@@ -16,7 +16,7 @@ questions about a render, and the **QA gate** at the end of this page turns the 
 
 ```bash
 scripts/qa/run_all.sh S05                         # one scene: render all its frames at 0.5x, check, report, gate
-scripts/qa/run_all.sh Main                        # the film (+ beat sync); ~6 min on the shared box
+scripts/qa/run_all.sh Main                        # the film (+ beat sync); ~5 min on the shared box
 scripts/qa/run_all.sh KitDemo --out=out/qa/kit    # any composition (dev comps: scenes = detected cuts)
 scripts/qa/sheets.sh S05 0 4 2 out/qa/s05_sheets  # every 2nd frame of S05, 0-4 s, in 6x4 sheets
 python3 scripts/qa/beatsync.py                    # current cut offsets vs audio/music_cinematic.mid
@@ -113,7 +113,7 @@ flagged dead run (its length and frame range are printed in red, e.g. `46 dead f
 threshold. Ticks along the top = event onsets (sparse ticks = few new things). Grey line = caption-band change.
 Header: `S01  7.6/10 x FAIL`, then events/s, the longest gap between events, dead frames, dead runs over the limit.
 Typical pictures: a **pink slab with red stubs** = only the camera (or nothing) moves; **red/green alternating near
-the dashed line** = the scene lives on slow idle motion only (S02 today); **dense ticks and tall green** = builds.
+the dashed line** = the scene lives on slow idle motion only (Main's S02 today); **dense ticks and tall green** = builds.
 
 ---
 
@@ -228,7 +228,20 @@ Scene agents: run `scripts/qa/run_all.sh SNN` before calling a scene done, read 
 excused windows) and compares with the analysis streams' hand-built measurements. Results:
 `scripts/qa/calib/calibration.md`, charts `scripts/qa/calib/ref1/deadframes.png`, `scripts/qa/calib/ref2/deadframes.png`.
 
-CALIBRATION_TABLE
+| metric | ref 1 measured | ref 1 tool | ref 2 measured | ref 2 tool |
+|---|---|---|---|---|
+| events per second | 5.9 | **5.58** | 3.6 | 5.40 |
+| median gap between event onsets | 4 f | 3 f | - | 1 f |
+| longest event gap outside transitions | 0.97 s | 1.47 s (the coins, 16.4-17.9 s) | - | - |
+| near-static / dead frames | 3.6 % (< 0.1 % px) | **4.7 %** | 35.6 % | **32.8 %** |
+| longest near-static / dead run | 0.2 s (< 1,000 px), 0.4 s (< 3,000 px) | **0.10 s**, 0.17 s (< 3,000 px) | 1.53 s | **1.20 s** (shot 16) |
+| scene life scores | - | 8.9-10.0, mean **9.30**; **6/6 pass**; 0 dead runs > 0.40 s | - | 7.0-10.0, mean **8.89**; 6/16 pass the strict gate |
+| framecheck | - | 0 errors, 0 warnings | - | 0 errors, 4 UI-zone warnings (its framing) |
+
+Reference 1 (our density target) passes the gate in every scene with no dead run over 0.40 s. Reference 2 is "the
+floor" (BRIEF): its 11 dead runs of 0.43-1.20 s are its genuine holds (verified on frames: a camera pull-out with
+nothing else moving), all shorter than its own measured 1.53 s maximum, so there are no false dead runs; the gate
+rightly flags them against our stricter 0.40 s limit.
 
 How the thresholds were chosen:
 
@@ -254,7 +267,14 @@ How the thresholds were chosen:
 
 ## 7. Results on the dev compositions and the film (2026-10-24)
 
-RESULTS_TABLE
+| composition | frames | life (deadframes) | framecheck | chart / report |
+|---|---|---|---|---|
+| KitDemo | 360 | **10.0/10 PASS** (11.7 events/s, longest dead 0.27 s); gate PASS | 0 errors, 3 UI-zone warnings | `out/qa/KitDemo/deadframes.png`, `REPORT.md` |
+| CineDemo | 660 | C01 **9.1 FAIL** (28 dead frames f4-f31: a multiplane crane with drifting clouds and nothing else moving, i.e. camera only), C02 **10.0**, C03 **10.0**, C04 **9.6 FAIL** (16 dead frames f148-f163) | 3 caption errors: a white caption crossing a light column edge (f174-f177) and a passer-by's hair (f300-f302) during wipes, a dark caption over the dark facade for 3 frames at a vignette cut (f477-f479); busy-facade warnings f571-f659 | `out/qa/CineDemo/deadframes.png`, `framecheck_frames.png` |
+| Main | 2,333 | S01 **7.6 FAIL** (46 dead frames 3.0-4.5 s after "switched themselves off": allow-list it if the hold is deliberate), S02 **4.0 FAIL** (0.9 events/s: lives on slow idle motion only), S03-S13 **0.4-2.4** (not built yet: placeholders) | 4 caption errors: f143 (horizon line through the caption at the S02 push-through), f985-f991 and f1997-f2000 (white caption over light sky at the edge of the S07 / S12 foreground wipes), f1420-f1494 (S09 has `captionTone: light` but its placeholder sky is day: 1.78:1) | `out/qa/Main/deadframes.png`, `REPORT.md` |
+
+Main beat sync: see section 4 (now 1/12 cuts on a beat, max 277 ms; the fit puts 12/12 on beats). The 6 cuts the
+detector finds in the pixels (placeholders look alike) cross-check at 1/6 on-beat, max 296 ms.
 
 ---
 
@@ -278,4 +298,4 @@ RESULTS_TABLE
   long wipe; the fit moves beats by up to ~0.4 s, so the bed's bar lines that were placed on words move too. The
   librosa path assumes 4/4 for downbeats.
 - **Performance:** ~45 ms/frame render (0.5x, concurrency 2) + ~60 ms/frame deadframes + ~100 ms/frame framecheck (in
-  parallel): Main (2,333 frames) takes about 6 minutes.
+  parallel): Main (2,333 frames) takes about 5 minutes (282 s).

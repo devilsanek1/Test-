@@ -158,7 +158,16 @@ const SetThumbs: React.FC = () => {
 
 /** QA modes (input props): look 'paper' = the ink-on-white line-art state (frame 0 / loop), 'fills' = fills only;
  *  unbuildAt = run the un-build (exit recipe) on every prop cell from that sheet time (0.5 s). */
-export type SharedKitSheetProps = {look?: 'paper' | 'fills'; unbuildAt?: number; /** 'context' = props at FILM SIZE on plain walls (1:1 check). */ mode?: 'sheet' | 'context'; /** false = skip the set thumbnails (props-only cost check). */ thumbs?: boolean};
+export type SharedKitSheetProps = {
+  look?: 'paper' | 'fills';
+  unbuildAt?: number;
+  /** 'context' = props at FILM SIZE on plain walls (1:1 check); 'lock' = the P1 bolt test at 200 px (S02 close-up) and
+   *  100 px on a teal door, no bracket, + the fixed / blueprint / paper variants; 'heads' = back-view heads at film and
+   *  phone size. Both loop on a 5 s clock. */
+  mode?: 'sheet' | 'context' | 'lock' | 'heads';
+  /** false = skip the set thumbnails (props-only cost check). */
+  thumbs?: boolean;
+};
 
 const Modes: React.FC<SharedKitSheetProps & {children?: React.ReactNode}> = ({look, unbuildAt, children}) => {
   let el = <>{children}</>;
@@ -214,14 +223,77 @@ const ContextMode: React.FC = () => {
   );
 };
 
+/** Back-view heads (caps, nape, collars) at film size and at a phone thumbnail scale (x 0.3). */
+const HeadsMode: React.FC = () => {
+  const t = useTime() % 5;
+  const row = (k: number) => (
+    <>
+      <Keeper x={150} y={600} h={300} seed="hk1" />
+      <Caretaker x={360} y={600} h={300} seed="hc1" />
+      <Keeper x={560} y={600} h={300} cap={palette.sage} seed="hk2" />
+      <Caretaker x={760} y={600} h={300} cap={palette.teal} seed="hc2" />
+      <EdgeOnlooker x={950} y={420} head={110} hair="cap" seed="ho1" frameBottom={k ? 2400 : 760} />
+    </>
+  );
+  return (
+    <TimeProvider global={t} offset={0}>
+      <rect width={1080} height={1920} fill={skies.day} />
+      <rect x={0} y={0} width={1080} height={760} fill={palette.sand} />
+      {row(0)}
+      <XG m={mat.compose(mat.translate(40, 900), mat.scale(0.3))}>
+        <rect x={0} y={0} width={1080} height={760} fill={palette.sand} />
+        {row(1)}
+      </XG>
+      <XG m={mat.compose(mat.translate(420, 900), mat.scale(0.3))}>
+        <Look fills="paper">
+          <rect x={0} y={0} width={1080} height={760} fill={palette.white} />
+          {row(1)}
+        </Look>
+      </XG>
+      <EdgeOnlooker x={140} y={1500} head={110} hair="cap" seed="ho2" />
+      <EdgeOnlooker x={420} y={1520} head={100} hair="cap" body={palette.teal} seed="ho3" />
+      <EdgeOnlooker x={700} y={1500} head={104} seed="ho4" />
+      <Ghost x={930} y={1700} h={260} seed="hg1" />
+    </TimeProvider>
+  );
+};
+
+/** The P1 read check: the bolt test at the S02 close-up size (200 px) and at 100 px, on a teal door, without the bracket. */
+const LockMode: React.FC = () => {
+  const t = useTime() % 5;
+  const door = (x: number, y: number, w: number, h: number) => <rect x={x} y={y} width={w} height={h} fill={palette.teal} />;
+  const seq = {screwsOutAt: 0.3, coverOpenAt: 0.55, boltTestAt: 1.0};
+  return (
+    <TimeProvider global={t} offset={0}>
+      <rect width={1080} height={1920} fill={palette.sand} />
+      {door(150, 180, 340, 520)}
+      <Lock x={320} y={440} size={200} {...seq} bit seed="qa1" />
+      {door(640, 300, 260, 300)}
+      <Lock x={770} y={450} size={100} {...seq} bit seed="qa2" />
+      {door(80, 900, 260, 300)}
+      <Lock x={210} y={1050} size={100} state="fixed" coverOpenAt={0.55} boltTestAt={1.0} seed="qa3" />
+      <rect x={400} y={900} width={260} height={300} fill={palette.white} />
+      <Lock x={530} y={1050} size={100} state="blueprint" at={0.2} seed="qa4" />
+      <Look fills="paper">
+        <rect x={720} y={900} width={260} height={300} fill={palette.white} />
+        <Lock x={850} y={1050} size={100} {...seq} seed="qa5" />
+      </Look>
+      {door(150, 1320, 340, 420)}
+      <Lock x={320} y={1530} size={200} {...seq} gapMarkAt={1.72} bit seed="qa6" />
+      <rect x={640} y={1400} width={260} height={260} fill={palette.white} />
+      <Lock x={770} y={1530} size={100} state="sketch" at={0.2} seed="qa7" />
+    </TimeProvider>
+  );
+};
+
 export const SharedKitSheet: React.FC<SharedKitSheetProps> = ({look, unbuildAt, mode, thumbs = true}) => {
   useCaptionFont();
-  if (mode === 'context') {
+  if (mode === 'context' || mode === 'lock' || mode === 'heads') {
     return (
       <AbsoluteFill style={{background: skies.day}}>
         <svg width={1080} height={1920} viewBox="0 0 1080 1920">
           <Modes look={look} unbuildAt={unbuildAt}>
-            <ContextMode />
+            {mode === 'lock' ? <LockMode /> : mode === 'heads' ? <HeadsMode /> : <ContextMode />}
           </Modes>
         </svg>
       </AbsoluteFill>

@@ -10,9 +10,12 @@
 //
 // Anchor: (x, y) = the BOX CENTRE. size = box height in world px (width = 0.8 x size). Local design units: the box is
 // 80 x 100 (x -40..40, y -50..50); `LOCK` lists the local points (gap, strike, keyhole...) and `lockPoint()` maps them.
-// The flaw: inside (cover open), a chunky bolt (0.22 of the box height) shoots ~43 % of the way to the strike plate and
-// STOPS SHORT with a knock-back, leaving the dark receiving slot in the strike empty; a dashed ink bracket and a small ink
-// ring mark the gap; Bit (`bit`) peeks out of the slot after the empty slot has held ~0.3 s. Fixed variant: same silhouette in sage, full-length bolt, cream check tag
+// The flaw: inside (cover open), a long cream BAR bolt (13 units tall, bevelled tip) aimed straight at a high-contrast
+// receiving SOCKET (a tealDark notch in the strike, lined by a cream rim, on the bolt's axis). Before the test a short stub
+// already points at it; on the test the bar shoots ~77 % of the way (from the guide to the socket mouth) and STOPS SHORT
+// with a knock-back, a 9-unit gap from the socket ("so close"); then a dashed cream ghost of the full bolt slides into the
+// socket and holds 0.3 s (the "should be"); then Bit peeks out of the socket into the gap. The dashed bracket + ring
+// (`gapMarkAt`) are optional extras. Fixed variant: same silhouette in sage, the bar seated in the socket, cream check tag
 // on a loop (S06 builds it body -> loop -> tag at 0.07 s steps). LOD by on-screen height: < 7 px a flat dot, < 28 px a
 // simple box (no hinge ticks / screw slots), full detail above (survives the zoom-3.25 dive and the 80x100 close-up).
 
@@ -42,17 +45,24 @@ export const LOCK = {
     [0, -44],
     [0, 44],
   ] as Pt[],
-  /** Bolt tip x: retracted (flush with the housing), short (the flaw: ~43 % of the way), full (the fix: into the slot). */
-  tip: {retracted: -11, short: 1, full: 25},
-  /** Bolt half-height (the bolt is 0.22 of the box height: chunky enough to read at phone size). */
-  boltR: 11,
-  strike: [17, -19, 12, 38] as [number, number, number, number],
-  /** The dark receiving slot cut into the strike plate (the hole the bolt never reaches). */
-  slot: [19, -12, 7, 24] as [number, number, number, number],
-  /** Centre of the gap between the short bolt and the strike plate (where Bit lives). */
-  gap: [9, 0] as Pt,
-  /** Where Bit peeks out of the slot (his feet; flip him so he faces the bolt). */
-  peek: [17, 8] as Pt,
+  /** The bolt guide the bar slides out of (x, y, w, h); its right edge (x -21) is where the bar comes out. */
+  housing: [-28, -12, 7, 24] as [number, number, number, number],
+  /** Bolt tip x: retracted (a 5-unit stub already aimed at the socket), short (the flaw: stops ~77 % of the way from the
+   *  guide to the socket mouth, a 9-unit gap left), full (the fix: seated in the socket). */
+  tip: {retracted: -16, short: 9, full: 24},
+  /** Bolt half-height (a bar 13 units tall, up to 30 long at the short stop: reads as a bar, not a block). */
+  boltR: 6.5,
+  /** Strike block; its left face (x 18) is the socket mouth. */
+  strike: [18, -19, 11, 38] as [number, number, number, number],
+  /** The receiving socket: a tealDark notch in the strike's left face on the bolt's axis (the hole it never reaches),
+   *  darker than the teal cavity. */
+  slot: [18, -8, 6.5, 16] as [number, number, number, number],
+  /** The cream rim lining the socket (outer notch edge): 3 units round the socket. */
+  rim: [18, -11, 9.5, 22] as [number, number, number, number],
+  /** Centre of the gap between the short bolt's tip and the socket mouth (where Bit lives). */
+  gap: [13.5, 0] as Pt,
+  /** Where Bit peeks out of the socket (his feet on the socket floor; flip him so he faces the bolt). */
+  peek: [18, 8] as Pt,
   /** Tag hang point of the fixed variant (top-right corner loop). */
   loop: [33, -50] as Pt,
 };
@@ -72,9 +82,14 @@ export type LockProps = PropBase & {
   coverOpenAt?: number;
   /** The cover swings shut again. */
   coverCloseAt?: number;
-  /** The bolt slides and stops short (the fixed variant reaches the strike). */
+  /** The bolt shoots out (0.2 s) and stops short with a knock-back (the fixed variant seats in the socket). */
   boltTestAt?: number;
-  /** Dashed bracket + ring at the gap (0.17 s). */
+  /** The "should be": a dashed cream ghost of the full bolt slides from the short tip into the socket (0.07 s) and holds
+   *  `shouldBeDur` (0.3 s), then is gone (one frame). Default boltTestAt + 0.36 (right after the recoil) on a flawed
+   *  lock; false = never. */
+  shouldBeAt?: number | false;
+  shouldBeDur?: number;
+  /** Optional dashed dimension bracket + ring at the gap (0.17 s); the read works without it. */
   gapMarkAt?: number;
   /** A quick cream glint on the box. */
   glintAt?: number;
@@ -95,10 +110,11 @@ export type LockProps = PropBase & {
   rider?: React.ReactNode;
   /** Children in lock-local units drawn inside the opened cavity (under the cover). */
   inside?: React.ReactNode;
-  /** Bit lives in the slot: he peeks out of it toward the short bolt (inside the cavity, under the cover). `peekAt`
-   *  defaults to boltTestAt + 0.55 (the bolt stops at +0.2, recoils, then the EMPTY slot holds ~0.3 s). size = his
-   *  length in lock-local units (default 14: he fills the gap). */
-  bit?: boolean | {peekAt?: number; hideAt?: number; size?: number; alertAt?: number; seed?: Seed};
+  /** Bit lives in the socket: he peeks out of it into the gap toward the short bolt (inside the cavity, under the cover).
+   *  `peekAt` defaults to boltTestAt + 0.72 (the bolt stops at +0.2, recoils, the ghost "should be" flashes 0.36-0.66).
+   *  size = his length in lock-local units (default 15: 30 px on a 200 px close-up, so his pupil shows); peekAmount
+   *  default 0.28 (head and antennae in the gap, the rest inside the socket). */
+  bit?: boolean | {peekAt?: number; hideAt?: number; size?: number; alertAt?: number; peekAmount?: number; seed?: Seed};
   /** Force a level of detail (0 dot, 1 simple, 2 full). Default by on-screen size. */
   lod?: 0 | 1 | 2;
 };
@@ -164,11 +180,11 @@ export const Lock: React.FC<LockProps> = (p) => {
   const tipTarget = fixed ? LOCK.tip.full : LOCK.tip.short;
   let tip = tipTarget;
   if (p.boltTestAt !== undefined) {
-    // spring-shot slide (0.2 s), then it hits its stop SHORT of the slot and knocks back 3.5 units (0.14 s); the
-    // fixed bolt seats in the slot with a 1-unit settle
+    // shot slide (0.2 s), then it hits its stop SHORT of the socket and knocks back 3 units (0.14 s); the fixed bolt
+    // seats in the socket with a 1-unit settle
     const q = prog(t, p.boltTestAt, 0.2, E.outCubic);
     const dt = t - p.boltTestAt - 0.2;
-    const knock = dt > 0 && dt < 0.14 ? -Math.sin((dt / 0.14) * Math.PI) * (fixed ? 1 : 3.5) : 0;
+    const knock = dt > 0 && dt < 0.14 ? -Math.sin((dt / 0.14) * Math.PI) * (fixed ? 1 : 3) : 0;
     tip = lerp(LOCK.tip.retracted, tipTarget, q) + knock;
   }
   const mech = open > 0.02 || paperish;
@@ -206,52 +222,78 @@ export const Lock: React.FC<LockProps> = (p) => {
   if (!paperish && lod === 2) fill('shade', rectPath(-40, -41, 8, 82), shade, T(0.2), {offset: false, mode: 'snap'});
 
   // cavity + mechanism (visible when the cover is open, and always in blueprint / sketch)
+  // marks drawn ON the dark cavity are cream in colour (ink on tealDark does not read), ink on paper / white
+  const onPaper = paperish || paperLook;
+  const markCol = onPaper ? palette.ink : palette.cream;
   if (mech) {
     const cav = rectPath(COV[0], COV[1], COV[2], COV[3]);
-    if (!paperish) fill('cav', cav, palette.tealDark, undefined, {offset: false, mode: 'none'});
-    // bolt housing, bolt, strike plate
-    const hx = -27;
-    const hb = -11; // housing right edge (where the bolt comes out)
+    // the cavity is teal (one step lighter than the socket, so the hole reads and ink Bit shows on it)
+    if (!paperish) fill('cav', cav, palette.teal, undefined, {offset: false, mode: 'none'});
+    const [hx, hy0, hw, hh] = LOCK.housing;
+    const hb = hx + hw; // guide right edge (where the bar comes out)
     const br = LOCK.boltR;
-    const housing = rectPath(hx, -17, 16, 34);
-    const boltL = Math.max(0, tip - hb);
     const st = LOCK.strike;
     const sl = LOCK.slot;
+    const rm = LOCK.rim;
+    const f2 = (v: number) => v.toFixed(2);
+    // the bar: cream, bevelled tip (it points at the socket)
+    const boltL = Math.max(0, tip - hb);
+    const barD = (x0: number, x1: number) => {
+      const bev = Math.min(2.4, Math.max(0, x1 - x0) * 0.4);
+      return `M${f2(x0)} ${-br}H${f2(x1 - bev)}L${f2(x1)} ${f2(-br + bev)}V${f2(br - bev)}L${f2(x1 - bev)} ${br}H${f2(x0)}`;
+    };
     if (!paperish) {
-      fill('housing', housing, body, undefined, {offset: false, mode: 'none'});
+      fill('housing', rectPath(hx, hy0, hw, hh), body, undefined, {offset: false, mode: 'none'});
       fill('strike', rectPath(st[0], st[1], st[2], st[3]), body, undefined, {offset: false, mode: 'none'});
+      fill('rim', rectPath(rm[0], rm[1], rm[2], rm[3]), coverCol, undefined, {offset: false, mode: 'none'});
       fill('slot', rectPath(sl[0], sl[1], sl[2], sl[3]), palette.tealDark, undefined, {offset: false, mode: 'none'});
-      if (boltL > 0.3) fill('bolt', rectPath(hb, -br, boltL, br * 2), palette.cream, undefined, {offset: false, mode: 'none'});
+      if (boltL > 0.3) fill('bolt', barD(hb, tip) + 'Z', palette.cream, undefined, {offset: false, mode: 'none'});
     }
     const mw = lod === 2 ? 0.7 : 0.9;
     if (blue || sketch || paperLook) ink('cavI', rect(COV[0], COV[1], COV[2], COV[3], {seed: `${seed}/cv`, over: 3}), T(0.2), mw);
-    const boltI = boltL > 0.3 ? `M${hb} ${-br}H${tip.toFixed(2)}V${br}H${hb}` + (lod === 2 ? `M${hb + 3} ${-br + 4}H${(tip - 3).toFixed(2)}` : '') : '';
-    ink('mechI', `M${hx} -17H${hb}V17H${hx}Z` + `M${st[0]} ${st[1]}H${st[0] + st[2]}V${st[1] + st[3]}H${st[0]}Z` + `M${sl[0]} ${sl[1]}H${sl[0] + sl[2]}V${sl[1] + sl[3]}H${sl[0]}Z`, blue || sketch ? T(0.3) : undefined, mw, {taper: false, vary: 0});
+    // guide + strike as a "C" round the socket notch (rim outer edge) + the socket's inner edge (thinner)
+    const strikeI = `M${st[0]} ${st[1]}H${st[0] + st[2]}V${st[1] + st[3]}H${st[0]}V${rm[1] + rm[3]}H${rm[0] + rm[2]}V${rm[1]}H${st[0]}Z`;
+    ink('mechI', `M${hx} ${hy0}H${hb}V${hy0 + hh}H${hx}Z` + strikeI, blue || sketch ? T(0.3) : undefined, mw, {taper: false, vary: 0});
+    // the socket's inner edge is the cream / tealDark colour edge; ink only where there are no fills (paper states)
+    if (onPaper) ink('slotI', `M${sl[0]} ${sl[1]}H${sl[0] + sl[2]}V${sl[1] + sl[3]}H${sl[0]}`, blue || sketch ? T(0.33) : undefined, mw * 0.7, {taper: false, vary: 0});
+    const boltI = boltL > 0.3 ? barD(hb, tip) + (lod === 2 && boltL > 8 ? `M${hb + 2} ${f2(-br + 3.4)}H${f2(tip - 4)}` : '') : '';
     if (boltI) ink('boltI', boltI, blue || sketch ? T(0.36) : undefined, mw, {taper: false, vary: 0});
-    if (sketch) ink('mechI2', rect(hx + 1.5, -16, 16, 34, {seed: `${seed}/s2`, over: 4}) + rect(hb + 1, -br + 2, tip - hb, br * 2 - 3, {seed: `${seed}/s3`, over: 5}), T(0.38), 0.55);
+    if (sketch) ink('mechI2', rect(hx + 1.2, hy0 + 1, hw, hh, {seed: `${seed}/s2`, over: 3}) + rect(hb + 1, -br + 1.5, Math.max(1, tip - hb), br * 2 - 2, {seed: `${seed}/s3`, over: 4}) + rect(st[0] + 1, st[1] + 1.2, st[2], st[3], {seed: `${seed}/s4`, over: 3}), T(0.38), 0.55);
     if (blue) {
       // centre line through the bolt (dash-dot) and a dimension line under the box
       ink('cl', `M-48 0H-40M-36 0H-34M-30 0H-20M-16 0H-14M-10 0H0M4 0H6M10 0H20M24 0H26M30 0H40M44 0H48`, T(0.45), 0.4, {taper: false, order: 'all'});
       ink('dim', line(-40, 62, 40, 62, {over: [0, 0], seed: `${seed}/dm`}) + `M-40 56V68M40 56V68M-40 62L-33 59M-40 62L-33 65M40 62L33 59M40 62L33 65`, T(0.5), 0.45, {taper: false});
     }
+    // the "should be": a dashed ghost of the full bolt slides from the short tip into the socket and holds
+    const sbAt = p.shouldBeAt === false || fixed ? undefined : p.shouldBeAt ?? (p.boltTestAt !== undefined ? p.boltTestAt + 0.36 : undefined);
+    if (sbAt !== undefined && t >= sbAt && t < sbAt + (p.shouldBeDur ?? 0.3)) {
+      const x0 = LOCK.tip.short + 0.8;
+      const x1 = lerp(x0, LOCK.tip.full, prog(t, sbAt, 0.07, E.outCubic));
+      const bev = Math.min(2.4, (x1 - x0) * 0.4);
+      const d = `M${f2(x0)} ${-br}H${f2(x1 - bev)}L${f2(x1)} ${f2(-br + bev)}V${f2(br - bev)}L${f2(x1 - bev)} ${br}H${f2(x0)}`;
+      out.push(<Ink key="should" d={d} width={W * 0.62} color={markCol} dash="3.2 2.6" cap="butt" seed={`${seed}/sb`} />);
+    }
     out.push(<g key="inside">{p.inside}</g>);
     if (p.bit) {
       const b = p.bit === true ? {} : p.bit;
-      const pk = b.peekAt ?? (p.boltTestAt !== undefined ? p.boltTestAt + 0.55 : undefined);
-      out.push(<Bit key="bit" x={LOCK.peek[0]} y={LOCK.peek[1]} size={b.size ?? 14} flip peekAt={pk} state={pk === undefined ? 'peek' : undefined} hideAt={b.hideAt} alertAt={b.alertAt} seed={b.seed ?? `${seed}/bit`} />);
+      const pk = b.peekAt ?? (p.boltTestAt !== undefined ? p.boltTestAt + 0.72 : undefined);
+      out.push(
+        <Bit key="bit" x={LOCK.peek[0]} y={LOCK.peek[1]} size={b.size ?? 15} flip peekAt={pk} peekAmount={b.peekAmount ?? 0.28} state={pk === undefined ? 'peek' : undefined} hideAt={b.hideAt} alertAt={b.alertAt} seed={b.seed ?? `${seed}/bit`} />,
+      );
     }
   }
 
-  // gap mark (dashed bracket + small ring)
+  // gap mark (optional: dashed dimension bracket above the gap + a small ring round it)
   if (p.gapMarkAt !== undefined || blue || sketch) {
     const ga = p.gapMarkAt ?? T(0.55);
     if (ga === undefined || t >= ga) {
       const x0 = LOCK.tip.short;
       const x1 = LOCK.strike[0];
-      let dash = `M${x0} -29V-23M${x1} -29V-23`;
-      for (let xx = x0 + 1.5; xx < x1 - 1; xx += 4) dash += `M${xx.toFixed(1)} -26H${Math.min(x1 - 1.5, xx + 2.2).toFixed(1)}`;
-      ink('gapB', dash, ga, 0.55, {taper: false, dur: 0.12});
-      ink('gapR', circle(LOCK.gap[0], LOCK.gap[1], 11, {seed: `${seed}/gr`, overlap: 20}), bt(ga, 0.05), 0.6, {taper: false, dur: 0.12});
+      const yb = LOCK.strike[1] - 4;
+      let dash = `M${x0} ${yb - 3}V${yb + 3}M${x1} ${yb - 3}V${yb + 3}`;
+      for (let xx = x0 + 1.3; xx < x1 - 1; xx += 3.4) dash += `M${xx.toFixed(1)} ${yb}H${Math.min(x1 - 1.3, xx + 1.8).toFixed(1)}`;
+      ink('gapB', dash, ga, 0.55, {taper: false, dur: 0.12, color: markCol});
+      ink('gapR', circle(LOCK.gap[0], LOCK.gap[1], 8, {seed: `${seed}/gr`, overlap: 20}), bt(ga, 0.05), 0.6, {taper: false, dur: 0.12, color: markCol});
     }
   }
 

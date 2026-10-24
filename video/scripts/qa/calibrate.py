@@ -17,6 +17,7 @@ import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.dont_write_bytecode = True   # keep scripts/qa free of __pycache__
 sys.path.insert(0, HERE)
 import qalib as Q  # noqa: E402
 

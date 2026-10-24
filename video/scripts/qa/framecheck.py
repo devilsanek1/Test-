@@ -31,6 +31,7 @@ import time
 import cv2
 import numpy as np
 
+sys.dont_write_bytecode = True   # keep scripts/qa free of __pycache__
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import qalib as Q  # noqa: E402
 
