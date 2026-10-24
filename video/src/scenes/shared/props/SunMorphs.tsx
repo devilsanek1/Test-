@@ -59,8 +59,9 @@ export type PowerGlyphProps = {
 export const PowerGlyph: React.FC<PowerGlyphProps> = ({r = 150, ring: ringIn, width: wIn, x = 0, y = 0, color = palette.cream, at, inkOnAt, glintAt, colorAt, toColor, fly, outAt, seed = 'pwr'}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
-  let ring = ringIn ?? (r * 56) / 150;
-  const w0 = wIn ?? (r * 10) / 150;
+  const ring0 = ringIn ?? (r * 56) / 150;
+  const w0 = wIn ?? (ring0 * 10) / 56;
+  let ring = ring0;
   let cx = x;
   let cy = y;
   if (fly && t >= fly.at) {
@@ -70,7 +71,7 @@ export const PowerGlyph: React.FC<PowerGlyphProps> = ({r = 150, ring: ringIn, wi
     cy = lerp(y, ty, q) - Math.sin(Math.PI * q) * (fly.arc ?? 80);
     ring = lerp(ring, tr, q);
   }
-  const w = wIn !== undefined ? w0 * (ring / (ringIn ?? ring)) : (ring * 10) / 56;
+  const w = (w0 * ring) / ring0;
   const col = colorAt !== undefined && toColor && t >= colorAt ? toColor : color;
   const pop = at !== undefined ? springAt(t, at, springs.pop) : 1;
   const outK = outAt !== undefined ? 1 - E.inCubic(prog(t, outAt, 0.12)) : 1;
@@ -197,8 +198,8 @@ export const SunPie: React.FC<SunPieProps> = ({r, n, cream = 0, spokesAt, slices
   idx.forEach((i, j) => {
     const sa = slicesAt === undefined ? undefined : slicesAt + j * sliceStagger;
     if (sa !== undefined && t < sa) return;
-    let k = sa !== undefined ? 1 + 0.06 * Math.sin(Math.PI * Math.min(1, prog(t, sa, 0.22))) : 1;
-    if (sa !== undefined) k *= Math.min(1, springAt(t, sa, springs.snappy) * 1.0 + 0.0);
+    // pop with the +6 % overshoot (snappy spring), then optional pulses
+    let k = sa !== undefined ? springAt(t, sa, {stiffness: 420, damping: 25, mass: 1}) : 1;
     for (const pa of pulses) if (t >= pa && t < pa + 0.22) k *= 1 + 0.06 * Math.sin(Math.PI * ((t - pa) / 0.22));
     if (solidAt !== undefined) k *= 1 - E.inCubic(prog(t, solidAt + j * 0.03, 0.12));
     if (k <= 0.002) return;
