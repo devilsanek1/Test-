@@ -1,0 +1,8 @@
+[
+  {"s": 0.16, "e": 2.16, "lines": [{"text": "Government websites", "s": 0.16}, {"text": "in four countries", "s": 1.12}], "highlights": [{"text": "four countries", "s": 1.36}]},
+  {"s": 2.16, "e": 3.76, "lines": [{"text": "just switched", "s": 2.16}, {"text": "themselves off.", "s": 2.8}], "highlights": [{"text": "off.", "s": 3.28}]},
+  {"s": 3.76, "e": 4.8, "lines": [{"text": "Nobody hacked them.", "s": 3.76}], "highlights": [{"text": "hacked", "s": 4.08}]},
+  {"s": 4.8, "e": 7.04, "lines": [{"text": "They were fixing", "s": 4.8}, {"text": "a security bug in PHP,", "s": 5.36}], "highlights": [{"text": "bug", "s": 5.84}]},
+  {"s": 7.04, "e": 8.88, "lines": [{"text": "the programming language", "s": 7.04}, {"text": "behind WordPress", "s": 8.0}], "highlights": [{"text": "WordPress", "s": 8.24}]},
+  {"s": 8.88, "e": 10.88, "lines": [{"text": "and about 7 out of 10", "s": 8.88}, {"text": "websites.", "s": 10.08}], "highlights": [{"text": "7 out of 10", "s": 9.04}]}
+]

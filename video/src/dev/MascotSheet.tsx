@@ -49,7 +49,7 @@ const Flashlight: React.FC = () => (
     <path d="M-4 -2 L-4 -26 L4 -26 L4 -2 Z" fill={palette.grey} transform="translate(1.6 1)" />
     <path d="M-7 -26 L-8 -36 L8 -36 L7 -26 Z" fill={palette.tan} transform="translate(1.6 1)" />
     <path d="M-4 -2 L-4 -26 M4 -26 L4 -2 M-7 -26 L-8 -36 L8 -36 L7 -26 Z M-4 -26 L4 -26" stroke={palette.ink} strokeWidth={1.8} fill="none" strokeLinecap="round" />
-    <path d="M-9 -38 L-30 -88 M9 -38 L30 -88" stroke={palette.ink} strokeWidth={1.2} strokeDasharray="3 5" />
+    <path d="M-10 -40 L-17 -50 M0 -41 L0 -53 M10 -40 L17 -50" stroke={palette.ink} strokeWidth={1.4} strokeLinecap="round" />
   </g>
 );
 

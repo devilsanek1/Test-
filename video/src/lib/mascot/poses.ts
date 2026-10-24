@@ -748,13 +748,13 @@ export const POSE_BUILDERS: Record<PoseName, (pen: Pen, ctx: PoseCtx) => void> =
 /** Approximate local-space bounds of each pose (for layout and clipping). Feet at y=0. */
 export const POSE_BOUNDS: Record<PoseName, {x0: number; x1: number; y0: number; y1: number}> = {
   'sit-back': {x0: -52, x1: 52, y0: -100, y1: 28},
-  'sit-front': {x0: -54, x1: 54, y0: -100, y1: 2},
+  'sit-front': {x0: -54, x1: 54, y0: -100, y1: 2}, // amount=1 (trunk dangle): y1 = 24
   'stand-side': {x0: -52, x1: 64, y0: -88, y1: 2},
   'walk-side': {x0: -52, x1: 66, y0: -90, y1: 2},
-  peek: {x0: -10, x1: 60, y0: -62, y1: 8},
+  peek: {x0: -8, x1: 66, y0: -72, y1: 6},
   'trunk-up': {x0: -58, x1: 60, y0: -112, y1: 2},
   hold: {x0: -54, x1: 70, y0: -100, y1: 2},
   'ears-cover': {x0: -50, x1: 50, y0: -96, y1: 2},
-  shrug: {x0: -56, x1: 56, y0: -104, y1: 2},
+  shrug: {x0: -56, x1: 56, y0: -112, y1: 2},
   sleep: {x0: -46, x1: 62, y0: -80, y1: 4},
 };

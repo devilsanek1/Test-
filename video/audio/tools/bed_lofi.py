@@ -62,7 +62,7 @@ for bar in range(1, NB + 1):
         _, pcs, _ = ch(bar, c0)
         vo = tones(pcs, 56, 72)[:4]
         if s in ("intro", "breath", "susp", "close") or (s == "leak" and bar == 10):
-            vel = (46 if bar == 1 else 50) if s != "breath" else 44
+            vel = (46 if bar == 1 else 50) if s != "breath" else (36 if bar == 15 else 42)
             for k, p in enumerate(vo):
                 ep.append((bar, c0 + 0.02 * k, c1 - c0 - 0.05, p, vel - 2 * k))
         elif s == "urgency":   # off-beat stabs
@@ -133,7 +133,8 @@ for bar in range(1, NB + 1):
             for k in range(4):
                 bn(k / 2, 70 + 4 * k, 0.4, pc=0)
     elif s in ("intro", "close", "susp", "breath"):
-        bn(0, 74 if s != "breath" else 62, min(3.0, nb - 0.1))
+        if bar != 15:
+            bn(0, 74 if s != "breath" else 54, min(3.0, nb - 0.1))
         if bar == 22:
             bn(2.0, 60, 1.9)
 
@@ -223,7 +224,11 @@ pos = rng.integers(0, n, size=int(6 * n / SR))
 crk[pos, rng.integers(0, 2, len(pos))] = rng.choice([-1, 1], len(pos)) * rng.uniform(0.02, 0.15, len(pos)) ** 2
 crk = fx(crk, [HighpassFilter(1500), LowpassFilter(6000)]) * db2a(-10)
 mix = fx(mix + hiss + crk, [HighpassFilter(38), LowpassFilter(9000)])
-mix = voice_carve(mix)
+# section dynamics (loop-safe: starts and ends at the same gain)
+arc = automation(n, [(0, -2), (g.t(4), 0), (g.t(10), -1), (g.t(11), 0), (g.t(12), 2), (g.t(14, 1), 2),
+                     (g.t(14, 1.6), -1), (g.t(15), -4), (g.t(16, 2), -3), (g.t(17), 0), (g.t(20), -0.5),
+                     (g.t(22), -1.5), (VIDEO_DUR, -2), (VIDEO_DUR + TAIL, -2)])
+mix = voice_carve(mix * arc[:, None])
 
 if __name__ == "__main__":
     for k, v in stems.items():

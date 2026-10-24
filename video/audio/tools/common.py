@@ -99,26 +99,38 @@ def short_term_lufs(x, sr=SR, win=3.0, hop=0.1):
 
 
 def click_report(x, sr=SR, thresh=8.0):
-    """Find derivative spikes: |second difference| > thresh * local robust level.
-    Returns count and the worst few (time, ratio)."""
+    """Find clicks = isolated discontinuities: |second difference| far above the local level AND
+    not followed by sustained high-frequency energy (a drum/hat/pluck onset keeps |d2| high for
+    several ms; a click/dropout does not). Returns (count, worst [(time, ratio)])."""
+    from scipy.ndimage import median_filter, maximum_filter1d
     m = to_stereo(x).mean(axis=1)
     d2 = np.abs(np.diff(m, 2))
     if d2.max() <= 0:
         return 0, []
-    # local robust scale (median over 20 ms) of |d2|
     k = int(0.02 * sr) | 1
-    from scipy.ndimage import median_filter, maximum_filter1d
     dec = 8
     loc = median_filter(d2[::dec], size=max(3, k // dec), mode="wrap")
-    loc = np.repeat(loc, dec)[: len(d2)] + 1e-6
+    loc = np.repeat(loc, dec)[: len(d2)] + 1e-7
     ratio = d2 / loc
-    # ignore spikes that belong to loud dense material (they are music transients):
-    # flag only where the spike is also big in absolute terms relative to local amplitude
     amp = maximum_filter1d(np.abs(m), int(0.01 * sr))[1:-1] + 1e-6
-    flag = (ratio > thresh * 6) & (d2 > 0.05 * amp)
-    idx = np.where(flag)[0]
-    worst = sorted([(round(i / sr, 4), round(float(ratio[i]), 1)) for i in idx], key=lambda t: -t[1])[:5]
-    return int(len(idx)), worst
+    cand = np.where((ratio > thresh * 6) & (d2 > 0.05 * amp))[0]
+    out = []
+    a, b = int(0.0005 * sr), int(0.005 * sr)
+    for i in cand:
+        before = np.median(d2[max(0, i - b):max(1, i - a)]) + 1e-7
+        after = np.median(d2[i + a:i + b]) if i + b < len(d2) else 0.0
+        if after / before < 3.0:  # nothing sustained after the spike -> genuine click
+            out.append((round(i / sr, 4), round(float(ratio[i]), 1)))
+    # merge hits within 2 ms
+    merged = []
+    for t_, r_ in out:
+        if merged and t_ - merged[-1][0] < 0.002:
+            if r_ > merged[-1][1]:
+                merged[-1] = (t_, r_)
+        else:
+            merged.append((t_, r_))
+    worst = sorted(merged, key=lambda t: -t[1])[:5]
+    return int(len(merged)), worst
 
 
 def band_energy_db(x, sr=SR, bands=((20, 60), (60, 120), (120, 250), (250, 500), (500, 1000), (1000, 2000),

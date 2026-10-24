@@ -1,57 +1,47 @@
+// KitDemo — 12 s showcase of the engine + kit (engine stream). A street corner builds up in the reference's
+// ink-sketch style: facades, a noticeboard, a bike, birds on a wire, a lamp, a tree, a crowd filling in,
+// line-art people drawing on, a website that locks and switches off, captions with highlights, and a
+// final un-build. Preview: scripts/sheet.sh KitDemo 0 12 24 out.png
 import React from 'react';
 import {Stage} from '../lib/timeline';
 import {Panel} from '../lib/Card';
 import {Sun} from '../lib/Sun';
 import {palette} from '../lib/theme';
-import {useTime} from '../lib/time';
-import {Person, Crowd, Building, Wall, Ground, Tree, Bike, BirdsOnWire, LampPost, BrowserWindow, Padlock, Noticeboard, Paper, Door} from '../lib/kit';
+import {CaptionBeat} from '../lib/Captions';
+import {Person, Crowd, Building, Ground, Tree, Bike, BirdsOnWire, LampPost, BrowserWindow, Padlock, Noticeboard, Paper} from '../lib/kit';
 
-const GalleryA: React.FC = () => (
-  <>
-    <Panel />
-    <Wall x={70} y={210} w={820} h={760} color={palette.cream} ground={110} />
-    <Sun cy={150} horizon={216} />
-    <Noticeboard x={150} y={380} w={400} h={300} legs={180}>
-      <Paper x={340} y={410} w={150} h={190} seed="pA" stamp />
-    </Noticeboard>
-    <Paper x={140} y={620} w={150} h={190} rot={-9} seed="pB" pin={false} />
-    <Door x={680} y={400} w={190} h={460} />
-    {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-      <Person key={i} x={150 + i * 112} y={1170} s={0.95} seed={`ga${i}`} style="line" acc={i === 4 ? ['phone', 'strap'] : i === 2 ? ['headphones', 'collar'] : undefined} hair={i === 3 ? 'long' : i === 5 ? 'beanie' : undefined} />
-    ))}
-  </>
-);
-
-const GalleryB: React.FC = () => (
-  <>
-    <Panel />
-    <Sun />
-    <Ground y={900} fillH={195} />
-    <Building x={70} y={900} w={300} floors={5} floorH={118} seed="b1" balconies={[2, 4]} shop={{sign: 'cart'}} roof="cornice" />
-    <Building x={370} y={900} w={200} floors={6} floorH={100} seed="b2" color={palette.tan} roof="mansard" win="tall" door={1} />
-    <Building x={570} y={900} w={170} floors={4} floorH={105} seed="b3" color={palette.mintPale} roof="flat" win="grid" shop={{sign: 'cross', awning: palette.salmon}} />
-    <Tree x={800} y={900} size={70} seed="t1" />
-    <LampPost x={750} y={905} h={300} seed="lp" lightAt={0} />
-    <BirdsOnWire x1={40} y1={230} x2={920} y2={250} sag={22} n={3} seed="bw" />
-    <Bike x={190} y={1000} seed="bk" basket />
-    <Crowd far={{y: 960, x0: 330, x1: 640, s: 0.3}} near={{y: 1110, x0: 280, x1: 900, s: 0.62}} rows={5} seed="cr" signs={0.1} />
-    <BrowserWindow x={560} y={380} w={300} h={260} url="gov.example" content="gov" />
-    <Padlock x={180} y={1200} size={90} />
-  </>
-);
-
-const Gallery: React.FC = () => {
-  const t = useTime();
-  return t < 6 ? <GalleryA /> : <GalleryB />;
-};
+const captions: CaptionBeat[] = [
+  {s: 0.25, lines: [{text: 'A street corner,', s: 0.25}, {text: 'drawn in ink.', s: 1.3}], highlights: [{text: 'ink', s: 1.75}]},
+  {s: 3.0, lines: [{text: 'People gather,', s: 3.0}, {text: 'the crowd fills in.', s: 4.1}], highlights: [{text: 'crowd', s: 4.4}]},
+  {s: 6.2, lines: [{text: 'The site locks up', s: 6.2}, {text: 'and switches off.', s: 7.4}], highlights: [{text: 'off.', s: 8.0}]},
+  {s: 9.3, lines: [{text: 'Then everything', s: 9.3}, {text: 'un-builds.', s: 10.1}], highlights: [{text: 'un-builds.', s: 10.3}]},
+];
 
 export const KitDemo: React.FC = () => (
-  <Stage
-    captions={[
-      {s: 0.0, lines: [{text: 'But normally they march', s: 0}, {text: 'against one law,', s: 0}], highlights: [{text: 'one law', s: 0}]},
-      {s: 6.0, lines: [{text: 'Half a million came.', s: 6}], highlights: [{text: 'Half a million', s: 6}]},
-    ]}
-  >
-    <Gallery />
+  <Stage captions={captions} unbuild={{at: 10.45, dur: 1.45}}>
+    <Panel />
+    <Sun at={0.05} breathe pulse={[8.05]} />
+    <Ground y={880} fillH={215} at={0.1} lines={2} />
+    <BirdsOnWire x1={60} y1={262} x2={900} y2={236} sag={16} us={[0.6, 0.645, 0.69]} at={1.5} flyAt={9.0} seed="kd-birds" />
+    <Building x={70} y={880} w={290} floors={5} floorH={118} at={0.2} seed="kd-a" balconies={[2, 4]} shop={{sign: 'cart'}} roof="cornice" />
+    <Building x={360} y={880} w={190} floors={6} floorH={100} at={0.6} seed="kd-b" color={palette.tan} roof="mansard" door={1} />
+    <Building x={550} y={880} w={200} floors={4} floorH={110} at={1.0} seed="kd-c" color={palette.mintPale} roof="flat" win="grid" shop={{sign: 'cross', awning: palette.salmon}} />
+    <LampPost x={566} y={884} h={300} at={1.6} lightAt={6.8} seed="kd-lamp" />
+    <Tree x={822} y={882} size={62} at={2.0} seed="kd-tree" />
+    <Noticeboard x={104} y={652} w={250} h={168} legs={60} at={2.2} seed="kd-board">
+      <Paper x={166} y={668} w={104} h={134} at={4.6} entry="drop" seed="kd-paper" stamp={{at: 6.0}} />
+    </Noticeboard>
+    <Bike x={452} y={936} s={0.78} at={2.6} seed="kd-bike" basket />
+    <BrowserWindow x={578} y={150} w={306} h={246} at={2.8} url="city.gov" content="gov" offAt={8.0} seed="kd-web" />
+    <Padlock x={731} y={318} size={84} at={5.0} lockAt={5.65} seed="kd-lock" />
+    <Crowd far={{y: 912, x0: 330, x1: 760, s: 0.27}} near={{y: 1010, x0: 250, x1: 880, s: 0.5}} rows={4} at={3.9} span={2.4} order="back" signs={0.12} seed="kd-crowd" />
+    {[
+      {x: 214, hair: 'bun', acc: ['backpack']},
+      {x: 330, hair: 'short', acc: ['headphones', 'collar']},
+      {x: 446, hair: 'long', acc: []},
+      {x: 562, hair: 'cap', acc: ['phone', 'strap']},
+    ].map((p, i) => (
+      <Person key={i} x={p.x} y={1112} s={0.92} at={3.2 + i * 0.28} style="line" seed={`kd-p${i}`} hair={p.hair as 'bun'} acc={p.acc as never} />
+    ))}
   </Stage>
 );

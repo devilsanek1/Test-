@@ -9,3 +9,4 @@ export * from './Nature';
 export * from './BrowserWindow';
 export * from './Padlock';
 export * from './Noticeboard';
+export * from './Icons';

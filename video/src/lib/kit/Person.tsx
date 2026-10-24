@@ -159,7 +159,7 @@ function makePaths(S: Spec) {
       P.strap = line(-w * 0.36, -h * 0.97, w * 0.4, -h * 0.02, {over: [0, 0], seed: `${sd}/st1`}) + line(-w * 0.28, -h * 1.0, w * 0.48, -h * 0.07, {over: [0, 0], seed: `${sd}/st2`});
     }
     if (a === 'collar') {
-      P.collar = `M${-hr * 0.55} ${-h + 2}L0 ${-h + hr * 0.62}L${hr * 0.55} ${-h + 2}`;
+      P.collar = `M${-hr * 0.6} ${-h + hr * 0.12}L0 ${-h + hr * 0.95}L${hr * 0.6} ${-h + hr * 0.12}`;
     }
     if (a === 'scarf') {
       P.scarfFill = `M${-hr * 0.95} ${-h - 4}Q0 ${-h + 16} ${hr * 0.95} ${-h - 4}L${hr * 0.9} ${-h + 8}Q0 ${-h + 28} ${-hr * 0.9} ${-h + 8}Z` + `M${hr * 0.05} ${-h + 10}L${hr * 0.6} ${-h + 10}L${hr * 0.5} ${-h + 52}L${hr * 0.12} ${-h + 50}Z`;
@@ -236,7 +236,7 @@ export const Person: React.FC<PersonProps> = (props) => {
   }
   if (P.collar && lod === 0) push(<Ink key="collar" d={P.collar} at={tm(0.36)} dur={0.15} width={W * 0.85} seed={k('collar')} />);
   if (P.scarfFill && lod === 0) {
-    push(<Fill key="scarfF" d={P.scarfFill} color={S.accent} at={tm(0.5)} mode={fillMode} seed={k('scarf')} />);
+    push(<Fill key="scarfF" d={P.scarfFill} color={S.line ? palette.card : S.accent} at={tm(0.5)} mode={fillMode} seed={k('scarf')} />);
     push(<Ink key="scarf" d={P.scarfInk} at={tm(0.4)} dur={0.25} width={W * 0.9} seed={k('scarf')} />);
   }
   if (P.armFill && lod < 2) {
