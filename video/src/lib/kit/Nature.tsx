@@ -16,6 +16,7 @@ import {ExitFade} from '../exit';
 import {blob, circle, crown, crownTicks, line, poly, polyPath, wire, wirePoint, Pt} from '../sketch';
 import {At, b, inkW, Place} from './common';
 import {mat, XG} from '../xf';
+import {TodAnchor} from '../tod';
 
 // ---------------------------------------------------------------- Tree
 
@@ -64,10 +65,10 @@ export const Tree: React.FC<TreeProps> = ({x, y, size = 80, h, at, seed = 'tree'
       <Ink d={ticks} at={b(at, 0.75)} dur={0.3} width={width * 0.8} order="all" />
     </>
   );
-  if (!sway) return content;
+  if (!sway) return <TodAnchor at={[cx, cy]}>{content}</TodAnchor>;
   return (
     <Wobble amp={0.6} rot={0.7} hz={0.35} x={x} y={y} seed={`${seed}/w`}>
-      {content}
+      <TodAnchor at={[cx, cy]}>{content}</TodAnchor>
     </Wobble>
   );
 };
@@ -211,7 +212,7 @@ export const LampPost: React.FC<LampPostProps> = ({x, y, h = 320, at, seed = 'la
   const lit = dt >= 0 && !(dt > 0.07 && dt < 0.14) ? 1 : 0;
   const flick = 1;
   return (
-    <>
+    <TodAnchor at={[x, y - h / 2]}>
       {lit > 0 ? (
         <ExitFade>
           <Fill d={polyPath([[ax - 14, top + 6], [ax + 14, top + 6], [ax + 80, y], [ax - 80, y]])} color={palette.cream} opacity={0.38 * lit * flick} offset={false} seed={`${seed}/cone`} />
@@ -228,7 +229,7 @@ export const LampPost: React.FC<LampPostProps> = ({x, y, h = 320, at, seed = 'la
       <ExitFade>
         <circle cx={ax} cy={top + 9} r={5} fill={lit > 0 ? palette.sun : palette.cream} />
       </ExitFade>
-    </>
+    </TodAnchor>
   );
 };
 
@@ -296,11 +297,13 @@ export const UtilityPole: React.FC<{x: number; y: number; h?: number; s?: number
   const top = -h;
   return (
     <Place x={x} y={y} s={s}>
+      <TodAnchor at={[0, -h / 2]}>
       <Fill rect={[-w / 2, top, w, h]} color={color} at={b(at, 0.12)} mode="wipe" dir="up" offset={[2, 1]} seed={`${seed}/f`} />
       <Ink d={line(-w / 2, 0, -w / 2, top, {over: [0, 6], seed: `${seed}/l`}) + line(w / 2, 0, w / 2, top + 4, {over: [0, 3], seed: `${seed}/r`})} at={at} width={W} order="all" />
       {bar ? <Fill rect={[-62, top + 40, 124, 10]} color={color} at={b(at, 0.22)} mode="snap" offset={[2, 1]} seed={`${seed}/bf`} /> : null}
       {bar ? <Ink d={line(-66, top + 40, 66, top + 40, {over: [3, 6], seed: `${seed}/b1`}) + line(-62, top + 50, 62, top + 50, {over: [2, 4], seed: `${seed}/b2`})} at={b(at, 0.1)} width={W * 0.9} /> : null}
       {bar ? <Ink d={line(-52, top + 40, -52, top + 26, {over: 0, seed: `${seed}/i1`}) + line(52, top + 40, 52, top + 26, {over: 0, seed: `${seed}/i2`})} at={b(at, 0.2)} width={W * 1.3} /> : null}
+      </TodAnchor>
     </Place>
   );
 };

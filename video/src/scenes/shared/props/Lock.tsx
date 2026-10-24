@@ -193,7 +193,7 @@ export const Lock: React.FC<LockProps> = (p) => {
     // bolt housing, bolt, strike plate
     const hx = -25;
     const housing = rectPath(hx, -14, 16, 28);
-    const bolt = rectPath(-12, -6, tip + 12, 12);
+    const bolt = rectPath(-12, -7.5, tip + 12, 15);
     const st = LOCK.strike;
     if (!paperish) {
       fill('housing', housing, body, undefined, {offset: false, mode: 'none'});
@@ -203,7 +203,7 @@ export const Lock: React.FC<LockProps> = (p) => {
     }
     const mw = lod === 2 ? 0.7 : 0.9;
     if (blue || sketch) ink('cavI', rect(COV[0], COV[1], COV[2], COV[3], {seed: `${seed}/cv`, over: 3}), T(0.2), mw);
-    ink('mechI', `M${hx} -14H${hx + 16}V14H${hx}Z` + `M-12 -6H${tip.toFixed(2)}V6H-12` + `M${st[0]} ${st[1]}H${st[0] + st[2]}V${st[1] + st[3]}H${st[0]}Z` + `M${st[0] + 4} -7V7`, blue || sketch ? T(0.3) : undefined, mw, {taper: false, vary: 0});
+    ink('mechI', `M${hx} -14H${hx + 16}V14H${hx}Z` + `M-12 -7.5H${tip.toFixed(2)}V7.5H-12` + `M${st[0]} ${st[1]}H${st[0] + st[2]}V${st[1] + st[3]}H${st[0]}Z` + `M${st[0] + 4} -7V7`, blue || sketch ? T(0.3) : undefined, mw, {taper: false, vary: 0});
     if (sketch) ink('mechI2', rect(hx + 1.5, -13, 16, 28, {seed: `${seed}/s2`, over: 4}) + rect(-11, -5, tip + 12, 12, {seed: `${seed}/s3`, over: 5}), T(0.38), 0.55);
     if (blue) {
       // centre line through the bolt (dash-dot) and a dimension line under the box
@@ -397,5 +397,37 @@ export const LockCrate: React.FC<LockCrateProps> = ({x = 0, y = 0, size = 80, n 
       {lod >= 1 ? <Ink d={rect(-w / 2, -h, w, h, {seed: `${seed}/o`, over: 4})} at={T(0)} width={F.W} seed={`${seed}/o`} /> : null}
       {lod === 2 ? <Ink d={line(-w / 2 + 4, -h * 0.5, w / 2 - 4, -h * 0.5, {over: [0, 0], seed: `${seed}/s1`}) + line(-w / 2 + 12, -h + 4, -w / 2 + 12, -4, {over: [0, 0], seed: `${seed}/s2`}) + line(w / 2 - 12, -h + 4, w / 2 - 12, -4, {over: [0, 0], seed: `${seed}/s3`})} at={T(0.18)} width={F.W * 0.65} seed={`${seed}/sl`} order="all" /> : null}
     </PropRoot>
+  );
+};
+
+// ---------------------------------------------------------------- LockSpecks (batched, for hundreds of far doors)
+
+export type LockSpot = {x: number; y: number; size: number; at?: number; fixed?: boolean};
+
+/** Hundreds of far locks (S02 / S03 rows, S10's ~650 doors) as TWO paths: sand (or sage) boxes + one ink outline path
+ *  for spots >= `inkFrom` px tall (world). Each pops at its `at` (one frame +30 %). Use the full <Lock> for the few near
+ *  ones. Ink width in world px (S10: authored in world units). */
+export const LockSpecks: React.FC<{spots: LockSpot[]; ink?: number; inkFrom?: number; outAt?: number}> = ({spots, ink = 0.6, inkFrom = 6, outAt}) => {
+  const t = useTime();
+  if (outAt !== undefined && t >= outAt) return null;
+  let sand = '';
+  let sage = '';
+  let line_ = '';
+  for (const sp of spots) {
+    if (sp.at !== undefined && t < sp.at) continue;
+    const k = sp.at !== undefined && t < sp.at + 0.067 ? 1.3 : 1;
+    const h = sp.size * k;
+    const w = h * 0.8;
+    const d = `M${(sp.x - w / 2).toFixed(2)} ${(sp.y - h / 2).toFixed(2)}h${w.toFixed(2)}v${h.toFixed(2)}h${(-w).toFixed(2)}z`;
+    if (sp.fixed) sage += d;
+    else sand += d;
+    if (sp.size >= inkFrom) line_ += d;
+  }
+  return (
+    <ExitFade>
+      {sand ? <path d={sand} fill={palette.sand} /> : null}
+      {sage ? <path d={sage} fill={palette.sage} /> : null}
+      {line_ && ink > 0 ? <path d={line_} fill="none" stroke={palette.ink} strokeWidth={ink} strokeLinejoin="round" /> : null}
+    </ExitFade>
   );
 };

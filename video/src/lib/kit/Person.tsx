@@ -27,6 +27,7 @@ import {MOTION} from '../spec';
 import {arc, blob, circle, crown, line, rectPath, roundRect, smooth, torso, Pt} from '../sketch';
 import {At, b, inkW, Place} from './common';
 import {mat, XG} from '../xf';
+import {TodAnchor} from '../tod';
 
 export type Hair = 'short' | 'long' | 'bun' | 'cap' | 'beanie' | 'bald' | 'curly';
 export type Acc = 'backpack' | 'headphones' | 'strap' | 'phone' | 'scarf' | 'sign' | 'collar' | 'hood';
@@ -190,7 +191,8 @@ function makePaths(S: Spec) {
     const by = hy + hr * 0.42;
     const cw = Math.sqrt(Math.max(0, 1.03 * 1.03 - 0.42 * 0.42)) * hr;
     P.capFill = `M${-cw} ${by}A${hr * 1.03} ${hr * 1.03} 0 1 1 ${cw} ${by}Z`;
-    P.capInk = line(-cw, by, cw, by - hr * 0.02, {over: [2, 2], seed: `${sd}/band`}) + arc(0, by, hr * 0.3, hr * 0.26, 180, 360, {seed: `${sd}/open`});
+    P.capBand = line(-cw, by, cw, by - hr * 0.02, {over: [2, 2], seed: `${sd}/band`});
+    P.capInk = P.capBand + arc(0, by, hr * 0.3, hr * 0.26, 180, 360, {seed: `${sd}/open`});
     P.capHole = `M${-hr * 0.3} ${by}A${hr * 0.3} ${hr * 0.26} 0 0 1 ${hr * 0.3} ${by}Z`;
     P.capBtn = circle(0, hy - hr * 1.0, hr * 0.12, {seed: `${sd}/btn`});
   }
@@ -201,6 +203,17 @@ function makePaths(S: Spec) {
     P.capInk = line(-cw, by, cw, by - hr * 0.01, {over: [1, 1], seed: `${sd}/bn1`}) + line(-hr * 0.98, hy + hr * 0.08, hr * 0.98, hy + hr * 0.07, {over: [1, 1], seed: `${sd}/bn2`});
     P.pomFill = blob(0, hy - hr * 1.18, hr * 0.3, hr * 0.3, {seed: `${sd}/pom`});
     P.pomInk = circle(0, hy - hr * 1.18, hr * 0.3, {seed: `${sd}/pom`});
+  }
+  // hero heads (lod 0, head > 60 px on screen): hair strands and a NOTCHED nape hairline, so a light-haired head never
+  // reads as a smooth skin-coloured disc (the back-of-the-head cue survives at any size)
+  {
+    const nape: Pt[] = [[-hr * 0.72, hy + hr * 0.7], [-hr * 0.36, hy + hr * 1.14], [0, hy + hr * 1.0], [hr * 0.36, hy + hr * 1.14], [hr * 0.72, hy + hr * 0.7]];
+    P.napeFill = `M${-hr * 0.72} ${hy + hr * 0.55}L${hr * 0.72} ${hy + hr * 0.55}` + nape.slice().reverse().map(([x, y]) => `L${x.toFixed(2)} ${y.toFixed(2)}`).join('') + 'Z';
+    P.napeInk = nape.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`).join('');
+    P.strands =
+      `M${-hr * 0.18} ${hy - hr * 0.86}Q${-hr * 0.5} ${hy - hr * 0.3} ${-hr * 0.42} ${hy + hr * 0.42}` +
+      `M${hr * 0.12} ${hy - hr * 0.7}Q${hr * 0.02} ${hy - hr * 0.1} ${hr * 0.1} ${hy + hr * 0.5}` +
+      `M${hr * 0.46} ${hy - hr * 0.62}Q${hr * 0.62} ${hy - hr * 0.1} ${hr * 0.5} ${hy + hr * 0.3}`;
   }
   // accessories
   for (const a of S.acc) {
@@ -223,8 +236,11 @@ function makePaths(S: Spec) {
       P.collar = `M${-hr * 0.6} ${-h + hr * 0.12}L0 ${-h + hr * 0.95}L${hr * 0.6} ${-h + hr * 0.12}`;
     }
     if (a === 'scarf') {
-      P.scarfFill = `M${-hr * 0.95} ${-h - 4}Q0 ${-h + 16} ${hr * 0.95} ${-h - 4}L${hr * 0.9} ${-h + 8}Q0 ${-h + 28} ${-hr * 0.9} ${-h + 8}Z` + `M${hr * 0.05} ${-h + 10}L${hr * 0.6} ${-h + 10}L${hr * 0.5} ${-h + 52}L${hr * 0.12} ${-h + 50}Z`;
-      P.scarfInk = `M${-hr * 0.95} ${-h - 4}Q0 ${-h + 16} ${hr * 0.95} ${-h - 4}M${-hr * 0.9} ${-h + 8}Q0 ${-h + 28} ${hr * 0.9} ${-h + 8}M${hr * 0.12} ${-h + 18}L${hr * 0.12} ${-h + 50}L${hr * 0.5} ${-h + 52}L${hr * 0.58} ${-h + 16}`;
+      // BELOW the collar line (a band of coat shows between the head and the scarf): a scarf right under the head reads
+      // as a beard under a face
+      const y0 = -h + hr * 0.42;
+      P.scarfFill = `M${-hr * 1.05} ${y0}Q0 ${y0 + 20} ${hr * 1.05} ${y0}L${hr * 1.0} ${y0 + 14}Q0 ${y0 + 34} ${-hr * 1.0} ${y0 + 14}Z` + `M${hr * 0.15} ${y0 + 16}L${hr * 0.7} ${y0 + 16}L${hr * 0.6} ${y0 + 60}L${hr * 0.22} ${y0 + 58}Z`;
+      P.scarfInk = `M${-hr * 1.05} ${y0}Q0 ${y0 + 20} ${hr * 1.05} ${y0}M${-hr * 1.0} ${y0 + 14}Q0 ${y0 + 34} ${hr * 1.0} ${y0 + 14}M${hr * 0.22} ${y0 + 24}L${hr * 0.22} ${y0 + 58}L${hr * 0.6} ${y0 + 60}L${hr * 0.68} ${y0 + 22}`;
     }
     if (a === 'phone') {
       const sx = w * 0.4;
@@ -312,7 +328,11 @@ export const Person: React.FC<PersonProps> = (props) => {
   const parts: React.ReactNode[] = [];
   const push = (n: React.ReactNode) => parts.push(n);
   const k = (n: string) => `${sd}/${n}`;
-  const headColor = S.line ? palette.card : S.hair === 'bald' ? palette.sand : S.hairColor;
+  const skinLike = S.hairColor === palette.sand || S.hairColor === palette.tan;
+  // a cap leaves only a strip of hair at the nape: never skin-coloured (it would read as a face under a cap)
+  const headColor = S.line ? palette.card : S.hair === 'bald' ? palette.sand : S.hair === 'cap' && skinLike ? palette.brown : S.hairColor;
+  const bigHead = lod === 0 && !S.line && 2 * S.hr * s > 60;
+  const lightHair = headColor !== palette.ink && headColor !== palette.tealDark;
 
   // walking (back view): the lifted foot shortens its leg, the body rises a hair mid-stride
   let legsD = P.legs;
@@ -426,10 +446,17 @@ export const Person: React.FC<PersonProps> = (props) => {
     push(<Fill key="bunF" d={P.bunFill} color={S.line ? palette.card : S.hairColor} at={tm(0.3)} mode={fillMode} offset={S.line ? false : undefined} seed={k('bun')} />);
     if (inked) push(<Ink key="bun" d={P.bunInk} at={tm(0.18)} width={W} seed={k('bunI')} />);
   }
+  // hero head detail: a notched nape hairline (hair colour over the neck) and strands on light hair
+  if (bigHead && (S.hair === 'short' || S.hair === 'bun' || S.hair === 'cap' || S.hair === 'curly')) {
+    push(<Fill key="napeF" d={P.napeFill} color={headColor} at={tm(0.28)} mode={fillMode} offset={false} seed={k('nape')} />);
+    if (inked) push(<Ink key="napeI" d={P.napeInk} at={tm(0.2)} width={W * 0.85} seed={k('napeI')} />);
+    if (inked && (S.hair === 'short' || S.hair === 'bun') && lightHair) push(<Ink key="strands" d={P.strands} at={tm(0.32)} width={W * 0.7} order="all" seed={k('strands')} />);
+  }
   if (P.capFill) {
     push(<Fill key="capF" d={P.capFill} color={S.line ? palette.card : S.hat} at={tm(0.3)} mode={fillMode} offset={false} seed={k('cap')} />);
-    if (P.capHole) push(<Fill key="capH" d={P.capHole} color={S.line ? palette.card : S.hairColor} at={tm(0.34)} mode={fillMode} offset={false} seed={k('capH')} />);
-    if (inked) push(<Ink key="cap" d={P.capInk} at={tm(0.22)} width={W * 0.9} seed={k('capI')} />);
+    // the strap opening only at small sizes: at hero size it reads as a face under the cap
+    if (P.capHole && !bigHead) push(<Fill key="capH" d={P.capHole} color={S.line ? palette.card : S.hairColor} at={tm(0.34)} mode={fillMode} offset={false} seed={k('capH')} />);
+    if (inked) push(<Ink key="cap" d={bigHead ? P.capBand : P.capInk} at={tm(0.22)} width={W * 0.9} seed={k('capI')} />);
     if (P.capBtn && lod === 0 && inked) push(<Ink key="capB" d={P.capBtn} at={tm(0.34)} width={W * 0.8} seed={k('capB')} />);
     if (P.pomFill) {
       push(<Fill key="pomF" d={P.pomFill} color={S.line ? palette.card : S.hat} at={tm(0.36)} mode={fillMode} offset={false} seed={k('pom')} />);
@@ -467,8 +494,11 @@ export const Person: React.FC<PersonProps> = (props) => {
   dy += walkBob * s;
   return (
     <Place x={x} y={y + dy} s={s} flip={flip}>
-      {clip}
-      {inner}
+      {/* the whole figure relights in one frame (time-of-day wave) */}
+      <TodAnchor at={[0, -S.h * 0.5]}>
+        {clip}
+        {inner}
+      </TodAnchor>
     </Place>
   );
 };

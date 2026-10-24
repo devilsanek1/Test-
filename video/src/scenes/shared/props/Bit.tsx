@@ -109,12 +109,12 @@ export const Bit: React.FC<BitProps> = (p) => {
     clipEdge = true;
     const amt = p.peekAmount ?? 0.75;
     const q = p.peekAt !== undefined ? prog(t, p.peekAt, 0.2, E.outBack(1.6)) : 1;
-    shift = lerp(-L - 2, -L + amt * L + 2, q) + 10;
+    shift = lerp(-L - 8, -L + amt * L + 2, q) + 10; // hidden: antenna tips behind the edge too
   }
   if (p.hideAt !== undefined && t >= p.hideAt) {
     const q = prog(t, p.hideAt, 0.14, E.inCubic);
     squash = lerp(1, 0.55, Math.min(1, q * 1.6));
-    if (clipEdge) shift = lerp(shift, -L - 4 + 10, q);
+    if (clipEdge) shift = lerp(shift, -L - 8 + 10, q);
     else if (q >= 1) return null; // ducked into the gap
   }
   if (state === 'hide' && p.hideAt === undefined) return null;

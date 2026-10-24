@@ -19,7 +19,7 @@ import {Fill} from '../../../lib/Fill';
 import {ExitFade} from '../../../lib/exit';
 import {blob, circle, hline, line, rect, rectPath, roundRect} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
-import {bt, Depth, DEPTH_INK, misregScreen, pendulum} from './common';
+import {bt, Depth, DEPTH_INK, misregScreen, pendulum, withOut} from './common';
 
 export type RollerShutterProps = {
   /** The window rect the curtain covers (world px). The box sits above it (y - box .. y). */
@@ -126,7 +126,7 @@ export type ShutterPadlockProps = {
 };
 
 /** The shutter padlock: sand body, ink shackle, cream glint. Pops on, the shackle clicks shut. */
-export const ShutterPadlock: React.FC<ShutterPadlockProps> = ({x, y, size = 28, at, lockAt, glintAt, depth, width, seed = 'padlock'}) => {
+const ShutterPadlockBase: React.FC<ShutterPadlockProps> = ({x, y, size = 28, at, lockAt, glintAt, depth, width, seed = 'padlock'}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const s = size / 28;
@@ -170,7 +170,7 @@ export type BackSoonTagProps = {
 };
 
 /** White "back soon" tag with an ink clock icon on a short string. */
-export const BackSoonTag: React.FC<BackSoonTagProps> = ({x, y, size = 30, at, tapAt, tilt = 0, depth, width, seed = 'tag'}) => {
+const BackSoonTagBase: React.FC<BackSoonTagProps> = ({x, y, size = 30, at, tapAt, tilt = 0, depth, width, seed = 'tag'}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const s = size / 30;
@@ -202,4 +202,7 @@ export const LIGHTS_OUT: Record<string, string> = {
 };
 /** One palette step darker (unknown colours pass through). */
 export const lightsOut = (c: string) => LIGHTS_OUT[c] ?? c;
-export {lerp};
+
+// build-out (outAt / outDur) for props that have no own exit
+export const ShutterPadlock = withOut(ShutterPadlockBase, 'ShutterPadlock');
+export const BackSoonTag = withOut(BackSoonTagBase, 'BackSoonTag');

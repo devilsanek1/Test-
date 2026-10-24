@@ -12,14 +12,16 @@
 // SKY + TIME OF DAY (one sky, one lighting model):
 //   sky = colour | bands (string[], top -> horizon) | a cine TOD palette (TOD.night: its skyBands + its name) |
 //         SkyKey[] = [{t, color?, tod?, wipe?, dur?}]
-//   A key's `tod` RELIGHTS THE WHOLE SCENE (every <Fill> through lib/tod.tsx: reference 2's step table) with the same
-//   wipe as the sky: during the wipe the scene is drawn twice, the new light clipped to the swept region, so the light
-//   arrives exactly with the sky edge. A key with only `tod` takes its colour from theme.todSky. The sky changes by a
-//   WIPE (default: down, 0.4 s, linear) or a 1-frame snap. Never a fade. Pair a dark sky with captionTone 'light'
-//   (scenes.json; give the tone key the same `wipe` so the caption colour follows the edge too).
+//   A key's `tod` RELIGHTS THE WHOLE SCENE (every <Fill> through lib/tod.tsx: reference 2's step table) in step with
+//   the sky wipe: the sky slab wipes (default: down, 0.4 s, linear; or a 1-frame snap), and every OBJECT flips whole
+//   in one frame when the sky edge reaches its centre / its <TodAnchor> (motion spec #12: per-object pops, staggered
+//   by height; no clip edge through figures, no double render). A key with only `tod` takes its colour from
+//   theme.todSky. Never a fade. Pair a dark sky with captionTone 'light' (scenes.json; give the tone key the same
+//   `wipe` so the caption colour follows the edge too).
 //
 // CAMERA: `push` = the per-shot gentle zoom reference 2 gives every shot (default 1.00 -> 1.06 over 2 s from t 0,
-//   ease in-out sine, about world.vp). For multiplane moves use <ShotCam> / cine <CineCamera stage> inside.
+//   ease in-out sine, about world.vp). After a camera-continuous transition whose zoom runs the OTHER way (dir 'out'
+//   + a push in), the push waits until the transition has settled (stage.pushStart): no camera bounce. For multiplane moves use <ShotCam> / cine <CineCamera stage> inside.
 // stage="flat" (default): the transition camera moves the whole scene as one plane and is CONSUMED here (children see
 //   useStageCam() = rest, so a <CineCamera stage> inside can never apply it twice). stage="context": World does not
 //   apply it; your <CineCamera stage> / <ShotCam> folds it in with real parallax. useWorldStage() tells which.
@@ -28,11 +30,11 @@ import React, {useId} from 'react';
 import {AbsoluteFill} from 'remotion';
 import {skies, TodName, todSky, world} from './theme';
 import {Fill, FrameArea} from './Fill';
-import {AppliedStageProvider, StageCamProvider, stageMat, STAGE_REST, StageKindProvider, useAppliedStageMat, useStageCam, useStageClip, visibleRectOf, WorldStageProvider, zoomAbout} from './stage';
+import {AppliedStageProvider, pushStart, SceneInfo, StageCamProvider, stageMat, STAGE_REST, StageKindProvider, useAppliedStageMat, useScene, useStageCam, useStageClip, visibleRectOf, WorldStageProvider, zoomAbout} from './stage';
 import {mat, Mat, XG} from './xf';
 import {Ease, ease as E, clamp, prog, useTime} from './time';
 import {exitFillProgress, useExit} from './exit';
-import {Tod} from './tod';
+import {Tod, TodWave, waveEdgeP} from './tod';
 import {MOTION} from './spec';
 import type {Pt} from './sketch';
 
@@ -218,12 +220,13 @@ const SkyLayer: React.FC<{keys: NKey[]; rect: [number, number, number, number]; 
   );
 };
 
-/** The push camera of a World at scene time t (rest when no push). */
-export function worldPushMat(push: WorldPush | boolean | undefined, t: number): Mat {
+/** The push camera of a World at scene time t (rest when no push). With `scene` (useScene()), a push that would
+ *  reverse the scene's incoming camera-continuous zoom starts when that transition has settled (pushStart). */
+export function worldPushMat(push: WorldPush | boolean | undefined, t: number, scene?: SceneInfo): Mat {
   if (!push) return mat.I;
   const p = push === true ? {} : push;
   const to = p.to ?? MOTION.camera.push.to;
-  const q = prog(t, p.at ?? 0, p.dur ?? MOTION.camera.push.dur, p.ease ?? MOTION.camera.push.ease);
+  const q = prog(t, pushStart(p.at ?? 0, to, scene), p.dur ?? MOTION.camera.push.dur, p.ease ?? MOTION.camera.push.ease);
   if (q <= 0 || to === 1) return mat.I;
   return stageMat(zoomAbout(p.anchor ?? world.vp, Math.exp(Math.log(to) * q)));
 }
@@ -233,32 +236,28 @@ export const World: React.FC<WorldProps> = ({sky = skies.day, tod, horizon = wor
   const cam = useStageCam();
   const clip = useStageClip();
   const uid = 'wd' + useId().replace(/[^a-zA-Z0-9]/g, '');
-  const pm = worldPushMat(push, t);
+  const scene = useScene();
+  const pm = worldPushMat(push, t, scene);
   const m = stage === 'flat' ? mat.mul(stageMat(cam), pm) : pm;
   const rect = visibleRectOf(m, 60);
   const keys = skyKeys(sky, tod);
-  // time of day: the current key's light, and while its wipe runs, the previous light underneath
+  // time of day: the current key's light; while its wipe runs, a relight WAVE: every object flips whole (one frame)
+  // when the sky edge reaches its centre (lib/tod.tsx), so the scene is drawn once and no edge cuts through a figure
   let cur = 0;
   for (let i = 1; i < keys.length; i++) if (t >= keys[i].t) cur = i;
   const curTod = keys[cur].tod;
   const prevTod = cur > 0 ? keys[cur - 1].tod : curTod;
   const p = cur > 0 ? wipeP(keys[cur], t) : 1;
-  const splitLight = prevTod !== curTod && p < 1;
-  const relit = splitLight ? (
-    <>
-      <Tod value={prevTod}>{children}</Tod>
-      <defs>
-        <clipPath id={`${uid}L`} clipPathUnits="userSpaceOnUse">
-          <rect {...rectAttrs(wipeRegion(keys[cur].wipe, p, rect))} />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${uid}L)`}>
-        <Tod value={curTod}>{children}</Tod>
-      </g>
-    </>
-  ) : (
-    <Tod value={curTod}>{children}</Tod>
-  );
+  let relit: React.ReactNode;
+  if (prevTod !== curTod && p < 1) {
+    const wave: TodWave = {from: prevTod, to: curTod, p, wipe: keys[cur].wipe, rect, inv: mat.inv(m)};
+    const vpTod = p >= waveEdgeP(wave, world.vp[0], world.vp[1]) ? curTod : prevTod;
+    relit = (
+      <Tod value={vpTod} wave={wave}>
+        {children}
+      </Tod>
+    );
+  } else relit = <Tod value={curTod}>{children}</Tod>;
   return (
     <AbsoluteFill style={{overflow: 'hidden', clipPath: clip}}>
       <svg width={world.w} height={world.h} viewBox={`0 0 ${world.w} ${world.h}`} style={{position: 'absolute', left: 0, top: 0, overflow: 'hidden'}}>

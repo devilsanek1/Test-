@@ -18,6 +18,7 @@ import {ExitFade} from '../exit';
 import {blob, check, crown, ellipse, hline, line, polyPath, rect, roundRect, Pt} from '../sketch';
 import {At, b} from './common';
 import {mat, XG} from '../xf';
+import {TodAnchor} from '../tod';
 
 // ---------------------------------------------------------------- Bug
 
@@ -104,11 +105,11 @@ export const Cloud: React.FC<{x: number; y: number; w?: number; at?: At; seed?: 
   // bumpy top from three crowns, flat bottom
   const d = crown(x, y, w * 0.5, h * 0.5, {seed: `${seed}/c`, bumps: 7, round: 0.75});
   return (
-    <>
+    <TodAnchor at={[x, y]}>
       <Fill d={d} color={color} at={b(at, 0.3)} mode="pop" seed={`${seed}/f`} />
       <Ink d={d} at={at} dur={0.55} width={width} />
       <Ink d={hline(x - w * 0.42, x + w * 0.42, y + h * 0.48, {seed: `${seed}/b`, over: [4, 14]})} at={b(at, 0.45)} dur={0.2} width={width} />
-    </>
+    </TodAnchor>
   );
 };
 

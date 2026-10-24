@@ -1,15 +1,15 @@
 [
-  {"id":"S01","start":0,"end":4.78,"transitionIn":{"type":"cut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Government Plaza powers down"},
-  {"id":"S02","start":4.78,"end":10.84,"transitionIn":{"type":"push-through","dur":0.5},"captionTone":[{"t":0,"tone":"dark"}],"note":"Built from one blueprint"},
-  {"id":"S03","start":10.84,"end":15.72,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Two steps"},
-  {"id":"S04","start":15.72,"end":21.5,"transitionIn":{"type":"camera-continuous","dur":0.88,"dir":"in"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Fourteen years of nobody"},
-  {"id":"S05","start":21.5,"end":25.44,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Found it"},
-  {"id":"S06","start":25.44,"end":30.5,"transitionIn":{"type":"camera-continuous","dur":0.66,"dir":"right"},"captionTone":[{"t":0,"tone":"dark"}],"note":"A quiet letter"},
-  {"id":"S07","start":30.5,"end":35.52,"transitionIn":{"type":"foreground-wipe","dur":0.38,"element":"scene","dir":"right"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Pinned for everyone"},
-  {"id":"S08","start":35.52,"end":43.7,"transitionIn":{"type":"camera-continuous","dur":1.8,"dir":"up"},"captionTone":[{"t":0,"tone":"dark"},{"t":7.58,"tone":"light"}],"note":"The dome and the flood"},
-  {"id":"S09","start":43.7,"end":47.72,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"light"}],"note":"Question marks, then dawn"},
-  {"id":"S10","start":47.72,"end":54.46,"transitionIn":{"type":"camera-continuous","dur":0.25,"dir":"in"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Twenty-two million doors"},
-  {"id":"S11","start":54.46,"end":60.47,"transitionIn":{"type":"push-through","dur":0.4},"captionTone":[{"t":0,"tone":"dark"}],"note":"Shutters down"},
-  {"id":"S12","start":60.47,"end":66.59,"transitionIn":{"type":"foreground-wipe","dur":0.4,"element":"scene","dir":"right"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Too old to fix"},
-  {"id":"S13","start":66.59,"end":70.687,"transitionIn":{"type":"camera-continuous","dur":1,"dir":"in"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Switch off, or hope","transitionOut":{"type":"unbuild","dur":0.847,"loop":true,"captionAt":70.48}}
+  {"id":"S01","start":0,"end":4.823,"transitionIn":{"type":"cut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Government Plaza powers down"},
+  {"id":"S02","start":4.823,"end":11.596,"transitionIn":{"type":"push-through","dur":0.61},"captionTone":[{"t":0,"tone":"dark"}],"note":"Built from one blueprint"},
+  {"id":"S03","start":11.596,"end":17.211,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Two steps"},
+  {"id":"S04","start":17.211,"end":23.671,"transitionIn":{"type":"camera-continuous","dur":1.2,"dir":"in"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Fourteen years of nobody"},
+  {"id":"S05","start":23.671,"end":27.633,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Found it"},
+  {"id":"S06","start":27.633,"end":32.947,"transitionIn":{"type":"cut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"A quiet letter"},
+  {"id":"S07","start":32.947,"end":38.566,"transitionIn":{"type":"foreground-wipe","dur":0.38,"element":"scene","dir":"right"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Pinned for everyone"},
+  {"id":"S08","start":38.566,"end":47.333,"transitionIn":{"type":"camera-continuous","dur":1.9,"dir":"up"},"captionTone":[{"t":0,"tone":"dark"}],"note":"The dome and the flood"},
+  {"id":"S09","start":47.333,"end":52.378,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"light"},{"t":2.482,"tone":"dark"}],"note":"Question marks, then dawn"},
+  {"id":"S10","start":52.378,"end":59.784,"transitionIn":{"type":"camera-continuous","dur":0.25,"dir":"in"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Twenty-two million doors"},
+  {"id":"S11","start":59.784,"end":66.693,"transitionIn":{"type":"push-through","dur":0.56},"captionTone":[{"t":0,"tone":"dark"}],"note":"Shutters down"},
+  {"id":"S12","start":66.693,"end":73.307,"transitionIn":{"type":"foreground-wipe","dur":0.4,"element":"scene","dir":"right"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Too old to fix"},
+  {"id":"S13","start":73.307,"end":77.76,"transitionIn":{"type":"camera-continuous","dur":1.41,"dir":"in"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Switch off, or hope","transitionOut":{"type":"unbuild","dur":0.815,"loop":true,"captionAt":77.589}}
 ]

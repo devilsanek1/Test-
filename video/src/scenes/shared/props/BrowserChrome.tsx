@@ -19,10 +19,10 @@ import {ease as E, lerp, prog, springAt, springs, useTime} from '../../../lib/ti
 import {Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
-import {ExitFade} from '../../../lib/exit';
+import {ExitFade, useLook} from '../../../lib/exit';
 import {circle, hline, line, rect, rectPath, roundRect} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
-import {bt, Depth, DEPTH_INK, lodOf, PropBase, PropRoot, usePropFrame} from './common';
+import {bt, Depth, DEPTH_INK, lodOf, PropBase, PropRoot, usePropFrame, withOut} from './common';
 
 export type ProgressStep = {t: number; v: number};
 
@@ -218,8 +218,10 @@ export type RingProps = {
 };
 
 /** Peach ring with an ink outline: the S11 loading ring and S10's "could be hit" target rings (same component). */
-export const LoadingRing: React.FC<RingProps> = ({x, y, r = 10, at, spin, pulseAt, popAt, outAt, width, depth, seed = 'ring', color = palette.peach}) => {
+export const LoadingRing: React.FC<RingProps> = ({x, y, r = 10, at, spin, pulseAt, popAt, outAt, width, depth, seed = 'ring', color: colorIn = palette.peach}) => {
   const t = useTime();
+  const look = useLook();
+  const color = look.fills === 'paper' ? palette.white : colorIn;
   const start = popAt ?? at;
   if (start !== undefined && t < start) return null;
   if (outAt !== undefined && t >= outAt + 0.12) return null;
@@ -263,7 +265,7 @@ export const TargetRing = LoadingRing;
 
 /** A cream bar with a sage segment stepping through `steps` (the morphed address pill, ~200 x 33 px on screen).
  *  (x, y) = top-left; h = bar height. `at` draws the frame. */
-export const ProgressBar: React.FC<{x: number; y: number; w: number; h: number; steps: ProgressStep[]; at?: number; width?: number; depth?: Depth; seed?: Seed}> = ({x, y, w, h, steps, at, width, depth, seed = 'pb'}) => {
+const ProgressBarBase: React.FC<{x: number; y: number; w: number; h: number; steps: ProgressStep[]; at?: number; width?: number; depth?: Depth; seed?: Seed}> = ({x, y, w, h, steps, at, width, depth, seed = 'pb'}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   let v = 0;
@@ -282,3 +284,6 @@ export const ProgressBar: React.FC<{x: number; y: number; w: number; h: number; 
     </>
   );
 };
+
+// build-out (outAt / outDur) for props that have no own exit
+export const ProgressBar = withOut(ProgressBarBase, 'ProgressBar');

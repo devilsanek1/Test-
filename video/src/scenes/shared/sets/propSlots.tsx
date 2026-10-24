@@ -17,7 +17,9 @@ import {mat, XG} from '../../../lib/xf';
 import {Noticeboard} from '../../../lib/kit';
 import {Seed} from '../../../lib/rng';
 import {popK, PopAt} from './common';
-import {BackSoonTag, Bit, BrowserChrome, CheckFlag, CheckMark, ElephantEmblem, ElephantPlaque, ElephantStamp, Lock, RollerShutter, ShutterPadlock, TargetRing, WrenchTag} from '../props';
+import {BackSoonTag, Bit, Bollard, BrowserChrome, Calendar, CalPage, CheckFlag, CheckMark, Citizen, EdgeOnlooker, ElephantEmblem, ElephantPlaque, ElephantStamp, Lock, LockProps, Magnifier, MailSlot, Maker, PaneRect, QuestionMark, RailBoard, RollerShutter, ShutterPadlock, TargetRing, WrenchGlyph, WrenchTag} from '../props';
+import type {Acc, Hair} from '../../../lib/kit';
+export type {LockProps, CalPage, PaneRect};
 
 // ---------------------------------------------------------------- elephant emblem (P2 ElephantEmblem stand-in)
 
@@ -74,7 +76,8 @@ export const ChromeSlot: React.FC<ChromeSlotProps> = ({x, y, w, h, chromeAt, chr
     h={h}
     chromeAt={chrome ? chromeAt : 1e9}
     plainFirst={!chrome || chromeAt !== undefined}
-    screenOnAt={screenOnAt}
+    screenOnAt={chrome ? screenOnAt ?? chromeAt : undefined}
+    state={chrome ? 'built' : 'glass'}
     offAt={offAt}
     mode={lod === 'dots' ? 'dots' : 'window'}
     ink={width}
@@ -119,13 +122,8 @@ export const BackSoonSlot: React.FC<{x: number; y: number; at?: number; tapAt?: 
 
 // ---------------------------------------------------------------- P17 Bollard
 
-/** PLACEHOLDER for props Bollard (P17): cream post 50 x 90, ink 4.8; (x, y) = top centre (Pip's feet). */
-export const BollardSlot: React.FC<{x: number; y: number; w?: number; h?: number; width?: number; seed?: Seed; at?: number}> = ({x, y, w = 50, h = 90, width = stroke.inkBold, seed = 'bollard', at}) => (
-  <PopAt at={at} x={x} y={y + h}>
-    <Fill d={`M${x - w / 2} ${y + h}L${x - w / 2} ${y + w * 0.3}Q${x - w / 2} ${y} ${x} ${y}Q${x + w / 2} ${y} ${x + w / 2} ${y + w * 0.3}L${x + w / 2} ${y + h}Z`} color={palette.cream} seed={`${seed}/f`} />
-    <Ink d={`M${x - w / 2} ${y + h + 6}L${x - w / 2} ${y + w * 0.3}Q${x - w / 2} ${y} ${x} ${y}Q${x + w / 2} ${y} ${x + w / 2} ${y + w * 0.3}L${x + w / 2} ${y + h + 6}` + hline(x - w / 2, x + w / 2, y + w * 0.62, {seed: `${seed}/b`, over: 'small'})} width={width} taper={false} />
-  </PopAt>
-);
+/** -> props Bollard (P17): cream post 50 x 90, ink 4.8; (x, y) = TOP centre (Pip's feet). */
+export const BollardSlot: React.FC<{x: number; y: number; w?: number; h?: number; width?: number; seed?: Seed; at?: number}> = ({x, y, w = 50, h = 90, seed = 'bollard', at}) => <Bollard x={x} y={y + h} w={w} h={h} at={at} seed={seed} />;
 
 // ---------------------------------------------------------------- hanging signs (P2 variants)
 
@@ -175,9 +173,14 @@ export function magnifierPath(x: number, y: number, r: number): string {
 
 // ---------------------------------------------------------------- P8 Noticeboard with address rail
 
-/** PLACEHOLDER for props NoticeboardRail (P8): kit Noticeboard (teal frame, two mintPale panes, legs) + an
- *  address-bar rail (cream pill + three dots) on the top frame. Frame rect x, y, w, h; legs to legsY. */
-export const NoticeboardSlot: React.FC<{x: number; y: number; w: number; h: number; legsY: number; rail?: [number, number, number, number]; at?: number; seed?: Seed; children?: React.ReactNode}> = ({x, y, w, h, legsY, rail, at, seed = 'nb', children}) => (
+/** -> props RailBoard (P8): teal frame, two mintPale panes, legs, address-bar rail on the top frame. Frame rect x, y, w, h;
+ *  legs to legsY; the rail size comes from `rail` [x, y, w, h] (only w, h are used: the prop centres it). */
+export const NoticeboardSlot: React.FC<{x: number; y: number; w: number; h: number; legsY: number; rail?: [number, number, number, number]; at?: number; riseAt?: number; railLightAt?: number; pane1?: (r: PaneRect) => React.ReactNode; pane2?: (r: PaneRect) => React.ReactNode; paneDarkAt?: number; pane2ScaleInAt?: number; outAt?: number; seed?: Seed}> = ({x, y, w, h, legsY, rail, seed = 'nb', ...rest}) => (
+  <RailBoard x={x} y={y} w={w} h={h} legs={legsY - (y + h)} rail={rail ? {w: rail[2], h: rail[3]} : undefined} seed={seed} {...rest} />
+);
+
+/** PLACEHOLDER (kept for reference): kit Noticeboard + a simple rail. */
+export const NoticeboardPlaceholder: React.FC<{x: number; y: number; w: number; h: number; legsY: number; rail?: [number, number, number, number]; at?: number; seed?: Seed; children?: React.ReactNode}> = ({x, y, w, h, legsY, rail, at, seed = 'nb', children}) => (
   <>
     <Noticeboard x={x} y={y} w={w} h={h} legs={legsY - (y + h)} at={at} seed={seed}>
       {children}
@@ -186,9 +189,6 @@ export const NoticeboardSlot: React.FC<{x: number; y: number; w: number; h: numb
       <>
         <Fill d={roundRect(rail[0], rail[1], rail[2], rail[3], rail[3] / 2)} color={palette.cream} at={at} seed={`${seed}/rail`} />
         <Ink d={roundRect(rail[0], rail[1], rail[2], rail[3], rail[3] / 2, {closed: false, seed: `${seed}/raili`})} width={stroke.inkThin} at={at} taper={false} />
-        {[palette.cream, palette.sage, palette.peach].map((c, i) => (
-          <circle key={i} cx={rail[0] + rail[3] * 0.7 + i * rail[3] * 0.62} cy={rail[1] + rail[3] / 2} r={rail[3] * 0.22} fill={c} stroke={palette.ink} strokeWidth={1} />
-        ))}
       </>
     ) : null}
   </>
@@ -199,20 +199,33 @@ export const NoticeboardSlot: React.FC<{x: number; y: number; w: number; h: numb
 /** -> props ElephantStamp: perspective ellipse print (S02) or round corner stamp (S05). `at` = the slam. */
 export const ElephantStampSlot: React.FC<{x: number; y: number; rx: number; ry: number; ring?: number; at?: number; seed?: Seed}> = ({x, y, rx, ry, ring = 14, at, seed = 'stamp'}) => <ElephantStamp x={x} y={y} rx={rx} ry={ry} ring={ring} slamAt={at} seed={seed} />;
 
-/** PLACEHOLDER for props Calendar (P14): tear-off calendar 70 x 80, cream pages, sand header, no numerals. */
-export const CalendarSlot: React.FC<{x: number; y: number; w?: number; h?: number; at?: number; seed?: Seed}> = ({x, y, w = 70, h = 80, at, seed = 'cal'}) => (
-  <PopAt at={at} x={x + w / 2} y={y}>
-    <Fill rect={[x, y, w, h]} color={palette.cream} seed={`${seed}/p`} />
-    <Fill rect={[x, y, w, h * 0.22]} color={palette.sand} offset={false} seed={`${seed}/h`} />
-    <Ink d={rect(x, y, w, h, {seed: `${seed}/o`, over: 'small'}) + hline(x, x + w, y + h * 0.22, {seed: `${seed}/hl`, over: 0}) + circle(x + w * 0.5, y + h * 0.6, w * 0.16, {seed: `${seed}/s`})} width={stroke.inkThin} taper={false} />
-  </PopAt>
+/** -> props Calendar (P14): tear-off calendar 70 x 80 (x, y = top-left). Default pages: four season pages. */
+export const CalendarSlot: React.FC<{x: number; y: number; w?: number; h?: number; at?: number; pages?: CalPage[]; tearAt?: number[]; seed?: Seed}> = ({x, y, w = 70, h = 80, at, pages, tearAt, seed = 'cal'}) => (
+  <Calendar x={x} y={y} w={w} h={h} at={at} pages={pages ?? [{kind: 'season', i: 0}, {kind: 'season', i: 1}, {kind: 'season', i: 2}, {kind: 'season', i: 3}]} tearAt={tearAt} seed={seed} />
 );
+
+/** -> props Magnifier / WrenchGlyph (riser glyphs, ink only). */
+export const MagnifierSlot: React.FC<{x: number; y: number; r: number; at?: number; width?: number; seed?: Seed}> = ({x, y, r, at, width, seed = 'mag'}) => <Magnifier x={x} y={y} r={r} at={at} width={width} seed={seed} />;
+export const WrenchSlot: React.FC<{x: number; y: number; w: number; at?: number; width?: number; seed?: Seed}> = ({x, y, w, at, width, seed = 'wr'}) => <WrenchGlyph x={x} y={y} w={w} at={at} width={width} seed={seed} />;
+/** -> props QuestionMark (S09). */
+export const QuestionSlot: React.FC<{x: number; y: number; size: number; at?: number; seed?: Seed}> = ({x, y, size, at, seed = 'q'}) => <QuestionMark x={x} y={y} size={size} at={at} seed={seed} />;
 
 /** -> props CheckMark (P15): strokes on over 0.17 s from `at`. */
 export const CheckSlot: React.FC<{x: number; y: number; size: number; at?: number; width?: number}> = ({x, y, size, at, width = stroke.inkBold}) => <CheckMark x={x} y={y} size={size} at={at} width={width} />;
 
 /** -> props ElephantEmblem: the generic ink elephant (blueprints, stamps). (x, y) = centre, size = width. */
 export const EmblemSlot: React.FC<{x: number; y: number; size: number; width?: number; bg?: string; old?: boolean; at?: number; seed?: Seed}> = ({x, y, size, width, bg = palette.white, old, at, seed = 'emb'}) => <ElephantEmblem x={x} y={y} size={size} ink={width} bg={bg} style={old ? 'old' : 'modern'} mode="line" at={at} seed={seed} />;
+
+// ---------------------------------------------------------------- P11 figures, P9 mail slot
+
+/** -> props Citizen (P11): 40-55 px back-view citizen with legs; (x, y) = feet; `silhouette` = flat sage cut-out. */
+export const CitizenSlot: React.FC<{x: number; y: number; h: number; silhouette?: boolean; riseAt?: number; body?: string; acc?: Acc[]; seed?: Seed}> = (p) => <Citizen {...p} />;
+/** -> props EdgeOnlooker (P11): big head + shoulders at a frame side, torso cropped by the bottom; (x, y) = head centre. */
+export const OnlookerSlot: React.FC<{x: number; y: number; head?: number; hair?: Hair; acc?: Acc[]; body?: string; riseAt?: number; raisePhoneAt?: number; rim?: 'left' | 'right' | false; seed?: Seed}> = (p) => <EdgeOnlooker {...p} />;
+/** -> props Maker (P11): cream apron over teal; `bust` = waist-up at a bench. (x, y) = feet (bust: waist). */
+export const MakerSlot: React.FC<{x: number; y: number; h: number; bust?: boolean; work?: number; riseAt?: number; seed?: Seed; flip?: boolean}> = (p) => <Maker {...p} />;
+/** -> props MailSlot (P9): (x, y) = centre, 50 x 10; flap clicks at clickAt. */
+export const MailSlotSlot: React.FC<{x: number; y: number; w?: number; h?: number; clickAt?: number | number[]; seed?: Seed}> = (p) => <MailSlot {...p} />;
 
 /** re-export for sets that draw the props-lane glyph shapes themselves */
 export {smooth, arc, springAt, springs, rectPath, ellipse, blob, polyPath, popK};

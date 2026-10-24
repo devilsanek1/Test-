@@ -12,13 +12,21 @@
 // RELIGHT RULE (style_bible_ref2 4, measured): time of day never MIXES paint. Only the light fields step down one
 // palette step at dusk (sky -> teal, mintPale -> sky, sand -> tan, cream -> sand) and the near ground a second step at
 // night (mintPale -> sage). Whites, mid and dark tones, ochre, ink, peach and the sun never move (TOD_STEPS).
+// ONE TABLE FOR BOTH LANES: the caption-band sky (skyBands[0]) and the caption tone come from theme `skies` / `todTone`
+// (day and golden: the flat day sky #ACD1BF + ink, style_bible_ref2 8 "golden = same flat sky + peach-lit faces";
+// dusk: sage + ink; night: #588077 + white). Pieces default `tod` to the core <Tod> context (useTodPal), so inside a
+// timed <World> they relight with it; pass `tod` to pin one.
 
-import {palette, todSteps, TodRole} from '../theme';
-import {relight} from '../tod';
+import {captionTones, palette, skies, todSteps, todTone, TodName, TodRole} from '../theme';
+import {relight, useTodValue} from '../tod';
 import {hexToRgb, mix, rgbToHex} from './util';
 
-export type Tod = 'day' | 'golden' | 'dusk' | 'night' | 'dawn';
-export const TODS: Tod[] = ['day', 'golden', 'dusk', 'night', 'dawn'];
+/** A time of day name (the same names as the core `TodName`). Renamed from `Tod` (which clashed with the core <Tod>
+ *  component in the barrels). */
+export type TodLike = TodName;
+/** @deprecated use `TodLike` (kept for deep imports from './atmosphere'; not re-exported by the cine barrel). */
+export type Tod = TodLike;
+export const TODS: TodLike[] = ['day', 'golden', 'dusk', 'night', 'dawn'];
 
 /** Multiply a colour's RGB by k (k < 1 darkens, keeps hue). */
 export function shade(hex: string, k: number): string {
@@ -39,18 +47,20 @@ type Base = {-readonly [K in keyof typeof palette]: string};
 
 /** Palette steps per time of day (hex -> hex), the `base` row of the SHARED table `todSteps` (theme.ts, read by core
  *  <Fill> through <Tod> too), so cine and core relight identically. Anything not listed keeps its paint. */
-export const TOD_STEPS: Record<Tod, Readonly<Record<string, string>>> = Object.fromEntries(
+export const TOD_STEPS: Record<TodLike, Readonly<Record<string, string>>> = Object.fromEntries(
   TODS.map((name) => {
     const row = todSteps[name]?.base ?? {};
     const m: Record<string, string> = {};
     for (const k of Object.keys(row) as (keyof typeof palette)[]) m[P[k].toUpperCase()] = row[k]!;
     return [name, m];
   }),
-) as Record<Tod, Readonly<Record<string, string>>>;
+) as Record<TodLike, Readonly<Record<string, string>>>;
 
 export type TodPalette = Base & {
-  name: Tod;
-  /** Flat sky value steps, top -> horizon (draw with <Sky>). */
+  name: TodLike;
+  /** Relight row the base keys were stepped with ('base'; 'far' / 'cloud' / 'framing' from a core <Tod role>). */
+  role: TodRole;
+  /** Flat sky value steps, top -> horizon (draw with <Sky>). [0] = the caption-band sky = theme todSky (golden: day). */
   skyBands: string[];
   /** Colour far layers are pulled toward (atmospheric perspective). */
   haze: string;
@@ -75,7 +85,7 @@ export type TodPalette = Base & {
   /** Rim light / lit edge colour. */
   rim: string;
   ground: string;
-  /** Caption text colour on this sky (ref 2: ink on light skies, white on teal). */
+  /** Caption text colour on this sky (= theme captionTones[todTone[name]].text: ink on day / golden / dusk, white at night). */
   text: string;
   /** Palette steps this light applies (TOD_STEPS[name]; see ambient()). */
   steps: Readonly<Record<string, string>>;
@@ -83,18 +93,21 @@ export type TodPalette = Base & {
   hazeMax: number;
 };
 
-function make(name: Tod, o: Omit<TodPalette, keyof Base | 'name' | 'steps'>): TodPalette {
+type Opts = Omit<TodPalette, keyof Base | 'name' | 'steps' | 'role' | 'text'>;
+
+function make(name: TodLike, o: Opts, role: TodRole = 'base'): TodPalette {
   const steps = TOD_STEPS[name];
   const base = {} as Base;
-  for (const k of Object.keys(P) as (keyof typeof P)[]) base[k] = steps[P[k].toUpperCase()] ?? P[k];
+  for (const k of Object.keys(P) as (keyof typeof P)[]) base[k] = relight(P[k], name, role);
   base.sky = o.skyBands[0];
   base.bg = o.skyBands[Math.min(1, o.skyBands.length - 1)];
-  return {...base, name, steps, ...o};
+  return {...base, name, role, steps, text: captionTones[todTone[name]].text, ...o};
 }
 
-export const TOD: Record<Tod, TodPalette> = {
-  day: make('day', {
-    skyBands: [P.sky, P.sky, mix(P.sky, P.mintPale, 0.3)],
+const OPTS: Record<TodLike, Opts> = {
+  day: {
+    // ONE flat value (ref 2 day skies are flat: no steps, no divider line under the caption band)
+    skyBands: [skies.day],
     // ref 2 day: far layers step from sage toward the sky (#98C0AE ~ mix(sky, sage, 0.25)), never lighter than it
     haze: P.sky,
     horizonGlow: mix(P.sky, P.mintPale, 0.55),
@@ -111,11 +124,11 @@ export const TOD: Record<Tod, TodPalette> = {
     silhouette: P.sage,
     rim: P.white,
     ground: P.mintPale,
-    text: P.ink,
     hazeMax: 0.78,
-  }),
-  golden: make('golden', {
-    skyBands: [P.sky, mix(P.sky, P.cream, 0.4), mix(P.cream, P.peach, 0.3)],
+  },
+  golden: {
+    // style_bible_ref2 8: golden = the same flat day sky + peach-lit faces and a low sun (no sky steps)
+    skyBands: [skies.day],
     haze: mix(P.cream, P.sky, 0.3),
     horizonGlow: mix(P.peach, P.cream, 0.45),
     glow: P.peach,
@@ -131,32 +144,33 @@ export const TOD: Record<Tod, TodPalette> = {
     silhouette: mix(P.sky, P.teal, 0.45),
     rim: P.cream,
     ground: P.cream,
-    text: P.ink,
     hazeMax: 0.75,
-  }),
-  dusk: make('dusk', {
-    skyBands: [P.teal, mix(P.teal, P.sage, 0.5), P.sage, mix(P.sage, P.sky, 0.5), P.sky, mix(P.peach, P.cream, 0.3)],
+  },
+  dusk: {
+    // ref 2 dusk sky = sage #6D988B (f_33) = theme skies.dusk, ink captions (todTone.dusk); value steps toward peach
+    // only BELOW y 600 (Sky keeps the caption band on skyBands[0]); teal / #588077 is night's
+    skyBands: [skies.dusk, mix(P.sage, P.sky, 0.55), mix(P.sky, P.peach, 0.45), mix(P.peach, P.cream, 0.3)],
     haze: mix(P.sky, P.peach, 0.35),
     horizonGlow: mix(P.peach, P.cream, 0.45),
     glow: P.peach,
     sunColor: P.sun,
-    cloud: P.sage,
+    cloud: mix(P.sage, P.teal, 0.5),
     cloudShade: P.teal,
     cloudInk: false,
     star: P.cream,
-    stars: 0.45,
+    stars: 0.25,
     windowLit: [P.peach, P.cream],
     windowDark: P.tealDark,
     facade: [P.tealDark, P.teal, P.tan, P.brown],
     silhouette: P.tealDark,
     rim: P.peach,
     ground: P.teal,
-    text: P.white,
     hazeMax: 0.8,
-  }),
-  night: make('night', {
-    // never darker than teal behind the captions (style_bible_ref2 8); a little lighter toward the horizon (city glow)
-    skyBands: [P.teal, mix(P.teal, P.sage, 0.3), mix(P.teal, P.sage, 0.55)],
+  },
+  night: {
+    // = theme skies.night #588077 behind the captions (never darker, style_bible_ref2 8); lighter steps toward the
+    // horizon (city glow), all below y 600
+    skyBands: [skies.night, mix(skies.night, P.sage, 0.3), mix(skies.night, P.sage, 0.55)],
     // ref 2 night far step #4B706B = mix(teal, tealDark, 0.5)
     haze: mix(P.teal, P.tealDark, 0.5),
     horizonGlow: P.teal,
@@ -173,11 +187,10 @@ export const TOD: Record<Tod, TodPalette> = {
     silhouette: deep.teal60,
     rim: P.sage,
     ground: P.tealDark,
-    text: P.white,
     hazeMax: 0.72,
-  }),
-  dawn: make('dawn', {
-    skyBands: [P.sage, mix(P.sky, P.peach, 0.25), mix(P.peach, P.cream, 0.5)],
+  },
+  dawn: {
+    skyBands: [skies.day, mix(P.sky, P.peach, 0.25), mix(P.peach, P.cream, 0.5)],
     haze: mix(P.sky, P.cream, 0.45),
     horizonGlow: P.cream,
     glow: P.cream,
@@ -193,18 +206,38 @@ export const TOD: Record<Tod, TodPalette> = {
     silhouette: P.teal,
     rim: P.cream,
     ground: P.sand,
-    text: P.ink,
     hazeMax: 0.75,
-  }),
+  },
 };
 
-export const todPal = (tod: Tod | TodPalette): TodPalette => (typeof tod === 'string' ? TOD[tod] : tod);
+export const TOD: Record<TodLike, TodPalette> = Object.fromEntries(TODS.map((n) => [n, make(n, OPTS[n])])) as Record<TodLike, TodPalette>;
+
+const ROLE_PAL = new Map<string, TodPalette>();
+/** TOD[name] with its base keys stepped by a relight `role` row (core <Tod role="far">). */
+export function todPalRole(name: TodLike, role: TodRole = 'base'): TodPalette {
+  if (role === 'base') return TOD[name];
+  const k = `${name}/${role}`;
+  let v = ROLE_PAL.get(k);
+  if (!v) ROLE_PAL.set(k, (v = make(name, OPTS[name], role)));
+  return v;
+}
+
+/** The palette a cine piece paints with: its own `tod` prop when given, else the core <Tod> context (time of day AND
+ *  relight role), so pieces inside a timed <World> relight with it. A hook: call it in the piece itself (below the
+ *  World / <Tod>); outside any <Tod> the context is 'day'. */
+export function useTodPal(tod?: TodLike | TodPalette): TodPalette {
+  const v = useTodValue();
+  return tod !== undefined ? todPal(tod) : todPalRole(v.tod, v.role);
+}
+
+export const todPal = (tod: TodLike | TodPalette): TodPalette => (typeof tod === 'string' ? TOD[tod] : tod);
 
 /** The paint `color` under this time of day's light (no depth tint): a palette STEP for the light fields (the shared
- *  todSteps table via core relight(); `role` picks its far / cloud / framing row), every other paint unchanged. Never a mix. */
-export function ambient(color: string, tod: Tod | TodPalette, role: TodRole = 'base'): string {
+ *  todSteps table via core relight(); `role` picks its far / cloud / framing row, default the palette's own role),
+ *  every other paint unchanged. Never a mix. */
+export function ambient(color: string, tod: TodLike | TodPalette, role?: TodRole): string {
   const p = todPal(tod);
-  return relight(color, p.name, role);
+  return relight(color, p.name, role ?? p.role);
 }
 
 export type AtmosOpts = {
@@ -225,7 +258,7 @@ export const tone = (depth: number, steps = 4) => Math.round(Math.max(0, Math.mi
 
 /** Depth-tinted flat colour: ambient-shifted paint pulled toward the sky haze in a few STEPS (far = flatter,
  *  closer to the sky). depth 0 = near, 1 = horizon. */
-export function atmos(color: string, depth: number, tod: Tod | TodPalette, o: AtmosOpts = {}): string {
+export function atmos(color: string, depth: number, tod: TodLike | TodPalette, o: AtmosOpts = {}): string {
   const p = todPal(tod);
   const q = depth < (o.clear ?? 0.3) ? 0 : tone(depth, o.steps ?? 4);
   const amt = (o.max ?? p.hazeMax) * Math.pow(q, o.gamma ?? 1.35);

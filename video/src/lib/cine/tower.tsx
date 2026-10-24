@@ -15,7 +15,7 @@ import {palette, stroke} from '../theme';
 import {useTime} from '../time';
 import {Seed} from '../rng';
 import {line, Pt} from '../sketch';
-import {ambient, Tod, TodPalette, todPal} from './atmosphere';
+import {ambient, TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
 import {darker} from './city';
 import {lerpPt, Quad, quadMap} from './persp';
 import {gridCells, SwitchEvent, switchTimes, windowPaths} from './windows';
@@ -57,7 +57,7 @@ export function towerFaces(o: TowerGeoOpts): {left: Quad; right: Quad; vp: Pt} {
 }
 
 export type TowerProps = TowerGeoOpts & {
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   /** Face colours (lit / shade). */
   lit?: string;
   shade?: string;
@@ -77,10 +77,10 @@ export type TowerProps = TowerGeoOpts & {
   buildDur?: number;
 };
 
-export const Tower: React.FC<TowerProps> = ({tod = 'day', lit, shade, floors = 60, colsL = 10, colsR = 9, windows, light = 'right', crown = true, seed = 'tower', inkW = stroke.inkBold, at, buildDur = 1.6, ...g}) => {
+export const Tower: React.FC<TowerProps> = ({tod, lit, shade, floors = 60, colsL = 10, colsR = 9, windows, light = 'right', crown = true, seed = 'tower', inkW = stroke.inkBold, at, buildDur = 1.6, ...g}) => {
   const S = useCineState();
   const t = S.t;
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const F = towerFaces(g);
   const litC = lit ?? ambient(palette.cream, p);
   const shadeC = shade ?? ambient(darker(darker(palette.cream)), p);

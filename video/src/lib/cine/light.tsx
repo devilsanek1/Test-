@@ -15,7 +15,7 @@ import React, {useId, useMemo} from 'react';
 import {Ease, ease as E, lerp, osc, prog, useTime} from '../time';
 import {Sun, SunMove, SunProps} from '../Sun';
 import type {Pt} from '../sketch';
-import {Tod, TodPalette, todPal} from './atmosphere';
+import {TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
 import {mix, PathBuf, r1} from './util';
 import {palette} from '../theme';
 import {exitScale, useCineState} from './state';
@@ -66,7 +66,7 @@ export const Glow: React.FC<GlowProps> = ({cx, cy, r, rings = 3, spread = 1.4, c
 export type SunKey = {t: number; x?: number; y?: number; r?: number; ease?: Ease};
 
 export type BigSunProps = Omit<SunProps, 'children'> & {
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   /** Set / rise path: keys of position (and radius) over scene time (converted to core Sun moves). */
   path?: SunKey[];
   /** Halo discs behind the disc (0 = none). Default 2. They follow every Sun behaviour (hops, beats). */
@@ -77,8 +77,15 @@ export type BigSunProps = Omit<SunProps, 'children'> & {
   glowSpread?: number;
   glowColor?: string;
   glowOpacity?: number;
+  /** Idle bob: amplitude px (default 0) at `bobHz` (default 0.22): a slow float, never perfectly still. */
+  bob?: number;
+  bobHz?: number;
   children?: React.ReactNode | ((r: number) => React.ReactNode);
 };
+
+/** BigSun's default idle drift (px/s): ENGINE rule 6 (>= 10 px/s or a bob). It SETS (sinks) at every time of day but
+ *  dawn, where it rises; a little sideways. */
+export const sunDrift = (tod: TodLike): [number, number] => (tod === 'dawn' ? [3, -9.5] : [3, 9.5]);
 
 function pathMoves(path: SunKey[]): SunMove[] {
   const out: SunMove[] = [];
@@ -128,13 +135,15 @@ const SunHalo: React.FC<{r: number; rings: number; spread: number; color: string
 
 /** The huge orange disc on the horizon (r 150 by default). Wraps the core <Sun> (beats, bounce, hops, drift, rise,
  *  moves, set behind a horizon line, overlays via children(r)) and adds stepped glow discs behind it that follow
- *  every behaviour (they ride on a second, invisible Sun). Default `drift` [2.2, 0.6] px/s: never perfectly still
- *  (pass [0, 0] to pin it, e.g. for a match-cut frame). */
+ *  every behaviour (they ride on a second, invisible Sun). Default `drift` sunDrift(tod) = ~10 px/s, sinking (setting):
+ *  never perfectly still (ENGINE rule 6). Pass [0, 0] to pin it (a match-cut frame) and use `bob` for a float instead.
+ *  Inter-shot handoffs: start the next shot's sun where the last one left it and `hops` it to its new place (squash /
+ *  stretch / landing squash, landing on a stressed word) once the wiper has passed. */
 export const BigSun: React.FC<BigSunProps> = ({
   cx = 540,
   cy = 1000,
   r = 150,
-  tod = 'dusk',
+  tod,
   path,
   breathe = 0.008,
   glow = 2,
@@ -144,17 +153,24 @@ export const BigSun: React.FC<BigSunProps> = ({
   glowOpacity = 0.14,
   color,
   moves: extra = [],
-  drift = [2.2, 0.6],
+  drift: driftIn,
+  bob = 0,
+  bobHz = 0.22,
   children,
   ...sunProps
 }) => {
-  const p = todPal(tod);
+  const p = useTodPal(tod);
+  const t = useTime();
+  const drift = driftIn ?? sunDrift(p.name);
   const x0 = path?.[0]?.x ?? cx;
   const y0 = path?.[0]?.y ?? cy;
   const r0 = path?.[0]?.r ?? r;
   const moves = [...(path ? pathMoves(path) : []), ...extra];
   const common = {cx: x0, cy: y0, r: r0, moves, breathe, drift, ...sunProps};
-  return (
+  const by = bob ? Math.sin(t * bobHz * 6.2832) * bob : 0;
+  // the bob moves the disc, not the horizon it sets behind
+  if (by && sunProps.horizon !== undefined) (common as {horizon?: number}).horizon = sunProps.horizon - by;
+  const body = (
     <>
       {glow > 0 ? (
         <Sun {...common} color="none">
@@ -166,6 +182,7 @@ export const BigSun: React.FC<BigSunProps> = ({
       </Sun>
     </>
   );
+  return by ? <g transform={`translate(0 ${by.toFixed(2)})`}>{body}</g> : body;
 };
 
 // ---------------------------------------------------------------- LightShaft

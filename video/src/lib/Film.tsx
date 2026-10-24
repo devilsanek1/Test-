@@ -431,7 +431,8 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
 
   const pushLayer = (s: FilmScene, i: number, o: {offset?: number; cam?: StageCam; clip?: string; exit?: number; z: number; trans?: TransitionInfo | null; key?: string}) => {
     const Comp = comp(s.id);
-    const info: SceneInfo = {id: s.id, start: s.start, end: s.end, dur: s.end - s.start};
+    const ti = s.transitionIn;
+    const info: SceneInfo = {id: s.id, start: s.start, end: s.end, dur: s.end - s.start, transitionIn: ti && i > 0 ? {type: ti.type, dur: tdur(ti), dir: 'dir' in ti ? ti.dir : undefined} : undefined};
     layers.push({
       key: o.key ?? `${s.id}#${i}`,
       z: o.z,

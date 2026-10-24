@@ -127,6 +127,8 @@ export type WindowFilter = {
   keep?: (i: number) => boolean;
   /** Force cell i dark this frame (e.g. a caption-safe band, or windows switched off by an un-build). */
   dark?: (i: number) => boolean;
+  /** Final say on cell i's state (after the events and `dark`): e.g. a hero window lit until its own off time. */
+  override?: (i: number, on: boolean) => boolean;
 };
 
 /** Build batched paths for the windows at time t. `times` from switchTimes(). */
@@ -158,6 +160,7 @@ export function windowPaths(cells: WinCell[], events: SwitchEvent[], times: Floa
       }
     }
     if (on && force && force(i)) on = false;
+    if (filter.override) on = filter.override(i, on);
     const dt = t - since;
     let s = 1;
     if (on && dt < POP && popK > 0) s = 1 + popK * Math.sin((Math.PI * dt) / POP);

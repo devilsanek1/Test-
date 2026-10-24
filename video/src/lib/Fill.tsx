@@ -10,8 +10,9 @@
 // Modes: pop (default: centre grow 0.2 -> 1 over MOTION.fillGrow, no overshoot) | snap (1-frame pop) | wipe (reveal
 // toward `dir`, linear) | grow (scale from the edge opposite `dir`, out-expo 0.2 s) | spring (centre pop with the 7%
 // overshoot spring) | none. 'fade' is accepted for old code and behaves like 'snap' (@deprecated: nothing fades).
-// Time of day: the colour goes through the current <Tod> (lib/tod.tsx: reference 2's relight step table), so a timed
-// <World sky> relights every fill with its sky wipe. The World sky itself (lookExempt) is never relit.
+// Time of day: the colour goes through the current <Tod> (lib/tod.tsx: reference 2's relight step table). When a timed
+// <World sky> key changes the light, each fill flips WHOLE in one frame as the sky's wipe edge reaches its centre (or
+// its <TodAnchor>), so objects relight staggered by height. The World sky itself (lookExempt) is never relit.
 // Exit (un-build): every fill shrinks to its centre (ease-in, small ones first); the big background slab (>= ~55% of
 // the frame: sky, a wall) collapses downward last.
 
@@ -25,7 +26,7 @@ import {rand, rng, Seed} from './rng';
 import {Ink, InkProps} from './Ink';
 import {MOTION} from './spec';
 import {applyH, projectPath} from './persp';
-import {useRelight} from './tod';
+import {relightAt, useTodValue} from './tod';
 
 import {rectPath} from './sketch';
 import {mat, useProj, useXf} from './xf';
@@ -167,7 +168,7 @@ export const Fill: React.FC<FillProps> = ({
   const t = useTime();
   const e = useExit();
   const look = useLook();
-  const rl = useRelight();
+  const tv = useTodValue();
   const clipCtx = useContext(ClipCtx);
   const area = useContext(AreaCtx);
   const proj = useProj();
@@ -184,7 +185,10 @@ export const Fill: React.FC<FillProps> = ({
   if (at !== undefined && t < at) return null;
   if (!lookExempt && look.fills === 'none') return null;
   const box = rect && !proj ? {x: rect[0], y: rect[1], w: rect[2], h: rect[3]} : bbox(d);
-  let paint = lookExempt ? color : rl(color);
+  // time of day: during a relight wave the fill flips whole, in one frame, when the sky edge reaches its centre
+  // (or its <TodAnchor>): motion spec #12, never a clip edge through the object
+  const screenC: [number, number] | undefined = tv.wave && !tv.anchor ? [m[0] * (box.x + box.w / 2) + m[2] * (box.y + box.h / 2) + m[4], m[1] * (box.x + box.w / 2) + m[3] * (box.y + box.h / 2) + m[5]] : undefined;
+  let paint = lookExempt ? color : tv.tod === 'day' && !tv.wave && !tv.map ? color : relightAt(tv, color, screenC);
   if (!lookExempt && look.fills === 'paper') paint = palette.white;
   else if (!lookExempt && look.cascade) {
     const c = look.cascade;

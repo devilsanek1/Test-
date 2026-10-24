@@ -16,6 +16,7 @@ import {Window} from './Window';
 import {Door} from './Door';
 import {circle, hatch, hline, line, poly, polyPath, rect, roundRect, wallTicks, Pt} from '../sketch';
 import {At, b} from './common';
+import {TodAnchor} from '../tod';
 
 export type ShopOpts = {sign?: 'cart' | 'cross' | 'cup' | 'text' | 'none'; awning?: string; color?: string; glass?: string};
 
@@ -252,7 +253,8 @@ export const Building: React.FC<BuildingProps> = ({
     }
   }
   out.push(<Ink key="base" d={hline(x - 4, x + w + 4, y, {seed: `${seed}/base`})} at={T(0.2)} dur={0.3 * k} width={width} />);
-  return <>{out}</>;
+  // the whole building relights in one frame (time-of-day wave)
+  return <TodAnchor at={[x + w / 2, y - H / 2]}>{out}</TodAnchor>;
 };
 
 // ---------------------------------------------------------------- Wall (f_9.0 style)
@@ -295,7 +297,7 @@ export const Wall: React.FC<WallProps> = ({x, y, w, h, at, seed = 'wall', color 
     out.push(<Fill key="g" rect={[x, y + h - ground, w, ground]} color={palette.mintPale} at={b(at, 0.3)} mode="wipe" dir="right" offset={false} seed={`${seed}/g`} />);
     out.push(<Ink key="gl" d={hline(x - 30, x + w + 40, y + h - ground, {seed: `${seed}/gl`, over: [20, 45]}) + hline(x - 10, x + w + 20, y + h - ground + 18, {seed: `${seed}/gl2`})} at={b(at, 0.2)} dur={0.5} width={width} />);
   }
-  return <>{out}</>;
+  return <TodAnchor at={[x + w / 2, y + h / 2]}>{out}</TodAnchor>;
 };
 
 /** A few horizontal ground / pavement lines with overshoot (street edge). */

@@ -22,8 +22,14 @@
 // ends are both at rest (a plain two-key move, or a direction change) uses its key's `ease` instead. `CAM.settle`
 // (starts in motion) is honoured only on the FIRST segment: a shot that continues the previous shot's move.
 //
-// Keys:  {t, x?, y?, zoom?, push?, rot?, ease?, anchor?, anchorDepth?, anchorTo?}
-//   x, y      world point at the screen centre on the reference plane (default 540, 960 = rest)
+// Keys:  {t, x?, y?, zoom?, push?, rot?, pan?, tilt?, ease?, anchor?, anchorDepth?, anchorTo?}
+//   x, y      world point at the screen centre on the reference plane (default 540, 960 = rest): a TRUCK / CRANE
+//             (the camera translates: near layers move more than far ones, the depth-1 sky not at all)
+//   pan, tilt the camera ROTATES (px on screen; tilt > 0 looks up, pan > 0 looks right): every layer, the sky and the
+//             sun included, shifts by the same amount, so the horizon stays on the sky's horizon and the vanishing
+//             lines keep converging on it. Arcane's tilt-up / tilt-down reveal. Applied after anchoring.
+//             A `y` crane with the horizon in frame slides the ground's horizon against the depth-1 sky: crane only
+//             with the horizon off-frame (or the ground's far edge on a depth ~1 layer); otherwise use `tilt`.
 //   anchor    [x, y] world point (in the layer of depth anchorDepth, default 0) kept at screen anchorTo
 //             (default: where it is at rest). Overrides x / y for that key.
 // Missing values inherit from the previous key. Times are scene seconds (useTime) unless you pass `t`.
@@ -83,10 +89,15 @@ export type CamKey = {
   anchor?: Pt;
   anchorDepth?: number;
   anchorTo?: Pt;
+  /** Camera pan (px on screen, + = look right: everything shifts left by the same amount). */
+  pan?: number;
+  /** Camera tilt (px on screen, + = look up: everything, the sky included, shifts down by the same amount). */
+  tilt?: number;
 };
 
-export type CamState = {ox: number; oy: number; zoom: number; push: number; rot: number};
-export const CAM_REST: CamState = {ox: 0, oy: 0, zoom: 1, push: 0, rot: 0};
+/** Camera state. `pan` / `tilt` (screen px) are optional so older literals stay valid. */
+export type CamState = {ox: number; oy: number; zoom: number; push: number; rot: number; pan?: number; tilt?: number};
+export const CAM_REST: CamState = {ox: 0, oy: 0, zoom: 1, push: 0, rot: 0, pan: 0, tilt: 0};
 
 // ---------------------------------------------------------------- math
 
@@ -105,7 +116,7 @@ export const layerScale = (c: CamState, depth: number) => c.zoom / pushDen(c.pus
 export function layerMat(c: CamState, depth: number): Mat {
   const f = 1 - depth;
   const s = layerScale(c, depth);
-  return mat.compose(mat.translate(SCREEN.cx, SCREEN.cy), c.rot ? mat.rotate(c.rot) : mat.I, mat.scale(s), mat.translate(-SCREEN.cx - c.ox * f, -SCREEN.cy - c.oy * f));
+  return mat.compose(mat.translate(SCREEN.cx - (c.pan ?? 0), SCREEN.cy + (c.tilt ?? 0)), c.rot ? mat.rotate(c.rot) : mat.I, mat.scale(s), mat.translate(-SCREEN.cx - c.ox * f, -SCREEN.cy - c.oy * f));
 }
 
 /** World point (in a layer at depth) -> screen. */
@@ -137,6 +148,8 @@ function resolve(keys: CamKey[]): Resolved[] {
     const zoom = k.zoom ?? prev.zoom;
     const push = k.push ?? prev.push;
     const rot = k.rot ?? prev.rot;
+    const pan = k.pan ?? prev.pan ?? 0;
+    const tilt = k.tilt ?? prev.tilt ?? 0;
     let ox: number;
     let oy: number;
     const anchorDepth = k.anchorDepth ?? 0;
@@ -148,7 +161,7 @@ function resolve(keys: CamKey[]): Resolved[] {
       ox = k.x !== undefined ? k.x - SCREEN.cx : prev.ox;
       oy = k.y !== undefined ? k.y - SCREEN.cy : prev.oy;
     }
-    prev = {t: k.t, zoom, push, rot, ox, oy, ease: k.ease ?? CAM.ease, anchor: k.anchor, anchorDepth, anchorTo};
+    prev = {t: k.t, zoom, push, rot, pan, tilt, ox, oy, ease: k.ease ?? CAM.ease, anchor: k.anchor, anchorDepth, anchorTo};
     out.push(prev);
   }
   return out;
@@ -160,13 +173,13 @@ const sameAnchor = (a: Resolved, b: Resolved) => !!a.anchor && !!b.anchor && a.a
 
 export type CamInterp = 'spline' | 'ease';
 
-// channels per key: 0 log zoom, 1 dolly-log, 2 rot, 3 ox, 4 oy, 5 anchorTo x, 6 anchorTo y
-const NCH = 7;
+// channels per key: 0 log zoom, 1 dolly-log, 2 rot, 3 ox, 4 oy, 5 anchorTo x, 6 anchorTo y, 7 pan, 8 tilt
+const NCH = 9;
 type Plan = {R: Resolved[]; v: number[][]; m: number[][]; anch: boolean[]};
 const PLAN_CACHE = new WeakMap<CamKey[], Plan>();
 
 function channels(r: Resolved): number[] {
-  return [Math.log(r.zoom), dollyLog(r.push), r.rot, r.ox, r.oy, r.anchorTo?.[0] ?? NaN, r.anchorTo?.[1] ?? NaN];
+  return [Math.log(r.zoom), dollyLog(r.push), r.rot, r.ox, r.oy, r.anchorTo?.[0] ?? NaN, r.anchorTo?.[1] ?? NaN, r.pan ?? 0, r.tilt ?? 0];
 }
 
 /** Monotone cubic (Fritsch-Carlson / PCHIP) tangents; ends at rest. NaN values break the chain (tangent 0). */
@@ -200,7 +213,7 @@ function plan(keys: CamKey[]): Plan {
   for (let c = 0; c < NCH; c++) {
     const ys = vals.map((x) => x[c]);
     // a channel is continuous across a key only if both adjacent segments interpolate it
-    const linked = R.map((_, i) => i > 0 && (c < 3 ? true : c < 5 ? !anch[i] : anch[i]));
+    const linked = R.map((_, i) => i > 0 && (c < 3 || c >= 7 ? true : c < 5 ? !anch[i] : anch[i]));
     v.push(ys);
     m.push(pchip(ts, ys, linked));
   }
@@ -237,12 +250,14 @@ export function camAt(keys: CamKey[], t: number, interp: CamInterp = 'spline'): 
     const zoom = Math.exp(ch(0));
     const push = fromDollyLog(ch(1));
     const rot = ch(2);
+    const pan = ch(7);
+    const tilt = ch(8);
     if (anch[i]) {
       const to: Pt = [ch(5), ch(6)];
       const [ox, oy] = anchorOffset(b.anchor!, to, b.anchorDepth, zoom, push);
-      return {ox, oy, zoom, push, rot};
+      return {ox, oy, zoom, push, rot, pan, tilt};
     }
-    return {ox: ch(3), oy: ch(4), zoom, push, rot};
+    return {ox: ch(3), oy: ch(4), zoom, push, rot, pan, tilt};
   }
   return R[R.length - 1];
 }
@@ -293,6 +308,8 @@ export const CineCamera: React.FC<CineCameraProps> = ({keys = [], handheld = 0, 
     zoom: base.zoom * (add?.zoom ?? 1) * st.zoom,
     push: base.push + (add?.push ?? 0),
     rot: base.rot + h.rot + (add?.rot ?? 0) + st.rot,
+    pan: (base.pan ?? 0) + (add?.pan ?? 0),
+    tilt: (base.tilt ?? 0) + (add?.tilt ?? 0),
   };
   return <CamCtx.Provider value={cam}>{children}</CamCtx.Provider>;
 };
@@ -310,3 +327,60 @@ export const useScreenWidth = (depth: number) => {
   const s = layerScale(c, depth);
   return (px: number) => px / s;
 };
+
+// ---------------------------------------------------------------- checks
+
+/** The full camera (keys + handheld) at time t, as a CineCamera with those props would compute it. */
+export function camFull(keys: CamKey[], t: number, o: {handheld?: number; seed?: Seed; interp?: CamInterp} = {}): CamState {
+  const base = camAt(keys, t, o.interp ?? 'spline');
+  const h = handheldAt(t, o.handheld ?? 0, o.seed ?? 'cam');
+  return {...base, ox: base.ox + h.ox, oy: base.oy + h.oy, rot: base.rot + h.rot};
+}
+
+/** Layer -> screen matrix over time for a camera path (e.g. to precompute what a moving camera will show). */
+export const camPath = (keys: CamKey[], depth = 0, o: {handheld?: number; seed?: Seed; interp?: CamInterp} = {}) => (t: number): Mat => layerMat(camFull(keys, t, o), depth);
+
+export type CamSpeed = {
+  /** Fastest on-screen motion of any sampled screen point (px per frame) and when / where / on which layer. */
+  max: number;
+  at: number;
+  depth: number;
+  point: Pt;
+  /** Mean over the move of the per-frame maximum (px / frame). */
+  avg: number;
+};
+
+/** On-screen speed of a camera move: for every frame in [t0, t1] and every layer depth, the screen points of a grid
+ *  (default 7 x 11 over the frame) are followed to the next frame; returns the fastest (px / frame). Flat inked art
+ *  strobes above ~15-20 px / frame: keep long cruises under that (CAM.reveal peaks at 1.43x its average). */
+export function camSpeed(keys: CamKey[], o: {t0?: number; t1?: number; fps?: number; depths?: number[]; grid?: [number, number]; handheld?: number; seed?: Seed} = {}): CamSpeed {
+  const fps = o.fps ?? 30;
+  const t0 = o.t0 ?? keys[0]?.t ?? 0;
+  const t1 = o.t1 ?? keys[keys.length - 1]?.t ?? 0;
+  const depths = o.depths ?? [0];
+  const [gx, gy] = o.grid ?? [7, 11];
+  const pts: Pt[] = [];
+  for (let i = 0; i < gx; i++) for (let j = 0; j < gy; j++) pts.push([(SCREEN.w * (i + 0.5)) / gx, (SCREEN.h * (j + 0.5)) / gy]);
+  let best: CamSpeed = {max: 0, at: t0, depth: depths[0], point: pts[0], avg: 0};
+  let sum = 0;
+  let n = 0;
+  for (let f = Math.round(t0 * fps); f < Math.round(t1 * fps); f++) {
+    const ta = f / fps;
+    const tb = (f + 1) / fps;
+    const ca = camFull(keys, ta, o);
+    const cb = camFull(keys, tb, o);
+    let fm = 0;
+    for (const d of depths) {
+      for (const sp of pts) {
+        const w = unproject(ca, d, sp);
+        const q = project(cb, d, w);
+        const v = Math.hypot(q[0] - sp[0], q[1] - sp[1]);
+        if (v > fm) fm = v;
+        if (v > best.max) best = {...best, max: v, at: ta, depth: d, point: sp};
+      }
+    }
+    sum += fm;
+    n++;
+  }
+  return {...best, avg: n ? sum / n : 0};
+}

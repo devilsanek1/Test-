@@ -183,13 +183,56 @@ export const todSteps: Record<TodName, Partial<Record<TodRole, Partial<Record<Pa
   dawn: {},
   dusk: {
     base: {mintPale: palette.sky, cream: palette.sand, sand: palette.tan},
-    far: {mintPale: palette.sage, sage: palette.teal, teal: palette.tealDark},
-    framing: {teal: palette.sage},
+    // far mintPale follows the base row (-> sky): sage would BE the dusk sky
+    far: {sage: palette.teal, teal: palette.tealDark},
+    // framing: teal fronds stay teal on the sage dusk sky (a darker silhouette, ref 2); teal -> sage would vanish
+    // into the sky and leave only the ink (review 3). Sage fronds step down to teal for the same reason.
+    framing: {sage: palette.teal},
   },
   night: {
     base: {mintPale: palette.sage, sky: palette.sage, cream: palette.sand, sand: palette.tan},
-    far: {mintPale: palette.teal, cream: palette.tan, sand: palette.tan, sage: nightFar, teal: palette.tealDark},
+    far: {mintPale: nightFar, cream: palette.tan, sand: palette.tan, sage: nightFar, teal: palette.tealDark},
     cloud: {white: palette.sage, mintPale: palette.sage},
-    framing: {teal: palette.sage, tealDark: palette.teal},
+    // teal fronds one step LIGHTER than the night sky; tealDark stays (teal would be ~the night sky: 1.09:1)
+    framing: {teal: palette.sage},
   },
 };
+
+/** Minimum contrast (WCAG ratio) between a relit fill and its sky: one palette step (the smallest designed step is
+ *  reference 2's night haze, #4B706B on #588077 = 1.25:1). */
+export const RELIGHT_MIN_STEP = 1.15;
+
+const lum = (hex: string) => {
+  const h = hex.replace('#', '');
+  const c = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((x) => (x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+};
+/** WCAG contrast ratio of two hex colours (pure; also in Captions as `contrast`). */
+export const contrastHex = (a: string, b: string) => {
+  const [x, y] = [lum(a), lum(b)].sort((p, q) => p - q);
+  return (y + 0.05) / (x + 0.05);
+};
+
+/** Colours each role puts AGAINST THE SKY (checked even when the table leaves them unchanged). */
+const SKY_FACING: Partial<Record<TodRole, PaletteKey[]>> = {framing: ['teal', 'tealDark', 'sage'], far: ['sage', 'teal', 'mintPale'], cloud: ['white', 'mintPale']};
+
+/** Relight table check (scripts/engine-numbers.mjs --check runs it): every fill the table relights, and every
+ *  sky-facing colour of the far / cloud / framing roles, must stay at least one palette step (RELIGHT_MIN_STEP) off
+ *  the sky of its time of day. Returns human-readable problems (empty = OK). */
+export function relightProblems(): string[] {
+  const out: string[] = [];
+  const roles: TodRole[] = ['base', 'far', 'cloud', 'framing'];
+  for (const tod of Object.keys(todSteps) as TodName[]) {
+    const sky = todSky[tod];
+    for (const role of roles) {
+      const row = {...(todSteps[tod].base ?? {}), ...(role === 'base' ? {} : todSteps[tod][role] ?? {})} as Partial<Record<PaletteKey, string>>;
+      const keys = new Set<PaletteKey>([...(Object.keys(row) as PaletteKey[]), ...(SKY_FACING[role] ?? [])]);
+      for (const k of keys) {
+        const c = row[k] ?? palette[k];
+        const r = contrastHex(c, sky);
+        if (r < RELIGHT_MIN_STEP) out.push(`${tod}/${role}: ${k} -> ${c} on the ${tod} sky ${sky} is ${r.toFixed(2)}:1 (< ${RELIGHT_MIN_STEP}: it vanishes into the sky)`);
+      }
+    }
+  }
+  return out;
+}

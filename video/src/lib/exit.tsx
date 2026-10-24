@@ -9,6 +9,7 @@
 //   Main sets it for 'unbuild' transitions. Inside a scene you can un-build any group locally:
 //   <UnBuild at={6.2}> ...old props... </UnBuild>          // 0.5 s
 //   <NoExit> <Elephant .../> </NoExit>                    // persistent objects survive the un-build
+//   <ExitShrink x={fx} y={fy}> <Elephant .../> </ExitShrink>  // raw-SVG characters shrink to their feet (no fade)
 //   <ExitProvider value={0.5}> ... </ExitProvider>        // drive it yourself
 
 import React, {createContext, useContext} from 'react';
@@ -67,6 +68,16 @@ export const ExitFade: React.FC<{children?: React.ReactNode; jitter?: number; x?
 
 /** Alias of ExitFade (the name is historical: nothing fades). */
 export const ExitPop = ExitFade;
+
+/** Un-build for raw-SVG CHARACTERS (the mascot): the whole group shrinks to its FEET anchor (x, y) with the fills'
+ *  ease-in window (~0.18 s of a 0.5 s un-build), like a reversed pop. Never an opacity ramp: use this instead of
+ *  driving the Elephant's `draw` (whose fills ramp opacity).
+ *    <ExitShrink x={556} y={1660}> <ElephantTimeline x={556} y={1660} ... /> </ExitShrink> */
+export const ExitShrink: React.FC<{x: number; y: number; jitter?: number; children?: React.ReactNode}> = ({x, y, jitter = 0.5, children}) => (
+  <ExitFade x={x} y={y} jitter={jitter}>
+    {children}
+  </ExitFade>
+);
 
 // ---------------------------------------------------------------- Look: ink-only / fills-only / paper states
 

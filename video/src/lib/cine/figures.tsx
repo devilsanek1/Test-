@@ -13,7 +13,7 @@ import React, {useMemo} from 'react';
 import {palette} from '../theme';
 import {springAt, springs, useTime} from '../time';
 import {rng, Seed} from '../rng';
-import {atmos, Tod, TodPalette} from './atmosphere';
+import {atmos, TodLike, TodPalette, useTodPal} from './atmosphere';
 import {PathBuf, r1} from './util';
 import {Person} from '../kit';
 import {FlatColor} from './light';
@@ -84,7 +84,7 @@ export type TinyCrowdProps = {
   walkDir?: number;
   /** Tint toward the haze (0 near .. 1 far) and time of day. */
   depth?: number;
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   /** Single-colour silhouettes (backlit). */
   silhouette?: string;
   seed?: Seed;
@@ -114,12 +114,13 @@ export const TinyCrowd: React.FC<TinyCrowdProps> = ({
   walkSpeed = 0.9,
   walkDir = -90,
   depth = 0,
-  tod = 'day',
+  tod,
   silhouette,
   seed = 'tc',
   personAbove = 40,
 }) => {
   const S = useCineState();
+  const P = useTodPal(tod);
   const t = S.t;
   const figs = useMemo(() => {
     const r = rng(`tc/${seed}`);
@@ -145,9 +146,9 @@ export const TinyCrowd: React.FC<TinyCrowdProps> = ({
     return list.sort((a, b) => a.y - b.y);
   }, [spots, n, area.join(), horizon, k, h, walk, order, seed]);
 
-  const coats = COATS.map((c) => silhouette ?? atmos(c, depth, tod));
-  const hairs = HAIR.map((c) => silhouette ?? atmos(c, depth, tod));
-  const legsC = LEGS.map((c) => silhouette ?? atmos(c, depth, tod));
+  const coats = COATS.map((c) => silhouette ?? atmos(c, depth, P));
+  const hairs = HAIR.map((c) => silhouette ?? atmos(c, depth, P));
+  const legsC = LEGS.map((c) => silhouette ?? atmos(c, depth, P));
   const dir = (walkDir * Math.PI) / 180;
   const out: React.ReactNode[] = [];
   const big: {f: Fig; x: number; y: number; sy: number; i: number}[] = [];

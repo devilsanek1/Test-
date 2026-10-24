@@ -1,0 +1,206 @@
+{
+ "source": "docs/style_bible_ref2.md section 1.1 (shot table) + measurements_ref2.json dissolves",
+ "scenes": [
+  {
+   "id": "R2-01",
+   "start": 0.0,
+   "end": 2.83,
+   "note": "street queue (day)"
+  },
+  {
+   "id": "R2-02",
+   "start": 2.83,
+   "end": 4.77,
+   "note": "protest street (day)",
+   "transitions": [
+    [
+     2.633,
+     3.033,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-03",
+   "start": 4.77,
+   "end": 6.5,
+   "note": "crowd + chair field, crane reveal",
+   "transitions": [
+    [
+     4.733,
+     4.867,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-04",
+   "start": 6.5,
+   "end": 8.97,
+   "note": "meeting seats, centre aisle (day)",
+   "transitions": [
+    [
+     6.433,
+     6.633,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-05",
+   "start": 8.97,
+   "end": 11.2,
+   "note": "data centre, high 3/4 aerial",
+   "transitions": [
+    [
+     8.933,
+     9.067,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-06",
+   "start": 11.2,
+   "end": 13.13,
+   "note": "meeting seats, oblique",
+   "transitions": [
+    [
+     11.1,
+     11.3,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-07",
+   "start": 13.13,
+   "end": 15.2,
+   "note": "giant plug over town (metaphor)",
+   "transitions": [
+    [
+     13.067,
+     13.3,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-08",
+   "start": 15.2,
+   "end": 17.4,
+   "note": "water cooler foreground, seats far",
+   "transitions": [
+    [
+     15.1,
+     15.367,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-09",
+   "start": 17.4,
+   "end": 20.9,
+   "note": "speaker at mic, seats",
+   "transitions": [
+    [
+     17.333,
+     17.5,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-10",
+   "start": 20.9,
+   "end": 23.0,
+   "note": "speaker close, chart",
+   "transitions": [
+    [
+     20.833,
+     21.0,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-11",
+   "start": 23.0,
+   "end": 25.53,
+   "note": "water tower over crowd (low angle)",
+   "transitions": [
+    [
+     22.933,
+     23.133,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-12",
+   "start": 25.53,
+   "end": 29.6,
+   "note": "presenters at table, audience heads at bottom",
+   "transitions": [
+    [
+     25.467,
+     25.633,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-13",
+   "start": 29.6,
+   "end": 31.83,
+   "note": "audience reacts (hands up)",
+   "transitions": [
+    [
+     29.533,
+     29.7,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-14",
+   "start": 31.83,
+   "end": 35.6,
+   "note": "meeting seats, DUSK (sky tween, sun sets, bulbs on)",
+   "transitions": [
+    [
+     31.767,
+     31.9,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-15",
+   "start": 35.6,
+   "end": 38.67,
+   "note": "seats, NIGHT, hands raised",
+   "transitions": [
+    [
+     35.533,
+     35.7,
+     "dissolve"
+    ]
+   ]
+  },
+  {
+   "id": "R2-16",
+   "start": 38.67,
+   "end": 44.1,
+   "note": "street queue (NIGHT), bookend of shot 1",
+   "transitions": [
+    [
+     38.6,
+     38.733,
+     "dissolve"
+    ]
+   ]
+  }
+ ]
+}

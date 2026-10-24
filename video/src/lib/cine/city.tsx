@@ -24,7 +24,7 @@ import {ease as E, osc, prog, useTime} from '../time';
 import {rng, Seed} from '../rng';
 import {arc, line, Pt} from '../sketch';
 import {Layer} from './camera';
-import {atmos, deep, Tod, TodPalette, todPal} from './atmosphere';
+import {atmos, deep, TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
 import {HazeBand} from './sky';
 import {SwitchEvent, switchTimes, WinCell, windowPaths, WindowLook} from './windows';
 import {memoize, PathBuf, r1} from './util';
@@ -414,7 +414,7 @@ export type SkylineProps = Omit<RowParams, 'seed'> & {
   seed?: Seed;
   /** Atmospheric depth 0 (near) .. 1 (horizon). */
   depth?: number;
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   /** Facade colours (default palette.facade of the tod). */
   colors?: string[];
   roofColors?: string[];
@@ -432,10 +432,10 @@ export type SkylineProps = Omit<RowParams, 'seed'> & {
 
 type BState = {k: number; paper: boolean; ink: boolean; steady: boolean};
 
-export const Skyline: React.FC<SkylineProps> = ({seed = 'sky', depth = 0, tod = 'day', colors, roofColors, windows, at, build, beacons = 0, inkColor = palette.ink, massColor, ...row}) => {
+export const Skyline: React.FC<SkylineProps> = ({seed = 'sky', depth = 0, tod, colors, roofColors, windows, at, build, beacons = 0, inkColor = palette.ink, massColor, ...row}) => {
   const S = useCineState();
   const t = S.t;
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const geo = rowGeo({...row, seed, nColors: (colors ?? p.facade).length});
   const cols = (colors ?? p.facade).map((c) => atmos(c, depth, p));
   const rcols = (roofColors ?? [palette.teal, palette.tealDark, palette.tan, palette.brown]).map((c) => atmos(c, depth, p));
@@ -599,7 +599,7 @@ export type EndlessCityProps = {
   depthFar?: number;
   /** Parallax factor of the nearest row (1 = reference plane). */
   parallaxNear?: number;
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   seed?: Seed;
   x0?: number;
   x1?: number;
@@ -630,7 +630,7 @@ export const EndlessCity: React.FC<EndlessCityProps> = ({
   depthNear = 0.05,
   depthFar = 1,
   parallaxNear = 1,
-  tod = 'dusk',
+  tod,
   seed = 'city',
   x0 = -500,
   x1 = 1580,
@@ -645,7 +645,7 @@ export const EndlessCity: React.FC<EndlessCityProps> = ({
   layered = true,
   inRow,
 }) => {
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const info = cityRows({horizon, nearY, rows, nearS, farS, depthNear, depthFar, parallaxNear});
   return (
     <>

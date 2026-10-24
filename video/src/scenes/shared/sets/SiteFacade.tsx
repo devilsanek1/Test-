@@ -253,7 +253,7 @@ export function shadeOf(c: string): string {
     case palette.mintPale:
       return palette.sage;
     case palette.tan:
-      return palette.brown;
+      return palette.tan;
     case palette.white:
       return palette.mintPale;
     default:

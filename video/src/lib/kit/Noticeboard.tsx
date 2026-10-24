@@ -19,6 +19,7 @@ import {ExitFade} from '../exit';
 import {arc, blob, circle, glint, hline, line, poly, polyPath, rect, roundRect, textLines, Pt} from '../sketch';
 import {At, b} from './common';
 import {mat, XG} from '../xf';
+import {TodAnchor} from '../tod';
 
 // ---------------------------------------------------------------- Noticeboard
 
@@ -100,7 +101,7 @@ export const Noticeboard: React.FC<NoticeboardProps> = ({x, y, w = 420, h = 300,
       order="all"
     />,
   );
-  return <>{out}</>;
+  return <TodAnchor at={[x + w / 2, y + h / 2]}>{out}</TodAnchor>;
 };
 
 // ---------------------------------------------------------------- Paper

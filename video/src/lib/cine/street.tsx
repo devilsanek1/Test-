@@ -12,7 +12,7 @@ import {palette, stroke} from '../theme';
 import {ease as E, osc, prog, springAt, springs, useTime} from '../time';
 import {rng, Seed} from '../rng';
 import {line, Pt, wirePoint} from '../sketch';
-import {atmos, ambient, Tod, TodPalette, todPal} from './atmosphere';
+import {atmos, ambient, TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
 import {darker} from './city';
 import {persp1, quadMap, Quad} from './persp';
 import {gridCells, SwitchEvent, switchTimes, windowPaths} from './windows';
@@ -32,9 +32,13 @@ export type StringLightsProps = {
   sag?: number;
   /** Number of bulbs. */
   n?: number;
-  /** Bulb radius (px). */
+  /** Bulb radius (px) at the (x1, y1) end. */
   r?: number;
-  tod?: Tod | TodPalette;
+  /** Bulb radius at the (x2, y2) end when the string RECEDES (reference 2 shrinks bulbs with distance): bulbs are
+   *  spaced evenly in depth (screen spacing and radius scale like 1 / z between the ends); bulbs under 3 px are dropped
+   *  into the wire. Default r (a string parallel to the lens). */
+  r1?: number;
+  tod?: TodLike | TodPalette;
   /** Bulbs light up along the wire over [at, at + dur] (pop). Omit = lit if the tod is dark. */
   on?: {at: number; dur?: number; reverse?: boolean};
   lit?: boolean;
@@ -47,10 +51,10 @@ export type StringLightsProps = {
 };
 
 /** A sagging wire with bulbs on short stems (ref 2). Lit bulbs: peach core + sage stepped halo discs. */
-export const StringLights: React.FC<StringLightsProps> = ({x1, y1, x2, y2, sag = 40, n = 12, r = 9, tod = 'day', on, lit, sway = 3, width = stroke.inkThin, seed = 'sl', at}) => {
+export const StringLights: React.FC<StringLightsProps> = ({x1, y1, x2, y2, sag = 40, n = 12, r = 9, r1: rEnd, tod, on, lit, sway = 3, width = stroke.inkThin, seed = 'sl', at}) => {
   const S = useCineState();
   const t = S.t;
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const dark = p.stars > 0.3;
   const sg = sag + osc(t, 0.21, x1 * 0.01) * sway;
   // un-build: bulbs shrink (small first), then the wire retracts from its far end
@@ -73,14 +77,19 @@ export const StringLights: React.FC<StringLightsProps> = ({x1, y1, x2, y2, sag =
   const fillOn = new PathBuf();
   const halo = new PathBuf();
   const halo2 = new PathBuf();
+  const rFar = rEnd ?? r;
   for (let i = 0; i < n; i++) {
-    const u = (i + 0.5) / n;
+    // w = even spacing in depth; on screen: scale k(w) (1 / z linear in w) and position s(w) = w * k(w) / k(1)
+    const w = (i + 0.5) / n;
+    const kw = rFar === r ? r : 1 / ((1 - w) / r + w / rFar);
+    const u = rFar === r ? w : (w * kw) / rFar;
     if (u > wp) break;
     const [bx, by] = wirePoint(x1, y1, x2, y2, sg, u);
     const pop = (at === undefined ? 1 : springAt(t, at + 0.25 + u * 0.35, springs.pop)) * bulbK;
     if (pop <= 0.01) continue;
-    const rr = r * pop;
-    const stem = r * 0.9;
+    if (kw < 3) continue; // too small: the bulb merges into the wire
+    const rr = kw * pop;
+    const stem = kw * 0.9;
     const swing = osc(t, 0.6, i * 1.3) * 0.08;
     const sx = bx + Math.sin(swing) * stem;
     const syy = by + stem;
@@ -197,7 +206,7 @@ export type PerspectiveStreetProps = {
   /** Depth range (world units). */
   zNear?: number;
   zFar?: number;
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   seed?: Seed;
   sides?: 'both' | 'left' | 'right';
   /** Building height range (world units). */
@@ -218,9 +227,24 @@ export type PerspectiveStreetProps = {
   ground?: boolean;
   /** Walkers at least this tall (px) are kit Persons (inked, legs). Default 40. */
   personAbove?: number;
+  /** Depth of the first pole (world units; default zNear + poles / 2). Push it back so pole tops stay under the
+   *  caption band with a low camera. */
+  poleStart?: number;
+  /** Pitched roof slabs on the facades (eaves overhang toward the street, ridge set back), inked eaves. Default true. */
+  roofs?: boolean;
+  /** Doors (and a step) on the facades. Default true. */
+  doors?: boolean;
+  /** A white railing / picket fence along the outer edge of a walk (reference 2 f_1). */
+  fence?: 'left' | 'right' | 'both' | 'none';
+  /** Ground paint: the central strip (`road`) and the walks. Default sand / cream (relit). With a narrow `road` the
+   *  strip reads as a central path (pass cream / mintPale). */
+  roadColor?: string;
+  walkColor?: string;
+  /** Fraction of the crowd that stands (idle) instead of walking. Default 0. */
+  standing?: number;
 };
 
-type Facade = {quad: Quad; color: string; zA: number; zB: number; side: -1 | 1; H: number};
+type Facade = {quad: Quad; color: string; zA: number; zB: number; side: -1 | 1; H: number; roof: Quad | null; roofC: string; doors: Quad[]; doorC: string};
 
 export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
   vp,
@@ -230,7 +254,7 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
   walk = 260,
   zNear = 260,
   zFar = 40000,
-  tod = 'day',
+  tod,
   seed = 'street',
   sides = 'both',
   heights = [700, 1700],
@@ -243,10 +267,17 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
   ink = stroke.ink,
   ground = true,
   personAbove = 40,
+  poleStart,
+  roofs = true,
+  doors = true,
+  fence = 'none',
+  roadColor,
+  walkColor,
+  standing = 0,
 }) => {
   const C = useCineState();
   const t = C.t;
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const P = persp1({vx: vp[0], vy: vp[1], f, camH});
   const S = (x: number, y: number, z: number): Pt => {
     const [sx, sy] = P(x, y, z);
@@ -268,12 +299,31 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
         const zB = z + len;
         const x = side * X;
         const quad: Quad = side === -1 ? [S(x, H, zA), S(x, H, zB), S(x, 0, zB), S(x, 0, zA)] : [S(x, H, zB), S(x, H, zA), S(x, 0, zA), S(x, 0, zB)];
-        fac.push({quad, color: r.pick(colors), zA, zB, side, H});
+        // pitched roof: eaves overhang 30 toward the street, ridge set back 260 and up 0.22 H (a low pitch: the ridge
+        // stays under the caption band); about 1 in 4 buildings keeps a flat parapet roof
+        let roof: Quad | null = null;
+        if (roofs && r.chance(0.75)) {
+          const xe = x - side * 30;
+          const xr = x + side * 260;
+          const rh = H * r.range(0.16, 0.26);
+          roof = side === -1 ? [S(xr, H + rh, zA), S(xr, H + rh, zB), S(xe, H - 8, zB), S(xe, H - 8, zA)] : [S(xr, H + rh, zB), S(xr, H + rh, zA), S(xe, H - 8, zA), S(xe, H - 8, zB)];
+        }
+        const ds: Quad[] = [];
+        if (doors) {
+          const nd = len > 1100 ? 2 : 1;
+          for (let k = 0; k < nd; k++) {
+            const z0 = zA + len * ((k + 0.5) / nd) + r.range(-0.15, 0.15) * len * 0.5;
+            const dw = 95;
+            const dh = Math.min(215, H * 0.72);
+            ds.push(side === -1 ? [S(x, dh, z0), S(x, dh, z0 + dw), S(x, 0, z0 + dw), S(x, 0, z0)] : [S(x, dh, z0 + dw), S(x, dh, z0), S(x, 0, z0), S(x, 0, z0 + dw)]);
+          }
+        }
+        fac.push({quad, color: r.pick(colors), zA, zB, side, H, roof, roofC: r.pick([palette.tealDark, palette.teal, palette.tan, palette.brown]), doors: ds, doorC: r.pick([palette.teal, palette.brown, palette.tealDark, palette.peach])});
         z = zB + r.range(0, 60);
       }
     }
     return fac;
-  }, [vp[0], vp[1], f, camH, road, walk, zNear, zFar, seed, sides, heights.join(), p.name]);
+  }, [vp[0], vp[1], f, camH, road, walk, zNear, zFar, seed, sides, heights.join(), p.name, roofs, doors]);
 
   // window cells per facade (u along the street, v top -> bottom)
   const cells = useMemo(() => {
@@ -302,9 +352,25 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
   const sorted = geo.slice().sort((a, b) => b.zA - a.zA);
   const fills: React.ReactNode[] = [];
   const inkPB = new PathBuf();
+  const roofInk = new PathBuf();
   sorted.forEach((fc, i) => {
     const depth = Math.min(1, fc.zA / (zFar * 0.25));
     fills.push(<path key={`fc${i}`} d={new PathBuf().quad(...fc.quad).d} fill={atmos(fc.color, depth, p)} />);
+    // the roof overhangs toward the street: in front of the facade's top edge
+    if (fc.roof) fills.push(<path key={`rf${i}`} d={new PathBuf().quad(...fc.roof).d} fill={atmos(fc.roofC, depth, p)} />);
+    if (fc.doors.length) {
+      const db = new PathBuf();
+      for (const q of fc.doors) db.quad(...q);
+      fills.push(<path key={`dr${i}`} d={db.d} fill={atmos(fc.doorC, depth, p)} />);
+      if (depth < 0.35) for (const q of fc.doors) roofInk.raw(`M${r1(q[3][0])} ${r1(q[3][1])}L${r1(q[0][0])} ${r1(q[0][1])}L${r1(q[1][0])} ${r1(q[1][1])}L${r1(q[2][0])} ${r1(q[2][1])}`);
+    }
+    if (fc.roof && depth < 0.55) {
+      const [rA, rB, eB, eA] = fc.side === -1 ? fc.roof : [fc.roof[1], fc.roof[0], fc.roof[3], fc.roof[2]];
+      // eaves (overshooting) + the near rake
+      roofInk.raw(line(eA[0], eA[1], eB[0], eB[1], {seed: `${seed}/e${i}`, over: [6, 3], breaks: false}));
+      roofInk.raw(line(eA[0], eA[1], rA[0], rA[1], {seed: `${seed}/rk${i}`, over: [2, 5], breaks: false}));
+      void rB;
+    }
     // near vertical edge + roofline + base (converging), ink fades out with depth (thinner, then none)
     if (depth < 0.55) {
       const [tl, tr, br, bl] = fc.quad;
@@ -365,7 +431,7 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
   const wirePB = new PathBuf();
   const tops: {l: Pt; r: Pt; k: number}[] = [];
   if (poles > 0) {
-    for (let z = zNear + poles * 0.5; z < zFar * 0.3; z += poles) {
+    for (let z = poleStart ?? zNear + poles * 0.5; z < zFar * 0.3; z += poles) {
       const k = f / z;
       const ph = poleH;
       const l: Pt = S(-road - 40, ph, z);
@@ -403,7 +469,7 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
       const to = i % 2 ? b.r : b.l;
       const lo = lightsOn ? {at: lightsOn.at + ((lightsOn.dur ?? 2) * i) / tops.length, dur: 0.4} : undefined;
       lightNodes.push(
-        <StringLights key={`sl${i}`} x1={from[0]} y1={from[1] + 4 * a.k} x2={to[0]} y2={to[1] + 4 * b.k} sag={60 * a.k} n={Math.max(4, Math.round(14 * Math.sqrt(a.k)))} r={Math.max(1.4, 14 * a.k)} tod={p} on={lo} width={Math.max(0.8, stroke.inkThin * Math.min(1, a.k * 2))} seed={`${seed}/sl${i}`} sway={2 * a.k} />,
+        <StringLights key={`sl${i}`} x1={from[0]} y1={from[1] + 4 * a.k} x2={to[0]} y2={to[1] + 4 * b.k} sag={60 * a.k} n={9} r={14 * a.k} r1={14 * b.k} tod={p} on={lo} width={Math.max(0.8, stroke.inkThin * Math.min(1, a.k * 2))} seed={`${seed}/sl${i}`} sway={2 * a.k} />,
       );
     }
   }
@@ -419,7 +485,8 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
     const r = rng(`walk/${seed}`);
     const list = Array.from({length: crowd}, () => {
       const side = sides === 'both' ? r.sign() : sides === 'left' ? -1 : 1;
-      return {x: side * (road + r.range(40, walk - 40)), z0: r.range(zNear * 1.6, zFar * 0.12), v: r.range(60, 140) * (r.chance(0.2) ? -1 : 1), c: r.int(0, WC.length - 1), h: r.int(0, WH.length - 1)};
+      const stand = r.next() < standing;
+      return {x: side * (road + r.range(40, walk - 40)), z0: r.range(zNear * 1.6, zFar * 0.12), v: stand ? 0 : r.range(60, 140) * (r.chance(0.2) ? -1 : 1), c: r.int(0, WC.length - 1), h: r.int(0, WH.length - 1)};
     });
     const pos = list.map((w, i) => ({...w, i, z: Math.max(zNear * 1.4, ((w.z0 + w.v * t - zNear * 1.4) % (zFar * 0.12)) + zNear * 1.4)})).sort((a, b) => b.z - a.z);
     const exK = exitScale(C.e, 0.3, 0.01);
@@ -427,7 +494,7 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
       const [sx, sy] = S(w.x, 0, w.z);
       const h = ((170 * f) / w.z) * exK;
       if (h < 2.5) continue;
-      const bob = Math.abs(Math.sin(t * 6 + w.x)) * h * 0.03;
+      const bob = w.v ? Math.abs(Math.sin(t * 6 + w.x)) * h * 0.03 : 0;
       if (personAbove > 0 && h >= personAbove) {
         const s = h / PERSON_H;
         people.push(<Person key={`wp${w.i}`} x={sx} y={sy - bob - PERSON_FEET * s} s={s} legs seed={`${seed}/wp${w.i}`} body={WC[w.c]} hairColor={WH[w.h]} ink={personInk(h)} lod={h < 70 ? 1 : 0} />);
@@ -437,6 +504,41 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
     }
   }
 
+  // railing fence along the outer edge of a walk: posts every 120 (inked when near), two rails to the VP, white boards
+  const fenceNodes: React.ReactNode[] = [];
+  if (fence !== 'none') {
+    for (const side of fence === 'both' ? [-1, 1] : fence === 'left' ? [-1] : [1]) {
+      const fx = side * (road + walk - 12);
+      const fh = 105;
+      const z0 = Math.max(zG, (f * Math.abs(fx)) / 700);
+      const z1 = zFar * 0.06;
+      const posts = new PathBuf();
+      const board = new PathBuf();
+      const fi = new PathBuf();
+      for (let z = z0, n = 0; z < z1 && n < 200; z += 120, n++) {
+        const a = S(fx, 0, z);
+        const b2 = S(fx, fh, z);
+        const k = f / z;
+        const pw = Math.max(1, 7 * k);
+        posts.rect(a[0] - pw / 2, b2[1], pw, a[1] - b2[1]);
+        if (k > 0.35) fi.raw(`M${r1(a[0])} ${r1(a[1])}L${r1(b2[0])} ${r1(b2[1])}`);
+      }
+      const t0 = S(fx, fh, z0);
+      const t1 = S(fx, fh, z1);
+      const m0 = S(fx, fh * 0.55, z0);
+      const m1 = S(fx, fh * 0.55, z1);
+      const g0 = S(fx, 0, z0);
+      const g1 = S(fx, 0, z1);
+      board.quad(t0, t1, [t1[0], t1[1] + Math.max(1, (m1[1] - t1[1]) * 0.25)], [t0[0], t0[1] + (m0[1] - t0[1]) * 0.25]);
+      fi.raw(line(t0[0], t0[1], t1[0], t1[1], {seed: `${seed}/fr${side}`, over: [0, 0], breaks: false}) + line(m0[0], m0[1], m1[0], m1[1], {seed: `${seed}/fm${side}`, over: [0, 0], breaks: false}) + line(g0[0], g0[1], g1[0], g1[1], {seed: `${seed}/fg${side}`, over: [0, 0], breaks: true}));
+      fenceNodes.push(
+        <React.Fragment key={`fn${side}`}>
+          {C.look.fills !== 'none' ? <path d={posts.d + board.d} fill={lookPaint(C, palette.white, vp)} /> : null}
+          {inkOn(C, 0.3) ? <path d={fi.d} fill="none" stroke={palette.ink} strokeWidth={stroke.inkThin} strokeLinecap="round" /> : null}
+        </React.Fragment>,
+      );
+    }
+  }
   const paper = isPaper(C, vp);
   const color = !paper && C.look.fills === 'color';
   const gp = (c: string) => lookPaint(C, c, vp);
@@ -446,13 +548,15 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
   if (k <= 0) return null;
   const body = (
     <>
-      {gp(ambient(palette.sand, p)) !== 'none' ? <path d={groundRoad} fill={gp(ambient(palette.sand, p))} /> : null}
-      {gp(ambient(palette.cream, p)) !== 'none' ? <path d={walks.d} fill={gp(ambient(palette.cream, p))} /> : null}
+      {gp(ambient(roadColor ?? palette.sand, p)) !== 'none' ? <path d={groundRoad} fill={gp(ambient(roadColor ?? palette.sand, p))} /> : null}
+      {gp(ambient(walkColor ?? palette.cream, p)) !== 'none' ? <path d={walks.d} fill={gp(ambient(walkColor ?? palette.cream, p))} /> : null}
       {color ? fills : paper ? <path d={sorted.map((fc) => new PathBuf().quad(...fc.quad).d).join('')} fill={palette.white} stroke={showInk ? palette.ink : 'none'} strokeWidth={1.2} /> : null}
       {color && W.dark ? <path d={W.dark} fill={atmos(p.windowDark, 0.3, p, {raw: true})} /> : null}
       {color ? W.lit.map((d, i) => (d ? <path key={`w${i}`} d={d} fill={p.windowLit[i % p.windowLit.length]} /> : null)) : null}
       {color && W.blinds ? <path d={W.blinds} fill={ambient(palette.tan, p)} /> : null}
       {showInk ? <path d={inkPB.d} fill="none" stroke={palette.ink} strokeWidth={ink * 0.8} strokeLinecap="round" /> : null}
+      {showInk && !roofInk.empty ? <path d={roofInk.d} fill="none" stroke={palette.ink} strokeWidth={ink * 0.7} strokeLinecap="round" strokeLinejoin="round" /> : null}
+      {fenceNodes}
       {showInk && !kerbPB.empty ? <path d={kerbPB.d} fill="none" stroke={palette.ink} strokeWidth={stroke.ink} strokeLinecap="round" /> : null}
       {showInk && !groundPB.empty ? <path d={groundPB.d} fill="none" stroke={palette.ink} strokeWidth={stroke.inkThin} strokeLinecap="round" /> : null}
       {color && !legsB.empty ? <path d={legsB.d} fill={ambient(palette.tealDark, p)} /> : null}

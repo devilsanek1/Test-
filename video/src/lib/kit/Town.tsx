@@ -18,6 +18,7 @@ import {Fill} from '../Fill';
 import {Pop} from '../motion';
 import {line, polyPath, rect, rectPath, roundRect, smooth, Pt} from '../sketch';
 import {At, b, inkW, Place} from './common';
+import {TodAnchor} from '../tod';
 
 const f1 = (n: number) => n.toFixed(1);
 
@@ -120,12 +121,12 @@ export const Palm: React.FC<PalmProps> = ({x, y, h = 220, lean, at, seed = 'palm
     rings += `M${f1(cx - ww)} ${f1(cy)}L${f1(cx + ww)} ${f1(cy - 1)}`;
   }
   return (
-    <>
+    <TodAnchor at={[x, y - h / 2]}>
       <Fill d={body} color={trunk} at={b(at, 0.15)} mode="grow" dir="up" offset={false} seed={`${seed}/t`} />
       <Ink d={left + right} at={at} dur={0.3} width={width} order="all" />
       <Ink d={rings} at={b(at, 0.25)} width={width * 0.7} order="all" />
       <Fronds x={top[0]} y={top[1]} r={h * 0.36} at={b(at, 0.35)} color={color} seed={`${seed}/c`} width={width} />
-    </>
+    </TodAnchor>
   );
 };
 
@@ -145,14 +146,14 @@ export const WaterTower: React.FC<{x: number; y: number; h?: number; at?: At; se
     [x + tw * 0.56, ty - th],
   ];
   return (
-    <>
+    <TodAnchor at={[x, y - h / 2]}>
       <Ink d={legs} at={at} dur={0.3} width={width} order="all" />
       <Ink d={brace} at={b(at, 0.2)} width={width * 0.75} />
       <Fill d={roundRect(x - tw / 2, ty - th, tw, th, th * 0.25)} color={tank} at={b(at, 0.4)} seed={`${seed}/tk`} />
       <Ink d={rect(x - tw / 2, ty - th, tw, th, {seed: `${seed}/tki`, over: 3})} at={b(at, 0.3)} width={width} />
       <Fill d={polyPath(capPts)} color={cap} at={b(at, 0.5)} mode="grow" dir="up" seed={`${seed}/cp`} />
       <Ink d={line(capPts[0][0], capPts[0][1], capPts[1][0], capPts[1][1], {seed: `${seed}/c1`, over: [2, 0]}) + line(capPts[1][0], capPts[1][1], capPts[2][0], capPts[2][1], {seed: `${seed}/c2`, over: [0, 2]})} at={b(at, 0.42)} width={width} />
-    </>
+    </TodAnchor>
   );
 };
 
@@ -167,6 +168,7 @@ export const Car: React.FC<{x: number; y: number; w?: number; at?: At; seed?: Se
   const on = lightsOn !== undefined && t >= lightsOn;
   return (
     <Place x={x} y={y} s={s}>
+      <TodAnchor at={[0, -80]}>
       {/* wheels peek out below the body */}
       <Fill d={rectPath(-108, -30, 34, 30) + rectPath(74, -30, 34, 30)} color={palette.ink} at={b(at, 0.2)} mode="snap" offset={false} seed={`${seed}/wh`} />
       {/* cabin */}
@@ -183,6 +185,7 @@ export const Car: React.FC<{x: number; y: number; w?: number; at?: At; seed?: Se
         width={W}
       />
       <Ink d={line(-124, -30, 124, -30, {seed: `${seed}/bp`, over: [4, 4]}) + rect(-26, -66, 52, 20, {seed: `${seed}/pli`, over: 1})} at={b(at, 0.3)} width={W * 0.8} />
+      </TodAnchor>
     </Place>
   );
 };

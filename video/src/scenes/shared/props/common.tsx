@@ -111,6 +111,20 @@ export const PropRoot: React.FC<{x?: number; y?: number; s?: number; rot?: numbe
   return <XG m={m}>{inner}</XG>;
 };
 
+/** Build-out props every prop accepts: the measured un-build (lines loosen, fills shrink, ink retracts) over outDur. */
+export type OutProps = {outAt?: number; outDur?: number};
+
+/** Wrap a prop component so it takes `outAt` / `outDur` (un-build of just this prop, default 0.5 s). */
+export function withOut<P extends object>(C: React.FC<P>, name?: string): React.FC<P & OutProps> {
+  const Wrapped: React.FC<P & OutProps> = (p) => {
+    const {outAt, outDur, ...rest} = p as P & OutProps;
+    const el = <C {...(rest as P)} />;
+    return outAt === undefined ? el : <UnBuild at={outAt} dur={outDur ?? MOTION.unbuild.total}>{el}</UnBuild>;
+  };
+  Wrapped.displayName = name ?? C.displayName;
+  return Wrapped;
+}
+
 /** Damped pendulum angle (deg): starts at `amp`, period `period`, settles in ~`settle` s (motion spec #14: -16 -> 0, ~0.5 s). */
 export function pendulum(t: number, at: number | undefined, amp = -16, period = 0.5, settle = 0.8): number {
   if (at === undefined || t < at) return 0;

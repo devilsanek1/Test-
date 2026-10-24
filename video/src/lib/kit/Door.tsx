@@ -12,6 +12,7 @@ import {Fill} from '../Fill';
 import {glint, hline, line, rect, roundRect} from '../sketch';
 import {At, b} from './common';
 import {mat, XG} from '../xf';
+import {TodAnchor} from '../tod';
 
 export type DoorProps = {
   x: number;
@@ -88,5 +89,5 @@ export const Door: React.FC<DoorProps> = ({
   }
   out.push(<Ink key="edges" d={line(x, y, x, y + h, {seed: `${seed}/e1`}) + line(x + w, y, x + w, y + h, {seed: `${seed}/e2`}) + hline(x, x + w, y, {seed: `${seed}/e3`})} at={b(at, 0.15)} dur={0.35} width={width} />);
   if (double && open <= 0) out.push(<Ink key="mid" d={line(x + lw, y, x + lw, y + h, {over: [0, 2], seed: `${seed}/mid`})} at={b(at, 0.3)} dur={0.2} width={width * 0.9} />);
-  return <>{out}</>;
+  return <TodAnchor at={[x + w / 2, y + h / 2]}>{out}</TodAnchor>;
 };

@@ -241,4 +241,3 @@ export const LeakClones: React.FC<{spots: {x: number; y: number; at: number; rot
   );
 };
 
-export {osc, stroke};

@@ -15,10 +15,9 @@ import {palette, stroke} from '../theme';
 import {osc, prog, springAt, springs, useTime} from '../time';
 import {rand, rng, Seed} from '../rng';
 import {line, Pt} from '../sketch';
-import {Tod, TodPalette, todPal} from './atmosphere';
+import {TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
 import {memoize, PathBuf, r1} from './util';
 import {exitScale, inkOn, isPaper, lookPaint, toScreen, useCineState, xfScale} from './state';
-import {exitFillProgress} from '../exit';
 import {ease as E} from '../time';
 
 const WIDE = {x0: -1600, x1: 2680};
@@ -26,7 +25,7 @@ const WIDE = {x0: -1600, x1: 2680};
 // ---------------------------------------------------------------- Sky
 
 export type SkyProps = {
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   /** Horizon y (world). */
   horizon: number;
   /** Override band colours, top -> horizon. */
@@ -41,22 +40,53 @@ export type SkyProps = {
   x0?: number;
   x1?: number;
   top?: number;
+  /** Hand-drawn band edges: each step edge breaks into streak tongues +- this many px (default 9; 0 = ruler-straight).
+   *  No edge runs straight across the full width. */
+  wobble?: number;
+  seed?: Seed;
 };
 
-/** Flat, horizontally banded sky (a few value steps, darkest at the top). It is the background SLAB of the un-build:
- *  it collapses downward last (its top edge falls from the screen top to the bottom). It keeps its colour in the
- *  paper / cascade Looks (like the World sky). */
-export const Sky: React.FC<SkyProps> = ({tod = 'day', horizon, colors, edges, span: spanIn, below = 500, x0 = WIDE.x0, x1 = WIDE.x1, top: top0 = -4000}) => {
-  const p = todPal(tod);
+/** One band's top edge: streak tongues (stepped offsets joined by short ramps) so the step reads as layered
+ *  cloud streaks, not a divider line. Returns the path of the band down to y1. */
+function bandPath(x0: number, x1: number, y: number, y1: number, amp: number, seed: Seed): string {
+  if (amp <= 0) return `M${r1(x0)} ${r1(y)}H${r1(x1)}V${r1(y1)}H${r1(x0)}Z`;
+  return memoize(BAND_CACHE, `${x0},${x1},${r1(y)},${r1(y1)},${amp},${seed}`, () => {
+    const r = rng(`band/${seed}`);
+    let d = `M${r1(x0)} ${r1(y1)}L${r1(x0)} ${r1(y)}`;
+    let x = x0;
+    let cy = y;
+    while (x < x1) {
+      const len = r.range(170, 430);
+      const ny = y + r.pick([-1, -0.55, 0, 0.45, 1]) * amp;
+      const ramp = Math.min(60, len * 0.25);
+      // short ramp to the new level (a quadratic, like the end of a streak), then a long flat run
+      d += `Q${r1(x + ramp * 0.5)} ${r1(cy)} ${r1(x + ramp)} ${r1(ny)}L${r1(Math.min(x1 + 40, x + len))} ${r1(ny)}`;
+      cy = ny;
+      x += len;
+    }
+    return d + `L${r1(x1 + 40)} ${r1(y1)}Z`;
+  });
+}
+const BAND_CACHE = new Map<string, string>();
+
+/** Flat sky. Day and golden are ONE flat value (reference 2); dusk / night / dawn add value steps toward the horizon,
+ *  all below y 600, with hand-drawn streak edges. It is the background SLAB of the un-build: the lower (glow) bands
+ *  shrink into the horizon with the fills, then the slab collapses downward (its top edge falls from the screen top to
+ *  the bottom, from e 0.5, overlapping the last fills). It keeps its colour in the paper / cascade Looks. */
+export const Sky: React.FC<SkyProps> = ({tod, horizon, colors, edges, span: spanIn, below = 500, x0 = WIDE.x0, x1 = WIDE.x1, top: top0 = -4000, wobble = 9, seed = 'sky'}) => {
+  const p = useTodPal(tod);
   const S = useCineState();
   let top = top0;
+  let glowK = 1;
   if (S.e > 0) {
-    const k = E.inCubic(exitFillProgress(S.e, 0, 1));
+    const k = E.inCubic(prog(S.e, 0.5, 0.42));
     if (k >= 1) return null;
     // screen y of the falling edge -> this layer's y (layers never rotate much: use the inverse of y only)
     const sy = -60 + (1920 + 120) * k;
     const sc = xfScale(S.m) || 1;
     top = Math.max(top0, (sy - S.m[5]) / sc);
+    // the glow / horizon bands go with the fills (not after them: no lone stripe on an empty slab)
+    glowK = exitScale(S.e, 0.3, 0.4);
   }
   const cols = colors ?? p.skyBands;
   const n = cols.length;
@@ -65,10 +95,16 @@ export const Sky: React.FC<SkyProps> = ({tod = 'day', horizon, colors, edges, sp
   const ratio = n > 2 ? Math.pow(Math.min(110, span * 0.5) / span, 1 / (n - 2)) : 1;
   const e = edges ?? Array.from({length: n - 1}, (_, i) => span * Math.pow(ratio, i));
   const out: React.ReactNode[] = [];
-  for (let i = 0; i < n; i++) {
-    const y0 = Math.max(top, i === 0 ? top : horizon - e[i - 1]);
-    const y1 = horizon + below;
-    if (y1 > y0) out.push(<rect key={i} x={x0} y={y0} width={x1 - x0} height={y1 - y0} fill={cols[i]} />);
+  const y1 = horizon + below;
+  if (y1 > top) out.push(<rect key={0} x={x0} y={top} width={x1 - x0} height={y1 - top} fill={cols[0]} />);
+  for (let i = 1; i < n; i++) {
+    const h = e[i - 1] * glowK;
+    if (h <= 0.5) continue;
+    const y0 = horizon - h;
+    if (y0 < top) continue;
+    // the band's wobble shrinks with its height (thin glow bands near the horizon wobble less)
+    const amp = Math.min(wobble, h * 0.18);
+    out.push(<path key={i} d={bandPath(x0, x1, y0, y1, amp, `${seed}/${i}`)} fill={cols[i]} />);
   }
   return <>{out}</>;
 };
@@ -126,7 +162,7 @@ export type SkyCloudProps = {
   w?: number;
   /** Height (default w * 0.42). */
   h?: number;
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   color?: string;
   /** Ink the top (default: palette.cloudInk). */
   ink?: boolean;
@@ -140,10 +176,10 @@ export type SkyCloudProps = {
 };
 
 /** Reference-style cloud: three scalloped bumps, flat bottom; white with ink on top (day) or fill-only (dusk). */
-export const SkyCloud: React.FC<SkyCloudProps> = ({x, y, w = 240, h, tod = 'day', color, ink, inkColor = palette.ink, width = stroke.ink, drift = 0, at, seed = 'c'}) => {
+export const SkyCloud: React.FC<SkyCloudProps> = ({x, y, w = 240, h, tod, color, ink, inkColor = palette.ink, width = stroke.ink, drift = 0, at, seed = 'c'}) => {
   const S = useCineState();
   const t = S.t;
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const g = cloudGeo(0, 0, w, h ?? w * 0.42, seed);
   if (at !== undefined && t < at) return null;
   const ex = exitScale(S.e, 0.3, 0.15);
@@ -162,9 +198,9 @@ export const SkyCloud: React.FC<SkyCloudProps> = ({x, y, w = 240, h, tod = 'day'
 };
 
 /** Long thin sunset streak clouds (flat pills) stacked near the horizon. */
-export const Streaks: React.FC<{y: number; tod?: Tod | TodPalette; color?: string; n?: number; x0?: number; x1?: number; seed?: Seed; drift?: number; thick?: number}> = ({
+export const Streaks: React.FC<{y: number; tod?: TodLike | TodPalette; color?: string; n?: number; x0?: number; x1?: number; seed?: Seed; drift?: number; thick?: number}> = ({
   y,
-  tod = 'dusk',
+  tod,
   color,
   n = 4,
   x0 = -200,
@@ -174,7 +210,7 @@ export const Streaks: React.FC<{y: number; tod?: Tod | TodPalette; color?: strin
   thick = 14,
 }) => {
   const t = useTime();
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const d = useMemo(() => {
     const r = rng(`streak/${seed}`);
     const pb = new PathBuf();
@@ -196,7 +232,7 @@ export const Streaks: React.FC<{y: number; tod?: Tod | TodPalette; color?: strin
 // ---------------------------------------------------------------- stars
 
 export type StarsProps = {
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   color?: string;
   /** [x0, y0, x1, y1] */
   region: [number, number, number, number];
@@ -218,10 +254,10 @@ export type StarsProps = {
 export const CAPTION_BAND: [number, number, number, number] = [80, 270, 1000, 580];
 
 /** Small cream dots and a few 4-point sparkles; pop in (spring scale), twinkle by size. One path. */
-export const Stars: React.FC<StarsProps> = ({tod = 'night', color, region, n, at, span = 3, twinkle = 0.35, seed = 'stars', size = 1, avoid = [CAPTION_BAND]}) => {
+export const Stars: React.FC<StarsProps> = ({tod, color, region, n, at, span = 3, twinkle = 0.35, seed = 'stars', size = 1, avoid = [CAPTION_BAND]}) => {
   const S = useCineState();
   const t = S.t;
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const [x0, y0, x1, y1] = region;
   const count = n ?? Math.round(((x1 - x0) * (y1 - y0) * p.stars) / 5200);
   const avoidKey = avoid.map((a) => a.join(',')).join('|');

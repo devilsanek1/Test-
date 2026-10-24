@@ -17,6 +17,7 @@ import {Tod as TodCtx} from '../../../lib/tod';
 import {mat, useXf, XG} from '../../../lib/xf';
 import {line, rect as sketchRect, wallTicks, Pt} from '../../../lib/sketch';
 import {Ink} from '../../../lib/Ink';
+import {Look, useLook} from '../../../lib/exit';
 import {Fill} from '../../../lib/Fill';
 import {Place} from '../../../lib/kit/common';
 import {rng, Seed} from '../../../lib/rng';
@@ -232,3 +233,26 @@ export const wk = (w: number, scale = 1) => w / Math.sqrt(Math.max(0.05, scale))
 export const inkScale = (k: number) => ({front: SI.front * k, mid: SI.mid * k, far: SI.far * k, hair: SI.hair * k});
 
 export const ink = stroke;
+
+// ---------------------------------------------------------------- render-state helpers
+
+/** true while the piece at world point p is still paper: the paper Look, or the opening cascade has not reached it. */
+export function usePaperAt(p: Pt): boolean {
+  const look = useLook();
+  const t = useTime();
+  const m = useXf();
+  if (look.fills === 'paper') return true;
+  if (!look.cascade) return false;
+  const c = look.cascade;
+  const q: Pt = [m[0] * p[0] + m[2] * p[1] + m[4], m[1] * p[0] + m[3] * p[1] + m[5]];
+  return t < c.at + Math.hypot(q[0] - c.origin[0], q[1] - c.origin[1]) / (c.speed ?? 2600);
+}
+
+/** Children render in the paper Look until the cascade wave reaches p (for raw-SVG / prop pieces that ignore it). */
+export const PaperUntilCascade: React.FC<{p: Pt; children?: React.ReactNode}> = ({p, children}) => {
+  const paper = usePaperAt(p);
+  return paper ? <Look fills="paper">{children}</Look> : <>{children}</>;
+};
+
+/** Children render only while the piece at p is paper (hairline outlines for fill-only shapes in the line-art frame). */
+export const OnlyWhilePaper: React.FC<{p: Pt; children?: React.ReactNode}> = ({p, children}) => (usePaperAt(p) ? <>{children}</> : null);

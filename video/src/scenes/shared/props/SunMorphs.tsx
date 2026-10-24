@@ -19,10 +19,10 @@ import {ease as E, lerp, osc, prog, springAt, springs, useTime} from '../../../l
 import {Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
-import {ExitFade} from '../../../lib/exit';
+import {ExitFade, useLook} from '../../../lib/exit';
 import {arc, crown, line, smooth, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
-import {DEPTH_INK, pendulum} from './common';
+import {DEPTH_INK, pendulum, withOut} from './common';
 import {ElephantEmblem} from './Elephant';
 
 const D2R = Math.PI / 180;
@@ -327,7 +327,7 @@ export type WaxSealProps = {
 
 /** The film's one allowed orange prop: a wax seal pops out of the sun, drops along a dotted ink arc onto the envelope,
  *  lands with a squash and settles with a pendulum wobble. */
-export const WaxSeal: React.FC<WaxSealProps> = ({from, to, at, dur = 0.33, arc: arcH = 120, r = 16, keepTrail = false, seed = 'seal'}) => {
+const WaxSealBase: React.FC<WaxSealProps> = ({from, to, at, dur = 0.33, arc: arcH = 120, r = 16, keepTrail = false, seed = 'seal'}) => {
   const t = useTime();
   if (t < at) return null;
   const popT = 0.1;
@@ -385,7 +385,9 @@ export const SunGlowSteps: React.FC<{cx: number; cy: number; r: number; at?: num
   opacity,
 }) => {
   const t = useTime();
+  const look = useLook();
   if (at !== undefined && t < at) return null;
+  if (look.fills !== 'color') return null; // light only exists in the coloured state
   const out: React.ReactNode[] = [];
   for (let i = rings.length - 1; i >= 0; i--) {
     const g = rings[i];
@@ -424,3 +426,6 @@ export const HeatTicks: React.FC<{r: number; at?: number; outAt?: number; width?
   });
   return <>{out}</>;
 };
+
+// build-out (outAt / outDur) for props that have no own exit
+export const WaxSeal = withOut(WaxSealBase, 'WaxSeal');

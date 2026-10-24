@@ -29,9 +29,9 @@ import {Look, useLook} from '../../../lib/exit';
 import {arc, blob, circle, crown, crownTicks, line, polyPath, rect, rectPath, smooth, vline, Pt} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {mat, XG} from '../../../lib/xf';
-import {Bird, Person} from '../../../lib/kit';
-import {brickHints, cornice, LayerWrap, LightsOut, noWrap, pavingJoints, SetPlace, SI} from './common';
-import {BackSoonSlot, BollardSlot, ChromeSlot, LockSlot, PadlockSlot, PlaqueSlot, ShutterSlot} from './propSlots';
+import {Bird} from '../../../lib/kit';
+import {brickHints, cornice, LayerWrap, LightsOut, noWrap, OnlyWhilePaper, PaperUntilCascade, pavingJoints, SetPlace, SI} from './common';
+import {BackSoonSlot, BitSlot, BollardSlot, ChromeSlot, CitizenSlot, LockSlot, OnlookerSlot, PadlockSlot, PlaqueSlot, ShutterSlot} from './propSlots';
 import {FacadeDoor} from './SiteFacade';
 
 // ---------------------------------------------------------------- layout (anchors for scenes)
@@ -120,6 +120,8 @@ export type GovernmentPlazaProps = {
   sun?: React.ReactNode;
   /** Bollard (Pip's perch). Default true. */
   bollard?: boolean;
+  /** Bit idling on govA's cornice at (200, 705) (frame 0 / last frame). Default true; false when the scene animates him. */
+  bit?: boolean;
   /** Per-window override (S11: progress bar / loading ring). Receives the window rect. */
   windowSlot?: (id: GovId, r: R4) => React.ReactNode;
   /** Multiplane split (see common LayerWrap). */
@@ -526,14 +528,13 @@ const FarCity: React.FC<{seed: string}> = ({seed}) => (
     <Fill d={G.farB} color={palette.sage} offset={false} seed={`${seed}/farB`} />
     <Fill d={G.farDots} color={palette.cream} offset={false} seed={`${seed}/farD`} />
     <Ink d={G.cranes} width={HAIR} taper={false} seed={`${seed}/cranes`} />
-    <PaperOnly>
+    <OnlyWhilePaper p={[630, 1000]}>
       <Ink d={G.farEdges} width={HAIR} taper={false} seed={`${seed}/farE`} />
-    </PaperOnly>
+    </OnlyWhilePaper>
   </>
 );
 
-/** Only in the paper (line-art) state: hairline outlines for fill-only shapes, so frame 0 reads as line art. */
-const PaperOnly: React.FC<{children?: React.ReactNode}> = ({children}) => (useLook().fills === 'paper' ? <>{children}</> : null);
+
 
 const Ground: React.FC<{seed: string}> = ({seed}) => (
   <>
@@ -575,67 +576,43 @@ const LightOnly: React.FC<{children?: React.ReactNode}> = ({children}) => {
   return <LookGate>{children}</LookGate>;
 };
 const LookGate: React.FC<{children?: React.ReactNode}> = ({children}) => {
-  const look = useLookSafe();
-  return look === 'color' ? <>{children}</> : null;
+  const look = useLook();
+  const t = useTime();
+  if (look.fills !== 'color') return null;
+  // under the opening cascade the light switches on once the colour wave has left the gap (1-frame pop, no fade)
+  if (look.cascade && t < look.cascade.at + 0.12) return null;
+  return <>{children}</>;
 };
-const useLookSafe = () => useLook().fills;
 
 const Citizens: React.FC<{at?: number; phonesAt?: number; seed: string}> = ({at, phonesAt, seed}) => {
   const t = useTime();
   const phones = phonesAt !== undefined && t >= phonesAt;
   return (
     <>
-      {PLAZA.citizens.map((c, i) => {
-        const s = c.h / 205;
-        const rAt = at === undefined ? undefined : at + i * 0.05;
-        const node = (
-          <Person
-            x={c.x}
-            y={c.y - 60 * s}
-            s={s}
-            legs
-            lod={1}
-            ink={c.sil ? 0 : THIN}
-            body={c.sil ? palette.sage : undefined}
-            hairColor={c.sil ? palette.sage : undefined}
-            legsColor={c.sil ? palette.sage : undefined}
-            acc={phones && (i === 2 || i === 7) ? ['phone'] : []}
-            at={rAt}
-            build="rise"
-            seed={`${seed}/cit${i}`}
-          />
-        );
-        return <React.Fragment key={i}>{node}</React.Fragment>;
-      })}
+      {PLAZA.citizens.map((c, i) => (
+        <PaperUntilCascade key={i} p={[c.x, c.y - c.h / 2]}>
+          <CitizenSlot x={c.x} y={c.y} h={c.h} silhouette={c.sil} riseAt={at === undefined ? undefined : at + i * 0.05} acc={phones && (i === 2 || i === 7) ? ['phone'] : undefined} seed={`${seed}/cit${i}`} />
+        </PaperUntilCascade>
+      ))}
     </>
   );
 };
 
 const Onlookers: React.FC<{seed: string}> = ({seed}) => (
   <>
-    {PLAZA.onlookers.map((o, i) => {
-      const s = o.s;
-      const hr = 23;
-      const y = 2010;
-      const torsoH = (y - o.head[1]) / s - hr * 0.86;
-      return (
-        <Person
-          key={i}
-          x={o.head[0]}
-          y={y}
-          s={s}
-          torsoH={torsoH}
-          ink={NEAR}
-          hero
-          hair={(['short', 'bun', 'cap'] as const)[i]}
-          body={[palette.teal, palette.sand, palette.sage][i]}
-          hairColor={[palette.brown, palette.ink, palette.tan][i]}
-          acc={i === 1 ? ['scarf'] : i === 2 ? ['collar'] : ['hood']}
-          rim={i === 2 ? 'right' : 'left'}
-          seed={`${seed}/onl${i}`}
-        />
-      );
-    })}
+    {PLAZA.onlookers.map((o, i) => (
+      <OnlookerSlot
+        key={i}
+        x={o.head[0]}
+        y={o.head[1]}
+        head={60 * o.s * 1.05}
+        hair={(['short', 'bun', 'cap'] as const)[i]}
+        body={[palette.teal, palette.sand, palette.sage][i]}
+        acc={i === 1 ? ['scarf'] : i === 2 ? ['collar'] : ['hood']}
+        rim={i === 2 ? 'right' : 'left'}
+        seed={`${seed}/onl${i}`}
+      />
+    ))}
   </>
 );
 
@@ -688,6 +665,7 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
   detail = 'wide',
   sun,
   bollard = true,
+  bit = true,
   windowSlot,
   wrap = noWrap,
   x = 0,
@@ -716,6 +694,7 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
           <GovC ev={ev('govC')} {...bp} />
           <GovA ev={ev('govA')} {...bp} />
           <GovB ev={ev('govB')} {...bp} />
+          {bit ? <BitSlot x={PLAZA.bit[0]} y={PLAZA.bit[1]} size={16} seed={`${seed}/bit`} /> : null}
           {(pennantUp || pennantTimes.length) && !lineArt
             ? (['govA', 'govB', 'govC'] as GovId[]).map((id, i) => <Pennant key={id} i={i} root={PLAZA.gov[id].pennant} at={pennantTimes[i]} up={pennantUp} waveAt={pennantWaveAt} seed={seed} />)
             : null}
@@ -756,3 +735,7 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
 
 /** S11 framing helper: the camera centre / zoom that frames govB's window as the storyboard measures it. */
 export const plazaCloseup = PLAZA.closeup;
+
+/** The REST layout: S01's opening frame and S11's ending frame (camera at rest, sun slot, Pip, Bit). Frame 0 =
+ *  <GovernmentPlaza state="lineArt"/> with the sun mid-rise at sunFrame0; S11's hard cut = state "off". */
+export const PLAZA_REST = {camera: {x: 540, y: 960, zoom: 1}, sun: PLAZA.sun, sunFrame0: {x: 630, y: 850, r: 150}, pip: PLAZA.pip, bit: PLAZA.bit, bollard: PLAZA.bollard} as const;

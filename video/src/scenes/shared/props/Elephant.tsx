@@ -23,8 +23,9 @@ import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {blob, circle, ellipse, line, polyPath, rect, roundRect, smooth, Pt} from '../../../lib/sketch';
 import {mat, useXf, XG} from '../../../lib/xf';
-import {bt, Depth, DEPTH_INK, lodOf, matScale, misregScreen, pendulum, PropBase, PropRoot, usePropFrame} from './common';
+import {bt, Depth, DEPTH_INK, lodOf, matScale, misregScreen, pendulum, PropBase, PropRoot, usePropFrame, withOut} from './common';
 import {Cobweb} from './Glyphs';
+import {ExitFade} from '../../../lib/exit';
 
 // ---------------------------------------------------------------- emblem geometry (100 x 80 box, centred, faces right)
 
@@ -149,7 +150,7 @@ export type ElephantEmblemProps = {
   seed?: Seed;
 };
 
-export const ElephantEmblem: React.FC<ElephantEmblemProps> = ({x = 0, y = 0, size = 100, style = 'modern', mode = 'auto', bg = palette.sand, color = palette.ink, at, lean = 0, cane = false, caneAt, ink, seed = 'emb'}) => {
+const ElephantEmblemBase: React.FC<ElephantEmblemProps> = ({x = 0, y = 0, size = 100, style = 'modern', mode = 'auto', bg = palette.sand, color = palette.ink, at, lean = 0, cane = false, caneAt, ink, seed = 'emb'}) => {
   const t = useTime();
   const m = useXf();
   const s = size / 100;
@@ -347,7 +348,7 @@ export type ElephantStampProps = {
   seed?: Seed;
 };
 
-export const ElephantStamp: React.FC<ElephantStampProps> = ({x, y, rx: rxIn, ry: ryIn, r, ring, color = palette.sand, at, slamAt, depth, seed = 'stamp'}) => {
+const ElephantStampBase: React.FC<ElephantStampProps> = ({x, y, rx: rxIn, ry: ryIn, r, ring, color = palette.sand, at, slamAt, depth, seed = 'stamp'}) => {
   const t = useTime();
   const rx = rxIn ?? r ?? 40;
   const ry = ryIn ?? r ?? 40;
@@ -380,4 +381,37 @@ export const ElephantStamp: React.FC<ElephantStampProps> = ({x, y, rx: rxIn, ry:
 
 /** Seeded colour variety helper for plaque rows (rarely used: keeps every plaque sand unless old). */
 export const plaqueSeed = (i: number, base: Seed = 'row') => `${base}/${i}/${Math.floor(rand(base, i) * 1000)}`;
-export {osc};
+
+// build-out (outAt / outDur) for props that have no own exit
+export const ElephantEmblem = withOut(ElephantEmblemBase, 'ElephantEmblem');
+export const ElephantStamp = withOut(ElephantStampBase, 'ElephantStamp');
+
+// ---------------------------------------------------------------- PlaqueSpecks (batched plaque dots for waves)
+
+/** Plaque dots for hundreds of doors (S10's wave from row 0 to the ridge) in one sand path + one ink rim path (rim only
+ *  for dots >= rimFrom world px). Each dot BLINKS on at its `at` (cream flash + 125 % for 3 frames). */
+export const PlaqueSpecks: React.FC<{spots: {x: number; y: number; size: number; at?: number; old?: boolean}[]; ink?: number; rimFrom?: number}> = ({spots, ink = 0.6, rimFrom = 3.5}) => {
+  const t = useTime();
+  let sand = '';
+  let tan = '';
+  let flash = '';
+  let rim = '';
+  for (const sp of spots) {
+    if (sp.at !== undefined && t < sp.at) continue;
+    const blink = sp.at !== undefined && t < sp.at + 0.1;
+    const r = (sp.size / 2) * (blink ? 1.25 : 1);
+    const d = `M${(sp.x - r).toFixed(2)} ${sp.y.toFixed(2)}a${r.toFixed(2)} ${r.toFixed(2)} 0 1 0 ${(2 * r).toFixed(2)} 0a${r.toFixed(2)} ${r.toFixed(2)} 0 1 0 ${(-2 * r).toFixed(2)} 0z`;
+    if (blink) flash += d;
+    else if (sp.old) tan += d;
+    else sand += d;
+    if (sp.size >= rimFrom) rim += d;
+  }
+  return (
+    <ExitFade>
+      {sand ? <path d={sand} fill={palette.sand} /> : null}
+      {tan ? <path d={tan} fill={palette.tan} /> : null}
+      {flash ? <path d={flash} fill={palette.cream} /> : null}
+      {rim && ink > 0 ? <path d={rim} fill="none" stroke={palette.ink} strokeWidth={ink} /> : null}
+    </ExitFade>
+  );
+};

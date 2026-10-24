@@ -1,0 +1,81 @@
+{
+ "source": "docs/motion_spec.md section 2 (scene/transition timeline); cut = transition midpoint",
+ "scenes": [
+  {
+   "id": "R1-S1",
+   "start": 0.0,
+   "end": 7.77,
+   "note": "street march"
+  },
+  {
+   "id": "R1-S2",
+   "start": 7.77,
+   "end": 13.8,
+   "note": "notice board",
+   "transitions": [
+    [
+     7.43,
+     8.03,
+     "zoom-through T1"
+    ]
+   ]
+  },
+  {
+   "id": "R1-S3",
+   "start": 13.8,
+   "end": 20.23,
+   "note": "city block, coins",
+   "transitions": [
+    [
+     13.33,
+     14.2,
+     "tilt + swipe T2"
+    ]
+   ]
+  },
+  {
+   "id": "R1-S4",
+   "start": 20.23,
+   "end": 23.83,
+   "note": "ATMs",
+   "transitions": [
+    [
+     19.63,
+     20.63,
+     "card flip T3"
+    ]
+   ]
+  },
+  {
+   "id": "R1-S5",
+   "start": 23.83,
+   "end": 27.57,
+   "note": "yes/no board",
+   "transitions": [
+    [
+     23.13,
+     24.23,
+     "card flip T4"
+    ]
+   ]
+  },
+  {
+   "id": "R1-S6",
+   "start": 27.57,
+   "end": 31.53,
+   "note": "close-up board + un-build loop",
+   "transitions": [
+    [
+     26.93,
+     28.2,
+     "push-in T5"
+    ],
+    [
+     30.77,
+     31.53,
+     "un-build T6"
+    ]
+   ]
+  }
+ ]
+}

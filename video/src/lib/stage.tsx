@@ -21,7 +21,9 @@ import {mat, Mat} from './xf';
 
 // ---------------------------------------------------------------- scene info
 
-export type SceneInfo = {id: string; start: number; end: number; dur: number};
+/** The scene's incoming transition as far as cameras need it (Film fills it in). */
+export type SceneTransitionIn = {type: string; dur: number; dir?: string};
+export type SceneInfo = {id: string; start: number; end: number; dur: number; transitionIn?: SceneTransitionIn};
 const SceneCtx = createContext<SceneInfo>({id: 'none', start: 0, end: 0, dur: 0});
 /** Info about the scene being rendered (id, start, end, dur in seconds). */
 export const useScene = () => useContext(SceneCtx);
@@ -47,6 +49,18 @@ export function stageMat(c: StageCam): Mat {
 /** Stage camera that zooms by `zoom` about world point `focus`, placing it at screen point `to` (default: where it is). */
 export function zoomAbout(focus: [number, number], zoom: number, to: [number, number] = focus): StageCam {
   return {ox: focus[0] - C[0] - (to[0] - C[0]) / zoom, oy: focus[1] - C[1] - (to[1] - C[1]) / zoom, zoom, rot: 0};
+}
+
+/** When a per-shot push (World `push` / ShotCam `push`, zoom `to`) may start: a push that would REVERSE the incoming
+ *  camera-continuous zoom (dir 'out' + push in, or dir 'in' + push out) waits until the transition has settled
+ *  (scene t = its dur), so the camera never bounces; a push in the same direction (or after any other transition)
+ *  starts at `at`. */
+export function pushStart(at: number, to: number, scene?: SceneInfo): number {
+  const tr = scene?.transitionIn;
+  if (!tr || tr.type !== 'camera-continuous') return at;
+  const dir = tr.dir ?? 'in';
+  const reverses = (dir === 'out' && to > 1) || (dir === 'in' && to < 1);
+  return reverses ? Math.max(at, tr.dur) : at;
 }
 
 /** Visible world rectangle [x, y, w, h] for a stage camera (to size backgrounds). */

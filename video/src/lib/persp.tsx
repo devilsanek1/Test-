@@ -164,3 +164,61 @@ export function frontQuad(o: {vp: Pt; x: number; y: number; w: number; h: number
 
 /** Screen scale of something at relative depth `depth` (0 = at the near plane, 1 = at the VP). */
 export const depthScale = (depth: number) => Math.max(0, 1 - depth);
+
+// ---------------------------------------------------------------- the EYE-LEVEL camera (people in perspective)
+
+/** A standing Person at s = 1 (back view, default proportions): hip line -> top of the head INCLUDING the average
+ *  hair volume (bare skull 137, + buns / curls / headphone bands; calibrated on KitDemo stills so the measured
+ *  camera / person ratio averages the nominal 1.1), and the default leg length (Person `legH` default = 0.62 x
+ *  torso). Total = PERSON_BODY_H + legH. */
+export const PERSON_BODY_H = 145;
+export const PERSON_LEG_H = 58.5;
+
+export type EyeLevel = {
+  horizon: number;
+  vpx: number;
+  /** camera height / person height */
+  ratio: number;
+  /** On-screen height (px) of a standing person whose FEET are at screen y. */
+  height: (feetY: number) => number;
+  /** Feet y of a standing person `heightPx` tall. */
+  feet: (heightPx: number) => number;
+  /** Person `s` for feet at y (legH = the Person's local leg length; default legs). */
+  s: (feetY: number, legH?: number) => number;
+  /** Person `y` (its HIP line) for feet at y. */
+  hip: (feetY: number, legH?: number) => number;
+  /** Screen x of a ground point X person-heights right (+) / left (-) of the camera axis, at the depth of feetY. */
+  x: (X: number, feetY: number) => number;
+  /** Screen y of the top of the head of a standing person with feet at y (the head band under the horizon). */
+  headTop: (feetY: number) => number;
+};
+
+/** EYE-LEVEL CAMERA: reference 2's baseline street, where the VIEWER FEELS SMALL. The lens sits at `ratio` x a
+ *  standing person's height (1.1: ref 2 f_1 measured 1.10, f_42 1.14), so every standing head lands in a thin band
+ *  just under the horizon (9 % of the feet's distance below it), near people tower over the lower frame and the
+ *  crowd converges ON the horizon line. A camera at 2-4x head height looks DOWN on a diorama (the viewer feels big).
+ *    const cam = eyeLevel({horizon: world.horizon, vpx: 560});
+ *    <Person x={cam.x(-0.5, 1500)} y={cam.hip(1500, 150)} s={cam.s(1500, 150)} legs legH={150} />
+ *    <Crowd eye={{horizon: world.horizon}} far={{y: 790, ...}} near={{y: 1250, ...}} />   // rows from the same camera
+ *  Check a still with `measureEye(feetY, headTopY, horizon)` (target 1.0-1.2). */
+export function eyeLevel(o: {horizon?: number; vpx?: number; ratio?: number} = {}): EyeLevel {
+  const horizon = o.horizon ?? 768;
+  const vpx = o.vpx ?? 540;
+  const ratio = o.ratio ?? 1.1;
+  const height = (fy: number) => Math.max(0, fy - horizon) / ratio;
+  const s = (fy: number, legH = PERSON_LEG_H) => height(fy) / (PERSON_BODY_H + legH);
+  return {
+    horizon,
+    vpx,
+    ratio,
+    height,
+    feet: (h: number) => horizon + h * ratio,
+    s,
+    hip: (fy: number, legH = PERSON_LEG_H) => fy - legH * s(fy, legH),
+    x: (X: number, fy: number) => vpx + X * height(fy),
+    headTop: (fy: number) => fy - height(fy),
+  };
+}
+
+/** Camera height / person height measured on a frame: (feet - horizon) / (feet - head top). */
+export const measureEye = (feetY: number, headTopY: number, horizon: number) => (feetY - horizon) / Math.max(1, feetY - headTopY);

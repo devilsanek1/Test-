@@ -7,8 +7,17 @@
 import React from 'react';
 import {palette, skies} from '../../../lib/theme';
 import {GovernmentPlaza, PLAZA} from './GovernmentPlaza';
+import {StoopStreet, STOOP} from './StoopStreet';
+import {BlueprintStreet, BLUEPRINT} from './BlueprintStreet';
+import {BlueprintWall, BLUEPRINT_WALL} from './BlueprintWall';
+import {MakersLane, MAKERS_LANE, Workshop, WORKSHOP_CORNER} from './MakersLane';
+import {NoticeboardCorner, NOTICE_CORNER, TelephoneWires, WIRES} from './NoticeboardCorner';
+import {DomeCity, DOME} from './DomeCity';
+import {TerraceHill, TERRACE} from './TerraceHill';
+import {OldQuarter, OLD_QUARTER} from './OldQuarter';
 import {DemoSun, DemoWorld} from './preview/demo';
 import {mat, XG} from '../../../lib/xf';
+import {ease as E, useTime} from '../../../lib/time';
 
 /** Camera matrix: world point (x, y) at screen centre, zoom z. */
 export const camMat = (x: number, y: number, z: number) => mat.compose(mat.translate(540, 960), mat.scale(z), mat.translate(-x, -y));
@@ -30,7 +39,11 @@ export const SET_CATALOG: SetEntry[] = [
     thumb: () => <GovernmentPlaza state="built" sun={<DemoSun cx={PLAZA.sun.x} cy={PLAZA.sun.y} r={PLAZA.sun.r} glyph />} pennantsAt />,
     preview: (v) => (
       <DemoWorld push={v === undefined || v === 'built'}>
-        {v === 'closeup' || v === 'dive' ? (
+        {v === 'endBuilt' || v === 'endOff' ? (
+          <GovernmentPlaza state={v === 'endOff' ? 'off' : 'built'} cascadeAt={v === 'endOff' ? undefined : 0.03} gov={v === 'endOff' ? undefined : S01_GOV} pennantsAt={v === 'endOff' ? undefined : [1.23, 1.38, 1.53, 1.68]} lanternOffAt={v === 'endOff' ? undefined : 3.25} pigeonsAt={v === 'endOff' ? undefined : 1.7} pigeonsFlyAt={v === 'endOff' ? undefined : 3.3} sun={<DemoSun cx={630} cy={800} r={150} glyph />} />
+        ) : v === 'f0built' || v === 'f0line' ? (
+          <GovernmentPlaza state={v === 'f0line' ? 'lineArt' : 'built'} cascadeAt={v === 'f0line' ? undefined : 0.03} gov={v === 'f0line' ? undefined : S01_GOV} pennantsAt={v === 'f0line' ? undefined : [1.23, 1.38, 1.53, 1.68]} pigeonsAt={v === 'f0line' ? undefined : 1.7} sun={<DemoSun cx={630} cy={850} r={150} glyph />} />
+        ) : v === 'closeup' || v === 'dive' ? (
           <XG m={v === 'closeup' ? camMat(375, 793, 1.85) : camMat(394, 1095, 3.25)}>
             <GovernmentPlaza state="built" detail="close" gov={{govB: {shutterAt: 2.0, padlockAt: 2.5, tagAt: 2.3}}} sun={<DemoSun cx={720} cy={760} r={110 / 1.85} glyph />} />
           </XG>
@@ -55,6 +68,152 @@ export const SET_CATALOG: SetEntry[] = [
       </DemoWorld>
     ),
   },
+  {
+    id: 'stoop',
+    label: 'StoopStreet',
+    sky: skies.day,
+    thumb: () => <StoopStreet sun={<DemoSun cx={720} cy={850} r={110} />} stoop={{magnifierAt: -1, wrenchAt: -1}} />,
+    preview: (v) =>
+      v === 'night' ? (
+        <DemoWorld sky={skies.night}>
+          <StoopStreet tod="night" sun={null} stoop={{magnifierAt: -1, wrenchAt: -1, checkAt: 2.6, peachAt: 2.7, ledgeAt: 3.2}} />
+        </DemoWorld>
+      ) : v === 'tower' ? (
+        <DemoWorld>
+          <StoopStreet sun={<DemoSun cx={720} cy={850} r={110} />} stoop={{magnifierAt: -1, wrenchAt: -1, towerAt: 0.5, towerDownAt: 3.0}} season={[{t: 0, s: 'green'}, {t: 3.5, s: 'peach'}, {t: 3.6, s: 'tan'}, {t: 3.7, s: 'bare'}]} ivy={0.6} heroLock={{cobwebAt: 3.2}} />
+        </DemoWorld>
+      ) : (
+        <DemoWorld push>
+          <StoopStreet drawAt={v === 'draw' ? 0.2 : undefined} sun={<DemoSun cx={720} cy={850} r={110} />} stoop={{step1At: 1.9, step2At: 2.3, magnifierAt: 2.4, wrenchAt: 3.1}} />
+        </DemoWorld>
+      ),
+  },
+  {
+    id: 'blueprint',
+    label: 'BlueprintStreet',
+    sky: skies.day,
+    thumb: () => <BlueprintStreet sun={<DemoSun cx={690} cy={700} r={110} />} />,
+    preview: (v) =>
+      v === 'closeup' ? (
+        <DemoWorld>
+          <XG m={camMat(BLUEPRINT.closeup.cam[0], BLUEPRINT.closeup.cam[1], BLUEPRINT.closeup.zoom)}>
+            <BlueprintStreet sun={<DemoSun cx={720} cy={750} r={55} />} lock={{screwsOutAt: 1, coverOpenAt: 1.3, boltTestAt: 1.8, gapMarkAt: 2.2}} />
+          </XG>
+        </DemoWorld>
+      ) : (
+        <DemoWorld push>
+          <BlueprintStreet
+            sun={<DemoSun cx={690} cy={700} r={110} />}
+            gridAt={0.1}
+            stampAt={0.8}
+            popAt={{L1: 1.2, R1: 1.26, L2: 1.32, R2: 1.38, L3: 1.44, R3: 1.5, L4: 1.56, R4: 1.62, L5: 1.68}}
+            plaqueAt={{P: 2.4, L1: 2.48, R1: 2.56, L2: 2.64, R2: 2.72, L4: 2.8, R3: 2.88, L3: 3.1, L5: 3.12, R4: 3.14}}
+            ventAt={2.0}
+            signSwingAt={2.1}
+          />
+        </DemoWorld>
+      ),
+  },
+  {
+    id: 'wall',
+    label: 'BlueprintWall',
+    sky: skies.day,
+    thumb: () => <BlueprintWall sun={<DemoSun cx={930} cy={725} r={110} />} />,
+    preview: (v) => (
+      <DemoWorld>
+        <XG m={camMat(540, 960, 1.08)}>
+          <BlueprintWall drawAt={v === 'draw' ? 0.3 : undefined} sun={<DemoSun cx={BLUEPRINT_WALL.sun.x} cy={BLUEPRINT_WALL.sun.y} r={110} />} />
+        </XG>
+      </DemoWorld>
+    ),
+  },
+  {
+    id: 'lane',
+    label: 'MakersLane',
+    sky: skies.golden,
+    thumb: () => <MakersLane sun={<DemoSun cx={MAKERS_LANE.sun.x} cy={MAKERS_LANE.sun.y} r={120} />} />,
+    preview: (v) =>
+      v === 'corner' ? (
+        <DemoWorld sky={skies.golden}>
+          <Workshop layout={WORKSHOP_CORNER} blind="down" signSwingAt={0.5} doorOpenAt={2.5} />
+        </DemoWorld>
+      ) : (
+        <DemoWorld sky={skies.golden}>
+          <MakersLane sun={<DemoSun cx={MAKERS_LANE.sun.x} cy={MAKERS_LANE.sun.y} r={120} />} curtainsAt={0.6} workshop={{glowAt: 1.0, makersAt: 1.0, blindDownAt: 2.4, signSwingAt: 1.6, slotClickAt: 1.9}} />
+        </DemoWorld>
+      ),
+  },
+  {
+    id: 'corner',
+    label: 'NoticeboardCorner',
+    sky: skies.golden,
+    thumb: () => <NoticeboardCorner sun={<DemoSun cx={NOTICE_CORNER.sun.x} cy={NOTICE_CORNER.sun.y} r={110} />} />,
+    preview: () => (
+      <DemoWorld sky={skies.golden}>
+        <NoticeboardCorner sun={<DemoSun cx={NOTICE_CORNER.sun.x} cy={NOTICE_CORNER.sun.y} r={110} />} board={{riseAt: 0.3, railLightAt: 1.2}} readers={{riseAt: 0.6, phonesAt: 2.0}} workshop={{signSwingAt: 1.0, doorOpenAt: 3.0}} pigeonsFlyAt={3.4} />
+      </DemoWorld>
+    ),
+  },
+  {
+    id: 'dome',
+    label: 'DomeCity',
+    sky: skies.golden,
+    thumb: () => <DomeCity sun={<DemoSun cx={DOME.sun.x} cy={DOME.sun.y} r={165} />} searchAt={-1} tallies={12} />,
+    preview: (v) => (
+      <DemoWorld sky={v === 'dusk' ? skies.dusk : skies.golden}>
+        <XG m={v === 'crane' ? camMat(540, 1260, 1.3) : v === 'push' ? camMat(480, 1040, 1.15) : mat.I}>
+          <DomeCity sun={<DemoSun cx={DOME.sun.x} cy={DOME.sun.y} r={165} />} domeAt={0.2} towerAt={1.2} searchAt={1.6} tallies={13} dotsAt={0.4} duskAt={v === 'dusk' ? 0 : undefined} />
+          <TelephoneWires spec={WIRES.S08} />
+        </XG>
+      </DemoWorld>
+    ),
+  },
+  {
+    id: 'terrace',
+    label: 'TerraceHill',
+    sky: skies.day,
+    thumb: () => <TerraceHill flagAt={-1} ringsAt={-1} sun={<DemoSun cx={700} cy={720} r={150} />} />,
+    preview: (v) => {
+      // demo pull-back 6.0 -> 1.0 over 2.2 s (log-space zoom), anchored on house #4 like the storyboard camera
+      const Pull: React.FC = () => {
+        const t = useTime();
+        if (v === 'flat')
+          return <TerraceHill mode="flat" plaqueWaveAt={0.5} bitWaveAt={1.0} sun={<DemoSun cx={700} cy={720} r={150} />} />;
+        const q = v === 'match' ? 0 : v === 'rest' ? 1 : E.inOutSine(Math.min(1, Math.max(0, (t - 0.3) / 2.2)));
+        const z = Math.exp(Math.log(6) * (1 - q));
+        const cx = 540;
+        const cy = 1407 + (960 - 1407) * q;
+        return (
+          <XG m={camMat(cx, cy, z)}>
+            <TerraceHill revealFloor={TERRACE.revealFloor} plaqueWaveAt={2.6} bitWaveAt={3.2} flagAt={2.9} ringsAt={3.6} extendAt={3.4} sun={<DemoSun cx={700} cy={760} r={150} />} />
+          </XG>
+        );
+      };
+      return (
+        <DemoWorld>
+          <Pull />
+        </DemoWorld>
+      );
+    },
+  },
+  {
+    id: 'old',
+    label: 'OldQuarter',
+    sky: skies.golden,
+    thumb: () => <OldQuarter sun={<DemoSun cx={OLD_QUARTER.sun.x} cy={OLD_QUARTER.sun.y} r={110} />} />,
+    preview: (v) => (
+      <DemoWorld sky={skies.golden}>
+        {v === 'board' ? (
+          <XG m={camMat(550, 1020, 1.12)}>
+            <OldQuarter sun={<DemoSun cx={530} cy={725} r={110 / 1.12} />} board={{riseAt: 0.3, railLightAt: 0.8, paneDarkAt: 2.0, pane2ScaleInAt: 2.4}} audience={{riseAt: 0.5}} />
+          </XG>
+        ) : (
+          <OldQuarter sun={<DemoSun cx={OLD_QUARTER.sun.x} cy={OLD_QUARTER.sun.y} r={110} />} sitePopAt={[0.3, 0.6, 0.9]} plaqueSwingAt={1.4} oldPlaque={{flipOldAt: 2.2, cobwebAt: 2.8, dustAt: 2.9, caneAt: 3.1}} />
+        )}
+      </DemoWorld>
+    ),
+  },
 ];
 
 void palette;
+void STOOP;

@@ -5,6 +5,8 @@
 //   <Ledge y={1460} tod="dusk" at={0.1} />                       // parapet across the frame, cropped by its edges
 //   <WipeCut at={5.6} dur={0.55} dir="right" kind="column" tod="dusk" a={<Shot ...>} b={<Shot ...>} />
 //   <WipePass at={5.6} dur={0.55} dir="right" kind="figure" />   // the element alone (screen space)
+//   wipeToneRegions(T, {at: 5.6, kind: 'column'}, 'dark', 'light')  // SkyCaptions regions during the wipe
+// The column / passer wipers live in the leaf module ./wipers (core WiperComponent shape, for Film too).
 
 import React from 'react';
 import {palette, stroke} from '../theme';
@@ -12,12 +14,15 @@ import {ease as E, prog, useTime} from '../time';
 import {Ink} from '../Ink';
 import {crown, glint, hline, line, rect, textLines, wallTicks} from '../sketch';
 import {rng, Seed} from '../rng';
-import {ambient, Tod, TodPalette, todPal} from './atmosphere';
+import {ambient, TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
 import {darker} from './city';
 import {Glow} from './light';
 import {PathBuf, r1} from './util';
 import {ExitShrink, exitScale, inkOn, lookPaint, useCineState} from './state';
-import {FigureWiper, FoliageWiper, PoleWiper} from '../Film';
+import {BUILTIN_WIPERS, FoliageWiper, WiperComponent} from '../Film';
+import {CINE_WIPE_HALF, CINE_WIPERS, ColumnWiper, PasserWiper, wipeEdgeX, wiperRegions} from './wipers';
+import type {ToneRegion} from '../Captions';
+import type {CaptionTone} from '../theme';
 import {NoExit} from '../exit';
 import {useId} from 'react';
 
@@ -29,7 +34,7 @@ export type LedgeProps = {
   /** Top surface depth (px) and front face height. */
   top?: number;
   face?: number;
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   color?: string;
   /** Draw-on start (ink), fills pop a beat later. Omit = built. */
   at?: number;
@@ -37,14 +42,17 @@ export type LedgeProps = {
   width?: number;
   /** Floor colour below the face (the roof we stand on). */
   floor?: string;
+  /** Roof detail so the floor is never a dead slab: brick courses on the face, a drain pipe, and roof clutter on the
+   *  floor (vents, a hatch, a pipe run, an antenna mast, tar seams). Default false. */
+  detail?: boolean;
 };
 
 /** A rooftop parapet seen from behind and slightly above: lit top surface, shaded front face, inked edges that
  *  overshoot past the frame, brick ticks. Everything below it is the roof floor. */
-export const Ledge: React.FC<LedgeProps> = ({y, x0 = -60, x1 = 1140, top = 30, face = 110, tod = 'day', color, at, seed = 'ledge', width = stroke.inkBold, floor}) => {
+export const Ledge: React.FC<LedgeProps> = ({y, x0 = -60, x1 = 1140, top = 30, face = 110, tod, color, at, seed = 'ledge', width = stroke.inkBold, floor, detail = false}) => {
   const S = useCineState();
   const t = S.t;
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const r = rng(`ledge/${seed}`);
   const c = color ?? ambient(palette.sand, p);
   const shadeC = ambient(darker(palette.sand), p);
@@ -56,7 +64,8 @@ export const Ledge: React.FC<LedgeProps> = ({y, x0 = -60, x1 = 1140, top = 30, f
     hline(x0 + 20, x1 - 10, y + top, {seed: `${seed}/b`, over: 'structural'}) +
     hline(x0, x1, y + top + face, {seed: `${seed}/c`, over: [10, 30]}) +
     line(x0 + (x1 - x0) * r.range(0.62, 0.7), y + top, x0 + (x1 - x0) * r.range(0.62, 0.7) + 2, y + top + face, {seed: `${seed}/j`, over: [0, 4]});
-  const ticks = wallTicks(x0 + 80, y + top + 22, x1 - x0 - 160, face - 40, {seed: `${seed}/t`, n: 7, size: 26});
+  const ticks = detail ? '' : wallTicks(x0 + 80, y + top + 22, x1 - x0 - 160, face - 40, {seed: `${seed}/t`, n: 7, size: 26});
+  const D = detail ? ledgeDetail(x0, x1, y + top, face, seed) : null;
   return (
     <>
       {fp > 0 && S.look.fills !== 'none' ? (
@@ -64,13 +73,88 @@ export const Ledge: React.FC<LedgeProps> = ({y, x0 = -60, x1 = 1140, top = 30, f
           <rect x={x0 - 400} y={y + top + face} width={x1 - x0 + 800} height={1400} fill={P(floorC)} />
           <rect x={x0 - 400} y={y + top} width={x1 - x0 + 800} height={face} fill={P(shadeC)} />
           <rect x={x0 - 400} y={y + 3} width={x1 - x0 + 800} height={top} fill={P(c)} />
+          {D ? (
+            <>
+              <path d={D.dark} fill={P(ambient(darker(floorC === palette.tealDark ? palette.tealDark : palette.tan), p))} transform="translate(2 1.5)" />
+              <path d={D.mid} fill={P(ambient(palette.teal, p))} transform="translate(2 1.5)" />
+              <path d={D.light} fill={P(ambient(palette.sand, p))} transform="translate(2 1.5)" />
+            </>
+          ) : null}
         </g>
       ) : null}
       <Ink d={ink} at={at} width={width} />
-      <Ink d={ticks} at={at === undefined ? undefined : at + 0.3} width={stroke.ink} order="all" />
+      {ticks ? <Ink d={ticks} at={at === undefined ? undefined : at + 0.3} width={stroke.ink} order="all" /> : null}
+      {D ? <Ink d={D.ink} at={at === undefined ? undefined : at + 0.3} width={stroke.ink} /> : null}
+      {D ? <Ink d={D.thin} at={at === undefined ? undefined : at + 0.4} width={stroke.inkThin} order="all" /> : null}
     </>
   );
 };
+
+/** Ledge detail geometry: brick courses on the face (joint lines with staggered head joints, broken), a drain pipe with
+ *  brackets, and roof clutter on the floor below (two mushroom vents, a hatch, a pipe run on blocks, a short antenna
+ *  mast, tar seams). Fills by tone: dark / mid / light. */
+function ledgeDetail(x0: number, x1: number, fy: number, face: number, seed: Seed) {
+  const r = rng(`ledgeD/${seed}`);
+  const ink = new PathBuf();
+  const thin = new PathBuf();
+  const dark = new PathBuf();
+  const mid = new PathBuf();
+  const light = new PathBuf();
+  // brick courses: 3-4 joint lines across the face, head joints every ~70 px, staggered per course, some skipped
+  const courses = Math.max(2, Math.round(face / 26));
+  for (let c = 1; c < courses; c++) {
+    const yy = fy + (face * c) / courses;
+    let x = x0 + r.range(-30, 0);
+    while (x < x1) {
+      const len = r.range(140, 320);
+      thin.raw(line(x, yy, Math.min(x1 + 20, x + len), yy + r.jitter(1.2), {seed: `${seed}/bc${c}/${Math.round(x)}`, over: [0, 0], breaks: false}));
+      x += len + r.range(14, 40);
+    }
+    for (let hx = x0 + (c % 2 ? 35 : 0) + r.range(0, 20); hx < x1; hx += r.range(58, 84)) {
+      if (r.chance(0.35)) continue;
+      const ya = yy - face / courses;
+      thin.raw(`M${r1(hx)} ${r1(ya + 3)}L${r1(hx + r.jitter(1))} ${r1(yy - 3)}`);
+    }
+  }
+  const fb = fy + face; // floor starts here
+  // drain pipe down the face into the floor
+  const px = x0 + (x1 - x0) * r.range(0.15, 0.25);
+  mid.rect(px - 9, fy - 6, 18, face + 70);
+  mid.rect(px - 9, fb + 50, 46, 18);
+  ink.raw(line(px - 9, fy - 8, px - 9, fb + 66, {seed: `${seed}/dp1`, over: [0, 0], breaks: false}) + line(px + 9, fy - 8, px + 9, fb + 50, {seed: `${seed}/dp2`, over: [0, 0], breaks: false}) + `M${r1(px + 9)} ${r1(fb + 50)}L${r1(px + 38)} ${r1(fb + 50)}M${r1(px - 9)} ${r1(fb + 68)}L${r1(px + 38)} ${r1(fb + 68)}`);
+  for (const k of [0.3, 0.75]) thin.raw(`M${r1(px - 14)} ${r1(fy + face * k)}h28`);
+  // floor clutter, nearer = lower and bigger
+  const vent = (vx: number, vy: number, s: number) => {
+    mid.rect(vx - 11 * s, vy - 34 * s, 22 * s, 34 * s);
+    light.raw(`M${r1(vx - 24 * s)} ${r1(vy - 34 * s)}Q${r1(vx)} ${r1(vy - 58 * s)} ${r1(vx + 24 * s)} ${r1(vy - 34 * s)}Z`);
+    ink.raw(line(vx - 11 * s, vy, vx - 11 * s, vy - 34 * s, {seed: `${seed}/v${vx}a`, over: [0, 0], breaks: false}) + line(vx + 11 * s, vy, vx + 11 * s, vy - 34 * s, {seed: `${seed}/v${vx}b`, over: [0, 0], breaks: false}));
+    ink.raw(`M${r1(vx - 26 * s)} ${r1(vy - 33 * s)}Q${r1(vx)} ${r1(vy - 60 * s)} ${r1(vx + 26 * s)} ${r1(vy - 33 * s)}L${r1(vx - 26 * s)} ${r1(vy - 33 * s)}`);
+  };
+  vent(x0 + (x1 - x0) * r.range(0.55, 0.62), fb + 120, 1.2);
+  vent(x0 + (x1 - x0) * r.range(0.82, 0.9), fb + 70, 0.9);
+  // hatch: a raised box with a lid line
+  const hx = x0 + (x1 - x0) * r.range(0.3, 0.42);
+  const hy = fb + 210;
+  dark.rect(hx, hy - 46, 150, 46);
+  light.raw(`M${r1(hx - 6)} ${r1(hy - 46)}L${r1(hx + 156)} ${r1(hy - 46)}L${r1(hx + 146)} ${r1(hy - 60)}L${r1(hx + 4)} ${r1(hy - 60)}Z`);
+  ink.raw(line(hx - 10, hy - 46, hx + 162, hy - 46, {seed: `${seed}/h1`, over: [4, 6], breaks: false}) + line(hx, hy - 46, hx, hy, {seed: `${seed}/h2`, over: [0, 0], breaks: false}) + line(hx + 150, hy - 46, hx + 150, hy, {seed: `${seed}/h3`, over: [0, 0], breaks: false}));
+  thin.raw(`M${r1(hx + 4)} ${r1(hy - 60)}L${r1(hx + 146)} ${r1(hy - 60)}`);
+  // pipe run on little blocks along the floor
+  const py = fb + 330;
+  mid.rect(x0 - 40, py - 14, x1 - x0 + 80, 14);
+  ink.raw(line(x0 - 40, py - 14, x1 + 40, py - 16, {seed: `${seed}/pr1`, over: [0, 0], breaks: true}) + line(x0 - 40, py, x1 + 40, py - 2, {seed: `${seed}/pr2`, over: [0, 0], breaks: true}));
+  for (let bx = x0 + 60; bx < x1; bx += 190) dark.rect(bx, py, 26, 16);
+  // antenna mast with a cross bar
+  const ax = x0 + (x1 - x0) * r.range(0.68, 0.74);
+  ink.raw(`M${r1(ax)} ${r1(fb + 160)}L${r1(ax)} ${r1(fb + 10)}M${r1(ax - 26)} ${r1(fb + 40)}L${r1(ax + 26)} ${r1(fb + 40)}M${r1(ax - 16)} ${r1(fb + 64)}L${r1(ax + 16)} ${r1(fb + 64)}`);
+  // tar seams on the floor
+  for (let i = 0; i < 4; i++) {
+    const sy = fb + 260 + i * r.range(70, 120);
+    const sx = r.range(x0, x1 - 300);
+    thin.raw(line(sx, sy, sx + r.range(220, 420), sy + r.jitter(4), {seed: `${seed}/ts${i}`, over: [0, 0], breaks: true}));
+  }
+  return {ink: ink.d, thin: thin.d, dark: dark.d, mid: mid.d, light: light.d};
+}
 
 export type WipeKind = 'column' | 'passer' | 'figure' | 'pole' | 'foliage' | 'slab';
 
@@ -83,7 +167,7 @@ export type WipePassProps = {
    *  rim), the core 'figure' / 'pole' / 'foliage' wipers, or the old flat 'slab'. All are opaque over the edge +-90 px,
    *  full height. */
   kind?: WipeKind;
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   /** Body colour (default tealDark, the darkest fill allowed). */
   color?: string;
   /** Lit edge strip on the leading side (default the tod rim / peach). */
@@ -97,84 +181,45 @@ export type WipePassProps = {
   seed?: Seed;
 };
 
-/** Half-width of each wiper (the edge travels from -half to W + half). */
-const WIPE_HALF: Record<WipeKind, number> = {column: 230, passer: 660, figure: 660, pole: 120, foliage: 460, slab: 760};
+/** Half-width of each wiper (the edge travels from -half to W + half). Film's own wipers: figure 660, pole 120,
+ *  foliage 460 (Film.tsx WIPE_HALF). */
+const WIPE_HALF: Record<WipeKind, number> = {...CINE_WIPE_HALF, figure: 660, pole: 120, foliage: 460, slab: 760};
 
-/** Outline of the 'passer' wiper (a giant back-view head + shoulders right at the lens) centred on x, screen px. The
- *  same path makes the caption tone region over it (export for tools). */
-export function passerPath(x: number): string {
-  const hr = 330;
-  const hy = 300;
-  return (
-    `M${x - hr} ${hy}a${hr} ${hr} 0 1 0 ${2 * hr} 0a${hr} ${hr} 0 1 0 ${-2 * hr} 0Z` +
-    `M${x - 215} 540H${x + 215}V720H${x - 215}Z` +
-    `M${x - 660} 1990L${x - 660} 1060Q${x - 640} 690 ${x - 230} 640L${x + 230} 640Q${x + 640} 690 ${x + 660} 1060L${x + 660} 1990Z`
-  );
-}
+/** Every wiper component by kind (the core Film's built-ins + the cine ones). */
+export const WIPERS: Record<Exclude<WipeKind, 'slab'>, WiperComponent> = {...(BUILTIN_WIPERS as Record<'figure' | 'pole' | 'foliage', WiperComponent>), ...CINE_WIPERS};
 
-/** A passer-by right in front of the lens: fill-only silhouette (back view), a peach rim on the leading side. */
-export const PasserWiper: React.FC<{x: number; p: number; dir: 'left' | 'right'; color?: string; rim?: string}> = ({x, p, dir, color = palette.tealDark, rim = palette.peach}) => {
-  const bob = Math.abs(Math.sin(p * Math.PI * 3)) * 10;
-  const d = passerPath(x);
-  const lead = dir === 'right' ? 7 : -7;
-  const ink = line(x - 660, 1060, x - 660, 1990, {seed: 'pw/l', over: [0, 0], breaks: false}) + line(x + 660, 1060, x + 660, 1990, {seed: 'pw/r', over: [0, 0], breaks: false});
-  return (
-    <g transform={bob ? `translate(0 ${r1(-bob)})` : undefined}>
-      <path d={d} fill={rim} transform={`translate(${lead} -4)`} />
-      <path d={d} fill={color} />
-      {/* hair: a darker cap of the head (back view), ears as small bumps */}
-      <path d={`M${r1(x - 315)} 399A330 330 0 1 1 ${r1(x + 315)} 399Q${x} 470 ${r1(x - 315)} 399Z`} fill={palette.ink} />
-      <path d={`M${x - 330} 300a330 330 0 1 1 660 0`} fill="none" stroke={palette.ink} strokeWidth={stroke.inkBold + 1} strokeLinecap="round" />
-      <path d={`M${x - 660} 1060Q${x - 640} 690 ${x - 230} 640M${x + 230} 640Q${x + 640} 690 ${x + 660} 1060M${x - 300} 760Q${x} 880 ${x + 300} 760`} fill="none" stroke={palette.ink} strokeWidth={stroke.inkBold + 1} strokeLinecap="round" />
-      <path d={ink} fill="none" stroke={palette.ink} strokeWidth={stroke.inkBold + 1} strokeLinecap="round" />
-    </g>
-  );
-};
-
-/** Screen x of the wipe edge at time t, or null outside the pass. The edge eases in-out across the frame. */
+/** Screen x of the wipe edge at time t, or null outside the pass. The edge eases in-out (sine) across the frame. */
 export function wipeEdge(t: number, at: number, dur: number, dir: 'left' | 'right', kind: WipeKind = 'column'): {x: number; p: number} | null {
   const p = prog(t, at, dur);
   if (p <= 0 || p >= 1) return null;
-  const half = WIPE_HALF[kind];
-  const x = -half - 30 + (1080 + 2 * half + 60) * E.inOutSine(p);
-  return {x: dir === 'right' ? x : 1080 - x, p};
+  return {x: wipeEdgeX(p, dir, WIPE_HALF[kind]), p};
 }
 
-/** A near-lens stone column: shaft with fill-only flutes, capital and base mouldings in doubled ink, a lit rim on the
- *  leading side. Screen px, centred on x. */
-export const ColumnWiper: React.FC<{x: number; p: number; dir: 'left' | 'right'; color?: string; rim?: string; light?: string}> = ({x, dir, color = palette.tealDark, rim = palette.peach, light = palette.teal}) => {
-  const w = 300;
-  const L = x - w / 2;
-  const lead = dir === 'right' ? 1 : -1;
-  const fl = new PathBuf();
-  for (const f of [0.2, 0.42, 0.64]) fl.rect(L + w * f, 210, w * 0.08, 1560);
-  const capW = 400;
-  const ink =
-    line(L, 170, L, 1820, {seed: 'cw/l', over: [0, 0], breaks: false}) +
-    line(L + w, 170, L + w, 1820, {seed: 'cw/r', over: [0, 0], breaks: false}) +
-    line(x - capW / 2 - 10, 110, x + capW / 2 + 10, 110, {seed: 'cw/c1', over: [6, 12], breaks: false}) +
-    line(x - capW / 2, 128, x + capW / 2, 128, {seed: 'cw/c2', over: [4, 8], breaks: false}) +
-    line(x - capW / 2 + 20, 190, x + capW / 2 - 20, 190, {seed: 'cw/c3', over: [4, 8], breaks: false}) +
-    line(x - capW / 2 + 20, 1830, x + capW / 2 - 20, 1830, {seed: 'cw/b1', over: [4, 8], breaks: false}) +
-    line(x - capW / 2, 1852, x + capW / 2, 1852, {seed: 'cw/b2', over: [6, 12], breaks: false});
-  const rx = lead > 0 ? L + w - 12 : L;
-  return (
-    <>
-      <rect x={L} y={-60} width={w} height={2040} fill={color} />
-      <path d={fl.d} fill={light} />
-      <rect x={x - capW / 2} y={110} width={capW} height={80} fill={color} />
-      <rect x={x - capW / 2} y={1830} width={capW} height={150} fill={color} />
-      <rect x={rx} y={190} width={12} height={1640} fill={rim} />
-      <rect x={lead > 0 ? x + capW / 2 - 14 : x - capW / 2} y={128} width={14} height={62} fill={rim} />
-      <path d={ink} fill="none" stroke={palette.ink} strokeWidth={stroke.inkBold + 1} strokeLinecap="round" />
-    </>
-  );
-};
+export type WipeSpec = {at: number; dur?: number; dir?: 'left' | 'right'; kind?: WipeKind; color?: string; grow?: number};
+
+/** Caption tone regions for a cine wipe at time T: the outgoing shot's tone on the unswept side, the incoming one's on
+ *  the swept side, and the element's own `captionRegions` (with the 8 % parallax growth) on top. null outside it.
+ *  Feed SkyCaptions `regions={(T) => wipeToneRegions(T, wipe, toneBefore, toneAfter) ?? null}`. */
+export function wipeToneRegions(T: number, w: WipeSpec, before: CaptionTone, after: CaptionTone): ToneRegion[] | null {
+  const dur = w.dur ?? 0.55;
+  const dir = w.dir ?? 'right';
+  const kind = w.kind ?? 'column';
+  const e = wipeEdge(T, w.at, dur, dir, kind);
+  if (!e) return null;
+  const x = e.x;
+  const regs: ToneRegion[] = [
+    {tone: before, rect: dir === 'right' ? [x, -200, 1300, 2200] : [-200, -200, x, 2200]},
+    {tone: after, rect: dir === 'right' ? [-200, -200, x, 2200] : [x, -200, 1300, 2200]},
+  ];
+  if (kind === 'slab') regs.push({tone: 'light', rect: [x - WIPE_HALF.slab, -200, x + WIPE_HALF.slab, 2200]});
+  else regs.push(...wiperRegions(WIPERS[kind], {x, p: e.p, dir, color: w.color}, w.grow ?? 0.08));
+  return regs;
+}
 
 /** The element passing the lens (screen space, outside any Layer). Use WipeCut to also split the two shots on its edge. */
-export const WipePass: React.FC<WipePassProps> = ({at, dur = 0.55, dir = 'right', kind = 'column', tod = 'dusk', color, rim, grow = 0.08, children, seed = 'wipe'}) => {
+export const WipePass: React.FC<WipePassProps> = ({at, dur = 0.55, dir = 'right', kind = 'column', tod, color, rim, grow = 0.08, children, seed = 'wipe'}) => {
   const t = useTime();
-  const P = todPal(tod);
+  const P = useTodPal(tod);
   const E0 = wipeEdge(t, at, dur, dir, kind);
   if (!E0) return null;
   const {x, p} = E0;
@@ -183,10 +228,12 @@ export const WipePass: React.FC<WipePassProps> = ({at, dur = 0.55, dir = 'right'
   let el: React.ReactNode;
   if (children) el = children(x, p);
   else if (kind === 'passer') el = <PasserWiper x={x} p={p} dir={dir} color={body} rim={rimC} />;
-  else if (kind === 'figure') el = <FigureWiper x={x} p={p} dir={dir} color={body} />;
-  else if (kind === 'pole') el = <PoleWiper x={x} p={p} dir={dir} color={body} />;
+  else if (kind === 'column') el = <ColumnWiper x={x} p={p} dir={dir} color={body} rim={rimC} />;
   else if (kind === 'foliage') el = <FoliageWiper x={x} p={p} dir={dir} color={color ?? palette.teal} />;
-  else if (kind === 'slab') {
+  else if (kind !== 'slab') {
+    const W = WIPERS[kind];
+    el = <W x={x} p={p} dir={dir} color={body} />;
+  } else {
     const half = WIPE_HALF.slab;
     el = (
       <>
@@ -195,7 +242,7 @@ export const WipePass: React.FC<WipePassProps> = ({at, dur = 0.55, dir = 'right'
         <path d={line(dir === 'right' ? x + half : x - half, -60, dir === 'right' ? x + half : x - half, 1980, {seed: `${seed}/e`, over: [0, 0]})} fill="none" stroke={palette.ink} strokeWidth={9} strokeLinecap="round" />
       </>
     );
-  } else el = <ColumnWiper x={x} p={p} dir={dir} color={body} rim={rimC} />;
+  }
   const k = 1 + grow * p;
   return (
     <NoExit>
@@ -238,15 +285,15 @@ export const WipeCut: React.FC<Omit<WipePassProps, 'children'> & {a: React.React
 // ---------------------------------------------------------------- Plinth
 
 /** A stone block / low wall end to perch a mascot or a figure on (front face, lit cap, ink). Top-centre at (x, y). */
-export const Plinth: React.FC<{x: number; y: number; w?: number; h?: number; tod?: Tod | TodPalette; seed?: Seed; width?: number}> = ({x, y, w = 260, h = 420, tod = 'day', seed = 'plinth', width = stroke.inkBold}) => (
+export const Plinth: React.FC<{x: number; y: number; w?: number; h?: number; tod?: TodLike | TodPalette; seed?: Seed; width?: number}> = ({x, y, w = 260, h = 420, tod, seed = 'plinth', width = stroke.inkBold}) => (
   <ExitShrink x={x} y={y + h} axis="y" size={0.2}>
     <PlinthBody x={x} y={y} w={w} h={h} tod={tod} seed={seed} width={width} />
   </ExitShrink>
 );
 
-const PlinthBody: React.FC<{x: number; y: number; w: number; h: number; tod: Tod | TodPalette; seed: Seed; width: number}> = ({x, y, w, h, tod, seed, width}) => {
+const PlinthBody: React.FC<{x: number; y: number; w: number; h: number; tod?: TodLike | TodPalette; seed: Seed; width: number}> = ({x, y, w, h, tod, seed, width}) => {
   const S = useCineState();
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const P = (c: string) => lookPaint(S, c, [x, y]);
   const cap = 26;
   const x0 = x - w / 2;
@@ -277,7 +324,7 @@ export type BalustradeProps = {
   h?: number;
   /** The rail continues to this side (cropped by the frame edge). */
   side?: 'left' | 'right';
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   /** A lit edge strip on this side (backlight from the sun). */
   rim?: 'left' | 'right' | 'none';
   width?: number;
@@ -292,9 +339,9 @@ export const Balustrade: React.FC<BalustradeProps> = (props) => (
   </ExitShrink>
 );
 
-const BalustradeBody: React.FC<BalustradeProps> = ({x, y, w = 220, h = 900, side = 'right', tod = 'day', rim = 'none', width = stroke.inkBold, seed = 'bal'}) => {
+const BalustradeBody: React.FC<BalustradeProps> = ({x, y, w = 220, h = 900, side = 'right', tod, rim = 'none', width = stroke.inkBold, seed = 'bal'}) => {
   const S = useCineState();
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const P = (c: string) => lookPaint(S, c, [x + w / 2, y]);
   const stone = ambient(palette.cream, p);
   const shade = ambient(palette.sand, p);
@@ -357,7 +404,7 @@ export type WindowCloseupProps = {
   /** Glass opening size in local px (draw at ~1x, then place it on a facade with affineFromTri). */
   w?: number;
   h?: number;
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   /** Room light switches off (pop). */
   offAt?: number;
   /** The monitor (a website) switches off. Default offAt + 0.35. */
@@ -379,6 +426,16 @@ export type WindowCloseupProps = {
   curtainAt?: number;
   /** The room light flickers off for two frames at these times (on a stressed word). */
   flickerAt?: number[];
+  /** Level of detail (pick it from the glass's SCREEN width): 'full' (>= ~60 px: room, person, desk, lamp, chair, plant,
+   *  frame band, glints), 'room' (~30-60 px: room colours, curtain and transom only), 'glass' (< ~30 px: one flat pane
+   *  in `litColor` / `darkColor`, pixel-identical to a WallOfWindows grid pane). Default 'full'. */
+  detail?: 'full' | 'room' | 'glass';
+  /** Room colour when lit / unlit (default peach / the tod's tealDark). Pass the grid's pane colours for this cell
+   *  (litColors[floor(k3 * n)], windowDark) so a close-up and its grid pane match exactly. */
+  litColor?: string;
+  darkColor?: string;
+  /** Force the lit state (overrides lit / onAt / offAt / flicker), e.g. from wallCellState(). */
+  on?: boolean;
 };
 
 /** One lit window up close: frame, transom, curtain, pendant lamp with a stepped glow, a desk with a monitor showing
@@ -389,20 +446,26 @@ export const WindowCloseup: React.FC<WindowCloseupProps> = (props) => (
   </ExitShrink>
 );
 
-const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod = 'night', offAt, screenOffAt, seed = 'wc', person, lit: lit0 = true, chair, desk = true, screenTick, onAt, curtainAt, flickerAt}) => {
+const ROOM_DARKER: Record<string, string> = {[palette.peach]: palette.tan, [palette.cream]: palette.sand, [palette.white]: palette.mintPale};
+
+const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod, offAt, screenOffAt, seed = 'wc', person, lit: lit0 = true, chair, desk = true, screenTick, onAt, curtainAt, flickerAt, detail = 'full', litColor, darkColor, on: onIn}) => {
   const t = useTime();
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const flick = (flickerAt ?? []).some((f) => t >= f && t < f + 0.07);
-  const lit = lit0 && (onAt === undefined || t >= onAt) && !flick;
-  const on = lit && (offAt === undefined || t < offAt);
+  const lit = onIn ?? (lit0 && (onAt === undefined || t >= onAt) && !flick);
+  const on = onIn ?? (lit && (offAt === undefined || t < offAt));
   const scrOn = lit && t < (screenOffAt ?? (offAt === undefined ? Infinity : offAt + 0.35));
+  const litC = litColor ?? palette.peach;
+  const darkC = darkColor ?? ambient(palette.tealDark, p);
+  if (detail === 'glass') return <rect x={0} y={0} width={w} height={h} fill={on ? litC : darkC} />;
+  const full = detail === 'full';
   const showChair = chair ?? !!person;
   const rr = rng(`wc/${seed}`);
   const curtainRight = !lit && rr.chance(0.5);
   const plantOn = lit || rr.chance(0.6);
   const fr = 22;
-  const room = on ? palette.peach : ambient(palette.tealDark, p);
-  const roomDark = on ? palette.tan : ambient(darker(palette.tealDark), p);
+  const room = on ? litC : darkC;
+  const roomDark = on ? ROOM_DARKER[litC] ?? darker(litC) : darker(darkC);
   const lampX = w * 0.64;
   const deskY = h * 0.6;
   const mon = {x: w * 0.47, y: h * 0.42, w: w * 0.36, h: h * 0.15};
@@ -416,7 +479,20 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod 
   const chairW = w * 0.3;
   const chairY = h * 0.8;
   const chairH = h * 0.12;
-  const chairInk = rect(chairX - chairW / 2, chairY, chairW, chairH, {seed: `${seed}/ch`, over: 'small'}) + `M${chairX - chairW * 0.36} ${chairY + chairH}L${chairX - chairW * 0.36} ${h}M${chairX + chairW * 0.36} ${chairY + chairH}L${chairX + chairW * 0.36} ${h}`;
+  // back-view chair (ref 2 f_33): an inked frame (posts overshooting the top rail), two slats, the seat edge and leg
+  // stubs below it
+  const cx0 = chairX - chairW / 2;
+  const cx1 = chairX + chairW / 2;
+  const seatY = chairY + chairH + h * 0.035;
+  const chairInk =
+    line(cx0, seatY, cx0, chairY - 6, {seed: `${seed}/cp1`, over: [0, 5], breaks: false}) +
+    line(cx1, seatY, cx1, chairY - 6, {seed: `${seed}/cp2`, over: [0, 5], breaks: false}) +
+    line(cx0 - 5, chairY, cx1 + 5, chairY, {seed: `${seed}/ct`, over: [3, 3], breaks: false}) +
+    line(cx0, chairY + chairH * 0.42, cx1, chairY + chairH * 0.42, {seed: `${seed}/cs1`, over: [0, 0], breaks: false}) +
+    line(cx0, chairY + chairH * 0.8, cx1, chairY + chairH * 0.8, {seed: `${seed}/cs2`, over: [0, 0], breaks: false}) +
+    line(cx0 - chairW * 0.08, seatY, cx1 + chairW * 0.08, seatY, {seed: `${seed}/cse`, over: [2, 2], breaks: false}) +
+    `M${r1(cx0 + chairW * 0.06)} ${r1(seatY)}L${r1(cx0 + chairW * 0.04)} ${r1(h)}M${r1(cx1 - chairW * 0.06)} ${r1(seatY)}L${r1(cx1 - chairW * 0.04)} ${r1(h)}`;
+  const chairFill = `M${r1(cx0)} ${r1(chairY)}H${r1(cx1)}V${r1(chairY + chairH * 0.42)}H${r1(cx0)}ZM${r1(cx0)} ${r1(chairY + chairH * 0.42 + 6)}H${r1(cx1)}V${r1(chairY + chairH * 0.8)}H${r1(cx0)}ZM${r1(cx0 - chairW * 0.08)} ${r1(seatY - 8)}H${r1(cx1 + chairW * 0.08)}V${r1(seatY)}H${r1(cx0 - chairW * 0.08)}Z`;
   const lamp = `M${lampX - 34} ${h * 0.2}L${lampX + 34} ${h * 0.2}L${lampX + 20} ${h * 0.14}L${lampX - 20} ${h * 0.14}Z`;
   const tick = screenTick ? Math.max(0, Math.floor(t / screenTick)) : 0;
   const web = textLines(mon.x + 16, mon.y + 38, mon.w - 32, {seed: `${seed}/web${tick}`, n: 3, gap: 16});
@@ -424,14 +500,14 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod 
   return (
     <>
       {/* frame band + interior */}
-      <rect x={-fr} y={-fr} width={w + fr * 2} height={h + fr * 2} fill={frameC} />
+      {full ? <rect x={-fr} y={-fr} width={w + fr * 2} height={h + fr * 2} fill={frameC} /> : null}
       <rect x={0} y={0} width={w} height={h} fill={room} />
       <rect x={0} y={deskY} width={w} height={h - deskY} fill={roomDark} />
-      {on ? <Glow cx={lampX} cy={h * 0.21} r={30} rings={3} spread={2.6} color={palette.cream} opacity={0.32} /> : null}
-      <path d={`M${lampX} 0L${lampX} ${h * 0.14}`} stroke={palette.ink} strokeWidth={2.2} />
-      <path d={lamp} fill={on ? palette.cream : ambient(palette.teal, p)} />
+      {on && full ? <Glow cx={lampX} cy={h * 0.21} r={30} rings={3} spread={2.6} color={palette.cream} opacity={0.32} /> : null}
+      {full ? <path d={`M${lampX} 0L${lampX} ${h * 0.14}`} stroke={palette.ink} strokeWidth={2.2} /> : null}
+      {full ? <path d={lamp} fill={on ? palette.cream : ambient(palette.teal, p)} /> : null}
       {/* desk + monitor (the website) */}
-      {desk ? (
+      {desk && full ? (
         <>
           <rect x={w * 0.22} y={deskY - 8} width={w * 0.78} height={16} fill={on ? palette.brown : palette.teal} />
           <rect x={mon.x} y={mon.y} width={mon.w} height={mon.h} fill={palette.ink} />
@@ -450,22 +526,22 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod 
         </>
       ) : null}
       {/* the person (back view) on a chair seen from behind (ref 2 f_33: white back + ink) */}
-      {person}
-      {showChair ? (
+      {full ? person : null}
+      {showChair && full ? (
         <>
-          <rect x={chairX - chairW / 2 + 3} y={chairY + 2} width={chairW} height={chairH} fill={on ? palette.white : palette.sage} />
+          <path d={chairFill} fill={on ? palette.cream : palette.sage} transform="translate(3 2)" />
           <path d={chairInk} fill="none" stroke={palette.ink} strokeWidth={stroke.ink} strokeLinecap="round" />
         </>
       ) : null}
       {/* curtain, transom bar, plant, glints */}
       <path d={curtain} fill={on ? palette.sand : lit ? ambient(palette.tan, p) : palette.teal} transform={curtainRight ? `translate(${w + 2} 2) scale(-1 1)` : 'translate(2 2)'} />
-      <path d={`M${w * 0.06} 6Q${w * 0.08} ${h * 0.4} ${w * 0.05} ${h * 0.7}M${w * 0.11} 6Q${w * 0.14} ${h * 0.4} ${w * 0.09} ${h * 0.71}`} fill="none" stroke={palette.ink} strokeWidth={2} strokeLinecap="round" />
+      {full ? <path d={`M${w * 0.06} 6Q${w * 0.08} ${h * 0.4} ${w * 0.05} ${h * 0.7}M${w * 0.11} 6Q${w * 0.14} ${h * 0.4} ${w * 0.09} ${h * 0.71}`} fill="none" stroke={palette.ink} strokeWidth={2} strokeLinecap="round" /> : null}
       <rect x={0} y={h * 0.3} width={w} height={14} fill={frameC} />
-      {plantOn ? <rect x={w * 0.68} y={h + fr - 44} width={58} height={44} fill={on ? palette.brown : palette.tealDark} /> : null}
-      {plantOn ? <path d={plant} fill={on ? palette.sage : palette.teal} transform="translate(3 2)" /> : null}
-      {plantOn ? <Ink d={plant} width={stroke.ink} exit={false} /> : null}
-      <path d={glint(w * 0.12, h * 0.26, 70, {seed: `${seed}/g`})} stroke={on ? palette.white : ambient(palette.sage, p)} strokeWidth={4} strokeLinecap="round" />
-      <Ink d={ink + tr} width={stroke.ink} exit={false} />
+      {plantOn && full ? <rect x={w * 0.68} y={h + fr - 44} width={58} height={44} fill={on ? palette.brown : palette.tealDark} /> : null}
+      {plantOn && full ? <path d={plant} fill={on ? palette.sage : palette.teal} transform="translate(3 2)" /> : null}
+      {plantOn && full ? <Ink d={plant} width={stroke.ink} exit={false} /> : null}
+      {full ? <path d={glint(w * 0.12, h * 0.26, 70, {seed: `${seed}/g`})} stroke={on ? palette.white : ambient(palette.sage, p)} strokeWidth={4} strokeLinecap="round" /> : null}
+      {full ? <Ink d={ink + tr} width={stroke.ink} exit={false} /> : null}
     </>
   );
 };

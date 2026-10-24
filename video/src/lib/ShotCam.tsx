@@ -8,7 +8,9 @@
 //       <Layer depth={1}> sky things </Layer>  <Layer depth={0}> ... </Layer>  <Layer depth={-0.5}> framing </Layer>
 //     </ShotCam>
 //   </World>
-//   <ShotCam keys={[{t: 0, y: 1260}, {t: 5, y: -540, ease: MOTION.camera.reveal}]} handheld={1.2}>   // any CineCamera keys
+//   <ShotCam keys={[{t: 0, y: 1260}, {t: 5, y: 60, ease: MOTION.camera.reveal}]} handheld={1.2}>   // any CineCamera keys
+//   (a 1200 px crane over 5 s = 8 px / frame average, 11.4 peak with the cruising reveal: keep the peak under
+//   MOTION.camera.peakPxPerFrame (18) or the flat ink strobes)
 //
 // For a flat scene (no layers) the World `push` prop does the same job without a camera.
 
@@ -17,6 +19,7 @@ import {CineCamera, CamKey, CamState} from './cine/camera';
 import {Ease} from './time';
 import {MOTION} from './spec';
 import {world} from './theme';
+import {pushStart, SceneInfo, useScene} from './stage';
 import type {Seed} from './rng';
 import type {Pt} from './sketch';
 
@@ -41,11 +44,12 @@ export type ShotCamProps = {
   children?: React.ReactNode;
 };
 
-/** CineCamera keys for a gentle push (dolly: push = 1 - 1 / to at depth 0). */
-export function pushKeys(p: ShotPush | boolean = true): CamKey[] {
+/** CineCamera keys for a gentle push (dolly: push = 1 - 1 / to at depth 0). With `scene` (useScene()), a push that
+ *  would reverse the scene's incoming camera-continuous zoom starts when that transition has settled. */
+export function pushKeys(p: ShotPush | boolean = true, scene?: SceneInfo): CamKey[] {
   const o = p === true || p === false ? {} : p;
   const to = o.to ?? MOTION.camera.push.to;
-  const at = o.at ?? 0;
+  const at = pushStart(o.at ?? 0, to, scene);
   const anchor = o.anchor ?? world.vp;
   return [
     {t: at, push: 0, anchor},
@@ -53,8 +57,11 @@ export function pushKeys(p: ShotPush | boolean = true): CamKey[] {
   ];
 }
 
-export const ShotCam: React.FC<ShotCamProps> = ({push, keys, handheld = 0, seed = 'shot', add, children}) => (
-  <CineCamera keys={keys ?? (push ? pushKeys(push) : [])} handheld={handheld} seed={seed} add={add} stage>
-    {children}
-  </CineCamera>
-);
+export const ShotCam: React.FC<ShotCamProps> = ({push, keys, handheld = 0, seed = 'shot', add, children}) => {
+  const scene = useScene();
+  return (
+    <CineCamera keys={keys ?? (push ? pushKeys(push, scene) : [])} handheld={handheld} seed={seed} add={add} stage>
+      {children}
+    </CineCamera>
+  );
+};

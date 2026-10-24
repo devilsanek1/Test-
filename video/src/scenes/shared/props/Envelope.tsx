@@ -16,7 +16,7 @@ import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {line, rect, rectPath, roundRect, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
-import {bt, Depth, DEPTH_INK, misregScreen} from './common';
+import {bt, Depth, DEPTH_INK, misregScreen, withOut} from './common';
 
 /** Where the seal sits on an envelope centred at (x, y) of width `size`. */
 export const envelopeSeal = (x: number, y: number, size = 60): Pt => [x, y + size * 0.03];
@@ -38,7 +38,7 @@ export type EnvelopeProps = {
   seed?: Seed;
 };
 
-export const Envelope: React.FC<EnvelopeProps> = ({x, y, size = 60, rot = 0, at, pullFromCoatAt, coatY, carry, slot, depth = 'mid', seed = 'env'}) => {
+const EnvelopeBase: React.FC<EnvelopeProps> = ({x, y, size = 60, rot = 0, at, pullFromCoatAt, coatY, carry, slot, depth = 'mid', seed = 'env'}) => {
   const t = useTime();
   const clipId = 'ev' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const start = Math.min(at ?? Infinity, pullFromCoatAt ?? Infinity);
@@ -100,7 +100,7 @@ export const Envelope: React.FC<EnvelopeProps> = ({x, y, size = 60, rot = 0, at,
 const MOTION_OUT = (x: number) => (x >= 1 ? 1 : (1 - Math.pow(2, -10 * x)) / (1 - Math.pow(2, -10)));
 
 /** The door's mail slot: a sand plate (w x h, default 50 x 10) with a dark slot and a hinged flap that clicks. (x, y) = centre. */
-export const MailSlot: React.FC<{x: number; y: number; w?: number; h?: number; at?: number; clickAt?: number | number[]; depth?: Depth; seed?: Seed}> = ({x, y, w = 50, h = 10, at, clickAt, depth = 'far', seed = 'slot'}) => {
+const MailSlotBase: React.FC<{x: number; y: number; w?: number; h?: number; at?: number; clickAt?: number | number[]; depth?: Depth; seed?: Seed}> = ({x, y, w = 50, h = 10, at, clickAt, depth = 'far', seed = 'slot'}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const clicks = clickAt === undefined ? [] : Array.isArray(clickAt) ? clickAt : [clickAt];
@@ -121,3 +121,7 @@ export const MailSlot: React.FC<{x: number; y: number; w?: number; h?: number; a
     </>
   );
 };
+
+// build-out (outAt / outDur) for props that have no own exit
+export const Envelope = withOut(EnvelopeBase, 'Envelope');
+export const MailSlot = withOut(MailSlotBase, 'MailSlot');

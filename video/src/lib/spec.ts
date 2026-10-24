@@ -10,11 +10,29 @@
 //   (so it COMPLETES on the word) | check/cross marks +0.0 | answer panel -0.25 | sun beat / bounce / hop +-0.05.
 
 import {Easing} from 'remotion';
-import {ease as E} from './time';
+import {clamp, ease as E} from './time';
 import type {Ease} from './time';
 
 /** CSS cubic-bezier(x1, y1, x2, y2) as an easing function (Remotion's implementation). */
 export const bez = (x1: number, y1: number, x2: number, y2: number): Ease => Easing.bezier(x1, y1, x2, y2);
+
+/** Trapezoid velocity profile: accelerate over `acc` of the move (sine ramp), cruise, decelerate over `dec`.
+ *  Peak speed = 1 / (1 - (acc + dec) / 2) x the average (1.43x for 0.25 / 0.35), against 4x for inOutQuart:
+ *  flat inked art strobes when a camera whips, so long moves CRUISE. (The cine `trapezoid` is the same curve.) */
+export function cruiseEase(acc = 0.25, dec = 0.35): Ease {
+  const a = Math.max(1e-3, acc);
+  const d = Math.max(1e-3, dec);
+  const v = 1 / (1 - (a + d) / 2);
+  return (u: number) => {
+    const x = clamp(u);
+    if (x < a) return v * (x / 2 - (a / (2 * Math.PI)) * Math.sin((Math.PI * x) / a));
+    if (x > 1 - d) {
+      const y = 1 - x;
+      return 1 - v * (y / 2 - (d / (2 * Math.PI)) * Math.sin((Math.PI * y) / d));
+    }
+    return v * (a / 2 + (x - a));
+  };
+}
 
 /** Out(exp) normalised to reach exactly 1: ~50% in the first frame of a 0.33 s move, then x0.5 per frame. */
 const outExp: Ease = (x) => (x >= 1 ? 1 : (1 - Math.pow(2, -10 * x)) / (1 - Math.pow(2, -10)));
@@ -55,18 +73,22 @@ export const MOTION = {
   matchZoom: {in: 4 / 30, hold: 3 / 30, out: 6 / 30},
   /** Un-build recipe (all ease-in): lines loosen 3 f, fills shrink 5-6 f, ink retracts 4 f, slab collapses 5 f. */
   unbuild: {loose: 0.1, fillShrink: 0.18, inkRetract: 0.13, slabCollapse: 0.17, total: 0.5},
-  /** THE camera vocabulary (one for both kits: the cine CAM presets should alias these). Long, weighty moves 2-6 s.
-   *  ease: default in-out move | slow: very long moves (4-6 s) | reveal: crane / tilt reveal | settle: a move that
-   *  starts in motion (continuing a transition) and lands softly | push: reference 2's per-shot gentle zoom
-   *  (World `push`, ShotCam `push`: +6 % over 2 s, in-out sine; ref 2 measured +1.3...+5.9 %, 1.0-3.3 s). */
+  /** THE camera vocabulary: ONE source of truth for both kits (the cine `CAM` presets carry the same values: ease
+   *  inOutCubic, slow inOutSine, reveal trapezoid(0.25, 0.35), settle outCubic). Long, weighty moves 2-6 s.
+   *  ease: default in-out move | slow: very long moves (4-6 s) | reveal: crane / tilt reveal that CRUISES (peak 1.43x
+   *  its average speed; keep the peak <= 15-20 px / frame or flat ink strobes) | settle: a move that starts in motion
+   *  (continuing a transition) and lands softly | push: reference 2's per-shot gentle zoom (World `push`, ShotCam
+   *  `push`: +6 % over 2 s, in-out sine; ref 2 measured +1.3...+5.9 %, 1.0-3.3 s). `peakPxPerFrame` = the strobe
+   *  limit for cruises. */
   camera: {
     min: 2,
     max: 6,
-    ease: bez(0.45, 0, 0.2, 1),
+    ease: E.inOutCubic,
     slow: E.inOutSine,
-    reveal: E.inOutQuart,
+    reveal: cruiseEase(0.25, 0.35),
     settle: E.outCubic,
     push: {to: 1.06, dur: 2, ease: E.inOutSine},
+    peakPxPerFrame: 18,
   },
 } as const;
 

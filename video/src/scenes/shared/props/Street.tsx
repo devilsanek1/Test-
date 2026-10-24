@@ -14,7 +14,7 @@ import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {blob, circle, line, rect, rectPath, roundRect, smooth, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
-import {bt, Depth, DEPTH_INK, misregScreen, PropRoot} from './common';
+import {bt, Depth, DEPTH_INK, misregScreen, PropRoot, withOut} from './common';
 
 // ---------------------------------------------------------------- Bollard
 
@@ -59,7 +59,7 @@ export type SnailProps = {
 };
 
 /** Sand shell with an ink spiral, cream foot, two eye stalks; slow peristalsis while crawling. Faces right. */
-export const Snail: React.FC<SnailProps> = ({x, y, size = 24, popAt, crawl, hideAt, flip = false, depth = 'far', seed = 'snail'}) => {
+const SnailBase: React.FC<SnailProps> = ({x, y, size = 24, popAt, crawl, hideAt, flip = false, depth = 'far', seed = 'snail'}) => {
   const t = useTime();
   if (popAt !== undefined && t < popAt) return null;
   const s = size / 24;
@@ -183,7 +183,7 @@ function pagePict(p: CalPage, w: number, h: number, top: number, seed: string): 
 }
 
 /** Tear-off wall calendar: cream pages, a sand header with two rings, NO numerals. */
-export const Calendar: React.FC<CalendarProps> = ({x, y, w = 70, h = 80, pages, tearAt = [], tearDur = 0.1, at, depth = 'far', seed = 'cal'}) => {
+const CalendarBase: React.FC<CalendarProps> = ({x, y, w = 70, h = 80, pages, tearAt = [], tearDur = 0.1, at, depth = 'far', seed = 'cal'}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const iw = DEPTH_INK[depth];
@@ -223,3 +223,7 @@ export const Calendar: React.FC<CalendarProps> = ({x, y, w = 70, h = 80, pages, 
     </XG>
   );
 };
+
+// build-out (outAt / outDur) for props that have no own exit
+export const Snail = withOut(SnailBase, 'Snail');
+export const Calendar = withOut(CalendarBase, 'Calendar');

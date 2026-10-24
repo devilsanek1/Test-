@@ -24,7 +24,7 @@ import {palette, stroke} from '../theme';
 import {ease as E, osc, prog} from '../time';
 import {rng, Seed} from '../rng';
 import {line, Pt} from '../sketch';
-import {ambient, deep, Tod, TodPalette, todPal} from './atmosphere';
+import {ambient, deep, TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
 import {darker} from './city';
 import {quadMap, UV} from './persp';
 import {mix, PathBuf, r1} from './util';
@@ -57,7 +57,7 @@ export function monumentMap(g: MonumentGeo) {
 }
 
 export type MonumentProps = MonumentGeo & {
-  tod?: Tod | TodPalette;
+  tod?: TodLike | TodPalette;
   /** 'front' (default): sunlit stone. 'back': the sun is behind it (flat shadow fields + peach rim, quiet upper storeys). */
   light?: 'front' | 'back';
   columns?: number;
@@ -341,7 +341,7 @@ export const Monument: React.FC<MonumentProps> = ({
   bw,
   ty,
   taper,
-  tod = 'day',
+  tod,
   light = 'front',
   columns = 8,
   dome = true,
@@ -363,7 +363,7 @@ export const Monument: React.FC<MonumentProps> = ({
 }) => {
   const S = useCineState();
   const t = S.t;
-  const p = todPal(tod);
+  const p = useTodPal(tod);
   const back = light === 'back';
   const key = JSON.stringify([cx, by, bw, ty, taper, columns, dome, back, emblemY, seed]);
   let G = GEO_CACHE.get(key);

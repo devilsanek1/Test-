@@ -9,6 +9,7 @@ import {Ink} from '../Ink';
 import {Fill} from '../Fill';
 import {glint as glintPath, hline, line, rect, rectPath} from '../sketch';
 import {At, b} from './common';
+import {TodAnchor} from '../tod';
 
 export type WindowProps = {
   x: number;
@@ -58,7 +59,7 @@ export const Window: React.FC<WindowProps> = ({x, y, w, h, at, seed = `${Math.ro
     const gl = Math.min(w, h) * r.range(0.32, 0.45);
     parts.push(<Ink key="g" d={glintPath(x + w * r.range(0.15, 0.3), y + h * r.range(0.45, 0.75), gl, {seed: `${seed}/g`})} at={T(0.6)} dur={0.15 * k} width={width * 0.7} order="all" />);
   }
-  return <>{parts}</>;
+  return <TodAnchor at={[x + w / 2, y + h / 2]}>{parts}</TodAnchor>;
 };
 
 // ---------------------------------------------------------------- simple "window grid" helper

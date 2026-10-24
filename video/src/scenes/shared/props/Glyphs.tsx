@@ -14,9 +14,10 @@ import {ease as E, lerp, osc, prog, springAt, springs, useTime} from '../../../l
 import {Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
+import {ExitFade} from '../../../lib/exit';
 import {arc, blob, check, circle, line, rectPath, roundRect, smooth, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
-import {bt, Depth, DEPTH_INK, misregScreen, pendulum} from './common';
+import {bt, Depth, DEPTH_INK, misregScreen, pendulum, withOut} from './common';
 
 type G = {x: number; y: number; at?: number; seed?: Seed; width?: number; depth?: Depth; color?: string};
 const wOf = (o: {width?: number; depth?: Depth}, def: Depth) => o.width ?? DEPTH_INK[o.depth ?? def];
@@ -33,14 +34,14 @@ const PopAt: React.FC<{at?: number; x: number; y: number; children?: React.React
 
 // ---------------------------------------------------------------- CheckMark
 
-export const CheckMark: React.FC<G & {size?: number; dur?: number}> = ({x, y, size = 60, at, dur = 0.17, seed = 'chk', width, depth, color = palette.ink}) => (
+const CheckMarkBase: React.FC<G & {size?: number; dur?: number}> = ({x, y, size = 60, at, dur = 0.17, seed = 'chk', width, depth, color = palette.ink}) => (
   <Ink d={check(x, y, size, {seed})} at={at} dur={dur} width={wOf({width, depth}, 'front')} color={color} taper={false} seed={seed} />
 );
 
 // ---------------------------------------------------------------- MarkRing
 
 /** Ink ring that strokes on in ~0.17 s; `pingAt` sends out an expanding ring (r -> 1.7 r, 0.3 s) that thins to nothing. */
-export const MarkRing: React.FC<G & {r?: number; dur?: number; pingAt?: number}> = ({x, y, r = 55, at, dur = 0.17, seed = 'ring', width, depth, color = palette.ink, pingAt}) => {
+const MarkRingBase: React.FC<G & {r?: number; dur?: number; pingAt?: number}> = ({x, y, r = 55, at, dur = 0.17, seed = 'ring', width, depth, color = palette.ink, pingAt}) => {
   const t = useTime();
   const w = wOf({width, depth}, 'front');
   const ping = pingAt !== undefined ? prog(t, pingAt, 0.3, E.outCubic) : 0;
@@ -57,7 +58,7 @@ export const MarkRing: React.FC<G & {r?: number; dur?: number; pingAt?: number}>
 export type Corner = 'tl' | 'tr' | 'bl' | 'br';
 
 /** Cobweb spanning a corner at (x, y) (the corner point), radius r, inkHair, draws on over `dur`. */
-export const Cobweb: React.FC<G & {r?: number; corner?: Corner; dur?: number}> = ({x, y, r = 40, corner = 'tl', at, dur = 0.3, seed = 'web', width, color = palette.ink}) => {
+const CobwebBase: React.FC<G & {r?: number; corner?: Corner; dur?: number}> = ({x, y, r = 40, corner = 'tl', at, dur = 0.3, seed = 'web', width, color = palette.ink}) => {
   const sx = corner === 'tl' || corner === 'bl' ? 1 : -1;
   const sy = corner === 'tl' || corner === 'tr' ? 1 : -1;
   const spokes = [0, 30, 60, 90];
@@ -79,7 +80,7 @@ export const Cobweb: React.FC<G & {r?: number; corner?: Corner; dur?: number}> =
 // ---------------------------------------------------------------- Magnifier / Wrench
 
 /** Magnifier: ring radius r centred at (x, y), handle down-right. Ink only. */
-export const Magnifier: React.FC<G & {r?: number; dur?: number}> = ({x, y, r = 28, at, dur = 0.25, seed = 'mag', width, depth, color = palette.ink}) => {
+const MagnifierBase: React.FC<G & {r?: number; dur?: number}> = ({x, y, r = 28, at, dur = 0.25, seed = 'mag', width, depth, color = palette.ink}) => {
   const a = Math.PI / 4;
   const h0: Pt = [x + Math.cos(a) * r * 1.05, y + Math.sin(a) * r * 1.05];
   const h1: Pt = [x + Math.cos(a) * r * 2.05, y + Math.sin(a) * r * 2.05];
@@ -111,7 +112,7 @@ export function wrenchPaths(x: number, y: number, w: number, h: number): {ink: s
 }
 
 /** Wrench glyph (ink only, or with a fill colour). (x, y) = centre, w = length (height = 0.43 w). */
-export const WrenchGlyph: React.FC<G & {w?: number; fill?: string; dur?: number; tilt?: number}> = ({x, y, w = 56, at, dur = 0.25, seed = 'wr', width, depth, color = palette.ink, fill, tilt = 0}) => {
+const WrenchGlyphBase: React.FC<G & {w?: number; fill?: string; dur?: number; tilt?: number}> = ({x, y, w = 56, at, dur = 0.25, seed = 'wr', width, depth, color = palette.ink, fill, tilt = 0}) => {
   const h = w * 0.43;
   const p = wrenchPaths(x, y, w, h);
   return (
@@ -125,7 +126,7 @@ export const WrenchGlyph: React.FC<G & {w?: number; fill?: string; dur?: number;
 // ---------------------------------------------------------------- WrenchTag
 
 /** Sage tag with a cream wrench glyph ("the fix has to go here"). (x, y) = tag centre; size = tag width (40-60 near). */
-export const WrenchTag: React.FC<G & {size?: number}> = ({x, y, size = 60, at, seed = 'wtag', width, depth}) => {
+const WrenchTagBase: React.FC<G & {size?: number}> = ({x, y, size = 60, at, seed = 'wtag', width, depth}) => {
   const w = size;
   const h = size * 0.72;
   const iw = width ?? DEPTH_INK[depth ?? 'far'];
@@ -147,7 +148,7 @@ export const WrenchTag: React.FC<G & {size?: number}> = ({x, y, size = 60, at, s
 // ---------------------------------------------------------------- CheckFlag
 
 /** Cream check flag on an ink pole. (x, y) = pole foot; size = flag width (60). raiseAt: the flag runs up the pole. */
-export const CheckFlag: React.FC<G & {size?: number; pole?: number; raiseAt?: number}> = ({x, y, size = 60, pole, at, raiseAt, seed = 'flag', width, depth}) => {
+const CheckFlagBase: React.FC<G & {size?: number; pole?: number; raiseAt?: number}> = ({x, y, size = 60, pole, at, raiseAt, seed = 'flag', width, depth}) => {
   const t = useTime();
   const H = pole ?? size * 1.7;
   const fw = size;
@@ -184,23 +185,25 @@ const qPath = (x: number, y: number, s: number) =>
   `M${x - s * 0.24} ${y - s * 0.22}C${x - s * 0.24} ${y - s * 0.5} ${x + s * 0.26} ${y - s * 0.52} ${x + s * 0.26} ${y - s * 0.24}C${x + s * 0.26} ${y - s * 0.04} ${x} ${y - s * 0.02} ${x} ${y + s * 0.16}`;
 
 /** "?" with a cream body and an ink outline (pops). (x, y) = centre, size = height. */
-export const QuestionMark: React.FC<G & {size?: number}> = ({x, y, size = 70, at, seed = 'q', width, depth}) => {
+const QuestionMarkBase: React.FC<G & {size?: number}> = ({x, y, size = 70, at, seed = 'q', width, depth}) => {
   const w = wOf({width, depth}, 'mid');
   const body = size * 0.16;
   const d = qPath(x, y, size);
   const dy = y + size * 0.38;
   return (
     <PopAt at={at} x={x} y={y + size * 0.4}>
+      <ExitFade x={x} y={y}>
       <path d={d} fill="none" stroke={palette.ink} strokeWidth={body + w * 2} strokeLinecap="round" />
       <path d={d} fill="none" stroke={palette.cream} strokeWidth={body} strokeLinecap="round" />
       <circle cx={x} cy={dy} r={body * 0.62 + w} fill={palette.ink} />
       <circle cx={x} cy={dy} r={body * 0.62} fill={palette.cream} />
+      </ExitFade>
     </PopAt>
   );
 };
 
 /** "!" in solid ink (pops). (x, y) = centre, size = height. */
-export const AlertMark: React.FC<G & {size?: number}> = ({x, y, size = 24, at, seed = 'alert', color = palette.ink}) => (
+const AlertMarkBase: React.FC<G & {size?: number}> = ({x, y, size = 24, at, seed = 'alert', color = palette.ink}) => (
   <PopAt at={at} x={x} y={y + size / 2}>
     <Fill d={`M${x - size * 0.11} ${y - size / 2}L${x + size * 0.11} ${y - size / 2}L${x + size * 0.06} ${y + size * 0.18}L${x - size * 0.06} ${y + size * 0.18}Z`} color={color} offset={false} seed={`${seed}/b`} />
     <Fill d={blob(x, y + size * 0.4, size * 0.1, size * 0.1, {seed: `${seed}/d`})} color={color} offset={false} seed={`${seed}/d`} />
@@ -215,4 +218,15 @@ export const Swing: React.FC<{px: number; py: number; at?: number; amp?: number;
   return <XG m={mat.about(mat.rotate(a), px, py)}>{children}</XG>;
 };
 
-export {PopAt, rectPath};
+export {PopAt};
+
+// build-out (outAt / outDur) for props that have no own exit
+export const CheckMark = withOut(CheckMarkBase, 'CheckMark');
+export const MarkRing = withOut(MarkRingBase, 'MarkRing');
+export const Cobweb = withOut(CobwebBase, 'Cobweb');
+export const Magnifier = withOut(MagnifierBase, 'Magnifier');
+export const WrenchGlyph = withOut(WrenchGlyphBase, 'WrenchGlyph');
+export const WrenchTag = withOut(WrenchTagBase, 'WrenchTag');
+export const CheckFlag = withOut(CheckFlagBase, 'CheckFlag');
+export const QuestionMark = withOut(QuestionMarkBase, 'QuestionMark');
+export const AlertMark = withOut(AlertMarkBase, 'AlertMark');

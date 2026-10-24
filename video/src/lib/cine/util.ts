@@ -5,6 +5,8 @@
 //   const pb = new PathBuf(); pb.rect(10, 10, 4, 6); pb.quad(a, b, c, d); <path d={pb.d} />
 
 import type {Pt} from '../sketch';
+import {line as skLine} from '../sketch';
+import {rng as skRng} from '../rng';
 
 export const r1 = (n: number) => Math.round(n * 10) / 10;
 export const r2 = (n: number) => Math.round(n * 100) / 100;
@@ -109,3 +111,28 @@ export function memoize<V>(cache: Map<string, V>, key: string, make: () => V, ma
 
 /** Smooth 0..1 hash noise in time (sum of sines), deterministic per phase. Range ~[-1, 1]. */
 export const drift = (t: number, hz: number, ph: number) => 0.62 * Math.sin(t * hz * 6.2832 + ph) + 0.38 * Math.sin(t * hz * 2.31 * 6.2832 + ph * 1.7);
+
+// ---------------------------------------------------------------- hand-drawn line helpers
+
+/** A long hand-drawn line broken into pen strokes every `every` px (random in the range) with `gap` px gaps
+ *  (reference 1: step nosings, paving joints, long mouldings never run unbroken). Screen px. */
+export function brokenLine(x1: number, y1: number, x2: number, y2: number, o: {seed: string; every?: [number, number]; gap?: [number, number]; over?: [number, number]} = {seed: 'bl'}): string {
+  const r = skRng(`bl/${o.seed}`);
+  const len = Math.hypot(x2 - x1, y2 - y1);
+  if (len < 1) return '';
+  const [e0, e1] = o.every ?? [80, 160];
+  const [g0, g1] = o.gap ?? [6, 14];
+  let d = '';
+  let s = 0;
+  let i = 0;
+  while (s < len) {
+    const seg = Math.min(len - s, r.range(e0, e1));
+    const a = s / len;
+    const b = (s + seg) / len;
+    const first = s === 0;
+    const last = s + seg >= len - 0.5;
+    d += skLine(x1 + (x2 - x1) * a, y1 + (y2 - y1) * a, x1 + (x2 - x1) * b, y1 + (y2 - y1) * b, {seed: `${o.seed}/${i++}`, over: [first ? o.over?.[0] ?? 0 : 0, last ? o.over?.[1] ?? 0 : 0], breaks: false, bow: 0.4});
+    s += seg + r.range(g0, g1);
+  }
+  return d;
+}
