@@ -49,6 +49,16 @@ try {
   dataProblems.push(`could not read the film data: ${e.message}`);
 }
 if (typeof T.relightProblems === 'function') for (const p of T.relightProblems()) dataProblems.push(`relight: ${p}`);
+// ONE time-of-day table for both lanes: every cine TOD palette's caption-band sky must equal theme todSky (and its
+// caption colour todTone), so a cine <Sky> / haze never disagrees with the World sky (src/lib/cine/atmosphere.ts)
+try {
+  const outA = path.join(root, 'node_modules/.cache/engine-numbers/atmosphere.mjs');
+  buildSync({entryPoints: [path.join(root, 'src/lib/cine/atmosphere.ts')], bundle: true, format: 'esm', platform: 'node', outfile: outA, logLevel: 'error'});
+  const A = await import(pathToFileURL(outA).href + `?v=${Date.now()}`);
+  if (typeof A.todTableProblems === 'function') for (const p of A.todTableProblems()) dataProblems.push(`tod table: ${p}`);
+} catch (e) {
+  dataProblems.push(`could not check the cine TOD table: ${e.message}`);
+}
 const docPath = path.join(root, 'docs/ENGINE.md');
 const doc = fs.readFileSync(docPath, 'utf8');
 const re = /<!-- numbers:begin[^>]*-->[\s\S]*?<!-- numbers:end -->/;
