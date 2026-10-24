@@ -1,0 +1,50 @@
+[
+ {
+  "props": {
+   "variant": "paint-subtle",
+   "shot": "street",
+   "hints": false
+  },
+  "out": "review/edges/loose/final/stills/nohints/paint-subtle_street.png"
+ },
+ {
+  "props": {
+   "variant": "paint-subtle",
+   "shot": "monument",
+   "hints": false
+  },
+  "out": "review/edges/loose/final/stills/nohints/paint-subtle_monument.png"
+ },
+ {
+  "props": {
+   "variant": "paint-subtle",
+   "shot": "vista",
+   "hints": false
+  },
+  "out": "review/edges/loose/final/stills/nohints/paint-subtle_vista.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "hints": false
+  },
+  "out": "review/edges/loose/final/stills/nohints/paint-medium_street.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "monument",
+   "hints": false
+  },
+  "out": "review/edges/loose/final/stills/nohints/paint-medium_monument.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "vista",
+   "hints": false
+  },
+  "out": "review/edges/loose/final/stills/nohints/paint-medium_vista.png"
+ }
+]

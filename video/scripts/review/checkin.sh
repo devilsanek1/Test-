@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # checkin.sh <label>: render a progress overview of every visual thread for the 30-minute check-ins.
-# Output: review/checkins/<label>/overview.png (+ one strip per composition). Failing compositions are
+# Output: review/checkins/<label>/overview.png + overview.jpg (committed) (+ one strip per composition, not committed). Failing compositions are
 # skipped and listed in review/checkins/<label>/status.txt so a mid-edit lane never blocks the update.
 set -uo pipefail
 cd "$(dirname "$0")/../.."
@@ -38,6 +38,10 @@ else
   echo "FAIL SharedKitSheet" >> "$OUT/status.txt"
 fi
 strips=$(ls "$OUT"/strip_*.png 2>/dev/null)
-[ -n "$strips" ] && montage $strips -tile 1x -geometry +0+4 -background '#222' "$OUT/overview.png"
+if [ -n "$strips" ]; then
+  montage $strips -tile 1x -geometry +0+4 -background '#222' "$OUT/overview.png"
+  # the committed copy: an 8-bit JPEG (the 16-bit PNG and the per-comp frames are gitignored)
+  convert "$OUT/overview.png" -depth 8 -quality 86 "$OUT/overview.jpg"
+fi
 cat "$OUT/status.txt"
 echo "$OUT"

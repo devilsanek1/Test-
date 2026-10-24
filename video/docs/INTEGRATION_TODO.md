@@ -32,6 +32,13 @@ their scenes, so none of this is done mid-flight; each item names the scenes it 
    text. Re-check scenes that relied on shrink-to-fit (S05's L6 slip, BlueprintWall slips) for overlap
    with the art.
 
+## Scenes still under 8/10 after their fix rounds
+
+The scene workflows stop after 3 review/fix rounds. Any scene whose lowest reviewer score is still under 8 gets a
+polish pass (same two reviewer lenses, plus a cross-scene continuity reviewer) before the final render. Scores at
+22:58, round 1 -> round 2: S01 art 7/7, motion 6.5/8 (one caption-legibility gate error in the dive); S11 art 7/7.5;
+S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6.5. Every other lens is at 7-8.
+
 ## Other
 
 - Edge treatment: DONE, `paint-subtle` is wired into `Film` (full film only, captions above, one painting per scene).

@@ -20,8 +20,9 @@
 //            square  the body's corner; one painted top corner gets the ruled crossing pair.
 //   bites    big straight-sided bites where the paint did not reach: the visible-zone gesture on the left side
 //            (y 680-1460; medium / loose), one on the right between the caption and the rail (loose), and the
-//            bottom under the app UI; only where the scene has drawing there. The line art inside a bite is complete
-//            (the sketch keeps the block's edge). No corner can go bare: the bottom's drawing gets a bite instead.
+//            bottom under the app UI; only where the scene has drawing there (the visible-zone bites need a measured
+//            hint: a scene without one stays calm in the visible zone). The line art inside a bite is complete (the
+//            sketch keeps the block's edge). No corner can go bare: the bottom's drawing gets a bite instead.
 //   tongues  stretches where the colour runs off the frame (the ground off the bottom, one end a long slant like a
 //            ground plane), only where the paper is deep enough for a real step (on a thin margin: a shelf).
 //   keep     hints.keep rects (a hero, the mascot and the ground under it, a lamp and its halo) are always in colour:
@@ -691,10 +692,11 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
   };
   const rbL = r.fork('leftBite');
   const lb = {depth: lerpR(P.leftBite, rbL.next()), w: lerpR(P.leftBiteW, rbL.next()), t: rbL.next(), e1: rbL.range(0.25, 0.6), e2: rbL.range(0.25, 0.6), tl: rbL.jitter(P.tilt * 0.5)};
-  if (lb.depth > 40 && (inkOf('left') ?? 0.5) >= 0.3) bite(3, H - LEFT_BITE_Y[1], H - LEFT_BITE_Y[0], lb.w, (d) => Math.max(lb.depth, d + P.step[0]), lb.t, lb.e1, lb.e2, lb.tl);
+  // the visible-zone bites need a measured hint (a scene without one may have a figure there: it stays calm)
+  if (lb.depth > 40 && (inkOf('left') ?? 0) >= 0.3) bite(3, H - LEFT_BITE_Y[1], H - LEFT_BITE_Y[0], lb.w, (d) => Math.max(lb.depth, d + P.step[0]), lb.t, lb.e1, lb.e2, lb.tl);
   const rbR = r.fork('rightBite');
   const rbd = {depth: lerpR(P.rightBite, rbR.next()), w: lerpR(P.rightBiteW, rbR.next()), t: rbR.next(), e1: rbR.range(0.15, 0.4), e2: rbR.range(0.15, 0.4), tl: rbR.jitter(P.tilt * 0.4)};
-  if (rbd.depth > 40 && (inkOf('right') ?? 0.5) >= 0.3) bite(1, RIGHT_BITE_Y[0], RIGHT_BITE_Y[1], Math.min(rbd.w, RIGHT_BITE_Y[1] - RIGHT_BITE_Y[0]), (d) => Math.max(rbd.depth, d + P.step[0]), rbd.t, rbd.e1, rbd.e2, rbd.tl, false);
+  if (rbd.depth > 40 && (inkOf('right') ?? 0) >= 0.3) bite(1, RIGHT_BITE_Y[0], RIGHT_BITE_Y[1], Math.min(rbd.w, RIGHT_BITE_Y[1] - RIGHT_BITE_Y[0]), (d) => Math.max(rbd.depth, d + P.step[0]), rbd.t, rbd.e1, rbd.e2, rbd.tl, false);
   const bottomInk = inkOf('bottom') ?? 0.5;
   // no corner could be left bare (flat sky, a hero, the mascot): the bottom's drawing gets a bite instead
   const nBottom = Math.round(P.bottomBites) + (roles.includes('bare') || bottomInk < 0.3 ? 0 : 1);
@@ -1222,7 +1224,9 @@ function inkReach(polys: Pt[][], P: Params, ri: Rng): Pt[][] {
       const comb: Pt[] = [a];
       ts.forEach((t, j) => {
         const d = D(t);
-        const o = off[j] ? d + OFF : Math.max(Math.min(6, d), Math.min(v[j], d - short));
+        // 'run off' only where the frame is near (an edge facing the interior, like a bleed block's inner edge, would
+        // otherwise throw a band of line art across the whole frame)
+        const o = off[j] && d < 420 ? d + OFF : Math.max(Math.min(6, d), Math.min(v[j] || lo + span * 0.5, d - short));
         if (j === 0) firstO[i] = o;
         lastO[i] = o;
         const p = at(t);

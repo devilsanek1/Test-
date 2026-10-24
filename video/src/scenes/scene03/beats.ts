@@ -32,7 +32,7 @@ const ABS = {
   cut: S03_START, //            cut(password): HARD CUT, the bare plan with ten footprints; the 4 % breath starts
   grid: 8.445, //               w29-0.16 'It's': grid lines draw on (the set: near 0.3 s, mid +0.12, far +0.24), a big-build
   //                            lead (ENGINE rule 5) so the hard-cut frame is alive and the grid is mostly down on 'It's'
-  pipLand: 8.755, //            w30 'in': Pip lands on the blueprint at BLUEPRINT.pip with a squash
+  pipLand: 8.755, //            w30 'in': Pip lands on the blueprint (the stamp's rump, cast.tsx PIP_AT) with a squash
   stamp: 8.83, //               w31-0.13 'PHP': the stamp SLAMS (ring 0.13 s, print 2.6x -> 1.0x in 0.27 s); Pip bounces
   L3: 9.26, //                  w31+0.30 'PHP': label L3 pops on the title-block card
   popUp: 9.46, //               w31+0.50 'PHP': the city springs out of the plan (press first, then L1 R1 L2 R2 L3 R3 L4 R4 L5)
@@ -50,8 +50,9 @@ const ABS = {
   ten: 12.55, //                w41-0.10 'ten': three blank plates L3, L5, R4 (0.05 s apart) + 3 cream sun slices
   websites: 12.905, //          w42 'websites': the seven PHP screens light up in a wave (0.02 s)
   heads: 13.205, //             w42+0.30: the near walkers turn their heads; a far walker waves
-  run: 13.485, //               w43 'run': walkers bob; Pip glances down the street (look 0.7); the vent puffs
-  solid: 13.855, //             w45 'it.': the pie slices pop back to solid (spokes retract)
+  run: 13.485, //               w43 'run': walkers bob; Pip glances down the street (look 0.7) (no vent puff here: fix
+  //                            round 1, it flew through the pie and the take-off)
+  solid: 13.855, //             w45 'it.': the pie slices pop back to solid (spokes retract), clean one frame before
   sunHop: 13.945, //            end(it): the sun's low glide-hop (take-off; mid-air at (810,680) on the cut, lands on 'This')
   pipHop: 14.05, //             cut(it)-0.12: Pip hops off the stamp toward the stoop (crosses the cut)
 } as const;

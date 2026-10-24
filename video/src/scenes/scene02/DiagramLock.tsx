@@ -2,10 +2,12 @@
 // same box / cover / guide / bolt / strike / socket: the S01 lock box and this drawing are one design), with the extra
 // S02 mechanics the shared Lock does not have yet (props-lane request in docs/scenes/S02.md):
 //   - the CLOSED cover with its keyhole in ink on white (the match-cut frame reads as S01's lock box),
-//   - the cover swinging open on its hinge (`coverOpenAt`), shown open as a DASHED outline + a dashed swing arc,
-//   - a THUMB-TURN on a cam link to the bolt; `turnAt` turns it 90 deg (0.2 s) and the bolt retracts all the way,
-//   - the bolt test (`boltTestAt`: shoots 0.2 s, stops SHORT of the socket 9 units away, knocks back 3 units),
-//   - the gap bracket + ring (`gapMarkAt`),
+//   - the cover swinging open on its hinge (`coverOpenAt`, 0.2 s out(cubic)), shown open as a DASHED outline + a
+//     dashed swing arc,
+//   - a THUMB-TURN on a cam link to the bolt; `turnAt` turns it 90 deg (0.2 s out(cubic)), the bolt retracts all the way,
+//   - the bolt test (`boltTestAt`: shoots at constant speed 0.13 s and SLAMS to a stop SHORT of the socket 9 units away,
+//     rebounds 2.6 units (~7 px on screen in the x2.8 loupe) and a second small bounce),
+//   - the gap mark (`gapMarkAt`): the gap floods peach, a bold ink bracket over it, a ring round it,
 //   - Bit living in the socket (`bit`): camouflaged as the socket's ink until he peeks out, cowers, ducks, pops back.
 // Anchor = box centre; size = box height (world px). Local units: the box is 80 x 100 (LOCK.box).
 
@@ -49,28 +51,35 @@ export type DiagramLockProps = {
   gapMarkAt?: number;
   turnAt?: number;
   bit?: DiagramBit;
+  /** Draw ONLY the thumb-turn (the layer S02 puts above the pinching hand, so the knob shows between the fingers). */
+  knobOnly?: boolean;
   seed?: string;
 };
 
 const f2 = (v: number) => v.toFixed(2);
 
 /** Local bolt tip x at time t. */
+export const BOLT_SHOOT = 0.13;
 export function boltTip(t: number, testAt?: number, turnAt?: number): number {
   let tip: number = LOCK.tip.retracted;
   if (testAt !== undefined) {
-    const q = prog(t, testAt, 0.2, E.outCubic);
-    const dt = t - testAt - 0.2;
-    const knock = dt > 0 && dt < 0.14 ? -Math.sin((dt / 0.14) * Math.PI) * 3 : 0;
+    // constant speed out of the guide (moving from the first frame) and an abrupt stop = a slam; then it rebounds
+    // 2.6 units off the stop (0.11 s) and bounces once more (0.8 units, 0.08 s): it hits something and stays short
+    const q = prog(t, testAt, BOLT_SHOOT);
+    const dt = t - testAt - BOLT_SHOOT;
+    let knock = 0;
+    if (dt > 0 && dt < 0.11) knock = -Math.sin(Math.pow(dt / 0.11, 0.7) * Math.PI) * 2.6;
+    else if (dt >= 0.11 && dt < 0.19) knock = -Math.sin(((dt - 0.11) / 0.08) * Math.PI) * 0.8;
     tip = lerp(LOCK.tip.retracted, LOCK.tip.short, q) + knock;
   }
   if (turnAt !== undefined && t >= turnAt) {
     const hb = LOCK.housing[0] + LOCK.housing[2];
-    tip = lerp(tip, hb, prog(t, turnAt, 0.2, E.inOutCubic));
+    tip = lerp(tip, hb, prog(t, turnAt, 0.2, E.outCubic));
   }
   return tip;
 }
 
-export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, coverOpenAt, boltTestAt, gapMarkAt, turnAt, bit, seed = 's2lock'}) => {
+export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, coverOpenAt, boltTestAt, gapMarkAt, turnAt, bit, knobOnly = false, seed = 's2lock'}) => {
   const t = useTime();
   const uid = 'dl' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const s = size / LOCK.h;
@@ -85,7 +94,7 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
   const rm = LOCK.rim;
 
   // ---- cover swing: scaleX 1 -> edge-on -> -0.3 about the hinge (0.2 s)
-  const open = coverOpenAt === undefined ? 0 : prog(t, coverOpenAt, 0.2, E.inOutSine);
+  const open = coverOpenAt === undefined ? 0 : prog(t, coverOpenAt, 0.2, E.outCubic);
   const coverSx = 1 - 1.3 * open;
   const swung = open >= 1;
 
@@ -98,8 +107,23 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
   };
 
   // ---- thumb-turn
-  const turn = turnAt === undefined ? 0 : prog(t, turnAt, 0.2, E.inOutCubic);
+  const turn = turnAt === undefined ? 0 : prog(t, turnAt, 0.2, E.outCubic);
   const knobRot = 90 * turn;
+  const knob = (
+    <XG key="thumb" m={mat.compose(mat.translate(THUMB[0], THUMB[1]), mat.rotate(knobRot))}>
+      <Fill d={`M-5.5 0a5.5 5.5 0 1 0 11 0a5.5 5.5 0 1 0 -11 0Z`} color={palette.white} offset={false} mode="none" seed={`${seed}/tdF`} />
+      <Ink d={circle(0, 0, 5.5, {seed: `${seed}/td`, overlap: 8})} width={W * 0.5} taper={false} vary={0} seed={`${seed}/td`} />
+      <Fill d={roundRect(-3, -10, 6, 20, 3)} color={palette.cream} offset={false} mode="none" seed={`${seed}/tkF`} />
+      <Ink d={roundRect(-3, -10, 6, 20, 3)} width={W * 0.6} taper={false} vary={0} seed={`${seed}/tk`} />
+    </XG>
+  );
+  if (knobOnly) {
+    return (
+      <PropRoot x={x} y={y} s={s}>
+        {knob}
+      </PropRoot>
+    );
+  }
 
   const mech: React.ReactNode[] = [];
   // the SECTION: a pale mint cavity (ink Bit and the ink outlines read on it), white guide and strike, the tealDark
@@ -109,29 +133,23 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
   mech.push(<Fill key="strikeF" d={`M${st[0]} ${st[1]}H${st[0] + st[2]}V${st[1] + st[3]}H${st[0]}Z`} color={palette.white} offset={false} mode="none" seed={`${seed}/stf`} />);
   mech.push(<Fill key="rimF" d={`M${rm[0]} ${rm[1]}H${rm[0] + rm[2]}V${rm[1] + rm[3]}H${rm[0]}Z`} color={palette.cream} offset={false} mode="none" seed={`${seed}/rmf`} />);
   mech.push(<Fill key="slotF" d={`M${sl[0]} ${sl[1]}H${sl[0] + sl[2]}V${sl[1] + sl[3]}H${sl[0]}Z`} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/slf`} />);
-  mech.push(<Ink key="cav" d={`M${cx0} ${cy0}H${cx0 + cw}V${cy0 + ch}H${cx0}Z`} width={W * 0.55} taper={false} vary={0} seed={`${seed}/cav`} />);
+  mech.push(<Ink key="cav" d={`M${cx0} ${cy0}H${cx0 + cw}V${cy0 + ch}H${cx0}Z`} width={W * 0.5} taper={false} vary={0} seed={`${seed}/cav`} />);
   const strikeI = `M${st[0]} ${st[1]}H${st[0] + st[2]}V${st[1] + st[3]}H${st[0]}V${rm[1] + rm[3]}H${rm[0] + rm[2]}V${rm[1]}H${st[0]}Z`;
-  mech.push(<Ink key="mech" d={`M${hx} ${hy0}H${hb}V${hy0 + hh}H${hx}Z` + strikeI} width={W * 0.55} taper={false} vary={0} seed={`${seed}/mech`} />);
+  mech.push(<Ink key="mech" d={`M${hx} ${hy0}H${hb}V${hy0 + hh}H${hx}Z` + strikeI} width={W * 0.8} taper={false} vary={0} seed={`${seed}/mech`} />);
   // centre line (dash-dot) on the bolt axis: only its blueprint ticks outside the box
   mech.push(<Ink key="cl" d={`M-50 0H-42M50 0H42`} width={W * 0.3} taper={false} order="all" vary={0} seed={`${seed}/cl`} />);
   // the bar bolt: cream with an ink outline and a groove line
   if (boltL > 0.3) {
     mech.push(<Fill key="boltF" d={barD(hb, tip) + 'Z'} color={palette.cream} offset={false} mode="none" seed={`${seed}/bf`} />);
-    mech.push(<Ink key="bolt" d={barD(hb, tip) + (boltL > 8 ? `M${hb + 2} ${f2(-br + 3.4)}H${f2(tip - 4)}` : '')} width={W * 0.55} taper={false} vary={0} seed={`${seed}/bolt`} />);
+    mech.push(<Ink key="bolt" d={barD(hb, tip)} width={W * 0.8} taper={false} vary={0} seed={`${seed}/bolt`} />);
+    if (boltL > 8) mech.push(<Ink key="boltG" d={`M${hb + 2} ${f2(-br + 3.4)}H${f2(tip - 4)}`} width={W * 0.4} taper={false} vary={0} seed={`${seed}/boltG`} />);
   }
   // cam link: from the thumb-turn pivot down to the bolt's top edge (the joint follows the bolt as it moves)
   const linkX = Math.max(hb + 1.5, Math.min(tip - 8, -4));
   mech.push(<Ink key="link" d={`M${THUMB[0]} ${THUMB[1]}L${f2(linkX)} ${-br}`} width={W * 0.42} taper={false} vary={0} seed={`${seed}/lk`} />);
   mech.push(<Ink key="linkJ" d={circle(linkX, -br - 1.2, 1.6, {seed: `${seed}/lj`})} width={W * 0.4} taper={false} vary={0} seed={`${seed}/lj`} />);
   // thumb-turn: a disc with a bar knob (vertical at rest, turns 90 deg)
-  mech.push(
-    <XG key="thumb" m={mat.compose(mat.translate(THUMB[0], THUMB[1]), mat.rotate(knobRot))}>
-      <Fill d={`M-5.5 0a5.5 5.5 0 1 0 11 0a5.5 5.5 0 1 0 -11 0Z`} color={palette.white} offset={false} mode="none" seed={`${seed}/tdF`} />
-      <Ink d={circle(0, 0, 5.5, {seed: `${seed}/td`, overlap: 8})} width={W * 0.45} taper={false} vary={0} seed={`${seed}/td`} />
-      <Fill d={roundRect(-3, -10, 6, 20, 3)} color={palette.cream} offset={false} mode="none" seed={`${seed}/tkF`} />
-      <Ink d={roundRect(-3, -10, 6, 20, 3)} width={W * 0.5} taper={false} vary={0} seed={`${seed}/tk`} />
-    </XG>,
-  );
+  mech.push(knob);
 
   // ---- Bit in the socket (clipped at the socket mouth: the part inside the strike is hidden)
   let bitNode: React.ReactNode = null;
@@ -143,7 +161,7 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
     if (bit.peekAt !== undefined && t >= bit.peekAt) out = lerp(0.06, 1.1, springAt(t, bit.peekAt, springs.snappy));
     let squashY = 1;
     if (bit.hideAt !== undefined && t >= bit.hideAt) {
-      const q = prog(t, bit.hideAt, 0.14, E.inCubic);
+      const q = prog(t, bit.hideAt, 0.14, E.outQuad);
       out = lerp(out, -0.1, q);
       squashY = lerp(1, 0.6, Math.min(1, q * 1.6));
     }
@@ -175,15 +193,21 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
     );
   }
 
-  // ---- gap bracket (cream, on the cavity) + a big ring round the gap (ink over a cream halo: reads on white AND teal)
+  // ---- the gap mark: the gap between the short bolt and the socket floods PEACH (under Bit: the bug lives there), a
+  // bold ink bracket spans it under the bolt (ticks + a bar with inward arrowheads, blueprint convention, ~4.5 px on
+  // screen, over a cream halo) and a big ring (ink over a cream halo: reads on white AND mint) circles it
+  const gapFill: React.ReactNode[] = [];
   const marks: React.ReactNode[] = [];
   if (gapMarkAt !== undefined && t >= gapMarkAt) {
     const x0 = LOCK.tip.short;
     const x1 = st[0];
-    const yb = st[1] + st[3] - 3; // under the gap (the thumb-turn sits above it)
-    // a mini dimension line across the gap: two ticks and a line with inward arrowheads (blueprint convention)
-    const dim = `M${x0} ${yb - 4.5}V${yb + 4.5}M${x1} ${yb - 4.5}V${yb + 4.5}M${x0 + 0.8} ${yb}H${x1 - 0.8}` + `M${x0 + 3.2} ${yb - 1.8}L${x0 + 0.8} ${yb}L${x0 + 3.2} ${yb + 1.8}M${x1 - 3.2} ${yb - 1.8}L${x1 - 0.8} ${yb}L${x1 - 3.2} ${yb + 1.8}`;
-    marks.push(<Ink key="gapB" d={dim} at={gapMarkAt} dur={0.08} width={W * 0.42} taper={false} seed={`${seed}/gb`} order="all" />);
+    // the peach gap: between the stopped tip and the socket mouth, from under the thumb-turn down to the bracket (taller
+    // than the bolt, so it still shows round Bit when he sits in the gap; it stays once the bolt is retracted)
+    gapFill.push(<Fill key="gapF" rect={[x0 + 0.4, -15, x1 - x0 - 0.8, 23]} color={palette.peach} at={gapMarkAt} mode="pop" dur={0.08} offset={false} seed={`${seed}/gpf`} />);
+    const yb = br + 5.5; // just under the bolt (the thumb-turn sits above it)
+    const dim = `M${x0} ${yb - 4}V${yb + 4}M${x1} ${yb - 4}V${yb + 4}M${x0 + 0.8} ${yb}H${x1 - 0.8}` + `M${x0 + 3} ${yb - 2}L${x0 + 0.8} ${yb}L${x0 + 3} ${yb + 2}M${x1 - 3} ${yb - 2}L${x1 - 0.8} ${yb}L${x1 - 3} ${yb + 2}`;
+    marks.push(<Ink key="gapBh" d={dim} at={gapMarkAt} dur={0.06} width={W * 1.3} color={palette.cream} taper={false} vary={0} seed={`${seed}/gbh`} order="all" />);
+    marks.push(<Ink key="gapB" d={dim} at={gapMarkAt} dur={0.06} width={W * 0.75} taper={false} vary={0} seed={`${seed}/gb`} order="all" />);
     const ring = circle(LOCK.gap[0], 2, 22, {seed: `${seed}/gr`, overlap: 30});
     marks.push(<Ink key="gapRh" d={ring} at={gapMarkAt + 0.04} dur={0.13} width={W * 1.25} color={palette.cream} taper={false} seed={`${seed}/grh`} />);
     marks.push(<Ink key="gapR" d={ring} at={gapMarkAt + 0.04} dur={0.13} width={W * 0.62} taper={false} seed={`${seed}/gr`} />);
@@ -228,6 +252,7 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
     <PropRoot x={x} y={y} s={s}>
       <Fill d={roundRect(bx0, by0, bw, bh, 9)} color={palette.white} offset={false} mode="none" seed={`${seed}/body`} />
       {mech}
+      {gapFill}
       {bitNode}
       {marks}
       {cover}

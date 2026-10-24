@@ -12,18 +12,28 @@ import {Elephant} from '../../lib/mascot';
 import {B, S09_END, WIPE_DUR} from './beats';
 import {wipeEdgeX} from '../../lib/cine/wipers';
 
-/** Tram geometry in tram-local screen px (x relative to the wipe edge). */
+/** Tram geometry in tram-local screen px (x relative to the wipe edge). `pipDx` = where Pip rides at the hand-over. */
 export const TRAM = {L: 1340, roof: 600, nose: 170, pipDx: -590, pipScale: 0.75};
 /** Pip leaves the roof here (S09 local; = 39.805 film: S10's 'Plus' + 0.10, where S10 picks him up). */
 export const TRAM_PIP_UNTIL = B.end + 0.171;
+/** The boarding (fix round 1): S09's Pip leaps straight up off his post (PartB NEAR.pip.x = 884) at B.board, past the
+ *  roof line before the nose reaches him, and lands on the roof at B.boardLand, where this Wiper takes him over. */
+export const BOARD = {x: 884, land: B.boardLand};
 
 const W = 4.8;
+const filmT0 = S09_END - WIPE_DUR / 2;
+const edgeAt = (T: number) => wipeEdgeX(Math.max(0, Math.min(1, (T - filmT0) / WIPE_DUR)), 'right', TramWiper.half!);
+const fT = (local: number) => local + (S09_END - B.end);
 
-/** Where S09's tram carries Pip at FILM time T (screen px; Pip's feet): S10 picks him up here at TRAM_PIP_UNTIL
- *  (film 39.805) for its hop onto the bollard. The wipe edge is Film's wipeEdgeX over S10's 0.5 s window. */
+/** Where S09's tram carries Pip at FILM time T (screen px; Pip's feet). He lands on the roof at (884, 602) and runs
+ *  back along it against the tram's travel, so on screen he only drifts right while the tram streams past under him,
+ *  to the hand-over spot (edge + pipDx at film 39.805, unchanged) where S10 picks him up for its hop. */
 export function tramPipAt(T: number): {x: number; y: number; scale: number} {
-  const p = Math.max(0, Math.min(1, (T - (S09_END - WIPE_DUR / 2)) / WIPE_DUR));
-  const x = wipeEdgeX(p, 'right', TramWiper.half!) + TRAM.pipDx;
+  const a = fT(BOARD.land);
+  const b = fT(TRAM_PIP_UNTIL);
+  const end = edgeAt(b) + TRAM.pipDx;
+  const q = Math.max(0, Math.min(1, (T - a) / (b - a)));
+  const x = T <= a ? BOARD.x : BOARD.x + (end - BOARD.x) * (q * q * (3 - 2 * q));
   return {x, y: TRAM.roof + 2, scale: TRAM.pipScale};
 }
 
@@ -84,12 +94,17 @@ const TramBody: React.FC<{x: number; dir: 'left' | 'right'}> = ({x, dir}) => {
 const TramWiperFC: React.FC<WiperProps> = ({x, p, dir}) => {
   const t = useTime();
   const sx = dir === 'right' ? 1 : -1;
-  const pipX = x + sx * TRAM.pipDx;
+  // Pip on the roof from the boarding landing to the S10 hand-over (his screen path is tramPipAt; mirrored for 'left')
+  const at = tramPipAt(fT(t));
+  const pipX = dir === 'right' ? at.x : 1080 - at.x;
+  const d = t - BOARD.land;
+  const land = d >= 0 && d < 0.3 ? 0.24 * Math.exp(-d * 11) * Math.cos(d * Math.PI * 2 * 3.2) : 0;
   const bob = Math.abs(Math.sin(t * 19)) * -4;
+  const on = t >= BOARD.land && t < TRAM_PIP_UNTIL && p > 0 && p < 1;
   return (
     <>
       <TramBody x={x} dir={dir} />
-      {t < TRAM_PIP_UNTIL && p > 0 && p < 1 ? <Elephant x={pipX} y={TRAM.roof + 2 + bob} scale={TRAM.pipScale} pose="sit-back" look={0.6 * sx} t={t} seed={9} /> : null}
+      {on ? <Elephant x={pipX} y={TRAM.roof + 2 + bob} scale={TRAM.pipScale} pose="walk-side" walkRate={3.2} flip={dir === 'right'} squash={land} look={-0.4 * sx} t={t} seed={9} /> : null}
     </>
   );
 };

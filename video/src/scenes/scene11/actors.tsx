@@ -12,7 +12,7 @@ import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {blob, circle, rectPath, roundRect, smooth, Pt} from '../../lib/sketch';
 import {mat, useXf, XG} from '../../lib/xf';
-import {captionFontStack, measureCaption, useCaptionFont} from '../../lib/font';
+import {captionFontStack, useCaptionFont} from '../../lib/font';
 import {BrowserChrome, ProgressStep} from '../shared/props';
 import {matScale} from '../shared/props/common';
 import {CRT} from '../shared/sets';

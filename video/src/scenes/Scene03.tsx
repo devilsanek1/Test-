@@ -1,21 +1,23 @@
 // S03 "Built from one blueprint" (storyboard v3, docs/storyboard_v3.md S03; cut(password) -> cut(it), 8.393-14.17 s).
 // VO: "It's in PHP, the language everyone loves, and about seven out of ten websites run on it."
 //
-// Blueprint Street (shared BlueprintStreet, wide): a HARD CUT onto the bare plan (ten dashed footprints, the plain
-// running to a hazy horizon, the sun already in its wide slot); the grid draws on ('It's'), Pip drops in from S02 and
-// lands ('in'), the elephant stamp slams under him ('PHP'), L3 pops on the title-block card, and in the ellipsis the
-// whole street springs out of the plan in one gesture (press house, then L1 R1 L2 R2 L3 R3 L4 R4 L5). The bait ('the
-// language everyone loves') plays on a calm frame: one screen lights, the street fills ('everyone'), Pip puffs up proudly
-// ('loves'), the pen-nib sign swings with Bit on it. The count: ten spokes on the sun ('about'), seven plaques tick
-// ('seven'), the card flips to the W3Techs footnote L4, three blank plates + three cream slices ('ten': the 7/10 pie),
-// the seven PHP screens light ('websites'). 'it.': the pie goes solid and the sun takes off on its low glide-hop to S04
-// (mid-air at screen (810, 680) on the cut); Pip crouches to hop to the stoop.
+// Blueprint Street (shared BlueprintStreet, wide): a HARD CUT onto the bare plan (ten inked footprints with door swings,
+// the sheet framed in S02's teal band, the plain running to a hazy horizon, the sun already in its wide slot); the grid
+// draws on (lead into 'It's'), Pip drops in and lands ('in'), the solid tealDark elephant stamp slams under him ('PHP')
+// and he settles on its rump, L3 pops on the title-block card, and in the ellipsis the whole street springs out of the
+// plan in one gesture (press house, then L1 R1 L2 R2 L3 R3 L4 R4 L5). The bait ('the language everyone loves') plays on
+// a calm frame: one screen lights, the street fills ('everyone'), Pip puffs up proudly ('loves'), the pen-nib sign
+// swings with Bit on it. The count: ten spokes on the sun ('about'), seven count badges tick over the doors ('seven'),
+// the card flips to the W3Techs footnote L4, three blank plates + three cream slices ('ten': the 7/10 pie), the seven
+// PHP screens light with an elephant on their page ('websites'). 'it.': the pie pops back to solid and the sun takes off
+// on its low glide-hop to S04 (mid-air at screen (810, 680) on the cut); Pip crouches to hop to the stoop.
 //
 // Camera: this scene's own keys (screen = (world - cam) x zoom + (540, 960)): a 4 % in-out-sine breath from rest
 // (540, 950, 1.00) -> (545, 945, 1.04) until 'everyone', then locked. The sun is SCREEN space (its slot does not breathe).
+// Notes: docs/scenes/S03.md.
 
 import React from 'react';
-import {World, useScene, useTime, skies, palette} from '../lib';
+import {World, useScene, useTime, skies} from '../lib';
 import {Sun} from '../lib/Sun';
 import {mat, XG} from '../lib/xf';
 import {BlueprintStreet, BLUEPRINT, blueprintAnchors, PopUp, SideId, BlueprintId, LayerWrap} from './shared/sets';

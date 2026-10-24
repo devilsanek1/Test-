@@ -38,6 +38,8 @@ const ABS = {
   kneel: 39.115, //          w127+0.25 'server': the keeper reaches door #5 and kneels; far window dots twinkle
   snail: 39.215, //          w127+0.35 'server': the snail crawls along Pip's bollard, Bit riding its shell
   sigh: 39.334, //           cut(server @0.8)-0.30: Pip sighs (sit-back squash pulse)
+  board: 39.5, //            cut-0.13: Pip crouch-leaps off the bollard as the tram's nose comes in (boarding)
+  boardLand: 39.65, //       cut+0.02: he lands on the tram's roof (the Wiper carries him from here)
   end: 39.634, //            cut(server @0.8): the tram wipe's centre; the sun takes off behind the tram
 } as const;
 

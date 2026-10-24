@@ -4,3 +4,8 @@ previews/
 audio/demo_*.wav
 audio/mix*.wav
 public/mix.wav
+# check-in renders: keep only overview.jpg, qa_life.png and status.txt per check-in
+review/checkins/*/*/
+review/checkins/*/strip_*.png
+review/checkins/*/overview.png
+review/checkins/*/sharedkit.png
