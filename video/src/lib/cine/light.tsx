@@ -271,3 +271,16 @@ export const Silhouette: React.FC<SilhouetteProps> = ({color, d, children, bound
     </>
   );
 };
+
+/** Rim-light any element: a flat silhouette of the children in `color`, offset toward the light by (dx, dy),
+ *  drawn behind them, so a lighter sliver shows along the lit edges (backlit figures, the mascot on a ledge). */
+export const Rimmed: React.FC<{color: string; dx?: number; dy?: number; bounds?: [number, number, number, number]; children?: React.ReactNode}> = ({color, dx = 5, dy = -3, bounds, children}) => (
+  <>
+    <g transform={`translate(${dx} ${dy})`}>
+      <Silhouette color={color} bounds={bounds}>
+        {children}
+      </Silhouette>
+    </g>
+    {children}
+  </>
+);

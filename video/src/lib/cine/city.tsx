@@ -53,7 +53,7 @@ export function darker(c: string): string {
 
 // ---------------------------------------------------------------- geometry
 
-type Kind = 'flat' | 'step' | 'gable' | 'dome' | 'spire' | 'tower';
+export type Kind = 'flat' | 'step' | 'gable' | 'dome' | 'spire' | 'tower';
 
 type Bld = {
   x: number;
@@ -100,7 +100,11 @@ export type RowParams = {
   nColors?: number;
   /** Rim light side ('right' = sun on the right / behind). */
   rimSide?: 'left' | 'right' | 'none';
+  /** Colossal landmark buildings at world x (centre), size in px at s = 1. */
+  landmarks?: Landmark[];
 };
+
+export type Landmark = {x: number; w: number; h: number; kind?: Kind; ci?: number};
 
 function rowGeo(p: RowParams): RowGeo {
   const key = JSON.stringify(p);
@@ -116,14 +120,7 @@ function buildRow(p: RowParams): RowGeo {
   const nC = p.nColors ?? 4;
   const blds: Bld[] = [];
   let x = x0 - r.range(0, w1 * s);
-  while (x < x1) {
-    const w = r.range(w0, w1) * s;
-    const tower = r.chance(p.towers ?? 0.08);
-    const kind: Kind = tower ? r.pick<Kind>(['tower', 'spire', 'step', 'dome']) : r.weighted<Kind>([['flat', 5], ['step', 1.4], ['gable', 1.6], ['dome', 0.5], ['spire', 0.3]]);
-    let h = r.range(h0, h1) * s * (tower ? r.range(1.8, 2.8) : 1);
-    if (kind === 'gable') h *= 0.75;
-    const ci = r.int(0, nC - 1);
-    const roofCi = r.int(0, nC - 1);
+  const make = (x: number, w: number, kind: Kind, h: number, tower: boolean, ci: number, roofCi: number): Bld => {
     const tiers: [number, number, number, number][] = [];
     const top = base - h;
     let roof: Pt[] | null = null;
@@ -170,9 +167,25 @@ function buildRow(p: RowParams): RowGeo {
     } else if (kind === 'flat' && r.chance(0.3)) extras.chimney = [tx + r.range(0.1, 0.8) * tw, ty, r.range(6, 12) * s, r.range(10, 26) * s];
     if (r.chance(kind === 'tower' || kind === 'step' ? 0.75 : 0.15)) extras.antenna = [tx + tw * r.range(0.3, 0.7), ty - (roof ? Math.max(0, ty - Math.min(...roof.map((q) => q[1]))) : 0), r.range(22, 60) * s];
     const beacon: Pt | undefined = tower || kind === 'spire' ? [extras.antenna ? extras.antenna[0] : tx + tw / 2, roof ? Math.min(...roof.map((q) => q[1])) - (extras.antenna ? extras.antenna[2] : 0) : ty] : undefined;
-    blds.push({x, w, h, kind, ci, roofCi, tiers, roof, extras, beacon});
+    return {x, w, h, kind, ci, roofCi, tiers, roof, extras, beacon};
+  };
+  while (x < x1) {
+    const w = r.range(w0, w1) * s;
+    const tower = r.chance(p.towers ?? 0.08);
+    const kind: Kind = tower ? r.pick<Kind>(['tower', 'spire', 'step', 'dome']) : r.weighted<Kind>([['flat', 5], ['step', 1.4], ['gable', 1.6], ['dome', 0.5], ['spire', 0.3]]);
+    let h = r.range(h0, h1) * s * (tower ? r.range(1.8, 2.8) : 1);
+    if (kind === 'gable') h *= 0.75;
+    blds.push(make(x, w, kind, h, tower, r.int(0, nC - 1), r.int(0, nC - 1)));
     x += w + r.range(-2, 14) * s;
   }
+  // colossal landmarks replace whatever stood in their footprint
+  for (const lm of p.landmarks ?? []) {
+    const lw = lm.w * s;
+    const lx = lm.x - lw / 2;
+    for (let i = blds.length - 1; i >= 0; i--) if (blds[i].x < lx + lw && blds[i].x + blds[i].w > lx) blds.splice(i, 1);
+    blds.push(make(lx, lw, lm.kind ?? 'step', lm.h * s, true, lm.ci ?? 0, lm.ci ?? 0));
+  }
+  blds.sort((a, b) => a.x - b.x);
 
   // ---- batched fills
   const fills = new Map<number, PathBuf>();

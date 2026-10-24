@@ -126,7 +126,7 @@ export const TOD: Record<Tod, TodPalette> = {
     hazeMax: 0.75,
   }),
   dusk: make('dusk', {
-    skyBands: [P.teal, P.sage, P.sky, mix(P.peach, P.cream, 0.25)],
+    skyBands: [P.teal, mix(P.teal, P.sage, 0.5), P.sage, mix(P.sage, P.sky, 0.5), P.sky, mix(P.peach, P.cream, 0.3)],
     haze: mix(P.sky, P.peach, 0.35),
     horizonGlow: mix(P.peach, P.cream, 0.45),
     glow: P.peach,

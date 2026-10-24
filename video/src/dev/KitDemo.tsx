@@ -17,7 +17,7 @@ import {palette, skies, stroke, world} from '../lib/theme';
 import {lerp, useTime} from '../lib/time';
 import {CaptionBeat} from '../lib/Captions';
 import {crown, crownTicks, hline, line, polyPath, rect, Pt} from '../lib/sketch';
-import {Building, Crowd, LampPost, Person, StringLights, Tree, UtilityPole, Window} from '../lib/kit';
+import {Building, Crowd, LampPost, Noticeboard, Paper, Person, StringLights, Tree, UtilityPole} from '../lib/kit';
 import {drawOut, ElephantTimeline, popIn} from '../lib/mascot';
 
 const VP: Pt = [560, 880];
@@ -136,6 +136,11 @@ const Fence: React.FC = () => {
       <Fill rect={[0, 18, FW, FH - 18]} color={palette.white} offset={[4, 2]} seed="fenceF" />
       <Ink d={hline(0, FW, 60, {seed: 'r1'}) + hline(0, FW, FH - 50, {seed: 'r2'})} width={stroke.ink} />
       <Ink d={posts} width={stroke.ink} order="all" />
+      {/* a notice board drawn ON the receding fence plane: draw-on, paper drop and stamp, all in perspective */}
+      <Noticeboard x={380} y={-560} w={520} h={380} legs={560} at={4.3} seed="kdboard">
+        <Paper x={420} y={-525} w={190} h={250} at={5.25} entry="drop" seed="kdpaper" stamp={{at: 6.2}} />
+        <Paper x={650} y={-510} w={200} h={150} at={5.5} entry="drop" seed="kdpaper2" lines={3} />
+      </Noticeboard>
     </Plane>
   );
 };
