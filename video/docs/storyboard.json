@@ -3426,7 +3426,7 @@
    "timeOfDay": "golden",
    "scale": {
     "colossal": "a glass dome over most of an endless city running to the horizon, the biggest sun of the film behind it, then a flood of millions",
-    "observer": "a 40 px guard in the watchtower cabin, hooded attempters 30-60 px at the rim and the uncovered doors, Pip on the foreground roof",
+    "observer": "a 40 px guard in the watchtower cabin, hooded attempters 30-40 px at the rim and 55-70 px at the uncovered doors, Pip on the foreground roof",
     "ratio": "an attempter is ~1/15 of the dome's height; the city runs past the horizon"
    },
    "layers": [
@@ -3516,7 +3516,7 @@
       "zoom": 1.15
      },
      "ease": "out(cubic)",
-     "why": "'tens of thousands': a 15% push toward the left rim so the first attempters read (30-46 px at the rim, rattlers 52-69 px); aimed at y 1040 so the dome apex stays at screen y 569"
+     "why": "'tens of thousands': a 15% push toward the left rim so the first attempters read (35-46 px at the rim, rattlers 63-80 px); aimed at y 1040 so the dome apex stays at screen y 569"
     },
     {
      "t0": 39.4,
@@ -3634,7 +3634,7 @@
     },
     {
      "id": "rattlers",
-     "what": "ten hooded figures rattling handles at the uncovered strip's nearest doors (row-3 scale, 45-60 px). NOT counted: the searchlight never reaches them; no door ever opens",
+     "what": "ten hooded figures rattling handles at the uncovered strip's nearest doors (row-3 scale, 55-70 px; 63-80 px during the push). NOT counted: the searchlight never reaches them; no door ever opens",
      "where": "x 100-250, y 1400-1480",
      "style": "tealDark fill, ink hood; rattle marks ink 2.2"
     },
@@ -3708,7 +3708,7 @@
     },
     {
      "t": 39.34,
-     "action": "'thousands': ten more attempters along the rim (counted: the glass tallies climb). Ten rattlers rattle handles at the uncoveredStrip's nearest doors (45-60 px, ink rattle marks) where the searchlight never reaches: nobody counts them."
+     "action": "'thousands': ten more attempters along the rim (counted: the glass tallies climb). Ten rattlers rattle handles at the uncoveredStrip's nearest doors (55-70 px, ink rattle marks) where the searchlight never reaches: nobody counts them."
     },
     {
      "t": 39.92,

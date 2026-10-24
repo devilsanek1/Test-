@@ -152,7 +152,7 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
   L('thin', -40, 215, 1040, 215, 'sb2', [10, 20]);
   F('dark').poly(P([[20, 215], [980, 215], [980, 1000], [20, 1000]]));
   // door: ~2.5x a person (a person on the top step is ~50 units tall here)
-  const dw = 70;
+  const dw = 46; // in the middle intercolumniation
   const dh = 140;
   F('door').poly(P([[500 - dw / 2, 215], [500 + dw / 2, 215], [500 + dw / 2, 215 + dh], [500 - dw / 2, 215 + dh]]));
   F('transom').poly(P([[500 - dw / 2, 215 + dh + 8], [500 + dw / 2, 215 + dh + 8], [500 + dw / 2, 215 + dh + 34], [500 - dw / 2, 215 + dh + 34]]));
@@ -174,7 +174,7 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
   const cs = 880 / (columns - 1);
   for (let i = 0; i < columns; i++) {
     const x = 60 + i * cs;
-    const r = 47;
+    const r = 42;
     begin(215, 1000, x - 52, x + 52);
     F('stone').poly(P([[x - 44, 215], [x + 44, 215], [x + 44, 250], [x - 44, 250]]));
     F('stone').poly(P([[x - r, 250], [x + r, 250], [x + r * 0.9, 960], [x - r * 0.9, 960]]));
@@ -426,10 +426,10 @@ export const Monument: React.FC<MonumentProps> = ({
   // the door opens: warm light in the doorway (one pop), door leaves folded to the sides
   if (doorAt !== undefined && t >= doorAt && st[1].k >= 1 && S.look.fills === 'color') {
     const q = (X: number, Y: number) => M.at(X, Y);
-    const a = q(465, 215);
-    const b = q(535, 215);
-    const c = q(535, 355);
-    const d = q(465, 355);
+    const a = q(477, 215);
+    const b = q(523, 215);
+    const c = q(523, 355);
+    const d = q(477, 355);
     const kk = E.outBack(1.6)(prog(t, doorAt, 0.2));
     const cx = (a[0] + b[0]) / 2;
     const sx = (x: number) => cx + (x - cx) * kk;

@@ -195,9 +195,21 @@ const ShotD: React.FC = () => {
         <Birds at={1.0} from={[1120, 680]} to={[-60, 630]} dur={3.2} n={4} size={14} />
       </Layer>
       <Layer depth={0}>
-        <PerspectiveStreet vp={D_VP} {...D_ST} tod={P} seed="dmain" crowd={22} heights={[330, 430]} poleH={470} poles={900} lightsOn={{at: 1.8, dur: 1.6}} />
-        <TinyCrowd spots={D_QUEUE} tod={P} at={0.2} span={1.7} order="front" walk={0} seed="queue" />
-        <Elephant x={mx} y={my} scale={(0.27 * 170 * mk) / 96} pose="sit-back" t={t} seed={4} look={0.25} />
+        <PerspectiveStreet
+          vp={D_VP}
+          {...D_ST}
+          tod={P}
+          seed="dmain"
+          crowd={22}
+          heights={[330, 430]}
+          poleH={470}
+          poles={900}
+          lightsOn={{at: 1.8, dur: 1.6}}
+          windows={{initial: 0.08, events: [{at: 1.2, dur: 2.8, to: 'on', pattern: 'random', fraction: 0.35}]}}
+        />
+        {/* the queue keeps growing toward the vanishing point while the narrator speaks */}
+        <TinyCrowd spots={D_QUEUE} tod={P} at={0.2} span={3.4} order="front" walk={0} seed="queue" />
+        <ElephantTimeline x={mx} y={my} scale={(0.27 * 170 * mk) / 96} t={t} seed={4} look={0.25} keys={[{t: 0, pose: 'sit-back'}, {t: 3.1, pose: 'sit-back', look: -0.6}]} />
       </Layer>
       <Layer depth={-0.05}>
         <Rise at={0.15} dist={300}>
@@ -245,8 +257,24 @@ const ShotB: React.FC = () => {
         <rect x={-600} y={1890} width={2300} height={900} fill={palette.cream} />
         <path d={`M-600 1890H1700`} stroke={palette.ink} strokeWidth={stroke.ink} />
         <LightShaft from={[1180, 700]} angle={128} length={1700} w0={90} w1={420} beams={2} color={palette.cream} opacity={0.16} sweep={1} at={1.2} />
-        <Monument {...MON} tod={P} light="back" people={26} doorPeople={3} seed="gov" build={{at: -0.45, dur: 3.1}} peopleAt={{at: 0.35, span: 1.6}} emblemY={1690} emblemAt={4.3} emblem={(x, y, r) => <ClockEmblem x={x} y={y} r={r} />} />
-        <TinyCrowd spots={[{x: 160, y: 2010}, {x: 290, y: 2050}, {x: 700, y: 2030}, {x: 845, y: 2080}, {x: 610, y: 2120}, {x: 420, y: 2160}]} horizon={1500} k={0.17} tod={P} at={0.1} span={0.9} walk={0.5} walkDir={-90} seed="plaza" />
+        <Monument
+          {...MON}
+          tod={P}
+          light="back"
+          people={30}
+          doorPeople={3}
+          seed="gov"
+          build={{at: -0.45, dur: 3.1}}
+          // the crowd keeps gathering on the steps all shot long (a counting build), four banners drop on "four",
+          // the door opens on "Nobody", the clock pops in once the crane has carried it under the captions
+          peopleAt={{at: 0.3, span: 4.6}}
+          banners={{at: 1.3, n: 4, stagger: 0.16}}
+          doorAt={3.45}
+          emblemY={1690}
+          emblemAt={4.3}
+          emblem={(x, y, r) => <ClockEmblem x={x} y={y} r={r} />}
+        />
+        <TinyCrowd spots={[{x: 160, y: 2010}, {x: 290, y: 2050}, {x: 700, y: 2030}, {x: 845, y: 2080}, {x: 610, y: 2120}, {x: 420, y: 2160}, {x: 520, y: 1990}, {x: 980, y: 2040}]} horizon={1500} k={0.17} tod={P} at={0.1} span={3.5} order="random" walk={0.5} walkDir={-90} seed="plaza" />
       </Layer>
       <Layer depth={-0.5}>
         <Balustrade x={40} y={1520} w={230} h={900} side="left" tod={P} rim="right" seed="balB" />
@@ -317,7 +345,7 @@ const ShotC: React.FC = () => {
         {/* LOD: the 24 windows around the hero as close-ups (frame, sill, curtain, room) while they are big */}
         <CloseupRing />
         <OnCell q={hq} h={760}>
-          {(w, h) => <WindowCloseup w={w} h={h} tod={P} offAt={HERO_OFF} seed="hero" person={<Person x={w * 0.3} y={h * 0.93} s={1.25} seed="hero-p" hair="bun" body={palette.teal} />} />}
+          {(w, h) => <WindowCloseup w={w} h={h} tod={P} offAt={HERO_OFF} seed="hero" screenTick={0.4} person={<Person x={w * 0.3} y={h * 0.93} s={1.25} seed="hero-p" hair="bun" body={palette.teal} />} />}
         </OnCell>
         <Rise at={3.75} dist={420}>
           <Ledge y={1540} x0={620} x1={1180} top={24} face={90} tod={P} floor={palette.tealDark} seed="ledgeC" />
@@ -350,7 +378,21 @@ const CloseupRing: React.FC = () => {
         const withPerson = (r * 7 + c * 3) % 3 === 0;
         return (
           <OnCell key={i} q={q} h={760}>
-            {(w, h) => <WindowCloseup w={w} h={h} tod={TOD.night} lit={on} seed={seed} desk={(r + c) % 2 === 0} person={withPerson && on ? <Person x={w * 0.3} y={h * 0.93} s={1.2} seed={`${seed}p`} body={palette.sage} /> : undefined} chair={withPerson} />}
+            {(w, h) => (
+              <WindowCloseup
+                w={w}
+                h={h}
+                tod={TOD.night}
+                lit={on}
+                seed={seed}
+                desk={(r + c) % 2 === 0}
+                screenTick={0.5 + (i % 3) * 0.15}
+                // dark neighbours: someone draws the curtain now and then
+                curtainAt={on ? undefined : 1.0 + ((i * 0.37) % 1) * 2.4}
+                person={withPerson && on ? <Person x={w * 0.3} y={h * 0.93} s={1.2} seed={`${seed}p`} body={palette.sage} /> : undefined}
+                chair={withPerson}
+              />
+            )}
           </OnCell>
         );
       })}

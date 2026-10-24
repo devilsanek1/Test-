@@ -3,15 +3,18 @@
 //   MascotSheet -> character stream
 //   FontTest    -> style-bible stream
 //   CineDemo    -> cinematic-kit stream
+//   SharedKitSheet -> shared-world-kit stream
 // Owners may change their component's body and the durationSeconds below for their own entry only.
 import {KitDemo} from './KitDemo';
 import {MascotSheet} from './MascotSheet';
 import {FontTest} from './FontTest';
 import {CineDemo} from './CineDemo';
+import {SharedKitSheet} from './SharedKitSheet';
 
 export const devCompositions = [
   {id: 'KitDemo', component: KitDemo, durationSeconds: 12},
   {id: 'MascotSheet', component: MascotSheet, durationSeconds: 8},
   {id: 'FontTest', component: FontTest, durationSeconds: 2},
   {id: 'CineDemo', component: CineDemo, durationSeconds: 22},
+  {id: 'SharedKitSheet', component: SharedKitSheet, durationSeconds: 10},
 ];
