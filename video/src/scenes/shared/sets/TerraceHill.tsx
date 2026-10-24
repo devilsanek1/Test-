@@ -30,21 +30,22 @@
 //   TERRACE.rows[k] = {base, top, w, h, s}; terraceDoor(k, j) / TERRACE.house4 / TERRACE.rings / stairPoint(k)
 //   TERRACE_FLAT = {horizon, vp, sun, rows, avenue}   // mode 'flat' anchors
 
-import React from 'react';
+import React, {useId} from 'react';
 import {palette, misreg, skies} from '../../../lib/theme';
 import {useTime} from '../../../lib/time';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
-import {line, rect as sketchRect, Pt} from '../../../lib/sketch';
+import {line, polyPath, rect as sketchRect, Pt} from '../../../lib/sketch';
 import {mat, useXf, XG} from '../../../lib/xf';
 import {rand, rng, Seed} from '../../../lib/rng';
 import {PathBuf, mix} from '../../../lib/cine/util';
 import {atmos} from '../../../lib/cine/atmosphere';
-import {LayerWrap, noWrap, SetPlace} from './common';
+import {GlowDiscs, LayerWrap, noWrap, SetPlace} from './common';
 import {ChromeSlot, CheckFlagSlot, LockProps, PlaqueSlot, TargetRingSlot} from './propSlots';
 import {Lock} from '../props';
 import {FacadeDoor} from './SiteFacade';
 import {Foreground, ForegroundSpec} from './ground';
+import {People, PeopleSpec, WalkerAnchor} from './life';
 
 type Mode = 'hill' | 'flat';
 
@@ -100,9 +101,18 @@ export const TERRACE = {
   sun: {x: 700, y: 720, r: 150},
   /** Rows from here collapse into haze bands. */
   hazeFrom: HAZE_FROM.hill,
-  /** The check flag: pole foot on house #4's cornice; the flag flies between the window and the door of the (tan) house
-   *  above, pole 76, flag 40 wide. */
-  flag: {x: 548, y: 1342, pole: 76, size: 40},
+  /** The check flag: pole foot on house #4's cornice; the flag flies over the (tan) house above, flag 60 wide (the
+   *  storyboard's 60 px legibility floor). */
+  flag: {x: 548, y: 1342, pole: 90, size: 60},
+  /** THE FIXED DOOR's light: two opaque stepped glow rings (SunGlowSteps language) centred on door #4, and a cream path
+   *  strip from the door down the near street. */
+  fixedGlow: {x: 530, y: 1464, r: [62, 46] as [number, number]},
+  /** People layer (life.tsx): two back-view standers on the near street flanking the path, looking up the hill
+   *  (heads in the visible band, feet under the platform UI); clear of house #4 and the row-0 rings. */
+  walkers: [
+    {x: 372, y: 1690, h: 236, go: 'stand', body: palette.teal, hair: 'short', acc: ['scarf']},
+    {x: 700, y: 1660, h: 206, go: 'stand', body: palette.sand, hair: 'bun', acc: ['backpack']},
+  ] as WalkerAnchor[],
   /** 12 "could be hit" target rings (x <= 930), [x, y, r]; index 7 = the dive target (row 7, r7). Drawn by
    *  <TerraceRings/> (a scene overlay), not by the set. */
   rings: [
@@ -176,13 +186,13 @@ const INK_ROWS = 6;
 
 // ---------------------------------------------------------------- per-row batched geometry
 
-type RowChunk = {facades: string[]; shade: string; screens: string; bars: string; doors: string; plaques: string; locks: string; bits: string; ink: string; detail: string; stairs: string; stairInk: string};
+type RowChunk = {facades: string[]; shade: string; screens: string; bars: string; barDots: string; doors: string; plaques: string; locks: string; bits: string; ink: string; detail: string; stairs: string; stairInk: string};
 
 const COLORS = [palette.cream, palette.sand, palette.tan, palette.mintPale];
 const f2 = (n: number) => n.toFixed(2);
 
 function rowChunks(mode: Mode, R: TerraceRow, half: [number, number], ext: [number, number], seed: string): {core: RowChunk; left: RowChunk; right: RowChunk} {
-  const mk = () => ({pb: COLORS.map(() => new PathBuf(2)), shade: new PathBuf(2), screens: new PathBuf(2), bars: new PathBuf(2), doors: new PathBuf(2), plaques: new PathBuf(2), locks: new PathBuf(2), bits: new PathBuf(2), ink: '', detail: '', stairs: new PathBuf(2), stairInk: ''});
+  const mk = () => ({pb: COLORS.map(() => new PathBuf(2)), shade: new PathBuf(2), screens: new PathBuf(2), bars: new PathBuf(2), barDots: new PathBuf(2), doors: new PathBuf(2), plaques: new PathBuf(2), locks: new PathBuf(2), bits: new PathBuf(2), ink: '', detail: '', stairs: new PathBuf(2), stairInk: ''});
   const parts = {core: mk(), left: mk(), right: mk()};
   const u = R.w / 90;
   const k = R.k;
@@ -225,6 +235,8 @@ function rowChunks(mode: Mode, R: TerraceRow, half: [number, number], ext: [numb
     if (k <= 6) {
       P.screens.rect(x + 17.5 * u, R.top + 39.5 * u, 55 * u, 25.5 * u);
       P.bars.rect(x + 17.5 * u, R.top + 30 * u, 55 * u, 9.5 * u);
+      // rows 0-1: the three cream dots on the bar (the bar alone does not say "browser" on a phone)
+      if (k <= 1) for (let d = 0; d < 3; d++) P.barDots.circle(x + (22.5 + d * 6) * u, R.top + 34.75 * u, 2.2 * u);
     } else P.screens.rect(x + 17.5 * u, R.top + 30 * u, 55 * u, 35 * u);
     P.doors.rect(x + 32.5 * u, R.top + 97.5 * u, 30 * u, 50 * u);
     // dots never under 3 px at rest (no sub-pixel noise)
@@ -254,7 +266,7 @@ function rowChunks(mode: Mode, R: TerraceRow, half: [number, number], ext: [numb
       }
     }
   }
-  const fin = (p: ReturnType<typeof mk>): RowChunk => ({facades: p.pb.map((b) => b.d), shade: p.shade.d, screens: p.screens.d, bars: p.bars.d, doors: p.doors.d, plaques: p.plaques.d, locks: p.locks.d, bits: p.bits.d, ink: p.ink, detail: p.detail, stairs: p.stairs.d, stairInk: p.stairInk});
+  const fin = (p: ReturnType<typeof mk>): RowChunk => ({facades: p.pb.map((b) => b.d), shade: p.shade.d, screens: p.screens.d, bars: p.bars.d, barDots: p.barDots.d, doors: p.doors.d, plaques: p.plaques.d, locks: p.locks.d, bits: p.bits.d, ink: p.ink, detail: p.detail, stairs: p.stairs.d, stairInk: p.stairInk});
   return {core: fin(parts.core), left: fin(parts.left), right: fin(parts.right)};
 }
 
@@ -361,6 +373,7 @@ const RowNode: React.FC<{mode: Mode; k: number; zoom: number; reveal: number; ex
           {c.stairs ? <Fill d={c.stairs} color={wall} offset={false} mode="snap" seed={`${seed}/st${k}/${i}`} /> : null}
           {c.screens ? <Fill d={c.screens} color={palette.cream} offset={false} mode="snap" seed={`${seed}/s${k}/${i}`} /> : null}
           {c.bars ? <Fill d={c.bars} color={palette.tealDark} offset={false} mode="snap" seed={`${seed}/b${k}/${i}`} /> : null}
+          {c.barDots ? <Fill d={c.barDots} color={palette.cream} offset={false} mode="snap" seed={`${seed}/bd${k}/${i}`} /> : null}
           {c.doors ? <Fill d={c.doors} color={door} offset={false} mode="snap" seed={`${seed}/d${k}/${i}`} /> : null}
           {plaques && c.plaques ? <Fill d={c.plaques} color={palette.sand} offset={false} mode="snap" seed={`${seed}/p${k}/${i}`} /> : null}
           {c.locks ? <Fill d={c.locks} color={palette.sand} offset={false} mode="snap" seed={`${seed}/l${k}/${i}`} /> : null}
@@ -391,12 +404,6 @@ const BandNode: React.FC<{band: Band; reveal: number; extended: boolean; plaques
   return revealXf(reveal, band.bottom, inner);
 };
 
-/** The fixed door's colour accent: a stepped sage glow arch (sage, then mintPale) around door #4 + a sage door. */
-function glowArch(x: number, y: number, w: number, bottom: number): string {
-  const r = w / 2;
-  return `M${x} ${bottom}V${y + r}A${r} ${r} 0 0 1 ${x + w} ${y + r}V${bottom}Z`;
-}
-
 export type TerraceHillProps = {
   mode?: Mode;
   /** Rows appear as their top passes below this SCREEN y (the caption floor, 570) — a 14 px spatial pop. Omit = all. */
@@ -420,6 +427,8 @@ export type TerraceHillProps = {
   /** Foreground framing on the near street (ground.tsx presets, world coords: it slides out of frame during the pull-back
    *  zoom). Default none: S10's bollard + kerb are screen-space scene props. */
   foreground?: ForegroundSpec;
+  /** Back-view standers on TERRACE.walkers (life.tsx). Default on in 'hill', off in 'flat'; false = nobody. */
+  people?: PeopleSpec;
   sun?: React.ReactNode;
   wrap?: LayerWrap;
   x?: number;
@@ -431,13 +440,14 @@ export type TerraceHillProps = {
   seed?: Seed;
 };
 
-export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFloor, plaqueWaveAt, bitWaveAt, waveStep = 0.06, extendAt, flagAt, fixedAt, house4Lock = {}, hazeFrom, foreground, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'terr'}) => {
+export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFloor, plaqueWaveAt, bitWaveAt, waveStep = 0.06, extendAt, flagAt, fixedAt, house4Lock = {}, hazeFrom, foreground, people, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'terr'}) => {
   const t = useTime();
   const m = useXf();
   const zoom = Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2])) * scale || 1;
   const rows = rowsOf(mode);
   const haze = Math.min(rows.length, hazeFrom ?? HAZE_FROM[mode]);
   const sd = String(seed);
+  const glowClip = 'tg' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const screenY = (wy: number) => m[1] * 540 + m[3] * (wy * scale + y) + m[5];
   const revealOf = (top: number) => (revealFloor === undefined ? 1 : Math.max(0, Math.min(1, (screenY(top) - revealFloor) / 14 + 1)));
   const plaquesAt = (k: number) => plaqueWaveAt === undefined || t >= plaqueWaveAt + k * waveStep;
@@ -467,13 +477,17 @@ export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFl
   const F = TERRACE.flag;
   const house4 = (
     <>
+      <defs>
+        <clipPath id={glowClip} clipPathUnits="userSpaceOnUse">
+          <rect x={-2000} y={-3000} width={5000} height={3000 + r0.base} />
+        </clipPath>
+      </defs>
       <Fill rect={H4.facade} color={palette.sand} offset={[misreg.dx / zoom, misreg.dy / zoom]} seed={`${sd}/h4f`} />
       <Fill rect={[H4.facade[0], H4.facade[1], H4.facade[2] * 0.22, H4.facade[3]]} color={palette.tan} offset={false} seed={`${sd}/h4s`} />
       {fixed ? (
-        <>
-          <Fill d={glowArch(498, 1406, 64, r0.base)} color={palette.sage} offset={false} mode="snap" seed={`${sd}/h4g1`} />
-          <Fill d={glowArch(507, 1420, 46, r0.base)} color={palette.mintPale} offset={false} mode="snap" seed={`${sd}/h4g2`} />
-        </>
+        <g clipPath={`url(#${glowClip})`}>
+          <GlowDiscs cx={TERRACE.fixedGlow.x} cy={TERRACE.fixedGlow.y} steps={[[TERRACE.fixedGlow.r[0], palette.cream], [TERRACE.fixedGlow.r[1], palette.peach]]} />
+        </g>
       ) : null}
       <Ink d={line(H4.facade[0], H4.facade[1], H4.facade[0] + H4.facade[2], H4.facade[1], {seed: `${sd}/h4c`, over: [5, 3], breaks: false}) + line(H4.facade[0], H4.facade[1], H4.facade[0], r0.base, {seed: `${sd}/h4l`, over: [0, 1], breaks: false}) + line(H4.facade[0] + H4.facade[2], H4.facade[1], H4.facade[0] + H4.facade[2], r0.base, {seed: `${sd}/h4r`, over: [0, 1], breaks: false})} width={w0} taper={false} vary={0} />
       <ChromeSlot x={H4.window[0]} y={H4.window[1]} w={H4.window[2]} h={H4.window[3]} width={wd} seed={`${sd}/h4w`} />
@@ -490,6 +504,7 @@ export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFl
       <Fill rect={[-700, r0.base, 2480, 10]} color={palette.sand} offset={false} mode="snap" seed={`${sd}/kerbF`} />
       <Ink d={line(-700, r0.base + 10, 1780, r0.base + 10, {seed: `${sd}/k1`, over: 0}) + line(-40, r0.base + 34, 1120, r0.base + 35, {seed: `${sd}/k2`, over: 0})} width={Math.max(0.85, 3.4 / zoom)} taper={false} vary={0} seed={`${sd}/kerb`} />
       <Ink d={STREET_SPECKS} width={Math.max(0.6, 2.2 / zoom)} taper={false} vary={0} seed={`${sd}/specks`} />
+      {fixed && mode === 'hill' ? <Fill d={FIXED_PATH} color={palette.cream} offset={false} mode="snap" seed={`${sd}/fpath`} /> : null}
     </>
   );
   const ground =
@@ -512,10 +527,14 @@ export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFl
         </>,
       )}
       {wrap('house4', 0.6, house4)}
+      {wrap('people', 0.95, <People anchors={TERRACE.walkers} vp={[540, 1440]} spec={people} def={mode === 'hill'} seed={`${sd}/ppl`} />)}
       {foreground ? wrap('foreground', 1.0, <Foreground spec={foreground} seed={`${sd}/fg`} />) : null}
     </SetPlace>
   );
 };
+
+/** The cream path strip from the fixed door down the near street (hill mode). */
+const FIXED_PATH = polyPath([[516, 1500], [544, 1500], [612, 2080], [448, 2080]]);
 
 /** Flat mode: the avenue roads (cream wedges from the near row's base to the VP), seen through the gaps and streets. */
 const AVENUES = (() => {

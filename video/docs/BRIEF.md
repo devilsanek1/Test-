@@ -157,3 +157,9 @@ across transitions); the mascot crosses every transition; target at least 5 visu
 - `docs/*.md`: the stream named in each file.
 - `audio/**`: the sound stream.
 Never delete or rewrite another lane's files. If you need a toolkit change, write the request in your final report.
+
+## VOICEOVER v3 STATUS (latest)
+The user recorded `assets/vo_v3_draft_take.wav` (54.56 s, ElevenLabs eleven_v4, WAV 48 kHz) from the 18:33 PRE-CHECK draft
+of the new script, not the final `docs/script/final_script_elevenlabs.txt`. A re-record of the final text has been
+requested. Until it arrives, this take is a stand-in for timing/animatics only; the final script remains the reference for
+the storyboard's word anchors.

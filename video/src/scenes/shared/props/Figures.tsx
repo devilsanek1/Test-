@@ -1,5 +1,6 @@
-// props/Figures.tsx — back-view figure PRESETS (P11) built on the kit <Person> (and cine tinyFigure for specks); Keeper and
-// Caretaker are drawn by BackBody (a hair-colour head with the cap on top, a visible neck, a collar).
+// props/Figures.tsx — back-view figure PRESETS (P11) built on the kit <Person> (and cine tinyFigure for specks); Keeper,
+// Caretaker and the Ghost are drawn by BackBody, and every cap wearer (incl. EdgeOnlooker hair="cap") gets BackHead: a cap
+// with a strap notch showing hair, a smooth nape, a sand neck, a straight collar band (review 5: no face read on a phone).
 // People are always seen from behind. Anchors are the FEET (x, y on the ground) and `h` = total height in world px,
 // except EdgeOnlooker (head centre + head diameter; the coat always runs off the frame bottom).
 //
@@ -11,7 +12,7 @@
 //   <Keeper x={480} y={1450} h={300} reachAt={48.5} holding={<NewLockIcon/>} installAt={49.0} />
 //   <Caretaker x={670} y={1380} h={225} raiseKeysAt={68.2} jingleAt={69.0} glintAt={69.3} />
 //   <Attempter x={300} y={1290} h={30} mode="tap" tapAt={[37.1, 37.6]} />  <AttemptStipple spots=[...] />
-//   <Ghost x={500} y={1420} h={180} at={18.2} />                                         // ink-only (S04)
+//   <Ghost x={500} y={1420} h={180} at={18.2} walk={{hz: 1.4}} />                       // ink-only line art (S04)
 // Common anims: riseAt (rises its own height from behind its feet line, out(exp) 0.33 s), walk (steps in place; move
 // x / y yourself or pass walk.to), bob (idle px), raisePhoneAt / raiseAt (an arm swings up, 0.3 s).
 
@@ -626,11 +627,10 @@ type BackBodyProps = {
   bun?: boolean;
 };
 
-/** A back-view figure built here instead of the kit Person when it wears a cap (style bible 6, closeup_board_people):
- *  the head circle IS the hair colour with sand ears at mid-height, the cap sits ON TOP (crown over the top ~45 %, the
- *  band line just above the middle with the small strap arch on it, a button), a sand neck block shows under the head,
- *  a coat collar band with its collar line sits on the shoulders. No skin-coloured crown and no dark crescent low on the head, so it never reads as
- *  a face (review 4). Person-local units: hip line at 0, the same w / h / hr / round as personGeo (arms, belts fit). */
+/** A back-view figure built here instead of the kit Person (style bible 6, closeup_board_people): legs, a tombstone
+ *  torso, a straight CollarBand and a BackHead (cap or bare hair, smooth nape, visible sand neck), so a cap wearer never
+ *  reads as a face (reviews 4 + 5). Under <Look fills="none"> with `at` it is the Ghost's line art. Person-local units:
+ *  hip line at 0, the same w / h / hr / round as personGeo (arms, belts fit). */
 const BackBody: React.FC<BackBodyProps> = ({g, seed, coat, legs, shoes = palette.tealDark, hair = palette.brown, cap, W, walk, detail = true, at, strands, bun}) => {
   const T = (dt: number) => (at === undefined ? undefined : at + dt);
   const t = useTime();

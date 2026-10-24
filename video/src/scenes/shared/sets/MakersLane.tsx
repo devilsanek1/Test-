@@ -200,9 +200,9 @@ export const MAKERS_LANE = {
   /** People layer (life.tsx): two passers walking up the lane to the sun, one stander in the left row's shade
    *  (heights (feet - 1040) / 1.1); clear of the Workshop door and the messenger's line (feet y 1520). */
   walkers: [
-    {x: 474, y: 1252, h: 192, go: 'vp', body: palette.teal, hair: 'short', acc: ['backpack']},
-    {x: 372, y: 1338, h: 270, go: 'vp', body: palette.sage, hair: 'bun'},
-    {x: 150, y: 1418, h: 340, go: 'stand', body: palette.tealDark, hair: 'curly', acc: ['scarf']},
+    {x: 512, y: 1250, h: 190, go: 'vp', body: palette.teal, hair: 'short', acc: ['backpack']},
+    {x: 360, y: 1340, h: 272, go: 'vp', body: palette.sage, hair: 'bun'},
+    {x: 150, y: 1418, h: 340, go: 'stand', body: palette.sand, hair: 'curly', acc: ['scarf']},
   ] as WalkerAnchor[],
   /** The makers' cart parked on the lane (props MakersCart) and a bike by the left row. */
   furniture: [
@@ -234,8 +234,8 @@ const G = (() => {
   let bandsTan = '';
   const bands: [number, number, number, number][] = [
     // [x at the frame bottom, half width there, start y, end y]
-    [470, 74, 1190, 2060],
-    [1060, 120, 1620, 2060],
+    [470, 78, 1300, 2060],
+    [1080, 120, 1700, 2060],
   ];
   for (const [xb, hw, y0, y1] of bands) bandsTan += polyPath([[rayAt(xb - hw * 0.35, y0), y0], [rayAt(xb + hw * 0.35, y0), y0], [rayAt(xb + hw, y1), y1], [rayAt(xb - hw, y1), y1]]);
   // a cream kerb strip along the left row's foot (the doorsteps' edge), thinning with distance
@@ -247,11 +247,12 @@ const G = (() => {
   const kx = (y: number) => VP[0] + ((W.x0 - VP[0]) * (y - VP[1])) / (W.base - VP[1]);
   const kerbTop = polyPath([[W.x0 - 2, W.base], [1240, W.base], [1240, W.base + 40], [kx(W.base + 40), W.base + 40]]);
   const kerbFace = polyPath([[kx(W.base + 40), W.base + 40], [1240, W.base + 40], [1240, W.base + 58], [kx(W.base + 40), W.base + 58]]);
-  const pave = polyPath([[kx(W.base + 58), W.base + 58], [1240, W.base + 58], [1240, 1660], [kx(1660), 1660]]);
-  const paveFace = polyPath([[kx(1660), 1660], [1240, 1660], [1240, 1676], [kx(1660), 1676]]);
+  const pave = polyPath([[kx(W.base + 58), W.base + 58], [1240, W.base + 58], [1240, 1646], [kx(1646), 1646]]);
+  const paveFace = polyPath([[kx(1646), 1646], [1240, 1646], [1240, 1660], [kx(1646), 1660]]);
+  const paveFace2 = polyPath([[kx(1660), 1660], [1240, 1660], [1240, 1676], [kx(1660), 1676]]);
   const kerbInk =
     line(kx(W.base + 40), W.base + 40, 900, W.base + 40, {seed: `${s}/k1`, over: [2, 0], breaks: false}) + line(924, W.base + 40, 1240, W.base + 41, {seed: `${s}/k2`, over: 0, breaks: false}) + line(kx(W.base + 40), W.base + 58, 1240, W.base + 60, {seed: `${s}/k3`, over: [3, 0]}) + line(W.x0, W.base, kx(W.base + 40), W.base + 40, {seed: `${s}/k4`, over: [0, 0], breaks: false}) + line(kx(W.base + 40), W.base + 40, kx(W.base + 40), W.base + 58, {seed: `${s}/k5`, over: [0, 2], breaks: false}) +
-    line(kx(W.base + 58), W.base + 58, kx(1660), 1660, {seed: `${s}/k6`, over: [0, 0], breaks: false}) + line(kx(1660), 1660, 1240, 1662, {seed: `${s}/k7`, over: [2, 0]}) + line(kx(1660), 1676, 1240, 1679, {seed: `${s}/k8`, over: [2, 0]});
+    line(kx(W.base + 58), W.base + 58, kx(1660), 1660, {seed: `${s}/k6`, over: [0, 0], breaks: false}) + line(kx(1646), 1646, 1240, 1648, {seed: `${s}/k7`, over: [2, 0]}) + line(kx(1660), 1676, 1240, 1679, {seed: `${s}/k8`, over: [2, 0]});
   // cobble dashes (short, sparse), denser near
   const r = rng(`${s}/cob`);
   let cobbles = '';
@@ -265,7 +266,7 @@ const G = (() => {
   }
   // far rooftop silhouettes across the sun's lower part
   const roofs = polyPath([[250, 1080], [250, 1030], [292, 1030], [292, 1004], [338, 1004], [338, 1022], [380, 1022], [396, 998], [412, 1022], [470, 1022], [470, 1008], [520, 1008], [520, 1030], [575, 1030], [575, 1014], [620, 1014], [620, 1080]]);
-  return {shade, bandsTan, kerbL, kerbLInk, cobbles, roofs, kerbTop, kerbFace, pave, paveFace, kerbInk};
+  return {shade, bandsTan, kerbL, kerbLInk, cobbles, roofs, kerbTop, kerbFace, pave, paveFace, paveFace2, kerbInk};
 })();
 
 export type MakersLaneProps = {
@@ -326,8 +327,10 @@ export const MakersLane: React.FC<MakersLaneProps> = ({sun, curtainsAt, workshop
           {/* the kerb / step plane the workshop sits on, in the lane's perspective */}
           <Fill d={G.kerbTop} color={palette.cream} offset={false} seed={`${seed}/kerbT`} />
           <Fill d={G.kerbFace} color={palette.tan} offset={false} seed={`${seed}/kerbF`} />
-          <Fill d={G.pave} color={palette.cream} offset={false} seed={`${seed}/pave`} />
-          <Fill d={G.paveFace} color={palette.tan} offset={false} seed={`${seed}/paveF`} />
+          {/* the pavement brought forward: sand, with a cream kerb strip (peach at golden) and a tan face */}
+          <Fill d={G.pave} color={palette.sand} offset={false} seed={`${seed}/pave`} />
+          <Fill d={G.paveFace} color={palette.cream} offset={false} seed={`${seed}/paveK`} />
+          <Fill d={G.paveFace2} color={palette.tan} offset={false} seed={`${seed}/paveF`} />
           <Ink d={G.kerbInk} width={SI.mid} seed={`${seed}/kerbI`} />
         </>,
       )}

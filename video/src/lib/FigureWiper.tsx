@@ -3,7 +3,8 @@
 //   - ONE closed, clockwise outline (shoulders + an irregular, slightly peaked hood): nothing cancels under nonzero
 //   - the hood's back seam, its drape on the shoulders as a U whose ink OVERSHOOTS the silhouette, creases, a yoke seam
 //     and sleeve seams (broken strokes), the outline left open in two places on the trailing side
-//   - fills misregistered 4 px from the ink (toward the trailing side, + 4 down)
+//   - fills misregistered 5 px from the ink (toward the leading side, + 5 down: a background sliver inside the trailing
+//     ink, the rim poking past the leading ink)
 //   - the rim: a ~8 px sliver INSIDE the leading outline (the body fill is shifted toward the trailing side inside the
 //     outline's clip, so the rim follows the hood and the shoulder curve, thinning out where the outline turns)
 //   - a walking bob (the same as the passer's)
@@ -53,8 +54,8 @@ function figureGeo(x: number, dir: 'left' | 'right'): FigureGeo {
   const lead = dir === 'right' ? 1 : -1;
   // hood contour, left drape -> over a slightly off-centre peak -> right drape (local x, screen y), hand-jittered
   const hood: Pt[] = [
-    [-300, 752], [-322, 640], [-334, 500], [-321, 362], [-284, 242], [-217, 146], [-128, 88], [-34, 62], [16, 55],
-    [72, 63], [162, 97], [242, 168], [298, 272], [327, 402], [331, 542], [318, 662], [300, 752],
+    [-300, 752], [-318, 646], [-334, 508], [-326, 372], [-292, 252], [-228, 154], [-140, 92], [-48, 62], [14, 40],
+    [66, 58], [150, 90], [236, 158], [296, 262], [330, 396], [336, 540], [322, 664], [302, 752],
   ].map(([a, b], i, all) => (i === 0 || i === all.length - 1 ? [a, b] : [a + r.jitter(5), b + r.jitter(5)])) as Pt[];
   const pts: Pt[] = [[x - 662, 1990], [x - 660, 1110]];
   const quad = (a: Pt, c: Pt, b: Pt, n: number) => {
@@ -97,8 +98,9 @@ function figureGeo(x: number, dir: 'left' | 'right'): FigureGeo {
     `M${r1(x + 266)} ${r1(340)}Q${r1(x + 276)} ${r1(440)} ${r1(x + 258)} ${r1(522)}` +
     `M${r1(x - 222)} ${r1(796)}Q${r1(x - 188)} ${r1(834)} ${r1(x - 146)} ${r1(846)}` +
     `M${r1(x + 172)} ${r1(842)}Q${r1(x + 206)} ${r1(826)} ${r1(x + 232)} ${r1(790)}` +
-    // jacket: a yoke seam across the shoulder blades overshooting the silhouette, sleeve seams, shoulder folds
-    line(x - 646, 1214, x + 640, 1198, {seed: 'fw/yoke', over: [18, 26], breaks: true}) +
+    // jacket: sleeve seams, shoulder folds, two tension creases under the drape
+    `M${r1(x - 96)} ${r1(1010)}Q${r1(x - 40)} ${r1(1060)} ${r1(x - 52)} ${r1(1150)}` +
+    `M${r1(x + 70)} ${r1(1030)}Q${r1(x + 112)} ${r1(1082)} ${r1(x + 98)} ${r1(1176)}` +
     line(x - 472, 1100, x - 452, 1990, {seed: 'fw/sl', over: [0, 0], breaks: true}) +
     line(x + 480, 1096, x + 462, 1990, {seed: 'fw/sr', over: [0, 0], breaks: true}) +
     `M${r1(x - 430)} ${r1(968)}Q${r1(x - 372)} ${r1(1004)} ${r1(x - 318)} ${r1(1072)}` +
@@ -124,12 +126,13 @@ const FigureWiperFC: React.FC<FigureWiperProps> = ({x, p, dir, color = palette.t
           <path d={g.outline} />
         </clipPath>
       </defs>
-      {/* fills 4 px off the ink toward the trailing side (+4 down); inside the outline the body is shifted a further
-          8 px to the trailing side, so the rim shows as a sliver along the LEADING outline only */}
-      <g transform={`translate(${-lead * 4} 4)`}>
+      {/* fills misregistered 5 px toward the LEADING side (+5 down): the rim colour pokes ~2 px past the leading ink, a
+          ~2 px sliver of background shows inside the trailing ink and under the top; inside the outline the body is
+          shifted 16 px back toward the trailing side, so the rim shows as an ~8 px sliver along the leading outline */}
+      <g transform={`translate(${lead * 5} 5)`}>
         <g clipPath={`url(#${id})`}>
           <path d={g.outline} fill={rim} />
-          <path d={g.outline} fill={color} transform={`translate(${-lead * 8} 1)`} />
+          <path d={g.outline} fill={color} transform={`translate(${-lead * 16} 1)`} />
         </g>
       </g>
       <path d={g.outlineInk} fill="none" stroke={palette.ink} strokeWidth={W} strokeLinejoin="round" strokeLinecap="round" />

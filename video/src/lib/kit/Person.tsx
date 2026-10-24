@@ -34,7 +34,7 @@ import {MOTION} from '../spec';
 import {arc, blob, circle, crown, line, rectPath, roundRect, smooth, torso, Pt} from '../sketch';
 import {At, b, inkW, Place} from './common';
 import {mat, XG} from '../xf';
-import {TodAnchor} from '../tod';
+import {Tod, TodAnchor} from '../tod';
 
 export type Hair = 'short' | 'long' | 'bun' | 'cap' | 'beanie' | 'bald' | 'curly';
 export type Acc = 'backpack' | 'headphones' | 'strap' | 'phone' | 'scarf' | 'sign' | 'collar' | 'hood';
@@ -410,7 +410,11 @@ export const Person: React.FC<PersonProps> = (props) => {
     const lw = S.w * 0.31;
     const g = S.w * 0.05;
     const ex = -sg * (g + lw);
-    push(<Fill key="rimLeg" d={rimStrip([ex, 0], [ex, S.legH], rimInset * 0.8, rimW, 0.08, rimTo(0.08, 0.72), -sg)} color={palette.white} at={tm(0.3)} mode={drawMode ? 'snap' : 'none'} offset={false} seed={k('rimLeg')} />);
+    push(
+      <Tod key="rimLeg" role="rim">
+        <Fill d={rimStrip([ex, 0], [ex, S.legH], rimInset * 0.8, rimW, 0.08, rimTo(0.08, 0.72), -sg)} color={palette.white} at={tm(0.3)} mode={drawMode ? 'snap' : 'none'} offset={false} seed={k('rimLeg')} />
+      </Tod>,
+    );
   }
   // sign (behind the head)
   if (P.pole && lod < 2) {
@@ -448,7 +452,12 @@ export const Person: React.FC<PersonProps> = (props) => {
     let d = rimStrip(a, bb, rimInset, rimW, 0.12, rimTo(0.12, 0.67), -sg);
     const armA = Math.min(rimA, seamA);
     if (armA > 0.02) d += rimStrip([-sg * (rg.hw - rg.d), rg.yTop], [-sg * (-rg.xc - rg.d), rg.yCuff], rimInset * 0.7, rimW, 0.18, 0.18 + 0.6 * armA, sg);
-    push(<Fill key="rim" d={d} color={palette.white} at={tm(0.3)} mode={drawMode ? 'snap' : 'none'} offset={false} seed={k('rim')} />);
+    // the rim's own relight row (golden: the low sun lights it peach)
+    push(
+      <Tod key="rim" role="rim">
+        <Fill d={d} color={palette.white} at={tm(0.3)} mode={drawMode ? 'snap' : 'none'} offset={false} seed={k('rim')} />
+      </Tod>,
+    );
   }
   if (inked) push(<Ink key="torso" d={P.torso} at={tm(0)} width={W} seed={k('torso')} />);
   if (seamA > 0.03 && inked) {

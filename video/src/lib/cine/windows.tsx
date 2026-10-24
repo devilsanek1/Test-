@@ -133,7 +133,58 @@ export type WindowFilter = {
   dark?: (i: number) => boolean;
   /** Final say on cell i's state (after the events and `dark`): e.g. a hero window lit until its own off time. */
   override?: (i: number, on: boolean) => boolean;
+  /** Called for every DRAWN cell with its final state, lit colour index, the quad as drawn (pop scale included) and
+   *  whether `dark` forced it off (WallOfWindows adds its room-level LOD shapes here). Quad cells only. */
+  each?: (i: number, on: boolean, ci: number, quad: Quad, forced: boolean) => void;
 };
+
+// ---------------------------------------------------------------- room-level LOD (shared by the grid and close-ups)
+
+/** Level of detail of a window by its GLASS width on screen (px, before the per-cell jitter x 0.9-1.1), shared by
+ *  WallOfWindows grid panes and WindowCloseup, so a close-up and the grid pane next to it look the same at the same
+ *  size: areas MELT over [a, b] (curtain + transom, the floor band), small things drop at one size. Below `glass` a
+ *  window is one flat pane. */
+export const ROOM_LOD = {
+  glass: 42,
+  curtain: [42, 56] as [number, number],
+  floor: [44, 62] as [number, number],
+  lamp: 56,
+  desk: 64,
+  chair: 72,
+  person: 80,
+  frame: [64, 84] as [number, number],
+} as const;
+/** Per-cell jitter (0..1) -> the factor every LOD size is multiplied by. */
+export const lodScale = (j: number) => 0.9 + 0.2 * j;
+/** 0..1 of a melting LOD area at glass width W over [a, b]. */
+export const roomMelt = (W: number, r: readonly [number, number]) => Math.max(0, Math.min(1, (W - r[0]) / (r[1] - r[0])));
+/** A window's room look from its seed (the same random sequence WindowCloseup draws with): curtain side and width,
+ *  plant on the sill. */
+export function roomLook(seed: Seed, lit: boolean): {curtainRight: boolean; curtainW: number; plant: boolean} {
+  const rr = rng(`wc/${seed}`);
+  const curtainRight = !lit && rr.chance(0.5);
+  const plant = lit || rr.chance(0.6);
+  const curtainW = lit ? 0.17 : rr.range(0.3, 0.46);
+  return {curtainRight, curtainW, plant};
+}
+/** Room-level shapes in pane units (u right, v down, 0..1): the curtain polygon (drawn from the curtain side), the
+ *  floor band [v0, 1] and the transom bar [v0, v1], each already melted by its k (0 = gone). */
+export function roomShapes(curtainW: number, curtainRight: boolean, kCurtain: number, kFloor: number): {curtain: Pt[] | null; floor: number | null; transom: [number, number] | null} {
+  const cw = curtainW * kCurtain;
+  const k = kCurtain;
+  const pts: Pt[] = [[0, 0], [cw, 0], [cw + 0.012 * k, 0.2], [cw + 0.006 * k, 0.45], [cw - 0.04 * k, 0.72], [0, 0.74]];
+  return {
+    curtain: kCurtain > 0 ? (curtainRight ? pts.map(([u, v]) => [1 - u, v] as Pt) : pts) : null,
+    floor: kFloor > 0 ? 1 - 0.4 * kFloor : null,
+    transom: kCurtain > 0 ? [0.3, 0.3 + 0.0184 * kCurtain] : null,
+  };
+}
+/** Bilinear point of a quad (TL, TR, BR, BL) at pane units (u, v). */
+export function quadAt(q: Quad, u: number, v: number): Pt {
+  const top: Pt = [q[0][0] + (q[1][0] - q[0][0]) * u, q[0][1] + (q[1][1] - q[0][1]) * u];
+  const bot: Pt = [q[3][0] + (q[2][0] - q[3][0]) * u, q[3][1] + (q[2][1] - q[3][1]) * u];
+  return [top[0] + (bot[0] - top[0]) * v, top[1] + (bot[1] - top[1]) * v];
+}
 
 /** Build batched paths for the windows at time t. `times` from switchTimes(). */
 export function windowPaths(cells: WinCell[], events: SwitchEvent[], times: Float64Array[], t: number, look: WindowLook = {}, precision = 1, filter: WindowFilter = {}): WindowPaths {
@@ -163,20 +214,24 @@ export function windowPaths(cells: WinCell[], events: SwitchEvent[], times: Floa
         }
       }
     }
-    if (on && force && force(i)) on = false;
+    const forced = !!(on && force && force(i));
+    if (forced) on = false;
     if (filter.override) on = filter.override(i, on);
     const dt = t - since;
     let s = 1;
     if (on && dt < POP && popK > 0) s = 1 + popK * Math.sin((Math.PI * dt) / POP);
     // one-frame-ish flicker right after switching on (deterministic per window)
     if (on && c.k2 < flick && dt > 0.035 && dt < 0.085) on = false;
+    const ci = Math.min(litCols.length - 1, Math.floor(c.k3 * litCols.length));
     if (!on) {
       if (look.noDark) continue;
       if (c.rect) dark.rect(...c.rect);
-      else if (c.quad) dark.quad(...c.quad);
+      else if (c.quad) {
+        dark.quad(...c.quad);
+        if (filter.each) filter.each(i, false, ci, c.quad, forced || !!(force && force(i)));
+      }
       continue;
     }
-    const ci = Math.min(litCols.length - 1, Math.floor(c.k3 * litCols.length));
     const pb = lit[ci];
     if (c.rect) {
       const [x, y, w, h] = c.rect;
@@ -186,6 +241,7 @@ export function windowPaths(cells: WinCell[], events: SwitchEvent[], times: Floa
     } else if (c.quad) {
       const q = s !== 1 ? scaleQuad(c.quad, s) : c.quad;
       pb.quad(...q);
+      if (filter.each) filter.each(i, true, ci, q, false);
       if (c.k2 > 1 - blinds) {
         const kk = 0.25 + 0.4 * c.k3;
         const [a, b, cc, d] = c.quad;

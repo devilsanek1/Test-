@@ -426,11 +426,17 @@ export type WindowCloseupProps = {
   curtainAt?: number;
   /** The room light flickers off for two frames at these times (on a stressed word). */
   flickerAt?: number[];
-  /** Level of detail (pick it from the glass's SCREEN width; jitter the thresholds per cell so no step lands on every
-   *  cell in one frame): 'full' (>= ~75 px: room, person, desk, lamp, chair, plant, frame band, glints), 'room' (~48-75 px:
-   *  the flat room colour, curtain and transom only), 'glass' (smaller: one flat pane in `litColor` / `darkColor`,
-   *  pixel-identical to a WallOfWindows grid pane, so swapping it for the grid is invisible). Default 'full'. */
+  /** Level of detail, fixed: 'full' (everything), 'room' (the flat room colour, curtain and transom only), 'glass'
+   *  (one flat pane in `litColor` / `darkColor`, pixel-identical to a WallOfWindows grid pane). Default 'full'.
+   *  Prefer `screenW`: the close-up then degrades ITSELF, element by element, as the camera pulls away. */
   detail?: 'full' | 'room' | 'glass';
+  /** The glass's on-screen width (px). Small things drop at staggered sizes (person < 80, chair / plant < 72, desk
+   *  < 64, lamp / glints / ink < 56; x 0.9-1.1 by `lodJitter`), and the big areas MELT instead of popping: the frame band
+   *  (70 -> 50 px), the floor band (62 -> 44), the curtain and transom (56 -> 42) shrink to nothing, so at 'glass'
+   *  (< ~42 px) nothing is left to vanish and the swap to the grid pane is invisible. Overrides `detail`. */
+  screenW?: number;
+  /** 0..1 per cell: jitters the drop sizes (so no step lands on every cell in the same frame). Default 0.5. */
+  lodJitter?: number;
   /** Room colour when lit / unlit (default peach / the tod's tealDark). Pass the grid's pane colours for this cell
    *  (litColors[floor(k3 * n)], windowDark) so a close-up and its grid pane match exactly. */
   litColor?: string;
@@ -449,7 +455,10 @@ export const WindowCloseup: React.FC<WindowCloseupProps> = (props) => (
 
 const ROOM_DARKER: Record<string, string> = {[palette.peach]: palette.tan, [palette.cream]: palette.sand, [palette.white]: palette.mintPale};
 
-const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod, offAt, screenOffAt, seed = 'wc', person, lit: lit0 = true, chair, desk = true, screenTick, onAt, curtainAt, flickerAt, detail = 'full', litColor, darkColor, on: onIn}) => {
+/** 0..1 ramp of a melting LOD element between the screen widths a (gone) and b (whole). */
+const melt = (W: number, a: number, b: number) => Math.max(0, Math.min(1, (W - a) / (b - a)));
+
+const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod, offAt, screenOffAt, seed = 'wc', person, lit: lit0 = true, chair, desk = true, screenTick, onAt, curtainAt, flickerAt, detail = 'full', litColor, darkColor, on: onIn, screenW, lodJitter = 0.5}) => {
   const t = useTime();
   const p = useTodPal(tod);
   const flick = (flickerAt ?? []).some((f) => t >= f && t < f + 0.07);
@@ -458,9 +467,18 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod,
   const scrOn = lit && t < (screenOffAt ?? (offAt === undefined ? Infinity : offAt + 0.35));
   const litC = litColor ?? palette.peach;
   const darkC = darkColor ?? ambient(palette.tealDark, p);
-  if (detail === 'glass') return <rect x={0} y={0} width={w} height={h} fill={on ? litC : darkC} />;
-  const full = detail === 'full';
-  const showChair = chair ?? !!person;
+  // level of detail: from the screen width (element by element, melting the big areas), or a fixed level
+  const jf = 0.9 + 0.2 * lodJitter;
+  const W = screenW !== undefined ? screenW / jf : detail === 'full' ? 1e6 : detail === 'room' ? 56 : 0;
+  if (W < 42) return <rect x={0} y={0} width={w} height={h} fill={on ? litC : darkC} />;
+  const full = W >= 56; // lamp, glints, ink
+  const deskOn = W >= 64;
+  const chairOn = W >= 72;
+  const personOn = W >= 80;
+  const kFrame = melt(W, 50, 70);
+  const kFloor = melt(W, 44, 62);
+  const kCurtain = melt(W, 42, 56);
+  const showChair = (chair ?? !!person) && chairOn;
   const rr = rng(`wc/${seed}`);
   const curtainRight = !lit && rr.chance(0.5);
   const plantOn = lit || rr.chance(0.6);
@@ -470,12 +488,15 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod,
   const lampX = w * 0.64;
   const deskY = h * 0.6;
   const mon = {x: w * 0.47, y: h * 0.42, w: w * 0.36, h: h * 0.15};
-  // an unlit window keeps the cool night values (frame sage, curtain teal): captions can sit on it
+  // an unlit window keeps the cool night values and stays close to its grid pane: the room IS the pane colour, the
+  // curtain one step lighter (tealDark on the darker panes), the frame band sage; captions can sit on it
   const frameC = on || lit ? palette.cream : palette.sage;
+  const curtainDark = darkC === ambient(palette.tealDark, p) || darkC === palette.tealDark ? palette.teal : ambient(palette.tealDark, p);
   const ink = rect(-fr, -fr, w + fr * 2, h + fr * 2, {seed: `${seed}/o`, over: 'medium'}) + rect(0, 0, w, h, {seed: `${seed}/i`, over: 'small'}) + hline(-fr - 30, w + fr + 30, h + fr + 14, {seed: `${seed}/s`, over: [20, 30]}) + hline(-fr - 24, w + fr + 24, h + fr + 30, {seed: `${seed}/s2`, over: [10, 20]});
   const tr = hline(0, w, h * 0.3, {seed: `${seed}/tr`, over: [2, 4]}) + hline(0, w, h * 0.3 + 14, {seed: `${seed}/tr2`, over: [2, 4]});
-  const curtainW = curtainAt !== undefined && t >= curtainAt ? 0.86 : lit ? 0.17 : rr.range(0.3, 0.46);
-  const curtain = `M0 0L${w * curtainW} 0Q${w * (curtainW + 0.03)} ${h * 0.4} ${w * (curtainW - 0.04)} ${h * 0.72}L0 ${h * 0.74}Z`;
+  const curtainW = (curtainAt !== undefined && t >= curtainAt ? 0.86 : lit ? 0.17 : rr.range(0.3, 0.46)) * kCurtain;
+  const curtain = `M0 0L${w * curtainW} 0Q${w * (curtainW + 0.03 * kCurtain)} ${h * 0.4} ${w * (curtainW - 0.04 * kCurtain)} ${h * 0.72}L0 ${h * 0.74}Z`;
+  const fr2 = fr * kFrame;
   const chairX = w * 0.3;
   const chairW = w * 0.3;
   const chairY = h * 0.8;
@@ -500,15 +521,15 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod,
   const plant = crown(w * 0.8, h + fr - 46, 38, 30, {seed: `${seed}/pl`, bumps: 7});
   return (
     <>
-      {/* frame band + interior */}
-      {full ? <rect x={-fr} y={-fr} width={w + fr * 2} height={h + fr * 2} fill={frameC} /> : null}
+      {/* frame band + interior (the band and the floor melt away with the screen size) */}
+      {fr2 > 0.5 ? <rect x={-fr2} y={-fr2} width={w + fr2 * 2} height={h + fr2 * 2} fill={frameC} /> : null}
       <rect x={0} y={0} width={w} height={h} fill={room} />
-      {full ? <rect x={0} y={deskY} width={w} height={h - deskY} fill={roomDark} /> : null}
+      {kFloor > 0 ? <rect x={0} y={h - (h - deskY) * kFloor} width={w} height={(h - deskY) * kFloor} fill={roomDark} /> : null}
       {on && full ? <Glow cx={lampX} cy={h * 0.21} r={30} rings={3} spread={2.6} color={palette.cream} opacity={0.32} /> : null}
       {full ? <path d={`M${lampX} 0L${lampX} ${h * 0.14}`} stroke={palette.ink} strokeWidth={2.2} /> : null}
       {full ? <path d={lamp} fill={on ? palette.cream : ambient(palette.teal, p)} /> : null}
       {/* desk + monitor (the website) */}
-      {desk && full ? (
+      {desk && deskOn ? (
         <>
           <rect x={w * 0.22} y={deskY - 8} width={w * 0.78} height={16} fill={on ? palette.brown : palette.teal} />
           <rect x={mon.x} y={mon.y} width={mon.w} height={mon.h} fill={palette.ink} />
@@ -527,22 +548,22 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod,
         </>
       ) : null}
       {/* the person (back view) on a chair seen from behind (ref 2 f_33: white back + ink) */}
-      {full ? person : null}
-      {showChair && full ? (
+      {personOn ? person : null}
+      {showChair ? (
         <>
           <path d={chairFill} fill={on ? palette.cream : palette.sage} transform="translate(3 2)" />
           <path d={chairInk} fill="none" stroke={palette.ink} strokeWidth={stroke.ink} strokeLinecap="round" />
         </>
       ) : null}
       {/* curtain, transom bar, plant, glints */}
-      <path d={curtain} fill={on ? palette.sand : lit ? ambient(palette.tan, p) : palette.teal} transform={curtainRight ? `translate(${w + 2} 2) scale(-1 1)` : 'translate(2 2)'} />
+      {kCurtain > 0 ? <path d={curtain} fill={on ? palette.sand : lit ? ambient(palette.tan, p) : curtainDark} transform={curtainRight ? `translate(${w + 2} 2) scale(-1 1)` : 'translate(2 2)'} /> : null}
       {full ? <path d={`M${w * 0.06} 6Q${w * 0.08} ${h * 0.4} ${w * 0.05} ${h * 0.7}M${w * 0.11} 6Q${w * 0.14} ${h * 0.4} ${w * 0.09} ${h * 0.71}`} fill="none" stroke={palette.ink} strokeWidth={2} strokeLinecap="round" /> : null}
-      <rect x={0} y={h * 0.3} width={w} height={14} fill={frameC} />
-      {plantOn && full ? <rect x={w * 0.68} y={h + fr - 44} width={58} height={44} fill={on ? palette.brown : palette.tealDark} /> : null}
-      {plantOn && full ? <path d={plant} fill={on ? palette.sage : palette.teal} transform="translate(3 2)" /> : null}
-      {plantOn && full ? <Ink d={plant} width={stroke.ink} exit={false} /> : null}
+      {kCurtain > 0 ? <rect x={0} y={h * 0.3} width={w} height={14 * kCurtain} fill={on || lit ? frameC : curtainDark} /> : null}
+      {plantOn && chairOn ? <rect x={w * 0.68} y={h + fr - 44} width={58} height={44} fill={on ? palette.brown : palette.tealDark} /> : null}
+      {plantOn && chairOn ? <path d={plant} fill={on ? palette.sage : palette.teal} transform="translate(3 2)" /> : null}
+      {plantOn && chairOn ? <Ink d={plant} width={stroke.ink} exit={false} /> : null}
       {full ? <path d={glint(w * 0.12, h * 0.26, 70, {seed: `${seed}/g`})} stroke={on ? palette.white : ambient(palette.sage, p)} strokeWidth={4} strokeLinecap="round" /> : null}
-      {full ? <Ink d={ink + tr} width={stroke.ink} exit={false} /> : null}
+      {deskOn ? <Ink d={ink + tr} width={stroke.ink} exit={false} /> : null}
     </>
   );
 };

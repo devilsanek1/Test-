@@ -42,6 +42,7 @@ import {
   camFull,
   camPath,
   camSpeed,
+  camSpeedAt,
   CineCamera,
   CineCameraProps,
   CineFrame,
@@ -57,6 +58,7 @@ import {
   layerScale,
   Ledge,
   LightShaft,
+  LensFigure,
   LitWindows,
   mix,
   Monument,
@@ -122,11 +124,12 @@ const T_C = [CUT_BC.at, 22] as const;
 const HZ = 1010;
 const A_ANCHOR = {anchor: [600, 1000] as Pt, anchorDepth: 0.85};
 /** The hook: open tilted UP on the sun and the colossal tower's crown, tilt down 640 px onto the observer (CAM.reveal:
- *  a 2.5 s crane-down, peak ~12 px / frame), while a slow push anchored on the far city keeps going. */
+ *  a 2.5 s crane-down, peak ~12 px / frame), while a slow push anchored on the far city keeps going. The last key sits
+ *  1.5 s PAST the shot's end, so the push is still moving at the wipe midpoint (no stall at the seam, gate 1). */
 const A_KEYS: CamKey[] = [
   {t: 0, tilt: 640, push: 0, ...A_ANCHOR},
   {t: 2.5, tilt: 0, push: 0.05, ...A_ANCHOR, ease: CAM.reveal},
-  {t: 6.1, tilt: 0, push: 0.12, zoom: 1.03, ...A_ANCHOR},
+  {t: 7.6, tilt: 0, push: 0.15, zoom: 1.04, ...A_ANCHOR},
 ];
 const A_SUN = {x: 640, y0: 860, y1: 1000, r: 300};
 const A_ROWS = cityRows({horizon: HZ, nearY: 1600, rows: 6});
@@ -230,11 +233,9 @@ const ShotA: React.FC = () => {
         <ElephantTimeline x={720} y={1706} scale={0.95} t={t} seed={3} look={0.3} keys={[{t: 0, pose: 'sit-back'}, {t: 1.85, pose: 'sit-front', expression: 'happy'}, {t: 2.9, pose: 'sit-back'}, {t: 4.3, pose: 'sit-back', look: -0.5}]} />
       </Layer>
       <Layer depth={-0.25}>
-        {/* the observer: a back-view silhouette against the sun (Arcane panel 1), a peach rim sliver on the sun side,
-            shoulders to waist, cut by the bottom edge */}
-        <Rimmed color={palette.peach} dx={6} dy={-4} silhouette={deep.teal78}>
-          <Person x={280} y={2000} s={3.5} seed="vista-fig" hair="short" body={palette.teal} hairColor={palette.ink} acc={['strap']} idle={1.6} ink={0} />
-        </Rimmed>
+        {/* the observer: a back-view silhouette against the sun (Arcane panel 1): hair clumps, one ear, the right shoulder
+            dropped, a peach rim sliver on the sun side, cut by the bottom edge; he turns his head on "hit" */}
+        <LensFigure x={282} y={1586} r={82} hair="short" turn={0.45} turns={[{t: 4.35, to: 0.15}]} lean={1} crop={2010} light="right" seed="vista-fig" />
       </Layer>
     </Cam>
   );
@@ -255,6 +256,12 @@ const D_QUEUE = Array.from({length: 15}, (_, i) => {
   return {x, y, h: 170 * k};
 });
 const D_SUN_START = {x: 602, y: 1003, r: 309}; // where A's sun is on screen at A's last frame
+/** D's dolly push, one long sine move whose ends lie OUTSIDE the shot (first key 1.5 s before it, last key 1.35 s
+ *  after it): the camera is already moving when the column uncovers D and still moving when the passer covers it. */
+const D_KEYS: CamKey[] = [
+  {t: -1.5, push: 0, anchor: D_VP, anchorDepth: 0.95},
+  {t: 6.0, push: 0.12, anchor: D_VP, anchorDepth: 0.95, ease: CAM.slow},
+];
 
 /** A small kerbside mailbox (reference 2 f_1): post, box, flag. x, y = foot, s = scale. */
 const Mailbox: React.FC<{x: number; y: number; s: number; flagAt?: number}> = ({x, y, s, flagAt}) => {
@@ -303,7 +310,7 @@ const ShotD: React.FC = () => {
   const [hx, hy, hk] = dP(D_HERO.x, 0, D_HERO.z);
   const [mx, my, mk] = dP(4, 0, 196); // the mascot at their feet, between the first two in the queue
   return (
-    <Cam keys={[{t: 0, push: 0, anchor: D_VP, anchorDepth: 0.95}, {t: 4.65, push: 0.09, anchor: D_VP, anchorDepth: 0.95, ease: CAM.slow}]} handheld={0.8} seed="D">
+    <Cam keys={D_KEYS} handheld={0.8} seed="D">
       <Layer depth={1}>
         <Sky tod={P} horizon={D_VP[1]} />
         <SkyCloud x={330} y={175} w={200} tod={P} drift={5} seed="dc" at={0.5} />
@@ -367,9 +374,11 @@ const ClockEmblem: React.FC<{x: number; y: number; r: number}> = ({x, y, r}) => 
 const MON = {cx: 540, by: 1820, bw: 1950, ty: -260, taper: 0.52};
 /** The plaza: its horizon (behind the building) and camera, so the crowd and the paving share one perspective. */
 const PLAZA = {vp: [540, 1712] as Pt, camH: 400, f: 900};
+/** The crane runs from 0.9 s before the shot to 1.15 s after it (y 1120 at the cut, ~940 at the end), so it is under
+ *  way when the passer uncovers B and still rising when the column covers it. */
 const B_KEYS: CamKey[] = [
-  {t: 0, y: 1120, zoom: 1.04, rot: -0.5},
-  {t: 6.0, y: 960, zoom: 1, rot: 0, ease: CAM.reveal},
+  {t: -0.9, y: 1124, zoom: 1.045, rot: -0.55},
+  {t: 7.6, y: 931, zoom: 0.995, rot: 0.05, ease: CAM.reveal},
 ];
 const D_SUN_END = {x: D_VP[0], y: D_VP[1] - 22 + 9.5 * (T_D[1] - T_D[0] - 0.5)};
 
@@ -432,10 +441,9 @@ const ShotB: React.FC = () => {
       <Layer depth={-0.5}>
         <Balustrade x={40} y={1560} w={230} h={900} side="left" tod={P} rim="right" seed="balB" />
         <ElephantTimeline x={155} y={1564} scale={1.1} t={t} seed={5} look={0.5} keys={[{t: 0, pose: 'sit-back'}, {t: 3.6, pose: 'sit-back', look: -0.3}]} />
-        {/* at the lens, backlit: head and shoulders only, in the bottom corner (the sun is behind the monument) */}
-        <Rimmed color={palette.peach} dx={6} dy={-5} silhouette={deep.teal78}>
-          <Person x={880} y={2330} s={4.4} seed="b-near" hair="cap" body={palette.teal} idle={1} ink={0} />
-        </Rimmed>
+        {/* at the lens, backlit: head and shoulders only, in the bottom corner (the sun is behind the monument); a cap
+            with its brim on the turned side, the left shoulder dropped; looks up at the door on "Nobody" */}
+        <LensFigure x={884} y={1800} r={102} hair="cap" turn={-0.45} turns={[{t: 3.4, to: -0.15}]} lean={-1} crop={2330} light="right" seed="b-near" />
       </Layer>
     </Cam>
   );
@@ -464,8 +472,8 @@ const LOD_ABOVE = 1.15;
 /** 8x -> 1.3x over 5.3 s (CAM.reveal cruise <= 20 px / frame anywhere on screen), the hero kept framed at (440, 1110)
  *  and >= 40 px tall; the wall's top edge leaves a wedge of night sky top right. */
 const C_KEYS: CamKey[] = [
-  {t: 0, zoom: 4, push: 0.5, anchor: HC, anchorTo: [540, 1090]},
-  {t: 0.3, zoom: 4, push: 0.5, anchor: HC, anchorTo: [540, 1090]},
+  // the pull-back starts 0.6 s before the cut: C enters already moving (no hold at the seam), 8.1x at the cut
+  {t: -0.6, zoom: 4.15, push: 0.5, anchor: HC, anchorTo: [540, 1090]},
   {t: 5.6, zoom: 1.3, push: 0, anchor: HC, anchorTo: [440, 1110], ease: CAM.reveal},
 ];
 const C_HANDHELD = 0.6;
@@ -544,8 +552,6 @@ const OnCell: React.FC<{q: Quad; h: number; children: (w: number, h: number) => 
   return <XG m={affineFromTri([0, 0, w, h], q[0], q[1], q[3])}>{children(w, h)}</XG>;
 };
 
-/** Close-up level of detail from the glass's on-screen width (jittered per cell, so steps never land in one frame). */
-const detailFor = (px: number, j: number): 'full' | 'room' | 'glass' => (px >= 74 * (0.9 + 0.2 * j) ? 'full' : px >= 48 * (0.9 + 0.2 * j) ? 'room' : 'glass');
 const heroOverride = (row: number, col: number, t: number, on: boolean) => (row === HERO[0] && col === HERO[1] ? t < HERO_OFF : on);
 
 const ShotC: React.FC = () => {
@@ -617,7 +623,8 @@ const CloseupRing: React.FC = () => {
         const j = hero ? 0.5 : ((r * 7 + c * 13) % 10) / 10;
         // behind the caption words: flat dark glass only (no frame / curtain / room ink through the glyphs)
         const underWords = !hero && !!darkFrom && darkFrom[r * COLS + c] <= t;
-        const detail = underWords ? 'glass' : detailFor(HERO_GLASS * z, j);
+        // the close-up degrades itself from its OWN glass width on screen (staggered drops, melting areas)
+        const gw = Math.hypot(project(cam, 0, q[1])[0] - a[0], project(cam, 0, q[1])[1] - a[1]);
         const lit = P.windowLit[Math.min(P.windowLit.length - 1, Math.floor(st.k3 * P.windowLit.length))];
         const seed = hero ? 'hero' : `nb${r}/${c}`;
         const withPerson = hero || (r * 7 + c * 3) % 3 === 0;
@@ -631,7 +638,8 @@ const CloseupRing: React.FC = () => {
                 on={st.on}
                 lit={st.on}
                 seed={seed}
-                detail={detail}
+                screenW={underWords ? 0 : gw}
+                lodJitter={j}
                 litColor={lit}
                 darkColor={P.windowDark}
                 desk={hero || (r + c) % 2 === 0}
@@ -764,15 +772,53 @@ const WipesCheck: React.FC = () => {
   );
 };
 
+/** The lens figures (backlit back views at the lens): every hair, both leans, in colour against the sun and in the
+ *  paper Look (line art). None may read as a round "user" icon: irregular skull, one ear, a dropped shoulder. */
+const LensCheck: React.FC = () => {
+  const hairs = ['short', 'bun', 'cap', 'hood', 'long'] as const;
+  return (
+    <>
+      <rect x={0} y={0} width={1080} height={1920} fill={TOD.golden.sky} />
+      <circle cx={540} cy={560} r={330} fill={palette.sun} />
+      <rect x={0} y={940} width={1080} height={980} fill={palette.sand} />
+      {hairs.map((h, i) => (
+        <LensFigure key={h} x={130 + i * 205} y={480 + (i % 2) * 60} r={64} hair={h} turn={i % 2 ? -0.5 : 0.5} lean={i % 2 ? -1 : 1} crop={940} light={i < 2 ? 'right' : 'left'} seed={`lc${i}`} />
+      ))}
+      <Look fills="paper">
+        {hairs.map((h, i) => (
+          <LensFigure key={h} x={130 + i * 205} y={1360 + (i % 2) * 60} r={64} hair={h} turn={i % 2 ? -0.5 : 0.5} lean={i % 2 ? -1 : 1} crop={1900} seed={`lc${i}`} />
+        ))}
+      </Look>
+    </>
+  );
+};
+
 /** Camera speed report (camSpeed over every shot, all layer depths in use): max on-screen px / frame and when.
  *  Flat inked art strobes above ~15-20 px / frame. */
 const SHOT_CAMS: {name: string; keys: CamKey[]; t1: number; depths: number[]; handheld: number; seed: string}[] = [
   {name: 'A vista (tilt + push)', keys: A_KEYS, t1: T_A[1] - T_A[0], depths: [1, 0.84, 0.6, 0.37, -0.15, -0.25], handheld: 1.2, seed: 'A'},
-  {name: 'D street (dolly push)', keys: [{t: 0, push: 0, anchor: D_VP, anchorDepth: 0.95}, {t: 4.65, push: 0.09, anchor: D_VP, anchorDepth: 0.95, ease: CAM.slow}], t1: T_D[1] - T_D[0], depths: [1, 0, -0.05, -0.6], handheld: 0.8, seed: 'D'},
+  {name: 'D street (dolly push)', keys: D_KEYS, t1: T_D[1] - T_D[0], depths: [1, 0, -0.05, -0.6], handheld: 0.8, seed: 'D'},
   {name: 'B monument (crane)', keys: B_KEYS, t1: T_B[1] - T_B[0], depths: [0.92, 0, -0.5], handheld: 0.8, seed: 'B'},
   {name: 'C pull-back (8x -> 1.3x)', keys: C_KEYS, t1: T_C[1] - T_C[0], depths: [1, 0], handheld: C_HANDHELD, seed: 'C'},
 ];
-export const cineSpeedReport = () => SHOT_CAMS.map((s) => ({name: s.name, ...camSpeed(s.keys, {t0: 0, t1: s.t1, depths: s.depths, handheld: s.handheld, seed: s.seed})}));
+/** Wipe midpoints in each shot's local time: the camera must be moving there (in = entering, out = leaving). */
+const SEAMS: [number | null, number | null][] = [
+  [null, CUT_AD.at + CUT_AD.dur / 2 - T_A[0]],
+  [CUT_AD.at + CUT_AD.dur / 2 - T_D[0], CUT_DB.at + CUT_DB.dur / 2 - T_D[0]],
+  [CUT_DB.at + CUT_DB.dur / 2 - T_B[0], CUT_BC.at + CUT_BC.dur / 2 - T_B[0]],
+  [CUT_BC.at + CUT_BC.dur / 2 - T_C[0], null],
+];
+export const cineSpeedReport = () =>
+  SHOT_CAMS.map((s, i) => {
+    const o = {depths: s.depths, handheld: 0, seed: s.seed};
+    const [tin, tout] = SEAMS[i];
+    return {
+      name: s.name,
+      ...camSpeed(s.keys, {t0: 0, t1: s.t1, depths: s.depths, handheld: s.handheld, seed: s.seed}),
+      seamIn: tin === null ? null : camSpeedAt(s.keys, tin, o),
+      seamOut: tout === null ? null : camSpeedAt(s.keys, tout, o),
+    };
+  });
 
 const SpeedCheck: React.FC = () => {
   const rows = cineSpeedReport();
@@ -787,8 +833,8 @@ const SpeedCheck: React.FC = () => {
           <text x={60} y={260 + i * 150} fontSize={38} fill={palette.ink} fontFamily="sans-serif">
             {r.name}
           </text>
-          <text x={60} y={310 + i * 150} fontSize={34} fill={r.max > 20 ? palette.sun : palette.teal} fontFamily="monospace">
-            {`max ${r.max.toFixed(1)} px/f @ ${r.at.toFixed(2)} s (depth ${r.depth}), avg ${r.avg.toFixed(1)}`}
+          <text x={60} y={310 + i * 150} fontSize={25} fill={r.max > 20 ? palette.sun : palette.teal} fontFamily="monospace">
+            {`max ${r.max.toFixed(1)} px/f @ ${r.at.toFixed(2)} s (depth ${r.depth}), avg ${r.avg.toFixed(1)}, max dv ${r.maxDv.toFixed(2)}; seams ${r.seamIn?.toFixed(1) ?? '-'} / ${r.seamOut?.toFixed(1) ?? '-'}`}
           </text>
         </React.Fragment>
       ))}
@@ -828,8 +874,12 @@ const LoopScene: React.FC = () => {
   );
 };
 
-export const CineDemo: React.FC<{mode?: 'demo' | 'street' | 'tower' | 'loop' | 'wipes' | 'speed'; lock?: boolean}> = ({mode = 'demo', lock = false}) =>
-  mode === 'street' ? (
+export const CineDemo: React.FC<{mode?: 'demo' | 'street' | 'tower' | 'loop' | 'wipes' | 'speed' | 'lens' | 'lod'; lock?: boolean}> = ({mode = 'demo', lock = false}) =>
+  mode === 'lens' ? (
+    <CineFrame bg={palette.sky}>
+      <LensCheck />
+    </CineFrame>
+  ) : mode === 'street' ? (
     <CineFrame bg={palette.sky}>
       <StreetCheck />
     </CineFrame>

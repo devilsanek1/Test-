@@ -172,8 +172,9 @@ export const todSky: Record<TodName, string> = {day: skies.day, golden: skies.go
 /** Caption tone that reads on each time of day's sky (ref 2: ink on day and dusk, white once the sky is night). */
 export const todTone: Record<TodName, CaptionTone> = {day: 'dark', golden: 'dark', dusk: 'dark', night: 'light', dawn: 'dark'};
 
-/** Subtree roles with their own relight row: far hills / skyline, clouds, foreground framing (palm fronds). */
-export type TodRole = 'base' | 'far' | 'cloud' | 'framing';
+/** Subtree roles with their own relight row: far hills / skyline, clouds, foreground framing (palm fronds), and the
+ *  one-sided rim strips of figures (Person wraps its rim in <Tod role="rim">). */
+export type TodRole = 'base' | 'far' | 'cloud' | 'framing' | 'rim';
 
 /** Reference 2's night haze step (style_bible_ref2 8: night sky #588077 -> far #4B706B -> tealDark #3E605F). */
 export const nightFar = '#4B706B';
@@ -185,14 +186,15 @@ export const nightFar = '#4B706B';
  *  Read by <Fill> through the <Tod> context (lib/tod.tsx); <World sky> keys with `tod` switch it with the sky wipe. */
 export const todSteps: Record<TodName, Partial<Record<TodRole, Partial<Record<PaletteKey, string>>>>> = {
   day: {},
-  // GOLDEN (same flat day sky): the light fields step one palette step WARMER, nothing gets darker (style_bible_ref2 8
-  // "peach-lit faces"): the pale-green ground / glass / pale facades warm to cream, cream faces catch the low sun as
-  // peach. Whites stay white (still the brightest lit), mid and dark tones, ink, the sun never move. Far rows stay
-  // atmospheric (no peach on the horizon), clouds warm to cream.
+  // GOLDEN (the same flat day sky, style_bible_ref2 8 "same flat sky + peach-lit faces"): the COOLEST light field steps
+  // one palette step warmer (pale-green ground / lawns / glass / pale facades -> cream), clouds warm to cream, and the
+  // figures' lit rim strips catch the low sun as PEACH. Nothing gets darker; whites, cream, mid and dark tones, ink and
+  // the sun never move. Deliberately NOT cream -> peach: whole walkways and walls turned into the accent colour (peach
+  // placards / highlight boxes vanished into peach ground, review 4).
   golden: {
-    base: {mintPale: palette.cream, cream: palette.peach},
-    far: {cream: palette.cream},
-    cloud: {white: palette.cream, mintPale: palette.cream, cream: palette.cream},
+    base: {mintPale: palette.cream},
+    cloud: {white: palette.cream, mintPale: palette.cream},
+    rim: {white: palette.peach},
   },
   dawn: {},
   dusk: {
@@ -228,8 +230,9 @@ export const glow = {
   bulbHaloR: 2.2,
   lamp: palette.peach,
 } as const;
-/** Bulb halo per time of day: a flat disc one step lighter than that sky; null = no visible halo in daylight. */
-export const todBulbHalo: Record<TodName, string | null> = {day: null, golden: null, dawn: null, dusk: palette.sky, night: glow.bulbHalo};
+/** Bulb halo per time of day: a flat disc one SMALL step lighter than that sky (ref 2 measured it at night only: at
+ *  dusk the bulbs pop peach with no halo, and no palette colour is a subtle step above the sage dusk sky); null = none. */
+export const todBulbHalo: Record<TodName, string | null> = {day: null, golden: null, dawn: null, dusk: null, night: glow.bulbHalo};
 
 const lum = (hex: string) => {
   const h = hex.replace('#', '');
@@ -268,7 +271,7 @@ const SKY_FACING: Partial<Record<TodRole, PaletteKey[]>> = {base: ['white', 'cre
  *  Also checks the bulb halo against its sky. Returns human-readable problems (empty = OK). */
 export function relightProblems(): string[] {
   const out: string[] = [];
-  const roles: TodRole[] = ['base', 'far', 'cloud', 'framing'];
+  const roles: TodRole[] = ['base', 'far', 'cloud', 'framing'];  // ('rim' strips sit inside figures, not on the sky)
   const distinct = (c: string, sky: string) => contrastHex(c, sky) >= RELIGHT_MIN_STEP || deltaE(c, sky) >= RELIGHT_MIN_DE;
   for (const tod of Object.keys(todSteps) as TodName[]) {
     const sky = todSky[tod];

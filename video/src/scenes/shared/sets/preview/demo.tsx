@@ -2,11 +2,12 @@
 import React from 'react';
 import {World} from '../../../../lib/World';
 import {Sun, PowerSymbol} from '../../../../lib/Sun';
-import {skies} from '../../../../lib/theme';
+import {skies, TodName} from '../../../../lib/theme';
 
-/** A simple S01-like demo: World sky + sun with the bold power glyph behind the set. */
-export const DemoWorld: React.FC<{sky?: string; push?: boolean; children?: React.ReactNode}> = ({sky = skies.day, push, children}) => (
-  <World sky={sky} push={push ? {to: 1.04, dur: 2.2, anchor: [560, 980]} : undefined}>
+/** A simple S01-like demo: World sky + sun with the bold power glyph behind the set. `tod` relights the set the way a
+ *  scene's World does (golden = the day sky + one-step-warmer light fields: mintPale -> cream, cream -> peach). */
+export const DemoWorld: React.FC<{sky?: string; tod?: TodName; push?: boolean; children?: React.ReactNode}> = ({sky, tod, push, children}) => (
+  <World sky={sky ?? (tod ? [{t: -1, tod}] : skies.day)} tod={tod} push={push ? {to: 1.04, dur: 2.2, anchor: [560, 980]} : undefined}>
     {children}
   </World>
 );

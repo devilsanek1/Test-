@@ -30,6 +30,7 @@ import {line, polyPath, rect, rectPath, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {rng, Seed} from '../../../lib/rng';
 import {Glass, glassStep, HALF, LayerWrap, noWrap, SetPlace, SI} from './common';
+import {ChromeSlot, OnlookerSlot} from './propSlots';
 
 export const DOME = {
   horizon: 1000,
@@ -42,15 +43,21 @@ export const DOME = {
   ] as Pt[],
   sun: {x: 700, y: 990, r: 165},
   strip: [90, 260] as [number, number],
-  /** The uncovered strip's nearest doors (rattlers stand here). */
+  /** The uncovered strip's nearest doors (rattlers stand here), just above the parapet's coping. */
   rattlerDoors: [
-    [112, 1478],
-    [158, 1474],
-    [205, 1470],
-    [244, 1466],
+    [112, 1436],
+    [158, 1432],
+    [205, 1430],
+    [244, 1428],
   ] as Pt[],
-  tower: {x0: 160, x1: 220, top: 800, base: 1500, cabin: [145, 800, 90, 60] as [number, number, number, number], light: [190, 830] as Pt, board: [130, 900, 115, 110] as [number, number, number, number]},
-  pip: [560, 1470] as Pt,
+  /** Watchtower: the cabin reads as the figure (a 56 px back-view guard in a 124 x 86 cabin). */
+  tower: {x0: 160, x1: 220, top: 790, base: 1500, cabin: [128, 772, 124, 86] as [number, number, number, number], light: [190, 800] as Pt, board: [130, 900, 115, 110] as [number, number, number, number]},
+  /** The near PARAPET we stand behind (the only rooftop vista): coping top y at x (sloping 1452 -> 1440), face to 1600. */
+  parapet: {top: [1452, 1440] as [number, number], coping: 22, face: 1600},
+  /** Pip's perch on the coping (feet), left of the chimney stack. */
+  pip: [500, 1448] as Pt,
+  /** A back-view observer behind the parapet, looking out at the dome (EdgeOnlooker head centre / diameter). */
+  observer: {head: [872, 1372] as Pt, size: 104},
   /** Stipple crowd zone (scene). */
   stipple: [60, 1050, 1060, 1500] as [number, number, number, number],
   rows: [
@@ -80,7 +87,8 @@ export function tallyGatePath(x: number, y: number, size: number, n = 5): string
 
 // ---------------------------------------------------------------- the city rows (batched geometry, module level)
 
-type RowGeo = {fills: {color: string; d: string}[]; ink: string; dots: string[]; bw: string; bars: string; back: {color: string; d: string}};
+type R4 = [number, number, number, number];
+type RowGeo = {fills: {color: string; d: string}[]; ink: string; dots: string[]; bw: string; bars: string; back: {color: string; d: string}; chrome: R4[]};
 
 const ROWS: RowGeo[] = (() => {
   const out: RowGeo[] = [];
@@ -100,7 +108,11 @@ const ROWS: RowGeo[] = (() => {
     const dots = ['', '', '', ''];
     let bw = '';
     let bars = '';
+    const chrome: R4[] = [];
     const s = [0.22, 0.38, 0.62, 1][ri];
+    // up to 4 buildings per row (rows 2-3) carry a REAL browser window (>= 60 px wide: dots + pill read on a phone),
+    // spread across the frame (one per x quarter)
+    const chromeQ = new Set<number>();
     let x = -260;
     while (x < 1340) {
       const w = r.range(60, 150) * s;
@@ -111,19 +123,41 @@ const ROWS: RowGeo[] = (() => {
       if (ri >= 2 && roof < 0.22) d += polyPath([[x - 2, top], [x + w / 2, top - w * 0.35], [x + w + 2, top]]);
       if (ri >= 2 && roof > 0.82) d += rectPath(x + w * 0.2, top - 16 * s, w * 0.6, 17 * s);
       byColor[ci] += d;
-      // window dots (rows 1-3) in 4 x-chunks (they pop in a wave / switch peach)
+      // a real browser window on this building? (rows 2-3, wide enough, one per x quarter, inside the frame)
+      const q4 = Math.floor(((x + w / 2) / 1080) * 4);
+      const cw = Math.min(w * 0.74, ri === 2 ? 74 : 112);
+      const wantChrome = ri >= 2 && cw >= 60 && x + w / 2 > 60 && x + w / 2 < 1020 && q4 >= 0 && q4 <= 3 && !chromeQ.has(q4) && r.chance(0.7);
+      let cr: R4 | null = null;
+      if (wantChrome) {
+        chromeQ.add(q4);
+        cr = [x + (w - cw) / 2, top + (row.base - top) * 0.14, cw, cw * 0.62];
+        chrome.push(cr);
+      }
+      // window dots (rows 1-3) in 4 x-chunks (they pop in a wave / switch peach): a JITTERED grid (style bible 7):
+      // seeded drop-outs (whole columns and single panes), 40-70 % partial fills (top or bottom), size / position jitter
       if (ri >= 1) {
         const ws = ri === 1 ? 4 : ri === 2 ? 6 : 9;
         const step = ws * 2.2;
-        for (let yy = top + ws * 1.4; yy < row.base - ws * 1.6; yy += step * 1.15)
-          for (let xx = x + ws; xx < x + w - ws * 1.2; xx += step)
-            if (r.chance(0.55)) {
-              const chunk = Math.max(0, Math.min(3, Math.floor(((xx + 260) / 1600) * 4)));
-              dots[chunk] += rectPath(xx, yy, ws, ws * 1.25);
-            }
+        const deadCol = r.int(0, 5);
+        let col = 0;
+        for (let xx = x + ws; xx < x + w - ws * 1.2; xx += step, col++) {
+          if (col === deadCol && w > step * 3) continue;
+          for (let yy = top + ws * 1.4; yy < row.base - ws * 1.6; yy += step * 1.15) {
+            if (cr && xx + ws > cr[0] - 3 && xx < cr[0] + cr[2] + 3 && yy + ws * 1.25 > cr[1] - 3 && yy < cr[1] + cr[3] + 3) continue;
+            if (!r.chance(0.55)) continue;
+            const chunk = Math.max(0, Math.min(3, Math.floor(((xx + 260) / 1600) * 4)));
+            const ww = ws * r.range(0.8, 1.15);
+            const hh = ws * 1.25 * r.range(0.85, 1.15);
+            const jx = xx + r.jitter(ws * 0.12);
+            if (ri >= 2 && r.chance(0.3)) {
+              const k = r.range(0.4, 0.7);
+              dots[chunk] += rectPath(jx, r.chance(0.5) ? yy : yy + hh * (1 - k), ww, hh * k);
+            } else dots[chunk] += rectPath(jx, yy, ww, hh);
+          }
+        }
       }
-      // tiny browser windows (rows 2-3): a cream screen with a dark bar
-      if (ri >= 2 && w > 40 * s && r.chance(0.6)) {
+      // tiny browser windows (rows 2-3): a cream screen with a dark bar (the far LOD of the real ones)
+      if (ri >= 2 && !cr && w > 40 * s && r.chance(0.5)) {
         const bwW = w * 0.5;
         const bwH = bwW * 0.55;
         const bx = x + w * 0.25;
@@ -152,7 +186,7 @@ const ROWS: RowGeo[] = (() => {
     // buildings below the first skyline
     const prevBase = ri === 0 ? row.top[1] : DOME.rows[ri - 1].base;
     const back = {color: ri === 0 ? palettes[0][0] : palettes[ri - 1][0], d: rectPath(-260, prevBase - 1, 1600, row.base - prevBase + 1)};
-    out.push({fills: cols.map((c, i) => ({color: c, d: byColor[i]})), ink, dots, bw, bars, back});
+    out.push({fills: cols.map((c, i) => ({color: c, d: byColor[i]})), ink, dots, bw, bars, back, chrome});
   });
   return out;
 })();
@@ -211,17 +245,38 @@ const G = (() => {
   const cabinInk = rect(cx, cy, cw, ch, {seed: `${s}/cab`, over: 'small'}) + line(cx - 10, cy, cx + cw / 2, cy - 22, {seed: `${s}/cr1`, over: [2, 0]}) + line(cx + cw / 2, cy - 22, cx + cw + 10, cy, {seed: `${s}/cr2`, over: [0, 2]}) + line(cx + 6, cy + ch * 0.62, cx + cw - 6, cy + ch * 0.62, {seed: `${s}/sill`, over: 0});
   const [bx, by, bw, bh] = T.board;
   const boardInk = rect(bx, by, bw, bh, {seed: `${s}/bd`, over: 'small'});
-  // foreground roof ledge with chimney pots and an antenna
-  const ledge = polyPath([[-160, 1490], [1240, 1476], [1240, 2080], [-160, 2080]]);
-  const ledgeShade = polyPath([[-160, 1520], [1240, 1508], [1240, 1548], [-160, 1560]]);
-  const pots = rectPath(510, 1470, 100, 40) + rectPath(840, 1424, 70, 60);
-  const potTops = rectPath(526, 1432, 22, 40) + rectPath(572, 1440, 22, 32) + rectPath(856, 1396, 18, 30);
-  const potBands = rectPath(510, 1470, 100, 9) + rectPath(840, 1424, 70, 9);
-  const ledgeInk = line(-160, 1490, 1240, 1476, {seed: `${s}/lg`, over: 0}) + line(-160, 1520, 1240, 1508, {seed: `${s}/lg2`, over: 0}) + rect(510, 1470, 100, 40, {seed: `${s}/ch1`, over: 'small', edges: 'tlr'}) + rect(526, 1432, 22, 40, {seed: `${s}/ch2`, over: 'small', edges: 'tlr'}) + rect(572, 1440, 22, 32, {seed: `${s}/ch3`, over: 'small', edges: 'tlr'}) + rect(840, 1424, 70, 60, {seed: `${s}/ch4`, over: 'small', edges: 'tlr'}) + rect(856, 1396, 18, 30, {seed: `${s}/ch5`, over: 'small', edges: 'tlr'});
-  const antenna = line(980, 1478, 980, 1330, {seed: `${s}/an`, over: 0}) + line(950, 1360, 1010, 1360, {seed: `${s}/an1`, over: [2, 2]}) + line(958, 1390, 1002, 1390, {seed: `${s}/an2`, over: [2, 2]}) + line(940, 1338, 1020, 1338, {seed: `${s}/an3`, over: [2, 2]});
-  let tiles = '';
-  for (let i = 0; i < 9; i++) tiles += line(-140 + i * 160, 1600 + (i % 2) * 40, -40 + i * 160, 1600 + (i % 2) * 40, {seed: `${s}/ti${i}`, over: 0});
-  return {potTops, potBands, leftHalf, rightHalf, interior, rim, lattice, glints, footprint, hill, lat, cabin, cabinRoof, cabinInk, boardInk, ledge, ledgeShade, pots, ledgeInk, antenna, tiles};
+  // the near PARAPET we stand behind (review 5: a real rooftop, not a road): a cream coping strip (peach at golden) with
+  // doubled coping lines that overshoot both frame edges, a tan front face with a few joints, cut by both frame edges;
+  // below it our own roof deck (sand) with the parapet's teal shadow band. A chimney stack with two pots and the
+  // antenna stand ON the coping at near scale.
+  const P = DOME.parapet;
+  const yTop = (x: number) => P.top[0] + ((P.top[1] - P.top[0]) * (x + 160)) / 1400;
+  const coping = polyPath([[-160, yTop(-160)], [1240, yTop(1240)], [1240, yTop(1240) + P.coping], [-160, yTop(-160) + P.coping]]);
+  const face = polyPath([[-160, yTop(-160) + P.coping], [1240, yTop(1240) + P.coping], [1240, P.face], [-160, P.face + 6]]);
+  const deck = polyPath([[-160, P.face + 6], [1240, P.face], [1240, 2080], [-160, 2080]]);
+  const deckShade = polyPath([[-160, P.face + 6], [1240, P.face], [1240, P.face + 46], [-160, P.face + 58]]);
+  let joints = '';
+  for (let i = 0; i < 9; i++) {
+    const jx = -100 + i * 150 + (i % 3) * 14;
+    joints += line(jx, yTop(jx) + P.coping + 10, jx + 1, P.face - 6, {seed: `${s}/jt${i}`, over: 0, breaks: false});
+  }
+  joints += line(-160, yTop(-160) + P.coping + 62, 1240, yTop(1240) + P.coping + 60, {seed: `${s}/jh`, over: 0});
+  const ledgeInk =
+    line(-160, yTop(-160) - 1, 1240, yTop(1240) - 1, {seed: `${s}/cp1`, over: [40, 40]}) +
+    line(-160, yTop(-160) + 7, 1240, yTop(1240) + 7, {seed: `${s}/cp2`, over: [26, 50]}) +
+    line(-160, yTop(-160) + P.coping, 1240, yTop(1240) + P.coping, {seed: `${s}/cp3`, over: [30, 30]}) +
+    line(-160, P.face + 6, 1240, P.face, {seed: `${s}/fb`, over: 0});
+  // chimney stack (x 690-800) with two pots, on the coping
+  const cs = {x0: 590, x1: 690, top: 1336};
+  const pots = rectPath(cs.x0, cs.top, cs.x1 - cs.x0, yTop(cs.x0) - cs.top + 2);
+  const potTops = rectPath(cs.x0 + 14, 1294, 24, 44) + rectPath(cs.x0 + 58, 1306, 24, 32);
+  const potBands = rectPath(cs.x0 - 6, cs.top, cs.x1 - cs.x0 + 12, 12);
+  const chimInk = rect(cs.x0, cs.top, cs.x1 - cs.x0, yTop(cs.x0) - cs.top, {seed: `${s}/ch1`, over: 'small', edges: 'tlr'}) + line(cs.x0 - 8, cs.top, cs.x1 + 8, cs.top, {seed: `${s}/ch1t`, over: [4, 4]}) + rect(cs.x0 + 14, 1294, 24, 44, {seed: `${s}/ch2`, over: 'small', edges: 'tlr'}) + rect(cs.x0 + 58, 1306, 24, 32, {seed: `${s}/ch3`, over: 'small', edges: 'tlr'}) + line(cs.x0 + 8, 1380, cs.x0 + 30, 1380, {seed: `${s}/chb`, over: 0}) + line(cs.x1 - 40, 1406, cs.x1 - 12, 1406, {seed: `${s}/chb2`, over: 0});
+  const antenna = line(990, yTop(990), 990, 1236, {seed: `${s}/an`, over: 0}) + line(956, 1280, 1024, 1280, {seed: `${s}/an1`, over: [2, 2]}) + line(964, 1318, 1016, 1318, {seed: `${s}/an2`, over: [2, 2]}) + line(944, 1250, 1036, 1250, {seed: `${s}/an3`, over: [2, 2]}) + line(990, 1350, 1030, yTop(1030), {seed: `${s}/an4`, over: 0});
+  const ledge = coping;
+  const ledgeShade = deckShade;
+  const tiles = joints;
+  return {potTops, potBands, leftHalf, rightHalf, interior, rim, lattice, glints, footprint, hill, lat, cabin, cabinRoof, cabinInk, boardInk, ledge, ledgeShade, pots, ledgeInk, antenna, tiles, face, deck, chimInk};
 })();
 
 // ---------------------------------------------------------------- pieces
@@ -242,6 +297,11 @@ const RowNode: React.FC<{ri: number; inkW: number; dotsAt?: number; duskAt?: num
       {R.bw ? <Fill d={R.bw} color={duskAt !== undefined && t >= duskAt + ri * 0.18 ? palette.peach : palette.cream} offset={false} mode="snap" seed={`${seed}/r${ri}bw`} /> : null}
       {R.bars ? <Fill d={R.bars} color={palette.tealDark} offset={false} mode="snap" seed={`${seed}/r${ri}bar`} /> : null}
       {inkW > 0 && R.ink ? <Ink d={R.ink} width={inkW} taper={false} seed={`${seed}/r${ri}i`} /> : null}
+      {R.chrome.map((c, i) =>
+        dotsAt !== undefined && t < dotsAt + ri * 0.05 + i * 0.04 ? null : (
+          <ChromeSlot key={`c${i}`} x={c[0]} y={c[1]} w={c[2]} h={c[3]} offAt={undefined} width={ri === 3 ? SI.far : SI.hair} seed={`${seed}/r${ri}c${i}`} />
+        ),
+      )}
     </>
   );
 };
@@ -267,9 +327,15 @@ const Searchlight: React.FC<{at?: number; angle?: number | ((t: number) => numbe
   );
 };
 
-/** The watchtower guard, back view, 34 px tall in the cabin window: tealDark coat shoulders under the sill, an ochre head
- *  and a teal peaked cap (the brim points away from us), ink 2.2. */
-const Guard: React.FC<{x: number; sill: number; seed: string}> = ({x, sill, seed}) => {
+/** The watchtower guard, back view, 56 px tall in the cabin window (review 5: >= 55 px, the cabin reads as the figure):
+ *  tealDark coat shoulders under the sill, a brown head and a teal peaked cap (the brim points away from us). Drawn at
+ *  the 34 px design and scaled x1.65 about the sill. */
+const Guard: React.FC<{x: number; sill: number; seed: string}> = ({x, sill, seed}) => (
+  <XG m={mat.about(mat.scale(1.65), x, sill)}>
+    <GuardBody x={x} sill={sill} seed={seed} />
+  </XG>
+);
+const GuardBody: React.FC<{x: number; sill: number; seed: string}> = ({x, sill, seed}) => {
   const hy = sill - 17;
   const shoulders = `M${x - 19} ${sill + 2}L${x - 19} ${sill - 4}Q${x - 18} ${sill - 11} ${x - 8} ${sill - 11}L${x + 8} ${sill - 11}Q${x + 18} ${sill - 11} ${x + 19} ${sill - 4}L${x + 19} ${sill + 2}Z`;
   const head = `M${x - 8.5} ${hy}a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0Z`;
@@ -281,7 +347,7 @@ const Guard: React.FC<{x: number; sill: number; seed: string}> = ({x, sill, seed
       <Fill d={head} color={palette.brown} seed={`${seed}/h`} />
       <Fill d={cap} color={palette.teal} seed={`${seed}/cap`} />
       <Fill d={band} color={palette.tealDark} offset={false} seed={`${seed}/b`} />
-      <Ink d={`M${x - 19} ${sill}L${x - 19} ${sill - 4}Q${x - 18} ${sill - 11} ${x - 8} ${sill - 11}M${x + 8} ${sill - 11}Q${x + 18} ${sill - 11} ${x + 19} ${sill - 4}L${x + 19} ${sill}` + `M${x - 8.5} ${hy + 1}A8.5 8.5 0 0 0 ${x + 8.5} ${hy + 1}` + `M${x - 10.5} ${hy - 1}Q${x - 10} ${hy - 13} ${x} ${hy - 13}Q${x + 10} ${hy - 13} ${x + 10.5} ${hy - 1}L${x - 10.5} ${hy - 1}`} width={SI.far} taper={false} vary={0} seed={`${seed}/i`} />
+      <Ink d={`M${x - 19} ${sill}L${x - 19} ${sill - 4}Q${x - 18} ${sill - 11} ${x - 8} ${sill - 11}M${x + 8} ${sill - 11}Q${x + 18} ${sill - 11} ${x + 19} ${sill - 4}L${x + 19} ${sill}` + `M${x - 8.5} ${hy + 1}A8.5 8.5 0 0 0 ${x + 8.5} ${hy + 1}` + `M${x - 10.5} ${hy - 1}Q${x - 10} ${hy - 13} ${x} ${hy - 13}Q${x + 10} ${hy - 13} ${x + 10.5} ${hy - 1}L${x - 10.5} ${hy - 1}` + `M${x - 3} ${sill - 10}L${x - 3} ${sill - 2}`} width={SI.far / 1.65} taper={false} vary={0} seed={`${seed}/i`} />
     </>
   );
 };
@@ -307,7 +373,9 @@ export type DomeCityProps = {
   searchAt?: number;
   searchAngle?: number | ((t: number) => number);
   guard?: boolean;
-  /** Sky colour behind (golden cream by default): the glass interior is one step lighter. */
+  /** The back-view observer behind the parapet (DOME.observer). Default true. */
+  observer?: boolean;
+  /** Sky colour behind (skies.golden by default): the glass interior is one step lighter. */
   sky?: string;
   wrap?: LayerWrap;
   x?: number;
@@ -319,7 +387,7 @@ export type DomeCityProps = {
   seed?: Seed;
 };
 
-export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, glassAt, footprintAt, dotsAt, duskAt, towerAt, searchAt, searchAngle, guard = true, sky = skies.golden, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'dome'}) => {
+export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, glassAt, footprintAt, dotsAt, duskAt, towerAt, searchAt, searchAngle, guard = true, observer = true, sky = skies.golden, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'dome'}) => {
   const t = useTime();
   const clipId = 'dm' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const sd = String(seed);
@@ -397,13 +465,18 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
   );
   const fg = (
     <>
-      <Fill d={G.ledge} color={palette.tan} offset={false} seed={`${sd}/ledge`} />
-      <Fill d={G.ledgeShade} color={palette.tealDark} offset={false} seed={`${sd}/ledgeS`} />
-      <Fill d={G.pots} color={palette.sand} seed={`${sd}/pots`} />
+      <Fill d={G.deck} color={palette.sand} offset={false} seed={`${sd}/deck`} />
+      <Fill d={G.ledgeShade} color={palette.teal} offset={false} seed={`${sd}/deckS`} />
+      <Fill d={G.face} color={palette.tan} offset={false} seed={`${sd}/face`} />
+      <Fill d={G.ledge} color={palette.cream} offset={false} seed={`${sd}/coping`} />
+      <Ink d={G.tiles} width={SI.far} taper={false} seed={`${sd}/joints`} />
+      <Ink d={G.ledgeInk} width={SI.front} seed={`${sd}/ledgeI`} />
+      <Fill d={G.pots} color={palette.brown} seed={`${sd}/pots`} />
       <Fill d={G.potBands} color={palette.tan} offset={false} seed={`${sd}/potb`} />
-      <Fill d={G.potTops} color={palette.cream} seed={`${sd}/pott`} />
-      <Ink d={G.ledgeInk + G.tiles} width={SI.front} seed={`${sd}/ledgeI`} />
+      <Fill d={G.potTops} color={palette.sand} seed={`${sd}/pott`} />
+      <Ink d={G.chimInk} width={SI.front} seed={`${sd}/chimI`} />
       <Ink d={G.antenna} width={SI.mid} color={palette.tealDark} taper={false} seed={`${sd}/ant`} />
+      {observer ? <OnlookerSlot x={DOME.observer.head[0]} y={DOME.observer.head[1]} head={DOME.observer.size} hair="short" body={palette.sage} acc={['scarf']} rim="left" arms="near" seed={`${sd}/obs2`} /> : null}
     </>
   );
   return (

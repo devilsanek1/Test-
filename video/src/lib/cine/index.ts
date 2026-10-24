@@ -11,6 +11,7 @@ export * from './sky';
 export * from './light';
 export * from './windows';
 export * from './figures';
+export * from './lens';
 export * from './city';
 export * from './frame';
 export * from './props';

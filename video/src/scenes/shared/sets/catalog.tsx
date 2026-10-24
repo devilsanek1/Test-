@@ -18,6 +18,10 @@ import {OldQuarter, OLD_QUARTER} from './OldQuarter';
 import {DemoSun, DemoWorld} from './preview/demo';
 import {mat, XG} from '../../../lib/xf';
 import {ease as E, useTime} from '../../../lib/time';
+import {Tod} from '../../../lib/tod';
+
+/** Golden-hour thumbnails: the same relight a scene's World applies (light fields one step warmer). */
+const Golden: React.FC<{children?: React.ReactNode}> = ({children}) => <Tod value="golden">{children}</Tod>;
 
 /** Camera matrix: world point (x, y) at screen centre, zoom z. */
 export const camMat = (x: number, y: number, z: number) => mat.compose(mat.translate(540, 960), mat.scale(z), mat.translate(-x, -y));
@@ -137,14 +141,18 @@ export const SET_CATALOG: SetEntry[] = [
     id: 'lane',
     label: 'MakersLane',
     sky: skies.golden,
-    thumb: () => <MakersLane sun={<DemoSun cx={MAKERS_LANE.sun.x} cy={MAKERS_LANE.sun.y} r={120} />} />,
+    thumb: () => (
+      <Golden>
+        <MakersLane sun={<DemoSun cx={MAKERS_LANE.sun.x} cy={MAKERS_LANE.sun.y} r={120} />} />
+      </Golden>
+    ),
     preview: (v) =>
       v === 'corner' ? (
-        <DemoWorld sky={skies.golden}>
+        <DemoWorld tod="golden">
           <Workshop layout={WORKSHOP_CORNER} blind="down" signSwingAt={0.5} doorOpenAt={2.5} />
         </DemoWorld>
       ) : (
-        <DemoWorld sky={skies.golden}>
+        <DemoWorld tod="golden">
           <MakersLane sun={<DemoSun cx={MAKERS_LANE.sun.x} cy={MAKERS_LANE.sun.y} r={120} />} curtainsAt={0.6} workshop={{glowAt: 1.0, makersAt: 1.0, blindDownAt: 2.4, signSwingAt: 1.6, slotClickAt: 1.9}} />
         </DemoWorld>
       ),
@@ -153,9 +161,13 @@ export const SET_CATALOG: SetEntry[] = [
     id: 'corner',
     label: 'NoticeboardCorner',
     sky: skies.golden,
-    thumb: () => <NoticeboardCorner sun={<DemoSun cx={NOTICE_CORNER.sun.x} cy={NOTICE_CORNER.sun.y} r={110} />} />,
+    thumb: () => (
+      <Golden>
+        <NoticeboardCorner sun={<DemoSun cx={NOTICE_CORNER.sun.x} cy={NOTICE_CORNER.sun.y} r={110} />} />
+      </Golden>
+    ),
     preview: () => (
-      <DemoWorld sky={skies.golden}>
+      <DemoWorld tod="golden">
         <NoticeboardCorner sun={<DemoSun cx={NOTICE_CORNER.sun.x} cy={NOTICE_CORNER.sun.y} r={110} />} board={{riseAt: 0.3, railLightAt: 1.2}} readers={{riseAt: 0.6, phonesAt: 2.0}} workshop={{signSwingAt: 1.0, doorOpenAt: 3.0}} pigeonsFlyAt={3.4} />
       </DemoWorld>
     ),
@@ -165,13 +177,13 @@ export const SET_CATALOG: SetEntry[] = [
     label: 'DomeCity',
     sky: skies.golden,
     thumb: () => (
-      <>
+      <Golden>
         <DomeCity sun={<DemoSun cx={DOME.sun.x} cy={DOME.sun.y} r={165} />} searchAt={-1} />
         <DomeTallies n={12} />
-      </>
+      </Golden>
     ),
     preview: (v) => (
-      <DemoWorld sky={v === 'dusk' ? skies.dusk : skies.golden}>
+      <DemoWorld tod={v === 'dusk' ? 'dusk' : 'golden'}>
         <XG m={v === 'crane' ? camMat(540, 1260, 1.3) : v === 'push' ? camMat(480, 1040, 1.15) : mat.I}>
           <DomeCity sun={<DemoSun cx={DOME.sun.x} cy={DOME.sun.y} r={165} />} domeAt={0.2} towerAt={1.2} searchAt={1.6} dotsAt={0.4} duskAt={v === 'dusk' ? 0 : undefined} />
           <TallyClock />
@@ -218,9 +230,13 @@ export const SET_CATALOG: SetEntry[] = [
     id: 'old',
     label: 'OldQuarter',
     sky: skies.golden,
-    thumb: () => <OldQuarter sun={<DemoSun cx={OLD_QUARTER.sun.x} cy={OLD_QUARTER.sun.y} r={110} />} />,
+    thumb: () => (
+      <Golden>
+        <OldQuarter sun={<DemoSun cx={OLD_QUARTER.sun.x} cy={OLD_QUARTER.sun.y} r={110} />} />
+      </Golden>
+    ),
     preview: (v) => (
-      <DemoWorld sky={skies.golden}>
+      <DemoWorld tod="golden">
         {v === 'unbuild' ? (
           <OldQuarter sun={<DemoSun cx={OLD_QUARTER.sun.x} cy={OLD_QUARTER.sun.y} r={110} />} board={{}} audience outAt={0.5} outDur={0.6} />
         ) : v === 'board' ? (

@@ -10,19 +10,19 @@
 // loops back to frame 0 MID-MOTION (the opening sun rise and colour cascade start at t < 0).
 // Exercises: eyeLevel camera, Crowd `eye` rows + rise rule, Person hero detail, World sky+tod keys and push, Tod roles,
 // TodAnchor relight wave, Plane facades, Festoon, Palm/Fronds/WaterTower/Car, Sun beats/hop/set, Look cascade,
-// Standalone loop, SkyCaptions tone wipe, mascot (ExitShrink, no fades), cine Skyline fed by useTod([x, y]).
+// Standalone loop, SkyCaptions tone wipe, mascot (ExitShrink, no fades), state-aware cine Skyline rows in a TodAnchor.
 // Preview: scripts/sheet.sh KitDemo 0 12 24 out.png
 import React from 'react';
 import {Standalone, ToneKey} from '../lib/Film';
 import {SkyKey, World} from '../lib/World';
 import {Sun} from '../lib/Sun';
-import {exitFillProgress, ExitShrink, Look, useExit, useLook} from '../lib/exit';
+import {ExitShrink, Look} from '../lib/exit';
 import {Ink} from '../lib/Ink';
 import {Fill} from '../lib/Fill';
-import {Tod, useTod} from '../lib/tod';
+import {Tod, TodAnchor, useTod} from '../lib/tod';
 import {eyeLevel, Plane, wallQuad} from '../lib/persp';
 import {palette, stroke, world} from '../lib/theme';
-import {ease as E, lerp, prog, useTime} from '../lib/time';
+import {lerp, prog, useTime} from '../lib/time';
 import {CaptionBeat} from '../lib/Captions';
 import {crown, hline, line, polyPath, smooth, Pt} from '../lib/sketch';
 import {Building, Car, Crowd, Festoon, Fronds, LampPost, Noticeboard, Palm, Paper, Person, Place, Tree, UtilityPole, WaterTower} from '../lib/kit';
@@ -68,36 +68,30 @@ const NIGHT = 8.45;
 
 // ---------------------------------------------------------------- far layers (fill-only, atmospheric)
 
-/** Cine rows inside the core grammar: absent in the paper state, pop in when the colour cascade reaches them,
- *  sink into their base line in the un-build (raw SVG does not read Look / exit by itself). */
-const CineRow: React.FC<{base: number; children?: React.ReactNode}> = ({base, children}) => {
-  const t = useTime();
-  const look = useLook();
-  const e = useExit();
-  if (look.fills !== 'color') return null;
-  if (look.cascade && t < look.cascade.at + 0.04) return null;
-  const d = exitFillProgress(e, 0.4, 0.3);
-  if (d >= 1) return null;
-  const k = 1 - E.inCubic(d);
-  return <g transform={k < 1 ? `translate(0 ${base}) scale(1 ${k.toFixed(4)}) translate(0 ${-base})` : undefined}>{children}</g>;
-};
-
 /** The far city on the horizon (cine Skyline rows), fill-only and close to the sky colour, two clusters framing the
- *  sun. Every top stays below y 600 (the caption band is one flat value). At night: window dots switch on. */
-const FarCity: React.FC = () => {
-  const tod = useTod([560, H - 60]); // flips when the sky edge reaches the city
-  const night = tod === 'night';
+ *  sun. Every top stays below y 600 (the caption band is one flat value). At night: window dots switch on.
+ *  Cine pieces are STATE-AWARE (cine/state.tsx): they un-build (sink into their base, small first) and take the paper /
+ *  cascade Look by themselves, so they are never wrapped in an exit / Look group (that would un-build them twice).
+ *  They read the time of day from the core context (no `tod` prop): the <TodAnchor> at the city's centre makes the
+ *  rows relight when the sky edge reaches THEM (not at the vanishing point). */
+const FarRows: React.FC = () => {
+  const night = useTod() === 'night'; // the anchored value (useTod below the World, never in a scene body)
   const win = {initial: 0, noDark: !night, events: night ? [{at: NIGHT + 0.25, dur: 1.6, to: 'on' as const, pattern: 'random' as const, fraction: 0.45}] : []};
-  const far = {s: 0.17, depth: 0.78, tod, towers: 0, hRange: [380, 760] as [number, number], wRange: [110, 220] as [number, number], colors: [palette.sage, palette.teal], windows: win, rimSide: 'none' as const};
-  const near = {s: 0.22, depth: 0.55, tod, towers: 0, hRange: [140, 330] as [number, number], wRange: [120, 240] as [number, number], colors: [palette.teal, palette.sage, palette.tealDark], windows: win, rimSide: 'none' as const};
+  const far = {s: 0.17, depth: 0.78, towers: 0, hRange: [380, 760] as [number, number], wRange: [110, 220] as [number, number], colors: [palette.sage, palette.teal], windows: win, rimSide: 'none' as const};
+  const near = {s: 0.22, depth: 0.55, towers: 0, hRange: [140, 330] as [number, number], wRange: [120, 240] as [number, number], colors: [palette.teal, palette.sage, palette.tealDark], windows: win, rimSide: 'none' as const};
   return (
-    <CineRow base={H}>
+    <>
       <Skyline base={H + 2} x0={150} x1={470} seed="kdFarL" landmarks={[{x: 380, w: 200, h: 860, kind: 'dome'}]} {...far} />
       <Skyline base={H + 2} x0={660} x1={980} seed="kdFarR" landmarks={[{x: 760, w: 160, h: 900, kind: 'step'}]} {...far} />
       <Skyline base={H + 3} x0={250} x1={880} seed="kdNear" landmarks={[{x: 640, w: 70, h: 720, kind: 'spire'}]} {...near} />
-    </CineRow>
+    </>
   );
 };
+const FarCity: React.FC = () => (
+  <TodAnchor at={[560, H - 60]}>
+    <FarRows />
+  </TodAnchor>
+);
 
 /** Low far hills on the horizon (the far row of the relight table). */
 const FarHills: React.FC = () => {
