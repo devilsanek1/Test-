@@ -31,7 +31,7 @@ def base_art(seed=3):
     hh, ww = im.shape[:2]
     cv2.rectangle(im, (0, int(hh * 0.45)), (ww, hh), (203, 225, 240), -1)
     for k in range(40):                                                   # buildings with windows
-        x = int(rng.uniform(0, ww)); w = int(rng.uniform(60, 220)); h = int(rng.uniform(200, 900))
+        x = int(rng.uniform(0, ww)); w = int(rng.uniform(60, 220)); h = int(rng.uniform(60, 160))   # tops stay below the caption band
         y = int(hh * 0.45)
         col = [(146, 184, 220), (95, 96, 62), (170, 195, 230), (120, 150, 200)][k % 4]
         cv2.rectangle(im, (x, y - h), (x + w, y), col, -1)
@@ -44,7 +44,7 @@ def base_art(seed=3):
         cv2.circle(im, (x, y), r, (30, 40, 60), -1)
         cv2.ellipse(im, (x, y + 3 * r), (int(1.6 * r), int(2.2 * r)), 0, 0, 360, (95, 96, 62), -1)
         cv2.ellipse(im, (x, y + 3 * r), (int(1.6 * r), int(2.2 * r)), 0, 0, 360, (15, 27, 43), 3)
-    cv2.circle(im, (ww // 2, int(hh * 0.42)), 200, (46, 107, 238), -1)  # the sun
+    cv2.circle(im, (ww // 2, hh // 4 + 700), 100, (46, 107, 238), -1)   # the sun, below the caption band
     return im
 
 
@@ -56,7 +56,7 @@ def camera(t, T):
 def frame_from(art, zoom, pan, roll, extra=None):
     hh, ww = art.shape[:2]
     c = (ww / 2, hh / 2)
-    M = cv2.getRotationMatrix2D(c, roll, zoom * 2.0)          # art is 2x oversize relative to the supersampled frame
+    M = cv2.getRotationMatrix2D(c, roll, zoom)                # art is 2x oversize: the camera has room to move
     M[:, 2] += np.array([W * S / 2 - c[0], H * S / 2 - c[1]]) + np.array([pan * S, 0])
     big = cv2.warpAffine(art, M, (W * S, H * S), flags=cv2.INTER_AREA if zoom < 1 else cv2.INTER_LINEAR)
     if extra:
@@ -65,6 +65,7 @@ def frame_from(art, zoom, pan, roll, extra=None):
 
 
 def write(d, frames):
+    shutil.rmtree(d, ignore_errors=True)
     os.makedirs(d, exist_ok=True)
     for i, f in enumerate(frames):
         cv2.imwrite(os.path.join(d, f'f{i:05d}.png'), f)
@@ -85,26 +86,26 @@ def main():
     A = [frame_from(art, *camera(i, 45)) for i in range(N)]
 
     def disc(i):
-        return lambda big: cv2.circle(big, (int((200 + 5 * i) * S), int(1150)), 26 * S // 2 * 2, (60, 60, 200), -1)
+        return lambda big: cv2.circle(big, (int(150 + 14 * i), 1150), 60, (60, 60, 200), -1)   # 14 canvas px/frame
     B = [frame_from(art, *camera(i, 45), extra=disc(i)) for i in range(N)]
     still = frame_from(art, 1.0, 0, 0)
 
     def pipe(i):
         def f(big):
-            L = 40 + 22 * i      # grows ~11 px/frame at 540 wide (~22 canvas px; x 10 px thick = ~1,000 canvas px^2/frame)
-            cv2.line(big, (100 * S, 300 * S), (100 * S + L * S // 2, 300 * S + L * S // 6), (255, 255, 255), 6 * S)
+            L = 40 + 18 * i      # grows 25 canvas px/frame along the diagonal, 40 px thick: ~1,000 px^2 of new pipe per frame
+            cv2.line(big, (60, 820), (60 + L, 820 + L), (255, 255, 255), 40)
         return f
-    Cf = [frame_from(art, 1.0, 0, 0, extra=pipe(i)) for i in range(N)]
+    Cf = [frame_from(art, 1.0, 0, 0, extra=pipe(i)) for i in range(40)]
     Df = [still.copy() for _ in range(N)]
-    Df[20] = frame_from(art, 1.0, 0, 0, extra=lambda big: cv2.rectangle(big, (100 * S, 900 * S), (400 * S, 1300 * S), (0, 0, 255), -1))
+    Df[20] = frame_from(art, 1.0, 0, 0, extra=lambda big: cv2.rectangle(big, (100, 900), (600, 1300), (0, 0, 255), -1))
     Df[40] = np.full_like(still, 240)
     # E: an ink caption on flat sky (frames 0-29), then the same caption over dark busy detail (30-59)
     def cap(big, busy):
         if busy:
             for k in range(0, W * S, 14):
-                cv2.line(big, (k, 330 * S // 1), (k + 60, 560 * S // 1), (60, 70, 50), 6)
+                cv2.line(big, (k, 300), (k + 60, 580), (95, 96, 62), 6)   # tealDark #3E605F detail behind ink text: < 3:1
         for row, text in ((387, 'Government sites'), (510, 'switched off')):
-            cv2.putText(big, text, (110 * S // 2, row * S // 2), cv2.FONT_HERSHEY_DUPLEX, 2.6, (15, 27, 43), 7, cv2.LINE_AA)
+            cv2.putText(big, text, (110, row), cv2.FONT_HERSHEY_SIMPLEX, 2.7, (15, 27, 43), 7, cv2.LINE_AA)
     Ef = [frame_from(art, 1.0, 0, 0, extra=(lambda big, b=(i >= 30): cap(big, b))) for i in range(N)]
     for name, fr in (('A', A), ('B', B), ('C', Cf), ('D', Df), ('E', Ef)):
         write(os.path.join(root, name), fr)
@@ -121,7 +122,8 @@ def main():
     fc = json.load(open(os.path.join(fc_out, 'framecheck.json')))
     kinds = sorted({(i['kind'], i['f0']) for i in fc['issues'] if i['severity'] == 'error'})
     fe_out = os.path.join(root, 'repE')
-    run([sys.executable, os.path.join(HERE, 'framecheck.py'), os.path.join(root, 'E'), '--scenes', 'none', '--out', fe_out, '--quiet', '--sheet', '0', '--no-ui-zones'])
+    run([sys.executable, os.path.join(HERE, 'framecheck.py'), os.path.join(root, 'E'), '--scenes', 'none', '--out', fe_out, '--quiet', '--sheet', '0',
+         '--no-ui-zones', '--expect-caption'])
     fe = json.load(open(os.path.join(fe_out, 'framecheck.json')))
     cap_err = [(i['f0'], i['f1']) for i in fe['issues'] if i['kind'] == 'caption' and i['severity'] == 'error']
     checks = [

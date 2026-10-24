@@ -21,7 +21,7 @@ sys.path.insert(0, HERE)
 import qalib as Q  # noqa: E402
 
 REFS = {
-    'ref1': dict(video='assets/ref/reference.mp4', scenes='scripts/qa/calib/ref1_scenes.json', band='1000,1240',
+    'ref1': dict(video='assets/ref/reference.mp4', scenes='scripts/qa/calib/ref1_scenes.json', band='990,1270',
                  spec={'events_per_s': 5.9, 'median_gap_f': 4, 'longest_event_gap_s': 0.97, 'dead_pct': 3.6, 'longest_dead_s': 0.2,
                        'longest_dead_3k_s': 0.4},
                  src='docs/motion_spec.md 9: medium events 5.9/s, median gap 4 f, longest gap outside transitions 0.97 s; '

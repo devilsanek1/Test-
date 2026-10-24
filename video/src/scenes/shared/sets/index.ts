@@ -15,3 +15,4 @@ export * from './TerraceHill';
 export * from './OldQuarter';
 export {SET_CATALOG} from './catalog';
 export type {SetEntry} from './catalog';
+export * from './ground';

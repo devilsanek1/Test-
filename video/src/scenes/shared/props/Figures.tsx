@@ -1,12 +1,13 @@
-// props/Figures.tsx — back-view figure PRESETS (P11) built on the kit <Person> (and cine tinyFigure for specks).
+// props/Figures.tsx — back-view figure PRESETS (P11) built on the kit <Person> (and cine tinyFigure for specks); Keeper and
+// Caretaker are drawn by BackBody (a hair-colour head with the cap on top, a visible neck, a collar).
 // People are always seen from behind. Anchors are the FEET (x, y on the ground) and `h` = total height in world px,
-// except EdgeOnlooker (head centre + head diameter; the torso runs off the frame bottom).
+// except EdgeOnlooker (head centre + head diameter; the coat always runs off the frame bottom).
 //
 //   <EdgeOnlooker x={80} y={1290} head={110} riseAt={0.2} raisePhoneAt={31.9} />        // tier A, cropped by the bottom
 //   <Citizen x={600} y={1260} h={48} riseAt={1.06} />  <Citizen ... silhouette />        // 40-55 px, or a flat sage cut-out
 //   <Investigator x={230} y={1470} h={130} riseAt={22.2} raiseAt={22.9} />               // shield badge, sparkle tablet
 //   <Messenger x={905} y={1470} h={130} pullAt={25.30} walk={{at: 25.5, to: [1200, 1470]}} />
-//   <Maker x={800} y={1260} h={50} bust />  <Maker ... h={200} walkHz={1.8} />           // cream apron over teal
+//   <Maker x={800} y={1260} h={50} bust />  <Maker ... h={200} walkHz={1.8} />           // cream apron (Y straps) over teal
 //   <Keeper x={480} y={1450} h={300} reachAt={48.5} holding={<NewLockIcon/>} installAt={49.0} />
 //   <Caretaker x={670} y={1380} h={225} raiseKeysAt={68.2} jingleAt={69.0} glintAt={69.3} />
 //   <Attempter x={300} y={1290} h={30} mode="tap" tapAt={[37.1, 37.6]} />  <AttemptStipple spots=[...] />
@@ -227,12 +228,20 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
   const need = (yb + 30 - y) / s - g0.hr * 0.86;
   const torsoH = Math.min(8000, Math.max(220, Math.ceil(need / 64) * 64));
   const g = personGeo(seed, torsoH);
-  const coat = body ?? personCoat(seed, hair !== undefined);
+  // hair: never the kit cap (from behind at this size its dark nape band under a dome reads as a bearded face, review 4):
+  // 'cap' becomes plain mid-tone hair with our CapTop on it; hoods are drawn here (the kit draws them only on heroes)
+  const capOn = hair === 'cap';
+  const hairUse: Hair = capOn ? 'short' : hair ?? rng(`onl/${seed}`).pick<Hair>(['short', 'short', 'long', 'bun', 'curly', 'beanie']);
+  const coat = body ?? personCoat(seed, true);
+  const capHair = coat === palette.brown ? palette.tan : palette.brown;
+  const capColor = coat === palette.teal || coat === palette.sage ? palette.tealDark : palette.teal;
+  const hoodOn = !!acc?.includes('hood') && hairUse !== 'long';
+  const clipId = 'eo' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const holdPhone = !!acc?.includes('phone');
   const q = holdPhone ? 1 : raiseQ(t, raisePhoneAt, lowerPhoneAt);
   const jolt = raisePhoneAt !== undefined && t >= raisePhoneAt && t < raisePhoneAt + 0.2 ? -Math.sin(((t - raisePhoneAt) / 0.2) * Math.PI) * 6 : 0;
   const hipY = y - g.hy * s + jolt + (bob ? osc(t, 0.5, rand(seed, 'b') * 6) * bob : 0);
-  const accs: Acc[] = (acc ?? []).filter((a) => a !== 'phone' && a !== 'backpack');
+  const accs: Acc[] = (acc ?? []).filter((a) => a !== 'phone' && a !== 'backpack' && a !== 'hood');
   const rise = riseAt !== undefined ? (1 - MOTION.rise.ease(prog(t, riseAt, MOTION.rise.dur))) * head * 2.2 : 0;
   if (riseAt !== undefined && t < riseAt) return null;
 
@@ -284,11 +293,40 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
     );
   }
   const rimD = rim ? rimStripD(g, rim === 'left' ? -1 : 1, W, px, g.w * 2.2) : '';
+  const person = <Person x={x} y={hipY} s={s} seed={seed} hair={hairUse} hairColor={capOn ? capHair : undefined} acc={accs} body={coat} torsoH={torsoH} ink={DEPTH_INK[depth]} hero={false} rim={false} />;
+  const local = mat.compose(mat.translate(x, hipY), mat.scale(s));
+  let hood: React.ReactNode = null;
+  if (hoodOn) {
+    // the hood lies over the coat and under the head: draw it, then the head again (the same Person clipped to the head)
+    const hr = g.hr;
+    const top = -g.h;
+    const hd = `M${-hr * 1.32} ${top + hr * 0.25}Q${-hr * 1.4} ${top - hr * 0.55} 0 ${top - hr * 0.62}Q${hr * 1.4} ${top - hr * 0.55} ${hr * 1.32} ${top + hr * 0.25}Q${hr * 0.9} ${top + hr * 1.3} 0 ${top + hr * 1.32}Q${-hr * 0.9} ${top + hr * 1.3} ${-hr * 1.32} ${top + hr * 0.25}Z`;
+    const hcy = hipY + g.hy * s;
+    hood = (
+      <>
+        <XG m={local}>
+          <Fill d={hd} color={coat} offset={false} mode="none" seed={`${seed}/hood`} />
+          <Ink d={hd + `M0 ${top + hr * 1.32}L0 ${top + hr * 0.75}`} width={W * 0.9} seed={`${seed}/hoodI`} />
+        </XG>
+        <defs>
+          <clipPath id={clipId}>
+            <circle cx={x} cy={hcy} r={hr * 1.1 * s} />
+            <circle cx={x - hr * 0.98 * s} cy={hcy + hr * 0.12 * s} r={hr * 0.36 * s} />
+            <circle cx={x + hr * 0.98 * s} cy={hcy + hr * 0.12 * s} r={hr * 0.36 * s} />
+            <circle cx={x} cy={hcy - hr * 1.12 * s} r={hr * 0.46 * s} />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${clipId})`}>{person}</g>
+      </>
+    );
+  }
   return (
     <XG m={mat.translate(0, rise)}>
-      <Person x={x} y={hipY} s={s} seed={seed} hair={hair} acc={accs} body={coat} torsoH={torsoH} ink={DEPTH_INK[depth]} hero={false} rim={false} />
-      <XG m={mat.compose(mat.translate(x, hipY), mat.scale(s))}>
+      {person}
+      {hood}
+      <XG m={local}>
         {rimD ? <Fill d={rimD} color={palette.white} offset={false} mode="none" seed={`${seed}/rim`} /> : null}
+        {capOn ? <CapTop hy={g.hy} hr={g.hr} color={capColor} hair={capHair} W={W} seed={String(seed)} /> : null}
         {parts}
       </XG>
     </XG>
@@ -436,7 +474,29 @@ export const Maker: React.FC<MakerProps> = (p) => {
   );
 };
 
-// ---------------------------------------------------------------- BackBody (Keeper, Caretaker)
+// ---------------------------------------------------------------- CapTop + BackBody (Keeper, Caretaker)
+
+/** A cap seen from behind (ref 1 line-art row), drawn ON a hair-colour head centred (0, hy) of radius hr: the crown
+ *  covers the top ~45 %, its band line sits just above the middle with the small strap arch on it (hair colour inside),
+ *  a button on top. Nothing of it reaches the lower half of the head, so no crescent can read as a beard. */
+const CapTop: React.FC<{hy: number; hr: number; color: string; hair: string; W: number; detail?: boolean; seed: string}> = ({hy, hr, color, hair, W, detail = true, seed}) => {
+  const f = (v: number) => v.toFixed(2);
+  const by = hy - hr * 0.1;
+  const R2 = hr * 1.04;
+  const cw = Math.sqrt(Math.max(0, R2 * R2 - (by - hy) * (by - hy)));
+  const crown = `M${f(-cw)} ${f(by)}A${f(R2)} ${f(R2)} 0 1 1 ${f(cw)} ${f(by)}Q0 ${f(by + hr * 0.06)} ${f(-cw)} ${f(by)}`;
+  const archD = `M${f(-hr * 0.28)} ${f(by + hr * 0.02)}A${f(hr * 0.28)} ${f(hr * 0.24)} 0 0 1 ${f(hr * 0.28)} ${f(by + hr * 0.02)}Z`;
+  const archInk = arc(0, by + hr * 0.02, hr * 0.28, hr * 0.24, 180, 360, {seed: `${seed}/arch`});
+  return (
+    <>
+      <Fill d={crown + 'Z'} color={color} offset={false} mode="none" seed={`${seed}/crown`} />
+      {detail ? <Fill d={archD} color={hair} offset={false} mode="none" seed={`${seed}/arch`} /> : null}
+      <Ink d={crown} width={W * 0.85} seed={`${seed}/capI`} />
+      {detail ? <Ink d={archInk} width={W * 0.7} taper={false} seed={`${seed}/archI`} /> : null}
+      {detail ? <Ink d={circle(0, hy - R2 + hr * 0.04, hr * 0.12, {seed: `${seed}/btn`})} width={W * 0.7} seed={`${seed}/btn`} /> : null}
+    </>
+  );
+};
 
 /** Head centre of a BackBody: higher than the kit Person's, so a neck block shows between the head and the collar. */
 const backHeadY = (g: Geo) => -g.h - g.hr * 1.5;
@@ -487,15 +547,6 @@ const BackBody: React.FC<BackBodyProps> = ({g, seed, coat, legs, shoes = palette
   const earInk = arc(-hr * 0.98, ey, hr * 0.2, hr * 0.3, 95, 265, {seed: `${seed}/ei1`}) + arc(hr * 0.98, ey, hr * 0.2, hr * 0.3, -85, 85, {seed: `${seed}/ei2`});
   const headD = blob(0, hy, hr, hr, {seed: `${seed}/head`});
   const headInk = circle(0, hy, hr, {seed: `${seed}/head`, overlap: 18});
-  // cap (ref 1 line-art row): crown over the top ~45 % of the head, its band line just above the middle with the small
-  // strap arch sitting ON the band (hair colour inside), a button on top; the head below the band stays hair colour
-  const by = hy - hr * 0.1;
-  const R2 = hr * 1.04;
-  const cw = Math.sqrt(Math.max(0, R2 * R2 - (by - hy) * (by - hy)));
-  const crownD = `M${f(-cw)} ${f(by)}A${f(R2)} ${f(R2)} 0 1 1 ${f(cw)} ${f(by)}Q0 ${f(by + hr * 0.06)} ${f(-cw)} ${f(by)}Z`;
-  const crownInk = `M${f(-cw)} ${f(by)}A${f(R2)} ${f(R2)} 0 1 1 ${f(cw)} ${f(by)}Q0 ${f(by + hr * 0.06)} ${f(-cw)} ${f(by)}`;
-  const archD = `M${f(-hr * 0.28)} ${f(by + hr * 0.02)}A${f(hr * 0.28)} ${f(hr * 0.24)} 0 0 1 ${f(hr * 0.28)} ${f(by + hr * 0.02)}Z`;
-  const archInk = arc(0, by + hr * 0.02, hr * 0.28, hr * 0.24, 180, 360, {seed: `${seed}/arch`});
   const strands = `M${f(-hr * 0.42)} ${f(hy - hr * 0.55)}Q${f(-hr * 0.5)} ${f(hy + hr * 0.1)} ${f(-hr * 0.36)} ${f(hy + hr * 0.72)}M${f(hr * 0.06)} ${f(hy - hr * 0.7)}Q${f(-hr * 0.02)} ${f(hy)} ${f(hr * 0.08)} ${f(hy + hr * 0.8)}M${f(hr * 0.46)} ${f(hy - hr * 0.5)}Q${f(hr * 0.56)} ${f(hy + hr * 0.1)} ${f(hr * 0.42)} ${f(hy + hr * 0.66)}`;
   return (
     <TodAnchor at={[0, -h * 0.5]}>
@@ -514,13 +565,7 @@ const BackBody: React.FC<BackBodyProps> = ({g, seed, coat, legs, shoes = palette
         <Fill d={headD} color={hair} seed={`${seed}/headF`} />
         <Ink d={headInk} width={W} open={0.1} seed={`${seed}/headI`} />
         {cap ? (
-          <>
-            <Fill d={crownD} color={cap} offset={false} mode="none" seed={`${seed}/crown`} />
-            {detail ? <Fill d={archD} color={hair} offset={false} mode="none" seed={`${seed}/arch`} /> : null}
-            <Ink d={crownInk} width={W * 0.85} seed={`${seed}/capI`} />
-            {detail ? <Ink d={archInk} width={W * 0.7} taper={false} seed={`${seed}/archI`} /> : null}
-            {detail ? <Ink d={circle(0, hy - R2 + hr * 0.04, hr * 0.12, {seed: `${seed}/btn`})} width={W * 0.7} seed={`${seed}/btn`} /> : null}
-          </>
+          <CapTop hy={hy} hr={hr} color={cap} hair={hair} W={W} detail={detail} seed={seed} />
         ) : detail ? (
           <Ink d={strands} width={W * 0.7} order="all" seed={`${seed}/strands`} />
         ) : null}

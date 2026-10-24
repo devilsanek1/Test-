@@ -26,11 +26,12 @@ import {ease as E, osc, prog, useTime} from '../../../lib/time';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {Look, useLook} from '../../../lib/exit';
-import {arc, blob, circle, crown, crownTicks, line, polyPath, rect, rectPath, smooth, vline, Pt} from '../../../lib/sketch';
+import {arc, blob, circle, crown, crownTicks, ellipse, line, polyPath, rect, rectPath, smooth, vline, Pt} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {mat, XG} from '../../../lib/xf';
 import {Bird} from '../../../lib/kit';
-import {brickHints, cornice, LayerWrap, LightsOut, noWrap, OnlyWhilePaper, PaperUntilCascade, pavingJoints, SetPlace, SI} from './common';
+import {brickHints, cornice, HALF, LayerWrap, LightsOut, noWrap, OnlyWhilePaper, PaperUntilCascade, SetPlace, SI} from './common';
+import {Foreground, ForegroundSpec, groundMarks, GroundMarks} from './ground';
 import {BackSoonSlot, BitSlot, BollardSlot, ChromeSlot, CitizenSlot, LockSlot, OnlookerSlot, PadlockSlot, PlaqueSlot, ShutterSlot} from './propSlots';
 import {FacadeDoor} from './SiteFacade';
 
@@ -52,14 +53,16 @@ export const PLAZA = {
   bit: [200, 705] as Pt,
   lamp: {x: 60, lantern: [60, 1090] as Pt, barY: 1150, bar: [30, 130] as [number, number], top: 1060},
   pigeons: [[52, 1150], [88, 1150], [118, 1150]] as Pt[],
-  citizens: [150, 260, 345, 505, 600, 700, 790, 880, 930].map((x, i) => ({x, y: [1262, 1300, 1248, 1286, 1270, 1294, 1240, 1298, 1268][i], h: [46, 52, 42, 50, 48, 54, 40, 50, 44][i], sil: x === 600 || x === 700})),
+  /** ~40 px citizens (doors are >= 3x a citizen: the monumental scale cue). */
+  citizens: [150, 260, 345, 505, 600, 700, 790, 880, 930].map((x, i) => ({x, y: [1262, 1300, 1248, 1286, 1270, 1294, 1240, 1298, 1268][i], h: [40, 44, 38, 42, 40, 44, 36, 42, 38][i], sil: x === 600 || x === 700})),
+  /** Edge onlookers cropped to heads + shoulders in the bottom corners (<= 0.15 H visible: framing, not scale). */
   onlookers: [
-    {head: [70, 1290] as Pt, s: 1.32},
-    {head: [185, 1345] as Pt, s: 1.38},
-    {head: [1000, 1310] as Pt, s: 1.34},
+    {head: [62, 1745] as Pt, s: 1.32},
+    {head: [196, 1818] as Pt, s: 1.38},
+    {head: [1010, 1765] as Pt, s: 1.34},
   ],
   gov: {
-    govA: {window: [95, 820, 150, 120] as R4, door: [120, 1040, 80, 100] as R4, padlock: [170, 945] as Pt, tag: [200, 935] as Pt, pennant: [240, 745] as Pt, lock: [186, 1092, 11, 14] as R4, plaque: [104, 1078, 20] as [number, number, number]},
+    govA: {window: [95, 820, 150, 120] as R4, door: [120, 1020, 80, 120] as R4, padlock: [170, 945] as Pt, tag: [200, 935] as Pt, pennant: [240, 745] as Pt, lock: [186, 1092, 11, 14] as R4, plaque: [104, 1078, 20] as [number, number, number]},
     govB: {window: [270, 860, 210, 150] as R4, door: [340, 1080, 80, 120] as R4, padlock: [375, 1015] as Pt, tag: [405, 1005] as Pt, pennant: [490, 775] as Pt, lock: [400, 1135, 16, 20] as R4, plaque: [322, 1112, 22] as [number, number, number]},
     govC: {window: [785, 710, 160, 110] as R4, door: null as R4 | null, padlock: [865, 825] as Pt, tag: [835, 815] as Pt, pennant: [775, 700] as Pt, lock: null as R4 | null, plaque: null as [number, number, number] | null},
     govD: {window: [775, 960, 155, 120] as R4, door: [980, 1170, 90, 120] as R4, padlock: [852, 1085] as Pt, tag: [822, 1075] as Pt, pennant: [790, 875] as Pt, lock: [1059, 1232, 12, 15] as R4, plaque: [962, 1205, 20] as [number, number, number]},
@@ -108,7 +111,11 @@ export type GovernmentPlazaProps = {
   citizensAt?: number | false;
   /** Two citizens raise phones. */
   phonesAt?: number;
+  /** The three edge onlookers, cropped to heads + shoulders in the bottom corners. Default true. */
   onlookers?: boolean;
+  /** Extra foreground framing (ground.tsx presets 'heads' | 'kerb' | 'railing' | 'treeL' | 'treeR', a list, or a node).
+   *  Default none: the plaza frames itself (lamp post, tree, bollard, corner onlookers). */
+  foreground?: ForegroundSpec;
   /** Lamp lantern cream -> sand. */
   lanternOffAt?: number;
   /** Pigeons land on the crossbar / scatter. Omit landing = absent (default), true = sitting. */
@@ -135,6 +142,9 @@ export type GovernmentPlazaProps = {
   seed?: string;
 };
 
+/** The day haze ladder (style_bible_ref2 8): near #84B09C, far #98C0AE. */
+const HAZE = ['#84B09C', '#98C0AE'] as const;
+
 const NEAR = SI.front;
 const MID = SI.mid;
 const THIN = SI.far;
@@ -145,7 +155,8 @@ const HAIR = SI.hair;
 const G = (() => {
   const s = 'gp';
   // ---- govA: columned hall
-  const A = {x0: -120, x1: 250, apex: [65, 610] as Pt, cornT: 690, cornB: 720, friezeB: 760, colTop: 772, colBot: 1128, styl: 1140, base: 1200};
+  // a tall colonnade inside the ceiling (columns 758-1136): the monumental cue
+  const A = {x0: -120, x1: 250, apex: [65, 610] as Pt, cornT: 690, cornB: 720, friezeB: 748, colTop: 758, colBot: 1136, styl: 1148, base: 1208};
   const colsA = [-104, -67, -30, 7, 44, 81];
   const ped = polyPath([[-140, A.cornT], A.apex, [270, A.cornT]]);
   const tymp = polyPath([[-104, A.cornT - 6], [65, 626], [234, A.cornT - 6]]);
@@ -156,7 +167,7 @@ const G = (() => {
     line(65, 628, 234, A.cornT - 6, {seed: `${s}/ar4`, over: [2, 2]}) +
     cornice(-150, 280, A.cornT, A.cornB - A.cornT, `${s}/ac`, 30) +
     line(-130, A.friezeB, 262, A.friezeB, {seed: `${s}/af`, over: [10, 10]}) +
-    line(-130, 740, 262, 740, {seed: `${s}/af2`, over: [4, 6]}) +
+    line(-130, 734, 262, 734, {seed: `${s}/af2`, over: [4, 6]}) +
     vline(250, A.cornB, A.styl, {seed: `${s}/aR`, over: [0, 4]}) +
     vline(244, A.friezeB, A.styl, {seed: `${s}/aR2`, over: [0, 0]});
   let colInk = '';
@@ -180,7 +191,8 @@ const G = (() => {
   let stepInk = '';
   steps.forEach((q, i) => (stepInk += line(q[0], q[1], q[0] + q[2], q[1], {seed: `${s}/st${i}`, over: [4, 10]})));
   // ---- govB: domed capitol
-  const B = {x0: 250, x1: 500, top: 820, base: 1200, drum: [268, 760, 214, 60] as R4, dome: {cx: 375, by: 760, rx: 76, ry: 110}, lantern: [365, 612, 20, 38] as R4};
+  // a taller drum (750-820) under a slightly flatter dome; the lantern tip stays on the ceiling (y 600)
+  const B = {x0: 250, x1: 500, top: 820, base: 1200, drum: [268, 750, 214, 70] as R4, dome: {cx: 375, by: 750, rx: 76, ry: 102}, lantern: [365, 614, 20, 34] as R4};
   const domeFill = `M${B.dome.cx - B.dome.rx} ${B.dome.by}A${B.dome.rx} ${B.dome.ry} 0 0 1 ${B.dome.cx + B.dome.rx} ${B.dome.by}Z`;
   const domeInk = arc(B.dome.cx, B.dome.by, B.dome.rx, B.dome.ry, 180, 360, {seed: `${s}/dm`, wobble: 0.01}) + line(B.dome.cx - B.dome.rx - 10, B.dome.by, B.dome.cx + B.dome.rx + 10, B.dome.by, {seed: `${s}/db`, over: [4, 4]});
   let ribs = '';
@@ -262,28 +274,39 @@ const G = (() => {
   let farB = '';
   let farDots = '';
   let farEdges = '';
+  // lower and smaller than the buildings around the gap (the far scale cue), two haze tiers on the day ladder
+  // (style_bible_ref2 8): a back skyline (#98C0AE, tops 912-968, behind the sun's lower edge) and a front tier of small
+  // blocks (#84B09C, tops 1030-1110); both fill-only, back-filled so no sky shows below the skyline
+  farA += rectPath(470, 968, 340, 236);
   for (let x = 470; x < 810; ) {
-    const w = fr.range(26, 54);
-    const top = fr.range(860, 940);
-    const dark = fr.chance(0.45);
-    const d = rectPath(x, top, w, 1204 - top);
-    if (dark) farB += d;
-    else farA += d;
+    const w = fr.range(16, 30);
+    const top = fr.range(912, 968);
+    farA += rectPath(x, top, w + 0.5, 1204 - top);
     farEdges += `M${x.toFixed(1)} 1200L${x.toFixed(1)} ${top.toFixed(1)}L${(x + w).toFixed(1)} ${top.toFixed(1)}`;
-    for (let yy = top + 10; yy < 1120; yy += 16) for (let xx = x + 6; xx < x + w - 6; xx += 12) if (fr.chance(0.32)) farDots += rectPath(xx, yy, 4, 5);
-    x += w + fr.range(-6, 2);
+    for (let yy = top + 8; yy < 1020; yy += 12) for (let xx = x + 4; xx < x + w - 4; xx += 8) if (fr.chance(0.18)) farDots += rectPath(xx, yy, 3, 4);
+    x += w;
+  }
+  for (let x = 476; x < 806; ) {
+    const w = fr.range(14, 26);
+    const top = fr.range(1030, 1110);
+    if (fr.chance(0.8)) {
+      farB += rectPath(x, top, w, 1204 - top);
+      for (let yy = top + 7; yy < 1180; yy += 11) for (let xx = x + 4; xx < x + w - 4; xx += 7) if (fr.chance(0.25)) farDots += rectPath(xx, yy, 2.6, 3.4);
+    }
+    x += w + fr.range(0, 6);
   }
   const cranes =
     // crane 1 (left of the gap): mast, jib, counter-jib, hook
-    line(548, 1000, 548, 842, {seed: `${s}/k1a`, over: 0}) + line(556, 1000, 556, 842, {seed: `${s}/k1b`, over: 0}) +
-    `M548 990L556 974L548 958L556 942L548 926L556 910L548 894L556 878L548 862L556 846` +
-    line(500, 846, 630, 846, {seed: `${s}/k1j`, over: [0, 0]}) + line(552, 836, 600, 846, {seed: `${s}/k1t`, over: 0}) + line(612, 846, 612, 880, {seed: `${s}/k1h`, over: 0}) +
+    line(548, 1000, 548, 886, {seed: `${s}/k1a`, over: 0}) + line(554, 1000, 554, 886, {seed: `${s}/k1b`, over: 0}) +
+    `M548 990L554 978L548 966L554 954L548 942L554 930L548 918L554 906L548 894` +
+    line(512, 890, 612, 890, {seed: `${s}/k1j`, over: [0, 0]}) + line(551, 880, 590, 890, {seed: `${s}/k1t`, over: 0}) + line(600, 890, 600, 914, {seed: `${s}/k1h`, over: 0}) +
     // crane 2 (right)
-    line(716, 1000, 716, 870, {seed: `${s}/k2a`, over: 0}) + line(723, 1000, 723, 870, {seed: `${s}/k2b`, over: 0}) +
-    `M716 990L723 976L716 962L723 948L716 934L723 920L716 906L723 892L716 878` +
-    line(680, 872, 768, 872, {seed: `${s}/k2j`, over: [0, 0]}) + line(694, 872, 694, 900, {seed: `${s}/k2h`, over: 0});
+    line(716, 1000, 716, 902, {seed: `${s}/k2a`, over: 0}) + line(721, 1000, 721, 902, {seed: `${s}/k2b`, over: 0}) +
+    `M716 990L721 979L716 968L721 957L716 946L721 935L716 924L721 913L716 904` +
+    line(688, 904, 756, 904, {seed: `${s}/k2j`, over: [0, 0]}) + line(698, 904, 698, 924, {seed: `${s}/k2h`, over: 0});
   // ---- plaza ground
-  const joints = pavingJoints([630, 1150], 1206, 2060, -1300, 2560, 15, 6, `${s}/pv`);
+  // ground: a few broken paving lines that die toward the viewer + specks (no tile grid)
+  const ground = groundMarks({vp: [630, 1150], top: 1212, bottom: 1920, x0: -420, x1: 1560, rays: 5, cross: 2, specks: 18, reach: 0.6, seed: `${s}/gm`});
   const kerbs = line(-150, 1206, 770, 1206, {seed: `${s}/k1`, over: [20, 0]}) + line(-150, 1222, 520, 1224, {seed: `${s}/k2`, over: [20, 8]});
   // sun path + shadow wedges (flat, fixed opacity)
   const pathPoly = polyPath([[560, 1200], [700, 1200], [900, 1480], [620, 1480]]);
@@ -305,9 +328,11 @@ const G = (() => {
   // foreground tree (cropped right)
   const crownD = crown(1030, 1290, 110, 125, {seed: `${s}/tree`, bumps: 10});
   const treeTicks = crownTicks(1030, 1290, 110, 125, {seed: `${s}/treek`, n: 4, size: 12});
-  const trunk = rectPath(1000, 1380, 22, 620);
-  const trunkInk = line(1000, 1990, 1000, 1395, {seed: `${s}/t1`, over: 0}) + line(1022, 1990, 1021, 1400, {seed: `${s}/t2`, over: 0});
-  return {pathFar, farEdges, A, colsA, ped, tymp, aInk, colInk, colFill, colShade, flutes, steps, stepInk, B, domeFill, domeInk, ribs, domeRim, lantern, lanternInk, bInk, drumThin, C, cInk, D, gridInk, cells, cellsDark, dInk, pilotis, farA, farB, farDots, cranes, joints, kerbs, pathPoly, pathEdges, wedgeB, wedgeD, benches, lampInk, lampFill, crownD, treeTicks, trunk, trunkInk};
+  // trunk into a tree pit on the plaza (not a pole to the frame bottom)
+  const trunk = rectPath(1000, 1380, 22, 282);
+  const trunkInk = line(1000, 1660, 1000, 1395, {seed: `${s}/t1`, over: 0}) + line(1022, 1660, 1021, 1400, {seed: `${s}/t2`, over: 0}) + ellipse(1011, 1662, 58, 13, {seed: `${s}/pit`, overlap: -40});
+  const pit = `M953 1662a58 13 0 1 0 116 0a58 13 0 1 0 -116 0Z`;
+  return {pathFar, farEdges, A, colsA, ped, tymp, aInk, colInk, colFill, colShade, flutes, steps, stepInk, B, domeFill, domeInk, ribs, domeRim, lantern, lanternInk, bInk, drumThin, C, cInk, D, gridInk, cells, cellsDark, dInk, pilotis, farA, farB, farDots, cranes, ground, kerbs, pathPoly, pathEdges, wedgeB, wedgeD, benches, lampInk, lampFill, crownD, treeTicks, trunk, trunkInk, pit};
 })();
 
 // ---------------------------------------------------------------- shared window hardware (chrome + shutter + lock + tag)
@@ -527,9 +552,9 @@ const GovD: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k}) => {
 
 const FarCity: React.FC<{seed: string}> = ({seed}) => (
   <>
-    <Fill d={G.farA} color={palette.mintPale} offset={false} seed={`${seed}/farA`} />
-    <Fill d={G.farB} color={palette.sage} offset={false} seed={`${seed}/farB`} />
-    <Fill d={G.farDots} color={palette.cream} offset={false} seed={`${seed}/farD`} />
+    <Fill d={G.farA} color={HAZE[1]} offset={false} seed={`${seed}/farA`} />
+    <Fill d={G.farB} color={HAZE[0]} offset={false} seed={`${seed}/farB`} />
+    <Fill d={G.farDots} color={HALF.daySky} offset={false} seed={`${seed}/farD`} />
     <Ink d={G.cranes} width={HAIR} taper={false} seed={`${seed}/cranes`} />
     <OnlyWhilePaper p={[630, 1000]}>
       <Ink d={G.farEdges} width={HAIR} taper={false} seed={`${seed}/farE`} />
@@ -553,7 +578,7 @@ const LightLayer: React.FC<{seed: string}> = ({seed}) => (
     {/* the flat sun path: cream at a FIXED partial opacity (never animated) with dashed ink edges; light only exists in
         the coloured state, so the line-art frame shows just its edges */}
     <Fill d={G.pathFar} color={palette.mintPale} offset={false} mode="snap" seed={`${seed}/pathFar`} />
-    <Ink d={G.joints} width={HAIR} taper={false} seed={`${seed}/joints`} />
+    <GroundMarks marks={G.ground} width={THIN} seed={`${seed}/gm`} />
     <SunPath seed={seed} />
     {G.benches.map((b, i) => (
       <React.Fragment key={i}>
@@ -636,7 +661,8 @@ const Near: React.FC<{lanternOffAt?: number; off: boolean; pigeonsAt?: number | 
           ))
         : null}
       {/* foreground tree cropped at the right edge */}
-      <XG m={mat.about(mat.rotate(sway), 1011, 1990)}>
+      <Fill d={G.pit} color={palette.tan} offset={false} seed={`${seed}/pit`} />
+      <XG m={mat.about(mat.rotate(sway), 1011, 1662)}>
         <Fill d={G.trunk} color={palette.brown} seed={`${seed}/trunk`} />
         <Ink d={G.trunkInk} width={NEAR} taper={false} />
         <Fill d={G.crownD} color={palette.sage} seed={`${seed}/crown`} />
@@ -662,6 +688,7 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
   citizensAt,
   phonesAt,
   onlookers = true,
+  foreground,
   lanternOffAt,
   pigeonsAt,
   pigeonsFlyAt,
@@ -721,7 +748,14 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
           {citizensAt !== false ? <Citizens at={lineArt || off ? undefined : citizensAt} phonesAt={lineArt ? undefined : phonesAt} seed={seed} /> : null}
         </>,
       )}
-      {wrap('near', L.near, <Near lanternOffAt={lanternOffAt} off={off} pigeonsAt={lineArt ? undefined : pigeonsAt} pigeonsFlyAt={pigeonsFlyAt} bollard={bollard} onlookers={onlookers} seed={seed} />)}
+      {wrap(
+        'near',
+        L.near,
+        <>
+          <Near lanternOffAt={lanternOffAt} off={off} pigeonsAt={lineArt ? undefined : pigeonsAt} pigeonsFlyAt={pigeonsFlyAt} bollard={bollard} onlookers={onlookers} seed={seed} />
+          <Foreground spec={foreground} seed={`${seed}/fg`} />
+        </>,
+      )}
     </>
   );
   const looked = lineArt ? (

@@ -15,7 +15,7 @@ import {palette, stroke} from '../theme';
 import {useTime} from '../time';
 import {Seed} from '../rng';
 import {line, Pt} from '../sketch';
-import {ambient, TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
+import {ambient, TodLike, TodPalette, useTodPal} from './atmosphere';
 import {darker} from './city';
 import {lerpPt, Quad, quadMap} from './persp';
 import {gridCells, SwitchEvent, switchTimes, windowPaths} from './windows';

@@ -6,13 +6,17 @@
 //   <StringLights x1={-40} y1={140} x2={1120} y2={190} sag={50} n={14} tod="night" on={{at: 1, dur: 1.2}} />
 //   <Pole x={120} y={1500} h={900} at={0.4} />
 //   <PerspectiveStreet vp={[600, 1000]} tod="golden" seed="main" crowd={40} lightsOn={{at: 2, dur: 2}} />
+//   <PerspectiveStreet vp={[560, 800]} camH={187} road={120} walk={260} heights={[270, 330]} fence="right"
+//     roadColor={palette.cream} walkColor={palette.mintPale} poleStart={2400} standing={0.3} />   // reference 2 f_1
+//   <StringLights x1 y1 x2 y2 r={14} r1={3} />            // a string RECEDING to the VP: bulbs shrink + crowd with depth
+//   <GroundPlane vp={[540, 1712]} y0={1814} camH={400} />  // a paved plaza: joints converge on the VP, broken strokes
 
 import React, {useMemo} from 'react';
 import {palette, stroke} from '../theme';
 import {ease as E, osc, prog, springAt, springs, useTime} from '../time';
 import {rng, Seed} from '../rng';
 import {line, Pt, wirePoint} from '../sketch';
-import {atmos, ambient, TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
+import {atmos, ambient, TodLike, TodPalette, useTodPal} from './atmosphere';
 import {darker} from './city';
 import {persp1, quadMap, Quad} from './persp';
 import {gridCells, SwitchEvent, switchTimes, windowPaths} from './windows';

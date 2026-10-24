@@ -7,12 +7,12 @@
 import React from 'react';
 import {palette, skies} from '../../../lib/theme';
 import {GovernmentPlaza, PLAZA} from './GovernmentPlaza';
-import {StoopStreet, STOOP} from './StoopStreet';
+import {StoopBeats, StoopStreet, STOOP} from './StoopStreet';
 import {BlueprintStreet, BLUEPRINT} from './BlueprintStreet';
 import {BlueprintWall, BLUEPRINT_WALL} from './BlueprintWall';
 import {MakersLane, MAKERS_LANE, Workshop, WORKSHOP_CORNER} from './MakersLane';
 import {NoticeboardCorner, NOTICE_CORNER, TelephoneWires, WIRES} from './NoticeboardCorner';
-import {DomeCity, DOME} from './DomeCity';
+import {DomeCity, DomeTallies, DOME} from './DomeCity';
 import {TerraceHill, TerraceRings, TERRACE, TERRACE_FLAT} from './TerraceHill';
 import {OldQuarter, OLD_QUARTER} from './OldQuarter';
 import {DemoSun, DemoWorld} from './preview/demo';
@@ -21,6 +21,12 @@ import {ease as E, useTime} from '../../../lib/time';
 
 /** Camera matrix: world point (x, y) at screen centre, zoom z. */
 export const camMat = (x: number, y: number, z: number) => mat.compose(mat.translate(540, 960), mat.scale(z), mat.translate(-x, -y));
+
+/** Demo tally beat: one mark every 0.18 s from 1.7 s (13 marks). */
+const TallyClock: React.FC = () => {
+  const t = useTime();
+  return <DomeTallies n={Math.min(13, Math.max(0, (t - 1.7) / 0.18))} />;
+};
 
 export type SetEntry = {id: string; label: string; sky: string; thumb: () => React.ReactNode; preview: (variant?: string) => React.ReactNode};
 
@@ -72,19 +78,19 @@ export const SET_CATALOG: SetEntry[] = [
     id: 'stoop',
     label: 'StoopStreet',
     sky: skies.day,
-    thumb: () => <StoopStreet sun={<DemoSun cx={720} cy={850} r={110} />} stoop={{magnifierAt: -1, wrenchAt: -1}} />,
+    thumb: () => <StoopStreet sun={<DemoSun cx={720} cy={850} r={110} />} heroSlot={<StoopBeats magnifierAt={-1} wrenchAt={-1} />} />,
     preview: (v) =>
       v === 'night' ? (
         <DemoWorld sky={skies.night}>
-          <StoopStreet tod="night" sun={null} stoop={{magnifierAt: -1, wrenchAt: -1, checkAt: 2.6, peachAt: 2.7, ledgeAt: 3.2}} />
+          <StoopStreet tod="night" sun={null} heroSlot={<StoopBeats magnifierAt={-1} wrenchAt={-1} checkAt={2.6} peachAt={2.7} ledgeAt={3.2} />} />
         </DemoWorld>
       ) : v === 'tower' ? (
         <DemoWorld>
-          <StoopStreet sun={<DemoSun cx={720} cy={850} r={110} />} stoop={{magnifierAt: -1, wrenchAt: -1, towerAt: 0.5, towerDownAt: 3.0}} season={[{t: 0, s: 'green'}, {t: 3.5, s: 'peach'}, {t: 3.6, s: 'tan'}, {t: 3.7, s: 'bare'}]} ivy={0.6} heroLock={{cobwebAt: 3.2}} />
+          <StoopStreet sun={<DemoSun cx={720} cy={850} r={110} />} heroSlot={<StoopBeats magnifierAt={-1} wrenchAt={-1} towerAt={0.5} towerDownAt={3.0} />} season={[{t: 0, s: 'green'}, {t: 3.5, s: 'peach'}, {t: 3.6, s: 'tan'}, {t: 3.7, s: 'bare'}]} ivy={0.6} heroLock={{cobwebAt: 3.2}} />
         </DemoWorld>
       ) : (
         <DemoWorld push>
-          <StoopStreet drawAt={v === 'draw' ? 0.2 : undefined} sun={<DemoSun cx={720} cy={850} r={110} />} stoop={{step1At: 1.9, step2At: 2.3, magnifierAt: 2.4, wrenchAt: 3.1}} />
+          <StoopStreet drawAt={v === 'draw' ? 0.2 : undefined} sun={<DemoSun cx={720} cy={850} r={110} />} stoop={{step1At: 1.9, step2At: 2.3}} heroSlot={<StoopBeats magnifierAt={2.4} wrenchAt={3.1} />} />
         </DemoWorld>
       ),
   },
@@ -158,11 +164,17 @@ export const SET_CATALOG: SetEntry[] = [
     id: 'dome',
     label: 'DomeCity',
     sky: skies.golden,
-    thumb: () => <DomeCity sun={<DemoSun cx={DOME.sun.x} cy={DOME.sun.y} r={165} />} searchAt={-1} tallies={12} />,
+    thumb: () => (
+      <>
+        <DomeCity sun={<DemoSun cx={DOME.sun.x} cy={DOME.sun.y} r={165} />} searchAt={-1} />
+        <DomeTallies n={12} />
+      </>
+    ),
     preview: (v) => (
       <DemoWorld sky={v === 'dusk' ? skies.dusk : skies.golden}>
         <XG m={v === 'crane' ? camMat(540, 1260, 1.3) : v === 'push' ? camMat(480, 1040, 1.15) : mat.I}>
-          <DomeCity sun={<DemoSun cx={DOME.sun.x} cy={DOME.sun.y} r={165} />} domeAt={0.2} towerAt={1.2} searchAt={1.6} tallies={13} dotsAt={0.4} duskAt={v === 'dusk' ? 0 : undefined} />
+          <DomeCity sun={<DemoSun cx={DOME.sun.x} cy={DOME.sun.y} r={165} />} domeAt={0.2} towerAt={1.2} searchAt={1.6} dotsAt={0.4} duskAt={v === 'dusk' ? 0 : undefined} />
+          <TallyClock />
           <TelephoneWires spec={WIRES.S08} />
         </XG>
       </DemoWorld>

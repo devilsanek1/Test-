@@ -14,7 +14,7 @@ import {ease as E, prog, useTime} from '../time';
 import {Ink} from '../Ink';
 import {crown, glint, hline, line, rect, textLines, wallTicks} from '../sketch';
 import {rng, Seed} from '../rng';
-import {ambient, TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
+import {ambient, TodLike, TodPalette, useTodPal} from './atmosphere';
 import {darker} from './city';
 import {Glow} from './light';
 import {PathBuf, r1} from './util';

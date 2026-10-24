@@ -27,7 +27,7 @@ import {palette, stroke} from '../theme';
 import {ease as E, osc, prog} from '../time';
 import {rng, Seed} from '../rng';
 import {line, Pt} from '../sketch';
-import {ambient, deep, TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
+import {ambient, deep, TodLike, TodPalette, useTodPal} from './atmosphere';
 import {darker} from './city';
 import {quadMap, UV} from './persp';
 import {brokenLine, mix, PathBuf, r1} from './util';
@@ -239,7 +239,7 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
   L('ink', -40, 1150, 1040, 1150, 'e3', [8, 12]);
   L('thin', -40, 1158, 1040, 1158, 'e3b', [4, 8]);
   for (let x = -30; x < 1030; x += 26) L('hair', x, 1150, x, 1138, `de${x}`, [0, 0], false);
-  L('ink', -40, 1190, 1040, 1190, 'e4', [8, 12], true, true);
+  L('ink', -40, 1190, 1040, 1190, 'e4', [8, 12], true); // in backlight above quietY the fill step is the edge
   end('entablature', 2 + columns * 0.45 + 0.3);
 
   // ---- pediment (Y 1190..1470)

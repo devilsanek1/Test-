@@ -24,8 +24,8 @@ import {crown, crownTicks, line, polyPath, rect, rectPath, wire, wirePoint, Pt} 
 import {wallQuad} from '../../../lib/persp';
 import {mat, XG} from '../../../lib/xf';
 import {Bird, Tree} from '../../../lib/kit';
-import {Glow} from '../../../lib/cine';
-import {brickHints, cornice, LayerWrap, noWrap, paneFill, pavingJoints, SetPlace, SetTod, SI, windowInk} from './common';
+import {brickHints, cornice, GlowDiscs, HALF, LayerWrap, NightGround, noWrap, paneFill, SetPlace, SetTod, SI, windowInk} from './common';
+import {Foreground, ForegroundSpec, groundMarks, GroundMarks} from './ground';
 import {BollardSlot, CalendarSlot, ChromeSlot, CheckSlot, LockProps, MagnifierSlot, PlaqueSlot, WrenchSlot} from './propSlots';
 import {Lock} from '../props';
 import {FacadeDoor} from './SiteFacade';
@@ -123,7 +123,8 @@ const G = (() => {
   const road = polyPath([[VP[0] - 1, VP[1] + 1], [VP[0] + 2, VP[1] + 1], [980, STOOP.pavementY], [520, STOOP.pavementY]]);
   const pavR = polyPath([[VP[0] + 2, VP[1] + 1], [footR(1500), 1500], [1300, 1500], [1300, STOOP.pavementY], [980, STOOP.pavementY]]);
   const kerbInk = line(VP[0] + 2, VP[1] + 2, kerbR(1372), 1372, {seed: `${s}/kr`, over: [0, 0], breaks: false}) + line(-150, STOOP.pavementY, 1230, STOOP.pavementY, {seed: `${s}/kn`, over: [0, 0]}) + line(-150, STOOP.pavementY + 18, 1230, STOOP.pavementY + 20, {seed: `${s}/kn2`, over: [0, 0]});
-  const joints = pavingJoints(VP, STOOP.pavementY + 24, 2060, -1600, 3000, 13, 4, `${s}/pj`);
+  // the pavement: one flat field, a few broken paving lines that die toward the viewer, specks (no tile grid)
+  const ground = groundMarks({vp: VP, top: STOOP.pavementY + 26, bottom: 1920, x0: -520, x1: 1640, rays: 4, cross: 2, specks: 16, reach: 0.58, seed: `${s}/gm`});
   // lamp post cropped at the left edge, lantern on an arm, telephone wire from its top
   const lp = STOOP.lamp;
   const lampFill = rectPath(lp.x - 12, lp.top, 24, 1400) + rectPath(lp.x, lp.lantern[1] - 46, 42, 6);
@@ -144,7 +145,7 @@ const G = (() => {
     towers += rectPath(tx, top, tw, VP[1] + 4 - top);
     for (let yy = top + 12; yy < VP[1] - 8; yy += 15) for (let xx = tx + 6; xx < tx + tw - 6; xx += 11) if ((xx * 7 + yy * 3) % 5 < 2) towerDots += rectPath(xx, yy, 4, 6);
   }
-  return {wins, winInk, glass, heroInk, plinthInk, bricks, road, pavR, kerbInk, joints, lampFill, lampInk, lantern, wireD, treeCrown, treeTicks, trunk, trunkInk, bare, towers, towerDots};
+  return {wins, winInk, glass, heroInk, plinthInk, bricks, road, pavR, kerbInk, ground, lampFill, lampInk, lantern, wireD, treeCrown, treeTicks, trunk, trunkInk, bare, towers, towerDots};
 })();
 
 const STARS: Pt[] = [
@@ -164,27 +165,13 @@ export type StoopProps = {
   /** Steps pop up (scaleY from their base, 6 % overshoot). Omit = there. */
   step1At?: number;
   step2At?: number;
-  /** Riser glyphs ink on (magnifier on step 1 = find, wrench on step 2 = fix). Omit = absent. */
-  magnifierAt?: number;
-  wrenchAt?: number;
-  /** Step 1's LEFT half shoots up into a 600 px brick tower (2 % overshoot) / boings back down (6 % undershoot). */
-  towerAt?: number;
-  towerDownAt?: number;
-  /** The magnifier rides up on the tower face (redrawn at 90 px). Default true. */
-  magnifierRide?: boolean;
-  /** Check mark over step 1's magnifier (0.17 s). */
-  checkAt?: number;
-  /** Step 2's riser turns peach. */
-  peachAt?: number;
-  /** Step 2's tread stretches into a ledge to the vanishing point (scaleX from the left anchor) over ledgeDur. */
-  ledgeAt?: number;
-  ledgeDur?: number;
   /** Draw-on (fill-first, then ink). */
   drawAt?: number;
   seed?: string;
 };
 
-/** Tower height (px above step 1's top) at time t: 0 -> 530 (+2 %) -> back to 0 (6 % undershoot). */
+/** Tower height (px above step 1's top) at time t: 0 -> 600 (+2 %) -> back to 0 (0.24 s drop). Never negative: the
+ *  tower is an overlay on step 1's left half (StoopBeats). */
 export function towerRise(t: number, at?: number, downAt?: number): number {
   const full = STOOP.step1[1] - STOOP.tower.top; // 600
   let k = 0;
@@ -192,90 +179,118 @@ export function towerRise(t: number, at?: number, downAt?: number): number {
     const p = prog(t, at, 0.36, E.outCubic);
     k = p < 1 ? p * 1.02 : 1.02 - 0.02 * prog(t, at + 0.36, 0.14, E.inOutSine);
   }
-  if (downAt !== undefined && t >= downAt) {
-    const p = prog(t, downAt, 0.24, E.inQuad);
-    const after = t - downAt - 0.24;
-    k = p < 1 ? lerp(1, 0, p) : after < 0.3 ? -0.06 * Math.sin(Math.min(1, after / 0.3) * Math.PI) : 0;
-  }
-  return k * full;
+  if (downAt !== undefined && t >= downAt) k = lerp(1, 0, prog(t, downAt, 0.24, E.inQuad));
+  return Math.max(0, k) * full;
 }
 
-export const Stoop: React.FC<StoopProps> = ({step1At, step2At, magnifierAt, wrenchAt, towerAt, towerDownAt, magnifierRide = true, checkAt, peachAt, ledgeAt, ledgeDur = 0.45, drawAt, seed = 'stoop'}) => {
+const TREAD = 9;
+
+/** The two-step stoop in front of door #4 (a LOCATION: steps only; the S03-S09 beats are <StoopBeats/>). */
+export const Stoop: React.FC<StoopProps> = ({step1At, step2At, drawAt, seed = 'stoop'}) => {
   const t = useTime();
   const [s2x, s2y, s2w, s2h] = STOOP.step2;
   const [s1x, s1y, s1w, s1h] = STOOP.step1;
   const k2 = popUpK(t, step2At);
   const k1 = popUpK(t, step1At);
-  const rise = towerRise(t, towerAt, towerDownAt);
-  const peach = peachAt !== undefined && t >= peachAt;
-  const tread = 9;
-  // ledge: the far end slides from x 410 to the VP along the tread line
-  const lp = ledgeAt === undefined ? 0 : E.outCubic(prog(t, ledgeAt, ledgeDur));
-  const L0 = STOOP.ledge.from;
-  const L1 = STOOP.ledge.to;
-  const lx = lerp(L0[0], L1[0], lp);
-  const ly = lerp(L0[1], L1[1], lp);
-  const riserH = (yy: number) => s2h * ((yy - STOOP.vp[1]) / (L0[1] - STOOP.vp[1])); // shrinks to the VP
+  const ia = drawAt !== undefined ? drawAt + 0.1 : undefined;
   const out: React.ReactNode[] = [];
-  // ---- step 2 (upper, behind)
   if (k2 > 0) {
     const g = (
       <>
-        <Fill d={polyPath([[s2x - 6, s2y - tread], [s2x + s2w + 6, s2y - tread], [s2x + s2w, s2y], [s2x, s2y]])} color={palette.sand} at={drawAt} mode="snap" seed={`${seed}/t2`} />
-        <Fill rect={[s2x, s2y, s2w, s2h]} color={peach ? palette.peach : palette.cream} at={drawAt} mode="snap" seed={`${seed}/r2`} />
-        <Ink d={line(s2x - 8, s2y - tread, s2x + s2w + 8, s2y - tread, {seed: `${seed}/i2a`, over: [3, 6]}) + line(s2x - 2, s2y, s2x + s2w + 4, s2y, {seed: `${seed}/i2b`, over: [2, 4]}) + line(s2x, s2y, s2x, s2y + s2h, {seed: `${seed}/i2c`, over: [0, 0]}) + line(s2x + s2w, s2y, s2x + s2w, s2y + s2h, {seed: `${seed}/i2d`, over: [0, 0]})} width={SI.mid} at={drawAt !== undefined ? drawAt + 0.1 : undefined} />
+        <Fill d={polyPath([[s2x - 6, s2y - TREAD], [s2x + s2w + 6, s2y - TREAD], [s2x + s2w, s2y], [s2x, s2y]])} color={palette.sand} at={drawAt} mode="snap" seed={`${seed}/t2`} />
+        <Fill rect={[s2x, s2y, s2w, s2h]} color={palette.cream} at={drawAt} mode="snap" seed={`${seed}/r2`} />
+        <Ink d={line(s2x - 8, s2y - TREAD, s2x + s2w + 8, s2y - TREAD, {seed: `${seed}/i2a`, over: [3, 6]}) + line(s2x - 2, s2y, s2x + s2w + 4, s2y, {seed: `${seed}/i2b`, over: [2, 4]}) + line(s2x, s2y, s2x, s2y + s2h, {seed: `${seed}/i2c`, over: [0, 0]}) + line(s2x + s2w, s2y, s2x + s2w, s2y + s2h, {seed: `${seed}/i2d`, over: [0, 0]})} width={SI.mid} at={ia} />
       </>
     );
     out.push(<React.Fragment key="s2">{k2 < 1 ? <XG m={mat.about(mat.scale(1, k2), s2x + s2w / 2, s1y)}>{g}</XG> : g}</React.Fragment>);
   }
-  // ---- the ledge (step 2's tread stretched to the VP, riser in perspective)
-  if (lp > 0) {
-    const ry0 = riserH(L0[1]);
-    const ry1 = riserH(ly);
-    out.push(<Fill key="lr" d={polyPath([[s2x + s2w - 2, L0[1]], [lx, ly], [lx, ly + ry1], [s2x + s2w - 2, L0[1] + ry0]])} color={palette.cream} offset={false} seed={`${seed}/lr`} />);
-    out.push(<Fill key="lt" d={polyPath([[s2x + s2w, L0[1] - tread], [lx + 2, ly - tread * (ry1 / ry0)], [lx, ly], [s2x + s2w, L0[1]]])} color={palette.sand} offset={false} seed={`${seed}/lt`} />);
-    out.push(<Ink key="li" d={`M${L0[0]} ${L0[1] - tread}L${lx.toFixed(1)} ${(ly - tread * (ry1 / ry0)).toFixed(1)}M${L0[0]} ${L0[1]}L${lx.toFixed(1)} ${ly.toFixed(1)}M${L0[0]} ${L0[1] + ry0}L${lx.toFixed(1)} ${(ly + ry1).toFixed(1)}`} width={SI.far} taper={false} />);
-  }
-  // ---- step 1 (lower, front) and its tower half
   if (k1 > 0) {
-    const half = STOOP.tower.w;
-    const top = s1y - rise;
     const g = (
       <>
-        <Fill d={polyPath([[s1x - 6, s1y - tread], [s1x + s1w + 6, s1y - tread], [s1x + s1w, s1y], [s1x, s1y]])} color={palette.sand} at={drawAt} mode="snap" seed={`${seed}/t1`} />
-        <Fill rect={[s1x + half, s1y, s1w - half, s1h]} color={palette.cream} at={drawAt} mode="snap" seed={`${seed}/r1b`} />
-        {/* the left half (the tower when it rises) */}
-        <Fill rect={[s1x, top, half, s1h + rise]} color={rise > 4 ? palette.sand : palette.cream} at={drawAt} mode="snap" seed={`${seed}/r1a`} />
-        {rise > 4 ? <Fill rect={[s1x, top, 22, s1h + rise]} color={palette.tan} offset={false} mode="snap" seed={`${seed}/tsh`} /> : null}
-        {rise > 4 ? <Fill d={polyPath([[s1x - 6, top - tread], [s1x + half + 6, top - tread], [s1x + half, top], [s1x, top]])} color={palette.sand} mode="snap" seed={`${seed}/ttop`} /> : null}
+        <Fill d={polyPath([[s1x - 6, s1y - TREAD], [s1x + s1w + 6, s1y - TREAD], [s1x + s1w, s1y], [s1x, s1y]])} color={palette.sand} at={drawAt} mode="snap" seed={`${seed}/t1`} />
+        <Fill rect={[s1x, s1y, s1w, s1h]} color={palette.cream} at={drawAt} mode="snap" seed={`${seed}/r1`} />
         <Ink
           d={
-            line(s1x - 8, top - tread, s1x + half + 4, top - tread, {seed: `${seed}/i1a`, over: [3, 2]}) +
-            line(s1x + half - 2, s1y - tread, s1x + s1w + 8, s1y - tread, {seed: `${seed}/i1b`, over: [2, 6]}) +
-            line(s1x - 2, top, s1x + half, top, {seed: `${seed}/i1c`, over: [2, 2]}) +
-            line(s1x + half, s1y, s1x + s1w + 4, s1y, {seed: `${seed}/i1d`, over: [2, 4]}) +
-            line(s1x, top, s1x, s1y + s1h, {seed: `${seed}/i1e`, over: [0, 0]}) +
-            line(s1x + half, top, s1x + half, s1y + s1h, {seed: `${seed}/i1f`, over: [0, 0]}) +
+            line(s1x - 8, s1y - TREAD, s1x + s1w + 8, s1y - TREAD, {seed: `${seed}/i1a`, over: [3, 6]}) +
+            line(s1x - 2, s1y, s1x + s1w + 4, s1y, {seed: `${seed}/i1d`, over: [2, 4]}) +
+            line(s1x, s1y, s1x, s1y + s1h, {seed: `${seed}/i1e`, over: [0, 0]}) +
             line(s1x + s1w, s1y, s1x + s1w, s1y + s1h, {seed: `${seed}/i1g`, over: [0, 0]})
           }
           width={SI.mid}
-          at={drawAt !== undefined ? drawAt + 0.1 : undefined}
+          at={ia}
         />
-        {rise > 60 ? <Ink d={brickHints(s1x + 26, top + 30, half - 40, rise - 20, `${seed}/tb`, Math.min(8, Math.round(rise / 70)), 22)} width={SI.far} taper={false} /> : null}
       </>
     );
     out.push(<React.Fragment key="s1">{k1 < 1 ? <XG m={mat.about(mat.scale(1, k1), s1x + s1w / 2, s1y + s1h)}>{g}</XG> : g}</React.Fragment>);
   }
-  // ---- glyphs
+  return <>{out}</>;
+};
+
+export type StoopBeatsProps = {
+  /** Step 1's LEFT half shoots up into a 600 px brick tower (2 % overshoot) / drops back down. */
+  towerAt?: number;
+  towerDownAt?: number;
+  /** Riser glyphs ink on (magnifier on step 1 = find, wrench on step 2 = fix). Omit = absent; -1 = there. */
+  magnifierAt?: number;
+  wrenchAt?: number;
+  /** The magnifier rides up on the tower face (redrawn at 34 px). Default true. */
+  magnifierRide?: boolean;
+  /** Check mark over step 1's magnifier (0.17 s). */
+  checkAt?: number;
+  /** Step 2's riser turns peach. */
+  peachAt?: number;
+  /** Step 2's tread stretches into a ledge to the vanishing point over ledgeDur. */
+  ledgeAt?: number;
+  ledgeDur?: number;
+  seed?: string;
+};
+
+/** The storyboard's stoop BEATS as an overlay that reads the STOOP anchors (S03 riser glyphs, S04 tower, S09 check / peach
+ *  riser / ledge). Pass it to <StoopStreet heroSlot={...}/> so it sits in the hero layer (under the near tree). */
+export const StoopBeats: React.FC<StoopBeatsProps> = ({towerAt, towerDownAt, magnifierAt, wrenchAt, magnifierRide = true, checkAt, peachAt, ledgeAt, ledgeDur = 0.45, seed = 'stoopBeats'}) => {
+  const t = useTime();
+  const [s2x, s2y, s2w, s2h] = STOOP.step2;
+  const [s1x, s1y, , s1h] = STOOP.step1;
+  const rise = towerRise(t, towerAt, towerDownAt);
+  const out: React.ReactNode[] = [];
+  if (peachAt !== undefined && t >= peachAt) out.push(<Fill key="peach" rect={[s2x + 2, s2y + 2, s2w - 4, s2h - 3]} color={palette.peach} offset={false} mode="snap" seed={`${seed}/peach`} />);
+  // the ledge: step 2's tread stretched to the VP (the far end slides along the tread line), riser in perspective
+  const lp = ledgeAt === undefined ? 0 : E.outCubic(prog(t, ledgeAt, ledgeDur));
+  if (lp > 0) {
+    const L0 = STOOP.ledge.from;
+    const L1 = STOOP.ledge.to;
+    const lx = lerp(L0[0], L1[0], lp);
+    const ly = lerp(L0[1], L1[1], lp);
+    const riserH = (yy: number) => s2h * ((yy - STOOP.vp[1]) / (L0[1] - STOOP.vp[1]));
+    const ry0 = riserH(L0[1]);
+    const ry1 = riserH(ly);
+    out.push(<Fill key="lr" d={polyPath([[s2x + s2w - 2, L0[1]], [lx, ly], [lx, ly + ry1], [s2x + s2w - 2, L0[1] + ry0]])} color={palette.cream} offset={false} seed={`${seed}/lr`} />);
+    out.push(<Fill key="lt" d={polyPath([[s2x + s2w, L0[1] - TREAD], [lx + 2, ly - TREAD * (ry1 / ry0)], [lx, ly], [s2x + s2w, L0[1]]])} color={palette.sand} offset={false} seed={`${seed}/lt`} />);
+    out.push(<Ink key="li" d={`M${L0[0]} ${L0[1] - TREAD}L${lx.toFixed(1)} ${(ly - TREAD * (ry1 / ry0)).toFixed(1)}M${L0[0]} ${L0[1]}L${lx.toFixed(1)} ${ly.toFixed(1)}M${L0[0]} ${L0[1] + ry0}L${lx.toFixed(1)} ${(ly + ry1).toFixed(1)}`} width={SI.far} taper={false} />);
+  }
+  // the tower over step 1's left half
+  if (rise > 0.5) {
+    const half = STOOP.tower.w;
+    const top = s1y - rise;
+    out.push(
+      <React.Fragment key="tower">
+        <Fill rect={[s1x, top, half, s1h + rise]} color={palette.sand} mode="snap" seed={`${seed}/tw`} />
+        <Fill rect={[s1x, top, 22, s1h + rise]} color={palette.tan} offset={false} mode="snap" seed={`${seed}/tsh`} />
+        <Fill d={polyPath([[s1x - 6, top - TREAD], [s1x + half + 6, top - TREAD], [s1x + half, top], [s1x, top]])} color={palette.sand} mode="snap" seed={`${seed}/ttop`} />
+        <Ink d={line(s1x - 8, top - TREAD, s1x + half + 4, top - TREAD, {seed: `${seed}/a`, over: [3, 2]}) + line(s1x - 2, top, s1x + half, top, {seed: `${seed}/c`, over: [2, 2]}) + line(s1x, top, s1x, s1y + s1h, {seed: `${seed}/e`, over: [0, 0]}) + line(s1x + half, top, s1x + half, s1y + s1h, {seed: `${seed}/f`, over: [0, 0]})} width={SI.mid} />
+        {rise > 60 ? <Ink d={brickHints(s1x + 26, top + 30, half - 40, rise - 20, `${seed}/tb`, Math.min(8, Math.round(rise / 70)), 22)} width={SI.far} taper={false} /> : null}
+      </React.Fragment>,
+    );
+  }
   const mg = STOOP.magnifier;
-  if (magnifierAt !== undefined && k1 > 0) {
+  if (magnifierAt !== undefined) {
     const riding = magnifierRide && rise > 30;
     const my = riding ? s1y - rise + 70 : mg.y;
     const mx = riding ? s1x + STOOP.tower.w / 2 : mg.x;
     const mr = riding ? lerp(mg.r, 34, Math.min(1, rise / 500)) : mg.r;
-    out.push(<MagnifierSlot key="mag" x={mx} y={my} r={mr} at={magnifierAt} seed={`${seed}/mag`} />);
+    out.push(<MagnifierSlot key="mag" x={mx} y={my} r={mr} at={magnifierAt < 0 ? undefined : magnifierAt} seed={`${seed}/mag`} />);
   }
-  if (wrenchAt !== undefined && k2 > 0) out.push(<WrenchSlot key="wr" x={STOOP.wrench.x} y={STOOP.wrench.y} w={STOOP.wrench.w} at={wrenchAt} seed={`${seed}/wr`} />);
+  if (wrenchAt !== undefined) out.push(<WrenchSlot key="wr" x={STOOP.wrench.x} y={STOOP.wrench.y} w={STOOP.wrench.w} at={wrenchAt < 0 ? undefined : wrenchAt} seed={`${seed}/wr`} />);
   if (checkAt !== undefined) out.push(<CheckSlot key="ck" x={mg.x + 6} y={mg.y - 4} size={70} at={checkAt} />);
   return <>{out}</>;
 };
@@ -300,7 +315,13 @@ export type StoopStreetProps = {
   dawnAt?: number;
   /** The sun (scene-owned): drawn behind the far towers. */
   sun?: React.ReactNode;
+  /** The two steps (pop-ups / draw-on). The storyboard beats on them are <StoopBeats/> in `heroSlot`. */
   stoop?: StoopProps;
+  /** Drawn in the hero layer right after the stoop (under the near tree): StoopBeats, the keeper, Pip's perch... */
+  heroSlot?: React.ReactNode;
+  /** Foreground framing in the bottom band (ground.tsx presets; default 'kerb': a near kerb, two cropped bollards and a
+   *  drain grate). false = none. */
+  foreground?: ForegroundSpec;
   /** Entrance draw-on: fill-first, top to bottom, the rows ripple near -> far. */
   drawAt?: number;
   /** Hero browser window chrome events. */
@@ -336,6 +357,8 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
   dawnAt,
   sun,
   stoop,
+  heroSlot,
+  foreground = 'kerb',
   drawAt,
   chromeAt,
   screenOnAt,
@@ -373,17 +396,22 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
       {dawnBand ? <Fill rect={[-160, 940, 1400, 124]} color={palette.peach} offset={false} mode="snap" seed={`${seed}/dawn`} /> : null}
       <Fill d={G.towers} color={night ? palette.tealDark : palette.sage} offset={false} mode="snap" at={fa} seed={`${seed}/towers`} />
       {night ? <Fill d={G.towerDots} color={palette.peach} offset={false} mode="snap" seed={`${seed}/tdots`} /> : null}
-      <Fill rect={[600, VP[1] - 2, 330, 8]} color={palette.mintPale} offset={false} at={fa} mode="snap" seed={`${seed}/hz`} />
+      <NightGround on={night}>
+        <Fill rect={[600, VP[1] - 2, 330, 8]} color={palette.mintPale} offset={false} at={fa} mode="snap" seed={`${seed}/hz`} />
+      </NightGround>
     </>
   );
 
+  // night relights the ground plane (ref 2's night mapping: mintPale -> sage, cream -> sand); facades keep day fills
   const ground = (
     <>
-      <Fill rect={[-160, VP[1], 1400, 1000]} color={palette.mintPale} offset={false} at={fa} mode="snap" seed={`${seed}/pave`} />
-      <Fill d={G.road} color={palette.cream} offset={false} at={fa} mode="snap" seed={`${seed}/road`} />
-      <Fill d={G.pavR} color={palette.mintPale} offset={false} at={fa} mode="snap" seed={`${seed}/pavR`} />
+      <NightGround on={night}>
+        <Fill rect={[-160, VP[1], 1400, 1000]} color={palette.mintPale} offset={false} at={fa} mode="snap" seed={`${seed}/pave`} />
+        <Fill d={G.road} color={palette.cream} offset={false} at={fa} mode="snap" seed={`${seed}/road`} />
+        <Fill d={G.pavR} color={palette.mintPale} offset={false} at={fa} mode="snap" seed={`${seed}/pavR`} />
+      </NightGround>
       <Ink d={G.kerbInk} width={SI.front} at={ia} seed={`${seed}/kerb`} />
-      <Ink d={G.joints} width={SI.hair} taper={false} at={ia} seed={`${seed}/joints`} />
+      <GroundMarks marks={G.ground} width={SI.far} at={ia} seed={`${seed}/gm`} />
     </>
   );
 
@@ -398,7 +426,7 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
         ? STOOP.nightLamps.map((l, i) => (
             <React.Fragment key={i}>
               <Ink d={line(l.x, l.base, l.x, l.head + 8, {seed: `${seed}/nl${i}`, over: 0})} width={SI.far} taper={false} />
-              <Glow cx={l.x} cy={l.head} r={i ? 14 : 20} rings={2} spread={1.4} color={palette.peach} opacity={0.35} core={palette.cream} />
+              <GlowDiscs cx={l.x} cy={l.head} steps={[[i ? 24 : 34, palette.peach], [i ? 15 : 21, HALF.peach], [i ? 7 : 10, palette.cream]]} />
             </React.Fragment>
           ))
         : null}
@@ -430,6 +458,7 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
       {ivy > 0 ? <Ivy k={ivy} seed={seed} /> : null}
       {heroLock === false ? null : <Lock x={STOOP.lock4.x} y={STOOP.lock4.y} size={STOOP.lock4.h} seed={`${seed}/lock4`} ink={SI.far} {...heroLock} />}
       <Stoop {...stoop} drawAt={stoop?.drawAt ?? drawAt} seed={`${seed}/stoop`} />
+      {heroSlot}
     </>
   );
 
@@ -449,11 +478,14 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
             return <Bird key={i} x={q[0]} y={q[1] + 1} s={0.85} seed={`${seed}/pg${i}`} flyAt={pigeonsFlyAt !== undefined ? pigeonsFlyAt + i * 0.1 : undefined} color={i ? palette.sand : palette.white} />;
           })
         : null}
-      {night ? <Glow cx={STOOP.lamp.lantern[0] + 24} cy={STOOP.lamp.lantern[1] - 18} r={18} rings={2} spread={2.2} color={palette.peach} opacity={0.4} /> : null}
+      {night ? <GlowDiscs cx={STOOP.lamp.lantern[0] + 24} cy={STOOP.lamp.lantern[1] - 18} steps={[[52, palette.peach], [38, HALF.peach]]} /> : null}
       <Fill d={G.lampFill} color={palette.tealDark} at={fa} mode="snap" seed={`${seed}/lamp`} />
       <Fill d={G.lantern} color={night ? palette.cream : palette.cream} at={fa} mode="snap" seed={`${seed}/lant`} />
       <Ink d={G.lampInk + rect(STOOP.lamp.lantern[0] + 6, STOOP.lamp.lantern[1] - 40, 36, 46, {seed: `${seed}/lanti`, over: 'small'})} width={SI.front} at={ia} seed={`${seed}/lampi`} />
       {bollard ? <BollardSlot x={STOOP.bollard.x} y={STOOP.bollard.y} w={STOOP.bollard.w} h={STOOP.bollard.h} seed={`${seed}/bollard`} /> : null}
+      <NightGround on={night}>
+        <Foreground spec={foreground} seed={`${seed}/fg`} />
+      </NightGround>
     </>
   );
 

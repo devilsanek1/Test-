@@ -1,7 +1,7 @@
 // props/Lock.tsx — THE PHP LOCK (P1), the film's most important prop, plus the fix (sage) and the crate of fixes.
 //
 //   <Lock x={400} y={1135} size={20} depth="far" />                                  // S01 govB lock box (16x20)
-//   <Lock x={540} y={1090} size={100} screwsOutAt={5.2} coverOpenAt={5.4} boltTestAt={5.9} gapMarkAt={6.2} />
+//   <Lock x={540} y={1090} size={100} screwsOutAt={5.2} coverOpenAt={5.4} boltTestAt={5.9} gapMarkAt={6.15} bit />
 //   <Lock x={488} y={960} size={75} state="blueprint" at={0.1} />                    // S05 blueprint detail, ink on white
 //   <Lock ... state="sketch" at={2} />  <Lock ... state="ghost" at={3} />  <Lock ... state="dot" />
 //   <Lock x={330} y={1130} size={42} state="fixed" at={1.2} />                       // THE FIX: sage box + cream check tag
@@ -10,8 +10,9 @@
 //
 // Anchor: (x, y) = the BOX CENTRE. size = box height in world px (width = 0.8 x size). Local design units: the box is
 // 80 x 100 (x -40..40, y -50..50); `LOCK` lists the local points (gap, strike, keyhole...) and `lockPoint()` maps them.
-// The flaw: inside (cover open), the bolt slides toward the strike plate and STOPS SHORT; a dashed ink bracket and a
-// small ink ring mark the gap where Bit lives. Fixed variant: same silhouette in sage, full-length bolt, cream check tag
+// The flaw: inside (cover open), a chunky bolt (0.22 of the box height) shoots ~43 % of the way to the strike plate and
+// STOPS SHORT with a knock-back, leaving the dark receiving slot in the strike empty; a dashed ink bracket and a small ink
+// ring mark the gap; Bit (`bit`) peeks out of the slot after the empty slot has held ~0.3 s. Fixed variant: same silhouette in sage, full-length bolt, cream check tag
 // on a loop (S06 builds it body -> loop -> tag at 0.07 s steps). LOD by on-screen height: < 7 px a flat dot, < 28 px a
 // simple box (no hinge ticks / screw slots), full detail above (survives the zoom-3.25 dive and the 80x100 close-up).
 
@@ -21,11 +22,12 @@ import {ease as E, lerp, prog, springAt, springs, useTime} from '../../../lib/ti
 import {Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
-import {ExitFade} from '../../../lib/exit';
+import {ExitFade, useLook} from '../../../lib/exit';
 import {check, circle, line, rect, rectPath, roundRect, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {bt, landSquash, lodOf, PropBase, PropRoot, usePropFrame} from './common';
 import {Cobweb} from './Glyphs';
+import {Bit} from './Bit';
 
 export type LockState = 'closed' | 'open' | 'blueprint' | 'sketch' | 'ghost' | 'dot' | 'fixed';
 
@@ -40,11 +42,17 @@ export const LOCK = {
     [0, -44],
     [0, 44],
   ] as Pt[],
-  /** Bolt tip x: retracted, short (the flaw), full (the fix). */
-  tip: {retracted: -10, short: 0, full: 19},
-  strike: [16, -16, 11, 32] as [number, number, number, number],
+  /** Bolt tip x: retracted (flush with the housing), short (the flaw: ~43 % of the way), full (the fix: into the slot). */
+  tip: {retracted: -11, short: 1, full: 25},
+  /** Bolt half-height (the bolt is 0.22 of the box height: chunky enough to read at phone size). */
+  boltR: 11,
+  strike: [17, -19, 12, 38] as [number, number, number, number],
+  /** The dark receiving slot cut into the strike plate (the hole the bolt never reaches). */
+  slot: [19, -12, 7, 24] as [number, number, number, number],
   /** Centre of the gap between the short bolt and the strike plate (where Bit lives). */
-  gap: [8, 0] as Pt,
+  gap: [9, 0] as Pt,
+  /** Where Bit peeks out of the slot (his feet; flip him so he faces the bolt). */
+  peek: [17, 8] as Pt,
   /** Tag hang point of the fixed variant (top-right corner loop). */
   loop: [33, -50] as Pt,
 };
@@ -87,6 +95,10 @@ export type LockProps = PropBase & {
   rider?: React.ReactNode;
   /** Children in lock-local units drawn inside the opened cavity (under the cover). */
   inside?: React.ReactNode;
+  /** Bit lives in the slot: he peeks out of it toward the short bolt (inside the cavity, under the cover). `peekAt`
+   *  defaults to boltTestAt + 0.55 (the bolt stops at +0.2, recoils, then the EMPTY slot holds ~0.3 s). size = his
+   *  length in lock-local units (default 14: he fills the gap). */
+  bit?: boolean | {peekAt?: number; hideAt?: number; size?: number; alertAt?: number; seed?: Seed};
   /** Force a level of detail (0 dot, 1 simple, 2 full). Default by on-screen size. */
   lod?: 0 | 1 | 2;
 };
@@ -98,6 +110,8 @@ const R = 9;
 export const Lock: React.FC<LockProps> = (p) => {
   const {x = 0, y = 0, size, state = 'closed', at, outAt, outDur, rot = 0, flip, seed = 'lock'} = p;
   const t = useTime();
+  const look = useLook();
+  const paperLook = look.fills === 'paper';
   const clipId = 'lk' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const scale = size !== undefined ? size / LOCK.h : p.scale ?? 1;
   const F = usePropFrame({scale, depth: p.depth, ink: p.ink, at, dur: p.dur, baseDur: 0.5, seed, defDepth: 'mid'});
@@ -136,20 +150,25 @@ export const Lock: React.FC<LockProps> = (p) => {
     return (
       <PropRoot x={x} y={y + dy} s={scale} rot={rot + dr} flip={flip} outAt={outAt} outDur={outDur}>
         {state === 'ghost' ? null : <Fill rect={[-40, -50, 80, 100]} color={body} at={at} mode="snap" offset={false} seed={`${seed}/dot`} />}
+        {state !== 'ghost' && paperLook ? <Ink d={rectPath(-40, -50, 80, 100)} at={at} width={W} taper={false} vary={0} seed={`${seed}/doti`} /> : null}
         {p.rider}
       </PropRoot>
     );
   }
 
   // ---------------------------------------------------------------- state progress
-  const cover = paperish ? 1 : state === 'open' && p.coverOpenAt === undefined ? 1 : p.coverOpenAt !== undefined ? prog(t, p.coverOpenAt, 0.15, E.inOutSine) : 0;
-  const coverShut = p.coverCloseAt !== undefined ? prog(t, p.coverCloseAt, 0.15, E.inOutSine) : 0;
+  // the hinge reads over ~6 frames: scaleX 1 -> edge-on -> -0.3 (its back shows) in 0.2 s
+  const cover = paperish ? 1 : state === 'open' && p.coverOpenAt === undefined ? 1 : p.coverOpenAt !== undefined ? prog(t, p.coverOpenAt, 0.2, E.inOutSine) : 0;
+  const coverShut = p.coverCloseAt !== undefined ? prog(t, p.coverCloseAt, 0.2, E.inOutSine) : 0;
   const open = Math.max(0, cover - coverShut);
   const tipTarget = fixed ? LOCK.tip.full : LOCK.tip.short;
   let tip = tipTarget;
   if (p.boltTestAt !== undefined) {
+    // spring-shot slide (0.2 s), then it hits its stop SHORT of the slot and knocks back 3.5 units (0.14 s); the
+    // fixed bolt seats in the slot with a 1-unit settle
     const q = prog(t, p.boltTestAt, 0.2, E.outCubic);
-    const knock = t > p.boltTestAt + 0.2 ? Math.sin(Math.min(1, (t - p.boltTestAt - 0.2) / 0.1) * Math.PI) * -1.6 : 0;
+    const dt = t - p.boltTestAt - 0.2;
+    const knock = dt > 0 && dt < 0.14 ? -Math.sin((dt / 0.14) * Math.PI) * (fixed ? 1 : 3.5) : 0;
     tip = lerp(LOCK.tip.retracted, tipTarget, q) + knock;
   }
   const mech = open > 0.02 || paperish;
@@ -191,26 +210,36 @@ export const Lock: React.FC<LockProps> = (p) => {
     const cav = rectPath(COV[0], COV[1], COV[2], COV[3]);
     if (!paperish) fill('cav', cav, palette.tealDark, undefined, {offset: false, mode: 'none'});
     // bolt housing, bolt, strike plate
-    const hx = -25;
-    const housing = rectPath(hx, -14, 16, 28);
-    const bolt = rectPath(-12, -7.5, tip + 12, 15);
+    const hx = -27;
+    const hb = -11; // housing right edge (where the bolt comes out)
+    const br = LOCK.boltR;
+    const housing = rectPath(hx, -17, 16, 34);
+    const boltL = Math.max(0, tip - hb);
     const st = LOCK.strike;
+    const sl = LOCK.slot;
     if (!paperish) {
       fill('housing', housing, body, undefined, {offset: false, mode: 'none'});
-      fill('bolt', bolt, palette.cream, undefined, {offset: false, mode: 'none'});
       fill('strike', rectPath(st[0], st[1], st[2], st[3]), body, undefined, {offset: false, mode: 'none'});
-      fill('slot', rectPath(st[0] + 1, -7, 4, 14), palette.tealDark, undefined, {offset: false, mode: 'none'});
+      fill('slot', rectPath(sl[0], sl[1], sl[2], sl[3]), palette.tealDark, undefined, {offset: false, mode: 'none'});
+      if (boltL > 0.3) fill('bolt', rectPath(hb, -br, boltL, br * 2), palette.cream, undefined, {offset: false, mode: 'none'});
     }
     const mw = lod === 2 ? 0.7 : 0.9;
-    if (blue || sketch) ink('cavI', rect(COV[0], COV[1], COV[2], COV[3], {seed: `${seed}/cv`, over: 3}), T(0.2), mw);
-    ink('mechI', `M${hx} -14H${hx + 16}V14H${hx}Z` + `M-12 -7.5H${tip.toFixed(2)}V7.5H-12` + `M${st[0]} ${st[1]}H${st[0] + st[2]}V${st[1] + st[3]}H${st[0]}Z` + `M${st[0] + 4} -7V7`, blue || sketch ? T(0.3) : undefined, mw, {taper: false, vary: 0});
-    if (sketch) ink('mechI2', rect(hx + 1.5, -13, 16, 28, {seed: `${seed}/s2`, over: 4}) + rect(-11, -5, tip + 12, 12, {seed: `${seed}/s3`, over: 5}), T(0.38), 0.55);
+    if (blue || sketch || paperLook) ink('cavI', rect(COV[0], COV[1], COV[2], COV[3], {seed: `${seed}/cv`, over: 3}), T(0.2), mw);
+    const boltI = boltL > 0.3 ? `M${hb} ${-br}H${tip.toFixed(2)}V${br}H${hb}` + (lod === 2 ? `M${hb + 3} ${-br + 4}H${(tip - 3).toFixed(2)}` : '') : '';
+    ink('mechI', `M${hx} -17H${hb}V17H${hx}Z` + `M${st[0]} ${st[1]}H${st[0] + st[2]}V${st[1] + st[3]}H${st[0]}Z` + `M${sl[0]} ${sl[1]}H${sl[0] + sl[2]}V${sl[1] + sl[3]}H${sl[0]}Z`, blue || sketch ? T(0.3) : undefined, mw, {taper: false, vary: 0});
+    if (boltI) ink('boltI', boltI, blue || sketch ? T(0.36) : undefined, mw, {taper: false, vary: 0});
+    if (sketch) ink('mechI2', rect(hx + 1.5, -16, 16, 34, {seed: `${seed}/s2`, over: 4}) + rect(hb + 1, -br + 2, tip - hb, br * 2 - 3, {seed: `${seed}/s3`, over: 5}), T(0.38), 0.55);
     if (blue) {
       // centre line through the bolt (dash-dot) and a dimension line under the box
       ink('cl', `M-48 0H-40M-36 0H-34M-30 0H-20M-16 0H-14M-10 0H0M4 0H6M10 0H20M24 0H26M30 0H40M44 0H48`, T(0.45), 0.4, {taper: false, order: 'all'});
       ink('dim', line(-40, 62, 40, 62, {over: [0, 0], seed: `${seed}/dm`}) + `M-40 56V68M40 56V68M-40 62L-33 59M-40 62L-33 65M40 62L33 59M40 62L33 65`, T(0.5), 0.45, {taper: false});
     }
     out.push(<g key="inside">{p.inside}</g>);
+    if (p.bit) {
+      const b = p.bit === true ? {} : p.bit;
+      const pk = b.peekAt ?? (p.boltTestAt !== undefined ? p.boltTestAt + 0.55 : undefined);
+      out.push(<Bit key="bit" x={LOCK.peek[0]} y={LOCK.peek[1]} size={b.size ?? 14} flip peekAt={pk} state={pk === undefined ? 'peek' : undefined} hideAt={b.hideAt} alertAt={b.alertAt} seed={b.seed ?? `${seed}/bit`} />);
+    }
   }
 
   // gap mark (dashed bracket + small ring)
@@ -219,8 +248,8 @@ export const Lock: React.FC<LockProps> = (p) => {
     if (ga === undefined || t >= ga) {
       const x0 = LOCK.tip.short;
       const x1 = LOCK.strike[0];
-      let dash = `M${x0} -26V-20M${x1} -26V-20`;
-      for (let xx = x0 + 1.5; xx < x1 - 1; xx += 4) dash += `M${xx.toFixed(1)} -23H${Math.min(x1 - 1.5, xx + 2.2).toFixed(1)}`;
+      let dash = `M${x0} -29V-23M${x1} -29V-23`;
+      for (let xx = x0 + 1.5; xx < x1 - 1; xx += 4) dash += `M${xx.toFixed(1)} -26H${Math.min(x1 - 1.5, xx + 2.2).toFixed(1)}`;
       ink('gapB', dash, ga, 0.55, {taper: false, dur: 0.12});
       ink('gapR', circle(LOCK.gap[0], LOCK.gap[1], 11, {seed: `${seed}/gr`, overlap: 20}), bt(ga, 0.05), 0.6, {taper: false, dur: 0.12});
     }
@@ -243,7 +272,7 @@ export const Lock: React.FC<LockProps> = (p) => {
       const sa = Math.sin((slotA * Math.PI) / 180) * 3;
       out.push(
         <XG key={`screw${i}`} m={mat.compose(mat.translate(sxp + ox, syp + oy), mat.scale(k))}>
-          <Fill d={roundRect(-4.2, -4.2, 8.4, 8.4, 4.2)} color={lod === 2 ? palette.cream : palette.ink} at={T(0.3 + i * 0.04)} offset={false} seed={`${seed}/sc${i}`} />
+          <Fill d={roundRect(-4.2, -4.2, 8.4, 8.4, 4.2)} color={lod === 2 ? palette.cream : palette.ink} at={T(0.3 + i * 0.04)} offset={false} seed={`${seed}/sc${i}`} lookExempt={lod < 2 && paperLook} />
           {lod === 2 ? <Ink d={circle(0, 0, 4.2, {seed: `${seed}/sci${i}`, overlap: 10}) + `M${-ca} ${-sa}L${ca} ${sa}`} at={T(0.26 + i * 0.04)} width={W * 0.5} taper={false} seed={`${seed}/sci${i}`} /> : null}
         </XG>,
       );
@@ -252,7 +281,7 @@ export const Lock: React.FC<LockProps> = (p) => {
 
   // the hinged cover (front plate with the keyhole)
   if (!paperish) {
-    const coverSx = 1 - 1.24 * open;
+    const coverSx = 1 - 1.3 * open;
     if (Math.abs(coverSx) > 0.02) {
       const back = coverSx < 0;
       const hinge = COV[0];
@@ -261,11 +290,14 @@ export const Lock: React.FC<LockProps> = (p) => {
         <XG key="cover" m={mat.about(mat.scale(coverSx, 1), hinge, 0)}>
           <Fill d={coverD} color={back ? shade : coverCol} at={T(0.2)} offset={[F.off[0] * 0.6, F.off[1] * 0.6]} seed={`${seed}/cov`} />
           {!back && coverSx > 0.3 ? (
-            <Fill d={`M0 -13a7 7 0 1 0 0.01 0Z` + `M-3.4 -2L-5.5 13H5.5L3.4 -2Z`} color={palette.ink} at={T(0.34)} offset={false} mode="snap" seed={`${seed}/kh`} />
+            // the keyhole is ink: it stays ink in the paper / line-art state (frame 0, the S13 un-build)
+            <Fill d={`M0 -13a7 7 0 1 0 0.01 0Z` + `M-3.4 -2L-5.5 13H5.5L3.4 -2Z`} color={palette.ink} at={T(0.34)} offset={false} mode="snap" seed={`${seed}/kh`} lookExempt={paperLook} />
           ) : null}
-          {lod === 2 ? <Ink d={roundRect(COV[0], COV[1], COV[2], COV[3], 4, {closed: false, seed: `${seed}/covi`})} at={T(0.16)} width={W * 0.75} seed={`${seed}/covi`} vary={0} /> : null}
+          {lod === 2 || paperLook ? <Ink d={roundRect(COV[0], COV[1], COV[2], COV[3], 4, {closed: false, seed: `${seed}/covi`})} at={T(0.16)} width={W * (lod === 2 ? 0.75 : 0.6)} seed={`${seed}/covi`} vary={0} /> : null}
         </XG>,
       );
+      // near edge-on the plate shows its thickness: one ink line at the free edge
+      if (Math.abs(coverSx) < 0.25 && open > 0 && open < 1) ink('covEdge', `M${(hinge + COV[2] * coverSx).toFixed(2)} ${COV[1] + 2}V${COV[1] + COV[3] - 2}`, undefined, 0.9, {taper: false, vary: 0});
       if (lod === 2 && !back) ink('hinge', `M${hinge - 3} -26V-17M${hinge - 3} 17V26`, T(0.4), 1.3, {taper: false, order: 'all'});
     }
   }

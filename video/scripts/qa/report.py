@@ -34,6 +34,12 @@ def main():
         gates.append(('life (deadframes)', ok, f"{df['passed']}/{len(df['scenes'])} scenes pass" + (': failing ' + ', '.join(
             f"{s['id']} {s['score']:.1f}/10" + (f" ({s['flagged_runs']} dead run{'s' if s['flagged_runs'] != 1 else ''} over {df['options']['dead_limit']:.2f} s)" if s['flagged_runs'] else '')
             for s in bad) if bad else '')))
+    if not df:
+        gates.append(('life (deadframes)', False, 'deadframes did not produce deadframes.json (see deadframes.log)'))
+    if not fc:
+        gates.append(('frames (framecheck)', False, 'framecheck did not produce framecheck.json (see framecheck.log)'))
+    if comp == 'Main' and not bs:
+        gates.append(('beat sync (beatsync)', False, 'beatsync did not produce beatsync/beatsync.json'))
     if fc:
         e = fc['summary']['errors']
         gates.append(('frames (framecheck)', e == 0, f"{e} errors, {fc['summary']['warnings']} warnings " + json.dumps(fc['summary']['by_kind'])))

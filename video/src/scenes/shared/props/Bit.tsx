@@ -10,7 +10,8 @@
 // Look: a side-view beetle facing RIGHT (flip to face left): a solid-ink dome shell, a round ink head with a cream eye
 // dot, two antennae, three little legs. Anchor (x, y) = where his feet touch the surface, at the middle of his body.
 // size = body length in world px (16 x 10 in wide shots, ~20 on the blueprint, ~60 in the S02 close-up, 1-8 px specks).
-// Detail drops with on-screen size: < 6 px a silhouette (dome + head), < 18 px no eye rim / leg joints.
+// Detail drops with on-screen size: < 6 px a silhouette (dome + head), < 12 px no shell highlight; the cream eye keeps
+// >= 1.4 px radius on screen down to ~10 px (so the 16 px hook-frame Bit still has a face).
 
 import React from 'react';
 import {palette} from '../../../lib/theme';
@@ -75,7 +76,10 @@ export const Bit: React.FC<BitProps> = (p) => {
   let rot = p.rot ?? 0;
   const s = size / L;
   const onScreen = size * matScale(m);
-  const lod = state === 'silhouette' ? 0 : lodOf(onScreen, 6, 18);
+  // < 6 px a silhouette; the cream eye always above it, the shell highlight from 12 px (the 16-24 px plaza / cornice
+  // Bit keeps a face on a phone: review 4)
+  const lod = state === 'silhouette' ? 0 : lodOf(onScreen, 6, 12);
+  const kpx = Math.max(1e-3, onScreen / L); // screen px per local unit
   const ph = rand(seed, 'ph') * 6.28;
   const doodle = state === 'doodle';
 
@@ -170,8 +174,8 @@ export const Bit: React.FC<BitProps> = (p) => {
     // cream details: eye dot (+ a shell highlight arc when big enough)
     parts.push(
       <ExitFade key="eye" x={9.6} y={-5.6}>
-        <circle cx={9.7} cy={-5.6} r={1.15} fill={palette.cream} />
-        {lod === 2 ? <path d="M-6.5 -7.2Q-4 -10 0 -10.2" stroke={palette.cream} strokeWidth={0.9} fill="none" strokeLinecap="round" /> : null}
+        <circle cx={9.7} cy={-5.6} r={Math.min(2, Math.max(1.15, 1.4 / kpx))} fill={palette.cream} />
+        {lod === 2 ? <path d="M-6.5 -7.2Q-4 -10 0 -10.2" stroke={palette.cream} strokeWidth={Math.min(1.6, Math.max(0.9, 1.1 / kpx))} fill="none" strokeLinecap="round" /> : null}
       </ExitFade>,
     );
   }

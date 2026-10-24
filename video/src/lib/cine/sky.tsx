@@ -15,7 +15,7 @@ import {palette, stroke} from '../theme';
 import {osc, prog, springAt, springs, useTime} from '../time';
 import {rand, rng, Seed} from '../rng';
 import {line, Pt} from '../sketch';
-import {TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
+import {TodLike, TodPalette, useTodPal} from './atmosphere';
 import {memoize, PathBuf, r1} from './util';
 import {exitScale, inkOn, isPaper, lookPaint, toScreen, useCineState, xfScale} from './state';
 import {ease as E} from '../time';

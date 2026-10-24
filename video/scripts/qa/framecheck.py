@@ -77,11 +77,17 @@ def text_components(mask, a, kind):
         if h > 1.35 * em or w > 3.2 * em or (w > 1.6 * em and h < 0.12 * em):
             continue
         sw = 2 * float(maxd[j])
-        if not (0.025 * em <= sw <= 0.17 * em):
+        if not (0.025 * em <= sw <= 0.22 * em):
             continue
         fill = ar / float(w * h)
         if fill > 0.75 and min(w, h) > 0.2 * em:
             continue
+        if min(w, h) >= 0.3 * em:
+            # hollow rectangles (window frames, panels, signs) are not letters: their ink hugs the bounding box
+            comp = lab[y:y + h, x:x + w] == j
+            inner = comp[3:-3, 3:-3] if h > 6 and w > 6 else comp
+            if inner.sum() <= 0.12 * ar:
+                continue
         keep[j] = True
     # words and lines: a glyph has at least 2 other glyphs on its line within 1.6 em (drops stray ink fragments)
     idx = np.nonzero(keep)[0]
@@ -110,8 +116,9 @@ def drop_enclosed(t, other, frac=0.5):
     return t & ~bad[lab]
 
 
-def caption_check(img, a, band, thr_low=3.0):
-    """Legibility of the caption in the band. Returns None when no caption glyphs are found."""
+def caption_check(img, a, band, thr_low=3.0, tone_hint=None):
+    """Legibility of the caption in the band. Returns None when no caption glyphs are found. tone_hint ('dark' |
+    'light'), when the film data says which tone the caption has, skips the other tone (art in caption ink)."""
     y0, y1 = int(round(band[0] * a)), int(round(band[1] * a))
     x0, x1 = int(round(60 * a)), int(round(1020 * a))
     crop = img[y0:y1, x0:x1]
@@ -120,12 +127,15 @@ def caption_check(img, a, band, thr_low=3.0):
     rgb = crop[..., ::-1].astype(np.float64)
     lum = Q.wcag_lum(crop[..., ::-1])
     em = EM * a
-    dark = (np.abs(rgb - INK).max(axis=2) <= 55) & (lum < 0.06)
+    dark = (np.abs(rgb - INK).max(axis=2) <= 40) & (lum < 0.035)
     light = (rgb.min(axis=2) >= 228) & ((rgb.max(axis=2) - rgb.min(axis=2)) <= 22)
     box = np.zeros(dark.shape, bool)
     for p in PEACH:
         box |= np.abs(rgb - p).max(axis=2) <= 22
     box = cv2.morphologyEx(box.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)) > 0
+    # highlight boxes with their words filled in: a highlighted word reads against its box (by design, ink on peach)
+    kb = max(3, int(round(0.25 * em)) | 1)
+    boxfill = cv2.morphologyEx(box.astype(np.uint8), cv2.MORPH_CLOSE, np.ones((kb, kb), np.uint8)) > 0
     # glyph rows: centres between the band top + 0.2 em and the band bottom - 0.45 em (keeps skyline / string-light
     # rows at the band edge out); line 1 and 2 of a page (and pages scrolling through) live there
     rows = np.zeros(dark.shape, bool)
@@ -143,17 +153,23 @@ def caption_check(img, a, band, thr_low=3.0):
         cand[tone] = t
     cand['light'] = drop_enclosed(cand['light'], cand['dark'])
     cand['dark'] = drop_enclosed(cand['dark'], cand['light'])
+    for k in cand:
+        cand[k] = cand[k] & ~boxfill
     areas = {k: int(v.sum()) for k, v in cand.items()}
     big = max(areas.values())
     res = []
     for tone in ('dark', 'light'):
+        if tone_hint and tone != tone_hint:
+            continue
         t = cand[tone]
         area = areas[tone]
         # a caption = several letters (>= 0.25 em^2 of ink); a minor second tone is art, unless it is a real tone split
-        if area < 0.25 * em * em or area < 0.35 * big:
+        if area < 0.25 * em * em or (area < 0.35 * big and not tone_hint):
             continue
         core = cv2.erode(t.astype(np.uint8), np.ones((2, 2), np.uint8)) > 0
         tl = float(np.median(lum[core])) if core.any() else float(np.median(lum[t]))
+        if (tone == 'dark' and tl > 0.025) or (tone == 'light' and tl < 0.85):
+            continue   # not the caption's own colour (ink #2B1B0F = 0.013, white = 1.0): art
         r = max(2, int(round(0.3 * em)))
         ring = cv2.dilate(t.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * r + 1, 2 * r + 1))) > 0
         # text = the glyphs plus same-colour fragments touching them or glyph-sized (letters clipped by the caption
@@ -196,6 +212,9 @@ def main(argv=None):
     ap.add_argument('--caption-band', default='280,600', help='y0,y1 canvas px (0,0 = skip the caption check)')
     ap.add_argument('--canvas-width', type=int, default=Q.CANVAS_W)
     ap.add_argument('--no-ui-zones', action='store_true', help='skip the platform UI-zone check (non-9:16 sources)')
+    ap.add_argument('--captions', default='auto', help='captions JSON: frames where a page is settled on screen must show legible glyphs '
+                    '("auto" = src/data/captions.json for the film and scene compositions, "none")')
+    ap.add_argument('--expect-caption', action='store_true', help='expect a caption in every frame (tests, dev comps that always show one)')
     ap.add_argument('--busy-warn', type=float, default=0.06)
     ap.add_argument('--low-err', type=float, default=0.05)
     ap.add_argument('--low-warn', type=float, default=0.02)
@@ -232,6 +251,34 @@ def main(argv=None):
             for f in range(int(math.floor(w0 * fps)) - 1, int(math.ceil(w1 * fps)) + 2):
                 trans_frames.add(f)
 
+    expect = np.zeros(src.n + 1, bool)
+    cap_path = os.path.join(Q.ROOT, 'src', 'data', 'captions.json') if (args.captions == 'auto' and sc_path) else (
+        None if args.captions in ('auto', 'none') else args.captions)
+    if args.expect_caption:
+        expect[:] = True
+    elif cap_path and os.path.exists(cap_path):
+        clip_end = args.t0 + src.n / fps
+        for pg in json.load(open(cap_path)):
+            a0, a1 = float(pg['s']) + 0.3, float(pg['e']) - 0.1        # after the scroll settles, before the next page
+            if a1 > a0 and a1 > args.t0 and a0 < clip_end:
+                expect[max(0, int(math.ceil((a0 - args.t0) * fps))):max(0, int((a1 - args.t0) * fps))] = True
+
+    tone_at = [None] * (src.n + 1)
+    if sc_path:
+        sj = json.load(open(sc_path))
+        sj = sj.get('scenes', sj) if isinstance(sj, dict) else sj
+        for sc in sorted(sj, key=lambda x: x['start']):
+            keys = sc.get('captionTone') or []
+            if not keys:
+                continue
+            for f in range(max(0, int(math.floor((sc['start'] - args.t0) * fps))), min(src.n, int(math.ceil((sc['end'] - args.t0) * fps)))):
+                tl = f / fps + args.t0 - sc['start']
+                k = [kk for kk in keys if kk['t'] <= tl] or keys[:1]
+                cur = k[-1]
+                # unknown while a tone key switches (wipes / 1-frame switches) and around transitions (split captions)
+                near_switch = any(abs(tl - kk['t']) <= max(0.5, kk.get('dur', 0.4) + 0.2) for kk in keys[1:])
+                tone_at[f] = None if near_switch or f in trans_frames else cur['tone']
+
     # pass 1: per-frame measurements
     aw, ah = src.aw, src.ah
     bm = np.zeros((ah, aw), bool)
@@ -253,7 +300,7 @@ def main(argv=None):
         smalls.append(small(img))
         b, std, top = is_blank(img)
         blanks.append((b, std, top))
-        caps.append(caption_check(img, a, band) if band[1] > band[0] else None)
+        caps.append(caption_check(img, a, band, tone_hint=tone_at[i] if i < len(tone_at) else None) if band[1] > band[0] else None)
         g = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         f = cam.features(g)
         e = Q.edges(img)
@@ -297,7 +344,10 @@ def main(argv=None):
     # blank runs
     for (s, e_) in Q.runs([b[0] for b in blanks]):
         L = e_ - s + 1
-        bridge = L <= 3 and (near_cut(s) or near_cut(e_) or s in trans_frames)
+        # a deliberate bridge: <= 3 flat frames BETWEEN two different shots (a white match frame, a push-through
+        # colour); a blank frame between two similar frames is a glitch
+        between = s > 0 and e_ + 1 < n and diff_frac(smalls[s - 1], smalls[e_ + 1]) >= 0.15
+        bridge = L <= 3 and between and (near_cut(s) or near_cut(e_) or s in trans_frames or not cut_frames)
         sev = 'warning' if bridge else 'error'
         why = 'bridge frame(s) at a cut' if bridge else ('frame 0 is blank: the hook must show' if s == 0 else 'blank / near-uniform frame')
         add('blank', sev, s, e_, f"{why} ({L} f, luma std {min(blanks[k][1] for k in range(s, e_ + 1)):.1f}, top colour {100 * max(blanks[k][2] for k in range(s, e_ + 1)):.0f} %)")
@@ -352,6 +402,12 @@ def main(argv=None):
             k = j + 1
         else:
             k += 1
+    # captions that should be on screen but cannot be found: merged with same-coloured art, covered, or the wrong tone
+    miss = [bool(expect[i]) and caps[i] is None and not blanks[i][0] for i in range(n)]
+    for (s0, e0) in Q.runs(miss):
+        if e0 - s0 + 1 >= 6:
+            add('caption', 'error', s0, e0, 'caption page on screen but no legible glyphs found: merged with same-coloured art behind it, '
+                'covered, or the wrong tone for the sky', missing=True)
     # UI zones
     if not args.no_ui_zones:
         for z in ZONES:

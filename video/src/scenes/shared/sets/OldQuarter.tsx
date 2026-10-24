@@ -18,11 +18,12 @@ import {palette} from '../../../lib/theme';
 import {useTime} from '../../../lib/time';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
-import {crown, crownTicks, line, polyPath, rectPath, Pt} from '../../../lib/sketch';
+import {crown, crownTicks, ellipse, line, polyPath, rectPath, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {osc} from '../../../lib/time';
 import {rand} from '../../../lib/rng';
-import {LayerWrap, noWrap, pavingJoints, PopUp, SetPlace, SI} from './common';
+import {LayerWrap, noWrap, PopUp, SetPlace, SI} from './common';
+import {Foreground, ForegroundSpec, groundMarks, GroundMarks} from './ground';
 import {BollardSlot, HangingPlaqueSlot, NoticeboardSlot, OnlookerSlot, PaneRect, PlaqueSlot} from './propSlots';
 import {SiteFacade, SiteFacadeProps} from './SiteFacade';
 import type {Acc, Hair} from '../../../lib/kit';
@@ -34,8 +35,8 @@ export const OLD_QUARTER = {
   base: 1300,
   kerb: 1500,
   sites: {
-    L: {x: 30, top: 690, w: 315, storeys: 6, fill: palette.cream, browser: [100, 880, 190, 130] as R4, door: [150, 1150, 90, 150] as R4, sign: {x: 300, y: 1190, wallX: 246}},
-    M: {x: 360, top: 820, w: 280, storeys: 4, fill: palette.sand, browser: [420, 920, 190, 120] as R4, door: [470, 1150, 90, 150] as R4, sign: {x: 590, y: 1190, wallX: 566}},
+    L: {x: 30, top: 690, w: 315, storeys: 6, fill: palette.sand, browser: [100, 880, 190, 130] as R4, door: [150, 1150, 90, 150] as R4, sign: {x: 300, y: 1190, wallX: 246}},
+    M: {x: 360, top: 820, w: 280, storeys: 4, fill: palette.cream, browser: [420, 920, 190, 120] as R4, door: [470, 1150, 90, 150] as R4, sign: {x: 590, y: 1190, wallX: 566}},
     R: {x: 740, top: 700, w: 310, storeys: 6, fill: palette.mintPale, browser: [770, 860, 170, 130] as R4, door: [850, 1150, 90, 150] as R4, sign: {x: 800, y: 1190, wallX: 844}},
   },
   gap: [640, 740] as [number, number],
@@ -63,13 +64,14 @@ const G = (() => {
   const s = 'oq';
   const VP = OLD_QUARTER.vp;
   // street gap receding to the horizon
-  const street = polyPath([[640, OLD_QUARTER.base], [740, OLD_QUARTER.base], [VP[0] + 3, VP[1]], [VP[0] - 3, VP[1]]]);
+  const streetGap = polyPath([[640, OLD_QUARTER.base], [740, OLD_QUARTER.base], [VP[0] + 3, VP[1]], [VP[0] - 3, VP[1]]]);
   // second row of 9 buildings (behind the near row), tops 760-800, base on the eye line
   const second: {x: number; w: number; top: number; c: string; plaque: 'new' | 'old'}[] = [];
   let x = 330;
   for (let i = 0; i < 9; i++) {
     const w = 52 + rand(s, `w${i}`) * 16;
-    second.push({x, w, top: 760 + rand(s, `t${i}`) * 40, c: [palette.cream, palette.sand, palette.mintPale][i % 3], plaque: i % 3 === 2 ? 'old' : 'new'});
+    // the second row's tops meet the golden sky: sand / tan, never cream (one or two steps off the sky)
+    second.push({x, w, top: 760 + rand(s, `t${i}`) * 40, c: [palette.sand, palette.tan, palette.sand][i % 3], plaque: i % 3 === 2 ? 'old' : 'new'});
     x += w + 2;
   }
   let secondInk = '';
@@ -81,7 +83,9 @@ const G = (() => {
   // far city at the end of the gap
   const far = rectPath(642, 1100, 22, 50) + rectPath(664, 1080, 18, 70) + rectPath(684, 1110, 26, 40) + rectPath(712, 1090, 24, 60);
   const kerb = line(-160, OLD_QUARTER.kerb, 1240, OLD_QUARTER.kerb + 2, {seed: `${s}/k`, over: 0}) + line(-160, OLD_QUARTER.kerb + 20, 1240, OLD_QUARTER.kerb + 23, {seed: `${s}/k2`, over: 0});
-  const joints = pavingJoints([690, 1150], OLD_QUARTER.base + 6, OLD_QUARTER.kerb - 4, -900, 2300, 13, 2, `${s}/pj`);
+  // the sidewalk and the street: one flat field each, a few broken paving lines + specks (no tile grid)
+  const walk = groundMarks({vp: [690, 1150], top: OLD_QUARTER.base + 30, bottom: OLD_QUARTER.kerb - 6, x0: -700, x1: 2000, rays: 4, cross: 1, specks: 8, reach: 0.9, seed: `${s}/gw`});
+  const street = groundMarks({vp: [690, 1150], top: OLD_QUARTER.kerb + 40, bottom: 1920, x0: -200, x1: 1300, rays: 0, cross: 1, specks: 14, seed: `${s}/gs`});
   // stoops in front of each door
   const stoops = (['L', 'M', 'R'] as SiteId[]).map((id) => {
     const d = OLD_QUARTER.sites[id].door;
@@ -96,9 +100,11 @@ const G = (() => {
   // near street tree cropped at the right edge
   const treeCrown = crown(1040, 1050, 110, 135, {seed: `${s}/tree`, bumps: 10});
   const treeTicks = crownTicks(1040, 1050, 110, 135, {seed: `${s}/treek`, n: 4, size: 12});
-  const trunk = rectPath(1022, 1150, 24, 900);
-  const trunkInk = line(1022, 2000, 1022, 1160, {seed: `${s}/t1`, over: 0}) + line(1046, 2000, 1045, 1165, {seed: `${s}/t2`, over: 0});
-  return {street, second, secondInk, secondWin, far, kerb, joints, stoops, stoopInk, treeCrown, treeTicks, trunk, trunkInk};
+  // the trunk stands in a tree pit at kerb height (style bible 8), not a pole to the frame bottom
+  const trunk = rectPath(1022, 1150, 24, 312);
+  const trunkInk = line(1022, 1462, 1022, 1160, {seed: `${s}/t1`, over: 0}) + line(1046, 1462, 1045, 1165, {seed: `${s}/t2`, over: 0}) + ellipse(1034, 1464, 54, 12, {seed: `${s}/pit`, overlap: -40});
+  const pit = `M980 1464a54 12 0 1 0 108 0a54 12 0 1 0 -108 0Z`;
+  return {street: streetGap, second, secondInk, secondWin, far, kerb, walk, streetMarks: street, stoops, stoopInk, treeCrown, treeTicks, trunk, trunkInk, pit};
 })();
 
 export type OldQuarterProps = {
@@ -116,6 +122,9 @@ export type OldQuarterProps = {
   audience?: boolean | {riseAt?: number};
   bollard?: boolean;
   band?: boolean;
+  /** Foreground framing in the bottom band (ground.tsx presets). Default: 'railing' (a low iron railing cut by the
+   *  left edge, ending in a post at x 700); none while the S13 audience is on. false = none. */
+  foreground?: ForegroundSpec;
   /** Per-site SiteFacade overrides (chromeAt, offAt, lit...). */
   site?: Partial<Record<SiteId, Partial<SiteFacadeProps>>>;
   wrap?: LayerWrap;
@@ -128,7 +137,7 @@ export type OldQuarterProps = {
   seed?: string;
 };
 
-export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaqueSwingAt, oldPlaque = {}, secondPlaques = true, board = false, audience = false, bollard = true, band = true, site = {}, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'oq'}) => {
+export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaqueSwingAt, oldPlaque = {}, secondPlaques = true, board = false, audience = false, bollard = true, band = true, foreground, site = {}, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'oq'}) => {
   const t = useTime();
   const S = OLD_QUARTER.sites;
   const far = (
@@ -153,7 +162,8 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
       <Fill d={G.street} color={palette.cream} offset={false} seed={`${seed}/gap`} />
       <Fill rect={[-160, OLD_QUARTER.kerb, 1400, 22]} color={palette.sand} offset={false} seed={`${seed}/kerbF`} />
       <Ink d={G.kerb} width={SI.front} seed={`${seed}/kerb`} />
-      <Ink d={G.joints} width={SI.hair} taper={false} seed={`${seed}/joints`} />
+      <GroundMarks marks={G.walk} width={SI.far} seed={`${seed}/gw`} />
+      <GroundMarks marks={G.streetMarks} width={SI.far} seed={`${seed}/gs`} />
     </>
   );
   const siteNode = (id: SiteId, i: number) => {
@@ -190,7 +200,8 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
   const sway = osc(t, 0.3, 2.1) * 0.5;
   const near = (
     <>
-      <XG m={mat.about(mat.rotate(sway), 1034, 2000)}>
+      <Fill d={G.pit} color={palette.tan} offset={false} seed={`${seed}/pit`} />
+      <XG m={mat.about(mat.rotate(sway), 1034, 1464)}>
         <Fill d={G.trunk} color={palette.brown} seed={`${seed}/trunk`} />
         <Ink d={G.trunkInk} width={SI.front} taper={false} />
         <Fill d={G.treeCrown} color={palette.sage} seed={`${seed}/crown`} />
@@ -216,6 +227,7 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
       {wrap('board', 0.8, boardNode)}
       {wrap('near', 1.0, near)}
       {wrap('audience', 1.0, aud)}
+      {wrap('foreground', 1.0, <Foreground spec={foreground === undefined ? (audience === false ? 'railing' : false) : foreground} seed={`${seed}/fg`} />)}
     </SetPlace>
   );
 };

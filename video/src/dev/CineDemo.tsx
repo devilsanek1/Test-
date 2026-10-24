@@ -12,7 +12,7 @@
 //   B (9.75-16.2)   PEAK, worm's-eye: a BACKLIT government building cropped by the frame (pediment past both edges,
 //                   lantern out of the top), inked below the caption band, a plaza crowd of back-view people, a
 //                   backlit head-and-shoulders silhouette at the lens; crane up while the upper storeys keep building.
-//   C (15.7-22)     PEAK, pull-back from one lit window (8x -> 1.5x, cruise <= 20 px / frame) to a wall of windows that
+//   C (15.7-22)     PEAK, pull-back from one lit window (8x -> 1.3x, cruise <= 20 px / frame) to a wall of windows that
 //                   light up, then go dark in waves that start at the captions; the hero window stays framed and is the
 //                   last light off. Close-ups degrade by screen size (full -> room -> pane, identical to the grid).
 // Cuts ride on the edge of something passing the lens (WipeCut: a column, a passer-by), each centred on a caption page.
@@ -75,7 +75,6 @@ import {
   Sky,
   SkyCloud,
   Stars,
-  Streaks,
   StringLights,
   TinyCrowd,
   TOD,
@@ -408,6 +407,8 @@ const ShotB: React.FC = () => {
           {...MON}
           tod={P}
           light="back"
+          // the crane carries the entablature up through the caption band: keep it quiet (fills only) down to y 720
+          quietY={720}
           people={30}
           doorPeople={3}
           seed="gov"
@@ -487,16 +488,24 @@ const wallUV = (q: Quad, p: Pt): [number, number] => {
   return best;
 };
 const CAP_UV = wallUV(WALL, unproject(camFull(C_KEYS, 1.4, {handheld: C_HANDHELD, seed: 'C'}), 0, [520, 430]));
-type Ev = {at: number; dur: number; to: 'on' | 'off'; pattern: 'wave' | 'rows' | 'random'; origin?: [number, number]; noise?: number; fraction?: number; region?: [number, number, number, number]};
-/** Switch-offs in BURSTS: one block of floors after another goes dark (0.12 s each, 0.4 s apart), starting at the block
- *  under the captions and spreading outward (a counting rhythm: sites switching off one by one, and every burst is
- *  its own legible event), then the last stragglers, then the hero. */
-const OFF_BLOCKS: [number, number, number, number][] = [];
-for (let i = 0; i < 2; i++) for (let j = 0; j < 4; j++) OFF_BLOCKS.push([i * 0.5, j * 0.25, i * 0.5 + 0.5, j * 0.25 + 0.25]);
-OFF_BLOCKS.sort((p, q) => Math.hypot((p[0] + p[2]) / 2 - CAP_UV[0], (p[1] + p[3]) / 2 - CAP_UV[1]) - Math.hypot((q[0] + q[2]) / 2 - CAP_UV[0], (q[1] + q[3]) / 2 - CAP_UV[1]));
+type Ev = {at: number; dur: number; to: 'on' | 'off'; pattern: 'wave' | 'rows' | 'random' | 'collapse'; origin?: [number, number]; noise?: number; fraction?: number; region?: [number, number, number, number]};
+/** The switch-off: darkness closes in on the hero (a ragged collapse wave from the far edges: the windows around the
+ *  hero go last), punctuated by whole blocks of floors going dark at once inside the final framing (legible, counted
+ *  events every ~0.4 s), then the stragglers, then the hero alone on "did.". */
+const OFF_BURSTS: [number, number, number, number][] = [
+  [0.3, 0.3, 0.45, 0.42],
+  [0.0, 0.64, 0.2, 0.76],
+  [0.45, 0.5, 0.6, 0.62],
+  [0.24, 0.56, 0.38, 0.66],
+  [0.0, 0.3, 0.12, 0.42],
+  [0.2, 0.72, 0.45, 0.86],
+];
 const C_EVENTS: Ev[] = [
   {at: 0.4, dur: 2.1, to: 'on', pattern: 'wave', origin: [(HERO[1] + 0.5) / COLS, (HERO[0] + 0.5) / ROWS], noise: 0.35, fraction: 0.94},
-  ...OFF_BLOCKS.map((r, i): Ev => ({at: 2.45 + 0.4 * i, dur: 0.12, to: 'off', pattern: 'rows', region: r})),
+  {at: 2.5, dur: 2.9, to: 'off', pattern: 'collapse', origin: [(HERO[1] + 0.5) / COLS, (HERO[0] + 0.5) / ROWS], noise: 0.3},
+  // the first block to go is the one under the words "switch it off"
+  {at: 2.55, dur: 0.12, to: 'off', pattern: 'rows', region: [CAP_UV[0] - 0.1, CAP_UV[1] - 0.07, CAP_UV[0] + 0.1, CAP_UV[1] + 0.07]},
+  ...OFF_BURSTS.map((r, i): Ev => ({at: 2.95 + 0.42 * i, dur: 0.12, to: 'off', pattern: 'rows', region: r})),
   {at: 5.45, dur: 0.1, to: 'off', pattern: 'random'},
 ];
 const WALL_SPEC = {quad: WALL, rows: ROWS, cols: COLS, fw: WFW, fh: WFH, seed: 'wall', exclude: [HERO], events: C_EVENTS, initial: 0};
@@ -541,7 +550,7 @@ const heroOverride = (row: number, col: number, t: number, on: boolean) => (row 
 const ShotC: React.FC = () => {
   const t = useTime();
   const P = TOD.night;
-  const pop = popIn(t, 3.15);
+  const pop = popIn(t, 2.65);
   return (
     <Cam keys={C_KEYS} handheld={C_HANDHELD} seed="C">
       <Layer depth={1}>
@@ -554,11 +563,28 @@ const ShotC: React.FC = () => {
         <CloseupRing />
       </Layer>
       {/* our own rooftop, near the lens (screen space): it rises into the frame as the camera pulls back over it */}
-      <Rise at={2.7} dist={460}>
+      <Rise at={2.2} dist={460}>
         <Ledge y={1600} x0={-60} x1={1140} top={24} face={96} tod={P} floor={palette.tealDark} seed="ledgeC" detail />
         {pop.visible ? (
           <Rimmed color={P.glow} dx={-3} dy={-3}>
-            <Mascot x={780} y={1612} scale={1.05 * pop.scale} squash={pop.squash} pose={t > HERO_OFF + 0.1 ? 'sit-front' : 'sit-back'} expression={t > HERO_OFF + 0.1 ? 'worried' : undefined} t={t} seed={7} look={-0.7} />
+            {/* it watches the blocks go dark (head turns with a squash pop), glances at us, and turns to us when the
+                last light goes out */}
+            <ElephantTimeline
+              x={780}
+              y={1612}
+              scale={1.05 * pop.scale}
+              squash={pop.squash}
+              t={t}
+              seed={7}
+              look={-0.7}
+              keys={[
+                {t: 0, pose: 'sit-back', look: -0.7},
+                {t: 3.6, pose: 'sit-back', look: 0.55},
+                {t: 4.3, pose: 'sit-front', expression: 'worried'},
+                {t: 4.9, pose: 'sit-back', look: -0.45},
+                {t: HERO_OFF + 0.1, pose: 'sit-front', expression: 'worried'},
+              ]}
+            />
           </Rimmed>
         ) : null}
       </Rise>
@@ -566,7 +592,7 @@ const ShotC: React.FC = () => {
   );
 };
 
-const C_KEEP: KeepDark = {boxes: () => [], path: C_PATH, span: [0, T_C[1] - T_C[0]], pad: 18, ragged: 30};
+const C_KEEP: KeepDark = {boxes: () => [], path: C_PATH, span: [0, T_C[1] - T_C[0]], pad: 10, ragged: 22};
 
 /** Close-ups for the hero + LOD cells: the same state, colour and darkness as the grid would give them. */
 const CloseupRing: React.FC = () => {
@@ -741,7 +767,7 @@ const SHOT_CAMS: {name: string; keys: CamKey[]; t1: number; depths: number[]; ha
   {name: 'A vista (tilt + push)', keys: A_KEYS, t1: T_A[1] - T_A[0], depths: [1, 0.84, 0.6, 0.37, -0.15, -0.25], handheld: 1.2, seed: 'A'},
   {name: 'D street (dolly push)', keys: [{t: 0, push: 0, anchor: D_VP, anchorDepth: 0.95}, {t: 4.65, push: 0.09, anchor: D_VP, anchorDepth: 0.95, ease: CAM.slow}], t1: T_D[1] - T_D[0], depths: [1, 0, -0.05, -0.6], handheld: 0.8, seed: 'D'},
   {name: 'B monument (crane)', keys: B_KEYS, t1: T_B[1] - T_B[0], depths: [0.92, 0, -0.5], handheld: 0.8, seed: 'B'},
-  {name: 'C pull-back (8x -> 1.5x)', keys: C_KEYS, t1: T_C[1] - T_C[0], depths: [1, 0], handheld: C_HANDHELD, seed: 'C'},
+  {name: 'C pull-back (8x -> 1.3x)', keys: C_KEYS, t1: T_C[1] - T_C[0], depths: [1, 0], handheld: C_HANDHELD, seed: 'C'},
 ];
 export const cineSpeedReport = () => SHOT_CAMS.map((s) => ({name: s.name, ...camSpeed(s.keys, {t0: 0, t1: s.t1, depths: s.depths, handheld: s.handheld, seed: s.seed})}));
 

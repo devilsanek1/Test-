@@ -15,7 +15,8 @@ import {palette} from '../../../lib/theme';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {arrow, circle, line, polyPath, rect, rectPath, Pt} from '../../../lib/sketch';
-import {brickHints, cornice, glintAt, LayerWrap, noWrap, pavingJoints, SetPlace, SI, windowInk} from './common';
+import {brickHints, cornice, glintAt, LayerWrap, noWrap, SetPlace, SI, windowInk} from './common';
+import {Foreground, ForegroundSpec, groundMarks, GroundMarks} from './ground';
 import {CalendarSlot, ElephantStampSlot, LockProps} from './propSlots';
 import {Lock} from '../props';
 
@@ -83,7 +84,9 @@ const G = (() => {
   const sheetEdge = rect(bx, by, bw, bh, {seed: `${s}/sheet`, over: 'small'}) + rect(bx + frame, by + frame, bw - frame * 2, bh - frame * 2, {seed: `${s}/sheet2`, over: 'small'});
   const tealFrame = rectPath(bx, by, bw, bh) + rectPath(bx + frame, by + frame, bw - frame * 2, bh - frame * 2);
   const rod = line(bx - 26, by, bx + bw + 26, by, {seed: `${s}/rod`, over: [0, 0]}) + circle(bx - 30, by, 7, {seed: `${s}/f1`}) + circle(bx + bw + 30, by, 7, {seed: `${s}/f2`}) + line(bx - 6, by, bx - 40, BLUEPRINT_WALL.facade.corn[1] + 2, {seed: `${s}/h1`, over: 0}) + line(bx + bw + 6, by, bx + bw + 40, BLUEPRINT_WALL.facade.corn[1] + 2, {seed: `${s}/h2`, over: 0});
-  return {facade, pils, wingFill, wingInk, wingGlass, corn, top, treads, risers, stepInk, doorEl, panels, dims, callout, title, sheetEdge, tealFrame, rod, corner};
+  // the forecourt: one flat field with a few broken paving lines + specks (no tile grid)
+  const ground = groundMarks({vp: [540, 1250], top: st.y1 + 8, bottom: 1920, x0: -380, x1: 1460, rays: 4, cross: 2, specks: 14, reach: 0.55, seed: `${s}/gm`});
+  return {facade, pils, wingFill, wingInk, wingGlass, corn, top, treads, risers, stepInk, doorEl, panels, dims, callout, title, sheetEdge, tealFrame, rod, corner, ground};
 })();
 
 export type BlueprintWallProps = {
@@ -95,6 +98,9 @@ export type BlueprintWallProps = {
   stampAt?: number;
   /** Calendar slot (default: a props-lane Calendar); false = none. */
   calendar?: React.ReactNode | false;
+  /** Foreground framing in the bottom band (ground.tsx presets; default 'heads': back-view heads looking up at the
+   *  blueprint, cut by the bottom edge, the centre left open). false = none. */
+  foreground?: ForegroundSpec;
   sun?: React.ReactNode;
   wrap?: LayerWrap;
   x?: number;
@@ -106,7 +112,7 @@ export type BlueprintWallProps = {
   seed?: string;
 };
 
-export const BlueprintWall: React.FC<BlueprintWallProps> = ({drawAt, lock = {}, stampAt, calendar, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bpw'}) => {
+export const BlueprintWall: React.FC<BlueprintWallProps> = ({drawAt, lock = {}, stampAt, calendar, foreground = 'heads', sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bpw'}) => {
   const F = BLUEPRINT_WALL.facade;
   const [bx, by, bw, bh] = BLUEPRINT_WALL.sheet;
   const L = BLUEPRINT_WALL.lock;
@@ -138,7 +144,7 @@ export const BlueprintWall: React.FC<BlueprintWallProps> = ({drawAt, lock = {}, 
   const steps = (
     <>
       <Fill rect={[-160, BLUEPRINT_WALL.steps.y1, 1400, 600]} color={palette.mintPale} offset={false} seed={`${seed}/ground`} />
-      <Ink d={pavingJoints([540, 1250], BLUEPRINT_WALL.steps.y1 + 4, 2080, -900, 1980, 9, 3, `${seed}/pj`)} width={SI.hair} taper={false} />
+      <GroundMarks marks={G.ground} width={SI.far} seed={`${seed}/gm`} />
       <Fill d={G.risers} color={palette.cream} offset={false} seed={`${seed}/ris`} />
       <Fill d={G.treads} color={palette.sand} offset={false} seed={`${seed}/tre`} />
       <Ink d={G.stepInk} width={SI.mid} seed={`${seed}/steps`} />
@@ -167,6 +173,7 @@ export const BlueprintWall: React.FC<BlueprintWallProps> = ({drawAt, lock = {}, 
       {wrap('facade', 0.5, facade)}
       {wrap('banner', 0.5, banner)}
       {wrap('steps', 0.75, steps)}
+      {wrap('foreground', 1.0, <Foreground spec={foreground} seed={`${seed}/fg`} />)}
     </SetPlace>
   );
 };

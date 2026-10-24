@@ -12,7 +12,7 @@
 // -20 .. +40 deg), a white tally board. Foreground roof ledge (y 1480+) with chimney pots, an antenna (the only
 // tealDark) and Pip's perch (560, 1470). Golden -> dusk: windows pop peach from the horizon outward on `duskAt`.
 //
-//   <DomeCity sun={<Sun cx={700} cy={990} r={165}/>} domeAt={36.2} towerAt={37.0} searchAt={37.3} tallies={tallyCount}
+//   <DomeCity sun={<Sun cx={700} cy={990} r={165}/>} domeAt={36.2} towerAt={37.0} searchAt={37.3}
 //     duskAt={42.7} sky="golden" />
 //   domeArcY(x) -> the arc's y at x (attempters on the rim), DOME.rattlerDoors, DOME.pip, tallyGatePath(x, y, size)
 
@@ -302,8 +302,6 @@ export type DomeCityProps = {
   towerAt?: number;
   searchAt?: number;
   searchAngle?: number | ((t: number) => number);
-  /** Tally marks on the white board (count). */
-  tallies?: number;
   guard?: boolean;
   /** Sky colour behind (golden cream by default): the glass interior is one step lighter. */
   sky?: string;
@@ -317,7 +315,7 @@ export type DomeCityProps = {
   seed?: Seed;
 };
 
-export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, glassAt, footprintAt, dotsAt, duskAt, towerAt, searchAt, searchAngle, tallies = 0, guard = true, sky = skies.golden, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'dome'}) => {
+export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, glassAt, footprintAt, dotsAt, duskAt, towerAt, searchAt, searchAngle, guard = true, sky = skies.golden, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'dome'}) => {
   const t = useTime();
   const clipId = 'dm' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const sd = String(seed);
@@ -388,7 +386,7 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
           <Fill rect={[T.cabin[0], T.cabin[1] + T.cabin[3] * 0.62, T.cabin[2], T.cabin[3] * 0.38]} color={palette.sand} offset={false} seed={`${sd}/cabsill`} />
           <Ink d={G.cabinInk} width={SI.mid} taper={false} seed={`${sd}/cabi`} />
           <Fill rect={T.board} color={palette.white} seed={`${sd}/board`} />
-          <Ink d={G.boardInk + boardTallies(tallies)} width={SI.far} taper={false} seed={`${sd}/boardi`} />
+          <Ink d={G.boardInk} width={SI.far} taper={false} seed={`${sd}/boardi`} />
         </XG>
       ) : null}
     </>
@@ -425,7 +423,8 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
   );
 };
 
-function boardTallies(n: number): string {
+/** Tally gates (5-bar) on the watchtower's white board for a count n (up to 30): DOME.tower.board anchors. */
+export function boardTallyPath(n: number): string {
   const [bx, by] = DOME.tower.board;
   let d = '';
   const gates = Math.floor(n / 5);
@@ -436,3 +435,10 @@ function boardTallies(n: number): string {
   return d;
 }
 
+
+/** The attack counter on the watchtower's board (a scene overlay in the dome's camera; S08's tally beat). Each new mark
+ *  inks on as n grows (pass a time-driven count). */
+export const DomeTallies: React.FC<{n: number; width?: number; seed?: string}> = ({n, width = SI.far, seed = 'dome'}) => {
+  const k = Math.max(0, Math.min(30, Math.floor(n)));
+  return k > 0 ? <Ink d={boardTallyPath(k)} width={width} taper={false} seed={`${seed}/tally`} /> : null;
+};

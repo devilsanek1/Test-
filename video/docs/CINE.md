@@ -1,7 +1,7 @@
 # CINE: the cinematic-scale kit (cine lane)
 
 `src/lib/cine/**`: full-bleed pieces that make the viewer feel small (Arcane-scale vistas, worm's-eye monuments,
-pull-backs to a million windows) in the reference's flat ink style, plus the reference-2 baseline street. Everything is
+pull-backs to a wall of windows) in the reference's flat ink style, plus the reference-2 baseline street. Everything is
 canvas coordinates (1080 x 1920 = the frame at camera rest), time-based in seconds (`useTime()`), deterministic
 (`rng` / `rand` seeds), flat (no gradients, no blur, no masks, no animated opacity: things pop, wipe, grow or switch).
 
@@ -9,31 +9,53 @@ canvas coordinates (1080 x 1920 = the frame at camera rest), time-based in secon
 import {CineCamera, Layer, Sky, BigSun, EndlessCity, Monument, WallOfWindows, WipeCut, TOD, ...} from '../lib/cine';
 ```
 
-Demo: `src/dev/CineDemo.tsx` (composition `CineDemo`, 22 s): A Arcane vista (peak) -> D eye-level street (baseline)
--> B backlit monument (peak) -> C pull-back from one window (peak), cut on things passing the lens, the sun hopping
-from shot to shot. Contact sheet: `docs/cine_demo.png`.
+Demo: `src/dev/CineDemo.tsx` (composition `CineDemo`, 22 s): A Arcane vista (peak, the hook) -> D eye-level street
+(baseline) -> B backlit monument (peak) -> C pull-back from one window (peak). Time of day only moves forward (golden,
+golden, late golden, night), the sun only sets across cuts and HOPS from shot to shot after each wiper has passed, and
+every wipe's midpoint sits on the first word of the incoming caption page. Contact sheet: `docs/cine_demo.png`.
 
 ![CineDemo](cine_demo.png)
 
 ```
-scripts/sheet.sh CineDemo 0 21.9 24 out.png --cols=8                      # contact sheet of the demo
-node scripts/capcheck.mjs CineDemo --t0=0 --t1=21.9 --n=110             # caption legibility
-npx remotion still src/index.ts CineDemo s.png --frame=75 --props='{"mode":"street"}'  # PerspectiveStreet + crowd check
-npx remotion still src/index.ts CineDemo t.png --frame=75 --props='{"mode":"tower"}'   # Tower build / silhouettes (each ONCE)
+scripts/sheet.sh CineDemo 0 21.9 32 out.png --cols=8                       # contact sheet (+ caption check)
+node scripts/capcheck.mjs CineDemo --t0=0 --t1=21.9 --n=110              # caption legibility
+scripts/still.sh CineDemo 0 s.png --props='{"mode":"speed"}'             # camera speed report per shot (camSpeed)
+scripts/still.sh CineDemo 0.3 w.png --props='{"mode":"wipes"}'           # the wipers + their caption regions
+npx remotion still src/index.ts CineDemo s.png --frame=75 --props='{"mode":"street"}'  # PerspectiveStreet + crowd
+npx remotion still src/index.ts CineDemo t.png --frame=75 --props='{"mode":"tower"}'   # Tower / silhouettes (each ONCE)
 npx remotion render src/index.ts CineDemo l.mp4 --frames=0-119 --props='{"mode":"loop"}'  # un-build + loop seam
-# event density with the camera LOCKED (props {"lock": true}): render every frame at scale 0.25, then density.py
+# event density: render every frame at scale 0.25 with props {"lock": true, "capcheck": "bg"} (camera held on each
+# shot's RESTING key, captions hidden), then count medium events (space-time blobs >= 500 voxels, diff > 18)
 ```
 
-Speed: CineDemo renders at **~115 ms/frame** (full 1080 x 1920, concurrency 2, 30 frames spread over all four shots;
-the heaviest single frames, the window close-ups of shot C, ~240 ms at concurrency 1).
+Camera speeds without a browser (the same numbers as `{mode: 'speed'}`):
+
+```
+npx esbuild speed.ts --bundle --platform=node --log-level=error > /tmp/speed.cjs && node /tmp/speed.cjs
+# speed.ts: import {cineSpeedReport} from './src/dev/CineDemo'; console.log(cineSpeedReport());
+```
+
+| shot | move | max on-screen speed | when / where |
+|---|---|---|---|
+| A vista | tilt 640 px down (`CAM.reveal`, 2.5 s) + push 0.12 anchored on the far city | 13.5 px / frame | 1.3 s, the observer layer (depth -0.25) |
+| D street | dolly push 0.09 anchored on the VP (real parallax) | 2.0 px / frame | the string lights (depth -0.6) |
+| B monument | crane 160 px (`CAM.reveal`, 6 s) | 2.3 px / frame | the lens figure (depth -0.5) |
+| C pull-back | 8x -> 1.3x (`CAM.reveal`, 5.3 s) | 19.2 px / frame | 3.7 s, the far frame corner |
+
+Flat inked art strobes above ~15-20 px / frame: every move stays at or under that (C's cruise is the limit; the old
+24x -> 1x in 4 s ran at 48-53 px / frame).
+
+Speed: ~120-135 ms / frame (full 1080 x 1920, concurrency 2, 20 frames per shot: A 118, D 125, B 133, C 122; on a
+machine shared with the other lanes a 90-frame run measured 204 ms / frame).
 
 ---
 
 ## 1. Camera + multiplane (`camera.tsx`)
 
 ```tsx
-<CineCamera keys={[{t: 0, push: 0, anchor: [600, 1000], anchorDepth: 0.85}, {t: 5.9, push: 0.14, zoom: 1.04, anchor: [600, 1000], anchorDepth: 0.85, ease: bez(0.45, 0, 0.15, 1)}]} handheld={1.2}>
-  <Layer depth={1}>   <Sky/> <BigSun/> </Layer>          // infinitely far: only the lens zoom affects it
+<CineCamera keys={[{t: 0, tilt: 640, push: 0, anchor: [600, 1000], anchorDepth: 0.85},
+                   {t: 2.5, tilt: 0, push: 0.05, anchor: [600, 1000], anchorDepth: 0.85, ease: CAM.reveal}]} handheld={1.2}>
+  <Layer depth={1}>   <Sky/> <BigSun/> </Layer>          // infinitely far: only the lens zoom (and pan / tilt) moves it
   <Layer depth={0.8}> far stuff </Layer>                  // slides / grows less
   <Layer depth={0}>   reference plane (1:1 with camera) </Layer>
   <Layer depth={-0.5}> foreground framing </Layer>        // whips past, grows fastest on a push
@@ -41,211 +63,264 @@ the heaviest single frames, the window close-ups of shot C, ~240 ms at concurren
 </CineCamera>
 ```
 
-Model: parallax factor `f = 1 - depth`; on screen `C + R(rot) * s_f * (p - C - o * f)` with
-`s_f = zoom / (1 - softPush(push * f))`, C = (540, 960).
+Model: parallax factor `f = 1 - depth`; on screen `C + T + R(rot) * s_f * (p - C - o * f)` with
+`s_f = zoom / (1 - softPush(push * f))`, C = (540, 960), T = (-pan, tilt).
 
 | key field | meaning |
 |---|---|
 | `t` | scene seconds |
-| `x, y` | world point at screen centre on the reference plane (truck / crane). Default 540, 960 |
+| `x, y` | world point at screen centre on the reference plane: a TRUCK / CRANE (the camera translates: near layers move more, the depth-1 sky not at all). Default 540, 960 |
+| `pan`, `tilt` | the camera ROTATES (screen px; tilt > 0 looks up, pan > 0 looks right): every layer, the sky and the sun included, shifts by the same amount, so the horizon stays on the sky's horizon and vanishing lines keep converging on it. Arcane's tilt-up / tilt-down reveal. Applied after anchoring |
 | `push` | dolly forward (fraction of the distance to the reference plane). Real parallax: far layers grow less |
 | `zoom` | lens zoom (all layers equally) |
 | `rot` | roll, degrees |
-| `anchor`, `anchorDepth`, `anchorTo` | keep world point `anchor` (in the layer of `anchorDepth`) at screen `anchorTo` (default: its rest position). Two consecutive keys with the same anchor keep it pinned through the move. **Anchor a push on the FAR city** (`anchorDepth` 0.8+) so the world grows and the foreground slides out; anchoring on the observer makes the viewer feel big |
-| `ease` | ease of a segment whose ends are both at rest (see below). Default `CAM.ease` (inOutCubic); `CAM.slow` (inOutSine), `CAM.reveal` (trapezoid: sine ramp 25 %, cruise, soft landing 35 %; peak 1.43x the average speed), `CAM.settle` (outCubic: first segment only) |
+| `anchor`, `anchorDepth`, `anchorTo` | keep world point `anchor` (in the layer of `anchorDepth`) at screen `anchorTo` (default: its rest position). Two consecutive keys with the same anchor keep it pinned through the move. **Anchor a push on the FAR city / the VP** (`anchorDepth` 0.8+) so the world grows and the foreground slides out |
+| `ease` | ease of a segment whose ends are both at rest. Default `CAM.ease` (inOutCubic); `CAM.slow` (inOutSine), `CAM.reveal` (trapezoid: sine ramp 25 %, cruise, soft landing 35 %; peak 1.43x the average speed), `CAM.settle` (outCubic: first segment only) |
 
-**Velocity-continuous** (`interp="spline"`, default): every channel (log zoom, dolly-log, rot, offset or anchorTo) is a
-monotone cubic (PCHIP) through the keys, so a move through several keys never stops dead and restarts at a key. A
-segment whose two ends are at rest (a two-key move, a direction change) uses its key's `ease`. `CAM.settle` (starts
-already moving) is honoured only on the FIRST segment, for a shot that continues the previous shot's move.
-`interp="ease"` restores per-segment easing. `trapezoid(acc, dec)` builds cruise eases: long moves should cruise
-(flat inked art strobes above ~15-20 px/frame; the demo's moves peak at 2.8-3.6 px/frame).
-`push * f` is linear up to `CAM.pushKnee` (0.85) and then saturates smoothly (tanh) toward 0.94: nothing passes
-through the lens and a foreground layer's scale never kinks. `handheld={px}` adds a deterministic drift.
+**Crane vs tilt.** A `y` crane with the horizon in frame moves the depth-0 ground (and its vanishing lines) while the
+depth-1 sky and sun stay put: the horizon slides against the sun. Crane only with the horizon off-frame (shot B), or use
+`tilt` (shot A).
+
+**Velocity-continuous** (`interp="spline"`, default): every channel (log zoom, dolly-log, rot, offset or anchorTo, pan,
+tilt) is a monotone cubic (PCHIP) through the keys, so a move through several keys never stops dead at a key. A segment
+whose two ends are at rest uses its key's `ease`. `interp="ease"` restores per-segment easing. `trapezoid(acc, dec)`
+builds cruise eases. `push * f` is linear up to `CAM.pushKnee` (0.85), then saturates (tanh) toward 0.94.
+`handheld={px}` adds a deterministic drift.
 
 Hooks / math: `useCam()`, `layerScale(cam, depth)`, `layerMat`, `project(cam, depth, p)`, `unproject`,
-`camAt(keys, t, interp?)`, `useScreenWidth(depth)(px)`. `<CineCamera stage>` folds the core transition camera in.
-`<CineFrame bg overlay>` is a minimal full-bleed svg root; `<Shot from to>` runs children on a local clock.
+`camAt(keys, t, interp?)`, `camFull(keys, t, {handheld, seed})` (with the handheld drift), `camPath(keys, depth, o)`
+(layer -> screen matrix over time: precompute what a moving camera will show, e.g. `WallOfWindows keepDark.path`),
+**`camSpeed(keys, {t0, t1, depths, handheld})`** (the fastest on-screen motion of a 7 x 11 screen grid, per layer depth, in
+px / frame, plus when / where and the average), `useScreenWidth(depth)(px)`. `<CineCamera stage>` folds the core
+transition camera in. `<CineFrame bg overlay>` is a minimal full-bleed svg root; `<Shot from to>` runs children on a
+local clock.
 
 ## 2. Atmosphere and time of day (`atmosphere.ts`)
 
 ```ts
-TOD.day | TOD.golden | TOD.dusk | TOD.night | TOD.dawn   // TodPalette: every `palette` key relit + skyBands, haze,
-                                                         // glow, cloud, stars, windowLit[], windowDark, facade[], silhouette, rim, text
-ambient(palette.cream, 'night')            // -> sand: a palette STEP, never a mix (shared table, see below)
-ambient(palette.sage, 'night', 'far')      // the table's far row
-atmos(palette.tan, 0.8, 'dusk')            // FAR layers only (depth >= 0.3): stepped pull toward the sky haze
-inkForDepth(depth)                         // 4.8 / 3.4 / 2.2 / 1.6 / 0 (fill-only far)
-deep.teal78 / teal60 / teal45              // ink-dark silhouette values (below tealDark: silhouettes / dark panes only)
+TOD.day | TOD.golden | TOD.dusk | TOD.night | TOD.dawn   // TodPalette: every `palette` key relit + skyBands, haze, glow,
+                                                         // cloud, stars, windowLit[], windowDark, facade[], silhouette, rim, text
+useTodPal(tod?)                          // a piece's palette: its `tod` prop, else the core <Tod> context (+ its role)
+ambient(palette.cream, 'night')          // -> sand: a palette STEP, never a mix (the shared todSteps table)
+atmos(palette.tan, 0.8, 'dusk')          // FAR layers only (depth >= 0.3): stepped pull toward the sky haze
+inkForDepth(depth)                       // 4.8 / 3.4 / 2.2 / 1.6 / 0 (fill-only far)
+deep.teal78 / teal60 / teal45            // ink-dark silhouette values (below tealDark: silhouettes / dark panes only)
 ```
 
-**Relight rule** (style_bible_ref2 4, measured): time of day never mixes paint. Only the light fields step down one
-palette step at dusk (mintPale -> sky, cream -> sand, sand -> tan) and the near ground a second step at night
-(mintPale -> sage); whites, mid and dark tones, ochre, ink, peach and the sun never move. The table is the SHARED
-`todSteps` in `theme.ts` (core `<Fill>` reads it through `<Tod>`): `ambient()` is core `relight()`, so cine and core
-relight identically. Inside a timed core `<World>`, feed cine pieces `tod={useTod()}`. Haze mixes (`atmos`) are kept
-for far rows only (the measured night far step #4B706B). Caption tone: `TOD[x].text`.
+**One table for both lanes.** The caption-band sky (`skyBands[0]`) and the caption tone (`text`) come from theme
+`skies` / `todTone`: day and golden = the flat day sky `#ACD1BF` + ink (style_bible_ref2 8: "golden = the same flat sky +
+peach-lit faces"), dusk = sage `#6D988B` + ink (ref 2 f_33), night = `#588077` + white. Dusk and night add value steps
+toward the horizon, all below y 600. (Core `todSky.golden` is cream: that disagrees with style_bible_ref2 8; cine follows
+the bible. Core lane to reconcile.)
+
+**`tod` defaults to the core context.** Every piece takes `tod?: TodLike | TodPalette`; when omitted it reads the core
+`<Tod>` context (time of day AND relight role) through `useTodPal`, so inside a timed `<World>` cine pieces relight
+with it. The hook runs in the piece itself (below the World); `useTod()` called in a scene body outside the World
+returns 'day'. Pass `tod` to pin a piece. The type is `TodLike` (it was `Tod`, which clashed with the core `<Tod>`
+component; a deprecated `Tod` alias stays in `./atmosphere` but is not re-exported by the barrel).
+
+**Relight rule** (style_bible_ref2 4): time of day never mixes paint. Only the light fields step down one palette step at
+dusk and the near ground a second step at night (`todSteps` in theme.ts, core `relight()`). Haze mixes (`atmos`) are for
+far rows only.
 
 ## 3. Sky (`sky.tsx`)
 
 ```tsx
-<Sky tod="dusk" horizon={1010} />          // flat value steps below y 600 (the caption band stays one flat value);
-                                           // the un-build SLAB: it collapses downward last; keeps colour in paper looks
-<SkyCloud x y w tod drift at />            // ref 2 cloud, inked white (day) or flat (dusk); hairline ink in paper looks
-<Streaks y tod n color />   <Hills y amp color seed ink? />   <HazeBand .../> (static translucency; avoid: use row steps)
+<Sky tod="golden" horizon={1010} />        // day / golden: ONE flat value (reference 2), no divider under the captions
+<Sky tod="dusk" horizon={1010} />          // dusk / night / dawn: value steps below y 600 with hand-drawn streak edges
+                                           //   (wobble +- 9 px: stepped tongues, no edge runs straight across the width)
+<SkyCloud x y w h tod drift at />          // ref 2 cloud: inked (day / golden) or flat (dusk / night)
+<Streaks y tod n color />   <Hills y amp color seed ink? />   <HazeBand .../> (static translucency; avoid)
 <Stars tod region at span n avoid? />      // dots + sparkles; `avoid` boxes default to CAPTION_BAND [80, 270, 1000, 580]
 <Birds at from to dur n size />            // keep flight paths out of the caption band
 ```
 
+`Sky` is the un-build SLAB: its glow / horizon bands shrink into the horizon WITH the fills, then the slab collapses
+downward from e 0.5 (overlapping the last fills; <= 2 bare frames); it reaches 1600 px below the horizon so it covers the
+whole frame. It keeps its colour in the paper / cascade Looks.
+
 ## 4. Big sun + light (`light.tsx`)
 
 ```tsx
-<BigSun cx cy r horizon tod path={[{t, x, y, r, ease}]} beats hops bounce drift glow glowMode />
-        // r 150 default (ref 2 baseline 94-120, PEAKS 270-490); default drift [2.2, 0.6] px/s (never perfectly still;
-        // pass [0, 0] to pin it); path keys move AND resize it: hop it into the next shot from where the last one left it
-<Glow cx cy r rings spread color opacity core at />      // stepped flat discs; shrink with the un-build
-<LightShaft from angle length w0 w1 beams opacity sweep at />  // flat translucent beams; keep them out of the caption band
-<RimLight rect side width color /> / <RimLight points light width color />
-<FlatColor color> ...any kit element... </FlatColor>      // recolour EVERY fill + stroke (scoped CSS rule, no raster)
-<Silhouette color> <Person .../> </Silhouette>            // fill-only (a FlatColor); <Silhouette d color/> for a path
-<Rimmed color dx dy silhouette?> ... </Rimmed>            // backlit: an offset flat copy behind -> a 3-5 px rim sliver
+<BigSun cx cy r horizon tod path={[{t, x, y, r, ease}]} moves hops beats bounce drift bob glow glowMode />
 ```
 
-Silhouettes no longer use alpha masks (masks tiled and repeated in Chrome). `bounds` / `SIL_BOUNDS` are accepted
-but ignored (deprecated).
+- r 150 default (ref 2 baseline 94-120; PEAKS 270-490). Default `drift` = `sunDrift(tod)`: ~10 px/s, SINKING (rising at
+  dawn): never still, ENGINE rule 6. `drift={[0, 0]}` pins it (a match-cut frame); `bob={px}` floats it instead.
+- **Shot-to-shot hops**: start the next shot's sun exactly where the last one left it (screen position and radius) and
+  `hops={[{t, to, h, air}]}` (anticipation squash, stretch, landing squash) after the wiper has passed, landing on a
+  stressed word; `moves={[{at, dur, r}]}` resizes it during the hop. CineDemo: A -> D (r 309 -> 110, lands on "that"),
+  D -> B (r 110 -> 150, lands on "four").
+- `<Glow cx cy r rings spread color opacity core at />` stepped flat discs; `<LightShaft .../>`; `<RimLight .../>`;
+  `<FlatColor color>` recolours every fill + stroke; `<Silhouette color>`; `<Rimmed color dx dy silhouette?>` (backlit:
+  an offset flat copy behind -> a rim sliver; with `silhouette` the element itself goes fill-only).
 
 ## 5. Windows (`windows.tsx`)
 
 ```tsx
 <LitWindows grid={{x, y, w, h, rows, cols, fw, fh, jitter, skip, bay}} quad? initial events lit dark blinds pop flicker ink />
-windowPaths(cells, events, times, t, look, precision, {keep?: (i) => bool, dark?: (i) => bool})   // filters
+windowPaths(cells, events, times, t, look, precision, {keep?, dark?, override?})
 ```
 
-Patterns `random | rows | cols | sweep | wave | collapse`; events apply in order (later switches win). Un-build:
-every window switches off at once (a 1-frame event), then the panes go with their building.
+Patterns `random | rows | cols | sweep | wave | collapse`; events apply in order (later switches win). `region: [u0, v0,
+u1, v1]` limits an event to a district (its timing spreads over the region only): "a whole district lights up in one
+sweep". `override(i, on)` has the final say (a hero window lit until its own off time).
 
 ## 6. Scale kit
 
 ```tsx
-<EndlessCity horizon nearY rows farS tod seed towers beacons
-  build={{at: -2.6, span: 1, rowStagger: 0.45, order: 'center'}}        // buildings pop up row by row, far first
-  rowProps={(r) => ({landmarks: r.i === 1 ? [{x: 300, w: 1150, h: 3000, kind: 'step'}] : undefined})}
-  windows={{initial, events}} haze={0} />                               // haze bands off by default (overlay look)
-<Skyline base s depth tod seed ink build={{at, span, per, order}} windows landmarks frames shops />
-<Monument cx by bw ty taper tod light="back" people doorPeople build peopleAt banners doorAt sideLitAt sideOffAt emblem emblemY emblemAt />
+<EndlessCity horizon nearY rows farS tod seed towers beacons backFrom={4} vpX={540} street lampsOn={{at, dur}}
+  build={{at: -2.6, span: 1, rowStagger: 0.45, order: 'center'}}
+  rowProps={(r) => ({landmarks: r.i === 1 ? [{x: 330, w: 1300, h: 9800, kind: 'colossal', color, quietAbove: 640}] : undefined})}
+  inRow={(r) => ({front: <SkyCloud .../>})} windows={{initial, events}} />
+<Skyline base s depth tod seed ink light="back" vp street lampsOn build windows landmarks variety />
+<Monument cx by bw ty taper tod light="back" quietY={720} people doorPeople build peopleAt banners doorAt sideLitAt emblem />
 <Tower x y wl wr top vpy tod floors windows light crown at buildDur />
-<WallOfWindows quad rows cols tod events exclude keepDark={{y0, y1}} lod={{cells, above}} inkW precision />
-wallQuadVP({vp, near: [x, top, bottom], farX})   wallCellOn(spec, row, col, t)   windowQuad(quad, rows, cols, r, c)
-<PerspectiveStreet vp f camH road walk tod seed heights poles poleH lightsOn windows crowd ground personAbove />
+<WallOfWindows quad rows cols tod events exclude keepDark={{boxes, path, span}} lod={{cells, above}} override bandsBelow />
+wallQuadVP(...)  wallDarkFrom(spec, keepDark)  wallCellState(spec, row, col, t, {darkFrom, override})  windowQuad(...)
+<PerspectiveStreet vp f camH road walk heights roofs doors fence roadColor walkColor poleStart standing crowd lightsOn />
+<GroundPlane vp y0 f camH every radial />        // a paved plaza: joints converge on the VP, broken pen strokes
 <TinyCrowd n|spots area horizon k at span order walk walkDir tod silhouette personAbove />
-<StringLights x1 y1 x2 y2 sag n r tod on={{at, dur}} lit at />   <Pole/>   <Wires/>
-<Ledge y top face tod floor at />   <Balustrade x y w h side tod rim />   <Plinth .../>
-<WindowCloseup w h tod lit onAt offAt screenTick curtainAt flickerAt person chair desk />
-<WipeCut at dur dir kind tod a={<Shot .../>} b={<Shot .../>} />   <WipePass .../>   wipeEdge(t, at, dur, dir, kind)
+<StringLights x1 y1 x2 y2 sag n r r1 tod on lit at />   <Pole/>   <Wires/>
+<Ledge y top face tod floor detail />   <Balustrade .../>   <Plinth .../>
+<WindowCloseup w h tod detail litColor darkColor on onAt offAt screenTick curtainAt flickerAt person chair desk />
+<WipeCut at dur dir kind tod rim a={<Shot/>} b={<Shot/>} />   <WipePass .../>   wipeEdge(...)   wipeToneRegions(T, wipe, before, after)
 ```
 
-- **Skyline / EndlessCity** (hand-drawn near rows): each building's fills sit misregistered from its ink (theme
-  `misreg`, seeded per building); 2-3 window types per building with their own rhythm; a ledge band every 3-5 floors;
-  shop fronts and 18 % awnings on the nearest row; water towers on ~25 % of flat roofs; ink window frames as open
-  rectangles overshooting 3-8 px on inked rows. Build: fill-first silhouettes rising from the base (outBack, ~0.27 s each,
-  50 % overlap), ink a beat later, windows once the building stands. The row's mass is the row's own facade paint.
-- **Monument**: elevation drawing mapped through a worm's-eye homography. Human-scale cues: a central bronze door in the
-  middle bay (~3x a person), people on the steps as kit Persons sized by step depth (0.032 H low -> 0.022 H high,
-  never under 40 px), doorway people, column bases and capitals as doubled ink lines; the ink thins with height
-  (`x clamp(scale / scale(base), 0.45, 1)`); lit strips cover 40-70 % of one edge. `light="back"` = the sun behind it:
-  flat shadow fields (golden: sage + one lighter step; dusk / night: tealDark + teal), columns as fill-only bands, the
-  upper storeys carry no inner ink and no horizontal lines (a crane moves them through the caption band; ink captions
-  on the golden field are >= 5:1), a 4 px peach rim on the sun-facing edges, people as tealDark silhouettes. Build
-  pops parts bottom -> top (0.16 s each, columns left -> right); `banners` drop one by one (a counting build: "four"),
-  `doorAt` opens the door on light, `sideLitAt` / `sideOffAt` switch the side doorways.
-- **WallOfWindows**: `wallQuadVP` puts the receding edges on the horizon's vanishing point. `keepDark` keeps every
-  window whose SCREEN quad overlaps the caption band dark (or switches it off as the camera brings it in). `lod`
-  leaves cells out of the batched grid while the layer is zoomed past `above`: draw them as `WindowCloseup`s, lit
-  exactly when the grid would light them (`wallCellOn`). Unlit close-ups keep cool values (sage frame, teal curtain).
-- **PerspectiveStreet**: camH 110 by default; ground detail (3.4 px kerb ink, paving joints across the walks and the
-  road, a centre dash on wide roads, 3-10 px dash specks, half of them near the lens); `poleH` keeps pole tops under
-  the caption band; keep facade heights low (~1.5x camH) so the sky band stays clear. Walkers and **TinyCrowd**
-  figures at least `personAbove` (40 px) tall are kit Persons (inked by size, legs, depth-sorted); smaller ones are
-  batched blobs in depth-sorted chunks (no head lands on a nearer body); walkers recede and shrink with perspective.
-- **Wipes**: `WipeCut` splits two shots on the moving edge of something passing the lens (`kind`: `column` (stone,
-  capital + base mouldings in doubled ink, fill-only flutes, lit rim), `passer` (giant back-view silhouette with a rim;
-  `passerPath(x)` gives its outline for caption tone regions), core `figure` / `pole` / `foliage`, old `slab`); the
-  element crosses in 0.45-0.6 s (in-out sine) and grows 8 % (parallax). The frame is never fully covered: both shots are
-  visible on either side of the element. Give `SkyCaptions` tone `regions` per side and white text over the element.
-- **WindowCloseup**: back-view chair in front of the person (ref 2 f_33), `lit={false}` dark neighbours, `onAt`,
-  `curtainAt`, `flickerAt`, `screenTick` (the web page refreshes: a visible pop).
+- **Skyline / EndlessCity** (hand-drawn rows): fills misregistered from the ink (theme `misreg`); the HAND: line ends
+  jittered +-(0.6-1.2 % of the length), verticals drifting 0.5-1.4 deg, ~15 % of long verticals broken in two, three
+  stroke widths per row (0.85 / 1 / 1.18x, by building); ~30 % of flat mid / near buildings get a setback storey;
+  `variety` (inked rows s >= 0.42): ~10 % wall cells, sill plants, a balcony band with a railing; 2-3 window types,
+  ledge bands, shop fronts / awnings, water towers, open ink window frames. **Looking down**: with `vp`, every roof
+  whose top is below the horizon gets its TOP FACE (a thin parallelogram converging on the VP). **Street life**: tree
+  clumps over the building feet and two lines of lamp dots per row (both kerbs) that shrink and crowd toward the horizon
+  row by row; `lampsOn` pops them on along the street. **`light="back"`** (EndlessCity `backFrom`): the sun behind the
+  row: facades teal / tealDark, roofs tealDark, roof tops sage (they catch the sky), warm windows the only accents, a
+  peach rim along the sun-facing roof edges. **Landmark `kind: 'colossal'`**: podium, long finned shaft, two setbacks,
+  crown and needle; `color` paints it fill-only (one atmospheric step from the sky), `quietAbove` drops its windows
+  above a line so it can rise THROUGH the caption band as a flat field. Build: fill-first rising silhouettes, ink a beat
+  later, windows once standing.
+- **Monument**: elevation drawing through a worm's-eye homography. `light="back"`: flat shadow fields + a peach rim; ink
+  stays BELOW `quietY` (screen y in the layer; default 600; shot B uses 720 because the crane carries the entablature
+  through the band): capitals and bases as doubled lines overshooting 4-10 px, every step nosing broken every 80-160 px,
+  1-2 hairline flutes per shaft, door frame + transom, entablature mouldings + dentils; above it only outlines (a
+  backlit drum is one flat field: no shade strip, no slots). Fills misregistered 3-5 px per part. Long mouldings
+  overshoot at most 12 px on screen. Human scale: door ~3x a person, people on the steps sized by step depth.
+- **WallOfWindows**: `keepDark` darkens the cells whose screen quad touches the caption LINE BOXES (`boxes(t)`, + `pad`
+  + a ragged per-cell noise) or a band; with a camera `path` (`camPath(keys)`) it has HYSTERESIS: once a cell has
+  touched a box it stays dark for the rest of the shot (only switch-offs: no row of windows popping back on as it
+  leaves the band). `wallDarkFrom` / `wallCellState` give close-ups the exact grid state (events, darkness, override,
+  one-frame flicker, lit colour index k3). `lod` leaves cells out of the grid while zoomed past `above`; floor bands end
+  ON a pier line and are drawn only below `bandsBelow` (3x) zoom.
+- **WindowCloseup** levels of detail by the glass's SCREEN width (jitter the thresholds per cell): `full` (>= ~75 px:
+  room, person, desk + web page, lamp glow, back-view chair with an inked frame, two slats, legs and a misregistered
+  cream fill, plant, frame band, glints), `room` (~48-75 px: the flat room colour, curtain, transom), `glass` (one flat
+  pane in `litColor` / `darkColor` = pixel-identical to the grid pane, so the swap to the grid is invisible).
+- **PerspectiveStreet**: one-point street on `persp1`; pitched roofs (eaves overhang, inked eaves + rake), doors,
+  `fence` (white railing along a walk), `roadColor` / `walkColor` (a narrow `road` reads as a central path),
+  `poleStart` (push the first pole back so pole tops stay under the captions), `standing` share of the crowd, kerb ink,
+  paving joints, specks; its zig-zag string lights shrink with depth (`r1`). Keep facades low (~1.5x camH) so the sky
+  band stays clear. **StringLights `r1`**: a string receding to the VP: bulbs spaced evenly in depth (screen spacing and
+  radius ~ 1 / z), bulbs under 3 px dropped into the wire.
+- **Ledge `detail`**: brick courses on the face, a drain pipe, roof clutter on the floor (vents, hatch, pipe run on
+  blocks, antenna mast, tar seams): the roof floor is never a dead slab.
 
-Perspective helpers (`persp.ts`): `quadMap(quad)`, `cell`, `persp1({vx, vy, f, camH})(x, y, z)` (place figures with
-the same camera as the street: `h = 170 * k`), `affineFromTri`, `toward`, `lerpPt`.
+## 7. Wipes (`wipers.tsx`, `props.tsx`)
 
-## 7. Render states: un-build, loop, paper (`state.tsx`)
+The cine wipers live in a LEAF module (`wipers.tsx`: no runtime import of Film or the rest of cine) in the core
+`WiperComponent` shape (`{x, p, dir, color}`, screen px, opaque over x +- 90, static `captionRegions`):
 
-Every cine piece takes part in the core un-build (`useExit`) and Looks (`useLook`):
-- **Un-build**: windows switch off at once; buildings, rows, monument parts, figures, poles and walls sink into their
-  base with `exitFillProgress` (small first, ease-in); batched ink drops at `exitInkProgress >= 0.5`; string-light
-  bulbs shrink, then the wire retracts; stars, glows, shafts shrink; the cine `Sky` is the SLAB and collapses downward
-  last. The mascot: `<Elephant draw={1 - exit}>` (it ignores exit by itself).
+```tsx
+import {CINE_WIPERS, CINE_WIPE_HALF, wipeEdgeX} from './cine/wipers';   // core Film: {...BUILTIN_WIPERS, ...CINE_WIPERS}
+<ColumnWiper x p dir rim light />    // a stone column at the lens: doubled-ink capital + base, fill-only flutes, lit rim
+<PasserWiper x p dir rim hair />     // a giant back-view passer-by (below)
+passerPath(x)                        // its outline: ONE closed clockwise path (head, ear, neck, shoulders)
+```
+
+- **Passer**: an irregular, egg-shaped head with hair bumps and one ear, ochre hair with three ink clump strokes and a
+  ragged nape, a collar whose ink overshoots, fold strokes; fills misregistered 3 px (toward the trailing side) + 4 px
+  down; an ~8 px one-sided rim sliver inside the leading edge. The outline is a single subpath, so nothing can cancel
+  under the nonzero rule (the old head circle and neck rect had opposite windings: a see-through hole).
+- `WipeCut` / `WipePass` draw any kind (`column`, `passer`, core `figure` / `pole` / `foliage`, old `slab`) from one
+  registry (`WIPERS`); the edge moves with in-out sine (`wipeEdgeX`; the core Film still moves its edge linearly: core
+  lane to switch to `wipeEdgeX` and register `CINE_WIPERS`). The element grows 8 % (parallax).
+- **Captions over a wipe**: `wipeToneRegions(T, {at, dur, dir, kind}, toneBefore, toneAfter)` returns the unswept /
+  swept tone rects + the wiper's own `captionRegions` (with its 8 % growth and the passer's walking bob): feed it to
+  `SkyCaptions regions`.
+
+## 8. Render states: un-build, loop, paper (`state.tsx`)
+
+- **Un-build**: windows switch off at once; buildings, rows (and their masses: capped below slab size), monument parts,
+  figures, poles and walls sink into their base with `exitFillProgress` (small first, ease-in); batched ink drops at
+  `exitInkProgress >= 0.5`; string-light bulbs shrink, then the wire retracts; stars, glows, shafts shrink; the Sky's
+  glow bands go with the fills and its slab collapses downward from e 0.5. The mascot: `<Elephant draw={1 - exit}>`.
 - **Looks**: `paper` = white fills + ink (fill-only far rows and hills get a hairline outline so frame 0 / the loop frame
-  reads as line art); `cascade` = paper until the wave from `origin` reaches each building / part / figure chunk; light
-  (glows, shafts, lit windows, haze) only exists in the coloured state. Sky and sun keep their colour.
-- Helpers for new pieces: `useCineState()` -> `{t, e, look, m}`, `exitScale(e, jitter, size)`, `inkGone`, `inkOn`,
-  `lookPaint(S, color, point)`, `isPaper`, `screenSize`, `<ExitShrink x y>`.
-- Check: CineDemo `{mode: 'loop'}` (Standalone un-build at 3.5 s, loop at 4 s: the end frame equals frame 0).
+  reads as line art); `cascade` = paper until the wave from `origin` reaches each piece; light only in colour.
+- Helpers: `useCineState()` -> `{t, e, look, m}`, `exitScale`, `inkGone`, `inkOn`, `lookPaint`, `isPaper`,
+  `screenSize`, `<ExitShrink x y>`. Check: CineDemo `{mode: 'loop'}`.
 
-## 8. Recipes (what the demo proves)
+## 9. Recipes (what the demo proves)
 
-**Arcane vista from a height (PEAK).** Sky steps below y 600 + stars (out of the caption band) + a half-set r 300 sun
-with two opaque glow rings behind the far rows; `EndlessCity` 6 rows building far -> near, ONE colossal stepped tower
-(0.13 W wide, cut by the sun, top below the caption band); a back-view observer (s 2.6, `Rimmed` peach) cut by the
-bottom edge and the mascot on the parapet (`Ledge` at the bottom, no dead slab); push 0 -> 0.14 + zoom 1.04 anchored
-on the far city; string-light bulbs popping on the "hit" beat; light sweeps across the city on the stressed words.
+**Arcane vista (PEAK, the hook).** Golden, flat sky. Frame 0 is already the image: the sun (r 300) and the crown of ONE
+colossal tower (3x anything near it, fill-only `mix(sky, sage)`, no windows above y 640) with a cloud band across it
+(Arcane panel 4); the camera TILTS down 640 px over 2.5 s (`CAM.reveal`) onto the city and lands on a backlit observer
+(`Rimmed peach` + `deep.teal78` silhouette, shoulders up, cut by the bottom edge) and the mascot on a parapet; a push
+anchored on the far city continues. Six rows, the near two backlit with roof top faces, street lamps and tree clumps.
+A big beat every 1.2-1.8 s: a district lights up in one sweep on "22 million" (1.15 s), the mascot turns on "PHP",
+a second district on "out there" (3.55), the tower lights bottom -> top + beacons + the street lamps on "hit" (4.4);
+the sun sinks 140 px.
 
-**Eye-level street (BASELINE).** `persp1` camera with eye above head height (`camH` 260): one 0.32 H back-view figure
-cut by the left edge, the mascot at people's feet (0.27x a person), a queue on the path receding to the vanishing
-point (kit Persons above 40 px), low facades, short poles, near string lights at the top (lights on near the end),
-sun r 110 at the vanishing point, 5 % push-in.
+**Eye-level street (BASELINE).** Reference 2 f_1: camera at 187 for 170 people (heads hug the horizon), a 240-wide
+central path between lawn strips, low pitched-roof houses with doors, a right-hand railing; the queue starts at the lens
+(z 150: the hero 0.55 H, cut by the bottom edge; the next ones 0.4-0.5 H) and recedes to the VP; the mascot at their
+feet; the near 30 % dressed with kit pieces placed by the street's own camera (mailbox, bike, car, lamp post, trees,
+palms, water tower), walkers (30 % standing) on both walks, bulbs shrinking toward the VP; a dolly push 0.09 anchored on
+the VP (real parallax); the sun hops in from shot A.
 
-**Backlit worm's-eye monument (PEAK).** `Monument light="back"` far wider than the frame (`bw` 1600, taper 0.52), sun
-behind the drum's right side, crane `y` 1260 -> 960 with `CAM.reveal` (+ zoom 1.06 -> 1): the columns never enter the
-caption band, only flat fields do; the dome lands inside the band as a flat field; people keep gathering on the steps,
-banners drop on "four", the door opens on "Nobody", the clock pops once it is below the captions; foreground
-`Balustrade` with the mascot and a near Person with legs at depth -0.5 fall out of frame first.
+**Backlit worm's-eye monument (PEAK).** `bw` 1950, `taper` 0.52: the pediment runs past both edges, the lantern leaves the
+top, only flat pediment / drum fields sit in the caption band; scale chain plaza person ~70 px -> door ~160 px -> column
+~700 px -> dome beyond. The colonnade stands at the cut (`build.at` -1.6) and the upper storeys keep building while the
+camera cranes up 160 px; a GroundPlane plaza with 44 back-view people walking up; a backlit head-and-shoulders
+silhouette at the lens; banners on "four", lanterns popping one by one, the door opens on "Nobody".
 
-**Pull-back (PEAK).** `WallOfWindows` 80 x 44 on `wallQuadVP` (edges converge on the horizon VP), `keepDark` on the
-caption band, a 5 x 5 block of `WindowCloseup`s around the hero while the zoom is above 3x; camera `zoom 5 * push 0.79`
-(~24x) -> rest anchored on the hero (hero centre at screen y 1120 so the neighbour above, a dark close-up, sits under
-the captions); on-wave from the hero, then two off-waves; the hero switches off last.
+**Pull-back (PEAK).** `WallOfWindows` 56 x 30 on `wallQuadVP`; 8x -> 1.3x over 5.3 s (cruise <= 20 px / frame) anchored
+on the hero, which ends framed at (440, 1110), 35 x 41 px; the 24 neighbours + the hero as close-ups degrading by screen
+size; keepDark on the caption LINE boxes with hysteresis; an on-wave from the hero, then the switch-off: the block under
+"switch it off" goes first, darkness closes in on the hero (a ragged collapse wave) punctuated by whole blocks of floors
+going dark inside the final framing, the stragglers, and the hero last on "did." (0.55 s before the cut); our own
+rooftop (Ledge with detail) rises into the frame and the mascot watches the blocks go dark, glances at us, and turns to
+us when the last light goes out.
 
-## 9. Captions and legibility
+## 10. Captions and legibility
 
-Captions own the band y 280-570 (`skyCaption.clipTop/clipBottom`). Keep busy detail out of it: stars avoid it,
-birds fly above or below it, sky steps stay below y 600, shafts start below it, wall windows keep dark in it, backlit
-monuments put only flat fields in it, street facades and poles stay under it. Check every shot with
-`scripts/capcheck.mjs` (renders a caption mask; fails when > 5 % of the background near the glyphs is below 3:1
-against the active tone). CineDemo: 141 of 143 sampled frames pass (every wipe sampled at 12 steps); the 2 borderline
-frames (5.7 % near < 3:1, 0.07 s) are a glyph straddling the passer's head edge mid-wipe.
+Captions own the band y 280-570. Keep busy detail out of it: stars avoid it, birds fly above or below it, sky steps stay
+below y 600 (day / golden have none), shafts start below it, wall windows behind the caption lines go dark, backlit
+monuments put only flat fields in it (`quietY`), street facades and poles stay under it, the colossal tower crosses it
+as a flat field. Check with `scripts/capcheck.mjs` (fails when > 5 % of the background near the glyphs is below 3:1).
+CineDemo: 110 sampled frames, 0 FAIL after the B `quietY` fix (earlier: 2 FAIL at 11.65-11.85 s, entablature ink
+under "in four countries" during the crane).
 
-## 10. Performance rules
+## 11. Performance rules
 
-1. **Batch.** Anything numerous (windows, stars, tiny people, bulbs, birds) goes into one `PathBuf` path per colour.
-   Rows / monuments keep per-building / per-part strings so they can build and un-build piece by piece and still batch
-   everything at rest.
-2. **Memoise geometry, recompute only state.** Static geometry is cached by seed; per frame only switch states,
-   positions and the few moving pieces are rebuilt.
-3. **Fill-only far, ink near.** Far rows have no ink. Use core `<Ink>` (taper, draw-on) only for a few hero lines.
+1. **Batch.** Anything numerous (windows, stars, tiny people, bulbs, lamps, trees) goes into one `PathBuf` path per
+   colour. Rows / monuments keep per-building / per-part strings so they build and un-build piece by piece.
+2. **Memoise geometry, recompute only state.** Static geometry is cached by seed (rows, monument, wall darkness per
+   camera path); per frame only switch states, positions and moving pieces are rebuilt.
+3. **Fill-only far, ink near.** Use core `<Ink>` (taper, draw-on) only for a few hero lines.
 4. **One `<g transform>` per layer.** Camera moves never touch geometry.
-5. **No masks.** Silhouettes / rims are `FlatColor` copies (a scoped CSS rule); clip paths only for wipe splits.
+5. **No masks.** Silhouettes / rims are `FlatColor` copies; clip paths only for wipe splits and the passer's rim.
 6. **Precision for deep zooms.** `PathBuf(precision)` / `WallOfWindows precision={3}` past 10x.
-7. **Static translucency only** (haze, shafts, glows): never animate opacity; switch things by pop / wipe / scale.
-8. Kit Persons cost ~20 elements each: fine for tens (the monument steps, a queue), not for hundreds (use blobs).
+7. **Static translucency only** (haze, shafts, glows): never animate opacity.
+8. Kit Persons cost ~20 elements each: fine for tens (the steps, the plaza, a queue), not hundreds (use blobs).
 
-## 11. Known gaps
+## 12. Known gaps
 
-- Event density measured with the camera LOCKED (`density.py`, 0.25 scale): 7.5 medium events/s over the demo; the
-  backlit monument and the 24x window shot still have 1-3 s stretches with only small events (people popping onto the
-  steps, page refreshes) because the sun's continuous drift and build chains merge neighbouring changes into one
-  space-time event; with the camera moving they read as busy.
-- Monument `light="back"` reads best at golden / dusk; at night prefer `light="front"` with lit windows.
-- `WindowCloseup` close-ups of the LOD block cost ~100 ms per frame while they are on screen (24 of them).
-- `PerspectiveStreet` facades are plain (windows + ink edges): no shopfronts or awnings yet; pair it
-  with core kit pieces on a `<Plane>` for hero blocks.
+- Event density (camera held on each shot's resting key, captions hidden; the reviewer's `density.py`, strict: blobs
+  >= 500 voxels at 1/4 scale, diff > 18): A 6.3 / s, D 5.1 / s, B 5.0 / s, C 17.1 / s (max gaps 1.00 / 0.53 / 0.63 /
+  1.07 s). Grid switch-offs barely count (each window is its own one-frame sub-threshold blob), so C's tail is carried
+  by the mascot's pose beats; the old "7.5 / s" came from an uncommitted tool (a committed copy in `scripts/` is the
+  core lane's to add).
+- `Monument light="back"` reads best at golden / dusk; at night prefer `light="front"` with lit windows.
+- The core Film still uses its own linear wipe edge and does not register `column` / `passer` yet (core lane:
+  `{...BUILTIN_WIPERS, ...CINE_WIPERS}` and `wipeEdgeX`).
+- Core `todSky.golden` (cream) vs style_bible_ref2 8 (golden = the flat day sky): cine follows the bible.

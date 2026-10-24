@@ -421,6 +421,7 @@ def write_retimed_midi(grid, per_beat, path):
             nt.append(m.copy(time=t - prev))
             prev = t
         out.tracks.append(nt)
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     out.save(path)
 
 

@@ -17,7 +17,8 @@ import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {line, polyPath, Pt} from '../../../lib/sketch';
 import {Bird} from '../../../lib/kit';
-import {brickHints, cornice, LayerWrap, noWrap, pavingJoints, SetPlace, SI} from './common';
+import {brickHints, cornice, HALF, LayerWrap, noWrap, SetPlace, SI} from './common';
+import {Foreground, ForegroundSpec, groundMarks, GroundMarks} from './ground';
 import {NoticeboardSlot, OnlookerSlot, PaneRect} from './propSlots';
 import {Workshop, WORKSHOP_CORNER, WorkshopProps} from './MakersLane';
 import type {Acc, Hair} from '../../../lib/kit';
@@ -104,7 +105,8 @@ const G = (() => {
   const pole = NOTICE_CORNER.pole;
   const poleFill = polyPath([[pole.x - 7, pole.base], [pole.x - 5, pole.top], [pole.x + 5, pole.top], [pole.x + 7, pole.base]]);
   const poleInk = line(pole.x - 7, pole.base, pole.x - 5, pole.top, {seed: `${s}/p1`, over: [0, 4]}) + line(pole.x + 7, pole.base, pole.x + 5, pole.top, {seed: `${s}/p2`, over: [0, 3]}) + line(pole.x - 46, pole.top + 18, pole.x + 46, pole.top + 18, {seed: `${s}/pb`, over: [3, 3]}) + `M${pole.x - 34} ${pole.top + 18}l0 -9M${pole.x + 34} ${pole.top + 18}l0 -9M${pole.x - 14} ${pole.top + 18}l0 -9`;
-  return {roofs, wallInk, kerb, poleFill, poleInk};
+  const ground = groundMarks({vp: [540, 1240], top: W.base + 50, bottom: 1920, x0: -300, x1: 1380, rays: 3, cross: 1, specks: 12, reach: 0.5, seed: `${s}/gm`});
+  return {roofs, wallInk, kerb, poleFill, poleInk, ground};
 })();
 
 export type NoticeboardCornerProps = {
@@ -118,6 +120,8 @@ export type NoticeboardCornerProps = {
   pigeons?: boolean;
   pigeonsFlyAt?: number;
   band?: boolean;
+  /** Extra foreground framing (ground.tsx presets). Default none: the edge readers frame the shot. */
+  foreground?: ForegroundSpec;
   wrap?: LayerWrap;
   x?: number;
   y?: number;
@@ -128,12 +132,13 @@ export type NoticeboardCornerProps = {
   seed?: string;
 };
 
-export const NoticeboardCorner: React.FC<NoticeboardCornerProps> = ({sun, board = {}, workshop, readers = true, pigeons = true, pigeonsFlyAt, band = true, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'nc'}) => {
+export const NoticeboardCorner: React.FC<NoticeboardCornerProps> = ({sun, board = {}, workshop, readers = true, pigeons = true, pigeonsFlyAt, band = true, foreground, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'nc'}) => {
   useTime();
   const W = NOTICE_CORNER.wall;
   const B = NOTICE_CORNER.board;
   const far = band ? <Fill rect={[-160, NOTICE_CORNER.band[0], 1400, NOTICE_CORNER.band[1] - NOTICE_CORNER.band[0] + 4]} color={palette.peach} offset={false} mode="snap" seed={`${seed}/band`} /> : null;
-  const roofs = <Fill d={G.roofs} color={palette.tan} offset={false} mode="snap" seed={`${seed}/roofs`} />;
+  // far roofs one half-step off the golden sky (haze), so the wall's tan cornice + bold roof line keep their silhouette
+  const roofs = <Fill d={G.roofs} color={HALF.sand} offset={false} mode="snap" seed={`${seed}/roofs`} />;
   const wires = <TelephoneWires spec={WIRES.S07} pigeons={pigeons ? [{i: 0, x: 380}, {i: 0, x: 420}, {i: 1, x: 700}] : []} pigeonsFlyAt={pigeonsFlyAt} seed={`${seed}/wires`} />;
   const wall = (
     <>
@@ -147,7 +152,8 @@ export const NoticeboardCorner: React.FC<NoticeboardCornerProps> = ({sun, board 
   const ground = (
     <>
       <Fill rect={[-160, W.base, 1400, 600]} color={palette.mintPale} offset={false} seed={`${seed}/pave`} />
-      <Ink d={G.kerb + pavingJoints([540, 1240], W.base + 48, 2080, -900, 1980, 9, 3, `${seed}/pj`)} width={SI.hair} taper={false} />
+      <Ink d={G.kerb} width={SI.far} seed={`${seed}/kerb`} />
+      <GroundMarks marks={G.ground} width={SI.far} seed={`${seed}/gm`} />
     </>
   );
   const corner = (
@@ -170,6 +176,7 @@ export const NoticeboardCorner: React.FC<NoticeboardCornerProps> = ({sun, board 
       {wrap('corner', 0.5, corner)}
       {wrap('board', 0.7, boardNode)}
       {wrap('readers', 1.0, rd)}
+      {wrap('foreground', 1.0, <Foreground spec={foreground} seed={`${seed}/fg`} />)}
     </SetPlace>
   );
 };

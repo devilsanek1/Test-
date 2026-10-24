@@ -5,7 +5,7 @@
 //   <SunPress at={2.28} cx={630} cy={800} r={150}><Sun .../></SunPress>                       // pressed like a button
 //   <Sun ...>{(r) => <SunPie r={r} n={10} cream={3} spokesAt={8.97} slicesAt={9.82} />}</Sun>  // 7/10 (S02), n=3 cream=1 (S12)
 //   <Sun ...>{(r) => <HoursClock r={r} at={33.9} spinAt={34.0} outAt={35.2} />}</Sun>          // S07 "hours"
-//   <Sun ...>{(r) => <MinuteWedge r={r} at={39.2} />}</Sun>                                   // S08 "45 minutes"
+//   <Sun ...>{(r) => <MinuteWedge r={r} at={39.2} />}</Sun>                                   // S08 "45 minutes" (peach sweep)
 //   <WaxSeal from={[640, 820]} to={[420, 1290]} at={25.70} />                                 // S06, world coords
 //   <SunGlowSteps cx={500} cy={690} r={110} at={69.1} />  (draw BEFORE the Sun: it sits behind)  // S13 "hope"
 //   <Sun ...>{(r) => <HeatTicks r={r} at={22.0} />}</Sun>                                     // S05 heat ticks
@@ -175,12 +175,23 @@ export type SunPieProps = {
   sliceStagger?: number;
   /** Extra +6 % pulses of the cream slices. */
   pulseAt?: number | number[];
-  /** The cream slices pop back to solid orange (shrink, 0.12 s, staggered 0.03). */
+  /** The cream slices pop back to solid orange (shrink, 0.12 s, staggered 0.03); the spokes retract right after. */
   solidAt?: number;
-  /** Spokes retract. */
+  /** Spokes retract (0.15 s). Default: solidAt + 0.1 (a solid sun never keeps its spokes: wagon wheel). */
   spokesOutAt?: number;
+  /** Spoke + rim ink width (default far 2.2: dividers, not a wheel). */
   width?: number;
+  /** Colour of the "missing" slices (default cream). Each one carries an ink rim arc, so it never dissolves into a
+   *  cream (golden) sky: the disc silhouette stays whole. */
+  sliceColor?: string;
   seed?: Seed;
+};
+
+/** An open arc path (sun-local) from angle a0 to a1 (deg, clockwise) at radius rr. */
+const rimArc = (a0: number, a1: number, rr: number) => {
+  const [x0, y0] = polar(a0, rr);
+  const [x1, y1] = polar(a1, rr);
+  return `M${x0.toFixed(2)} ${y0.toFixed(2)}A${rr} ${rr} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
 };
 
 const sector = (a0: number, a1: number, rr: number) => {
@@ -189,7 +200,8 @@ const sector = (a0: number, a1: number, rr: number) => {
   return `M0 0L${x0.toFixed(2)} ${y0.toFixed(2)}A${rr} ${rr} 0 ${a1 - a0 > 180 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}Z`;
 };
 
-export const SunPie: React.FC<SunPieProps> = ({r, n, cream = 0, spokesAt, slicesAt, sliceStagger = 0, pulseAt, solidAt, spokesOutAt, width = DEPTH_INK.mid, seed = 'pie'}) => {
+export const SunPie: React.FC<SunPieProps> = ({r, n, cream = 0, spokesAt, slicesAt, sliceStagger = 0, pulseAt, solidAt, spokesOutAt: spokesOutIn, width = DEPTH_INK.far, sliceColor = palette.cream, seed = 'pie'}) => {
+  const spokesOutAt = spokesOutIn ?? (solidAt !== undefined ? solidAt + 0.1 : undefined);
   const t = useTime();
   const idx = Array.isArray(cream) ? cream : Array.from({length: cream}, (_, i) => n - cream + i);
   const step = 360 / n;
@@ -207,7 +219,8 @@ export const SunPie: React.FC<SunPieProps> = ({r, n, cream = 0, spokesAt, slices
     const mid = polar(a0 + step / 2, r * 0.45);
     out.push(
       <XG key={`s${i}`} m={mat.about(mat.scale(k), mid[0] * 0.2, mid[1] * 0.2)}>
-        <Fill d={sector(a0 + 0.6, a0 + step - 0.6, r * 0.985)} color={palette.cream} offset={false} mode="none" seed={`${seed}/s${i}`} lookExempt />
+        <Fill d={sector(a0 + 0.6, a0 + step - 0.6, r * 0.985)} color={sliceColor} offset={false} mode="none" seed={`${seed}/s${i}`} lookExempt />
+        <path d={rimArc(a0 + 0.6, a0 + step - 0.6, r * 0.985 - width / 2)} fill="none" stroke={palette.ink} strokeWidth={width} strokeLinecap="round" />
       </XG>,
     );
   });
@@ -280,8 +293,23 @@ export const HoursClock: React.FC<HoursClockProps> = ({r, at, spinAt, spinDur = 
 
 // ---------------------------------------------------------------- MinuteWedge (S08)
 
-/** One minute hand sweeps a cream wedge of `fraction` (3/4 = 45 min) once (0.61 s ease-out), then ticks. */
-export const MinuteWedge: React.FC<{r: number; at?: number; dur?: number; fraction?: number; outAt?: number; width?: number; seed?: Seed}> = ({r, at, dur = 0.61, fraction = 0.75, outAt, width, seed = 'wedge'}) => {
+export type MinuteWedgeProps = {
+  r: number;
+  at?: number;
+  dur?: number;
+  /** Swept fraction of the hour (3/4 = 45 min). */
+  fraction?: number;
+  outAt?: number;
+  width?: number;
+  /** Swept-sector colour. Default peach: it contrasts with the day (mint), golden (cream) and dusk (sage) skies AND
+   *  with the orange disc, so "3/4 swept" is the dominant shape whatever the sky. */
+  sweepColor?: string;
+  seed?: Seed;
+};
+
+/** A clock face on the sun: 4 ink quarter ticks pop, then one minute hand sweeps a peach sector of `fraction` (0.61 s
+ *  ease-out) with an ink rim arc following it, and ticks. The disc silhouette stays whole (thin orange ring outside). */
+export const MinuteWedge: React.FC<MinuteWedgeProps> = ({r, at, dur = 0.61, fraction = 0.75, outAt, width, sweepColor = palette.peach, seed = 'wedge'}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const q = at !== undefined ? prog(t, at, dur, E.outCubic) : 1;
@@ -290,16 +318,29 @@ export const MinuteWedge: React.FC<{r: number; at?: number; dur?: number; fracti
   const outK = outAt !== undefined ? 1 - E.inCubic(prog(t, outAt, 0.14)) : 1;
   if (outK <= 0.002) return null;
   const end = -90 + 360 * fraction * q;
-  const R = r * 0.94;
+  const R = r * 0.9;
   const w = width ?? Math.max(DEPTH_INK.front, r * 0.035);
-  const [hx, hy] = polar(end + tick, R * 0.96);
-  const [t0x, t0y] = polar(-90 + 360 * fraction, R * 0.8);
-  const [t1x, t1y] = polar(-90 + 360 * fraction, R * 0.97);
+  const [hx, hy] = polar(end + tick, R * 0.92);
+  // quarter ticks (12, 3, 6, 9) pop with the 7 % spring, 0.04 s apart
+  let ticks = '';
+  [-90, 0, 90, 180].forEach((a, i) => {
+    const k = at === undefined ? 1 : springAt(t, at + i * 0.04, springs.pop);
+    if (k <= 0.01) return;
+    const [x0, y0] = polar(a, R * (1 - 0.2 * k));
+    const [x1, y1] = polar(a, R * 0.97);
+    ticks += `M${x0.toFixed(1)} ${y0.toFixed(1)}L${x1.toFixed(1)} ${y1.toFixed(1)}`;
+  });
+  const [sx, sy] = polar(-90, R);
   return (
     <ExitFade x={0} y={0}>
       <g transform={`scale(${outK.toFixed(4)})`}>
-        {q > 0.003 ? <path d={sector(-90, Math.max(-89.9, end), R)} fill={palette.cream} /> : null}
-        {done ? <path d={`M${t0x.toFixed(1)} ${t0y.toFixed(1)}L${t1x.toFixed(1)} ${t1y.toFixed(1)}`} stroke={palette.ink} strokeWidth={w} strokeLinecap="round" /> : null}
+        {q > 0.003 ? (
+          <>
+            <path d={sector(-90, Math.max(-89.9, end), R)} fill={sweepColor} />
+            <path d={`M0 0L${sx.toFixed(2)} ${sy.toFixed(2)}` + rimArc(-90, Math.max(-89.9, end), R)} fill="none" stroke={palette.ink} strokeWidth={w * 0.7} strokeLinecap="round" strokeLinejoin="round" />
+          </>
+        ) : null}
+        {ticks ? <path d={ticks} stroke={palette.ink} strokeWidth={w * 0.8} strokeLinecap="round" fill="none" /> : null}
         <path d={`M0 0L${hx.toFixed(2)} ${hy.toFixed(2)}`} stroke={palette.ink} strokeWidth={w} strokeLinecap="round" />
         <circle r={w * 1.3} fill={palette.ink} />
       </g>

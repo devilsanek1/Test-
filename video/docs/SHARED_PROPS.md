@@ -8,13 +8,16 @@ import {Lock, Bit, BrowserChrome, ElephantPlaque, RollerShutter, PowerGlyph, Sun
 ```
 
 Dev sheet: `src/dev/SharedKitSheet.tsx` (composition `SharedKitSheet`, 10 s; every cell loops on a 5 s clock, the bottom
-band shows a thumbnail of every set from `sets/catalog.tsx`).
+band shows a thumbnail of every set from `sets/catalog.tsx`; the QA modes `look` / `unbuildAt` reach the thumbnails too).
+The sun cells show each morph on two skies (pie: day + golden; 45-minute wedge: golden + dusk). `mode: 'context'` also has
+the S10 keeper (h 300) and the S13 caretaker (h 225) at film size.
 
 ```bash
 scripts/still.sh SharedKitSheet 2.5 out.png                                         # every prop, mid-animation
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 3.5 --props='{"mode":"context"}' # props at FILM SIZE on plain walls
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 4.6 --props='{"look":"paper"}'  # frame-0 line-art state
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 2.3 --props='{"unbuildAt":2.0}' # the un-build on every prop
+node scripts/render-frames.mjs SharedKitSheet /tmp/o 2.5 --props='{"thumbs":false}'  # props only (cost check)
 scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 --cols=12   # one cell, every frame
 ```
 
@@ -47,8 +50,8 @@ scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 -
 
 ```tsx
 <Lock x={400} y={1135} size={20} depth="far" />                                    // S01 govB lock box (16 x 20)
-<Lock x={595} y={1100} size={100} screwsOutAt={5.2} coverOpenAt={5.4} boltTestAt={5.9} gapMarkAt={6.2}
-      rider={<Bit x={LOCK.gap[0]} y={4} size={30} peekAt={6.6} />} />               // S02 close-up
+<Lock x={595} y={1100} size={100} screwsOutAt={5.2} coverOpenAt={5.4} boltTestAt={5.9} gapMarkAt={6.15}
+      bit />                                                                          // S02 close-up: Bit peeks out of the slot at 6.45
 <Lock x={488} y={960} size={75} state="blueprint" at={21.5} />                      // S05 detail, ink on white
 <Lock ... state="sketch" />  <Lock ... state="ghost" popOnAt={14.2} />  <Lock ... state="dot" />
 <Lock x={330} y={1130} size={42} state="fixed" at={1.2} checkAt={1.4} tagSwingAt={2} />  // THE FIX
@@ -58,16 +61,28 @@ scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 -
 ```
 
 - Anchor = box centre; `size` = box height (width 0.8 x). Local design box 80 x 100; `LOCK` lists the local points (`gap`,
-  `strike`, `keyhole`, `screws`, `loop`) and `lockPoint(x, y, size, LOCK.gap)` maps one to world coordinates (place Bit, rings).
+  `strike`, `slot`, `peek`, `keyhole`, `screws`, `loop`, `tip`, `boltR`) and `lockPoint(x, y, size, LOCK.gap)` maps one to
+  world coordinates (place rings, a rider).
 - Look: sand box, left tan shade strip, two screws, a hinged cream cover with a keyhole. Inside (cover open): a tealDark
-  cavity, the bolt housing, a cream bolt that STOPS SHORT of the strike plate, dashed ink bracket + small ink ring at the gap.
+  cavity, the bolt housing, a CHUNKY cream bolt (0.22 of the box height) that STOPS SHORT of the strike plate, a dark
+  tealDark receiving SLOT cut into the strike (ink-outlined: the hole the bolt never reaches), dashed ink bracket + small
+  ink ring at the gap. Bit lives in the slot (`bit`).
 - States: `closed` (default) | `open` (cover already open) | `blueprint` (ink on white + centre line + dimension line) |
   `sketch` (loose double strokes, for the leaked page) | `ghost` (dashed outline) | `dot` (LOD) | `fixed`.
-- Events: `screwsOutAt` (spin 0.1 s, pop out, 0.08 s apart), `coverOpenAt` / `coverCloseAt` (hinge 0.15 s), `boltTestAt`
-  (slides 0.2 s, knocks, stops short; the fixed bolt reaches the strike), `gapMarkAt` (0.17 s), `glintAt`, `lensGlintAt`
+- Events: `screwsOutAt` (spin 0.1 s, pop out, 0.08 s apart), `coverOpenAt` / `coverCloseAt` (hinge 0.2 s: scaleX 1 ->
+  edge-on (an ink edge line) -> -0.3, its tan back showing: ~6 frames at 30 fps), `boltTestAt` (the bolt is retracted
+  flush with the housing until then; it shoots out 0.2 s out(cubic) over ~43 % of the housing-to-strike gap, hits its stop
+  SHORT of the slot and knocks back 3.5 units over 0.14 s; the fixed bolt seats IN the slot with a 1-unit settle),
+  `gapMarkAt` (0.17 s; put it after the recoil, ~boltTestAt + 0.35), `glintAt`, `lensGlintAt`
   (white bar sweeps the box, 0.32 s), `cobwebAt` (0.3 s), `dropAt` + `dropDist` (gravity 4200 px/s^2, 10 deg tilt, landing
   squash), `popOnAt` (7 % spring), `checkAt` (0.17 s; on the tag for `fixed`), `tagSwingAt`. Slots: `rider` (lock-local,
   rides every move), `inside` (in the cavity under the cover).
+- `bit` (true or `{peekAt, hideAt, alertAt, size, seed}`): Bit inside the cavity, flipped to face the bolt, peeking OUT OF
+  the slot into the gap (clipped by the strike's edge, so the slot stays visible). `peekAt` defaults to boltTestAt + 0.55:
+  the bolt stops at +0.2, recoils, and the EMPTY slot holds ~0.3 s before he appears. size 14 lock units fills the gap.
+- Paper / line-art state (`<Look fills="paper">`, frame 0 and the S13 un-build): the box, the cover outline and the
+  keyhole stay ink at every LOD >= 1 (the keyhole fill is look-exempt), screws stay ink dots, an open lock shows its
+  cavity, housing, bolt, strike and slot as outlines; LOD 0 gets an ink outline. A closed lock never reads as an empty box.
 - **Fixed variant** (resolves the S06 "shackle" conflict): the SAME box silhouette in sage, a full-length bolt, and a cream
   check tag on a loop at the top-right corner. Its build is body -> loop -> tag at 0.07 s steps, so the S06 "shackle" beat is
   the loop: the fix reads as the same lock, repaired.
@@ -110,7 +125,9 @@ scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 -
 
 States: `idle` (antennae wiggle, breathing) | `peek` | `hide` | `crawl` | `scuttle` (fast legs) | `ride` (calm; ride by
 nesting him in a moving parent, e.g. a Lock `rider`) | `hop` | `alert` | `silhouette` | `doodle`. Solid ink in every Look
-state (he is in the frame-0 line art). LOD: < 6 px silhouette, < 18 px no shell highlight. `bitPath(x, y, size)` adds one
+state (he is in the frame-0 line art). LOD: < 6 px silhouette; the cream eye is drawn above that and kept >= 1.4 px radius
+on screen (so the 16 px hook-frame Bit still has a face on a phone); the shell highlight from 12 px. Recommended size for
+wide-shot cornice / plaza Bits: 20-24 px. `bitPath(x, y, size)` adds one
 silhouette to your own batch. The kit `Icons.Bug` (orange, top view) is NOT Bit: use Bit for the story's bug.
 
 ## 5. P4 BrowserChrome, P6 progress bar + rings
@@ -156,11 +173,20 @@ distinct from the P1 door lock (a shackle loop, no cover / screws). The tag swin
 <SunPress at={68.0} amount={0.06} .../>  <SunPress mode="land" .../>               // S13 echo / S06 landing (-10 % y, in place)
 <Sun ...>{(r) => <SunPie r={r} n={10} cream={3} spokesAt={8.97} slicesAt={9.82} solidAt={10.6} />}</Sun>   // 7/10; n=3 cream=1 for 1/3
 <Sun ...>{(r) => <HoursClock r={r} at={33.9} spinAt={34.0} spinDur={1.1} turns={3.5} hourSteps={4} outAt={35.2} />}</Sun>
-<Sun ...>{(r) => <MinuteWedge r={r} at={39.2} dur={0.61} fraction={0.75} />}</Sun>                         // one sweep, then a tick
+<Sun ...>{(r) => <MinuteWedge r={r} at={39.2} dur={0.61} fraction={0.75} />}</Sun>                         // ticks pop, one sweep, a tick
 <WaxSeal from={[sunEdgeX, sunEdgeY]} to={envelopeSeal(ex, ey)} at={25.70} dur={0.33} arc={120} />          // world coords
 <SunGlowSteps cx cy r at={69.1} />   // OPAQUE stepped discs peach 1.25 r + cream 1.5 r; render BEFORE the Sun
 <Sun ...>{(r) => <HeatTicks r={r} at={22.0} />}</Sun>
 ```
+
+- `SunPie`: each "missing" slice (`sliceColor`, default cream) carries an ink RIM ARC on the disc edge, so on a cream
+  (golden) sky the disc silhouette stays whole and the slice reads as a slice, not a hole. Spokes default to far ink (2.2:
+  dividers, not a wheel) and retract on their own 0.1 s after `solidAt` (`spokesOutAt` overrides), so the solid end state
+  is a clean disc.
+- `MinuteWedge` ("45 minutes"): 4 ink quarter ticks pop (0.04 s apart), then the hand sweeps a PEACH sector (`sweepColor`)
+  with an ink rim arc and an ink start radius; a thin orange ring stays outside it. Peach contrasts with the day (mint),
+  golden (cream) and dusk (sage) skies and with the orange disc, so "3/4 swept" is the dominant shape on any sky
+  (checked on golden and dusk in the sheet).
 
 The seal is the film's one allowed orange prop (r16, wax drips, ink ring, a tiny solid elephant); it pops out of the sun,
 drops along a dotted ink arc (the trail retracts after the landing), squashes, settles with a pendulum.
@@ -204,19 +230,27 @@ out(exp)), `walk={{at, hz, to, dur}}`, `bob`, `flip`, `depth` (default by size: 
 
 | preset | look | extra props |
 |---|---|---|
-| `EdgeOnlooker` | tier A: head centre + `head` diameter, torso runs off the frame bottom, ink 4.8, hero detail + rim | `raisePhoneAt` (phone arm pops up with a shoulder jolt), `hair`, `acc`, `body` |
+| `EdgeOnlooker` | tier A: head centre + `head` diameter; a long coat that ALWAYS runs off the frame bottom (its length is derived every frame from the camera transform: frame bottom + 40 px, never less than world.h + bleed; `frameBottom` overrides), so no hem and no legs can show; hanging arms (sleeve seam, cuff, sand hand at a natural arm length), a fixed-length white rim strip, ink 4.8 | `raisePhoneAt` / `lowerPhoneAt` (the arm swings up about the shoulder, 0.3 s outBack, phone in hand, shoulder jolt), `phoneSide` (default: the side facing the frame centre), `arms` ('both' / 'near' / false), `hair` ('cap' = mid-tone hair + our back-view cap, never the kit cap), `acc` ('hood' drawn here, under the head; 'backpack' dropped), `body`, `rim` |
 | `Citizen` | 40-55 px kit Person with legs | `silhouette` (flat sage cut-out; white tombstone in paper), `color` |
 | `Investigator` | 110-140 px, ink shield badge on the back | `raiseAt` / `lowerAt` (arm swings up with a SparkleTablet), `arm` |
 | `Messenger` | teal coat | `pullAt` (envelope out of the coat to shoulder height), `holdEnvelope`; `messengerHand(x, y, h)` |
-| `Maker` | teal + cream apron (straps, bow, apron edges) | `bust` (waist-up at a bench), `work` (nodding hz) |
-| `Keeper` | sand coat, teal trousers, ochre tool belt (hammer, pouch); NOT a maker | `reachAt` + `holding` (e.g. `<NewLockIcon/>`), `installAt`, `climb={{at, steps, run, rise}}`; < 30 px = sand speck |
-| `Caretaker` | teal coat, cream cap, key ring r22 with sand keys | `raiseKeysAt`, `jingleAt`, `glintAt` |
+| `Maker` | teal + cream apron (Y straps meeting mid-back, bow, apron edges; crossed X straps read as "crossed out"); no caps | `bust` (waist-up at a bench), `work` (nodding hz) |
+| `Keeper` | sand coat with a tan collar, teal cap, ochre hair, teal trousers, ochre tool belt (hammer, pouch); NOT a maker | `reachAt` + `holding` (e.g. `<NewLockIcon/>`), `installAt`, `climb={{at, steps, run, rise}}`, `cap` (colour or false), `hair`; < 30 px = sand speck |
+| `Caretaker` | teal coat with a tealDark collar, sage cap, ochre hair, key ring r22 with sand keys | `raiseKeysAt`, `jingleAt`, `glintAt`, `cap`, `hair` |
 | `Attempter` | hooded, tealDark, ink hood point | `mode` `tap` (`tapAt[]`, ripple arcs at `tapPoint`) / `rattle` (`rattleAt`, handle + marks) / `stand` |
 | `AttemptStipple` | 4-8 px hooded tombstones | ONE path for hundreds, each pops at `at` |
 | `Ghost` | ink-only Person (no fills) | `at` draws it on |
 
-The presets mirror the kit Person's seeded torso width / head radius (`personGeo` in `Figures.tsx`) to keep hand-placed
-arms, caps and belts on the body; if `kit/Person.tsx`'s `makeSpec` draw order changes, update `personGeo`.
+The presets mirror the kit Person's seeded torso width / head radius / shoulder rounding and coat pick (`personGeo`,
+`personCoat` in `Figures.tsx`) to keep hand-placed arms, caps and belts on the body; if `kit/Person.tsx`'s `makeSpec` draw
+order changes, update them.
+
+Back-view heads (review 4: Keeper / Caretaker read as bearded faces): `Keeper` and `Caretaker` are drawn by `BackBody`
+(Figures.tsx), not the kit Person: the head circle IS the hair colour (mid-tone ochre, never ink under a cap), sand ears at
+mid-height, the cap ON TOP (`CapTop`: crown over the top ~45 %, band line just above the middle with the small strap arch
+on it, a button; nothing on the lower half of the head), a sand NECK block visible under the head and a coat collar band
+with its collar line on the shoulders (style bible 6, ref 1 line-art row). `h` is their true feet-to-cap height. The same
+`CapTop` replaces the kit cap on `EdgeOnlooker` heads.
 
 ## 10. Continuity contracts this lane honours
 
@@ -230,12 +264,13 @@ arms, caps and belts on the body; if `kit/Person.tsx`'s `makeSpec` draw order ch
 
 ## 11. Render cost (measured, concurrency 1, 1080 x 1920)
 
-| frame | ms / frame |
+| frame (review 4, 24 frames each, shared machine at load ~4.5) | ms / frame |
 |---|---|
-| FontTest (baseline: simple page) | 112 |
-| SharedKitSheet `context` (about 25 props at film size + 2 onlookers) | 133 |
-| SharedKitSheet (about 130 prop instances + the set thumbnails) | 218 |
-| KitDemo (reference) | 262 |
+| FontTest (baseline: simple page) | 146 |
+| SharedKitSheet `context` (about 25 props at film size + keeper, caretaker, 2 onlookers) | 155 |
+| SharedKitSheet `thumbs: false` (about 135 prop instances) | 215-227 |
+| SharedKitSheet (+ the 9 set thumbnails, sets lane) | ~400 |
+| KitDemo (reference) | 251 |
 
 So a typical prop costs well under 1 ms. Hundreds of far things go through the batched components (`LockSpecks`,
 `PlaqueSpecks`, `BitSwarm`, `AttemptStipple`: 1-3 paths whatever the count), never through hundreds of `<Lock>`s.
@@ -245,6 +280,8 @@ So a typical prop costs well under 1 ms. Hundreds of far things go through the b
 - Raw-SVG parts (ring bands, clock hands, ripples, the seal's trail, attempters) leave with `ExitFade` (shrink / 1-frame pop)
   instead of retracting stroke by stroke.
 - The Maker's apron is read from behind (straps + bow + edges); a front apron never shows (people are always back view).
-- `EdgeOnlooker.raisePhoneAt` is a pop of the kit's phone arm (plus a jolt), not an arm swing: the kit Person draws the arm.
+- `EdgeOnlooker` draws a hood (`acc: ['hood']`) by rendering the kit Person's head a second time, clipped to the head,
+  over the hood (the kit only draws hoods on hero figures, and hero detail puts cuffs / hands at the hip).
+- Sets lane: `BitSlot` defaults to 16 px; 20-24 px reads better in wide shots (Bit itself now keeps its eye at 16 px).
 - Engine lane (optional): kit `Icons.Bug` is an orange top-view bug; the film's bug is `Bit` (solid ink side view). Consider
   deprecating `Bug` or re-styling it to Bit so the two never meet in a scene.

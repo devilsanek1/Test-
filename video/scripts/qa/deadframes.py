@@ -436,7 +436,7 @@ def main(argv=None):
     else:
         scenes = Q.scenes_from_cuts([c['frame'] for c in cuts], n, fps)
         scenes_from = 'detected cuts'
-    allow = Q.load_allow(args.allow) if args.allow else []
+    allow = load_allow(args.allow) if args.allow else []
     sc_rep, dead, trans = score_scenes(rows, scenes, events, cap_events, fps, opt, allow, args.t0, grace=not args.no_transition_grace)
     for s in sc_rep:
         s['camera_frames'] = int(sum(1 for r in rows[s['f0']:s['f1'] + 1] if r['model'] != 'static' and r['model'] != 'first'))

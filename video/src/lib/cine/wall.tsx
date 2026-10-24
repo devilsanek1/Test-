@@ -20,7 +20,7 @@ import {palette} from '../theme';
 import {useTime} from '../time';
 import {Seed} from '../rng';
 import {line, Pt} from '../sketch';
-import {ambient, atmos, TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
+import {ambient, atmos, TodLike, TodPalette, useTodPal} from './atmosphere';
 import {darker} from './city';
 import {Quad, quadMap} from './persp';
 import {gridCells, SwitchEvent, switchTimes, WinCell, windowPaths, WindowLook} from './windows';

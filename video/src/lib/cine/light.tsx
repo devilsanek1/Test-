@@ -15,7 +15,7 @@ import React, {useId, useMemo} from 'react';
 import {Ease, ease as E, lerp, osc, prog, useTime} from '../time';
 import {Sun, SunMove, SunProps} from '../Sun';
 import type {Pt} from '../sketch';
-import {TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
+import {TodLike, TodPalette, useTodPal} from './atmosphere';
 import {mix, PathBuf, r1} from './util';
 import {palette} from '../theme';
 import {exitScale, useCineState} from './state';

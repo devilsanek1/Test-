@@ -202,29 +202,52 @@ const LEFT_Q: Quad = [
   [330, 1120],
   [-140, 1700],
 ];
-const LEFT = perspRowLayout({quad: LEFT_Q, n: 6, H: 700, hw: 700 * 0.5, storeys: 3, side: 'left', seed: 'laneL', colors: [palette.cream, palette.sand, palette.cream, palette.tan, palette.sand, palette.cream], litFraction: 0.8});
+// golden: the row's roofline meets the cream sky, so its facades sit a step off it (sand / tan, never cream)
+const LEFT = perspRowLayout({quad: LEFT_Q, n: 6, H: 700, hw: 700 * 0.5, storeys: 3, side: 'left', seed: 'laneL', colors: [palette.sand, palette.tan, palette.sand, palette.sand, palette.tan, palette.sand], litFraction: 0.8});
 
 const G = (() => {
   const s = 'lane';
   const VP = MAKERS_LANE.vp;
-  // cobbled floor: alternating sand / tan bands converging on the sun at the VP
+  // the lane: ONE flat sand field with 4 thin, broken tan shadow bands cast toward us by the low sun (long shadows of
+  // posts and doorsteps). Each band follows a ray from the VP, starts at its caster's foot and breaks once or twice.
+  const rayAt = (xb: number, y: number) => VP[0] + ((xb - VP[0]) * (y - VP[1])) / (1920 - VP[1]);
   let bandsTan = '';
-  const edges = [-1400, -900, -560, -300, -90, 120, 300, 470, 640, 840, 1100, 1500];
-  for (let i = 0; i < edges.length - 1; i += 2) bandsTan += polyPath([[VP[0], VP[1]], [edges[i], 2060], [edges[i + 1], 2060]]);
-  // cobble dashes (hair), denser near
+  const bands: [number, number, number, number][] = [
+    // [x at the frame bottom, half width there, start y, end y]
+    [-60, 22, 1130, 1920],
+    [250, 14, 1210, 1700],
+    [330, 18, 1460, 1920],
+    [1180, 26, 1260, 1920],
+  ];
+  const br = rng(`${s}/bands`);
+  for (const [xb, hw, y0, y1] of bands) {
+    let y = y0;
+    while (y < y1) {
+      const yEnd = Math.min(y1, y + br.range(160, 380));
+      bandsTan += polyPath([[rayAt(xb - hw, y), y], [rayAt(xb + hw, y), y], [rayAt(xb + hw, yEnd), yEnd], [rayAt(xb - hw, yEnd), yEnd]]);
+      y = yEnd + br.range(26, 60);
+    }
+  }
+  // the Workshop's kerb / step plane, its left end on the lane's ray through the workshop corner (600, 1500)
+  const W = WORKSHOP_LANE;
+  const kx = (y: number) => VP[0] + ((W.x0 - VP[0]) * (y - VP[1])) / (W.base - VP[1]);
+  const kerbTop = polyPath([[W.x0 - 2, W.base], [1240, W.base], [1240, W.base + 40], [kx(W.base + 40), W.base + 40]]);
+  const kerbFace = polyPath([[kx(W.base + 40), W.base + 40], [1240, W.base + 40], [1240, W.base + 58], [kx(W.base + 40), W.base + 58]]);
+  const kerbInk = line(kx(W.base + 40), W.base + 40, 900, W.base + 40, {seed: `${s}/k1`, over: [2, 0], breaks: false}) + line(924, W.base + 40, 1240, W.base + 41, {seed: `${s}/k2`, over: 0, breaks: false}) + line(kx(W.base + 40), W.base + 58, 1240, W.base + 60, {seed: `${s}/k3`, over: [3, 0]}) + line(W.x0, W.base, kx(W.base + 40), W.base + 40, {seed: `${s}/k4`, over: [0, 0], breaks: false}) + line(kx(W.base + 40), W.base + 40, kx(W.base + 40), W.base + 58, {seed: `${s}/k5`, over: [0, 2], breaks: false});
+  // cobble dashes (short, sparse), denser near
   const r = rng(`${s}/cob`);
   let cobbles = '';
-  for (let i = 0; i < 70; i++) {
+  for (let i = 0; i < 30; i++) {
     const v = Math.pow(r.next(), 0.6);
     const y = VP[1] + 70 + v * 900;
     const half = (y - VP[1]) * 1.25;
     const x = VP[0] + r.range(-half, half);
-    const L = 6 + v * 16;
+    const L = 3 + v * 8;
     cobbles += `M${x.toFixed(1)} ${y.toFixed(1)}l${L.toFixed(1)} ${(r.range(-0.6, 0.6)).toFixed(1)}`;
   }
   // far rooftop silhouettes across the sun's lower part
   const roofs = polyPath([[250, 1080], [250, 1030], [292, 1030], [292, 1004], [338, 1004], [338, 1022], [380, 1022], [396, 998], [412, 1022], [470, 1022], [470, 1008], [520, 1008], [520, 1030], [575, 1030], [575, 1014], [620, 1014], [620, 1080]]);
-  return {bandsTan, cobbles, roofs};
+  return {bandsTan, cobbles, roofs, kerbTop, kerbFace, kerbInk};
 })();
 
 export type MakersLaneProps = {
@@ -258,7 +281,7 @@ export const MakersLane: React.FC<MakersLaneProps> = ({sun, curtainsAt, workshop
     <>
       <Fill rect={[-160, VP[1], 1400, 1100]} color={palette.sand} offset={false} seed={`${seed}/floor`} />
       <Fill d={G.bandsTan} color={palette.tan} offset={false} mode="snap" seed={`${seed}/bands`} />
-      <Ink d={G.cobbles} width={SI.hair} taper={false} seed={`${seed}/cob`} />
+      <Ink d={G.cobbles} width={SI.far} taper={false} seed={`${seed}/cob`} />
     </>
   );
   const houses = <PerspRow layout={LEFT} lit={curtains} litColor={palette.sand} stagger={0} seed={`${seed}/L`} />;
@@ -269,7 +292,17 @@ export const MakersLane: React.FC<MakersLaneProps> = ({sun, curtainsAt, workshop
       {wrap('roofs', 0.1, farRoofs)}
       {wrap('floor', 0.8, floor)}
       {wrap('houses', 0.4, houses)}
-      {wrap('workshop', 0.6, <Workshop layout={WORKSHOP_LANE} seed={`${seed}/ws`} {...workshop} />)}
+      {wrap(
+        'workshop',
+        0.6,
+        <>
+          <Workshop layout={WORKSHOP_LANE} seed={`${seed}/ws`} {...workshop} />
+          {/* the kerb / step plane the workshop sits on, in the lane's perspective */}
+          <Fill d={G.kerbTop} color={palette.cream} offset={false} seed={`${seed}/kerbT`} />
+          <Fill d={G.kerbFace} color={palette.tan} offset={false} seed={`${seed}/kerbF`} />
+          <Ink d={G.kerbInk} width={SI.mid} seed={`${seed}/kerbI`} />
+        </>,
+      )}
     </SetPlace>
   );
 };

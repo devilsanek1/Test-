@@ -110,6 +110,19 @@ const STEPS = [
   {t: 3.2, v: 0.15},
 ];
 
+/** A thumbnail label that never leaves the sheet: shrinks to the cell width (Patrick Hand ~0.46 em per char) and is
+ *  inset from both sheet edges. */
+const ThumbLabel: React.FC<{x: number; y: number; w: number; label: string}> = ({x, y, w, label}) => {
+  const fs = Math.min(20, (w - 6) / (label.length * 0.46));
+  const half = (label.length * 0.46 * fs) / 2;
+  const cx = Math.min(1080 - 8 - half, Math.max(8 + half, x));
+  return (
+    <text x={cx} y={y} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink} textAnchor="middle">
+      {label}
+    </text>
+  );
+};
+
 /** Set thumbnails (from the sets lane's catalog), scaled into the bottom band. */
 const SetThumbs: React.FC = () => {
   const y0 = Y0 + ROWS * RH + 6;
@@ -135,9 +148,7 @@ const SetThumbs: React.FC = () => {
               <XG m={mat.compose(mat.translate(cx, y0), mat.scale(sc))}>{e.thumb()}</XG>
             </g>
             <rect x={cx} y={y0} width={1080 * sc} height={1920 * sc} fill="none" stroke={palette.ink} strokeWidth={1.6} />
-            <text x={cx + (1080 * sc) / 2} y={y0 + 1920 * sc + 24} fontFamily={captionFontStack} fontSize={20} fill={palette.ink} textAnchor="middle">
-              {e.label}
-            </text>
+            <ThumbLabel x={cx + (1080 * sc) / 2} y={y0 + 1920 * sc + 24} w={cw} label={e.label} />
           </g>
         );
       })}
@@ -147,7 +158,7 @@ const SetThumbs: React.FC = () => {
 
 /** QA modes (input props): look 'paper' = the ink-on-white line-art state (frame 0 / loop), 'fills' = fills only;
  *  unbuildAt = run the un-build (exit recipe) on every prop cell from that sheet time (0.5 s). */
-export type SharedKitSheetProps = {look?: 'paper' | 'fills'; unbuildAt?: number; /** 'context' = props at FILM SIZE on plain walls (1:1 check). */ mode?: 'sheet' | 'context'};
+export type SharedKitSheetProps = {look?: 'paper' | 'fills'; unbuildAt?: number; /** 'context' = props at FILM SIZE on plain walls (1:1 check). */ mode?: 'sheet' | 'context'; /** false = skip the set thumbnails (props-only cost check). */ thumbs?: boolean};
 
 const Modes: React.FC<SharedKitSheetProps & {children?: React.ReactNode}> = ({look, unbuildAt, children}) => {
   let el = <>{children}</>;
@@ -203,7 +214,7 @@ const ContextMode: React.FC = () => {
   );
 };
 
-export const SharedKitSheet: React.FC<SharedKitSheetProps> = ({look, unbuildAt, mode}) => {
+export const SharedKitSheet: React.FC<SharedKitSheetProps> = ({look, unbuildAt, mode, thumbs = true}) => {
   useCaptionFont();
   if (mode === 'context') {
     return (
@@ -231,7 +242,7 @@ export const SharedKitSheet: React.FC<SharedKitSheetProps> = ({look, unbuildAt, 
           <Lock x={154} y={90} size={110} state="fixed" seed="l2" at={0.4} checkAt={1.0} tagSwingAt={1.4} />
         </Cell>
         <Cell c={1} r={0} label="screws, cover, short bolt">
-          <Lock x={108} y={88} size={140} screwsOutAt={0.5} coverOpenAt={0.8} boltTestAt={1.3} gapMarkAt={1.7} lensGlintAt={3.2} glintAt={4.2} seed="l3" rider={<Bit x={8} y={4} size={18} peekAt={2.2} seed="b1" />} />
+          <Lock x={108} y={88} size={140} screwsOutAt={0.5} coverOpenAt={0.8} boltTestAt={1.3} gapMarkAt={1.65} bit={{seed: 'b1'}} lensGlintAt={3.2} glintAt={4.2} seed="l3" />
         </Cell>
         <Cell c={2} r={0} label="blueprint / sketch" bg={palette.white}>
           <Lock x={62} y={88} size={110} state="blueprint" at={0.3} seed="l4" />
@@ -314,16 +325,20 @@ export const SharedKitSheet: React.FC<SharedKitSheetProps> = ({look, unbuildAt, 
             <Sun cx={108} cy={84} r={62}>{(r) => <PowerGlyph r={r} glintAt={0.6} />}</Sun>
           </SunPress>
         </Cell>
-        <Cell c={3} r={3} label="pie 7/10 -> solid" bg={skies.day}>
-          <Sun cx={108} cy={84} r={62}>{(r) => <SunPie r={r} n={10} cream={3} spokesAt={0.4} slicesAt={1.2} pulseAt={2} solidAt={3.6} />}</Sun>
+        <Cell c={3} r={3} label="pie 7/10 -> solid, 1/3" bg={skies.day}>
+          <rect x={108} y={0} width={108} height={170} fill={skies.golden} />
+          <Sun cx={56} cy={84} r={46}>{(r) => <SunPie r={r} n={10} cream={3} spokesAt={0.4} slicesAt={1.2} pulseAt={2} solidAt={3.6} />}</Sun>
+          <Sun cx={162} cy={84} r={46}>{(r) => <SunPie r={r} n={3} cream={1} spokesAt={0.5} slicesAt={1.3} />}</Sun>
         </Cell>
         <Cell c={4} r={3} label="hours clock" bg={skies.golden}>
           <Sun cx={108} cy={84} r={62}>{(r) => <HoursClock r={r} at={0.4} spinAt={0.8} outAt={3.4} />}</Sun>
         </Cell>
 
         {/* ---- row 4 */}
-        <Cell c={0} r={4} label="45-minute wedge" bg={skies.golden}>
-          <Sun cx={108} cy={84} r={62}>{(r) => <MinuteWedge r={r} at={0.6} />}</Sun>
+        <Cell c={0} r={4} label="45 min: golden / dusk" bg={skies.golden}>
+          <rect x={108} y={0} width={108} height={170} fill={skies.dusk} />
+          <Sun cx={56} cy={84} r={46}>{(r) => <MinuteWedge r={r} at={0.6} />}</Sun>
+          <Sun cx={162} cy={84} r={46}>{(r) => <MinuteWedge r={r} at={0.7} />}</Sun>
         </Cell>
         <Cell c={1} r={4} label="wax seal + envelope" bg={skies.golden}>
           <Sun cx={56} cy={56} r={40} />
@@ -419,7 +434,12 @@ export const SharedKitSheet: React.FC<SharedKitSheetProps> = ({look, unbuildAt, 
         </Cell>
 
         </Modes>
-        <SetThumbs />
+        {/* the QA modes (paper / fills / un-build) reach the set thumbnails too */}
+        {thumbs ? (
+          <Modes look={look} unbuildAt={unbuildAt}>
+            <SetThumbs />
+          </Modes>
+        ) : null}
       </svg>
     </AbsoluteFill>
   );

@@ -471,9 +471,25 @@ def load_scenes(path, duration, t0=0.0, only=None):
     return out, [(w0 - t0, w1 - t0, ty, sid) for (w0, w1, ty, sid) in wins]
 
 
-def scenes_from_cuts(cut_frames, n, fps, prefix='C'):
-    b = [0] + [c for c in cut_frames if 0 < c < n] + [n]
-    return [Scene(f'{prefix}{k + 1:02d}', b[k] / fps, b[k + 1] / fps) for k in range(len(b) - 1)]
+def scenes_from_cuts(cut_frames, n, fps, prefix='C', min_len=1.0):
+    """Segments between detected cuts; a segment shorter than min_len s (a loop un-build, a flash of a shot) joins its
+    neighbour. Each cut gets a +-3-frame transition window."""
+    b = [0] + sorted(c for c in cut_frames if 0 < c < n) + [n]
+    k = 1
+    while k < len(b) - 1:
+        if (b[k] - b[k - 1]) < min_len * fps or (b[k + 1] - b[k]) < min_len * fps:
+            del b[k]
+        else:
+            k += 1
+    out = []
+    for k in range(len(b) - 1):
+        sc = Scene(f'{prefix}{k + 1:02d}', b[k] / fps, b[k + 1] / fps, note='detected cut' if k else '')
+        if k:
+            sc.trans.append((b[k] / fps, (b[k] + 3) / fps, 'detected cut'))
+        if k < len(b) - 2:
+            sc.trans.append(((b[k + 1] - 3) / fps, b[k + 1] / fps, 'detected cut'))
+        out.append(sc)
+    return out
 
 
 # ---------------------------------------------------------------- misc

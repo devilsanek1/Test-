@@ -92,6 +92,35 @@ export const glassStep = (c: string): string => (c && c[0] === '#' ? GLASS[c.toU
 export const Glass: React.FC<{on?: boolean; children?: React.ReactNode}> = ({on = true, children}) =>
   on ? <TodCtx map={glassStep}>{children}</TodCtx> : <>{children}</>;
 
+/** Reference 2's night mapping for the LIGHT ground fields (style_bible_ref2 4: mintPale -> sage, sky -> sage,
+ *  cream -> sand, sand -> tan); facades that must keep their day fills simply stay outside it. */
+const NIGHT_GROUND: Record<string, string> = {
+  [palette.mintPale.toUpperCase()]: palette.sage,
+  ['#ACD1BF']: palette.sage,
+  [palette.sky.toUpperCase()]: palette.sage,
+  [palette.cream.toUpperCase()]: palette.sand,
+  [palette.sand.toUpperCase()]: palette.tan,
+};
+export const nightGroundStep = (c: string): string => (c && c[0] === '#' ? NIGHT_GROUND[c.toUpperCase()] ?? c : c);
+/** Relights its <Fill>s with the night ground mapping while `on`. */
+export const NightGround: React.FC<{on?: boolean; children?: React.ReactNode}> = ({on = true, children}) =>
+  on ? <TodCtx map={nightGroundStep}>{children}</TodCtx> : <>{children}</>;
+
+/** A glow as OPAQUE stepped flat discs (outer first), never translucent rings; light exists only in the coloured state.
+ *  steps = [[radius, colour], ...] outer -> inner. */
+export const GlowDiscs: React.FC<{cx: number; cy: number; steps: [number, string][]; at?: number}> = ({cx, cy, steps, at}) => {
+  const look = useLook();
+  const t = useTime();
+  if (look.fills !== 'color' || (at !== undefined && t < at)) return null;
+  return (
+    <>
+      {steps.map(([r, c], i) => (
+        <circle key={i} cx={cx} cy={cy} r={r} fill={c} />
+      ))}
+    </>
+  );
+};
+
 /** Lights out: from `at` every <Fill> inside steps one palette step darker (a 1-frame pop; `stagger` > 0 lets the
  *  caller cascade several groups). `on` forces the state (the 'off' end state). */
 export const LightsOut: React.FC<{at?: number; on?: boolean; children?: React.ReactNode}> = ({at, on, children}) => {

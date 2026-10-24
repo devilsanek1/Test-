@@ -78,8 +78,14 @@ case "$SCN" in
 esac
 [ -f "$ALLOW" ] && DF_ARGS+=(--allow "$ALLOW")
 set +e
-python3 scripts/qa/deadframes.py "$FR/frames" "${DF_ARGS[@]}"
-python3 scripts/qa/framecheck.py "$FR/frames" "${FC_ARGS[@]}"
+# deadframes and framecheck in parallel (one core each)
+python3 scripts/qa/deadframes.py "$FR/frames" "${DF_ARGS[@]}" > "$OUT/deadframes.log" 2>&1 &
+P1=$!
+python3 scripts/qa/framecheck.py "$FR/frames" "${FC_ARGS[@]}" > "$OUT/framecheck.log" 2>&1 &
+P2=$!
+wait $P1; wait $P2
+grep -v '^  \[' "$OUT/deadframes.log" | head -n 40
+grep -v '^  \[' "$OUT/framecheck.log" | head -n 16
 if [ "$COMP" = "Main" ]; then
   python3 scripts/qa/beatsync.py --cuts scenes --fit-tempo --tempo-out "$OUT/tempo_map_proposal.json" \
     --write-midi "$OUT/music_retimed.mid" --out "$OUT/beatsync" --quiet | tail -n 4
