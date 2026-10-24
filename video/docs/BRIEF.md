@@ -5,7 +5,21 @@ A 70.7-second vertical video (TikTok / Instagram Reels / YouTube Shorts) built o
 in the visual style, animation language and motion design of the supplied reference video.
 Quality bar: top-tier editorial motion design that people rewatch and share. Every frame should be worth pausing on.
 
-## CINEMATIC DIRECTION (from the user; overrides the card layout and anything below that conflicts)
+## BALANCE NOTE (from the user, latest; read this first): "Don't overdo it. It should be nuanced, and we still target TikTok / Reels."
+How to apply the cinematic direction below with restraint:
+- The BASE stays the references' look and feel: bright, warm, legible, charming editorial illustration with snappy
+  TikTok pacing. Reference 2's immersive eye-level full-bleed framing is the everyday baseline that makes the viewer
+  feel a little small. That is most of the video.
+- Reserve true Arcane-scale moments for 2–3 story peaks (e.g. the hook, the attack/scale reveal, the closing beat).
+  Everywhere else, scale is a seasoning: a taller building, a deeper street, a sun a bit bigger, a slightly lower camera.
+- Camera: mostly gentle (5–15% push-ins, light parallax). At most one or two big reveal moves in the whole video.
+- Light and time of day: mostly day and golden hour. Dusk or night only where the story earns it (lights switching off,
+  "by evening"). Never murky or trailer-dark; captions always crisp and readable on a phone.
+- Tone: a smart, curious, slightly urgent explainer, not a dramatic movie trailer. Clarity and the hook beat spectacle.
+- Pacing stays TikTok-native: the hook lands in the first second, something meaningful changes every ~1–2 s, no
+  lingering establishing shots.
+
+## CINEMATIC DIRECTION (from the user; overrides the card layout and anything below that conflicts; apply with the balance note above)
 The user's note: some videos make the viewer feel big (reference 1: we look down at a little diorama on a card),
 others make the viewer feel small. We want SMALL: the sense of scale of Arcane's cinematic shots.
 References: `assets/ref2/` (same artist family as reference 1 but full-bleed and immersive: `sheet.png`, `f_*.png`,
