@@ -37,7 +37,7 @@ export type RowHouse = {
   plaque: {x: number; y: number; size: number};
   browser: Quad;
   /** Geometry (screen-space path strings). */
-  g: {facade: string; shade: string; cornice: string; glass: string; dark: string; lit: string; door: string; kick: string; frame: string; screen: string; bar: string; dots: string; stoop: string; plaqueDot: string; lockDot: string; ink: string; thin: string};
+  g: {facade: string; shade: string; cornice: string; glass: string; dark: string; lit: string; door: string; kick: string; frame: string; screen: string; bar: string; dots: string; stoop: string; plaqueDot: string; lockDot: string; ink: string; thin: string; awning: string; shutters: string};
 };
 
 export type PerspRowSpec = {
@@ -109,6 +109,7 @@ function houseGeo(o: {i: number; P: (x: number, y: number) => Pt; left: boolean;
   let dark = '';
   let lit = '';
   let thin = '';
+  let shutters = '';
   for (let s = 0; s < storeys; s++) {
     if (s === 1) continue; // browser storey
     for (const c of [0.14, 0.6]) {
@@ -118,6 +119,7 @@ function houseGeo(o: {i: number; P: (x: number, y: number) => Pt; left: boolean;
       const wh = sh * 0.5;
       if (s === storeys - 1 && wx + ww > dx - w * 0.16 && wx < dx + dw + 4) continue;
       const q = Q(wx, wy, ww, wh);
+      if (tier === 'full' || tier === 'simple') shutters += quadPath(Q(wx - ww * 0.3, wy, ww * 0.26, wh)) + quadPath(Q(wx + ww * 1.04, wy, ww * 0.26, wh));
       const k = rand(String(spec.seed ?? 'row'), `${i}/${s}/${c}`);
       if (k < (spec.litFraction ?? 0.55)) lit += quadPath(q);
       if (tier === 'full' || tier === 'simple') {
@@ -157,6 +159,8 @@ function houseGeo(o: {i: number; P: (x: number, y: number) => Pt; left: boolean;
     }
   }
   const shadeQ = Q(left ? hx : hx + w * 0.78, cornH, w * 0.22, H - cornH);
+  // a flat awning over the door frame (a quad on the wall plane, a little wider than the frame)
+  const awning = tier === 'fill' ? '' : quadPath(Q(dx - dw * 0.34, H - dh - dw * 0.12 - sh * 0.16, dw * 1.68, sh * 0.13));
   return ({
     i,
     h: hScreen,
@@ -187,6 +191,8 @@ function houseGeo(o: {i: number; P: (x: number, y: number) => Pt; left: boolean;
       lockDot: quadPath(Q(dx + dw * (left ? 0.7 : 0.1), H - dh * 0.55, dw * 0.2, dw * 0.25)),
       ink,
       thin,
+      awning,
+      shutters,
     },
   });
 
@@ -265,6 +271,12 @@ export type PerspRowProps = {
   screens?: 'on' | 'dark';
   /** Ink widths [near, far] (screen px). Default [2.2, 1.6]. */
   ink?: [number, number];
+  /** Pane colour of the ordinary windows (default sage). */
+  glass?: string;
+  /** Flat awning over every door in this colour (full / simple / dots tiers); default none. */
+  awning?: string;
+  /** Flat shutters beside every ordinary window in this colour (full / simple tiers); default none. */
+  shutters?: string;
   /** Per-house plaque tick-on time (pop with overshoot); omit = there. */
   plaqueAt?: (i: number) => number | undefined;
   /** Render only houses in [from, to). */
@@ -273,7 +285,7 @@ export type PerspRowProps = {
   seed?: Seed;
 };
 
-export const PerspRow: React.FC<PerspRowProps> = ({layout, popAt, drawAt, stagger = 0.05, lit, litColor = palette.peach, offAt, propMin = 7, lock, screens = 'on', ink = [SI.far, SI.hair], plaqueAt, from = 0, to, seed = 'pr'}) => {
+export const PerspRow: React.FC<PerspRowProps> = ({layout, popAt, drawAt, stagger = 0.05, lit, litColor = palette.peach, offAt, propMin = 7, lock, screens = 'on', ink = [SI.far, SI.hair], glass = palette.sage, awning, shutters, plaqueAt, from = 0, to, seed = 'pr'}) => {
   const t = useTime();
   const litOn = lit === true || (typeof lit === 'number' && t >= lit);
   const dark = offAt !== undefined && t >= offAt;
@@ -295,7 +307,8 @@ export const PerspRow: React.FC<PerspRowProps> = ({layout, popAt, drawAt, stagge
             <Fill d={g.facade} color={facadeColor} at={at} mode="snap" seed={`${seed}/f${h.i}`} />
             {h.tier !== 'fill' ? <Fill d={g.shade} color={shadeOf(facadeColor)} at={at} mode="snap" offset={false} seed={`${seed}/s${h.i}`} /> : null}
             {h.tier !== 'fill' ? <Fill d={g.cornice} color={palette.tan} at={at} mode="snap" offset={false} seed={`${seed}/c${h.i}`} /> : null}
-            {g.glass ? <Fill d={g.glass} color={palette.sage} at={at} mode="snap" seed={`${seed}/g${h.i}`} /> : null}
+            {shutters && g.shutters ? <Fill d={g.shutters} color={shutters} at={at} mode="snap" offset={false} seed={`${seed}/sh${h.i}`} /> : null}
+            {g.glass ? <Fill d={g.glass} color={glass} at={at} mode="snap" seed={`${seed}/g${h.i}`} /> : null}
             {g.dark && !litOn ? <Fill d={g.dark} color={palette.tealDark} at={at} mode="snap" offset={false} seed={`${seed}/k${h.i}`} /> : null}
             {litOn && g.lit ? <Fill d={g.lit} color={litColor} mode="snap" offset={false} seed={`${seed}/l${h.i}`} /> : null}
             {h.tier !== 'fill' ? (
@@ -307,6 +320,7 @@ export const PerspRow: React.FC<PerspRowProps> = ({layout, popAt, drawAt, stagge
                 <Fill d={g.door} color={palette.teal} at={at} mode="snap" seed={`${seed}/dr${h.i}`} />
                 {h.tier !== 'dots' ? <Fill d={g.kick} color={palette.tealDark} at={at} mode="snap" offset={false} seed={`${seed}/kk${h.i}`} /> : null}
                 {g.stoop ? <Fill d={g.stoop} color={palette.sand} at={at} mode="snap" seed={`${seed}/st${h.i}`} /> : null}
+                {awning && g.awning ? <Fill d={g.awning} color={awning} at={at} mode="snap" seed={`${seed}/aw${h.i}`} /> : null}
               </>
             ) : (
               <Fill d={g.door} color={palette.teal} at={at} mode="snap" offset={false} seed={`${seed}/dr${h.i}`} />

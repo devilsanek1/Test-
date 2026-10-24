@@ -55,6 +55,7 @@ import {MOTION} from './spec';
 import {World} from './World';
 import {Sun} from './Sun';
 import {captionFontStack} from './font';
+import {FigureWiper} from './FigureWiper';
 import {CINE_WIPE_HALF, CINE_WIPERS, wipeEdgeX} from './cine/wipers';
 
 // ---------------------------------------------------------------- data types
@@ -198,39 +199,10 @@ const wipeDrift = (p: number) => 50 * E.inOutSine(clamp(p));
 
 // ---------------------------------------------------------------- built-in wipers (screen px)
 
-/** A giant back-view passer-by right in front of the lens (head + shoulders fill the frame height). */
-const figureGeo = (x: number, p: number, dir: 'left' | 'right') => ({hy: 330 + osc(p * 1.6, 1) * 14, lean: (dir === 'right' ? 1 : -1) * 1.5, R: 385});
-/** Plain SVG ellipse path (clip shapes). */
-const ellipseD = (cx: number, cy: number, rx: number, ry: number) => `M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0Z`;
-
-export const FigureWiper: WiperComponent = ({x, p, dir, color = palette.tealDark}) => {
-  const {hy, lean, R} = figureGeo(x, p, dir);
-  const hx = x;
-  const W = 1320;
-  return (
-    <g transform={`rotate(${lean} ${x} 1920)`}>
-      <Fill d={torso(x, 2060, W, 1430, 0.42, 0.04)} color={color} offset={false} exit={false} />
-      {/* a hood around the head: one dark silhouette over the caption band (no skin-coloured ears at caption height) */}
-      <Fill d={blob(hx, hy + 70, R * 1.16, R * 1.12, {seed: 'fwHd', wobble: 0.01})} color={color} offset={false} exit={false} />
-      <Ink d={circle(hx, hy + 70, R * 1.14, {seed: 'fwHdi', overlap: 20})} width={stroke.inkBold + 0.4} exit={false} />
-      <Fill d={blob(hx, hy, R, R, {seed: 'fwH', wobble: 0.015})} color={palette.ink} offset={false} exit={false} />
-      <Ink d={torso(x, 2060, W, 1430, 0.42, 0.04)} width={stroke.inkBold + 0.4} exit={false} />
-      <Ink d={circle(hx, hy, R, {seed: 'fwHi', overlap: 20})} width={stroke.inkBold + 0.4} exit={false} />
-      <Ink d={`M${x - 330} ${hy + 520}Q${x} ${hy + 640} ${x + 330} ${hy + 520}`} width={stroke.inkBold} exit={false} />
-      {/* rim light on the leading side: a one-sided lighter strip */}
-      <Fill d={torso(x + (dir === 'right' ? 18 : -18), 2060, W - 30, 1415, 0.42, 0.04)} color={palette.teal} offset={false} exit={false} rule="evenodd" style={{clipPath: dir === 'right' ? 'inset(0 0 0 52%)' : 'inset(0 52% 0 0)'}} />
-    </g>
-  );
-};
-
-/** Over the caption band the figure is one dark silhouette (head in its hood): white captions on it. */
-FigureWiper.captionRegions = ({x, p, dir, color = palette.tealDark}) => {
-  const {hy, lean, R} = figureGeo(x, p, dir);
-  const transform = `rotate(${lean} ${x} 1920)`;
-  const t = toneOn(color) === 'light' ? 'light' : 'dark';
-  // + the outline stroke and the blob wobble
-  return [{tone: t, d: ellipseD(x, hy + 70, R * 1.16 + 6, R * 1.12 + 6) + ellipseD(x, hy, R + 6, R + 6), transform}];
-};
+/** The hooded passer-by right in front of the lens ('figure', and the fallback for 'scene'): src/lib/FigureWiper.tsx
+ *  (drawn like the cine passer: irregular hood, overshooting drape ink, misregistered fills, a rim sliver that follows
+ *  the leading outline). */
+export {FigureWiper};
 
 /** A near-camera post sliding past (lateral truck). */
 export const PoleWiper: WiperComponent = ({x, dir, color = palette.tealDark}) => {

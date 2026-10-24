@@ -26,6 +26,7 @@ import {rng} from '../../../lib/rng';
 import {brickHints, cornice, glintAt, LayerWrap, noWrap, SetPlace, SI, windowInk} from './common';
 import {ChromeSlot, MailSlotSlot, MakerSlot, RoundSignSlot} from './propSlots';
 import {perspRowLayout, PerspRow} from './rows';
+import {Furniture, FurnitureItem, People, PeopleSpec, WalkerAnchor} from './life';
 
 type R4 = [number, number, number, number];
 
@@ -196,6 +197,18 @@ export const MAKERS_LANE = {
   pipY: 1480,
   /** Leak sheet entry point (off-frame left). */
   leakEntry: [0, 1350] as Pt,
+  /** People layer (life.tsx): two passers walking up the lane to the sun, one stander in the left row's shade
+   *  (heights (feet - 1040) / 1.1); clear of the Workshop door and the messenger's line (feet y 1520). */
+  walkers: [
+    {x: 474, y: 1252, h: 192, go: 'vp', body: palette.teal, hair: 'short', acc: ['backpack']},
+    {x: 372, y: 1338, h: 270, go: 'vp', body: palette.sage, hair: 'bun'},
+    {x: 150, y: 1418, h: 340, go: 'stand', body: palette.tealDark, hair: 'curly', acc: ['scarf']},
+  ] as WalkerAnchor[],
+  /** The makers' cart parked on the lane (props MakersCart) and a bike by the left row. */
+  furniture: [
+    {kind: 'cart', x: 300, y: 1600, s: 1.25},
+    {kind: 'bike', x: 268, y: 1250, s: 0.62, flip: true},
+  ] as FurnitureItem[],
 } as const;
 
 const LEFT_Q: Quad = [
@@ -206,40 +219,43 @@ const LEFT_Q: Quad = [
 ];
 // golden: the row's roofline meets the cream sky, so its facades sit a step off it (sand / tan, never cream)
 const LEFT = perspRowLayout({quad: LEFT_Q, n: 6, H: 700, hw: 700 * 0.5, storeys: 3, side: 'left', seed: 'laneL', colors: [palette.sand, palette.tan, palette.sand, palette.sand, palette.tan, palette.sand], litFraction: 0.8});
+/** Ref-1 dusk wall: sand / clay walls carrying tealDark / teal (~25-30 %): teal doors, glass, awnings and shutters. */
+const ROW_TEAL = {glass: palette.teal, awning: palette.tealDark, shutters: palette.teal} as const;
 
 const G = (() => {
   const s = 'lane';
   const VP = MAKERS_LANE.vp;
-  // the lane: ONE flat sand field with 4 thin, broken tan shadow bands cast toward us by the low sun (long shadows of
-  // posts and doorsteps). Each band follows a ray from the VP, starts at its caster's foot and breaks once or twice.
   const rayAt = (xb: number, y: number) => VP[0] + ((xb - VP[0]) * (y - VP[1])) / (1920 - VP[1]);
+  // review 5 (ref-1 dusk-wall recipe): the lane's light reads as LIGHT, not road markings. (1) ONE flat teal shade wedge
+  // over the left third: the left row's own shadow, between its base line and a ray from the sun / VP; (2) two WIDE tan
+  // shadow wedges of off-frame posts, unbroken, on rays from the sun (narrow far, wide near: one direction).
+  const baseX = (y: number) => 330 - ((330 + 140) * (y - 1120)) / (1700 - 1120);
+  const shade = polyPath([[330, 1121], [rayAt(150, 1121), 1121], [rayAt(150, 2060), 2060], [-200, 2060], [-200, 1760], [baseX(1700), 1700]]);
   let bandsTan = '';
   const bands: [number, number, number, number][] = [
     // [x at the frame bottom, half width there, start y, end y]
-    [-60, 22, 1130, 1920],
-    [250, 14, 1210, 1700],
-    [330, 18, 1460, 1920],
-    [1180, 26, 1260, 1920],
+    [470, 74, 1190, 2060],
+    [1060, 120, 1620, 2060],
   ];
-  const br = rng(`${s}/bands`);
-  for (const [xb, hw, y0, y1] of bands) {
-    let y = y0;
-    while (y < y1) {
-      const yEnd = Math.min(y1, y + br.range(160, 380));
-      bandsTan += polyPath([[rayAt(xb - hw, y), y], [rayAt(xb + hw, y), y], [rayAt(xb + hw, yEnd), yEnd], [rayAt(xb - hw, yEnd), yEnd]]);
-      y = yEnd + br.range(26, 60);
-    }
-  }
-  // the Workshop's kerb / step plane, its left end on the lane's ray through the workshop corner (600, 1500)
+  for (const [xb, hw, y0, y1] of bands) bandsTan += polyPath([[rayAt(xb - hw * 0.35, y0), y0], [rayAt(xb + hw * 0.35, y0), y0], [rayAt(xb + hw, y1), y1], [rayAt(xb - hw, y1), y1]]);
+  // a cream kerb strip along the left row's foot (the doorsteps' edge), thinning with distance
+  const kerbL = polyPath([[330, 1121], [baseX(1700) + 0.5, 1700], [baseX(1700) + 0.5, 1722], [330, 1125]]);
+  const kerbLInk = line(330, 1125, baseX(1720), 1722, {seed: `${s}/kl`, over: [0, 0], breaks: false});
+  // the Workshop's kerb / step plane + a cream pavement brought FORWARD in front of it (the right of the lane is
+  // pavement down to y 1660, so the dead sand field is shorter); left ends on the lane's ray through (600, 1500)
   const W = WORKSHOP_LANE;
   const kx = (y: number) => VP[0] + ((W.x0 - VP[0]) * (y - VP[1])) / (W.base - VP[1]);
   const kerbTop = polyPath([[W.x0 - 2, W.base], [1240, W.base], [1240, W.base + 40], [kx(W.base + 40), W.base + 40]]);
   const kerbFace = polyPath([[kx(W.base + 40), W.base + 40], [1240, W.base + 40], [1240, W.base + 58], [kx(W.base + 40), W.base + 58]]);
-  const kerbInk = line(kx(W.base + 40), W.base + 40, 900, W.base + 40, {seed: `${s}/k1`, over: [2, 0], breaks: false}) + line(924, W.base + 40, 1240, W.base + 41, {seed: `${s}/k2`, over: 0, breaks: false}) + line(kx(W.base + 40), W.base + 58, 1240, W.base + 60, {seed: `${s}/k3`, over: [3, 0]}) + line(W.x0, W.base, kx(W.base + 40), W.base + 40, {seed: `${s}/k4`, over: [0, 0], breaks: false}) + line(kx(W.base + 40), W.base + 40, kx(W.base + 40), W.base + 58, {seed: `${s}/k5`, over: [0, 2], breaks: false});
+  const pave = polyPath([[kx(W.base + 58), W.base + 58], [1240, W.base + 58], [1240, 1660], [kx(1660), 1660]]);
+  const paveFace = polyPath([[kx(1660), 1660], [1240, 1660], [1240, 1676], [kx(1660), 1676]]);
+  const kerbInk =
+    line(kx(W.base + 40), W.base + 40, 900, W.base + 40, {seed: `${s}/k1`, over: [2, 0], breaks: false}) + line(924, W.base + 40, 1240, W.base + 41, {seed: `${s}/k2`, over: 0, breaks: false}) + line(kx(W.base + 40), W.base + 58, 1240, W.base + 60, {seed: `${s}/k3`, over: [3, 0]}) + line(W.x0, W.base, kx(W.base + 40), W.base + 40, {seed: `${s}/k4`, over: [0, 0], breaks: false}) + line(kx(W.base + 40), W.base + 40, kx(W.base + 40), W.base + 58, {seed: `${s}/k5`, over: [0, 2], breaks: false}) +
+    line(kx(W.base + 58), W.base + 58, kx(1660), 1660, {seed: `${s}/k6`, over: [0, 0], breaks: false}) + line(kx(1660), 1660, 1240, 1662, {seed: `${s}/k7`, over: [2, 0]}) + line(kx(1660), 1676, 1240, 1679, {seed: `${s}/k8`, over: [2, 0]});
   // cobble dashes (short, sparse), denser near
   const r = rng(`${s}/cob`);
   let cobbles = '';
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 26; i++) {
     const v = Math.pow(r.next(), 0.6);
     const y = VP[1] + 70 + v * 900;
     const half = (y - VP[1]) * 1.25;
@@ -249,7 +265,7 @@ const G = (() => {
   }
   // far rooftop silhouettes across the sun's lower part
   const roofs = polyPath([[250, 1080], [250, 1030], [292, 1030], [292, 1004], [338, 1004], [338, 1022], [380, 1022], [396, 998], [412, 1022], [470, 1022], [470, 1008], [520, 1008], [520, 1030], [575, 1030], [575, 1014], [620, 1014], [620, 1080]]);
-  return {bandsTan, cobbles, roofs, kerbTop, kerbFace, kerbInk};
+  return {shade, bandsTan, kerbL, kerbLInk, cobbles, roofs, kerbTop, kerbFace, pave, paveFace, kerbInk};
 })();
 
 export type MakersLaneProps = {
@@ -259,6 +275,10 @@ export type MakersLaneProps = {
   workshop?: WorkshopProps;
   /** The peach horizon band (golden). Default true. */
   band?: boolean;
+  /** Back-view passers on MAKERS_LANE.walkers (life.tsx). Default on; false = nobody. */
+  people?: PeopleSpec;
+  /** Street furniture (default MAKERS_LANE.furniture: the parked cart + a bike); false = none. */
+  furniture?: FurnitureItem[] | false;
   wrap?: LayerWrap;
   x?: number;
   y?: number;
@@ -269,7 +289,7 @@ export type MakersLaneProps = {
   seed?: string;
 };
 
-export const MakersLane: React.FC<MakersLaneProps> = ({sun, curtainsAt, workshop, band = true, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'lane'}) => {
+export const MakersLane: React.FC<MakersLaneProps> = ({sun, curtainsAt, workshop, band = true, people, furniture = MAKERS_LANE.furniture, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'lane'}) => {
   const t = useTime();
   const VP = MAKERS_LANE.vp;
   const curtains = curtainsAt === undefined || t >= curtainsAt;
@@ -283,10 +303,14 @@ export const MakersLane: React.FC<MakersLaneProps> = ({sun, curtainsAt, workshop
     <>
       <Fill rect={[-160, VP[1], 1400, 1100]} color={palette.sand} offset={false} seed={`${seed}/floor`} />
       <Fill d={G.bandsTan} color={palette.tan} offset={false} mode="snap" seed={`${seed}/bands`} />
+      <Fill d={G.shade} color={palette.teal} offset={false} mode="snap" seed={`${seed}/shade`} />
+      <Fill d={G.kerbL} color={palette.cream} offset={false} mode="snap" seed={`${seed}/kerbL`} />
+      <Ink d={G.kerbLInk} width={SI.mid} taper={false} seed={`${seed}/kerbLi`} />
       <Ink d={G.cobbles} width={SI.far} taper={false} seed={`${seed}/cob`} />
     </>
   );
-  const houses = <PerspRow layout={LEFT} lit={curtains} litColor={palette.sand} stagger={0} seed={`${seed}/L`} />;
+  // curtains drawn = warm lit panes (peach) at golden hour
+  const houses = <PerspRow layout={LEFT} lit={curtains} litColor={palette.peach} stagger={0} {...ROW_TEAL} seed={`${seed}/L`} />;
   return (
     <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
       {wrap('far', 0.05, far)}
@@ -302,7 +326,17 @@ export const MakersLane: React.FC<MakersLaneProps> = ({sun, curtainsAt, workshop
           {/* the kerb / step plane the workshop sits on, in the lane's perspective */}
           <Fill d={G.kerbTop} color={palette.cream} offset={false} seed={`${seed}/kerbT`} />
           <Fill d={G.kerbFace} color={palette.tan} offset={false} seed={`${seed}/kerbF`} />
+          <Fill d={G.pave} color={palette.cream} offset={false} seed={`${seed}/pave`} />
+          <Fill d={G.paveFace} color={palette.tan} offset={false} seed={`${seed}/paveF`} />
           <Ink d={G.kerbInk} width={SI.mid} seed={`${seed}/kerbI`} />
+        </>,
+      )}
+      {wrap(
+        'people',
+        0.85,
+        <>
+          <Furniture items={furniture} seed={`${seed}/furn`} />
+          <People anchors={MAKERS_LANE.walkers} vp={MAKERS_LANE.vp} spec={people} seed={`${seed}/ppl`} />
         </>,
       )}
     </SetPlace>

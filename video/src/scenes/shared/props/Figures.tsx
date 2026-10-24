@@ -500,7 +500,7 @@ export const Maker: React.FC<MakerProps> = (p) => {
  *  collar read as a bearded face looking at us). Person-local units, head centre (0, hy), radius hr:
  *  - a sand NECK block (0.45 x head wide) from inside the head down to `neckTo` (hidden by the collar there);
  *  - the hair ends in a SMOOTH NAPE: the sides taper into the neck and a shallow curve crosses it (no zig-zag, no round
- *    hair "chin"), three short strands under the cap, sand ears just under the cap band;
+ *    hair "chin"; no strands under a cap: in line art they read as a grille), sand ears just under the cap band;
  *  - the cap (`cap` colour) covers the top ~65 % down to a gently sagging band; its back STRAP is a clear notch: an arch
  *    cut up into the cap with HAIR showing through it, over a thin strap with a buckle tick; a button on top.
  *  `under` renders after the neck and before the ears / head (the collar band goes there). */
@@ -579,11 +579,6 @@ const BackHead: React.FC<{
       parts.push(<Ink key="btn" d={circle(0, hy - R2 + hr * 0.05, hr * 0.12, {seed: `${seed}/btn`})} width={W * 0.7} seed={`${seed}/btn`} />);
     }
     parts.push(<Ink key="capI" d={crown} width={W * 0.85} seed={`${seed}/capI`} />);
-    // hair texture under the band (big heads): short strands that end above the nape
-    if (detail && hr * 2 * W > 0) {
-      const sy0 = by + hr * 0.16;
-      parts.push(<Ink key="hstr" d={`M${X(-0.42)} ${f(sy0)}Q${X(-0.46)} ${Y(0.58)} ${X(-0.36)} ${Y(0.74)}M${X(0.04)} ${f(sy0 + hr * 0.04)}L${X(0.02)} ${Y(0.8)}M${X(0.44)} ${f(sy0)}Q${X(0.48)} ${Y(0.56)} ${X(0.38)} ${Y(0.72)}`} width={W * 0.55} order="all" taper={false} seed={`${seed}/hstr`} />);
-    }
   }
   return <>{parts}</>;
 };
