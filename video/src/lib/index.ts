@@ -14,6 +14,8 @@ export * from './Fill';
 export * from './motion';
 export * from './Card';
 export * from './World';
+export * from './tod';
+export * from './ShotCam';
 export * from './Sun';
 export * from './font';
 export * from './Captions';

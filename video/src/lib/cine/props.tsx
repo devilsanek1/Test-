@@ -205,8 +205,16 @@ export const WipeCut: React.FC<Omit<WipePassProps, 'children'> & {a: React.React
 // ---------------------------------------------------------------- Plinth
 
 /** A stone block / low wall end to perch a mascot or a figure on (front face, lit cap, ink). Top-centre at (x, y). */
-export const Plinth: React.FC<{x: number; y: number; w?: number; h?: number; tod?: Tod | TodPalette; seed?: Seed; width?: number}> = ({x, y, w = 260, h = 420, tod = 'day', seed = 'plinth', width = stroke.inkBold}) => {
+export const Plinth: React.FC<{x: number; y: number; w?: number; h?: number; tod?: Tod | TodPalette; seed?: Seed; width?: number}> = ({x, y, w = 260, h = 420, tod = 'day', seed = 'plinth', width = stroke.inkBold}) => (
+  <ExitShrink x={x} y={y + h} axis="y" size={0.2}>
+    <PlinthBody x={x} y={y} w={w} h={h} tod={tod} seed={seed} width={width} />
+  </ExitShrink>
+);
+
+const PlinthBody: React.FC<{x: number; y: number; w: number; h: number; tod: Tod | TodPalette; seed: Seed; width: number}> = ({x, y, w, h, tod, seed, width}) => {
+  const S = useCineState();
   const p = todPal(tod);
+  const P = (c: string) => lookPaint(S, c, [x, y]);
   const cap = 26;
   const x0 = x - w / 2;
   const ink =
@@ -216,11 +224,96 @@ export const Plinth: React.FC<{x: number; y: number; w?: number; h?: number; tod
     line(x0 + w, y + cap, x0 + w, y + h, {seed: `${seed}/r`, over: [0, 0]});
   return (
     <>
-      <rect x={x0} y={y + cap} width={w} height={h} fill={ambient(palette.sand, p)} />
-      <rect x={x0} y={y + cap} width={w * 0.22} height={h} fill={ambient(palette.tan, p)} />
-      <rect x={x0 - 12} y={y + 2} width={w + 24} height={cap} fill={ambient(palette.cream, p)} />
-      <path d={ink} fill="none" stroke={palette.ink} strokeWidth={width} strokeLinecap="round" />
-      <path d={wallTicks(x0 + 30, y + cap + 40, w - 60, h - 80, {seed: `${seed}/t`, n: 3, size: 22})} fill="none" stroke={palette.ink} strokeWidth={stroke.ink} strokeLinecap="round" />
+      <rect x={x0} y={y + cap} width={w} height={h} fill={P(ambient(palette.sand, p))} />
+      <rect x={x0} y={y + cap} width={w * 0.22} height={h} fill={P(ambient(palette.tan, p))} />
+      <rect x={x0 - 12} y={y + 2} width={w + 24} height={cap} fill={P(ambient(palette.cream, p))} />
+      {inkOn(S) ? <path d={ink} fill="none" stroke={palette.ink} strokeWidth={width} strokeLinecap="round" /> : null}
+      {inkOn(S) ? <path d={wallTicks(x0 + 30, y + cap + 40, w - 60, h - 80, {seed: `${seed}/t`, n: 3, size: 22})} fill="none" stroke={palette.ink} strokeWidth={stroke.ink} strokeLinecap="round" /> : null}
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- Balustrade
+
+export type BalustradeProps = {
+  /** Front-left corner of the pedestal top (where a mascot sits: top centre = (x + w / 2, y)). */
+  x: number;
+  y: number;
+  /** Pedestal width / height (it runs down past the frame bottom). */
+  w?: number;
+  h?: number;
+  /** The rail continues to this side (cropped by the frame edge). */
+  side?: 'left' | 'right';
+  tod?: Tod | TodPalette;
+  /** A lit edge strip on this side (backlight from the sun). */
+  rim?: 'left' | 'right' | 'none';
+  width?: number;
+  seed?: Seed;
+};
+
+/** A stone balustrade end: a pedestal with cap and base mouldings (doubled ink), a rail running off the frame edge on
+ *  short vase balusters. Foreground framing to perch the mascot on in a civic / monumental shot. */
+export const Balustrade: React.FC<BalustradeProps> = (props) => (
+  <ExitShrink x={props.x + (props.w ?? 220) / 2} y={props.y + (props.h ?? 900)} axis="y" size={0.25}>
+    <BalustradeBody {...props} />
+  </ExitShrink>
+);
+
+const BalustradeBody: React.FC<BalustradeProps> = ({x, y, w = 220, h = 900, side = 'right', tod = 'day', rim = 'none', width = stroke.inkBold, seed = 'bal'}) => {
+  const S = useCineState();
+  const p = todPal(tod);
+  const P = (c: string) => lookPaint(S, c, [x + w / 2, y]);
+  const stone = ambient(palette.cream, p);
+  const shade = ambient(palette.sand, p);
+  const dark = ambient(palette.tan, p);
+  const capH = 34;
+  const railY = y + 150; // top of the rail
+  const railH = 40;
+  const balH = 190;
+  const dirX = side === 'right' ? 1 : -1;
+  const edge = side === 'right' ? x + w : x;
+  const far = side === 'right' ? 1500 : -500;
+  // balusters: vase = narrow neck + round belly + base, every 74 px off to the side
+  const bal = new PathBuf();
+  const balInk: string[] = [];
+  for (let i = 0; i < 9; i++) {
+    const bx = edge + dirX * (52 + i * 74);
+    const top = railY + railH;
+    bal.rect(bx - 9, top, 18, 30);
+    bal.circle(bx, top + 30 + 52, 30);
+    bal.rect(bx - 22, top + balH - 28, 44, 28);
+    balInk.push(line(bx - 9, top, bx - 9, top + 34, {seed: `${seed}/b${i}a`, over: [0, 2], breaks: false}) + line(bx + 9, top, bx + 9, top + 34, {seed: `${seed}/b${i}b`, over: [0, 2], breaks: false}));
+  }
+  const ink =
+    line(x - 16, y, x + w + 16, y, {seed: `${seed}/c1`, over: [6, 14], breaks: false}) +
+    line(x - 10, y + capH, x + w + 10, y + capH, {seed: `${seed}/c2`, over: [4, 10], breaks: false}) +
+    line(x + 4, y + capH + 12, x + w - 4, y + capH + 12, {seed: `${seed}/c3`, over: [2, 6], breaks: false}) +
+    line(x, y + capH, x, y + h, {seed: `${seed}/l`, over: [0, 0], breaks: false}) +
+    line(x + w, y + capH, x + w, y + h, {seed: `${seed}/r`, over: [0, 0], breaks: false}) +
+    line(edge, railY, far, railY, {seed: `${seed}/rt`, over: [0, 0], breaks: false}) +
+    line(edge, railY + railH, far, railY + railH, {seed: `${seed}/rb`, over: [0, 0], breaks: false}) +
+    line(edge, railY + railH + balH, far, railY + railH + balH, {seed: `${seed}/rl`, over: [0, 0], breaks: false}) +
+    // a recessed panel on the pedestal face
+    line(x + 34, y + 120, x + w - 34, y + 120, {seed: `${seed}/p1`, over: [2, 4], breaks: false}) +
+    line(x + 34, y + 120, x + 34, y + h, {seed: `${seed}/p2`, over: [2, 0], breaks: false}) +
+    line(x + w - 34, y + 120, x + w - 34, y + h, {seed: `${seed}/p3`, over: [2, 0], breaks: false});
+  const railX = side === 'right' ? edge : far;
+  const railW = Math.abs(far - edge);
+  const showInk = inkOn(S, 0.3);
+  return (
+    <>
+      {/* rail + balusters (behind the pedestal) */}
+      <rect x={railX} y={railY} width={railW} height={railH} fill={P(stone)} />
+      <path d={bal.d} fill={P(shade)} />
+      <rect x={railX} y={railY + railH + balH} width={railW} height={h} fill={P(dark)} />
+      {/* pedestal */}
+      <rect x={x} y={y + capH} width={w} height={h} fill={P(shade)} />
+      <rect x={side === 'right' ? x : x + w * 0.78} y={y + capH} width={w * 0.22} height={h} fill={P(dark)} />
+      <rect x={x - 10} y={y + 2} width={w + 20} height={capH} fill={P(stone)} />
+      {rim !== 'none' && S.look.fills === 'color' ? <rect x={rim === 'right' ? x + w - 5 : x} y={y + capH} width={5} height={h * 0.55} fill={palette.peach} /> : null}
+      {rim !== 'none' && S.look.fills === 'color' ? <rect x={rim === 'right' ? x + w + 4 : x - 10} y={y + 2} width={6} height={capH} fill={palette.peach} /> : null}
+      {showInk ? <path d={ink} fill="none" stroke={palette.ink} strokeWidth={width} strokeLinecap="round" /> : null}
+      {showInk ? <path d={balInk.join('')} fill="none" stroke={palette.ink} strokeWidth={stroke.ink} strokeLinecap="round" /> : null}
     </>
   );
 };
@@ -239,15 +332,31 @@ export type WindowCloseupProps = {
   seed?: Seed;
   /** Person at the desk (back view). */
   person?: React.ReactNode;
+  /** Room light on from the start (default true). false = a dark neighbour window: no lamp, dark room. */
+  lit?: boolean;
+  /** Back-view chair in front of the person's lower torso (default: when there is a person). */
+  chair?: boolean;
+  /** Desk + monitor (default true). */
+  desk?: boolean;
 };
 
 /** One lit window up close: frame, transom, curtain, pendant lamp with a stepped glow, a desk with a monitor showing
  *  a web page, a plant on the sill, glints. Local origin = top-left of the glass. */
-export const WindowCloseup: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod = 'night', offAt, screenOffAt, seed = 'wc', person}) => {
+export const WindowCloseup: React.FC<WindowCloseupProps> = (props) => (
+  <ExitShrink x={(props.w ?? 420) / 2} y={(props.h ?? 760) / 2} size={0.15}>
+    <WindowCloseupBody {...props} />
+  </ExitShrink>
+);
+
+const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod = 'night', offAt, screenOffAt, seed = 'wc', person, lit = true, chair, desk = true}) => {
   const t = useTime();
   const p = todPal(tod);
-  const on = offAt === undefined || t < offAt;
-  const scrOn = t < (screenOffAt ?? (offAt === undefined ? Infinity : offAt + 0.35));
+  const on = lit && (offAt === undefined || t < offAt);
+  const scrOn = lit && t < (screenOffAt ?? (offAt === undefined ? Infinity : offAt + 0.35));
+  const showChair = chair ?? !!person;
+  const rr = rng(`wc/${seed}`);
+  const curtainRight = !lit && rr.chance(0.5);
+  const plantOn = lit || rr.chance(0.6);
   const fr = 22;
   const room = on ? palette.peach : ambient(palette.tealDark, p);
   const roomDark = on ? palette.tan : ambient(darker(palette.tealDark), p);
@@ -257,7 +366,12 @@ export const WindowCloseup: React.FC<WindowCloseupProps> = ({w = 420, h = 760, t
   const frameC = palette.cream;
   const ink = rect(-fr, -fr, w + fr * 2, h + fr * 2, {seed: `${seed}/o`, over: 'medium'}) + rect(0, 0, w, h, {seed: `${seed}/i`, over: 'small'}) + hline(-fr - 30, w + fr + 30, h + fr + 14, {seed: `${seed}/s`, over: [20, 30]}) + hline(-fr - 24, w + fr + 24, h + fr + 30, {seed: `${seed}/s2`, over: [10, 20]});
   const tr = hline(0, w, h * 0.3, {seed: `${seed}/tr`, over: [2, 4]}) + hline(0, w, h * 0.3 + 14, {seed: `${seed}/tr2`, over: [2, 4]});
-  const curtain = `M0 0L${w * 0.17} 0Q${w * 0.2} ${h * 0.4} ${w * 0.13} ${h * 0.72}L0 ${h * 0.74}Z`;
+  const curtainW = lit ? 0.17 : rr.range(0.3, 0.46);
+  const curtain = `M0 0L${w * curtainW} 0Q${w * (curtainW + 0.03)} ${h * 0.4} ${w * (curtainW - 0.04)} ${h * 0.72}L0 ${h * 0.74}Z`;
+  const chairX = w * 0.3;
+  const chairW = w * 0.34;
+  const chairY = h * 0.78;
+  const chairInk = rect(chairX - chairW / 2, chairY, chairW, h * 0.16, {seed: `${seed}/ch`, over: 'small'}) + `M${chairX - chairW * 0.36} ${chairY + h * 0.16}L${chairX - chairW * 0.36} ${h}M${chairX + chairW * 0.36} ${chairY + h * 0.16}L${chairX + chairW * 0.36} ${h}`;
   const lamp = `M${lampX - 34} ${h * 0.2}L${lampX + 34} ${h * 0.2}L${lampX + 20} ${h * 0.14}L${lampX - 20} ${h * 0.14}Z`;
   const web = textLines(mon.x + 16, mon.y + 38, mon.w - 32, {seed: `${seed}/web`, n: 3, gap: 16});
   const plant = crown(w * 0.8, h + fr - 46, 38, 30, {seed: `${seed}/pl`, bumps: 7});
@@ -271,22 +385,32 @@ export const WindowCloseup: React.FC<WindowCloseupProps> = ({w = 420, h = 760, t
       <path d={`M${lampX} 0L${lampX} ${h * 0.14}`} stroke={palette.ink} strokeWidth={2.2} />
       <path d={lamp} fill={on ? palette.cream : ambient(palette.teal, p)} />
       {/* desk + monitor (the website) */}
-      <rect x={w * 0.22} y={deskY - 8} width={w * 0.78} height={16} fill={palette.brown} />
-      <rect x={mon.x} y={mon.y} width={mon.w} height={mon.h} fill={palette.ink} />
-      <rect x={mon.x + 7} y={mon.y + 7} width={mon.w - 14} height={mon.h - 14} fill={scrOn ? palette.white : ambient(palette.tealDark, p)} />
-      {scrOn ? <rect x={mon.x + 7} y={mon.y + 7} width={mon.w - 14} height={16} fill={palette.sage} /> : null}
-      {scrOn ? <path d={web} fill="none" stroke={palette.ink} strokeWidth={2} strokeLinecap="round" /> : null}
-      <path d={`M${mon.x + mon.w / 2} ${mon.y + mon.h}L${mon.x + mon.w / 2} ${deskY - 8}`} stroke={palette.ink} strokeWidth={6} />
-      {/* the person (back view) */}
+      {desk ? (
+        <>
+          <rect x={w * 0.22} y={deskY - 8} width={w * 0.78} height={16} fill={on ? palette.brown : ambient(palette.teal, p)} />
+          <rect x={mon.x} y={mon.y} width={mon.w} height={mon.h} fill={palette.ink} />
+          <rect x={mon.x + 7} y={mon.y + 7} width={mon.w - 14} height={mon.h - 14} fill={scrOn ? palette.white : ambient(palette.tealDark, p)} />
+          {scrOn ? <rect x={mon.x + 7} y={mon.y + 7} width={mon.w - 14} height={16} fill={palette.sage} /> : null}
+          {scrOn ? <path d={web} fill="none" stroke={palette.ink} strokeWidth={2} strokeLinecap="round" /> : null}
+          <path d={`M${mon.x + mon.w / 2} ${mon.y + mon.h}L${mon.x + mon.w / 2} ${deskY - 8}`} stroke={palette.ink} strokeWidth={6} />
+        </>
+      ) : null}
+      {/* the person (back view) on a chair seen from behind (ref 2 f_33: white back + ink) */}
       {person}
+      {showChair ? (
+        <>
+          <rect x={chairX - chairW / 2 + 3} y={chairY + 2} width={chairW} height={h * 0.16} fill={on ? palette.white : ambient(palette.sage, p)} />
+          <path d={chairInk} fill="none" stroke={palette.ink} strokeWidth={stroke.ink} strokeLinecap="round" />
+        </>
+      ) : null}
       {/* curtain, transom bar, plant, glints */}
-      <path d={curtain} fill={on ? palette.sand : ambient(palette.tan, p)} transform="translate(2 2)" />
+      <path d={curtain} fill={on ? palette.sand : ambient(palette.tan, p)} transform={curtainRight ? `translate(${w + 2} 2) scale(-1 1)` : 'translate(2 2)'} />
       <path d={`M${w * 0.06} 6Q${w * 0.08} ${h * 0.4} ${w * 0.05} ${h * 0.7}M${w * 0.11} 6Q${w * 0.14} ${h * 0.4} ${w * 0.09} ${h * 0.71}`} fill="none" stroke={palette.ink} strokeWidth={2} strokeLinecap="round" />
       <rect x={0} y={h * 0.3} width={w} height={14} fill={frameC} />
-      <rect x={w * 0.68} y={h + fr - 44} width={58} height={44} fill={palette.brown} />
-      <path d={plant} fill={palette.sage} transform="translate(3 2)" />
-      <Ink d={plant} width={stroke.ink} exit={false} />
-      <path d={glint(w * 0.12, h * 0.26, 70, {seed: `${seed}/g`})} stroke={palette.white} strokeWidth={4} strokeLinecap="round" />
+      {plantOn ? <rect x={w * 0.68} y={h + fr - 44} width={58} height={44} fill={palette.brown} /> : null}
+      {plantOn ? <path d={plant} fill={on ? palette.sage : ambient(palette.teal, p)} transform="translate(3 2)" /> : null}
+      {plantOn ? <Ink d={plant} width={stroke.ink} exit={false} /> : null}
+      <path d={glint(w * 0.12, h * 0.26, 70, {seed: `${seed}/g`})} stroke={on ? palette.white : ambient(palette.sage, p)} strokeWidth={4} strokeLinecap="round" />
       <Ink d={ink + tr} width={stroke.ink} exit={false} />
     </>
   );

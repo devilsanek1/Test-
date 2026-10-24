@@ -10,3 +10,4 @@ export * from './BrowserWindow';
 export * from './Padlock';
 export * from './Noticeboard';
 export * from './Icons';
+export * from './Town';

@@ -53,7 +53,7 @@ Sections 1-8 below describe the v1/v2 work on the old MP3 voice. Wherever they c
   - The bed level in the mix is 2 dB lower again (10.5 LU under the voice, 14 dB duck).
   - Piano velocities are capped inside the soft layer, so no note jumps into the 12 dB louder layer.
 - **Measured** in `mix.wav` (music under the voice, 400 ms medians): hook 39 dB, setup 25 dB, leak 22 dB, Cloudflare 22 dB, breath 29 dB, close 29 dB.
-  In speech the minimum is 12.7 dB and the median 26.0 dB. The bed alone: hook -31.5, setup -18.7, Cloudflare -14.7, close -23.1 LUFS. Loop seam within 1.5 dB.
+  In speech the minimum is 12.7 dB and the median 26.0 dB. The bed alone: hook -31.3, setup -18.8, Cloudflare -14.6, close -22.8 LUFS. Loop seam within 1.3 dB.
 
 **Cues.** `audio/cues.json` is re-timed to the new take.
 - A word-anchored warp (`audio/tools/warp.py`, 223 anchors) does the mapping. Numbers and transitions were then snapped to the new word onsets and measured pauses.
