@@ -69,7 +69,6 @@ import {
   RimLight,
   Glow,
   LitWindows,
-  camAt,
   passerPath,
   persp1,
   PERSON_FEET,
@@ -120,7 +119,7 @@ const ShotA: React.FC = () => {
         <Sky tod={P} horizon={HZ} />
         <Stars tod={P} region={[-100, -100, 1180, 900]} at={0.1} span={4.5} n={90} />
         <SkyCloud x={-40} y={720} w={330} tod={P} color={mix(P.teal, P.sage, 0.5)} drift={5} seed="ca1" at={0.6} />
-        <SkyCloud x={760} y={700} w={250} tod={P} color={P.sage} drift={7} seed="ca2" at={1.4} />
+        <SkyCloud x={760} y={700} w={250} tod={P} color={P.sage} drift={7} seed="ca2" at={2.35} />
         <Streaks y={HZ - 30} tod={P} n={4} color={P.horizonGlow} />
         <BigSun cx={A_SUN.x} cy={A_SUN.y} r={A_SUN.r} horizon={HZ + 80} tod={P} path={[{t: 0, y: A_SUN.y}, {t: 6, y: A_SUN.set}]} beats={[1.25, {t: 4.4, amp: 0.08}]} drift={[0, 0]} />
         <Birds at={2.4} from={[-80, 760]} to={[1160, 640]} dur={4.5} n={5} size={16} />
@@ -153,7 +152,8 @@ const ShotA: React.FC = () => {
       />
       <Layer depth={-0.15}>
         <Ledge y={1690} top={30} face={260} tod={P} floor={palette.tealDark} />
-        <ElephantTimeline x={650} y={1696} scale={0.95} t={t} seed={3} look={0.3} keys={[{t: 0, pose: 'sit-back'}, {t: 4.3, pose: 'sit-back', look: -0.5}]} />
+        {/* on "PHP" the elephant turns to us (it IS the PHP elephant), then back to the view */}
+        <ElephantTimeline x={650} y={1696} scale={0.95} t={t} seed={3} look={0.3} keys={[{t: 0, pose: 'sit-back'}, {t: 1.85, pose: 'sit-front', expression: 'happy'}, {t: 2.9, pose: 'sit-back'}, {t: 4.3, pose: 'sit-back', look: -0.5}]} />
       </Layer>
       <Layer depth={-0.2}>
         <Rimmed color={palette.peach} dx={4} dy={-3}>
@@ -217,7 +217,7 @@ const ShotD: React.FC = () => {
         </Rise>
       </Layer>
       <Layer depth={-0.6}>
-        <StringLights x1={-120} y1={40} x2={1200} y2={150} sag={60} n={11} r={16} tod={P} lit={false} seed="slD" width={2.8} />
+        <StringLights x1={-120} y1={40} x2={1200} y2={150} sag={60} n={11} r={16} tod={P} on={{at: 3.45, dur: 0.65}} seed="slD" width={2.8} />
       </Layer>
     </Cam>
   );
@@ -250,7 +250,7 @@ const ShotB: React.FC = () => {
       <Layer depth={0.92}>
         <Sky tod={P} horizon={2400} span={900} />
         <BigSun cx={sun0.x} cy={sun0.y} r={115} tod={P} glow={2} path={[{t: 0, x: sun0.x, y: sun0.y + 30, r: 115}, {t: 1.1, x: 860, y: 830, r: 150, ease: bez(0.4, 0, 0.3, 1.25)}]} beats={[1.5, {t: 3.65, amp: 0.1}]} />
-        <Birds at={1.6} from={[1150, 230]} to={[-150, 120]} dur={3.4} n={6} size={18} />
+        <Birds at={3.7} from={[1150, 230]} to={[-150, 120]} dur={2.6} n={6} size={18} />
       </Layer>
       <Layer depth={0}>
         {/* plaza */}
@@ -596,6 +596,3 @@ export const CineDemo: React.FC<{mode?: 'demo' | 'street' | 'tower' | 'loop'; lo
       </CineFrame>
     </LockCtx.Provider>
   );
-
-/** Camera keys of each shot (shot-local seconds), for tools (camera speed checks). */
-export const CINE_DEMO_CAMS = {A: A_KEYS, B: B_KEYS, camAt};

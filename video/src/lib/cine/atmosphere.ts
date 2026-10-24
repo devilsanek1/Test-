@@ -13,7 +13,8 @@
 // palette step at dusk (sky -> teal, mintPale -> sky, sand -> tan, cream -> sand) and the near ground a second step at
 // night (mintPale -> sage). Whites, mid and dark tones, ochre, ink, peach and the sun never move (TOD_STEPS).
 
-import {palette} from '../theme';
+import {palette, todSteps, TodRole} from '../theme';
+import {relight} from '../tod';
 import {hexToRgb, mix, rgbToHex} from './util';
 
 export type Tod = 'day' | 'golden' | 'dusk' | 'night' | 'dawn';
@@ -36,16 +37,16 @@ export const deep = {
 
 type Base = {-readonly [K in keyof typeof palette]: string};
 
-const DAY_SKY = '#ACD1BF'; // reference 2's measured day sky (theme skies.day)
-
-/** Palette steps per time of day (hex -> hex). Anything not listed keeps its paint. */
-export const TOD_STEPS: Record<Tod, Readonly<Record<string, string>>> = {
-  day: {},
-  golden: {},
-  dawn: {},
-  dusk: {[P.sky]: P.teal, [DAY_SKY]: P.teal, [P.mintPale]: P.sky, [P.sand]: P.tan, [P.cream]: P.sand},
-  night: {[P.sky]: P.teal, [DAY_SKY]: P.teal, [P.mintPale]: P.sage, [P.sand]: P.tan, [P.cream]: P.sand},
-};
+/** Palette steps per time of day (hex -> hex), the `base` row of the SHARED table `todSteps` (theme.ts, read by core
+ *  <Fill> through <Tod> too), so cine and core relight identically. Anything not listed keeps its paint. */
+export const TOD_STEPS: Record<Tod, Readonly<Record<string, string>>> = Object.fromEntries(
+  TODS.map((name) => {
+    const row = todSteps[name]?.base ?? {};
+    const m: Record<string, string> = {};
+    for (const k of Object.keys(row) as (keyof typeof palette)[]) m[P[k].toUpperCase()] = row[k]!;
+    return [name, m];
+  }),
+) as Record<Tod, Readonly<Record<string, string>>>;
 
 export type TodPalette = Base & {
   name: Tod;
@@ -85,7 +86,7 @@ export type TodPalette = Base & {
 function make(name: Tod, o: Omit<TodPalette, keyof Base | 'name' | 'steps'>): TodPalette {
   const steps = TOD_STEPS[name];
   const base = {} as Base;
-  for (const k of Object.keys(P) as (keyof typeof P)[]) base[k] = steps[P[k]] ?? P[k];
+  for (const k of Object.keys(P) as (keyof typeof P)[]) base[k] = steps[P[k].toUpperCase()] ?? P[k];
   base.sky = o.skyBands[0];
   base.bg = o.skyBands[Math.min(1, o.skyBands.length - 1)];
   return {...base, name, steps, ...o};
@@ -199,11 +200,11 @@ export const TOD: Record<Tod, TodPalette> = {
 
 export const todPal = (tod: Tod | TodPalette): TodPalette => (typeof tod === 'string' ? TOD[tod] : tod);
 
-/** The paint `color` under this time of day's light (no depth tint): a palette STEP for the light fields
- *  (TOD_STEPS), every other paint unchanged. Never a mix. */
-export function ambient(color: string, tod: Tod | TodPalette): string {
+/** The paint `color` under this time of day's light (no depth tint): a palette STEP for the light fields (the shared
+ *  todSteps table via core relight(); `role` picks its far / cloud / framing row), every other paint unchanged. Never a mix. */
+export function ambient(color: string, tod: Tod | TodPalette, role: TodRole = 'base'): string {
   const p = todPal(tod);
-  return p.steps[color] ?? p.steps[color.toUpperCase()] ?? color;
+  return relight(color, p.name, role);
 }
 
 export type AtmosOpts = {

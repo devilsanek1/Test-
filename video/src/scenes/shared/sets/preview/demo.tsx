@@ -1,0 +1,18 @@
+// Demo helpers for the sets preview / catalog (World sky + a sun behind the set).
+import React from 'react';
+import {World} from '../../../../lib/World';
+import {Sun, PowerSymbol} from '../../../../lib/Sun';
+import {skies} from '../../../../lib/theme';
+
+/** A simple S01-like demo: World sky + sun with the bold power glyph behind the set. */
+export const DemoWorld: React.FC<{sky?: string; push?: boolean; children?: React.ReactNode}> = ({sky = skies.day, push, children}) => (
+  <World sky={sky} push={push ? {to: 1.04, dur: 2.2, anchor: [560, 980]} : undefined}>
+    {children}
+  </World>
+);
+
+export const DemoSun: React.FC<{cx: number; cy: number; r: number; glyph?: boolean}> = ({cx, cy, r, glyph}) => (
+  <Sun cx={cx} cy={cy} r={r}>
+    {glyph ? <PowerSymbol r={r * 0.37} color="#F3E0CB" width={10} /> : null}
+  </Sun>
+);

@@ -107,8 +107,8 @@ export function passerPath(x: number): string {
   const hy = 300;
   return (
     `M${x - hr} ${hy}a${hr} ${hr} 0 1 0 ${2 * hr} 0a${hr} ${hr} 0 1 0 ${-2 * hr} 0Z` +
-    `M${x - 165} 560H${x + 165}V760H${x - 165}Z` +
-    `M${x - 650} 1990L${x - 650} 1000Q${x - 650} 720 ${x - 340} 700L${x + 340} 700Q${x + 650} 720 ${x + 650} 1000L${x + 650} 1990Z`
+    `M${x - 215} 540H${x + 215}V720H${x - 215}Z` +
+    `M${x - 660} 1990L${x - 660} 1060Q${x - 640} 690 ${x - 230} 640L${x + 230} 640Q${x + 640} 690 ${x + 660} 1060L${x + 660} 1990Z`
   );
 }
 
@@ -117,13 +117,15 @@ export const PasserWiper: React.FC<{x: number; p: number; dir: 'left' | 'right';
   const bob = Math.abs(Math.sin(p * Math.PI * 3)) * 10;
   const d = passerPath(x);
   const lead = dir === 'right' ? 7 : -7;
-  const ink = line(x - 650, 1000, x - 650, 1990, {seed: 'pw/l', over: [0, 0], breaks: false}) + line(x + 650, 1000, x + 650, 1990, {seed: 'pw/r', over: [0, 0], breaks: false});
+  const ink = line(x - 660, 1060, x - 660, 1990, {seed: 'pw/l', over: [0, 0], breaks: false}) + line(x + 660, 1060, x + 660, 1990, {seed: 'pw/r', over: [0, 0], breaks: false});
   return (
     <g transform={bob ? `translate(0 ${r1(-bob)})` : undefined}>
       <path d={d} fill={rim} transform={`translate(${lead} -4)`} />
       <path d={d} fill={color} />
+      {/* hair: a darker cap of the head (back view), ears as small bumps */}
+      <path d={`M${r1(x - 315)} 399A330 330 0 1 1 ${r1(x + 315)} 399Q${x} 470 ${r1(x - 315)} 399Z`} fill={palette.ink} />
       <path d={`M${x - 330} 300a330 330 0 1 1 660 0`} fill="none" stroke={palette.ink} strokeWidth={stroke.inkBold + 1} strokeLinecap="round" />
-      <path d={`M${x - 650} 1000Q${x - 650} 720 ${x - 340} 700L${x + 340} 700Q${x + 650} 720 ${x + 650} 1000`} fill="none" stroke={palette.ink} strokeWidth={stroke.inkBold + 1} strokeLinecap="round" />
+      <path d={`M${x - 660} 1060Q${x - 640} 690 ${x - 230} 640M${x + 230} 640Q${x + 640} 690 ${x + 660} 1060M${x - 300} 760Q${x} 880 ${x + 300} 760`} fill="none" stroke={palette.ink} strokeWidth={stroke.inkBold + 1} strokeLinecap="round" />
       <path d={ink} fill="none" stroke={palette.ink} strokeWidth={stroke.inkBold + 1} strokeLinecap="round" />
     </g>
   );

@@ -12,6 +12,19 @@ one with `scripts/timewarp.py` (word-anchored, piecewise-linear). The video is n
 APPROVED BY THE USER: the treated voice (`audio/vo_clean.wav`, chain in `audio/tools/vo_clean.py`) and the subtler
 cinematic bed (`audio/music_cinematic.wav`; near-silent first ~10.7 s). Don't change the voice chain without asking.
 
+## QUALITY GATES (user-requested, from a creator's workflow; apply to every scene)
+1. Motion physics: physical motion uses springs or the measured curves from docs/motion_spec.md, never generic CSS-style
+   eases or linear tweens. Motion keeps its VELOCITY across segments and cuts (a camera move must not stall at a seam; an
+   interrupted motion retargets with its current velocity).
+2. No dead frames: a frame is dead if nothing on screen moves once camera drift is subtracted (drift alone doesn't count
+   as life). Default limit: no dead run over 0.40 s unless it's a deliberate, allow-listed hold. Target >= 5 events/s.
+   Tooling: scripts/qa/deadframes.py (per-scene life score and chart), scripts/qa/framecheck.py, scripts/qa/sheets.sh.
+3. Every frame looks reasonable: frame-by-frame contact-sheet review (no glitches, broken half-states, unreadable
+   captions, clutter in platform UI zones). Every scene must reach >= 8/10 from independent critics before it ships;
+   re-render until it does.
+4. Beat-locked edit: the voice decides the cuts; the music's tempo map bends so its beats/downbeats land on the cuts
+   (scripts/qa/beatsync.py --fit-tempo), target off-beat <= 25 ms. SFX hits sit on cuts and key events.
+
 ## ENGAGEMENT LAYER (user-approved goal: growth / maximum engagement, done subtly)
 The script will carry 1–3 subtle, true engagement hooks (see docs/CREATIVE_BRIEF.md "ENGAGEMENT LAYER"). The visuals carry
 their own, quietly: REWATCH BAIT such as Bit the ink beetle hidden somewhere in every scene (a "spot the bug" game that

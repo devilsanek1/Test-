@@ -16,7 +16,7 @@
 // columns are fill-only bands, the upper storeys (entablature and up) carry NO inner ink (only their outline), and a
 // 4 px peach rim runs down the sun-facing edges: captions can sit on it (ink on the golden field >= 5:1).
 // Build (`build`): parts pop up bottom -> top (steps, door, columns left -> right, entablature, pediment, drum, dome,
-// lantern, flag), each rising from its own base in 0.26 s. Un-build: parts sink into their base (small first), ink
+// lantern, flag), each rising from its own base in 0.16 s (separate pops, not one smear). Un-build: parts sink into their base (small first), ink
 // drops. Look: paper = white fills + ink; cascade = paper until the wave reaches each part.
 
 import React, {useMemo} from 'react';
@@ -171,7 +171,7 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
     L('hair', dx + 34, 215, dx + 34, 334, `sd${dx}b`, [0, 2], false);
     L('hair', dx - 38, 334, dx + 38, 334, `sd${dx}c`, [2, 4], false);
   }
-  end('portico', 2 + columns * 0.35 + 0.05);
+  end('portico', 2 + columns * 0.45 + 0.05);
 
   // ---- columns (each its own part: they pop left -> right)
   const cs = 880 / (columns - 1);
@@ -206,7 +206,7 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
       L('thin', x - 50, 964, x + 50, 964, `cc${i}a`, [3, 5], false);
       L('thin', x - 54, 996, x + 54, 996, `cc${i}b`, [3, 5], false);
     }
-    end(`col${i}`, 2 + i * 0.35);
+    end(`col${i}`, 2 + i * 0.45);
   }
 
   // ---- entablature (Y 1000..1190)
@@ -222,7 +222,7 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
     for (let x = -30; x < 1030; x += 26) L('hair', x, 1150, x, 1138, `de${x}`, [0, 0], false);
   }
   L('ink', -60, 1190, 1060, 1190, 'e4', [20, 40]);
-  end('entablature', 2 + columns * 0.35 + 0.3);
+  end('entablature', 2 + columns * 0.45 + 0.3);
 
   // ---- pediment (Y 1190..1470)
   begin(1190, 1470, -40, 1040);
@@ -235,7 +235,7 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
     L('thin', 40, 1215, 500, 1430, 'p3', [4, 6], false);
     L('thin', 960, 1215, 500, 1430, 'p4', [4, 6], false);
   }
-  end('pediment', 2 + columns * 0.35 + 0.8);
+  end('pediment', 2 + columns * 0.45 + 0.8);
 
   let emblemPart = parts.length - 1;
   // ---- drum + dome + lantern + flagpole
@@ -251,7 +251,7 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
     if (!quiet) L('ink', 230, 1900, 770, 1900, 'dc', [16, 24]);
     L(quiet ? 'thin' : 'ink', 260, 1420, 260, 1900, 'dl', [0, 10], false);
     L(quiet ? 'thin' : 'ink', 740, 1420, 740, 1900, 'dr', [0, 10], false);
-    end('drum', 2 + columns * 0.35 + 1.3);
+    end('drum', 2 + columns * 0.45 + 1.3);
     if (emblemY > 1470) emblemPart = parts.length - 1;
     // dome: half ellipse (sampled, mapped), shade on the left third, ribs (front light only)
     begin(1900, 2230, 250, 750);
@@ -289,7 +289,7 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
         cur!.hair.raw(rib);
       }
     }
-    end('dome', 2 + columns * 0.35 + 1.8);
+    end('dome', 2 + columns * 0.45 + 1.8);
     // lantern + flagpole
     begin(2215, 2900, 440, 560);
     F('stone').poly(P([[455, 2215], [545, 2215], [545, 2390], [455, 2390]]));
@@ -299,7 +299,7 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
     L('thin', 455, 2215, 455, 2390, 'll', [0, 4], false);
     L('thin', 545, 2215, 545, 2390, 'lr', [0, 4], false);
     L('thin', 500, 2460, 500, 2880, 'fp', [0, 0], false);
-    end('lantern', 2 + columns * 0.35 + 2.2);
+    end('lantern', 2 + columns * 0.45 + 2.2);
   }
   // emblem disc lives in its part (pediment or drum)
   const ec = A(500, emblemY);
@@ -382,7 +382,7 @@ export const Monument: React.FC<MonumentProps> = ({
     if (build) {
       const t0 = build.at + ((build.dur ?? 2.6) * part.order) / Math.max(1, maxOrder);
       if (t < t0) return {k: 0, ink: false, paper: false};
-      const u = prog(t, t0, 0.26);
+      const u = prog(t, t0, 0.16);
       k = u >= 1 ? 1 : E.outBack(1.5)(u);
       ink = ink && t >= t0 + 0.12;
     }
