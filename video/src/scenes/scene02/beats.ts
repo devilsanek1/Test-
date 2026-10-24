@@ -26,26 +26,35 @@ export const W = {
   passwordEnd: 8.18,
 } as const;
 
-/** Storyboard beats (absolute s). */
+/** Storyboard beats (absolute s). Small elements LEAD their word by ~0.10 s with out-type starts (ENGINE rule 5,
+ *  motion_spec 7: nothing visibly starts more than 70 ms after its word); fix round 1 retimed every lead. */
 const ABS = {
   cut: S02_START, //                        cut(purpose): the matchcut lands, the sheet draws outward from the lock
   pipLand: 4.865, //                        w15+0.15 'because': Pip lands on the rod with a squash
-  coverOpen: 4.955, //                      w16 'of': the lock cover swings open (diagram dashes)
-  boltTest: 5.105, //                       w17 'this': the bolt shoots out and STOPS SHORT
-  bug: 5.305, //                            w18 'bug': gap bracket + ring, Bit peeks out
+  coverOpen: 4.855, //                      w16-0.10 'of': the lock cover swings open (out(cubic), diagram dashes)
+  boltTest: 5.005, //                       w17-0.10 'this': the bolt shoots out, SLAMS to a stop short of the socket
+  bug: 5.205, //                            w18-0.10 'bug': peach gap + bold bracket + ring draw on
+  bitPeek: 5.235, //                        w18-0.07 'bug': Bit peeks out of the socket, antennae up
   site: 5.695, //                           w19 'where': site icon draws on, connector runs lock -> icon
   L1: 5.775, //                             w19+0.08 'where': label L1 (static title-block tag)
   handIn: 5.825, //                         w20-0.05 'hackers': the dashed hand slides in (0.3 s, out(cubic))
-  could: 6.28, //                           w21 'could': Bit's antennae flatten; connector dashes march one step
-  take: 6.42, //                            w22 'take': the hand turns the thumb-turn 90 deg, the bolt retracts
-  L2: 6.57, //                              w22+0.15 'take': label L2 + its leader
-  over: 6.635, //                           w23 'over': arrow along the connector, hatching, flag; Bit ducks
-  siteWord: 6.9, //                         w25 'site': the icon's padlock dot pops open
+  could: 6.18, //                           w21-0.10 'could': Bit's antennae flatten; connector dashes march one step
+  turn: 6.34, //                            w22-0.08 'take': the thumb-turn turns 90 deg (0.2 s out(cubic)), bolt retracts
+  take: 6.42, //                            w22 'take': (lock_click SFX; the bolt is visibly moving, home ~6.5)
+  L2: 6.57, //                              w22+0.15 'take': label L2 + its curved leader
+  arrow: 6.475, //                          w23-0.16 'over': the arrow runs along the connector, lands on the word
+  bitHide: 6.575, //                        w23-0.06 'over': Bit ducks into the socket (out(quad))
+  taken: 6.535, //                          w23-0.10 'over': the icon's window floods dark + hatching (starts on the word)
+  flag: 6.615, //                           w23-0.02 'over': the big flag pops on the roof, the icon squash-pops
+  ring: 6.605, //                           w23-0.03 'over': an ink ring pops round the icon and runs out
+  siteWord: 6.82, //                        w25-0.08 'site': the icon jolts, its padlock pops open
   release: 7.05, //                         (between 'site' and 'without'): the hand lets go of the turned knob, hovers
-  without: 7.275, //                        w26 'without': key glyph draws beside the lock, then an ink cross
+  erase: 7.175, //                          w26-0.10 'without': an eraser rubs a patch of paper clean beside the loupe
+  without: 7.275, //                        w26 'without': key glyph draws in the patch, then an ink cross
   pipCover: 7.77, //                        w28+0.10 'password': GAG: Pip ears-cover
   flutter: 8.03, //                         end(password)-0.15: the flag flutters; the cross ink settles
-  handOut: 8.273, //                        cut(password)-0.12: the hand slides out; Bit pops back up
+  handOut: 8.19, //                         end(password)+0.01: the hand slides out past the sheet edge (0.18 s)
+  bitPop: 8.273, //                         cut(password)-0.12: Bit pops back up in the socket
   pipHop: 8.353, //                         cut(password)-0.04: Pip lifts his ears and hops off toward the lens
 } as const;
 
