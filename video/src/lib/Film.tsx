@@ -60,7 +60,9 @@ export type FilmScene = {
   start: number;
   end: number;
   transitionIn?: FilmTransition;
-  transitionOut?: {type: 'unbuild'; dur?: number; loop?: boolean};
+  /** Last scene only. loop: reveal the first scene underneath; captionAt: VO time the captions roll back to page 1
+   *  (default end - 0.22). */
+  transitionOut?: {type: 'unbuild'; dur?: number; loop?: boolean; captionAt?: number};
   captionTone?: ToneKey[];
   note?: string;
 };
@@ -90,8 +92,10 @@ function camCont(tr: Extract<FilmTransition, {type: 'camera-continuous'}>): {dOu
   const dIn = d * 0.5;
   const dir = tr.dir ?? 'in';
   if (dir === 'in' || dir === 'out') {
-    const A = tr.amount ?? 1.45; // outgoing zoom factor
-    const B = 1.12; // incoming starts 1/B (in) or B (out)
+    // defaults scale with the duration: a 0.25 s continuation is a nudge, a 1.4 s one a real push
+    const k = Math.min(1, d / 1.4);
+    const A = tr.amount ?? 1 + 0.45 * k; // outgoing zoom factor
+    const B = 1 + 0.12 * k; // incoming starts 1/B (in) or B (out)
     const n = clamp((3 * Math.log(A) * dIn) / (dOut * Math.log(B)), 1.5, 9);
     const sgn = dir === 'in' ? 1 : -1;
     const f: Pt = tr.focus ?? C;
@@ -103,8 +107,9 @@ function camCont(tr: Extract<FilmTransition, {type: 'camera-continuous'}>): {dOu
       in: (v) => zoomAbout(to, Math.exp(-sgn * Math.log(B) * Math.pow(1 - v, n)), to),
     };
   }
-  const D = tr.amount ?? 380;
-  const Din = 150;
+  const kd = Math.min(1, d / 1.4);
+  const D = tr.amount ?? 380 * kd;
+  const Din = 150 * kd;
   const n = clamp((3 * D * dIn) / (dOut * Din), 1.5, 9);
   const [vx, vy] = dir === 'up' ? [0, -1] : dir === 'down' ? [0, 1] : dir === 'left' ? [-1, 0] : [1, 0];
   return {
@@ -434,7 +439,11 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
   layers.sort((a, b) => a.z - b.z);
   const tone = (t: number) => toneAt(scenes, t);
   const last = scenes[scenes.length - 1];
-  const loopAt = !only && last?.transitionOut?.type === 'unbuild' && last.transitionOut.loop !== false ? end - 0.24 : undefined;
+  // the captions roll back to page 1 for the loop (unless captions.json already ends on an explicit loop page)
+  const firstText = captions[0]?.lines[0]?.text;
+  const lastCap = captions[captions.length - 1];
+  const explicitLoopPage = captions.length > 1 && lastCap.lines.length === 1 && lastCap.lines[0].text === firstText && lastCap.s > end - 1.5;
+  const loopAt = !only && !explicitLoopPage && last?.transitionOut?.type === 'unbuild' && last.transitionOut.loop !== false ? last.transitionOut.captionAt ?? end - 0.22 : undefined;
   const onlyIdx = only ? scenes.findIndex((s) => s.id === only) : -1;
   const range: [number, number] | undefined = only && onlyIdx >= 0 ? [scenes[onlyIdx].start, scenes[onlyIdx + 1]?.start ?? Infinity] : undefined;
 

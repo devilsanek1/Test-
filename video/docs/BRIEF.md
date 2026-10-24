@@ -19,6 +19,14 @@ How to apply the cinematic direction below with restraint:
 - Pacing stays TikTok-native: the hook lands in the first second, something meaningful changes every ~1–2 s, no
   lingering establishing shots.
 
+MEASURED FULL-BLEED NUMBERS: `docs/style_bible_ref2.md` (reference 2 measurements + the two-tier scale playbook in its
+section 8) is authoritative for full-bleed framing and wins over the guesses in the section below. Key values (already in
+`src/lib/theme.ts`): captions Patrick Hand 98 px, baselines y 387 / 510, centred x 520, max line 850, ink on day sky and
+white on night sky; horizon ~0.40 H (y 768); sun r 94–120 (peaks only: 270–490); day sky #ACD1BF, night #588077; every
+shot carries a gentle 3–8% zoom over 1–2.5 s. Decisions: keep NO fades (reference 2's cross-dissolves are not adopted);
+caption MOTION follows reference 1 (scroll/rise/wipe) with reference 2's size, positions and colours; the sun-as-character
+beats from reference 1 are used sparingly.
+
 ## CINEMATIC DIRECTION (from the user; overrides the card layout and anything below that conflicts; apply with the balance note above)
 The user's note: some videos make the viewer feel big (reference 1: we look down at a little diorama on a card),
 others make the viewer feel small. We want SMALL: the sense of scale of Arcane's cinematic shots.

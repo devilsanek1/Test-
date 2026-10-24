@@ -268,12 +268,13 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
   const times = useMemo(() => switchTimes(cells, ev, `${seed}/w`), [cells, JSON.stringify(ev), seed]);
   const W = windowPaths(cells, ev, times, t, {initial: windows?.initial ?? (p.stars > 0.3 ? 0.55 : 0.1), lit: p.windowLit, blinds: 0.1});
 
-  // ground
-  const groundRoad = new PathBuf().quad(S(-road, 0, zNear), S(road, 0, zNear), S(road, 0, zFar), S(-road, 0, zFar)).d;
+  // ground: from below the frame bottom (+ bleed) to the far end
+  const zG = Math.min(zNear, (f * camH) / Math.max(1, 2300 - vp[1]));
+  const groundRoad = new PathBuf().quad(S(-road, 0, zG), S(road, 0, zG), S(road, 0, zFar), S(-road, 0, zFar)).d;
   const walks = new PathBuf();
   const X = road + walk;
-  if (sides !== 'right') walks.quad(S(-X, 0, zNear), S(-road, 0, zNear), S(-road, 0, zFar), S(-X, 0, zFar));
-  if (sides !== 'left') walks.quad(S(road, 0, zNear), S(X, 0, zNear), S(X, 0, zFar), S(road, 0, zFar));
+  if (sides !== 'right') walks.quad(S(-X * 3, 0, zG), S(-road, 0, zG), S(-road, 0, zFar), S(-X, 0, zFar));
+  if (sides !== 'left') walks.quad(S(road, 0, zG), S(X * 3, 0, zG), S(X, 0, zFar), S(road, 0, zFar));
 
   // facade fills / shade / ink, drawn far -> near
   const sorted = geo.slice().sort((a, b) => b.zA - a.zA);
@@ -292,7 +293,7 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
   });
   // kerb lines toward the VP
   for (const x of sides === 'both' ? [-road, road] : sides === 'left' ? [-road] : [road]) {
-    const a = S(x, 0, zNear);
+    const a = S(x, 0, zG);
     const b = S(x, 0, zFar * 0.3);
     inkPB.raw(line(a[0], a[1], b[0], b[1], {seed: `${seed}/k${x}`, over: [0, 0]}));
   }
@@ -345,22 +346,24 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
     }
   }
 
-  // walkers on the sidewalks, heading to the VP (z grows with time, wraps)
-  const walkers = new PathBuf();
-  const wBody = new PathBuf();
-  const wLegs = new PathBuf();
+  // walkers on the sidewalks, heading to the VP (z grows with time, wraps); colours vary per walker
+  const WC = [palette.teal, palette.sage, palette.tan, palette.cream, palette.brown, palette.tealDark, palette.peach];
+  const WH = [palette.ink, palette.brown, palette.tan, palette.tealDark];
+  const heads = WH.map(() => new PathBuf());
+  const bodies = WC.map(() => new PathBuf());
+  const legsB = new PathBuf();
   if (crowd > 0) {
     const r = rng(`walk/${seed}`);
     const list = Array.from({length: crowd}, () => {
       const side = sides === 'both' ? r.sign() : sides === 'left' ? -1 : 1;
-      return {x: side * (road + r.range(40, walk - 40)), z0: r.range(zNear * 1.6, zFar * 0.12), v: r.range(60, 140) * (r.chance(0.2) ? -1 : 1)};
+      return {x: side * (road + r.range(40, walk - 40)), z0: r.range(zNear * 1.6, zFar * 0.12), v: r.range(60, 140) * (r.chance(0.2) ? -1 : 1), c: r.int(0, WC.length - 1), h: r.int(0, WH.length - 1)};
     });
-    const pos = list.map((w) => ({x: w.x, z: Math.max(zNear * 1.4, ((w.z0 + w.v * t - zNear * 1.4) % (zFar * 0.12)) + zNear * 1.4)})).sort((a, b) => b.z - a.z);
+    const pos = list.map((w) => ({...w, z: Math.max(zNear * 1.4, ((w.z0 + w.v * t - zNear * 1.4) % (zFar * 0.12)) + zNear * 1.4)})).sort((a, b) => b.z - a.z);
     for (const w of pos) {
       const [sx, sy] = S(w.x, 0, w.z);
       const h = (170 * f) / w.z;
       if (h < 2.5) continue;
-      tinyFigure(walkers, wBody, wLegs, sx, sy - Math.abs(Math.sin(t * 6 + w.x)) * h * 0.03, h);
+      tinyFigure(heads[w.h], bodies[w.c], legsB, sx, sy - Math.abs(Math.sin(t * 6 + w.x)) * h * 0.03, h);
     }
   }
 
@@ -373,9 +376,9 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
       {W.lit.map((d, i) => (d ? <path key={`w${i}`} d={d} fill={p.windowLit[i % p.windowLit.length]} /> : null))}
       {W.blinds ? <path d={W.blinds} fill={ambient(palette.tan, p)} /> : null}
       <path d={inkPB.d} fill="none" stroke={palette.ink} strokeWidth={ink * 0.8} strokeLinecap="round" />
-      {wLegs.empty ? null : <path d={wLegs.d} fill={ambient(palette.tealDark, p)} />}
-      {wBody.empty ? null : <path d={wBody.d} fill={ambient(palette.teal, p)} />}
-      {walkers.empty ? null : <path d={walkers.d} fill={palette.ink} />}
+      {legsB.empty ? null : <path d={legsB.d} fill={ambient(palette.tealDark, p)} />}
+      {bodies.map((b, i) => (b.empty ? null : <path key={`wb${i}`} d={b.d} fill={ambient(WC[i], p)} />))}
+      {heads.map((b, i) => (b.empty ? null : <path key={`wh${i}`} d={b.d} fill={ambient(WH[i], p)} />))}
       {poleNodes}
       <path d={wirePB.d} fill="none" stroke={palette.ink} strokeWidth={stroke.inkHair} strokeLinecap="round" />
       {lightNodes}

@@ -12,8 +12,10 @@
 
 import type {Pt} from '../sketch';
 import type {Mat} from '../xf';
+import type {Quad} from '../persp';
 
-export type Quad = [Pt, Pt, Pt, Pt];
+/** [TL, TR, BR, BL] — the same type as the core lane's persp.tsx Quad (re-exported, not redeclared). */
+export type {Quad};
 export type UV = (u: number, v: number) => Pt;
 
 /** Projective map of the unit square (u right, v down) onto quad [TL, TR, BR, BL]. */

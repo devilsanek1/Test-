@@ -233,9 +233,9 @@ export const LampPost: React.FC<LampPostProps> = ({x, y, h = 320, at, seed = 'la
 };
 
 
-// ---------------------------------------------------------------- String lights (reference 2)
+// ---------------------------------------------------------------- Festoon: string lights (reference 2). (The cine lane has a richer StringLights with tod / sway.)
 
-export type StringLightsProps = {
+export type FestoonProps = {
   x1: number;
   y1: number;
   x2: number;
@@ -258,7 +258,7 @@ export type StringLightsProps = {
 
 /** A festoon of bulbs on a sagging wire. Wire draws, bulbs pop in L->R, then light up. Built from Ink/Fill only, so
  *  it works inside a <Plane> and un-builds with the scene. */
-export const StringLights: React.FC<StringLightsProps> = ({x1, y1, x2, y2, sag = 30, n, bulb = 9, at, lightAt, seed = 'lights', width = stroke.inkThin, color = palette.white, litColor = palette.peach}) => {
+export const Festoon: React.FC<FestoonProps> = ({x1, y1, x2, y2, sag = 30, n, bulb = 9, at, lightAt, seed = 'lights', width = stroke.inkThin, color = palette.white, litColor = palette.peach}) => {
   const t = useTime();
   const len = Math.hypot(x2 - x1, y2 - y1);
   const count = n ?? Math.max(3, Math.round(len / 70));

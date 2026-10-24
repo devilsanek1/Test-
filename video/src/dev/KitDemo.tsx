@@ -2,7 +2,7 @@
 // perspective to a vanishing point under a huge low sun, a colossal far skyline silhouetted against it, a crowd seen
 // from behind walking into the distance, string lights, captions in the sky with a tone switch at nightfall, and an
 // un-build that loops back into frame 0 (the paper/ink state, then the colour cascade from the vanishing point).
-// Exercises: World + sky wipes, Plane (projected facades/fence), Crowd depth ink, Person rise, StringLights,
+// Exercises: World + sky wipes, Plane (projected facades/fence), Crowd depth ink, Person rise, Festoon,
 // UtilityPole, LampPost, Sun (rise, beats, hop, set), Look cascade, Standalone loop, SkyCaptions tones, mascot.
 // Preview: scripts/sheet.sh KitDemo 0 12 24 out.png
 import React from 'react';
@@ -17,7 +17,7 @@ import {palette, skies, stroke, world} from '../lib/theme';
 import {lerp, useTime} from '../lib/time';
 import {CaptionBeat} from '../lib/Captions';
 import {crown, crownTicks, hline, line, polyPath, rect, Pt} from '../lib/sketch';
-import {Building, Crowd, LampPost, Noticeboard, Paper, Person, Place, StringLights, Tree, UtilityPole} from '../lib/kit';
+import {Building, Crowd, LampPost, Noticeboard, Paper, Person, Place, Festoon, Tree, UtilityPole} from '../lib/kit';
 import {drawOut, ElephantTimeline, popIn} from '../lib/mascot';
 
 const VP: Pt = [560, 880];
@@ -165,10 +165,10 @@ const Lights: React.FC = () => {
   return (
     <>
       {/* foreground strand right across the top of the frame (cropped): pushes the world back */}
-      <StringLights x1={-60} y1={40} x2={1140} y2={96} sag={58} n={11} bulb={16} at={0.6} lightAt={lightAt} seed="sl0" width={stroke.ink} />
-      <StringLights x1={POLES[1].top[0]} y1={POLES[1].top[1] + 40} x2={1000} y2={760} sag={36} bulb={[8, 7]} at={1.2} lightAt={lightAt + 0.1} seed="sl1" />
-      <StringLights x1={POLES[2].top[0]} y1={POLES[2].top[1] + 30} x2={850} y2={812} sag={22} bulb={[5, 4]} at={1.5} lightAt={lightAt + 0.2} seed="sl2" width={stroke.inkHair} />
-      <StringLights x1={POLES[3].top[0]} y1={POLES[3].top[1] + 20} x2={720} y2={846} sag={12} n={6} bulb={3} at={1.7} lightAt={lightAt + 0.3} seed="sl3" width={stroke.inkHair} />
+      <Festoon x1={-60} y1={40} x2={1140} y2={96} sag={58} n={11} bulb={16} at={0.6} lightAt={lightAt} seed="sl0" width={stroke.ink} />
+      <Festoon x1={POLES[1].top[0]} y1={POLES[1].top[1] + 40} x2={1000} y2={760} sag={36} bulb={[8, 7]} at={1.2} lightAt={lightAt + 0.1} seed="sl1" />
+      <Festoon x1={POLES[2].top[0]} y1={POLES[2].top[1] + 30} x2={850} y2={812} sag={22} bulb={[5, 4]} at={1.5} lightAt={lightAt + 0.2} seed="sl2" width={stroke.inkHair} />
+      <Festoon x1={POLES[3].top[0]} y1={POLES[3].top[1] + 20} x2={720} y2={846} sag={12} n={6} bulb={3} at={1.7} lightAt={lightAt + 0.3} seed="sl3" width={stroke.inkHair} />
     </>
   );
 };

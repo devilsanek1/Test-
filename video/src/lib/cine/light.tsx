@@ -255,8 +255,12 @@ export type SilhouetteProps = {
   opacity?: number;
 };
 
+/** Default mask region (layer coords): the frame plus a margin. Keep masks under ~4000 px a side (Chrome rasterises
+ *  masks as one texture; bigger regions tile and repeat). Pass `bounds` for content far outside the frame. */
+export const SIL_BOUNDS: [number, number, number, number] = [-400, -400, 1880, 2720];
+
 /** Fill-only dark shape of a path or of any children (alpha mask: the children's coverage is filled flat). */
-export const Silhouette: React.FC<SilhouetteProps> = ({color, d, children, bounds = [-2000, -3000, 5080, 7000], opacity}) => {
+export const Silhouette: React.FC<SilhouetteProps> = ({color, d, children, bounds = SIL_BOUNDS, opacity}) => {
   const id = 'sil' + useId().replace(/[^a-zA-Z0-9]/g, '');
   if (d) return <path d={d} fill={color} opacity={opacity} />;
   const [x, y, w, h] = bounds;

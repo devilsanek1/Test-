@@ -23,7 +23,7 @@ import {
   CAM,
   CineCamera,
   CineFrame,
-  Cloud,
+  SkyCloud,
   deep,
   EndlessCity,
   Layer,
@@ -47,6 +47,13 @@ import {
   WindowCloseup,
   windowQuad,
   WipePass,
+  Hills,
+  PerspectiveStreet,
+  Tower,
+  Silhouette,
+  RimLight,
+  Glow,
+  LitWindows,
 } from '../lib/cine';
 
 // ---------------------------------------------------------------- A: vista
@@ -61,8 +68,8 @@ const ShotA: React.FC = () => {
       <Layer depth={1}>
         <Sky tod={P} horizon={HZ} />
         <Stars tod={P} region={[-100, -100, 1180, 560]} at={0.2} span={5.5} n={80} />
-        <Cloud x={-40} y={560} w={330} tod={P} color={mix(P.teal, P.sage, 0.5)} drift={5} seed="ca1" />
-        <Cloud x={720} y={690} w={250} tod={P} color={P.sage} drift={7} seed="ca2" />
+        <SkyCloud x={-40} y={560} w={330} tod={P} color={mix(P.teal, P.sage, 0.5)} drift={5} seed="ca1" />
+        <SkyCloud x={720} y={690} w={250} tod={P} color={P.sage} drift={7} seed="ca2" />
         <Streaks y={HZ - 30} tod={P} n={4} color={P.horizonGlow} />
         <BigSun cx={610} cy={HZ + 20} r={150} horizon={HZ + 60} tod={P} path={[{t: 0, y: HZ + 20}, {t: 6, y: HZ + 70}]} beats={[0.32, {t: 1.33, amp: 0.1}]} glowSpread={1.1} />
         <Birds at={0.6} from={[-80, 780]} to={[1160, 600]} dur={6.5} n={5} size={16} />
@@ -228,7 +235,63 @@ const CAPTIONS: CaptionBeat[] = [
 ];
 const tone = (T: number): CaptionTone => (T >= 6 && T < 12 ? 'dark' : 'light');
 
-export const CineDemo: React.FC = () => (
+// ---------------------------------------------------------------- kit checks
+// npx remotion still src/index.ts CineDemo out.png --frame=75 --props='{"mode":"street"}'   (or "tower")
+
+const StreetCheck: React.FC = () => {
+  const P = TOD.golden;
+  const VP: [number, number] = [600, 980];
+  return (
+    <CineCamera keys={[{t: 0, push: 0}, {t: 6, push: 0.15}]} handheld={1}>
+      <Layer depth={1}>
+        <Sky tod={P} horizon={VP[1]} />
+        <SkyCloud x={160} y={430} w={300} tod="day" drift={6} />
+        <BigSun cx={VP[0]} cy={VP[1] - 40} r={150} horizon={VP[1] + 10} tod={P} />
+        <Hills y={VP[1] + 10} amp={50} color={P.sand} seed="h1" />
+      </Layer>
+      <Layer depth={0}>
+        <PerspectiveStreet vp={VP} tod={P} seed="main" crowd={60} lightsOn={{at: 1, dur: 2}} />
+      </Layer>
+    </CineCamera>
+  );
+};
+
+const TowerCheck: React.FC = () => {
+  const P = TOD.dusk;
+  return (
+    <CineCamera keys={[{t: 0, y: 1100}, {t: 6, y: 700}]}>
+      <Layer depth={1}>
+        <Sky tod={P} horizon={1700} span={1700} />
+        <Stars tod={P} region={[0, 0, 1080, 900]} at={0} span={3} />
+      </Layer>
+      <Layer depth={0.3}>
+        <Tower x={600} y={1950} wl={520} wr={430} top={-200} vpy={-4200} tod={P} floors={70} windows={{initial: 0.1, events: [{at: 0.5, dur: 4, to: 'on', pattern: 'rows', fraction: 0.6}]}} />
+        <LightShaft from={[1100, -200]} angle={125} length={2600} w0={80} w1={700} beams={3} color={palette.peach} opacity={0.16} sweep={3} at={1} />
+      </Layer>
+      <Layer depth={0}>
+        <Silhouette color={deep.teal60}>
+          <Person x={300} y={1760} s={1.6} seed="sil1" legs />
+          <Person x={420} y={1790} s={1.3} seed="sil2" legs acc={['backpack']} />
+        </Silhouette>
+        <TinyCrowd n={50} area={[0, 1700, 1080, 1900]} horizon={1300} k={0.06} tod={P} silhouette={deep.teal60} at={0.3} span={2} />
+        <RimLight rect={[700, 1500, 300, 500]} side="right" width={10} color={palette.peach} />
+        <Glow cx={900} cy={1400} r={10} rings={3} spread={2.5} color={P.glow} core={palette.peach} at={2} />
+        <LitWindows grid={{x: 60, y: 1400, w: 220, h: 260, rows: 6, cols: 5}} initial={0} events={[{at: 0.5, dur: 2, to: 'on', pattern: 'wave', origin: [0, 1]}, {at: 4, dur: 1, to: 'off', pattern: 'rows'}]} ink={{}} dark={palette.tealDark} />
+      </Layer>
+    </CineCamera>
+  );
+};
+
+export const CineDemo: React.FC<{mode?: 'demo' | 'street' | 'tower'}> = ({mode = 'demo'}) =>
+  mode === 'street' ? (
+    <CineFrame bg={palette.sky}>
+      <StreetCheck />
+    </CineFrame>
+  ) : mode === 'tower' ? (
+    <CineFrame bg={palette.tealDark}>
+      <TowerCheck />
+    </CineFrame>
+  ) : (
   <CineFrame bg={palette.tealDark} overlay={<SkyCaptions beats={CAPTIONS} tone={tone} hookAtStart />}>
     <Shot from={0} to={6}>
       <ShotA />
@@ -242,4 +305,4 @@ export const CineDemo: React.FC = () => (
     <WipePass at={5.72} dur={0.56} dir="right" color={deep.teal60} rim={palette.peach} seed="w1" />
     <WipePass at={11.72} dur={0.56} dir="left" color={palette.tealDark} rim={palette.sage} seed="w2" />
   </CineFrame>
-);
+  );

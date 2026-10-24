@@ -187,6 +187,8 @@ export type SkyCaptionsProps = {
   /** Things that started before range[0] + this are shown settled (no roll). Default 0.35 s. */
   instantWithin?: number;
   size?: number;
+  /** Override theme skyCaption.motion: 'scroll' (reference 1, measured) or 'pop' (reference 2: 1-frame pops). */
+  motion?: 'scroll' | 'pop';
 };
 
 type SkyLine = {text: string; start: number; baseline: number; boxes: (Box & {start: number; dur: number})[]};
@@ -238,7 +240,7 @@ function layoutSky(b: CaptionBeat, baseSize: number): SkyPage {
 
 const textStyle: React.CSSProperties = {fontKerning: 'normal', fontVariantLigatures: 'common-ligatures contextual', letterSpacing: typeTok.letterSpacing};
 
-const SkyPageG: React.FC<{page: SkyPage; T: number; dy: number; instantUntil: number; tone: CaptionTone; uid: string}> = ({page, T, dy, instantUntil, tone, uid}) => {
+const SkyPageG: React.FC<{page: SkyPage; T: number; dy: number; instantUntil: number; tone: CaptionTone; uid: string; pop?: boolean}> = ({page, T, dy, instantUntil, tone, uid, pop}) => {
   const col = captionTones[tone];
   const pitch = (skyCaption.line2 - skyCaption.line1) * (page.size / skyCaption.size);
   return (
@@ -247,9 +249,9 @@ const SkyPageG: React.FC<{page: SkyPage; T: number; dy: number; instantUntil: nu
         const settled = ln.start <= instantUntil;
         if (!settled && T < ln.start) return null;
         const rises = i > 0 && ln.start > page.start + 0.001;
-        const ldy = rises && !settled ? pitch * MOTION.captionLine2.pitch * (1 - MOTION.captionLine2.ease(clamp((T - ln.start) / MOTION.captionLine2.dur))) : 0;
+        const ldy = rises && !settled && !pop ? pitch * MOTION.captionLine2.pitch * (1 - MOTION.captionLine2.ease(clamp((T - ln.start) / MOTION.captionLine2.dur))) : 0;
         const boxes = ln.boxes
-          .map((bx) => ({bx, p: bx.start <= instantUntil ? 1 : MOTION.highlight.ease(clamp((T - bx.start) / bx.dur))}))
+          .map((bx) => ({bx, p: bx.start <= instantUntil ? 1 : pop ? (T >= bx.start ? 1 : 0) : MOTION.highlight.ease(clamp((T - bx.start) / bx.dur))}))
           .filter(({p}) => p > 0);
         const needsInk = boxes.length > 0 && col.text !== col.highlightText;
         const textEl = (fill: string, clip?: string) => (
@@ -284,7 +286,8 @@ const SkyPageG: React.FC<{page: SkyPage; T: number; dy: number; instantUntil: nu
   );
 };
 
-export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', range, hookAtStart = true, loopAt, instantWithin = 0.35, size = skyCaption.size}) => {
+export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', range, hookAtStart = true, loopAt, instantWithin = 0.35, size = skyCaption.size, motion = skyCaption.motion}) => {
+  const pop = motion === 'pop';
   const T = useGlobalTime();
   const fontOk = useCaptionFont();
   const uid = 'sc' + useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -315,7 +318,7 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', r
   const cur = pages[k];
   const prev = k > 0 ? pages[k - 1] : null;
   // the first page never scrolls in when it is the hook (it is already on screen at frame 0)
-  const instant = settledAll || cur.start <= instantUntil || (hookAtStart && k === 0);
+  const instant = pop || settledAll || cur.start <= instantUntil || (hookAtStart && k === 0);
   const u = clamp((T - cur.start) / MOTION.captionScroll.dur);
   const q = instant ? 1 : MOTION.captionScroll.ease(u);
   const tn: CaptionTone = typeof tone === 'function' ? tone(T) : tone;
@@ -329,8 +332,8 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', r
         </clipPath>
       </defs>
       <g clipPath={`url(#${uid})`}>
-        {prev && !instant && u < 1 ? <SkyPageG key={`p${k - 1}`} page={prev} T={T} dy={-SKY_D * q} instantUntil={iu} tone={tn} uid={`${uid}a`} /> : null}
-        <SkyPageG key={`p${k}`} page={cur} T={settledAll ? Math.max(T, cur.start) : T} dy={SKY_D * (1 - q)} instantUntil={iu} tone={tn} uid={`${uid}b`} />
+        {prev && !instant && u < 1 ? <SkyPageG key={`p${k - 1}`} page={prev} T={T} dy={-SKY_D * q} instantUntil={iu} tone={tn} uid={`${uid}a`} pop={pop} /> : null}
+        <SkyPageG key={`p${k}`} page={cur} T={settledAll ? Math.max(T, cur.start) : T} dy={SKY_D * (1 - q)} instantUntil={iu} tone={tn} uid={`${uid}b`} pop={pop} />
       </g>
     </svg>
   );

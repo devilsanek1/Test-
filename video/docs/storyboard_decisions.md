@@ -26,14 +26,14 @@ a clock, and the hour hand sweeps less than one turn. There is one sunset ("by e
 hosting visual holds 0.77 s before the un-build starts on "sorts", and "out." stays on screen until it ends. "7" is re-timed
 to 9.38 by an energy check of the VO.
 
-**Art-direction rules:** periwinkle belongs to Pip alone (PHP is sand with an ink elephant). Orange is the sun plus one seal.
-Only the 13 palette colours are used, and "lights out" is a pop to the next palette step. There are no blurs, fades, whips,
-irises, text or numerals in the art. Pip never goes below scale 0.75. Each scene has one quiet field and at most two
-framings of one set.
+**Art-direction rules:** periwinkle belongs to Pip alone (PHP is sand + ink elephant); orange is the sun plus one seal; only
+the 13 palette colours, with "lights out" as a pop to the next palette step; no blurs, fades, whips, irises, text or numerals
+in the art; Pip never below scale 0.75; each scene has one quiet field and at most two framings of one set.
 
-**Balance note (user):** true Arcane scale appears only in S01, S08 and S10. There are only two big moves, the S08 crane and
-the S10 pull-back. Everything else is a 5-15% push or a medium move of 2.2x or less lasting about 1 s. The light is mostly
-day and golden, with 1.75 s of night. Captions always sit on a clean sky. The tone is a curious explainer, not a trailer.
+**Balance note (user):** true Arcane scale only in S01, S08 and S10; only two big moves (S08 crane, S10 pull-back), the rest
+5-15% pushes or medium moves of 2.2x or less over about 1 s; mostly day and golden light, 1.75 s of night; captions always on
+a clean sky; the tone is a curious explainer, not a trailer.
+
 **Dropped:** the underground world and code glyphs, patch stickers, bouncing darts, doors that hold, footprints, the server
 rack, the periwinkle speck gag (it breaks the mascot-only colour), odometer digits, the sneeze (it would crowd the cane gag),
 the eye glint (it can't read in flat colour), and the retired 3D flip (a foreground wipe on "Except," replaces it).

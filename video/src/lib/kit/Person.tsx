@@ -35,7 +35,9 @@ export const PERSON_SHOES = [palette.teal, palette.peach, palette.cream, palette
 export const PERSON_PACKS = [palette.cream, palette.sand, palette.teal, palette.tealDark, palette.brown] as const;
 /** Placards: peach, teal, sand, white. (One orange placard per scene at most: pass signColor={palette.sun} yourself.) */
 export const SIGN_COLORS = [palette.peach, palette.teal, palette.sand, palette.card, palette.sage, palette.peach] as const;
-const HAT_COLORS = [palette.teal, palette.sage, palette.tealDark, palette.cream, palette.brown] as const;
+/** Caps / beanies: saturated mid-dark tones so the head never reads as a face (a light cap over dark hair looks like a
+ *  forehead over a beard). */
+const HAT_COLORS = [palette.teal, palette.sage, palette.tealDark, palette.brown] as const;
 
 export type PersonProps = {
   x?: number;
@@ -73,12 +75,13 @@ function makeSpec(p: PersonProps) {
   const h = p.torsoH ?? (p.legs ? w * r.range(0.95, 1.08) : w * r.range(1.02, 1.16));
   const hr = w * r.range(0.23, 0.26);
   const round = r.range(0.36, 0.45);
-  const hair: Hair = p.hair ?? r.weighted<Hair>([['short', 5], ['long', 2.2], ['bun', 1], ['cap', 1], ['beanie', 0.9], ['bald', 0.6], ['curly', 1.2]]);
+  // 'bald' is never picked at random (a skin crown over a low hair band can read as a face); ask for it explicitly
+  const hair: Hair = p.hair ?? r.weighted<Hair>([['short', 5], ['long', 2.2], ['bun', 1], ['cap', 1], ['beanie', 0.9], ['curly', 1.2]]);
   let acc: Acc[] = p.acc ?? [];
   if (!p.acc) {
     if (r.chance(0.26)) acc.push('backpack');
     else if (r.chance(0.16)) acc.push('strap');
-    if (hair !== 'long' && hair !== 'beanie' && r.chance(0.16)) acc.push('headphones');
+    if ((hair === 'short' || hair === 'bun' || hair === 'curly') && r.chance(0.16)) acc.push('headphones');
     if (r.chance(0.08)) acc.push('scarf');
     if (!acc.includes('backpack') && r.chance(0.35)) acc.push('collar');
   }
@@ -154,15 +157,19 @@ function makePaths(S: Spec) {
   }
   if (S.hair === 'cap') {
     // dome above a straight band; the strap opening is a small arch ON the band (back of a cap)
-    const by = hy + hr * 0.02;
-    P.capFill = `M${-hr * 1.03} ${by}A${hr * 1.03} ${hr * 1.03} 0 0 1 ${hr * 1.03} ${by}Z`;
-    P.capInk = line(-hr * 1.04, by, hr * 1.04, by - hr * 0.02, {over: [2, 2], seed: `${sd}/band`}) + arc(0, by, hr * 0.3, hr * 0.26, 180, 360, {seed: `${sd}/open`});
+    // from behind the cap covers most of the head: only a narrow strip of hair shows at the nape
+    const by = hy + hr * 0.42;
+    const cw = Math.sqrt(Math.max(0, 1.03 * 1.03 - 0.42 * 0.42)) * hr;
+    P.capFill = `M${-cw} ${by}A${hr * 1.03} ${hr * 1.03} 0 1 1 ${cw} ${by}Z`;
+    P.capInk = line(-cw, by, cw, by - hr * 0.02, {over: [2, 2], seed: `${sd}/band`}) + arc(0, by, hr * 0.3, hr * 0.26, 180, 360, {seed: `${sd}/open`});
     P.capHole = `M${-hr * 0.3} ${by}A${hr * 0.3} ${hr * 0.26} 0 0 1 ${hr * 0.3} ${by}Z`;
     P.capBtn = circle(0, hy - hr * 1.0, hr * 0.12, {seed: `${sd}/btn`});
   }
   if (S.hair === 'beanie') {
-    P.capFill = `M${-hr * 1.03} ${hy + hr * 0.16}A${hr * 1.03} ${hr * 1.03} 0 0 1 ${hr * 1.03} ${hy + hr * 0.16}Z`;
-    P.capInk = line(-hr, hy + hr * 0.16, hr, hy + hr * 0.15, {over: [1, 1], seed: `${sd}/bn1`}) + line(-hr * 0.93, hy - hr * 0.16, hr * 0.93, hy - hr * 0.17, {over: [1, 1], seed: `${sd}/bn2`});
+    const by = hy + hr * 0.4;
+    const cw = Math.sqrt(Math.max(0, 1.03 * 1.03 - 0.4 * 0.4)) * hr;
+    P.capFill = `M${-cw} ${by}A${hr * 1.03} ${hr * 1.03} 0 1 1 ${cw} ${by}Z`;
+    P.capInk = line(-cw, by, cw, by - hr * 0.01, {over: [1, 1], seed: `${sd}/bn1`}) + line(-hr * 0.98, hy + hr * 0.08, hr * 0.98, hy + hr * 0.07, {over: [1, 1], seed: `${sd}/bn2`});
     P.pomFill = blob(0, hy - hr * 1.18, hr * 0.3, hr * 0.3, {seed: `${sd}/pom`});
     P.pomInk = circle(0, hy - hr * 1.18, hr * 0.3, {seed: `${sd}/pom`});
   }

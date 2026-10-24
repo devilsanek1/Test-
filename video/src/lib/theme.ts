@@ -95,9 +95,9 @@ export const world = {
   w: 1080,
   h: 1920,
   /** Default eye-level horizon (y). Low camera: towers rise into the sky above it. */
-  horizon: 880,
+  horizon: 768, // reference 2 median 0.40 H (docs/style_bible_ref2.md); peaks go lower (0.58-0.70 H)
   /** Default vanishing point. */
-  vp: [540, 880] as [number, number],
+  vp: [540, 768] as [number, number],
   /** Author scenes this far past every frame edge (camera-continuous / push transitions zoom out by up to ~12%). */
   bleed: 140,
 } as const;
@@ -111,21 +111,24 @@ export const safe = {
   action: {x0: 90, x1: 990, y0: 200, y1: 1480},
 } as const;
 
-/** The sun in full-bleed scenes: big and low, sitting on the horizon (reference 2: r ~150 at 1080 wide). */
-export const sunWorld = {cx: 540, cy: 840, r: 150} as const;
+/** The sun in full-bleed scenes, sitting on the far hills (reference 2 measured: r 94 median, centre y 639). Baseline r 94-120; peaks only: r 270-490. */
+export const sunWorld = {cx: 540, cy: 650, r: 100} as const;
 
 /** Captions in the SKY (screen space, upper third). Baselines in canvas px. */
 export const skyCaption = {
-  cx: 540,
-  line1: 330,
-  line2: 426,
+  cx: 520, // reference 2 centres captions slightly left of frame centre (clears the right rail)
+  line1: 387,
+  line2: 510,
   /** A one-line page sits centred between the two slots (motion spec 4). */
-  oneLine: 378,
-  size: 82,
-  maxWidth: 860,
+  oneLine: 448,
+  size: 98, // reference 2 measured (emphasis pages ~168)
+  maxWidth: 850,
   /** Roll window: text outside [clipTop, clipBottom] is hidden (lines rise into it; pages scroll out of it). */
-  clipTop: 236,
-  clipBottom: 476,
+  clipTop: 280,
+  clipBottom: 570,
+  /** 'scroll' = reference 1's measured page scroll / line-2 rise / highlight wipe (docs/motion_spec.md 4).
+   *  'pop' = reference 2's grammar (docs/style_bible_ref2.md 3): pages, lines and highlight boxes pop in 1 frame. */
+  motion: 'scroll' as 'scroll' | 'pop',
 } as const;
 
 /** Caption tones: dark ink on light skies, white on dark (dusk/night) skies. The highlight word is ink on peach in both. */
@@ -140,9 +143,9 @@ export const depthInk = {front: 4.8, mid: 3.4, far: 2.2, hair: 1.6} as const;
 
 /** Sky colours for the time of day (flat; switch with a pop or a wipe, never a fade). */
 export const skies = {
-  day: palette.sky,
+  day: '#ACD1BF', // reference 2 day sky
   golden: palette.cream,
   dusk: palette.sage,
-  night: palette.teal,
+  night: '#588077', // reference 2 night sky (never darker behind captions)
   deep: palette.tealDark,
 } as const;

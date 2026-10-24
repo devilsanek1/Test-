@@ -3,7 +3,7 @@
 // no blur); motion is drift, pops and wing flaps (no opacity animation).
 //
 //   <Sky tod="dusk" horizon={1010} />                                  // 4 flat value steps down to the horizon
-//   <Cloud x={300} y={420} w={260} tod="day" drift={6} />              // white, inked top (ref 2 f_1)
+//   <SkyCloud x={300} y={420} w={260} tod="day" drift={6} />           // white, inked top (ref 2 f_1)
 //   <Streaks y={930} tod="dusk" n={4} />                               // thin sunset streak clouds near the horizon
 //   <Stars tod="night" region={[0, 0, 1080, 700]} at={1} span={4} />  // pop in one by one, twinkle by size
 //   <HazeBand y={985} h={70} color={TOD.dusk.haze} opacity={0.55} />  // flat fog between two city rows
@@ -102,7 +102,7 @@ function cloudGeo(x: number, y: number, w: number, h: number, seed: Seed): {fill
 }
 const CLOUD_CACHE = new Map<string, {fill: string; top: string; bottom: string}>();
 
-export type CloudProps = {
+export type SkyCloudProps = {
   x: number;
   /** Flat base y. */
   y: number;
@@ -123,7 +123,7 @@ export type CloudProps = {
 };
 
 /** Reference-style cloud: three scalloped bumps, flat bottom; white with ink on top (day) or fill-only (dusk). */
-export const Cloud: React.FC<CloudProps> = ({x, y, w = 240, h, tod = 'day', color, ink, inkColor = palette.ink, width = stroke.ink, drift = 0, at, seed = 'c'}) => {
+export const SkyCloud: React.FC<SkyCloudProps> = ({x, y, w = 240, h, tod = 'day', color, ink, inkColor = palette.ink, width = stroke.ink, drift = 0, at, seed = 'c'}) => {
   const t = useTime();
   const p = todPal(tod);
   const g = cloudGeo(0, 0, w, h ?? w * 0.42, seed);
