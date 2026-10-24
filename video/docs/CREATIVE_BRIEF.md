@@ -111,8 +111,11 @@ So: the user WANTS a deliberately provocative, comment-bait line about how big P
 The user decides; present both clearly in the final deliverable.
 
 ## ENGAGEMENT LAYER (approved by the user, latest)
-The user LOVES and APPROVED this line's bait: "PHP, the language everyone loves to call dead, still runs about 7 in 10
-websites" (or a tighter variant). Use it.
+UPDATED BY THE USER (final word on this line): use the shorter ironic version: "PHP, the language everyone loves". It's dry
+irony (PHP is the internet's favourite language to hate), so developers pile into the comments ("nobody loves PHP"), and it's
+a joke rather than a factual claim. Keep the real stakes fact right after it (about 7 in 10 websites, with a safe
+denominator). For the ElevenLabs version, give the irony a tiny beat with punctuation, e.g. "PHP. The language everyone
+loves." (Supersedes the earlier "everyone loves to call dead" wording.)
 Goal: growth, maximizing engagement, by sneaking in VERY SUBTLE, defensible engagement hooks wherever they fit naturally.
 Mechanisms to use (1–3 in the script, never more than feels natural):
 - Comment bait: a true claim that experts and fans love to argue about (the narrator is right; the comments do the rest).
