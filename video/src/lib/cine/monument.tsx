@@ -258,11 +258,13 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
   if (dome) {
     begin(1400, 1900, 230, 770);
     F('stone').poly(P([[260, 1400], [740, 1400], [740, 1900], [260, 1900]]));
-    F('shade').poly(P([[260, 1400], [330, 1400], [330, 1900], [260, 1900]]));
+    // backlit and above the quiet line (the caption band): the drum stays ONE flat field (no shade strip, no slots)
+    const drumQuiet = back && A(500, 1560)[1] < quietY;
+    if (!drumQuiet) F('shade').poly(P([[260, 1400], [330, 1400], [330, 1900], [260, 1900]]));
     if (back) F('rim').poly(P([[740 - 10, 1420], [740, 1420], [740, 1880], [740 - 10, 1880]]));
     // window slots (fill-only, framed by the drum's pilasters in front light)
     // window slots: dark in front light; one shade step (teal) in backlight, so a caption over them stays >= 3:1
-    for (let x = 320; x < 700; x += 60) F(back ? 'shade' : 'dark').poly(P([[x, 1560], [x + 26, 1560], [x + 26, 1650], [x, 1650]]));
+    if (!drumQuiet) for (let x = 320; x < 700; x += 60) F(back ? 'shade' : 'dark').poly(P([[x, 1560], [x + 26, 1560], [x + 26, 1650], [x, 1650]]));
     for (let x = 290; x <= 710; x += 60) L('thin', x, 1470, x, 1880, `dp${x}`, [0, 0], false);
     L('ink', 230, 1900, 770, 1900, 'dc', [8, 12]);
     L(quiet ? 'thin' : 'ink', 260, 1420, 260, 1900, 'dl', [0, 10], false, true);

@@ -1,0 +1,4 @@
+{
+  "_doc": "Allow-list of DELIBERATE holds for scripts/qa/deadframes.py (run_all.sh reads this file by default). A dead run that lies inside an entry's window is reported but not flagged. Entries: {\"scene\": \"S05\", \"t0\": 1.2, \"t1\": 2.4, \"why\": \"...\"} with scene-local seconds, or {\"t0\": 33.0, \"t1\": 34.1, \"why\": \"...\"} with film seconds. Every hold needs a why, and the creative lead's OK.",
+  "holds": []
+}

@@ -13,7 +13,7 @@ import {BlueprintWall, BLUEPRINT_WALL} from './BlueprintWall';
 import {MakersLane, MAKERS_LANE, Workshop, WORKSHOP_CORNER} from './MakersLane';
 import {NoticeboardCorner, NOTICE_CORNER, TelephoneWires, WIRES} from './NoticeboardCorner';
 import {DomeCity, DOME} from './DomeCity';
-import {TerraceHill, TERRACE} from './TerraceHill';
+import {TerraceHill, TerraceRings, TERRACE, TERRACE_FLAT} from './TerraceHill';
 import {OldQuarter, OLD_QUARTER} from './OldQuarter';
 import {DemoSun, DemoWorld} from './preview/demo';
 import {mat, XG} from '../../../lib/xf';
@@ -172,20 +172,26 @@ export const SET_CATALOG: SetEntry[] = [
     id: 'terrace',
     label: 'TerraceHill',
     sky: skies.day,
-    thumb: () => <TerraceHill flagAt={-1} ringsAt={-1} sun={<DemoSun cx={700} cy={720} r={150} />} />,
+    thumb: () => (
+      <>
+        <TerraceHill flagAt={-1} sun={<DemoSun cx={TERRACE.sun.x} cy={TERRACE.sun.y} r={TERRACE.sun.r} />} />
+        <TerraceRings />
+      </>
+    ),
     preview: (v) => {
       // demo pull-back 6.0 -> 1.0 over 2.2 s (log-space zoom), anchored on house #4 like the storyboard camera
       const Pull: React.FC = () => {
         const t = useTime();
         if (v === 'flat')
-          return <TerraceHill mode="flat" plaqueWaveAt={0.5} bitWaveAt={1.0} sun={<DemoSun cx={700} cy={720} r={150} />} />;
+          return <TerraceHill mode="flat" plaqueWaveAt={0.5} bitWaveAt={1.0} flagAt={1.4} sun={<DemoSun cx={TERRACE_FLAT.sun.x} cy={TERRACE_FLAT.sun.y} r={TERRACE_FLAT.sun.r} />} />;
         const q = v === 'match' ? 0 : v === 'rest' ? 1 : E.inOutSine(Math.min(1, Math.max(0, (t - 0.3) / 2.2)));
         const z = Math.exp(Math.log(6) * (1 - q));
         const cx = 540;
         const cy = 1407 + (960 - 1407) * q;
         return (
           <XG m={camMat(cx, cy, z)}>
-            <TerraceHill revealFloor={TERRACE.revealFloor} plaqueWaveAt={2.6} bitWaveAt={3.2} flagAt={2.9} ringsAt={3.6} extendAt={3.4} sun={<DemoSun cx={700} cy={760} r={150} />} />
+            <TerraceHill revealFloor={TERRACE.revealFloor} plaqueWaveAt={2.6} bitWaveAt={3.2} flagAt={2.9} extendAt={3.4} sun={<DemoSun cx={700} cy={760} r={150} />} />
+            <TerraceRings at={3.6} />
           </XG>
         );
       };

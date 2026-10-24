@@ -35,7 +35,7 @@ export type SkyProps = {
   /** Total height of the stepped part above the horizon. Default keeps every step below y 600, so the caption zone
    *  (y 280-570) sits on ONE flat value (style_bible_ref2 8): min(1150, horizon - 600), at least 160. */
   span?: number;
-  /** How far the last band continues below the horizon (default 500). */
+  /** How far the last band continues below the horizon (default 1600: the un-build slab covers the whole frame). */
   below?: number;
   x0?: number;
   x1?: number;
@@ -73,13 +73,13 @@ const BAND_CACHE = new Map<string, string>();
  *  all below y 600, with hand-drawn streak edges. It is the background SLAB of the un-build: the lower (glow) bands
  *  shrink into the horizon with the fills, then the slab collapses downward (its top edge falls from the screen top to
  *  the bottom, from e 0.5, overlapping the last fills). It keeps its colour in the paper / cascade Looks. */
-export const Sky: React.FC<SkyProps> = ({tod, horizon, colors, edges, span: spanIn, below = 500, x0 = WIDE.x0, x1 = WIDE.x1, top: top0 = -4000, wobble = 9, seed = 'sky'}) => {
+export const Sky: React.FC<SkyProps> = ({tod, horizon, colors, edges, span: spanIn, below = 1600, x0 = WIDE.x0, x1 = WIDE.x1, top: top0 = -4000, wobble = 9, seed = 'sky'}) => {
   const p = useTodPal(tod);
   const S = useCineState();
   let top = top0;
   let glowK = 1;
   if (S.e > 0) {
-    const k = E.inCubic(prog(S.e, 0.5, 0.42));
+    const k = E.inQuad(prog(S.e, 0.5, 0.38));
     if (k >= 1) return null;
     // screen y of the falling edge -> this layer's y (layers never rotate much: use the inverse of y only)
     const sy = -60 + (1920 + 120) * k;

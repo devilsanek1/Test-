@@ -62,6 +62,36 @@ const STEP_LIGHT: Record<string, string> = {
 /** One palette step lighter (the dome glass: tan -> sand -> cream -> white, sage -> sky, teal -> sage). */
 export const stepLighter = (c: string): string => (c && c[0] === '#' ? STEP_LIGHT[c.toUpperCase()] ?? c : c);
 
+/** Half palette steps (50/50 mixes of neighbouring tokens, style_bible_ref2 8's haze rule). */
+export const HALF = {
+  cream: '#F9F0E5', // cream -> white
+  sand: '#E6CEB6', // sand -> cream
+  peach: '#F5CCAF', // peach -> cream
+  daySky: '#CCE4D2', // day sky -> mintPale
+  mintPale: '#F5FBF2', // mintPale -> white
+} as const;
+
+const GLASS: Record<string, string> = {
+  [palette.cream.toUpperCase()]: HALF.cream,
+  [palette.sand.toUpperCase()]: HALF.sand,
+  [HALF.sand.toUpperCase()]: HALF.sand,
+  [palette.peach.toUpperCase()]: HALF.peach,
+  [palette.tan.toUpperCase()]: palette.sand,
+  [palette.brown.toUpperCase()]: palette.tan,
+  [palette.sage.toUpperCase()]: '#ACD1BF',
+  ['#ACD1BF']: HALF.daySky,
+  [palette.teal.toUpperCase()]: palette.sage,
+  [palette.tealDark.toUpperCase()]: palette.teal,
+  [palette.mintPale.toUpperCase()]: HALF.mintPale,
+};
+/** The dome glass: one step lighter for the mid / dark tones, HALF a step for the light ones, so nothing behind the glass
+ *  turns paper-white (cream -> #F9F0E5, sand -> #E6CEB6, peach -> #F5CCAF; whites stay white). */
+export const glassStep = (c: string): string => (c && c[0] === '#' ? GLASS[c.toUpperCase()] ?? c : c);
+
+/** Behind glass: every <Fill> inside takes the glassStep (the dome interior). */
+export const Glass: React.FC<{on?: boolean; children?: React.ReactNode}> = ({on = true, children}) =>
+  on ? <TodCtx map={glassStep}>{children}</TodCtx> : <>{children}</>;
+
 /** Lights out: from `at` every <Fill> inside steps one palette step darker (a 1-frame pop; `stagger` > 0 lets the
  *  caller cascade several groups). `on` forces the state (the 'off' end state). */
 export const LightsOut: React.FC<{at?: number; on?: boolean; children?: React.ReactNode}> = ({at, on, children}) => {

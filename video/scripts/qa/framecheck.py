@@ -95,6 +95,21 @@ def text_components(mask, a, kind):
     return keep[lab]
 
 
+def drop_enclosed(t, other, frac=0.5):
+    """Remove components of glyph mask t that sit inside the other tone's glyphs (letter counters, gaps)."""
+    n, lab = cv2.connectedComponents(t.astype(np.uint8), connectivity=8)
+    if n <= 1 or not other.any():
+        return t
+    ring = cv2.dilate(t.astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
+    ring &= ~t
+    owner = cv2.dilate(lab.astype(np.float32), np.ones((5, 5), np.uint8)).astype(np.int64)
+    tot = np.bincount(owner[ring].ravel(), minlength=n)
+    enc = np.bincount(owner[ring & other].ravel(), minlength=n)
+    bad = (tot > 0) & (enc >= frac * np.maximum(tot, 1))
+    bad[0] = False
+    return t & ~bad[lab]
+
+
 def caption_check(img, a, band, thr_low=3.0):
     """Legibility of the caption in the band. Returns None when no caption glyphs are found."""
     y0, y1 = int(round(band[0] * a)), int(round(band[1] * a))
@@ -111,19 +126,51 @@ def caption_check(img, a, band, thr_low=3.0):
     for p in PEACH:
         box |= np.abs(rgb - p).max(axis=2) <= 22
     box = cv2.morphologyEx(box.astype(np.uint8), cv2.MORPH_OPEN, np.ones((3, 3), np.uint8)) > 0
-    res = []
+    # glyph rows: centres between the band top + 0.2 em and the band bottom - 0.45 em (keeps skyline / string-light
+    # rows at the band edge out); line 1 and 2 of a page (and pages scrolling through) live there
+    rows = np.zeros(dark.shape, bool)
+    rows[int(0.2 * em):max(int(0.2 * em) + 1, crop.shape[0] - int(0.45 * em)), :] = True
+    cand = {}
+    allg = {}
     for tone, m in (('dark', dark), ('light', light)):
         t = text_components(m, a, tone)
-        area = int(t.sum())
-        if area < 0.6 * em * em * 0.05 * 3:   # fewer than ~3 letters: no caption of this tone
+        allg[tone] = t            # every glyph-like shape (also a page scrolling in or out at the band edge)
+        n, lab, st, cen = cv2.connectedComponentsWithStats(t.astype(np.uint8), connectivity=8)
+        if n > 1:
+            ok = np.zeros(n, bool)
+            ok[1:] = rows[np.clip(cen[1:, 1].astype(int), 0, rows.shape[0] - 1), 0]
+            t = ok[lab]
+        cand[tone] = t
+    cand['light'] = drop_enclosed(cand['light'], cand['dark'])
+    cand['dark'] = drop_enclosed(cand['dark'], cand['light'])
+    areas = {k: int(v.sum()) for k, v in cand.items()}
+    big = max(areas.values())
+    res = []
+    for tone in ('dark', 'light'):
+        t = cand[tone]
+        area = areas[tone]
+        # a caption = several letters (>= 0.25 em^2 of ink); a minor second tone is art, unless it is a real tone split
+        if area < 0.25 * em * em or area < 0.35 * big:
             continue
         core = cv2.erode(t.astype(np.uint8), np.ones((2, 2), np.uint8)) > 0
         tl = float(np.median(lum[core])) if core.any() else float(np.median(lum[t]))
         r = max(2, int(round(0.3 * em)))
         ring = cv2.dilate(t.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * r + 1, 2 * r + 1))) > 0
-        near = cv2.dilate(t.astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
+        # text = the glyphs plus same-colour fragments touching them or glyph-sized (letters clipped by the caption
+        # window while a page scrolls, anti-aliasing fringes); everything else in the ring is background
+        raw = dark if tone == 'dark' else light
+        nr, lr, sr, _ = cv2.connectedComponentsWithStats(raw.astype(np.uint8), connectivity=8)
+        hit = np.zeros(nr, bool)
+        hit[np.unique(lr[t])] = True
+        small_ = sr[:, cv2.CC_STAT_AREA] <= 0.08 * em * em
+        hit &= sr[:, cv2.CC_STAT_AREA] <= 3 * em * em
+        hit |= small_
+        hit[0] = False
+        text = t | hit[lr] | allg[tone]
+        near = cv2.dilate(text.astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
         boxd = cv2.dilate(box.astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
-        bg = ring & ~near & ~boxd
+        other = cv2.dilate(cand['light' if tone == 'dark' else 'dark'].astype(np.uint8), np.ones((5, 5), np.uint8)) > 0
+        bg = ring & ~near & ~boxd & ~other
         if bg.sum() < 50:
             continue
         c = Q.contrast(lum[bg], tl)
@@ -315,14 +362,18 @@ def main(argv=None):
                     merged[-1][1] = e_
                 else:
                     merged.append([s, e_])
-            for (s, e_) in merged:
-                mx = max(zones[x][z]['new_px'] for x in range(s, e_ + 1))
-                add('ui-zone', 'warning', s, e_, f"new element(s) in the {z} UI zone (largest {mx:.0f} px²): anything important there? "
-                    f"the platform UI covers it", zone=z, px=round(mx))
+            if merged:
+                # one warning per zone: the stretches, biggest first (the bottom zone usually holds moving foreground)
+                st = sorted(merged, key=lambda r: -max(zones[x][z]['new_px'] for x in range(r[0], r[1] + 1)))
+                mx = max(zones[x][z]['new_px'] for x in range(st[0][0], st[0][1] + 1))
+                lst = ', '.join(f"f{s0}-f{e0}" if e0 > s0 else f"f{s0}" for s0, e0 in st[:8]) + (f' (+{len(st) - 8} more)' if len(st) > 8 else '')
+                add('ui-zone', 'warning', st[0][0], st[0][1], f"new elements in the {z} UI zone in {len(st)} stretch(es), largest {mx:.0f} px\u00b2: {lst}. "
+                    f"Is anything important there? The platform UI covers it.", zone=z, px=round(mx), stretches=[[int(s0), int(e0)] for s0, e0 in st])
         rail = np.array([zr.get('rail', {}).get('edges', 0) for zr in zones])
-        for (s, e_) in Q.runs(list(rail > 0.08)):
-            if e_ - s + 1 >= int(0.5 * fps):
-                add('ui-zone', 'warning', s, e_, f"strong edges in the right rail (edge density up to {100 * rail[s:e_ + 1].max():.0f} %): keep key detail left of x 950", zone='rail')
+        rr = [(s, e_) for (s, e_) in Q.runs(list(rail > 0.12)) if e_ - s + 1 >= int(0.5 * fps)]
+        if rr:
+            add('ui-zone', 'warning', rr[0][0], rr[0][1], f"dense detail in the right rail (edge density up to {100 * max(rail[s:e + 1].max() for s, e in rr):.0f} %) "
+                f"in {len(rr)} stretch(es): {', '.join(f'f{s}-f{e}' for s, e in rr[:8])}. Keep key detail left of x 950.", zone='rail')
     issues.sort(key=lambda r: (r['severity'] != 'error', r['f0']))
     errs = sum(1 for r in issues if r['severity'] == 'error')
     warns = len(issues) - errs

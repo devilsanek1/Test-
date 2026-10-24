@@ -15,18 +15,19 @@
 // x / y yourself or pass walk.to), bob (idle px), raisePhoneAt / raiseAt (an arm swings up, 0.3 s).
 
 import React, {useId} from 'react';
-import {palette, stroke} from '../../../lib/theme';
+import {canvas, palette, stroke, world} from '../../../lib/theme';
 import {ease as E, lerp, osc, prog, springAt, springs, useTime} from '../../../lib/time';
 import {rng, rand, Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {Look, ExitFade, useLook} from '../../../lib/exit';
 import {MOTION} from '../../../lib/spec';
-import {Acc, Hair, Person} from '../../../lib/kit';
+import {Acc, Hair, Person, PERSON_BODIES} from '../../../lib/kit';
 import {tinyFigure} from '../../../lib/cine/figures';
 import {PathBuf} from '../../../lib/cine/util';
-import {arc, blob, circle, line, polyPath, rectPath, roundRect, Pt} from '../../../lib/sketch';
-import {mat, XG} from '../../../lib/xf';
+import {arc, blob, circle, line, polyPath, rectPath, roundRect, torso, Pt} from '../../../lib/sketch';
+import {mat, useXf, XG} from '../../../lib/xf';
+import {TodAnchor} from '../../../lib/tod';
 import {Depth, DEPTH_INK} from './common';
 import {SparkleTablet} from './Tablet';
 import {Envelope} from './Envelope';
@@ -39,14 +40,51 @@ const LEG = 62;
 /** Total height of a preset figure at s = 1 (feet to head top), approx. */
 export const FIG_H = 199;
 
-/** The kit Person's random torso width and head radius for a seed (mirrors makeSpec's first two draws when torsoH is
- *  given). Keeps hand-placed extras (arms, caps, belts) on the body. */
+/** The kit Person's random torso width, head radius and shoulder rounding for a seed (mirrors makeSpec's first three
+ *  draws when torsoH is given). Keeps hand-placed extras (arms, caps, belts) on the body. */
 function personGeo(seed: Seed, torsoH = TORSO) {
   const r = rng(`person/${seed}`);
   const w = r.range(86, 100);
   const hr = w * r.range(0.23, 0.26);
+  const round = r.range(0.36, 0.45);
   const hy = -torsoH - hr * 0.86;
-  return {w, hr, hy, h: torsoH, shoulderL: [-w * 0.36, -torsoH * 0.8] as Pt, shoulderR: [w * 0.36, -torsoH * 0.8] as Pt};
+  return {w, hr, hy, h: torsoH, round, shoulderL: [-w * 0.36, -torsoH * 0.8] as Pt, shoulderR: [w * 0.36, -torsoH * 0.8] as Pt};
+}
+type Geo = ReturnType<typeof personGeo>;
+
+/** The coat colour the kit Person picks for a seed when `body` is not given (mirrors makeSpec: w, hr, round, [hair],
+ *  body; accessories are passed explicitly so they draw nothing). */
+function personCoat(seed: Seed, hairGiven: boolean): string {
+  const r = rng(`person/${seed}`);
+  for (let i = 0; i < (hairGiven ? 3 : 4); i++) r.next();
+  return r.pick(PERSON_BODIES);
+}
+
+/** Outline of the kit torso (sketch `torso`, flare 0.07): straight sides from the shoulder curve to the hip. */
+function torsoSides(g: {w: number; h: number; round: number}) {
+  const hw = g.w / 2;
+  const bx = hw * 1.07;
+  const R = Math.min(g.w * g.round, g.h * 0.8);
+  /** |x| of the side at y (valid for y >= -h + R). */
+  const xAt = (y: number) => hw + ((bx - hw) * (y - (-g.h + R))) / (g.h - R);
+  return {hw, bx, R, xAt};
+}
+
+/** A white rim strip (ref 2: 3 px on screen, just inside the outline) along one torso side, a FIXED length from the
+ *  shoulder (so it never moves when a cropped torso is lengthened). Local person units; `px` = local units per screen px. */
+function rimStripD(g: {w: number; h: number; round: number}, side: 1 | -1, W: number, px: number, len: number): string {
+  const {hw, bx, R} = torsoSides(g);
+  const a: Pt = [side * hw, -g.h + R];
+  const b: Pt = [side * bx, 0];
+  const L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+  const dir: Pt = [(b[0] - a[0]) / L, (b[1] - a[1]) / L];
+  const n: Pt = [-side * dir[1], side * dir[0]]; // inward
+  const ins = W / 2 + 0.6 * px;
+  const wpx = 3 * px;
+  const u0 = g.w * 0.1;
+  const u1 = Math.min(L * 0.92, u0 + len);
+  const P = (u: number, o: number): Pt => [a[0] + dir[0] * u + n[0] * o, a[1] + dir[1] * u + n[1] * o];
+  return polyPath([P(u0, ins), P(u1, ins), P(u1, ins + wpx), P(u0, ins + wpx)]);
 }
 
 /** Rise wrapper: children rise `dist` from behind the line y = clipY (in the same coords) over 0.33 s out(exp). */
@@ -150,30 +188,109 @@ export type EdgeOnlookerProps = {
   head?: number;
   seed?: Seed;
   hair?: Hair;
+  /** Accessories of the kit Person ('backpack' is dropped: it scales with the cropped torso; 'phone' = holding it up). */
   acc?: Acc[];
   body?: string;
   riseAt?: number;
   bob?: number;
+  /** The phone arm swings up from the hanging arm (0.3 s, slight overshoot) with a shoulder jolt. */
   raisePhoneAt?: number;
+  /** The phone arm swings back down (0.25 s). */
+  lowerPhoneAt?: number;
+  /** Which arm holds the phone. Default: the side facing the frame centre. */
+  phoneSide?: 'left' | 'right';
+  /** Hanging arms (sleeve seam, cuff, hand): both (default), only the side facing the frame centre, or none. */
+  arms?: 'both' | 'near' | false;
   depth?: Depth;
+  /** White rim strip on this side of the torso (fixed length from the shoulder). Default 'left'. */
   rim?: 'left' | 'right' | false;
+  /** Parent y the coat must run past. Default: the frame bottom + 40 px read from the camera transform every frame
+   *  (never less than world.h + world.bleed in parent units), so the torso always runs off the bottom edge. */
+  frameBottom?: number;
 };
 
-/** Big back-view head + shoulders at a frame side; the torso runs off the bottom of the frame. */
-export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, seed = 'onl', hair, acc, body, riseAt, bob = 1.5, raisePhoneAt, depth = 'front', rim}) => {
+/** Big back-view head + shoulders at a frame side in a long coat that runs off the bottom of the frame (no hem, no legs:
+ *  it can never end inside the frame), arms hanging at the sides (sleeve seam, cuff, sand hand), a white rim strip. */
+export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, seed = 'onl', hair, acc, body, riseAt, bob = 1.5, raisePhoneAt, lowerPhoneAt, phoneSide, arms = 'both', depth = 'front', rim = 'left', frameBottom}) => {
   const t = useTime();
-  const torsoH = 260;
+  const m = useXf();
+  const g0 = personGeo(seed);
+  const s = head / (g0.hr * 2);
+  // where the frame bottom is in parent units (camera zoom / pull-back / sheet cell all included)
+  let yb = frameBottom;
+  if (yb === undefined) {
+    const iv = mat.inv(m);
+    const Y = canvas.height + 40;
+    yb = Math.max(world.h + world.bleed, iv[3] * Y + iv[5], iv[1] * canvas.width + iv[3] * Y + iv[5]);
+  }
+  // torso length so the hip line (coat bottom) sits below it; quantised so the path is not rebuilt every frame
+  const need = (yb + 30 - y) / s - g0.hr * 0.86;
+  const torsoH = Math.min(8000, Math.max(220, Math.ceil(need / 64) * 64));
   const g = personGeo(seed, torsoH);
-  const s = head / (g.hr * 2);
-  const phone = raisePhoneAt !== undefined && t >= raisePhoneAt;
+  const coat = body ?? personCoat(seed, hair !== undefined);
+  const holdPhone = !!acc?.includes('phone');
+  const q = holdPhone ? 1 : raiseQ(t, raisePhoneAt, lowerPhoneAt);
   const jolt = raisePhoneAt !== undefined && t >= raisePhoneAt && t < raisePhoneAt + 0.2 ? -Math.sin(((t - raisePhoneAt) / 0.2) * Math.PI) * 6 : 0;
   const hipY = y - g.hy * s + jolt + (bob ? osc(t, 0.5, rand(seed, 'b') * 6) * bob : 0);
-  const accs: Acc[] = [...(acc ?? []), ...(phone ? (['phone'] as Acc[]) : [])];
+  const accs: Acc[] = (acc ?? []).filter((a) => a !== 'phone' && a !== 'backpack');
   const rise = riseAt !== undefined ? (1 - MOTION.rise.ease(prog(t, riseAt, MOTION.rise.dur))) * head * 2.2 : 0;
   if (riseAt !== undefined && t < riseAt) return null;
+
+  // ---- arms (person-local units: hip line at 0, torso top at -h)
+  const W = DEPTH_INK[depth] / s;
+  const px = 1 / Math.max(1e-4, s * Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2])));
+  const sx = m[0] * x + m[2] * y + m[4];
+  const near: 1 | -1 = sx < canvas.width / 2 ? 1 : -1;
+  const pside: 1 | -1 = phoneSide ? (phoneSide === 'right' ? 1 : -1) : near;
+  const {hw, R, xAt} = torsoSides(g);
+  const d = g.w * 0.18;
+  const yTop = -g.h + R - Math.sqrt(Math.max(0, R * R - (R - d) * (R - d))) + g.w * 0.03;
+  const yCuff = -g.h + g.w * 1.05;
+  const xc = xAt(yCuff);
+  const parts: React.ReactNode[] = [];
+  const sides: (1 | -1)[] = arms === false ? [] : arms === 'near' ? [near] : [-1, 1];
+  for (const sd of sides) {
+    if (sd === pside && q > 0.02) continue; // that arm is up
+    const seam = `M${(sd * (hw - d)).toFixed(2)} ${yTop.toFixed(2)}Q${(sd * (hw - d + g.w * 0.012)).toFixed(2)} ${((yTop + yCuff) / 2).toFixed(2)} ${(sd * (xc - d)).toFixed(2)} ${yCuff.toFixed(2)}`;
+    const cuff = `M${(sd * (xc - 0.5)).toFixed(2)} ${yCuff.toFixed(2)}L${(sd * (xc - d)).toFixed(2)} ${(yCuff + 0.6).toFixed(2)}`;
+    const hand = blob(sd * (xc - d * 0.5), yCuff + g.w * 0.085, g.w * 0.075, g.w * 0.1, {seed: `${seed}/h${sd}`});
+    parts.push(
+      <g key={`arm${sd}`}>
+        <Ink d={seam + cuff} width={W * 0.85} taper={false} seed={`${seed}/seam${sd}`} />
+        <Fill d={hand} color={palette.sand} offset={false} mode="none" seed={`${seed}/hf${sd}`} />
+        <Ink d={hand} width={W * 0.8} taper={false} seed={`${seed}/hi${sd}`} />
+      </g>,
+    );
+  }
+  if (q > 0.02) {
+    // the phone arm swings about the shoulder from hanging to raised (mirrored for the left arm)
+    const sh: Pt = [hw - d * 0.5, -g.h + R * 0.55];
+    const hd: Pt = [xc - d * 0.5, yCuff + g.w * 0.06];
+    const hu: Pt = [g.w * 0.62, g.hy - g.hr * 1.25];
+    const a0 = Math.atan2(hd[1] - sh[1], hd[0] - sh[0]);
+    const a1 = Math.atan2(hu[1] - sh[1], hu[0] - sh[0]);
+    const L = lerp(Math.hypot(hd[0] - sh[0], hd[1] - sh[1]), Math.hypot(hu[0] - sh[0], hu[1] - sh[1]), Math.min(1, q));
+    const a = a0 + (a1 - a0) * q;
+    const hand: Pt = [pside * (sh[0] + Math.cos(a) * L), sh[1] + Math.sin(a) * L];
+    const rot = (pside * (a - a1) * 180) / Math.PI;
+    parts.push(
+      <g key="phoneArm">
+        <Arm sh={[pside * sh[0], sh[1]]} hand={hand} w={d * 1.05} coat={coat} W={W * 0.9} seed={`${seed}/parm`} />
+        <XG m={mat.compose(mat.translate(hand[0], hand[1]), mat.rotate(rot))}>
+          <Fill d={roundRect(-11, -42, 22, 38, 4)} color={palette.card} offset={false} mode="none" seed={`${seed}/ph`} />
+          <Ink d={roundRect(-11, -42, 22, 38, 4, {seed: `${seed}/phi`}) + `M-5 -34H5`} width={W * 0.85} taper={false} seed={`${seed}/phi`} />
+        </XG>
+      </g>,
+    );
+  }
+  const rimD = rim ? rimStripD(g, rim === 'left' ? -1 : 1, W, px, g.w * 2.2) : '';
   return (
     <XG m={mat.translate(0, rise)}>
-      <Person x={x} y={hipY} s={s} seed={seed} hair={hair} acc={accs} body={body} torsoH={torsoH} ink={DEPTH_INK[depth]} hero rim={rim} />
+      <Person x={x} y={hipY} s={s} seed={seed} hair={hair} acc={accs} body={coat} torsoH={torsoH} ink={DEPTH_INK[depth]} hero={false} rim={false} />
+      <XG m={mat.compose(mat.translate(x, hipY), mat.scale(s))}>
+        {rimD ? <Fill d={rimD} color={palette.white} offset={false} mode="none" seed={`${seed}/rim`} /> : null}
+        {parts}
+      </XG>
     </XG>
   );
 };
@@ -288,7 +405,8 @@ export type MakerProps = FigBase & {
   work?: number;
 };
 
-/** Maker in a teal shirt with a cream apron (back view: cream straps crossing, a bow at the waist, apron edges). */
+/** Maker in a teal shirt with a cream apron (back view: cream Y straps, a bow at the waist, apron edges). No caps (the
+ *  kit cap from behind can read as a face at small sizes). */
 export const Maker: React.FC<MakerProps> = (p) => {
   const t = useTime();
   const seed = p.seed ?? 'maker';
@@ -299,12 +417,15 @@ export const Maker: React.FC<MakerProps> = (p) => {
   const nod = p.work ? osc(t, p.work, rand(seed, 'w') * 6) * 2.5 : 0;
   const hw = g.w / 2;
   const wy = -g.h * 0.12;
-  const straps = `M${-hw * 0.42} ${-g.h * 0.98}L${hw * 0.52} ${wy}M${hw * 0.42} ${-g.h * 0.98}L${-hw * 0.52} ${wy}`;
+  // Y straps (two from the shoulders meet mid-back, one runs down to the bow): crossed X straps read as a figure
+  // being crossed out at small sizes (review 4)
+  const yj = -g.h * 0.52;
+  const straps = `M${-hw * 0.46} ${-g.h * 0.98}L0 ${yj}M${hw * 0.46} ${-g.h * 0.98}L0 ${yj}L0 ${wy - 4}`;
   const bow = `M0 ${wy}q-12 -10 -14 0q2 9 14 0q12 -10 14 0q-2 9 -14 0M-3 ${wy + 2}l-6 14M3 ${wy + 2}l6 14`;
   return (
     <FigFrame b={p} s={s} feetBelowHip={p.bust ? 0 : LEG}>
       <XG m={mat.translate(0, nod)}>
-        <Person seed={seed} legs={!p.bust} torsoH={TORSO} legH={LEG} body={palette.teal} hair={rng(`mk/${seed}`).pick<Hair>(['short', 'bun', 'cap', 'curly'])} acc={[]} ink={W} walk={walking ? p.walk?.hz ?? 1.8 : undefined} />
+        <Person seed={seed} legs={!p.bust} torsoH={TORSO} legH={LEG} body={palette.teal} hair={rng(`mk/${seed}`).pick<Hair>(['short', 'bun', 'curly', 'short'])} acc={[]} ink={W} walk={walking ? p.walk?.hz ?? 1.8 : undefined} />
         <Fill d={polyPath([[-hw * 1.02, wy - 6], [-hw * 0.82, wy - 6], [-hw * 0.84, 0], [-hw * 1.07, 0]]) + polyPath([[hw * 1.02, wy - 6], [hw * 0.82, wy - 6], [hw * 0.84, 0], [hw * 1.07, 0]])} color={palette.cream} offset={false} mode="none" seed={`${seed}/ap`} />
         <Ink d={straps} width={W * 1.7} color={palette.ink} taper={false} seed={`${seed}/st0`} />
         <Ink d={straps} width={W * 0.9} color={palette.cream} taper={false} seed={`${seed}/st1`} />
@@ -312,6 +433,99 @@ export const Maker: React.FC<MakerProps> = (p) => {
         <Ink d={bow} width={W * 0.7} seed={`${seed}/bow`} />
       </XG>
     </FigFrame>
+  );
+};
+
+// ---------------------------------------------------------------- BackBody (Keeper, Caretaker)
+
+/** Head centre of a BackBody: higher than the kit Person's, so a neck block shows between the head and the collar. */
+const backHeadY = (g: Geo) => -g.h - g.hr * 1.5;
+/** Feet to cap top of a BackBody at s = 1 (the presets scale `h` by this, so `h` is the true height). */
+const backFigH = (g: Geo) => LEG + g.h + g.hr * 2.6;
+/** One palette step darker (collar bands). */
+const darker = (c: string) =>
+  c === palette.sand ? palette.tan : c === palette.teal ? palette.tealDark : c === palette.cream ? palette.sand : c === palette.sage ? palette.teal : c === palette.tan ? palette.brown : palette.tealDark;
+
+type BackBodyProps = {g: Geo; seed: string; coat: string; legs: string; shoes?: string; hair?: string; cap?: string | false; W: number; walk?: number; detail?: boolean};
+
+/** A back-view figure built here instead of the kit Person when it wears a cap (style bible 6, closeup_board_people):
+ *  the head circle IS the hair colour with sand ears at mid-height, the cap sits ON TOP (crown over the top ~45 %, the
+ *  band line just above the middle with the small strap arch on it, a button), a sand neck block shows under the head,
+ *  a coat collar band with its collar line sits on the shoulders. No skin-coloured crown and no dark crescent low on the head, so it never reads as
+ *  a face (review 4). Person-local units: hip line at 0, the same w / h / hr / round as personGeo (arms, belts fit). */
+const BackBody: React.FC<BackBodyProps> = ({g, seed, coat, legs, shoes = palette.tealDark, hair = palette.brown, cap, W, walk, detail = true}) => {
+  const t = useTime();
+  const {w, h, hr} = g;
+  const hy = backHeadY(g);
+  const lw = w * 0.31;
+  const gp = w * 0.05;
+  let lL = 0;
+  let lR = 0;
+  let bob = 0;
+  if (walk) {
+    const ph = t * walk * Math.PI + rand(seed, 'wph') * 6.28;
+    lL = Math.max(0, Math.sin(ph)) * LEG * 0.16;
+    lR = Math.max(0, -Math.sin(ph)) * LEG * 0.16;
+    bob = -Math.abs(Math.sin(ph)) * LEG * 0.035;
+  }
+  const f = (v: number) => v.toFixed(2);
+  const legsD = rectPath(-gp - lw, -2, lw, LEG - lL) + rectPath(gp, -2, lw, LEG - lR);
+  const shoesD = rectPath(-gp - lw - 1, LEG - lL - 12, lw + 3, 14) + rectPath(gp - 2, LEG - lR - 12, lw + 3, 14);
+  const legInk = `M${f(-gp - lw)} 0V${f(LEG - lL)}M${f(-gp)} 0V${f(LEG - 2 - lL)}M${f(gp)} 0V${f(LEG - 2 - lR)}M${f(gp + lw)} 0V${f(LEG - lR)}`;
+  const torsoD = torso(0, 0, w, h, g.round, 0.07);
+  // neck block (sand) from inside the head down into the collar; ink on its two sides
+  const neckD = rectPath(-hr * 0.45, hy + hr * 0.55, hr * 0.9, -h + hr * 0.3 - (hy + hr * 0.55));
+  const neckInk = `M${f(-hr * 0.45)} ${f(hy + hr * 0.9)}V${f(-h - hr * 0.12)}M${f(hr * 0.45)} ${f(hy + hr * 0.9)}V${f(-h - hr * 0.12)}`;
+  // collar band on the shoulders: top edge round the neck, the collar line below
+  const ct = -h - hr * 0.16;
+  const collarTop = `M${f(-hr * 0.68)} ${f(ct)}Q0 ${f(-h + hr * 0.06)} ${f(hr * 0.68)} ${f(ct)}`;
+  const collarD = collarTop + `L${f(hr * 1.14)} ${f(-h + hr * 0.38)}Q0 ${f(-h + hr * 0.8)} ${f(-hr * 1.14)} ${f(-h + hr * 0.38)}Z`;
+  const collarInk = collarTop + `M${f(-hr * 0.68)} ${f(ct)}L${f(-hr * 1.14)} ${f(-h + hr * 0.38)}Q0 ${f(-h + hr * 0.8)} ${f(hr * 1.14)} ${f(-h + hr * 0.38)}L${f(hr * 0.68)} ${f(ct)}`;
+  // head (hair colour) + ears at mid-height
+  const ey = hy + hr * 0.12;
+  const ears = blob(-hr * 0.98, ey, hr * 0.2, hr * 0.3, {seed: `${seed}/e1`}) + blob(hr * 0.98, ey, hr * 0.2, hr * 0.3, {seed: `${seed}/e2`});
+  const earInk = arc(-hr * 0.98, ey, hr * 0.2, hr * 0.3, 95, 265, {seed: `${seed}/ei1`}) + arc(hr * 0.98, ey, hr * 0.2, hr * 0.3, -85, 85, {seed: `${seed}/ei2`});
+  const headD = blob(0, hy, hr, hr, {seed: `${seed}/head`});
+  const headInk = circle(0, hy, hr, {seed: `${seed}/head`, overlap: 18});
+  // cap (ref 1 line-art row): crown over the top ~45 % of the head, its band line just above the middle with the small
+  // strap arch sitting ON the band (hair colour inside), a button on top; the head below the band stays hair colour
+  const by = hy - hr * 0.1;
+  const R2 = hr * 1.04;
+  const cw = Math.sqrt(Math.max(0, R2 * R2 - (by - hy) * (by - hy)));
+  const crownD = `M${f(-cw)} ${f(by)}A${f(R2)} ${f(R2)} 0 1 1 ${f(cw)} ${f(by)}Q0 ${f(by + hr * 0.06)} ${f(-cw)} ${f(by)}Z`;
+  const crownInk = `M${f(-cw)} ${f(by)}A${f(R2)} ${f(R2)} 0 1 1 ${f(cw)} ${f(by)}Q0 ${f(by + hr * 0.06)} ${f(-cw)} ${f(by)}`;
+  const archD = `M${f(-hr * 0.28)} ${f(by + hr * 0.02)}A${f(hr * 0.28)} ${f(hr * 0.24)} 0 0 1 ${f(hr * 0.28)} ${f(by + hr * 0.02)}Z`;
+  const archInk = arc(0, by + hr * 0.02, hr * 0.28, hr * 0.24, 180, 360, {seed: `${seed}/arch`});
+  const strands = `M${f(-hr * 0.42)} ${f(hy - hr * 0.55)}Q${f(-hr * 0.5)} ${f(hy + hr * 0.1)} ${f(-hr * 0.36)} ${f(hy + hr * 0.72)}M${f(hr * 0.06)} ${f(hy - hr * 0.7)}Q${f(-hr * 0.02)} ${f(hy)} ${f(hr * 0.08)} ${f(hy + hr * 0.8)}M${f(hr * 0.46)} ${f(hy - hr * 0.5)}Q${f(hr * 0.56)} ${f(hy + hr * 0.1)} ${f(hr * 0.42)} ${f(hy + hr * 0.66)}`;
+  return (
+    <TodAnchor at={[0, -h * 0.5]}>
+      <XG m={mat.translate(0, bob)}>
+        <Fill d={legsD} color={legs} offset={false} mode="none" seed={`${seed}/legs`} />
+        <Fill d={shoesD} color={shoes} offset={false} mode="none" seed={`${seed}/shoes`} />
+        <Ink d={legInk} width={W * 0.9} seed={`${seed}/legI`} />
+        <Fill d={neckD} color={palette.sand} offset={false} mode="none" seed={`${seed}/neck`} />
+        {detail ? <Ink d={neckInk} width={W * 0.7} taper={false} seed={`${seed}/neckI`} /> : null}
+        <Fill d={ears} color={palette.sand} offset={false} mode="none" seed={`${seed}/ear`} />
+        <Ink d={earInk} width={W * 0.85} order="all" seed={`${seed}/earI`} />
+        <Fill d={torsoD} color={coat} seed={`${seed}/torso`} />
+        <Ink d={torsoD} width={W} seed={`${seed}/torsoI`} />
+        <Fill d={collarD} color={darker(coat)} offset={false} mode="none" seed={`${seed}/collar`} />
+        <Ink d={collarInk} width={W * 0.8} taper={false} seed={`${seed}/collarI`} />
+        <Fill d={headD} color={hair} seed={`${seed}/headF`} />
+        <Ink d={headInk} width={W} open={0.1} seed={`${seed}/headI`} />
+        {cap ? (
+          <>
+            <Fill d={crownD} color={cap} offset={false} mode="none" seed={`${seed}/crown`} />
+            {detail ? <Fill d={archD} color={hair} offset={false} mode="none" seed={`${seed}/arch`} /> : null}
+            <Ink d={crownInk} width={W * 0.85} seed={`${seed}/capI`} />
+            {detail ? <Ink d={archInk} width={W * 0.7} taper={false} seed={`${seed}/archI`} /> : null}
+            {detail ? <Ink d={circle(0, hy - R2 + hr * 0.04, hr * 0.12, {seed: `${seed}/btn`})} width={W * 0.7} seed={`${seed}/btn`} /> : null}
+          </>
+        ) : detail ? (
+          <Ink d={strands} width={W * 0.7} order="all" seed={`${seed}/strands`} />
+        ) : null}
+      </XG>
+    </TodAnchor>
   );
 };
 
@@ -327,9 +541,12 @@ export type KeeperProps = FigBase & {
   installDur?: number;
   /** Climb a zig-zag stair: steps of (run, rise) world px, one per stepDur, starting at climb.at. */
   climb?: {at: number; steps: number; run: number; rise: number; stepDur?: number};
+  /** Cap colour (default teal) or false for bare hair; hair colour (default ochre). */
+  cap?: string | false;
+  hair?: string;
 };
 
-/** Site keeper (NOT a maker): sand coat, teal trousers, ochre tool belt with a hammer and a pouch. */
+/** Site keeper (NOT a maker): sand coat with a tan collar, teal cap, teal trousers, ochre tool belt (hammer, pouch). */
 export const Keeper: React.FC<KeeperProps> = (p) => {
   const t = useTime();
   const seed = p.seed ?? 'keeper';
@@ -345,8 +562,8 @@ export const Keeper: React.FC<KeeperProps> = (p) => {
     b = {...p, x: p.x + n * p.climb.run, y: p.y - n * p.climb.rise - hop};
   }
   if (p.h < 30) return <Citizen {...b} silhouette color={palette.sand} />;
-  const s = p.h / FIG_H;
   const g = personGeo(seed);
+  const s = p.h / backFigH(g);
   const W = inkFor(p.h, p.depth) / s;
   const q = raiseQ(t, p.reachAt, p.lowerAt);
   const work = p.installAt !== undefined && t >= p.installAt && t < p.installAt + (p.installDur ?? 0.6) ? Math.sin((t - p.installAt) * 40) * 4 : 0;
@@ -354,10 +571,10 @@ export const Keeper: React.FC<KeeperProps> = (p) => {
   const hand: Pt = [lerp(g.w * 0.5, g.w * 0.66, q) + work, lerp(-g.h * 0.05, -g.h * 1.18, q)];
   const hw = g.w / 2;
   const by = -g.h * 0.2;
-  const walking = walkPos(t, b).walking;
+  const walking = walkPos(t, b).walking || (!!p.climb && t >= p.climb.at && t < p.climb.at + p.climb.steps * (p.climb.stepDur ?? 0.35));
   return (
     <FigFrame b={b} s={s}>
-      <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={palette.sand} legsColor={palette.teal} hair={rng(`kp/${seed}`).pick<Hair>(['short', 'cap', 'curly'])} acc={[]} ink={W} walk={walking || (p.climb && t >= p.climb.at && t < p.climb.at + p.climb.steps * (p.climb.stepDur ?? 0.35)) ? p.walk?.hz ?? 2.2 : undefined} />
+      <BackBody g={g} seed={String(seed)} coat={palette.sand} legs={palette.teal} cap={p.cap ?? palette.teal} hair={p.hair} W={W} walk={walking ? p.walk?.hz ?? 2.2 : undefined} detail={p.h >= 60} />
       <Fill d={rectPath(-hw * 1.04, by, hw * 2.08, 12)} color={palette.brown} offset={false} mode="none" seed={`${seed}/belt`} />
       <Fill d={roundRect(-hw * 0.7, by + 8, 20, 22, 4)} color={palette.tan} offset={false} mode="none" seed={`${seed}/pouch`} />
       <Ink d={`M${-hw * 1.04} ${by}H${hw * 1.04}M${-hw * 1.04} ${by + 12}H${hw * 1.04}` + `M${-hw * 0.7} ${by + 8}h20v22h-20Z` + `M${hw * 0.55} ${by + 6}l6 34M${hw * 0.45} ${by + 38}h22`} width={W * 0.8} taper={false} seed={`${seed}/beltI`} />
@@ -373,27 +590,32 @@ export const Keeper: React.FC<KeeperProps> = (p) => {
 
 // ---------------------------------------------------------------- Caretaker (S13)
 
-export type CaretakerProps = FigBase & {raiseKeysAt?: number; lowerAt?: number; jingleAt?: number | number[]; glintAt?: number; ring?: number};
+export type CaretakerProps = FigBase & {
+  raiseKeysAt?: number;
+  lowerAt?: number;
+  jingleAt?: number | number[];
+  glintAt?: number;
+  ring?: number;
+  /** Cap colour (default sage) or false; hair colour (default ochre). */
+  cap?: string | false;
+  hair?: string;
+};
 
-/** The hosting company's caretaker: teal coat, cream cap, a big key ring (r 22) with sand keys held up. */
+/** The hosting company's caretaker: teal coat with a dark collar, sage cap, a big key ring (r 22) with sand keys. */
 export const Caretaker: React.FC<CaretakerProps> = (p) => {
   const t = useTime();
   const seed = p.seed ?? 'care';
-  const s = p.h / FIG_H;
   const g = personGeo(seed);
+  const s = p.h / backFigH(g);
   const W = inkFor(p.h, p.depth) / s;
   const q = raiseQ(t, p.raiseKeysAt, p.lowerAt);
   const sh: Pt = [g.w * 0.34, -g.h * 0.8];
-  const hand: Pt = [lerp(g.w * 0.5, g.w * 0.68, q), lerp(-g.h * 0.05, g.hy - g.hr * 1.2, q)];
+  const hand: Pt = [lerp(g.w * 0.5, g.w * 0.68, q), lerp(-g.h * 0.05, backHeadY(g) - g.hr * 1.2, q)];
   const R = (p.ring ?? 22) / s;
   const jingles = p.jingleAt === undefined ? [] : Array.isArray(p.jingleAt) ? p.jingleAt : [p.jingleAt];
   let jig = osc(t, 1.1, 1) * 4;
   for (const j of jingles) if (t >= j && t < j + 0.6) jig += 16 * Math.exp(-(t - j) * 6) * Math.sin((t - j) * 34);
   const glint = p.glintAt !== undefined && t >= p.glintAt && t < p.glintAt + 0.22;
-  // cream cap (Person's cap geometry, our colour)
-  const capBy = g.hy + g.hr * 0.42;
-  const cw = Math.sqrt(Math.max(0, 1.03 * 1.03 - 0.42 * 0.42)) * g.hr;
-  const cap = `M${-cw} ${capBy}A${g.hr * 1.03} ${g.hr * 1.03} 0 1 1 ${cw} ${capBy}Z`;
   const walking = walkPos(t, p).walking;
   const keys = [-35, 10, 55].map((a, i) => {
     const ang = ((90 + a + jig * (i % 2 ? -0.6 : 1)) * Math.PI) / 180;
@@ -406,9 +628,7 @@ export const Caretaker: React.FC<CaretakerProps> = (p) => {
   });
   return (
     <FigFrame b={p} s={s}>
-      <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={palette.teal} hair="short" acc={['collar']} ink={W} walk={walking ? p.walk?.hz ?? 1.8 : undefined} />
-      <Fill d={cap} color={palette.cream} offset={false} mode="none" seed={`${seed}/cap`} />
-      <Ink d={`M${-cw} ${capBy}A${g.hr * 1.03} ${g.hr * 1.03} 0 1 1 ${cw} ${capBy}L${-cw} ${capBy}` + arc(0, capBy, g.hr * 0.3, g.hr * 0.26, 180, 360, {seed: `${seed}/op`})} width={W * 0.85} seed={`${seed}/capI`} />
+      <BackBody g={g} seed={String(seed)} coat={palette.teal} legs={palette.brown} cap={p.cap ?? palette.sage} hair={p.hair} W={W} walk={walking ? p.walk?.hz ?? 1.8 : undefined} detail={p.h >= 60} />
       {q > 0.02 ? (
         <>
           <Arm sh={sh} hand={hand} coat={palette.teal} W={W * 0.85} seed={`${seed}/arm`} />

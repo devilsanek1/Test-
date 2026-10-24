@@ -61,8 +61,8 @@ cam.height(1500)                 // px tall for feet at y 1500: (1500 - 768) / 1
 // set dressing in person-heights at its feet line: a door 1.2, a house eave 1.1-1.4, a palm 5-8, a car 0.85 tall
 ```
 
-Check a still: `measureEye(feetY, headTopY, horizon)` = camera / person height, **target 1.0-1.2** (KitDemo v3:
-1.05 / 1.05 / 0.97 before the hair calibration; nominal 1.1). Peaks may go lower (worm's eye: heads above the horizon)
+Check a still: `measureEye(feetY, headTopY, horizon)` = camera / person height, **target 1.0-1.2** (KitDemo v3 at
+4.4 s: walkers 1.06 / 1.08 (1.04 to the top of the bun), nearest queue adult 1.04 (a tall jitter); nominal 1.1). Peaks may go lower (worm's eye: heads above the horizon)
 but never higher than ~1.3. The reference figure is `src/dev/KitDemo.tsx` (section 10).
 
 Current values (always reference the TOKEN in code, never the literal):
@@ -282,7 +282,7 @@ Outgoing and incoming scenes keep rendering through overlaps (they hold their en
 
 Reference figure (`src/dev/KitDemo.tsx` v3, copy its CAMERA block): an EYE-LEVEL street (lens 1.1 x person height,
 horizon world.horizon): every head in the band just under the horizon, a queue converging on the horizon line
-(`Crowd eye`), two hero walkers (0.30-0.34 H) and a passer-by cut by the left edge and the frame bottom, the mascot at
+(`Crowd eye`), two hero walkers (0.36 / 0.34 H, heads at y ~815) and a passer-by cut by the left edge and the frame bottom, the mascot at
 the walkers' feet, a huge low sun flanked by far palms, a far skyline under the caption band, single-storey houses
 (left) and a long low row behind a picket fence (right) on receding planes, string lights, corner fronds,
 day → dusk → night (per-object relight), and an un-build that loops mid-motion.

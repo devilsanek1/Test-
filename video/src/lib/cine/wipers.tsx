@@ -184,9 +184,9 @@ const PasserWiperFC: React.FC<PasserWiperProps> = ({x, p, dir, color = palette.t
           <path d={g.outline} />
         </clipPath>
       </defs>
-      {/* fills misregistered (3, 4) px from the ink; inside the outline the body is shifted 8 px to the trailing side,
-          so the rim colour shows as a sliver along the leading edge only */}
-      <g transform="translate(-3 4)">
+      {/* fills misregistered 3 px toward the trailing side (+4 down) from the ink; inside the outline the body is shifted
+          a further 8 px to the trailing side, so the rim colour shows as an ~8 px sliver inside the leading edge only */}
+      <g transform={`translate(${-lead * 3} 4)`}>
         <g clipPath={`url(#${id})`}>
           <path d={g.outline} fill={rim} />
           <g transform={`translate(${-lead * 8} 1)`}>

@@ -426,9 +426,10 @@ export type WindowCloseupProps = {
   curtainAt?: number;
   /** The room light flickers off for two frames at these times (on a stressed word). */
   flickerAt?: number[];
-  /** Level of detail (pick it from the glass's SCREEN width): 'full' (>= ~60 px: room, person, desk, lamp, chair, plant,
-   *  frame band, glints), 'room' (~30-60 px: room colours, curtain and transom only), 'glass' (< ~30 px: one flat pane
-   *  in `litColor` / `darkColor`, pixel-identical to a WallOfWindows grid pane). Default 'full'. */
+  /** Level of detail (pick it from the glass's SCREEN width; jitter the thresholds per cell so no step lands on every
+   *  cell in one frame): 'full' (>= ~75 px: room, person, desk, lamp, chair, plant, frame band, glints), 'room' (~48-75 px:
+   *  the flat room colour, curtain and transom only), 'glass' (smaller: one flat pane in `litColor` / `darkColor`,
+   *  pixel-identical to a WallOfWindows grid pane, so swapping it for the grid is invisible). Default 'full'. */
   detail?: 'full' | 'room' | 'glass';
   /** Room colour when lit / unlit (default peach / the tod's tealDark). Pass the grid's pane colours for this cell
    *  (litColors[floor(k3 * n)], windowDark) so a close-up and its grid pane match exactly. */
@@ -502,7 +503,7 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod,
       {/* frame band + interior */}
       {full ? <rect x={-fr} y={-fr} width={w + fr * 2} height={h + fr * 2} fill={frameC} /> : null}
       <rect x={0} y={0} width={w} height={h} fill={room} />
-      <rect x={0} y={deskY} width={w} height={h - deskY} fill={roomDark} />
+      {full ? <rect x={0} y={deskY} width={w} height={h - deskY} fill={roomDark} /> : null}
       {on && full ? <Glow cx={lampX} cy={h * 0.21} r={30} rings={3} spread={2.6} color={palette.cream} opacity={0.32} /> : null}
       {full ? <path d={`M${lampX} 0L${lampX} ${h * 0.14}`} stroke={palette.ink} strokeWidth={2.2} /> : null}
       {full ? <path d={lamp} fill={on ? palette.cream : ambient(palette.teal, p)} /> : null}

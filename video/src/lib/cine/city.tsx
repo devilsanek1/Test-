@@ -235,6 +235,9 @@ function buildRow(p: RowParams): RowGeo {
       tiers.push([bx + ww * 0.1, base - hP - hS, ww * 0.8, hS]);
       tiers.push([bx + ww * 0.22, base - hP - hS - hT, ww * 0.56, hT]);
       tiers.push([bx + ww * 0.33, top + b.h * 0.0, ww * 0.34, b.h - hP - hS - hT]);
+      // two vertical fins down the shaft and a setback ledge (fill-only, one value step darker)
+      for (const f of [0.34, 0.63]) SH.rect(bx + ww * 0.1 + ww * 0.8 * f + ox, base - hP - hS + oy, Math.max(1.5, ww * 0.025), hS);
+      BA.rect(bx + ww * 0.1 + ox, base - hP - hS + oy, ww * 0.8, Math.max(2, b.h * 0.006));
     } else if (b.kind === 'step') {
       const hA = b.h * br.range(0.55, 0.68);
       const hB = b.h * br.range(0.2, 0.28);
@@ -487,7 +490,8 @@ function buildRow(p: RowParams): RowGeo {
       const rr = gr.range(9, 18) * s;
       const n = gr.int(2, 3);
       for (let k = 0; k < n; k++) trees.circle(tx + (k - (n - 1) / 2) * rr * 1.1 + gr.jitter(rr * 0.2), base - rr * gr.range(0.55, 0.95), rr * gr.range(0.8, 1.1));
-      if ((p.ink ?? 0) > 0) treeInk.raw(`M${r1(tx - rr * n * 0.6)} ${r1(base - rr * 0.2)}Q${r1(tx)} ${r1(base - rr * 2.1)} ${r1(tx + rr * n * 0.6)} ${r1(base - rr * 0.2)}`);
+      // a couple of crown ticks on near rows (reference tree crowns: short curved strokes inside the clump)
+      if ((p.ink ?? 0) > 0 && s >= 0.5) treeInk.raw(`M${r1(tx - rr * 0.4)} ${r1(base - rr * 0.9)}q${r1(rr * 0.2)} ${r1(rr * 0.25)} ${r1(rr * 0.45)} 0`);
     }
     const step = 44 * s;
     for (const [dy, ph] of [[5 * s, 0], [30 * s, 0.5]] as [number, number][]) {
@@ -626,7 +630,7 @@ export const Skyline: React.FC<SkylineProps> = ({seed = 'sky', depth = 0, tod, c
       ink = ink && t >= t0 + starts.per * 0.45; // ink lands a beat after the fill
     }
     if (S.e > 0) {
-      const sz = Math.min(rowSize, screenSize(S.m, b.w, b.base - b.top));
+      const sz = Math.min(0.7, rowSize, screenSize(S.m, b.w, b.base - b.top));
       k *= exitScale(S.e, b.j, sz);
       ink = ink && !inkGone(S.e, b.j);
     }
@@ -648,7 +652,8 @@ export const Skyline: React.FC<SkylineProps> = ({seed = 'sky', depth = 0, tod, c
   const out: React.ReactNode[] = [];
   // the low city mass under a row: the row's own darkest facade paint (never a deeper invented step)
   const massPaint = lookPaint(S, massColor ?? atmos(p.facade[Math.min(1, p.facade.length - 1)], depth, p), [540, row.base]);
-  const massK = (S.e > 0 ? exitScale(S.e, 0.5, rowSize) : 1) * (starts && t < Math.min(...starts.st) ? 0 : 1);
+  // the row mass goes with the fills (capped below the slab size: only the Sky is the slab)
+  const massK = (S.e > 0 ? exitScale(S.e, 0.5, Math.min(0.7, rowSize)) : 1) * (starts && t < Math.min(...starts.st) ? 0 : 1);
   if (massPaint !== 'none' && massK > 0) out.push(<path key="mass" d={geo.mass} fill={massPaint} transform={massK < 1 ? `translate(0 ${r1(row.base * (1 - massK))}) scale(1 ${massK.toFixed(4)})` : undefined} />);
 
   const drawBatch = (b: Batch, key: string, paper: boolean, ink: boolean) => {

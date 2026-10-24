@@ -47,7 +47,7 @@ PASS_SCORE = 8.0
 
 # ---------------------------------------------------------------- analysis
 
-def analyze(src: Q.FrameSource, opt: dict, band=(280, 600), progress=True):
+def analyze(src: Q.FrameSource, opt: dict, band=(280, 600), progress=True, dump=None):
     """Per-frame life energy, caption-band energy, camera, cut signals, and space-time events."""
     a = src.a
     aw, ah = src.aw, src.ah
@@ -60,8 +60,9 @@ def analyze(src: Q.FrameSource, opt: dict, band=(280, 600), progress=True):
     cam = Q.Camera(aw, ah, feat_mask)
     px_area = 1.0 / (a * a)                     # canvas px^2 per analysis px
     min_px = max(1, int(math.ceil(opt['min_blob'] * a * a)))
-    life_tr = Q.EventTracker(link=max(1, int(round(opt['event_link'] * a))), merge=int(round(opt['event_merge'] * a)))
-    cap_tr = Q.EventTracker(link=max(1, int(round(opt['event_link'] * a))), merge=int(round(opt['event_merge'] * a)))
+    tk = dict(link=max(1, int(round(opt['event_link'] * a))), merge=int(round(opt['event_merge'] * a)), hold=int(opt['event_hold']))
+    life_tr = Q.EventTracker(**tk)
+    cap_tr = Q.EventTracker(**tk)
     rows = []
     hist = deque(maxlen=5)                       # (img, grad, edges, M from previous frame): the 4-frame baseline
     prev = prev_feats = prev_e = prev_g = None
@@ -83,6 +84,8 @@ def analyze(src: Q.FrameSource, opt: dict, band=(280, 600), progress=True):
             ch = res.changed & outside
             m, lab, stats, n = Q.drop_small(ch, min_px)
             life_tr.add(i, m, px_area, a)
+            if dump is not None:
+                dump.append((i, np.packbits(m)))
             row['life'] = float(m.sum()) * px_area
             row['blobs'] = n
             cb = res.changed & band_mask
@@ -231,28 +234,31 @@ C = dict(surface='#fcfcfb', text='#0b0b0b', text2='#52514e', muted='#8a897f', gr
 
 
 def chart(path, rows, scenes, dead, trans, events, fps, opt, title, t0):
+    """Small multiples, one panel per scene: life energy per frame (log), green alive / red dead / blue excused
+    (inside a transition), pink band = flagged dead run, ticks = event onsets, grey line = caption-band change."""
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
-    from matplotlib.patches import Patch
     from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
 
     life = np.array([r['life'] for r in rows], float)
     life = np.where(np.isnan(life), np.nanmax(life) if np.isfinite(life).any() else 1, life)
     band = np.array([r['band'] for r in rows], float)
     ns = len(scenes)
-    ncol = 1 if ns <= 4 else 2
+    ncol = 1 if ns <= 3 else 2
     nrow = int(math.ceil(ns / ncol))
-    fig_h = 1.15 + 1.55 * nrow
-    fig, axes = plt.subplots(nrow, ncol, figsize=(7.2 * ncol, fig_h), squeeze=False, facecolor=C['surface'])
+    W = max(9.6, 7.4 * ncol)
+    ph, top_in, bot_in = 1.62, 1.1, 0.62
+    H = top_in + bot_in + ph * nrow
+    fig = plt.figure(figsize=(W, H), facecolor=C['surface'])
+    gs = fig.add_gridspec(nrow, ncol, left=0.06 if ncol > 1 else 0.085, right=0.985, top=1 - top_in / H, bottom=bot_in / H,
+                          hspace=0.95, wspace=0.12)
     floor = 10.0
-    ymax = max(opt['dead_px'] * 50, float(np.nanmax(life)) * 1.5 if len(life) else 1)
-    for k in range(nrow * ncol):
-        ax = axes[k % nrow][k // nrow] if ncol > 1 else axes[k][0]
+    ymax = max(opt['dead_px'] * 60, float(np.nanmax(life)) * 2.0 if len(life) else 1)
+    for k in range(ns):
+        ax = fig.add_subplot(gs[k % nrow, k // nrow]) if ncol > 1 else fig.add_subplot(gs[k, 0])
         ax.set_facecolor(C['surface'])
-        if k >= ns:
-            ax.axis('off')
-            continue
         sc = scenes[k]
         f0, f1 = sc['f0'], sc['f1'] + 1
         x = np.arange(f0, f1) - f0
@@ -262,14 +268,15 @@ def chart(path, rows, scenes, dead, trans, events, fps, opt, title, t0):
         for r in sc['dead_runs']:
             if r['flagged']:
                 ax.axvspan(r['local_f0'] - 0.5, r['local_f1'] + 0.5, color=C['flag'], zorder=0, lw=0)
-        cols = np.where(tt & dd, C['trans'], np.where(dd, C['critical'], C['good']))
-        ax.bar(x, lv, width=0.82, color=cols, bottom=0, zorder=2, linewidth=0)
+        rawdead = np.array([rows[i]['life'] < opt['dead_px'] if np.isfinite(rows[i]['life']) else False for i in range(f0, f1)])
+        cols = np.where(tt & rawdead, C['trans'], np.where(dd, C['critical'], C['good']))
+        ax.bar(x, lv, width=0.85 if len(x) < 400 else 1.0, color=cols, zorder=2, linewidth=0)
         bv = np.where(band[f0:f1] > 0, np.maximum(band[f0:f1], floor), np.nan)
         ax.plot(x, bv, color=C['band'], lw=0.8, zorder=3)
         ax.axhline(opt['dead_px'], color=C['text2'], lw=0.8, ls=(0, (3, 2)), zorder=4)
-        for e in events:
-            if f0 <= e['onset'] < f1:
-                ax.plot([e['onset'] - f0] * 2, [ymax * 0.55, ymax * 0.95], color=C['text2'], lw=0.7, zorder=4)
+        on = [e['onset'] - f0 for e in events if f0 <= e['onset'] < f1]
+        if on:
+            ax.vlines(on, ymax * 0.5, ymax * 0.95, color=C['text2'], lw=0.7, zorder=4)
         ax.set_yscale('log')
         ax.set_ylim(floor, ymax)
         ax.set_xlim(-1, max(1, f1 - f0))
@@ -281,31 +288,37 @@ def chart(path, rows, scenes, dead, trans, events, fps, opt, title, t0):
         ax.grid(axis='y', color=C['grid'], lw=0.5, zorder=1)
         ax.set_yticks([100, 1000, 10000, 100000])
         ax.set_yticklabels(['100', '1k', '10k', '100k'])
+        ax.minorticks_off()
         verdict = 'PASS' if sc['pass'] else 'FAIL'
-        mark = '✓' if sc['pass'] else '✗'
-        dr = f"{sc['flagged_runs']} dead run{'s' if sc['flagged_runs'] != 1 else ''} > {opt['dead_limit']:.2f}s" if sc['flagged_runs'] else f"longest dead {sc['longest_dead_s']:.2f}s"
-        head = f"{sc['id']}  {sc['score']:.1f}/10 {mark} {verdict}"
-        sub = f"{sc['events_per_s']:.1f} ev/s · max gap {sc['max_gap_s']:.2f}s · {sc['dead_frames']} dead f · {dr}"
-        ax.set_title(head, loc='left', fontsize=9.5, color=C['text'], fontweight='bold', pad=13)
-        ax.text(0, 1.02, sub, transform=ax.transAxes, fontsize=7.5, color=C['text2'], va='bottom')
-        ax.set_xlabel(f"scene frame (f0 = {sc['start']:.2f}s, film f{sc['f0']})", fontsize=7, color=C['text2'], labelpad=1)
+        mark = '\u2713' if sc['pass'] else '\u2717'
+        if sc['flagged_runs']:
+            dr = f"{sc['flagged_runs']} dead run{'s' if sc['flagged_runs'] != 1 else ''} > {opt['dead_limit']:.2f}s"
+        else:
+            dr = f"longest dead {sc['longest_dead_s']:.2f}s"
+        ax.set_title(f"{sc['id']}   {sc['score']:.1f}/10  {mark} {verdict}", loc='left', fontsize=10, color=C['text'], fontweight='bold', pad=14)
+        ax.text(0, 1.035, f"{sc['events_per_s']:.1f} events/s \u00b7 max gap {sc['max_gap_s']:.2f}s \u00b7 {sc['dead_frames']} dead f \u00b7 {dr}",
+                transform=ax.transAxes, fontsize=7.5, color=C['text2'], va='bottom')
+        ax.set_xlabel(f"scene frame  (frame 0 = {sc['start']:.2f}s, f{sc['f0']} of the clip)", fontsize=7, color=C['text2'], labelpad=1)
         fl = [r for r in sc['dead_runs'] if r['flagged']]
         if fl:
             r = max(fl, key=lambda r: r['frames'])
-            ax.text(r['local_f0'], ymax * 0.32, f" {r['frames']} dead f (f{r['local_f0']}–f{r['local_f1']})", fontsize=7, color=C['critical'], va='center', zorder=5)
+            ax.text(r['local_f1'] + 1, ymax * 0.12, f"{r['frames']} dead f (f{r['local_f0']}\u2013f{r['local_f1']})", fontsize=7.2,
+                    color=C['critical'], va='center', zorder=5, fontweight='bold')
     handles = [Patch(color=C['good'], label='alive'), Patch(color=C['critical'], label='dead'),
-               Patch(color=C['trans'], label='dead, inside a transition (excused)'),
-               Patch(color=C['flag'], label=f'dead run > {opt["dead_limit"]:.2f}s'),
-               Line2D([0], [0], color=C['band'], lw=1, label='caption band change (not life)'),
-               Line2D([0], [0], color=C['text2'], lw=0.8, ls=(0, (3, 2)), label=f'dead threshold {opt["dead_px"]:.0f} px²'),
-               Line2D([0], [0], color=C['text2'], lw=0.8, label='event onset')]
-    fig.legend(handles=handles, loc='upper center', ncol=4, fontsize=7.5, frameon=False, bbox_to_anchor=(0.5, 1 - 0.32 / fig_h * 1.0), labelcolor=C['text'])
-    fig.suptitle(title, fontsize=11, color=C['text'], y=1 - 0.08 / fig_h, fontweight='bold')
-    fig.text(0.5, 0.004, 'bars = camera-compensated life energy per frame (changed canvas px² outside the caption band, log).  '
-             'score = 10·(0.45·min(1, ev/s ÷ 5) + 0.35·(1 − flagged dead frames ÷ frames) + 0.20·gap), gap = 1 at ≤ 1 s → 0 at 2 s',
-             ha='center', fontsize=6.8, color=C['text2'])
-    fig.tight_layout(rect=(0, 0.02, 1, 1 - 0.62 / fig_h))
-    fig.savefig(path, dpi=130, facecolor=C['surface'])
+               Patch(color=C['trans'], label='dead, but inside a transition (excused)'),
+               Patch(color=C['flag'], label=f'dead run > {opt["dead_limit"]:.2f}s (flagged)'),
+               Line2D([0], [0], color=C['text2'], lw=0.8, ls=(0, (3, 2)), label=f'dead threshold {opt["dead_px"]:.0f} px\u00b2'),
+               Line2D([0], [0], color=C['text2'], lw=0.8, label='event onset'),
+               Line2D([0], [0], color=C['band'], lw=1, label='caption-band change (not life)')]
+    fig.text(0.5, 1 - 0.3 / H, title, ha='center', va='center', fontsize=12, color=C['text'], fontweight='bold')
+    fig.legend(handles=handles, loc='center', ncol=4, fontsize=7.5, frameon=False, bbox_to_anchor=(0.5, 1 - 0.68 / H),
+               labelcolor=C['text'], handlelength=1.6, columnspacing=1.4)
+    foot = ['Bars: camera-compensated life energy per frame (changed canvas px\u00b2 outside the caption band, log scale). Camera moves alone are not life.',
+            'Score = 10 \u00d7 (0.45\u00b7density + 0.35\u00b7coverage + 0.20\u00b7gap); density = min(1, events/s \u00f7 5); coverage = 1 \u2212 flagged dead frames \u00f7 frames;',
+            'gap = 1 if the longest gap between event onsets \u2264 1 s, falling to 0 at 2 s.  PASS = score \u2265 8 and no dead run over the limit.']
+    for k, t in enumerate(foot):
+        fig.text(0.5, (0.42 - 0.14 * k) / H, t, ha='center', fontsize=6.8, color=C['text2'])
+    fig.savefig(path, dpi=125, facecolor=C['surface'])
     plt.close(fig)
 
 
@@ -369,6 +382,7 @@ def main(argv=None):
     ap.add_argument('--analysis', type=float, default=Q.DEFAULTS['analysis'], help='analysis scale vs the 1080 canvas (default 0.5)')
     ap.add_argument('--no-transition-grace', action='store_true', help='count dead frames inside transition windows too')
     ap.add_argument('--no-chart', action='store_true')
+    ap.add_argument('--dump-masks', default=None, help=argparse.SUPPRESS)   # calibration: save the per-frame life masks
     ap.add_argument('--quiet', action='store_true')
     args = ap.parse_args(argv)
 
@@ -384,7 +398,11 @@ def main(argv=None):
                dead_px=args.dead_px, event_vox=args.event_vox, dead_limit=args.dead_limit, target_rate=args.target_rate,
                analysis=args.analysis, caption_band=list(band))
     t_a = time.time()
-    rows, life_tr, cap_tr = analyze(src, opt, band, progress=not args.quiet)
+    dump = [] if args.dump_masks else None
+    rows, life_tr, cap_tr = analyze(src, opt, band, progress=not args.quiet, dump=dump)
+    if dump is not None:
+        np.savez_compressed(args.dump_masks, idx=np.array([d[0] for d in dump]), masks=np.array([d[1] for d in dump]),
+                            shape=(src.ah, src.aw), a=src.a, fps=src.fps, n=len(rows))
     n = len(rows)
     fps = src.fps
     dur = n / fps

@@ -25,8 +25,7 @@ import {useLook} from '../../../lib/exit';
 import {line, polyPath, rect, rectPath, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {rng, Seed} from '../../../lib/rng';
-import {Person} from '../../../lib/kit';
-import {LayerWrap, Lighter, noWrap, SetPlace, SI, stepLighter} from './common';
+import {Glass, glassStep, HALF, LayerWrap, noWrap, SetPlace, SI} from './common';
 
 export const DOME = {
   horizon: 1000,
@@ -77,13 +76,15 @@ export function tallyGatePath(x: number, y: number, size: number, n = 5): string
 
 // ---------------------------------------------------------------- the city rows (batched geometry, module level)
 
-type RowGeo = {fills: {color: string; d: string}[]; ink: string; dots: string[]; bw: string; bars: string};
+type RowGeo = {fills: {color: string; d: string}[]; ink: string; dots: string[]; bw: string; bars: string; back: {color: string; d: string}};
 
 const ROWS: RowGeo[] = (() => {
   const out: RowGeo[] = [];
+  // golden atmosphere ladder (sky cream -> half-sand -> sand -> tan / sage + ink -> tan / teal + ink): every row sits one
+  // step off what is behind it, and NO row is the sky colour (a cream block on the cream sky would read as a hole)
   const palettes = [
-    [palette.sand, palette.cream],
-    [palette.sand, palette.cream, palette.sand],
+    [HALF.sand, palette.sand, HALF.sand],
+    [palette.sand, palette.sand, HALF.sand],
     [palette.tan, palette.sage, palette.sand, palette.tan],
     [palette.tan, palette.teal, palette.sand, palette.tan, palette.sage],
   ];
@@ -142,7 +143,12 @@ const ROWS: RowGeo[] = (() => {
       }
       x += w + r.range(-4, 3) * s;
     }
-    out.push({fills: cols.map((c, i) => ({color: c, d: byColor[i]})), ink, dots, bw, bars});
+    // BACK-FILL: the band under this row's lowest roof, down from the row behind (or this row's lowest top for row 0),
+    // in the colour of the row behind, so nothing behind the city (the sun, the sky) shows through the gaps between
+    // buildings below the first skyline
+    const prevBase = ri === 0 ? row.top[1] : DOME.rows[ri - 1].base;
+    const back = {color: ri === 0 ? palettes[0][0] : palettes[ri - 1][0], d: rectPath(-260, prevBase - 1, 1600, row.base - prevBase + 1)};
+    out.push({fills: cols.map((c, i) => ({color: c, d: byColor[i]})), ink, dots, bw, bars, back});
   });
   return out;
 })();
@@ -221,12 +227,13 @@ const RowNode: React.FC<{ri: number; inkW: number; dotsAt?: number; duskAt?: num
   const R = ROWS[ri];
   return (
     <>
+      <Fill d={R.back.d} color={R.back.color} offset={false} mode="snap" seed={`${seed}/r${ri}back`} />
       {R.fills.map((f, i) => (f.d ? <Fill key={i} d={f.d} color={f.color} offset={ri >= 2 ? undefined : false} mode="snap" seed={`${seed}/r${ri}f${i}`} /> : null))}
       {R.dots.map((d, c) => {
         if (!d) return null;
         if (dotsAt !== undefined && t < dotsAt + c * 0.08 + ri * 0.05) return null;
         const lit = duskAt !== undefined && t >= duskAt + ri * 0.18 + Math.abs(c - 1.5) * 0.06;
-        return <Fill key={`d${c}`} d={d} color={lit ? palette.peach : ri === 1 ? palette.cream : palette.tealDark} offset={false} mode="snap" seed={`${seed}/r${ri}d${c}`} />;
+        return <Fill key={`d${c}`} d={d} color={lit ? palette.peach : ri === 1 ? HALF.sand : palette.tealDark} offset={false} mode="snap" seed={`${seed}/r${ri}d${c}`} />;
       })}
       {R.bw ? <Fill d={R.bw} color={duskAt !== undefined && t >= duskAt + ri * 0.18 ? palette.peach : palette.cream} offset={false} mode="snap" seed={`${seed}/r${ri}bw`} /> : null}
       {R.bars ? <Fill d={R.bars} color={palette.tealDark} offset={false} mode="snap" seed={`${seed}/r${ri}bar`} /> : null}
@@ -252,6 +259,25 @@ const Searchlight: React.FC<{at?: number; angle?: number | ((t: number) => numbe
     <>
       <path d={polyPath([[ox, oy], p0, p1])} fill={palette.cream} opacity={0.55} />
       <path d={`M${ox} ${oy}L${p0[0].toFixed(1)} ${p0[1].toFixed(1)}M${ox} ${oy}L${p1[0].toFixed(1)} ${p1[1].toFixed(1)}`} fill="none" stroke={palette.ink} strokeWidth={SI.far} strokeDasharray="12 10" strokeLinecap="round" data-seed={seed} />
+    </>
+  );
+};
+
+/** The watchtower guard, back view, 34 px tall in the cabin window: tealDark coat shoulders under the sill, an ochre head
+ *  and a teal peaked cap (the brim points away from us), ink 2.2. */
+const Guard: React.FC<{x: number; sill: number; seed: string}> = ({x, sill, seed}) => {
+  const hy = sill - 17;
+  const shoulders = `M${x - 19} ${sill + 2}L${x - 19} ${sill - 4}Q${x - 18} ${sill - 11} ${x - 8} ${sill - 11}L${x + 8} ${sill - 11}Q${x + 18} ${sill - 11} ${x + 19} ${sill - 4}L${x + 19} ${sill + 2}Z`;
+  const head = `M${x - 8.5} ${hy}a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0Z`;
+  const cap = `M${x - 10} ${hy - 2}Q${x - 10} ${hy - 13} ${x} ${hy - 13}Q${x + 10} ${hy - 13} ${x + 10} ${hy - 2}Z`;
+  const band = rectPath(x - 10.5, hy - 3.5, 21, 3.5);
+  return (
+    <>
+      <Fill d={shoulders} color={palette.tealDark} seed={`${seed}/c`} />
+      <Fill d={head} color={palette.brown} seed={`${seed}/h`} />
+      <Fill d={cap} color={palette.teal} seed={`${seed}/cap`} />
+      <Fill d={band} color={palette.tealDark} offset={false} seed={`${seed}/b`} />
+      <Ink d={`M${x - 19} ${sill}L${x - 19} ${sill - 4}Q${x - 18} ${sill - 11} ${x - 8} ${sill - 11}M${x + 8} ${sill - 11}Q${x + 18} ${sill - 11} ${x + 19} ${sill - 4}L${x + 19} ${sill}` + `M${x - 8.5} ${hy + 1}A8.5 8.5 0 0 0 ${x + 8.5} ${hy + 1}` + `M${x - 10.5} ${hy - 1}Q${x - 10} ${hy - 13} ${x} ${hy - 13}Q${x + 10} ${hy - 13} ${x + 10.5} ${hy - 1}L${x - 10.5} ${hy - 1}`} width={SI.far} taper={false} vary={0} seed={`${seed}/i`} />
     </>
   );
 };
@@ -298,7 +324,7 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
   const glassT = glassAt ?? (domeAt !== undefined ? domeAt + domeDur : undefined);
   const glass = glassT === undefined || t >= glassT;
   const dusk = duskAt !== undefined && t >= duskAt + 0.2;
-  const domeSky = stepLighter(dusk ? skies.dusk : sky);
+  const domeSky = glassStep(dusk ? skies.dusk : sky);
   const T = DOME.tower;
   // tower rise: scaleY 0 -> 1.04 -> 1 about its base
   const tk = towerAt === undefined ? 1 : t < towerAt ? 0 : prog(t, towerAt, 0.3, E.outCubic) < 1 ? prog(t, towerAt, 0.3, E.outCubic) * 1.04 : 1.04 - 0.04 * prog(t, towerAt + 0.3, 0.15);
@@ -317,7 +343,7 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
       {glass ? (
         <g clipPath={`url(#${clipId})`}>
           <Fill d={G.interior} color={domeSky} offset={false} mode="snap" seed={`${sd}/gsky`} />
-          <Fill rect={[-260, DOME.band[0], 1600, DOME.band[1] - DOME.band[0] + 2]} color={stepLighter(palette.peach)} offset={false} mode="snap" seed={`${sd}/gband`} />
+          <Fill rect={[-260, DOME.band[0], 1600, DOME.band[1] - DOME.band[0] + 2]} color={glassStep(palette.peach)} offset={false} mode="snap" seed={`${sd}/gband`} />
         </g>
       ) : null}
     </>
@@ -327,7 +353,7 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
       {rows(false)}
       {glass ? (
         <g clipPath={`url(#${clipId})`}>
-          <Lighter>{rows(true)}</Lighter>
+          <Glass>{rows(true)}</Glass>
         </g>
       ) : null}
     </>
@@ -336,6 +362,8 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
     <>
       {glass ? <Fill d={G.rim} color={palette.cream} offset={false} mode="snap" seed={`${sd}/rim`} /> : null}
       {glass ? <Fill d={G.glints} color={palette.white} offset={false} mode="snap" seed={`${sd}/glint`} /> : null}
+      {/* the searchlight passes UNDER the dome's ink (the bold arc stays ink where the beam crosses it) */}
+      <Searchlight at={searchAt} angle={searchAngle} seed={sd} />
       {glass ? <Ink d={G.lattice} width={SI.hair} taper={false} order="all" seed={`${sd}/lat`} /> : null}
       <Ink d={G.leftHalf} width={SI.front} at={domeAt} dur={domeDur} pace="free" ease={E.inOutCubic} seed={`${sd}/arcL`} />
       <Ink d={G.rightHalf} width={SI.front} at={domeAt} dur={domeDur} pace="free" ease={E.inOutCubic} seed={`${sd}/arcR`} />
@@ -355,15 +383,14 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
           <Ink d={G.lat} width={SI.mid} taper={false} seed={`${sd}/tower`} />
           <Fill d={G.cabinRoof} color={palette.teal} seed={`${sd}/croof`} />
           <Fill d={G.cabin} color={palette.sand} seed={`${sd}/cabin`} />
-          <Fill rect={[T.cabin[0] + 8, T.cabin[1] + 10, T.cabin[2] - 16, T.cabin[3] * 0.5]} color={palette.tealDark} offset={false} seed={`${sd}/cwin`} />
-          {guard ? <Person x={T.cabin[0] + T.cabin[2] / 2} y={T.cabin[1] + T.cabin[3] * 0.62} s={0.27} torsoH={60} body={palette.teal} hair="cap" acc={[]} ink={SI.hair} seed={`${sd}/guard`} /> : null}
+          <Fill rect={[T.cabin[0] + 8, T.cabin[1] + 6, T.cabin[2] - 16, T.cabin[3] * 0.56]} color={palette.sage} offset={false} seed={`${sd}/cwin`} />
+          {guard ? <Guard x={T.cabin[0] + T.cabin[2] / 2} sill={T.cabin[1] + T.cabin[3] * 0.62} seed={`${sd}/guard`} /> : null}
           <Fill rect={[T.cabin[0], T.cabin[1] + T.cabin[3] * 0.62, T.cabin[2], T.cabin[3] * 0.38]} color={palette.sand} offset={false} seed={`${sd}/cabsill`} />
           <Ink d={G.cabinInk} width={SI.mid} taper={false} seed={`${sd}/cabi`} />
           <Fill rect={T.board} color={palette.white} seed={`${sd}/board`} />
           <Ink d={G.boardInk + boardTallies(tallies)} width={SI.far} taper={false} seed={`${sd}/boardi`} />
         </XG>
       ) : null}
-      <Searchlight at={searchAt} angle={searchAngle} seed={sd} />
     </>
   );
   const fg = (
@@ -383,9 +410,13 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
         <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
           <path d={G.interior} />
         </clipPath>
+        <clipPath id={`${clipId}s`} clipPathUnits="userSpaceOnUse">
+          <rect x={-2000} y={-3000} width={5000} height={3000 + DOME.rows[0].base} />
+        </clipPath>
       </defs>
       {wrap('sky', 0.05, far)}
-      {sun ? wrap('sun', 0.08, sun) : null}
+      {/* the sun never shows below the first skyline (row 0's base), whatever the camera or the dome draw-on does */}
+      {sun ? wrap('sun', 0.08, <g clipPath={`url(#${clipId}s)`}>{sun}</g>) : null}
       {wrap('city', 0.3, city)}
       {wrap('dome', 0.55, domeNode)}
       {wrap('near', 0.8, near)}

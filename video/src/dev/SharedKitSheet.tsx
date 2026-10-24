@@ -194,6 +194,9 @@ const ContextMode: React.FC = () => {
       <Snail x={720} y={1338} size={14} crawl={{at: 0, speed: 6}} seed="ctxsn" />
       <Bollard x={760} y={1530} seed="ctxbo" />
       <WrenchTag x={820} y={1000} size={56} at={0.6} seed="ctxwt" />
+      {/* S10 keeper (h 300) and S13 caretaker (h 225) at film size */}
+      <Keeper x={430} y={1600} h={300} reachAt={1.0} holding={<NewLockIcon size={42} grip="bottom" seed="ctxkh" />} installAt={1.6} seed="ctxkp" />
+      <Caretaker x={640} y={1560} h={225} raiseKeysAt={1.2} jingleAt={2.0} seed="ctxct" />
       <EdgeOnlooker x={70} y={1330} head={110} seed="ctxo1" />
       <EdgeOnlooker x={1010} y={1300} head={104} seed="ctxo2" hair="long" />
     </TimeProvider>

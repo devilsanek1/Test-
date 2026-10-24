@@ -288,14 +288,15 @@ const Strollers: React.FC = () => (
   <Crowd eye={{horizon: H}} far={{y: 792, x0: gx(-0.6, 792), x1: gx(-0.3, 792)}} near={{y: 1010, x0: gx(-0.62, 1010), x1: gx(-0.28, 1010)}} rows={6} density={0.55} spacing={1.4} at={3.1} span={1.2} build="pop" idle={1} jitter={{x: 0.4, y: 0.2, scale: [0.7, 1.08]}} seed="kd3s" />
 );
 
-/** The two hero walkers (ref 2 f_1: 0.30-0.35 H) strolling into depth, and a passer-by cut by the left edge. */
+/** The two hero walkers (0.36 / 0.34 H at the start, heads at y ~840, ref 2 f_1) strolling into depth, and a
+ *  passer-by cut by the left edge and the frame bottom. */
 const Walkers: React.FC = () => {
   const t = useTime();
   const u = prog(t, 0, 12);
   return (
     <>
-      <Placed X={lerp(-0.32, -0.3, u)} feet={lerp(1475, 1420, u)} at={0.75} build="draw" walk={1.7} hair="short" acc={['headphones', 'hood']} body={palette.teal} legsColor={palette.tealDark} hairColor={palette.ink} seed="kdW1" ink={stroke.inkBold} />
-      <Placed X={lerp(0.04, 0.05, u)} feet={lerp(1395, 1345, u)} at={0.95} build="draw" walk={1.55} hair="bun" acc={['backpack']} body={palette.sage} legsColor={palette.tan} hairColor={palette.brown} seed="kdW2" ink={stroke.inkBold} />
+      <Placed X={lerp(-0.32, -0.3, u)} feet={lerp(1530, 1470, u)} at={0.75} build="draw" walk={1.7} hair="short" acc={['headphones', 'hood']} body={palette.teal} legsColor={palette.tealDark} hairColor={palette.ink} seed="kdW1" ink={stroke.inkBold} />
+      <Placed X={lerp(0.04, 0.05, u)} feet={lerp(1482, 1428, u)} at={0.95} build="draw" walk={1.55} hair="bun" acc={['backpack']} body={palette.sage} legsColor={palette.tan} hairColor={palette.brown} seed="kdW2" ink={stroke.inkBold} />
     </>
   );
 };
@@ -307,8 +308,8 @@ const PasserBy: React.FC = () => (
 
 // ---------------------------------------------------------------- the mascot (the corgi's spot in ref 2 f_1)
 
-const PIP_X = gx(-0.12, 1545);
-const PIP_Y = 1545;
+const PIP_X = gx(-0.1, 1600);
+const PIP_Y = 1600;
 const Mascot: React.FC = () => {
   const t = useTime();
   const p = popIn(t, 1.9);

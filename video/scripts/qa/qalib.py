@@ -32,7 +32,8 @@ DEFAULTS = dict(
     dead_px=2000.0,        # a frame is DEAD when its camera-compensated life energy is below this (canvas px^2; ~0.1 % of 1080x1920)
     event_vox=2000.0,      # an EVENT is a space-time change chain of at least this many canvas px^2 * frames
     event_merge=12.0,      # changed pixels closer than this (canvas px) belong to one blob
-    event_link=4.0,        # a blob continues a chain when it overlaps the previous frame's blob within this (canvas px)
+    event_link=4.0,        # a blob continues a chain when it overlaps the chain's recent footprint within this (canvas px)
+    event_hold=2,          # ... changed within the last this many frames (a 1-frame pause in a walk cycle is not a new event)
     caption_band=(280, 600),
 )
 
@@ -283,44 +284,47 @@ def drop_small(mask, min_px):
 
 class EventTracker:
     """Motion EVENTS = space-time change blobs. Each frame, changed pixels within `merge` px of each other form one
-    blob (neighbouring fragments of one motion); a blob CONTINUES the chain of the previous frame's blob it overlaps
-    most (within `link` px), otherwise it STARTS a new chain. Chains never merge, so a new pop next to an ongoing
-    motion still counts as its own onset. An event is a chain with >= min_vox canvas px^2 * frames.
-    Calibrated on reference 1 (docs/QA.md): 6.15 events/s (measured 5.9), median gap 3 f (4), longest gap 1.07 s (0.97)."""
+    blob (neighbouring fragments of one motion). A blob CONTINUES the chain whose recent footprint (pixels it changed
+    in the last `hold` frames, grown by `link` px) it overlaps most; otherwise it STARTS a new chain. Chains never
+    merge, so a new pop next to an ongoing motion still counts as its own onset, while a walk cycle that pauses for a
+    frame or two stays one event. An event is a chain with >= min_vox canvas px^2 * frames.
+    Calibration (docs/QA.md): on reference 1 the onsets match the measured 5.9 events/s and 4-frame median gap."""
 
-    def __init__(self, link=2, merge=6):
+    def __init__(self, link=2, merge=6, hold=3):
         self.onset: list[int] = []
         self.last: list[int] = []
         self.vox: list[float] = []
         self.peak: list[float] = []
         self.cx: list[float] = []
         self.cy: list[float] = []
-        self.prev_lab = None
-        self.prev_ids = None
+        self.foot = None          # chain id (+1) that last changed each pixel
+        self.foot_t = None        # frame index of that change
+        self.hold = hold
         self.kl = np.ones((2 * link + 1, 2 * link + 1), np.uint8)
         self.km = np.ones((2 * merge + 1, 2 * merge + 1), np.uint8) if merge else None
 
     def add(self, i, mask, px_area, a):
         """mask: changed pixels of frame i (noise already removed), analysis res."""
+        if self.foot is None:
+            self.foot = np.zeros(mask.shape, np.float32)
+            self.foot_t = np.full(mask.shape, -10 ** 6, np.int32)
         if not mask.any():
-            self.prev_lab, self.prev_ids = None, None
             return
         m8 = mask.astype(np.uint8)
         grp = cv2.dilate(m8, self.km) if self.km is not None else m8
         n, lab, stats, cent = cv2.connectedComponentsWithStats(grp, connectivity=8)
         lab = np.where(mask, lab, 0)
         areas = np.bincount(lab.ravel(), minlength=n)
-        ids = np.full(n, -1, np.int64)
+        recent = np.where(i - self.foot_t <= self.hold, self.foot, 0).astype(np.float32)
+        pl = cv2.dilate(recent, self.kl).astype(np.int64) - 1        # chain id or -1
         cont = {}
-        if self.prev_lab is not None:
-            pl = cv2.dilate(self.prev_lab.astype(np.float32), self.kl).astype(np.int64)
-            both = (lab > 0) & (pl > 0)
-            if both.any():
-                pairs, cnt = np.unique(np.stack([lab[both], pl[both]], 1), axis=0, return_counts=True)
-                for (cj, pj), c in zip(pairs, cnt):
-                    g = int(self.prev_ids[pj])
-                    if g >= 0 and c > cont.get(int(cj), (0, -1))[0]:
-                        cont[int(cj)] = (int(c), g)
+        both = (lab > 0) & (pl >= 0)
+        if both.any():
+            pairs, cnt = np.unique(np.stack([lab[both], pl[both]], 1), axis=0, return_counts=True)
+            for (cj, g), c in zip(pairs, cnt):
+                if c > cont.get(int(cj), (0, -1))[0]:
+                    cont[int(cj)] = (int(c), int(g))
+        ids = np.full(n, -1, np.int64)
         for j in range(1, n):
             ar = float(areas[j]) * px_area
             if ar <= 0:
@@ -339,11 +343,13 @@ class EventTracker:
                 self.cx.append(float(cent[j][0]) / a)
                 self.cy.append(float(cent[j][1]) / a)
             ids[j] = g
-        self.prev_lab, self.prev_ids = lab, ids
+        sel = lab > 0
+        self.foot[sel] = (ids[lab[sel]] + 1).astype(np.float32)
+        self.foot_t[sel] = i
 
     def break_link(self):
-        self.prev_lab = None
-        self.prev_ids = None
+        self.foot = None
+        self.foot_t = None
 
     def events(self, min_vox):
         ev = [{'onset': self.onset[g], 'last': self.last[g], 'vox': self.vox[g], 'peak': self.peak[g], 'cx': self.cx[g], 'cy': self.cy[g]}
