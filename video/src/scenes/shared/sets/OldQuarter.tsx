@@ -29,6 +29,7 @@ import {Foreground, ForegroundSpec, groundMarks, GroundMarks} from './ground';
 import {BollardSlot, HangingPlaqueSlot, NoticeboardSlot, OnlookerSlot, PaneRect, PlaqueSlot} from './propSlots';
 import {SiteFacade, SiteFacadeProps} from './SiteFacade';
 import type {Acc, Hair} from '../../../lib/kit';
+import {Furniture, FurnitureItem, People, PeopleSpec, WalkerAnchor} from './life';
 
 type R4 = [number, number, number, number];
 
@@ -58,6 +59,20 @@ export const OLD_QUARTER = {
   ],
   /** Pip on the board top (S13). */
   pipBoard: [760, 1090] as Pt,
+  /** People layer (life.tsx): a walker heading up the street gap, a stander cut by the left edge (heights from the
+   *  door-height eye level: (feet - 1150) / 1.1). Clear of the doors, the hanging plaques and the cart's line (y 1440). */
+  walkers: [
+    {x: 692, y: 1356, h: 186, go: 'vp', body: palette.teal, hair: 'short', acc: ['backpack']},
+    {x: 64, y: 1478, h: 296, go: 'stand', body: palette.sage, hair: 'curly', acc: ['scarf']},
+  ] as WalkerAnchor[],
+  /** Street furniture: a planter on the sidewalk, a bike by the tree. */
+  furniture: [
+    {kind: 'planter', x: 420, y: 1486, s: 0.78},
+    {kind: 'bike', x: 960, y: 1496, s: 0.95, flip: true},
+  ] as FurnitureItem[],
+  /** Rooftops (review 5: one distinct type + one rooftop detail per site, all under the y-600 ceiling): siteL a teal
+   *  mansard with two dormers, siteM a TV antenna, siteR balconies, rooftop plants and a water tank on legs. */
+  roofs: {mansard: {base: 690, top: 616, x0: 22, x1: 353, inset: 30}, dormers: [[112, 640], [238, 640]] as Pt[], antenna: {x: 548, base: 820, top: 724}, tank: {x: 978, y: 618, w: 54, h: 42, legs: 700}, balconies: [800, 1000] as number[]},
 } as const;
 
 type SiteId = 'L' | 'M' | 'R';
@@ -106,7 +121,39 @@ const G = (() => {
   const trunk = rectPath(1022, 1150, 24, 312);
   const trunkInk = line(1022, 1462, 1022, 1160, {seed: `${s}/t1`, over: 0}) + line(1046, 1462, 1045, 1165, {seed: `${s}/t2`, over: 0}) + ellipse(1034, 1464, 54, 12, {seed: `${s}/pit`, overlap: -40});
   const pit = `M980 1464a54 12 0 1 0 108 0a54 12 0 1 0 -108 0Z`;
-  return {street: streetGap, second, secondInk, secondWin, far, kerb, walk, streetMarks: street, stoops, stoopInk, treeCrown, treeTicks, trunk, trunkInk, pit};
+  // rooftops
+  const RF = OLD_QUARTER.roofs;
+  const M = RF.mansard;
+  const mansard = polyPath([[M.x0, M.base], [M.x0 + M.inset, M.top], [M.x1 - M.inset, M.top], [M.x1, M.base]]);
+  let dormers = '';
+  let dormerGlass = '';
+  let dormerInk = '';
+  for (const [dx, dy] of RF.dormers) {
+    dormers += rectPath(dx - 20, dy, 40, 44) + polyPath([[dx - 25, dy + 1], [dx, dy - 18], [dx + 25, dy + 1]]);
+    dormerGlass += rectPath(dx - 12, dy + 10, 24, 28);
+    dormerInk += line(dx - 28, dy + 2, dx, dy - 18, {seed: `${s}/dr${dx}a`, over: [3, 1]}) + line(dx, dy - 18, dx + 28, dy + 2, {seed: `${s}/dr${dx}b`, over: [1, 3]}) + line(dx - 20, dy + 2, dx - 20, dy + 44, {seed: `${s}/dr${dx}c`, over: 0}) + line(dx + 20, dy + 2, dx + 20, dy + 44, {seed: `${s}/dr${dx}d`, over: 0}) + line(dx - 12, dy + 10, dx + 12, dy + 10, {seed: `${s}/dr${dx}e`, over: 0});
+  }
+  const mansardInk = line(M.x0 - 6, M.base + 2, M.x0 + M.inset, M.top, {seed: `${s}/ml`, over: [2, 4]}) + line(M.x1 - M.inset, M.top, M.x1 + 6, M.base + 2, {seed: `${s}/mr`, over: [4, 2]}) + line(M.x0 + M.inset - 10, M.top, M.x1 - M.inset + 10, M.top, {seed: `${s}/mt`, over: [6, 6]}) + line(M.x0 + 14, M.base - 34, M.x1 - 14, M.base - 34, {seed: `${s}/mm`, over: 0});
+  const A = RF.antenna;
+  const antenna = line(A.x, A.base, A.x, A.top, {seed: `${s}/an`, over: 0}) + line(A.x - 34, A.top + 14, A.x + 30, A.top + 14, {seed: `${s}/an1`, over: [2, 2]}) + line(A.x - 26, A.top + 34, A.x + 24, A.top + 34, {seed: `${s}/an2`, over: [2, 2]}) + line(A.x - 18, A.top + 52, A.x + 16, A.top + 52, {seed: `${s}/an3`, over: [2, 2]}) + line(A.x, A.top + 60, A.x + 42, A.base, {seed: `${s}/an4`, over: 0});
+  const T = RF.tank;
+  const tank = rectPath(T.x - T.w / 2, T.y, T.w, T.h) + polyPath([[T.x - T.w / 2 - 4, T.y], [T.x, T.y - 16], [T.x + T.w / 2 + 4, T.y]]);
+  const tankInk = line(T.x - T.w / 2 - 6, T.y + 1, T.x, T.y - 16, {seed: `${s}/tk1`, over: [2, 0]}) + line(T.x, T.y - 16, T.x + T.w / 2 + 6, T.y + 1, {seed: `${s}/tk2`, over: [0, 2]}) + line(T.x - T.w / 2, T.y, T.x - T.w / 2, T.y + T.h, {seed: `${s}/tk3`, over: 0}) + line(T.x + T.w / 2, T.y, T.x + T.w / 2, T.y + T.h, {seed: `${s}/tk4`, over: 0}) + line(T.x - T.w / 2 - 2, T.y + T.h, T.x + T.w / 2 + 2, T.y + T.h, {seed: `${s}/tk5`, over: [2, 2]}) + line(T.x - T.w / 2 + 6, T.y + T.h, T.x - T.w / 2 + 2, T.legs, {seed: `${s}/tk6`, over: 0}) + line(T.x + T.w / 2 - 6, T.y + T.h, T.x + T.w / 2 - 2, T.legs, {seed: `${s}/tk7`, over: 0}) + line(T.x - T.w / 2 + 4, T.y + T.h + 22, T.x + T.w / 2 - 4, T.legs - 6, {seed: `${s}/tk8`, over: 0}) + line(T.x - 12, T.y + 10, T.x - 12, T.y + T.h - 6, {seed: `${s}/tk9`, over: 0});
+  // rooftop plants along siteR's roof (scalloped shrubs) + two balconies (slab overshooting, a glass rail)
+  const plants = crown(800, 684, 26, 18, {seed: `${s}/pl1`, bumps: 6}) + crown(846, 688, 20, 14, {seed: `${s}/pl2`, bumps: 5}) + crown(890, 686, 24, 16, {seed: `${s}/pl3`, bumps: 6});
+  const R = OLD_QUARTER.sites.R;
+  let balcSlab = '';
+  let balcRail = '';
+  let balcInk = '';
+  for (const by of RF.balconies) {
+    const bx0 = 952;
+    const bx1 = R.x + R.w + 26;
+    balcSlab += rectPath(bx0 - 14, by, bx1 - bx0 + 14, 9);
+    balcRail += rectPath(bx0 - 8, by - 34, bx1 - bx0 + 2, 34);
+    balcInk += line(bx0 - 22, by, bx1 + 10, by, {seed: `${s}/bs${by}`, over: [6, 10]}) + line(bx0 - 18, by + 9, bx1 + 6, by + 9, {seed: `${s}/bs2${by}`, over: [4, 8]}) + line(bx0 - 8, by - 34, bx1, by - 34, {seed: `${s}/br${by}`, over: [3, 6]});
+    for (let x = bx0 + 14; x < bx1; x += 26) balcInk += line(x, by - 32, x, by - 2, {seed: `${s}/bv${by}/${x}`, over: 0});
+  }
+  return {street: streetGap, second, secondInk, secondWin, far, kerb, walk, streetMarks: street, stoops, stoopInk, treeCrown, treeTicks, trunk, trunkInk, pit, mansard, dormers, dormerGlass, dormerInk, mansardInk, antenna, tank, tankInk, plants, balcSlab, balcRail, balcInk};
 })();
 
 export type OldQuarterProps = {
@@ -129,6 +176,10 @@ export type OldQuarterProps = {
   foreground?: ForegroundSpec;
   /** Per-site SiteFacade overrides (chromeAt, offAt, lit...). */
   site?: Partial<Record<SiteId, Partial<SiteFacadeProps>>>;
+  /** Back-view walkers on OLD_QUARTER.walkers (life.tsx). Default on while the S13 audience is off; false = nobody. */
+  people?: PeopleSpec;
+  /** Street furniture (default OLD_QUARTER.furniture); false = none. */
+  furniture?: FurnitureItem[] | false;
   wrap?: LayerWrap;
   x?: number;
   y?: number;
@@ -139,7 +190,7 @@ export type OldQuarterProps = {
   seed?: string;
 };
 
-export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaqueSwingAt, oldPlaque = {}, secondPlaques = true, board = false, audience = false, bollard = true, band = true, foreground, site = {}, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'oq'}) => {
+export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaqueSwingAt, oldPlaque = {}, secondPlaques = true, board = false, audience = false, bollard = true, band = true, foreground, site = {}, people, furniture = OLD_QUARTER.furniture, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'oq'}) => {
   const t = useTime();
   const S = OLD_QUARTER.sites;
   const far = (
@@ -168,11 +219,38 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
       <GroundMarks marks={G.streetMarks} width={SI.far} seed={`${seed}/gs`} />
     </>
   );
+  const roofNode = (id: SiteId) =>
+    id === 'L' ? (
+      <>
+        <Fill d={G.mansard} color={palette.teal} seed={`${seed}/mans`} />
+        <Fill d={G.dormers} color={palette.sand} seed={`${seed}/dorm`} />
+        <Fill d={G.dormerGlass} color={palette.tealDark} offset={false} seed={`${seed}/dormg`} />
+        <Ink d={G.mansardInk + G.dormerInk} width={SI.mid} seed={`${seed}/mansi`} />
+      </>
+    ) : id === 'M' ? (
+      <Ink d={G.antenna} width={SI.far} taper={false} seed={`${seed}/ant`} />
+    ) : (
+      <>
+        <Fill d={G.tank} color={palette.tan} seed={`${seed}/tank`} />
+        <Ink d={G.tankInk} width={SI.far} taper={false} seed={`${seed}/tanki`} />
+        <Fill d={G.plants} color={palette.sage} seed={`${seed}/plants`} />
+        <Ink d={G.plants} width={SI.far} open={0.15} seed={`${seed}/plantsi`} />
+      </>
+    );
+  const balconies = (
+    <>
+      <Fill d={G.balcRail} color={palette.sage} seed={`${seed}/brail`} />
+      <Fill d={G.balcSlab} color={palette.cream} offset={false} seed={`${seed}/bslab`} />
+      <Ink d={G.balcInk} width={SI.far} taper={false} seed={`${seed}/balci`} />
+    </>
+  );
   const siteNode = (id: SiteId, i: number) => {
     const c = S[id];
     const node = (
       <>
+        {roofNode(id)}
         <SiteFacade x={c.x} y={OLD_QUARTER.base} w={c.w} storeys={c.storeys} storeyH={(OLD_QUARTER.base - c.top) / c.storeys} fill={c.fill} roof="cornice" browser={c.browser} door={c.door} plaque={false} lock="closed" cols={c.w > 300 ? 3 : 2} seed={`${seed}/site${id}`} {...site[id]} />
+        {id === 'R' ? balconies : null}
         <Fill d={G.stoops[i]} color={palette.sand} seed={`${seed}/stoop${id}`} />
       </>
     );
@@ -227,6 +305,14 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
       {wrap('ground', 0.6, ground)}
       {wrap('sites', 0.6, sites)}
       {wrap('board', 0.8, boardNode)}
+      {wrap(
+        'people',
+        0.85,
+        <>
+          <Furniture items={audience === false ? furniture : false} seed={`${seed}/furn`} />
+          <People anchors={OLD_QUARTER.walkers} vp={OLD_QUARTER.vp} spec={people} def={audience === false} seed={`${seed}/ppl`} />
+        </>,
+      )}
       {wrap('near', 1.0, near)}
       {wrap('audience', 1.0, aud)}
       {wrap('foreground', 1.0, <Foreground spec={foreground === undefined ? (audience === false ? 'railing' : false) : foreground} seed={`${seed}/fg`} />)}

@@ -276,7 +276,10 @@ Outgoing and incoming scenes keep rendering through overlaps (they hold their en
   collar, the nape notch flattens), staggered and jittered per person, so a figure walking into depth (s 1.32 → 1.08)
   loses its detail over ~15 frames instead of in one. To keep the detail fixed for a whole shot pass **`lodScale`**
   (the s the LOD decisions use, e.g. the starting scale). Moving a whole crowd in depth: use the camera (World `push`,
-  ShotCam), which never changes LOD; `Crowd`'s ink ladder and lod switches are ramped / jittered per person too.
+  ShotCam), which never changes LOD; `Crowd`'s ink ladder and lod switches are ramped / jittered per person too. If a
+  crowd's `far` / `near` rows must animate, give it **`layout={{far, near}}`** (the rows at the start of the shot):
+  the slots (who stands where, how many per row) and every LOD decision are frozen and carried onto the moving rows;
+  without it a row that gains a slot re-lays out in one frame.
 - `Crowd` (rows far→near, depth ink via `crowdInk(s)`, far rows fill-only blobs, `build`, `order`, `limit`;
   **`eye={{horizon, ratio?}}`**: rows' `y` are FEET lines and every scale comes from the eye-level camera (section 2b;
   legs on every row); **`jitter={{x, y, scale: [min, max]}}`** for an organic queue (children, tall adults,

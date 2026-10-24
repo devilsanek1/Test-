@@ -19,6 +19,8 @@ import {darker} from './city';
 import {Glow} from './light';
 import {PathBuf, r1} from './util';
 import {CineExitShrink, exitScale, inkOn, lookPaint, useCineState} from './state';
+import {lodScale, ROOM_LOD, roomLook, roomMelt, roomShapes} from './windows';
+import {roomColors} from './wall';
 import {BUILTIN_WIPERS, FoliageWiper, WiperComponent} from '../Film';
 import {CINE_WIPE_HALF, CINE_WIPERS, ColumnWiper, PasserWiper, wipeEdgeX, wiperRegions} from './wipers';
 import type {ToneRegion} from '../Captions';
@@ -468,35 +470,38 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod,
   const litC = litColor ?? palette.peach;
   const darkC = darkColor ?? ambient(palette.tealDark, p);
   // level of detail: from the screen width (element by element, melting the big areas), or a fixed level
-  const jf = 0.9 + 0.2 * lodJitter;
-  const W = screenW !== undefined ? screenW / jf : detail === 'full' ? 1e6 : detail === 'room' ? 56 : 0;
-  if (W < 42) return <rect x={0} y={0} width={w} height={h} fill={on ? litC : darkC} />;
-  const full = W >= 56; // lamp, glints, ink
-  const deskOn = W >= 64;
-  const chairOn = W >= 72;
-  const personOn = W >= 80;
-  const kFrame = melt(W, 50, 70);
-  const kFloor = melt(W, 44, 62);
-  const kCurtain = melt(W, 42, 56);
+  // (the SAME ladder, shapes, colours and random look as WallOfWindows grid panes: ROOM_LOD / roomShapes / roomColors)
+  const W = screenW !== undefined ? screenW / lodScale(lodJitter) : detail === 'full' ? 1e6 : detail === 'room' ? ROOM_LOD.lamp - 0.01 : 0;
+  if (W < ROOM_LOD.glass) return <rect x={0} y={0} width={w} height={h} fill={on ? litC : darkC} />;
+  const full = W >= ROOM_LOD.lamp; // lamp, glints
+  const deskOn = W >= ROOM_LOD.desk; // desk + monitor, frame ink
+  const chairOn = W >= ROOM_LOD.chair; // chair, plant
+  const personOn = W >= ROOM_LOD.person;
+  const kFrame = roomMelt(W, ROOM_LOD.frame);
+  const kFloor = roomMelt(W, ROOM_LOD.floor);
+  const kCurtain = roomMelt(W, ROOM_LOD.curtain);
   const showChair = (chair ?? !!person) && chairOn;
-  const rr = rng(`wc/${seed}`);
-  const curtainRight = !lit && rr.chance(0.5);
-  const plantOn = lit || rr.chance(0.6);
+  const look = roomLook(seed, lit);
+  const curtainRight = look.curtainRight;
+  const plantOn = look.plant;
   const fr = 22;
   const room = on ? litC : darkC;
-  const roomDark = on ? ROOM_DARKER[litC] ?? darker(litC) : darker(darkC);
+  const rcol = roomColors(on, litC, darkC, p);
+  const roomDark = rcol.floor;
   const lampX = w * 0.64;
   const deskY = h * 0.6;
   const mon = {x: w * 0.47, y: h * 0.42, w: w * 0.36, h: h * 0.15};
   // an unlit window keeps the cool night values and stays close to its grid pane: the room IS the pane colour, the
   // curtain one step lighter (tealDark on the darker panes), the frame band sage; captions can sit on it
   const frameC = on || lit ? palette.cream : palette.sage;
-  const curtainDark = darkC === ambient(palette.tealDark, p) || darkC === palette.tealDark ? palette.teal : ambient(palette.tealDark, p);
+  const curtainDark = rcol.curtain;
   const ink = rect(-fr, -fr, w + fr * 2, h + fr * 2, {seed: `${seed}/o`, over: 'medium'}) + rect(0, 0, w, h, {seed: `${seed}/i`, over: 'small'}) + hline(-fr - 30, w + fr + 30, h + fr + 14, {seed: `${seed}/s`, over: [20, 30]}) + hline(-fr - 24, w + fr + 24, h + fr + 30, {seed: `${seed}/s2`, over: [10, 20]});
   const tr = hline(0, w, h * 0.3, {seed: `${seed}/tr`, over: [2, 4]}) + hline(0, w, h * 0.3 + 14, {seed: `${seed}/tr2`, over: [2, 4]});
-  const curtainW = (curtainAt !== undefined && t >= curtainAt ? 0.86 : lit ? 0.17 : rr.range(0.3, 0.46)) * kCurtain;
-  const curtain = `M0 0L${w * curtainW} 0Q${w * (curtainW + 0.03 * kCurtain)} ${h * 0.4} ${w * (curtainW - 0.04 * kCurtain)} ${h * 0.72}L0 ${h * 0.74}Z`;
+  const sh = roomShapes(curtainAt !== undefined && t >= curtainAt ? 0.86 : look.curtainW, false, kCurtain, kFloor);
+  const curtain = sh.curtain ? sh.curtain.map(([u, v], i) => `${i ? 'L' : 'M'}${r1(u * w)} ${r1(v * h)}`).join('') + 'Z' : '';
   const fr2 = fr * kFrame;
+  // sub-pixel at room sizes: the misregistration offset only at full detail
+  const mis = full ? 2 : 0;
   const chairX = w * 0.3;
   const chairW = w * 0.3;
   const chairY = h * 0.8;
@@ -524,7 +529,7 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod,
       {/* frame band + interior (the band and the floor melt away with the screen size) */}
       {fr2 > 0.5 ? <rect x={-fr2} y={-fr2} width={w + fr2 * 2} height={h + fr2 * 2} fill={frameC} /> : null}
       <rect x={0} y={0} width={w} height={h} fill={room} />
-      {kFloor > 0 ? <rect x={0} y={h - (h - deskY) * kFloor} width={w} height={(h - deskY) * kFloor} fill={roomDark} /> : null}
+      {sh.floor !== null ? <rect x={0} y={h * sh.floor} width={w} height={h * (1 - sh.floor)} fill={roomDark} /> : null}
       {on && full ? <Glow cx={lampX} cy={h * 0.21} r={30} rings={3} spread={2.6} color={palette.cream} opacity={0.32} /> : null}
       {full ? <path d={`M${lampX} 0L${lampX} ${h * 0.14}`} stroke={palette.ink} strokeWidth={2.2} /> : null}
       {full ? <path d={lamp} fill={on ? palette.cream : ambient(palette.teal, p)} /> : null}
@@ -556,9 +561,9 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod,
         </>
       ) : null}
       {/* curtain, transom bar, plant, glints */}
-      {kCurtain > 0 ? <path d={curtain} fill={on ? palette.sand : lit ? ambient(palette.tan, p) : curtainDark} transform={curtainRight ? `translate(${w + 2} 2) scale(-1 1)` : 'translate(2 2)'} /> : null}
+      {curtain ? <path d={curtain} fill={on ? rcol.curtain : lit ? ambient(palette.tan, p) : curtainDark} transform={curtainRight ? `translate(${w + mis} ${mis}) scale(-1 1)` : mis ? `translate(${mis} ${mis})` : undefined} /> : null}
       {full ? <path d={`M${w * 0.06} 6Q${w * 0.08} ${h * 0.4} ${w * 0.05} ${h * 0.7}M${w * 0.11} 6Q${w * 0.14} ${h * 0.4} ${w * 0.09} ${h * 0.71}`} fill="none" stroke={palette.ink} strokeWidth={2} strokeLinecap="round" /> : null}
-      {kCurtain > 0 ? <rect x={0} y={h * 0.3} width={w} height={14 * kCurtain} fill={on || lit ? frameC : curtainDark} /> : null}
+      {sh.transom ? <rect x={0} y={h * sh.transom[0]} width={w} height={h * (sh.transom[1] - sh.transom[0])} fill={on || lit ? rcol.transom : curtainDark} /> : null}
       {plantOn && chairOn ? <rect x={w * 0.68} y={h + fr - 44} width={58} height={44} fill={on ? palette.brown : palette.tealDark} /> : null}
       {plantOn && chairOn ? <path d={plant} fill={on ? palette.sage : palette.teal} transform="translate(3 2)" /> : null}
       {plantOn && chairOn ? <Ink d={plant} width={stroke.ink} exit={false} /> : null}

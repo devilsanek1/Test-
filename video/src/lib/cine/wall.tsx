@@ -27,7 +27,7 @@ import {gridCells, lodScale, quadAt, ROOM_LOD, roomLook, roomMelt, roomShapes, S
 import {PathBuf} from './util';
 import {exitScale, inkOn, isPaper, lookPaint, toScreen, useCineState, xfScale} from './state';
 import type {Mat} from '../xf';
-import {useXf} from '../xf';
+import {mat, useXf} from '../xf';
 import {rand} from '../rng';
 
 /** A receding wall whose horizontal lines converge on the vanishing point `vp` (on the horizon): the near edge is
@@ -273,13 +273,18 @@ export type WallOfWindowsProps = WindowLook & {
   lod?: {cells: [number, number][]; above: number};
   /** Final say on a cell's state, e.g. a hero window lit until its own off time: (row, col, t, on) => on. */
   override?: (row: number, col: number, t: number, on: boolean) => boolean;
-  /** Floor bands are only drawn while the layer's zoom is at most this (their free ends would crawl over the grid in a
-   *  deep zoom). Default 3. */
+  /** Floor bands DRAW ON (each from its near end, staggered like pen strokes, ~0.15 s each over a ~0.4 s window at a
+   *  typical pull-back) as the layer's zoom falls through ~1.13x .. 0.93x this value, and retract the same way on a
+   *  push-in (their free ends would crawl over the grid in a deep zoom). Default 3. */
   bandsBelow?: number;
+  /** Room-level detail on big grid panes (curtain, floor band, transom: the same shapes and sizes WindowCloseup melts
+   *  through), so a close-up and the grid pane beside it match at any size. Default true. */
+  rooms?: boolean;
 };
 
-export const WallOfWindows: React.FC<WallOfWindowsProps> = ({quad, rows, cols, tod, wall, events = [], seed = 'wall', exclude = [], bandEvery = 4, pierEvery = 6, inkW = 1.6, farDepth = 0.5, fw = WALL_FW, fh = WALL_FH, precision = 2, keepDark, lod, override, bandsBelow = 3, ...look}) => {
+export const WallOfWindows: React.FC<WallOfWindowsProps> = ({quad, rows, cols, tod, wall, events = [], seed = 'wall', exclude = [], bandEvery = 4, pierEvery = 6, inkW = 1.6, farDepth = 0.5, fw = WALL_FW, fh = WALL_FH, precision = 2, keepDark, lod, override, bandsBelow = 3, rooms = true, ...look}) => {
   const S = useCineState();
+  const clipId = 'wk' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const t = S.t;
   const p = useTodPal(tod);
   const ex = new Set(exclude.map(([r, c]) => `${r},${c}`));
@@ -337,9 +342,54 @@ export const WallOfWindows: React.FC<WallOfWindowsProps> = ({quad, rows, cols, t
   const darkBand = darkFrom ? (i: number) => darkFrom[rc[i][0] * cols + rc[i][1]] <= t : keepDark ? bandTest(S.m, cells, keepDark, t) : undefined;
   const switchOff = S.e > 0.05; // un-build: every window switches off at once
   const ov = override ? (i: number, on: boolean) => override(rc[i][0], rc[i][1], t, on) : undefined;
-  const W = windowPaths(cells, events, times, t, {lit: p.windowLit, dark: p.windowDark, ...look}, precision, {keep: skipLod, dark: switchOff ? () => true : darkBand, override: switchOff ? undefined : ov});
-  const wallC = wall ?? ambient(palette.teal, p);
   const lit = look.lit ?? p.windowLit;
+  const darkPane = look.dark ?? p.windowDark;
+  // room-level LOD on big panes (the shapes WindowCloseup melts through at the same glass width): batched per colour
+  const roomBufs = new Map<string, PathBuf>();
+  const roomAdd = (c: string) => {
+    let b = roomBufs.get(c);
+    if (!b) roomBufs.set(c, (b = new PathBuf(precision)));
+    return b;
+  };
+  const each =
+    rooms && S.look.fills === 'color'
+      ? (i: number, on: boolean, ci: number, q: Quad, forced: boolean) => {
+          if (forced) return; // under the caption words: flat glass only
+          const a = toScreen(S.m, q[0]);
+          const b = toScreen(S.m, q[1]);
+          const [r, c] = rc[i];
+          const Wg = Math.hypot(b[0] - a[0], b[1] - a[1]) / lodScale(rand(seed, `lod${r * cols + c}`));
+          if (Wg < ROOM_LOD.glass) return;
+          const lk = roomLook(`${seed}/${r},${c}`, on);
+          const sh = roomShapes(lk.curtainW, lk.curtainRight, roomMelt(Wg, ROOM_LOD.curtain), roomMelt(Wg, ROOM_LOD.floor));
+          const col = roomColors(on, lit[ci % lit.length], darkPane, p);
+          if (sh.floor !== null) roomAdd(col.floor).quad(quadAt(q, 0, sh.floor), quadAt(q, 1, sh.floor), q[2], q[3]);
+          if (sh.curtain) roomAdd(col.curtain).poly(sh.curtain.map(([u, v]) => quadAt(q, u, v)));
+          if (sh.transom) roomAdd(col.transom).quad(quadAt(q, 0, sh.transom[0]), quadAt(q, 1, sh.transom[0]), quadAt(q, 1, sh.transom[1]), quadAt(q, 0, sh.transom[1]));
+        }
+      : undefined;
+  const W = windowPaths(cells, events, times, t, {lit: p.windowLit, dark: p.windowDark, ...look}, precision, {keep: skipLod, dark: switchOff ? () => true : darkBand, override: switchOff ? undefined : ov, each: switchOff ? undefined : each});
+  const wallC = wall ?? ambient(palette.teal, p);
+  // thin ink (floor bands, piers) never runs through the caption words: cut the padded caption boxes out of it
+  const capBoxes = keepDark?.boxes ? keepDark.boxes(t) : [];
+  let inkClip: string | null = null;
+  if (capBoxes.length) {
+    const inv = mat.inv(S.m);
+    const ip = keepDark?.inkPad ?? 14;
+    const poly = (x0: number, y0: number, x1: number, y1: number) => new PathBuf(2).poly([toScreen(inv, [x0, y0]), toScreen(inv, [x1, y0]), toScreen(inv, [x1, y1]), toScreen(inv, [x0, y1])]).d;
+    inkClip = poly(-400, -400, 1480, 2320) + capBoxes.map(([x0, y0, x1, y1]) => poly(x0 - ip, y0 - ip, x1 + ip, y1 + ip)).join('');
+  }
+  // floor bands draw on from their near ends as the zoom falls past bandsBelow (staggered), never all in one frame
+  const lz = Math.log(Math.max(1e-6, zoom));
+  const hiZ = Math.log(bandsBelow * 1.13);
+  const loZ = Math.log(bandsBelow * 0.93);
+  const bandD = geo.bands
+    .map((b) => {
+      const start = hiZ - b.o * (hiZ - loZ) * 0.6;
+      const g = Math.max(0, Math.min(1, (start - lz) / ((hiZ - loZ) * 0.4)));
+      return trimStrokes(b.d, g);
+    })
+    .join('');
   // the wall is a slab-sized piece: it collapses toward its base edge late in an un-build
   const size = Math.min(1, xfScale(S.m) * 0.9);
   const k = exitScale(S.e, 0.4, size);
@@ -353,11 +403,21 @@ export const WallOfWindows: React.FC<WallOfWindowsProps> = ({quad, rows, cols, t
       {wallPaint !== 'none' ? <path d={geo.outline} fill={wallPaint} /> : null}
       {color ? <path d={geo.far} fill={atmos(wallC, farDepth, p, {raw: true, clear: 0})} /> : null}
       {color && geo.shade ? <path d={geo.shade} fill={darker(palette.teal) === wallC ? atmos(palette.tealDark, 0, p) : ambient(darker(palette.teal), p)} /> : null}
-      {color && W.dark ? <path d={W.dark} fill={look.dark ?? p.windowDark} /> : null}
+      {color && W.dark ? <path d={W.dark} fill={darkPane} /> : null}
       {color ? W.lit.map((d, i) => (d ? <path key={i} d={d} fill={lit[i % lit.length]} /> : null)) : null}
+      {color ? [...roomBufs.entries()].map(([c, b]) => <path key={`rm${c}`} d={b.d} fill={c} />) : null}
       {color && W.blinds ? <path d={W.blinds} fill={ambient(look.blindColor ?? palette.tan, p)} /> : null}
-      {inkW > 0 && geo.ink && inkOn(S, 0.4) ? <path d={geo.ink} fill="none" stroke={palette.ink} strokeWidth={inkW} strokeLinecap="round" /> : null}
-      {inkW > 0 && geo.bands && zoom <= bandsBelow && inkOn(S, 0.4) ? <path d={geo.bands} fill="none" stroke={palette.ink} strokeWidth={inkW} strokeLinecap="round" /> : null}
+      {inkClip ? (
+        <defs>
+          <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+            <path d={inkClip} clipRule="evenodd" />
+          </clipPath>
+        </defs>
+      ) : null}
+      <g clipPath={inkClip ? `url(#${clipId})` : undefined}>
+        {inkW > 0 && geo.ink && inkOn(S, 0.4) ? <path d={geo.ink} fill="none" stroke={palette.ink} strokeWidth={inkW} strokeLinecap="round" /> : null}
+        {inkW > 0 && bandD && inkOn(S, 0.4) ? <path d={bandD} fill="none" stroke={palette.ink} strokeWidth={inkW} strokeLinecap="round" /> : null}
+      </g>
       {paper && inkOn(S) ? <path d={geo.outline} fill="none" stroke={palette.ink} strokeWidth={inkW || 1.6} /> : null}
     </>
   );
