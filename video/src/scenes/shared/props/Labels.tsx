@@ -36,6 +36,7 @@ import {captionFontStack, measureCaption, useCaptionFont} from '../../../lib/fon
 import {circle, line, poly, Pt, rect, rectPath, roundRect} from '../../../lib/sketch';
 import {mat, Mat, XG} from '../../../lib/xf';
 import {Depth, DEPTH_INK, pendulum, usePropFrame} from './common';
+import {ElephantEmblem} from './Elephant';
 
 // ---------------------------------------------------------------- shared text layout
 
@@ -475,3 +476,396 @@ export function labelBox(p: LabelTagProps): [number, number, number, number] {
 
 // keep the shared ink ladder import used (labels default to the 2.2 px outline, `depth` overrides)
 export const LABEL_INK = DEPTH_INK.far;
+
+// ---------------------------------------------------------------- CheckBoxTag (S09) + CheckBoxTags (batched)
+
+/** The tag's local outline (the LockCrate / fixed-lock cream tag: a slightly skewed card hanging from its loop): hang
+ *  point (0, 0), size = tag width. Returns the corners. */
+function checkTagPts(x: number, y: number, s: number): Pt[] {
+  return [
+    [x - s * 0.46, y + s * 0.22],
+    [x + s * 0.5, y + s * 0.12],
+    [x + s * 0.47, y + s * 0.98],
+    [x - s * 0.5, y + s * 1.02],
+  ];
+}
+const ptsD = (p: Pt[]) => `M${p.map((q) => `${q[0].toFixed(2)} ${q[1].toFixed(2)}`).join('L')}Z`;
+/** The check box on a tag (square, 0.5 of the tag) and its tick. */
+function checkBoxD(x: number, y: number, s: number): string {
+  const b = s * 0.25;
+  const cy = y + s * 0.58;
+  return `M${(x - b).toFixed(2)} ${(cy - b).toFixed(2)}h${(2 * b).toFixed(2)}v${(2 * b).toFixed(2)}h${(-2 * b).toFixed(2)}z`;
+}
+function tickD(x: number, y: number, s: number): string {
+  const cy = y + s * 0.58;
+  return `M${(x - s * 0.2).toFixed(2)} ${(cy - s * 0.02).toFixed(2)}L${(x - s * 0.05).toFixed(2)} ${(cy + s * 0.16).toFixed(2)}L${(x + s * 0.3).toFixed(2)} ${(cy - s * 0.34).toFixed(2)}`;
+}
+
+export type CheckBoxTagProps = {
+  /** Hang point (the loop's top); the tag hangs below it. */
+  x: number;
+  y: number;
+  /** Tag width (world px). Default 40. */
+  size?: number;
+  /** Ticked (the box carries an ink tick) or EMPTY (default: the fix is there, not installed yet). */
+  ticked?: boolean;
+  /** Pops in (7 % spring) and swings -16 -> 0. */
+  at?: number;
+  /** The tick strokes on (0.17 s): an empty tag becomes ticked. */
+  tickAt?: number;
+  swingAt?: number | number[];
+  depth?: Depth;
+  ink?: number;
+  seed?: Seed;
+};
+
+/** One cream check-box tag on a short loop (the LockCrate's tag), EMPTY or ticked. For hundreds use CheckBoxTags. */
+export const CheckBoxTag: React.FC<CheckBoxTagProps> = ({x, y, size = 40, ticked = false, at, tickAt, swingAt, depth, ink, seed = 'cbt'}) => {
+  const t = useTime();
+  const F = usePropFrame({depth, ink, seed, defDepth: 'far'});
+  if (at !== undefined && t < at) return null;
+  const s = size;
+  let a = at !== undefined ? pendulum(t, at, -16, 0.5, 0.8) : 0;
+  const sw = swingAt === undefined ? [] : Array.isArray(swingAt) ? swingAt : [swingAt];
+  for (const w of sw) a += pendulum(t, w, 12, 0.5, 0.9);
+  const k = springPop(t, at);
+  const P = checkTagPts(0, 0, s);
+  const W = F.W;
+  const small = s * F.k < 10;
+  return (
+    <XG m={mat.compose(mat.translate(x, y), mat.rotate(a), mat.scale(k))}>
+      <Ink d={`M0 0L${(-s * 0.02).toFixed(2)} ${(s * 0.18).toFixed(2)}`} width={W * 0.6} taper={false} vary={0} seed={`${seed}/lp`} />
+      <Fill d={ptsD(P)} color={palette.cream} offset={small ? false : F.off} mode="none" seed={`${seed}/f`} />
+      {small ? null : <Ink d={poly(P, {closed: true, over: 1.5, seed: `${seed}/o`})} width={W * 0.75} taper={false} seed={`${seed}/o`} />}
+      {small ? null : <Ink d={checkBoxD(0, 0, s)} width={W * 0.65} taper={false} vary={0} seed={`${seed}/bx`} />}
+      {ticked || tickAt !== undefined ? <Ink d={tickD(0, 0, s)} at={ticked ? undefined : tickAt} dur={0.17} width={W * 1.1} taper={false} vary={0} seed={`${seed}/tk`} /> : null}
+    </XG>
+  );
+};
+
+export type CheckBoxSpot = {x: number; y: number; size: number; at?: number; ticked?: boolean; tickAt?: number};
+
+/** Hundreds of check-box tags in FOUR paths (cream bodies, ink outlines + boxes, ink ticks, loops): S09's wave over
+ *  every door. Each pops at its `at` (one frame at +30 %, like LockSpecks); ink only on tags >= `inkFrom` world px wide,
+ *  boxes from `boxFrom`; ticks show on `ticked` spots (or from `tickAt`). Ink in WORLD px (pass ink / zoom for a
+ *  screen weight). */
+export const CheckBoxTags: React.FC<{spots: CheckBoxSpot[]; ink?: number; inkFrom?: number; boxFrom?: number; outAt?: number; color?: string}> = ({spots, ink = 0.8, inkFrom = 8, boxFrom = 12, outAt, color = palette.cream}) => {
+  const t = useTime();
+  const look = useLook();
+  if (outAt !== undefined && t >= outAt) return null;
+  const bodyCol = look.fills === 'paper' ? palette.white : look.fills === 'none' ? undefined : color;
+  const inkOn = look.ink;
+  let body = '';
+  let line_ = '';
+  let tick = '';
+  for (const sp of spots) {
+    if (sp.at !== undefined && t < sp.at) continue;
+    const k = sp.at !== undefined && t < sp.at + 0.067 ? 1.3 : 1;
+    const s = sp.size * k;
+    const P = checkTagPts(sp.x, sp.y, s);
+    const d = ptsD(P);
+    body += d;
+    if (sp.size >= inkFrom) line_ += d + `M${sp.x.toFixed(2)} ${sp.y.toFixed(2)}l0 ${(s * 0.18).toFixed(2)}`;
+    if (sp.size >= boxFrom) line_ += checkBoxD(sp.x, sp.y, s);
+    if (sp.ticked || (sp.tickAt !== undefined && t >= sp.tickAt)) tick += tickD(sp.x, sp.y, s);
+  }
+  return (
+    <ExitFade>
+      {body && bodyCol ? <path d={body} fill={bodyCol} /> : null}
+      {line_ && ink > 0 && inkOn ? <path d={line_} fill="none" stroke={palette.ink} strokeWidth={ink} strokeLinejoin="round" strokeLinecap="round" /> : null}
+      {tick && inkOn ? <path d={tick} fill="none" stroke={palette.ink} strokeWidth={Math.max(ink * 1.6, 0.6)} strokeLinejoin="round" strokeLinecap="round" /> : null}
+    </ExitFade>
+  );
+};
+
+// ---------------------------------------------------------------- SupportTag (S10)
+
+export type SupportTagProps = {
+  /** Hang point (the loop's top); the tag hangs below it. */
+  x: number;
+  y: number;
+  /** Tag width (world px). Default 44 (height ~0.9 x). */
+  size?: number;
+  /** Pops in (7 % spring) and swings -16 -> 0 (a maker hands it over). */
+  at?: number;
+  /** The cream check strokes on (0.17 s; default: drawn with the tag). */
+  checkAt?: number;
+  /** The elephant stamp slams onto it (ring 0.13 s, print 2.6 x -> 1 x). Default: already stamped. */
+  stampAt?: number;
+  swingAt?: number | number[];
+  depth?: Depth;
+  ink?: number;
+  seed?: Seed;
+};
+
+/** The makers' official "supported" tag: a sage check tag with a bold cream check, stamped with the elephant mark (an
+ *  ink ring with the solid elephant). Below ~22 px on screen: sage tag + cream check only. */
+export const SupportTag: React.FC<SupportTagProps> = ({x, y, size = 44, at, checkAt, stampAt, swingAt, depth, ink, seed = 'sup'}) => {
+  const t = useTime();
+  const F = usePropFrame({depth, ink, seed, defDepth: 'far'});
+  if (at !== undefined && t < at) return null;
+  const s = size;
+  let a = at !== undefined ? pendulum(t, at, -16, 0.5, 0.8) : 0;
+  const sw = swingAt === undefined ? [] : Array.isArray(swingAt) ? swingAt : [swingAt];
+  for (const w of sw) a += pendulum(t, w, 12, 0.5, 0.9);
+  const k = springPop(t, at);
+  const W = F.W;
+  const screen = s * F.k;
+  const bw = s;
+  const bh = s * 0.82;
+  const top = s * 0.16;
+  const body = roundRect(-bw / 2, top, bw, bh, bh * 0.16, {seed: `${seed}/b`});
+  const er = Math.max(1, s * 0.05);
+  const stampK = stampAt === undefined ? 1 : slamScale(t, stampAt);
+  const sc: Pt = [bw * 0.2, top + bh * 0.66];
+  const sr = s * 0.19;
+  return (
+    <XG m={mat.compose(mat.translate(x, y), mat.rotate(a), mat.scale(k))}>
+      <Ink d={`M0 0L0 ${(top + er).toFixed(2)}`} width={W * 0.6} taper={false} vary={0} seed={`${seed}/lp`} />
+      <Fill d={body} color={palette.sage} offset={screen < 22 ? false : F.off} mode="none" seed={`${seed}/f`} />
+      {screen >= 14 ? <Ink d={roundRect(-bw / 2, top, bw, bh, bh * 0.16, {seed: `${seed}/o`, closed: false})} width={W * 0.75} taper={false} seed={`${seed}/o`} /> : null}
+      {screen >= 14 ? <Fill d={circle(0, top + er * 2.2, er, {seed: `${seed}/e`})} color={palette.cream} offset={false} mode="none" seed={`${seed}/e`} /> : null}
+      <Ink d={`M${(-bw * 0.32).toFixed(2)} ${(top + bh * 0.42).toFixed(2)}L${(-bw * 0.14).toFixed(2)} ${(top + bh * 0.62).toFixed(2)}L${(bw * 0.12).toFixed(2)} ${(top + bh * 0.2).toFixed(2)}`} at={checkAt} dur={0.17} width={Math.max(W * 1.3, s * 0.085)} color={palette.cream} taper={false} vary={0} seed={`${seed}/ck`} />
+      {screen >= 22 && stampK > 0 ? (
+        <XG m={mat.about(mat.scale(stampK), sc[0], sc[1])}>
+          <Ink d={circle(sc[0], sc[1], sr, {seed: `${seed}/sr`, overlap: 8})} width={W * 0.6} taper={false} vary={0} seed={`${seed}/sr`} />
+          <ElephantEmblem x={sc[0]} y={sc[1] + sr * 0.04} size={sr * 1.45} mode="solid" seed={`${seed}/el`} />
+        </XG>
+      ) : null}
+    </XG>
+  );
+};
+
+// ---------------------------------------------------------------- StickyNote (S11)
+
+export type StickyNoteProps = {
+  /** Rest centre on the surface (world). */
+  x: number;
+  y: number;
+  /** Note size (world px). Default: fits the text (min square-ish). */
+  w?: number;
+  h?: number;
+  /** One string per line (`text` = alias; a string splits on '\n'). */
+  lines?: string[];
+  text?: LabelText;
+  /** Font size (world px). Keep it >= 24 px ON SCREEN. Default 30. `fontSize` = alias. */
+  size?: number;
+  fontSize?: number;
+  /** The substring that gets struck through (only its own width, measured), e.g. 'and on again'. */
+  strike?: string;
+  /** The slap: the note lands flat at slapAt (0.12 s squash 1.12 x / 0.8 y + three slap ticks); it flutters in on a
+   *  breeze before it when `flutter` is given (default: a short flutter from up-left). Omit = already stuck on. */
+  slapAt?: number;
+  flutter?: {from: Pt; dur?: number; spin?: number} | false;
+  /** One ink strike-through stroke over `strike` (0.15 s). */
+  strikeAt?: number;
+  /** The bottom-right corner curls up and settles (0.4 s). */
+  curlAt?: number | number[];
+  /** Static tilt (deg). Default -4. */
+  rot?: number;
+  /** Paper colour (default cream) and its adhesive band (sand). */
+  color?: string;
+  /** Outline in world px (default 2.4) or SCREEN px (`inkPx`, divided by the camera scale). */
+  ink?: number;
+  inkPx?: number;
+  outAt?: number;
+  seed?: Seed;
+};
+
+/** A cream sticky note with hand-lettered text (CaptionHand): it flutters in and SLAPS onto a surface, then a substring
+ *  gets struck through. J6: <StickyNote x y lines={['Turn it off', 'and on again']} strike="and on again" slapAt strikeAt />. */
+export const StickyNote: React.FC<StickyNoteProps> = (p) => {
+  useCaptionFont();
+  const t = useTime();
+  const seed = p.seed ?? 'note';
+  const F = usePropFrame({ink: p.ink ?? 2.4, seed, defDepth: 'mid'});
+  const flutter = p.flutter === false ? undefined : (p.flutter ?? (p.slapAt !== undefined ? {from: [p.x - 220, p.y - 160] as Pt} : undefined));
+  const fd = flutter?.dur ?? 0.36;
+  if (p.slapAt !== undefined && t < p.slapAt - (flutter ? fd : 0)) return null;
+  if (p.outAt !== undefined && t >= p.outAt + 1 / 30) return null;
+  const iw = p.inkPx !== undefined ? p.inkPx / F.k : F.W;
+  const lines = p.lines ?? labelLines(p.text);
+  const fs0 = p.fontSize ?? p.size ?? 30;
+  const pad = {x: 0.4, top: 0.62, bot: 0.38, pitch: 1.08};
+  const auto = layoutText(lines, fs0, pad);
+  const side = Math.max(auto.w, auto.h);
+  const w = p.w ?? side;
+  const h = p.h ?? side;
+  const L = layoutText(lines, fs0, pad, [w, h]);
+  // placement: flutter in (a tumbling, edge-turning sheet on an arc), then the slap squash
+  const rot = p.rot ?? -4;
+  let cx = p.x;
+  let cy = p.y;
+  let a = rot;
+  let sx = 1;
+  let sy = 1;
+  if (flutter && p.slapAt !== undefined && t < p.slapAt) {
+    const q = prog(t, p.slapAt - fd, fd);
+    const e = E.outQuad(q);
+    const [fx, fy] = flutter.from;
+    cx = lerp(fx, p.x, e) + Math.sin(q * Math.PI * 2.2) * 26 * (1 - q);
+    cy = lerp(fy, p.y, e) - Math.sin(q * Math.PI) * 40;
+    a = rot + (flutter.spin ?? 70) * (1 - e) * Math.cos(q * Math.PI * 1.5);
+    sx = 0.3 + 0.7 * Math.abs(Math.cos(q * Math.PI * 1.6 * (1 - q * 0.4)));
+    sy = 0.9 + 0.1 * q;
+  } else if (p.slapAt !== undefined) {
+    const q = prog(t, p.slapAt, 0.12, E.outCubic);
+    if (q < 1) {
+      sx = lerp(1.12, 1, q);
+      sy = lerp(0.8, 1, q);
+    }
+  }
+  if (p.outAt !== undefined && t >= p.outAt) {
+    sx *= 0.72;
+    sy *= 0.72;
+  }
+  const curls = p.curlAt === undefined ? [] : Array.isArray(p.curlAt) ? p.curlAt : [p.curlAt];
+  let c = 0;
+  for (const ca of curls) if (t >= ca && t < ca + 0.4) c = Math.max(c, Math.sin(prog(t, ca, 0.4) * Math.PI) * Math.min(w, h) * 0.22);
+  const x0 = -w / 2;
+  const y0 = -h / 2;
+  const x1 = w / 2;
+  const y1 = h / 2;
+  const body: Pt[] =
+    c > 0.5
+      ? [
+          [x0, y0],
+          [x1, y0],
+          [x1, y1 - c],
+          [x1 - c, y1],
+          [x0, y1],
+        ]
+      : [
+          [x0, y0],
+          [x1, y0],
+          [x1, y1],
+          [x0, y1],
+        ];
+  const bodyD = ptsD(body);
+  const flap = c > 0.5 ? ptsD([[x1, y1 - c], [x1 - c, y1], [x1 - c * 0.92, y1 - c * 0.92]]) : '';
+  // the strike: the substring's measured extent on its line (centred lines)
+  let strikeNode: React.ReactNode = null;
+  if (p.strike && p.strikeAt !== undefined && t >= p.strikeAt) {
+    const li = L.lines.findIndex((l) => l.includes(p.strike!));
+    if (li >= 0) {
+      const ln = L.lines[li];
+      const i0 = ln.indexOf(p.strike);
+      const pre = (measureCaption(ln.slice(0, i0), 100) / 100) * L.fs;
+      const sub = (measureCaption(p.strike, 100) / 100) * L.fs;
+      const lx = x0 + (w - L.widths[li]) / 2 + pre;
+      const ly = y0 + L.base0 + li * (L.pitch ?? PITCH) * L.fs - L.fs * 0.28;
+      strikeNode = <Ink d={line(lx - 4, ly + 1.5, lx + sub + 4, ly - 1.5, {seed: `${seed}/st`, over: [2, 5]})} at={p.strikeAt} dur={0.15} width={iw * 1.3} seed={`${seed}/sti`} />;
+    }
+  }
+  // slap marks: three short ink ticks for 0.16 s as it lands
+  let slapMarks: React.ReactNode = null;
+  if (p.slapAt !== undefined && t >= p.slapAt && t < p.slapAt + 0.16) {
+    const q = prog(t, p.slapAt, 0.16);
+    const Ln = 9 * Math.sin(Math.PI * q) + 2;
+    const tk = (px: number, py: number, dx: number, dy: number) => `M${(px + dx * 4).toFixed(1)} ${(py + dy * 4).toFixed(1)}l${(dx * Ln).toFixed(1)} ${(dy * Ln).toFixed(1)}`;
+    slapMarks = <path d={tk(x0 - 3, y0 - 3, -0.7, -0.7) + tk(x1 + 3, y0 - 3, 0.7, -0.7) + tk(x1 + 4, 0, 1, 0) + tk(x0 - 4, y1 * 0.4, -1, 0.15)} stroke={palette.ink} strokeWidth={iw * 0.8} strokeLinecap="round" fill="none" />;
+  }
+  const off = F.off;
+  return (
+    <XG m={mat.compose(mat.translate(cx, cy), mat.rotate(a), mat.scale(sx, sy))}>
+      <Fill d={bodyD} color={p.color ?? palette.cream} offset={off} mode="none" seed={`${seed}/p`} />
+      <Fill d={ptsD([[x0, y0], [x1, y0], [x1, y0 + h * 0.15], [x0, y0 + h * 0.15]])} color={palette.sand} offset={off} mode="none" seed={`${seed}/band`} />
+      <Ink d={bodyD} width={iw} taper={false} vary={0} open={0.06} seed={`${seed}/o`} />
+      {flap ? (
+        <>
+          <Fill d={flap} color={palette.sand} offset={false} mode="none" seed={`${seed}/fl`} />
+          <Ink d={flap} width={iw * 0.8} taper={false} vary={0} seed={`${seed}/fli`} />
+        </>
+      ) : null}
+      {sx > 0.55 ? (
+        <XG m={mat.translate(x0, y0)}>
+          <InkTextBlock L={L} align="center" color={palette.ink} k={F.k} seed={seed} />
+        </XG>
+      ) : null}
+      {strikeNode}
+      {slapMarks}
+    </XG>
+  );
+};
+
+// ---------------------------------------------------------------- Sticker (S03)
+
+export type StickerProps = {
+  /** Centre (world). */
+  x: number;
+  y: number;
+  /** Width (world px). Default 124 (keep >= 110 on screen; the lettering is 0.24 w >= 24 px). */
+  w?: number;
+  /** Static tilt (deg). Default -6. */
+  rot?: number;
+  /** Optional pop-in (it rides its building's pop-up otherwise: static, no animation). */
+  at?: number;
+  /** The scribbled '?' (default true). */
+  question?: boolean;
+  ink?: number;
+  seed?: Seed;
+};
+
+/** The bait sticker: 'I [heart] PHP' with a DRAWN heart (CaptionHand has no heart glyph) and a hand-scribbled '?' in
+ *  ink half off its edge. A white rounded sticker, slightly peeled at one corner. Static: a pauser detail. */
+export const Sticker: React.FC<StickerProps> = ({x, y, w = 124, rot = -6, at, question = true, ink, seed = 'sticker'}) => {
+  useCaptionFont();
+  const t = useTime();
+  const F = usePropFrame({ink: ink ?? 2.2, seed, defDepth: 'far'});
+  const look = useLook();
+  if (at !== undefined && t < at) return null;
+  const k = springPop(t, at);
+  const W = F.W;
+  const fs = w * 0.25;
+  const h = fs * 1.75;
+  const x0 = -w / 2;
+  const y0 = -h / 2;
+  const r = h * 0.28;
+  const peel = h * 0.26;
+  // body with the peeled top-right corner folded back
+  const body = `M${x0 + r} ${y0}H${w / 2 - peel}L${w / 2} ${y0 + peel}V${y0 + h - r}A${r} ${r} 0 0 1 ${w / 2 - r} ${y0 + h}H${x0 + r}A${r} ${r} 0 0 1 ${x0} ${y0 + h - r}V${y0 + r}A${r} ${r} 0 0 1 ${x0 + r} ${y0}Z`;
+  const fold = `M${w / 2 - peel} ${y0}L${w / 2} ${y0 + peel}L${w / 2 - peel * 0.9} ${y0 + peel * 0.92}Z`;
+  // 'I', the heart, 'PHP' laid out by measurement, centred
+  const wI = (measureCaption('I', 100) / 100) * fs;
+  const wP = (measureCaption('PHP', 100) / 100) * fs;
+  const hw = fs * 0.78;
+  const gap = fs * 0.2;
+  const total = wI + gap + hw + gap + wP;
+  const sx0 = -total / 2 - w * 0.04;
+  const base = y0 + h * 0.5 + fs * 0.34;
+  const hx = sx0 + wI + gap + hw / 2;
+  const hy = base - fs * 0.32;
+  const hs = hw / 2;
+  const heart = `M${hx} ${hy + hs * 0.85}C${hx - hs * 0.2} ${hy + hs * 0.6} ${hx - hs * 1.05} ${hy + hs * 0.15} ${hx - hs * 0.98} ${hy - hs * 0.35}C${hx - hs * 0.92} ${hy - hs * 0.85} ${hx - hs * 0.2} ${hy - hs * 0.95} ${hx} ${hy - hs * 0.45}C${hx + hs * 0.2} ${hy - hs * 0.95} ${hx + hs * 0.92} ${hy - hs * 0.85} ${hx + hs * 0.98} ${hy - hs * 0.35}C${hx + hs * 1.05} ${hy + hs * 0.15} ${hx + hs * 0.2} ${hy + hs * 0.6} ${hx} ${hy + hs * 0.85}Z`;
+  // the scribbled '?': a loose ink hook + dot, overlapping the sticker's right edge
+  const qx = w / 2 + fs * 0.12;
+  const qy = y0 + h * 0.42;
+  const qs = fs * 1.15;
+  const qD = `M${qx - qs * 0.26} ${qy - qs * 0.26}C${qx - qs * 0.3} ${qy - qs * 0.6} ${qx + qs * 0.3} ${qy - qs * 0.66} ${qx + qs * 0.28} ${qy - qs * 0.3}C${qx + qs * 0.26} ${qy - qs * 0.06} ${qx + qs * 0.02} ${qy - qs * 0.04} ${qx + qs * 0.01} ${qy + qs * 0.2}`;
+  return (
+    <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(k))}>
+      <Fill d={body} color={palette.white} offset={F.off} mode="none" seed={`${seed}/b`} />
+      <Ink d={body} width={W} taper={false} vary={0} seed={`${seed}/bo`} />
+      <Fill d={fold} color={palette.sand} offset={false} mode="none" seed={`${seed}/fd`} />
+      <Ink d={fold} width={W * 0.7} taper={false} vary={0} seed={`${seed}/fdi`} />
+      <Fill d={heart} color={palette.peach} offset={[F.off[0] * 0.6, F.off[1] * 0.6]} mode="none" seed={`${seed}/h`} />
+      <Ink d={heart} width={W * 0.75} taper={false} vary={0} seed={`${seed}/hi`} />
+      {look.ink ? (
+        <ExitFade x={0} y={0}>
+          <text x={sx0} y={base} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink}>
+            I
+          </text>
+          <text x={sx0 + wI + gap + hw + gap} y={base} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink}>
+            PHP
+          </text>
+        </ExitFade>
+      ) : null}
+      {question ? (
+        <>
+          <Ink d={qD} width={W * 1.25} taper={false} seed={`${seed}/q`} />
+          <Fill d={circle(qx + qs * 0.02, qy + qs * 0.4, Math.max(1.4, W * 0.85), {seed: `${seed}/qd`})} color={palette.ink} offset={false} mode="none" lookExempt seed={`${seed}/qd`} />
+        </>
+      ) : null}
+    </XG>
+  );
+};

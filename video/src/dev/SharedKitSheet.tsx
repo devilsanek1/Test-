@@ -10,6 +10,7 @@ import {captionFontStack, useCaptionFont} from '../lib/font';
 import {mat, XG} from '../lib/xf';
 import {Look, UnBuild} from '../lib/exit';
 import {Sun} from '../lib/Sun';
+import {Tod} from '../lib/tod';
 import {Ink} from '../lib/Ink';
 import {hline} from '../lib/sketch';
 import {Door} from '../lib/kit';
@@ -25,6 +26,14 @@ import {
   LabelTag,
   RewindGlyph,
   CounterBoard,
+  DiagramHand,
+  SiteIcon,
+  KeyCross,
+  StickyNote,
+  Sticker,
+  CheckBoxTag,
+  CheckBoxTags,
+  SupportTag,
   Caretaker,
   CheckFlag,
   CheckMark,
@@ -335,12 +344,18 @@ const BigCell: React.FC<{x: number; y: number; w: number; h: number; label: stri
 };
 
 /** Storyboard v3 pieces at (near) film size: labels in every kind, the rewind kit, the counter board, the diagram, tags. */
+const TodGolden: React.FC<{children?: React.ReactNode}> = ({children}) => <Tod value="golden">{children}</Tod>;
+
 const V3Mode: React.FC = () => {
   const C = 540;
   const R = 280;
   const Y = 76;
   const Y3 = Y + 3 * R;
   const R3 = 420;
+  const Y4 = Y3 + R3;
+  const R4 = 290;
+  const Y5 = Y4 + R4;
+  const R5 = 1920 - Y5;
   return (
     <>
       <rect width={1080} height={1920} fill={palette.white} />
@@ -401,6 +416,41 @@ const V3Mode: React.FC = () => {
           gatesAt={[1.0, 1.4, 1.7, 1.8, 1.9, 2.3, 2.4, 2.8, 3.3]}
           stamps={[{at: 2.6, text: 'first 45 min: tens of thousands'}, {at: 3.4, text: 'millions · within a day'}]} seed="v3cb" />
         <rect x={0} y={386} width={540} height={40} fill={palette.sand} />
+      </BigCell>
+      <BigCell x={C} y={Y3} w={C} h={R3} label="DiagramHand (slide / draw-on), SiteIcon taken, KeyCross" bg={palette.white}>
+        <Lock x={150} y={150} size={150} state="blueprint" seed="v3dl" />
+        <DiagramHand x={134} y={112} angle={-36} scale={0.82} enterAt={0.4} from={520} turnAt={1.2} turnDeg={34} exitAt={4.3} seed="v3hand" />
+        <SiteIcon x={330} y={40} w={120} h={120} at={0.3} takenAt={1.5} unlockAt={1.9} flutterAt={2.6} seed="v3site" />
+        <KeyCross x={400} y={250} size={84} at={2.0} crossAt={2.25} settleAt={2.8} seed="v3key" />
+        <DiagramHand x={150} y={330} angle={-10} scale={0.6} drawAt={2.4} turnAt={2.8} undrawAt={4.0} seed="v3hand2" />
+      </BigCell>
+      {/* row 4: S11 sticky note, S03 sticker, S09 check-box tags (single + batched), S10 support tag */}
+      <BigCell x={0} y={Y4} w={C} h={R4} label="StickyNote: flutter + slap, strike 'and on again', curl" bg={palette.sand}>
+        <RollerShutter x={60} y={30} w={420} h={210} state="down" seed="v3sn_sh" />
+        <StickyNote x={270} y={130} lines={['Turn it off', 'and on again']} strike="and on again" size={30} slapAt={0.6} strikeAt={1.6} curlAt={2.6} seed="v3note" />
+      </BigCell>
+      <BigCell x={C} y={Y4} w={C} h={R4} label="Sticker; CheckBoxTag empty / ticked; x60 batched; SupportTag" bg={palette.cream}>
+        <rect x={20} y={40} width={150} height={120} fill={palette.teal} />
+        <Sticker x={95} y={100} w={124} seed="v3stk" />
+        <CheckBoxTag x={220} y={40} size={44} at={0.4} seed="v3cb1" />
+        <CheckBoxTag x={280} y={40} size={44} at={0.5} tickAt={1.4} seed="v3cb2" />
+        <CheckBoxTags spots={Array.from({length: 60}, (_, i) => ({x: 200 + (i % 15) * 13, y: 130 + Math.floor(i / 15) * 22, size: 10 + (i % 3) * 2, at: 0.6 + i * 0.02, ticked: i === 22}))} ink={0.7} />
+        <SupportTag x={400} y={30} size={56} at={0.7} checkAt={0.9} stampAt={1.2} seed="v3sup1" />
+        <SupportTag x={470} y={36} size={30} at={0.9} seed="v3sup2" />
+        <SupportTag x={510} y={40} size={14} at={1.0} seed="v3sup3" />
+      </BigCell>
+      {/* row 5: S08 glow steps at r260 (scaled 0.4, half-set), S10 1/2 pie */}
+      <BigCell x={0} y={Y5} w={C} h={R5} label="SunGlowSteps r260 (x 0.4, half-set on the skyline)" bg={skies.golden}>
+        <XG m={mat.compose(mat.translate(270, 250), mat.scale(0.4))}>
+          <SunGlowSteps cx={0} cy={0} r={260} at={0.6} />
+          <Sun cx={0} cy={0} r={260} drift={[0, 0]} />
+        </XG>
+        <rect x={0} y={250} width={540} height={60} fill={palette.tan} />
+      </BigCell>
+      <BigCell x={C} y={Y5} w={C} h={R5} label="SunPie n=2 cream=1 (1/2): day / golden" bg={skies.day}>
+        <rect x={270} y={0} width={270} height={290} fill={skies.golden} />
+        <Sun cx={135} cy={128} r={90} drift={[0, 0]}>{(r) => <SunPie r={r} n={2} cream={1} spokesAt={0.5} slicesAt={1.2} />}</Sun>
+        <Look fills="color"><TodGolden><Sun cx={405} cy={128} r={90} drift={[0, 0]}>{(r) => <SunPie r={r} n={2} cream={1} spokesAt={0.6} slicesAt={1.3} solidAt={3.8} />}</Sun></TodGolden></Look>
       </BigCell>
     </>
   );

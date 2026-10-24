@@ -16,3 +16,4 @@ export * from './Tablet';
 export * from './Vehicles';
 export * from './Labels';
 export * from './CounterBoard';
+export * from './Diagram';

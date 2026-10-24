@@ -14,13 +14,16 @@ import {BLUEPRINT, popUpK} from '../shared/sets';
 import {Bit, Citizen, EdgeOnlooker} from '../shared/props';
 import type {Acc, Hair} from '../../lib/kit';
 import type {Beats} from './beats';
+import {ROOF_SIGN} from './plan';
 import type {Pt} from '../../lib/sketch';
 
 // ---------------------------------------------------------------- Pip
 
 const PIP_SCALE = 1.2;
-/** S02's rod perch on screen (836, 786) = world (836, 776) under this scene's rest camera. */
-const PIP_FROM: Pt = [836, 776];
+/** Where S02's hop-off has carried Pip at the cut: S02 hops him off its rod perch (screen ~(843, 770)) up-left toward the
+ *  lens at cut(password)-0.04; on its last frame he is at screen ~(839, 749) still rising. S03 picks him up there:
+ *  screen (836, 748) = world (836, 738) under this scene's rest camera, moving up (vy0) and falling onto the plan. */
+const PIP_FROM: Pt = [836, 738];
 const PIP_AT: Pt = [BLUEPRINT.pip[0], BLUEPRINT.pip[1]];
 
 /** Ballistic drop with an initial upward kick vy0 (px/s) landing exactly at `to` after T. */
@@ -47,7 +50,7 @@ const landSq = (t: number, at: number, amp = 0.24) => {
 
 export const PipS03: React.FC<{b: Beats}> = ({b}) => {
   const t = useTime();
-  const t0 = b.cut - 0.038; // S02's hop-off (cut(password)-0.04) carried across the hard cut
+  const t0 = b.cut; // picks S02's hop-off up at the hard cut (S02 takes off at cut(password)-0.04)
   const printLand = b.stamp + 0.4; // the stamp's print lands (ring 0.13 + slam 0.27)
   const b1 = {at: printLand, T: 0.4, h: 64};
   const b2 = {at: printLand + 0.4, T: 0.25, h: 16};
@@ -59,7 +62,7 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
   let rotate = 0;
   if (t < b.pipLand) {
     // the drop from S02's rod: falling down-left onto the bare plan, nose dipping
-    [x, y] = drop(t, t0, b.pipLand - t0, PIP_FROM, PIP_AT, -60);
+    [x, y] = drop(t, t0, b.pipLand - t0, PIP_FROM, PIP_AT, -150);
     const u = clamp((t - t0) / (b.pipLand - t0));
     squash = -0.16 * (1 - u) - 0.04;
     rotate = lerp(-6, 14, u);
@@ -87,22 +90,22 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
 
 // ---------------------------------------------------------------- Bit on the pen-nib sign
 
-/** The set's NibSign swing (copied formula: about the bracket hook, -16 deg, decaying). */
+/** The pen-nib sign's swing (same formula as the set's NibSign: -16 deg, decaying) about its hook. */
 export const signAngle = (t: number, swingAt: number) => (t >= swingAt ? -16 * Math.exp(-5 * (t - swingAt)) * Math.cos((t - swingAt) * 12.5) : 0);
 
+/** Bit sits on top of the pen-nib sign (S03's visible roof sign, ROOF_SIGN) and swings with it; antennae twitch. */
 export const BitOnSign: React.FC<{swingAt: number; twitchAt: number; size?: number}> = ({swingAt, twitchAt, size = 19}) => {
   const t = useTime();
-  const S = BLUEPRINT.sign;
-  const hookY = S.y - S.r - 22;
+  const S = ROOF_SIGN;
   const a = signAngle(t, swingAt);
   // antennae twitch: a quick stretch up and a look up
   const tw = t >= twitchAt && t < twitchAt + 0.18 ? Math.sin(Math.PI * ((t - twitchAt) / 0.18)) : 0;
   const feet: Pt = [S.x + 1, S.y - S.r + 1];
   const look = t >= twitchAt && t < twitchAt + 0.7 ? 'up' : t >= swingAt && t < swingAt + 0.9 ? 'down' : 'auto';
   return (
-    <XG m={mat.about(mat.rotate(a), S.x, hookY)}>
+    <XG m={mat.about(mat.rotate(a), S.hook[0], S.top + 8)}>
       <XG m={mat.about(mat.scale(1 - 0.06 * tw, 1 + 0.2 * tw), feet[0], feet[1])}>
-        <Bit x={feet[0]} y={feet[1]} size={size} flip look={look} blinkAt={[twitchAt + 0.3]} seed="s03/bit" />
+        <Bit x={feet[0]} y={feet[1]} size={size} look={look} blinkAt={[twitchAt + 0.3]} seed="s03/bit" />
       </XG>
     </XG>
   );
@@ -184,9 +187,9 @@ export function walkersFor(b: Beats): Walker[] {
     // the doorway walker: R4's door, steps out and heads up the street toward the press house
     {id: 'door', x: 800, y: 1228, h: 58, at: b.doorway, walkAt: b.doorway + 0.25, pace: 0.05, body: palette.tan, hair: 'bun'},
     // the six: pop up out of the plan near -> far, alternating sides (0.05 s apart)
-    {id: 'a', x: 404, y: 1322, h: 104, at: e, body: palette.teal, hair: 'short', acc: ['backpack'], waveAt: b.heads},
+    {id: 'a', x: 404, y: 1322, h: 104, at: e, body: palette.teal, hair: 'short', acc: ['backpack']},
     {id: 'b', x: 712, y: 1312, h: 100, at: e + 0.05, walkAt: e + 0.4, pace: 0.05, body: palette.brown, hair: 'long'},
-    {id: 'c', x: 468, y: 1282, h: 86, at: e + 0.1, body: palette.sage, hair: 'curly'},
+    {id: 'c', x: 468, y: 1282, h: 86, at: e + 0.1, body: palette.sage, hair: 'curly', waveAt: b.heads},
     {id: 'd', x: 650, y: 1270, h: 82, at: e + 0.15, walkAt: e + 0.3, stop: b.looksUp, lookUpAt: b.looksUp, pace: 0.07, body: palette.tealDark, hair: 'bun'},
     {id: 'e', x: 388, y: 1250, h: 70, at: e + 0.2, walkAt: e + 0.35, pace: 0.05, body: palette.tan, hair: 'short'},
     {id: 'f', x: 760, y: 1258, h: 72, at: e + 0.25, body: palette.teal, hair: 'beanie'},
@@ -214,7 +217,7 @@ export const NearWalkers: React.FC<{b: Beats}> = ({b}) => {
   if (t < b.everyone) return null;
   const turn = (side: number) => -side * 3.2 * E.outBack(1.4)(prog(t, b.heads, 0.3));
   const bobY = (delay: number) => (t >= b.run + delay && t < b.run + delay + 0.26 ? -7 * Math.sin(Math.PI * ((t - b.run - delay) / 0.26)) : 0);
-  const L: Pt = [40, 1470];
+  const L: Pt = [64, 1492];
   const R: Pt = [1036, 1432];
   return (
     <>

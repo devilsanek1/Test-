@@ -19,19 +19,18 @@ import {World, useScene, useTime, skies, palette} from '../lib';
 import {Sun} from '../lib/Sun';
 import {mat, XG} from '../lib/xf';
 import {BlueprintStreet, BLUEPRINT, blueprintAnchors, PopUp, SideId, BlueprintId, LayerWrap} from './shared/sets';
-import {LabelTag, SunPie} from './shared/props';
-import {beats, Beats, S03_START} from './scene03/beats';
+import {LabelTag, Sticker, SunPie} from './shared/props';
+import {beats, Beats, local, S03_START, W} from './scene03/beats';
 import {camAt, camMat} from './scene03/camera';
-import {CountPing, FarPlain, Footprints, PressScreen, SideScreens, VentPuffs} from './scene03/plan';
+import {CountPing, FarPlain, Footprints, PressScreen, RoofSign, SideScreens, VentPuffs} from './scene03/plan';
 import {BitOnSign, NearWalkers, PipS03, StreetLife} from './scene03/cast';
-import {Sticker, TitleBlock} from './scene03/shims';
 
 // ---------------------------------------------------------------- labels (final_script section 6)
 
 const L3 = ['PHP · the code most', 'websites are built with'];
 const L4 = ['of sites whose server', 'language is known · W3Techs'];
-/** The plan's title-block card slot (world, storyboard S03 composition). */
-const CARD: [number, number, number, number] = [490, 1320, 910, 1440];
+/** Plaque / door anchors of every building (static). */
+const anchors = blueprintAnchors();
 
 // ---------------------------------------------------------------- timing tables (scene-local, from the beats)
 
@@ -66,19 +65,19 @@ function tables(b: Beats) {
 const Scene03: React.FC = () => {
   const t = useTime();
   const scene = useScene();
-  const b = beats(scene?.start ?? S03_START);
+  const start = scene?.start ?? S03_START;
+  const b = beats(start);
   const T = tables(b);
   const cam = camAt(t, b.everyone);
   const M = camMat(cam);
-  const anchors = blueprintAnchors();
 
   // the sun: SCREEN space (690, 700) r110, pinned (no idle drift: it is S04's match object), the 7/10 pie, then the
   // low glide-hop: take-off at end(it), mid-air at (810, 680) on the cut, touch-down on 'This' at (930, 690)
-  const sunHopAir = 14.395 - 13.945;
+  const sunHopAir = local(W.this, start) - b.sunHop; // end(it) -> 'This': 0.45 s, its midpoint is the cut
   const sun = (
     <XG m={mat.inv(M)}>
       <Sun cx={690} cy={700} r={110} drift={[0, 0]} hops={[{t: b.sunHop, to: [930, 690], h: 15, air: sunHopAir}]}>
-        {(r: number) => <SunPie r={r} n={10} cream={3} spokesAt={b.spokes} slicesAt={b.ten} sliceStagger={0.05} solidAt={b.solid} seed="s03/pie" />}
+        {(r: number) => <SunPie r={r} n={10} cream={3} spokesAt={b.spokes} slicesAt={b.ten} sliceStagger={0.05} solidAt={b.solid} spokesOutAt={b.solid + 0.03} seed="s03/pie" />}
       </Sun>
     </XG>
   );
@@ -87,25 +86,32 @@ const Scene03: React.FC = () => {
   const wrap: LayerWrap = (name, _n, node) => {
     if (name === 'far') return (
       <>
-        <FarPlain />
-        {t >= T.pressAt ? node : null}
+        <FarPlain gridAt={b.grid} />
+        {/* the set's far peeks only once the street is up (they would float above the bare plan's horizon) */}
+        {t >= T.popAt.L5 + 0.12 ? node : null}
       </>
     );
     if (name === 'ground') return (
       <>
         {node}
         <Footprints />
-        <TitleBlock box={CARD} at={b.grid + 0.3} seed="s03/tb" />
-        <LabelTag kind="card" box={CARD} text={L3} fontSize={38 / 1.04} at={b.L3} flipTo={{at: b.flip, text: L4, fontSize: 36 / 1.04}} seed="s03/card" />
       </>
     );
     if (name === 'press') return (
       <>
-        {node}
+        {/* the set's own pen-nib sign hangs right of the press house, where R4 hides it once R4 is up: keep it out of the
+            frame while R4 pops (S03 hangs a visible sign on the roof instead, RoofSign) */}
+        {t < T.popAt.R4 + 0.2 ? <g clipPath="url(#s03pressClip)">{node}</g> : node}
+        <defs>
+          <clipPath id="s03pressClip" clipPathUnits="userSpaceOnUse">
+            <path clipRule="evenodd" d="M-500 -500H1600V2500H-500Z M768 600H900V1180H768Z" />
+          </clipPath>
+        </defs>
         <PopUp at={T.pressAt} x={560} y={BLUEPRINT.press.base}>
           <PressScreen lightAt={b.pressScreen} pulseAt={b.websites} />
-          <Sticker x={640} y={1062} seed="s03/sticker" />
+          <Sticker x={648} y={1040} w={124} seed="s03/sticker" />
           <CountPing x={anchors.P.plaque.x} y={anchors.P.plaque.y} r={34} at={T.countAt.P} />
+          <RoofSign swingAt={b.swing} />
           <BitOnSign swingAt={b.swing} twitchAt={b.doorway} />
           <VentPuffs times={[b.pipSettle, b.swing, b.run]} />
         </PopUp>
@@ -113,7 +119,14 @@ const Scene03: React.FC = () => {
     );
     if (name === 'sides') return (
       <>
-        {node}
+        {/* the set's bleed slivers (beyond the frame edges) stand from frame 0: keep their ink overshoot out of the
+            frame until the near buildings pop up over them */}
+        {t < T.popAt.L1 ? <g clipPath="url(#s03sidesClip)">{node}</g> : node}
+        <defs>
+          <clipPath id="s03sidesClip" clipPathUnits="userSpaceOnUse">
+            <rect x={2} y={-2000} width={1076} height={6000} />
+          </clipPath>
+        </defs>
         <SideScreens popAt={T.popAt} lightAt={T.lightAt} />
         {(['L1', 'R1', 'L2', 'R2', 'L4', 'R3'] as SideId[]).map((id) => (
           <CountPing key={id} x={anchors[id].plaque.x} y={anchors[id].plaque.y} r={Math.max(14, anchors[id].plaque.size * 1.4)} at={T.countAt[id]} width={2.6} />
@@ -141,6 +154,7 @@ const Scene03: React.FC = () => {
           stampAt={b.stamp}
           signSwingAt={b.swing}
           people={false}
+          titleBlock={(box) => <LabelTag kind="card" box={box} text={L3} fontSize={38 / 1.04} at={b.L3} flipTo={{at: b.flip, text: L4, fontSize: 36 / 1.04}} seed="s03/card" />}
           sun={sun}
           wrap={wrap}
           seed="bp"

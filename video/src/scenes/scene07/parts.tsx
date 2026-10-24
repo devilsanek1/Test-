@@ -120,7 +120,7 @@ export const WireCopy: React.FC<{c: WireCopySpec}> = ({c}) => {
   return (
     <XG m={mat.compose(mat.translate(pt[0], pt[1]), mat.rotate(rot), mat.scale(1, sq))}>
       <LeakSheet x={0} y={hang} w={COPY.w} h={COPY.h} scale={s} peg={pegged} pin={false} depth="far" seed={c.seed} />
-      {c.bit ? <Bit x={4} y={1} size={17} state="ride" flip look="forward" seed={`${c.seed}/bit`} /> : null}
+      {c.bit ? <Bit x={9} y={-0.5} size={18} state="ride" flip look="forward" seed={`${c.seed}/bit`} /> : null}
     </XG>
   );
 };

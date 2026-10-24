@@ -7,7 +7,7 @@
 //       'single' and HOLDS still to the tram wipe.
 // screen = (world - cam) * zoom + (540, 960).
 
-import {MOTION, ease as E, clamp, mat, Mat} from '../../../lib';
+import {MOTION, ease as E, clamp, mat, Mat} from '../../lib';
 import {B} from './beats';
 
 export type Cam = {x: number; y: number; zoom: number; part: 'A1' | 'A2' | 'B'};

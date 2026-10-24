@@ -1,0 +1,5 @@
+600 paint edges checked (3 presets x 5 amounts x 40 seeds), 0 failures
+preset @ amount 1, 40 seeds: p5 / median / p95
+paint-subtle: paper 6 / 7 / 7 % of the frame (3 / 3 / 4 % of y 180-1520); depth left 0 / 21 / 34, right 7 / 17 / 20 (y 200-1500), top 0 / 24 / 31, bottom 0 / 37 / 55 px; blocks 4 / 5 / 5; ink clip 5 / 5 / 5 KB; holes + hairlines 1
+paint-medium: paper 9 / 11 / 12 % of the frame (4 / 5 / 7 % of y 180-1520); depth left 0 / 36 / 74, right 8 / 18 / 28 (y 200-1500), top 0 / 41 / 107, bottom 0 / 64 / 162 px; blocks 6 / 7 / 8; ink clip 6 / 7 / 8 KB; holes + hairlines 1
+paint-loose: paper 15 / 17 / 21 % of the frame (6 / 7 / 8 % of y 180-1520); depth left 23 / 38 / 103, right 8 / 18 / 39 (y 200-1500), top 0 / 80 / 189, bottom 0 / 136 / 278 px; blocks 6 / 7 / 8; ink clip 8 / 8 / 9 KB; holes + hairlines 1

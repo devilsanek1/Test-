@@ -102,11 +102,14 @@ export const PLAZA = {
     {head: [236, 1818] as Pt, s: 1.38},
     {head: [1010, 1765] as Pt, s: 1.34},
   ],
+  /** Per building: window / door rects, the shutter padlock (body centre) and the tag hang point on the shutter rail
+   *  (storyboard v3: spaced so the LETTERED 'back soon' tag (64-84 px wide, govB >= 80) clears the padlock; all at
+   *  x <= 930), the pennant root, the door lock box and plaque. */
   gov: {
-    govA: {window: [118, 906, 144, 108] as R4, door: [148, 1228, 84, 164] as R4, padlock: [190, 1019] as Pt, tag: [222, 1009] as Pt, pennant: [392, 760] as Pt, lock: [218, 1312, 14, 18] as R4, plaque: [126, 1292, 26] as [number, number, number]},
-    govB: {window: [414, 970, 208, 146] as R4, door: [478, 1236, 82, 166] as R4, padlock: [518, 1121] as Pt, tag: [548, 1111] as Pt, pennant: [612, 820] as Pt, lock: [543, 1318, 22, 27] as R4, plaque: [454, 1300, 28] as [number, number, number]},
-    govC: {window: [812, 734, 132, 106] as R4, door: null as R4 | null, padlock: [878, 845] as Pt, tag: [848, 835] as Pt, pennant: [800, 722] as Pt, lock: null as R4 | null, plaque: null as [number, number, number] | null},
-    govD: {window: [800, 1004, 146, 124] as R4, door: [992, 1300, 96, 170] as R4, padlock: [873, 1133] as Pt, tag: [843, 1123] as Pt, pennant: [798, 990] as Pt, lock: [1068, 1392, 15, 19] as R4, plaque: [972, 1352, 24] as [number, number, number]},
+    govA: {window: [118, 906, 144, 108] as R4, door: [148, 1228, 84, 164] as R4, padlock: [190, 1019] as Pt, tag: [246, 1009] as Pt, pennant: [392, 760] as Pt, lock: [218, 1312, 14, 18] as R4, plaque: [126, 1292, 26] as [number, number, number]},
+    govB: {window: [414, 970, 208, 146] as R4, door: [478, 1236, 82, 166] as R4, padlock: [488, 1121] as Pt, tag: [566, 1111] as Pt, pennant: [612, 820] as Pt, lock: [543, 1318, 22, 27] as R4, plaque: [454, 1300, 28] as [number, number, number]},
+    govC: {window: [812, 734, 132, 106] as R4, door: null as R4 | null, padlock: [904, 845] as Pt, tag: [846, 835] as Pt, pennant: [800, 722] as Pt, lock: null as R4 | null, plaque: null as [number, number, number] | null},
+    govD: {window: [800, 1004, 146, 124] as R4, door: [992, 1300, 96, 170] as R4, padlock: [900, 1133] as Pt, tag: [840, 1123] as Pt, pennant: [798, 990] as Pt, lock: [1068, 1392, 15, 19] as R4, plaque: [972, 1352, 24] as [number, number, number]},
   },
   /** govC's clock face. */
   clock: {x: 870, y: 670, r: 26},

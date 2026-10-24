@@ -8,25 +8,27 @@
 // on screen 104-440 x 1256-1466), locked from 'of'. Docs: docs/scenes/S10.md.
 
 import React from 'react';
-import {World, ScreenSpace, Sun, useScene, useTime, useTransition} from '../lib';
+import {World, ScreenSpace, Sun, TimeShift, ease as E, useScene, useTime, useTransition} from '../lib';
 import {wipeEdgeX} from '../lib/cine/wipers';
-import {LabelTag, OLD_QUARTER, OldQuarter, SunPie, Tram, tramRoof} from './scene10/kit';
+import scenesJson from '../data/scenes.json';
+import {LabelTag, OLD_QUARTER, OldQuarter, SunPie} from './scene10/kit';
 import {localBeats, SCENE, W} from './scene10/beats';
 import {SecondRow} from './scene10/secondRow';
 import {PLAQUE_SIZE, Sites, TAG_HANG} from './scene10/sites';
-import {plaqueFacePoint} from './scene10/plaques';
+import {plaqueFacePoint, TAG_W, tagBodyOffset} from './scene10/plaques';
 import {Cart, CartTimes, Tosses} from './scene10/cart';
-import {Pip, PipRiding} from './scene10/pip';
+import {Pip} from './scene10/pip';
+import {GapWalker} from './scene10/walker';
+// S09's tram (its exported Wiper): read-only, to hand Pip over from its roof and to preview the wipe standalone
+import {TRAM as S09_TRAM, TramWiper, tramPipAt} from './scene09/TramWiper';
 import type {Pt} from '../lib/sketch';
 
-/** S09's tram Wiper as Film will run it (ENGINE 5: a 1300 px tram, half 660): its centre x at scene time t. */
-export const TRAM = {w: 1300, half: 660, y: 1150, dur: 0.5};
-const tramX = (t: number) => wipeEdgeX((t + TRAM.dur / 2) / TRAM.dur, 'right', TRAM.half);
-/** Pip rides near the tram's tail; he leaps off it at ABS.pipHop. */
-const tailX = (t: number) => tramX(t) - TRAM.w / 2 + 52;
+/** The S09 -> S10 foreground wipe as Film runs it: 0.5 s centred on the cut, the edge = the tram's centre. */
+const WIPE = {dur: 0.5, half: TramWiper.half ?? S09_TRAM.L / 2 + 8};
+const wipeP = (t: number) => (t + WIPE.dur / 2) / WIPE.dur;
+const tramX = (t: number) => wipeEdgeX(wipeP(t), 'right', WIPE.half);
 
 const L13 = ['Rough estimate from', 'W3Techs data · only sites', 'that show their version ·', 'some hosts patch old', 'versions themselves'];
-const TAG = 46; // support tag body height (world px)
 
 const Scene10: React.FC = () => {
   const t = useTime();
@@ -40,60 +42,72 @@ const Scene10: React.FC = () => {
   // the support tags land on siteL's / siteR's plaques (body centre = hang point + string + half the tag)
   const hangL = plaqueFacePoint({x: sg.L.sign.x, y: sg.L.sign.y, size: PLAQUE_SIZE.L}, TAG_HANG.L);
   const hangR = plaqueFacePoint({x: sg.R.sign.x, y: sg.R.sign.y, size: PLAQUE_SIZE.R}, TAG_HANG.R);
-  const body = (h: Pt): Pt => [h[0], h[1] + TAG * 0.22 + TAG / 2];
+  const body = (h: Pt): Pt => [h[0], h[1] + tagBodyOffset(TAG_W)];
   const cartT: CartTimes = {inAt: b.cartIn, pull1: b.pullTag1, toss1: b.toss1, land1: b.tick1, pull2: b.pullTag2, toss2: b.toss2, land2: b.tick2, end};
 
-  // standalone preview only (no Film transition running): S09's tram, with Pip on its tail, as the wipe would show it
-  const standIn = tr === null && t < TRAM.dur / 2 + 0.02;
+  // standalone preview only (no Film transition running): S09's own tram Wiper (Pip on its roof) as the wipe shows it
+  const standIn = tr === null && t < WIPE.dur / 2;
+  const s09 = (scenesJson as {id: string; start: number}[]).find((x) => x.id === 'S09');
+  // the S09 sun's hop (PartB: takes off ON the cut from (700, 720) r150, lands at (500, 690) r110 after 0.56 s, h 60):
+  // the same sun on both sides of the wipe; then it idles with a slow drift
+  const sunAir = b.sunLand - b.cut;
+  // Pip leaves S09's tram roof exactly where S09's Wiper last drew him (its tramPipAt, film time)
+  const hand = tramPipAt(start + b.pipHop);
 
   return (
     <World sky={[{t: 0, tod: 'day'}]} push={{to: 1.05, at: 0.25, dur: W.of - start - 0.25, anchor: [540, 1380]}}>
       <OldQuarter
         sun={
           <ScreenSpace>
-            <Sun cx={700} cy={720} r={150} drift={[6, 0]} hops={[{t: b.sunHop, to: [497, 690], h: 40, air: b.sunLand - b.sunHop}]} moves={[{at: b.sunHop, dur: b.sunLand - b.sunHop, r: 110}]}>
+            <Sun cx={700} cy={720} r={150} drift={[5, 0]} hops={[{t: b.cut, to: [500, 690], h: 60, air: sunAir}]} moves={[{at: b.cut, dur: sunAir, r: 110, ease: E.inOutSine}]}>
               {(r) => <SunPie r={r} n={2} cream={1} spokesAt={b.pieSpoke} slicesAt={b.pieCream} solidAt={b.pieSolid} width={2.6} seed="s10/pie" />}
             </Sun>
           </ScreenSpace>
         }
-        people={{walkers: [{...OLD_QUARTER.walkers[0], pace: 0.22}], riseAt: b.walkerRise, walk: b.walker}}
-        furniture={[OLD_QUARTER.furniture[1]]}
+        people={false}
+        furniture="bike"
+        cart={<Cart T={cartT} />}
+        noticeSign={(box) => <LabelTag kind="sign" box={box} fontSize={30 / 1.05} legH={30} text={L13} at={b.label} seed="s10/L13" />}
         wrap={(name, _n, node) => {
+          if (name === 'far') return null; // the band + far city sit behind the second row (and float in the empty street)
           if (name === 'second') return <SecondRow popAt={b.second} flipAt={b.flip2} windowAt={b.pieSolid} tagsAt={b.wave} />;
           if (name === 'sites')
             return (
-              <Sites
-                popAt={[b.siteL, b.siteL + 0.1, b.siteL + 0.2]}
-                plaqueAt={[b.plaques, b.plaques + 0.06, b.plaques + 0.12]}
-                old={{flipOldAt: b.flipM, cobwebAt: b.cobweb, dustAt: b.dust, caneAt: b.cane, droopAt: b.droop, wobbleAt: b.wobble, bit: {at: b.bitIn, size: 15.3}}}
-                tagL={{at: b.tick1, tickAt: b.tick1 + 0.03}}
-                tagR={{at: b.tick2, tickAt: b.tick2 + 0.03}}
-                updateAt={b.update}
-              />
+              <>
+                <Sites
+                  popAt={[b.siteL, b.siteL + 0.1, b.siteL + 0.2]}
+                  plaqueAt={[b.plaques, b.plaques + 0.06, b.plaques + 0.12]}
+                  old={{flipOldAt: b.flipM, cobwebAt: b.cobweb, dustAt: b.dust, caneAt: b.cane, droopAt: b.droop, wobbleAt: b.wobble, bit: {at: b.bitIn, size: 17, bursts: [0, b.cane, b.not, b.update].map((x) => x - (b.bitIn + 0.4))}}}
+                  tagL={{at: b.tick1, tickAt: b.tick1 + 0.03}}
+                  tagR={{at: b.tick2, tickAt: b.tick2 + 0.03}}
+                  updateAt={b.update}
+                />
+                {/* the gap walker is FARTHER than the cart line (feet 1262 -> 1238 vs 1336): drawn before the set's cart slot */}
+                <GapWalker walkAt={b.walker} stopAt={b.cobweb - 0.12} />
+              </>
             );
-          if (name === 'people')
+          if (name === 'sign')
             return (
               <>
                 {node}
-                <Cart T={cartT} />
-                <LabelTag kind="sign" box={[125, 1262, 445, 1462]} fontSize={30 / 1.05} legH={30} text={L13} at={b.label} seed="s10/L13" />
-                <Tosses T={cartT} land1={body(hangL)} land2={body(hangR)} tagSize={TAG} />
+                <Tosses T={cartT} land1={body(hangL)} land2={body(hangR)} tagSize={TAG_W} />
               </>
             );
           if (name === 'near')
             return (
               <>
                 {node}
-                <Pip T={{leap: b.pipHop, leapFrom: [tailX(b.pipHop), tramRoof(TRAM.y)], perk: b.pipPerk, lookPlaque: b.walker, hey: b.hey, heyEnd: b.heyEnd, out: b.pipOut}} />
+                <Pip T={{leap: b.pipHop, leapFrom: [hand.x, hand.y], leapScale: hand.scale, perk: b.pipPerk, lookPlaque: b.walker, lookWeb: b.cobweb + 0.1, hey: b.hey, heyEnd: b.heyEnd, out: b.pipOut}} />
               </>
             );
           return node;
         }}
       />
-      {standIn ? (
+      {standIn && s09 ? (
         <ScreenSpace>
-          <Tram x={tramX(t)} y={TRAM.y} w={TRAM.w} seed="s10/tram" />
-          {t < b.pipHop ? <PipRiding x={tailX(t)} y={tramRoof(TRAM.y)} /> : null}
+          <TimeShift by={s09.start - start}>
+            <TramWiper x={tramX(t)} p={wipeP(t)} dir="right" />
+          </TimeShift>
         </ScreenSpace>
       ) : null}
     </World>

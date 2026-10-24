@@ -26,6 +26,19 @@ export const STROKE_MAX_Y = CAPTION_SAFE[1] - 12;
 
 export type EdgeStroke = {d: string; w: number; taper?: boolean};
 
+/** A screen rect [x0, y0, x1, y1] (px). */
+export type EdgeRect = [number, number, number, number];
+/** The regions an edge may leave bare: the four corners, the visible left side (y 860-1460), the right side between
+ *  the caption and the rail (y 630-860), the bottom middle. */
+export type EdgeInkRegion = 'tl' | 'tr' | 'br' | 'bl' | 'left' | 'right' | 'bottom';
+/** What an edge should know about the scene under it (screen px, for the whole shot; see edges/hints.ts):
+ *  - `ink`: how much LINE ART each region holds, 0 (a flat sky) to 1 (a crowd, branches). 'paint' leaves a region
+ *    bare only where there is drawing to show there; a flat region gets colour to the edge instead. Measured from a
+ *    clean render (review/edges/loose/final/tools/scan_hints.py). Unknown regions are allowed, with ruled strokes.
+ *  - `keep`: rects that must stay entirely in colour (a hero figure, the mascot and the ground under it, a lamp and
+ *    its halo, a key prop): no colour edge ever cuts them. */
+export type EdgeHints = {ink?: Partial<Record<EdgeInkRegion, number>>; keep?: EdgeRect[]};
+
 /** A ruled stroke from a to b (no auto overshoot: the caller sets the ends), drifting a hair, never broken. */
 export const ruled = (a: Pt, b: Pt, seed: string, drift = 0.25) => line(a[0], a[1], b[0], b[1], {seed, over: 'none', drift, bow: 1.2, jitter: 0.6, breaks: false});
 

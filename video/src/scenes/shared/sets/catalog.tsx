@@ -19,6 +19,12 @@ import {DemoSun, DemoWorld} from './preview/demo';
 import {mat, XG} from '../../../lib/xf';
 import {ease as E, useTime} from '../../../lib/time';
 import {Tod} from '../../../lib/tod';
+import {GlowDiscs} from './common';
+import {CartSlot, LabelSlot, CrateSlot} from './propSlots';
+import {World} from '../../../lib/World';
+
+/** v3 preview: the crate of new locks on step 2's tread. */
+const CartSlotPlaceholder: React.FC = () => <CrateSlot x={STOOP.crate[0]} y={STOOP.crate[1]} size={70} n={3} />;
 
 /** Golden-hour thumbnails: the same relight a scene's World applies (light fields one step warmer). */
 const Golden: React.FC<{children?: React.ReactNode}> = ({children}) => <Tod value="golden">{children}</Tod>;
@@ -45,9 +51,9 @@ const S01_GOV = {
  *  power-off wave (govA 'all', govC 'over', the civic skyline 'Europe'), shutters ('shut', 'down', govC half on 'bunch'),
  *  padlocks, lettered tags, govB's lantern on 'purpose'. */
 const S01_V3 = {
-  govA: {screenOffAt: 0.63, shutterAt: 1.98, offAt: 2.12, padlockAt: 3.44, tagAt: 3.74},
-  govB: {screenOffAt: 0.0, shutterAt: 1.71, offAt: 1.85, padlockAt: 3.38, tagAt: 3.69, lanternOffAt: 3.96},
-  govC: {screenOffAt: 0.89, shutterAt: 2.35, shutterStop: 0.5, padlockAt: 3.5, tagAt: 3.79},
+  govA: {screenOffAt: 0.63, shutterAt: 1.98, offAt: 2.12, padlockAt: 3.44, tagAt: 3.74, tagProps: {lettered: true, size: 70}},
+  govB: {screenOffAt: 0.0, shutterAt: 1.71, offAt: 1.85, padlockAt: 3.38, tagAt: 3.69, lanternOffAt: 3.96, tagProps: {lettered: true, size: 84}},
+  govC: {screenOffAt: 0.89, shutterAt: 2.35, shutterStop: 0.5, padlockAt: 3.5, tagAt: 3.79, tagProps: {lettered: true, size: 64}},
 };
 /** Storyboard v3 S12 (scene seconds, recorded take): the shut-down state at the cut, then the stepped rewind from
  *  'before' (1.55) to one step before the press (2.85). */
@@ -107,7 +113,13 @@ export const SET_CATALOG: SetEntry[] = [
     sky: skies.day,
     thumb: () => <StoopStreet sun={<DemoSun cx={720} cy={850} r={110} />} heroSlot={<StoopBeats magnifierAt={-1} wrenchAt={-1} />} />,
     preview: (v) =>
-      v === 'night' ? (
+      v === 'v3' ? (
+        // storyboard v3 S09 Part A: the dusk held at the cut (glows, three lit windows popping off), the dawn wipe up at
+        // 1.5 s (band + rims pop as it passes, the glows pop off), the crate on step 2's tread
+        <World sky={[{t: -1, tod: 'dusk'}, {t: 1.5, tod: 'dawn', wipe: 'up', dur: 0.4}]}>
+          <StoopStreet tod="dusk" duskOffAt={[0.4, 0.8, 0.9]} glowFlickerAt={0.4} sun={<DemoSun cx={720} cy={1060} r={110} />} crate={<CartSlotPlaceholder />} heroSlot={null} />
+        </World>
+      ) : v === 'night' ? (
         <DemoWorld sky={skies.night}>
           <StoopStreet tod="night" sun={null} heroSlot={<StoopBeats magnifierAt={-1} wrenchAt={-1} checkAt={2.6} peachAt={2.7} ledgeAt={3.2} />} />
         </DemoWorld>
@@ -143,6 +155,11 @@ export const SET_CATALOG: SetEntry[] = [
             plaqueAt={{P: 2.4, L1: 2.48, R1: 2.56, L2: 2.64, R2: 2.72, L4: 2.8, R3: 2.88, L3: 3.1, L5: 3.12, R4: 3.14}}
             ventAt={2.0}
             signSwingAt={2.1}
+            titleBlock={
+              v === 'v3'
+                ? (box) => <LabelSlot kind="card" box={box} text={['PHP · the code most', 'websites are built with']} at={1.0} flipTo={{at: 3.0, text: ['of sites whose server', 'language is known · W3Techs']}} />
+                : undefined
+            }
           />
         </DemoWorld>
       ),
@@ -156,6 +173,7 @@ export const SET_CATALOG: SetEntry[] = [
       <DemoWorld>
         <XG m={camMat(540, 960, 1.08)}>
           <BlueprintWall drawAt={v === 'draw' ? 0.3 : undefined} sun={<DemoSun cx={BLUEPRINT_WALL.sun.x} cy={BLUEPRINT_WALL.sun.y} r={110} />} />
+          {v === 'v3' ? <LabelSlot kind="slip" box={[205, 688, 650, 760]} text={['found with AI help ·', 'reported privately in August']} at={0.5} /> : null}
         </XG>
       </DemoWorld>
     ),
@@ -172,11 +190,19 @@ export const SET_CATALOG: SetEntry[] = [
     preview: (v) =>
       v === 'corner' ? (
         <DemoWorld tod="golden">
-          <Workshop layout={WORKSHOP_CORNER} blind="down" signSwingAt={0.5} doorOpenAt={2.5} />
+          <Workshop layout={WORKSHOP_CORNER} blind="down" signSwingAt={0.5} doorOpenAt={2.5} blindSign={(a) => <LabelSlot kind="card" x={a.x} y={a.y} text="still fixing..." fontSize={30} at={0.3} />} />
         </DemoWorld>
       ) : (
         <DemoWorld tod="golden">
-          <MakersLane sun={<DemoSun cx={MAKERS_LANE.sun.x} cy={MAKERS_LANE.sun.y} r={120} />} curtainsAt={0.6} workshop={{glowAt: 1.0, makersAt: 1.0, blindDownAt: 2.4, signSwingAt: 1.6, slotClickAt: 1.9}} />
+          <MakersLane
+            sun={<DemoSun cx={MAKERS_LANE.sun.x} cy={MAKERS_LANE.sun.y} r={120} />}
+            curtainsAt={0.6}
+            workshop={
+              v === 'v3'
+                ? {blind: 'down', signSwingAt: 1.6, slotClickAt: 1.9, blindSign: (a) => <LabelSlot kind="card" x={a.x} y={a.y} text="still fixing..." fontSize={32} />}
+                : {glowAt: 1.0, makersAt: 1.0, blindDownAt: 2.4, signSwingAt: 1.6, slotClickAt: 1.9}
+            }
+          />
         </DemoWorld>
       ),
   },
@@ -205,15 +231,46 @@ export const SET_CATALOG: SetEntry[] = [
         <DomeTallies n={12} />
       </Golden>
     ),
-    preview: (v) => (
+    preview: (v) =>
+      v === 'v3' || v === 'v3crane' || v === 'v3push' || v === 'v3dusk' ? (
+        // storyboard v3 S08: the district dome, the r260 sun with two stepped glow rings, the foot tower, rattler doors,
+        // the rooftop pole; v3crane / v3push = the crane start and the baseline push as a multiplane camera
+        <DemoWorld tod={v === 'v3dusk' ? 'dusk' : 'golden'}>
+          <DomeCity
+            dome="district"
+            wrap={
+              v === 'v3crane'
+                ? (_n, near, node) => <XG m={camMat(540, 960 + 300 * near, 1.3)}>{node}</XG>
+                : v === 'v3push'
+                  ? (_n, near, node) => <XG m={camMat(540 + 60 * near, 960 + 140 * near, 1 + 0.15 * near)}>{node}</XG>
+                  : undefined
+            }
+            sun={
+              <>
+                <GlowDiscs cx={DOME.sunV3.x} cy={DOME.sunV3.y} steps={[[DOME.sunV3.r * 1.5, palette.cream], [DOME.sunV3.r * 1.25, palette.peach]]} />
+                <DemoSun cx={DOME.sunV3.x} cy={DOME.sunV3.y} r={DOME.sunV3.r} />
+              </>
+            }
+            domeAt={0.2}
+            towerAt={1.4}
+            searchAt={1.8}
+            dotsAt={0.4}
+            footprintAt={false}
+            duskAt={v === 'v3dusk' ? 0 : undefined}
+          />
+          <XG m={v === 'v3crane' ? camMat(540, 1260, 1.3) : v === 'v3push' ? camMat(600, 1100, 1.15) : mat.I}>
+            <TelephoneWires spec={WIRES.S08} />
+          </XG>
+        </DemoWorld>
+      ) : (
       <DemoWorld tod={v === 'dusk' ? 'dusk' : 'golden'}>
         <XG m={v === 'crane' ? camMat(540, 1260, 1.3) : v === 'push' ? camMat(480, 1040, 1.15) : mat.I}>
           <DomeCity sun={<DemoSun cx={DOME.sun.x} cy={DOME.sun.y} r={165} />} domeAt={0.2} towerAt={1.2} searchAt={1.6} dotsAt={0.4} duskAt={v === 'dusk' ? 0 : undefined} />
           <TallyClock />
-          <TelephoneWires spec={WIRES.S08} />
+          <TelephoneWires spec={WIRES.S08wide} />
         </XG>
       </DemoWorld>
-    ),
+      ),
   },
   {
     id: 'terrace',
@@ -231,10 +288,18 @@ export const SET_CATALOG: SetEntry[] = [
         const t = useTime();
         if (v === 'flat')
           return <TerraceHill mode="flat" plaqueWaveAt={0.5} bitWaveAt={1.0} flagAt={1.4} sun={<DemoSun cx={TERRACE_FLAT.sun.x} cy={TERRACE_FLAT.sun.y} r={TERRACE_FLAT.sun.r} />} />;
-        const q = v === 'match' ? 0 : v === 'rest' ? 1 : E.inOutSine(Math.min(1, Math.max(0, (t - 0.3) / 2.2)));
+        const v3 = v === 'v3' || v === 'v3match' || v === 'v3rest';
+        const q = v === 'match' || v === 'v3match' ? 0 : v === 'rest' || v === 'v3rest' ? 1 : E.inOutSine(Math.min(1, Math.max(0, (t - 0.3) / 2.2)));
         const z = Math.exp(Math.log(6) * (1 - q));
         const cx = 540;
         const cy = 1407 + (960 - 1407) * q;
+        if (v3)
+          // storyboard v3 S09 Part B: Bit on door #4's jamb, the keeper walking to door #5, the flag + the check-box wave
+          return (
+            <XG m={camMat(cx, cy, z)}>
+              <TerraceHill revealFloor={TERRACE.revealFloor} flagAt={v === 'v3rest' ? -1 : 2.5} checkBoxWaveAt={v === 'v3rest' ? -1 : 2.6} bit keeper={{walkAt: 0.6, walkDur: 1.9}} extendAt={2.9} sun={<DemoSun cx={700} cy={720} r={150} />} />
+            </XG>
+          );
         return (
           <XG m={camMat(cx, cy, z)}>
             <TerraceHill revealFloor={TERRACE.revealFloor} plaqueWaveAt={2.6} bitWaveAt={3.2} flagAt={2.9} extendAt={3.4} sun={<DemoSun cx={700} cy={760} r={150} />} />
@@ -260,7 +325,23 @@ export const SET_CATALOG: SetEntry[] = [
     ),
     preview: (v) => (
       <DemoWorld tod="golden">
-        {v === 'unbuild' ? (
+        {v === 'v3' ? (
+          // storyboard v3 S10 (the World is golden here; S10 itself is day): half the second-row plaques flip old, the
+          // support tags land and skip the old ones, the caretaker's tag, the A-frame sign, the cart on the stoop line
+          <OldQuarter
+            sun={<DemoSun cx={OLD_QUARTER.sun.x} cy={OLD_QUARTER.sun.y} r={110} />}
+            sitePopAt={[0.2, 0.3, 0.4]}
+            plaqueSwingAt={1.0}
+            oldPlaque={{flipOldAt: 1.6, cobwebAt: 2.2, dustAt: 2.3, caneAt: 2.5}}
+            secondOld="half"
+            secondOldAt={1.8}
+            supportAt={{L: 3.2, R: 3.7, second: 3.8}}
+            people="gap"
+            furniture="bike"
+            noticeSign={(box) => <LabelSlot kind="sign" box={box} fontSize={30} text={['Rough estimate from', 'W3Techs data · only sites', 'that show their version ·', 'some hosts patch old', 'versions themselves']} at={1.2} />}
+            cart={<CartSlot x={160} y={OLD_QUARTER.cartY} size={160} roll={{at: 2.6, to: [980, OLD_QUARTER.cartY], dur: 2.2}} />}
+          />
+        ) : v === 'unbuild' ? (
           <OldQuarter sun={<DemoSun cx={OLD_QUARTER.sun.x} cy={OLD_QUARTER.sun.y} r={110} />} board={{}} audience outAt={0.5} outDur={0.6} />
         ) : v === 'board' ? (
           <XG m={camMat(550, 1020, 1.12)}>

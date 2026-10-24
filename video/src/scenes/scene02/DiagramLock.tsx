@@ -17,12 +17,12 @@ import {Fill} from '../../lib/Fill';
 import {arc, circle, line, roundRect, Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import {LOCK} from '../shared/props/Lock';
-import {Bit} from '../shared/props/Bit';
+import {Bit, bitPath} from '../shared/props/Bit';
 import {PropRoot} from '../shared/props/common';
 
-/** Thumb-turn pivot (local units): in the cavity above the bolt, so a hand from the upper right reaches it without
- *  covering the gap. */
-export const THUMB: Pt = [-9, -26];
+/** Thumb-turn pivot (local units): in the cavity's upper right, above the strike, so a hand from the upper right
+ *  pinches it without covering the bolt, the gap or Bit. */
+export const THUMB: Pt = [11, -27];
 
 export type DiagramBit = {
   /** Size in lock-local units (body length). */
@@ -102,9 +102,9 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
   const knobRot = 90 * turn;
 
   const mech: React.ReactNode[] = [];
-  // the SECTION: a flat teal cavity (the shared Lock's colours, white instead of sand), white guide and strike, the
-  // tealDark socket lined with a cream rim (the hole the bolt never reaches = the highest-contrast thing), a cream bar
-  mech.push(<Fill key="cavF" d={`M${cx0} ${cy0}H${cx0 + cw}V${cy0 + ch}H${cx0}Z`} color={palette.teal} offset={false} mode="none" seed={`${seed}/cvf`} />);
+  // the SECTION: a pale mint cavity (ink Bit and the ink outlines read on it), white guide and strike, the tealDark
+  // socket lined with a cream rim (the hole the bolt never reaches = the highest-contrast thing), a cream bar
+  mech.push(<Fill key="cavF" d={`M${cx0} ${cy0}H${cx0 + cw}V${cy0 + ch}H${cx0}Z`} color={palette.mintPale} offset={false} mode="none" seed={`${seed}/cvf`} />);
   mech.push(<Fill key="housF" d={`M${hx} ${hy0}H${hb}V${hy0 + hh}H${hx}Z`} color={palette.white} offset={false} mode="none" seed={`${seed}/hsf`} />);
   mech.push(<Fill key="strikeF" d={`M${st[0]} ${st[1]}H${st[0] + st[2]}V${st[1] + st[3]}H${st[0]}Z`} color={palette.white} offset={false} mode="none" seed={`${seed}/stf`} />);
   mech.push(<Fill key="rimF" d={`M${rm[0]} ${rm[1]}H${rm[0] + rm[2]}V${rm[1] + rm[3]}H${rm[0]}Z`} color={palette.cream} offset={false} mode="none" seed={`${seed}/rmf`} />);
@@ -119,9 +119,10 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
     mech.push(<Fill key="boltF" d={barD(hb, tip) + 'Z'} color={palette.cream} offset={false} mode="none" seed={`${seed}/bf`} />);
     mech.push(<Ink key="bolt" d={barD(hb, tip) + (boltL > 8 ? `M${hb + 2} ${f2(-br + 3.4)}H${f2(tip - 4)}` : '')} width={W * 0.55} taper={false} vary={0} seed={`${seed}/bolt`} />);
   }
-  // cam link: thumb-turn pivot down to the bolt's top edge (it follows the bolt); cream on the teal cavity
-  const linkX = Math.max(hb + 1.5, Math.min(tip - 6, THUMB[0] + 4));
-  mech.push(<Ink key="link" d={`M${THUMB[0]} ${THUMB[1]}L${f2(linkX)} ${-br}`} width={W * 0.5} color={palette.cream} taper={false} vary={0} seed={`${seed}/lk`} />);
+  // cam link: from the thumb-turn pivot down to the bolt's top edge (the joint follows the bolt as it moves)
+  const linkX = Math.max(hb + 1.5, Math.min(tip - 8, -4));
+  mech.push(<Ink key="link" d={`M${THUMB[0]} ${THUMB[1]}L${f2(linkX)} ${-br}`} width={W * 0.42} taper={false} vary={0} seed={`${seed}/lk`} />);
+  mech.push(<Ink key="linkJ" d={circle(linkX, -br - 1.2, 1.6, {seed: `${seed}/lj`})} width={W * 0.4} taper={false} vary={0} seed={`${seed}/lj`} />);
   // thumb-turn: a disc with a bar knob (vertical at rest, turns 90 deg)
   mech.push(
     <XG key="thumb" m={mat.compose(mat.translate(THUMB[0], THUMB[1]), mat.rotate(knobRot))}>
@@ -139,7 +140,7 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
     const L = bs; // body length in local units (Bit design 20 -> bs)
     // how far out of the socket (0 = only the antenna tips at the mouth, 1 = head + front half in the gap)
     let out = 0.06;
-    if (bit.peekAt !== undefined && t >= bit.peekAt) out = lerp(0.06, 1, springAt(t, bit.peekAt, springs.snappy));
+    if (bit.peekAt !== undefined && t >= bit.peekAt) out = lerp(0.06, 1.1, springAt(t, bit.peekAt, springs.snappy));
     let squashY = 1;
     if (bit.hideAt !== undefined && t >= bit.hideAt) {
       const q = prog(t, bit.hideAt, 0.14, E.inCubic);
@@ -147,7 +148,7 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
       squashY = lerp(1, 0.6, Math.min(1, q * 1.6));
     }
     if (bit.popAt !== undefined && t >= bit.popAt) {
-      out = lerp(-0.1, 0.85, springAt(t, bit.popAt, springs.snappy));
+      out = lerp(-0.1, 1.0, springAt(t, bit.popAt, springs.snappy));
       squashY = 1;
     }
     let cower = 1;
@@ -165,6 +166,8 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
         </defs>
         <g clipPath={`url(#${uid}b)`}>
           <XG m={mat.about(mat.scale(1 + (1 - cower) * 0.4, squashY * cower), ax, 9)}>
+            {/* a cream rim round his silhouette separates the ink beetle from the dark socket and the lock's ink */}
+            <path d={bitPath(ax, 9, L, true)} fill="none" stroke={palette.cream} strokeWidth={W * 0.75} strokeLinejoin="round" />
             <Bit x={ax} y={9} size={L} flip look={cowering ? 'up' : 'auto'} seed={`${seed}/bit`} />
           </XG>
         </g>
@@ -177,10 +180,10 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
   if (gapMarkAt !== undefined && t >= gapMarkAt) {
     const x0 = LOCK.tip.short;
     const x1 = st[0];
-    const yb = st[1] - 6;
-    let dash = `M${x0} ${yb - 4}V${yb + 4}M${x1} ${yb - 4}V${yb + 4}`;
-    for (let xx = x0 + 1.3; xx < x1 - 1; xx += 3.4) dash += `M${xx.toFixed(1)} ${yb}H${Math.min(x1 - 1.3, xx + 1.8).toFixed(1)}`;
-    marks.push(<Ink key="gapB" d={dash} at={gapMarkAt} dur={0.1} width={W * 0.5} color={palette.cream} taper={false} seed={`${seed}/gb`} order="all" />);
+    const yb = st[1] + st[3] - 3; // under the gap (the thumb-turn sits above it)
+    // a mini dimension line across the gap: two ticks and a line with inward arrowheads (blueprint convention)
+    const dim = `M${x0} ${yb - 4.5}V${yb + 4.5}M${x1} ${yb - 4.5}V${yb + 4.5}M${x0 + 0.8} ${yb}H${x1 - 0.8}` + `M${x0 + 3.2} ${yb - 1.8}L${x0 + 0.8} ${yb}L${x0 + 3.2} ${yb + 1.8}M${x1 - 3.2} ${yb - 1.8}L${x1 - 0.8} ${yb}L${x1 - 3.2} ${yb + 1.8}`;
+    marks.push(<Ink key="gapB" d={dim} at={gapMarkAt} dur={0.08} width={W * 0.42} taper={false} seed={`${seed}/gb`} order="all" />);
     const ring = circle(LOCK.gap[0], 2, 22, {seed: `${seed}/gr`, overlap: 30});
     marks.push(<Ink key="gapRh" d={ring} at={gapMarkAt + 0.04} dur={0.13} width={W * 1.25} color={palette.cream} taper={false} seed={`${seed}/grh`} />);
     marks.push(<Ink key="gapR" d={ring} at={gapMarkAt + 0.04} dur={0.13} width={W * 0.62} taper={false} seed={`${seed}/gr`} />);

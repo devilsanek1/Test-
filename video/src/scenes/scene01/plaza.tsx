@@ -14,7 +14,7 @@ import {GovEvents, GovernmentPlaza, GovId, PLAZA} from '../shared/sets';
 import {EdgeOnlooker, MarkRing, PowerGlyph, SunPress} from '../shared/props';
 import {layerMat, PARALLAX} from './camera';
 import {B} from './timing';
-import {CitizenPlan, PigeonPlan, PipS01, PlazaCitizen, Pigeon} from './cast';
+import {CitizenPlan, PigeonPlan, PipPlan, PipS01, PlazaCitizen, Pigeon} from './cast';
 
 const SUN = PLAZA.sun; // (720, 900) r155
 const VP = PLAZA.vp as Pt;
@@ -36,35 +36,41 @@ export const S01_GOV: Partial<Record<GovId, GovEvents>> = {
 // ---------------------------------------------------------------- citizens (PLAZA.citizens slots, re-acted)
 
 const C = PLAZA.citizens;
-/** The six readable citizens + the four far ones. Bodies are explicit so the pointing sleeve matches the coat. */
-const CITIZENS: CitizenPlan[] = [
-  // c0: a walker who slows on 'all' and stops
-  {x: C[0].x, y: C[0].y, h: C[0].h, seed: 'c0', body: palette.sage, hair: 'short', walk: {speed: 9, hz: 1.9, slowAt: B.crtA, stopAt: B.crtA + 0.5}, lean: [{t: B.crtA + 0.5, a: -4}, {t: B.headsBack, a: 0}]},
+/** The six readable citizens + the four far ones, on the set's seeds (coats / hair = the set's own picks), re-acted. */
+const cs = (i: number) => `plaza/cit${i}`; // the set's citizen seeds: frame 0 shows the set's own citizens
+export const S01_CITIZENS: CitizenPlan[] = [
+  // c0: a walker who slows on 'all' and stops, then glances toward govB
+  {x: C[0].x, y: C[0].y, h: C[0].h, seed: cs(0), walk: {speed: 9, hz: 1.9, slowAt: B.crtA, stopAt: B.crtA + 0.5}, lean: [{t: B.crtA + 0.5, a: -4}, {t: B.headsBack, a: 0}]},
   // c1, c3: walking at frame 0 (the seam is mid-motion), they stop on 'Governments' and turn toward govB
-  {x: C[1].x, y: C[1].y, h: C[1].h, seed: 'c1', body: palette.tan, hair: 'bun', walk: {speed: 10, hz: 2.1, slowAt: B.heads - 0.12, stopAt: B.heads}, lean: [{t: B.heads, a: -6}, {t: B.headsBack, a: 0}]},
+  {x: C[1].x, y: C[1].y, h: C[1].h, seed: cs(1), walk: {speed: 10, hz: 2.1, slowAt: B.heads - 0.12, stopAt: B.heads}, lean: [{t: B.heads, a: -6}, {t: B.headsBack, a: 0}]},
   // c2: raises a phone toward govB, lowers it on 'websites'
-  {x: C[2].x, y: C[2].y, h: C[2].h, seed: 'c2', body: palette.teal, hair: 'curly', acc: ['backpack'], phone: {up: B.phonesUp, down: B.phoneDown}, lean: [{t: B.heads + 0.05, a: -3}, {t: B.headsBack, a: 0}], bob: 0.6},
-  {x: C[3].x, y: C[3].y, h: C[3].h, seed: 'c3', body: palette.brown, hair: 'long', walk: {speed: 9, hz: 2.0, slowAt: B.heads - 0.1, stopAt: B.heads + 0.04}, lean: [{t: B.heads + 0.04, a: -7}, {t: B.headsBack + 0.05, a: 0}]},
-  {x: C[4].x, y: C[4].y, h: C[4].h, seed: 'c4', body: palette.sand, hair: 'cap', acc: ['strap'], bob: 0.7},
+  {x: C[2].x, y: C[2].y, h: C[2].h, seed: cs(2), phone: {up: B.phonesUp, down: B.phoneDown}, lean: [{t: B.heads + 0.05, a: -3}, {t: B.headsBack, a: 0}], bob: 0.6},
+  {x: C[3].x, y: C[3].y, h: C[3].h, seed: cs(3), walk: {speed: 9, hz: 2.0, slowAt: B.heads - 0.1, stopAt: B.heads + 0.04}, lean: [{t: B.heads + 0.04, a: -7}, {t: B.headsBack + 0.05, a: 0}]},
+  {x: C[4].x, y: C[4].y, h: C[4].h, seed: cs(4), bob: 0.7},
   // c5: points up at govC on 'of'
-  {x: C[5].x, y: C[5].y, h: C[5].h, seed: 'c5', body: palette.sage, hair: 'beanie', point: {at: B.point, side: -1, hand: [-30, -205]}, lean: [{t: B.point, a: -2}]},
+  {x: C[5].x, y: C[5].y, h: C[5].h, seed: cs(5), point: {at: B.point, side: -1, hand: [-30, -205]}, lean: [{t: B.point, a: -2}]},
   // far texture on govA's steps and two silhouettes deep in the gap
-  {x: C[6].x, y: C[6].y, h: C[6].h, seed: 'c6', body: palette.teal, hair: 'short'},
-  {x: C[7].x, y: C[7].y, h: C[7].h, seed: 'c7', body: palette.tan, hair: 'bun'},
-  {x: C[8].x, y: C[8].y, h: C[8].h, seed: 'c8', body: palette.sage, silhouette: true},
-  {x: C[9].x, y: C[9].y, h: C[9].h, seed: 'c9', body: palette.sage, silhouette: true},
+  {x: C[6].x, y: C[6].y, h: C[6].h, seed: cs(6)},
+  {x: C[7].x, y: C[7].y, h: C[7].h, seed: cs(7)},
+  {x: C[8].x, y: C[8].y, h: C[8].h, seed: cs(8), silhouette: true},
+  {x: C[9].x, y: C[9].y, h: C[9].h, seed: cs(9), silhouette: true},
 ];
 /** Paint order: far first, then by feet y. */
-const CITIZEN_ORDER = CITIZENS.map((c, i) => [c.y, i] as [number, number]).sort((a, b) => a[0] - b[0]).map((p) => p[1]);
+const CITIZEN_ORDER = S01_CITIZENS.map((c, i) => [c.y, i] as [number, number]).sort((a, b) => a[0] - b[0]).map((p) => p[1]);
 
 // ---------------------------------------------------------------- pigeons on the lamp crossbar
 
 const PG = PLAZA.pigeons;
-const PIGEONS: PigeonPlan[] = [
-  {x: PG[0][0], y: PG[0][1], seed: 'pg0', color: palette.white, landAt: B.pigeonsLand - 0.24, from: [170, -150], flyAt: B.pigeonsFly, flyTo: [190, -380], backAt: B.pigeonBack, backFrom: [-150, -250]},
-  {x: PG[1][0], y: PG[1][1], seed: 'pg1', color: palette.sand, landAt: B.pigeonsLand - 0.18, from: [200, -120], shuffleAt: B.shuffle, shuffleDx: -10, flyAt: B.pigeonsFly + 0.05, flyTo: [260, -330]},
-  {x: PG[2][0], y: PG[2][1], seed: 'pg2', color: palette.white, flip: true, landAt: B.pigeonsLand - 0.12, from: [230, -170], flyAt: B.pigeonsFly + 0.1, flyTo: [330, -300]},
+export const S01_PIGEONS: PigeonPlan[] = [
+  {x: PG[0][0], y: PG[0][1], seed: 'pg0', color: palette.white, landAt: 0.12, inDur: B.pigeonsLand - 0.12, fromAbs: [-70, 1010], via: [430, 860], flyAt: B.pigeonsFly, flyTo: [190, -380], backAt: B.pigeonBack, backFrom: [-150, -250]},
+  {x: PG[1][0], y: PG[1][1], seed: 'pg1', color: palette.sand, landAt: 0.17, inDur: B.pigeonsLand + 0.06 - 0.17, fromAbs: [-70, 950], via: [470, 900], shuffleAt: B.shuffle, shuffleDx: -10, flyAt: B.pigeonsFly + 0.05, flyTo: [260, -330]},
+  {x: PG[2][0], y: PG[2][1], seed: 'pg2', color: palette.white, flip: true, landAt: 0.22, inDur: B.pigeonsLand + 0.12 - 0.22, fromAbs: [-70, 1060], via: [520, 940], flyAt: B.pigeonsFly + 0.1, flyTo: [330, -300]},
 ];
+
+// ---------------------------------------------------------------- Pip (frame 0: sit-back, look 0, seed 11, idle clock t = 0)
+
+export const S01_PIP_SEED = 11;
+export const S01_PIP: PipPlan = {x: PLAZA.pip[0], y: PLAZA.pip[1], flinchAt: B.pipFlinch, lookAt: B.heads, look: -0.55, hopAt: B.pipHop, landAt: B.pipLand, backAt: B.pipBack, exitAt: B.dive + 0.06, exitTo: [1010, 1270], lookBackAt: B.headsBack + 0.05};
 
 // ---------------------------------------------------------------- the edge onlookers (PLAZA.onlookers, re-acted)
 
@@ -101,19 +107,17 @@ export const PlazaShutdown: React.FC = () => {
     light: (
       <>
         {CITIZEN_ORDER.map((i) => (
-          <PlazaCitizen key={i} p={CITIZENS[i]} vp={VP} horizon={HZ} />
+          <PlazaCitizen key={i} p={S01_CITIZENS[i]} vp={VP} horizon={HZ} />
         ))}
       </>
     ),
     near: (
       <>
-        {PIGEONS.map((p) => (
+        {S01_PIGEONS.map((p) => (
           <Pigeon key={p.seed} p={p} />
         ))}
         <Onlookers />
-        <PipS01
-          p={{x: PLAZA.pip[0], y: PLAZA.pip[1], lookAt: B.heads, look: -0.55, hopAt: B.pipHop, landAt: B.pipLand, backAt: B.pipBack, exitAt: B.dive + 0.06, exitTo: [1010, 1270], lookBackAt: B.headsBack + 0.05}}
-        />
+        <PipS01 p={S01_PIP} seed={S01_PIP_SEED} />
       </>
     ),
   };

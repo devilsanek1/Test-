@@ -42,7 +42,7 @@ import {rand, rng, Seed} from '../../../lib/rng';
 import {PathBuf, mix} from '../../../lib/cine/util';
 import {atmos} from '../../../lib/cine/atmosphere';
 import {GlowDiscs, LayerWrap, noWrap, SetPlace} from './common';
-import {ChromeSlot, CheckFlagSlot, LockProps, PlaqueSlot, TargetRingSlot} from './propSlots';
+import {BitSlot, CheckBoxTagSlot, ChromeSlot, CheckFlagSlot, KeeperSlot, LockProps, PlaqueSlot, TargetRingSlot} from './propSlots';
 import {Lock} from '../props';
 import {FacadeDoor} from './SiteFacade';
 import {Foreground, ForegroundSpec} from './ground';
@@ -132,6 +132,16 @@ export const TERRACE = {
   ] as [number, number, number][],
   /** Screen floor the rows reveal under during the pull-back (the caption band floor). */
   revealFloor: 570,
+  // ---- storyboard v3 (S09 Part B)
+  /** Bit on house #4's right door jamb (the hidden-cut match object: 3 px at rest -> 18 px at the zoom-6 match, screen
+   *  (570, 1230)); he climbs the jamb (rot -90: head up). */
+  bit: {x: 545, y: 1452, size: 3, rot: -90},
+  /** The keeper speck (>= 40 px at rest): beside door #4 at the hidden match, walking to door #5 on a dotted path. */
+  keeper: {from: [581, 1500] as Pt, to: [662, 1500] as Pt, h: 46, pathY: 1513},
+  /** The check-box tag over every door (house-local units at row scale u = w / 90): the props-lane CheckBoxTag design (a
+   *  cream tag hanging from (47.5, 64) on a short loop, an EMPTY ink check box), `size` 19 wide; batched per row. Door
+   *  #4's is the only TICKED one (props CheckBoxTag). */
+  checkBox: {hang: [47.5, 64] as [number, number], size: 19},
 } as const;
 
 /** Mode 'flat' anchors: the horizon the haze bands sit on, the VP the house columns / avenues converge to, the sun
@@ -187,13 +197,13 @@ const INK_ROWS = 6;
 
 // ---------------------------------------------------------------- per-row batched geometry
 
-type RowChunk = {facades: string[]; shade: string; screens: string; bars: string; barDots: string; doors: string; plaques: string; locks: string; bits: string; ink: string; detail: string; stairs: string; stairInk: string};
+type RowChunk = {facades: string[]; shade: string; screens: string; bars: string; barDots: string; doors: string; plaques: string; locks: string; bits: string; ink: string; detail: string; stairs: string; stairInk: string; tags: string; tagBoxes: string; tagInk: string};
 
 const COLORS = [palette.cream, palette.sand, palette.tan, palette.mintPale];
 const f2 = (n: number) => n.toFixed(2);
 
 function rowChunks(mode: Mode, R: TerraceRow, half: [number, number], ext: [number, number], seed: string): {core: RowChunk; left: RowChunk; right: RowChunk} {
-  const mk = () => ({pb: COLORS.map(() => new PathBuf(2)), shade: new PathBuf(2), screens: new PathBuf(2), bars: new PathBuf(2), barDots: new PathBuf(2), doors: new PathBuf(2), plaques: new PathBuf(2), locks: new PathBuf(2), bits: new PathBuf(2), ink: '', detail: '', stairs: new PathBuf(2), stairInk: ''});
+  const mk = () => ({pb: COLORS.map(() => new PathBuf(2)), shade: new PathBuf(2), screens: new PathBuf(2), bars: new PathBuf(2), barDots: new PathBuf(2), doors: new PathBuf(2), plaques: new PathBuf(2), locks: new PathBuf(2), bits: new PathBuf(2), ink: '', detail: '', stairs: new PathBuf(2), stairInk: '', tags: new PathBuf(2), tagBoxes: new PathBuf(2), tagInk: ''});
   const parts = {core: mk(), left: mk(), right: mk()};
   const u = R.w / 90;
   const k = R.k;
@@ -240,6 +250,21 @@ function rowChunks(mode: Mode, R: TerraceRow, half: [number, number], ext: [numb
       if (k <= 1) for (let d = 0; d < 3; d++) P.barDots.circle(x + (22.5 + d * 6) * u, R.top + 34.75 * u, 2.2 * u);
     } else P.screens.rect(x + 17.5 * u, R.top + 30 * u, 55 * u, 35 * u);
     P.doors.rect(x + 32.5 * u, R.top + 97.5 * u, 30 * u, 50 * u);
+    // v3 check-box tag over the door: the props CheckBoxTag shape (a slanted cream tag on a loop, an empty box at 0.58),
+    // >= 4 px; ink (outline, box, loop) on rows 0-1, a sand box beyond
+    {
+      const CB = TERRACE.checkBox;
+      const sz = Math.max(CB.size * u, 4);
+      const hx = x + CB.hang[0] * u;
+      const hy = R.top + CB.hang[1] * u;
+      const q: Pt[] = [[hx - sz * 0.46, hy + sz * 0.22], [hx + sz * 0.5, hy + sz * 0.12], [hx + sz * 0.47, hy + sz * 0.98], [hx - sz * 0.5, hy + sz * 1.02]];
+      P.tags.poly(q);
+      const b = sz * 0.25;
+      const by = hy + sz * 0.58;
+      if (k <= 1) {
+        P.tagInk += `M${f2(hx)} ${f2(hy)}L${f2(hx - sz * 0.02)} ${f2(hy + sz * 0.18)}` + `M${q.map((p) => `${f2(p[0])} ${f2(p[1])}`).join('L')}Z` + `M${f2(hx - b)} ${f2(by - b)}h${f2(2 * b)}v${f2(2 * b)}h${f2(-2 * b)}Z`;
+      } else if (2 * b >= 2) P.tagBoxes.rect(hx - b, by - b, 2 * b, 2 * b);
+    }
     // dots never under 3 px at rest (no sub-pixel noise)
     const pq = Math.max(8 * u, 3);
     P.plaques.rect(x + 18 * u - pq / 2, R.top + 110 * u - pq / 2, pq, pq);
@@ -267,7 +292,7 @@ function rowChunks(mode: Mode, R: TerraceRow, half: [number, number], ext: [numb
       }
     }
   }
-  const fin = (p: ReturnType<typeof mk>): RowChunk => ({facades: p.pb.map((b) => b.d), shade: p.shade.d, screens: p.screens.d, bars: p.bars.d, barDots: p.barDots.d, doors: p.doors.d, plaques: p.plaques.d, locks: p.locks.d, bits: p.bits.d, ink: p.ink, detail: p.detail, stairs: p.stairs.d, stairInk: p.stairInk});
+  const fin = (p: ReturnType<typeof mk>): RowChunk => ({facades: p.pb.map((b) => b.d), shade: p.shade.d, screens: p.screens.d, bars: p.bars.d, barDots: p.barDots.d, doors: p.doors.d, plaques: p.plaques.d, locks: p.locks.d, bits: p.bits.d, ink: p.ink, detail: p.detail, stairs: p.stairs.d, stairInk: p.stairInk, tags: p.tags.d, tagBoxes: p.tagBoxes.d, tagInk: p.tagInk});
   return {core: fin(parts.core), left: fin(parts.left), right: fin(parts.right)};
 }
 
@@ -351,7 +376,7 @@ function bandsFor(mode: Mode, hazeFrom: number, seed: string): Band[] {
 
 const revealXf = (reveal: number, y: number, node: React.ReactNode) => (reveal >= 1 ? node : reveal <= 0 ? null : <XG m={mat.about(mat.scale(1, reveal), 540, y)}>{node}</XG>);
 
-const RowNode: React.FC<{mode: Mode; k: number; zoom: number; reveal: number; extended: boolean; plaques: boolean; bits: boolean; seed: string}> = ({mode, k, zoom, reveal, extended, plaques, bits, seed}) => {
+const RowNode: React.FC<{mode: Mode; k: number; zoom: number; reveal: number; extended: boolean; plaques: boolean; bits: boolean; tags?: boolean; seed: string}> = ({mode, k, zoom, reveal, extended, plaques, bits, tags, seed}) => {
   const R = rowsOf(mode)[k];
   const C = chunksFor(mode, k, seed);
   const depth = Math.min(1, k / (HAZE_FROM[mode] + 3));
@@ -382,6 +407,9 @@ const RowNode: React.FC<{mode: Mode; k: number; zoom: number; reveal: number; ex
           {iw > 0 && c.ink ? <Ink d={c.ink} width={iw} taper={false} vary={0.05} seed={`${seed}/i${k}/${i}`} /> : null}
           {dw > 0 && c.detail ? <Ink d={c.detail} width={dw} taper={false} vary={0.05} seed={`${seed}/di${k}/${i}`} /> : null}
           {c.stairInk && iw > 0 ? <Ink d={c.stairInk} width={iw * 0.8} taper={false} vary={0} seed={`${seed}/si${k}/${i}`} /> : null}
+          {tags && c.tags ? <Fill d={c.tags} color={palette.cream} offset={false} mode="snap" seed={`${seed}/tg${k}/${i}`} /> : null}
+          {tags && c.tagBoxes ? <Fill d={c.tagBoxes} color={palette.sand} offset={false} mode="snap" seed={`${seed}/tgb${k}/${i}`} /> : null}
+          {tags && c.tagInk && iw > 0 ? <Ink d={c.tagInk} width={Math.max(dw, iw * 0.5)} taper={false} vary={0} seed={`${seed}/tgi${k}/${i}`} /> : null}
         </React.Fragment>
       ))}
     </>
@@ -423,6 +451,17 @@ export type TerraceHillProps = {
   fixedAt?: number;
   /** House #4's lock (props-lane Lock props; default the FIXED lock: Part A installed it). */
   house4Lock?: Partial<LockProps>;
+  /** Storyboard v3: EMPTY cream check-box tags pop over every door, row 0 -> the last house row (row k at
+   *  checkBoxWaveAt + k * checkBoxStep: 0.6 s over rows 0-7 by default); door #4's tag is the only TICKED one (with row 0).
+   *  -1 = all there. Omit = none. */
+  checkBoxWaveAt?: number;
+  checkBoxStep?: number;
+  /** Storyboard v3: Bit on house #4's door jamb (TERRACE.bit, 3 px at rest = 18 px at the zoom-6 match). true = there;
+   *  {at, outAt} = pops on / off (1 frame); {x, y, size, rot, flip} overrides the pose. Default none. */
+  bit?: boolean | {at?: number; outAt?: number; x?: number; y?: number; size?: number; rot?: number; flip?: boolean};
+  /** Storyboard v3: the keeper speck (props Keeper, TERRACE.keeper: 46 px at rest beside door #4) walking to door #5 on
+   *  a dotted path that draws on behind him, then kneeling to work. true = standing at door #4. Default none. */
+  keeper?: boolean | {at?: number; walkAt?: number; walkDur?: number; kneelAt?: number; outAt?: number};
   /** Rows from here are haze bands (default hill 8, flat 6). */
   hazeFrom?: number;
   /** Foreground framing on the near street (ground.tsx presets, world coords: it slides out of frame during the pull-back
@@ -441,7 +480,7 @@ export type TerraceHillProps = {
   seed?: Seed;
 };
 
-export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFloor, plaqueWaveAt, bitWaveAt, waveStep = 0.06, extendAt, flagAt, fixedAt, house4Lock = {}, hazeFrom, foreground, people, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'terr'}) => {
+export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFloor, plaqueWaveAt, bitWaveAt, waveStep = 0.06, extendAt, flagAt, fixedAt, house4Lock = {}, checkBoxWaveAt, checkBoxStep = 0.085, bit, keeper, hazeFrom, foreground, people, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'terr'}) => {
   const t = useTime();
   const m = useXf();
   const zoom = Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2])) * scale || 1;
@@ -465,7 +504,8 @@ export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFl
     const reveal = revealOf(rows[k].top);
     if (reveal <= 0) continue;
     const bits = bitWaveAt !== undefined && t >= bitWaveAt + k * waveStep;
-    nodes.push(<RowNode key={k} mode={mode} k={k} zoom={zoom} reveal={reveal} extended={extendedAt(k)} plaques={plaquesAt(k)} bits={bits} seed={sd} />);
+    const tags = checkBoxWaveAt !== undefined && (checkBoxWaveAt < 0 || t >= checkBoxWaveAt + k * checkBoxStep);
+    nodes.push(<RowNode key={k} mode={mode} k={k} zoom={zoom} reveal={reveal} extended={extendedAt(k)} plaques={plaquesAt(k)} bits={bits} tags={tags} seed={sd} />);
   }
   // house #4 in full detail (the hidden-match object, THE fixed door)
   const H4 = TERRACE.house4;
@@ -496,6 +536,8 @@ export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFl
       <PlaqueSlot x={H4.facade[0] + 18} y={H4.facade[1] + 110} size={8} width={Math.max(0.4, 1 / zoom)} seed={`${sd}/h4p`} />
       <Lock x={H4.lock.x} y={H4.lock.y} size={H4.lock.h} state="fixed" ink={Math.max(0.6, 1.2 / zoom)} seed={`${sd}/h4lock`} {...house4Lock} />
       {flagAt !== undefined ? <CheckFlagSlot x={F.x} y={F.y} size={F.size} raiseAt={flagAt < 0 ? undefined : flagAt} at={flagAt < 0 ? undefined : flagAt} width={Math.max(1.6, 2.2 / zoom)} seed={`${sd}/flag`} /> : null}
+      {checkBoxWaveAt !== undefined && (checkBoxWaveAt < 0 || t >= checkBoxWaveAt) ? <House4Tag ink={Math.max(0.6, 2.2 / zoom)} seed={sd} /> : null}
+      <House4Bit spec={bit} seed={sd} />
     </>
   );
   // the near street (screen-flat field) with a few seeded specks; flat mode adds the ground plane behind the rows
@@ -528,9 +570,71 @@ export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFl
         </>,
       )}
       {wrap('house4', 0.6, house4)}
+      {keeper ? wrap('keeper', 0.6, <KeeperSpeck spec={keeper} zoom={zoom} seed={sd} />) : null}
       {wrap('people', 0.95, <People anchors={TERRACE.walkers} vp={[540, 1440]} spec={people} def={mode === 'hill'} seed={`${sd}/ppl`} />)}
       {foreground ? wrap('foreground', 1.0, <Foreground spec={foreground} seed={`${sd}/fg`} />) : null}
     </SetPlace>
+  );
+};
+
+/** Door #4's check-box tag: the only TICKED one (props CheckBoxTag, same design as the batched ones). */
+const House4Tag: React.FC<{ink: number; seed: string}> = ({ink, seed}) => {
+  const CB = TERRACE.checkBox;
+  return <CheckBoxTagSlot x={TERRACE.house4.facade[0] + CB.hang[0]} y={TERRACE.house4.facade[1] + CB.hang[1]} size={CB.size} ticked ink={ink} seed={`${seed}/h4tag`} />;
+};
+
+/** Bit on house #4's door jamb (v3 hidden-cut match object). */
+const House4Bit: React.FC<{spec: TerraceHillProps['bit']; seed: string}> = ({spec, seed}) => {
+  const t = useTime();
+  if (!spec) return null;
+  const o = spec === true ? {} : spec;
+  if (o.at !== undefined && t < o.at) return null;
+  if (o.outAt !== undefined && t >= o.outAt) return null;
+  const B = TERRACE.bit;
+  const bx = o.x ?? B.x;
+  const by = o.y ?? B.y;
+  const rot = o.rot ?? B.rot;
+  const bit = <BitSlot x={bx} y={by} size={o.size ?? B.size} flip={o.flip} seed={`${seed}/h4bit`} />;
+  return rot ? <XG m={mat.about(mat.rotate(rot), bx, by)}>{bit}</XG> : bit;
+};
+
+/** The keeper speck: beside door #4, walks to door #5 (walkAt, walkDur) on a dotted path that draws on behind him, then
+ *  kneels (a 0.82 crouch about his feet) and works (installAt). His ink holds a world floor through the pull-back. */
+const KeeperSpeck: React.FC<{spec: NonNullable<TerraceHillProps['keeper']>; zoom: number; seed: string}> = ({spec, zoom, seed}) => {
+  const t = useTime();
+  if (spec === false) return null;
+  const o = spec === true ? {} : spec;
+  if (o.at !== undefined && t < o.at) return null;
+  if (o.outAt !== undefined && t >= o.outAt) return null;
+  const K = TERRACE.keeper;
+  const walkAt = o.walkAt;
+  const dur = o.walkDur ?? 1.6;
+  const q = walkAt === undefined ? 0 : Math.max(0, Math.min(1, (t - walkAt) / dur));
+  const kx = K.from[0] + (K.to[0] - K.from[0]) * q;
+  const kneelAt = o.kneelAt ?? (walkAt !== undefined ? walkAt + dur : undefined);
+  const kneel = kneelAt !== undefined && t >= kneelAt;
+  // the figure is drawn larger and scaled down so its ink (props ladder 'hair' at that size) lands near a 0.85 world /
+  // 1.6 screen floor whatever the zoom
+  const kk = Math.max(1, Math.min(3, 1.6 / Math.max(0.85, 1.6 / zoom)));
+  const fig = (
+    <KeeperSlot
+      x={K.from[0] * kk}
+      y={K.from[1] * kk}
+      h={K.h * kk}
+      depth="hair"
+      walk={walkAt !== undefined ? {at: walkAt, to: [K.to[0] * kk, K.to[1] * kk], dur, hz: 2.4} : undefined}
+      installAt={kneel ? kneelAt : undefined}
+      installDur={1.5}
+      seed={`${seed}/keeper`}
+    />
+  );
+  const scaled = <XG m={mat.scale(1 / kk)}>{fig}</XG>;
+  const dash = Math.max(1.2, 6 / zoom);
+  return (
+    <>
+      {q > 0.02 ? <Ink d={`M${K.from[0]} ${K.pathY}L${kx.toFixed(2)} ${K.pathY}`} width={Math.max(0.5, 2.2 / zoom)} dash={`${dash} ${dash * 1.4}`} taper={false} vary={0} seed={`${seed}/kpath`} /> : null}
+      {kneel ? <XG m={mat.about(mat.scale(1, 0.82), K.to[0], K.to[1])}>{scaled}</XG> : scaled}
+    </>
   );
 };
 

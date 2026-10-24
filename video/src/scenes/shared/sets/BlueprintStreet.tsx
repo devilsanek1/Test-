@@ -50,6 +50,9 @@ export const BLUEPRINT = {
   sign: {x: 795, y: 930, r: 34, wallX: 760},
   vent: {x: 652, y: 816},
   stamp: {x: 330, y: 1400, rx: 160, ry: 60},
+  /** v3: the plan's title-block CARD at its bottom-right ([x0, y0, x1, y1], LabelTag kind 'card' `box`): the `titleBlock`
+   *  slot (S03's L3 -> L4 paper flip). */
+  titleBlock: [490, 1320, 910, 1440] as [number, number, number, number],
   /** S02's close-up framing (camera centre, zoom): apex at screen y 580, the lock at screen (570, 1240) 80 x 100. */
   closeup: {cam: [580, 960] as Pt, zoom: 2.0},
   /** PHP plaques vs blank plates. */
@@ -252,6 +255,12 @@ const VentPuff: React.FC<{at?: number; seed: string}> = ({at, seed}) => {
 
 // ---------------------------------------------------------------- the set
 
+/** v3: the plan's title-block frame under the card slot (a double ink frame 8 / 16 px outside the card box). */
+const TB_FRAME = (() => {
+  const [x0, y0, x1, y1] = BLUEPRINT.titleBlock;
+  return rect(x0 - 8, y0 - 8, x1 - x0 + 16, y1 - y0 + 16, {seed: 'bp/tbf1', over: 'small'}) + rect(x0 - 16, y0 - 16, x1 - x0 + 32, y1 - y0 + 32, {seed: 'bp/tbf2', over: 'small'});
+})();
+
 export type BlueprintStreetProps = {
   /** Side buildings pop up (pop-up book); omit an id = standing. */
   popAt?: Partial<Record<SideId, number>>;
@@ -271,6 +280,9 @@ export type BlueprintStreetProps = {
   lock?: Partial<LockProps>;
   /** Back-view people on BLUEPRINT.walkers (life.tsx). Default OFF here; true / options to show them. */
   people?: PeopleSpec;
+  /** v3 label slot: the plan's title-block card at BLUEPRINT.titleBlock (drawn in front of the side buildings, with an
+   *  inked title-block frame on the plan under it), e.g. (box) => <LabelTag kind="card" box={box} text={L3} flipTo={...} />. */
+  titleBlock?: React.ReactNode | ((box: [number, number, number, number]) => React.ReactNode);
   sun?: React.ReactNode;
   wrap?: LayerWrap;
   x?: number;
@@ -282,7 +294,7 @@ export type BlueprintStreetProps = {
   seed?: string;
 };
 
-export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pressAt, plaqueAt = {}, gridAt, stampAt, ventAt, signSwingAt, blinkAt, lock = {}, people, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bp'}) => {
+export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pressAt, plaqueAt = {}, gridAt, stampAt, ventAt, signSwingAt, blinkAt, lock = {}, people, titleBlock, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bp'}) => {
   const t = useTime();
   const P = BLUEPRINT.press;
   const [wx, wy, ww, wh] = BLUEPRINT.window;
@@ -308,6 +320,7 @@ export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pre
       {gridP > 0 ? <Ink d={G.gridFar} width={SI.hair * 0.6} at={gridAt !== undefined ? gridAt + 0.24 : undefined} dur={0.3} order="all" taper={false} seed={`${seed}/gF`} /> : null}
       <Ink d={G.dimL + G.dimR} width={SI.far} at={gridAt !== undefined ? gridAt + 0.3 : undefined} taper={false} seed={`${seed}/dim`} />
       <Ink d={G.tb} width={SI.far} at={gridAt !== undefined ? gridAt + 0.35 : undefined} taper={false} seed={`${seed}/tb`} />
+      {titleBlock ? <Ink d={TB_FRAME} width={SI.hair} at={gridAt !== undefined ? gridAt + 0.35 : undefined} taper={false} seed={`${seed}/tb3`} /> : null}
       {stampAt !== false ? <ElephantStampSlot x={BLUEPRINT.stamp.x} y={BLUEPRINT.stamp.y} rx={BLUEPRINT.stamp.rx} ry={BLUEPRINT.stamp.ry} ring={14} at={stampAt} seed={`${seed}/stamp`} /> : null}
     </>
   );
@@ -350,6 +363,7 @@ export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pre
       {wrap('ground', 0.8, ground)}
       {wrap('press', 0.5, press)}
       {wrap('sides', 0.6, sides)}
+      {titleBlock ? wrap('label', 0.85, typeof titleBlock === 'function' ? titleBlock(BLUEPRINT.titleBlock) : titleBlock) : null}
       {wrap('people', 0.9, <People anchors={BLUEPRINT.walkers} vp={BLUEPRINT.vp} spec={people} def={false} seed={`${seed}/ppl`} />)}
     </SetPlace>
   );

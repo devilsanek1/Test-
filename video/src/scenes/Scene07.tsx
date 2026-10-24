@@ -6,14 +6,15 @@
 // raise phones, the sun lands behind the wall top and becomes an hours clock (the fix is not ready), the workshop's
 // blind stays down ('still fixing...', J4), then a fixed 0.40 s tilt-up follows the copies into S08 (wires at screen
 // 896 / 928 / 960, the sun half behind the wall top at (640, 1021)). Label L7 on the board's bottom rail.
-// Beat table: scene07/beats.ts. Local stand-ins (LabelTag, BlindSign): scene07/shims.tsx. Notes: docs/scenes/S07.md.
+// Beat table: scene07/beats.ts. Local stand-in (BlindSign, until the sets lane ships the Workshop blindSign slot):
+// scene07/shims.tsx. Isolated preview entry: scene07/entry.tsx. Notes: docs/scenes/S07.md.
 
 import React from 'react';
 import {World, Sun, XG, mat, palette, useTime, ease as E} from '../lib';
 import {NoticeboardCorner, NOTICE_CORNER, WORKSHOP_CORNER} from './shared/sets';
 import {EdgeOnlooker, HoursClock, LabelTag, LeakClones, LeakSheet} from './shared/props';
 import {useBeats} from './scene07/beats';
-import {camAt, camMat, Flyer, InkReveal, PhoneCopy, Pigeon, PinDot, PipS07, RevealPass, tiltPx, WireCopy, WireCopySpec} from './scene07/parts';
+import {camAt, camMat, Flyer, InkReveal, PhoneCopy, Pigeon, PinDot, PipS07, PUSHED, RevealPass, tiltPx, WireCopy, WireCopySpec} from './scene07/parts';
 import {BlindSign} from './scene07/shims';
 
 // ---------------------------------------------------------------- layout (world px at camera rest)
@@ -27,6 +28,11 @@ const S7_READERS = NOTICE_CORNER.readers;
 /** On 'fix' the sun lifts a little so the whole clock face reads over the wall top (it sinks back as the tilt starts,
  *  so it is half behind the wall top again on the cut: S08's (640, 1021) match). */
 const CLOCK_LIFT = 70;
+/** Screen x of S08's pegged copies on its first frame (src/scenes/Scene08.tsx COPIES / BIT_COPY at its crane start
+ *  (540, 1260) zoom 1.3: screen = 540 + (x0 - 540) x 1.3): S07's copies end exactly there on the cut. */
+const CUT_COPIES = {w0: 540 + (128 - 540) * 1.3, w2: 540 + (262 - 540) * 1.3, w1: 540 + (392 - 540) * 1.3, bit: 540 + (478 - 540) * 1.3};
+/** World x (S07) of a screen x on the last frame (camera (480, 760) zoom 1.06). */
+const cutWorldX = (sx: number) => PUSHED.x + (sx - 540) / PUSHED.z;
 /** Reader 1's phone screen once raised (world, measured on the render at t 1.5). */
 const PHONE: [number, number] = [296, 1238];
 
@@ -69,12 +75,14 @@ const Scene07: React.FC = () => {
     {x: 205, y: 990, at: B.out + 0.25, rot: -6, s: 0.6},
   ];
 
-  // ---- copies lift off the board, peg onto the wires on 'before' and travel left over the rooftops (into S08)
+  // ---- copies lift off the board, peg onto the wires on 'before' and travel left over the rooftops (into S08). Each
+  //      one slides at the constant speed that puts it where S08's first frame has it (CUT_COPIES, the match).
+  const toCut = (x: number, pegAt: number, sx: number) => (x - cutWorldX(sx)) / (B.end - pegAt);
   const copies: WireCopySpec[] = [
-    {from: [560, 1040], liftAt: B.before - 0.2, wire: 0, x: 500, pegAt: B.before, speed: 280, seed: 's7wc0'},
-    {from: [620, 1140], liftAt: B.before - 0.14, wire: 1, x: 640, pegAt: B.before + 0.06, speed: 280, bit: true, seed: 's7wc1'},
-    {from: [500, 1250], liftAt: B.before - 0.08, wire: 2, x: 430, pegAt: B.before + 0.12, speed: 260, seed: 's7wc2'},
-    {from: [240, 1000], liftAt: B.before - 0.02, wire: 1, x: 420, pegAt: B.before + 0.18, speed: 240, seed: 's7wc3'},
+    {from: [560, 1040], liftAt: B.before - 0.2, wire: 0, x: 420, pegAt: B.before, speed: toCut(420, B.before, CUT_COPIES.w0), seed: 's7wc0'},
+    {from: [620, 1140], liftAt: B.before - 0.14, wire: 1, x: 640, pegAt: B.before + 0.06, speed: toCut(640, B.before + 0.06, CUT_COPIES.bit), bit: true, seed: 's7wc1'},
+    {from: [500, 1250], liftAt: B.before - 0.08, wire: 2, x: 430, pegAt: B.before + 0.12, speed: toCut(430, B.before + 0.12, CUT_COPIES.w2), seed: 's7wc2'},
+    {from: [240, 1000], liftAt: B.before - 0.02, wire: 1, x: 420, pegAt: B.before + 0.18, speed: toCut(420, B.before + 0.18, CUT_COPIES.w1), seed: 's7wc3'},
   ];
 
   const set = (pass: RevealPass) => (
@@ -90,9 +98,9 @@ const Scene07: React.FC = () => {
       {/* J4: the makers' blind is still down: 'still fixing...' (on the blind's left half, clear of the right rail) */}
       <BlindSign x={WORKSHOP_CORNER.shop[0] + 58} y={WORKSHOP_CORNER.shop[1] + 12} swingAt={[B.fix]} seed="s7blind" />
       {/* pigeons on the wires: they hop over the passing pegs; one flaps up on 'was' */}
-      <Pigeon wire={0} x={470} hopAt={[B.before - 0.02]} seed="s7pg0" />
-      <Pigeon wire={0} x={428} hopAt={[B.before + 0.12]} flip color={palette.sand} seed="s7pg1" />
-      <Pigeon wire={0} x={318} flyAt={B.was - 0.02} flyTo={[-240, -150]} seed="s7pg2" />
+      <Pigeon wire={0} x={384} hopAt={[B.before - 0.04]} seed="s7pg0" />
+      <Pigeon wire={0} x={330} hopAt={[B.before + 0.1]} flip color={palette.sand} seed="s7pg1" />
+      <Pigeon wire={0} x={186} flyAt={B.was - 0.02} flyTo={[-240, -150]} seed="s7pg2" />
     </>
   );
 

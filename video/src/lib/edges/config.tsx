@@ -10,10 +10,11 @@ import {getInputProps} from 'remotion';
 import {capcheckMode} from '../Captions';
 import {EdgeTreatment, EdgeTreatmentProps} from './EdgeTreatment';
 import {EDGE_VARIANTS, EdgeVariant} from './variants';
+import {EDGE_HINTS} from './hints';
 
 export type EdgeConfig = Omit<EdgeTreatmentProps, 'children'>;
 
-/** House default for the film. 'clean' until the user picks one (docs/EDGES.md: 'trim' or 'panel'). */
+/** House default for the film. 'clean' until the user picks one (docs/EDGES.md: 'trim', 'panel' or a 'paint-*' preset). */
 export const FILM_EDGES: EdgeConfig = {variant: 'clean', seed: 'film', amount: 1};
 
 const EdgeCtx = createContext<EdgeConfig | null>(null);
@@ -38,9 +39,19 @@ export function useEdgeConfig(): EdgeConfig {
 }
 
 /** Film's one-line integration: wrap the scene stack (every layer + transition overlays, NOT the captions). Steps aside
- *  in the caption check's 'mask' pass (Film draws no scene there; a paper layer would cover the whole frame). */
-export const FilmEdges: React.FC<{children?: React.ReactNode}> = ({children}) => {
+ *  in the caption check's 'mask' pass (Film draws no scene there; a paper layer would cover the whole frame).
+ *  `scene` (optional): the id of the scene on screen; it is appended to the config seed, so each scene gets its own
+ *  hand-made edge (with 'paint': a separate painting per scene; the edge changes on the cut, never within a scene),
+ *  and the scene's EDGE_HINTS entry (edges/hints.ts) is applied: bare corners only where the scene has drawing,
+ *  keep rects never cut. */
+export const FilmEdges: React.FC<{scene?: string; children?: React.ReactNode}> = ({scene, children}) => {
   const cfg = useEdgeConfig();
   if (capcheckMode() === 'mask') return <>{children}</>;
-  return <EdgeTreatment {...cfg}>{children}</EdgeTreatment>;
+  const seed = scene ? `${String(cfg.seed ?? 'film')}/${scene}` : cfg.seed;
+  const hints = cfg.hints ?? (scene ? EDGE_HINTS[scene] : undefined);
+  return (
+    <EdgeTreatment {...cfg} seed={seed} hints={hints}>
+      {children}
+    </EdgeTreatment>
+  );
 };

@@ -69,11 +69,62 @@ export const DOME = {
     {top: [1080, 1170], base: 1300},
     {top: [1220, 1300], base: 1520},
   ],
+  // ---- storyboard v3 (S08 re-staged)
+  /** v3 `dome="district"`: the dome over ONE far district (~1/5 of the city): feet (180, 1080) / (600, 1080), apex (390, 830). */
+  district: {cx: 390, by: 1080, rx: 210, ry: 250},
+  /** v3 sun slot: r260 half-set on the horizon; SunGlowSteps rings at x1.25 / x1.5 (outer top at y 610). */
+  sunV3: {x: 700, y: 1000, r: 260, glow: [1.25, 1.5] as [number, number]},
+  /** v3 watchtower at the district dome's right foot, silhouetted against the sun (dark cabin, no guard): lattice
+   *  x 600-650 from its base on row 1 (y 1100) up to the cabin (600-650 x 892-934, roof apex y 880); the searchlight
+   *  sits on the cabin's left side and points at the dome. */
+  towerV3: {x0: 600, x1: 650, base: 1100, cabin: [600, 892, 50, 42] as [number, number, number, number], top: 880, light: [598, 910] as Pt},
+  /** v3 searchlight: `searchAngle` = degrees BELOW the horizontal, pointing at the dome (left), clamped -10..+25; the cone
+   *  is cut so it never rises above world y 800 (screen y >= 600 through the S08 baseline push). */
+  searchV3: {clamp: [-10, 25] as [number, number], ceiling: 800, length: 520, half: 7},
+  /** v3 rattler doors (feet points; h = the attempter's height there): row 3 (the near rooftops) x 100-460 with
+   *  55-70 px figures, their feet just above our coping; row 2 across the width (30-40 px figures) at street level y 1300,
+   *  each in front of a LOW row-3 shed so its door and figure show. */
+  rattlers: {
+    row3: [
+      {x: 110, y: 1442, h: 62},
+      {x: 195, y: 1441, h: 58},
+      {x: 285, y: 1440, h: 70},
+      {x: 370, y: 1439, h: 64},
+      {x: 455, y: 1438, h: 56},
+    ],
+    row2: [
+      {x: 50, y: 1300, h: 36},
+      {x: 210, y: 1300, h: 34},
+      {x: 370, y: 1300, h: 38},
+      {x: 540, y: 1300, h: 32},
+      {x: 720, y: 1300, h: 36},
+      {x: 880, y: 1300, h: 40},
+    ],
+  },
+  /** v3 multiplane depths (storyboard S08 layers; wrap gets nearness = 1 - depth). */
+  depths: {sky: 1, sun: 1, row0: 0.85, row1: 0.7, dome: 0.7, row2: 0.45, row3: 0.2, fg: 0},
 } as const;
 
-/** The dome arc's y at x (upper half of the ellipse; NaN outside). */
-export function domeArcY(x: number): number {
-  const a = DOME.arc;
+/** A dome as an ellipse arc (centre x, foot y, half-width, height). */
+export type DomeArc = {cx: number; by: number; rx: number; ry: number};
+/** 'wide' = the review-5 dome over ~80 % of the city (default); 'district' = storyboard v3 (DOME.district); or an arc /
+ *  feet + apex. Anything but 'wide' switches the v3 staging (tower at the right foot, observer off, v3 layers, v3 doors). */
+export type DomeShape = 'wide' | 'district' | DomeArc | {feet: [Pt, Pt]; apex: Pt};
+
+/** Resolve a DomeShape to its arc. */
+export function domeArc(d: DomeShape = 'wide'): DomeArc {
+  if (d === 'wide') return DOME.arc;
+  if (d === 'district') return DOME.district;
+  if ('feet' in d) {
+    const [a, b] = d.feet;
+    return {cx: (a[0] + b[0]) / 2, by: (a[1] + b[1]) / 2, rx: Math.abs(b[0] - a[0]) / 2, ry: (a[1] + b[1]) / 2 - d.apex[1]};
+  }
+  return d;
+}
+
+/** The dome arc's y at x (upper half of the ellipse; NaN outside). Pass the v3 dome (`'district'`) for its arc. */
+export function domeArcY(x: number, dome: DomeShape = 'wide'): number {
+  const a = domeArc(dome);
   const u = (x - a.cx) / a.rx;
   if (Math.abs(u) > 1) return NaN;
   return a.by - a.ry * Math.sqrt(1 - u * u);
@@ -119,12 +170,16 @@ const ROWS: RowGeo[] = (() => {
     let x = -260;
     while (x < 1340) {
       const w = r.range(60, 150) * s;
-      const top = r.range(row.top[0], row.top[1]);
+      const top0 = r.range(row.top[0], row.top[1]);
+      // v3: a LOW row-3 shed in front of every row-2 rattler door, so the door at row 2's street level (y 1300) and its
+      // attempter show above it (same RNG stream: the rest of the city is unchanged)
+      const low = ri === 3 && DOME.rattlers.row2.some((q) => q.x + 18 > x && q.x - 18 < x + w);
+      const top = low ? 1338 : top0;
       const ci = r.int(0, cols.length - 1);
       const roof = r.next();
       let d = rectPath(x, top, w, row.base - top);
-      if (ri >= 2 && roof < 0.22) d += polyPath([[x - 2, top], [x + w / 2, top - w * 0.35], [x + w + 2, top]]);
-      if (ri >= 2 && roof > 0.82) d += rectPath(x + w * 0.2, top - 16 * s, w * 0.6, 17 * s);
+      if (ri >= 2 && !low && roof < 0.22) d += polyPath([[x - 2, top], [x + w / 2, top - w * 0.35], [x + w + 2, top]]);
+      if (ri >= 2 && !low && roof > 0.82) d += rectPath(x + w * 0.2, top - 16 * s, w * 0.6, 17 * s);
       byColor[ci] += d;
       // a real browser window on this building? (rows 2-3, wide enough, one per x quarter, inside the frame)
       const q4 = Math.floor(((x + w / 2) / 1080) * 4);
@@ -171,9 +226,12 @@ const ROWS: RowGeo[] = (() => {
       if (ri >= 2) {
         ink += line(x, top, x + w, top, {seed: `dm${ri}t${Math.round(x)}`, over: 'small', breaks: false}) + line(x, top, x, row.base, {seed: `dm${ri}l${Math.round(x)}`, over: [1, 0], breaks: false});
         if (ri === 3 && roof > 0.55 && roof < 0.82) {
-          // chimney or water tank on the near rooftops
+          // chimney or water tank on the near rooftops (not on the low sheds; the RNG draws stay the same)
           const cx = x + w * r.range(0.2, 0.7);
-          if (r.chance(0.5)) {
+          const chim = r.chance(0.5);
+          if (low) {
+            /* flat shed roof */
+          } else if (chim) {
             byColor[0] += rectPath(cx - 7, top - 26, 14, 27);
             ink += rect(cx - 7, top - 26, 14, 26, {seed: `dmc${Math.round(x)}`, over: 'small', edges: 'tlr'});
           } else {
@@ -282,6 +340,96 @@ const G = (() => {
   return {potTops, potBands, leftHalf, rightHalf, interior, rim, lattice, glints, footprint, hill, lat, cabin, cabinRoof, cabinInk, boardInk, ledge, ledgeShade, pots, ledgeInk, antenna, tiles, face, deck, chimInk};
 })();
 
+// ---------------------------------------------------------------- v3 geometry (district dome, foot tower, doors)
+
+/** Arc-dependent dome geometry (memoised per arc): the two halves drawn from the feet, the interior (glass clip), the
+ *  cream rim strip on the sun side, glint bars, a lattice (meridians / parallels scale with the dome) and the footprint. */
+const DOME_GEO = new Map<string, {leftHalf: string; rightHalf: string; interior: string; rim: string; lattice: string; glints: string; footprint: string}>();
+function domeGeo(a: DomeArc) {
+  const key = `${a.cx},${a.by},${a.rx},${a.ry}`;
+  const hit = DOME_GEO.get(key);
+  if (hit) return hit;
+  const pts = (rx: number, ry: number, from: number, to: number, n = 40) => {
+    const p: Pt[] = [];
+    for (let i = 0; i <= n; i++) {
+      const th = from + ((to - from) * i) / n;
+      p.push([a.cx + Math.cos(th) * rx, a.by - Math.sin(th) * ry]);
+    }
+    return p;
+  };
+  const toD = (p: Pt[]) => p.map((q, i) => `${i ? 'L' : 'M'}${q[0].toFixed(1)} ${q[1].toFixed(1)}`).join('');
+  const small = a.rx < 320;
+  const leftHalf = toD(pts(a.rx, a.ry, Math.PI, Math.PI / 2));
+  const rightHalf = toD(pts(a.rx, a.ry, 0, Math.PI / 2));
+  const interior = toD(pts(a.rx, a.ry, 0, Math.PI, 64)) + 'Z';
+  const rimW = small ? 7 : 9;
+  const rim = toD([...pts(a.rx - 2, a.ry - 2, Math.PI * 0.18, Math.PI * 0.62, 24), ...pts(a.rx - 2 - rimW, a.ry - 2 - rimW, Math.PI * 0.62, Math.PI * 0.18, 24)]) + 'Z';
+  let lattice = '';
+  for (const k of small ? [-0.62, -0.24, 0.24, 0.62] : [-0.78, -0.5, -0.2, 0.2, 0.5, 0.78]) {
+    lattice += toD(pts(Math.abs(k) * a.rx, a.ry, k < 0 ? Math.PI : 0, Math.PI / 2, 24));
+  }
+  for (const v of small ? [0.36, 0.7] : [0.3, 0.58, 0.82]) {
+    const yy = a.by - v * a.ry;
+    const half = a.rx * Math.sqrt(1 - v * v);
+    lattice += `M${(a.cx - half).toFixed(1)} ${yy.toFixed(1)}Q${a.cx} ${(yy - 18 * (a.ry / 600) * (1 - v)).toFixed(1)} ${(a.cx + half).toFixed(1)} ${yy.toFixed(1)}`;
+  }
+  // glint bars: long thin diagonal quads on the left half (2 on a district dome, 3 on the wide one)
+  const k = a.ry / 600;
+  const bar = (x: number, y: number, L: number, w: number) => polyPath([[x, y], [x + w, y], [x + w + L * 0.42, y - L], [x + L * 0.42, y - L]]);
+  const gx = a.cx - a.rx * 0.66;
+  const gy = a.by - a.ry * 0.4;
+  const glints = small
+    ? bar(gx, gy, 230 * k * 1.2, 12 * Math.max(0.6, k)) + bar(gx + 26 * k * 1.6, gy + 8 * k, 170 * k * 1.2, 6)
+    : bar(420, 1060, 230, 16) + bar(452, 1068, 180, 7) + bar(880, 960, 170, 12);
+  const footprint = line(a.cx - a.rx, a.by + 2, a.cx + a.rx, a.by, {seed: `dome/fp${a.cx}`, over: 0, breaks: false});
+  const out = {leftHalf, rightHalf, interior, rim, lattice, glints, footprint};
+  DOME_GEO.set(key, out);
+  return out;
+}
+
+/** v3: the watchtower at the dome's right foot as a SILHOUETTE against the big sun (tealDark lattice + cabin, a dark
+ *  window band, no guard), its searchlight housing on the cabin's left. */
+const TOWER_V3 = (() => {
+  const T = DOME.towerV3;
+  const [cx, cy, cw, ch] = T.cabin;
+  const legL: [Pt, Pt] = [[T.x0 - 6, T.base], [cx + 6, cy + ch]];
+  const legR: [Pt, Pt] = [[T.x1 + 6, T.base], [cx + cw - 6, cy + ch]];
+  const at = (leg: [Pt, Pt], u: number): Pt => [leg[0][0] + (leg[1][0] - leg[0][0]) * u, leg[0][1] + (leg[1][1] - leg[0][1]) * u];
+  let lattice = `M${legL[0][0]} ${legL[0][1]}L${legL[1][0]} ${legL[1][1]}M${legR[0][0]} ${legR[0][1]}L${legR[1][0]} ${legR[1][1]}`;
+  const us = [0, 0.22, 0.44, 0.66, 0.86];
+  for (let i = 0; i < us.length - 1; i++) {
+    const a0 = at(legL, us[i]);
+    const b0 = at(legR, us[i]);
+    const b1 = at(legR, us[i + 1]);
+    const a1 = at(legL, us[i + 1]);
+    lattice += `M${a0[0].toFixed(1)} ${a0[1].toFixed(1)}L${b0[0].toFixed(1)} ${b0[1].toFixed(1)}`;
+    lattice += i % 2 ? `M${a0[0].toFixed(1)} ${a0[1].toFixed(1)}L${b1[0].toFixed(1)} ${b1[1].toFixed(1)}` : `M${b0[0].toFixed(1)} ${b0[1].toFixed(1)}L${a1[0].toFixed(1)} ${a1[1].toFixed(1)}`;
+  }
+  const cabin = rectPath(cx, cy, cw, ch) + polyPath([[cx - 5, cy + 1], [cx + cw / 2, T.top], [cx + cw + 5, cy + 1]]) + rectPath(cx - 4, cy + ch - 3, cw + 8, 5);
+  const window = rectPath(cx + 5, cy + 7, cw - 10, ch * 0.42);
+  const lamp = rectPath(T.light[0] - 7, T.light[1] - 6, 9, 12);
+  return {lattice, cabin, window, lamp};
+})();
+
+/** v3 rattler doors: row 3 (near rooftops, feet just above our coping) and row 2 (street level y 1300, in front of the
+ *  low row-3 sheds). Fill + ink per row, batched. */
+const DOORS_V3 = (() => {
+  const make = (list: readonly {x: number; y: number; h: number}[], k: number, seed: string) => {
+    let fill = '';
+    let lintel = '';
+    let ink = '';
+    list.forEach((q, i) => {
+      const h = q.h * 1.18;
+      const w = h * 0.42;
+      fill += rectPath(q.x - w / 2, q.y - h, w, h);
+      lintel += rectPath(q.x - w / 2 - 3 * k, q.y - h - 5 * k, w + 6 * k, 5 * k);
+      ink += rect(q.x - w / 2, q.y - h, w, h, {seed: `${seed}${i}`, edges: 'tlr', over: 'small'}) + `M${(q.x + w * 0.26).toFixed(1)} ${(q.y - h * 0.5).toFixed(1)}l0 ${(h * 0.12).toFixed(1)}`;
+    });
+    return {fill, lintel, ink};
+  };
+  return {row3: make(DOME.rattlers.row3, 1, 'dr3'), row2: make(DOME.rattlers.row2, 0.6, 'dr2')};
+})();
+
 // ---------------------------------------------------------------- pieces
 
 const RowNode: React.FC<{ri: number; inkW: number; dotsAt?: number; duskAt?: number; seed: string}> = ({ri, inkW, dotsAt, duskAt, seed}) => {
@@ -310,18 +458,27 @@ const RowNode: React.FC<{ri: number; inkW: number; dotsAt?: number; duskAt?: num
 };
 
 /** The searchlight: a flat cream wedge at a FIXED partial opacity with dashed ink edges (never animated opacity). */
-const Searchlight: React.FC<{at?: number; angle?: number | ((t: number) => number); seed: string}> = ({at, angle, seed}) => {
+const Searchlight: React.FC<{at?: number; angle?: number | ((t: number) => number); seed: string; v3?: boolean; clamp?: [number, number]}> = ({at, angle, seed, v3, clamp}) => {
   const t = useTime();
   const look = useLook();
   if (at === undefined || t < at || look.fills !== 'color') return null;
-  const [ox, oy] = DOME.tower.light;
-  const a = typeof angle === 'function' ? angle(t) : angle ?? 10 + 30 * Math.sin((t - at) * 0.9);
-  const L = 900 * E.outCubic(prog(t, at, 0.35));
-  const half = 7;
-  const d0 = ((a - half) * Math.PI) / 180;
-  const d1 = ((a + half) * Math.PI) / 180;
-  const p0: Pt = [ox + Math.cos(d0) * L, oy + Math.sin(d0) * L];
-  const p1: Pt = [ox + Math.cos(d1) * L, oy + Math.sin(d1) * L];
+  const S = DOME.searchV3;
+  const [ox, oy] = v3 ? DOME.towerV3.light : DOME.tower.light;
+  const lim = clamp ?? (v3 ? S.clamp : undefined);
+  const raw = typeof angle === 'function' ? angle(t) : angle ?? (v3 ? (S.clamp[0] + S.clamp[1]) / 2 + ((S.clamp[1] - S.clamp[0]) / 2) * Math.sin((t - at) * 0.9) : 10 + 30 * Math.sin((t - at) * 0.9));
+  const a = lim ? Math.max(lim[0], Math.min(lim[1], raw)) : raw;
+  const grow = E.outCubic(prog(t, at, 0.35));
+  const half = v3 ? S.half : 7;
+  // v3 points LEFT at the dome (angle = degrees below the horizontal) and never rises above the ceiling
+  const dir = v3 ? -1 : 1;
+  const edge = (deg: number): Pt => {
+    const r = (deg * Math.PI) / 180;
+    let L = (v3 ? S.length : 900) * grow;
+    if (v3 && deg < 0) L = Math.min(L, (oy - S.ceiling) / Math.sin(-r));
+    return [ox + dir * Math.cos(r) * L, oy + Math.sin(r) * L];
+  };
+  const p0 = edge(a - half);
+  const p1 = edge(a + half);
   return (
     <>
       <path d={polyPath([[ox, oy], p0, p1])} fill={palette.cream} opacity={0.55} />
@@ -376,8 +533,17 @@ export type DomeCityProps = {
   searchAt?: number;
   searchAngle?: number | ((t: number) => number);
   guard?: boolean;
-  /** The back-view observer behind the parapet (DOME.observer). Default true. */
+  /** The back-view observer behind the parapet (DOME.observer). Default true ('wide'), false in v3. */
   observer?: boolean;
+  /** Storyboard v3: 'district' re-scales the dome to one far district (DOME.district: feet (180, 1080) / (600, 1080),
+   *  apex (390, 830)); also an arc {cx, by, rx, ry} or {feet, apex}. Anything but 'wide' (default) stages v3: the
+   *  watchtower silhouetted at the dome's right foot (dark cabin, no guard), the searchlight pointing at the dome
+   *  (clamped), observer off, the v3 rattler doors and the v3 multiplane layers (DOME.depths). */
+  dome?: DomeShape;
+  /** Clamp of `searchAngle` in degrees (v3 default -10..+25: below the horizontal, pointing at the dome). */
+  searchClamp?: [number, number];
+  /** v3 rattler doors on rows 2-3 (DOME.rattlers). Default true in v3. */
+  doors?: boolean;
   /** Sky colour behind (skies.golden by default): the glass interior is one step lighter. */
   sky?: string;
   wrap?: LayerWrap;
@@ -390,7 +556,28 @@ export type DomeCityProps = {
   seed?: Seed;
 };
 
-export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, glassAt, footprintAt, dotsAt, duskAt, towerAt, searchAt, searchAngle, guard = true, observer = true, sky = skies.golden, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'dome'}) => {
+export const DomeCity: React.FC<DomeCityProps> = (props) => (props.dome !== undefined && props.dome !== 'wide' ? <DomeCityV3 {...props} /> : <DomeCityWide {...props} />);
+
+/** The near layer: our rooftop parapet (deck, shadow band, face, coping, joints), the chimney stack, the antenna and
+ *  the optional back-view observer. */
+const Rooftop: React.FC<{sd: string; observer: boolean}> = ({sd, observer}) => (
+  <>
+    <Fill d={G.deck} color={palette.sand} offset={false} seed={`${sd}/deck`} />
+    <Fill d={G.ledgeShade} color={palette.teal} offset={false} seed={`${sd}/deckS`} />
+    <Fill d={G.face} color={palette.tan} offset={false} seed={`${sd}/face`} />
+    <Fill d={G.ledge} color={palette.cream} offset={false} seed={`${sd}/coping`} />
+    <Ink d={G.tiles} width={SI.far} taper={false} seed={`${sd}/joints`} />
+    <Ink d={G.ledgeInk} width={SI.front} seed={`${sd}/ledgeI`} />
+    <Fill d={G.pots} color={palette.brown} seed={`${sd}/pots`} />
+    <Fill d={G.potBands} color={palette.tan} offset={false} seed={`${sd}/potb`} />
+    <Fill d={G.potTops} color={palette.sand} seed={`${sd}/pott`} />
+    <Ink d={G.chimInk} width={SI.front} seed={`${sd}/chimI`} />
+    <Ink d={G.antenna} width={SI.mid} color={palette.tealDark} taper={false} seed={`${sd}/ant`} />
+    {observer ? <OnlookerSlot x={DOME.observer.head[0]} y={DOME.observer.head[1]} head={DOME.observer.size} hair="cap" body={palette.sand} acc={['scarf']} rim="left" arms="near" seed={`${sd}/obs3`} /> : null}
+  </>
+);
+
+const DomeCityWide: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, glassAt, footprintAt, dotsAt, duskAt, towerAt, searchAt, searchAngle, guard = true, observer = true, sky = skies.golden, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'dome'}) => {
   const t = useTime();
   const clipId = 'dm' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const sd = String(seed);
@@ -466,22 +653,7 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
       ) : null}
     </>
   );
-  const fg = (
-    <>
-      <Fill d={G.deck} color={palette.sand} offset={false} seed={`${sd}/deck`} />
-      <Fill d={G.ledgeShade} color={palette.teal} offset={false} seed={`${sd}/deckS`} />
-      <Fill d={G.face} color={palette.tan} offset={false} seed={`${sd}/face`} />
-      <Fill d={G.ledge} color={palette.cream} offset={false} seed={`${sd}/coping`} />
-      <Ink d={G.tiles} width={SI.far} taper={false} seed={`${sd}/joints`} />
-      <Ink d={G.ledgeInk} width={SI.front} seed={`${sd}/ledgeI`} />
-      <Fill d={G.pots} color={palette.brown} seed={`${sd}/pots`} />
-      <Fill d={G.potBands} color={palette.tan} offset={false} seed={`${sd}/potb`} />
-      <Fill d={G.potTops} color={palette.sand} seed={`${sd}/pott`} />
-      <Ink d={G.chimInk} width={SI.front} seed={`${sd}/chimI`} />
-      <Ink d={G.antenna} width={SI.mid} color={palette.tealDark} taper={false} seed={`${sd}/ant`} />
-      {observer ? <OnlookerSlot x={DOME.observer.head[0]} y={DOME.observer.head[1]} head={DOME.observer.size} hair="cap" body={palette.sand} acc={['scarf']} rim="left" arms="near" seed={`${sd}/obs3`} /> : null}
-    </>
-  );
+  const fg = <Rooftop sd={sd} observer={observer} />;
   return (
     <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
       <defs>
@@ -502,6 +674,100 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
     </SetPlace>
   );
 };
+
+/** Storyboard v3 staging (S08 re-staged): the district dome (or any non-wide arc) over rows 0-1, the watchtower
+ *  silhouetted against the big sun at its right foot, the clamped searchlight, rattler doors on rows 2-3, and one layer
+ *  per row for the crane (DOME.depths: rows 0-3 at 0.85 / 0.7 / 0.45 / 0.2, the dome + tower with row 1, the sky and
+ *  the sun at 1, our rooftop at 0). The glass copy of each row lives in that row's own layer (clipped to the dome
+ *  interior), the glass sky in a layer at the dome's depth drawn UNDER the sun. */
+const DomeCityV3: React.FC<DomeCityProps> = ({sun, dome = 'district', domeAt, domeDur = 1.1, glassAt, footprintAt, dotsAt, duskAt, towerAt, searchAt, searchAngle, searchClamp, observer = false, doors = true, sky = skies.golden, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'dome'}) => {
+  const t = useTime();
+  const clipId = 'dv' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const sd = String(seed);
+  const arc = domeArc(dome);
+  const g = domeGeo(arc);
+  const glassT = glassAt ?? (domeAt !== undefined ? domeAt + domeDur : undefined);
+  const glass = glassT === undefined || t >= glassT;
+  const dusk = duskAt !== undefined && t >= duskAt + 0.2;
+  const domeSky = glassStep(dusk ? skies.dusk : sky);
+  const nz = (k: keyof typeof DOME.depths) => 1 - DOME.depths[k];
+  const T = DOME.towerV3;
+  const tk = towerAt === undefined ? 1 : t < towerAt ? 0 : prog(t, towerAt, 0.3, E.outCubic) < 1 ? prog(t, towerAt, 0.3, E.outCubic) * 1.04 : 1.04 - 0.04 * prog(t, towerAt + 0.3, 0.15);
+  const clip = (node: React.ReactNode) => (glass ? <g clipPath={`url(#${clipId})`}>{node}</g> : null);
+  const row = (ri: number, lighter: boolean) => (
+    <>
+      {ri === 0 ? (
+        <>
+          <Fill d={G.hill} color={palette.sand} offset={false} mode="snap" seed={`${sd}/${lighter ? 'g' : 'n'}hill`} />
+          <Ink d={`M-20 984L10 984M26 966L56 966M70 950L104 950M118 968L146 968M160 986L196 986`} width={SI.hair} taper={false} />
+        </>
+      ) : null}
+      <RowNode ri={ri} inkW={ri === 3 ? SI.mid : ri === 2 ? SI.hair : 0} dotsAt={dotsAt} duskAt={duskAt} seed={`${sd}/${lighter ? 'g' : 'n'}${ri}`} />
+    </>
+  );
+  const doorNode = (k: 'row2' | 'row3') =>
+    doors ? (
+      <>
+        <Fill d={DOORS_V3[k].fill} color={palette.teal} offset={false} mode="snap" seed={`${sd}/${k}door`} />
+        <Fill d={DOORS_V3[k].lintel} color={palette.sand} offset={false} mode="snap" seed={`${sd}/${k}lint`} />
+        <Ink d={DOORS_V3[k].ink} width={k === 'row3' ? SI.far : SI.hair} taper={false} seed={`${sd}/${k}di`} />
+      </>
+    ) : null;
+  return (
+    <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
+      <defs>
+        <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+          <path d={g.interior} />
+        </clipPath>
+        <clipPath id={`${clipId}s`} clipPathUnits="userSpaceOnUse">
+          <rect x={-2000} y={-3000} width={5000} height={3000 + DOME.rows[0].base} />
+        </clipPath>
+      </defs>
+      {wrap('sky', nz('sky'), <Fill rect={[-260, DOME.band[0], 1600, DOME.band[1] - DOME.band[0] + 2]} color={palette.peach} offset={false} mode="snap" seed={`${sd}/band`} />)}
+      {wrap(
+        'domeGlass',
+        nz('dome'),
+        clip(
+          <>
+            <Fill d={g.interior} color={domeSky} offset={false} mode="snap" seed={`${sd}/gsky`} />
+            <Fill rect={[-260, DOME.band[0], 1600, DOME.band[1] - DOME.band[0] + 2]} color={glassStep(palette.peach)} offset={false} mode="snap" seed={`${sd}/gband`} />
+          </>,
+        ),
+      )}
+      {sun ? wrap('sun', nz('sun'), <g clipPath={`url(#${clipId}s)`}>{sun}</g>) : null}
+      {wrap('row0', nz('row0'), <>{row(0, false)}{clip(<Glass>{row(0, true)}</Glass>)}</>)}
+      {wrap('row1', nz('row1'), <>{row(1, false)}{clip(<Glass>{row(1, true)}</Glass>)}</>)}
+      {wrap(
+        'dome',
+        nz('dome'),
+        <>
+          {glass ? <Fill d={g.rim} color={palette.cream} offset={false} mode="snap" seed={`${sd}/rim`} /> : null}
+          {glass && (glassT === undefined || t >= glassT + 0.07) ? <Fill d={g.glints} color={palette.white} offset={false} mode="snap" seed={`${sd}/glint`} /> : null}
+          <Searchlight at={searchAt} angle={searchAngle} clamp={searchClamp} v3 seed={sd} />
+          {glass ? <Ink d={g.lattice} width={SI.hair} taper={false} order="all" seed={`${sd}/lat`} /> : null}
+          <Ink d={g.leftHalf} width={SI.front} at={domeAt} dur={domeDur} pace="free" ease={E.inOutCubic} seed={`${sd}/arcL`} />
+          <Ink d={g.rightHalf} width={SI.front} at={domeAt} dur={domeDur} pace="free" ease={E.inOutCubic} seed={`${sd}/arcR`} />
+          {footprintAt !== false && footprintAt !== undefined ? <Ink d={g.footprint} width={SI.far} dash="14 12" at={footprintAt} seed={`${sd}/fp`} /> : null}
+          {/* the watchtower: a silhouette against the sun (tealDark, no ink), dark cabin, no guard */}
+          {tk > 0 ? (
+            <XG m={tk !== 1 ? mat.about(mat.scale(1, tk), (T.x0 + T.x1) / 2, T.base) : mat.I}>
+              <Ink d={TOWER_V3.lattice} width={3.2} color={palette.tealDark} taper={false} vary={0} seed={`${sd}/tw`} />
+              <Fill d={TOWER_V3.cabin} color={palette.tealDark} offset={false} seed={`${sd}/twc`} />
+              <Fill d={TOWER_V3.window} color={DEEP_WINDOW} offset={false} seed={`${sd}/tww`} />
+              <Fill d={TOWER_V3.lamp} color={palette.tealDark} offset={false} seed={`${sd}/twl`} />
+            </XG>
+          ) : null}
+        </>,
+      )}
+      {wrap('row2', nz('row2'), <>{row(2, false)}{doorNode('row2')}</>)}
+      {wrap('near', nz('row3'), <>{row(3, false)}{doorNode('row3')}</>)}
+      {wrap('fg', nz('fg'), <Rooftop sd={sd} observer={observer} />)}
+    </SetPlace>
+  );
+};
+
+/** A dark (unlit) cabin window on the tealDark silhouette: one value step below tealDark. */
+const DEEP_WINDOW = '#2F4A49';
 
 /** Tally gates (5-bar) on the watchtower's white board for a count n (up to 30): DOME.tower.board anchors. */
 export function boardTallyPath(n: number): string {

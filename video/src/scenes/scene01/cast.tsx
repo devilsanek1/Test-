@@ -8,7 +8,7 @@ import {Fill} from '../../lib/Fill';
 import {blob, polyPath, Pt} from '../../lib/sketch';
 import {rng} from '../../lib/rng';
 import {mat, XG} from '../../lib/xf';
-import {Person, Bird} from '../../lib/kit';
+import {Person, Bird, PERSON_BODIES} from '../../lib/kit';
 import type {Acc, Hair} from '../../lib/kit/Person';
 import {Elephant, hop, popSwitch} from '../../lib/mascot';
 import {Citizen} from '../shared/props';
@@ -25,7 +25,8 @@ export type CitizenPlan = {
   y: number;
   h: number;
   seed: string;
-  body: string;
+  /** Coat colour; omit = the kit Person's own pick for the seed (so the figure matches the set's citizen). */
+  body?: string;
   hair?: Hair;
   acc?: Acc[];
   /** Walking away toward the VP: px/s along the ray to `vp`, legs at `hz`; slows from slowAt, stands from stopAt. */
@@ -39,6 +40,14 @@ export type CitizenPlan = {
   bob?: number;
   silhouette?: boolean;
 };
+
+/** The coat colour the kit Person picks for a seed when neither body, hair nor acc picks are random (mirrors
+ *  makeSpec with torsoH given: w, hr, round, [hair], then body). */
+export function coatOf(seed: string, hairGiven = false): string {
+  const r = rng(`person/${seed}`);
+  for (let i = 0; i < (hairGiven ? 3 : 4); i++) r.next();
+  return r.pick(PERSON_BODIES);
+}
 
 /** Distance walked along the ray (px) with a linear slow-down from slowAt to stopAt. */
 function walked(t: number, w: NonNullable<CitizenPlan['walk']>): number {
@@ -100,7 +109,7 @@ export const PlazaCitizen: React.FC<{p: CitizenPlan; vp: Pt; horizon: number}> =
     walking = p.walk.stopAt === undefined || t < p.walk.stopAt;
   }
   const s = h / FIG_H;
-  const bob = p.bob ? osc(t, 0.55, p.x * 0.01) * p.bob : 0;
+  const bob = p.bob ? osc(t, 0.55) * p.bob : 0; // phase 0: frame 0 = the set's standing citizen
   const lean = leanAt(t, p.lean);
   const phone = p.phone !== undefined && t >= p.phone.up && (p.phone.down === undefined || t < p.phone.down);
   const acc = [...(p.acc ?? []), ...(phone ? (['phone'] as Acc[]) : [])];
@@ -112,7 +121,7 @@ export const PlazaCitizen: React.FC<{p: CitizenPlan; vp: Pt; horizon: number}> =
     const sh: Pt = [p.point.side * w * 0.34, -TORSO * 0.8];
     const down: Pt = [p.point.side * w * 0.5, -TORSO * 0.1];
     const hand: Pt = [lerp(down[0], p.point.hand[0], q), lerp(down[1], p.point.hand[1], q)];
-    arm = <Arm sh={sh} hand={hand} coat={p.body} W={W * 0.85} seed={`${p.seed}/arm`} />;
+    arm = <Arm sh={sh} hand={hand} coat={p.body ?? coatOf(p.seed, p.hair !== undefined)} W={W * 0.85} seed={`${p.seed}/arm`} />;
   }
   return (
     <XG m={mat.compose(mat.translate(x, y + bob), mat.rotate(lean), mat.translate(0, -LEG * s), mat.scale(s))}>
@@ -130,9 +139,13 @@ export type PigeonPlan = {
   seed: string;
   color: string;
   flip?: boolean;
-  /** Lands at landAt + 0.24 s, flying in from `from` (offset from the perch). */
+  /** Flies in from landAt and touches down at landAt + inDur: from `from` (offset from the perch) or `fromAbs`, along
+   *  a quadratic arc through `via` (absolute; default: a lift above the chord). */
   landAt?: number;
+  inDur?: number;
   from?: Pt;
+  fromAbs?: Pt;
+  via?: Pt;
   /** A small sideways hop on the bar. */
   shuffleAt?: number;
   shuffleDx?: number;
@@ -146,6 +159,8 @@ export type PigeonPlan = {
 
 const FLY_IN = 0.24;
 const BACK_DUR = 0.34;
+
+const quadPt = (a: Pt, c: Pt, b: Pt, q: number): Pt => [(1 - q) * (1 - q) * a[0] + 2 * (1 - q) * q * c[0] + q * q * b[0], (1 - q) * (1 - q) * a[1] + 2 * (1 - q) * q * c[1] + q * q * b[1]];
 
 /** Wings-only flying silhouette (the kit Bird's flight shape), flapping. */
 const Flyer: React.FC<{x: number; y: number; s: number; t: number; ph: number; flip?: boolean}> = ({x, y, s, t, ph, flip}) => {
@@ -166,12 +181,17 @@ export const Pigeon: React.FC<{p: PigeonPlan; s?: number}> = ({p, s = 0.8}) => {
   const ph = (p.x % 7) * 0.9;
   const perch: Pt = [p.x + (p.shuffleAt !== undefined && t >= p.shuffleAt ? (p.shuffleDx ?? 10) * E.outCubic(clamp((t - p.shuffleAt) / 0.12)) : 0), p.y];
   // phase: before landing (flying in), perched, scattered (flying away), coming back
+  const inDur = p.inDur ?? FLY_IN;
   if (p.landAt !== undefined && t < p.landAt) return null;
-  if (p.landAt !== undefined && t < p.landAt + FLY_IN) {
-    const q = E.outQuad((t - p.landAt) / FLY_IN);
+  if (p.landAt !== undefined && t < p.landAt + inDur) {
+    const q = E.outQuad((t - p.landAt) / inDur);
     const f = p.from ?? [140, -170];
-    const [x, y] = arcPt([p.x + f[0], p.y + f[1]], [p.x, p.y], q, 30);
-    return <Flyer x={x} y={y} s={s} t={t} ph={ph} flip={f[0] > 0} />;
+    const a: Pt = p.fromAbs ?? [p.x + f[0], p.y + f[1]];
+    const b: Pt = [p.x, p.y];
+    const c: Pt = p.via ?? [(a[0] + b[0]) / 2, Math.min(a[1], b[1]) - 30];
+    const [x, y] = quadPt(a, c, b, q);
+    const [x2] = quadPt(a, c, b, Math.min(1, q + 0.02));
+    return <Flyer x={x} y={y} s={s} t={t} ph={ph} flip={x2 < x} />;
   }
   const back = p.backAt !== undefined && t >= p.backAt;
   if (p.flyAt !== undefined && t >= p.flyAt && !back) {
@@ -188,7 +208,7 @@ export const Pigeon: React.FC<{p: PigeonPlan; s?: number}> = ({p, s = 0.8}) => {
     return <Flyer x={x} y={y} s={s} t={t} ph={ph} flip={f[0] > 0} />;
   }
   // perched: a landing squash after each touch-down, a little hop on the shuffle
-  const touch = back ? (p.backAt as number) + BACK_DUR : p.landAt !== undefined ? p.landAt + FLY_IN : undefined;
+  const touch = back ? (p.backAt as number) + BACK_DUR : p.landAt !== undefined ? p.landAt + inDur : undefined;
   const sq = touch !== undefined && t < touch + 0.2 ? 1 - 0.18 * Math.sin(Math.PI * clamp((t - touch) / 0.2)) : 1;
   const hopY = p.shuffleAt !== undefined && t >= p.shuffleAt && t < p.shuffleAt + 0.12 ? -Math.sin(Math.PI * ((t - p.shuffleAt) / 0.12)) * 6 : 0;
   const x = back ? p.x : perch[0];
@@ -204,6 +224,8 @@ export const Pigeon: React.FC<{p: PigeonPlan; s?: number}> = ({p, s = 0.8}) => {
 export type PipPlan = {
   x: number;
   y: number;
+  /** Flinches at the click of the press (a squash jolt, still facing away). */
+  flinchAt?: number;
   /** Looks at govB (head turn + popSwitch ear flick). */
   lookAt: number;
   look: number;
@@ -244,7 +266,7 @@ export const PipS01: React.FC<{p: PipPlan; seed?: number}> = ({p, seed = 11}) =>
     return <Elephant x={p.x} y={y} scale={1} t={t} seed={seed} pose="trunk-up" expression="wide" look={p.look * 0.8} squash={squash} />;
   }
   let look = 0;
-  let squash = 0;
+  let squash = p.flinchAt !== undefined ? popSwitch(t, p.flinchAt) * 1.25 : 0;
   if (t >= p.lookAt) {
     look = p.look;
     squash += popSwitch(t, p.lookAt);

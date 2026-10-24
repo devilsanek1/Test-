@@ -72,7 +72,12 @@ export const Pigeon: React.FC<PigeonProps> = ({x, y, s = 0.7, flip = false, land
     dy -= Math.sin(Math.PI * q) * 5;
     if (t >= sh.at + 0.02) face = sh.dx < 0;
   }
-  for (const h of hopAt) if (t >= h && t < h + 0.22) dy -= Math.sin(prog(t, h, 0.22) * Math.PI) * 9;
+  let flap = false;
+  for (const h of hopAt) if (t >= h && t < h + 0.26) {
+    dy -= Math.sin(prog(t, h, 0.26) * Math.PI) * 14;
+    flap = true;
+  }
+  for (const sh of shuffle) if (t >= sh.at && t < sh.at + 0.2) flap = true;
   // landing squash
   let sq = 1;
   if (land && t < land.at + 0.16) sq = 1 - 0.18 * Math.sin(prog(t, land.at, 0.16) * Math.PI);
@@ -82,6 +87,11 @@ export const Pigeon: React.FC<PigeonProps> = ({x, y, s = 0.7, flip = false, land
   return (
     <XG m={mat.compose(mat.translate(x + dx, y + dy), mat.scale(face ? -1 : 1, sq), mat.rotate(rot))}>
       <Bird x={0} y={0} s={s} seed={seed} flyAt={flyAt} flyTo={face ? [-flyTo[0], flyTo[1]] : flyTo} color={color} />
+      {flap && (flyAt === undefined || t < flyAt) ? (
+        <XG m={mat.compose(mat.translate(-2 * s, -16 * s), mat.scale(s * 0.9))}>
+          <path d={wings(t, ph)} fill="none" stroke={palette.ink} strokeWidth={2.6 / (k * s)} strokeLinecap="round" strokeLinejoin="round" />
+        </XG>
+      ) : null}
     </XG>
   );
 };
@@ -255,28 +265,36 @@ const Page: React.FC<{w: number; h: number; reloadAt: number[]; shakeAt?: number
   // the latest reload that has started: the page blanks for one frame and rebuilds (header wipe, button pop)
   let ra: number | undefined;
   for (const r of reloadAt) if (t >= r) ra = r;
-  const blank = ra !== undefined && t < ra + 1 / 30;
+  const blank = ra !== undefined && t < ra + 2 / 30;
   const dx = shakeAt !== undefined && t >= shakeAt && t < shakeAt + 0.24 ? Math.sin(prog(t, shakeAt, 0.24) * Math.PI * 3) * 5 * (1 - prog(t, shakeAt, 0.24)) : 0;
   if (blank) return null;
   const pad = Math.max(5, w * 0.07);
   const hh = h * 0.24;
-  const wipe = ra !== undefined ? prog(t, ra + 1 / 30, 0.16, E.outCubic) : 1;
-  const btnK = ra !== undefined ? springAt(t, ra + 0.2, springs.pop) : 1;
+  const hdrK = ra !== undefined ? 0.2 + 0.8 * prog(t, ra + 2 / 30, 0.1, E.outCubic) : 1;
+  const wipe = 1;
+  const btnK = ra !== undefined ? springAt(t, ra + 0.16, springs.pop) : 1;
   // content bars (the page still loading): each draws on L -> R at its time; a reload hides them again
   const gy = (h - pad * 2 - hh) / 3.6;
   const bars: React.ReactNode[] = [];
   [0.84, 0.62, 0.74].forEach((f, i) => {
     const at = barsAt[i];
     if (at === undefined || t < at || (ra !== undefined && ra > at)) return;
-    const q = prog(t, at, 0.14, E.outCubic);
+    const q = 0.2 + 0.8 * prog(t, at, 0.067, E.outCubic);
     const yy = pad + hh + gy * (i + 0.75);
-    bars.push(<Fill key={i} d={rectPath(pad, yy - 3, (w - pad * 2) * f * q, 6.5)} color={i === 1 ? palette.sage : palette.sand} offset={false} mode="none" seed={`${seed}/bar${i}`} />);
+    const bw = (w - pad * 2) * f;
+    bars.push(
+      <XG key={i} m={mat.about(mat.scale(q), pad + bw / 2, yy)}>
+        <Fill d={rectPath(pad, yy - 5.5, bw, 11)} color={i === 1 ? palette.sage : palette.tan} offset={false} mode="none" seed={`${seed}/bar${i}`} />
+      </XG>,
+    );
   });
   return (
     <XG m={mat.translate(dx, 0)}>
-      <Fill d={rectPath(pad, pad, (w - pad * 2) * wipe, hh)} color={palette.peach} offset={false} mode="none" seed={`${seed}/hdr`} />
+      <XG m={hdrK < 1 ? mat.about(mat.scale(hdrK), w / 2, pad + hh / 2) : mat.I}>
+        <Fill d={rectPath(pad, pad, (w - pad * 2) * wipe, hh)} color={palette.peach} offset={false} mode="none" seed={`${seed}/hdr`} />
+      </XG>
       {/* a sage 'update' button on the header's right end: the thing that cannot finish */}
-      {wipe > 0.85 && btnK > 0.01 ? (
+      {hdrK > 0.85 && btnK > 0.01 ? (
         <XG m={mat.about(mat.scale(btnK), w - pad - hh * 1.1, pad + hh * 0.5)}>
           <Fill d={rectPath(w - pad - hh * 1.9, pad + hh * 0.22, hh * 1.6, hh * 0.56)} color={palette.sage} offset={false} mode="none" seed={`${seed}/btn`} />
         </XG>

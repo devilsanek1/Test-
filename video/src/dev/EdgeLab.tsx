@@ -1,17 +1,21 @@
 // EdgeLab — the screen-edge treatments (src/lib/edges, docs/EDGES.md) over three representative shots, so the variants
 // can be judged side by side and in motion. Composition `EdgeLab` (6 s), driven by props:
-//   {variant: 'clean' | 'trim' | 'panel' | 'vignette' | 'construction' | 'rough-tb', shot: 'street' | 'monument' |
-//    'vista', amount?: number, seed?: string, from?: number (shot seconds at lab t 0), cam?: boolean, margin?: 'actors' |
-//    'strict' | 'look', paper?: 'white' | 'warm' | colour, debug?: boolean, captions?: boolean}
+//   {variant: 'clean' | 'trim' | 'panel' | 'paint-subtle' | 'paint-medium' | 'paint-loose' | 'paint' | 'vignette' |
+//    'construction' | 'rough-tb', shot: 'street' | 'monument' | 'vista', amount?: number ('paint': the looseness),
+//    seed?: string (a scene seed: a different painted edge), from?: number (shot seconds at lab t 0), cam?: boolean,
+//    margin?: 'actors' | 'strict' | 'look', paper?: 'white' | 'warm' | colour, debug?: boolean, captions?: boolean,
+//    hints?: boolean (default true: the shot's EDGE_HINTS entry 'edgelab/<shot>', so 'paint' leaves bare only what holds
+//    drawing and never cuts the hero / mascot / lamp; false = the scene-blind edge)}
 // Shots: KitDemo's eye-level street (default from 7.6 s, dusk), CineDemo's backlit monument (shot B, 13.0 s) and its
 // Arcane vista (shot A, 4.6 s). `cam` adds a slow lab push + pan to the street (its own push ends at 2.4 s) so the
 // edge can be judged while the world moves under it; the monument cranes by itself.
 //   scripts/still.sh EdgeLab 0 out.png --props='{"variant":"panel","shot":"monument"}'
+//   scripts/still.sh EdgeLab 0 out.png --props='{"variant":"paint-loose","shot":"vista","seed":"scene-04"}'
 //   npx remotion render src/index.ts EdgeLab out.mp4 --frames=0-149 --scale=0.5 --concurrency=2 \
 //     --props='{"variant":"panel","shot":"street","from":3.2,"cam":true}'
 import React from 'react';
 import {AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig} from 'remotion';
-import {EdgeTreatment, EdgeVariant} from '../lib/edges';
+import {EDGE_HINTS, EdgeTreatment, EdgeVariant} from '../lib/edges';
 import {StageContexts, StageCam} from '../lib/stage';
 import {SkyCaptions, CaptionBeat} from '../lib/Captions';
 import {palette} from '../lib/theme';
@@ -51,7 +55,8 @@ export const EdgeLab: React.FC<{
   debug?: boolean;
   captions?: boolean;
   paper?: 'white' | 'warm' | string;
-}> = ({variant = 'panel', shot = 'street', amount = 1, seed = 'film', from, cam = false, margin = 'actors', debug = false, captions = true, paper}) => {
+  hints?: boolean;
+}> = ({variant = 'panel', shot = 'street', amount = 1, seed = 'film', from, cam = false, margin = 'actors', debug = false, captions = true, paper, hints = true}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const T = frame / fps;
@@ -69,7 +74,7 @@ export const EdgeLab: React.FC<{
     );
   return (
     <AbsoluteFill style={{background: palette.sky, overflow: 'hidden'}}>
-      <EdgeTreatment variant={variant} seed={seed} amount={amount} margin={margin} debug={debug} paper={paper} vp={EDGE_SHOTS[shot].vp}>
+      <EdgeTreatment variant={variant} seed={seed} amount={amount} margin={margin} debug={debug} paper={paper} vp={EDGE_SHOTS[shot].vp} hints={hints ? EDGE_HINTS[`edgelab/${shot}`] : undefined}>
         <Sequence from={-Math.round(start * fps)} layout="none">
           {scene}
         </Sequence>

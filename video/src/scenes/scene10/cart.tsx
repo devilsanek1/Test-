@@ -8,10 +8,12 @@ import {palette} from '../../lib/theme';
 import {useTime, prog} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Pt} from '../../lib/sketch';
-import {MakersCart} from './kit';
-import {CartSign, Satchel, SupportTag} from './shims';
+import {MakersCart, SupportTag} from './kit';
+import {mat, XG} from '../../lib/xf';
+import {CartSign, Satchel} from './shims';
+import {tagBodyOffset} from './plaques';
 
-export const CART = {y: 1336, size: 115, v0: 494, vMax: 760, acc: 0.5};
+export const CART = {y: 1330, size: 115, v0: 494, vMax: 760, acc: 0.5};
 const CS = CART.size / 140; // MakersCart local -> world
 
 export type CartTimes = {
@@ -53,7 +55,7 @@ function tossPos(t: number, t0: number, t1: number, a: Pt, b: Pt, h: number): {p
 
 export type CartProps = {
   T: CartTimes;
-  /** Body-centre landing points of the two tags (world): siteL's and siteR's hang points + the string. */
+  /** Body-centre landing points of the two tags (world): siteL's and siteR's hang points + tagBodyOffset. */
   land1: Pt;
   land2: Pt;
   tagSize: number;
@@ -87,7 +89,7 @@ export const Tosses: React.FC<CartProps> = ({T, land1, land2, tagSize}) => {
   const fly = (key: string, t0: number, t1: number, b: Pt, h: number, spin: number, trail: boolean) => {
     if (t < t0) return;
     const a = satchelAt(t0, T);
-    const a0: Pt = [a[0], a[1] - tagSize * 0.5];
+    const a0: Pt = [a[0] - 18, a[1] - tagSize * 0.45 - 54]; // flicked up clear of the crate, the maker and the sign
     // the dashed trail: from the launch to the tag, retracting from its tail after the landing (0.3 s)
     if (trail && t < t1 + 0.32) {
       const uTail = t <= t1 ? 0 : prog(t, t1 + 0.02, 0.3);
@@ -105,7 +107,12 @@ export const Tosses: React.FC<CartProps> = ({T, land1, land2, tagSize}) => {
     }
     if (t >= t1) return;
     const {p, u} = tossPos(t, t0, t1, a0, b, h);
-    out.push(<SupportTag key={key} x={p[0]} y={p[1]} size={tagSize} string={false} stringLen={-tagSize / 2} rot={-spin * 360 * u} seed={`s10/${key}`} />);
+    // the tag spins about its body centre on the way (its check is drawn only when it lands)
+    out.push(
+      <XG key={key} m={mat.about(mat.rotate(-spin * 360 * u), p[0], p[1])}>
+        <SupportTag x={p[0]} y={p[1] - tagBodyOffset(tagSize)} size={tagSize} checkAt={t1 + 1} seed={`s10/${key}`} />
+      </XG>,
+    );
   };
   fly('toss1', T.toss1, T.land1, land1, 60, 1, false);
   fly('toss2', T.toss2, T.land2, land2, 205, 1.5, true);

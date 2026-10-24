@@ -98,12 +98,28 @@ const FAR = (() => {
   return {far, near};
 })();
 
-/** The plain from the horizon down to the street (sand, like the set's street) and a low hazy far city on it. */
-export const FarPlain: React.FC = () => (
+/** The far construction lines of the bare plan: the horizon and rays from the vanishing point (hidden under the street
+ *  and the buildings below y 1180 / once the city is up). */
+const RAYS = (() => {
+  let d = '';
+  for (let i = 0; i <= 14; i++) {
+    const xb = -900 + i * 205;
+    if (Math.abs(xb - 560) < 60) continue;
+    d += line(BLUEPRINT.vp[0], BLUEPRINT.vp[1], BLUEPRINT.vp[0] + (xb - BLUEPRINT.vp[0]) * 1.0, 1200, {seed: `s03/ray${i}`, over: 0, breaks: false, drift: 0.2});
+  }
+  return d;
+})();
+const HLINE = line(-120, HORIZON, 1200, HORIZON, {seed: 's03/hz', over: 0});
+
+/** The plain from the horizon down to the street (sand, like the set's street), a low hazy far city on it, and the
+ *  plan's horizon + construction rays (drawn on with the grid). */
+export const FarPlain: React.FC<{gridAt?: number}> = ({gridAt}) => (
   <>
     <Fill d={FAR.far} color={SKY_FAR} offset={false} mode="none" seed="s03/farA" />
     <Fill d={FAR.near} color={SKY_NEAR} offset={false} mode="none" seed="s03/farB" />
     <Fill rect={[-260, HORIZON, 1600, 1200 - HORIZON + 10]} color={palette.sand} offset={false} mode="none" seed="s03/plain" />
+    <Ink d={HLINE} width={1.6} taper={false} seed="s03/hzi" />
+    <Ink d={RAYS} at={gridAt} dur={0.25} order="all" width={1.3} taper={false} seed="s03/rays" />
   </>
 );
 
@@ -137,10 +153,21 @@ const FOOT = (() => {
   return {d, m};
 })();
 
+/** The lots' poche (a flat tan step under each future building): both side triangles and the press-house trapezoid. */
+const LOTS = (() => {
+  const k = (1120 - HORIZON) / (1180 - HORIZON);
+  return (
+    polyPath([[354, 1180], [-300, 1180], [-300, 1716], [-146, 1708]]) +
+    polyPath([[766, 1180], [1380, 1180], [1380, 1740], [1232, 1726]]) +
+    polyPath([[366, 1175], [754, 1175], [560 + (760 - 560) * k - 4, 1122], [560 + (360 - 560) * k + 4, 1122]])
+  );
+})();
+
 export const Footprints: React.FC = () => (
   <>
-    <Ink d={FOOT.d} width={2.0} dash="9 7" taper={false} seed="s03/foot" />
-    <Ink d={FOOT.m} width={1.6} taper={false} seed="s03/footm" />
+    <Fill d={LOTS} color={palette.tan} offset={false} mode="none" seed="s03/lots" />
+    <Ink d={FOOT.d} width={2.2} dash="10 7" taper={false} seed="s03/foot" />
+    <Ink d={FOOT.m} width={1.8} taper={false} seed="s03/footm" />
   </>
 );
 
@@ -148,11 +175,12 @@ export const Footprints: React.FC = () => (
 
 const GLOW = 0.067; // two frames of white
 
-/** One screen overlay: tealDark before `lightAt`, white for two frames at it, then the set's own lit screen shows. */
+/** One screen overlay: unlit sage glass (BrowserChrome's glass before `screenOnAt`; never the tealDark 'off' of S01)
+ *  before `lightAt`, white for two frames at it (the glow pop), then the set's own lit screen shows. */
 const ScreenState: React.FC<{d: string; lightAt: number; seed: string}> = ({d, lightAt, seed}) => {
   const t = useTime();
   if (t >= lightAt + GLOW) return null;
-  return <Fill d={d} color={t < lightAt ? palette.tealDark : palette.white} offset={false} mode="none" seed={seed} />;
+  return <Fill d={d} color={t < lightAt ? palette.sage : palette.white} offset={false} mode="none" seed={seed} />;
 };
 
 /** Side screens (each inside a PopUp synced with its building). */
@@ -209,7 +237,7 @@ export const VentPuffs: React.FC<{times: number[]; n?: number; seed?: string}> =
       const side = (i % 2 ? 1 : -1) * (j % 2 ? -1 : 1);
       const dx = side * r.range(26, 48);
       const x = V.x + dx * p + Math.sin(p * 6 + i + j) * 7;
-      const y = V.y - 30 - r.range(170, 230) * p;
+      const y = V.y - 30 - r.range(120, 150) * p; // stays under screen y ~620 (the caption floor is 570)
       const rot = side * 50 * p + Math.sin(p * 9 + i) * 18;
       out.push(
         <XG key={`${j}/${i}`} m={mat.about(mat.rotate(rot), x, y)}>
@@ -223,3 +251,35 @@ export const VentPuffs: React.FC<{times: number[]; n?: number; seed?: string}> =
 };
 
 export type {BlueprintId};
+
+// ---------------------------------------------------------------- the pen-nib sign, made visible
+
+/** The set's pen-nib sign hangs at BLUEPRINT.sign (795, 930), which is entirely BEHIND building R4 in this framing (R4's
+ *  facade covers x 760-840 from y 800 down). S03 hangs the same sign (cream disc + ink nib, r 32) from a little iron
+ *  pole on the press house's left roof slope instead, against the sky, where it can swing and Bit can ride it.
+ *  Request to the sets lane: a `signAt` slot (or move BLUEPRINT.sign) so the sign is visible in the S03 wide. */
+export const ROOF_SIGN = {pole: [438, 832] as Pt, top: 704, hook: [392, 712] as Pt, x: 392, y: 762, r: 32};
+
+export const RoofSign: React.FC<{swingAt?: number; seed?: string}> = ({swingAt, seed = 's03/nib'}) => {
+  const t = useTime();
+  const S = ROOF_SIGN;
+  const a = swingAt !== undefined && t >= swingAt ? -16 * Math.exp(-5 * (t - swingAt)) * Math.cos((t - swingAt) * 12.5) : 0;
+  const nib = `M${S.x} ${S.y - 19}L${S.x + 12} ${S.y + 4}L${S.x} ${S.y + 21}L${S.x - 12} ${S.y + 4}Z`;
+  const pole =
+    line(S.pole[0], S.pole[1] + 6, S.pole[0], S.top, {seed: `${seed}/p`, over: [0, 4], breaks: false}) +
+    line(S.pole[0] + 2, S.top + 8, S.x - 22, S.top + 8, {seed: `${seed}/arm`, over: [0, 5], breaks: false}) +
+    line(S.pole[0], S.top + 34, S.pole[0] - 26, S.top + 8, {seed: `${seed}/br`, over: 0, breaks: false});
+  return (
+    <>
+      <Ink d={pole} width={3.0} taper={false} seed={`${seed}/pi`} />
+      <XG m={mat.about(mat.rotate(a), S.hook[0], S.top + 8)}>
+        <Ink d={`M${S.x - 15} ${S.top + 8}L${S.x - 18} ${S.y - S.r + 4}M${S.x + 15} ${S.top + 8}L${S.x + 18} ${S.y - S.r + 4}`} width={1.6} taper={false} seed={`${seed}/h`} />
+        <Fill d={`M${S.x - S.r} ${S.y}a${S.r} ${S.r} 0 1 0 ${2 * S.r} 0a${S.r} ${S.r} 0 1 0 ${-2 * S.r} 0Z`} color={palette.cream} seed={`${seed}/df`} />
+        <Ink d={`M${S.x - S.r} ${S.y}a${S.r} ${S.r} 0 1 0 ${2 * S.r} 0a${S.r} ${S.r} 0 1 0 ${-2 * S.r} 0`} width={3.0} taper={false} seed={`${seed}/di`} />
+        <Fill d={nib} color={palette.ink} offset={false} mode="none" seed={`${seed}/nib`} />
+        <Ink d={`M${S.x} ${S.y - 5}L${S.x} ${S.y + 19}`} width={2} color={palette.cream} taper={false} seed={`${seed}/slit`} />
+        <circle cx={S.x} cy={S.y - 3} r={3} fill={palette.cream} />
+      </XG>
+    </>
+  );
+};

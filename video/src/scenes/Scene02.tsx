@@ -10,11 +10,10 @@ import React, {useId} from 'react';
 import {World, Sun, XG, Ink, Fill, useTime, useScene, palette, prog, lerp, springAt, springs, ease as E, mat, circle} from '../lib';
 import {ElephantTimeline, hop} from '../lib/mascot';
 import {BlueprintWall, BLUEPRINT_WALL} from './shared/sets';
-import {LabelTag} from './shared/props';
+import {LabelTag, DiagramHand, KeyCross, SiteIcon, dashPath, pointAlong} from './shared/props';
 import {camAt, camMat} from './scene02/camera';
 import {B, S02_END, S02_START} from './scene02/beats';
 import {DiagramLock, THUMB} from './scene02/DiagramLock';
-import {DiagramHand, KeyCross, SiteIcon, dashPath, pointAlong} from './scene02/shims';
 import type {Pt} from '../lib/sketch';
 
 const L = BLUEPRINT_WALL.lock;
@@ -35,6 +34,8 @@ const CONNECTOR: Pt[] = [
 // the sheet's inner rect (inside the teal frame): the diagram hand is DRAWN ON the plan, so it is clipped to it
 const [SX, SY, SW, SH] = BLUEPRINT_WALL.sheet;
 const SHEET_IN: [number, number, number, number] = [SX + 12, SY + 12, SW - 24, SH - 24];
+// the crossed-out key: up-left of the loupe, clear of its ring, the L1 card and the hand
+const KEY: Pt = [292, 826];
 const DASH = 9;
 const GAP = 7;
 const PIP_PERCH = BLUEPRINT_WALL.perch;
@@ -59,10 +60,11 @@ const Loupe: React.FC = () => {
       boltTestAt={B.boltTest}
       gapMarkAt={B.bug}
       turnAt={B.take}
-      bit={{size: 17, peekAt: B.bug - 0.02, cowerAt: B.could, hideAt: B.over, popAt: B.handOut}}
+      bit={{size: 24, peekAt: B.bug - 0.02, cowerAt: B.could, hideAt: B.over, popAt: B.handOut}}
     />
   );
-  if (k <= 0) return lock;
+  // before the swell the ring is the blueprint's callout circle round the detail (r 64, ~74 px at the cut): it picks up
+  // S01's ink ring round govB's lock box (~71 px) at the same spot, so the match carries the ring too
   const ring = circle(C[0], C[1], r, {seed: 's2loupe', overlap: 14});
   return (
     <g>
@@ -104,6 +106,47 @@ const Connector: React.FC = () => {
   return <>{nodes}</>;
 };
 
+/** Clip to the sheet's inner rect (world): the diagram hand is drawn ON the plan, it enters from the sheet's edge. */
+const OnSheet: React.FC<{children: React.ReactNode}> = ({children}) => {
+  const id = 'sh' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  return (
+    <>
+      <defs>
+        <clipPath id={id} clipPathUnits="userSpaceOnUse">
+          <rect x={SHEET_IN[0]} y={SHEET_IN[1]} width={SHEET_IN[2]} height={SHEET_IN[3]} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>{children}</g>
+    </>
+  );
+};
+
+const HAND_ANGLE = -40;
+const HAND_TURN = 18;
+/** Extra life on the hand (a wrapper, so the shared DiagramHand stays as it is): it GRABS (pushes 12 px further onto
+ *  the knob and back) as the slide-in ends, lets go after the site is taken (backs off 26 px), then hovers (a slow
+ *  bob) until it slides out in the sentence pause. Offsets run along the forearm. */
+const HandLife: React.FC<{children: React.ReactNode}> = ({children}) => {
+  const t = useTime();
+  const turned = HAND_ANGLE + HAND_TURN * prog(t, B.take, 0.2, E.inOutCubic);
+  const a = (turned * Math.PI) / 180;
+  const grab = -12 * Math.sin(Math.PI * prog(t, B.handIn + 0.27, 0.24));
+  const letGo = 26 * prog(t, B.release, 0.2, E.outCubic);
+  const hover = t > B.release + 0.2 ? 7 * Math.sin(((t - B.release - 0.2) / 0.95) * Math.PI * 2) : 0;
+  const d = grab + letGo + hover;
+  const lift = t > B.release ? -4 * Math.sin(((t - B.release) / 0.95) * Math.PI * 2) : 0;
+  return <XG m={mat.translate(Math.cos(a) * d, Math.sin(a) * d + lift)}>{children}</XG>;
+};
+
+/** The site icon reacts: a squash-pop when it is taken over (with its flag) and a jolt on 'site' (its padlock pops). */
+const SiteJolt: React.FC<{children: React.ReactNode}> = ({children}) => {
+  const t = useTime();
+  const base: Pt = [ICON[0] + ICON[2] / 2, ICON[1] + ICON[3]];
+  const pop = t >= B.over + 0.16 ? 1 + 0.12 * Math.sin(Math.PI * prog(t, B.over + 0.16, 0.2)) * (1 - prog(t, B.over + 0.36, 0.1)) : 1;
+  const jolt = t >= B.siteWord ? 5 * Math.exp(-(t - B.siteWord) * 9) * Math.sin((t - B.siteWord) * 40) : 0;
+  return <XG m={mat.compose(mat.about(mat.rotate(jolt), base[0], base[1]), mat.about(mat.scale(2 - pop, pop), base[0], base[1]))}>{children}</XG>;
+};
+
 const Pip: React.FC = () => {
   const t = useTime();
   // hop in from S01 (mid-air at the cut, lands on 'because'), hop out toward the lens at the end (crosses the cut)
@@ -122,13 +165,15 @@ const Pip: React.FC = () => {
       seed={22}
       squash={h.squash}
       rotate={h.rotate}
-      flip={air && !out}
+      flip={air || out || t >= B.pipHop - 0.2}
       amount={air ? h.spread : undefined}
       keys={[
         {t: -1, pose: 'stand-side'},
         {t: B.pipLand, pose: 'sit-back', look: -0.55},
         {t: B.handIn + 0.05, pose: 'sit-back', look: 0.55},
         {t: B.take + 0.05, pose: 'sit-back', look: -0.45},
+        {t: B.siteWord + 0.1, pose: 'sit-back', look: 0.2},
+        {t: B.without + 0.06, pose: 'sit-back', look: -0.9},
         {t: B.pipCover, pose: 'ears-cover'},
         {t: B.pipHop - 0.2, pose: 'stand-side', expression: 'wide'},
       ]}
@@ -147,22 +192,23 @@ const Scene02: React.FC = () => {
       <Sun cx={870} cy={740} r={110} drift={[6, 0]} />
       <XG m={camMat(cam)}>
         {/* the PHP master blueprint: its linework draws outward from the lock from the cut (0.7 s) */}
-        <BlueprintWall drawAt={0} lock={{at: 1e6}} calendar={undefined} />
+        <BlueprintWall drawAt={0} lock={{at: 1e6}} />
         {/* the lock detail (match object: already there at the cut), then the detail loupe */}
         <Loupe />
         <Connector />
-        <SiteIcon x={ICON[0]} y={ICON[1]} w={ICON[2]} h={ICON[3]} at={B.site - 0.04} takenAt={B.over} unlockAt={B.siteWord} flutterAt={B.flutter} seed="s2site" />
-        <KeyCross x={338} y={846} size={84} at={B.without} crossAt={B.without + 0.17} settleAt={B.flutter} seed="s2key" />
+        <SiteJolt>
+          <SiteIcon x={ICON[0]} y={ICON[1]} w={ICON[2]} h={ICON[3]} at={B.site - 0.04} takenAt={B.over} unlockAt={B.siteWord} flutterAt={B.flutter} ink={3.8} seed="s2site" />
+        </SiteJolt>
+        {/* 'without': the key draws in a cleared patch of paper beside the loupe, then gets crossed out */}
+        {t >= B.without ? <Fill d={`M${KEY[0] - 74} ${KEY[1]}a74 48 0 1 0 148 0a74 48 0 1 0 -148 0Z`} color={palette.white} at={B.without} mode="pop" offset={false} seed="s2keyF" /> : null}
+        <KeyCross x={KEY[0]} y={KEY[1]} size={118} at={B.without} crossAt={B.without + 0.17} settleAt={B.flutter} ink={5.2} seed="s2key" />
         <LabelTag kind="card" x={215 + 196} y={724} text="PHP2Shell · two linked flaws" fontSize={40 / 1.3} inkPx={2.2} at={B.L1} seed="s2L1" />
         <LabelTag kind="card" box={[214, 1110, 618, 1198]} text={['no password ·', 'control of the site and its data']} fontSize={40 / 1.32} inkPx={2.2} at={B.L2} leader={[ICON[0] + 10, 1160]} seed="s2L2" />
-        <defs>
-          <clipPath id="s2sheet" clipPathUnits="userSpaceOnUse">
-            <rect x={SHEET_IN[0]} y={SHEET_IN[1]} width={SHEET_IN[2]} height={SHEET_IN[3]} />
-          </clipPath>
-        </defs>
-        <g clipPath="url(#s2sheet)">
-          <DiagramHand x={KNOB[0]} y={KNOB[1] - 4} angle={-36} scale={1.45} enterAt={B.handIn} from={560} turnAt={B.take} turnDeg={34} exitAt={B.handOut} ink={2.6} seed="s2hand" />
-        </g>
+        <OnSheet>
+          <HandLife>
+            <DiagramHand x={KNOB[0]} y={KNOB[1] - 3} angle={HAND_ANGLE} scale={1.2} enterAt={B.handIn} from={560} turnAt={B.take} turnDeg={HAND_TURN} exitAt={B.handOut} ink={2.6} handFill={palette.white} seed="s2hand" />
+          </HandLife>
+        </OnSheet>
         <Pip />
       </XG>
     </World>

@@ -1,6 +1,6 @@
 // S10 LOCAL STAND-INS for shared-kit pieces requested in docs/storyboard_v3.json "requests" that do not exist yet.
 // Each keeps the requested name / props so a later fix round can swap the import to src/scenes/shared/**:
-//   SupportTag  (props request: "SupportTag (S10): a sage check tag stamped with the elephant mark")
+//   (SupportTag: swapped to the shared props one, src/scenes/shared/props/Labels.tsx)
 //   CartSign    (sets request: the MakersLane `blindSign` 'still fixing...' that hangs on the MakersCart in S09, struck
 //                to 'still fixed!' there; S10 carries the struck sign)
 //   Satchel     (the cart's satchel of support tags; no shared piece requested, scene-owned)
@@ -11,78 +11,9 @@ import {palette} from '../../lib/theme';
 import {ease as E, prog, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {check, circle, line, poly, Pt, rect, rectPath, roundRect} from '../../lib/sketch';
+import {circle, line, rect, rectPath, roundRect} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import {captionFontStack, measureCaption, useCaptionFont} from '../../lib/font';
-import {ElephantEmblem, pendulum, popK} from './kit';
-
-// ---------------------------------------------------------------- SupportTag
-
-export type SupportTagProps = {
-  /** Hang point (string top) in parent coords. */
-  x: number;
-  y: number;
-  /** Tag body height (parent px). Width = 0.74 h. Default 44. */
-  size?: number;
-  /** Lands / pops in here (7 % pop about the hang point + the pendulum -16 -> 0). Omit = already hanging. */
-  at?: number;
-  /** The check strokes on (0.17 s). Omit = no check (an empty tag); -1 = already ticked. */
-  tickAt?: number;
-  /** Extra rotation (deg) about the hang point (flight spin). */
-  rot?: number;
-  /** Draw the string (false while it flies). Default true. */
-  string?: boolean;
-  /** String length (parent px). Default 0.22 h. */
-  stringLen?: number;
-  /** Outline width (parent px). Default 2.2. */
-  ink?: number;
-  /** Pendulum amplitude on landing (deg). Default -16. */
-  swingAmp?: number;
-  seed?: string;
-};
-
-/** A sage 'officially supported' check tag stamped with the elephant mark (it comes from the people who make PHP). */
-export const SupportTag: React.FC<SupportTagProps> = ({x, y, size = 44, at, tickAt, rot = 0, string = true, stringLen, ink = 2.2, swingAmp = -16, seed = 'stag'}) => {
-  const t = useTime();
-  if (at !== undefined && t < at) return null;
-  const h = size;
-  const w = h * 0.74;
-  const sl = stringLen ?? h * 0.22;
-  const k = at !== undefined ? popK(t, at, 0.1, 0.18) : 1;
-  const sw = at !== undefined && string ? pendulum(t, at, swingAmp, 0.5, 0.9) : 0;
-  const c = Math.min(w * 0.26, h * 0.2);
-  const pts: Pt[] = [
-    [-w / 2 + c, 0],
-    [w / 2 - c, 0],
-    [w / 2, c],
-    [w / 2, h],
-    [-w / 2, h],
-    [-w / 2, c],
-  ];
-  const body = poly(pts, {closed: true, joined: true, jitter: 0.3, seed: `${seed}/f`}) + 'Z';
-  const bodyInk = poly(pts, {closed: true, over: 2, seed: `${seed}/i`});
-  const er = Math.max(1.6, h * 0.06);
-  const ey = c * 0.9;
-  // the stamp: a cream disc with an ink ring and a solid ink elephant (the makers' mark)
-  const sr = w * 0.28;
-  const sy = h * 0.42;
-  const ticked = tickAt === -1 || (tickAt !== undefined && t >= tickAt);
-  return (
-    <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot + sw), mat.scale(k))}>
-      {string ? <Ink d={line(0, 0, 0, sl + ey, {over: [0, 0], seed: `${seed}/s`, drift: 0.3})} width={ink * 0.6} taper={false} seed={`${seed}/s`} /> : null}
-      <XG m={mat.translate(0, sl)}>
-        <Fill d={body} color={palette.sage} offset={[2, 1.5]} seed={`${seed}/body`} />
-        <Ink d={bodyInk} width={ink} taper={false} seed={`${seed}/bi`} />
-        <Fill d={circle(0, ey, er * 1.5, {seed: `${seed}/ey`})} color={palette.cream} offset={false} mode="none" seed={`${seed}/ey`} />
-        <Ink d={circle(0, ey, er, {seed: `${seed}/eyi`, overlap: 8})} width={ink * 0.55} taper={false} seed={`${seed}/eyi`} />
-        <Fill d={circle(0, sy, sr, {seed: `${seed}/st`})} color={palette.cream} offset={false} mode="none" seed={`${seed}/st`} />
-        <Ink d={circle(0, sy, sr, {seed: `${seed}/sti`, overlap: 10})} width={ink * 0.55} taper={false} seed={`${seed}/sti`} />
-        <ElephantEmblem x={0} y={sy + sr * 0.04} size={sr * 1.55} mode="solid" seed={`${seed}/e`} />
-        {ticked || tickAt !== undefined ? <Ink d={check(0, h * 0.8, w * 0.42, {seed: `${seed}/ck`})} at={tickAt === -1 ? undefined : tickAt} dur={0.17} width={Math.max(1.6, ink * 1.05)} color={palette.ink} taper={false} seed={`${seed}/ck`} /> : null}
-      </XG>
-    </XG>
-  );
-};
 
 // ---------------------------------------------------------------- CartSign ('still fixed!')
 
@@ -136,10 +67,10 @@ export const Satchel: React.FC<{x: number; y: number; w?: number; pullAt?: numbe
       </XG>,
     );
   });
-  // a pulled tag rises out (0.12 s), held for 0.08 s, then the scene's flying tag takes over
+  // a pulled tag rises out (0.12 s) and is gone 2 frames before the scene flicks the flying tag up from above the bag
   pullAt.forEach((pa, i) => {
-    if (t < pa || t >= pa + 0.2) return;
-    const q = E.outCubic(prog(t, pa, 0.12));
+    if (t < pa || t >= pa + 0.1) return;
+    const q = E.outCubic(prog(t, pa, 0.1));
     const ty = y0 - h * 0.3 - q * h * 0.9;
     tags.push(
       <g key={`pl${i}`}>

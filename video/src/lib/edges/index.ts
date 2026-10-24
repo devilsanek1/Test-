@@ -4,3 +4,5 @@ export * from './EdgeTreatment';
 export * from './config';
 export * from './variants';
 export * from './rough';
+export * from './paint';
+export * from './hints';

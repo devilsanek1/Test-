@@ -9,8 +9,9 @@
 // the running gag; Bit hops onto the padlock's shackle (rewatch spot: he guards the lock that keeps the bug out).
 //
 // Hard cut in and out (no transition camera). Camera: a 4 % push from rest, locked, a 3 % lean into the joke, hold.
-// Local helpers: ./scene11/* (beats, camera, actors, shims = stand-ins for the pending shared LabelTag / StickyNote /
-// lettered BackSoonTag).
+// Local helpers: ./scene11/* (beats, camera, actors; shims = the NoteBreeze wrapper around the shared StickyNote; entry =
+// an isolated preview entry). Every shared piece comes from the kit: GovernmentPlaza (padlock + lettered 'back soon'
+// tag rigs, far civic skyline), LabelTag (L14 notice), StickyNote (J6), PowerGlyph, SunPress, Bit.
 
 import React, {useMemo} from 'react';
 import {World, Sun, palette, useTime, useScene, mat, XG} from '../lib';
@@ -18,11 +19,11 @@ import {Elephant, ElephantTimeline, hop} from '../lib/mascot';
 import type {PoseKey} from '../lib/mascot';
 import {GovernmentPlaza, PLAZA, GovId} from './shared/sets';
 import {ChromeSlot} from './shared/sets/propSlots';
-import {Bit, LabelTag, PowerGlyph, SunPress} from './shared/props';
+import {Bit, LabelTag, PowerGlyph, StickyNote, SunPress} from './shared/props';
 import {ABS, localBeats, SCENE} from './scene11/beats';
 import {camAt, camKeys, camMat, toScreen} from './scene11/camera';
 import {GovBWindow, Pigeon, SillSnail} from './scene11/actors';
-import {StickyNote} from './scene11/shims';
+import {NoteBreeze} from './scene11/shims';
 import type {Pt} from '../lib/sketch';
 
 // ---------------------------------------------------------------- anchors (world = S01 camera rest)
@@ -74,7 +75,7 @@ const Scene11: React.FC = () => {
   const windowSlot = (id: GovId, r: [number, number, number, number]) => {
     if (id !== 'govB') return <ChromeSlot x={r[0]} y={r[1]} w={r[2]} h={r[3]} width={id === 'govD' ? MID_CLOSE * (4 / 3.4) : MID_CLOSE} seed={`s11/${id}/bw`} />;
     return (
-      <GovBWindow r={r} steps={steps} hiccups={[b.ringHiccup1, b.barBack]} barsAt={[0.3, 0.55, 0.8]} reloadAt={[b.barStep, b.snailCrawl + 0.17]} shakeAt={b.barBack} flickerAt={b.barFlicker} inkW={MID_CLOSE} seed="s11/govB">
+      <GovBWindow r={r} steps={steps} hiccups={[b.ringHiccup1, b.barBack]} barsAt={[b.ringHiccup1 - 0.12, b.barFlicker - 0.03, b.earFlick - 0.03]} reloadAt={[b.barStep, b.snailCrawl + 0.17]} shakeAt={b.barBack} flickerAt={b.barFlicker} inkW={MID_CLOSE} seed="s11/govB">
         <LabelTag kind="notice" x={NOTICE.x} y={NOTICE.y} w={NOTICE.w} h={NOTICE.h} lines={['FBI · NSA', 'UK NCSC · CERT-EU']} fontSize={21} at={b.notice} rot={-1.5} inkPx={2.2} seed="s11/L14" />
       </GovBWindow>
     );
@@ -114,6 +115,8 @@ const Scene11: React.FC = () => {
     {t: b.lookNotice, pose: 'sit-back', look: 0.6},
     {t: b.glanceSun, pose: 'sit-back', look: 1},
     {t: b.shutter + 0.06, pose: 'sit-back', look: 0.3},
+    {t: b.padlock + 0.04, pose: 'sit-back', look: 0.5}, // the click: he glances at the padlock
+    {t: b.pigeonLand + 0.08, pose: 'sit-back', look: -0.15}, // a pigeon lands right above him: he looks up
     {t: b.noteSlap + 0.2, pose: 'sit-back', look: 0.55},
     {t: b.shrug, pose: 'shrug', look: 0.8, expression: 'meh'},
     {t: b.shrug + 0.55, pose: 'sit-back', look: 0.7},
@@ -125,15 +128,20 @@ const Scene11: React.FC = () => {
   } else if (t < b.pipOut) {
     pip = <ElephantTimeline x={pipAnchor[0]} y={pipAnchor[1]} scale={pipScale} t={t} seed={11} keys={pipKeys} squash={inHop.squash} />;
   } else {
-    // hops off the sill toward the lens: down-left and bigger, out of frame by the cut
-    const outHop = hop({t, t0: b.pipOut + 0.12, dur: 0.34, from: {x: pipAnchor[0], y: pipAnchor[1]}, to: {x: 230, y: 2260}, height: 60});
-    const grow = 1 + 0.9 * Math.max(0, outHop.k);
-    pip =
-      outHop.k <= 0 ? (
-        <ElephantTimeline x={pipAnchor[0]} y={pipAnchor[1]} scale={pipScale} t={t} seed={11} keys={pipKeys} squash={outHop.squash} />
-      ) : (
-        <Elephant x={outHop.x} y={outHop.y} scale={pipScale * grow} pose="stand-side" flip amount={outHop.spread} squash={outHop.squash} rotate={outHop.rotate} t={t} seed={11} />
-      );
+    // hops off the sill toward the lens: a crouch, then a ballistic leap down-right that grows (he leaves the frame
+    // toward the viewer, keeping the left-to-right travel of S10 -> S11; S12 lands him on his bollard on 'And')
+    const t0 = b.pipOut;
+    const tau = t - t0;
+    if (tau < 0) {
+      const crouch = 0.2 * Math.sin((Math.min(1, (t - (t0 - 0.12)) / 0.12) * Math.PI) / 2);
+      pip = <ElephantTimeline x={pipAnchor[0]} y={pipAnchor[1]} scale={pipScale} t={t} seed={11} keys={pipKeys} squash={t >= t0 - 0.12 ? crouch : 0} />;
+    } else {
+      const x = pipAnchor[0] + 380 * tau;
+      const y = pipAnchor[1] - 150 * tau + 0.5 * 9000 * tau * tau;
+      const grow = 1 + 3.2 * tau;
+      const stretch = -0.18 * Math.exp(-tau * 8);
+      pip = <Elephant x={x} y={y} scale={pipScale * grow} pose="stand-side" amount={Math.min(1, tau * 6)} squash={stretch} rotate={-8 + 60 * tau} t={t} seed={11} />;
+    }
   }
 
   return (
@@ -157,29 +165,34 @@ const Scene11: React.FC = () => {
             },
           }}
           windowSlot={windowSlot}
+          civicOffAt={[0, 1, 2, 3, 4, 5].map((i) => b.padlock + 0.1 + i * 0.12)}
+          civicLanternsOffAt={b.padlock + 0.6}
           seed="plaza"
         />
         {/* on the closed shutter (the set hangs the padlock + the lettered 'back soon' tag of S01 on it): the sticky note (J6) */}
-        <StickyNote
-          x={NOTE.x}
-          y={NOTE.y}
-          w={NOTE.w}
-          h={NOTE.h}
-          lines={['Turn it off', 'and on again']}
-          size={15}
-          strike="and on again"
-          slapAt={b.noteSlap + 0.03}
-          flutter={{from: [720, 950], dur: 0.38, spin: 80}}
-          strikeAt={b.strike}
-          curlAt={[b.noteCurl, b.strike + 0.2]}
-          rot={-4}
-          seed="s11/J6"
-        />
+        <NoteBreeze x={NOTE.x} y={NOTE.y} h={NOTE.h} flutterAt={[b.noteCurl - 0.02, b.strike + 0.18]} joltAt={b.strike}>
+          <StickyNote
+            x={NOTE.x}
+            y={NOTE.y}
+            w={NOTE.w}
+            h={NOTE.h}
+            lines={['Turn it off', 'and on again']}
+            size={15}
+            strike="and on again"
+            slapAt={b.noteSlap + 0.03}
+            flutter={{from: [690, 935], dur: 0.38, spin: 80}}
+            strikeAt={b.strike}
+            curlAt={[b.noteCurl, b.strike + 0.2]}
+            rot={-4}
+            inkPx={2.6}
+            seed="s11/J6"
+          />
+        </NoteBreeze>
         {/* the sill: the snail (running gag), Bit; the pigeons on the cornice and on the shutter box */}
         <SillSnail x={SNAIL_AT[0]} y={SNAIL_AT[1]} size={28} shellAt={b.snailShell} crawlAt={b.snailCrawl} hideAt={b.bitHop} antennaeAt={b.antennae} peekAt={b.pipOut} seed="s11/snail" />
         {bit}
-        <Pigeon x={CORNICE_PIGEON[0]} y={CORNICE_PIGEON[1]} s={0.85} shuffle={[{at: b.ringHiccup1, dx: -9}, {at: 2.1, dx: 6}, {at: 2.32, dx: 4}]} hopAt={[b.press + 0.05]} preenAt={b.preen} seed="s11/pg1" />
-        <Pigeon x={BOX_PIGEON[0]} y={BOX_PIGEON[1]} s={0.85} land={{at: b.pigeonLand, from: [300, 840], dur: 0.45}} shuffle={[{at: b.noteSlap + 0.18, dx: 5}]} hopAt={[b.glint]} flyAt={b.tagSway} flyTo={[-320, -260]} color={palette.white} seed="s11/pg2" />
+        <Pigeon x={CORNICE_PIGEON[0]} y={CORNICE_PIGEON[1]} s={0.95} shuffle={[{at: b.ringHiccup1, dx: -9}, {at: b.snailCrawl + 0.14, dx: 6}, {at: b.barBack - 0.06, dx: 4}]} hopAt={[b.press + 0.05]} preenAt={b.preen} seed="s11/pg1" />
+        <Pigeon x={BOX_PIGEON[0]} y={BOX_PIGEON[1]} s={0.95} land={{at: b.pigeonLand, from: [300, 840], dur: 0.45}} shuffle={[{at: b.noteSlap + 0.18, dx: 5}]} hopAt={[b.glint]} flyAt={b.tagSway} flyTo={[-320, -260]} color={palette.white} seed="s11/pg2" />
       </XG>
       {pip}
     </World>

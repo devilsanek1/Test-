@@ -5,6 +5,8 @@
 
 ```tsx
 import {Lock, Bit, BrowserChrome, ElephantPlaque, RollerShutter, PowerGlyph, SunPress, RailBoard, Keeper} from '../shared/props';
+import {LabelTag, RewindGlyph, CounterBoard, DiagramHand, SiteIcon, KeyCross, StickyNote, Sticker, CheckBoxTag, CheckBoxTags,
+  SupportTag} from '../shared/props';                                    // storyboard v3 pieces (section 9b)
 ```
 
 Dev sheet: `src/dev/SharedKitSheet.tsx` (composition `SharedKitSheet`, 10 s; every cell loops on a 5 s clock, the bottom
@@ -24,6 +26,7 @@ node scripts/render-frames.mjs SharedKitSheet /tmp/o 2.3 --props='{"unbuildAt":2
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 2.5 --props='{"thumbs":false}'  # props only (cost check)
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 0.9,1.3,1.5,1.9 --props='{"mode":"lock"}'  # stub, stop, ghost, Bit
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 0.5 --props='{"mode":"heads"}'  # add "look":"paper" for line art
+node scripts/render-frames.mjs SharedKitSheet /tmp/o 2.5 --props='{"mode":"v3"}'     # the storyboard-v3 pieces (section 9b)
 scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 --cols=12   # one cell, every frame
 ```
 
@@ -182,6 +185,11 @@ lightsOut(colour)  // the 1-frame step map: cream->sand, sand->tan, mintPale->sa
 18 px tealDark box with ink; the curtain unrolls (tealDark, ink ribs every 14 px moving with the bottom edge, sand bottom
 rail with a handle). `slamAt`: 0.16 s ease-in drop + a 6 px bounce; `liftAt` rolls up (0.3 s). The padlock is visually
 distinct from the P1 door lock (a shackle loop, no cover / screws). The tag swings -16 -> 0 (0.5 s); `tapAt` swings again.
+v3 `BackSoonTag lettered`: 'back soon' in CaptionHand instead of the clock (default width 84: one line at ~22 px when it fits,
+else 'back' / 'soon' bigger; `text`, `font`, `w` = alias of `size`, `inkPx` = screen ink), `twirlAt` (spins once on its
+string, 0.45 s), `liftAt` (S12: swings back UP 0 -> -16 deg stepped, one shrunken frame, gone), `outAt` pops it off in one
+shrunken frame (lettered / liftAt; the clock tag keeps the un-build unless `outMode="pop"`). `ShutterPadlock outMode="pop"`
+= the same 1-frame pop off (default still the un-build).
 
 ## 7. P7 Sun morphs (sun-local overlays; r = 110 / 120 / 150 / 165)
 
@@ -198,7 +206,19 @@ distinct from the P1 door lock (a shackle loop, no cover / screws). The tag swin
 <WaxSeal from={[sunEdgeX, sunEdgeY]} to={envelopeSeal(ex, ey)} at={25.70} dur={0.33} arc={120} />          // world coords
 <SunGlowSteps cx cy r at={69.1} />   // OPAQUE stepped discs peach 1.25 r + cream 1.5 r; render BEFORE the Sun
 <Sun ...>{(r) => <HeatTicks r={r} at={22.0} />}</Sun>
+<SunPress mode="release" at={0} cx cy r><Sun .../></SunPress>      // v3 frame 0: AT `at` the bottom of the squash + ripple at r
+<SunPress mode="reverse" at={55.01} cx cy r><Sun .../></SunPress>  // v3 S12: the release backwards (stepped 12 Hz), HOLDS the bottom
+<Sun ...>{(r) => <RewindGlyph r={r} at={53.45} outAt={54.95} nudgeAt={[53.9, 54.4]} />}</Sun>   // v3 S12 rewind button
+<Sun ...>{(r) => <SunPie r={r} n={2} cream={1} spokesAt slicesAt />}</Sun>                     // v3 S10 1/2 pie (works as is)
+<SunGlowSteps cx={700} cy={1000} r={260} at={26.1} />                                             // v3 S08 r260 (x1.25 / x1.5)
 ```
+
+- v3 frame-0 / rewind pair: `mode="release"` (S01) and `mode="reverse"` (S12) share `releaseState(u)` (u 0 = the bottom:
+  scale 0.88, the ink ripple ring AT r with full width; u 1 = released, the ripple at r + 40 thinned to nothing), so S12's
+  last frame and S01's frame 0 are the same picture. Before `at`, release holds the bottom; reverse shows the released sun.
+- `RewindGlyph`: two solid left-pointing cream triangles, corners rounded by a stroke of the PowerGlyph weight (same size:
+  half-height = the power ring 56/150 r). Swap: `<PowerGlyph outAt={T} />` + `<RewindGlyph at={T + 0.06} outAt={F} />` +
+  `<PowerGlyph at={F + 0.06} />` (pop in 7 %, shrink out 0.12 s; never both full at once). `nudgeAt` jabs it left (0.16 s).
 
 - `SunPie`: each "missing" slice (`sliceColor`, default cream) carries an ink RIM ARC on the disc edge, so on a cream
   (golden) sky the disc silhouette stays whole and the slice reads as a slice, not a hole. Spokes default to far ink (2.2:
@@ -276,6 +296,105 @@ with HAIR showing through, over a thin strap with a buckle tick) and a button. T
 step darker than the coat (no V). `h` is their true feet-to-cap height. Checked in colour and line art at film size and
 at phone-thumbnail scale (`mode: 'heads'`).
 
+## 9b. Storyboard v3 pieces (labels, rewind, board, diagram, tags, notes)
+
+Sheet: `--props='{"mode":"v3"}'` (every piece below at film size, on a 5 s clock; `look` / `unbuildAt` reach it too).
+
+### LabelTag (labelStyle: every on-screen label L1-L14)
+
+```tsx
+<LabelTag kind="tag" x={385} y={1150} text={['in the code since', 'at least 2012']} fontSize={30} at={15.39} />  // hangs from (x, y)
+<LabelTag kind="card" box={[215, 700, 540, 745]} text="PHP2Shell · two linked flaws" at={5.78} />              // pin dot
+<LabelTag kind="card" box={[215, 1100, 600, 1185]} text={L2} at={6.57} leader={[700, 1150]} />                // + leader
+<LabelTag kind="card" box={[490, 1320, 910, 1440]} text={L3} at={9.26} flipTo={{at: 12.51, text: L4}} />      // paper flip
+<LabelTag kind="slip" box={[205, 688, 650, 760]} text={L6} at={18.11} />                                      // paper clip
+<LabelTag kind="notice" x={300} y={1080} text={['FBI · NSA', 'UK NCSC · CERT-EU']} at={46.2} />               // 4 tapes
+<LabelTag kind="sign" box={[125, 1262, 445, 1462]} fontSize={26} text={L13} at={41.0} />                      // A-frame
+<LabelTag kind="stamp" box={[450, 1295, 870, 1338]} text="first 45 min: tens of thousands" at={32.0} />       // slams
+```
+
+- **Anchor**: `box` [x0, y0, x1, y1] = the PAPER (the storyboard's label box; for `sign` the board face, its teal frame
+  wraps it and the legs stand `legH` (0.32 x h) below). Without a box, (x, y) = the paper centre, except `tag` (the HANG
+  point: the string's top) and `sign` (the GROUND point). `w` / `h` fix the paper; by default it fits the text.
+  `labelBox(props)` returns the rest rect (for lint boxes / leaders).
+- **Text**: `text` (string, or one string per line; '\n' splits) or `lines`. `fontSize` (alias `size`) in WORLD px
+  (default 36, sign 30, stamp 34): the label lives in the world, so divide the on-screen target by the camera zoom
+  (S02: `40 / 1.3`). With a box (or w / h) the font SHRINKS to fit (never grows; floor 0.5 x). `align` center | left.
+  Below 7 px on screen the text becomes hairline placeholders.
+- **Look**: cream paper (`paper` / `color`), ink text (`textColor`), 2.2 px outline (`ink` world px, `inkPx` SCREEN px,
+  or `depth`), fill misregistered in screen space. Paper Look = white paper + ink text (labels read in line art);
+  `<Look ink={false}>` hides the text with the ink. Kind details: tag = clipped top corners, sand eyelet, string;
+  card = soft corners + ink pin dot; slip = tealDark paper clip over the top edge; notice = 4 sand tape strips
+  (`tapeStagger` 0.04 s after the paper); sign = teal A-frame (tapered frame, legs, crossbar, handle slot; `frame={false}`
+  = paper only); stamp = double ink border, -3.5 deg.
+- **Motion**: `at` = pop (7 % spring) about the attachment (tag: hang point, card: pin, slip: clip, sign: ground,
+  notice / stamp: centre); tags add the pendulum -16 -> 0 (0.5 s; `swing={false}` off, `swing` on any kind = on);
+  `swing={t | [t..]}` swings again; stamps SLAM (ring 0.13 s, print 2.6 x -> 1 x in 0.27 s); `flipTo` = `{at, text}` (or
+  several, or text + `flipAt`): scaleX through edge-on in 0.2 s, the text (and size) swap at the edge-on; `outAt` = one
+  shrunken frame (x 0.72), then gone (`outMode="unbuild"` = the measured 0.5 s un-build). `leader` = [x, y] or
+  `{to, at}`: an ink line from the nearest paper edge + an end dot, drawn 0.12 s after the pop. `rot` / `tilt` = static
+  tilt (default a seeded +-1.2 deg; tags and signs hang straight). Aliases for scene shims: `variant` / `type` / `style` =
+  `kind`, `size` = `fontSize`, `lines` = `text`, `color` = `paper`.
+- Text in a `<Plane>` is NOT projected (raw SVG text): put labels on screen-facing surfaces (cards in front of a ground
+  plane), not inside a plane.
+
+### CounterBoard (S08: the one count device)
+
+```tsx
+<CounterBoard box={[430, 1080, 890, 1440]} riseAt={26.64} header={['Cloudflare · sits in front', 'of about 1 in 5 websites']}
+  flagAt={28.34} note={['counted from the', 'public announcement', 'attempts, not break-ins']}
+  footer={['Matthew Prince, Cloudflare CEO, on X', "Cloudflare's own count"]} footerAt={28.74}
+  gatesAt={[28.40, 28.86, 29.23, 29.33, 29.43, 29.82, 29.92, 30.86, 32.59]}
+  stamps={[{at: 32.02, text: 'first 45 min: tens of thousands'}, {at: 32.85, text: 'millions · within a day'}]} />
+```
+
+Teal 8 px frame, cream face, two tealDark posts (`post` 80 px below the board, behind the parapet), a sage shield with a
+cream glass dome top-left (`emblem={false}` off). Zones follow the storyboard layout scaled to the box
+(`counterBoardZones(box)`: emblem, header, flag, note, gates, the two stamp slots, footer, and `top` = Bit's perch at the
+top edge's right end). Painted text pops in place (7 % spring): header (`headerAt`, default with the board; 33 world px =
+38 on screen at the 1.15 push), note (`noteAt` = flagAt + 0.08; 26), footer (`footerAt`; 24 max, shrinks to its 47 px
+zone: ~21 world / 24 on screen). The start flag (sage pennant on a short pole) pops at `flagAt`. `gatesAt[i]` = tally
+gate i strokes on (4 hand-drawn bars + the strike, 0.12 s) in rows of `gateCols` (3); never digits. `stamps[i]` = a
+LabelTag stamp in slot i (29 world px, `fontSize` / `rot` per stamp). `riseAt`: rises board height + posts from below its
+base (0.33 s out(expo)), clipped at the posts' foot so it never shows under its base. `outAt`: un-build.
+
+### Diagram pieces (S02, S05 callback) — the S02 shims, promoted (same props)
+
+`DiagramHand {x, y (the pinch point), angle -20, scale, enterAt, from 760, settle 0.12, turnAt, turnDeg 38, exitAt, ink
+3.4}` + v3 extras: `drawAt` / `undrawAt` (+ `drawDur` 0.25: the dashes draw on along the outlines / come off in reverse,
+the S05 "redraw"), `dash` [7, 5.5] world px, `handFill` (default NONE: a bare dashed hand per the request, the lock
+drawing reads through it; the S02 shim used white), `sleeve` teal / `cuff` tealDark (the attempters' hoodie; false = ink
+only), `color`. `SiteIcon {x, y, w, h (box, top-left), at, takenAt (hatching floods the window, then the roof flag pops at
++0.2), unlockAt (shackle pops open), flutterAt, ink}`. `KeyCross {x, y, size 60, at, crossAt (0.06 s cross), settleAt (8 %
+pulse), ink}`. Helpers: `dashPath(points, dash, gap, phase)` (explicit dashes for connectors that draw on / march),
+`pointAlong(points, s)`, `flattenPath(d)` (absolute M L H V C Z -> polylines).
+
+### Notes, sticker, tags
+
+```tsx
+<StickyNote x={540} y={1180} lines={['Turn it off', 'and on again']} strike="and on again" size={30} slapAt={50.6} strikeAt={52.2} />
+<Sticker x={640} y={1060} w={124} />                                                    // S03 'I [heart] PHP ?', static
+<CheckBoxTag x y size={40} at />  <CheckBoxTag ... ticked />  <CheckBoxTag ... tickAt />   // S09 the crate's cream tag
+<CheckBoxTags spots={[{x, y, size, at, ticked}]} ink={0.8} inkFrom={8} boxFrom={12} />    // hundreds: 4 paths
+<SupportTag x y size={44} at checkAt stampAt swingAt />                                  // S10 sage, elephant-stamped
+```
+
+- `StickyNote` (the S11 shim's props): (x, y) = rest centre; `w` / `h` (default: a square that fits the text), `lines` /
+  `text`, `size` / `fontSize` (world; keep >= 24 px on screen), `strike` = the SUBSTRING struck (its measured extent only),
+  `strikeAt` (0.15 s ink stroke), `slapAt` (lands with a 0.12 s squash 1.12 x / 0.8 y + three slap ticks; before it the
+  note flutters in on an arc, turning edge-on: `flutter={{from, dur 0.36, spin 70}}`, default from 220 px up-left,
+  `flutter={false}` = no flutter), `curlAt` (bottom-right corner curls, 0.4 s), `rot` -4, `color`, `ink` / `inkPx`,
+  `outAt` (1-frame pop). Cream paper, sand adhesive band, ink outline.
+- `Sticker`: (x, y) centre, `w` 124 (lettering 0.25 w), `rot` -6, white sticker with a sand peeled corner, 'I' + a DRAWN
+  peach heart + 'PHP' in CaptionHand, and a scribbled ink '?' half off its right edge (`question={false}` off). Static
+  (`at` only if it must pop).
+- `CheckBoxTag`: hang point (x, y), `size` = width; cream skewed tag (the LockCrate tag) on a short loop, an ink check
+  BOX, EMPTY unless `ticked` / `tickAt` (0.17 s tick). Pops + swings at `at`. Below 10 px on screen: a cream speck.
+  `CheckBoxTags` = the batched wave (cream bodies / ink outlines + loops from `inkFrom` / boxes from `boxFrom` / ticks):
+  each spot pops for one frame at +30 % at its `at`; Look-aware (paper = white bodies).
+- `SupportTag`: hang point, `size` 44; sage rounded tag, a bold cream check (`checkAt` strokes it), an ink-ring stamp
+  with the solid elephant (`stampAt` slams it; >= 22 px on screen), eyelet + loop. Below 22 px: sage + cream check only.
+
 ## 10. Continuity contracts this lane honours
 
 - Frame 0 = the S13 un-build end: every prop has a clean `Look fills="paper"` state (ink on white; Bit stays ink; the sun keeps
@@ -298,10 +417,20 @@ at phone-thumbnail scale (`mode: 'heads'`).
 
 (review 4 at load ~4.5: FontTest 146, context 155, props only 215-227, with thumbnails ~400, KitDemo 251.)
 
+Storyboard v3 round (24 frames, concurrency 1, machine at load ~11 with twelve scene agents rendering): FontTest 208,
+SharedKitSheet `v3` (~45 v3 instances: 13 labels incl. a sign and stamps, the counter board with 9 gates and 2 stamps, two
+diagram hands, site icon, key, sticky note, sticker, 60 batched check-box tags, 3 support tags, shutters, suns) **216**,
+`thumbs: false` 308. A label / tag / note costs well under 1 ms; the board ~2 ms; hundreds of check-box tags = 4 paths.
+
 So a typical prop costs well under 1 ms. Hundreds of far things go through the batched components (`LockSpecks`,
 `PlaqueSpecks`, `BitSwarm`, `AttemptStipple`: 1-3 paths whatever the count), never through hundreds of `<Lock>`s.
 
 ## 12. Known gaps / requests
+
+- v3: labels are raw SVG text, so they are not projected by a `<Plane>` (place them on a screen-facing card) and they
+  leave with `ExitFade` (shrink) in an un-build. LabelTag sizes are world px (divide by the zoom for an on-screen size).
+- v3: the CounterBoard footer (L9b, 2 lines in a 47 px zone) fits at ~21 world px = ~24 px on screen at the 1.15 push, a
+  little under the labelStyle's 28 px fine print; give the board a taller box (or one more line of height) if it must be 28.
 
 - Raw-SVG parts (ring bands, clock hands, ripples, the seal's trail, attempters) leave with `ExitFade` (shrink / 1-frame pop)
   instead of retracting stroke by stroke.

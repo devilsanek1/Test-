@@ -28,6 +28,8 @@ export const B = {
   pressAt: -0.08, // pressScale bottom (0.88) lands exactly on t = 0
   rippleAt: 0, // the ripple ring leaves the rim at frame 0 (r155 -> r195, 0.2 s)
   crtB: -0.05, // govB's CRT collapse: at t = 0 its screen IS the bright horizontal line
+  // Pip flinches at the click of the press (frame 0 is untouched: the jolt's anticipation starts after it)
+  pipFlinch: 0.12,
   // 'Governments' w0+0.15
   heads: 0.34,
   // 'all' w1-0.10: govA's screen collapses; a walker slows

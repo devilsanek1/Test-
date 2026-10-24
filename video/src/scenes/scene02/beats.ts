@@ -41,6 +41,7 @@ const ABS = {
   L2: 6.57, //                              w22+0.15 'take': label L2 + its leader
   over: 6.635, //                           w23 'over': arrow along the connector, hatching, flag; Bit ducks
   siteWord: 6.9, //                         w25 'site': the icon's padlock dot pops open
+  release: 7.05, //                         (between 'site' and 'without'): the hand lets go of the turned knob, hovers
   without: 7.275, //                        w26 'without': key glyph draws beside the lock, then an ink cross
   pipCover: 7.77, //                        w28+0.10 'password': GAG: Pip ears-cover
   flutter: 8.03, //                         end(password)-0.15: the flag flutters; the cross ink settles

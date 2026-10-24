@@ -30,7 +30,6 @@ export const SCENE = {start: 39.634, end: 45.618};
 export const ABS = {
   cut: SCENE.start, // tram wipe centre (S09's Wiper); behind it the empty street in full day
   pipHop: W.plus + 0.1, // Pip leaps off the tram's tail onto the bollard
-  sunHop: SCENE.start + 0.17, // the sun's hop takes off (it rides the wipe), lands on 'something'
   siteL: W.something - 0.1, // siteL pops up (scaleY 0 -> 1.06 -> 1), siteM +0.10, siteR +0.20
   sunLand: W.something, // the sun lands over siteM ON the word
   second: W.like, // the nine second-row buildings pop up behind (0.04 s stagger); the caretaker tag is already there
@@ -41,7 +40,6 @@ export const ABS = {
   label: W.php + 0.15, // L13 rises on the A-frame sign
   pieSolid: W.sites - 0.3, // the pie settles (cream shrinks, spoke retracts); a second-row window lights
   walker: W.sites, // the walker heads up the street gap; Pip looks up at siteM's plaque
-  walkerRise: W.sites - 0.36, // he rises in from behind Pip (hidden entry) just before
   flipM: W.run - 0.05, // siteM's plaque paper-flips to the OLD version
   bitIn: W.run + 0.22, // Bit drops onto the old plaque's chain and crawls to its corner
   flip2: W.versions, // five second-row plaques flip old (alternating, 0.04 s apart) + dust puffs
@@ -50,10 +48,11 @@ export const ABS = {
   cane: W.old, // the old emblem leans on a tiny cane
   cartIn: W.old + 0.15, // the makers' cart rolls in from the left (sign 'still fixed!', satchel of tags)
   droop: W.theyre, // the old emblem's ear droops (it sags further on its cane); a dust speck drifts down
-  pullTag1: W.not - 0.06, // the maker pulls a tag from the satchel
+  not: W.not, // Bit struggles in the web; the maker reaches into the satchel
+  pullTag1: W.not - 0.15, // the maker pulls a tag from the satchel (gone 2 frames before the flick)
   toss1: W.not + 0.02, // ... and flicks it at siteL's plaque
   tick1: W.officially, // it lands on siteL's plaque: tick
-  pullTag2: W.officially - 0.06, // the second tag comes out of the satchel
+  pullTag2: W.officially - 0.14, // the second tag comes out of the satchel
   toss2: W.officially + 0.03, // the toss that arcs OVER siteM's old plaque (0.36 s flight, over siteM ~0.2 s in)
   tick2: W.supported + 0.01, // lands on siteR's plaque: tick
   wave: W.supported + 0.06, // tiny tags pop onto the CURRENT second-row plaques, skipping the old ones

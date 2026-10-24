@@ -35,6 +35,12 @@ export const BLUEPRINT_WALL = {
   steps: {y0: 1320, y1: 1480, n: 4},
   /** Team feet line at the foot of the steps. */
   feetY: 1470,
+  /** v3: the sheet's clean TOP MARGIN (inside the frame, no linework: the S02 tight framing and the L6 slip at world
+   *  (205-650, 688-760)); everything on the plan starts at y >= 760. */
+  topMargin: [212, 692, 764, 760] as [number, number, number, number],
+  /** v3: the banner's BOTTOM RAIL (a wooden weight bar along the sheet's foot) and Pip's S05 perch on it (feet). */
+  bottomRail: {x0: 178, x1: 798, y: 1296, h: 11},
+  perchBottom: [620, 1296] as Pt,
 } as const;
 
 // pilasters lean in toward the top: base x -> top x (vertical vanishing point far above the centre)
@@ -86,7 +92,11 @@ const G = (() => {
   const rod = line(bx - 26, by, bx + bw + 26, by, {seed: `${s}/rod`, over: [0, 0]}) + circle(bx - 30, by, 7, {seed: `${s}/f1`}) + circle(bx + bw + 30, by, 7, {seed: `${s}/f2`}) + line(bx - 6, by, bx - 40, BLUEPRINT_WALL.facade.corn[1] + 2, {seed: `${s}/h1`, over: 0}) + line(bx + bw + 6, by, bx + bw + 40, BLUEPRINT_WALL.facade.corn[1] + 2, {seed: `${s}/h2`, over: 0});
   // the forecourt: one flat field with a few broken paving lines + specks (no tile grid)
   const ground = groundMarks({vp: [540, 1250], top: st.y1 + 8, bottom: 1920, x0: -380, x1: 1460, rays: 4, cross: 2, specks: 14, reach: 0.55, seed: `${s}/gm`});
-  return {facade, pils, wingFill, wingInk, wingGlass, corn, top, treads, risers, stepInk, doorEl, panels, dims, callout, title, sheetEdge, tealFrame, rod, corner, ground};
+  // v3 bottom rail: a wooden bar along the sheet's foot with turned end knobs (Pip's S05 perch)
+  const BR = BLUEPRINT_WALL.bottomRail;
+  const railFill = rectPath(BR.x0, BR.y, BR.x1 - BR.x0, BR.h) + `M${BR.x0 - 15} ${BR.y + BR.h / 2}a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z` + `M${BR.x1 - 1} ${BR.y + BR.h / 2}a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z`;
+  const railInk = line(BR.x0 - 4, BR.y, BR.x1 + 4, BR.y, {seed: `${s}/br1`, over: [2, 2]}) + line(BR.x0 - 4, BR.y + BR.h, BR.x1 + 4, BR.y + BR.h, {seed: `${s}/br2`, over: [2, 2]}) + circle(BR.x0 - 7, BR.y + BR.h / 2, 8, {seed: `${s}/bk1`}) + circle(BR.x1 + 7, BR.y + BR.h / 2, 8, {seed: `${s}/bk2`});
+  return {facade, pils, wingFill, wingInk, wingGlass, corn, top, treads, risers, stepInk, doorEl, panels, dims, callout, title, sheetEdge, tealFrame, rod, corner, ground, railFill, railInk};
 })();
 
 export type BlueprintWallProps = {
@@ -101,6 +111,8 @@ export type BlueprintWallProps = {
   /** Foreground framing in the bottom band (ground.tsx presets; default 'heads': back-view heads looking up at the
    *  blueprint, cut by the bottom edge, the centre left open). false = none. */
   foreground?: ForegroundSpec;
+  /** v3: the banner's bottom rail (BLUEPRINT_WALL.bottomRail, Pip's S05 perch). Default true; false = none. */
+  bottomRail?: boolean;
   sun?: React.ReactNode;
   wrap?: LayerWrap;
   x?: number;
@@ -112,7 +124,7 @@ export type BlueprintWallProps = {
   seed?: string;
 };
 
-export const BlueprintWall: React.FC<BlueprintWallProps> = ({drawAt, lock = {}, stampAt, calendar, foreground = 'heads', sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bpw'}) => {
+export const BlueprintWall: React.FC<BlueprintWallProps> = ({drawAt, lock = {}, stampAt, calendar, foreground = 'heads', bottomRail = true, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bpw'}) => {
   const F = BLUEPRINT_WALL.facade;
   const [bx, by, bw, bh] = BLUEPRINT_WALL.sheet;
   const L = BLUEPRINT_WALL.lock;
@@ -163,7 +175,14 @@ export const BlueprintWall: React.FC<BlueprintWallProps> = ({drawAt, lock = {}, 
       <Ink d={G.title} width={SI.hair} at={d(0.6)} taper={false} seed={`${seed}/title`} />
       <Ink d={G.sheetEdge} width={SI.far} at={d(0.7)} taper={false} seed={`${seed}/edge`} />
       <ElephantStampSlot x={BLUEPRINT_WALL.stamp.x} y={BLUEPRINT_WALL.stamp.y} rx={BLUEPRINT_WALL.stamp.r} ry={BLUEPRINT_WALL.stamp.r} ring={7} at={stampAt} seed={`${seed}/stamp`} />
-      <Ink d={glintAt(bx + bw - 60, by + 90, 40, `${seed}/gl`)} width={SI.hair} taper={false} />
+      {/* the paper's glint sits low on the right: the top margin stays clean (v3) */}
+      <Ink d={glintAt(bx + bw - 60, by + 470, 40, `${seed}/gl`)} width={SI.hair} taper={false} />
+      {bottomRail ? (
+        <>
+          <Fill d={G.railFill} color={palette.brown} seed={`${seed}/rail`} />
+          <Ink d={G.railInk} width={SI.mid} taper={false} seed={`${seed}/railI`} />
+        </>
+      ) : null}
     </>
   );
   return (

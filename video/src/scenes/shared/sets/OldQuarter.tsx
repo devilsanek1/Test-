@@ -26,7 +26,7 @@ import {osc} from '../../../lib/time';
 import {rand} from '../../../lib/rng';
 import {LayerWrap, noWrap, PopUp, SetPlace, SI} from './common';
 import {Foreground, ForegroundSpec, groundMarks, GroundMarks} from './ground';
-import {BollardSlot, HangingPlaqueSlot, NoticeboardSlot, OnlookerSlot, PaneRect, PlaqueSlot} from './propSlots';
+import {BollardSlot, HangingPlaqueSlot, NoticeboardSlot, OnlookerSlot, PaneRect, PlaqueSlot, SupportTagSlot} from './propSlots';
 import {SiteFacade, SiteFacadeProps} from './SiteFacade';
 import type {Acc, Hair} from '../../../lib/kit';
 import {Furniture, FurnitureItem, People, PeopleSpec, WalkerAnchor} from './life';
@@ -73,6 +73,18 @@ export const OLD_QUARTER = {
   /** Rooftops (review 5: one distinct type + one rooftop detail per site, all under the y-600 ceiling): siteL a teal
    *  mansard with two dormers, siteM a TV antenna, siteR balconies, rooftop plants and a water tank on legs. */
   roofs: {mansard: {base: 690, top: 616, x0: 22, x1: 353, inset: 30}, dormers: [[112, 640], [238, 640]] as Pt[], antenna: {x: 616, base: 820, top: 730}, tank: {x: 978, y: 618, w: 54, h: 42, legs: 700}, balconies: [800, 1000] as number[]},
+  // ---- storyboard v3 (S10)
+  /** The A-frame notice sign's board face on the left pavement ([x0, y0, x1, y1], LabelTag kind 'sign' `box`); its legs
+   *  stand below it. Rendered through the `noticeSign` slot in front of the cart, behind the near layer. */
+  noticeSign: [125, 1262, 445, 1462] as [number, number, number, number],
+  /** The makers' cart's line along the frontage (the stoop line, feet y): the cart slot rolls here, behind the sign and the
+   *  bollard. */
+  cartY: 1330,
+  /** v3 second-row 'old' mask: 5 of 9, alternating (secondOld="half"). */
+  secondOldHalf: [true, false, true, false, true, false, true, false, true] as boolean[],
+  /** Support-tag hang points (props SupportTag) on the three hanging plaques (hung over each plate's upper-right corner,
+   *  clear of the A-frame sign) and their size. */
+  support: {L: [348, 1166] as Pt, M: [640, 1164] as Pt, R: [848, 1166] as Pt, size: 34},
 } as const;
 
 type SiteId = 'L' | 'M' | 'R';
@@ -93,9 +105,15 @@ const G = (() => {
   }
   let secondInk = '';
   let secondWin = '';
+  let secondDoors = '';
+  let secondDoorInk = '';
   for (const b of second) {
     secondInk += line(b.x, b.top, b.x + b.w, b.top, {seed: `${s}/st${b.x}`, over: 'small', breaks: false}) + line(b.x, b.top, b.x, OLD_QUARTER.eye, {seed: `${s}/sl${b.x}`, over: 0, breaks: false});
     for (let yy = b.top + 14; yy < OLD_QUARTER.eye - 40; yy += 34) secondWin += rectPath(b.x + b.w * 0.2, yy, b.w * 0.24, 16) + rectPath(b.x + b.w * 0.56, yy, b.w * 0.24, 16);
+    // v3: a street door per second-row building (they show in the street gap)
+    const dx = b.x + b.w * 0.12;
+    secondDoors += rectPath(dx, OLD_QUARTER.eye - 30, 14, 30);
+    secondDoorInk += line(dx, OLD_QUARTER.eye, dx, OLD_QUARTER.eye - 30, {seed: `${s}/sd${b.x}a`, over: 0, breaks: false}) + line(dx - 1, OLD_QUARTER.eye - 30, dx + 15, OLD_QUARTER.eye - 30, {seed: `${s}/sd${b.x}b`, over: 'small', breaks: false}) + line(dx + 14, OLD_QUARTER.eye - 30, dx + 14, OLD_QUARTER.eye, {seed: `${s}/sd${b.x}c`, over: 0, breaks: false});
   }
   // far city at the end of the gap
   const far = rectPath(642, 1100, 22, 50) + rectPath(664, 1080, 18, 70) + rectPath(684, 1110, 26, 40) + rectPath(712, 1090, 24, 60);
@@ -153,8 +171,16 @@ const G = (() => {
     balcInk += line(bx0 - 22, by, bx1 + 10, by, {seed: `${s}/bs${by}`, over: [6, 10]}) + line(bx0 - 18, by + 9, bx1 + 6, by + 9, {seed: `${s}/bs2${by}`, over: [4, 8]}) + line(bx0 - 8, by - 34, bx1, by - 34, {seed: `${s}/br${by}`, over: [3, 6]});
     for (let x = bx0 + 14; x < bx1; x += 26) balcInk += line(x, by - 32, x, by - 2, {seed: `${s}/bv${by}/${x}`, over: 0});
   }
-  return {street: streetGap, second, secondInk, secondWin, far, kerb, walk, streetMarks: street, stoops, stoopInk, treeCrown, treeTicks, trunk, trunkInk, pit, mansard, dormers, dormerGlass, dormerInk, mansardInk, antenna, tank, tankInk, plants, balcSlab, balcRail, balcInk};
+  return {secondDoors, secondDoorInk, street: streetGap, second, secondInk, secondWin, far, kerb, walk, streetMarks: street, stoops, stoopInk, treeCrown, treeTicks, trunk, trunkInk, pit, mansard, dormers, dormerGlass, dormerInk, mansardInk, antenna, tank, tankInk, plants, balcSlab, balcRail, balcInk};
 })();
+
+/** A host's own patch on an old door: a small sage tag tied to the handle (static; fill + hair ink). (x, y) = the knot. */
+const CaretakerTag: React.FC<{x: number; y: number; seed: string}> = ({x, y, seed}) => (
+  <>
+    <Fill d={polyPath([[x - 4, y + 3], [x + 4, y + 2], [x + 4.5, y + 12], [x - 4.5, y + 12.5]])} color={palette.sage} offset={false} seed={`${seed}/f`} />
+    <Ink d={`M${x} ${y - 1}L${x} ${y + 2.5}M${x - 4} ${y + 3}L${x + 4} ${y + 2}L${x + 4.5} ${y + 12}L${x - 4.5} ${y + 12.5}Z`} width={1.1} taper={false} vary={0} seed={`${seed}/i`} />
+  </>
+);
 
 export type OldQuarterProps = {
   sun?: React.ReactNode;
@@ -166,6 +192,23 @@ export type OldQuarterProps = {
   oldPlaque?: {flipOldAt?: number; cobwebAt?: number; dustAt?: number; caneAt?: number};
   /** Second row plaques blink (every third is old). */
   secondPlaques?: boolean;
+  /** Storyboard v3: which second-row plaques are OLD (9 booleans, left to right) or 'half' (5 of 9, alternating:
+   *  OLD_QUARTER.secondOldHalf). Default: every third (review 5). */
+  secondOld?: boolean[] | 'half';
+  /** The old second-row plaques paper-flip from new to old (one time = 0.04 s apart over the old ones, left to right,
+   *  each with a dust puff +0.1 s; or one time per plaque). Omit = old from the start. */
+  secondOldAt?: number | number[];
+  /** A host's own patch: one OLD second-row door (the one in the street gap) carries a small sage tag tied to its handle
+   *  (a static pauser detail). Default true with secondOld="half". */
+  caretakerTag?: boolean;
+  /** The makers' sage support tags (props SupportTag) land on the hanging plaques L / M / R (OLD_QUARTER.support), and
+   *  `second` = tiny tags pop onto the CURRENT second-row plaques in a wave (0.04 s apart) that skips the old ones. */
+  supportAt?: {L?: number; M?: number; R?: number; second?: number};
+  /** Slot: the A-frame notice sign (OLD_QUARTER.noticeSign box), e.g. (box) => <LabelTag kind="sign" box={box} .../>. */
+  noticeSign?: React.ReactNode | ((box: [number, number, number, number]) => React.ReactNode);
+  /** Slot: the makers' cart (props MakersCart) on the stoop line OLD_QUARTER.cartY, drawn behind the sign and the
+   *  bollard (in front of the sites and the walkers). */
+  cart?: React.ReactNode;
   /** S13: the noticeboard (RailBoard props) and the edge audience. */
   board?: {riseAt?: number; railLightAt?: number; pane1?: (r: PaneRect) => React.ReactNode; pane2?: (r: PaneRect) => React.ReactNode; paneDarkAt?: number; pane2ScaleInAt?: number; outAt?: number} | false;
   audience?: boolean | {riseAt?: number};
@@ -176,10 +219,11 @@ export type OldQuarterProps = {
   foreground?: ForegroundSpec;
   /** Per-site SiteFacade overrides (chromeAt, offAt, lit...). */
   site?: Partial<Record<SiteId, Partial<SiteFacadeProps>>>;
-  /** Back-view walkers on OLD_QUARTER.walkers (life.tsx). Default on while the S13 audience is off; false = nobody. */
-  people?: PeopleSpec;
-  /** Street furniture (default OLD_QUARTER.furniture); false = none. */
-  furniture?: FurnitureItem[] | false;
+  /** Back-view walkers on OLD_QUARTER.walkers (life.tsx). Default on while the S13 audience is off; false = nobody;
+   *  'gap' = only the street-gap walker (S10; = {n: 1}). */
+  people?: PeopleSpec | 'gap';
+  /** Street furniture (default OLD_QUARTER.furniture); false = none; 'bike' = the bike only (S10). */
+  furniture?: FurnitureItem[] | false | 'bike';
   wrap?: LayerWrap;
   x?: number;
   y?: number;
@@ -190,9 +234,20 @@ export type OldQuarterProps = {
   seed?: string;
 };
 
-export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaqueSwingAt, oldPlaque = {}, secondPlaques = true, board = false, audience = false, bollard = true, band = true, foreground, site = {}, people, furniture = OLD_QUARTER.furniture, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'oq'}) => {
+export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaqueSwingAt, oldPlaque = {}, secondPlaques = true, secondOld, secondOldAt, caretakerTag, supportAt = {}, noticeSign, cart, board = false, audience = false, bollard = true, band = true, foreground, site = {}, people: peopleIn, furniture: furnitureIn = OLD_QUARTER.furniture, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'oq'}) => {
   const t = useTime();
   const S = OLD_QUARTER.sites;
+  const people: PeopleSpec | undefined = peopleIn === 'gap' ? {n: 1} : peopleIn;
+  const furniture: FurnitureItem[] | false = furnitureIn === 'bike' ? OLD_QUARTER.furniture.filter((f) => f.kind === 'bike') : furnitureIn;
+  // v3 second-row plaques: the old mask, the flip times (over the old ones, left to right), the support-tag wave (over the
+  // current ones), the caretaker's tag on the old door in the street gap
+  const oldMask = secondOld === 'half' ? OLD_QUARTER.secondOldHalf : secondOld;
+  const isOld = (i: number) => (oldMask ? !!oldMask[i] : G.second[i].plaque === 'old');
+  const oldIdx = G.second.map((_, i) => i).filter(isOld);
+  const curIdx = G.second.map((_, i) => i).filter((i) => !isOld(i));
+  const flipAt = (i: number) => (secondOldAt === undefined ? undefined : Array.isArray(secondOldAt) ? secondOldAt[oldIdx.indexOf(i)] : secondOldAt + oldIdx.indexOf(i) * 0.04);
+  const gapDoor = G.second.findIndex((b, i) => isOld(i) && b.x + b.w * 0.12 + 7 > OLD_QUARTER.gap[0] && b.x + b.w * 0.12 + 7 < OLD_QUARTER.gap[1]);
+  const showCaretaker = (caretakerTag ?? secondOld === 'half') && gapDoor >= 0;
   const far = (
     <>
       {band ? <Fill rect={[600, OLD_QUARTER.band[0], 200, OLD_QUARTER.band[1] - OLD_QUARTER.band[0] + 2]} color={palette.peach} offset={false} mode="snap" seed={`${seed}/band`} /> : null}
@@ -205,8 +260,24 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
         <Fill key={i} rect={[b.x, b.top, b.w, OLD_QUARTER.eye - b.top]} color={b.c} seed={`${seed}/s2${i}`} />
       ))}
       <Fill d={G.secondWin} color={palette.sage} offset={false} seed={`${seed}/s2w`} />
+      <Fill d={G.secondDoors} color={palette.teal} offset={false} seed={`${seed}/s2d`} />
       <Ink d={G.secondInk} width={SI.far} taper={false} seed={`${seed}/s2i`} />
-      {secondPlaques ? G.second.map((b, i) => <PlaqueSlot key={`p${i}`} x={b.x + b.w * 0.5} y={OLD_QUARTER.eye - 20} size={10} variant={b.plaque} width={SI.hair} seed={`${seed}/s2p${i}`} />) : null}
+      <Ink d={G.secondDoorInk} width={SI.hair} taper={false} seed={`${seed}/s2di`} />
+      {secondPlaques
+        ? G.second.map((b, i) => {
+            const old = isOld(i);
+            const fa = old ? flipAt(i) : undefined;
+            // a flipping plaque starts new and paper-flips old at fa (props ElephantPlaque flipOldAt), with a dust puff
+            return <PlaqueSlot key={`p${i}`} x={b.x + b.w * 0.5} y={OLD_QUARTER.eye - 20} size={10} variant={old && fa === undefined ? 'old' : 'new'} width={SI.hair} extra={fa !== undefined ? {flipOldAt: fa, dustAt: fa + 0.1} : undefined} seed={`${seed}/s2p${i}`} />;
+          })
+        : null}
+      {secondPlaques && supportAt.second !== undefined
+        ? curIdx.map((i, n) => {
+            const b = G.second[i];
+            return <SupportTagSlot key={`st${i}`} x={b.x + b.w * 0.5 + 3} y={OLD_QUARTER.eye - 16} size={9} at={(supportAt.second as number) + n * 0.04} seed={`${seed}/s2t${i}`} />;
+          })
+        : null}
+      {showCaretaker ? <CaretakerTag x={G.second[gapDoor].x + G.second[gapDoor].w * 0.12 + 11} y={OLD_QUARTER.eye - 16} seed={`${seed}/ctag`} /> : null}
     </>
   );
   const ground = (
@@ -275,6 +346,12 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
           return <HangingPlaqueSlot key={id} x={sg.x} y={sg.y} size={120} wallX={sg.wallX} variant={oldPlaque.flipOldAt === undefined ? 'old' : 'new'} swingAt={swing} flipOldAt={oldPlaque.flipOldAt} cobwebAt={oldPlaque.cobwebAt} dustAt={oldPlaque.dustAt} caneAt={oldPlaque.caneAt} seed={`${seed}/plq${id}`} />;
         return <HangingPlaqueSlot key={id} x={sg.x} y={sg.y} size={112} wallX={sg.wallX} swingAt={swing} seed={`${seed}/plq${id}`} />;
       })}
+      {(['L', 'M', 'R'] as SiteId[]).map((id) => {
+        const at = supportAt[id];
+        if (at === undefined) return null;
+        const p = OLD_QUARTER.support[id];
+        return <SupportTagSlot key={`sup${id}`} x={p[0]} y={p[1]} size={OLD_QUARTER.support.size} at={at} seed={`${seed}/sup${id}`} />;
+      })}
     </>
   );
   const sway = osc(t, 0.3, 2.1) * 0.5;
@@ -305,6 +382,8 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
       {wrap('ground', 0.6, ground)}
       {wrap('sites', 0.6, sites)}
       {wrap('board', 0.8, boardNode)}
+      {/* the cart on the stoop line (y 1330): in front of the sites, behind nearer walkers, the sign and the bollard */}
+      {cart ? wrap('cart', 0.8, cart) : null}
       {wrap(
         'people',
         0.85,
@@ -313,6 +392,7 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
           <People anchors={OLD_QUARTER.walkers} vp={OLD_QUARTER.vp} spec={people} def={audience === false} seed={`${seed}/ppl`} />
         </>,
       )}
+      {noticeSign ? wrap('sign', 0.9, typeof noticeSign === 'function' ? noticeSign(OLD_QUARTER.noticeSign) : noticeSign) : null}
       {wrap('near', 1.0, near)}
       {wrap('audience', 1.0, aud)}
       {wrap('foreground', 1.0, <Foreground spec={foreground === undefined ? (audience === false ? 'railing' : false) : foreground} seed={`${seed}/fg`} />)}

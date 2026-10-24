@@ -122,8 +122,9 @@ export type SitesProps = {
   updateAt: number;
 };
 
-/** Face-local hang points of the support tags (100-unit face coords): siteL's bottom-right, siteR's bottom-left. */
-export const TAG_HANG: Record<'L' | 'R', Pt> = {L: [30, 50], R: [-30, 50]};
+/** Face-local hang points of the support tags (100-unit face coords): tied to the top screw on the side the cart comes
+ *  from... siteL's top-right, siteR's top-left, so the tag hangs over the plate's edge, clear of the A-frame sign. */
+export const TAG_HANG: Record<'L' | 'R', Pt> = {L: [44, -40], R: [-44, -40]};
 export const PLAQUE_SIZE: Record<SiteId, number> = {L: 112, M: 120, R: 112};
 
 export const Sites: React.FC<SitesProps> = ({popAt, plaqueAt, old, tagL, tagR, updateAt}) => {

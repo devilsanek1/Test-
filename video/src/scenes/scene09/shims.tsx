@@ -1,82 +1,16 @@
 // S09 LOCAL STAND-INS for shared-kit pieces requested in docs/storyboard_v3.json "requests" that do not exist yet
 // (a later fix round swaps them for the shared versions; same names / props where the request names them):
 //   LidCrate      = props LockCrate with `lidAt` / `tagsAt` (the crate of new locks: lid pops, check tags pop up)
-//   CheckBoxTags  = props CheckBoxTag / CheckBoxTags (the crate's cream check tag, EMPTY; one ticked; batched)
 //   CartSign      = sets MakersLane `blindSign` re-hung on the MakersCart ('still fixing...' -> struck, 'fixed!')
 //   Glint         = a 1-frame-pop four-point sparkle (plaque glint)
 // Everything is flat: pops (7 % spring), swings, draw-ons, wipes. No opacity animation anywhere.
 
 import React from 'react';
-import {Fill, Ink, palette, prog, springAt, springs, useTime, ease as E, lerp, rect, line, rectPath, roundRect, mat, XG, captionFontStack, useCaptionFont, useXf} from '../../../lib';
-import {Lock} from '../shared/props';
+import {Fill, Ink, palette, prog, springAt, springs, useTime, ease as E, lerp, rect, line, rectPath, roundRect, mat, XG, captionFontStack, useCaptionFont, useXf} from '../../lib';
+import {CheckBoxTag, Lock} from '../shared/props';
 
 const f1 = (v: number) => v.toFixed(1);
 const f2 = (v: number) => v.toFixed(2);
-
-// ---------------------------------------------------------------- CheckBoxTag geometry
-
-/** A cream check-box tag hanging from (x, y) (its string top), `s` = tag width (world). The card is 1.0 x 1.15 s,
- *  hangs 0.35 s below the hang point; the empty box is 0.5 s square in its middle. */
-export function checkTagGeom(x: number, y: number, s: number) {
-  const w = s;
-  const h = s * 1.15;
-  const top = y + s * 0.35;
-  const card = roundRect(x - w / 2, top, w, h, s * 0.14);
-  const b = s * 0.5;
-  const bx = x - b / 2;
-  const by = top + h * 0.5 - b / 2 + s * 0.04;
-  const box = `M${f2(bx)} ${f2(by)}h${f2(b)}v${f2(b)}h${f2(-b)}Z`;
-  const str = `M${f2(x)} ${f2(y)}L${f2(x)} ${f2(top + s * 0.08)}`;
-  const tick = `M${f2(bx + b * 0.12)} ${f2(by + b * 0.55)}L${f2(bx + b * 0.42)} ${f2(by + b * 0.88)}L${f2(bx + b * 1.15)} ${f2(by - b * 0.25)}`;
-  return {card, box, str, tick, w, h, top};
-}
-
-export type CheckSpot = {x: number; y: number; size: number; at?: number; ticked?: boolean};
-
-/** Hundreds of check-box tags as a handful of paths (cream cards, ink boxes, ink strings, ticks). Each pops at `at`
- *  (one frame at +30 %, then the 7 % spring settle is skipped: tiny far tags just pop). `ink` = world width for the
- *  outlines (spots under `inkFrom` world px get no outline, only the box). */
-export const CheckBoxTags: React.FC<{spots: CheckSpot[]; ink?: number; inkFrom?: number; seed?: string}> = ({spots, ink = 0.8, inkFrom = 9}) => {
-  const t = useTime();
-  let cards = '';
-  let lines = '';
-  let thin = '';
-  let ticks = '';
-  for (const sp of spots) {
-    if (sp.at !== undefined && t < sp.at) continue;
-    const k = sp.at !== undefined && t < sp.at + 0.067 ? 1.3 : 1;
-    const g = checkTagGeom(sp.x, sp.y, sp.size * k);
-    cards += g.card;
-    if (sp.size >= inkFrom) lines += g.card + g.box + g.str;
-    else thin += g.box;
-    if (sp.ticked) ticks += g.tick;
-  }
-  return (
-    <>
-      {cards ? <path d={cards} fill={palette.cream} /> : null}
-      {lines ? <path d={lines} fill="none" stroke={palette.ink} strokeWidth={ink} strokeLinejoin="round" strokeLinecap="round" /> : null}
-      {thin ? <path d={thin} fill="none" stroke={palette.ink} strokeWidth={ink * 0.7} strokeLinejoin="round" /> : null}
-      {ticks ? <path d={ticks} fill="none" stroke={palette.ink} strokeWidth={ink * 1.6} strokeLinejoin="round" strokeLinecap="round" /> : null}
-    </>
-  );
-};
-
-/** One check-box tag (a hero-size tag: inked with the scene's Ink, pops with the spring and swings). */
-export const CheckBoxTag: React.FC<{x: number; y: number; size: number; at?: number; ticked?: boolean; tickAt?: number; ink?: number; seed?: string}> = ({x, y, size, at, ticked, tickAt, ink = 2.2, seed = 'cbt'}) => {
-  const t = useTime();
-  if (at !== undefined && t < at) return null;
-  const k = at === undefined ? 1 : springAt(t, at, springs.pop);
-  const sw = at === undefined ? 0 : -16 * Math.exp(-(t - at) * 5.5) * Math.cos((2 * Math.PI * (t - at)) / 0.5);
-  const g = checkTagGeom(0, 0, size);
-  const tickOn = ticked || (tickAt !== undefined && t >= tickAt);
-  return (
-    <XG m={mat.compose(mat.translate(x, y), mat.rotate(sw), mat.scale(k, k))}>
-      <Fill d={g.card} color={palette.cream} offset={[size * 0.06, size * 0.05]} mode="snap" seed={`${seed}/c`} />
-      <Ink d={g.card + g.box + g.str} width={ink} taper={false} vary={0} seed={`${seed}/i`} />
-      {tickOn ? <Ink d={g.tick} width={ink * 1.5} at={tickAt} taper={false} vary={0} seed={`${seed}/t`} /> : null}
-    </XG>
-  );
-};
 
 // ---------------------------------------------------------------- LidCrate (LockCrate lidAt / tagsAt)
 
@@ -132,7 +66,7 @@ export const LidCrate: React.FC<LidCrateProps> = ({x, y, size = 70, n = 3, lidAt
       tags.push(
         <React.Fragment key={i}>
           <Ink d={`M${f1(tx)} ${f1(top + 2)}L${f1(tx + (i - 1.5) * 1.5)} ${f1(stickTop)}`} width={ink * 0.7} taper={false} vary={0} seed={`${seed}/s${i}`} />
-          <CheckBoxTag x={tx + (i - 1.5) * 1.5} y={stickTop - size * 0.1} size={size * 0.3} at={at} ink={ink * 0.75} seed={`${seed}/t${i}`} />
+          <CheckBoxTag x={tx + (i - 1.5) * 1.5} y={stickTop - size * 0.1} size={size * 0.34} at={at} ink={ink * 0.75} seed={`${seed}/t${i}`} />
         </React.Fragment>,
       );
     }

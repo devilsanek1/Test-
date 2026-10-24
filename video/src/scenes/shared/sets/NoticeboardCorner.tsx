@@ -33,17 +33,29 @@ export type WireSpec = {
   x1: number;
   /** End heights relative to the centre height (left, right). */
   rise: [number, number];
+  /** Storyboard v3: the wires END at a pole at pole.x (world), each tied off at its own height ys[i] there (the S07 / S08
+   *  contract heights, so x1 should equal pole.x); the pole stands on `base` (our parapet's coping) and rises to `top`. */
+  pole?: {x: number; base: number; top: number};
 };
 
-/** S07: from the pole on the workshop roof sweeping left; S08: sagging across the whole frame (foreground). */
+/** S07: from the pole on the workshop roof sweeping left; S08 (storyboard v3): from the left edge to a rooftop pole at
+ *  x 540 on the DomeCity parapet (draw the counter board after the wires: it covers their ends); S08wide = review 5's
+ *  wires sagging across the whole frame. */
 export const WIRES = {
   S07: {ys: [700, 730, 760], x0: -260, x1: 1000, rise: [-34, -60]} as WireSpec,
-  S08: {ys: [1211, 1235.5, 1260], x0: -260, x1: 1340, rise: [-60, -60]} as WireSpec,
+  S08: {ys: [1211, 1235.5, 1260], x0: -260, x1: 540, rise: [-60, 0], pole: {x: 540, base: 1446, top: 1178}} as WireSpec,
+  S08wide: {ys: [1211, 1235.5, 1260], x0: -260, x1: 1340, rise: [-60, -60]} as WireSpec,
 } as const;
 
-/** Quadratic through (x0, yc + rise[0]), (540, yc) and (x1, yc + rise[1]): returns its control point. */
+/** Quadratic through (x0, yc + rise[0]), (540, yc) and (x1, yc + rise[1]): returns its control point. With a pole the
+ *  wire ends ON the pole at (pole.x, yc) and sags 22 px between its ends. */
 function wireCtrl(spec: WireSpec, i: number): {a: Pt; c: Pt; b: Pt} {
   const yc = spec.ys[i];
+  if (spec.pole) {
+    const a: Pt = [spec.x0, yc + spec.rise[0] + i * 3];
+    const b: Pt = [spec.pole.x, yc];
+    return {a, c: [(a[0] + b[0]) / 2, Math.max(a[1], b[1]) + 22], b};
+  }
   const a: Pt = [spec.x0, yc + spec.rise[0] + i * 3];
   const b: Pt = [spec.x1, yc + spec.rise[1] - i * 6];
   const cx = (a[0] + b[0]) / 2;
@@ -65,8 +77,27 @@ export const TelephoneWires: React.FC<{spec: WireSpec; width?: number; at?: numb
     const {a, c, b} = wireCtrl(spec, i);
     d += `M${a[0].toFixed(1)} ${a[1].toFixed(1)}Q${c[0].toFixed(1)} ${c[1].toFixed(1)} ${b[0].toFixed(1)} ${b[1].toFixed(1)}`;
   }
+  const P = spec.pole;
   return (
     <>
+      {P ? (
+        <>
+          {/* the rooftop pole on our parapet: an ochre post with a cap, three insulator pins where the wires tie off */}
+          <Fill d={polyPath([[P.x - 8, P.base], [P.x - 6, P.top], [P.x + 6, P.top], [P.x + 8, P.base]])} color={palette.brown} at={at} seed={`${seed}/pole`} />
+          <Ink
+            d={
+              line(P.x - 8, P.base, P.x - 6, P.top, {seed: `${seed}/p1`, over: [0, 3]}) +
+              line(P.x + 8, P.base, P.x + 6, P.top, {seed: `${seed}/p2`, over: [0, 3]}) +
+              line(P.x - 11, P.top, P.x + 11, P.top, {seed: `${seed}/pc`, over: [2, 2]}) +
+              spec.ys.map((yy, i) => `M${(P.x - 6).toFixed(1)} ${yy.toFixed(1)}l${(i % 2 ? 14 : -10).toFixed(1)} 0`).join('')
+            }
+            width={SI.front * 0.8}
+            at={at}
+            taper={false}
+            seed={`${seed}/pi`}
+          />
+        </>
+      ) : null}
       <Ink d={d} width={width} at={at} order="all" taper={false} seed={`${seed}/w`} />
       {pigeons.map((p, k) => {
         const q = wireAt(spec, p.i, p.x);

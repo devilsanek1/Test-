@@ -15,7 +15,12 @@
 // amount): it never moves or flickers. Captions are not part of it: render them after (above) the treatment.
 //
 //   <EdgeTreatment variant="trim" seed="film" amount={1}> <MyScene/> </EdgeTreatment>
+//   <EdgeTreatment variant="paint-medium" seed="scene-04"> ... </EdgeTreatment>   // white paper, colour painted on top
+//   <EdgeTreatment variant="paint-loose" seed="scene-04" hints={EDGE_HINTS['scene-04']}> ... </EdgeTreatment>
 //   variant 'clean' (or amount 0) renders the children untouched (no second render).
+// 'paint' / 'paint-subtle' / 'paint-medium' / 'paint-loose' (edges/paint.ts): the colour clip and the ink clip are
+// UNIONS of flat blocks (several same-wound subpaths, nonzero), so the colour edge steps, bites and runs off like
+// colour laid on by hand; nothing else differs here.
 
 import React, {useId, useMemo} from 'react';
 import {Look} from '../exit';
@@ -26,6 +31,7 @@ import {MASCOT} from '../mascot/colors';
 import type {Seed} from '../rng';
 import type {Pt} from '../sketch';
 import {edgeSpec, EdgeVariant, EdgeOpts} from './variants';
+import type {EdgeHints} from './shared';
 
 /** A faintly warm paper for night / dark scenes (pure white is the brightest thing in a night frame). */
 export const PAPER_WARM = '#FAF6EE';
@@ -35,7 +41,8 @@ export type EdgeTreatmentProps = {
   variant?: EdgeVariant;
   /** Shape seed (default 'edge'): change it for a differently cut edge. */
   seed?: Seed;
-  /** 0 = none, 1 = the designed amount, up to ~1.4 (margins, snips, overshoots and stroke reach scale with it). */
+  /** 0 = none, 1 = the designed amount, up to ~1.4 (margins, snips, overshoots and stroke reach scale with it).
+   *  'paint': the LOOSENESS (0.5 subtle, 1 medium, 1.6 loose); a 'paint-*' preset multiplies its own looseness. */
   amount?: number;
   /** Screen vanishing point for perspective guides (construction). Default world.vp. */
   vp?: Pt;
@@ -50,6 +57,9 @@ export type EdgeTreatmentProps = {
   actorFills?: string[];
   /** Extra flat sky values to paint paper in the margin (margin 'look' only: the other modes catch every fill). */
   skyFills?: string[];
+  /** What the scene under the edge holds ('paint' only; edges/hints.ts): line-art density per region (a corner is
+   *  left bare only where there is drawing) and keep rects (a hero, the mascot, a lamp: never cut by a colour edge). */
+  hints?: EdgeHints;
   /** Draw the colour contour (magenta) and the ink contour (cyan) as hairlines (tuning). */
   debug?: boolean;
   children?: React.ReactNode;
@@ -89,10 +99,11 @@ function inkCss(cls: string, paper: string, margin: 'actors' | 'strict' | 'look'
   return rules.join('\n');
 }
 
-export const EdgeTreatment: React.FC<EdgeTreatmentProps> = ({variant = 'clean', seed = 'edge', amount = 1, vp, paper: paperIn, margin = 'actors', actorFills, skyFills, debug, children}) => {
+export const EdgeTreatment: React.FC<EdgeTreatmentProps> = ({variant = 'clean', seed = 'edge', amount = 1, vp, paper: paperIn, margin = 'actors', actorFills, skyFills, hints, debug, children}) => {
   const uid = 'edge' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const paper = paperColor(paperIn);
-  const opts: EdgeOpts = useMemo(() => ({vp}), [vp?.[0], vp?.[1]]);
+  const hintKey = hints ? JSON.stringify(hints) : '';
+  const opts: EdgeOpts = useMemo(() => ({vp, hints}), [vp?.[0], vp?.[1], hintKey]);
   const spec = edgeSpec(variant, seed, amount, opts);
   const actors = useMemo(() => uniq([...ACTOR_FILLS, ...(actorFills ?? [])]), [actorFills?.join(',')]);
   const css = useMemo(() => inkCss(uid, paper, margin, actors, skyFills ?? []), [uid, paper, margin, actors, skyFills?.join(',')]);

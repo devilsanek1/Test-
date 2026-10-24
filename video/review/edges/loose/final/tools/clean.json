@@ -1,0 +1,14 @@
+[
+ {"props": {"variant": "clean", "shot": "street"}, "out": "review/edges/loose/final/stills/clean_street.png"},
+ {"props": {"variant": "clean", "shot": "monument"}, "out": "review/edges/loose/final/stills/clean_monument.png"},
+ {"props": {"variant": "clean", "shot": "vista"}, "out": "review/edges/loose/final/stills/clean_vista.png"},
+ {"props": {"variant": "clean", "shot": "street", "from": 3.2, "cam": true, "captions": false}, "t": 0, "out": "review/edges/loose/final/stills/scan/street_clip_0.png"},
+ {"props": {"variant": "clean", "shot": "street", "from": 3.2, "cam": true, "captions": false}, "t": 3, "out": "review/edges/loose/final/stills/scan/street_clip_3.png"},
+ {"props": {"variant": "clean", "shot": "street", "from": 3.2, "cam": true, "captions": false}, "t": 5.9, "out": "review/edges/loose/final/stills/scan/street_clip_6.png"},
+ {"props": {"variant": "clean", "shot": "monument", "captions": false}, "t": 0, "out": "review/edges/loose/final/stills/scan/monument_0.png"},
+ {"props": {"variant": "clean", "shot": "monument", "captions": false}, "t": 3, "out": "review/edges/loose/final/stills/scan/monument_3.png"},
+ {"props": {"variant": "clean", "shot": "monument", "captions": false}, "t": 5.9, "out": "review/edges/loose/final/stills/scan/monument_6.png"},
+ {"props": {"variant": "clean", "shot": "vista", "captions": false}, "t": 0, "out": "review/edges/loose/final/stills/scan/vista_0.png"},
+ {"props": {"variant": "clean", "shot": "vista", "captions": false}, "t": 3, "out": "review/edges/loose/final/stills/scan/vista_3.png"},
+ {"props": {"variant": "clean", "shot": "vista", "captions": false}, "t": 5.9, "out": "review/edges/loose/final/stills/scan/vista_6.png"}
+]

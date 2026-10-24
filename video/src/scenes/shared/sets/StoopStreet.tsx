@@ -27,6 +27,7 @@ import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {crown, crownTicks, line, polyPath, rect, rectPath, wire, wirePoint, Pt} from '../../../lib/sketch';
 import {wallQuad} from '../../../lib/persp';
+import {useTod} from '../../../lib/tod';
 import {mat, XG} from '../../../lib/xf';
 import {Bird, Tree} from '../../../lib/kit';
 import {brickHints, cornice, GlowDiscs, HALF, LayerWrap, NightGround, noWrap, paneFill, SetPlace, SetTod, SI, windowInk} from './common';
@@ -91,6 +92,24 @@ export const STOOP = {
     {kind: 'planter', x: 482, y: 1394, s: 0.72},
     {kind: 'bike', x: 760, y: 1446, s: 1.05},
   ] as FurnitureItem[],
+  // ---- storyboard v3 (S09 Part A)
+  /** The crate slot on step 2's tread (bottom centre of the crate: the props LockCrate's ground point). */
+  crate: [395, 1226] as Pt,
+  /** tod="dusk": the houses whose windows are still lit at the cut (in `duskOffAt` order: they pop off one by one). */
+  duskLit: [
+    {side: 'left' as const, i: 2},
+    {side: 'right' as const, i: 3},
+    {side: 'right' as const, i: 1},
+  ],
+  /** Dawn rim strips (peach) on the facades' sun side (the sun rises at the VP): the hero house's right edge and the far
+   *  towers' VP-facing edges, all below world y 650 (screen >= 600 at the S09 camera). [x, y, w, h]. */
+  dawnRims: [
+    [512, 660, 8, 570],
+    [640, 812, 6, 160],
+    [716, 760, 6, 240],
+    [748, 842, 6, 160],
+    [818, 866, 6, 150],
+  ] as [number, number, number, number][],
 } as const;
 
 const LEFT_ROW = {quad: wallQuad({vp: [720, 1060], x: 520, top: 660, bottom: 1370, depth: 0.905}), n: 16, H: 700, hw: 700 * 0.62, storeys: 4, side: 'left' as const, seed: 'stoopL', colors: [palette.cream, palette.sand, palette.mintPale, palette.tan]};
@@ -341,8 +360,18 @@ export type StoopStreetProps = {
   tod?: SetTod;
   /** Night features (stars, lit windows, lamp glows, tower dots) pop off at this time (the dawn). */
   nightUntil?: number;
-  /** Dawn peach horizon band appears at this time (default: with tod 'dawn' / nightUntil). */
+  /** Dawn: the peach horizon band AND peach rim strips on the facades' sun side (STOOP.dawnRims) pop at this time
+   *  (default: with tod 'dawn' / nightUntil). Inside a World whose sky key turns 'dawn' (S09: {tod: 'dawn', wipe: 'up'})
+   *  each piece also pops when the wipe edge reaches it, and the dusk features pop off the same way. */
   dawnAt?: number;
+  /** tod="dusk" (S09's cut, under a World dusk key): the lamp glows ON and a few windows lit (STOOP.duskLit), no stars,
+   *  no night ground; they pop off at nightUntil / as the dawn wipe passes them. The lit windows pop off one by one at
+   *  these times (STOOP.duskLit order). */
+  duskOffAt?: number[];
+  /** The lamp-post glow drops one step for two frames (one flicker, no blink). */
+  glowFlickerAt?: number;
+  /** v3 slot: the crate on step 2's tread (STOOP.crate (395, 1226), drawn on the stoop, under heroSlot). */
+  crate?: React.ReactNode;
   /** The sun (scene-owned): drawn behind the far towers. */
   sun?: React.ReactNode;
   /** The two steps (pop-ups / draw-on). The storyboard beats on them are <StoopBeats/> in `heroSlot`. */
@@ -389,6 +418,9 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
   tod = 'day',
   nightUntil,
   dawnAt,
+  duskOffAt,
+  glowFlickerAt,
+  crate,
   sun,
   stoop,
   heroSlot,
@@ -416,7 +448,8 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
 }) => {
   const t = useTime();
   const night = tod === 'night' && (nightUntil === undefined || t < nightUntil);
-  const dawnBand = tod === 'dawn' || (dawnAt !== undefined && t >= dawnAt) || (tod === 'night' && nightUntil !== undefined && t >= nightUntil);
+  const dusk = tod === 'dusk' && (nightUntil === undefined || t < nightUntil);
+  const dawnBand = tod === 'dawn' || (dawnAt !== undefined && t >= dawnAt) || ((tod === 'night' || tod === 'dusk') && nightUntil !== undefined && t >= nightUntil);
   const sz = typeof season === 'string' ? season : season.reduce<Season>((acc, k) => (t >= k.t ? k.s : acc), season[0]?.s ?? 'green');
   const crownColor = SEASON[sz];
   const VP = STOOP.vp;
@@ -429,7 +462,9 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
   const farLayer = (
     <>
       {night ? <Stars seed={seed} /> : null}
-      {dawnBand ? <Fill rect={[-160, 940, 1400, 124]} color={palette.peach} offset={false} mode="snap" seed={`${seed}/dawn`} /> : null}
+      <DawnOnly on={dawnBand} p={[720, 1000]}>
+        <Fill rect={[-160, 940, 1400, 124]} color={palette.peach} offset={false} mode="snap" seed={`${seed}/dawn`} />
+      </DawnOnly>
       <Fill d={G.towersFar} color={night ? palette.tealDark : TOWER_HAZE[1]} offset={false} mode="snap" at={fa} seed={`${seed}/towersF`} />
       <Fill d={G.towers} color={night ? palette.tealDark : TOWER_HAZE[0]} offset={false} mode="snap" at={fa} seed={`${seed}/towers`} />
       {night ? <Fill d={G.towerDots} color={palette.peach} offset={false} mode="snap" seed={`${seed}/tdots`} /> : <Fill d={G.towerDayDots} color={HALF.daySky} offset={false} mode="snap" at={fa} seed={`${seed}/tddots`} />}
@@ -459,11 +494,24 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
         <Tree key={i} x={tr.x} y={tr.base} size={tr.size} h={tr.size * 2.4} color={i % 2 ? palette.teal : palette.sage} sway={false} width={i === 0 ? SI.far : SI.hair} seed={`${seed}/st${i}`} at={drawAt !== undefined ? drawAt + 0.4 + i * 0.05 : undefined} />
       ))}
       <PerspRow layout={L} drawAt={drawAt !== undefined ? drawAt + 0.15 : undefined} lit={night} lock={rowLock ? (i) => rowLock('left', i) : undefined} seed={`${seed}/L`} />
-      {night
+      {dusk
+        ? STOOP.duskLit.map((q, k) => {
+            const h = (q.side === 'left' ? L : R).houses[q.i];
+            if (!h || !h.g.lit || (duskOffAt?.[k] !== undefined && t >= (duskOffAt[k] as number))) return null;
+            return (
+              <DuskOnly key={`dl${k}`} p={[(h.base[0] + h.top[0]) / 2, (h.base[1] + h.top[1]) / 2]}>
+                <Fill d={h.g.lit} color={palette.peach} mode="snap" offset={false} seed={`${seed}/dl${k}`} />
+              </DuskOnly>
+            );
+          })
+        : null}
+      {night || dusk
         ? STOOP.nightLamps.map((l, i) => (
             <React.Fragment key={i}>
               <Ink d={line(l.x, l.base, l.x, l.head + 8, {seed: `${seed}/nl${i}`, over: 0})} width={SI.far} taper={false} />
-              <GlowDiscs cx={l.x} cy={l.head} steps={[[i ? 24 : 34, palette.peach], [i ? 15 : 21, HALF.peach], [i ? 7 : 10, palette.cream]]} />
+              <DuskOnly p={[l.x, l.head]} gate={dusk}>
+                <GlowDiscs cx={l.x} cy={l.head} steps={[[i ? 24 : 34, palette.peach], [i ? 15 : 21, HALF.peach], [i ? 7 : 10, palette.cream]]} />
+              </DuskOnly>
             </React.Fragment>
           ))
         : null}
@@ -495,6 +543,13 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
       {ivy > 0 ? <Ivy k={ivy} seed={seed} /> : null}
       {heroLock === false ? null : <Lock x={STOOP.lock4.x} y={STOOP.lock4.y} size={STOOP.lock4.h} seed={`${seed}/lock4`} ink={SI.far} {...heroLock} />}
       <Stoop {...stoop} drawAt={stoop?.drawAt ?? drawAt} seed={`${seed}/stoop`} />
+      {/* v3 dawn rims: peach strips on the sun side (the sun rises at the VP) */}
+      {STOOP.dawnRims.map((r, i) => (
+        <DawnOnly key={`rim${i}`} on={dawnBand} p={[r[0] + r[2] / 2, r[1] + r[3] / 2]}>
+          <Fill rect={r} color={palette.peach} offset={false} mode="snap" seed={`${seed}/rim${i}`} />
+        </DawnOnly>
+      ))}
+      {crate}
       {heroSlot}
     </>
   );
@@ -515,7 +570,11 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
             return <Bird key={i} x={q[0]} y={q[1] + 1} s={0.85} seed={`${seed}/pg${i}`} flyAt={pigeonsFlyAt !== undefined ? pigeonsFlyAt + i * 0.1 : undefined} color={i ? palette.sand : palette.white} />;
           })
         : null}
-      {night ? <GlowDiscs cx={STOOP.lamp.lantern[0] + 24} cy={STOOP.lamp.lantern[1] - 18} steps={[[52, palette.peach], [38, HALF.peach]]} /> : null}
+      {night || dusk ? (
+        <DuskOnly p={[STOOP.lamp.lantern[0] + 24, STOOP.lamp.lantern[1] - 18]} gate={dusk}>
+          <GlowDiscs cx={STOOP.lamp.lantern[0] + 24} cy={STOOP.lamp.lantern[1] - 18} steps={glowFlickerAt !== undefined && t >= glowFlickerAt && t < glowFlickerAt + 0.067 ? [[38, HALF.peach]] : [[52, palette.peach], [38, HALF.peach]]} />
+        </DuskOnly>
+      ) : null}
       <Fill d={G.lampFill} color={palette.tealDark} at={fa} mode="snap" seed={`${seed}/lamp`} />
       <Fill d={G.lantern} color={night ? palette.cream : palette.cream} at={fa} mode="snap" seed={`${seed}/lant`} />
       <Ink d={G.lampInk + rect(STOOP.lamp.lantern[0] + 6, STOOP.lamp.lantern[1] - 40, 36, 46, {seed: `${seed}/lanti`, over: 'small'})} width={SI.front} at={ia} seed={`${seed}/lampi`} />
@@ -544,6 +603,21 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
       {wrap('near', 1.0, nearNode)}
     </SetPlace>
   );
+};
+
+/** Dusk features (glows, lit windows) at world point p: gone once the World's dawn wipe has reached p (useTod is 'dawn'
+ *  there) — the lamp glows pop off as the wipe passes them. `gate` false = always shown (night mode). */
+const DuskOnly: React.FC<{p: Pt; gate?: boolean; children?: React.ReactNode}> = ({p, gate = true, children}) => {
+  const tod = useTod(p);
+  if (gate && tod === 'dawn') return null;
+  return <>{children}</>;
+};
+
+/** Dawn pieces (band, rims) at world point p: shown from `on` (dawnAt / nightUntil) or once the World's dawn wipe has
+ *  reached p. */
+const DawnOnly: React.FC<{p: Pt; on: boolean; children?: React.ReactNode}> = ({p, on, children}) => {
+  const tod = useTod(p);
+  return on || tod === 'dawn' ? <>{children}</> : null;
 };
 
 const Stars: React.FC<{seed: string}> = ({seed}) => {

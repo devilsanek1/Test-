@@ -112,10 +112,26 @@ export type WorkshopProps = {
   slotClickAt?: number | number[];
   chromeAt?: number;
   screenOnAt?: number;
+  /** v3 slot: the little hand-lettered sign on the shop-window BLIND ('still fixing...', S06 / the S07 corner). It rides
+   *  the blind (shown while the blind covers >= 30 % of the window): a node, or (a) => node with the anchor `a` = the
+   *  sign centre on the blind's upper third (x, y), the blind width w (S06 200, S07 140: size the lettering to fit),
+   *  visible height h and bottom edge (pin a LabelTag card there). */
+  blindSign?: React.ReactNode | ((a: BlindAnchor) => React.ReactNode);
   seed?: string;
 };
 
-export const Workshop: React.FC<WorkshopProps> = ({layout = WORKSHOP_LANE, glowAt, makersAt, blind = 'up', blindDownAt, blindUpAt, signSwingAt, doorOpenAt, slotClickAt, chromeAt, screenOnAt, seed = 'ws'}) => {
+/** Where a blind sign sits right now (world): the sign's centre on the visible blind (its upper third, clear of the
+ *  corner preset's hanging elephant sign), the blind's width / visible height and its bottom edge. */
+export type BlindAnchor = {x: number; y: number; w: number; h: number; bottom: number};
+
+/** The blind-sign anchor of a layout with `cover` of its blind down (1 = fully down: S06 (840, 1137), S07 corner
+ *  (870, 998)). */
+export const blindSignAnchor = (L: WorkshopLayout, cover = 1): BlindAnchor => {
+  const [sx, sy, sw, sh] = L.shop;
+  return {x: sx + sw / 2, y: sy + sh * cover * 0.32, w: sw, h: sh * cover, bottom: sy + sh * cover};
+};
+
+export const Workshop: React.FC<WorkshopProps> = ({layout = WORKSHOP_LANE, glowAt, makersAt, blind = 'up', blindDownAt, blindUpAt, signSwingAt, doorOpenAt, slotClickAt, chromeAt, screenOnAt, blindSign, seed = 'ws'}) => {
   const t = useTime();
   const L = layout;
   const H = L.base - L.roof;
@@ -162,6 +178,7 @@ export const Workshop: React.FC<WorkshopProps> = ({layout = WORKSHOP_LANE, glowA
           <Ink d={ribs + line(sx - 2, sy + sh * bk, sx + sw + 2, sy + sh * bk, {seed: `${seed}/bb`, over: 0})} width={SI.hair} taper={false} />
         </>
       ) : null}
+      {blindSign && bk >= 0.3 ? (typeof blindSign === 'function' ? blindSign(blindSignAnchor(L, bk)) : blindSign) : null}
       <Fill rect={[sx - 6, sy - 30, sw + 12, 30]} color={palette.tealDark} offset={[1.5, 1]} seed={`${seed}/box`} />
       <Ink d={rect(sx - 6, sy - 30, sw + 12, 30, {seed: `${seed}/boxi`, over: 'small'}) + rect(sx, sy, sw, sh, {seed: `${seed}/shopi`, over: 'small'}) + line(sx - 10, sy + sh + 5, sx + sw + 10, sy + sh + 5, {seed: `${seed}/sill`, over: 'small'})} width={SI.mid} taper={false} />
       {/* door with mail slot + lock tick; opens (dark interior, the leaf swings) */}

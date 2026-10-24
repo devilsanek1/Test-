@@ -17,8 +17,8 @@ import {mat, XG} from '../../../lib/xf';
 import {Noticeboard} from '../../../lib/kit';
 import {Seed} from '../../../lib/rng';
 import {popK, PopAt} from './common';
-import {BackSoonTag, Bit, Bollard, BrowserChrome, Calendar, CalPage, CheckFlag, CheckMark, Citizen, EdgeOnlooker, ElephantEmblem, ElephantPlaque, ElephantStamp, Lock, LockProps, Magnifier, MailSlot, Maker, PaneRect, QuestionMark, RailBoard, RollerShutter, ShutterPadlock, TargetRing, WrenchGlyph, WrenchTag} from '../props';
-import type {BackSoonTagProps, BrowserChromeProps, ShutterPadlockProps} from '../props';
+import {BackSoonTag, Bit, Bollard, BrowserChrome, Calendar, CalPage, CheckBoxTag, CheckFlag, CheckMark, Citizen, EdgeOnlooker, ElephantEmblem, ElephantPlaque, ElephantStamp, Keeper, LabelTag, Lock, LockCrate, LockProps, Magnifier, MailSlot, Maker, MakersCart, PaneRect, QuestionMark, RailBoard, RollerShutter, ShutterPadlock, SupportTag, TargetRing, WrenchGlyph, WrenchTag} from '../props';
+import type {BackSoonTagProps, BrowserChromeProps, ElephantPlaqueProps, LabelTagProps, ShutterPadlockProps} from '../props';
 import type {Acc, Hair} from '../../../lib/kit';
 export type {LockProps, CalPage, PaneRect, BackSoonTagProps, ShutterPadlockProps};
 
@@ -102,8 +102,8 @@ export const LockSlot: React.FC<LockSlotProps> = ({x, y, h, variant = 'closed', 
 
 export type PlaqueVariant = 'new' | 'blank' | 'old' | 'dot';
 /** -> props ElephantPlaque (P2): 'new' sand plate, 'blank' cream, 'old' tan + chipped corner, 'dot' LOD. `at` = tick-on pop. */
-export const PlaqueSlot: React.FC<{x: number; y: number; size: number; variant?: PlaqueVariant; width?: number; seed?: Seed; at?: number}> = ({x, y, size, variant = 'new', width = stroke.inkThin, seed = 'plq', at}) => (
-  <ElephantPlaque x={x} y={y} size={size} variant={variant === 'blank' ? 'blank' : variant === 'dot' ? 'dot' : 'plate'} age={variant === 'old' ? 'old' : 'new'} tickOnAt={at} ink={width} seed={seed} />
+export const PlaqueSlot: React.FC<{x: number; y: number; size: number; variant?: PlaqueVariant; width?: number; seed?: Seed; at?: number; extra?: Partial<ElephantPlaqueProps>}> = ({x, y, size, variant = 'new', width = stroke.inkThin, seed = 'plq', at, extra}) => (
+  <ElephantPlaque x={x} y={y} size={size} variant={variant === 'blank' ? 'blank' : variant === 'dot' ? 'dot' : 'plate'} age={variant === 'old' ? 'old' : 'new'} tickOnAt={at} ink={width} seed={seed} {...extra} />
 );
 
 // ---------------------------------------------------------------- P3 Bit
@@ -226,6 +226,19 @@ export const EmblemSlot: React.FC<{x: number; y: number; size: number; width?: n
 export const CitizenSlot: React.FC<{x: number; y: number; h: number; silhouette?: boolean; riseAt?: number; body?: string; hair?: Hair; acc?: Acc[]; walk?: {at?: number; hz?: number; to?: [number, number]; dur?: number}; bob?: number; flip?: boolean; color?: string; seed?: Seed}> = (p) => <Citizen {...p} />;
 /** -> props EdgeOnlooker (P11): big head + shoulders at a frame side, torso cropped by the bottom; (x, y) = head centre. */
 export const OnlookerSlot: React.FC<{x: number; y: number; head?: number; hair?: Hair; acc?: Acc[]; body?: string; riseAt?: number; raisePhoneAt?: number; rim?: 'left' | 'right' | false; arms?: 'both' | 'near' | false; bob?: number; seed?: Seed}> = (p) => <EdgeOnlooker {...p} />;
+/** -> props LabelTag (v3 labels: tag / card / slip / notice / sign / stamp). Sets only render it as a DEFAULT inside a
+ *  label slot (previews); scenes pass their own LabelTag with the storyboard text and times. */
+export const LabelSlot: React.FC<LabelTagProps> = (p) => <LabelTag {...p} />;
+/** -> props LockCrate: a crate of new locks (ground point under its centre, `size` = width). */
+export const CrateSlot: React.FC<React.ComponentProps<typeof LockCrate>> = (p) => <LockCrate {...p} />;
+/** -> props MakersCart: the makers' handcart (ground point under its centre, `size` = bed length). */
+export const CartSlot: React.FC<React.ComponentProps<typeof MakersCart>> = (p) => <MakersCart {...p} />;
+/** -> props CheckBoxTag (S09): a cream check-box tag hanging from (x, y), `size` wide; `ticked` or `tickAt`. */
+export const CheckBoxTagSlot: React.FC<{x: number; y: number; size?: number; ticked?: boolean; at?: number; tickAt?: number; swingAt?: number | number[]; ink?: number; seed?: Seed}> = (p) => <CheckBoxTag {...p} />;
+/** -> props SupportTag (S10): the makers' sage 'supported' tag (cream check, elephant stamp) hanging from (x, y). */
+export const SupportTagSlot: React.FC<{x: number; y: number; size?: number; at?: number; checkAt?: number; stampAt?: number; swingAt?: number | number[]; ink?: number; seed?: Seed}> = (p) => <SupportTag {...p} />;
+/** -> props Keeper (P11): the site keeper (sand coat, teal cap, tool belt); (x, y) = feet. */
+export const KeeperSlot: React.FC<{x: number; y: number; h: number; walk?: {at?: number; hz?: number; to?: [number, number]; dur?: number}; installAt?: number; installDur?: number; riseAt?: number; depth?: 'front' | 'mid' | 'far' | 'hair'; flip?: boolean; seed?: Seed}> = (p) => <Keeper {...p} />;
 /** -> props Maker (P11): cream apron over teal; `bust` = waist-up at a bench. (x, y) = feet (bust: waist). */
 export const MakerSlot: React.FC<{x: number; y: number; h: number; bust?: boolean; work?: number; riseAt?: number; seed?: Seed; flip?: boolean}> = (p) => <Maker {...p} />;
 /** -> props MailSlot (P9): (x, y) = centre, 50 x 10; flap clicks at clickAt. */

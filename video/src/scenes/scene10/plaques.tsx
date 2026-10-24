@@ -6,13 +6,12 @@
 
 import React from 'react';
 import {palette} from '../../lib/theme';
-import {ease as E, prog, useTime} from '../../lib/time';
+import {ease as E, prog, TimeShift, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {blob, line, polyPath, Pt, rect, roundRect} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
-import {Bit, Cobweb, ElephantEmblem, pendulum, popK} from './kit';
-import {SupportTag} from './shims';
+import {Bit, Cobweb, ElephantEmblem, pendulum, popK, SupportTag} from './kit';
 
 /** Bracket root for a hanging sign whose face centre is (x, y) (= sets/propSlots bracketFor). */
 export function bracketFor(x: number, y: number, size: number, wallX: number): {x: number; y: number; side: 'left' | 'right'; arm: number} {
@@ -20,6 +19,11 @@ export function bracketFor(x: number, y: number, size: number, wallX: number): {
   const arm = Math.max(size * 0.6, Math.abs(x - wallX) / 0.66);
   return {x: x - (side === 'right' ? 1 : -1) * arm * 0.66, y: y - (66 * size) / 100, side, arm};
 }
+
+/** Support tag width (world px; props SupportTag: body w x 0.82 w under a 0.16 w loop). */
+export const TAG_W = 42;
+/** Hang point -> the tag body's centre (props SupportTag geometry). */
+export const tagBodyOffset = (w: number) => w * (0.16 + 0.41);
 
 const CHIPPED: Pt[] = [[-50, -50], [26, -50], [33, -42], [38, -44], [44, -36], [50, -30], [50, 50], [-50, 50]];
 
@@ -43,7 +47,7 @@ export type HangPlaqueProps = {
   /** A support tag lands at this face-local hang point (100-unit face coords) at `at`, its check at `tickAt`. */
   tag?: {at: number; tickAt: number; hang: Pt; size?: number};
   /** Bit: pops on the hook at `at`, crawls down the chain onto the face and into the web corner (arrives at + 0.4). */
-  bit?: {at: number; size: number};
+  bit?: {at: number; size: number; /** struggle bursts, s after he is caught */ bursts?: number[]};
   seed?: string;
 };
 
@@ -65,7 +69,8 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
   const W = 3.4 / s;
   const brW = Math.max(W * 1.3, 2.4 / s);
   const k = popK(t, at, 0.08, 0.2);
-  const sw = pendulum(t, at, -16, 0.5, 0.8) * dir;
+  // the swing out, then a jolt when the face flips (old) and a smaller one when the cane pops
+  const sw = (pendulum(t, at, -16, 0.5, 0.8) + pendulum(t, p.flipOldAt !== undefined ? p.flipOldAt + 0.1 : undefined, 8, 0.5, 0.45) + pendulum(t, p.caneAt, -4, 0.45, 0.4)) * dir;
 
   // ---- face state
   const flipQ = p.flipOldAt !== undefined ? prog(t, p.flipOldAt, 0.2, E.inOutSine) : 0;
@@ -109,16 +114,37 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
     } else {
       // caught: legs flail, the body jerks in short bursts
       const d = t - arrive;
-      const burst = Math.max(0, Math.sin(d * 2 * Math.PI * 0.9));
-      const jerk = 9 * burst * Math.sin(d * 2 * Math.PI * 7);
+      // struggle bursts: right after he is caught, on 'old', on 'not' and on 'anymore' (a beat each)
+      const bursts = p.bit.bursts ?? [0, 0.7, 1.4, 2.3];
+      let burst = 0;
+      let last = -1;
+      for (const bt of bursts) {
+        if (d >= bt && d < bt + 0.32) burst = Math.max(burst, Math.sin(((d - bt) / 0.32) * Math.PI));
+        if (d >= bt) last = bt;
+      }
+      const jerk = 12 * burst * Math.sin(d * 2 * Math.PI * 7);
       const ang = (Math.atan2(path[2][1] - path[1][1], path[2][0] - path[1][0]) * 180) / Math.PI - 180;
-      face.push(<Bit key="bit" x={path[2][0]} y={path[2][1]} size={bs} flip state={burst > 0.2 ? 'scuttle' : 'idle'} rot={ang + jerk} look="up" seed={`${seed}/bit`} />);
+      // between the bursts he is stuck STILL (his clock frozen at the end of the last burst): crisp beats, no idle fidget
+      const still = burst <= 0 && last >= 0 ? arrive + last + 0.32 : undefined;
+      const bitNode = <Bit x={path[2][0]} y={path[2][1]} size={bs} flip state={burst > 0.2 ? 'scuttle' : 'idle'} rot={ang + jerk} look="up" blink={false} seed={`${seed}/bit`} />;
+      face.push(still !== undefined ? <TimeShift key="bit" by={t - still}>{bitNode}</TimeShift> : <React.Fragment key="bit">{bitNode}</React.Fragment>);
     }
   }
   if (old && (p.cobwebAt !== undefined || p.age === 'old')) face.push(<Cobweb key="web" x={-50} y={-50} r={46} corner="tl" at={p.cobwebAt} width={1.7 / s} seed={`${seed}/web`} />);
+  // the flip shakes a puff of dust off the plate (specks fly out and shrink away: no fade)
+  if (p.flipOldAt !== undefined && t >= p.flipOldAt + 0.12 && t < p.flipOldAt + 0.5) {
+    const q = E.outCubic(prog(t, p.flipOldAt + 0.12, 0.28));
+    const shrink = 1 - prog(t, p.flipOldAt + 0.36, 0.14);
+    let d = '';
+    ([[-1, -0.7], [1, -0.9], [-1.1, 0.4], [1.1, 0.5], [-0.4, 1.1], [0.5, 1.15]] as Pt[]).forEach(([dx, dy], i) => {
+      const r = 4.2 * shrink;
+      if (r > 0.3) d += blob(dx * (52 + q * 22), dy * (52 + q * 22), r, r, {seed: `${seed}/pf${i}`});
+    });
+    if (d) face.push(<Fill key="puff" d={d} color={palette.sand} mode="none" offset={false} seed={`${seed}/puff`} />);
+  }
   if (old && p.dustAt !== undefined) {
-    const pts: Pt[] = [[-30, 60], [8, 58], [36, 63], [58, 24], [-60, 30]];
-    pts.forEach(([dx, dy], i) => face.push(<Fill key={`dust${i}`} d={blob(dx, dy, 2.8, 2.8, {seed: `${seed}/du${i}`})} color={palette.ink} at={p.dustAt! + i * 0.04} mode="spring" offset={false} seed={`${seed}/du${i}`} />));
+    const pts: Pt[] = [[-26, 60], [14, 58], [52, 30]];
+    pts.forEach(([dx, dy], i) => face.push(<Fill key={`dust${i}`} d={blob(dx, dy, 2.4, 2.4, {seed: `${seed}/du${i}`})} color={palette.ink} at={p.dustAt! + i * 0.04} mode="spring" offset={false} seed={`${seed}/du${i}`} />));
   }
   if (old && p.droopAt !== undefined && t >= p.droopAt && t < p.droopAt + 0.75) {
     // one speck drifts down from the chipped corner, then pops away (shrink, no fade)
@@ -134,7 +160,7 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
     `M${dir * armL} 0q${dir * 8} 0 ${dir * 8} -8q0 -6 ${-dir * 5} -5`;
   const chain = 16;
   const tag = p.tag && t >= p.tag.at ? (
-    <SupportTag x={hookX + p.tag.hang[0]} y={chain + 50 + p.tag.hang[1]} size={(p.tag.size ?? 46) / s} at={p.tag.at} tickAt={p.tag.tickAt} ink={2.2 / s} seed={`${seed}/tag`} />
+    <SupportTag x={hookX + p.tag.hang[0]} y={chain + 50 + p.tag.hang[1]} size={(p.tag.size ?? TAG_W) / s} at={p.tag.at} checkAt={p.tag.tickAt} seed={`${seed}/tag`} />
   ) : null;
   return (
     <XG m={mat.compose(mat.translate(b.x, b.y), mat.scale(s))}>

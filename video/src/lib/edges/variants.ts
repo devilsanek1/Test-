@@ -6,11 +6,11 @@ import {rng, Seed} from '../rng';
 import type {Pt} from '../sketch';
 import {stroke, world} from '../theme';
 import {containsRect, cutPoly, cutSide, organic, pathOf, roundRectPts, smoothClosed} from './rough';
-import {CAPTION_SAFE, EdgeStroke, H, ruled, ruledCorner, STROKE_MAX_Y, W} from './shared';
+import {CAPTION_SAFE, EdgeHints, EdgeStroke, H, ruled, ruledCorner, STROKE_MAX_Y, W} from './shared';
 import {PAINT_LOOSENESS, PaintPreset, paintSpec} from './paint';
 
 export {CAPTION_SAFE, PHONE_UI} from './shared';
-export type {EdgeStroke} from './shared';
+export type {EdgeStroke, EdgeHints, EdgeRect, EdgeInkRegion} from './shared';
 
 /** 'paint' takes its looseness from `amount` (1 = medium); the three presets are named points on that scale. */
 export type EdgeVariant = 'clean' | 'panel' | 'vignette' | 'construction' | 'rough-tb' | 'trim' | 'paint' | PaintPreset;
@@ -37,6 +37,8 @@ export type EdgeSpec = {
 export type EdgeOpts = {
   /** Screen vanishing point for perspective guides (construction). Default world.vp. */
   vp?: Pt;
+  /** What the scene under the edge holds (line-art density per region, keep rects); 'paint' only. */
+  hints?: EdgeHints;
 };
 
 const dir = (a: Pt, b: Pt): Pt => {
@@ -282,7 +284,7 @@ const CACHE = new Map<string, EdgeSpec>();
 /** The spec of a variant (memoised by variant, seed, amount and the VP). */
 export function edgeSpec(variant: EdgeVariant, seed: Seed = 'edge', amount = 1, o: EdgeOpts = {}): EdgeSpec {
   const a = Math.max(0, amount);
-  const key = `${variant}|${seed}|${a.toFixed(3)}|${o.vp?.join(',') ?? ''}`;
+  const key = `${variant}|${seed}|${a.toFixed(3)}|${o.vp?.join(',') ?? ''}|${o.hints ? JSON.stringify(o.hints) : ''}`;
   let s = CACHE.get(key);
   if (s) return s;
   if (variant === 'clean' || a <= 0) s = {variant, colour: null, colourPts: null, strokes: []};
@@ -291,7 +293,7 @@ export function edgeSpec(variant: EdgeVariant, seed: Seed = 'edge', amount = 1, 
   else if (variant === 'construction') s = construction(seed, a, o);
   else if (variant === 'rough-tb') s = roughTB(seed, a);
   else if (variant === 'paint' || variant in PAINT_LOOSENESS) {
-    const g = paintSpec(seed, variant === 'paint' ? a : PAINT_LOOSENESS[variant as PaintPreset] * a);
+    const g = paintSpec(seed, variant === 'paint' ? a : PAINT_LOOSENESS[variant as PaintPreset] * a, o.hints);
     s = {variant, colour: g.colour, colourPts: g.colourPts, colourPolys: g.colourPolys, ink: g.ink, inkPolys: g.inkPolys, strokes: g.strokes};
   }
   else s = trim(seed, a);

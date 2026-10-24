@@ -16,11 +16,12 @@ import {ElephantPlaque, OLD_QUARTER, pendulum, popK, PopUp, SI} from './kit';
 const EYE = OLD_QUARTER.eye; // 1150: the far row stands on the eye line
 const WIDTHS = [44, 46, 42, 45, 43, 44, 46, 42, 44];
 const TOPS = [748, 740, 754, 744, 758, 742, 750, 738, 746];
-/** Old sites (5 of 9, alternating). Old plates sit on sage walls, current (sand) plates on tan / cream walls. */
+/** Old sites (5 of 9, alternating). Old plates sit on sage walls, current (sand) plates on tan / cream walls. An old
+ *  plate flips to tan, puffs dust and drops onto one screw (hangs crooked): the far-row read of 'old'. */
 const OLD = [true, false, true, false, true, false, true, false, true];
 const COLS = [palette.sage, palette.tan, palette.sage, palette.cream, palette.sage, palette.tan, palette.sage, palette.cream, palette.sage];
 export const PLAQUE_Y = 782;
-const PLAQUE = 18;
+const PLAQUE = 20;
 
 export const SECOND = (() => {
   let x = 346;
@@ -72,17 +73,18 @@ const Puff: React.FC<{x: number; y: number; at: number; r?: number; seed: string
   return d ? <Fill d={d} color={palette.sand} mode="none" offset={false} seed={`${seed}/puff`} /> : null;
 };
 
-/** The tiny sage support tag of the far row (one string, a 7 x 10 tag), swinging in. */
+/** The tiny sage support tag of the far row (one string, a 16 x 15 tag with a cream tick), swinging in. */
 const TinyTag: React.FC<{x: number; y: number; at: number; seed: string}> = ({x, y, at, seed}) => {
   const t = useTime();
   if (t < at) return null;
   const k = popK(t, at, 0.12, 0.18);
-  const sw = pendulum(t, at, -18, 0.45, 0.8);
+  const sw = pendulum(t, at, -26, 0.45, 0.85);
   return (
     <XG m={mat.compose(mat.translate(x, y), mat.rotate(sw), mat.scale(k))}>
-      <Ink d={`M0 0L0 4`} width={1.1} taper={false} seed={`${seed}/s`} />
-      <Fill d={rectPath(-4, 4, 8, 10)} color={palette.sage} offset={false} mode="none" seed={`${seed}/f`} />
-      <Ink d={rect(-4, 4, 8, 10, {seed: `${seed}/i`, over: 0.5})} width={1.2} taper={false} seed={`${seed}/i`} />
+      <Ink d={`M0 0L0 5`} width={1.2} taper={false} seed={`${seed}/s`} />
+      <Fill d={rectPath(-8, 5, 16, 15)} color={palette.sage} offset={false} mode="none" seed={`${seed}/f`} />
+      <Ink d={rect(-8, 5, 16, 15, {seed: `${seed}/i`, over: 0.5})} width={1.5} taper={false} seed={`${seed}/i`} />
+      <Ink d={`M-4 12.5l2.6 3.1l5 -6.2`} width={1.9} color={palette.cream} taper={false} seed={`${seed}/c`} />
     </XG>
   );
 };
@@ -102,7 +104,9 @@ export const SecondRow: React.FC<SecondRowProps> = ({popAt, flipAt, windowAt, ta
           <PopUp key={b.i} at={pa} x={b.cx} y={EYE}>
             <Fill rect={[b.x, b.top, b.w + 2, EYE - b.top]} color={b.color} seed={`s10s/b${b.i}`} />
             <Ink d={line(b.x, b.top, b.x + b.w + 2, b.top, {seed: `s10s/t${b.i}`, over: 'small', breaks: false}) + line(b.x, b.top, b.x, EYE, {seed: `s10s/l${b.i}`, over: 0, breaks: false})} width={SI.far} taper={false} seed={`s10s/i${b.i}`} />
-            <ElephantPlaque x={b.cx} y={PLAQUE_Y} size={PLAQUE} variant="plate" age="new" flipOldAt={flips[b.i]} ink={SI.hair} seed={`s10s/p${b.i}`} />
+            <XG m={mat.about(mat.rotate(b.old ? 15 * prog(t, flips[b.i]! + 0.2, 0.3, E.outBack(2.2)) : 0), b.cx - PLAQUE * 0.38, PLAQUE_Y - PLAQUE * 0.38)}>
+              <ElephantPlaque x={b.cx} y={PLAQUE_Y} size={PLAQUE} variant="plate" age="new" flipOldAt={flips[b.i]} ink={SI.hair} seed={`s10s/p${b.i}`} />
+            </XG>
           </PopUp>
         );
       })}
