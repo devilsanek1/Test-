@@ -48,7 +48,7 @@ import {capcheckMode, CaptionBeat, SkyCaptions, ToneRegion, toneOn} from './Capt
 import {exitFillProgress} from './exit';
 import {SceneInfo, SceneTransitionIn, StageCam, StageContexts, STAGE_REST, TransitionInfo, zoomAbout} from './stage';
 import {Ink} from './Ink';
-import {Fill} from './Fill';
+import {bbox, Fill} from './Fill';
 import {blob, circle, crown, crownTicks, line, torso} from './sketch';
 import type {Pt} from './sketch';
 import {MOTION} from './spec';
@@ -105,8 +105,11 @@ const tdur = (t?: FilmTransition | FilmScene['transitionOut']) => (t ? t.dur ?? 
 export type WiperProps = {x: number; p: number; dir: 'left' | 'right'; color?: string};
 /** A wiper component with an optional static `captionRegions`: where (screen px) the element covers the caption band
  *  and which caption tone reads on it there (painted in order, later wins). Without it Film assumes x +- 90 and a tone
- *  derived from the wipe colour. */
-export type WiperComponent = React.FC<WiperProps> & {captionRegions?: (p: WiperProps) => ToneRegion[]};
+ *  derived from the wipe colour. Optional static `half`: the element's real half-width about x (screen px, ink and
+ *  misregistration included); the wipe edge runs from -half - 30 to W + half + 30, so the element enters and leaves
+ *  fully off-frame. Without it Film derives it from `captionRegions` (their bounds + 10 px), else uses the
+ *  FigureWiper's (`wiperHalf`). */
+export type WiperComponent = React.FC<WiperProps> & {captionRegions?: (p: WiperProps) => ToneRegion[]; half?: number};
 
 // ---------------------------------------------------------------- transition math
 
@@ -188,7 +191,39 @@ function transitionInfo(ti: FilmTransition): SceneTransitionIn {
   return {type: ti.type, dur: d, dir, settle: 0, zoomDir: 0};
 }
 
-const WIPE_HALF: Record<string, number> = {figure: 660, pole: 120, foliage: 460, scene: 600, ...CINE_WIPE_HALF};
+const HALF_CACHE = new WeakMap<object, number>();
+/** Half-width (screen px about x) of a wiper element: its static `half`; else the bounds of its `captionRegions` at
+ *  x = 0 (+ 10 px for ink and misregistration: a scene Wiper that wraps a built-in, like the ENGINE template, reports
+ *  the built-in's own outline); else the FigureWiper's (the fallback element for 'scene'). */
+export function wiperHalf(W: React.FC<WiperProps> | undefined): number {
+  const C = W as WiperComponent | undefined;
+  if (!C) return FigureWiper.half!;
+  if (typeof C.half === 'number') return C.half;
+  const hit = HALF_CACHE.get(C);
+  if (hit !== undefined) return hit;
+  let half = FigureWiper.half!;
+  if (C.captionRegions) {
+    let m = 0;
+    for (const r of C.captionRegions({x: 0, p: 0.5, dir: 'right'})) {
+      if (r.rect) m = Math.max(m, -r.rect[0], r.rect[2]);
+      else if (r.d) {
+        const b = bbox(r.d);
+        m = Math.max(m, -b.x, b.x + b.w);
+      }
+    }
+    if (m > 0 && m < 1500) half = Math.ceil(m + 10);
+  }
+  HALF_CACHE.set(C, half);
+  return half;
+}
+
+/** The element a foreground wipe draws (a scene without its own Wiper falls back to the figure) and its half-width. */
+function wipeElement(tr: Extract<FilmTransition, {type: 'foreground-wipe'}>, outgoingId: string, wipers: Record<string, React.FC<WiperProps>>): {W: WiperComponent; half: number} {
+  const el = tr.element ?? 'figure';
+  const W = ((el === 'scene' ? wipers[outgoingId] : ALL_WIPERS[el]) ?? FigureWiper) as WiperComponent;
+  const half = el in CINE_WIPE_HALF ? CINE_WIPE_HALF[el as keyof typeof CINE_WIPE_HALF] : wiperHalf(W);
+  return {W, half};
+}
 
 /** Boundary x of a foreground wipe at progress p (crosses the centre at p = 0.5): the ONE edge curve of both kits
  *  (cine wipeEdgeX: in-out sine from -half - 30 to W + half + 30, so the element enters and leaves without a velocity
@@ -204,9 +239,10 @@ const wipeDrift = (p: number) => 50 * E.inOutSine(clamp(p));
  *  the leading outline). */
 export {FigureWiper};
 
+const POLE_W = 230;
 /** A near-camera post sliding past (lateral truck). */
 export const PoleWiper: WiperComponent = ({x, dir, color = palette.tealDark}) => {
-  const w = 230;
+  const w = POLE_W;
   const rim = dir === 'right' ? x + w / 2 - 26 : x - w / 2;
   return (
     <>
@@ -222,6 +258,8 @@ export const PoleWiper: WiperComponent = ({x, dir, color = palette.tealDark}) =>
 };
 
 PoleWiper.captionRegions = ({x, color = palette.tealDark}) => [{tone: toneOn(color), rect: [x - 130, -200, x + 130, 2200]}];
+/** the bands stick out 14 px past the post */
+PoleWiper.half = POLE_W / 2 + 14 + 2;
 
 const foliageItems = (color: string): [number, number, number, string][] => [
   [-60, 120, 380, palette.sage],
@@ -246,6 +284,14 @@ export const FoliageWiper: WiperComponent = ({x, color = palette.teal}) => {
     </>
   );
 };
+
+/** The widest crown, its 4 px misregistration and half its ink. */
+FoliageWiper.half = Math.ceil(
+  Math.max(...foliageItems(palette.teal).map(([dx, y, r], i) => {
+    const b = bbox(crown(dx, y, r, r * 0.9, {seed: `fol${i}`, bumps: 9}));
+    return Math.max(-b.x, b.x + b.w);
+  })) + 4 + stroke.inkBold / 2 + 1,
+);
 
 /** Each crown takes the caption tone that reads best on its own colour (sage: ink, teal: white). */
 FoliageWiper.captionRegions = ({x, color = palette.teal}) =>
@@ -320,8 +366,9 @@ export function toneRegionsAt(scenes: FilmScene[], T: number, wipers: Record<str
       const p = (T - s.start + d / 2) / d;
       if (p <= 0 || p >= 1) continue;
       const dir = tr.dir ?? 'right';
-      const el = tr.element ?? 'figure';
-      const x = wipeX(p, dir, WIPE_HALF[el]);
+      // the same component Film draws, and its real half-width (so the edge and the element agree)
+      const {W, half} = wipeElement(tr, prev.id, wipers);
+      const x = wipeX(p, dir, half);
       const cx = clamp(x, -1, world.w + 1);
       const tOld = sceneToneAt(prev, T);
       const tNew = sceneToneAt(s, T);
@@ -329,8 +376,6 @@ export function toneRegionsAt(scenes: FilmScene[], T: number, wipers: Record<str
         dir === 'right'
           ? [{tone: tNew, rect: [-200, -200, cx, 2200]}, {tone: tOld, rect: [cx, -200, 1300, 2200]}]
           : [{tone: tOld, rect: [-200, -200, cx, 2200]}, {tone: tNew, rect: [cx, -200, 1300, 2200]}];
-      // the same component Film draws (a scene without its own Wiper falls back to the figure)
-      const W = ((el === 'scene' ? wipers[prev.id] : ALL_WIPERS[el]) ?? FigureWiper) as WiperComponent;
       const props: WiperProps = {x, p, dir, color: tr.color};
       let wr: ToneRegion[] = W.captionRegions ? W.captionRegions(props) : [{tone: tr.color ? toneOn(tr.color) : 'light', rect: [x - 90, -200, x + 90, 2200]}];
       if (tr.captionTone) wr = wr.map((r) => ({...r, tone: tr.captionTone!}));
@@ -493,7 +538,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
         const p = clamp((q + d / 2) / d);
         if (p < 1) {
           const dir = tin.dir ?? 'right';
-          const x = wipeX(p, dir, WIPE_HALF[tin.element ?? 'figure']);
+          const x = wipeX(p, dir, wipeElement(tin, scenes[i - 1].id, wipers).half);
           const cx = clamp(x, 0, world.w);
           clip = dir === 'right' ? `inset(0px ${(world.w - cx).toFixed(1)}px 0px 0px)` : `inset(0px 0px 0px ${cx.toFixed(1)}px)`;
           const drift = (dir === 'right' ? 1 : -1) * (50 - wipeDrift(p));
@@ -525,14 +570,14 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
         const p = clamp((q + d / 2) / d);
         if (p > 0) {
           const dir = tout.dir ?? 'right';
-          const x = wipeX(p, dir, WIPE_HALF[tout.element ?? 'figure']);
+          const {W: Wiper, half} = wipeElement(tout, s.id, wipers);
+          const x = wipeX(p, dir, half);
           const cx = clamp(x, 0, world.w);
           clip = dir === 'right' ? `inset(0px 0px 0px ${cx.toFixed(1)}px)` : `inset(0px ${(world.w - cx).toFixed(1)}px 0px 0px)`;
           const drift = (dir === 'right' ? 1 : -1) * wipeDrift(p);
           cam = {ox: -drift, oy: 0, zoom: 1, rot: 0};
           trans = {type: tout.type, phase: 'out', p};
           // the element itself, above both scenes
-          const Wiper = tout.element === 'scene' ? wipers[s.id] ?? FigureWiper : ALL_WIPERS[tout.element ?? 'figure'] ?? FigureWiper;
           if (p < 1)
             overlays.push(
               <svg key={`wipe${i}`} width={world.w} height={world.h} viewBox={`0 0 ${world.w} ${world.h}`} style={{position: 'absolute', left: 0, top: 0}}>

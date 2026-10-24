@@ -6,6 +6,7 @@ import {rng, Seed} from '../rng';
 import {line, Pt} from '../sketch';
 import {skyCaption, stroke, world} from '../theme';
 import {containsRect, cutPoly, cutSide, organic, pathOf, roundRectPts, smoothClosed} from './rough';
+import type {Rng} from '../rng';
 
 export type EdgeVariant = 'clean' | 'panel' | 'vignette' | 'construction' | 'rough-tb' | 'trim';
 export const EDGE_VARIANTS: EdgeVariant[] = ['clean', 'panel', 'vignette', 'construction', 'rough-tb', 'trim'];
@@ -18,6 +19,10 @@ export type EdgeSpec = {
   colour: string | null;
   /** The clip contour as points (checks, debug). */
   colourPts: Pt[] | null;
+  /** Clip of the INK layer (the line art in the margin): lines stop at it, so they visibly end in the white. null /
+   *  absent = the line art runs off the screen. */
+  ink?: string | null;
+  inkPts?: Pt[] | null;
   /** Hand-drawn overlay strokes (screen px), drawn above both layers and below the captions. */
   strokes: EdgeStroke[];
 };
@@ -46,58 +51,89 @@ const add = (p: Pt, u: Pt, k: number): Pt => [p[0] + u[0] * k, p[1] + u[1] * k];
 /** A ruled stroke from a to b (no auto overshoot: the caller sets the ends), drifting a hair, never broken. */
 const ruled = (a: Pt, b: Pt, seed: string, drift = 0.25) => line(a[0], a[1], b[0], b[1], {seed, over: 'none', drift, bow: 1.2, jitter: 0.6, breaks: false});
 
+// ---------------------------------------------------------------- shared: the corner strokes
+
+/** The artist's ruled corner: one or two thin ruled lines along the cut edges near a corner, sitting 2-4 px OUT in the
+ *  paper (misregistered from the colour like every fill in the style) and overshooting the corner into the margin.
+ *  `h` = the horizontal (along the top cut) and `v` = the vertical (along the side cut); each is optional.
+ *  sx = +1 for a left corner, -1 for a right one. Single strokes, no re-strokes. */
+function ruledCorner(
+  r: Rng,
+  key: string,
+  c: Pt,
+  sx: 1 | -1,
+  o: {h?: {len: [number, number]; over: number}; v?: {len: [number, number]; over: number}},
+): EdgeStroke[] {
+  const out: EdgeStroke[] = [];
+  const m = r.range(2.5, 4); // out into the paper
+  if (o.h) {
+    const y = c[1] - m;
+    const x0 = c[0] + sx * r.range(o.h.len[0], o.h.len[1]);
+    const x1 = c[0] - sx * o.h.over;
+    out.push({d: ruled([x0, y + r.jitter(0.6)], [x1, y + r.jitter(0.6)], `${key}h`, 0.2), w: stroke.inkThin});
+  }
+  if (o.v) {
+    const x = c[0] - sx * m;
+    const y0 = c[1] + r.range(o.v.len[0], o.v.len[1]);
+    const y1 = c[1] - o.v.over;
+    out.push({d: ruled([x + r.jitter(0.6), y0], [x + r.jitter(0.6), y1], `${key}v`, 0.2), w: stroke.inkThin});
+  }
+  return out;
+}
+
+/** Lowest y a stroke near the left / right frame edge may reach: just above the caption block. */
+const STROKE_MAX_Y = CAPTION_SAFE[1] - 12;
+
 // ---------------------------------------------------------------- panel
 
-/** Outward normal of a side running along u on a clockwise (screen) contour. */
-const outward = (u: Pt): Pt => [u[1], -u[0]];
-
-/** Reference 1, nearly full-bleed: full colour inside a hand-cut panel 30-45 px in (each corner its own inset, so
- *  every side runs a hair off-axis), cut in 1-4 scissor strokes per side; the ink-only drawing runs on into the paper
- *  margin; at 2-3 corners ONE of the two sides is inked and overshoots the corner by 22-50 px (sometimes with a
- *  re-stroke 4-7 px outside it), the other side stays open (style bible 3: overshoot + unclosed contours). */
+/** Reference 1's panel, phone-aware: "the sketch runs out at the edges". Colour stops on a hand-cut edge, the line art
+ *  keeps going into white paper and visibly STOPS there (lines end in the white, like f_9.0), and the colour runs out of
+ *  the frame at the bottom (the ground and the foreground figures stay full-bleed and in colour, nothing white sits
+ *  under the platform's description text).
+ *  - LEFT 36-42 px (the side that carries the charm: away from the right rail), cut in 3-4 scissor strokes (2-3 px
+ *    jogs), ending at y 1490-1570 in ONE sharp diagonal snip out to the frame edge; RIGHT 18-22 px (clear of the
+ *    rail), TOP 14-18 px (clear of the status bar); every side off-axis by < 1 px.
+ *  - The ink layer is clipped to a comb on the left: stretches of 80-180 px where the line art stops 6-20 px short of
+ *    the screen edge (a line ends in the white, 20-35 px past the colour), between stretches where it runs off.
+ *  - Two inked corners, single strokes: top-left = a crossing ruled pair, the horizontal ending in the paper;
+ *    top-right (usually sky) = one ruled vertical that overshoots off the top. */
 function panel(seed: Seed, a: number): EdgeSpec {
   const r = rng(`${seed}/panel`);
-  const ins = Array.from({length: 8}, () => r.range(30, 45) * a); // [x, y] inset per corner
-  let corners: Pt[] = [];
+  let L = r.range(36, 42) * a;
+  const R = r.range(18, 22) * a;
+  const T = r.range(14, 18) * a;
+  const yOpen = r.range(1490, 1570);
+  const snipDy = r.range(120, 170);
+  const tilt = () => r.jitter(0.8);
   let pts: Pt[] = [];
-  // at large amounts the side insets give way (never into the caption block: white captions on paper would vanish)
-  for (let k = 0, sx = 1; k < 12; k++, sx *= 0.9) {
-    corners = [
-      [ins[0] * sx, ins[1]],
-      [W - ins[2] * sx, ins[3]],
-      [W - ins[4] * sx, H - ins[5]],
-      [ins[6] * sx, H - ins[7]],
-    ];
-    pts = cutPoly(corners, r.fork('cut'), {
-      dev: 1.6 * a,
-      bow: 2.2 * a,
-      side: (i) => (i % 2 === 0 ? {segs: [1, 2]} : {segs: [2, 4]}),
+  let tl: Pt = [L, T];
+  let tr: Pt = [W - R, T];
+  for (let k = 0; k < 12; k++, L *= 0.9) {
+    tl = [L, T];
+    tr = [W - R, T + tilt()];
+    const corners: Pt[] = [tl, tr, [W - R + tilt(), H + 40], [-40, H + 40], [-40, yOpen + snipDy], [L + tilt(), yOpen]];
+    pts = cutPoly(corners, r.fork(`cut${k}`), {
+      side: (i) =>
+        i === 0 ? {segs: [2, 3], dev: 1.8 * a, bow: 1.2 * a} : i === 1 ? {segs: [3, 4], dev: 2.2 * a, bow: 1.2 * a} : i === 5 ? {segs: [3, 4], dev: 2.6 * a, bow: 1.6 * a} : {segs: [1, 1], dev: 0, bow: 0},
     });
     if (containsRect(pts, CAPTION_SAFE)) break;
   }
-  const strokes: EdgeStroke[] = [];
-  const pick = r.fork('corners').shuffle([0, 1, 2, 3]).slice(0, r.int(2, 3));
-  for (const ci of pick) {
-    const c = corners[ci];
-    const rr = r.fork(`c${ci}`);
-    const incoming = rr.chance(0.5);
-    const u = incoming ? dir(corners[(ci + 3) % 4], c) : dir(c, corners[(ci + 1) % 4]);
-    const n = outward(u);
-    const L = rr.range(70, 220) * a;
-    const O = rr.range(22, 50) * a;
-    const off = rr.jitter(1.2);
-    const p0 = add(add(c, u, incoming ? -L : -O), n, off);
-    const p1 = add(add(c, u, incoming ? O : L), n, off);
-    strokes.push({d: ruled(p0, p1, `${seed}pc${ci}`), w: stroke.inkThin});
-    if (rr.chance(0.45)) {
-      // a re-stroke over part of it, 4-7 px into the margin, a degree off-parallel
-      const k = rr.range(4, 7);
-      const q0 = add(add(c, u, incoming ? -L * 0.45 : -O * 1.1), n, k);
-      const q1 = add(add(c, u, incoming ? O * 1.1 : L * 0.45), n, k + rr.jitter(2.5));
-      strokes.push({d: ruled(q0, q1, `${seed}pr${ci}`), w: stroke.inkHair});
-    }
+  // the ink comb (left side, down to just below the snip)
+  const rc = r.fork('comb');
+  const comb: Pt[] = [];
+  let y = yOpen + 60;
+  while (y > -40) {
+    const h = rc.range(80, 180);
+    const k = rc.chance(0.6) ? rc.range(6, 20) * a : -2;
+    comb.push([k, y], [k, y - h]);
+    y -= h;
   }
-  return {variant: 'panel', colour: pathOf(pts), colourPts: pts, strokes};
+  const inkPts: Pt[] = [[W + 40, -60], [W + 40, H + 40], [-40, H + 40], [-40, yOpen + 60], ...comb, [-40, y - 20], [-40, -60]];
+  const strokes: EdgeStroke[] = [
+    ...ruledCorner(r.fork('tl'), `${seed}ptl`, tl, 1, {h: {len: [170, 290], over: Math.min(L - 10, r.range(18, 30) * a)}, v: {len: [150, STROKE_MAX_Y - T], over: 40}}),
+    ...ruledCorner(r.fork('tr'), `${seed}ptr`, tr, -1, {v: {len: [200, 320], over: 40}}),
+  ];
+  return {variant: 'panel', colour: pathOf(pts), colourPts: pts, ink: pathOf(inkPts), inkPts, strokes};
 }
 
 // ---------------------------------------------------------------- vignette
@@ -233,36 +269,49 @@ function roughTB(seed: Seed, a: number): EdgeSpec {
   return {variant: 'rough-tb', colour: pathOf(pts), colourPts: pts, strokes: []};
 }
 
-// ---------------------------------------------------------------- trim (the house proposal)
+// ---------------------------------------------------------------- trim
 
-/** A hand-trimmed print, phone-aware: the edge charm where it costs no immersion. SLIM hand-cut side margins (16-24 px: the only edges
- *  the viewer sees in the app, so the world stays a window and the scene's lines just cross a sliver of paper),
- *  DEEPER top (48-66) and bottom (64-92) margins that live under the platform UI (the full card charm in a clean
- *  export or a paused frame), every corner snipped with a small scissor chamfer, no added strokes: only the scene's
- *  own lines overshoot, and actors (the sun, the mascot) break the edge in colour. */
+/** A hand-trimmed WINDOW, the quiet one: paper only where a phone viewer sees it and nothing hides it, and the world
+ *  still bleeds. Hand-cut side slivers (LEFT 28-32 px with one stretch where the scissors drift out to 36-40, RIGHT
+ *  22-26 px: clear of the rail), a thin TOP (12-16 px: clear of the status bar), the BOTTOM OPEN (ground and
+ *  foreground run off the frame in colour). One sharp, uneven scissor snip at the top-right corner (a straight
+ *  chamfer, 18-28 x 30-46 px, never a radius); at the top-left the artist's two ruled lines cross and overshoot into
+ *  the paper (single thin strokes). Everything else is the scene's own ink running off the screen across the slivers. */
 function trim(seed: Seed, a: number): EdgeSpec {
   const r = rng(`${seed}/trim`);
-  const side = () => r.range(16, 24) * a;
-  const top = () => r.range(48, 66) * a;
-  const bot = () => r.range(64, 92) * a;
-  const c: Pt[] = [
-    [side(), top()],
-    [W - side(), top()],
-    [W - side(), H - bot()],
-    [side(), H - bot()],
-  ];
-  // each corner snipped: two points 5-12 px from the corner along its sides
-  const pts0: Pt[] = [];
-  c.forEach((p, i) => {
-    const prev = c[(i + 3) % 4];
-    const next = c[(i + 1) % 4];
-    pts0.push(add(p, dir(p, prev), r.range(5, 12) * a), add(p, dir(p, next), r.range(5, 12) * a));
-  });
-  // sides: 0-1 chamfer, 1-2 top, 2-3 chamfer, 3-4 right, ... (odd = a real side)
-  const pts = cutPoly(pts0, r.fork('cut'), {
-    side: (i) => (i % 2 === 0 ? {segs: [1, 1], dev: 0, bow: 0} : i % 4 === 1 ? {segs: [2, 3], dev: 1.2 * a, bow: 1.5 * a} : {segs: [3, 4], dev: 1.2 * a, bow: 1.8 * a}),
-  });
-  return {variant: 'trim', colour: pathOf(pts), colourPts: pts, strokes: []};
+  let L = r.range(28, 32) * a;
+  let Lw = r.range(36, 40) * a;
+  const R = r.range(22, 26) * a;
+  const T = r.range(12, 16) * a;
+  const w0 = r.range(560, 900);
+  const w1 = w0 + r.range(300, 440);
+  const tr0 = r.range(80, 120); // the drift out / back in runs over 80-120 px (a gentle 4-6 deg turn)
+  const tr1 = r.range(80, 120);
+  const snip: [number, number] = [r.range(18, 28) * a, r.range(30, 46) * a];
+  const tilt = () => r.jitter(0.8);
+  let pts: Pt[] = [];
+  let tl: Pt = [L, T];
+  for (let k = 0; k < 12; k++, L *= 0.9, Lw *= 0.9) {
+    tl = [L, T];
+    const yT = T + tilt();
+    const corners: Pt[] = [
+      tl,
+      [W - R - snip[0], yT],
+      [W - R, yT + snip[1]],
+      [W - R + tilt(), H + 40],
+      [L + tilt(), H + 40],
+      [L, w1 + tr1],
+      [Lw, w1],
+      [Lw + tilt(), w0],
+      [L, w0 - tr0],
+    ];
+    pts = cutPoly(corners, r.fork(`cut${k}`), {
+      side: (i) => (i === 0 ? {segs: [2, 3], dev: 1.2 * a, bow: 1 * a} : i === 2 ? {segs: [3, 4], dev: 1.5 * a, bow: 1.2 * a} : i === 4 || i === 6 || i === 8 ? {segs: [1, 2], dev: 1.5 * a, bow: 1 * a} : {segs: [1, 1], dev: 0, bow: 0}),
+    });
+    if (containsRect(pts, CAPTION_SAFE)) break;
+  }
+  const strokes = ruledCorner(r.fork('tl'), `${seed}ttl`, tl, 1, {h: {len: [140, 240], over: Math.min(L - 8, r.range(16, 22) * a)}, v: {len: [140, STROKE_MAX_Y - T], over: 40}});
+  return {variant: 'trim', colour: pathOf(pts), colourPts: pts, ink: null, inkPts: null, strokes};
 }
 
 // ---------------------------------------------------------------- registry

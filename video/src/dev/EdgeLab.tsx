@@ -1,8 +1,8 @@
 // EdgeLab — the screen-edge treatments (src/lib/edges, docs/EDGES.md) over three representative shots, so the variants
 // can be judged side by side and in motion. Composition `EdgeLab` (6 s), driven by props:
-//   {variant: 'clean' | 'panel' | 'vignette' | 'construction' | 'rough-tb' | 'trim', shot: 'street' | 'monument' |
+//   {variant: 'clean' | 'trim' | 'panel' | 'vignette' | 'construction' | 'rough-tb', shot: 'street' | 'monument' |
 //    'vista', amount?: number, seed?: string, from?: number (shot seconds at lab t 0), cam?: boolean, margin?: 'actors' |
-//    'strict', debug?: boolean}
+//    'strict' | 'look', paper?: 'white' | 'warm' | colour, debug?: boolean, captions?: boolean}
 // Shots: KitDemo's eye-level street (default from 7.6 s, dusk), CineDemo's backlit monument (shot B, 13.0 s) and its
 // Arcane vista (shot A, 4.6 s). `cam` adds a slow lab push + pan to the street (its own push ends at 2.4 s) so the
 // edge can be judged while the world moves under it; the monument cranes by itself.
@@ -47,10 +47,11 @@ export const EdgeLab: React.FC<{
   seed?: string;
   from?: number;
   cam?: boolean;
-  margin?: 'actors' | 'strict';
+  margin?: 'actors' | 'strict' | 'look';
   debug?: boolean;
   captions?: boolean;
-}> = ({variant = 'panel', shot = 'street', amount = 1, seed = 'film', from, cam = false, margin = 'actors', debug = false, captions = true}) => {
+  paper?: 'white' | 'warm' | string;
+}> = ({variant = 'panel', shot = 'street', amount = 1, seed = 'film', from, cam = false, margin = 'actors', debug = false, captions = true, paper}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const T = frame / fps;
@@ -68,7 +69,7 @@ export const EdgeLab: React.FC<{
     );
   return (
     <AbsoluteFill style={{background: palette.sky, overflow: 'hidden'}}>
-      <EdgeTreatment variant={variant} seed={seed} amount={amount} margin={margin} debug={debug} vp={EDGE_SHOTS[shot].vp}>
+      <EdgeTreatment variant={variant} seed={seed} amount={amount} margin={margin} debug={debug} paper={paper} vp={EDGE_SHOTS[shot].vp}>
         <Sequence from={-Math.round(start * fps)} layout="none">
           {scene}
         </Sequence>

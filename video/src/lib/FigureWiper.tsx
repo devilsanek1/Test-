@@ -14,6 +14,7 @@
 //   <FigureWiper x={x} p={p} dir="left" color={palette.teal} rim={palette.peach} />
 
 import React from 'react';
+import {getBoundingBox} from '@remotion/paths';
 import {palette, stroke} from './theme';
 import {rng} from './rng';
 import {line, Pt} from './sketch';
@@ -142,9 +143,17 @@ const FigureWiperFC: React.FC<FigureWiperProps> = ({x, p, dir, color = palette.t
   );
 };
 
+/** The figure's real half-width about x (screen px): its outline, the 5 px fill misregistration and half the outline
+ *  ink. Film runs the wipe edge from -half - 30 so the figure enters and leaves fully off-frame (no edge sliver). */
+const FIGURE_HALF = (() => {
+  const b = getBoundingBox(figureGeo(0, 'right').outline);
+  return Math.ceil(Math.max(-b.x1, b.x2) + 5 + (stroke.inkBold + 1) / 2 + 1);
+})();
+
 /** Over the caption band only the hood is there (one dark field): the tone that reads on its colour (white on the
  *  default tealDark), the bob included. */
 export const FigureWiper: WiperComponent = Object.assign(FigureWiperFC as React.FC<WiperProps>, {
+  half: FIGURE_HALF,
   captionRegions: ({x, p, dir, color = palette.tealDark}: WiperProps): ToneRegion[] => [
     {tone: toneOn(color) === 'light' ? 'light' : 'dark', d: figureGeo(x, dir).outline, transform: `translate(0 ${r1(-figureBob(p))})`},
   ],

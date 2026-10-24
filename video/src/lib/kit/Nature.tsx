@@ -207,18 +207,19 @@ export const LampPost: React.FC<LampPostProps> = ({x, y, h = 320, at, seed = 'la
     [ax + 9, top - 18],
     [ax + 18, top + 6],
   ];
-  // switches on with a 1-frame flicker (on, off, on): never a fade. The cone is a static translucent flat polygon.
+  // switches on with a 1-frame flicker (on, off, on): never a fade. The cone is a static translucent flat polygon; the
+  // glow is STEPPED FLAT DISCS from the palette (LampGlow), opaque, like the cine Glow / BigSun rings.
   const dt = lightAt !== undefined ? t - lightAt : -1;
   const lit = dt >= 0 && !(dt > 0.07 && dt < 0.14) ? 1 : 0;
-  const flick = 1;
   return (
     <TodAnchor at={[x, y - h / 2]}>
       {lit > 0 ? (
-        <ExitFade>
-          <Fill d={polyPath([[ax - 14, top + 6], [ax + 14, top + 6], [ax + 80, y], [ax - 80, y]])} color={palette.cream} opacity={0.38 * lit * flick} offset={false} seed={`${seed}/cone`} />
-          <circle cx={ax} cy={top + 8} r={30} fill={palette.peach} opacity={0.3 * lit * flick} />
-          <circle cx={ax} cy={top + 8} r={18} fill={palette.peach} opacity={0.3 * lit * flick} />
-        </ExitFade>
+        <>
+          <ExitFade>
+            <Fill d={polyPath([[ax - 14, top + 6], [ax + 14, top + 6], [ax + 80, y], [ax - 80, y]])} color={palette.cream} opacity={0.38} offset={false} seed={`${seed}/cone`} />
+          </ExitFade>
+          <LampGlow cx={ax} cy={top + 8} seed={seed} />
+        </>
       ) : null}
       <Fill d={`M${x - 4} ${y}L${x - 4} ${top}L${x + 4} ${top}L${x + 4} ${y}Z`} color={color} at={b(at, 0.4)} mode="grow" offset={false} seed={`${seed}/pf`} />
       <Fill d={`M${x - 12} ${y}L${x - 8} ${y - 26}L${x + 8} ${y - 26}L${x + 12} ${y}Z`} color={color} at={b(at, 0.45)} mode="grow" offset={false} seed={`${seed}/base`} />
@@ -233,6 +234,19 @@ export const LampPost: React.FC<LampPostProps> = ({x, y, h = 320, at, seed = 'la
   );
 };
 
+
+/** A lit lamp's glow: stepped, OPAQUE flat discs from the palette (no translucency, no gradient): the peach lamp disc
+ *  (glow.lamp, r 18) and, where the time of day has one (night), the bulb-halo step one shade lighter than the sky
+ *  (todBulbHalo, r 30), slightly hand-cut. Fills, so they relight with the lamp and shrink away in an un-build. */
+const LampGlow: React.FC<{cx: number; cy: number; seed: Seed}> = ({cx, cy, seed}) => {
+  const halo = todBulbHalo[useTod()];
+  return (
+    <>
+      {halo ? <Fill d={blob(cx, cy, 30, 29.2, {seed: `${seed}/g2`, wobble: 0.025})} color={halo} offset={false} seed={`${seed}/g2f`} /> : null}
+      <Fill d={blob(cx, cy, 18, 17.5, {seed: `${seed}/g1`, wobble: 0.025})} color={glow.lamp} offset={false} seed={`${seed}/g1f`} />
+    </>
+  );
+};
 
 // ---------------------------------------------------------------- Festoon: string lights (reference 2). (The cine lane has a richer StringLights with tod / sway.)
 
