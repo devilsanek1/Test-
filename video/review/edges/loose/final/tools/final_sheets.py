@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""Paint edge comparison sheets (review/edges/loose/).
+"""Paint edge FINAL sheets (review/edges/loose/final/, round 3 refined).
 
-  loose_sheets.py grid      -> paint_sheet.png      rows trim / paint-subtle / paint-medium / paint-loose x the three
+  final_sheets.py grid      -> paint_sheet.png      rows trim / paint-subtle / paint-medium / paint-loose x the three
                                                     shots, full frames on a dark phone bezel, labelled
-  loose_sheets.py corners   -> paint_corners.png    per shot and row: top-left, top-right, left edge (mid), bottom-left,
-                                                    bottom-right, 300 px crops from the full-res stills (1:1)
-  loose_sheets.py ref       -> paint_vs_ref.png     reference 1 (f_5.5, f_9.0) panel-edge crops next to paint-loose /
-                                                    paint-medium crops at the same scale
-  loose_sheets.py seeds     -> paint_seeds.png      paint-medium on the street for 6 scene seeds (separate paintings)
-  loose_sheets.py labels    -> tools/sbs_labels.png the label bar for the side-by-side clip
+  final_sheets.py phone     -> paint_phone.png      the same with the phone app UI drawn on top (status bar + header
+                                                    180 px, description block 400 px, the right action rail): what a
+                                                    viewer actually sees of the edge
+  final_sheets.py corners   -> paint_corners.png    per shot and row: top-left, top-right, left edge (y 800-1100),
+                                                    bottom-left, bottom-right, 300 px crops from the full-res stills (1:1)
+  final_sheets.py ref       -> paint_vs_ref.png     reference 1 (f_5.5, f_9.0, f_12.0) panel-edge crops next to
+                                                    paint-medium / paint-loose crops at the same scale
+  final_sheets.py seeds     -> paint_seeds.png      paint-medium on the street for 6 scene seeds (separate paintings)
+  final_sheets.py labels    -> tools/sbs_labels.png the label bar for the 4-panel side-by-side clip
 """
 import os
 import sys
@@ -26,15 +29,15 @@ BEZEL = (24, 24, 26)
 ROWS = ['trim', 'paint-subtle', 'paint-medium', 'paint-loose']
 SHOTS = [('street', 'KitDemo street, dusk'), ('monument', 'CineDemo monument (crane)'), ('vista', 'CineDemo vista (peak sun)')]
 NOTES = {
-    'trim': 'THE PICK (round 2).\nHand-trimmed slivers,\nbottom open. For\nreference.',
-    'paint-subtle': 'PAINT, SUBTLE\n(looseness 0.5).\nWhite paper, colour laid\non as 2 flat blocks: the\nmargin wanders 8-40 px,\none small unpainted\ncorner, one lip, a shelf,\nthe ground runs off the\nbottom once. Ink runs\n14-34 px into the white.',
-    'paint-medium': 'PAINT, MEDIUM (1.0).\n3 blocks stepping in and\nout, notches, an unpainted\ncorner, a bleed corner,\nshelves, two tongues out\nto the edge. Ink 24-58 px\npast the colour, ending\nin the white on ~60 %\nof stretches.',
-    'paint-loose': 'PAINT, LOOSE (1.6).\nAs messy as reference 1\ndares: 4 blocks, deep\nnotches, two corners left\nas line art, the bottom\nbroken up under the app\nUI. Ink 30-66 px past\nthe colour.',
+    'trim': 'ROUND 2 PICK.\nHand-trimmed slivers,\nbottom open. For\nreference.',
+    'paint-subtle': 'PAINT, SUBTLE (0.6).\nTrim, painted: each side\none long tilted edge, one\nclear step. ONE bare\ncorner where the scene\nhas drawing (else a bite\nin the ground\'s drawing).\nInk runs 18-38 px on.',
+    'paint-medium': 'PAINT, MEDIUM (1.0).\nThree blocks, clear\nsteps; a bare corner and\na partly bare top corner\nwhere there is drawing,\na bleed corner, one left\nbite with line art in it.\nInk runs 26-56 px on.',
+    'paint-loose': 'PAINT, LOOSE (1.6).\nTwo bare corners, a deep\nleft bite and a right bite\nin the visible zone, the\nbottom broken up under\nthe UI, the ruled crossing\nat a painted corner.\nInk runs 32-66 px on.',
 }
 CROPS = [
     ('top-left', (0, 0, 300, 300)),
     ('top-right', (780, 0, 1080, 300)),
-    ('left edge, y 760-1060', (0, 760, 300, 1060)),
+    ('left edge, y 800-1100', (0, 800, 300, 1100)),
     ('bottom-left', (0, 1620, 300, 1920)),
     ('bottom-right', (780, 1620, 1080, 1920)),
 ]
@@ -45,7 +48,7 @@ def font(size, bold=False):
     return ImageFont.truetype(f, size) if os.path.exists(f) else ImageFont.load_default()
 
 
-def grid(rows=ROWS, out='paint_sheet.png'):
+def grid(rows=ROWS, out='paint_sheet.png', ui=False):
     w, h = 432, 768
     lab, head, gap = 290, 64, 30
     W = lab + len(SHOTS) * (w + gap) + gap
@@ -62,14 +65,40 @@ def grid(rows=ROWS, out='paint_sheet.png'):
             d.text((18, yy), ln, fill=MUTED, font=font(17))
             yy += 25
         for j, (s, _) in enumerate(SHOTS):
-            im = Image.open(os.path.join(ST, f'{r}_{s}.png')).convert('RGB').resize((w, h), Image.LANCZOS)
+            im = Image.open(os.path.join(ST, f'{r}_{s}.png')).convert('RGB')
+            if ui:
+                im = phone_ui(im)
+            im = im.resize((w, h), Image.LANCZOS)
             x = lab + gap + j * (w + gap)
             d.rounded_rectangle((x - 9, y - 9, x + w + 9, y + h + 9), radius=14, fill=BEZEL)
             S.paste(im, (x, y))
-    d.text((18, H - 34), 'Full frames, 1080x1920 shown at 0.4 on a dark phone bezel. Captions render above the treatment. Seed "film", amount 1 (the preset).', fill=MUTED, font=font(17))
+    d.text((18, H - 34), 'Full frames, 1080x1920 at 0.4 on a dark phone bezel. Captions render above the treatment. Seed "film", amount 1 (the preset); each shot with its EDGE_HINTS (line-art density, keep rects).' + (' Phone app UI drawn on top.' if ui else ''), fill=MUTED, font=font(17))
     p = os.path.join(OUT, out)
     S.save(p)
     print(p, S.size)
+
+
+def phone_ui(im):
+    """A 9:16 short-video app's UI over a full-res frame: status bar + header (top 180 px), the description / sound /
+    progress block (bottom 400 px) on a dark scrim, white text bars, the action rail (x > 950, y 900-1500)."""
+    im = im.convert('RGBA')
+    ov = Image.new('RGBA', im.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
+    for y in range(0, 180):
+        d.line((0, y, 1080, y), fill=(0, 0, 0, int(110 * (1 - y / 180))))
+    for y in range(1520, 1920):
+        d.line((0, y, 1080, y), fill=(0, 0, 0, int(140 * (y - 1520) / 400)))
+    W_ = (255, 255, 255, 235)
+    d.rounded_rectangle((40, 30, 150, 60), 8, fill=W_)
+    d.rounded_rectangle((900, 30, 1040, 60), 8, fill=W_)
+    d.rounded_rectangle((330, 110, 750, 140), 10, fill=W_)
+    for i, w in enumerate([380, 620, 300]):
+        d.rounded_rectangle((40, 1640 + i * 62, 40 + w, 1676 + i * 62), 10, fill=W_)
+    d.rectangle((0, 1880, 1080, 1886), fill=W_)
+    for i in range(5):
+        cy = 960 + i * 120
+        d.ellipse((985, cy - 38, 1061, cy + 38), outline=W_, width=6)
+    return Image.alpha_composite(im, ov).convert('RGB')
 
 
 def corners():
@@ -154,17 +183,17 @@ def seeds():
 
 
 def labels():
-    w, h = 540, 56
-    items = [('paint-subtle', 'looseness 0.5'), ('paint-medium', 'looseness 1'), ('paint-loose', 'looseness 1.6')]
+    w, h = 432, 56
+    items = [('trim', 'round 2'), ('paint-subtle', '0.6'), ('paint-medium', '1'), ('paint-loose', '1.6')]
     S = Image.new('RGB', (len(items) * w, h), BG)
     d = ImageDraw.Draw(S)
     for i, (r, sub) in enumerate(items):
-        d.text((i * w + 20, 12), r, fill=INK, font=font(28, True))
-        d.text((i * w + 20 + d.textlength(r, font=font(28, True)) + 14, 19), sub, fill=MUTED, font=font(20))
+        d.text((i * w + 16, 12), r, fill=INK, font=font(26, True))
+        d.text((i * w + 16 + d.textlength(r, font=font(26, True)) + 10, 18), sub, fill=MUTED, font=font(19))
     p = os.path.join(HERE, 'sbs_labels.png')
     S.save(p)
     print(p, S.size)
 
 
 if __name__ == '__main__':
-    {'grid': grid, 'corners': corners, 'ref': ref, 'seeds': seeds, 'labels': labels}[sys.argv[1]]()
+    {'grid': grid, 'phone': lambda: grid(out='paint_phone.png', ui=True), 'corners': corners, 'ref': ref, 'seeds': seeds, 'labels': labels}[sys.argv[1]]()

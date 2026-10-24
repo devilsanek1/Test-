@@ -33,7 +33,7 @@ import type {Pt} from '../lib/sketch';
 
 const SUN = {x: 870, y: 700, r: 110}; // SCREEN space, in the gap right of the dome
 const SILL_Y = PLAZA.closeup.sill; // 1122
-const PIP_W: Pt = [403, SILL_Y]; // the sill's left end
+const PIP_W: Pt = [397, SILL_Y]; // the sill's left end (6 left of v1: his ear clears the readout and the notice)
 const PIP_S = 1.2; // on-screen scale at zoom 1.6 (grows with the push like the sill)
 const BIT_SILL: Pt = [594, SILL_Y];
 const BIT_SIZE = 11; // world: ~18 px on screen
@@ -45,7 +45,7 @@ const SHACKLE_TOP: Pt = [PAD[0], PAD[1] + padlockShackleTop(PAD_SIZE)];
 const TAG = {x: PLAZA.gov.govB.tag[0], y: PLAZA.gov.govB.tag[1] - 20, size: 48, text: ['back', 'soon'] as [string, string]};
 const SNAIL_AT: Pt = [634, SILL_Y];
 const NOTICE = {x: 549, y: 1082, w: 140, h: 56}; // L14, inside the lower part of the browser screen, clear of Pip's ear
-const NOTE = {x: 553, y: 1033, w: 118, h: 92}; // J6 on the closed shutter's right part, above the tag's nail
+const NOTE = {x: 553, y: 1026, w: 118, h: 92}; // J6 on the closed shutter's right part, above the tag's nail and Bit
 const NOTE_FROM: Pt = [905, 990]; // off the right edge (the breeze)
 const CORNICE_PIGEON: Pt = [640, 904];
 const BOX_PIGEON: Pt = [454, 952];
@@ -91,7 +91,7 @@ const Scene11: React.FC = () => {
       return <ChromeSlot x={r[0]} y={r[1]} w={r[2]} h={r[3]} width={id === 'govD' ? MID_CLOSE * (4 / 3.4) : MID_CLOSE} offAt={u >= 0.999 ? -1e6 : undefined} content={content} seed={`s11/${id}/bw`} />;
     }
     return (
-      <GovBWindow r={r} steps={steps} hiccups={[b.ringHiccup1, b.barBack]} barsAt={[b.ringHiccup1 - 0.12, b.barFlicker - 0.03, b.earFlick - 0.03]} reloadAt={[b.snailCrawl + 0.17]} shakeAt={b.barBack} flickerAt={b.barFlicker} ringR={12.5} inkW={MID_CLOSE} seed="s11/govB">
+      <GovBWindow r={r} steps={steps} hiccups={[b.ringHiccup1, b.barBack]} barsAt={[b.ringHiccup1 - 0.12, b.barFlicker - 0.03, b.earFlick - 0.03]} reloadAt={[b.snailCrawl + 0.05]} shakeAt={b.barBack} flickerAt={b.barFlicker} ringR={12.5} inkW={MID_CLOSE} seed="s11/govB">
         <LabelTag kind="notice" x={NOTICE.x} y={NOTICE.y} w={NOTICE.w} h={NOTICE.h} lines={['FBI · NSA', 'UK NCSC · CERT-EU']} fontSize={19} at={b.notice} rot={-1.5} inkPx={2.2} seed="s11/L14" />
       </GovBWindow>
     );
@@ -133,6 +133,7 @@ const Scene11: React.FC = () => {
     {t: b.earFlick, pose: 'sit-back', look: 0.6, rot: 4},
     {t: b.lookNotice, pose: 'sit-back', look: 1, rot: 8},
     {t: b.glanceSun, pose: 'sit-back', look: 1, rot: 3, up: 0.08},
+    {t: b.press - 0.2, pose: 'sit-back', look: 1, rot: 7, up: 0.03}, // braces, leaning toward the sun as it gets pressed
     {t: b.shutter + 0.06, pose: 'sit-back', look: 0.2, rot: -5},
     {t: b.padlock + 0.04, pose: 'sit-back', look: 0.6, rot: 4}, // the click: he glances at the padlock
     {t: b.pigeonLand + 0.08, pose: 'sit-back', look: 0.3, rot: -2, up: 0.08}, // a pigeon lands right above him: he looks up
@@ -235,7 +236,7 @@ const Scene11: React.FC = () => {
         {/* the sill: the snail (running gag), Bit; the pigeons on the cornice and on the shutter box */}
         <SillSnail x={SNAIL_AT[0]} y={SNAIL_AT[1]} size={28} shellAt={b.snailShell} crawlAt={b.snailCrawl} hideAt={b.bitHop} antennaeAt={b.antennae} peekAt={b.pipOut} seed="s11/snail" />
         {bit}
-        <Pigeon x={CORNICE_PIGEON[0]} y={CORNICE_PIGEON[1]} s={PIGEON_S} shuffle={[{at: b.ringHiccup1, dx: -9}, {at: b.snailCrawl + 0.14, dx: 6}, {at: b.barBack - 0.06, dx: 4}]} hopAt={[b.press + 0.05]} preenAt={b.preen} seed="s11/pg1" />
+        <Pigeon x={CORNICE_PIGEON[0]} y={CORNICE_PIGEON[1]} s={PIGEON_S} shuffle={[{at: b.ringHiccup1, dx: -9}, {at: b.snailCrawl - 0.12, dx: 6}, {at: b.barBack + 0.17, dx: 4}, {at: b.antennae + 0.08, dx: -3}]} hopAt={[b.press + 0.05, b.glint + 0.17]} preenAt={b.preen} seed="s11/pg1" />
         <Pigeon x={BOX_PIGEON[0]} y={BOX_PIGEON[1]} s={PIGEON_S} land={{at: b.pigeonLand, from: [300, 840], dur: 0.45}} shuffle={[{at: b.noteSlap + 0.18, dx: 5}]} hopAt={[b.glint - 0.03]} hopH={20} flyAt={b.tagSway} flyTo={[-320, -260]} seed="s11/pg2" />
       </XG>
       {pip}

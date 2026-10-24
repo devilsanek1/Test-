@@ -1,0 +1,50 @@
+[
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "seed": "film"
+  },
+  "out": "review/edges/loose/final/stills/seeds/paint-medium_film.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "seed": "scene-01"
+  },
+  "out": "review/edges/loose/final/stills/seeds/paint-medium_scene-01.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "seed": "scene-02"
+  },
+  "out": "review/edges/loose/final/stills/seeds/paint-medium_scene-02.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "seed": "scene-03"
+  },
+  "out": "review/edges/loose/final/stills/seeds/paint-medium_scene-03.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "seed": "scene-04"
+  },
+  "out": "review/edges/loose/final/stills/seeds/paint-medium_scene-04.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "seed": "scene-05"
+  },
+  "out": "review/edges/loose/final/stills/seeds/paint-medium_scene-05.png"
+ }
+]

@@ -6,10 +6,11 @@
 //   the ring on govB's lock; the dive into the lock box (fixed 0.33 s) onto S02's blueprint lock.
 import React from 'react';
 import {palette} from '../../lib/theme';
-import {useTime} from '../../lib/time';
+import {clamp, ease as E, useTime} from '../../lib/time';
+import {Ink} from '../../lib/Ink';
 import {Sun} from '../../lib/Sun';
 import {Pt} from '../../lib/sketch';
-import {XG} from '../../lib/xf';
+import {mat, XG} from '../../lib/xf';
 import {GovEvents, GovernmentPlaza, GovId, PLAZA} from '../shared/sets';
 import {Bit, EdgeOnlooker, MarkRing, PowerGlyph, SunPress} from '../shared/props';
 import {layerMat} from './camera';
@@ -122,6 +123,27 @@ const Onlookers: React.FC = () => {
   );
 };
 
+// ---------------------------------------------------------------- 'PURPOSE': the padlocks glint
+
+/** Two glint ticks pop off a padlock's upper-left corner, cream on the dark shutter slats it hangs from (the kit's glint
+ *  is a 1-px cream tick: invisible on a phone; the facade right of the body is taken by the tags). Pop 30 % -> 100 % in
+ *  0.05 s, gone after 0.25 s. */
+const PadlockSpark: React.FC<{x: number; y: number; at: number; seed: string}> = ({x, y, at, seed}) => {
+  const t = useTime();
+  if (t < at || t >= at + 0.25) return null;
+  const k = 0.3 + 0.7 * E.outBack(1.8)(clamp((t - at) / 0.05));
+  return (
+    <XG m={mat.about(mat.scale(k), x - 14, y - 10)}>
+      <Ink d={`M${x - 16} ${y - 13}L${x - 28} ${y - 26}M${x - 19} ${y - 4}L${x - 35} ${y - 6}`} width={4.2} color={palette.cream} taper={false} seed={seed} />
+    </XG>
+  );
+};
+const SPARKS: [number, number, number][] = [
+  [462, PLAZA.gov.govB.padlock[1], B.padlockGlint[0]],
+  [152, PLAZA.gov.govA.padlock[1], B.padlockGlint[1]],
+  [838, PLAZA.gov.govC.padlock[1] - 0.5 * PLAZA.gov.govC.window[3], B.padlockGlint[2]],
+];
+
 // ---------------------------------------------------------------- the shot
 
 export const PlazaShutdown: React.FC = () => {
@@ -130,6 +152,9 @@ export const PlazaShutdown: React.FC = () => {
     buildings: (
       <>
         <Bit x={S01_BIT[0]} y={S01_BIT[1]} size={PLAZA.bitSize} seed="plaza/bit" state="idle" />
+        {SPARKS.map(([x, y, at], i) => (
+          <PadlockSpark key={i} x={x} y={y} at={at} seed={`s01/spark${i}`} />
+        ))}
         <MarkRing x={PLAZA.gov.govB.lock[0]} y={PLAZA.gov.govB.lock[1]} r={24} at={B.lockRing} dur={0.12} width={2.4} seed="s01/ring" />
       </>
     ),

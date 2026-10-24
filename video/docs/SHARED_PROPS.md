@@ -472,6 +472,11 @@ SharedKitSheet `v3` (~45 v3 instances: 13 labels incl. a sign and stamps, the co
 diagram hands, site icon, key, sticky note, sticker, 60 batched check-box tags, 3 support tags, shutters, suns) **216**,
 `thumbs: false` 308. A label / tag / note costs well under 1 ms; the board ~2 ms; hundreds of check-box tags = 4 paths.
 
+v3 review round (12 frames, concurrency 1, machine at load ~10): SharedKitSheet `v3fix` (6 FixSigns, 2 MakersCarts with a
+sign slot + pusher, 3 crates (2 with lids, 4 rising check-box tags each), 6 lettered tags, the board, 3 grown labels, a
+paper-Look row) **384** ms/frame, `v3` 265, FontTest 237 in the same pass. A FixSign costs about a LabelTag (one card,
+2-3 text nodes, 1-2 strike strokes); the cart's sign slot adds one post stroke.
+
 So a typical prop costs well under 1 ms. Hundreds of far things go through the batched components (`LockSpecks`,
 `PlaqueSpecks`, `BitSwarm`, `AttemptStipple`: 1-3 paths whatever the count), never through hundreds of `<Lock>`s.
 

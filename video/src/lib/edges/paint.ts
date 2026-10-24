@@ -380,11 +380,28 @@ function blockInsets(lims: Range[], P: Params, r: Rng): {s: number[]; e: number[
     const tilt = r.jitter(P.tilt / 2);
     if (i === 0) s[i] = want;
     else {
-      const opts = [e[i - 1] + st, e[i - 1] - st].filter((v) => v >= lo && v <= hi).sort((a, b) => Math.abs(a - want) - Math.abs(b - want));
+      const p = e[i - 1];
+      const [plo, phi] = lims[i - 1];
+      const m = P.step[0];
+      const M = P.step[1] * 1.5;
+      // the values in range a full step away (up or down), as near the drawn step as they can be
+      const ups: Range = [Math.max(lo, p + m), Math.min(hi, p + M)];
+      const dns: Range = [Math.max(lo, p - M), Math.min(hi, p - m)];
+      const near = (rg: Range, dir: number) => Math.min(rg[1], Math.max(rg[0], p + dir * st));
+      const opts = [...(ups[1] >= ups[0] ? [near(ups, 1)] : []), ...(dns[1] >= dns[0] ? [near(dns, -1)] : [])].sort((a, b) => Math.abs(a - want) - Math.abs(b - want));
       if (opts.length) s[i] = opts[0];
-      else {
-        const c = Math.min(hi, Math.max(lo, e[i - 1]));
-        if (Math.abs(c - e[i - 1]) > 0.5 && c >= lims[i - 1][0] && c <= lims[i - 1][1]) e[i - 1] = c;
+      else if (hi - m >= plo) {
+        // re-aim the previous block's end so a full step up fits
+        e[i - 1] = Math.min(p, hi - m);
+        s[i] = Math.max(lo, e[i - 1] + m);
+      } else if (lo + m <= phi) {
+        // ... or a full step down
+        e[i - 1] = Math.max(p, lo + m);
+        s[i] = Math.min(hi, e[i - 1] - m);
+      } else {
+        // no full step fits (a thin margin): the previous block slopes into this one, never a small jog
+        const c = Math.min(hi, Math.max(lo, p));
+        if (c >= plo && c <= phi) e[i - 1] = c;
         s[i] = c;
       }
     }
@@ -694,8 +711,9 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
     const qb = Math.abs(Q[k][1] - fc[k][1]);
     const bx = Math.max(lerpR(P.bleedR, t[0]), (qa + P.step[0]) / t[2]);
     const by = Math.max(lerpR(P.bleedR, t[1]) * (k <= 1 ? 0.8 : 1), (qb + P.step[0]) / t[3]);
-    // where the block crosses a side's paper margin it tapers (a long slant, ~1:2.5): never a short square jog
-    blocks.push(cw([local(k, -OFF, -OFF), local(k, bx + 2.5 * (qb + OFF), -OFF), local(k, bx, qb + 2), local(k, bx * t[2], by * t[3]), local(k, qa + 2, by), local(k, -OFF, by + 2.5 * (qa + OFF))]));
+    // where the block crosses a side's paper margin it ends in a clean cut, slanted a little (a long taper would read
+    // as a white spike)
+    blocks.push(cw([local(k, -OFF, -OFF), local(k, bx + 0.6 * (qb + OFF), -OFF), local(k, bx, qb + 2), local(k, bx * t[2], by * t[3]), local(k, qa + 2, by), local(k, -OFF, by + 0.6 * (qa + OFF))]));
   }
 
   // 6. assemble the body (colour) and its sketch (ink): corners in clockwise order, first point on the side before
@@ -732,18 +750,15 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
     if (containsRectAny([body, ...blocks], kr, 12)) continue;
     const pad = 14;
     const near = 110;
-    const ext = [
-      kr[1] - pad < depthAt([body], 0, (kr[0] + kr[2]) / 2) + near, // top
-      kr[2] + pad > W - depthAt([body], 1, (kr[1] + kr[3]) / 2) - near, // right
-      kr[3] + pad > H - depthAt([body], 2, W - (kr[0] + kr[2]) / 2) - near, // bottom
-      kr[0] - pad < depthAt([body], 3, H - (kr[1] + kr[3]) / 2) + near, // left
-    ];
+    // run off on a side only where the rect comes within reach of the FRAME there (beside a bare corner or a bite the
+    // paper is deep: the block must not cut through it)
+    const ext = [kr[1] - pad < near, kr[2] + pad > W - near, kr[3] + pad > H - near, kr[0] - pad < near]; // top, right, bottom, left
     const x0 = ext[3] ? -OFF : kr[0] - pad;
     const y0 = ext[0] ? -OFF : kr[1] - pad;
     const x1 = ext[1] ? W + OFF : kr[2] + pad;
     const y1 = ext[2] ? H + OFF : kr[3] + pad;
     // the extension flares out toward the frame (a tongue, crossing the margin on a slant)
-    const fl = (e: number) => Math.min(90, Math.max(0.3 * e, 0.8 * (e + OFF)));
+    const fl = (e: number) => Math.min(60, 0.45 * (e + OFF));
     const tl: Pt = [x0, y0];
     const tr: Pt = [x1, y0];
     const br: Pt = [x1, y1];
@@ -779,8 +794,8 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
     nKeeps++;
   }
   // 8. tongues: stretches where the colour runs off the frame, placed clear of every block that already reaches it
-  // (keep blocks, bleeds) and of the bites. Each end crosses the paper margin on a 1:2.5 taper (a square end on a
-  // thin margin reads as a jog); one end may run on as a long slant inside the colour (a ground plane in perspective).
+  // (keep blocks, bleeds) and of the bites, and only where the paper is deep enough for a real step. Each end is a
+  // clean slanted cut; one end may run on as a long slant (a ground plane in perspective).
   const frameSpan = (blk: Pt[], sd: number): Range | null => {
     const at = blk.map((p) => fromScreen(sd, p)).filter((k) => k.d < 1);
     return at.length ? [Math.min(...at.map((k) => k.u)), Math.max(...at.map((k) => k.u))] : null;
@@ -807,17 +822,21 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
     const inner = deep + reach;
     const mA = Math.max(0, interp(colourK[s], ua));
     const mB = Math.max(0, interp(colourK[s], ub));
+    // on a thin margin a stretch of colour to the edge is a shelf (a glitch-like step): only where the paper is deep
+    if (Math.min(mA, mB) < P.step[0]) continue;
     const e = sl * w;
-    const a = Math.max(flip ? 0 : e, 2.5 * (mA + 2) + 6);
-    const b = Math.max(flip ? e : 0, 2.5 * (mB + 2) + 6);
+    const cutA = 0.6 * (mA + 2);
+    const cutB = 0.6 * (mB + 2);
+    const a = Math.max(flip ? 0 : e, cutA + 6);
+    const b = Math.max(flip ? e : 0, cutB + 6);
     if (ua + a > ub - b - 30) continue;
     const q: Pt[] = [
-      toScreen(s, ua - 2.5 * OFF, -OFF),
-      toScreen(s, ub + 2.5 * OFF, -OFF),
-      toScreen(s, ub - 2.5 * (mB + 2), mB + 2),
+      toScreen(s, ua - 0.6 * OFF, -OFF),
+      toScreen(s, ub + 0.6 * OFF, -OFF),
+      toScreen(s, ub - cutB, mB + 2),
       toScreen(s, ub - b, inner),
       toScreen(s, ua + a, inner),
-      toScreen(s, ua + 2.5 * (mA + 2), mA + 2),
+      toScreen(s, ua + cutA, mA + 2),
     ];
     blocks.push(cw(q.map((p, j) => (j === 2 || j === 5 ? p : ([p[0] + jit[j], p[1] + jit[j + 1]] as Pt)))));
     taken[s].push([ua, ub]);

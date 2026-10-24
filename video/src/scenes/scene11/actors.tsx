@@ -119,6 +119,7 @@ export const Pigeon: React.FC<PigeonProps> = ({x, y, s = 0.7, flip = false, land
     flap = true;
   }
   for (const sh of shuffle) if (t >= sh.at && t < sh.at + 0.2) flap = true;
+  if (preenAt !== undefined && t >= preenAt + 0.1 && t < preenAt + 0.45) flap = true;
   // landing squash
   let sq = 1;
   if (land && t < land.at + 0.16) sq = 1 - 0.18 * Math.sin(prog(t, land.at, 0.16) * Math.PI);
@@ -207,6 +208,9 @@ export const SillSnail: React.FC<SillSnailProps> = ({x, y, size = 24, flip = tru
     st2 = Math.max(st2, prog(t, antennaeAt + 0.2, 0.14, E.outBack(1.6)));
   }
   const pop = springAt(t, shellAt, springs.pop);
+  // each eye stalk pokes out with a little jolt of the shell
+  let jolt = 0;
+  if (antennaeAt !== undefined) for (const a of [antennaeAt, antennaeAt + 0.2]) if (t >= a && t < a + 0.16) jolt -= 3.5 * Math.sin(prog(t, a, 0.16) * Math.PI);
   const peri = moving ? 1 + 0.07 * Math.sin((t - crawlAt) * 6) : 1;
   const wob = osc(t, 1.3, rand(seed, 'p') * 6) * 1.2;
   // when tucked, the stalks start from the shell mouth (-2 + 6, -6) instead of the head
@@ -223,7 +227,7 @@ export const SillSnail: React.FC<SillSnailProps> = ({x, y, size = 24, flip = tru
   const eyes = [a1.eye, a2.eye].filter((e): e is Pt => !!e);
   const dirX = flip ? -1 : 1;
   return (
-    <XG m={mat.compose(mat.translate(x + dirX * dist, y), mat.scale(dirX * s * pop, s * pop))}>
+    <XG m={mat.compose(mat.translate(x + dirX * dist, y + jolt), mat.scale(dirX * s * pop, s * pop))}>
       {out > 0.02 ? (
         <XG m={mat.about(mat.scale(peri * lerp(0.3, 1, out), lerp(0.55, 1, out)), -2, 0)}>
           <Fill d={FOOT} color={palette.cream} offset={false} mode="none" seed={`${seed}/ft`} />
@@ -305,7 +309,7 @@ export function pillGeom(w: number, h: number) {
 }
 
 /** The page's readout layout (screen-local): lettering row, then the fat bar (180 x 15 world = ~290 x 25 px on screen). */
-export const PAGE = {fs: 20, ty: 23, by: 30, bh: 15, bw: 180, barsY: [58, 76, 94]} as const;
+export const PAGE = {fs: 20, ty: 23, by: 30, bh: 15, bw: 176, barsY: [58, 76, 94]} as const;
 
 const stepAt = (steps: ProgressStep[], t: number) => {
   let v = steps[0]?.v ?? 0;
@@ -322,7 +326,7 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
   for (const r of reloadAt) if (t >= r) ra = r;
   const blank = ra !== undefined && t < ra + 2 / 30;
   const dx = shakeAt !== undefined && t >= shakeAt && t < shakeAt + 0.24 ? Math.sin(prog(t, shakeAt, 0.24) * Math.PI * 3) * 5 * (1 - prog(t, shakeAt, 0.24)) : 0;
-  const bx = (w - PAGE.bw) / 2;
+  const bx = w - PAGE.bw - 10; // a wider left margin: Pip's ear sits by the window's lower-left corner
   // ---- the value: steps, an up-step's spring past its value, the reload regrow
   let v = stepAt(steps, t);
   let flash = false;
@@ -349,12 +353,14 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
     } else flipY = (d - 0.08) / 0.08;
   }
   const iw = inkW;
+  // the % tile sits at the LEFT end (over the fill it reports; away from the spinning ring), 'updating...' after it
   const tileW = 34;
   const tileH = 24;
-  const tileX = bx + PAGE.bw - tileW;
+  const tileX = bx + PAGE.bw - tileW - 32;
   const tileY = PAGE.ty - 19;
+  const txtX = bx;
   const dots = '.'.repeat(1 + (Math.floor(t / 0.3) % 3));
-  const txtK = ra !== undefined && t >= ra + 2 / 30 ? 0.25 + 0.75 * springAt(t, ra + 2 / 30, springs.pop) : 1;
+  const txtK = ra !== undefined && t >= ra + 2 / 30 ? 0.25 + 0.75 * prog(t, ra + 2 / 30, 0.12, E.outCubic) : 1;
   // content bars (the page still loading): each draws on L -> R at its time; a reload hides them again
   const bars: React.ReactNode[] = [];
   [0.84, 0.62, 0.74].forEach((f, i) => {
@@ -373,8 +379,8 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
   return (
     <XG m={mat.translate(dx, 0)}>
       {/* 'updating...' */}
-      <XG m={txtK !== 1 ? mat.about(mat.scale(txtK), bx, PAGE.ty - 7) : mat.I}>
-        <text x={bx} y={PAGE.ty} fontFamily={captionFontStack} fontSize={PAGE.fs} fill={palette.ink}>
+      <XG m={txtK !== 1 ? mat.about(mat.scale(txtK), txtX, PAGE.ty - 7) : mat.I}>
+        <text x={txtX} y={PAGE.ty} fontFamily={captionFontStack} fontSize={PAGE.fs} fill={palette.ink}>
           {'updating' + dots}
         </text>
       </XG>
