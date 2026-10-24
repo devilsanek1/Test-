@@ -206,7 +206,7 @@ for (bar, beat, p, d) in [(25, 0, 86, 1.5), (25, 1.5, 84, .5), (25, 2, 82, 2), (
                           (27, 0, 76, 2), (27, 2, 79, 1), (27, 3, 81, 1), (28, 0, 81, 2), (28, 2, 79, 1), (28, 3, 76, 1)]:
     P(bar, beat, p, d, 40)
 for bar in range(25, 29):
-    pchord(bar, vel=28)
+    pchord(bar, vel=28, dur=4.1 if bar == 28 else 3.5)  # last chord rings across the loop point
 
 # ------------------------------------------------------------------ sustained strings: leak -> urgency -> suspension
 bed.note("vc_sus", vcs, 38, 46, 13, 2, 6.0)      # D2 pedal

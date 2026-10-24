@@ -20,7 +20,9 @@ const opt = Object.fromEntries(rest.filter((a) => a.startsWith('--')).map((a) =>
 const scale = opt.scale ? Number(opt.scale) : 1;
 const concurrency = opt.concurrency ? Number(opt.concurrency) : 2;
 const browserExecutable = '/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell';
-const chromiumOptions = {gl: 'swangle'};
+// GL: default (software raster) is ~3x faster than 'swangle' for our vector-heavy frames and renders identically
+// (verified incl. 3D card flips). Override with GL=swangle|angle|swiftshader if ever needed.
+const chromiumOptions = process.env.GL && process.env.GL !== 'default' ? {gl: process.env.GL} : {};
 
 const outDir = path.resolve(outDirArg);
 fs.mkdirSync(outDir, {recursive: true});
@@ -53,7 +55,8 @@ await renderFrames({
   chromiumOptions,
   logLevel: 'error',
   onStart: () => undefined,
-  onFrameUpdate: () => undefined,
+  onFrameUpdate: (n, f, ms) => { if (process.env.PROFILE) console.error(`frame ${f} ${ms}ms`); },
+  onBrowserLog: (l) => { if (process.env.PROFILE && l.text.includes('PROFILE')) console.error(l.text); },
 });
 const tE = Date.now();
 const files = fs.readdirSync(tmp).filter((f) => f.endsWith('.png')).sort();

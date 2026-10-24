@@ -1,0 +1,210 @@
+[
+ {
+  "t": 0.06,
+  "sfx": "pencil_scratch_medium",
+  "gain_db": -19,
+  "pan": 0.0,
+  "prio": "A",
+  "why": "opening line art draws on (frame 1 is never silent of 'life')"
+ },
+ {
+  "t": 3.3,
+  "sfx": "power_off_thunk",
+  "gain_db": -12,
+  "pan": 0.0,
+  "prio": "A",
+  "why": "'switched themselves OFF' - lights out on the gov sites"
+ },
+ {
+  "t": 9.19,
+  "sfx": "pop_mid",
+  "gain_db": -18,
+  "pan": -0.2,
+  "prio": "B",
+  "why": "'7' (out of 10) pops in"
+ },
+ {
+  "t": 9.83,
+  "sfx": "pop_high",
+  "gain_db": -20,
+  "pan": 0.2,
+  "prio": "B",
+  "why": "'10'"
+ },
+ {
+  "t": 12.26,
+  "sfx": "pop_low",
+  "gain_db": -19,
+  "pan": 0.0,
+  "prio": "B",
+  "why": "'two steps' - the two-step card"
+ },
+ {
+  "t": 13.12,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -18,
+  "pan": -0.15,
+  "prio": "B",
+  "why": "'First' - check mark / circle drawn"
+ },
+ {
+  "t": 14.25,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -18,
+  "pan": 0.15,
+  "prio": "B",
+  "why": "'Then' - second mark"
+ },
+ {
+  "t": 18.18,
+  "sfx": "card_flip",
+  "gain_db": -17,
+  "pan": 0.0,
+  "prio": "A",
+  "why": "0.39 s pause before 'And for 14 years' - card flip"
+ },
+ {
+  "t": 18.87,
+  "sfx": "pop_mid",
+  "gain_db": -17,
+  "pan": 0.0,
+  "prio": "B",
+  "why": "'14'"
+ },
+ {
+  "t": 21.27,
+  "sfx": "whoosh_soft",
+  "gain_db": -21,
+  "pan": 0.0,
+  "prio": "B",
+  "why": "pause after 'nobody did.' - time jump to August"
+ },
+ {
+  "t": 24.98,
+  "sfx": "ding",
+  "gain_db": -19,
+  "pan": 0.25,
+  "prio": "A",
+  "why": "'found it' - the discovery"
+ },
+ {
+  "t": 31.71,
+  "sfx": "riser_leak",
+  "gain_db": -15,
+  "pan": 0.0,
+  "prio": "A",
+  "why": "leak build: 3.64 s riser peaking at 35.35 (bar line before 'Cloudflare')"
+ },
+ {
+  "t": 35.62,
+  "sfx": "pop_low",
+  "gain_db": -15,
+  "pan": 0.0,
+  "prio": "A",
+  "why": "'Cloudflare' lands on the riser peak"
+ },
+ {
+  "t": 38.82,
+  "sfx": "counter_ticker",
+  "gain_db": -19,
+  "pan": 0.1,
+  "prio": "A",
+  "why": "'tens of thousands' counting up (runs ~2 s, stops before '45')"
+ },
+ {
+  "t": 41.06,
+  "sfx": "pop_high",
+  "gain_db": -18,
+  "pan": 0.0,
+  "prio": "B",
+  "why": "'45' minutes"
+ },
+ {
+  "t": 42.48,
+  "sfx": "pop_mid",
+  "gain_db": -15,
+  "pan": 0.0,
+  "prio": "A",
+  "why": "'millions'"
+ },
+ {
+  "t": 45.13,
+  "sfx": "lock_click",
+  "gain_db": -20,
+  "pan": 0.0,
+  "prio": "B",
+  "why": "'got in.' - a tiny button on the line"
+ },
+ {
+  "t": 45.4,
+  "sfx": "card_flip",
+  "gain_db": -18,
+  "pan": 0.0,
+  "prio": "A",
+  "why": "breath / 'So now comes step two' - scene flip"
+ },
+ {
+  "t": 46.4,
+  "sfx": "pop_low",
+  "gain_db": -19,
+  "pan": 0.0,
+  "prio": "B",
+  "why": "'two'"
+ },
+ {
+  "t": 48.47,
+  "sfx": "typing_burst",
+  "gain_db": -22,
+  "pan": 0.2,
+  "prio": "B",
+  "why": "'install that fix' - quiet keystrokes"
+ },
+ {
+  "t": 51.09,
+  "sfx": "pop_mid",
+  "gain_db": -17,
+  "pan": 0.0,
+  "prio": "A",
+  "why": "'22' million"
+ },
+ {
+  "t": 58.03,
+  "sfx": "switch_toggle",
+  "gain_db": -12,
+  "pan": 0.0,
+  "prio": "A",
+  "why": "'switch it OFF'"
+ },
+ {
+  "t": 60.75,
+  "sfx": "pop_mid",
+  "gain_db": -18,
+  "pan": -0.2,
+  "prio": "B",
+  "why": "'one' in three"
+ },
+ {
+  "t": 61.11,
+  "sfx": "pop_high",
+  "gain_db": -19,
+  "pan": 0.2,
+  "prio": "B",
+  "why": "'three'"
+ },
+ {
+  "t": 68.0,
+  "sfx": "switch_toggle",
+  "gain_db": -15,
+  "pan": 0.0,
+  "prio": "B",
+  "why": "'switch off' (callback, softer)"
+ },
+ {
+  "t": 69.3,
+  "sfx": "pencil_scratch_long",
+  "gain_db": -20,
+  "pan": 0.0,
+  "prio": "A",
+  "why": "un-build back to the opening line art; tail wraps across the loop"
+ }
+]

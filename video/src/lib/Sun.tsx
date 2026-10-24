@@ -13,7 +13,7 @@ import React, {useId} from 'react';
 import {palette, stroke, sun as sunGeo} from './theme';
 import {Ease, ease as E, lerp, osc, prog, springAt, springs, useTime} from './time';
 import {useCardRotY} from './Card';
-import {exitFillProgress, useExit} from './exit';
+import {ExitFade, exitFillProgress, useExit} from './exit';
 import {Ink} from './Ink';
 import {arc, line} from './sketch';
 
@@ -121,6 +121,7 @@ export const ClockHands: React.FC<{r: number; at?: number; speed?: number; color
     return `M0 0L${(Math.cos(rad) * len).toFixed(1)} ${(Math.sin(rad) * len).toFixed(1)}`;
   };
   return (
+    <ExitFade>
     <g transform={`scale(${pop.toFixed(3)})`}>
       {ticks
         ? [0, 90, 180, 270].map((a) => {
@@ -132,5 +133,6 @@ export const ClockHands: React.FC<{r: number; at?: number; speed?: number; color
       <path d={hand(mA, r * 0.6)} stroke={color} strokeWidth={width} strokeLinecap="round" fill="none" />
       <circle r={width * 0.9} fill={color} />
     </g>
+    </ExitFade>
   );
 };

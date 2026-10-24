@@ -12,6 +12,7 @@ import {rand, rng, Seed} from '../rng';
 import {Ink} from '../Ink';
 import {Fill} from '../Fill';
 import {Pop, Wobble} from '../motion';
+import {ExitFade} from '../exit';
 import {blob, circle, crown, crownTicks, line, poly, polyPath, wire, wirePoint, Pt} from '../sketch';
 import {At, b, inkW, Place} from './common';
 
@@ -45,7 +46,8 @@ export const Tree: React.FC<TreeProps> = ({x, y, size = 80, h, at, seed = 'tree'
   const trunk = th > 0 ? line(x - 3, y, x - 2, cy + ry * 0.2, {over: [0, 0], seed: `${seed}/t1`}) + line(x + 4, y, x + 3, cy + ry * 0.35, {over: [0, 0], seed: `${seed}/t2`}) : '';
   const branches =
     th > 0
-      ? line(x, cy + ry * 0.45, x - rx * 0.32, cy + ry * 0.05, {over: [0, 2], seed: `${seed}/b1`}) + line(x + 2, cy + ry * 0.55, x + rx * 0.3, cy + ry * 0.12, {over: [0, 2], seed: `${seed}/b2`})
+      ? line(x, cy + ry * 0.92, x - rx * r.range(0.16, 0.26), cy + ry * r.range(0.5, 0.62), {over: [0, 1], seed: `${seed}/b1`}) +
+        line(x + 1, cy + ry * 1.0, x + rx * r.range(0.12, 0.2), cy + ry * r.range(0.68, 0.78), {over: [0, 1], seed: `${seed}/b2`})
       : '';
   const ticks = crownTicks(cx, cy, rx, ry, {seed: `${seed}/k`});
   const content = (
@@ -147,8 +149,10 @@ export const Bird: React.FC<{x: number; y: number; s?: number; seed?: Seed; at?:
       <g transform={`rotate(${look} 9 -16)`}>
         <Fill d={blob(10, -19, 6.5, 6, {seed: `${sd}/h`})} color={color} offset={false} seed={`${sd}/hf`} />
         <Ink d={circle(10, -19, 6.5, {seed: `${sd}/h`, overlap: 12})} width={inkW(s) * 0.85} />
-        <path d="M16 -19L21 -18L16 -16.5" fill={palette.sun} stroke="none" />
-        <circle cx={12} cy={-20.5} r={1.1} fill={palette.ink} />
+        <ExitFade>
+          <path d="M16 -19L21 -18L16 -16.5" fill={palette.sun} stroke="none" />
+          <circle cx={12} cy={-20.5} r={1.1} fill={palette.ink} />
+        </ExitFade>
       </g>
       <Fill d={`M-6 -14Q2 -16 6 -10Q0 -6 -8 -9Z`} color={palette.tan} offset={false} seed={`${sd}/w`} opacity={0.8} />
     </Place>
@@ -208,10 +212,10 @@ export const LampPost: React.FC<LampPostProps> = ({x, y, h = 320, at, seed = 'la
   return (
     <>
       {lit > 0 ? (
-        <>
+        <ExitFade>
           <Fill d={polyPath([[ax - 14, top + 6], [ax + 14, top + 6], [ax + 80, y], [ax - 80, y]])} color={palette.cream} opacity={0.38 * lit * flick} offset={false} seed={`${seed}/cone`} />
           <circle cx={ax} cy={top + 8} r={26} fill={palette.sun} opacity={0.22 * lit * flick} />
-        </>
+        </ExitFade>
       ) : null}
       <Fill d={`M${x - 4} ${y}L${x - 4} ${top}L${x + 4} ${top}L${x + 4} ${y}Z`} color={color} at={b(at, 0.4)} mode="grow" offset={false} seed={`${seed}/pf`} />
       <Fill d={`M${x - 12} ${y}L${x - 8} ${y - 26}L${x + 8} ${y - 26}L${x + 12} ${y}Z`} color={color} at={b(at, 0.45)} mode="grow" offset={false} seed={`${seed}/base`} />
@@ -219,7 +223,9 @@ export const LampPost: React.FC<LampPostProps> = ({x, y, h = 320, at, seed = 'la
       <Ink d={armD} at={b(at, 0.35)} dur={0.25} width={width} />
       <Fill d={polyPath(shade)} color={color} at={b(at, 0.7)} mode="pop" seed={`${seed}/sh`} />
       <Ink d={poly(shade, {closed: true, seed: `${seed}/shi`, over: 2})} at={b(at, 0.55)} dur={0.3} width={width} />
-      <circle cx={ax} cy={top + 9} r={5} fill={lit > 0 ? palette.sun : palette.cream} />
+      <ExitFade>
+        <circle cx={ax} cy={top + 9} r={5} fill={lit > 0 ? palette.sun : palette.cream} />
+      </ExitFade>
     </>
   );
 };

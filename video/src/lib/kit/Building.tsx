@@ -13,7 +13,7 @@ import {Ink} from '../Ink';
 import {Fill} from '../Fill';
 import {Window} from './Window';
 import {Door} from './Door';
-import {circle, hatch, hline, line, poly, polyPath, rect, rectPath, roundRect, wallTicks, Pt} from '../sketch';
+import {circle, hatch, hline, line, poly, polyPath, rect, roundRect, wallTicks, Pt} from '../sketch';
 import {At, b} from './common';
 
 export type ShopOpts = {sign?: 'cart' | 'cross' | 'cup' | 'text' | 'none'; awning?: string; color?: string; glass?: string};
@@ -163,14 +163,17 @@ export const Building: React.FC<BuildingProps> = ({
       const bh = floorH * 0.4;
       const bx = x - 8;
       const bw = w + 16;
+      const panels = Math.max(2, Math.round(bw / r.range(70, 110)));
+      let dividers = '';
+      for (let i = 1; i < panels; i++) dividers += line(bx + (bw * i) / panels, by, bx + (bw * i) / panels, by + bh, {over: [0, 1], seed: `${seed}/bd${f}/${i}`});
       out.push(<Fill key={`bf${f}`} rect={[bx, by, bw, bh]} color={balconyColor} at={T(1.55 + f * 0.06)} mode="wipe" dir="right" seed={`${seed}/bf${f}`} />);
       out.push(
         <Ink
           key={`b${f}`}
-          d={rect(bx, by, bw, bh, {seed: `${seed}/b${f}`, edges: 'tlrb'}) + hatch(bx + 6, by + 4, bw - 12, bh - 6, {angle: 90, gap: 22, seed: `${seed}/bh${f}`})}
+          d={hline(bx, bx + bw, by, {seed: `${seed}/bt${f}`, over: [r.range(6, 34), r.range(4, 24)]}) + hline(bx, bx + bw, by + bh, {seed: `${seed}/bb${f}`}) + line(bx, by, bx, by + bh, {seed: `${seed}/bl${f}`}) + line(bx + bw, by, bx + bw, by + bh, {seed: `${seed}/br${f}`}) + dividers}
           at={T(1.4 + f * 0.06)}
           dur={0.45 * k}
-          width={width * 0.85}
+          width={width * 0.9}
         />,
       );
     }

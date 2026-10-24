@@ -28,7 +28,14 @@ can't update fast enough, the safest thing is to switch it off until it can. Tha
 And one in three sites on PHP runs a version so old that the people who make PHP don't fix it anymore. For those, it's
 switch off or hope the hosting company sorts it out.
 
-## What the reference does (first-pass observations; the style/motion bible refines these)
+## What the reference does (first-pass observations)
+AUTHORITATIVE SPECS NOW EXIST, and they win over the notes below: `docs/style_bible.md` (measured look),
+`docs/motion_spec.md` (measured motion and sync rules), `assets/timing.json` (VO timing), `docs/mascot.md` (mascot API).
+Key corrections from measurement: there are NO opacity fades anywhere (everything pops, scales, wipes or slides); the
+camera never pans (one push-in only); the sun is a character (beat pulses, bounces on words, hops with squash and stretch
+across transitions); the mascot crosses every transition; target at least 5 visual events per second and no gap over
+1.0 s; the reference audio is voice only (no music, no SFX).
+
 - Layout: white "polaroid" card on a flat mint background (~#A5C9BC). Illustration panel in the upper card, a hand-lettered
   caption (1–2 centered lines, dark brown ink) below it. A flat orange disc ("the sun", ~#EC6A2F) sits top-center,
   overlapping the panel's top edge. It appears in every scene and is the visual anchor.

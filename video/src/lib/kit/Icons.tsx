@@ -14,6 +14,7 @@ import {rand, Seed} from '../rng';
 import {Ink} from '../Ink';
 import {Fill} from '../Fill';
 import {Pop} from '../motion';
+import {ExitFade} from '../exit';
 import {blob, check, crown, ellipse, hline, line, polyPath, rect, roundRect, Pt} from '../sketch';
 import {At, b} from './common';
 
@@ -63,7 +64,7 @@ export const Bug: React.FC<{x: number; y: number; size?: number; at?: At; seed?:
         <Fill d={blob(x, y - s * 0.36, s * 0.16, s * 0.13, {seed: `${seed}/h`})} color={palette.ink} at={b(at, 0.3)} mode="pop" offset={false} seed={`${seed}/hf`} />
         <Ink d={ellipse(x, y + s * 0.08, s * 0.3, s * 0.38, {seed: `${seed}/bo`})} at={at} dur={0.3} width={width} />
         <Ink d={line(x, y - s * 0.26, x, y + s * 0.44, {over: [0, 0], seed: `${seed}/sp`})} at={b(at, 0.3)} dur={0.15} width={width * 0.9} />
-        {dots}
+        <ExitFade>{dots}</ExitFade>
       </Pop>
     </g>
   );
@@ -136,7 +137,11 @@ export const Server: React.FC<{x: number; y: number; w?: number; h?: number; uni
     for (let k = 0; k < 2; k++) {
       const on = !blink || osc(t, 0.8 + rand(`${seed}${i}${k}`, 'hz') * 2.5, rand(`${seed}${i}${k}`, 'ph') * 6) > -0.2;
       const c = k === 0 ? palette.sage : palette.sun;
-      out.push(<circle key={`l${i}${k}`} cx={x + w - 34 + k * 14} cy={uy + uh / 2} r={4.5} fill={on ? c : palette.olive} opacity={at !== undefined && t < at + 0.8 ? 0 : 1} />);
+      out.push(
+        <ExitFade key={`l${i}${k}`}>
+          <circle cx={x + w - 34 + k * 14} cy={uy + uh / 2} r={4.5} fill={on ? c : palette.olive} opacity={at !== undefined && t < at + 0.8 ? 0 : 1} />
+        </ExitFade>,
+      );
     }
   }
   return <>{out}</>;

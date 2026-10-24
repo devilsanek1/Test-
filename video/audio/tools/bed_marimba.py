@@ -167,4 +167,4 @@ if __name__ == "__main__":
     for k, v in stems.items():
         print(f"  stem {k:7s} rms {20 * np.log10(np.sqrt((v ** 2).mean()) + 1e-12):6.1f} dBFS")
     finish(bed, mix, AUDIO / "music_marimba.wav")
-    bed.write_midi(AUDIO / "music_marimba.mid", [(12, 8, 0.0)])
+    bed.write_midi(AUDIO / "music_marimba.mid", [(12, 8, 0.0)], quarter_bpm=g.bpm * 1.5)

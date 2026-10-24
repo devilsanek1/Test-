@@ -98,8 +98,9 @@ class Bed:
         tr.buf[: len(y)] += y * db2a(gain_db)
 
     # ---------------------------------------------------------------- export
-    def write_midi(self, path, time_sigs=None):
-        pm = pretty_midi.PrettyMIDI(initial_tempo=self.g.bpm)
+    def write_midi(self, path, time_sigs=None, quarter_bpm=None):
+        """quarter_bpm: MIDI tempo is in quarter notes; pass beat_bpm*1.5 for compound (x/8) meters."""
+        pm = pretty_midi.PrettyMIDI(initial_tempo=quarter_bpm or self.g.bpm)
         if time_sigs:
             pm.time_signature_changes = [pretty_midi.TimeSignature(n, d, t) for (n, d, t) in time_sigs]
         for name, notes in self.midi.items():

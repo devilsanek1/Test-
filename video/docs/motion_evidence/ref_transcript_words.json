@@ -1,0 +1,633 @@
+{
+ "source": "assets/ref/reference.mp4 audio, Parakeet TDT 0.6b v2 int8 (sherpa-onnx); onsets refined with librosa onset detection / digital-silence edges",
+ "accuracy": "onsets +-40 ms (ASR frame = 80 ms); ends approximate (= next onset)",
+ "speech_rate_words_per_s": 2.78,
+ "silences_exact_zero_s": [
+  [
+   2.0,
+   2.094
+  ],
+  [
+   3.339,
+   3.418
+  ],
+  [
+   5.323,
+   5.509
+  ],
+  [
+   7.5,
+   7.665
+  ],
+  [
+   12.342,
+   12.825
+  ],
+  [
+   15.823,
+   16.194
+  ],
+  [
+   22.857,
+   23.96
+  ],
+  [
+   26.903,
+   27.139
+  ],
+  [
+   30.328,
+   31.552
+  ]
+ ],
+ "words": [
+  {
+   "w": "France",
+   "on": 0.08,
+   "frame30": 2,
+   "asr_start": 0.0,
+   "onset_src": "energy"
+  },
+  {
+   "w": "expected",
+   "on": 0.41,
+   "frame30": 12,
+   "asr_start": 0.4,
+   "onset_src": "onset"
+  },
+  {
+   "w": "200,000",
+   "on": 0.8,
+   "frame30": 24,
+   "asr_start": 0.8,
+   "onset_src": "asr"
+  },
+  {
+   "w": "marchers,",
+   "on": 1.44,
+   "frame30": 43,
+   "asr_start": 1.44,
+   "onset_src": "asr"
+  },
+  {
+   "w": "half",
+   "on": 2.104,
+   "frame30": 63,
+   "asr_start": 2.16,
+   "onset_src": "silence-end"
+  },
+  {
+   "w": "a",
+   "on": 2.37,
+   "frame30": 71,
+   "asr_start": 2.4,
+   "onset_src": "onset"
+  },
+  {
+   "w": "million",
+   "on": 2.47,
+   "frame30": 74,
+   "asr_start": 2.48,
+   "onset_src": "onset"
+  },
+  {
+   "w": "came,",
+   "on": 2.88,
+   "frame30": 86,
+   "asr_start": 2.88,
+   "onset_src": "asr"
+  },
+  {
+   "w": "and",
+   "on": 3.428,
+   "frame30": 103,
+   "asr_start": 3.44,
+   "onset_src": "silence-end"
+  },
+  {
+   "w": "they",
+   "on": 3.53,
+   "frame30": 106,
+   "asr_start": 3.6,
+   "onset_src": "onset"
+  },
+  {
+   "w": "didn't",
+   "on": 3.68,
+   "frame30": 110,
+   "asr_start": 3.76,
+   "onset_src": "onset"
+  },
+  {
+   "w": "all",
+   "on": 4.08,
+   "frame30": 122,
+   "asr_start": 4.08,
+   "onset_src": "asr"
+  },
+  {
+   "w": "want",
+   "on": 4.25,
+   "frame30": 128,
+   "asr_start": 4.24,
+   "onset_src": "onset"
+  },
+  {
+   "w": "the",
+   "on": 4.43,
+   "frame30": 133,
+   "asr_start": 4.48,
+   "onset_src": "onset"
+  },
+  {
+   "w": "same",
+   "on": 4.58,
+   "frame30": 137,
+   "asr_start": 4.64,
+   "onset_src": "onset"
+  },
+  {
+   "w": "thing.",
+   "on": 4.83,
+   "frame30": 145,
+   "asr_start": 4.88,
+   "onset_src": "onset"
+  },
+  {
+   "w": "France",
+   "on": 5.519,
+   "frame30": 166,
+   "asr_start": 5.52,
+   "onset_src": "silence-end"
+  },
+  {
+   "w": "has",
+   "on": 6.0,
+   "frame30": 180,
+   "asr_start": 6.0,
+   "onset_src": "asr"
+  },
+  {
+   "w": "had",
+   "on": 6.22,
+   "frame30": 187,
+   "asr_start": 6.16,
+   "onset_src": "onset"
+  },
+  {
+   "w": "bigger",
+   "on": 6.47,
+   "frame30": 194,
+   "asr_start": 6.4,
+   "onset_src": "onset"
+  },
+  {
+   "w": "marches,",
+   "on": 6.75,
+   "frame30": 202,
+   "asr_start": 6.72,
+   "onset_src": "onset"
+  },
+  {
+   "w": "but",
+   "on": 7.675,
+   "frame30": 230,
+   "asr_start": 7.68,
+   "onset_src": "silence-end"
+  },
+  {
+   "w": "normally",
+   "on": 7.87,
+   "frame30": 236,
+   "asr_start": 7.84,
+   "onset_src": "onset"
+  },
+  {
+   "w": "they",
+   "on": 8.4,
+   "frame30": 252,
+   "asr_start": 8.4,
+   "onset_src": "asr"
+  },
+  {
+   "w": "march",
+   "on": 8.72,
+   "frame30": 262,
+   "asr_start": 8.64,
+   "onset_src": "onset"
+  },
+  {
+   "w": "against",
+   "on": 9.08,
+   "frame30": 272,
+   "asr_start": 9.04,
+   "onset_src": "onset"
+  },
+  {
+   "w": "one",
+   "on": 9.41,
+   "frame30": 282,
+   "asr_start": 9.36,
+   "onset_src": "onset"
+  },
+  {
+   "w": "law",
+   "on": 9.59,
+   "frame30": 288,
+   "asr_start": 9.6,
+   "onset_src": "onset"
+  },
+  {
+   "w": "and",
+   "on": 10.06,
+   "frame30": 302,
+   "asr_start": 10.0,
+   "onset_src": "onset"
+  },
+  {
+   "w": "the",
+   "on": 10.19,
+   "frame30": 306,
+   "asr_start": 10.16,
+   "onset_src": "onset"
+  },
+  {
+   "w": "government",
+   "on": 10.29,
+   "frame30": 309,
+   "asr_start": 10.24,
+   "onset_src": "onset"
+  },
+  {
+   "w": "drops",
+   "on": 10.71,
+   "frame30": 321,
+   "asr_start": 10.64,
+   "onset_src": "onset"
+  },
+  {
+   "w": "it",
+   "on": 11.09,
+   "frame30": 333,
+   "asr_start": 11.12,
+   "onset_src": "onset"
+  },
+  {
+   "w": "or",
+   "on": 11.37,
+   "frame30": 341,
+   "asr_start": 11.36,
+   "onset_src": "onset"
+  },
+  {
+   "w": "passes",
+   "on": 11.55,
+   "frame30": 346,
+   "asr_start": 11.6,
+   "onset_src": "onset"
+  },
+  {
+   "w": "it.",
+   "on": 12.21,
+   "frame30": 366,
+   "asr_start": 12.16,
+   "onset_src": "onset"
+  },
+  {
+   "w": "This",
+   "on": 12.835,
+   "frame30": 385,
+   "asr_start": 12.8,
+   "onset_src": "silence-end"
+  },
+  {
+   "w": "time,",
+   "on": 13.13,
+   "frame30": 394,
+   "asr_start": 13.04,
+   "onset_src": "onset"
+  },
+  {
+   "w": "it's",
+   "on": 13.44,
+   "frame30": 403,
+   "asr_start": 13.44,
+   "onset_src": "asr"
+  },
+  {
+   "w": "prices,",
+   "on": 13.81,
+   "frame30": 414,
+   "asr_start": 13.76,
+   "onset_src": "onset"
+  },
+  {
+   "w": "schools,",
+   "on": 14.47,
+   "frame30": 434,
+   "asr_start": 14.48,
+   "onset_src": "onset"
+  },
+  {
+   "w": "and",
+   "on": 14.99,
+   "frame30": 450,
+   "asr_start": 15.04,
+   "onset_src": "onset"
+  },
+  {
+   "w": "lots",
+   "on": 15.2,
+   "frame30": 456,
+   "asr_start": 15.2,
+   "onset_src": "asr"
+  },
+  {
+   "w": "more.",
+   "on": 15.52,
+   "frame30": 466,
+   "asr_start": 15.52,
+   "onset_src": "asr"
+  },
+  {
+   "w": "Saying",
+   "on": 16.204,
+   "frame30": 486,
+   "asr_start": 16.16,
+   "onset_src": "silence-end"
+  },
+  {
+   "w": "yes",
+   "on": 16.56,
+   "frame30": 497,
+   "asr_start": 16.56,
+   "onset_src": "asr"
+  },
+  {
+   "w": "on",
+   "on": 16.9,
+   "frame30": 507,
+   "asr_start": 16.88,
+   "onset_src": "onset"
+  },
+  {
+   "w": "schools",
+   "on": 17.12,
+   "frame30": 514,
+   "asr_start": 17.12,
+   "onset_src": "asr"
+  },
+  {
+   "w": "alone",
+   "on": 17.45,
+   "frame30": 524,
+   "asr_start": 17.52,
+   "onset_src": "onset"
+  },
+  {
+   "w": "would",
+   "on": 17.93,
+   "frame30": 538,
+   "asr_start": 17.92,
+   "onset_src": "onset"
+  },
+  {
+   "w": "cost",
+   "on": 18.06,
+   "frame30": 542,
+   "asr_start": 18.08,
+   "onset_src": "onset"
+  },
+  {
+   "w": "10",
+   "on": 18.47,
+   "frame30": 554,
+   "asr_start": 18.52,
+   "onset_src": "onset"
+  },
+  {
+   "w": "billion",
+   "on": 18.81,
+   "frame30": 564,
+   "asr_start": 18.8,
+   "onset_src": "onset"
+  },
+  {
+   "w": "Euros,",
+   "on": 19.15,
+   "frame30": 574,
+   "asr_start": 19.2,
+   "onset_src": "onset"
+  },
+  {
+   "w": "and",
+   "on": 20.13,
+   "frame30": 604,
+   "asr_start": 20.08,
+   "onset_src": "onset"
+  },
+  {
+   "w": "France",
+   "on": 20.24,
+   "frame30": 607,
+   "asr_start": 20.24,
+   "onset_src": "asr"
+  },
+  {
+   "w": "now",
+   "on": 20.8,
+   "frame30": 624,
+   "asr_start": 20.72,
+   "onset_src": "onset"
+  },
+  {
+   "w": "pays",
+   "on": 21.06,
+   "frame30": 632,
+   "asr_start": 20.96,
+   "onset_src": "onset"
+  },
+  {
+   "w": "more",
+   "on": 21.36,
+   "frame30": 641,
+   "asr_start": 21.36,
+   "onset_src": "asr"
+  },
+  {
+   "w": "to",
+   "on": 21.61,
+   "frame30": 648,
+   "asr_start": 21.52,
+   "onset_src": "onset"
+  },
+  {
+   "w": "borrow",
+   "on": 21.68,
+   "frame30": 650,
+   "asr_start": 21.68,
+   "onset_src": "asr"
+  },
+  {
+   "w": "than",
+   "on": 22.18,
+   "frame30": 665,
+   "asr_start": 22.16,
+   "onset_src": "onset"
+  },
+  {
+   "w": "Greece.",
+   "on": 22.34,
+   "frame30": 670,
+   "asr_start": 22.4,
+   "onset_src": "onset"
+  },
+  {
+   "w": "Saying",
+   "on": 23.97,
+   "frame30": 719,
+   "asr_start": 23.92,
+   "onset_src": "silence-end"
+  },
+  {
+   "w": "no",
+   "on": 24.32,
+   "frame30": 730,
+   "asr_start": 24.32,
+   "onset_src": "asr"
+  },
+  {
+   "w": "isn't",
+   "on": 24.64,
+   "frame30": 739,
+   "asr_start": 24.64,
+   "onset_src": "asr"
+  },
+  {
+   "w": "easy",
+   "on": 25.04,
+   "frame30": 751,
+   "asr_start": 25.04,
+   "onset_src": "asr"
+  },
+  {
+   "w": "with",
+   "on": 25.5,
+   "frame30": 765,
+   "asr_start": 25.44,
+   "onset_src": "onset"
+  },
+  {
+   "w": "an",
+   "on": 25.61,
+   "frame30": 768,
+   "asr_start": 25.6,
+   "onset_src": "onset"
+  },
+  {
+   "w": "election",
+   "on": 25.79,
+   "frame30": 774,
+   "asr_start": 25.76,
+   "onset_src": "onset"
+  },
+  {
+   "w": "in",
+   "on": 26.16,
+   "frame30": 785,
+   "asr_start": 26.16,
+   "onset_src": "asr"
+  },
+  {
+   "w": "April.",
+   "on": 26.37,
+   "frame30": 791,
+   "asr_start": 26.4,
+   "onset_src": "onset"
+  },
+  {
+   "w": "So",
+   "on": 27.149,
+   "frame30": 814,
+   "asr_start": 27.2,
+   "onset_src": "silence-end"
+  },
+  {
+   "w": "now",
+   "on": 27.45,
+   "frame30": 824,
+   "asr_start": 27.44,
+   "onset_src": "onset"
+  },
+  {
+   "w": "it's",
+   "on": 27.68,
+   "frame30": 830,
+   "asr_start": 27.68,
+   "onset_src": "asr"
+  },
+  {
+   "w": "hard",
+   "on": 27.96,
+   "frame30": 839,
+   "asr_start": 28.0,
+   "onset_src": "onset"
+  },
+  {
+   "w": "to",
+   "on": 28.25,
+   "frame30": 848,
+   "asr_start": 28.24,
+   "onset_src": "onset"
+  },
+  {
+   "w": "say",
+   "on": 28.42,
+   "frame30": 853,
+   "asr_start": 28.4,
+   "onset_src": "onset"
+  },
+  {
+   "w": "yes",
+   "on": 28.58,
+   "frame30": 857,
+   "asr_start": 28.64,
+   "onset_src": "onset"
+  },
+  {
+   "w": "and",
+   "on": 29.04,
+   "frame30": 871,
+   "asr_start": 29.04,
+   "onset_src": "asr"
+  },
+  {
+   "w": "hard",
+   "on": 29.28,
+   "frame30": 878,
+   "asr_start": 29.28,
+   "onset_src": "asr"
+  },
+  {
+   "w": "to",
+   "on": 29.56,
+   "frame30": 887,
+   "asr_start": 29.52,
+   "onset_src": "onset"
+  },
+  {
+   "w": "say",
+   "on": 29.73,
+   "frame30": 892,
+   "asr_start": 29.68,
+   "onset_src": "onset"
+  },
+  {
+   "w": "no.",
+   "on": 29.93,
+   "frame30": 898,
+   "asr_start": 30.0,
+   "onset_src": "onset"
+  }
+ ]
+}

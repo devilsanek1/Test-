@@ -59,7 +59,7 @@ def speech_rel(music, vo):
     tm, lm = short_term_lufs(music, win=0.4, hop=0.1)
     tv, lv = short_term_lufs(vo, win=0.4, hop=0.1)
     k = min(len(lm), len(lv))
-    sp = lv[:k] > -35
+    sp = lv[:k] > (lufs(vo) - 6 + (3.0 if np.ndim(vo) == 1 else 0.0))
     d = lv[:k][sp] - lm[:k][sp]
     print(f"voice-over-music during speech: median {np.median(d):.1f} dB, p5 {np.percentile(d, 5):.1f} dB, "
           f"min {d.min():.1f} dB, frames <12 dB: {(d < 12).mean() * 100:.1f}%")

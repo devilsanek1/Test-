@@ -15,6 +15,7 @@ import {rng, Seed} from '../rng';
 import {Ink} from '../Ink';
 import {Fill} from '../Fill';
 import {Pop} from '../motion';
+import {ExitFade} from '../exit';
 import {arc, blob, circle, glint, hline, line, poly, polyPath, rect, roundRect, textLines, Pt} from '../sketch';
 import {At, b} from './common';
 
@@ -151,7 +152,11 @@ export const Paper: React.FC<PaperProps> = ({x, y, w = 150, h = 200, rot = 0, at
       {fold ? <Ink d={`M${w - f} 0L${w - f + 1} ${f}L${w} ${f}`} at={b(A, 0.45)} dur={0.15} width={width * 0.8} /> : null}
       <Ink d={hline(w * 0.18, w * 0.18 + w * r.range(0.25, 0.4), h * 0.2, {over: 0, seed: `${seed}/hd`})} at={b(A, 0.55)} dur={0.15} width={width * 1.7} />
       <Ink d={textLines(w * 0.14, h * 0.34, w * 0.7, {n: lines, gap: (h * 0.5) / Math.max(1, lines), heading: false, seed: `${seed}/tl`})} at={b(A, 0.6)} dur={0.45} width={width * 0.8} />
-      {pin ? <circle cx={w / 2} cy={h * 0.07} r={Math.max(3, w * 0.035)} fill={palette.ink} /> : null}
+      {pin ? (
+        <ExitFade>
+          <circle cx={w / 2} cy={h * 0.07} r={Math.max(3, w * 0.035)} fill={palette.ink} />
+        </ExitFade>
+      ) : null}
       {stampO ? <Stamp x={w * 0.66} y={h * 0.64} r={w * 0.22} at={stampO.at ?? b(at, 0.9)} color={stampO.color} seed={`${seed}/st`} /> : null}
     </>
   );

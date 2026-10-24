@@ -13,6 +13,7 @@ import {rng, Seed} from '../rng';
 import {Ink} from '../Ink';
 import {Fill} from '../Fill';
 import {Pop} from '../motion';
+import {ExitFade} from '../exit';
 import {arc, circle, hline, line, poly, rect, rectPath, roundRect, textLines} from '../sketch';
 import {captionFontStack} from '../font';
 import {At, b} from './common';
@@ -133,15 +134,17 @@ export const BrowserWindow: React.FC<BrowserWindowProps> = ({x, y, w, h, at, see
       {q2 > 0 && q2 < 1 ? <circle cx={ccx} cy={ccy} r={6 * (1 - q2) + 2} fill={palette.card} /> : null}
       {offAt !== undefined && offIcon ? (
         <Pop at={offAt + 0.6} x={ccx} y={ccy}>
-          <Ink d={arc(ccx, ccy + 2, 26, 26, -55, 235, {seed: `${seed}/pw`})} at={offAt + 0.65} dur={0.4} width={stroke.inkBold} color={palette.grey} exit={false} />
-          <Ink d={line(ccx, ccy - 34, ccx, ccy - 6, {over: 0, seed: `${seed}/pw2`})} at={offAt + 0.95} dur={0.15} width={stroke.inkBold} color={palette.grey} exit={false} />
+          <Ink d={arc(ccx, ccy + 2, 26, 26, -55, 235, {seed: `${seed}/pw`})} at={offAt + 0.65} dur={0.4} width={stroke.inkBold} color={palette.grey} />
+          <Ink d={line(ccx, ccy - 34, ccx, ccy - 6, {over: 0, seed: `${seed}/pw2`})} at={offAt + 0.95} dur={0.15} width={stroke.inkBold} color={palette.grey} />
         </Pop>
       ) : null}
       <Ink d={rect(x, y, w, h, {seed: `${seed}/frame`})} at={at} dur={0.5} width={width} />
       <Ink d={hline(x, x + w, y + TB, {seed: `${seed}/tbl`, over: [2, 8]})} at={b(at, 0.3)} dur={0.25} width={width} />
       {[palette.salmon, palette.sun, palette.sage].map((c, i) => (
         <Pop key={i} at={b(at, 0.45 + i * 0.07) ?? -10} x={x + 24 + i * 22} y={y + TB / 2}>
-          <circle cx={x + 24 + i * 22} cy={y + TB / 2} r={7} fill={c} />
+          <ExitFade>
+            <circle cx={x + 24 + i * 22} cy={y + TB / 2} r={7} fill={c} />
+          </ExitFade>
           <Ink d={circle(x + 24 + i * 22, y + TB / 2, 7, {seed: `${seed}/d${i}`})} width={width * 0.6} />
         </Pop>
       ))}
@@ -161,9 +164,11 @@ const UrlText: React.FC<{x: number; y: number; text: string; at: At}> = ({x, y, 
   const n = at === undefined ? text.length : Math.floor(text.length * prog(t, at, Math.min(0.8, text.length * 0.04)));
   if (n <= 0) return null;
   return (
-    <text x={x} y={y} fontFamily={captionFontStack} fontSize={20} fill={palette.brown}>
-      {text.slice(0, n)}
-    </text>
+    <ExitFade>
+      <text x={x} y={y} fontFamily={captionFontStack} fontSize={20} fill={palette.brown}>
+        {text.slice(0, n)}
+      </text>
+    </ExitFade>
   );
 };
 

@@ -35,3 +35,11 @@ export const exitFillProgress = (e: number, jitter = 0) => (e <= 0 ? 0 : prog(e,
 
 /** Ink retract progress for exit value e. */
 export const exitInkProgress = (e: number, jitter = 0) => (e <= 0 ? 0 : prog(e, 0.36 + jitter * 0.22, 0.42, ease.inOutCubic));
+
+/** Fades raw SVG children (circles, text...) out together with the fills during an un-build. */
+export const ExitFade: React.FC<{children?: React.ReactNode; jitter?: number}> = ({children, jitter = 0.5}) => {
+  const e = useExit();
+  const o = 1 - exitFillProgress(e, jitter);
+  if (o <= 0.001) return null;
+  return o < 1 ? <g opacity={o}>{children}</g> : <>{children}</>;
+};

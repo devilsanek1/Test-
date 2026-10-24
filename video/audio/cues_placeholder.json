@@ -1,0 +1,198 @@
+[
+ {
+  "t": 1.345,
+  "sfx": "pop_mid",
+  "gain_db": -14,
+  "pan": -0.2,
+  "why": "number 'four'"
+ },
+ {
+  "t": 3.602,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.15s gap)"
+ },
+ {
+  "t": 4.664,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.18s gap)"
+ },
+ {
+  "t": 9.2,
+  "sfx": "pop_high",
+  "gain_db": -14,
+  "pan": 0.2,
+  "why": "number '7'"
+ },
+ {
+  "t": 9.838,
+  "sfx": "pop_low",
+  "gain_db": -14,
+  "pan": 0.0,
+  "why": "number '10'"
+ },
+ {
+  "t": 10.721,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.17s gap)"
+ },
+ {
+  "t": 12.936,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.17s gap)"
+ },
+ {
+  "t": 14.073,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.17s gap)"
+ },
+ {
+  "t": 15.63,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.15s gap)"
+ },
+ {
+  "t": 18.179,
+  "sfx": "card_flip",
+  "gain_db": -18,
+  "pan": 0,
+  "why": "sentence boundary (0.39s gap)"
+ },
+ {
+  "t": 18.87,
+  "sfx": "pop_mid",
+  "gain_db": -14,
+  "pan": -0.2,
+  "why": "number '14'"
+ },
+ {
+  "t": 21.267,
+  "sfx": "card_flip",
+  "gain_db": -18,
+  "pan": 0,
+  "why": "sentence boundary (0.35s gap)"
+ },
+ {
+  "t": 22.873,
+  "sfx": "pop_high",
+  "gain_db": -14,
+  "pan": 0.2,
+  "why": "number 'two'"
+ },
+ {
+  "t": 30.142,
+  "sfx": "card_flip",
+  "gain_db": -18,
+  "pan": 0,
+  "why": "sentence boundary (0.48s gap)"
+ },
+ {
+  "t": 31.71,
+  "sfx": "riser_leak",
+  "gain_db": -16,
+  "pan": 0,
+  "why": "leak build peaking on 'Cloudflare' (35.35-35.6)"
+ },
+ {
+  "t": 35.425,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.19s gap)"
+ },
+ {
+  "t": 38.832,
+  "sfx": "pop_low",
+  "gain_db": -14,
+  "pan": 0.0,
+  "why": "number 'tens'"
+ },
+ {
+  "t": 41.07,
+  "sfx": "pop_mid",
+  "gain_db": -14,
+  "pan": -0.2,
+  "why": "number '45'"
+ },
+ {
+  "t": 42.485,
+  "sfx": "pop_high",
+  "gain_db": -14,
+  "pan": 0.2,
+  "why": "number 'millions'"
+ },
+ {
+  "t": 43.636,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.16s gap)"
+ },
+ {
+  "t": 47.672,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.12s gap)"
+ },
+ {
+  "t": 51.094,
+  "sfx": "pop_low",
+  "gain_db": -14,
+  "pan": 0.0,
+  "why": "number '22'"
+ },
+ {
+  "t": 51.745,
+  "sfx": "pop_mid",
+  "gain_db": -14,
+  "pan": -0.2,
+  "why": "number 'million'"
+ },
+ {
+  "t": 54.381,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.18s gap)"
+ },
+ {
+  "t": 58.901,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.16s gap)"
+ },
+ {
+  "t": 60.403,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.16s gap)"
+ },
+ {
+  "t": 60.755,
+  "sfx": "pop_high",
+  "gain_db": -14,
+  "pan": 0.2,
+  "why": "number 'one'"
+ },
+ {
+  "t": 66.529,
+  "sfx": "whoosh_soft",
+  "gain_db": -22,
+  "pan": 0,
+  "why": "sentence boundary (0.15s gap)"
+ }
+]

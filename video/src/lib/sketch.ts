@@ -20,34 +20,69 @@ const D2R = Math.PI / 180;
 
 const autoSeed = (...n: number[]) => n.map((v) => Math.round(v)).join(',');
 
+// ---------------------------------------------------------------- memoisation
+// All path generators are pure, so results are cached by (name, args). Kit components call them on every
+// frame; the cache turns that into a Map lookup.
+const PATH_CACHE = new Map<string, string>();
+function memo<A extends unknown[]>(name: string, fn: (...a: A) => string): (...a: A) => string {
+  return (...args: A) => {
+    const key = name + JSON.stringify(args);
+    let v = PATH_CACHE.get(key);
+    if (v === undefined) {
+      v = fn(...args);
+      if (PATH_CACHE.size > 200000) PATH_CACHE.clear();
+      PATH_CACHE.set(key, v);
+    }
+    return v;
+  };
+}
+
 // ---------------------------------------------------------------- lines
+
+/** Overshoot presets (style bible 3): small details 3-8, windows/doors/frames 6-15, structural 30-62 px. */
+export type OverPreset = 'none' | 'small' | 'medium' | 'structural';
 
 export type LineOpts = {
   seed?: Seed;
-  /** Overshoot past the ends (px). number = both ends (randomised 0.5–1.4x); [start, end] = exact; 0 = none.
-   *  Default: ~4–18 px scaled by length, ~14% chance of a long 16–40 px "construction" tail on one end. */
-  over?: number | [number, number];
-  /** Max sideways bow (px), random sign. Default ~0.5% of length (min 0.4). */
+  /** Overshoot past the ends (px). number = both ends (randomised 0.5-1.4x); [start, end] = exact;
+   *  a preset ('small' | 'medium' | 'structural' | 'none'). Default per end: ~20% clean, ~65% medium-ish
+   *  (scaled by length), ~15% long "construction" tail. */
+  over?: number | [number, number] | OverPreset;
+  /** Max sideways bow (px), random sign. Default ~0.4% of length (min 0.4). */
   bow?: number;
   /** Endpoint jitter (px). Default 0.8. */
   jitter?: number;
+  /** Off-axis drift in degrees (default random 0.3-1; near-vertical lines get 40% of it). 0 = ruler-true. */
+  drift?: number;
+  /** Lines longer than 400 px are drawn as 2-4 pen strokes with 6-16 px gaps (style bible 3). Default true. */
+  breaks?: boolean;
 };
+
+const OVER_RANGES: Record<Exclude<OverPreset, 'none'>, [number, number]> = {small: [3, 8], medium: [6, 15], structural: [30, 62]};
 
 function overs(r: Rng, over: LineOpts['over'], len: number): [number, number] {
   if (Array.isArray(over)) return over;
   if (typeof over === 'number') return [over * r.range(0.5, 1.4), over * r.range(0.5, 1.4)];
-  const base = Math.min(15, Math.max(4, len * 0.05));
-  const a = base * r.range(0.3, 1.25);
-  const b = base * r.range(0.3, 1.45);
-  if (len > 60 && r.chance(0.14)) {
-    const tail = r.range(16, 40);
-    return r.chance(0.5) ? [tail, b] : [a, tail];
+  if (over === 'none') return [0, 0];
+  if (over) {
+    const [lo, hi] = OVER_RANGES[over];
+    return [r.range(lo, hi), r.range(lo, hi)];
   }
-  return [a, b];
+  const base = Math.min(14, Math.max(4, len * 0.05));
+  const end = () => {
+    const k = r.next();
+    if (k < 0.2) return r.range(0, 2);
+    if (k < 0.85 || len < 50) return base * r.range(0.5, 1.3);
+    return Math.min(40, base * r.range(1.8, 3.2));
+  };
+  return [end(), end()];
 }
 
-/** A single hand-drawn straight stroke from (x1,y1) to (x2,y2), extended past both ends. */
-export function line(x1: number, y1: number, x2: number, y2: number, o: LineOpts = {}): string {
+const quadAt = (p0: number, c: number, p1: number, t: number) => (1 - t) * (1 - t) * p0 + 2 * (1 - t) * t * c + t * t * p1;
+
+/** A single hand-drawn straight stroke from (x1,y1) to (x2,y2): overshoots, drifts slightly off-axis, bows a
+ *  hair, and (if > 400 px) is broken into 2-4 strokes with small gaps. */
+function _line(x1: number, y1: number, x2: number, y2: number, o: LineOpts = {}): string {
   const r = rng(o.seed ?? autoSeed(x1, y1, x2, y2));
   const dx = x2 - x1;
   const dy = y2 - y1;
@@ -56,15 +91,41 @@ export function line(x1: number, y1: number, x2: number, y2: number, o: LineOpts
   const uy = dy / len;
   const [o1, o2] = overs(r, o.over, len);
   const j = o.jitter ?? 0.8;
+  const vertical = Math.abs(uy) > 0.9;
+  const driftDeg = (o.drift ?? r.range(0.3, 1)) * (vertical ? 0.4 : 1) * r.sign();
+  const dOff = Math.tan(driftDeg * D2R) * len; // perpendicular offset of the end point
   const ax = x1 - ux * o1 + r.jitter(j);
   const ay = y1 - uy * o1 + r.jitter(j);
-  const bx = x2 + ux * o2 + r.jitter(j);
-  const by = y2 + uy * o2 + r.jitter(j);
-  const bow = (o.bow ?? Math.max(0.4, len * 0.005)) * r.range(-1, 1);
+  const bx = x2 + ux * o2 - uy * dOff + r.jitter(j);
+  const by = y2 + uy * o2 + ux * dOff + r.jitter(j);
+  const bow = (o.bow ?? Math.max(0.4, len * 0.004)) * r.range(-1, 1);
   const cx = (ax + bx) / 2 - uy * bow * 2;
   const cy = (ay + by) / 2 + ux * bow * 2;
-  return `M${P(ax, ay)}Q${P(cx, cy)} ${P(bx, by)}`;
+  const total = len + o1 + o2;
+  if (o.breaks === false || total <= 400) return `M${P(ax, ay)}Q${P(cx, cy)} ${P(bx, by)}`;
+  // break into n strokes with small gaps (sub-curves of the same quadratic)
+  const n = total > 800 ? r.int(3, 4) : r.int(2, 3);
+  const cuts: number[] = [0];
+  for (let i = 1; i < n; i++) cuts.push(i / n + r.jitter(0.25 / n));
+  cuts.push(1);
+  let d = '';
+  for (let i = 0; i < n; i++) {
+    const gap = i > 0 ? r.range(6, 16) / total : 0;
+    const t0 = cuts[i] + gap / 2;
+    const t1 = cuts[i + 1] - (i < n - 1 ? r.range(3, 8) / total : 0);
+    if (t1 <= t0) continue;
+    const p0x = quadAt(ax, cx, bx, t0);
+    const p0y = quadAt(ay, cy, by, t0);
+    const p1x = quadAt(ax, cx, bx, t1);
+    const p1y = quadAt(ay, cy, by, t1);
+    // control point of the sub-curve: B(t0) + (t1-t0) * B'(t0)/2
+    const qx = p0x + (t1 - t0) * ((1 - t0) * (cx - ax) + t0 * (bx - cx));
+    const qy = p0y + (t1 - t0) * ((1 - t0) * (cy - ay) + t0 * (by - cy));
+    d += `M${P(p0x, p0y)}Q${P(qx, qy)} ${P(p1x, p1y)}`;
+  }
+  return d;
 }
+export const line = memo('line', _line);
 
 /** Horizontal line helper. */
 export const hline = (x1: number, x2: number, y: number, o: LineOpts = {}) => line(x1, y, x2, y, o);
@@ -74,14 +135,17 @@ export const vline = (x: number, y1: number, y2: number, o: LineOpts = {}) => li
 export type RectOpts = LineOpts & {
   /** Which edges to draw, in drawing order: any of 't','l','r','b'. Default 'tlrb'. */
   edges?: string;
+  /** Probability (0..1) of leaving the right or bottom edge un-inked (style bible: 20-40% of contours open). */
+  open?: number;
 };
 
 /** Rectangle as separate edge strokes that overshoot at the corners (reference windows/boards/facades). */
-export function rect(x: number, y: number, w: number, h: number, o: RectOpts = {}): string {
+function _rect(x: number, y: number, w: number, h: number, o: RectOpts = {}): string {
   const seed = o.seed ?? autoSeed(x, y, w, h);
   const r = rng(seed);
-  const edges = o.edges ?? 'tlrb';
-  const base: LineOpts = {over: o.over, bow: o.bow, jitter: o.jitter};
+  let edges = o.edges ?? 'tlrb';
+  if (o.open && r.chance(o.open)) edges = edges.replace(r.chance(0.55) ? 'r' : 'b', '');
+  const base: LineOpts = {over: o.over, bow: o.bow, jitter: o.jitter, drift: o.drift ?? r.range(0.1, 0.5), breaks: o.breaks};
   const out: string[] = [];
   for (const e of edges) {
     const s = `${seed}/${e}${r.int(0, 999)}`;
@@ -92,6 +156,7 @@ export function rect(x: number, y: number, w: number, h: number, o: RectOpts = {
   }
   return out.join('');
 }
+export const rect = memo('rect', _rect);
 
 export type PolyOpts = LineOpts & {
   closed?: boolean;
@@ -100,7 +165,7 @@ export type PolyOpts = LineOpts & {
 };
 
 /** Polyline through points. Default: each segment its own overshooting stroke (roofs, frames, perspective lines). */
-export function poly(points: Pt[], o: PolyOpts = {}): string {
+function _poly(points: Pt[], o: PolyOpts = {}): string {
   const seed = o.seed ?? autoSeed(...points.flat());
   const pts = o.closed ? [...points, points[0]] : points;
   if (o.joined) {
@@ -114,11 +179,12 @@ export function poly(points: Pt[], o: PolyOpts = {}): string {
   }
   return out.join('');
 }
+export const poly = memo('poly', _poly);
 
 // ---------------------------------------------------------------- curves
 
 /** Smooth Catmull-Rom curve through points (cubic beziers). tension 0.5 = standard. */
-export function smooth(points: Pt[], o: {closed?: boolean; tension?: number} = {}): string {
+function _smooth(points: Pt[], o: {closed?: boolean; tension?: number} = {}): string {
   const pts = points;
   const n = pts.length;
   if (n < 2) return '';
@@ -139,6 +205,7 @@ export function smooth(points: Pt[], o: {closed?: boolean; tension?: number} = {
   }
   return o.closed ? d + 'Z' : d;
 }
+export const smooth = memo('smooth', _smooth);
 
 export type CircleOpts = {
   seed?: Seed;
@@ -175,20 +242,22 @@ function ellipsePts(cx: number, cy: number, rx: number, ry: number, o: CircleOpt
 }
 
 /** Hand-drawn ellipse outline: slightly wobbly, ends overlap (or leave a tiny gap) like a pen loop. */
-export function ellipse(cx: number, cy: number, rx: number, ry: number, o: CircleOpts = {}): string {
+function _ellipse(cx: number, cy: number, rx: number, ry: number, o: CircleOpts = {}): string {
   return smooth(ellipsePts(cx, cy, rx, ry, o, false));
 }
+export const ellipse = memo('ellipse', _ellipse);
 
 /** Hand-drawn circle outline. */
 export const circle = (cx: number, cy: number, rad: number, o: CircleOpts = {}) => ellipse(cx, cy, rad, rad, o);
 
 /** Closed wobbly blob (for fills under circles/ellipses). Same wobble family as ellipse(). */
-export function blob(cx: number, cy: number, rx: number, ry: number, o: CircleOpts = {}): string {
+function _blob(cx: number, cy: number, rx: number, ry: number, o: CircleOpts = {}): string {
   return smooth(ellipsePts(cx, cy, rx, ry, o, true), {closed: true});
 }
+export const blob = memo('blob', _blob);
 
 /** Partial ellipse arc from a0 to a1 (degrees, clockwise when a1 > a0). Slight wobble. */
-export function arc(cx: number, cy: number, rx: number, ry: number, a0: number, a1: number, o: {seed?: Seed; wobble?: number} = {}): string {
+function _arc(cx: number, cy: number, rx: number, ry: number, a0: number, a1: number, o: {seed?: Seed; wobble?: number} = {}): string {
   const r = rng(o.seed ?? autoSeed(cx, cy, rx, a0, a1));
   const wob = o.wobble ?? 0.02;
   const span = Math.abs(a1 - a0) * D2R * (rx + ry) * 0.5;
@@ -202,9 +271,10 @@ export function arc(cx: number, cy: number, rx: number, ry: number, a0: number, 
   }
   return smooth(pts);
 }
+export const arc = memo('arc', _arc);
 
 /** Sagging wire / cable from (x1,y1) to (x2,y2); sag in px (positive = down). */
-export function wire(x1: number, y1: number, x2: number, y2: number, sag = 18, o: LineOpts = {}): string {
+function _wire(x1: number, y1: number, x2: number, y2: number, sag = 18, o: LineOpts = {}): string {
   const r = rng(o.seed ?? autoSeed(x1, y1, x2, y2, sag));
   const [o1, o2] = Array.isArray(o.over) ? o.over : [r.range(2, 10), r.range(2, 10)];
   const dx = x2 - x1;
@@ -214,6 +284,7 @@ export function wire(x1: number, y1: number, x2: number, y2: number, sag = 18, o
   const uy = dy / len;
   return `M${P(x1 - ux * o1, y1 - uy * o1)}Q${P((x1 + x2) / 2, (y1 + y2) / 2 + sag * 2)} ${P(x2 + ux * o2, y2 + uy * o2)}`;
 }
+export const wire = memo('wire', _wire);
 
 /** Point on a wire() at u in 0..1 (ignores the overshoot). Use to sit birds / lamps on a wire. */
 export function wirePoint(x1: number, y1: number, x2: number, y2: number, sag: number, u: number): Pt {
@@ -230,7 +301,7 @@ export function wirePoint(x1: number, y1: number, x2: number, y2: number, sag: n
 export type CrownOpts = {seed?: Seed; bumps?: number; /** bump roundness 0.5 (flat) .. 0.9 (round). */ round?: number};
 
 /** Scalloped tree crown (cloud-like bumpy outline, closed). Use as both Ink and Fill. */
-export function crown(cx: number, cy: number, rx: number, ry: number, o: CrownOpts = {}): string {
+function _crown(cx: number, cy: number, rx: number, ry: number, o: CrownOpts = {}): string {
   const r = rng(o.seed ?? autoSeed(cx, cy, rx, ry));
   const per = Math.PI * (rx + ry);
   const n = o.bumps ?? Math.max(6, Math.round(per / 52));
@@ -252,31 +323,34 @@ export function crown(cx: number, cy: number, rx: number, ry: number, o: CrownOp
   }
   return d + 'Z';
 }
+export const crown = memo('crown', _crown);
 
 /** Small "smile" ticks inside a crown (the reference's leaf marks). */
-export function crownTicks(cx: number, cy: number, rx: number, ry: number, o: {seed?: Seed; n?: number; size?: number} = {}): string {
+function _crownTicks(cx: number, cy: number, rx: number, ry: number, o: {seed?: Seed; n?: number; size?: number} = {}): string {
   const r = rng(o.seed ?? autoSeed(cx, cy, rx, ry, 7));
   const n = o.n ?? Math.max(3, Math.min(7, Math.round((rx * ry) / 1800)));
   const s = o.size ?? Math.max(6, Math.min(12, rx * 0.095));
   let d = '';
+  // ticks hug the rim (lower half + sides), never the centre, so no accidental "faces"
   const a0 = r.range(0, Math.PI * 2);
   for (let i = 0; i < n; i++) {
-    // spread around a ring (golden-angle steps) biased to the lower half; avoids accidental faces
-    const a = a0 + i * 2.39996 + r.jitter(0.3);
-    const rr = r.range(0.42, 0.7);
+    let a = a0 + i * 2.39996 + r.jitter(0.3);
+    if (Math.sin(a) < -0.3) a = -a; // flip upper-rim ticks to the lower half
+    const rr = r.range(0.58, 0.78);
     const x = cx + Math.cos(a) * rx * rr;
-    const y = cy + Math.abs(Math.sin(a)) * ry * rr * (Math.sin(a) < 0 ? 0.35 : 1);
-    const w = s * r.range(0.6, 1.25);
-    const tilt = r.jitter(0.25);
+    const y = cy + Math.sin(a) * ry * rr;
+    const w = s * r.range(0.6, 1.2);
+    const tilt = Math.cos(a) * 0.35 + r.jitter(0.15);
     d += `M${P(x - w, y - w * (0.32 + tilt))}C${P(x - w * 0.75, y + w * 0.38)} ${P(x + w * 0.75, y + w * 0.38)} ${P(x + w, y - w * (0.32 - tilt))}`;
   }
   return d;
 }
+export const crownTicks = memo('crownTicks', _crownTicks);
 
 // ---------------------------------------------------------------- marks & details
 
 /** Window glint: two parallel diagonal strokes "//" (default rising to the right). */
-export function glint(x: number, y: number, len = 40, o: {seed?: Seed; angle?: number; gap?: number} = {}): string {
+function _glint(x: number, y: number, len = 40, o: {seed?: Seed; angle?: number; gap?: number} = {}): string {
   const r = rng(o.seed ?? autoSeed(x, y, len));
   const a = (o.angle ?? -62) * D2R;
   const ux = Math.cos(a);
@@ -289,9 +363,10 @@ export function glint(x: number, y: number, len = 40, o: {seed?: Seed; angle?: n
   const oy = y + ny * gap + uy * len * 0.12;
   return `M${P(x, y)}L${P(x + ux * len, y + uy * len)}M${P(ox, oy)}L${P(ox + ux * l2, oy + uy * l2)}`;
 }
+export const glint = memo('glint', _glint);
 
 /** Parallel hatching clipped to a rect. angle in degrees, gap in px. */
-export function hatch(x: number, y: number, w: number, h: number, o: {seed?: Seed; angle?: number; gap?: number; jitter?: number} = {}): string {
+function _hatch(x: number, y: number, w: number, h: number, o: {seed?: Seed; angle?: number; gap?: number; jitter?: number} = {}): string {
   const r = rng(o.seed ?? autoSeed(x, y, w, h, 3));
   const a = (o.angle ?? 45) * D2R;
   const gap = o.gap ?? 12;
@@ -331,9 +406,10 @@ export function hatch(x: number, y: number, w: number, h: number, o: {seed?: See
   }
   return d;
 }
+export const hatch = memo('hatch', _hatch);
 
 /** Arrow from (x1,y1) to (x2,y2): bowed shaft + two head strokes. */
-export function arrow(x1: number, y1: number, x2: number, y2: number, o: {seed?: Seed; head?: number; bow?: number; spread?: number} = {}): string {
+function _arrow(x1: number, y1: number, x2: number, y2: number, o: {seed?: Seed; head?: number; bow?: number; spread?: number} = {}): string {
   const seed = o.seed ?? autoSeed(x1, y1, x2, y2);
   const r = rng(seed);
   const head = o.head ?? 18;
@@ -344,9 +420,10 @@ export function arrow(x1: number, y1: number, x2: number, y2: number, o: {seed?:
   const h2 = `L${P(x2 + Math.cos(a + spread) * head * r.range(0.85, 1.1), y2 + Math.sin(a + spread) * head * r.range(0.85, 1.1))}`;
   return shaft + h1 + h2;
 }
+export const arrow = memo('arrow', _arrow);
 
 /** Check mark (one continuous stroke: short down-stroke, long up-stroke) centred at (x,y). */
-export function check(x: number, y: number, size = 80, o: {seed?: Seed} = {}): string {
+function _check(x: number, y: number, size = 80, o: {seed?: Seed} = {}): string {
   const r = rng(o.seed ?? autoSeed(x, y, size, 1));
   const s = size;
   const a: Pt = [x - 0.38 * s, y + 0.02 * s + r.jitter(0.03 * s)];
@@ -354,9 +431,10 @@ export function check(x: number, y: number, size = 80, o: {seed?: Seed} = {}): s
   const c: Pt = [x + 0.42 * s + r.jitter(0.03 * s), y - 0.5 * s];
   return `M${P(...a)}Q${P(a[0] + 0.12 * s, b[1] - 0.15 * s)} ${P(...b)}Q${P(x + 0.1 * s, y - 0.05 * s)} ${P(...c)}`;
 }
+export const check = memo('check', _check);
 
 /** Cross mark: two overshooting diagonal strokes centred at (x,y). */
-export function cross(x: number, y: number, size = 80, o: {seed?: Seed} = {}): string {
+function _cross(x: number, y: number, size = 80, o: {seed?: Seed} = {}): string {
   const seed = o.seed ?? autoSeed(x, y, size, 2);
   const h = size / 2;
   return (
@@ -364,9 +442,10 @@ export function cross(x: number, y: number, size = 80, o: {seed?: Seed} = {}): s
     line(x + h, y - h, x - h, y + h, {seed: `${seed}/b`, over: [2, 8], bow: size * 0.03})
   );
 }
+export const cross = memo('cross', _cross);
 
 /** Text placeholder lines (documents, notices, web pages). First line = heading (shorter) unless heading=false. */
-export function textLines(x: number, y: number, w: number, o: {seed?: Seed; n?: number; gap?: number; heading?: boolean; align?: 'left' | 'center'} = {}): string {
+function _textLines(x: number, y: number, w: number, o: {seed?: Seed; n?: number; gap?: number; heading?: boolean; align?: 'left' | 'center'} = {}): string {
   const r = rng(o.seed ?? autoSeed(x, y, w, 9));
   const n = o.n ?? 4;
   const gap = o.gap ?? 22;
@@ -380,9 +459,10 @@ export function textLines(x: number, y: number, w: number, o: {seed?: Seed; n?: 
   }
   return d;
 }
+export const textLines = memo('textLines', _textLines);
 
 /** Scattered little wall marks ("-", "L", "_|", "⌐") like the reference brick ticks. */
-export function wallTicks(x: number, y: number, w: number, h: number, o: {seed?: Seed; n?: number; size?: number} = {}): string {
+function _wallTicks(x: number, y: number, w: number, h: number, o: {seed?: Seed; n?: number; size?: number} = {}): string {
   const r = rng(o.seed ?? autoSeed(x, y, w, h, 5));
   const n = o.n ?? Math.max(3, Math.round((w * h) / 22000));
   const s = o.size ?? 22;
@@ -399,9 +479,10 @@ export function wallTicks(x: number, y: number, w: number, h: number, o: {seed?:
   }
   return d;
 }
+export const wallTicks = memo('wallTicks', _wallTicks);
 
 /** Small speed / motion marks: n short parallel strokes trailing behind a moving object (pointing -dir). */
-export function speedLines(x: number, y: number, o: {seed?: Seed; n?: number; len?: number; gap?: number; angle?: number} = {}): string {
+function _speedLines(x: number, y: number, o: {seed?: Seed; n?: number; len?: number; gap?: number; angle?: number} = {}): string {
   const r = rng(o.seed ?? autoSeed(x, y, 11));
   const n = o.n ?? 3;
   const len = o.len ?? 30;
@@ -419,15 +500,17 @@ export function speedLines(x: number, y: number, o: {seed?: Seed; n?: number; le
   }
   return d;
 }
+export const speedLines = memo('speedLines', _speedLines);
 
 /** Zig-zag scribble (crossing things out). */
-export function scribble(x: number, y: number, w: number, h: number, o: {seed?: Seed; n?: number} = {}): string {
+function _scribble(x: number, y: number, w: number, h: number, o: {seed?: Seed; n?: number} = {}): string {
   const r = rng(o.seed ?? autoSeed(x, y, w, h, 13));
   const n = o.n ?? 6;
   const pts: Pt[] = [];
   for (let i = 0; i <= n; i++) pts.push([x + (w * i) / n + r.jitter(w * 0.03), i % 2 ? y + h + r.jitter(h * 0.1) : y + r.jitter(h * 0.1)]);
   return smooth(pts, {tension: 0.3});
 }
+export const scribble = memo('scribble', _scribble);
 
 // ---------------------------------------------------------------- closed shapes for fills
 
@@ -435,7 +518,7 @@ export function scribble(x: number, y: number, w: number, h: number, o: {seed?: 
 export const rectPath = (x: number, y: number, w: number, h: number) => `M${P(x, y)}H${r1(x + w)}V${r1(y + h)}H${r1(x)}Z`;
 
 /** Rounded rectangle; closed (fills) or as one pen stroke with a slight overlap (closed=false, for Ink). */
-export function roundRect(x: number, y: number, w: number, h: number, rad: number, o: {seed?: Seed; closed?: boolean} = {}): string {
+function _roundRect(x: number, y: number, w: number, h: number, rad: number, o: {seed?: Seed; closed?: boolean} = {}): string {
   const rr = Math.min(rad, w / 2, h / 2);
   const r = rng(o.seed ?? autoSeed(x, y, w, h, rad));
   const j = (a: number) => a + r.jitter(0.6);
@@ -444,6 +527,7 @@ export function roundRect(x: number, y: number, w: number, h: number, rad: numbe
   else d += 'Z';
   return d;
 }
+export const roundRect = memo('roundRect', _roundRect);
 
 /** Closed polygon path (fills). */
 export const polyPath = (points: Pt[]) => points.map(([x, y], i) => `${i ? 'L' : 'M'}${P(x, y)}`).join('') + 'Z';
@@ -451,7 +535,7 @@ export const polyPath = (points: Pt[]) => points.map(([x, y], i) => `${i ? 'L' :
 /** Shoulders / torso silhouette (back view): bottom-centre at (x,y), shoulder width w, height h.
  *  round = shoulder corner radius as a fraction of w (0.38 = soft, round shoulders); flare = extra width at the
  *  bottom (A-line). Open at the bottom (use as Ink and as Fill). */
-export function torso(x: number, y: number, w: number, h: number, round = 0.38, flare = 0.06): string {
+function _torso(x: number, y: number, w: number, h: number, round = 0.38, flare = 0.06): string {
   const hw = w / 2;
   const bx = hw * (1 + flare);
   const R = Math.min(w * round, h * 0.8);
@@ -462,6 +546,7 @@ export function torso(x: number, y: number, w: number, h: number, round = 0.38, 
     `L${P(x + hw - R, top)}C${P(x + hw - R * k, top)} ${P(x + hw, top + R * k)} ${P(x + hw, top + R)}L${P(x + bx, y)}`
   );
 }
+export const torso = memo('torso', _torso);
 
 /** Translate a list of points. */
 export const offsetPts = (pts: Pt[], dx: number, dy: number): Pt[] => pts.map(([x, y]) => [x + dx, y + dy]);
