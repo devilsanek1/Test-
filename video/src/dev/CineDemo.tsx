@@ -161,7 +161,7 @@ const ShotA: React.FC = () => {
         </Rimmed>
       </Layer>
       <Layer depth={-0.8}>
-        <StringLights x1={-80} y1={60} x2={1160} y2={130} sag={46} n={13} r={14} tod={P} on={{at: 2.0, dur: 1.2}} seed="slA" width={2.6} at={0.3} />
+        <StringLights x1={-80} y1={60} x2={1160} y2={130} sag={46} n={13} r={14} tod={P} on={{at: 4.55, dur: 0.75}} seed="slA" width={2.6} at={0.3} />
       </Layer>
     </Cam>
   );
@@ -271,6 +271,7 @@ const ShotB: React.FC = () => {
           banners={{at: 1.3, n: 4, stagger: 0.16, upAt: 4.55}}
           doorAt={3.45}
           sideLitAt={[2.5, 2.95]}
+          sideOffAt={[5.55, 5.75]}
           emblemY={1690}
           emblemAt={4.3}
           emblem={(x, y, r) => <ClockEmblem x={x} y={y} r={r} />}

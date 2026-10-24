@@ -85,8 +85,9 @@ export type MonumentProps = MonumentGeo & {
   banners?: {at: number; n?: number; stagger?: number; color?: string; upAt?: number};
   /** The bronze door opens (warm light inside) at this time. */
   doorAt?: number;
-  /** The two side doorways light up (warm), one at each time. */
+  /** The two side doorways light up (warm), one at each time; and go dark again at sideOffAt. */
   sideLitAt?: number[];
+  sideOffAt?: number[];
 };
 
 type PaintKey = 'stone' | 'lit' | 'shade' | 'dark' | 'door' | 'transom' | 'dome' | 'domeShade' | 'rim' | 'disc';
@@ -358,6 +359,7 @@ export const Monument: React.FC<MonumentProps> = ({
   banners,
   doorAt,
   sideLitAt,
+  sideOffAt,
 }) => {
   const S = useCineState();
   const t = S.t;
@@ -441,6 +443,7 @@ export const Monument: React.FC<MonumentProps> = ({
   // side doorways light up (warm interior), one by one
   (sideLitAt ?? []).forEach((at, i) => {
     if (t < at || st[1].k < 1 || S.look.fills !== 'color') return;
+    if (sideOffAt && sideOffAt[i] !== undefined && t >= sideOffAt[i]) return;
     const X = i % 2 ? 750 : 250;
     const kk = E.outBack(1.6)(prog(t, at, 0.2)) * exitScale(S.e, 0.3, 0.05);
     const a = M.at(X - 30, 215);

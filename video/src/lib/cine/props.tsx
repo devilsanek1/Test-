@@ -433,7 +433,7 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod 
         <>
           <rect x={w * 0.22} y={deskY - 8} width={w * 0.78} height={16} fill={on ? palette.brown : palette.teal} />
           <rect x={mon.x} y={mon.y} width={mon.w} height={mon.h} fill={palette.ink} />
-          <rect x={mon.x + 7} y={mon.y + 7} width={mon.w - 14} height={mon.h - 14} fill={scrOn ? palette.white : ambient(palette.tealDark, p)} />
+          <rect x={mon.x + 7} y={mon.y + 7} width={mon.w - 14} height={mon.h - 14} fill={scrOn ? (screenTick && tick % 2 ? palette.mintPale : palette.white) : ambient(palette.tealDark, p)} />
           {scrOn ? <rect x={mon.x + 7} y={mon.y + 7} width={mon.w - 14} height={16} fill={palette.sage} /> : null}
           {scrOn && screenTick ? (() => {
             // a new page every tick: an image block jumps to a new place / colour (a visible pop)
