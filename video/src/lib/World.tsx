@@ -35,7 +35,7 @@ import {Fill, FrameArea} from './Fill';
 import {AppliedStageProvider, pushStart, pushTo, SceneInfo, StageCamProvider, stageMat, STAGE_REST, StageKindProvider, useAppliedStageMat, useScene, useStageCam, useStageClip, visibleRectOf, WorldStageProvider, zoomAbout} from './stage';
 import {mat, Mat, XG} from './xf';
 import {Ease, ease as E, clamp, prog, useTime} from './time';
-import {exitFillProgress, useExit} from './exit';
+import {exitFillProgress, SlabEdge, useExit} from './exit';
 import {Tod, TodWave, waveEdgeP} from './tod';
 import {MOTION} from './spec';
 import type {Pt} from './sketch';
@@ -271,7 +271,8 @@ export const World: React.FC<WorldProps> = ({sky = skies.day, tod, horizon = wor
                 <FrameArea value={world.w * world.h}>
                   <XG m={m}>
                     <SkyLayer keys={keys} rect={rect} horizon={horizon} uid={uid} />
-                    {relit}
+                    {/* slab fills (a bleed ground, a big wall) collapse under the sky's own falling edge: one slab */}
+                    <SlabEdge value={{rect, m}}>{relit}</SlabEdge>
                   </XG>
                   {overlay}
                 </FrameArea>

@@ -122,7 +122,8 @@ const Scene07: React.FC = () => {
              rows={12} at={1.0} span={1.8} build="rise" seed="c7" jitter={{x: 0.3, y: 0.15, scale: [0.62, 1.06]}} rim="left" />
       {/* 6 an actor: ink first, its fill lands 0.13-0.27 s later */}
       <Drawn d={rect(700, 1200, 160, 120, {seed: 'sign7'})} fillD={rectPath(700, 1200, 160, 120)} fill={palette.peach} at={2.1} width={stroke.inkBold} />
-      {/* 7 the mascot (other lane's API): its un-build is a shrink to its feet (never `draw={1 - exit}`: a fade) */}
+      {/* 7 the mascot (other lane's API): its un-build is a shrink to its feet, or its own exit={useExit()} (both
+             opacity-free; docs/mascot.md "No fades") */}
       <ExitShrink x={480} y={1540}>
         <ElephantTimeline x={480} y={1540} scale={1.4} t={t} seed={7} keys={[{t: 0, pose: 'sit-back'}]} />
       </ExitShrink>
@@ -248,7 +249,7 @@ Outgoing and incoming scenes keep rendering through overlaps (they hold their en
 | `<Move from to at dur arc>`, `<Walk>`, `<Wobble>` (idle), `<Shake>`, `<Tween>` | slides, walks, idle life. |
 | `<Appear at outAt>` | 1-frame pop in/out. |
 | `<UnBuild at dur=0.5>` / `<NoExit>` / `useExit()` | local un-build with the measured recipe (loosen → fills shrink → ink retracts → slab collapses). |
-| `<ExitShrink x y>` | raw-SVG characters (the MASCOT) un-build by shrinking to their FEET anchor with the fills' ease-in window (~0.18 s of a 0.5 s un-build; a reversed pop). **Never** drive `<Elephant draw={1 - exit}>` / `drawOut` for an un-build: `draw < 1` ramps the mascot's fill OPACITY (a fade, rule 3). |
+| `<ExitShrink x y>` | raw-SVG characters (the MASCOT) un-build by shrinking to their FEET anchor with the fills' ease-in window (~0.18 s of a 0.5 s un-build; a reversed pop). For the mascot, `<ExitShrink>` or the Elephant's own **`exit={useExit()}`** (fills shrink, then the ink retracts, in the un-build order; docs/mascot.md "No fades") are both fine. The Elephant's `draw` is opacity-free too (its fills grow 20% → 100%). |
 | Camera vocabulary | `MOTION.camera` = THE vocabulary for both kits (the cine `CAM` presets carry identical values): `ease` in-out cubic (default move), `slow` in-out sine (4–6 s moves), `reveal` = cruise trapezoid(0.25, 0.35) (crane / tilt: peak 1.43 x its average speed), `settle` out-cubic (starts in motion), `push` (per-shot zoom), `peakPxPerFrame` 18 (flat ink strobes above ~15-20 px / frame: size long moves so the PEAK stays under it). `cruiseEase(acc, dec)` builds other cruises. |
 
 ## 9. The sun (a character)

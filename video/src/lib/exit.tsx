@@ -10,6 +10,7 @@
 //   <UnBuild at={6.2}> ...old props... </UnBuild>          // 0.5 s
 //   <NoExit> <Elephant .../> </NoExit>                    // persistent objects survive the un-build
 //   <ExitShrink x={fx} y={fy}> <Elephant .../> </ExitShrink>  // raw-SVG characters shrink to their feet (no fade)
+//   <Elephant ... exit={useExit()} />                      // or the mascot's own un-build (opacity-free too)
 //   <ExitProvider value={0.5}> ... </ExitProvider>        // drive it yourself
 //   <ExitSync seed="p1"> ...one figure... </ExitSync>      // one window: its ink retracts WITH its fills (Person does it)
 // The slab: every slab fill of a World (the sky, a bleed ground, a wall >= 55% of the frame) collapses under ONE shared
@@ -102,9 +103,10 @@ export const ExitFade: React.FC<{children?: React.ReactNode; jitter?: number; x?
 /** Alias of ExitFade (the name is historical: nothing fades). */
 export const ExitPop = ExitFade;
 
-/** Un-build for raw-SVG CHARACTERS (the mascot): the whole group shrinks to its FEET anchor (x, y) with the fills'
- *  ease-in window (~0.18 s of a 0.5 s un-build), like a reversed pop. Never an opacity ramp: use this instead of
- *  driving the Elephant's `draw` (whose fills ramp opacity).
+/** Un-build for raw-SVG CHARACTERS: the whole group shrinks to its FEET anchor (x, y) with the fills' ease-in window
+ *  (~0.18 s of a 0.5 s un-build), like a reversed pop. For the mascot, this OR the Elephant's own `exit={useExit()}`
+ *  (fills shrink, then the ink retracts, following the un-build order: docs/mascot.md "No fades") are both fine; the
+ *  Elephant's `draw` is opacity-free as well (its fills grow 20% -> 100%).
  *    <ExitShrink x={556} y={1660}> <ElephantTimeline x={556} y={1660} ... /> </ExitShrink> */
 export const ExitShrink: React.FC<{x: number; y: number; jitter?: number; children?: React.ReactNode}> = ({x, y, jitter = 0.5, children}) => (
   <ExitFade x={x} y={y} jitter={jitter}>

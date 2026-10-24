@@ -14,13 +14,15 @@
 // <World sky> key changes the light, each fill flips WHOLE in one frame as the sky's wipe edge reaches its centre (or
 // its <TodAnchor>), so objects relight staggered by height. The World sky itself (lookExempt) is never relit.
 // Exit (un-build): every fill shrinks to its centre (ease-in, small ones first); the big background slab (>= ~55% of
-// the frame: sky, a wall) collapses downward last.
+// the frame: sky, a bleed ground, a wall) collapses downward last, under the World sky's ONE falling edge (a slab fill
+// is eaten by that shared edge when it reaches it: never a second slab with its own top edge). Inside an <ExitSync>
+// (every Person) all fills share the group's jitter, so a figure leaves as one.
 
 import React, {createContext, useContext, useId, useMemo} from 'react';
 import {getBoundingBox} from '@remotion/paths';
 import {misreg, panel as panelGeo} from './theme';
 import {Ease, ease as E, prog, springAt, springs, useTime} from './time';
-import {exitFillProgress, SLAB_SIZE, useExit, useLook} from './exit';
+import {exitFillProgress, SLAB_SIZE, useExit, useExitSync, useLook, useSlab} from './exit';
 import {palette} from './theme';
 import {rand, rng, Seed} from './rng';
 import {Ink, InkProps} from './Ink';
@@ -167,6 +169,8 @@ export const Fill: React.FC<FillProps> = ({
 }) => {
   const t = useTime();
   const e = useExit();
+  const sync = useExitSync();
+  const slab = useSlab();
   const look = useLook();
   const tv = useTodValue();
   const clipCtx = useContext(ClipCtx);
@@ -196,7 +200,7 @@ export const Fill: React.FC<FillProps> = ({
     if (t < c.at + dist / (c.speed ?? 2600)) paint = palette.white;
   }
   const size = Math.sqrt(Math.min(1, (box.w * box.h * Math.abs(m[0] * m[3] - m[1] * m[2])) / area));
-  const drain = exit ? exitFillProgress(e, jit, size) : 0;
+  const drain = exit ? exitFillProgress(e, sync ? sync.jitter : jit, size) : 0;
   if (drain >= 1) return null;
   const org0: [number, number] | undefined = origin ? (proj ? applyH(proj.H, origin[0], origin[1]) : origin) : undefined;
 
@@ -207,6 +211,7 @@ export const Fill: React.FC<FillProps> = ({
   let sy = 1;
   let clipCss: string | undefined;
   let org: [number, number] | null = null;
+  let slabClip: React.ReactNode = null;
 
   if (at !== undefined) {
     if (md === 'pop') {
@@ -230,7 +235,16 @@ export const Fill: React.FC<FillProps> = ({
   if (drain > 0) {
     const xm = exitMode === 'fade' ? 'collapse' : exitMode ?? (size >= SLAB_SIZE ? 'slab' : 'collapse');
     const k = E.inCubic(drain);
-    if (xm === 'slab') clipCss = inset('down', 1 - k, true);
+    if (xm === 'slab' && slab) {
+      // ONE slab: the World sky's falling edge (world y = rect.y + rect.h * k), mapped into this fill's local space
+      const [rx, ry, rw, rh] = slab.rect;
+      if (k >= 1) return null;
+      slabClip = (
+        <clipPath id={`${localId}s`} clipPathUnits="userSpaceOnUse">
+          <rect x={rx - rw} y={ry + rh * k} width={rw * 3} height={rh * (1 - k) + rh} transform={mat.str(mat.mul(mat.inv(m), slab.m))} />
+        </clipPath>
+      );
+    } else if (xm === 'slab') clipCss = inset('down', 1 - k, true);
     else if (xm === 'wipe') clipCss = inset(exitDir ?? wdir, 1 - k, true);
     else {
       if (!org) org = org0 ?? (md === 'grow' ? growOrigin(box, wdir) : [box.x + box.w / 2, box.y + box.h / 2]);
@@ -245,7 +259,15 @@ export const Fill: React.FC<FillProps> = ({
   if (org && (scale !== 1 || sx !== 1 || sy !== 1)) {
     tr += ` translate(${org[0]} ${org[1]}) scale(${(scale * sx).toFixed(4)} ${(scale * sy).toFixed(4)}) translate(${-org[0]} ${-org[1]})`;
   }
-  const path = <path d={d} fill={paint} fillRule={rule} opacity={opacity < 1 ? opacity : undefined} transform={tr} style={clipCss ? {...style, clipPath: clipCss} : style} />;
+  const shape = <path d={d} fill={paint} fillRule={rule} opacity={opacity < 1 ? opacity : undefined} transform={tr} style={clipCss ? {...style, clipPath: clipCss} : style} />;
+  const path = slabClip ? (
+    <>
+      <defs>{slabClip}</defs>
+      <g clipPath={`url(#${localId}s)`}>{shape}</g>
+    </>
+  ) : (
+    shape
+  );
 
   const doClip = clip ?? clipCtx.id !== null;
   if (!doClip || !clipCtx.id) return path;

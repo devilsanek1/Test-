@@ -35,6 +35,7 @@ import {arc, blob, circle, crown, line, rectPath, roundRect, smooth, torso, Pt} 
 import {At, b, inkW, Place} from './common';
 import {mat, XG} from '../xf';
 import {Tod, TodAnchor} from '../tod';
+import {ExitSync} from '../exit';
 
 export type Hair = 'short' | 'long' | 'bun' | 'cap' | 'beanie' | 'bald' | 'curly';
 export type Acc = 'backpack' | 'headphones' | 'strap' | 'phone' | 'scarf' | 'sign' | 'collar' | 'hood';
@@ -572,10 +573,13 @@ export const Person: React.FC<PersonProps> = (props) => {
   dy += walkBob * s;
   return (
     <Place x={x} y={y + dy} s={s} flip={flip}>
-      {/* the whole figure relights in one frame (time-of-day wave) */}
+      {/* the whole figure relights in one frame (time-of-day wave) and un-builds as one: its outlines retract WITH its
+          own fills (ExitSync), so a crowd never leaves a tangle of bare outlines behind the shrinking fills */}
       <TodAnchor at={[0, -S.h * 0.5]}>
-        {clip}
-        {inner}
+        <ExitSync seed={`${lodKey}/exit`}>
+          {clip}
+          {inner}
+        </ExitSync>
       </TodAnchor>
     </Place>
   );
