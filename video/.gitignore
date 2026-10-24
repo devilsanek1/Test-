@@ -1,3 +1,5 @@
 node_modules/
 out/
 previews/
+audio/demo_*.wav
+audio/mix*.wav
