@@ -1,0 +1,755 @@
+{
+  "fps": 30,
+  "duration": 70.687,
+  "mascot": {
+    "name": "Pip",
+    "design": "Original small elephant, a nod to (not a copy of) PHP's elePHPant. Round bean body about 80 x 70 card px when sitting at 1:1 scene scale, big soft half-disc ears, short stump legs, one tapered trunk stroke with a small curl at the tip, thin tail with an ink tuft, dot eyes only when facing camera, no mouth line, no tusks. Same ink as the world (theme ink, 3 px, strokes overshoot their joins) with flat fills offset by the misregistration constant. Usually seen from behind or 3/4 back, sitting on things (bench, toolbox, noticeboard top, watchtower roof, stoop step, chimney) exactly the way the reference cat sits on the noticeboard. Uses the existing pose set: sit-back, sit-front, stand-side, walk-side, peek, trunk-up, hold, ears-cover, shrug, sleep; expressions neutral, happy, wide, worried, meh, closed. Two requested extras (fallbacks given in each scene): 'trunk-cross' (hope) and a sneeze puff. Kept at panel edges and thirds, never in front of the explanatory object, never animated during a highlight wipe unless the gag illustrates that word.",
+    "colorway": "Periwinkle (src/lib/mascot/colors.ts): body #8D90CC, shade #7377B5, inner ear salmon, cheek salmon, nails cream, ink theme ink. It is the only cool violet in the frame, so the eye finds him the way it finds the reference's orange cat, while the orange stays reserved for the sun and highlights."
+  },
+  "scenes": [
+    {
+      "id": "S01",
+      "start": 0.0,
+      "end": 4.8,
+      "vo": "Government websites in four countries just switched themselves off. Nobody hacked them.",
+      "title": "Civic Row goes dark",
+      "transitionIn": {
+        "type": "loop-start",
+        "dur": 0.9,
+        "persist": ["sun", "mascot", "civicRow", "bench"],
+        "notes": "Frame 0 is the pure line-art state of this composition (ink on white paper fills, no color), sun low at (480,440) half hidden behind the far buildings, Pip already in color on the bench in sit-back. This is exactly the frame S13 un-builds into, so the loop is invisible. Color floods in on the first word, the sun rises to its anchor."
+      },
+      "setting": "Civic Row: a one-point-perspective boulevard of four government buildings (two each side) on Web Street, the world where every website is a building and every visitor comes in through a door.",
+      "composition": "Vanishing point (480,470), horizon y 470. Mint sky block x 150..810, y 95..470 (misregistered, like the reference's mint rectangle). Near-left civic A x 70..310, y 240..1010; far-left civic B x 300..430, y 360..610; near-right civic C x 650..890, y 250..1010 (hero door for S02 and S11); far-right civic D x 530..650, y 370..610. Distant low blocks at the VP x 420..550, y 400..470 (the sun hides behind them in frame 0). Pavement trapezoid narrowing from x 230..730 at y 1095 to the VP; crosswalk stripes y 1040..1080. Wire with 3 birds from (300,330) to (660,320). Bench on the right sidewalk x 610..810, y 930..1010 with Pip. Palette: facades cream/peach/tan, columns cream, pediments tan, doors teal, lit windows cream with salmon glow, dark windows tealDark, pennants in peach/sage/tan/teal patterns (no orange, not real flags). In the line-art state every shape keeps a white paper fill so it still occludes the sun.",
+      "elements": [
+        {"id": "sky", "what": "mint sky block behind the street", "where": "150,95,660,375", "style": "bg mint flat fill, misregistered, no ink"},
+        {"id": "farBlocks", "what": "low distant buildings at the vanishing point; the sun hides behind them at frame 0", "where": "420,400,130,70", "style": "ink thin; fills cream/peach"},
+        {"id": "civicA", "what": "near-left government building: 4 columns in perspective, pediment, 3 floors x 4 windows, 5 front steps, door with lockPlateA, flagpole", "where": "70,240,240,770", "style": "ink 3px overshoot; facade cream, columns cream, pediment tan, door teal"},
+        {"id": "civicB", "what": "far-left government building, same grammar, smaller", "where": "300,360,130,250", "style": "ink 2px; facade peach, roof tan, door teal"},
+        {"id": "civicC", "what": "near-right government building, hero door at (720,880) with lockPlateC", "where": "650,250,240,760", "style": "ink 3px; facade tan, columns cream, door teal, plate tan with elephant emblem"},
+        {"id": "civicD", "what": "far-right government building", "where": "530,370,120,240", "style": "ink 2px; facade cream, roof brown, door teal"},
+        {"id": "windows", "what": "about 56 windows across the four buildings, the 'screens' of the websites", "where": "inside each facade", "style": "lit: cream fill + salmon inner glow; dark: tealDark fill with a 2-frame flicker on the way"},
+        {"id": "pennants", "what": "4 generic pennants, one per country: stripes, chevron, dots, half-diamond", "where": "flagpole tops near (190,200), (365,330), (770,210), (590,340), each 50x30", "style": "peach/teal stripes, tan/cream chevron, teal/cream dots, sage/brown half-diamond; never orange, never a real flag"},
+        {"id": "lockPlates", "what": "brass-like plate on each civic door with a tiny engraved elephant emblem (PHP)", "where": "one per door, 18x40 at near doors, 8x18 far", "style": "tan fill, brown emblem, ink"},
+        {"id": "doorPlaques", "what": "small hanging plaque on each door that flips to a power glyph when that building goes dark", "where": "above each door handle, 28x28 near, 12x12 far", "style": "cream + ink glyph"},
+        {"id": "street", "what": "pavement, curbs, crosswalk, two lamp posts at x 335 and x 625", "where": "230,470,500,625", "style": "mintPale pavement, ink converging lines, white crosswalk stripes"},
+        {"id": "wireBirds", "what": "overhead wire with three small birds", "where": "300,318,360,20", "style": "ink thin, birds cream with ink"},
+        {"id": "bench", "what": "park bench on the right sidewalk, Pip's home seat (frame 0 and S11)", "where": "610,930,200,80", "style": "tan slats, teal legs, ink"},
+        {"id": "pedestrians", "what": "two tiny back-view walkers far down the street, calm", "where": "450,560,60,60", "style": "sage/tan, ink thin"},
+        {"id": "mascot", "what": "Pip, sit-back on the bench looking up the street", "where": "665,860,90,80", "style": "mascot colorway + ink"}
+      ],
+      "beats": [
+        {"t": 0.0, "action": "Frame 0 = line-art state: all ink, white paper fills, sun low at (480,440) behind farBlocks, Pip in color on the bench (identical to the last frame of S13)."},
+        {"t": 0.1, "action": "sun rises from (480,440) to its anchor (480,100), ease-out with a 6 px overshoot, 0.8 s; passes in front of the sky block as soon as it clears the far roofs."},
+        {"t": 0.16, "action": "'Government': fills arrive building by building, wiping bottom to top, misregistered: civicA 0.16, civicC 0.28, civicB 0.40, civicD 0.50 (0.3 s each); sky fill 0.20."},
+        {"t": 0.56, "action": "'websites': every window lights up cream with a salmon glow in a front-to-back stagger, 0.56 to 1.05, like screens turning on."},
+        {"t": 0.85, "action": "street details fill (pavement, crosswalk, lamp posts); birds pop onto the wire with overshoot at 1.00."},
+        {"t": 1.36, "action": "'four': the four pennants hoist up their poles and pop open one per beat: A 1.36, B 1.52, C 1.68 ('countries' 1.60), D 1.84; each slides 0.18 s then flutters."},
+        {"t": 2.32, "action": "'switched': a cream power glyph draws on inside the sun (arc 2.32 to 2.55, stem 2.50 to 2.62). The sun stays orange."},
+        {"t": 2.8, "action": "'themselves': civicA's windows flicker and go dark (tealDark) and its plaque flips to the power glyph; civicC 2.96; civicB 3.12; panel micro-jolt 2 px on each."},
+        {"t": 3.28, "action": "'off.': civicD goes dark, the fourth click. The power glyph erases out of the sun 3.28 to 3.65; the pennants droop 10 degrees; birds hop once."},
+        {"t": 3.76, "action": "'Nobody': Pip hops off the bench and trots (walk-side) to civicC's door, 3.76 to 4.06."},
+        {"t": 4.08, "action": "'hacked': Pip tugs the door handle (hold); the door does not budge (Pip squashes, door rigid). The four lockPlates glint in sequence 4.10 to 4.30: intact, no damage, no intruder anywhere."},
+        {"t": 4.48, "action": "'them.': Pip turns to camera and shrugs (shrug, expression meh) 4.48 to 4.75."},
+        {"t": 4.55, "action": "camera starts its push into civicC's lock plate (zoom transition to S02)."}
+      ],
+      "sun": "Rises from behind the far buildings to the anchor during the color flood (0.10 to 0.90). Becomes a power button at 'switched' (cream glyph drawn inside), glyph erases on 'off'. Back to a plain disc for 'Nobody hacked them'.",
+      "mascot": "Pip sits on the bench (sit-back) in frame 0, the same pose the loop lands on. Ears droop a little as each building goes dark (2.80 to 3.28). 'Nobody': trots to the near door; 'hacked': tugs the handle, it holds; 'them': shrug to camera.",
+      "sfx": [
+        {"t": 0.1, "sound": "whoosh", "notes": "soft airy swell under the sun rise and color flood"},
+        {"t": 0.16, "sound": "pencil", "notes": "quick fill scratches per building"},
+        {"t": 0.56, "sound": "click", "notes": "tiny glassy ticks as windows light, rising pitch"},
+        {"t": 1.36, "sound": "pop", "notes": "four pennant pops with a cloth flap, 1.36/1.52/1.68/1.84"},
+        {"t": 2.32, "sound": "pencil", "notes": "short stroke for the power glyph"},
+        {"t": 2.8, "sound": "power-off", "notes": "four relay clicks with a low thunk, descending pitch: 2.80, 2.96, 3.12, 3.28"},
+        {"t": 3.76, "sound": "footsteps", "notes": "soft padded elephant patter"},
+        {"t": 4.08, "sound": "rattle", "notes": "door handle, locked"},
+        {"t": 4.12, "sound": "tick", "notes": "four tiny glints on the lock plates"},
+        {"t": 4.55, "sound": "whoosh", "notes": "zoom in"}
+      ],
+      "captions": [
+        {"s": 0.0, "e": 2.16, "lines": [{"text": "Government websites", "s": 0.16}, {"text": "in four countries", "s": 1.12}], "highlights": [{"text": "four countries", "s": 1.36}]},
+        {"s": 2.16, "e": 3.76, "lines": [{"text": "just switched", "s": 2.16}, {"text": "themselves off.", "s": 2.8}], "highlights": [{"text": "off", "s": 3.28}]},
+        {"s": 3.76, "e": 4.8, "lines": [{"text": "Nobody hacked them.", "s": 3.76}], "highlights": [{"text": "Nobody hacked", "s": 3.76}]}
+      ]
+    },
+    {
+      "id": "S02",
+      "start": 4.8,
+      "end": 10.88,
+      "vo": "They were fixing a security bug in PHP, the programming language behind WordPress and about 7 out of 10 websites.",
+      "title": "The elephant lock",
+      "transitionIn": {
+        "type": "zoom",
+        "dur": 0.5,
+        "persist": ["sun", "mascot", "lockPlateC"],
+        "notes": "4.55 to 5.05: continuous push from S01 into civicC's door until its lock plate is hero size. The plate is the same object, now 100x220."
+      },
+      "setting": "Close-up on civicC's front door, then two pull-backs along Web Street: first to the press house (WordPress), then to a two-terrace row of ten shopfronts.",
+      "composition": "Phase A (4.80 to 7.04) close-up: door frame (cream stone, fluted column edges) x 150..810, y 210..1095; double door (teal panels, mintPale glass insets) x 200..760, y 260..1095; hero lockPlate x 560..660, y 560..780; toolbox bottom-left x 110..300, y 960..1060 with Pip on it. Phase B (7.04 to 8.88) street row: civicC edge x 70..250; press house center x 250..640, y 260..1010; cafe right x 640..890, y 330..1010. Phase C (8.88 to 10.88) ten shopfronts on two terraces: top row 5 facades x 70..890 (164 wide each), y 300..640; bottom row 5 facades, y 670..1010; a door with a lock plate on each. Palette: warm facades (peach, cream, tan, salmon), doors teal, lit plates salmon, plain locks ink-only.",
+      "elements": [
+        {"id": "doorFrame", "what": "civicC stone door surround with fluted column edges", "where": "150,210,660,885", "style": "cream fill, ink 3px"},
+        {"id": "doorClose", "what": "civicC double door close-up", "where": "200,260,560,835", "style": "teal panels, mintPale glass insets, tealDark shadows"},
+        {"id": "lockPlate", "what": "hero lock plate with engraved elephant emblem and keyhole; 4 screws; hinges open", "where": "560,560,100,220", "style": "tan fill, brown emblem, ink"},
+        {"id": "mechanism", "what": "lock interior revealed when the plate swings open: 5 pins, a spring, a cam, all line art", "where": "570,580,80,180", "style": "ink on mintPale backing"},
+        {"id": "bug", "what": "the security bug: a tiny beetle living inside the lock (6 legs, 2 antennae)", "where": "590,690,34,24", "style": "ink body, salmon shell highlight"},
+        {"id": "toolbox", "what": "open toolbox with screwdriver: the fixing is in progress, no hands shown", "where": "110,960,190,100", "style": "tan box, teal handle, ink"},
+        {"id": "pressHouse", "what": "WordPress as a generic press house: tall round-top window, sign bracket with a pen-nib icon, newspaper stacks in the shop window, sheets pinned on a line, door with an elephant plate", "where": "250,260,390,750", "style": "peach facade, cream sign disc with ink nib, white/cream papers, teal door"},
+        {"id": "cafe", "what": "neighbor cafe with striped awning", "where": "640,330,250,680", "style": "sage facade, teal/cream awning"},
+        {"id": "shopRow10", "what": "ten shopfronts on two terraces (bakery awning, books, florist, press house, civic, cafe, repair shop, gallery, grocer, studio), each with a door and a lock plate", "where": "70,300,820,710", "style": "alternating peach/cream/tan/sage facades, teal doors"},
+        {"id": "plates10", "what": "7 doors with the elephant plate (light up), 3 with plain round locks", "where": "one per door, 30x60", "style": "elephant plates: tan then salmon glow; plain: ink only on cream"},
+        {"id": "sunPie", "what": "the sun divided into 10 slices by cream lines; 7 stay orange, 3 turn cream", "where": "sun anchor", "style": "sun + cream dividers"},
+        {"id": "mascot", "what": "Pip on the toolbox (phase A), then on the sign bracket of the press house (B), then sitting on the top terrace roofline (C)", "where": "phase A 150,890,90,80; B 560,250,80,70; C 470,240,80,70", "style": "mascot colorway"}
+      ],
+      "beats": [
+        {"t": 4.8, "action": "'They': zoom lands on the door; lock plate fills in tan with its elephant emblem."},
+        {"t": 5.04, "action": "'fixing': the 4 screws spin out and pop off (5.04 to 5.30); the plate swings open on its hinge (5.30 to 5.50); mechanism line art draws on 5.36 to 5.70."},
+        {"t": 5.84, "action": "'bug': the beetle scuttles out of the keyhole channel, freezes, waggles its antennae (5.84 to 6.10) and ducks back inside (6.20)."},
+        {"t": 6.32, "action": "'PHP': a salmon ring wipes around the elephant emblem on the plate; Pip looks at the emblem, then at himself, then back (double take, sit-front, expression wide) 6.32 to 6.90."},
+        {"t": 7.04, "action": "'the programming language': pull-back 7.04 to 7.50 (ease in-out); the door shrinks into the left edge of a street row; the press house linework draws on 7.10 to 7.60, fills 7.40 to 7.90."},
+        {"t": 7.68, "action": "'language': the elephant plates on civicC's door and on the press house door glint in sync."},
+        {"t": 8.24, "action": "'WordPress': the press house sign (pen-nib icon) pops with overshoot and the pinned sheets flutter 8.24 to 8.70."},
+        {"t": 8.88, "action": "'and about': second pull-back 8.88 to 9.30 to the ten-shopfront double terrace; new facades draw on in a fast left-to-right stagger. The sun gets 10 cream divider lines (9.10)."},
+        {"t": 9.38, "action": "'7': elephant plates light up salmon one by one, 1 to 7, 0.07 s apart (9.38 to 9.86), rising-pitch pops."},
+        {"t": 9.86, "action": "'10': the 3 remaining doors pop their plain round locks (ink only); 3 sun slices fade to cream, 7 stay orange."},
+        {"t": 10.08, "action": "'websites.': all ten facades' windows brighten once; Pip settles on the top roofline counting with his trunk (trunk-up, small)."},
+        {"t": 10.5, "action": "sun slices merge back into the full disc 10.50 to 10.80; camera starts drifting toward the bottom-row door #4 (matchcut to S03)."}
+      ],
+      "sun": "Plain anchor during the close-up. At 'about 7 out of 10' it becomes a 10-slice pie chart: cream divider lines (9.10), 7 slices stay orange and 3 fade to cream on '10' (9.86). Merges back to a full disc by 10.80.",
+      "mascot": "Sits on the toolbox watching the fix; the double take at 'PHP' is the first rewatch gag (he is the elephant on the plate). Rides the pull-backs by re-seating: press house sign bracket, then the top terrace roofline, counting the lit plates with small trunk taps.",
+      "sfx": [
+        {"t": 5.04, "sound": "click", "notes": "four screw ticks, 5.04/5.10/5.16/5.22"},
+        {"t": 5.3, "sound": "creak", "notes": "small hinge"},
+        {"t": 5.84, "sound": "scuttle", "notes": "tiny beetle skitter, 0.25 s"},
+        {"t": 6.32, "sound": "pop", "notes": "soft emblem ring"},
+        {"t": 7.04, "sound": "whoosh", "notes": "pull-back"},
+        {"t": 8.24, "sound": "paper", "notes": "sheets flutter"},
+        {"t": 8.88, "sound": "whoosh", "notes": "second pull-back"},
+        {"t": 9.38, "sound": "pop", "notes": "seven ascending pops"},
+        {"t": 9.86, "sound": "click", "notes": "three dull clicks for plain locks"}
+      ],
+      "captions": [
+        {"s": 4.8, "e": 7.04, "lines": [{"text": "They were fixing", "s": 4.8}, {"text": "a security bug in PHP,", "s": 5.36}], "highlights": [{"text": "PHP", "s": 6.32}]},
+        {"s": 7.04, "e": 8.88, "lines": [{"text": "the programming language", "s": 7.04}, {"text": "behind WordPress", "s": 8.0}], "highlights": [{"text": "WordPress", "s": 8.24}]},
+        {"s": 8.88, "e": 10.88, "lines": [{"text": "and about 7 out of 10", "s": 8.88}, {"text": "websites.", "s": 10.08}], "highlights": [{"text": "7 out of 10", "s": 9.38}]}
+      ]
+    },
+    {
+      "id": "S03",
+      "start": 10.88,
+      "end": 15.76,
+      "vo": "Fixing a bug like that takes two steps. First, you find it. Then, you fix it everywhere.",
+      "title": "The two-step stoop",
+      "transitionIn": {
+        "type": "matchcut",
+        "dur": 0.4,
+        "persist": ["sun", "mascot", "lockPlate", "door4"],
+        "notes": "10.70 to 11.10: push into bottom-row door #4 of the ten-shopfront row; its door and elephant plate grow into the hero doorway. New details draw on around it as it lands."
+      },
+      "setting": "A single shopfront on Web Street with a two-step stoop in front of its door. The stoop is the persistent 'two steps' object of the whole film (returns in S04, S05, S09, S10).",
+      "composition": "Frontal. Facade (peach wall, sparse brick ticks) fills the panel x 70..890, y 95..990. Awning (teal/cream stripes, scalloped) x 150..810, y 200..270. Shop window left x 110..330, y 330..820 (display boxes). Door center x 380..580, y 360..880 (teal), elephant plate at x 530..574, y 590..700. Stoop: step 2 (upper) x 350..610, y 880..935; step 1 (lower, wider) x 320..640, y 935..990; risers carry hand-drawn numerals 1 and 2. Pavement mintPale y 990..1095. Lamp post right x 760..800, y 300..990. Planter with a small cloud tree x 680..810, y 780..990.",
+      "elements": [
+        {"id": "facade4", "what": "shopfront facade, the hero building of the film", "where": "70,95,820,895", "style": "peach fill, ink brick ticks"},
+        {"id": "awning", "what": "striped scalloped awning", "where": "150,200,660,70", "style": "teal/cream stripes, ink"},
+        {"id": "shopWindow", "what": "display window with stacked boxes", "where": "110,330,220,490", "style": "mintPale glass, tan/cream boxes, ink glints"},
+        {"id": "door4", "what": "hero door", "where": "380,360,200,520", "style": "teal, mintPale glass inset"},
+        {"id": "lockPlate", "what": "elephant plate (old version, with the beetle inside)", "where": "530,590,44,110", "style": "tan, brown emblem, ink"},
+        {"id": "stoop", "what": "two-step stoop; risers numbered 1 (bottom) and 2 (top)", "where": "320,880,320,110", "style": "cream treads, tan risers, ink numerals"},
+        {"id": "magnifier", "what": "the sun turned magnifying glass: a tan handle draws on at its lower right; the lens shows the lock's x-ray with the beetle magnified", "where": "lens over lockPlate, centered (552,645), r 60", "style": "sun disc at 85% opacity as lens, ink rim, tan handle 18x90"},
+        {"id": "newPlate", "what": "the fix: a fresh plate with a small check tag", "where": "528,588,48,114", "style": "sage plate, cream tag, ink tick"},
+        {"id": "ghostPlates", "what": "dashed-outline plates that pop onto every door of the row when the camera pulls back: where the fix will have to go", "where": "on the ten-shopfront row doors, 30x60 each", "style": "ink dashed outline, no fill"},
+        {"id": "lampPost", "what": "street lamp", "where": "760,300,40,690", "style": "teal post, cream lamp, ink"},
+        {"id": "planterTree", "what": "planter with a cloud-shaped tree (seasonal in S04)", "where": "680,700,130,290", "style": "tan planter, sage/teal canopy"},
+        {"id": "mascot", "what": "Pip on the pavement, then step 1, then step 2", "where": "300,930,80,70 then on the steps", "style": "mascot colorway"}
+      ],
+      "beats": [
+        {"t": 10.88, "action": "'Fixing': the doorway lands; new linework draws on (awning, window, lamp) 10.88 to 11.40; fills follow 11.10 to 11.60."},
+        {"t": 11.28, "action": "'bug': the beetle peeks out of the keyhole for a blink (11.28 to 11.60). Only the viewer sees it."},
+        {"t": 12.24, "action": "'two': the stoop pops up out of the pavement with squash and stretch, step 1 at 12.24, step 2 at 12.40."},
+        {"t": 12.48, "action": "'steps.': numerals 1 and 2 hand-draw onto the risers 12.48 to 12.80."},
+        {"t": 13.12, "action": "'First': Pip hops onto step 1 (13.12 to 13.40). The sun begins to descend."},
+        {"t": 13.52, "action": "a tan handle draws onto the sun; the sun shrinks to r 60 and glides down onto the lock plate as a magnifying glass (13.52 to 13.85)."},
+        {"t": 13.68, "action": "'find': inside the lens the plate turns x-ray: pins, spring, and the magnified beetle, which freezes with a '!' at 13.92 ('it')."},
+        {"t": 14.32, "action": "'Then': handle erases; the sun flies back to the anchor and regains r 78 (14.32 to 14.65). Pip hops up to step 2 (14.40 to 14.65)."},
+        {"t": 14.8, "action": "'fix': the newPlate stamps over the old one with squash; a tiny dust puff where the beetle was (14.90); check tag pops (15.00)."},
+        {"t": 15.2, "action": "'everywhere.': quick pull-back (15.10 to 15.50) to the ten-shopfront row; dashed ghostPlates pop onto every door in a left-to-right ripple 15.20 to 15.70: this is where the fix must go."}
+      ],
+      "sun": "Becomes the magnifying glass for 'find' (handle draws on, sun drops onto the lock as the lens, shows the x-ray), then flies back to the anchor on 'Then'.",
+      "mascot": "Physically walks the explanation: pavement, step 1 on 'First', step 2 on 'Then'. Small, at the stoop's left end so the lock stays clear.",
+      "sfx": [
+        {"t": 10.88, "sound": "pencil", "notes": "draw-on"},
+        {"t": 12.24, "sound": "pop", "notes": "two stone pops for the steps"},
+        {"t": 12.48, "sound": "pencil", "notes": "numerals"},
+        {"t": 13.12, "sound": "boing", "notes": "tiny hop"},
+        {"t": 13.52, "sound": "whoosh", "notes": "sun drops in as lens"},
+        {"t": 13.92, "sound": "pop", "notes": "'!' on the beetle"},
+        {"t": 14.32, "sound": "whoosh", "notes": "sun returns"},
+        {"t": 14.8, "sound": "stamp", "notes": "new plate clunks on"},
+        {"t": 15.2, "sound": "pop", "notes": "ripple of soft ascending pops"}
+      ],
+      "captions": [
+        {"s": 10.88, "e": 13.12, "lines": [{"text": "Fixing a bug like that", "s": 10.88}, {"text": "takes two steps.", "s": 12.0}], "highlights": [{"text": "two steps", "s": 12.24}]},
+        {"s": 13.12, "e": 14.32, "lines": [{"text": "First, you find it.", "s": 13.12}], "highlights": [{"text": "find", "s": 13.68}]},
+        {"s": 14.32, "e": 15.76, "lines": [{"text": "Then, you fix it", "s": 14.32}, {"text": "everywhere.", "s": 15.2}], "highlights": [{"text": "everywhere", "s": 15.2}]}
+      ]
+    },
+    {
+      "id": "S04",
+      "start": 15.76,
+      "end": 21.68,
+      "vo": "You'd think finding it is the hard part, right? And for 14 years, nobody did.",
+      "title": "Fourteen years",
+      "transitionIn": {
+        "type": "matchcut",
+        "dur": 0.3,
+        "persist": ["sun", "mascot", "facade4", "door4", "stoop", "lockPlate", "planterTree"],
+        "notes": "15.60 to 15.90: push back in from the row to the S03 doorway framing. The new plate un-stamps (we are back in the past): the old elephant plate, beetle inside."
+      },
+      "setting": "The same doorway and stoop, now a time-lapse spot: a wall calendar appears beside the door.",
+      "composition": "Same framing as S03. Added: wall calendar x 640..730, y 420..530 (white page, tan header bar, big ink numeral); ivy root at the left of the door, growing up x 330..380; cobweb across the lock plate x 515..595, y 575..655; passersby lane on the pavement y 900..1095.",
+      "elements": [
+        {"id": "stoop", "what": "the two steps; step 1 stretches into a cliff for the 'hard part' gag", "where": "320,880,320,110 (step 1 top rises to y 650)", "style": "cream treads, tan risers, ink numerals"},
+        {"id": "calendar", "what": "wall calendar whose numeral counts years 1 to 14", "where": "640,420,90,110", "style": "white page, tan header, ink numeral"},
+        {"id": "ivy", "what": "ivy vine drawing up the facade over the years", "where": "330,380,60,600", "style": "ink vine, sage/teal leaves"},
+        {"id": "planterTree", "what": "the tree cycles seasons: green, salmon, bare, green", "where": "680,700,130,290", "style": "sage/salmon/bare ink branches"},
+        {"id": "ghostBug", "what": "the beetle shown as a dotted ghost inside the plate, napping (viewer-only x-ray)", "where": "540,640,24,18", "style": "ink dotted outline"},
+        {"id": "passersby", "what": "three back-view pedestrians crossing the pavement over the years, none looks at the door", "where": "lane y 860..1095, figures ~180 px tall, cropped at bottom", "style": "teal/tan/peach coats, ink"},
+        {"id": "cobweb", "what": "cobweb over the lock plate", "where": "515,575,80,80", "style": "ink thin"},
+        {"id": "zzz", "what": "z marks over sleeping Pip", "where": "above Pip", "style": "ink hand letters"},
+        {"id": "mascot", "what": "Pip at the base of the stretched step, then asleep on step 1", "where": "300,930,80,70", "style": "mascot colorway"}
+      ],
+      "beats": [
+        {"t": 15.76, "action": "'You'd': the new plate pops off and fades (15.76 to 15.95); Pip hops down from step 2 to the pavement left of the stoop (15.90 to 16.20)."},
+        {"t": 16.24, "action": "'finding': step 1 begins to stretch upward like taffy, its numeral 1 growing with it (16.24 to 17.04)."},
+        {"t": 17.04, "action": "'hard part': step 1 lands as a tall cliff (top at y 650) with overshoot; Pip tilts his head way up (stand-side, look up)."},
+        {"t": 17.36, "action": "'part': Pip tries one hop, slides back down the cliff face (17.36 to 17.85)."},
+        {"t": 17.92, "action": "'right?': Pip turns to camera, ears raised, expression wide: a knowing 'right?' (17.92 to 18.40)."},
+        {"t": 18.56, "action": "'And': the cliff springs back to a normal step (boing, 18.56 to 18.80)."},
+        {"t": 18.92, "action": "'14': time-lapse starts. The calendar numeral counts 1 to 14 (18.92 to 20.30, ~0.1 s per year). The sun swoops in 5 fast arcs from left (120,230) over the anchor to right (840,230), 18.92 to 21.04; sky tint pulses mint and salmon with each arc; ivy starts drawing up beside the door at 19.00."},
+        {"t": 19.6, "action": "'years': passersby slide across the pavement left to right at 19.60, 19.90, 20.20, never stopping or looking at the door; ivy (started 19.00) keeps drawing up the facade to 21.00; the tree cycles its leaves twice."},
+        {"t": 20.32, "action": "'nobody': Pip curls up asleep on step 1 (sleep); z marks pop 20.40, 20.75, 21.10; a cobweb draws across the lock plate 20.32 to 20.90; the ghost beetle naps inside, visible only to us."},
+        {"t": 21.04, "action": "'did.': the sun ends its last arc settling on the anchor (21.04 to 21.40); the calendar holds on 14."}
+      ],
+      "sun": "Time-lapse: five fast arcs across the top of the panel (each ~0.42 s, motion-smeared) for the 14 years, settling back on the anchor at 'did'.",
+      "mascot": "Gag beat: looks up at the stretched 'hard part' step, slides off it, asks the camera 'right?'. Then falls asleep on the stoop through the years (sleep pose, cobweb grows next to him).",
+      "sfx": [
+        {"t": 15.76, "sound": "pop", "notes": "plate pops off"},
+        {"t": 16.24, "sound": "stretch", "notes": "rubbery creak rising in pitch"},
+        {"t": 17.36, "sound": "slide", "notes": "short slide-down squeak"},
+        {"t": 18.56, "sound": "boing", "notes": "step snaps back"},
+        {"t": 18.92, "sound": "tick", "notes": "rapid calendar flips, 14 ticks"},
+        {"t": 19.0, "sound": "whoosh", "notes": "five airy sun swooshes"},
+        {"t": 20.4, "sound": "snore", "notes": "tiny elephant snore"}
+      ],
+      "captions": [
+        {"s": 15.76, "e": 18.56, "lines": [{"text": "You'd think finding it", "s": 15.76}, {"text": "is the hard part, right?", "s": 16.72}], "highlights": [{"text": "hard part", "s": 17.04}]},
+        {"s": 18.56, "e": 21.68, "lines": [{"text": "And for 14 years,", "s": 18.56}, {"text": "nobody did.", "s": 20.32}], "highlights": [{"text": "14 years", "s": 18.92}]}
+      ]
+    },
+    {
+      "id": "S05",
+      "start": 21.68,
+      "end": 25.44,
+      "vo": "Then, in August, two security teams using AI tools found it",
+      "title": "August: found",
+      "transitionIn": {
+        "type": "matchcut",
+        "dur": 0.25,
+        "persist": ["sun", "mascot", "facade4", "door4", "stoop", "lockPlate", "calendar", "planterTree"],
+        "notes": "21.68: the time-lapse halts on a hard settle (ding). Camera eases back to 0.85 scale over 21.68 to 22.10 to make room for the teams on the pavement."
+      },
+      "setting": "Same doorway in high summer. Two security teams arrive with scanners.",
+      "composition": "S03 framing at 0.85 scale (doorway centered, top of awning y 230). Team A (2 back-view figures) enters from the left x 70..290, y 820..1095; Team B from the right x 670..890, y 820..1095; figures large and cropped at the bottom like the reference's foreground people. Scanner devices held at chest height (about y 860). Scan cones from both scanners converge on the plate (552,645).",
+      "elements": [
+        {"id": "calendar", "what": "page tears off to an AUG page", "where": "640,440,80,95", "style": "white page, tan header, ink 'AUG'"},
+        {"id": "heatLines", "what": "three short wavy shimmer lines under the sun (summer)", "where": "420..540, 190..215", "style": "ink thin"},
+        {"id": "teamA", "what": "security team A: two back-view people (one with headphones), one holds a scanner", "where": "70,820,220,275", "style": "teal and sage jackets, cream/peach skin, brown/olive hair, ink"},
+        {"id": "teamB", "what": "security team B: two back-view people (one with a backpack), one holds a scanner", "where": "670,820,220,275", "style": "tan and brown jackets, ink"},
+        {"id": "scanners", "what": "boxy handheld scanners with a small screen showing a four-point sparkle icon (the generic 'AI' mark)", "where": "50x34 each, near (250,860) and (700,860)", "style": "teal body, mintPale screen, ink sparkle"},
+        {"id": "scanCones", "what": "dashed scanning cones sweeping the facade, converging on the lock", "where": "from scanners to (552,645)", "style": "salmon 30% fill, ink dashed edges"},
+        {"id": "xrayLock", "what": "the plate turns x-ray: pins, spring, and the beetle revealed with a '!' above it", "where": "530,590,44,110", "style": "ink line art on mintPale, beetle ink + salmon"},
+        {"id": "mascot", "what": "Pip waking on step 1", "where": "320,880,80,70", "style": "mascot colorway"}
+      ],
+      "beats": [
+        {"t": 21.68, "action": "'Then': time-lapse stops (ding). The cobweb snaps; Pip wakes and sits up (sit-front, expression wide) 21.68 to 21.95."},
+        {"t": 22.16, "action": "'August': the calendar page tears off to AUG (22.16 to 22.40); the tree pops to full summer green; heat shimmer lines wobble under the sun from 22.20."},
+        {"t": 22.8, "action": "'two': Team A slides in from the left (22.80 to 23.10) and Team B from the right (23.04 to 23.34), each with a small settle bounce."},
+        {"t": 23.52, "action": "'teams': both teams' jacket fills land (line first, fill a beat later)."},
+        {"t": 23.92, "action": "'using': the scanners lift to chest height."},
+        {"t": 24.16, "action": "'AI': sparkle icons pop on both scanner screens with a twinkle (24.16 to 24.40)."},
+        {"t": 24.56, "action": "'tools': dashed scan cones sweep across the facade from both sides (24.56 to 24.96)."},
+        {"t": 24.96, "action": "'found': both cones lock onto the plate; it turns x-ray and the beetle is caught mid-step with a '!' pop (24.96 to 25.30). Pip's ears shoot up."},
+        {"t": 25.2, "action": "'it': the two scanner holders do a tiny victory hop; the beetle sweats one drop."}
+      ],
+      "sun": "Summer sun: sits on the anchor with three heat-shimmer lines beneath it from 'August'.",
+      "mascot": "Wakes up at 'Then' (the cobweb snaps), watches the teams from step 1, ears pop up on 'found'.",
+      "sfx": [
+        {"t": 21.68, "sound": "ding", "notes": "time-lapse stop"},
+        {"t": 22.16, "sound": "paper", "notes": "calendar tear"},
+        {"t": 22.8, "sound": "footsteps", "notes": "two groups arriving, left then right"},
+        {"t": 24.16, "sound": "sparkle", "notes": "twinkle on AI icons"},
+        {"t": 24.56, "sound": "scan", "notes": "soft electronic sweep"},
+        {"t": 24.96, "sound": "pop", "notes": "'!' found"}
+      ],
+      "captions": [
+        {"s": 21.68, "e": 23.92, "lines": [{"text": "Then, in August,", "s": 21.68}, {"text": "two security teams", "s": 22.8}], "highlights": [{"text": "August", "s": 22.16}]},
+        {"s": 23.92, "e": 25.44, "lines": [{"text": "using AI tools", "s": 23.92}, {"text": "found it", "s": 24.96}], "highlights": [{"text": "AI tools", "s": 24.16}]}
+      ]
+    },
+    {
+      "id": "S06",
+      "start": 25.44,
+      "end": 30.64,
+      "vo": "and quietly told the people who make PHP so a fix could be ready before anyone else knew.",
+      "title": "The quiet tip",
+      "transitionIn": {
+        "type": "push",
+        "dur": 0.46,
+        "persist": ["sun", "mascot", "teamA", "teamB"],
+        "notes": "25.44 to 25.90: the world pans left by one building width (parallax: pavement faster than facades). The teams and Pip walk with the camera; the stoop door slides out left, the locksmith workshop slides in."
+      },
+      "setting": "The locksmith workshop of the people who make PHP, a few doors down Web Street.",
+      "composition": "Workshop facade (brown brick, cream trim) x 170..790, y 260..1010. Hanging sign on a bracket top right x 640..780, y 280..380 (key icon + elephant silhouette). Big shop window x 220..560, y 420..800 with a roller blind. Door x 600..740, y 500..900 with mail slot at (670,640). Interior cutaway through the window: pegboard of keys and tools x 240..540, y 440..560 (repetition), elephant emblem on the back wall (390,470), workbench x 240..540, y 700..780, three makers back view x 250..530, y 560..800. Pavement y 1010..1095 with teams (cropped) and Pip.",
+      "elements": [
+        {"id": "workshop", "what": "locksmith workshop of PHP's makers", "where": "170,260,620,750", "style": "brown brick with ink hatch ticks, cream trim, teal door"},
+        {"id": "workshopSign", "what": "hanging sign: key icon + elephant silhouette, no text", "where": "640,280,140,100", "style": "cream board, ink, brown emblem"},
+        {"id": "workshopWindow", "what": "shop window with roller blind", "where": "220,420,340,380", "style": "mintPale glass, cream blind"},
+        {"id": "pegboard", "what": "rows of keys and tools on a pegboard", "where": "240,440,300,120", "style": "tan board, ink keys"},
+        {"id": "makers", "what": "three back-view makers in aprons at the bench", "where": "250,560,280,240", "style": "salmon, sage, tan aprons; ink"},
+        {"id": "workbench", "what": "workbench where the new plate is assembled", "where": "240,700,300,80", "style": "tan, ink"},
+        {"id": "envelope", "what": "the tip: a sealed envelope; its seal is a drop of the sun", "where": "carried at (300,900), 60x40", "style": "cream, ink V flap, sun-orange seal"},
+        {"id": "benchPlate", "what": "new plate assembling from three pieces, then a check tag", "where": "360,700,60,40 on the bench", "style": "sage plate, cream tag"},
+        {"id": "hourglassSign", "what": "small hourglass card flipped into the door window: 'not yet'", "where": "640,560,40,50", "style": "cream, ink"},
+        {"id": "passersby", "what": "two strollers on the pavement who notice nothing", "where": "lane y 900..1095", "style": "sage/peach coats"},
+        {"id": "mascot", "what": "Pip tiptoeing behind the teams, trunk raised to his mouth: 'shh'", "where": "120,960,80,70", "style": "mascot colorway"}
+      ],
+      "beats": [
+        {"t": 25.44, "action": "'and': pan (whoosh) 25.44 to 25.90; teams walk with a bob; workshop slides in."},
+        {"t": 25.68, "action": "'quietly': teams switch to tiptoe (dotted footprints); Pip, behind them, raises his trunk to his mouth: shh (trunk-up, expression closed) 25.68 to 26.20."},
+        {"t": 26.0, "action": "a small orange drop detaches from the bottom of the sun and falls (26.00 to 26.20), landing on an envelope in Team A's hands as its wax seal."},
+        {"t": 26.16, "action": "'told': the envelope slides through the mail slot (26.30 to 26.60)."},
+        {"t": 26.4, "action": "'the people': cutaway, the shop window brightens and the interior draws on: pegboard keys as a repetition pattern, makers pop in one by one at 26.48, 26.62, 26.76."},
+        {"t": 27.12, "action": "'PHP': the elephant emblem on the back wall gets a salmon ring pulse (27.12 to 27.50); one maker turns toward the opened envelope."},
+        {"t": 28.08, "action": "'fix': three plate pieces slide together on the bench (28.08 to 28.40)."},
+        {"t": 28.72, "action": "'ready': a check tag pops onto the new plate."},
+        {"t": 28.96, "action": "'before anyone else': the roller blind draws down over the window (28.96 to 29.40); the hourglass card flips into the door window (29.20); two strollers pass by on the pavement without looking (29.20 to 29.90)."},
+        {"t": 29.92, "action": "'knew.': Pip gives a final little shh to the camera; the teams walk off left (29.92 to 30.40)."}
+      ],
+      "sun": "Stays on the anchor but 'drips' a small orange drop that becomes the envelope's wax seal (nod to the reference's sun-copy stamp).",
+      "mascot": "Tiptoes behind the teams with a trunk 'shh' on 'quietly', repeats a tiny shh to camera on 'knew'. Lives on the pavement edge, bottom left.",
+      "sfx": [
+        {"t": 25.44, "sound": "whoosh", "notes": "pan"},
+        {"t": 25.68, "sound": "shh", "notes": "very soft, almost subliminal"},
+        {"t": 26.2, "sound": "stamp", "notes": "seal lands, small"},
+        {"t": 26.3, "sound": "paper", "notes": "envelope through mail slot"},
+        {"t": 26.48, "sound": "pop", "notes": "three makers"},
+        {"t": 28.08, "sound": "click", "notes": "plate pieces snap"},
+        {"t": 28.72, "sound": "ding", "notes": "small, ready"},
+        {"t": 28.96, "sound": "blind-roll", "notes": "roller blind down"}
+      ],
+      "captions": [
+        {"s": 25.44, "e": 27.84, "lines": [{"text": "and quietly told", "s": 25.44}, {"text": "the people who make PHP", "s": 26.4}], "highlights": [{"text": "quietly", "s": 25.68}]},
+        {"s": 27.84, "e": 30.64, "lines": [{"text": "so a fix could be ready", "s": 27.84}, {"text": "before anyone else knew.", "s": 28.96}], "highlights": [{"text": "ready", "s": 28.72}]}
+      ]
+    },
+    {
+      "id": "S07",
+      "start": 30.64,
+      "end": 35.6,
+      "vo": "Except, the details of the bug leaked online hours before the fix came out.",
+      "title": "The leak",
+      "transitionIn": {
+        "type": "matchcut",
+        "dur": 0.46,
+        "persist": ["sun", "mascot", "workshop", "hourglassSign"],
+        "notes": "30.64 to 31.10: pull-back (scale 1.4 to 1). The workshop, blind down, slides to the right half; the left half reveals a public noticeboard on the wall: the reference's bulletin board, here standing for 'online'."
+      },
+      "setting": "The street outside the workshop: a public noticeboard, a lamp post, far rooftops.",
+      "composition": "Cream wall across x 70..480, y 300..860. Noticeboard (teal frame, two mintPale glass doors, legs to y 860) x 110..420, y 380..700. Workshop facade on the right x 480..890, y 260..1010, blind down, hourglass in the door. Lamp post x 450..480, y 280..900. Background skyline of small facades x 70..890, y 180..300 with tiny windows (flyer targets). Pavement mintPale y 860..1095. Pip sits on the pavement under the board.",
+      "elements": [
+        {"id": "noticeboard", "what": "public bulletin board with two glass doors on legs", "where": "110,380,310,480", "style": "teal frame, mintPale glass, ink glints"},
+        {"id": "blueprint", "what": "the bug's details: a sheet with a lock diagram and a drawn beetle, pinned to the board", "where": "170,410,170,220", "style": "white paper, ink diagram, beetle ink + salmon circle"},
+        {"id": "flyers", "what": "12 copies of the sheet that fly off and stick everywhere (walls, lamp post, workshop door, pavement, Pip's face)", "where": "40x55 each, scattered across the panel", "style": "white paper, ink lines"},
+        {"id": "farWindowFlyers", "what": "tiny white rectangles appearing in the background windows in a ripple", "where": "skyline 70,180,820,120", "style": "white, ink thin"},
+        {"id": "workshop", "what": "workshop with blind down, then blind up", "where": "480,260,410,750", "style": "brown brick, cream blind"},
+        {"id": "cart", "what": "a wooden cart with a crate of new plates and a tiny elephant flag, rolling out of the workshop", "where": "560,880,220,140", "style": "tan wood, sage plates, cream flag with brown elephant"},
+        {"id": "sunClock", "what": "the sun as a clock: 12 cream ticks and two cream hands", "where": "sun anchor", "style": "sun + cream"},
+        {"id": "mascot", "what": "Pip under the board; gets a flyer on his face", "where": "300,880,80,70", "style": "mascot colorway"}
+      ],
+      "beats": [
+        {"t": 30.64, "action": "'Except': sting; pull-back reveals the noticeboard; Pip's ears jump."},
+        {"t": 31.6, "action": "'details': the blueprint slaps onto the board and gets pinned (31.60 to 31.85, pin pop)."},
+        {"t": 32.32, "action": "'bug': a salmon pencil circle draws around the beetle on the sheet (32.32 to 32.65)."},
+        {"t": 32.72, "action": "'leaked': copies peel off the sheet and flutter across the frame, sticking to the wall, lamp post, workshop door and pavement in a staggered pop cascade (32.72 to 33.80)."},
+        {"t": 33.2, "action": "'online': tiny flyer rectangles ripple through every background window (33.20 to 33.70). At 33.40 a flyer slaps onto Pip's face."},
+        {"t": 33.84, "action": "'hours': the sun becomes a clock: 12 cream ticks and two hands draw on (33.84 to 34.05); the hour hand spins three turns (34.05 to 34.70) while the minute hand blurs."},
+        {"t": 34.72, "action": "'fix': the workshop blind rolls up (34.72 to 35.00)."},
+        {"t": 35.04, "action": "'came out.': the cart with the crate of new plates rolls out of the workshop door (35.04 to 35.35). Pip peels the flyer off his face, sees the cart, ears droop: too late."},
+        {"t": 35.3, "action": "clock marks fade off the sun as the card begins to tilt for the flip."}
+      ],
+      "sun": "Clock face for 'hours before the fix came out': ticks and hands draw on, the hour hand spins a few hours, then fades back to the plain disc.",
+      "mascot": "Gag: a flyer slaps onto his face at 'online'; he peels it off on 'came out' just in time to see the cart, ears drooping.",
+      "sfx": [
+        {"t": 30.64, "sound": "sting", "notes": "short pizzicato 'uh-oh'"},
+        {"t": 31.6, "sound": "pop", "notes": "pin"},
+        {"t": 32.32, "sound": "pencil", "notes": "circle"},
+        {"t": 32.72, "sound": "paper", "notes": "flurry of flyers, 1 s"},
+        {"t": 33.4, "sound": "paper", "notes": "slap on Pip's face"},
+        {"t": 34.05, "sound": "tick", "notes": "fast clock ticking"},
+        {"t": 34.72, "sound": "blind-roll", "notes": "blind up"},
+        {"t": 35.04, "sound": "cart-roll", "notes": "wooden wheels"}
+      ],
+      "captions": [
+        {"s": 30.64, "e": 33.84, "lines": [{"text": "Except, the details", "s": 30.64}, {"text": "of the bug leaked online", "s": 32.08}], "highlights": [{"text": "leaked", "s": 32.72}]},
+        {"s": 33.84, "e": 35.6, "lines": [{"text": "hours before", "s": 33.84}, {"text": "the fix came out.", "s": 34.56}], "highlights": [{"text": "hours", "s": 33.84}]}
+      ]
+    },
+    {
+      "id": "S08",
+      "start": 35.6,
+      "end": 43.76,
+      "vo": "Cloudflare, which protects a big chunk of the web, says it saw tens of thousands of break-in attempts in 45 minutes, and millions by evening.",
+      "title": "The shield-dome",
+      "transitionIn": {
+        "type": "flip",
+        "dur": 0.5,
+        "persist": ["sun", "mascot"],
+        "notes": "35.35 to 35.85: card tilts about -4 degrees and flips on the Y axis, edge-on at 35.60; the back face lands at +2 degrees and settles to 0 by 36.0. Caption flips with the card; 'Cloudflare,' is on the new face. First of two flips (chapter: the attack)."
+      },
+      "setting": "Wide view of the neighborhood as a hill town: three terraces of rooftops, a big glass dome over most of it, a watchtower at the dome's gate.",
+      "composition": "Mint sky x 70..890, y 95..300. Back row of small facades y 300..480, middle row y 470..700, front row y 690..900, plaza mintPale y 900..1095. Dome: half-ellipse from base x 90..690 at y 900, apex (390,260); glass = mint at 30% with 3 white glint strokes. Uncovered buildings at the right x 690..890 (so the dome is visibly 'a big chunk', not everything). Watchtower x 560..690, y 690..900 at the dome gate; counter box on its front x 540..710, y 760..810 (6 digit wheels, later 7); spotlight lamp on the tower roof. Attempters: small back-view silhouettes (26 to 50 px) in tealDark/brown/tan, no faces, entering from the left, right and bottom edges and clustering at the dome rim.",
+      "elements": [
+        {"id": "terraces", "what": "three rows of small facades with tiny windows (repetition pattern)", "where": "70,300,820,600", "style": "cream/peach/tan/sage facades, teal doors, ink thin"},
+        {"id": "dome", "what": "the shield-dome (generic stand-in for Cloudflare): ink arc + glass", "where": "90,260,600,640", "style": "ink 3px arc, mint 30% glass, white glints"},
+        {"id": "uncovered", "what": "buildings outside the dome", "where": "690,330,200,570", "style": "same facades, no glass tint"},
+        {"id": "watchtower", "what": "lookout tower at the dome gate with a tiny guard silhouette in the window and a spotlight", "where": "560,690,130,210", "style": "tan body, teal roof, ink"},
+        {"id": "counter", "what": "mechanical odometer counter, 6 wheels then 7; digits blur while rolling, never settles on a claimed figure", "where": "540,760,170,50", "style": "teal box, cream wheels, ink digits"},
+        {"id": "spotlight", "what": "sweeping spotlight cone: the dome 'sees'", "where": "from (625,690) sweeping across the dome", "style": "salmon 35%"},
+        {"id": "attempters", "what": "break-in attempters: tiny back-view silhouettes that knock and rattle at the dome rim (shown trying, never shown getting in or bouncing off)", "where": "waves from edges into the rim and plaza; 36 then 150+", "style": "tealDark/brown/tan, ink thin, rattle tick marks"},
+        {"id": "stopwatch", "what": "sun as stopwatch: a crown nub on top and a cream wedge sweeping 45 minutes", "where": "sun anchor", "style": "sun + cream wedge + ink nub"},
+        {"id": "eveningGlow", "what": "sky shifts mint to salmon; windows light warm as the sun sets", "where": "sky and all windows", "style": "salmon sky, cream/salmon windows"},
+        {"id": "mascot", "what": "Pip on the watchtower roof beside the spotlight", "where": "585,630,80,70", "style": "mascot colorway"}
+      ],
+      "beats": [
+        {"t": 35.6, "action": "flip midpoint: the wide town appears (no dome yet), fills already in."},
+        {"t": 35.65, "action": "'Cloudflare': the dome's ink arc sweeps from the left base over the apex to the right base (35.65 to 36.15); glass fill fades in (36.00 to 36.30); three glint strokes pop (36.20)."},
+        {"t": 36.4, "action": "'which': the watchtower pops up from the plaza with overshoot (36.40 to 36.65); a tiny guard silhouette appears in its window."},
+        {"t": 36.56, "action": "'protects': a diagonal shine sweeps across the dome glass (36.56 to 36.90)."},
+        {"t": 37.04, "action": "'big chunk': rooftops under the dome take a soft mint tint in a left-to-right sweep (37.04 to 37.68); a dashed ink bracket traces the dome's footprint along the plaza (37.28 to 37.68). The uncovered buildings on the right stay untinted."},
+        {"t": 38.16, "action": "'says': the spotlight switches on and starts sweeping left and right (period 1.2 s)."},
+        {"t": 38.4, "action": "'it saw': the counter box draws on with six wheels at zero (38.40 to 38.70)."},
+        {"t": 38.88, "action": "'tens': wave 1 of 12 attempters slides in from the left edge to the dome rim; wave 2 from the right at 39.20; wave 3 from the bottom at 39.44. Each arrival does a tiny knock (two tick marks). Counter wheels roll fast and blurred, synced to knocks."},
+        {"t": 39.92, "action": "'of break-in attempts': rattle marks multiply all around the rim, ~30 staggered pops 39.92 to 40.80; the spotlight sweeps faster."},
+        {"t": 40.88, "action": "'in': a stopwatch crown pops onto the top of the sun."},
+        {"t": 41.04, "action": "'45': a cream wedge sweeps clockwise from 12 to 9 o'clock (41.04 to 42.10), ticking at each quarter (41.30, 41.70, 42.10)."},
+        {"t": 42.48, "action": "'millions': the counter box stretches and pops a 7th wheel (42.48 to 42.65), all wheels blur; attempters multiply into a dense dot-crowd filling the plaza and margins (42.48 to 43.10, 150+ figures, like the reference's far crowd)."},
+        {"t": 43.04, "action": "'by': the stopwatch crown and wedge erase off the sun."},
+        {"t": 43.2, "action": "'evening.': the sun sinks from the anchor toward the back-row skyline (43.20 to 43.90, continuing into S09); the sky warms mint to salmon; windows across town light up warm in a stagger (43.30 to 43.70)."}
+      ],
+      "sun": "Stopwatch for 'in 45 minutes' (crown nub + a cream wedge sweeping three quarters of the disc), then the setting sun for 'by evening' as the sky turns salmon.",
+      "mascot": "Watches from the watchtower roof. Head follows each wave of attempters (38.88 to 40.80). On 'millions' his ears blow back and he ducks behind the spotlight, peeking (peek, expression worried).",
+      "sfx": [
+        {"t": 35.35, "sound": "whoosh", "notes": "card flip"},
+        {"t": 35.65, "sound": "pencil", "notes": "long confident arc stroke"},
+        {"t": 36.2, "sound": "sparkle", "notes": "glass glints"},
+        {"t": 36.4, "sound": "pop", "notes": "tower"},
+        {"t": 38.16, "sound": "click", "notes": "spotlight on, with a soft hum"},
+        {"t": 38.88, "sound": "knock", "notes": "a patter of knocks that thickens"},
+        {"t": 39.0, "sound": "rolling-digits", "notes": "odometer whirr, continuous"},
+        {"t": 41.04, "sound": "tick", "notes": "stopwatch ticks at 41.30, 41.70, 42.10"},
+        {"t": 42.48, "sound": "rolling-digits", "notes": "extra wheel pop, whirr pitches up"},
+        {"t": 43.2, "sound": "wind-down", "notes": "evening: soft descending tone"}
+      ],
+      "captions": [
+        {"s": 35.6, "e": 36.88, "lines": [{"text": "Cloudflare,", "s": 35.6}, {"text": "which protects", "s": 36.4}], "highlights": [{"text": "Cloudflare", "s": 35.6}]},
+        {"s": 36.88, "e": 38.88, "lines": [{"text": "a big chunk of the web,", "s": 36.88}, {"text": "says it saw", "s": 38.16}], "highlights": [{"text": "big chunk", "s": 37.04}]},
+        {"s": 38.88, "e": 40.88, "lines": [{"text": "tens of thousands", "s": 38.88}, {"text": "of break-in attempts", "s": 39.92}], "highlights": [{"text": "tens of thousands", "s": 38.88}]},
+        {"s": 40.88, "e": 42.24, "lines": [{"text": "in 45 minutes,", "s": 40.88}], "highlights": [{"text": "45 minutes", "s": 41.04}]},
+        {"s": 42.24, "e": 43.76, "lines": [{"text": "and millions", "s": 42.24}, {"text": "by evening.", "s": 43.04}], "highlights": [{"text": "millions", "s": 42.48}]}
+      ]
+    },
+    {
+      "id": "S09",
+      "start": 43.76,
+      "end": 47.84,
+      "vo": "Nobody knows yet how many got in. So now comes step two, the slow one.",
+      "title": "Unknown, and the slow step",
+      "transitionIn": {
+        "type": "zoom",
+        "dur": 0.4,
+        "persist": ["sun", "mascot", "facade4", "door4", "stoop"],
+        "notes": "43.60 to 44.00: dive into the front terrace at dusk until three doorways fill the panel; the center one is our stoop door from S03. The sun settles half-set on the roofline cornice at (480,185) (clipped behind it, like the reference's sun setting behind a wall)."
+      },
+      "setting": "Dusk on Web Street: three doorways side by side, the center one with the two-step stoop.",
+      "composition": "Roofline cornice y 180 (the sun half-hidden behind it); salmon dusk sky above. Facade row x 70..890, y 180..1010 (tan/brown at dusk), windows lit warm. Doors: left x 130..300, y 560..990; center (door4 + stoop) x 395..565, y 520..880 with stoop to y 990; right x 660..830, y 560..990. Pavement y 990..1095 with footprints leading to each door. Phase 2 (45.52 onward): push in to the stoop (scale 1 to 1.8, centered on (480,900)).",
+      "elements": [
+        {"id": "duskRow", "what": "three doorways at dusk with lit windows", "where": "70,180,820,830", "style": "tan/brown facades, teal doors, cream/salmon windows, salmon sky"},
+        {"id": "footprints", "what": "ink footprint trails leading up to each door and stopping at the threshold (ambiguous, never shown inside)", "where": "pavement 70,990,820,105 converging on the doors", "style": "ink small ovals"},
+        {"id": "questionTags", "what": "a hand-drawn '?' tag popping above each door", "where": "above doors at (215,520), (480,470), (745,520), 40x50", "style": "cream tag, ink '?'"},
+        {"id": "stoop", "what": "the two-step stoop; the '2' riser gets a salmon fill wipe", "where": "365,880,230,110", "style": "cream treads, tan risers, salmon highlight on step 2"},
+        {"id": "snail", "what": "a snail on step 2: 'the slow one'", "where": "enters at 640,870; 70x50", "style": "spiral shell salmon/tan with ink spiral, cream body, ink"},
+        {"id": "mascot", "what": "Pip peeking from the left door frame, then sitting on step 1", "where": "290,880,80,70 then 380,930,80,70", "style": "mascot colorway"}
+      ],
+      "beats": [
+        {"t": 43.76, "action": "'Nobody': footprint trails draw on toward the three doors (43.76 to 44.30, staggered dots), stopping at each threshold."},
+        {"t": 44.08, "action": "'knows': a '?' tag pops above the left door; center 44.32 ('yet'); right 44.56 ('how')."},
+        {"t": 44.72, "action": "'many': Pip peeks around the left door frame (peek) and looks at camera."},
+        {"t": 45.12, "action": "'in.': Pip shrugs (shrug, expression worried); the three '?' tags wobble."},
+        {"t": 45.52, "action": "'So': push in on the center stoop (45.52 to 46.00); the '?' tags drift off frame."},
+        {"t": 46.08, "action": "'step': a salmon highlight wipes across the step 2 riser behind the numeral 2 (46.08 to 46.40); step 1 dims slightly."},
+        {"t": 46.4, "action": "'two,': step 2 does a single proud bounce."},
+        {"t": 47.12, "action": "'slow': a snail draws on at the right end of step 2 and starts sliding left at a constant crawl (~35 px/s), continuing into S10."},
+        {"t": 47.44, "action": "'one.': Pip sits on step 1 next to it, ears droop with a sigh (sit-front, expression meh)."}
+      ],
+      "sun": "Evening: half-set behind the roofline cornice at (480,185), only the upper half visible. Stays there through the scene (the day is over, step two will take more days).",
+      "mascot": "Peeks from the left door frame, shrugs at 'got in', then sits beside the snail with a sigh. The snail returns in S10 and S11.",
+      "sfx": [
+        {"t": 43.76, "sound": "footsteps", "notes": "faint, distant"},
+        {"t": 44.08, "sound": "pop", "notes": "three question pops, slightly detuned"},
+        {"t": 45.52, "sound": "whoosh", "notes": "push in"},
+        {"t": 46.08, "sound": "pencil", "notes": "highlight wipe"},
+        {"t": 47.12, "sound": "slide", "notes": "slow wet squeak, comic"},
+        {"t": 47.44, "sound": "sigh", "notes": "tiny elephant sigh"}
+      ],
+      "captions": [
+        {"s": 43.76, "e": 45.52, "lines": [{"text": "Nobody knows yet", "s": 43.76}, {"text": "how many got in.", "s": 44.56}], "highlights": [{"text": "how many", "s": 44.56}]},
+        {"s": 45.52, "e": 47.84, "lines": [{"text": "So now comes step two,", "s": 45.52}, {"text": "the slow one.", "s": 46.96}], "highlights": [{"text": "slow", "s": 47.12}]}
+      ]
+    },
+    {
+      "id": "S10",
+      "start": 47.84,
+      "end": 54.56,
+      "vo": "Someone has to install that fix on every site, and there are about 22 million copies of PHP out there that could be hit.",
+      "title": "Twenty-two million doors",
+      "transitionIn": {
+        "type": "matchcut",
+        "dur": 0.5,
+        "persist": ["sun", "mascot", "stoop", "door4", "lockPlate", "snail"],
+        "notes": "47.84: same stoop framing, time jumps to morning: the sun rises up from behind the cornice to the anchor (47.84 to 48.30), sky back to mint, windows unlit. The snail keeps crawling (it has barely moved overnight)."
+      },
+      "setting": "Morning at the stoop door; then the camera pulls back to an endless street of doors, then to an aerial carpet of rooftops.",
+      "composition": "Phase A (47.84 to 49.44): stoop framing as S03; a locksmith, back view, large and cropped at the bottom x 410..610, y 620..1095; toolbox x 190..340, y 980..1060. Phase B (49.44 to 50.48): one-point street of doors, VP (480,430), 12 doors per side receding, a small checkbox flag above each door. Phase C (50.48 to 54.56): aerial top-down carpet of tiny gabled roofs (~18 columns x 22 rows) filling the panel, mintPale streets between; the zoom keeps drifting outward slowly so the pattern seems endless. Foreground layer: a chimney bottom right x 760..850, y 960..1095 where Pip sits at constant screen size.",
+      "elements": [
+        {"id": "locksmith", "what": "one locksmith, back view: cap, overalls, tool belt", "where": "410,620,200,475", "style": "teal cap, sage overalls, brown belt, ink"},
+        {"id": "toolbox", "what": "open toolbox", "where": "190,980,150,80", "style": "tan, teal handle"},
+        {"id": "newPlate", "what": "the fix being installed on the hero door; check tag", "where": "528,588,48,114", "style": "sage plate, cream tag"},
+        {"id": "doorStreet", "what": "perspective street of 24 doors, each with an elephant plate and a small checkbox flag; only the first is ticked", "where": "70,200,820,895, VP (480,430)", "style": "facades alternating peach/cream/tan, teal doors, ink boxes"},
+        {"id": "roofCarpet", "what": "aerial tiling of ~400 tiny gabled roofs, each with a tiny salmon elephant dot", "where": "70,95,820,1000 (keeps tiling outward)", "style": "tan/salmon/sage/cream roofs, ink thin, mintPale streets"},
+        {"id": "targetRings", "what": "about 15 small target rings popping over scattered roofs: could be hit", "where": "random roofs, 36 px each", "style": "ink circle + cross, no fill"},
+        {"id": "chimney", "what": "foreground chimney that carries Pip through the zoom-out", "where": "760,960,90,135", "style": "brown brick, ink"},
+        {"id": "snail", "what": "the snail, still on step 2", "where": "step 2, moving left", "style": "as S09"},
+        {"id": "mascot", "what": "Pip pushing the toolbox closer, then on the chimney overlooking the carpet", "where": "250,930,80,70 then 770,900,80,70", "style": "mascot colorway"}
+      ],
+      "beats": [
+        {"t": 47.84, "action": "'Someone': the locksmith slides up into frame from the bottom edge (back view) and stops at the door; sun rising."},
+        {"t": 48.16, "action": "'has to': Pip nudges the toolbox closer with his head (stand-side)."},
+        {"t": 48.48, "action": "'install': the old plate pops off; the new plate slides on and four screws twirl in (48.48 to 49.04)."},
+        {"t": 49.04, "action": "'fix': check tag pops on the new plate."},
+        {"t": 49.44, "action": "'on': zoom-out begins (49.44 to 50.20): the door becomes the first of a long perspective street of doors; checkbox flags pop above each door front to back (49.68 'every' to 50.30)."},
+        {"t": 49.92, "action": "'site,': the first checkbox ticks; the other 23 stay empty. The locksmith is a tiny figure at the first door."},
+        {"t": 50.48, "action": "'and there are': the camera tilts to top-down and pulls back into the aerial roof carpet (50.48 to 51.20); roofs tile outward from the center in a ripple."},
+        {"t": 51.24, "action": "'22 million': salmon elephant dots blink on across the carpet from the center outward (51.24 to 52.24)."},
+        {"t": 52.24, "action": "'copies': the zoom keeps drifting outward slowly; new rows keep tiling in at the edges (endless pattern)."},
+        {"t": 52.8, "action": "'PHP': every elephant dot pulses once in unison."},
+        {"t": 54.08, "action": "'hit.': ~15 target rings pop over scattered roofs (54.08 to 54.40), each with a small overshoot."}
+      ],
+      "sun": "Sunrise at the start (rises from behind the cornice to the anchor, 47.84 to 48.30): step two begins the next morning. Then a plain anchor over the endless carpet.",
+      "mascot": "Helps: nudges the toolbox to the locksmith. On the zoom-out he hops onto a foreground chimney and sits (sit-back) looking out over the endless roofs, tiny against the pattern: the scale gag.",
+      "sfx": [
+        {"t": 47.84, "sound": "birdsong", "notes": "two chirps, morning"},
+        {"t": 48.48, "sound": "click", "notes": "old plate off, screws twirl"},
+        {"t": 49.04, "sound": "ding", "notes": "small check"},
+        {"t": 49.44, "sound": "whoosh", "notes": "long pull-back"},
+        {"t": 49.68, "sound": "pop", "notes": "soft run of checkbox pops"},
+        {"t": 50.48, "sound": "whoosh", "notes": "second pull-back to aerial"},
+        {"t": 51.24, "sound": "sparkle", "notes": "shimmering ripple of dots"},
+        {"t": 54.08, "sound": "pop", "notes": "scattered target pops, dry"}
+      ],
+      "captions": [
+        {"s": 47.84, "e": 50.48, "lines": [{"text": "Someone has to install", "s": 47.84}, {"text": "that fix on every site,", "s": 48.8}], "highlights": [{"text": "every site", "s": 49.68}]},
+        {"s": 50.48, "e": 52.56, "lines": [{"text": "and there are about", "s": 50.48}, {"text": "22 million copies", "s": 51.24}], "highlights": [{"text": "22 million", "s": 51.24}]},
+        {"s": 52.56, "e": 54.56, "lines": [{"text": "of PHP out there", "s": 52.56}, {"text": "that could be hit.", "s": 53.68}], "highlights": [{"text": "hit", "s": 54.08}]}
+      ]
+    },
+    {
+      "id": "S11",
+      "start": 54.56,
+      "end": 60.56,
+      "vo": "If a site can't update fast enough, the safest thing is to switch it off until it can. That's what those government sites did.",
+      "title": "Switch it off",
+      "transitionIn": {
+        "type": "zoom",
+        "dur": 0.4,
+        "persist": ["sun", "mascot", "snail"],
+        "notes": "54.40 to 54.80: dive into one target-ringed roof; it resolves into a frontal close-up of a door. Do not reveal yet that it is civicC from S01: only a fluted column edge hints at it."
+      },
+      "setting": "A close-up of one building's door (secretly civicC), then the pull-back reveal of Civic Row from S01.",
+      "composition": "Phase A (54.56 to 59.04): fluted column edge left x 70..200, y 95..1010 (cream); double door x 250..610, y 330..1010 (teal); window above x 300..560, y 160..300 (lit); knife-switch box on the wall right of the door x 660..780, y 520..740; hourglass sign hung on the door at (430,470); pavement y 1010..1095 with the snail crossing. Pip bottom right x 720..800, y 960..1040. Phase B (59.04 to 60.56): zoom out (scale 2.6 to 1) into the exact S01 composition: Civic Row, all four buildings dark, a plaque on each door, pennants hanging, Pip on the bench.",
+      "elements": [
+        {"id": "columnEdge", "what": "fluted stone column edge: the only hint that this is a civic building", "where": "70,95,130,915", "style": "cream, ink flutes"},
+        {"id": "doorC", "what": "civicC's double door, close", "where": "250,330,360,680", "style": "teal, mintPale glass"},
+        {"id": "windowAbove", "what": "lit window above the door", "where": "300,160,260,140", "style": "cream/salmon lit, then tealDark"},
+        {"id": "hourglassSign", "what": "hanging hourglass sign: waiting for the fix, sand trickling", "where": "400,450,70,90", "style": "cream, ink, tan sand"},
+        {"id": "switchBox", "what": "wall-mounted knife-switch box with a big lever", "where": "660,520,120,220", "style": "teal box, tan lever handle, ink"},
+        {"id": "backSoonPlaque", "what": "hanging plaque with a small clock icon: back when it can", "where": "400,450,70,70", "style": "cream, ink clock"},
+        {"id": "snail", "what": "the snail crawling along the pavement", "where": "enters 820,1030 moving left", "style": "as S09"},
+        {"id": "civicRow", "what": "the S01 composition, dark, with plaques: the payoff of the hook", "where": "full panel as S01", "style": "as S01 with all windows tealDark"},
+        {"id": "mascot", "what": "Pip near the switch box, then on the bench", "where": "720,960,80,70 then 665,860,90,80", "style": "mascot colorway"}
+      ],
+      "beats": [
+        {"t": 54.56, "action": "'If': the zoom lands on the door; window above lit."},
+        {"t": 55.04, "action": "'can't': the hourglass sign swings onto the door and settles."},
+        {"t": 55.28, "action": "'update': sand starts trickling in the hourglass (continuous)."},
+        {"t": 55.68, "action": "'fast enough': the snail inches across the pavement from the right (55.68 to 56.40). Callback."},
+        {"t": 56.56, "action": "'safest': the switch box draws on (56.56 to 56.90), fill lands (56.80 to 57.04), the lever glints."},
+        {"t": 57.52, "action": "'switch': the power glyph draws on inside the sun again (callback to S01, 57.52 to 57.80); Pip covers his eyes with his ears (ears-cover)."},
+        {"t": 58.0, "action": "'off': the lever throws down (clunk, 58.00 to 58.10); window and door glass flicker and go dark (58.05 to 58.25); panel micro-jolt 2 px."},
+        {"t": 58.24, "action": "'until': the hourglass sign flips over to the back-soon plaque with its clock icon and swings to rest (58.24 to 58.60)."},
+        {"t": 59.04, "action": "'That's': the power glyph erases; zoom-out (59.04 to 59.84) reveals this door belongs to civicC on Civic Row, the exact S01 framing; all four civic buildings are dark with plaques on their doors."},
+        {"t": 59.52, "action": "'government': the four pennants flutter once in sequence (59.52 to 59.90)."},
+        {"t": 59.84, "action": "'sites': Pip is back on the bench in his frame-0 pose (sit-back)."},
+        {"t": 60.16, "action": "'did.': Pip nods once; birds on the wire hop."}
+      ],
+      "sun": "Power button again (callback to the hook) on 'switch it off', glyph erased on 'That's'. Plain anchor over Civic Row for the reveal.",
+      "mascot": "Covers his eyes with his ears as the lever drops, then is found on the S01 bench for the reveal, same pose as frame 0, and nods.",
+      "sfx": [
+        {"t": 54.4, "sound": "whoosh", "notes": "zoom in"},
+        {"t": 55.04, "sound": "creak", "notes": "sign swing"},
+        {"t": 55.28, "sound": "sand", "notes": "soft trickle, low in the mix"},
+        {"t": 56.56, "sound": "pencil", "notes": "switch box"},
+        {"t": 57.52, "sound": "pencil", "notes": "power glyph"},
+        {"t": 58.0, "sound": "power-off", "notes": "big knife-switch clunk + hum dying"},
+        {"t": 58.24, "sound": "creak", "notes": "plaque flip"},
+        {"t": 59.04, "sound": "whoosh", "notes": "pull-back reveal"},
+        {"t": 59.52, "sound": "flag-flap", "notes": "four soft flaps"}
+      ],
+      "captions": [
+        {"s": 54.56, "e": 56.4, "lines": [{"text": "If a site can't", "s": 54.56}, {"text": "update fast enough,", "s": 55.28}], "highlights": [{"text": "fast enough", "s": 55.68}]},
+        {"s": 56.4, "e": 58.24, "lines": [{"text": "the safest thing", "s": 56.4}, {"text": "is to switch it off", "s": 57.2}], "highlights": [{"text": "switch it off", "s": 57.52}]},
+        {"s": 58.24, "e": 59.04, "lines": [{"text": "until it can.", "s": 58.24}], "highlights": []},
+        {"s": 59.04, "e": 60.56, "lines": [{"text": "That's what those", "s": 59.04}, {"text": "government sites did.", "s": 59.52}], "highlights": [{"text": "government sites", "s": 59.52}]}
+      ]
+    },
+    {
+      "id": "S12",
+      "start": 60.56,
+      "end": 66.64,
+      "vo": "And one in three sites on PHP runs a version so old that the people who make PHP don't fix it anymore.",
+      "title": "Too old to fix",
+      "transitionIn": {
+        "type": "flip",
+        "dur": 0.5,
+        "persist": ["sun", "mascot"],
+        "notes": "60.31 to 60.81: second card flip (chapter: the long tail), tilt +4 degrees this time (mirror of S08), edge-on at 60.56, settles by 61.0."
+      },
+      "setting": "Three neighboring buildings on an older stretch of Web Street; the locksmith cart from S07 does its rounds.",
+      "composition": "Frontal row. Left building x 80..330, y 300..1000 (cream walls, teal balconies); center building x 330..620, y 260..1000 (ornate older facade: cornice, arched windows, shutters; the one that ages); right building x 620..880, y 320..1000 (glass grid in mint/teal checker like the reference's right building). Doors with elephant plates at y 800..990 (left (205), center (475), right (750)). Street y 1000..1095; the cart lane y 930..1070. Pip on the center building's stoop x 440..520, y 960..1030.",
+      "elements": [
+        {"id": "leftBldg", "what": "mid-age apartment block", "where": "80,300,250,700", "style": "cream walls, teal balconies, ink"},
+        {"id": "oldBldg", "what": "the old-version building: ornate facade that ages to sepia, cracks, cobwebs, a crooked shutter", "where": "330,260,290,740", "style": "peach that drains to tan/brown sepia; ink jitter increases"},
+        {"id": "rightBldg", "what": "modern glass-grid building", "where": "620,320,260,680", "style": "mint/teal/tealDark checker panes, ink"},
+        {"id": "plates3", "what": "elephant plates on the three doors", "where": "30x60 each at the doors", "style": "tan, brown emblem"},
+        {"id": "oldPlate", "what": "the center plate morphs into an old skeleton-key lock plate with a faded elephant", "where": "455,860,50,110", "style": "brown, faded emblem, ink"},
+        {"id": "wrenchSlash", "what": "a tiny wrench icon with a slash: no longer serviced", "where": "450,800,50,50", "style": "ink, cream disc"},
+        {"id": "cart", "what": "the makers' cart from S07 (crate of new plates, elephant flag), pulled by one maker (side/back view)", "where": "enters x -220, rolls to 900; y 930..1070", "style": "tan wood, sage plates, cream flag"},
+        {"id": "sunPie3", "what": "sun as a 3-slice pie; one slice turns tan", "where": "sun anchor", "style": "sun + cream dividers + tan slice"},
+        {"id": "dustPuff", "what": "dust cloud from Pip blowing on the old plate (sneeze gag)", "where": "around (480,860)", "style": "cream puffs, ink"},
+        {"id": "mascot", "what": "Pip on the old building's stoop", "where": "440,960,80,70", "style": "mascot colorway"}
+      ],
+      "beats": [
+        {"t": 60.56, "action": "'And': flip lands; the three buildings settle with fills in."},
+        {"t": 60.72, "action": "'one': three cream divider lines draw onto the sun, making a 3-slice pie (60.72 to 60.96)."},
+        {"t": 61.12, "action": "'three': one slice of the sun turns tan; the center building gets a matching tan outline pulse at the same moment."},
+        {"t": 61.84, "action": "'PHP': the elephant plates on all three doors glint left to right (61.84 to 62.10)."},
+        {"t": 62.4, "action": "'runs': the center building starts aging: fills drain toward sepia tan (62.40 to 63.20), its linework gets wobblier."},
+        {"t": 62.72, "action": "'version': its plate morphs into the old skeleton-key plate with a faded elephant (62.72 to 63.00); cracks draw on (62.72 to 63.20); a shutter drops crooked (63.00)."},
+        {"t": 63.2, "action": "'so': cobwebs pop into the window corners."},
+        {"t": 63.44, "action": "'old': Pip blows on the old plate; a dust cloud puffs up and he sneezes (trunk-up, 63.44 to 63.84)."},
+        {"t": 63.84, "action": "'that the people': sun pie merges back into the disc (63.84 to 64.20); the cart rolls in from the left pulled by a maker (63.84 to 64.40)."},
+        {"t": 64.64, "action": "'make': the cart stops at the left building; a new plate stamps on its door with a check tag (64.64 to 64.90)."},
+        {"t": 64.88, "action": "'PHP': the elephant flag on the cart glints."},
+        {"t": 65.52, "action": "'don't': the cart rolls past the old center building without stopping (65.52 to 66.00)."},
+        {"t": 65.76, "action": "'fix': the wrench-slash icon pops over the old plate."},
+        {"t": 66.0, "action": "'it': the cart stops at the right building; new plate stamps on with a check (66.00 to 66.20)."},
+        {"t": 66.16, "action": "'anymore.': Pip turns from the departing cart back to the old building, ears droop (66.16 to 66.60)."}
+      ],
+      "sun": "A 3-slice pie for 'one in three' (rhymes with the 10-slice pie of S02), one slice tan, merges back to the full disc.",
+      "mascot": "Sits on the old building's stoop. Gag: blows the dust off the old plate and sneezes on 'old'. Watches the cart skip his building, ears droop on 'anymore'.",
+      "sfx": [
+        {"t": 60.31, "sound": "whoosh", "notes": "card flip"},
+        {"t": 60.72, "sound": "pencil", "notes": "pie dividers"},
+        {"t": 62.4, "sound": "creak", "notes": "old wood settling"},
+        {"t": 63.0, "sound": "clunk", "notes": "shutter drops"},
+        {"t": 63.44, "sound": "sneeze", "notes": "tiny trumpet sneeze + dust"},
+        {"t": 63.84, "sound": "cart-roll", "notes": "same cart as S07"},
+        {"t": 64.64, "sound": "stamp", "notes": "plate on left building"},
+        {"t": 65.76, "sound": "pop", "notes": "wrench-slash, dull"},
+        {"t": 66.0, "sound": "stamp", "notes": "plate on right building"}
+      ],
+      "captions": [
+        {"s": 60.56, "e": 62.4, "lines": [{"text": "And one in three", "s": 60.56}, {"text": "sites on PHP", "s": 61.36}], "highlights": [{"text": "one in three", "s": 60.72}]},
+        {"s": 62.4, "e": 63.84, "lines": [{"text": "runs a version so old", "s": 62.4}], "highlights": [{"text": "so old", "s": 63.2}]},
+        {"s": 63.84, "e": 65.52, "lines": [{"text": "that the people", "s": 63.84}, {"text": "who make PHP", "s": 64.48}], "highlights": []},
+        {"s": 65.52, "e": 66.64, "lines": [{"text": "don't fix it anymore.", "s": 65.52}], "highlights": [{"text": "don't fix it", "s": 65.52}]}
+      ]
+    },
+    {
+      "id": "S13",
+      "start": 66.64,
+      "end": 70.687,
+      "vo": "For those, it's switch off or hope the hosting company sorts it out.",
+      "title": "Switch off, or hope",
+      "transitionIn": {
+        "type": "matchcut",
+        "dur": 0.64,
+        "persist": ["sun", "mascot", "oldBldg", "oldPlate", "switchBox"],
+        "notes": "66.64 to 67.28: push in (scale 1 to 1.7) on the old building's door; neighbors slide out of frame. The switch box from S11 re-appears on its wall at 'switch'. Scene ends in the un-build that returns to frame 0."
+      },
+      "setting": "The old building's doorway, a side street running off to the right; then the un-build back to Civic Row's line art.",
+      "composition": "Old facade (sepia tan) x 200..760, y 95..1010 with cracks and cobwebs; door x 360..600, y 520..990 with the old plate; switch box on the left wall x 100..220, y 560..760; side street gap at the right x 760..890 receding to a tiny VP at (830,600) where the van appears; Pip on the stoop at (480,990). Behind everything, the S01 Civic Row line art is waiting (revealed by the un-build).",
+      "elements": [
+        {"id": "oldFacadeClose", "what": "the old building close: sepia, cracks, cobwebs, crooked shutter", "where": "200,95,560,915", "style": "tan/brown fills, ink with extra jitter"},
+        {"id": "oldDoor", "what": "door with the old skeleton-key plate and the wrench-slash icon", "where": "360,520,240,470", "style": "tealDark, brown plate"},
+        {"id": "switchBox", "what": "the S11 knife-switch box: option one", "where": "100,560,120,200", "style": "teal box, tan lever, ink"},
+        {"id": "sideStreet", "what": "a narrow side street receding to the right", "where": "760,300,130,700", "style": "mintPale road, ink converging lines"},
+        {"id": "van", "what": "the hosting company as a plain caretaker van with a ladder rack and a key icon on its side (no text, no logo): option two, far away", "where": "appears at (830,600) 20x14, grows to 60x40", "style": "cream body, teal windows, tan ladder, ink"},
+        {"id": "hopeSparkle", "what": "small four-point sparkle next to Pip's crossed trunk", "where": "520,930,24,24", "style": "ink + highlight"},
+        {"id": "unbuildBlock", "what": "the single tan block all fills collapse into, which then slides down out of the panel", "where": "200,95,560,915 collapsing to 200,600,560,410 then sliding below y 1095", "style": "tan flat"},
+        {"id": "civicRowLineArt", "what": "the S01 composition in pure line art (ink on white paper fills): frame 0", "where": "full panel", "style": "ink only, white fills"},
+        {"id": "bench", "what": "the S01 bench in line art", "where": "610,930,200,80", "style": "ink, white fill"},
+        {"id": "mascot", "what": "Pip on the stoop, then on the bench in the frame-0 pose", "where": "440,950,80,70 then 665,860,90,80", "style": "mascot colorway (stays in color through the un-build, like the reference cat)"}
+      ],
+      "beats": [
+        {"t": 66.64, "action": "'For those': push in on the old door (66.64 to 67.28); cobwebs sway."},
+        {"t": 67.28, "action": "'it's': Pip stands up on the stoop (stand-side)."},
+        {"t": 67.6, "action": "'switch': the switch box pops onto the left wall with a glint (67.60 to 67.85)."},
+        {"t": 68.0, "action": "'off': the lever wobbles and the window flickers once: offered, not decided."},
+        {"t": 68.56, "action": "'or': Pip looks from the switch (left) to the side street (right), 68.56 to 68.80."},
+        {"t": 68.8, "action": "'hope': Pip sits and crosses his trunk (requested 'trunk-cross'; fallback trunk-up + expression closed) with a small sparkle; the sun begins a gentle descent."},
+        {"t": 69.2, "action": "'hosting': the caretaker van pops in tiny at the side street's vanishing point and inches forward (69.20 to 69.84)."},
+        {"t": 69.52, "action": "'company': the van's ladder glints."},
+        {"t": 69.84, "action": "'sorts': UN-BUILD. Small fills (windows, door, shutter, van, switch) shrink to their centers and vanish (69.84 to 70.05); the old building's linework draws off in reverse (69.90 to 70.20); the facade fills contract into one tan block (70.00 to 70.15)."},
+        {"t": 70.16, "action": "'it': the tan block slides down and out of the panel (70.15 to 70.50), uncovering the S01 Civic Row line art behind it. Pip hops onto the line-art bench (70.10 to 70.55) and settles into sit-back."},
+        {"t": 70.24, "action": "'out.': the sun finishes sinking to (480,440), half hidden behind the far line-art buildings (by 70.60). Caption holds."},
+        {"t": 70.52, "action": "caption rolls up and out (70.52 to 70.687) leaving the caption zone empty. Last frame = frame 0."}
+      ],
+      "sun": "Gentle sunset on 'hope' (from 68.80), then during the un-build it sinks all the way to its frame-0 position behind the far buildings of Civic Row (480,440) by 70.60.",
+      "mascot": "Weighs the two options with his head (switch left, van right), then crosses his trunk and hopes. In the un-build he hops onto the line-art bench and ends in the exact frame-0 pose.",
+      "sfx": [
+        {"t": 66.64, "sound": "whoosh", "notes": "push in, soft"},
+        {"t": 67.6, "sound": "pop", "notes": "switch box"},
+        {"t": 68.0, "sound": "click", "notes": "lever wobble, half click"},
+        {"t": 68.8, "sound": "sparkle", "notes": "small hope twinkle"},
+        {"t": 69.2, "sound": "engine", "notes": "distant small van putter"},
+        {"t": 69.84, "sound": "unbuild", "notes": "reverse pencil scratches + soft paper slide"},
+        {"t": 70.15, "sound": "whoosh", "notes": "block slides down; tail fades so the loop re-enters cleanly on the frame-0 swell"}
+      ],
+      "captions": [
+        {"s": 66.64, "e": 68.56, "lines": [{"text": "For those, it's", "s": 66.64}, {"text": "switch off", "s": 67.6}], "highlights": [{"text": "switch off", "s": 67.6}]},
+        {"s": 68.56, "e": 70.687, "lines": [{"text": "or hope the hosting", "s": 68.56}, {"text": "company sorts it out.", "s": 69.52}], "highlights": [{"text": "hope", "s": 68.8}]}
+      ]
+    }
+  ],
+  "loop": "The film opens and closes on the same frame: Civic Row in pure line art (ink on white paper fills), the sun half hidden behind the far buildings at (480,440), Pip in color on the bench in sit-back, and an empty caption zone. S13's un-build (69.84 to 70.60) collapses every fill into one tan block that slides down out of the panel, revealing that line art behind it, while the sun sets to (480,440) and Pip hops onto the bench. The last caption rolls out from 70.52 to 70.687; the first caption rolls in from 0.00 to 0.16, so the seam falls on an empty caption zone. On replay the color floods back and the sun rises again (0.10 to 0.90): the ending reads as the beginning. Audio: sfx tails die before 70.687, and the frame-0 whoosh swell starts at 0.10, so the cut is clean."
+}

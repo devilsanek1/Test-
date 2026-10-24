@@ -10,5 +10,5 @@ import {FontTest} from './FontTest';
 export const devCompositions = [
   {id: 'KitDemo', component: KitDemo, durationSeconds: 12},
   {id: 'MascotSheet', component: MascotSheet, durationSeconds: 8},
-  {id: 'FontTest', component: FontTest, durationSeconds: 1},
+  {id: 'FontTest', component: FontTest, durationSeconds: 2},
 ];

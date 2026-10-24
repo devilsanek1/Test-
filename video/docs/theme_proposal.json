@@ -1,0 +1,94 @@
+{
+  "_about": "Style-bible stream proposal for src/lib/theme.ts. Same keys as theme.ts plus additions. Each entry: value (proposed), was (current theme.ts), reason. All px are at 1080 px canvas width; card-local unless noted. Evidence and method: docs/style_bible.md (section numbers in reasons) and docs/style_evidence/.",
+  "palette": {
+    "bg": {"value": "#A6CABB", "was": "#A6CABB", "reason": "Unchanged. Page bg measured exactly rgb(166,202,187) with 0 variance (flat)."},
+    "card": {"value": "#FFFFFF", "was": "#FFFFFF", "reason": "Unchanged. Card measured pure 255 white, no grain, no shadow (see Card notes below)."},
+    "ink": {"value": "#2B1B0A", "was": "#302013", "reason": "Median core colour of line and caption strokes across 4 scenes = rgb(43,27,10). Same ink for art and captions."},
+    "sun": {"value": "#EC6B2E", "was": "#EC6B2E", "reason": "Unchanged. Measured rgb(236,107,46) in every scene."},
+    "highlight": {"value": "#F6B892", "was": "#F6B892", "reason": "Unchanged. Caption box measured rgb(246,184,146) in 8 boxes."},
+    "peach": {"value": "#F6B892", "was": "#E4BC9E", "reason": "#E4BC9E does not occur in the reference. The only peach is the highlight paint, reused for placards, screens, awnings, doors (k-means cluster #F6B791 = same paint)."},
+    "salmon": {"value": "#F6B892", "was": "#F2A57E", "reason": "No second peach/salmon exists in the reference; alias to peach so existing uses stay on-palette. Prefer palette.peach in new code."},
+    "cream": {"value": "#F3E0CB", "was": "#F3E3CC", "reason": "Measured light-wall cluster rgb(243,224,203)."},
+    "tan": {"value": "#BA977E", "was": "#B79A83", "reason": "Measured dark-wall / shade-step cluster rgb(186,151,126) ('clay'). Most-used fill in the warm scenes (29-36% of panel)."},
+    "brown": {"value": "#88652F", "was": "#836C54", "reason": "The reference's brown is an ochre rgb(136,101,47): hair, jackets, tree trunks, sign posts. #836C54 is not in the reference."},
+    "teal": {"value": "#547977", "was": "#506E6A", "reason": "Measured door / frame / coat teal rgb(84,121,119)."},
+    "tealDark": {"value": "#3E605F", "was": "#3F615F", "reason": "Measured rgb(62,96,95); 1-unit refinement. Darkest fill: shade step, door kick panels, ATM body, dusk sky."},
+    "sage": {"value": "#6D988B", "was": "#769689", "reason": "Measured rgb(109,152,139): glass panes, tree crowns, coats, cladding."},
+    "mintPale": {"value": "#EBF6E5", "was": "#EAF6E5", "reason": "Measured rgb(235,246,229): ground, glass, light facades."},
+    "olive": {"value": "#3E605F", "was": "#444233", "reason": "No olive/khaki exists in the reference. Dark trousers/objects use tealDark or ink. Aliased to tealDark; avoid in new code."},
+    "grey": {"value": "#D9BBA1", "was": "#D6D6CB", "reason": "No neutral grey exists in the reference (palette is all warm/teal). Paper dog-ears and soft shades use sand. Aliased to sand; avoid in new code."},
+    "sky": {"value": "#A6CABB", "was": null, "reason": "NEW. Explicit name for the panel sky block (same paint as bg; measured rgb(166,201,186), 1 unit off = identical)."},
+    "sand": {"value": "#D9BBA1", "was": null, "reason": "NEW. Missing role: mid walls, necks/skin, coats, light hair, paper dog-ears. 13% of the street scene, 28% of the dusk wall."},
+    "clay": {"value": "#BA977E", "was": null, "reason": "NEW. Readable alias of tan."},
+    "ochre": {"value": "#88652F", "was": null, "reason": "NEW. Readable alias of brown."},
+    "white": {"value": "#FFFFFF", "was": null, "reason": "NEW. Paper, signs, line-art (unfilled) people, glass glare. 6-14% of panel in several scenes."}
+  },
+  "canvas": {"value": {"width": 1080, "height": 1920, "fps": 30}, "was": {"width": 1080, "height": 1920, "fps": 30}, "reason": "Unchanged."},
+  "card": {
+    "value": {"x": 60, "y": 120, "w": 960, "h": 1400, "radius": 0},
+    "was": {"x": 60, "y": 120, "w": 960, "h": 1400, "radius": 0},
+    "reason": "Unchanged. Width 960 equals the reference card width exactly, so every px number in the bible transfers 1:1 to card-local coords. Corners square (radius 0 measured). Bottom edge (canvas 1520) sits where platform UI starts."
+  },
+  "panel": {
+    "value": {"x": 96, "y": 96, "w": 768, "h": 944},
+    "was": {"x": 70, "y": 95, "w": 820, "h": 1000},
+    "reason": "Reference panel is inset exactly 96 px (= 0.10 x card width) on left, right and top and is 768 wide (0.80 x card width). Height 944 (vs 768 square in the 4:5 reference) uses the extra 9:16 height while keeping caption baselines inside the safe zone. Canvas: x 156-924, y 216-1160."
+  },
+  "captionZone": {
+    "value": {"x": 90, "y": 1136, "w": 780, "h": 220},
+    "was": {"x": 60, "y": 1120, "w": 840, "h": 240},
+    "reason": "Max line width 780 keeps a centred line inside canvas x 150-930 (safe zone 90-930; centre stays on the card centre x=540). Zone spans line-1 cap top (1152) to line-2 descender (1330) +-16 px; canvas y 1256-1476 < 1480."
+  },
+  "sun": {
+    "value": {"cx": 480, "cy": 132, "r": 72},
+    "was": {"cx": 480, "cy": 100, "r": 78},
+    "reason": "Radius measured 71-72 px in all 13 wide shots (0.075 x card width). Default centre = reference opening position: 36 px below the panel top so the disc crosses the panel edge (top of disc 36 px above panel). Across scenes the centre ranges cx 320-752, cy 115-155. Canvas top of disc = 180 (> safe 160)."
+  },
+  "stroke": {
+    "ink": {"value": 3.4, "was": 3, "reason": "Coverage width of default architectural lines at mid-length measured 3.3-3.7 px (ledges, kerbs, door frames)."},
+    "inkThin": {"value": 2.2, "was": 2, "reason": "Distant / detail lines: distance-transform median 2.0-2.5 px (far street, skyline windows, bikes)."},
+    "inkBold": {"value": 4.8, "was": 4.5, "reason": "Foreground figures, heavy ledges and kerbs measured 4.5-5.2 px."},
+    "inkHair": {"value": 1.6, "was": null, "reason": "NEW. Glass glints, paper text lines, crane cables, tapered line ends (1.5-1.8 px)."},
+    "taperEnd": {"value": 0.45, "was": null, "reason": "NEW. Long lines (>150 px) thin to ~45% of their width over the last 8-10% of length at both ends (ledge line: 3.5 px mid, 1.5-2.3 px at the ends)."}
+  },
+  "type": {
+    "family": {"value": "CaptionHand", "was": "CaptionHand", "reason": "Unchanged name. File public/fonts/CaptionHand.woff2 = Patrick Hand Regular 400 (OFL). Overlay vs reference: ink IoU 0.88 after Chromium render, widths within 0.1%, highlight boxes within 1 px. The reference IS Patrick Hand."},
+    "size": {"value": 82, "was": 64, "reason": "Reference set at 82 px on a 960 px card (8.5% of card width): x-height 38, cap height 55, ascender 60, descender 26 px."},
+    "lineHeight": {"value": 1.17, "was": 1.32, "reason": "Baseline-to-baseline 96 px measured in 30+ frames (96/82 = 1.17)."},
+    "color": {"value": "#2B1B0A", "was": "palette.ink", "reason": "Same ink as the art (keep referencing palette.ink)."},
+    "weight": {"value": 400, "was": null, "reason": "NEW. Patrick Hand has one weight. Never fake-bold."},
+    "letterSpacing": {"value": 0, "was": null, "reason": "NEW. Width fit across 8 lines is best at 0 (sd 0.1%); any tracking breaks the match."},
+    "fontFeatures": {"value": "kerning normal; ligatures on (font-variant-ligatures: common-ligatures contextual)", "was": null, "reason": "NEW. The looped 'll' in all/million/normally is the font's ligature; it must stay on."},
+    "align": {"value": "center on card x = 480 (canvas 540), by advance width", "was": null, "reason": "NEW. Reference lines are centred on the card centre to within 1 px."},
+    "baselines": {"value": {"line1": 1208, "line2": 1304, "singleWaiting": 1208, "punch": 1265}, "was": null, "reason": "NEW. Card-local. Reference: line 1 sits 175 px below the panel bottom, line 2 +96. A 1-line caption that will get a 2nd line sits on line 1. A one-line 'punch' caption is centred (reference baseline 1152 screen = midpoint + 4)."},
+    "punchScale": {"value": 1.16, "was": null, "reason": "NEW. 'Half a million came.' is set at ~95 px (x1.16), alone and centred."},
+    "hookScale": {"value": 1.06, "was": null, "reason": "NEW. The opening/loop caption ('France expected / 200,000 marchers.') is ~87 px with 103 px line gap (x1.06)."},
+    "maxLineWidth": {"value": 780, "was": null, "reason": "NEW. Safe-zone limit (see captionZone). ~27 characters per line at 82 px (avg advance 28 px/char)."},
+    "clip": {"value": {"top": 1070, "bottom": 1400}, "was": null, "reason": "NEW. Card-local caption viewport for the roll: lines enter from below the card bottom edge (clipped by it) and exit upward, clipped ~30 px under the panel bottom (reference: ~27 px)."}
+  },
+  "highlight": {
+    "value": {"color": "#F6B892", "padLeftEm": 0.02, "padRightEm": 0.11, "topEm": 0.671, "bottomEm": 0.305, "radiusEm": 0.035, "excludeTrailingPunctuation": true, "behindText": true},
+    "was": null,
+    "reason": "NEW. Fitted on 8 reference boxes: box = [word advance start - 0.02em, word advance end + 0.11em] x [baseline - 0.671em, baseline + 0.305em] (at 82 px: -1.6/+9 px, 55 px up, 25 px down, h 80, r 3). Multi-word phrases get one continuous box incl. spaces. Trailing . or , is NOT covered. Text stays ink."
+  },
+  "misreg": {
+    "value": {"dx": 1.5, "dy": 1, "jitter": 3},
+    "was": {"dx": -4, "dy": -3, "jitter": 2},
+    "reason": "Measured fill-vs-ink offsets are 2-5 px but the direction varies per object (cat +x+y in 4 scenes, jacket +x 5-7 px, doorbell +x, sage coat -x, backpack -x-y, paper -x+y). A fixed up-left shift reads as a mechanical print error; a small +x+y bias with +-3 jitter reproduces the mix (x in [-1.5,4.5], y in [-2,4])."
+  },
+  "timing": {
+    "highlightWipe": {"value": 0.25, "was": 0.3, "reason": "Measured at 30 fps: 'same' box wipes L->R from 0 to 100% in 0.25 s with strong ease-out (87% width after 0.1 s), landing as line 2 settles."},
+    "captionLine": {"value": 0.37, "was": 0.3, "reason": "Line 2 roll-in measured 11 frames (0.37 s) from +40 px below to its baseline, ease-out (cubic)."},
+    "captionRoll": {"value": 0.42, "was": 0.42, "reason": "Unchanged; measured: old block exits upward in ~0.07-0.1 s (45 px/frame), new line rises from +112 px to its baseline over ~0.4 s, ease-out."}
+  },
+  "cardSurface": {
+    "value": {"grain": false, "shadow": false},
+    "was": {"grain": "Card default true (opacity 0.55)", "shadow": "Card default true"},
+    "reason": "NEW / toolkit request. Reference card is flat 255 white (std 0.06) with a hard edge straight onto flat mint: no paper grain, no drop shadow. If kept for taste, grain opacity <= 0.15 and shadow <= 0.06 alpha."
+  },
+  "overshoot": {
+    "value": {"maxSide": 60, "maxTop": 80, "maxBottom": 50, "structural": [30, 62], "medium": [6, 15], "small": [3, 8]},
+    "was": null,
+    "reason": "NEW. Ink beyond the panel edge measured per scene: L 53-60, R 53-61, top 20-96 (crane/props), bottom 0-47 px. Corner overshoot: structural lines (ledges, kerbs, roof lines) 30-62 px past the panel; windows/doors/frames 6-15 px; small details 3-8 px."
+  }
+}
