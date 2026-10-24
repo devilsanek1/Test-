@@ -6,7 +6,7 @@
 
 import React from 'react';
 import {palette, skies} from '../../../lib/theme';
-import {GovernmentPlaza, PLAZA, PLAZA_REST} from './GovernmentPlaza';
+import {GovernmentPlaza, PLAZA, PLAZA_REST, plazaShutdownGov} from './GovernmentPlaza';
 import {StoopBeats, StoopStreet, STOOP} from './StoopStreet';
 import {BlueprintStreet, BLUEPRINT} from './BlueprintStreet';
 import {BlueprintWall, BLUEPRINT_WALL} from './BlueprintWall';
@@ -41,6 +41,25 @@ const S01_GOV = {
   govD: {chromeAt: 0.7, screenOnAt: 1.02, shutterAt: 3.25, offAt: 3.3, tagAt: 3.55, padlockAt: 3.88, glintAt: 4.28},
 };
 
+/** Storyboard v3 S01 on the recorded take (scene seconds): frame 0 = the press (govB's screen a bright line), the
+ *  power-off wave (govA 'all', govC 'over', the civic skyline 'Europe'), shutters ('shut', 'down', govC half on 'bunch'),
+ *  padlocks, lettered tags, govB's lantern on 'purpose'. */
+const S01_V3 = {
+  govA: {screenOffAt: 0.63, shutterAt: 1.98, offAt: 2.12, padlockAt: 3.44, tagAt: 3.74},
+  govB: {screenOffAt: 0.0, shutterAt: 1.71, offAt: 1.85, padlockAt: 3.38, tagAt: 3.69, lanternOffAt: 3.96},
+  govC: {screenOffAt: 0.89, shutterAt: 2.35, shutterStop: 0.5, padlockAt: 3.5, tagAt: 3.79},
+};
+/** Storyboard v3 S12 (scene seconds, recorded take): the shut-down state at the cut, then the stepped rewind from
+ *  'before' (1.55) to one step before the press (2.85). */
+const S12_V3 = (() => {
+  const g = plazaShutdownGov(-1);
+  return {
+    govA: {...g.govA, tagOutAt: 1.55, padlockOutAt: 1.7, liftAt: 2.15, onAt: 2.4, screenOnAt: 2.57},
+    govB: {...g.govB, tagOutAt: 1.6, padlockOutAt: 1.75, lanternOnAt: 1.86, liftAt: 2.23, onAt: 2.48, screenLineAt: 2.85},
+    govC: {...g.govC, tagOutAt: 1.65, padlockOutAt: 1.8, liftAt: 2.07, screenOnAt: 2.4},
+  };
+})();
+
 export const SET_CATALOG: SetEntry[] = [
   {
     id: 'plaza',
@@ -57,6 +76,10 @@ export const SET_CATALOG: SetEntry[] = [
           <XG m={v === 'closeup' ? camMat(PLAZA.closeup.cam[0], PLAZA.closeup.cam[1], PLAZA.closeup.zoom) : camMat(PLAZA.dive.cam[0], PLAZA.dive.cam[1], PLAZA.dive.zoom)}>
             <GovernmentPlaza state="built" detail="close" gov={{govB: {shutterAt: 2.0, padlockAt: 2.5, tagAt: 2.3}}} sun={<DemoSun cx={PLAZA.sun.x + 40} cy={PLAZA.sun.y - 40} r={110 / PLAZA.closeup.zoom} glyph />} />
           </XG>
+        ) : v === 'v3' ? (
+          <GovernmentPlaza state="frame0" gov={S01_V3} civicOffAt={1.16} civicLanternsOffAt={1.41} phonesAt={1.41} phonesDownAt={3.04} lanternOffAt={2.69} pigeonsAt={0.89} pigeonsFlyAt={2.75} sun={<DemoSun cx={PLAZA.sun.x} cy={PLAZA.sun.y} r={PLAZA.sun.r} glyph />} />
+        ) : v === 'rewind' ? (
+          <GovernmentPlaza state="built" gov={S12_V3} civicOffAt={-1} civicOnAt={2.24} civicLanternsOffAt={-1} lanternOffAt={-1} lanternOnAt={1.94} phonesAt={-1} phonesDownAt={0.86} sun={<DemoSun cx={PLAZA.sun.x} cy={PLAZA.sun.y} r={PLAZA.sun.r} glyph />} />
         ) : v === 'lineArt' ? (
           <GovernmentPlaza state="lineArt" sun={<DemoSun cx={PLAZA_REST.sunFrame0.x} cy={PLAZA_REST.sunFrame0.y} r={PLAZA_REST.sunFrame0.r} glyph />} />
         ) : v === 'off' ? (

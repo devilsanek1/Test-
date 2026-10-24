@@ -26,8 +26,9 @@
 //                    element: 'figure' | 'pole' | 'foliage' | 'column' | 'passer' | 'scene' = 'figure', dir: 'left' |
 //                    'right' = 'right', color?, captionTone?}. 'column' / 'passer' are the cine wipers (cine/wipers.tsx).
 //                    'scene' uses the OUTGOING scene module's exported `Wiper` component (WiperProps; give it a static
-//                    `captionRegions` for its caption tone over the element). The edge moves with an in-out sine
-//                    (wipeEdgeX) and both scenes drift 50 px with the same ease: nothing starts or stops dead.
+//                    `captionRegions` for its caption tone over the element, and its real half-width `half`). The edge
+//                    moves with an in-out sine (wipeEdgeX) from -half - 30 to W + half + 30. Both scenes stay put
+//                    under it (no transition camera); `drift: 50` (px) restores the v2 parallax drift.
 //   push-through     zoom into a point of the outgoing scene until it fills the frame, (optional flat `bridge` colour
 //                    for 3 frames), then the incoming scene pulls back out of its own point:
 //                    {dur = 1.1, from: [x, y], to?: [x, y] (default centre), zoom = 7, bridge?: colour}.

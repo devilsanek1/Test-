@@ -380,6 +380,7 @@ const G = (() => {
   const gx0 = 600;
   const gx1 = 820;
   farA += rectPath(gx0, 1050, gx1 - gx0, HZ + 4 - 1050);
+  const civicBand = rectPath(gx0, 1110, gx1 - gx0, HZ + 4 - 1110);
   for (let x = gx0; x < gx1; ) {
     const w = fr.range(18, 34);
     const top = fr.range(968, 1050);
@@ -438,7 +439,7 @@ const G = (() => {
   const trunk = rectPath(1046, 1390, 24, 168);
   const trunkInk = line(1046, 1556, 1046, 1404, {seed: `${s}/t1`, over: 0}) + line(1070, 1556, 1069, 1408, {seed: `${s}/t2`, over: 0}) + ellipse(1058, 1558, 60, 14, {seed: `${s}/pit`, overlap: -40});
   const pit = `M998 1558a60 14 0 1 0 120 0a60 14 0 1 0 -120 0Z`;
-  return {pathFar, farEdges, A, colsA, CW, ped, tymp, aInk, colInk, colFill, colShade, flutes, steps, stepInk, B, bSteps, domeFill, domeInk, ribs, domeRim, lantern, lanternInk, bInk, drumThin, C, cInk, D, gridInk, cells, cellsDark, dInk, pilotis, farA, farB, farDots, cranes, ground, kerbs, pathPoly, pathEdges, wedgeB, wedgeD, benches, lampInk, lampFill, lanternRect, crownD, treeTicks, trunk, trunkInk, pit};
+  return {civicBand, pathFar, farEdges, A, colsA, CW, ped, tymp, aInk, colInk, colFill, colShade, flutes, steps, stepInk, B, bSteps, domeFill, domeInk, ribs, domeRim, lantern, lanternInk, bInk, drumThin, C, cInk, D, gridInk, cells, cellsDark, dInk, pilotis, farA, farB, farDots, cranes, ground, kerbs, pathPoly, pathEdges, wedgeB, wedgeD, benches, lampInk, lampFill, lanternRect, crownD, treeTicks, trunk, trunkInk, pit};
 })();
 
 // ---------------------------------------------------------------- far civic skyline (v3)
@@ -780,13 +781,14 @@ const Pennant: React.FC<{i: number; root: Pt; at?: number; up: boolean; waveAt?:
 
 // ---------------------------------------------------------------- the four buildings
 
-type BProps = {ev: GovEvents; off: boolean; chrome: boolean; detail: 'wide' | 'close'; seed: string; windowSlot?: GovernmentPlazaProps['windowSlot']; k: number};
+type BProps = {ev: GovEvents; off: boolean; chrome: boolean; detail: 'wide' | 'close'; seed: string; windowSlot?: GovernmentPlazaProps['windowSlot']; k: number; fps: number};
 
-const GovA: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k}) => {
+const GovA: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k, fps}) => {
+  const t = useTime();
   const A = G.A;
   return (
     <>
-      <LightsOut at={ev.offAt} on={off || undefined}>
+      <LightsOut on={isDark(t, ev, off)}>
         <Fill d={G.ped} color={palette.cream} seed={`${seed}/aped`} />
         <Fill d={G.tymp} color={palette.sand} offset={false} seed={`${seed}/atymp`} />
         <Fill rect={[A.pedL, A.cornT, A.pedR - A.pedL, A.cornB - A.cornT]} color={palette.tan} offset={false} seed={`${seed}/acorn`} />
@@ -805,20 +807,23 @@ const GovA: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k}) => {
       <Ink d={G.aInk} width={MID * k} seed={`${seed}/aink`} />
       <Ink d={G.colInk + G.stepInk} width={MID * 0.85 * k} taper={false} seed={`${seed}/acolink`} />
       <Ink d={G.flutes} width={HAIR * k} taper={false} seed={`${seed}/aflute`} />
-      <WindowRig k={k} id="govA" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
+      <WindowRig k={k} fps={fps} id="govA" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
     </>
   );
 };
 
-const GovB: React.FC<BProps> = ({ev, off, chrome, detail, seed, windowSlot, k}) => {
+const GovB: React.FC<BProps> = ({ev, off, chrome, detail, seed, windowSlot, k, fps}) => {
+  const t = useTime();
   const B = G.B;
   const close = detail === 'close';
   const win = PLAZA.gov.govB.window;
   const sill = win[1] + win[3] + 6;
+  const lanternLit = ev.lanternOffAt === undefined && ev.lanternOnAt === undefined ? !isDark(t, ev, off) : latestState(t, [ev.lanternOnAt], [ev.lanternOffAt], !off);
   return (
     <>
-      <LightsOut at={ev.offAt} on={off || undefined}>
-        <Fill d={G.lantern} color={palette.cream} seed={`${seed}/blant`} />
+      {/* the dome lantern: its own switch (v3 lanternOffAt / lanternOnAt), else it follows the building's lights */}
+      <Fill d={G.lantern} color={lanternLit ? palette.cream : palette.sand} seed={`${seed}/blant`} />
+      <LightsOut on={isDark(t, ev, off)}>
         <Fill d={G.domeFill} color={palette.sand} seed={`${seed}/bdome`} />
         <Fill d={G.domeRim} color={palette.cream} offset={false} seed={`${seed}/brim`} />
         <Fill rect={B.drum} color={palette.cream} seed={`${seed}/bdrum`} />
@@ -837,7 +842,7 @@ const GovB: React.FC<BProps> = ({ev, off, chrome, detail, seed, windowSlot, k}) 
       <Ink d={G.ribs} width={THIN * k} taper={false} color={palette.teal} seed={`${seed}/bribs`} />
       <Ink d={G.bInk} width={MID * k} seed={`${seed}/bink`} />
       <Ink d={G.drumThin + (close ? stoneCourses(B.x0 + 16, B.x1 - 16, B.cornB + 20, B.base - 30, `${seed}/bsc`) + brickHints(B.x0 + 22, 1150, 200, 200, `${seed}/bbh`, 4, 20) : '')} width={HAIR * k} taper={false} seed={`${seed}/bthin`} />
-      <WindowRig k={k} id="govB" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
+      <WindowRig k={k} fps={fps} id="govB" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
       {/* window sill (Pip / snail perch in S11) */}
       <Ink d={line(win[0] - 10, sill, win[0] + win[2] + 10, sill, {seed: `${seed}/bsill`, over: [6, 6]}) + line(win[0] - 6, sill + 9, win[0] + win[2] + 6, sill + 9, {seed: `${seed}/bsill2`, over: [2, 2]})} width={MID * k} taper={false} />
     </>
@@ -866,11 +871,12 @@ const stoneCourses = (x0: number, x1: number, y0: number, y1: number, seed: stri
   return d;
 };
 
-const GovC: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k}) => {
+const GovC: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k, fps}) => {
+  const t = useTime();
   const C = G.C;
   return (
     <>
-      <LightsOut at={ev.offAt} on={off || undefined}>
+      <LightsOut on={isDark(t, ev, off)}>
         <Fill d={polyPath([[C.turret[0] - 6, C.turret[1]], [870, 606], [C.turret[0] + C.turret[2] + 6, C.turret[1]]])} color={palette.teal} seed={`${seed}/croof`} />
         <Fill rect={C.turret} color={palette.tan} seed={`${seed}/ctur`} />
         <Fill rect={[C.x0 - 6, C.corn, C.x1 - C.x0 + 12, 12]} color={palette.sand} offset={false} seed={`${seed}/ccorn`} />
@@ -882,16 +888,17 @@ const GovC: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k}) => {
       <Ink d={circle(PLAZA.clock.x, PLAZA.clock.y, PLAZA.clock.r, {seed: `${seed}/clki`}) + `M${PLAZA.clock.x} ${PLAZA.clock.y}L${PLAZA.clock.x} ${PLAZA.clock.y - 18}M${PLAZA.clock.x} ${PLAZA.clock.y}L${PLAZA.clock.x + 13} ${PLAZA.clock.y + 6}`} width={THIN * k} taper={false} />
       <Ink d={G.cInk} width={MID * k} seed={`${seed}/cink`} />
       <Ink d={brickHints(C.x0 + 10, C.corn + 20, C.x1 - C.x0 - 20, 30, `${seed}/cbh`, 3, 20) + brickHints(C.x0 + 8, 850, C.x1 - C.x0 - 16, 26, `${seed}/cbh2`, 2, 20)} width={THIN * k} taper={false} />
-      <WindowRig k={k} id="govC" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
+      <WindowRig k={k} fps={fps} id="govC" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
     </>
   );
 };
 
-const GovD: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k}) => {
+const GovD: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k, fps}) => {
+  const t = useTime();
   const D = G.D;
   return (
     <>
-      <LightsOut at={ev.offAt} on={off || undefined}>
+      <LightsOut on={isDark(t, ev, off)}>
         <Fill rect={[D.x0, D.roof, D.x1 - D.x0 + 40, D.base - D.roof]} color={palette.cream} seed={`${seed}/dfac`} />
         <Fill d={G.cells} color={palette.mintPale} offset={false} seed={`${seed}/dcell`} />
         <Fill d={G.cellsDark} color={palette.sage} offset={false} seed={`${seed}/dcelld`} />
@@ -902,14 +909,21 @@ const GovD: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k}) => {
       </LightsOut>
       <Ink d={G.dInk} width={NEARMID * k} seed={`${seed}/dink`} />
       <Ink d={G.gridInk} width={THIN * k} taper={false} seed={`${seed}/dgrid`} />
-      <WindowRig k={k * (NEARMID / MID)} id="govD" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
+      <WindowRig k={k * (NEARMID / MID)} fps={fps} id="govD" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
     </>
   );
 };
 
 // ---------------------------------------------------------------- layers
 
-const FarCity: React.FC<{seed: string}> = ({seed}) => (
+const FarCity: React.FC<{seed: string; civic?: React.ReactNode}> = ({seed, civic}) =>
+  civic ? (
+    <>
+      {/* v3: the civic silhouettes ARE the far city in the gap (the back band keeps the sun's lower edge off the horizon) */}
+      <Fill d={G.civicBand} color={HAZE[1]} offset={false} seed={`${seed}/farA`} />
+      {civic}
+    </>
+  ) : (
   <>
     <Fill d={G.farA} color={HAZE[1]} offset={false} seed={`${seed}/farA`} />
     <Fill d={G.farB} color={HAZE[0]} offset={false} seed={`${seed}/farB`} />
@@ -919,7 +933,7 @@ const FarCity: React.FC<{seed: string}> = ({seed}) => (
       <Ink d={G.farEdges} width={HAIR} taper={false} seed={`${seed}/farE`} />
     </OnlyWhilePaper>
   </>
-);
+  );
 
 const Ground: React.FC<{seed: string}> = ({seed}) => (
   <>
@@ -969,9 +983,9 @@ const LookGate: React.FC<{children?: React.ReactNode}> = ({children}) => {
   return <>{children}</>;
 };
 
-const Citizens: React.FC<{at?: number; phonesAt?: number; seed: string}> = ({at, phonesAt, seed}) => {
+const Citizens: React.FC<{at?: number; phonesAt?: number | number[]; phonesDownAt?: number | number[]; seed: string}> = ({at, phonesAt, phonesDownAt, seed}) => {
   const t = useTime();
-  const phones = phonesAt !== undefined && t >= phonesAt;
+  const phones = latestState(t, arr(phonesAt), arr(phonesDownAt), false);
   const idx = PLAZA.phoneIdx as readonly number[];
   return (
     <>
@@ -1003,9 +1017,9 @@ const Onlookers: React.FC<{seed: string}> = ({seed}) => (
   </>
 );
 
-const Near: React.FC<{lanternOffAt?: number; off: boolean; pigeonsAt?: number | boolean; pigeonsFlyAt?: number; bollard: boolean; onlookers: boolean; seed: string}> = ({lanternOffAt, off, pigeonsAt, pigeonsFlyAt, bollard, onlookers, seed}) => {
+const Near: React.FC<{lanternOffAt?: number; lanternOnAt?: number; off: boolean; pigeonsAt?: number | boolean; pigeonsFlyAt?: number; bollard: boolean; onlookers: boolean; seed: string}> = ({lanternOffAt, lanternOnAt, off, pigeonsAt, pigeonsFlyAt, bollard, onlookers, seed}) => {
   const t = useTime();
-  const lanternOff = off || (lanternOffAt !== undefined && t >= lanternOffAt);
+  const lanternOff = latestState(t, [lanternOffAt], [lanternOnAt], off);
   const pigeons = !off && (pigeonsAt === true || (typeof pigeonsAt === 'number' && t >= pigeonsAt));
   const sway = osc(t, 0.3, 1.2) * 0.6;
   return (
@@ -1049,8 +1063,15 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
   onlookers = true,
   foreground,
   lanternOffAt,
+  lanternOnAt,
   pigeonsAt,
   pigeonsFlyAt,
+  phonesDownAt,
+  farCivic = true,
+  civicOffAt,
+  civicOnAt,
+  civicLanternsOffAt,
+  rewindFps = 12,
   detail = 'wide',
   sun,
   bollard = true,
@@ -1067,16 +1088,21 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
   const off = state === 'off';
   const lineArt = state === 'lineArt';
   const ch = chrome ?? true;
-  const ev = (id: GovId): GovEvents => (lineArt ? {} : gov[id] ?? {});
+  const ev = (id: GovId): GovEvents => {
+    if (lineArt) return {};
+    const e = gov[id] ?? {};
+    // frame 0 (v3): govB's screen is held as the bright line until its screenOffAt releases it
+    return state === 'frame0' && id === 'govB' && e.screenLineAt === undefined ? {...e, screenLineAt: -1e6} : e;
+  };
   const pennantUp = pennantsAt === true || (pennantsAt === undefined && off);
   const pennantTimes = Array.isArray(pennantsAt) ? pennantsAt : [];
-  const bp = {off, chrome: ch, detail, seed, windowSlot, k: detail === 'close' ? 0.7 : 1};
+  const bp = {off, chrome: ch, detail, seed, windowSlot, k: detail === 'close' ? 0.7 : 1, fps: rewindFps};
   const L = PLAZA.layers;
 
   const scene = (
     <>
       {sun ? wrap('sun', L.sun, sun) : null}
-      {wrap('far', L.far, <FarCity seed={seed} />)}
+      {wrap('far', L.far, <FarCity seed={seed} civic={farCivic ? <FarCivic off={off} offAt={lineArt ? undefined : civicOffAt} onAt={lineArt ? undefined : civicOnAt} lanternsOffAt={lineArt ? undefined : civicLanternsOffAt} seed={seed} /> : undefined} />)}
       {wrap('ground', L.ground, <Ground seed={seed} />)}
       {wrap(
         'buildings',
@@ -1104,14 +1130,14 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
         L.light,
         <>
           <LightLayer seed={seed} />
-          {citizensAt !== false ? <Citizens at={lineArt || off ? undefined : citizensAt} phonesAt={lineArt ? undefined : phonesAt} seed={seed} /> : null}
+          {citizensAt !== false ? <Citizens at={lineArt || off ? undefined : citizensAt} phonesAt={lineArt ? undefined : phonesAt} phonesDownAt={lineArt ? undefined : phonesDownAt} seed={seed} /> : null}
         </>,
       )}
       {wrap(
         'near',
         L.near,
         <>
-          <Near lanternOffAt={lanternOffAt} off={off} pigeonsAt={lineArt ? undefined : pigeonsAt} pigeonsFlyAt={pigeonsFlyAt} bollard={bollard} onlookers={onlookers} seed={seed} />
+          <Near lanternOffAt={lineArt ? undefined : lanternOffAt} lanternOnAt={lineArt ? undefined : lanternOnAt} off={off} pigeonsAt={lineArt ? undefined : pigeonsAt} pigeonsFlyAt={pigeonsFlyAt} bollard={bollard} onlookers={onlookers} seed={seed} />
           <Foreground spec={foreground} seed={`${seed}/fg`} />
         </>,
       )}
@@ -1130,6 +1156,20 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
     </SetPlace>
   );
 };
+
+/** Storyboard v3: the gov events of the state S01 leaves the plaza in (S12's hard cut, the cover frame), every event at
+ *  `at` (default -1: already happened): govA + govB screens off, shuttered, darker, padlocked, tagged; govB's dome
+ *  lantern off; govC's screen off, its shutter HALF down, padlocked, tagged (not darker); govD lit. Merge the rewind
+ *  events over it (liftAt, onAt, tagOutAt, padlockOutAt, screenOnAt, lanternOnAt, screenLineAt), plus the set props
+ *  civicOffAt={at} lanternOffAt={at} phonesAt={at} for the far skyline, the lamp and the phones. */
+export function plazaShutdownGov(at = -1): Record<'govA' | 'govB' | 'govC', GovEvents> {
+  const closed: GovEvents = {screenOffAt: at, shutterAt: at, offAt: at, padlockAt: at, tagAt: at};
+  return {
+    govA: {...closed},
+    govB: {...closed, lanternOffAt: at},
+    govC: {screenOffAt: at, shutterAt: at, shutterStop: 0.5, padlockAt: at, tagAt: at},
+  };
+}
 
 /** S11 framing helper: the camera centre / zoom that frames govB's window as the storyboard measures it. */
 export const plazaCloseup = PLAZA.closeup;

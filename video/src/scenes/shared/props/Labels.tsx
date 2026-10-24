@@ -116,6 +116,8 @@ export type LabelTagProps = {
   kind?: LabelKind;
   variant?: LabelKind;
   type?: LabelKind;
+  /** Alias of `kind` (scene shims). */
+  style?: LabelKind;
   /** The text: a string or one string per line. `lines` is an alias. */
   text?: LabelText;
   lines?: string[];
@@ -155,6 +157,10 @@ export type LabelTagProps = {
   depth?: Depth;
   /** Outline width in world px (default 2.2: the labelStyle outline). */
   ink?: number;
+  /** Outline width in SCREEN px (divided by the accumulated camera scale, so a push keeps the pen). Overrides `ink`. */
+  inkPx?: number;
+  /** notice: the tape strips pop one after another this far apart, after the paper (default 0.04 s). */
+  tapeStagger?: number;
   /** sign: leg length below the board (default 0.32 x board height); frame={false} = paper only (the set draws it). */
   legH?: number;
   frame?: boolean;
@@ -221,11 +227,11 @@ export const slamScale = (t: number, at: number | undefined): number => (at === 
 
 const LabelTagInner: React.FC<LabelTagProps & {t: number}> = (p) => {
   const {t} = p;
-  const kind: LabelKind = p.kind ?? p.variant ?? p.type ?? 'card';
+  const kind: LabelKind = p.kind ?? p.variant ?? p.type ?? p.style ?? 'card';
   const seed = p.seed ?? `label/${kind}/${labelLines(p.text ?? p.lines).join('|')}`;
   const F = usePropFrame({depth: p.depth, ink: p.ink ?? (p.depth ? undefined : 2.2), seed, defDepth: 'far'});
   const look = useLook();
-  const W = F.W;
+  const W = p.inkPx !== undefined ? p.inkPx / F.k : F.W;
   const fs0 = p.fontSize ?? p.size ?? DEF_FS[kind];
   const align = p.align ?? 'center';
   const paperCol = p.paper ?? p.color ?? palette.cream;
@@ -397,8 +403,10 @@ const LabelTagInner: React.FC<LabelTagProps & {t: number}> = (p) => {
     ];
     corners.forEach(([qx, qy, a], i) => {
       const jx = (rand(seed, `tp${i}`) - 0.5) * 4;
+      const tk = p.at === undefined ? 1 : springPop(t, p.at + 0.08 + i * (p.tapeStagger ?? 0.04));
+      if (tk <= 0.001) return;
       parts.push(
-        <XG key={`tp${i}`} m={mat.compose(mat.translate(qx + jx, qy), mat.rotate(a + (rand(seed, `ta${i}`) - 0.5) * 10))}>
+        <XG key={`tp${i}`} m={mat.compose(mat.translate(qx + jx, qy), mat.rotate(a + (rand(seed, `ta${i}`) - 0.5) * 10), mat.scale(tk))}>
           <Fill d={rectPath(-tw / 2, -th / 2, tw, th)} color={palette.sand} offset={false} mode="none" seed={`${seed}/tp${i}`} />
           <Ink d={`M${-tw / 2} ${-th / 2}l${-1} ${th}M${tw / 2} ${-th / 2}l1 ${th}`} width={W * 0.55} taper={false} seed={`${seed}/te${i}`} />
         </XG>,
@@ -451,7 +459,7 @@ export const LabelTag: React.FC<LabelTagProps> = (p) => {
  *  (exact once CaptionHand has loaded, an estimate before). */
 export function labelBox(p: LabelTagProps): [number, number, number, number] {
   if (p.box) return p.box;
-  const kind: LabelKind = p.kind ?? p.variant ?? p.type ?? 'card';
+  const kind: LabelKind = p.kind ?? p.variant ?? p.type ?? p.style ?? 'card';
   const fs = p.fontSize ?? p.size ?? DEF_FS[kind];
   const lines = labelLines(p.text ?? p.lines);
   const L0 = layoutText(lines, fs, PAD[kind]);

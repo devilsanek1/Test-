@@ -12,11 +12,13 @@
 
 import React from 'react';
 import {palette} from '../../../lib/theme';
-import {ease as E, lerp, prog, springAt, springs, useTime} from '../../../lib/time';
+import {clamp, ease as E, lerp, prog, springAt, springs, useTime} from '../../../lib/time';
 import {Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
-import {ExitFade} from '../../../lib/exit';
+import {ExitFade, UnBuild} from '../../../lib/exit';
+import {MOTION} from '../../../lib/spec';
+import {captionFontStack, measureCaption, useCaptionFont} from '../../../lib/font';
 import {blob, circle, hline, line, rect, rectPath, roundRect} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {bt, Depth, DEPTH_INK, misregScreen, pendulum, withOut} from './common';
@@ -35,6 +37,14 @@ export type RollerShutterProps = {
   liftAt?: number;
   /** Rest state before any event: 'up' (default) or 'down'. */
   state?: 'up' | 'down';
+  /** A partial shutter: the drop stops at this FRACTION of the window (govC: 0.5) with a 1-frame jolt (+5 px, -2 px);
+   *  the fall time shortens with the distance (gravity). 'down' rests at it too. Default 1 (all the way). */
+  stopAt?: number;
+  /** How `liftAt` lifts it: 'roll' (default: rolls up 0.3 s) | 'reverse' (S12 rewind: the slam played BACKWARDS, the
+   *  bounce first, then the curtain shoots up, stepped at `step` Hz like a tape). */
+  liftMode?: 'roll' | 'reverse';
+  /** Tape-step rate (Hz) for liftMode 'reverse'. Default 12. 0 = smooth. */
+  step?: number;
   /** Rib spacing (world px). Default 14. */
   rib?: number;
   peephole?: {x: number; y: number; r?: number};
@@ -44,28 +54,51 @@ export type RollerShutterProps = {
   outAt?: number;
 };
 
+/** Quantise the time since `at` to `hz` steps (a tape rewind look); hz 0 = smooth. */
+export const stepTime = (t: number, at: number, hz = 12) => (hz > 0 ? at + Math.floor((t - at) * hz + 1e-6) / hz : t);
+
+/** The forward slam at local time u (0 = slamAt) for a drop to `stop`: [k, bouncePx]. Gravity fall (in(quad)) whose
+ *  length shortens with the distance (0.16 s for a full drop), then the 6 px bounce (full) or a 1-frame jolt (partial). */
+export function slamCurve(u: number, stop = 1): [number, number] {
+  if (u < 0) return [0, 0];
+  const dur = 0.16 * Math.sqrt(Math.max(0.05, stop));
+  const k = E.inQuad(Math.min(1, u / dur)) * stop;
+  const d = u - dur;
+  if (d <= 0) return [k, 0];
+  if (stop < 0.999) return [k, d < 1 / 30 ? 5 : d < 2 / 30 ? -2 : 0];
+  return [k, d < 0.18 ? -6 * Math.sin((d / 0.18) * Math.PI) * Math.exp(-d * 6) : 0];
+}
+/** Length of the forward slam (fall + bounce / jolt) for a drop to `stop`. */
+export const slamLength = (stop = 1) => 0.16 * Math.sqrt(Math.max(0.05, stop)) + (stop < 0.999 ? 2 / 30 : 0.18);
+
 /** Drop progress 0 (rolled up) .. 1 (down) with the slam bounce. Returns [k, bouncePx]. */
-export function shutterDrop(t: number, o: {slamAt?: number; liftAt?: number; state?: 'up' | 'down'}): [number, number] {
-  let k = o.state === 'down' ? 1 : 0;
+export function shutterDrop(t: number, o: {slamAt?: number; liftAt?: number; state?: 'up' | 'down'; stopAt?: number; liftMode?: 'roll' | 'reverse'; step?: number}): [number, number] {
+  const stop = clamp(o.stopAt ?? 1, 0.02, 1);
+  let k = o.state === 'down' ? stop : 0;
   let bounce = 0;
   if (o.slamAt !== undefined && t >= o.slamAt) {
-    const q = prog(t, o.slamAt, 0.16, E.inQuad);
+    const [q, b] = slamCurve(t - o.slamAt, stop);
     k = Math.max(k, q);
-    if (t > o.slamAt + 0.16) {
-      const dt = t - o.slamAt - 0.16;
-      bounce = dt < 0.18 ? -6 * Math.sin((dt / 0.18) * Math.PI) * Math.exp(-dt * 6) : 0;
-    }
+    bounce = b;
   }
-  if (o.liftAt !== undefined && t >= o.liftAt) k = Math.min(k, 1 - prog(t, o.liftAt, 0.3, E.inOutCubic));
+  if (o.liftAt !== undefined && t >= o.liftAt) {
+    if (o.liftMode === 'reverse') {
+      const L = slamLength(stop);
+      const u = stepTime(t, o.liftAt, o.step ?? 12) - o.liftAt;
+      const [q, b] = slamCurve(L - u, stop);
+      k = Math.min(k, q);
+      bounce = u < L ? b : 0;
+    } else k = Math.min(k, 1 - prog(t, o.liftAt, 0.3, E.inOutCubic));
+  }
   return [k, bounce];
 }
 
-export const RollerShutter: React.FC<RollerShutterProps> = ({x, y, w, h, box = 18, at, slamAt, liftAt, state = 'up', rib = 14, peephole, depth, width, seed = 'shut', outAt}) => {
+export const RollerShutter: React.FC<RollerShutterProps> = ({x, y, w, h, box = 18, at, slamAt, liftAt, state = 'up', stopAt, liftMode, step, rib = 14, peephole, depth, width, seed = 'shut', outAt}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   if (outAt !== undefined && t >= outAt + 0.2) return null;
   const iw = width ?? DEPTH_INK[depth ?? 'mid'];
-  const [k, bounce] = shutterDrop(t, {slamAt, liftAt, state});
+  const [k, bounce] = shutterDrop(t, {slamAt, liftAt, state, stopAt, liftMode, step});
   const bottom = y + h * k + bounce;
   const curH = bottom - y;
   const off = misregScreen(seed);

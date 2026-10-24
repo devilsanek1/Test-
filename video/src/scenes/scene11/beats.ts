@@ -52,6 +52,7 @@ export const ABS = {
   press: W.turn, // the sun is PRESSED (SunPress 0.88 + ripple)
   shutter: W.it, // govB's shutter rolls down clean (0.16 s + 6 px bounce), covering the bar and the notice
   lightsOut: W.off, // govB one palette step darker
+  offCut: 49.515, // cut(off): the comma pause after 'off,' (gap anchor): the lean into the joke starts here
   padlock: W.off + 0.14, // padlock pops + the lettered 'back soon' tag swings in
   bitHop: W.offEnd + 0.05, // Bit hops onto the padlock's shackle; the snail pulls into its shell
   pigeonLand: W.which, // the lean-in starts; a pigeon lands on the shutter box

@@ -1,7 +1,6 @@
 // S11 LOCAL STAND-INS for shared props requested in docs/storyboard_v3.json "requests" that the props lane has not
 // shipped yet. Same names and the props the requests describe, so a later fix round swaps the import to
 // '../shared/props' and deletes this file:
-//   LabelTag    (request: tag / card / slip / notice / sign / stamp; at, outAt, flipTo, swing)  -> only 'notice' + 'card'
 //   StickyNote  (request: cream note, slapAt (flutter in + slap squash), strikeAt + strike substring; lettering >= 24 px)
 //   BackSoonTag (request: LETTERED 'back soon' variant, CaptionHand >= 22 px on screen, tag >= 80 px wide; liftAt / outAt)
 // House rules kept: no opacity anywhere (pops, springs, draw-ons, squashes, pendulums), flat fills misregistered in SCREEN
@@ -13,94 +12,11 @@ import {ease as E, lerp, prog, springAt, springs, useTime} from '../../lib/time'
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {captionFontStack, useCaptionFont} from '../../lib/font';
-import {circle, line, polyPath, rect, roundRect, Pt} from '../../lib/sketch';
+import {circle, line, polyPath, Pt} from '../../lib/sketch';
 import {mat, useXf, XG} from '../../lib/xf';
 import {matScale, misregScreen, pendulum} from '../shared/props/common';
 
 const useScreenK = () => Math.max(1e-4, matScale(useXf()));
-
-// ---------------------------------------------------------------- LabelTag (notice)
-
-export type LabelTagProps = {
-  /** Box centre (world). */
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  lines: string[];
-  /** Font size in world px (pick it so it lands at 34-40 px on screen). */
-  size: number;
-  style?: 'notice' | 'card';
-  /** Pops in (7 % spring, 0.2 s); a notice's 4 tape strips pop after it, `tapeStagger` apart. */
-  at?: number;
-  tapeStagger?: number;
-  /** 1-frame shrink pop out. */
-  outAt?: number;
-  rot?: number;
-  paper?: string;
-  /** Outline width in SCREEN px (label style: 2.2). */
-  inkPx?: number;
-  seed?: string;
-};
-
-export const LabelTag: React.FC<LabelTagProps> = ({x, y, w, h, lines, size, style = 'notice', at, tapeStagger = 0.04, outAt, rot = 0, paper = palette.cream, inkPx = 2.2, seed = 'label'}) => {
-  const t = useTime();
-  useCaptionFont();
-  const k = useScreenK();
-  if (at !== undefined && t < at) return null;
-  if (outAt !== undefined && t >= outAt) return null;
-  const pop = at !== undefined ? springAt(t, at, springs.pop) : 1;
-  if (pop <= 0.001) return null;
-  const iw = inkPx / k;
-  const mr = misregScreen(seed);
-  const off: [number, number] = [mr[0] / k, mr[1] / k];
-  const x0 = -w / 2;
-  const y0 = -h / 2;
-  const tapes: React.ReactNode[] = [];
-  if (style === 'notice') {
-    // 4 tape strips across the corners, popping in sequence (TL, TR, BR, BL)
-    const tw = Math.min(30, w * 0.2);
-    const th = tw * 0.36;
-    const corners: [number, number, number][] = [
-      [x0 + 2, y0 + 2, -38],
-      [-x0 - 2, y0 + 2, 38],
-      [-x0 - 2, -y0 - 2, -38],
-      [x0 + 2, -y0 - 2, 38],
-    ];
-    corners.forEach(([cx, cy, a], i) => {
-      const ta = at === undefined ? undefined : at + 0.08 + i * tapeStagger;
-      if (ta !== undefined && t < ta) return;
-      const tp = ta !== undefined ? springAt(t, ta, springs.pop) : 1;
-      const d = polyPath([
-        [-tw / 2, -th / 2],
-        [tw / 2, -th / 2 + 0.6],
-        [tw / 2 - 0.8, th / 2],
-        [-tw / 2 + 0.6, th / 2 - 0.4],
-      ]);
-      tapes.push(
-        <XG key={i} m={mat.compose(mat.translate(cx, cy), mat.rotate(a), mat.scale(tp))}>
-          <Fill d={d} color={palette.mintPale} offset={false} mode="none" seed={`${seed}/tp${i}`} />
-          <Ink d={d} width={iw * 0.55} taper={false} vary={0} seed={`${seed}/tpi${i}`} />
-        </XG>,
-      );
-    });
-  }
-  const lh = size * 1.12;
-  const ty0 = -((lines.length - 1) * lh) / 2 + size * 0.34;
-  return (
-    <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(pop))}>
-      <Fill d={roundRect(x0, y0, w, h, 3)} color={paper} offset={off} mode="none" seed={`${seed}/p`} />
-      <Ink d={rect(x0, y0, w, h, {seed: `${seed}/o`, over: 'small'})} width={iw} vary={0} seed={`${seed}/o`} />
-      {style === 'card' ? <path d={circle(0, y0 + 6, 2.4, {seed: `${seed}/pin`})} fill={palette.ink} /> : null}
-      {lines.map((s, i) => (
-        <text key={i} x={0} y={ty0 + i * lh} fontFamily={captionFontStack} fontSize={size} fill={palette.ink} textAnchor="middle">
-          {s}
-        </text>
-      ))}
-      {tapes}
-    </XG>
-  );
-};
 
 // ---------------------------------------------------------------- StickyNote (J6)
 
