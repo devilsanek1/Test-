@@ -82,9 +82,11 @@ export type MonumentProps = MonumentGeo & {
   /** People rise onto the steps over [at, at + span] (front to back). Omit = there. */
   peopleAt?: {at: number; span?: number};
   /** Banners unroll from the entablature between the columns, one by one (a counting build, e.g. on "four"). */
-  banners?: {at: number; n?: number; stagger?: number; color?: string};
+  banners?: {at: number; n?: number; stagger?: number; color?: string; upAt?: number};
   /** The bronze door opens (warm light inside) at this time. */
   doorAt?: number;
+  /** The two side doorways light up (warm), one at each time. */
+  sideLitAt?: number[];
 };
 
 type PaintKey = 'stone' | 'lit' | 'shade' | 'dark' | 'door' | 'transom' | 'dome' | 'domeShade' | 'rim' | 'disc';
@@ -355,6 +357,7 @@ export const Monument: React.FC<MonumentProps> = ({
   peopleAt,
   banners,
   doorAt,
+  sideLitAt,
 }) => {
   const S = useCineState();
   const t = S.t;
@@ -435,6 +438,17 @@ export const Monument: React.FC<MonumentProps> = ({
     const sx = (x: number) => cx + (x - cx) * kk;
     out.push(<path key="door" d={`M${r1(sx(a[0]))} ${r1(a[1])}L${r1(sx(b[0]))} ${r1(b[1])}L${r1(sx(c[0]))} ${r1(c[1])}L${r1(sx(d[0]))} ${r1(d[1])}Z`} fill={palette.peach} />);
   }
+  // side doorways light up (warm interior), one by one
+  (sideLitAt ?? []).forEach((at, i) => {
+    if (t < at || st[1].k < 1 || S.look.fills !== 'color') return;
+    const X = i % 2 ? 750 : 250;
+    const kk = E.outBack(1.6)(prog(t, at, 0.2)) * exitScale(S.e, 0.3, 0.05);
+    const a = M.at(X - 30, 215);
+    const b = M.at(X + 30, 215);
+    const c = M.at(X + 30, 215 + 115 * kk);
+    const d = M.at(X - 30, 215 + 115 * kk);
+    out.push(<path key={`sd${i}`} d={`M${r1(a[0])} ${r1(a[1])}L${r1(b[0])} ${r1(b[1])}L${r1(c[0])} ${r1(c[1])}L${r1(d[0])} ${r1(d[1])}Z`} fill={palette.peach} />);
+  });
   // banners between the columns, unrolling down from the entablature
   if (banners && S.look.fills !== 'none') {
     const n = banners.n ?? 4;
@@ -444,7 +458,8 @@ export const Monument: React.FC<MonumentProps> = ({
     pick.forEach((X, i) => {
       const t0 = banners.at + i * (banners.stagger ?? 0.14);
       if (t < t0 || st[2 + columns] === undefined || st[2 + columns].k < 1) return;
-      const u = E.outBack(1.3)(prog(t, t0, 0.3)) * exitScale(S.e, jit(i + 3), 0.05);
+      const up = banners.upAt === undefined ? 0 : E.inCubic(prog(t, banners.upAt + i * (banners.stagger ?? 0.14), 0.22));
+      const u = E.outBack(1.3)(prog(t, t0, 0.3)) * (1 - up) * exitScale(S.e, jit(i + 3), 0.05);
       if (u <= 0.01) return;
       const bw = 34;
       const top = 990;

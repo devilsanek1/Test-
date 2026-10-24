@@ -268,8 +268,9 @@ const ShotB: React.FC = () => {
           // the crowd keeps gathering on the steps all shot long (a counting build), four banners drop on "four",
           // the door opens on "Nobody", the clock pops in once the crane has carried it under the captions
           peopleAt={{at: 0.3, span: 4.6}}
-          banners={{at: 1.3, n: 4, stagger: 0.16}}
+          banners={{at: 1.3, n: 4, stagger: 0.16, upAt: 4.55}}
           doorAt={3.45}
+          sideLitAt={[2.5, 2.95]}
           emblemY={1690}
           emblemAt={4.3}
           emblem={(x, y, r) => <ClockEmblem x={x} y={y} r={r} />}
@@ -345,7 +346,7 @@ const ShotC: React.FC = () => {
         {/* LOD: the 24 windows around the hero as close-ups (frame, sill, curtain, room) while they are big */}
         <CloseupRing />
         <OnCell q={hq} h={760}>
-          {(w, h) => <WindowCloseup w={w} h={h} tod={P} offAt={HERO_OFF} seed="hero" screenTick={0.4} person={<Person x={w * 0.3} y={h * 0.93} s={1.25} seed="hero-p" hair="bun" body={palette.teal} />} />}
+          {(w, h) => <WindowCloseup w={w} h={h} tod={P} offAt={HERO_OFF} seed="hero" screenTick={0.4} flickerAt={[1.45]} person={<Person x={w * 0.3} y={h * 0.93} s={1.25} seed="hero-p" hair="bun" body={palette.teal} />} />}
         </OnCell>
         <Rise at={3.75} dist={420}>
           <Ledge y={1540} x0={620} x1={1180} top={24} face={90} tod={P} floor={palette.tealDark} seed="ledgeC" />

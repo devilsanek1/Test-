@@ -375,6 +375,8 @@ export type WindowCloseupProps = {
   onAt?: number;
   /** The curtain is drawn closed at this time (a pop). */
   curtainAt?: number;
+  /** The room light flickers off for two frames at these times (on a stressed word). */
+  flickerAt?: number[];
 };
 
 /** One lit window up close: frame, transom, curtain, pendant lamp with a stepped glow, a desk with a monitor showing
@@ -385,10 +387,11 @@ export const WindowCloseup: React.FC<WindowCloseupProps> = (props) => (
   </ExitShrink>
 );
 
-const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod = 'night', offAt, screenOffAt, seed = 'wc', person, lit: lit0 = true, chair, desk = true, screenTick, onAt, curtainAt}) => {
+const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod = 'night', offAt, screenOffAt, seed = 'wc', person, lit: lit0 = true, chair, desk = true, screenTick, onAt, curtainAt, flickerAt}) => {
   const t = useTime();
   const p = todPal(tod);
-  const lit = lit0 && (onAt === undefined || t >= onAt);
+  const flick = (flickerAt ?? []).some((f) => t >= f && t < f + 0.07);
+  const lit = lit0 && (onAt === undefined || t >= onAt) && !flick;
   const on = lit && (offAt === undefined || t < offAt);
   const scrOn = lit && t < (screenOffAt ?? (offAt === undefined ? Infinity : offAt + 0.35));
   const showChair = chair ?? !!person;
@@ -432,6 +435,14 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod 
           <rect x={mon.x} y={mon.y} width={mon.w} height={mon.h} fill={palette.ink} />
           <rect x={mon.x + 7} y={mon.y + 7} width={mon.w - 14} height={mon.h - 14} fill={scrOn ? palette.white : ambient(palette.tealDark, p)} />
           {scrOn ? <rect x={mon.x + 7} y={mon.y + 7} width={mon.w - 14} height={16} fill={palette.sage} /> : null}
+          {scrOn && screenTick ? (() => {
+            // a new page every tick: an image block jumps to a new place / colour (a visible pop)
+            const pr = rng(`wc/${seed}/pg${tick}`);
+            const bw = (mon.w - 14) * pr.range(0.35, 0.5);
+            const bh = (mon.h - 30) * pr.range(0.45, 0.8);
+            const bx = mon.x + 7 + pr.range(0, mon.w - 14 - bw);
+            return <rect x={bx} y={mon.y + 25} width={bw} height={bh} fill={pr.pick([palette.peach, palette.sky, palette.sand])} />;
+          })() : null}
           {scrOn ? <path d={web} fill="none" stroke={palette.ink} strokeWidth={2} strokeLinecap="round" /> : null}
           <path d={`M${mon.x + mon.w / 2} ${mon.y + mon.h}L${mon.x + mon.w / 2} ${deskY - 8}`} stroke={palette.ink} strokeWidth={6} />
         </>

@@ -125,3 +125,18 @@ Mechanisms to use (1–3 in the script, never more than feels natural):
 - A loop-friendly last line that flows back into the first line (the video loops).
 Rules: never false or misleading (the brief's accuracy rules still win), never punch down, keep neutrality, no begging.
 In every rewrite and the final table, tag each bait line with its mechanism.
+
+## DELIVERY CUES: REQUIRED FORMAT FOR EVERY SCRIPT VERSION (user, latest)
+The user wants every new script WITH EMOTIONAL/DELIVERY CUES, "as detailed and concrete as you can make it", in the format of
+their original (see docs/script/original_annotated.md, which produced the current ElevenLabs eleven_v4 take):
+- A bracketed cue on its own line before each beat (a beat = 1–3 sentences with one delivery intent).
+- CAPS on the one or two stressed words of a beat (sparingly). "…" for intended beats/pauses. Numbers spelled as spoken.
+- Make each cue concrete and actionable for a voice actor or TTS: PACE (relative: quicker / slower / back to normal),
+  ENERGY and PITCH (brighter, lower, level), INTENT/SUBTEXT (teasing, letting them in on it, honest, reassuring), WHO we're
+  talking to (a friend who doesn't code), where the EMPHASIS lands, and a "DON'T" when there's a trap ("don't sell it",
+  "no news-anchor drop", "don't rush the number"). Name the ONE joke explicitly, like the original does.
+- Keep cues short enough to read in a glance (one line, ~6–16 words), in the user's voice ("like you just saw this").
+- final_script.md must contain the cued version as the main script; final_script_elevenlabs.txt must be the cued version
+  exactly as the user would paste it into ElevenLabs (cues + text, nothing else). Also keep a plain no-cue version in
+  final_script.md for captions and timing.
+- Rewrites (rewrite_*.md) should include cues too, so the user can compare deliveries.
