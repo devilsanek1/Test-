@@ -22,13 +22,13 @@ import type {Pt} from '../../lib/sketch';
 const PIP_SCALE = 1.2;
 /** Where Pip is on the hard cut: S02 hops him off its rod perch toward the lens at cut(password)-0.04; this being a
  *  hard cut, S03 picks him up already lower and closer (world (700, 1000) = screen (700, 1010) at the rest camera),
- *  still rising a little (vy0) and dropping onto the plan: dx 270, dy 405 in 0.362 s, g ~7,000 px/s2, landing at
+ *  still rising a little (vy0) and dropping onto the plan: dx 280, dy 405 in 0.362 s, g ~7,000 px/s2, landing at
  *  ~80 px/frame (motion_spec #25: g 3,000-8,000, <= ~93 px/frame). */
 const PIP_FROM: Pt = [700, 1000];
 /** Fix round 1: Pip sits on the stamp's RUMP (its right end), not its centre (BLUEPRINT.pip (350, 1420) hid ~80 % of
- *  the print): the reversed-out elephant faces left, so its trunk, ear and legs stay clear. Screen at the 1.04 lock:
- *  (420.4, 1438.4), where he crouches on the cut (S04 continues from there). */
-export const PIP_AT: Pt = [430, 1405];
+ *  the print): the reversed-out elephant faces left, so its trunk, ear and legs stay clear (and his ear clears the title
+ *  card). Screen at the 1.04 lock: (410.0, 1438.4), where he crouches on the cut (S04 continues from there). */
+export const PIP_AT: Pt = [420, 1405];
 
 /** Ballistic drop with an initial upward kick vy0 (px/s) landing exactly at `to` after T. */
 function drop(t: number, t0: number, T: number, from: Pt, to: Pt, vy0: number): Pt {

@@ -30,7 +30,8 @@ export const W = {
 /** Storyboard beats (absolute s). */
 const ABS = {
   cut: S03_START, //            cut(password): HARD CUT, the bare plan with ten footprints; the 4 % breath starts
-  grid: 8.605, //               w29 'It's': grid lines draw on (0.37 s)
+  grid: 8.445, //               w29-0.16 'It's': grid lines draw on (the set: near 0.3 s, mid +0.12, far +0.24), a big-build
+  //                            lead (ENGINE rule 5) so the hard-cut frame is alive and the grid is mostly down on 'It's'
   pipLand: 8.755, //            w30 'in': Pip lands on the blueprint at BLUEPRINT.pip with a squash
   stamp: 8.83, //               w31-0.13 'PHP': the stamp SLAMS (ring 0.13 s, print 2.6x -> 1.0x in 0.27 s); Pip bounces
   L3: 9.26, //                  w31+0.30 'PHP': label L3 pops on the title-block card

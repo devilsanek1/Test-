@@ -22,7 +22,7 @@ import {BlueprintStreet, BLUEPRINT, blueprintAnchors, PopUp, SideId, BlueprintId
 import {LabelTag, Sticker, SunPie} from './shared/props';
 import {beats, Beats, local, S03_START, W} from './scene03/beats';
 import {camAt, camMat} from './scene03/camera';
-import {CountPing, FarPlain, Footprints, PressScreen, RoofSign, SheetFrame, SideOverlays, SideRows, VentPuffs} from './scene03/plan';
+import {CountPing, EdgeTree, FarPlain, Footprints, PressScreen, RoofSign, SheetFrame, SideOverlays, SideRows, VentPuffs} from './scene03/plan';
 import {StampS03} from './scene03/stamp';
 import {BitOnSign, NearWalkers, PipS03, StreetLife} from './scene03/cast';
 
@@ -150,6 +150,7 @@ const Scene03: React.FC = () => {
             </clipPath>
           </defs>
           <SideOverlays popAt={T.popAt} lightAt={T.lightAt} badgeAt={T.plaqueAt} />
+          <EdgeTree at={T.popAt.L1} />
         </>
       );
     }

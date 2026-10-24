@@ -15,7 +15,7 @@ import {palette} from '../../lib/theme';
 import {ease as E, prog, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {line, polyPath, rect, Pt} from '../../lib/sketch';
+import {crown, crownTicks, line, polyPath, rect, Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import {rng} from '../../lib/rng';
 import {Quad} from '../../lib/persp';
@@ -198,13 +198,45 @@ const LOTS: Lot[] = (() => {
   return out;
 })();
 
+/** A convex quad inset by d (each edge moved toward the centroid, consecutive edges intersected): the plan's inner wall
+ *  line (double-line walls read as an architect's footprint, not a slab). */
+function insetQuad(q: Pt[], d: number): Pt[] {
+  const n = q.length;
+  const cx = q.reduce((a, p) => a + p[0], 0) / n;
+  const cy = q.reduce((a, p) => a + p[1], 0) / n;
+  const L = q.map((a, i) => {
+    const b = q[(i + 1) % n];
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const len = Math.hypot(dx, dy) || 1;
+    let nx = -dy / len;
+    let ny = dx / len;
+    if (nx * (cx - a[0]) + ny * (cy - a[1]) < 0) {
+      nx = -nx;
+      ny = -ny;
+    }
+    return {p: [a[0] + nx * d, a[1] + ny * d] as Pt, v: [dx, dy] as Pt};
+  });
+  return q.map((_, i) => {
+    const A = L[(i + n - 1) % n];
+    const B = L[i];
+    const den = A.v[0] * B.v[1] - A.v[1] * B.v[0];
+    if (Math.abs(den) < 1e-9) return B.p;
+    const u = ((B.p[0] - A.p[0]) * B.v[1] - (B.p[1] - A.p[1]) * B.v[0]) / den;
+    return [A.p[0] + A.v[0] * u, A.p[1] + A.v[1] * u] as Pt;
+  });
+}
+
 const LOT_GEO = (() => {
   let fill = '';
   let ink = '';
+  let inner = '';
   const marks: string[] = [];
   LOTS.forEach((l, i) => {
     fill += polyPath(l.quad);
     const q = l.quad;
+    const w = insetQuad(q, 6 * Math.max(0.5, l.s));
+    inner += polyPath(w);
     ink += line(q[0][0], q[0][1], q[1][0], q[1][1], {seed: `s03/lot${i}a`, over: [2, 2], breaks: false}) + line(q[1][0], q[1][1], q[2][0], q[2][1], {seed: `s03/lot${i}b`, over: [2, 3], breaks: false}) + line(q[2][0], q[2][1], q[3][0], q[3][1], {seed: `s03/lot${i}c`, over: [3, 2], breaks: false}) + line(q[3][0], q[3][1], q[0][0], q[0][1], {seed: `s03/lot${i}d`, over: [2, 2], breaks: false});
     // door swing: the leaf (hinge -> open) and its quarter arc back to the jamb; a lot mark (a small cross)
     const [hg, op, jb] = l.door;
@@ -216,18 +248,17 @@ const LOT_GEO = (() => {
         `M${(l.mark[0] - c).toFixed(1)} ${(l.mark[1] - c * 0.6).toFixed(1)}L${(l.mark[0] + c).toFixed(1)} ${(l.mark[1] + c * 0.6).toFixed(1)}M${(l.mark[0] + c).toFixed(1)} ${(l.mark[1] - c * 0.6).toFixed(1)}L${(l.mark[0] - c).toFixed(1)} ${(l.mark[1] + c * 0.6).toFixed(1)}`,
     );
   });
-  return {fill, ink, marks};
+  return {fill, ink, inner, marks: marks.join('')};
 })();
 
-/** The ten footprints: cream lots (3 px misregistered fill) inked solid at 2.2 px, each with a door swing and a lot
- *  cross that ink on one by one (0.03 s apart, in the pop-up order) from `marksAt`. */
-export const Footprints: React.FC<{marksAt?: number}> = ({marksAt = 0.03}) => (
+/** The ten footprints, there from the hard cut: cream lots (3 px misregistered fill) inked solid at 2.2 px with a thin
+ *  inner wall line, each with a door swing and a lot cross. */
+export const Footprints: React.FC = () => (
   <>
     <Fill d={LOT_GEO.fill} color={palette.cream} offset={[3, 2]} mode="none" seed="s03/lots" />
     <Ink d={LOT_GEO.ink} width={2.2} taper={false} seed="s03/foot" />
-    {LOT_GEO.marks.map((d, i) => (
-      <Ink key={i} d={d} at={marksAt + i * 0.03} dur={0.1} width={1.6} taper={false} seed={`s03/footm${i}`} />
-    ))}
+    <Ink d={LOT_GEO.inner} width={1.2} taper={false} seed="s03/footw" />
+    <Ink d={LOT_GEO.marks} width={1.6} taper={false} seed="s03/footm" />
   </>
 );
 
@@ -242,8 +273,8 @@ const SHEET = (() => {
   const sL = (y: number) => lB(y) + inset(y);
   const sR = (y: number) => rB(y) - inset(y);
   const u = (y: number) => (y - yF) / (yN - yF);
-  const gap = (y: number) => 3 + 4 * u(y);
-  const bw = (y: number) => 5 + 10 * u(y);
+  const gap = (y: number) => 4 + 5 * u(y);
+  const bw = (y: number) => 10 + 14 * u(y);
   const yL = yF + 30; // the left band starts below the dog-ear
   const left = polyPath([[sL(yL) + gap(yL), yL], [sL(yN) + gap(yN), yN], [sL(yN) + gap(yN) + bw(yN), yN], [sL(yL) + gap(yL) + bw(yL), yL]]);
   const right = polyPath([[sR(yF) - gap(yF), yF + 3], [sR(yN) - gap(yN), yN], [sR(yN) - gap(yN) - bw(yN), yN], [sR(yF + 8) - gap(yF) - bw(yF), yF + 8]]);
@@ -271,6 +302,31 @@ export const SheetFrame: React.FC = () => (
     <Fill d={SHEET.ear} color={palette.cream} offset={false} mode="none" seed="s03/ear" />
     <Ink d={SHEET.earInk} width={1.6} taper={false} seed="s03/earI" />
   </>
+);
+
+// ---------------------------------------------------------------- a street tree at the near left edge (charm, colour)
+
+const TREE = (() => {
+  const cx = 18;
+  const cy = 1116;
+  const crownD = crown(cx, cy, 92, 100, {seed: 's03/tree', bumps: 10});
+  const ticks = crownTicks(cx, cy, 92, 100, {seed: 's03/treek', n: 4, size: 12});
+  const tx = 30;
+  const trunk = polyPath([[tx - 8, 1200], [tx + 8, 1200], [tx + 9, 1566], [tx - 9, 1566]]);
+  const trunkInk = line(tx - 8, 1205, tx - 9, 1566, {seed: 's03/tt1', over: 0}) + line(tx + 8, 1212, tx + 9, 1566, {seed: 's03/tt2', over: 0});
+  return {crownD, ticks, trunk, trunkInk, base: [tx, 1566] as Pt};
+})();
+
+/** A sage street tree in front of L1, cropped by the frame's left edge (crown screen y ~1040-1240, below the caption
+ *  band); it pops up with L1. */
+export const EdgeTree: React.FC<{at?: number}> = ({at}) => (
+  <PopUp at={at} x={TREE.base[0]} y={TREE.base[1]}>
+    <Fill d={TREE.trunk} color={palette.brown} seed="s03/treeT" />
+    <Ink d={TREE.trunkInk} width={SI.mid} taper={false} seed="s03/treeTi" />
+    <Fill d={TREE.crownD} color={palette.sage} seed="s03/treeC" />
+    <Ink d={TREE.crownD} width={SI.mid} open={0.14} seed="s03/treeCi" />
+    <Ink d={TREE.ticks} width={SI.far} taper={false} seed="s03/treeK" />
+  </PopUp>
 );
 
 // ---------------------------------------------------------------- browser screens: unlit -> peach pop -> lit page
