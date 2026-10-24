@@ -12,9 +12,12 @@
 // Scale cues at human size: a central bronze door ~2.5x a person, people beside it, people on the steps sized by
 // step depth (0.032 H on the lowest step -> 0.022 H on the top one; kit Persons, never under 40 px), column bases and
 // capitals as doubled ink lines. The ink thins with height (x clamp(scale / scale(base), 0.45, 1)).
-// light="back": the sun is behind it. Every face is a flat shadow field (silhouette value + one lighter step), the
-// columns are fill-only bands, the upper storeys (entablature and up) carry NO inner ink (only their outline), and a
-// 4 px peach rim runs down the sun-facing edges: captions can sit on it (ink on the golden field >= 5:1).
+// light="back": the sun is behind it. Every face is a flat shadow field (silhouette value + one lighter step) and a
+// 4 px peach rim runs down the sun-facing edges. Ink stays where the reference has it: BELOW `quietY` (screen y in the
+// layer, default 600) the back-lit stone keeps its hand-drawn ink (capitals and bases as doubled lines overshooting
+// 4-10 px, step nosings broken every 80-160 px, 1-2 hairline flutes per shaft, door frame + transom, entablature
+// mouldings); ABOVE it only outlines remain, so the caption band sits on quiet flat fields (ink captions >= 5:1).
+// Fills sit misregistered 3-5 px from the ink (seeded per part). Long mouldings overshoot at most 12 px on screen.
 // Build (`build`): parts pop up bottom -> top (steps, door, columns left -> right, entablature, pediment, drum, dome,
 // lantern, flag), each rising from its own base in 0.16 s (separate pops, not one smear). Un-build: parts sink into their base (small first), ink
 // drops. Look: paper = white fills + ink; cascade = paper until the wave reaches each part.
@@ -27,7 +30,7 @@ import {line, Pt} from '../sketch';
 import {ambient, deep, TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
 import {darker} from './city';
 import {quadMap, UV} from './persp';
-import {mix, PathBuf, r1} from './util';
+import {brokenLine, mix, PathBuf, r1} from './util';
 import {Person} from '../kit';
 import {FlatColor} from './light';
 import {PERSON_FEET, PERSON_H, personInk} from './figures';
@@ -88,17 +91,19 @@ export type MonumentProps = MonumentGeo & {
   /** The two side doorways light up (warm), one at each time; and go dark again at sideOffAt. */
   sideLitAt?: number[];
   sideOffAt?: number[];
+  /** light="back": inner ink is dropped above this screen y (layer coords; the caption band). Default 600. */
+  quietY?: number;
 };
 
 type PaintKey = 'stone' | 'lit' | 'shade' | 'dark' | 'door' | 'transom' | 'dome' | 'domeShade' | 'rim' | 'disc';
 const PAINTS: PaintKey[] = ['stone', 'dark', 'door', 'transom', 'shade', 'lit', 'dome', 'domeShade', 'disc', 'rim'];
 
 /** One build part: fills per paint, ink per weight, the screen y of its base (it rises from there), its band. */
-type Part = {name: string; fills: Partial<Record<PaintKey, string>>; ink: string; thin: string; hair: string; baseY: number; baseX: number; inkK: number; order: number; j: number; w: number; h: number};
+type Part = {name: string; fills: Partial<Record<PaintKey, string>>; ink: string; thin: string; hair: string; baseY: number; baseX: number; inkK: number; order: number; j: number; w: number; h: number; mx: number; my: number};
 
 type Geo = {parts: Part[]; emblem: {x: number; y: number; r: number}; flagPole: Pt; flagScale: number; emblemPart: number};
 
-function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean, emblemY: number, seed: Seed): Geo {
+function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean, emblemY: number, seed: Seed, quietY: number): Geo {
   const M = monumentMap(g);
   const A = M.at;
   const s0 = M.scale(500, 0);
@@ -115,7 +120,9 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
     const sc = M.scale(500, (c.Y0 + c.Y1) / 2);
     const wl = A(c.X0, c.Y0);
     const wr = A(c.X1, c.Y0);
-    parts.push({name, fills, ink: c.ink.d, thin: c.thin.d, hair: c.hair.d, baseY: b[1], baseX: b[0], inkK: Math.max(0.45, Math.min(1, sc / s0)), order, j: r0.next(), w: Math.abs(wr[0] - wl[0]), h: Math.abs(b[1] - tp[1])});
+    const j = r0.next();
+    // fills misregistered 3-5 px from the ink (theme misreg direction, seeded per part)
+    parts.push({name, fills, ink: c.ink.d, thin: c.thin.d, hair: c.hair.d, baseY: b[1], baseX: b[0], inkK: Math.max(0.45, Math.min(1, sc / s0)), order, j, w: Math.abs(wr[0] - wl[0]), h: Math.abs(b[1] - tp[1]), mx: 3 + 2 * j, my: 2 + 1.5 * r0.next()});
     cur = null;
   };
   const P = (pts: [number, number][]) => pts.map(([x, y]) => A(x, y));
@@ -123,12 +130,23 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
     const c = cur!;
     return (c.fills[k] ??= new PathBuf());
   };
-  const L = (w: 'ink' | 'thin' | 'hair', x1: number, y1: number, x2: number, y2: number, s: string, over: [number, number] = [4, 8], breaks = true) => {
+  // in backlight, INNER lines whose both ends sit above quietY (screen) are dropped: the caption band stays a flat field
+  const isQuiet = (a: Pt, b: Pt) => back && Math.max(a[1], b[1]) < quietY;
+  const L = (w: 'ink' | 'thin' | 'hair', x1: number, y1: number, x2: number, y2: number, s: string, over: [number, number] = [4, 8], breaks = true, outline = false) => {
     const a = A(x1, y1);
     const b = A(x2, y2);
-    cur![w].raw(line(a[0], a[1], b[0], b[1], {seed: `${seed}/${s}`, over, breaks}));
+    if (!outline && isQuiet(a, b)) return;
+    // overshoot is screen px, capped at 12 (long mouldings must not run edge to edge like wires)
+    cur![w].raw(line(a[0], a[1], b[0], b[1], {seed: `${seed}/${s}`, over: [Math.min(12, over[0]), Math.min(12, over[1])], breaks}));
   };
-  const quiet = back; // upper storeys carry no inner ink in backlight
+  /** A long line broken into strokes every 80-160 px (step nosings, joints). */
+  const LB = (w: 'ink' | 'thin' | 'hair', x1: number, y1: number, x2: number, y2: number, s: string, over: [number, number] = [4, 10]) => {
+    const a = A(x1, y1);
+    const b = A(x2, y2);
+    if (isQuiet(a, b)) return;
+    cur![w].raw(brokenLine(a[0], a[1], b[0], b[1], {seed: `${seed}/${s}`, over}));
+  };
+  const quiet = back; // (kept for the upper-storey outlines: thin instead of bold in backlight)
 
   // ---- steps (Y 0..180), stepped sides
   begin(0, 180, -150, 1150);
@@ -141,18 +159,18 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
     const xb = 1150 - i * 6;
     F('shade').poly(P([[xa, y], [xb, y], [xb, y + sh * 0.62], [xa, y + sh * 0.62]]));
     F('lit').poly(P([[xa, y + sh * 0.62], [xb, y + sh * 0.62], [xb - 6, y + sh], [xa + 6, y + sh]]));
-    if (!back) L(i % 3 === 0 ? 'ink' : 'thin', xa - 20, y + sh * 0.62, xb + 20, y + sh * 0.62, `st${i}`, [10, 30]);
-    else if (i % 3 === 0) L('thin', xa - 20, y + sh * 0.62, xb + 20, y + sh * 0.62, `st${i}`, [10, 30]);
+    // every nosing inked, broken every 80-160 px (reference 1: long lines are several pen strokes)
+    LB(i % 3 === 0 ? 'ink' : 'thin', xa, y + sh * 0.62, xb, y + sh * 0.62, `st${i}`, [4, 10]);
   }
-  L('ink', -150, 0, -150 + nSteps * 6, 180, 'sl', [0, 6], false);
-  L('ink', 1150, 0, 1150 - nSteps * 6, 180, 'sr', [0, 6], false);
+  L('ink', -150, 0, -150 + nSteps * 6, 180, 'sl', [0, 6], false, true);
+  L('ink', 1150, 0, 1150 - nSteps * 6, 180, 'sr', [0, 6], false, true);
   end('steps', 0);
 
   // ---- stylobate + portico recess + the central bronze door (+ two side doorways)
   begin(180, 1000, -20, 1020);
   F('stone').poly(P([[-20, 180], [1020, 180], [1020, 215], [-20, 215]]));
-  L('ink', -60, 180, 1060, 180, 'sb1', [20, 40]);
-  L('thin', -40, 215, 1040, 215, 'sb2', [10, 20]);
+  L('ink', -20, 180, 1020, 180, 'sb1', [8, 12]);
+  L('thin', -20, 215, 1020, 215, 'sb2', [6, 10]);
   F('dark').poly(P([[20, 215], [980, 215], [980, 1000], [20, 1000]]));
   // door: ~2.5x a person (a person on the top step is ~50 units tall here)
   const dw = 46; // in the middle intercolumniation
@@ -196,16 +214,17 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
       L('ink', x + r, 250, x + r * 0.9, 960, `cr${i}`, [2, 6], false);
       L('hair', x - r * 0.15, 270, x - r * 0.13, 940, `cf${i}a`, [0, 0], false);
     } else {
-      L('thin', x - r, 250, x - r * 0.9, 960, `cl${i}`, [2, 4], false);
-      L('thin', x + r, 250, x + r * 0.9, 960, `cr${i}`, [2, 4], false);
+      L('thin', x - r, 250, x - r * 0.9, 960, `cl${i}`, [2, 6], true);
+      L('thin', x + r, 250, x + r * 0.9, 960, `cr${i}`, [2, 6], true);
+      // 1-2 hairline flutes per shaft (broken)
+      LB('hair', x - r * 0.42, 280, x - r * 0.38, 930, `cf${i}a`, [0, 0]);
+      if (i % 2 === 0) LB('hair', x + r * 0.18, 300, x + r * 0.16, 920, `cf${i}b`, [0, 0]);
     }
-    // base + capital: two short doubled ink lines each
-    L('thin', x - 50, 222, x + 50, 222, `cb${i}a`, [3, 5], false);
-    L('thin', x - 46, 246, x + 46, 246, `cb${i}b`, [3, 5], false);
-    if (!back) {
-      L('thin', x - 50, 964, x + 50, 964, `cc${i}a`, [3, 5], false);
-      L('thin', x - 54, 996, x + 54, 996, `cc${i}b`, [3, 5], false);
-    }
+    // base + capital: doubled ink lines overshooting 4-10 px (both lights)
+    L('thin', x - 50, 222, x + 50, 222, `cb${i}a`, [4, 9], false);
+    L('thin', x - 46, 246, x + 46, 246, `cb${i}b`, [4, 8], false);
+    L('thin', x - 50, 964, x + 50, 964, `cc${i}a`, [4, 9], false);
+    L('thin', x - 54, 996, x + 54, 996, `cc${i}b`, [5, 10], false);
     end(`col${i}`, 2 + i * 0.45);
   }
 
@@ -215,13 +234,12 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
   F('shade').poly(P([[-10, 1060], [1010, 1060], [1010, 1150], [-10, 1150]]));
   F('lit').poly(P([[-40, 1150], [1040, 1150], [1040, 1190], [-40, 1190]]));
   if (back) F('rim').poly(P([[1010 - 9, 1000], [1010, 1000], [1010, 1150], [1010 - 9, 1150]]));
-  L('ink', -60, 1000, 1060, 1000, 'e1', [30, 50]);
-  if (!quiet) {
-    L('thin', -30, 1060, 1030, 1060, 'e2', [10, 20]);
-    L('ink', -70, 1150, 1070, 1150, 'e3', [30, 60]);
-    for (let x = -30; x < 1030; x += 26) L('hair', x, 1150, x, 1138, `de${x}`, [0, 0], false);
-  }
-  L('ink', -60, 1190, 1060, 1190, 'e4', [20, 40]);
+  L('ink', -10, 1000, 1010, 1000, 'e1', [8, 12], true, true);
+  LB('thin', -10, 1060, 1010, 1060, 'e2', [6, 10]);
+  L('ink', -40, 1150, 1040, 1150, 'e3', [8, 12]);
+  L('thin', -40, 1158, 1040, 1158, 'e3b', [4, 8]);
+  for (let x = -30; x < 1030; x += 26) L('hair', x, 1150, x, 1138, `de${x}`, [0, 0], false);
+  L('ink', -40, 1190, 1040, 1190, 'e4', [8, 12], true, true);
   end('entablature', 2 + columns * 0.45 + 0.3);
 
   // ---- pediment (Y 1190..1470)
@@ -229,12 +247,10 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
   F('stone').poly(P([[-40, 1190], [1040, 1190], [500, 1470]]));
   F(back ? 'lit' : 'shade').poly(P([[40, 1215], [960, 1215], [500, 1430]]));
   if (back) F('rim').poly(P([[500, 1470], [1040, 1190], [1040 - 30, 1190], [500, 1470 - 18]]));
-  L('ink', -60, 1190, 520, 1480, 'p1', [10, 20], false);
-  L('ink', 1060, 1190, 480, 1480, 'p2', [10, 20], false);
-  if (!quiet) {
-    L('thin', 40, 1215, 500, 1430, 'p3', [4, 6], false);
-    L('thin', 960, 1215, 500, 1430, 'p4', [4, 6], false);
-  }
+  L(quiet ? 'thin' : 'ink', -40, 1190, 500, 1470, 'p1', [8, 12], false, true);
+  L(quiet ? 'thin' : 'ink', 1040, 1190, 500, 1470, 'p2', [8, 12], false, true);
+  L('thin', 40, 1215, 500, 1430, 'p3', [4, 6], false);
+  L('thin', 960, 1215, 500, 1430, 'p4', [4, 6], false);
   end('pediment', 2 + columns * 0.45 + 0.8);
 
   let emblemPart = parts.length - 1;
@@ -247,10 +263,10 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
     // window slots (fill-only, framed by the drum's pilasters in front light)
     // window slots: dark in front light; one shade step (teal) in backlight, so a caption over them stays >= 3:1
     for (let x = 320; x < 700; x += 60) F(back ? 'shade' : 'dark').poly(P([[x, 1560], [x + 26, 1560], [x + 26, 1650], [x, 1650]]));
-    if (!quiet) for (let x = 290; x <= 710; x += 60) L('thin', x, 1470, x, 1880, `dp${x}`, [0, 0], false);
-    if (!quiet) L('ink', 230, 1900, 770, 1900, 'dc', [16, 24]);
-    L(quiet ? 'thin' : 'ink', 260, 1420, 260, 1900, 'dl', [0, 10], false);
-    L(quiet ? 'thin' : 'ink', 740, 1420, 740, 1900, 'dr', [0, 10], false);
+    for (let x = 290; x <= 710; x += 60) L('thin', x, 1470, x, 1880, `dp${x}`, [0, 0], false);
+    L('ink', 230, 1900, 770, 1900, 'dc', [8, 12]);
+    L(quiet ? 'thin' : 'ink', 260, 1420, 260, 1900, 'dl', [0, 10], false, true);
+    L(quiet ? 'thin' : 'ink', 740, 1420, 740, 1900, 'dr', [0, 10], false, true);
     end('drum', 2 + columns * 0.45 + 1.3);
     if (emblemY > 1470) emblemPart = parts.length - 1;
     // dome: half ellipse (sampled, mapped), shade on the left third, ribs (front light only)
@@ -278,7 +294,7 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
       outline += `${i ? 'L' : 'M'}${r1(sp[0])} ${r1(sp[1])}`;
     });
     (quiet ? cur!.thin : cur!.ink).raw(outline);
-    if (!quiet) {
+    if (!quiet || A(500, 1900)[1] > quietY) {
       for (const k of [-0.6, -0.25, 0.25, 0.6]) {
         let rib = '';
         for (let i = 0; i <= 12; i++) {
@@ -293,12 +309,12 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, back: boolean,
     // lantern + flagpole
     begin(2215, 2900, 440, 560);
     F('stone').poly(P([[455, 2215], [545, 2215], [545, 2390], [455, 2390]]));
-    if (!quiet) for (const x of [470, 500, 530]) L('hair', x, 2225, x, 2380, `ln${x}`, [0, 0], false);
+    for (const x of [470, 500, 530]) L('hair', x, 2225, x, 2380, `ln${x}`, [0, 0], false);
     F('dome').poly(P([[440, 2390], [560, 2390], [535, 2440], [500, 2460], [465, 2440]]));
-    if (!quiet) L('thin', 440, 2390, 560, 2390, 'lt', [6, 8], false);
-    L('thin', 455, 2215, 455, 2390, 'll', [0, 4], false);
-    L('thin', 545, 2215, 545, 2390, 'lr', [0, 4], false);
-    L('thin', 500, 2460, 500, 2880, 'fp', [0, 0], false);
+    L('thin', 440, 2390, 560, 2390, 'lt', [6, 8], false);
+    L('thin', 455, 2215, 455, 2390, 'll', [0, 4], false, true);
+    L('thin', 545, 2215, 545, 2390, 'lr', [0, 4], false, true);
+    L('thin', 500, 2460, 500, 2880, 'fp', [0, 0], false, true);
     end('lantern', 2 + columns * 0.45 + 2.2);
   }
   // emblem disc lives in its part (pediment or drum)
@@ -360,15 +376,16 @@ export const Monument: React.FC<MonumentProps> = ({
   doorAt,
   sideLitAt,
   sideOffAt,
+  quietY = 600,
 }) => {
   const S = useCineState();
   const t = S.t;
   const p = useTodPal(tod);
   const back = light === 'back';
-  const key = JSON.stringify([cx, by, bw, ty, taper, columns, dome, back, emblemY, seed]);
+  const key = JSON.stringify([cx, by, bw, ty, taper, columns, dome, back, emblemY, seed, quietY]);
   let G = GEO_CACHE.get(key);
   if (!G) {
-    G = buildGeo({cx, by, bw, ty, taper}, columns, dome, back, emblemY, seed);
+    G = buildGeo({cx, by, bw, ty, taper}, columns, dome, back, emblemY, seed, quietY);
     if (GEO_CACHE.size > 50) GEO_CACHE.clear();
     GEO_CACHE.set(key, G);
   }
@@ -401,14 +418,18 @@ export const Monument: React.FC<MonumentProps> = ({
     if (x0.k <= 0.002) return;
     const node: React.ReactNode[] = [];
     if (S.look.fills !== 'none') {
+      const mr = `translate(${r1(part.mx)} ${r1(part.my)})`;
       if (x0.paper) {
         const d = PAINTS.filter((k) => k !== 'rim' && k !== 'disc').map((k) => part.fills[k] ?? '').join('');
-        if (d) node.push(<path key="pw" d={d} fill={palette.white} />);
-      } else
+        if (d) node.push(<path key="pw" d={d} fill={palette.white} transform={mr} />);
+      } else {
+        const fl: React.ReactNode[] = [];
         for (const k of PAINTS) {
           const d = k === 'disc' ? '' : part.fills[k];
-          if (d) node.push(<path key={k} d={d} fill={PM[k]} />);
+          if (d) fl.push(<path key={k} d={d} fill={PM[k]} />);
         }
+        node.push(<g key="fl" transform={mr}>{fl}</g>);
+      }
     }
     if (x0.ink) {
       // ink thins with height (inkK per part)

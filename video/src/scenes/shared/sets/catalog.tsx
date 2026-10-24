@@ -17,6 +17,7 @@ import {TerraceHill, TERRACE} from './TerraceHill';
 import {OldQuarter, OLD_QUARTER} from './OldQuarter';
 import {DemoSun, DemoWorld} from './preview/demo';
 import {mat, XG} from '../../../lib/xf';
+import {UnBuild} from '../../../lib/exit';
 import {ease as E, useTime} from '../../../lib/time';
 
 /** Camera matrix: world point (x, y) at screen centre, zoom z. */
@@ -203,7 +204,11 @@ export const SET_CATALOG: SetEntry[] = [
     thumb: () => <OldQuarter sun={<DemoSun cx={OLD_QUARTER.sun.x} cy={OLD_QUARTER.sun.y} r={110} />} />,
     preview: (v) => (
       <DemoWorld sky={skies.golden}>
-        {v === 'board' ? (
+        {v === 'unbuild' ? (
+          <UnBuild at={0.5} dur={0.6}>
+            <OldQuarter sun={<DemoSun cx={OLD_QUARTER.sun.x} cy={OLD_QUARTER.sun.y} r={110} />} board={{}} audience />
+          </UnBuild>
+        ) : v === 'board' ? (
           <XG m={camMat(550, 1020, 1.12)}>
             <OldQuarter sun={<DemoSun cx={530} cy={725} r={110 / 1.12} />} board={{riseAt: 0.3, railLightAt: 0.8, paneDarkAt: 2.0, pane2ScaleInAt: 2.4}} audience={{riseAt: 0.5}} />
           </XG>
