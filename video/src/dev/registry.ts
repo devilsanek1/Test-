@@ -13,5 +13,5 @@ export const devCompositions = [
   {id: 'KitDemo', component: KitDemo, durationSeconds: 12},
   {id: 'MascotSheet', component: MascotSheet, durationSeconds: 8},
   {id: 'FontTest', component: FontTest, durationSeconds: 2},
-  {id: 'CineDemo', component: CineDemo, durationSeconds: 18},
+  {id: 'CineDemo', component: CineDemo, durationSeconds: 22},
 ];

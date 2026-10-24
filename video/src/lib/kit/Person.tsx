@@ -74,6 +74,9 @@ export type PersonProps = {
   flip?: boolean;
   /** Idle bob amplitude in px (default 0). */
   idle?: number;
+  /** Walking in place, seen from behind: steps per second (ref 2 ~3; 1.5-2 reads as a stroll). Needs `legs`. Move
+   *  x / y / s yourself to walk into depth. */
+  walk?: number;
   /** ON-SCREEN ink weight in px (depthInk: front 4.8, mid 3.4, far 2.2). 0 = no ink. Default ~3.4 * s^0.45. */
   ink?: number;
 };
@@ -288,7 +291,7 @@ function makePaths(S: Spec) {
 }
 
 export const Person: React.FC<PersonProps> = (props) => {
-  const {x = 0, y = 0, s = 1, at, build = 'draw', lod = 0, flip, legs, idle = 0, ink} = props;
+  const {x = 0, y = 0, s = 1, at, build = 'draw', lod = 0, flip, legs, idle = 0, ink, walk} = props;
   const hero = (props.hero ?? s >= 1.2) && lod === 0;
   const rimSide = props.rim === undefined ? (hero ? 'left' : false) : props.rim;
   const t = useTime();
@@ -311,11 +314,27 @@ export const Person: React.FC<PersonProps> = (props) => {
   const k = (n: string) => `${sd}/${n}`;
   const headColor = S.line ? palette.card : S.hair === 'bald' ? palette.sand : S.hairColor;
 
+  // walking (back view): the lifted foot shortens its leg, the body rises a hair mid-stride
+  let legsD = P.legs;
+  let shoesD = P.shoes;
+  let legInkD = P.legInk;
+  let walkBob = 0;
+  if (walk && legs && P.legs) {
+    const ph = t * walk * Math.PI + S.phase;
+    const lw = S.w * 0.31;
+    const g = S.w * 0.05;
+    const lL = Math.max(0, Math.sin(ph)) * S.legH * 0.16;
+    const lR = Math.max(0, -Math.sin(ph)) * S.legH * 0.16;
+    legsD = rectPath(-g - lw, -2, lw, S.legH - lL) + rectPath(g, -2, lw, S.legH - lR);
+    shoesD = rectPath(-g - lw - 1, S.legH - lL - 12, lw + 3, 14) + rectPath(g - 2, S.legH - lR - 12, lw + 3, 14);
+    legInkD = `M${-g - lw} 0L${-g - lw} ${S.legH - lL}M${-g} 0L${-g} ${S.legH - 2 - lL}M${g} 0L${g} ${S.legH - 2 - lR}M${g + lw} 0L${g + lw} ${S.legH - lR}`;
+    walkBob = -Math.abs(Math.sin(ph)) * S.legH * 0.035;
+  }
   // legs (behind)
   if (legs && P.legs && lod < 2) {
-    push(<Fill key="legs" d={P.legs} color={S.legsColor} at={tm(0.2)} mode={drawMode ? 'grow' : 'none'} dir="down" offset={false} seed={k('legs')} />);
-    push(<Fill key="shoes" d={P.shoes} color={S.shoeColor} at={tm(0.26)} mode={drawMode ? 'snap' : 'none'} offset={false} seed={k('shoes')} />);
-    if (inked && lod === 0) push(<Ink key="legI" d={P.legInk} at={tm(0.06)} width={W * 0.9} seed={k('legI')} />);
+    push(<Fill key="legs" d={legsD} color={S.legsColor} at={tm(0.2)} mode={drawMode ? 'grow' : 'none'} dir="down" offset={false} seed={k('legs')} />);
+    push(<Fill key="shoes" d={shoesD} color={S.shoeColor} at={tm(0.26)} mode={drawMode ? 'snap' : 'none'} offset={false} seed={k('shoes')} />);
+    if (inked && lod === 0) push(<Ink key="legI" d={legInkD} at={tm(0.06)} width={W * 0.9} seed={k('legI')} />);
   } else if (legs && P.legs) {
     push(<Fill key="legs" d={P.legs} color={S.legsColor} offset={false} seed={k('legs')} />);
   } else if (legs && S.line && inked) {
@@ -445,6 +464,7 @@ export const Person: React.FC<PersonProps> = (props) => {
     }
   }
   if (idle) dy += osc(t, S.hz, S.phase) * idle;
+  dy += walkBob * s;
   return (
     <Place x={x} y={y + dy} s={s} flip={flip}>
       {clip}

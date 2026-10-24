@@ -203,8 +203,15 @@ export const Shake: React.FC<Children & {at: number; dur?: number; amp?: number;
 
 // ---------------------------------------------------------------- Tween (general)
 
-/** opacity is treated as a visibility switch (>= 0.5 = visible), never a fade. */
-export type TweenState = {x?: number; y?: number; s?: number; r?: number; opacity?: number};
+/** Tween state. `opacity` is @deprecated: it is only a visibility switch (>= 0.5 = visible), never a fade. */
+export type TweenState = {
+  x?: number;
+  y?: number;
+  s?: number;
+  r?: number;
+  /** @deprecated nothing fades: a visibility switch (>= 0.5 visible). Use <Appear> / `at` instead. */
+  opacity?: number;
+};
 
 export const Tween: React.FC<
   Children & {

@@ -14,7 +14,8 @@
 
 import React from 'react';
 import {CineCamera, CamKey, CamState} from './cine/camera';
-import {ease as E, Ease} from './time';
+import {Ease} from './time';
+import {MOTION} from './spec';
 import {world} from './theme';
 import type {Seed} from './rng';
 import type {Pt} from './sketch';
@@ -43,12 +44,12 @@ export type ShotCamProps = {
 /** CineCamera keys for a gentle push (dolly: push = 1 - 1 / to at depth 0). */
 export function pushKeys(p: ShotPush | boolean = true): CamKey[] {
   const o = p === true || p === false ? {} : p;
-  const to = o.to ?? 1.06;
+  const to = o.to ?? MOTION.camera.push.to;
   const at = o.at ?? 0;
   const anchor = o.anchor ?? world.vp;
   return [
     {t: at, push: 0, anchor},
-    {t: at + (o.dur ?? 2), push: 1 - 1 / to, anchor, ease: o.ease ?? E.inOutSine},
+    {t: at + (o.dur ?? MOTION.camera.push.dur), push: 1 - 1 / to, anchor, ease: o.ease ?? MOTION.camera.push.ease},
   ];
 }
 

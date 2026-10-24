@@ -15,3 +15,4 @@ export * from './street';
 export * from './wall';
 export * from './tower';
 export * from './monument';
+export * from './state';

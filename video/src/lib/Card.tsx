@@ -17,7 +17,15 @@ import {card, cardSurface, palette, panel} from './theme';
 import {clamp, ease as E, lerp, prog, springAt} from './time';
 import {Fill, PanelClip} from './Fill';
 
-export type CardXf = {rotY?: number; rotZ?: number; x?: number; y?: number; scale?: number; opacity?: number};
+export type CardXf = {
+  rotY?: number;
+  rotZ?: number;
+  x?: number;
+  y?: number;
+  scale?: number;
+  /** @deprecated v1 card only; animating it is a fade (forbidden in the film). */
+  opacity?: number;
+};
 
 type CardCtxV = {rotY: number};
 const CardCtx = createContext<CardCtxV>({rotY: 0});
@@ -88,7 +96,13 @@ export const Card: React.FC<{
 
 /** SVG layer in card-local coordinates. Fills inside are clipped to the panel (see Fill / Unclipped).
  *  `zoom` scales the art about a focus point (zoom transitions). */
-export const Art: React.FC<{children?: React.ReactNode; zoom?: {s: number; x: number; y: number}; opacity?: number; clip?: boolean}> = ({children, zoom, opacity = 1, clip = true}) => {
+export const Art: React.FC<{
+  children?: React.ReactNode;
+  zoom?: {s: number; x: number; y: number};
+  /** @deprecated v1 card only; animating it is a fade (forbidden in the film). */
+  opacity?: number;
+  clip?: boolean;
+}> = ({children, zoom, opacity = 1, clip = true}) => {
   if (opacity <= 0.001) return null;
   const inner = zoom && zoom.s !== 1 ? <g transform={`translate(${zoom.x} ${zoom.y}) scale(${zoom.s}) translate(${-zoom.x} ${-zoom.y})`}>{children}</g> : children;
   return (
@@ -103,7 +117,7 @@ export const Art: React.FC<{children?: React.ReactNode; zoom?: {s: number; x: nu
 export const Panel: React.FC<{
   at?: number;
   color?: string;
-  mode?: 'grow' | 'wipe' | 'fade' | 'pop';
+  mode?: 'grow' | 'wipe' | /** @deprecated = 'snap' (nothing fades) */ 'fade' | 'pop';
   x?: number;
   y?: number;
   w?: number;

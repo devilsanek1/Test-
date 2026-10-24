@@ -495,8 +495,9 @@ export const Skyline: React.FC<SkylineProps> = ({seed = 'sky', depth = 0, tod = 
   const B = allSteady ? geo.all : batch(geo.blds, steadyIdx);
 
   const out: React.ReactNode[] = [];
-  const massPaint = lookPaint(S, massColor ?? atmos(darker(p.facade[0]), depth, p), [540, row.base]);
-  const massK = S.e > 0 ? exitScale(S.e, 0.5, rowSize) : 1;
+  // the low city mass under a row: the row's own darkest facade paint (never a deeper invented step)
+  const massPaint = lookPaint(S, massColor ?? atmos(p.facade[Math.min(1, p.facade.length - 1)], depth, p), [540, row.base]);
+  const massK = (S.e > 0 ? exitScale(S.e, 0.5, rowSize) : 1) * (starts && t < Math.min(...starts.st) ? 0 : 1);
   if (massPaint !== 'none' && massK > 0) out.push(<path key="mass" d={geo.mass} fill={massPaint} transform={massK < 1 ? `translate(0 ${r1(row.base * (1 - massK))}) scale(1 ${massK.toFixed(4)})` : undefined} />);
 
   const drawBatch = (b: Batch, key: string, paper: boolean, ink: boolean) => {

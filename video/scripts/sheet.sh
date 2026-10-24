@@ -30,6 +30,7 @@ while read -r S FR F; do
 done < "$TMP/list.txt"
 mkdir -p "$(dirname "$OUT")"
 montage -background '#2b2b2b' -fill '#f0f0f0' -pointsize 18 "${ARGS[@]}" -tile "${COLS}x" -geometry +6+6 "$OUT"
+node scripts/engine-numbers.mjs --check 2>&1 | grep STALE || true
 if [ "$CAPCHECK" = 1 ]; then
   node scripts/render-frames.mjs "$COMP" "$TMP/mask" "$TIMES" --scale="$SCALE" --props='{"capcheck":"mask"}' ${PASS[@]+"${PASS[@]}"} > "$TMP/mask.txt" 2>/dev/null || true
   paste -d' ' "$TMP/list.txt" <(awk '{print $3}' "$TMP/mask.txt") > "$TMP/cc.txt" 2>/dev/null && python3 scripts/capcheck.py "$TMP/cc.txt" --quiet || true

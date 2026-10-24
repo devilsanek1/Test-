@@ -8,7 +8,8 @@
 
 import React from 'react';
 import {palette, stroke} from '../theme';
-import {rng, Seed} from '../rng';
+import {rand, rng, Seed} from '../rng';
+import {useTime} from '../time';
 import {Ink} from '../Ink';
 import {Fill} from '../Fill';
 import {Window} from './Window';
@@ -40,6 +41,12 @@ export type BuildingProps = {
   /** Total build time budget (s). Default ~2.2. */
   span?: number;
   width?: number;
+  /** Evening: from this time a seeded `lit` fraction of the windows switch on one by one (1-frame pops to `litColor`,
+   *  spread over `litSpan` s, random order). */
+  lightAt?: number;
+  lit?: number;
+  litColor?: string;
+  litSpan?: number;
 };
 
 export const Building: React.FC<BuildingProps> = ({
@@ -61,8 +68,15 @@ export const Building: React.FC<BuildingProps> = ({
   door,
   span = 2.2,
   width = stroke.ink,
+  lightAt,
+  lit = 0.55,
+  litColor = palette.peach,
+  litSpan = 0.8,
 }) => {
+  const t = useTime();
   const r = rng(`bld/${seed}`);
+  // the rng sequence must not depend on time: the default glass is always drawn first, then maybe overridden
+  const litGlass = (g: string, key: string) => (lightAt !== undefined && rand(key, 'on') < lit && t >= lightAt + rand(key, 't') * litSpan ? litColor : g);
   const H = floors * floorH;
   const top = y - H;
   const cols = colsIn ?? Math.max(1, Math.round(w / (win === 'wide' ? 150 : 95)));
@@ -148,7 +162,7 @@ export const Building: React.FC<BuildingProps> = ({
           h={wh}
           at={T(0.75 + wi * (0.9 / Math.max(1, floors * cols)))}
           seed={`${seed}/w${f}/${c}`}
-          glass={glass ?? (r.chance(0.15) ? palette.teal : r.chance(0.12) ? palette.cream : palette.mintPale)}
+          glass={litGlass(glass ?? (r.chance(0.15) ? palette.teal : r.chance(0.12) ? palette.cream : palette.mintPale), `${seed}/lit${f}/${c}`)}
           panes={win === 'grid' ? 2 : win === 'wide' ? 3 : r.chance(0.5) ? 2 : 1}
           transom={win === 'grid' ? 0.35 : undefined}
           sill={!balc(f) && r.chance(0.6)}

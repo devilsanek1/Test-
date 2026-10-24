@@ -16,8 +16,8 @@
 // Transition types (transitionIn of the INCOMING scene; c = its start):
 //   cut              hard cut at c.
 //   matchcut         hard cut at c; the two scenes put their shared object (sun, horizon, a door) in the same place.
-//   camera-continuous  the outgoing camera move accelerates into the cut (last third of dur, ease-in cubic) and the
-//                    incoming scene continues it with the SAME velocity and decelerates over the other two thirds
+//   camera-continuous  the outgoing camera move accelerates into the cut (dur / 2 before it, ease-in cubic) and the
+//                    incoming scene continues it with the SAME velocity and decelerates over dur after it
 //                    (out-cubic, n = 3): one weighty move, no whip-and-stop. {dur = 1.4, dir: 'in' | 'out' | 'up' |
 //                    'down' | 'left' | 'right' = 'in', amount? (incoming travel: zoom factor <= 1.15 or px <= 150),
 //                    focus?: [x, y] (outgoing push target), to?: [x, y] (incoming push target)}. The incoming scene
@@ -110,13 +110,14 @@ const C: Pt = [world.w / 2, world.h / 2];
 const PT_HOLD = 0.1;
 
 function camCont(tr: Extract<FilmTransition, {type: 'camera-continuous'}>): {dOut: number; dIn: number; out: (u: number) => StageCam; in: (v: number) => StageCam} {
-  // One continuous, weighty move: the outgoing leg (last third) accelerates with ease-in cubic, the incoming leg (two
-  // thirds) continues at the SAME velocity and decelerates with out-cubic (n = 3), so the settle lasts 2/3 of dur.
+  // One continuous, weighty move: the outgoing leg (dur / 2 before the cut) accelerates with ease-in cubic, the
+  // incoming leg (dur after the cut = 2x the outgoing one) continues at the SAME velocity and decelerates with
+  // out-cubic (n = 3): a long settle (0.6-1.2 s for 0.6-1.2 s transitions), never a whip-and-stop.
   // Matched velocity at the cut: 3 * travelOut / dOut = n * travelIn / dIn  =>  travelOut = travelIn * dOut / dIn.
   // The incoming travel is bounded by the bleed (world.bleed 140 px, ~12 % zoom); the outgoing one follows from it.
   const d = tdur(tr);
-  const dOut = d / 3;
-  const dIn = d - dOut;
+  const dOut = d / 2;
+  const dIn = d;
   const n = 3;
   const dir = tr.dir ?? 'in';
   const k = Math.min(1, d / 1.4);
@@ -193,8 +194,9 @@ export const FigureWiper: WiperComponent = ({x, p, dir, color = palette.tealDark
   return (
     <g transform={`rotate(${lean} ${x} 1920)`}>
       <Fill d={torso(x, 2060, W, 1430, 0.42, 0.04)} color={color} offset={false} exit={false} />
-      <Fill d={blob(hx - R * 0.96, hy + 40, 70, 105, {seed: 'fwE1'})} color={palette.sand} offset={false} exit={false} />
-      <Fill d={blob(hx + R * 0.96, hy + 40, 70, 105, {seed: 'fwE2'})} color={palette.sand} offset={false} exit={false} />
+      {/* a hood around the head: one dark silhouette over the caption band (no skin-coloured ears at caption height) */}
+      <Fill d={blob(hx, hy + 70, R * 1.16, R * 1.12, {seed: 'fwHd', wobble: 0.01})} color={color} offset={false} exit={false} />
+      <Ink d={circle(hx, hy + 70, R * 1.14, {seed: 'fwHdi', overlap: 20})} width={stroke.inkBold + 0.4} exit={false} />
       <Fill d={blob(hx, hy, R, R, {seed: 'fwH', wobble: 0.015})} color={palette.ink} offset={false} exit={false} />
       <Ink d={torso(x, 2060, W, 1430, 0.42, 0.04)} width={stroke.inkBold + 0.4} exit={false} />
       <Ink d={circle(hx, hy, R, {seed: 'fwHi', overlap: 20})} width={stroke.inkBold + 0.4} exit={false} />
@@ -205,14 +207,13 @@ export const FigureWiper: WiperComponent = ({x, p, dir, color = palette.tealDark
   );
 };
 
-/** Over the caption band the figure is its dark head (white captions) with sand ears at its sides (ink captions). */
-FigureWiper.captionRegions = ({x, p, dir}) => {
+/** Over the caption band the figure is one dark silhouette (head in its hood): white captions on it. */
+FigureWiper.captionRegions = ({x, p, dir, color = palette.tealDark}) => {
   const {hy, lean, R} = figureGeo(x, p, dir);
   const transform = `rotate(${lean} ${x} 1920)`;
-  return [
-    {tone: 'dark', d: ellipseD(x - R * 0.96, hy + 40, 72, 107) + ellipseD(x + R * 0.96, hy + 40, 72, 107), transform},
-    {tone: 'light', d: ellipseD(x, hy, R + 3, R + 3), transform},
-  ];
+  const t = toneOn(color) === 'light' ? 'light' : 'dark';
+  // + the outline stroke and the blob wobble
+  return [{tone: t, d: ellipseD(x, hy + 70, R * 1.16 + 6, R * 1.12 + 6) + ellipseD(x, hy, R + 6, R + 6), transform}];
 };
 
 /** A near-camera post sliding past (lateral truck). */
@@ -338,9 +339,10 @@ export function toneRegionsAt(scenes: FilmScene[], T: number, wipers: Record<str
         dir === 'right'
           ? [{tone: tNew, rect: [-200, -200, cx, 2200]}, {tone: tOld, rect: [cx, -200, 1300, 2200]}]
           : [{tone: tOld, rect: [-200, -200, cx, 2200]}, {tone: tNew, rect: [cx, -200, 1300, 2200]}];
-      const W = (el === 'scene' ? wipers[prev.id] : BUILTIN_WIPERS[el]) as WiperComponent | undefined;
+      // the same component Film draws (a scene without its own Wiper falls back to the figure)
+      const W = ((el === 'scene' ? wipers[prev.id] : BUILTIN_WIPERS[el]) ?? FigureWiper) as WiperComponent;
       const props: WiperProps = {x, p, dir, color: tr.color};
-      let wr: ToneRegion[] = W?.captionRegions ? W.captionRegions(props) : [{tone: tr.color ? toneOn(tr.color) : 'light', rect: [x - 90, -200, x + 90, 2200]}];
+      let wr: ToneRegion[] = W.captionRegions ? W.captionRegions(props) : [{tone: tr.color ? toneOn(tr.color) : 'light', rect: [x - 90, -200, x + 90, 2200]}];
       if (tr.captionTone) wr = wr.map((r) => ({...r, tone: tr.captionTone!}));
       const all = [...sides, ...wr];
       return uniform(all) ? null : all;
@@ -620,7 +622,17 @@ export const Standalone: React.FC<{
   const exit = unbuild ? prog(T, unbuild.at, unbuild.dur ?? MOTION.unbuild.total) : 0;
   const scene: FilmScene = {id: 'standalone', start: 0, end: 1e9, captionTone: tone};
   const info = {id: 'standalone', start: 0, end: 1e9, dur: 1e9};
-  const loopT = (t: number) => (loop && t >= loop.at - 0.35 ? t - loop.at : t);
+  const loopT = (t: number) => (loop && t >= loop.at ? t - loop.at : t);
+  // the loop's caption tone follows the collapsing slab edge (old tone below it, the opening tone above it)
+  const regions = (t: number): ToneRegion[] | null => {
+    if (loop && unbuild && t >= unbuild.at && t < loop.at) {
+      const k = E.inCubic(exitFillProgress(prog(t, unbuild.at, unbuild.dur ?? MOTION.unbuild.total), 0, 1));
+      const a = toneAt([scene], t);
+      const b = toneAt([scene], -1e-3);
+      if (k > 0 && a !== b) return [{tone: a, rect: FULL}, {tone: b, rect: [-200, -200, 1300, skyEdgeY(k)]}];
+    }
+    return sceneToneRegions(scene, loopT(t));
+  };
   const capMask = capcheckMode() === 'mask';
   return (
     <TimeProvider global={T} offset={0}>
@@ -643,7 +655,7 @@ export const Standalone: React.FC<{
           <SkyCaptions
             beats={captions}
             tone={(t) => toneAt([scene], loopT(t))}
-            regions={(t) => sceneToneRegions(scene, loopT(t))}
+            regions={regions}
             loopAt={loop ? loop.at - 0.3 : undefined}
           />
         ) : null}

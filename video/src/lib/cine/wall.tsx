@@ -20,7 +20,7 @@ import {line, Pt} from '../sketch';
 import {ambient, atmos, Tod, TodPalette, todPal} from './atmosphere';
 import {darker} from './city';
 import {Quad, quadMap} from './persp';
-import {gridCells, SwitchEvent, switchTimes, windowPaths, WindowLook} from './windows';
+import {gridCells, SwitchEvent, switchTimes, WinCell, windowPaths, WindowLook} from './windows';
 import {PathBuf} from './util';
 import {exitScale, inkOn, isPaper, lookPaint, toScreen, useCineState, xfScale} from './state';
 import type {Mat} from '../xf';
@@ -38,6 +38,44 @@ export function wallQuadVP(o: {vp: Pt; near: [number, number, number]; farX: num
     [o.farX, nb + (vy - nb) * k],
     [nx, nb],
   ];
+}
+
+export type WallSpec = {quad: Quad; rows: number; cols: number; fw?: number; fh?: number; seed?: Seed; exclude?: [number, number][]; events?: SwitchEvent[]; initial?: number};
+
+const WALL_TIMES = new Map<string, {index: Map<string, number>; cells: WinCell[]; times: Float64Array[]}>();
+
+/** Is window (row, col) of a WallOfWindows with these props lit at time t (same cells, seeds and switch order as the
+ *  wall itself)? Lets a close-up drawn over a cell light up exactly when the grid would. */
+export function wallCellOn(o: WallSpec, row: number, col: number, t: number): boolean {
+  const key = JSON.stringify([o.quad, o.rows, o.cols, o.fw, o.fh, o.seed, o.exclude, o.events]);
+  let v = WALL_TIMES.get(key);
+  if (!v) {
+    const ex = new Set((o.exclude ?? []).map(([r, c]) => `${r},${c}`));
+    const all = gridCells({rows: o.rows, cols: o.cols, fw: o.fw ?? WALL_FW, fh: o.fh ?? WALL_FH, jitter: 0}, o.seed ?? 'wall', o.quad);
+    const index = new Map<string, number>();
+    const cells: WinCell[] = [];
+    all.forEach((c, i) => {
+      const k = `${Math.floor(i / o.cols)},${i % o.cols}`;
+      if (ex.has(k)) return;
+      index.set(k, cells.length);
+      cells.push(c);
+    });
+    v = {index, cells, times: switchTimes(cells, o.events ?? [], `${o.seed ?? 'wall'}/sw`)};
+    if (WALL_TIMES.size > 16) WALL_TIMES.clear();
+    WALL_TIMES.set(key, v);
+  }
+  const i = v.index.get(`${row},${col}`);
+  if (i === undefined) return false;
+  let on = v.cells[i].k < (o.initial ?? 0);
+  let since = -1e9;
+  (o.events ?? []).forEach((ev, e) => {
+    const sw = v!.times[e][i];
+    if (sw === sw && t >= sw && sw >= since) {
+      on = ev.to === 'on';
+      since = sw;
+    }
+  });
+  return on;
 }
 
 /** Uniform screen scale of the current layer (1 = rest). */

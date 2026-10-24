@@ -33,6 +33,7 @@ import {mat, Mat, XG} from './xf';
 import {Ease, ease as E, clamp, prog, useTime} from './time';
 import {exitFillProgress, useExit} from './exit';
 import {Tod} from './tod';
+import {MOTION} from './spec';
 import type {Pt} from './sketch';
 
 export type SkyWipe = 'down' | 'up' | 'left' | 'right' | 'snap';
@@ -221,8 +222,8 @@ const SkyLayer: React.FC<{keys: NKey[]; rect: [number, number, number, number]; 
 export function worldPushMat(push: WorldPush | boolean | undefined, t: number): Mat {
   if (!push) return mat.I;
   const p = push === true ? {} : push;
-  const to = p.to ?? 1.06;
-  const q = prog(t, p.at ?? 0, p.dur ?? 2, p.ease ?? E.inOutSine);
+  const to = p.to ?? MOTION.camera.push.to;
+  const q = prog(t, p.at ?? 0, p.dur ?? MOTION.camera.push.dur, p.ease ?? MOTION.camera.push.ease);
   if (q <= 0 || to === 1) return mat.I;
   return stageMat(zoomAbout(p.anchor ?? world.vp, Math.exp(Math.log(to) * q)));
 }

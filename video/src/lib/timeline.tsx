@@ -33,7 +33,18 @@ import {card, palette, panel, stroke} from './theme';
 import {ease as E, lerp, prog, TimeProvider} from './time';
 import {rect as sketchRect} from './sketch';
 
-export type TransitionType = 'cut' | 'match' | 'flip' | 'swipe' | 'push' | 'zoom' | 'crossfade' | 'unbuild' | 'sheet';
+/** v1 CARD transitions (legacy; the film uses Film / FilmTransition, which has no fades).
+ *  'crossfade' and 'zoom' animate opacity: @deprecated, never use them in the film. */
+export type TransitionType =
+  | 'cut'
+  | 'match'
+  | 'flip'
+  | 'swipe'
+  | 'push'
+  | /** @deprecated animates opacity (a fade) */ 'zoom'
+  | /** @deprecated animates opacity (a fade) */ 'crossfade'
+  | 'unbuild'
+  | 'sheet';
 export type Transition = {
   type: TransitionType;
   dur?: number;

@@ -9,6 +9,8 @@ Quality bar: top-tier editorial motion design that people rewatch and share. Eve
 lossless, 77.76 s; same script, slower pacing, about +7 s by the end). `assets/timing.json` is being rebuilt for it (the old
 take's timing is kept as `assets/timing_v1.json`). Anything timed to the old take (storyboard, cues) is mapped onto the new
 one with `scripts/timewarp.py` (word-anchored, piecewise-linear). The video is now ~78 s long.
+APPROVED BY THE USER: the treated voice (`audio/vo_clean.wav`, chain in `audio/tools/vo_clean.py`) and the subtler
+cinematic bed (`audio/music_cinematic.wav`; near-silent first ~10.7 s). Don't change the voice chain without asking.
 
 ## BALANCE NOTE (from the user, latest; read this first): "Don't overdo it. It should be nuanced, and we still target TikTok / Reels."
 How to apply the cinematic direction below with restraint:

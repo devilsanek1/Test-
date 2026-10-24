@@ -202,8 +202,9 @@ export type PerspectiveStreetProps = {
   sides?: 'both' | 'left' | 'right';
   /** Building height range (world units). */
   heights?: [number, number];
-  /** Pole spacing (world units, 0 = none). */
+  /** Pole spacing (world units, 0 = none) and height (world units; keep pole tops under the caption band). */
   poles?: number;
+  poleH?: number;
   /** String lights zig-zag across the street between poles. */
   lights?: boolean;
   lightsOn?: {at: number; dur?: number};
@@ -234,6 +235,7 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
   sides = 'both',
   heights = [700, 1700],
   poles = 1400,
+  poleH = 950,
   lights = true,
   lightsOn,
   windows,
@@ -350,7 +352,7 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
   if (poles > 0) {
     for (let z = zNear + poles * 0.5; z < zFar * 0.3; z += poles) {
       const k = f / z;
-      const ph = 950;
+      const ph = poleH;
       const l: Pt = S(-road - 40, ph, z);
       const rr: Pt = S(road + 40, ph, z);
       tops.push({l, r: rr, k});

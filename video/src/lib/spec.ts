@@ -10,6 +10,7 @@
 //   (so it COMPLETES on the word) | check/cross marks +0.0 | answer panel -0.25 | sun beat / bounce / hop +-0.05.
 
 import {Easing} from 'remotion';
+import {ease as E} from './time';
 import type {Ease} from './time';
 
 /** CSS cubic-bezier(x1, y1, x2, y2) as an easing function (Remotion's implementation). */
@@ -54,8 +55,19 @@ export const MOTION = {
   matchZoom: {in: 4 / 30, hold: 3 / 30, out: 6 / 30},
   /** Un-build recipe (all ease-in): lines loosen 3 f, fills shrink 5-6 f, ink retracts 4 f, slab collapses 5 f. */
   unbuild: {loose: 0.1, fillShrink: 0.18, inkRetract: 0.13, slabCollapse: 0.17, total: 0.5},
-  /** Long, weighty camera moves (cinematic direction): 2-6 s in-out. */
-  camera: {min: 2, max: 6, ease: bez(0.45, 0, 0.2, 1)},
+  /** THE camera vocabulary (one for both kits: the cine CAM presets should alias these). Long, weighty moves 2-6 s.
+   *  ease: default in-out move | slow: very long moves (4-6 s) | reveal: crane / tilt reveal | settle: a move that
+   *  starts in motion (continuing a transition) and lands softly | push: reference 2's per-shot gentle zoom
+   *  (World `push`, ShotCam `push`: +6 % over 2 s, in-out sine; ref 2 measured +1.3...+5.9 %, 1.0-3.3 s). */
+  camera: {
+    min: 2,
+    max: 6,
+    ease: bez(0.45, 0, 0.2, 1),
+    slow: E.inOutSine,
+    reveal: E.inOutQuart,
+    settle: E.outCubic,
+    push: {to: 1.06, dur: 2, ease: E.inOutSine},
+  },
 } as const;
 
 /** Duration of one pen stroke of `len` px (0.10-0.20 s). */

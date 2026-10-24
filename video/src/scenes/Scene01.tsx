@@ -6,7 +6,7 @@ import {World, Sun, Fill, Ink, Plane, wallQuad, Building, BrowserWindow, hline, 
 const VP: [number, number] = [540, world.horizon];
 
 const Scene01: React.FC = () => (
-  <World sky={skies.day}>
+  <World sky={skies.day} push>
     <Sun rise={{at: 0, from: [540, 1000]}} cx={540} cy={820} horizon={world.horizon} beats={[1.33, 2.28]} drift={[8, 0]} />
     <Fill rect={[-200, world.horizon, 1480, 1300]} color={palette.mintPale} offset={false} />
     <Ink d={hline(-60, 1140, world.horizon, {seed: 's1h'})} width={stroke.ink} at={0.05} />

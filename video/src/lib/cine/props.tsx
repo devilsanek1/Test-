@@ -363,15 +363,17 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod 
   const lampX = w * 0.64;
   const deskY = h * 0.6;
   const mon = {x: w * 0.47, y: h * 0.42, w: w * 0.36, h: h * 0.15};
-  const frameC = palette.cream;
+  // an unlit window keeps the cool night values (frame sage, curtain teal): captions can sit on it
+  const frameC = on || lit ? palette.cream : palette.sage;
   const ink = rect(-fr, -fr, w + fr * 2, h + fr * 2, {seed: `${seed}/o`, over: 'medium'}) + rect(0, 0, w, h, {seed: `${seed}/i`, over: 'small'}) + hline(-fr - 30, w + fr + 30, h + fr + 14, {seed: `${seed}/s`, over: [20, 30]}) + hline(-fr - 24, w + fr + 24, h + fr + 30, {seed: `${seed}/s2`, over: [10, 20]});
   const tr = hline(0, w, h * 0.3, {seed: `${seed}/tr`, over: [2, 4]}) + hline(0, w, h * 0.3 + 14, {seed: `${seed}/tr2`, over: [2, 4]});
   const curtainW = lit ? 0.17 : rr.range(0.3, 0.46);
   const curtain = `M0 0L${w * curtainW} 0Q${w * (curtainW + 0.03)} ${h * 0.4} ${w * (curtainW - 0.04)} ${h * 0.72}L0 ${h * 0.74}Z`;
   const chairX = w * 0.3;
-  const chairW = w * 0.34;
-  const chairY = h * 0.78;
-  const chairInk = rect(chairX - chairW / 2, chairY, chairW, h * 0.16, {seed: `${seed}/ch`, over: 'small'}) + `M${chairX - chairW * 0.36} ${chairY + h * 0.16}L${chairX - chairW * 0.36} ${h}M${chairX + chairW * 0.36} ${chairY + h * 0.16}L${chairX + chairW * 0.36} ${h}`;
+  const chairW = w * 0.3;
+  const chairY = h * 0.8;
+  const chairH = h * 0.12;
+  const chairInk = rect(chairX - chairW / 2, chairY, chairW, chairH, {seed: `${seed}/ch`, over: 'small'}) + `M${chairX - chairW * 0.36} ${chairY + chairH}L${chairX - chairW * 0.36} ${h}M${chairX + chairW * 0.36} ${chairY + chairH}L${chairX + chairW * 0.36} ${h}`;
   const lamp = `M${lampX - 34} ${h * 0.2}L${lampX + 34} ${h * 0.2}L${lampX + 20} ${h * 0.14}L${lampX - 20} ${h * 0.14}Z`;
   const web = textLines(mon.x + 16, mon.y + 38, mon.w - 32, {seed: `${seed}/web`, n: 3, gap: 16});
   const plant = crown(w * 0.8, h + fr - 46, 38, 30, {seed: `${seed}/pl`, bumps: 7});
@@ -387,7 +389,7 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod 
       {/* desk + monitor (the website) */}
       {desk ? (
         <>
-          <rect x={w * 0.22} y={deskY - 8} width={w * 0.78} height={16} fill={on ? palette.brown : ambient(palette.teal, p)} />
+          <rect x={w * 0.22} y={deskY - 8} width={w * 0.78} height={16} fill={on ? palette.brown : palette.teal} />
           <rect x={mon.x} y={mon.y} width={mon.w} height={mon.h} fill={palette.ink} />
           <rect x={mon.x + 7} y={mon.y + 7} width={mon.w - 14} height={mon.h - 14} fill={scrOn ? palette.white : ambient(palette.tealDark, p)} />
           {scrOn ? <rect x={mon.x + 7} y={mon.y + 7} width={mon.w - 14} height={16} fill={palette.sage} /> : null}
@@ -399,16 +401,16 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod 
       {person}
       {showChair ? (
         <>
-          <rect x={chairX - chairW / 2 + 3} y={chairY + 2} width={chairW} height={h * 0.16} fill={on ? palette.white : ambient(palette.sage, p)} />
+          <rect x={chairX - chairW / 2 + 3} y={chairY + 2} width={chairW} height={chairH} fill={on ? palette.white : palette.sage} />
           <path d={chairInk} fill="none" stroke={palette.ink} strokeWidth={stroke.ink} strokeLinecap="round" />
         </>
       ) : null}
       {/* curtain, transom bar, plant, glints */}
-      <path d={curtain} fill={on ? palette.sand : ambient(palette.tan, p)} transform={curtainRight ? `translate(${w + 2} 2) scale(-1 1)` : 'translate(2 2)'} />
+      <path d={curtain} fill={on ? palette.sand : lit ? ambient(palette.tan, p) : palette.teal} transform={curtainRight ? `translate(${w + 2} 2) scale(-1 1)` : 'translate(2 2)'} />
       <path d={`M${w * 0.06} 6Q${w * 0.08} ${h * 0.4} ${w * 0.05} ${h * 0.7}M${w * 0.11} 6Q${w * 0.14} ${h * 0.4} ${w * 0.09} ${h * 0.71}`} fill="none" stroke={palette.ink} strokeWidth={2} strokeLinecap="round" />
       <rect x={0} y={h * 0.3} width={w} height={14} fill={frameC} />
-      {plantOn ? <rect x={w * 0.68} y={h + fr - 44} width={58} height={44} fill={palette.brown} /> : null}
-      {plantOn ? <path d={plant} fill={on ? palette.sage : ambient(palette.teal, p)} transform="translate(3 2)" /> : null}
+      {plantOn ? <rect x={w * 0.68} y={h + fr - 44} width={58} height={44} fill={on ? palette.brown : palette.tealDark} /> : null}
+      {plantOn ? <path d={plant} fill={on ? palette.sage : palette.teal} transform="translate(3 2)" /> : null}
       {plantOn ? <Ink d={plant} width={stroke.ink} exit={false} /> : null}
       <path d={glint(w * 0.12, h * 0.26, 70, {seed: `${seed}/g`})} stroke={on ? palette.white : ambient(palette.sage, p)} strokeWidth={4} strokeLinecap="round" />
       <Ink d={ink + tr} width={stroke.ink} exit={false} />

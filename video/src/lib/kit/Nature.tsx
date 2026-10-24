@@ -249,6 +249,8 @@ export type FestoonProps = {
   at?: At;
   /** Bulbs switch on L->R (1 frame apart), each a 1-frame pop to peach with a stepped halo. */
   lightAt?: number;
+  /** Same as the cine StringLights prop: switch-on time, or {at, dur} to spread the L->R switch-on over dur s. */
+  on?: number | {at: number; dur?: number};
   seed?: Seed;
   /** Wire ink width (on screen). Default inkThin. */
   width?: number;
@@ -258,8 +260,9 @@ export type FestoonProps = {
 
 /** A festoon of bulbs on a sagging wire. Wire draws, bulbs pop in L->R, then light up. Built from Ink/Fill only, so
  *  it works inside a <Plane> and un-builds with the scene. */
-export const Festoon: React.FC<FestoonProps> = ({x1, y1, x2, y2, sag = 30, n, bulb = 9, at, lightAt, seed = 'lights', width = stroke.inkThin, color = palette.white, litColor = palette.peach}) => {
+export const Festoon: React.FC<FestoonProps> = ({x1, y1, x2, y2, sag = 30, n, bulb = 9, at, lightAt: lightAtIn, on, seed = 'lights', width = stroke.inkThin, color = palette.white, litColor = palette.peach}) => {
   const t = useTime();
+  const lightAt = lightAtIn ?? (typeof on === 'number' ? on : on?.at);
   const len = Math.hypot(x2 - x1, y2 - y1);
   const count = n ?? Math.max(3, Math.round(len / 70));
   const [b0, b1] = Array.isArray(bulb) ? bulb : [bulb, bulb];
@@ -270,12 +273,13 @@ export const Festoon: React.FC<FestoonProps> = ({x1, y1, x2, y2, sag = 30, n, bu
     const r = lerp(b0, b1, u);
     const by = by0 + r * 1.25;
     const bAt = b(at, 0.15 + i * (1 / 30));
-    const on = lightAt !== undefined && t >= lightAt + i * (1 / 30);
+    const step = typeof on === 'object' && on.dur !== undefined ? on.dur / Math.max(1, count - 1) : 1 / 30;
+    const lit = lightAt !== undefined && t >= lightAt + i * step;
     out.push(
       <React.Fragment key={i}>
-        {on ? <Fill d={blob(bx, by, r * 2.5, r * 2.5, {seed: `${seed}/h${i}`})} color={litColor} opacity={0.22} offset={false} seed={`${seed}/hf${i}`} /> : null}
-        {on ? <Fill d={blob(bx, by, r * 1.7, r * 1.7, {seed: `${seed}/g${i}`})} color={litColor} opacity={0.3} offset={false} seed={`${seed}/gf${i}`} /> : null}
-        <Fill d={blob(bx, by, r, r * 1.08, {seed: `${seed}/b${i}`})} color={on ? litColor : color} at={bAt} mode="snap" offset={[r * 0.15, r * 0.12]} seed={`${seed}/bf${i}`} />
+        {lit ? <Fill d={blob(bx, by, r * 2.5, r * 2.5, {seed: `${seed}/h${i}`})} color={litColor} opacity={0.22} offset={false} seed={`${seed}/hf${i}`} /> : null}
+        {lit ? <Fill d={blob(bx, by, r * 1.7, r * 1.7, {seed: `${seed}/g${i}`})} color={litColor} opacity={0.3} offset={false} seed={`${seed}/gf${i}`} /> : null}
+        <Fill d={blob(bx, by, r, r * 1.08, {seed: `${seed}/b${i}`})} color={lit ? litColor : color} at={bAt} mode="snap" offset={[r * 0.15, r * 0.12]} seed={`${seed}/bf${i}`} />
         {r > 3 ? <Ink d={`M${bx.toFixed(1)} ${(by0 - 1).toFixed(1)}L${bx.toFixed(1)} ${(by - r * 0.8).toFixed(1)}` + circle(bx, by, r, {seed: `${seed}/bi${i}`, overlap: 8})} at={bAt} width={Math.min(width, r * 0.35)} /> : null}
       </React.Fragment>,
     );
