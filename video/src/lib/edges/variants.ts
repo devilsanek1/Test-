@@ -3,15 +3,18 @@
 // amount); memoised, so the shapes are computed once per (variant, seed, amount) and never move.
 
 import {rng, Seed} from '../rng';
-import {line, Pt} from '../sketch';
-import {skyCaption, stroke, world} from '../theme';
+import type {Pt} from '../sketch';
+import {stroke, world} from '../theme';
 import {containsRect, cutPoly, cutSide, organic, pathOf, roundRectPts, smoothClosed} from './rough';
-import type {Rng} from '../rng';
+import {CAPTION_SAFE, EdgeStroke, H, ruled, ruledCorner, STROKE_MAX_Y, W} from './shared';
+import {PAINT_LOOSENESS, PaintPreset, paintSpec} from './paint';
 
-export type EdgeVariant = 'clean' | 'panel' | 'vignette' | 'construction' | 'rough-tb' | 'trim';
-export const EDGE_VARIANTS: EdgeVariant[] = ['clean', 'panel', 'vignette', 'construction', 'rough-tb', 'trim'];
+export {CAPTION_SAFE, PHONE_UI} from './shared';
+export type {EdgeStroke} from './shared';
 
-export type EdgeStroke = {d: string; w: number; taper?: boolean};
+/** 'paint' takes its looseness from `amount` (1 = medium); the three presets are named points on that scale. */
+export type EdgeVariant = 'clean' | 'panel' | 'vignette' | 'construction' | 'rough-tb' | 'trim' | 'paint' | PaintPreset;
+export const EDGE_VARIANTS: EdgeVariant[] = ['clean', 'panel', 'vignette', 'construction', 'rough-tb', 'trim', 'paint', 'paint-subtle', 'paint-medium', 'paint-loose'];
 
 export type EdgeSpec = {
   variant: EdgeVariant;
@@ -23,6 +26,10 @@ export type EdgeSpec = {
    *  absent = the line art runs off the screen. */
   ink?: string | null;
   inkPts?: Pt[] | null;
+  /** 'paint': the colour / ink clips are UNIONS of blocks (nonzero subpaths, all clockwise); these are the blocks
+   *  (colourPts is then the top band alone, which holds the caption block). */
+  colourPolys?: Pt[][];
+  inkPolys?: Pt[][];
   /** Hand-drawn overlay strokes (screen px), drawn above both layers and below the captions. */
   strokes: EdgeStroke[];
 };
@@ -32,57 +39,11 @@ export type EdgeOpts = {
   vp?: Pt;
 };
 
-const W = world.w;
-const H = world.h;
-
-/** Screen rect the captions can occupy (hook pages are 1.06x): every colour clip must contain it, so a caption is
- *  always over the scene's own sky (white captions on a paper margin would vanish). */
-export const CAPTION_SAFE: [number, number, number, number] = (() => {
-  const half = (skyCaption.maxWidth * 1.06) / 2 + 20;
-  return [Math.round(skyCaption.cx - half), skyCaption.clipTop - 22, Math.round(skyCaption.cx + half), skyCaption.clipBottom + 24];
-})();
-
 const dir = (a: Pt, b: Pt): Pt => {
   const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
   return [(b[0] - a[0]) / l, (b[1] - a[1]) / l];
 };
 const add = (p: Pt, u: Pt, k: number): Pt => [p[0] + u[0] * k, p[1] + u[1] * k];
-
-/** A ruled stroke from a to b (no auto overshoot: the caller sets the ends), drifting a hair, never broken. */
-const ruled = (a: Pt, b: Pt, seed: string, drift = 0.25) => line(a[0], a[1], b[0], b[1], {seed, over: 'none', drift, bow: 1.2, jitter: 0.6, breaks: false});
-
-// ---------------------------------------------------------------- shared: the corner strokes
-
-/** The artist's ruled corner: one or two thin ruled lines along the cut edges near a corner, sitting 2-4 px OUT in the
- *  paper (misregistered from the colour like every fill in the style) and overshooting the corner into the margin.
- *  `h` = the horizontal (along the top cut) and `v` = the vertical (along the side cut); each is optional.
- *  sx = +1 for a left corner, -1 for a right one. Single strokes, no re-strokes. */
-function ruledCorner(
-  r: Rng,
-  key: string,
-  c: Pt,
-  sx: 1 | -1,
-  o: {h?: {len: [number, number]; over: number}; v?: {len: [number, number]; over: number}},
-): EdgeStroke[] {
-  const out: EdgeStroke[] = [];
-  const m = r.range(2.5, 4); // out into the paper
-  if (o.h) {
-    const y = c[1] - m;
-    const x0 = c[0] + sx * r.range(o.h.len[0], o.h.len[1]);
-    const x1 = c[0] - sx * o.h.over;
-    out.push({d: ruled([x0, y + r.jitter(0.6)], [x1, y + r.jitter(0.6)], `${key}h`, 0.2), w: stroke.inkThin});
-  }
-  if (o.v) {
-    const x = c[0] - sx * m;
-    const y0 = c[1] + r.range(o.v.len[0], o.v.len[1]);
-    const y1 = c[1] - o.v.over;
-    out.push({d: ruled([x + r.jitter(0.6), y0], [x + r.jitter(0.6), y1], `${key}v`, 0.2), w: stroke.inkThin});
-  }
-  return out;
-}
-
-/** Lowest y a stroke near the left / right frame edge may reach: just above the caption block. */
-const STROKE_MAX_Y = CAPTION_SAFE[1] - 12;
 
 // ---------------------------------------------------------------- panel
 
@@ -329,6 +290,10 @@ export function edgeSpec(variant: EdgeVariant, seed: Seed = 'edge', amount = 1, 
   else if (variant === 'vignette') s = vignette(seed, a);
   else if (variant === 'construction') s = construction(seed, a, o);
   else if (variant === 'rough-tb') s = roughTB(seed, a);
+  else if (variant === 'paint' || variant in PAINT_LOOSENESS) {
+    const g = paintSpec(seed, variant === 'paint' ? a : PAINT_LOOSENESS[variant as PaintPreset] * a);
+    s = {variant, colour: g.colour, colourPts: g.colourPts, colourPolys: g.colourPolys, ink: g.ink, inkPolys: g.inkPolys, strokes: g.strokes};
+  }
   else s = trim(seed, a);
   CACHE.set(key, s);
   return s;

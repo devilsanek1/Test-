@@ -10,7 +10,9 @@ Checks: scene tiling and lengths; captions reproduce the transcript word for wor
 against word starts; line count, characters and measured width (Patrick Hand at the sky-caption size); page
 lengths; scene boundaries inside pauses; transition windows; element ids (incl. `inheritsElements` and
 `contains`), persist ids, beat id references; camera segments (sequence, continuity, labels, coverage, cuts);
-match-cuts (`transitionIn.match`: the match object keeps screen position and size across the cut);
+match-cuts (`transitionIn.match`: the match object keeps screen position and size across the cut); labels (hold >= 1.5 s,
+`holdAloneBefore`, `carriesInto` / `continues` across a cut); cuts on a word boundary when the take has no pause there
+(accepted via `acceptedPhraseBoundaries`); short scenes accepted via `acceptedShortScenes`;
 SKY CEILING (every `ceiling` item and every `sunKeys` disc projected through every camera keyframe must stay
 at screen y >= 560 inside x 90-990); sun character beats on their word (+-0.05 s); mascot poses vs docs/mascot.md;
 beat gaps. Exit code 1 on any blocker/major.
@@ -84,6 +86,8 @@ CAP_MAX = band.get('maxWidth', 850)
 WIDE_OK = set(band.get('acceptedWide', []))
 SHORT_OK = set(SB.get('acceptedShortPages', []))
 LONG_OK = set(SB.get('acceptedLongScenes', []))
+SHORT_SCENES_OK = set(SB.get('acceptedShortScenes', []))
+PHRASE_OK = set(SB.get('acceptedPhraseBoundaries', []))
 
 print('=' * 20, 'TILING')
 if abs(scenes[0]['start']) > 1e-6:
@@ -95,7 +99,7 @@ if abs(scenes[-1]['end'] - DUR) > 1e-6:
     issue('blocker', scenes[-1]['id'], f"last end {scenes[-1]['end']} != {DUR}")
 for s in scenes:
     d = s['end'] - s['start']
-    if not (3.5 - 1e-6 <= d <= 8.0 + 1e-6) and s['id'] not in LONG_OK:
+    if not (3.5 - 1e-6 <= d <= 8.0 + 1e-6) and s['id'] not in LONG_OK and not (d < 3.5 and s['id'] in SHORT_SCENES_OK):
         issue('minor', s['id'], f'duration {d:.2f}s outside 3.5-8 s')
 print(f'  {len(scenes)} scenes')
 
@@ -171,9 +175,16 @@ P = TM['pauses']
 for a, b in zip(scenes, scenes[1:]):
     t = a['end']
     hit = [p for p in P if p['s'] - 1e-6 <= t <= p['e'] + 1e-6]
-    if not hit:
+    # a take with no (or a sub-threshold) pause between two words: a cut placed on that word boundary (a gap anchor)
+    seam = next((i for i in range(len(W) - 1) if W[i]['e'] - 0.002 <= t <= W[i + 1]['s'] + 0.002 and W[i + 1]['s'] - W[i]['e'] < 0.1), None)
+    if not hit and seam is not None:
+        if b['id'] not in PHRASE_OK:
+            issue('minor', f"{a['id']}/{b['id']} {t}", f"on the word boundary '{W[seam]['w']}' | '{W[seam + 1]['w']}' (this take has no pause there)")
+        elif not args.quiet:
+            print(f"  ok {a['id']}/{b['id']} {t}: accepted word-boundary cut '{W[seam]['w']}' | '{W[seam + 1]['w']}' (no pause in this take)")
+    elif not hit:
         issue('major', f"{a['id']}/{b['id']} {t}", 'boundary not inside a pause')
-    elif hit[0]['kind'] != 'sentence' and b['id'] not in set(SB.get('acceptedPhraseBoundaries', [])):
+    elif hit[0]['kind'] != 'sentence' and b['id'] not in PHRASE_OK:
         issue('minor', f"{a['id']}/{b['id']} {t}", f"'{hit[0]['kind']}' pause, not a sentence end")
     tr = b['transitionIn']
     if 't0' in tr and 't1' in tr:  # numeric window wins over prose (prose is not warped by scripts/timewarp.py)
@@ -357,6 +368,29 @@ for s in scenes:
 for m in set(cand.findall(SB['mascot']['design'])):
     if m not in poses:
         issue('major', 'root mascot.design', f"pose '{m}' not in docs/mascot.md")
+
+print('=' * 20, 'LABELS')
+labs = [(s, l) for s in scenes for l in s.get('labels', [])]
+for s, l in labs:
+    hold = l['out'] - l['at']
+    if l.get('carriesInto'):
+        nxt = [x for t, x in labs if x['id'] == l['id'] and t['id'] == l['carriesInto']]
+        hold = nxt[0]['out'] - l['at'] if nxt else hold
+    if l.get('continues'):
+        prv = [x for t, x in labs if x['id'] == l['id'] and t['id'] == l['continues']]
+        hold = l['out'] - prv[0]['at'] if prv else hold
+    if hold < 1.5 - 1e-6:
+        issue('major' if l.get('mandatory') else 'minor', f"{s['id']} label {l['id']}", f'on screen {hold:.2f} s < 1.5 s')
+    if l['at'] < s['start'] - 1e-6 or l['out'] > s['end'] + 1e-6:
+        issue('minor', f"{s['id']} label {l['id']}", f"{l['at']}-{l['out']} outside the scene")
+    ha = l.get('holdAloneBefore')
+    if ha:
+        others = [x['at'] for t, x in labs if x['id'] in ha.get('labels', [])]
+        if others and min(others) - l['at'] < ha.get('min', 1.5) - 1e-6:
+            issue('major', f"{s['id']} label {l['id']}", f"alone {min(others) - l['at']:.2f} s before {ha.get('labels')} (needs {ha.get('min', 1.5)} s)")
+        elif others and not args.quiet:
+            print(f"  ok {l['id']} alone {min(others) - l['at']:.2f} s before {ha.get('labels')}")
+print(f'  {len(labs)} labels')
 
 print('=' * 20, 'BEAT GAPS')
 bt = sorted(b['t'] for s in scenes for b in s['beats'])

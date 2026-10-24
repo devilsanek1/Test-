@@ -92,6 +92,9 @@ written as an anchor, and caption times that may be omitted.
   - A `toneAt` key keeps `wipe` and `dur`.
   - The loop un-build can be structured: a top-level `loop` `{t0, t1, captionAt}`, or the last scene's
     `transitionOut`. The old free-text "un-build (a-b) ... rolled in (c-" note still works.
+  - A structured loop whose `type` is not `unbuild` (the v3 rewind: S12 `transitionOut: {type: 'cut', loop: true,
+    captionAt}`) is emitted as `{type, loop, captionAt}`: no un-build. Film has to honour it (engine request in
+    `docs/storyboard_v3.json`: no un-build, captions still roll back at `captionAt`).
 
 ## 3. resolve.py
 

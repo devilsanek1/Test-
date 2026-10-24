@@ -9,7 +9,9 @@ output, checked by selftest.py against the node scripts):
   * caption `toneAt` keys keep `wipe` / `dur` (ENGINE.md: give a tone key the same wipe as its sky key);
   * the loop un-build can be structured: the last scene's `transitionOut` ({t0, t1} or {dur}, captionAt) or a
     top-level `loop: {t0, t1, captionAt}` (resolved anchors); the free-text "un-build (a-b) ... rolled in (c-" note
-    of the old storyboards still works.
+    of the old storyboards still works;
+  * a structured loop with a `type` other than 'unbuild' (e.g. the v3 rewind: `transitionOut: {type: 'cut', loop: true,
+    captionAt}`) is emitted as that type with `loop` and `captionAt` only: no un-build window is invented.
 """
 import math
 import re
@@ -193,7 +195,15 @@ def scene_rows(sb, vo_dur, caption_rows_out=None, overrides=None, warp_doc=None,
     loop = sb.get('loop')
     tout = last_sb.get('transitionOut') if isinstance(last_sb.get('transitionOut'), dict) else None
     struct = tout or (loop if isinstance(loop, dict) else None)
-    if struct is not None:
+    ttype = struct.get('type') if struct is not None and isinstance(struct.get('type'), str) else 'unbuild'
+    if struct is not None and ttype != 'unbuild':
+        # a full-colour loop seam (e.g. the v3 rewind): no un-build, only the loop flag and the caption roll-back time
+        last['transitionOut'] = {'type': ttype, 'loop': struct.get('loop', True) is not False}
+        if A.is_num(struct.get('dur')):
+            last['transitionOut']['dur'] = r3(struct['dur'])
+        if A.is_num(struct.get('captionAt')):
+            last['transitionOut']['captionAt'] = r3(struct['captionAt'])
+    elif struct is not None:
         src = struct.get('unbuild') if isinstance(struct.get('unbuild'), dict) else struct
         if A.is_num(src.get('t0')) and A.is_num(src.get('t1')):
             dur = r3(src['t1'] - src['t0'])
@@ -244,6 +254,6 @@ def scene_rows(sb, vo_dur, caption_rows_out=None, overrides=None, warp_doc=None,
         if not abs(cap_end - vo_dur) <= 0.002:
             problems.append(f'captions end at {cap_end} s, the voice at {vo_dur} s')
     lt = last['transitionOut']
-    if 'captionAt' in lt and (lt['captionAt'] < last['end'] - lt['dur'] - 0.5 or lt['captionAt'] > last['end']):
-        problems.append(f"loop captionAt {lt['captionAt']} is outside the last scene's un-build ({r3(last['end'] - lt['dur'])}-{last['end']})")
+    if 'captionAt' in lt and (lt['captionAt'] < last['end'] - lt.get('dur', 0) - 0.5 or lt['captionAt'] > last['end']):
+        problems.append(f"loop captionAt {lt['captionAt']} is outside the last scene's loop window ({r3(last['end'] - lt.get('dur', 0) - 0.5)}-{last['end']})")
     return scenes, problems

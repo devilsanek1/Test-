@@ -1,15 +1,14 @@
 [
-  {"id":"S01","start":0,"end":4.823,"transitionIn":{"type":"cut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Government Plaza powers down"},
-  {"id":"S02","start":4.823,"end":11.596,"transitionIn":{"type":"push-through","dur":0.61},"captionTone":[{"t":0,"tone":"dark"}],"note":"Built from one blueprint"},
-  {"id":"S03","start":11.596,"end":17.211,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Two steps"},
-  {"id":"S04","start":17.211,"end":23.671,"transitionIn":{"type":"camera-continuous","dur":1.2,"dir":"in"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Fourteen years of nobody"},
-  {"id":"S05","start":23.671,"end":27.633,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Found it"},
-  {"id":"S06","start":27.633,"end":32.947,"transitionIn":{"type":"cut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"A quiet letter"},
-  {"id":"S07","start":32.947,"end":38.566,"transitionIn":{"type":"foreground-wipe","dur":0.38,"element":"scene","dir":"right"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Pinned for everyone"},
-  {"id":"S08","start":38.566,"end":47.333,"transitionIn":{"type":"camera-continuous","dur":1.9,"dir":"up"},"captionTone":[{"t":0,"tone":"dark"}],"note":"The dome and the flood"},
-  {"id":"S09","start":47.333,"end":52.378,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"light"},{"t":2.482,"tone":"dark"}],"note":"Question marks, then dawn"},
-  {"id":"S10","start":52.378,"end":59.784,"transitionIn":{"type":"camera-continuous","dur":0.25,"dir":"in"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Twenty-two million doors"},
-  {"id":"S11","start":59.784,"end":66.693,"transitionIn":{"type":"push-through","dur":0.56},"captionTone":[{"t":0,"tone":"dark"}],"note":"Shutters down"},
-  {"id":"S12","start":66.693,"end":73.307,"transitionIn":{"type":"foreground-wipe","dur":0.4,"element":"scene","dir":"right"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Too old to fix"},
-  {"id":"S13","start":73.307,"end":77.76,"transitionIn":{"type":"camera-continuous","dur":1.41,"dir":"in"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Switch off, or hope","transitionOut":{"type":"unbuild","dur":0.815,"loop":true,"captionAt":77.589}}
+  {"id":"S01","start":0,"end":4.715,"transitionIn":{"type":"cut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Government Plaza powers down"},
+  {"id":"S02","start":4.715,"end":8.393,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"The takeover diagram"},
+  {"id":"S03","start":8.393,"end":14.17,"transitionIn":{"type":"cut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Built from one blueprint"},
+  {"id":"S04","start":14.17,"end":16.59,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Fourteen years in plain sight"},
+  {"id":"S05","start":16.59,"end":19.773,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Found with AI"},
+  {"id":"S06","start":19.773,"end":21.985,"transitionIn":{"type":"cut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"A heads-up"},
+  {"id":"S07","start":21.985,"end":24.095,"transitionIn":{"type":"foreground-wipe","dur":0.42,"element":"scene","dir":"right"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Word got out"},
+  {"id":"S08","start":24.095,"end":34.483,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Counted from the announcement"},
+  {"id":"S09","start":34.483,"end":39.634,"transitionIn":{"type":"matchcut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Every single server"},
+  {"id":"S10","start":39.634,"end":45.618,"transitionIn":{"type":"foreground-wipe","dur":0.5,"element":"scene","dir":"right"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Half on versions too old"},
+  {"id":"S11","start":45.618,"end":52.163,"transitionIn":{"type":"cut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Just turn it off"},
+  {"id":"S12","start":52.163,"end":55.36,"transitionIn":{"type":"cut"},"captionTone":[{"t":0,"tone":"dark"}],"note":"Before there was even a fix (the rewind)","transitionOut":{"type":"cut","loop":true,"captionAt":55.26}}
 ]
