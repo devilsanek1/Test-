@@ -252,11 +252,11 @@ export const BitRide: React.FC<{plan: BitPlan}> = ({plan}) => {
   if (t < hopAt) {
     const [px, py] = copyPeg(copy, t);
     // riding on the copy's peg like in S07 (size 18 at its zoom 1.06): the same pixels on screen until the camera rests
-    const sz = Math.max(size, (18 * 1.06) / (plan.zoomAt ? plan.zoomAt(t) : 1));
+    const sz = (18 * 1.06) / (plan.zoomAt ? plan.zoomAt(t) : 1);
     const lean = copyLean(copy, t);
     return (
       <XG m={mat.compose(mat.translate(px, py), mat.rotate(lean))}>
-        <Bit x={9 * COPY_S / 0.34} y={-0.5} size={Math.min(sz, size + 5)} state="ride" flip look="forward" seed="s8/bit" />
+        <Bit x={(9 * COPY_S) / 0.34} y={-0.5} size={sz} state="ride" flip look="forward" seed="s8/bit" />
       </XG>
     );
   }

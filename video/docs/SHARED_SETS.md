@@ -7,7 +7,9 @@
 import {GovernmentPlaza, PLAZA, StoopStreet, Stoop, StoopBeats, stoopStreetDoors, BlueprintStreet, BlueprintWall,
   MakersLane, Workshop, WORKSHOP_CORNER, NoticeboardCorner, TelephoneWires, WIRES, DomeCity, DomeTallies, domeArcY,
   TerraceHill, TerraceRings, TERRACE, TERRACE_FLAT, OldQuarter, SiteFacade, PerspRow, Foreground, groundMarks,
-  GroundMarks, People, Furniture, EdgeFigure} from '../shared/sets';
+  GroundMarks, People, Furniture, EdgeFigure,
+  // storyboard v3 (section 9)
+  PLAZA_CIVIC, plazaShutdownGov, crtPhase, CRT, rewindStep, latestState, domeArc, blindSignAnchor} from '../shared/sets';
 ```
 `SET_CATALOG` (storyboard-v1 demo times, the preview DemoWorld / DemoSun) is NOT in the barrel: it is preview-only, and
 SetsPreview / SharedKitSheet import it from `sets/catalog` directly, so no demo choreography reaches the film bundle.

@@ -18,7 +18,7 @@
 import React, {useId} from 'react';
 import {World, Sun, palette} from '../lib';
 import {ease as E, lerp, prog, useTime as useTimeLocal} from '../lib/time';
-import {Layer} from '../lib/cine/camera';
+import {camAt, Layer} from '../lib/cine/camera';
 import type {CamKey} from '../lib/cine/camera';
 import {ShotCam} from '../lib/ShotCam';
 import type {SkyKey} from '../lib/World';
@@ -166,12 +166,14 @@ const PAPER = [
 
 // ---------------------------------------------------------------- the copies on the wires (S07 match) + Bit
 
+// x0 / v0 = where and how fast S07 hands each copy over on the cut (scene07 CUT_COPIES / toCut: 387, 280, 124, 216 px/s
+// on screen = 298, 215, 95, 166 world px/s here at zoom 1.3); then they ease off along the wire
 const COPIES: CopySpec[] = [
-  {wire: 0, x0: 128, speed: 150, unpegAt: T.were, seed: 's8/cp0'},
-  {wire: 2, x0: 262, speed: 165, unpegAt: T.were + 0.16, seed: 's8/cp1'},
-  {wire: 1, x0: 392, speed: 118, unpegAt: 2.62, seed: 's8/cp2'},
+  {wire: 0, x0: 128, v0: 298, tau: 0.5, vr: 20, unpegAt: T.were - 0.18, seed: 's8/cp0'},
+  {wire: 2, x0: 262, v0: 215, tau: 0.5, vr: 20, unpegAt: T.were, seed: 's8/cp1'},
+  {wire: 1, x0: 392, v0: 95, tau: 0.8, vr: 12, unpegAt: 2.62, seed: 's8/cp2'},
 ];
-const BIT_COPY: CopySpec = {wire: 1, x0: 478, speed: 26, unpegAt: T.says + 0.35, seed: 's8/cp3'};
+const BIT_COPY: CopySpec = {wire: 1, x0: 478, v0: 166, tau: 0.45, vr: 6, unpegAt: T.says + 0.35, seed: 's8/cp3'};
 
 // ---------------------------------------------------------------- Pip (scale 0.75: the peak's tininess)
 
@@ -326,7 +328,7 @@ const EXTRAS: Record<string, React.ReactNode> = {
       </AboveCoping>
       <StampHit box={ZONES.stamps[0]} at={T.stamp1 + 0.4} dur={0.3} />
       <StampHit box={ZONES.stamps[1]} at={T.stamp2 + 0.4} dur={0.3} />
-      <BitRide plan={{copy: BIT_COPY, hopAt: T.bitHop, land: [466, BOARD.y0], crawlAt: T.bitHop + 0.55, crawlTo: [ZONES.top[0] - 14, BOARD.y0], alertAt: T.millionsWord, cheers: [T.tens + 0.06, T.thousands + 0.06, T.attempts + 0.1], size: 20}} />
+      <BitRide plan={{copy: BIT_COPY, hopAt: T.bitHop, land: [466, BOARD.y0], crawlAt: T.bitHop + 0.55, crawlTo: [ZONES.top[0] - 14, BOARD.y0], alertAt: T.millionsWord, zoomAt: (tt) => camAt(CAMERA, tt).zoom, cheers: [T.tens + 0.06, T.thousands + 0.06, T.attempts + 0.1], size: 20}} />
       <Pip plan={{hopAt: T.settle - 0.42, hopFrom: [1150, copingY(1150)], hopDur: 0.42, spot: PIP, keys: PIP_KEYS, scale: 0.75}} />
     </>
   ),
