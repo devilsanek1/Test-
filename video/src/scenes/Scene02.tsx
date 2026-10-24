@@ -1,15 +1,16 @@
 // S02 "The takeover diagram" (storyboard v3, cut(purpose) -> cut(password), 4.715-8.393 s on the take).
 // VO: "because of this bug where hackers could take over a site without a password."
 // The 'inset': a tight look at the PHP master blueprint (BlueprintWall, drawing outward from the lock). The lock detail
-// lands exactly where S01's dive left govB's lock box (screen (560, 1150), ~70 x 86 px at the cut); its cover swings
-// open, the bolt stops SHORT, Bit peeks out of the socket; a dashed hooded hand turns the thumb-turn with no key and a
-// tiny schematic site is taken over; a key gets crossed out. Labels L1 (static title-block card) and L2 (with a leader).
+// lands exactly where S01's dive left govB's lock box (screen (560, 1150), ~70 x 86 px at the cut) and the blueprint's
+// own DETAIL CIRCLE round it swells into a loupe (x2.4) so the mechanism reads on a phone: the cover swings open, the
+// bolt stops SHORT, Bit peeks out of the socket; a dashed hooded hand turns the thumb-turn with no key and a tiny
+// schematic site is taken over; a key gets crossed out. Labels L1 (static title-block card) and L2 (with a leader).
 // Camera, beats, positions: docs/storyboard_v3.md S02 + docs/storyboard_v3_resolved.json; notes: docs/scenes/S02.md.
-import React from 'react';
-import {World, Sun, XG, Ink, useTime, useScene, palette, prog, ease as E} from '../lib';
+import React, {useId} from 'react';
+import {World, Sun, XG, Ink, Fill, useTime, useScene, palette, prog, lerp, springAt, springs, ease as E, mat, circle} from '../lib';
 import {ElephantTimeline, hop} from '../lib/mascot';
 import {BlueprintWall, BLUEPRINT_WALL} from './shared/sets';
-import {LabelTag, lockPoint} from './shared/props';
+import {LabelTag} from './shared/props';
 import {camAt, camMat} from './scene02/camera';
 import {B, S02_END, S02_START} from './scene02/beats';
 import {DiagramLock, THUMB} from './scene02/DiagramLock';
@@ -17,14 +18,18 @@ import {DiagramHand, KeyCross, SiteIcon, dashPath, pointAlong} from './scene02/s
 import type {Pt} from '../lib/sketch';
 
 const L = BLUEPRINT_WALL.lock;
-const LOCK_SIZE = L.h; // 75: 60 x 75 world, 69 x 86 px on screen at the 1.15 landing
-const THUMB_W = lockPoint(L.x, L.y, LOCK_SIZE, THUMB);
-// the icon sits 30 px higher than the storyboard box (640-760 x 1090-1210) so it clears the sheet's elephant stamp
+const LOCK_SIZE = L.h; // 75: 60 x 75 world, 69 x 86 px on screen at the 1.15 landing (the S01 match)
+const C: Pt = [L.x, L.y];
+// the detail loupe: the blueprint's callout circle (r 64) swells to r 145 and magnifies the lock x2.4 about its centre
+const LOUPE = {at: 0.1, r0: 64, r1: 145, m: 2.4};
+// the thumb-turn knob in the magnified view (world)
+const KNOB: Pt = [C[0] + THUMB[0] * (LOCK_SIZE / 100) * LOUPE.m, C[1] + THUMB[1] * (LOCK_SIZE / 100) * LOUPE.m];
+// the site icon sits 30 px higher than the storyboard box (640-760 x 1090-1210) so it clears the sheet's elephant stamp
 const ICON: [number, number, number, number] = [640, 1060, 120, 120];
-// dashed connector: out of the lock's right side at the bolt axis, along, then down onto the icon's roof
+// dashed connector: out of the loupe's right edge at the bolt axis, along, then down onto the icon's roof
 const CONNECTOR: Pt[] = [
-  [L.x + 34, L.y + 14],
-  [ICON[0] + 60, L.y + 14],
+  [C[0] + Math.sqrt(LOUPE.r1 ** 2 - 14 ** 2) + 3, C[1] + 14],
+  [ICON[0] + 60, C[1] + 14],
   [ICON[0] + 60, ICON[1] - 2],
 ];
 // the sheet's inner rect (inside the teal frame): the diagram hand is DRAWN ON the plan, so it is clipped to it
@@ -35,28 +40,66 @@ const GAP = 7;
 const PIP_PERCH = BLUEPRINT_WALL.perch;
 const PIP_SCALE = 1.2 / 1.3; // 1.2 on screen at the 1.30 landing (~115 px)
 
+/** The lock detail inside the swelling detail circle. Before the swell it is the plain 60 x 75 detail (the match). */
+const Loupe: React.FC = () => {
+  const t = useTime();
+  const uid = 'lp' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const k = t < LOUPE.at ? 0 : springAt(t, LOUPE.at, springs.pop);
+  const r = lerp(LOUPE.r0, LOUPE.r1, k);
+  const m = lerp(1, LOUPE.m, k);
+  // keep the lock's pen ~5 px on screen once magnified (3.4 world at x1, 1.58 x 2.4 = 3.8 world at x2.4)
+  const ink = lerp(3.4, 1.58, Math.min(1, k));
+  const lock = (
+    <DiagramLock
+      x={C[0]}
+      y={C[1]}
+      size={LOCK_SIZE}
+      ink={ink}
+      coverOpenAt={B.coverOpen}
+      boltTestAt={B.boltTest}
+      gapMarkAt={B.bug}
+      turnAt={B.take}
+      bit={{size: 17, peekAt: B.bug - 0.02, cowerAt: B.could, hideAt: B.over, popAt: B.handOut}}
+    />
+  );
+  if (k <= 0) return lock;
+  const ring = circle(C[0], C[1], r, {seed: 's2loupe', overlap: 14});
+  return (
+    <g>
+      <Fill d={`M${C[0] - r} ${C[1]}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`} color={palette.white} offset={false} mode="none" seed="s2lpF" />
+      <defs>
+        <clipPath id={`${uid}c`} clipPathUnits="userSpaceOnUse">
+          <circle cx={C[0]} cy={C[1]} r={r - 1} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${uid}c)`}>
+        <XG m={mat.about(mat.scale(m), C[0], C[1])}>{lock}</XG>
+      </g>
+      <Ink d={ring} width={4.2} taper={false} vary={0} seed="s2lpI" />
+    </g>
+  );
+};
+
 const Connector: React.FC = () => {
   const t = useTime();
   if (t < B.site) return null;
-  // the dashes draw on lock -> icon; on 'could' they march one step toward the icon (0.12 s)
+  // the dashes draw on loupe -> icon; on 'could' they march one step toward the icon (0.12 s)
   const phase = prog(t, B.could, 0.12, E.inOutCubic);
   const {d, len} = dashPath(CONNECTOR, DASH, GAP, phase);
-  const nodes: React.ReactNode[] = [
-    <Ink key="dash" d={d} at={phase > 0 ? undefined : B.site} dur={0.28} width={2.6} taper={false} vary={0} seed="s2con" />,
-  ];
-  // 'over': an arrow runs along the connector (0.26 s) and stays as the arrowhead on the icon's roof
+  const nodes: React.ReactNode[] = [<Ink key="dash" d={d} at={phase > 0 ? undefined : B.site} dur={0.2} width={2.8} taper={false} vary={0} seed="s2con" />];
+  // 'over': an arrow runs along the connector (0.24 s) and stays as the arrowhead on the icon's roof
   if (t >= B.over) {
-    const q = prog(t, B.over, 0.26, E.inOutCubic);
+    const q = prog(t, B.over, 0.24, E.inOutCubic);
     const s1 = q * len;
-    const s0 = Math.max(0, s1 - 60);
+    const s0 = Math.max(0, s1 - 50);
     const pts: Pt[] = [];
     for (let i = 0; i <= 8; i++) pts.push(pointAlong(CONNECTOR, s0 + ((s1 - s0) * i) / 8).p);
     const {p, ang} = pointAlong(CONNECTOR, s1);
     const a = (ang * Math.PI) / 180;
     const hl = 15;
     const head = `M${(p[0] - Math.cos(a - 0.5) * hl).toFixed(1)} ${(p[1] - Math.sin(a - 0.5) * hl).toFixed(1)}L${p[0].toFixed(1)} ${p[1].toFixed(1)}L${(p[0] - Math.cos(a + 0.5) * hl).toFixed(1)} ${(p[1] - Math.sin(a + 0.5) * hl).toFixed(1)}`;
-    if (q < 1) nodes.push(<path key="streak" d={'M' + pts.map((pp) => `${pp[0].toFixed(1)} ${pp[1].toFixed(1)}`).join('L')} stroke={palette.ink} strokeWidth={3.4} strokeLinecap="round" fill="none" />);
-    nodes.push(<path key="head" d={head} stroke={palette.ink} strokeWidth={3.6} strokeLinecap="round" strokeLinejoin="round" fill="none" />);
+    if (q < 1) nodes.push(<path key="streak" d={'M' + pts.map((pp) => `${pp[0].toFixed(1)} ${pp[1].toFixed(1)}`).join('L')} stroke={palette.ink} strokeWidth={3.6} strokeLinecap="round" fill="none" />);
+    nodes.push(<path key="head" d={head} stroke={palette.ink} strokeWidth={3.8} strokeLinecap="round" strokeLinejoin="round" fill="none" />);
   }
   return <>{nodes}</>;
 };
@@ -105,29 +148,20 @@ const Scene02: React.FC = () => {
       <XG m={camMat(cam)}>
         {/* the PHP master blueprint: its linework draws outward from the lock from the cut (0.7 s) */}
         <BlueprintWall drawAt={0} lock={{at: 1e6}} calendar={undefined} />
-        {/* the lock detail (match object: already there at the cut) */}
-        <DiagramLock
-          x={L.x}
-          y={L.y}
-          size={LOCK_SIZE}
-          coverOpenAt={B.coverOpen}
-          boltTestAt={B.boltTest}
-          gapMarkAt={B.bug}
-          turnAt={B.take}
-          bit={{size: 26, peekAt: B.bug - 0.02, cowerAt: B.could, hideAt: B.over, popAt: B.handOut}}
-        />
+        {/* the lock detail (match object: already there at the cut), then the detail loupe */}
+        <Loupe />
         <Connector />
         <SiteIcon x={ICON[0]} y={ICON[1]} w={ICON[2]} h={ICON[3]} at={B.site - 0.04} takenAt={B.over} unlockAt={B.siteWord} flutterAt={B.flutter} seed="s2site" />
-        <KeyCross x={604} y={1030} size={84} at={B.without} crossAt={B.without + 0.17} settleAt={B.flutter} seed="s2key" />
+        <KeyCross x={338} y={846} size={84} at={B.without} crossAt={B.without + 0.17} settleAt={B.flutter} seed="s2key" />
         <LabelTag kind="card" x={215 + 196} y={724} text="PHP2Shell · two linked flaws" fontSize={40 / 1.3} inkPx={2.2} at={B.L1} seed="s2L1" />
-        <LabelTag kind="card" box={[214, 1098, 618, 1190]} text={['no password ·', 'control of the site and its data']} fontSize={40 / 1.32} inkPx={2.2} at={B.L2} leader={[ICON[0] + 10, 1150]} seed="s2L2" />
+        <LabelTag kind="card" box={[214, 1110, 618, 1198]} text={['no password ·', 'control of the site and its data']} fontSize={40 / 1.32} inkPx={2.2} at={B.L2} leader={[ICON[0] + 10, 1160]} seed="s2L2" />
         <defs>
           <clipPath id="s2sheet" clipPathUnits="userSpaceOnUse">
             <rect x={SHEET_IN[0]} y={SHEET_IN[1]} width={SHEET_IN[2]} height={SHEET_IN[3]} />
           </clipPath>
         </defs>
         <g clipPath="url(#s2sheet)">
-          <DiagramHand x={THUMB_W[0]} y={THUMB_W[1] - 3} angle={-36} scale={0.82} enterAt={B.handIn} from={520} turnAt={B.take} turnDeg={34} exitAt={B.handOut} seed="s2hand" />
+          <DiagramHand x={KNOB[0]} y={KNOB[1] - 4} angle={-36} scale={1.45} enterAt={B.handIn} from={560} turnAt={B.take} turnDeg={34} exitAt={B.handOut} ink={2.6} seed="s2hand" />
         </g>
         <Pip />
       </XG>

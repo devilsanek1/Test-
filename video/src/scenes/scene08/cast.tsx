@@ -251,7 +251,7 @@ export const BitRide: React.FC<{plan: BitPlan}> = ({plan}) => {
       </XG>
     );
   }
-  if (t < crawlAt) return <Bit x={land[0]} y={land[1]} size={size} hopAt={hopAt + air - 0.02} hopH={0.2} state="idle" look="forward" seed="s8/bit" />;
+  if (t < crawlAt) return <Bit x={land[0]} y={land[1]} size={size} state="idle" look="forward" seed="s8/bit" />;
   return <Bit x={land[0]} y={land[1]} size={size} crawl={{at: crawlAt, path: [land, crawlTo], speed: 300}} state={t < crawlAt + Math.hypot(crawlTo[0] - land[0], crawlTo[1] - land[1]) / 300 ? 'scuttle' : 'idle'} alertAt={alertAt} alertDur={1.0} look={t > crawlAt + 1.4 ? 'down' : 'auto'} seed="s8/bit" />;
 };
 

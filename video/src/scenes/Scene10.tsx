@@ -32,9 +32,9 @@ const Scene10: React.FC = () => {
   const t = useTime();
   const scene = useScene();
   const tr = useTransition();
-  const start = scene?.start ?? SCENE.start;
+  const start = scene.id === 'none' ? SCENE.start : scene.start;
   const b = localBeats(start);
-  const end = (scene?.end ?? SCENE.end) - start;
+  const end = (scene.id === 'none' ? SCENE.end : scene.end) - start;
   const sg = OLD_QUARTER.sites;
 
   // the support tags land on siteL's / siteR's plaques (body centre = hang point + string + half the tag)

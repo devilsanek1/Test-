@@ -7,15 +7,13 @@
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {useTime} from '../../lib/time';
-import {Fill} from '../../lib/Fill';
 import {Sun} from '../../lib/Sun';
-import {rectPath, Pt} from '../../lib/sketch';
+import {Pt} from '../../lib/sketch';
 import {XG} from '../../lib/xf';
-import {GovernmentPlaza, GovId, PLAZA} from '../shared/sets';
-import {MarkRing, PowerGlyph, PressRipple, ShutterPadlock, SunPress, EdgeOnlooker} from '../shared/props';
+import {GovEvents, GovernmentPlaza, GovId, PLAZA} from '../shared/sets';
+import {EdgeOnlooker, MarkRing, PowerGlyph, SunPress} from '../shared/props';
 import {layerMat, PARALLAX} from './camera';
 import {B} from './timing';
-import {BackSoonTag, CrtChrome, curtainBottom, FarCivic, ShutterCurtain} from './shims';
 import {CitizenPlan, PigeonPlan, PipS01, PlazaCitizen, Pigeon} from './cast';
 
 const SUN = PLAZA.sun; // (720, 900) r155
@@ -23,14 +21,17 @@ const VP = PLAZA.vp as Pt;
 const HZ = PLAZA.horizon;
 const MID = 3.4;
 
-// ---------------------------------------------------------------- per-building switch-off plan
+// ---------------------------------------------------------------- per-building switch-off plan (kit v3 events)
 
-/** Screen power-off (CRT) times; govD stays lit ('a bunch of', not all). */
-const SCREEN_OFF: Record<GovId, number | undefined> = {govA: B.crtA, govB: B.crtB, govC: B.crtC, govD: undefined};
 const SLAM_DUR = 0.16;
-/** govC's half shutter. */
-const C_WIN = PLAZA.gov.govC.window;
-const C_STOP = 0.5;
+/** The power-off wave and the closures. govB: frame 0 holds its screen as the bright line (state 'frame0') and
+ *  screenOffAt 0 releases it; govD stays lit ('a bunch of', not all). Padlocks / lettered tags are shifted apart on the
+ *  rails (the kit's default slots overlap once the tag is lettered). */
+export const S01_GOV: Partial<Record<GovId, GovEvents>> = {
+  govA: {screenOffAt: B.crtA, shutterAt: B.slamA, offAt: B.slamA + SLAM_DUR, padlockAt: B.padlocks[1], padlockProps: {x: 152}, tagAt: B.tags[1], tagProps: {lettered: true, size: 74, x: 226}},
+  govB: {screenOffAt: 0, shutterAt: B.slamB, offAt: B.slamB + SLAM_DUR, padlockAt: B.padlocks[0], padlockProps: {x: 462}, tagAt: B.tags[0], tagProps: {lettered: true, size: 104, x: 562}, lanternOffAt: B.domeLanternOff},
+  govC: {screenOffAt: B.crtC, shutterAt: B.slamC, shutterStop: 0.5, padlockAt: B.padlocks[2], padlockProps: {x: 838}, tagAt: B.tags[2], tagProps: {lettered: true, size: 62, x: 900}},
+};
 
 // ---------------------------------------------------------------- citizens (PLAZA.citizens slots, re-acted)
 
@@ -87,42 +88,13 @@ const Onlookers: React.FC = () => (
   </>
 );
 
-// ---------------------------------------------------------------- overlays on the buildings layer
-
-/** govB's dome lantern stays lit after its facade steps dark, until it pops off on 'PURPOSE'. */
-const DomeLantern: React.FC = () => {
-  const t = useTime();
-  if (t >= B.domeLanternOff) return null;
-  return <Fill d={rectPath(511, 615, 14, 34)} color={palette.cream} offset={false} mode="snap" seed="s01/dlant" />;
-};
-
-/** The closed shutters' padlock (govC's: on its half shutter) and the three lettered 'back soon' tags. */
-const Hardware: React.FC = () => {
-  const t = useTime();
-  const cRail = curtainBottom(t, C_WIN[1], C_WIN[3], B.slamC, C_STOP);
-  const gB = PLAZA.gov.govB;
-  const gA = PLAZA.gov.govA;
-  return (
-    <>
-      <ShutterPadlock x={458} y={gB.window[1] + gB.window[3] + 5} at={B.padlocks[0]} seed="s01/plB" />
-      <ShutterPadlock x={866} y={cRail + 6} at={B.padlocks[2]} seed="s01/plC" />
-      <BackSoonTag x={566} y={gB.window[1] + gB.window[3] - 2} w={112} font={25} at={B.tags[0]} seed="s01/tagB" />
-      <BackSoonTag x={237} y={gA.window[1] + gA.window[3] - 2} w={68} at={B.tags[1]} seed="s01/tagA" />
-      <BackSoonTag x={912} y={cRail - 2} w={60} at={B.tags[2]} tilt={2} seed="s01/tagC" />
-    </>
-  );
-};
-
 // ---------------------------------------------------------------- the shot
 
 export const PlazaShutdown: React.FC = () => {
   const t = useTime();
   const extra: Record<string, React.ReactNode> = {
-    far: <FarCivic civicOffAt={[...B.civicOff]} lanternOffAt={[...B.civicLanterns]} />,
     buildings: (
       <>
-        <DomeLantern />
-        <Hardware />
         <MarkRing x={PLAZA.gov.govB.lock[0]} y={PLAZA.gov.govB.lock[1]} r={24} at={B.lockRing} dur={0.12} width={2.4} seed="s01/ring" />
       </>
     ),
@@ -151,34 +123,22 @@ export const PlazaShutdown: React.FC = () => {
       {extra[name] ?? null}
     </XG>
   );
+  // frame 0 = the bottom of the SunPress (0.88) with the ripple at its emission radius; it releases over 0.2 s while
+  // the ripple runs out to r + 40 (S12 ends on mode="reverse": the same state)
   const sun = (
-    <>
-      <SunPress at={B.pressAt} cx={SUN.x} cy={SUN.y} r={SUN.r} ripple={false}>
-        <Sun cx={SUN.x} cy={SUN.y} r={SUN.r} drift={[0, 0]}>
-          {(r: number) => <PowerGlyph r={r} glintAt={B.glint} seed="s01/pwr" />}
-        </Sun>
-      </SunPress>
-      <PressRipple cx={SUN.x} cy={SUN.y} r={SUN.r} at={B.rippleAt} grow={40} dur={0.22} width={MID} />
-    </>
-  );
-  const gov = {
-    govA: {shutterAt: B.slamA, offAt: B.slamA + SLAM_DUR, padlockAt: B.padlocks[1]},
-    govB: {shutterAt: B.slamB, offAt: B.slamB + SLAM_DUR},
-    govC: {},
-    govD: {},
-  };
-  const windowSlot = (id: GovId, r: [number, number, number, number]) => (
-    <>
-      <CrtChrome x={r[0]} y={r[1]} w={r[2]} h={r[3]} screenOffAt={SCREEN_OFF[id]} width={id === 'govD' ? 4.0 : MID} seed={`plaza/${id}/bw`} />
-      {id === 'govC' ? <ShutterCurtain x={r[0]} y={r[1]} w={r[2]} h={r[3]} slamAt={B.slamC} stopAt={C_STOP} width={MID} seed="s01/curC" /> : null}
-    </>
+    <SunPress mode="release" at={B.rippleAt} cx={SUN.x} cy={SUN.y} r={SUN.r} width={MID}>
+      <Sun cx={SUN.x} cy={SUN.y} r={SUN.r} drift={[0, 0]}>
+        {(r: number) => <PowerGlyph r={r} glintAt={B.glint} seed="s01/pwr" />}
+      </Sun>
+    </SunPress>
   );
   return (
     <GovernmentPlaza
-      state="built"
+      state="frame0"
       sun={sun}
-      gov={gov}
-      windowSlot={windowSlot}
+      gov={S01_GOV}
+      civicOffAt={B.civicOff[0]}
+      civicLanternsOffAt={B.civicLanterns[0]}
       citizensAt={false}
       onlookers={false}
       lanternOffAt={B.lampOff}
