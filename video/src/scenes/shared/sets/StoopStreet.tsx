@@ -78,12 +78,12 @@ export const STOOP = {
   /** Pip's spots (S03): pavement, step 1 tread, step 2 tread. */
   pip: {pavement: [520, 1450] as Pt, step1: [380, 1300] as Pt, step2: [380, 1230] as Pt},
   pavementY: 1370,
-  /** People layer anchors (life.tsx): two walkers heading up the road to the VP, one stander on the right pavement
+  /** People layer anchors (life.tsx): two walkers heading up the road to the VP, one stander on the right sidewalk
    *  (heights from the eye-level camera: (feet - 1060) / 1.1). Never on the stoop (x 160-440) or door #4. */
   walkers: [
-    {x: 772, y: 1200, h: 127, go: 'vp', body: palette.teal, hair: 'short'},
-    {x: 792, y: 1252, h: 175, go: 'vp', body: palette.sand, hair: 'bun', acc: ['backpack']},
-    {x: 884, y: 1338, h: 252, go: 'stand', body: palette.sage, hair: 'curly', acc: ['scarf']},
+    {x: 792, y: 1240, h: 164, go: 'vp', body: palette.sand, hair: 'bun', acc: ['backpack']},
+    {x: 888, y: 1338, h: 252, go: 'stand', body: palette.sage, hair: 'curly', acc: ['scarf']},
+    {x: 742, y: 1150, h: 82, go: 'vp', body: palette.teal, hair: 'short'},
   ] as WalkerAnchor[],
   /** Street furniture (ink-led): a planter right of the stoop, a bike on the near pavement. */
   furniture: [

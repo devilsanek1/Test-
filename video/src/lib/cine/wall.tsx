@@ -143,6 +143,10 @@ export function wallDarkFrom(o: WallSpec, k: KeepDark): Float64Array | null {
   return out;
 }
 
+/** true while a cell with this glass width on screen (px) and LOD jitter needs a CLOSE-UP (it shows more than the
+ *  grid's room level: a lamp, a desk, a person); below it the grid pane is the same picture. */
+export const wallLodDetailed = (screenW: number, jitter: number, from: number = ROOM_LOD.lamp) => screenW / lodScale(jitter) >= from;
+
 /** Per-cell LOD jitter (0..1) of a WallOfWindows cell: pass it to the close-up drawn over that cell (`lodJitter`). */
 export const wallCellJitter = (o: WallSpec, row: number, col: number) => rand(o.seed ?? 'wall', `lod${row * o.cols + col}`);
 
@@ -269,8 +273,11 @@ export type WallOfWindowsProps = WindowLook & {
   /** Caption-safe darkness (see KeepDark): a static screen band, or caption ink boxes with hysteresis along a camera
    *  path. */
   keepDark?: KeepDark;
-  /** Level of detail: these cells are skipped while the layer's screen scale is above `above` (draw closeups). */
-  lod?: {cells: [number, number][]; above: number};
+  /** Level of detail: these cells are left to WindowCloseups. Per cell (default): a cell is skipped while its glass is
+   *  at least `detailFrom` px wide on screen (default ROOM_LOD.lamp, jittered by wallCellJitter): below that a close-up
+   *  would draw exactly what the grid draws (same room shapes / colours), so the swap is invisible. Draw the close-ups
+   *  where wallLodDetailed() is true. `above` (old API): skip them all while the layer zoom is above it. */
+  lod?: {cells: [number, number][]; above?: number; detailFrom?: number};
   /** Final say on a cell's state, e.g. a hero window lit until its own off time: (row, col, t, on) => on. */
   override?: (row: number, col: number, t: number, on: boolean) => boolean;
   /** Floor bands DRAW ON (each from its near end, staggered like pen strokes, ~0.15 s each over a ~0.4 s window at a
@@ -336,7 +343,19 @@ export const WallOfWindows: React.FC<WallOfWindowsProps> = ({quad, rows, cols, t
     return {ink: ink.d, bands, shade: shade.d, far: far.d, outline: new PathBuf(precision).quad(...quad).d};
   }, [JSON.stringify(quad), rows, cols, bandEvery, pierEvery, seed, precision]);
   const zoom = xfScale(S.m);
-  const skipLod = lodSet && zoom > lod!.above ? (i: number) => lodSet[i] === 0 : undefined;
+  const glassW = (i: number) => {
+    const q = cells[i].quad!;
+    const a = toScreen(S.m, q[0]);
+    const b = toScreen(S.m, q[1]);
+    return Math.hypot(b[0] - a[0], b[1] - a[1]);
+  };
+  const skipLod = !lodSet
+    ? undefined
+    : lod!.above !== undefined
+      ? zoom > lod!.above
+        ? (i: number) => lodSet[i] === 0
+        : undefined
+      : (i: number) => lodSet[i] === 0 || !wallLodDetailed(glassW(i), rand(seed, `lod${rc[i][0] * cols + rc[i][1]}`), lod!.detailFrom);
   const spec: WallSpec = {quad, rows, cols, fw, fh, seed, exclude, events};
   const darkFrom = keepDark?.path ? wallDarkFrom(spec, keepDark) : null;
   const darkBand = darkFrom ? (i: number) => darkFrom[rc[i][0] * cols + rc[i][1]] <= t : keepDark ? bandTest(S.m, cells, keepDark, t) : undefined;

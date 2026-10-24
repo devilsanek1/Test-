@@ -1,6 +1,6 @@
 // BlueprintStreet — S3 (S02 "built from one blueprint"; complex, used once). Canvas coords at the S02 wide rest.
 //
-// The street floor carries a giant cream BLUEPRINT sheet laid on it (a visible paper far edge at y 1214 with a dog-eared
+// The street floor carries a giant cream BLUEPRINT sheet laid on it (a visible paper far edge at y 1238 with a dog-eared
 // corner, a margin line with dimension ticks, side edges just inside the kerbs): a broken-stroke grid converging to VP
 // (560, 950) that overshoots the sheet edge and thins with distance, dimension arrows, a title block bottom-left, the
 // giant elephant stamp slot (330, 1400). At the end of the vista the
@@ -28,6 +28,7 @@ import {ChromeSlot, ElephantStampSlot, LockProps, PlaqueSlot} from './propSlots'
 import {Lock} from '../props';
 import {FacadeDoor} from './SiteFacade';
 import {PerspRow, quadRowLayout} from './rows';
+import {People, PeopleSpec, WalkerAnchor} from './life';
 
 export type SideId = 'L1' | 'L2' | 'L3' | 'L4' | 'L5' | 'R1' | 'R2' | 'R3' | 'R4';
 export type BlueprintId = 'P' | SideId;
@@ -56,6 +57,12 @@ export const BLUEPRINT = {
   blank: ['L3', 'L5', 'R4'] as BlueprintId[],
   /** Pip's landing spot on the stamp (wide). */
   pip: [350, 1420] as Pt,
+  /** People layer anchors (life.tsx), OFF by default (S02's lock close-up needs the doorway clear): a walker on the right
+   *  of the plan heading for the press house, a stander at the left kerb beside the stamp. */
+  walkers: [
+    {x: 866, y: 1290, h: 300, go: 'vp', body: palette.teal, hair: 'short', acc: ['backpack']},
+    {x: 214, y: 1318, h: 330, go: 'stand', body: palette.sand, hair: 'bun', acc: ['scarf']},
+  ] as WalkerAnchor[],
 } as const;
 
 const leftQuads: Quad[] = LX.slice(0, -1).map((x0, i) => {
@@ -111,7 +118,7 @@ const G = (() => {
   // a margin line inset from every edge with dimension ticks along it. The grid follows the ink rules: every line is
   // 2-4 broken pen strokes, it overshoots the sheet edge by 30-60 px, and its weight thins with distance (3 width
   // groups, near -> far, drawn on in that order).
-  const yF = 1214; // the sheet's far edge
+  const yF = 1238; // the sheet's far edge (the pavement shows 58 px of street in front of the press house)
   const lB = (y: number) => 360 - ((360 + 140) * (y - 1180)) / (1708 - 1180); // left buildings' base line
   const rB = (y: number) => 760 + ((1226 - 760) * (y - 1180)) / (1726 - 1180); // right buildings' base line
   const inset = (y: number) => 10 + ((y - yF) / (2060 - yF)) * 34;
@@ -262,6 +269,8 @@ export type BlueprintStreetProps = {
   blinkAt?: number;
   /** The press-house lock: props-lane Lock props (screwsOutAt, coverOpenAt, boltTestAt, gapMarkAt, rider ...). */
   lock?: Partial<LockProps>;
+  /** Back-view people on BLUEPRINT.walkers (life.tsx). Default OFF here; true / options to show them. */
+  people?: PeopleSpec;
   sun?: React.ReactNode;
   wrap?: LayerWrap;
   x?: number;
@@ -273,7 +282,7 @@ export type BlueprintStreetProps = {
   seed?: string;
 };
 
-export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pressAt, plaqueAt = {}, gridAt, stampAt, ventAt, signSwingAt, blinkAt, lock = {}, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bp'}) => {
+export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pressAt, plaqueAt = {}, gridAt, stampAt, ventAt, signSwingAt, blinkAt, lock = {}, people, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bp'}) => {
   const t = useTime();
   const P = BLUEPRINT.press;
   const [wx, wy, ww, wh] = BLUEPRINT.window;
@@ -341,6 +350,7 @@ export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pre
       {wrap('ground', 0.8, ground)}
       {wrap('press', 0.5, press)}
       {wrap('sides', 0.6, sides)}
+      {wrap('people', 0.9, <People anchors={BLUEPRINT.walkers} vp={BLUEPRINT.vp} spec={people} def={false} seed={`${seed}/ppl`} />)}
     </SetPlace>
   );
 };

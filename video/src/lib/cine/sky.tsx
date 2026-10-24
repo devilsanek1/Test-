@@ -43,6 +43,10 @@ export type SkyProps = {
   /** Hand-drawn band edges: each step edge breaks into streak tongues +- this many px (default 9; 0 = ruler-straight).
    *  No edge runs straight across the full width. */
   wobble?: number;
+  /** Every value step stays at or below this SCREEN y (default 600: under the caption band), whatever the camera does:
+   *  the step edges are placed in screen space from the current layer matrix (a lens zoom > 1 used to lift them into
+   *  the captions). */
+  minScreenY?: number;
   seed?: Seed;
 };
 
@@ -73,7 +77,7 @@ const BAND_CACHE = new Map<string, string>();
  *  all below y 600, with hand-drawn streak edges. It is the background SLAB of the un-build: the lower (glow) bands
  *  shrink into the horizon with the fills, then the slab collapses downward (its top edge falls from the screen top to
  *  the bottom, from e 0.5, overlapping the last fills). It keeps its colour in the paper / cascade Looks. */
-export const Sky: React.FC<SkyProps> = ({tod, horizon, colors, edges, span: spanIn, below = 1600, x0 = WIDE.x0, x1 = WIDE.x1, top: top0 = -4000, wobble = 9, seed = 'sky'}) => {
+export const Sky: React.FC<SkyProps> = ({tod, horizon, colors, edges, span: spanIn, below = 1600, x0 = WIDE.x0, x1 = WIDE.x1, top: top0 = -4000, wobble = 9, minScreenY = 600, seed = 'sky'}) => {
   const p = useTodPal(tod);
   const S = useCineState();
   let top = top0;
@@ -100,10 +104,12 @@ export const Sky: React.FC<SkyProps> = ({tod, horizon, colors, edges, span: span
   for (let i = 1; i < n; i++) {
     const h = e[i - 1] * glowK;
     if (h <= 0.5) continue;
-    const y0 = horizon - h;
-    if (y0 < top) continue;
     // the band's wobble shrinks with its height (thin glow bands near the horizon wobble less)
     const amp = Math.min(wobble, h * 0.18);
+    // keep the step edge (tongues included) at or below minScreenY ON SCREEN: layer y -> screen y = m[3] * y + m[5]
+    const sy = S.m[3] || 1;
+    const y0 = Math.max(horizon - h, (minScreenY - S.m[5]) / sy + amp);
+    if (y0 < top || y0 >= y1) continue;
     out.push(<path key={i} d={bandPath(x0, x1, y0, y1, amp, `${seed}/${i}`)} fill={cols[i]} />);
   }
   return <>{out}</>;

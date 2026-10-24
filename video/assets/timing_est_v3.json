@@ -1,0 +1,2615 @@
+{
+ "duration": 57.118,
+ "estimated": true,
+ "decodedDuration": 57.118,
+ "voStart": 0.035,
+ "voEnd": 56.918,
+ "words": [
+  {
+   "i": 0,
+   "w": "Governments",
+   "s": 0.125,
+   "e": 0.565,
+   "stress": 0.85
+  },
+  {
+   "i": 1,
+   "w": "all",
+   "s": 0.565,
+   "e": 0.724,
+   "stress": 0.15
+  },
+  {
+   "i": 2,
+   "w": "over",
+   "s": 0.724,
+   "e": 1.147,
+   "stress": 0.65
+  },
+  {
+   "i": 3,
+   "w": "Europe",
+   "s": 1.147,
+   "e": 1.57,
+   "stress": 0.65
+  },
+  {
+   "i": 4,
+   "w": "just",
+   "s": 1.57,
+   "e": 1.73,
+   "stress": 0.15
+  },
+  {
+   "i": 5,
+   "w": "shut",
+   "s": 1.73,
+   "e": 2.026,
+   "stress": 0.55
+  },
+  {
+   "i": 6,
+   "w": "down",
+   "s": 2.026,
+   "e": 2.322,
+   "stress": 0.55
+  },
+  {
+   "i": 7,
+   "w": "a",
+   "s": 2.322,
+   "e": 2.481,
+   "stress": 0.15
+  },
+  {
+   "i": 8,
+   "w": "bunch",
+   "s": 2.481,
+   "e": 2.777,
+   "stress": 0.55
+  },
+  {
+   "i": 9,
+   "w": "of",
+   "s": 2.777,
+   "e": 2.937,
+   "stress": 0.15
+  },
+  {
+   "i": 10,
+   "w": "their",
+   "s": 2.937,
+   "e": 3.096,
+   "stress": 0.15
+  },
+  {
+   "i": 11,
+   "w": "own",
+   "s": 3.096,
+   "e": 3.255,
+   "stress": 0.15
+  },
+  {
+   "i": 12,
+   "w": "websites",
+   "s": 3.255,
+   "e": 3.678,
+   "stress": 0.65
+  },
+  {
+   "i": 13,
+   "w": "on",
+   "s": 3.678,
+   "e": 3.838,
+   "stress": 0.15
+  },
+  {
+   "i": 14,
+   "w": "purpose,",
+   "s": 3.838,
+   "e": 4.406,
+   "stress": 1
+  },
+  {
+   "i": 15,
+   "w": "because",
+   "s": 4.573,
+   "e": 4.814,
+   "stress": 0.15
+  },
+  {
+   "i": 16,
+   "w": "of",
+   "s": 4.814,
+   "e": 4.973,
+   "stress": 0.15
+  },
+  {
+   "i": 17,
+   "w": "this",
+   "s": 4.973,
+   "e": 5.132,
+   "stress": 0.15
+  },
+  {
+   "i": 18,
+   "w": "bug",
+   "s": 5.132,
+   "e": 5.428,
+   "stress": 0.55
+  },
+  {
+   "i": 19,
+   "w": "where",
+   "s": 5.428,
+   "e": 5.588,
+   "stress": 0.15
+  },
+  {
+   "i": 20,
+   "w": "hackers",
+   "s": 5.588,
+   "e": 6.011,
+   "stress": 0.65
+  },
+  {
+   "i": 21,
+   "w": "could",
+   "s": 6.011,
+   "e": 6.17,
+   "stress": 0.15
+  },
+  {
+   "i": 22,
+   "w": "take",
+   "s": 6.17,
+   "e": 6.466,
+   "stress": 0.55
+  },
+  {
+   "i": 23,
+   "w": "over",
+   "s": 6.466,
+   "e": 6.889,
+   "stress": 0.65
+  },
+  {
+   "i": 24,
+   "w": "a",
+   "s": 6.889,
+   "e": 7.048,
+   "stress": 0.15
+  },
+  {
+   "i": 25,
+   "w": "site",
+   "s": 7.048,
+   "e": 7.344,
+   "stress": 0.55
+  },
+  {
+   "i": 26,
+   "w": "without",
+   "s": 7.344,
+   "e": 7.767,
+   "stress": 0.65
+  },
+  {
+   "i": 27,
+   "w": "a",
+   "s": 7.767,
+   "e": 7.927,
+   "stress": 0.15
+  },
+  {
+   "i": 28,
+   "w": "password.",
+   "s": 7.927,
+   "e": 8.333,
+   "stress": 0.8
+  },
+  {
+   "i": 29,
+   "w": "It's",
+   "s": 8.835,
+   "e": 8.994,
+   "stress": 0.15
+  },
+  {
+   "i": 30,
+   "w": "in",
+   "s": 8.994,
+   "e": 9.154,
+   "stress": 0.15
+  },
+  {
+   "i": 31,
+   "w": "PHP,",
+   "s": 9.154,
+   "e": 9.94,
+   "stress": 0.95
+  },
+  {
+   "i": 32,
+   "w": "the",
+   "s": 10.275,
+   "e": 10.434,
+   "stress": 0.15
+  },
+  {
+   "i": 33,
+   "w": "language",
+   "s": 10.434,
+   "e": 10.857,
+   "stress": 0.65
+  },
+  {
+   "i": 34,
+   "w": "everyone",
+   "s": 10.857,
+   "e": 11.298,
+   "stress": 0.75
+  },
+  {
+   "i": 35,
+   "w": "loves,",
+   "s": 11.298,
+   "e": 11.739,
+   "stress": 0.7
+  },
+  {
+   "i": 36,
+   "w": "and",
+   "s": 11.906,
+   "e": 12.065,
+   "stress": 0.15
+  },
+  {
+   "i": 37,
+   "w": "about",
+   "s": 12.065,
+   "e": 12.306,
+   "stress": 0.15
+  },
+  {
+   "i": 38,
+   "w": "seven",
+   "s": 12.306,
+   "e": 12.729,
+   "stress": 0.9
+  },
+  {
+   "i": 39,
+   "w": "out",
+   "s": 12.729,
+   "e": 13.025,
+   "stress": 0.55
+  },
+  {
+   "i": 40,
+   "w": "of",
+   "s": 13.025,
+   "e": 13.184,
+   "stress": 0.15
+  },
+  {
+   "i": 41,
+   "w": "ten",
+   "s": 13.184,
+   "e": 13.48,
+   "stress": 0.9
+  },
+  {
+   "i": 42,
+   "w": "websites",
+   "s": 13.48,
+   "e": 13.903,
+   "stress": 0.65
+  },
+  {
+   "i": 43,
+   "w": "run",
+   "s": 13.903,
+   "e": 14.199,
+   "stress": 0.7
+  },
+  {
+   "i": 44,
+   "w": "on",
+   "s": 14.199,
+   "e": 14.358,
+   "stress": 0.15
+  },
+  {
+   "i": 45,
+   "w": "it.",
+   "s": 14.358,
+   "e": 14.5,
+   "stress": 0.15
+  },
+  {
+   "i": 46,
+   "w": "This",
+   "s": 15.003,
+   "e": 15.162,
+   "stress": 0.15
+  },
+  {
+   "i": 47,
+   "w": "bug",
+   "s": 15.162,
+   "e": 15.458,
+   "stress": 0.65
+  },
+  {
+   "i": 48,
+   "w": "was",
+   "s": 15.458,
+   "e": 15.618,
+   "stress": 0.15
+  },
+  {
+   "i": 49,
+   "w": "in",
+   "s": 15.618,
+   "e": 15.777,
+   "stress": 0.15
+  },
+  {
+   "i": 50,
+   "w": "there",
+   "s": 15.777,
+   "e": 15.936,
+   "stress": 0.15
+  },
+  {
+   "i": 51,
+   "w": "for",
+   "s": 15.936,
+   "e": 16.096,
+   "stress": 0.15
+  },
+  {
+   "i": 52,
+   "w": "like",
+   "s": 16.096,
+   "e": 16.255,
+   "stress": 0.15
+  },
+  {
+   "i": 53,
+   "w": "fourteen",
+   "s": 16.255,
+   "e": 16.678,
+   "stress": 0.9
+  },
+  {
+   "i": 54,
+   "w": "years",
+   "s": 16.678,
+   "e": 16.974,
+   "stress": 0.55
+  },
+  {
+   "i": 55,
+   "w": "before",
+   "s": 16.974,
+   "e": 17.214,
+   "stress": 0.15
+  },
+  {
+   "i": 56,
+   "w": "researchers",
+   "s": 17.214,
+   "e": 17.654,
+   "stress": 0.75
+  },
+  {
+   "i": 57,
+   "w": "using",
+   "s": 17.654,
+   "e": 18.077,
+   "stress": 0.65
+  },
+  {
+   "i": 58,
+   "w": "AI",
+   "s": 18.077,
+   "e": 18.505,
+   "stress": 0.65
+  },
+  {
+   "i": 59,
+   "w": "figured",
+   "s": 18.505,
+   "e": 18.928,
+   "stress": 0.65
+  },
+  {
+   "i": 60,
+   "w": "out",
+   "s": 18.928,
+   "e": 19.224,
+   "stress": 0.55
+  },
+  {
+   "i": 61,
+   "w": "how",
+   "s": 19.224,
+   "e": 19.383,
+   "stress": 0.15
+  },
+  {
+   "i": 62,
+   "w": "bad",
+   "s": 19.383,
+   "e": 19.679,
+   "stress": 0.7
+  },
+  {
+   "i": 63,
+   "w": "it",
+   "s": 19.679,
+   "e": 19.839,
+   "stress": 0.15
+  },
+  {
+   "i": 64,
+   "w": "was.",
+   "s": 19.839,
+   "e": 19.981,
+   "stress": 0.15
+  },
+  {
+   "i": 65,
+   "w": "They",
+   "s": 20.483,
+   "e": 20.642,
+   "stress": 0.15
+  },
+  {
+   "i": 66,
+   "w": "gave",
+   "s": 20.642,
+   "e": 20.938,
+   "stress": 0.65
+  },
+  {
+   "i": 67,
+   "w": "the",
+   "s": 20.938,
+   "e": 21.098,
+   "stress": 0.15
+  },
+  {
+   "i": 68,
+   "w": "PHP",
+   "s": 21.098,
+   "e": 21.739,
+   "stress": 0.75
+  },
+  {
+   "i": 69,
+   "w": "people",
+   "s": 21.739,
+   "e": 22.162,
+   "stress": 0.65
+  },
+  {
+   "i": 70,
+   "w": "a",
+   "s": 22.162,
+   "e": 22.321,
+   "stress": 0.15
+  },
+  {
+   "i": 71,
+   "w": "heads-up,",
+   "s": 22.321,
+   "e": 22.89,
+   "stress": 0.8
+  },
+  {
+   "i": 72,
+   "w": "but",
+   "s": 23.057,
+   "e": 23.216,
+   "stress": 0.15
+  },
+  {
+   "i": 73,
+   "w": "word",
+   "s": 23.216,
+   "e": 23.512,
+   "stress": 0.55
+  },
+  {
+   "i": 74,
+   "w": "got",
+   "s": 23.512,
+   "e": 23.808,
+   "stress": 0.55
+  },
+  {
+   "i": 75,
+   "w": "out",
+   "s": 23.808,
+   "e": 24.104,
+   "stress": 0.55
+  },
+  {
+   "i": 76,
+   "w": "before",
+   "s": 24.104,
+   "e": 24.344,
+   "stress": 0.15
+  },
+  {
+   "i": 77,
+   "w": "the",
+   "s": 24.344,
+   "e": 24.504,
+   "stress": 0.15
+  },
+  {
+   "i": 78,
+   "w": "fix",
+   "s": 24.504,
+   "e": 24.8,
+   "stress": 0.55
+  },
+  {
+   "i": 79,
+   "w": "was",
+   "s": 24.8,
+   "e": 24.959,
+   "stress": 0.15
+  },
+  {
+   "i": 80,
+   "w": "ready,",
+   "s": 24.959,
+   "e": 25.528,
+   "stress": 0.8
+  },
+  {
+   "i": 81,
+   "w": "and",
+   "s": 25.695,
+   "e": 25.854,
+   "stress": 0.15
+  },
+  {
+   "i": 82,
+   "w": "hackers",
+   "s": 25.854,
+   "e": 26.277,
+   "stress": 0.65
+  },
+  {
+   "i": 83,
+   "w": "were",
+   "s": 26.277,
+   "e": 26.437,
+   "stress": 0.15
+  },
+  {
+   "i": 84,
+   "w": "already",
+   "s": 26.437,
+   "e": 26.877,
+   "stress": 1
+  },
+  {
+   "i": 85,
+   "w": "trying",
+   "s": 26.877,
+   "e": 27.3,
+   "stress": 0.65
+  },
+  {
+   "i": 86,
+   "w": "to",
+   "s": 27.3,
+   "e": 27.459,
+   "stress": 0.15
+  },
+  {
+   "i": 87,
+   "w": "use",
+   "s": 27.459,
+   "e": 27.755,
+   "stress": 0.7
+  },
+  {
+   "i": 88,
+   "w": "it.",
+   "s": 27.755,
+   "e": 27.897,
+   "stress": 0.15
+  },
+  {
+   "i": 89,
+   "w": "Cloudflare",
+   "s": 28.399,
+   "e": 28.822,
+   "stress": 0.75
+  },
+  {
+   "i": 90,
+   "w": "says",
+   "s": 28.822,
+   "e": 29.118,
+   "stress": 0.55
+  },
+  {
+   "i": 91,
+   "w": "that",
+   "s": 29.118,
+   "e": 29.278,
+   "stress": 0.15
+  },
+  {
+   "i": 92,
+   "w": "once",
+   "s": 29.278,
+   "e": 29.437,
+   "stress": 0.15
+  },
+  {
+   "i": 93,
+   "w": "it",
+   "s": 29.437,
+   "e": 29.596,
+   "stress": 0.15
+  },
+  {
+   "i": 94,
+   "w": "was",
+   "s": 29.596,
+   "e": 29.756,
+   "stress": 0.15
+  },
+  {
+   "i": 95,
+   "w": "announced,",
+   "s": 29.756,
+   "e": 30.324,
+   "stress": 0.8
+  },
+  {
+   "i": 96,
+   "w": "they",
+   "s": 30.491,
+   "e": 30.651,
+   "stress": 0.15
+  },
+  {
+   "i": 97,
+   "w": "saw",
+   "s": 30.651,
+   "e": 30.947,
+   "stress": 0.55
+  },
+  {
+   "i": 98,
+   "w": "tens",
+   "s": 30.947,
+   "e": 31.243,
+   "stress": 0.9
+  },
+  {
+   "i": 99,
+   "w": "of",
+   "s": 31.243,
+   "e": 31.402,
+   "stress": 0.15
+  },
+  {
+   "i": 100,
+   "w": "thousands",
+   "s": 31.402,
+   "e": 31.825,
+   "stress": 0.9
+  },
+  {
+   "i": 101,
+   "w": "of",
+   "s": 31.825,
+   "e": 31.985,
+   "stress": 0.15
+  },
+  {
+   "i": 102,
+   "w": "hacking",
+   "s": 31.985,
+   "e": 32.408,
+   "stress": 0.65
+  },
+  {
+   "i": 103,
+   "w": "attempts",
+   "s": 32.408,
+   "e": 32.831,
+   "stress": 0.65
+  },
+  {
+   "i": 104,
+   "w": "in",
+   "s": 32.831,
+   "e": 32.99,
+   "stress": 0.15
+  },
+  {
+   "i": 105,
+   "w": "forty-five",
+   "s": 32.99,
+   "e": 33.43,
+   "stress": 0.9
+  },
+  {
+   "i": 106,
+   "w": "minutes,",
+   "s": 33.43,
+   "e": 33.999,
+   "stress": 0.8
+  },
+  {
+   "i": 107,
+   "w": "and",
+   "s": 34.166,
+   "e": 34.325,
+   "stress": 0.15
+  },
+  {
+   "i": 108,
+   "w": "millions",
+   "s": 34.325,
+   "e": 34.748,
+   "stress": 0.9
+  },
+  {
+   "i": 109,
+   "w": "within",
+   "s": 34.748,
+   "e": 35.171,
+   "stress": 0.65
+  },
+  {
+   "i": 110,
+   "w": "a",
+   "s": 35.171,
+   "e": 35.331,
+   "stress": 0.15
+  },
+  {
+   "i": 111,
+   "w": "day.",
+   "s": 35.331,
+   "e": 35.609,
+   "stress": 0.7
+  },
+  {
+   "i": 112,
+   "w": "But",
+   "s": 36.111,
+   "e": 36.271,
+   "stress": 0.15
+  },
+  {
+   "i": 113,
+   "w": "even",
+   "s": 36.271,
+   "e": 36.511,
+   "stress": 0.15
+  },
+  {
+   "i": 114,
+   "w": "with",
+   "s": 36.511,
+   "e": 36.67,
+   "stress": 0.15
+  },
+  {
+   "i": 115,
+   "w": "the",
+   "s": 36.67,
+   "e": 36.83,
+   "stress": 0.15
+  },
+  {
+   "i": 116,
+   "w": "fix",
+   "s": 36.83,
+   "e": 37.126,
+   "stress": 0.65
+  },
+  {
+   "i": 117,
+   "w": "out,",
+   "s": 37.126,
+   "e": 37.567,
+   "stress": 0.7
+  },
+  {
+   "i": 118,
+   "w": "somebody",
+   "s": 37.734,
+   "e": 38.174,
+   "stress": 0.75
+  },
+  {
+   "i": 119,
+   "w": "still",
+   "s": 38.174,
+   "e": 38.47,
+   "stress": 1
+  },
+  {
+   "i": 120,
+   "w": "has",
+   "s": 38.47,
+   "e": 38.63,
+   "stress": 0.15
+  },
+  {
+   "i": 121,
+   "w": "to",
+   "s": 38.63,
+   "e": 38.789,
+   "stress": 0.15
+  },
+  {
+   "i": 122,
+   "w": "install",
+   "s": 38.789,
+   "e": 39.212,
+   "stress": 0.65
+  },
+  {
+   "i": 123,
+   "w": "it",
+   "s": 39.212,
+   "e": 39.372,
+   "stress": 0.15
+  },
+  {
+   "i": 124,
+   "w": "on",
+   "s": 39.372,
+   "e": 39.531,
+   "stress": 0.15
+  },
+  {
+   "i": 125,
+   "w": "every",
+   "s": 39.531,
+   "e": 39.954,
+   "stress": 0.65
+  },
+  {
+   "i": 126,
+   "w": "single",
+   "s": 39.954,
+   "e": 40.377,
+   "stress": 0.65
+  },
+  {
+   "i": 127,
+   "w": "server.",
+   "s": 40.377,
+   "e": 40.783,
+   "stress": 0.8
+  },
+  {
+   "i": 128,
+   "w": "Plus",
+   "s": 41.285,
+   "e": 41.581,
+   "stress": 0.65
+  },
+  {
+   "i": 129,
+   "w": "something",
+   "s": 41.581,
+   "e": 42.004,
+   "stress": 0.65
+  },
+  {
+   "i": 130,
+   "w": "like",
+   "s": 42.004,
+   "e": 42.163,
+   "stress": 0.15
+  },
+  {
+   "i": 131,
+   "w": "half",
+   "s": 42.163,
+   "e": 42.459,
+   "stress": 1
+  },
+  {
+   "i": 132,
+   "w": "of",
+   "s": 42.459,
+   "e": 42.619,
+   "stress": 0.15
+  },
+  {
+   "i": 133,
+   "w": "PHP",
+   "s": 42.619,
+   "e": 43.26,
+   "stress": 0.75
+  },
+  {
+   "i": 134,
+   "w": "sites",
+   "s": 43.26,
+   "e": 43.556,
+   "stress": 0.55
+  },
+  {
+   "i": 135,
+   "w": "run",
+   "s": 43.556,
+   "e": 43.852,
+   "stress": 0.55
+  },
+  {
+   "i": 136,
+   "w": "versions",
+   "s": 43.852,
+   "e": 44.275,
+   "stress": 0.65
+  },
+  {
+   "i": 137,
+   "w": "so",
+   "s": 44.275,
+   "e": 44.434,
+   "stress": 0.15
+  },
+  {
+   "i": 138,
+   "w": "old",
+   "s": 44.434,
+   "e": 44.73,
+   "stress": 0.55
+  },
+  {
+   "i": 139,
+   "w": "they're",
+   "s": 44.73,
+   "e": 44.89,
+   "stress": 0.15
+  },
+  {
+   "i": 140,
+   "w": "not",
+   "s": 44.89,
+   "e": 45.049,
+   "stress": 0.15
+  },
+  {
+   "i": 141,
+   "w": "officially",
+   "s": 45.049,
+   "e": 45.591,
+   "stress": 0.75
+  },
+  {
+   "i": 142,
+   "w": "supported",
+   "s": 45.591,
+   "e": 46.031,
+   "stress": 0.75
+  },
+  {
+   "i": 143,
+   "w": "anymore.",
+   "s": 46.031,
+   "e": 46.454,
+   "stress": 0.9
+  },
+  {
+   "i": 144,
+   "w": "Even",
+   "s": 46.956,
+   "e": 47.196,
+   "stress": 0.15
+  },
+  {
+   "i": 145,
+   "w": "the",
+   "s": 47.196,
+   "e": 47.356,
+   "stress": 0.15
+  },
+  {
+   "i": 146,
+   "w": "FBI",
+   "s": 47.356,
+   "e": 47.997,
+   "stress": 0.85
+  },
+  {
+   "i": 147,
+   "w": "said",
+   "s": 47.997,
+   "e": 48.293,
+   "stress": 0.55
+  },
+  {
+   "i": 148,
+   "w": "if",
+   "s": 48.293,
+   "e": 48.452,
+   "stress": 0.15
+  },
+  {
+   "i": 149,
+   "w": "you",
+   "s": 48.452,
+   "e": 48.612,
+   "stress": 0.15
+  },
+  {
+   "i": 150,
+   "w": "can't",
+   "s": 48.612,
+   "e": 48.908,
+   "stress": 0.55
+  },
+  {
+   "i": 151,
+   "w": "update",
+   "s": 48.908,
+   "e": 49.331,
+   "stress": 0.65
+  },
+  {
+   "i": 152,
+   "w": "yet,",
+   "s": 49.331,
+   "e": 49.772,
+   "stress": 0.7
+  },
+  {
+   "i": 153,
+   "w": "just",
+   "s": 49.939,
+   "e": 50.098,
+   "stress": 0.15
+  },
+  {
+   "i": 154,
+   "w": "turn",
+   "s": 50.098,
+   "e": 50.394,
+   "stress": 0.55
+  },
+  {
+   "i": 155,
+   "w": "it",
+   "s": 50.394,
+   "e": 50.554,
+   "stress": 0.15
+  },
+  {
+   "i": 156,
+   "w": "off,",
+   "s": 50.554,
+   "e": 50.995,
+   "stress": 0.7
+  },
+  {
+   "i": 157,
+   "w": "which",
+   "s": 51.162,
+   "e": 51.322,
+   "stress": 0.15
+  },
+  {
+   "i": 158,
+   "w": "is",
+   "s": 51.322,
+   "e": 51.481,
+   "stress": 0.15
+  },
+  {
+   "i": 159,
+   "w": "basically",
+   "s": 51.481,
+   "e": 51.921,
+   "stress": 0.75
+  },
+  {
+   "i": 160,
+   "w": "tech",
+   "s": 51.921,
+   "e": 52.217,
+   "stress": 0.55
+  },
+  {
+   "i": 161,
+   "w": "support's",
+   "s": 52.217,
+   "e": 52.64,
+   "stress": 0.65
+  },
+  {
+   "i": 162,
+   "w": "answer",
+   "s": 52.64,
+   "e": 53.063,
+   "stress": 0.65
+  },
+  {
+   "i": 163,
+   "w": "to",
+   "s": 53.063,
+   "e": 53.223,
+   "stress": 0.15
+  },
+  {
+   "i": 164,
+   "w": "everything.",
+   "s": 53.223,
+   "e": 53.645,
+   "stress": 0.9
+  },
+  {
+   "i": 165,
+   "w": "And",
+   "s": 54.148,
+   "e": 54.307,
+   "stress": 0.15
+  },
+  {
+   "i": 166,
+   "w": "some",
+   "s": 54.307,
+   "e": 54.466,
+   "stress": 0.15
+  },
+  {
+   "i": 167,
+   "w": "of",
+   "s": 54.466,
+   "e": 54.626,
+   "stress": 0.15
+  },
+  {
+   "i": 168,
+   "w": "those",
+   "s": 54.626,
+   "e": 54.785,
+   "stress": 0.15
+  },
+  {
+   "i": 169,
+   "w": "governments",
+   "s": 54.785,
+   "e": 55.225,
+   "stress": 0.85
+  },
+  {
+   "i": 170,
+   "w": "did",
+   "s": 55.225,
+   "e": 55.521,
+   "stress": 0.55
+  },
+  {
+   "i": 171,
+   "w": "it",
+   "s": 55.521,
+   "e": 55.681,
+   "stress": 0.15
+  },
+  {
+   "i": 172,
+   "w": "before",
+   "s": 55.681,
+   "e": 55.921,
+   "stress": 0.15
+  },
+  {
+   "i": 173,
+   "w": "there",
+   "s": 55.921,
+   "e": 56.08,
+   "stress": 0.15
+  },
+  {
+   "i": 174,
+   "w": "was",
+   "s": 56.08,
+   "e": 56.24,
+   "stress": 0.15
+  },
+  {
+   "i": 175,
+   "w": "even",
+   "s": 56.24,
+   "e": 56.48,
+   "stress": 0.15
+  },
+  {
+   "i": 176,
+   "w": "a",
+   "s": 56.48,
+   "e": 56.639,
+   "stress": 0.15
+  },
+  {
+   "i": 177,
+   "w": "fix.",
+   "s": 56.639,
+   "e": 56.918,
+   "stress": 0.7
+  }
+ ],
+ "pauses": [
+  {
+   "s": 4.406,
+   "e": 4.573,
+   "dur": 0.167,
+   "after": 14,
+   "kind": "comma"
+  },
+  {
+   "s": 8.333,
+   "e": 8.835,
+   "dur": 0.502,
+   "after": 28,
+   "kind": "sentence"
+  },
+  {
+   "s": 9.94,
+   "e": 10.275,
+   "dur": 0.335,
+   "after": 31,
+   "kind": "ellipsis"
+  },
+  {
+   "s": 11.739,
+   "e": 11.906,
+   "dur": 0.167,
+   "after": 35,
+   "kind": "comma"
+  },
+  {
+   "s": 14.5,
+   "e": 15.003,
+   "dur": 0.503,
+   "after": 45,
+   "kind": "sentence"
+  },
+  {
+   "s": 19.981,
+   "e": 20.483,
+   "dur": 0.502,
+   "after": 64,
+   "kind": "sentence"
+  },
+  {
+   "s": 22.89,
+   "e": 23.057,
+   "dur": 0.167,
+   "after": 71,
+   "kind": "comma"
+  },
+  {
+   "s": 25.528,
+   "e": 25.695,
+   "dur": 0.167,
+   "after": 80,
+   "kind": "comma"
+  },
+  {
+   "s": 27.897,
+   "e": 28.399,
+   "dur": 0.502,
+   "after": 88,
+   "kind": "sentence"
+  },
+  {
+   "s": 30.324,
+   "e": 30.491,
+   "dur": 0.167,
+   "after": 95,
+   "kind": "comma"
+  },
+  {
+   "s": 33.999,
+   "e": 34.166,
+   "dur": 0.167,
+   "after": 106,
+   "kind": "comma"
+  },
+  {
+   "s": 35.609,
+   "e": 36.111,
+   "dur": 0.502,
+   "after": 111,
+   "kind": "sentence"
+  },
+  {
+   "s": 37.567,
+   "e": 37.734,
+   "dur": 0.167,
+   "after": 117,
+   "kind": "comma"
+  },
+  {
+   "s": 40.783,
+   "e": 41.285,
+   "dur": 0.502,
+   "after": 127,
+   "kind": "sentence"
+  },
+  {
+   "s": 46.454,
+   "e": 46.956,
+   "dur": 0.502,
+   "after": 143,
+   "kind": "sentence"
+  },
+  {
+   "s": 49.772,
+   "e": 49.939,
+   "dur": 0.167,
+   "after": 152,
+   "kind": "comma"
+  },
+  {
+   "s": 50.995,
+   "e": 51.162,
+   "dur": 0.167,
+   "after": 156,
+   "kind": "comma"
+  },
+  {
+   "s": 53.645,
+   "e": 54.148,
+   "dur": 0.503,
+   "after": 164,
+   "kind": "sentence"
+  }
+ ],
+ "sentences": [
+  {
+   "text": "Governments all over Europe just shut down a bunch of their own websites on purpose, because of this bug where hackers could take over a site without a password.",
+   "s": 0.125,
+   "e": 8.333,
+   "words": [
+    0,
+    28
+   ]
+  },
+  {
+   "text": "It's in PHP, the language everyone loves, and about seven out of ten websites run on it.",
+   "s": 8.835,
+   "e": 14.5,
+   "words": [
+    29,
+    45
+   ]
+  },
+  {
+   "text": "This bug was in there for like fourteen years before researchers using AI figured out how bad it was.",
+   "s": 15.003,
+   "e": 19.981,
+   "words": [
+    46,
+    64
+   ]
+  },
+  {
+   "text": "They gave the PHP people a heads-up, but word got out before the fix was ready, and hackers were already trying to use it.",
+   "s": 20.483,
+   "e": 27.897,
+   "words": [
+    65,
+    88
+   ]
+  },
+  {
+   "text": "Cloudflare says that once it was announced, they saw tens of thousands of hacking attempts in forty-five minutes, and millions within a day.",
+   "s": 28.399,
+   "e": 35.609,
+   "words": [
+    89,
+    111
+   ]
+  },
+  {
+   "text": "But even with the fix out, somebody still has to install it on every single server.",
+   "s": 36.111,
+   "e": 40.783,
+   "words": [
+    112,
+    127
+   ]
+  },
+  {
+   "text": "Plus something like half of PHP sites run versions so old they're not officially supported anymore.",
+   "s": 41.285,
+   "e": 46.454,
+   "words": [
+    128,
+    143
+   ]
+  },
+  {
+   "text": "Even the FBI said if you can't update yet, just turn it off, which is basically tech support's answer to everything.",
+   "s": 46.956,
+   "e": 53.645,
+   "words": [
+    144,
+    164
+   ]
+  },
+  {
+   "text": "And some of those governments did it before there was even a fix.",
+   "s": 54.148,
+   "e": 56.918,
+   "words": [
+    165,
+    177
+   ]
+  }
+ ],
+ "captions": [
+  {
+   "s": 0.125,
+   "e": 2.322,
+   "lines": [
+    {
+     "text": "Governments all over",
+     "s": 0.125,
+     "words": [
+      0,
+      2
+     ]
+    },
+    {
+     "text": "Europe just shut down",
+     "s": 1.147,
+     "words": [
+      3,
+      6
+     ]
+    }
+   ],
+   "words": [
+    0,
+    6
+   ],
+   "highlights": [
+    {
+     "text": "Governments",
+     "s": 0.125,
+     "i": 0
+    }
+   ]
+  },
+  {
+   "s": 2.322,
+   "e": 4.573,
+   "lines": [
+    {
+     "text": "a bunch of their own",
+     "s": 2.322,
+     "words": [
+      7,
+      11
+     ]
+    },
+    {
+     "text": "websites on purpose,",
+     "s": 3.255,
+     "words": [
+      12,
+      14
+     ]
+    }
+   ],
+   "words": [
+    7,
+    14
+   ],
+   "highlights": [
+    {
+     "text": "purpose",
+     "s": 3.838,
+     "i": 14
+    }
+   ]
+  },
+  {
+   "s": 4.573,
+   "e": 6.011,
+   "lines": [
+    {
+     "text": "because of this bug",
+     "s": 4.573,
+     "words": [
+      15,
+      18
+     ]
+    },
+    {
+     "text": "where hackers",
+     "s": 5.428,
+     "words": [
+      19,
+      20
+     ]
+    }
+   ],
+   "words": [
+    15,
+    20
+   ],
+   "highlights": [
+    {
+     "text": "hackers",
+     "s": 5.588,
+     "i": 20
+    }
+   ]
+  },
+  {
+   "s": 6.011,
+   "e": 8.835,
+   "lines": [
+    {
+     "text": "could take over a site",
+     "s": 6.011,
+     "words": [
+      21,
+      25
+     ]
+    },
+    {
+     "text": "without a password.",
+     "s": 7.344,
+     "words": [
+      26,
+      28
+     ]
+    }
+   ],
+   "words": [
+    21,
+    28
+   ],
+   "highlights": [
+    {
+     "text": "password",
+     "s": 7.927,
+     "i": 28
+    }
+   ]
+  },
+  {
+   "s": 8.835,
+   "e": 10.275,
+   "lines": [
+    {
+     "text": "It's in PHP,",
+     "s": 8.835,
+     "words": [
+      29,
+      31
+     ]
+    }
+   ],
+   "words": [
+    29,
+    31
+   ],
+   "highlights": [
+    {
+     "text": "PHP",
+     "s": 9.154,
+     "i": 31
+    }
+   ]
+  },
+  {
+   "s": 10.275,
+   "e": 11.906,
+   "lines": [
+    {
+     "text": "the language",
+     "s": 10.275,
+     "words": [
+      32,
+      33
+     ]
+    },
+    {
+     "text": "everyone loves,",
+     "s": 10.857,
+     "words": [
+      34,
+      35
+     ]
+    }
+   ],
+   "words": [
+    32,
+    35
+   ],
+   "highlights": [
+    {
+     "text": "everyone",
+     "s": 10.857,
+     "i": 34
+    }
+   ]
+  },
+  {
+   "s": 11.906,
+   "e": 12.729,
+   "lines": [
+    {
+     "text": "and about seven",
+     "s": 11.906,
+     "words": [
+      36,
+      38
+     ]
+    }
+   ],
+   "words": [
+    36,
+    38
+   ],
+   "highlights": [
+    {
+     "text": "seven",
+     "s": 12.306,
+     "i": 38
+    }
+   ]
+  },
+  {
+   "s": 12.729,
+   "e": 15.003,
+   "lines": [
+    {
+     "text": "out of ten websites run",
+     "s": 12.729,
+     "words": [
+      39,
+      43
+     ]
+    },
+    {
+     "text": "on it.",
+     "s": 14.199,
+     "words": [
+      44,
+      45
+     ]
+    }
+   ],
+   "words": [
+    39,
+    45
+   ],
+   "highlights": [
+    {
+     "text": "ten",
+     "s": 13.184,
+     "i": 41
+    }
+   ]
+  },
+  {
+   "s": 15.003,
+   "e": 15.936,
+   "lines": [
+    {
+     "text": "This bug was in there",
+     "s": 15.003,
+     "words": [
+      46,
+      50
+     ]
+    }
+   ],
+   "words": [
+    46,
+    50
+   ],
+   "highlights": [
+    {
+     "text": "bug",
+     "s": 15.162,
+     "i": 47
+    }
+   ]
+  },
+  {
+   "s": 15.936,
+   "e": 17.654,
+   "lines": [
+    {
+     "text": "for like fourteen years",
+     "s": 15.936,
+     "words": [
+      51,
+      54
+     ]
+    },
+    {
+     "text": "before researchers",
+     "s": 16.974,
+     "words": [
+      55,
+      56
+     ]
+    }
+   ],
+   "words": [
+    51,
+    56
+   ],
+   "highlights": [
+    {
+     "text": "fourteen",
+     "s": 16.255,
+     "i": 53
+    }
+   ]
+  },
+  {
+   "s": 17.654,
+   "e": 20.483,
+   "lines": [
+    {
+     "text": "using AI figured out",
+     "s": 17.654,
+     "words": [
+      57,
+      60
+     ]
+    },
+    {
+     "text": "how bad it was.",
+     "s": 19.224,
+     "words": [
+      61,
+      64
+     ]
+    }
+   ],
+   "words": [
+    57,
+    64
+   ],
+   "highlights": [
+    {
+     "text": "bad",
+     "s": 19.383,
+     "i": 62
+    }
+   ]
+  },
+  {
+   "s": 20.483,
+   "e": 23.057,
+   "lines": [
+    {
+     "text": "They gave the PHP",
+     "s": 20.483,
+     "words": [
+      65,
+      68
+     ]
+    },
+    {
+     "text": "people a heads-up,",
+     "s": 21.739,
+     "words": [
+      69,
+      71
+     ]
+    }
+   ],
+   "words": [
+    65,
+    71
+   ],
+   "highlights": [
+    {
+     "text": "heads-up",
+     "s": 22.321,
+     "i": 71
+    }
+   ]
+  },
+  {
+   "s": 23.057,
+   "e": 25.695,
+   "lines": [
+    {
+     "text": "but word got out before",
+     "s": 23.057,
+     "words": [
+      72,
+      76
+     ]
+    },
+    {
+     "text": "the fix was ready,",
+     "s": 24.344,
+     "words": [
+      77,
+      80
+     ]
+    }
+   ],
+   "words": [
+    72,
+    80
+   ],
+   "highlights": [
+    {
+     "text": "ready",
+     "s": 24.959,
+     "i": 80
+    }
+   ]
+  },
+  {
+   "s": 25.695,
+   "e": 26.877,
+   "lines": [
+    {
+     "text": "and hackers",
+     "s": 25.695,
+     "words": [
+      81,
+      82
+     ]
+    },
+    {
+     "text": "were already",
+     "s": 26.277,
+     "words": [
+      83,
+      84
+     ]
+    }
+   ],
+   "words": [
+    81,
+    84
+   ],
+   "highlights": [
+    {
+     "text": "already",
+     "s": 26.437,
+     "i": 84
+    }
+   ]
+  },
+  {
+   "s": 26.877,
+   "e": 28.399,
+   "lines": [
+    {
+     "text": "trying to use it.",
+     "s": 26.877,
+     "words": [
+      85,
+      88
+     ]
+    }
+   ],
+   "words": [
+    85,
+    88
+   ],
+   "highlights": [
+    {
+     "text": "use",
+     "s": 27.459,
+     "i": 87
+    }
+   ]
+  },
+  {
+   "s": 28.399,
+   "e": 30.491,
+   "lines": [
+    {
+     "text": "Cloudflare says that",
+     "s": 28.399,
+     "words": [
+      89,
+      91
+     ]
+    },
+    {
+     "text": "once it was announced,",
+     "s": 29.278,
+     "words": [
+      92,
+      95
+     ]
+    }
+   ],
+   "words": [
+    89,
+    95
+   ],
+   "highlights": [
+    {
+     "text": "announced",
+     "s": 29.756,
+     "i": 95
+    }
+   ]
+  },
+  {
+   "s": 30.491,
+   "e": 31.825,
+   "lines": [
+    {
+     "text": "they saw",
+     "s": 30.491,
+     "words": [
+      96,
+      97
+     ]
+    },
+    {
+     "text": "tens of thousands",
+     "s": 30.947,
+     "words": [
+      98,
+      100
+     ]
+    }
+   ],
+   "words": [
+    96,
+    100
+   ],
+   "highlights": [
+    {
+     "text": "tens",
+     "s": 30.947,
+     "i": 98
+    }
+   ]
+  },
+  {
+   "s": 31.825,
+   "e": 34.166,
+   "lines": [
+    {
+     "text": "of hacking attempts",
+     "s": 31.825,
+     "words": [
+      101,
+      103
+     ]
+    },
+    {
+     "text": "in forty-five minutes,",
+     "s": 32.831,
+     "words": [
+      104,
+      106
+     ]
+    }
+   ],
+   "words": [
+    101,
+    106
+   ],
+   "highlights": [
+    {
+     "text": "forty-five",
+     "s": 32.99,
+     "i": 105
+    }
+   ]
+  },
+  {
+   "s": 34.166,
+   "e": 36.111,
+   "lines": [
+    {
+     "text": "and millions",
+     "s": 34.166,
+     "words": [
+      107,
+      108
+     ]
+    },
+    {
+     "text": "within a day.",
+     "s": 34.748,
+     "words": [
+      109,
+      111
+     ]
+    }
+   ],
+   "words": [
+    107,
+    111
+   ],
+   "highlights": [
+    {
+     "text": "millions",
+     "s": 34.325,
+     "i": 108
+    }
+   ]
+  },
+  {
+   "s": 36.111,
+   "e": 37.734,
+   "lines": [
+    {
+     "text": "But even",
+     "s": 36.111,
+     "words": [
+      112,
+      113
+     ]
+    },
+    {
+     "text": "with the fix out,",
+     "s": 36.511,
+     "words": [
+      114,
+      117
+     ]
+    }
+   ],
+   "words": [
+    112,
+    117
+   ],
+   "highlights": [
+    {
+     "text": "out",
+     "s": 37.126,
+     "i": 117
+    }
+   ]
+  },
+  {
+   "s": 37.734,
+   "e": 39.372,
+   "lines": [
+    {
+     "text": "somebody",
+     "s": 37.734,
+     "words": [
+      118,
+      118
+     ]
+    },
+    {
+     "text": "still has to install it",
+     "s": 38.174,
+     "words": [
+      119,
+      123
+     ]
+    }
+   ],
+   "words": [
+    118,
+    123
+   ],
+   "highlights": [
+    {
+     "text": "still",
+     "s": 38.174,
+     "i": 119
+    }
+   ]
+  },
+  {
+   "s": 39.372,
+   "e": 41.285,
+   "lines": [
+    {
+     "text": "on every single server.",
+     "s": 39.372,
+     "words": [
+      124,
+      127
+     ]
+    }
+   ],
+   "words": [
+    124,
+    127
+   ],
+   "highlights": [
+    {
+     "text": "server",
+     "s": 40.377,
+     "i": 127
+    }
+   ]
+  },
+  {
+   "s": 41.285,
+   "e": 43.556,
+   "lines": [
+    {
+     "text": "Plus something",
+     "s": 41.285,
+     "words": [
+      128,
+      129
+     ]
+    },
+    {
+     "text": "like half of PHP sites",
+     "s": 42.004,
+     "words": [
+      130,
+      134
+     ]
+    }
+   ],
+   "words": [
+    128,
+    134
+   ],
+   "highlights": [
+    {
+     "text": "half",
+     "s": 42.163,
+     "i": 131
+    }
+   ]
+  },
+  {
+   "s": 43.556,
+   "e": 44.73,
+   "lines": [
+    {
+     "text": "run versions so old",
+     "s": 43.556,
+     "words": [
+      135,
+      138
+     ]
+    }
+   ],
+   "words": [
+    135,
+    138
+   ],
+   "highlights": [
+    {
+     "text": "versions",
+     "s": 43.852,
+     "i": 136
+    }
+   ]
+  },
+  {
+   "s": 44.73,
+   "e": 46.956,
+   "lines": [
+    {
+     "text": "they're not officially",
+     "s": 44.73,
+     "words": [
+      139,
+      141
+     ]
+    },
+    {
+     "text": "supported anymore.",
+     "s": 45.591,
+     "words": [
+      142,
+      143
+     ]
+    }
+   ],
+   "words": [
+    139,
+    143
+   ],
+   "highlights": [
+    {
+     "text": "anymore",
+     "s": 46.031,
+     "i": 143
+    }
+   ]
+  },
+  {
+   "s": 46.956,
+   "e": 49.939,
+   "lines": [
+    {
+     "text": "Even the FBI said",
+     "s": 46.956,
+     "words": [
+      144,
+      147
+     ]
+    },
+    {
+     "text": "if you can't update yet,",
+     "s": 48.293,
+     "words": [
+      148,
+      152
+     ]
+    }
+   ],
+   "words": [
+    144,
+    152
+   ],
+   "highlights": [
+    {
+     "text": "FBI",
+     "s": 47.356,
+     "i": 146
+    }
+   ]
+  },
+  {
+   "s": 49.939,
+   "e": 51.921,
+   "lines": [
+    {
+     "text": "just turn it off,",
+     "s": 49.939,
+     "words": [
+      153,
+      156
+     ]
+    },
+    {
+     "text": "which is basically",
+     "s": 51.162,
+     "words": [
+      157,
+      159
+     ]
+    }
+   ],
+   "words": [
+    153,
+    159
+   ],
+   "highlights": [
+    {
+     "text": "basically",
+     "s": 51.481,
+     "i": 159
+    }
+   ]
+  },
+  {
+   "s": 51.921,
+   "e": 54.148,
+   "lines": [
+    {
+     "text": "tech support's",
+     "s": 51.921,
+     "words": [
+      160,
+      161
+     ]
+    },
+    {
+     "text": "answer to everything.",
+     "s": 52.64,
+     "words": [
+      162,
+      164
+     ]
+    }
+   ],
+   "words": [
+    160,
+    164
+   ],
+   "highlights": [
+    {
+     "text": "everything",
+     "s": 53.223,
+     "i": 164
+    }
+   ]
+  },
+  {
+   "s": 54.148,
+   "e": 55.681,
+   "lines": [
+    {
+     "text": "And some of those",
+     "s": 54.148,
+     "words": [
+      165,
+      168
+     ]
+    },
+    {
+     "text": "governments did it",
+     "s": 54.785,
+     "words": [
+      169,
+      171
+     ]
+    }
+   ],
+   "words": [
+    165,
+    171
+   ],
+   "highlights": [
+    {
+     "text": "governments",
+     "s": 54.785,
+     "i": 169
+    }
+   ]
+  },
+  {
+   "s": 55.681,
+   "e": 57.118,
+   "lines": [
+    {
+     "text": "before there",
+     "s": 55.681,
+     "words": [
+      172,
+      173
+     ]
+    },
+    {
+     "text": "was even a fix.",
+     "s": 56.08,
+     "words": [
+      174,
+      177
+     ]
+    }
+   ],
+   "words": [
+    172,
+    177
+   ],
+   "highlights": [
+    {
+     "text": "fix",
+     "s": 56.639,
+     "i": 177
+    }
+   ]
+  }
+ ],
+ "hits": [
+  {
+   "i": 14,
+   "w": "purpose,",
+   "s": 3.838,
+   "stress": 1,
+   "number": false
+  },
+  {
+   "i": 31,
+   "w": "PHP,",
+   "s": 9.154,
+   "stress": 0.95,
+   "number": false
+  },
+  {
+   "i": 38,
+   "w": "seven",
+   "s": 12.306,
+   "stress": 0.9,
+   "number": true
+  },
+  {
+   "i": 41,
+   "w": "ten",
+   "s": 13.184,
+   "stress": 0.9,
+   "number": true
+  },
+  {
+   "i": 53,
+   "w": "fourteen",
+   "s": 16.255,
+   "stress": 0.9,
+   "number": true
+  },
+  {
+   "i": 84,
+   "w": "already",
+   "s": 26.437,
+   "stress": 1,
+   "number": false
+  },
+  {
+   "i": 98,
+   "w": "tens",
+   "s": 30.947,
+   "stress": 0.9,
+   "number": true
+  },
+  {
+   "i": 100,
+   "w": "thousands",
+   "s": 31.402,
+   "stress": 0.9,
+   "number": true
+  },
+  {
+   "i": 105,
+   "w": "forty-five",
+   "s": 32.99,
+   "stress": 0.9,
+   "number": true
+  },
+  {
+   "i": 108,
+   "w": "millions",
+   "s": 34.325,
+   "stress": 0.9,
+   "number": true
+  },
+  {
+   "i": 119,
+   "w": "still",
+   "s": 38.174,
+   "stress": 1,
+   "number": false
+  },
+  {
+   "i": 131,
+   "w": "half",
+   "s": 42.163,
+   "stress": 1,
+   "number": true
+  },
+  {
+   "i": 143,
+   "w": "anymore.",
+   "s": 46.031,
+   "stress": 0.9,
+   "number": false
+  },
+  {
+   "i": 164,
+   "w": "everything.",
+   "s": 53.223,
+   "stress": 0.9,
+   "number": false
+  }
+ ],
+ "leadIn": {
+  "s": 0,
+  "e": 0.035
+ },
+ "tail": {
+  "s": 56.918,
+  "e": 57.118
+ },
+ "estimate": {
+  "note": "ESTIMATED timeline for the unrecorded v3 script: every time here is a prediction from the measured pace of assets/timing.json. Replace with the real timing (same schema, no \"estimated\") once the voice is recorded; storyboards anchor to WORDS, so scripts/anchor/resolve.py re-times them.",
+  "script": "docs/script/final_script.md",
+  "cued": "docs/script/final_script_elevenlabs.txt",
+  "paceFrom": "assets/timing.json",
+  "paceFactor": 1,
+  "generatedBy": "scripts/anchor/estimate_timing.py",
+  "words": 178,
+  "model": {
+   "slot": "a + b*syllables + c*function_word + bucket residual (k=5 shrink) + final lengthening; acronyms per letter",
+   "coef": {
+    "a": 0.2369,
+    "b_per_syllable": 0.0804,
+    "c_function_word": -0.1544
+   },
+   "slotBySyllables": {
+    "content:1": {
+     "slot": 0.296,
+     "n": 74
+    },
+    "content:2": {
+     "slot": 0.423,
+     "n": 40
+    },
+    "content:3": {
+     "slot": 0.44,
+     "n": 13
+    },
+    "content:4": {
+     "slot": 0.542,
+     "n": 2
+    },
+    "func:1": {
+     "slot": 0.159,
+     "n": 90
+    },
+    "func:2": {
+     "slot": 0.24,
+     "n": 5
+    }
+   },
+   "finalLengthening": {
+    "comma": 0.146,
+    "sentence": -0.017,
+    "ellipsis": 0.146
+   },
+   "acronymPerLetter": 0.214,
+   "pauses": {
+    "comma": 0.167,
+    "sentence": 0.502,
+    "ellipsis": 0.335,
+    "measuredCommas": 15,
+    "measuredSentenceEnds": 18
+   },
+   "leadIn": 0.125,
+   "tail": 0.2
+  },
+  "stressHeuristic": "cued CAPS 1.0, numbers 0.9, function words 0.15, content 0.55-0.95 (no audio yet)",
+  "cuedCaps": [
+   "purpose,",
+   "already",
+   "still",
+   "half"
+  ],
+  "uncertainty": {
+   "sentenceWordTimeRms": 0.431,
+   "sentenceBias": -0.124,
+   "totalSigma": 1.4,
+   "how": "leave-one-sentence-out on the pace source + spread of the measured pauses"
+  },
+  "validation": {
+   "take": "assets/vo_v3_draft_take_words_raw.json",
+   "words": 170,
+   "compared": 166,
+   "startErrMean": -0.141,
+   "startErrRms": 0.468,
+   "startErrMax": -0.985,
+   "endPredicted": 55,
+   "endMeasured": 54.56,
+   "driftAtSentenceStarts": [
+    -0.39,
+    -0.68,
+    -0.61,
+    0.25,
+    0.25,
+    -0.37,
+    -0.31,
+    0.12,
+    0.52,
+    0.56
+   ]
+  },
+  "durationWithOtherPace": {
+   "assets/timing_v1.json": 53.176,
+   "assets/vo_v3_draft_take_words_raw.json": 56.922
+  }
+ }
+}

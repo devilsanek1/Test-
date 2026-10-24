@@ -72,7 +72,7 @@ export const OLD_QUARTER = {
   ] as FurnitureItem[],
   /** Rooftops (review 5: one distinct type + one rooftop detail per site, all under the y-600 ceiling): siteL a teal
    *  mansard with two dormers, siteM a TV antenna, siteR balconies, rooftop plants and a water tank on legs. */
-  roofs: {mansard: {base: 690, top: 616, x0: 22, x1: 353, inset: 30}, dormers: [[112, 640], [238, 640]] as Pt[], antenna: {x: 548, base: 820, top: 724}, tank: {x: 978, y: 618, w: 54, h: 42, legs: 700}, balconies: [800, 1000] as number[]},
+  roofs: {mansard: {base: 690, top: 616, x0: 22, x1: 353, inset: 30}, dormers: [[112, 640], [238, 640]] as Pt[], antenna: {x: 616, base: 820, top: 730}, tank: {x: 978, y: 618, w: 54, h: 42, legs: 700}, balconies: [800, 1000] as number[]},
 } as const;
 
 type SiteId = 'L' | 'M' | 'R';

@@ -98,7 +98,7 @@ export const PLAZA = {
    *  x 374-707, y 1191-1425); govB window sill (Pip, snail) at world y 1122. */
   closeup: {cam: [518, 826] as Pt, zoom: 1.6, sill: 1122},
   /** The S01 -> S02 dive: camera that puts govB's 22 x 27 lock box at screen (560, 1090) at 52 x 65 px. */
-  dive: {cam: [492, 1246] as Pt, zoom: 2.4},
+  dive: {cam: [535, 1264] as Pt, zoom: 2.4},
   /** Layer nearness (storyboard depths). */
   layers: {far: 0.1, sun: 0.12, buildings: 0.55, govD: 0.62, ground: 0.7, light: 0.7, near: 1.0},
 } as const;

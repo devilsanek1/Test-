@@ -41,6 +41,35 @@ def load_json(p):
         return json.load(f)
 
 
+_GLUED = re.compile(r"^([A-Za-z']+)(\d+)([.,!?]*)$")
+
+
+def load_timing(p):
+    """A timing doc in the assets/timing.json schema. A raw ASR word list ({text?, duration, words: [{w, s, e}]}, e.g.
+    assets/vo_v3_draft_take_words_raw.json) is normalized in memory: ASR digit glue is split ("about7" -> "about",
+    "7"; the digit gets the later half of the span), i / stress / voStart / voEnd are filled, and "rawAsr": true."""
+    doc = load_json(p)
+    words = doc.get('words') or []
+    if words and all('i' in w and 'stress' in w for w in words):
+        return doc
+    out = []
+    for w in words:
+        m = _GLUED.match(w['w'])
+        if m:
+            mid = round(w['s'] + (w['e'] - w['s']) / 2, 3)
+            out.append({'w': m.group(1), 's': w['s'], 'e': mid})
+            out.append({'w': m.group(2) + m.group(3), 's': mid, 'e': w['e']})
+        else:
+            out.append({'w': w['w'], 's': w['s'], 'e': w['e']})
+    for i, w in enumerate(out):
+        w['i'] = i
+        w['stress'] = 0.5
+    dur = float(doc.get('duration', out[-1]['e'] if out else 0))
+    return {'duration': dur, 'voStart': out[0]['s'] if out else 0.0, 'voEnd': out[-1]['e'] if out else dur,
+            'words': [{'i': w['i'], 'w': w['w'], 's': w['s'], 'e': w['e'], 'stress': w['stress']} for w in out],
+            'rawAsr': True, 'source': p}
+
+
 # ---------------------------------------------------------------- tokens
 
 def split_words(text):

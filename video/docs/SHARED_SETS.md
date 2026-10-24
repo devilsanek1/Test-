@@ -7,8 +7,10 @@
 import {GovernmentPlaza, PLAZA, StoopStreet, Stoop, StoopBeats, stoopStreetDoors, BlueprintStreet, BlueprintWall,
   MakersLane, Workshop, WORKSHOP_CORNER, NoticeboardCorner, TelephoneWires, WIRES, DomeCity, DomeTallies, domeArcY,
   TerraceHill, TerraceRings, TERRACE, TERRACE_FLAT, OldQuarter, SiteFacade, PerspRow, Foreground, groundMarks,
-  GroundMarks} from '../shared/sets';
+  GroundMarks, People, Furniture, EdgeFigure} from '../shared/sets';
 ```
+`SET_CATALOG` (storyboard-v1 demo times, the preview DemoWorld / DemoSun) is NOT in the barrel: it is preview-only, and
+SetsPreview / SharedKitSheet import it from `sets/catalog` directly, so no demo choreography reaches the film bundle.
 
 ![sets](shared_sets_sheet.png)
 
@@ -35,7 +37,10 @@ node src/scenes/shared/sets/preview/render.mjs SetsSheet /tmp/o 2          # eve
 
 Demo event times live only in `sets/catalog.tsx` (storyboard v1 values), including the demo beat overlays
 (`StoopBeats`, `TerraceRings`, `DomeTallies`). `SET_CATALOG[i].thumb()` renders a set at rest without a World (the props
-lane's `SharedKitSheet` draws them in its bottom band).
+lane's `SharedKitSheet` draws them in its bottom band; golden sets are wrapped in `<Tod value="golden">`). The preview
+`DemoWorld tod="golden"` relights a set like a scene's World does (golden = the day sky + the core `todSteps.golden`
+row); `DemoSun` is pinned (`drift={[0, 0]}`) so a preview frame shows the sun SLOT exactly (a scene's `<Sun>` drifts
+10 px/s by default: see the S01 note in section 3).
 
 ## 1. The contract (every set)
 
@@ -58,7 +63,7 @@ lane's `SharedKitSheet` draws them in its bottom band).
   depth (behind the far city / rows / roofs).
 - **Multiplane:** `wrap={(name, nearness, node) => <Layer depth={1 - nearness}>{node}</Layer>}` splits any set into its
   layers (nearness follows the storyboard: 0.05 sky ... 1.0 foreground). Layer names are listed per set.
-- **Ink by depth** (4.8 / 3.4 / 2.2 / 1.6, far layers fill-only). Ink is in world px and scales with the camera (like the
+- **Ink by depth** (4.8 / 3.4 / 2.2 / 1.6, far layers fill-only; the plaza's nearest building govD 4.0). Ink is in world px and scales with the camera (like the
   reference push-in). Exceptions: `detail="close"` thins govB (S11 at 1.85x); TerraceHill uses a SCREEN-space ladder
   (row 0 3.4, row 1 2.2, rows 2-3 1.6, then none) with a world-unit floor for its zoom-6 match (row 0 0.85): on-screen
   width = max(world x zoom, screen), so there is no pop across the pull-back (`terraceInk(k, zoom)`).
@@ -69,8 +74,14 @@ lane's `SharedKitSheet` draws them in its bottom band).
   sky is cream (sand / tan, or half-sand for far silhouettes); the dome glass uses `glassStep` (never paper-white).
 - **Ground = one flat field** with 2-3 broken kerb lines, a few broken paving lines that die toward the viewer and
   sparse specks (`groundMarks`, section 2); never a full perspective tile grid (BlueprintStreet's grid is the blueprint
-  sheet itself). **Foreground**: every street set takes `foreground` (ground.tsx presets) so the bottom third is never
-  a dead field; it lives in the bottom band (y >= ~1480, under the platform UI).
+  sheet laid on the street, drawn with the ink rules). **Foreground**: every street set takes `foreground` (ground.tsx
+  presets). Review 5: the DEFAULT near layer sits INSIDE the visible band (y 1150-1500), because the platform UI covers
+  the bottom band on a phone: a back-view figure cropped by a side edge (`edgeL` / `edgeR`, the plaza's left onlooker,
+  the dome's observer) or a tree crown at a frame side; kerbs / railings / bottom heads remain as extra framing.
+- **Life** (review 5, `life.tsx`): every street set has a seeded `people` layer (2-3 back-view walkers / standers at
+  0.10-0.24 H on documented pavement anchors `SET.walkers`, `riseAt` / `walk` in seconds, `false` = nobody) and 1-2
+  ink-led street-furniture props (`furniture`: bike, bench, planter, the makers' cart). Scenes stop re-inventing
+  placement; they pass `people={false}` where the story says nobody (S04) and their own walkers otherwise.
 - **Misregistration** is per object (core `Fill`); TerraceHill and the props use SCREEN-space offsets (/ zoom).
 - **Render states**: `<Look fills="paper">` (line art), `<Look cascade>`, the un-build and `<Tod>` relight all work: sets are
   built from core `Ink` / `Fill` (batched paths where numerous). `LightsOut` = one palette step darker (`stepDarker`:
@@ -96,12 +107,33 @@ const g = groundMarks({vp, top, bottom: 1920, x0, x1, rays: 4, cross: 2, specks:
 ```
 `groundMarks`: 3-6 paving lines on rays to the VP, each 2-3 pen strokes with gaps, starting near the far edge and dying
 by `reach` of the way down; 1-2 partial, broken cross joints; seeded specks (bigger near). `avoid(x, y)` keeps marks off
-paths / props. Foreground presets (bottom band, world coords at rest): `heads` = 4 back-view heads + shoulders (props
-EdgeOnlooker) at x 70 / 300 / 800 / 1015, tops 0.86-0.91 H, the centre open; `kerb` = a sand kerb band at y 1660 with
-bold broken lines, bollards at x 160 and 1046 (cut by the right edge) and a drain grate; `railing` = a low iron railing
-(top rail y 1710) from the left edge to an end post at x 700; `treeL` / `treeR` = a teal crown r150-165 cut by the side
-edge, trunk into a tree pit at y 1700. Defaults: StoopStreet `kerb`, BlueprintWall `heads`, OldQuarter `railing` (none
-while the S13 audience is on); GovernmentPlaza, NoticeboardCorner and TerraceHill none (they frame themselves).
+paths / props. Foreground presets (world coords at rest): `edgeL` / `edgeR` = a big back-view figure (props
+EdgeOnlooker, head 124 at (46 | 1034, 1330), the near arm, a rim strip) cropped by the side edge, its head INSIDE the
+visible band, coat running off the bottom; `treeL` / `treeR` = a teal crown r150-165 centred at y 1310 (in the band) cut
+by the side edge, trunk into a tree pit at y 1640; bottom-band framing (under the platform UI): `heads` = 4 back-view
+heads + shoulders at x 70 / 300 / 800 / 1015, the centre open; `kerb` = a sand kerb band at y 1660 with bold broken
+lines, bollards at x 160 and 1046 and a drain grate; `railing` = a low iron railing (top rail y 1710) from the left edge
+to an end post at x 700. Defaults: StoopStreet `['kerb', 'edgeL']`, BlueprintWall `heads`, OldQuarter `railing` (+ its
+in-band tree and left stander; none while the S13 audience is on); GovernmentPlaza, NoticeboardCorner, DomeCity and
+TerraceHill frame themselves (plaza left onlooker in the band, readers, the dome observer, the terrace standers).
+
+### Street life (`life.tsx`, review 5)
+
+```tsx
+<People anchors={STOOP.walkers} vp={STOOP.vp} spec={people} />     // what every street set draws for you
+people={false}                         // nobody (S04's "nobody did")
+people={{riseAt: 1.2, walk: 1.6}}      // rise in (0.33 s out-exp, 0.06 s stagger), start walking at 1.6 s
+people={{n: 1, walk: false}}           // only the first anchor, standing
+people={{walkers: [{x, y, h, go: 'vp', body, hair, acc}]}}        // replace the anchors
+<Furniture items={[{kind: 'bike' | 'bench' | 'planter' | 'cart', x, y, s, flip, at}]} />
+<EdgeFigure side="L" y={1330} head={124} riseAt={...} />           // the in-band edge figure (any set, any spot)
+walkerAt(anchor, vp, t, walkAt)        // feet / height of a walker at t (to place a prop on someone)
+```
+Walkers are props `Citizen` (back view, legs). `go: 'vp'` walks AWAY along the anchor's ray to the set's vanishing point
+at constant speed in depth (`pace`, default 5 % farther per second) and shrinks with perspective; `go: 'stand'` idles
+(bob 1.2 px). Nobody walks toward the camera or sideways (people are always seen from behind). Heights come from each
+set's eye-level camera, h = (feet y - horizon) / 1.1. Furniture: kit `Bike` (ink only), a sand bench (150 px at s 1), a
+tan planter with a sage shrub (110 px at s 1), props `MakersCart` (160 px bed at s 1).
 
 ### SiteFacade (S0) — a website building, frontal (or on a core `<Plane>`)
 
@@ -137,34 +169,50 @@ Every house is a handful of batched paths computed once in screen space through 
   gov={{govA: {chromeAt, screenOnAt, shutterAt, offAt, tagAt, tagTapAt, padlockAt, glintAt}, govB: {...}, govC, govD}}
   pennantsAt={[1.23, 1.38, 1.53, 1.68]} pennantWaveAt={...} citizensAt={1.06} phonesAt={2.05}
   lanternOffAt={3.25} pigeonsAt={1.7} pigeonsFlyAt={3.3} />
-<GovernmentPlaza state="lineArt" />   // frame 0 / the S13 un-build underlay
+<GovernmentPlaza state="lineArt" />   // frame 0 / the S13 un-build underlay (ink-only browser chrome by default)
 <GovernmentPlaza state="off" />       // the S01 end state = S11's hard cut
 <GovernmentPlaza detail="close" windowSlot={(id, r) => id === 'govB' ? <BrowserChrome ... progress={...} ring={...}/> : undefined} />
 ```
 - **States share every path and seed** (pixel-identical geometry). `lineArt`: ink on white fills, people as white
-  tombstones, plain windows (no chrome), no pennants, no light. `built`: colour (optionally the cascade from the sun gap,
-  `PLAZA.cascadeOrigin`) + the timed events. `off`: chrome on, every shutter down, padlocked and tagged, every building
-  one step darker, the lantern sand, pennants up, the sun path and the clock face still bright.
-- **Scale (PEAK 1)**: inside the ceiling the monumental cues are pushed: govA's colonnade runs y 758-1136 (stylobate
-  1148, steps to 1208), govB's drum 750-820 under a dome ry 102 (lantern tip still 600), every door is >= 3x a citizen
-  (govA door now (120, 1020, 80, 120)), the 9 citizens are 36-44 px, and the far city in the gap is two fill-only haze
-  tiers (#98C0AE skyline 912-968 behind the sun's lower edge, #84B09C blocks 1030-1110) with two short cranes. The three
-  onlookers are cropped to heads + shoulders in the bottom corners (<= 0.15 H visible: framing, not scale).
-  Ceiling-vs-peak trade-off (for the orchestrator): with nothing above y 600 the architecture spans y 600-1208
-  (0.32 H); a true playbook peak (colossus >= 0.7 H) would need the ceiling raised for this shot (or a caption-free
-  first second), not a set change.
-- **Ground**: one flat mintPale plaza field with the sage shadow wedges, the cream sun path, 5 broken paving lines and
-  specks (no tile grid); the foreground tree stands in a tree pit at y 1662. `foreground` takes extra presets (default
-  none).
-- **Anchors** (`PLAZA`, `PLAZA_REST`): sun slot (630, 800) r150 (frame 0 mid-rise (630, 850)); Pip's bollard (760, 1440);
-  Bit (200, 705) on govA's cornice (rendered by the set, `bit={false}` when the scene animates him); per building
-  `window / door / padlock / tag / pennant / lock / plaque`; govB lock box (400, 1135) 16 x 20; clock (865, 650) r26;
-  citizens, onlookers (heads (62, 1745), (196, 1818), (1010, 1765)), pigeons; `closeup` = camera (375, 793) zoom 1.85,
-  sill y 1010.
+  tombstones, browser chrome in INK ONLY (bar outline, dot rings, pill: frame 0 already says "building = website" on a
+  silent autoplay; `chrome={false}` restores storyboard v1's plain windows — a proposal for the storyboard, see section 8),
+  no pennants, no light. `built`: colour (optionally the cascade from the sun gap, `PLAZA.cascadeOrigin`) + the timed
+  events. `off`: chrome on, every shutter down, padlocked and tagged, every building one step darker, the lantern sand,
+  pennants up, the sun path and the clock face still bright.
+- **PEAK-1 scale (review 5)**: the architecture is ~1.35x taller under the SAME y-600 ceiling: bases at y 1400-1470
+  (was 1200-1290), the horizon / VP low at (720, 1384) = 0.72 H, so the plaza is shallow and the sun path sits in the
+  visible band. govA Columned Hall x -40..400: the FULL colossal order (pediment apex (180, 614), entablature 712-794,
+  two pairs of 46 px columns x 28/82 and 298/352 rising 806-1392, stylobate 1404, a 3-step crepidoma to 1462) with its
+  browser window (118, 906, 144, 108) and door in the wide central bay (nothing covers a column). govB Domed Capitol
+  x 396..640 (the hero): lantern tip (518, 600), dome ry 140, a TALL drum 792-904, cornice 904-926, facade to 1402, 3
+  steps to 1450. govC Clock Tower x 800..1000 behind govD (spire 606, clock (870, 670) r26, window above govD's roof).
+  govD Modern Ministry x 790..1240 (cut by the right edge), roof 880, base 1470: the NEAREST and biggest mass (ink 4.0).
+  The sun gap x 640..790 holds the far city (two fill-only haze tiers on the horizon, #98C0AE tops 968-1050 behind the
+  sun's lower edge, #84B09C blocks 1150-1300, two cranes) and the sun. Colossus (the 4-building wall, cut by both
+  edges: >= 1.0 W) vs readable citizen ~13:1.
+- **People**: 6 READABLE back-view citizens 55-75 px on the VP axis (feet y 1452-1494, heads just under the horizon),
+  4 x ~40 px far texture (two on govA's steps, two silhouettes deep in the gap); `phoneIdx` [2, 5] raise phones. The
+  left onlooker is cropped by the left edge INSIDE the visible band (head (52, 1452)): the near layer a phone still
+  shows; two more heads in the bottom corners (under the UI: framing only).
+- **Ground**: one flat mintPale plaza field from the horizon with the sage shadow wedges (govB's side, govD's side), the
+  cream sun path from the gap (668-774 at the horizon) widening to (700-930, 1530), 5 broken paving lines and specks
+  (no tile grid), kerb lines in front of govA, two benches. Near layer: the lamp post at the left edge (x 50, lantern
+  1066, crossbar 1126 with the pigeons), the tree cropped by the right edge in front of govD's ground floor (pit 1558),
+  Pip's bollard. `foreground` takes extra presets (default none).
+- **Anchors** (`PLAZA`, `PLAZA_REST`): `horizon` 1384, `vp` (720, 1384); sun slot (720, 900) r155 (frame 0 mid-rise
+  (720, 950)); Pip's bollard top (812, 1426) 50 x 90; Bit (262, 742) on govA's cornice band, `bitSize` 22 (rendered by
+  the set, `bit={false}` when the scene animates him); per building `window / door / padlock / tag / pennant / lock /
+  plaque`; govB lock box (543, 1318) 22 x 27; clock (870, 670) r26; citizens, onlookers, pigeons, lamp; `closeup` =
+  camera (518, 826) zoom 1.6 (lantern at screen y >= 603, window at screen x 374-707, y 1191-1425), sill y 1122;
+  `dive` = camera (535, 1264) zoom 2.4 (the lock box lands at screen (560, 1090) at 52 x 65, S02's lock).
+- **The sun in S01**: the gap is 150 px wide and the power glyph (r 0.37 x 155 = 57) fills most of it. A scene `<Sun>`
+  drifts 10 px/s right by default, which slides the glyph behind govD after ~3 s: in S01 pin it, drift it up / left, or
+  keep the total drift under ~12 px.
 - **Layers** (`wrap` names / nearness): `sun` 0.12 (behind the far city), `far` 0.1, `ground` 0.7, `buildings` 0.55 (govC,
   govA, govB, Bit, 3 pennants), `govD` 0.62, `light` 0.7 (shadow wedges, sun path, joints, benches, citizens), `near` 1.0
   (lamp post + pigeons, tree, bollard, onlookers).
-- Ceiling: nothing above world y 600 inside x 90-990 (lantern tip 600); padlocks / tags at x <= 930.
+- Ceiling: nothing above world y 600 inside x 90-990 (lantern tip 600, spire 606, pediment apex 614); windows, padlocks
+  and tags end at x <= 946 (out of the right rail).
 - Note: in `built`, `citizensAt` makes the citizens RISE (absent before); omit it to keep them standing from frame 0 (the
   line-art frame always shows them).
 
@@ -174,7 +222,8 @@ Every house is a handful of batched paths computed once in screen space through 
 <StoopStreet tod="day" sun={...} drawAt={...} chromeAt={...} heroLock={{cobwebAt, screwsOutAt, dropAt, rider, state: 'fixed', popOnAt}}
   stoop={{step1At, step2At}} heroSlot={<StoopBeats magnifierAt wrenchAt towerAt towerDownAt checkAt peachAt ledgeAt ledgeDur />}
   rowLock={(side, i) => 'ghost'} calendar={<Calendar ... tearAt={[...]}/>} season={[{t, s: 'green' | 'peach' | 'tan' | 'bare'}]}
-  ivy={0.6} pigeonsFlyAt={...} foreground="kerb" />
+  ivy={0.6} pigeonsFlyAt={...} foreground={['kerb', 'edgeL']} people={{walk: 0.4}} furniture={STOOP.furniture} />
+<StoopStreet people={false} foreground="kerb" ... />   // S04: nobody did
 <StoopStreet tod="night" nightUntil={1.6} />     // stars, peach windows, opaque lamp glow discs, tower dots, night ground
 stoopStreetDoors()  // [{id: '#4' | '#5'.. | 'R1'.., side, overDoor, lock, plaque, h}] near -> far (ripples, "?", tags)
 towerRise(t, towerAt, towerDownAt)  // the tower's height (camera tilt sync); never negative (the tower is an overlay)
@@ -186,8 +235,16 @@ towerRise(t, towerAt, towerDownAt)  // the tower's height (camera tilt sync); ne
   right row, pigeons; near tree (655, 1040); bollard (930, 1420). Rows: 16 left doors, 22 right doors.
 - `Stoop` is the location (two steps, pop-ups, draw-on); `StoopBeats` is the overlay of the S03-S09 beats (it reads
   STOOP anchors; magnifier / wrench `-1` = already there).
-- Ground: pavement = one flat field with 4 broken paving lines + specks; default `foreground: 'kerb'`.
-- Layers: `sun` 0.12, `far` 0.1, `ground` 0.4, `rows` 0.4, `hero` 0.7 (hero house + Stoop + heroSlot), `near` 1.0.
+- Ground: pavement = one flat field with 4 broken paving lines + specks; default `foreground: ['kerb', 'edgeL']` (a
+  hooded back-view figure cropped by the left edge, head at y 1330, in front of the lamp post; S04 passes `'kerb'`).
+- Life: `STOOP.walkers` = a backpacker (792, 1240) h164 and a far walker (742, 1150) h82 heading up the road to the VP
+  (clear of the near tree), a stander on the right sidewalk (888, 1338) h252; `STOOP.furniture` = a planter right of the
+  stoop (482, 1394), a bike on the near pavement (760, 1446). Nothing on the stoop (x 160-440) or door #4.
+- Far towers (review 5): the city beyond the VP on the day haze ladder (#98C0AE farther pair, #84B09C nearer pair:
+  lighter than the facades, stepping toward the sky), stepped set-back tops with a mast / tank, a few 3.5 px window dots;
+  at night the same silhouettes in tealDark with peach dots.
+- Layers: `sun` 0.12, `far` 0.1, `ground` 0.4, `rows` 0.4, `hero` 0.7 (hero house + Stoop + heroSlot), `people` 0.8
+  (furniture + walkers), `near` 1.0.
 - S09 night: use a World sky colour key (`skies.night`), not the World's `tod: 'night'` (facades keep their day fills);
   with the set's `tod="night"` it relights its ground plane, road, sidewalk, horizon strip and the foreground kerb with
   the night mapping (mintPale -> sage, cream -> sand, sand -> tan) and draws the lamp glows as opaque peach /
@@ -203,8 +260,15 @@ BLUEPRINT.closeup    // {cam: [580, 960], zoom: 2.0}: the close-up framing of th
 ```
 Press house 360..760 (apex (560, 770), eaves 870, base 1180), window (470, 900, 180, 110), door (500, 1010, 120, 170),
 lock (595, 1100) 40 x 50, plaque (455, 1085) 50, pen-nib sign r34 at (795, 930), vent puff; side buildings at the
-storyboard's screen boundaries (7 PHP plates P L1 R1 L2 R2 L4 R3, 3 blank L3 L5 R4); grid -> VP (560, 950) draws near ->
-far; dimension arrows, title block; stamp (330, 1400) 320 x 120. Layers: `sun`, `far`, `ground` 0.8, `press` 0.5, `sides` 0.6.
+storyboard's screen boundaries (7 PHP plates P L1 R1 L2 R2 L4 R3, 3 blank L3 L5 R4). The floor (review 5) is a sand
+street with a cream PLAN laid on it: a visible paper far edge at y 1238 (58 px of street show in front of the press house)
+with a white dog-eared far-left corner, side edges just inside the kerbs, a margin line (inset 14 -> 40 px) with
+dimension ticks along the far and left edges, dimension arrows inside the margin, a title block (190, 1700, 280, 160). The
+grid follows the ink rules: every line is 2-4 broken pen strokes, rays overshoot the far edge by 15-30 px, cross lines
+overshoot the side edges by 30-60 px, and the weight thins with distance (3 groups: near 2.0, mid 1.4, far 1.0 px, drawn
+on near -> far from `gridAt`). Stamp (330, 1400) 320 x 120 sits on the sheet's left margin. `BLUEPRINT.walkers` (a walker
+on the right heading for the press house, a stander by the stamp) are OFF by default (`people` opt-in: S02's lock
+close-up needs the doorway clear). Layers: `sun`, `far`, `ground` 0.8, `press` 0.5, `sides` 0.6, `people` 0.9.
 
 ### S4 BlueprintWall (S05)
 
@@ -224,14 +288,22 @@ stamp r40 (720, 1230). The forecourt is one flat field (4 broken paving lines + 
 <MakersLane sun={...} curtainsAt={...} workshop={{glowAt, makersAt, blindDownAt, blindUpAt, signSwingAt, doorOpenAt, slotClickAt, chromeAt}} />
 <Workshop layout={WORKSHOP_CORNER} blind="down" glowAt={false} makersAt={false} signSwingAt={...} doorOpenAt={...} />
 ```
-Lane VP (430, 1040), sun (420, 985) r120 behind far-roof silhouettes, peach band 920-1040, left houses (a PerspRow in
-sand / tan: their roofline meets the golden sky; curtains = sand "lit" windows), the lane = ONE flat sand field with 4
-thin, broken tan shadow bands on rays from the sun and sparse 3-10 px specks; the Workshop sits on a cream kerb / step
-plane (tread y 1500-1540, tan face to 1558) whose left end follows the lane's ray through (600, 1500). `WORKSHOP_LANE` (600-1000, roof
-720: browser (680, 790, 220, 110), door (620, 1150, 100, 300) + MailSlot (670, 1300), sign r45 (700, 980), shop window
-(740, 1060, 200, 240) + blind to 1180, bench + 3 Makers + crate) and `WORKSHOP_CORNER` (780-1220, roof 700: door
-(800, 1150, 120, 310), sign r40 (850, 1080), blind window (800, 950, 140, 150)): one component, one design.
-Anchors: `MAKERS_LANE.zzz`, `.messengerY`, `.pipY`, `.leakEntry`. Layers: `far`, `sun`, `roofs`, `floor`, `houses`, `workshop`.
+Lane VP (430, 1040), sun (420, 985) r120 behind far-roof silhouettes, peach band 920-1040. Review 5, the ref-1 dusk-wall
+recipe (sand / clay walls carrying tealDark / teal ~25-30 %, so S06 no longer plays into the beige S07): the left row
+(PerspRow in sand / tan) has teal glass, teal shutters beside every window and a tealDark awning over every door
+(`PerspRow glass / shutters / awning`); its curtains pop as PEACH lit panes at `curtainsAt`; a cream kerb strip runs along
+its foot. The lane = one flat sand field with ONE flat teal shade wedge over the left third (the row's own shadow,
+between its base line and a ray from the sun) and two WIDE, unbroken tan shadow wedges on rays from the sun (narrow far,
+wide near: one direction) instead of the thin stripes, plus sparse specks. The Workshop sits on a cream kerb / step
+plane (tread y 1500-1540, tan face to 1558) and a sand pavement brought FORWARD to y 1646 (cream kerb strip, tan face to
+1676), so the dead lane is shorter. Life: `MAKERS_LANE.walkers` = two passers walking up the lane to the sun (512, 1250)
+h190 and (360, 1340) h272, a stander in the shade (150, 1418) h340; `MAKERS_LANE.furniture` = the makers' cart parked on
+the lane (300, 1600) s1.25 and a bike by the left row; clear of the Workshop door and the messenger's line (feet y 1520).
+`WORKSHOP_LANE` (600-1000, roof 720: browser (680, 790, 220, 110), door (620, 1150, 100, 300) + MailSlot (670, 1300),
+sign r45 (700, 980), shop window (740, 1060, 200, 240) + blind to 1180, bench + 3 Makers + crate) and `WORKSHOP_CORNER`
+(780-1220, roof 700: door (800, 1150, 120, 310), sign r40 (850, 1080), blind window (800, 950, 140, 150)): one component,
+one design. Anchors: `MAKERS_LANE.zzz`, `.messengerY`, `.pipY`, `.leakEntry`, `.walkers`, `.furniture`. Layers: `far`,
+`sun`, `roofs`, `floor`, `houses`, `workshop`, `people` 0.85.
 
 ### S6 NoticeboardCorner (S07) + TelephoneWires
 
@@ -261,13 +333,22 @@ sand, row 2 tan / sage + ink, row 3 tan / teal + ink; no row is the sky colour);
 of the row behind and the sun slot is clipped to y < row 0's base (1052), so the sun never shows below the first
 skyline (dome draw-on, crane, dusk included). One bold 4.8 arc (260, 1300) -> (730, 700) -> (1200, 1300) drawn from both
 feet up; inside it every fill takes the `Glass` step (the rows are drawn twice: the second pass clipped to the dome;
-glass sky #F9F0E5 golden, the day sky #ACD1BF at dusk), cream rim strip, 3 white glint bars, 6 meridians + 3 parallels;
+the glass sky is `glassStep(sky)`: #CCE4D2 on today's golden = day sky, the day sky #ACD1BF at dusk), cream rim strip, 3 white glint bars, 6 meridians + 3 parallels;
 uncovered strip x 90-260 with 4 doors (rattler slots); dashed footprint; watchtower (rises, cabin with a sage window and
-a 34 px back-view guard: shoulders, head, peaked cap; white tally board; searchlight: flat cream at a FIXED 0.55 opacity
-with dashed edges, default sweep -20..+40 deg, drawn in the dome layer UNDER the arc / lattice ink); foreground ledge
-with chimney pots and the antenna (the only tealDark). Dusk: windows pop peach from the horizon outward; the glass
+a back-view guard: shoulders, head, peaked cap; white tally board; searchlight: flat cream at a FIXED 0.55 opacity
+with dashed edges, default sweep -20..+40 deg, drawn in the dome layer UNDER the arc / lattice ink).
+Review 5: (a) the near layer is a real ROOFTOP: a PARAPET cut by both frame edges (`DOME.parapet`: a cream coping strip
+sloping 1452 -> 1440 with doubled coping lines that overshoot, a tan face with joints to y 1600, our own sand roof deck
+below with the parapet's teal shadow band), a brown chimney stack with two pots (x 590-690, top 1294) and the tealDark
+antenna (x 990) standing ON the coping at near scale; Pip's perch `DOME.pip` (500, 1448) on the coping; one back-view
+observer (`DOME.observer`, head (872, 1372) d104, a cap, never a hood: hoods belong to S08's attackers; `observer={false}`
+hides him). (b) rows 2-3 carry 6-8 REAL BrowserChrome windows (dots + pill, 60-112 px wide, one per x quarter per row;
+they pop with `dotsAt`); window grids are jittered (a dead column per building, 45 % seeded drop-outs, 30 % partial
+fills top or bottom on rows 2-3, size / x jitter). (c) the guard is 56 px (the 34 px design x1.65) in a 124 x 86 cabin
+(`DOME.tower.cabin` (128, 772)): the cabin reads as the figure. The rattler doors moved up to feet y 1428-1436 (above the
+coping). Dusk: windows pop peach from the horizon outward; the glass
 sky follows the dusk sage. Holds the crane start (540, 1260, 1.3) and the 15 % push. Layers: `sky`, `sun`, `city` 0.3,
-`dome` 0.55 (glass, searchlight, ink), `near` 0.8, `fg` 1.0. The board count is `<DomeTallies/>`; the glass tallies on
+`dome` 0.55 (glass, searchlight, ink), `near` 0.8, `fg` 1.0 (parapet, chimney, antenna, observer). The board count is `<DomeTallies/>`; the glass tallies on
 the dome are scene choreography (use `tallyGatePath`).
 
 ### S8 TerraceHill / SeaOfDoors (S10 Part B) — PEAK 3
@@ -289,9 +370,13 @@ lines with overshoot, a doubled cornice on rows 0-1, left wall edges (1 in 6 lef
 few window dots and sand plaque specks that blink with the wave. House #4 is drawn in full detail (BrowserChrome,
 FacadeDoor, plaque, props Lock `fixed`) at facade 482.5-572.5 x 1342-1500, window (500, 1372, 55, 35), door (515,
 1439.5, 30, 50), lock (540, 1464.5) 8.5 x 10.5: at `matchCam` (540, 1407) zoom 6 it lands on Part A's door #4 / window /
-lock and the cornice at screen y 570. THE FIXED DOOR: from `fixedAt` (default `flagAt`; -1 = on) a stepped sage /
-mintPale glow arch around the door and a sage door; the cream check flag (`TERRACE.flag`: foot (548, 1342), pole 76,
-40 wide) flies over the tan house above it (hill row 1, j 0 is always tan). `revealFloor`: a row (or band) shows once
+lock and the cornice at screen y 570. THE FIXED DOOR: from `fixedAt` (default `flagAt`; -1 = on) two OPAQUE stepped glow rings in the SunGlowSteps language
+(`TERRACE.fixedGlow`: cream r62, peach r46, centred on door #4, clipped at the street) behind a sage door, and a cream
+path strip from the door down the near street (hill mode); the cream check flag (`TERRACE.flag`: foot (548, 1342), pole
+90, 60 wide: the storyboard's legibility floor) flies over the tan house above it (hill row 1, j 0 is always tan). Rows
+0-1 browser bars carry three cream dots (one extra batched path per chunk). Life: `TERRACE.walkers` = two back-view
+standers on the near street flanking the path, looking up the hill, (372, 1690) h236 and (700, 1660) h206 (heads in the
+visible band); default on in `hill`, off in `flat`. `revealFloor`: a row (or band) shows once
 its top is below that SCREEN y (14 px spatial pop). Stairs zig-zag up rows 1-6 at x ~612 (`stairPoint`). The near
 street is one mintPale field with two kerb lines and specks; S10's bollard + kerb are screen-space scene props.
 `flat`: the same houses on a ONE-POINT ground plane (horizon 850, camera height 650 at scale 1): row k at scale 0.74^k,
@@ -299,7 +384,7 @@ base = 850 + 650 s, streets between the rows, house columns converging on the VP
 wedges to the VP seen through the gaps; row 0 gaps at x 122-212 and 752-842), haze bands from row 6 up to the horizon
 where the sun sits half-set (its top at y 610, under the caption block). House #4, the flag and the fixed accent are the
 same. The ring anchors are for `hill`; build flat ones from `terraceDoor(k, j, 'flat')`.
-Layers: `sun`, `street` 0.9, `hill` 0.6 (ground plane + bands + rows), `house4` 0.6, `foreground` 1.0.
+Layers: `sun`, `street` 0.9, `hill` 0.6 (ground plane + bands + rows), `house4` 0.6, `people` 0.95, `foreground` 1.0.
 
 ### S9 OldQuarter (S12, S13)
 
@@ -313,10 +398,15 @@ mintPale (SiteFacades with browser windows, doors, locks, stoops; the facades wh
 off it); hanging plaques (props ElephantPlaque `hanging`) at (300 / 590 / 800, 1190), siteM's turns old; street gap
 640-740 with the second row (sand / tan, every third plaque old), far city and a peach band only in the gap; the tree is
 cropped right and stands in a tree pit at kerb height (1464); sidewalk and street are flat fields with broken paving
-lines + specks; kerb 1500, bollard (700, 1450); default `foreground: 'railing'` (none while the S13 audience is on). S13: board (300, 1090, 500, 310), rail
+lines + specks; kerb 1500, bollard (700, 1450); default `foreground: 'railing'` (none while the S13 audience is on). Rooftops (review 5,
+`OLD_QUARTER.roofs`, all under the y-600 ceiling): siteL a teal MANSARD (690 -> 616) with two dormers, siteM a TV
+antenna (x 616, clear of the sun disc), siteR two balconies (cream slab, sage glass rail) on its right bay, rooftop
+plants and a water tank on legs (978, 618). Life (while the audience is off): `OLD_QUARTER.walkers` = a walker heading up
+the street gap (692, 1356) h186 and a stander cut by the left edge (64, 1478) h296; `OLD_QUARTER.furniture` = a planter
+(420, 1486) and a bike by the tree (960, 1496); clear of the doors, the hanging plaques and the cart's line (y 1440). S13: board (300, 1090, 500, 310), rail
 (380, 1060, 340, 28), legs to 1480; audience heads (90, 1290) (200, 1350) (890, 1320) (1000, 1280). Anchors:
-`OLD_QUARTER.crates` (never siteM), `.pipBoard`, `.sun`. Layers: `far`, `sun`, `second`, `ground`, `sites`, `board`,
-`near`, `audience`, `foreground`.
+`OLD_QUARTER.crates` (never siteM), `.pipBoard`, `.sun`, `.walkers`, `.furniture`, `.roofs`. Layers: `far`, `sun`,
+`second`, `ground`, `sites`, `board`, `people`, `near`, `audience`, `foreground`.
 
 ## 4. Continuity contracts (storyboard section A)
 

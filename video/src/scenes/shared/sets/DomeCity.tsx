@@ -476,7 +476,7 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
       <Fill d={G.potTops} color={palette.sand} seed={`${sd}/pott`} />
       <Ink d={G.chimInk} width={SI.front} seed={`${sd}/chimI`} />
       <Ink d={G.antenna} width={SI.mid} color={palette.tealDark} taper={false} seed={`${sd}/ant`} />
-      {observer ? <OnlookerSlot x={DOME.observer.head[0]} y={DOME.observer.head[1]} head={DOME.observer.size} hair="short" body={palette.sage} acc={['scarf']} rim="left" arms="near" seed={`${sd}/obs2`} /> : null}
+      {observer ? <OnlookerSlot x={DOME.observer.head[0]} y={DOME.observer.head[1]} head={DOME.observer.size} hair="cap" body={palette.sand} acc={['scarf']} rim="left" arms="near" seed={`${sd}/obs3`} /> : null}
     </>
   );
   return (

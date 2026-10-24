@@ -22,7 +22,7 @@ Model (all numbers measured on --pace-from, printed with --verbose and stored un
   * Lead-in (first word start), voStart and the tail after the last word are copied from --pace-from.
   * stress (0-1) is a TEXT heuristic (no audio yet): cued CAPS words 1.0, numbers 0.9, function words 0.15, content
     words 0.55-0.95 (longer and phrase-final words higher). hits = stress >= 0.9 or a number.
-  * captions = an automatic paging (<= 2 lines of <= 24 characters and <= 850 px at Patrick Hand 98 px, pages never
+  * captions = an automatic paging (<= 2 lines of ~24 (max 26) characters and <= 850 px at Patrick Hand 98 px, pages never
     cross a sentence end, breaks at punctuation / before conjunctions, >= 0.8 s per page, one highlight per page).
 Output schema = assets/timing.json (+ "estimated": true and an "estimate" block). Pause kind "ellipsis" is new.
 """
@@ -64,7 +64,10 @@ or than for in on by""".split())
 NO_BREAK_BEFORE = set("""out up off down of it them to""".split())
 # never end a caption line on these (they lean on the next word)
 GLUE = set("""a an the of to in on at by for from with their this those these that's it's some every single my your our
-his her its into about like just even still has have had was were is are be can can't could would will tens""".split())
+his her its into about has have had was were is are be can can't could would will tens
+and but because or so which who where if until once""".split())
+# weaker glue: adverbs that usually lean on the next word ("just | turn" is bad, "But even | with the fix" is fine)
+SOFT_GLUE = set("""like just even still""".split())
 NUMBERISH = set('tens hundreds thousands millions billions hundred thousand million billion half dozen'.split())
 
 
@@ -311,10 +314,14 @@ def paginate(words_out, sentences, duration, max_chars=24, max_px=850, min_page=
 
     def fits(a, b):
         txt = ' '.join(W[a:b])
-        return len(txt) <= max_chars and (textw is None or textw(txt) <= max_px)
+        return len(txt) <= max_chars + 2 and (textw is None or textw(txt) <= max_px)
 
     def fill(a, b):
-        return ((max_chars - len(' '.join(W[a:b]))) / max_chars) ** 2 * 2.0
+        n = len(' '.join(W[a:b]))
+        c = ((max_chars - min(n, max_chars)) / max_chars) ** 2 * 2.0 + 1.5 * max(0, n - max_chars)
+        # a comma / ellipsis inside a line (not at its end) splits the phrase badly
+        c += 3.0 * sum(1 for i in range(a, b - 1) if A.punct_kind(W[i]))
+        return c
 
     def brk(k, page):
         """cost of a break after word k-1 (before word k)."""
@@ -323,8 +330,13 @@ def paginate(words_out, sentences, duration, max_chars=24, max_px=850, min_page=
             return 0.0
         if A.base_token(prev) in GLUE:
             return 15.0
-        if A.base_token(W[k]) in NO_BREAK_BEFORE:
+        nxt = A.base_token(W[k])
+        if nxt == 'out' and k + 1 < len(W) and A.base_token(W[k + 1]) == 'of':
+            return 1.0                       # "seven | out of ten"
+        if nxt in NO_BREAK_BEFORE:
             return 12.0
+        if A.base_token(prev) in SOFT_GLUE:
+            return 6.0
         if A.base_token(W[k]) in BREAK_BEFORE:
             return 1.5 if page else 1.0
         return 5.0 if page else 3.0
@@ -381,15 +393,44 @@ def paginate(words_out, sentences, duration, max_chars=24, max_px=850, min_page=
     return caps
 
 
+# ---------------------------------------------------------------- out-of-sample check
+
+def validate_take(raw_path, pace):
+    """Predict a DIFFERENT recorded take (raw ASR words, e.g. the v3 draft take) with this pace model and compare the
+    word starts (offset-aligned on the first word). ASR digit glue ("about7") is split; the glued second halves have
+    no measured start and are skipped."""
+    d = A.load_json(raw_path)
+    toks, meas = [], []
+    for w in d['words']:
+        m = re.fullmatch(r"([A-Za-z']+)(\d+)([.,!?]?)", w['w'])
+        if m:
+            toks += [m.group(1), m.group(2) + m.group(3)]
+            meas += [w['s'], None]
+        else:
+            toks.append(w['w'])
+            meas.append(w['s'])
+    wo, _, _, vo_end, _, _ = estimate(toks, toks, pace)
+    off = meas[0] - wo[0]['s']
+    errs = [wo[i]['s'] + off - meas[i] for i in range(len(toks)) if meas[i] is not None]
+    rms = (sum(e * e for e in errs) / len(errs)) ** 0.5
+    sent_ends = [round(wo[i]['s'] + off - meas[i], 2) for i, t in enumerate(toks)
+                 if A.punct_kind(t) == 'sentence' and meas[i] is not None]
+    return {'take': A.rel(raw_path), 'words': len(toks), 'compared': len(errs),
+            'startErrMean': round(sum(errs) / len(errs), 3), 'startErrRms': round(rms, 3),
+            'startErrMax': round(max(errs, key=abs), 3),
+            'endPredicted': round(vo_end + off, 2), 'endMeasured': round(d['words'][-1]['e'], 2),
+            'driftAtSentenceStarts': sent_ends}
+
+
 # ---------------------------------------------------------------- main
 
-def build(script_path, cued_path, pace_path, pace_factor=1.0, ellipsis_pause=None):
+def build(script_path, cued_path, pace_path, pace_factor=1.0, ellipsis_pause=None, validate=None, alt_paces=()):
     words = A.plain_script(script_path)
     cued = A.plain_script(cued_path) if cued_path and os.path.exists(cued_path) else list(words)
     if [A.key(w) for w in cued] != [A.key(w) for w in words]:
         diff, _ = A.word_diff(words, cued, 'plain script', 'cued script')
         raise SystemExit('the cued script does not have the same words as the plain script:\n' + '\n'.join(diff))
-    src = A.load_json(pace_path)
+    src = A.load_timing(pace_path)
     pace = Pace(src)
     words_out, pauses, vo_start, vo_end, duration, caps = estimate(words, cued, pace, pace_factor, ellipsis_pause)
     sents = sentences_of(words_out)
@@ -446,6 +487,15 @@ def build(script_path, cued_path, pace_path, pace_factor=1.0, ellipsis_pause=Non
                             'how': 'leave-one-sentence-out on the pace source + spread of the measured pauses'},
         },
     }
+    if validate and os.path.exists(validate):
+        doc['estimate']['validation'] = validate_take(validate, pace)
+    alt = {}
+    for ap_ in alt_paces:
+        if os.path.exists(ap_) and os.path.abspath(ap_) != os.path.abspath(pace_path):
+            p2 = Pace(A.load_timing(ap_))
+            alt[A.rel(ap_)] = estimate(words, cued, p2, pace_factor, ellipsis_pause)[4]
+    if alt:
+        doc['estimate']['durationWithOtherPace'] = alt
     return doc, pace
 
 
@@ -458,6 +508,12 @@ def summary(doc):
            f"pace from {est['paceFrom']} x{est['paceFactor']}: slot = {m['coef']['a']:.3f} + {m['coef']['b_per_syllable']:.3f}*syl "
            f"{m['coef']['c_function_word']:+.3f}*func; pauses comma {m['pauses']['comma']:.3f} / sentence "
            f"{m['pauses']['sentence']:.3f} / ellipsis {m['pauses']['ellipsis']:.3f}; acronym {m['acronymPerLetter']:.3f} s/letter"]
+    v = est.get('validation')
+    if v:
+        out.append(f"out-of-sample check on {v['take']}: word starts rms {v['startErrRms']:.2f} s (max {v['startErrMax']:+.2f}), "
+                   f"end {v['endPredicted']:.2f} predicted vs {v['endMeasured']:.2f} measured")
+    for k, d in (est.get('durationWithOtherPace') or {}).items():
+        out.append(f"with the pace of {k}: {d:.2f} s")
     for s in doc['sentences']:
         out.append(f"  {s['s']:7.3f}-{s['e']:7.3f}  w{s['words'][0]:>3}-{s['words'][1]:<3} {s['text'][:70]}")
     return '\n'.join(out)
@@ -471,9 +527,14 @@ def main():
     ap.add_argument('--pace', type=float, default=1.0, help='scale every slot and pause (0.9 = 10%% faster)')
     ap.add_argument('--ellipsis-pause', type=float, default=None)
     ap.add_argument('-o', '--out', default=os.path.join(A.ROOT, 'assets/timing_est_v3.json'))
+    ap.add_argument('--validate', default=os.path.join(A.ROOT, 'assets/vo_v3_draft_take_words_raw.json'),
+                    help='a different recorded take (raw ASR words) to predict as an out-of-sample check')
+    ap.add_argument('--alt-pace', nargs='*', default=[os.path.join(A.ROOT, 'assets/timing_v1.json'),
+                                                       os.path.join(A.ROOT, 'assets/vo_v3_draft_take_words_raw.json')],
+                    help='other takes: report the duration their pace would give (not used for the timeline)')
     ap.add_argument('--dry-run', action='store_true')
     a = ap.parse_args()
-    doc, _ = build(a.script, a.cued, a.pace_from, a.pace, a.ellipsis_pause)
+    doc, _ = build(a.script, a.cued, a.pace_from, a.pace, a.ellipsis_pause, a.validate, a.alt_pace)
     print(summary(doc))
     if not a.dry_run:
         A.dump_pretty(doc, a.out)

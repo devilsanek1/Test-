@@ -84,8 +84,10 @@ import {
   unproject,
   useCam,
   WallOfWindows,
-  wallCellState,
+  wallCloseupProps,
   wallDarkFrom,
+  wallLodDetailed,
+  layerMat,
   wallQuadVP,
   WindowCloseup,
   windowQuad,
@@ -467,8 +469,6 @@ for (let dr = -4; dr <= 4; dr++) for (let dc = -3; dc <= 3; dc++) if ((dr || dc)
 const HQ = windowQuad(WALL, ROWS, COLS, HERO[0], HERO[1], WFW, WFH);
 const HC: Pt = [(HQ[0][0] + HQ[2][0]) / 2, (HQ[0][1] + HQ[2][1]) / 2];
 const HERO_GLASS = Math.hypot(HQ[1][0] - HQ[0][0], HQ[1][1] - HQ[0][1]);
-/** Below this layer zoom the 24 neighbours are plain grid panes (their close-ups are at 'glass' level by then). */
-const LOD_ABOVE = 1.15;
 /** 8x -> 1.3x over 5.3 s (CAM.reveal cruise <= 20 px / frame anywhere on screen), the hero kept framed at (440, 1110)
  *  and >= 40 px tall; the wall's top edge leaves a wedge of night sky top right. */
 const C_KEYS: CamKey[] = [
@@ -565,7 +565,7 @@ const ShotC: React.FC = () => {
         <Stars tod={P} region={[300, -500, 1400, 1000]} n={130} at={0.5} span={3} />
       </Layer>
       <Layer depth={0}>
-        <ScreenInkWall>{(w) => <WallOfWindows {...WALL_SPEC} tod={P} inkW={w} precision={3} keepDark={C_KEEP} lod={{cells: LOD, above: LOD_ABOVE}} override={heroOverride} />}</ScreenInkWall>
+        <ScreenInkWall>{(w) => <WallOfWindows {...WALL_SPEC} tod={P} inkW={w} precision={3} keepDark={C_KEEP} lod={{cells: LOD}} override={heroOverride} />}</ScreenInkWall>
         {/* LOD: the hero and the 24 windows around it as close-ups while they are big enough to need it */}
         <CloseupRing />
       </Layer>
@@ -605,48 +605,40 @@ const C_KEEP: KeepDark = {boxes: () => [], path: C_PATH, span: [0, T_C[1] - T_C[
 const CloseupRing: React.FC = () => {
   const t = useTime();
   const cam = useCam();
-  const z = layerScale(cam, 0);
+  const m = layerMat(cam, 0);
   const darkFrom = wallDarkFrom(WALL_SPEC, C_KEEP);
   const P = TOD.night;
   const cells: [number, number][] = [HERO, ...LOD];
   return (
     <>
       {cells.map(([r, c], i) => {
-        const q = windowQuad(WALL, ROWS, COLS, r, c, WFW, WFH);
+        const hero = i === 0;
+        // the wall's own state, colours, room look and LOD jitter for this cell, and its glass width on screen
+        const cp = wallCloseupProps(WALL_SPEC, r, c, t, m, {lit: P.windowLit, dark: P.windowDark}, {darkFrom, override: heroOverride});
+        const q = cp.quad;
         const a = project(cam, 0, q[0]);
         const b = project(cam, 0, q[2]);
         if (Math.max(a[0], b[0]) < -60 || Math.min(a[0], b[0]) > 1140 || Math.max(a[1], b[1]) < -60 || Math.min(a[1], b[1]) > 1980) return null;
-        const hero = i === 0;
-        // below the wall's lod threshold the grid draws the neighbours itself (the hero is never in the grid)
-        if (!hero && z <= LOD_ABOVE) return null;
-        const st = wallCellState(WALL_SPEC, r, c, t, {darkFrom, override: heroOverride});
-        const j = hero ? 0.5 : ((r * 7 + c * 13) % 10) / 10;
+        // per cell: below the lamp size the grid pane IS this picture (the wall draws it; the hero is never in the grid)
+        if (!hero && !wallLodDetailed(cp.screenW, cp.lodJitter)) return null;
         // behind the caption words: flat dark glass only (no frame / curtain / room ink through the glyphs)
         const underWords = !hero && !!darkFrom && darkFrom[r * COLS + c] <= t;
-        // the close-up degrades itself from its OWN glass width on screen (staggered drops, melting areas)
-        const gw = Math.hypot(project(cam, 0, q[1])[0] - a[0], project(cam, 0, q[1])[1] - a[1]);
-        const lit = P.windowLit[Math.min(P.windowLit.length - 1, Math.floor(st.k3 * P.windowLit.length))];
-        const seed = hero ? 'hero' : `nb${r}/${c}`;
         const withPerson = hero || (r * 7 + c * 3) % 3 === 0;
+        const seed = hero ? 'hero' : cp.seed;
         return (
           <OnCell key={i} q={q} h={760}>
             {(w, h) => (
               <WindowCloseup
+                {...cp}
                 w={w}
                 h={h}
                 tod={P}
-                on={st.on}
-                lit={st.on}
                 seed={seed}
-                screenW={underWords ? 0 : gw}
-                lodJitter={j}
-                litColor={lit}
-                darkColor={P.windowDark}
+                screenW={underWords ? 0 : cp.screenW}
+                lodJitter={hero ? 0.5 : cp.lodJitter}
                 desk={hero || (r + c) % 2 === 0}
                 screenTick={hero ? 0.4 : 0.5 + (i % 3) * 0.15}
-                // dark neighbours: someone draws the curtain now and then
-                curtainAt={st.on || hero ? undefined : 1.0 + ((i * 0.37) % 1) * 2.4}
-                person={withPerson && st.on ? <Person x={w * 0.3} y={h * 0.93} s={1.22} seed={`${seed}p`} hair={hero ? 'bun' : undefined} body={hero ? palette.teal : palette.sage} /> : undefined}
+                person={withPerson && cp.on ? <Person x={w * 0.3} y={h * 0.93} s={1.22} seed={`${seed}p`} hair={hero ? 'bun' : undefined} body={hero ? palette.teal : palette.sage} /> : undefined}
                 chair={withPerson}
               />
             )}

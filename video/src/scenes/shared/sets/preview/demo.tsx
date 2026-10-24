@@ -12,8 +12,9 @@ export const DemoWorld: React.FC<{sky?: string; tod?: TodName; push?: boolean; c
   </World>
 );
 
+/** The demo sun sits PINNED in its slot (no idle drift), so a preview frame shows the set's sun anchor exactly. */
 export const DemoSun: React.FC<{cx: number; cy: number; r: number; glyph?: boolean}> = ({cx, cy, r, glyph}) => (
-  <Sun cx={cx} cy={cy} r={r}>
+  <Sun cx={cx} cy={cy} r={r} drift={[0, 0]}>
     {glyph ? <PowerSymbol r={r * 0.37} color="#F3E0CB" width={10} /> : null}
   </Sun>
 );
