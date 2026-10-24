@@ -176,9 +176,15 @@ for a, b in zip(scenes, scenes[1:]):
     elif hit[0]['kind'] != 'sentence' and b['id'] not in set(SB.get('acceptedPhraseBoundaries', [])):
         issue('minor', f"{a['id']}/{b['id']} {t}", f"'{hit[0]['kind']}' pause, not a sentence end")
     tr = b['transitionIn']
-    m = re.match(r'\s*(\d+\.\d+)\s*-\s*(\d+\.\d+)', tr.get('notes', ''))
-    if m and abs((float(m.group(2)) - float(m.group(1))) - tr['dur']) > 0.03:
-        issue('minor', f"{b['id']}.transitionIn", f"notes window {m.group(1)}-{m.group(2)} != dur {tr['dur']}")
+    if 't0' in tr and 't1' in tr:  # numeric window wins over prose (prose is not warped by scripts/timewarp.py)
+        if abs((tr['t1'] - tr['t0']) - tr['dur']) > 0.03:
+            issue('minor', f"{b['id']}.transitionIn", f"t0-t1 {tr['t0']}-{tr['t1']} != dur {tr['dur']}")
+        if not (tr['t0'] - 1e-6 <= b['start'] <= tr['t1'] + 1e-6):
+            issue('minor', f"{b['id']}.transitionIn", f"window {tr['t0']}-{tr['t1']} does not contain the cut {b['start']}")
+    else:
+        m = re.match(r'\s*(\d+\.\d+)\s*-\s*(\d+\.\d+)', tr.get('notes', ''))
+        if m and abs((float(m.group(2)) - float(m.group(1))) - tr['dur']) > 0.03:
+            issue('minor', f"{b['id']}.transitionIn", f"notes window {m.group(1)}-{m.group(2)} != dur {tr['dur']}")
 
 print('=' * 20, 'ELEMENT IDS')
 GLOBAL = {'sun', 'pip', 'bit', 'snail', 'scaleX', 'scaleY', 'inkHair', 'inOut', 'tealDark', 'mintPale'}

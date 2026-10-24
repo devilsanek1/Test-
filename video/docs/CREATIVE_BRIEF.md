@@ -98,3 +98,14 @@ story should flow extremely naturally. Example: is 'behind WordPress' actually a
 Maybe 'the most popular programming language in the world' would bring better engagement. Really strawman the script."
 (Orchestrator note: "most popular programming language in the world" is FALSE for PHP: by usage rankings that is Python or
 JavaScript. The intent, a far more relatable and impressive anchor than WordPress, is right; find a TRUE one.)
+
+## The user's follow-up on "most popular" (October 2026), read before rewriting
+"I think it's intentionally a bit controversial, the 'most popular' statement, as it will raise engagement and comments."
+So: the user WANTS a deliberately provocative, comment-bait line about how big PHP is. Rewriters must:
+1. Deliver the most provocative line that is still DEFENSIBLE, so the comment fight works for us, not against us.
+   Example direction: "PHP, the language everyone loves to call dead, still runs about 7 in 10 websites." Developers argue,
+   and the numbers back the narrator (W3Techs ~70% of sites with a known server-side language).
+2. ALSO show the user's literal option ("the most popular programming language in the world" or close variants), clearly
+   flagged with its risk: by mainstream rankings that's Python or JavaScript, so the top comment may be a correction.
+   Offer the closest-to-literal wording that is still true (e.g. "the most used language for building websites").
+The user decides; present both clearly in the final deliverable.
