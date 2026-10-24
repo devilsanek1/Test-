@@ -647,8 +647,8 @@ domeArcY(x, 'district')                // rim attempters on the district dome
 ```tsx
 <BlueprintStreet ... titleBlock={(box) => <LabelTag kind="card" box={box} text={L3} at={...} flipTo={{at: ..., text: L4}} />} />
 <BlueprintWall ... />                               // clean top margin + bottom rail are on by default
-<MakersLane workshop={{blind: 'down', blindSign: (a) => <LabelTag kind="card" x={a.x} y={a.y} text="still fixing..." .../>}} />
-<NoticeboardCorner workshop={{blindSign: (a) => ...}} />      // the S07 corner preset (WORKSHOP_CORNER)
+<MakersLane workshop={{blind: 'down', blindSign: (a) => <FixSign x={a.x} y={a.y} fs={27} .../>}} />   // props FixSign (J3)
+<NoticeboardCorner workshop={{blindSign: (a) => <FixSign x={a.x} y={a.y} fs={27} .../>}} />      // the S07 corner preset (J4)
 <World sky={[{t: 0, tod: 'dusk'}, {t: dawn, tod: 'dawn', wipe: 'up', dur: 0.4}]}>
   <StoopStreet tod="dusk" duskOffAt={[t1, t2, t3]} glowFlickerAt={t1} dawnAt={dawn} crate={<LockCrate x={395} y={1226} .../>} ... />
 </World>
@@ -665,7 +665,9 @@ domeArcY(x, 'district')                // rim attempters on the district dome
 - Workshop `blindSign` slot (MakersLane `workshop`, NoticeboardCorner `workshop`, `<Workshop>`): rides the blind while
   it covers >= 30 % of the window; `(a) => node` with `a` = {x, y (the blind's upper third), w (S06 200 / S07 140), h,
   bottom}; `blindSignAnchor(layout, cover)` for static placement (S06 (840, 1137), S07 corner (870, 998), clear of the
-  corner's hanging elephant sign). The S09 cart sign ('still fixing...' -> 'fixed!') is scene / props (MakersCart).
+  corner's hanging elephant sign). **Hang the props `FixSign` in it** (`blindSign: (a) => <FixSign x={a.x} y={a.y}
+  fs={27} />`, hang point = the nail): the SAME component the props MakersCart `sign` slot carries in S09 (struck +
+  'fixed!') and S10, so J3 -> J4 -> J5 is one sign (docs/SHARED_PROPS.md 9b "FixSign"; not a LabelTag card, not a shim).
 - StoopStreet: `tod="dusk"` (with a World DUSK key; no stars, no night ground: the World relights): the lamp-post glow
   and the street lamps' glows ON and 3 lit houses (`STOOP.duskLit`, they pop off one by one at `duskOffAt`);
   `glowFlickerAt` = the lamp-post glow drops one step for two frames. Each dusk piece pops OFF as the World's dawn wipe
