@@ -1,0 +1,4904 @@
+{
+ "fps": 30,
+ "duration": 70.687,
+ "mascot": {
+  "name": "Pip",
+  "design": "Our own small baby elephant (a nod to PHP's elePHPant, not the official mascot; built in src/lib/mascot): egg-shaped body, two big round ear flaps with salmon inners, a short curled trunk with 2-3 wrinkle ticks, a 3-strand head tuft, 3 downward-bowed back wrinkles (the cat's stripes), cream toenails, salmon soles, dot eyes, no tusks, no text, no logo. Loose 3.4 px ink with open contours (top of head between the ears and the base left open), flat fill offset 3 px right / 2 px down. Size: scale 1.0 (~96 px sitting) in wide shots, never below 0.75; in camera moves he is kept at constant screen size (screen space) so he never shrinks to a speck. Plays the reference cat's role: perched, watching, reacting, one small physical gag per scene timed to its word, never covering the thing being explained, the sun or the counter. Exactly ONE look to camera in the film (S04 'right?'). Crosses every transition (hop, fall, ride). Poses used: sit-back, sit-front, stand-side, walk-side, trunk-up, hold (+Flashlight / new-lock props), ears-cover, sleep; one requested extra: trunk-cross (S13, fallback hold + expression closed). Supporting cast (not mascots): Bit, a solid-ink beetle (the bug: 16 px in wide shots, ~60 px in close-up) hiding in plain sight from frame 0 to the final frame; a sand-shelled snail (running gag S09-S11).",
+  "colorway": "periwinkle #8D90CC body (shade per src/lib/mascot/colors.ts), salmon (= theme peach) ear inners, cheeks and soles, cream toenails, ink #2B1B0A. Periwinkle is reserved for Pip: no scene object ever uses it (PHP markers are sand plates with an ink elephant)."
+ },
+ "scenes": [
+  {
+   "id": "S01",
+   "start": 0.0,
+   "end": 4.78,
+   "vo": "Government websites in four countries just switched themselves off. Nobody hacked them.",
+   "title": "Government Plaza powers down",
+   "transitionIn": {
+    "type": "loop-start",
+    "dur": 0.0,
+    "persist": [
+     "sun",
+     "pip",
+     "bit",
+     "govA",
+     "govB",
+     "govC",
+     "govD",
+     "captionLine1"
+    ],
+    "notes": "Frame 0 = the exact end state of the S13 un-build: full S01 linework (ink on unfilled white shapes, people as white tombstones), the mint sky block already filled, the orange sun mid-rise at (628,740) carrying a faint cream power glyph (hair weight), Pip in full colour sit-back on the bollard, Bit (ink beetle) on govA's cornice, caption line 1 'Government websites' already set at hook scale. Motion starts on frame 1 (sun rise + fill cascade), so the seam is mid-motion like the reference."
+   },
+   "setting": "STORY PEAK 1/3 (true Arcane-scale hook). Government Plaza in Webtown, a city where every building is a website. Four monumental government buildings (four countries) stand shoulder to shoulder at the far edge of a vast empty plaza; the huge low sun sits in the gap behind the capitol dome; an endless city fades to the horizon behind them. The viewer stands low on the plaza behind three back-view onlookers.",
+   "composition": "Canvas coords at camera rest (1080x1920). Mint sky y 0-1180 (captions in it, y 270-452). Far city band y 1000-1180. Four frontal government buildings, bases on the plaza's far edge y 1200, tops 480-640 (never above y 470, so the caption sky stays clean). Sun r150 at (628,700) layered BEHIND the buildings, in the gap between govB's dome (x<=570) and govC's tower (x>=690). Plaza mintPale y 1200-1920 with 1-point paving converging to VP (628,1130). Tiny citizens 40-55 px at y 1215-1300. Foreground framing: lamp post cropped at left, tree crown cropped at right, three big back-view onlookers on the bottom edge. Pip on a bollard right-middle. Quiet field = sky (~45%). Orange = sun only.",
+   "timeOfDay": "day",
+   "scale": {
+    "colossal": "four monumental government buildings 560-720 px tall plus the r150 sun behind the capitol dome; an endless city beyond",
+    "observer": "nine back-view citizens 40-55 px tall at the buildings' feet; Pip (96 px) and three onlookers in the foreground",
+    "ratio": "a citizen is ~1/13 of a building's height; the sun's diameter is larger than any facade"
+   },
+   "layers": [
+    {
+     "depth": 0.1,
+     "contents": "far city skyline band, fill-only blocks with cream window dots; two hair-weight cranes",
+     "palette": "mintPale + sage blocks, cream dots, no ink (cranes inkHair)"
+    },
+    {
+     "depth": 0.15,
+     "contents": "the sun (r150) behind the buildings",
+     "palette": "sun orange; power glyph cream"
+    },
+    {
+     "depth": 0.55,
+     "contents": "govA, govB, govC, govD frontal facades, pennants, browser windows, shutters, padlocks, clock tags",
+     "palette": "cream / sand / tan facades, teal + tealDark doors and shutters, sage glass, ink 3.4"
+    },
+    {
+     "depth": 0.7,
+     "contents": "plaza paving, benches, nine tiny citizens",
+     "palette": "mintPale ground, coats sand/sage/teal/ochre, ink 2.2"
+    },
+    {
+     "depth": 1.0,
+     "contents": "lamp post (left edge), tree crown (right edge), bollard with Pip, three big onlookers on the bottom edge",
+     "palette": "ink 4.8; tree sage; coats teal/sand/ochre; periwinkle Pip"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 0.0,
+     "t1": 4.4,
+     "move": "push-in",
+     "from": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 560,
+      "y": 1000,
+      "zoom": 1.08
+     },
+     "ease": "inOut(sine)",
+     "why": "creep toward the colossal row while it switches off; parallax: far city x0.3, buildings x0.7, foreground x1.0"
+    },
+    {
+     "t0": 4.52,
+     "t1": 4.78,
+     "move": "push-in",
+     "from": {
+      "x": 560,
+      "y": 1000,
+      "zoom": 1.08
+     },
+     "to": {
+      "x": 495,
+      "y": 1130,
+      "zoom": 2.6
+     },
+     "ease": "in(expo) accelerating",
+     "why": "first half of the push-through into govB's door lock (finishes in S02)"
+    }
+   ],
+   "light": "Bright day. Sun r150 low in the gap behind the capitol dome, half-occluded by the dome flank and the clock tower: the buildings read as near-silhouettes against it only at their rooflines (one-sided cream rim strip on govB's dome, 8 px, right side). Browser windows light up like screens on 'websites' (cream glow + peach page block), then die building by building as the shutters land: each building's fills step one palette step darker (cream->sand, sand->tan, mintPale glass->sage, window glow->tealDark) as a 1-frame pop cascade. The sky never darkens; only the buildings go dark. Sun and Pip keep full colour.",
+   "elements": [
+    {
+     "id": "sky",
+     "what": "flat sky block",
+     "where": "0,0,1080,1180",
+     "style": "fill sky; no ink"
+    },
+    {
+     "id": "farCity",
+     "what": "distant skyline band of 22 blocky buildings, heights 60-170, with cream window dots; 2 hair cranes",
+     "where": "0,1000,1080,180",
+     "style": "fill-only mintPale/sage; cranes inkHair"
+    },
+    {
+     "id": "sun",
+     "what": "the orange disc; carries a faint cream power glyph at frame 0 (ring r56 open at top + vertical bar)",
+     "where": "center 628,700 r150 (frame 0: 628,740)",
+     "style": "fill sun; glyph cream, hair weight at frame 0, 10 px bold from 2.10"
+    },
+    {
+     "id": "govA",
+     "what": "Columned Hall: triangular pediment (apex 640), double-line cornice with tan band (y 700-730), 6 fluted columns, 3-step stylobate",
+     "where": "30,640,300,560",
+     "style": "ink 3.4; cream facade, sand tympanum, tan shade plane on the left 30%"
+    },
+    {
+     "id": "govB",
+     "what": "Domed Capitol: ribbed dome (590-760) with lantern spire to 545, drum, pedimented facade",
+     "where": "330,545,290,655",
+     "style": "ink 3.4; cream facade, sand dome with teal ribs, cream rim strip on the dome's right"
+    },
+    {
+     "id": "govC",
+     "what": "Clock Tower: narrow tower x 690-770 with white clock face (r30 at 730,640, two ink hands) and spire to 480; brick body x 620-800 from y 820",
+     "where": "620,480,180,720",
+     "style": "ink 3.4; tan brick with 6 brick-hint marks, white clock"
+    },
+    {
+     "id": "govD",
+     "what": "Modern Ministry: flat-roofed glass slab, 4x6 window grid, cropped by the right frame edge",
+     "where": "800,600,300,600",
+     "style": "ink 3.4; mintPale/sage cells ~35% filled, tealDark fascia"
+    },
+    {
+     "id": "browserWindows",
+     "what": "each building's main window drawn as a browser window: rounded frame, three dots top-left, address-bar pill; screen shows a peach header block + 3 ink hairlines. THE 'building = website' cue",
+     "where": "govA 95,800,170,120; govB 395,830,160,110; govC 640,900,140,100; govD 830,1030,190,120",
+     "style": "ink 3.4 frame; dots cream/sage/peach; bar cream; glow cream"
+    },
+    {
+     "id": "doors",
+     "what": "teal double doors; each carries a small elephant-plaque (PHP) beside it and a small sand lock box on the right leaf (govB's lock at 495,1130 is the push-through target)",
+     "where": "govA 140,1000,80,140; govB 440,1060,70,140; govC 680,1100,60,100; govD 880,1150,90,50",
+     "style": "teal, sage glass, tealDark kick panels; plaque sand + ink elephant 14 px"
+    },
+    {
+     "id": "shutters",
+     "what": "roller shutters rolled into a box above each browser window; drop to cover it",
+     "where": "box 18 px tall above each window, same x/w",
+     "style": "tealDark with ink ribs every 14 px"
+    },
+    {
+     "id": "padlocks",
+     "what": "padlocks on each shutter's bottom bar (appear on 'Nobody')",
+     "where": "govA 180,925; govB 475,945; govC 710,1005; govD 925,1155; 24x28 each",
+     "style": "sand body, ink shackle, cream glint"
+    },
+    {
+     "id": "clockTags",
+     "what": "'back soon' tags: small white tag with an ink clock icon, hung beside each padlock (planted here, paid off in S11)",
+     "where": "30x36, 30 px right of each padlock",
+     "style": "white, ink"
+    },
+    {
+     "id": "pennants",
+     "what": "four abstract pennants for four countries (dot, chevron, stripe, star patterns; never real flags)",
+     "where": "poles: govA 182,640->565; govB 477,545->490; govC 732,480->456; govD 862,600->530; flags 60x36",
+     "style": "peach+ink dots / sage+cream chevron / sand+teal stripe / tealDark+cream star"
+    },
+    {
+     "id": "plaza",
+     "what": "plaza paving with 1-point joints to VP (628,1130), two kerb lines, two benches",
+     "where": "0,1200,1080,720",
+     "style": "fill mintPale; ink 2.2 joints"
+    },
+    {
+     "id": "citizens",
+     "what": "nine tiny back-view citizens (tier C), two later raise phones",
+     "where": "x 150,260,345,505,600,700,790,880,930; feet y 1240-1300; 40-55 px tall",
+     "style": "coats sand/sage/teal/ochre, ink 2.2"
+    },
+    {
+     "id": "lampPost",
+     "what": "foreground lamp post with a lantern and a crossbar where 3 pigeons land",
+     "where": "50,1080,70,840 (lantern at 80,1090; crossbar y 1150)",
+     "style": "ink 4.8; lantern cream; pigeons white/sand"
+    },
+    {
+     "id": "treeFG",
+     "what": "foreground tree crown cropped by the right edge",
+     "where": "930,1180,170,240 + trunk to 1920",
+     "style": "sage crown, 4 smile arcs, ochre trunk, ink 4.8"
+    },
+    {
+     "id": "bollard",
+     "what": "stone bollard Pip sits on",
+     "where": "735,1440,50,90",
+     "style": "cream, ink 4.8"
+    },
+    {
+     "id": "onlookers",
+     "what": "three big back-view onlookers on the bottom edge (tier A, heads 60 px), torsos run off the frame",
+     "where": "heads at 230,1650 / 360,1630 / 500,1660",
+     "style": "hair ochre/ink/tan, coats teal/sand/sage, ink 4.8"
+    },
+    {
+     "id": "pip",
+     "what": "mascot, sit-back on the bollard, watching govB",
+     "where": "feet 760,1440; scale 1.0 (~96 px)",
+     "style": "periwinkle mascot colorway"
+    },
+    {
+     "id": "bit",
+     "what": "Bit the beetle, hiding in plain sight on govA's cornice (rewatch bait)",
+     "where": "232,693; 16x10",
+     "style": "solid ink beetle with a cream eye dot"
+    }
+   ],
+   "beats": [
+    {
+     "t": 0.0,
+     "action": "Frame 0 = loop seam state (see transitionIn). Camera push starts. Sun begins its rise from (628,740) to (628,700), ease-out 0.37 s, then +7% pulse 0.30-0.55."
+    },
+    {
+     "t": 0.03,
+     "action": "'Government': fill cascade radiates out from the sun gap, 1-frame pops, 2-3 regions per frame: far city, govB, govC, govA, govD, plaza, citizens, onlookers; complete by 0.40."
+    },
+    {
+     "t": 0.46,
+     "action": "'websites': browser chrome reveals in all four main windows: three dots pop with overshoot (0.04 s stagger) and the address-bar pill draws on (0.2 s); order govB, govA, govC, govD, 0.08 s apart. This is the 'building = website' teach."
+    },
+    {
+     "t": 0.9,
+     "action": "Screens switch on: window glow fills pop cream with a peach page-header block and 3 ink hairlines inside each window (0.90-1.05)."
+    },
+    {
+     "t": 1.06,
+     "action": "'in': nine tiny citizens rise in on the plaza (rise 0.33 s out(exp), 0.05 s stagger, left to right)."
+    },
+    {
+     "t": 1.23,
+     "action": "'four': four pennants unfurl one per beat at 1.23 / 1.38 / 1.53 / 1.68 (scaleX 0->1, 6% overshoot), a counting tick each. Sun pulse +6% on 'four' (1.325)."
+    },
+    {
+     "t": 1.7,
+     "action": "Three pigeons land on the lamp crossbar (0.06 s stagger)."
+    },
+    {
+     "t": 2.05,
+     "action": "Two citizens raise phones (arm lines + white phones). Pip's ear flicks; he looks toward govB (look 0.3)."
+    },
+    {
+     "t": 2.1,
+     "action": "'just': a bold cream power glyph inks onto the sun (ring arc then bar, 0.17 s), replacing the faint one."
+    },
+    {
+     "t": 2.28,
+     "action": "'switched': the sun is PRESSED like a power button (squash to 0.88 over 0.08 s, release 0.2 s) and one ink ripple ring expands from it (r150->190, 0.2 s). This press is the deliberate act."
+    },
+    {
+     "t": 2.4,
+     "action": "Shutter 1 slams down over govA's browser window (0.16 s, 6 px bounce); govA's fills step one palette step darker as it lands."
+    },
+    {
+     "t": 2.82,
+     "action": "'themselves': shutter 2 slams on govB, govB goes dark."
+    },
+    {
+     "t": 3.04,
+     "action": "'-selves': shutter 3 slams on govC, govC goes dark (its clock face stays white)."
+    },
+    {
+     "t": 3.25,
+     "action": "'off': shutter 4 slams on govD, govD goes dark; the lantern on the lamp post switches off (cream -> sand); the pigeons scatter off the crossbar (3.30); Pip startles: quick trunk-up hop on the bollard (3.28-3.60, expression wide)."
+    },
+    {
+     "t": 3.4,
+     "action": "Plant: 'back soon' clock tags swing onto each shutter (3.40-3.55, 0.05 s stagger, pendulum -16..0 deg, 0.5 s)."
+    },
+    {
+     "t": 3.64,
+     "action": "'Nobody': padlocks pop onto the four shutters at 3.64 / 3.72 / 3.80 / 3.88, each with a small click."
+    },
+    {
+     "t": 4.09,
+     "action": "'hacked': Pip looks left, then right (look -0.6 -> 0.6), checking. No intruders anywhere; every door and wall is intact."
+    },
+    {
+     "t": 4.28,
+     "action": "'them': all four padlocks glint at once (pairs of ink glint diagonals pop)."
+    },
+    {
+     "t": 4.52,
+     "action": "Push-through begins: camera accelerates into govB's door lock. Pip launches a hop toward frame centre-bottom (he lands in S02)."
+    }
+   ],
+   "sun": "Rises 40 px into its slot at frame 0-0.37 with a +7% pulse, pulses on 'four', gets a bold power glyph on 'just', is pressed like a power button on 'switched' (the cause of the shutdown). Stays the brightest thing on screen while the buildings go dark. During the push-through it glides to screen (820,520) for the S02 close-up.",
+   "mascot": "Pip, sit-back on the bollard at (760,1440), scale 1.0. Watches the screens light up (ear flick 2.05). Gag: a startled trunk-up hop on 'off' (3.28). On 'hacked' he checks left and right. No look to camera in this scene. Crosses into S02 with a hop at 4.52.",
+   "sfx": [
+    {
+     "t": 0.03,
+     "sound": "whoosh_soft",
+     "notes": "-18 dB, the colour flood; loops with the S13 un-build tail"
+    },
+    {
+     "t": 0.46,
+     "sound": "pop_high",
+     "notes": "-20 dB, browser dots x4 (one file, 4 offsets)"
+    },
+    {
+     "t": 1.23,
+     "sound": "pop_mid",
+     "notes": "-16 dB, pennant 1 of 4 (repeat 1.38, 1.53, 1.68)"
+    },
+    {
+     "t": 2.1,
+     "sound": "pencil_scratch_short",
+     "notes": "power glyph inks on"
+    },
+    {
+     "t": 2.28,
+     "sound": "switch_toggle",
+     "notes": "the sun is pressed"
+    },
+    {
+     "t": 2.4,
+     "sound": "pop_low",
+     "notes": "shutter 1 (repeat 2.82, 3.04)"
+    },
+    {
+     "t": 3.25,
+     "sound": "power_off_thunk",
+     "notes": "shutter 4 + lights out"
+    },
+    {
+     "t": 3.64,
+     "sound": "lock_click",
+     "notes": "-16 dB, padlocks x4"
+    },
+    {
+     "t": 4.28,
+     "sound": "click_light",
+     "notes": "glint"
+    },
+    {
+     "t": 4.52,
+     "sound": "whoosh_soft",
+     "notes": "push-through"
+    }
+   ],
+   "captions": [
+    {
+     "s": 0.0,
+     "e": 2.155,
+     "lines": [
+      {
+       "text": "Government websites",
+       "s": 0.0
+      },
+      {
+       "text": "in four countries",
+       "s": 1.155
+      }
+     ],
+     "highlights": [
+      {
+       "text": "four",
+       "s": 1.325
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 2.155,
+     "e": 3.741,
+     "lines": [
+      {
+       "text": "just switched",
+       "s": 2.155
+      },
+      {
+       "text": "themselves off.",
+       "s": 2.815
+      }
+     ],
+     "highlights": [
+      {
+       "text": "themselves",
+       "s": 2.815
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 3.741,
+     "e": 4.834,
+     "lines": [
+      {
+       "text": "Nobody hacked them.",
+       "s": 3.741
+      }
+     ],
+     "highlights": [
+      {
+       "text": "Nobody",
+       "s": 3.741
+      }
+     ],
+     "tone": "dark"
+    }
+   ]
+  },
+  {
+   "id": "S02",
+   "start": 4.78,
+   "end": 10.84,
+   "vo": "They were fixing a security bug in PHP, the programming language behind WordPress and about 7 out of 10 websites.",
+   "title": "Built from one blueprint",
+   "transitionIn": {
+    "type": "push-through",
+    "dur": 0.5,
+    "persist": [
+     "sun",
+     "pip",
+     "lockBox"
+    ],
+    "notes": "4.52-5.02, midpoint on 'They' (4.83). The camera dives into govB's small sand lock box; at the midpoint the lock fills the centre of frame and we land on the SAME lock design on a different building's door (S02 close-up). It is not a government door, and it never opens (no break-in implication right after 'Nobody hacked them')."
+   },
+   "setting": "Blueprint Street: a sunny street whose ground is a giant cream blueprint sheet with an ink perspective grid running to the horizon. The WordPress press house terminates the vista; on 'behind' nine more buildings pop up out of the plan like a pop-up book. PHP = the elephant-stamped blueprint all these buildings are built from.",
+   "composition": "Wide framing at camera rest. Mint sky y 0-1000. Press house (frontal, terminating the vista) x 360-760, y 760-1180, its peaked ridge at y 760. Sun r150 sits on the ridge at (560,640). Side buildings recede in 1-point perspective to VP (560,1000): left rooflines from (0,480) to (360,760), bases from (0,1560) to (360,1180); right rooflines from (1080,480) to (760,760), bases (1080,1560) to (760,1180). Ground y 1180-1920 = cream blueprint sheet. The close-up (4.78-7.07) is the same world at zoom 2.0 centred on (590,1000), which keeps the press-house ridge at screen y 480 so captions stay in sky.",
+   "timeOfDay": "day",
+   "scale": {
+    "colossal": "the blueprint ground stretching to the horizon and the press house towering 420 px over its door",
+    "observer": "Pip (96 px) standing on the elephant stamp in the foreground; six walkers 40-70 px",
+    "ratio": "a walker is ~1/7 of the press house; the elephant stamp alone is 3x Pip's width"
+   },
+   "layers": [
+    {
+     "depth": 0.1,
+     "contents": "far city tops peeking over the street's end",
+     "palette": "fill-only mintPale/sage"
+    },
+    {
+     "depth": 0.15,
+     "contents": "sun",
+     "palette": "orange; 7/10 pie overlay cream slices + ink spokes"
+    },
+    {
+     "depth": 0.5,
+     "contents": "press house (WordPress) with pen-nib sign",
+     "palette": "sand facade, teal door, cream sign disc, ink 3.4"
+    },
+    {
+     "depth": 0.6,
+     "contents": "side buildings L1-L5 / R1-R4 (pop-up), browser windows, plaques, lock boxes",
+     "palette": "cream/sand/tan/mintPale facades, ink 2.2-3.4"
+    },
+    {
+     "depth": 0.8,
+     "contents": "blueprint ground with grid, dimension arrows, title block; walkers",
+     "palette": "cream ground, inkHair grid, ink 2.2"
+    },
+    {
+     "depth": 1.0,
+     "contents": "elephant stamp in the foreground with Pip on it",
+     "palette": "sand stamp ring, ink elephant, periwinkle Pip"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 4.78,
+     "t1": 5.02,
+     "move": "pull-back",
+     "from": {
+      "x": 590,
+      "y": 1000,
+      "zoom": 2.6
+     },
+     "to": {
+      "x": 590,
+      "y": 1000,
+      "zoom": 2.0
+     },
+     "ease": "out(cubic)",
+     "why": "the push-through lands (S02 world) and settles on the lock close-up"
+    },
+    {
+     "t0": 5.02,
+     "t1": 7.07,
+     "move": "hold",
+     "from": {
+      "x": 590,
+      "y": 1000,
+      "zoom": 2.0
+     },
+     "to": {
+      "x": 588,
+      "y": 1000,
+      "zoom": 2.03
+     },
+     "ease": "linear",
+     "why": "near-locked close-up with a 1.5% drift so it never sits dead"
+    },
+    {
+     "t0": 7.07,
+     "t1": 8.0,
+     "move": "pull-back",
+     "from": {
+      "x": 588,
+      "y": 1000,
+      "zoom": 2.03
+     },
+     "to": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "ease": "bezier(0.6,0.25,0.41,0.87)",
+     "why": "medium move: from one lock to the street it belongs to (teaches 'one design, many buildings')"
+    },
+    {
+     "t0": 8.0,
+     "t1": 10.84,
+     "move": "push-in",
+     "from": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 550,
+      "y": 990,
+      "zoom": 1.05
+     },
+     "ease": "inOut(sine)",
+     "why": "gentle settle while the count happens"
+    }
+   ],
+   "light": "Bright day, flat. The press house's right face gets a one-sided cream rim strip; shade planes tan on the left of each side facade. No shafts. Browser windows on every building show the cream glow from S01 (all sites are live here).",
+   "elements": [
+    {
+     "id": "sky",
+     "what": "flat sky",
+     "where": "0,0,1080,1000",
+     "style": "fill sky"
+    },
+    {
+     "id": "sun",
+     "what": "orange disc sitting on the press-house ridge; becomes a 10-slice pie (7 orange / 3 cream)",
+     "where": "center 560,640 r150 (close-up: screen 820,520)",
+     "style": "fill sun; spokes ink 3.4; 3 slices cream"
+    },
+    {
+     "id": "pressHouse",
+     "what": "WordPress stand-in: tall printing hall, peaked roof, big browser window, roof vent that puffs paper; generic pen-nib icon sign on a bracket (no text, no logo)",
+     "where": "360,760,400,420; window 470,820,180,120; door 500,1010,120,170; sign disc r34 at 795,900",
+     "style": "ink 3.4; sand facade, teal door, cream sign with ink nib"
+    },
+    {
+     "id": "lockBox",
+     "what": "the PHP lock: chunky sand lock box with two screws and a hinged cover; inside, a bolt that stops short of the strike plate (the flaw)",
+     "where": "575,1075,40,50 on the press-house door (screen ~80x100 in close-up)",
+     "style": "sand box, ink 3.4; bolt ink rect; gap marked with dashed ink bracket + small ink ring"
+    },
+    {
+     "id": "elephantPlaque",
+     "what": "PHP marker: square sand plate with an ink elephant emblem (our generic elephant, not the PHP logo), beside the door",
+     "where": "430,1060,50,50",
+     "style": "sand plate, ink emblem; never periwinkle"
+    },
+    {
+     "id": "blueprintGround",
+     "what": "the street floor is a giant cream blueprint sheet: inkHair grid converging to VP (560,1000), cross lines at y 1195,1215,1240,1275,1320,1380,1460,1570,1710,1900, dimension arrows along the kerbs, a title-block rectangle bottom-left",
+     "where": "0,1180,1080,740",
+     "style": "cream fill, inkHair 1.6 grid, ink 2.2 arrows"
+    },
+    {
+     "id": "elephantStamp",
+     "what": "giant elephant stamp printed on the blueprint (perspective ellipse)",
+     "where": "ellipse centre 300,1640, 320x120",
+     "style": "sand ring 14 px, ink elephant emblem squashed to perspective"
+    },
+    {
+     "id": "sideBuildings",
+     "what": "nine pop-up buildings in perspective, each with a small browser window and a door: L1 x 0-95, L2 95-175, L3 175-240, L4 240-300, L5 300-360; R1 985-1080, R2 905-985, R3 840-905, R4 760-840",
+     "where": "left band 0-360, right band 760-1080, between the roof and base lines in composition",
+     "style": "facades cream/sand/tan/mintPale alternating; ink 3.4 near, 2.2 far; crease line at each base"
+    },
+    {
+     "id": "plaques",
+     "what": "elephant plaques for the 7 PHP buildings (P, L1, R1, L2, R2, L4, R3) and blank cream plates for the 3 others (L3, L5, R4)",
+     "where": "beside each door; ~60 px at L1/R1 down to ~18 px at L5",
+     "style": "sand + ink elephant / cream blank"
+    },
+    {
+     "id": "bitSilhouettes",
+     "what": "seven tiny ink Bit silhouettes, one in each PHP building's lock (same bug in every copy)",
+     "where": "on each PHP door, 6-14 px",
+     "style": "solid ink"
+    },
+    {
+     "id": "walkers",
+     "what": "six tiny back-view walkers on the blueprint street",
+     "where": "y 1200-1400, x 300-800, 40-70 px",
+     "style": "coats sand/sage/teal, ink 2.2"
+    },
+    {
+     "id": "bit",
+     "what": "Bit the beetle, close-up size",
+     "where": "lives in the lock gap at 595,1100 (screen ~60 px in close-up)",
+     "style": "solid ink, cream eye"
+    },
+    {
+     "id": "pip",
+     "what": "mascot",
+     "where": "close-up: doorstep, screen 680,1320 at screen-scale 1.5; wide: on the stamp at 330,1690 scale 1.0",
+     "style": "periwinkle"
+    }
+   ],
+   "beats": [
+    {
+     "t": 4.8,
+     "action": "Push-through lands on the lock close-up; camera settles 2.6 -> 2.0 (ease-out)."
+    },
+    {
+     "t": 4.95,
+     "action": "Pip lands on the press-house doorstep (screen 680,1320, screen-scale 1.5) with a landing squash."
+    },
+    {
+     "t": 5.0,
+     "action": "'fixing': the lock's two screws spin out and pop off (4.92, 5.00) and its cover swings open on a hinge (0.15 s), showing the bolt mechanism."
+    },
+    {
+     "t": 5.3,
+     "action": "'security': the bolt slides out but STOPS SHORT of the strike plate; a dashed ink bracket and a small ink ring draw around the gap (0.17 s)."
+    },
+    {
+     "t": 5.78,
+     "action": "'bug': Bit scuttles out of the gap onto the open cover, antennae wiggling (big enough to read: ~60 px on screen)."
+    },
+    {
+     "t": 6.19,
+     "action": "'PHP': the elephant plaque beside the door pops to 112% and back, two ink ring pulses expand from it (0.2 s)."
+    },
+    {
+     "t": 6.35,
+     "action": "Pip double-takes at the plaque (head snap, look -0.5 -> 0.6 -> -0.5)."
+    },
+    {
+     "t": 6.6,
+     "action": "Pip copies the emblem's pose (stand-side, trunk raised like the emblem). Bit scurries back into the lock (6.85)."
+    },
+    {
+     "t": 7.07,
+     "action": "'the programming language': pull-back starts (medium move). Pip hops off the step toward the foreground (7.10-7.62), staying at screen-scale 1.0 where he lands."
+    },
+    {
+     "t": 7.2,
+     "action": "'programming': as the frame widens, the street floor reads as a blueprint: grid lines draw on from the press house toward the viewer (1-frame stagger texture build, 7.20-7.60)."
+    },
+    {
+     "t": 7.57,
+     "action": "'language': the elephant stamp SLAMS onto the blueprint in the foreground (ring drawn 0.13 s, then disc 2.6x -> 1.0x in 0.27 s); Pip lands on it at 7.80 and bounces."
+    },
+    {
+     "t": 7.93,
+     "action": "'behind': pop-up book: nine buildings pop up out of the plan with scaleY overshoot (0->1.06->1), near to far, alternating sides: L1 7.93, R1 7.99, L2 8.05, R2 8.11, L3 8.17, R3 8.23, L4 8.29, R4 8.35, L5 8.41; each shows its small browser window."
+    },
+    {
+     "t": 8.17,
+     "action": "'WordPress': the press-house sign swings out on its bracket (pendulum) and its roof vent puffs three paper sheets that flutter onto the roof."
+    },
+    {
+     "t": 8.6,
+     "action": "Six tiny walkers rise in along the street (0.05 s stagger): the buildings tower over them."
+    },
+    {
+     "t": 9.2,
+     "action": "'about': ten ink spokes draw across the sun (0.15 s): it is now a 10-slice pie."
+    },
+    {
+     "t": 9.38,
+     "action": "'7': elephant plaques tick on, counting: P (re-pulse) 9.38, L1 9.48, R1 9.58, L2 9.68, R2 9.78, L4 9.88, R3 9.98; a tick sound each."
+    },
+    {
+     "t": 9.88,
+     "action": "'10': blank cream plates pop on L3, L5, R4 (9.88 / 9.93 / 9.98) and the matching 3 sun slices pop cream: a 7/10 pie. Sun pulse +6%."
+    },
+    {
+     "t": 10.01,
+     "action": "'websites': burst: a tiny Bit silhouette pops into the lock of all seven PHP buildings at once (0-1 frame stagger): one bug, every copy."
+    },
+    {
+     "t": 10.3,
+     "action": "Pip glances down the street (look 0.7); walkers bob."
+    },
+    {
+     "t": 10.55,
+     "action": "Sun anticipation squash (sx 1.07 / sy 0.91), then hops toward S03 (arc). Pip hops off the stamp at 10.62 (crosses the cut)."
+    }
+   ],
+   "sun": "Close-up: peeks over the press-house roofline at screen (820,520). During the pull-back it glides to (560,640) on the ridge. On 'about' it gains ten ink spokes; on '7'/'10' three slices pop cream: a 7/10 pie (the statistic shown in the anchor). Pie slices pop back to solid orange as it hops away at 10.55.",
+   "mascot": "Lands on the doorstep from S01 (4.95). Gag: double-take at the elephant plaque on 'PHP' (6.35) and copies its pose (6.60). Hops to the foreground stamp during the pull-back so he keeps a readable size. Watches the count. Hops out at 10.62.",
+   "sfx": [
+    {
+     "t": 4.92,
+     "sound": "click_light",
+     "notes": "screw 1 (repeat 5.00)"
+    },
+    {
+     "t": 5.01,
+     "sound": "lock_click",
+     "notes": "cover swings open"
+    },
+    {
+     "t": 5.3,
+     "sound": "pencil_scratch_short",
+     "notes": "gap bracket + ring"
+    },
+    {
+     "t": 5.78,
+     "sound": "pop_high",
+     "notes": "-18 dB, Bit scuttles"
+    },
+    {
+     "t": 6.19,
+     "sound": "bubble_pop",
+     "notes": "plaque pulse"
+    },
+    {
+     "t": 7.57,
+     "sound": "pop_low",
+     "notes": "stamp slam"
+    },
+    {
+     "t": 7.93,
+     "sound": "paper_flip",
+     "notes": "pop-up book rises (one file)"
+    },
+    {
+     "t": 8.17,
+     "sound": "pop_mid",
+     "notes": "sign swings"
+    },
+    {
+     "t": 9.38,
+     "sound": "pop_high",
+     "notes": "-18 dB counting ticks x7 (9.38..9.98, 0.10 apart)"
+    },
+    {
+     "t": 9.88,
+     "sound": "pop_low",
+     "notes": "-16 dB, 3 blank plates + pie"
+    },
+    {
+     "t": 10.55,
+     "sound": "whoosh_soft",
+     "notes": "sun hop / cut"
+    }
+   ],
+   "captions": [
+    {
+     "s": 4.834,
+     "e": 7.065,
+     "lines": [
+      {
+       "text": "They were fixing",
+       "s": 4.834
+      },
+      {
+       "text": "a security bug in PHP,",
+       "s": 5.335
+      }
+     ],
+     "highlights": [
+      {
+       "text": "PHP",
+       "s": 6.291
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 7.065,
+     "e": 8.895,
+     "lines": [
+      {
+       "text": "the programming language",
+       "s": 7.065
+      },
+      {
+       "text": "behind WordPress",
+       "s": 8.032
+      }
+     ],
+     "highlights": [
+      {
+       "text": "WordPress",
+       "s": 8.265
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 8.895,
+     "e": 10.88,
+     "lines": [
+      {
+       "text": "and about 7 out of 10",
+       "s": 8.895
+      },
+      {
+       "text": "websites.",
+       "s": 10.105
+      }
+     ],
+     "highlights": [
+      {
+       "text": "7 out of 10",
+       "s": 9.38
+      }
+     ],
+     "tone": "dark"
+    }
+   ]
+  },
+  {
+   "id": "S03",
+   "start": 10.84,
+   "end": 15.72,
+   "vo": "Fixing a bug like that takes two steps. First, you find it. Then, you fix it everywhere.",
+   "title": "Two steps",
+   "transitionIn": {
+    "type": "matchcut",
+    "dur": 0.4,
+    "persist": [
+     "sun",
+     "pip"
+    ],
+    "notes": "10.62-11.02. Match-cut on the sun: it hops in an arc from (560,640) and lands in the S03 sky at (700,820) with a landing squash (11.05). The cut itself is at 10.84 under the hop; S03 appears as flat fills first, its linework draws on top-to-bottom 10.88-11.55 (reference T1 'fill-first' build). Pip, mid-hop at the cut, lands on the pavement at 10.98."
+   },
+   "setting": "Stoop Street, a long residential street of identical townhouses that runs to an off-centre vanishing point and on into the city. In front: door #4, a teal townhouse door up a two-step stoop. Every door down the street has the same elephant plaque and the same lock.",
+   "composition": "Canvas coords at rest. Mint sky y 0-1060. VP (720,1060), off-centre right. Hero townhouse frontal on the left (x 40-520, cornice y 640-680, 4 storeys) with its browser window, door #4, plaque and wall calendar. Two-step stoop in front of door #4: step 2 (upper) riser y 1230-1300, x 190-410; step 1 (lower) riser y 1300-1370, x 160-440. Right of the hero house the street recedes: left row x 520-715, right row from x 1080 to the VP; far towers beyond the VP. Sun r150 at (700,820) low over the street's far end. Pavement mintPale y 1370-1920. Quiet field = sky (~50%).",
+   "timeOfDay": "day",
+   "scale": {
+    "colossal": "an endless row of identical doors running to the vanishing point, with far towers rising beyond",
+    "observer": "Pip (96 px) on the stoop; three distant pedestrians 30-40 px",
+    "ratio": "door #4 is 200 px tall; the 10th door down the street is 14 px: the same lock repeated to infinity"
+   },
+   "layers": [
+    {
+     "depth": 0.1,
+     "contents": "far city towers beyond the VP",
+     "palette": "fill-only sage/mintPale, tops y 760-860"
+    },
+    {
+     "depth": 0.15,
+     "contents": "sun",
+     "palette": "orange"
+    },
+    {
+     "depth": 0.4,
+     "contents": "receding rows of townhouses (left and right), street trees, distant pedestrians",
+     "palette": "cream/sand/tan facades, sage crowns, ink 2.2 -> 1.6 toward the VP"
+    },
+    {
+     "depth": 0.7,
+     "contents": "hero townhouse: browser window, door #4, lock box, plaque, calendar, stoop with risers",
+     "palette": "sand brick, teal door, cream risers, ink 3.4"
+    },
+    {
+     "depth": 1.0,
+     "contents": "pavement, kerb, a bollard bottom-right, Pip",
+     "palette": "mintPale, ink 4.8, periwinkle"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 10.84,
+     "t1": 15.05,
+     "move": "push-in",
+     "from": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 480,
+      "y": 1050,
+      "zoom": 1.06
+     },
+     "ease": "inOut(sine)",
+     "why": "gentle push toward the stoop as the two steps are taught"
+    },
+    {
+     "t0": 15.1,
+     "t1": 15.72,
+     "move": "truck-right",
+     "from": {
+      "x": 480,
+      "y": 1050,
+      "zoom": 1.06
+     },
+     "to": {
+      "x": 600,
+      "y": 1000,
+      "zoom": 1.0
+     },
+     "ease": "out(cubic)",
+     "why": "slide to show the whole street as the ghost plates ripple 'everywhere' (light parallax: far towers x0.3)"
+    }
+   ],
+   "light": "Bright day. Sun low over the street's far end; far towers are flat silhouettes against it (fill-only sage). Hero facade: tan shade plane on its left 25%, cream rim strip on the cornice. Doors' glass glints (pairs of hair diagonals).",
+   "elements": [
+    {
+     "id": "sky",
+     "what": "flat sky",
+     "where": "0,0,1080,1060",
+     "style": "fill sky"
+    },
+    {
+     "id": "sun",
+     "what": "orange disc",
+     "where": "center 700,820 r150",
+     "style": "fill sun"
+    },
+    {
+     "id": "farTowers",
+     "what": "four tall far towers beyond the VP",
+     "where": "x 600-900, tops y 760-860, to the horizon 1060",
+     "style": "fill-only sage/mintPale, no ink"
+    },
+    {
+     "id": "heroHouse",
+     "what": "frontal 4-storey townhouse with cornice and 6 windows",
+     "where": "40,640,480,590",
+     "style": "sand brick (5 brick hints), cream window frames, ink 3.4"
+    },
+    {
+     "id": "heroBrowserWindow",
+     "what": "the hero house's main window as a browser window (website cue)",
+     "where": "170,760,220,140",
+     "style": "ink 3.4, dots, cream address pill, cream glow"
+    },
+    {
+     "id": "door4",
+     "what": "teal door #4",
+     "where": "230,1030,120,200",
+     "style": "teal, sage glass, tealDark kick panels"
+    },
+    {
+     "id": "lock4",
+     "what": "the same sand PHP lock box",
+     "where": "center 330,1130, 34x42",
+     "style": "sand, ink"
+    },
+    {
+     "id": "plaque4",
+     "what": "elephant plaque",
+     "where": "150,1080,50,50",
+     "style": "sand + ink elephant"
+    },
+    {
+     "id": "calendar",
+     "what": "tear-off wall calendar (planted for S04): cream pages with a sand header band, pages show season pictograms only, no numerals",
+     "where": "385,1040,70,80",
+     "style": "cream/sand, ink 2.2"
+    },
+    {
+     "id": "stoop",
+     "what": "two-step stoop: step 2 (upper) and step 1 (lower) with blank risers",
+     "where": "step2 190,1230,220,70; step1 160,1300,280,70",
+     "style": "cream risers, sand treads, ink 3.4"
+    },
+    {
+     "id": "riserGlyphs",
+     "what": "magnifier glyph on step 1's riser (find), wrench glyph on step 2's riser (fix)",
+     "where": "magnifier centre 300,1335 r28; wrench centre 300,1265 56x24",
+     "style": "ink 4.8"
+    },
+    {
+     "id": "streetRows",
+     "what": "receding rows of townhouses with doors, stoops, plaques, locks, browser-window dots; 10 doors per side visible",
+     "where": "left row x 520-715; right row x 1080 -> 730; bases converge to VP 720,1060",
+     "style": "alternating cream/sand/tan, ink 2.2 -> 1.6"
+    },
+    {
+     "id": "streetTrees",
+     "what": "three street trees on the right pavement receding",
+     "where": "crowns at 900,1090 / 820,1080 / 770,1068 (shrinking)",
+     "style": "sage/teal crowns, ochre trunks"
+    },
+    {
+     "id": "nearTree",
+     "what": "near street tree right of the stoop (it cycles seasons in S04)",
+     "where": "crown 590,960,130,160; trunk to 1380",
+     "style": "sage crown, 4 smile arcs, ochre trunk, ink 3.4"
+    },
+    {
+     "id": "ghostPlates",
+     "what": "dashed ink outlines of the NEW lock shape, one on every door down the street (intent: where the fix must go, not done)",
+     "where": "on each lock position; 34x42 on door 4 down to 4 px near the VP",
+     "style": "ink 2.2 dashed, no fill"
+    },
+    {
+     "id": "pavement",
+     "what": "pavement, kerb lines, bollard",
+     "where": "0,1370,1080,550; bollard 930,1420,40,90",
+     "style": "mintPale, ink 4.8 kerb"
+    },
+    {
+     "id": "bit",
+     "what": "Bit, hiding on door #4's frame",
+     "where": "380,1010 (16 px)",
+     "style": "solid ink"
+    },
+    {
+     "id": "pip",
+     "what": "mascot",
+     "where": "pavement 520,1450 -> step 1 tread 380,1300 -> step 2 tread 380,1230; scale 1.0",
+     "style": "periwinkle"
+    }
+   ],
+   "beats": [
+    {
+     "t": 10.84,
+     "action": "Cut under the sun hop: Stoop Street appears as flat fills; linework draws on top-to-bottom (10.88-11.55), 3-6 strokes in flight, 1-frame stagger."
+    },
+    {
+     "t": 10.98,
+     "action": "Pip lands on the pavement at (520,1450), landing squash."
+    },
+    {
+     "t": 11.05,
+     "action": "Sun lands at (700,820) with landing squash (sx 1.085 / sy 0.88)."
+    },
+    {
+     "t": 11.27,
+     "action": "'bug': Bit peeks round door #4's frame, antennae out, then freezes (rewatch bait)."
+    },
+    {
+     "t": 11.7,
+     "action": "Window glow pops along the street rows (texture, 1-frame stagger, near to far); three distant pedestrians rise in near the VP."
+    },
+    {
+     "t": 12.15,
+     "action": "'two': step 1 pops up out of the pavement (scaleY 0->1.06->1, 0.25 s). Sun hop 1, touch-down on 'two' (12.25)."
+    },
+    {
+     "t": 12.31,
+     "action": "'steps': step 2 pops up on top of it. Sun hop 2, touch-down on 'steps' (12.41)."
+    },
+    {
+     "t": 12.7,
+     "action": "Pip looks up at the steps (look 0.4), ears perk."
+    },
+    {
+     "t": 13.1,
+     "action": "'First': Pip hops onto step 1 (crouch 0.14 s, air 0.30 s, lands on the word)."
+    },
+    {
+     "t": 13.56,
+     "action": "'find': a magnifier glyph inks onto step 1's riser (circle then handle, 0.17 s); a lens glint sweeps across door #4's lock (13.66-13.85)."
+    },
+    {
+     "t": 13.75,
+     "action": "Bit ducks behind the door frame as the glint passes."
+    },
+    {
+     "t": 14.23,
+     "action": "'Then': Pip hops up onto step 2."
+    },
+    {
+     "t": 14.7,
+     "action": "'fix': a wrench glyph inks onto step 2's riser (0.17 s)."
+    },
+    {
+     "t": 15.12,
+     "action": "'everywhere': dashed ghost outlines of the new lock ripple onto every door, door #4 first, then down both rows toward the VP (1-frame stagger, 15.12-15.50). Camera trucks right to show the length of the street."
+    },
+    {
+     "t": 15.5,
+     "action": "The ripple reaches the vanishing point as tiny dashed specks; Pip looks down the street (look 0.8)."
+    }
+   ],
+   "sun": "Lands from the S02 hop at 11.05, then two small character hops that touch down on 'two' and 'steps' (step, step). Otherwise drifts 8 px/s right.",
+   "mascot": "Lands on the pavement (10.98). Gag: the literal two-step: hops onto step 1 on 'First', onto step 2 on 'Then'. Never covers the riser glyphs (sits on the right half of each tread, glyphs are at x 300).",
+   "sfx": [
+    {
+     "t": 10.84,
+     "sound": "whoosh_soft",
+     "notes": "cut under the sun hop"
+    },
+    {
+     "t": 10.88,
+     "sound": "pencil_scratch_long",
+     "notes": "-16 dB, linework draws on"
+    },
+    {
+     "t": 12.15,
+     "sound": "pop_low",
+     "notes": "step 1"
+    },
+    {
+     "t": 12.31,
+     "sound": "pop_low",
+     "notes": "step 2"
+    },
+    {
+     "t": 13.1,
+     "sound": "pop_mid",
+     "notes": "-14 dB, hop lands"
+    },
+    {
+     "t": 13.56,
+     "sound": "pencil_scratch_short",
+     "notes": "magnifier"
+    },
+    {
+     "t": 14.23,
+     "sound": "pop_mid",
+     "notes": "-14 dB, hop lands"
+    },
+    {
+     "t": 14.7,
+     "sound": "pencil_scratch_short",
+     "notes": "wrench"
+    },
+    {
+     "t": 15.12,
+     "sound": "pencil_scratch_medium",
+     "notes": "-16 dB, ghost plates ripple"
+    }
+   ],
+   "captions": [
+    {
+     "s": 10.88,
+     "e": 13.1,
+     "lines": [
+      {
+       "text": "Fixing a bug like that",
+       "s": 10.88
+      },
+      {
+       "text": "takes two steps.",
+       "s": 11.958
+      }
+     ],
+     "highlights": [
+      {
+       "text": "two steps",
+       "s": 12.247
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 13.1,
+     "e": 14.228,
+     "lines": [
+      {
+       "text": "First, you find it.",
+       "s": 13.1
+      }
+     ],
+     "highlights": [
+      {
+       "text": "find",
+       "s": 13.665
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 14.228,
+     "e": 15.769,
+     "lines": [
+      {
+       "text": "Then, you fix it",
+       "s": 14.228
+      },
+      {
+       "text": "everywhere.",
+       "s": 15.225
+      }
+     ],
+     "highlights": [
+      {
+       "text": "everywhere",
+       "s": 15.225
+      }
+     ],
+     "tone": "dark"
+    }
+   ]
+  },
+  {
+   "id": "S04",
+   "start": 15.72,
+   "end": 21.5,
+   "vo": "You'd think finding it is the hard part, right? And for 14 years, nobody did.",
+   "title": "Fourteen years of nobody",
+   "transitionIn": {
+    "type": "camera-continuous",
+    "dur": 0.88,
+    "persist": [
+     "sun",
+     "pip",
+     "heroHouse",
+     "stoop",
+     "calendar",
+     "nearTree",
+     "bit"
+    ],
+    "notes": "Same set as S03. The camera keeps moving: a gentle push-in from the S03 truck position toward the stoop (15.72-16.60)."
+   },
+   "setting": "Stoop Street, same set. The 'hard part' becomes a literal tower; then a locked-off 14-year time-lapse in front of door #4.",
+   "composition": "As S03 (canvas coords at rest). On 'hard' the LEFT HALF of step 1 (x 160-300) extrudes upward into a brick column to y 560 (740 px tall), carrying Pip; the camera tilts up to follow (top of column at screen y ~700). Time-lapse elements sit around door #4: calendar (385,1040), near tree (590,960), ivy on the door frame's left (x 210-235, y 1040-1300), cobweb over the lock (330,1130). Ghost passers-by on the pavement y 1380-1600, x 480-900.",
+   "timeOfDay": "day",
+   "scale": {
+    "colossal": "step 1 shooting up into a 740 px brick tower ('the hard part')",
+    "observer": "Pip riding on top of it (96 px)",
+    "ratio": "the tower is ~8x Pip's height and taller than the hero house"
+   },
+   "layers": [
+    {
+     "depth": 0.1,
+     "contents": "far towers",
+     "palette": "fill-only sage/mintPale"
+    },
+    {
+     "depth": 0.15,
+     "contents": "sun",
+     "palette": "orange (pulses on each calendar tear)"
+    },
+    {
+     "depth": 0.4,
+     "contents": "street rows and trees",
+     "palette": "as S03"
+    },
+    {
+     "depth": 0.7,
+     "contents": "hero house, door #4, calendar, ivy, cobweb, stoop / tower",
+     "palette": "sand brick, teal, cream, sage ivy blobs, inkHair cobweb"
+    },
+    {
+     "depth": 0.85,
+     "contents": "ghost passers-by (time-lapse)",
+     "palette": "ink-only line art (no fill), ink 2.2"
+    },
+    {
+     "depth": 1.0,
+     "contents": "pavement, Pip, Bit",
+     "palette": "mintPale, periwinkle, ink"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 15.72,
+     "t1": 16.6,
+     "move": "push-in",
+     "from": {
+      "x": 600,
+      "y": 1000,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 420,
+      "y": 1060,
+      "zoom": 1.08
+     },
+     "ease": "inOut(sine)",
+     "why": "lean into the joke"
+    },
+    {
+     "t0": 17.0,
+     "t1": 17.55,
+     "move": "tilt-up",
+     "from": {
+      "x": 420,
+      "y": 1060,
+      "zoom": 1.08
+     },
+     "to": {
+      "x": 420,
+      "y": 860,
+      "zoom": 1.08
+     },
+     "ease": "out(cubic)",
+     "why": "follow the tower up: a small tilt, not a big move"
+    },
+    {
+     "t0": 18.4,
+     "t1": 18.85,
+     "move": "tilt-down",
+     "from": {
+      "x": 420,
+      "y": 860,
+      "zoom": 1.08
+     },
+     "to": {
+      "x": 420,
+      "y": 1060,
+      "zoom": 1.08
+     },
+     "ease": "inOut(sine)",
+     "why": "drop back with the tower"
+    },
+    {
+     "t0": 18.85,
+     "t1": 21.04,
+     "move": "hold",
+     "from": {
+      "x": 420,
+      "y": 1060,
+      "zoom": 1.08
+     },
+     "to": {
+      "x": 420,
+      "y": 1060,
+      "zoom": 1.08
+     },
+     "ease": "none",
+     "why": "locked-off time-lapse: everything changes except the lock"
+    },
+    {
+     "t0": 21.1,
+     "t1": 21.45,
+     "move": "push-in",
+     "from": {
+      "x": 420,
+      "y": 1060,
+      "zoom": 1.08
+     },
+     "to": {
+      "x": 330,
+      "y": 1130,
+      "zoom": 2.6
+     },
+     "ease": "in(cubic)",
+     "why": "push into door #4's lock for the match-cut to S05"
+    }
+   ],
+   "light": "Day. During the time-lapse the light does NOT flicker (no day/night strobing); time is carried by the calendar, the tree's seasons, ivy, cobweb and ghosts. The sun pulses once per calendar tear.",
+   "elements": [
+    {
+     "id": "tower",
+     "what": "step 1's left half extruded into a brick column",
+     "where": "160,560,140,740 at full height",
+     "style": "sand brick, 8 brick hints, ink 3.4, tan shade strip on the left"
+    },
+    {
+     "id": "calendar",
+     "what": "tear-off calendar, 14 tears; each page shows a season pictogram (sage sprout / peach heat-wave / tan leaf / white snowflake) cycling; no numerals",
+     "where": "385,1040,70,80",
+     "style": "cream page, sand header, ink 2.2"
+    },
+    {
+     "id": "nearTree",
+     "what": "near tree cycling seasons: sage -> tan (autumn) -> bare ink branches -> sage with cream blossoms -> sage",
+     "where": "590,960,130,160",
+     "style": "palette swaps only (1-frame pops), ink 3.4"
+    },
+    {
+     "id": "ivy",
+     "what": "ivy creeping up door #4's frame",
+     "where": "x 210-235, y 1040-1300",
+     "style": "ink 2.2 vine + sage leaf blobs"
+    },
+    {
+     "id": "cobweb",
+     "what": "cobweb over the lock",
+     "where": "centre 330,1130 r40",
+     "style": "inkHair"
+    },
+    {
+     "id": "ghosts",
+     "what": "ink-only back-view passers-by (tier B/C 120-200 px) that pop in and out at random pavement spots, none ever looking at the door",
+     "where": "pavement y 1380-1600, x 480-900",
+     "style": "ink 2.2, no fill"
+    },
+    {
+     "id": "passersBy",
+     "what": "two coloured passers-by before the time-lapse, looking at their phones",
+     "where": "x 620-760, y 1300-1500",
+     "style": "coats sage/ochre, ink 3.4"
+    },
+    {
+     "id": "pigeon",
+     "what": "a pigeon that lands on the tower top beside Pip",
+     "where": "250,560 (28x14)",
+     "style": "white fill, ink"
+    },
+    {
+     "id": "leaf",
+     "what": "a single tan leaf that lands on sleeping Pip's ear",
+     "where": "lands at 360,1270",
+     "style": "tan, ink"
+    },
+    {
+     "id": "bit",
+     "what": "Bit sitting in plain sight on the lock box the whole time",
+     "where": "330,1112",
+     "style": "solid ink"
+    },
+    {
+     "id": "pip",
+     "what": "mascot",
+     "where": "step 1 tread 230,1300 -> top of tower 230,560 -> step 1 tread 330,1300 (sleep)",
+     "style": "periwinkle"
+    }
+   ],
+   "beats": [
+    {
+     "t": 15.72,
+     "action": "Camera continues: gentle push-in toward the stoop."
+    },
+    {
+     "t": 15.9,
+     "action": "Pip turns from step 2 to look at step 1 (look -0.4)."
+    },
+    {
+     "t": 16.15,
+     "action": "'finding': Pip hops back down onto step 1's left half (x 230)."
+    },
+    {
+     "t": 16.65,
+     "action": "Two coloured passers-by walk past behind, eyes on phones (slide + bob)."
+    },
+    {
+     "t": 16.92,
+     "action": "'hard': step 1's left half SHOOTS UP into a brick tower carrying Pip (0.48 s ease-out with 4% overshoot); camera tilts up to follow."
+    },
+    {
+     "t": 17.35,
+     "action": "Brick hints pop down the tower (texture); a pigeon lands beside Pip at the top (17.45)."
+    },
+    {
+     "t": 17.91,
+     "action": "'right?': Pip turns to camera (sit-front, expression meh) and holds the look 0.45 s. The ONLY look to camera in the film."
+    },
+    {
+     "t": 18.46,
+     "action": "'And': the tower retracts with a boing (0.24 s, 6% undershoot); camera tilts back down; Pip lands on step 1 (18.70) with a squash."
+    },
+    {
+     "t": 18.85,
+     "action": "'14': time-lapse starts, frame locked. The calendar tears 14 pages at 18.85 + k*0.105 (k = 0..13, last at 20.22), each page flipping up and away; the sun pulses +4% on every tear."
+    },
+    {
+     "t": 18.9,
+     "action": "Ghost passers-by (ink-only) start popping in and out on the pavement, ~3 per tear, never looking at the door."
+    },
+    {
+     "t": 19.0,
+     "action": "Pip lies down: sleep pose on step 1, z's float."
+    },
+    {
+     "t": 19.1,
+     "action": "Tree cycles seasons: tan 19.10, bare 19.60, blossom 20.10, sage 20.60 (1-frame palette pops)."
+    },
+    {
+     "t": 19.3,
+     "action": "Ivy creeps up door #4's frame (progressive draw-on to 20.80)."
+    },
+    {
+     "t": 19.7,
+     "action": "A cobweb draws over the lock (inkHair, 0.3 s). Bit doesn't move."
+    },
+    {
+     "t": 20.38,
+     "action": "'nobody': the ghost traffic thins out; the last two tears (20.12, 20.22) feel slower."
+    },
+    {
+     "t": 20.6,
+     "action": "A tan leaf drifts down and lands on sleeping Pip's ear."
+    },
+    {
+     "t": 21.04,
+     "action": "'did': HARD STOP. Ghosts vanish (1-frame pop), tree holds, ivy stops. Bit walks across sleeping Pip's trunk (21.04-21.40)."
+    },
+    {
+     "t": 21.1,
+     "action": "Camera pushes into door #4's lock (in(cubic), 0.35 s) for the match-cut."
+    }
+   ],
+   "sun": "Stays on its spot (700,820). Character work only: one +4% pulse per calendar tear (14 pulses, the visual count of the years). No clock face here (one clock = one timescale).",
+   "mascot": "Hops down to step 1 on 'finding', rides the tower up on 'hard', THE look to camera on 'right?' (17.91), lands with the boing, then sleeps through the 14 years (a leaf lands on his ear; Bit walks over his trunk).",
+   "sfx": [
+    {
+     "t": 16.15,
+     "sound": "pop_mid",
+     "notes": "-16 dB hop"
+    },
+    {
+     "t": 16.92,
+     "sound": "whoosh_soft",
+     "notes": "tower rises"
+    },
+    {
+     "t": 18.46,
+     "sound": "pop_low",
+     "notes": "boing back down"
+    },
+    {
+     "t": 18.85,
+     "sound": "counter_ticker",
+     "notes": "-18 dB, ticks under the 14 tears"
+    },
+    {
+     "t": 18.85,
+     "sound": "paper_flip",
+     "notes": "-20 dB, first tear"
+    },
+    {
+     "t": 21.04,
+     "sound": "lock_click",
+     "notes": "hard stop on 'did'"
+    }
+   ],
+   "captions": [
+    {
+     "s": 15.769,
+     "e": 18.558,
+     "lines": [
+      {
+       "text": "You'd think finding it",
+       "s": 15.769
+      },
+      {
+       "text": "is the hard part, right?",
+       "s": 16.755
+      }
+     ],
+     "highlights": [
+      {
+       "text": "hard part",
+       "s": 17.025
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 18.558,
+     "e": 21.606,
+     "lines": [
+      {
+       "text": "And for 14 years,",
+       "s": 18.558
+      },
+      {
+       "text": "nobody did.",
+       "s": 20.379
+      }
+     ],
+     "highlights": [
+      {
+       "text": "14 years",
+       "s": 18.85
+      }
+     ],
+     "tone": "dark"
+    }
+   ]
+  },
+  {
+   "id": "S05",
+   "start": 21.5,
+   "end": 25.44,
+   "vo": "Then, in August, two security teams using AI tools found it",
+   "title": "Found it",
+   "transitionIn": {
+    "type": "matchcut",
+    "dur": 0.55,
+    "persist": [
+     "sun",
+     "pip",
+     "bit",
+     "lockShape"
+    ],
+    "notes": "21.10-21.65. S04 pushes into door #4's lock; cut at 21.50 inside the 'Then' pause onto the SAME lock silhouette drawn in ink on the PHP master blueprint, at the same screen position and size; the camera then settles back. The flaw was in the blueprint all along. Pip falls in from the top still asleep."
+   },
+   "setting": "The blueprint wall: the PHP master blueprint (the plan all those buildings come from) pinned in a teal frame on a tall sunny civic wall, the reference's noticeboard composition at monumental size. Two security teams stand in front of it, back to us.",
+   "composition": "Canvas coords at rest. Mint sky y 0-640 (captions). Cornice band y 640-690; the sun peeks over it, centre (800,640) so only its top half shows. Cream wall y 640-1500 with brick hints. Blueprint sheet in a teal frame x 170-850, y 740-1320 (white paper, ink drawing of a door elevation; the lock detail drawn large at the centre (510,1030), ~120x150; elephant stamp bottom-right (770,1240); dimension lines; title block). Calendar x 880-950, y 760-850. Team A (3 back-view, waist-up) x 40-420 and team B x 660-1040, heads y 1360-1440, bodies off the bottom edge. Pip asleep on the frame top (720,740). Quiet field = wall (~40%).",
+   "timeOfDay": "day",
+   "scale": {
+    "colossal": "the master blueprint, 680x580, on a monumental wall: the plan behind millions of buildings",
+    "observer": "six back-view investigators cropped at the waist; Pip asleep on the frame",
+    "ratio": "the lock detail alone is as big as an investigator's head and shoulders"
+   },
+   "layers": [
+    {
+     "depth": 0.1,
+     "contents": "sky strip above the cornice",
+     "palette": "fill sky"
+    },
+    {
+     "depth": 0.15,
+     "contents": "sun peeking over the cornice",
+     "palette": "orange; heat ticks ink"
+    },
+    {
+     "depth": 0.4,
+     "contents": "civic wall with cornice and brick hints, calendar",
+     "palette": "cream wall, tan cornice band, ink 3.4"
+    },
+    {
+     "depth": 0.6,
+     "contents": "blueprint sheet in teal frame, Bit on the lock detail, Pip on the frame top",
+     "palette": "white paper, ink drawing 2.2, sand stamp, teal frame"
+    },
+    {
+     "depth": 1.0,
+     "contents": "two teams of three back-view investigators with tablets; scan beams",
+     "palette": "coats sage/teal/sand, white tablets with ink sparkle; beams flat mintPale with dashed ink edges"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 21.5,
+     "t1": 22.45,
+     "move": "pull-back",
+     "from": {
+      "x": 510,
+      "y": 1030,
+      "zoom": 1.3
+     },
+     "to": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "ease": "out(cubic)",
+     "why": "settle out of the match-cut: from the lock drawing to the whole plan (gentle, 1.3x)"
+    },
+    {
+     "t0": 22.45,
+     "t1": 25.3,
+     "move": "push-in",
+     "from": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 520,
+      "y": 1020,
+      "zoom": 1.06
+     },
+     "ease": "inOut(sine)",
+     "why": "slow lean toward the lock as the teams close in"
+    },
+    {
+     "t0": 25.3,
+     "t1": 25.44,
+     "move": "truck-right",
+     "from": {
+      "x": 520,
+      "y": 1020,
+      "zoom": 1.06
+     },
+     "to": {
+      "x": 600,
+      "y": 1020,
+      "zoom": 1.06
+     },
+     "ease": "in(cubic)",
+     "why": "start of the continuous pan into S06"
+    }
+   ],
+   "light": "High summer day ('August'): flat, bright. Three ink heat-shimmer ticks above the sun. Tablet screens cream. Scan beams = flat mintPale polygons at fixed partial opacity with dashed ink edges (no gradients, never animated opacity: they wipe on).",
+   "elements": [
+    {
+     "id": "sky",
+     "what": "sky strip",
+     "where": "0,0,1080,640",
+     "style": "fill sky"
+    },
+    {
+     "id": "sun",
+     "what": "orange disc peeking over the cornice (top half visible)",
+     "where": "centre 800,640 r150",
+     "style": "fill sun"
+    },
+    {
+     "id": "wall",
+     "what": "tall civic wall with cornice (2 lines + tan band) and 6 brick hints",
+     "where": "0,640,1080,860",
+     "style": "cream, tan band, ink 3.4"
+    },
+    {
+     "id": "blueprint",
+     "what": "PHP master blueprint: white sheet, teal frame 12 px, ink door elevation, LOCK DETAIL drawn big with the short bolt and the gap, elephant stamp, dimension lines, title block (no text)",
+     "where": "170,740,680,580; lock detail centre 510,1030 (120x150); stamp centre 770,1240 r50",
+     "style": "white paper, teal frame, ink 2.2 / 3.4 on the lock, sand stamp + ink elephant"
+    },
+    {
+     "id": "calendar",
+     "what": "the S04 calendar; tears to a summer page (peach page with an ink heat-wave pictogram)",
+     "where": "880,760,70,90",
+     "style": "cream/peach, ink"
+    },
+    {
+     "id": "teamA",
+     "what": "three back-view investigators (tier A, heads 56 px), small ink shield badge on each back",
+     "where": "x 40-420, heads y 1360-1440",
+     "style": "coats sage/teal/sand; badges ink outline on cream patch"
+    },
+    {
+     "id": "teamB",
+     "what": "three more from the right",
+     "where": "x 660-1040, heads y 1360-1440",
+     "style": "coats teal/sand/sage"
+    },
+    {
+     "id": "tablets",
+     "what": "two raised tablets with a four-point sparkle glyph (generic 'AI' sign)",
+     "where": "230,1250 and 820,1250; 70x100",
+     "style": "white, ink outline, ink sparkle"
+    },
+    {
+     "id": "scanBeams",
+     "what": "two scan cones from the tablets across the sheet, converging on the lock detail",
+     "where": "from tablet tops to 510,1030",
+     "style": "flat mintPale fixed partial opacity, dashed ink edges 2.2"
+    },
+    {
+     "id": "targetRing",
+     "what": "ink target ring that strokes on around the lock detail on 'found'",
+     "where": "centre 510,1030 r90",
+     "style": "ink 4.8 (not orange)"
+    },
+    {
+     "id": "bit",
+     "what": "Bit sitting on the blueprint's lock detail, pretending to be part of the drawing; gets an ink '!' when caught",
+     "where": "530,1040 (20 px)",
+     "style": "solid ink"
+    },
+    {
+     "id": "pip",
+     "what": "mascot asleep on the frame top (the reference cat's spot)",
+     "where": "720,740; sleep pose, scale 1.0",
+     "style": "periwinkle"
+    }
+   ],
+   "beats": [
+    {
+     "t": 21.5,
+     "action": "Cut on the lock: the blueprint's lock drawing sits where door #4's lock was. Wall and sheet are flat fills; the blueprint linework draws outward from the lock (21.52-22.20)."
+    },
+    {
+     "t": 21.55,
+     "action": "Camera settles 1.3 -> 1.0."
+    },
+    {
+     "t": 21.62,
+     "action": "Pip, still asleep, falls in from the top of frame and lands on the frame top (21.80) without waking (z's)."
+    },
+    {
+     "t": 21.75,
+     "action": "Sun hops in and lands peeking over the cornice (squash)."
+    },
+    {
+     "t": 22.08,
+     "action": "'August': the calendar tears to a summer page; sun bounce touches down on 'August' (22.185); three ink heat-shimmer ticks pop above the sun (22.20)."
+    },
+    {
+     "t": 22.4,
+     "action": "The elephant stamp in the blueprint corner pulses once (this is PHP's own plan)."
+    },
+    {
+     "t": 22.75,
+     "action": "'two': team A rises in from the bottom-left (22.75 / 22.88 / 23.01, rise 0.33 s)."
+    },
+    {
+     "t": 23.0,
+     "action": "'security': team B rises in from the bottom-right (23.00 / 23.13 / 23.26)."
+    },
+    {
+     "t": 23.45,
+     "action": "'teams': ink shield badges pop on all six backs (23.45-23.62)."
+    },
+    {
+     "t": 24.05,
+     "action": "'AI': one tablet per team is raised (24.05, 24.12), each showing a four-point sparkle that twinkles (scale pulse)."
+    },
+    {
+     "t": 24.48,
+     "action": "'tools': two scan beams wipe on and sweep the sheet from opposite sides (24.48-24.90)."
+    },
+    {
+     "t": 24.9,
+     "action": "'found': both beams converge on the lock detail; an ink target ring strokes on around it on the word (24.96, 0.17 s). Bit freezes; an ink '!' pops over him."
+    },
+    {
+     "t": 24.96,
+     "action": "Pip jolts awake on the frame top (trunk-up, expression wide); sun bounce touches down on 'found'."
+    },
+    {
+     "t": 25.23,
+     "action": "'it': the ring pulses +10%, tablets glint."
+    },
+    {
+     "t": 25.3,
+     "action": "Camera starts trucking right (continuous into S06). Pip jumps off the frame top (25.35)."
+    }
+   ],
+   "sun": "Peeks over the cornice like the reference's S2 sun, half hidden, and bounces with each touch-down on a word: 'August' (22.185), 'found' (24.96). Heat-shimmer ticks on 'August'.",
+   "mascot": "Asleep since S04; falls into frame asleep (gag 1 is the reveal). Main gag: jolts awake on 'found' (24.96). Jumps off at 25.35 to follow the envelope.",
+   "sfx": [
+    {
+     "t": 21.5,
+     "sound": "pencil_scratch_medium",
+     "notes": "blueprint lines draw outward"
+    },
+    {
+     "t": 21.8,
+     "sound": "pop_low",
+     "notes": "-18 dB, Pip lands asleep"
+    },
+    {
+     "t": 22.08,
+     "sound": "paper_flip",
+     "notes": "calendar to summer"
+    },
+    {
+     "t": 22.75,
+     "sound": "pop_mid",
+     "notes": "-18 dB, team A rise (one file)"
+    },
+    {
+     "t": 23.0,
+     "sound": "pop_mid",
+     "notes": "-18 dB, team B rise"
+    },
+    {
+     "t": 24.05,
+     "sound": "bubble_pop",
+     "notes": "sparkles"
+    },
+    {
+     "t": 24.48,
+     "sound": "whoosh_soft",
+     "notes": "-16 dB scan sweep"
+    },
+    {
+     "t": 24.96,
+     "sound": "ding",
+     "notes": "found it"
+    },
+    {
+     "t": 24.96,
+     "sound": "alert_ping",
+     "notes": "-14 dB, Pip wakes"
+    }
+   ],
+   "captions": [
+    {
+     "s": 21.606,
+     "e": 22.853,
+     "lines": [
+      {
+       "text": "Then, in August,",
+       "s": 21.606
+      }
+     ],
+     "highlights": [
+      {
+       "text": "August",
+       "s": 22.185
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 22.853,
+     "e": 25.527,
+     "lines": [
+      {
+       "text": "two security teams",
+       "s": 22.853
+      },
+      {
+       "text": "using AI tools found it",
+       "s": 23.885
+      }
+     ],
+     "highlights": [
+      {
+       "text": "AI tools",
+       "s": 24.155
+      }
+     ],
+     "tone": "dark"
+    }
+   ]
+  },
+  {
+   "id": "S06",
+   "start": 25.44,
+   "end": 30.5,
+   "vo": "and quietly told the people who make PHP so a fix could be ready before anyone else knew.",
+   "title": "A quiet letter",
+   "transitionIn": {
+    "type": "camera-continuous",
+    "dur": 0.66,
+    "persist": [
+     "sun",
+     "pip",
+     "messenger",
+     "envelope"
+    ],
+    "notes": "25.44-26.10. The 9 s sentence splits at 'and' (25.53) with NO cut: the camera trucks right from the blueprint wall down Makers' Lane, following a team member carrying an envelope. The sky wipes mint -> cream (golden) right-to-left in sync with the pan (a wipe, never a fade)."
+   },
+   "setting": "Makers' Lane at golden hour: a narrow lane leading toward a huge low sun. On the right, the workshop of the people who make PHP (narrow brick building, hanging elephant sign, lit window, mail slot). On the left, neighbours' houses with curtains drawn.",
+   "composition": "Canvas coords at rest. Golden sky (cream) y 0-1080 with a flat peach horizon band y 900-1080. VP (430,1060) at the lane's end where the sun sits: centre (430,960) r150, its lower part behind far rooftops. Left houses recede from x 0 (roof y 560, base 1600) to x 330 (roof 900, base 1120). Workshop frontal on the right x 600-1000, y 560-1500: browser window upstairs x 680-900, y 720-860; door x 620-720, y 1150-1450 (mail slot at 670,1300); shop window x 740-940, y 1060-1300 with a roller-blind box above; elephant sign on a bracket at (700,980). Lane floor (sand cobbles) y 1120-1920 converging to the VP.",
+   "timeOfDay": "golden",
+   "scale": {
+    "colossal": "the huge low sun filling the end of the lane, the tall narrow workshop",
+    "observer": "the messenger (260 px) and Pip walking toward it",
+    "ratio": "the sun's diameter is ~1.2x the messenger's height; the workshop is 4x his height"
+   },
+   "layers": [
+    {
+     "depth": 0.05,
+     "contents": "golden sky and peach horizon band",
+     "palette": "cream sky, peach band"
+    },
+    {
+     "depth": 0.1,
+     "contents": "sun and far rooftop silhouettes at the lane's end",
+     "palette": "orange; fill-only sand/tan silhouettes"
+    },
+    {
+     "depth": 0.4,
+     "contents": "neighbours' houses (left), receding",
+     "palette": "cream/sand facades, sand curtains, ink 2.2"
+    },
+    {
+     "depth": 0.6,
+     "contents": "workshop: browser window, sign, shop window with three makers, door with mail slot, blind",
+     "palette": "tan brick, teal door, peach window glow, ink 3.4"
+    },
+    {
+     "depth": 0.8,
+     "contents": "cobbled lane, two passers-by",
+     "palette": "sand cobbles (ink dashes), coats sage/tan"
+    },
+    {
+     "depth": 1.0,
+     "contents": "messenger with envelope, Pip, the gust sheet entering at the left edge",
+     "palette": "coat teal, white envelope, orange wax seal, periwinkle"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 25.44,
+     "t1": 26.1,
+     "move": "truck-right",
+     "from": {
+      "x": 600,
+      "y": 1020,
+      "zoom": 1.06
+     },
+     "to": {
+      "x": 560,
+      "y": 980,
+      "zoom": 1.04
+     },
+     "ease": "out(cubic)",
+     "why": "the continuous pan from the blueprint wall into the lane (parallax: sun x0.1, houses x0.6)"
+    },
+    {
+     "t0": 26.1,
+     "t1": 30.4,
+     "move": "push-in",
+     "from": {
+      "x": 560,
+      "y": 980,
+      "zoom": 1.04
+     },
+     "to": {
+      "x": 620,
+      "y": 1080,
+      "zoom": 1.12
+     },
+     "ease": "inOut(sine)",
+     "why": "slow push toward the workshop window as the secret is kept"
+    },
+    {
+     "t0": 30.4,
+     "t1": 30.5,
+     "move": "hold",
+     "from": {
+      "x": 620,
+      "y": 1080,
+      "zoom": 1.12
+     },
+     "to": {
+      "x": 620,
+      "y": 1080,
+      "zoom": 1.12
+     },
+     "ease": "none",
+     "why": "hold for the foreground wipe"
+    }
+   ],
+   "light": "Golden hour, flat: cream sky with a hard-edged peach horizon band; the sun huge at the lane's end with the far rooftops silhouetted (fill-only tan) across its lower third. Workshop shop window glows peach (stepped: peach pane + one cream inner rectangle) once the makers appear. Long flat shade planes: the left houses' street faces in sand, a tan diagonal shade wedge across the lane floor from the workshop.",
+   "elements": [
+    {
+     "id": "sky",
+     "what": "golden sky with a flat peach horizon band",
+     "where": "0,0,1080,1080; band y 900-1080",
+     "style": "cream + peach"
+    },
+    {
+     "id": "sun",
+     "what": "orange disc at the lane's end; dips to stamp the seal",
+     "where": "centre 430,960 r150",
+     "style": "fill sun"
+    },
+    {
+     "id": "farRoofs",
+     "what": "rooftop silhouettes across the sun's lower third",
+     "where": "x 250-620, y 990-1080",
+     "style": "fill-only tan"
+    },
+    {
+     "id": "leftHouses",
+     "what": "neighbours' houses receding, curtains drawn (sand), two windows where 'Zzz' appears",
+     "where": "x 0-330; Zzz windows at 120,900 and 230,980",
+     "style": "cream/sand, ink 2.2"
+    },
+    {
+     "id": "workshop",
+     "what": "PHP makers' workshop: narrow tall brick building with a browser window upstairs (it is a website too)",
+     "where": "600,560,400,940",
+     "style": "tan brick, ink 3.4"
+    },
+    {
+     "id": "elephantSign",
+     "what": "hanging round sign with the ink elephant emblem on an iron bracket",
+     "where": "centre 700,980 r45",
+     "style": "sand disc, ink emblem, ink bracket"
+    },
+    {
+     "id": "shopWindow",
+     "what": "shop window, peach glow, three makers at a bench (back view, waist-up), a crate",
+     "where": "740,1060,200,240; makers x 760-920; bench line y 1260; crate 860,1230,70,60",
+     "style": "peach glow, coats cream aprons over teal, ink 2.2"
+    },
+    {
+     "id": "blind",
+     "what": "roller blind box above the shop window; blind pulls down halfway",
+     "where": "740,1030,200,30; blind travel to y 1180",
+     "style": "sand blind with ink ribs"
+    },
+    {
+     "id": "door",
+     "what": "teal workshop door with a brass-like mail slot",
+     "where": "620,1150,100,300; slot centre 670,1300 50x10",
+     "style": "teal, sand slot, ink"
+    },
+    {
+     "id": "messenger",
+     "what": "investigator from team A, back view, carrying the envelope",
+     "where": "walks x 380 -> 600, feet y 1560, 260 px tall",
+     "style": "teal coat, ink 3.4"
+    },
+    {
+     "id": "envelope",
+     "what": "white envelope; receives an orange wax-seal dot (the scene's hero orange prop)",
+     "where": "60x40, held at shoulder height; seal r18",
+     "style": "white, ink; seal = sun orange"
+    },
+    {
+     "id": "newLock",
+     "what": "THE FIX (one icon for the whole film): sage lock box with a cream check tag",
+     "where": "on the bench, ~40x50",
+     "style": "sage body, ink, cream tag with ink check"
+    },
+    {
+     "id": "zzz",
+     "what": "two ink 'Zzz' marks from neighbours' windows",
+     "where": "120,860 and 230,950",
+     "style": "ink 2.2"
+    },
+    {
+     "id": "passersBy",
+     "what": "two back-view passers-by crossing mid-distance, not looking",
+     "where": "x 250-400, y 1150-1300, 90 px",
+     "style": "coats sage/tan"
+    },
+    {
+     "id": "gustSheet",
+     "what": "a white sheet corner that flutters in from OFF-FRAME left on a gust (no source)",
+     "where": "enters at 0,1350",
+     "style": "white, ink"
+    },
+    {
+     "id": "pip",
+     "what": "mascot",
+     "where": "walk-side behind the messenger x 250 -> 460, feet y 1520; scale 1.0",
+     "style": "periwinkle"
+    }
+   ],
+   "beats": [
+    {
+     "t": 25.44,
+     "action": "Truck-right continues into the lane; sky wipes mint -> cream with the peach horizon band (right-to-left wipe, 0.4 s)."
+    },
+    {
+     "t": 25.5,
+     "action": "Pip lands behind the messenger and tiptoes (walk-side, slow rate 0.8)."
+    },
+    {
+     "t": 25.57,
+     "action": "'quietly': the messenger raises the envelope; the sun leaves its slot and dips toward it (arc, 25.60-25.92)."
+    },
+    {
+     "t": 25.67,
+     "action": "Pip stops and goes 'shh' (hold pose with no prop: trunk curled up to his mouth)."
+    },
+    {
+     "t": 25.92,
+     "action": "The sun STAMPS the envelope's wax seal (contact squash), leaving an orange seal dot, then floats back to its slot (25.95-26.40)."
+    },
+    {
+     "t": 26.05,
+     "action": "'told': the envelope slides through the workshop's mail slot (0.25 s); the slot flap clicks (26.25)."
+    },
+    {
+     "t": 26.37,
+     "action": "'people': the shop window lights up (peach glow pop) and three makers pop in at the bench (26.37 / 26.45 / 26.53)."
+    },
+    {
+     "t": 26.95,
+     "action": "'PHP': the hanging elephant sign swings (pendulum -16 -> 0 deg, 0.5 s)."
+    },
+    {
+     "t": 27.4,
+     "action": "Neighbours' curtains are drawn (four 1-frame pops, 27.40-27.55)."
+    },
+    {
+     "t": 28.01,
+     "action": "'fix': on the bench a new lock assembles: sage body 28.01, shackle 28.08, cream tag 28.15."
+    },
+    {
+     "t": 28.68,
+     "action": "'ready': a check mark strokes onto the cream tag (0.17 s, on the word)."
+    },
+    {
+     "t": 28.83,
+     "action": "'before': the roller blind pulls down halfway over the window (0.2 s)."
+    },
+    {
+     "t": 29.15,
+     "action": "'anyone': 'Zzz' pops from two neighbours' windows (29.15, 29.30)."
+    },
+    {
+     "t": 29.55,
+     "action": "'else': two passers-by cross mid-distance without looking."
+    },
+    {
+     "t": 29.91,
+     "action": "'knew': the workshop door lock gives a small ink tick (closed)."
+    },
+    {
+     "t": 30.2,
+     "action": "A white sheet corner flutters in at the LEFT FRAME EDGE on a gust, from off-frame (never from the workshop). Pip's ear twitches (30.25)."
+    },
+    {
+     "t": 30.4,
+     "action": "The gust lifts the sheet toward the lens; Pip leaps after it (crosses into S07)."
+    }
+   ],
+   "sun": "Arrives at the lane's end (hop from S05, landing 25.62), then the scene's gag: dips down to stamp the envelope's wax seal on 'quietly' (25.92) and floats home (26.40). One meaningful morph: the seal copy it leaves behind is the scene's single orange hero prop. It does NOT set here (one sunset only, in S08).",
+   "mascot": "Tiptoes behind the messenger; gag: trunk 'shh' on 'quietly' (25.67). Ear twitch at the gust sheet (30.25), then leaps after it.",
+   "sfx": [
+    {
+     "t": 25.44,
+     "sound": "whoosh_soft",
+     "notes": "-18 dB, the pan"
+    },
+    {
+     "t": 25.92,
+     "sound": "pop_low",
+     "notes": "seal stamp"
+    },
+    {
+     "t": 26.25,
+     "sound": "click_light",
+     "notes": "mail slot flap"
+    },
+    {
+     "t": 26.37,
+     "sound": "pop_mid",
+     "notes": "-18 dB, makers appear"
+    },
+    {
+     "t": 28.01,
+     "sound": "typing_burst",
+     "notes": "-20 dB, the fix being made (bench work)"
+    },
+    {
+     "t": 28.68,
+     "sound": "pencil_scratch_short",
+     "notes": "check mark"
+    },
+    {
+     "t": 28.83,
+     "sound": "paper_flip",
+     "notes": "-18 dB, blind"
+    },
+    {
+     "t": 29.91,
+     "sound": "lock_click",
+     "notes": "-16 dB"
+    },
+    {
+     "t": 30.2,
+     "sound": "paper_flip",
+     "notes": "-16 dB, gust sheet"
+    }
+   ],
+   "captions": [
+    {
+     "s": 25.527,
+     "e": 27.902,
+     "lines": [
+      {
+       "text": "and quietly told",
+       "s": 25.527
+      },
+      {
+       "text": "the people who make PHP",
+       "s": 26.375
+      }
+     ],
+     "highlights": [
+      {
+       "text": "quietly",
+       "s": 25.667
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 27.902,
+     "e": 30.615,
+     "lines": [
+      {
+       "text": "so a fix could be ready",
+       "s": 27.902
+      },
+      {
+       "text": "before anyone else knew.",
+       "s": 28.929
+      }
+     ],
+     "highlights": [
+      {
+       "text": "before",
+       "s": 28.929
+      }
+     ],
+     "tone": "dark"
+    }
+   ]
+  },
+  {
+   "id": "S07",
+   "start": 30.5,
+   "end": 35.52,
+   "vo": "Except, the details of the bug leaked online hours before the fix came out.",
+   "title": "Pinned for everyone",
+   "transitionIn": {
+    "type": "foreground-wipe",
+    "dur": 0.38,
+    "persist": [
+     "sun",
+     "pip",
+     "leakSheet"
+    ],
+    "notes": "30.50-30.88. THE pattern interrupt on 'Except,' (replaces the retired card flip). The gust sheet sweeps across the lens left-to-right, growing (x1 -> x8, accelerating), fills the frame white for 3 frames centred on 'Except,' (30.58-30.68), then shrinks (ease-out) into the notice pinned on the board's left pane. The new scene is revealed around it as flat fills; its linework draws on 30.75-31.40 (reference T1 recipe)."
+   },
+   "setting": "Town Square: the public noticeboard (the reference's board) on legs in front of a sunny public wall at golden hour. Its top rail is an address bar, so the board itself is 'online'. Telephone wires run over the wall top to the city. The makers' workshop corner stands at the right edge, blind still down.",
+   "composition": "Canvas coords at rest. Golden sky (cream) y 0-700, peach band y 600-700; far rooftops and telephone poles silhouetted y 560-700, three wires from a pole at (1000,560) sweeping left at y 610-680. Sun centre (820,620) r150, its bottom hidden by the wall top (y 700). Sand public wall y 700-1500, tan cornice band 700-740. Board: teal frame x 140-740, y 820-1300, two mintPale panes (160-430, 450-720), address-bar rail on the top frame x 220-660, y 790-822, legs to y 1490. Workshop corner x 780-1080 (door x 800-920, y 1150-1460; elephant sign at 850,1080). Crowd: 8 back-view heads on the bottom edge (heads y 1500-1580). Pip on the board top at (705,818), right of the address rail.",
+   "timeOfDay": "golden",
+   "scale": {
+    "colossal": "the public wall and the city's wire network carrying copies away over the rooftops",
+    "observer": "a back-view crowd cropped at the bottom edge, phones raised; Pip on the board",
+    "ratio": "the board is 4x a reader's head-and-shoulders; copies shrink to specks along the wires"
+   },
+   "layers": [
+    {
+     "depth": 0.05,
+     "contents": "golden sky, peach band",
+     "palette": "cream, peach"
+    },
+    {
+     "depth": 0.1,
+     "contents": "sun",
+     "palette": "orange; clock overlay cream ring + ink hands"
+    },
+    {
+     "depth": 0.2,
+     "contents": "far rooftops, telephone poles and wires with birds; copies travelling along them",
+     "palette": "fill-only tan silhouettes; ink 2.2 wires; white sheets"
+    },
+    {
+     "depth": 0.5,
+     "contents": "public wall and cornice; workshop corner with blind, door, sign",
+     "palette": "sand wall, tan band, tan brick, teal door"
+    },
+    {
+     "depth": 0.7,
+     "contents": "noticeboard with address-bar rail, notices and clones; the fix cart",
+     "palette": "teal frame, mintPale glass, cream rail, white papers, sage locks"
+    },
+    {
+     "depth": 1.0,
+     "contents": "crowd on the bottom edge with phones; Pip on the board top",
+     "palette": "coats teal/sand/sage/ochre, white phones, periwinkle"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 30.5,
+     "t1": 30.88,
+     "move": "hold",
+     "from": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "ease": "none",
+     "why": "the wipe does the work"
+    },
+    {
+     "t0": 30.88,
+     "t1": 35.2,
+     "move": "push-in",
+     "from": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 480,
+      "y": 1040,
+      "zoom": 1.06
+     },
+     "ease": "inOut(sine)",
+     "why": "gentle push onto the board as the copies multiply"
+    },
+    {
+     "t0": 35.2,
+     "t1": 35.52,
+     "move": "tilt-up",
+     "from": {
+      "x": 480,
+      "y": 1040,
+      "zoom": 1.06
+     },
+     "to": {
+      "x": 480,
+      "y": 820,
+      "zoom": 1.06
+     },
+     "ease": "in(cubic)",
+     "why": "follow the copies up the wires: start of the S08 crane"
+    }
+   ],
+   "light": "Golden, flat. Wall in sand with a tan shade plane on its left 30%. The sun sits behind the wall top like the reference S2 sun. Phone screens cream. No shafts.",
+   "elements": [
+    {
+     "id": "sky",
+     "what": "golden sky with peach band",
+     "where": "0,0,1080,700; band y 600-700",
+     "style": "cream, peach"
+    },
+    {
+     "id": "sun",
+     "what": "orange disc behind the wall top; becomes a clock on 'hours'",
+     "where": "centre 820,620 r150",
+     "style": "fill sun; clock = cream ring r120 + 2 ink hands, no numerals"
+    },
+    {
+     "id": "wiresRoofs",
+     "what": "far rooftops, two telephone poles, three wires with 3 pigeons",
+     "where": "poles at 1000,560 and 300,580; wires y 610-680",
+     "style": "fill-only tan roofs; ink 2.2 wires; pigeons white/sand"
+    },
+    {
+     "id": "wall",
+     "what": "public wall with cornice",
+     "where": "0,700,780,800",
+     "style": "sand, tan band, ink 3.4"
+    },
+    {
+     "id": "board",
+     "what": "two-pane public noticeboard on two teal legs; top rail = browser address bar (cream pill + three dots)",
+     "where": "frame 140,820,600,480; rail 220,790,440,32; legs to 1490",
+     "style": "teal frame 13 px, mintPale panes with glints, cream rail, ink 3.4"
+    },
+    {
+     "id": "leakSheet",
+     "what": "the leaked page: white paper, sand dog-ear, pin dot; shows the lock sketch with the short bolt and a tiny Bit doodle",
+     "where": "190,880,210,270 after the wipe",
+     "style": "white, ink 2.2, sand dog-ear, ink pin dot 5 px"
+    },
+    {
+     "id": "clones",
+     "what": "copies of the page cloning across both panes: 2, then 4, then 8",
+     "where": "~120x150 each across x 160-720, y 840-1290",
+     "style": "white, ink"
+    },
+    {
+     "id": "crowd",
+     "what": "eight back-view readers on the bottom edge (tier A), five raise phones showing tiny copies",
+     "where": "heads at x 60-1000, y 1500-1580",
+     "style": "hair varied; coats teal/sand/sage/ochre; white phones"
+    },
+    {
+     "id": "wireCopies",
+     "what": "six copies pegged onto the wires travelling off over the rooftops",
+     "where": "along wires from x 700 to 0, y 610-680, shrinking",
+     "style": "white with ink pegs"
+    },
+    {
+     "id": "workshopCorner",
+     "what": "the makers' workshop at the right edge, blind down, elephant sign",
+     "where": "780,560,300,940; door 800,1150,120,310; sign centre 850,1080 r40",
+     "style": "tan brick, teal door, sand sign"
+    },
+    {
+     "id": "fixCart",
+     "what": "the makers' handcart with a crate of new locks (sage + cream check)",
+     "where": "rolls from 860,1450 to 700,1450; 160x100",
+     "style": "ochre cart, sand crate, sage locks"
+    },
+    {
+     "id": "pip",
+     "what": "mascot on the board top, right of the rail",
+     "where": "705,818 sit-back; flyer-on-face at 33.16",
+     "style": "periwinkle"
+    }
+   ],
+   "beats": [
+    {
+     "t": 30.5,
+     "action": "Foreground wipe: the gust sheet crosses the lens, full white 30.58-30.68 ('Except,' 30.615), then shrinks into the notice on the left pane (30.68-30.88). Scene revealed as flat fills; ink draws on 30.75-31.40."
+    },
+    {
+     "t": 30.8,
+     "action": "Pip lands on the board top (from his leap); the sun lands behind the wall top (hop from S06) with a squash."
+    },
+    {
+     "t": 30.88,
+     "action": "Pin dot pops on the notice."
+    },
+    {
+     "t": 31.2,
+     "action": "Three pigeons pop onto the wire; a far window glints (idle)."
+    },
+    {
+     "t": 31.49,
+     "action": "'details': the notice's detail lines draw on (lock sketch with the short bolt, Bit doodle, hairlines)."
+    },
+    {
+     "t": 32.0,
+     "action": "First three readers rise in on the bottom edge (32.00-32.26)."
+    },
+    {
+     "t": 32.33,
+     "action": "'bug': a small ink ring draws round the Bit doodle."
+    },
+    {
+     "t": 32.62,
+     "action": "'leaked': the board's address-bar rail lights (cream pill pops, three dots pop): the board is online. Two clones pop."
+    },
+    {
+     "t": 33.06,
+     "action": "'online': clones double 4 (33.06) then 8 (33.20); one copy slaps onto Pip's face (33.16): sit-front with the paper stuck on, he peels it off at 33.60."
+    },
+    {
+     "t": 33.3,
+     "action": "Five more readers rise (33.30-33.50); five phones raise (33.50-33.75) showing tiny copies."
+    },
+    {
+     "t": 33.55,
+     "action": "Copies peg onto the telephone wires and travel off over the rooftops (33.55-34.60); the pigeons hop."
+    },
+    {
+     "t": 33.74,
+     "action": "'hours': the sun becomes a clock (cream ring + two ink hands pop, 0.15 s); the hour hand sweeps about two-thirds of a turn, never a full one (33.84-35.00), with ticks. No numbers."
+    },
+    {
+     "t": 34.43,
+     "action": "'the fix': the workshop blind rolls up (0.2 s)."
+    },
+    {
+     "t": 34.8,
+     "action": "The workshop door swings open (0.13 s, ease-out)."
+    },
+    {
+     "t": 34.92,
+     "action": "'came': the fix cart rolls out onto the pavement (34.92-35.35): too late."
+    },
+    {
+     "t": 35.22,
+     "action": "'out': the cart stops; one lock on it glints. Clock face pops off the sun (35.30)."
+    },
+    {
+     "t": 35.3,
+     "action": "Camera tilts up after the copies on the wires (transition to S08). Pip hops off the board (35.40)."
+    }
+   ],
+   "sun": "Hops in across the wipe and lands behind the wall top. Morph: a clock face on 'hours' whose hour hand sweeps less than one full turn (hours, no stated count). Pops back to a plain disc at 35.30.",
+   "mascot": "On the board top (the reference cat's spot). Gag: a leaked copy slaps onto his face on 'online' (33.16); he peels it off (33.60). Watches the cart come out late. Hops off at 35.40.",
+   "sfx": [
+    {
+     "t": 30.5,
+     "sound": "whoosh_soft",
+     "notes": "the sheet crossing the lens"
+    },
+    {
+     "t": 30.88,
+     "sound": "click_light",
+     "notes": "pin"
+    },
+    {
+     "t": 31.49,
+     "sound": "pencil_scratch_medium",
+     "notes": "-18 dB, details"
+    },
+    {
+     "t": 31.71,
+     "sound": "riser_leak",
+     "notes": "-20 dB; peaks at 35.35 (Cloudflare)"
+    },
+    {
+     "t": 32.62,
+     "sound": "pop_high",
+     "notes": "address bar lights"
+    },
+    {
+     "t": 33.06,
+     "sound": "paper_flip",
+     "notes": "clones x2 (repeat 33.20)"
+    },
+    {
+     "t": 33.16,
+     "sound": "pop_mid",
+     "notes": "flyer on Pip's face"
+    },
+    {
+     "t": 33.84,
+     "sound": "typing_tick",
+     "notes": "-20 dB, clock ticks every 0.2 s to 35.0"
+    },
+    {
+     "t": 34.8,
+     "sound": "lock_click",
+     "notes": "workshop door"
+    },
+    {
+     "t": 34.92,
+     "sound": "coin_chink",
+     "notes": "-22 dB, cart rattle"
+    }
+   ],
+   "captions": [
+    {
+     "s": 30.615,
+     "e": 33.838,
+     "lines": [
+      {
+       "text": "Except, the details",
+       "s": 30.615
+      },
+      {
+       "text": "of the bug leaked online",
+       "s": 32.085
+      }
+     ],
+     "highlights": [
+      {
+       "text": "leaked",
+       "s": 32.715
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 33.838,
+     "e": 35.604,
+     "lines": [
+      {
+       "text": "hours before",
+       "s": 33.838
+      },
+      {
+       "text": "the fix came out.",
+       "s": 34.535
+      }
+     ],
+     "highlights": [
+      {
+       "text": "hours",
+       "s": 33.838
+      }
+     ],
+     "tone": "dark"
+    }
+   ]
+  },
+  {
+   "id": "S08",
+   "start": 35.52,
+   "end": 43.7,
+   "vo": "Cloudflare, which protects a big chunk of the web, says it saw tens of thousands of break-in attempts in 45 minutes, and millions by evening.",
+   "title": "The dome and the flood",
+   "transitionIn": {
+    "type": "camera-continuous",
+    "dur": 1.8,
+    "persist": [
+     "sun",
+     "pip",
+     "wires",
+     "wireCopies"
+    ],
+    "notes": "35.30-37.10. BIG REVEAL MOVE 1 of 2. S07's camera tilts up after the copies on the wires; the wall top drops out of frame and we are low on the rooftops behind it (wires in the foreground). The camera cranes up and pulls back to reveal the endless city to the horizon and the colossal glass dome over a big chunk of it. The S07 wires become the thin lines across the whole skyline."
+   },
+   "setting": "STORY PEAK 2/3 (true Arcane-scale). Webtown seen from the rooftops at golden hour: an endless city of websites to the horizon, a colossal glass dome covering a big chunk (about 65%) but visibly not all of it, a lattice watchtower at the dome's edge with a guard and a searchlight (Cloudflare: a generic shield-dome, no logo, no cloud shape). Then the attempts come, and the sun sets.",
+   "composition": "Canvas coords at rest (after the crane). Golden sky y 0-900 with a peach horizon band y 760-900. Sun centre (650,860) r150 on the horizon, lower part behind the city. Four city depth rows (see layers). Dome: one long bold ink arc from (-120,1260) over apex (350,640) to (820,1260), hair lattice, glints; inside it the city continues unchanged (no tint). Uncovered strip x 820-1080 with four street doors visible at y 1380-1480. Watchtower in the uncovered strip x 860-920 from y 1500 up to a cabin y 760-820, searchlight at (875,790); tally board on the tower x 830-945, y 900-1010. Foreground rooftop ledge y 1480-1920 with chimney pots; two telephone wires sag across the frame y 1080-1180. Pip on a chimney ledge (560,1470).",
+   "timeOfDay": "golden",
+   "scale": {
+    "colossal": "the glass dome over most of an endless city, the huge setting sun behind it, a flood of millions",
+    "observer": "the guard (12 px) in the tower cabin, hooded attempters 18-30 px, Pip on the foreground rooftop",
+    "ratio": "an attempter is ~1/30 of the dome's height; the city runs past the horizon"
+   },
+   "layers": [
+    {
+     "depth": 0.05,
+     "contents": "golden sky -> dusk sage (wipe on 'by evening'), peach horizon band",
+     "palette": "cream -> sage; peach band"
+    },
+    {
+     "depth": 0.08,
+     "contents": "sun, sets behind the horizon row on 'by evening'",
+     "palette": "orange; 45-min wedge cream"
+    },
+    {
+     "depth": 0.15,
+     "contents": "row 0: horizon silhouettes y 880-960",
+     "palette": "fill-only sand, low contrast to the sky"
+    },
+    {
+     "depth": 0.3,
+     "contents": "row 1: y 920-1060 blocks with window dots (lit peach at evening)",
+     "palette": "fill-only tan, peach dots"
+    },
+    {
+     "depth": 0.55,
+     "contents": "row 2: y 1000-1260 buildings with tiny browser-window dots; the dome arc and lattice; attempters at the rim",
+     "palette": "sand/cream/sage fills, ink 2.2; dome ink 4.8 + inkHair lattice; attempters tealDark fill + ink hood"
+    },
+    {
+     "depth": 0.8,
+     "contents": "row 3: near rooftops y 1150-1520 (chimneys, water tanks), uncovered-strip doors, watchtower, tally board, searchlight cone",
+     "palette": "tan/sand roofs, ink 3.4; searchlight flat cream fixed partial opacity with dashed ink edges"
+    },
+    {
+     "depth": 1.0,
+     "contents": "foreground rooftop ledge, chimney pots, sagging wires, Pip",
+     "palette": "tan tiles, ink 4.8, periwinkle"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 35.52,
+     "t1": 37.1,
+     "move": "crane-up",
+     "from": {
+      "x": 540,
+      "y": 1460,
+      "zoom": 1.5
+     },
+     "to": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "ease": "bezier(0.6,0.25,0.41,0.87)",
+     "why": "the reveal: from the rooftop wires up to the whole city and the dome; parallax: rows move x0.15 / 0.3 / 0.55 / 0.8 / 1.0"
+    },
+    {
+     "t0": 37.1,
+     "t1": 43.2,
+     "move": "push-in",
+     "from": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 500,
+      "y": 1000,
+      "zoom": 1.06
+     },
+     "ease": "linear",
+     "why": "slow, weighty creep toward the dome rim while the attempts escalate"
+    },
+    {
+     "t0": 43.2,
+     "t1": 43.7,
+     "move": "hold",
+     "from": {
+      "x": 500,
+      "y": 1000,
+      "zoom": 1.06
+     },
+     "to": {
+      "x": 500,
+      "y": 1000,
+      "zoom": 1.06
+     },
+     "ease": "none",
+     "why": "hold on the sunset"
+    }
+   ],
+   "light": "Golden hour turning to dusk. The huge sun sits on the horizon behind the dome with the city silhouetted across its lower third; the dome glass shows only pairs of hair glints on its sun side. Searchlight = flat cream polygon at a fixed partial opacity with dashed ink edges. On 'by evening' the sun sets (two steps with a bob), the sky swaps cream -> sage (skies.dusk) with a top-down wipe, the peach band shrinks, and windows across the city pop peach in a wave from the horizon outward. Captions switch to cream text at 43.10. Never murky: the city fills stay at their day values.",
+   "elements": [
+    {
+     "id": "sky",
+     "what": "golden sky with peach horizon band; sage at dusk",
+     "where": "0,0,1080,900; band y 760-900",
+     "style": "cream / peach -> sage (skies.dusk)"
+    },
+    {
+     "id": "sun",
+     "what": "huge low sun on the horizon behind the dome",
+     "where": "centre 650,860 r150",
+     "style": "fill sun; clock ring cream + one ink hand + cream 45-min wedge (270 deg)"
+    },
+    {
+     "id": "cityRows",
+     "what": "four rows of the endless city of websites (tiny browser-window dots on rows 2-3)",
+     "where": "row0 y 880-960; row1 920-1060; row2 1000-1260; row3 1150-1520; all full width",
+     "style": "see layers"
+    },
+    {
+     "id": "dome",
+     "what": "colossal glass shield-dome over ~65% of the city: one bold ink arc, 6 hair meridians, 3 hair parallels, glints. No logo, no cloud shape",
+     "where": "arc (-120,1260) -> apex (350,640) -> (820,1260)",
+     "style": "ink 4.8 arc, inkHair lattice; no fill"
+    },
+    {
+     "id": "uncoveredStrip",
+     "what": "the part of the city outside the dome, with four visible street doors",
+     "where": "x 820-1080; doors at y 1380-1480",
+     "style": "same fills as the city"
+    },
+    {
+     "id": "bigChunkLine",
+     "what": "dashed ink line tracing the dome's footprint along the rooftops",
+     "where": "y ~1260 from x -120 to 820",
+     "style": "ink 2.2 dashed"
+    },
+    {
+     "id": "watchtower",
+     "what": "lattice watchtower with a cabin and a tiny back-view guard",
+     "where": "x 860-920, y 760-1500; cabin 845-935, 760-820",
+     "style": "ink 3.4 lattice, sand cabin, teal roof"
+    },
+    {
+     "id": "searchlight",
+     "what": "searchlight cone sweeping from the cabin over the dome rim",
+     "where": "apex 875,790, sweep from 200 deg to 260 deg",
+     "style": "flat cream fixed partial opacity, dashed ink edges"
+    },
+    {
+     "id": "tallyBoard",
+     "what": "white tally board on the tower; marks overflow onto the tower and up the dome glass on 'millions'",
+     "where": "830,900,115,110",
+     "style": "white, ink 2.2 tally groups"
+    },
+    {
+     "id": "attempters",
+     "what": "hooded back-view figures that tap the dome glass and rattle handles at uncovered doors: 3, then 10, then 30, then a stipple crowd of hundreds. Never bouncing off, never getting in, no door ever opens",
+     "where": "rim y 1240-1260; doors x 840-1000, y 1400-1480; 18-30 px",
+     "style": "tealDark fill, ink hood point; rattle marks ink 2.2; ripple arcs inkHair on the glass"
+    },
+    {
+     "id": "stipple",
+     "what": "the 'millions' crowd: hundreds of 4-8 px tombstone dots filling the streets between rows and along the rim",
+     "where": "y 1000-1500 across the frame",
+     "style": "ink / tealDark dots, no outline"
+    },
+    {
+     "id": "wires",
+     "what": "two telephone wires from S07 sagging across the skyline",
+     "where": "y 1080-1180",
+     "style": "ink 2.2"
+    },
+    {
+     "id": "roofFG",
+     "what": "foreground rooftop ledge with chimney pots and an antenna",
+     "where": "0,1480,1080,440",
+     "style": "tan tiles, ink 4.8"
+    },
+    {
+     "id": "pip",
+     "what": "mascot on a chimney ledge",
+     "where": "560,1470 sit-back scale 1.0",
+     "style": "periwinkle"
+    }
+   ],
+   "beats": [
+    {
+     "t": 35.5,
+     "action": "'Cloudflare': the dome draws: one long bold ink arc (0.35 s ease-out) as the crane rises."
+    },
+    {
+     "t": 35.85,
+     "action": "Dome lattice hairlines pop (35.85-36.10, 0.03 s stagger); glints pop (36.10)."
+    },
+    {
+     "t": 36.1,
+     "action": "Pip lands on the chimney ledge (from S07)."
+    },
+    {
+     "t": 36.28,
+     "action": "'which protects': the watchtower rises from the rooftops (rise 0.33 s) and the guard pops into the cabin (36.55)."
+    },
+    {
+     "t": 36.81,
+     "action": "'a big chunk': a dashed ink line traces the dome's footprint along the rooftops (36.81-37.10); the uncovered strip gets nothing. Sun pulse +8% on 'big' (37.07)."
+    },
+    {
+     "t": 37.6,
+     "action": "'web': window dots pop across the far rows in a wave (texture): every building is a website."
+    },
+    {
+     "t": 38.11,
+     "action": "'says': the searchlight switches on (cone wipes on) and sweeps left to right over the dome rim (38.11-38.90)."
+    },
+    {
+     "t": 38.38,
+     "action": "'saw': the tally board pops onto the tower."
+    },
+    {
+     "t": 38.71,
+     "action": "'tens': three hooded figures pop at the dome rim and start tapping (jiggle); three tally marks."
+    },
+    {
+     "t": 39.34,
+     "action": "'thousands': ten more figures pop along the rim and at the uncovered doors, rattling handles (ink rattle marks); ripple arcs where the glass is tapped; tally speeds up."
+    },
+    {
+     "t": 39.92,
+     "action": "'break-in': burst of thirty more within 4 frames; tally groups accumulate fast."
+    },
+    {
+     "t": 40.41,
+     "action": "'attempts': the searchlight sweeps back, catching groups (they are SEEN; nothing is blocked)."
+    },
+    {
+     "t": 40.95,
+     "action": "'45': the sun becomes a clock face and a cream 45-minute wedge sweeps 270 deg (40.95-41.66, ease-out), with ticks."
+    },
+    {
+     "t": 41.56,
+     "action": "'minutes': the wedge completes; the tally board is full."
+    },
+    {
+     "t": 42.1,
+     "action": "Clock overlay pops off the sun; attempters keep rattling (idle)."
+    },
+    {
+     "t": 42.37,
+     "action": "'millions': BURST. The figures multiply into a dense stipple crowd (hundreds, 1-frame burst); tally marks overflow off the board and climb the tower and up the dome glass (42.37-43.00). Pip folds his ears over his eyes (ears-cover, 42.47). The visual peak of the middle act."
+    },
+    {
+     "t": 43.0,
+     "action": "'by evening': the sun sets in two steps with a bob (43.00-43.55); sky wipes cream -> sage top-down (43.05-43.35); windows pop peach across the city in a wave from the horizon outward (43.10-43.50); caption text recolours cream (43.10)."
+    },
+    {
+     "t": 43.45,
+     "action": "Dusk: the searchlight keeps sweeping, the stipple flickers; Pip peeks out from under his ears (43.50)."
+    }
+   ],
+   "sun": "Glides lower during the crane to (650,860): the huge low sun behind the dome. Pulses on 'big'. Morph: clock face with a 45-minute wedge on '45'. Then THE one sunset of the film on 'by evening' (43.00-43.55), in two steps with a bob, gone behind the horizon row.",
+   "mascot": "Lands on a foreground chimney ledge at 36.10, watches. Gag: folds his ears over his eyes on 'millions' (42.47), peeks out at 43.50. Drops into S09 at 43.60.",
+   "sfx": [
+    {
+     "t": 35.5,
+     "sound": "pencil_scratch_long",
+     "notes": "-16 dB, the dome arc"
+    },
+    {
+     "t": 36.28,
+     "sound": "pop_low",
+     "notes": "watchtower"
+    },
+    {
+     "t": 38.11,
+     "sound": "switch_toggle",
+     "notes": "-16 dB, searchlight on"
+    },
+    {
+     "t": 38.71,
+     "sound": "door_knock",
+     "notes": "-20 dB, first taps"
+    },
+    {
+     "t": 39.34,
+     "sound": "handle_rattle",
+     "notes": "-18 dB"
+    },
+    {
+     "t": 39.92,
+     "sound": "crowd_murmur",
+     "notes": "-24 dB, 39.92-43.0, very light"
+    },
+    {
+     "t": 40.95,
+     "sound": "counter_ticker",
+     "notes": "-18 dB, the 45-minute wedge"
+    },
+    {
+     "t": 42.37,
+     "sound": "handle_rattle",
+     "notes": "-16 dB + door_knock layered, the burst"
+    },
+    {
+     "t": 43.0,
+     "sound": "whoosh_soft",
+     "notes": "-18 dB, sunset"
+    }
+   ],
+   "captions": [
+    {
+     "s": 35.604,
+     "e": 36.905,
+     "lines": [
+      {
+       "text": "Cloudflare,",
+       "s": 35.604
+      },
+      {
+       "text": "which protects",
+       "s": 36.385
+      }
+     ],
+     "highlights": [
+      {
+       "text": "Cloudflare",
+       "s": 35.604
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 36.905,
+     "e": 38.812,
+     "lines": [
+      {
+       "text": "a big chunk of the web,",
+       "s": 36.905
+      },
+      {
+       "text": "says it saw",
+       "s": 38.208
+      }
+     ],
+     "highlights": [
+      {
+       "text": "big chunk",
+       "s": 37.071
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 38.812,
+     "e": 40.895,
+     "lines": [
+      {
+       "text": "tens of thousands",
+       "s": 38.812
+      },
+      {
+       "text": "of break-in attempts",
+       "s": 39.895
+      }
+     ],
+     "highlights": [
+      {
+       "text": "tens of thousands",
+       "s": 38.812
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 40.895,
+     "e": 42.304,
+     "lines": [
+      {
+       "text": "in 45 minutes,",
+       "s": 40.895
+      }
+     ],
+     "highlights": [
+      {
+       "text": "45 minutes",
+       "s": 41.05
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 42.304,
+     "e": 43.785,
+     "lines": [
+      {
+       "text": "and millions",
+       "s": 42.304
+      },
+      {
+       "text": "by evening.",
+       "s": 43.07
+      }
+     ],
+     "highlights": [
+      {
+       "text": "millions",
+       "s": 42.465
+      }
+     ],
+     "tone": "dark",
+     "toneAt": [
+      {
+       "t": 43.1,
+       "tone": "light"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "S09",
+   "start": 43.7,
+   "end": 47.72,
+   "vo": "Nobody knows yet how many got in. So now comes step two, the slow one.",
+   "title": "Question marks, then dawn",
+   "transitionIn": {
+    "type": "matchcut",
+    "dur": 0.3,
+    "persist": [
+     "skylineLine",
+     "pip"
+    ],
+    "notes": "43.55-43.85. Match-cut on the skyline line: the dusk city's horizon silhouette stays at the same screen height while everything in front of it cuts to Stoop Street at night (same set as S03/S04). Pip drops from the chimney and lands on step 1 holding a flashlight."
+   },
+   "setting": "Stoop Street at night (the only true night in the film), then dawn. Door #4 and its stoop; the street of identical doors runs to the vanishing point.",
+   "composition": "S03 set, canvas coords at rest. Night sky teal (skies.night) y 0-1060 with 8 sparse cream star dots; far skyline beyond the VP in tealDark silhouettes with peach lit windows. Hero house with lit windows (peach). Two lamp posts on the right pavement (x 820 and 700, heads at y 980 / 1020) with stepped flat glow discs. Pip on step 1 (330,1300) with a flashlight beam pointing right toward the doors. '?' marks over doors: #4 at (290,1100) 90 px, #5 (560,1150) 60 px, #6 (620,1110) 45 px, #7 (660,1090) 32 px, #8 (685,1078) 24 px, then specks. Dawn: sun rises at the VP to (720,860). Step 2's tread then stretches into a ledge from (410,1230) to the VP (715,1062).",
+   "timeOfDay": "night",
+   "scale": {
+    "colossal": "an endless street of doors, every one with a question mark, then a ledge that runs to the horizon",
+    "observer": "Pip with a flashlight on the stoop; a snail on the ledge",
+    "ratio": "the ledge is ~40x the snail's length before it even reaches the vanishing point"
+   },
+   "layers": [
+    {
+     "depth": 0.05,
+     "contents": "night sky teal -> dawn sage (+ peach horizon band)",
+     "palette": "teal (skies.night) -> sage (skies.dusk); cream stars; peach band"
+    },
+    {
+     "depth": 0.1,
+     "contents": "far skyline silhouettes with lit windows; the rising sun",
+     "palette": "tealDark fill-only, peach dots; orange sun"
+    },
+    {
+     "depth": 0.4,
+     "contents": "street rows with lit windows and '?' marks, lamp posts with glow discs",
+     "palette": "facades at their day fills, windows peach, '?' cream fill + ink outline"
+    },
+    {
+     "depth": 0.7,
+     "contents": "hero house, door #4, stoop with risers (check mark on step 1, peach highlight on step 2), the ledge",
+     "palette": "sand, teal, cream, peach riser, ink 3.4"
+    },
+    {
+     "depth": 1.0,
+     "contents": "pavement, Pip with flashlight beam, snail",
+     "palette": "mintPale, beam flat cream fixed partial opacity with dashed ink edges, periwinkle, snail sand shell + ink spiral"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 43.7,
+     "t1": 46.9,
+     "move": "push-in",
+     "from": {
+      "x": 560,
+      "y": 1020,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 520,
+      "y": 1040,
+      "zoom": 1.05
+     },
+     "ease": "inOut(sine)",
+     "why": "slow lean in the dark"
+    },
+    {
+     "t0": 46.95,
+     "t1": 47.72,
+     "move": "truck-right",
+     "from": {
+      "x": 520,
+      "y": 1040,
+      "zoom": 1.05
+     },
+     "to": {
+      "x": 580,
+      "y": 1030,
+      "zoom": 1.06
+     },
+     "ease": "out(cubic)",
+     "why": "follow the ledge as it stretches toward the horizon (light parallax)"
+    }
+   ],
+   "light": "Night (43.70-45.45): teal sky (skies.night), every lit window peach, lamp heads cream with two stepped flat glow discs (sand r60, peach r40 behind the head), the flashlight beam a flat cream polygon. Facade fills keep their day values (never murky). Dawn from 45.45: sky wipes teal -> sage (skies.dusk; top-down, 0.2 s), a flat peach horizon band pops (45.60), the sun rises at the VP; lamps and lit windows pop off. Captions cream throughout S09.",
+   "elements": [
+    {
+     "id": "sky",
+     "what": "night sky with 8 cream star dots -> dawn sage with peach band",
+     "where": "0,0,1080,1060; band y 940-1060",
+     "style": "teal -> sage; cream; peach"
+    },
+    {
+     "id": "sun",
+     "what": "rises at the VP from below the horizon",
+     "where": "from 720,1150 to 720,860 r150",
+     "style": "fill sun"
+    },
+    {
+     "id": "farSkyline",
+     "what": "the held skyline line from S08 (match-cut object)",
+     "where": "y 880-1060 around the VP",
+     "style": "tealDark fill-only with peach dots"
+    },
+    {
+     "id": "streetSet",
+     "what": "Stoop Street as S03 (hero house, door #4, lock, plaque, calendar, rows, trees)",
+     "where": "as S03",
+     "style": "as S03, windows lit peach"
+    },
+    {
+     "id": "lamps",
+     "what": "two lamp posts on the right pavement with stepped glow discs",
+     "where": "x 820 (head 820,980) and 700 (head 700,1020)",
+     "style": "ink 3.4, cream heads, sand/peach glow discs"
+    },
+    {
+     "id": "flashlight",
+     "what": "flashlight held at Pip's trunk tip; beam = flat cream cone with dashed ink edges",
+     "where": "beam from 360,1260 sweeping across the doors",
+     "style": "teal flashlight body, cream beam"
+    },
+    {
+     "id": "questionMarks",
+     "what": "hand-drawn '?' marks over the doors: one per word, then a ripple of small ones down the street. Honest 'nobody knows': no figures, no footprints, no open doors",
+     "where": "#4 290,1100 (90 px); #5 560,1150; #6 620,1110; #7 660,1090; #8 685,1078; specks to the VP",
+     "style": "cream fill, ink 3.4 outline"
+    },
+    {
+     "id": "stepCheck",
+     "what": "check mark over step 1's magnifier riser: step one is done",
+     "where": "300,1335",
+     "style": "ink 4.8"
+    },
+    {
+     "id": "ledge",
+     "what": "step 2's tread stretching into a ledge that runs past every door to the vanishing point",
+     "where": "(410,1230) -> (715,1062), riser in perspective",
+     "style": "cream riser, sand tread, ink 3.4 -> 1.6"
+    },
+    {
+     "id": "snail",
+     "what": "the running-gag snail (sand shell with ink spiral)",
+     "where": "pops at 520,1190, crawls ~6 px/s",
+     "style": "sand shell, ink"
+    },
+    {
+     "id": "pip",
+     "what": "mascot with flashlight (hold pose, prop Flashlight)",
+     "where": "step 1 tread 330,1300, scale 1.0",
+     "style": "periwinkle"
+    }
+   ],
+   "beats": [
+    {
+     "t": 43.7,
+     "action": "Match-cut: night Stoop Street appears around the held skyline line, fully built, windows lit."
+    },
+    {
+     "t": 43.75,
+     "action": "Pip lands on step 1 holding a flashlight (hold pose)."
+    },
+    {
+     "t": 43.88,
+     "action": "'Nobody': the flashlight clicks on; the beam wipes on."
+    },
+    {
+     "t": 44.08,
+     "action": "'knows': beam on door #4: a big '?' pops (overshoot)."
+    },
+    {
+     "t": 44.33,
+     "action": "'yet': beam to door #5: '?' pops."
+    },
+    {
+     "t": 44.56,
+     "action": "'how': '?' pops on door #6."
+    },
+    {
+     "t": 44.73,
+     "action": "'many': '?' pops on doors #7 and #8."
+    },
+    {
+     "t": 44.91,
+     "action": "'got in': the beam sweeps down the street; a ripple of small '?' marks pops over every far door toward the VP (44.91-45.25)."
+    },
+    {
+     "t": 45.35,
+     "action": "'So': SUNRISE (the one sunrise): the sun rises at the VP (45.35-46.00, ease-out, +7% pulse); sky wipes teal -> sage (45.45); peach horizon band pops (45.60)."
+    },
+    {
+     "t": 45.6,
+     "action": "Pip clicks the flashlight off; beam pops off (45.65); lamp glow discs pop off (45.80); lit windows pop off near to far (45.85-46.00)."
+    },
+    {
+     "t": 45.98,
+     "action": "'step': a check mark strokes onto step 1's riser over the magnifier (on 'step' 46.10): step one is done."
+    },
+    {
+     "t": 46.29,
+     "action": "'two': step 2's riser pops peach (highlighted) with a 6% pulse; sun pulse."
+    },
+    {
+     "t": 46.6,
+     "action": "The '?' marks shrink to half size and stay (still nobody knows)."
+    },
+    {
+     "t": 46.99,
+     "action": "'slow': step 2's tread stretches into a ledge that runs past every door to the vanishing point (scaleX from its left anchor, 46.99-47.50, inOut); camera follows."
+    },
+    {
+     "t": 47.2,
+     "action": "A snail pops onto the ledge and begins to crawl."
+    },
+    {
+     "t": 47.45,
+     "action": "'one': Pip's ears droop and he looks along the ledge (look 0.8)."
+    }
+   ],
+   "sun": "Hidden below the horizon at the start (it set in S08). THE one sunrise of the film on 'So now comes step two' (45.35-46.00) at the vanishing point: a new day, a new phase. Pulses on 'two'.",
+   "mascot": "Lands on step 1 with a flashlight. Gag: the flashlight sweep that reveals a '?' at each door, one per word (44.08-44.73). Ears droop on 'the slow one'. No look to camera.",
+   "sfx": [
+    {
+     "t": 43.7,
+     "sound": "whoosh_soft",
+     "notes": "-20 dB, match-cut"
+    },
+    {
+     "t": 43.88,
+     "sound": "click_light",
+     "notes": "flashlight on"
+    },
+    {
+     "t": 44.08,
+     "sound": "pop_mid",
+     "notes": "-18 dB, '?' x5 (44.08, 44.33, 44.56, 44.73)"
+    },
+    {
+     "t": 44.91,
+     "sound": "pop_high",
+     "notes": "-22 dB, '?' ripple"
+    },
+    {
+     "t": 45.35,
+     "sound": "alert_ping",
+     "notes": "-16 dB, sunrise"
+    },
+    {
+     "t": 45.6,
+     "sound": "click_light",
+     "notes": "flashlight off"
+    },
+    {
+     "t": 45.98,
+     "sound": "pencil_scratch_short",
+     "notes": "check on step 1"
+    },
+    {
+     "t": 46.99,
+     "sound": "whoosh_soft",
+     "notes": "-18 dB, ledge stretches"
+    }
+   ],
+   "captions": [
+    {
+     "s": 43.785,
+     "e": 45.452,
+     "lines": [
+      {
+       "text": "Nobody knows yet",
+       "s": 43.785
+      },
+      {
+       "text": "how many got in.",
+       "s": 44.565
+      }
+     ],
+     "highlights": [
+      {
+       "text": "how many",
+       "s": 44.565
+      }
+     ],
+     "tone": "light"
+    },
+    {
+     "s": 45.452,
+     "e": 47.786,
+     "lines": [
+      {
+       "text": "So now comes step two,",
+       "s": 45.452
+      },
+      {
+       "text": "the slow one.",
+       "s": 47.013
+      }
+     ],
+     "highlights": [
+      {
+       "text": "slow",
+       "s": 47.09
+      }
+     ],
+     "tone": "light"
+    }
+   ]
+  },
+  {
+   "id": "S10",
+   "start": 47.72,
+   "end": 54.46,
+   "vo": "Someone has to install that fix on every site, and there are about 22 million copies of PHP out there that could be hit.",
+   "title": "Twenty-two million doors",
+   "transitionIn": {
+    "type": "camera-continuous",
+    "dur": 0.25,
+    "persist": [
+     "sun",
+     "pip",
+     "streetSet",
+     "snail"
+    ],
+    "notes": "Same Stoop Street set, now in full morning light: the sky wipes sage -> mint (skies.day) top-down (47.72-47.97) and the peach band pops off. No cut."
+   },
+   "setting": "STORY PEAK 3/3 (true Arcane-scale). Part A: Stoop Street in the morning, where one keeper installs the fix on door #4. Part B: the camera pulls back and up and the street turns out to be one of thousands: rows of identical PHP buildings to the horizon, every one with the same lock, and only one fixed.",
+   "composition": "Part A (47.72-49.45) = S03 set at rest, then a push to zoom 1.5 centred (330,966) (keeps the facade top at screen y >= 470, so captions stay in sky). Part B (49.45-54.46) = 'Door Sea', canvas coords at rest: mint sky y 0-790; sun screen-fixed at (700,690) r150 on the horizon (y 780); rows of frontal townhouse facades stacked to the horizon: row k has facade width 90*0.8^k and height 200*0.8^k, row bases y 1500, 1340, 1215, 1115, 1035, 970, 920, 880, 850, 828, 812, 800 (then tiling pattern to 780). Rows 0-2 drawn with detail (doors, locks, plaques, windows); rows 3+ as pattern fills (block + door dot + plaque dot). Door #4 sits in row 0 centred (540,1465), 30x50, its lock at (550,1465): at the Part B start camera (550,1424, zoom 6.0) door and lock land exactly where Part A left them (door centre screen 480,1206; lock 540,1206). Foreground perch: a chimney stack in screen space, x 730-830, y 1460-1920, Pip on top at (780,1460).",
+   "timeOfDay": "day",
+   "scale": {
+    "colossal": "an endless sea of identical PHP doors stacked to the horizon",
+    "observer": "one keeper (25 px at the widest) and Pip on a foreground chimney",
+    "ratio": "at the widest framing ~900 doors are visible and the pattern keeps tiling past the horizon; one is fixed"
+   },
+   "layers": [
+    {
+     "depth": 0.05,
+     "contents": "sky",
+     "palette": "mint"
+    },
+    {
+     "depth": 0.08,
+     "contents": "sun, screen-fixed during the pull-back (the only thing that does not shrink)",
+     "palette": "orange"
+    },
+    {
+     "depth": 0.2,
+     "contents": "rows 3-11+: pattern-fill facades with door and plaque dots",
+     "palette": "fill-only cream/sand/tan/mintPale blocks, sand dots, no ink beyond row 5"
+    },
+    {
+     "depth": 0.5,
+     "contents": "rows 1-2: facades with doors, locks, plaques, browser-window dots",
+     "palette": "ink 2.2; facades alternating"
+    },
+    {
+     "depth": 0.75,
+     "contents": "row 0 with door #4 (new sage lock + cream check), the keeper, the snail on a ledge",
+     "palette": "ink 3.4; sage lock; keeper sand coat"
+    },
+    {
+     "depth": 1.0,
+     "contents": "foreground chimney perch with Pip (screen space)",
+     "palette": "tan brick chimney, ink 4.8, periwinkle"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 47.72,
+     "t1": 48.2,
+     "move": "hold",
+     "from": {
+      "x": 580,
+      "y": 1030,
+      "zoom": 1.06
+     },
+     "to": {
+      "x": 580,
+      "y": 1030,
+      "zoom": 1.06
+     },
+     "ease": "none",
+     "why": "breathe after the dawn"
+    },
+    {
+     "t0": 48.2,
+     "t1": 49.3,
+     "move": "push-in",
+     "from": {
+      "x": 580,
+      "y": 1030,
+      "zoom": 1.06
+     },
+     "to": {
+      "x": 330,
+      "y": 966,
+      "zoom": 1.5
+     },
+     "ease": "inOut(sine)",
+     "why": "lean into the install"
+    },
+    {
+     "t0": 49.45,
+     "t1": 49.52,
+     "move": "hold",
+     "from": {
+      "x": 550,
+      "y": 1424,
+      "zoom": 6.0
+     },
+     "to": {
+      "x": 550,
+      "y": 1424,
+      "zoom": 6.0
+     },
+     "ease": "none",
+     "why": "hidden match-cut frame: door #4 at the same screen position and size as Part A"
+    },
+    {
+     "t0": 49.52,
+     "t1": 51.75,
+     "move": "pull-back",
+     "from": {
+      "x": 550,
+      "y": 1424,
+      "zoom": 6.0
+     },
+     "to": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "ease": "bezier(0.6,0.25,0.41,0.87)",
+     "why": "BIG REVEAL MOVE 2 of 2: one door becomes a sea of doors (camera rises as it pulls back)"
+    },
+    {
+     "t0": 53.28,
+     "t1": 54.3,
+     "move": "push-in",
+     "from": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 540,
+      "y": 980,
+      "zoom": 1.03
+     },
+     "ease": "linear",
+     "why": "slow drift so the wide never sits dead"
+    },
+    {
+     "t0": 54.3,
+     "t1": 54.46,
+     "move": "push-in",
+     "from": {
+      "x": 540,
+      "y": 980,
+      "zoom": 1.03
+     },
+     "to": {
+      "x": 612,
+      "y": 1215,
+      "zoom": 1.8
+     },
+     "ease": "in(expo)",
+     "why": "start of the push-through into one ringed facade"
+    }
+   ],
+   "light": "Clear morning, bright and flat. The sun sits on the horizon dead ahead and stays screen-fixed while the world shrinks. Far rows lose their ink and move toward the sky colour (atmospheric perspective by palette step: rows 0-2 full fills, rows 3-6 mintPale/cream, rows 7+ sky-adjacent mintPale only).",
+   "elements": [
+    {
+     "id": "sky",
+     "what": "morning sky",
+     "where": "0,0,1080,790 (Part B) / as S03 (Part A)",
+     "style": "mint"
+    },
+    {
+     "id": "sun",
+     "what": "orange disc",
+     "where": "Part A: 720,860 -> peeks at screen 860,600 during the push; Part B: screen-fixed 700,690 r150",
+     "style": "fill sun"
+    },
+    {
+     "id": "keeper",
+     "what": "'someone': a generic site keeper (NOT a maker), back view, sand coat, ochre tool belt",
+     "where": "Part A: x 430-560, y 1150-1450 at the stoop; Part B: 25 px in row 0",
+     "style": "sand coat, teal trousers, ochre belt, ink 3.4"
+    },
+    {
+     "id": "crate",
+     "what": "crate of new locks dropped at the stoop by the makers' cart",
+     "where": "440,1380,80,60",
+     "style": "sand crate, sage locks with cream tags"
+    },
+    {
+     "id": "makersCart",
+     "what": "the makers' cart rolling away far down the street (makers ship, keepers install)",
+     "where": "from 650,1100 shrinking toward the VP",
+     "style": "ochre, ink 2.2"
+    },
+    {
+     "id": "oldLock",
+     "what": "door #4's old sand lock with Bit in it",
+     "where": "330,1130",
+     "style": "sand, ink"
+    },
+    {
+     "id": "newLock",
+     "what": "THE FIX: sage lock with cream check tag",
+     "where": "330,1130 on door #4; Part B: 540,1470 (6 px) + a cream check flag above door #4 (12 px)",
+     "style": "sage, cream, ink"
+    },
+    {
+     "id": "doorSea",
+     "what": "rows of identical facades to the horizon, each door with the same old lock and an elephant plaque dot",
+     "where": "rows per composition; ~900 doors visible at rest",
+     "style": "fills alternate cream/sand/tan/mintPale; sand plaque dots; ink only rows 0-5"
+    },
+    {
+     "id": "plaqueWave",
+     "what": "the plaque dots blinking on in a wave from row 0 to the horizon on '22 million'",
+     "where": "all rows",
+     "style": "sand dots with ink rim on rows 0-3"
+    },
+    {
+     "id": "fixedDoorPing",
+     "what": "ink ring pulse around the only fixed door",
+     "where": "centre 540,1465 r40",
+     "style": "ink 3.4"
+    },
+    {
+     "id": "targetRings",
+     "what": "twelve 'could be hit' rings over random doors in rows 0-4",
+     "where": "r 14-30",
+     "style": "peach ring 6 px + ink outline (not orange)"
+    },
+    {
+     "id": "chimneyPerch",
+     "what": "foreground chimney stack in screen space; Pip's perch during the pull-back",
+     "where": "screen 730,1460,100,460",
+     "style": "tan brick, ink 4.8"
+    },
+    {
+     "id": "snail",
+     "what": "the snail, now on row 0's ledge next to door #5, barely moved",
+     "where": "560,1488 (8 px)",
+     "style": "sand, ink"
+    },
+    {
+     "id": "bit",
+     "what": "Bit rides the old lock as it drops, then scurries up the door frame",
+     "where": "330,1130 -> 360,1000",
+     "style": "solid ink"
+    },
+    {
+     "id": "pip",
+     "what": "mascot",
+     "where": "Part A: step 2 tread 380,1230 (hold, prop = new lock); Part B: chimney top screen 780,1460, scale 1.0 throughout",
+     "style": "periwinkle"
+    }
+   ],
+   "beats": [
+    {
+     "t": 47.72,
+     "action": "Sky wipes sage -> mint top-down (47.72-47.97); peach band pops off. Morning."
+    },
+    {
+     "t": 47.79,
+     "action": "'Someone': the keeper rises in on the pavement beside the stoop (rise 0.33 s)."
+    },
+    {
+     "t": 47.85,
+     "action": "A crate of new locks pops at the stoop's foot; far down the street the makers' cart rolls away toward the VP (47.85-49.30)."
+    },
+    {
+     "t": 48.2,
+     "action": "Camera pushes in toward door #4."
+    },
+    {
+     "t": 48.35,
+     "action": "'install': the old lock drops off door #4 with a clunk; Bit rides it down, hops off and scurries up the door frame."
+    },
+    {
+     "t": 48.7,
+     "action": "Pip lifts a new lock from the crate with his trunk (hold, prop = new lock) and hands it to the keeper (48.90)."
+    },
+    {
+     "t": 48.92,
+     "action": "'fix': the new sage lock pops onto door #4 (overshoot); its check strokes on at 49.02 (on the word)."
+    },
+    {
+     "t": 49.3,
+     "action": "Hold on the fixed lock; the snail on the step inches forward 3 px."
+    },
+    {
+     "t": 49.45,
+     "action": "Hidden match-cut on the door (same screen position and size) into Part B, camera (550,1424) at zoom 6.0."
+    },
+    {
+     "t": 49.52,
+     "action": "'every': THE PULL-BACK begins (49.52-51.75). Pip hops onto the foreground chimney perch (49.55-49.90) and stays the same size on screen."
+    },
+    {
+     "t": 49.62,
+     "action": "Row 0's neighbouring doors resolve, each with the same old lock (tiny Bit silhouettes) and elephant plaque (49.62-49.90)."
+    },
+    {
+     "t": 49.95,
+     "action": "'site': rows 1-3 pop up behind (pop-up rows, 0.05 s stagger)."
+    },
+    {
+     "t": 50.54,
+     "action": "'and there are about': far rows tile outward to the horizon (texture build, 50.54-51.30)."
+    },
+    {
+     "t": 50.97,
+     "action": "'22': plaque dots blink on across all rows in a wave from row 0 to the horizon (50.97-51.65); sun pulse +8% on '22' (51.07)."
+    },
+    {
+     "t": 51.63,
+     "action": "'million': the wave reaches the horizon (burst)."
+    },
+    {
+     "t": 52.17,
+     "action": "'copies': the one fixed door pings: an ink ring pulse around it. Find the fixed door."
+    },
+    {
+     "t": 52.7,
+     "action": "'PHP': the tiny keeper steps to the next door. One at a time."
+    },
+    {
+     "t": 53.28,
+     "action": "'out there': slow drift push begins."
+    },
+    {
+     "t": 53.6,
+     "action": "'could': far-row window dots twinkle (texture)."
+    },
+    {
+     "t": 53.98,
+     "action": "'hit': twelve peach target rings pop over random doors (burst within 4 frames) and pulse."
+    },
+    {
+     "t": 54.3,
+     "action": "Pip gulps (expression worried). Push-through starts toward one ringed facade in row 1."
+    }
+   ],
+   "sun": "Screen-fixed on the horizon through the big pull-back: the one thing that never shrinks while 22 million doors appear around it. Pulses on '22'.",
+   "mascot": "Gag: hands the keeper the new lock with his trunk on 'fix' (48.70-48.90). Then hops onto a foreground chimney and stays the same size on screen while the world shrinks behind him. Gulps on 'hit'. Hops into S11 at 54.30.",
+   "sfx": [
+    {
+     "t": 48.35,
+     "sound": "lock_click",
+     "notes": "old lock drops (clunk)"
+    },
+    {
+     "t": 48.92,
+     "sound": "pop_mid",
+     "notes": "new lock on"
+    },
+    {
+     "t": 49.02,
+     "sound": "ding",
+     "notes": "-14 dB, fixed"
+    },
+    {
+     "t": 49.52,
+     "sound": "whoosh_soft",
+     "notes": "the pull-back"
+    },
+    {
+     "t": 50.97,
+     "sound": "pop_high",
+     "notes": "-24 dB, plaque wave (one file, 6 offsets 0.1 s)"
+    },
+    {
+     "t": 52.17,
+     "sound": "bubble_pop",
+     "notes": "-16 dB, the fixed door pings"
+    },
+    {
+     "t": 53.98,
+     "sound": "alert_ping",
+     "notes": "-18 dB, target rings"
+    },
+    {
+     "t": 54.3,
+     "sound": "whoosh_soft",
+     "notes": "push-through"
+    }
+   ],
+   "captions": [
+    {
+     "s": 47.786,
+     "e": 50.54,
+     "lines": [
+      {
+       "text": "Someone has to install",
+       "s": 47.786
+      },
+      {
+       "text": "that fix on every site,",
+       "s": 48.825
+      }
+     ],
+     "highlights": [
+      {
+       "text": "every site",
+       "s": 49.617
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 50.54,
+     "e": 53.375,
+     "lines": [
+      {
+       "text": "and there are about",
+       "s": 50.54
+      },
+      {
+       "text": "22 million copies of PHP",
+       "s": 51.074
+      }
+     ],
+     "highlights": [
+      {
+       "text": "22 million",
+       "s": 51.074
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 53.375,
+     "e": 54.556,
+     "lines": [
+      {
+       "text": "out there",
+       "s": 53.375
+      },
+      {
+       "text": "that could be hit.",
+       "s": 53.685
+      }
+     ],
+     "highlights": [
+      {
+       "text": "hit",
+       "s": 54.085
+      }
+     ],
+     "tone": "dark"
+    }
+   ]
+  },
+  {
+   "id": "S11",
+   "start": 54.46,
+   "end": 60.47,
+   "vo": "If a site can't update fast enough, the safest thing is to switch it off until it can. That's what those government sites did.",
+   "title": "Shutters down",
+   "transitionIn": {
+    "type": "push-through",
+    "dur": 0.4,
+    "persist": [
+     "sun",
+     "pip",
+     "snail"
+    ],
+    "notes": "54.30-54.70. The camera dives into one ringed facade; its browser window fills the frame and we land on a browser window in close-up: govB's, in the S01 world (we don't say so yet). Its peach target ring becomes the small loading ring next to the progress bar."
+   },
+   "setting": "Government Plaza (the S01 world) seen close on the Domed Capitol's browser window, then a pull-back to the exact S01 framing: the hook's mystery explained.",
+   "composition": "S01 world. Close-up camera (480,813) zoom 2.2: govB's dome top sits at screen y ~470 (sky above for captions), its browser window fills screen x 353-705, y 997-1239, the window sill at screen y ~1250, govA's fluted columns show at the left edge (the only clue), govC's brick at the right. The sun in screen space at (900,600) in the sky right of the dome. At 60.15 the camera is back at rest: the exact S01 framing, all four buildings shuttered.",
+   "timeOfDay": "day",
+   "scale": {
+    "colossal": "the capitol facade filling the frame in close-up, then the whole government row",
+    "observer": "Pip on the window sill, a snail beside him",
+    "ratio": "the browser window alone is ~3.5x Pip's height"
+   },
+   "layers": [
+    {
+     "depth": 0.1,
+     "contents": "far city band (revealed during the pull-back)",
+     "palette": "as S01"
+    },
+    {
+     "depth": 0.15,
+     "contents": "sun (screen space)",
+     "palette": "orange; power glyph cream"
+    },
+    {
+     "depth": 0.55,
+     "contents": "govA-D: browser windows with progress bar, shutters, padlocks, clock tags, pennants",
+     "palette": "as S01; switched-off state = one palette step darker"
+    },
+    {
+     "depth": 0.7,
+     "contents": "plaza, citizens",
+     "palette": "as S01"
+    },
+    {
+     "depth": 1.0,
+     "contents": "lamp post, tree, onlookers (revealed at the end of the pull-back); Pip",
+     "palette": "as S01"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 54.46,
+     "t1": 58.95,
+     "move": "push-in",
+     "from": {
+      "x": 480,
+      "y": 813,
+      "zoom": 2.2
+     },
+     "to": {
+      "x": 480,
+      "y": 820,
+      "zoom": 2.28
+     },
+     "ease": "linear",
+     "why": "near-locked close-up, slow creep (tension while the bar crawls)"
+    },
+    {
+     "t0": 58.95,
+     "t1": 60.15,
+     "move": "pull-back",
+     "from": {
+      "x": 480,
+      "y": 820,
+      "zoom": 2.28
+     },
+     "to": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "ease": "bezier(0.6,0.25,0.41,0.87)",
+     "why": "the payoff: land on the EXACT S01 framing on 'That's what those government sites did' (medium move)"
+    },
+    {
+     "t0": 60.15,
+     "t1": 60.47,
+     "move": "hold",
+     "from": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "ease": "none",
+     "why": "hold the hook frame for the line"
+    }
+   ],
+   "light": "Day. govB lit (screen glow) until 'off', then its fills step one palette step darker (the same switch-off look as S01). During the pull-back the other three buildings are revealed already dark, shuttered and padlocked: the S01 end state.",
+   "elements": [
+    {
+     "id": "progressBar",
+     "what": "govB's address bar turned progress bar: cream bar with a sage fill segment that crawls in steps (0 -> 14% before the shutter; one more step behind it)",
+     "where": "in govB's window: 405,840,140,14 (screen ~310x30)",
+     "style": "cream bar, sage fill, ink 2.2"
+    },
+    {
+     "id": "loadingRing",
+     "what": "small peach loading ring that spins next to the bar (the target ring from S10, re-used)",
+     "where": "550,847 r9",
+     "style": "peach ring, ink"
+    },
+    {
+     "id": "shutterB",
+     "what": "govB's roller shutter",
+     "where": "395,812,160,128 travel",
+     "style": "tealDark, ink ribs"
+    },
+    {
+     "id": "padlockB",
+     "what": "padlock on govB's shutter",
+     "where": "475,945",
+     "style": "sand, ink"
+    },
+    {
+     "id": "clockTagB",
+     "what": "the 'back soon' clock tag planted in S01, now meaningful",
+     "where": "505,950,30,36",
+     "style": "white, ink clock"
+    },
+    {
+     "id": "peephole",
+     "what": "round spy hole in the shutter showing the progress bar still crawling behind it",
+     "where": "centre 475,890 r10",
+     "style": "cream rim, ink"
+    },
+    {
+     "id": "snail",
+     "what": "the running-gag snail crossing govB's window sill",
+     "where": "from 400,948 to 430,948",
+     "style": "sand, ink"
+    },
+    {
+     "id": "powerGlyph",
+     "what": "power glyph on the sun (callback to S01)",
+     "where": "on the sun",
+     "style": "cream 10 px"
+    },
+    {
+     "id": "govRow",
+     "what": "govA, govC, govD in their switched-off S01 end state (shutters, padlocks, clock tags, darker fills)",
+     "where": "as S01",
+     "style": "as S01"
+    },
+    {
+     "id": "pip",
+     "what": "mascot on govB's window sill",
+     "where": "screen 680,1252 (sit-back, scale 1.0) -> S01 bollard 760,1440",
+     "style": "periwinkle"
+    }
+   ],
+   "beats": [
+    {
+     "t": 54.46,
+     "action": "'If': push-through lands on govB's browser window. Its address bar morphs into a progress bar at 0%; the peach loading ring spins."
+    },
+    {
+     "t": 54.7,
+     "action": "Pip lands on the window sill."
+    },
+    {
+     "t": 54.92,
+     "action": "'can't': progress steps to 4%."
+    },
+    {
+     "t": 55.2,
+     "action": "'update': progress steps to 8%."
+    },
+    {
+     "t": 55.59,
+     "action": "'fast': the snail crosses the window sill (running gag) while Pip watches it."
+    },
+    {
+     "t": 55.85,
+     "action": "'enough': progress steps to 11%; the loading ring keeps spinning."
+    },
+    {
+     "t": 56.37,
+     "action": "'the safest': a power glyph inks onto the sun (callback)."
+    },
+    {
+     "t": 56.9,
+     "action": "'thing': Pip looks from the bar up to the sun (look 0.7)."
+    },
+    {
+     "t": 57.33,
+     "action": "'switch': the sun is pressed (squash 0.88, ripple ring)."
+    },
+    {
+     "t": 57.75,
+     "action": "'it off': govB's shutter rolls down over the window (57.75-57.98, 6 px bounce)."
+    },
+    {
+     "t": 57.98,
+     "action": "'off': lights out: govB's fills step one palette step darker (1-frame cascade top to bottom, 57.98-58.10); padlock pops (58.10)."
+    },
+    {
+     "t": 58.12,
+     "action": "'until': the 'back soon' clock tag swings onto the shutter; Pip taps it with his trunk (58.30) and it swings again (his gag)."
+    },
+    {
+     "t": 58.48,
+     "action": "'can': a peephole in the shutter shows the progress bar still crawling: one more step (still updating, until it can)."
+    },
+    {
+     "t": 58.95,
+     "action": "'That's': PULL-BACK to the exact S01 framing (58.95-60.15). Pip hops from the sill to his S01 bollard (59.10-59.55)."
+    },
+    {
+     "t": 59.43,
+     "action": "'government': govA, govC, govD are revealed already shuttered, padlocked and tagged, lights out; the four pennants wave once. The sun glides into its S01 slot, landing squash on 'government' (59.53)."
+    },
+    {
+     "t": 59.82,
+     "action": "'sites': the citizens and pigeons are back in place; the frame now matches the hook."
+    },
+    {
+     "t": 60.18,
+     "action": "'did': Pip nods; all four padlocks glint at once (callback)."
+    },
+    {
+     "t": 60.4,
+     "action": "A tram enters from the left foreground (transition to S12); Pip hops toward its roof."
+    }
+   ],
+   "sun": "Screen-space at (900,600) right of the dome. Callback morph: the power glyph inks on ('the safest'), the sun is pressed on 'switch' (57.43). During the pull-back it glides back into its exact S01 slot (628,700), landing on 'government'.",
+   "mascot": "Lands on the window sill, watches the slow bar and the snail. Gag: taps the swinging 'back soon' tag with his trunk (58.30). Hops back to his S01 bollard during the pull-back; nods on 'did'.",
+   "sfx": [
+    {
+     "t": 54.46,
+     "sound": "typing_tick",
+     "notes": "-22 dB, progress steps (54.92, 55.20, 55.85, 58.48)"
+    },
+    {
+     "t": 56.37,
+     "sound": "pencil_scratch_short",
+     "notes": "power glyph"
+    },
+    {
+     "t": 57.43,
+     "sound": "switch_toggle",
+     "notes": "sun pressed"
+    },
+    {
+     "t": 57.75,
+     "sound": "pop_low",
+     "notes": "shutter"
+    },
+    {
+     "t": 57.98,
+     "sound": "power_off_thunk",
+     "notes": "-14 dB lights out"
+    },
+    {
+     "t": 58.1,
+     "sound": "lock_click",
+     "notes": "padlock"
+    },
+    {
+     "t": 58.3,
+     "sound": "click_light",
+     "notes": "trunk taps the tag"
+    },
+    {
+     "t": 58.95,
+     "sound": "whoosh_soft",
+     "notes": "-16 dB, pull-back"
+    },
+    {
+     "t": 60.18,
+     "sound": "click_light",
+     "notes": "-18 dB, padlocks glint"
+    }
+   ],
+   "captions": [
+    {
+     "s": 54.556,
+     "e": 56.472,
+     "lines": [
+      {
+       "text": "If a site can't update",
+       "s": 54.556
+      },
+      {
+       "text": "fast enough,",
+       "s": 55.685
+      }
+     ],
+     "highlights": [
+      {
+       "text": "fast enough",
+       "s": 55.685
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 56.472,
+     "e": 58.215,
+     "lines": [
+      {
+       "text": "the safest thing",
+       "s": 56.472
+      },
+      {
+       "text": "is to switch it off",
+       "s": 57.225
+      }
+     ],
+     "highlights": [
+      {
+       "text": "switch it off",
+       "s": 57.43
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 58.215,
+     "e": 59.051,
+     "lines": [
+      {
+       "text": "until it can.",
+       "s": 58.215
+      }
+     ],
+     "highlights": [],
+     "tone": "dark"
+    },
+    {
+     "s": 59.051,
+     "e": 60.552,
+     "lines": [
+      {
+       "text": "That's what those",
+       "s": 59.051
+      },
+      {
+       "text": "government sites did.",
+       "s": 59.53
+      }
+     ],
+     "highlights": [
+      {
+       "text": "government sites",
+       "s": 59.53
+      }
+     ],
+     "tone": "dark"
+    }
+   ]
+  },
+  {
+   "id": "S12",
+   "start": 60.47,
+   "end": 66.59,
+   "vo": "And one in three sites on PHP runs a version so old that the people who make PHP don't fix it anymore.",
+   "title": "Too old to fix",
+   "transitionIn": {
+    "type": "foreground-wipe",
+    "dur": 0.4,
+    "persist": [
+     "sun",
+     "pip",
+     "fixCart"
+    ],
+    "notes": "60.40-60.80. A tram (reference DNA: teal body, mintPale windows, peach lamps) crosses the near foreground left to right and wipes the plaza away, revealing an empty golden street. Pip rides its roof and hops off onto a bollard (60.90). The sun hops across behind it."
+   },
+   "setting": "The Old Quarter at warm golden afternoon: a frontal row of three sites with a second row of nine behind and the endless city beyond. Every third site runs an old PHP version: only its elephant plaque is old (the building itself is fine).",
+   "composition": "Canvas coords at rest. Golden sky (cream) y 0-860, peach band y 760-860. Sun centre (540,700) r150, lower part behind row 2. Far city y 780-880 fill-only sand. Second row (9 buildings, 120 wide each) tops y 780-840. Near row: siteL x 30-360 (top 900), siteM x 375-705 (top 860), siteR x 720-1050 (top 920), bases y 1380; each with a browser window (siteL 110,980,170,110; siteM 455,950,170,110; siteR 800,1000,150,100), a door (siteL 150-240; siteM 495-585; siteR 840-930, y 1220-1380) and a 60x60 elephant plaque (siteL 260,1250; siteM 605,1250; siteR 770,1250). Pavement mintPale y 1380-1920, kerb y 1500. Pip on a bollard at (700,1490).",
+   "timeOfDay": "golden",
+   "scale": {
+    "colossal": "the pattern continuing behind the three sites into the city: every third building, everywhere",
+    "observer": "the maker pushing the cart (200 px), Pip on a bollard",
+    "ratio": "the three sites are 2.5x the maker's height; the pattern repeats past the horizon"
+   },
+   "layers": [
+    {
+     "depth": 0.05,
+     "contents": "golden sky, peach band",
+     "palette": "cream, peach"
+    },
+    {
+     "depth": 0.1,
+     "contents": "sun (1/3 pie)",
+     "palette": "orange; 1 cream slice; ink spokes"
+    },
+    {
+     "depth": 0.2,
+     "contents": "far city",
+     "palette": "fill-only sand"
+    },
+    {
+     "depth": 0.45,
+     "contents": "second row of nine with small plaques (every third one old)",
+     "palette": "cream/sand/sage fills, ink 2.2, plaque dots sand / old tan"
+    },
+    {
+     "depth": 0.7,
+     "contents": "siteL, siteM, siteR with browser windows, doors, plaques, locks",
+     "palette": "cream/sand/mintPale facades, teal doors, ink 3.4"
+    },
+    {
+     "depth": 0.85,
+     "contents": "pavement, the makers' cart and maker",
+     "palette": "mintPale, ochre cart, sage locks"
+    },
+    {
+     "depth": 1.0,
+     "contents": "tram (wipe only), bollard, Pip",
+     "palette": "teal tram, mintPale windows, peach lamps; periwinkle"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 60.8,
+     "t1": 66.4,
+     "move": "push-in",
+     "from": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 540,
+      "y": 1040,
+      "zoom": 1.07
+     },
+     "ease": "inOut(sine)",
+     "why": "gentle push; the plaques are the subject"
+    },
+    {
+     "t0": 66.4,
+     "t1": 66.59,
+     "move": "hold",
+     "from": {
+      "x": 540,
+      "y": 1040,
+      "zoom": 1.07
+     },
+     "to": {
+      "x": 540,
+      "y": 1040,
+      "zoom": 1.07
+     },
+     "ease": "none",
+     "why": "settle before the board rises"
+    }
+   ],
+   "light": "Warm golden afternoon: cream sky, peach band, sun on the horizon behind the second row. Facades with tan shade planes on their left 25% and cream rim strips on the right. The OLD plaque is the only aged thing: tan instead of sand, chipped corner, older curly elephant outline, cobweb, dust specks. No sepia, no filters.",
+   "elements": [
+    {
+     "id": "sky",
+     "what": "golden sky, peach band",
+     "where": "0,0,1080,860",
+     "style": "cream, peach"
+    },
+    {
+     "id": "sun",
+     "what": "orange disc; becomes a 1/3 pie (rhymes with S02's 7/10)",
+     "where": "centre 540,700 r150",
+     "style": "fill sun; 3 ink spokes; 1 cream slice"
+    },
+    {
+     "id": "secondRow",
+     "what": "nine buildings behind, small plaques; every third plaque old",
+     "where": "x 0-1080, tops 780-840",
+     "style": "cream/sand/sage, ink 2.2"
+    },
+    {
+     "id": "siteL",
+     "what": "site with a current plaque",
+     "where": "30,900,330,480",
+     "style": "cream facade, teal door, ink 3.4"
+    },
+    {
+     "id": "siteM",
+     "what": "site with the OLD plaque (the building itself is ordinary)",
+     "where": "375,860,330,520",
+     "style": "sand facade, teal door, ink 3.4"
+    },
+    {
+     "id": "siteR",
+     "what": "site with a current plaque",
+     "where": "720,920,330,460",
+     "style": "mintPale facade, teal door, ink 3.4"
+    },
+    {
+     "id": "plaques",
+     "what": "elephant plaques on all PHP sites; siteM's flips to an older style",
+     "where": "siteL 260,1250; siteM 605,1250; siteR 770,1250; 60x60",
+     "style": "sand + ink elephant; old = tan, chipped corner, curly older outline"
+    },
+    {
+     "id": "oldCane",
+     "what": "a tiny cane the old elephant emblem leans on",
+     "where": "at 668,1260, 45 px",
+     "style": "ochre cane, ink"
+    },
+    {
+     "id": "cobwebDust",
+     "what": "cobweb across the old plaque's corner + 5 dust specks",
+     "where": "around 605-665, 1240-1310",
+     "style": "inkHair, ink dots"
+    },
+    {
+     "id": "fixCart",
+     "what": "the makers' handcart with new locks, pushed by a back-view maker in a cream apron",
+     "where": "rolls from x -150 to 1250 along y 1400-1480",
+     "style": "ochre cart, sand crate, sage locks, maker teal + cream apron"
+    },
+    {
+     "id": "newLocks",
+     "what": "new locks popping onto siteL's and siteR's doors (never siteM's)",
+     "where": "siteL 225,1300; siteR 915,1300",
+     "style": "sage, cream check"
+    },
+    {
+     "id": "tram",
+     "what": "foreground tram for the wipe",
+     "where": "x -1100 -> 1100, y 1150-1750",
+     "style": "teal body, mintPale windows, peach lamps, ink 4.8"
+    },
+    {
+     "id": "pip",
+     "what": "mascot on a bollard at the kerb",
+     "where": "700,1490 sit-back scale 1.0",
+     "style": "periwinkle"
+    }
+   ],
+   "beats": [
+    {
+     "t": 60.4,
+     "action": "Tram wipe crosses the foreground (60.40-60.80), revealing an empty golden street; Pip rides its roof and hops off onto the bollard (60.90)."
+    },
+    {
+     "t": 60.63,
+     "action": "'one': siteL pops up from the ground (scaleY 0 -> 1.06 -> 1)."
+    },
+    {
+     "t": 60.84,
+     "action": "'in': siteM pops up."
+    },
+    {
+     "t": 60.99,
+     "action": "'three': siteR pops up; the sun draws 3 ink spokes and one slice pops cream on 'three' (61.09): a 1/3 pie."
+    },
+    {
+     "t": 61.18,
+     "action": "'sites': the nine second-row buildings pop up behind (0.04 s stagger)."
+    },
+    {
+     "t": 61.74,
+     "action": "'PHP': elephant plaques pop onto every site, near and far."
+    },
+    {
+     "t": 62.32,
+     "action": "'runs': siteM's plaque flips (paper flip) to the OLD version; every third plaque in the second row flips old too (62.40-62.55)."
+    },
+    {
+     "t": 62.7,
+     "action": "'a version': a cobweb draws across the old plaque's corner."
+    },
+    {
+     "t": 63.1,
+     "action": "'so': dust specks pop around the old plaque."
+    },
+    {
+     "t": 63.38,
+     "action": "'old': the old elephant emblem leans on a tiny cane (cane pops, emblem tilts 12 deg)."
+    },
+    {
+     "t": 64.0,
+     "action": "'the people': the makers' cart rolls in from the left, pushed by a maker (64.00-64.50)."
+    },
+    {
+     "t": 64.66,
+     "action": "'make': the cart stops at siteL; a new lock pops onto siteL's door; check at 64.80."
+    },
+    {
+     "t": 64.99,
+     "action": "'PHP': the maker moves on."
+    },
+    {
+     "t": 65.2,
+     "action": "The cart rolls straight past siteM without slowing (65.20-65.70)."
+    },
+    {
+     "t": 65.46,
+     "action": "'don't': Pip's gag: trunk-up 'hey!' at the cart, pointing at the old plaque (65.46-65.90, expression wide)."
+    },
+    {
+     "t": 65.8,
+     "action": "'fix': the cart stops at siteR; a new lock pops onto siteR's door; check at 66.02. Rhythm: tick, skip, tick."
+    },
+    {
+     "t": 66.17,
+     "action": "'anymore': the old emblem's cane wobbles; the cart exits right (66.17-66.50)."
+    }
+   ],
+   "sun": "Hops across the tram wipe and lands on the horizon. Morph: a 1/3 pie on 'three' (61.09), one slice cream, rhyming with the 7/10 pie. Holds the pie through the scene.",
+   "mascot": "Rides the tram roof across the wipe, sits on the bollard. Gag: trunk-up 'hey!' as the cart skips the old site on 'don't' (65.46). Hops onto the board at 66.70.",
+   "sfx": [
+    {
+     "t": 60.4,
+     "sound": "whoosh_soft",
+     "notes": "tram passes"
+    },
+    {
+     "t": 60.63,
+     "sound": "pop_low",
+     "notes": "site pops x3 (60.63, 60.84, 60.99)"
+    },
+    {
+     "t": 61.74,
+     "sound": "pop_high",
+     "notes": "-22 dB, plaques"
+    },
+    {
+     "t": 62.32,
+     "sound": "paper_flip",
+     "notes": "old plaque flips"
+    },
+    {
+     "t": 63.38,
+     "sound": "pop_mid",
+     "notes": "-16 dB, cane"
+    },
+    {
+     "t": 64.0,
+     "sound": "coin_chink",
+     "notes": "-24 dB, cart rattle"
+    },
+    {
+     "t": 64.66,
+     "sound": "lock_click",
+     "notes": "tick"
+    },
+    {
+     "t": 65.8,
+     "sound": "lock_click",
+     "notes": "tick"
+    },
+    {
+     "t": 65.46,
+     "sound": "alert_ping",
+     "notes": "-20 dB, Pip's 'hey!'"
+    }
+   ],
+   "captions": [
+    {
+     "s": 60.552,
+     "e": 62.42,
+     "lines": [
+      {
+       "text": "And one in three",
+       "s": 60.552
+      },
+      {
+       "text": "sites on PHP",
+       "s": 61.285
+      }
+     ],
+     "highlights": [
+      {
+       "text": "one in three",
+       "s": 60.735
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 62.42,
+     "e": 64.1,
+     "lines": [
+      {
+       "text": "runs a version",
+       "s": 62.42
+      },
+      {
+       "text": "so old that",
+       "s": 63.09
+      }
+     ],
+     "highlights": [
+      {
+       "text": "old",
+       "s": 63.475
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 64.1,
+     "e": 66.665,
+     "lines": [
+      {
+       "text": "the people who make PHP",
+       "s": 64.1
+      },
+      {
+       "text": "don't fix it anymore.",
+       "s": 65.556
+      }
+     ],
+     "highlights": [
+      {
+       "text": "don't fix",
+       "s": 65.556
+      }
+     ],
+     "tone": "dark"
+    }
+   ]
+  },
+  {
+   "id": "S13",
+   "start": 66.59,
+   "end": 70.687,
+   "vo": "For those, it's switch off or hope the hosting company sorts it out.",
+   "title": "Switch off, or hope",
+   "transitionIn": {
+    "type": "camera-continuous",
+    "dur": 1.0,
+    "persist": [
+     "sun",
+     "pip",
+     "siteM",
+     "oldPlaque"
+    ],
+    "notes": "66.59-67.60. Same street. The public noticeboard from S07 (same design, address-bar rail) rises from the pavement in front of the old site and the camera pushes in on it: the reference's yes/no board finale."
+   },
+   "setting": "The noticeboard in front of the old site, a back-view audience below, Pip on top: the reference's two-option finale. Then the un-build back to the opening line art.",
+   "composition": "S12 world at rest + board. Board frame x 300-800, y 1090-1400, panes 320-540 and 560-780 (y 1110-1380), address rail x 380-720, y 1060-1088, legs to y 1480. Pip on the board top (760,1090), right of the rail. Audience: five back-view heads rising on the bottom edge (y 1560-1640). After the push (zoom 1.2 on (550,1120)) the old plaque stays visible upper left of the board, the sun peeks over siteM's roof at screen (790,580).",
+   "timeOfDay": "golden",
+   "scale": {
+    "colossal": "the old site's facade rising behind the board",
+    "observer": "five back-view audience members, Pip on the board",
+    "ratio": "the board is ~2x an audience member's head-and-shoulders; the facade towers behind"
+   },
+   "layers": [
+    {
+     "depth": 0.05,
+     "contents": "golden sky",
+     "palette": "cream, peach band"
+    },
+    {
+     "depth": 0.1,
+     "contents": "sun with stepped glow on 'hope'",
+     "palette": "orange; glow discs peach r175 + cream r200 behind"
+    },
+    {
+     "depth": 0.6,
+     "contents": "siteM facade with old plaque, second row",
+     "palette": "as S12"
+    },
+    {
+     "depth": 0.8,
+     "contents": "noticeboard: pane 1 power glyph, pane 2 caretaker with key ring",
+     "palette": "teal frame; pane 1 tealDark with cream glyph; pane 2 peach answer panel; caretaker teal coat, cream cap, sand keys"
+    },
+    {
+     "depth": 1.0,
+     "contents": "audience on the bottom edge, Pip on the board top",
+     "palette": "coats teal/sand/sage; periwinkle"
+    }
+   ],
+   "camera": [
+    {
+     "t0": 66.59,
+     "t1": 67.6,
+     "move": "push-in",
+     "from": {
+      "x": 540,
+      "y": 1040,
+      "zoom": 1.07
+     },
+     "to": {
+      "x": 550,
+      "y": 1120,
+      "zoom": 1.2
+     },
+     "ease": "inOut(sine)",
+     "why": "gentle push onto the two options"
+    },
+    {
+     "t0": 67.6,
+     "t1": 69.84,
+     "move": "push-in",
+     "from": {
+      "x": 550,
+      "y": 1120,
+      "zoom": 1.2
+     },
+     "to": {
+      "x": 550,
+      "y": 1130,
+      "zoom": 1.23
+     },
+     "ease": "linear",
+     "why": "slow creep"
+    },
+    {
+     "t0": 70.05,
+     "t1": 70.25,
+     "move": "hold",
+     "from": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "to": {
+      "x": 540,
+      "y": 960,
+      "zoom": 1.0
+     },
+     "ease": "none",
+     "why": "as the slab falls the S01 world is revealed at camera rest (the frame-0 framing)"
+    }
+   ],
+   "light": "Golden. On 'hope' the sun gets a stepped glow (two flat concentric discs behind it). Pane 1 goes dark (tealDark) on 'off'. Un-build: no fades; fills shrink, ink retracts, the colour slab collapses downward.",
+   "elements": [
+    {
+     "id": "board",
+     "what": "the public noticeboard from S07 (same design: teal frame, two panes, address-bar rail, legs)",
+     "where": "frame 300,1090,500,310; rail 380,1060,340,28",
+     "style": "teal, mintPale panes, cream rail, ink 3.4"
+    },
+    {
+     "id": "pane1",
+     "what": "option 1: a big power glyph; pane turns dark on 'off'",
+     "where": "320,1110,220,270; glyph r70",
+     "style": "mintPale -> tealDark; glyph ink -> cream"
+    },
+    {
+     "id": "pane2",
+     "what": "option 2: peach answer panel; the hosting company's caretaker (back view, teal coat, cream cap) holding up a big key ring",
+     "where": "560,1110,220,270; caretaker 600-740, 1180-1380; key ring r22 at 700,1200",
+     "style": "peach panel; teal/cream; sand keys, ink ring"
+    },
+    {
+     "id": "audience",
+     "what": "five back-view audience heads on the bottom edge",
+     "where": "heads y 1560-1640, x 140-940",
+     "style": "hair varied; coats teal/sand/sage"
+    },
+    {
+     "id": "glow",
+     "what": "stepped flat glow behind the sun on 'hope'",
+     "where": "discs r175 (peach) and r200 (cream) behind the sun",
+     "style": "peach, cream"
+    },
+    {
+     "id": "tanSlab",
+     "what": "un-build: every remaining fill collapses into one tan slab that slides down out of frame",
+     "where": "full frame -> off the bottom edge",
+     "style": "tan"
+    },
+    {
+     "id": "s01LineArt",
+     "what": "the S01 plaza linework revealed underneath (= frame 0)",
+     "where": "as S01",
+     "style": "ink only on white unfilled shapes; mint sky block"
+    },
+    {
+     "id": "pip",
+     "what": "mascot on the board top; the only thing that never un-builds",
+     "where": "760,1090 -> S01 bollard 760,1440",
+     "style": "periwinkle"
+    },
+    {
+     "id": "bit",
+     "what": "Bit hops back onto govA's cornice in the revealed line art",
+     "where": "232,693",
+     "style": "solid ink"
+    }
+   ],
+   "beats": [
+    {
+     "t": 66.59,
+     "action": "'For': the noticeboard rises from the pavement in front of siteM (rise 0.33 s); camera push-in begins."
+    },
+    {
+     "t": 66.7,
+     "action": "Pip hops from the bollard onto the board top (lands 67.05), sit-back like the reference cat."
+    },
+    {
+     "t": 66.95,
+     "action": "'those': five audience heads rise on the bottom edge (0.1 s stagger)."
+    },
+    {
+     "t": 67.3,
+     "action": "'it's': the board's address-bar rail lights (cream pill + dots)."
+    },
+    {
+     "t": 67.45,
+     "action": "'switch': pane 1: a big power glyph draws on (0.17 s); the sun echoes a small press (squash 0.94 on 67.55)."
+    },
+    {
+     "t": 67.88,
+     "action": "'off': pane 1 pops dark (tealDark), its glyph turns cream: lights out."
+    },
+    {
+     "t": 68.38,
+     "action": "'or': pane 2's peach answer panel scales in from 0.2 (0.30 s, completes 68.68)."
+    },
+    {
+     "t": 68.8,
+     "action": "'hope': Pip crosses his trunk (trunk-cross; fallback: hold pose, expression closed); the sun's stepped glow discs pop behind it."
+    },
+    {
+     "t": 69.07,
+     "action": "'hosting': the caretaker rises into pane 2 (rise 0.30 s)."
+    },
+    {
+     "t": 69.3,
+     "action": "His big key ring pops up and jingles (keys swing). The hosting visual is on screen 0.77 s before the un-build."
+    },
+    {
+     "t": 69.44,
+     "action": "'company': the keys glint; we never see whether he sorts it out (honest open ending)."
+    },
+    {
+     "t": 69.84,
+     "action": "'sorts': UN-BUILD begins: lines go loose (ink overshoots extend, 3 frames)."
+    },
+    {
+     "t": 69.9,
+     "action": "Fills shrink to their centres (69.90-70.08, ease-in); audience sinks out."
+    },
+    {
+     "t": 70.0,
+     "action": "Board linework retracts (70.00-70.13)."
+    },
+    {
+     "t": 70.05,
+     "action": "The remaining colour collapses into one tan slab that slides down out of frame (70.05-70.25, ease-in), revealing the S01 plaza line art and mint sky at camera rest."
+    },
+    {
+     "t": 70.1,
+     "action": "Pane 1's power glyph floats up and docks on the sun as the faint frame-0 glyph (70.10-70.47); the sun glides to (628,770)."
+    },
+    {
+     "t": 70.15,
+     "action": "Pip hops from the vanishing board to his S01 bollard (70.15-70.52), in colour the whole time."
+    },
+    {
+     "t": 70.2,
+     "action": "S01 linework draws in row by row (70.20-70.55); Bit hops back onto govA's cornice (70.30)."
+    },
+    {
+     "t": 70.48,
+     "action": "Caption rolls: the last page exits up, 'Government websites' rolls in (hook scale)."
+    },
+    {
+     "t": 70.6,
+     "action": "The sun begins its opening rise (628,770 -> 748 by 70.687 -> 740 at frame 0): the seam is mid-motion."
+    }
+   ],
+   "sun": "Glides to peek over siteM's roof during the push; small press echo on 'switch' (67.55); stepped glow on 'hope' (68.80). In the un-build it receives pane 1's power glyph as the faint frame-0 glyph, sinks to (628,770) and starts the opening rise at 70.60.",
+   "mascot": "Hops onto the board top (the reference cat's finale spot). Gag: crosses his trunk on 'hope' (68.80). Rides the un-build back to his frame-0 bollard, never losing colour.",
+   "sfx": [
+    {
+     "t": 66.59,
+     "sound": "pop_low",
+     "notes": "board rises"
+    },
+    {
+     "t": 67.45,
+     "sound": "pencil_scratch_short",
+     "notes": "power glyph"
+    },
+    {
+     "t": 67.88,
+     "sound": "power_off_thunk",
+     "notes": "-18 dB, pane 1 dark"
+    },
+    {
+     "t": 68.38,
+     "sound": "pop_mid",
+     "notes": "pane 2 panel"
+    },
+    {
+     "t": 69.3,
+     "sound": "coin_chink",
+     "notes": "-18 dB, key ring jingle"
+    },
+    {
+     "t": 69.84,
+     "sound": "pencil_scratch_long",
+     "notes": "the un-build (tail wraps into frame 0)"
+    },
+    {
+     "t": 70.05,
+     "sound": "whoosh_soft",
+     "notes": "-18 dB, slab falls"
+    }
+   ],
+   "captions": [
+    {
+     "s": 66.665,
+     "e": 68.644,
+     "lines": [
+      {
+       "text": "For those,",
+       "s": 66.665
+      },
+      {
+       "text": "it's switch off",
+       "s": 67.39
+      }
+     ],
+     "highlights": [
+      {
+       "text": "switch off",
+       "s": 67.55
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 68.644,
+     "e": 70.48,
+     "lines": [
+      {
+       "text": "or hope the hosting",
+       "s": 68.644
+      },
+      {
+       "text": "company sorts it out.",
+       "s": 69.542
+      }
+     ],
+     "highlights": [
+      {
+       "text": "hope",
+       "s": 68.805
+      }
+     ],
+     "tone": "dark"
+    },
+    {
+     "s": 70.48,
+     "e": 70.687,
+     "lines": [
+      {
+       "text": "Government websites",
+       "s": 70.48
+      }
+     ],
+     "highlights": [],
+     "tone": "dark"
+    }
+   ]
+  }
+ ],
+ "loop": "S13's un-build (69.84-70.687) ends on the exact frame-0 state: the S01 plaza linework at camera rest (ink on unfilled white shapes, people as white tombstones), the mint sky block, the sun at (628,~748) already rising and carrying pane 1's power glyph as the faint frame-0 glyph, Pip in full colour sit-back on his bollard (760,1440), Bit back on govA's cornice, and the caption 'Government websites' rolled in (70.48-70.687, settled by frame 0). Frame 0 continues the same sun rise (740 -> 700 by 0.37 s) while the fill cascade starts on frame 1: the seam is mid-motion, as in the reference. The last caption 'or hope the hosting / company sorts it out.' stays until 'out.' has ended (70.445). Story loop: the film ends on 'switch off' and restarts on 'switched themselves off'. Audio: the un-build pencil scratch tail and the music bed wrap across the cut (sound_plan.md loop design)."
+}

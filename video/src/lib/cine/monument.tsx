@@ -105,7 +105,8 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, seed: Seed): G
     const y = i * sh;
     const xa = -150 + i * 6;
     const xb = 1150 - i * 6;
-    // tread (lit top of each step)
+    // riser in shade, tread (top of each step) lit
+    stoneShade.poly(P([[xa, y], [xb, y], [xb, y + sh * 0.62], [xa, y + sh * 0.62]]));
     stoneLit.poly(P([[xa, y + sh * 0.62], [xb, y + sh * 0.62], [xb - 6, y + sh], [xa + 6, y + sh]]));
     L(i % 3 === 0 ? ink : thin, xa - 20, y + sh * 0.62, xb + 20, y + sh * 0.62, `st${i}`, [10, 30]);
   }
@@ -135,14 +136,14 @@ function buildGeo(g: MonumentGeo, columns: number, dome: boolean, seed: Seed): G
   const cs = 880 / (columns - 1);
   for (let i = 0; i < columns; i++) {
     const x = 60 + i * cs;
-    const r = 41;
+    const r = 47;
     // base, shaft, capital
     stone.poly(P([[x - 44, 215], [x + 44, 215], [x + 44, 250], [x - 44, 250]]));
     stone.poly(P([[x - r, 250], [x + r, 250], [x + r * 0.9, 960], [x - r * 0.9, 960]]));
     stone.poly(P([[x - 48, 960], [x + 48, 960], [x + 52, 1000], [x - 52, 1000]]));
     // shade on the left 30% of the shaft, rim light on the right edge
-    stoneShade.poly(P([[x - r, 250], [x - r * 0.4, 250], [x - r * 0.35, 960], [x - r * 0.9, 960]]));
-    stoneLit.poly(P([[x + r * 0.72, 250], [x + r, 250], [x + r * 0.9, 960], [x + r * 0.64, 960]]));
+    stoneShade.poly(P([[x - r, 250], [x - r * 0.3, 250], [x - r * 0.27, 960], [x - r * 0.9, 960]]));
+    stoneLit.poly(P([[x + r * 0.8, 250], [x + r, 250], [x + r * 0.9, 960], [x + r * 0.72, 960]]));
     // the entablature's shadow across the top of the shafts
     stoneShade.poly(P([[x - r * 0.9, 900], [x + r * 0.9, 900], [x + r * 0.9, 960], [x - r * 0.9, 960]]));
     L(ink, x - r, 250, x - r * 0.9, 960, `cl${i}`, [2, 6], false);
@@ -267,7 +268,7 @@ export const Monument: React.FC<MonumentProps> = ({cx, by, bw, ty, taper, tod = 
   const stoneC = ambient(palette.cream, p);
   const litC = ambient(palette.white, p);
   const shadeC = ambient(palette.sand, p);
-  const darkC = ambient(palette.teal, p);
+  const darkC = ambient(palette.tealDark, p);
   const domeC = ambient(palette.sage, p);
   const domeShade = ambient(darker(palette.sage), p);
 
@@ -300,7 +301,7 @@ export const Monument: React.FC<MonumentProps> = ({cx, by, bw, ty, taper, tod = 
     <>
       <path d={G.stone} fill={stoneC} />
       <path d={G.dark} fill={darkC} />
-      <path d={G.doors} fill={ambient(palette.tealDark, p)} />
+      <path d={G.doors} fill={ambient(darker(palette.tealDark), p)} />
       <path d={G.transoms} fill={lit ?? p.stars > 0.3 ? palette.peach : ambient(palette.sage, p)} />
       <path d={G.stoneShade} fill={shadeC} />
       <path d={G.stoneLit} fill={litC} />

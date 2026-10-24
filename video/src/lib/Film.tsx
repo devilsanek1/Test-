@@ -434,7 +434,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
   layers.sort((a, b) => a.z - b.z);
   const tone = (t: number) => toneAt(scenes, t);
   const last = scenes[scenes.length - 1];
-  const loopAt = !only && last?.transitionOut?.type === 'unbuild' && last.transitionOut.loop !== false ? end - 0.3 : undefined;
+  const loopAt = !only && last?.transitionOut?.type === 'unbuild' && last.transitionOut.loop !== false ? end - 0.24 : undefined;
   const onlyIdx = only ? scenes.findIndex((s) => s.id === only) : -1;
   const range: [number, number] | undefined = only && onlyIdx >= 0 ? [scenes[onlyIdx].start, scenes[onlyIdx + 1]?.start ?? Infinity] : undefined;
 

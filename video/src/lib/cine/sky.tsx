@@ -44,8 +44,9 @@ export const Sky: React.FC<SkyProps> = ({tod = 'day', horizon, colors, edges, sp
   const p = todPal(tod);
   const cols = colors ?? p.skyBands;
   const n = cols.length;
-  // default edges: geometric toward the horizon (thin bands near it, like a low sun's glow steps)
-  const e = edges ?? Array.from({length: n - 1}, (_, i) => span * Math.pow(0.42, i));
+  // default edges: geometric toward the horizon (thin bands near it, like a low sun's glow steps); last edge 110 px
+  const ratio = n > 2 ? Math.pow(110 / span, 1 / (n - 2)) : 1;
+  const e = edges ?? Array.from({length: n - 1}, (_, i) => span * Math.pow(ratio, i));
   const out: React.ReactNode[] = [];
   for (let i = 0; i < n; i++) {
     const y0 = i === 0 ? top : horizon - e[i - 1];

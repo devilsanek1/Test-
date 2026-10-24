@@ -17,7 +17,7 @@ import {palette, skies, stroke, world} from '../lib/theme';
 import {lerp, useTime} from '../lib/time';
 import {CaptionBeat} from '../lib/Captions';
 import {crown, crownTicks, hline, line, polyPath, rect, Pt} from '../lib/sketch';
-import {Building, Crowd, LampPost, Noticeboard, Paper, Person, StringLights, Tree, UtilityPole} from '../lib/kit';
+import {Building, Crowd, LampPost, Noticeboard, Paper, Person, Place, StringLights, Tree, UtilityPole} from '../lib/kit';
 import {drawOut, ElephantTimeline, popIn} from '../lib/mascot';
 
 const VP: Pt = [560, 880];
@@ -136,11 +136,6 @@ const Fence: React.FC = () => {
       <Fill rect={[0, 18, FW, FH - 18]} color={palette.white} offset={[4, 2]} seed="fenceF" />
       <Ink d={hline(0, FW, 60, {seed: 'r1'}) + hline(0, FW, FH - 50, {seed: 'r2'})} width={stroke.ink} />
       <Ink d={posts} width={stroke.ink} order="all" />
-      {/* a notice board drawn ON the receding fence plane: draw-on, paper drop and stamp, all in perspective */}
-      <Noticeboard x={380} y={-560} w={520} h={380} legs={560} at={4.3} seed="kdboard">
-        <Paper x={420} y={-525} w={190} h={250} at={5.25} entry="drop" seed="kdpaper" stamp={{at: 6.2}} />
-        <Paper x={650} y={-510} w={200} h={150} at={5.5} entry="drop" seed="kdpaper2" lines={3} />
-      </Noticeboard>
     </Plane>
   );
 };
@@ -227,6 +222,13 @@ export const StreetScene: React.FC = () => (
         const base = rayPoint(VP, [1000, 1660], k);
         return <LampPost key={i} x={base[0]} y={base[1]} h={560 * (1 - k)} at={1.0 + i * 0.1} lightAt={8.55 + i * 0.05} arm="left" seed={`lp${i}`} width={stroke.inkThin} />;
       })}
+      {/* a notice board facing the camera on the verge: draw-on, paper drops, the stamp is the scene's hero orange */}
+      <Place x={792} y={1012} s={0.42}>
+        <Noticeboard x={0} y={0} w={420} h={300} legs={330} at={4.3} seed="kdboard">
+          <Paper x={30} y={26} w={150} h={200} at={5.25} entry="drop" seed="kdpaper" stamp={{at: 6.2}} />
+          <Paper x={220} y={40} w={160} h={120} at={5.5} entry="drop" seed="kdpaper2" lines={3} />
+        </Noticeboard>
+      </Place>
       <Crowd
         far={{y: 905, x0: rayX(-40, 905), x1: rayX(980, 905), s: 0.07}}
         near={{y: 1430, x0: rayX(60, 1430), x1: rayX(940, 1430), s: 0.82}}
