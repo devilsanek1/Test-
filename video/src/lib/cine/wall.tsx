@@ -15,7 +15,7 @@
 // out of the batched grid while the layer is zoomed past `above` (draw them as WindowCloseup yourself, level of detail
 // from the cell's screen size; at 'glass' they are pixel-identical to the grid pane, so the swap is invisible).
 
-import React, {useMemo} from 'react';
+import React, {useId, useMemo} from 'react';
 import {palette} from '../theme';
 import {useTime} from '../time';
 import {Seed} from '../rng';
@@ -23,7 +23,7 @@ import {line, Pt} from '../sketch';
 import {ambient, atmos, TodLike, TodPalette, useTodPal} from './atmosphere';
 import {darker} from './city';
 import {Quad, quadMap} from './persp';
-import {gridCells, SwitchEvent, switchTimes, WinCell, windowPaths, WindowLook} from './windows';
+import {gridCells, lodScale, quadAt, ROOM_LOD, roomLook, roomMelt, roomShapes, SwitchEvent, switchTimes, WinCell, windowPaths, WindowLook} from './windows';
 import {PathBuf} from './util';
 import {exitScale, inkOn, isPaper, lookPaint, toScreen, useCineState, xfScale} from './state';
 import type {Mat} from '../xf';
@@ -87,6 +87,13 @@ export type KeepDark = {
   /** Boxes grow by pad + ragged * noise(cell) px (a ragged edge, not a ruler line). Default 20 / 26. */
   pad?: number;
   ragged?: number;
+  /** With a `path`: 'static' (default) decides membership ONCE for the shot: every cell that touches a box at ANY
+   *  sampled time is dark for the whole shot, so nothing switches off as the camera carries cells into the caption
+   *  boxes (the old sweep traced a moving scan line of switch-offs along the box edge). 'sweep' = the old hysteresis:
+   *  a cell goes dark the first time it touches a box and stays dark. */
+  mode?: 'static' | 'sweep';
+  /** Thin ink (floor bands, piers) is cut out of the caption boxes, grown by this many px. Default 14. */
+  inkPad?: number;
 };
 
 const DARK_CACHE = new WeakMap<object, Map<string, Float64Array>>();
@@ -95,7 +102,7 @@ const DARK_CACHE = new WeakMap<object, Map<string, Float64Array>>();
  *  never). Needs keepDark.path; memoised per path function (define it once, at module level). */
 export function wallDarkFrom(o: WallSpec, k: KeepDark): Float64Array | null {
   if (!k.path) return null;
-  const key = JSON.stringify([o.quad, o.rows, o.cols, o.fw, o.fh, o.seed, k.y0, k.y1, k.x0, k.x1, k.span, k.step, k.pad, k.ragged, !!k.boxes]);
+  const key = JSON.stringify([o.quad, o.rows, o.cols, o.fw, o.fh, o.seed, k.y0, k.y1, k.x0, k.x1, k.span, k.step, k.pad, k.ragged, !!k.boxes, k.mode ?? 'static']);
   let m = DARK_CACHE.get(k.path);
   if (!m) DARK_CACHE.set(k.path, (m = new Map()));
   let out = m.get(key);
@@ -129,10 +136,66 @@ export function wallDarkFrom(o: WallSpec, k: KeepDark): Float64Array | null {
       }
     }
   }
+  // static membership: a cell that is EVER under a box is dark for the whole shot (no switch-off crossing the box edge)
+  if ((k.mode ?? 'static') === 'static') for (let i = 0; i < out.length; i++) if (out[i] !== Infinity) out[i] = -Infinity;
   if (m.size > 8) m.clear();
   m.set(key, out);
   return out;
 }
+
+/** Per-cell LOD jitter (0..1) of a WallOfWindows cell: pass it to the close-up drawn over that cell (`lodJitter`). */
+export const wallCellJitter = (o: WallSpec, row: number, col: number) => rand(o.seed ?? 'wall', `lod${row * o.cols + col}`);
+
+/** The colours of a window's room-level shapes (shared by the grid and WindowCloseup): floor band, curtain, transom. */
+export function roomColors(on: boolean, litC: string, darkC: string, p: TodPalette): {floor: string; curtain: string; transom: string} {
+  if (on) return {floor: ROOM_DARKER[litC] ?? darker(litC), curtain: palette.sand, transom: palette.cream};
+  const td = ambient(palette.tealDark, p);
+  const cur = darkC === td || darkC === palette.tealDark ? palette.teal : td;
+  return {floor: darker(darkC), curtain: cur, transom: cur};
+}
+const ROOM_DARKER: Record<string, string> = {[palette.peach]: palette.tan, [palette.cream]: palette.sand, [palette.white]: palette.mintPale};
+
+/** Everything a WindowCloseup drawn over grid cell (row, col) needs to match the grid exactly (state, colours, room
+ *  seed, LOD jitter and its glass width on screen through `m`, the layer -> screen matrix). Spread it into the close-up;
+ *  pass `screenW: 0` under caption words (flat glass). */
+export function wallCloseupProps(o: WallSpec, row: number, col: number, t: number, m: Mat, look: {lit: string[]; dark: string}, extra: {darkFrom?: Float64Array | null; override?: (row: number, col: number, t: number, on: boolean) => boolean} = {}) {
+  const st = wallCellState(o, row, col, t, extra);
+  const q = windowQuad(o.quad, o.rows, o.cols, row, col, o.fw ?? WALL_FW, o.fh ?? WALL_FH);
+  const a = toScreen(m, q[0]);
+  const b = toScreen(m, q[1]);
+  const litColor = look.lit[Math.min(look.lit.length - 1, Math.floor(st.k3 * look.lit.length))];
+  return {on: st.on, lit: st.on, litColor, darkColor: look.dark, seed: `${o.seed ?? 'wall'}/${row},${col}`, lodJitter: wallCellJitter(o, row, col), screenW: Math.hypot(b[0] - a[0], b[1] - a[1]), quad: q};
+}
+
+/** Trim a path of `M x yQ cx cy x y` pen strokes (sketch line() output) to its first fraction g of length. */
+function trimStrokes(d: string, g: number): string {
+  if (g >= 1) return d;
+  if (g <= 0) return '';
+  const segs = d.split('M').filter(Boolean).map((p) => p.match(/-?[\d.]+(?:e-?\d+)?/g)!.map(Number));
+  const lens = segs.map((n) => Math.hypot(n[2] - n[0], n[3] - n[1]) + Math.hypot(n[4] - n[2], n[5] - n[3]));
+  let left = g * lens.reduce((a, b) => a + b, 0);
+  let out = '';
+  for (let i = 0; i < segs.length; i++) {
+    const [x0, y0, cx, cy, x1, y1] = segs[i];
+    if (left >= lens[i]) {
+      out += `M${x0} ${y0}Q${cx} ${cy} ${x1} ${y1}`;
+      left -= lens[i];
+      continue;
+    }
+    const u = Math.max(0, left / (lens[i] || 1));
+    if (u > 0.01) {
+      // de Casteljau: the first part [0, u] of the quadratic
+      const ax = x0 + (cx - x0) * u;
+      const ay = y0 + (cy - y0) * u;
+      const bx = cx + (x1 - cx) * u;
+      const by = cy + (y1 - cy) * u;
+      out += `M${x0} ${y0}Q${r2(ax)} ${r2(ay)} ${r2(ax + (bx - ax) * u)} ${r2(ay + (by - ay) * u)}`;
+    }
+    break;
+  }
+  return out;
+}
+const r2 = (n: number) => Math.round(n * 100) / 100;
 
 export type CellState = {on: boolean; since: number; k2: number; k3: number};
 
@@ -237,7 +300,7 @@ export const WallOfWindows: React.FC<WallOfWindowsProps> = ({quad, rows, cols, t
   const geo = useMemo(() => {
     const m = quadMap(quad);
     const ink = new PathBuf(precision);
-    const bands = new PathBuf(precision);
+    const bands: {d: string; o: number}[] = [];
     const shade = new PathBuf(precision);
     const far = new PathBuf(precision);
     // far half of the wall, one haze step lighter (stepped atmospheric perspective)
@@ -250,7 +313,8 @@ export const WallOfWindows: React.FC<WallOfWindowsProps> = ({quad, rows, cols, t
         const v = r / rows;
         const a: Pt = m(0, v);
         const b: Pt = m(uEnd, v);
-        bands.raw(line(a[0], a[1], b[0], b[1], {seed: `${seed}/b${r}`, over: [10, 0], breaks: true}));
+        // each band is drawn on from its NEAR end (pen order: a random stagger per band) when the zoom falls past bandsBelow
+        bands.push({d: new PathBuf(precision).raw(line(a[0], a[1], b[0], b[1], {seed: `${seed}/b${r}`, over: [10, 0], breaks: true})).d, o: rand(seed, `bo${r}`)});
       }
     }
     if (pierEvery > 0) {
@@ -264,7 +328,7 @@ export const WallOfWindows: React.FC<WallOfWindowsProps> = ({quad, rows, cols, t
         shade.quad(m(u, 0), m(u2, 0), m(u2, 1), m(u, 1));
       }
     }
-    return {ink: ink.d, bands: bands.d, shade: shade.d, far: far.d, outline: new PathBuf(precision).quad(...quad).d};
+    return {ink: ink.d, bands, shade: shade.d, far: far.d, outline: new PathBuf(precision).quad(...quad).d};
   }, [JSON.stringify(quad), rows, cols, bandEvery, pierEvery, seed, precision]);
   const zoom = xfScale(S.m);
   const skipLod = lodSet && zoom > lod!.above ? (i: number) => lodSet[i] === 0 : undefined;

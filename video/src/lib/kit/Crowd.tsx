@@ -70,6 +70,11 @@ export type CrowdProps = {
   /** build 'rise': the FRONT row's entry is hidden by a foreground element, so it may rise too (default: the front
    *  row pops unless its feet are at the frame bottom). */
   occluded?: boolean;
+  /** FREEZE the crowd for a shot in which `far` / `near` animate (a crowd walking toward us, rows spreading): who stands
+   *  where, how many per row, and every level-of-detail decision come from these rows; each person is carried onto the
+   *  current far / near rows by its row and its position along the row. Without it, animated rows re-lay out (a row
+   *  gains a person and everybody shifts in one frame). Moving the camera instead (World push, ShotCam) needs nothing. */
+  layout?: {far: CrowdRow; near: CrowdRow};
 };
 
 /** On-screen ink weight for a figure drawn at scale s (style bible 3/6): 4.8 front, 3.4 mid, 2.2 far, 0 = fill-only.
@@ -111,6 +116,7 @@ export const Crowd: React.FC<CrowdProps> = ({
   heroFrom = 0.7,
   eye,
   occluded = false,
+  layout,
 }) => {
   // rise builds fill FRONT -> back by default: each row rises behind the row already standing in front of it
   const order = orderIn ?? (build === 'rise' ? 'front' : 'random');
@@ -120,10 +126,17 @@ export const Crowd: React.FC<CrowdProps> = ({
   // eye mode: rows' y are feet lines; derive (hip y, s) from the camera
   const cam = eye ? eyeLevel({horizon: eye.horizon, ratio: eye.ratio}) : null;
   const rowOf = (r: CrowdRow): Required<CrowdRow> => (cam ? {x0: r.x0, x1: r.x1, s: cam.s(r.y), y: cam.hip(r.y)} : {...r, s: r.s ?? 1});
-  const farR = rowOf(farIn);
-  const nearR = rowOf(nearIn);
-  const far = farR;
-  const near = nearR;
+  const farC = rowOf(farIn);
+  const nearC = rowOf(nearIn);
+  // the rows the slots are laid out on (the current ones, or the frozen `layout`)
+  const far = layout ? rowOf(layout.far) : farC;
+  const near = layout ? rowOf(layout.near) : nearC;
+  /** Row r's hip y, scale and extent between rows F (far) and N (near). */
+  const rowGeo = (F: Required<CrowdRow>, N: Required<CrowdRow>, r: number) => {
+    const sr = F.s * Math.pow(N.s / F.s, rows === 1 ? 1 : r / (rows - 1));
+    const k = (sr - F.s) / (N.s - F.s || 1);
+    return {s: sr, y: F.y + (N.y - F.y) * k, x0: F.x0 + (N.x0 - F.x0) * k, x1: F.x1 + (N.x1 - F.x1) * k};
+  };
   const legRowsN = legRows ?? (eye ? rows : 2);
   const slots = useMemo(() => {
     const out: Slot[] = [];
@@ -183,7 +196,7 @@ export const Crowd: React.FC<CrowdProps> = ({
     const rowStart = new Map<number, number>();
     for (const sl of slots) rowStart.set(sl.row, Math.min(rowStart.get(sl.row) ?? Infinity, sl.rank * span));
     const frontRow = Math.max(...slots.map((sl) => sl.row));
-    const frontFeet = near.y + (eye ? PERSON_LEG_H * near.s : 0);
+    const frontFeet = nearC.y + (eye ? PERSON_LEG_H * nearC.s : 0);
     for (const sl of slots) {
       const mine = sl.rank * span;
       if (sl.row === frontRow) ok.set(sl.key, occluded || frontFeet >= world.h - 8);
@@ -196,27 +209,38 @@ export const Crowd: React.FC<CrowdProps> = ({
       }
     }
     return ok;
-  }, [slots, build, at, span, occluded, near.y, near.s, eye]);
+  }, [slots, build, at, span, occluded, nearC.y, nearC.s, eye]);
 
   return (
     <>
       {slots.map((sl) => {
         if (sl.rank > limit + 1e-9) return null;
+        // a frozen layout: carry the slot onto the current rows (same row, same place along it, scaled with the row)
+        let {x, y, s: sc} = sl;
+        if (layout) {
+          const L = rowGeo(far, near, sl.row);
+          const C = rowGeo(farC, nearC, sl.row);
+          const k = C.s / L.s;
+          x = C.x0 + ((sl.x - L.x0) / (L.x1 - L.x0 || 1)) * (C.x1 - C.x0);
+          y = C.y + (sl.y - L.y) * k;
+          sc = sl.s * k;
+        }
         const lod = crowdLod(sl.s, rand(sl.key, 'lod'));
-        const w = ink === 'depth' ? crowdInk(sl.s) : ink;
+        const w = ink === 'depth' ? crowdInk(sc) : ink;
         return (
           <Person
             key={sl.key}
             seed={sl.key}
-            x={sl.x}
-            y={sl.y}
-            s={sl.s}
+            x={x}
+            y={y}
+            s={sc}
+            lodScale={layout ? sl.s : undefined}
             lod={lod}
             legs={sl.legs}
             style={style}
             build={build === 'rise' && !riseOk.get(sl.key) ? 'pop' : build}
             at={at === undefined ? undefined : at + sl.rank * span}
-            idle={idle * sl.s}
+            idle={idle * sc}
             acc={sl.sign ? ['sign'] : undefined}
             ink={w}
             heroFrom={heroFrom}
