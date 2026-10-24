@@ -36,6 +36,8 @@ export type EdgeTreatmentProps = {
   /** 'actors' (default): raw-SVG pieces that ignore <Look> keep their colour in the margin (they break the edge like
    *  reference 1's sun and cat). 'strict': every fill in the margin is paper (pure line art). */
   margin?: 'actors' | 'strict';
+  /** Extra flat sky values to paint paper in the margin (a scene whose sky is not a theme / TOD token). */
+  skyFills?: string[];
   /** Draw the colour contour as a magenta hairline (tuning). */
   debug?: boolean;
   children?: React.ReactNode;
@@ -49,11 +51,12 @@ export const SKY_FILLS: string[] = Array.from(
   new Set([...Object.values(skies), ...Object.values(todSky), palette.sky, palette.bg, ...TODS.flatMap((n) => TOD[n].skyBands)].map((c) => c.toUpperCase())),
 );
 
-function inkCss(cls: string, paper: string, strict: boolean): string {
+function inkCss(cls: string, paper: string, strict: boolean, extra: string[] = []): string {
   const sel = (s: string) => `.${cls} ${s}`;
+  const skies = [...SKY_FILLS, ...extra.map((c) => c.toUpperCase())];
   const rules = [
     // the sky slab(s) -> paper (they are <Look>-exempt by design)
-    `${SKY_FILLS.map((c) => sel(`[fill="${c}" i]`)).join(',')}{fill:${paper} !important}`,
+    `${skies.map((c) => sel(`[fill="${c}" i]`)).join(',')}{fill:${paper} !important}`,
     // background colours of scene roots (CineFrame bg etc.)
     `${sel('div')}{background:transparent !important}`,
   ];
@@ -62,11 +65,11 @@ function inkCss(cls: string, paper: string, strict: boolean): string {
   return rules.join('\n');
 }
 
-export const EdgeTreatment: React.FC<EdgeTreatmentProps> = ({variant = 'clean', seed = 'edge', amount = 1, vp, paper = palette.white, margin = 'actors', debug, children}) => {
+export const EdgeTreatment: React.FC<EdgeTreatmentProps> = ({variant = 'clean', seed = 'edge', amount = 1, vp, paper = palette.white, margin = 'actors', skyFills, debug, children}) => {
   const uid = 'edge' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const opts: EdgeOpts = useMemo(() => ({vp}), [vp?.[0], vp?.[1]]);
   const spec = edgeSpec(variant, seed, amount, opts);
-  const css = useMemo(() => inkCss(uid, paper, margin === 'strict'), [uid, paper, margin]);
+  const css = useMemo(() => inkCss(uid, paper, margin === 'strict', skyFills), [uid, paper, margin, skyFills?.join(',')]);
   if (!spec.colour && !spec.strokes.length && !debug) return <>{children}</>;
   return (
     <div style={FULL}>

@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
-"""Edge stability check for an EdgeLab clip: is the colour contour fixed on screen in every frame?
+"""Edge stability check: does the colour contour of an EdgeLab clip stay fixed on screen in every frame?
 
-  edgecheck.py clip.mp4 [--side left|right|top|bottom ...]
+  edgecheck.py variant.mp4 clean.mp4 [--side left right top bottom]
 
-For every frame and every scanline (left/right sides: rows; top/bottom: columns) it finds where the paper margin ends
-(the first two pixels in a row from the frame edge that carry fill colour: chroma > 24, not dark), within the outer 15 % of the frame.
-A fixed edge gives the same position in every frame; ink lines crossing the margin only move single scanlines.
-Prints, per side: the median edge position, the share of (frame, scanline) samples on that scanline's usual position
-(+-3 px; the rest is scene content crossing the margin), and the largest drift of the per-frame mean edge (a fixed edge
-stays at ~0 px; an edge that moved with the camera would drift by many px).
+Both clips render the same shot with the same camera; `clean` has no treatment. Inside the colour contour the two are
+identical (same scene), in the paper margin they differ (paper + line art vs the coloured scene). For every frame and
+scanline (left / right: rows, top / bottom: columns) the contour is where the LAST pixel that differs from the clean
+clip lies (searched in the outer 15 % of the frame; ink lines and white objects are identical in both, so they never
+fake an edge further in). Prints per side: the median contour position, the share of samples within +-2 px of their
+scanline's median, and the largest drift of the per-frame mean contour (a fixed edge: ~0 px; an edge riding the camera
+would drift by the camera's motion, tens of px).
 """
 import argparse
 import subprocess
 
+import warnings
+
 import numpy as np
+
+warnings.filterwarnings("ignore")
 
 
 def frames(path):
@@ -28,46 +33,50 @@ def frames(path):
         yield np.frombuffer(b, np.uint8).reshape(h, w, 3)
 
 
-def edge_pos(img, side):
-    a = img.astype(np.int16)
+def orient(a, side):
     if side == 'right':
-        a = a[:, ::-1]
-    elif side == 'top':
-        a = a.transpose(1, 0, 2)
-    elif side == 'bottom':
-        a = a.transpose(1, 0, 2)[:, ::-1]
+        return a[:, ::-1]
+    if side == 'top':
+        return a.transpose(1, 0, 2)
+    if side == 'bottom':
+        return a.transpose(1, 0, 2)[:, ::-1]
+    return a
+
+
+def contour(v, c, side):
+    a = orient(v, side).astype(np.int16)
+    b = orient(c, side).astype(np.int16)
     lim = int(a.shape[1] * 0.15)
-    a = a[:, :lim]
-    # a flat FILL colour: chroma > 24 and not dark (paper white, ink and the grey anti-aliased ink-over-paper blends
-    # are excluded), two pixels in a row
-    chroma = a.max(axis=2) - a.min(axis=2)
-    c1 = (chroma > 24) & (a.max(axis=2) > 110)
-    colour = c1 & np.roll(c1, -1, axis=1)
-    pos = np.where(colour.any(axis=1), colour.argmax(axis=1), -1)
-    return pos
+    diff = np.abs(a[:, :lim] - b[:, :lim]).max(axis=2) > 40
+    # last differing pixel (+1) per scanline; -1 if none
+    return np.where(diff.any(axis=1), lim - np.argmax(diff[:, ::-1], axis=1), -1)
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('clip')
+    ap.add_argument('clean')
     ap.add_argument('--side', nargs='*', default=['left', 'right', 'top', 'bottom'])
     a = ap.parse_args()
     data = {s: [] for s in a.side}
-    for f in frames(a.clip):
+    for v, c in zip(frames(a.clip), frames(a.clean)):
         for s in a.side:
-            data[s].append(edge_pos(f, s))
+            data[s].append(contour(v, c, s))
     for s in a.side:
-        P = np.array(data[s]).astype(float)  # frames x scanlines
+        P = np.array(data[s]).astype(float)
         P[P < 0] = np.nan
         with np.errstate(all='ignore'):
-            med = np.nanmedian(P, axis=0)  # each scanline's usual edge position
-            near = np.abs(P - med[None, :]) <= 3  # content crossing the margin (lines, bulbs) moves single scanlines
-            stable = np.nanmean(near, axis=0)
+            valid = ~np.isnan(P)
+            if valid.mean() < 0.2:
+                print(f'{s:6s}: no margin (full-bleed colour on this side)')
+                continue
+            med = np.nanmedian(P, axis=0)
+            near = np.abs(P - med[None, :]) <= 2
             Q = np.where(near, P, np.nan)
-            fm = np.nanmean(Q, axis=1)  # per-frame mean edge over the scanlines that sit on the edge
+            fm = np.nanmean(Q, axis=1)
             drift = np.nanmax(np.abs(fm - np.nanmean(fm)))
-        print(f'{s:6s}: edge at {np.nanmedian(med):5.1f} px | scanlines on their usual edge position: {np.nanmean(stable) * 100:5.1f}% of samples | '
-              f'per-frame mean edge drift: {drift:.2f} px (fixed edge ~0; a moving one >> 1)')
+            share = near[valid].mean() * 100
+            print(f'{s:6s}: contour at {np.nanmedian(med):5.1f} px | samples within 2 px of their scanline median: {share:5.1f}% | per-frame mean contour drift: {drift:.2f} px')
 
 
 if __name__ == '__main__':

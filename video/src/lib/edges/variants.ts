@@ -57,18 +57,24 @@ const outward = (u: Pt): Pt => [u[1], -u[0]];
  *  re-stroke 4-7 px outside it), the other side stays open (style bible 3: overshoot + unclosed contours). */
 function panel(seed: Seed, a: number): EdgeSpec {
   const r = rng(`${seed}/panel`);
-  const ins = () => r.range(30, 45) * a;
-  const corners: Pt[] = [
-    [ins(), ins()],
-    [W - ins(), ins()],
-    [W - ins(), H - ins()],
-    [ins(), H - ins()],
-  ];
-  const pts = cutPoly(corners, r.fork('cut'), {
-    dev: 1.6 * a,
-    bow: 2.2 * a,
-    side: (i) => (i % 2 === 0 ? {segs: [1, 2]} : {segs: [2, 4]}),
-  });
+  const ins = Array.from({length: 8}, () => r.range(30, 45) * a); // [x, y] inset per corner
+  let corners: Pt[] = [];
+  let pts: Pt[] = [];
+  // at large amounts the side insets give way (never into the caption block: white captions on paper would vanish)
+  for (let k = 0, sx = 1; k < 12; k++, sx *= 0.9) {
+    corners = [
+      [ins[0] * sx, ins[1]],
+      [W - ins[2] * sx, ins[3]],
+      [W - ins[4] * sx, H - ins[5]],
+      [ins[6] * sx, H - ins[7]],
+    ];
+    pts = cutPoly(corners, r.fork('cut'), {
+      dev: 1.6 * a,
+      bow: 2.2 * a,
+      side: (i) => (i % 2 === 0 ? {segs: [1, 2]} : {segs: [2, 4]}),
+    });
+    if (containsRect(pts, CAPTION_SAFE)) break;
+  }
   const strokes: EdgeStroke[] = [];
   const pick = r.fork('corners').shuffle([0, 1, 2, 3]).slice(0, r.int(2, 3));
   for (const ci of pick) {
@@ -222,8 +228,8 @@ function roughTB(seed: Seed, a: number): EdgeSpec {
   const b1: Pt = [W + 60, H - r.range(56, 90) * a];
   const b0: Pt = [-60, H - r.range(56, 90) * a];
   const o = {segs: [4, 6] as [number, number], dev: 6 * a, bow: 4 * a};
+  // t0 -> (top cut) -> t1, straight down outside the frame to b1 -> (bottom cut) -> b0, closing outside the frame
   const pts: Pt[] = [t0, ...cutSide(t0, t1, r.fork('top'), o), b1, ...cutSide(b1, b0, r.fork('bot'), o)];
-  pts.pop();
   return {variant: 'rough-tb', colour: pathOf(pts), colourPts: pts, strokes: []};
 }
 

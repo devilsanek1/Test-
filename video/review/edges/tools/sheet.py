@@ -54,7 +54,7 @@ def grid(a):
         note = notes.get(r, '')
         yy = y + 52
         for ln in note.split('\n'):
-            d.text((16, yy), ln, fill=MUTED, font=font(17))
+            d.text((16, yy), ln, fill=MUTED, font=font(16))
             yy += 24
         for j, c in enumerate(cols):
             p = os.path.join(a.dir, f'{r}_{c}.png')
@@ -81,8 +81,8 @@ def corners(a):
     d = ImageDraw.Draw(S)
     for j, col in enumerate(cols):
         x = lab + gap + j * 2 * (cw + gap)
-        d.text((x, 20), f'{col}: top-left', fill=INK, font=bold(20))
-        d.text((x + cw + gap, 20), f'{col}: bottom-right', fill=INK, font=bold(20))
+        d.text((x, 20), f'{col}: top-left', fill=INK, font=bold(18))
+        d.text((x + cw + gap, 20), f'{col}: bottom-right', fill=INK, font=bold(18))
     for i, r in enumerate(rows):
         y = head + gap + i * (cw + gap)
         d.text((16, y + 8), r, fill=INK, font=bold(28))
