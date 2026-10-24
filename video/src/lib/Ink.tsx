@@ -18,7 +18,7 @@ import React, {useMemo} from 'react';
 import {getBoundingBox, getLength} from '@remotion/paths';
 import {palette, stroke} from './theme';
 import {clamp, Ease, ease as E, prog, useTime} from './time';
-import {exitInkProgress, exitLoose, useExit, useLook} from './exit';
+import {exitInkProgress, exitInkSyncProgress, exitLoose, useExit, useExitSync, useLook} from './exit';
 import {rand, Seed} from './rng';
 import {MOTION, strokeDur} from './spec';
 import {useProjected} from './persp';
@@ -157,22 +157,25 @@ export const Ink: React.FC<InkProps> = ({
 }) => {
   const t = useTime();
   const e = useExit();
+  const sync = useExitSync();
   const look = useLook();
   const d = useProjected(dIn);
   const jit = useMemo(() => rand(seed ?? dIn.slice(0, 40), 'ink'), [seed, dIn]);
   if (!look.ink) return null;
+  // un-build: retract after the fills (recipe), or WITH its group's fills inside an <ExitSync> (a figure in a crowd)
+  const retract = sync ? exitInkSyncProgress(e, sync.jitter) : exitInkProgress(e, jit);
   const w = width * (1 + (jit * 2 - 1) * vary);
   const common = {fill: 'none', stroke: color, strokeLinecap: cap, strokeLinejoin: join, opacity, style} as const;
 
   if (dash) {
     if (at !== undefined && t < at) return null;
-    if (exit && exitInkProgress(e, jit) >= 0.5) return null;
+    if (exit && retract >= 0.5) return null;
     return <path d={d} strokeDasharray={dash} strokeWidth={w} {...common} />;
   }
   if (at !== undefined && t < at) return null;
   const P = parseInk(d);
   const n = P.subs.length;
-  const r = exit ? E.inQuad(exitInkProgress(e, jit)) : 0;
+  const r = exit ? E.inQuad(retract) : 0;
   if (r >= 1 || n === 0) return null;
   const loose = exit ? exitLoose(e) : 0;
 

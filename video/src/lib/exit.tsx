@@ -11,11 +11,15 @@
 //   <NoExit> <Elephant .../> </NoExit>                    // persistent objects survive the un-build
 //   <ExitShrink x={fx} y={fy}> <Elephant .../> </ExitShrink>  // raw-SVG characters shrink to their feet (no fade)
 //   <ExitProvider value={0.5}> ... </ExitProvider>        // drive it yourself
+//   <ExitSync seed="p1"> ...one figure... </ExitSync>      // one window: its ink retracts WITH its fills (Person does it)
+// The slab: every slab fill of a World (the sky, a bleed ground, a wall >= 55% of the frame) collapses under ONE shared
+// falling edge (the World sky's), never as separate slabs with their own top edges (World provides <SlabEdge>).
 
 import React, {createContext, useContext} from 'react';
 import {clamp, ease, prog, useTime} from './time';
 import {MOTION} from './spec';
-import {mat, XG} from './xf';
+import {Mat, mat, XG} from './xf';
+import {rand, Seed} from './rng';
 
 const ExitCtx = createContext(0);
 
@@ -50,6 +54,35 @@ export const exitFillProgress = (e: number, jitter = 0, size = 0) => {
 
 /** Ink retract progress (LINEAR 0..1) for exit value e. */
 export const exitInkProgress = (e: number, jitter = 0) => (e <= 0 ? 0 : prog(e, 0.36 + jitter * 0.08, 0.26));
+
+/** Ink retract progress (LINEAR 0..1) inside an <ExitSync> group: the group's FILL window (small fills' start, the
+ *  same 0.36 duration), so the outline undraws while its own fills shrink and is gone with them. */
+export const exitInkSyncProgress = (e: number, jitter = 0) => (e <= 0 ? 0 : prog(e, 0.1 + jitter * 0.1, 0.36));
+
+// ---------------------------------------------------------------- ExitSync: one un-build window per figure
+
+type ExitSyncV = {jitter: number} | null;
+const ExitSyncCtx = createContext<ExitSyncV>(null);
+/** The enclosing <ExitSync> group ({jitter}) or null. Fill and Ink read it. */
+export const useExitSync = () => useContext(ExitSyncCtx);
+
+/** One un-build window for a group (a figure): every <Fill> inside uses the group's jitter instead of its own seeded
+ *  one, and every <Ink> retracts WITH those fills (exitInkSyncProgress) instead of after them. For things whose
+ *  outlines overlap other things (a crowd): while a front figure shrinks, the figures behind it are either still whole
+ *  (fills + outline) or already gone, never bare outlines tangled together (the "hairball"). Person wraps itself in
+ *  it (seeded per person, so a crowd still leaves staggered). `jitter` 0..1 or a `seed`. */
+export const ExitSync: React.FC<{jitter?: number; seed?: Seed; children?: React.ReactNode}> = ({jitter, seed, children}) => (
+  <ExitSyncCtx.Provider value={{jitter: jitter ?? rand(seed ?? 'exitsync', 'exitsync')}}>{children}</ExitSyncCtx.Provider>
+);
+
+// ---------------------------------------------------------------- the slab's shared edge
+
+/** The World's slab: its sky rect [x, y, w, h] in WORLD coordinates and the world -> screen matrix. Slab fills clip to
+ *  the same falling edge as the sky (top edge at y + h * k), so sky, ground and walls collapse as ONE slab. */
+export type SlabV = {rect: [number, number, number, number]; m: Mat} | null;
+const SlabCtx = createContext<SlabV>(null);
+export const useSlab = () => useContext(SlabCtx);
+export const SlabEdge = SlabCtx.Provider;
 
 /** How loose the lines are (0..1): ramps up at the start of an un-build and holds until the ink retracts. */
 export const exitLoose = (e: number) => (e <= 0 ? 0 : prog(e, 0, 0.2, ease.outCubic));
