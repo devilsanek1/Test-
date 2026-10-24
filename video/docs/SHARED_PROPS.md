@@ -6,7 +6,7 @@
 ```tsx
 import {Lock, Bit, BrowserChrome, ElephantPlaque, RollerShutter, PowerGlyph, SunPress, RailBoard, Keeper} from '../shared/props';
 import {LabelTag, RewindGlyph, CounterBoard, DiagramHand, SiteIcon, KeyCross, StickyNote, Sticker, CheckBoxTag, CheckBoxTags,
-  SupportTag} from '../shared/props';                                    // storyboard v3 pieces (section 9b)
+  SupportTag, FixSign} from '../shared/props';                           // storyboard v3 pieces (section 9b)
 ```
 
 Dev sheet: `src/dev/SharedKitSheet.tsx` (composition `SharedKitSheet`, 10 s; every cell loops on a 5 s clock, the bottom
@@ -27,6 +27,8 @@ node scripts/render-frames.mjs SharedKitSheet /tmp/o 2.5 --props='{"thumbs":fals
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 0.9,1.3,1.5,1.9 --props='{"mode":"lock"}'  # stub, stop, ghost, Bit
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 0.5 --props='{"mode":"heads"}'  # add "look":"paper" for line art
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 2.5 --props='{"mode":"v3"}'     # the storyboard-v3 pieces (section 9b)
+node scripts/render-frames.mjs SharedKitSheet /tmp/o 1.0,2.5 --props='{"mode":"v3fix"}'  # v3 review: FixSign + cart slot,
+                                                   # LockCrate lid / tags, BackSoonTag ladder, board footer, LabelTag minFont
 scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 --cols=12   # one cell, every frame
 ```
 
@@ -66,6 +68,8 @@ scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 -
 <Lock x={330} y={1130} size={42} state="fixed" at={1.2} checkAt={1.4} tagSwingAt={2} />  // THE FIX
 <Lock ... dropAt={48.6} dropDist={260} rider={<Bit .../>} />                        // falls with a clunk, Bit rides
 <LockCrate x={440} y={1440} size={80} n={3} />   <NewLockIcon size={50} grip="bottom" />
+<LockCrate x={215} y={1226} size={58} lidAt={0.96} tagsAt={1.25} ink={2.2} />       // S09: shut, lid pops, tags rise
+<LidCrate x={215} y={1226} size={58} lidAt tagsAt ink seed />                       // = the S09 shim name, same props
 <LockSpecks spots={[{x, y, size, at, fixed}]} ink={0.6} />                          // hundreds of far locks, 3 paths
 ```
 
@@ -104,6 +108,13 @@ scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 -
   check tag on a loop at the top-right corner. Its build is body -> loop -> tag at 0.07 s steps, so the S06 "shackle" beat is
   the loop: the fix reads as the same lock, repaired.
 - LOD: < 7 px a flat box, < 28 px no screw slots / hinge / shade, full above (the zoom-3.25 dive and 80 x 100 close-up).
+- `LockCrate` (anchor = bottom centre, `size` = width, height 0.62 x): sand crate, tan shade strip, slats, `n` fixed locks
+  peeking out (`checkAt` ticks their tags). v3 (S09 Part A, the S09 `LidCrate` shim promoted, same prop names): `lid`
+  (a tan lid slab; default true when `lidAt` is given) keeps it SHUT, no locks showing; `lidAt` = the lid pops open
+  (hinged at its back-left end, 0 -> -118 deg with the 7 % spring), the dark interior shows and the locks bob up into
+  the opening (0.04 s apart); `tagsAt` = `tags` (default n + 1) EMPTY cream `CheckBoxTag`s rise out of it on sticks
+  (0.04 s apart, each pops + swings). Without `lid` / `lidAt` it is the v2 open crate, unchanged. `LidCrate` = the
+  same with the shim defaults (size 70, ink 2.2, lid on): S09 only changes its import.
 - Match cuts: one design at every size (S01 16 x 20 -> S02 40 x 50; S04 34 x 42 -> S05 blueprint 60 x 75; S10 A -> B at zoom 6).
   At a cut, give both sides the same on-screen ink (`ink`), e.g. S01 at zoom 3.25 with `depth="far"` = 7.2 px on screen.
 
@@ -179,14 +190,20 @@ silhouette to your own batch. The kit `Icons.Bug` (orange, top view) is NOT Bit:
 <RollerShutter ... state="down" peephole={{x: 375, y: 935, r: 12}} />                 // a real hole: the bar shows through
 <ShutterPadlock x={375} y={1015} at={3.72} glintAt={4.28} />                          // 24 x 28, body centre
 <BackSoonTag x={405} y={1006} at={3.45} tapAt={58.2} />                               // hang point; tag 30 x 36 below
+<BackSoonTag x={566} y={1111} lettered size={104} at={3.7} liftAt={53.9} />           // v3 govB: one line, 25 px
 lightsOut(colour)  // the 1-frame step map: cream->sand, sand->tan, mintPale->sage, white->cream, peach->tan
 ```
 
 18 px tealDark box with ink; the curtain unrolls (tealDark, ink ribs every 14 px moving with the bottom edge, sand bottom
 rail with a handle). `slamAt`: 0.16 s ease-in drop + a 6 px bounce; `liftAt` rolls up (0.3 s). The padlock is visually
 distinct from the P1 door lock (a shackle loop, no cover / screws). The tag swings -16 -> 0 (0.5 s); `tapAt` swings again.
-v3 `BackSoonTag lettered`: 'back soon' in CaptionHand instead of the clock (default width 84: one line at ~22 px when it fits,
-else 'back' / 'soon' bigger; `text`, `font`, `w` = alias of `size`, `inkPx` = screen ink), `twirlAt` (spins once on its
+v3 `BackSoonTag lettered`: 'back soon' in CaptionHand instead of the clock (default width **100**: one line at ~24 px). Auto
+layout: ONE line only when its lettering is >= `minFont` (world px, default 22 = the on-screen floor at zoom 1; pass
+22 / zoom for a pulled-back shot), else 'back' / 'soon' stack on two BIGGER lines (one line is always the smaller font on
+the same width: 0.24 W vs 0.34 W). At zoom 1 that means: width < ~92 -> two lines (60: 20, 74: 25, 84: 29 px), >= 92 ->
+one line (92: 22, 100: 24, 104: 25 px); the layout never depends on the camera, so it cannot flip mid-shot. `font` fixes
+the size (one line if it fits), a `text` pair forces two lines. Also `text`, `w` = alias of `size`, `inkPx` = screen ink,
+`twirlAt` (spins once on its
 string, 0.45 s), `liftAt` (S12: swings back UP 0 -> -16 deg stepped, one shrunken frame, gone), `outAt` pops it off in one
 shrunken frame (lettered / liftAt; the clock tag keeps the un-build unless `outMode="pop"`). `ShutterPadlock outMode="pop"`
 = the same 1-frame pop off (default still the un-build).
@@ -260,7 +277,7 @@ Lens wipe = motion spec T-MATCH: grow to `peak` about `focus` in 4 f, 3 f of ful
 | `Bollard` | bottom centre; 50 x 90 | cream, ink 4.8, tan band, base. `bollardTop(x, y)` = Pip's perch. |
 | `SparkleTablet` | centre; 60 x 85 | white tablet, ink four-point sparkle twinkling by size, `raiseAt`. `sparklePath()` for your own. |
 | `ScanBeam` | `from` -> `to` | flat mintPale at fixed 0.5 opacity, dashed ink edges; `at` (shoots out 0.25 s), `sweep`, `convergeAt`. |
-| `MakersCart` | ground under the centre; `size` 160 | ochre handcart, crates of fixed locks; `roll={{at, to, dur}}` (wheel turns with the distance), `dropCrateAt[]` (last crate first; lands with a tick and STAYS in world coords), `skipAt`, `pusher`, `flip`. |
+| `MakersCart` | ground under the centre; `size` 160 | ochre handcart, crates of fixed locks; `roll={{at, to, dur}}` (wheel turns with the distance), `dropCrateAt[]` (last crate first; lands with a tick and STAYS in world coords), `skipAt`, `pusher`, `flip`. v3 **`sign`** (a node: J5, `<FixSign x={0} y={0} .../>`): an ink post stands in the bed's front end and the node hangs from its top, (0, 0) = that hook, in WORLD px (not scaled or mirrored with the cart, so a flipped cart keeps its lettering); it rides the roll and the skips and jolts when the roll starts / a skip lands. `signPost` = post height above the bed top (world, default 0.55 x size; 0 / false = none), `signX` = post position on the bed (cart-local -70..70, default 46 = the front end). `cartSignHook({x, y, size, flip, signPost, signX})` = the rest hook in world coords. |
 | `Tram` | centre x, top y; 1500 x 600 | teal, mintPale windows, peach lamps, ink 4.8; `cross={{at, dur: 0.4, from: -1100, to: 1100}}`; `tramRoof(y)` = perch. |
 | `CheckMark`, `MarkRing` (`pingAt`), `Cobweb` (`corner`), `Magnifier`, `WrenchGlyph`, `WrenchTag` (sage + cream wrench), `CheckFlag` (`raiseAt`), `QuestionMark`, `AlertMark`, `Swing`, `PopAt` | centre (flag: pole foot) | P15: the same marks in every scene. Check 0.17 s, ring 0.17 s. |
 
@@ -319,7 +336,12 @@ Sheet: `--props='{"mode":"v3"}'` (every piece below at film size, on a 5 s clock
   `labelBox(props)` returns the rest rect (for lint boxes / leaders).
 - **Text**: `text` (string, or one string per line; '\n' splits) or `lines`. `fontSize` (alias `size`) in WORLD px
   (default 36, sign 30, stamp 34): the label lives in the world, so divide the on-screen target by the camera zoom
-  (S02: `40 / 1.3`). With a box (or w / h) the font SHRINKS to fit (never grows; floor 0.5 x). `align` center | left.
+  (S02: `40 / 1.3`). With a box (or w / h) the font SHRINKS to fit (never grows) down to **`minFont`** (world px,
+  default 0.85 x fontSize); if the box cannot hold that, the PAPER GROWS past the box instead (keeping the attachment:
+  tag / card / slip grow down from the top edge, a sign grows up from its legs, stamp / notice about the centre, wider
+  about the centre x) and the browser console gets ONE `[LabelTag] ... the box fits only N world px` warning per label
+  (Studio / Chrome devtools). `labelBox(props)` returns the grown rect. `minFont={fontSize * 0.5}` = the old behaviour.
+  `align` center | left.
   Below 7 px on screen the text becomes hairline placeholders.
 - **Look**: cream paper (`paper` / `color`), ink text (`textColor`), 2.2 px outline (`ink` world px, `inkPx` SCREEN px,
   or `depth`), fill misregistered in screen space. Paper Look = white paper + ink text (labels read in line art);
@@ -338,6 +360,31 @@ Sheet: `--props='{"mode":"v3"}'` (every piece below at film size, on a 5 s clock
 - Text in a `<Plane>` is NOT projected (raw SVG text): put labels on screen-facing surfaces (cards in front of a ground
   plane), not inside a plane.
 
+### FixSign (J3 -> J4 -> J5: the one 'still fixing...' sign)
+
+```tsx
+<MakersLane workshop={{blind: 'down', blindSign: (a) => <FixSign x={a.x} y={a.y} fs={27} swingAt={[B.headsUp]} />}} />  // S06 J3
+<NoticeboardCorner workshop={{blindSign: (a) => <FixSign x={a.x} y={a.y} fs={27} swingAt={[B.fix]} />}} />              // S07 J4
+<MakersCart x={760} y={1432} size={150} pusher roll={...} signPost={132} signX={34}
+  sign={<FixSign x={0} y={0} w={224} fs={36} strikeAt={B.out} fixedAt={B.out + 0.1} />} />                              // S09 J5
+<FixSign x={x + 46} y={bedTop - 64} w={118} fs={18} strikeAt={-10} fixedAt={-10} />                                      // S10 end state
+```
+
+- ONE component for the four appearances (the S09 `CartSign` shim promoted; `CartSign` is exported as an alias, same
+  props `{x, y, w, fs, strikeAt, fixedAt, ink, seed}`, so S09 / S10 only change the import). Use it in the Workshop
+  `blindSign` slot too (S06's LabelTag card and S07's BlindSign shim) so J3 / J4 / J5 show the SAME sign: pass only `fs`
+  (27 on the blinds) and every scene gets the same proportions and line break.
+- Anchor (x, y) = the HANG point (the nail on the blind / the cart post's hook); the cream card hangs 0.5 fs below it on
+  a V string (`string={false}` = pinned flat, an ink pin at the top centre, anchor = the pin). Card = `w` (default: fits
+  the lettering + 0.5 fs margins: ~5 fs) x 2.55 fs: row 1 'still fixing...' (one line, `text` / `lines` override; an
+  array = several lines, + 1 fs height each), row 2 = the room 'fixed!' is scribbled into (`fixedText`, 1.12 fs, -4 deg).
+  `h` overrides the height (rows keep their proportions). `fixSignBox(props)` = the card rect.
+- Motion: `at` pops it in (7 % spring + a small pendulum), `swingAt` = taps (12 deg), `strikeAt` = one ink stroke across
+  each row-1 line (0.12 s draw-on, lines 0.05 s apart) + a -7 deg jolt, `fixedAt` = 'fixed!' scribbled in with an L -> R
+  wipe (0.16 s, out-cubic), `outAt` = one shrunken frame. Strike / fixed times in the past = the end state (S10).
+- Look: cream card (`paper`), 2.2 px outline (`ink` world / `inkPx` screen), the fill misregistered in screen space, ink
+  lettering (hairlines under 7 px on screen); paper Look = white card. Keep the lettering >= 24 px on screen (fs x zoom).
+
 ### CounterBoard (S08: the one count device)
 
 ```tsx
@@ -352,8 +399,11 @@ Teal 8 px frame, cream face, two tealDark posts (`post` 80 px below the board, b
 cream glass dome top-left (`emblem={false}` off). Zones follow the storyboard layout scaled to the box
 (`counterBoardZones(box)`: emblem, header, flag, note, gates, the two stamp slots, footer, and `top` = Bit's perch at the
 top edge's right end). Painted text pops in place (7 % spring): header (`headerAt`, default with the board; 33 world px =
-38 on screen at the 1.15 push), note (`noteAt` = flagAt + 0.08; 26), footer (`footerAt`; 24 max, shrinks to its 47 px
-zone: ~21 world / 24 on screen). The start flag (sage pennant on a short pole) pops at `flagAt`. `gatesAt[i]` = tally
+38 on screen at the 1.15 push), note (`noteAt` = flagAt + 0.08; 26), footer (`footerAt`; default **28**: its zone is now
+58 board px tall (x the box's y scale; was 47), so two lines hold >= 28 px from zoom 1.0 (S08's 460 x 390 box: up to
+~31 world); the room came from the note / gates band, 3 note lines still fit at 27). `footerH` (world px) sets the
+footer height (the stamps and the band move with it): pass the same value to `counterBoardZones(box, {footerH})`. S08:
+`footerSize={26}` caps it at 26 world: drop it (default 28) or pass >= 28. The start flag (sage pennant on a short pole) pops at `flagAt`. `gatesAt[i]` = tally
 gate i strokes on (4 hand-drawn bars + the strike, 0.12 s) in rows of `gateCols` (3); never digits. `stamps[i]` = a
 LabelTag stamp in slot i (29 world px, `fontSize` / `rot` per stamp). `riseAt`: rises board height + posts from below its
 base (0.33 s out(expo)), clipped at the posts' foot so it never shows under its base. `outAt`: un-build.
@@ -429,8 +479,9 @@ So a typical prop costs well under 1 ms. Hundreds of far things go through the b
 
 - v3: labels are raw SVG text, so they are not projected by a `<Plane>` (place them on a screen-facing card) and they
   leave with `ExitFade` (shrink) in an un-build. LabelTag sizes are world px (divide by the zoom for an on-screen size).
-- v3: the CounterBoard footer (L9b, 2 lines in a 47 px zone) fits at ~21 world px = ~24 px on screen at the 1.15 push, a
-  little under the labelStyle's 28 px fine print; give the board a taller box (or one more line of height) if it must be 28.
+- v3 review: the CounterBoard footer zone is 58 board px (two lines at >= 28 px from zoom 1); S08 still passes
+  `footerSize={26}` (drop it or pass 28). LabelTag boxes that are too small now GROW the paper (minFont 0.85 x
+  fontSize) instead of shrinking the text to 0.5 x: check the console for `[LabelTag]` warnings and enlarge those boxes.
 
 - Raw-SVG parts (ring bands, clock hands, ripples, the seal's trail, attempters) leave with `ExitFade` (shrink / 1-frame pop)
   instead of retracting stroke by stroke.
