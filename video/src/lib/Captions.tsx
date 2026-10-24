@@ -1,170 +1,159 @@
-// Captions.tsx — word-group captions in the caption zone, reference grammar:
-//  - 1–2 centred lines in the hand font, dark-brown ink
-//  - a line rolls up into place (clipped) when its first word is spoken
-//  - the whole caption rolls up/out while the next one rolls in from below
-//  - keyword highlight box (theme.highlight) wipes in left->right behind the keyword when it is spoken
+// Captions.tsx — word-group captions, reference grammar (style bible 10 + motion measurements):
+//  - Patrick Hand ('CaptionHand') 82 px, ink, centred on the card; baselines card-local 1208 / 1304
+//    (a 1-line caption sits centred on 1265; style 'punch' = x1.16 there; style 'hook' = x1.06)
+//  - a later line rises from +88 px into place when its first word is spoken (0.4 s, fast ease-out)
+//  - on a new caption the old block exits upward (~250 px in 0.2 s) while the new block rises from +112 px
+//  - everything is clipped to the caption viewport type.clip (y 1070..1400)
+//  - keyword highlight box (theme.highlight / highlightBox em geometry) wipes in left->right behind the
+//    keyword at its time; trailing punctuation stays outside the box; multi-word phrases get one box
 // Times are VO / timeline seconds (useGlobalTime), so captions stay synced inside any scene.
 //
-//   <Captions beats={captions} />                                  // inside <Card>, above <Art>
-//   type CaptionBeat = {s, e?, lines: {text, s}[], highlights?: {text, s}[]}
+//   <Captions beats={captions} />                       // inside <Card>, after <Art>
+//   type CaptionBeat = {s, e?, lines: {text, s}[], highlights?: {text, s}[], style?: 'punch' | 'hook'}
 
-import React from 'react';
-import {captionZone, palette, timing, type as typeTok} from './theme';
+import React, {useId} from 'react';
+import {card, highlightBox, palette, type as typeTok} from './theme';
 import {ease as E, prog, useGlobalTime} from './time';
 import {captionFontStack, measureCaption, useCaptionFont} from './font';
 
 export type CaptionLine = {text: string; s: number};
 export type CaptionHighlight = {text: string; s: number};
-export type CaptionBeat = {s: number; e?: number; lines: CaptionLine[]; highlights?: CaptionHighlight[]};
+export type CaptionBeat = {s: number; e?: number; lines: CaptionLine[]; highlights?: CaptionHighlight[]; style?: 'normal' | 'punch' | 'hook'};
 
 export type CaptionsProps = {
   beats: CaptionBeat[];
   /** Only beats starting in [from, to) (seconds). Used per card so a flipping card keeps its own caption. */
   range?: [number, number];
-  /** First beat of the range appears without rolling if it starts within 0.35 s of range[0]. */
-  instantFirst?: boolean;
-  /** Font size (px). Auto-shrinks per beat to fit the zone width. */
+  /** Also show the beat that was active at range[0] (a new card shows the current caption). Default true. */
+  carry?: boolean;
+  /** Beats / lines / highlights starting before range[0] + this are shown settled (no roll). Default 0.35 s. */
+  instantWithin?: number;
+  /** Base font size (px). Default type.size (82). Auto-shrinks to type.maxLineWidth. */
   size?: number;
-  zone?: {x: number; y: number; w: number; h: number};
   color?: string;
   highlightColor?: string;
 };
 
-type Seg = {text: string; hl?: CaptionHighlight};
+// measured curves (docs/motion_evidence/measurements.json)
+const PAGE_RISE = 112; // new block starts this far below its rest position
+const LINE_RISE = 88; // a later line starts this far below
+const RISE_DUR = 0.4;
+const OUT_DIST = 250; // old block travel upward
+const OUT_DUR = 0.2;
+const riseEase = E.expOut(4.5);
+const hlEase = E.expOut(4);
 
-function segment(line: string, hls: CaptionHighlight[], used: Set<CaptionHighlight>): Seg[] {
-  let segs: Seg[] = [{text: line}];
-  for (const h of hls) {
-    if (used.has(h) || !h.text) continue;
-    const next: Seg[] = [];
-    let done = false;
-    for (const sg of segs) {
-      if (done || sg.hl) {
-        next.push(sg);
-        continue;
-      }
-      let idx = sg.text.indexOf(h.text);
-      if (idx < 0) idx = sg.text.toLowerCase().indexOf(h.text.toLowerCase());
-      if (idx < 0) {
-        next.push(sg);
-        continue;
-      }
-      if (idx > 0) next.push({text: sg.text.slice(0, idx)});
-      next.push({text: sg.text.slice(idx, idx + h.text.length), hl: h});
-      if (idx + h.text.length < sg.text.length) next.push({text: sg.text.slice(idx + h.text.length)});
-      done = true;
+const TRAILING = /[\s.,!?;:…"')\]]+$/;
+
+type Box = {x: number; y: number; w: number; h: number; r: number; s: number};
+type LineLayout = {text: string; s: number; baseline: number; boxes: Box[]};
+
+function layoutBeat(b: CaptionBeat, baseSize: number): {size: number; lines: LineLayout[]} {
+  const n = b.lines.length;
+  const style = b.style ?? 'normal';
+  let size = baseSize * (style === 'punch' ? typeTok.punchScale : style === 'hook' ? typeTok.hookScale : 1);
+  const widest = Math.max(1, ...b.lines.map((l) => measureCaption(l.text, size)));
+  if (widest > typeTok.maxLineWidth) size = Math.floor((size * typeTok.maxLineWidth) / widest);
+  const {line1, line2, punch} = typeTok.baselines;
+  const gap = (line2 - line1) * (style === 'hook' ? typeTok.hookScale : 1);
+  let baselines: number[];
+  if (n === 1) baselines = [punch];
+  else if (n === 2) baselines = style === 'hook' ? [(line1 + line2) / 2 - gap / 2, (line1 + line2) / 2 + gap / 2] : [line1, line2];
+  else baselines = b.lines.map((_, i) => line1 - ((n - 2) * gap) / 2 + i * gap);
+  const used = new Set<CaptionHighlight>();
+  const cx = card.w / 2;
+  const lines: LineLayout[] = b.lines.map((ln, i) => {
+    const boxes: Box[] = [];
+    const lw = measureCaption(ln.text, size);
+    for (const h of b.highlights ?? []) {
+      if (used.has(h) || !h.text) continue;
+      const want = h.text.replace(TRAILING, '');
+      let idx = ln.text.indexOf(want);
+      if (idx < 0) idx = ln.text.toLowerCase().indexOf(want.toLowerCase());
+      if (idx < 0 || !want) continue;
       used.add(h);
+      const x0 = cx - lw / 2 + measureCaption(ln.text.slice(0, idx), size);
+      const x1 = x0 + measureCaption(ln.text.slice(idx, idx + want.length), size);
+      boxes.push({
+        x: x0 - highlightBox.padLeftEm * size,
+        y: baselines[i] - highlightBox.topEm * size,
+        w: x1 - x0 + (highlightBox.padLeftEm + highlightBox.padRightEm) * size,
+        h: (highlightBox.topEm + highlightBox.bottomEm) * size,
+        r: highlightBox.radiusEm * size,
+        s: h.s,
+      });
     }
-    segs = next;
-  }
-  return segs;
+    return {text: ln.text, s: ln.s, baseline: baselines[i], boxes};
+  });
+  return {size, lines};
 }
 
-const Block: React.FC<{
-  beat: CaptionBeat;
-  T: number;
-  dy: number;
-  size: number;
-  zone: {w: number; h: number};
-  rollFirstLine: boolean;
-  color: string;
-  hlColor: string;
-}> = ({beat, T, dy, size, zone, rollFirstLine, color, hlColor}) => {
-  const lineH = Math.round(size * typeTok.lineHeight);
-  const n = beat.lines.length;
-  const top = (zone.h - n * lineH) / 2;
-  const used = new Set<CaptionHighlight>();
-  const hls = beat.highlights ?? [];
+const Block: React.FC<{beat: CaptionBeat; T: number; dy: number; baseSize: number; instantUntil: number; color: string; hlColor: string}> = ({beat, T, dy, baseSize, instantUntil, color, hlColor}) => {
+  const {size, lines} = layoutBeat(beat, baseSize);
   return (
-    <div style={{position: 'absolute', left: 0, top: 0, width: zone.w, height: zone.h, fontSize: size, transform: dy ? `translateY(${dy.toFixed(2)}px)` : undefined}}>
-      {beat.lines.map((ln, i) => {
-        const rolls = i > 0 ? ln.s > beat.s + 0.04 : rollFirstLine;
-        const p = rolls ? prog(T, ln.s, timing.captionLine, E.outCubic) : 1;
-        if (p <= 0) return null;
-        const segs = segment(ln.text, hls, used);
+    <g transform={dy ? `translate(0 ${dy.toFixed(2)})` : undefined}>
+      {lines.map((ln, i) => {
+        const rolls = i > 0 && ln.s > beat.s + 0.04 && ln.s > instantUntil;
+        if (rolls && T < ln.s) return null;
+        const ldy = rolls ? LINE_RISE * (1 - riseEase(prog(T, ln.s, RISE_DUR))) : 0;
         return (
-          <div
-            key={i}
-            style={{position: 'absolute', left: -40, width: zone.w + 80, top: top + i * lineH - size * 0.1, height: lineH + size * 0.2, overflow: 'hidden'}}
-          >
-            <div
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                top: size * 0.1,
-                height: lineH,
-                lineHeight: `${lineH}px`,
-                textAlign: 'center',
-                whiteSpace: 'nowrap',
-                transform: p < 1 ? `translateY(${((1 - p) * (lineH + size * 0.2)).toFixed(2)}px)` : undefined,
-              }}
+          <g key={i} transform={ldy > 0.01 ? `translate(0 ${ldy.toFixed(2)})` : undefined}>
+            {ln.boxes.map((bx, j) => {
+              const p = bx.s <= instantUntil ? 1 : hlEase(prog(T, bx.s + 0.02, 0.2 + bx.w / 3000));
+              if (p <= 0) return null;
+              return <rect key={j} x={bx.x} y={bx.y} width={bx.w * p} height={bx.h} rx={Math.min(bx.r, (bx.w * p) / 2)} fill={hlColor} />;
+            })}
+            <text
+              x={card.w / 2}
+              y={ln.baseline}
+              textAnchor="middle"
+              fontFamily={captionFontStack}
+              fontSize={size}
+              fontWeight={typeTok.weight}
+              fill={color}
+              style={{fontKerning: 'normal', fontVariantLigatures: 'common-ligatures contextual', letterSpacing: typeTok.letterSpacing}}
             >
-              {segs.map((sg, j) => {
-                if (!sg.hl) return <span key={j}>{sg.text}</span>;
-                const hp = prog(T, sg.hl.s, timing.highlightWipe, E.inOutCubic);
-                return (
-                  <span key={j} style={{position: 'relative', display: 'inline-block', zIndex: 0}}>
-                    {hp > 0 ? (
-                      <span
-                        style={{
-                          position: 'absolute',
-                          left: -size * 0.09,
-                          top: lineH / 2 - size * 0.5,
-                          height: size * 1.06,
-                          width: `calc(${(hp * 100).toFixed(2)}% + ${(size * 0.18 * hp).toFixed(2)}px)`,
-                          background: hlColor,
-                          borderRadius: 2,
-                          zIndex: -1,
-                        }}
-                      />
-                    ) : null}
-                    {sg.text}
-                  </span>
-                );
-              })}
-            </div>
-          </div>
+              {ln.text}
+            </text>
+          </g>
         );
       })}
-    </div>
+    </g>
   );
 };
 
-export const Captions: React.FC<CaptionsProps> = ({beats, range, instantFirst = true, size = typeTok.size, zone = captionZone, color = typeTok.color, highlightColor = palette.highlight}) => {
+export const Captions: React.FC<CaptionsProps> = ({beats, range, carry = true, instantWithin = 0.35, size = typeTok.size, color = typeTok.color, highlightColor = palette.highlight}) => {
   const T = useGlobalTime();
   const fontOk = useCaptionFont();
-  const list = (range ? beats.filter((b) => b.s >= range[0] && b.s < range[1]) : beats).slice().sort((a, b) => a.s - b.s);
+  const id = 'cap' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const sorted = beats.slice().sort((a, b) => a.s - b.s);
+  let list = range ? sorted.filter((b) => b.s >= range[0] && b.s < range[1]) : sorted;
+  if (range && carry && isFinite(range[0])) {
+    const prev = sorted.filter((b) => b.s < range[0]).pop();
+    if (prev) list = [prev, ...list];
+  }
+  const instantUntil = Math.max(range && isFinite(range[0]) ? range[0] + instantWithin : -Infinity, 0.05);
   let k = -1;
   for (let i = 0; i < list.length; i++) if (list[i].s <= T) k = i;
   if (k < 0) return null;
   const cur = list[k];
   const prev = k > 0 ? list[k - 1] : null;
-  const fit = (b: CaptionBeat) => {
-    const widest = Math.max(...b.lines.map((l) => measureCaption(l.text, size)));
-    return widest > zone.w ? Math.floor((size * zone.w) / widest) : size;
-  };
-  const roll = prev ? prog(T, cur.s, timing.captionRoll, E.inOutCubic) : 1;
-  const travel = zone.h * 0.92;
-  const firstInstant = instantFirst && !prev && (!range || cur.s - range[0] < 0.35);
-  const common = {T, zone, color, hlColor: highlightColor};
+  const instant = cur.s <= instantUntil;
+  const u = prog(T, cur.s, RISE_DUR);
+  const curDy = instant ? 0 : PAGE_RISE * (1 - riseEase(u));
+  const prevDy = prev && !instant && T - cur.s < OUT_DUR ? -OUT_DIST * E.inSine(prog(T, cur.s, OUT_DUR)) : null;
+  const common = {T, baseSize: size, instantUntil, color, hlColor: highlightColor};
   return (
-    <div
-      style={{
-        position: 'absolute',
-        left: zone.x,
-        top: zone.y,
-        width: zone.w,
-        height: zone.h,
-        overflow: 'visible',
-        clipPath: 'inset(0px -60px 0px -60px)',
-        fontFamily: captionFontStack,
-        color,
-        visibility: fontOk ? undefined : 'hidden',
-      }}
-    >
-      {prev && roll < 1 ? <Block beat={prev} dy={-roll * travel} size={fit(prev)} rollFirstLine={false} {...common} key={`b${k - 1}`} /> : null}
-      <Block beat={cur} dy={(1 - roll) * travel} size={fit(cur)} rollFirstLine={!prev && !firstInstant} {...common} key={`b${k}`} />
-    </div>
+    <svg width={card.w} height={card.h} viewBox={`0 0 ${card.w} ${card.h}`} style={{position: 'absolute', left: 0, top: 0, visibility: fontOk ? undefined : 'hidden'}}>
+      <defs>
+        <clipPath id={id}>
+          <rect x={0} y={typeTok.clip.top} width={card.w} height={typeTok.clip.bottom - typeTok.clip.top} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>
+        {prev && prevDy !== null ? <Block key={`b${k - 1}`} beat={prev} dy={prevDy} {...common} /> : null}
+        <Block key={`b${k}`} beat={cur} dy={curDy} {...common} />
+      </g>
+    </svg>
   );
 };

@@ -5,6 +5,36 @@ A 70.7-second vertical video (TikTok / Instagram Reels / YouTube Shorts) built o
 in the visual style, animation language and motion design of the supplied reference video.
 Quality bar: top-tier editorial motion design that people rewatch and share. Every frame should be worth pausing on.
 
+## CINEMATIC DIRECTION (from the user; overrides the card layout and anything below that conflicts)
+The user's note: some videos make the viewer feel big (reference 1: we look down at a little diorama on a card),
+others make the viewer feel small. We want SMALL: the sense of scale of Arcane's cinematic shots.
+References: `assets/ref2/` (same artist family as reference 1 but full-bleed and immersive: `sheet.png`, `f_*.png`,
+`frame_XXXX.jpg` at 5 fps, `reference2.mp4`) and `assets/ref_cinematic/arcane_collage.jpg` (Arcane stills).
+1. FULL-BLEED world. No polaroid card. The 1080x1920 frame is a window into the world (like reference 2). Keep the
+   reference's ink style, palette, mascot role, captions, highlight boxes and motion grammar (pops, draw-ons, no fades).
+2. Captions live in the SKY, upper third, centered on x=540 (line-1 baseline ~y 330, line-2 ~y 426, 82 px Patrick Hand,
+   max width ~860). Dark ink on light skies; white/cream text on dark dusk/night skies (reference 2 does exactly this).
+3. Make the viewer feel SMALL in every scene:
+   - Scale contrast: tiny people and a tiny mascot against something colossal (monumental buildings, an endless city to
+     the horizon, a wall of windows, a vast server hall, a sky-filling sun). One colossal element per scene, minimum.
+   - Camera at eye level or lower, looking out or up. Deep perspective with a clear vanishing point. Towers rise into the
+     sky. Back-view figures facing vast vistas (Arcane's signature shot; reference 2's crowd).
+   - Depth: 4–6 layers with atmospheric perspective (far layers flatter, closer to the sky color, thinner or no ink).
+     Foreground framing elements cropped by the frame edge (figures, wires, string lights, branches) push the world back.
+   - Light as drama, in FLAT style: a huge low sun on the horizon behind silhouetted skylines; time of day that evolves
+     (day, golden, dusk, night with lit windows); light shafts as flat translucent polygons; glows as stepped concentric
+     flat discs; silhouettes as fill-only dark shapes; rim light as one-sided lighter edge strips. No blur or gradients.
+   - Camera with weight: slow push-ins, crane/tilt-ups that reveal height, pull-backs that reveal scale (one door becomes
+     a million doors), lateral moves with multiplane parallax. Long, smooth in-out eases (2–6 s). The build animation
+     density inside the frame stays high (>= 5 events/s) so grandeur never becomes slow.
+4. Transitions suit full-bleed: continuous camera moves that carry one scene into the next, match-cuts on the sun or the
+   horizon, foreground wipes (something passes close to the lens), and the un-build to bare line art for the loop.
+   The 3D card flip is retired.
+5. Safe zones for full-bleed: platform UI covers the top ~180 px, the bottom ~400 px and a right rail (x > 950,
+   y 900–1500). Keep captions and key action inside x 90–990, y 200–1480; the bottom of the frame holds ground and
+   foreground only.
+The sun in reference 2 is about r 150 at 1080 wide and sits on the horizon, setting as the video goes on.
+
 ## Inputs (all in this repo)
 - `assets/vo.mp3`: voiceover, mono, 70.687 s (also copied to `public/vo.mp3` for Remotion)
 - `assets/vo_words_raw.json`: ASR word timestamps (Parakeet TDT). Starts are accurate (~±40 ms); ends are approximate.

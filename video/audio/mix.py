@@ -164,8 +164,6 @@ def render_sfx(cues, wrap=True):
                 i += N_TOTAL
             else:
                 x = x[-i:]; i = 0
-        for k in range(len(x)):  # write with wrap (chunked)
-            break
         end = i + len(x)
         if end <= N_TOTAL:
             bus[i:end] += x

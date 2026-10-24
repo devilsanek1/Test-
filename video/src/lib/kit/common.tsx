@@ -6,6 +6,7 @@
 
 import React from 'react';
 import {stroke} from '../theme';
+import {mat, XG} from '../xf';
 
 export type At = number | undefined;
 /** at + dt, preserving "undefined = already built". */
@@ -28,11 +29,10 @@ export const Place: React.FC<{x?: number; y?: number; s?: number; sx?: number; s
   flip = false,
   children,
 }) => {
-  const parts: string[] = [];
-  if (x || y) parts.push(`translate(${x.toFixed(2)} ${y.toFixed(2)})`);
-  if (rot) parts.push(`rotate(${rot.toFixed(2)})`);
-  if (skewX) parts.push(`skewX(${skewX.toFixed(2)})`);
-  if (skewY) parts.push(`skewY(${skewY.toFixed(2)})`);
-  if (s !== 1 || sx !== 1 || sy !== 1 || flip) parts.push(`scale(${((flip ? -s : s) * sx).toFixed(4)} ${(s * sy).toFixed(4)})`);
-  return <g transform={parts.length ? parts.join(' ') : undefined}>{children}</g>;
+  let m = mat.translate(x, y);
+  if (rot) m = mat.mul(m, mat.rotate(rot));
+  if (skewX) m = mat.mul(m, mat.skewX(skewX));
+  if (skewY) m = mat.mul(m, mat.skewY(skewY));
+  if (s !== 1 || sx !== 1 || sy !== 1 || flip) m = mat.mul(m, mat.scale((flip ? -s : s) * sx, s * sy));
+  return <XG m={m}>{children}</XG>;
 };

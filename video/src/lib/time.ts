@@ -93,6 +93,8 @@ export const ease = {
   /** Overshoots then settles. s=1.70158 is the classic; 1.2 is subtle, 2.5 is bouncy. */
   outBack: (s = 1.70158): Ease => outBackF(s),
   inBack: (s = 1.70158): Ease => inBackF(s),
+  /** Exponential ease-out normalised to reach 1 at x=1; k = sharpness (4-5 fits the reference caption roll). */
+  expOut: (k = 4.5): Ease => (x) => (x >= 1 ? 1 : (1 - Math.exp(-k * x)) / (1 - Math.exp(-k))),
   /** Hand-drawn pen stroke: quick start, gentle landing. Default for Ink. */
   pen: ((x) => 1 - Math.pow(1 - x, 2.2)) as Ease,
 };
