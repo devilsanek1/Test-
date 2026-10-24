@@ -1,0 +1,41 @@
+[
+{
+"props": {
+"variant": "clean",
+"shot": "street",
+"from": 3.2,
+"cam": true
+},
+"frames": [
+0,
+179
+],
+"out": "review/edges/final/clips/clean_street.mp4"
+},
+{
+"props": {
+"variant": "trim",
+"shot": "street",
+"from": 3.2,
+"cam": true
+},
+"frames": [
+0,
+179
+],
+"out": "review/edges/final/clips/trim_street.mp4"
+},
+{
+"props": {
+"variant": "panel",
+"shot": "street",
+"from": 3.2,
+"cam": true
+},
+"frames": [
+0,
+179
+],
+"out": "review/edges/final/clips/panel_street.mp4"
+}
+]

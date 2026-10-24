@@ -4,123 +4,183 @@ The user's note: *"I like a bit of hand-drawing messiness that the first video h
 we can experiment with a few different variations and see what looks cleaner, more polished and premium."*
 
 Reference 1's edge charm is one rule (style bible 4 + 5.4): **the fills stop dead at the panel edge, the ink keeps going**
-30-62 px into the white card, corners overshoot, some contours stay open. We stay full-bleed (reference 2 framing, the
-viewer feels small). The treatment only adds that ink-past-colour charm at the frame edge, in screen space, around any
-scene.
+into the white card, corners overshoot, some contours stay open. We stay full-bleed (reference 2 framing, the viewer feels
+small): the treatment only adds that ink-past-colour charm at the frame edge, in screen space, around any scene.
+
+**Status (round 2, final comparison):** three candidates, `clean` (control), `trim` and `panel`, refined from the judges'
+round-1 ranking (trim 26.5, panel 26.0, rough-tb 20, clean 20, construction 19.5, vignette 15.5). Review material:
+`review/edges/final/` (section 6). The film default is still `clean` (`FILM_EDGES`); the user picks.
+
+## 1. The three candidates
+
+| variant | in plain words | paper (amount 1, 1080x1920) | added ink |
+|---|---|---|---|
+| `clean` | the control: full-bleed, no treatment, one render | none | none |
+| `trim` | **the quiet one.** A hand-trimmed window: thin scissor-cut paper slivers at the sides and top; the scene's own lines cross them and run off the screen; the bottom is open, so the ground and the foreground figures run out of frame in colour | left 28-32 px (one stretch drifts out to 36-40 over 80-120 px turns), right 22-26 (clear of the rail), top 12-16 (clear of the status bar), bottom 0 | one ruled ink corner (top-left: two thin crossing lines, 2-4 px out in the paper, the horizontal ending in the white); one sharp, uneven scissor snip at the top-right (a straight 18-28 x 30-46 px chamfer, never a radius) |
+| `panel` | **the sketch runs out.** Reference 1's panel: the colour stops on a hand-cut edge, the line art keeps going into the white and visibly STOPS there (lines end 6-20 px short of the screen edge on some stretches); near the bottom the left cut snips out to the frame edge, so the bottom of the world is full-bleed | left 36-42 px (the side that carries the charm, away from the rail), right 18-22, top 14-18, bottom 0; the left cut ends at y 1490-1570 in one diagonal snip | ruled ink at both top corners, single strokes (top-left crossing pair, top-right one vertical running off the top) |
+
+Measured over 40 seeds at amount 1 (`check-shapes.ts`): trim paper left 28-41 / right 20-27 / top 11-18 px, panel left
+34-45 / right 16-25 / top 13-20 px; every side is off-axis by < 1 px; the scissor character is in the 1-3 px jogs between
+2-4 straight cuts per side, never in noise.
+
+How round 2 answers the judges (premium / immersion / charm / phone):
+
+| note | change |
+|---|---|
+| 1 px grey seam along the contour where actors cross it (trim vista, panel vista) | fixed at the source: the colour layer is clipped once as a composited layer (section 4); measured 0 seam pixels (was 5,251 px differing along the contour) |
+| peach cine banners leak through the margin | the margin is now line art for EVERY fill except the actors' colours (`margin="actors"` = allow-list: sun disc, mascot body); banners, sun halos, emblem discs go paper |
+| big BigSun halo arcs spill into the white like a sticker | halos go paper in the margin; only the sun DISC and the mascot break the edge |
+| trim's 16-24 px sides are ambiguous / pillarbox-like | trim sides 28-32 (left, with a wider stretch) and 22-26 (right) |
+| rounded-looking 5-12 px corner snips | one sharp, asymmetric scissor snip; the other corner is square with ruled ink |
+| white border closes all four sides ("matted print", "UI card") | both variants are OPEN at the bottom: the world runs off the frame in colour, foreground figures stay in colour |
+| deep top / bottom margins sit under the status bar and the sound text (white on white) | top 12-18 px, bottom 0 |
+| panel sides read as a card; right margin under the rail icons | panel left 36-42 (charm side), right 18-22 |
+| panel: doubled re-strokes busy; limit overshoot to 1-2 corners | single strokes, two corners |
+| panel: lines run straight off the screen ("a white mat under a drawing"); line ENDS should show in the white | the ink layer is clipped to a comb contour on the left: stretches of 80-180 px where the line art stops 6-20 px short of the edge, between stretches where it runs off |
+| panel: blank white L at the top-right sky corner | one ruled vertical overshoot there |
+| panel: let the colour bleed where ground / foreground meets the frame | bottom open + the left cut snips out to the frame edge at y 1490-1570 |
+| warm paper for night scenes | `paper="warm"` (`PAPER_WARM` #FAF6EE) |
+| vignette / construction / rough-tb | kept in the lab for reference, not refined (ranked out); construction's best idea (a couple of ruled guide strokes) survives as the ruled corners |
+
+## 2. API
 
 ```tsx
-import {EdgeTreatment, FilmEdges, EdgeProvider} from '../lib/edges';
-<EdgeTreatment variant="trim" seed="film" amount={1}> <MyScene/> </EdgeTreatment>   // captions go AFTER it (above)
+import {EdgeTreatment, FilmEdges, EdgeProvider, FILM_EDGES, PAPER_WARM, edgeSpec} from '../lib/edges';
+
+<EdgeTreatment variant="trim" seed="film" amount={1}>  <MyScene/>  </EdgeTreatment>   // captions go AFTER it (above)
 ```
 
-## 1. How it works
+| prop | default | what |
+|---|---|---|
+| `variant` | `'clean'` | `'clean' \| 'trim' \| 'panel'` (+ lab-only `'vignette' \| 'construction' \| 'rough-tb'`) |
+| `seed` | `'edge'` | a different hand cut (the film uses `'film'`; every number in this doc is for seed `'film'` or 40 seeds) |
+| `amount` | `1` | **the strength** (section 3) |
+| `paper` | `'white'` | `'white'` (reference 1's card), `'warm'` (`PAPER_WARM`, for night acts) or any colour |
+| `margin` | `'actors'` | what keeps colour in the margin: `'actors'` = only `ACTOR_FILLS` (sun disc #EC6B2E in every TOD, mascot body #8D90CC + shade #7377B5) + `actorFills`; `'strict'` = nothing (the mascot becomes a white outline); `'look'` = round-1 behaviour (anything that ignores `<Look>` keeps its colour) |
+| `actorFills` | - | extra fill colours that break the edge in colour |
+| `skyFills` | - | extra flat sky values (only needed with `margin="look"`) |
+| `vp` | `world.vp` | screen vanishing point (lab `construction` only) |
+| `debug` | `false` | colour contour as a magenta hairline, ink contour cyan |
+
+`edgeSpec(variant, seed, amount)` returns the pure geometry: `{colour, colourPts, ink, inkPts, strokes}` (screen px,
+memoised). `CAPTION_SAFE` = the caption block every colour contour must contain. `FilmEdges` = `EdgeTreatment` with the
+config in effect (provider > input props > `FILM_EDGES`); it steps aside in the caption check's `mask` pass.
+
+## 3. The strength parameter (`amount`)
+
+`amount` scales every distance of a variant: margin widths, the drift stretch, the snip, the comb insets, the jog size
+and the stroke overshoot (stroke lengths stay put). `0` (or `clean`) renders the children untouched, with no second render.
+
+Measured over 40 seeds (paper width in the always-visible zone y 250-1450 for the sides; jogs and the drift stretch
+included):
+
+| amount | trim (left / right / top) | panel (left / right / top) | use |
+|---|---|---|---|
+| 0.6 | 17-25 / 12-16 / 6-11 px | 20-27 / 10-15 / 8-12 px | night acts, very fast cuts: a whisper of paper |
+| 0.8 | 22-33 / 16-22 / 8-14 px | 27-36 / 13-20 / 10-16 px | the judges' phone pick for panel |
+| **1** | 28-41 / 20-27 / 11-18 px | 34-45 / 16-25 / 13-20 px | designed |
+| 1.2 | 34-49 / 24-33 / 13-22 px | 40-53 / 19-30 / 15-24 px | hook / loop moments only |
+| 1.4 | 36-57 / 28-38 / 15-25 px | 39-53 / 23-34 / 16-27 px | the side insets give way wherever they would reach the caption block (x < 50 beside it) |
+
+Every contour at every amount 0.5-1.4 contains the caption block, and no stroke enters it (`check-shapes.ts`: 800
+contours, 0 failures). Per scene: wrap that scene composition in its own `<EdgeProvider value={{variant: 'trim', amount: 0.6, paper: 'warm'}}>`.
+
+## 4. How it works
 
 The scene is rendered twice, both layers fixed to the SCREEN (the camera moves the world under them):
 
 1. **Ink layer** (underneath, full frame): the same scene under `<Look fills="paper">` (every Fill white, people as white
-   tombstones, cine pieces in their own paper state, ink untouched) on paper (`palette.white`, reference 1's card). The
-   World / cine sky is `<Look>`-exempt by design, so a scoped CSS rule paints every flat sky value (theme `skies`,
-   `todSky`, every cine `TOD.*.skyBands`, `palette.sky`) paper inside this layer only. Result: the drawing as line art.
-2. **Colour layer** on top, clipped with CSS `clip-path: path(...)` to the variant's hand-cut contour: a hard, flat,
-   anti-aliased edge (no masks, no blur, no opacity).
-3. **Overlay strokes** (some variants): core `<Ink>` strokes in screen space (`exit={false}`: they never un-build).
+   tombstones, cine pieces in their own paper state), on paper. A scoped CSS rule then paints every remaining `fill`
+   attribute paper except ink, `none` and the actor colours: the World / cine sky (Look-exempt by design), raw-SVG pieces
+   that ignore the Look (cine banners, sun halos, emblem discs), translucent glows. Scene-root `div` backgrounds go
+   transparent. Result: the drawing as line art, with the sun disc and the mascot breaking the edge in colour. `panel`
+   also clips this layer to its comb contour, so lines END in the white.
+2. **Colour layer** on top, clipped to the variant's hand-cut contour. **The clip is `clip-path: path()` on a parent whose
+   child is a composited layer (`will-change: transform`)**: Chrome then clips the finished layer once. A plain
+   `clip-path` on the content anti-aliases every shape inside it separately (each shape blends at partial coverage over
+   what is beneath), which left a 1 px darker seam wherever both layers show the same colour (an actor crossing the cut:
+   rgb 216,177,146 in a 246,184,146 sun halo). Measured: plain clip 5,251 px differ from a masked render along the
+   contour, composited clip 0 seam pixels (only AA rounding of 1 level). A CSS `mask-image` (SVG data URI) fixes it too
+   but loads asynchronously; the composited clip is synchronous.
+3. **Overlay strokes**: core `<Ink>` strokes in screen space (no `at`: already drawn; `exit={false}`: they never un-build).
 
-Every contour is a pure function of `(variant, seed, amount[, vp])`, memoised once: nothing depends on time, so the edge
-cannot move or flicker. Scissor cuts are a few straight segments with 1-6 px jogs (`rough.ts: cutPoly / cutSide`), never
-per-frame noise. **Every colour contour contains the caption block** (`CAPTION_SAFE` = the widest hook page + 20 px), so a
-caption is always over the scene's own sky (a white night caption over a paper margin would vanish); the panel's side
-insets give way at large amounts to keep that true. Checked for 5 variants x 5 amounts x 40 seeds:
-`review/edges/tools/check-shapes.ts` (0 failures).
+Every contour is a pure function of `(variant, seed, amount)`, memoised: nothing depends on time, so the edge cannot move
+or flicker. Captions are not part of the treatment; render them after it.
 
-**Actors break the edge** (default `margin="actors"`): raw-SVG pieces that do not read `<Look>` keep their colour in the
-margin, like reference 1's sun and cat breaking the panel. On the three lab shots that is exactly: the core `Sun`, the
-cine `BigSun` (disc + its static glow rings) and the mascot (`Elephant` / `ElephantTimeline`). `margin="strict"`
-paints every non-ink fill in the margin paper (pure line art; the mascot becomes a white outline).
-
-## 2. Variants (`amount` scales every distance; 0 = off, 1 = designed, ~1.6 max)
-
-| variant | what it does | layers | cost (1080x1920, conc. 2) |
-|---|---|---|---|
-| `clean` | control, no treatment (children returned untouched) | 1x | 108-117 ms/frame |
-| `panel` | reference 1, nearly full-bleed: colour in a hand-cut panel 30-45 px in (each corner its own inset, sides a hair off-axis, 1-4 scissor cuts per side); the line art runs on into a white margin; at 2-3 corners ONE side is inked and overshoots the corner 22-50 px (sometimes with a re-stroke 4-7 px outside it), the other side stays open | 2x + strokes | 133-155 |
-| `vignette` | centre finished, periphery a sketch: a loose organic contour (18 px slow wobble) that hugs the sides (touching the frame in places) and pulls in at the corners with UNEQUAL elliptical bites (one tight top corner, one long shallow one, the deepest bite at a bottom corner); line art out to the screen edge | 2x | 144-155 |
-| `construction` | full-bleed colour + the artist's construction lines, sparse: perspective guides toward the shot's VP that start past the frame and stop 120-260 px in, the eye-level horizon guide crossing both sides, composition ticks at the thirds and the half of every edge, two crop-mark corners (diagonal pair); nothing in the caption block | 1x + strokes | 110-114 |
-| `rough-tb` | a hand-cut paper edge at the TOP (44-70 px) and BOTTOM (56-90 px) only, 4-6 rougher scissor cuts each; the sides stay fully immersive | 2x | 142-164 |
-| `trim` (**proposal**) | a hand-trimmed print, phone-aware: SLIM hand-cut sides (16-24 px, the only edges a viewer sees in the app, so the world stays a window and its lines just cross a sliver of paper), deeper top (48-66) and bottom (64-92) margins that sit under the platform UI (the full card charm in a clean export or a paused frame), every corner snipped with a 5-12 px scissor chamfer, NO added strokes (only the scene's own lines overshoot), actors keep their colour | 2x | 138-175 |
-
-Cost: 30 spread frames per shot (KitDemo street with the lab camera move, CineDemo monument), minimum of two interleaved
-runs, on the shared machine at load 2-5 (`review/edges/bench_fullres.txt`). The second render costs +20-50 % per frame,
-not 2x: page capture and PNG encoding are paid once. Half-scale clip renders incl. H.264: clean 83, construction 68,
-panel 94-99, rough-tb 84-107, trim 104-114, vignette 114-142 ms/frame.
-
-My ranking for "cleaner, more polished, premium": **trim** (charm where it is seen, no frame weight, nothing added), then
-**panel** (the most reference-1, a little more "card"), **rough-tb** (safe but mostly hidden under the UI), **vignette**
-(the boldest; best as a one-off moment, e.g. the hook or the loop frame, not the whole film), **construction** (charming
-up close, but reads as stray marks at phone size and needs each scene's VP).
-
-## 3. Using it in the film (do not edit Film yourself: core lane)
+## 5. Using it in the film (do not edit Film yourself: core lane)
 
 The one-line integration in `src/lib/Film.tsx` (core lane): wrap the SCENE STACK, not the captions:
 
 ```tsx
-// Film's return: the layers + transition overlays (wipers, bridges) go inside, SkyCaptions stays outside (above)
+// Film's return, inside <AbsoluteFill>: the layers + transition overlays (wipers, bridges) go inside, SkyCaptions stays after it (above)
 <FilmEdges>{layers.map((l) => <React.Fragment key={l.key}>{l.node}</React.Fragment>)}{overlays}</FilmEdges>
+{showCaptions ? <SkyCaptions ... /> : null}
 ```
 
-and the same around `Standalone`'s two scene blocks (the loop underlay + the scene). `FilmEdges` reads, first wins:
-an `<EdgeProvider value={{variant: 'trim', amount: 1}}>` above it, then the render's input props
-(`npx remotion render src/index.ts Main out.mp4 --props='{"edges":"trim"}'` or `'{"edges":{"variant":"panel","amount":0.8}}'`:
-review any variant on the real film without a code change), then `FILM_EDGES` in `src/lib/edges/config.tsx`
-(house default, currently `'clean'`). Per scene: wrap a scene composition in its own `EdgeProvider` (e.g. a different
-`vp` for `construction`, `amount` 0.6 at night).
+and the same around `Standalone`'s two scene blocks (the loop underlay + the scene). Then pick the look without a code change:
+`npx remotion render src/index.ts Main out.mp4 --props='{"edges":"trim"}'` or `'{"edges":{"variant":"panel","amount":0.8}}'`;
+make it the house look by setting `FILM_EDGES` in `src/lib/edges/config.tsx` (e.g. `{variant: 'trim', seed: 'film', amount: 1}`).
 
-Props: `variant`, `seed` (a different cut), `amount`, `vp` (construction guides; default `world.vp`), `paper` (margin
-colour, default white), `margin` ('actors' | 'strict'), `skyFills` (extra flat sky values for a scene whose sky is not a
-theme token), `debug` (magenta contour).
+## 6. Render cost
 
-## 4. Limitations / notes
+Frames only (PNG), full 1080x1920, concurrency 2, 30 spread frames, best of two interleaved runs
+(`review/edges/final/bench_fullres.txt`):
 
-- **Pieces that ignore `<Look>`** keep their colour in the margin (`margin="actors"`, intended): core `Sun`, cine `BigSun`
-  (disc and glow rings), the mascot. Anything else raw-SVG that does not read `useLook()` / `useCineState()` behaves the
-  same; `margin="strict"` catches all of them (every non-ink fill, set as an attribute, goes paper).
-- **The sky is found by colour**: flat sky values must be theme / TOD tokens (or listed in `skyFills`). A fill set via
-  inline `style={{fill}}` instead of the `fill` attribute is not matched by the sky rule (strict mode matches attributes
-  only too).
-- **Two renders**: +20-50 % per frame; `construction` is free (one render + strokes). Duplicate DOM ids are not an issue
-  (every clipPath id comes from `useId`, except the cine passer wiper's, whose geometry is identical in both layers).
-- **Captions must render after the treatment** (Film / Standalone already draw them after the scenes). EdgeLab hides
+| shot | clean | trim | panel |
+|---|---|---|---|
+| KitDemo street + lab camera move | 105 ms/frame | 145 (+38 %) | 152 (+45 %) |
+| CineDemo monument (crane) | 125 | 150 (+20 %) | 156 (+25 %) |
+
+With H.264 encoding (the final clips): clean 96, trim 132, panel 120 ms/frame. The second render costs +20-45 %, not
+2x: page capture and encoding are paid once. In Film, the cost applies to every layer inside `FilmEdges` (during a
+transition both scenes render twice).
+
+## 7. Limitations
+
+- **Actors are found by colour.** Any fill painted exactly the sun orange or the mascot's body / shade keeps its colour
+  in the margin (orange is reserved for the sun by the style bible). The mascot's inner ears and cheeks (peach, shared
+  with banners and placards) go paper in the margin. Fills set through inline `style={{fill}}` instead of the `fill`
+  attribute are not matched (they keep their colour). A large peak sun disc still breaks the margin in orange (the halo
+  does not).
+- **Night**: white paper is the brightest thing in a night frame: use `paper="warm"` and/or `amount` 0.6-0.8 for that
+  act (`review/edges/final/extra/`). Dark captions never sit on paper (the caption block is always inside the colour).
+- **Scene whites merge with the paper** where a white object meets a side (the street's right-hand fence): the scene's
+  ink still separates them, but trim's right sliver reads less there.
+- **Comb clip (panel)**: an actor in colour that sits in the leftmost 6-20 px of a combed stretch is cut by the comb.
+- **Pieces that draw a background on a `div`** (bridges) are transparent in the ink layer: the margin shows paper.
+- **The composited colour layer** (`will-change: transform`) is one extra 1080x1920 layer per treatment: fine for one
+  treatment around the scene stack; do not nest treatments.
+- Captions must render after the treatment (Film and Standalone already draw them after the scenes). EdgeLab hides
   CineDemo's built-in caption overlay inside both layers (CSS) and draws its own lab captions on top.
-- **Platform UI**: the top ~180 px and bottom ~400 px are covered in the app, so `rough-tb` and trim's deeper margins are
-  mostly a clean-export / paused-frame detail; the left and right edges are what a viewer always sees. A white bottom
-  band sits under the platform's white UI text: keep it thin (trim 64-92 px, panel 30-45 px).
-- **Night**: the white margin is the brightest thing in a night frame (`review/edges/extra/night_sheet.png`). It reads
-  as a deliberate card, but for a long night act consider `amount` 0.6-0.8 for that scene.
-- **construction needs the scene's VP** (`vp`, screen px): the guides are drawn toward it; with the default `world.vp`
-  they are only right for eye-level scenes on the default horizon.
-- Wipers and push-through bridges inside the treatment become line art in the margin (the edge never breaks during a
-  wipe); a bridge colour (a div background) is transparent in the ink layer.
 
-## 5. Review material (`review/edges/`)
+## 8. Review material
+
+`review/edges/final/` (round 2, this code):
 
 | file | what |
 |---|---|
-| `edges_comparison.png` | rows = variants, columns = the three shots (KitDemo street 7.6 s dusk, CineDemo monument 13.0 s, CineDemo vista 4.6 s), full frames with notes |
-| `edges_corners.png` | the top-left and bottom-right 340 px corners of every variant x shot (the edges are the point) |
-| `clips/<variant>_street.mp4`, `clips/<variant>_monument.mp4` | 5 s, 540x960: the street (KitDemo 3.2-8.2 s, day -> dusk relight, with a lab push x1.07 + 40 px pan) and the monument (CineDemo 10.4-15.4 s, its own crane) |
-| `edgecheck.txt` | contour stability in every clip frame vs the clean clip: 90-100 % of scanline samples within 2 px of their own position, per-frame mean drift 0.03-3.7 px (residue of scene content crossing the contour; an edge riding the lab camera would drift ~20 px at this scale; meaningless for `construction`, which has no contour). Decisive probe: with `debug` (the contour drawn in magenta) at lab t 0 / 2.5 / 4.97 s, every contour pixel of t 2.5 and 4.97 lies within 1 px of t 0's (0-12 stray px of ~6000) for trim + panel street (camera push + pan) and vignette + rough-tb monument (crane) |
-| `extra/amount_sheet.png` | amount 0.5 / 1.0 / 1.5 per variant (monument) |
-| `extra/night_sheet.png` | the street at night per variant |
+| `edges_final_sheet.png` | rows clean / trim / panel x the three shots (KitDemo street 7.6 s dusk, CineDemo monument 13.0 s, CineDemo vista 4.6 s), full frames on a dark phone bezel, labelled |
+| `edges_final_corners.png` | per shot and variant, 300 px crops at 1:1: top-left, top-right, left edge (y 640-940), bottom-left |
+| `clips/{clean,trim,panel}_street.mp4` | 6 s, 1080x1920, 30 fps: the street (KitDemo 3.2-9.2 s, day -> dusk) with a lab push x1.07 + 40 px pan, captions on top |
+| `clips/side_by_side_street.mp4` | the three clips side by side (1644x1024), labelled |
+| `extra/*_night*.png` | the street at 9.6 s: clean, trim / panel on white and on warm paper |
+| `edgecheck.txt` | contour stability in the final clips: 95-98 % of scanline samples within 2 px of their position, per-frame mean drift 0.8-1.6 px (scene content crossing the cut; an edge riding the camera would drift tens of px); debug-contour probe at lab t 0 / 2.5 / 5.9 s: panel 0 contour px moved, trim 0 (32 threshold pixels in the cut's own column) |
+| `bench_fullres.txt` | the cost table above |
 | `stills/` | the full-resolution stills behind the sheets |
 
-Tools (`review/edges/tools/`): `render-lab.mjs` (many EdgeLab stills from one bundle), `render-clips.mjs` (clips and
-`bench` frame timings), `sheet.py` (grid / corners sheets), `edgecheck.py`, `check-shapes.ts`. Lab composition:
-`EdgeLab` (`src/dev/EdgeLab.tsx`), props `{variant, shot: 'street' | 'monument' | 'vista', amount, seed, from, cam,
-margin, debug}`:
+Round 1 (six variants, the geometry the judges scored; code at commit f28ae81): `review/edges/edges_comparison.png`,
+`edges_corners.png`, `clips/`, `stills/`, `extra/`.
+
+Tools: `review/edges/tools/render-lab.mjs` (many EdgeLab stills, one bundle), `render-clips.mjs` (clips and `bench`),
+`edgecheck.py`, `check-shapes.ts`; `review/edges/final/tools/final_sheets.py` (`grid` / `corners` / `labels`) and its job
+files (`stills.json`, `clips.json`, `bench.json`). Lab composition `EdgeLab` (`src/dev/EdgeLab.tsx`), props
+`{variant, shot: 'street' | 'monument' | 'vista', amount, seed, from, cam, margin, paper, debug, captions}`:
 
 ```bash
 scripts/still.sh EdgeLab 0 out.png --props='{"variant":"trim","shot":"vista"}'
-node review/edges/tools/render-lab.mjs jobs.json --scale=1          # [{"props": {...}, "t": 0, "out": "x.png"}, ...]
-node review/edges/tools/render-clips.mjs clips.json --scale=0.5     # [{"props": {...}, "frames": [0, 149], "out": "x.mp4"}]
-python3 review/edges/tools/edgecheck.py review/edges/clips/trim_street.mp4 review/edges/clips/clean_street.mp4
+node review/edges/tools/render-lab.mjs review/edges/final/tools/stills.json --scale=1
+node review/edges/tools/render-clips.mjs review/edges/final/tools/clips.json --scale=1 --concurrency=2
+python3 review/edges/final/tools/final_sheets.py grid      # also: corners, labels
+python3 review/edges/tools/edgecheck.py review/edges/final/clips/trim_street.mp4 review/edges/final/clips/clean_street.mp4
 npx esbuild review/edges/tools/check-shapes.ts --bundle --platform=node --log-level=error > /tmp/cs.cjs && node /tmp/cs.cjs
 ```

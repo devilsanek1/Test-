@@ -7,12 +7,13 @@
 
 import React, {createContext, useContext} from 'react';
 import {getInputProps} from 'remotion';
+import {capcheckMode} from '../Captions';
 import {EdgeTreatment, EdgeTreatmentProps} from './EdgeTreatment';
 import {EDGE_VARIANTS, EdgeVariant} from './variants';
 
 export type EdgeConfig = Omit<EdgeTreatmentProps, 'children'>;
 
-/** House default for the film. 'clean' until a variant is chosen (docs/EDGES.md). */
+/** House default for the film. 'clean' until the user picks one (docs/EDGES.md: 'trim' or 'panel'). */
 export const FILM_EDGES: EdgeConfig = {variant: 'clean', seed: 'film', amount: 1};
 
 const EdgeCtx = createContext<EdgeConfig | null>(null);
@@ -36,5 +37,10 @@ export function useEdgeConfig(): EdgeConfig {
   return {...FILM_EDGES, ...(ctx ?? fromInputProps() ?? {})};
 }
 
-/** Film's one-line integration: wrap the scene stack (every layer + transition overlays, NOT the captions). */
-export const FilmEdges: React.FC<{children?: React.ReactNode}> = ({children}) => <EdgeTreatment {...useEdgeConfig()}>{children}</EdgeTreatment>;
+/** Film's one-line integration: wrap the scene stack (every layer + transition overlays, NOT the captions). Steps aside
+ *  in the caption check's 'mask' pass (Film draws no scene there; a paper layer would cover the whole frame). */
+export const FilmEdges: React.FC<{children?: React.ReactNode}> = ({children}) => {
+  const cfg = useEdgeConfig();
+  if (capcheckMode() === 'mask') return <>{children}</>;
+  return <EdgeTreatment {...cfg}>{children}</EdgeTreatment>;
+};
