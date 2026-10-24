@@ -50,7 +50,7 @@ from common import (SR, N_TOTAL, VIDEO_DUR, ASSETS, load, save, lufs, true_peak_
 #   "lu":  bed is set `level` LU under the voice (integrated), then ducked, then margin-guarded
 #   "abs": bed is played at its rendered level (gain `level` dB), for the near-silent bed whose
 #          room tone must stay at an absolute floor (~ -60 dBFS after mastering)
-BEDS = {"cinematic": (HERE / "music_cinematic.wav", "lu", 6.0, 12.0),
+BEDS = {"cinematic": (HERE / "music_cinematic.wav", "lu", 8.5, 14.0),   # v2: user asked "a tiny bit more subtle"
         "marimba": (HERE / "music_marimba.wav", "lu", 6.0, 12.0),
         "near_silent": (HERE / "music_near_silent.wav", "abs", 0.0, 6.0)}
 
