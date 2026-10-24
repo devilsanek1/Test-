@@ -12,7 +12,8 @@ import {Look, UnBuild} from '../lib/exit';
 import {Sun} from '../lib/Sun';
 import {Tod} from '../lib/tod';
 import {Ink} from '../lib/Ink';
-import {hline} from '../lib/sketch';
+import {hline, rect as rectInk} from '../lib/sketch';
+import {Fill} from '../lib/Fill';
 import {Door} from '../lib/kit';
 import {
   AttemptStipple,
@@ -34,6 +35,9 @@ import {
   CheckBoxTag,
   CheckBoxTags,
   SupportTag,
+  FixSign,
+  LidCrate,
+  cartSignHook,
   Caretaker,
   CheckFlag,
   CheckMark,
@@ -194,8 +198,10 @@ export type SharedKitSheetProps = {
   /** 'context' = props at FILM SIZE on plain walls (1:1 check); 'lock' = the P1 bolt test at 200 px (S02 close-up) and
    *  100 px on a teal door, no bracket, + the fixed / blueprint / paper variants; 'heads' = back-view heads at film and
    *  phone size. 'v3' = the storyboard-v3 pieces (labels, rewind, counter board, diagram, tags, notes) in big cells.
+   *  'v3fix' = the v3 review round: FixSign (J3 -> J5) + the MakersCart sign slot, LockCrate lid + tags, the lettered
+   *  BackSoonTag width ladder, the CounterBoard footer zone, LabelTag minFont (paper growth).
    *  All loop on a 5 s clock. */
-  mode?: 'sheet' | 'context' | 'lock' | 'heads' | 'v3';
+  mode?: 'sheet' | 'context' | 'lock' | 'heads' | 'v3' | 'v3fix';
   /** false = skip the set thumbnails (props-only cost check). */
   thumbs?: boolean;
 };
@@ -456,14 +462,119 @@ const V3Mode: React.FC = () => {
   );
 };
 
+/** A shop window with its blind down (the J3 / J4 surface) for the FixSign cell: frame + tan blind with slats. */
+const BlindWindow: React.FC<{x: number; y: number; w: number; h: number; seed: string}> = ({x, y, w, h, seed}) => {
+  let slats = '';
+  for (let yy = y + 16; yy < y + h - 6; yy += 16) slats += `M${x + 4} ${yy}H${x + w - 4}`;
+  return (
+    <>
+      <Fill rect={[x - 8, y - 8, w + 16, h + 16]} color={palette.teal} seed={`${seed}/fr`} />
+      <Fill rect={[x, y, w, h]} color={palette.tan} offset={false} seed={`${seed}/bl`} />
+      <Ink d={rectInk(x - 8, y - 8, w + 16, h + 16, {seed: `${seed}/fri`}) + slats} width={2.2} taper={false} seed={`${seed}/sl`} />
+    </>
+  );
+};
+
+/** The requested label box as a dashed outline (what the scene asked for; the paper may grow past it). */
+const DashBox: React.FC<{b: [number, number, number, number]}> = ({b}) => (
+  <path d={`M${b[0]} ${b[1]}H${b[2]}V${b[3]}H${b[0]}Z`} fill="none" stroke={palette.peach} strokeWidth={2} strokeDasharray="6 5" />
+);
+
+/** The v3 review round (props lane): FixSign + cart slot, LockCrate lid / tags, BackSoonTag ladder, board footer, minFont. */
+const V3FixMode: React.FC = () => {
+  const C = 540;
+  const Y = 76;
+  const RA = 330;
+  const YB = Y + RA;
+  const RB = 360;
+  const YC = YB + RB;
+  const RC = 330;
+  const YD = YC + RC;
+  const RD = 470;
+  const YE = YD + RD;
+  const RE = 1920 - YE;
+  const cart = {x: 210, y: 300, size: 150};
+  return (
+    <>
+      <rect width={1080} height={1920} fill={palette.white} />
+      <text x={540} y={52} fontFamily={captionFontStack} fontSize={40} fill={palette.ink} textAnchor="middle">
+        Shared kit v3 fixes: sign, cart, crate, tags, board, labels
+      </text>
+      {/* A: the same sign on the S06 / S07 blinds (J3 / J4) and its J5 payoff */}
+      <BigCell x={0} y={Y} w={C} h={RA} label="FixSign J3 / J4 on the blinds (fs 27; S06 200 / S07 140 wide)" bg={palette.sand}>
+        <BlindWindow x={30} y={40} w={200} h={220} seed="v3f/b1" />
+        <FixSign x={130} y={74} fs={27} at={0.4} swingAt={[2.0]} seed="v3f/s1" />
+        <BlindWindow x={330} y={40} w={140} h={220} seed="v3f/b2" />
+        <FixSign x={400} y={70} fs={27} at={0.6} swingAt={[2.6]} seed="v3f/s2" />
+      </BigCell>
+      <BigCell x={C} y={Y} w={C} h={RA} label="J5: strike + 'fixed!' (fs 36, w 224) | S10 end state (fs 18)" bg={palette.mintPale}>
+        <FixSign x={170} y={60} w={224} fs={36} at={0.3} strikeAt={1.3} fixedAt={1.4} seed="v3f/s3" />
+        <FixSign x={430} y={90} fs={18} strikeAt={-10} fixedAt={-10} seed="v3f/s4" />
+        <FixSign x={430} y={190} fs={27} string={false} strikeAt={2.2} fixedAt={2.3} seed="v3f/s5" />
+      </BigCell>
+      {/* B: the MakersCart sign slot (rides the roll and the skip; unmirrored on a flipped cart) */}
+      <BigCell x={0} y={YB} w={1080} h={RB} label="MakersCart sign slot: post + FixSign, roll / skip jolt; flipped cart keeps the lettering" bg={palette.cream}>
+        <rect x={0} y={300} width={1080} height={30} fill={palette.mintPale} />
+        <MakersCart x={cart.x} y={cart.y} size={cart.size} crates={2} pusher roll={{at: 1.6, to: [560, cart.y], dur: 1.4}} skipAt={3.3}
+          sign={<FixSign x={0} y={0} w={224} fs={36} strikeAt={0.7} fixedAt={0.8} seed="v3f/cs1" />} signPost={120} seed="v3f/cart1" />
+        <MakersCart x={960} y={300} size={115} crates={1} flip roll={{at: 2.0, to: [800, 300], dur: 1.2}}
+          sign={<FixSign x={0} y={0} fs={18} strikeAt={-10} fixedAt={-10} seed="v3f/cs2" />} seed="v3f/cart2" />
+        {(() => {
+          const [hx, hy] = cartSignHook({...cart, signPost: 120});
+          return <circle cx={hx} cy={hy} r={5} fill="none" stroke={palette.peach} strokeWidth={2} />;
+        })()}
+      </BigCell>
+      {/* C: the S09 crate (lid pops, locks bob up, empty check tags rise) | the lettered tag width ladder */}
+      <BigCell x={0} y={YC} w={C} h={RC} label="LockCrate lidAt + tagsAt (S09) | LidCrate 58 | open (v2)" bg={palette.sand}>
+        <LockCrate x={150} y={270} size={150} lidAt={1.0} tagsAt={1.6} ink={2.6} seed="v3f/cr1" />
+        <LidCrate x={330} y={270} size={58} lidAt={1.2} tagsAt={1.8} seed="v3f/cr2" />
+        <LockCrate x={460} y={270} size={80} seed="v3f/cr3" />
+        <rect x={0} y={270} width={540} height={30} fill={palette.tan} />
+      </BigCell>
+      <BigCell x={C} y={YC} w={C} h={RC} label="BackSoonTag lettered: 60 / 74 / 84 / 92 / 104 / default (100)" bg={palette.tan}>
+        <BackSoonTag x={45} y={40} lettered size={60} seed="v3f/t1" />
+        <BackSoonTag x={128} y={40} lettered size={74} seed="v3f/t2" />
+        <BackSoonTag x={222} y={40} lettered size={84} seed="v3f/t3" />
+        <BackSoonTag x={325} y={40} lettered size={92} seed="v3f/t4" />
+        <BackSoonTag x={440} y={40} lettered size={104} seed="v3f/t5" />
+        <BackSoonTag x={270} y={180} lettered at={0.5} tapAt={2.4} seed="v3f/t6" />
+      </BigCell>
+      {/* D: the S08 board at its scene box ratio (460 x 390), footer zone 58 board px, fine print 28 */}
+      <BigCell x={0} y={YD} w={C} h={RD} label="CounterBoard footer: 58 px zone, 28 px (S08 box 460 x 390)" bg={palette.tan}>
+        <CounterBoard box={[40, 14, 500, 404]} header={['Cloudflare · sits in front', 'of about 1 in 5 websites']} headerSize={36}
+          flagAt={0.6} note={['counted from the', 'public announcement', 'attempts, not break-ins']} noteSize={27}
+          footer={['Matthew Prince, Cloudflare CEO, on X', "Cloudflare's own count"]} footerAt={0.8}
+          gatesAt={[0.7, 0.9, 1.1, 1.2, 1.3, 1.5, 1.6, 1.9, 2.2]} stampSize={31}
+          stamps={[{at: 1.4, text: 'first 45 min: tens of thousands'}, {at: 2.0, text: 'millions · within a day'}]} seed="v3f/cb" />
+      </BigCell>
+      <BigCell x={C} y={YD} w={C} h={RD} label="LabelTag minFont: a too-small box grows the paper (dashed = the box)" bg={palette.cream}>
+        <LabelTag kind="slip" box={[20, 40, 465, 112]} text={['found with AI help ·', 'reported privately in August']} fontSize={38} at={0.4} seed="v3f/l6" />
+        <LabelTag kind="card" box={[60, 240, 230, 280]} text="PHP2Shell · two linked flaws" fontSize={30} at={0.7} seed="v3f/l1" />
+        <LabelTag kind="sign" box={[290, 230, 510, 330]} fontSize={26} text={['Rough estimate from', 'W3Techs data · only sites', 'that show their version']} legH={40} at={1.0} seed="v3f/l13" />
+        <DashBox b={[20, 40, 465, 112]} />
+        <DashBox b={[60, 240, 230, 280]} />
+        <DashBox b={[290, 230, 510, 330]} />
+      </BigCell>
+      {/* E: line art of the new pieces (frame 0 / S12 un-build state) */}
+      <BigCell x={0} y={YE} w={1080} h={RE} label="paper Look: FixSign J5, cart + sign, LockCrate with tags" bg={palette.white}>
+        <Look fills="paper">
+          <FixSign x={160} y={40} w={224} fs={36} strikeAt={0} fixedAt={0} seed="v3f/p1" />
+          <MakersCart x={520} y={300} size={130} crates={2} sign={<FixSign x={0} y={0} fs={24} seed="v3f/p2s" />} seed="v3f/p2" />
+          <LockCrate x={880} y={300} size={130} lidAt={0} tagsAt={0} ink={2.4} seed="v3f/p3" />
+        </Look>
+      </BigCell>
+    </>
+  );
+};
+
 export const SharedKitSheet: React.FC<SharedKitSheetProps> = ({look, unbuildAt, mode, thumbs = true}) => {
   useCaptionFont();
-  if (mode === 'v3') {
+  if (mode === 'v3' || mode === 'v3fix') {
     return (
       <AbsoluteFill style={{background: palette.white}}>
         <svg width={1080} height={1920} viewBox="0 0 1080 1920">
           <Modes look={look} unbuildAt={unbuildAt}>
-            <V3Mode />
+            {mode === 'v3fix' ? <V3FixMode /> : <V3Mode />}
           </Modes>
         </svg>
       </AbsoluteFill>

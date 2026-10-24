@@ -197,8 +197,20 @@ export const WireCopy: React.FC<CopySpec & {children?: React.ReactNode}> = (c) =
 
 // ---------------------------------------------------------------- pigeons on the chimney
 
+/** S07's two pigeons on wire 0 (its Pigeon x 384 white / x 330 sand flipped, Bird s 0.8 at zoom 1.06), carried over
+ *  the cut at the same screen spot and size: S07 x -> S08 x = 540 + 1.06 / 1.3 (x - 480). */
+const WIRE_PIGEONS = [
+  {x7: 384, seed: 's7pg0', color: palette.white, flip: false},
+  {x7: 330, seed: 's7pg1', color: palette.sand, flip: true},
+];
+
 export const Pigeons: React.FC<{flyAt: number}> = ({flyAt}) => (
   <>
+    {WIRE_PIGEONS.map((p, i) => {
+      const x = 540 + (1.06 / 1.3) * (p.x7 - 480);
+      const q = wireAt(WIRES.S08, 0, x);
+      return <Bird key={p.seed} x={q[0]} y={q[1] + 1} s={(0.8 * 1.06) / 1.3} seed={p.seed} flyAt={flyAt - 0.12 + i * 0.09} flyTo={[-300 - i * 80, -200 + i * 30]} color={p.color} flip={p.flip} />;
+    })}
     {[
       [612, 1294, 0.8],
       [662, 1306, 0.75],

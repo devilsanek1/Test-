@@ -17,14 +17,16 @@ export const EDGE_HINTS: Record<string, EdgeHints> = {
   'edgelab/street': {
     ink: {tl: 0.92, tr: 1, br: 0.02, bl: 0.39, left: 1, right: 1, bottom: 0.11},
     keep: [
-      [319, 1467, 594, 1845], // the mascot (whole clip) + the ground under it
+      [331, 1479, 582, 1803], // the mascot (whole clip) + the ground under it
       [0, 980, 175, 1920], // the coat figure walking at the left frame edge
     ],
   },
   'edgelab/monument': {
     ink: {tl: 0.04, tr: 0.04, br: 1, bl: 1, left: 0.7, right: 0.91, bottom: 1},
     keep: [
-      [64, 1337, 244, 1601], // the mascot on its pillar
+      [76, 1349, 232, 1559], // the mascot on its pillar
+      [15, 1470, 295, 1920], // the pillar
+      [10, 700, 160, 1110], // the banner at the left frame edge
       [0, 1335, 80, 1445], // the lamp + halo at the left frame edge
       [745, 1590, 1080, 1920], // the foreground head (bottom right)
     ],
@@ -32,7 +34,7 @@ export const EDGE_HINTS: Record<string, EdgeHints> = {
   'edgelab/vista': {
     ink: {tl: 0, tr: 0, br: 1, bl: 0.93, left: 0.7, right: 0, bottom: 1},
     keep: [
-      [645, 1667, 824, 1907], // the mascot on the parapet
+      [657, 1679, 812, 1865], // the mascot on the parapet
       [0, 1555, 360, 1920], // the foreground hero (bottom left)
     ],
   },

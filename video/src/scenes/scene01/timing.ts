@@ -39,17 +39,20 @@ export const B = {
   pigeonsLand: 0.885,
   // 'Europe' w3: the far civic skyline steps dark as WHOLE shapes, left to right, 0.06 s apart
   civicOff: [1.155, 1.215, 1.275],
-  // w3+0.25: two far dome lanterns pop off; two citizens raise phones
-  civicLanterns: [1.405, 1.455],
+  // the two far domes' lanterns pop off ON their dome's step (domeB is silhouette 2, domeF 3 of the left-to-right wave),
+  // so each step is one visible light event (fix round 1; was w3+0.25)
+  civicLanterns: [1.215, 1.275],
+  // w3+0.25: a citizen and the left edge onlooker raise phones (lit screens)
   phonesUp: 1.405,
   // 'just' w4: the power glyph glints
   glint: 1.565,
-  // 'shut' w5: govB's shutter SLAMS (0.16 s drop lands just after the word onset); govB one step darker on landing
-  slamB: 1.64,
-  // 'down' w6: govA's shutter slams
-  slamA: 1.91,
-  // 'bunch' w8: govC's shutter drops only HALF way and jolts
-  slamC: 2.28,
+  // 'shut' w5: govB's shutter SLAMS: the 0.16 s drop LANDS on the word (ENGINE rule 5: a big motion completes ON the
+  // word; the pop_low cue sits on the word), govB one step darker on landing
+  slamB: 1.55,
+  // 'down' w6: govA's shutter slams, lands on the word
+  slamA: 1.82,
+  // 'bunch' w8: govC's shutter drops only HALF way (~0.15 s to its stop) and jolts ON the word
+  slamC: 2.2,
   // 'of' w9: a citizen points up at govC; a pigeon shuffles
   point: 2.565,
   shuffle: 2.565,
@@ -61,15 +64,17 @@ export const B = {
   pipLand: 3.035,
   pipBack: 3.24,
   phoneDown: 3.035,
-  // w12+0.30: padlocks pop onto the three closed shutters (0.06 s apart): govB, govA, govC
-  padlocks: [3.385, 3.445, 3.505],
+  // w12+0.30: padlocks pop onto the three closed shutters (0.06 s apart): govB, govA, govC; led by 0.04 s so the
+  // 20% -> 100% grow reads ON each lock_click
+  padlocks: [3.345, 3.405, 3.465],
   // w12+0.45: a pigeon circles back to the lamp
   pigeonBack: 3.535,
   // 'on' w13-0.10: the lettered 'back soon' tags swing on (pendulum -16 -> 0, 0.35 s, 0.05 s stagger)
   tags: [3.695, 3.745, 3.795],
-  // 'PURPOSE' w14: govB's dome lantern pops off; heads turn back to the plaza
+  // 'PURPOSE' w14: govB's dome lantern pops off; heads turn back to the plaza; the three padlocks glint; Pip glances back
   domeLanternOff: 3.955,
   headsBack: 3.955,
+  padlockGlint: [3.955, 3.985, 4.015],
   // cut(purpose)-0.45: a small ink ring pops around govB's lock box
   lockRing: 4.265,
   // cut(purpose)-0.33: the dive (fixed 0.33 s, in(quad)); Pip hops toward the lens

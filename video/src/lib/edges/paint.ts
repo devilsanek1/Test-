@@ -84,6 +84,9 @@ type Params = {
   /** The visible-zone left bite: depth from the frame (0 = none) and width. */
   leftBite: Range;
   leftBiteW: Range;
+  /** The right-side bite between the caption block and the rail (loose): depth from the frame (0 = none), width. */
+  rightBite: Range;
+  rightBiteW: Range;
   /** Bites in the bottom (under the UI): how many, depth past the bottom edge, width. */
   bottomBites: number;
   bottomBite: Range;
@@ -124,9 +127,11 @@ const ANCHORS: [number, Params][] = [
       bleedR: [130, 200],
       leftBite: [0, 0],
       leftBiteW: [160, 240],
+      rightBite: [0, 0],
+      rightBiteW: [140, 200],
       bottomBites: 0,
       bottomBite: [30, 60],
-      bottomBiteW: [160, 260],
+      bottomBiteW: [240, 320],
       tongues: 1,
       tongueW: [220, 380],
       over: [18, 38],
@@ -158,10 +163,12 @@ const ANCHORS: [number, Params][] = [
       bleed: 1,
       bleedR: [150, 250],
       leftBite: [92, 124],
-      leftBiteW: [180, 300],
+      leftBiteW: [260, 380],
+      rightBite: [0, 0],
+      rightBiteW: [140, 200],
       bottomBites: 1,
       bottomBite: [50, 100],
-      bottomBiteW: [180, 320],
+      bottomBiteW: [240, 360],
       tongues: 1,
       tongueW: [220, 420],
       over: [26, 56],
@@ -193,10 +200,12 @@ const ANCHORS: [number, Params][] = [
       bleed: 1,
       bleedR: [170, 300],
       leftBite: [128, 166],
-      leftBiteW: [220, 360],
+      leftBiteW: [300, 440],
+      rightBite: [96, 136],
+      rightBiteW: [200, 230],
       bottomBites: 2,
       bottomBite: [70, 150],
-      bottomBiteW: [180, 340],
+      bottomBiteW: [260, 400],
       tongues: 2,
       tongueW: [240, 440],
       over: [32, 66],
@@ -207,7 +216,7 @@ const ANCHORS: [number, Params][] = [
 ];
 
 /** Fields that are counts or chances (not scaled down below subtle). */
-const COUNTS = new Set<keyof Params>(['topStep', 'bottomSteps', 'bands', 'bare', 'stepCorners', 'bleed', 'bottomBites', 'tongues', 'endP']);
+const COUNTS = new Set<keyof Params>(['step', 'topStep', 'bottomSteps', 'bands', 'bare', 'stepCorners', 'bleed', 'bottomBites', 'tongues', 'endP']);
 
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 function mixParams(a: Params, b: Params, t: number): Params {
@@ -274,7 +283,9 @@ export const PAINT_LIMITS = {left: CX0 - 12, right: W - CX1 - 12, rail: 18, top:
 /** Lowest screen y a top corner's bare / step area may reach down a side (above the caption block). */
 const TOP_CORNER_Y = CY0 - CAP_PAD - 8;
 /** The visible-zone left bite lives in this screen y range. */
-const LEFT_BITE_Y: Range = [880, 1460];
+const LEFT_BITE_Y: Range = [680, 1460];
+/** ... and the right one (loose) between the caption block and the rail. */
+const RIGHT_BITE_Y: Range = [CY1 + CAP_PAD + 4, RAIL[0] - 4];
 
 // ---------------------------------------------------------------- polygons
 
@@ -449,8 +460,11 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
   const seamsL = nL === 2 ? [sL[0]] : nL === 3 ? [sL[0], sL[1]] : sL;
   const seamsR = nR === 2 ? [sR[0]] : sR;
   const rail: Range = [10, PAINT_LIMITS.rail];
-  const limsL: Range[] = [P.left0, P.left, ...(nL >= 3 ? [P.leftLow] : []), ...(nL >= 4 ? [P.leftLow] : [])];
-  const limsR: Range[] = [P.right0, rail, ...(nR >= 3 ? [P.rightLow] : [])];
+  // the caption bands are held to the phone limits (looseness above loose extrapolates every range)
+  const capL: Range = [Math.min(P.left0[0], PAINT_LIMITS.left - 4), Math.min(P.left0[1], PAINT_LIMITS.left - 0.5)];
+  const capR: Range = [Math.min(P.right0[0], PAINT_LIMITS.right - 10), Math.min(P.right0[1], PAINT_LIMITS.right - 0.5)];
+  const limsL: Range[] = [capL, P.left, ...(nL >= 3 ? [P.leftLow] : []), ...(nL >= 4 ? [P.leftLow] : [])];
+  const limsR: Range[] = [capR, rail, ...(nR >= 3 ? [P.rightLow] : [])];
   const insL = blockInsets(limsL, P, r.fork('insetsL'));
   const insR = blockInsets(limsR, P, r.fork('insetsR'));
   const rsl = r.fork('slants');
@@ -466,9 +480,12 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
   const topIns = blockInsets(topStepOn ? [P.top, [P.top[0], P.top[1] * 1.5] as Range] : [P.top], P, rt);
   const top = blockKnots(W, topStepOn ? [topCut] : [], topIns.s, topIns.e, [rt.range(0.2, 0.5)]);
   const rbt = r.fork('bottom');
-  const nBS = Math.round(P.bottomSteps);
+  const nBS = (inkOf('bottom') ?? 0.5) >= 0.25 ? Math.round(P.bottomSteps) : 0;
   const bCuts = [rbt.range(240, 440), rbt.range(620, 860)].slice(0, nBS).sort((a, b) => a - b);
-  const bLims: Range[] = Array.from({length: nBS + 1}, (_, i) => (i % 2 ? [P.bottom[0] * 1.2, Math.min(PAINT_LIMITS.bottom - 60, P.bottom[1] * 1.6)] : P.bottom) as Range);
+  // where the bottom holds little drawing, its paper is a thin clean strip (a deep white band with nothing in it reads
+  // as a hole; pale ground on white loses its edge)
+  const bScale = (inkOf('bottom') ?? 0.5) < 0.3 ? 0.5 : 1;
+  const bLims: Range[] = Array.from({length: nBS + 1}, (_, i) => (i % 2 ? [P.bottom[0] * 1.2, Math.min(PAINT_LIMITS.bottom - 60, P.bottom[1] * 1.6)] : [Math.max(14, P.bottom[0] * bScale), Math.max(20, P.bottom[1] * bScale)]) as Range);
   const botIns = blockInsets(bLims, P, rbt);
   const bottom = blockKnots(W, bCuts, botIns.s, botIns.e, [rbt.range(0.2, 0.5), rbt.range(0.2, 0.5)]);
   const prof: Knot[][] = [top, right, bottom, left];
@@ -549,10 +566,15 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
     let V = role === 'bare' ? lerpR(k <= 1 ? [P.bareH[0] * 0.5, P.bareH[1] * 0.5] : P.bareV, sd.v) : lerpR(P.stepV, sd.sv);
     let Hh = role === 'bare' ? lerpR(P.bareH, sd.h) : lerpR(P.stepH, sd.sh);
     V = Math.min(V, vMax);
-    if (V < (role === 'bare' ? 90 : 60)) return null;
-    for (const f of [1, 0.85, 0.72, 0.6]) {
-      const v = V * f;
-      const h = Hh * f;
+    const minV = role === 'bare' ? 90 : 60;
+    const minH = role === 'bare' ? 130 : 110;
+    if (V < minV) return null;
+    // shrink to clear the keep rects: both ways first, then one dimension at a time (a figure beside the corner
+    // takes the corner's height, a figure above it its width), keeping as much bare area as possible
+    for (const [fv, fh] of [[1, 1], [1, 0.82], [0.82, 1], [0.82, 0.82], [1, 0.62], [0.62, 1], [0.66, 0.66], [1, 0.45], [0.45, 1], [0.5, 0.5], [0.32, 1.1], [0.32, 0.8], [1, 0.32]]) {
+      const v = V * fv;
+      const h = Hh * fh;
+      if (v < minV || h < minH) continue;
       const reg = region(k, role === 'bare' ? runPts(k, v, h, false) : stepPts(k, v, h));
       if (!keeps.some((kr) => rectHitsPoly(kr, reg))) return {V: v, Hh: h};
     }
@@ -623,9 +645,9 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
     s === 3 ? seamsL.map((y) => [H - y - 80, H - y + 80] as Range) : s === 1 ? seamsR.map((y) => [y - 80, y + 80] as Range) : s === 2 ? bCuts.map((u) => [u - 80, u + 80] as Range) : [];
   const colourK: Knot[][] = prof.map((k) => k.slice());
   let nBites = 0;
-  const bite = (s: number, lo: number, hi: number, w: number, depthFn: (dSide: number) => number, t: number, e1: number, e2: number, tl: number) => {
+  const bite = (s: number, lo: number, hi: number, w: number, depthFn: (dSide: number) => number, t: number, e1: number, e2: number, tl: number, seams = true) => {
     const probe = depthFn(Math.max(...colourK[s].map((p) => p.d)));
-    const fr = free(lo, hi, w, [...cornerSpan(s), ...seamSpan(s), ...keepSpan(s, probe), ...taken[s].map(([a, b]) => [a - 150, b + 150] as Range)]);
+    const fr = free(lo, hi, w, [...cornerSpan(s), ...(seams ? seamSpan(s) : []), ...keepSpan(s, probe), ...taken[s].map(([a, b]) => [a - 150, b + 150] as Range)]);
     const ua = pickIn(fr, t);
     if (ua === null) return;
     const ub = ua + w;
@@ -639,7 +661,7 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
       {u: ua + e1 * deep, d: dIn - tl / 2},
       {u: ub - e2 * deep, d: dIn + tl / 2},
     ];
-    if (mid[1].u - mid[0].u < 40) return;
+    if (mid[1].u - mid[0].u < 170) return;
     colourK[s] = [...base.filter((p) => p.u < ua), {u: ua, d: dA}, ...mid, {u: ub, d: dB}, ...base.filter((p) => p.u > ub)];
     taken[s].push([ua, ub]);
     nBites++;
@@ -647,12 +669,18 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
   const rbL = r.fork('leftBite');
   const lb = {depth: lerpR(P.leftBite, rbL.next()), w: lerpR(P.leftBiteW, rbL.next()), t: rbL.next(), e1: rbL.range(0.25, 0.6), e2: rbL.range(0.25, 0.6), tl: rbL.jitter(P.tilt * 0.5)};
   if (lb.depth > 40 && (inkOf('left') ?? 0.5) >= 0.3) bite(3, H - LEFT_BITE_Y[1], H - LEFT_BITE_Y[0], lb.w, (d) => Math.max(lb.depth, d + P.step[0]), lb.t, lb.e1, lb.e2, lb.tl);
+  const rbR = r.fork('rightBite');
+  const rbd = {depth: lerpR(P.rightBite, rbR.next()), w: lerpR(P.rightBiteW, rbR.next()), t: rbR.next(), e1: rbR.range(0.15, 0.4), e2: rbR.range(0.15, 0.4), tl: rbR.jitter(P.tilt * 0.4)};
+  if (rbd.depth > 40 && (inkOf('right') ?? 0.5) >= 0.3) bite(1, RIGHT_BITE_Y[0], RIGHT_BITE_Y[1], Math.min(rbd.w, RIGHT_BITE_Y[1] - RIGHT_BITE_Y[0]), (d) => Math.max(rbd.depth, d + P.step[0]), rbd.t, rbd.e1, rbd.e2, rbd.tl, false);
   const bottomInk = inkOf('bottom') ?? 0.5;
-  for (let i = 0; i < 2; i++) {
+  // no corner could be left bare (flat sky, a hero, the mascot): the bottom's drawing gets a bite instead
+  const nBottom = Math.round(P.bottomBites) + (roles.includes('bare') || bottomInk < 0.3 ? 0 : 1);
+  for (let i = 0; i < 3; i++) {
     const rb = r.fork(`bottomBite${i}`);
     const d = {depth: lerpR(P.bottomBite, rb.next()), w: lerpR(P.bottomBiteW, rb.next()), t: rb.next(), e1: rb.range(0.3, 0.8), e2: rb.range(0.3, 0.8), tl: rb.jitter(P.tilt * 0.6)};
-    if (i >= Math.round(P.bottomBites) || bottomInk < 0.25) continue;
-    bite(2, 60, W - 60, d.w, (ds) => Math.min(PAINT_LIMITS.bottom - 10, ds + d.depth), d.t, d.e1, d.e2, d.tl);
+    if (i >= nBottom || bottomInk < 0.25) continue;
+    const depth = Math.max(d.depth, P.step[1] * 1.2);
+    bite(2, 60, W - 60, d.w, (ds) => Math.min(PAINT_LIMITS.bottom - 10, ds + depth), d.t, d.e1, d.e2, d.tl, false);
   }
 
   // 5. blocks: bleed corners, tongues
@@ -666,33 +694,8 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
     const qb = Math.abs(Q[k][1] - fc[k][1]);
     const bx = Math.max(lerpR(P.bleedR, t[0]), (qa + P.step[0]) / t[2]);
     const by = Math.max(lerpR(P.bleedR, t[1]) * (k <= 1 ? 0.8 : 1), (qb + P.step[0]) / t[3]);
-    blocks.push(cw([local(k, -OFF, -OFF), local(k, bx, -OFF), local(k, bx * t[2], by * t[3]), local(k, -OFF, by)]));
-  }
-  let nTongues = 0;
-  for (let i = 0; i < 2; i++) {
-    const rt2 = r.fork(`tongue${i}`);
-    const s = i === 0 || rt2.chance(0.6) ? 2 : 3;
-    const w = lerpR(P.tongueW, rt2.next());
-    const t = rt2.next();
-    const sl = rt2.range(0.2, 0.42);
-    const flip = rt2.chance(0.5);
-    const reach = rt2.range(40, 80);
-    const jit = Array.from({length: 8}, () => rt2.jitter(2));
-    if (i >= Math.round(P.tongues)) continue;
-    const [lo, hi] = s === 2 ? [60, W - 60] : [H - 1880, H - 1520];
-    const fr = free(lo, hi, w, [...cornerSpan(s), ...seamSpan(s).map(([a, b]) => [a + 40, b - 40] as Range), ...taken[s].map(([a, b]) => [a - 160, b + 160] as Range)]);
-    const ua = pickIn(fr, t);
-    if (ua === null) continue;
-    let deep = 0;
-    for (let u = ua; u <= ua + w; u += 10) deep = Math.max(deep, interp(colourK[s], u));
-    const inner = deep + reach;
-    const e = sl * w;
-    const a = flip ? 14 : e;
-    const b = flip ? e : 14;
-    const q = [toScreen(s, ua, -OFF), toScreen(s, ua + w, -OFF), toScreen(s, ua + w - b, inner), toScreen(s, ua + a, inner)];
-    blocks.push(cw(q.map((p, j) => [p[0] + jit[2 * j], p[1] + jit[2 * j + 1]] as Pt)));
-    taken[s].push([ua, ua + w]);
-    nTongues++;
+    // where the block crosses a side's paper margin it tapers (a long slant, ~1:2.5): never a short square jog
+    blocks.push(cw([local(k, -OFF, -OFF), local(k, bx + 2.5 * (qb + OFF), -OFF), local(k, bx, qb + 2), local(k, bx * t[2], by * t[3]), local(k, qa + 2, by), local(k, -OFF, by + 2.5 * (qa + OFF))]));
   }
 
   // 6. assemble the body (colour) and its sketch (ink): corners in clockwise order, first point on the side before
@@ -719,34 +722,124 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
   const body = assemble(colourK, false);
   const sketch = assemble(prof, true);
 
-  // 7. keep rects: always in colour (a block, run off the frame on any side the rect comes close to)
+  // 7. keep rects: always in colour (a block, flaring out to the frame on any side the rect comes close to, like a
+  // tongue), then fill every white notch narrower than ~100 px along the frame (a pocket between two blocks, or between
+  // a block and a step, reads as a glitch)
   const rk = r.fork('keep');
   let nKeeps = 0;
   for (const kr of keeps) {
     const jit = [rk.jitter(2), rk.jitter(2), rk.jitter(2), rk.jitter(2)];
     if (containsRectAny([body, ...blocks], kr, 12)) continue;
     const pad = 14;
-    let [x0, y0, x1, y1] = [kr[0] - pad, kr[1] - pad, kr[2] + pad, kr[3] + pad];
     const near = 110;
-    if (x0 < depthAt([body], 3, H - (kr[1] + kr[3]) / 2) + near) x0 = -OFF;
-    if (x1 > W - depthAt([body], 1, (kr[1] + kr[3]) / 2) - near) x1 = W + OFF;
-    if (y0 < depthAt([body], 0, (kr[0] + kr[2]) / 2) + near) y0 = -OFF;
-    if (y1 > H - depthAt([body], 2, W - (kr[0] + kr[2]) / 2) - near) y1 = H + OFF;
+    const ext = [
+      kr[1] - pad < depthAt([body], 0, (kr[0] + kr[2]) / 2) + near, // top
+      kr[2] + pad > W - depthAt([body], 1, (kr[1] + kr[3]) / 2) - near, // right
+      kr[3] + pad > H - depthAt([body], 2, W - (kr[0] + kr[2]) / 2) - near, // bottom
+      kr[0] - pad < depthAt([body], 3, H - (kr[1] + kr[3]) / 2) + near, // left
+    ];
+    const x0 = ext[3] ? -OFF : kr[0] - pad;
+    const y0 = ext[0] ? -OFF : kr[1] - pad;
+    const x1 = ext[1] ? W + OFF : kr[2] + pad;
+    const y1 = ext[2] ? H + OFF : kr[3] + pad;
+    // the extension flares out toward the frame (a tongue, crossing the margin on a slant)
+    const fl = (e: number) => Math.min(90, Math.max(0.3 * e, 0.8 * (e + OFF)));
+    const tl: Pt = [x0, y0];
+    const tr: Pt = [x1, y0];
+    const br: Pt = [x1, y1];
+    const bl: Pt = [x0, y1];
+    if (ext[2]) {
+      const f = fl(H - kr[3]);
+      if (!ext[3]) bl[0] -= f;
+      if (!ext[1]) br[0] += f;
+    }
+    if (ext[0]) {
+      const f = fl(kr[1]);
+      if (!ext[3]) tl[0] -= f;
+      if (!ext[1]) tr[0] += f;
+    }
+    if (ext[3]) {
+      const f = fl(kr[0]);
+      if (!ext[0]) tl[1] -= f;
+      if (!ext[2]) bl[1] += f;
+    }
+    if (ext[1]) {
+      const f = fl(W - kr[2]);
+      if (!ext[0]) tr[1] -= f;
+      if (!ext[2]) br[1] += f;
+    }
     blocks.push(
       cw([
-        [x0 + jit[0], y0 + jit[1]],
-        [x1 + jit[2], y0 - jit[1]],
-        [x1 - jit[2], y1 + jit[3]],
-        [x0 - jit[0], y1 - jit[3]],
+        [tl[0] + jit[0], tl[1] + jit[1]],
+        [tr[0] + jit[2], tr[1] - jit[1]],
+        [br[0] - jit[2], br[1] + jit[3]],
+        [bl[0] - jit[0], bl[1] - jit[3]],
       ]),
     );
     nKeeps++;
   }
+  // 8. tongues: stretches where the colour runs off the frame, placed clear of every block that already reaches it
+  // (keep blocks, bleeds) and of the bites. Each end crosses the paper margin on a 1:2.5 taper (a square end on a
+  // thin margin reads as a jog); one end may run on as a long slant inside the colour (a ground plane in perspective).
+  const frameSpan = (blk: Pt[], sd: number): Range | null => {
+    const at = blk.map((p) => fromScreen(sd, p)).filter((k) => k.d < 1);
+    return at.length ? [Math.min(...at.map((k) => k.u)), Math.max(...at.map((k) => k.u))] : null;
+  };
+  let nTongues = 0;
+  for (let i = 0; i < 2; i++) {
+    const rt2 = r.fork(`tongue${i}`);
+    const s = i === 0 || rt2.chance(0.6) ? 2 : 3;
+    const w = lerpR(P.tongueW, rt2.next());
+    const t = rt2.next();
+    const sl = rt2.range(0.2, 0.42);
+    const flip = rt2.chance(0.5);
+    const reach = rt2.range(40, 80);
+    const jit = Array.from({length: 8}, () => rt2.jitter(1.5));
+    if (i >= Math.round(P.tongues)) continue;
+    const [lo, hi] = s === 2 ? [60, W - 60] : [H - 1880, H - 1520];
+    const atFrame = blocks.map((blk) => frameSpan(blk, s)).filter((x): x is Range => !!x);
+    const fr = free(lo, hi, w, [...cornerSpan(s), ...seamSpan(s).map(([a, b]) => [a + 40, b - 40] as Range), ...[...taken[s], ...atFrame].map(([a, b]) => [a - 180, b + 180] as Range)]);
+    const ua = pickIn(fr, t);
+    if (ua === null) continue;
+    const ub = ua + w;
+    let deep = 0;
+    for (let u = ua; u <= ub; u += 10) deep = Math.max(deep, interp(colourK[s], u));
+    const inner = deep + reach;
+    const mA = Math.max(0, interp(colourK[s], ua));
+    const mB = Math.max(0, interp(colourK[s], ub));
+    const e = sl * w;
+    const a = Math.max(flip ? 0 : e, 2.5 * (mA + 2) + 6);
+    const b = Math.max(flip ? e : 0, 2.5 * (mB + 2) + 6);
+    if (ua + a > ub - b - 30) continue;
+    const q: Pt[] = [
+      toScreen(s, ua - 2.5 * OFF, -OFF),
+      toScreen(s, ub + 2.5 * OFF, -OFF),
+      toScreen(s, ub - 2.5 * (mB + 2), mB + 2),
+      toScreen(s, ub - b, inner),
+      toScreen(s, ua + a, inner),
+      toScreen(s, ua + 2.5 * (mA + 2), mA + 2),
+    ];
+    blocks.push(cw(q.map((p, j) => (j === 2 || j === 5 ? p : ([p[0] + jit[j], p[1] + jit[j + 1]] as Pt)))));
+    taken[s].push([ua, ub]);
+    nTongues++;
+  }
+
+  // each side between the body's corners (beyond them a ray runs along the other side's margin)
+  const spans: Range[] = [
+    [Q[0][0], Q[1][0]],
+    [Q[1][1], Q[2][1]],
+    [W - Q[2][0], W - Q[3][0]],
+    [H - Q[3][1], H - Q[0][1]],
+  ];
+  blocks.push(...fillNotches([body, ...blocks], spans, 160, 240));
+  blocks.push(...fillHoles([body, ...blocks]));
 
   const colourPolys = [body, ...blocks];
-  const inkPolys = [sketch, ...blocks, ...inkReach([sketch, ...blocks], P, r.fork('ink'))];
+  const inkBase = [sketch, ...blocks, ...inkReach([sketch, ...blocks], P, r.fork('ink'))];
+  // close the ink along every side: no gap under 60 px between two inked stretches on a line parallel to the frame
+  const inkPolys = [...inkBase, ...bridgeInk(colourPolys, inkBase, 60)];
 
-  // 8. ruled strokes: the block's corner where the paint stopped short (step corners; bare corners that hold little
+  // 9. ruled strokes: the block's corner where the paint stopped short (step corners; bare corners that hold little
   // drawing), else one painted top corner: a crossing pair 2-4 px out in the paper, overshooting the corner
   const strokes: EdgeStroke[] = [];
   const rsr = r.fork('ruled');
@@ -798,6 +891,244 @@ function build(seed: Seed, L: number, hints?: EdgeHints): PaintGeometry {
     strokes,
     meta: {roles, seamsL, seamsR, bites: nBites, tongues: nTongues, keeps: nKeeps, L},
   };
+}
+
+// ---------------------------------------------------------------- raster helpers
+
+/** Covered intervals of a union of polygons along a scanline (horizontal: y = c, vertical: x = c), merged. */
+export function scanSpans(polys: Pt[][], c: number, vertical: boolean): Range[] {
+  const iv: Range[] = [];
+  for (const p of polys) {
+    const xs: number[] = [];
+    for (let i = 0; i < p.length; i++) {
+      const a = p[i];
+      const b = p[(i + 1) % p.length];
+      const [ay, by, ax, bx] = vertical ? [a[0], b[0], a[1], b[1]] : [a[1], b[1], a[0], b[0]];
+      if (ay > c === by > c) continue;
+      xs.push(ax + ((bx - ax) * (c - ay)) / (by - ay));
+    }
+    xs.sort((m, n) => m - n);
+    for (let i = 0; i + 1 < xs.length; i += 2) iv.push([xs[i], xs[i + 1]]);
+  }
+  iv.sort((m, n) => m[0] - n[0]);
+  const out: Range[] = [];
+  for (const s of iv) {
+    const l = out[out.length - 1];
+    if (l && s[0] <= l[1] + 0.5) l[1] = Math.max(l[1], s[1]);
+    else out.push([s[0], s[1]]);
+  }
+  return out;
+}
+
+/** Colour for any paper the union encloses (a sliver where two slanted blocks meet near the frame): rasterise the union
+ *  (1 px), flood the paper from the frame border, and cover each enclosed patch with its padded bounding box. */
+function fillHoles(polys: Pt[][]): Pt[][] {
+  const mask = new Uint8Array(W * H); // 1 colour, 2 reached paper
+  for (let y = 0; y < H; y++) for (const [a, b] of scanSpans(polys, y + 0.5, false)) for (let x = Math.max(0, Math.ceil(a - 0.5)); x < Math.min(W, Math.floor(b - 0.5) + 1); x++) mask[y * W + x] = 1;
+  const stack: number[] = [];
+  const seed = (i: number) => {
+    if (!mask[i]) {
+      mask[i] = 2;
+      stack.push(i);
+    }
+  };
+  for (let x = 0; x < W; x++) (seed(x), seed((H - 1) * W + x));
+  for (let y = 0; y < H; y++) (seed(y * W), seed(y * W + W - 1));
+  const flood = () => {
+    while (stack.length) {
+      const i = stack.pop()!;
+      const x = i % W;
+      if (x > 0) seed(i - 1);
+      if (x < W - 1) seed(i + 1);
+      if (i >= W) seed(i - W);
+      if (i < W * (H - 1)) seed(i + W);
+    }
+  };
+  flood();
+  const out: Pt[][] = [];
+  for (let i = 0; i < W * H; i++) {
+    if (mask[i]) continue;
+    // an enclosed patch: its bounding box
+    let [x0, y0, x1, y1]: number[] = [W, H, 0, 0];
+    mask[i] = 3;
+    const st = [i];
+    while (st.length) {
+      const j = st.pop()!;
+      const x = j % W;
+      const y = (j / W) | 0;
+      x0 = Math.min(x0, x);
+      x1 = Math.max(x1, x);
+      y0 = Math.min(y0, y);
+      y1 = Math.max(y1, y);
+      for (const k of [x > 0 ? j - 1 : -1, x < W - 1 ? j + 1 : -1, j - W, j + W]) {
+        if (k < 0 || k >= W * H || mask[k]) continue;
+        mask[k] = 3;
+        st.push(k);
+      }
+    }
+    out.push([
+      [x0 - 1.5, y0 - 1.5],
+      [x1 + 2.5, y0 - 1.5],
+      [x1 + 2.5, y1 + 2.5],
+      [x0 - 1.5, y1 + 2.5],
+    ]);
+  }
+  return out;
+}
+
+/** Ink bridges: on scanlines parallel to each frame side (every 3 px, 2-360 px deep), wherever two inked stretches
+ *  on the paper are less than `gap` apart, the gap is inked too; consecutive scanlines' bridges join into polygons.
+ *  A scene line running parallel to an edge then never breaks into dashes where two reach bands meet (a block corner,
+ *  a step): it shows on one stretch and ends once. */
+function bridgeInk(colour: Pt[][], ink: Pt[][], gap: number): Pt[][] {
+  const out: Pt[][] = [];
+  const hh = 1.6;
+  for (let s = 0; s < 4; s++) {
+    const vertical = s === 1 || s === 3;
+    const len = vertical ? H : W;
+    type G = {rows: [number, number, number][]};
+    let open: G[] = [];
+    const done: G[] = [];
+    for (let dd = 2; dd <= 360; dd += 3) {
+      const c = s === 0 ? dd : s === 1 ? W - dd : s === 2 ? H - dd : dd;
+      const col = scanSpans(colour, c, vertical);
+      const cov = scanSpans(ink, c, vertical);
+      const paper: Range[] = [];
+      let x = 0;
+      for (const [a, b] of col) {
+        if (a > x) paper.push([x, Math.min(a, len)]);
+        x = Math.max(x, b);
+      }
+      if (x < len) paper.push([x, len]);
+      const gaps: Range[] = [];
+      for (const [pa, pb] of paper) {
+        const pieces = cov.map(([a, b]) => [Math.max(a, pa), Math.min(b, pb)] as Range).filter(([a, b]) => b - a > 4);
+        for (let i = 1; i < pieces.length; i++) {
+          const g = pieces[i][0] - pieces[i - 1][1];
+          if (g > 0.3 && g < gap) gaps.push([pieces[i - 1][1] - 1, pieces[i][0] + 1]);
+        }
+      }
+      const next: G[] = [];
+      for (const g of gaps) {
+        const grp = open.find((o) => {
+          const l = o.rows[o.rows.length - 1];
+          return l[0] === c - (s === 1 || s === 2 ? -3 : 3) && l[1] < g[1] && g[0] < l[2] && !next.includes(o);
+        });
+        if (grp) {
+          grp.rows.push([c, g[0], g[1]]);
+          next.push(grp);
+        } else next.push({rows: [[c, g[0], g[1]]]});
+      }
+      for (const o of open) if (!next.includes(o)) done.push(o);
+      open = next;
+    }
+    done.push(...open);
+    for (const g of done) {
+      const rows = g.rows.slice().sort((p, q) => p[0] - q[0]);
+      const left: Pt[] = [];
+      const right: Pt[] = [];
+      for (const [c, a, b] of rows) {
+        if (vertical) {
+          left.push([c - hh, a], [c + hh, a]);
+          right.push([c - hh, b], [c + hh, b]);
+        } else {
+          left.push([a, c - hh], [a, c + hh]);
+          right.push([b, c - hh], [b, c + hh]);
+        }
+      }
+      out.push(cw(simplify([...left, ...right.reverse()])));
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------- notch filler
+
+/** Drop points that lie on the line through their neighbours (within 0.4 px). */
+function simplify(p: Pt[]): Pt[] {
+  if (p.length < 4) return p;
+  const out: Pt[] = [];
+  for (let i = 0; i < p.length; i++) {
+    const a = out.length ? out[out.length - 1] : p[p.length - 1];
+    const b = p[i];
+    const c = p[(i + 1) % p.length];
+    const l = Math.hypot(c[0] - a[0], c[1] - a[1]);
+    const dist = l < 1e-6 ? 0 : Math.abs((c[0] - a[0]) * (a[1] - b[1]) - (a[0] - b[0]) * (c[1] - a[1])) / l;
+    if (dist > 0.4) out.push(b);
+  }
+  return out.length >= 3 ? out : p;
+}
+
+/** Colour for every white notch narrower than `w` along each frame side: a 1-D morphological opening of the paper
+ *  depth profile (erode then dilate with a flat window) removes paper peaks narrower than the window; the removed paper
+ *  becomes colour. Steps, bites (>= 170 px inside), bare corners (at the ends) and stretches of colour to the edge are
+ *  untouched. And every white stretch along the frame that is shorter than `gap` and has colour reaching the edge on
+ *  both sides is filled (a block running to the edge right next to a short white bite reads as a cut-out). */
+function fillNotches(polys: Pt[][], spans: Range[], w: number, gap: number): Pt[][] {
+  const out: Pt[][] = [];
+  const st = 4;
+  for (let s = 0; s < 4; s++) {
+    const n = Math.floor(LEN[s] / st) + 1;
+    const d: number[] = [];
+    // a ray beside a corner runs up the other side's margin (or hits nothing): cap it, so that column reads as one
+    // plateau with the corner (kept), never as a narrow peak
+    // that column is neutral: it takes no part in the opening and is never filled
+    const DMAX = 420;
+    const capped: boolean[] = [];
+    for (let i = 0; i < n; i++) {
+      const u = Math.min(LEN[s] - 1, Math.max(1, i * st));
+      const v = depthAt(polys, s, u);
+      capped.push(!(v < DMAX) || u < spans[s][0] + 2 || u > spans[s][1] - 2);
+      d.push(capped[i] ? DMAX : Math.max(0, v));
+    }
+    const h = Math.round(w / st / 2);
+    const at = (a: number[], j: number) => a[Math.min(n - 1, Math.max(0, j))];
+    const ero = d.map((_, i) => {
+      let m = Infinity;
+      for (let j = i - h; j <= i + h; j++) if (!capped[Math.min(n - 1, Math.max(0, j))]) m = Math.min(m, at(d, j));
+      return Number.isFinite(m) ? m : DMAX;
+    });
+    const opn = ero.map((_, i) => {
+      let m = -Infinity;
+      for (let j = i - h; j <= i + h; j++) m = Math.max(m, at(ero, j));
+      return m;
+    });
+    // short white stretches between two stretches of colour at the edge: no paper at all
+    for (let a = 0; a < n; ) {
+      if (d[a] <= 0.5) {
+        a++;
+        continue;
+      }
+      let b = a;
+      while (b + 1 < n && d[b + 1] > 0.5) b++;
+      if (a > 0 && b < n - 1 && (b - a + 1) * st < gap) for (let k = a; k <= b; k++) opn[k] = 0;
+      a = b + 1;
+    }
+    let i = 0;
+    while (i < n) {
+      if (capped[i] || d[i] - opn[i] <= 3) {
+        i++;
+        continue;
+      }
+      let j = i;
+      while (j + 1 < n && !capped[j + 1] && d[j + 1] - opn[j + 1] > 3) j++;
+      const outer: Pt[] = [];
+      const inner: Pt[] = [];
+      for (let k = Math.max(0, i - 2); k <= Math.min(n - 1, j + 2); k++) {
+        // a level under 10 px would leave a hairline of paper at the frame: run off instead
+        if (capped[k]) continue;
+        // the inner edge overshoots into the colour (the deepest of the neighbouring samples), so no sliver of paper
+        // stays between it and a slanted block edge
+        let dIn = d[k];
+        for (let q = k - 2; q <= k + 2; q++) if (q >= 0 && q < n && !capped[q]) dIn = Math.max(dIn, d[q]);
+        outer.push(toScreen(s, k * st, opn[k] >= 10 ? opn[k] - 1 : -OFF));
+        inner.push(toScreen(s, k * st, dIn + 3));
+      }
+      out.push(cw(simplify(dedupe([...outer, ...inner.reverse()]))));
+      i = j + 1;
+    }
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------- the ink reach

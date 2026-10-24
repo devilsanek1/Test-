@@ -136,8 +136,9 @@ export const TERRACE = {
   /** Bit on house #4's right door jamb (the hidden-cut match object: 3 px at rest -> 18 px at the zoom-6 match, screen
    *  (570, 1230)); he climbs the jamb (rot -90: head up). */
   bit: {x: 545, y: 1452, size: 3, rot: -90},
-  /** The keeper speck (>= 40 px at rest): beside door #4 at the hidden match, walking to door #5 on a dotted path. */
-  keeper: {from: [581, 1500] as Pt, to: [662, 1500] as Pt, h: 46, pathY: 1513},
+  /** The keeper speck (>= 40 px at rest, KNEELING too): beside door #4 at the hidden match, walking to door #5 on a
+   *  dotted path; 48 px standing, `crouch` 0.86 when he kneels = 41 px (the storyboard holds the kneel at rest). */
+  keeper: {from: [581, 1500] as Pt, to: [662, 1500] as Pt, h: 48, crouch: 0.86, pathY: 1513},
   /** The check-box tag over every door (house-local units at row scale u = w / 90): the props-lane CheckBoxTag design (a
    *  cream tag hanging from (47.5, 64) on a short loop, an EMPTY ink check box), `size` 19 wide; batched per row. Door
    *  #4's is the only TICKED one (props CheckBoxTag). */
@@ -459,7 +460,7 @@ export type TerraceHillProps = {
   /** Storyboard v3: Bit on house #4's door jamb (TERRACE.bit, 3 px at rest = 18 px at the zoom-6 match). true = there;
    *  {at, outAt} = pops on / off (1 frame); {x, y, size, rot, flip} overrides the pose. Default none. */
   bit?: boolean | {at?: number; outAt?: number; x?: number; y?: number; size?: number; rot?: number; flip?: boolean};
-  /** Storyboard v3: the keeper speck (props Keeper, TERRACE.keeper: 46 px at rest beside door #4) walking to door #5 on
+  /** Storyboard v3: the keeper speck (props Keeper, TERRACE.keeper: 48 px at rest beside door #4) walking to door #5 on
    *  a dotted path that draws on behind him, then kneeling to work. true = standing at door #4. Default none. */
   keeper?: boolean | {at?: number; walkAt?: number; walkDur?: number; kneelAt?: number; outAt?: number};
   /** Rows from here are haze bands (default hill 8, flat 6). */
@@ -599,7 +600,8 @@ const House4Bit: React.FC<{spec: TerraceHillProps['bit']; seed: string}> = ({spe
 };
 
 /** The keeper speck: beside door #4, walks to door #5 (walkAt, walkDur) on a dotted path that draws on behind him, then
- *  kneels (a 0.82 crouch about his feet) and works (installAt). His ink holds a world floor through the pull-back. */
+ *  kneels (a TERRACE.keeper.crouch 0.86 crouch about his feet: 41 px at rest) and works (installAt). His ink holds a
+ *  world floor through the pull-back. */
 const KeeperSpeck: React.FC<{spec: NonNullable<TerraceHillProps['keeper']>; zoom: number; seed: string}> = ({spec, zoom, seed}) => {
   const t = useTime();
   if (spec === false) return null;
@@ -633,7 +635,7 @@ const KeeperSpeck: React.FC<{spec: NonNullable<TerraceHillProps['keeper']>; zoom
   return (
     <>
       {q > 0.02 ? <Ink d={`M${K.from[0]} ${K.pathY}L${kx.toFixed(2)} ${K.pathY}`} width={Math.max(0.5, 2.2 / zoom)} dash={`${dash} ${dash * 1.4}`} taper={false} vary={0} seed={`${seed}/kpath`} /> : null}
-      {kneel ? <XG m={mat.about(mat.scale(1, 0.82), K.to[0], K.to[1])}>{scaled}</XG> : scaled}
+      {kneel ? <XG m={mat.about(mat.scale(1, K.crouch), K.to[0], K.to[1])}>{scaled}</XG> : scaled}
     </>
   );
 };

@@ -7,7 +7,7 @@ import React from 'react';
 import {palette} from '../../lib/theme';
 import {useTime, prog} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
-import {Pt} from '../../lib/sketch';
+import {line, Pt} from '../../lib/sketch';
 import {MakersCart, SupportTag} from './kit';
 import {mat, XG} from '../../lib/xf';
 import {CartSign, Satchel} from './shims';
@@ -77,7 +77,8 @@ export const Cart: React.FC<{T: CartTimes}> = ({T}) => {
     <>
       <MakersCart x={x0} y={CART.y} size={CART.size} crates={1} roll={roll} pusher at={t0} seed="s10/cart" />
       <Satchel x={x - 42} y={bedTop + 2} w={30} pullAt={[T.pull1, T.pull2]} seed="s10/satchel" />
-      <CartSign x={x + 44} y={bedTop} post={34} fontSize={22} seed="s10/csign" />
+      <Ink d={line(x + 46, bedTop + 2, x + 46, bedTop - 64, {over: [0, 0], seed: 's10/cpost'})} width={2.6} taper={false} seed="s10/cpost" />
+      <CartSign x={x + 46} y={bedTop - 64} w={118} fs={18} strikeAt={-10} fixedAt={-10} ink={2.2} seed="s10/csign" />
     </>
   );
 };

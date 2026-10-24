@@ -3,6 +3,8 @@
 //   <MakersCart x={900} y={1450} size={160} crates={2} roll={{at: 34.6, to: [720, 1450], dur: 0.8}} />
 //   <MakersCart x={-150} y={1440} roll={{at: 64.0, to: [1250, 1440], dur: 2.4}} pusher
 //     dropCrateAt={[64.6, 65.6]} skipAt={65.1} />                                // tick (siteL), skip (siteM), tick (siteR)
+//   <MakersCart x={760} y={1432} size={150} pusher roll={...}
+//     sign={<FixSign x={0} y={0} w={224} fs={36} strikeAt={B.out} fixedAt={B.out + 0.1} />} />   // S09 J5, S10
 //   <Tram y={1150} cross={{at: 60.3, dur: 0.4}} />                              // crosses x -1100 -> 1100 over 0.4 s
 //   tramRoof(y) -> world y of the roof line (Pip's perch slot)
 //
@@ -17,7 +19,7 @@ import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {circle, line, rect, rectPath, roundRect, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
-import {Depth, DEPTH_INK, hopY, landSquash, lodOf, misregScreen, usePropFrame, withOut} from './common';
+import {Depth, DEPTH_INK, hopY, landSquash, lodOf, misregScreen, pendulum, usePropFrame, withOut} from './common';
 import {LockCrate} from './Lock';
 import {Maker} from './Figures';
 
@@ -34,6 +36,15 @@ export type MakersCartProps = {
   skipAt?: number | number[];
   /** A back-view maker pushing it. */
   pusher?: boolean;
+  /** A node hung on the cart (the J5 sign: `<FixSign x={0} y={0} ... />`): drawn with (0, 0) = the HOOK at the top of
+   *  a short ink post standing in the bed's front end, in WORLD px (not scaled or mirrored with the cart: lettering
+   *  stays readable on a flipped cart). It rides the roll and the skips and jolts (a small pendulum) when the roll
+   *  starts and on each skip landing. `cartSignHook()` gives the rest hook in world coords. */
+  sign?: React.ReactNode;
+  /** Post height above the bed top (world px, default 0.55 x size); 0 / false = no post (the hook on the bed edge). */
+  signPost?: number | false;
+  /** Post position along the bed (cart-local units, bed -70..70; default 46 = the front end; mirrors with `flip`). */
+  signX?: number;
   at?: number;
   flip?: boolean;
   depth?: Depth;
@@ -42,6 +53,15 @@ export type MakersCartProps = {
 
 const BED = {x0: -70, x1: 70, y0: -60, y1: -47};
 const WHEEL: [number, number, number] = [-6, -24, 24];
+
+/** The sign slot's hook (world) for a cart at rest at (x, y): the top of the post in the bed's front end. */
+export function cartSignHook(p: {x: number; y: number; size?: number; flip?: boolean; signPost?: number | false; signX?: number}): Pt {
+  const size = p.size ?? 160;
+  const s = size / 140;
+  const post = p.signPost === false ? 0 : p.signPost ?? size * 0.55;
+  const dir = p.flip ? -1 : 1;
+  return [p.x + dir * ((p.signX ?? 46) * s + post * 0.03), p.y + BED.y0 * s - post];
+}
 
 function cartPos(t: number, p: MakersCartProps): {x: number; y: number; dist: number} {
   if (!p.roll || t < p.roll.at) return {x: p.x, y: p.y, dist: 0};
@@ -98,6 +118,22 @@ const MakersCartBase: React.FC<MakersCartProps> = (p) => {
   }
   const off = misregScreen(seed);
   const o: [number, number] = [off[0] / F.k, off[1] / F.k];
+  // the sign slot: a post in the bed's front end, the node hung from its top (world px, unmirrored)
+  let signNode: React.ReactNode = null;
+  if (p.sign) {
+    const post = p.signPost === false ? 0 : p.signPost ?? size * 0.55;
+    const sx = pos.x + dir * (p.signX ?? 46) * s;
+    const baseY = pos.y + hy * s + BED.y0 * s;
+    const hookY = baseY - post;
+    let sa = p.roll ? pendulum(t, p.roll.at, 6 * dir, 0.6, 0.9) : 0;
+    for (const sk of skips) sa += pendulum(t, sk + 0.25, -8 * dir, 0.5, 0.8);
+    signNode = (
+      <>
+        {post > 0 ? <Ink d={line(sx, baseY + 2, sx + dir * post * 0.03, hookY, {over: [0, 0], seed: `${seed}/post`})} width={F.Ww * 0.9} taper={false} seed={`${seed}/post`} /> : null}
+        <XG m={mat.compose(mat.translate(sx + dir * post * 0.03, hookY), mat.rotate(sa))}>{p.sign}</XG>
+      </>
+    );
+  }
   const body = (
     <>
       {/* handle rails + grip (behind the bed) */}
@@ -123,6 +159,7 @@ const MakersCartBase: React.FC<MakersCartProps> = (p) => {
       {dropped}
       {p.pusher ? <Maker x={pos.x - dir * 150 * s} y={pos.y} h={200 * s * 1.0} walk={p.roll && t >= p.roll.at && t < p.roll.at + (p.roll.dur ?? 1) ? {hz: 2.2} : undefined} seed={`${seed}/maker`} /> : null}
       <XG m={mat.compose(mat.translate(pos.x, pos.y + hy * s), mat.scale(dir * s * sq[0], s * sq[1]))}>{body}</XG>
+      {signNode}
     </>
   );
 };

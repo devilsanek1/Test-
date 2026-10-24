@@ -670,8 +670,11 @@ const TagRig: React.FC<{x: number; y: number; at?: number; tapAt?: number; outAt
   if (outAt === undefined || t < outAt) return tag;
   const SW = 0.17;
   if (t >= outAt + SW + 1 / fps) return null;
-  if (t >= outAt + SW) return <XG m={mat.about(mat.compose(mat.rotate(-16), mat.scale(0.55)), x, y)}>{tag}</XG>;
-  return <XG m={mat.about(mat.rotate(-16 * rewindStep(t, outAt, SW, fps)), x, y)}>{tag}</XG>;
+  // the swing pivots on the tag's real hang point (tagProps x / y move it off the PLAZA.gov slot: S01's rail offsets)
+  const px = extra?.x ?? x;
+  const py = extra?.y ?? y;
+  if (t >= outAt + SW) return <XG m={mat.about(mat.compose(mat.rotate(-16), mat.scale(0.55)), px, py)}>{tag}</XG>;
+  return <XG m={mat.about(mat.rotate(-16 * rewindStep(t, outAt, SW, fps)), px, py)}>{tag}</XG>;
 };
 
 /** The shutter padlock; `outAt` = one shrunken step, then gone (a pop off). */
@@ -680,7 +683,7 @@ const PadlockRig: React.FC<{x: number; y: number; at?: number; glintAt?: number;
   const pl = <PadlockSlot x={x} y={y} at={at} glintAt={glintAt} extra={extra} seed={seed} />;
   if (outAt === undefined || t < outAt) return pl;
   if (t >= outAt + 1 / fps) return null;
-  return <XG m={mat.about(mat.scale(0.55), x, y)}>{pl}</XG>;
+  return <XG m={mat.about(mat.scale(0.55), extra?.x ?? x, extra?.y ?? y)}>{pl}</XG>;
 };
 
 const WindowRig: React.FC<WinCtx> = ({id, ev, off, chrome, seed, windowSlot, k = 1, fps = 12}) => {
@@ -1180,17 +1183,72 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
   );
 };
 
+/** Storyboard v3: what S01 hangs on its closed shutters (scene01/plaza.tsx `S01_GOV`, mirrored here so the kit's
+ *  shut-down state = S01's last state): LETTERED 'back soon' tags (govB 104 px, govA 74, govC 62 wide) and the padlock /
+ *  tag x positions S01 shifts apart on the rails (the default `PLAZA.gov` slots overlap once a tag is lettered; govC's
+ *  tag hangs right of its padlock). No event times: `plazaShutdownGov` adds them. If S01 changes its numbers, pass its
+ *  spec as `plazaShutdownGov(at, S01_GOV)` (that always wins). */
+export const PLAZA_SHUTDOWN: Record<'govA' | 'govB' | 'govC', GovEvents> = {
+  govA: {padlockProps: {x: 152}, tagProps: {lettered: true, size: 74, x: 226}},
+  govB: {padlockProps: {x: 462}, tagProps: {lettered: true, size: 104, x: 562}},
+  govC: {shutterStop: 0.5, padlockProps: {x: 838}, tagProps: {lettered: true, size: 62, x: 900}},
+};
+
+/** The closing events of the shut-down state: set to `at`. */
+const SHUTDOWN_CLOSE = ['screenOffAt', 'shutterAt', 'offAt', 'padlockAt', 'tagAt', 'lanternOffAt'] as const;
+/** Everything else timed in a source spec is dropped (a missing build time = built, a missing event = never): the
+ *  build-ins (chromeAt, screenOnAt), the transient beats (tagTapAt, glintAt) and any rewind events (liftAt, onAt,
+ *  tagOutAt, padlockOutAt, lanternOnAt, screenLineAt): the rewinding scene merges its own. */
+const SHUTDOWN_DROP = ['chromeAt', 'screenOnAt', 'tagTapAt', 'glintAt', 'screenLineAt', 'liftAt', 'onAt', 'tagOutAt', 'padlockOutAt', 'lanternOnAt'] as const;
+
+/** Strip the timed props (at, tapAt, twirlAt, liftAt, outAt, lockAt, glintAt, ...) of a tag / padlock spec: keep its
+ *  look and placement (lettered, text, size, font, x, y, inkPx, ...). */
+function stripTimes<T extends object>(p: T | undefined): T | undefined {
+  if (!p) return undefined;
+  const out: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(p)) if (k !== 'at' && !/At$/.test(k) && k !== 'outDur') out[k] = v;
+  return out as T;
+}
+
+/** One building's shut-down events from a source spec (S01's): every closing event it has at `at`. */
+function shutdownOf(src: GovEvents, at: number): GovEvents {
+  const ev: GovEvents = {...src};
+  for (const k of SHUTDOWN_DROP) delete ev[k];
+  for (const k of SHUTDOWN_CLOSE) if (src[k] !== undefined) ev[k] = at;
+  const tagProps = stripTimes(src.tagProps);
+  const padlockProps = stripTimes(src.padlockProps);
+  if (tagProps) ev.tagProps = tagProps;
+  else delete ev.tagProps;
+  if (padlockProps) ev.padlockProps = padlockProps;
+  else delete ev.padlockProps;
+  return ev;
+}
+
 /** Storyboard v3: the gov events of the state S01 leaves the plaza in (S12's hard cut, the cover frame), every event at
  *  `at` (default -1: already happened): govA + govB screens off, shuttered, darker, padlocked, tagged; govB's dome
- *  lantern off; govC's screen off, its shutter HALF down, padlocked, tagged (not darker); govD lit. Merge the rewind
- *  events over it (liftAt, onAt, tagOutAt, padlockOutAt, screenOnAt, lanternOnAt, screenLineAt), plus the set props
- *  civicOffAt={at} lanternOffAt={at} phonesAt={at} for the far skyline, the lamp and the phones. */
-export function plazaShutdownGov(at = -1): Record<'govA' | 'govB' | 'govC', GovEvents> {
+ *  lantern off; govC's screen off, its shutter HALF down, padlocked, tagged (not darker); govD lit. The tags are S01's
+ *  LETTERED 'back soon' tags at S01's rail positions (`PLAZA_SHUTDOWN`), so the cut opens on exactly what S01 left.
+ *  `from` = a scene's own S01 gov spec (scene01/plaza.tsx `S01_GOV`): returned with every CLOSING event it has
+ *  (screenOffAt, shutterAt, offAt, padlockAt, tagAt, lanternOffAt) set to `at`, its non-time props kept (shutterStop,
+ *  tagProps / padlockProps look + x / y) and every other time dropped (build-ins, glints, taps, twirls): the exact
+ *  S01 end state whatever S01 tunes. Merge the rewind events over it (liftAt, onAt, tagOutAt, padlockOutAt, screenOnAt,
+ *  lanternOnAt, screenLineAt), plus the set props civicOffAt={at} lanternOffAt={at} phonesAt={at} for the far skyline,
+ *  the lamp and the phones. */
+export function plazaShutdownGov(at = -1, from?: Partial<Record<GovId, GovEvents>>): Record<'govA' | 'govB' | 'govC', GovEvents> & Partial<Record<'govD', GovEvents>> {
+  if (from) {
+    const out: Partial<Record<GovId, GovEvents>> = {};
+    for (const id of ['govA', 'govB', 'govC', 'govD'] as const) {
+      const src = from[id];
+      if (src) out[id] = shutdownOf(src, at);
+    }
+    return {govA: out.govA ?? {}, govB: out.govB ?? {}, govC: out.govC ?? {}, ...(out.govD ? {govD: out.govD} : {})};
+  }
   const closed: GovEvents = {screenOffAt: at, shutterAt: at, offAt: at, padlockAt: at, tagAt: at};
+  const S = PLAZA_SHUTDOWN;
   return {
-    govA: {...closed},
-    govB: {...closed, lanternOffAt: at},
-    govC: {screenOffAt: at, shutterAt: at, shutterStop: 0.5, padlockAt: at, tagAt: at},
+    govA: {...closed, padlockProps: {...S.govA.padlockProps}, tagProps: {...S.govA.tagProps}},
+    govB: {...closed, lanternOffAt: at, padlockProps: {...S.govB.padlockProps}, tagProps: {...S.govB.tagProps}},
+    govC: {screenOffAt: at, shutterAt: at, shutterStop: S.govC.shutterStop, padlockAt: at, tagAt: at, padlockProps: {...S.govC.padlockProps}, tagProps: {...S.govC.tagProps}},
   };
 }
 

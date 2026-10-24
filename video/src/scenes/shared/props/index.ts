@@ -15,5 +15,6 @@ export * from './Figures';
 export * from './Tablet';
 export * from './Vehicles';
 export * from './Labels';
+export * from './FixSign';
 export * from './CounterBoard';
 export * from './Diagram';

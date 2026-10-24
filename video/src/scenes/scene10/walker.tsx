@@ -6,7 +6,7 @@ import {useTime} from '../../lib/time';
 import type {Pt} from '../../lib/sketch';
 import {Citizen, OLD_QUARTER} from './kit';
 
-export const GAP_WALKER = {x: 684, y: 1262, h: 102, pace: 0.3};
+export const GAP_WALKER = {x: 696, y: 1262, h: 100, pace: 0.3};
 
 export const GapWalker: React.FC<{walkAt: number; stopAt: number; vp?: Pt}> = ({walkAt, stopAt, vp = OLD_QUARTER.vp as unknown as Pt}) => {
   const t = useTime();

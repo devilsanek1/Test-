@@ -59,10 +59,12 @@ export const OLD_QUARTER = {
   ],
   /** Pip on the board top (S13). */
   pipBoard: [760, 1090] as Pt,
-  /** People layer (life.tsx): a walker heading up the street gap, a stander cut by the left edge (heights from the
-   *  door-height eye level: (feet - 1150) / 1.1). Clear of the doors, the hanging plaques and the cart's line (y 1440). */
+  /** People layer (life.tsx): a walker UP the street gap (feet 1262, h 100: past siteM's old plaque, its corner and
+   *  cane and the cart line, so he never covers the S10 'old' event or Pip; he walks away to the VP, pace 0.3 = S10's
+   *  GapWalker), a stander cut by the left edge (heights from the door-height eye level: (feet - 1150) / 1.1). The gap
+   *  walker is FARTHER than the cart line (cartY 1330): the set draws him before the cart slot. */
   walkers: [
-    {x: 692, y: 1356, h: 186, go: 'vp', body: palette.teal, hair: 'short', acc: ['backpack']},
+    {x: 696, y: 1262, h: 100, go: 'vp', pace: 0.3, body: palette.teal, hair: 'short', acc: ['backpack']},
     {x: 64, y: 1478, h: 296, go: 'stand', body: palette.sage, hair: 'curly', acc: ['scarf']},
   ] as WalkerAnchor[],
   /** Street furniture: a planter on the sidewalk, a bike by the tree. */
@@ -85,6 +87,12 @@ export const OLD_QUARTER = {
   /** Support-tag hang points (props SupportTag) on the three hanging plaques (hung over each plate's upper-right corner,
    *  clear of the A-frame sign) and their size. */
   support: {L: [348, 1166] as Pt, M: [640, 1164] as Pt, R: [848, 1166] as Pt, size: 34},
+  /** v3: the second-row buildings that SHOW in the street gap (>= 20 px of wall between siteM and siteR) carry their
+   *  plaque at a readable size on their gap wall (`gapPlaque`, default 20 world px with secondOld = >= 21 px on screen in
+   *  S10), centred on the visible strip at y `gapPlaqueY`, above siteM's hanging plaque and its bracket; with 'half'
+   *  that is one current and one OLD plate. The caretaker's tag on the old gap door is drawn at `caretakerScale`. */
+  gapPlaqueY: 1062,
+  caretakerScale: 1.6,
 } as const;
 
 type SiteId = 'L' | 'M' | 'R';
@@ -115,6 +123,23 @@ const G = (() => {
     secondDoors += rectPath(dx, OLD_QUARTER.eye - 30, 14, 30);
     secondDoorInk += line(dx, OLD_QUARTER.eye, dx, OLD_QUARTER.eye - 30, {seed: `${s}/sd${b.x}a`, over: 0, breaks: false}) + line(dx - 1, OLD_QUARTER.eye - 30, dx + 15, OLD_QUARTER.eye - 30, {seed: `${s}/sd${b.x}b`, over: 'small', breaks: false}) + line(dx + 14, OLD_QUARTER.eye - 30, dx + 14, OLD_QUARTER.eye, {seed: `${s}/sd${b.x}c`, over: 0, breaks: false});
   }
+  // v3: the second-row buildings visible in the street gap, their plaque centre on the visible strip, and the window
+  // batch with the gap plaques' storey left blank (a plate replaces that window)
+  const gapBuildings = second
+    .map((b, i) => {
+      const lo = Math.max(b.x, 640);
+      const hi = Math.min(b.x + b.w, 740);
+      return {i, cx: (lo + hi) / 2, vis: hi - lo};
+    })
+    .filter((g) => g.vis >= 20);
+  let secondWinGap = '';
+  second.forEach((b, i) => {
+    const gb = gapBuildings.find((g) => g.i === i);
+    for (let yy = b.top + 14; yy < OLD_QUARTER.eye - 40; yy += 34) {
+      if (gb && yy + 16 > OLD_QUARTER.gapPlaqueY - 16 && yy < OLD_QUARTER.gapPlaqueY + 16) continue;
+      secondWinGap += rectPath(b.x + b.w * 0.2, yy, b.w * 0.24, 16) + rectPath(b.x + b.w * 0.56, yy, b.w * 0.24, 16);
+    }
+  });
   // far city at the end of the gap
   const far = rectPath(642, 1100, 22, 50) + rectPath(664, 1080, 18, 70) + rectPath(684, 1110, 26, 40) + rectPath(712, 1090, 24, 60);
   const kerb = line(-160, OLD_QUARTER.kerb, 1240, OLD_QUARTER.kerb + 2, {seed: `${s}/k`, over: 0}) + line(-160, OLD_QUARTER.kerb + 20, 1240, OLD_QUARTER.kerb + 23, {seed: `${s}/k2`, over: 0});
@@ -171,15 +196,16 @@ const G = (() => {
     balcInk += line(bx0 - 22, by, bx1 + 10, by, {seed: `${s}/bs${by}`, over: [6, 10]}) + line(bx0 - 18, by + 9, bx1 + 6, by + 9, {seed: `${s}/bs2${by}`, over: [4, 8]}) + line(bx0 - 8, by - 34, bx1, by - 34, {seed: `${s}/br${by}`, over: [3, 6]});
     for (let x = bx0 + 14; x < bx1; x += 26) balcInk += line(x, by - 32, x, by - 2, {seed: `${s}/bv${by}/${x}`, over: 0});
   }
-  return {secondDoors, secondDoorInk, street: streetGap, second, secondInk, secondWin, far, kerb, walk, streetMarks: street, stoops, stoopInk, treeCrown, treeTicks, trunk, trunkInk, pit, mansard, dormers, dormerGlass, dormerInk, mansardInk, antenna, tank, tankInk, plants, balcSlab, balcRail, balcInk};
+  return {secondDoors, secondDoorInk, street: streetGap, second, secondInk, secondWin, secondWinGap, gapBuildings, far, kerb, walk, streetMarks: street, stoops, stoopInk, treeCrown, treeTicks, trunk, trunkInk, pit, mansard, dormers, dormerGlass, dormerInk, mansardInk, antenna, tank, tankInk, plants, balcSlab, balcRail, balcInk};
 })();
 
-/** A host's own patch on an old door: a small sage tag tied to the handle (static; fill + hair ink). (x, y) = the knot. */
-const CaretakerTag: React.FC<{x: number; y: number; seed: string}> = ({x, y, seed}) => (
-  <>
+/** A host's own patch on an old door: a small sage tag tied to the handle (static; fill + hair ink). (x, y) = the knot;
+ *  `k` scales it about the knot (v3: OLD_QUARTER.caretakerScale, 9 -> 14 px wide, >= 12 px on screen in S10). */
+const CaretakerTag: React.FC<{x: number; y: number; k?: number; seed: string}> = ({x, y, k = 1, seed}) => (
+  <XG m={mat.about(mat.scale(k), x, y)}>
     <Fill d={polyPath([[x - 4, y + 3], [x + 4, y + 2], [x + 4.5, y + 12], [x - 4.5, y + 12.5]])} color={palette.sage} offset={false} seed={`${seed}/f`} />
-    <Ink d={`M${x} ${y - 1}L${x} ${y + 2.5}M${x - 4} ${y + 3}L${x + 4} ${y + 2}L${x + 4.5} ${y + 12}L${x - 4.5} ${y + 12.5}Z`} width={1.1} taper={false} vary={0} seed={`${seed}/i`} />
-  </>
+    <Ink d={`M${x} ${y - 1}L${x} ${y + 2.5}M${x - 4} ${y + 3}L${x + 4} ${y + 2}L${x + 4.5} ${y + 12}L${x - 4.5} ${y + 12.5}Z`} width={1.1 / Math.max(1, k * 0.8)} taper={false} vary={0} seed={`${seed}/i`} />
+  </XG>
 );
 
 export type OldQuarterProps = {
@@ -201,6 +227,10 @@ export type OldQuarterProps = {
   /** A host's own patch: one OLD second-row door (the one in the street gap) carries a small sage tag tied to its handle
    *  (a static pauser detail). Default true with secondOld="half". */
   caretakerTag?: boolean;
+  /** v3: the plaques of the second-row buildings that show in the street gap, drawn at this size (world px) on their
+   *  gap wall at OLD_QUARTER.gapPlaqueY (readable: with 'half' one current + one OLD plate), their support tags and
+   *  flips with them. Default 20 when `secondOld` is given, else false (review 5: every plaque size 10 at the eye line). */
+  gapPlaque?: number | false;
   /** The makers' sage support tags (props SupportTag) land on the hanging plaques L / M / R (OLD_QUARTER.support), and
    *  `second` = tiny tags pop onto the CURRENT second-row plaques in a wave (0.04 s apart) that skips the old ones. */
   supportAt?: {L?: number; M?: number; R?: number; second?: number};
@@ -234,7 +264,7 @@ export type OldQuarterProps = {
   seed?: string;
 };
 
-export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaqueSwingAt, oldPlaque = {}, secondPlaques = true, secondOld, secondOldAt, caretakerTag, supportAt = {}, noticeSign, cart, board = false, audience = false, bollard = true, band = true, foreground, site = {}, people: peopleIn, furniture: furnitureIn = OLD_QUARTER.furniture, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'oq'}) => {
+export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaqueSwingAt, oldPlaque = {}, secondPlaques = true, secondOld, secondOldAt, caretakerTag, gapPlaque: gapPlaqueIn, supportAt = {}, noticeSign, cart, board = false, audience = false, bollard = true, band = true, foreground, site = {}, people: peopleIn, furniture: furnitureIn = OLD_QUARTER.furniture, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'oq'}) => {
   const t = useTime();
   const S = OLD_QUARTER.sites;
   const people: PeopleSpec | undefined = peopleIn === 'gap' ? {n: 1} : peopleIn;
@@ -248,6 +278,14 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
   const flipAt = (i: number) => (secondOldAt === undefined ? undefined : Array.isArray(secondOldAt) ? secondOldAt[oldIdx.indexOf(i)] : secondOldAt + oldIdx.indexOf(i) * 0.04);
   const gapDoor = G.second.findIndex((b, i) => isOld(i) && b.x + b.w * 0.12 + 7 > OLD_QUARTER.gap[0] && b.x + b.w * 0.12 + 7 < OLD_QUARTER.gap[1]);
   const showCaretaker = (caretakerTag ?? secondOld === 'half') && gapDoor >= 0;
+  const gapPlaque = gapPlaqueIn ?? (secondOld !== undefined ? 20 : false);
+  const gapOf = (i: number) => (gapPlaque === false ? undefined : G.gapBuildings.find((g) => g.i === i));
+  // a plaque's spot + size: the gap buildings' readable plates on their gap wall, the rest at the eye line (size 10)
+  const plaqueSpot = (i: number) => {
+    const gb = gapOf(i);
+    const b = G.second[i];
+    return gb ? {x: gb.cx, y: OLD_QUARTER.gapPlaqueY, size: gapPlaque as number} : {x: b.x + b.w * 0.5, y: OLD_QUARTER.eye - 20, size: 10};
+  };
   const far = (
     <>
       {band ? <Fill rect={[600, OLD_QUARTER.band[0], 200, OLD_QUARTER.band[1] - OLD_QUARTER.band[0] + 2]} color={palette.peach} offset={false} mode="snap" seed={`${seed}/band`} /> : null}
@@ -259,25 +297,35 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
       {G.second.map((b, i) => (
         <Fill key={i} rect={[b.x, b.top, b.w, OLD_QUARTER.eye - b.top]} color={b.c} seed={`${seed}/s2${i}`} />
       ))}
-      <Fill d={G.secondWin} color={palette.sage} offset={false} seed={`${seed}/s2w`} />
+      <Fill d={gapPlaque === false ? G.secondWin : G.secondWinGap} color={palette.sage} offset={false} seed={`${seed}/s2w`} />
       <Fill d={G.secondDoors} color={palette.teal} offset={false} seed={`${seed}/s2d`} />
       <Ink d={G.secondInk} width={SI.far} taper={false} seed={`${seed}/s2i`} />
       <Ink d={G.secondDoorInk} width={SI.hair} taper={false} seed={`${seed}/s2di`} />
       {secondPlaques
-        ? G.second.map((b, i) => {
+        ? G.second.map((_b, i) => {
             const old = isOld(i);
             const fa = old ? flipAt(i) : undefined;
             // a flipping plaque starts new and paper-flips old at fa (props ElephantPlaque flipOldAt), with a dust puff
-            return <PlaqueSlot key={`p${i}`} x={b.x + b.w * 0.5} y={OLD_QUARTER.eye - 20} size={10} variant={old && fa === undefined ? 'old' : 'new'} width={SI.hair} extra={fa !== undefined ? {flipOldAt: fa, dustAt: fa + 0.1} : undefined} seed={`${seed}/s2p${i}`} />;
+            const sp = plaqueSpot(i);
+            return <PlaqueSlot key={`p${i}`} x={sp.x} y={sp.y} size={sp.size} variant={old && fa === undefined ? 'old' : 'new'} width={sp.size > 10 ? SI.far : SI.hair} extra={fa !== undefined ? {flipOldAt: fa, dustAt: fa + 0.1} : undefined} seed={`${seed}/s2p${i}`} />;
           })
         : null}
       {secondPlaques && supportAt.second !== undefined
         ? curIdx.map((i, n) => {
-            const b = G.second[i];
-            return <SupportTagSlot key={`st${i}`} x={b.x + b.w * 0.5 + 3} y={OLD_QUARTER.eye - 16} size={9} at={(supportAt.second as number) + n * 0.04} seed={`${seed}/s2t${i}`} />;
+            // hung over the plate's upper-right corner, scaled with it (size 9 on a 10 px plate)
+            const sp = plaqueSpot(i);
+            const k = sp.size / 10;
+            return <SupportTagSlot key={`st${i}`} x={sp.x + 3 * k} y={sp.y + 4 * k} size={9 * k} at={(supportAt.second as number) + n * 0.04} seed={`${seed}/s2t${i}`} />;
           })
         : null}
-      {showCaretaker ? <CaretakerTag x={G.second[gapDoor].x + G.second[gapDoor].w * 0.12 + 11} y={OLD_QUARTER.eye - 16} seed={`${seed}/ctag`} /> : null}
+      {showCaretaker ? (
+        gapPlaque === false ? (
+          <CaretakerTag x={G.second[gapDoor].x + G.second[gapDoor].w * 0.12 + 11} y={OLD_QUARTER.eye - 16} seed={`${seed}/ctag`} />
+        ) : (
+          // v3: readable (OLD_QUARTER.caretakerScale), knotted higher on the handle so it hangs inside the door's height
+          <CaretakerTag x={G.second[gapDoor].x + G.second[gapDoor].w * 0.12 + 11} y={OLD_QUARTER.eye - 24} k={OLD_QUARTER.caretakerScale} seed={`${seed}/ctag`} />
+        )
+      ) : null}
     </>
   );
   const ground = (
@@ -382,14 +430,17 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
       {wrap('ground', 0.6, ground)}
       {wrap('sites', 0.6, sites)}
       {wrap('board', 0.8, boardNode)}
-      {/* the cart on the stoop line (y 1330): in front of the sites, behind nearer walkers, the sign and the bollard */}
+      {/* people FARTHER than the cart line (the gap walker, feet 1262 and up the gap): behind the cart */}
+      {wrap('peopleFar', 0.75, <People anchors={OLD_QUARTER.walkers} vp={OLD_QUARTER.vp} spec={people} def={audience === false} split={{y: OLD_QUARTER.cartY, side: 'far'}} seed={`${seed}/ppl`} />)}
+      {/* the cart on the stoop line (y 1330): in front of the sites and the gap walker, behind nearer walkers, the sign
+          and the bollard */}
       {cart ? wrap('cart', 0.8, cart) : null}
       {wrap(
         'people',
         0.85,
         <>
           <Furniture items={audience === false ? furniture : false} seed={`${seed}/furn`} />
-          <People anchors={OLD_QUARTER.walkers} vp={OLD_QUARTER.vp} spec={people} def={audience === false} seed={`${seed}/ppl`} />
+          <People anchors={OLD_QUARTER.walkers} vp={OLD_QUARTER.vp} spec={people} def={audience === false} split={{y: OLD_QUARTER.cartY, side: 'near'}} seed={`${seed}/ppl`} />
         </>,
       )}
       {noticeSign ? wrap('sign', 0.9, typeof noticeSign === 'function' ? noticeSign(OLD_QUARTER.noticeSign) : noticeSign) : null}

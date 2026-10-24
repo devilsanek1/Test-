@@ -459,12 +459,16 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
   const L = perspRowLayout(LEFT_ROW);
   const R = perspRowLayout(RIGHT_ROW);
 
+  // the dawn peach horizon band sits BEHIND the sun slot (band -> sun -> towers): a sun rising at the VP (S09 'with')
+  // shows over the band between the towers instead of being painted over by it
+  const dawnLayer = (
+    <DawnOnly on={dawnBand} p={[720, 1000]}>
+      <Fill rect={[-160, 940, 1400, 124]} color={palette.peach} offset={false} mode="snap" seed={`${seed}/dawn`} />
+    </DawnOnly>
+  );
   const farLayer = (
     <>
       {night ? <Stars seed={seed} /> : null}
-      <DawnOnly on={dawnBand} p={[720, 1000]}>
-        <Fill rect={[-160, 940, 1400, 124]} color={palette.peach} offset={false} mode="snap" seed={`${seed}/dawn`} />
-      </DawnOnly>
       <Fill d={G.towersFar} color={night ? palette.tealDark : TOWER_HAZE[1]} offset={false} mode="snap" at={fa} seed={`${seed}/towersF`} />
       <Fill d={G.towers} color={night ? palette.tealDark : TOWER_HAZE[0]} offset={false} mode="snap" at={fa} seed={`${seed}/towers`} />
       {night ? <Fill d={G.towerDots} color={palette.peach} offset={false} mode="snap" seed={`${seed}/tdots`} /> : <Fill d={G.towerDayDots} color={HALF.daySky} offset={false} mode="snap" at={fa} seed={`${seed}/tddots`} />}
@@ -587,6 +591,7 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
 
   return (
     <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
+      {wrap('dawn', 0.1, dawnLayer)}
       {sun ? wrap('sun', 0.12, sun) : null}
       {wrap('far', 0.1, farLayer)}
       {wrap('ground', 0.4, ground)}

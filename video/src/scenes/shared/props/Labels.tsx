@@ -51,27 +51,46 @@ const DESC = 0.26;
 
 export const labelLines = (t: LabelText | undefined): string[] => (t === undefined ? [] : Array.isArray(t) ? t : t.split('\n'));
 
-export type TextLayout = {fs: number; w: number; h: number; lines: string[]; widths: number[]; base0: number; padX: number; pitch?: number};
+export type TextLayout = {
+  fs: number;
+  w: number;
+  h: number;
+  lines: string[];
+  widths: number[];
+  base0: number;
+  padX: number;
+  pitch?: number;
+  /** The largest font the given box holds (= fs without a box). */
+  fit?: number;
+  /** true = the box could not hold `minFont`: the paper was grown past it (w / h larger than the box). */
+  grew?: boolean;
+};
 
 /** Lay out lines at font size fs inside paper padding (padX, padTop, padBot in em). With `box` [w, h] the font shrinks
- *  to fit and the block is centred vertically in it. */
-export function layoutText(lines: string[], fs: number, pad: {x: number; top: number; bot: number; pitch?: number}, box?: [number, number]): TextLayout {
+ *  to fit and the block is centred vertically in it. `minFont`: the font never shrinks below it; when the box cannot
+ *  hold it, the PAPER grows (w / h past the box, `grew`). Without `minFont` the old floor applies (0.5 x fs, the text
+ *  may then overflow the box). */
+export function layoutText(lines: string[], fs: number, pad: {x: number; top: number; bot: number; pitch?: number}, box?: [number, number], minFont?: number): TextLayout {
   const raw = lines.map((l) => measureCaption(l, 100) / 100);
   const m = Math.max(0.5, ...raw);
   const n = Math.max(1, lines.length);
   const pitch = pad.pitch ?? PITCH;
   const blockEm = (n - 1) * pitch + CAP + DESC;
   let f = fs;
+  let fit = fs;
   if (box) {
-    f = Math.min(fs, box[0] / (m + 2 * pad.x), box[1] / (blockEm + pad.top + pad.bot));
-    f = Math.max(f, fs * 0.5);
+    fit = Math.min(fs, box[0] / (m + 2 * pad.x), box[1] / (blockEm + pad.top + pad.bot));
+    f = Math.max(fit, minFont !== undefined ? Math.min(fs, minFont) : fs * 0.5);
   }
-  const w = box ? box[0] : f * (m + 2 * pad.x);
-  const h = box ? box[1] : f * (blockEm + pad.top + pad.bot);
+  const needW = f * (m + 2 * pad.x);
+  const needH = f * (blockEm + pad.top + pad.bot);
+  const w = box ? (minFont !== undefined ? Math.max(box[0], needW) : box[0]) : needW;
+  const h = box ? (minFont !== undefined ? Math.max(box[1], needH) : box[1]) : needH;
+  const grew = !!box && (w > box[0] + 0.5 || h > box[1] + 0.5);
   // centre the block in the space left after the top pad (keeps the attachment's room at the top)
   const free = h - f * (pad.top + pad.bot + blockEm);
   const base0 = f * (pad.top + CAP) + Math.max(0, free) / 2;
-  return {fs: f, w, h, lines, widths: raw.map((r) => r * f), base0, padX: pad.x * f, pitch};
+  return {fs: f, w, h, lines, widths: raw.map((r) => r * f), base0, padX: pad.x * f, pitch, fit, grew};
 }
 
 /** Ink text block (CaptionHand) laid out by `layoutText`, at local (0, 0) = the block's paper top-left. Hairline
@@ -134,6 +153,10 @@ export type LabelTagProps = {
   /** Font size in WORLD px (on screen = x camera zoom). Default 36 (sign 30, stamp 34). `size` is an alias. */
   fontSize?: number;
   size?: number;
+  /** With a box (or w / h): the font never shrinks below this (world px; default 0.85 x fontSize). When the box is too
+   *  small for it the PAPER grows instead (down from the top edge: tag / card / slip; up from the ground: sign; about
+   *  the centre: stamp / notice; wider about the centre x), and a console warning names the label. */
+  minFont?: number;
   align?: 'center' | 'left';
   /** Pop in (7 % spring) about the attachment; omit = already there. */
   at?: number;
@@ -254,25 +277,9 @@ const LabelTagInner: React.FC<LabelTagProps & {t: number}> = (p) => {
     if (t >= f.at && t < f.at + 0.2) flipX = Math.max(0.03, Math.abs(Math.cos(Math.PI * prog(t, f.at, 0.2))));
   }
 
-  // paper rect + layout
+  // paper rect + layout (a too-small box grows the paper: minFont)
   const legRatio = 0.32;
-  let L: TextLayout;
-  let px: number;
-  let py: number;
-  if (p.box) {
-    const [x0, y0, x1, y1] = p.box;
-    L = layoutText(lines, fs, pad, [x1 - x0, y1 - y0]);
-    px = x0;
-    py = y0;
-  } else {
-    L = layoutText(lines, fs, pad, p.w !== undefined || p.h !== undefined ? [p.w ?? layoutText(lines, fs, pad).w, p.h ?? layoutText(lines, fs, pad).h] : undefined);
-    const x = p.x ?? 0;
-    const y = p.y ?? 0;
-    px = x - L.w / 2;
-    if (kind === 'tag') py = y + fs * 0.5;
-    else if (kind === 'sign') py = y - (p.legH ?? L.h * legRatio) - L.h;
-    else py = y - L.h / 2;
-  }
+  const {L, px, py} = labelRect(p, kind, lines, fs, seed);
   const w = L.w;
   const h = L.h;
   const cx = px + w / 2;
@@ -458,19 +465,51 @@ export const LabelTag: React.FC<LabelTagProps> = (p) => {
   return <LabelTagInner {...p} t={t} />;
 };
 
-/** The paper rect [x0, y0, x1, y1] a LabelTag will occupy at rest (for lint boxes / placing leaders). Needs the font
- *  (exact once CaptionHand has loaded, an estimate before). */
+/** Labels already warned about (one console warning per label, not per frame). */
+const WARNED = new Set<string>();
+
+/** The paper's layout and top-left for a label: a box (or w / h) the font cannot fit at `minFont` grows the paper,
+ *  keeping the attachment edge (tag / card / slip: the top; sign: the ground; stamp / notice: the centre). */
+function labelRect(p: LabelTagProps, kind: LabelKind, lines: string[], fs: number, seed: Seed): {L: TextLayout; px: number; py: number} {
+  const pad = PAD[kind];
+  const minF = Math.min(fs, p.minFont ?? fs * 0.85);
+  let L: TextLayout;
+  let px: number;
+  let py: number;
+  if (p.box) {
+    const [x0, y0, x1, y1] = p.box;
+    const bw = x1 - x0;
+    const bh = y1 - y0;
+    L = layoutText(lines, fs, pad, [bw, bh], minF);
+    px = x0 - (L.w - bw) / 2;
+    py = kind === 'sign' ? y1 - L.h : kind === 'stamp' || kind === 'notice' ? y0 - (L.h - bh) / 2 : y0;
+  } else {
+    const auto = p.w !== undefined || p.h !== undefined ? layoutText(lines, fs, pad) : undefined;
+    L = auto ? layoutText(lines, fs, pad, [p.w ?? auto.w, p.h ?? auto.h], minF) : layoutText(lines, fs, pad);
+    const x = p.x ?? 0;
+    const y = p.y ?? 0;
+    px = x - L.w / 2;
+    if (kind === 'tag') py = y + fs * 0.5;
+    else if (kind === 'sign') py = y - (p.legH ?? L.h * 0.32) - L.h;
+    else py = y - L.h / 2;
+  }
+  if (L.fit !== undefined && L.fit < minF - 0.05 && lines.length) {
+    const key = `${String(seed)}|${lines.join('/')}|${fs}`;
+    if (!WARNED.has(key)) {
+      WARNED.add(key);
+      console.warn(`[LabelTag] "${lines.join(' / ')}" (${kind}, seed ${String(seed)}): the box fits only ${L.fit.toFixed(1)} world px, under the floor ${minF.toFixed(1)} (fontSize ${fs}); the paper grew to ${L.w.toFixed(0)} x ${L.h.toFixed(0)}. Enlarge the box, or lower fontSize / minFont.`);
+    }
+  }
+  return {L, px, py};
+}
+
+/** The paper rect [x0, y0, x1, y1] a LabelTag will occupy at rest (for lint boxes / placing leaders), including any
+ *  growth past a too-small box (minFont). Needs the font (exact once CaptionHand has loaded, an estimate before). */
 export function labelBox(p: LabelTagProps): [number, number, number, number] {
-  if (p.box) return p.box;
   const kind: LabelKind = p.kind ?? p.variant ?? p.type ?? p.style ?? 'card';
   const fs = p.fontSize ?? p.size ?? DEF_FS[kind];
   const lines = labelLines(p.text ?? p.lines);
-  const L0 = layoutText(lines, fs, PAD[kind]);
-  const L = p.w !== undefined || p.h !== undefined ? layoutText(lines, fs, PAD[kind], [p.w ?? L0.w, p.h ?? L0.h]) : L0;
-  const x = p.x ?? 0;
-  const y = p.y ?? 0;
-  const px = x - L.w / 2;
-  const py = kind === 'tag' ? y + fs * 0.5 : kind === 'sign' ? y - (p.legH ?? L.h * 0.32) - L.h : y - L.h / 2;
+  const {L, px, py} = labelRect(p, kind, lines, fs, p.seed ?? `label/${kind}/${lines.join('|')}`);
   return [px, py, px + L.w, py + L.h];
 }
 

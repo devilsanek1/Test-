@@ -7,6 +7,7 @@
 //   <Lock x={330} y={1130} size={42} state="fixed" at={1.2} />                       // THE FIX: sage box + cream check tag
 //   <Lock ... dropAt={48.6} dropDist={260} rider={<Bit .../>} />                     // falls with a clunk, Bit rides it
 //   <LockCrate x={440} y={1440} size={80} n={3} at={0.5} />   <NewLockIcon grip="bottom" size={60} />
+//   <LockCrate x={215} y={1226} size={58} lidAt={0.96} tagsAt={1.25} ink={2.2} />    // S09: shut, lid pops, tags rise
 //
 // Anchor: (x, y) = the BOX CENTRE. size = box height in world px (width = 0.8 x size). Local design units: the box is
 // 80 x 100 (x -40..40, y -50..50); `LOCK` lists the local points (gap, strike, keyhole...) and `lockPoint()` maps them.
@@ -31,6 +32,7 @@ import {mat, XG} from '../../../lib/xf';
 import {bt, landSquash, lodOf, PropBase, PropRoot, usePropFrame} from './common';
 import {Cobweb} from './Glyphs';
 import {Bit} from './Bit';
+import {CheckBoxTag} from './Labels';
 
 export type LockState = 'closed' | 'open' | 'blueprint' | 'sketch' | 'ghost' | 'dot' | 'fixed';
 
@@ -446,33 +448,92 @@ export type LockCrateProps = PropBase & {
   size?: number;
   /** Number of fixed locks peeking out. Default 3. */
   n?: number;
-  /** Checks stroke onto the tags. */
+  /** Checks stroke onto the locks' tags. */
   checkAt?: number;
+  /** A tan lid on the crate: shut (no locks showing) until `lidAt`. Default: true when `lidAt` is given, else false (the
+   *  open crate with its locks peeking out, the v2 look). */
+  lid?: boolean;
+  /** S09 dawn: the lid pops open (hinged at its back-left end, 0 -> -118 deg with the 7 % spring) and the new locks bob
+   *  up into the opening (0.04 s apart). */
+  lidAt?: number;
+  /** S09 'out': n + 1 EMPTY cream check-box tags (CheckBoxTag) pop up out of the crate on sticks, 0.04 s apart. */
+  tagsAt?: number;
+  /** Number of rising tags (default n + 1). */
+  tags?: number;
 };
 
-/** A sand crate of fixed locks (S07 cart, S10 stoop, S12 steps). (x, y) = bottom centre. */
-export const LockCrate: React.FC<LockCrateProps> = ({x = 0, y = 0, size = 80, n = 3, at, dur, outAt, outDur, seed = 'crate', depth, ink, rot, flip, checkAt}) => {
+/** A sand crate of fixed locks (S07 cart, S09 stoop, S10 stoop, S12 steps). (x, y) = bottom centre. With a lid
+ *  (`lid` / `lidAt`) it stays shut until `lidAt`; `tagsAt` raises its check-box tags. */
+export const LockCrate: React.FC<LockCrateProps> = ({x = 0, y = 0, size = 80, n = 3, at, dur, outAt, outDur, seed = 'crate', depth, ink, rot, flip, checkAt, lid, lidAt, tagsAt, tags}) => {
+  const t = useTime();
   const s = size / 80;
   const F = usePropFrame({scale: s, depth, ink, at, dur, baseDur: 0.5, seed, defDepth: 'mid'});
   const lod = lodOf(80 * F.k, 10, 40);
   const w = 80;
   const h = 50;
   const T = F.T;
+  const hasLid = lid ?? lidAt !== undefined;
+  const open = !hasLid || (lidAt !== undefined && t >= lidAt);
   const locks: React.ReactNode[] = [];
-  for (let i = 0; i < n; i++) {
-    const lx = -w / 2 + (w * (i + 0.5)) / n + (i % 2 ? 2 : -2);
-    locks.push(<Lock key={i} x={lx} y={-h + 4 - (i % 2 ? 4 : 0)} size={34} state="fixed" at={T(0.3 + i * 0.07)} checkAt={checkAt} seed={`${seed}/l${i}`} ink={F.W} lod={lod === 0 ? 0 : undefined} rot={(i - (n - 1) / 2) * 7} />);
+  if (open) {
+    for (let i = 0; i < n; i++) {
+      const lx = -w / 2 + (w * (i + 0.5)) / n + (i % 2 ? 2 : -2);
+      const ly = -h + 4 - (i % 2 ? 4 : 0);
+      // with a lid the locks bob up into the opening after it pops (hidden inside the crate before)
+      const rise = hasLid && lidAt !== undefined ? (t < lidAt + 0.04 + i * 0.04 ? 0 : springAt(t, lidAt + 0.04 + i * 0.04, springs.pop)) : 1;
+      if (rise <= 0.001) continue;
+      locks.push(<Lock key={i} x={lx} y={ly + (1 - rise) * 22} size={34} state="fixed" at={hasLid ? undefined : T(0.3 + i * 0.07)} checkAt={checkAt} seed={`${seed}/l${i}`} ink={F.W} lod={lod === 0 ? 0 : undefined} rot={(i - (n - 1) / 2) * 7} />);
+    }
+  }
+  // the check-box tags rising out of the crate on sticks (EMPTY: the fix is here, not installed yet)
+  const tagNodes: React.ReactNode[] = [];
+  if (tagsAt !== undefined && t >= tagsAt && lod >= 1) {
+    const m = tags ?? n + 1;
+    for (let i = 0; i < m; i++) {
+      const ta = tagsAt + i * 0.04;
+      if (t < ta) continue;
+      const tx = -w / 2 + (w * (i + 0.5)) / m;
+      const k = springAt(t, ta, springs.pop);
+      const lean = (i - (m - 1) / 2) * 1.6;
+      const stickTop = -h - w * (0.62 + (i % 2) * 0.14) * k;
+      tagNodes.push(
+        <React.Fragment key={i}>
+          <Ink d={`M${tx.toFixed(1)} ${(-h + 2).toFixed(1)}L${(tx + lean).toFixed(1)} ${stickTop.toFixed(1)}`} width={F.W * 0.7} taper={false} vary={0} seed={`${seed}/ts${i}`} />
+          <CheckBoxTag x={tx + lean} y={stickTop - w * 0.1} size={w * 0.34} at={ta} ink={F.W * 0.75} seed={`${seed}/tg${i}`} />
+        </React.Fragment>,
+      );
+    }
+  }
+  // the lid: a tan slab on the crate top, hinged at its back-left end
+  let lidNode: React.ReactNode = null;
+  if (hasLid) {
+    const ang = lidAt === undefined ? 0 : -118 * (t < lidAt ? 0 : springAt(t, lidAt, springs.pop));
+    const lw = w + 8;
+    lidNode = (
+      <XG m={mat.compose(mat.translate(-w / 2 - 4, -h), mat.rotate(ang))}>
+        <Fill d={rectPath(0, -9, lw, 9)} color={palette.tan} at={T(0.16)} offset={F.off} seed={`${seed}/lid`} />
+        {lod >= 1 ? <Ink d={rect(0, -9, lw, 9, {seed: `${seed}/lidI`, over: 3})} at={T(0.05)} width={F.W} seed={`${seed}/lidI`} /> : null}
+      </XG>
+    );
   }
   return (
     <PropRoot x={x} y={y} s={s} rot={rot} flip={flip} outAt={outAt} outDur={outDur}>
+      {hasLid && open ? <Fill rect={[-w / 2 + 3, -h - 4, w - 6, 8]} color={palette.tealDark} offset={false} mode="snap" seed={`${seed}/hole`} /> : null}
+      {tagNodes}
       {locks}
       <Fill rect={[-w / 2, -h, w, h]} color={palette.sand} at={T(0.12)} offset={F.off} seed={`${seed}/f`} />
       {lod >= 1 ? <Fill rect={[-w / 2, -h, 9, h]} color={palette.tan} at={T(0.2)} offset={false} mode="snap" seed={`${seed}/sh`} /> : null}
       {lod >= 1 ? <Ink d={rect(-w / 2, -h, w, h, {seed: `${seed}/o`, over: 4})} at={T(0)} width={F.W} seed={`${seed}/o`} /> : null}
       {lod === 2 ? <Ink d={line(-w / 2 + 4, -h * 0.5, w / 2 - 4, -h * 0.5, {over: [0, 0], seed: `${seed}/s1`}) + line(-w / 2 + 12, -h + 4, -w / 2 + 12, -4, {over: [0, 0], seed: `${seed}/s2`}) + line(w / 2 - 12, -h + 4, w / 2 - 12, -4, {over: [0, 0], seed: `${seed}/s3`})} at={T(0.18)} width={F.W * 0.65} seed={`${seed}/sl`} order="all" /> : null}
+      {lidNode}
     </PropRoot>
   );
 };
+
+export type LidCrateProps = LockCrateProps;
+/** The S09 shim name (same props): a LockCrate WITH a lid (shut until `lidAt`), size 70 and the 2.2 px label ink by
+ *  default. `<LidCrate x y size lidAt tagsAt ink seed />`. */
+export const LidCrate: React.FC<LidCrateProps> = (p) => <LockCrate size={70} ink={2.2} seed="lidcrate" lid {...p} />;
 
 // ---------------------------------------------------------------- LockSpecks (batched, for hundreds of far doors)
 

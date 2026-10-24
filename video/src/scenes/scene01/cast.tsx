@@ -1,41 +1,140 @@
-// S01 cast: the plaza citizens (back view, kit Person), the lamp pigeons and Pip. Everything is a pure function of
-// scene time (no state between frames), so S12's rewind can replay it backwards through a TimeProvider.
+// S01 cast: the plaza citizens (back view, kit Person), the edge onlooker's phone, the lamp pigeons and Pip. Everything
+// is a pure function of scene time (no state between frames), so S12's rewind can replay it backwards through a
+// TimeProvider.
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {clamp, ease as E, lerp, osc, prog, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {blob, polyPath, Pt} from '../../lib/sketch';
-import {rng} from '../../lib/rng';
+import {arc, blob, polyPath, rectPath, roundRect, Pt} from '../../lib/sketch';
+import {rand, rng} from '../../lib/rng';
 import {mat, XG} from '../../lib/xf';
 import {Person, Bird, PERSON_BODIES} from '../../lib/kit';
 import type {Acc, Hair} from '../../lib/kit/Person';
-import {Elephant, hop, popSwitch} from '../../lib/mascot';
+import {Elephant, popSwitch} from '../../lib/mascot';
 import {Citizen} from '../shared/props';
 
-// ---------------------------------------------------------------- citizens
+// ---------------------------------------------------------------- shared bits: elbow arm, lit phone, head turn
 
+/** A sleeve with an elbow from the shoulder to the hand (2-link IK, the elbow bends OUTWARD on `side` and down, so the
+ *  arm folds instead of sweeping straight), coat polygon + ink sides + a sand hand. Local units of the figure. */
+const ElbowArm: React.FC<{sh: Pt; hand: Pt; lu: number; lf: number; side: 1 | -1; w: number; coat: string; W: number; seed: string}> = ({sh, hand, lu, lf, side, w, coat, W, seed}) => {
+  let dx = hand[0] - sh[0];
+  let dy = hand[1] - sh[1];
+  let d = Math.hypot(dx, dy) || 1e-6;
+  const maxD = (lu + lf) * 0.999;
+  const H: Pt = d > maxD ? [sh[0] + (dx / d) * maxD, sh[1] + (dy / d) * maxD] : hand;
+  dx = H[0] - sh[0];
+  dy = H[1] - sh[1];
+  d = Math.hypot(dx, dy) || 1e-6;
+  const a = (lu * lu - lf * lf + d * d) / (2 * d);
+  const hh = Math.sqrt(Math.max(0, lu * lu - a * a));
+  const ux = dx / d;
+  const uy = dy / d;
+  const P: Pt = [sh[0] + ux * a, sh[1] + uy * a];
+  const c1: Pt = [P[0] - uy * hh, P[1] + ux * hh];
+  const c2: Pt = [P[0] + uy * hh, P[1] - ux * hh];
+  // prefer the elbow BELOW the hand-shoulder line (the arm folds up, never a raised elbow with the forearm hanging),
+  // then outward on `side`
+  const score = (c: Pt) => 0.5 * side * c[0] + c[1];
+  const El = score(c1) >= score(c2) ? c1 : c2;
+  const nrm = (a0: Pt, b0: Pt): Pt => {
+    const L = Math.hypot(b0[0] - a0[0], b0[1] - a0[1]) || 1;
+    return [-(b0[1] - a0[1]) / L, (b0[0] - a0[0]) / L];
+  };
+  const n1 = nrm(sh, El);
+  const n2 = nrm(El, H);
+  let mx = n1[0] + n2[0];
+  let my = n1[1] + n2[1];
+  const mL = Math.hypot(mx, my) || 1;
+  mx /= mL;
+  my /= mL;
+  const ml = Math.min(2.2, 1 / Math.max(0.45, mx * n1[0] + my * n1[1]));
+  const hw = w / 2;
+  const tw = hw * 0.85;
+  const A: Pt[] = [[sh[0] + n1[0] * hw, sh[1] + n1[1] * hw], [El[0] + mx * hw * ml, El[1] + my * hw * ml], [H[0] + n2[0] * tw, H[1] + n2[1] * tw]];
+  const Bp: Pt[] = [[sh[0] - n1[0] * hw, sh[1] - n1[1] * hw], [El[0] - mx * hw * ml, El[1] - my * hw * ml], [H[0] - n2[0] * tw, H[1] - n2[1] * tw]];
+  const f = (p: Pt) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+  const fx = H[0] - El[0];
+  const fy = H[1] - El[1];
+  const fL = Math.hypot(fx, fy) || 1;
+  return (
+    <>
+      <Fill d={blob(H[0] + (fx / fL) * w * 0.25, H[1] + (fy / fL) * w * 0.25, w * 0.42, w * 0.46, {seed: `${seed}/h`})} color={palette.sand} offset={false} mode="none" seed={`${seed}/hf`} />
+      <Fill d={polyPath([...A, ...Bp.slice().reverse()])} color={coat} offset={false} mode="none" seed={`${seed}/af`} />
+      <Ink d={`M${f(A[0])}L${f(A[1])}L${f(A[2])}M${f(Bp[0])}L${f(Bp[1])}L${f(Bp[2])}M${f(A[2])}L${f(Bp[2])}`} width={W} taper={false} seed={`${seed}/ai`} />
+    </>
+  );
+};
+
+/** A phone held up, its lit screen toward us (we stand behind the filmer): a 3-stroke mini govB on it (the dome, the
+ *  shut teal block, the shutter slats): everyone is filming the shutdown. Local units, the hand at (0, 0). */
+const LitPhone: React.FC<{W: number; seed: string}> = ({W, seed}) => (
+  <>
+    <Fill d={roundRect(-12, -42, 24, 40, 4)} color={palette.card} offset={false} mode="none" seed={`${seed}/pb`} />
+    <Fill d={rectPath(-9, -38, 18, 31)} color={palette.cream} offset={false} mode="none" seed={`${seed}/ps`} />
+    <Fill d={rectPath(-6.5, -25, 13, 15)} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/pg`} />
+    <Ink d={roundRect(-12, -42, 24, 40, 4, {seed: `${seed}/pi`})} width={W * 0.85} taper={false} seed={`${seed}/pi`} />
+    <Ink d="M-5.5 -25Q-5 -33 0 -33Q5 -33 5.5 -25" width={W * 0.6} taper={false} seed={`${seed}/pd`} />
+    <path d="M-5 -20.5H5M-5 -15.5H5" fill="none" stroke={palette.cream} strokeWidth={W * 0.45} strokeLinecap="round" />
+  </>
+);
+
+type HeadGeo = {w: number; hr: number; hy: number};
 const TORSO = 95; // the props presets' Person torso (Figures.tsx), so FIG_H = 199 local units
 const LEG = 62;
 const FIG_H = 199;
-const inkFor = (h: number) => (h >= 260 ? 4.8 : h >= 120 ? 3.4 : h >= 70 ? 2.2 : 1.6);
+/** The kit Person's torso width / head radius for a seed (mirrors makeSpec's first draws when torsoH is given). */
+const headGeo = (seed: string, torsoH = TORSO): HeadGeo => {
+  const r = rng(`person/${seed}`);
+  const w = r.range(86, 100);
+  const hr = w * r.range(0.23, 0.26);
+  return {w, hr, hy: -torsoH - hr * 0.86};
+};
+
+/** The back-view -> 3/4 head swap (review: a lean alone reads as nothing on a phone): on the turning side the cheek and
+ *  jaw edge appear past the hair and the ear moves in. Grows 20 % -> 100 % about the head (no fades). */
+const HeadTurn: React.FC<{g: HeadGeo; d: 1 | -1; k: number; W: number; seed: string}> = ({g, d, k, W, seed}) => {
+  const {hr, hy} = g;
+  const cx = d * hr * 0.6;
+  const cy = hy + hr * 0.3;
+  const rx = hr * 0.52;
+  const ry = hr * 0.66;
+  const ex = d * hr * 0.26;
+  const ey = hy + hr * 0.1;
+  return (
+    <XG m={mat.about(mat.scale(k), d * hr * 0.15, hy + hr * 0.2)}>
+      <Fill d={blob(cx, cy, rx, ry, {seed: `${seed}/ck`})} color={palette.sand} offset={false} mode="none" seed={`${seed}/ckf`} />
+      <Ink d={arc(cx, cy, rx, ry, d > 0 ? -70 : 110, d > 0 ? 75 : 250, {seed: `${seed}/jw`})} width={W} taper={false} seed={`${seed}/jw`} />
+      <Fill d={blob(ex, ey, hr * 0.17, hr * 0.27, {seed: `${seed}/er`})} color={palette.sand} offset={false} mode="none" seed={`${seed}/erf`} />
+      <Ink d={arc(ex, ey, hr * 0.17, hr * 0.27, d > 0 ? 100 : -80, d > 0 ? 260 : 80, {seed: `${seed}/eri`})} width={W * 0.8} taper={false} seed={`${seed}/eri`} />
+    </XG>
+  );
+};
+
+// ---------------------------------------------------------------- citizens
+
+const inkFor = (h: number) => (h >= 120 ? 3.4 : h >= 70 ? 2.2 : 1.6);
 
 export type CitizenPlan = {
   x: number;
   y: number;
   h: number;
   seed: string;
-  /** Coat colour; omit = the kit Person's own pick for the seed (so the figure matches the set's citizen). */
+  /** Coat colour; omit = the kit Person's own pick for the seed. */
   body?: string;
   hair?: Hair;
   acc?: Acc[];
   /** Walking away toward the VP: px/s along the ray to `vp`, legs at `hz`; slows from slowAt, stands from stopAt. */
   walk?: {speed: number; hz: number; slowAt?: number; stopAt?: number};
-  /** Lean keys (deg about the feet: the head turns toward something); each eases in over 0.2 s. */
+  /** Lean keys (deg about the feet); each eases in over 0.2 s. */
   lean?: {t: number; a: number}[];
-  phone?: {up: number; down?: number};
-  /** Points an arm up at something: local hand target in person units (hip line at 0). */
-  point?: {at: number; side: 1 | -1; hand: Pt};
+  /** Head swaps: d = 1 / -1 = the 3/4 head turned right / left (cheek + ear show), 0 = back to the back view. */
+  turn?: {t: number; d: 1 | 0 | -1}[];
+  /** Raises a phone (lit screen, mini govB) on `side`, along an elbow arc; lowers it at `down`. */
+  phone?: {up: number; down?: number; side?: 1 | -1};
+  /** Points an arm up at something: local hand target in person units (hip line at 0); lowers it at downAt. */
+  point?: {at: number; side: 1 | -1; hand: Pt; downAt?: number};
   /** Idle bob (px). */
   bob?: number;
   silhouette?: boolean;
@@ -66,32 +165,20 @@ const leanAt = (t: number, keys?: {t: number; a: number}[]) => {
   return a;
 };
 
-/** A sleeve from the shoulder to the hand (person units): coat polygon + ink sides + a sand hand. */
-const Arm: React.FC<{sh: Pt; hand: Pt; coat: string; W: number; seed: string}> = ({sh, hand, coat, W, seed}) => {
-  const w = 19;
-  const dx = hand[0] - sh[0];
-  const dy = hand[1] - sh[1];
-  const L = Math.hypot(dx, dy) || 1;
-  const nx = (-dy / L) * (w / 2);
-  const ny = (dx / L) * (w / 2);
-  const poly: Pt[] = [
-    [sh[0] + nx, sh[1] + ny],
-    [hand[0] + nx * 0.85, hand[1] + ny * 0.85],
-    [hand[0] - nx * 0.85, hand[1] - ny * 0.85],
-    [sh[0] - nx, sh[1] - ny],
-  ];
-  const f = (p: Pt) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
-  return (
-    <>
-      <Fill d={blob(hand[0] + (dx / L) * 5, hand[1] + (dy / L) * 5, 8, 8.5, {seed: `${seed}/h`})} color={palette.sand} offset={false} mode="none" seed={`${seed}/hf`} />
-      <Fill d={polyPath(poly)} color={coat} offset={false} mode="none" seed={`${seed}/af`} />
-      <Ink d={`M${f(poly[0])}L${f(poly[1])}M${f(poly[2])}L${f(poly[3])}M${f(poly[1])}L${f(poly[2])}`} width={W} taper={false} seed={`${seed}/ai`} />
-    </>
-  );
+/** The head swap state at t: the side shown and its grow (0.2 -> 1 in 0.1 s; the swap back shrinks in 0.07 s). */
+const turnAt = (t: number, keys?: {t: number; d: 1 | 0 | -1}[]): {d: 1 | -1; k: number} | null => {
+  if (!keys || !keys.length) return null;
+  let cur: 1 | 0 | -1 = 0;
+  let prev: 1 | 0 | -1 = 0;
+  let at = -1e9;
+  for (const k of keys) if (t >= k.t) (prev = cur), (cur = k.d), (at = k.t);
+  if (cur !== 0) return {d: cur, k: 0.2 + 0.8 * E.outBack(1.6)(clamp((t - at) / 0.1))};
+  if (prev !== 0 && t < at + 0.07) return {d: prev, k: 1 - 0.8 * clamp((t - at) / 0.07)};
+  return null;
 };
 
-/** One back-view plaza citizen (kit Person with legs, like props Citizen) with the S01 acting: walk away and stop,
- *  lean toward govB, phone up / down, point up. (x, y) = feet. */
+/** One back-view plaza citizen (kit Person with legs) with the S01 acting: walk away and stop, lean, swap to a 3/4 head
+ *  toward govB, phone up / down (lit screen), point up. (x, y) = feet. */
 export const PlazaCitizen: React.FC<{p: CitizenPlan; vp: Pt; horizon: number}> = ({p, vp, horizon}) => {
   const t = useTime();
   if (p.silhouette) return <Citizen x={p.x} y={p.y} h={p.h} silhouette seed={p.seed} />;
@@ -109,24 +196,96 @@ export const PlazaCitizen: React.FC<{p: CitizenPlan; vp: Pt; horizon: number}> =
     walking = p.walk.stopAt === undefined || t < p.walk.stopAt;
   }
   const s = h / FIG_H;
-  const bob = p.bob ? osc(t, 0.55) * p.bob : 0; // phase 0: frame 0 = the set's standing citizen
+  const bob = p.bob ? osc(t, 0.55) * p.bob : 0; // phase 0: frame 0 = standing
   const lean = leanAt(t, p.lean);
-  const phone = p.phone !== undefined && t >= p.phone.up && (p.phone.down === undefined || t < p.phone.down);
-  const acc = [...(p.acc ?? []), ...(phone ? (['phone'] as Acc[]) : [])];
   const W = inkFor(p.h) / s;
-  let arm: React.ReactNode = null;
+  const g = headGeo(p.seed);
+  const coat = p.body ?? coatOf(p.seed, p.hair !== undefined);
+  const parts: React.ReactNode[] = [];
+  const turn = turnAt(t, p.turn);
+  if (turn) parts.push(<HeadTurn key="turn" g={g} d={turn.d} k={turn.k} W={W * 0.85} seed={`${p.seed}/turn`} />);
   if (p.point && t >= p.point.at) {
-    const q = E.outBack(1.5)(clamp((t - p.point.at) / 0.22));
-    const w = rng(`person/${p.seed}`).range(86, 100);
-    const sh: Pt = [p.point.side * w * 0.34, -TORSO * 0.8];
-    const down: Pt = [p.point.side * w * 0.5, -TORSO * 0.1];
-    const hand: Pt = [lerp(down[0], p.point.hand[0], q), lerp(down[1], p.point.hand[1], q)];
-    arm = <Arm sh={sh} hand={hand} coat={p.body ?? coatOf(p.seed, p.hair !== undefined)} W={W * 0.85} seed={`${p.seed}/arm`} />;
+    const up = E.outBack(1.5)(clamp((t - p.point.at) / 0.22));
+    const dn = p.point.downAt !== undefined ? E.inOutCubic(clamp((t - p.point.downAt) / 0.2)) : 0;
+    const q = up * (1 - dn);
+    if (q > 0.01) {
+      const sh: Pt = [p.point.side * g.w * 0.36, -TORSO * 0.8];
+      const down: Pt = [p.point.side * g.w * 0.5, -TORSO * 0.1];
+      const hand: Pt = [lerp(down[0], p.point.hand[0], q), lerp(down[1], p.point.hand[1], q)];
+      const L = Math.hypot(p.point.hand[0] - sh[0], p.point.hand[1] - sh[1]);
+      parts.push(<ElbowArm key="point" sh={sh} hand={hand} lu={L * 0.52} lf={L * 0.52} side={p.point.side} w={19} coat={coat} W={W * 0.85} seed={`${p.seed}/pt`} />);
+    }
+  }
+  if (p.phone && t >= p.phone.up) {
+    const side = p.phone.side ?? 1;
+    const up = E.outBack(1.2)(clamp((t - p.phone.up) / 0.24));
+    const dn = p.phone.down !== undefined ? E.inOutCubic(clamp((t - p.phone.down) / 0.22)) : 0;
+    const q = up * (1 - dn);
+    if (q > 0.01) {
+      const sh: Pt = [side * g.w * 0.38, -TORSO * 0.8];
+      const hd: Pt = [side * g.w * 0.52, -TORSO * 0.06];
+      const hu: Pt = [side * (g.w * 0.38 + 32), g.hy - g.hr * 0.25];
+      const hand: Pt = [lerp(hd[0], hu[0], q) + side * 6 * Math.sin(Math.PI * clamp(q)), lerp(hd[1], hu[1], q)];
+      const L = Math.hypot(hd[0] - sh[0], hd[1] - sh[1]);
+      parts.push(
+        <g key="phone">
+          <ElbowArm sh={sh} hand={hand} lu={L * 0.5} lf={L * 0.52} side={side} w={19} coat={coat} W={W * 0.85} seed={`${p.seed}/ph`} />
+          {q > 0.35 ? (
+            <XG m={mat.compose(mat.translate(hand[0], hand[1] - 4), mat.rotate(side * 6 * (1 - q)), mat.scale(1.05))}>
+              <LitPhone W={W} seed={`${p.seed}/lp`} />
+            </XG>
+          ) : null}
+        </g>,
+      );
+    }
   }
   return (
     <XG m={mat.compose(mat.translate(x, y + bob), mat.rotate(lean), mat.translate(0, -LEG * s), mat.scale(s))}>
-      <Person seed={p.seed} legs torsoH={TORSO} legH={LEG} body={p.body} hair={p.hair} acc={acc} ink={W} walk={walking ? p.walk?.hz : undefined} hero={false} lod={h < 34 ? 1 : 0} />
-      {arm}
+      <Person seed={p.seed} legs torsoH={TORSO} legH={LEG} body={p.body} hair={p.hair} acc={p.acc} ink={W} walk={walking ? p.walk?.hz : undefined} hero={false} lod={h < 34 ? 1 : 0} />
+      {parts}
+    </XG>
+  );
+};
+
+// ---------------------------------------------------------------- the left edge onlooker's phone (elbow arc)
+
+/** The phone arm of a props EdgeOnlooker drawn by the scene (the prop's own raise sweeps a stiff straight arm across the
+ *  plaza): render the onlooker with arms 'near' before `up` and none after, and this on top. Mirrors the prop's figure
+ *  frame (head diameter -> scale, shoulder, hanging hand, breathing bob) for the seed. Near side = +1 (left edge). */
+export const OnlookerPhoneArm: React.FC<{x: number; y: number; head: number; seed: string; coat: string; up: number; down?: number; hand: Pt}> = ({x, y, head, seed, coat, up, down, hand: handW}) => {
+  const t = useTime();
+  if (t < up) return null;
+  const r = rng(`person/${seed}`);
+  const w = r.range(86, 100);
+  const hr = w * r.range(0.23, 0.26);
+  const round = r.range(0.36, 0.45);
+  const s = head / (hr * 2);
+  const torsoH = Math.min(8000, Math.max(220, Math.ceil(((1920 + 140 + 30 - y) / s - hr * 0.86) / 64) * 64));
+  const hw = w / 2;
+  const R = Math.min(w * round, torsoH * 0.8);
+  const dd = w * 0.18;
+  const bob = osc(t, 0.5, rand(seed, 'b') * 6) * 1.5;
+  const hipY = y + (torsoH + hr * 0.86) * s + bob;
+  // local frame = the prop's (hip line at 0, torso top at -torsoH)
+  const sh: Pt = [hw - dd * 0.5, -torsoH + R * 0.55];
+  const yCuff = -torsoH + w * 1.05;
+  const xc = hw + (hw * 0.07 * (yCuff - (-torsoH + R))) / (torsoH - R);
+  const hd: Pt = [xc - dd * 0.5, yCuff + w * 0.06];
+  const hu: Pt = [(handW[0] - x) / s, (handW[1] - hipY) / s];
+  const qUp = E.outBack(1.15)(clamp((t - up) / 0.26));
+  const qDn = down !== undefined ? E.inOutCubic(clamp((t - down) / 0.25)) : 0;
+  const q = qUp * (1 - qDn);
+  const hand: Pt = [lerp(hd[0], hu[0], q) + 10 * Math.sin(Math.PI * clamp(q)), lerp(hd[1], hu[1], q)];
+  const L = Math.hypot(hd[0] - sh[0], hd[1] - sh[1]);
+  const W = 4.8 / s;
+  return (
+    <XG m={mat.compose(mat.translate(x, hipY), mat.scale(s))}>
+      <ElbowArm sh={sh} hand={hand} lu={L * 0.5} lf={L * 0.52} side={1} w={dd * 1.05} coat={coat} W={W * 0.9} seed={`${seed}/parm`} />
+      {q > 0.3 ? (
+        <XG m={mat.compose(mat.translate(hand[0], hand[1] - 3), mat.rotate(8 * (1 - q)), mat.scale(0.9))}>
+          <LitPhone W={W} seed={`${seed}/lp`} />
+        </XG>
+      ) : null}
     </XG>
   );
 };
@@ -162,13 +321,20 @@ const BACK_DUR = 0.34;
 
 const quadPt = (a: Pt, c: Pt, b: Pt, q: number): Pt => [(1 - q) * (1 - q) * a[0] + 2 * (1 - q) * q * c[0] + q * q * b[0], (1 - q) * (1 - q) * a[1] + 2 * (1 - q) * q * c[1] + q * q * b[1]];
 
-/** Wings-only flying silhouette (the kit Bird's flight shape), flapping. */
-const Flyer: React.FC<{x: number; y: number; s: number; t: number; ph: number; flip?: boolean}> = ({x, y, s, t, ph, flip}) => {
-  const flap = osc(t, 7, ph) * 9;
-  const d = `M-16 ${(-6 - flap).toFixed(1)}Q-8 -2 0 0Q8 -2 16 ${(-6 - flap).toFixed(1)}`;
+/** A flying pigeon (fix round 1: a bare ink 'v' read as a UI chevron): body + head + tail in the pigeon's colour with
+ *  ink, and two flapping wing strokes, so it reads as a bird at phone size. Faces right (flip = left). */
+const Flyer: React.FC<{x: number; y: number; s: number; t: number; ph: number; color: string; flip?: boolean; seed: string}> = ({x, y, s, t, ph, color, flip, seed}) => {
+  const f = osc(t, 7, ph); // -1 (down) .. 1 (up)
+  const wy = -12 - 13 * f;
+  const body = `M-13 -10Q-4 -16 7 -13Q13 -12 14 -9Q9 -5 -2 -6Q-9 -6 -13 -10Z`;
+  const tail = `M-12 -10L-21 -13L-20 -7Z`;
+  const wings = `M-5 -11Q-6 ${(wy - 2).toFixed(1)} -14 ${(wy - 6 * f).toFixed(1)}M2 -12Q5 ${(wy - 4).toFixed(1)} 13 ${(wy - 2 - 7 * f).toFixed(1)}`;
   return (
-    <XG m={mat.compose(mat.translate(x, y - 12 * s), mat.scale(flip ? -s : s, s))}>
-      <path d={d + 'M-3 -1Q0 3 3 -1'} fill="none" stroke={palette.ink} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+    <XG m={mat.compose(mat.translate(x, y), mat.scale(flip ? -s : s, s))}>
+      <Fill d={body + tail} color={color} offset={false} mode="none" seed={`${seed}/fb`} />
+      <Fill d={blob(14, -13, 4.2, 4, {seed: `${seed}/fh`})} color={color} offset={false} mode="none" seed={`${seed}/fhf`} />
+      <path d={body + tail + `M10 -13a4.2 4 0 1 0 8.4 0a4.2 4 0 1 0 -8.4 0`} fill="none" stroke={palette.ink} strokeWidth={1.7 / s} strokeLinejoin="round" />
+      <path d={wings} fill="none" stroke={palette.ink} strokeWidth={2.5 / s} strokeLinecap="round" />
     </XG>
   );
 };
@@ -191,7 +357,7 @@ export const Pigeon: React.FC<{p: PigeonPlan; s?: number}> = ({p, s = 0.8}) => {
     const c: Pt = p.via ?? [(a[0] + b[0]) / 2, Math.min(a[1], b[1]) - 30];
     const [x, y] = quadPt(a, c, b, q);
     const [x2] = quadPt(a, c, b, Math.min(1, q + 0.02));
-    return <Flyer x={x} y={y} s={s} t={t} ph={ph} flip={x2 < x} />;
+    return <Flyer x={x} y={y} s={s} t={t} ph={ph} color={p.color} flip={x2 < x} seed={p.seed} />;
   }
   const back = p.backAt !== undefined && t >= p.backAt;
   if (p.flyAt !== undefined && t >= p.flyAt && !back) {
@@ -199,13 +365,13 @@ export const Pigeon: React.FC<{p: PigeonPlan; s?: number}> = ({p, s = 0.8}) => {
     if (q >= 1) return null;
     const to = p.flyTo ?? [200, -360];
     const [x, y] = arcPt(perch, [perch[0] + to[0], perch[1] + to[1]], q, 40);
-    return <Flyer x={x} y={y} s={s * (1 - q * 0.3)} t={t} ph={ph} flip={to[0] < 0} />;
+    return <Flyer x={x} y={y} s={s * (1 - q * 0.3)} t={t} ph={ph} color={p.color} flip={to[0] < 0} seed={p.seed} />;
   }
   if (back && t < (p.backAt as number) + BACK_DUR) {
     const q = E.outQuad((t - (p.backAt as number)) / BACK_DUR);
     const f = p.backFrom ?? [-260, -220];
     const [x, y] = arcPt([p.x + f[0], p.y + f[1]], [p.x, p.y], q, 60);
-    return <Flyer x={x} y={y} s={s} t={t} ph={ph} flip={f[0] > 0} />;
+    return <Flyer x={x} y={y} s={s} t={t} ph={ph} color={p.color} flip={f[0] > 0} seed={p.seed} />;
   }
   // perched: a landing squash after each touch-down, a little hop on the shuffle
   const touch = back ? (p.backAt as number) + BACK_DUR : p.landAt !== undefined ? p.landAt + inDur : undefined;
@@ -226,29 +392,42 @@ export type PipPlan = {
   y: number;
   /** Flinches at the click of the press (a squash jolt, still facing away). */
   flinchAt?: number;
-  /** Looks at govB (head turn + popSwitch ear flick). */
+  /** Looks at govB (head turn + a big popSwitch ear flick). */
   lookAt: number;
   look: number;
   /** Startle hop (trunk-up, wide) in place: takeoff, landing, back to sit-back. */
   hopAt: number;
   landAt: number;
   backAt: number;
-  /** Hops toward the lens on the dive (crouch from here). */
+  /** The leap toward the lens on the dive: takeoff time (a 2-frame side-pose crouch before it). */
   exitAt: number;
   exitTo: Pt;
   /** Looks back at the plaza (stays sit-back). */
   lookBackAt?: number;
 };
 
+const EXIT_CROUCH = 0.075; // 2 frames at 30 fps (f131, f132 before the 4.43 take-off)
+const EXIT_AIR = 0.34;
+
 /** Pip on his bollard, scale 1.0 (the hop gag must read in the vista). No look to camera. */
 export const PipS01: React.FC<{p: PipPlan; seed?: number}> = ({p, seed = 11}) => {
   const t = useTime();
-  // the dive exit: a leap toward the lens (up-right, growing), so he crosses the cut toward S02's rod
-  if (t >= p.exitAt - 0.14) {
-    const air = 0.34;
-    const h = hop({t, t0: p.exitAt, dur: air, from: {x: p.x, y: p.y}, to: {x: p.exitTo[0], y: p.exitTo[1]}, height: 110});
-    const grow = 1 + 0.7 * E.inQuad(clamp((t - p.exitAt) / air));
-    return <Elephant x={h.x} y={h.y} scale={grow} t={t} seed={seed} pose={h.airborne ? 'stand-side' : 'sit-back'} amount={h.spread} squash={h.squash} rotate={h.rotate} look={p.look} />;
+  // the dive exit: a 2-frame crouch in the side pose on the bollard (squash +0.12: the anticipation), then the leap
+  // toward the lens (up-right): a -0.08 stretch at take-off, growing 1.0 -> 1.3 along the arc, so he crosses the cut
+  // toward S02's rod
+  if (t >= p.exitAt - EXIT_CROUCH) {
+    if (t < p.exitAt) {
+      const k = (t - (p.exitAt - EXIT_CROUCH)) / EXIT_CROUCH;
+      return <Elephant x={p.x} y={p.y} scale={1} t={t} seed={seed} pose="stand-side" amount={0} squash={0.12 * Math.sin((Math.PI / 2) * Math.min(1, k * 1.6))} look={0.2} />;
+    }
+    const k = clamp((t - p.exitAt) / EXIT_AIR);
+    const top = Math.min(p.y, p.exitTo[1]) - 110;
+    const cy = 2 * top - (p.y + p.exitTo[1]) / 2;
+    const x = lerp(p.x, p.exitTo[0], E.outQuad(k));
+    const y = (1 - k) * (1 - k) * p.y + 2 * (1 - k) * k * cy + k * k * p.exitTo[1];
+    const squash = -0.08 * (1 - E.outCubic(clamp(k / 0.5)));
+    const grow = 1 + 0.3 * E.inOutSine(k);
+    return <Elephant x={x} y={y} scale={grow} t={t} seed={seed} pose="stand-side" amount={Math.sqrt(Math.sin(Math.PI * Math.min(1, k * 0.9 + 0.1)))} squash={squash} rotate={-10 * Math.cos(Math.PI * k)} look={0.2} />;
   }
   // the startle hop: an instant pop into trunk-up (wide), a quick vertical hop, landing squash, back to sit-back
   if (t >= p.hopAt && t < p.backAt) {
@@ -269,12 +448,12 @@ export const PipS01: React.FC<{p: PipPlan; seed?: number}> = ({p, seed = 11}) =>
   let squash = p.flinchAt !== undefined ? popSwitch(t, p.flinchAt) * 1.25 : 0;
   if (t >= p.lookAt) {
     look = p.look;
-    squash += popSwitch(t, p.lookAt);
+    squash += popSwitch(t, p.lookAt) * 1.9;
   }
   if (t >= p.backAt) squash += popSwitch(t, p.backAt);
   if (p.lookBackAt !== undefined && t >= p.lookBackAt) {
-    look = p.look * 0.35;
-    squash += popSwitch(t, p.lookBackAt) * 0.6;
+    look = p.look * 0.2;
+    squash += popSwitch(t, p.lookBackAt) * 1.4;
   }
   return <Elephant x={p.x} y={p.y} scale={1} t={t} seed={seed} pose="sit-back" look={look} squash={squash} />;
 };

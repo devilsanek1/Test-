@@ -9,7 +9,7 @@ import {GovernmentPlaza, PLAZA, StoopStreet, Stoop, StoopBeats, stoopStreetDoors
   TerraceHill, TerraceRings, TERRACE, TERRACE_FLAT, OldQuarter, SiteFacade, PerspRow, Foreground, groundMarks,
   GroundMarks, People, Furniture, EdgeFigure,
   // storyboard v3 (section 9)
-  PLAZA_CIVIC, plazaShutdownGov, crtPhase, CRT, rewindStep, latestState, domeArc, blindSignAnchor} from '../shared/sets';
+  PLAZA_CIVIC, PLAZA_SHUTDOWN, plazaShutdownGov, crtPhase, CRT, rewindStep, latestState, domeArc, blindSignAnchor} from '../shared/sets';
 ```
 `SET_CATALOG` (storyboard-v1 demo times, the preview DemoWorld / DemoSun) is NOT in the barrel: it is preview-only, and
 SetsPreview / SharedKitSheet import it from `sets/catalog` directly, so no demo choreography reaches the film bundle.
@@ -28,14 +28,14 @@ node src/scenes/shared/sets/preview/render.mjs SetsSheet /tmp/o 2          # eve
 | set id | variants |
 |---|---|
 | `plaza` | (S01 demo build), `lineArt`, `off`, `closeup` (S11, `PLAZA.closeup` zoom 1.6), `dive` (`PLAZA.dive` zoom 2.4 into govB's lock box), **v3**: `v3` (S01 on the take: frame 0 = the press, CRT wave, civic skyline, govC half, lettered tags), `rewind` (S12: the shut-down state, the stepped rewind, ends = frame 0) |
-| `stoop` | (S03 steps), `draw` (entrance draw-on), `tower` (S04: tower, seasons, ivy, cobweb), `night` (S09: night + check + ledge), **v3**: `v3` (S09 A: dusk key, lit windows popping off, dawn wipe up at 1.5 s, crate) |
+| `stoop` | (S03 steps), `draw` (entrance draw-on), `tower` (S04: tower, seasons, ivy, cobweb), `night` (S09: night + check + ledge), **v3**: `v3` (S09 A: dusk key, lit windows popping off, dawn wipe up at 1.5 s, the sun RISING at the VP from the set's own sun slot, crate) |
 | `blueprint` | (S02 wide: grid, stamp, pop-up, plaque count), `closeup` (zoom 2.0 on the lock), **v3**: `v3` (+ the title-block card L3 -> L4) |
-| `wall` | (S05 at zoom 1.08), `draw` (blueprint draws outward from the lock), **v3**: `v3` (+ the L6 slip in the clean top margin; the bottom rail is default) |
+| `wall` | (S05 at zoom 1.08), `draw` (blueprint draws outward from the lock), **v3**: `v3` (S05 at zoom 1.13 + the two-line L6 slip (205-650, 688-784) in the clean top margin; the bottom rail is default) |
 | `lane` | (S06), `corner` (the same Workshop, S07 preset, + a blind sign), **v3**: `v3` (blind down + 'still fixing...') |
 | `corner` | (S07) |
-| `dome` | (S08 rest), `crane` (S08 start, zoom 1.3 on (540, 1260)), `push` (15 %), `dusk`, **v3**: `v3`, `v3crane` / `v3push` (multiplane by `DOME.depths`), `v3dusk` |
+| `dome` | (S08 rest), `crane` (S08 start, zoom 1.3 on (540, 1260)), `push` (15 %), `dusk`, **v3**: `v3`, `v3crane` / `v3push` (multiplane by `DOME.depths` = S08's tuned table), `v3dusk` |
 | `terrace` | (S10 pull-back 6.0 -> 1.0, + TerraceRings), `match` (zoom 6 hidden-match frame), `rest`, `flat` (sea of doors), **v3**: `v3` (pull-back + keeper + check-box wave), `v3match`, `v3rest` |
-| `old` | (S12), `board` (S13 at zoom 1.12), **v3**: `v3` (S10: half old, support tags, A-frame sign, cart, gap walker + bike) |
+| `old` | (S12), `board` (S13 at zoom 1.12), **v3**: `v3` (S10: half old with readable gap plaques, support tags, caretaker tag, A-frame sign, cart, gap walker up the gap + bike) |
 
 Demo event times live only in `sets/catalog.tsx` (storyboard v1 values), including the demo beat overlays
 (`StoopBeats`, `TerraceRings`, `DomeTallies`). `SET_CATALOG[i].thumb()` renders a set at rest without a World (the props
@@ -126,6 +126,7 @@ TerraceHill frame themselves (plaza left onlooker in the band, readers, the dome
 people={false}                         // nobody (S04's "nobody did")
 people={{riseAt: 1.2, walk: 1.6}}      // rise in (0.33 s out-exp, 0.06 s stagger), start walking at 1.6 s
 people={{n: 1, walk: false}}           // only the first anchor, standing
+people={{n: 1, walk: 2.1, stop: 3.4}}  // walk away from 2.1 s, stop (and stand still, no bob) at 3.4 s
 people={{walkers: [{x, y, h, go: 'vp', body, hair, acc}]}}        // replace the anchors
 <Furniture items={[{kind: 'bike' | 'bench' | 'planter' | 'cart', x, y, s, flip, at}]} />
 <EdgeFigure side="L" y={1330} head={124} riseAt={...} />           // the in-band edge figure (any set, any spot)
@@ -245,8 +246,9 @@ towerRise(t, towerAt, towerDownAt)  // the tower's height (camera tilt sync); ne
 - Far towers (review 5): the city beyond the VP on the day haze ladder (#98C0AE farther pair, #84B09C nearer pair:
   lighter than the facades, stepping toward the sky), stepped set-back tops with a mast / tank, a few 3.5 px window dots;
   at night the same silhouettes in tealDark with peach dots.
-- Layers: `sun` 0.12, `far` 0.1, `ground` 0.4, `rows` 0.4, `hero` 0.7 (hero house + Stoop + heroSlot), `people` 0.8
-  (furniture + walkers), `near` 1.0.
+- Layers: `dawn` 0.1 (the dawn peach horizon band only), `sun` 0.12, `far` 0.1, `ground` 0.4, `rows` 0.4, `hero` 0.7
+  (hero house + Stoop + heroSlot), `people` 0.8 (furniture + walkers), `near` 1.0. Paint order: dawn band -> sun slot ->
+  far towers, so a sun rising at the VP (S09 'with') shows OVER the band between the towers.
 - S09 night: use a World sky colour key (`skies.night`), not the World's `tod: 'night'` (facades keep their day fills);
   with the set's `tod="night"` it relights its ground plane, road, sidewalk, horizon strip and the foreground kerb with
   the night mapping (mintPale -> sage, cream -> sand, sand -> tan) and draws the lamp glows as opaque peach /
@@ -404,11 +406,13 @@ lines + specks; kerb 1500, bollard (700, 1450); default `foreground: 'railing'` 
 `OLD_QUARTER.roofs`, all under the y-600 ceiling): siteL a teal MANSARD (690 -> 616) with two dormers, siteM a TV
 antenna (x 616, clear of the sun disc), siteR two balconies (cream slab, sage glass rail) on its right bay, rooftop
 plants and a water tank on legs (978, 618). Life (while the audience is off): `OLD_QUARTER.walkers` = a walker heading up
-the street gap (692, 1356) h186 and a stander cut by the left edge (64, 1478) h296; `OLD_QUARTER.furniture` = a planter
+UP the street gap (696, 1262) h100 (v3: was (692, 1356) h186, which stood in front of siteM's plaque; pace 0.3, drawn
+behind the cart line) and a stander cut by the left edge (64, 1478) h296; `OLD_QUARTER.furniture` = a planter
 (420, 1486) and a bike by the tree (960, 1496); clear of the doors, the hanging plaques and the cart's line (y 1440). S13: board (300, 1090, 500, 310), rail
 (380, 1060, 340, 28), legs to 1480; audience heads (90, 1290) (200, 1350) (890, 1320) (1000, 1280). Anchors:
-`OLD_QUARTER.crates` (never siteM), `.pipBoard`, `.sun`, `.walkers`, `.furniture`, `.roofs`. Layers: `far`, `sun`,
-`second`, `ground`, `sites`, `board`, `people`, `near`, `audience`, `foreground`.
+`OLD_QUARTER.crates` (never siteM), `.pipBoard`, `.sun`, `.walkers`, `.furniture`, `.roofs`, `.gapPlaqueY`. Layers: `far`,
+`sun`, `second`, `ground`, `sites`, `board`, `peopleFar` (people farther than the cart line), `cart`, `people`, `sign`,
+`near`, `audience`, `foreground`.
 
 ## 4. Continuity contracts (storyboard section A)
 
@@ -512,7 +516,9 @@ on the recorded take, `sets/catalog.tsx`): `plaza` `v3` (S01) and `rewind` (S12)
         govA: {screenOffAt: 0.63, shutterAt: 1.98, offAt: 2.12, padlockAt: 3.44, tagAt: 3.74},
         govC: {screenOffAt: 0.89, shutterAt: 2.35, shutterStop: 0.5, padlockAt: 3.5, tagAt: 3.79}}}
   civicOffAt={1.16} civicLanternsOffAt={1.41} phonesAt={1.41} phonesDownAt={3.04} lanternOffAt={2.69} />   // S01
-const g = plazaShutdownGov(-1);                                  // S12: the state S01 left (every event already happened)
+import {S01_GOV} from '../scene01/plaza';                         // S01's own gov spec (lettered tags, rail offsets)
+const g = plazaShutdownGov(-1, S01_GOV);                         // S12: EXACTLY the state S01 left (every event at -1)
+// (plazaShutdownGov(-1) alone gives the same thing from the kit's copy of S01's numbers, PLAZA_SHUTDOWN)
 <GovernmentPlaza state="built" idleOffset={-sceneDur} civicOffAt={-1} civicLanternsOffAt={-1} lanternOffAt={-1} phonesAt={-1}
   gov={{govA: {...g.govA, tagOutAt, padlockOutAt, liftAt, onAt, screenOnAt},
         govB: {...g.govB, tagOutAt, padlockOutAt, lanternOnAt, liftAt, onAt, screenLineAt},   // ends on the bright line
@@ -537,8 +543,19 @@ const g = plazaShutdownGov(-1);                                  // S12: the sta
 - Set level, new: `state="frame0"`, `lanternOnAt` (the lamp), `phonesAt` / `phonesDownAt` (number or list; latest
   wins), `rewindFps` (12: the rewind's tape steps), `idleOffset` (seconds added to the idle clocks of Bit, the tree sway and
   the onlookers: S12 passes `-duration` so its last frame is pixel-identical to S01's frame 0; checked: 0 px differ).
-- Helpers: `plazaShutdownGov(at)`, `crtPhase(t, ev)`, `CRT` {dur 0.15, rev 0.17, line 0.4}, `rewindStep(t, at, dur,
-  fps)`, `latestState(t, on[], off[], init)`, `PLAZA.civic`, `PLAZA.frame0` (sun (720, 900) r155, press 0.88).
+- Helpers: `plazaShutdownGov(at, from?)`, `PLAZA_SHUTDOWN`, `crtPhase(t, ev)`, `CRT` {dur 0.15, rev 0.17, line 0.4},
+  `rewindStep(t, at, dur, fps)`, `latestState(t, on[], off[], init)`, `PLAZA.civic`, `PLAZA.frame0` (sun (720, 900)
+  r155, press 0.88).
+- **The shut-down state = what S01 / S11 leave on screen.** `plazaShutdownGov(at)` returns S01's closures with S01's
+  LETTERED 'back soon' tags and rail positions (`PLAZA_SHUTDOWN`, mirrored from scene01/plaza.tsx `S01_GOV`: tags
+  govA 74 px at x 226, govB 104 at x 562, govC 62 at x 900; padlocks at x 152 / 462 / 838; govC half shut), never the v2
+  clock tags. `plazaShutdownGov(at, S01_GOV)` takes S01's spec itself and returns it with every CLOSING event
+  (screenOffAt, shutterAt, offAt, padlockAt, tagAt, lanternOffAt) at `at`, its look kept (shutterStop, tagProps /
+  padlockProps lettered / size / text / x / y / inkPx) and every other time dropped (chromeAt, screenOnAt, glints, taps,
+  twirls, rewind events): use it, and S12 opens on exactly S01's last state whatever S01 tunes. (S11 is a close-up of
+  govB with its own lettered ['back', 'soon'] size-50 tag; S12 is a hard cut to the WIDE plaza, so S12 matches S01.)
+  The rewind's tag swing-up / padlock pop now pivot on the tag's / padlock's REAL hang point when `tagProps` /
+  `padlockProps` move it off the `PLAZA.gov` slot (they pivoted on the slot before: a visible jump on govC's tag).
 
 ### DomeCity + TelephoneWires (S08)
 
@@ -561,9 +578,15 @@ domeArcY(x, 'district')                // rim attempters on the district dome
   0's base, so it is half-set); `DOME.rattlers.row3` = 5 doors x 110-455 with their feet just above the coping (y
   1438-1442, attempters 56-70 px); `DOME.rattlers.row2` = 6 doors across the width at street level y 1300 (x 50 / 210 /
   370 / 540 / 720 / 880, attempters 32-40 px), each in front of a LOW row-3 shed (top 1338) so door and figure show.
-- v3 layers (wrap names / nearness = 1 - `DOME.depths`): `sky` 0 (band), `domeGlass` 0.3 (the glass sky, drawn under the
-  sun), `sun` 0, `row0` 0.15 (+ its glass copy), `row1` 0.3 (+ glass copy), `dome` 0.3 (rim, glints, searchlight,
-  lattice, arcs, tower), `row2` 0.55 (+ row-2 doors), `near` 0.8 (row 3 + row-3 doors), `fg` 1.0 (our rooftop).
+- v3 layers (wrap names / nearness = 1 - `DOME.depths`): `sky` 0 (band), `domeGlass` 0.02 (the glass sky, drawn under
+  the sun), `sun` 0, `row0` 0.02 (+ its glass copy), `row1` 0.02 (+ glass copy), `dome` 0.02 (rim, glints, searchlight,
+  lattice, arcs, tower), `row2` 0.25 (+ row-2 doors), `near` 0.62 (row 3 + row-3 doors), `fg` 1.0 (our rooftop).
+- **`DOME.depths` = S08's tuned table** (scene08/layout.ts `F`; depths rows 0-1 / dome 0.98, row 2 0.75, row 3 0.38,
+  rooftop 0, sky / sun 1). The storyboard's 0.85 / 0.7 / 0.45 / 0.2 (kept as `DOME.depthsStoryboard`) lift rows 1-3
+  over the sun on the crane's first frame (camera (540, 1260) zoom 1.3), where the S07 match wants the sun HALF behind
+  the skyline; with the tuned table the far rooftops sit on that skyline at the cut, row 3 stays mostly behind our
+  parapet, the crane opens the city row by row, and rows 0-1 share the dome's depth so the glass copies stay registered
+  on the arc through every move. The `v3crane` / `v3push` previews use it (they match the film's layering again).
 - `WIRES.S08` now ends at a rooftop POLE (`pole` {x 540, base 1446 (coping), top 1178}; the wires keep the S07 / S08
   contract heights 1211 / 1235.5 / 1260 at x 540, where they tie off); draw the counter board AFTER the wires so it covers
   their ends. `WIRES.S08wide` = the review-5 wires across the whole frame. `WireSpec.pole` works on any spec.
@@ -579,9 +602,10 @@ domeArcY(x, 'district')                // rim attempters on the district dome
   wrench-tag wave (no set change needed: that was scene choreography).
 - `bit`: Bit on house #4's right door jamb (`TERRACE.bit` (545, 1452) size 3, rot -90 = climbing: 18 px at screen
   (570, 1230) in the zoom-6 match); `true` or `{at, outAt, x, y, size, rot, flip}` (match Part A's pose).
-- `keeper`: the keeper speck (props Keeper via `KeeperSlot`, `TERRACE.keeper`: 46 px, feet (581, 1500) beside door #4 ->
+- `keeper`: the keeper speck (props Keeper via `KeeperSlot`, `TERRACE.keeper`: 48 px, feet (581, 1500) beside door #4 ->
   (662, 1500) at door #5) walking on `walkAt` / `walkDur`, a dotted path (y 1513) drawing on behind him, then kneeling
-  (0.82 crouch + working hands) at `kneelAt` (default the arrival); his ink keeps a 0.85 world floor through the pull-back.
+  (`TERRACE.keeper.crouch` 0.86 + working hands) at `kneelAt` (default the arrival): 41 px kneeling at rest, so the held
+  kneel stays >= 40 px (was 46 x 0.82 = 38); his ink keeps a 0.85 world floor through the pull-back.
   Layer `keeper` 0.6.
 
 ### OldQuarter (S10)
@@ -595,13 +619,23 @@ domeArcY(x, 'district')                // rim attempters on the district dome
 ```
 - `noticeSign` slot: the A-frame on the left pavement, `OLD_QUARTER.noticeSign` box [125, 1262, 445, 1462] (LabelTag
   `kind="sign"` `box`), drawn in layer `sign` 0.9: in front of the cart and the walkers, behind the near layer.
-- `people="gap"` = only the street-gap walker (= `{n: 1}`; pass `{n: 1, walk: t}` to time his walk); `furniture="bike"`
+- `people="gap"` = only the street-gap walker (= `{n: 1}`, walking away from frame 0; pass `{n: 1, walk: t, stop: t2}`
+  to time his walk and his stop). The gap anchor `OLD_QUARTER.walkers[0]` now stands UP the gap (feet (696, 1262), h 100,
+  `go: 'vp'`, pace 0.3 = S10's GapWalker): clear of siteM's old plaque, its corner and cane, and the cart line, so he
+  never covers the S10 'old' event or Pip. He is farther than the cart line (`cartY` 1330), so the set draws him in a
+  new layer `peopleFar` 0.75 BEFORE the `cart` slot (nearer people stay in `people` 0.85, after it). `furniture="bike"`
   = the bike only.
 - `secondOld`: the second-row OLD mask (9 booleans) or `'half'` (`OLD_QUARTER.secondOldHalf`: 5 of 9, alternating);
   default = review 5 (every third). `secondOldAt`: the old ones paper-flip new -> old (one time = 0.04 s apart left to
   right, a dust puff +0.1 s each; or a list). Second-row buildings now have street doors (they show in the gap);
-  `caretakerTag` (default true with 'half'): the old door IN the street gap carries a small sage tag tied to its handle
-  (a host's own patch, static).
+  `caretakerTag` (default true with 'half'): the old door IN the street gap carries a sage tag tied to its handle (a
+  host's own patch, static; `OLD_QUARTER.caretakerScale` 1.6 = 14 x 15 px, >= 12 px on a phone).
+- `gapPlaque` (default 20 when `secondOld` is given, else false = review 5): the second-row buildings that SHOW in the
+  street gap (>= 20 px of wall between siteM and siteR: buildings 5 and 6) carry their plaque at that size on their
+  gap wall at `OLD_QUARTER.gapPlaqueY` 1062 (above siteM's hanging plaque and bracket; the window on that storey gives
+  way): with 'half' one CURRENT and one OLD plate (>= 21 px on screen in S10), so 'about half' reads in the gap too,
+  not only from the front row. Their flip, dust and support tag (size 9 -> 18, on the plate's corner) scale with them.
+  The other second-row plates stay at the eye line, size 10 (hidden behind siteM / siteR anyway).
 - `supportAt` = props SupportTag landing on the hanging plaques L / M / R (`OLD_QUARTER.support`: over each plate's
   upper-right corner, size 34; give no M time to skip the old one) and `second` = tiny tags (size 9) popping onto the
   CURRENT second-row plaques, 0.04 s apart, skipping the old ones.
@@ -622,8 +656,10 @@ domeArcY(x, 'district')                // rim attempters on the district dome
 - BlueprintStreet `titleBlock` slot: the plan's title-block card `BLUEPRINT.titleBlock` [490, 1320, 910, 1440] (LabelTag
   `box`), drawn in layer `label` 0.85 (in front of the side buildings) over an inked double title-block frame on the plan
   (drawn with the grid). The old bottom-left title block stays (under the platform UI).
-- BlueprintWall: the sheet's top margin `BLUEPRINT_WALL.topMargin` [212, 692, 764, 760] is clean (the paper glint moved
-  low right; nothing on the plan starts above y 760: the S02 tight framing and the L6 slip read). New `bottomRail`
+- BlueprintWall: the sheet's top margin `BLUEPRINT_WALL.topMargin` [212, 692, 764, 790] is clean (98 world px: two L6
+  lines at 38 px on screen at zoom 1.13 need ~85, e.g. S05's slip (205-650, 688-784)); the door elevation's head and its
+  dimension tick start at y 796, the panels at 832, and the paper glint sits low right (y ~1150): the S02 tight framing
+  and the L6 slip read without touching plan detail. New `bottomRail`
   (default true): a wooden weight bar along the sheet's foot (`BLUEPRINT_WALL.bottomRail` x 178-798, y 1296, h 11, turned
   knobs) and Pip's S05 perch `BLUEPRINT_WALL.perchBottom` (620, 1296).
 - Workshop `blindSign` slot (MakersLane `workshop`, NoticeboardCorner `workshop`, `<Workshop>`): rides the blind while
@@ -634,7 +670,8 @@ domeArcY(x, 'district')                // rim attempters on the district dome
   and the street lamps' glows ON and 3 lit houses (`STOOP.duskLit`, they pop off one by one at `duskOffAt`);
   `glowFlickerAt` = the lamp-post glow drops one step for two frames. Each dusk piece pops OFF as the World's dawn wipe
   reaches it (`useTod` at the piece: 'dawn'), or at `nightUntil`. `dawnAt` (or the dawn wipe reaching it) pops the peach
-  horizon band AND the peach rim strips on the sun side (`STOOP.dawnRims`: the hero house's right edge, the far towers'
+  horizon band (its own layer `dawn`, drawn BEFORE the sun slot: the S09 sunrise goes in `sun={...}` with no scene-side
+  re-layering) AND the peach rim strips on the sun side (`STOOP.dawnRims`: the hero house's right edge, the far towers'
   VP-facing edges, all below world y 650 = screen >= 600). `crate` slot on step 2's tread (`STOOP.crate` (395, 1226),
   drawn on the stoop under `heroSlot`).
 
@@ -671,5 +708,7 @@ numerous (civic silhouettes 6 fills, check-box tags 3 paths per row, rattler doo
   `state="frame0"` (or `gov.govB.screenLineAt <= 0`) AND `gov.govB.screenOffAt` at the release time.
 - The S12 last frame equals the S01 frame 0 only for the SET: pass the same sun (bottom of its press), Pip, Bit (the
   set's Bit is idle; S12 animates its own with `bit={false}`), citizens' phones and pigeons states.
-- DomeCity v3 row 0's glass copy sits in row 0's layer (depth 0.85) and the dome arc in depth 0.7: during the baseline
-  push the glass edge can sit up to ~4 px off the arc under its 4.8 px ink (the dome appears after the crane).
+- DomeCity v3 rows 0-1, their glass copies and the dome arc share one depth (0.98, `DOME.depths`): the glass edge stays
+  on the arc through the crane and the baseline push (the storyboard depths let it drift ~4 px).
+- BlueprintStreet `sign` (scene request from S03): `false` hides the set's pen-nib sign (S03 hangs its own from the
+  press roof), or `{x, y, r, wallX}` moves it (the default (795, 930) sits behind side building R4 in the S03 wide).

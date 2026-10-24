@@ -6,7 +6,7 @@
 
 import React from 'react';
 import {palette, skies} from '../../../lib/theme';
-import {GovernmentPlaza, PLAZA, PLAZA_REST, plazaShutdownGov} from './GovernmentPlaza';
+import {GovernmentPlaza, PLAZA, PLAZA_REST, PLAZA_SHUTDOWN, plazaShutdownGov} from './GovernmentPlaza';
 import {StoopBeats, StoopStreet, STOOP} from './StoopStreet';
 import {BlueprintStreet, BLUEPRINT} from './BlueprintStreet';
 import {BlueprintWall, BLUEPRINT_WALL} from './BlueprintWall';
@@ -22,6 +22,15 @@ import {Tod} from '../../../lib/tod';
 import {GlowDiscs} from './common';
 import {CartSlot, LabelSlot, CrateSlot} from './propSlots';
 import {World} from '../../../lib/World';
+import {Sun} from '../../../lib/Sun';
+
+/** v3 preview (S09 'with'): the sun rises at the stoop VP, clipped by the horizon, in the set's sun slot. */
+const StoopSunrise: React.FC<{at: number}> = ({at}) => {
+  const t = useTime();
+  if (t < at) return null;
+  const [vx, vy] = STOOP.vp;
+  return <Sun cx={vx} cy={vy + 125} r={112} horizon={vy} drift={[0, 0]} moves={[{at, dur: 0.45, y: vy - 82, ease: E.outCubic}, {at: at + 0.45, dur: 1.4, y: vy - 126, ease: E.inOutSine}]} />;
+};
 
 /** v3 preview: the crate of new locks on step 2's tread. */
 const CartSlotPlaceholder: React.FC = () => <CrateSlot x={STOOP.crate[0]} y={STOOP.crate[1]} size={70} n={3} />;
@@ -51,14 +60,14 @@ const S01_GOV = {
  *  power-off wave (govA 'all', govC 'over', the civic skyline 'Europe'), shutters ('shut', 'down', govC half on 'bunch'),
  *  padlocks, lettered tags, govB's lantern on 'purpose'. */
 const S01_V3 = {
-  govA: {screenOffAt: 0.63, shutterAt: 1.98, offAt: 2.12, padlockAt: 3.44, tagAt: 3.74, tagProps: {lettered: true, size: 70}},
-  govB: {screenOffAt: 0.0, shutterAt: 1.71, offAt: 1.85, padlockAt: 3.38, tagAt: 3.69, lanternOffAt: 3.96, tagProps: {lettered: true, size: 84}},
-  govC: {screenOffAt: 0.89, shutterAt: 2.35, shutterStop: 0.5, padlockAt: 3.5, tagAt: 3.79, tagProps: {lettered: true, size: 64}},
+  govA: {screenOffAt: 0.63, shutterAt: 1.98, offAt: 2.12, padlockAt: 3.44, tagAt: 3.74, padlockProps: PLAZA_SHUTDOWN.govA.padlockProps, tagProps: PLAZA_SHUTDOWN.govA.tagProps},
+  govB: {screenOffAt: 0.0, shutterAt: 1.71, offAt: 1.85, padlockAt: 3.38, tagAt: 3.69, lanternOffAt: 3.96, padlockProps: PLAZA_SHUTDOWN.govB.padlockProps, tagProps: PLAZA_SHUTDOWN.govB.tagProps},
+  govC: {screenOffAt: 0.89, shutterAt: 2.35, shutterStop: 0.5, padlockAt: 3.5, tagAt: 3.79, padlockProps: PLAZA_SHUTDOWN.govC.padlockProps, tagProps: PLAZA_SHUTDOWN.govC.tagProps},
 };
 /** Storyboard v3 S12 (scene seconds, recorded take): the shut-down state at the cut, then the stepped rewind from
  *  'before' (1.55) to one step before the press (2.85). */
 const S12_V3 = (() => {
-  const g = plazaShutdownGov(-1);
+  const g = plazaShutdownGov(-1, S01_V3); // = S01's end state: lettered tags at S01's rail positions
   return {
     govA: {...g.govA, tagOutAt: 1.55, padlockOutAt: 1.7, liftAt: 2.15, onAt: 2.4, screenOnAt: 2.57},
     govB: {...g.govB, tagOutAt: 1.6, padlockOutAt: 1.75, lanternOnAt: 1.86, liftAt: 2.23, onAt: 2.48, screenLineAt: 2.85},
@@ -115,9 +124,10 @@ export const SET_CATALOG: SetEntry[] = [
     preview: (v) =>
       v === 'v3' ? (
         // storyboard v3 S09 Part A: the dusk held at the cut (glows, three lit windows popping off), the dawn wipe up at
-        // 1.5 s (band + rims pop as it passes, the glows pop off), the crate on step 2's tread
+        // 1.5 s (band + rims pop as it passes, the glows pop off), the crate on step 2's tread; the SUN RISES at the VP
+        // from the set's own sun slot (drawn over the dawn band, behind the towers: no scene-side re-layering needed)
         <World sky={[{t: -1, tod: 'dusk'}, {t: 1.5, tod: 'dawn', wipe: 'up', dur: 0.4}]}>
-          <StoopStreet tod="dusk" duskOffAt={[0.4, 0.8, 0.9]} glowFlickerAt={0.4} sun={<DemoSun cx={720} cy={1060} r={110} />} crate={<CartSlotPlaceholder />} heroSlot={null} />
+          <StoopStreet tod="dusk" duskOffAt={[0.4, 0.8, 0.9]} glowFlickerAt={0.4} sun={<StoopSunrise at={1.5} />} crate={<CartSlotPlaceholder />} heroSlot={null} />
         </World>
       ) : v === 'night' ? (
         <DemoWorld sky={skies.night}>
@@ -171,9 +181,10 @@ export const SET_CATALOG: SetEntry[] = [
     thumb: () => <BlueprintWall sun={<DemoSun cx={930} cy={725} r={110} />} />,
     preview: (v) => (
       <DemoWorld>
-        <XG m={camMat(540, 960, 1.08)}>
+        <XG m={camMat(540, 960, v === 'v3' ? 1.13 : 1.08)}>
           <BlueprintWall drawAt={v === 'draw' ? 0.3 : undefined} sun={<DemoSun cx={BLUEPRINT_WALL.sun.x} cy={BLUEPRINT_WALL.sun.y} r={110} />} />
-          {v === 'v3' ? <LabelSlot kind="slip" box={[205, 688, 650, 760]} text={['found with AI help ·', 'reported privately in August']} at={0.5} /> : null}
+          {/* S05: L6 = two 38 px lines on screen at zoom 1.13 in the clean top margin (BLUEPRINT_WALL.topMargin, to y 790) */}
+          {v === 'v3' ? <LabelSlot kind="slip" box={[205, 688, 650, 784]} text={['found with AI help ·', 'reported privately in August']} fontSize={38 / 1.13} at={0.5} /> : null}
         </XG>
       </DemoWorld>
     ),

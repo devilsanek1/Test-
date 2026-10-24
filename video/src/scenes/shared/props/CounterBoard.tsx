@@ -12,8 +12,8 @@
 //
 // Anchor: `box` [x0, y0, x1, y1] = the board FACE incl. its frame (storyboard: world 430-890 x 1080-1440), or x, y (top
 // left) + w, h (default 460 x 360). The zones follow the storyboard layout scaled to the box (`counterBoardZones`).
-// Text sizes are WORLD px (default for the 1.15 push: header 33, note 26, footer 24, stamps 29 = 38 / 30 / 28 / 34 px on
-// screen). riseAt: the board rises its own height + posts from behind its base line (0.33 s out(expo), clipped at the
+// Text sizes are WORLD px (defaults: header 33, note 26, footer 28, stamps 29 = 38 / 30 / 32 / 34 px on screen at the
+// 1.15 push; the footer zone holds two lines at >= 28 px from zoom 1.0). riseAt: the board rises its own height + posts from behind its base line (0.33 s out(expo), clipped at the
 // base: put the parapet in front). gatesAt[i]: gate i strokes on (4 bars + the strike, 0.12 s), laid out in rows of
 // `gateCols` in the gates zone. stamps[i] slam (ink ring 0.13 s, print 2.6 x -> 1.0 x in 0.27 s). outAt: un-build.
 
@@ -44,21 +44,32 @@ export type CounterBoardZones = {
   top: Pt;
 };
 
-/** The board's zones (world rects [x0, y0, x1, y1]) for a board box, from the storyboard layout (430-890 x 1080-1440). */
-export function counterBoardZones(box: Rect4): CounterBoardZones {
+/** Default footer zone height in board units (storyboard px of the 460 x 360 layout): two lines of fine print at
+ *  >= 28 px (2.04 em each block). */
+export const COUNTER_FOOTER_H = 58;
+
+/** The board's zones (world rects [x0, y0, x1, y1]) for a board box, from the storyboard layout (430-890 x 1080-1440).
+ *  v3 fix: the footer (L9b) is 58 board px tall (was 47) so its two lines hold >= 28 px fine print; the room comes from
+ *  the note / gates band (3 note lines still fit at 27). `footerH` (WORLD px) overrides the footer height: the stamps and
+ *  the note / gates band move up / down with it. Pass the SAME `footerH` to the board and to this function. */
+export function counterBoardZones(box: Rect4, opts: {footerH?: number} = {}): CounterBoardZones {
   const [x0, y0, x1, y1] = box;
   const sx = (x1 - x0) / 460;
   const sy = (y1 - y0) / 360;
   const R = (a: number, b: number, c: number, d: number): Rect4 => [x0 + (a - 430) * sx, y0 + (b - 1080) * sy, x0 + (c - 430) * sx, y0 + (d - 1080) * sy];
+  // footer height in board units; whatever it takes / gives back shifts the stamps and the bottom of the note band
+  const fh = Math.max(30, Math.min(110, opts.footerH !== undefined ? opts.footerH / sy : COUNTER_FOOTER_H));
+  const d = fh - COUNTER_FOOTER_H;
+  const bandB = 1276 - d;
   return {
     face: box,
     emblem: R(442, 1094, 486, 1146),
     header: R(490, 1092, 870, 1172),
-    flag: R(450, 1186, 474, 1290),
-    note: R(476, 1180, 720, 1290),
-    gates: R(730, 1188, 878, 1290),
-    stamps: [R(450, 1295, 870, 1338), R(450, 1340, 760, 1383)],
-    footer: R(450, 1385, 870, 1432),
+    flag: R(450, 1186, 474, bandB),
+    note: R(476, 1180, 720, bandB),
+    gates: R(730, 1188, 878, bandB),
+    stamps: [R(450, 1280 - d, 870, 1324 - d), R(450, 1326 - d, 760, 1370 - d)],
+    footer: R(446, 1374 - d, 874, 1432),
     top: [x0 + (860 - 430) * sx, y0],
   };
 }
@@ -92,7 +103,10 @@ export type CounterBoardProps = {
   stampSize?: number;
   footer?: LabelText;
   footerAt?: number;
+  /** Footer fine print (world px). Default 28 (the labelStyle fine-print floor at zoom 1). */
   footerSize?: number;
+  /** Footer zone height in WORLD px (default 58 board px x the box's y scale); see counterBoardZones. */
+  footerH?: number;
   /** false = no emblem. */
   emblem?: boolean;
   depth?: Depth;
@@ -155,7 +169,7 @@ export const CounterBoard: React.FC<CounterBoardProps> = (p) => {
   if (p.riseAt !== undefined && t < p.riseAt) return null;
   const W = F.W;
   const off = F.off;
-  const Z = counterBoardZones(box);
+  const Z = counterBoardZones(box, {footerH: p.footerH});
   const post = p.post ?? 80;
   const rise = p.riseAt === undefined ? 1 : E.outExpo(prog(t, p.riseAt, 0.33));
   const dy = (1 - rise) * (bh + post + 10);
@@ -200,7 +214,7 @@ export const CounterBoard: React.FC<CounterBoardProps> = (p) => {
   };
   block('hd', p.header, Z.header, p.headerSize ?? 33, p.headerAt, 'center');
   block('nt', p.note, Z.note, p.noteSize ?? 26, p.noteAt ?? (p.flagAt !== undefined ? p.flagAt + 0.08 : undefined), 'left', 1.05);
-  block('ft', p.footer, Z.footer, p.footerSize ?? 24, p.footerAt, 'center', 0.98);
+  block('ft', p.footer, Z.footer, p.footerSize ?? 28, p.footerAt, 'center', 0.98);
 
   // start flag: a short pole with a sage pennant at the count's left end
   if (p.flagAt === undefined || t >= p.flagAt) {

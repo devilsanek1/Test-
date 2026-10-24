@@ -63,10 +63,10 @@ def main():
             boxes.append(b)
     norm = {k: round(min(1.0, v / DENSE), 2) for k, v in dens.items()}
     # one keep rect per mascot position (frames of one continuous shot overlap and merge; a cut does not)
-    pad = 36
+    pad = 24
     keep = []
     for b in boxes:
-        r = [max(0, b[0] - pad), max(0, b[1] - pad), min(1080, b[2] + pad), min(1920, b[3] + pad + 60)]  # + the ground
+        r = [max(0, b[0] - pad), max(0, b[1] - pad), min(1080, b[2] + pad), min(1920, b[3] + pad + 30)]  # + the ground
         for k in keep:
             if r[0] < k[2] and k[0] < r[2] and r[1] < k[3] and k[1] < r[3]:
                 k[:] = [min(k[0], r[0]), min(k[1], r[1]), max(k[2], r[2]), max(k[3], r[3])]

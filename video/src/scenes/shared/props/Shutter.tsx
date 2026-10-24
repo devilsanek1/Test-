@@ -5,7 +5,7 @@
 //   <RollerShutter ... state="down" peephole={{x: 375, y: 935, r: 12}} />           // S11: the bar still crawls behind it
 //   <ShutterPadlock x={375} y={1015} at={3.64} glintAt={4.28} />                    // 24 x 28, centre of the body
 //   <BackSoonTag x={405} y={1006} at={3.70} tapAt={58.2} />                         // hang point; tag 30 x 36 below it
-//   <BackSoonTag x={518} y={1124} lettered size={88} at={3.69} liftAt={53.9} />       // v3: 'back soon' lettered, rewind
+//   <BackSoonTag x={518} y={1124} lettered size={104} at={3.69} liftAt={53.9} />      // v3: 'back soon' lettered, rewind
 //   <RollerShutter ... slamAt={2.35} stopAt={0.5} />  <RollerShutter ... liftAt={54.2} liftMode="reverse" />   // v3
 //
 // Roller shutter: an 18 px box above the window (tealDark, ink), the curtain unrolls from it: tealDark slats with ink
@@ -195,7 +195,8 @@ export type BackSoonTagProps = {
   /** Hang point (the string's top). The tag hangs below it. */
   x: number;
   y: number;
-  /** Tag width (height = 1.2 x for the clock tag; the lettered tag fits its words). Default 30 (lettered: 84). */
+  /** Tag width (height = 1.2 x for the clock tag; the lettered tag fits its words). Default 30 (lettered: 100, one
+   *  line at ~24 px). */
   size?: number;
   /** Alias of `size` (scene shims). */
   w?: number;
@@ -214,6 +215,10 @@ export type BackSoonTagProps = {
   text?: string | [string, string];
   /** Lettering size in world px (default: the largest that fits the width). */
   font?: number;
+  /** Lettered, auto layout: the ONE-line layout is used only if its lettering is at least this big (world px; default 22
+   *  = the on-screen floor at zoom 1: pass 22 / zoom for a pulled-back shot), otherwise 'back' / 'soon' stack on two
+   *  bigger lines. (A tag narrower than ~92 px at zoom 1 therefore always gets two lines.) */
+  minFont?: number;
   /** S12 rewind: the tag swings back UP (0 -> -16 deg, stepped at `step` Hz, 0.17 s), then one shrunken frame, gone. */
   liftAt?: number;
   /** Out: 'pop' = one shrunken frame, then gone (default when lettered or with liftAt) | 'unbuild' = the measured
@@ -231,7 +236,7 @@ export type BackSoonTagProps = {
 };
 
 /** White "back soon" tag on a short string: an ink clock icon (v2) or LETTERED 'back soon' (v3). */
-const BackSoonTagBase: React.FC<BackSoonTagProps & {k: number}> = ({x, y, size: sizeIn, w: wIn, at, tapAt, twirlAt, tilt = 0, lettered = false, text = 'back soon', font, liftAt, step = 12, depth, width, inkPx, seed = 'tag', k}) => {
+const BackSoonTagBase: React.FC<BackSoonTagProps & {k: number}> = ({x, y, size: sizeIn, w: wIn, at, tapAt, twirlAt, tilt = 0, lettered = false, text = 'back soon', font, minFont = 22, liftAt, step = 12, depth, width, inkPx, seed = 'tag', k}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   let a = pendulum(t, at, -16, 0.5, 0.8) + tilt;
@@ -268,7 +273,7 @@ const BackSoonTagBase: React.FC<BackSoonTagProps & {k: number}> = ({x, y, size: 
     );
   }
   // lettered: W wide, clipped top corners, an eyelet, the words in CaptionHand
-  const W = sizeIn ?? wIn ?? 84;
+  const W = sizeIn ?? wIn ?? 100;
   const iw = inkPx !== undefined ? inkPx / k : width ?? DEPTH_INK[depth ?? 'far'];
   const one = typeof text === 'string' ? text : text.join(' ');
   const two: [string, string] = typeof text === 'string' ? (text.includes(' ') ? [text.slice(0, text.indexOf(' ')), text.slice(text.indexOf(' ') + 1)] : [text, '']) : text;
@@ -276,8 +281,12 @@ const BackSoonTagBase: React.FC<BackSoonTagProps & {k: number}> = ({x, y, size: 
   const m2 = Math.max(measureCaption(two[0], 100), measureCaption(two[1], 100)) / 100;
   const fit1 = (W * 0.84) / m1;
   const fit2 = (W * 0.8) / m2;
-  const useOne = typeof text === 'string' && (font !== undefined ? font * m1 <= W * 0.9 : fit1 >= Math.max(20, W * 0.24));
-  const fs = font ?? (useOne ? Math.min(fit1, W * 0.34) : Math.min(fit2, W * 0.34));
+  // one line only when it keeps the lettering at the floor (it is always SMALLER than the two-line stack on the same
+  // width, so a too-narrow one-line tag would undercut the >= 22 px rule); else 'back' / 'soon', bigger
+  const fsOne = Math.min(fit1, W * 0.34);
+  const fsTwo = Math.min(fit2, W * 0.34);
+  const useOne = typeof text === 'string' && (font !== undefined ? font * m1 <= W * 0.9 : fsOne >= minFont);
+  const fs = font ?? (useOne ? fsOne : fsTwo);
   const n = Math.min(W * 0.14, fs * 0.6);
   const str = Math.max(6, fs * 0.36);
   const H = n + fs * 0.42 + (useOne ? fs * 1.02 : fs * 2.0) + fs * 0.28;

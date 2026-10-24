@@ -69,8 +69,8 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
   const W = 3.4 / s;
   const brW = Math.max(W * 1.3, 2.4 / s);
   const k = popK(t, at, 0.08, 0.2);
-  // the swing out, then a jolt when the face flips (old) and a smaller one when the cane pops
-  const sw = (pendulum(t, at, -16, 0.5, 0.8) + pendulum(t, p.flipOldAt !== undefined ? p.flipOldAt + 0.1 : undefined, 8, 0.5, 0.45) + pendulum(t, p.caneAt, -4, 0.45, 0.4)) * dir;
+  // the swing out (motion spec #14), settled well before the next beat on the plate so each beat reads on its own
+  const sw = pendulum(t, at, -16, 0.5, 0.6) * dir;
 
   // ---- face state
   const flipQ = p.flipOldAt !== undefined ? prog(t, p.flipOldAt, 0.2, E.inOutSine) : 0;

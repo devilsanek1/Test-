@@ -35,9 +35,10 @@ export const BLUEPRINT_WALL = {
   steps: {y0: 1320, y1: 1480, n: 4},
   /** Team feet line at the foot of the steps. */
   feetY: 1470,
-  /** v3: the sheet's clean TOP MARGIN (inside the frame, no linework: the S02 tight framing and the L6 slip at world
-   *  (205-650, 688-760)); everything on the plan starts at y >= 760. */
-  topMargin: [212, 692, 764, 760] as [number, number, number, number],
+  /** v3: the sheet's clean TOP MARGIN (inside the frame, no linework: the S02 tight framing and the L6 slip, two 38 px
+   *  lines at zoom 1.13 = ~85 world px, e.g. S05's (205-650, 688-784)); everything on the plan starts at y >= 796 (the
+   *  door elevation's head and its dimension tick); the paper glint sits low right (y ~1150). */
+  topMargin: [212, 692, 764, 790] as [number, number, number, number],
   /** v3: the banner's BOTTOM RAIL (a wooden weight bar along the sheet's foot) and Pip's S05 perch on it (feet). */
   bottomRail: {x0: 178, x1: 798, y: 1296, h: 11},
   perchBottom: [620, 1296] as Pt,
@@ -81,10 +82,12 @@ const G = (() => {
   const [bx, by, bw, bh] = BLUEPRINT_WALL.sheet;
   const frame = 12;
   const L = BLUEPRINT_WALL.lock;
-  // door elevation around the lock: door 330..646 x 760..1180, panels, the lock box drawn by the Lock prop
-  const doorEl = rect(330, 760, 316, 430, {seed: `${s}/door`, over: 'small'}) + rect(352, 782, 272, 386, {seed: `${s}/door2`, over: 'small'}) + line(488, 782, 488, 900, {seed: `${s}/dm`, over: 0}) + line(488, 1020, 488, 1168, {seed: `${s}/dm2`, over: 0});
-  const panels = rect(370, 800, 98, 90, {seed: `${s}/pn1`, over: 'small'}) + rect(508, 800, 98, 90, {seed: `${s}/pn2`, over: 'small'}) + rect(370, 1040, 98, 110, {seed: `${s}/pn3`, over: 'small'}) + rect(508, 1040, 98, 110, {seed: `${s}/pn4`, over: 'small'});
-  const dims = arrow(310, 760, 310, 1190, {seed: `${s}/d1`, head: 10}) + arrow(310, 1190, 310, 760, {seed: `${s}/d2`, head: 10}) + arrow(330, 1214, 646, 1214, {seed: `${s}/d3`, head: 10}) + arrow(646, 1214, 330, 1214, {seed: `${s}/d4`, head: 10}) + line(300, 760, 330, 760, {seed: `${s}/d5`, over: 0}) + line(300, 1190, 330, 1190, {seed: `${s}/d6`, over: 0}) + line(L.x + 44, L.y - 30, L.x + 120, L.y - 70, {seed: `${s}/lead`, over: 0}) + line(L.x + 120, L.y - 70, L.x + 200, L.y - 70, {seed: `${s}/lead2`, over: 0});
+  // door elevation around the lock: door 330..646 x 796..1190 (its head kept below the clean top margin, y 790), panels,
+  // the lock box drawn by the Lock prop
+  const DT = BLUEPRINT_WALL.topMargin[3] + 6;
+  const doorEl = rect(330, DT, 316, 1190 - DT, {seed: `${s}/door`, over: 'small'}) + rect(352, DT + 22, 272, 1168 - DT - 22, {seed: `${s}/door2`, over: 'small'}) + line(488, DT + 22, 488, 894, {seed: `${s}/dm`, over: 0}) + line(488, 1020, 488, 1168, {seed: `${s}/dm2`, over: 0});
+  const panels = rect(370, DT + 36, 98, 894 - DT - 36, {seed: `${s}/pn1`, over: 'small'}) + rect(508, DT + 36, 98, 894 - DT - 36, {seed: `${s}/pn2`, over: 'small'}) + rect(370, 1040, 98, 110, {seed: `${s}/pn3`, over: 'small'}) + rect(508, 1040, 98, 110, {seed: `${s}/pn4`, over: 'small'});
+  const dims = arrow(310, DT, 310, 1190, {seed: `${s}/d1`, head: 10}) + arrow(310, 1190, 310, DT, {seed: `${s}/d2`, head: 10}) + arrow(330, 1214, 646, 1214, {seed: `${s}/d3`, head: 10}) + arrow(646, 1214, 330, 1214, {seed: `${s}/d4`, head: 10}) + line(300, DT, 330, DT, {seed: `${s}/d5`, over: 0}) + line(300, 1190, 330, 1190, {seed: `${s}/d6`, over: 0}) + line(L.x + 44, L.y - 30, L.x + 120, L.y - 70, {seed: `${s}/lead`, over: 0}) + line(L.x + 120, L.y - 70, L.x + 200, L.y - 70, {seed: `${s}/lead2`, over: 0});
   const callout = circle(L.x, L.y, 64, {seed: `${s}/call`, overlap: 10});
   const title = rect(bx + 26, by + bh - 96, 176, 70, {seed: `${s}/tb`, over: 'small'}) + line(bx + 26, by + bh - 70, bx + 202, by + bh - 70, {seed: `${s}/tb1`, over: 0}) + line(bx + 40, by + bh - 84, bx + 140, by + bh - 84, {seed: `${s}/tb2`, over: 0}) + line(bx + 40, by + bh - 52, bx + 120, by + bh - 52, {seed: `${s}/tb3`, over: 0}) + line(bx + 40, by + bh - 38, bx + 150, by + bh - 38, {seed: `${s}/tb4`, over: 0});
   const sheetEdge = rect(bx, by, bw, bh, {seed: `${s}/sheet`, over: 'small'}) + rect(bx + frame, by + frame, bw - frame * 2, bh - frame * 2, {seed: `${s}/sheet2`, over: 'small'});

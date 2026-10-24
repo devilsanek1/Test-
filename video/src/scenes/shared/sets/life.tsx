@@ -53,6 +53,9 @@ export type PeopleOpts = {
   riseAt?: number;
   /** Walkers start walking at this time (s); false = everyone stands. Default 0 (walking from frame 0). */
   walk?: number | false;
+  /** Walkers stop where they are at this time (s) and stand still from then on (no idle bob: the beats around them stay
+   *  crisp). Omit = they keep walking. */
+  stop?: number;
   /** Use only the first n anchors. */
   n?: number;
   /** Replace the set's anchors. */
@@ -70,15 +73,20 @@ export function peopleOpts(spec: PeopleSpec | undefined, def = true): PeopleOpts
   return spec;
 }
 
-/** Feet + height of a walker at time t (perspective walk away toward vp, constant speed in depth). */
-export function walkerAt(w: WalkerAnchor, vp: Pt, t: number, walkAt: number | false): {x: number; y: number; h: number; walking: boolean} {
+/** Feet + height of a walker at time t (perspective walk away toward vp, constant speed in depth); `stopAt` freezes him
+ *  where he is at that time (walking false from then on). */
+export function walkerAt(w: WalkerAnchor, vp: Pt, t: number, walkAt: number | false, stopAt?: number): {x: number; y: number; h: number; walking: boolean} {
   if (w.go !== 'vp' || walkAt === false || t < walkAt) return {x: w.x, y: w.y, h: w.h, walking: false};
-  const k = 1 / (1 + (w.pace ?? 0.05) * (t - walkAt)); // screen size ratio vs the start (depth grows linearly)
-  return {x: vp[0] + (w.x - vp[0]) * k, y: vp[1] + (w.y - vp[1]) * k, h: w.h * k, walking: true};
+  const stopped = stopAt !== undefined && t >= stopAt;
+  const tt = stopped ? Math.max(walkAt, stopAt as number) : t;
+  const k = 1 / (1 + (w.pace ?? 0.05) * (tt - walkAt)); // screen size ratio vs the start (depth grows linearly)
+  return {x: vp[0] + (w.x - vp[0]) * k, y: vp[1] + (w.y - vp[1]) * k, h: w.h * k, walking: !stopped};
 }
 
-/** The people layer: back-view walkers / standers on a set's pavement anchors. */
-export const People: React.FC<{anchors: WalkerAnchor[]; vp: Pt; spec?: PeopleSpec; def?: boolean; seed?: Seed}> = ({anchors, vp, spec, def = true, seed = 'ppl'}) => {
+/** The people layer: back-view walkers / standers on a set's pavement anchors. `split` draws only the people whose feet
+ *  are farther ('far': feet y < split.y) or nearer ('near') than a line, so a set can put a prop line (a cart) between
+ *  them; seeds and timing stay those of the full list. */
+export const People: React.FC<{anchors: WalkerAnchor[]; vp: Pt; spec?: PeopleSpec; def?: boolean; split?: {y: number; side: 'far' | 'near'}; seed?: Seed}> = ({anchors, vp, spec, def = true, split, seed = 'ppl'}) => {
   const t = useTime();
   const o = peopleOpts(spec, def);
   if (!o) return null;
@@ -89,7 +97,9 @@ export const People: React.FC<{anchors: WalkerAnchor[]; vp: Pt; spec?: PeopleSpe
   return (
     <>
       {order.map(({w, i}) => {
-        const p = walkerAt(w, vp, t, walkAt);
+        const p = walkerAt(w, vp, t, walkAt, o.stop);
+        if (split && (split.side === 'far') !== p.y < split.y) return null;
+        const stood = o.stop !== undefined && t >= o.stop && w.go === 'vp';
         return (
           <CitizenSlot
             key={i}
@@ -100,7 +110,7 @@ export const People: React.FC<{anchors: WalkerAnchor[]; vp: Pt; spec?: PeopleSpe
             acc={w.acc}
             riseAt={o.riseAt === undefined ? undefined : o.riseAt + i * 0.06}
             walk={p.walking ? {hz: 1.7} : undefined}
-            bob={p.walking ? 0 : 1.2}
+            bob={p.walking || stood ? 0 : 1.2}
             flip={w.flip}
             seed={`${o.seed ?? seed}/${i}`}
           />

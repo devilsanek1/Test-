@@ -205,9 +205,9 @@ const G = (() => {
 // ---------------------------------------------------------------- pieces
 
 /** The pen-nib sign: cream disc r34 with an ink nib, on an iron bracket from the press-house wall; pendulum swing. */
-const NibSign: React.FC<{swingAt?: number; seed: string}> = ({swingAt, seed}) => {
+const NibSign: React.FC<{swingAt?: number; spec?: Partial<{x: number; y: number; r: number; wallX: number}>; seed: string}> = ({swingAt, spec, seed}) => {
   const t = useTime();
-  const S = BLUEPRINT.sign;
+  const S: {x: number; y: number; r: number; wallX: number} = {...BLUEPRINT.sign, ...spec};
   const hookX = S.x;
   const top = S.y - S.r - 22;
   const a = swingAt !== undefined && t >= swingAt ? -16 * Math.exp(-5 * (t - swingAt)) * Math.cos((t - swingAt) * 12.5) : 0;
@@ -280,6 +280,9 @@ export type BlueprintStreetProps = {
   lock?: Partial<LockProps>;
   /** Back-view people on BLUEPRINT.walkers (life.tsx). Default OFF here; true / options to show them. */
   people?: PeopleSpec;
+  /** The pen-nib sign: false = none (a scene hangs its own), or a new spot {x, y, r, wallX} (the default (795, 930) is
+   *  behind side building R4 in the S03 wide). */
+  sign?: false | Partial<{x: number; y: number; r: number; wallX: number}>;
   /** v3 label slot: the plan's title-block card at BLUEPRINT.titleBlock (drawn in front of the side buildings, with an
    *  inked title-block frame on the plan under it), e.g. (box) => <LabelTag kind="card" box={box} text={L3} flipTo={...} />. */
   titleBlock?: React.ReactNode | ((box: [number, number, number, number]) => React.ReactNode);
@@ -294,7 +297,7 @@ export type BlueprintStreetProps = {
   seed?: string;
 };
 
-export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pressAt, plaqueAt = {}, gridAt, stampAt, ventAt, signSwingAt, blinkAt, lock = {}, people, titleBlock, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bp'}) => {
+export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pressAt, plaqueAt = {}, gridAt, stampAt, ventAt, signSwingAt, blinkAt, lock = {}, people, titleBlock, sign, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bp'}) => {
   const t = useTime();
   const P = BLUEPRINT.press;
   const [wx, wy, ww, wh] = BLUEPRINT.window;
@@ -341,7 +344,7 @@ export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pre
       <FacadeDoor r={BLUEPRINT.door} seed={`${seed}/pdoor`} width={SI.mid} />
       <PlaqueSlot x={BLUEPRINT.plaque.x} y={BLUEPRINT.plaque.y} size={BLUEPRINT.plaque.size} at={plaqueAt.P} seed={`${seed}/pplq`} width={SI.far} />
       <Lock x={BLUEPRINT.lock.x} y={BLUEPRINT.lock.y} size={BLUEPRINT.lock.h} seed={`${seed}/plock`} ink={SI.far} {...lock} />
-      <NibSign swingAt={signSwingAt} seed={`${seed}/nib`} />
+      {sign === false ? null : <NibSign swingAt={signSwingAt} spec={sign} seed={`${seed}/nib`} />}
       <VentPuff at={ventAt} seed={seed} />
     </PopUp>
   );

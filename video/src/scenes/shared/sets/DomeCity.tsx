@@ -101,8 +101,16 @@ export const DOME = {
       {x: 880, y: 1300, h: 40},
     ],
   },
-  /** v3 multiplane depths (storyboard S08 layers; wrap gets nearness = 1 - depth). */
-  depths: {sky: 1, sun: 1, row0: 0.85, row1: 0.7, dome: 0.7, row2: 0.45, row3: 0.2, fg: 0},
+  /** v3 multiplane depths (wrap gets nearness = 1 - depth), TUNED in S08 (scene08/layout.ts `F`): rows 0-1, the dome
+   *  and its glass 0.98, row 2 0.75, row 3 0.38, our rooftop 0, the sky and the sun 1 (screen space: it only swells and
+   *  sets). Why not the storyboard's 0.85 / 0.7 / 0.45 / 0.2 (`depthsStoryboard`): on the crane's first frame (camera
+   *  (540, 1260) zoom 1.3) they lift rows 1-3 over the sun, while the S07 match wants the sun HALF behind the skyline;
+   *  with these the far rooftops sit on that skyline at the cut, row 3 stays mostly behind our parapet, the crane opens
+   *  the city row by row, and rows 0-1 share the dome's depth so the glass copies stay registered on the dome through
+   *  every move (no glass-edge drift under the arc ink). */
+  depths: {sky: 1, sun: 1, row0: 0.98, row1: 0.98, dome: 0.98, row2: 0.75, row3: 0.38, fg: 0},
+  /** The storyboard's S08 layer depths (superseded by `depths`, kept for reference). */
+  depthsStoryboard: {sky: 1, sun: 1, row0: 0.85, row1: 0.7, dome: 0.7, row2: 0.45, row3: 0.2, fg: 0},
 } as const;
 
 /** A dome as an ellipse arc (centre x, foot y, half-width, height). */
@@ -677,8 +685,8 @@ const DomeCityWide: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, glas
 
 /** Storyboard v3 staging (S08 re-staged): the district dome (or any non-wide arc) over rows 0-1, the watchtower
  *  silhouetted against the big sun at its right foot, the clamped searchlight, rattler doors on rows 2-3, and one layer
- *  per row for the crane (DOME.depths: rows 0-3 at 0.85 / 0.7 / 0.45 / 0.2, the dome + tower with row 1, the sky and
- *  the sun at 1, our rooftop at 0). The glass copy of each row lives in that row's own layer (clipped to the dome
+ *  per row for the crane (DOME.depths, S08-tuned: rows 0-1 + the dome / tower / glass 0.98, row 2 0.75, row 3 0.38,
+ *  the sky and the sun at 1, our rooftop at 0). The glass copy of each row lives in that row's own layer (clipped to the dome
  *  interior), the glass sky in a layer at the dome's depth drawn UNDER the sun. */
 const DomeCityV3: React.FC<DomeCityProps> = ({sun, dome = 'district', domeAt, domeDur = 1.1, glassAt, footprintAt, dotsAt, duskAt, towerAt, searchAt, searchAngle, searchClamp, observer = false, doors = true, sky = skies.golden, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'dome'}) => {
   const t = useTime();
