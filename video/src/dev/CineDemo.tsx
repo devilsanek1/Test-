@@ -70,6 +70,7 @@ import {
   Glow,
   LitWindows,
   camAt,
+  passerPath,
   persp1,
   PERSON_FEET,
   PERSON_H,
@@ -377,24 +378,29 @@ const SHOT_TONES: ShotTone[] = [
   {from: CUT_BC.at + CUT_BC.dur / 2, tone: 'light'}, // C night
 ];
 const toneAtT = (T: number): CaptionTone => SHOT_TONES.filter((s) => T >= s.from).pop()!.tone;
-/** During a wipe each side of the moving edge keeps its own shot's tone. */
+/** During a wipe each side of the moving edge keeps its own shot's tone, and the dark element passing the lens takes
+ *  white text (later regions win; rects are [x0, y0, x1, y1] in screen px). */
+const WIPES = [
+  {...CUT_AD, dir: 'right', kind: 'column'},
+  {...CUT_DB, dir: 'left', kind: 'passer'},
+  {...CUT_BC, dir: 'right', kind: 'column'},
+] as const;
 const toneRegions = (T: number): ToneRegion[] | null => {
-  for (const [w, dir] of [
-    [CUT_AD, 'right'],
-    [CUT_DB, 'left'],
-    [CUT_BC, 'right'],
-  ] as const) {
-    const e = wipeEdge(T, w.at, w.dur, dir);
+  for (const w of WIPES) {
+    const e = wipeEdge(T, w.at, w.dur, w.dir, w.kind);
     if (!e) continue;
     const before = toneAtT(w.at - 0.01);
     const after = toneAtT(w.at + w.dur);
-    const x = Math.max(0, Math.min(1080, e.x));
-    const newSide: [number, number, number, number] = dir === 'right' ? [0, 0, x, 1920] : [x, 0, 1080 - x, 1920];
-    const oldSide: [number, number, number, number] = dir === 'right' ? [x, 0, 1080 - x, 1920] : [0, 0, x, 1920];
-    return [
-      {tone: before, rect: oldSide},
-      {tone: after, rect: newSide},
+    const x = e.x;
+    const k = 1 + 0.08 * e.p; // WipePass grows 8 % about the element's foot
+    const grow = `translate(${x} 1920) scale(${k}) translate(${-x} -1920)`;
+    const regs: ToneRegion[] = [
+      {tone: before, rect: w.dir === 'right' ? [x, -200, 1300, 2200] : [-200, -200, x, 2200]},
+      {tone: after, rect: w.dir === 'right' ? [-200, -200, x, 2200] : [x, -200, 1300, 2200]},
     ];
+    if (w.kind === 'column') regs.push({tone: 'light', d: `M${x - 150} -60H${x + 150}V1980H${x - 150}Z`, transform: grow});
+    else regs.push({tone: 'light', d: passerPath(x), transform: `${grow} translate(0 ${-Math.abs(Math.sin(e.p * Math.PI * 3)) * 10})`});
+    return regs;
   }
   return null;
 };
@@ -415,6 +421,8 @@ const StreetCheck: React.FC = () => {
       </Layer>
       <Layer depth={0}>
         <PerspectiveStreet vp={VP} tod={P} seed="main" crowd={60} lightsOn={{at: 1, dur: 2}} />
+        {/* people on the road: under 40 px batched blobs, above it inked kit Persons (camH 110: h = (y - horizon) * 170 / 110) */}
+        <TinyCrowd n={26} area={[260, 812, 900, 1010]} horizon={VP[1]} k={170 / 110} tod={P} at={0.2} span={1.5} walk={0.4} seed="road" />
       </Layer>
     </CineCamera>
   );
@@ -512,7 +520,7 @@ export const CineDemo: React.FC<{mode?: 'demo' | 'street' | 'tower' | 'loop'; lo
             <WipeCut
               {...CUT_DB}
               dir="left"
-              kind="figure"
+              kind="passer"
               tod="golden"
               a={
                 <Shot from={T_D[0]} to={T_D[1]}>

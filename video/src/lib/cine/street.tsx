@@ -334,17 +334,32 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
         groundPB.raw(line(a[0], a[1], b[0], b[1], {seed: `${seed}/j${z.toFixed(0)}${side}`, over: [0, 2], breaks: false}));
       }
     }
-    // dash specks: short horizontal ticks, 3-10 px, scattered on the road and walks, denser near the lens
-    for (let i = 0; i < 70; i++) {
-      const z = zG * Math.pow(gr.range(1, 30), 1.4);
+    // long joints across the road (ref 2 f_1: expansion lines across the walkway), every other joint step
+    for (let z = zG * 1.15; z < zFar * 0.05; z *= 1.55) {
+      const a = S(-road, 0, z);
+      const b = S(road, 0, z);
+      if (f / z < 0.05) break;
+      groundPB.raw(line(a[0], a[1], b[0], b[1], {seed: `${seed}/rj${z.toFixed(0)}`, over: [0, 0], breaks: true}));
+    }
+    // a dashed centre line on wide roads
+    if (road >= 300) {
+      for (let z = zG; z < zFar * 0.1; z += 900) {
+        const a = S(0, 0, z);
+        const b = S(0, 0, z + 380);
+        groundPB.raw(`M${r1(a[0])} ${r1(a[1])}L${r1(b[0])} ${r1(b[1])}`);
+      }
+    }
+    // dash specks: short horizontal ticks, 3-10 px, scattered on the road and walks, half of them near the lens
+    for (let i = 0; i < 110; i++) {
+      const near = i % 2 === 0;
+      const z = near ? zG * gr.range(1, 4) : zG * Math.pow(gr.range(1, 30), 1.4);
       const x = gr.range(-(road + walk), road + walk);
       const [sx, sy] = S(x, 0, z);
-      if (sy > 2100 || sy < vp[1] + 6) continue;
+      if (sy > 2100 || sy < vp[1] + 6 || sx < -40 || sx > 1120) continue;
       const len = Math.min(10, Math.max(3, (f / z) * gr.range(14, 30)));
       groundPB.raw(`M${r1(sx - len / 2)} ${r1(sy)}h${r1(len)}`);
     }
   }
-
   // poles, wires, string lights
   const poleNodes: React.ReactNode[] = [];
   const wirePB = new PathBuf();

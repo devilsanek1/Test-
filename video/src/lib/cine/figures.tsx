@@ -187,20 +187,23 @@ export const TinyCrowd: React.FC<TinyCrowdProps> = ({
     if (sy <= 0.002) return;
     let x = f.x;
     let y = f.y;
+    let hh = f.h;
     if (f.walk) {
       const dist = (t * walkSpeed * f.spd * f.h) % (f.h * 6);
-      // walking away shrinks toward the horizon a little; sideways walkers just slide
+      // walking away recedes toward the horizon (and shrinks with the ground perspective); sideways walkers slide
       x += Math.cos(dir) * dist;
       y += Math.sin(dir) * dist * 0.35;
-      y -= Math.abs(Math.sin(t * 7 * f.spd + f.ph)) * f.h * 0.05;
+      if (horizon !== undefined && f.y > horizon + 1) hh = f.h * Math.max(0.05, (y - horizon) / (f.y - horizon));
+      y -= Math.abs(Math.sin(t * 7 * f.spd + f.ph)) * hh * 0.05;
     } else {
       y -= Math.max(0, Math.sin(t * 0.9 + f.ph * 3)) * f.h * 0.02;
     }
+    const ff = hh === f.h ? f : {...f, h: hh};
     if (personAbove > 0 && f.h >= personAbove) {
-      big.push({f, x, y, sy, i});
+      big.push({f: ff, x, y, sy, i});
       return;
     }
-    chunk.push({f, x, y, sy});
+    chunk.push({f: ff, x, y, sy});
     if (chunk.length >= CH) flush();
   });
   flush();

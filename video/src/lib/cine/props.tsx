@@ -72,15 +72,16 @@ export const Ledge: React.FC<LedgeProps> = ({y, x0 = -60, x1 = 1140, top = 30, f
   );
 };
 
-export type WipeKind = 'column' | 'figure' | 'pole' | 'foliage' | 'slab';
+export type WipeKind = 'column' | 'passer' | 'figure' | 'pole' | 'foliage' | 'slab';
 
 export type WipePassProps = {
   at: number;
   /** Seconds to cross the frame (0.45-0.6 reads as "something passing close"). The edge crosses the centre at at + dur/2. */
   dur?: number;
   dir?: 'left' | 'right';
-  /** What passes the lens: a stone 'column' with a capital (default), a back-view passer-by ('figure', the core
-   *  FigureWiper), a 'pole', 'foliage', or the old flat 'slab'. All are opaque over the edge +-90 px, full height. */
+  /** What passes the lens: a stone 'column' with a capital (default), a 'passer' (a giant back-view silhouette with a
+   *  rim), the core 'figure' / 'pole' / 'foliage' wipers, or the old flat 'slab'. All are opaque over the edge +-90 px,
+   *  full height. */
   kind?: WipeKind;
   tod?: Tod | TodPalette;
   /** Body colour (default tealDark, the darkest fill allowed). */
@@ -97,7 +98,36 @@ export type WipePassProps = {
 };
 
 /** Half-width of each wiper (the edge travels from -half to W + half). */
-const WIPE_HALF: Record<WipeKind, number> = {column: 230, figure: 660, pole: 120, foliage: 460, slab: 760};
+const WIPE_HALF: Record<WipeKind, number> = {column: 230, passer: 660, figure: 660, pole: 120, foliage: 460, slab: 760};
+
+/** Outline of the 'passer' wiper (a giant back-view head + shoulders right at the lens) centred on x, screen px. The
+ *  same path makes the caption tone region over it (export for tools). */
+export function passerPath(x: number): string {
+  const hr = 330;
+  const hy = 300;
+  return (
+    `M${x - hr} ${hy}a${hr} ${hr} 0 1 0 ${2 * hr} 0a${hr} ${hr} 0 1 0 ${-2 * hr} 0Z` +
+    `M${x - 165} 560H${x + 165}V760H${x - 165}Z` +
+    `M${x - 650} 1990L${x - 650} 1000Q${x - 650} 720 ${x - 340} 700L${x + 340} 700Q${x + 650} 720 ${x + 650} 1000L${x + 650} 1990Z`
+  );
+}
+
+/** A passer-by right in front of the lens: fill-only silhouette (back view), a peach rim on the leading side. */
+export const PasserWiper: React.FC<{x: number; p: number; dir: 'left' | 'right'; color?: string; rim?: string}> = ({x, p, dir, color = palette.tealDark, rim = palette.peach}) => {
+  const bob = Math.abs(Math.sin(p * Math.PI * 3)) * 10;
+  const d = passerPath(x);
+  const lead = dir === 'right' ? 7 : -7;
+  const ink = line(x - 650, 1000, x - 650, 1990, {seed: 'pw/l', over: [0, 0], breaks: false}) + line(x + 650, 1000, x + 650, 1990, {seed: 'pw/r', over: [0, 0], breaks: false});
+  return (
+    <g transform={bob ? `translate(0 ${r1(-bob)})` : undefined}>
+      <path d={d} fill={rim} transform={`translate(${lead} -4)`} />
+      <path d={d} fill={color} />
+      <path d={`M${x - 330} 300a330 330 0 1 1 660 0`} fill="none" stroke={palette.ink} strokeWidth={stroke.inkBold + 1} strokeLinecap="round" />
+      <path d={`M${x - 650} 1000Q${x - 650} 720 ${x - 340} 700L${x + 340} 700Q${x + 650} 720 ${x + 650} 1000`} fill="none" stroke={palette.ink} strokeWidth={stroke.inkBold + 1} strokeLinecap="round" />
+      <path d={ink} fill="none" stroke={palette.ink} strokeWidth={stroke.inkBold + 1} strokeLinecap="round" />
+    </g>
+  );
+};
 
 /** Screen x of the wipe edge at time t, or null outside the pass. The edge eases in-out across the frame. */
 export function wipeEdge(t: number, at: number, dur: number, dir: 'left' | 'right', kind: WipeKind = 'column'): {x: number; p: number} | null {
@@ -150,6 +180,7 @@ export const WipePass: React.FC<WipePassProps> = ({at, dur = 0.55, dir = 'right'
   const rimC = rim ?? (P.rim === palette.white ? palette.cream : P.rim);
   let el: React.ReactNode;
   if (children) el = children(x, p);
+  else if (kind === 'passer') el = <PasserWiper x={x} p={p} dir={dir} color={body} rim={rimC} />;
   else if (kind === 'figure') el = <FigureWiper x={x} p={p} dir={dir} color={body} />;
   else if (kind === 'pole') el = <PoleWiper x={x} p={p} dir={dir} color={body} />;
   else if (kind === 'foliage') el = <FoliageWiper x={x} p={p} dir={dir} color={color ?? palette.teal} />;
