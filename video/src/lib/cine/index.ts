@@ -5,7 +5,7 @@ export * from './camera';
 export * from './persp';
 // atmosphere: listed (not `export *`) so the deprecated `Tod` type alias stays out of the barrels (it clashed with the
 // core <Tod> component); the name is `TodLike` now.
-export {TODS, TOD, TOD_STEPS, deep, shade, todPal, todPalRole, useTodPal, ambient, atmos, tone, inkForDepth} from './atmosphere';
+export {TODS, TOD, TOD_STEPS, deep, shade, todPal, todPalRole, useTodPal, ambient, atmos, tone, inkForDepth, todTableProblems} from './atmosphere';
 export type {TodLike, TodPalette, AtmosOpts} from './atmosphere';
 export * from './sky';
 export * from './light';

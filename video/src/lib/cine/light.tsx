@@ -18,7 +18,7 @@ import type {Pt} from '../sketch';
 import {TodLike, TodPalette, useTodPal} from './atmosphere';
 import {mix, PathBuf, r1} from './util';
 import {palette} from '../theme';
-import {exitScale, useCineState} from './state';
+import {CineState, exitScale, isPaper, useCineState} from './state';
 
 // ---------------------------------------------------------------- Glow
 
@@ -275,22 +275,39 @@ export type RimLightProps = {
   opacity?: number;
 };
 
-/** One-sided lighter edge strip (flat): the sun-facing side of a building, a figure's shoulder, a column. */
+/** One-sided lighter edge strip (flat): the sun-facing side of a building, a figure's shoulder, a column. Light: it
+ *  exists only in the coloured Look (paper / before the cascade wave: no rim) and thins out first in an un-build. */
 export const RimLight: React.FC<RimLightProps> = ({rect, side = 'right', points, light = 0, width = 6, color, opacity}) => {
+  const S = useCineState();
+  const ex = exitScale(S.e, 0.2, 0.05);
+  const w = Math.round(width * ex * 4) / 4;
+  const anchor: Pt | undefined = rect ? [rect[0] + rect[2] / 2, rect[1] + rect[3] / 2] : points?.[0];
+  const off = paperState(S, anchor) || w <= 0.25;
   const d = useMemo(() => {
+    if (off) return '';
     if (rect) {
-      const [x, y, w, h] = rect;
+      const [x, y, rw, h] = rect;
       const pb = new PathBuf();
-      if (side === 'right') pb.rect(x + w - width, y, width, h);
-      if (side === 'left') pb.rect(x, y, width, h);
-      if (side === 'top') pb.rect(x, y, w, width);
-      if (side === 'bottom') pb.rect(x, y + h - width, w, width);
+      if (side === 'right') pb.rect(x + rw - w, y, w, h);
+      if (side === 'left') pb.rect(x, y, w, h);
+      if (side === 'top') pb.rect(x, y, rw, w);
+      if (side === 'bottom') pb.rect(x, y + h - w, rw, w);
       return pb.d;
     }
-    return points ? rimPath(points, light, width) : '';
-  }, [rect?.join(), side, points, light, width]);
+    return points ? rimPath(points, light, w) : '';
+  }, [off, rect?.join(), side, points, light, w]);
   return d ? <path d={d} fill={color} opacity={opacity} /> : null;
 };
+
+/** true when light / flat-colour treatments must step aside: the paper Look, fills 'none', or the cascade wave has not
+ *  reached `p` yet (layer coords; without a point: until the cascade starts). Then silhouettes and rims render their
+ *  children NORMALLY (white fills + ink in paper), so frame 0 / the loop frame is line art, not dark blobs. */
+export function paperState(S: CineState, p?: Pt): boolean {
+  const L = S.look;
+  if (L.fills !== 'color') return true;
+  if (!L.cascade) return false;
+  return p ? isPaper(S, p) : S.t < L.cascade.at;
+}
 
 // ---------------------------------------------------------------- Silhouette
 
@@ -311,8 +328,11 @@ export const SIL_BOUNDS: [number, number, number, number] = [-400, -400, 1880, 2
 /** Recolour EVERY fill and stroke of the children to one flat colour (no offscreen raster, no mask): a scoped CSS rule
  *  on a class overrides the presentation attributes of everything inside ([fill] / [stroke] that are not "none").
  *  This is how cine makes silhouettes and rim copies of any kit element (Person, the mascot, a Building). */
-export const FlatColor: React.FC<{color: string; opacity?: number; children?: React.ReactNode}> = ({color, opacity, children}) => {
+export const FlatColor: React.FC<{color: string; opacity?: number; at?: Pt; children?: React.ReactNode}> = ({color, opacity, at, children}) => {
   const id = 'fc' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const S = useCineState();
+  // paper Look / before the cascade reaches it: the children draw themselves (white fills + ink), no recolour
+  if (paperState(S, at)) return <>{children}</>;
   const css = `.${id} [fill]:not([fill="none"]){fill:${color}!important}.${id} [stroke]:not([stroke="none"]){stroke:${color}!important}`;
   return (
     <g className={id} opacity={opacity}>
@@ -322,11 +342,18 @@ export const FlatColor: React.FC<{color: string; opacity?: number; children?: Re
   );
 };
 
-/** Fill-only flat shape of a path or of any children (a FlatColor copy: exact, fast, no mask tiling). */
-export const Silhouette: React.FC<SilhouetteProps> = ({color, d, children, opacity}) => {
-  if (d) return <path d={d} fill={color} opacity={opacity} />;
+/** Fill-only flat shape of a path or of any children (a FlatColor copy: exact, fast, no mask tiling). In the paper
+ *  Look (or before the cascade reaches `at`) the children render normally; a bare `d` gets a white fill + hairline. */
+export const Silhouette: React.FC<SilhouetteProps & {at?: Pt}> = ({color, d, children, opacity, at}) => {
+  const S = useCineState();
+  if (d) {
+    if (paperState(S, at)) return S.look.ink ? <path d={d} fill={S.look.fills === 'none' ? 'none' : palette.white} stroke={palette.ink} strokeWidth={1.6} /> : null;
+    const k = exitScale(S.e, 0.3, 0.2);
+    if (k <= 0) return null;
+    return <path d={d} fill={color} opacity={opacity} />;
+  }
   return (
-    <FlatColor color={color} opacity={opacity}>
+    <FlatColor color={color} opacity={opacity} at={at}>
       {children}
     </FlatColor>
   );
@@ -335,11 +362,16 @@ export const Silhouette: React.FC<SilhouetteProps> = ({color, d, children, opaci
 /** Rim-light any element: a flat copy of the children in `color`, offset toward the light by (dx, dy), drawn behind
  *  them, so a lighter sliver (3-5 px) shows along the lit edges (backlit figures, the mascot on a ledge).
  *  `silhouette` also draws the element itself fill-only (a backlit figure against the sun). */
-export const Rimmed: React.FC<{color: string; dx?: number; dy?: number; silhouette?: string; bounds?: [number, number, number, number]; children?: React.ReactNode}> = ({color, dx = 4, dy = -3, silhouette, children}) => (
-  <>
-    <g transform={`translate(${dx} ${dy})`}>
-      <FlatColor color={color}>{children}</FlatColor>
-    </g>
-    {silhouette ? <FlatColor color={silhouette}>{children}</FlatColor> : children}
-  </>
-);
+export const Rimmed: React.FC<{color: string; dx?: number; dy?: number; silhouette?: string; at?: Pt; bounds?: [number, number, number, number]; children?: React.ReactNode}> = ({color, dx = 4, dy = -3, silhouette, at, children}) => {
+  const S = useCineState();
+  // light only exists in colour: in paper / before the cascade the element draws itself (no rim copy, no silhouette)
+  if (paperState(S, at)) return <>{children}</>;
+  return (
+    <>
+      <g transform={`translate(${dx} ${dy})`}>
+        <FlatColor color={color}>{children}</FlatColor>
+      </g>
+      {silhouette ? <FlatColor color={silhouette}>{children}</FlatColor> : children}
+    </>
+  );
+};

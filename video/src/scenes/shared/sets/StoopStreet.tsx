@@ -34,6 +34,7 @@ import {BollardSlot, CalendarSlot, ChromeSlot, CheckSlot, LockProps, MagnifierSl
 import {Lock} from '../props';
 import {FacadeDoor} from './SiteFacade';
 import {perspRowLayout, PerspRow, RowHouse} from './rows';
+import {Furniture, FurnitureItem, People, PeopleSpec, WalkerAnchor} from './life';
 
 // ---------------------------------------------------------------- layout
 
@@ -77,6 +78,18 @@ export const STOOP = {
   /** Pip's spots (S03): pavement, step 1 tread, step 2 tread. */
   pip: {pavement: [520, 1450] as Pt, step1: [380, 1300] as Pt, step2: [380, 1230] as Pt},
   pavementY: 1370,
+  /** People layer anchors (life.tsx): two walkers heading up the road to the VP, one stander on the right pavement
+   *  (heights from the eye-level camera: (feet - 1060) / 1.1). Never on the stoop (x 160-440) or door #4. */
+  walkers: [
+    {x: 772, y: 1200, h: 127, go: 'vp', body: palette.teal, hair: 'short'},
+    {x: 792, y: 1252, h: 175, go: 'vp', body: palette.sand, hair: 'bun', acc: ['backpack']},
+    {x: 884, y: 1338, h: 252, go: 'stand', body: palette.sage, hair: 'curly', acc: ['scarf']},
+  ] as WalkerAnchor[],
+  /** Street furniture (ink-led): a planter right of the stoop, a bike on the near pavement. */
+  furniture: [
+    {kind: 'planter', x: 482, y: 1394, s: 0.72},
+    {kind: 'bike', x: 760, y: 1446, s: 1.05},
+  ] as FurnitureItem[],
 } as const;
 
 const LEFT_ROW = {quad: wallQuad({vp: [720, 1060], x: 520, top: 660, bottom: 1370, depth: 0.905}), n: 16, H: 700, hw: 700 * 0.62, storeys: 4, side: 'left' as const, seed: 'stoopL', colors: [palette.cream, palette.sand, palette.mintPale, palette.tan]};
@@ -142,15 +155,27 @@ const G = (() => {
   const trunk = rectPath(t.cx - 7, t.cy + t.ry * 0.6, 14, t.base - t.cy - t.ry * 0.6);
   const trunkInk = line(t.cx - 7, t.base, t.cx - 6, t.cy + t.ry * 0.5, {seed: `${s}/tt1`, over: 0}) + line(t.cx + 7, t.base, t.cx + 6, t.cy + t.ry * 0.6, {seed: `${s}/tt2`, over: 0}) + line(t.cx, t.cy + t.ry * 0.9, t.cx - t.rx * 0.3, t.cy + t.ry * 0.45, {seed: `${s}/br1`, over: 0}) + line(t.cx + 2, t.cy + t.ry * 1.0, t.cx + t.rx * 0.28, t.cy + t.ry * 0.62, {seed: `${s}/br2`, over: 0});
   const bare = line(t.cx, t.cy + t.ry * 0.6, t.cx - t.rx * 0.5, t.cy - t.ry * 0.3, {seed: `${s}/b1`, over: 0}) + line(t.cx, t.cy + t.ry * 0.5, t.cx + t.rx * 0.45, t.cy - t.ry * 0.5, {seed: `${s}/b2`, over: 0}) + line(t.cx, t.cy + t.ry * 0.3, t.cx + 4, t.cy - t.ry * 0.8, {seed: `${s}/b3`, over: 0}) + line(t.cx - t.rx * 0.25, t.cy, t.cx - t.rx * 0.6, t.cy - t.ry * 0.1, {seed: `${s}/b4`, over: 0});
-  // far towers (fill-only), with night window dots
+  // far towers (fill-only, the far city beyond the VP): stepped roof silhouettes on the day haze ladder (the farther
+  // pair #98C0AE, the nearer pair #84B09C: both step TOWARD the sky), a few >= 3 px window dots; at night the same
+  // silhouettes in tealDark with peach dots
   let towers = '';
+  let towersFar = '';
   let towerDots = '';
-  for (const [tx, tw, top] of STOOP.towers) {
-    towers += rectPath(tx, top, tw, VP[1] + 4 - top);
-    for (let yy = top + 12; yy < VP[1] - 8; yy += 15) for (let xx = tx + 6; xx < tx + tw - 6; xx += 11) if ((xx * 7 + yy * 3) % 5 < 2) towerDots += rectPath(xx, yy, 4, 6);
-  }
-  return {wins, winInk, glass, heroInk, plinthInk, bricks, road, pavR, kerbInk, ground, lampFill, lampInk, lantern, wireD, treeCrown, treeTicks, trunk, trunkInk, bare, towers, towerDots};
+  let towerDayDots = '';
+  STOOP.towers.forEach(([tx, tw, top], i) => {
+    // stepped roof: a set-back top storey + a short mast / tank on two of them
+    const setback = tw * 0.22;
+    const d = rectPath(tx, top + 22, tw, VP[1] + 4 - top - 22) + rectPath(tx + setback, top, tw - setback * 2, 24) + (i % 2 ? rectPath(tx + tw * 0.46, top - 26, 4, 28) : rectPath(tx + tw * 0.2, top - 12, tw * 0.28, 14));
+    if (i === 0 || i === 2) towersFar += d;
+    else towers += d;
+    for (let yy = top + 34; yy < VP[1] - 8; yy += 15) for (let xx = tx + 6; xx < tx + tw - 6; xx += 11) if ((xx * 7 + yy * 3) % 5 < 2) towerDots += rectPath(xx, yy, 4, 6);
+    for (let yy = top + 36; yy < VP[1] - 20; yy += 22) for (let xx = tx + 7; xx < tx + tw - 7; xx += 12) if ((xx * 5 + yy * 7) % 9 < 2) towerDayDots += rectPath(xx, yy, 3.5, 4.5);
+  });
+  return {wins, winInk, glass, heroInk, plinthInk, bricks, road, pavR, kerbInk, ground, lampFill, lampInk, lantern, wireD, treeCrown, treeTicks, trunk, trunkInk, bare, towers, towersFar, towerDots, towerDayDots};
 })();
+
+/** The day haze ladder for the far towers (style_bible_ref2 8): nearer #84B09C, farther #98C0AE. */
+const TOWER_HAZE = ['#84B09C', '#98C0AE'] as const;
 
 const STARS: Pt[] = [
   [96, 120],
@@ -345,6 +370,10 @@ export type StoopStreetProps = {
   pigeons?: boolean;
   pigeonsFlyAt?: number;
   bollard?: boolean;
+  /** Back-view walkers / standers on STOOP.walkers (life.tsx). Default on; false = nobody (S04). */
+  people?: PeopleSpec;
+  /** Street furniture (default STOOP.furniture: a planter + a bike); false = none. */
+  furniture?: FurnitureItem[] | false;
   wrap?: LayerWrap;
   x?: number;
   y?: number;
@@ -362,7 +391,7 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
   sun,
   stoop,
   heroSlot,
-  foreground = 'kerb',
+  foreground = ['kerb', 'edgeL'],
   drawAt,
   chromeAt,
   screenOnAt,
@@ -374,6 +403,8 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
   pigeons = true,
   pigeonsFlyAt,
   bollard = true,
+  people,
+  furniture = STOOP.furniture,
   wrap = noWrap,
   x = 0,
   y = 0,
@@ -398,8 +429,9 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
     <>
       {night ? <Stars seed={seed} /> : null}
       {dawnBand ? <Fill rect={[-160, 940, 1400, 124]} color={palette.peach} offset={false} mode="snap" seed={`${seed}/dawn`} /> : null}
-      <Fill d={G.towers} color={night ? palette.tealDark : palette.sage} offset={false} mode="snap" at={fa} seed={`${seed}/towers`} />
-      {night ? <Fill d={G.towerDots} color={palette.peach} offset={false} mode="snap" seed={`${seed}/tdots`} /> : null}
+      <Fill d={G.towersFar} color={night ? palette.tealDark : TOWER_HAZE[1]} offset={false} mode="snap" at={fa} seed={`${seed}/towersF`} />
+      <Fill d={G.towers} color={night ? palette.tealDark : TOWER_HAZE[0]} offset={false} mode="snap" at={fa} seed={`${seed}/towers`} />
+      {night ? <Fill d={G.towerDots} color={palette.peach} offset={false} mode="snap" seed={`${seed}/tdots`} /> : <Fill d={G.towerDayDots} color={HALF.daySky} offset={false} mode="snap" at={fa} seed={`${seed}/tddots`} />}
       <NightGround on={night}>
         <Fill rect={[600, VP[1] - 2, 330, 8]} color={palette.mintPale} offset={false} at={fa} mode="snap" seed={`${seed}/hz`} />
       </NightGround>
@@ -500,6 +532,14 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
       {wrap('ground', 0.4, ground)}
       {wrap('rows', 0.4, rows)}
       {wrap('hero', 0.7, heroNode)}
+      {wrap(
+        'people',
+        0.8,
+        <>
+          <Furniture items={furniture} seed={`${seed}/furn`} />
+          <People anchors={STOOP.walkers} vp={STOOP.vp} spec={people} seed={`${seed}/ppl`} />
+        </>,
+      )}
       {wrap('near', 1.0, nearNode)}
     </SetPlace>
   );

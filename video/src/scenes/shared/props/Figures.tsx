@@ -224,23 +224,27 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
     const Y = canvas.height + 40;
     yb = Math.max(world.h + world.bleed, iv[3] * Y + iv[5], iv[1] * canvas.width + iv[3] * Y + iv[5]);
   }
+  // hair: never the kit cap (from behind its dark nape band under a dome reads as a bearded face, review 4) and no kit
+  // head under a cap at all (its zig-zag hero nape did the same, review 5): 'cap' = our BackHead (cap with a strap
+  // notch, smooth nape, sand neck) over a straight collar band, the head raised so the neck shows; the kit Person is
+  // drawn bald and clipped to the torso. Hoods are drawn here (the kit draws them only on heroes).
+  const capOn = hair === 'cap';
+  const lift = capOn ? 1.32 : 0.86; // head centre above the torso top, in head radii
   // torso length so the hip line (coat bottom) sits below it; quantised so the path is not rebuilt every frame
-  const need = (yb + 30 - y) / s - g0.hr * 0.86;
+  const need = (yb + 30 - y) / s - g0.hr * lift;
   const torsoH = Math.min(8000, Math.max(220, Math.ceil(need / 64) * 64));
   const g = personGeo(seed, torsoH);
-  // hair: never the kit cap (from behind at this size its dark nape band under a dome reads as a bearded face, review 4):
-  // 'cap' becomes plain mid-tone hair with our CapTop on it; hoods are drawn here (the kit draws them only on heroes)
-  const capOn = hair === 'cap';
-  const hairUse: Hair = capOn ? 'short' : hair ?? rng(`onl/${seed}`).pick<Hair>(['short', 'short', 'long', 'bun', 'curly', 'beanie']);
+  const hyUse = capOn ? -torsoH - g.hr * lift : g.hy;
+  const hairUse: Hair = capOn ? 'bald' : hair ?? rng(`onl/${seed}`).pick<Hair>(['short', 'short', 'long', 'bun', 'curly', 'beanie']);
   const coat = body ?? personCoat(seed, true);
   const capHair = coat === palette.brown ? palette.tan : palette.brown;
   const capColor = coat === palette.teal || coat === palette.sage ? palette.tealDark : palette.teal;
-  const hoodOn = !!acc?.includes('hood') && hairUse !== 'long';
+  const hoodOn = !!acc?.includes('hood') && hairUse !== 'long' && !capOn;
   const clipId = 'eo' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const holdPhone = !!acc?.includes('phone');
   const q = holdPhone ? 1 : raiseQ(t, raisePhoneAt, lowerPhoneAt);
   const jolt = raisePhoneAt !== undefined && t >= raisePhoneAt && t < raisePhoneAt + 0.2 ? -Math.sin(((t - raisePhoneAt) / 0.2) * Math.PI) * 6 : 0;
-  const hipY = y - g.hy * s + jolt + (bob ? osc(t, 0.5, rand(seed, 'b') * 6) * bob : 0);
+  const hipY = y - hyUse * s + jolt + (bob ? osc(t, 0.5, rand(seed, 'b') * 6) * bob : 0);
   const accs: Acc[] = (acc ?? []).filter((a) => a !== 'phone' && a !== 'backpack' && a !== 'hood');
   const rise = riseAt !== undefined ? (1 - MOTION.rise.ease(prog(t, riseAt, MOTION.rise.dur))) * head * 2.2 : 0;
   if (riseAt !== undefined && t < riseAt) return null;
@@ -275,7 +279,7 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
     // the phone arm swings about the shoulder from hanging to raised (mirrored for the left arm)
     const sh: Pt = [hw - d * 0.5, -g.h + R * 0.55];
     const hd: Pt = [xc - d * 0.5, yCuff + g.w * 0.06];
-    const hu: Pt = [g.w * 0.62, g.hy - g.hr * 1.25];
+    const hu: Pt = [g.w * 0.62, hyUse - g.hr * 1.25];
     const a0 = Math.atan2(hd[1] - sh[1], hd[0] - sh[0]);
     const a1 = Math.atan2(hu[1] - sh[1], hu[0] - sh[0]);
     const L = lerp(Math.hypot(hd[0] - sh[0], hd[1] - sh[1]), Math.hypot(hu[0] - sh[0], hu[1] - sh[1]), Math.min(1, q));
@@ -293,7 +297,21 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
     );
   }
   const rimD = rim ? rimStripD(g, rim === 'left' ? -1 : 1, W, px, g.w * 2.2) : '';
-  const person = <Person x={x} y={hipY} s={s} seed={seed} hair={hairUse} hairColor={capOn ? capHair : undefined} acc={accs} body={coat} torsoH={torsoH} ink={DEPTH_INK[depth]} hero={false} rim={false} />;
+  let person: React.ReactNode = <Person x={x} y={hipY} s={s} seed={seed} hair={hairUse} acc={accs} body={coat} torsoH={torsoH} ink={DEPTH_INK[depth]} hero={false} rim={false} />;
+  if (capOn) {
+    // only the coat of the kit Person (its head is replaced by the BackHead + collar band below)
+    const cid = clipId + 'c';
+    person = (
+      <>
+        <defs>
+          <clipPath id={cid}>
+            <rect x={x - head * 8} y={hipY - torsoH * s} width={head * 16} height={torsoH * s + 4000} />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${cid})`}>{person}</g>
+      </>
+    );
+  }
   const local = mat.compose(mat.translate(x, hipY), mat.scale(s));
   let hood: React.ReactNode = null;
   if (hoodOn) {
@@ -326,7 +344,9 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
       {hood}
       <XG m={local}>
         {rimD ? <Fill d={rimD} color={palette.white} offset={false} mode="none" seed={`${seed}/rim`} /> : null}
-        {capOn ? <CapTop hy={g.hy} hr={g.hr} color={capColor} hair={capHair} W={W} seed={String(seed)} /> : null}
+        {capOn ? (
+          <BackHead hy={hyUse} hr={g.hr} hair={capHair} cap={capColor} W={W} neckTo={-torsoH + g.hr * 0.2} seed={String(seed)} under={<CollarBand top={-torsoH} hr={g.hr} coat={coat} W={W} seed={String(seed)} />} />
+        ) : null}
         {parts}
       </XG>
     </XG>
@@ -474,26 +494,114 @@ export const Maker: React.FC<MakerProps> = (p) => {
   );
 };
 
-// ---------------------------------------------------------------- CapTop + BackBody (Keeper, Caretaker)
+// ---------------------------------------------------------------- BackHead + CollarBand + BackBody (cap wearers)
 
-/** A cap seen from behind (ref 1 line-art row), drawn ON a hair-colour head centred (0, hy) of radius hr: the crown
- *  covers the top ~45 %, its band line sits just above the middle with the small strap arch on it (hair colour inside),
- *  a button on top. Nothing of it reaches the lower half of the head, so no crescent can read as a beard. */
-const CapTop: React.FC<{hy: number; hr: number; color: string; hair: string; W: number; detail?: boolean; seed: string}> = ({hy, hr, color, hair, W, detail = true, seed}) => {
+/** A back-view head for cap wearers (review 5: at phone size a cap over a full hair-colour disc, a zig-zag nape and a V
+ *  collar read as a bearded face looking at us). Person-local units, head centre (0, hy), radius hr:
+ *  - a sand NECK block (0.45 x head wide) from inside the head down to `neckTo` (hidden by the collar there);
+ *  - the hair ends in a SMOOTH NAPE: the sides taper into the neck and a shallow curve crosses it (no zig-zag, no round
+ *    hair "chin"), three short strands under the cap, sand ears just under the cap band;
+ *  - the cap (`cap` colour) covers the top ~65 % down to a gently sagging band; its back STRAP is a clear notch: an arch
+ *    cut up into the cap with HAIR showing through it, over a thin strap with a buckle tick; a button on top.
+ *  `under` renders after the neck and before the ears / head (the collar band goes there). */
+const BackHead: React.FC<{
+  hy: number;
+  hr: number;
+  hair: string;
+  cap: string | false;
+  W: number;
+  neckTo: number;
+  detail?: boolean;
+  seed: string;
+  under?: React.ReactNode;
+  /** Bare-hair strands (default true). */
+  strands?: boolean;
+  /** A bun on top (bare hair). */
+  bun?: boolean;
+  /** Draw-on start (the Ghost); omit = drawn. */
+  at?: number;
+}> = ({hy, hr, hair, cap, W, neckTo, detail = true, seed, under, strands = true, bun = false, at}) => {
   const f = (v: number) => v.toFixed(2);
-  const by = hy - hr * 0.1;
-  const R2 = hr * 1.04;
-  const cw = Math.sqrt(Math.max(0, R2 * R2 - (by - hy) * (by - hy)));
-  const crown = `M${f(-cw)} ${f(by)}A${f(R2)} ${f(R2)} 0 1 1 ${f(cw)} ${f(by)}Q0 ${f(by + hr * 0.06)} ${f(-cw)} ${f(by)}`;
-  const archD = `M${f(-hr * 0.28)} ${f(by + hr * 0.02)}A${f(hr * 0.28)} ${f(hr * 0.24)} 0 0 1 ${f(hr * 0.28)} ${f(by + hr * 0.02)}Z`;
-  const archInk = arc(0, by + hr * 0.02, hr * 0.28, hr * 0.24, 180, 360, {seed: `${seed}/arch`});
+  const T = (dt: number) => (at === undefined ? undefined : at + dt);
+  const X = (k: number) => f(k * hr);
+  const Y = (k: number) => f(hy + k * hr);
+  // neck
+  const nw = hr * 0.45;
+  const neckD = rectPath(-nw, hy + hr * 0.5, nw * 2, neckTo - (hy + hr * 0.5));
+  const neckInk = `M${f(-nw)} ${Y(0.84)}V${f(neckTo)}M${f(nw)} ${Y(0.84)}V${f(neckTo)}`;
+  // hair: the head circle down to (+-0.8, 0.6), tapering into the neck sides, a shallow nape curve across the neck
+  const sideY = 0.6;
+  const sideX = Math.sqrt(1 - sideY * sideY);
+  const taperR = `C${X(sideX - 0.07)} ${Y(0.8)} ${X(0.56)} ${Y(0.86)} ${X(0.45)} ${Y(0.86)}`;
+  const nape = `Q0 ${Y(0.97)} ${X(-0.45)} ${Y(0.86)}`;
+  const taperL = `C${X(-0.56)} ${Y(0.86)} ${X(-(sideX - 0.07))} ${Y(0.8)} ${X(-sideX)} ${Y(sideY)}`;
+  const dome = `M${X(-sideX)} ${Y(sideY)}A${f(hr)} ${f(hr)} 0 1 1 ${X(sideX)} ${Y(sideY)}`;
+  const hairD = dome + taperR + nape + taperL + 'Z';
+  const headInk = dome + taperR + `M${X(-0.45)} ${Y(0.86)}` + taperL;
+  // ears just under the cap band
+  const ey = hy + hr * 0.36;
+  const ears = blob(-hr * 0.98, ey, hr * 0.2, hr * 0.28, {seed: `${seed}/e1`}) + blob(hr * 0.98, ey, hr * 0.2, hr * 0.28, {seed: `${seed}/e2`});
+  const earInk = arc(-hr * 0.98, ey, hr * 0.2, hr * 0.28, 95, 265, {seed: `${seed}/ei1`}) + arc(hr * 0.98, ey, hr * 0.2, hr * 0.28, -85, 85, {seed: `${seed}/ei2`});
+  const parts: React.ReactNode[] = [
+    <Fill key="neck" d={neckD} color={palette.sand} offset={false} mode="none" seed={`${seed}/neck`} />,
+    detail ? <Ink key="neckI" d={neckInk} at={T(0.14)} width={W * 0.7} taper={false} seed={`${seed}/neckI`} /> : null,
+    <React.Fragment key="under">{under}</React.Fragment>,
+    <Fill key="ear" d={ears} color={palette.sand} offset={false} mode="none" seed={`${seed}/ear`} />,
+    <Ink key="earI" d={earInk} at={T(0.12)} width={W * 0.85} order="all" seed={`${seed}/earI`} />,
+    <Fill key="hair" d={hairD} color={hair} seed={`${seed}/headF`} />,
+    <Ink key="headI" d={headInk} at={T(0.04)} width={W} seed={`${seed}/headI`} />,
+    detail ? <Ink key="napeI" d={`M${X(0.45)} ${Y(0.86)}` + nape} at={T(0.16)} width={W * 0.55} taper={false} seed={`${seed}/napeI`} /> : null,
+  ];
+  if (!cap && bun) {
+    parts.push(<Fill key="bunF" d={blob(0, hy - hr * 1.1, hr * 0.36, hr * 0.34, {seed: `${seed}/bun`})} color={hair} offset={false} mode="none" seed={`${seed}/bunF`} />);
+    parts.push(<Ink key="bunI" d={circle(0, hy - hr * 1.1, hr * 0.36, {seed: `${seed}/bun`, overlap: 10})} at={T(0.1)} width={W * 0.85} seed={`${seed}/bunI`} />);
+  }
+  if (!cap && detail && strands) {
+    // bare hair: three strands
+    const sd = `M${X(-0.42)} ${Y(-0.55)}Q${X(-0.5)} ${Y(0.1)} ${X(-0.36)} ${Y(0.7)}M${X(0.06)} ${Y(-0.7)}Q${X(-0.02)} ${Y(0)} ${X(0.08)} ${Y(0.78)}M${X(0.46)} ${Y(-0.5)}Q${X(0.56)} ${Y(0.1)} ${X(0.42)} ${Y(0.66)}`;
+    parts.push(<Ink key="strands" d={sd} at={T(0.2)} width={W * 0.7} order="all" seed={`${seed}/strands`} />);
+  }
+  if (cap) {
+    const by = hy + hr * 0.3;
+    const R2 = hr * 1.04;
+    const cw = Math.sqrt(Math.max(0, R2 * R2 - (by - hy) * (by - hy)));
+    const crown = `M${f(-cw)} ${f(by)}A${f(R2)} ${f(R2)} 0 1 1 ${f(cw)} ${f(by)}Q0 ${f(by + hr * 0.12)} ${f(-cw)} ${f(by)}`;
+    // the strap notch: an arch cut up into the cap (hair shows through), over a thin strap along the band
+    const sy = by + hr * 0.04; // strap bottom (on the band)
+    const st = by - hr * 0.1; // strap top = arch base
+    const aw = hr * 0.34;
+    const ah = hr * 0.36;
+    const archD = `M${f(-aw)} ${f(st)}A${f(aw)} ${f(ah)} 0 0 1 ${f(aw)} ${f(st)}Z`;
+    parts.push(<Fill key="crown" d={crown + 'Z'} color={cap} offset={false} mode="none" seed={`${seed}/crown`} />);
+    if (detail) {
+      parts.push(<Fill key="arch" d={archD} color={hair} offset={false} mode="none" seed={`${seed}/arch`} />);
+      parts.push(<Ink key="archI" d={`M${f(-aw)} ${f(sy)}V${f(st)}A${f(aw)} ${f(ah)} 0 0 1 ${f(aw)} ${f(st)}V${f(sy)}M${f(-aw - hr * 0.06)} ${f(st)}H${f(aw + hr * 0.06)}M${f(aw * 0.35)} ${f(st + hr * 0.02)}V${f(sy - hr * 0.01)}`} width={W * 0.7} taper={false} seed={`${seed}/archI`} />);
+      parts.push(<Ink key="btn" d={circle(0, hy - R2 + hr * 0.05, hr * 0.12, {seed: `${seed}/btn`})} width={W * 0.7} seed={`${seed}/btn`} />);
+    }
+    parts.push(<Ink key="capI" d={crown} width={W * 0.85} seed={`${seed}/capI`} />);
+    // hair texture under the band (big heads): short strands that end above the nape
+    if (detail && hr * 2 * W > 0) {
+      const sy0 = by + hr * 0.16;
+      parts.push(<Ink key="hstr" d={`M${X(-0.42)} ${f(sy0)}Q${X(-0.46)} ${Y(0.58)} ${X(-0.36)} ${Y(0.74)}M${X(0.04)} ${f(sy0 + hr * 0.04)}L${X(0.02)} ${Y(0.8)}M${X(0.44)} ${f(sy0)}Q${X(0.48)} ${Y(0.56)} ${X(0.38)} ${Y(0.72)}`} width={W * 0.55} order="all" taper={false} seed={`${seed}/hstr`} />);
+    }
+  }
+  return <>{parts}</>;
+};
+
+/** A straight coat collar band on the shoulders (person-local: torso top at y = top), a step darker than the coat; the
+ *  neck goes in behind it. Replaces the V chevron on cap wearers (a V reads as a shirt front). */
+const CollarBand: React.FC<{top: number; hr: number; coat: string; W: number; seed: string; at?: number}> = ({top, hr, coat, W, seed, at}) => {
+  const f = (v: number) => v.toFixed(2);
+  const hw = hr * 1.05;
+  const y0 = top - hr * 0.04;
+  const y1 = top + hr * 0.34;
+  const sag = hr * 0.07;
+  const d = `M${f(-hw)} ${f(y0 + sag)}Q0 ${f(y0 - sag)} ${f(hw)} ${f(y0 + sag)}L${f(hw)} ${f(y1 + sag)}Q0 ${f(y1 - sag)} ${f(-hw)} ${f(y1 + sag)}Z`;
+  const ink = `M${f(-hw)} ${f(y0 + sag)}Q0 ${f(y0 - sag)} ${f(hw)} ${f(y0 + sag)}M${f(-hw)} ${f(y1 + sag)}Q0 ${f(y1 - sag)} ${f(hw)} ${f(y1 + sag)}`;
   return (
     <>
-      <Fill d={crown + 'Z'} color={color} offset={false} mode="none" seed={`${seed}/crown`} />
-      {detail ? <Fill d={archD} color={hair} offset={false} mode="none" seed={`${seed}/arch`} /> : null}
-      <Ink d={crown} width={W * 0.85} seed={`${seed}/capI`} />
-      {detail ? <Ink d={archInk} width={W * 0.7} taper={false} seed={`${seed}/archI`} /> : null}
-      {detail ? <Ink d={circle(0, hy - R2 + hr * 0.04, hr * 0.12, {seed: `${seed}/btn`})} width={W * 0.7} seed={`${seed}/btn`} /> : null}
+      <Fill d={d} color={darker(coat)} offset={false} mode="none" seed={`${seed}/collar`} />
+      <Ink d={ink} at={at} width={W * 0.8} taper={false} seed={`${seed}/collarI`} />
     </>
   );
 };
@@ -506,14 +614,30 @@ const backFigH = (g: Geo) => LEG + g.h + g.hr * 2.6;
 const darker = (c: string) =>
   c === palette.sand ? palette.tan : c === palette.teal ? palette.tealDark : c === palette.cream ? palette.sand : c === palette.sage ? palette.teal : c === palette.tan ? palette.brown : palette.tealDark;
 
-type BackBodyProps = {g: Geo; seed: string; coat: string; legs: string; shoes?: string; hair?: string; cap?: string | false; W: number; walk?: number; detail?: boolean};
+type BackBodyProps = {
+  g: Geo;
+  seed: string;
+  coat: string;
+  legs: string;
+  shoes?: string;
+  hair?: string;
+  cap?: string | false;
+  W: number;
+  walk?: number;
+  detail?: boolean;
+  /** Draw-on start for every stroke (the Ghost); omit = drawn. */
+  at?: number;
+  strands?: boolean;
+  bun?: boolean;
+};
 
 /** A back-view figure built here instead of the kit Person when it wears a cap (style bible 6, closeup_board_people):
  *  the head circle IS the hair colour with sand ears at mid-height, the cap sits ON TOP (crown over the top ~45 %, the
  *  band line just above the middle with the small strap arch on it, a button), a sand neck block shows under the head,
  *  a coat collar band with its collar line sits on the shoulders. No skin-coloured crown and no dark crescent low on the head, so it never reads as
  *  a face (review 4). Person-local units: hip line at 0, the same w / h / hr / round as personGeo (arms, belts fit). */
-const BackBody: React.FC<BackBodyProps> = ({g, seed, coat, legs, shoes = palette.tealDark, hair = palette.brown, cap, W, walk, detail = true}) => {
+const BackBody: React.FC<BackBodyProps> = ({g, seed, coat, legs, shoes = palette.tealDark, hair = palette.brown, cap, W, walk, detail = true, at, strands, bun}) => {
+  const T = (dt: number) => (at === undefined ? undefined : at + dt);
   const t = useTime();
   const {w, h, hr} = g;
   const hy = backHeadY(g);
@@ -533,42 +657,15 @@ const BackBody: React.FC<BackBodyProps> = ({g, seed, coat, legs, shoes = palette
   const shoesD = rectPath(-gp - lw - 1, LEG - lL - 12, lw + 3, 14) + rectPath(gp - 2, LEG - lR - 12, lw + 3, 14);
   const legInk = `M${f(-gp - lw)} 0V${f(LEG - lL)}M${f(-gp)} 0V${f(LEG - 2 - lL)}M${f(gp)} 0V${f(LEG - 2 - lR)}M${f(gp + lw)} 0V${f(LEG - lR)}`;
   const torsoD = torso(0, 0, w, h, g.round, 0.07);
-  // neck block (sand) from inside the head down into the collar; ink on its two sides
-  const neckD = rectPath(-hr * 0.45, hy + hr * 0.55, hr * 0.9, -h + hr * 0.3 - (hy + hr * 0.55));
-  const neckInk = `M${f(-hr * 0.45)} ${f(hy + hr * 0.9)}V${f(-h - hr * 0.12)}M${f(hr * 0.45)} ${f(hy + hr * 0.9)}V${f(-h - hr * 0.12)}`;
-  // collar band on the shoulders: top edge round the neck, the collar line below
-  const ct = -h - hr * 0.16;
-  const collarTop = `M${f(-hr * 0.68)} ${f(ct)}Q0 ${f(-h + hr * 0.06)} ${f(hr * 0.68)} ${f(ct)}`;
-  const collarD = collarTop + `L${f(hr * 1.14)} ${f(-h + hr * 0.38)}Q0 ${f(-h + hr * 0.8)} ${f(-hr * 1.14)} ${f(-h + hr * 0.38)}Z`;
-  const collarInk = collarTop + `M${f(-hr * 0.68)} ${f(ct)}L${f(-hr * 1.14)} ${f(-h + hr * 0.38)}Q0 ${f(-h + hr * 0.8)} ${f(hr * 1.14)} ${f(-h + hr * 0.38)}L${f(hr * 0.68)} ${f(ct)}`;
-  // head (hair colour) + ears at mid-height
-  const ey = hy + hr * 0.12;
-  const ears = blob(-hr * 0.98, ey, hr * 0.2, hr * 0.3, {seed: `${seed}/e1`}) + blob(hr * 0.98, ey, hr * 0.2, hr * 0.3, {seed: `${seed}/e2`});
-  const earInk = arc(-hr * 0.98, ey, hr * 0.2, hr * 0.3, 95, 265, {seed: `${seed}/ei1`}) + arc(hr * 0.98, ey, hr * 0.2, hr * 0.3, -85, 85, {seed: `${seed}/ei2`});
-  const headD = blob(0, hy, hr, hr, {seed: `${seed}/head`});
-  const headInk = circle(0, hy, hr, {seed: `${seed}/head`, overlap: 18});
-  const strands = `M${f(-hr * 0.42)} ${f(hy - hr * 0.55)}Q${f(-hr * 0.5)} ${f(hy + hr * 0.1)} ${f(-hr * 0.36)} ${f(hy + hr * 0.72)}M${f(hr * 0.06)} ${f(hy - hr * 0.7)}Q${f(-hr * 0.02)} ${f(hy)} ${f(hr * 0.08)} ${f(hy + hr * 0.8)}M${f(hr * 0.46)} ${f(hy - hr * 0.5)}Q${f(hr * 0.56)} ${f(hy + hr * 0.1)} ${f(hr * 0.42)} ${f(hy + hr * 0.66)}`;
   return (
     <TodAnchor at={[0, -h * 0.5]}>
       <XG m={mat.translate(0, bob)}>
         <Fill d={legsD} color={legs} offset={false} mode="none" seed={`${seed}/legs`} />
         <Fill d={shoesD} color={shoes} offset={false} mode="none" seed={`${seed}/shoes`} />
-        <Ink d={legInk} width={W * 0.9} seed={`${seed}/legI`} />
-        <Fill d={neckD} color={palette.sand} offset={false} mode="none" seed={`${seed}/neck`} />
-        {detail ? <Ink d={neckInk} width={W * 0.7} taper={false} seed={`${seed}/neckI`} /> : null}
-        <Fill d={ears} color={palette.sand} offset={false} mode="none" seed={`${seed}/ear`} />
-        <Ink d={earInk} width={W * 0.85} order="all" seed={`${seed}/earI`} />
+        <Ink d={legInk} at={T(0.14)} width={W * 0.9} seed={`${seed}/legI`} />
         <Fill d={torsoD} color={coat} seed={`${seed}/torso`} />
-        <Ink d={torsoD} width={W} seed={`${seed}/torsoI`} />
-        <Fill d={collarD} color={darker(coat)} offset={false} mode="none" seed={`${seed}/collar`} />
-        <Ink d={collarInk} width={W * 0.8} taper={false} seed={`${seed}/collarI`} />
-        <Fill d={headD} color={hair} seed={`${seed}/headF`} />
-        <Ink d={headInk} width={W} open={0.1} seed={`${seed}/headI`} />
-        {cap ? (
-          <CapTop hy={hy} hr={hr} color={cap} hair={hair} W={W} detail={detail} seed={seed} />
-        ) : detail ? (
-          <Ink d={strands} width={W * 0.7} order="all" seed={`${seed}/strands`} />
-        ) : null}
+        <Ink d={torsoD} at={T(0)} width={W} seed={`${seed}/torsoI`} />
+        <BackHead hy={hy} hr={hr} hair={hair} cap={cap ?? false} W={W} neckTo={-h + hr * 0.2} detail={detail} seed={seed} at={T(0.1)} strands={strands} bun={bun} under={<CollarBand top={-h} hr={hr} coat={coat} W={W} seed={seed} at={T(0.18)} />} />
       </XG>
     </TodAnchor>
   );
@@ -781,16 +878,22 @@ export const AttemptStipple: React.FC<{spots: {x: number; y: number; h: number; 
 
 // ---------------------------------------------------------------- Ghost (S04)
 
-/** An ink-only back-view figure (no fills at all): the years of passers-by who never look at the door. */
+/** An ink-only back-view figure (no fills at all): the years of passers-by who never look at the door. Built on BackBody
+ *  in line art (review 5: the kit line head's seeded side gap + hair tick read as a broken scribble): a clean head dome
+ *  that flows into the neck lines (the only opening is the nape), ears, a collar band, torso, legs. `hair` 'bun' adds a
+ *  bun; other hair styles and `acc` are not drawn. `at` draws it on. */
 export const Ghost: React.FC<FigBase & {at?: number; hair?: Hair; acc?: Acc[]}> = (p) => {
   const t = useTime();
   if (p.at !== undefined && t < p.at) return null;
-  const s = p.h / FIG_H;
+  const seed = String(p.seed ?? 'ghost');
+  const g = personGeo(seed);
+  const s = p.h / backFigH(g);
+  const W = (p.depth ? DEPTH_INK[p.depth] : stroke.ink) / s;
   const walking = walkPos(t, p).walking;
   return (
     <Look fills="none">
       <FigFrame b={p} s={s}>
-        <Person seed={p.seed ?? 'ghost'} legs torsoH={TORSO} legH={LEG} style="line" hair={p.hair} acc={p.acc ?? []} ink={(p.depth ? DEPTH_INK[p.depth] : stroke.ink) / s} at={p.at} build="draw" walk={walking ? p.walk?.hz ?? 1.6 : undefined} hero={false} />
+        <BackBody g={g} seed={seed} coat={palette.white} legs={palette.white} cap={false} W={W} walk={walking ? p.walk?.hz ?? 1.6 : undefined} at={p.at} strands={false} bun={p.hair === 'bun'} />
       </FigFrame>
     </Look>
   );

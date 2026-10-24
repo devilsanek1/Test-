@@ -144,10 +144,16 @@ export const depthInk = {front: 4.8, mid: 3.4, far: 2.2, hair: 1.6} as const;
 /** Sky colours for the time of day (flat; switch with a pop or a wipe, never a fade). */
 export const skies = {
   day: '#ACD1BF', // reference 2 day sky
-  golden: palette.cream,
+  /** GOLDEN = the SAME flat day sky (style_bible_ref2 8: "golden variant = same flat sky + peach-lit faces"): golden
+   *  hour is told by the light on the world (todSteps.golden: light fields one step warmer) and a big low sun, never
+   *  by a cream sky (cream facades, walkways and white clouds vanished into it: 1.0-1.3:1). */
+  golden: '#ACD1BF',
   dusk: palette.sage,
   night: '#588077', // reference 2 night sky (never darker behind captions)
   deep: palette.tealDark,
+  /** A deliberate warm paper sky for a stylised beat (NOT a time of day; no relight row is built for it: keep cream /
+   *  white / mintPale fills off it). The old `skies.golden` value. */
+  cream: palette.cream,
 } as const;
 
 // ---- engine v2.1 (review 2). New keys only.
@@ -179,7 +185,15 @@ export const nightFar = '#4B706B';
  *  Read by <Fill> through the <Tod> context (lib/tod.tsx); <World sky> keys with `tod` switch it with the sky wipe. */
 export const todSteps: Record<TodName, Partial<Record<TodRole, Partial<Record<PaletteKey, string>>>>> = {
   day: {},
-  golden: {},
+  // GOLDEN (same flat day sky): the light fields step one palette step WARMER, nothing gets darker (style_bible_ref2 8
+  // "peach-lit faces"): the pale-green ground / glass / pale facades warm to cream, cream faces catch the low sun as
+  // peach. Whites stay white (still the brightest lit), mid and dark tones, ink, the sun never move. Far rows stay
+  // atmospheric (no peach on the horizon), clouds warm to cream.
+  golden: {
+    base: {mintPale: palette.cream, cream: palette.peach},
+    far: {cream: palette.cream},
+    cloud: {white: palette.cream, mintPale: palette.cream, cream: palette.cream},
+  },
   dawn: {},
   dusk: {
     base: {mintPale: palette.sky, cream: palette.sand, sand: palette.tan},
@@ -201,6 +215,21 @@ export const todSteps: Record<TodName, Partial<Record<TodRole, Partial<Record<Pa
 /** Minimum contrast (WCAG ratio) between a relit fill and its sky: one palette step (the smallest designed step is
  *  reference 2's night haze, #4B706B on #588077 = 1.25:1). */
 export const RELIGHT_MIN_STEP = 1.15;
+/** ...or this CIE76 colour difference (a warm fill on a cool sky reads by HUE even at equal luminance: sand on the
+ *  day sky is 1.09:1 but dE 26; the smallest designed same-hue step, sage -> teal, is dE 13). */
+export const RELIGHT_MIN_DE = 15;
+
+/** Glow colours (style_bible_ref2 1.5 / 4, measured): the flat halo DISC behind a lit bulb (r = bulbHalo.r x the
+ *  bulb's radius; one step lighter than the sky it hangs in) and the peach lamp-glow disc. Opaque, never translucent. */
+export const glow = {
+  /** Night bulb halo #749484 (ref 2 measured, one step lighter than the night sky). */
+  bulbHalo: '#749484',
+  /** Halo radius in bulb radii (ref 2: 2.2). */
+  bulbHaloR: 2.2,
+  lamp: palette.peach,
+} as const;
+/** Bulb halo per time of day: a flat disc one step lighter than that sky; null = no visible halo in daylight. */
+export const todBulbHalo: Record<TodName, string | null> = {day: null, golden: null, dawn: null, dusk: palette.sky, night: glow.bulbHalo};
 
 const lum = (hex: string) => {
   const h = hex.replace('#', '');
@@ -213,15 +242,34 @@ export const contrastHex = (a: string, b: string) => {
   return (y + 0.05) / (x + 0.05);
 };
 
-/** Colours each role puts AGAINST THE SKY (checked even when the table leaves them unchanged). */
-const SKY_FACING: Partial<Record<TodRole, PaletteKey[]>> = {framing: ['teal', 'tealDark', 'sage'], far: ['sage', 'teal', 'mintPale'], cloud: ['white', 'mintPale']};
+/** CIE76 colour difference of two hex colours (sRGB -> Lab, D65). Pure. */
+export const deltaE = (a: string, b: string) => {
+  const lab = (hex: string) => {
+    const h = hex.replace('#', '');
+    const [r, g, bl] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).map((x) => (x <= 0.04045 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)));
+    const X = (0.4124 * r + 0.3576 * g + 0.1805 * bl) / 0.95047;
+    const Y = 0.2126 * r + 0.7152 * g + 0.0722 * bl;
+    const Z = (0.0193 * r + 0.1192 * g + 0.9505 * bl) / 1.08883;
+    const f = (t: number) => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116);
+    return [116 * f(Y) - 16, 500 * (f(X) - f(Y)), 200 * (f(Y) - f(Z))];
+  };
+  const p = lab(a);
+  const q = lab(b);
+  return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]);
+};
+
+/** Colours each role puts AGAINST THE SKY (checked even when the table leaves them unchanged). `base` = the light
+ *  fields that commonly meet the sky: facades, walkways and fences on the horizon, white clouds and signs. */
+const SKY_FACING: Partial<Record<TodRole, PaletteKey[]>> = {base: ['white', 'cream', 'sand', 'mintPale', 'tan'], framing: ['teal', 'tealDark', 'sage'], far: ['sage', 'teal', 'mintPale', 'cream'], cloud: ['white', 'mintPale']};
 
 /** Relight table check (scripts/engine-numbers.mjs --check runs it): every fill the table relights, and every
- *  sky-facing colour of the far / cloud / framing roles, must stay at least one palette step (RELIGHT_MIN_STEP) off
- *  the sky of its time of day. Returns human-readable problems (empty = OK). */
+ *  sky-facing colour of each role (base facades / walkways / whites included), must stay distinct from the sky of its
+ *  time of day: at least one palette step of contrast (RELIGHT_MIN_STEP) or a clear hue difference (RELIGHT_MIN_DE).
+ *  Also checks the bulb halo against its sky. Returns human-readable problems (empty = OK). */
 export function relightProblems(): string[] {
   const out: string[] = [];
   const roles: TodRole[] = ['base', 'far', 'cloud', 'framing'];
+  const distinct = (c: string, sky: string) => contrastHex(c, sky) >= RELIGHT_MIN_STEP || deltaE(c, sky) >= RELIGHT_MIN_DE;
   for (const tod of Object.keys(todSteps) as TodName[]) {
     const sky = todSky[tod];
     for (const role of roles) {
@@ -229,10 +277,12 @@ export function relightProblems(): string[] {
       const keys = new Set<PaletteKey>([...(Object.keys(row) as PaletteKey[]), ...(SKY_FACING[role] ?? [])]);
       for (const k of keys) {
         const c = row[k] ?? palette[k];
-        const r = contrastHex(c, sky);
-        if (r < RELIGHT_MIN_STEP) out.push(`${tod}/${role}: ${k} -> ${c} on the ${tod} sky ${sky} is ${r.toFixed(2)}:1 (< ${RELIGHT_MIN_STEP}: it vanishes into the sky)`);
+        if (!distinct(c, sky))
+          out.push(`${tod}/${role}: ${k} -> ${c} on the ${tod} sky ${sky} is ${contrastHex(c, sky).toFixed(2)}:1, dE ${deltaE(c, sky).toFixed(1)} (< ${RELIGHT_MIN_STEP}:1 and < dE ${RELIGHT_MIN_DE}: it vanishes into the sky)`);
       }
     }
+    const halo = todBulbHalo[tod];
+    if (halo && !distinct(halo, sky)) out.push(`${tod}: bulb halo ${halo} on the ${tod} sky ${sky} is ${contrastHex(halo, sky).toFixed(2)}:1 (it vanishes into the sky)`);
   }
   return out;
 }

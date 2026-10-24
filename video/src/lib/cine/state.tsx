@@ -7,7 +7,7 @@
 //   const k = exitScale(S.e, jitter, size);          // 1 built .. 0 gone (ease-in, small pieces first)
 //   const inkOn = S.look.ink && !inkGone(S.e);       // batched ink drops at exitInkProgress 0.5
 //   const fill = lookPaint(S, color, [x, y]);         // white in paper / before the cascade wave
-//   <ExitShrink x y jitter size> ... </ExitShrink>    // shrink a group about its base point
+//   <CineExitShrink x y jitter size axis> ... </CineExitShrink>   // shrink a group about its base point
 
 import React from 'react';
 import {ease as E, useTime} from '../time';
@@ -68,8 +68,11 @@ export function isPaper(S: CineState, p?: Pt): boolean {
   return false;
 }
 
-/** Shrink children about (x, y) with the un-build (axis 'y' = sink into the base, 'xy' = shrink to the point). */
-export const ExitShrink: React.FC<{x: number; y: number; jitter?: number; size?: number; axis?: 'xy' | 'y'; children?: React.ReactNode}> = ({x, y, jitter = 0.5, size = 0.2, axis = 'xy', children}) => {
+/** Shrink children about (x, y) with the un-build (axis 'y' = sink into the base, 'xy' = shrink to the point), with the
+ *  cine exit ordering (`size` = screen size share: small first). Named CineExitShrink so the barrels never export two
+ *  different `ExitShrink`s: for the MASCOT / any raw-SVG character use the core `ExitShrink` (lib/exit: shrink to the
+ *  feet with the fills' window). */
+export const CineExitShrink: React.FC<{x: number; y: number; jitter?: number; size?: number; axis?: 'xy' | 'y'; children?: React.ReactNode}> = ({x, y, jitter = 0.5, size = 0.2, axis = 'xy', children}) => {
   const e = useExit();
   const k = exitScale(e, jitter, size);
   if (k >= 1) return <>{children}</>;

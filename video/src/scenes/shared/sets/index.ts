@@ -13,6 +13,7 @@ export * from './NoticeboardCorner';
 export * from './DomeCity';
 export * from './TerraceHill';
 export * from './OldQuarter';
-export {SET_CATALOG} from './catalog';
-export type {SetEntry} from './catalog';
 export * from './ground';
+export * from './life';
+// SET_CATALOG (storyboard-v1 demo times + the preview DemoWorld / DemoSun) is preview-only: import it from
+// './catalog' directly (SetsPreview, SharedKitSheet), never through this barrel.

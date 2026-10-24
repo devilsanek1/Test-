@@ -19,7 +19,7 @@ import {CineCamera, CamKey, CamState} from './cine/camera';
 import {Ease} from './time';
 import {MOTION} from './spec';
 import {world} from './theme';
-import {pushStart, SceneInfo, useScene} from './stage';
+import {pushStart, pushTo, SceneInfo, useScene} from './stage';
 import type {Seed} from './rng';
 import type {Pt} from './sketch';
 
@@ -48,7 +48,7 @@ export type ShotCamProps = {
  *  would reverse the scene's incoming camera-continuous zoom starts when that transition has settled. */
 export function pushKeys(p: ShotPush | boolean = true, scene?: SceneInfo): CamKey[] {
   const o = p === true || p === false ? {} : p;
-  const to = o.to ?? MOTION.camera.push.to;
+  const to = pushTo(o.to, scene);
   const at = pushStart(o.at ?? 0, to, scene);
   const anchor = o.anchor ?? world.vp;
   return [

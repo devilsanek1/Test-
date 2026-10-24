@@ -20,6 +20,7 @@ import {Person, PersonProps} from './Person';
 import {At} from './common';
 import {depthInk, world} from '../theme';
 import {MOTION} from '../spec';
+import {clamp} from '../time';
 import {eyeLevel, PERSON_LEG_H} from '../persp';
 
 /** A row: y = hip line (eye mode: FEET line), x0..x1 = its extent, s = person scale (ignored in eye mode). */
@@ -58,9 +59,9 @@ export type CrowdProps = {
    *  the row gap, scale = [min, max] size multiplier skewed toward 1 (a few children, some tall adults; feet stay on the
    *  ground). Default {x: 0.175, y: 0, scale: [0.94, 1.06]}. */
   jitter?: {x?: number; y?: number; scale?: [number, number]};
-  /** Rim light (Person `rim`) for people with s >= 0.6. Default false. */
+  /** Rim light (Person `rim`) for people with s >= ~0.6 (it ramps in around 0.6). Default false. */
   rim?: 'left' | 'right' | false;
-  /** People at or above this scale get Person's hero detail (sleeves, hands, hood). Default 0.7. */
+  /** People around / above this scale get Person's hero detail (sleeves, hands, hood; ramped, see Person). Default 0.7. */
   heroFrom?: number;
   /** EYE-LEVEL camera: rows' y are FEET lines and every scale follows from the camera (persp.tsx eyeLevel: camera at
    *  `ratio` x person height, default 1.1 = reference 2), so all heads sit in a band just under the horizon. Legs on
@@ -71,10 +72,19 @@ export type CrowdProps = {
   occluded?: boolean;
 };
 
-/** On-screen ink weight for a figure drawn at scale s (style bible 3/6): 4.8 front, 3.4 mid, 2.2 far, 0 = fill-only. */
-export const crowdInk = (s: number) => (s >= 0.75 ? depthInk.front : s >= 0.45 ? depthInk.mid : s >= 0.28 ? depthInk.far : 0);
-/** Level of detail for a figure at scale s. */
-export const crowdLod = (s: number): 0 | 1 | 2 => (s < 0.28 ? 2 : s < 0.45 ? 1 : 0);
+/** On-screen ink weight for a figure drawn at scale s (style bible 3/6): 4.8 front, 3.4 mid, 2.2 far, 0 = fill-only.
+ *  The ladder steps are short RAMPS (s +-0.02-0.04 around 0.28 / 0.45 / 0.75), so a crowd whose scale animates never
+ *  switches a whole row's ink weight in one frame; static rows sit on the ladder values. */
+export const crowdInk = (s: number) => {
+  const r = (c: number, w: number) => clamp((s - (c - w / 2)) / w);
+  return depthInk.far * r(0.28, 0.04) + (depthInk.mid - depthInk.far) * r(0.45, 0.06) + (depthInk.front - depthInk.mid) * r(0.75, 0.08);
+};
+/** Level of detail for a figure at scale s. `j` 0..1 = per-person jitter of the thresholds (+-7 %), so the switches of
+ *  an animated crowd are spread over many frames (Crowd passes a seeded value). */
+export const crowdLod = (s: number, j = 0.5): 0 | 1 | 2 => {
+  const k = 1 + 0.14 * (j - 0.5);
+  return s < 0.28 * k ? 2 : s < 0.45 * k ? 1 : 0;
+};
 
 type Slot = {key: string; x: number; y: number; s: number; row: number; rank: number; sign: boolean; legs: boolean};
 
@@ -192,7 +202,7 @@ export const Crowd: React.FC<CrowdProps> = ({
     <>
       {slots.map((sl) => {
         if (sl.rank > limit + 1e-9) return null;
-        const lod = crowdLod(sl.s);
+        const lod = crowdLod(sl.s, rand(sl.key, 'lod'));
         const w = ink === 'depth' ? crowdInk(sl.s) : ink;
         return (
           <Person
@@ -209,8 +219,9 @@ export const Crowd: React.FC<CrowdProps> = ({
             idle={idle * sl.s}
             acc={sl.sign ? ['sign'] : undefined}
             ink={w}
-            hero={lod === 0 && sl.s >= heroFrom}
-            rim={rim && sl.s >= 0.6 ? rim : false}
+            heroFrom={heroFrom}
+            rim={rim}
+            rimFrom={rim ? 0.6 : undefined}
             {...person}
           />
         );

@@ -3,7 +3,7 @@
 // Reference 2 does not tint a night scene, it STEPS its light fields down one or two palette steps (style_bible_ref2 4:
 // cream sidewalk -> sand, mintPale lawn -> sage, sand walls -> tan; whites, mid and dark tones, ink and the sun stay).
 // The table is `todSteps` in theme.ts. Every <Fill> (so every kit component: Person, Crowd, Building, Tree, ...)
-// passes its colour through the current <Tod>; raw SVG in the cine kit takes `tod={useTod([x, y])}`.
+// passes its colour through the current <Tod>; the cine kit reads the same context (useTodPal): omit its `tod` prop.
 //
 // HOW A TIME-OF-DAY KEY ARRIVES (motion spec #12, the measured recolour grammar): the SKY slab wipes down (the World
 // draws it), and every OBJECT flips whole, in ONE frame, at the moment the sky's edge reaches its centre (or its
@@ -16,7 +16,9 @@
 //   <Tod role="far"> ...hills, far skyline... </Tod>        // the far row of the table (night: sage -> #4B706B)
 //   <Tod value="night"> ... </Tod>                           // a static subtree (no wave)
 //   <TodAnchor at={[x, y]}> ...one object... </TodAnchor>    // everything inside flips together (kit components do it)
-//   const tod = useTod([cx, cy]);  <Skyline tod={tod} .../>  // raw-SVG pieces: their own switch time (local coords)
+//   <TodAnchor at={[cx, cy]}><Skyline .../></TodAnchor>      // a raw-SVG cine piece flips when the edge reaches IT
+//   useTod([cx, cy])                                         // the same, as a value (only BELOW the World: in a scene
+//                                                            // body, above <World>, every hook here returns 'day')
 //   relight(palette.cream, 'night')                          // -> palette.sand (pure function)
 
 import React, {createContext, useContext} from 'react';
@@ -30,7 +32,7 @@ import {applyH} from './persp';
 export type TodWave = {from: TodName; to: TodName; p: number; wipe: 'down' | 'up' | 'left' | 'right' | 'snap'; rect: [number, number, number, number]; inv: Mat};
 
 export type TodValue = {
-  /** The time of day of this subtree (during a wave: the value at the vanishing point, world.vp). */
+  /** The time of day of this subtree (during a wave: the value at its <TodAnchor>, else at the vanishing point). */
   tod: TodName;
   role: TodRole;
   /** Custom colour map applied after the step table. */
@@ -145,12 +147,16 @@ export const Tod: React.FC<{value?: TodName; role?: TodRole; map?: (c: string) =
 };
 
 /** Everything inside flips TOGETHER during a relight wave, when the sky edge reaches `at` (local coordinates; the
- *  outermost anchor wins). Kit components (Person, Building, Tree, Palm, Car, ...) anchor themselves. */
+ *  outermost anchor wins). Kit components (Person, Building, Tree, Palm, Car, ...) anchor themselves.
+ *  The anchored time of day is also the context's `tod`, so ANY consumer flips at the anchor: core <Fill>, useTod(),
+ *  and the cine pieces (useTodPal reads the context): wrap a raw-SVG cine piece / row in <TodAnchor at={its centre}>
+ *  (world coordinates of the scene, inside the <World>) and it relights when the sky edge reaches it. */
 export const TodAnchor: React.FC<{at: [number, number]; children?: React.ReactNode}> = ({at, children}) => {
   const v = useContext(TodCtx);
   const s = useScreenPoint(at);
   if (!v.wave || v.anchor) return <>{children}</>;
-  return <TodCtx.Provider value={{...v, anchor: s}}>{children}</TodCtx.Provider>;
+  const anchored: TodValue = {...v, anchor: s};
+  return <TodCtx.Provider value={{...anchored, tod: todAtScreen(anchored)}}>{children}</TodCtx.Provider>;
 };
 
 /** Default switch point of a wave without an anchor: the vanishing point. */

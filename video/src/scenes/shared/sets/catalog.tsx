@@ -6,7 +6,7 @@
 
 import React from 'react';
 import {palette, skies} from '../../../lib/theme';
-import {GovernmentPlaza, PLAZA} from './GovernmentPlaza';
+import {GovernmentPlaza, PLAZA, PLAZA_REST} from './GovernmentPlaza';
 import {StoopBeats, StoopStreet, STOOP} from './StoopStreet';
 import {BlueprintStreet, BLUEPRINT} from './BlueprintStreet';
 import {BlueprintWall, BLUEPRINT_WALL} from './BlueprintWall';
@@ -46,17 +46,17 @@ export const SET_CATALOG: SetEntry[] = [
     preview: (v) => (
       <DemoWorld push={v === undefined || v === 'built'}>
         {v === 'endBuilt' || v === 'endOff' ? (
-          <GovernmentPlaza state={v === 'endOff' ? 'off' : 'built'} cascadeAt={v === 'endOff' ? undefined : 0.03} gov={v === 'endOff' ? undefined : S01_GOV} pennantsAt={v === 'endOff' ? undefined : [1.23, 1.38, 1.53, 1.68]} lanternOffAt={v === 'endOff' ? undefined : 3.25} pigeonsAt={v === 'endOff' ? undefined : 1.7} pigeonsFlyAt={v === 'endOff' ? undefined : 3.3} sun={<DemoSun cx={630} cy={800} r={150} glyph />} />
+          <GovernmentPlaza state={v === 'endOff' ? 'off' : 'built'} cascadeAt={v === 'endOff' ? undefined : 0.03} gov={v === 'endOff' ? undefined : S01_GOV} pennantsAt={v === 'endOff' ? undefined : [1.23, 1.38, 1.53, 1.68]} lanternOffAt={v === 'endOff' ? undefined : 3.25} pigeonsAt={v === 'endOff' ? undefined : 1.7} pigeonsFlyAt={v === 'endOff' ? undefined : 3.3} sun={<DemoSun cx={PLAZA.sun.x} cy={PLAZA.sun.y} r={PLAZA.sun.r} glyph />} />
         ) : v === 'f0built' || v === 'f0line' ? (
-          <GovernmentPlaza state={v === 'f0line' ? 'lineArt' : 'built'} cascadeAt={v === 'f0line' ? undefined : 0.03} gov={v === 'f0line' ? undefined : S01_GOV} pennantsAt={v === 'f0line' ? undefined : [1.23, 1.38, 1.53, 1.68]} pigeonsAt={v === 'f0line' ? undefined : 1.7} sun={<DemoSun cx={630} cy={850} r={150} glyph />} />
+          <GovernmentPlaza state={v === 'f0line' ? 'lineArt' : 'built'} cascadeAt={v === 'f0line' ? undefined : 0.03} gov={v === 'f0line' ? undefined : S01_GOV} pennantsAt={v === 'f0line' ? undefined : [1.23, 1.38, 1.53, 1.68]} pigeonsAt={v === 'f0line' ? undefined : 1.7} sun={<DemoSun cx={PLAZA_REST.sunFrame0.x} cy={PLAZA_REST.sunFrame0.y} r={PLAZA_REST.sunFrame0.r} glyph />} />
         ) : v === 'closeup' || v === 'dive' ? (
-          <XG m={v === 'closeup' ? camMat(375, 793, 1.85) : camMat(394, 1095, 3.25)}>
-            <GovernmentPlaza state="built" detail="close" gov={{govB: {shutterAt: 2.0, padlockAt: 2.5, tagAt: 2.3}}} sun={<DemoSun cx={720} cy={760} r={110 / 1.85} glyph />} />
+          <XG m={v === 'closeup' ? camMat(PLAZA.closeup.cam[0], PLAZA.closeup.cam[1], PLAZA.closeup.zoom) : camMat(PLAZA.dive.cam[0], PLAZA.dive.cam[1], PLAZA.dive.zoom)}>
+            <GovernmentPlaza state="built" detail="close" gov={{govB: {shutterAt: 2.0, padlockAt: 2.5, tagAt: 2.3}}} sun={<DemoSun cx={PLAZA.sun.x + 40} cy={PLAZA.sun.y - 40} r={110 / PLAZA.closeup.zoom} glyph />} />
           </XG>
         ) : v === 'lineArt' ? (
-          <GovernmentPlaza state="lineArt" sun={<DemoSun cx={630} cy={850} r={150} glyph />} />
+          <GovernmentPlaza state="lineArt" sun={<DemoSun cx={PLAZA_REST.sunFrame0.x} cy={PLAZA_REST.sunFrame0.y} r={PLAZA_REST.sunFrame0.r} glyph />} />
         ) : v === 'off' ? (
-          <GovernmentPlaza state="off" sun={<DemoSun cx={630} cy={800} r={150} glyph />} />
+          <GovernmentPlaza state="off" sun={<DemoSun cx={PLAZA.sun.x} cy={PLAZA.sun.y} r={PLAZA.sun.r} glyph />} />
         ) : (
           <GovernmentPlaza
             state="built"
@@ -68,7 +68,7 @@ export const SET_CATALOG: SetEntry[] = [
             lanternOffAt={3.25}
             pigeonsAt={1.7}
             pigeonsFlyAt={3.3}
-            sun={<DemoSun cx={630} cy={800} r={150} glyph />}
+            sun={<DemoSun cx={PLAZA.sun.x} cy={PLAZA.sun.y} r={PLAZA.sun.r} glyph />}
           />
         )}
       </DemoWorld>

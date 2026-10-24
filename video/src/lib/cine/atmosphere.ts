@@ -17,7 +17,7 @@
 // dusk: sage + ink; night: #588077 + white). Pieces default `tod` to the core <Tod> context (useTodPal), so inside a
 // timed <World> they relight with it; pass `tod` to pin one.
 
-import {captionTones, palette, skies, todSteps, todTone, TodName, TodRole} from '../theme';
+import {captionTones, nightFar, palette, skies, todSky, todSteps, todTone, TodName, TodRole} from '../theme';
 import {relight, useTodValue} from '../tod';
 import {hexToRgb, mix, rgbToHex} from './util';
 
@@ -91,17 +91,37 @@ export type TodPalette = Base & {
   steps: Readonly<Record<string, string>>;
   /** Max haze mix for depth 1 (atmos()). */
   hazeMax: number;
+  /** FAR-LAYER LADDER (dusk / night): flat palette steps from the horizon toward the viewer. With a ladder, atmos()
+   *  does not MIX far rows toward a haze: each far band (depth >= 0.75 / 0.5 / 0.3) takes one step of the ladder (light
+   *  paints that step, dark paints the next), so far rows read as flat silhouettes one value step off the sky that
+   *  is actually drawn (style_bible_ref2 8: night sky #588077 -> far #4B706B -> tealDark -> ink-dark; Arcane: haze
+   *  layers step in value toward the sky). Without it (day / golden / dawn) far rows mix toward `haze` (= the sky). */
+  ladder?: string[];
 };
 
 type Opts = Omit<TodPalette, keyof Base | 'name' | 'steps' | 'role' | 'text'>;
 
-function make(name: TodLike, o: Opts, role: TodRole = 'base'): TodPalette {
+function make(name: TodLike, o0: Opts, role: TodRole = 'base'): TodPalette {
   const steps = TOD_STEPS[name];
+  // the caption-band sky is READ from the core table (theme todSky), never restated here: the World sky and a cine
+  // <Sky> / haze can't disagree (review: golden used to be cream in core and the day sky in cine)
+  const o: Opts = {...o0, skyBands: [todSky[name], ...o0.skyBands.slice(1)]};
   const base = {} as Base;
   for (const k of Object.keys(P) as (keyof typeof P)[]) base[k] = relight(P[k], name, role);
   base.sky = o.skyBands[0];
   base.bg = o.skyBands[Math.min(1, o.skyBands.length - 1)];
   return {...base, name, role, steps, text: captionTones[todTone[name]].text, ...o};
+}
+
+/** Table check (engine-numbers --check runs it): every TOD palette's caption-band sky equals the core todSky, and its
+ *  caption colour the core todTone. Returns problems (empty = OK). */
+export function todTableProblems(): string[] {
+  const out: string[] = [];
+  for (const n of TODS) {
+    if (TOD[n].skyBands[0].toUpperCase() !== todSky[n].toUpperCase()) out.push(`TOD.${n}.skyBands[0] ${TOD[n].skyBands[0]} != todSky.${n} ${todSky[n]}`);
+    if (TOD[n].text !== captionTones[todTone[n]].text) out.push(`TOD.${n}.text ${TOD[n].text} != the ${todTone[n]} caption tone`);
+  }
+  return out;
 }
 
 const OPTS: Record<TodLike, Opts> = {
@@ -150,7 +170,10 @@ const OPTS: Record<TodLike, Opts> = {
     // ref 2 dusk sky = sage #6D988B (f_33) = theme skies.dusk, ink captions (todTone.dusk); value steps toward peach
     // only BELOW y 600 (Sky keeps the caption band on skyBands[0]); teal / #588077 is night's
     skyBands: [skies.dusk, mix(P.sage, P.sky, 0.55), mix(P.sky, P.peach, 0.45), mix(P.peach, P.cream, 0.3)],
-    haze: mix(P.sky, P.peach, 0.35),
+    // far rows are SILHOUETTES one step darker than the flat sage sky the core World draws (teal 1.36:1), stepping
+    // darker toward the viewer; never a light peach-grey mix (that read as fog: 1.2-1.4:1 LIGHTER than the sky)
+    haze: P.teal,
+    ladder: [P.teal, nightFar, P.tealDark, deep.teal78],
     horizonGlow: mix(P.peach, P.cream, 0.45),
     glow: P.peach,
     sunColor: P.sun,
@@ -171,8 +194,9 @@ const OPTS: Record<TodLike, Opts> = {
     // = theme skies.night #588077 behind the captions (never darker, style_bible_ref2 8); lighter steps toward the
     // horizon (city glow), all below y 600
     skyBands: [skies.night, mix(skies.night, P.sage, 0.3), mix(skies.night, P.sage, 0.55)],
-    // ref 2 night far step #4B706B = mix(teal, tealDark, 0.5)
-    haze: mix(P.teal, P.tealDark, 0.5),
+    // ref 2 night far step #4B706B = mix(teal, tealDark, 0.5) (theme nightFar)
+    haze: nightFar,
+    ladder: [nightFar, P.tealDark, deep.teal78, deep.teal60],
     horizonGlow: P.teal,
     glow: P.sage,
     sunColor: P.sun,
@@ -256,10 +280,27 @@ export type AtmosOpts = {
 /** Which flat haze step a depth falls into, as a 0..1 value (stepped). */
 export const tone = (depth: number, steps = 4) => Math.round(Math.max(0, Math.min(1, depth)) * steps) / steps;
 
+/** Relative luminance (WCAG) of a hex colour. */
+function lumOf(hex: string): number {
+  const c = hexToRgb(hex).map((x) => x / 255).map((x) => (x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+/** Paints at least this light take the LIGHT step of a ladder band (sage and lighter); darker ones the next step. */
+const LADDER_LIGHT = 0.22;
+
 /** Depth-tinted flat colour: ambient-shifted paint pulled toward the sky haze in a few STEPS (far = flatter,
- *  closer to the sky). depth 0 = near, 1 = horizon. */
+ *  closer to the sky). depth 0 = near, 1 = horizon. At dusk / night (palettes with a `ladder`) far rows take flat
+ *  palette steps of the ladder instead (silhouettes one step off the sky; no mixes), and `raw` colours (lights, rims,
+ *  top faces: already tod colours) keep their paint, taking the shared FAR relight step only past depth 0.75. */
 export function atmos(color: string, depth: number, tod: TodLike | TodPalette, o: AtmosOpts = {}): string {
   const p = todPal(tod);
+  if (p.ladder) {
+    if (o.raw) return depth >= 0.75 ? relight(color, p.name, 'far') : color;
+    if (depth < (o.clear ?? 0.3)) return ambient(color, p);
+    const band = depth >= 0.75 ? 0 : depth >= 0.5 ? 1 : 2;
+    const L = p.ladder;
+    return L[Math.min(L.length - 1, band + (lumOf(ambient(color, p)) >= LADDER_LIGHT ? 0 : 1))];
+  }
   const q = depth < (o.clear ?? 0.3) ? 0 : tone(depth, o.steps ?? 4);
   const amt = (o.max ?? p.hazeMax) * Math.pow(q, o.gamma ?? 1.35);
   return mix(o.raw ? color : ambient(color, p), p.haze, amt);

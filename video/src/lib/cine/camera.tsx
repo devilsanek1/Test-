@@ -218,35 +218,60 @@ function plan(keys: CamKey[]): Plan {
     m.push(pchip(ts, ys, linked));
   }
   p = {R, v, m, anch};
+  // ANCHOR SWITCH (a key between an anchored and a free segment, or two different anchors): the anchorTo channel rests
+  // at the key, but the anchored OFFSET keeps moving with the zoom / dolly. Hand that velocity to the free ox / oy
+  // channel as its tangent at the key, so the screen motion stays velocity-continuous (gate 1: a push that retargets
+  // keeps its speed; before: 4.9 -> 2.9 px / frame in one frame).
+  for (let i = 1; i < R.length - 1; i++) {
+    if (anch[i] === anch[i + 1]) continue;
+    const a = anch[i] ? R[i] : R[i + 1]; // the anchored side's key (anchor, depth)
+    const to = R[i].anchorTo ?? (a.anchor ? ([a.anchor[0], a.anchor[1]] as Pt) : undefined);
+    if (!a.anchor || !to) continue;
+    const h = 1e-3;
+    const st = (tt: number) => {
+      // zoom / push are C1 across keys: sample them in the segment after the key (before it for the last key)
+      const seg = Math.min(R.length - 1, i + 1);
+      return anchorOffset(a.anchor!, to, a.anchorDepth, Math.exp(chAt(p!, 0, seg, tt)), fromDollyLog(chAt(p!, 1, seg, tt)));
+    };
+    const o1 = st(R[i].t + h);
+    const o0 = st(R[i].t);
+    m[3][i] = (o1[0] - o0[0]) / h;
+    m[4][i] = (o1[1] - o0[1]) / h;
+  }
   PLAN_CACHE.set(keys, p);
   return p;
+}
+
+/** Channel c of segment i (keys i-1 -> i) at time t: cubic Hermite through the plan's tangents, or the key's ease when
+ *  both ends rest (or when forced). */
+function chAt(P: Plan, c: number, i: number, t: number, force = false): number {
+  const {R, v, m} = P;
+  const a = R[i - 1];
+  const b = R[i];
+  const h = Math.max(1e-6, b.t - a.t);
+  const u = clamp((t - a.t) / h);
+  const m0 = m[c][i - 1];
+  const m1 = m[c][i];
+  const y0 = v[c][i - 1];
+  const y1 = v[c][i];
+  if (force || (m0 === 0 && m1 === 0)) return lerp(y0, y1, b.ease(u));
+  const u2 = u * u;
+  const u3 = u2 * u;
+  return (2 * u3 - 3 * u2 + 1) * y0 + (u3 - 2 * u2 + u) * h * m0 + (-2 * u3 + 3 * u2) * y1 + (u3 - u2) * h * m1;
 }
 
 /** Camera state at time t (no handheld). interp 'spline' (default) is velocity-continuous across keys; 'ease'
  *  eases every segment on its own (the old behaviour: the camera rests at every key). */
 export function camAt(keys: CamKey[], t: number, interp: CamInterp = 'spline'): CamState {
   if (!keys.length) return CAM_REST;
-  const {R, v, m, anch} = plan(keys);
+  const P = plan(keys);
+  const {R, anch} = P;
   if (t <= R[0].t) return R[0];
   for (let i = 1; i < R.length; i++) {
-    const a = R[i - 1];
     const b = R[i];
     if (t > b.t) continue;
-    const h = Math.max(1e-6, b.t - a.t);
-    const u = clamp((t - a.t) / h);
-    const pe = b.ease(u);
     const forceEase = interp === 'ease' || (i === 1 && b.ease === CAM.settle);
-    const ch = (c: number) => {
-      const m0 = m[c][i - 1];
-      const m1 = m[c][i];
-      const y0 = v[c][i - 1];
-      const y1 = v[c][i];
-      if (forceEase || (m0 === 0 && m1 === 0)) return lerp(y0, y1, pe);
-      // cubic Hermite
-      const u2 = u * u;
-      const u3 = u2 * u;
-      return (2 * u3 - 3 * u2 + 1) * y0 + (u3 - 2 * u2 + u) * h * m0 + (-2 * u3 + 3 * u2) * y1 + (u3 - u2) * h * m1;
-    };
+    const ch = (c: number) => chAt(P, c, i, t, forceEase);
     const zoom = Math.exp(ch(0));
     const push = fromDollyLog(ch(1));
     const rot = ch(2);
@@ -348,6 +373,11 @@ export type CamSpeed = {
   point: Pt;
   /** Mean over the move of the per-frame maximum (px / frame). */
   avg: number;
+  /** VELOCITY CONTINUITY: the largest change of any sampled point's on-screen speed from one frame to the next
+   *  (px / frame per frame) and when. A smooth move stays well under ~0.6; a stall, slam or whip at a key shows up
+   *  as a spike (the old anchor-switch hitch: 1.9). */
+  maxDv: number;
+  dvAt: number;
 };
 
 /** On-screen speed of a camera move: for every frame in [t0, t1] and every layer depth, the screen points of a grid
@@ -361,26 +391,54 @@ export function camSpeed(keys: CamKey[], o: {t0?: number; t1?: number; fps?: num
   const [gx, gy] = o.grid ?? [7, 11];
   const pts: Pt[] = [];
   for (let i = 0; i < gx; i++) for (let j = 0; j < gy; j++) pts.push([(SCREEN.w * (i + 0.5)) / gx, (SCREEN.h * (j + 0.5)) / gy]);
-  let best: CamSpeed = {max: 0, at: t0, depth: depths[0], point: pts[0], avg: 0};
+  let best: CamSpeed = {max: 0, at: t0, depth: depths[0], point: pts[0], avg: 0, maxDv: 0, dvAt: t0};
   let sum = 0;
   let n = 0;
+  let prev: Float64Array | null = null;
+  let maxDv = 0;
+  let dvAt = t0;
   for (let f = Math.round(t0 * fps); f < Math.round(t1 * fps); f++) {
     const ta = f / fps;
     const tb = (f + 1) / fps;
     const ca = camFull(keys, ta, o);
     const cb = camFull(keys, tb, o);
     let fm = 0;
+    const cur = new Float64Array(depths.length * pts.length);
+    let j = 0;
     for (const d of depths) {
       for (const sp of pts) {
         const w = unproject(ca, d, sp);
         const q = project(cb, d, w);
-        const v = Math.hypot(q[0] - sp[0], q[1] - sp[1]);
+        // velocity vector, so a direction flip counts as a change too
+        const vx = q[0] - sp[0];
+        const vy = q[1] - sp[1];
+        const v = Math.hypot(vx, vy);
+        cur[j++] = v;
         if (v > fm) fm = v;
         if (v > best.max) best = {...best, max: v, at: ta, depth: d, point: sp};
       }
     }
+    if (prev) {
+      for (let k = 0; k < cur.length; k++) {
+        const dv = Math.abs(cur[k] - prev[k]);
+        if (dv > maxDv) {
+          maxDv = dv;
+          dvAt = ta;
+        }
+      }
+    }
+    prev = cur;
     sum += fm;
     n++;
   }
-  return {...best, avg: n ? sum / n : 0};
+  return {...best, avg: n ? sum / n : 0, maxDv, dvAt};
+}
+
+/** On-screen speed (max over the grid and the depths, px / frame) of the frame starting at time t. Use it at a CUT:
+ *  a camera must still be moving at the wipe midpoint on both sides (gate 1: no stall at a seam). Recipe: put the
+ *  outgoing shot's LAST key 1-2 s past its end and the incoming shot's FIRST key 0.5-1.5 s before its start (negative
+ *  t), so both cameras are mid-move through the transition (CineDemo: every seam >= ~1 px / frame). */
+export function camSpeedAt(keys: CamKey[], t: number, o: {fps?: number; depths?: number[]; grid?: [number, number]; handheld?: number; seed?: Seed} = {}): number {
+  const fps = o.fps ?? 30;
+  return camSpeed(keys, {...o, t0: t, t1: t + 1 / fps}).max;
 }

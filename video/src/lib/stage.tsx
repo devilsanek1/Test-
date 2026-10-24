@@ -17,12 +17,15 @@
 
 import React, {createContext, useContext} from 'react';
 import {world} from './theme';
+import {MOTION} from './spec';
 import {mat, Mat} from './xf';
 
 // ---------------------------------------------------------------- scene info
 
-/** The scene's incoming transition as far as cameras need it (Film fills it in). */
-export type SceneTransitionIn = {type: string; dur: number; dir?: string};
+/** The scene's incoming transition as far as cameras need it (Film fills it in). `settle` = scene-local time at which
+ *  the incoming camera leg has come to rest; `zoomDir` = which way that leg zooms (1 = in, -1 = pulling back, 0 = no
+ *  zoom). Both are optional (older callers): pushStart derives them from type / dir / dur. */
+export type SceneTransitionIn = {type: string; dur: number; dir?: string; settle?: number; zoomDir?: number};
 export type SceneInfo = {id: string; start: number; end: number; dur: number; transitionIn?: SceneTransitionIn};
 const SceneCtx = createContext<SceneInfo>({id: 'none', start: 0, end: 0, dur: 0});
 /** Info about the scene being rendered (id, start, end, dur in seconds). */
@@ -51,16 +54,37 @@ export function zoomAbout(focus: [number, number], zoom: number, to: [number, nu
   return {ox: focus[0] - C[0] - (to[0] - C[0]) / zoom, oy: focus[1] - C[1] - (to[1] - C[1]) / zoom, zoom, rot: 0};
 }
 
+/** Zoom direction of the scene's incoming camera leg: 1 = zooming in (camera-continuous 'in'), -1 = pulling back
+ *  (camera-continuous 'out', and every push-through: the incoming scene pulls back out of its point), 0 = none. */
+export function incomingZoomDir(scene?: SceneInfo): number {
+  const tr = scene?.transitionIn;
+  if (!tr) return 0;
+  if (tr.zoomDir !== undefined) return tr.zoomDir;
+  if (tr.type === 'push-through') return -1;
+  if (tr.type !== 'camera-continuous') return 0;
+  const dir = tr.dir ?? 'in';
+  return dir === 'in' ? 1 : dir === 'out' ? -1 : 0;
+}
+
+/** The default per-shot push target when the scene does not give `to`: reference 2's gentle push-in (MOTION.camera.push,
+ *  1.06), EXCEPT after an incoming pull-back (push-through, camera-continuous 'out'), where it is the matching gentle
+ *  pull-out (1 / 1.06): the pull-back lands INTO a slow continuing pull-back, one velocity-continuous move (no stop and
+ *  reverse into a push-in a beat after the cut). An explicit `to` is always kept (see pushStart). */
+export function pushTo(to: number | undefined, scene?: SceneInfo): number {
+  if (to !== undefined) return to;
+  return incomingZoomDir(scene) < 0 ? 1 / MOTION.camera.push.to : MOTION.camera.push.to;
+}
+
 /** When a per-shot push (World `push` / ShotCam `push`, zoom `to`) may start: a push that would REVERSE the incoming
- *  camera-continuous zoom (dir 'out' + push in, or dir 'in' + push out) waits until the transition has settled
- *  (scene t = its dur), so the camera never bounces; a push in the same direction (or after any other transition)
- *  starts at `at`. */
+ *  leg's zoom (camera-continuous 'out' or a push-through + a push IN, camera-continuous 'in' + a push OUT) waits until
+ *  that leg has settled (`settle`, else the transition's dur), so the camera never bounces; a push in the same
+ *  direction (or after any other transition) starts at `at` and blends with the leg's deceleration. */
 export function pushStart(at: number, to: number, scene?: SceneInfo): number {
   const tr = scene?.transitionIn;
-  if (!tr || tr.type !== 'camera-continuous') return at;
-  const dir = tr.dir ?? 'in';
-  const reverses = (dir === 'out' && to > 1) || (dir === 'in' && to < 1);
-  return reverses ? Math.max(at, tr.dur) : at;
+  const leg = incomingZoomDir(scene);
+  const dir = to > 1 ? 1 : to < 1 ? -1 : 0;
+  if (!tr || leg * dir >= 0) return at;
+  return Math.max(at, tr.settle ?? tr.dur);
 }
 
 /** Visible world rectangle [x, y, w, h] for a stage camera (to size backgrounds). */

@@ -6,7 +6,7 @@
 //   <LampPost x={150} y={900} h={320} at={1} lightAt={4} />
 
 import React from 'react';
-import {palette, stroke} from '../theme';
+import {glow, palette, stroke, todBulbHalo} from '../theme';
 import {ease as E, lerp, osc, prog, springAt, springs, useTime} from '../time';
 import {rand, rng, Seed} from '../rng';
 import {Ink} from '../Ink';
@@ -16,7 +16,7 @@ import {ExitFade} from '../exit';
 import {blob, circle, crown, crownTicks, line, poly, polyPath, wire, wirePoint, Pt} from '../sketch';
 import {At, b, inkW, Place} from './common';
 import {mat, XG} from '../xf';
-import {TodAnchor} from '../tod';
+import {TodAnchor, useTod} from '../tod';
 
 // ---------------------------------------------------------------- Tree
 
@@ -260,14 +260,30 @@ export type FestoonProps = {
 };
 
 /** A festoon of bulbs on a sagging wire. Wire draws, bulbs pop in L->R, then light up. Built from Ink/Fill only, so
- *  it works inside a <Plane> and un-builds with the scene. */
-export const Festoon: React.FC<FestoonProps> = ({x1, y1, x2, y2, sag = 30, n, bulb = 9, at, lightAt: lightAtIn, on, seed = 'lights', width = stroke.inkThin, color = palette.white, litColor = palette.peach}) => {
+ *  it works inside a <Plane> and un-builds with the scene. A lit bulb gets reference 2's flat HALO: one opaque disc
+ *  (r = glow.bulbHaloR x the bulb, the time of day's `todBulbHalo` colour: #749484 at night, one step lighter than the
+ *  sky) BEHIND the wire and the bulb; no halo in daylight. Never a translucent overlay (that mixes off-palette colours
+ *  where it overlaps fronds, wires or other halos). The whole festoon relights at its midpoint. */
+export const Festoon: React.FC<FestoonProps> = (p) => {
+  const {x1, y1, x2, y2, sag = 30} = p;
+  const [mx, my] = wirePoint(x1, y1, x2, y2, sag, 0.5);
+  return (
+    <TodAnchor at={[mx, my]}>
+      <FestoonBody {...p} />
+    </TodAnchor>
+  );
+};
+
+const FestoonBody: React.FC<FestoonProps> = ({x1, y1, x2, y2, sag = 30, n, bulb = 9, at, lightAt: lightAtIn, on, seed = 'lights', width = stroke.inkThin, color = palette.white, litColor = palette.peach}) => {
   const t = useTime();
+  const tod = useTod();
+  const halo = todBulbHalo[tod];
   const lightAt = lightAtIn ?? (typeof on === 'number' ? on : on?.at);
   const len = Math.hypot(x2 - x1, y2 - y1);
   const count = n ?? Math.max(3, Math.round(len / 70));
   const [b0, b1] = Array.isArray(bulb) ? bulb : [bulb, bulb];
-  const out: React.ReactNode[] = [<Ink key="w" d={wire(x1, y1, x2, y2, sag, {seed: `${seed}/w`})} at={at} width={width} />];
+  const halos: React.ReactNode[] = [];
+  const bulbs: React.ReactNode[] = [];
   for (let i = 0; i < count; i++) {
     const u = (i + 0.5) / count;
     const [bx, by0] = wirePoint(x1, y1, x2, y2, sag, u);
@@ -276,16 +292,23 @@ export const Festoon: React.FC<FestoonProps> = ({x1, y1, x2, y2, sag = 30, n, bu
     const bAt = b(at, 0.15 + i * (1 / 30));
     const step = typeof on === 'object' && on.dur !== undefined ? on.dur / Math.max(1, count - 1) : 1 / 30;
     const lit = lightAt !== undefined && t >= lightAt + i * step;
-    out.push(
+    // the halo pops with its bulb (1 frame), a flat opaque disc a hair irregular (hand-cut), behind the wire
+    if (lit && halo && r * glow.bulbHaloR >= 4)
+      halos.push(<Fill key={`h${i}`} d={blob(bx, by, r * glow.bulbHaloR, r * glow.bulbHaloR * 0.97, {seed: `${seed}/h${i}`, wobble: 0.025})} color={halo} offset={false} seed={`${seed}/hf${i}`} />);
+    bulbs.push(
       <React.Fragment key={i}>
-        {lit ? <Fill d={blob(bx, by, r * 2.5, r * 2.5, {seed: `${seed}/h${i}`})} color={litColor} opacity={0.22} offset={false} seed={`${seed}/hf${i}`} /> : null}
-        {lit ? <Fill d={blob(bx, by, r * 1.7, r * 1.7, {seed: `${seed}/g${i}`})} color={litColor} opacity={0.3} offset={false} seed={`${seed}/gf${i}`} /> : null}
         <Fill d={blob(bx, by, r, r * 1.08, {seed: `${seed}/b${i}`})} color={lit ? litColor : color} at={bAt} mode="snap" offset={[r * 0.15, r * 0.12]} seed={`${seed}/bf${i}`} />
         {r > 3 ? <Ink d={`M${bx.toFixed(1)} ${(by0 - 1).toFixed(1)}L${bx.toFixed(1)} ${(by - r * 0.8).toFixed(1)}` + circle(bx, by, r, {seed: `${seed}/bi${i}`, overlap: 8})} at={bAt} width={Math.min(width, r * 0.35)} /> : null}
       </React.Fragment>,
     );
   }
-  return <>{out}</>;
+  return (
+    <>
+      {halos}
+      <Ink key="w" d={wire(x1, y1, x2, y2, sag, {seed: `${seed}/w`})} at={at} width={width} />
+      {bulbs}
+    </>
+  );
 };
 
 // ---------------------------------------------------------------- Utility pole

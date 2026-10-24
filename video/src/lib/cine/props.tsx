@@ -18,7 +18,7 @@ import {ambient, TodLike, TodPalette, useTodPal} from './atmosphere';
 import {darker} from './city';
 import {Glow} from './light';
 import {PathBuf, r1} from './util';
-import {ExitShrink, exitScale, inkOn, lookPaint, useCineState} from './state';
+import {CineExitShrink, exitScale, inkOn, lookPaint, useCineState} from './state';
 import {BUILTIN_WIPERS, FoliageWiper, WiperComponent} from '../Film';
 import {CINE_WIPE_HALF, CINE_WIPERS, ColumnWiper, PasserWiper, wipeEdgeX, wiperRegions} from './wipers';
 import type {ToneRegion} from '../Captions';
@@ -286,9 +286,9 @@ export const WipeCut: React.FC<Omit<WipePassProps, 'children'> & {a: React.React
 
 /** A stone block / low wall end to perch a mascot or a figure on (front face, lit cap, ink). Top-centre at (x, y). */
 export const Plinth: React.FC<{x: number; y: number; w?: number; h?: number; tod?: TodLike | TodPalette; seed?: Seed; width?: number}> = ({x, y, w = 260, h = 420, tod, seed = 'plinth', width = stroke.inkBold}) => (
-  <ExitShrink x={x} y={y + h} axis="y" size={0.2}>
+  <CineExitShrink x={x} y={y + h} axis="y" size={0.2}>
     <PlinthBody x={x} y={y} w={w} h={h} tod={tod} seed={seed} width={width} />
-  </ExitShrink>
+  </CineExitShrink>
 );
 
 const PlinthBody: React.FC<{x: number; y: number; w: number; h: number; tod?: TodLike | TodPalette; seed: Seed; width: number}> = ({x, y, w, h, tod, seed, width}) => {
@@ -334,9 +334,9 @@ export type BalustradeProps = {
 /** A stone balustrade end: a pedestal with cap and base mouldings (doubled ink), a rail running off the frame edge on
  *  short vase balusters. Foreground framing to perch the mascot on in a civic / monumental shot. */
 export const Balustrade: React.FC<BalustradeProps> = (props) => (
-  <ExitShrink x={props.x + (props.w ?? 220) / 2} y={props.y + (props.h ?? 900)} axis="y" size={0.25}>
+  <CineExitShrink x={props.x + (props.w ?? 220) / 2} y={props.y + (props.h ?? 900)} axis="y" size={0.25}>
     <BalustradeBody {...props} />
-  </ExitShrink>
+  </CineExitShrink>
 );
 
 const BalustradeBody: React.FC<BalustradeProps> = ({x, y, w = 220, h = 900, side = 'right', tod, rim = 'none', width = stroke.inkBold, seed = 'bal'}) => {
@@ -442,9 +442,9 @@ export type WindowCloseupProps = {
 /** One lit window up close: frame, transom, curtain, pendant lamp with a stepped glow, a desk with a monitor showing
  *  a web page, a plant on the sill, glints. Local origin = top-left of the glass. */
 export const WindowCloseup: React.FC<WindowCloseupProps> = (props) => (
-  <ExitShrink x={(props.w ?? 420) / 2} y={(props.h ?? 760) / 2} size={0.15}>
+  <CineExitShrink x={(props.w ?? 420) / 2} y={(props.h ?? 760) / 2} size={0.15}>
     <WindowCloseupBody {...props} />
-  </ExitShrink>
+  </CineExitShrink>
 );
 
 const ROOM_DARKER: Record<string, string> = {[palette.peach]: palette.tan, [palette.cream]: palette.sand, [palette.white]: palette.mintPale};

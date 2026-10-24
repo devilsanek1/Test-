@@ -1,26 +1,26 @@
-[quick and bright, a little amazed, lean on "purpose", "password" plain, no drama]
-Governments all over Europe just shut down their own websites on PURPOSE, because of this bug where anyone could take over a site without a password.
+[quick and bright, a little amazed, like you just saw this, lean on "purpose"]
+Governments all over Europe just shut down a bunch of their own websites on PURPOSE, because of this bug where hackers could take over a site without a password.
 
-[the bait, not the joke, tiny pause after "PHP", "loves" dead flat, straight into the number]
+[deadpan, like you're stating the obvious, tiny pause after "PHP", roll right into the number]
 It's in PHP… the language everyone loves, and about seven out of ten websites run on it.
 
-[a notch quicker, easy, letting a friend who doesn't code in on it, "like" tossed off]
-It was in there for like fourteen years before some researchers using AI figured out how bad it was.
+[a notch quicker, easy, like filling in a friend who doesn't code, "like" tossed off]
+This bug was in there for like fourteen years before researchers using AI figured out how bad it was.
 
-[brisk and level, small dip on "but", stress "already", no ominous drop]
-They gave the PHP people a heads-up so they could fix it first, but word got out a day early, and hackers were ALREADY trying it.
+[brisk and level, like you're telling them where it went sideways, no ominous drop]
+They gave the PHP people a heads-up, but word got out before the fix was ready, and hackers were ALREADY trying to use it.
 
-[brighter, passing on what they said, tiny breath after "says", "millions" plain, no build]
-Cloudflare says, once it was official, they saw tens of thousands of attempts in forty-five minutes, and then millions.
+[brighter, like passing on something wild you read, numbers clear, no trailer build]
+Cloudflare says that once it was announced, they saw tens of thousands of hacking attempts in forty-five minutes, and millions within a day.
 
-[ease off, the "oh, I get it" line, lean on "actually", slower on "every single server"]
-And the fix doesn't help until somebody ACTUALLY installs it on every single server.
+[same pace, plain and clear, like it just clicked for you, lean on "still"]
+But even with the fix out, somebody STILL has to install it on every single server.
 
-[a touch more serious, unhurried, stress "half" not "old", no doom, no blame]
-Plus about HALF of PHP sites are on versions so old they're not officially supported anymore.
+[a touch more serious, same pace, like being straight with a friend, no doom, no blame]
+Plus something like HALF of PHP sites run versions so old they're not officially supported anymore.
 
-[THE one joke, dry half-smile, advice said straight, no pause before "which", don't sell it]
-So even the FBI said if you can't update yet, just turn it off, which is basically what tech support tells you about everything.
+[THE one joke, advice said straight, dry half-smile like you've been there, don't sell it]
+Even the FBI said if you can't update yet, just turn it off, which is basically tech support's answer to everything.
 
-[relaxed and warm, a touch slower, shrug on "pretty much", don't land it like a title card]
-And that's pretty much what those governments already did.
+[relaxed and warm, same pace, like an easy shrug, don't land it like a title card]
+And some of those governments did it before there was even a fix.

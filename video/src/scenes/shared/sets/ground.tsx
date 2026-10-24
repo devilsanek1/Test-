@@ -11,7 +11,11 @@
 //   'kerb'    a near kerb (sand band, bold broken lines) with two near bollards (the right one cut by the edge) and a
 //             drain grate
 //   'railing' a low iron railing across the bottom-left, cut by the left edge, ending in a post at x 700
-//   'treeL' / 'treeR'  a near tree cropped by a side edge, trunk into a tree pit at kerb height
+//   'treeL' / 'treeR'  a near tree cropped by a side edge, its crown INSIDE the visible band (y 1150-1500), trunk into a
+//             tree pit at y 1640
+//   'edgeL' / 'edgeR'  a big back-view figure cropped by a side edge, its head INSIDE the visible band (y ~1330), coat
+//             running off the bottom (review 5: the default near layer of the street sets, since the bottom band is
+//             covered by the platform UI on a phone)
 // Every street set takes `foreground?: ForegroundSpec` (a preset, a list of presets, any node, or false).
 
 import React from 'react';
@@ -23,6 +27,7 @@ import {rng, Seed} from '../../../lib/rng';
 import {SI} from './common';
 import {BollardSlot, OnlookerSlot} from './propSlots';
 import type {Acc, Hair} from '../../../lib/kit';
+import {EdgeFigure} from './life';
 
 // ---------------------------------------------------------------- ground marks
 
@@ -108,7 +113,7 @@ export const GroundMarks: React.FC<{marks: {lines: string; specks: string}; widt
 
 // ---------------------------------------------------------------- foreground presets
 
-export type ForegroundPreset = 'heads' | 'kerb' | 'railing' | 'treeL' | 'treeR';
+export type ForegroundPreset = 'heads' | 'kerb' | 'railing' | 'treeL' | 'treeR' | 'edgeL' | 'edgeR';
 export type ForegroundSpec = ForegroundPreset | ForegroundPreset[] | React.ReactNode | false;
 
 const HEADS: {x: number; y: number; head: number; hair: Hair; body: string; acc: Acc[]; rim: 'left' | 'right'}[] = [
@@ -149,8 +154,8 @@ const RAIL = (() => {
 
 const TREE = (side: 'L' | 'R') => {
   const cx = side === 'L' ? -10 : 1090;
-  const cy = 1390;
-  const pit = 1700;
+  const cy = 1310;
+  const pit = 1640;
   const crownD = crown(cx, cy, 150, 165, {seed: `fgt${side}`, bumps: 11});
   const ticks = crownTicks(cx, cy, 150, 165, {seed: `fgt${side}k`, n: 5, size: 14});
   const tx = side === 'L' ? 46 : 1034;
@@ -163,6 +168,7 @@ const TREE = (side: 'L' | 'R') => {
 const TREES = {L: TREE('L'), R: TREE('R')};
 
 const Preset: React.FC<{p: ForegroundPreset; seed: string; at?: number}> = ({p, seed, at}) => {
+  if (p === 'edgeL' || p === 'edgeR') return <EdgeFigure side={p === 'edgeL' ? 'L' : 'R'} riseAt={at} seed={`${seed}/e`} />;
   if (p === 'heads')
     return (
       <>
@@ -204,7 +210,7 @@ const Preset: React.FC<{p: ForegroundPreset; seed: string; at?: number}> = ({p, 
   );
 };
 
-const PRESETS: ForegroundPreset[] = ['heads', 'kerb', 'railing', 'treeL', 'treeR'];
+const PRESETS: ForegroundPreset[] = ['heads', 'kerb', 'railing', 'treeL', 'treeR', 'edgeL', 'edgeR'];
 const isPreset = (v: unknown): v is ForegroundPreset => typeof v === 'string' && (PRESETS as string[]).includes(v);
 
 /** The foreground framing band (see the file header). `at` pops the presets in (heads rise). */

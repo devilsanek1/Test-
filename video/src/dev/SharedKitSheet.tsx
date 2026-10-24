@@ -68,7 +68,9 @@ import {
   WrenchTag,
   yearPages,
 } from '../scenes/shared/props';
-import {SET_CATALOG} from '../scenes/shared/sets/catalog';
+import {SET_CATALOG, SetEntry} from '../scenes/shared/sets/catalog';
+import {TerraceHill, TERRACE_FLAT} from '../scenes/shared/sets/TerraceHill';
+import {DemoSun} from '../scenes/shared/sets/preview/demo';
 
 const CW = 216;
 const RH = 196;
@@ -123,17 +125,33 @@ const ThumbLabel: React.FC<{x: number; y: number; w: number; label: string}> = (
   );
 };
 
-/** Set thumbnails (from the sets lane's catalog), scaled into the bottom band. */
+/** The SeaOfDoors (TerraceHill mode 'flat', the md's "doors to the horizon") is a set of its own in the brief: the band
+ *  shows it next to the hill unless the catalog already lists it. */
+const SEA: SetEntry = {
+  id: 'sea',
+  label: 'SeaOfDoors',
+  sky: skies.day,
+  thumb: () => <TerraceHill mode="flat" flagAt={-1} sun={<DemoSun cx={TERRACE_FLAT.sun.x} cy={TERRACE_FLAT.sun.y} r={TERRACE_FLAT.sun.r} />} />,
+  preview: () => null,
+};
+const TI = SET_CATALOG.findIndex((e) => e.id === 'terrace');
+const THUMBS: SetEntry[] = SET_CATALOG.some((e) => e.id === 'sea' || /sea/i.test(e.label))
+  ? SET_CATALOG
+  : TI < 0
+    ? [...SET_CATALOG, SEA]
+    : [...SET_CATALOG.slice(0, TI + 1), SEA, ...SET_CATALOG.slice(TI + 1)];
+
+/** Set thumbnails (from the sets lane's catalog, + the SeaOfDoors), scaled into the bottom band. */
 const SetThumbs: React.FC = () => {
   const y0 = Y0 + ROWS * RH + 6;
   const hAvail = 1920 - y0 - 34;
-  const n = Math.max(1, SET_CATALOG.length);
+  const n = Math.max(1, THUMBS.length);
   const cw = Math.min(1080 / n, (hAvail * 1080) / 1920 + 12);
   const sc = Math.min((cw - 10) / 1080, hAvail / 1920);
   const x0 = (1080 - n * cw) / 2;
   return (
     <g>
-      {SET_CATALOG.map((e, i) => {
+      {THUMBS.map((e, i) => {
         const cx = x0 + i * cw + (cw - 1080 * sc) / 2;
         const id = `thumb${i}`;
         return (

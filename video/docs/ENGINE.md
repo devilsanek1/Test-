@@ -79,8 +79,8 @@ Current values (always reference the TOKEN in code, never the literal):
 | sun | centre **(540, 650)**, r **100** (`sunWorld`; baseline r 94-120, peaks only 270-490) |
 | safe zones | UI covers y < 180, y > 1520, right rail x > 950 for y 900-1500; key action inside x 90-990, y 200-1480 (`safe`) |
 | ink by depth | front 4.8, mid 3.4, far 2.2, hair 1.6 px; far layers no ink (`depthInk`) |
-| skies | day #ACD1BF, golden #F3E0CB, dusk #6D988B, night #588077, deep #3E605F (`skies`) |
-| time of day | sky day #ACD1BF, golden #F3E0CB, dusk #6D988B, night #588077, dawn #ACD1BF; caption tone day dark, golden dark, dusk dark, night light, dawn dark (`todSky`, `todTone`) |
+| skies | day #ACD1BF, golden #ACD1BF, dusk #6D988B, night #588077, deep #3E605F (`skies`) |
+| time of day | sky day #ACD1BF, golden #ACD1BF, dusk #6D988B, night #588077, dawn #ACD1BF; caption tone day dark, golden dark, dusk dark, night light, dawn dark (`todSky`, `todTone`) |
 <!-- numbers:end -->
 
 ## 3. A complete minimal scene (the template: copy it)

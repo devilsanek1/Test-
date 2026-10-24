@@ -23,9 +23,11 @@
 //                    focus?: [x, y] (outgoing push target), to?: [x, y] (incoming push target)}. The incoming scene
 //                    starts zoomed out / offset by up to ~12%: author it with world.bleed (140 px) past every edge.
 //   foreground-wipe  something passes close to the lens and the new scene is behind it: {dur = 0.8,
-//                    element: 'figure' | 'pole' | 'foliage' | 'scene' = 'figure', dir: 'left' | 'right' = 'right',
-//                    color?, captionTone?}. 'scene' uses the OUTGOING scene module's exported `Wiper` component
-//                    (WiperProps; give it a static `captionRegions` for its caption tone over the element).
+//                    element: 'figure' | 'pole' | 'foliage' | 'column' | 'passer' | 'scene' = 'figure', dir: 'left' |
+//                    'right' = 'right', color?, captionTone?}. 'column' / 'passer' are the cine wipers (cine/wipers.tsx).
+//                    'scene' uses the OUTGOING scene module's exported `Wiper` component (WiperProps; give it a static
+//                    `captionRegions` for its caption tone over the element). The edge moves with an in-out sine
+//                    (wipeEdgeX) and both scenes drift 50 px with the same ease: nothing starts or stops dead.
 //   push-through     zoom into a point of the outgoing scene until it fills the frame, (optional flat `bridge` colour
 //                    for 3 frames), then the incoming scene pulls back out of its own point:
 //                    {dur = 1.1, from: [x, y], to?: [x, y] (default centre), zoom = 7, bridge?: colour}.
@@ -44,7 +46,7 @@ import {clamp, ease as E, lerp, osc, prog, TimeProvider} from './time';
 import {ExitProvider, NoExit} from './exit';
 import {capcheckMode, CaptionBeat, SkyCaptions, ToneRegion, toneOn} from './Captions';
 import {exitFillProgress} from './exit';
-import {SceneInfo, StageCam, StageContexts, STAGE_REST, TransitionInfo, zoomAbout} from './stage';
+import {SceneInfo, SceneTransitionIn, StageCam, StageContexts, STAGE_REST, TransitionInfo, zoomAbout} from './stage';
 import {Ink} from './Ink';
 import {Fill} from './Fill';
 import {blob, circle, crown, crownTicks, line, torso} from './sketch';
@@ -53,6 +55,7 @@ import {MOTION} from './spec';
 import {World} from './World';
 import {Sun} from './Sun';
 import {captionFontStack} from './font';
+import {CINE_WIPE_HALF, CINE_WIPERS, wipeEdgeX} from './cine/wipers';
 
 // ---------------------------------------------------------------- data types
 
@@ -64,7 +67,7 @@ export type FilmTransition =
   | {
       type: 'foreground-wipe';
       dur?: number;
-      element?: 'figure' | 'pole' | 'foliage' | 'scene';
+      element?: 'figure' | 'pole' | 'foliage' | 'column' | 'passer' | 'scene';
       dir?: 'left' | 'right';
       color?: string;
       /** Caption tone over the wiper element (default: the wiper's captionRegions, else derived from `color`). */
@@ -170,15 +173,28 @@ function pushThrough(tr: Extract<FilmTransition, {type: 'push-through'}>) {
   };
 }
 
-const WIPE_HALF: Record<string, number> = {figure: 660, pole: 120, foliage: 460, scene: 600};
-
-/** Boundary x of a foreground wipe at progress p (crosses the centre at p = 0.5). */
-function wipeX(p: number, dir: 'left' | 'right', half: number): number {
-  const x0 = -half - 30;
-  const x1 = world.w + half + 30;
-  const x = lerp(x0, x1, p);
-  return dir === 'right' ? x : world.w - x;
+/** What a scene's cameras need to know about its incoming transition: type, dur, dir, when the incoming camera leg
+ *  has come to rest (`settle`, scene-local s) and which way it zooms (`zoomDir`: 1 in, -1 pulling back, 0 none). */
+function transitionInfo(ti: FilmTransition): SceneTransitionIn {
+  const d = tdur(ti);
+  const dir = 'dir' in ti ? ti.dir : undefined;
+  if (ti.type === 'camera-continuous') return {type: ti.type, dur: d, dir, settle: camCont(ti).dIn, zoomDir: (dir ?? 'in') === 'in' ? 1 : dir === 'out' ? -1 : 0};
+  if (ti.type === 'push-through') {
+    const pt = pushThrough(ti);
+    return {type: ti.type, dur: d, settle: pt.hold / 2 + pt.dIn, zoomDir: -1};
+  }
+  if (ti.type === 'foreground-wipe') return {type: ti.type, dur: d, dir, settle: d / 2, zoomDir: 0};
+  return {type: ti.type, dur: d, dir, settle: 0, zoomDir: 0};
 }
+
+const WIPE_HALF: Record<string, number> = {figure: 660, pole: 120, foliage: 460, scene: 600, ...CINE_WIPE_HALF};
+
+/** Boundary x of a foreground wipe at progress p (crosses the centre at p = 0.5): the ONE edge curve of both kits
+ *  (cine wipeEdgeX: in-out sine from -half - 30 to W + half + 30, so the element enters and leaves without a velocity
+ *  step). */
+const wipeX = (p: number, dir: 'left' | 'right', half: number): number => wipeEdgeX(p, dir, half);
+/** The 50 px parallax drift of both scenes under a foreground wipe, eased like the edge (0 -> 1). */
+const wipeDrift = (p: number) => 50 * E.inOutSine(clamp(p));
 
 // ---------------------------------------------------------------- built-in wipers (screen px)
 
@@ -266,6 +282,8 @@ FoliageWiper.captionRegions = ({x, color = palette.teal}) =>
     .map(([dx, y, r, c], i) => ({tone: toneOn(c), d: crown(x + dx, y, r, r * 0.9, {seed: `fol${i}`, bumps: 9})}));
 
 export const BUILTIN_WIPERS: Record<string, WiperComponent> = {figure: FigureWiper, pole: PoleWiper, foliage: FoliageWiper};
+/** Every named wiper Film can draw: the built-ins + the cine 'column' / 'passer' (element names in transitionIn). */
+const ALL_WIPERS: Record<string, WiperComponent> = {...BUILTIN_WIPERS, ...CINE_WIPERS};
 
 // ---------------------------------------------------------------- helpers
 
@@ -340,7 +358,7 @@ export function toneRegionsAt(scenes: FilmScene[], T: number, wipers: Record<str
           ? [{tone: tNew, rect: [-200, -200, cx, 2200]}, {tone: tOld, rect: [cx, -200, 1300, 2200]}]
           : [{tone: tOld, rect: [-200, -200, cx, 2200]}, {tone: tNew, rect: [cx, -200, 1300, 2200]}];
       // the same component Film draws (a scene without its own Wiper falls back to the figure)
-      const W = ((el === 'scene' ? wipers[prev.id] : BUILTIN_WIPERS[el]) ?? FigureWiper) as WiperComponent;
+      const W = ((el === 'scene' ? wipers[prev.id] : ALL_WIPERS[el]) ?? FigureWiper) as WiperComponent;
       const props: WiperProps = {x, p, dir, color: tr.color};
       let wr: ToneRegion[] = W.captionRegions ? W.captionRegions(props) : [{tone: tr.color ? toneOn(tr.color) : 'light', rect: [x - 90, -200, x + 90, 2200]}];
       if (tr.captionTone) wr = wr.map((r) => ({...r, tone: tr.captionTone!}));
@@ -432,7 +450,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
   const pushLayer = (s: FilmScene, i: number, o: {offset?: number; cam?: StageCam; clip?: string; exit?: number; z: number; trans?: TransitionInfo | null; key?: string}) => {
     const Comp = comp(s.id);
     const ti = s.transitionIn;
-    const info: SceneInfo = {id: s.id, start: s.start, end: s.end, dur: s.end - s.start, transitionIn: ti && i > 0 ? {type: ti.type, dur: tdur(ti), dir: 'dir' in ti ? ti.dir : undefined} : undefined};
+    const info: SceneInfo = {id: s.id, start: s.start, end: s.end, dur: s.end - s.start, transitionIn: ti && i > 0 ? transitionInfo(ti) : undefined};
     layers.push({
       key: o.key ?? `${s.id}#${i}`,
       z: o.z,
@@ -504,7 +522,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
           const x = wipeX(p, dir, WIPE_HALF[tin.element ?? 'figure']);
           const cx = clamp(x, 0, world.w);
           clip = dir === 'right' ? `inset(0px ${(world.w - cx).toFixed(1)}px 0px 0px)` : `inset(0px 0px 0px ${cx.toFixed(1)}px)`;
-          const drift = (dir === 'right' ? 1 : -1) * 50 * (1 - p);
+          const drift = (dir === 'right' ? 1 : -1) * (50 - wipeDrift(p));
           cam = {ox: drift, oy: 0, zoom: 1, rot: 0};
           trans = {type: tin.type, phase: 'in', p};
         }
@@ -536,11 +554,11 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
           const x = wipeX(p, dir, WIPE_HALF[tout.element ?? 'figure']);
           const cx = clamp(x, 0, world.w);
           clip = dir === 'right' ? `inset(0px 0px 0px ${cx.toFixed(1)}px)` : `inset(0px ${(world.w - cx).toFixed(1)}px 0px 0px)`;
-          const drift = (dir === 'right' ? 1 : -1) * 50 * p;
+          const drift = (dir === 'right' ? 1 : -1) * wipeDrift(p);
           cam = {ox: -drift, oy: 0, zoom: 1, rot: 0};
           trans = {type: tout.type, phase: 'out', p};
           // the element itself, above both scenes
-          const Wiper = tout.element === 'scene' ? wipers[s.id] ?? FigureWiper : BUILTIN_WIPERS[tout.element ?? 'figure'] ?? FigureWiper;
+          const Wiper = tout.element === 'scene' ? wipers[s.id] ?? FigureWiper : ALL_WIPERS[tout.element ?? 'figure'] ?? FigureWiper;
           if (p < 1)
             overlays.push(
               <svg key={`wipe${i}`} width={world.w} height={world.h} viewBox={`0 0 ${world.w} ${world.h}`} style={{position: 'absolute', left: 0, top: 0}}>

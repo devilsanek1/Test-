@@ -7,7 +7,9 @@
 //   <Sun beats={[1.33, {t: 2.0, amp: 0.13}]} />               // beat pulses on stressed words (+4..+13%, default 8%)
 //   <Sun bounce={{times: [3.1, 3.7, 4.25], h: 40}} />         // bounces whose TOUCH-DOWNS land on those word times
 //   <Sun hops={[{t: 6.0, to: [700, 840]}]} />                 // squash-and-stretch hop: take-off at t (anticipation before)
-//   <Sun drift={[12, 0]} />                                   // idle drift px/s (never perfectly still)
+//   <Sun drift={[12, 0]} />                                   // idle drift px/s (never perfectly still; in a <World>
+//                                                             // the default is SUN_IDLE_DRIFT, 10 px/s to the right)
+//   <Sun drift={[0, 0]} />                                    // pinned (a match-cut frame on the sun)
 //   <Sun moves={[{at: 6, dur: 1.5, y: 960}]} horizon={900} /> // sets behind a horizon line
 //   <Sun>{(r) => <PowerSymbol r={r} at={3} />}</Sun>          // overlays in sun-local coords (0,0 = centre)
 //
@@ -48,7 +50,9 @@ export type SunProps = {
   bounce?: SunBounce;
   /** Hops with anticipation squash, stretch, landing squash (positions chain: each hop starts where the last landed). */
   hops?: SunHop[];
-  /** Idle linear drift (px/s), applied on top of everything. */
+  /** Idle linear drift (px/s), applied on top of everything (from scene t 0). Default in a <World>: SUN_IDLE_DRIFT
+   *  (10 px/s, ENGINE rule 6 / motion spec 9: never perfectly still); [0, 0] pins it (match-cuts on the sun: its x at
+   *  the cut is cx + drift x t). Card layout: none. */
   drift?: [number, number];
   /** Idle breathing (true = 1.2%, or a fraction). */
   breathe?: boolean | number;
@@ -58,6 +62,9 @@ export type SunProps = {
   exit?: boolean;
   children?: React.ReactNode | ((r: number) => React.ReactNode);
 };
+
+/** The sun's default idle drift in full-bleed scenes (px/s): motion spec 9 "sun drift >= 10 px/s or a bob". */
+export const SUN_IDLE_DRIFT: [number, number] = [10, 0];
 
 /** Beat pulse scale factor (1 = rest) at time t for a list of beats. */
 export function sunBeatScale(t: number, beats: SunBeat[] | undefined): number {
@@ -159,10 +166,11 @@ export function sunPoseAt(t: number, o: {cx: number; cy: number; r: number; rise
   return {x, y, r: rad, sq};
 }
 
-export const Sun: React.FC<SunProps> = ({at, cx, cy, r, color = palette.sun, rise, moves = [], pulse, beats, bounce, hops, drift, breathe, horizon, exit = true, children}) => {
+export const Sun: React.FC<SunProps> = ({at, cx, cy, r, color = palette.sun, rise, moves = [], pulse, beats, bounce, hops, drift: driftIn, breathe, horizon, exit = true, children}) => {
   const t = useTime();
   const rotY = useCardRotY();
   const kind = useStageKind();
+  const drift = driftIn ?? (kind === 'world' ? SUN_IDLE_DRIFT : undefined);
   const e = useExit();
   const id = useId().replace(/[^a-zA-Z0-9]/g, '');
   if (at !== undefined && t < at) return null;

@@ -11,11 +11,13 @@
 // dot, two antennae, three little legs. Anchor (x, y) = where his feet touch the surface, at the middle of his body.
 // size = body length in world px (16 x 10 in wide shots, ~20 on the blueprint, ~60 in the S02 close-up, 1-8 px specks).
 // Detail drops with on-screen size: < 6 px a silhouette (dome + head), < 12 px no shell highlight; the cream eye keeps
-// >= 1.4 px radius on screen down to ~10 px (so the 16 px hook-frame Bit still has a face).
+// >= 1.4 px radius on screen down to ~10 px (so the 16 px hook-frame Bit still has a face). From 24 px the eye grows
+// (continuously, 20-28 px) and gets an ink PUPIL that looks toward the action (forward on a peek, up on an alert, or
+// `look`), and he blinks now and then (2 frames, seeded) when calm.
 
 import React from 'react';
 import {palette} from '../../../lib/theme';
-import {ease as E, lerp, osc, prog, springAt, springs, useTime} from '../../../lib/time';
+import {clamp, ease as E, lerp, osc, prog, springAt, springs, useTime} from '../../../lib/time';
 import {rand, Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
@@ -66,7 +68,19 @@ export type BitProps = PropBase & {
   crawl?: {at: number; path: Pt[]; speed?: number};
   /** Draw-on for the doodle state / pop-in for the others. */
   at?: number;
+  /** Where the pupil looks (from 24 px on screen), in his own facing frame (+x = the way he faces, so it follows `flip`):
+   *  'auto' (default: forward on a peek / crawl, up on an alert or hop, idle glances forward / up / back, seeded),
+   *  'forward' | 'up' | 'back' | 'down', or a direction [dx, dy]. */
+  look?: 'auto' | 'forward' | 'up' | 'back' | 'down' | Pt;
+  /** Extra blinks (2 frames each). Calm Bits (idle / peek / ride) also blink every ~2.6-4 s on their own; blink={false}
+   *  = none. */
+  blinkAt?: number | number[];
+  blink?: boolean;
 };
+
+const LOOKS: Record<'forward' | 'up' | 'back' | 'down', Pt> = {forward: [1, 0.1], up: [0.25, -1], back: [-1, -0.15], down: [0.5, 0.85]};
+const EYE: Pt = [9.7, -5.6];
+const BLINK = 0.07; // two frames at 30 fps
 
 export const Bit: React.FC<BitProps> = (p) => {
   const t = useTime();
@@ -171,10 +185,49 @@ export const Bit: React.FC<BitProps> = (p) => {
     parts.push(<Ink key="ant" d={antennae} width={W * 0.85} taper={false} seed={`${seed}/ant`} />);
     parts.push(<Fill key="shell" d={SHELL} color={bodyColor} offset={false} mode="none" seed={`${seed}/shell`} lookExempt />);
     parts.push(<Fill key="head" d={headD} color={bodyColor} offset={false} mode="none" seed={`${seed}/head`} lookExempt />);
-    // cream details: eye dot (+ a shell highlight arc when big enough)
+    // cream details: eye (+ an ink pupil from 24 px) and a shell highlight arc when big enough
+    const big = clamp((onScreen - 20) / 8);
+    const er = lerp(Math.min(2, Math.max(1.15, 1.4 / kpx)), 1.75, big);
+    const pupil = onScreen >= 24;
+    let closed = false;
+    if (pupil && p.blink !== false && !alertOn) {
+      const extra = p.blinkAt === undefined ? [] : Array.isArray(p.blinkAt) ? p.blinkAt : [p.blinkAt];
+      closed = extra.some((b) => t >= b && t < b + BLINK);
+      const calm = (state === 'idle' || state === 'peek' || state === 'ride') && p.hopAt === undefined;
+      if (calm) {
+        const per = 2.6 + rand(seed, 'blp') * 1.4;
+        const ph = rand(seed, 'blo') * per;
+        closed = closed || (t + ph) % per < BLINK;
+      }
+    }
+    let eye: React.ReactNode;
+    if (closed) {
+      eye = <path d={`M${EYE[0] - er} ${EYE[1]}Q${EYE[0]} ${EYE[1] + er * 0.7} ${EYE[0] + er} ${EYE[1]}`} stroke={palette.cream} strokeWidth={Math.max(0.45, er * 0.42)} fill="none" strokeLinecap="round" />;
+    } else {
+      let g: Pt = LOOKS.forward;
+      const lk = p.look ?? 'auto';
+      if (Array.isArray(lk)) g = lk;
+      else if (lk !== 'auto') g = LOOKS[lk];
+      else if (alertOn || (p.hopAt !== undefined && t >= p.hopAt && t < p.hopAt + hopDur)) g = LOOKS.up;
+      else if (state === 'idle' || state === 'ride') {
+        // idle glances: a new target every ~1.6 s (instant saccades), mostly forward
+        const seg = Math.floor((t + rand(seed, 'gz') * 1.6) / 1.6);
+        const r = rand(seed, `g${seg}`);
+        g = r < 0.55 ? LOOKS.forward : r < 0.8 ? LOOKS.up : LOOKS.back;
+      }
+      const gl = Math.hypot(g[0], g[1]) || 1;
+      const pr = er * 0.5;
+      const off = (er - pr) * 0.8;
+      eye = (
+        <>
+          <circle cx={EYE[0]} cy={EYE[1]} r={er} fill={palette.cream} />
+          {pupil ? <circle cx={EYE[0] + (g[0] / gl) * off} cy={EYE[1] + (g[1] / gl) * off} r={pr} fill={palette.ink} /> : null}
+        </>
+      );
+    }
     parts.push(
-      <ExitFade key="eye" x={9.6} y={-5.6}>
-        <circle cx={9.7} cy={-5.6} r={Math.min(2, Math.max(1.15, 1.4 / kpx))} fill={palette.cream} />
+      <ExitFade key="eye" x={EYE[0]} y={EYE[1]}>
+        {eye}
         {lod === 2 ? <path d="M-6.5 -7.2Q-4 -10 0 -10.2" stroke={palette.cream} strokeWidth={Math.min(1.6, Math.max(0.9, 1.1 / kpx))} fill="none" strokeLinecap="round" /> : null}
       </ExitFade>,
     );
@@ -245,4 +298,4 @@ export const BitSwarm: React.FC<{spots: BitSpot[]; color?: string; outAt?: numbe
 };
 
 /** Bit's local design: body length 20, head centre, eye. */
-export const BIT = {length: L, head: [HEAD[0], HEAD[1]] as Pt, eye: [9.7, -5.6] as Pt};
+export const BIT = {length: L, head: [HEAD[0], HEAD[1]] as Pt, eye: EYE};

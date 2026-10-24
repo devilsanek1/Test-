@@ -10,16 +10,23 @@
 // build: 'draw' (ink strokes draw, fills pop 0.13-0.27 s later; default) | 'pop' (7% spring from the feet) |
 // 'rise' (rises its own height from behind its base line, out-expo 0.33 s) | 'fade' (@deprecated: = a 1-frame pop).
 // lod: 0 full, 1 simplified, 2 flat fill-only blob (far crowd: no ink at all).
-// HERO detail (reference 2's foreground figures; default for s >= 1.2, `hero` forces it): arms in sleeves (inner ink
-// seams from the shoulder to the hem, inset 18 % of the torso width each side), cuffs, a waistband, sand hands at the
-// hem, an optional hood ('hood' accessory), and the measured RIM: a 3 px pure-white strip just inside the outline on
-// one side (`rim` 'left' | 'right' | false; default 'left' for heroes) over ~55 % of the edge, on the arm seam and leg.
+// HERO detail (reference 2's foreground figures; default around s 1.2 (`heroFrom`), `hero` forces it on / off): arms
+// in sleeves (inner ink seams from the shoulder to the hem, inset 18 % of the torso width each side), cuffs, a
+// waistband, sand hands at the hem, an optional hood ('hood' accessory), and the measured RIM: a 3 px pure-white strip
+// just inside the outline on one side (`rim` 'left' | 'right' | false; default 'left' for heroes) over ~55 % of the
+// edge, on the arm seam and leg.
 //   <Person x={160} y={1700} s={1.6} legs legH={120} hero rim="left" ink={4.8} />
+// LEVEL OF DETAIL NEVER POPS (a figure whose s animates, e.g. walking into depth): every size-dependent detail RAMPS
+// with the scale over its own short window instead of switching in one frame: the rim strip shortens along the edge,
+// the seams / cuffs / waistband thin out, the hands shrink into the sleeves, the hood sinks to the collar, the nape
+// notch flattens; the windows are staggered (rim, then seams, then hands, then hood) and jittered per person (seeded,
+// +-4 %), so a crowd never changes in unison. `lodScale` freezes the decision for a shot (pass the s the figure should
+// be detailed at, e.g. its starting scale): <Person s={sNow} lodScale={1.32} .../>.
 
 import React, {useId, useMemo} from 'react';
 import {palette} from '../theme';
-import {osc, prog, useTime} from '../time';
-import {rng, Seed} from '../rng';
+import {clamp, osc, prog, useTime} from '../time';
+import {rand, rng, Seed} from '../rng';
 import {Ink} from '../Ink';
 import {Fill} from '../Fill';
 import {Pop} from '../motion';
@@ -67,10 +74,18 @@ export type PersonProps = {
   torsoH?: number;
   /** Leg length override (px, local; default 0.62 x torso height). Long legs for foreground walkers (ref 2 ~1.2 x). */
   legH?: number;
-  /** Hero detail: arms in sleeves, cuffs, waistband, hands, hood (see header). Default s >= 1.2. */
+  /** Hero detail: arms in sleeves, cuffs, waistband, hands, hood (see header). true / false force it; default: it
+   *  ramps in around s = heroFrom. */
   hero?: boolean;
+  /** Scale around which hero detail ramps in (each detail over its own ~5 % window, jittered per person). Default 1.2. */
+  heroFrom?: number;
   /** Rim light: a 3 px white strip inside the outline on this side. Default 'left' for heroes, else none. */
   rim?: 'left' | 'right' | false;
+  /** With an explicit `rim`: the scale around which the rim ramps in (Crowd: 0.6). Default: always on. */
+  rimFrom?: number;
+  /** The scale every level-of-detail decision uses (hero detail, rim, hero head). Default s. Freeze it for a shot in
+   *  which s animates. */
+  lodScale?: number;
   lod?: 0 | 1 | 2;
   flip?: boolean;
   /** Idle bob amplitude in px (default 0). */
@@ -192,8 +207,10 @@ function makePaths(S: Spec) {
     const cw = Math.sqrt(Math.max(0, 1.03 * 1.03 - 0.42 * 0.42)) * hr;
     P.capFill = `M${-cw} ${by}A${hr * 1.03} ${hr * 1.03} 0 1 1 ${cw} ${by}Z`;
     P.capBand = line(-cw, by, cw, by - hr * 0.02, {over: [2, 2], seed: `${sd}/band`});
-    P.capInk = P.capBand + arc(0, by, hr * 0.3, hr * 0.26, 180, 360, {seed: `${sd}/open`});
+    P.capOpen = arc(0, by, hr * 0.3, hr * 0.26, 180, 360, {seed: `${sd}/open`});
+    P.capInk = P.capBand + P.capOpen;
     P.capHole = `M${-hr * 0.3} ${by}A${hr * 0.3} ${hr * 0.26} 0 0 1 ${hr * 0.3} ${by}Z`;
+    P.capBy = String(by);
     P.capBtn = circle(0, hy - hr * 1.0, hr * 0.12, {seed: `${sd}/btn`});
   }
   if (S.hair === 'beanie') {
@@ -209,6 +226,7 @@ function makePaths(S: Spec) {
   {
     const nape: Pt[] = [[-hr * 0.72, hy + hr * 0.7], [-hr * 0.36, hy + hr * 1.14], [0, hy + hr * 1.0], [hr * 0.36, hy + hr * 1.14], [hr * 0.72, hy + hr * 0.7]];
     P.napeFill = `M${-hr * 0.72} ${hy + hr * 0.55}L${hr * 0.72} ${hy + hr * 0.55}` + nape.slice().reverse().map(([x, y]) => `L${x.toFixed(2)} ${y.toFixed(2)}`).join('') + 'Z';
+    P.napeTop = String(hy + hr * 0.55);
     P.napeInk = nape.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`).join('');
     P.strands =
       `M${-hr * 0.18} ${hy - hr * 0.86}Q${-hr * 0.5} ${hy - hr * 0.3} ${-hr * 0.42} ${hy + hr * 0.42}` +
@@ -284,7 +302,9 @@ function makePaths(S: Spec) {
     }
     P.waistTicks = ticks;
     const hx = xAt(0) + d / 2;
-    P.hands = blob(hx, h * 0.04, w * 0.072, w * 0.095, {seed: `${sd}/hl`}) + blob(-hx, h * 0.04, w * 0.072, w * 0.095, {seed: `${sd}/hr`});
+    P.handL = blob(hx, h * 0.04, w * 0.072, w * 0.095, {seed: `${sd}/hl`});
+    P.handR = blob(-hx, h * 0.04, w * 0.072, w * 0.095, {seed: `${sd}/hr`});
+    P.handX = String(hx);
     P.rimGeo = JSON.stringify({hw, bx, R, d, yTop, yCuff, xc: xAt(yCuff)});
     if (S.acc.includes('hood')) {
       const top = -h;
@@ -308,8 +328,23 @@ function makePaths(S: Spec) {
 
 export const Person: React.FC<PersonProps> = (props) => {
   const {x = 0, y = 0, s = 1, at, build = 'draw', lod = 0, flip, legs, idle = 0, ink, walk} = props;
-  const hero = (props.hero ?? s >= 1.2) && lod === 0;
-  const rimSide = props.rim === undefined ? (hero ? 'left' : false) : props.rim;
+  // ---- level of detail: continuous amounts 0..1 (see the header: nothing pops when s animates)
+  const lodS = props.lodScale ?? s;
+  const lodKey = `person/${props.seed ?? 0}`;
+  const hf = props.heroFrom ?? 1.2;
+  const hT = hf * (1 + 0.08 * (rand(lodKey, 'lodH') - 0.5));
+  const win = (v: number, lo: number, hi: number) => clamp((v - lo) / Math.max(1e-6, hi - lo));
+  const heroAmt = (lo: number, hi: number) => (lod !== 0 ? 0 : props.hero === true ? 1 : props.hero === false ? 0 : win(lodS, hT + lo * hf, hT + hi * hf));
+  const rimHeroA = heroAmt(-0.07, -0.02); // the rim first (the strongest read), then seams, hands, hood
+  const seamA = heroAmt(-0.045, 0.005);
+  const handA = heroAmt(-0.02, 0.03);
+  const hoodA = heroAmt(0, 0.05);
+  const tT = 1.4 * (1 + 0.06 * (rand(lodKey, 'lodT') - 0.5));
+  const tickA = Math.min(seamA, win(lodS, tT - 0.04, tT + 0.04));
+  const rimSide = props.rim === undefined ? 'left' : props.rim;
+  const rf = props.rimFrom;
+  const rimA =
+    props.rim === undefined ? rimHeroA : props.rim === false || lod !== 0 ? 0 : rf === undefined ? 1 : win(lodS, rf * (1 + 0.1 * (rand(lodKey, 'lodR') - 0.5)) - 0.035 * rf, rf * (1 + 0.1 * (rand(lodKey, 'lodR') - 0.5)) + 0.035 * rf);
   const t = useTime();
   const clipId = 'pr' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const S = useMemo(() => makeSpec(props), [props.seed, props.style, props.hair, props.acc?.join(), props.body, props.hairColor, props.legsColor, props.packColor, props.signColor, props.legs, props.torsoH, props.legH]);
@@ -332,7 +367,10 @@ export const Person: React.FC<PersonProps> = (props) => {
   // a cap leaves only a strip of hair at the nape: never skin-coloured (it would read as a face under a cap)
   const capNape = S.hat === palette.brown ? palette.ink : palette.brown;
   const headColor = S.line ? palette.card : S.hair === 'bald' ? palette.sand : S.hair === 'cap' && (skinLike || S.hairColor === S.hat) ? capNape : S.hairColor;
-  const bigHead = lod === 0 && !S.line && 2 * S.hr * s > 60;
+  // hero head (head > ~60 px): ramps over a 10 px window around a per-person threshold
+  const headT = 60 * (1 + 0.1 * (rand(lodKey, 'lodN') - 0.5));
+  const headA = lod === 0 && !S.line ? win(2 * S.hr * lodS, headT - 5, headT + 5) : 0;
+  const bigHead = headA > 0.02;
   const lightHair = headColor !== palette.ink && headColor !== palette.tealDark;
 
   // walking (back view): the lifted foot shortens its leg, the body rises a hair mid-stride
@@ -364,14 +402,15 @@ export const Person: React.FC<PersonProps> = (props) => {
   // rim strips: 3 px on screen, pure white, just inside the outline (reference 2 measured), ~55 % of the edge
   const rimW = 3 / Math.max(0.05, s);
   const rimInset = W / 2 + 0.6 / Math.max(0.05, s);
-  const rimOn = !!rimSide && !S.line && lod === 0 && W > 0;
+  const rimOn = !!rimSide && rimA > 0.02 && !S.line && lod === 0 && W > 0;
+  const rimTo = (from: number, to: number) => from + (to - from) * rimA; // the strip grows along the edge
   const rg = P.rimGeo ? (JSON.parse(P.rimGeo) as {hw: number; bx: number; R: number; d: number; yTop: number; yCuff: number; xc: number}) : null;
   const sg = rimSide === 'right' ? -1 : 1; // mirror for the right side
   if (rimOn && legs && P.legs) {
     const lw = S.w * 0.31;
     const g = S.w * 0.05;
     const ex = -sg * (g + lw);
-    push(<Fill key="rimLeg" d={rimStrip([ex, 0], [ex, S.legH], rimInset * 0.8, rimW, 0.08, 0.72, -sg)} color={palette.white} at={tm(0.3)} mode={drawMode ? 'snap' : 'none'} offset={false} seed={k('rimLeg')} />);
+    push(<Fill key="rimLeg" d={rimStrip([ex, 0], [ex, S.legH], rimInset * 0.8, rimW, 0.08, rimTo(0.08, 0.72), -sg)} color={palette.white} at={tm(0.3)} mode={drawMode ? 'snap' : 'none'} offset={false} seed={k('rimLeg')} />);
   }
   // sign (behind the head)
   if (P.pole && lod < 2) {
@@ -388,27 +427,44 @@ export const Person: React.FC<PersonProps> = (props) => {
     if (inked && lod === 0) push(<Ink key="earI" d={P.earInk} at={tm(0.14)} width={W * 0.85} order="all" seed={k('earI')} />);
   }
   // hands hang below the sleeves (behind the torso hem)
-  if (hero && inked) {
-    push(<Fill key="handsF" d={P.hands} color={S.line ? palette.card : palette.sand} at={tm(0.3)} mode={fillMode} offset={false} seed={k('hands')} />);
-    push(<Ink key="hands" d={P.hands} at={tm(0.22)} width={W * 0.85} order="all" seed={k('handsI')} />);
+  if (handA > 0.02 && inked) {
+    // the hands shrink up into the sleeves as the figure gets small (never a 1-frame pop)
+    const hx = Number(P.handX);
+    [[P.handL, hx], [P.handR, -hx]].forEach(([d, x0], i) => {
+      const hand = (
+        <>
+          <Fill d={d as string} color={S.line ? palette.card : palette.sand} at={tm(0.3)} mode={fillMode} offset={false} seed={k(`hand${i}`)} />
+          <Ink d={d as string} at={tm(0.22)} width={W * 0.85} order="all" seed={k(`handI${i}`)} />
+        </>
+      );
+      push(handA >= 1 ? <React.Fragment key={`hand${i}`}>{hand}</React.Fragment> : <XG key={`hand${i}`} m={mat.about(mat.scale(handA), x0 as number, -S.h * 0.02)}>{hand}</XG>);
+    });
   }
   // torso
   push(<Fill key="torsoF" d={P.torso} color={S.body} at={tm(0.16)} mode={drawMode ? 'pop' : 'none'} seed={k('torso')} offset={lod === 2 ? false : S.line ? [-2, -1.5] : undefined} />);
   if (rimOn && rg) {
     const a: Pt = [-sg * rg.hw, -S.h + rg.R];
     const bb: Pt = [-sg * rg.bx, 0];
-    let d = rimStrip(a, bb, rimInset, rimW, 0.12, 0.67, -sg);
-    if (hero) d += rimStrip([-sg * (rg.hw - rg.d), rg.yTop], [-sg * (-rg.xc - rg.d), rg.yCuff], rimInset * 0.7, rimW, 0.18, 0.78, sg);
+    let d = rimStrip(a, bb, rimInset, rimW, 0.12, rimTo(0.12, 0.67), -sg);
+    const armA = Math.min(rimA, seamA);
+    if (armA > 0.02) d += rimStrip([-sg * (rg.hw - rg.d), rg.yTop], [-sg * (-rg.xc - rg.d), rg.yCuff], rimInset * 0.7, rimW, 0.18, 0.18 + 0.6 * armA, sg);
     push(<Fill key="rim" d={d} color={palette.white} at={tm(0.3)} mode={drawMode ? 'snap' : 'none'} offset={false} seed={k('rim')} />);
   }
   if (inked) push(<Ink key="torso" d={P.torso} at={tm(0)} width={W} seed={k('torso')} />);
-  if (hero && inked) {
-    push(<Ink key="seams" d={P.seams + P.cuffs + P.waist} at={tm(0.12)} width={W * 0.85} order="all" seed={k('seams')} />);
-    if (s >= 1.4) push(<Ink key="ticks" d={P.waistTicks} at={tm(0.3)} width={W * 0.55} order="all" seed={k('ticks')} />);
+  if (seamA > 0.03 && inked) {
+    // seams, cuffs and the waistband thin out (never a 1-frame pop)
+    push(<Ink key="seams" d={P.seams + P.cuffs + P.waist} at={tm(0.12)} width={W * 0.85 * seamA} order="all" seed={k('seams')} />);
+    if (tickA > 0.03) push(<Ink key="ticks" d={P.waistTicks} at={tm(0.3)} width={W * 0.55 * tickA} order="all" seed={k('ticks')} />);
   }
-  if (hero && P.hoodFill) {
-    push(<Fill key="hoodF" d={P.hoodFill} color={S.body} at={tm(0.22)} mode={fillMode} offset={false} seed={k('hood')} />);
-    if (inked) push(<Ink key="hood" d={P.hoodInk} at={tm(0.18)} width={W * 0.9} seed={k('hoodI')} />);
+  if (hoodA > 0.02 && P.hoodFill) {
+    // the hood sinks into the collar as the figure gets small
+    const hood = (
+      <>
+        <Fill d={P.hoodFill} color={S.body} at={tm(0.22)} mode={fillMode} offset={false} seed={k('hood')} />
+        {inked ? <Ink d={P.hoodInk} at={tm(0.18)} width={W * 0.9} seed={k('hoodI')} /> : null}
+      </>
+    );
+    push(hoodA >= 1 ? <React.Fragment key="hood">{hood}</React.Fragment> : <XG key="hood" m={mat.about(mat.scale(1, hoodA), 0, -S.h + S.hr * 1.3)}>{hood}</XG>);
   }
   // back accessories
   if (P.strap && lod === 0 && inked) push(<Ink key="strap" d={P.strap} at={tm(0.2)} width={W * 0.85} order="all" seed={k('strap')} />);
@@ -449,15 +505,27 @@ export const Person: React.FC<PersonProps> = (props) => {
   }
   // hero head detail: a notched nape hairline (hair colour over the neck) and strands on light hair
   if (bigHead && (S.hair === 'short' || S.hair === 'bun' || S.hair === 'cap' || S.hair === 'curly')) {
-    push(<Fill key="napeF" d={P.napeFill} color={headColor} at={tm(0.28)} mode={fillMode} offset={false} seed={k('nape')} />);
-    if (inked) push(<Ink key="napeI" d={P.napeInk} at={tm(0.2)} width={W * 0.85} seed={k('napeI')} />);
-    if (inked && (S.hair === 'short' || S.hair === 'bun') && lightHair) push(<Ink key="strands" d={P.strands} at={tm(0.32)} width={W * 0.7} order="all" seed={k('strands')} />);
+    // the notch flattens into the hairline and the strands thin out as the head gets small
+    const nape = (
+      <>
+        <Fill d={P.napeFill} color={headColor} at={tm(0.28)} mode={fillMode} offset={false} seed={k('nape')} />
+        {inked ? <Ink d={P.napeInk} at={tm(0.2)} width={W * 0.85 * Math.min(1, headA * 1.5)} seed={k('napeI')} /> : null}
+      </>
+    );
+    push(headA >= 1 ? <React.Fragment key="nape">{nape}</React.Fragment> : <XG key="nape" m={mat.about(mat.scale(1, headA), 0, Number(P.napeTop))}>{nape}</XG>);
+    if (inked && (S.hair === 'short' || S.hair === 'bun') && lightHair && headA > 0.05) push(<Ink key="strands" d={P.strands} at={tm(0.32)} width={W * 0.7 * headA} order="all" seed={k('strands')} />);
   }
   if (P.capFill) {
     push(<Fill key="capF" d={P.capFill} color={S.line ? palette.card : S.hat} at={tm(0.3)} mode={fillMode} offset={false} seed={k('cap')} />);
-    // the strap opening only at small sizes: at hero size it reads as a face under the cap
-    if (P.capHole && !bigHead) push(<Fill key="capH" d={P.capHole} color={S.line ? palette.card : S.hairColor} at={tm(0.34)} mode={fillMode} offset={false} seed={k('capH')} />);
-    if (inked) push(<Ink key="cap" d={bigHead && P.capBand ? P.capBand : P.capInk} at={tm(0.22)} width={W * 0.9} seed={k('capI')} />);
+    // the strap opening only at small sizes: at hero size it reads as a face under the cap (it shrinks away with the
+    // hero-head ramp)
+    const openA = 1 - headA;
+    if (P.capHole && openA > 0.02) {
+      const hole = <Fill d={P.capHole} color={S.line ? palette.card : S.hairColor} at={tm(0.34)} mode={fillMode} offset={false} seed={k('capH')} />;
+      push(openA >= 1 ? <React.Fragment key="capH">{hole}</React.Fragment> : <XG key="capH" m={mat.about(mat.scale(openA), 0, Number(P.capBy))}>{hole}</XG>);
+    }
+    if (inked) push(<Ink key="cap" d={P.capBand ?? P.capInk} at={tm(0.22)} width={W * 0.9} seed={k('capI')} />);
+    if (inked && P.capOpen && openA > 0.02) push(<Ink key="capO" d={P.capOpen} at={tm(0.22)} width={W * 0.9 * openA} seed={k('capO')} />);
     if (P.capBtn && lod === 0 && inked) push(<Ink key="capB" d={P.capBtn} at={tm(0.34)} width={W * 0.8} seed={k('capB')} />);
     if (P.pomFill) {
       push(<Fill key="pomF" d={P.pomFill} color={S.line ? palette.card : S.hat} at={tm(0.36)} mode={fillMode} offset={false} seed={k('pom')} />);

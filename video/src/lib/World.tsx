@@ -20,8 +20,10 @@
 //   `wipe` so the caption colour follows the edge too).
 //
 // CAMERA: `push` = the per-shot gentle zoom reference 2 gives every shot (default 1.00 -> 1.06 over 2 s from t 0,
-//   ease in-out sine, about world.vp). After a camera-continuous transition whose zoom runs the OTHER way (dir 'out'
-//   + a push in), the push waits until the transition has settled (stage.pushStart): no camera bounce. For multiplane moves use <ShotCam> / cine <CineCamera stage> inside.
+//   ease in-out sine, about world.vp). After an incoming PULL-BACK (push-through, camera-continuous 'out') the default
+//   becomes the matching pull-out (1 / 1.06, stage.pushTo): the leg lands into a slow continuing pull-back. An explicit
+//   `to` that runs AGAINST the incoming leg waits until that leg has settled (stage.pushStart): no camera bounce, no
+//   reversal a beat after the cut. For multiplane moves use <ShotCam> / cine <CineCamera stage> inside.
 // stage="flat" (default): the transition camera moves the whole scene as one plane and is CONSUMED here (children see
 //   useStageCam() = rest, so a <CineCamera stage> inside can never apply it twice). stage="context": World does not
 //   apply it; your <CineCamera stage> / <ShotCam> folds it in with real parallax. useWorldStage() tells which.
@@ -30,7 +32,7 @@ import React, {useId} from 'react';
 import {AbsoluteFill} from 'remotion';
 import {skies, TodName, todSky, world} from './theme';
 import {Fill, FrameArea} from './Fill';
-import {AppliedStageProvider, pushStart, SceneInfo, StageCamProvider, stageMat, STAGE_REST, StageKindProvider, useAppliedStageMat, useScene, useStageCam, useStageClip, visibleRectOf, WorldStageProvider, zoomAbout} from './stage';
+import {AppliedStageProvider, pushStart, pushTo, SceneInfo, StageCamProvider, stageMat, STAGE_REST, StageKindProvider, useAppliedStageMat, useScene, useStageCam, useStageClip, visibleRectOf, WorldStageProvider, zoomAbout} from './stage';
 import {mat, Mat, XG} from './xf';
 import {Ease, ease as E, clamp, prog, useTime} from './time';
 import {exitFillProgress, useExit} from './exit';
@@ -58,7 +60,8 @@ export type TodSky = {name: TodName; skyBands: string[]};
 export type SkySpec = string | string[] | SkyKey[] | TodSky;
 
 export type WorldPush = {
-  /** Zoom at the end. Default 1.06 (reference 2: +1.3 ... +5.9 %, median 3.7 %; the brief: 3-8 %). <1 = pull-out. */
+  /** Zoom at the end. Default 1.06 (reference 2: +1.3 ... +5.9 %, median 3.7 %; the brief: 3-8 %); after an incoming
+   *  pull-back (push-through, camera-continuous 'out') 1 / 1.06 (stage.pushTo). <1 = pull-out. */
   to?: number;
   /** Seconds. Default 2. */
   dur?: number;
@@ -225,7 +228,7 @@ const SkyLayer: React.FC<{keys: NKey[]; rect: [number, number, number, number]; 
 export function worldPushMat(push: WorldPush | boolean | undefined, t: number, scene?: SceneInfo): Mat {
   if (!push) return mat.I;
   const p = push === true ? {} : push;
-  const to = p.to ?? MOTION.camera.push.to;
+  const to = pushTo(p.to, scene);
   const q = prog(t, pushStart(p.at ?? 0, to, scene), p.dur ?? MOTION.camera.push.dur, p.ease ?? MOTION.camera.push.ease);
   if (q <= 0 || to === 1) return mat.I;
   return stageMat(zoomAbout(p.anchor ?? world.vp, Math.exp(Math.log(to) * q)));

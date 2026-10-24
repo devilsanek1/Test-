@@ -219,9 +219,9 @@ export const EmblemSlot: React.FC<{x: number; y: number; size: number; width?: n
 // ---------------------------------------------------------------- P11 figures, P9 mail slot
 
 /** -> props Citizen (P11): 40-55 px back-view citizen with legs; (x, y) = feet; `silhouette` = flat sage cut-out. */
-export const CitizenSlot: React.FC<{x: number; y: number; h: number; silhouette?: boolean; riseAt?: number; body?: string; acc?: Acc[]; seed?: Seed}> = (p) => <Citizen {...p} />;
+export const CitizenSlot: React.FC<{x: number; y: number; h: number; silhouette?: boolean; riseAt?: number; body?: string; hair?: Hair; acc?: Acc[]; walk?: {at?: number; hz?: number; to?: [number, number]; dur?: number}; bob?: number; flip?: boolean; color?: string; seed?: Seed}> = (p) => <Citizen {...p} />;
 /** -> props EdgeOnlooker (P11): big head + shoulders at a frame side, torso cropped by the bottom; (x, y) = head centre. */
-export const OnlookerSlot: React.FC<{x: number; y: number; head?: number; hair?: Hair; acc?: Acc[]; body?: string; riseAt?: number; raisePhoneAt?: number; rim?: 'left' | 'right' | false; seed?: Seed}> = (p) => <EdgeOnlooker {...p} />;
+export const OnlookerSlot: React.FC<{x: number; y: number; head?: number; hair?: Hair; acc?: Acc[]; body?: string; riseAt?: number; raisePhoneAt?: number; rim?: 'left' | 'right' | false; arms?: 'both' | 'near' | false; bob?: number; seed?: Seed}> = (p) => <EdgeOnlooker {...p} />;
 /** -> props Maker (P11): cream apron over teal; `bust` = waist-up at a bench. (x, y) = feet (bust: waist). */
 export const MakerSlot: React.FC<{x: number; y: number; h: number; bust?: boolean; work?: number; riseAt?: number; seed?: Seed; flip?: boolean}> = (p) => <Maker {...p} />;
 /** -> props MailSlot (P9): (x, y) = centre, 50 x 10; flap clicks at clickAt. */
