@@ -25,7 +25,7 @@ import {palette, skyCaption, stroke} from '../lib/theme';
 import {XG} from '../lib/xf';
 import {Bike, Car, LampPost, Palm, Person, Tree, WaterTower} from '../lib/kit';
 import {Rise} from '../lib/motion';
-import {Look, useExit} from '../lib/exit';
+import {ExitShrink, Look} from '../lib/exit';
 import {Standalone} from '../lib/Film';
 import {Elephant, ElephantTimeline, popIn} from '../lib/mascot';
 import {SkyCaptions, CaptionBeat, ToneRegion} from '../lib/Captions';
@@ -104,11 +104,13 @@ const Cam: React.FC<CineCameraProps> = (p) => {
   return <CineCamera {...p} keys={lock && p.keys?.length ? [{...p.keys[p.keys.length - 1], t: 0}] : p.keys} handheld={lock ? 0 : p.handheld} />;
 };
 
-/** The mascot follows the un-build (it ignores exit by itself: drive draw = 1 - exit). */
-const Mascot: React.FC<React.ComponentProps<typeof Elephant>> = (p) => {
-  const e = useExit();
-  return <Elephant {...p} draw={Math.max(0, 1 - e * 1.6)} />;
-};
+/** The mascot follows the un-build by SHRINKING to its feet (core ExitShrink: a reversed pop). Never draw={1 - exit}:
+ *  draw < 1 ramps the mascot's fill opacity (a fade). */
+const Mascot: React.FC<React.ComponentProps<typeof Elephant>> = (p) => (
+  <ExitShrink x={p.x ?? 0} y={p.y ?? 0}>
+    <Elephant {...p} />
+  </ExitShrink>
+);
 
 // ---------------------------------------------------------------- timeline
 // Each wipe's midpoint sits on the first word of the incoming caption page (motion spec 7).
@@ -764,6 +766,46 @@ const WipesCheck: React.FC = () => {
   );
 };
 
+/** LOD consistency check: the same night wall at one zoom, either all grid ('grid') or with a 9 x 7 block around the
+ *  hero handed to WindowCloseups ('closeups'). Below the lamp size (ROOM_LOD.lamp ~56 px glass) the two renders must be
+ *  pixel-identical (a close-up and its grid pane draw the same room shapes); above it only the close-ups' small things
+ *  (lamp, desk, person) differ. Diff two stills (see CINE.md 5). */
+const LOD_SPEC = {...WALL_SPEC, exclude: [] as [number, number][]};
+const LOD_RING: [number, number][] = [];
+for (let dr = -4; dr <= 4; dr++) for (let dc = -3; dc <= 3; dc++) if (HERO[1] + dc >= 0) LOD_RING.push([HERO[0] + dr, HERO[1] + dc]);
+const LodCheck: React.FC<{view: 'grid' | 'closeups'; zoom: number}> = ({view, zoom}) => {
+  const P = TOD.night;
+  const keys: CamKey[] = [{t: 0, zoom, anchor: HC, anchorTo: [540, 960]}];
+  const Ring: React.FC = () => {
+    const cam = useCam();
+    const t = useTime();
+    const m = layerMat(cam, 0);
+    return (
+      <>
+        {LOD_RING.map(([r, c], i) => {
+          const cp = wallCloseupProps(LOD_SPEC, r, c, t, m, {lit: P.windowLit, dark: P.windowDark});
+          return (
+            <OnCell key={i} q={cp.quad} h={760}>
+              {(w, h) => <WindowCloseup {...cp} w={w} h={h} tod={P} desk chair person={cp.on ? <Person x={w * 0.3} y={h * 0.93} s={1.22} seed={`lk${i}`} body={palette.sage} /> : undefined} />}
+            </OnCell>
+          );
+        })}
+      </>
+    );
+  };
+  return (
+    <CineCamera keys={keys}>
+      <Layer depth={1}>
+        <Sky tod={P} horizon={C_VP[1]} />
+      </Layer>
+      <Layer depth={0}>
+        <WallOfWindows {...LOD_SPEC} tod={P} inkW={0} precision={3} lod={view === 'closeups' ? {cells: LOD_RING, detailFrom: 0} : undefined} />
+        {view === 'closeups' ? <Ring /> : null}
+      </Layer>
+    </CineCamera>
+  );
+};
+
 /** The lens figures (backlit back views at the lens): every hair, both leans, in colour against the sun and in the
  *  paper Look (line art). None may read as a round "user" icon: irregular skull, one ear, a dropped shoulder. */
 const LensCheck: React.FC = () => {
@@ -866,8 +908,12 @@ const LoopScene: React.FC = () => {
   );
 };
 
-export const CineDemo: React.FC<{mode?: 'demo' | 'street' | 'tower' | 'loop' | 'wipes' | 'speed' | 'lens' | 'lod'; lock?: boolean}> = ({mode = 'demo', lock = false}) =>
-  mode === 'lens' ? (
+export const CineDemo: React.FC<{mode?: 'demo' | 'street' | 'tower' | 'loop' | 'wipes' | 'speed' | 'lens' | 'lod'; lock?: boolean; view?: 'grid' | 'closeups'; zoom?: number}> = ({mode = 'demo', lock = false, view = 'grid', zoom = 1.6}) =>
+  mode === 'lod' ? (
+    <CineFrame bg={palette.tealDark}>
+      <LodCheck view={view} zoom={zoom} />
+    </CineFrame>
+  ) : mode === 'lens' ? (
     <CineFrame bg={palette.sky}>
       <LensCheck />
     </CineFrame>

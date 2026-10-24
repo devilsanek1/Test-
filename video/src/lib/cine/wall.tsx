@@ -299,7 +299,11 @@ export const WallOfWindows: React.FC<WallOfWindowsProps> = ({quad, rows, cols, t
     const all = gridCells({rows, cols, fw, fh, jitter: 0}, seed, quad);
     // gridCells walks row-major without skips here, so index -> (row, col)
     const keepI = all.map((_, i) => i).filter((i) => !ex.has(`${Math.floor(i / cols)},${i % cols}`));
-    return {cells: keepI.map((i) => all[i]), rc: keepI.map((i) => [Math.floor(i / cols), i % cols] as [number, number])};
+    // each pane as the PARALLELOGRAM on its top-left, top-right and bottom-left corners (perspective inside one pane is
+    // sub-pixel): exactly the affine frame a WindowCloseup is placed with, so a close-up and its grid pane match to the
+    // pixel (a projective 4th corner left a 1 px sliver along the bottom edge at the swap)
+    const para = (q: Quad): Quad => [q[0], q[1], [q[1][0] + q[3][0] - q[0][0], q[1][1] + q[3][1] - q[0][1]], q[3]];
+    return {cells: keepI.map((i) => (all[i].quad ? {...all[i], quad: para(all[i].quad!)} : all[i])), rc: keepI.map((i) => [Math.floor(i / cols), i % cols] as [number, number])};
   }, [JSON.stringify(quad), rows, cols, seed, fw, fh, exclude.join('|')]);
   const lodSet = useMemo(() => {
     if (!lod) return null;

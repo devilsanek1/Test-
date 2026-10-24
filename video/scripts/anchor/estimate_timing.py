@@ -31,6 +31,7 @@ import os
 import re
 import sys
 
+sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import anchorlib as A  # noqa: E402
 
@@ -119,8 +120,8 @@ class Pace:
         import numpy as np
         W = timing['words']
         self.src_first = float(W[0]['s'])
-        self.src_vostart = float(timing.get('voStart', W[0]['s']))
-        self.src_tail = float(timing['duration']) - float(timing.get('voEnd', W[-1]['e']))
+        self.src_vostart = float(timing.get('voStart') if timing.get('voStart') is not None else W[0]['s'])
+        self.src_tail = float(timing['duration']) - float(timing.get('voEnd') if timing.get('voEnd') is not None else W[-1]['e'])
         rows = []
         for i, w in enumerate(W):
             kind = A.punct_kind(w['w'])

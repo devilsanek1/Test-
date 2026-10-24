@@ -1,286 +1,194 @@
-# VO timing: source of truth (v2 take)
+# VO timing: source of truth (v3 FINAL)
 
-Owner: timing stream. Data: `assets/timing.json` (v2). Audio: `assets/vo_v2_eleven.wav` (ElevenLabs, 48 kHz mono PCM).
-The previous take is archived as `assets/timing_v1.json` (for `assets/vo.mp3`, 70.687 s). `assets/timewarp_v1_to_v2.json` and `scripts/timewarp.py` move anything timed on v1 onto v2.
-All times are in **seconds from the first audio sample**, with 3 decimals. To get a frame number, use `Math.round(t * fps)`; the `@30` columns assume 30 fps.
+Owner: timing stream. Data: `assets/timing.json` for **`assets/vo_v3_final.wav`** (ElevenLabs, 48 kHz mono PCM, LOCKED).
+The script is `docs/script/final_script_elevenlabs.txt`, using the spoken lines and ignoring the [cue] lines. Earlier takes are archived as `assets/timing_v1.json` (`vo.mp3`) and `assets/timing_v2.json` (`vo_v2_eleven.wav`). Those were a different, longer script, so there is no time-warp to v3: storyboards anchor to word indices, and `scripts/anchor/resolve.py` turns the anchors into times.
+All times are in **seconds from the first audio sample**, with 3 decimals. Frame = `Math.round(t * fps)`; the `@30` columns assume 30 fps.
 
-## v1 to v2 delta
+## v2 to v3 delta
 
-| | v1 (`vo.mp3`) | v2 (`vo_v2_eleven.wav`) | Change |
+| | v2 (old script, `vo_v2_eleven.wav`) | v3 FINAL (new script) | Change |
 |---|---|---|---|
-| File length | 70.687 | 77.760 | **+7.07 s (+10.0 %)** |
-| VO span (voStart to voEnd) | 0.040 to 70.445 | 0.035 to 77.560 | +7.12 s |
-| Time inside words | 63.00 | 64.38 | +1.37 s (+2.2 %) |
-| Pauses of 120 ms or more (count / total) | 28 / 6.13 | 30 / 11.97 | +5.85 s |
-| Pauses of 300 ms or more | 7 | 18 | |
-| Captions (same pages, lines, highlights) | 38 | 38 | shortest 0.97 s (v1 0.84 s) |
+| Words (tokens) | 230 | 178 | -52 |
+| File length | 77.760 s | 55.360 s | **-22.40 s (-29 %)** |
+| VO span (voStart to voEnd) | 0.035 to 77.560 | 0.060 to 55.235 | -22.35 s |
+| Speaking rate over the span | 178 wpm | 194 wpm | +16 wpm |
+| Time inside words | 64.38 s (83 % of span) | 48.77 s (88 %) | |
+| Pauses of 120 ms or more (count / total) | 30 / 11.97 s | 16 / 5.23 s | -6.74 s |
+| Pauses of 300 ms or more | 18 | 9 | |
+| Sentence breaks (mean, min to max) | 502 ms (255 to 770) | 447 ms (355 to 535) | tighter, more even |
+| Sentences / default caption pages | 18 / 38 | 9 / 30 | |
+| Tail after voEnd | 0.200 s | 0.125 s | |
 
-**Where the extra time comes from:** about 5.8 s of the 7.1 s is longer pauses, mostly between sentences. The words themselves are only 1.4 s (2 %) slower. The drift therefore grows in steps at sentence breaks, not evenly:
-
-| Sentence starts | v1 | v2 | Drift |
-|---|---|---|---|
-| 1. Government websites in four countries ... | 0.160 | 0.125 | -0.04 |
-| 4. Fixing a bug like that takes two steps... | 10.880 | 11.700 | +0.82 |
-| 8. And for 14 years, nobody did.... | 18.558 | 20.535 | +1.98 |
-| 10. Except, the details of the bug leaked ... | 30.615 | 33.080 | +2.46 |
-| 11. Cloudflare, which protects a big chunk... | 35.604 | 38.850 | +3.25 |
-| 13. So now comes step two, the slow one.... | 45.452 | 49.815 | +4.36 |
-| 15. If a site can't update fast enough, th... | 54.556 | 60.075 | +5.52 |
-| 17. And one in three sites on PHP runs a v... | 60.552 | 67.000 | +6.45 |
-| 18. For those, it's switch off or hope the... | 66.665 | 73.515 | +6.85 |
-| End of VO | 70.445 | 77.560 | +7.12 |
-
-Biggest pacing changes:
-
-- Break after "out." (into "Cloudflare, which protects..."): 189 → 640 ms (+451 ms) at v2 38.210.
-- Break after "in." (into "So now comes..."): 115 → 560 ms (+445 ms) at v2 49.255.
-- Break after "did." (into "And one in..."): 159 → 595 ms (+436 ms) at v2 66.405.
-- Break after "did." (into "Then, in August,..."): 349 → 770 ms (+421 ms) at v2 23.135.
-- Break after "evening." (into "Nobody knows yet..."): 159 → 565 ms (+406 ms) at v2 47.070.
-- Break after "one." (into "Someone has to..."): 124 → 520 ms (+396 ms) at v2 52.135.
-- Sentences spoken slower: #3 "They were fixing a..." +0.43 s; #10 "Except, the details of..." +0.33 s; #14 "Someone has to install..." +0.27 s. Everything else is within ±0.15 s.
-- Every sentence break is now at least 255 ms long (in v1 the shortest was 115 ms). 14 of the 17 breaks are 400 ms or more. Scene changes at sentence boundaries now have room, and visual holds between beats get longer.
+Pacing: v3 is a brisker read, at 194 vs 178 words per minute. Sentence breaks are a steady 355 to 535 ms, where v2 ran from 255 to 770 ms, so the rhythm is even and there are no long dead holds. Within sentences, the only pause over 300 ms is the cued ellipsis after "PHP…" (320 ms). The comma breaths are 120 to 230 ms.
 
 ## Conventions
 
-- `words[i].s` is the audible onset of the word. For stops (p, t, k, b) it is the release burst, for s/sh/ch it is the start of the hiss, and after silence it is where energy rises.
-- `words[i].e` is where the word's energy falls below -48 dBFS before a gap (this take's silence floor is about -86 dBFS). In connected speech it equals the next word's `s`.
-- `pauses` lists every gap of at least 120 ms between `words[after].e` and `words[after+1].s`. `kind` is `sentence`, `comma` or `phrase` (a pause the transcript has no punctuation for).
-- `captions[k].e` is the next caption's `s`, and the last caption runs to `duration`. `lines[n].s` is the start of the line's first word. `highlights[0].s` is the start of the highlighted word. `lines[n].words` and `captions[k].words` hold `[firstIdx, lastIdx]` into `words`. The chunking is identical to v1: same 38 pages, same lines, same highlight words.
-- `stress` (0 to 1) is a percentile rank of acoustic prominence, with function words damped. `hits` holds every word with stress of 0.9 or more, plus every numeral.
-- `duration` = 77.76 s is the WAV length (`decodedDuration` is the same; there is no codec offset).
+- **Word indexing** (what storyboard anchors `{"w": i}` point at): the spoken lines of the cued script, split on whitespace, punctuation attached, 0-based: **178 tokens, w0 "Governments" to w177 "fix."**. `words[i].w` is the cued text exactly, including the CAPS (`PURPOSE,` `ALREADY` `STILL` `HALF`), the ellipsis `PHP…` (w31), and the spelled numbers `seven` (w38), `ten` (w41), `fourteen` (w53) and `forty-five` (w105). `heads-up,` (w71) and `forty-five` are one token each. That is why the count is 178 here and 180 when counting hyphen halves. Under `scripts/anchor/anchorlib.py`'s comparison key, every index matches the plain script in `final_script.md` §1 and the estimate `timing_est_v3.json`.
+- `words[i].s` is the audible onset: for stops, the release burst; for s/sh, the start of the hiss; after silence, where energy rises. `words[i].e` is where energy falls below -48 dBFS before a gap (the silence floor of this take is about -86 dBFS); otherwise it is the next word's `s`.
+- `pauses` lists every gap of 120 ms or more. `kind` is `sentence`, `comma`, `ellipsis` or `phrase` (unpunctuated).
+- `captions` is a **default fallback** only, because the storyboard owns caption chunking. It has at most 2 lines of 26 characters or fewer, one highlight per page timed at its word's start, line 2 appearing at its first word, and every page on screen for at least 0.8 s. `e` is the next page's `s`, and the last page runs to `duration`.
+- `stress` (0 to 1) is a percentile rank of acoustic prominence (loudness, pitch, duration per syllable), with function words damped and numbers boosted. `hits` holds every word with stress of 0.9 or more, plus every number word.
 
 ## Global
 
 | Key | Value | Note |
 |---|---|---|
-| `voStart` | 0.035 | First audible energy: the voiced lead-in of "G". The /g/ burst is at 0.125. |
-| first word | 0.125 | "Government" |
-| `voEnd` | 77.560 | End of "out." |
-| lead-in | 0.000 to 0.035 | None to speak of: frame 1 must already be the hook. |
-| tail | 77.560 to 77.760 (0.200 s) | Short: start the loop-back motion under the last phrase. |
-| words / sentences / pauses / captions | 230 / 18 / 30 / 38 | |
+| `duration` | 55.36 | WAV length (= `decodedDuration`) |
+| `voStart` | 0.060 | First audible energy: the voiced lead-in of "G" |
+| first word | 0.190 | "Governments" /g/ burst |
+| `voEnd` | 55.235 | End of "fix." |
+| tail | 55.235 to 55.360 (0.125 s) | Very short: start the loop-back under the last phrase |
+| words / sentences / pauses / captions | 178 / 9 / 16 / 30 | |
 
 ## Sentences
 
 | # | Start | End | Dur | @30 | Words | Text |
 |---|---|---|---|---|---|---|
-| 1 | 0.125 | 3.415 | 3.29 | 4 | 0-8 | Government websites in four countries just switched themselves off. |
-| 2 | 3.695 | 4.525 | 0.83 | 111 | 9-11 | Nobody hacked them. |
-| 3 | 4.950 | 11.260 | 6.31 | 148 | 12-31 | They were fixing a security bug in PHP, the programming language behind WordPress and about 7 out of 10 websites. |
-| 4 | 11.700 | 13.800 | 2.10 | 351 | 32-39 | Fixing a bug like that takes two steps. |
-| 5 | 14.055 | 15.025 | 0.97 | 422 | 40-43 | First, you find it. |
-| 6 | 15.355 | 16.865 | 1.51 | 461 | 44-48 | Then, you fix it everywhere. |
-| 7 | 17.380 | 19.970 | 2.59 | 521 | 49-57 | You'd think finding it is the hard part, right? |
-| 8 | 20.535 | 23.135 | 2.60 | 616 | 58-63 | And for 14 years, nobody did. |
-| 9 | 23.905 | 32.520 | 8.62 | 717 | 64-92 | Then, in August, two security teams using AI tools found it and quietly told the people who make PHP so a fix could be ready before anyone else knew. |
-| 10 | 33.080 | 38.210 | 5.13 | 992 | 93-106 | Except, the details of the bug leaked online hours before the fix came out. |
-| 11 | 38.850 | 47.070 | 8.22 | 1166 | 107-131 | Cloudflare, which protects a big chunk of the web, says it saw tens of thousands of break-in attempts in 45 minutes, and millions by evening. |
-| 12 | 47.635 | 49.255 | 1.62 | 1429 | 132-138 | Nobody knows yet how many got in. |
-| 13 | 49.815 | 52.135 | 2.32 | 1494 | 139-146 | So now comes step two, the slow one. |
-| 14 | 52.655 | 59.515 | 6.86 | 1580 | 147-170 | Someone has to install that fix on every site, and there are about 22 million copies of PHP out there that could be hit. |
-| 15 | 60.075 | 64.510 | 4.44 | 1802 | 171-188 | If a site can't update fast enough, the safest thing is to switch it off until it can. |
-| 16 | 65.065 | 66.405 | 1.34 | 1952 | 189-194 | That's what those government sites did. |
-| 17 | 67.000 | 73.110 | 6.11 | 2010 | 195-216 | And one in three sites on PHP runs a version so old that the people who make PHP don't fix it anymore. |
-| 18 | 73.515 | 77.560 | 4.05 | 2205 | 217-229 | For those, it's switch off or hope the hosting company sorts it out. |
+| 1 | 0.190 | 8.180 | 7.99 | 6 | w0-w28 | Governments all over Europe just shut down a bunch of their own websites on PURPOSE, because of this bug where hackers could take over a site without a password. |
+| 2 | 8.605 | 13.945 | 5.34 | 258 | w29-w45 | It's in PHP… the language everyone loves, and about seven out of ten websites run on it. |
+| 3 | 14.395 | 19.565 | 5.17 | 432 | w46-w64 | This bug was in there for like fourteen years before researchers using AI figured out how bad it was. |
+| 4 | 19.980 | 26.325 | 6.34 | 599 | w65-w88 | They gave the PHP people a heads-up, but word got out before the fix was ready, and hackers were ALREADY trying to use it. |
+| 5 | 26.790 | 34.250 | 7.46 | 804 | w89-w111 | Cloudflare says that once it was announced, they saw tens of thousands of hacking attempts in forty-five minutes, and millions within a day. |
+| 6 | 34.715 | 39.350 | 4.63 | 1041 | w112-w127 | But even with the fix out, somebody STILL has to install it on every single server. |
+| 7 | 39.705 | 45.385 | 5.68 | 1191 | w128-w143 | Plus something like HALF of PHP sites run versions so old they're not officially supported anymore. |
+| 8 | 45.850 | 51.895 | 6.05 | 1376 | w144-w164 | Even the FBI said if you can't update yet, just turn it off, which is basically tech support's answer to everything. |
+| 9 | 52.430 | 55.235 | 2.80 | 1573 | w165-w177 | And some of those governments did it before there was even a fix. |
 
 ## Pauses (>= 120 ms)
 
-Pauses of 300 ms or more are in **bold**. These are the natural places for scene changes, flips and un-builds.
+Pauses of 300 ms or more are in **bold**.
 
 | # | Start | End | Dur (ms) | @30 | After | Before | Kind |
 |---|---|---|---|---|---|---|---|
-| 1 | 3.415 | 3.695 | 280 | 102-111 | off. | Nobody | sentence |
-| 2 | 4.525 | 4.950 | **425** | 136-148 | them. | They | sentence |
-| 3 | 7.110 | 7.375 | 265 | 213-221 | PHP, | the | comma |
-| 4 | 11.260 | 11.700 | **440** | 338-351 | websites. | Fixing | sentence |
-| 5 | 13.800 | 14.055 | 255 | 414-422 | steps. | First, | sentence |
-| 6 | 15.025 | 15.355 | **330** | 451-461 | it. | Then, | sentence |
-| 7 | 16.865 | 17.380 | **515** | 506-521 | everywhere. | You'd | sentence |
-| 8 | 19.285 | 19.635 | **350** | 579-589 | part, | right? | comma |
-| 9 | 19.970 | 20.535 | **565** | 599-616 | right? | And | sentence |
-| 10 | 21.990 | 22.245 | 255 | 660-667 | years, | nobody | comma |
-| 11 | 23.135 | 23.905 | **770** | 694-717 | did. | Then, | sentence |
-| 12 | 24.915 | 25.075 | 160 | 747-752 | August, | two | comma |
-| 13 | 27.545 | 27.715 | 170 | 826-831 | it | and | phrase |
-| 14 | 30.065 | 30.340 | 275 | 902-910 | PHP | so | phrase |
-| 15 | 32.520 | 33.080 | **560** | 976-992 | knew. | Except, | sentence |
-| 16 | 33.870 | 34.120 | 250 | 1016-1024 | Except, | the | comma |
-| 17 | 36.290 | 36.655 | **365** | 1089-1100 | online | hours | phrase |
-| 18 | 38.210 | 38.850 | **640** | 1146-1166 | out. | Cloudflare, | sentence |
-| 19 | 45.510 | 45.765 | 255 | 1365-1373 | minutes, | and | comma |
-| 20 | 47.070 | 47.635 | **565** | 1412-1429 | evening. | Nobody | sentence |
-| 21 | 49.255 | 49.815 | **560** | 1478-1494 | in. | So | sentence |
-| 22 | 51.205 | 51.560 | **355** | 1536-1547 | two, | the | comma |
-| 23 | 52.135 | 52.655 | **520** | 1564-1580 | one. | Someone | sentence |
-| 24 | 55.295 | 55.580 | 285 | 1659-1667 | site, | and | comma |
-| 25 | 59.515 | 60.075 | **560** | 1785-1802 | hit. | If | sentence |
-| 26 | 61.895 | 62.095 | 200 | 1857-1863 | enough, | the | comma |
-| 27 | 64.510 | 65.065 | **555** | 1935-1952 | can. | That's | sentence |
-| 28 | 66.405 | 67.000 | **595** | 1992-2010 | did. | And | sentence |
-| 29 | 73.110 | 73.515 | **405** | 2193-2205 | anymore. | For | sentence |
-| 30 | 75.335 | 75.585 | 250 | 2260-2268 | off | or | phrase |
+| 1 | 8.180 | 8.605 | **425** | 245-258 | w28 password. | It's | sentence |
+| 2 | 9.815 | 10.135 | **320** | 294-304 | w31 PHP… | the | ellipsis |
+| 3 | 13.945 | 14.395 | **450** | 418-432 | w45 it. | This | sentence |
+| 4 | 19.565 | 19.980 | **415** | 587-599 | w64 was. | They | sentence |
+| 5 | 21.920 | 22.050 | 130 | 658-662 | w71 heads-up, | but | comma |
+| 6 | 26.325 | 26.790 | **465** | 790-804 | w88 it. | Cloudflare | sentence |
+| 7 | 28.640 | 28.860 | 220 | 859-866 | w95 announced, | they | comma |
+| 8 | 32.545 | 32.765 | 220 | 976-983 | w106 minutes, | and | comma |
+| 9 | 34.250 | 34.715 | **465** | 1028-1041 | w111 day. | But | sentence |
+| 10 | 35.985 | 36.180 | 195 | 1080-1085 | w117 out, | somebody | comma |
+| 11 | 39.350 | 39.705 | **355** | 1180-1191 | w127 server. | Plus | sentence |
+| 12 | 45.385 | 45.850 | **465** | 1362-1376 | w143 anymore. | Even | sentence |
+| 13 | 48.145 | 48.365 | 220 | 1444-1451 | w152 yet, | just | comma |
+| 14 | 49.400 | 49.630 | 230 | 1482-1489 | w156 off, | which | comma |
+| 15 | 49.870 | 49.990 | 120 | 1496-1500 | w158 is | basically | phrase |
+| 16 | 51.895 | 52.430 | **535** | 1557-1573 | w164 everything. | And | sentence |
 
-There is also a lead-in of 0.000 to 0.035 and a tail of 77.560 to 77.760. Every sentence break is a pause of at least 120 ms.
+## Default caption pages (fallback; the storyboard owns chunking)
 
-## Caption beats
-
-Grammar: at most 2 centered lines, each of 24 characters or fewer. Each caption is a natural phrase and replaces the previous one at a phrase boundary. Line 2 appears when its first word is spoken. A caption has at most one highlight, which starts when its word starts. Every caption is on screen for at least 0.8 s. The text keeps the transcript's punctuation, and the renderer may drop trailing commas and periods. Pages, lines and highlight words are identical to v1; only the times changed.
-
-| # | In | Out | Dur | Line 1 | Line 2 (in) | Highlight (in) | v1 in |
+| # | In | Out | Dur | Line 1 | Line 2 (in) | Highlight (in) | Words |
 |---|---|---|---|---|---|---|---|
-| 1 | 0.125 | 2.025 | 1.90 | Government websites | in four countries (1.075) | **four** (1.245) | 0.160 |
-| 2 | 2.025 | 3.695 | 1.67 | just switched | themselves off. (2.685) | **themselves** (2.685) | 2.155 |
-| 3 | 3.695 | 4.950 | 1.26 | Nobody hacked them. |  | **Nobody** (3.695) | 3.741 |
-| 4 | 4.950 | 7.375 | 2.42 | They were fixing | a security bug in PHP, (5.435) | **PHP** (6.405) | 4.834 |
-| 5 | 7.375 | 9.275 | 1.90 | the programming language | behind WordPress (8.330) | **WordPress** (8.575) | 7.065 |
-| 6 | 9.275 | 11.700 | 2.42 | and about 7 out of 10 | websites. (10.595) | **7** (9.535) | 8.895 |
-| 7 | 11.700 | 14.055 | 2.36 | Fixing a bug like that | takes two steps. (12.785) | **two** (13.095) | 10.880 |
-| 8 | 14.055 | 15.355 | 1.30 | First, you find it. |  | **find** (14.645) | 13.100 |
-| 9 | 15.355 | 17.380 | 2.02 | Then, you fix it | everywhere. (16.305) | **everywhere** (16.305) | 14.228 |
-| 10 | 17.380 | 20.535 | 3.16 | You'd think finding it | is the hard part, right? (18.455) | **hard** (18.765) | 15.769 |
-| 11 | 20.535 | 23.905 | 3.37 | And for 14 years, | nobody did. (22.245) | **14** (20.800) | 18.558 |
-| 12 | 23.905 | 26.105 | 2.20 | Then, in August, | two security teams (25.075) | **August** (24.405) | 21.606 |
-| 13 | 26.105 | 27.715 | 1.61 | using AI tools | found it (27.175) | **AI** (26.375) | 23.885 |
-| 14 | 27.715 | 30.340 | 2.62 | and quietly told | the people who make PHP (28.685) | **quietly** (27.970) | 25.527 |
-| 15 | 30.340 | 33.080 | 2.74 | so a fix could be ready | before anyone else knew. (31.435) | **before** (31.435) | 27.902 |
-| 16 | 33.080 | 36.655 | 3.58 | Except, the details | of the bug leaked online (34.685) | **leaked** (35.150) | 30.615 |
-| 17 | 36.655 | 38.850 | 2.20 | hours before | the fix came out. (37.345) | **hours** (36.655) | 33.838 |
-| 18 | 38.850 | 40.165 | 1.31 | Cloudflare, | which protects (39.585) | **Cloudflare** (38.850) | 35.604 |
-| 19 | 40.165 | 41.540 | 1.38 | a big chunk of the web, |  | **big** (40.355) | 36.905 |
-| 20 | 41.540 | 43.285 | 1.74 | says it saw | tens of thousands (42.190) | **thousands** (42.825) | 38.208 |
-| 21 | 43.285 | 44.250 | 0.97 | of break-in attempts |  | **break-in** (43.370) | 39.895 |
-| 22 | 44.250 | 45.765 | 1.52 | in 45 minutes, |  | **45** (44.485) | 40.895 |
-| 23 | 45.765 | 47.635 | 1.87 | and millions by evening. |  | **millions** (45.925) | 42.304 |
-| 24 | 47.635 | 49.815 | 2.18 | Nobody knows yet | how many got in. (48.435) | **Nobody** (47.635) | 43.785 |
-| 25 | 49.815 | 52.655 | 2.84 | So now comes step two, | the slow one. (51.560) | **two** (50.880) | 45.452 |
-| 26 | 52.655 | 55.580 | 2.92 | Someone has to install | that fix on every site, (53.725) | **every** (54.550) | 47.786 |
-| 27 | 55.580 | 58.435 | 2.86 | and there are about | 22 million copies of PHP (56.145) | **22** (56.145) | 50.540 |
-| 28 | 58.435 | 60.075 | 1.64 | out there | that could be hit. (58.765) | **hit** (59.275) | 53.375 |
-| 29 | 60.075 | 62.095 | 2.02 | If a site can't update | fast enough, (61.255) | **can't** (60.560) | 54.556 |
-| 30 | 62.095 | 63.825 | 1.73 | the safest thing | is to switch it off (62.815) | **switch** (63.080) | 56.472 |
-| 31 | 63.825 | 65.065 | 1.24 | until it can. |  |  | 58.215 |
-| 32 | 65.065 | 67.000 | 1.94 | That's what those | government sites did. (65.560) | **government** (65.560) | 59.051 |
-| 33 | 67.000 | 68.905 | 1.91 | And one in three | sites on PHP (67.775) | **one** (67.095) | 60.552 |
-| 34 | 68.905 | 70.395 | 1.49 | runs a version so old |  | **old** (69.995) | 62.425 |
-| 35 | 70.395 | 72.140 | 1.75 | that the people | who make PHP (71.035) |  | 63.855 |
-| 36 | 72.140 | 73.515 | 1.38 | don't fix it anymore. |  | **don't** (72.140) | 65.556 |
-| 37 | 73.515 | 75.585 | 2.07 | For those, | it's switch off (74.335) | **switch** (74.530) | 66.665 |
-| 38 | 75.585 | 77.760 | 2.18 | or hope the hosting | company sorts it out. (76.655) | **hope** (75.865) | 68.644 |
+| 1 | 0.190 | 2.205 | 2.02 | Governments all over | Europe just shut down (1.155) | **Europe** (1.155) | w0-w6 |
+| 2 | 2.205 | 4.715 | 2.51 | a bunch of their own | websites on PURPOSE, (3.085) | **PURPOSE** (3.955) | w7-w14 |
+| 3 | 4.715 | 5.695 | 0.98 | because of this bug |  | **bug** (5.305) | w15-w18 |
+| 4 | 5.695 | 7.275 | 1.58 | where hackers could | take over a site (6.420) | **hackers** (5.875) | w19-w25 |
+| 5 | 7.275 | 8.605 | 1.33 | without a password. |  | **password** (7.670) | w26-w28 |
+| 6 | 8.605 | 10.135 | 1.53 | It's in PHP… |  | **PHP** (8.960) | w29-w31 |
+| 7 | 10.135 | 11.605 | 1.47 | the language | everyone loves, (10.640) | **loves** (11.105) | w32-w35 |
+| 8 | 11.605 | 14.395 | 2.79 | and about seven out of ten | websites run on it. (12.905) | **seven** (11.955) | w36-w45 |
+| 9 | 14.395 | 16.610 | 2.21 | This bug was in there | for like fourteen years (15.195) | **fourteen** (15.490) | w46-w54 |
+| 10 | 16.610 | 18.705 | 2.09 | before researchers | using AI figured out (17.435) | **AI** (17.705) | w55-w60 |
+| 11 | 18.705 | 19.980 | 1.28 | how bad it was. |  | **bad** (18.870) | w61-w64 |
+| 12 | 19.980 | 22.050 | 2.07 | They gave the PHP people | a heads-up, (21.165) | **heads-up** (21.285) | w65-w71 |
+| 13 | 22.050 | 24.095 | 2.04 | but word got out | before the fix was ready, (22.875) | **out** (22.665) | w72-w80 |
+| 14 | 24.095 | 26.790 | 2.70 | and hackers were ALREADY | trying to use it. (25.545) | **ALREADY** (24.920) | w81-w88 |
+| 15 | 26.790 | 28.860 | 2.07 | Cloudflare says that | once it was announced, (27.765) | **Cloudflare** (26.790) | w89-w95 |
+| 16 | 28.860 | 31.235 | 2.38 | they saw tens of thousands | of hacking attempts (30.295) | **thousands** (29.825) | w96-w103 |
+| 17 | 31.235 | 32.765 | 1.53 | in forty-five minutes, |  | **forty-five** (31.475) | w104-w106 |
+| 18 | 32.765 | 34.715 | 1.95 | and millions within a day. |  | **millions** (32.935) | w107-w111 |
+| 19 | 34.715 | 36.180 | 1.46 | But even with | the fix out, (35.305) | **fix** (35.445) | w112-w117 |
+| 20 | 36.180 | 38.005 | 1.83 | somebody STILL | has to install it (36.965) | **STILL** (36.705) | w118-w123 |
+| 21 | 38.005 | 39.705 | 1.70 | on every single server. |  | **every** (38.210) | w124-w127 |
+| 22 | 39.705 | 42.295 | 2.59 | Plus something like HALF | of PHP sites (41.145) | **HALF** (40.755) | w128-w134 |
+| 23 | 42.295 | 43.605 | 1.31 | run versions so old |  | **old** (43.205) | w135-w138 |
+| 24 | 43.605 | 45.850 | 2.25 | they're not officially | supported anymore. (44.390) | **not** (43.855) | w139-w143 |
+| 25 | 45.850 | 48.365 | 2.52 | Even the FBI said | if you can't update yet, (47.095) | **FBI** (46.195) | w144-w152 |
+| 26 | 48.365 | 49.630 | 1.27 | just turn it off, |  | **off** (49.065) | w153-w156 |
+| 27 | 49.630 | 51.345 | 1.71 | which is basically | tech support's answer (50.235) | **tech** (50.235) | w157-w162 |
+| 28 | 51.345 | 52.430 | 1.09 | to everything. |  | **everything** (51.705) | w163-w164 |
+| 29 | 52.430 | 53.760 | 1.33 | And some of those | governments did it (53.015) | **governments** (53.015) | w165-w171 |
+| 30 | 53.760 | 55.360 | 1.60 | before there was | even a fix. (54.395) | **before** (53.760) | w172-w177 |
 
-## Hit moments (sync visual punches here)
+## Hit moments
 
-### Numbers and stats
+### Numbers, stats and cued words
 
-| Time | @30 | Word | Stress | Note |
+| Time | @30 | w | Word | Stress | Note |
+|---|---|---|---|---|---|
+| 3.955 | 119 | w14 | PURPOSE, | 0.94 | cued CAPS: the hook ("on PURPOSE") |
+| 8.960 | 269 | w31 | PHP… | 0.72 | cued ellipsis: the bait. 320 ms pause after it |
+| 11.955 | 359 | w38 | seven | 0.85 | seven (out of ten) |
+| 12.650 | 380 | w41 | ten | 0.58 | ten |
+| 15.490 | 465 | w53 | fourteen | 0.90 | fourteen (years) |
+| 17.705 | 531 | w58 | AI | 0.83 | AI |
+| 24.920 | 748 | w84 | ALREADY | 0.94 | cued CAPS |
+| 29.235 | 877 | w98 | tens | 0.76 | tens (of thousands) |
+| 29.825 | 895 | w100 | thousands | 0.78 | thousands |
+| 31.475 | 944 | w105 | forty-five | 0.89 | forty-five (minutes) |
+| 32.935 | 988 | w108 | millions | 1.00 | millions: the loudest word in the VO |
+| 36.705 | 1101 | w119 | STILL | 0.97 | cued CAPS |
+| 40.755 | 1223 | w131 | HALF | 0.77 | cued CAPS: HALF (of PHP sites) |
+| 46.195 | 1386 | w146 | FBI | 0.88 | FBI: the joke setup |
+
+### Strongest emphasis (acoustic stress of 0.9 or more)
+
+| Time | @30 | w | Word | Stress |
 |---|---|---|---|---|
-| 1.245 | 37 | four | 0.94 | four (countries) |
-| 9.535 | 286 | 7 | 0.90 | 7 (out of 10) |
-| 10.290 | 309 | 10 | 0.58 | 10 (websites) |
-| 13.095 | 393 | two | 0.44 | two (steps) |
-| 20.800 | 624 | 14 | 1.00 | 14 (years) |
-| 21.400 | 642 | years, | 0.98 | years: held for about 0.6 s, then a 255 ms pause |
-| 25.075 | 752 | two | 0.65 | two (security teams) |
-| 42.190 | 1266 | tens | 0.83 | tens (of thousands) |
-| 42.825 | 1285 | thousands | 0.81 | thousands |
-| 44.485 | 1335 | 45 | 0.84 | 45 (minutes). The /f/ is soft and the vowel lands about 40 ms later. |
-| 45.925 | 1378 | millions | 0.98 | millions |
-| 50.880 | 1526 | two, | 0.78 | (step) two |
-| 56.145 | 1684 | 22 | 0.67 | 22 (million) |
-| 56.775 | 1703 | million | 0.80 | million |
-| 67.095 | 2013 | one | 0.72 | one (in three) |
-| 67.525 | 2026 | three | 0.48 | three |
-
-### Strongest emphasis (acoustic stress of 0.9 or more, numbers excluded)
-
-| Time | @30 | Word | Stress | Sentence |
-|---|---|---|---|---|
-| 0.125 | 4 | Government | 0.94 | 1 |
-| 3.695 | 111 | Nobody | 0.93 | 2 |
-| 8.575 | 257 | WordPress | 0.91 | 3 |
-| 14.055 | 422 | First, | 0.99 | 5 |
-| 18.765 | 563 | hard | 0.93 | 7 |
-| 24.405 | 732 | August, | 0.97 | 9 |
-| 27.175 | 815 | found | 0.91 | 9 |
-| 27.970 | 839 | quietly | 0.97 | 9 |
-| 28.460 | 854 | told | 0.93 | 9 |
-| 30.545 | 916 | fix | 1.00 | 9 |
-| 33.080 | 992 | Except, | 0.96 | 10 |
-| 36.655 | 1100 | hours | 0.96 | 10 |
-| 38.850 | 1166 | Cloudflare, | 0.99 | 11 |
-| 50.545 | 1516 | step | 0.90 | 13 |
-| 51.610 | 1548 | slow | 0.95 | 13 |
-| 60.205 | 1806 | site | 0.95 | 15 |
-| 62.145 | 1864 | safest | 0.92 | 15 |
-| 65.560 | 1967 | government | 0.90 | 16 |
-| 69.995 | 2100 | old | 0.92 | 17 |
-| 74.530 | 2236 | switch | 0.97 | 18 |
-
-### Top 12 punches (curated: meaning × prominence; same beats as v1)
-
-1. **2.685** (frame 81): "themselves (off)": the hook payoff
-1. **3.695** (frame 111): "Nobody (hacked them)": first twist
-1. **9.535** (frame 286): "7 out of 10": scale reveal
-1. **20.800** (frame 624): "14 years": slow-burn number, then a 255 ms pause after "years,"
-1. **26.375** (frame 791): "AI (tools)": the discovery beat
-1. **35.150** (frame 1054): "leaked": the turn (560 ms pause before "Except,")
-1. **38.850** (frame 1166): "Cloudflare": new act, after a 640 ms pause
-1. **42.190** (frame 1266): "tens of thousands": attack-counter start
-1. **44.485** (frame 1335): "45 minutes": counter / clock hit
-1. **45.925** (frame 1378): "millions": counter peak
-1. **56.145** (frame 1684): "22 million (copies)": scale beat
-1. **67.095** (frame 2013): "one in three": final stat
+| 3.955 | 119 | w14 | PURPOSE, | 0.94 |
+| 5.305 | 159 | w18 | bug | 0.96 |
+| 10.640 | 319 | w34 | everyone | 0.92 |
+| 11.105 | 333 | w35 | loves, | 0.90 |
+| 15.490 | 465 | w53 | fourteen | 0.90 |
+| 16.225 | 487 | w54 | years | 0.97 |
+| 20.085 | 603 | w66 | gave | 0.95 |
+| 22.155 | 665 | w73 | word | 0.92 |
+| 23.205 | 696 | w78 | fix | 0.98 |
+| 24.920 | 748 | w84 | ALREADY | 0.94 |
+| 26.790 | 804 | w89 | Cloudflare | 0.95 |
+| 27.290 | 819 | w90 | says | 0.91 |
+| 32.935 | 988 | w108 | millions | 1.00 |
+| 35.445 | 1063 | w116 | fix | 0.93 |
+| 36.705 | 1101 | w119 | STILL | 0.97 |
+| 39.705 | 1191 | w128 | Plus | 0.99 |
+| 43.205 | 1296 | w138 | old | 0.99 |
+| 50.235 | 1507 | w160 | tech | 0.93 |
+| 53.015 | 1590 | w169 | governments | 0.98 |
 
 ### Structural beats
 
-- Longest pauses (best spots for flips, un-builds and scene changes): after "right?" 19.970 to 20.535 (**565 ms**); after "did." 23.135 to 23.905 (**770 ms**); after "knew." 32.520 to 33.080 (**560 ms**); after "out." 38.210 to 38.850 (**640 ms**); after "evening." 47.070 to 47.635 (**565 ms**); after "did." 66.405 to 67.000 (**595 ms**).
-- Hook: the VO starts at 0.035. "off." ends at 3.415, then a 280 ms pause before "Nobody" (3.695).
-- Two-step setup: "First," 14.055 / "Then," 15.355. "right?" (19.635) sits alone between pauses of 350 and 565 ms.
-- Act change: "knew." ends 32.520, then 560 ms, then "Except," 33.080, then 250 ms before "the details" (34.120).
-- Ending: "switch off" 74.530 to 75.335, then a 250 ms pause, then "or hope..." 75.585 to 77.560. The tail is 0.200 s.
+- Sentence breaks, the natural cut points: after w28 "password." 8.180 to 8.605 (425 ms); after w45 "it." 13.945 to 14.395 (450 ms); after w64 "was." 19.565 to 19.980 (415 ms); after w88 "it." 26.325 to 26.790 (465 ms); after w111 "day." 34.250 to 34.715 (465 ms); after w127 "server." 39.350 to 39.705 (355 ms); after w143 "anymore." 45.385 to 45.850 (465 ms); after w164 "everything." 51.895 to 52.430 (535 ms).
+- Inside sentences, the only long beat is the ellipsis "PHP…" (9.815 to 10.135). The joke lands at "which is basically tech support's answer to everything." (49.630 to 51.895), right after a 230 ms comma breath.
+- Ending: "before there was even a fix." runs 53.760 to 55.235. The tail is 0.125 s.
 
-## Using the v1 → v2 time-warp
+## Method and audio-vs-script notes
 
-`assets/timewarp_v1_to_v2.json` holds 462 anchor pairs `[v1_time, v2_time]`: every word start and end in both takes, plus the file start and the file ends (70.687 → 77.76). `labels` names each anchor. `scripts/timewarp.py` interpolates linearly between anchors, so a v1 time inside a pause lands proportionally inside the matching v2 pause.
+- **Alignment.** Parakeet TDT tokens were aligned to the script at character level, with digits spelled out. The match ratio was 1.0: the audio says exactly the 178 script tokens. Each start is the median of 8 runs at 10 ms sub-frame offsets. Starts were then snapped to the audio, as for v1 and v2: onsets after silence, hiss onsets for s/sh words, release bursts for stop-initial words. The doubtful spots were checked on spectrograms and by truncating the clip and re-running the ASR. 6 starts were set by hand.
+- **Glued ASR tokens, split at audio boundaries:** about | seven at 11.955 (/s/ hiss right after the /t/ closure); of | ten at 12.650 (/t/ burst); like | fourteen at 15.490 (/f/ onset after the /k/ release, confirmed by truncation); in | forty-five at 31.475 (soft /f/; the vowel lands at about 31.52); run | versions at 42.495. "heads up" (two ASR words) is the one script token `heads-up,`.
+- **Raw ASR starts that were off by 80 ms or more:** w29 "It's" 8.48→8.605, w32 "the" 10.00→10.135, w47 "bug" 14.48→14.600, w53 "fourteen" 15.60→15.490, w65 "They" 19.84→19.980, w66 "gave" 20.00→20.085, w89 "Cloudflare" 26.64→26.790, w90 "says" 27.44→27.290, w113 "even" 34.88→34.980, w127 "server." 38.96→38.865, w142 "supported" 44.48→44.390, w163 "to" 51.44→51.345, w165 "And" 52.32→52.430, w172 "before" 53.84→53.760. As in the earlier takes, the raw ASR tends to mark s/sh words mid-hiss and to put some words inside the preceding silence.
+- **Cross-check with Whisper small.en:** the wording matches the script. Whisper writes digits (14, 45), drops the ellipsis and CAPS, and writes "fixout" and "heads up". There are no word-level disagreements.
+- **Audio vs script.** No word differs. The cued ellipsis after "PHP…" is a real 320 ms pause. The comma after "announced," is a short breath (220 ms), as the script notes asked. "basically" follows a tiny unpunctuated 120 ms gap after "is". "and" (w81, before "hackers were ALREADY") is almost swallowed, at about -48 dBFS.
+- **Validation.** All checks passed: the tokens equal the script exactly, CAPS and "…" included; times are monotonic; the pause list is complete; the sentences tile the words; the captions cover every word once and in order; there are at most 2 lines of 26 characters or fewer; every line and highlight `s` equals its word's start; there is one highlight per page, and each one is found by the engine's first-substring match; every page is at least 0.8 s long. Indices were also checked against `scripts/anchor/anchorlib.py` (`key()` match against `final_script.md` §1 and `timing_est_v3.json`: 178/178).
 
-```bash
-python3 scripts/timewarp.py --t 9.18 30.6 41.05                       # map single times
-python3 scripts/timewarp.py src/data/scenes_v1.json --dry-run         # show what would change
-python3 scripts/timewarp.py src/data/scenes_v1.json -o src/data/scenes.json
-python3 scripts/timewarp.py IN.json -o OUT.json --keys s,e,start --add-keys voStart   # choose keys
-python3 scripts/timewarp.py assets/timing_v1.json --compare assets/timing.json        # self-test
-```
-
-- By default the keys `s, e, t, t0, t1, start, end, at, time` are warped. `dur` is recomputed as end minus start in the same object. Every other value is left as is.
-- In 9 places v1 ran two words together but v2 has a gap between them. The map jumps there, and the value at that exact instant is the later side, the next word's start. This keeps starts and "until the next beat" ends exact. Pass `--end-keys e` for word-end style fields to take the earlier side.
-- Validation: warping `timing_v1.json` reproduces the v2 captions exactly (179 caption times, max error 0.000 s; tolerance 0.03 s). With `--end-keys e` it also reproduces all 460 word starts and ends exactly.
-
-## Method and audio-vs-transcript notes
-
-- **Word list.** The words are the BRIEF transcript, token for token. Parakeet's "seven" and "ten" are mapped back to "7" and "10", and the glued tokens "for14", "in45", "about22" and "aversion" are split at the bare word-boundary token. Each start is the median of 8 Parakeet runs at 10 ms sub-frame offsets.
-- **Split boundaries, taken from the audio:**
-  - about | 7 at **9.535**: the /s/ hiss starts right after the /t/ closure of "about". The ASR said 9.68, which is mid-hiss.
-  - of | 10 at **10.290**: /t/ burst after a 60 ms closure.
-  - for | 14 at **20.800**: the second /f/ frication after "for".
-  - in | 45 at **44.485**: the /f/ cannot be separated from the noisy "in". This is the ASR boundary, and the vowel onset is about 44.53.
-  - about | 22 at **56.145**: /t/ burst after the closure.
-  - a | version at **69.240**: /v/ onset. "a" is at 69.165.
-- **Refinement.** The same pipeline as v1: a 20 ms RMS envelope at a 5 ms hop, onset strength and 4 to 11 kHz band energy. Starts that fell inside silence move to the next onset; an onset after silence wins; s/sh/ch words snap to the hiss onset; stop-initial words snap to the burst; otherwise the ASR start is kept. Doubtful spots were checked on spectrograms and by truncating the clip and re-running the ASR, and 25 starts were set by hand.
-- **Raw ASR starts that were off by 100 ms or more:** "Government" 0.00→0.125, "switched" 2.24→2.135, "them." 4.48→4.330, "They" 4.80→4.950, "7" 9.68→9.535, "steps." 13.36→13.255, "years," 21.52→21.400, "did." 23.20→22.775, "so" 30.24→30.340, "knew." 32.40→32.265, "the" 33.92→34.120, "details" 34.16→34.295, "leaked" 35.28→35.150, "out." 38.16→37.975, "Cloudflare," 38.72→38.850, "Nobody" 47.52→47.635, "the" 51.44→51.560, "of" 57.60→57.715, "If" 59.92→60.075, "That's" 64.96→65.065, "did." 66.32→66.200, "And" 66.88→67.000, "so" 69.76→69.550, "switch" 74.64→74.530. The largest are "did." (the raw ASR said 23.20, but the /d/ burst is at 22.775, which truncation confirms), "so" (old) (the /s/ is drawn out from 69.55), and "years" (21.40, again late in the raw ASR as in v1).
-- **Cross-check with Whisper small.en** on v2: the wording matches the transcript with one exception. Whisper hears "says it *sought* tens of thousands" where the transcript and Parakeet have "saw". This is the usual "saw it" → "sought" ASR slip, not a change in the script. Whisper's other differences are only punctuation and casing ("Except the", "CloudFlare", "switch off, or"). Parakeet on v2 matches word for word, apart from writing out "seven" and "ten".
-- **Audio vs transcript.** No word differs. Pauses the transcript has no punctuation for: after "it" (170 ms), after "PHP" (275 ms), after "online" (365 ms), after "off" (250 ms). The ElevenLabs take has clean digital silence between phrases, at about -86 dBFS. "Government" starts with about 90 ms of voicing before the /g/ burst. "did." and "years," are drawn out, as in v1.
-- **Stress.** For each word: loudness (90th percentile dB), pitch (90th percentile f0) and duration per syllable, each normalised against the words within ±2.5 s and weighted 0.45 / 0.35 / 0.20. Function words ×0.45, numerals ×1.15, then a percentile rank.
-- **Validation.** All checks passed: the words equal the transcript; times are monotonic; the pause list is complete; the sentences tile the words; the captions cover every word exactly once and in order; there are at most 2 lines of 24 characters or fewer; every line and highlight `s` equals its word's start; there is at most one highlight per caption; every caption is at least 0.8 s long; captions are contiguous; and each highlight's first substring match lands on the intended word. The chunking also matches v1 page for page.
-
-<details><summary>Validation script (run: <code>python3 validate.py assets/timing.json docs/BRIEF.md</code>)</summary>
+<details><summary>Validation script (run: <code>python3 validate.py assets/timing.json docs/script/final_script_elevenlabs.txt 26</code>)</summary>
 
 ```python
-"""Validate assets/timing.json against docs/BRIEF.md transcript and the caption grammar."""
+"""Validate assets/timing.json against the script and the caption grammar.
+
+  python3 validate.py [timing.json] [script: final_script_elevenlabs.txt | BRIEF.md] [max line chars, default 26]
+"""
 import json, re, sys
 tj = sys.argv[1] if len(sys.argv) > 1 else '/home/user/Test-/video/assets/timing.json'
-brief = sys.argv[2] if len(sys.argv) > 2 else '/home/user/Test-/video/docs/BRIEF.md'
+script = sys.argv[2] if len(sys.argv) > 2 else '/home/user/Test-/video/docs/script/final_script_elevenlabs.txt'
+MAXLEN = int(sys.argv[3]) if len(sys.argv) > 3 else 26
 d = json.load(open(tj))
-tx = ' '.join(open(brief).read().split('## Transcript', 1)[1].split('\n## ', 1)[0].split())
+if script.endswith('.txt'):   # spoken lines of the cued script: drop [cue] lines
+    tx = ' '.join(' '.join(l.strip() for l in open(script, encoding='utf-8').read().splitlines()
+                           if l.strip() and not re.match(r'^\s*\[.*\]\s*$', l)).split())
+else:                         # BRIEF.md '## Transcript' section (v1/v2 takes)
+    tx = ' '.join(open(script).read().split('## Transcript', 1)[1].split('\n## ', 1)[0].split())
 norm = lambda s: re.sub(r"[^a-z0-9]", '', s.lower())
 errs = []
 def check(c, msg):
@@ -320,7 +228,7 @@ for k, c in enumerate(C):
     check(len(c['highlights']) <= 1, f"caption {k}: >1 highlight")
     cw = []
     for ln in c['lines']:
-        check(len(ln['text']) <= 24, f"caption {k}: line too long ({len(ln['text'])}) '{ln['text']}'")
+        check(len(ln['text']) <= MAXLEN, f"caption {k}: line too long ({len(ln['text'])} > {MAXLEN}) '{ln['text']}'")
         a, b = ln['words']
         check(ln['text'] == ' '.join(w['w'] for w in W[a:b + 1]), f"caption {k}: line text != words")
         check(ln['s'] == W[a]['s'], f"caption {k}: line s != word start")

@@ -27,6 +27,7 @@ import os
 import re
 import sys
 
+sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import anchorlib as A  # noqa: E402
 
@@ -215,7 +216,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('storyboard')
     src = ap.add_mutually_exclusive_group(required=True)
-    src.add_argument('--timing', help='timing JSON whose words[].w are the new script')
+    src.add_argument('--timing', help='timing JSON (or raw ASR word list) whose words[].w are the new script')
     src.add_argument('--script', help='script file (final_script.md plain section, or plain text / ElevenLabs paste)')
     src.add_argument('--words', help='the new script as a string')
     ap.add_argument('-o', '--out')
@@ -228,7 +229,7 @@ def main():
     if 'wordsRef' not in sb:
         sys.exit('the storyboard has no wordsRef: nothing to align against')
     if a.timing:
-        new = [w['w'] for w in A.load_json(a.timing)['words']]
+        new = [w['w'] for w in A.load_timing(a.timing)['words']]
     elif a.script:
         new = A.plain_script(a.script)
     else:

@@ -14,6 +14,7 @@ import sys
 import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.dont_write_bytecode = True
 sys.path.insert(0, HERE)
 import anchorlib as A  # noqa: E402
 import engine_emit as E  # noqa: E402

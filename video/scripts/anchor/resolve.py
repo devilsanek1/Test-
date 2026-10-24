@@ -35,6 +35,7 @@ import argparse
 import os
 import sys
 
+sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import anchorlib as A  # noqa: E402
 import engine_emit as E  # noqa: E402
@@ -265,6 +266,9 @@ def main():
     timing_path = a.timing or default_timing()
     log = Log(a.quiet)
 
+    if not os.path.exists(a.storyboard):
+        print(f'ERROR no storyboard at {A.rel(a.storyboard)} (pass the word-anchored storyboard as the first argument)')
+        sys.exit(1)
     sb = A.load_json(a.storyboard)
     timing = A.load_timing(timing_path)
     est = bool(timing.get('estimated'))

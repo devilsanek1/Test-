@@ -1,0 +1,129 @@
+{
+ "what": "structure of audio/music_cinematic.mid (render with audio/tools/bed_cinematic.py)",
+ "voice": "assets/vo_v3_final.wav",
+ "ppq": 960,
+ "base_bpm": 96.2162,
+ "beats_per_bar": [
+  4,
+  4,
+  4,
+  4,
+  4,
+  3,
+  4,
+  5,
+  3,
+  4,
+  3,
+  4,
+  6,
+  3,
+  4,
+  4,
+  4,
+  4,
+  4,
+  4,
+  5,
+  5
+ ],
+ "loop_end_beats": 89,
+ "base_loop_s": 55.5,
+ "sections_bars": {
+  "S1_hook": [
+   1,
+   6
+  ],
+  "S2_entrance": [
+   7,
+   8
+  ],
+  "S3_heads_up": [
+   9,
+   9
+  ],
+  "S4_leak": [
+   10,
+   11
+  ],
+  "S5_cloudflare": [
+   12,
+   13
+  ],
+  "S6_suspension": [
+   14,
+   14
+  ],
+  "S7_breath": [
+   15,
+   16
+  ],
+  "S8_rebuild": [
+   17,
+   21
+  ],
+  "S9_close": [
+   22,
+   22
+  ]
+ },
+ "level_arc_bar_beat_db": [
+  [
+   1,
+   0,
+   -4
+  ],
+  [
+   7,
+   0,
+   -3
+  ],
+  [
+   9,
+   0,
+   0
+  ],
+  [
+   10,
+   0,
+   -1.5
+  ],
+  [
+   12,
+   0,
+   1.0
+  ],
+  [
+   14,
+   0,
+   -0.5
+  ],
+  [
+   15,
+   0,
+   -2.5
+  ],
+  [
+   17,
+   0,
+   0
+  ],
+  [
+   21,
+   0,
+   -1.5
+  ],
+  [
+   22,
+   0,
+   -3
+  ],
+  [
+   "END",
+   0,
+   -4
+  ]
+ ],
+ "accent": "track 'accent': swell ends on the note, soft sub on it",
+ "provisional": "tempo map not final: bend with scripts/qa/beatsync.py --fit-tempo --write-midi"
+}
