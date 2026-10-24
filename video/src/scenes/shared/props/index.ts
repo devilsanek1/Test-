@@ -6,3 +6,5 @@ export * from './Lock';
 export * from './Bit';
 export * from './BrowserChrome';
 export * from './Elephant';
+export * from './Shutter';
+export * from './SunMorphs';

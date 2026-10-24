@@ -30,7 +30,7 @@ import {arc, blob, circle, crown, crownTicks, line, polyPath, rect, rectPath, sm
 import {rng} from '../../../lib/rng';
 import {mat, XG} from '../../../lib/xf';
 import {Bird, Person} from '../../../lib/kit';
-import {brickHints, cornice, glintAt, LayerWrap, LightsOut, noWrap, pavingJoints, SetPlace, SI} from './common';
+import {brickHints, cornice, LayerWrap, LightsOut, noWrap, pavingJoints, SetPlace, SI} from './common';
 import {BackSoonSlot, BollardSlot, ChromeSlot, LockSlot, PadlockSlot, PlaqueSlot, ShutterSlot} from './propSlots';
 import {FacadeDoor} from './SiteFacade';
 
@@ -307,20 +307,17 @@ const G = (() => {
 
 // ---------------------------------------------------------------- shared window hardware (chrome + shutter + lock + tag)
 
-type WinCtx = {id: GovId; ev: GovEvents; off: boolean; chrome: boolean; seed: string; windowSlot?: GovernmentPlazaProps['windowSlot']};
+type WinCtx = {id: GovId; ev: GovEvents; off: boolean; chrome: boolean; seed: string; windowSlot?: GovernmentPlazaProps['windowSlot']; k?: number};
 
-const WindowRig: React.FC<WinCtx> = ({id, ev, off, chrome, seed, windowSlot}) => {
-  const t = useTime();
+const WindowRig: React.FC<WinCtx> = ({id, ev, off, chrome, seed, windowSlot, k = 1}) => {
   const g = PLAZA.gov[id];
   const [x, y, w, h] = g.window;
-  const glint = ev.glintAt !== undefined && t >= ev.glintAt && t < ev.glintAt + 0.3;
   return (
     <>
-      {windowSlot ? windowSlot(id, g.window) : <ChromeSlot x={x} y={y} w={w} h={h} chrome={chrome} chromeAt={off ? undefined : ev.chromeAt} screenOnAt={off ? undefined : ev.screenOnAt} offAt={off ? -1e6 : ev.offAt} width={MID} seed={`${seed}/${id}/bw`} />}
-      <ShutterSlot x={x} y={y} w={w} h={h} slamAt={ev.shutterAt} down={off} width={MID} seed={`${seed}/${id}/sh`} />
+      {windowSlot ? windowSlot(id, g.window) : <ChromeSlot x={x} y={y} w={w} h={h} chrome={chrome} chromeAt={off ? undefined : ev.chromeAt} screenOnAt={off ? undefined : ev.screenOnAt} offAt={off ? -1e6 : ev.offAt} width={MID * k} seed={`${seed}/${id}/bw`} />}
+      <ShutterSlot x={x} y={y} w={w} h={h} slamAt={ev.shutterAt} down={off} width={MID * k} seed={`${seed}/${id}/sh`} />
       {off || ev.tagAt !== undefined ? <BackSoonSlot x={g.tag[0]} y={g.tag[1]} at={off ? undefined : ev.tagAt} tapAt={ev.tagTapAt} seed={`${seed}/${id}/tag`} /> : null}
-      {off || ev.padlockAt !== undefined ? <PadlockSlot x={g.padlock[0]} y={g.padlock[1]} at={off ? undefined : ev.padlockAt} seed={`${seed}/${id}/pl`} /> : null}
-      {glint ? <Ink d={glintAt(g.padlock[0] - 4, g.padlock[1] + 2, 12, `${seed}/${id}/gl`)} width={HAIR} taper={false} /> : null}
+      {off || ev.padlockAt !== undefined ? <PadlockSlot x={g.padlock[0]} y={g.padlock[1]} at={off ? undefined : ev.padlockAt} glintAt={ev.glintAt} seed={`${seed}/${id}/pl`} /> : null}
     </>
   );
 };
@@ -405,9 +402,9 @@ const Pennant: React.FC<{i: number; root: Pt; at?: number; up: boolean; waveAt?:
 
 // ---------------------------------------------------------------- the four buildings
 
-type BProps = {ev: GovEvents; off: boolean; chrome: boolean; detail: 'wide' | 'close'; seed: string; windowSlot?: GovernmentPlazaProps['windowSlot']};
+type BProps = {ev: GovEvents; off: boolean; chrome: boolean; detail: 'wide' | 'close'; seed: string; windowSlot?: GovernmentPlazaProps['windowSlot']; k: number};
 
-const GovA: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot}) => (
+const GovA: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k}) => (
   <>
     <LightsOut at={ev.offAt} on={off || undefined}>
       <Fill d={G.ped} color={palette.cream} seed={`${seed}/aped`} />
@@ -421,16 +418,16 @@ const GovA: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot}) => (
       {G.steps.map((q, i) => (
         <Fill key={i} rect={q} color={i % 2 ? palette.sand : palette.cream} offset={false} seed={`${seed}/ast${i}`} />
       ))}
-      <DoorRig id="govA" seed={seed} inkW={MID} />
+      <DoorRig id="govA" seed={seed} inkW={MID * k} />
     </LightsOut>
-    <Ink d={G.aInk} width={MID} seed={`${seed}/aink`} />
-    <Ink d={G.colInk + G.stepInk} width={MID * 0.85} taper={false} seed={`${seed}/acolink`} />
-    <Ink d={G.flutes} width={HAIR} taper={false} seed={`${seed}/aflute`} />
-    <WindowRig id="govA" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
+    <Ink d={G.aInk} width={MID * k} seed={`${seed}/aink`} />
+    <Ink d={G.colInk + G.stepInk} width={MID * 0.85 * k} taper={false} seed={`${seed}/acolink`} />
+    <Ink d={G.flutes} width={HAIR * k} taper={false} seed={`${seed}/aflute`} />
+    <WindowRig k={k} id="govA" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
   </>
 );
 
-const GovB: React.FC<BProps> = ({ev, off, chrome, detail, seed, windowSlot}) => {
+const GovB: React.FC<BProps> = ({ev, off, chrome, detail, seed, windowSlot, k}) => {
   const B = G.B;
   const close = detail === 'close';
   return (
@@ -447,15 +444,15 @@ const GovB: React.FC<BProps> = ({ev, off, chrome, detail, seed, windowSlot}) => 
         <Fill rect={[B.x0 - 22, B.base - 20, B.x1 - B.x0 + 44, 20]} color={palette.sand} offset={false} seed={`${seed}/bstep`} />
         <Fill d={polyPath([[326, 1066], [380, 1040], [434, 1066]])} color={palette.sand} offset={false} seed={`${seed}/bdped`} />
         {close ? <Fill d={drumSlits()} color={palette.tealDark} offset={false} seed={`${seed}/bslit`} /> : null}
-        <DoorRig id="govB" seed={seed} inkW={MID} />
+        <DoorRig id="govB" seed={seed} inkW={MID * k} />
       </LightsOut>
-      <Ink d={G.domeInk + G.lanternInk} width={MID} seed={`${seed}/bdomeink`} />
-      <Ink d={G.ribs} width={THIN} taper={false} color={palette.teal} seed={`${seed}/bribs`} />
-      <Ink d={G.bInk} width={MID} seed={`${seed}/bink`} />
-      <Ink d={G.drumThin + (close ? stoneCourses(B.x0 + 14, B.x1 - 14, B.top + 30, B.base - 30, `${seed}/bsc`) + brickHints(B.x0 + 20, 1020, 200, 160, `${seed}/bbh`, 4, 18) : '')} width={HAIR} taper={false} seed={`${seed}/bthin`} />
-      <WindowRig id="govB" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
+      <Ink d={G.domeInk + G.lanternInk} width={MID * k} seed={`${seed}/bdomeink`} />
+      <Ink d={G.ribs} width={THIN * k} taper={false} color={palette.teal} seed={`${seed}/bribs`} />
+      <Ink d={G.bInk} width={MID * k} seed={`${seed}/bink`} />
+      <Ink d={G.drumThin + (close ? stoneCourses(B.x0 + 14, B.x1 - 14, B.top + 30, B.base - 30, `${seed}/bsc`) + brickHints(B.x0 + 20, 1020, 200, 160, `${seed}/bbh`, 4, 18) : '')} width={HAIR * k} taper={false} seed={`${seed}/bthin`} />
+      <WindowRig k={k} id="govB" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
       {/* window sill (Pip / snail perch in S11) */}
-      <Ink d={line(262, 1013, 488, 1013, {seed: `${seed}/bsill`, over: [6, 6]}) + line(266, 1021, 484, 1021, {seed: `${seed}/bsill2`, over: [2, 2]})} width={MID} taper={false} />
+      <Ink d={line(262, 1013, 488, 1013, {seed: `${seed}/bsill`, over: [6, 6]}) + line(266, 1021, 484, 1021, {seed: `${seed}/bsill2`, over: [2, 2]})} width={MID * k} taper={false} />
     </>
   );
 };
@@ -480,7 +477,7 @@ const stoneCourses = (x0: number, x1: number, y0: number, y1: number, seed: stri
   return d;
 };
 
-const GovC: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot}) => {
+const GovC: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k}) => {
   const C = G.C;
   return (
     <>
@@ -493,15 +490,15 @@ const GovC: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot}) => {
       </LightsOut>
       {/* the clock face stays white when the building goes dark (white is never stepped) */}
       <Fill d={blob(PLAZA.clock.x, PLAZA.clock.y, PLAZA.clock.r, PLAZA.clock.r, {seed: `${seed}/clk`})} color={palette.white} seed={`${seed}/clkf`} />
-      <Ink d={circle(PLAZA.clock.x, PLAZA.clock.y, PLAZA.clock.r, {seed: `${seed}/clki`}) + `M865 650L865 632M865 650L878 656`} width={THIN} taper={false} />
-      <Ink d={G.cInk} width={MID} seed={`${seed}/cink`} />
-      <Ink d={brickHints(C.x0 + 10, C.corn + 20, C.x1 - C.x0 - 20, 30, `${seed}/cbh`, 3, 20) + brickHints(C.x0 + 8, 828, C.x1 - C.x0 - 16, 30, `${seed}/cbh2`, 2, 20)} width={THIN} taper={false} />
-      <WindowRig id="govC" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
+      <Ink d={circle(PLAZA.clock.x, PLAZA.clock.y, PLAZA.clock.r, {seed: `${seed}/clki`}) + `M865 650L865 632M865 650L878 656`} width={THIN * k} taper={false} />
+      <Ink d={G.cInk} width={MID * k} seed={`${seed}/cink`} />
+      <Ink d={brickHints(C.x0 + 10, C.corn + 20, C.x1 - C.x0 - 20, 30, `${seed}/cbh`, 3, 20) + brickHints(C.x0 + 8, 828, C.x1 - C.x0 - 16, 30, `${seed}/cbh2`, 2, 20)} width={THIN * k} taper={false} />
+      <WindowRig k={k} id="govC" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
     </>
   );
 };
 
-const GovD: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot}) => {
+const GovD: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k}) => {
   const D = G.D;
   return (
     <>
@@ -512,11 +509,11 @@ const GovD: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot}) => {
         <Fill rect={[D.x0, D.roof, D.x1 - D.x0 + 40, D.fascia]} color={palette.tealDark} offset={false} seed={`${seed}/dfasc`} />
         <Fill rect={[D.x0, 1170, D.x1 - D.x0 + 40, D.base - 1170]} color={palette.sage} offset={false} seed={`${seed}/dground`} />
         <Fill d={G.pilotis} color={palette.mintPale} offset={false} seed={`${seed}/dpil`} />
-        <DoorRig id="govD" seed={seed} inkW={MID} />
+        <DoorRig id="govD" seed={seed} inkW={MID * k} />
       </LightsOut>
-      <Ink d={G.dInk} width={MID} seed={`${seed}/dink`} />
-      <Ink d={G.gridInk} width={THIN} taper={false} seed={`${seed}/dgrid`} />
-      <WindowRig id="govD" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
+      <Ink d={G.dInk} width={MID * k} seed={`${seed}/dink`} />
+      <Ink d={G.gridInk} width={THIN * k} taper={false} seed={`${seed}/dgrid`} />
+      <WindowRig k={k} id="govD" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
     </>
   );
 };
@@ -541,7 +538,6 @@ const PaperOnly: React.FC<{children?: React.ReactNode}> = ({children}) => (useLo
 const Ground: React.FC<{seed: string}> = ({seed}) => (
   <>
     <Fill rect={[-160, 1196, 1400, 900]} color={palette.mintPale} offset={false} seed={`${seed}/plaza`} />
-    <Ink d={G.joints} width={THIN * 0.8} taper={false} seed={`${seed}/joints`} />
     <Ink d={G.kerbs} width={THIN} seed={`${seed}/kerbs`} />
   </>
 );
@@ -553,6 +549,7 @@ const LightLayer: React.FC<{seed: string}> = ({seed}) => (
     {/* the flat sun path: cream at a FIXED partial opacity (never animated) with dashed ink edges; light only exists in
         the coloured state, so the line-art frame shows just its edges */}
     <Fill d={G.pathFar} color={palette.mintPale} offset={false} mode="snap" seed={`${seed}/pathFar`} />
+    <Ink d={G.joints} width={HAIR} taper={false} seed={`${seed}/joints`} />
     <SunPath seed={seed} />
     {G.benches.map((b, i) => (
       <React.Fragment key={i}>
@@ -704,7 +701,7 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
   const ev = (id: GovId): GovEvents => (lineArt ? {} : gov[id] ?? {});
   const pennantUp = pennantsAt === true || (pennantsAt === undefined && off);
   const pennantTimes = Array.isArray(pennantsAt) ? pennantsAt : [];
-  const bp = {off, chrome: ch, detail, seed, windowSlot};
+  const bp = {off, chrome: ch, detail, seed, windowSlot, k: detail === 'close' ? 0.7 : 1};
   const L = PLAZA.layers;
 
   const scene = (

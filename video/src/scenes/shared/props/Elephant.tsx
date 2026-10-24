@@ -48,59 +48,79 @@ function tube(c: Pt[], w0: number, w1: number): string {
   return smooth([...L, ...Rr.reverse()], {closed: true, tension: 0.45});
 }
 
-type EmblemGeo = {farLegs: string; nearLegs: string; body: string; head: string; trunk: string; ear: string; tail: string; eye: string; detail: string; toes: string; cane?: string};
+type EmblemGeo = {farLegs: string; outline: string; ear: string; tail: string; eye: string; detail: string; toes: string; cane?: string};
 const GEO = new Map<string, EmblemGeo>();
+
+/** Smooth closed outline through points; points flagged with `!` (third element 1) are sharp corners. */
+function outlinePath(pts: [number, number, number?][]): string {
+  const P: Pt[] = [];
+  for (const [x, y, c] of pts) {
+    P.push([x, y]);
+    if (c) P.push([x, y]);
+  }
+  return smooth(P, {closed: true, tension: 0.42});
+}
 
 function emblemGeo(style: 'modern' | 'old'): EmblemGeo {
   const hit = GEO.get(style);
   if (hit) return hit;
   const old = style === 'old';
-  const body = smooth(
+  // one continuous silhouette: rear leg, rump, back, head, raised trunk (curled tip), chest, front leg, belly
+  const outline = outlinePath([
+    [-35, 34, 1],
+    [-36, 20],
+    [-40, 6],
+    [-38, -8],
+    [-30, -18],
+    [-15, -23],
+    [0, -23],
+    [11, -21],
+    [18, -26],
+    [28, -28],
+    [36, -23],
+    [40, -17],
+    [44, -22],
+    [46, -30],
+    [45, -37],
+    [41, -41],
+    [36, -40, 1],
+    [36, -36, 1],
+    [40, -34],
+    [40, -27],
+    [37, -19],
+    [34, -11],
+    [30, -6],
+    [26, -3],
+    [24, 6],
+    [24, 34, 1],
+    [13, 34, 1],
+    [13, 17],
+    [6, 15],
+    [-10, 15],
+    [-20, 17],
+    [-21, 34, 1],
+  ]);
+  const farLegs = roundRect(-20, 12, 8, 20, 2.5) + roundRect(5, 12, 8, 20, 2.5);
+  const ear = smooth(
     [
-      [-36, 8],
-      [-35, -8],
-      [-24, -18],
-      [-4, -21],
-      [14, -18],
-      [22, -6],
-      [21, 10],
-      [6, 18],
-      [-16, 19],
-      [-32, 15],
+      [18, -23],
+      [8, -21],
+      [3, -12],
+      [4, -2],
+      [11, 3],
+      [17, -3],
+      [19, -12],
     ],
     {closed: true},
   );
-  const farLegs = roundRect(-25, 6, 10, 27, 3) + roundRect(4, 6, 10, 27, 3);
-  const nearLegs = roundRect(-34, 8, 11, 26, 3.5) + roundRect(12, 8, 11, 26, 3.5);
-  const head = blob(26, -12, 13, 12.5, {seed: 'emb-head', wobble: 0.02});
-  const trunkC: Pt[] = old
-    ? [
-        [34, -5],
-        [40, -11],
-        [44, -21],
-        [45, -31],
-        [41, -38],
-        [35, -38],
-        [33, -33],
-        [37, -30],
-      ]
-    : [
-        [34, -5],
-        [40, -11],
-        [44, -21],
-        [44, -31],
-        [40, -37],
-        [35, -36],
-      ];
-  const trunk = tube(trunkC, 8.6, old ? 3.2 : 4.4);
-  const ear = blob(20, -10, 9, 11.5, {seed: 'emb-ear', wobble: 0.03});
-  const tail = old ? `M-35 -2Q-41 4 -42 10Q-43 16 -38 15Q-36 12 -39 11` : `M-35 -2Q-41 5 -41 13M-41 13l-2 3M-41 13l1.5 3`;
-  const eye = blob(30.5, -15, 1.7, 1.7, {seed: 'emb-eye'});
-  let detail = `M${[28, 0].join(' ')}Q33 2 36 -2`; // mouth line under the trunk
-  if (old) detail += `M17 -14Q23 -16 23 -9Q22 -5 18 -7Q17 -10 20 -10` + `M-28 -10Q-10 -17 10 -14` + `M-30 10Q-12 15 8 12`;
-  else detail += `M-26 -6Q-24 -12 -18 -14M-22 2Q-20 -4 -14 -6`; // two skin wrinkles on the back
-  const toes = `M-32 32h3M-27 32h3M14 32h3M19 32h3`;
-  const geo: EmblemGeo = {farLegs, nearLegs, body, head, trunk, ear, tail, eye, detail, toes};
+  const tail = old ? `M-39 -2Q-46 4 -46 11Q-46 17 -41 16Q-38 14 -41 11` : `M-39 -2Q-45 5 -45 13M-45 13l-2.4 3.6M-45 13l1.4 3.8`;
+  const eye = blob(31, -18, 1.8, 1.8, {seed: 'emb-eye'});
+  let detail = `M29 -8Q31 -5 34 -7` + `M41 -26l4 1M40 -20l4 2`;
+  detail += old
+    ? `M14 -14Q9 -10 12 -5Q17 -4 16 -10` + `M36 -38q-5 3 -2 7q4 1 4 -3` + `M-32 -11Q-16 -20 6 -19` + `M-29 10Q-10 13 8 11`
+    : `M-28 -8Q-26 -14 -20 -16M-24 1Q-22 -5 -16 -7`;
+  const toes = `M-32 33h3M-27 33h3M15 33h3M20 33h3`;
+  const geo: EmblemGeo = {farLegs, outline, ear, tail, eye, detail, toes};
   if (old) geo.cane = tube([[51, 34], [48, 8], [46, -12]], 4.2, 4.2) + tube([[46, -12], [45, -18], [40, -20], [36, -16]], 4.2, 4.2);
   GEO.set(style, geo);
   return geo;
@@ -142,21 +162,18 @@ export const ElephantEmblem: React.FC<ElephantEmblemProps> = ({x = 0, y = 0, siz
   const caneK = caneAt !== undefined ? springAt(t, caneAt, springs.pop) : 1;
   const parts: React.ReactNode[] = [];
   if (solid) {
-    parts.push(<Fill key="sil" d={G.farLegs + G.body + G.nearLegs + G.head + G.trunk + G.ear} color={color} at={at} mode="snap" offset={false} seed={`${seed}/sil`} lookExempt />);
+    parts.push(<Fill key="sil" d={G.farLegs + G.outline + G.ear} color={color} at={at} mode="snap" offset={false} seed={`${seed}/sil`} lookExempt />);
   } else {
     const L = (k: string, d: string, dt: number, fill = true, wk = 1, open = 0) => {
       if (fill) parts.push(<Fill key={`${k}F`} d={d} color={bg} at={bt(at, dt + 0.04)} mode="snap" offset={false} seed={`${seed}/${k}F`} />);
       parts.push(<Ink key={`${k}I`} d={d} at={bt(at, dt)} width={W * wk} color={color} seed={`${seed}/${k}I`} open={open} />);
     };
-    L('farLegs', G.farLegs, 0.1);
-    L('body', G.body, 0, true, 1, 0.08);
-    L('nearLegs', G.nearLegs, 0.14);
-    L('head', G.head, 0.05);
-    L('trunk', G.trunk, 0.08);
-    L('ear', G.ear, 0.12);
+    L('farLegs', G.farLegs, 0.1, true, 0.85);
+    L('body', G.outline, 0, true, 1, 0.06);
+    L('ear', G.ear, 0.12, true, 0.9);
     parts.push(<Ink key="tail" d={G.tail} at={bt(at, 0.16)} width={W * 0.9} color={color} seed={`${seed}/tail`} />);
     parts.push(<Fill key="eye" d={G.eye} color={color} at={bt(at, 0.2)} mode="snap" offset={false} seed={`${seed}/eye`} lookExempt />);
-    if (screen >= 44) parts.push(<Ink key="det" d={G.detail + (screen >= 70 ? G.toes : '')} at={bt(at, 0.2)} width={W * 0.6} color={color} seed={`${seed}/det`} order="all" />);
+    if (screen >= 40) parts.push(<Ink key="det" d={G.detail + (screen >= 70 ? G.toes : '')} at={bt(at, 0.2)} width={W * 0.6} color={color} seed={`${seed}/det`} order="all" />);
   }
   const caneNode =
     cane && G.cane && (caneAt === undefined || t >= caneAt) ? (

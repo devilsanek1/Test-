@@ -14,9 +14,10 @@ import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {arc, blob, check, circle, ellipse, hline, line, polyPath, rect, rectPath, roundRect, smooth} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
-import {Padlock, Noticeboard} from '../../../lib/kit';
-import {rand, Seed} from '../../../lib/rng';
-import {glintAt, popK, PopAt} from './common';
+import {Noticeboard} from '../../../lib/kit';
+import {Seed} from '../../../lib/rng';
+import {popK, PopAt} from './common';
+import {BackSoonTag, Bit, BrowserChrome, CheckFlag, CheckMark, ElephantEmblem, ElephantPlaque, ElephantStamp, Lock, RollerShutter, ShutterPadlock, TargetRing, WrenchTag} from '../props';
 
 // ---------------------------------------------------------------- elephant emblem (P2 ElephantEmblem stand-in)
 
@@ -64,185 +65,57 @@ export type ChromeSlotProps = {
   glass?: string;
 };
 
-/** PLACEHOLDER for props BrowserChrome (P4): the "chunky" chrome of a website window. */
-export const ChromeSlot: React.FC<ChromeSlotProps> = ({x, y, w, h, chromeAt, chrome = true, screenOnAt, offAt, lod = 'full', width = stroke.ink, seed = 'chrome', glass = palette.sage}) => {
-  const t = useTime();
-  const bar = Math.max(3, Math.min(30, h * 0.21));
-  const hasChrome = chrome && (chromeAt === undefined || t >= chromeAt);
-  const screenOn = hasChrome && (screenOnAt === undefined || t >= screenOnAt);
-  const dark = offAt !== undefined && t >= offAt;
-  const sy = y + (hasChrome ? bar : 0);
-  const sh = h - (hasChrome ? bar : 0);
-  const out: React.ReactNode[] = [];
-  // screen / glass
-  const screenColor = dark ? palette.tealDark : screenOn ? palette.cream : hasChrome ? palette.mintPale : glass;
-  out.push(<Fill key="scr" rect={[x, sy, w, sh]} color={screenColor} seed={`${seed}/s`} offset={hasChrome ? [1.5, 1] : undefined} />);
-  if (!hasChrome && lod !== 'dots') out.push(<Ink key="gl" d={glintAt(x + w * 0.2, y + h * 0.7, Math.min(w, h) * 0.35, `${seed}/g`)} width={width * 0.5} taper={false} />);
-  if (hasChrome) {
-    const wipe = chromeAt === undefined ? 1 : prog(t, chromeAt, 0.12);
-    out.push(<Fill key="bar" rect={[x, y, w * wipe, bar]} color={palette.tealDark} offset={false} seed={`${seed}/b`} />);
-    const dr = Math.min(bar * 0.25, 7.5);
-    if (lod !== 'dots' || bar > 5) {
-      [palette.cream, palette.sage, palette.peach].forEach((c, i) => {
-        const cx = x + bar * 0.5 + i * dr * 2.6;
-        const k = popK(t, chromeAt === undefined ? undefined : chromeAt + 0.08 + i * 0.04, 0.25, 0.16);
-        if (k > 0) out.push(<circle key={`d${i}`} cx={cx} cy={y + bar / 2} r={dr * k} fill={c} />);
-      });
-    }
-    if (lod === 'full' && w > 60) {
-      const px = x + bar * 0.5 + dr * 2.6 * 2 + dr * 2.4;
-      const pw = Math.max(10, x + w - bar * 0.4 - px);
-      const ph = Math.min(18, bar * 0.6);
-      const pd = chromeAt === undefined ? 1 : prog(t, chromeAt + 0.1, 0.2);
-      if (pd > 0) out.push(<Fill key="pill" d={roundRect(px, y + (bar - ph) / 2, pw * pd, ph, ph / 2)} color={palette.cream} offset={false} seed={`${seed}/p`} />);
-    }
-    if (screenOn && !dark && lod !== 'dots') {
-      const hh = sh * 0.24;
-      out.push(<Fill key="hdr" rect={[x + w * 0.08, sy + sh * 0.12, w * 0.84, hh]} color={palette.peach} offset={false} seed={`${seed}/h`} />);
-      if (lod === 'full') {
-        let d = '';
-        for (let i = 0; i < 3; i++) d += hline(x + w * 0.1, x + w * (0.9 - (i === 2 ? 0.3 : i * 0.08)), sy + sh * (0.52 + i * 0.15), {seed: `${seed}/l${i}`, over: 0});
-        out.push(<Ink key="ln" d={d} width={Math.max(0.6, width * 0.45)} taper={false} vary={0} />);
-      }
-    }
-  }
-  if (lod !== 'dots') out.push(<Ink key="fr" d={rect(x, y, w, h, {seed: `${seed}/f`, over: 'small'}) + (hasChrome ? hline(x, x + w, y + bar, {seed: `${seed}/bl`, over: 0}) : '')} width={width} taper={false} />);
-  return <>{out}</>;
-};
+/** -> props BrowserChrome (P4). `chrome={false}` = a plain window forever. */
+export const ChromeSlot: React.FC<ChromeSlotProps> = ({x, y, w, h, chromeAt, chrome = true, screenOnAt, offAt, lod = 'full', width = stroke.ink, seed = 'chrome', glass = palette.sage}) => (
+  <BrowserChrome
+    x={x}
+    y={y}
+    w={w}
+    h={h}
+    chromeAt={chrome ? chromeAt : 1e9}
+    plainFirst={!chrome || chromeAt !== undefined}
+    screenOnAt={screenOnAt}
+    offAt={offAt}
+    mode={lod === 'dots' ? 'dots' : 'window'}
+    ink={width}
+    glass={glass}
+    seed={seed}
+  />
+);
 
 // ---------------------------------------------------------------- P1 Lock
 
 export type LockVariant = 'closed' | 'open' | 'blueprint' | 'sketch' | 'ghost' | 'dot' | 'fixed';
 export type LockSlotProps = {x: number; y: number; w: number; h: number; variant?: LockVariant; width?: number; seed?: Seed; at?: number};
 
-/** PLACEHOLDER for props Lock (P1): sand box, two screws, keyhole; 'fixed' = sage with a cream tag; 'dot' = LOD. */
-export const LockSlot: React.FC<LockSlotProps> = ({x, y, w, h, variant = 'closed', width = stroke.inkThin, seed = 'lock', at}) => {
-  const t = useTime();
-  if (at !== undefined && t < at) return null;
-  const x0 = x - w / 2;
-  const y0 = y - h / 2;
-  if (variant === 'dot') return <Fill rect={[x0, y0, w, h]} color={palette.sand} offset={false} seed={`${seed}/d`} />;
-  const body = variant === 'fixed' ? palette.sage : variant === 'blueprint' || variant === 'sketch' ? palette.white : palette.sand;
-  const out: React.ReactNode[] = [];
-  if (variant !== 'ghost') out.push(<Fill key="b" d={roundRect(x0, y0, w, h, Math.min(w, h) * 0.12)} color={body} seed={`${seed}/b`} />);
-  const kh = `M${(x - w * 0.07).toFixed(2)} ${(y + h * 0.12).toFixed(2)}L${(x + w * 0.07).toFixed(2)} ${(y + h * 0.12).toFixed(2)}L${x.toFixed(2)} ${(y - h * 0.06).toFixed(2)}Z`;
-  if (variant !== 'ghost' && w >= 6) out.push(<Fill key="kh" d={blob(x, y - h * 0.08, w * 0.09, w * 0.09, {seed: `${seed}/k`}) + kh} color={palette.ink} offset={false} seed={`${seed}/kh`} />);
-  if (w >= 10 && variant !== 'ghost') {
-    out.push(<circle key="s1" cx={x0 + w * 0.2} cy={y0 + h * 0.14} r={Math.max(0.6, w * 0.06)} fill={palette.ink} />);
-    out.push(<circle key="s2" cx={x0 + w * 0.8} cy={y0 + h * 0.86} r={Math.max(0.6, w * 0.06)} fill={palette.ink} />);
-  }
-  out.push(<Ink key="o" d={roundRect(x0, y0, w, h, Math.min(w, h) * 0.12, {closed: false, seed: `${seed}/o`})} width={width} taper={false} dash={variant === 'ghost' ? `${(w * 0.18).toFixed(1)} ${(w * 0.12).toFixed(1)}` : undefined} />);
-  if (variant === 'fixed') {
-    out.push(<Fill key="tag" d={roundRect(x + w * 0.3, y + h * 0.1, w * 0.55, h * 0.45, 2)} color={palette.cream} offset={false} seed={`${seed}/t`} />);
-    out.push(<Ink key="ck" d={check(x + w * 0.57, y + h * 0.32, w * 0.32)} width={width * 0.8} taper={false} />);
-  }
-  return <>{out}</>;
-};
+/** -> props Lock (P1). (x, y) = box centre, h = box height (the prop's width is 0.8 h). */
+export const LockSlot: React.FC<LockSlotProps> = ({x, y, h, variant = 'closed', width = stroke.inkThin, seed = 'lock', at}) => <Lock x={x} y={y} size={h} state={variant} ink={width} at={at} seed={seed} />;
 
 // ---------------------------------------------------------------- P2 ElephantPlaque
 
 export type PlaqueVariant = 'new' | 'blank' | 'old' | 'dot';
-/** PLACEHOLDER for props ElephantPlaque (P2): square sand plate with the ink elephant; blank cream; old tan. */
-export const PlaqueSlot: React.FC<{x: number; y: number; size: number; variant?: PlaqueVariant; width?: number; seed?: Seed; at?: number}> = ({x, y, size, variant = 'new', width = stroke.inkThin, seed = 'plq', at}) => {
-  const t = useTime();
-  const k = popK(t, at);
-  if (k <= 0) return null;
-  const s = size * k;
-  const col = variant === 'blank' ? palette.cream : variant === 'old' ? palette.tan : palette.sand;
-  if (variant === 'dot' || s < 6) return <Fill rect={[x - s / 2, y - s / 2, s, s]} color={col} offset={false} seed={`${seed}/d`} />;
-  return (
-    <>
-      <Fill d={roundRect(x - s / 2, y - s / 2, s, s, s * 0.08)} color={col} seed={`${seed}/f`} />
-      <Ink d={rect(x - s / 2, y - s / 2, s, s, {seed: `${seed}/i`, over: 'small'})} width={width} taper={false} />
-      {variant !== 'blank' && s >= 10 ? <Ink d={elephantPath(x, y + s * 0.02, s * 0.72, variant === 'old')} width={Math.max(0.7, width * 0.7)} taper={false} vary={0} /> : null}
-    </>
-  );
-};
+/** -> props ElephantPlaque (P2): 'new' sand plate, 'blank' cream, 'old' tan + chipped corner, 'dot' LOD. `at` = tick-on pop. */
+export const PlaqueSlot: React.FC<{x: number; y: number; size: number; variant?: PlaqueVariant; width?: number; seed?: Seed; at?: number}> = ({x, y, size, variant = 'new', width = stroke.inkThin, seed = 'plq', at}) => (
+  <ElephantPlaque x={x} y={y} size={size} variant={variant === 'blank' ? 'blank' : variant === 'dot' ? 'dot' : 'plate'} age={variant === 'old' ? 'old' : 'new'} tickOnAt={at} ink={width} seed={seed} />
+);
 
 // ---------------------------------------------------------------- P3 Bit
 
-/** PLACEHOLDER for props Bit (P3): solid ink beetle (16 x 10 at size 16) with a cream eye dot and antennae. */
-export const BitSlot: React.FC<{x: number; y: number; size?: number; flip?: boolean; at?: number; seed?: Seed}> = ({x, y, size = 16, flip, at, seed = 'bit'}) => {
-  const t = useTime();
-  if (at !== undefined && t < at) return null;
-  const s = size;
-  const f = flip ? -1 : 1;
-  const wig = osc(t, 1.3, rand(String(seed), 'p') * 6) * 0.06 * s;
-  return (
-    <>
-      <path d={blob(x, y - s * 0.3, s * 0.5, s * 0.32, {seed: `${seed}/b`})} fill={palette.ink} />
-      <circle cx={x + f * s * 0.42} cy={y - s * 0.34} r={s * 0.16} fill={palette.ink} />
-      <circle cx={x + f * s * 0.46} cy={y - s * 0.38} r={s * 0.05} fill={palette.cream} />
-      <path
-        d={`M${x + f * s * 0.5} ${y - s * 0.44}q${f * s * 0.12} ${-s * 0.24 + wig} ${f * s * 0.3} ${-s * 0.3}M${x + f * s * 0.46} ${y - s * 0.46}q${f * s * 0.02} ${-s * 0.24} ${f * s * 0.14} ${-s * 0.36 - wig}`}
-        fill="none"
-        stroke={palette.ink}
-        strokeWidth={Math.max(0.6, s * 0.07)}
-        strokeLinecap="round"
-      />
-    </>
-  );
-};
+/** -> props Bit (P3): solid ink beetle (16 x 10 at size 16). */
+export const BitSlot: React.FC<{x: number; y: number; size?: number; flip?: boolean; at?: number; seed?: Seed; state?: 'idle' | 'silhouette'}> = ({x, y, size = 16, flip, at, seed = 'bit', state = 'idle'}) => <Bit x={x} y={y} size={size} flip={flip} at={at} seed={seed} state={state} />;
 
 // ---------------------------------------------------------------- P5 shutter set
 
-/** PLACEHOLDER for props Shutter (P5): roller shutter box (18 px) above the window rect; on `slamAt` it drops over
- *  the window in 0.16 s (ease-in) with a 6 px bounce. Ribs every 14 px. `peephole` = r12 cream-rim hole. */
-export const ShutterSlot: React.FC<{x: number; y: number; w: number; h: number; slamAt?: number; down?: boolean; boxH?: number; peephole?: [number, number]; width?: number; seed?: Seed}> = ({x, y, w, h, slamAt, down, boxH = 18, peephole, width = stroke.ink, seed = 'sh'}) => {
-  const t = useTime();
-  let k = down ? 1 : 0;
-  if (!down && slamAt !== undefined && t >= slamAt) {
-    const fall = prog(t, slamAt, 0.16, E.inQuad);
-    const bounce = t > slamAt + 0.16 ? Math.max(0, Math.sin(prog(t, slamAt + 0.16, 0.14) * Math.PI)) * 6 : 0;
-    k = fall - bounce / (h + boxH);
-  }
-  const top = y - boxH;
-  const len = (h + boxH) * k;
-  const out: React.ReactNode[] = [];
-  if (len > boxH) {
-    const bot = top + len;
-    out.push(<Fill key="s" rect={[x, top, w, len]} color={palette.tealDark} offset={[1.5, 1]} seed={`${seed}/s`} />);
-    let ribs = '';
-    for (let yy = top + boxH + 14; yy < bot - 4; yy += 14) ribs += hline(x + 2, x + w - 2, yy, {seed: `${seed}/r${Math.round(yy)}`, over: 0});
-    out.push(<Ink key="r" d={ribs} width={Math.max(0.6, width * 0.45)} taper={false} vary={0} />);
-    out.push(<Ink key="o" d={line(x, top, x, bot, {over: 0, seed: `${seed}/l`}) + line(x + w, top, x + w, bot, {over: 0, seed: `${seed}/rr`}) + hline(x - 3, x + w + 3, bot, {seed: `${seed}/b`, over: 'small'})} width={width} taper={false} />);
-    if (peephole && k >= 1) {
-      out.push(<circle key="ph" cx={peephole[0]} cy={peephole[1]} r={12} fill={palette.cream} />);
-      out.push(<Ink key="phi" d={circle(peephole[0], peephole[1], 12, {seed: `${seed}/ph`})} width={width * 0.7} taper={false} />);
-    }
-  }
-  out.push(<Fill key="box" rect={[x - 4, top, w + 8, boxH]} color={palette.tealDark} offset={[1.5, 1]} seed={`${seed}/bx`} />);
-  out.push(<Ink key="bxi" d={rect(x - 4, top, w + 8, boxH, {seed: `${seed}/bxi`, over: 'small'})} width={width} taper={false} />);
-  return <>{out}</>;
-};
+/** -> props RollerShutter (P5): box (18 px) above the window rect; slams over it at `slamAt` (0.16 s, 6 px bounce). */
+export const ShutterSlot: React.FC<{x: number; y: number; w: number; h: number; slamAt?: number; down?: boolean; boxH?: number; peephole?: [number, number]; width?: number; seed?: Seed}> = ({x, y, w, h, slamAt, down, boxH = 18, peephole, width = stroke.ink, seed = 'sh'}) => (
+  <RollerShutter x={x} y={y} w={w} h={h} box={boxH} slamAt={slamAt} state={down ? 'down' : 'up'} peephole={peephole ? {x: peephole[0], y: peephole[1]} : undefined} width={width} seed={seed} />
+);
 
-/** Shutter padlock (kit Padlock, sand body, ink shackle): 24 x 28 by default, pops on at `at`. Distinct from the door lock. */
-export const PadlockSlot: React.FC<{x: number; y: number; size?: number; at?: number; seed?: Seed}> = ({x, y, size = 24, at, seed = 'pl'}) => {
-  const t = useTime();
-  const k = popK(t, at, 0.12, 0.18);
-  if (k <= 0) return null;
-  return (
-    <XG m={mat.about(mat.scale(k), x, y)}>
-      <Padlock x={x} y={y + size * 0.1} size={size} color={palette.sand} shackleColor={palette.sand} seed={seed} width={stroke.inkThin} />
-    </XG>
-  );
-};
+/** -> props ShutterPadlock (P5): 24 x 28, sand body, ink shackle, cream glint (distinct from the door lock). */
+export const PadlockSlot: React.FC<{x: number; y: number; size?: number; at?: number; glintAt?: number; seed?: Seed}> = ({x, y, size = 28, at, glintAt, seed = 'pl'}) => <ShutterPadlock x={x} y={y} size={size} at={at} glintAt={glintAt} seed={seed} />;
 
-/** PLACEHOLDER for props BackSoonTag (P5): white 30 x 36 tag with an ink clock, hung from (x, y); swings -16 -> 0 deg
- *  over 0.5 s from `at`, again on `tapAt`. */
-export const BackSoonSlot: React.FC<{x: number; y: number; at?: number; tapAt?: number; w?: number; h?: number; seed?: Seed}> = ({x, y, at, tapAt, w = 30, h = 36, seed = 'tag'}) => {
-  const t = useTime();
-  if (at !== undefined && t < at) return null;
-  const swing = (t0: number | undefined) => (t0 === undefined || t < t0 ? 0 : -16 * Math.exp(-6 * (t - t0)) * Math.cos((t - t0) * 12.5));
-  const a = (at !== undefined ? swing(at) : 0) + swing(tapAt);
-  return (
-    <XG m={mat.about(mat.rotate(a), x, y)}>
-      <Ink d={`M${x} ${y}L${x} ${y + 6}`} width={stroke.inkHair} taper={false} />
-      <Fill d={roundRect(x - w / 2, y + 6, w, h, 3)} color={palette.white} seed={`${seed}/f`} />
-      <Ink d={roundRect(x - w / 2, y + 6, w, h, 3, {closed: false, seed: `${seed}/o`}) + circle(x, y + 6 + h * 0.5, w * 0.28, {seed: `${seed}/c`}) + `M${x} ${y + 6 + h * 0.5}L${x} ${y + 6 + h * 0.34}M${x} ${y + 6 + h * 0.5}L${x + w * 0.14} ${y + 6 + h * 0.56}`} width={stroke.inkHair} taper={false} />
-    </XG>
-  );
-};
+/** -> props BackSoonTag (P5): white 30 x 36 tag with an ink clock, hung from (x, y); swings from `at`, again on `tapAt`. */
+export const BackSoonSlot: React.FC<{x: number; y: number; at?: number; tapAt?: number; seed?: Seed}> = ({x, y, at, tapAt, seed = 'tag'}) => <BackSoonTag x={x} y={y} at={at} tapAt={tapAt} seed={seed} />;
 
 // ---------------------------------------------------------------- P17 Bollard
 
@@ -256,88 +129,39 @@ export const BollardSlot: React.FC<{x: number; y: number; w?: number; h?: number
 
 // ---------------------------------------------------------------- hanging signs (P2 variants)
 
-/** PLACEHOLDER for props ElephantPlaque 'round hanging sign' (S06 r45 / S07 r40): sand disc on an iron bracket from
- *  the wall at (wallX, y - r - 24). `swingAt` = pendulum -16 -> 0 deg over 0.5 s. */
+/** -> props ElephantPlaque 'round' (S06 r45 / S07 r40): sand disc on an iron bracket from the wall at wallX; (x, y) =
+ *  the disc centre. `swingAt` = pendulum -16 -> 0 deg over 0.5 s. */
 export const RoundSignSlot: React.FC<{x: number; y: number; r: number; wallX: number; swingAt?: number; width?: number; seed?: Seed}> = ({x, y, r, wallX, swingAt, width = stroke.ink, seed = 'rsign'}) => {
-  const t = useTime();
-  const top = y - r - 18;
-  const a = swingAt !== undefined && t >= swingAt ? -16 * Math.exp(-5 * (t - swingAt)) * Math.cos((t - swingAt) * 12.5) : 0;
+  const b = bracketFor(x, y, r * 2, wallX);
+  return <ElephantPlaque x={b.x} y={b.y} size={r * 2} variant="round" side={b.side} arm={b.arm} swingAt={swingAt} ink={width} seed={seed} />;
+};
+
+/** -> props ElephantPlaque 'hanging' (S12 / S13, 110-130 px): (x, y) = the plate centre, bracket from wallX. */
+export const HangingPlaqueSlot: React.FC<{x: number; y: number; size: number; wallX: number; variant?: PlaqueVariant; swingAt?: number; flipOldAt?: number; cobwebAt?: number; dustAt?: number; caneAt?: number; at?: number; seed?: Seed}> = ({x, y, size, wallX, variant = 'new', swingAt, flipOldAt, cobwebAt, dustAt, caneAt, at, seed = 'hp'}) => {
+  const b = bracketFor(x, y, size, wallX);
   return (
-    <>
-      <Ink d={line(wallX, top, x + r * 0.4, top, {seed: `${seed}/br`, over: [0, 4]}) + line(wallX, top + r * 0.6, x - r * 0.2, top, {seed: `${seed}/st`, over: 0})} width={width} taper={false} />
-      <XG m={mat.about(mat.rotate(a), x, top)}>
-        <Ink d={`M${x - r * 0.4} ${top}L${x - r * 0.4} ${y - r + 2}M${x + r * 0.4} ${top}L${x + r * 0.4} ${y - r + 2}`} width={stroke.inkHair} taper={false} />
-        <Fill d={blob(x, y, r, r, {seed: `${seed}/d`})} color={palette.sand} seed={`${seed}/df`} />
-        <Ink d={circle(x, y, r, {seed: `${seed}/di`})} width={width} taper={false} />
-        <Ink d={elephantPath(x, y + r * 0.04, r * 1.3)} width={stroke.inkThin} taper={false} vary={0} />
-      </XG>
-    </>
+    <ElephantPlaque x={b.x} y={b.y} size={size} variant="hanging" age={variant === 'old' ? 'old' : 'new'} side={b.side} arm={b.arm} swingAt={swingAt} flipOldAt={flipOldAt} cobwebAt={cobwebAt} dustAt={dustAt} caneAt={caneAt} at={at} ink={stroke.ink} seed={seed} />
   );
 };
 
-/** PLACEHOLDER for props ElephantPlaque 'hanging square plaque' (S12 / S13, 110-130 px) on a bracket from wallX. */
-export const HangingPlaqueSlot: React.FC<{x: number; y: number; size: number; wallX: number; variant?: PlaqueVariant; swingAt?: number; at?: number; seed?: Seed}> = ({x, y, size, wallX, variant = 'new', swingAt, at, seed = 'hp'}) => {
-  const t = useTime();
-  if (at !== undefined && t < at) return null;
-  const top = y - size / 2 - 22;
-  const a = swingAt !== undefined && t >= swingAt ? -16 * Math.exp(-5 * (t - swingAt)) * Math.cos((t - swingAt) * 12.5) : 0;
-  return (
-    <>
-      <Ink d={line(wallX, top, x + size * 0.45, top, {seed: `${seed}/br`, over: [0, 5]}) + line(wallX, top + size * 0.35, x - size * 0.1, top, {seed: `${seed}/st`, over: 0})} width={stroke.ink} taper={false} />
-      <XG m={mat.about(mat.rotate(a), x, top)}>
-        <Ink d={`M${x - size * 0.3} ${top}L${x - size * 0.3} ${y - size / 2}M${x + size * 0.3} ${top}L${x + size * 0.3} ${y - size / 2}`} width={stroke.inkHair} taper={false} />
-        <PlaqueSlot x={x} y={y} size={size} variant={variant} width={stroke.ink} seed={seed} />
-      </XG>
-    </>
-  );
-};
+/** Bracket root for a hanging sign whose face centre is (x, y): the props lane hangs the face at hook = 0.66 arm, 16 + 50
+ *  local units below the bracket (local unit = size / 100). */
+export function bracketFor(x: number, y: number, size: number, wallX: number): {x: number; y: number; side: 'left' | 'right'; arm: number} {
+  const side = x >= wallX ? 'right' : 'left';
+  const arm = Math.max(size * 0.6, Math.abs(x - wallX) / 0.66);
+  return {x: x - (side === 'right' ? 1 : -1) * arm * 0.66, y: y - (66 * size) / 100, side, arm};
+}
 
 // ---------------------------------------------------------------- P15 glyphs, flags, rings
 
-/** PLACEHOLDER for props CheckFlag (60 px flag on a pole); (x, y) = pole foot. */
-export const CheckFlagSlot: React.FC<{x: number; y: number; size?: number; at?: number; width?: number; seed?: Seed}> = ({x, y, size = 60, at, width = stroke.ink, seed = 'cf'}) => {
-  const t = useTime();
-  if (at !== undefined && t < at) return null;
-  const rise = at === undefined ? 1 : E.outBack(1.4)(prog(t, at, 0.3));
-  const h = size * 1.6 * rise;
-  return (
-    <>
-      <Ink d={`M${x} ${y}L${x} ${y - h}`} width={width} taper={false} />
-      <Fill d={polyPath([[x, y - h], [x + size, y - h + size * 0.1], [x + size * 0.92, y - h + size * 0.62], [x, y - h + size * 0.55]])} color={palette.cream} seed={`${seed}/f`} />
-      <Ink d={polyPath([[x, y - h], [x + size, y - h + size * 0.1], [x + size * 0.92, y - h + size * 0.62], [x, y - h + size * 0.55]]) + check(x + size * 0.48, y - h + size * 0.3, size * 0.4)} width={width * 0.8} taper={false} />
-    </>
-  );
-};
+/** -> props CheckFlag: (x, y) = pole foot, size = flag width (60). */
+export const CheckFlagSlot: React.FC<{x: number; y: number; size?: number; at?: number; raiseAt?: number; width?: number; seed?: Seed}> = ({x, y, size = 60, at, raiseAt, width = stroke.ink, seed = 'cf'}) => <CheckFlag x={x} y={y} size={size} at={at} raiseAt={raiseAt} width={width} seed={seed} />;
 
-/** PLACEHOLDER for props TargetRing / LoadingRing (P6): peach ring + ink outline. */
-export const TargetRingSlot: React.FC<{x: number; y: number; r: number; at?: number; width?: number; seed?: Seed}> = ({x, y, r, at, width = stroke.inkThin, seed = 'tr'}) => {
-  const t = useTime();
-  const k = popK(t, at, 0.15, 0.2);
-  if (k <= 0) return null;
-  const rr = r * k;
-  return (
-    <>
-      <circle cx={x} cy={y} r={rr} fill="none" stroke={palette.peach} strokeWidth={Math.max(1, rr * 0.35)} />
-      <Ink d={circle(x, y, rr * 1.18, {seed: `${seed}/o`})} width={width} taper={false} />
-    </>
-  );
-};
+/** -> props TargetRing / LoadingRing (P6): peach ring + ink outline; pops at `at`. */
+export const TargetRingSlot: React.FC<{x: number; y: number; r: number; at?: number; width?: number; seed?: Seed}> = ({x, y, r, at, width = stroke.inkThin, seed = 'tr'}) => <TargetRing x={x} y={y} r={r} popAt={at} width={width} seed={seed} />;
 
-/** PLACEHOLDER for props WrenchTag (P15): sage tag with a cream wrench. */
-export const WrenchTagSlot: React.FC<{x: number; y: number; size: number; at?: number; seed?: Seed}> = ({x, y, size, at, seed = 'wt'}) => {
-  const t = useTime();
-  const k = popK(t, at, 0.15);
-  if (k <= 0) return null;
-  const s = size * k;
-  if (s < 5) return <Fill rect={[x - s / 2, y - s / 2, s, s]} color={palette.sage} offset={false} seed={`${seed}/d`} />;
-  return (
-    <>
-      <Fill d={roundRect(x - s / 2, y - s / 2, s, s, s * 0.18)} color={palette.sage} seed={`${seed}/f`} />
-      <Ink d={roundRect(x - s / 2, y - s / 2, s, s, s * 0.18, {closed: false, seed: `${seed}/o`})} width={Math.max(0.8, s * 0.045)} taper={false} />
-      <path d={wrenchPath(x, y, s * 0.62)} fill="none" stroke={palette.cream} strokeWidth={Math.max(1, s * 0.11)} strokeLinecap="round" />
-    </>
-  );
-};
+/** -> props WrenchTag (P15): sage tag with a cream wrench; size = tag width. */
+export const WrenchTagSlot: React.FC<{x: number; y: number; size: number; at?: number; seed?: Seed}> = ({x, y, size, at, seed = 'wt'}) => <WrenchTag x={x} y={y} size={size} at={at} seed={seed} />;
 
 /** Wrench glyph path (centre, length). */
 export function wrenchPath(x: number, y: number, L: number): string {
@@ -372,21 +196,8 @@ export const NoticeboardSlot: React.FC<{x: number; y: number; w: number; h: numb
 
 // ---------------------------------------------------------------- P2 ElephantStamp, P14 Calendar
 
-/** PLACEHOLDER for props ElephantStamp: perspective ellipse ring (sand ring + ink elephant squashed). */
-export const ElephantStampSlot: React.FC<{x: number; y: number; rx: number; ry: number; ring?: number; at?: number; seed?: Seed}> = ({x, y, rx, ry, ring = 14, at, seed = 'stamp'}) => {
-  const t = useTime();
-  if (at !== undefined && t < at) return null;
-  const k = at === undefined ? 1 : 1 + 1.6 * (1 - E.inOutCubic(prog(t, at, 0.27)));
-  return (
-    <XG m={mat.about(mat.scale(k), x, y)}>
-      <path d={blob(x, y, rx, ry, {seed: `${seed}/o`}) + blob(x, y, rx - ring, ry - ring * (ry / rx), {seed: `${seed}/i`})} fill={palette.sand} fillRule="evenodd" />
-      <Ink d={ellipse(x, y, rx, ry, {seed: `${seed}/oi`}) + ellipse(x, y, rx - ring, ry - ring * (ry / rx), {seed: `${seed}/ii`})} width={stroke.inkThin} taper={false} />
-      <XG m={mat.about(mat.scale(1, ry / rx), x, y)}>
-        <Ink d={elephantPath(x, y, rx * 1.1)} width={stroke.ink} taper={false} vary={0} />
-      </XG>
-    </XG>
-  );
-};
+/** -> props ElephantStamp: perspective ellipse print (S02) or round corner stamp (S05). `at` = the slam. */
+export const ElephantStampSlot: React.FC<{x: number; y: number; rx: number; ry: number; ring?: number; at?: number; seed?: Seed}> = ({x, y, rx, ry, ring = 14, at, seed = 'stamp'}) => <ElephantStamp x={x} y={y} rx={rx} ry={ry} ring={ring} slamAt={at} seed={seed} />;
 
 /** PLACEHOLDER for props Calendar (P14): tear-off calendar 70 x 80, cream pages, sand header, no numerals. */
 export const CalendarSlot: React.FC<{x: number; y: number; w?: number; h?: number; at?: number; seed?: Seed}> = ({x, y, w = 70, h = 80, at, seed = 'cal'}) => (
@@ -397,8 +208,11 @@ export const CalendarSlot: React.FC<{x: number; y: number; w?: number; h?: numbe
   </PopAt>
 );
 
-/** Stand-in check mark stroke (P15 CheckMark): strokes on over 0.17 s from `at`. */
-export const CheckSlot: React.FC<{x: number; y: number; size: number; at?: number; width?: number}> = ({x, y, size, at, width = stroke.inkBold}) => <Ink d={check(x, y, size)} at={at} dur={0.17} width={width} />;
+/** -> props CheckMark (P15): strokes on over 0.17 s from `at`. */
+export const CheckSlot: React.FC<{x: number; y: number; size: number; at?: number; width?: number}> = ({x, y, size, at, width = stroke.inkBold}) => <CheckMark x={x} y={y} size={size} at={at} width={width} />;
+
+/** -> props ElephantEmblem: the generic ink elephant (blueprints, stamps). (x, y) = centre, size = width. */
+export const EmblemSlot: React.FC<{x: number; y: number; size: number; width?: number; bg?: string; old?: boolean; at?: number; seed?: Seed}> = ({x, y, size, width, bg = palette.white, old, at, seed = 'emb'}) => <ElephantEmblem x={x} y={y} size={size} ink={width} bg={bg} style={old ? 'old' : 'modern'} mode="line" at={at} seed={seed} />;
 
 /** re-export for sets that draw the props-lane glyph shapes themselves */
-export {smooth, arc, springAt, springs};
+export {smooth, arc, springAt, springs, rectPath, ellipse, blob, polyPath, popK};
