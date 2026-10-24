@@ -40,6 +40,8 @@ const REINK_HAIR =
 const DISC = blob(L.x, L.y, 58, 57, {seed: 's5disc'});
 const BOX_D = roundRect(LOCK.box[0], LOCK.box[1], LOCK.box[2], LOCK.box[3], 9);
 const SECTION_D = rectPath(LOCK.cover[0], LOCK.cover[1], LOCK.cover[2], LOCK.cover[3]);
+/** The section colour inside the lock box: one step stronger than the disc so the lock is the strongest spot. */
+export const SECTION = palette.bg;
 const LOCK_M = mat.compose(mat.translate(L.x, L.y), mat.scale(L.h / LOCK.h));
 
 /** Flat accents on the white plan (all misregistered fills under re-inked outlines): cream on two door panels and the
@@ -55,7 +57,7 @@ export const SheetColour: React.FC = () => (
     <Fill d={DISC} color={palette.mintPale} seed="s5disc" />
     <XG m={LOCK_M}>
       <Fill d={BOX_D} color={palette.white} offset={false} seed="s5box" />
-      <Fill d={SECTION_D} color={palette.mintPale} seed="s5sect" />
+      <Fill d={SECTION_D} color={SECTION} seed="s5sect" />
     </XG>
     {/* the set's lock (same props), ink only, over the new fills */}
     <Look fills="none">
@@ -121,7 +123,7 @@ export const LockTurn: React.FC<{drawAt: number; turnAt: number; undrawAt: numbe
     <>
       {q > 0 ? (
         <>
-          <path d={patch} fill={palette.mintPale} />
+          <path d={patch} fill={SECTION} />
           <Ink d={bar} width={W} taper={false} vary={0} seed="s5bolt" />
         </>
       ) : null}

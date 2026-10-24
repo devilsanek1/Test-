@@ -1,7 +1,7 @@
 [
   {"s":0.19,"e":2.205,"lines":[{"text":"Governments all over","s":0.19},{"text":"Europe just shut down","s":1.155}],"highlights":[{"text":"shut down","s":1.71}],"style":"hook"},
-  {"s":2.205,"e":4.715,"lines":[{"text":"a bunch of their own","s":2.205},{"text":"websites on purpose,","s":3.085}],"highlights":[{"text":"purpose,","s":3.955}]},
-  {"s":4.715,"e":6.42,"lines":[{"text":"because of this bug","s":4.715},{"text":"where hackers could","s":5.695}],"highlights":[{"text":"bug","s":5.305}]},
+  {"s":2.205,"e":4.715,"lines":[{"text":"a bunch of their own","s":2.205},{"text":"websites on purpose,","s":3.085}],"highlights":[{"text":"purpose,","s":3.955}],"out":4.285},
+  {"s":4.755,"e":6.42,"lines":[{"text":"because of this bug","s":4.715},{"text":"where hackers could","s":5.695}],"highlights":[{"text":"bug","s":5.305}]},
   {"s":6.42,"e":8.605,"lines":[{"text":"take over a site","s":6.42},{"text":"without a password.","s":7.275}],"highlights":[{"text":"without a password.","s":7.275}]},
   {"s":8.605,"e":10.135,"lines":[{"text":"It's in PHP,","s":8.605}],"highlights":[{"text":"PHP,","s":8.96}]},
   {"s":10.135,"e":11.795,"lines":[{"text":"the language","s":10.135},{"text":"everyone loves, and","s":10.64}],"highlights":[]},

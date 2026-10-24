@@ -6,36 +6,45 @@
 // S04's dive into lock4 lands on the SAME lock drawn in ink on the blueprint (same screen spot and size), the L5 tag
 // riding across as an annotation, the camera still creeping IN (1.08 -> 1.13, out(expo), 0.30 s), then locked.
 // 'before': a z floats up from Pip (asleep on the banner's bottom rail) and the banner sways once; 'researchers': team A
-// rises, then team B; 'using': the facade calendar tears to its summer page (August); L5 pops off; 'AI': one sparkle
-// tablet per team is raised, the scan beams shoot out and sweep the banner, L6 pops as a clipped slip; 'figured': the
-// beams converge on the lock; 'out': the ink target ring strokes on (found); 'how': it pulses, the teams lean in; 'bad':
-// ONE focal event: S02's dashed hooded hand redraws over the lock and turns it, Bit (posing as part of the drawing) gets
-// an ink '!'; 'it': Pip jolts awake; 'was.': the messenger pulls the envelope and dashes out right, the camera trucks
-// with him (0.30 s, ~890 screen px/s: the cut on action into S06), Pip hops off the rail to follow.
+// pops up, then team B (two depths); 'using': the facade calendar tears to its summer page (August); L5 pops off; 'AI':
+// one sparkle tablet per team is raised, the scan beams shoot out and sweep the banner, L6 pops as a clipped slip;
+// 'figured': the beams converge on the lock, team A's back-row member points at it; 'out': ONE hand-circling ink ring
+// strokes on round the lock (found) and the beams retract; 'how': it pulses, the teams lean in; 'bad': ONE focal event:
+// S02's dashed hooded hand redraws over the lock and turns it, Bit (posing as part of the drawing) gets an ink '!' and
+// hops out onto the lock box; 'it': Pip jolts awake; 'was.': the messenger raises the envelope over his left shoulder and
+// dashes out right, the camera trucks with him (0.30 s, MULTIPLANE: steps 1.0, banner / facade 0.67, wing 0.4, heads
+// 1.3: the cut on action into S06), Pip hops off the rail to follow.
 //
-// Camera: scene05/camera.ts. The sun is SCREEN space in its notch (930, 725) r110 (depth 0.05: it barely moves on the
-// truck). Notes: docs/scenes/S05.md.
+// Camera: scene05/camera.ts (each set layer gets its own camera matrix in `wrap`). The sun is SCREEN space in its notch
+// (930, 725) r110 (depth 0.05: it barely moves on the truck). Notes: docs/scenes/S05.md.
 
 import React, {useId} from 'react';
 import {World, useScene, useTime, skies, palette} from '../lib';
 import {Sun} from '../lib/Sun';
 import {mat, XG} from '../lib/xf';
 import {BlueprintWall, BLUEPRINT_WALL, LayerWrap} from './shared/sets';
-import {Calendar, DiagramHand, LabelTag, MarkRing, yearPages} from './shared/props';
+import {Calendar, DiagramHand, LabelTag, yearPages} from './shared/props';
 import {beats, S05_START, S05_END} from './scene05/beats';
-import {camAt, camMat} from './scene05/camera';
-import {Beams, BigZ, BitOnLock, KNOB, LockTurn, MessengerDash, PipS05, Teams, LOCK_C} from './scene05/cast';
+import {camAt, camMat, layerCam, LAYER_F} from './scene05/camera';
+import {Beams, BigZ, BitOnLock, MessengerDash, PipHop, PipOnRail, Teams} from './scene05/cast';
+import {FoundRing, handTurn, KNOB, LOCK_C, LockTurn, SheetColour, StepsOverlay} from './scene05/plan';
 
 // ---------------------------------------------------------------- labels (final_script section 6)
 
+/** L6's first line starts after the slip's paper clip (at 24 % of the slip's width): two en spaces push the centred
+ *  line right so the clip sits in its margin, clear of the 'f' of 'found'. */
 const L5 = ['in the code since', 'at least 2012'];
-const L6 = ['found with AI help ·', 'reported privately in August'];
+const L6 = ['   found with AI help ·', 'reported privately in August'];
 const ZOOM = 1.13;
 /** L5 continues S04's tag: where S04's dive leaves it on the cut (screen ~(426-749, 1004-1106) at zoom 1.9 around
- *  lock4), in S05 world at the 1.08 landing; hung from the lock's bottom-right corner. 36 world = 39-41 px on screen. */
-const L5_BOX: [number, number, number, number] = [434, 998, 734, 1106];
+ *  lock4), in S05 world at the 1.08 landing; hung from the lock's bottom-right corner. 36 world = 39-41 px on screen.
+ *  (Fix round 1: measured against S04's last frame, 1.5 right and 4 lower: text within 1 px.) */
+const L5_BOX: [number, number, number, number] = [435.5, 1002, 735.5, 1110];
 /** L6 on the banner's clean top margin (storyboard (205-650, 688-760), 24 px taller so two 38 px lines fit). */
 const L6_BOX: [number, number, number, number] = [205, 688, 650, 784];
+/** The calendar, 1.2 x and nudged in from the frame edge (its summer page centre at screen ~105), right edge just short
+ *  of the banner's frame (x 200). */
+const CAL: [number, number, number, number] = [114, 748, 84, 108];
 
 /** The banner's one sway on its rod: from rest, a damped sine (deg). */
 const swayAngle = (t: number, at: number, amp = 1.1, period = 0.9, settle = 0.9) => {
@@ -65,8 +74,14 @@ const OnSheet: React.FC<{children: React.ReactNode}> = ({children}) => {
 
 // ---------------------------------------------------------------- the scene
 
-/** The hand turns the thumb-turn once it is drawn (the fingers are on by +0.13 s). */
-const TURN_AT = (b: {bad: number}) => b.bad + 0.2;
+/** 'bad' (rule 5: the big read lands ON the word): the hand draws on from bad-0.10 in 0.15 s (its teal sleeve fills at
+ *  ~bad-0.02), the '!' pops and Bit hops out ON the word, the hand turns the knob from bad+0.12. */
+const HAND_AT = (b: {bad: number}) => b.bad - 0.1;
+const TURN_AT = (b: {bad: number}) => b.bad + 0.12;
+/** The pinch point and the forearm angle: -15 deg, so the teal sleeve enters the sheet's right edge below the L6 slip
+ *  (its upper edge at screen y ~ 793 on the sheet's edge) and passes ~70 px under the slip's right end. */
+const PINCH: [number, number] = [KNOB[0] + 3, KNOB[1] - 2];
+const HAND_ANGLE = -15;
 
 const Scene05: React.FC = () => {
   const t = useTime();
@@ -75,7 +90,6 @@ const Scene05: React.FC = () => {
   const end = (scene?.end ?? S05_END) - start;
   const b = beats(start);
   const cam = camAt(t, end);
-  const M = camMat(cam);
 
   // the banner sways once on its rod on 'before' (a small damped pendulum about the rod's centre)
   const sway = swayAngle(t, b.zzz);
@@ -84,32 +98,32 @@ const Scene05: React.FC = () => {
   // the sun: SCREEN space in its notch (930, 725) r110, a slow 6 px/s idle drift (never perfectly still, ENGINE 9);
   // depth 0.05 on the exit truck
   const sunX = 930 - (cam.x - 540) * cam.zoom * 0.05;
-  const sun = (
-    <XG m={mat.inv(M)}>
-      <Sun cx={sunX} cy={725} r={110} drift={[6, 0]} />
-    </XG>
-  );
+  const sun = <Sun cx={sunX} cy={725} r={110} drift={[6, 0]} />;
 
-  const calendar = (
-    <Calendar x={BLUEPRINT_WALL.calendar[0]} y={BLUEPRINT_WALL.calendar[1]} w={BLUEPRINT_WALL.calendar[2]} h={BLUEPRINT_WALL.calendar[3]} pages={[...yearPages(1), {kind: 'summer'}]} tearAt={[b.calendar]} tearDur={0.12} seed="s5cal" />
-  );
+  const calendar = <Calendar x={CAL[0]} y={CAL[1]} w={CAL[2]} h={CAL[3]} pages={[...yearPages(1), {kind: 'summer'}]} tearAt={[b.calendar]} tearDur={0.12} seed="s5cal" />;
 
-  const wrap: LayerWrap = (name, _n, node) => {
+  const turn = handTurn(t, TURN_AT(b));
+
+  const inner = (name: string, node: React.ReactNode): React.ReactNode => {
     if (name === 'banner')
       return (
         <XG m={swayM}>
           {node}
+          <SheetColour />
           {/* L5 rides across the match-cut as the lock's annotation tag; pops off on 'using' */}
           <LabelTag kind="tag" box={L5_BOX} hang={[LOCK_C[0] + 24, LOCK_C[1] + 36]} text={L5} fontSize={36} outAt={b.l5Out} seed="s5L5" />
-          <LockTurn drawAt={b.bad} turnAt={TURN_AT(b)} undrawAt={b.envelope} />
-          <MarkRing x={LOCK_C[0]} y={LOCK_C[1]} r={55} at={b.ring} pingAt={b.how} width={4.8} seed="s5ring" />
+          <LockTurn drawAt={HAND_AT(b)} turnAt={TURN_AT(b)} undrawAt={b.envelope} />
+          <FoundRing x={LOCK_C[0]} y={LOCK_C[1]} r={92} at={b.ring} pulseAt={b.how} width={4.8} />
           <OnSheet>
-            <DiagramHand x={KNOB[0] + 3} y={KNOB[1] - 2} angle={-40} scale={0.85} drawAt={b.bad} drawDur={0.22} turnAt={TURN_AT(b)} turnDeg={20} undrawAt={b.envelope} ink={3.0} handFill={palette.white} seed="s5hand" />
+            <XG m={mat.about(mat.rotate(turn), PINCH[0], PINCH[1])}>
+              <DiagramHand x={PINCH[0]} y={PINCH[1]} angle={HAND_ANGLE} scale={0.85} drawAt={HAND_AT(b)} drawDur={0.15} undrawAt={b.envelope} ink={3.0} handFill={palette.white} seed="s5hand" />
+            </XG>
           </OnSheet>
           {/* Bit over the hand (he is the one being caught), his '!' balloon over everything on the sheet */}
-          <BitOnLock b={b} alertAt={b.bad + 0.07} />
-          {/* L6: the clipped slip on the banner's clean top margin */}
-          <LabelTag kind="slip" box={L6_BOX} text={L6} fontSize={38 / ZOOM} at={b.l6} seed="s5L6" />
+          <BitOnLock alertAt={b.bad} backAt={b.bitBack} />
+          {/* L6: the clipped slip on the banner's clean top margin (leads its beat: in full by 'AI'+0.40) */}
+          <LabelTag kind="slip" box={L6_BOX} text={L6} fontSize={38 / ZOOM} at={b.l6 - 0.08} seed="s5L6" />
+          <PipOnRail b={b} />
           <BigZ at={b.zzz} />
         </XG>
       );
@@ -117,20 +131,26 @@ const Scene05: React.FC = () => {
       return (
         <>
           {node}
+          <StepsOverlay />
           <Beams b={b} />
           <Teams b={b} />
           <MessengerDash b={b} />
-          <PipS05 b={b} sway={sway} />
+          <PipHop b={b} />
         </>
       );
     return node;
   };
 
+  // MULTIPLANE: every layer gets its own camera (zoom shared, x by parallax factor); the sun stays in screen space
+  const wrap: LayerWrap = (name, _n, node) => {
+    if (name === 'sun') return node;
+    const f = LAYER_F[name] ?? 1;
+    return <XG m={camMat(layerCam(cam, f))}>{inner(name, node)}</XG>;
+  };
+
   return (
     <World sky={[{t: 0, tod: 'day', color: skies.day}]}>
-      <XG m={M}>
-        <BlueprintWall sun={sun} calendar={calendar} wrap={wrap} seed="bpw" />
-      </XG>
+      <BlueprintWall sun={sun} calendar={calendar} wrap={wrap} seed="bpw" />
     </World>
   );
 };

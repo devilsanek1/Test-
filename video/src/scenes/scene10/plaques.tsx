@@ -69,8 +69,9 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
   const W = 3.4 / s;
   const brW = Math.max(W * 1.3, 2.4 / s);
   const k = popK(t, at, 0.08, 0.2);
-  // the swing out (motion spec #14), settled well before the next beat on the plate so each beat reads on its own
-  const sw = pendulum(t, at, -16, 0.5, 0.6) * dir;
+  // the swing out (motion spec #14), settled (0.72 s) well before the next beat on the plate so each beat reads on its own
+  // + a small nudge when the cane pops on 'old' (the whole 120 px plate answers the beat, not just a thin cane line)
+  const sw = (pendulum(t, at, -16, 0.5, 0.45) + (p.caneAt !== undefined ? pendulum(t, p.caneAt, 5, 0.3, 0.25) : 0)) * dir;
 
   // ---- face state
   const flipQ = p.flipOldAt !== undefined ? prog(t, p.flipOldAt, 0.2, E.inOutSine) : 0;
@@ -102,15 +103,18 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
   // Bit (under the web: caught IN it)
   if (p.bit && t >= p.bit.at) {
     const bs = p.bit.size / s;
+    // down the left chain onto the plate's top edge, then onto the web's 30-degree strand, away from its hub (the corner):
+    // caught there at an angle along the strand, head out, so the beetle silhouette (split shell, eye dot) reads
+    const strand: Pt = [-50 + Math.cos(Math.PI / 6) * 32, -50 + Math.sin(Math.PI / 6) * 32];
     const path: Pt[] = [
-      [hookX - 18 - hookX, -66],
-      [hookX - 21.5 - hookX, -50],
-      [-37, -37],
+      [-18, -66],
+      [-21.5, -50],
+      strand,
     ];
     const crawlAt = p.bit.at + 0.1;
     const arrive = crawlAt + 0.3;
     if (t < arrive) {
-      face.push(<Bit key="bit" x={path[0][0]} y={path[0][1]} size={bs} flip state="scuttle" crawl={{at: crawlAt, path, speed: 118}} at={p.bit.at} seed={`${seed}/bit`} />);
+      face.push(<Bit key="bit" x={path[0][0]} y={path[0][1]} size={bs} state="scuttle" crawl={{at: crawlAt, path, speed: 118}} at={p.bit.at} seed={`${seed}/bit`} />);
     } else {
       // caught: legs flail, the body jerks in short bursts
       const d = t - arrive;
@@ -122,11 +126,12 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
         if (d >= bt && d < bt + 0.32) burst = Math.max(burst, Math.sin(((d - bt) / 0.32) * Math.PI));
         if (d >= bt) last = bt;
       }
-      const jerk = 12 * burst * Math.sin(d * 2 * Math.PI * 7);
-      const ang = (Math.atan2(path[2][1] - path[1][1], path[2][0] - path[1][0]) * 180) / Math.PI - 180;
+      const jerk = 14 * burst * Math.sin(d * 2 * Math.PI * 7);
+      // along the strand (30 deg, facing out of the web), kicking (scuttle legs) in the bursts
+      const ang = 30;
       // between the bursts he is stuck STILL (his clock frozen at the end of the last burst): crisp beats, no idle fidget
       const still = burst <= 0 && last >= 0 ? arrive + last + 0.32 : undefined;
-      const bitNode = <Bit x={path[2][0]} y={path[2][1]} size={bs} flip state={burst > 0.2 ? 'scuttle' : 'idle'} rot={ang + jerk} look="up" blink={false} seed={`${seed}/bit`} />;
+      const bitNode = <Bit x={path[2][0]} y={path[2][1]} size={bs} state={burst > 0.2 ? 'scuttle' : 'idle'} rot={ang + jerk} look="up" blink={false} seed={`${seed}/bit`} />;
       face.push(still !== undefined ? <TimeShift key="bit" by={t - still}>{bitNode}</TimeShift> : <React.Fragment key="bit">{bitNode}</React.Fragment>);
     }
   }
@@ -136,9 +141,11 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
     const q = E.outCubic(prog(t, p.flipOldAt + 0.12, 0.28));
     const shrink = 1 - prog(t, p.flipOldAt + 0.36, 0.14);
     let d = '';
-    ([[-1, -0.7], [1, -0.9], [-1.1, 0.4], [1.1, 0.5], [-0.4, 1.1], [0.5, 1.15]] as Pt[]).forEach(([dx, dy], i) => {
+    // (the specks stay within ~14 units of the plate on the right: the gap walker stands just right of it)
+    ([[-1, -0.7], [0.9, -0.9], [-1.1, 0.4], [0.95, 0.4], [-0.4, 1.1], [0.5, 1.1]] as Pt[]).forEach(([dx, dy], i) => {
       const r = 4.2 * shrink;
-      if (r > 0.3) d += blob(dx * (52 + q * 22), dy * (52 + q * 22), r, r, {seed: `${seed}/pf${i}`});
+      const sp = dx > 0 ? 50 + q * 12 : 52 + q * 22;
+      if (r > 0.3) d += blob(dx * sp, dy * (52 + q * 18), r, r, {seed: `${seed}/pf${i}`});
     });
     if (d) face.push(<Fill key="puff" d={d} color={palette.sand} mode="none" offset={false} seed={`${seed}/puff`} />);
   }

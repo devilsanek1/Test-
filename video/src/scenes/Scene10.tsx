@@ -11,14 +11,15 @@ import React from 'react';
 import {World, ScreenSpace, Sun, TimeShift, ease as E, useScene, useTime, useTransition} from '../lib';
 import {wipeEdgeX} from '../lib/cine/wipers';
 import scenesJson from '../data/scenes.json';
-import {LabelTag, OLD_QUARTER, OldQuarter, SunPie} from './scene10/kit';
+import {LabelTag, OLD_QUARTER, OldQuarter, PopUp, SunPie} from './scene10/kit';
 import {localBeats, SCENE, W} from './scene10/beats';
 import {SecondRow} from './scene10/secondRow';
-import {PLAQUE_SIZE, Sites, TAG_HANG} from './scene10/sites';
+import {PLAQUE_SIZE, Plaques, Sites, Stoops, TAG_HANG} from './scene10/sites';
 import {plaqueFacePoint, TAG_W, tagBodyOffset} from './scene10/plaques';
 import {Cart, CartTimes, Tosses} from './scene10/cart';
 import {Pip} from './scene10/pip';
-import {GapWalker} from './scene10/walker';
+import {GAP_WALKER, GapWalker} from './scene10/walker';
+import {BottomCrowd, FarStreet, SandwichBoard, StreetGround} from './scene10/street';
 // S09's tram (its exported Wiper): read-only, to hand Pip over from its roof and to preview the wipe standalone
 import {TRAM as S09_TRAM, TramWiper, tramPipAt} from './scene09/TramWiper';
 import type {Pt} from '../lib/sketch';
@@ -53,6 +54,9 @@ const Scene10: React.FC = () => {
   const sunAir = b.sunLand - b.cut;
   // Pip leaves S09's tram roof exactly where S09's Wiper last drew him (its tramPipAt, film time)
   const hand = tramPipAt(start + b.pipHop);
+  // the street-gap wedge and its walker pop up with siteR (not floating in the empty street from the cut)
+  const sitePops: [number, number, number] = [b.siteL, b.siteL + 0.1, b.siteL + 0.2];
+  const wedgeAt = sitePops[2];
 
   return (
     <World sky={[{t: 0, tod: 'day'}]} push={{to: 1.05, at: 0.25, dur: W.of - start - 0.25, anchor: [540, 1380]}}>
@@ -67,28 +71,40 @@ const Scene10: React.FC = () => {
         people={false}
         furniture="bike"
         cart={<Cart T={cartT} />}
-        noticeSign={(box) => <LabelTag kind="sign" box={box} fontSize={30 / 1.05} legH={30} text={L13} at={b.label} seed="s10/L13" />}
+        noticeSign={(box) => (
+          <SandwichBoard box={box} ground={box[3] + 30} at={b.label}>
+            <LabelTag kind="sign" box={box} fontSize={30 / 1.05} legH={30} frame={false} text={L13} seed="s10/L13" />
+          </SandwichBoard>
+        )}
         wrap={(name, _n, node) => {
-          if (name === 'far') return null; // the band + far city sit behind the second row (and float in the empty street)
-          if (name === 'second') return <SecondRow popAt={b.second} flipAt={b.flip2} windowAt={b.pieSolid} tagsAt={b.wave} />;
+          // the empty street has a horizon from the cut: pavement to the eye line + a thin fill-only skyline
+          if (name === 'far') return <FarStreet />;
+          if (name === 'ground') return <StreetGround wedgeAt={wedgeAt} />;
+          if (name === 'second') return <SecondRow popAt={b.second} flipAt={b.flip2} dropAt={b.dust + 0.1} windowAt={b.pieSolid} tagsAt={b.wave} />;
           if (name === 'sites')
             return (
               <>
-                <Sites
-                  popAt={[b.siteL, b.siteL + 0.1, b.siteL + 0.2]}
-                  plaqueAt={[b.plaques, b.plaques + 0.06, b.plaques + 0.12]}
-                  old={{flipOldAt: b.flipM, cobwebAt: b.cobweb, dustAt: b.dust, caneAt: b.cane, droopAt: b.droop, wobbleAt: b.wobble, bit: {at: b.bitIn, size: 17, bursts: [0, b.cane, b.not, b.update].map((x) => x - (b.bitIn + 0.4))}}}
-                  tagL={{at: b.tick1, tickAt: b.tick1 + 0.03}}
-                  tagR={{at: b.tick2, tickAt: b.tick2 + 0.03}}
-                  updateAt={b.update}
-                />
-                {/* the gap walker is FARTHER than the cart line (feet 1262 -> 1238 vs 1336): drawn before the set's cart slot */}
-                <GapWalker walkAt={b.walker} stopAt={b.cobweb - 0.12} />
+                <Sites popAt={sitePops} updateAt={b.update} wobbleAt={b.wobble} />
+                {/* the gap walker is FARTHER than the cart line (feet 1262 -> 1238 vs 1336): drawn before the set's cart
+                    slot; he pops up with the gap wedge (siteR) and keeps walking up the gap until the cart steps out */}
+                <PopUp at={wedgeAt} x={GAP_WALKER.x} y={GAP_WALKER.y}>
+                  <GapWalker walkAt={b.walker} stopAt={b.cartIn} />
+                </PopUp>
               </>
             );
           if (name === 'sign')
             return (
               <>
+                {/* the stoops' fronts and the hanging plaques are nearer than the cart line: the cart's wheels and the
+                    maker's feet pass behind the stoops, his head and shoulders behind the plaques (which project toward
+                    the camera from their brackets); the A-frame stands below the plaques */}
+                <Stoops popAt={sitePops} />
+                <Plaques
+                  plaqueAt={[b.plaques, b.plaques + 0.06, b.plaques + 0.12]}
+                  old={{flipOldAt: b.flipM, cobwebAt: b.cobweb, dustAt: b.dust, caneAt: b.cane, droopAt: b.droop, wobbleAt: b.wobble, bit: {at: b.bitIn, size: 20, bursts: [0, b.cane, b.not, b.update].map((x) => x - (b.bitIn + 0.4))}}}
+                  tagL={{at: b.tick1, tickAt: b.tick1 + 0.03}}
+                  tagR={{at: b.tick2, tickAt: b.tick2 + 0.03}}
+                />
                 {node}
                 <Tosses T={cartT} land1={body(hangL)} land2={body(hangR)} tagSize={TAG_W} />
               </>
@@ -97,7 +113,14 @@ const Scene10: React.FC = () => {
             return (
               <>
                 {node}
-                <Pip T={{leap: b.pipHop, leapFrom: [hand.x, hand.y], leapScale: hand.scale, perk: b.pipPerk, lookPlaque: b.walker, lookWeb: b.cobweb + 0.1, hey: b.hey, heyEnd: b.heyEnd, out: b.pipOut}} />
+                <Pip T={{leap: b.pipHop, leapFrom: [hand.x, hand.y], leapScale: hand.scale, perk: b.pipPerk, lookPlaque: b.walker, lookFar: b.flip2 + 0.04, lookWeb: b.cobweb + 0.1, lookCart: b.cartIn + 0.05, hey: b.hey, heyEnd: b.heyEnd, out: b.pipOut}} />
+              </>
+            );
+          if (name === 'foreground')
+            return (
+              <>
+                {node}
+                <BottomCrowd />
               </>
             );
           return node;

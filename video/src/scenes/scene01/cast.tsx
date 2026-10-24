@@ -2,7 +2,7 @@
 // is a pure function of scene time (no state between frames), so S12's rewind can replay it backwards through a
 // TimeProvider.
 import React from 'react';
-import {palette} from '../../lib/theme';
+import {palette, skies} from '../../lib/theme';
 import {clamp, ease as E, lerp, osc, prog, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
@@ -18,7 +18,7 @@ import {Citizen} from '../shared/props';
 
 /** A sleeve with an elbow from the shoulder to the hand (2-link IK, the elbow bends OUTWARD on `side` and down, so the
  *  arm folds instead of sweeping straight), coat polygon + ink sides + a sand hand. Local units of the figure. */
-const ElbowArm: React.FC<{sh: Pt; hand: Pt; lu: number; lf: number; side: 1 | -1; w: number; coat: string; W: number; seed: string}> = ({sh, hand, lu, lf, side, w, coat, W, seed}) => {
+const ElbowArm: React.FC<{sh: Pt; hand: Pt; lu: number; lf: number; side: 1 | -1; w: number; coat: string; W: number; seed: string; showHand?: boolean}> = ({sh, hand, lu, lf, side, w, coat, W, seed, showHand = true}) => {
   let dx = hand[0] - sh[0];
   let dy = hand[1] - sh[1];
   let d = Math.hypot(dx, dy) || 1e-6;
@@ -58,25 +58,39 @@ const ElbowArm: React.FC<{sh: Pt; hand: Pt; lu: number; lf: number; side: 1 | -1
   const fx = H[0] - El[0];
   const fy = H[1] - El[1];
   const fL = Math.hypot(fx, fy) || 1;
+  // fix round 2: a ROUNDED elbow (each sleeve side is one quadratic through its miter point; the old polyline read as a
+  // stiff angular Z at the frame edge)
+  const sideD = (P: Pt[]) => `M${f(P[0])}Q${f(P[1])} ${f(P[2])}`;
   return (
     <>
-      <Fill d={blob(H[0] + (fx / fL) * w * 0.25, H[1] + (fy / fL) * w * 0.25, w * 0.42, w * 0.46, {seed: `${seed}/h`})} color={palette.sand} offset={false} mode="none" seed={`${seed}/hf`} />
-      <Fill d={polyPath([...A, ...Bp.slice().reverse()])} color={coat} offset={false} mode="none" seed={`${seed}/af`} />
-      <Ink d={`M${f(A[0])}L${f(A[1])}L${f(A[2])}M${f(Bp[0])}L${f(Bp[1])}L${f(Bp[2])}M${f(A[2])}L${f(Bp[2])}`} width={W} taper={false} seed={`${seed}/ai`} />
+      {showHand ? <Fill d={blob(H[0] + (fx / fL) * w * 0.25, H[1] + (fy / fL) * w * 0.25, w * 0.42, w * 0.46, {seed: `${seed}/h`})} color={palette.sand} offset={false} mode="none" seed={`${seed}/hf`} /> : null}
+      <Fill d={`${sideD(A)}L${f(Bp[2])}Q${f(Bp[1])} ${f(Bp[0])}Z`} color={coat} offset={false} mode="none" seed={`${seed}/af`} />
+      <Ink d={`${sideD(A)}${sideD(Bp)}M${f(A[2])}L${f(Bp[2])}`} width={W} taper={false} seed={`${seed}/ai`} />
     </>
   );
 };
 
-/** A phone held up, its lit screen toward us (we stand behind the filmer): a 3-stroke mini govB on it (the dome, the
- *  shut teal block, the shutter slats): everyone is filming the shutdown. Local units, the hand at (0, 0). */
+/** A phone held up, its screen toward us (we stand behind the filmer), showing what it films (fix round 2: a single
+ *  rounded shape over a dark block read as a padlock icon): the plaza in miniature, day sky, the orange sun in the
+ *  gap, govB (small dome, BLACK window = the dead screen) left of it and govD's cream block right of it: everyone is
+ *  filming the shutdown. The hand's thumb and two fingers wrap the phone's sides in front of
+ *  it (sand + ink). Local units, the hand at (0, 0). */
 const LitPhone: React.FC<{W: number; seed: string}> = ({W, seed}) => (
   <>
     <Fill d={roundRect(-12, -42, 24, 40, 4)} color={palette.card} offset={false} mode="none" seed={`${seed}/pb`} />
-    <Fill d={rectPath(-9, -38, 18, 31)} color={palette.cream} offset={false} mode="none" seed={`${seed}/ps`} />
-    <Fill d={rectPath(-6.5, -25, 13, 15)} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/pg`} />
+    <Fill d={rectPath(-9, -38, 18, 31)} color={skies.day} offset={false} mode="none" seed={`${seed}/ps`} />
+    {/* the sun in the gap, govB (dome + black window) left of it, govD's cream block right of it */}
+    <Fill d="M-2 -21a5.4 5.4 0 1 0 10.8 0a5.4 5.4 0 1 0 -10.8 0Z" color={palette.sun} offset={false} mode="none" seed={`${seed}/psun`} />
+    <Fill d="M-9 -9V-20H-8A3.4 3.8 0 0 1 -1.2 -20H0V-9Z" color={palette.sand} offset={false} mode="none" seed={`${seed}/pbb`} />
+    <Fill d={rectPath(4, -17.5, 5, 8.5)} color={palette.cream} offset={false} mode="none" seed={`${seed}/pbd`} />
+    <Fill d={rectPath(-7.6, -17.6, 6.2, 4)} color={palette.ink} offset={false} mode="none" seed={`${seed}/pwin`} />
+    <Fill d={rectPath(-9, -9, 18, 2)} color={palette.mintPale} offset={false} mode="none" seed={`${seed}/pgr`} />
     <Ink d={roundRect(-12, -42, 24, 40, 4, {seed: `${seed}/pi`})} width={W * 0.85} taper={false} seed={`${seed}/pi`} />
-    <Ink d="M-5.5 -25Q-5 -33 0 -33Q5 -33 5.5 -25" width={W * 0.6} taper={false} seed={`${seed}/pd`} />
-    <path d="M-5 -20.5H5M-5 -15.5H5" fill="none" stroke={palette.cream} strokeWidth={W * 0.45} strokeLinecap="round" />
+    <Ink d="M-9 -20H-8A3.4 3.8 0 0 1 -1.2 -20H0V-9M4 -9V-17.5H9M-9 -9H9" width={W * 0.36} taper={false} seed={`${seed}/pbi`} />
+    {/* the hand around the phone: thumb at the lower left, two fingers on the right, in front of the case */}
+    <Fill d={blob(-11.5, -8.5, 3.4, 5.4, {seed: `${seed}/th`})} color={palette.sand} offset={false} mode="none" seed={`${seed}/thf`} />
+    <Fill d={blob(12, -13, 3.2, 3.8, {seed: `${seed}/f1`}) + blob(12, -6.5, 3.2, 3.6, {seed: `${seed}/f2`})} color={palette.sand} offset={false} mode="none" seed={`${seed}/fgf`} />
+    <Ink d={blob(-11.5, -8.5, 3.4, 5.4, {seed: `${seed}/th`}) + blob(12, -13, 3.2, 3.8, {seed: `${seed}/f1`}) + blob(12, -6.5, 3.2, 3.6, {seed: `${seed}/f2`})} width={W * 0.6} taper={false} seed={`${seed}/hi`} />
   </>
 );
 
@@ -138,6 +152,9 @@ export type CitizenPlan = {
   /** Idle bob (px). */
   bob?: number;
   silhouette?: boolean;
+  /** On-screen ink width override (default by height: 3.4 / 2.2 / 1.6). */
+  ink?: number;
+  hairColor?: string;
 };
 
 /** The coat colour the kit Person picks for a seed when neither body, hair nor acc picks are random (mirrors
@@ -198,7 +215,7 @@ export const PlazaCitizen: React.FC<{p: CitizenPlan; vp: Pt; horizon: number}> =
   const s = h / FIG_H;
   const bob = p.bob ? osc(t, 0.55) * p.bob : 0; // phase 0: frame 0 = standing
   const lean = leanAt(t, p.lean);
-  const W = inkFor(p.h) / s;
+  const W = (p.ink ?? inkFor(p.h)) / s;
   const g = headGeo(p.seed);
   const coat = p.body ?? coatOf(p.seed, p.hair !== undefined);
   const parts: React.ReactNode[] = [];
@@ -241,7 +258,7 @@ export const PlazaCitizen: React.FC<{p: CitizenPlan; vp: Pt; horizon: number}> =
   }
   return (
     <XG m={mat.compose(mat.translate(x, y + bob), mat.rotate(lean), mat.translate(0, -LEG * s), mat.scale(s))}>
-      <Person seed={p.seed} legs torsoH={TORSO} legH={LEG} body={p.body} hair={p.hair} acc={p.acc} ink={W} walk={walking ? p.walk?.hz : undefined} hero={false} lod={h < 34 ? 1 : 0} />
+      <Person seed={p.seed} legs torsoH={TORSO} legH={LEG} body={p.body} hair={p.hair} hairColor={p.hairColor} acc={p.acc} ink={W} walk={walking ? p.walk?.hz : undefined} hero={false} lod={h < 34 ? 1 : 0} />
       {parts}
     </XG>
   );
@@ -429,20 +446,25 @@ export const PipS01: React.FC<{p: PipPlan; seed?: number}> = ({p, seed = 11}) =>
     const grow = 1 + 0.3 * E.inOutSine(k);
     return <Elephant x={x} y={y} scale={grow} t={t} seed={seed} pose="stand-side" amount={Math.sqrt(Math.sin(Math.PI * Math.min(1, k * 0.9 + 0.1)))} squash={squash} rotate={-10 * Math.cos(Math.PI * k)} look={0.2} />;
   }
-  // the startle hop: an instant pop into trunk-up (wide), a quick vertical hop, landing squash, back to sit-back
+  // the startle hop (fix round 2: no look to camera): an instant pop into the PROFILE facing govB (stand-side, flipped
+  // to face left), eyes wide, a quick vertical hop with the legs spread and the ears + tail up (the leap `amount`),
+  // landing squash, back to sit-back. The old trunk-up pose is front-facing whatever its `look`.
   if (t >= p.hopAt && t < p.backAt) {
     const air = p.landAt - p.hopAt;
     let y = p.y;
     let squash = popSwitch(t, p.hopAt) * 0.6;
+    let amount = 0.45;
     if (t < p.landAt) {
       const k = (t - p.hopAt) / air;
       y = p.y - 34 * 4 * k * (1 - k);
       squash -= 0.16 * Math.sin(Math.PI * k);
+      amount = 0.45 + 0.55 * Math.sin(Math.PI * Math.min(1, k * 1.4));
     } else {
       const d = t - p.landAt;
       squash += 0.22 * Math.exp(-d * 11) * Math.cos(d * Math.PI * 2 * 3.2);
+      amount = 0.2 + 0.25 * Math.exp(-d * 8);
     }
-    return <Elephant x={p.x} y={y} scale={1} t={t} seed={seed} pose="trunk-up" expression="wide" look={p.look * 0.8} squash={squash} />;
+    return <Elephant x={p.x} y={y} scale={1} t={t} seed={seed} pose="stand-side" flip expression="wide" amount={amount} look={0.9} squash={squash} />;
   }
   let look = 0;
   let squash = p.flinchAt !== undefined ? popSwitch(t, p.flinchAt) * 1.25 : 0;

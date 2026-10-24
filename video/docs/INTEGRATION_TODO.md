@@ -39,6 +39,20 @@ polish pass (same two reviewer lenses, plus a cross-scene continuity reviewer) b
 22:58, round 1 -> round 2: S01 art 7/7, motion 6.5/8 (one caption-legibility gate error in the dive); S11 art 7/7.5;
 S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6.5. Every other lens is at 7-8.
 
+## Cross-lane findings scene agents can't fix (polish pass)
+
+- DONE (core, 23:40): S01 caption over the dive. `out` on caption pages; page 2 leaves at 4.285, page 3 rolls in on
+  the cut at 4.715 (docs/ENGINE.md).
+- Core: ink weight jumps across S01 -> S02 because the dive scales every stroke by up to 3.07x (8-10 px at the cut
+  against S02's 3-4 px). Fix with stroke x zoom^-0.6 on transition-flagged camera segments, or a GovernmentPlaza
+  `inkScale` driven by S01 over 4.385-4.715.
+- Sets (GovernmentPlaza): (a) the plaza ground is ~60% sage, so the bottom half is a heavy teal mass. Make the field
+  mintPale/cream with one diagonal sage shade wedge of <= 1/3. (b) The "Europe" far-civic silhouettes step only
+  ~1.3:1 and the gap reads as one teal pillar. Give a two-value dark step, a horizon line at world y ~1150-1180, and
+  3 shrinking tiers. (c) One flute stroke per column (govA reads as a barcode in the dive).
+- S01 in lane (if its fix rounds don't get to it): padlocks 52-60 px, 3.4 px ink, cream/ochre body, overlapping the
+  shutter's bottom rail.
+
 ## Other
 
 - Edge treatment: DONE, `paint-subtle` is wired into `Film` (full film only, captions above, one painting per scene).

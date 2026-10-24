@@ -2,7 +2,8 @@
 // x 600-650, on the board's top edge) is switched off (towerAt far in the future, no searchAt) and the scene draws its
 // own tower INSIDE the glass by the right flank, in the set's silhouette style (tealDark lattice + cabin, dark window,
 // no guard), and a flat light cone: one solid 1.6 px ink edge on the upper side, none below, stopping at the dome's far
-// (left) side instead of the frame edge; fixed translucency (no fades), the fill stepped to a dusk value on 'day'.
+// (left) side instead of the frame edge; a warm (peach) light at a FIXED translucency (no fades: it has to read on the
+// light glass), one step quieter on 'day' so it never becomes the brightest shape of the dusk.
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {ease as E, prog, useTime} from '../../lib/time';
@@ -90,7 +91,7 @@ export const beamEnd = (deg: number): Pt => {
 };
 
 /** The searchlight cone (pointing LEFT across the dome; angle = degrees BELOW the horizontal). */
-export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; duskAt?: number; half?: number}> = ({at, angle, duskAt, half = 7}) => {
+export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; duskAt?: number; half?: number}> = ({at, angle, duskAt, half = 8}) => {
   const t = useTime();
   const look = useLook();
   if (t < at || look.fills !== 'color') return null;
@@ -108,7 +109,7 @@ export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; d
   const dusk = duskAt !== undefined && t >= duskAt;
   return (
     <>
-      <path d={poly([o, up, mid, lo])} fill={dusk ? '#A0C7B5' : palette.cream} opacity={0.5} />
+      <path d={poly([o, up, mid, lo])} fill={palette.peach} opacity={dusk ? 0.45 : 0.6} />
       <path d={`M${o[0]} ${o[1]}L${up[0].toFixed(1)} ${up[1].toFixed(1)}`} fill="none" stroke={palette.ink} strokeWidth={SI.hair} strokeLinecap="round" />
     </>
   );

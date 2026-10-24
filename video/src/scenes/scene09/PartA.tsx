@@ -22,7 +22,7 @@ import {StoopStreet, STOOP, paneFill, windowInk, SI, HALF, Foreground, EdgeFigur
 import type {WalkerAnchor} from '../shared/sets';
 import {Bit, Keeper, Lock, LockCrate, MakersCart, NewLockIcon, FixSign} from '../shared/props';
 import {B} from './beats';
-import {A2_NEAR_TOP, ClipOut} from './matchcut';
+import {ClipOut, WIRE_HOLE} from './matchcut';
 
 // ---------------------------------------------------------------- anchors (Part A world)
 
@@ -450,7 +450,7 @@ export const PartA: React.FC = () => {
       </>
     );
     if (name === 'ground') return groundStep(t, node);
-    if (name === 'near') return <ClipOut holes={[TREE_HOLE]} top={a2 ? A2_NEAR_TOP : undefined}>{groundStep(t, node)}</ClipOut>;
+    if (name === 'near') return <ClipOut holes={a2 ? [TREE_HOLE, WIRE_HOLE] : [TREE_HOLE]}>{groundStep(t, node)}</ClipOut>;
     return node;
   };
   return (

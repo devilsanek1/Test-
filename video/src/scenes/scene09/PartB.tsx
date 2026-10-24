@@ -88,7 +88,7 @@ const RidgeRims: React.FC = () => {
   const top = TERRACE.ridge;
   let d = '';
   RIDGE_RIMS.forEach(([x, w], i) => {
-    if (t >= B.server + Math.floor(i / 2) * 0.03) d += `M${x} ${top}h${w}v4h${-w}Z`;
+    if (t >= B.server + Math.floor(i / 2) * 0.03) d += `M${x} ${top - 1}h${w}v5h${-w}Z`;
   });
   return <Fill d={d} color={palette.peach} offset={false} mode="snap" seed="s9ridgeRims" />;
 };
@@ -182,8 +182,18 @@ const PipB: React.FC = () => {
   // him; he lands on the roof at boardLand, where the Wiper takes over
   if (t >= B.board - 0.14) {
     if (t >= B.boardLand) return null;
-    const b = hop({t, t0: B.board, dur: B.boardLand - B.board, from: to, to: {x: to.x, y: 602}, height: 44});
-    return <Elephant x={b.x} y={b.y} scale={NEAR.pip.scale} pose={b.airborne ? 'stand-side' : 'sit-back'} amount={b.spread} squash={b.squash} rotate={b.rotate * 0.5} look={-0.4} t={t} seed={9} />;
+    if (t < B.board) {
+      // the crouch (anticipation) on the post
+      const a = (t - (B.board - 0.14)) / 0.14;
+      return <Elephant x={to.x} y={to.y} scale={NEAR.pip.scale} pose="sit-back" look={-0.4} squash={0.22 * Math.sin((a * Math.PI) / 2)} t={t} seed={9} />;
+    }
+    // straight up, decelerating to 14 px above the roof line, then down onto it (feet never above y 586: his head stays
+    // under the caption box)
+    const k = (t - B.board) / (B.boardLand - B.board);
+    const up = 0.78;
+    const y = k < up ? lerp(to.y, 586, 1 - Math.pow(1 - k / up, 2)) : lerp(586, 602, Math.pow((k - up) / (1 - up), 2));
+    const squash = k < 0.3 ? -0.22 * (1 - k / 0.3) - 0.04 : -0.04;
+    return <Elephant x={to.x} y={y} scale={NEAR.pip.scale} pose="stand-side" amount={Math.sqrt(Math.sin(Math.PI * Math.min(1, k)))} squash={squash} look={-0.4} t={t} seed={9} />;
   }
   const m0 = mapped(t0);
   const h = hop({t, t0, dur: air, from: {x: m0.x, y: m0.y}, to, height: 46});

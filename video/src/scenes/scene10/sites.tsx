@@ -1,13 +1,14 @@
 // S10 near row (replaces the OldQuarter 'sites' layer through the set's `wrap`): the same three SiteFacades, roofs,
 // balconies and stoops as the set (geometry copied from sets/OldQuarter.tsx, anchors from OLD_QUARTER), with
-//  - each stoop's ink inside its own pop-up (the empty street at the reveal has no floating stoop lines),
-//  - the hanging plaques as local HangPlaques (swing out on 'PHP'; siteM's carries every old-plaque beat; the support
-//    tags land on siteL's and siteR's),
-//  - siteM's browser window starting the update that stalls (a progress track in the screen + the title-bar ring).
+//  - the stoops as their own component (`Stoops`, popping with their sites, drawn in front of the cart line),
+//  - siteM's browser window starting the update that stalls (a fat progress bar + '10%' in the screen, a 1.4x ring).
+// The hanging plaques are a separate component (`Plaques`), drawn above the cart line.
 
 import React from 'react';
 import {palette} from '../../lib/theme';
-import {lerp, prog, ease as E, useTime} from '../../lib/time';
+import {lerp, prog, ease as E, springAt, springs, useTime} from '../../lib/time';
+import {mat, XG} from '../../lib/xf';
+import {captionFontStack, useCaptionFont} from '../../lib/font';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {crown, line, polyPath, Pt, rectPath, roundRect} from '../../lib/sketch';
@@ -81,45 +82,75 @@ const Roof: React.FC<{id: SiteId}> = ({id}) =>
     </>
   );
 
-/** siteM's update page: a peach header, a big progress track that stalls at ~10 % (the bar the voice says can't finish). */
-const UpdatePage: React.FC<{w: number; h: number; at: number}> = ({w, h, at}) => {
+/** siteM's update page (the scene's last focal beat, read on a phone): a FAT progress bar spanning the window (32 px,
+ *  3.4 ink outline, white trough, orange fill) creeps 4 % -> 7 % -> 10 % and STOPS with a 1-frame shudder (another, smaller
+ *  one on the cane wobble); a hand-lettered readout above it ('10%', the rhyme of S11's '8%') pops to each step. */
+export const STALL = {steps: [[0.04, 0.04], [0.13, 0.07], [0.23, 0.1]] as [number, number][], shudder: 0.42};
+const UpdatePage: React.FC<{w: number; h: number; at: number; wobbleAt?: number}> = ({w, h, at, wobbleAt}) => {
+  useCaptionFont();
   const t = useTime();
-  const steps: [number, number][] = [
-    [at + 0.05, 0.04],
-    [at + 0.17, 0.075],
-    [at + 0.31, 0.1],
-  ];
   let v = 0;
-  for (const [ts, vv] of steps) {
+  let shown = 0;
+  let popT = -1;
+  for (const [dt, vv] of STALL.steps) {
+    const ts = at + dt;
     if (t < ts) break;
     v = lerp(v, vv, prog(t, ts, 0.08, E.outCubic));
+    shown = Math.round(vv * 100);
+    popT = ts;
   }
-  const pad = 14;
+  // the stall: a 1-frame shudder (4 px right) when it stops, a 2.5 px one on the wobble
+  let dx = 0;
+  if (t >= at + STALL.shudder && t < at + STALL.shudder + 1 / 30) dx = 4;
+  if (wobbleAt !== undefined && t >= wobbleAt && t < wobbleAt + 1 / 30) dx = -2.5;
+  const pad = 8;
   const tw = w - pad * 2;
-  const ty = h * 0.5;
-  const th = 22;
+  const th = 32;
+  const ty = h - th - 14;
+  const fs = 24;
+  const k = popT >= 0 ? 1 + 0.18 * Math.max(0, 1 - (t - popT) / 0.12) : 1;
   return (
-    <>
-      <Fill rect={[pad, 9, tw, 14]} color={palette.peach} offset={false} mode="snap" seed="s10u/h" />
-      <Fill d={roundRect(pad, ty, tw, th, 5)} color={palette.white} offset={false} mode="snap" seed="s10u/tr" />
-      {v > 0.002 ? <Fill d={rectPath(pad + 3, ty + 3, (tw - 6) * v, th - 6)} color={palette.sage} offset={false} mode="none" seed="s10u/f" /> : null}
-      <Ink d={roundRect(pad, ty, tw, th, 5, {seed: 's10u/ti', closed: false})} width={2.4} taper={false} seed="s10u/ti" />
-      <Ink d={line(pad + 4, ty - 10, pad + tw * 0.46, ty - 10, {seed: 's10u/l', over: [0, 2]})} width={1.6} taper={false} seed="s10u/l" />
-    </>
+    <XG m={mat.translate(dx, 0)}>
+      {shown > 0 ? (
+        <XG m={mat.about(mat.scale(k), pad + 22, ty - 12)}>
+          <text x={pad + 2} y={ty - 6} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink}>
+            {`${shown}%`}
+          </text>
+        </XG>
+      ) : null}
+      <Fill d={roundRect(pad, ty, tw, th, 6)} color={palette.white} offset={false} mode="snap" seed="s10u/tr" />
+      {v > 0.002 ? <Fill d={rectPath(pad + 3, ty + 3, (tw - 6) * v, th - 6)} color={palette.sun} offset={false} mode="none" seed="s10u/f" /> : null}
+      <Ink d={roundRect(pad, ty, tw, th, 6, {seed: 's10u/ti', closed: false})} width={3.4} taper={false} vary={0} seed="s10u/ti" />
+    </XG>
+  );
+};
+
+/** The stalled update's loading ring in siteM's title bar (1.4 x the chrome's): peach band, ink rims, ONE ink tick that
+ *  spins (1.3 rev/s), popping in on the update. World coords. */
+const StallRing: React.FC<{x: number; y: number; r: number; at: number}> = ({x, y, r, at}) => {
+  const t = useTime();
+  if (t < at) return null;
+  const k = springAt(t, at, springs.pop);
+  const band = r * 0.42;
+  const a = (((t - at) * 1.3 * 360 - 90) * Math.PI) / 180;
+  const c = Math.cos(a);
+  const sn = Math.sin(a);
+  return (
+    <g transform={`translate(${x} ${y}) scale(${k.toFixed(4)})`}>
+      <circle r={r} fill="none" stroke={palette.peach} strokeWidth={band} />
+      <circle r={r + band / 2} fill="none" stroke={palette.ink} strokeWidth={2.4} />
+      <circle r={Math.max(0.5, r - band / 2)} fill="none" stroke={palette.ink} strokeWidth={1.7} />
+      <path d={`M${(c * (r - band * 0.75)).toFixed(2)} ${(sn * (r - band * 0.75)).toFixed(2)}L${(c * (r + band * 0.75)).toFixed(2)} ${(sn * (r + band * 0.75)).toFixed(2)}`} stroke={palette.ink} strokeWidth={3.2} strokeLinecap="round" />
+    </g>
   );
 };
 
 export type SitesProps = {
   popAt: [number, number, number];
-  /** Plaques swing out (L, M, R). */
-  plaqueAt: [number, number, number];
-  /** siteM's plaque events (HangPlaque). */
-  old: Pick<HangPlaqueProps, 'flipOldAt' | 'cobwebAt' | 'dustAt' | 'caneAt' | 'droopAt' | 'wobbleAt' | 'bit'>;
-  /** Support tags landing on siteL's / siteR's plaques. */
-  tagL?: {at: number; tickAt: number};
-  tagR?: {at: number; tickAt: number};
   /** siteM's browser starts its stalled update. */
   updateAt: number;
+  /** The stalled bar shudders again (the cane wobble). */
+  wobbleAt?: number;
 };
 
 /** Face-local hang points of the support tags (100-unit face coords): tied to the top screw on the side the cart comes
@@ -127,15 +158,35 @@ export type SitesProps = {
 export const TAG_HANG: Record<'L' | 'R', Pt> = {L: [44, -40], R: [-44, -40]};
 export const PLAQUE_SIZE: Record<SiteId, number> = {L: 112, M: 120, R: 112};
 
-export const Sites: React.FC<SitesProps> = ({popAt, plaqueAt, old, tagL, tagR, updateAt}) => {
+/** siteM's title-bar ring spot (world): where the chrome reserves its ring (BrowserChrome pill geometry). */
+function ringSpot(r: [number, number, number, number]): {x: number; y: number; r: number} {
+  const [x, y, w, h] = r;
+  const bar = Math.min(30, h * 0.27);
+  const dr = bar * 0.25;
+  const sp = bar * 0.63;
+  const d0 = bar * 0.47;
+  const px = d0 + 2 * sp + dr + bar * 0.38;
+  const ringR = bar * 0.33;
+  const pw = Math.max(bar, w - px - (ringR * 2 + bar * 0.5));
+  return {x: x + px + pw + bar * 0.25 + ringR, y: y + bar / 2, r: ringR * 1.4};
+}
+
+export const Sites: React.FC<SitesProps> = ({popAt, updateAt, wobbleAt}) => {
   const t = useTime();
   const node = (id: SiteId, i: number) => {
     const c = S[id];
     const browserSlot =
       id === 'M'
-        ? (r: [number, number, number, number]) => (
-            <BrowserChrome x={r[0]} y={r[1]} w={r[2]} h={r[3]} ink={SI.mid} ring={{at: updateAt, spin: 1.4}} content={t >= updateAt ? ({w, h}) => <UpdatePage w={w} h={h} at={updateAt} /> : undefined} seed="oq/siteM/bw" />
-          )
+        ? (r: [number, number, number, number]) => {
+            const rs = ringSpot(r);
+            return (
+              <>
+                {/* ring={{at: never}} keeps the chrome's pill short (the ring's slot reserved); ours draws there */}
+                <BrowserChrome x={r[0]} y={r[1]} w={r[2]} h={r[3]} ink={SI.mid} ring={{at: 1e6}} content={t >= updateAt ? ({w, h}) => <UpdatePage w={w} h={h} at={updateAt} wobbleAt={wobbleAt} /> : undefined} seed="oq/siteM/bw" />
+                <StallRing x={rs.x} y={rs.y} r={rs.r} at={updateAt} />
+              </>
+            );
+          }
         : undefined;
     return (
       <PopUp key={id} at={popAt[i]} x={c.x + c.w / 2} y={OLD_QUARTER.base + 24}>
@@ -148,21 +199,50 @@ export const Sites: React.FC<SitesProps> = ({popAt, plaqueAt, old, tagL, tagR, u
             <Ink d={G.balcInk} width={SI.far} taper={false} seed="oq/balci" />
           </>
         ) : null}
-        <Fill d={G.stoops[i]} color={palette.sand} seed={`oq/stoop${id}`} />
-        <Ink d={G.stoopInk[i]} width={SI.mid} taper={false} seed={`oq/stoopI${id}`} />
       </PopUp>
     );
   };
-  const sg = (id: SiteId) => S[id].sign;
   return (
     <>
       {node('M', 1)}
       {node('L', 0)}
       {node('R', 2)}
+    </>
+  );
+};
+
+/** The three stoops, popping with their sites. Drawn IN FRONT of the cart line (Scene10's 'sign' layer): the cart rolls
+ *  just behind the stoops' front edge, so its wheels and the maker's feet pass behind them (and clear of Pip's ears). */
+export const Stoops: React.FC<{popAt: [number, number, number]}> = ({popAt}) => (
+  <>
+    {IDS.map((id, i) => (
+      <PopUp key={id} at={popAt[i]} x={S[id].x + S[id].w / 2} y={OLD_QUARTER.base + 24}>
+        <Fill d={G.stoops[i]} color={palette.sand} seed={`oq/stoop${id}`} />
+        <Ink d={G.stoopInk[i]} width={SI.mid} taper={false} seed={`oq/stoopI${id}`} />
+      </PopUp>
+    ))}
+  </>
+);
+
+export type PlaquesProps = {
+  /** Plaques swing out (L, M, R). */
+  plaqueAt: [number, number, number];
+  /** siteM's plaque events (HangPlaque). */
+  old: Pick<HangPlaqueProps, 'flipOldAt' | 'cobwebAt' | 'dustAt' | 'caneAt' | 'droopAt' | 'wobbleAt' | 'bit'>;
+  /** Support tags landing on siteL's / siteR's plaques. */
+  tagL?: {at: number; tickAt: number};
+  tagR?: {at: number; tickAt: number};
+};
+
+/** The three hanging plaques. They project toward the camera from their brackets, so they are drawn ABOVE the cart line
+ *  (the maker and the cart pass behind them): Scene10 renders them in the set's 'sign' layer. */
+export const Plaques: React.FC<PlaquesProps> = ({plaqueAt, old, tagL, tagR}) => {
+  const sg = (id: SiteId) => S[id].sign;
+  return (
+    <>
       <HangPlaque x={sg('L').x} y={sg('L').y} size={PLAQUE_SIZE.L} wallX={sg('L').wallX} at={plaqueAt[0]} tag={tagL ? {...tagL, hang: TAG_HANG.L} : undefined} seed="s10/plqL" />
       <HangPlaque x={sg('M').x} y={sg('M').y} size={PLAQUE_SIZE.M} wallX={sg('M').wallX} at={plaqueAt[1]} {...old} seed="s10/plqM" />
       <HangPlaque x={sg('R').x} y={sg('R').y} size={PLAQUE_SIZE.R} wallX={sg('R').wallX} at={plaqueAt[2]} tag={tagR ? {...tagR, hang: TAG_HANG.R} : undefined} seed="s10/plqR" />
     </>
   );
 };
-

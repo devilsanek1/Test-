@@ -3,7 +3,7 @@
 // the time-lapse), and the season clock shared by the ivy and the near tree.
 
 import React from 'react';
-import {palette} from '../../lib/theme';
+import {palette, skies} from '../../lib/theme';
 import {ease as E, lerp, prog, springAt, springs, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
@@ -53,7 +53,8 @@ const IVY_TONES: Record<Season, [string, string] | null> = {green: [palette.sage
 
 /** Ivy on door #4's frame: a vine with two leaves per node (fanned off both sides, two tones). `steps` = how many nodes
  *  are grown from when (each new node's leaves pop 20 % -> 100 % in 0.12 s, 0.03 s apart); the leaves recolour in one
- *  frame when the season steps (bare = only the vine and its twig ticks). Settled leaves are batched in 3 paths. */
+ *  frame when the season steps (bare = only the vine and its twig ticks). Settled leaves draw node by node (fills, then
+ *  that node's ink) so the overlaps stay clean. */
 export const SeasonIvy: React.FC<{steps: {t: number; n: number}[]; seasons: {t: number; s: Season}[]; seed?: string}> = ({steps, seasons, seed = 's4ivy'}) => {
   const t = useTime();
   const season = seasonAt(seasons, t);
@@ -67,10 +68,10 @@ export const SeasonIvy: React.FC<{steps: {t: number; n: number}[]; seasons: {t: 
   const pts = IVY_NODES.slice(0, n);
   const vine = smoothVine(pts);
   const tones = IVY_TONES[season];
-  let fa = '';
-  let fb = '';
-  let ink = '';
   let twigs = '';
+  // settled leaves are drawn NODE BY NODE (that node's two fills, then its ink), from the root up: a nearer / newer
+  // leaf's fill covers the outline of the one under it (fix round 1: one batched ink pass let back outlines show through)
+  const settled: React.ReactNode[] = [];
   const popping: React.ReactNode[] = [];
   pts.forEach((p, i) => {
     if (i === 0) return;
@@ -78,6 +79,9 @@ export const SeasonIvy: React.FC<{steps: {t: number; n: number}[]; seasons: {t: 
     const dir = (Math.atan2(p[1] - prev[1], p[0] - prev[0]) * 180) / Math.PI;
     const q = Math.min(1, (t - born[i]) / 0.12);
     const k = 0.2 + 0.8 * E.outCubic(q);
+    let fa = '';
+    let fb = '';
+    let ink = '';
     for (const side of [-1, 1]) {
       const j = `${i}${side}`;
       const a = dir + side * (62 + rand(seed, `a${j}`) * 26);
@@ -104,13 +108,19 @@ export const SeasonIvy: React.FC<{steps: {t: number; n: number}[]; seasons: {t: 
         ink += L.d + L.vein;
       }
     }
+    if (tones && ink)
+      settled.push(
+        <React.Fragment key={i}>
+          {fa ? <Fill d={fa} color={tones[0]} offset={false} mode="none" seed={`${seed}/fa${i}`} /> : null}
+          {fb ? <Fill d={fb} color={tones[1]} offset={false} mode="none" seed={`${seed}/fb${i}`} /> : null}
+          <Ink d={ink} width={1.3} taper={false} seed={`${seed}/li${i}`} />
+        </React.Fragment>,
+      );
   });
   return (
     <>
       <Ink d={vine + twigs} width={2.2} taper={false} seed={`${seed}/vine`} />
-      {fa && tones ? <Fill d={fa} color={tones[0]} offset={false} mode="none" seed={`${seed}/fa`} /> : null}
-      {fb && tones ? <Fill d={fb} color={tones[1]} offset={false} mode="none" seed={`${seed}/fb`} /> : null}
-      {ink ? <Ink d={ink} width={1.3} taper={false} seed={`${seed}/li`} /> : null}
+      {settled}
       {popping}
     </>
   );
@@ -213,40 +223,92 @@ const HERO_WINS: [number, number, number, number][] = [
   [428, 862, 62, 92],
 ];
 
-/** During the dive the hero facade sweeps up through the caption band (y 280-570) for the last ~6 frames before the cut.
- *  Inside the band (and only there: a world-space clip at the camera's screen y `bandBottom`), the upper facade is
- *  redrawn FLAT (no ink: sand wall, tan shade strip and cornice, flat windows, the browser window as one cream field),
- *  a smear-frame simplification so the caption keeps reading over the fast move. Outside the band nothing changes. */
-export const DiveCalm: React.FC<{camY: number; zoom: number; bandBottom?: number; seed?: string}> = ({camY, zoom, bandBottom = 588, seed = 's4calm'}) => {
-  const yClip = (bandBottom - 960) / zoom + camY; // world y of the screen line
-  const id = `${seed}clip`;
+/** The shade strip on the hero facade's left quarter (tan; the rest of the wall is sand). */
+const SHADE_X = STOOP.hero.x + STOOP.hero.w * 0.25;
+/** A wall-coloured cover over [x, y, w, h] that follows the shade strip (tan left of it, sand right of it). */
+const wallCover = (x: number, y: number, w: number, h: number): {tan: string; sand: string} => {
+  const x1 = x + w;
+  if (x1 <= SHADE_X) return {tan: rectPath(x, y, w, h), sand: ''};
+  if (x >= SHADE_X) return {tan: '', sand: rectPath(x, y, w, h)};
+  return {tan: rectPath(x, y, SHADE_X - x, h), sand: rectPath(SHADE_X, y, x1 - SHADE_X, h)};
+};
+
+type FlatObj = {id: string; top: number; draw: () => {tan: string; sand: string; cream: string; sage: string; lite: string; sky: string}};
+
+/** The objects of the hero facade that cross the caption band during the dive, each with its FLAT (no-ink) version:
+ *  the cornice (tan band + cream rim; its ink overshoots covered with sky above the left row's roof), every window
+ *  (wall margin, cream frame, sage glass, pale lite), the browser window (flattened to the WALL: it melts into the
+ *  facade instead of becoming a plate behind the caption). `top` = the object's world top (incl. its ink). */
+const FLAT_OBJS: FlatObj[] = (() => {
   const H = STOOP.hero;
   const B = STOOP.browser;
-  let glass = '';
-  let lite = '';
-  let frames = '';
-  HERO_WINS.forEach(([x, y, w, h]) => {
-    frames += rectPath(x - 8, y - 8, w + 16, h + 16);
-    glass += rectPath(x, y, w, h);
-    lite += rectPath(x + 1, y, w - 2, h * 0.58);
+  const out: FlatObj[] = [];
+  out.push({
+    id: 'cornice',
+    top: H.y - 16,
+    draw: () => {
+      const below = wallCover(H.x, H.y + 38, H.w, 12);
+      // the overshoot ends: sky left of the house; on the right only ABOVE the left row's roofline (y = 660 + 2 (x - 520))
+      const sky = rectPath(H.x - 44, H.y - 16, 38, 70) + `M${H.x + H.w + 6} ${H.y - 16}H${H.x + H.w + 50}V${H.y + 54}H${H.x + H.w + 17}L${H.x + H.w + 6} ${H.y + 32}Z`;
+      // the lower line's end stubs: sky left of the house, the left row's cream facade right of it
+      const stubs = rectPath(H.x - 6, H.y + 38, 6, 16);
+      return {tan: rectPath(H.x - 6, H.y, H.w + 12, 40) + below.tan, sand: below.sand, cream: rectPath(H.x - 6, H.y - 7, H.w + 12, 8) + rectPath(H.x + H.w, H.y + 38, 8, 14), sage: '', lite: '', sky: sky + stubs + rectPath(H.x - 6, H.y - 16, H.w + 12, 9)};
+    },
   });
+  HERO_WINS.forEach(([x, y, w, h], i) => {
+    out.push({
+      id: `w${i}`,
+      top: y - 16,
+      draw: () => {
+        const m = wallCover(x - 16, y - 16, w + 32, h + 32);
+        return {tan: m.tan, sand: m.sand, cream: rectPath(x - 6, y - 6, w + 12, h + 12), sage: rectPath(x, y, w, h), lite: rectPath(x + 1, y, w - 2, h * 0.58), sky: ''};
+      },
+    });
+  });
+  out.push({
+    id: 'browser',
+    top: B[1] - 16,
+    draw: () => {
+      const m = wallCover(B[0] - 36, B[1] - 16, B[2] + 54, B[3] + 32);
+      return {tan: m.tan, sand: m.sand, cream: '', sage: '', lite: '', sky: ''};
+    },
+  });
+  return out;
+})();
+
+/** During the dive the hero facade sweeps up through the caption band (y 280-570). From `from` on, every object that
+ *  has ENTERED the band (its screen top above `bandBottom`) pops WHOLE to its flat no-ink version on the first frame
+ *  it is in (a per-object LOD swap: any seam follows the object's own edges, never a screen line). Outside the dive
+ *  nothing changes. */
+export const DiveFlat: React.FC<{cam: {y: number; zoom: number}; from: number; bandBottom?: number; seed?: string}> = ({cam, from, bandBottom = 588, seed = 's4flat'}) => {
+  const t = useTime();
+  if (t < from) return null;
+  let tan = '';
+  let sand = '';
+  let cream = '';
+  let sage = '';
+  let lite = '';
+  let sky = '';
+  for (const o of FLAT_OBJS) {
+    const top = (o.top - cam.y) * cam.zoom + 960;
+    if (top >= bandBottom) continue;
+    const d = o.draw();
+    tan += d.tan;
+    sand += d.sand;
+    cream += d.cream;
+    sage += d.sage;
+    lite += d.lite;
+    sky += d.sky;
+  }
+  const f = (d: string, color: string, k: string) => (d ? <Fill d={d} color={color} offset={false} mode="none" exit={false} seed={`${seed}/${k}`} /> : null);
   return (
     <>
-      <defs>
-        <clipPath id={id} clipPathUnits="userSpaceOnUse">
-          <rect x={-400} y={-3000} width={2000} height={yClip + 3000} />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${id})`}>
-        <Fill rect={[H.x - 14, H.y - 8, H.w + 28, 48]} color={palette.tan} offset={false} mode="none" exit={false} seed={`${seed}/c`} />
-        <Fill rect={[H.x - 14, H.y - 14, H.w + 28, 8]} color={palette.cream} offset={false} mode="none" exit={false} seed={`${seed}/r`} />
-        <Fill rect={[H.x - 6, H.y + 40, H.w + 12, 1040 - H.y - 40]} color={palette.sand} offset={false} mode="none" exit={false} seed={`${seed}/w`} />
-        <Fill rect={[H.x - 6, H.y + 40, H.w * 0.25 + 6, 1040 - H.y - 40]} color={palette.tan} offset={false} mode="none" exit={false} seed={`${seed}/s`} />
-        <Fill d={frames} color={palette.cream} offset={false} mode="none" exit={false} seed={`${seed}/f`} />
-        <Fill d={glass} color={palette.sage} offset={false} mode="none" exit={false} seed={`${seed}/g`} />
-        <Fill d={lite} color={palette.mintPale} offset={false} mode="none" exit={false} seed={`${seed}/l`} />
-        <Fill rect={[B[0] - 34, B[1] - 12, B[2] + 50, B[3] + 24]} color={palette.cream} offset={false} mode="none" exit={false} seed={`${seed}/b`} />
-      </g>
+      {f(sky, skies.day, 'k')}
+      {f(tan, palette.tan, 't')}
+      {f(sand, palette.sand, 's')}
+      {f(cream, palette.cream, 'c')}
+      {f(sage, palette.sage, 'g')}
+      {f(lite, palette.mintPale, 'l')}
     </>
   );
 };

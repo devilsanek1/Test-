@@ -37,7 +37,7 @@ export const SCENE = {start: 45.618, end: 52.163};
 /** Absolute beat times (storyboard S11 beats; leads per ENGINE rule 5 already applied by the storyboard). */
 export const ABS = {
   cut: 45.618,
-  pipLand: W.even, // Pip lands on the sill's left end
+  pipLand: W.even + 0.05, // Pip lands on the sill's left end (his hop enters past the left edge: f0 shows only a sliver)
   ringHiccup1: W.the, // the loading ring hiccups; a pigeon on the cornice shuffles
   barFlicker: W.fbi, // the bar's fill edge flickers without moving
   earFlick: W.fbi + 0.25, // Pip's ear flicks toward the window
@@ -54,16 +54,20 @@ export const ABS = {
   lightsOut: W.off, // govB one palette step darker
   offCut: 49.515, // cut(off): the comma pause after 'off,' (gap anchor): the lean into the joke starts here
   padlock: W.off + 0.14, // padlock pops + the lettered 'back soon' tag swings in
-  govAScreen: W.off + 0.27, // the switch-off spreads: govA's screen CRT-collapses (S12 opens with it dark) ...
-  govAShutter: W.off + 0.42, // ... its shutter slams ...
-  govAOff: W.off + 0.56, // ... and govA steps one palette step darker
-  govCScreen: W.off + 0.66, // govC's screen collapses at the right edge ...
-  govCShutter: W.off + 0.8, // ... and its shutter drops half way (S12: govC half shut)
+  // the switch-off spreads, AFTER the padlock beat (the padlock + tag are the only focal event on 'off'):
+  govAScreen: W.which + 0.04, // govA's screen CRT-collapses on 'which' (S12 opens with it dark) ...
+  govAShutter: W.is + 0.06, // ... its shutter slams on 'is' ...
+  govAOff: W.is + 0.2, // ... and govA steps one palette step darker
+  govCScreen: W.basically, // govC's screen collapses at the right edge on 'basically' ...
+  govCShutter: W.basically + 0.14, // ... and its shutter drops half way (S12: govC half shut)
+  civicOff: W.supports + 0.03, // the far civic silhouettes step dark left to right (0.1 s apart) from "support's" ...
+  civicLanterns: W.answer + 0.15, // ... and their lanterns pop off after them ('answer' -> 'to')
   bitHop: W.offEnd + 0.05, // Bit hops onto the padlock's shackle; the snail pulls into its shell
   pigeonLand: W.which, // the lean-in starts; a pigeon lands on the shutter box
   tagTwirl: W.is - 0.12, // the tag twirls once in a breeze (its first narrowing lands on 'is')
   antennae: W.basically, // the snail pokes one antenna out, then the other (span 0.4)
-  noteSlap: W.tech - 0.05, // the sticky note flutters in and slaps flat onto the closed shutter (J6)
+  noteDrop: W.basically - 0.08, // the note drops from behind govB's cornice (blank back, tumbling; visible from ~'basically')
+  noteSlap: W.tech - 0.05, // ... flips to its lettered face and slaps flat onto the closed shutter (J6)
   noteCurl: W.supports, // the note's corner curls once; Bit looks up at it
   preen: W.supports + 0.25, // a pigeon on the cornice preens; the tag stills
   shrug: W.answer, // GAG: Pip turns toward the sun and does a tiny shrug (0.5 s)

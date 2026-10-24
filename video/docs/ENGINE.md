@@ -230,6 +230,10 @@ Outgoing and incoming scenes keep rendering through overlaps (they hold their en
   `python3 -I scripts/anchor/resolve.py` (paging + highlights from `docs/storyboard_v3.json`). The v2 node generators
   (`node scripts/gen-captions.mjs [--storyboard]`) still work on the old storyboards. Overrides:
   `src/data/captions.overrides.json` (by page index).
+- **Empty band across a dive or match cut (`out`).** A page with `out: t` scrolls up and away at `t` (the standard
+  scroll curve, clear of the band ~0.1 s later) with no page replacing it; the next page then rolls into an empty
+  band instead of pushing the old one. S01 uses it so no caption sits over the 0.33 s dive into the lock:
+  `{"1": {"out": 4.285}, "2": {"s": 4.755}}` (page 3's s = cut + scroll lead, so its roll starts exactly on the cut).
 - **Labels are scene-owned props, never captions.** The storyboard's on-screen labels (`labelStyle`: tags on strings,
   cards, slips, an A-frame sign, the S08 board; Patrick Hand 34-40 px ink on cream, pinned / hung / taped in the
   world) are drawn by the scene that owns them (the shared `LabelTag` prop), in WORLD space, under the camera, at

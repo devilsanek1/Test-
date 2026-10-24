@@ -20,7 +20,9 @@ import {captionFontStack, measureCaption, useCaptionFont} from './font';
 
 export type CaptionLine = {text: string; s: number};
 export type CaptionHighlight = {text: string; s: number};
-export type CaptionBeat = {s: number; e?: number; lines: CaptionLine[]; highlights?: CaptionHighlight[]; style?: 'normal' | 'punch' | 'hook'};
+/** `out` (SkyCaptions): the page scrolls up and away at this time with no page replacing it, so the caption band is
+ *  empty until the next page rolls in (e.g. across a camera dive or a match cut). */
+export type CaptionBeat = {s: number; e?: number; out?: number; lines: CaptionLine[]; highlights?: CaptionHighlight[]; style?: 'normal' | 'punch' | 'hook'};
 
 export type CaptionsProps = {
   beats: CaptionBeat[];
@@ -255,7 +257,7 @@ export function splitRegions(x: number, left: CaptionTone, right: CaptionTone): 
 
 type SkyLine = {text: string; start: number; baseline: number; boxes: (Box & {start: number; dur: number; hl: CaptionHighlight})[]};
 /** scrollDur: this page's scroll duration when it differs from MOTION.captionScroll.dur (the loop roll, see loopEnd). */
-type SkyPage = {start: number; size: number; lines: SkyLine[]; scrollDur?: number};
+type SkyPage = {start: number; size: number; lines: SkyLine[]; scrollDur?: number; out?: number};
 
 const SKY_D = skyCaption.clipBottom - skyCaption.clipTop + 20;
 const PUNCT = /[.,!?;:…]/;
@@ -428,7 +430,7 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
   }
   if (!list.length) return null;
   const pages = list.map((b) => {
-    const pg = layoutSky(b, size);
+    const pg: SkyPage = {...layoutSky(b, size), out: b.out};
     if (b !== loopBeat) return pg;
     // boxes frame 0 shows roll in already drawn; the roll is LOOP_SEAM_PX short at the seam and frame 0 continues it
     const lines = pg.lines.map((ln) => ({...ln, boxes: ln.boxes.map((bx) => (preDrawn.has(bx.hl) ? {...bx, start: -Infinity} : bx))}));
@@ -457,17 +459,23 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
     const lu = (T + loopEnd - lp.start) / (lp.scrollDur ?? MOTION.captionScroll.dur);
     if (loopEnd > lp.start && T < lp.start && lu < 1) tail = {q: MOTION.captionScroll.ease(clamp(lu)), prev: pages.length > 1 ? pages[pages.length - 2] : null};
   }
+  // a page with `out` scrolls up and away on its own; the next page then rolls into an empty band (no prev to push)
+  const scroll = MOTION.captionScroll;
+  const prevOutQ = prev?.out !== undefined && T >= prev.out ? scroll.ease(clamp((T - prev.out) / scroll.dur)) : 0;
+  const prevGone = prevOutQ >= 1;
+  const outQ = cur.out !== undefined && T >= cur.out ? scroll.ease(clamp((T - cur.out) / scroll.dur)) : 0;
+  if (outQ >= 1) return null;
   const tn: CaptionTone = typeof tone === 'function' ? tone(T) : tone;
   // the hook frame: the first page's line 1 shows settled before anything starts; later lines/boxes keep their times
   const iu = settledAll || (hookAtStart && k === 0) ? Math.max(instantUntil, cur.start) : instantUntil;
   const regs = (regions ? regions(T) : null) ?? (split ? splitRegions(split.x(T), split.left, split.right) : null);
   const stack = (t: CaptionTone, sfx: string) => (
     <>
-      {prev && !instant && u < 1 ? <SkyPageG key={`p${k - 1}`} page={prev} T={T} dy={-SKY_D * q} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}a`} pop={pop} /> : null}
+      {prev && !prevGone && !instant && u < 1 ? <SkyPageG key={`p${k - 1}`} page={prev} T={T} dy={-SKY_D * Math.max(q, prevOutQ)} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}a`} pop={pop} /> : null}
       {tail?.prev && tail.q < 1 ? (
         <SkyPageG key="ptail" page={tail.prev} T={loopEnd! + T} dy={-SKY_D * tail.q} instantUntil={instantUntil} col={toneCols(t, mask)} uid={`${uid}${sfx}t`} pop={pop} />
       ) : null}
-      <SkyPageG key={`p${k}`} page={cur} T={settledAll ? Math.max(T, cur.start) : T} dy={SKY_D * (1 - q) + (tail ? SKY_D * (1 - tail.q) : 0)} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}b`} pop={pop} />
+      <SkyPageG key={`p${k}`} page={cur} T={settledAll ? Math.max(T, cur.start) : T} dy={SKY_D * (1 - q) + (tail ? SKY_D * (1 - tail.q) : 0) - SKY_D * outQ} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}b`} pop={pop} />
     </>
   );
   const body =

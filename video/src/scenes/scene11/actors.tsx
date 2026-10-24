@@ -92,12 +92,19 @@ export const Pigeon: React.FC<PigeonProps> = ({x, y, s = 0.7, flip = false, land
     const dur = land.dur ?? 0.5;
     if (t < land.at - dur) return null;
     if (t < land.at) {
-      const q = prog(t, land.at - dur, dur, E.outQuad);
+      // a glide in (half linear, half ease-out: it brakes into the landing), the WHOLE bird (body + head) with the
+      // flapping wing strokes over its back, tipped nose-up as it brakes: the body never pops in on landing
+      const u = prog(t, land.at - dur, dur);
+      const q = 0.5 * u + 0.5 * E.outSine(u);
       const px = lerp(land.from[0], x, q);
       const py = lerp(land.from[1], y, q) - Math.sin(q * Math.PI) * 30;
+      const dir = land.from[0] > x ? -1 : 1;
       return (
-        <XG m={mat.compose(mat.translate(px, py - 12 * s), mat.scale(s * (0.75 + 0.25 * q)))}>
-          <path d={wings(t, ph)} fill="none" stroke={palette.ink} strokeWidth={2.6 / (k * s)} strokeLinecap="round" strokeLinejoin="round" />
+        <XG m={mat.compose(mat.translate(px, py), mat.scale(dir, 1), mat.rotate(-10 * Math.sin(Math.PI * u)))}>
+          <InkBird s={s} seed={seed} flyTo={flyTo} color={color} />
+          <XG m={mat.compose(mat.translate(-2 * s, -16 * s), mat.scale(s * 0.9))}>
+            <path d={wings(t, ph)} fill="none" stroke={palette.ink} strokeWidth={2.6 / (k * s)} strokeLinecap="round" strokeLinejoin="round" />
+          </XG>
         </XG>
       );
     }
@@ -285,6 +292,9 @@ export type GovBWindowProps = {
   shakeAt?: number;
   /** The page's three content bars draw on (it is still loading). */
   barsAt?: number[];
+  /** Screen-local x where the content bars start (default: the page margin). S11 starts them under the notice's left
+   *  edge, so once the notice is taped up they are all under it (no bar ends poking out between Pip's ear and it). */
+  barsX0?: number;
   /** The fill (and the % tile) flickers on / off every 2 frames for 0.27 s without moving. */
   flickerAt?: number;
   /** Loading-ring radius (world; the chrome's own is ~10). */
@@ -317,7 +327,7 @@ const stepAt = (steps: ProgressStep[], t: number) => {
   return v;
 };
 
-const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: number[]; shakeAt?: number; barsAt: number[]; flickerAt?: number; inkW: number; seed: string}> = ({w, h, steps, reloadAt, shakeAt, barsAt, flickerAt, inkW, seed}) => {
+const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: number[]; shakeAt?: number; barsAt: number[]; barsX0?: number; flickerAt?: number; inkW: number; seed: string}> = ({w, h, steps, reloadAt, shakeAt, barsAt, barsX0, flickerAt, inkW, seed}) => {
   useCaptionFont();
   const t = useTime();
   const k = Math.max(1e-4, matScale(useXf()));
@@ -368,10 +378,11 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
     if (at === undefined || t < at || (ra !== undefined && ra > at)) return;
     const q = 0.2 + 0.8 * prog(t, at, 0.067, E.outCubic);
     const yy = PAGE.barsY[i];
-    const bw = (w - bx * 2) * f;
+    const x0 = barsX0 ?? bx;
+    const bw = (w - bx - x0) * f;
     bars.push(
-      <XG key={i} m={mat.about(mat.scale(q), bx + bw / 2, yy)}>
-        <Fill d={rectPath(bx, yy - 5.5, bw, 11)} color={i === 1 ? palette.sage : palette.tan} offset={false} mode="none" seed={`${seed}/bar${i}`} />
+      <XG key={i} m={mat.about(mat.scale(q), x0 + bw / 2, yy)}>
+        <Fill d={rectPath(x0, yy - 5.5, bw, 11)} color={i === 1 ? palette.sage : palette.tan} offset={false} mode="none" seed={`${seed}/bar${i}`} />
       </XG>,
     );
   });
@@ -403,7 +414,7 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
   );
 };
 
-export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reloadAt = [], shakeAt, barsAt = [], flickerAt, ringR, inkW, children, seed = 's11/govB'}) => {
+export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reloadAt = [], shakeAt, barsAt = [], barsX0, flickerAt, ringR, inkW, children, seed = 's11/govB'}) => {
   const [x, y, w, h] = r;
   const g = pillGeom(w, h);
   const rr = ringR ?? g.ringR;
@@ -417,7 +428,7 @@ export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reload
         ink={inkW}
         progress={{steps}}
         ring={{at: 1e6}}
-        content={({w: sw, h: sh}) => <Page w={sw} h={sh} steps={steps} reloadAt={reloadAt} shakeAt={shakeAt} barsAt={barsAt} flickerAt={flickerAt} inkW={inkW} seed={seed} />}
+        content={({w: sw, h: sh}) => <Page w={sw} h={sh} steps={steps} reloadAt={reloadAt} shakeAt={shakeAt} barsAt={barsAt} barsX0={barsX0} flickerAt={flickerAt} inkW={inkW} seed={seed} />}
         seed={seed}
       >
         {null}
@@ -462,6 +473,23 @@ export const crtContent = (u: number, seed: string) => ({w, h}: {w: number; h: n
       <Fill d={rectPath(-1, -1, w + 5, h + 5)} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/crtg`} />
       {halo ? <Fill d={halo} color={palette.cream} offset={false} mode="none" seed={`${seed}/crth`} /> : null}
       {core ? <Fill d={core} color={palette.white} offset={false} mode="none" seed={`${seed}/crtc`} /> : null}
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- plain panes (govC / govD at the right edge)
+
+/** A plain lit window pane for the edge buildings (govC / govD are cut by the right edge in the close-up: their browser
+ *  chrome read as stray dots and bars there). Cream glow + an ink frame; `crt` (0..1, the set's CRT phase) plays the
+ *  power-off (tealDark glass, the bright band -> line -> dot) and then holds the dark screen. */
+export const PlainPane: React.FC<{r: [number, number, number, number]; inkW: number; crt?: number; seed: string}> = ({r, inkW, crt = 0, seed}) => {
+  const [x, y, w, h] = r;
+  const dark = crt >= 0.999;
+  return (
+    <>
+      <Fill d={rectPath(x, y, w, h)} color={dark ? palette.tealDark : palette.cream} offset={false} mode="none" seed={`${seed}/pane`} />
+      {crt > 0.001 && !dark ? <XG m={mat.translate(x, y)}>{crtContent(crt, `${seed}/crt`)({w, h})}</XG> : null}
+      <Ink d={rectPath(x, y, w, h)} width={inkW} taper={false} vary={0} seed={`${seed}/frame`} />
     </>
   );
 };

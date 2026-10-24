@@ -22,25 +22,35 @@ const latest = (ts: number[], t: number): number | undefined => {
   return r;
 };
 
-/** Hooded tombstone (feet centre x, y; height h; width 0.5 h) + its rim strip on side s (+1 right, -1 left). */
-function tomb(x: number, y: number, h: number, wk = 0.5): string {
-  const w = h * wk;
-  return `M${(x - w / 2).toFixed(1)} ${y.toFixed(1)}V${(y - h * 0.62).toFixed(1)}Q${(x - w / 2).toFixed(1)} ${(y - h * 0.82).toFixed(1)} ${x.toFixed(1)} ${(y - h).toFixed(1)}Q${(x + w / 2).toFixed(1)} ${(y - h * 0.82).toFixed(1)} ${(x + w / 2).toFixed(1)} ${(y - h * 0.62).toFixed(1)}V${y.toFixed(1)}Z`;
+/** A hooded figure seen from behind (feet centre x, y; height h): rounded shoulders 0.62 h wide + a pointed hood
+ *  0.34 h wide, so a packed crowd reads as a mass of HEADS (reference 1) rather than a hedge of tombstones. */
+function person(x: number, y: number, h: number): string {
+  const sw = 0.31 * h;
+  const hw = 0.17 * h;
+  const f = (v: number) => v.toFixed(1);
+  return (
+    `M${f(x - sw)} ${f(y)}V${f(y - 0.36 * h)}Q${f(x - sw)} ${f(y - 0.54 * h)} ${f(x - 0.1 * h)} ${f(y - 0.55 * h)}H${f(x + 0.1 * h)}Q${f(x + sw)} ${f(y - 0.54 * h)} ${f(x + sw)} ${f(y - 0.36 * h)}V${f(y)}Z` +
+    `M${f(x - hw)} ${f(y - 0.48 * h)}C${f(x - hw * 1.3)} ${f(y - 0.84 * h)} ${f(x - 0.07 * h)} ${f(y - 0.93 * h)} ${f(x)} ${f(y - h)}C${f(x + 0.07 * h)} ${f(y - 0.93 * h)} ${f(x + hw * 1.3)} ${f(y - 0.84 * h)} ${f(x + hw)} ${f(y - 0.48 * h)}Z`
+  );
 }
-function tombRim(x: number, y: number, h: number, s: number, rw: number, wk = 0.5): string {
-  const w = h * wk;
-  const e = x + (s * w) / 2;
-  const i = e - s * rw;
-  return `M${e.toFixed(1)} ${(y - h * 0.12).toFixed(1)}V${(y - h * 0.62).toFixed(1)}Q${e.toFixed(1)} ${(y - h * 0.82).toFixed(1)} ${x.toFixed(1)} ${(y - h).toFixed(1)}Q${i.toFixed(1)} ${(y - h * 0.8).toFixed(1)} ${i.toFixed(1)} ${(y - h * 0.6).toFixed(1)}V${(y - h * 0.12).toFixed(1)}Z`;
+/** Its rim strips (rw wide) on side s (+1 right, -1 left): the hood edge and the outer shoulder. */
+function personRim(x: number, y: number, h: number, s: number, rw: number): string {
+  const sw = 0.31 * h;
+  const hw = 0.17 * h;
+  const f = (v: number) => v.toFixed(1);
+  return (
+    `M${f(x + s * hw)} ${f(y - 0.5 * h)}C${f(x + s * hw * 1.3)} ${f(y - 0.84 * h)} ${f(x + s * 0.07 * h)} ${f(y - 0.93 * h)} ${f(x)} ${f(y - h)}C${f(x + s * 0.03 * h)} ${f(y - 0.9 * h)} ${f(x + s * (hw * 1.3 - rw))} ${f(y - 0.82 * h)} ${f(x + s * (hw - rw))} ${f(y - 0.5 * h)}Z` +
+    `M${f(x + s * sw)} ${f(y - 0.12 * h)}V${f(y - 0.36 * h)}Q${f(x + s * sw)} ${f(y - 0.54 * h)} ${f(x + s * 0.12 * h)} ${f(y - 0.55 * h)}V${f(y - 0.55 * h + rw)}Q${f(x + s * (sw - rw))} ${f(y - 0.52 * h)} ${f(x + s * (sw - rw))} ${f(y - 0.36 * h)}V${f(y - 0.12 * h)}Z`
+  );
 }
 
 // ---------------------------------------------------------------- rattlers (the near doors: NOT counted)
 
-export type RattlerSpec = {x: number; y: number; h: number; at: number; rattles: number[]; hop?: {at: number; to: number}; flip?: boolean; seed: string};
+export type RattlerSpec = {x: number; y: number; h: number; at: number; rattles: number[]; hop?: {at: number; to: number}; flip?: boolean; seed: string; /** 'stand' = a crowd figure pushing in behind the door rattlers (no door, no handle) */ mode?: 'rattle' | 'stand'};
 
 /** A hooded attempter at a door rattling its handle; `hop` = gives up and hops to the next door (its door highlight
  *  goes with it). Accents for readability: sage door behind, peach rim strip, big rattle marks. */
-export const Rattler: React.FC<RattlerSpec> = ({x, y, h, at, rattles, hop, flip, seed}) => {
+export const Rattler: React.FC<RattlerSpec> = ({x, y, h, at, rattles, hop, flip, seed, mode = 'rattle'}) => {
   const t = useTime();
   const look = useLook();
   if (t < at) return null;
@@ -82,16 +92,17 @@ export const Rattler: React.FC<RattlerSpec> = ({x, y, h, at, rattles, hop, flip,
   const dcx = px + h * 0.16;
   const hx = hcx + tw * 0.66;
   const hy = top + th * 0.45;
-  const marks = rattling && Math.floor(t * 15) % 2 === 0 ? `M${hx + 4} ${hy - 5}l8 -4M${hx + 5} ${hy}l10 0M${hx + 4} ${hy + 5}l8 4` : '';
+  const stand = mode === 'stand';
+  const marks = !stand && rattling && Math.floor(t * 15) % 2 === 0 ? `M${hx + 4} ${hy - 5}l8 -4M${hx + 5} ${hy}l10 0M${hx + 4} ${hy + 5}l8 4` : '';
   const sc = pop < 1 ? `translate(${px} ${py}) scale(${pop.toFixed(3)}) translate(${-px} ${-py})` : undefined;
   return (
     <>
-      {!air && look.fills === 'color' ? <path d={`M${(dcx - dw / 2 + 1.5).toFixed(1)} ${(py - 0.5).toFixed(1)}V${(py - dh + 1.5).toFixed(1)}H${(dcx + dw / 2 - 1.5).toFixed(1)}V${(py - 0.5).toFixed(1)}Z`} fill={palette.sage} transform={sc} /> : null}
-      <Attempter x={px} y={py} h={h} mode="rattle" riseAt={at} rattleAt={rattleAt} rattleDur={rattleDur} flip={flip} seed={seed} />
+      {!air && !stand && look.fills === 'color' ? <path d={`M${(dcx - dw / 2 + 1.5).toFixed(1)} ${(py - 0.5).toFixed(1)}V${(py - dh + 1.5).toFixed(1)}H${(dcx + dw / 2 - 1.5).toFixed(1)}V${(py - 0.5).toFixed(1)}Z`} fill={palette.sage} transform={sc} /> : null}
+      <Attempter x={px} y={py} h={h} mode={stand ? 'stand' : 'rattle'} riseAt={at} rattleAt={stand ? undefined : rattleAt} rattleDur={rattleDur} flip={flip} seed={seed} />
       {look.fills === 'color' ? (
         <g transform={sc}>
           <path d={rim} fill="none" stroke={palette.peach} strokeWidth={rw} strokeLinecap="round" />
-          <path d={`M${hcx + tw * 0.36} ${top + th * 0.2}L${hcx + tw * 0.62} ${top + th * 0.25}`} stroke={palette.tealDark} strokeWidth={h * 0.09} strokeLinecap="round" fill="none" />
+          {stand ? null : <path d={`M${hcx + tw * 0.36} ${top + th * 0.2}L${hcx + tw * 0.62} ${top + th * 0.25}`} stroke={palette.tealDark} strokeWidth={h * 0.09} strokeLinecap="round" fill="none" />}
           {marks ? <path d={marks} stroke={palette.ink} strokeWidth={2.2} strokeLinecap="round" fill="none" /> : null}
         </g>
       ) : null}
@@ -115,7 +126,7 @@ export function pileSlots(side: -1 | 1, o: {foot?: number; levels: number; groun
       const h = lerp(18, 24, rand(o.seed, `h${L}/${k}`));
       const y = foot - L * 13 + (rand(o.seed, `y${L}/${k}`) - 0.5) * 3;
       const touch = flankX(y - h * 0.78, side);
-      const x = touch - side * (h * 0.25 + 3 + k * 10.5 + (rand(o.seed, `x${L}/${k}`) - 0.5) * 3);
+      const x = touch + side * (h * 0.25 + 3 + k * 10.5 + (rand(o.seed, `x${L}/${k}`) - 0.5) * 3);
       out.push({x, y, h, order: L * 1.0 + k * 0.85 + rand(o.seed, `o${L}/${k}`) * 0.3});
     }
   }
@@ -140,21 +151,21 @@ export const RimPile: React.FC<{figs: PileFig[]}> = ({figs}) => {
     const h = f.h * k;
     const {x, y, side} = f;
     const flashing = f.flash !== undefined && t >= f.flash && t < f.flash + 0.067;
-    const b = tomb(x, y, h, 0.52);
+    const b = person(x, y, h);
     if (flashing) lit += b;
     else body += b;
-    rim += tombRim(x, y, h, side, Math.max(2, h * 0.11), 0.52);
+    rim += personRim(x, y, h, x < SUN_X ? 1 : -1, Math.max(1.8, h * 0.09));
     // the hand on the glass
-    const sx = x + side * h * 0.2;
-    const sy = y - h * 0.62;
-    const hx = flankX(y - h * 0.95, side) - side * 1.5;
+    const sx = x - side * h * 0.22;
+    const sy = y - h * 0.5;
+    const hx = flankX(y - h * 0.95, side) + side * 1.5;
     const hy = y - h * 0.95;
     arms += `M${sx.toFixed(1)} ${sy.toFixed(1)}L${hx.toFixed(1)} ${hy.toFixed(1)}`;
     const tap = latest(f.taps, t);
     if (tap !== undefined && t < tap + 0.3 && Math.floor((t - tap) * 15) % 2 === 0) {
       // 3 short ticks fanning out from the touch point, on the glass side
       for (const a of [-50, 0, 50]) {
-        const r = ((a + (side > 0 ? 0 : 180)) * Math.PI) / 180;
+        const r = ((a + (side > 0 ? 180 : 0)) * Math.PI) / 180;
         const c = Math.cos(r);
         const sn = Math.sin(r);
         ticks += `M${(hx + c * 3).toFixed(1)} ${(hy + sn * 3).toFixed(1)}l${(c * 5).toFixed(1)} ${(sn * 5).toFixed(1)}`;
@@ -198,10 +209,10 @@ export function crowdBand(
     let x = x0 + rand(seed, `s${r}`) * hm * 0.4;
     let i = 0;
     while (x < x1) {
-      const h = lerp(h0, h1, rand(seed, `h${r}/${i}`)) * (1 - r * 0.08);
-      const y = yFeet - r * hm * 0.3 + (rand(seed, `y${r}/${i}`) - 0.5) * 2 * (o.jy ?? 1.5);
-      // seeded gaps: the crowd breaks into clumps
-      const gapHere = o.gap !== undefined && rand(seed, `g${r}/${Math.floor(i / 6)}`) < o.gap;
+      const h = lerp(h0, h1, rand(seed, `h${r}/${i}`)) * (1 - r * 0.07);
+      const y = yFeet - r * hm * 0.38 + (rand(seed, `y${r}/${i}`) - 0.5) * 2 * (o.jy ?? 1.5);
+      // seeded gaps: the crowd breaks into clumps (the back ranks thin out in places)
+      const gapHere = (o.gap !== undefined && rand(seed, `g${r}/${Math.floor(i / 6)}`) < o.gap) || (r > 0 && rand(seed, `G${r}/${Math.floor(i / 5)}`) < 0.18 * r);
       if (!gapHere && !(o.skip && o.skip(x, y, h))) {
         const ord = o.order ?? 'rand';
         const u = ord === 'ltr' ? (x - x0) / (x1 - x0) : ord === 'rand' ? rand(seed, `a${r}/${i}`) : Math.min(1, Math.abs(x - ord.from) / 700);
@@ -225,6 +236,7 @@ export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string
   if (look.fills !== 'color') return null;
   const step = flickerAt !== undefined && t >= flickerAt ? Math.floor((t - flickerAt) / 0.1) : -1;
   const bodies: string[] = [];
+  const bodies2: string[] = [];
   const rims: string[] = [];
   figs.forEach((f, i) => {
     if (t < f.at) return;
@@ -232,12 +244,14 @@ export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string
     const h = f.h * k;
     const bob = step >= 0 && rand(seed, `f${i}`) < 0.35 && (step + i) % 2 === 0 ? -Math.max(1, h * 0.12) : 0;
     const y = f.y + bob;
-    bodies[f.rank] = (bodies[f.rank] ?? '') + tomb(f.x, y, h);
-    rims[f.rank] = (rims[f.rank] ?? '') + tombRim(f.x, y, h, f.x < SUN_X ? 1 : -1, Math.max(1, h * 0.13));
+    if (rand(seed, `c${i}`) < 0.3) bodies2[f.rank] = (bodies2[f.rank] ?? '') + person(f.x, y, h);
+    else bodies[f.rank] = (bodies[f.rank] ?? '') + person(f.x, y, h);
+    rims[f.rank] = (rims[f.rank] ?? '') + personRim(f.x, y, h, f.x < SUN_X ? 1 : -1, Math.max(1, h * 0.1));
   });
   const out: React.ReactNode[] = [];
-  for (let r = 0; r < bodies.length; r++) {
+  for (let r = 0; r < Math.max(bodies.length, bodies2.length); r++) {
     if (bodies[r]) out.push(<path key={`b${r}`} d={bodies[r]} fill={color} />);
+    if (bodies2[r]) out.push(<path key={`c${r}`} d={bodies2[r]} fill={palette.tealDark} />);
     if (rims[r]) out.push(<path key={`r${r}`} d={rims[r]} fill={palette.cream} />);
   }
   return out.length ? <>{out}</> : null;

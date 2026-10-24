@@ -30,7 +30,7 @@ export const SCENE = {start: 39.634, end: 45.618};
 export const ABS = {
   cut: SCENE.start, // tram wipe centre (S09's Wiper); behind it the empty street in full day
   pipHop: W.plus + 0.1, // Pip leaps off the tram's tail onto the bollard
-  siteL: W.something - 0.1, // siteL pops up (scaleY 0 -> 1.06 -> 1), siteM +0.10, siteR +0.20
+  siteL: W.something - 0.1, // siteL pops up (scaleY 0 -> 1.06 -> 1), siteM +0.10, siteR +0.20 (with the gap wedge + walker)
   sunLand: W.something, // the sun lands over siteM ON the word
   second: W.like, // the nine second-row buildings pop up behind (0.04 s stagger); the caretaker tag is already there
   pieSpoke: W.half - 0.06, // the sun draws its one ink spoke
@@ -43,10 +43,10 @@ export const ABS = {
   flipM: W.run - 0.05, // siteM's plaque paper-flips to the OLD version
   bitIn: W.run + 0.22, // Bit drops onto the old plaque's chain and crawls to its corner
   flip2: W.versions, // five second-row plaques flip old (alternating, 0.04 s apart) + dust puffs
-  cobweb: W.so, // a cobweb draws across the old plaque's corner: Bit is caught in it
-  dust: W.so + 0.12, // dust specks pop under the old plaque
+  cobweb: W.so - 0.1, // a cobweb draws across the old plaque's corner (rule-5 lead: it reads ON 'so'): Bit is caught in it
+  dust: W.so + 0.02, // dust specks pop under the old plaque
   cane: W.old, // the old emblem leans on a tiny cane
-  cartIn: W.old + 0.15, // the makers' cart rolls in from the left (sign 'still fixed!', satchel of tags)
+  cartIn: W.old + 0.15, // the maker + cart step out from behind the A-frame's right edge (sign 'fixed!' under the deck)
   droop: W.theyre, // the old emblem's ear droops (it sags further on its cane); a dust speck drifts down
   not: W.not, // Bit struggles in the web; the maker reaches into the satchel
   pullTag1: W.not - 0.15, // the maker pulls a tag from the satchel (gone 2 frames before the flick)
@@ -60,7 +60,7 @@ export const ABS = {
   heyEnd: W.anymore + 0.2, // Pip settles back to sit-back
   update: W.anymore, // siteM's browser starts an update: the bar stalls at ~10 %, ring spinning; the cart rolls out right
   wobble: W.anymoreEnd - 0.1, // the old emblem's cane wobbles; the ring keeps spinning
-  pipOut: W.anymoreEnd + 0.04, // Pip hops toward the right edge (mid-air at the cut, into S11)
+  pipOut: W.anymoreEnd - 0.09, // Pip hops out past the right edge (0.30 s: gone one frame before the cut, into S11)
 } as const;
 
 export type Beats = Record<keyof typeof ABS, number>;

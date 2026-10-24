@@ -38,7 +38,10 @@ const ABS = {
   how: 18.705, //           w61 'how': the ring pulses once; the teams lean in
   bad: 18.87, //            w62 'bad': ONE focal event: the S02 dashed hand redraws and turns the lock; Bit's ink '!'
   pipWake: 19.215, //       w63+0.05 'it': GAG: Pip jolts awake on the rail (trunk-up, wide)
-  envelope: 19.425, //      w64+0.10 'was.': the messenger pulls the envelope and turns right; the hand retracts
+  pull: 19.25, //           w64-0.075 'was.': the messenger raises the envelope over his left shoulder (a small element
+  //                        leads its word: up and readable ~5 frames before the dash moves him)
+  bitBack: 19.325, //       w64 'was.': Bit drops back into the socket; his '!' balloon pops off
+  envelope: 19.425, //      w64+0.10 'was.': the messenger turns right and dashes; the hand retracts
   truck: 19.473, //         cut(was)-0.30: he walks out right, the camera trucks with him (0.30 s); Pip hops to follow
   end: S05_END, //          cut(was): CUT ON ACTION into S06
 } as const;

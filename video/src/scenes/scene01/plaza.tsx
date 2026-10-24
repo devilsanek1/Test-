@@ -34,7 +34,7 @@ const SLAM_DUR = 0.16;
  *  overlap once the tag is lettered); the padlocks glint on 'PURPOSE'. */
 export const S01_GOV: Partial<Record<GovId, GovEvents>> = {
   govA: {screenOffAt: B.crtA, shutterAt: B.slamA, offAt: B.slamA + SLAM_DUR, padlockAt: B.padlocks[1], padlockProps: {x: 152, size: 36}, glintAt: B.padlockGlint[1], tagAt: B.tags[1], tagProps: {lettered: true, size: 74, x: 226}},
-  govB: {screenOffAt: 0, shutterAt: B.slamB, offAt: B.slamB + SLAM_DUR, padlockAt: B.padlocks[0], padlockProps: {x: 462, size: 36}, glintAt: B.padlockGlint[0], tagAt: B.tags[0], tagProps: {lettered: true, size: 144, x: 566}, lanternOffAt: B.domeLanternOff},
+  govB: {screenOffAt: 0, shutterAt: B.slamB, offAt: B.slamB + SLAM_DUR, padlockAt: B.padlocks[0], padlockProps: {x: 462, size: 36}, glintAt: B.padlockGlint[0], tagAt: B.tags[0], tagProps: {lettered: true, size: 138, x: 566, y: 1104}, lanternOffAt: B.domeLanternOff},
   govC: {screenOffAt: B.crtC, shutterAt: B.slamC, shutterStop: 0.5, padlockAt: B.padlocks[2], padlockProps: {x: 838, size: 36}, glintAt: B.padlockGlint[2], tagAt: B.tags[2], tagProps: {lettered: true, size: 62, x: 900}},
 };
 
@@ -75,6 +75,14 @@ export const S01_CITIZENS: CitizenPlan[] = [
   {x: 130, y: 1442, h: 52, seed: 'plaza/cit7'},
   {x: 744, y: 1402, h: 26, seed: 'plaza/cit8', silhouette: true},
 ];
+/** NEAR observer (fix round 2, PEAK-1 depth, ref2 f_1 / ref f_9.0): one big back-view figure on the VP axis cut by
+ *  the bottom edge (0.29 H, head top ~y 1500), left of Pip's bollard column, in the near layer (it leaves the dive
+ *  fast, down and out). Leans toward govB on 'Governments', straightens on 'PURPOSE' (no 3/4 head swap: at this size
+ *  the cheek patch read as a mask). */
+export const S01_NEAR: CitizenPlan[] = [
+  {x: 600, y: 2075, h: 560, seed: 's01/nA', hair: 'short', hairColor: palette.ink, acc: ['headphones'], body: palette.tealDark, ink: 4.8, lean: [{t: B.heads + 0.08, a: -3}, {t: B.headsBack + 0.04, a: 0}], bob: 1.2},
+];
+
 /** Paint order: far first, then by feet y. */
 const CITIZEN_ORDER = S01_CITIZENS.map((c, i) => [c.y, i] as [number, number]).sort((a, b) => a[0] - b[0]).map((p) => p[1]);
 
@@ -210,8 +218,11 @@ export const PlazaShutdown: React.FC = () => {
         {S01_PIGEONS.map((p) => (
           <Pigeon key={p.seed} p={p} />
         ))}
-        <Onlookers />
         <PipS01 p={S01_PIP} seed={S01_PIP_SEED} />
+        {S01_NEAR.map((c) => (
+          <PlazaCitizen key={c.seed} p={c} vp={VP} horizon={HZ} />
+        ))}
+        <Onlookers />
       </>
     ),
   };

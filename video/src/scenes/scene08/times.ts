@@ -23,7 +23,7 @@ export const T = {
   craneEnd: CRANE,
   pushAt: w(89, -0.25), // 'Cloudflare' - 0.25
   pushEnd: w(106), // 'minutes'
-  pullAt: w(108, -0.15), // 'millions' - 0.15
+  pullAt: w(108, -0.15), // 'millions' - 0.15 (the burst)
   pullEnd: w(108, 0.75),
   // beats
   hackers: w(81, 0.1), // the city opens row by row
@@ -51,16 +51,23 @@ export const T = {
   in: w(104), // rim taps
   fortyFive: w(105, -0.05), // rings off, sun hops up
   fortyFiveWord: w(105), // the clock lands
-  stamp1: w(106, -0.08), // L10
+  hopOff: w(105, -0.2), // the sun's hop take-off (anticipation from -0.1 s before)
+  stamp1: w(106, -0.08), // L10 (storyboard anchor: the old ink-ring hit)
+  stamp1At: w(106, -0.2), // fix round 1: the print appears at a clamped 1.5x ...
+  stamp1Land: w(106), // ... and LANDS on 'minutes' (impact ticks here)
   stamp1Ring: w(106, 0.25),
   comma: we(106, 0.05), // clock off, sun sinks back, rings on, a gate
   millions: w(108, -0.15), // burst + pull-back
-  stamp2: w(108, -0.08), // L11
+  stamp2: w(108, -0.08), // L11 (storyboard anchor)
+  stamp2At: w(108, -0.2),
+  stamp2Land: w(108), // lands on 'millions'
   wave2: w(108, 0.35),
   millionsWord: w(108),
-  within: w(109), // sunset step 1 + stepped dusk
+  within: w(109), // stepped dusk starts (sky snaps on the word)
+  sunset1: w(109, -0.13), // sunset step 1 (inCubic 0.16 s: the drop completes on 'within')
   earsCover: w(109, 0.25),
-  day: w(111), // sunset step 2
+  day: w(111), // relight of the far rows
+  sunset2: w(111, -0.13), // sunset step 2 (completes on 'day')
   duskIdle: DUR - 0.15,
   end: DUR,
 } as const;

@@ -1,125 +1,23 @@
-// S08 cast: the hooded attempters (rattlers at doors, the rim crowd tapping the glass, the stipple flood), the leaked
-// copies on the wires, the pigeons, Pip and Bit. Everything is time-driven (scene seconds), no fades.
+// S08 cast: the leaked copies on the wires, the pigeons, Pip and Bit, the glint / window wink, stamp impact ticks and the
+// paper specks (the hooded attempters live in crowd.tsx). Everything is time-driven (scene seconds), no fades.
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {ease as E, lerp, prog, useTime} from '../../lib/time';
 import {rand} from '../../lib/rng';
 import {useLook} from '../../lib/exit';
-import {arc, Pt} from '../../lib/sketch';
+import type {Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import {Bird} from '../../lib/kit';
 import {ElephantTimeline, hop as pipHop} from '../../lib/mascot';
 import type {PoseKey} from '../../lib/mascot';
-import {Attempter, Bit, LeakSheet} from '../shared/props';
-import {glassStep, WIRES, wireAt} from '../shared/sets';
-import {inDome} from './layout';
-
-// ---------------------------------------------------------------- rattlers (the near doors: NOT counted)
+import {Bit, LeakSheet} from '../shared/props';
+import {WIRES, wireAt} from '../shared/sets';
 
 const latest = (ts: number[], t: number): number | undefined => {
   let r: number | undefined;
   for (const x of ts) if (x <= t) r = x;
   return r;
 };
-
-export type RattlerSpec = {x: number; y: number; h: number; at: number; rattles: number[]; hop?: {at: number; to: number}; flip?: boolean; seed: string};
-
-/** A hooded attempter at a door rattling its handle (ink marks); `hop` = gives up and hops to the next door. */
-export const Rattler: React.FC<RattlerSpec> = ({x, y, h, at, rattles, hop, flip, seed}) => {
-  const t = useTime();
-  if (t < at) return null;
-  let px = x;
-  let py = y;
-  let rattleAt = latest(rattles, t);
-  if (hop && t >= hop.at) {
-    const q = prog(t, hop.at, 0.34);
-    px = lerp(x, hop.to, E.inOutSine(q));
-    py = y - Math.sin(q * Math.PI) * h * 0.38;
-    if (q < 1) rattleAt = undefined;
-  }
-  return <Attempter x={px} y={py} h={h} mode="rattle" riseAt={at} rattleAt={rattleAt} rattleDur={0.5} flip={flip} seed={seed} />;
-};
-
-// ---------------------------------------------------------------- the rim crowd (tiny, tapping the glass: counted)
-
-export type RimFig = {x: number; y: number; h: number; at: number; taps: number[]};
-
-/** Tiny hooded attempters pressed against the dome's foot, tapping the glass: ripple arcs on the glass (seen, never
- *  getting in). Batched: three paths for the whole crowd. */
-export const RimCrowd: React.FC<{figs: RimFig[]; glassColor?: string}> = ({figs}) => {
-  const t = useTime();
-  const look = useLook();
-  let body = '';
-  let arms = '';
-  let ripples = '';
-  for (const f of figs) {
-    if (t < f.at) continue;
-    const pop = t < f.at + 0.067 ? 1.25 : 1;
-    const h = f.h * pop;
-    const w = h * 0.46;
-    const {x, y} = f;
-    body += `M${(x - w / 2).toFixed(1)} ${y.toFixed(1)}V${(y - h * 0.6).toFixed(1)}Q${(x - w / 2).toFixed(1)} ${(y - h * 0.84).toFixed(1)} ${x.toFixed(1)} ${(y - h).toFixed(1)}Q${(x + w / 2).toFixed(1)} ${(y - h * 0.84).toFixed(1)} ${(x + w / 2).toFixed(1)} ${(y - h * 0.6).toFixed(1)}V${y.toFixed(1)}Z`;
-    const tap = latest(f.taps, t);
-    if (tap !== undefined && t < tap + 0.4) {
-      const q = (t - tap) / 0.4;
-      const hx = x + w * 0.62;
-      const hy = y - h * 1.12 + Math.sin(q * Math.PI * 4) * 0.8;
-      arms += `M${(x + w * 0.3).toFixed(1)} ${(y - h * 0.62).toFixed(1)}L${hx.toFixed(1)} ${hy.toFixed(1)}`;
-      for (let i = 0; i < 2; i++) {
-        const rr = 3 + i * 4 + q * 7;
-        ripples += arc(hx, hy, rr, rr * 0.8, -150, -30, {seed: `rim${Math.round(x)}${i}`});
-      }
-    }
-  }
-  if (!body) return null;
-  return (
-    <>
-      {look.fills === 'color' ? <path d={body} fill={palette.tealDark} /> : <path d={body} fill={palette.white} stroke={palette.ink} strokeWidth={0.8} />}
-      {arms ? <path d={arms} stroke={palette.tealDark} strokeWidth={2.2} strokeLinecap="round" fill="none" /> : null}
-      {ripples ? <path d={ripples} stroke={palette.ink} strokeWidth={1.3} strokeLinecap="round" fill="none" /> : null}
-    </>
-  );
-};
-
-// ---------------------------------------------------------------- the stipple flood
-
-export type Speck = {x: number; y: number; h: number; at: number};
-
-/** Hundreds of 3-12 px hooded tombstones in ONE path per colour; each pops at its `at` (1.25x for 2 frames). After
- *  `flickerAt` a seeded third of them bob 1-2 px in 0.1 s steps (the crowd seethes). Specks inside the dome take the
- *  glass step. */
-export const Stipple: React.FC<{specks: Speck[]; flickerAt?: number; glass?: boolean; seed: string}> = ({specks, flickerAt, glass, seed}) => {
-  const t = useTime();
-  const look = useLook();
-  if (look.fills !== 'color') return null;
-  const step = flickerAt !== undefined && t >= flickerAt ? Math.floor((t - flickerAt) / 0.1) : -1;
-  let d = '';
-  specks.forEach((sp, i) => {
-    if (t < sp.at) return;
-    const k = t < sp.at + 0.067 ? 1.25 : 1;
-    const h = sp.h * k;
-    const w = h * 0.5;
-    const bob = step >= 0 && rand(seed, `f${i}`) < 0.35 && (step + i) % 2 === 0 ? -Math.max(1, h * 0.15) : 0;
-    const y = sp.y + bob;
-    d += `M${(sp.x - w / 2).toFixed(1)} ${y.toFixed(1)}V${(y - h * 0.62).toFixed(1)}Q${(sp.x - w / 2).toFixed(1)} ${(y - h * 0.82).toFixed(1)} ${sp.x.toFixed(1)} ${(y - h).toFixed(1)}Q${(sp.x + w / 2).toFixed(1)} ${(y - h * 0.82).toFixed(1)} ${(sp.x + w / 2).toFixed(1)} ${(y - h * 0.62).toFixed(1)}V${y.toFixed(1)}Z`;
-  });
-  if (!d) return null;
-  return <path d={d} fill={glass ? glassStep(palette.tealDark) : palette.tealDark} />;
-};
-
-/** Specks along a street line: n seeded positions in [x0, x1] at feet y (+- jy), sizes in [h0, h1], popping over span. */
-export function specksAlong(seed: string, n: number, x0: number, x1: number, y: number, h0: number, h1: number, at: number, span: number, o: {jy?: number; order?: 'rand' | 'ltr' | 'center'; skip?: (x: number, y: number) => boolean} = {}): Speck[] {
-  const out: Speck[] = [];
-  for (let i = 0; i < n * 3 && out.length < n; i++) {
-    const x = x0 + rand(seed, `x${i}`) * (x1 - x0);
-    const yy = y + (rand(seed, `y${i}`) - 0.5) * 2 * (o.jy ?? 2);
-    if (o.skip && o.skip(x, yy)) continue;
-    const u = o.order === 'ltr' ? (x - x0) / (x1 - x0) : o.order === 'center' ? Math.abs(x - (x0 + x1) / 2) / ((x1 - x0) / 2) : rand(seed, `a${i}`);
-    out.push({x, y: yy, h: lerp(h0, h1, rand(seed, `h${i}`)), at: at + u * span});
-  }
-  return out;
-}
-export const splitDome = (sp: Speck[]) => ({inside: sp.filter((s) => inDome(s.x, s.y - s.h * 0.5)), outside: sp.filter((s) => !inDome(s.x, s.y - s.h * 0.5))});
 
 // ---------------------------------------------------------------- paper specks (the copies landing in the streets)
 
@@ -241,7 +139,7 @@ export const Pip: React.FC<{plan: PipPlan}> = ({plan}) => {
         scale={scale}
         t={t}
         seed={8}
-        flip={!landed}
+        flip={!landed && hopFrom[0] > spot[0]}
         squash={h.squash}
         rotate={h.rotate}
         amount={h.spread}
@@ -290,29 +188,6 @@ export const BitRide: React.FC<{plan: BitPlan}> = ({plan}) => {
   return <Bit x={land[0]} y={land[1]} size={size} hopAt={cheer} hopH={0.7} crawl={{at: crawlAt, path: [land, crawlTo], speed: 300}} state={t < crawlAt + Math.hypot(crawlTo[0] - land[0], crawlTo[1] - land[1]) / 300 ? 'scuttle' : 'idle'} alertAt={alertAt} alertDur={1.0} look={t > crawlAt + 1.4 ? 'down' : 'auto'} seed="s8/bit" />;
 };
 
-
-/** Crowds as CLUMPS (a flood reads as crowds, not as an even grain): `n` clumps along a band, each 'per' specks packed
- *  shoulder to shoulder (back rows a hair higher and smaller), all popping at `at` (+ the clump's share of `span`). */
-export function clumps(seed: string, n: number, x0: number, x1: number, y0: number, y1: number, h0: number, h1: number, per: [number, number], at: number, span: number, o: {order?: 'rand' | 'ltr'; skip?: (x: number, y: number) => boolean} = {}): Speck[] {
-  const out: Speck[] = [];
-  for (let c = 0, made = 0; c < n * 3 && made < n; c++) {
-    const cx = x0 + rand(seed, `cx${c}`) * (x1 - x0);
-    const cy = y0 + rand(seed, `cy${c}`) * (y1 - y0);
-    if (o.skip && o.skip(cx, cy)) continue;
-    made++;
-    const h = lerp(h0, h1, rand(seed, `ch${c}`));
-    const k = Math.round(lerp(per[0], per[1], rand(seed, `ck${c}`)));
-    const u = o.order === 'ltr' ? (cx - x0) / (x1 - x0) : rand(seed, `ca${c}`);
-    for (let i = 0; i < k; i++) {
-      const row = i % 2;
-      const x = cx + (i - k / 2) * h * 0.42 + (rand(seed, `jx${c}/${i}`) - 0.5) * h * 0.3;
-      const y = cy - row * h * 0.22 + (rand(seed, `jy${c}/${i}`) - 0.5) * h * 0.12;
-      out.push({x, y, h: h * (row ? 0.92 : 1) * lerp(0.9, 1.08, rand(seed, `js${c}/${i}`)), at: at + u * span});
-    }
-  }
-  // back rows first (smaller y first) so nearer specks overlap them
-  return out.sort((a, b) => a.y - b.y);
-}
 
 /** A window grid on a far building winks: its panes flash cream for 2 frames, twice. */
 export const WindowWink: React.FC<{x: number; y: number; cols: number; rows: number; at: number; size?: number}> = ({x, y, cols, rows, at, size = 5}) => {

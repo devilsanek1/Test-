@@ -6,7 +6,8 @@ import {useTime} from '../../lib/time';
 import type {Pt} from '../../lib/sketch';
 import {Citizen, OLD_QUARTER} from './kit';
 
-export const GAP_WALKER = {x: 696, y: 1262, h: 100, pace: 0.3};
+/** x 708 (the set's anchor is 696): a clear 40 px from siteM's plaque edge, so its beats never touch his walk. */
+export const GAP_WALKER = {x: 708, y: 1262, h: 100, pace: 0.3};
 
 export const GapWalker: React.FC<{walkAt: number; stopAt: number; vp?: Pt}> = ({walkAt, stopAt, vp = OLD_QUARTER.vp as unknown as Pt}) => {
   const t = useTime();

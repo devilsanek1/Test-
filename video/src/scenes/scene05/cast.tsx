@@ -25,6 +25,8 @@ const FEET_BACK = 1446;
 
 type Member = {
   x: number;
+  /** Pop-up order inside the team (front left first). */
+  rise: number;
   h: number;
   seed: string;
   body: string;
@@ -34,21 +36,22 @@ type Member = {
   pose?: 'point' | 'clipboard' | 'hips';
 };
 
-/** Team A (x 130-310) and team B (x 570-880, the rightmost is the messenger): two depths (a back-row member behind each
+/** Team A (x 130-310) and team B (x 555-845, the rightmost is the messenger): two depths (a back-row member behind each
  *  front pair, partly hidden), different heights and poses. One tablet per team, held at HEAD height (40 x 57 world): its
  *  top stays below the banner's bottom rail (y 1296), clear of Pip and the elephant stamp. */
 export const TEAM_A: Member[] = [
-  {x: 216, h: 117, seed: 's5a3', body: palette.teal, hair: 'curly', back: true, pose: 'point'},
-  {x: 160, h: 130, seed: 's5a1', body: palette.sage, hair: 'bun', pose: 'clipboard'},
-  {x: 272, h: 140, seed: 's5a2', body: palette.tan, hair: 'short', tablet: 'right'},
+  {x: 216, rise: 1, h: 117, seed: 's5a3', body: palette.teal, hair: 'curly', back: true, pose: 'point'},
+  {x: 160, rise: 0, h: 130, seed: 's5a1', body: palette.sage, hair: 'bun', pose: 'clipboard'},
+  {x: 272, rise: 2, h: 140, seed: 's5a2', body: palette.tan, hair: 'short', tablet: 'right'},
 ];
 export const TEAM_B: Member[] = [
-  {x: 652, h: 116, seed: 's5b3', body: palette.tan, hair: 'bald', back: true},
-  {x: 600, h: 128, seed: 's5b1', body: palette.sand, hair: 'long', tablet: 'left'},
-  {x: 706, h: 136, seed: 's5b2', body: palette.sage, hair: 'short', pose: 'hips'},
+  {x: 642, rise: 1, h: 116, seed: 's5b3', body: palette.tan, hair: 'bald', back: true},
+  {x: 584, rise: 0, h: 128, seed: 's5b1', body: palette.sand, hair: 'long', tablet: 'left'},
+  {x: 700, rise: 2, h: 136, seed: 's5b2', body: palette.sage, hair: 'short', pose: 'hips'},
 ];
-/** The messenger: in from the rail (screen ~ 880, his envelope raised over his LEFT shoulder at screen ~ (830, 1350)). */
-export const MESSENGER = {x: 840, h: 136, seed: 's5msg'};
+/** The messenger: in from the platform rail (screen x ~845, body 810-880), his envelope raised over his LEFT shoulder at
+ *  screen ~(800, 1350). */
+export const MESSENGER = {x: 810, h: 136, seed: 's5msg'};
 const TABLET = 40;
 
 const feetOf = (m: Member) => (m.back ? FEET_BACK : FEET);
@@ -95,11 +98,11 @@ export const Teams: React.FC<{b: Beats}> = ({b}) => {
   return (
     <>
       {order(TEAM_A).map((m) => {
-        const i = TEAM_A.indexOf(m);
+        const i = m.rise;
         return <TeamMember key={m.seed} m={m} riseAt={b.teamA + i * 0.1} raiseAt={m.tablet ? b.tablets : undefined} poseAt={b.converge} leanAt={lean0 + i * 0.02} leanDir={1} />;
       })}
       {order(TEAM_B).map((m) => {
-        const i = TEAM_B.indexOf(m);
+        const i = m.rise;
         return <TeamMember key={m.seed} m={m} riseAt={b.teamB + i * 0.08} raiseAt={m.tablet ? b.tablets + 0.07 : undefined} poseAt={b.converge} leanAt={lean0 + i * 0.02} leanDir={-1} />;
       })}
     </>
@@ -139,9 +142,6 @@ export function messengerScreenDx(t: number, b: Beats): number {
 /** His world x (steps plane, f = 1): he rides the truck plus his own screen dash. */
 export const messengerX = (t: number, b: Beats, cam: Cam) => MESSENGER.x + (cam.x - 540) + messengerScreenDx(t, b) / cam.zoom;
 
-/** The envelope comes out on 'was.'-0.075 (a small element leads its word) and is up, readable over his LEFT shoulder
- *  inside the frame (screen x ~ 830), for ~5 frames before the dash starts moving him. */
-export const pullAt = (b: Beats) => b.envelope - 0.175;
 
 export const MessengerDash: React.FC<{b: Beats}> = ({b}) => {
   const t = useTime();
@@ -154,7 +154,7 @@ export const MessengerDash: React.FC<{b: Beats}> = ({b}) => {
   return (
     <XG m={mat.about(mat.rotate(ang), x, FEET)}>
       <PopRise at={b.teamB + 0.24} x={MESSENGER.x} y={FEET}>
-        <Messenger x={x} y={FEET} h={MESSENGER.h} pullAt={pullAt(b)} side="left" lift="high" walk={walking ? 4.2 : undefined} bob={1.2} seed={MESSENGER.seed} />
+        <Messenger x={x} y={FEET} h={MESSENGER.h} pullAt={b.pull} side="left" lift="high" walk={walking ? 4.2 : undefined} bob={1.2} seed={MESSENGER.seed} />
       </PopRise>
       <SpeedLines t={t} at={b.truck + 0.02} x={x} />
     </XG>
@@ -177,7 +177,9 @@ const SpeedLines: React.FC<{t: number; at: number; x: number}> = ({t, at, x}) =>
 
 // ---------------------------------------------------------------- Pip
 
-export const PIP_RAIL: Pt = [BLUEPRINT_WALL.perchBottom[0], BLUEPRINT_WALL.perchBottom[1]];
+/** Pip's perch on the bottom rail: the set's perchBottom (620) moved 10 left so his trunk-up wake clears the stamp
+ *  (team B's tablet and beam origin stay ~25 world left of his tail). */
+export const PIP_RAIL: Pt = [BLUEPRINT_WALL.perchBottom[0] - 10, BLUEPRINT_WALL.perchBottom[1]];
 /** 1.2 on screen at the 1.13 lock. */
 export const PIP_SCALE = 1.2 / 1.13;
 /** Pip's hop off the rail after the messenger: a LOW hop (45 world) down toward the steps, take-off 0.04 s into the
@@ -239,7 +241,7 @@ const SOCKET: Pt = (() => {
   const p = lp(LOCK.peek[0], LOCK.peek[1]);
   return [p[0] - 1, p[1] + 1];
 })();
-const EDGE: Pt = lp(-27, -50);
+const EDGE: Pt = lp(-33, -50);
 const HOP_OUT = 0.22;
 const HOP_IN = 0.16;
 
