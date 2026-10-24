@@ -8,17 +8,17 @@
   "why": "opening line art draws on (frame 1 is never silent of 'life')"
  },
  {
-  "t": 3.3,
+  "t": 3.45,
   "sfx": "power_off_thunk",
   "gain_db": -12,
   "pan": 0.0,
   "prio": "A",
-  "why": "'switched themselves OFF' - lights out on the gov sites"
+  "why": "end of 'switched themselves OFF.' - lights out; hum tail fills the pause"
  },
  {
   "t": 9.19,
   "sfx": "pop_mid",
-  "gain_db": -18,
+  "gain_db": -15,
   "pan": -0.2,
   "prio": "B",
   "why": "'7' (out of 10) pops in"
@@ -26,7 +26,7 @@
  {
   "t": 9.83,
   "sfx": "pop_high",
-  "gain_db": -20,
+  "gain_db": -17,
   "pan": 0.2,
   "prio": "B",
   "why": "'10'"
@@ -34,7 +34,7 @@
  {
   "t": 12.26,
   "sfx": "pop_low",
-  "gain_db": -19,
+  "gain_db": -16,
   "pan": 0.0,
   "prio": "B",
   "why": "'two steps' - the two-step card"
@@ -66,7 +66,7 @@
  {
   "t": 18.87,
   "sfx": "pop_mid",
-  "gain_db": -17,
+  "gain_db": -14,
   "pan": 0.0,
   "prio": "B",
   "why": "'14'"
@@ -82,7 +82,7 @@
  {
   "t": 24.98,
   "sfx": "ding",
-  "gain_db": -19,
+  "gain_db": -16,
   "pan": 0.25,
   "prio": "A",
   "why": "'found it' - the discovery"
@@ -90,7 +90,7 @@
  {
   "t": 31.71,
   "sfx": "riser_leak",
-  "gain_db": -15,
+  "gain_db": -18,
   "pan": 0.0,
   "prio": "A",
   "why": "leak build: 3.64 s riser peaking at 35.35 (bar line before 'Cloudflare')"
@@ -98,7 +98,7 @@
  {
   "t": 35.62,
   "sfx": "pop_low",
-  "gain_db": -15,
+  "gain_db": -12,
   "pan": 0.0,
   "prio": "A",
   "why": "'Cloudflare' lands on the riser peak"
@@ -106,7 +106,7 @@
  {
   "t": 38.82,
   "sfx": "counter_ticker",
-  "gain_db": -19,
+  "gain_db": -14,
   "pan": 0.1,
   "prio": "A",
   "why": "'tens of thousands' counting up (runs ~2 s, stops before '45')"
@@ -114,7 +114,7 @@
  {
   "t": 41.06,
   "sfx": "pop_high",
-  "gain_db": -18,
+  "gain_db": -15,
   "pan": 0.0,
   "prio": "B",
   "why": "'45' minutes"
@@ -122,7 +122,7 @@
  {
   "t": 42.48,
   "sfx": "pop_mid",
-  "gain_db": -15,
+  "gain_db": -12,
   "pan": 0.0,
   "prio": "A",
   "why": "'millions'"
@@ -130,7 +130,7 @@
  {
   "t": 45.13,
   "sfx": "lock_click",
-  "gain_db": -20,
+  "gain_db": -17,
   "pan": 0.0,
   "prio": "B",
   "why": "'got in.' - a tiny button on the line"
@@ -146,7 +146,7 @@
  {
   "t": 46.4,
   "sfx": "pop_low",
-  "gain_db": -19,
+  "gain_db": -16,
   "pan": 0.0,
   "prio": "B",
   "why": "'two'"
@@ -154,7 +154,7 @@
  {
   "t": 48.47,
   "sfx": "typing_burst",
-  "gain_db": -22,
+  "gain_db": -18,
   "pan": 0.2,
   "prio": "B",
   "why": "'install that fix' - quiet keystrokes"
@@ -162,7 +162,7 @@
  {
   "t": 51.09,
   "sfx": "pop_mid",
-  "gain_db": -17,
+  "gain_db": -14,
   "pan": 0.0,
   "prio": "A",
   "why": "'22' million"
@@ -170,7 +170,7 @@
  {
   "t": 58.03,
   "sfx": "switch_toggle",
-  "gain_db": -12,
+  "gain_db": -7,
   "pan": 0.0,
   "prio": "A",
   "why": "'switch it OFF'"
@@ -178,7 +178,7 @@
  {
   "t": 60.75,
   "sfx": "pop_mid",
-  "gain_db": -18,
+  "gain_db": -15,
   "pan": -0.2,
   "prio": "B",
   "why": "'one' in three"
@@ -186,7 +186,7 @@
  {
   "t": 61.11,
   "sfx": "pop_high",
-  "gain_db": -19,
+  "gain_db": -16,
   "pan": 0.2,
   "prio": "B",
   "why": "'three'"
@@ -194,7 +194,7 @@
  {
   "t": 68.0,
   "sfx": "switch_toggle",
-  "gain_db": -15,
+  "gain_db": -10,
   "pan": 0.0,
   "prio": "B",
   "why": "'switch off' (callback, softer)"
