@@ -4,7 +4,55 @@ Owner: sound stream. Lane: `audio/**`, `docs/sound_plan.md`, `docs/sound_credits
 Sources and licences: `docs/sound_credits.md`. This version follows the brief's **CINEMATIC DIRECTION** and its
 **BALANCE NOTE**: a warm, modern explainer at the core, with a touch of space, and nothing trailer-like.
 
-## CURRENT STATE: v3, new ElevenLabs voice (`assets/vo_v2_eleven.wav`)
+## CURRENT STATE: v4, FINAL voice (`assets/vo_v3_final.wav`, 55.36 s, new script)
+
+Everything below this section is history (v1 MP3 voice, v2/v3 78 s take). Where it conflicts with this section, this section wins.
+
+- **Timeline.** The loop is **55.5 s** (`common.VIDEO_DUR`; speech runs 0.06-55.23 s). This is provisional until the storyboard sets the film length.
+- **Voice.** `audio/vo_clean.wav` comes from the APPROVED v4 chain, unchanged (`python3 audio/tools/vo_clean.py`). The previous take's file is kept as `audio/vo_clean_v2.wav`.
+  The matching EQ adapts to each file by design; on this take it came out as: +3.8 dB at 125 Hz, +4.4 dB at 160-250 Hz, -3.9 dB at 500 Hz, -5.5 dB at 630 Hz,
+  +2.3 dB at 1 kHz, +4.4 dB at 3-4 kHz, +4.4 dB at 8-10 kHz. The de-esser was active on 18 % of speech at 1.8 dB; the leveler averaged 0.9 dB.
+
+  | Metric | raw final take | **treated** | ref 1 | ref 2 |
+  |---|---|---|---|---|
+  | Tonal distance to the reference average | 6.74 dB | **2.58 dB** | 2.66 | 2.66 |
+  | 150-300 Hz / 400-800 Hz / 3-5 kHz | +2.2 / +6.3 / -18.4 | **+9.0 / +4.4 / -11.8** | +14.0 / +4.4 / -14.5 | +11.9 / +3.8 / -10.7 |
+  | Sibilance / crest factor | -12.7 / 14.2 dB | **-9.0 / 12.3 dB** | -8.5 / 11.0 | -9.7 / 11.1 |
+  | HF artifact index / true peak | 0.209 / -0.1 dBTP | **0.208 / -3.2 dBTP** (-17.1 LUFS stem) | | |
+
+- **Music, MIDI-driven** (`audio/tools/bed_cinematic.py`):
+  1. **compose** writes `audio/music_cinematic.mid`: every note in ticks on a 96.22 BPM grid, 22 bars of 3/4 to 6/4 (89 beats), ppq 960.
+     It also writes `audio/music_cinematic.json`: the structure, the loop end in beats, the level arc in bar/beat terms, and the routing.
+  2. **render** turns ANY MIDI with those tracks into the WAV. Note times, the Cloudflare accent, the level arc and the loop point all come from the MIDI's own tempo map.
+
+  The approved character is kept:
+  - The hook (0-14.3 s) is **air only**, 37.6 dB under the voice.
+  - The soft piano pulse enters on "This bug was in there" (bar line at 14.34 s; the word starts at 14.32).
+  - The leak creep sits on "but word got out" (21.83), and the **one soft accent** on Cloudflare (26.19, in the pause before the word at 26.64).
+  - A hush on "…within a day", then **breathing room** on "But even with the fix out" (34.30): one rolled chord, two piano notes, air. It sits 28 dB under the voice.
+  - Rebuild at "Plus" (39.29), and a **quiet air-only close** (52.38-55.5) that matches the start (seam within 2.2 dB, no step).
+
+  Music under the voice, medians in `mix.wav`: hook 37.6, entrance 27.3, leak 23.8, Cloudflare 21.0, breath 28.1, rebuild 22.6, close 32.9 dB.
+  Across all speech: median 27.0, minimum 12.8 dB.
+
+- **Tempo not final.** Once the storyboard's cut times exist, bend the bed so the cuts land on beats:
+  ```
+  python3 scripts/qa/beatsync.py --fit-tempo --end-time film --write-midi audio/music_cinematic_retimed.mid
+  SOUND_VIDEO_DUR=<film length> python3 audio/tools/bed_cinematic.py --render-only --midi audio/music_cinematic_retimed.mid
+  SOUND_VIDEO_DUR=<film length> python3 audio/mix.py --music cinematic --out audio/mix.wav
+  ```
+  Tested end to end with 8 trial cuts and a 55.4 s end: 8/8 cuts on beat; the render follows (tempo 90.9-100.6 BPM, the accent moved to its cut, the loop is 55.400 s).
+  Never re-run compose after bending: it rewrites the base MIDI.
+- **Cues** (`audio/cues.json`, 19 cues, all `"provisional": true`). Each carries an `anchor` (a word plus an offset) for re-timing once `timing.json` and the scenes exist.
+  Kept: city hum into the "shut DOWN" thunk, the opening pencil, pops on seven, ten, fourteen, forty-five, millions and HALF, the Cloudflare pop, the counter on "tens of thousands",
+  two foreground wipes at the big pauses, the shimmer on the turn, air under "every single server", typing on "install it", switches on "turn it OFF" and on "did it" (callback),
+  and the closing pencil across the loop.
+  Dropped: everything tied to the old script ("two steps", "First/Then", "got in", "22 million", "one in three"), and the "found it" ding, because the bed's celesta glint now sits on "figured out".
+- **Renders:** `audio/mix.wav` and `review/audio/mix_v4_final_voice.mp3` (320 kb/s). Both measure **-14.0 LUFS and -1.2 dBTP** (ffmpeg agrees), LRA 1.7 LU, 55.500 s, 0 clipped samples.
+  The 19 flagged click-type events are designed SFX attacks or consonant onsets.
+- The previous bed script (78 s, v3) is archived as `audio/tools/retired/bed_cinematic_v3_78s.py`.
+
+## HISTORY: v3, new ElevenLabs voice (`assets/vo_v2_eleven.wav`)
 
 Sections 1-8 below describe the v1/v2 work on the old MP3 voice. Wherever they conflict with this section, this section wins.
 
