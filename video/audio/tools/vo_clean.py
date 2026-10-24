@@ -183,7 +183,8 @@ def match_eq(x, ref, cap_db=6.0, lo_hz=100.0, hi_hz=11000.0, ntaps=4095, report=
     faded to 0 dB below lo_hz (no rumble boost) and above hi_hz (never boost the MP3 swirl band).
     Linear-phase FIR (gentle curve -> negligible pre-ring)."""
     f, a = ltas_db(x)
-    _, r = ltas_db(ref)
+    refs = ref if isinstance(ref, (list, tuple)) else [ref]
+    r = np.mean([ltas_db(rr)[1] for rr in refs], axis=0)
     d = r - a
     lf = np.log2(np.maximum(f, 1.0))
     sm = np.array([d[np.abs(lf - l) <= 1 / 6].mean() for l in lf])          # 1/3-octave smoothing
@@ -215,7 +216,7 @@ def parallel_comp(x, mix_db=-9.0, report=None):
     return y
 
 
-def saturate(x, drive=1.6, bias=0.12, report=None):
+def saturate(x, drive=0.75, bias=0.2, report=None):
     """Very light tube-style saturation (asymmetric tanh -> mostly 2nd harmonic), 4x oversampled."""
     import soxr
     pk = np.percentile(np.abs(x), 99.9) + 1e-12
@@ -269,6 +270,88 @@ def process_v3(x, variant="A", report=None, air_frac_db=-9.5):
     return x, report
 
 
+# ---------------------------------------------------------------------------- v4: ElevenLabs take (vo_v2_eleven.wav)
+REF1 = ASSETS / "ref" / "reference.mp4"
+VO_V2 = ASSETS / "vo_v2_eleven.wav"
+
+
+def declip(x, thr=0.999):
+    """Repair isolated clipped samples (the TTS export has exactly one) by cubic interpolation."""
+    idx = np.where(np.abs(x) >= thr)[0]
+    if len(idx) == 0:
+        return x, 0
+    y = x.copy()
+    good = np.ones(len(x), bool); good[idx] = False
+    for i in idx:
+        lo, hi = max(0, i - 4), min(len(x), i + 5)
+        k = np.arange(lo, hi); m = good[lo:hi]
+        if m.sum() >= 4:
+            y[i] = np.polyval(np.polyfit(k[m], x[lo:hi][m], 3), i)
+    return y, len(idx)
+
+
+def deess_relative(x, report, margin_db=-8.0, ratio=3.0, max_db=5.0):
+    """De-esser that only acts when the 5-10 kHz band comes within `margin_db` of the 200 Hz-3 kHz body
+    (a percentile threshold would always act, even on a non-sibilant voice)."""
+    lo = ss.sosfiltfilt(ss.butter(4, 5000, "lowpass", fs=SR, output="sos"), x)
+    hi = x - lo
+    det = rms_db(ss.sosfiltfilt(ss.butter(4, [5000, 10000], "bandpass", fs=SR, output="sos"), x), 5)
+    body = rms_db(ss.sosfiltfilt(ss.butter(2, [200, 3000], "bandpass", fs=SR, output="sos"), x), 30)
+    speech = rms_db(x, 30) > -40
+    body_ref = np.percentile(body[speech], 75)
+    gr = np.minimum(np.maximum(det - (body_ref + margin_db), 0) * (1 - 1 / ratio), max_db)
+    gr = smooth_gain(gr, 1.0, 60.0)
+    report["deess"] = {"active_pct": round(float(np.mean(gr[speech] > 0.5) * 100), 1),
+                       "mean_when_active_db": round(float(gr[gr > 0.5].mean()) if (gr > 0.5).any() else 0.0, 2),
+                       "max_db": round(float(gr.max()), 2)}
+    return lo + hi * db2a(-gr)
+
+
+def process_v4(x, report=None, air=False, air_frac_db=-9.5):
+    """New-take chain: declip -> HPF 60 -> matching EQ toward the AVERAGE of both reference voices
+    (1/3-oct smoothed, +-6 dB cap, flat below 100 Hz and above 13 kHz) -> [optional 1/3-strength exciter]
+    -> relative de-esser -> light parallel compression -> very light even-harmonic saturation
+    -> light leveler. (finalize() adds -17 LUFS and the -1.5 dBTP safety limiter.)"""
+    report = {} if report is None else report
+    x, nclip = declip(x)
+    report["declipped_samples"] = int(nclip)
+    x = x - x.mean()
+    x = ss.sosfilt(ss.butter(4, 60, "highpass", fs=SR, output="sos"), x)
+    x = match_eq(x, [load(REF1, SR, mono=True), load(REF2, SR, mono=True)], cap_db=6.0, lo_hz=100.0,
+                 hi_hz=13000.0, report=report)
+    if air:
+        full, info = exciter(x)
+        x = x + db2a(air_frac_db) * (full - x)
+        report["air"] = info
+    x = deess_relative(x, report)
+    x = parallel_comp(x, report=report)
+    x = saturate(x, report=report)
+    x = leveler_light(x, report)
+    return x, report
+
+
+def write_ab_v4(src, y_treated, seconds=20.0):
+    """review/audio/new_vo_raw.wav, new_vo_treated.wav, ref2_voice_20s.wav (-16 LUFS, 24-bit WAV)."""
+    d = ROOT / "review" / "audio"
+    d.mkdir(parents=True, exist_ok=True)
+    sys.path.insert(0, str(AUDIO))
+    from mix import tp_limit
+    n = int(seconds * SR)
+    out = {}
+    for name, y in {"new_vo_raw": src[:n] - src[:n].mean(), "new_vo_treated": y_treated[:n],
+                    "ref2_voice_20s": load(REF2, SR, mono=True)[:n]}.items():
+        y = y * db2a(-16.0 - lufs(y))
+        if true_peak_db(y) > -1.5:
+            y = tp_limit(np.stack([y, y], axis=1), ceiling_db=-1.7, release_ms=60.0)[:, 0]
+            y = y * db2a(-16.0 - lufs(y))
+        f = int(0.01 * SR); y[-f:] *= np.linspace(1, 0, f)
+        p = d / f"{name}.wav"
+        save(p, y)
+        out[name] = p
+        print(f"  A/B {p}  {lufs(y):.2f} LUFS  TP {true_peak_db(y):.2f}")
+    return out
+
+
 def finalize(y, n_total=N_TOTAL, target=-17.0, ceiling=-1.5):
     y = y * db2a(target - lufs(y))
     if true_peak_db(y) > ceiling:               # rare plosive/sibilant overs after the presence lift
@@ -311,22 +394,30 @@ def write_ab(src):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--src", default=str(ASSETS / "vo.mp3"))
-    ap.add_argument("--chain", default="full", choices=["full", "eq", "basic", "A", "B", "C"])
+    ap.add_argument("--src", default=str(ASSETS / "vo_v2_eleven.wav"))
+    ap.add_argument("--chain", default="v4", choices=["v4", "v4air", "full", "eq", "basic", "A", "B", "C"])
     ap.add_argument("--out", default=str(AUDIO / "vo_clean.wav"))
     ap.add_argument("--ab", action="store_true")
     a = ap.parse_args()
     src = load(a.src, SR, mono=True)
     print(f"source {a.src}: {len(src) / SR:.3f} s, {lufs(src):.2f} LUFS, TP {true_peak_db(src):.2f} dBTP, "
           f"air present: {has_air(src)}")
-    y, rep = process_v3(src, a.chain) if a.chain in ("A", "B", "C") else process(src, a.chain)
+    if a.chain in ("v4", "v4air"):
+        y, rep = process_v4(src, air=(a.chain == "v4air"))
+    elif a.chain in ("A", "B", "C"):
+        y, rep = process_v3(src, a.chain)
+    else:
+        y, rep = process(src, a.chain)
     for k, v in rep.items():
         print(f"  {k}: {v}")
     out = finalize(y)
     save(a.out, out)
     print(f"vo_clean ({a.chain}): {lufs(out):.2f} LUFS, TP {true_peak_db(out):.2f} dBTP -> {a.out}")
     if a.ab:
-        write_ab(src)
+        if a.chain in ("v4", "v4air"):
+            write_ab_v4(src, y)
+        else:
+            write_ab(src)
 
 
 if __name__ == "__main__":

@@ -9,6 +9,7 @@
 //   <RimLight points={roofPts} light={-60} width={5} color={palette.cream} />
 //   <Silhouette color={TOD.dusk.silhouette}> <Person .../> </Silhouette>        // any kit element, fill-only
 //   <Silhouette d={path} color="#2F4847" />
+//   <FlatColor color={palette.peach}> ... </FlatColor>                           // recolour every fill + stroke
 
 import React, {useId, useMemo} from 'react';
 import {Ease, ease as E, lerp, osc, prog, useTime} from '../time';
@@ -17,6 +18,7 @@ import type {Pt} from '../sketch';
 import {Tod, TodPalette, todPal} from './atmosphere';
 import {mix, PathBuf, r1} from './util';
 import {palette} from '../theme';
+import {exitScale, useCineState} from './state';
 
 // ---------------------------------------------------------------- Glow
 
@@ -42,16 +44,20 @@ export type GlowProps = {
 
 /** Stepped concentric flat discs (no gradient): each ring is a flat translucent disc; overlaps form the steps. */
 export const Glow: React.FC<GlowProps> = ({cx, cy, r, rings = 3, spread = 1.4, color, opacity = 0.16, core, breathe = 0, at}) => {
-  const t = useTime();
+  const S = useCineState();
+  const t = S.t;
   if (at !== undefined && t < at) return null;
-  const b = breathe ? 1 + breathe * osc(t, 0.23, cx * 0.01) : 1;
+  if (S.look.fills !== 'color') return null; // light only exists in the coloured state
+  const ex = exitScale(S.e, 0.2, 0.05);
+  if (ex <= 0) return null;
+  const b = (breathe ? 1 + breathe * osc(t, 0.23, cx * 0.01) : 1) * ex;
   const out: React.ReactNode[] = [];
   for (let i = rings - 1; i >= 0; i--) {
     const k = at === undefined ? 1 : E.outBack(1.6)(prog(t, at + i * 0.05, 0.22));
     const rr = r * (1 + (spread * (i + 1)) / rings) * b * k;
     if (rr > 0.3) out.push(<circle key={i} cx={cx} cy={cy} r={r1(rr)} fill={color} opacity={opacity} />);
   }
-  if (core) out.push(<circle key="core" cx={cx} cy={cy} r={r} fill={core} />);
+  if (core) out.push(<circle key="core" cx={cx} cy={cy} r={r1(r * ex)} fill={core} />);
   return <>{out}</>;
 };
 
@@ -122,7 +128,8 @@ const SunHalo: React.FC<{r: number; rings: number; spread: number; color: string
 
 /** The huge orange disc on the horizon (r 150 by default). Wraps the core <Sun> (beats, bounce, hops, drift, rise,
  *  moves, set behind a horizon line, overlays via children(r)) and adds stepped glow discs behind it that follow
- *  every behaviour (they ride on a second, invisible Sun). */
+ *  every behaviour (they ride on a second, invisible Sun). Default `drift` [2.2, 0.6] px/s: never perfectly still
+ *  (pass [0, 0] to pin it, e.g. for a match-cut frame). */
 export const BigSun: React.FC<BigSunProps> = ({
   cx = 540,
   cy = 1000,
@@ -137,6 +144,7 @@ export const BigSun: React.FC<BigSunProps> = ({
   glowOpacity = 0.14,
   color,
   moves: extra = [],
+  drift = [2.2, 0.6],
   children,
   ...sunProps
 }) => {
@@ -145,7 +153,7 @@ export const BigSun: React.FC<BigSunProps> = ({
   const y0 = path?.[0]?.y ?? cy;
   const r0 = path?.[0]?.r ?? r;
   const moves = [...(path ? pathMoves(path) : []), ...extra];
-  const common = {cx: x0, cy: y0, r: r0, moves, breathe, ...sunProps};
+  const common = {cx: x0, cy: y0, r: r0, moves, breathe, drift, ...sunProps};
   return (
     <>
       {glow > 0 ? (
@@ -185,10 +193,14 @@ export type LightShaftProps = {
 
 /** Translucent flat light polygons from a source (cathedral / window / god rays). */
 export const LightShaft: React.FC<LightShaftProps> = ({from, angle, length = 2000, w0 = 50, w1 = 500, beams = 1, color = '#FFFFFF', opacity = 0.18, sweep = 0, sweepHz = 0.07, at, seed = 0}) => {
-  const t = useTime();
+  const S = useCineState();
+  const t = S.t;
   if (at !== undefined && t < at) return null;
+  if (S.look.fills !== 'color') return null;
+  const ex = exitScale(S.e, 0.1, 0.3); // the beam retracts into its source
+  if (ex <= 0) return null;
   const a = ((angle + (sweep ? sweep * osc(t, sweepHz, seed) : 0)) * Math.PI) / 180;
-  const L = length * (at === undefined ? 1 : E.outCubic(prog(t, at, 0.35)));
+  const L = ex * length * (at === undefined ? 1 : E.outCubic(prog(t, at, 0.35)));
   const d: Pt = [Math.cos(a), Math.sin(a)];
   const n: Pt = [-d[1], d[0]];
   const list: [number, number][] =
@@ -269,42 +281,48 @@ export type SilhouetteProps = {
   color: string;
   /** A path to fill directly (cheapest). */
   d?: string;
-  /** Or: children whose alpha becomes the silhouette (any kit element). Mask region [x, y, w, h]. */
+  /** Or: children drawn fill-only in `color` (any kit element: every fill and stroke is recoloured, see FlatColor). */
   children?: React.ReactNode;
+  /** @deprecated ignored (silhouettes no longer use an alpha mask, so there is no mask region to size). */
   bounds?: [number, number, number, number];
   opacity?: number;
 };
 
-/** Default mask region (layer coords): the frame plus a margin. Keep masks under ~4000 px a side (Chrome rasterises
- *  masks as one texture; bigger regions tile and repeat). Pass `bounds` for content far outside the frame. */
+/** @deprecated kept for old imports; silhouettes no longer use masks. */
 export const SIL_BOUNDS: [number, number, number, number] = [-400, -400, 1880, 2720];
 
-/** Fill-only dark shape of a path or of any children (alpha mask: the children's coverage is filled flat). */
-export const Silhouette: React.FC<SilhouetteProps> = ({color, d, children, bounds = SIL_BOUNDS, opacity}) => {
-  const id = 'sil' + useId().replace(/[^a-zA-Z0-9]/g, '');
-  if (d) return <path d={d} fill={color} opacity={opacity} />;
-  const [x, y, w, h] = bounds;
+/** Recolour EVERY fill and stroke of the children to one flat colour (no offscreen raster, no mask): a scoped CSS rule
+ *  on a class overrides the presentation attributes of everything inside ([fill] / [stroke] that are not "none").
+ *  This is how cine makes silhouettes and rim copies of any kit element (Person, the mascot, a Building). */
+export const FlatColor: React.FC<{color: string; opacity?: number; children?: React.ReactNode}> = ({color, opacity, children}) => {
+  const id = 'fc' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const css = `.${id} [fill]:not([fill="none"]){fill:${color}!important}.${id} [stroke]:not([stroke="none"]){stroke:${color}!important}`;
   return (
-    <>
-      <defs>
-        <mask id={id} maskUnits="userSpaceOnUse" x={x} y={y} width={w} height={h} style={{maskType: 'alpha'}}>
-          {children}
-        </mask>
-      </defs>
-      <rect x={x} y={y} width={w} height={h} fill={color} mask={`url(#${id})`} opacity={opacity} />
-    </>
+    <g className={id} opacity={opacity}>
+      <style>{css}</style>
+      {children}
+    </g>
   );
 };
 
-/** Rim-light any element: a flat silhouette of the children in `color`, offset toward the light by (dx, dy),
- *  drawn behind them, so a lighter sliver shows along the lit edges (backlit figures, the mascot on a ledge). */
-export const Rimmed: React.FC<{color: string; dx?: number; dy?: number; bounds?: [number, number, number, number]; children?: React.ReactNode}> = ({color, dx = 5, dy = -3, bounds, children}) => (
+/** Fill-only flat shape of a path or of any children (a FlatColor copy: exact, fast, no mask tiling). */
+export const Silhouette: React.FC<SilhouetteProps> = ({color, d, children, opacity}) => {
+  if (d) return <path d={d} fill={color} opacity={opacity} />;
+  return (
+    <FlatColor color={color} opacity={opacity}>
+      {children}
+    </FlatColor>
+  );
+};
+
+/** Rim-light any element: a flat copy of the children in `color`, offset toward the light by (dx, dy), drawn behind
+ *  them, so a lighter sliver (3-5 px) shows along the lit edges (backlit figures, the mascot on a ledge).
+ *  `silhouette` also draws the element itself fill-only (a backlit figure against the sun). */
+export const Rimmed: React.FC<{color: string; dx?: number; dy?: number; silhouette?: string; bounds?: [number, number, number, number]; children?: React.ReactNode}> = ({color, dx = 4, dy = -3, silhouette, children}) => (
   <>
     <g transform={`translate(${dx} ${dy})`}>
-      <Silhouette color={color} bounds={bounds}>
-        {children}
-      </Silhouette>
+      <FlatColor color={color}>{children}</FlatColor>
     </g>
-    {children}
+    {silhouette ? <FlatColor color={silhouette}>{children}</FlatColor> : children}
   </>
 );

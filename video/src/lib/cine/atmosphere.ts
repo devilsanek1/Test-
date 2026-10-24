@@ -9,6 +9,9 @@
 //
 // Measured anchors: reference 2's dusk sky is sage #6D988B (f_33), its night sky teal #547977 (f_38, f_42);
 // lit bulbs are peach with a sage halo disc (f_38). Deeper night steps are tealDark at 78% / 60% value.
+// RELIGHT RULE (style_bible_ref2 4, measured): time of day never MIXES paint. Only the light fields step down one
+// palette step at dusk (sky -> teal, mintPale -> sky, sand -> tan, cream -> sand) and the near ground a second step at
+// night (mintPale -> sage). Whites, mid and dark tones, ochre, ink, peach and the sun never move (TOD_STEPS).
 
 import {palette} from '../theme';
 import {hexToRgb, mix, rgbToHex} from './util';
@@ -32,6 +35,17 @@ export const deep = {
 } as const;
 
 type Base = {-readonly [K in keyof typeof palette]: string};
+
+const DAY_SKY = '#ACD1BF'; // reference 2's measured day sky (theme skies.day)
+
+/** Palette steps per time of day (hex -> hex). Anything not listed keeps its paint. */
+export const TOD_STEPS: Record<Tod, Readonly<Record<string, string>>> = {
+  day: {},
+  golden: {},
+  dawn: {},
+  dusk: {[P.sky]: P.teal, [DAY_SKY]: P.teal, [P.mintPale]: P.sky, [P.sand]: P.tan, [P.cream]: P.sand},
+  night: {[P.sky]: P.teal, [DAY_SKY]: P.teal, [P.mintPale]: P.sage, [P.sand]: P.tan, [P.cream]: P.sand},
+};
 
 export type TodPalette = Base & {
   name: Tod;
@@ -62,22 +76,19 @@ export type TodPalette = Base & {
   ground: string;
   /** Caption text colour on this sky (ref 2: ink on light skies, white on teal). */
   text: string;
-  /** How strongly ordinary paint is shifted toward `ambientTo` (see ambient()). */
-  ambientK: number;
-  ambientTo: string;
+  /** Palette steps this light applies (TOD_STEPS[name]; see ambient()). */
+  steps: Readonly<Record<string, string>>;
   /** Max haze mix for depth 1 (atmos()). */
   hazeMax: number;
 };
 
-function make(name: Tod, o: Omit<TodPalette, keyof Base | 'name'>): TodPalette {
+function make(name: Tod, o: Omit<TodPalette, keyof Base | 'name' | 'steps'>): TodPalette {
+  const steps = TOD_STEPS[name];
   const base = {} as Base;
-  for (const k of Object.keys(P) as (keyof typeof P)[]) {
-    const keep = k === 'ink' || k === 'sun' || k === 'highlight' || k === 'card';
-    base[k] = keep ? P[k] : mix(P[k], o.ambientTo, o.ambientK);
-  }
+  for (const k of Object.keys(P) as (keyof typeof P)[]) base[k] = steps[P[k]] ?? P[k];
   base.sky = o.skyBands[0];
   base.bg = o.skyBands[Math.min(1, o.skyBands.length - 1)];
-  return {...base, name, ...o};
+  return {...base, name, steps, ...o};
 }
 
 export const TOD: Record<Tod, TodPalette> = {
@@ -100,8 +111,6 @@ export const TOD: Record<Tod, TodPalette> = {
     rim: P.white,
     ground: P.mintPale,
     text: P.ink,
-    ambientK: 0,
-    ambientTo: P.sky,
     hazeMax: 0.78,
   }),
   golden: make('golden', {
@@ -122,8 +131,6 @@ export const TOD: Record<Tod, TodPalette> = {
     rim: P.cream,
     ground: P.cream,
     text: P.ink,
-    ambientK: 0.1,
-    ambientTo: P.peach,
     hazeMax: 0.75,
   }),
   dusk: make('dusk', {
@@ -144,8 +151,6 @@ export const TOD: Record<Tod, TodPalette> = {
     rim: P.peach,
     ground: P.teal,
     text: P.white,
-    ambientK: 0.22,
-    ambientTo: P.teal,
     hazeMax: 0.8,
   }),
   night: make('night', {
@@ -163,13 +168,11 @@ export const TOD: Record<Tod, TodPalette> = {
     stars: 1,
     windowLit: [P.peach, P.cream],
     windowDark: deep.teal78,
-    facade: [P.tealDark, P.teal, deep.teal78],
+    facade: [P.tealDark, P.teal, P.tan],
     silhouette: deep.teal60,
     rim: P.sage,
     ground: P.tealDark,
     text: P.white,
-    ambientK: 0.42,
-    ambientTo: deep.teal78,
     hazeMax: 0.72,
   }),
   dawn: make('dawn', {
@@ -190,19 +193,17 @@ export const TOD: Record<Tod, TodPalette> = {
     rim: P.cream,
     ground: P.sand,
     text: P.ink,
-    ambientK: 0.12,
-    ambientTo: P.peach,
     hazeMax: 0.75,
   }),
 };
 
 export const todPal = (tod: Tod | TodPalette): TodPalette => (typeof tod === 'string' ? TOD[tod] : tod);
 
-/** The paint `color` under this time of day's ambient light (no depth tint). ink / sun / highlight never shift. */
+/** The paint `color` under this time of day's light (no depth tint): a palette STEP for the light fields
+ *  (TOD_STEPS), every other paint unchanged. Never a mix. */
 export function ambient(color: string, tod: Tod | TodPalette): string {
   const p = todPal(tod);
-  if (color === P.ink || color === P.sun || color === P.highlight || p.ambientK <= 0) return color;
-  return mix(color, p.ambientTo, p.ambientK);
+  return p.steps[color] ?? p.steps[color.toUpperCase()] ?? color;
 }
 
 export type AtmosOpts = {
@@ -214,6 +215,8 @@ export type AtmosOpts = {
   gamma?: number;
   /** Skip the ambient shift (colour is already a tod colour). */
   raw?: boolean;
+  /** Depths below this keep their paint exactly (only FAR layers take haze steps). Default 0.3. */
+  clear?: number;
 };
 
 /** Which flat haze step a depth falls into, as a 0..1 value (stepped). */
@@ -223,7 +226,7 @@ export const tone = (depth: number, steps = 4) => Math.round(Math.max(0, Math.mi
  *  closer to the sky). depth 0 = near, 1 = horizon. */
 export function atmos(color: string, depth: number, tod: Tod | TodPalette, o: AtmosOpts = {}): string {
   const p = todPal(tod);
-  const q = tone(depth, o.steps ?? 4);
+  const q = depth < (o.clear ?? 0.3) ? 0 : tone(depth, o.steps ?? 4);
   const amt = (o.max ?? p.hazeMax) * Math.pow(q, o.gamma ?? 1.35);
   return mix(o.raw ? color : ambient(color, p), p.haze, amt);
 }

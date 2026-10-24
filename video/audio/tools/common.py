@@ -16,7 +16,9 @@ import soundfile as sf
 import soxr
 
 SR = 48000
-VIDEO_DUR = 70.7  # seconds, the video (and loop) length
+# seconds, the video (and loop) length. v2 voice (assets/vo_v2_eleven.wav, 77.76 s) -> 78.0 s loop
+# (VO 0-77.76, last word ends 77.4). The v1 voice/timeline was 70.7 s. Override with SOUND_VIDEO_DUR.
+VIDEO_DUR = float(os.environ.get("SOUND_VIDEO_DUR", "78.0"))
 N_TOTAL = int(round(VIDEO_DUR * SR))  # 3,393,600 samples
 
 ROOT = Path(__file__).resolve().parents[2]  # /home/user/Test-/video

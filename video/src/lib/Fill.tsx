@@ -9,7 +9,9 @@
 //
 // Modes: pop (default: centre grow 0.2 -> 1 over MOTION.fillGrow, no overshoot) | snap (1-frame pop) | wipe (reveal
 // toward `dir`, linear) | grow (scale from the edge opposite `dir`, out-expo 0.2 s) | spring (centre pop with the 7%
-// overshoot spring) | none. 'fade' is accepted for old code and behaves like 'snap'.
+// overshoot spring) | none. 'fade' is accepted for old code and behaves like 'snap' (@deprecated: nothing fades).
+// Time of day: the colour goes through the current <Tod> (lib/tod.tsx: reference 2's relight step table), so a timed
+// <World sky> relights every fill with its sky wipe. The World sky itself (lookExempt) is never relit.
 // Exit (un-build): every fill shrinks to its centre (ease-in, small ones first); the big background slab (>= ~55% of
 // the frame: sky, a wall) collapses downward last.
 
@@ -23,6 +25,7 @@ import {rand, rng, Seed} from './rng';
 import {Ink, InkProps} from './Ink';
 import {MOTION} from './spec';
 import {applyH, projectPath} from './persp';
+import {useRelight} from './tod';
 
 import {rectPath} from './sketch';
 import {mat, useProj, useXf} from './xf';
@@ -81,7 +84,8 @@ export const FrameArea = AreaCtx.Provider;
 
 // ---------------------------------------------------------------- Fill
 
-export type FillMode = 'pop' | 'snap' | 'wipe' | 'grow' | 'spring' | 'none' | 'fade';
+/** Fill entrance modes. `'fade'` is @deprecated: it is a 1-frame snap (nothing fades); use 'snap'. */
+export type FillMode = 'pop' | 'snap' | 'wipe' | 'grow' | 'spring' | 'none' | /** @deprecated nothing fades: = 'snap' */ 'fade';
 export type Dir = 'right' | 'left' | 'up' | 'down';
 
 export type FillProps = {
@@ -108,8 +112,8 @@ export type FillProps = {
   /** React to SceneExit (default true). */
   exit?: boolean;
   /** 'collapse' (shrink to the centre / origin) | 'wipe' (retreat toward exitDir) | 'slab' (wipe down, last).
-   *  Default: collapse; fills covering >= ~55% of the frame behave as 'slab'. 'fade' = collapse. */
-  exitMode?: 'fade' | 'collapse' | 'wipe' | 'slab';
+   *  Default: collapse; fills covering >= ~55% of the frame behave as 'slab'. 'fade' is @deprecated (= collapse). */
+  exitMode?: /** @deprecated nothing fades: = 'collapse' */ 'fade' | 'collapse' | 'wipe' | 'slab';
   /** exitMode 'wipe': the direction the remaining fill retreats toward (default = dir). 'down' = the top edge
    *  drops to the bottom (the reference's wall collapse). */
   exitDir?: Dir;
@@ -163,6 +167,7 @@ export const Fill: React.FC<FillProps> = ({
   const t = useTime();
   const e = useExit();
   const look = useLook();
+  const rl = useRelight();
   const clipCtx = useContext(ClipCtx);
   const area = useContext(AreaCtx);
   const proj = useProj();
@@ -179,7 +184,7 @@ export const Fill: React.FC<FillProps> = ({
   if (at !== undefined && t < at) return null;
   if (!lookExempt && look.fills === 'none') return null;
   const box = rect && !proj ? {x: rect[0], y: rect[1], w: rect[2], h: rect[3]} : bbox(d);
-  let paint = color;
+  let paint = lookExempt ? color : rl(color);
   if (!lookExempt && look.fills === 'paper') paint = palette.white;
   else if (!lookExempt && look.cascade) {
     const c = look.cascade;

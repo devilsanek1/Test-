@@ -7,6 +7,11 @@
 //   useStageKind()  -> 'world' | 'card'               which layout the primitives are inside (Sun defaults etc.)
 //   useTransition() -> {phase, p, type} | null         whether this scene is entering/leaving through a transition
 //
+//   useWorldStage() -> 'flat' | 'context' | null      the enclosing <World>'s stage mode (null outside a World).
+//                                                     A FLAT World applies (consumes) the transition camera: inside it
+//                                                     useStageCam() is REST, so <CineCamera stage> can never apply it
+//                                                     twice. A 'context' World passes it through untouched.
+//
 // The stage camera uses the same model as the cine camera (src/lib/cine/camera.tsx) with depth 0:
 //   screen = C + R(rot) * zoom * (p - C - o),  C = frame centre (540, 960), o = (ox, oy)
 
@@ -46,7 +51,12 @@ export function zoomAbout(focus: [number, number], zoom: number, to: [number, nu
 
 /** Visible world rectangle [x, y, w, h] for a stage camera (to size backgrounds). */
 export function visibleRect(c: StageCam, pad = 40): [number, number, number, number] {
-  const inv = mat.inv(stageMat(c));
+  return visibleRectOf(stageMat(c), pad);
+}
+
+/** Visible world rectangle [x, y, w, h] for any world -> screen matrix (always covers at least the frame). */
+export function visibleRectOf(m: Mat, pad = 40): [number, number, number, number] {
+  const inv = mat.inv(m);
   const pts = [
     [0, 0],
     [world.w, 0],
@@ -61,6 +71,17 @@ export function visibleRect(c: StageCam, pad = 40): [number, number, number, num
   const y1 = Math.max(world.h, ...ys) + pad;
   return [x0, y0, x1 - x0, y1 - y0];
 }
+
+/** The world -> screen matrix a <World> has already applied (transition camera + push). <ScreenSpace> inverts it. */
+const AppliedCtx = createContext<Mat>(mat.I);
+export const useAppliedStageMat = () => useContext(AppliedCtx);
+export const AppliedStageProvider = AppliedCtx.Provider;
+
+export type WorldStage = 'flat' | 'context';
+const WorldStageCtx = createContext<WorldStage | null>(null);
+/** The enclosing <World>'s stage mode, or null outside a World. */
+export const useWorldStage = () => useContext(WorldStageCtx);
+export const WorldStageProvider = WorldStageCtx.Provider;
 
 // ---------------------------------------------------------------- layout kind
 

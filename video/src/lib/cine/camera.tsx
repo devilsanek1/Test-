@@ -14,9 +14,13 @@
 // in a layer lands on screen at
 //     screen = C + R(rot) * s_f * (p - C - o * f),      s_f = zoom / (1 - push * f)
 // so far layers slide and grow less (real dolly parallax), the sky (depth 1) only follows the lens zoom, and a
-// foreground layer (depth < 0) whips past. Keys ease between each other (default inOutCubic); zoom and the dolly
-// scale interpolate in log space so pushes/pull-backs feel constant-speed. `anchor` pins a world point to a screen
-// position for the whole move (push toward the mascot; pull back from one window).
+// foreground layer (depth < 0) whips past. Zoom and the dolly scale interpolate in log space so pushes/pull-backs
+// feel constant-speed. `anchor` pins a world point to a screen position for the whole move (push toward the mascot;
+// pull back from one window).
+// Interpolation is VELOCITY-CONTINUOUS (default interp 'spline'): every channel is a monotone cubic (PCHIP) through
+// the keys, so a move that runs through several keys never stops dead and restarts at a key. A segment whose two
+// ends are both at rest (a plain two-key move, or a direction change) uses its key's `ease` instead. `CAM.settle`
+// (starts in motion) is honoured only on the FIRST segment: a shot that continues the previous shot's move.
 //
 // Keys:  {t, x?, y?, zoom?, push?, rot?, ease?, anchor?, anchorDepth?, anchorTo?}
 //   x, y      world point at the screen centre on the reference plane (default 540, 960 = rest)
@@ -35,17 +39,36 @@ import {STAGE_REST, useStageCam} from '../stage';
 
 export const SCREEN = {w: canvas.width, h: canvas.height, cx: canvas.width / 2, cy: canvas.height / 2} as const;
 
+/** Trapezoid velocity profile: accelerate over `acc` of the move (sine ramp), cruise, decelerate over `dec`.
+ *  Peak speed = 1 / (1 - (acc + dec) / 2) x the average (1.43x for 0.25 / 0.35), against 4x for inOutQuart:
+ *  flat inked art strobes when a camera whips, so long moves should cruise. */
+export function trapezoid(acc = 0.25, dec = 0.35): Ease {
+  const a = Math.max(1e-3, acc);
+  const d = Math.max(1e-3, dec);
+  const v = 1 / (1 - (a + d) / 2);
+  return (u: number) => {
+    const x = clamp(u);
+    if (x < a) return v * (x / 2 - (a / (2 * Math.PI)) * Math.sin((Math.PI * x) / a));
+    if (x > 1 - d) {
+      const y = 1 - x;
+      return 1 - v * (y / 2 - (d / (2 * Math.PI)) * Math.sin((Math.PI * y) / d));
+    }
+    return v * (a / 2 + (x - a));
+  };
+}
+
 /** Camera presets (seconds / eases) for weighty moves. */
 export const CAM = {
   /** default move ease: long, symmetric, heavy. */
   ease: E.inOutCubic,
   /** gentler start/stop for very long moves (4-6 s). */
   slow: E.inOutSine,
-  /** a crane / tilt reveal: slow lift-off, long glide, soft landing. */
-  reveal: E.inOutQuart,
-  /** a move that starts already in motion (continuing a previous shot) and lands softly. */
+  /** a crane / tilt reveal: sine lift-off over 25%, cruise, long soft landing over 35% (peak 1.43x average). */
+  reveal: trapezoid(0.25, 0.35),
+  /** a move that starts already in motion (continuing a previous shot) and lands softly. First segment only. */
   settle: E.outCubic,
-  /** max push * f (keeps a layer from passing through the lens). */
+  /** push * f is linear up to `pushKnee`, then saturates smoothly toward `maxPushF` (nothing passes the lens). */
+  pushKnee: 0.85,
   maxPushF: 0.94,
 } as const;
 
@@ -67,7 +90,14 @@ export const CAM_REST: CamState = {ox: 0, oy: 0, zoom: 1, push: 0, rot: 0};
 
 // ---------------------------------------------------------------- math
 
-const pushDen = (push: number, f: number) => Math.max(1 - CAM.maxPushF, 1 - push * f);
+/** push * f with a soft knee: identity up to CAM.pushKnee, then a tanh saturation toward CAM.maxPushF (C1, so a
+ *  foreground layer's scale never kinks). */
+const softPush = (x: number) => {
+  const K = CAM.pushKnee;
+  const M = CAM.maxPushF;
+  return x <= K ? x : K + (M - K) * Math.tanh((x - K) / (M - K));
+};
+const pushDen = (push: number, f: number) => 1 - softPush(push * f);
 /** Screen scale of a layer at `depth`. */
 export const layerScale = (c: CamState, depth: number) => c.zoom / pushDen(c.push, 1 - depth);
 
@@ -128,25 +158,91 @@ const dollyLog = (push: number) => Math.log(1 / Math.max(1e-3, 1 - push));
 const fromDollyLog = (l: number) => 1 - 1 / Math.exp(l);
 const sameAnchor = (a: Resolved, b: Resolved) => !!a.anchor && !!b.anchor && a.anchor[0] === b.anchor[0] && a.anchor[1] === b.anchor[1] && a.anchorDepth === b.anchorDepth;
 
-/** Camera state at time t (no handheld). */
-export function camAt(keys: CamKey[], t: number): CamState {
-  if (!keys.length) return CAM_REST;
+export type CamInterp = 'spline' | 'ease';
+
+// channels per key: 0 log zoom, 1 dolly-log, 2 rot, 3 ox, 4 oy, 5 anchorTo x, 6 anchorTo y
+const NCH = 7;
+type Plan = {R: Resolved[]; v: number[][]; m: number[][]; anch: boolean[]};
+const PLAN_CACHE = new WeakMap<CamKey[], Plan>();
+
+function channels(r: Resolved): number[] {
+  return [Math.log(r.zoom), dollyLog(r.push), r.rot, r.ox, r.oy, r.anchorTo?.[0] ?? NaN, r.anchorTo?.[1] ?? NaN];
+}
+
+/** Monotone cubic (Fritsch-Carlson / PCHIP) tangents; ends at rest. NaN values break the chain (tangent 0). */
+function pchip(ts: number[], ys: number[], linked: boolean[]): number[] {
+  const n = ys.length;
+  const m = new Array(n).fill(0);
+  for (let i = 1; i < n - 1; i++) {
+    if (!linked[i] || !linked[i + 1]) continue; // segment i-1..i or i..i+1 is not part of this chain
+    const h0 = ts[i] - ts[i - 1];
+    const h1 = ts[i + 1] - ts[i];
+    if (h0 <= 0 || h1 <= 0) continue;
+    const d0 = (ys[i] - ys[i - 1]) / h0;
+    const d1 = (ys[i + 1] - ys[i]) / h1;
+    if (!(d0 * d1 > 0)) continue; // direction change, a flat side or NaN: rest at this key
+    const w1 = 2 * h1 + h0;
+    const w2 = h1 + 2 * h0;
+    m[i] = (w1 + w2) / (w1 / d0 + w2 / d1);
+  }
+  return m;
+}
+
+function plan(keys: CamKey[]): Plan {
+  let p = PLAN_CACHE.get(keys);
+  if (p) return p;
   const R = resolve(keys);
+  const anch = R.map((r, i) => i > 0 && sameAnchor(R[i - 1], r)); // segment (i-1 -> i) is anchored
+  const ts = R.map((r) => r.t);
+  const vals = R.map(channels);
+  const v: number[][] = [];
+  const m: number[][] = [];
+  for (let c = 0; c < NCH; c++) {
+    const ys = vals.map((x) => x[c]);
+    // a channel is continuous across a key only if both adjacent segments interpolate it
+    const linked = R.map((_, i) => i > 0 && (c < 3 ? true : c < 5 ? !anch[i] : anch[i]));
+    v.push(ys);
+    m.push(pchip(ts, ys, linked));
+  }
+  p = {R, v, m, anch};
+  PLAN_CACHE.set(keys, p);
+  return p;
+}
+
+/** Camera state at time t (no handheld). interp 'spline' (default) is velocity-continuous across keys; 'ease'
+ *  eases every segment on its own (the old behaviour: the camera rests at every key). */
+export function camAt(keys: CamKey[], t: number, interp: CamInterp = 'spline'): CamState {
+  if (!keys.length) return CAM_REST;
+  const {R, v, m, anch} = plan(keys);
   if (t <= R[0].t) return R[0];
   for (let i = 1; i < R.length; i++) {
     const a = R[i - 1];
     const b = R[i];
     if (t > b.t) continue;
-    const p = b.ease(clamp((t - a.t) / Math.max(1e-6, b.t - a.t)));
-    const zoom = Math.exp(lerp(Math.log(a.zoom), Math.log(b.zoom), p));
-    const push = fromDollyLog(lerp(dollyLog(a.push), dollyLog(b.push), p));
-    const rot = lerp(a.rot, b.rot, p);
-    if (sameAnchor(a, b)) {
-      const to: Pt = [lerp(a.anchorTo![0], b.anchorTo![0], p), lerp(a.anchorTo![1], b.anchorTo![1], p)];
+    const h = Math.max(1e-6, b.t - a.t);
+    const u = clamp((t - a.t) / h);
+    const pe = b.ease(u);
+    const forceEase = interp === 'ease' || (i === 1 && b.ease === CAM.settle);
+    const ch = (c: number) => {
+      const m0 = m[c][i - 1];
+      const m1 = m[c][i];
+      const y0 = v[c][i - 1];
+      const y1 = v[c][i];
+      if (forceEase || (m0 === 0 && m1 === 0)) return lerp(y0, y1, pe);
+      // cubic Hermite
+      const u2 = u * u;
+      const u3 = u2 * u;
+      return (2 * u3 - 3 * u2 + 1) * y0 + (u3 - 2 * u2 + u) * h * m0 + (-2 * u3 + 3 * u2) * y1 + (u3 - u2) * h * m1;
+    };
+    const zoom = Math.exp(ch(0));
+    const push = fromDollyLog(ch(1));
+    const rot = ch(2);
+    if (anch[i]) {
+      const to: Pt = [ch(5), ch(6)];
       const [ox, oy] = anchorOffset(b.anchor!, to, b.anchorDepth, zoom, push);
       return {ox, oy, zoom, push, rot};
     }
-    return {ox: lerp(a.ox, b.ox, p), oy: lerp(a.oy, b.oy, p), zoom, push, rot};
+    return {ox: ch(3), oy: ch(4), zoom, push, rot};
   }
   return R[R.length - 1];
 }
@@ -176,17 +272,19 @@ export type CineCameraProps = {
   t?: number;
   /** Extra state added on top (e.g. a shake you compute yourself). */
   add?: Partial<CamState>;
+  /** 'spline' (default): velocity-continuous through the keys. 'ease': each segment eases on its own. */
+  interp?: CamInterp;
   /** Fold in the core TRANSITION camera (useStageCam) with full multiplane parallax. Use it inside
    *  <World stage="context"> (a flat World already applies the stage camera to everything: leave this false). */
   stage?: boolean;
   children?: React.ReactNode;
 };
 
-export const CineCamera: React.FC<CineCameraProps> = ({keys = [], handheld = 0, seed = 'cam', t: tIn, add, stage = false, children}) => {
+export const CineCamera: React.FC<CineCameraProps> = ({keys = [], handheld = 0, seed = 'cam', t: tIn, add, stage = false, interp = 'spline', children}) => {
   const tScene = useTime();
   const sc = useStageCam();
   const t = tIn ?? tScene;
-  const base = camAt(keys, t);
+  const base = camAt(keys, t, interp);
   const h = handheldAt(t, handheld, seed);
   const st = stage ? sc : STAGE_REST;
   const cam: CamState = {

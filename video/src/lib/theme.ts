@@ -149,3 +149,47 @@ export const skies = {
   night: '#588077', // reference 2 night sky (never darker behind captions)
   deep: palette.tealDark,
 } as const;
+
+// ---- engine v2.1 (review 2). New keys only.
+
+/** Full-bleed (sky) caption highlight box, reference 2 measured (style_bible_ref2 3): square corners, 0.19 em padding on
+ *  BOTH sides, top 0.90 em above the baseline (ascenders stay inside), bottom 0.19 em below it, trailing punctuation
+ *  INSIDE the box ('asking.', 'cool.', 'jobs,'). In em of the caption font size. `highlightBox` stays for card captions. */
+export const skyHighlightBox = {padEm: 0.19, topEm: 0.9, bottomEm: 0.19, radiusEm: 0.02, includePunct: true} as const;
+
+/** Time of day (the same names as the cine lane's `Tod`). */
+export type TodName = 'day' | 'golden' | 'dusk' | 'night' | 'dawn';
+
+/** Sky colour per time of day: what a World sky key with only `tod` uses. */
+export const todSky: Record<TodName, string> = {day: skies.day, golden: skies.golden, dusk: skies.dusk, night: skies.night, dawn: skies.day};
+
+/** Caption tone that reads on each time of day's sky (ref 2: ink on day and dusk, white once the sky is night). */
+export const todTone: Record<TodName, CaptionTone> = {day: 'dark', golden: 'dark', dusk: 'dark', night: 'light', dawn: 'dark'};
+
+/** Subtree roles with their own relight row: far hills / skyline, clouds, foreground framing (palm fronds). */
+export type TodRole = 'base' | 'far' | 'cloud' | 'framing';
+
+/** Reference 2's night haze step (style_bible_ref2 8: night sky #588077 -> far #4B706B -> tealDark #3E605F). */
+export const nightFar = '#4B706B';
+
+/** THE SHARED RELIGHT STEP TABLE (style_bible_ref2 4, pixel-mapped across reference 2's dusk tween). Only the LIGHT
+ *  fields step down: one palette step at dusk, two for the near ground at night. Whites stay white (they read as lit);
+ *  mid and dark tones, ink, the sun and the highlight never move. Rows are per TodRole (`base` = everything, the other
+ *  roles fall back to `base` for colours they do not list); keys are palette token names, values colours.
+ *  Read by <Fill> through the <Tod> context (lib/tod.tsx); <World sky> keys with `tod` switch it with the sky wipe. */
+export const todSteps: Record<TodName, Partial<Record<TodRole, Partial<Record<PaletteKey, string>>>>> = {
+  day: {},
+  golden: {},
+  dawn: {},
+  dusk: {
+    base: {mintPale: palette.sky, cream: palette.sand, sand: palette.tan},
+    far: {mintPale: palette.sage, sage: palette.teal, teal: palette.tealDark},
+    framing: {teal: palette.sage},
+  },
+  night: {
+    base: {mintPale: palette.sage, sky: palette.sage, cream: palette.sand, sand: palette.tan},
+    far: {mintPale: palette.teal, cream: palette.tan, sand: palette.tan, sage: nightFar, teal: palette.tealDark},
+    cloud: {white: palette.sage, mintPale: palette.sage},
+    framing: {teal: palette.sage, tealDark: palette.teal},
+  },
+};
