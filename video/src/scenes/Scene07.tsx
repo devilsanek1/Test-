@@ -11,8 +11,7 @@
 import React from 'react';
 import {World, Sun, XG, mat, useTime} from '../lib';
 import {NoticeboardCorner, NOTICE_CORNER, WORKSHOP_CORNER} from './shared/sets';
-import {HoursClock, LeakClones, LeakSheet, OnlookerSlotProps} from './scene07/kit';
-import {EdgeOnlooker} from './shared/props';
+import {EdgeOnlooker, HoursClock, LeakClones, LeakSheet} from './shared/props';
 import {useBeats} from './scene07/beats';
 import {camAt, camMat, Flyer, InkReveal, PhoneCopy, Pigeon, PinDot, PipS07, RevealPass, tiltPx, WireCopy, WireCopySpec} from './scene07/parts';
 import {BlindSign, LabelTag} from './scene07/shims';
@@ -22,7 +21,7 @@ import {BlindSign, LabelTag} from './scene07/shims';
 /** The notice on the left pane (pane 1 = x 153-436, y 943-1347). */
 const NOTICE = {x: 295, y: 1140, w: 210, h: 270, rot: -2};
 /** Its pin: the top centre of the rotated sheet. */
-const PIN: [number, number] = [NOTICE.x + 119 * Math.sin((-NOTICE.rot * Math.PI) / 180) * -1, NOTICE.y - 119 * Math.cos((NOTICE.rot * Math.PI) / 180)];
+const PIN: [number, number] = [NOTICE.x + 118.8 * Math.sin((NOTICE.rot * Math.PI) / 180), NOTICE.y - 118.8 * Math.cos((NOTICE.rot * Math.PI) / 180)];
 
 const S7_READERS = NOTICE_CORNER.readers;
 
@@ -132,4 +131,3 @@ const Scene07: React.FC = () => {
 
 export default Scene07;
 
-export type {OnlookerSlotProps};

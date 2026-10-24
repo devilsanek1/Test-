@@ -69,7 +69,7 @@ export const ABS = {
   tagSway: SCENE.end - 0.1, // the tag sways; the pigeon flaps off the shutter box
 } as const;
 
-export type Beats = {[K in keyof typeof ABS]: number};
+export type Beats = {-readonly [K in keyof typeof ABS]: number};
 
 /** Scene-local beat times for a scene that starts at `start` (film seconds). */
 export function localBeats(start: number): Beats {
