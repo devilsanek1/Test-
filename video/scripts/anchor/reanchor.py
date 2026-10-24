@@ -128,6 +128,7 @@ def reanchor_doc(sb, new_words, deleted='next'):
     lines = _caption_lines(sb)
     new_sb = A.walk(sb, fn)
     starts_old = [ln[3] for ln in lines] + [len(old)]
+    drop = []
     for k, (si, pi, li, start, line) in enumerate(lines):
         a_old, b_old = starts_old[k], starts_old[k + 1]
         # words inserted at a line boundary join the line BEFORE it; words inserted before the first word join line 1
@@ -143,25 +144,45 @@ def reanchor_doc(sb, new_words, deleted='next'):
                     holder['s'] = {**holder['s'], 'w': a_new}
                     if 'word' in holder['s']:
                         holder['s']['word'] = new_words[a_new]
-        if text_new != line.get('text') and text_new:
+        if not text_new:
+            drop.append((si, pi, li))
+            report['captions'].append({'scene': sb['scenes'][si].get('id'), 'page': pi, 'line': li,
+                                       'from': line.get('text'), 'to': '', 'note': 'all its words are gone: line removed'})
+        elif text_new != line.get('text'):
             report['captions'].append({'scene': sb['scenes'][si].get('id'), 'page': pi, 'line': li,
                                        'from': line.get('text'), 'to': text_new})
             tgt['text'] = text_new
-        elif not text_new:
-            report['captions'].append({'scene': sb['scenes'][si].get('id'), 'page': pi, 'line': li,
-                                       'from': line.get('text'), 'to': '', 'note': 'all words of this line were removed: delete or merge it'})
-    # highlights whose words are no longer in their page
+    # remove emptied lines, then emptied pages (back to front so indices stay valid)
+    for si, pi, li in sorted(drop, reverse=True):
+        del new_sb['scenes'][si]['captions'][pi]['lines'][li]
+    for si, sc in enumerate(new_sb.get('scenes', [])):
+        caps = sc.get('captions') or []
+        for pi in range(len(caps) - 1, -1, -1):
+            if not caps[pi].get('lines'):
+                del caps[pi]
+                report['captions'].append({'scene': sc.get('id'), 'page': pi, 'note': 'page removed (no words left)'})
+    # highlights whose words are no longer in their page: retarget an anchored one to its (moved) word if that word is
+    # in the page, else drop it
     for si, sc in enumerate(new_sb.get('scenes', [])):
         for pi, c in enumerate(sc.get('captions') or []):
             page_keys = [A.key(t) for l in c.get('lines') or [] for t in A.split_words(l.get('text', ''))]
+            keep = []
             for hi, h in enumerate(c.get('highlights') or []):
                 hk = [A.key(t) for t in A.split_words(h.get('text', ''))]
-                if hk and not any(page_keys[x:x + len(hk)] == hk for x in range(len(page_keys))):
-                    s = h.get('s')
-                    if A.is_anchor(s) and isinstance(s['w'], int):
-                        h['text'] = re.sub(r"[^\w'\-]+$", '', new_words[s['w']])
+                if not hk or any(page_keys[x:x + len(hk)] == hk for x in range(len(page_keys))):
+                    keep.append(h)
+                    continue
+                hs = h.get('s')
+                word = re.sub(r"[^\w'\-]+$", '', new_words[hs['w']]) if A.is_anchor(hs) and isinstance(hs['w'], int) else None
+                if word and A.key(word) in page_keys:
                     report['captions'].append({'scene': sc.get('id'), 'page': pi, 'highlight': hi,
-                                               'note': f"highlight no longer in its page -> '{h.get('text')}'"})
+                                               'note': f"highlight '{h.get('text')}' -> '{word}' (its anchored word)"})
+                    keep.append({**h, 'text': word})
+                else:
+                    report['captions'].append({'scene': sc.get('id'), 'page': pi, 'highlight': hi,
+                                               'note': f"highlight '{h.get('text')}' removed (its word is gone from the page)"})
+            if 'highlights' in c:
+                c['highlights'] = keep
     ref = sb['wordsRef']
     new_sb['wordsRef'] = ' '.join(new_words) if isinstance(ref, str) else (
         {**ref, 'words': list(new_words)} if isinstance(ref, dict) and 'words' in ref else

@@ -16,9 +16,10 @@ import soundfile as sf
 import soxr
 
 SR = 48000
-# seconds, the video (and loop) length. v2 voice (assets/vo_v2_eleven.wav, 77.76 s) -> 78.0 s loop
-# (VO 0-77.76, last word ends 77.4). The v1 voice/timeline was 70.7 s. Override with SOUND_VIDEO_DUR.
-VIDEO_DUR = float(os.environ.get("SOUND_VIDEO_DUR", "78.0"))
+# seconds, the video (and loop) length. FINAL voice (assets/vo_v3_final.wav, 55.36 s, speech 0.06-55.23 s)
+# -> 55.5 s loop until the storyboard fixes the film length (then set SOUND_VIDEO_DUR / re-fit with beatsync).
+# History: v1 voice 70.7 s, v2 voice 78.0 s.
+VIDEO_DUR = float(os.environ.get("SOUND_VIDEO_DUR", "55.5"))
 N_TOTAL = int(round(VIDEO_DUR * SR))  # 3,393,600 samples
 
 ROOT = Path(__file__).resolve().parents[2]  # /home/user/Test-/video

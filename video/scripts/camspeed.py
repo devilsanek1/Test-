@@ -230,8 +230,10 @@ def main(argv=None):
     pk_fast = max(fast) if fast else 0
     print(f'[camspeed] {o.comp or src_dir} {t0:.2f}-{rows[-1]["t"] if rows else t0:.2f} s, {len(rows)} frame pairs; limit {limit:g} px/frame, dv {o.dv_limit:g}')
     print(f'  camera peak {pk_cam:.1f} px/frame, fastest edge motion peak {pk_fast:.1f} px/frame (allow-listed windows included)')
+    tl = rows[-1]['t'] if rows else t0
     for (a, b, why) in allow:
-        print(f'  allowed {a:.2f}-{b:.2f} s  {why}')
+        if b >= t0 and a <= tl:
+            print(f'  allowed {a:.2f}-{b:.2f} s  {why}')
     for p in problems:
         print('  FAIL ' + p)
     for p in warnings:
@@ -252,6 +254,7 @@ def main(argv=None):
         ax.plot(ts, [r['layer2'] for r in rows], label='parallax layer px/f', color='#709F8B', lw=0.8)
         ax.plot(ts, fast, label='fastest edges (p99) px/f', color='#EC6B2E', lw=0.8)
         ax.axhline(limit, color='#B03030', ls='--', lw=0.8)
+        ax.set_xlim(ts[0], ts[-1])
         ax.set_xlabel('s')
         ax.legend(loc='upper right', fontsize=8)
         fig.tight_layout()

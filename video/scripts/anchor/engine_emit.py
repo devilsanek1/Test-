@@ -42,6 +42,13 @@ def caption_rows(sb, timing, overrides=None, hook=True, log=print):
     words = timing['words']
     overrides = overrides or {}
     pages = [c for sc in sb['scenes'] for c in (sc.get('captions') or [])]
+    if not pages and timing.get('captions'):
+        # no paging in the storyboard yet: gen-captions.mjs's default mode, the timing file's own pages
+        log('[captions] the storyboard has no caption pages: using the timing\'s own paging')
+        out = [{'s': r3(c['s']), 'e': r3(c['e']), 'lines': [{'text': l['text'], 's': r3(l['s'])} for l in c['lines']],
+                'highlights': [{'text': h['text'], 's': r3(h['s'])} for h in (c.get('highlights') or [])]}
+               for c in timing['captions']]
+        return _finish(out, overrides, hook, log)
     first = pages[0]['lines'][0]['text'] if pages and pages[0].get('lines') else None
     if len(pages) > 1 and len(pages[-1]['lines']) == 1 and pages[-1]['lines'][0]['text'] == first:
         pages = pages[:-1]
@@ -55,6 +62,10 @@ def caption_rows(sb, timing, overrides=None, hook=True, log=print):
                 log(f'[captions] highlight "{h["text"]}": storyboard {h["s"]} -> word start {r3(ws)}')
             hls.append({'text': h['text'], 's': r3(ws)})
         out.append({'s': r3(lines[0]['s']), 'e': r3(c['e']), 'lines': lines, 'highlights': hls})
+    return _finish(out, overrides, hook, log)
+
+
+def _finish(out, overrides, hook, log):
     for i, beat in enumerate(out):
         if i == 0 and hook:
             beat['style'] = 'hook'

@@ -5,6 +5,8 @@
   python3 scripts/anchor/words.py --find purpose half   # where are these words? (normalized match)
   python3 scripts/anchor/words.py --at 4.2 12.31        # seconds on this timing -> {"w", "dt"} (nearest word start)
   python3 scripts/anchor/words.py --anchor 14 -0.1      # an anchor -> seconds on this timing
+  python3 scripts/anchor/words.py --pages               # the timing's caption paging as storyboard caption pages
+                                                        # (text only: resolve.py fills every time from the words)
   python3 scripts/anchor/words.py --timing assets/timing.json ...   # any timing / raw ASR file
 
 The timing defaults to the one resolve.py uses (assets/timing_v3.json if present, else assets/timing_est_v3.json).
@@ -30,6 +32,7 @@ def main():
     ap.add_argument('--find', nargs='+')
     ap.add_argument('--at', nargs='+', type=float)
     ap.add_argument('--anchor', nargs=2)
+    ap.add_argument('--pages', action='store_true')
     a = ap.parse_args()
     path = a.timing
     if not path:
@@ -51,6 +54,11 @@ def main():
         w = a.anchor[0]
         anc = {'w': int(w) if w.lstrip('-').isdigit() else w, 'dt': float(a.anchor[1])}
         print(f'{json.dumps(anc)} -> {A.anchor_time(anc, tm):.3f} s')
+        return
+    if a.pages:
+        rows = [{'lines': [{'text': l['text']} for l in c['lines']],
+                 'highlights': [{'text': h['text']} for h in c.get('highlights') or []]} for c in tm.get('captions') or []]
+        print('[\n' + ',\n'.join('  ' + json.dumps(r, ensure_ascii=False) for r in rows) + '\n]')
         return
     pauses = {p['after']: p for p in tm.get('pauses', [])}
     print(f"# {A.rel(path)}{' (ESTIMATED)' if tm.get('estimated') else ''}: {len(W)} words, {tm['duration']} s")

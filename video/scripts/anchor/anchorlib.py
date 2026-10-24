@@ -7,10 +7,13 @@ A WORD ANCHOR is the only way a time is written in a word-anchored storyboard:
     {"w": 14, "dt": -0.1, "word": "purpose,"}             -> same as {"w": 14, "dt": -0.1}, plus a text check
     {"w": "START", "dt": 0}  {"w": "END", "dt": -0.4}     -> 0 + dt / timing.duration + dt
     {"w": "VO_START", "dt": 0}  {"w": "VO_END", "dt": 0}  -> timing.voStart + dt / timing.voEnd + dt
+    {"w": 28, "dt": 0, "gap": 0.5}                        -> the middle of the pause after word 28:
+                                                             words[28].e + 0.5 * (words[29].s - words[28].e) + dt
+                                                             (a cut that stays INSIDE the pause whatever its length)
 
 `w` indexes the PLAIN script split on whitespace, punctuation attached, 0-based (the storyboard's `wordsRef`).
 A dict is an anchor when it has BOTH "w" and "dt" (so a match box {"cx", "cy", "w", "h"} never is).
-Optional keys: "edge" ("s" | "e"), "word" (text check), "note" / "why" (ignored).
+Optional keys: "edge" ("s" | "e"), "gap" (0..1), "word" (text check), "note" / "why" (ignored).
 """
 import json
 import math
@@ -21,7 +24,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
 
 SPECIAL = ('START', 'END', 'VO_START', 'VO_END')
-ANCHOR_KEYS = {'w', 'dt', 'edge', 'word', 'note', 'why'}
+ANCHOR_KEYS = {'w', 'dt', 'edge', 'gap', 'word', 'note', 'why'}
 # keys that hold times in storyboards (same family as scripts/timewarp.py); a plain number under one of them in a
 # word-anchored storyboard is an UN-ANCHORED time and is reported
 TIME_KEYS = {'s', 'e', 't', 't0', 't1', 'start', 'end', 'at', 'time', 'captionAt', 'coverFrame'}
@@ -190,6 +193,14 @@ def anchor_time(a, timing):
     words = timing['words']
     if not 0 <= w < len(words):
         raise ValueError(f'word index {w} out of range 0..{len(words) - 1}')
+    if 'gap' in a:
+        g = a['gap']
+        if not is_num(g) or not 0 <= g <= 1:
+            raise ValueError(f'gap must be a fraction 0..1, got {g!r}')
+        if w + 1 >= len(words):
+            raise ValueError(f'gap after the last word {w}: use {{"w": "VO_END"}} / {{"w": "END"}}')
+        a0, b0 = float(words[w]['e']), float(words[w + 1]['s'])
+        return a0 + g * max(0.0, b0 - a0) + dt
     return float(words[w][edge]) + dt
 
 

@@ -8,7 +8,7 @@
 
 Inputs
   STORYBOARD   word-anchored storyboard (default docs/storyboard_v3.json). Every time is an anchor
-               {"w": <word index in wordsRef>, "dt": <s>} (also "edge": "e", "word": "<text check>", w = "START" /
+               {"w": <word index in wordsRef>, "dt": <s>} (also "edge": "e", "gap": 0..1, "word": "<text check>", w = "START" /
                "END" / "VO_START" / "VO_END"); top-level "wordsRef" = the plain script it was anchored to (string or
                list of words). Plain numbers stay as they are (positions, sizes, zooms, durations): a plain number
                under a time key (s, e, t, t0, t1, start, end, at, time, captionAt, coverFrame) is reported as
@@ -116,6 +116,8 @@ def fill_captions(sb, ref, log, strict=False):
                              'applies its own leads)')
             else:
                 log.warn(f'{where}: un-anchored line time {s!r}')
+            if len(l.get('text', '')) > 26:
+                log.warn(f'{where}: {len(l["text"])} characters (> 26: too long for one caption line)')
             got = [A.key(t) for t in toks]
             if got != keys[wi:wi + len(toks)]:
                 bad(f"{where}: text does not match the script at w{wi}: expected '{' '.join(ref[wi:wi + len(toks)])}'")

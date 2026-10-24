@@ -395,7 +395,7 @@ def write_ab(src):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--src", default=str(ASSETS / "vo_v2_eleven.wav"))
+    ap.add_argument("--src", default=str(ASSETS / "vo_v3_final.wav"))   # FINAL voice (approved v4 chain)
     ap.add_argument("--chain", default="v4", choices=["v4", "v4air", "full", "eq", "basic", "A", "B", "C"])
     ap.add_argument("--out", default=str(AUDIO / "vo_clean.wav"))
     ap.add_argument("--ab", action="store_true")
