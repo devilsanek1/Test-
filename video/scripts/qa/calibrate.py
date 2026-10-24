@@ -73,10 +73,11 @@ def main():
     ap.add_argument('--out', default=os.path.join(HERE, 'calib'))
     ap.add_argument('--jobs', type=int, default=2)
     ap.add_argument('--no-framecheck', action='store_true')
+    ap.add_argument('--skip-deadframes', action='store_true', help='reuse the deadframes results already in --out')
     ap.add_argument('extra', nargs='*', help='extra deadframes arguments (after --)')
     args = ap.parse_args()
     procs = []
-    for name, r in REFS.items():
+    for name, r in ({} if args.skip_deadframes else REFS).items():
         od = os.path.join(args.out, name)
         cmd = [sys.executable, os.path.join(HERE, 'deadframes.py'), os.path.join(Q.ROOT, r['video']), '--scenes', os.path.join(Q.ROOT, r['scenes']),
                '--caption-band', r['band'], '--name', name, '--out', od, '--quiet'] + args.extra

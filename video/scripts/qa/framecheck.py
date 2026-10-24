@@ -256,7 +256,8 @@ def main(argv=None):
                 trans_frames.add(f)
 
     expect = np.zeros(src.n + 1, bool)
-    cap_path = os.path.join(Q.ROOT, 'src', 'data', 'captions.json') if (args.captions == 'auto' and sc_path) else (
+    film_clip = bool(sc_path) and os.path.abspath(sc_path) == os.path.abspath(film)   # our film's scenes -> our captions
+    cap_path = os.path.join(Q.ROOT, 'src', 'data', 'captions.json') if (args.captions == 'auto' and film_clip) else (
         None if args.captions in ('auto', 'none') else args.captions)
     if args.expect_caption:
         expect[:] = True

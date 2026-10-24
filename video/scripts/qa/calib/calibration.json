@@ -1,0 +1,128 @@
+{
+ "ref1": {
+  "tool": {
+   "events_per_s": 5.581,
+   "median_gap_f": 3.0,
+   "longest_event_gap_s": 1.47,
+   "longest_event_gap_at": [
+    16.43,
+    17.9
+   ],
+   "dead_pct": 4.7,
+   "longest_dead_s": 0.1,
+   "longest_dead_3k_s": 0.17,
+   "scores": {
+    "R1-S1": 8.9,
+    "R1-S2": 10.0,
+    "R1-S3": 9.0,
+    "R1-S4": 9.0,
+    "R1-S5": 10.0,
+    "R1-S6": 8.9
+   },
+   "mean_score": 9.3,
+   "scenes_pass": "6/6",
+   "flagged_runs": 0
+  },
+  "measured": {
+   "events_per_s": 5.9,
+   "median_gap_f": 4,
+   "longest_event_gap_s": 0.97,
+   "dead_pct": 3.6,
+   "longest_dead_s": 0.2,
+   "longest_dead_3k_s": 0.4
+  },
+  "source": "docs/motion_spec.md 9: medium events 5.9/s, median gap 4 f, longest gap outside transitions 0.97 s; 3.6 % of frames < 0.1 % pixels changed; longest near-static run 0.2 s (< 1,000 px) / 0.4 s (< 3,000 px)",
+  "framecheck": {
+   "frames": 946,
+   "fps": 30.0,
+   "errors": 0,
+   "warnings": 0,
+   "by_kind": {},
+   "caption_frames": 941,
+   "caption_low_frac_p95": 0.0,
+   "caption_busy_p95": 0.0001,
+   "cuts_known": [
+    233,
+    414,
+    607,
+    715,
+    827
+   ],
+   "seconds": 63.9
+  }
+ },
+ "ref2": {
+  "tool": {
+   "events_per_s": 5.397,
+   "median_gap_f": 1.0,
+   "longest_event_gap_s": 1.1,
+   "longest_event_gap_at": [
+    25.47,
+    26.57
+   ],
+   "dead_pct": 32.8,
+   "longest_dead_s": 1.2,
+   "longest_dead_3k_s": 1.13,
+   "scores": {
+    "R2-01": 10.0,
+    "R2-02": 10.0,
+    "R2-03": 9.4,
+    "R2-04": 9.3,
+    "R2-05": 7.0,
+    "R2-06": 8.8,
+    "R2-07": 9.4,
+    "R2-08": 7.0,
+    "R2-09": 8.6,
+    "R2-10": 8.0,
+    "R2-11": 8.4,
+    "R2-12": 9.6,
+    "R2-13": 10.0,
+    "R2-14": 9.5,
+    "R2-15": 9.1,
+    "R2-16": 8.2
+   },
+   "mean_score": 8.89,
+   "scenes_pass": "6/16",
+   "flagged_runs": 11
+  },
+  "measured": {
+   "events_per_s": 3.6,
+   "dead_pct": 35.6,
+   "longest_dead_s": 1.53
+  },
+  "source": "docs/style_bible_ref2.md 6.4: medium events 3.6/s; 36 % of frames change < 0.1 % besides the zoom; longest near-static run 1.5 s (shot 12)",
+  "framecheck": {
+   "frames": 1323,
+   "fps": 30.0,
+   "errors": 0,
+   "warnings": 4,
+   "by_kind": {
+    "ui-zone": {
+     "error": 0,
+     "warning": 4
+    }
+   },
+   "caption_frames": 1277,
+   "caption_low_frac_p95": 0.0,
+   "caption_busy_p95": 0.0009,
+   "cuts_known": [
+    85,
+    143,
+    195,
+    269,
+    336,
+    394,
+    456,
+    522,
+    627,
+    690,
+    766,
+    888,
+    955,
+    1068,
+    1160
+   ],
+   "seconds": 167.9
+  }
+ }
+}

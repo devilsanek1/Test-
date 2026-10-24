@@ -1,0 +1,43 @@
+{
+ "tool": "framecheck",
+ "name": "reference",
+ "source": "/home/user/Test-/video/assets/ref/reference.mp4",
+ "options": {
+  "src": "/home/user/Test-/video/assets/ref/reference.mp4",
+  "fps": null,
+  "out": "/home/user/Test-/video/scripts/qa/calib/ref1",
+  "name": null,
+  "scenes": "/home/user/Test-/video/scripts/qa/calib/ref1_scenes.json",
+  "t0": 0.0,
+  "caption_band": "990,1270",
+  "canvas_width": 1080,
+  "no_ui_zones": true,
+  "captions": "auto",
+  "expect_caption": false,
+  "busy_warn": 0.06,
+  "low_err": 0.05,
+  "low_warn": 0.02,
+  "zone_px": 1500.0,
+  "sheet": 24,
+  "quiet": true
+ },
+ "summary": {
+  "frames": 946,
+  "fps": 30.0,
+  "errors": 0,
+  "warnings": 0,
+  "by_kind": {},
+  "caption_frames": 941,
+  "caption_low_frac_p95": 0.0,
+  "caption_busy_p95": 0.0001,
+  "cuts_known": [
+   233,
+   414,
+   607,
+   715,
+   827
+  ],
+  "seconds": 62.0
+ },
+ "issues": []
+}

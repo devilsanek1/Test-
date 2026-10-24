@@ -1,0 +1,208 @@
+{
+ "tool": "framecheck",
+ "name": "reference2",
+ "source": "/home/user/Test-/video/assets/ref2/reference2.mp4",
+ "options": {
+  "src": "/home/user/Test-/video/assets/ref2/reference2.mp4",
+  "fps": null,
+  "out": "/home/user/Test-/video/scripts/qa/calib/ref2",
+  "name": null,
+  "scenes": "/home/user/Test-/video/scripts/qa/calib/ref2_scenes.json",
+  "t0": 0.0,
+  "caption_band": "280,600",
+  "canvas_width": 1080,
+  "no_ui_zones": false,
+  "captions": "auto",
+  "expect_caption": false,
+  "busy_warn": 0.06,
+  "low_err": 0.05,
+  "low_warn": 0.02,
+  "zone_px": 1500.0,
+  "sheet": 24,
+  "quiet": true
+ },
+ "summary": {
+  "frames": 1323,
+  "fps": 30.0,
+  "errors": 0,
+  "warnings": 4,
+  "by_kind": {
+   "ui-zone": {
+    "error": 0,
+    "warning": 4
+   }
+  },
+  "caption_frames": 1277,
+  "caption_low_frac_p95": 0.0,
+  "caption_busy_p95": 0.0009,
+  "cuts_known": [
+   85,
+   143,
+   195,
+   269,
+   336,
+   394,
+   456,
+   522,
+   627,
+   690,
+   766,
+   888,
+   955,
+   1068,
+   1160
+  ],
+  "seconds": 167.9
+ },
+ "issues": [
+  {
+   "kind": "ui-zone",
+   "severity": "warning",
+   "f0": 0,
+   "f1": 87,
+   "t0": 0.0,
+   "t1": 2.933,
+   "msg": "dense detail in the right rail (edge density up to 28 %) in 5 stretch(es): f0-f87, f109-f270, f335-f395, f521-f767, f887-f1182. Keep key detail left of x 950.",
+   "zone": "rail"
+  },
+  {
+   "kind": "ui-zone",
+   "severity": "warning",
+   "f0": 62,
+   "f1": 73,
+   "t0": 2.067,
+   "t1": 2.467,
+   "msg": "new elements in the top UI zone in 1 stretch(es), largest 3356 px\u00b2: f62-f73. Is anything important there? The platform UI covers it.",
+   "zone": "top",
+   "px": 3356,
+   "stretches": [
+    [
+     62,
+     73
+    ]
+   ]
+  },
+  {
+   "kind": "ui-zone",
+   "severity": "warning",
+   "f0": 646,
+   "f1": 656,
+   "t0": 21.533,
+   "t1": 21.9,
+   "msg": "new elements in the bottom UI zone in 11 stretch(es), largest 63568 px\u00b2: f646-f656, f1173-f1257, f377-f390, f51-f75, f152-f181, f93-f113, f1051-f1062, f4-f34 (+3 more). Is anything important there? The platform UI covers it.",
+   "zone": "bottom",
+   "px": 63568,
+   "stretches": [
+    [
+     646,
+     656
+    ],
+    [
+     1173,
+     1257
+    ],
+    [
+     377,
+     390
+    ],
+    [
+     51,
+     75
+    ],
+    [
+     152,
+     181
+    ],
+    [
+     93,
+     113
+    ],
+    [
+     1051,
+     1062
+    ],
+    [
+     4,
+     34
+    ],
+    [
+     495,
+     497
+    ],
+    [
+     435,
+     436
+    ],
+    [
+     870,
+     872
+    ]
+   ]
+  },
+  {
+   "kind": "ui-zone",
+   "severity": "warning",
+   "f0": 664,
+   "f1": 672,
+   "t0": 22.133,
+   "t1": 22.433,
+   "msg": "new elements in the rail UI zone in 13 stretch(es), largest 24756 px\u00b2: f664-f672, f771-f802, f62, f240-f249, f713, f1121-f1144, f1023-f1033, f265 (+5 more). Is anything important there? The platform UI covers it.",
+   "zone": "rail",
+   "px": 24756,
+   "stretches": [
+    [
+     664,
+     672
+    ],
+    [
+     771,
+     802
+    ],
+    [
+     62,
+     62
+    ],
+    [
+     240,
+     249
+    ],
+    [
+     713,
+     713
+    ],
+    [
+     1121,
+     1144
+    ],
+    [
+     1023,
+     1033
+    ],
+    [
+     265,
+     265
+    ],
+    [
+     152,
+     181
+    ],
+    [
+     608,
+     610
+    ],
+    [
+     916,
+     950
+    ],
+    [
+     1051,
+     1051
+    ],
+    [
+     102,
+     112
+    ]
+   ]
+  }
+ ]
+}

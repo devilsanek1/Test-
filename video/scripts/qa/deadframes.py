@@ -170,7 +170,7 @@ def score_scenes(rows, scenes, events, cap_events, fps, opt, allow, t0, grace=Tr
         for (w0, w1, ty) in sc.trans:
             a, b = int(math.floor(w0 * fps)), int(math.ceil(w1 * fps))
             trans[max(0, a):min(n, b + 1)] = True
-    # the first frame of each scene (a cut) and frame 0 are never dead
+    # frame 0 has no predecessor and is never dead; a hard cut is alive by its own change
     out = []
     for sc in scenes:
         f0 = int(round(sc.start * fps))
@@ -262,7 +262,7 @@ def chart(path, rows, scenes, dead, trans, events, fps, opt, title, t0):
         sc = scenes[k]
         f0, f1 = sc['f0'], sc['f1'] + 1
         x = np.arange(f0, f1) - f0
-        lv = np.maximum(life[f0:f1], floor)
+        lv = np.maximum(life[f0:f1], floor * 3)        # a visible stub for frames where nothing changed at all
         dd = dead[f0:f1]
         tt = trans[f0:f1]
         for r in sc['dead_runs']:

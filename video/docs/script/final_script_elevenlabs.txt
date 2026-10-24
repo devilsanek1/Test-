@@ -1,0 +1,26 @@
+[quick and bright, a little amazed, lean on "purpose", "password" plain, no drama]
+Governments all over Europe just shut down their own websites on PURPOSE, because of this bug where anyone could take over a site without a password.
+
+[the bait, not the joke, tiny pause after "PHP", "loves" dead flat, straight into the number]
+It's in PHP… the language everyone loves, and about seven out of ten websites run on it.
+
+[a notch quicker, easy, letting a friend who doesn't code in on it, "like" tossed off]
+It was in there for like fourteen years before some researchers using AI figured out how bad it was.
+
+[brisk and level, small dip on "but", stress "already", no ominous drop]
+They gave the PHP people a heads-up so they could fix it first, but word got out a day early, and hackers were ALREADY trying it.
+
+[brighter, passing on what they said, tiny breath after "says", "millions" plain, no build]
+Cloudflare says, once it was official, they saw tens of thousands of attempts in forty-five minutes, and then millions.
+
+[ease off, the "oh, I get it" line, lean on "actually", slower on "every single server"]
+And the fix doesn't help until somebody ACTUALLY installs it on every single server.
+
+[a touch more serious, unhurried, stress "half" not "old", no doom, no blame]
+Plus about HALF of PHP sites are on versions so old they're not officially supported anymore.
+
+[THE one joke, dry half-smile, advice said straight, no pause before "which", don't sell it]
+So even the FBI said if you can't update yet, just turn it off, which is basically what tech support tells you about everything.
+
+[relaxed and warm, a touch slower, shrug on "pretty much", don't land it like a title card]
+And that's pretty much what those governments already did.
