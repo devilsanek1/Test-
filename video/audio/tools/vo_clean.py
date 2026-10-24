@@ -173,9 +173,14 @@ def write_ab(src):
                 "vo_ab_2_eq": process(seg, "eq")[0],
                 "vo_ab_3_eq_air": process(seg, "full")[0]}
     paths = []
+    sys.path.insert(0, str(AUDIO))
+    from mix import tp_limit
     for name, y in versions.items():
         y = y[:n]
         y = y * db2a(-16.0 - lufs(y))
+        if true_peak_db(y) > -1.5:   # same true-peak safety as the stem (rare plosive overs only)
+            y = tp_limit(np.stack([y, y], axis=1), ceiling_db=-1.7, release_ms=60.0)[:, 0]
+            y = y * db2a(-16.0 - lufs(y))
         f = int(0.01 * SR); y[-f:] *= np.linspace(1, 0, f)
         p = d / f"{name}.wav"
         save(p, y)
