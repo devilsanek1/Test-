@@ -53,7 +53,7 @@ export function cartX(t: number, T: CartTimes): number {
 
 /** Where a tag is flicked up from (world) at t: a head above the maker, clear of him, the plaques and the A-frame (the
  *  satchel's pulled tag is gone two frames before it appears here). */
-export const throwHand = (t: number, T: CartTimes): Pt => [cartX(t, T) + MAKER_DX + 2, 1090];
+export const throwHand = (t: number, T: CartTimes): Pt => [cartX(t, T) + MAKER_DX + 2, 1064];
 
 /** A ballistic toss: body centre from `a` to `b` over [t0, t1], apex `h` px above the higher end. */
 function tossPos(t: number, t0: number, t1: number, a: Pt, b: Pt, h: number): {p: Pt; u: number} {
@@ -127,7 +127,7 @@ export const Tosses: React.FC<CartProps> = ({T, land1, land2, tagSize}) => {
     );
   };
   // a short flick back-left onto siteL's plaque, then the lob over siteM's (apex under siteM's window, over its bracket)
-  fly('toss1', T.toss1, T.land1, land1, 40, -1, false);
-  fly('toss2', T.toss2, T.land2, land2, 64, 1.5, true);
+  fly('toss1', T.toss1, T.land1, land1, 36, -1, false);
+  fly('toss2', T.toss2, T.land2, land2, 40, 1.5, true);
   return <>{out}</>;
 };
