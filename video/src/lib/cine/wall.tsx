@@ -7,13 +7,13 @@
 //     events={[{at: 2, dur: 2.4, to: 'off', pattern: 'wave', origin: [0.95, 0.4], noise: 0.3}]} />
 //   const hero = windowQuad(Q, 80, 44, 41, 3);                               // row 41, col 3
 //   const Q2 = wallQuadVP({vp: [1000, 1180], near: [-170, -1000, 2600], farX: 690});  // edges converge on the horizon
-//   <WallOfWindows ... keepDark={{y0: 260, y1: 590}} lod={{cells: [[39, 3], [39, 4]], above: 3}} />
-// keepDark: windows whose SCREEN quad touches the caption band (or caption ink `boxes`) are dark. With a camera `path`
-// it has HYSTERESIS: a cell that has touched a box at any time <= t stays dark for the rest of the shot (only
-// switch-offs, which read as lights going out; never a row of windows popping back on as they leave the band), with a
-// ragged, noisy edge. Share the result with close-ups via wallDarkFrom() / wallCellState(). lod: those cells are left
-// out of the batched grid while the layer is zoomed past `above` (draw them as WindowCloseup yourself, level of detail
-// from the cell's screen size; at 'glass' they are pixel-identical to the grid pane, so the swap is invisible).
+//   <WallOfWindows ... keepDark={{boxes, path, span}} lod={{cells: [[39, 3], [39, 4]]}} />
+// keepDark: windows whose SCREEN quad touches the caption band (or caption ink `boxes`) are dark, with a ragged, noisy
+// edge. With a camera `path` the membership is decided ONCE for the shot (any cell that ever touches a box is dark from
+// the start: no switch-offs tracing the box edge as the camera moves); the thin ink is cut out of the boxes. Share it
+// with close-ups via wallDarkFrom() / wallCloseupProps(). Big panes carry the room-level LOD shapes (ROOM_LOD) the
+// close-ups melt through; lod cells are handed to WindowCloseups per cell while they are above the lamp size
+// (wallLodDetailed), so the swap between close-up and grid pane is invisible.
 
 import React, {useId, useMemo} from 'react';
 import {palette} from '../theme';

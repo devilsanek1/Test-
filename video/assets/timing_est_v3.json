@@ -1478,7 +1478,911 @@
    ]
   }
  ],
- "captions": [],
+ "captions": [
+  {
+   "s": 0.125,
+   "e": 2.063,
+   "lines": [
+    {
+     "text": "Governments all over",
+     "s": 0.125,
+     "words": [
+      0,
+      2
+     ]
+    },
+    {
+     "text": "Europe just shut down",
+     "s": 1.177,
+     "words": [
+      3,
+      6
+     ]
+    }
+   ],
+   "words": [
+    0,
+    6
+   ],
+   "highlights": [
+    {
+     "text": "shut down",
+     "s": 1.637,
+     "i": 5
+    }
+   ],
+   "scene": "S01",
+   "style": "hook"
+  },
+  {
+   "s": 2.063,
+   "e": 4.336,
+   "lines": [
+    {
+     "text": "a bunch of their own",
+     "s": 2.063,
+     "words": [
+      7,
+      11
+     ]
+    },
+    {
+     "text": "websites on purpose,",
+     "s": 2.889,
+     "words": [
+      12,
+      14
+     ]
+    }
+   ],
+   "words": [
+    7,
+    14
+   ],
+   "highlights": [
+    {
+     "text": "purpose,",
+     "s": 3.614,
+     "i": 14
+    }
+   ],
+   "scene": "S01"
+  },
+  {
+   "s": 4.336,
+   "e": 5.953,
+   "lines": [
+    {
+     "text": "because of this bug",
+     "s": 4.336,
+     "words": [
+      15,
+      18
+     ]
+    },
+    {
+     "text": "where hackers could",
+     "s": 5.222,
+     "words": [
+      19,
+      21
+     ]
+    }
+   ],
+   "words": [
+    15,
+    21
+   ],
+   "highlights": [
+    {
+     "text": "bug",
+     "s": 4.997,
+     "i": 18
+    }
+   ],
+   "scene": "S02"
+  },
+  {
+   "s": 5.953,
+   "e": 8.328,
+   "lines": [
+    {
+     "text": "take over a site",
+     "s": 5.953,
+     "words": [
+      22,
+      25
+     ]
+    },
+    {
+     "text": "without a password.",
+     "s": 6.916,
+     "words": [
+      26,
+      28
+     ]
+    }
+   ],
+   "words": [
+    22,
+    28
+   ],
+   "highlights": [
+    {
+     "text": "without a password.",
+     "s": 6.916,
+     "i": 26
+    }
+   ],
+   "scene": "S02"
+  },
+  {
+   "s": 8.328,
+   "e": 10.265,
+   "lines": [
+    {
+     "text": "It's in PHP,",
+     "s": 8.328,
+     "words": [
+      29,
+      31
+     ]
+    },
+    {
+     "text": "the language",
+     "s": 9.77,
+     "words": [
+      32,
+      33
+     ]
+    }
+   ],
+   "words": [
+    29,
+    33
+   ],
+   "highlights": [
+    {
+     "text": "PHP,",
+     "s": 8.703,
+     "i": 31
+    }
+   ],
+   "scene": "S03"
+  },
+  {
+   "s": 10.265,
+   "e": 12.5,
+   "lines": [
+    {
+     "text": "everyone loves, and",
+     "s": 10.265,
+     "words": [
+      34,
+      36
+     ]
+    },
+    {
+     "text": "about seven out of ten",
+     "s": 11.554,
+     "words": [
+      37,
+      41
+     ]
+    }
+   ],
+   "words": [
+    34,
+    41
+   ],
+   "highlights": [
+    {
+     "text": "seven out of ten",
+     "s": 11.679,
+     "i": 38
+    }
+   ],
+   "scene": "S03"
+  },
+  {
+   "s": 12.5,
+   "e": 14.124,
+   "lines": [
+    {
+     "text": "websites run on it.",
+     "s": 12.5,
+     "words": [
+      42,
+      45
+     ]
+    }
+   ],
+   "words": [
+    42,
+    45
+   ],
+   "highlights": [],
+   "scene": "S03"
+  },
+  {
+   "s": 14.124,
+   "e": 16.028,
+   "lines": [
+    {
+     "text": "This bug was in there",
+     "s": 14.124,
+     "words": [
+      46,
+      50
+     ]
+    },
+    {
+     "text": "for like fourteen years",
+     "s": 15.127,
+     "words": [
+      51,
+      54
+     ]
+    }
+   ],
+   "words": [
+    46,
+    54
+   ],
+   "highlights": [
+    {
+     "text": "fourteen years",
+     "s": 15.465,
+     "i": 53
+    }
+   ],
+   "scene": "S04"
+  },
+  {
+   "s": 16.028,
+   "e": 17.925,
+   "lines": [
+    {
+     "text": "before researchers",
+     "s": 16.028,
+     "words": [
+      55,
+      56
+     ]
+    },
+    {
+     "text": "using AI figured out",
+     "s": 16.719,
+     "words": [
+      57,
+      60
+     ]
+    }
+   ],
+   "words": [
+    55,
+    60
+   ],
+   "highlights": [
+    {
+     "text": "AI",
+     "s": 16.989,
+     "i": 58
+    }
+   ],
+   "scene": "S05"
+  },
+  {
+   "s": 17.925,
+   "e": 19.245,
+   "lines": [
+    {
+     "text": "how bad it was.",
+     "s": 17.925,
+     "words": [
+      61,
+      64
+     ]
+    }
+   ],
+   "words": [
+    61,
+    64
+   ],
+   "highlights": [
+    {
+     "text": "bad",
+     "s": 18.115,
+     "i": 62
+    }
+   ],
+   "scene": "S05"
+  },
+  {
+   "s": 19.245,
+   "e": 21.262,
+   "lines": [
+    {
+     "text": "They gave the PHP",
+     "s": 19.245,
+     "words": [
+      65,
+      68
+     ]
+    },
+    {
+     "text": "people a heads-up,",
+     "s": 20.253,
+     "words": [
+      69,
+      71
+     ]
+    }
+   ],
+   "words": [
+    65,
+    71
+   ],
+   "highlights": [
+    {
+     "text": "heads-up,",
+     "s": 20.591,
+     "i": 71
+    }
+   ],
+   "scene": "S06"
+  },
+  {
+   "s": 21.262,
+   "e": 23.651,
+   "lines": [
+    {
+     "text": "but word got out before",
+     "s": 21.262,
+     "words": [
+      72,
+      76
+     ]
+    },
+    {
+     "text": "the fix was ready,",
+     "s": 22.366,
+     "words": [
+      77,
+      80
+     ]
+    }
+   ],
+   "words": [
+    72,
+    80
+   ],
+   "highlights": [
+    {
+     "text": "word got out",
+     "s": 21.475,
+     "i": 73
+    }
+   ],
+   "scene": "S07"
+  },
+  {
+   "s": 23.651,
+   "e": 26.017,
+   "lines": [
+    {
+     "text": "and hackers were",
+     "s": 23.651,
+     "words": [
+      81,
+      83
+     ]
+    },
+    {
+     "text": "already trying to use it.",
+     "s": 24.246,
+     "words": [
+      84,
+      88
+     ]
+    }
+   ],
+   "words": [
+    81,
+    88
+   ],
+   "highlights": [
+    {
+     "text": "already",
+     "s": 24.246,
+     "i": 84
+    }
+   ],
+   "scene": "S08"
+  },
+  {
+   "s": 26.017,
+   "e": 28.302,
+   "lines": [
+    {
+     "text": "Cloudflare says that",
+     "s": 26.017,
+     "words": [
+      89,
+      91
+     ]
+    },
+    {
+     "text": "once it was announced,",
+     "s": 27.149,
+     "words": [
+      92,
+      95
+     ]
+    }
+   ],
+   "words": [
+    89,
+    95
+   ],
+   "highlights": [
+    {
+     "text": "Cloudflare",
+     "s": 26.017,
+     "i": 89
+    }
+   ],
+   "scene": "S08"
+  },
+  {
+   "s": 28.302,
+   "e": 29.659,
+   "lines": [
+    {
+     "text": "they saw",
+     "s": 28.302,
+     "words": [
+      96,
+      97
+     ]
+    },
+    {
+     "text": "tens of thousands",
+     "s": 28.667,
+     "words": [
+      98,
+      100
+     ]
+    }
+   ],
+   "words": [
+    96,
+    100
+   ],
+   "highlights": [
+    {
+     "text": "tens of thousands",
+     "s": 28.667,
+     "i": 98
+    }
+   ],
+   "scene": "S08"
+  },
+  {
+   "s": 29.659,
+   "e": 31.762,
+   "lines": [
+    {
+     "text": "of hacking attempts in",
+     "s": 29.659,
+     "words": [
+      101,
+      104
+     ]
+    },
+    {
+     "text": "forty-five minutes,",
+     "s": 30.602,
+     "words": [
+      105,
+      106
+     ]
+    }
+   ],
+   "words": [
+    101,
+    106
+   ],
+   "highlights": [
+    {
+     "text": "forty-five minutes,",
+     "s": 30.602,
+     "i": 105
+    }
+   ],
+   "scene": "S08"
+  },
+  {
+   "s": 31.762,
+   "e": 33.73,
+   "lines": [
+    {
+     "text": "and millions",
+     "s": 31.762,
+     "words": [
+      107,
+      108
+     ]
+    },
+    {
+     "text": "within a day.",
+     "s": 32.482,
+     "words": [
+      109,
+      111
+     ]
+    }
+   ],
+   "words": [
+    107,
+    111
+   ],
+   "highlights": [
+    {
+     "text": "millions",
+     "s": 31.892,
+     "i": 108
+    }
+   ],
+   "scene": "S08"
+  },
+  {
+   "s": 33.73,
+   "e": 35.377,
+   "lines": [
+    {
+     "text": "But even with",
+     "s": 33.73,
+     "words": [
+      112,
+      114
+     ]
+    },
+    {
+     "text": "the fix out,",
+     "s": 34.507,
+     "words": [
+      115,
+      117
+     ]
+    }
+   ],
+   "words": [
+    112,
+    117
+   ],
+   "highlights": [
+    {
+     "text": "fix out,",
+     "s": 34.617,
+     "i": 116
+    }
+   ],
+   "scene": "S09"
+  },
+  {
+   "s": 35.377,
+   "e": 37.011,
+   "lines": [
+    {
+     "text": "somebody still has",
+     "s": 35.377,
+     "words": [
+      118,
+      120
+     ]
+    },
+    {
+     "text": "to install it on",
+     "s": 36.263,
+     "words": [
+      121,
+      124
+     ]
+    }
+   ],
+   "words": [
+    118,
+    124
+   ],
+   "highlights": [
+    {
+     "text": "still",
+     "s": 35.865,
+     "i": 119
+    }
+   ],
+   "scene": "S09"
+  },
+  {
+   "s": 37.011,
+   "e": 38.648,
+   "lines": [
+    {
+     "text": "every single server.",
+     "s": 37.011,
+     "words": [
+      125,
+      127
+     ]
+    }
+   ],
+   "words": [
+    125,
+    127
+   ],
+   "highlights": [
+    {
+     "text": "every single server.",
+     "s": 37.011,
+     "i": 125
+    }
+   ],
+   "scene": "S09"
+  },
+  {
+   "s": 38.648,
+   "e": 40.62,
+   "lines": [
+    {
+     "text": "Plus something like",
+     "s": 38.648,
+     "words": [
+      128,
+      130
+     ]
+    },
+    {
+     "text": "half of PHP sites",
+     "s": 39.346,
+     "words": [
+      131,
+      134
+     ]
+    }
+   ],
+   "words": [
+    128,
+    134
+   ],
+   "highlights": [
+    {
+     "text": "half",
+     "s": 39.346,
+     "i": 131
+    }
+   ],
+   "scene": "S10"
+  },
+  {
+   "s": 40.62,
+   "e": 42.913,
+   "lines": [
+    {
+     "text": "run versions so old",
+     "s": 40.62,
+     "words": [
+      135,
+      138
+     ]
+    },
+    {
+     "text": "they're not officially",
+     "s": 41.723,
+     "words": [
+      139,
+      141
+     ]
+    }
+   ],
+   "words": [
+    135,
+    141
+   ],
+   "highlights": [
+    {
+     "text": "so old",
+     "s": 41.183,
+     "i": 137
+    }
+   ],
+   "scene": "S10"
+  },
+  {
+   "s": 42.913,
+   "e": 44.536,
+   "lines": [
+    {
+     "text": "supported anymore.",
+     "s": 42.913,
+     "words": [
+      142,
+      143
+     ]
+    }
+   ],
+   "words": [
+    142,
+    143
+   ],
+   "highlights": [],
+   "scene": "S10"
+  },
+  {
+   "s": 44.536,
+   "e": 47.211,
+   "lines": [
+    {
+     "text": "Even the FBI said if",
+     "s": 44.536,
+     "words": [
+      144,
+      148
+     ]
+    },
+    {
+     "text": "you can't update yet,",
+     "s": 45.787,
+     "words": [
+      149,
+      152
+     ]
+    }
+   ],
+   "words": [
+    144,
+    152
+   ],
+   "highlights": [
+    {
+     "text": "FBI",
+     "s": 44.996,
+     "i": 146
+    }
+   ],
+   "scene": "S11"
+  },
+  {
+   "s": 47.211,
+   "e": 49.029,
+   "lines": [
+    {
+     "text": "just turn it off,",
+     "s": 47.211,
+     "words": [
+      153,
+      156
+     ]
+    },
+    {
+     "text": "which is basically",
+     "s": 48.093,
+     "words": [
+      157,
+      159
+     ]
+    }
+   ],
+   "words": [
+    153,
+    159
+   ],
+   "highlights": [
+    {
+     "text": "turn it off,",
+     "s": 47.321,
+     "i": 154
+    }
+   ],
+   "scene": "S11"
+  },
+  {
+   "s": 49.029,
+   "e": 51.191,
+   "lines": [
+    {
+     "text": "tech support's answer",
+     "s": 49.029,
+     "words": [
+      160,
+      162
+     ]
+    },
+    {
+     "text": "to everything.",
+     "s": 49.943,
+     "words": [
+      163,
+      164
+     ]
+    }
+   ],
+   "words": [
+    160,
+    164
+   ],
+   "highlights": [],
+   "scene": "S11"
+  },
+  {
+   "s": 51.191,
+   "e": 52.84,
+   "lines": [
+    {
+     "text": "And some of those",
+     "s": 51.191,
+     "words": [
+      165,
+      168
+     ]
+    },
+    {
+     "text": "governments did it",
+     "s": 52.029,
+     "words": [
+      169,
+      171
+     ]
+    }
+   ],
+   "words": [
+    165,
+    171
+   ],
+   "highlights": [
+    {
+     "text": "did it",
+     "s": 52.517,
+     "i": 170
+    }
+   ],
+   "scene": "S12"
+  },
+  {
+   "s": 52.84,
+   "e": 54.592,
+   "lines": [
+    {
+     "text": "before there was",
+     "s": 52.84,
+     "words": [
+      172,
+      174
+     ]
+    },
+    {
+     "text": "even a fix.",
+     "s": 53.428,
+     "words": [
+      175,
+      177
+     ]
+    }
+   ],
+   "words": [
+    172,
+    177
+   ],
+   "highlights": [
+    {
+     "text": "before",
+     "s": 52.84,
+     "i": 172
+    }
+   ],
+   "scene": "S12"
+  }
+ ],
  "hits": [
   {
    "i": 14,

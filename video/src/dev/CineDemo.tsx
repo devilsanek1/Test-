@@ -12,13 +12,16 @@
 //   B (9.75-16.2)   PEAK, worm's-eye: a BACKLIT government building cropped by the frame (pediment past both edges,
 //                   lantern out of the top), inked below the caption band, a plaza crowd of back-view people, a
 //                   backlit head-and-shoulders silhouette at the lens; crane up while the upper storeys keep building.
-//   C (15.7-22)     PEAK, pull-back from one lit window (8x -> 1.3x, cruise <= 20 px / frame) to a wall of windows that
+//   C (15.7-22)     PEAK, pull-back from one lit window (8x -> 1.3x, cruise <= 17 px / frame) to a wall of windows that
 //                   light up, then go dark in waves that start at the captions; the hero window stays framed and is the
-//                   last light off. Close-ups degrade by screen size (full -> room -> pane, identical to the grid).
+//                   last light off. Close-ups degrade element by element and hand over to the grid per cell at the lamp
+//                   size (the grid draws the same room shapes: the swap is invisible).
+// Every camera is still moving at every wipe midpoint (keys past the shot ends: no stall at a seam).
 // Cuts ride on the edge of something passing the lens (WipeCut: a column, a passer-by), each centred on a caption page.
 // Check modes (props): {mode: 'street'} | {mode: 'tower'} | {mode: 'loop'} (un-build + loop seam) | {mode: 'wipes'}
-// (the cine wipers over flat fields) | {mode: 'speed'} (camera speed report per shot) and {lock: true} (camera locked,
-// for event-density checks).
+// (the cine wipers over flat fields) | {mode: 'speed'} (camera speed report per shot, seams) | {mode: 'lens'} (the lens
+// figures, colour + paper) | {mode: 'lod', view: 'grid' | 'closeups', zoom} (grid vs close-ups must match below the lamp
+// size) and {lock: true} (camera locked, for event-density checks).
 import React, {createContext, useContext} from 'react';
 import {useTime} from '../lib/time';
 import {palette, skyCaption, stroke} from '../lib/theme';

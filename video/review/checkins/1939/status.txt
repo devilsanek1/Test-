@@ -1,0 +1,3 @@
+ok   CineDemo
+ok   KitDemo
+ok   SharedKitSheet
