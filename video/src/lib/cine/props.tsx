@@ -455,10 +455,7 @@ export const WindowCloseup: React.FC<WindowCloseupProps> = (props) => (
   </CineExitShrink>
 );
 
-const ROOM_DARKER: Record<string, string> = {[palette.peach]: palette.tan, [palette.cream]: palette.sand, [palette.white]: palette.mintPale};
 
-/** 0..1 ramp of a melting LOD element between the screen widths a (gone) and b (whole). */
-const melt = (W: number, a: number, b: number) => Math.max(0, Math.min(1, (W - a) / (b - a)));
 
 const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod, offAt, screenOffAt, seed = 'wc', person, lit: lit0 = true, chair, desk = true, screenTick, onAt, curtainAt, flickerAt, detail = 'full', litColor, darkColor, on: onIn, screenW, lodJitter = 0.5}) => {
   const t = useTime();
@@ -563,7 +560,7 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod,
       {/* curtain, transom bar, plant, glints */}
       {curtain ? <path d={curtain} fill={on ? rcol.curtain : lit ? ambient(palette.tan, p) : curtainDark} transform={curtainRight ? `translate(${w + mis} ${mis}) scale(-1 1)` : mis ? `translate(${mis} ${mis})` : undefined} /> : null}
       {full ? <path d={`M${w * 0.06} 6Q${w * 0.08} ${h * 0.4} ${w * 0.05} ${h * 0.7}M${w * 0.11} 6Q${w * 0.14} ${h * 0.4} ${w * 0.09} ${h * 0.71}`} fill="none" stroke={palette.ink} strokeWidth={2} strokeLinecap="round" /> : null}
-      {sh.transom ? <rect x={0} y={h * sh.transom[0]} width={w} height={h * (sh.transom[1] - sh.transom[0])} fill={on || lit ? rcol.transom : curtainDark} /> : null}
+      {sh.transom ? <rect x={0} y={h * sh.transom[0]} width={w} height={h * (sh.transom[1] - sh.transom[0])} fill={on ? rcol.transom : lit ? frameC : curtainDark} /> : null}
       {plantOn && chairOn ? <rect x={w * 0.68} y={h + fr - 44} width={58} height={44} fill={on ? palette.brown : palette.tealDark} /> : null}
       {plantOn && chairOn ? <path d={plant} fill={on ? palette.sage : palette.teal} transform="translate(3 2)" /> : null}
       {plantOn && chairOn ? <Ink d={plant} width={stroke.ink} exit={false} /> : null}

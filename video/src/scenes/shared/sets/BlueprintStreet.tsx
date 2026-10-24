@@ -1,7 +1,9 @@
 // BlueprintStreet — S3 (S02 "built from one blueprint"; complex, used once). Canvas coords at the S02 wide rest.
 //
-// The street floor is a giant cream BLUEPRINT sheet: an inkHair grid converging to VP (560, 950), dimension arrows
-// along the kerbs, a title block bottom-left, the giant elephant stamp slot (330, 1400). At the end of the vista the
+// The street floor carries a giant cream BLUEPRINT sheet laid on it (a visible paper far edge at y 1214 with a dog-eared
+// corner, a margin line with dimension ticks, side edges just inside the kerbs): a broken-stroke grid converging to VP
+// (560, 950) that overshoots the sheet edge and thins with distance, dimension arrows, a title block bottom-left, the
+// giant elephant stamp slot (330, 1400). At the end of the vista the
 // generic PRESS HOUSE (a WordPress stand-in, no text, no logo): frontal 360..760, apex (560, 770), eaves 870, base
 // 1180; chunky browser window (470,900,180,110), teal door (500,1010,120,170) with THE lock (595,1100) 40x50 and the
 // plaque (455,1085); a cream pen-nib sign disc r34 at (795,930) on a swinging bracket; a roof vent that puffs 3 sheets.
@@ -104,25 +106,71 @@ const G = (() => {
   const s = 'bps';
   const VP = BLUEPRINT.vp;
   const P = BLUEPRINT.press;
-  // blueprint grid: rays to the VP + cross lines at perspective depths, ordered NEAR -> FAR (it draws on that way)
-  let cross = '';
+  // THE SHEET (review 5): a plan LAID ON the street, not a tiled floor. A paper trapezoid with a visible far edge in front
+  // of the press house (the pavement shows between them), side edges just inside the kerbs, a dog-eared far-left corner,
+  // a margin line inset from every edge with dimension ticks along it. The grid follows the ink rules: every line is
+  // 2-4 broken pen strokes, it overshoots the sheet edge by 30-60 px, and its weight thins with distance (3 width
+  // groups, near -> far, drawn on in that order).
+  const yF = 1214; // the sheet's far edge
+  const lB = (y: number) => 360 - ((360 + 140) * (y - 1180)) / (1708 - 1180); // left buildings' base line
+  const rB = (y: number) => 760 + ((1226 - 760) * (y - 1180)) / (1726 - 1180); // right buildings' base line
+  const inset = (y: number) => 10 + ((y - yF) / (2060 - yF)) * 34;
+  const sL = (y: number) => lB(y) + inset(y);
+  const sR = (y: number) => rB(y) - inset(y);
+  const sheet = polyPath([[sL(yF) + 22, yF], [sR(yF), yF], [sR(2080), 2080], [sL(2080), 2080], [sL(yF + 22), yF + 22]]);
+  const dogEar = polyPath([[sL(yF) + 22, yF], [sL(yF + 22), yF + 22], [sL(yF) + 26, yF + 26]]);
+  const edgeInk =
+    line(sL(yF) + 22, yF, sR(yF), yF, {seed: `${s}/ef`, over: [0, 6], breaks: false}) +
+    line(sL(yF + 22), yF + 22, sL(2060), 2060, {seed: `${s}/el`, over: 0}) +
+    line(sR(yF), yF, sR(2060), 2060, {seed: `${s}/er`, over: 0}) +
+    line(sL(yF) + 22, yF, sL(yF + 22), yF + 22, {seed: `${s}/ed`, over: 0, breaks: false}) +
+    line(sL(yF + 22), yF + 22, sL(yF) + 26, yF + 26, {seed: `${s}/ed2`, over: 0, breaks: false});
+  // margin line (inset 14 -> 40 px) with dimension ticks every ~60 px along the far edge and the left edge
+  const m = (y: number) => 14 + ((y - yF) / (2060 - yF)) * 26;
+  const yM = yF + 12;
+  let margin = line(sL(yM) + m(yM) + 18, yM, sR(yM) - m(yM), yM, {seed: `${s}/mf`, over: [0, 0]}) + line(sL(yM + 20) + m(yM + 20), yM + 20, sL(2060) + m(2060), 2060, {seed: `${s}/ml`, over: [0, 0]}) + line(sR(yM) - m(yM), yM, sR(2060) - m(2060), 2060, {seed: `${s}/mr`, over: [0, 0]});
+  for (let x = sL(yM) + 50; x < sR(yM) - 20; x += 46) margin += `M${x.toFixed(1)} ${yM - 5}L${x.toFixed(1)} ${yM + 5}`;
+  for (let y = yM + 60; y < 1900; y += 60 + (y - yM) * 0.12) {
+    const x = sL(y) + m(y);
+    margin += `M${(x - 6).toFixed(1)} ${y.toFixed(1)}L${(x + 6).toFixed(1)} ${(y - 2).toFixed(1)}`;
+  }
+  // the grid: cross lines at perspective depths, rays toward the VP; broken strokes, 30-60 px overshoot, width by depth
+  const r = rng(`${s}/grid`);
+  const groups = ['', '', ''];
+  const grp = (y: number) => (y > 1560 ? 0 : y > 1330 ? 1 : 2);
+  const broken = (x0: number, y0: number, x1: number, y1: number, key: string) => {
+    const n = r.int(2, 4);
+    let d = '';
+    let a = 0;
+    for (let i = 0; i < n; i++) {
+      const b = i === n - 1 ? 1 : a + (1 - a) / (n - i) * r.range(0.75, 1.2);
+      const g0 = i ? r.range(0.006, 0.02) : 0;
+      d += line(x0 + (x1 - x0) * (a + g0), y0 + (y1 - y0) * (a + g0), x0 + (x1 - x0) * b, y0 + (y1 - y0) * b, {seed: `${key}/${i}`, over: 0, breaks: false, drift: 0.15});
+      a = b;
+    }
+    return d;
+  };
   for (let k = 9; k >= 1; k--) {
     const y = VP[1] + (2060 - VP[1]) * Math.pow(k / 10, 1.6);
-    if (y < 1186) continue;
-    cross += line(-160, y, 1240, y, {seed: `${s}/x${k}`, over: 0, breaks: false, drift: 0.1});
+    if (y < yF + 30) continue;
+    groups[grp(y)] += broken(sL(y) - r.range(30, 60), y, sR(y) + r.range(30, 60), y, `${s}/x${k}`);
   }
-  let rays = '';
   for (let i = 0; i <= 22; i++) {
     const xb = -1500 + i * 190;
-    const yt = 1186;
-    const xt = VP[0] + ((xb - VP[0]) * (yt - VP[1])) / (2060 - VP[1]);
-    rays += line(xb, 2060, xt, yt, {seed: `${s}/r${i}`, over: 0, breaks: false, drift: 0.1});
+    const xAt = (y: number) => VP[0] + ((xb - VP[0]) * (y - VP[1])) / (2060 - VP[1]);
+    // only rays that land on the sheet; each overshoots the far edge by 30-60 px (onto the pavement)
+    if (xAt(yF) < sL(yF) + 10 || xAt(yF) > sR(yF) - 10) continue;
+    const yT = yF - r.range(30, 60) * 0.5;
+    // split by depth: far part (thin), mid, near (heavier)
+    const cuts = [yT, 1330, 1560, 2060];
+    for (let g = 0; g < 3; g++) groups[2 - g] += broken(xAt(cuts[g]), cuts[g], xAt(cuts[g + 1]), cuts[g + 1], `${s}/r${i}/${g}`);
   }
-  // dimension arrows along the kerbs (both directions, ticks at the ends)
-  const dimL = arrow(380, 1196, 120, 1440, {seed: `${s}/dl1`, head: 14}) + arrow(120, 1440, 380, 1196, {seed: `${s}/dl2`, head: 14}) + line(372, 1186, 392, 1206, {seed: `${s}/dt1`, over: 0}) + line(108, 1430, 132, 1452, {seed: `${s}/dt2`, over: 0});
-  const dimR = arrow(742, 1196, 1000, 1440, {seed: `${s}/dr1`, head: 14}) + arrow(1000, 1440, 742, 1196, {seed: `${s}/dr2`, head: 14});
-  // title block bottom-left
-  const tb = rect(40, 1690, 300, 170, {seed: `${s}/tb`, over: 'small'}) + line(40, 1740, 340, 1740, {seed: `${s}/tb1`, over: 'small'}) + line(190, 1740, 190, 1860, {seed: `${s}/tb2`, over: 'small'}) + line(60, 1716, 200, 1716, {seed: `${s}/tb3`, over: 0}) + line(60, 1770, 170, 1770, {seed: `${s}/tb4`, over: 0}) + line(60, 1800, 150, 1800, {seed: `${s}/tb5`, over: 0}) + line(210, 1770, 320, 1770, {seed: `${s}/tb6`, over: 0});
+  const [gridNear, gridMid, gridFar] = groups;
+  // dimension arrows along the kerbs (both directions, ticks at the ends), just inside the margin
+  const dimL = arrow(sL(1250) + 34, 1250, sL(1480) + 40, 1480, {seed: `${s}/dl1`, head: 14}) + arrow(sL(1480) + 40, 1480, sL(1250) + 34, 1250, {seed: `${s}/dl2`, head: 14});
+  const dimR = arrow(sR(1250) - 34, 1250, sR(1480) - 40, 1480, {seed: `${s}/dr1`, head: 14}) + arrow(sR(1480) - 40, 1480, sR(1250) - 34, 1250, {seed: `${s}/dr2`, head: 14});
+  // title block bottom-left (inside the margin)
+  const tb = rect(190, 1700, 280, 160, {seed: `${s}/tb`, over: 'small'}) + line(190, 1748, 470, 1748, {seed: `${s}/tb1`, over: 'small'}) + line(330, 1748, 330, 1860, {seed: `${s}/tb2`, over: 'small'}) + line(208, 1724, 340, 1724, {seed: `${s}/tb3`, over: 0}) + line(208, 1776, 310, 1776, {seed: `${s}/tb4`, over: 0}) + line(208, 1806, 290, 1806, {seed: `${s}/tb5`, over: 0}) + line(348, 1776, 452, 1776, {seed: `${s}/tb6`, over: 0});
   // press house
   const gable = polyPath([[P.x0, P.eaves], P.apex, [P.x1, P.eaves]]);
   const roofBand = polyPath([[P.x0 - 16, P.eaves + 6], P.apex, [P.x1 + 16, P.eaves + 6], [P.x1 + 16, P.eaves + 16], [P.apex[0], P.apex[1] + 12], [P.x0 - 16, P.eaves + 16]]);
@@ -141,7 +189,7 @@ const G = (() => {
   const ventInk = rect(V.x - 12, V.y - 22, 24, 26, {seed: `${s}/v`, over: 'small', edges: 'tlr'}) + rect(V.x - 17, V.y - 28, 34, 7, {seed: `${s}/vc`, over: 'small'});
   // far city peeks
   const peeks = rectPath(296, 776, 30, 60) + rectPath(326, 792, 26, 40) + rectPath(764, 780, 26, 50) + rectPath(790, 770, 34, 64);
-  return {cross, rays, dimL, dimR, tb, gable, roofBand, pressInk, sideWins, sideGlass, vent, ventInk, peeks};
+  return {sheet, dogEar, edgeInk, margin, gridNear, gridMid, gridFar, dimL, dimR, tb, gable, roofBand, pressInk, sideWins, sideGlass, vent, ventInk, peeks};
 })();
 
 // ---------------------------------------------------------------- pieces
@@ -240,9 +288,15 @@ export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pre
 
   const ground = (
     <>
-      <Fill rect={[-160, 1180, 1400, 900]} color={palette.cream} offset={false} mode="snap" seed={`${seed}/sheet`} />
-      {gridP > 0 ? <Ink d={G.cross} width={SI.hair} at={gridAt} dur={0.45} taper={false} seed={`${seed}/cross`} /> : null}
-      {gridP > 0 ? <Ink d={G.rays} width={SI.hair} at={gridAt !== undefined ? gridAt + 0.05 : undefined} order="all" taper={false} seed={`${seed}/rays`} /> : null}
+      {/* the street (pavement) and the plan laid on it */}
+      <Fill rect={[-160, 1180, 1400, 900]} color={palette.sand} offset={false} mode="snap" seed={`${seed}/street`} />
+      <Fill d={G.sheet} color={palette.cream} offset={false} mode="snap" seed={`${seed}/sheet`} />
+      <Fill d={G.dogEar} color={palette.white} offset={false} mode="snap" seed={`${seed}/ear`} />
+      <Ink d={G.edgeInk} width={SI.far} taper={false} seed={`${seed}/edge`} />
+      {gridP > 0 ? <Ink d={G.margin} width={SI.hair * 0.8} at={gridAt} dur={0.3} order="all" taper={false} seed={`${seed}/margin`} /> : null}
+      {gridP > 0 ? <Ink d={G.gridNear} width={SI.hair * 1.25} at={gridAt} dur={0.3} order="all" taper={false} seed={`${seed}/gN`} /> : null}
+      {gridP > 0 ? <Ink d={G.gridMid} width={SI.hair * 0.9} at={gridAt !== undefined ? gridAt + 0.12 : undefined} dur={0.3} order="all" taper={false} seed={`${seed}/gM`} /> : null}
+      {gridP > 0 ? <Ink d={G.gridFar} width={SI.hair * 0.6} at={gridAt !== undefined ? gridAt + 0.24 : undefined} dur={0.3} order="all" taper={false} seed={`${seed}/gF`} /> : null}
       <Ink d={G.dimL + G.dimR} width={SI.far} at={gridAt !== undefined ? gridAt + 0.3 : undefined} taper={false} seed={`${seed}/dim`} />
       <Ink d={G.tb} width={SI.far} at={gridAt !== undefined ? gridAt + 0.35 : undefined} taper={false} seed={`${seed}/tb`} />
       {stampAt !== false ? <ElephantStampSlot x={BLUEPRINT.stamp.x} y={BLUEPRINT.stamp.y} rx={BLUEPRINT.stamp.rx} ry={BLUEPRINT.stamp.ry} ring={14} at={stampAt} seed={`${seed}/stamp`} /> : null}

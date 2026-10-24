@@ -59,7 +59,9 @@ they them then than with if you your it's that's they're can could has have had 
 just like not now once even own its from into until because before after while about""".split())
 # break BEFORE these words is natural (captions)
 BREAK_BEFORE = set("""and but because before after so which who where that if until once with within without when while
-or than of to for in on by""".split())
+or than for in on by""".split())
+# never START a caption line with these (particles / complements that belong to the previous word: "figured | out")
+NO_BREAK_BEFORE = set("""out up off down of it them to""".split())
 # never end a caption line on these (they lean on the next word)
 GLUE = set("""a an the of to in on at by for from with their this those these that's it's some every single my your our
 his her its into about like just even still has have had was were is are be can can't could would will tens""".split())
@@ -321,6 +323,8 @@ def paginate(words_out, sentences, duration, max_chars=24, max_px=850, min_page=
             return 0.0
         if A.base_token(prev) in GLUE:
             return 15.0
+        if A.base_token(W[k]) in NO_BREAK_BEFORE:
+            return 12.0
         if A.base_token(W[k]) in BREAK_BEFORE:
             return 1.5 if page else 1.0
         return 5.0 if page else 3.0
