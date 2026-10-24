@@ -25,7 +25,7 @@ node src/scenes/shared/sets/preview/render.mjs SetsSheet /tmp/o 2          # eve
 
 | set id | variants |
 |---|---|
-| `plaza` | (S01 demo build), `lineArt`, `off`, `closeup` (S11, zoom 1.85), `dive` (zoom 3.25 into govB's lock box) |
+| `plaza` | (S01 demo build), `lineArt`, `off`, `closeup` (S11, `PLAZA.closeup` zoom 1.6), `dive` (`PLAZA.dive` zoom 2.4 into govB's lock box) |
 | `stoop` | (S03 steps), `draw` (entrance draw-on), `tower` (S04: tower, seasons, ivy, cobweb), `night` (S09: night + check + ledge) |
 | `blueprint` | (S02 wide: grid, stamp, pop-up, plaque count), `closeup` (zoom 2.0 on the lock) |
 | `wall` | (S05 at zoom 1.08), `draw` (blueprint draws outward from the lock) |
@@ -64,7 +64,7 @@ row); `DemoSun` is pinned (`drift={[0, 0]}`) so a preview frame shows the sun SL
 - **Multiplane:** `wrap={(name, nearness, node) => <Layer depth={1 - nearness}>{node}</Layer>}` splits any set into its
   layers (nearness follows the storyboard: 0.05 sky ... 1.0 foreground). Layer names are listed per set.
 - **Ink by depth** (4.8 / 3.4 / 2.2 / 1.6, far layers fill-only; the plaza's nearest building govD 4.0). Ink is in world px and scales with the camera (like the
-  reference push-in). Exceptions: `detail="close"` thins govB (S11 at 1.85x); TerraceHill uses a SCREEN-space ladder
+  reference push-in). Exceptions: `detail="close"` thins govB (S11 close-up); TerraceHill uses a SCREEN-space ladder
   (row 0 3.4, row 1 2.2, rows 2-3 1.6, then none) with a world-unit floor for its zoom-6 match (row 0 0.85): on-screen
   width = max(world x zoom, screen), so there is no pop across the pull-back (`terraceInk(k, zoom)`).
 - **Haze ladder** (style_bible_ref2 8): far layers are fill-only and step toward the sky, day `#84B09C` -> `#98C0AE` ->
@@ -412,8 +412,9 @@ the street gap (692, 1356) h186 and a stander cut by the left edge (64, 1478) h2
 
 | contract | where |
 |---|---|
-| frame 0 = S11 cut = S13 un-build: plaza `lineArt` / `built` / `off` share geometry; Pip's bollard (760, 1440); Bit (200, 705) | GovernmentPlaza |
-| S01 govB lock box 16 x 20 at (400, 1135) -> S02 (props Lock size 20 / 50) | PLAZA.gov.govB.lock, BLUEPRINT.lock |
+| frame 0 = S11 cut = S13 un-build: plaza `lineArt` / `built` / `off` share geometry; Pip's bollard top (812, 1426); Bit (262, 742) size 22 | GovernmentPlaza (review 5 PEAK layout, pending sign-off: section 8) |
+| S01 govB lock box 22 x 27 at (543, 1318) -> S02 (props Lock size 27 / 50): `PLAZA.dive` camera (535, 1264) zoom 2.4 lands it at screen (560, 1090) 52 x 65 | PLAZA.gov.govB.lock, PLAZA.dive, BLUEPRINT.lock |
+| S10 row-7 ring -> S11 govB loading ring in the close-up `PLAZA.closeup` (518, 826) zoom 1.6 | TERRACE.rings[7], PLAZA.closeup |
 | S04 lock4 (330, 1130) 34 x 42 -> S05 blueprint lock (488, 960) 60 x 75 (props Lock `blueprint`) | STOOP.lock4, BLUEPRINT_WALL.lock |
 | S10 Part A lock4 -> Part B house4 lock 8.5 x 10.5 at zoom 6 | TERRACE.house4, TERRACE.matchCam |
 | S07 wires -> S08 wires (same screen height / spacing) | WIRES.S07 / WIRES.S08 |
@@ -431,32 +432,67 @@ the street gap (692, 1356) h186 and a stander cut by the left edge (64, 1478) h2
 
 ## 6. Render cost
 
-Measured with `preview/render.mjs`, full 1080 x 1920, concurrency 2, 12 frames over each demo (incl. page setup), review 4,
-on a shared machine (load average ~7 on 4 CPUs): the unchanged BlueprintStreet measured 141-180 ms against 131 before,
-so read these as roughly x1.1-1.4 of an idle machine.
+Review 5, measured with `preview/render.mjs`, full 1080 x 1920, concurrency 2, 12 frames over each demo (incl. page
+setup) on a QUIET machine (load average ~1.1 on 4 CPUs; review 4's table was taken at load ~7, so the numbers are not
+directly comparable: KitDemo idles at ~113 ms/frame).
 
-| set | ms / frame |
+| set (review 5 demo) | ms / frame |
 |---|---|
-| GovernmentPlaza (S01 demo: cascade, chrome, shutters, citizens, onlookers) | 204 |
-| StoopStreet (+ kerb foreground) | 200-232 |
-| BlueprintStreet (unchanged: the load control) | 141-180 |
-| BlueprintWall (+ heads foreground) | 209 |
-| MakersLane | 130-225 |
-| NoticeboardCorner | 178 |
-| DomeCity | 142 |
-| TerraceHill (during the 6x pull-back; haze bands replace ~14 far rows) | 152 |
-| OldQuarter (+ railing) | 148 |
+| GovernmentPlaza (S01 demo: cascade, chrome, shutters, 10 citizens, 3 onlookers) | 133 |
+| StoopStreet (+ 3 walkers, planter, bike, kerb + edge figure) | 127 |
+| BlueprintStreet (broken-stroke grid in 3 weight groups, sheet edge, margin) | 146 |
+| MakersLane (+ 3 passers, cart, bike, awnings / shutters batched per house) | 116 |
+| DomeCity (+ parapet, observer, 7 BrowserChrome windows, jittered dots) | 115 |
+| TerraceHill (during the 6x pull-back, + 2 standers, glow rings) | 116 |
+| OldQuarter (+ rooftops, 2 walkers, planter, bike) | 125 |
 
-(KitDemo, for comparison: ~113 ms/frame idle.) Rows, cities and terraces are batched (a few paths per house / row);
+The people layer costs ~5-8 ms per walker (kit Person); the BrowserChrome windows on the dome ~1 ms each. Rows, cities
+and terraces stay batched (a few paths per house / row, the new shutters / awnings / bar dots ride in those batches);
 static paths are memoised at module level; real props only where they are big enough to read.
 
 ## 7. Gaps / notes for scene builders
 
 - Scene-owned by design: the sun (and its morphs), Pip, Bit's choreography (the plaza draws an idle Bit unless
-  `bit={false}`), citizens' / readers' timing beyond the slots, the beat overlays (`StoopBeats`, `TerraceRings`,
+  `bit={false}`), citizens' / readers' / walkers' timing beyond the slots (`people={{riseAt, walk}}`), where nobody
+  should be (`people={false}`: S04), the beat overlays (`StoopBeats`, `TerraceRings`,
   `DomeTallies`: the sets lane ships them, the scene places and times them), S04 ghosts and leaf, S08 glass tallies /
   attempters / stipple, S09 flashlight and "?" ripple (anchors: `stoopStreetDoors()`), S10 keeper / snail / bollard
-  (anchors: `stairPoint`, `terraceDoor`), the S11 progress bar (pass `windowSlot` for govB), crates and the makers'
-  cart.
+  (anchors: `stairPoint`, `terraceDoor`), the S11 progress bar (pass `windowSlot` for govB), crates and the ROLLING
+  makers' cart (the parked one in S06 is `MAKERS_LANE.furniture`; pass `furniture={false}` when the scene rolls its own).
+- Golden sets are previewed with `DemoWorld tod="golden"` (today's golden = the day sky + the core relight row): a scene
+  must give its World the same `tod` for the warm light fields; the sets no longer assume a cream sky.
 - The plaza's `built` cascade uses the core `<Look cascade>`; if a scene wants its own cascade, omit `cascadeAt`.
 - Sets read the props through `sets/propSlots.tsx`; `NoticeboardPlaceholder` is kept there only for reference.
+
+## 8. REQUESTS: need orchestrator / storyboard sign-off (review 5)
+
+**R1. GovernmentPlaza PEAK-1 layout (S01 hook / frame 0 / S11 end / S13 underlay).** The art director judged the v1 frame
+"a pleasant town square, not a peak" (architecture in a 0.32 H band, 36-44 px citizens, no visible near layer on a phone).
+The set now ships the PEAK layout (section 3, S1) as its only layout; the trade-off and every anchor it moves:
+
+| what | storyboard v1 | review 5 (shipped) | who must follow |
+|---|---|---|---|
+| building bases / horizon | 1200-1290 / VP (630, 1150) | 1400-1470 / VP (720, 1384) = 0.72 H | S01, S11, S13 framing notes |
+| architecture band | y 600-1208 (0.32 H) | y 600-1470 (0.45 H), the 4-building wall cut by both edges (>= 1.0 W) | storyboard composition text |
+| sun slot / frame-0 rise | (630, 800) r150 / (630, 850) | (720, 900) r155 / (720, 950), in a 150 px gap (x 640-790) | S01 / S11 sun, the S11 -> rest hop |
+| sun drift | free | <= ~12 px total in S01 (10 px/s default drift slides the glyph behind govD after ~3 s) | S01 scene |
+| govB lock box (S01 -> S02 dive) | (400, 1135) 16 x 20, zoom 3.25 | (543, 1318) 22 x 27, `PLAZA.dive` (535, 1264) zoom 2.4 -> screen (560, 1090) 52 x 65 (S02's landing unchanged) | S01 push-through `from`, scenes.json |
+| S11 close-up | cam (375, 793) zoom 1.85, sill 1010 | cam (518, 826) zoom 1.6 (lantern >= screen 603), sill 1122; window 333 px on screen (was ~389) | S11 camera, S10 -> S11 ring dive target size |
+| Pip's bollard | top (760, 1440) | top (812, 1426) | S01 / S11 / S13 Pip keys |
+| Bit | (200, 705) size 16 | (262, 742) size 22 | S01 / S13 / loop |
+| windows | govA 95,820,150,120; govB 270,860,210,150; govC 785,710,160,110; govD 775,960,155,120 | govA 118,906,144,108; govB 414,970,208,146; govC 812,734,132,106; govD 800,1004,146,124 | S01 chrome / shutter beats (times unchanged) |
+| citizens | 9 x 36-44 px at y 1240-1300 | 6 readable 55-75 px on the VP axis (feet 1452-1494) + 4 x ~40 px far texture | S01 citizens beat (`citizensAt`, `phonesAt` unchanged) |
+| near layer | 3 heads at y > 1700 (under the UI) | left onlooker in the visible band (head (52, 1452)) + 2 bottom heads; lamp post at the left edge (x 50), tree in front of govD | storyboard near-layer text |
+
+Cost of saying no: the set would need the v1 geometry back (git history, review 4); nothing else in the kit depends on
+it. Ask: approve the table (or name the anchors to keep), then the storyboard / scenes.json numbers above follow.
+
+**R2. Frame-0 chrome (proposal for the storyboard).** `state="lineArt"` now draws the browser chrome in INK ONLY (bar
+outline, three dot rings, pill) by default, so a silent autoplay's first frame and the loop's last frame already say
+"building = website". The 'websites' beat still reveals the COLOURED chrome (tealDark bar, coloured dots) with the
+cascade. Storyboard v1 says plain windows in line art: pass `chrome={false}` to keep that.
+
+**R3. People in the storyboard.** Every street set now ships default walkers / standers (section 2, Street life). Scenes
+whose beats need an empty street (S04 "nobody did") must pass `people={false}`; the storyboard may want to name the
+walkers' `riseAt` / `walk` per scene.
+
