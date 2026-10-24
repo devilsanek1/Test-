@@ -24,10 +24,10 @@ import {ease as E, osc, prog, useTime} from '../time';
 import {rng, Seed} from '../rng';
 import {arc, line, Pt} from '../sketch';
 import {Layer} from './camera';
-import {atmos, deep, TodLike, TodPalette, todPal, useTodPal} from './atmosphere';
+import {ambient, atmos, deep, TodLike, TodPalette, useTodPal} from './atmosphere';
 import {HazeBand} from './sky';
 import {SwitchEvent, switchTimes, WinCell, windowPaths, WindowLook} from './windows';
-import {memoize, PathBuf, r1} from './util';
+import {memoize, mix, PathBuf, r1} from './util';
 import {exitScale, inkGone, isPaper, jit, lookPaint, screenSize, useCineState} from './state';
 
 // ---------------------------------------------------------------- palette steps
@@ -94,12 +94,15 @@ type BGeo = {
   j: number;
 };
 
-type RowGeo = {blds: BGeo[]; mass: string; cells: WinCell[]; cellB: Int32Array; all: Batch};
+type RowGeo = {blds: BGeo[]; mass: string; cells: WinCell[]; cellB: Int32Array; all: Batch; lmColors: Map<number, string>; trees: string; treeInk: string; lamps: {x: number; y: number; r: number; u: number}[]};
 
 type Batch = {fills: Map<number, string>; roofs: Map<number, string>; shades: Map<number, string>; bands: Map<number, string>; rim: string; awning: string; tops: string; extras: string; ink: string[]; inkThin: string[]; outline: string};
 
 /** Stroke width multipliers of the three hands a row's buildings are drawn with. */
 const WCLASS = [0.85, 1, 1.18];
+
+/** Facades of a back-lit row (the sun behind it): shadow values only. */
+const BACK_FACADE = [palette.teal, palette.tealDark, mix(palette.teal, palette.sage, 0.45)];
 
 export type RowParams = {
   base: number;
@@ -133,6 +136,9 @@ export type RowParams = {
   rimTop?: boolean;
   /** Window variety (skipped cells, sill plants, a balcony band per building). Default: inked rows with s >= 0.42. */
   variety?: boolean;
+  /** Street life along the row's foot (the street in front of it, seen from above): tree clumps over the building
+   *  bases and two lines of tiny lamp dots (both kerbs) that shrink and crowd toward the horizon row by row. */
+  street?: boolean;
 };
 
 /** A landmark replacing whatever stood in its footprint. kind 'colossal': a stepped, finned super-tower with a spire;
@@ -177,8 +183,15 @@ function buildRow(p: RowParams): RowGeo {
     protos.push({x, w, h, kind, tower, ci: r.int(0, nC - 1), roofCi: r.int(0, nC - 1), setback});
     x += w + r.range(-2, 14) * s;
   }
-  // colossal landmarks replace whatever stood in their footprint
-  for (const lm of p.landmarks ?? []) {
+  // colossal landmarks replace whatever stood in their footprint (a landmark with its own colour gets ci -1, -2, ...)
+  const lmColors = new Map<number, string>();
+  for (const lm0 of p.landmarks ?? []) {
+    let lm = lm0;
+    if (lm.color) {
+      const k = -1 - lmColors.size;
+      lmColors.set(k, lm.color);
+      lm = {...lm, ci: k};
+    }
     const lw = lm.w * s;
     const lx = lm.x - lw / 2;
     for (let i = protos.length - 1; i >= 0; i--) if (protos[i].x < lx + lw && protos[i].x + protos[i].w > lx) protos.splice(i, 1);
@@ -463,7 +476,25 @@ function buildRow(p: RowParams): RowGeo {
   });
   // low city mass behind / below the row (no sky shows under it)
   const mass = new PathBuf().rect(x0 - 400, base - 70 * s, x1 - x0 + 800, 2400).d;
-  return {blds, mass, cells, cellB: Int32Array.from(cellB), all: batch(blds, blds.map((_, i) => i))};
+  // street life: tree clumps over the building feet, lamp dots along both kerbs
+  const trees = new PathBuf();
+  const treeInk = new PathBuf();
+  const lamps: RowGeo['lamps'] = [];
+  if (p.street) {
+    const gr = rng(`street/${p.seed}`);
+    for (let tx = x0 + gr.range(0, 90 * s); tx < x1; tx += gr.range(70, 200) * s) {
+      if (gr.chance(0.35)) continue;
+      const rr = gr.range(9, 18) * s;
+      const n = gr.int(2, 3);
+      for (let k = 0; k < n; k++) trees.circle(tx + (k - (n - 1) / 2) * rr * 1.1 + gr.jitter(rr * 0.2), base - rr * gr.range(0.55, 0.95), rr * gr.range(0.8, 1.1));
+      if ((p.ink ?? 0) > 0) treeInk.raw(`M${r1(tx - rr * n * 0.6)} ${r1(base - rr * 0.2)}Q${r1(tx)} ${r1(base - rr * 2.1)} ${r1(tx + rr * n * 0.6)} ${r1(base - rr * 0.2)}`);
+    }
+    const step = 44 * s;
+    for (const [dy, ph] of [[5 * s, 0], [30 * s, 0.5]] as [number, number][]) {
+      for (let lx = x0 + step * ph; lx < x1; lx += step * gr.range(0.85, 1.15)) lamps.push({x: lx, y: base + dy, r: Math.max(1.1, 2.6 * s), u: (lx - x0) / Math.max(1, x1 - x0)});
+    }
+  }
+  return {blds, mass, cells, cellB: Int32Array.from(cellB), all: batch(blds, blds.map((_, i) => i)), lmColors, trees: trees.d, treeInk: treeInk.d, lamps};
 }
 
 function batch(blds: BGeo[], idx: number[]): Batch {
@@ -533,18 +564,33 @@ export type SkylineProps = Omit<RowParams, 'seed'> & {
   inkColor?: string;
   /** Mass colour under the row (default the darkest facade colour, tinted). */
   massColor?: string;
+  /** 'back': the sun is BEHIND the row (Monument light="back" logic): facades step to teal / tealDark, roofs tealDark,
+   *  roof top faces catch the sky (sage), lit windows are the only warm accents, and a peach rim runs along the
+   *  sun-facing roof edges. Default 'front'. */
+  light?: 'front' | 'back';
+  /** Street lamps (row `street`) switch on along the row (left -> right) over [at, at + dur]; lit from the start when
+   *  omitted. */
+  lampsOn?: {at: number; dur?: number};
 };
 
 type BState = {k: number; paper: boolean; ink: boolean; steady: boolean};
 
-export const Skyline: React.FC<SkylineProps> = ({seed = 'sky', depth = 0, tod, colors, roofColors, windows, at, build, beacons = 0, inkColor = palette.ink, massColor, ...row}) => {
+export const Skyline: React.FC<SkylineProps> = ({seed = 'sky', depth = 0, tod, colors, roofColors, windows, at, build, beacons = 0, inkColor = palette.ink, massColor, light = 'front', lampsOn, ...row}) => {
   const S = useCineState();
   const t = S.t;
   const p = useTodPal(tod);
-  const geo = rowGeo({...row, seed, nColors: (colors ?? p.facade).length});
-  const cols = (colors ?? p.facade).map((c) => atmos(c, depth, p));
-  const rcols = (roofColors ?? [palette.teal, palette.tealDark, palette.tan, palette.brown]).map((c) => atmos(c, depth, p));
-  const shades = (colors ?? p.facade).map((c) => atmos(darker(c), depth, p));
+  const back = light === 'back';
+  const facade = colors ?? (back ? BACK_FACADE : p.facade);
+  const geo = rowGeo({...row, seed, nColors: facade.length, rimTop: row.rimTop ?? back});
+  const lmC = (k: number) => geo.lmColors.get(k);
+  const cols = facade.map((c) => atmos(c, depth, p));
+  const rcols = (roofColors ?? (back ? [palette.tealDark, deep.teal78] : [palette.teal, palette.tealDark, palette.tan, palette.brown])).map((c) => atmos(c, depth, p));
+  const shades = facade.map((c) => atmos(darker(c), depth, p));
+  const topC = atmos(back ? palette.sage : ambient(palette.sand, p), depth, p, {raw: true});
+  const rimC = back ? atmos(palette.peach, depth, p, {raw: true}) : atmos(p.rim, depth, p, {raw: true});
+  const fillC = (k: number) => lmC(k) ?? cols[((k % cols.length) + cols.length) % cols.length];
+  const shadeC = (k: number) => (lmC(k) ? mix(lmC(k)!, palette.tealDark, 0.1) : shades[((k % shades.length) + shades.length) % shades.length]);
+  const roofC = (k: number) => lmC(k) ?? rcols[((k % rcols.length) + rcols.length) % rcols.length];
   const ev = windows?.events ?? [];
   const times = useMemo(() => switchTimes(geo.cells, ev, `${seed}/w`), [geo, JSON.stringify(ev), seed]);
   // build start per building
@@ -612,22 +658,27 @@ export const Skyline: React.FC<SkylineProps> = ({seed = 'sky', depth = 0, tod, c
         const d = [...b.fills.values(), ...b.roofs.values()].join('');
         if (d) o.push(<path key={`${key}pw`} d={d} fill={palette.white} />);
       } else {
-        b.fills.forEach((d, k) => o.push(<path key={`${key}f${k}`} d={d} fill={cols[k % cols.length]} />));
-        b.roofs.forEach((d, k) => o.push(<path key={`${key}r${k}`} d={d} fill={rcols[k % rcols.length]} />));
-        b.shades.forEach((d, k) => o.push(<path key={`${key}s${k}`} d={d} fill={shades[k % shades.length]} />));
-        b.bands.forEach((d, k) => o.push(<path key={`${key}b${k}`} d={d} fill={shades[k % shades.length]} />));
-        if (b.rim && row.rimSide !== 'none') o.push(<path key={`${key}rim`} d={b.rim} fill={atmos(p.rim, depth, p, {raw: true})} />);
+        if (b.tops) o.push(<path key={`${key}tp`} d={b.tops} fill={topC} />);
+        b.fills.forEach((d, k) => o.push(<path key={`${key}f${k}`} d={d} fill={fillC(k)} />));
+        b.roofs.forEach((d, k) => o.push(<path key={`${key}r${k}`} d={d} fill={roofC(k)} />));
+        b.shades.forEach((d, k) => o.push(<path key={`${key}s${k}`} d={d} fill={shadeC(k)} />));
+        b.bands.forEach((d, k) => o.push(<path key={`${key}b${k}`} d={d} fill={shadeC(k)} />));
+        if (b.rim && (row.rimSide !== 'none' || back)) o.push(<path key={`${key}rim`} d={b.rim} fill={rimC} />);
         if (b.awning) o.push(<path key={`${key}aw`} d={b.awning} fill={atmos(palette.peach, depth, p, {raw: true})} />);
       }
     }
     if (ink) {
       if (rowInk) {
-        if (b.ink) o.push(<path key={`${key}i`} d={b.ink} fill="none" stroke={inkColor} strokeWidth={row.ink} strokeLinecap="round" strokeLinejoin="round" />);
-        if (b.inkThin) o.push(<path key={`${key}it`} d={b.inkThin} fill="none" stroke={inkColor} strokeWidth={(row.ink ?? 2) * 0.62} strokeLinecap="round" />);
+        // three hands per row (0.85 / 1 / 1.18 x the row's ink width)
+        b.ink.forEach((d, c) => d && o.push(<path key={`${key}i${c}`} d={d} fill="none" stroke={inkColor} strokeWidth={r1((row.ink ?? 2) * WCLASS[c] * 10) / 10} strokeLinecap="round" strokeLinejoin="round" />));
+        b.inkThin.forEach((d, c) => d && o.push(<path key={`${key}it${c}`} d={d} fill="none" stroke={inkColor} strokeWidth={r1((row.ink ?? 2) * 0.62 * WCLASS[c] * 10) / 10} strokeLinecap="round" />));
       } else if (paper) {
         // fill-only row in the paper state: a hairline outline so it reads as line art
         o.push(<path key={`${key}po`} d={b.outline} fill="none" stroke={inkColor} strokeWidth={1.3} strokeLinejoin="round" />);
-      } else if (b.inkThin) o.push(<path key={`${key}ant`} d={b.inkThin} fill="none" stroke={atmos(darker(p.facade[0]), depth, p)} strokeWidth={Math.max(0.8, 2.2 * row.s)} strokeLinecap="round" />);
+      } else {
+        const d = b.inkThin.join('');
+        if (d) o.push(<path key={`${key}ant`} d={d} fill="none" stroke={atmos(darker(facade[0]), depth, p)} strokeWidth={Math.max(0.8, 2.2 * row.s)} strokeLinecap="round" />);
+      }
     }
     return o;
   };
@@ -643,10 +694,13 @@ export const Skyline: React.FC<SkylineProps> = ({seed = 'sky', depth = 0, tod, c
     })();
     const W = windowPaths(geo.cells, ev, times, t, windows ?? {}, 1, {keep});
     const lit = (windows?.lit ?? p.windowLit).map((c) => atmos(c, depth * 0.6, p, {raw: true}));
-    const dark = atmos(windows?.dark ?? p.windowDark, depth, p, {raw: true});
+    const dark = atmos(windows?.dark ?? (back ? deep.teal78 : p.windowDark), depth, p, {raw: true});
     if (W.dark && !windows?.noDark) out.push(<path key="wd" d={W.dark} fill={dark} />);
     W.lit.forEach((d, i) => d && out.push(<path key={`wl${i}`} d={d} fill={lit[i % lit.length]} />));
     if (W.blinds) out.push(<path key="wb" d={W.blinds} fill={atmos(windows?.blindColor ?? palette.tan, depth, p)} />);
+    // sill plants / balcony slabs over the panes (inked rows only)
+    const ex = allSteady ? geo.all.extras : steadyIdx.map((i) => geo.blds[i].extras).join('');
+    if (ex) out.push(<path key="ex" d={ex} fill={atmos(back ? palette.sage : palette.teal, depth, p, {raw: true})} />);
     if (beacons > 0) {
       const pb = new PathBuf();
       geo.blds.forEach((b, i) => {
@@ -654,6 +708,23 @@ export const Skyline: React.FC<SkylineProps> = ({seed = 'sky', depth = 0, tod, c
       });
       if (!pb.empty) out.push(<path key="bc" d={pb.d} fill={palette.peach} />);
     }
+  }
+  // street life: trees over the building feet, lamp dots popping on along the street
+  if (geo.trees && S.look.fills === 'color' && (!starts || t >= Math.max(...starts.st)) && S.e <= 0.3) {
+    out.push(<path key="tr" d={geo.trees} fill={atmos(back ? deep.teal78 : palette.teal, depth, p, {raw: true})} />);
+    if (geo.treeInk && S.look.ink) out.push(<path key="tri" d={geo.treeInk} fill="none" stroke={inkColor} strokeWidth={Math.max(0.8, (row.ink ?? 1) * 0.5)} strokeLinecap="round" />);
+  }
+  if (geo.lamps.length && S.look.fills === 'color' && S.e <= 0.05) {
+    const pb = new PathBuf();
+    for (const l of geo.lamps) {
+      if (lampsOn) {
+        const ta = lampsOn.at + (lampsOn.dur ?? 1) * l.u;
+        if (t < ta) continue;
+        const k = t - ta < 0.12 ? 1.6 : 1;
+        pb.circle(l.x, l.y, l.r * k);
+      } else pb.circle(l.x, l.y, l.r);
+    }
+    if (!pb.empty) out.push(<path key="lp" d={pb.d} fill={palette.peach} />);
   }
   // buildings rising / sinking: one group each, scaled about their base
   for (const i of moving) {
@@ -724,6 +795,15 @@ export type EndlessCityProps = {
   layered?: boolean;
   /** Render extra things inside a row's layer (behind = before the row, front = after). */
   inRow?: (info: RowInfo) => {behind?: React.ReactNode; front?: React.ReactNode} | null;
+  /** Vanishing point x (the horizon is `horizon`): roofs below the horizon get top faces. Default 540. Pass null for
+   *  none. */
+  vpX?: number | null;
+  /** Street life (trees, lamp dots) on rows with s >= 0.15. Default true. */
+  street?: boolean;
+  /** Rows nearer than this index are back-lit (Skyline light="back"). Default: none. */
+  backFrom?: number;
+  /** Lamps switch on (all rows, near rows a little later). */
+  lampsOn?: {at: number; dur?: number};
 };
 
 export const EndlessCity: React.FC<EndlessCityProps> = ({
@@ -749,6 +829,10 @@ export const EndlessCity: React.FC<EndlessCityProps> = ({
   beacons = 0,
   layered = true,
   inRow,
+  vpX = 540,
+  street = true,
+  backFrom,
+  lampsOn,
 }) => {
   const p = useTodPal(tod);
   const info = cityRows({horizon, nearY, rows, nearS, farS, depthNear, depthFar, parallaxNear});
@@ -778,6 +862,10 @@ export const EndlessCity: React.FC<EndlessCityProps> = ({
               build={rb}
               beacons={beacons}
               rimSide="right"
+              vp={vpX === null ? undefined : [vpX, horizon]}
+              street={street && ri.s >= 0.15}
+              light={backFrom !== undefined && ri.i >= backFrom ? 'back' : 'front'}
+              lampsOn={lampsOn ? {at: lampsOn.at + ri.i * 0.08, dur: lampsOn.dur} : undefined}
               {...rowProps?.(ri)}
             />
             {haze > 0 && ri.i < rows - 1 ? <HazeBand y={ri.base - 30 * ri.s} h={nextBase - ri.base + 200} color={p.haze} opacity={haze * (0.55 + 0.45 * ri.depth)} wave={10 * ri.s + 3} seed={`${seed}/hz${ri.i}`} /> : null}

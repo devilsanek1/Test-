@@ -83,6 +83,15 @@ def text_components(mask, a, kind):
         if fill > 0.75 and min(w, h) > 0.2 * em:
             continue
         keep[j] = True
+    # words and lines: a glyph has at least 2 other glyphs on its line within 1.6 em (drops stray ink fragments)
+    idx = np.nonzero(keep)[0]
+    if len(idx):
+        cx = st[idx, 0] + st[idx, 2] / 2.0
+        cy = st[idx, 1] + st[idx, 3] / 2.0
+        for k, j in enumerate(idx):
+            nb = np.sum((np.abs(cy - cy[k]) < 0.45 * em) & (np.abs(cx - cx[k]) < 1.6 * em)) - 1
+            if nb < 2:
+                keep[j] = False
     return keep[lab]
 
 
@@ -300,9 +309,16 @@ def main(argv=None):
     if not args.no_ui_zones:
         for z in ZONES:
             flags = [bool(zr.get(z, {}).get('new_px', 0) > 0) and i not in trans_frames for i, zr in enumerate(zones)]
+            merged = []
             for (s, e_) in Q.runs(flags):
+                if merged and s - merged[-1][1] <= int(round(0.5 * fps)):
+                    merged[-1][1] = e_
+                else:
+                    merged.append([s, e_])
+            for (s, e_) in merged:
                 mx = max(zones[x][z]['new_px'] for x in range(s, e_ + 1))
-                add('ui-zone', 'warning', s, e_, f"new element in the {z} UI zone ({mx:.0f} px²): is it important? platform UI covers it", zone=z, px=round(mx))
+                add('ui-zone', 'warning', s, e_, f"new element(s) in the {z} UI zone (largest {mx:.0f} px²): anything important there? "
+                    f"the platform UI covers it", zone=z, px=round(mx))
         rail = np.array([zr.get('rail', {}).get('edges', 0) for zr in zones])
         for (s, e_) in Q.runs(list(rail > 0.08)):
             if e_ - s + 1 >= int(0.5 * fps):

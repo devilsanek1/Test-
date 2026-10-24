@@ -1,4 +1,4 @@
-# ENGINE v2.1: cheat-sheet for scene agents (core lane)
+# ENGINE v2.2: cheat-sheet for scene agents (core lane)
 
 Full-bleed, cinematic, hand-drawn ink. Read `docs/BRIEF.md` (BALANCE NOTE + CINEMATIC DIRECTION), then this page.
 Camera / light / skyline / city kit: **`docs/CINE.md`** (`src/lib/cine`). Mascot: **`docs/mascot.md`** (`src/lib/mascot`).
@@ -6,8 +6,8 @@ Look: `docs/style_bible.md` + `docs/style_bible_ref2.md` (full-bleed numbers win
 (all of them live in `MOTION`, `src/lib/spec.ts`).
 
 ```ts
-import {World, ShotCam, Tod, useTod, Sun, Ink, Fill, Drawn, rect, line, Plane, wallQuad, Person, Crowd, MOTION,
-  palette, skies, world, skyCaption} from '../lib';
+import {World, ShotCam, Tod, TodAnchor, useTod, Sun, Ink, Fill, Drawn, rect, line, Plane, wallQuad, eyeLevel, Person,
+  Crowd, ExitShrink, MOTION, palette, skies, world, skyCaption} from '../lib';
 import {Layer, BigSun, EndlessCity, Skyline} from '../lib/cine';
 import {Elephant, ElephantTimeline} from '../lib/mascot';
 ```
@@ -28,8 +28,10 @@ import {Elephant, ElephantTimeline} from '../lib/mascot';
    idle, crowd bob, walkers, lights switching on in staggers.
 7. **People are always seen from behind** (`Person`: ears, neck, back of the head, no faces).
 8. **Ink weight by depth** (`depthInk`), far things get NO ink.
-9. **One colossal element per scene, tiny people / mascot against it**, eye-level or low camera — with restraint
-   (balance note): mostly gentle pushes (World `push`), 2–3 Arcane-scale peaks in the whole film.
+9. **One colossal element per scene, tiny people / mascot against it**, and an **EYE-LEVEL camera** (section 2b:
+   the lens at ~1.1 x a standing person's height, so every head sits just under the horizon; never 2-4 x head height,
+   which looks DOWN on a diorama and makes the viewer feel big) — with restraint (balance note): mostly gentle pushes
+   (World `push`), 2–3 Arcane-scale peaks in the whole film.
 10. **Captions own the sky band** (`skyCaption.clipTop`–`clipBottom`, screen space): keep busy detail, skyline tops and
     sky-band steps out of it (tops below y 600). Dark ink on light skies, white on dark skies (`captionTone`).
     `scripts/sheet.sh` checks it for you (section 11).
@@ -42,6 +44,26 @@ import {Elephant, ElephantTimeline} from '../lib/mascot';
   and the World `push` show beyond the frame. The sky is always infinite (World sizes it).
 - **Safe zones** (`safe`): platform UI covers the top, the bottom and a right rail. The bottom = ground and foreground
   framing only.
+
+### 2b. The camera: eye level (the viewer feels small)
+
+Reference 2 keeps the lens at **1.10-1.14 x a standing person's height** (f_1, f_42 measured). Consequence: every
+standing head, near or far, sits in a thin band **just under the horizon** (9 % of its feet's distance below it); near
+people tower over the lower frame (0.30-0.45 H), the crowd converges ON the horizon line, towers rise above it. Place
+people from ONE camera (`eyeLevel`, persp.tsx) instead of guessing scales:
+
+```tsx
+const cam = eyeLevel({horizon: world.horizon, vpx: 560});     // ratio 1.1 (camera / person height)
+cam.height(1500)                 // px tall for feet at y 1500: (1500 - 768) / 1.1 = 665
+<Person x={cam.x(-0.3, 1500)} y={cam.hip(1500, 150)} s={cam.s(1500, 150)} legs legH={150} />   // X = person-heights
+<Crowd eye={{horizon: world.horizon}} far={{y: 790, x0: cam.x(0.3, 790), x1: cam.x(0.8, 790)}}
+       near={{y: 1190, x0: cam.x(0.32, 1190), x1: cam.x(0.82, 1190)}} rows={13} />    // y = FEET lines
+// set dressing in person-heights at its feet line: a door 1.2, a house eave 1.1-1.4, a palm 5-8, a car 0.85 tall
+```
+
+Check a still: `measureEye(feetY, headTopY, horizon)` = camera / person height, **target 1.0-1.2** (KitDemo v3:
+1.05 / 1.05 / 0.97 before the hair calibration; nominal 1.1). Peaks may go lower (worm's eye: heads above the horizon)
+but never higher than ~1.3. The reference figure is `src/dev/KitDemo.tsx` (section 10).
 
 Current values (always reference the TOKEN in code, never the literal):
 
@@ -68,39 +90,44 @@ Current values (always reference the TOKEN in code, never the literal):
 ```tsx
 import React from 'react';
 import {World, Sun, Fill, Ink, Drawn, Plane, wallQuad, Building, Crowd, Person, Tod, Palm, hline, rect, rectPath,
-  palette, stroke, world, useTime, WiperComponent, FigureWiper} from '../lib';
+  palette, stroke, world, useTime, eyeLevel, ExitShrink, WiperComponent, FigureWiper} from '../lib';
 import {ElephantTimeline} from '../lib/mascot';
 
-const H = 900;                       // this scene's horizon
+const H = world.horizon;             // 768: reference 2's 0.40 H
 const VP: [number, number] = [560, H];
+const cam = eyeLevel({horizon: H, vpx: VP[0]});   // the lens at 1.1 x person height (section 2b)
 
 const Scene07: React.FC = () => {
-  const t = useTime();               // scene seconds; VO word at 32.715 s with start 30.5 => t = 2.215
+  const t = useTime();               // scene seconds; VO word at 35.162 s with start 32.947 => t = 2.215
   return (
-    // one sky + one light: each key with `tod` relights EVERY fill with the sky's own down-wipe (no fade);
-    // `push` = reference 2's per-shot gentle zoom (+6 % over 2 s, in-out sine, about world.vp)
+    // one sky + one light: each key with `tod` wipes the sky down and relights every OBJECT in one frame as the
+    // sky edge passes it (no fade, no edge through figures); `push` = reference 2's per-shot gentle zoom (+6 % / 2 s)
     <World sky={[{t: 0, tod: 'golden'}, {t: 4.2, tod: 'dusk', wipe: 'down'}]} push={{anchor: VP}}>
       {/* 1 sky-level: the sun sits on the horizon, beats on stressed words, never perfectly still */}
-      <Sun cx={560} cy={830} horizon={H} beats={[1.33, {t: 2.215, amp: 0.13}]} drift={[10, 0]} />
-      {/* 2 far layer: fill-only, its own relight row (night: sage -> the night haze step) */}
-      <Tod role="far"><Palm x={820} y={H + 20} h={180} at={0.4} seed="p7" /></Tod>
+      <Sun cx={560} cy={690} horizon={H} beats={[1.33, {t: 2.215, amp: 0.13}]} drift={[10, 0]} />
+      {/* 2 far layer: fill-only, its own relight row (night: sage -> the night haze step); palm 6 person-heights */}
+      <Tod role="far"><Palm x={cam.x(4.5, 800)} y={800} h={cam.height(800) * 6} at={0.4} seed="p7" /></Tod>
       {/* 3 ground: a flat fill + one long ink line (structural overshoot past the frame) */}
       <Fill rect={[-140, H, 1360, 1160]} color={palette.mintPale} offset={false} />
       <Ink d={hline(-60, 1140, H, {seed: 'h7'})} at={0.1} width={stroke.ink} />
-      {/* 4 a facade receding to the vanishing point: draw it flat, map it onto the wall plane */}
-      <Plane quad={wallQuad({vp: VP, x: -60, top: 420, bottom: 1300, depth: 0.7})} w={1400} h={880}>
-        <Building x={0} y={880} w={600} floors={4} floorH={220} at={0.3} seed="b7" color={palette.cream} lightAt={4.5} />
+      {/* 4 a facade receding to the vanishing point: draw it flat, map it onto the wall plane; its near edge (x -60)
+             stands at feet y 1050 and is 2.2 person-heights tall (two low storeys: the top stays under the caption band) */}
+      <Plane quad={wallQuad({vp: VP, x: -60, top: 1050 - cam.height(1050) * 2.2, bottom: 1050, depth: 0.7})} w={1400} h={440}>
+        <Building x={0} y={440} w={600} floors={2} floorH={220} at={0.3} seed="b7" color={palette.cream} lightAt={4.5} />
       </Plane>
-      {/* 5 an organic queue from behind walking into the distance (ink by depth, far rows fill-only, rim light) */}
-      <Crowd far={{y: 920, x0: 520, x1: 600, s: 0.08}} near={{y: 1450, x0: 260, x1: 860, s: 0.9}}
-             rows={9} at={1.0} span={1.8} build="rise" order="back" legRows={9} seed="c7"
-             jitter={{x: 0.3, y: 0.15, scale: [0.6, 1.1]}} rim="left" />
+      {/* 5 an organic queue from behind walking into the distance: EYE-LEVEL rows (y = feet; scales from the camera,
+             heads hug the horizon), ink by depth, far rows fill-only, rim light; rise builds front -> back */}
+      <Crowd eye={{horizon: H}} far={{y: 790, x0: cam.x(0.3, 790), x1: cam.x(0.8, 790)}} near={{y: 1190, x0: cam.x(0.3, 1190), x1: cam.x(0.85, 1190)}}
+             rows={12} at={1.0} span={1.8} build="rise" seed="c7" jitter={{x: 0.3, y: 0.15, scale: [0.62, 1.06]}} rim="left" />
       {/* 6 an actor: ink first, its fill lands 0.13-0.27 s later */}
       <Drawn d={rect(700, 1200, 160, 120, {seed: 'sign7'})} fillD={rectPath(700, 1200, 160, 120)} fill={palette.peach} at={2.1} width={stroke.inkBold} />
-      {/* 7 the mascot (other lane's API) */}
-      <ElephantTimeline x={640} y={1640} scale={1} t={t} seed={7} keys={[{t: 0, pose: 'sit-back'}]} />
-      {/* 8 the queue starts at the camera: a hero walker cut by the frame bottom (sleeves, hands, rim strip) */}
-      <Person x={300} y={1760} s={1.5} at={0.4} build="rise" legs legH={150} walk={1.7} ink={stroke.inkBold} seed="fg7" />
+      {/* 7 the mascot (other lane's API): its un-build is a shrink to its feet (never `draw={1 - exit}`: a fade) */}
+      <ExitShrink x={480} y={1540}>
+        <ElephantTimeline x={480} y={1540} scale={1.4} t={t} seed={7} keys={[{t: 0, pose: 'sit-back'}]} />
+      </ExitShrink>
+      {/* 8 a hero walker from the same camera (0.34 H, head just under the horizon; sleeves, hands, rim strip) */}
+      <Person x={cam.x(-0.3, 1480)} y={cam.hip(1480, 150)} s={cam.s(1480, 150)} at={0.4} build="draw" legs legH={150}
+              walk={1.7} ink={stroke.inkBold} seed="fg7" />
     </World>
   );
 };
@@ -112,12 +139,12 @@ export const Wiper: WiperComponent = (p) => <FigureWiper {...p} color={palette.t
 Wiper.captionRegions = (p) => FigureWiper.captionRegions!({...p, color: palette.teal});
 ```
 
-`src/data/scenes.json` entry (generated by `node scripts/gen-scenes.mjs` from `docs/storyboard.json`; manual tweaks
-go in `src/data/scenes.overrides.json`). Give a tone key the same `wipe` as its sky key so the caption colour follows
+`src/data/scenes.json` entry (generated by `node scripts/gen-scenes.mjs` from `docs/storyboard_v2voice.json`, the
+storyboard warped onto the v2 voice; manual tweaks go in `src/data/scenes.overrides.json`). Give a tone key the same `wipe` as its sky key so the caption colour follows
 the sky edge:
 
 ```json
-{"id": "S07", "start": 30.5, "end": 35.52,
+{"id": "S07", "start": 32.947, "end": 38.566,
  "transitionIn": {"type": "foreground-wipe", "dur": 0.38, "element": "scene", "dir": "right"},
  "captionTone": [{"t": 0, "tone": "dark"}, {"t": 4.2, "tone": "light", "wipe": "down", "dur": 0.4}]}
 ```
@@ -141,13 +168,13 @@ World too (a flat World consumes the transition camera, so nothing is applied tw
 
 | API | what |
 |---|---|
-| `<World sky tod? horizon? push? stage? overlay?>` | scene root. Full-bleed SVG in world px, the sky slab behind everything (it collapses LAST in an un-build). `sky` = colour \| bands `string[]` (top → horizon, all steps below y 600) \| a cine `TOD.x` palette (its bands + its name) \| `SkyKey[]` = `{t, color?, tod?, wipe?: 'down'\|'up'\|'left'\|'right'\|'snap', dur? = 0.4}`. A key's `tod` relights the whole scene with the same wipe (the scene is drawn twice during the wipe, ~1.5x render cost for 0.4 s). A key with only `tod` takes `todSky[tod]`. |
-| `push` | `true` or `{to = 1.06, dur = 2, at = 0, anchor = world.vp, ease = in-out sine}` (`MOTION.camera.push`): the gentle per-shot zoom every shot should carry (ref 2: +1.3…+5.9 %, starting with the cut). < 1 = pull-out (ref 2's night act). |
+| `<World sky tod? horizon? push? stage? overlay?>` | scene root. Full-bleed SVG in world px, the sky slab behind everything (it collapses LAST in an un-build). `sky` = colour \| bands `string[]` (top → horizon, all steps below y 600) \| a cine `TOD.x` palette (its bands + its name) \| `SkyKey[]` = `{t, color?, tod?, wipe?: 'down'\|'up'\|'left'\|'right'\|'snap', dur? = 0.4}`. A key's `tod` relights the scene in step with the sky wipe: the SKY slab wipes, and every OBJECT flips whole in one frame when the sky edge reaches its centre / its `<TodAnchor>` (motion spec #12: per-object pops staggered by height; no clip edge through figures; drawn once, no extra render cost). A key with only `tod` takes `todSky[tod]`. |
+| `push` | `true` or `{to = 1.06, dur = 2, at = 0, anchor = world.vp, ease = in-out sine}` (`MOTION.camera.push`): the gentle per-shot zoom every shot should carry (ref 2: +1.3…+5.9 %, starting with the cut). < 1 = pull-out (ref 2's night act). After a camera-continuous transition whose zoom runs the other way (dir `'out'` + a push in, `'in'` + a pull-out) the push waits until the transition has settled (`pushStart`, also in ShotCam): no camera bounce. |
 | `stage` | `'flat'` (default): the transition camera moves the scene as one plane and is CONSUMED (children see `useStageCam()` = rest). `'context'`: World does not apply it; `<ShotCam>` / `<CineCamera stage>` folds it in with parallax. `useWorldStage()` tells which. |
-| `<Tod value? role? map?>`, `useTod()`, `relight(c, tod, role)` | time-of-day relight (lib/tod.tsx). Every `<Fill>` maps its colour through the shared step table `todSteps` (theme.ts, reference 2 measured: only light fields step down, whites stay white, ink / sun / highlight never move). Roles: `'far'` (hills, far rows: night sage → `nightFar`), `'cloud'`, `'framing'` (corner fronds: one step lighter than the night sky). Feed raw-SVG cine components `tod={useTod()}` so they relight in the same frame. |
+| `<Tod value? role? map?>`, `<TodAnchor at>`, `useTod(at?)`, `relight(c, tod, role)` | time-of-day relight (lib/tod.tsx). Every `<Fill>` maps its colour through the shared step table `todSteps` (theme.ts, reference 2 measured: only light fields step down, whites stay white, ink / sun / highlight never move). Roles: `'far'` (hills, far rows: night sage → `nightFar`), `'cloud'`, `'framing'` (corner fronds: a darker teal silhouette on the dusk sky, one step lighter than the night sky). `<TodAnchor at={[x, y]}>` = everything inside flips together (kit components anchor themselves: Person, Building, Wall, Tree, Palm, Car, WaterTower, LampPost, UtilityPole, Noticeboard, Window, Door, Cloud). Raw-SVG cine pieces: `tod={useTod([cx, cy])}` (their own centre, local coords) so each flips when the edge reaches it. `node scripts/engine-numbers.mjs --check` fails if any relit fill lands within one palette step (1.15:1) of its sky (`relightProblems`). |
 | `skies.*`, `todSky`, `todTone` | sky colours and the caption tone that reads on each time of day. |
 | `<ScreenSpace>` | children ignore the transition camera AND the push (HUD-like layers inside a World). |
-| `useScene()` | `{id, start, end, dur}` (VO seconds) |
+| `useScene()` | `{id, start, end, dur, transitionIn?: {type, dur, dir?}}` (VO seconds) |
 | `useTransition()` | `{type, phase: 'in'\|'out', p}` while this scene is entering/leaving, else null |
 | `<ShotCam push? keys? handheld?>`, `pushKeys()` | multiplane camera with the transition camera folded in (see 3). |
 | `<Film scenes components wipers captions offset? only?>` | Main's sequencer (you don't render it). Captions (with tone regions, section 6) + soundtrack (`public/mix.wav` if present, else `public/vo.mp3`). |
@@ -166,14 +193,15 @@ offset to its range, its own un-build) and the dev compositions in `src/dev/regi
 | `foreground-wipe` | `dur` 0.8, `element` 'figure'\|'pole'\|'foliage'\|'scene', `dir` 'right', `color`, `captionTone` | something passes right in front of the lens; old scene on the unswept side, new scene behind it. `'scene'` = the OUTGOING module's `export const Wiper: WiperComponent` ({x, p, dir, color}, screen px, opaque over x±90 for the full height; give it a static `captionRegions`). Captions are split at the wipe edge and take the wiper's tone over the element (built-ins: hooded figure / pole → white, foliage per crown). Both scenes drift 50 px. |
 | `push-through` | `dur` 1.1, `from` [x,y] (outgoing point), `to` [x,y] (incoming point, default centre), `zoom` 7, `bridge` colour | the outgoing scene zooms into `from` until it fills the frame (match its colour to the incoming scene), optional 3-frame flat `bridge`, the incoming scene pulls back out of `to`. |
 | `unbuild` | `dur` 0.5 | the outgoing scene un-builds ON TOP of the incoming one, which is already rendered at local t < 0: design your t < 0 state (ink-only line art via `<Look fills="paper">` or nothing). The new caption tone follows the collapsing slab edge. |
-| last scene `transitionOut` | `{type: 'unbuild', dur, loop: true, captionAt}` | un-builds into the FIRST scene at its t < 0 state (the loop). Captions roll back to page 1 at `captionAt` (default end − 0.22). Frame 0 must equal that state: the seam is mid-motion. |
+| last scene `transitionOut` | `{type: 'unbuild', dur, loop: true, captionAt}` | un-builds into the FIRST scene at its t < 0 state (the loop). Captions roll back to page 1 at `captionAt` (default end − 0.22). Frame 0 must equal that state AND the seam must be MID-MOTION (spec T6): start the opening's first motions slightly BEFORE t 0, e.g. `<Sun rise={{at: -0.12, ...}}>` and `<Look cascade={{at: -0.05, ...}}>` (negative start times are allowed everywhere), so the underlay is already moving while it is revealed (KitDemo: 358→359→0→1 = 0.6 / 4.2 / 2.3 % of pixels change; no held frames). |
 
 Outgoing and incoming scenes keep rendering through overlaps (they hold their end state; local time keeps running).
 
 ## 6. Captions
 
 - Data: `src/data/captions.json` = `[{s, e, lines: [{text, s}], highlights: [{text, s}], style?}]`, all **word-start**
-  times. Regenerate: `node scripts/gen-captions.mjs` (pages from `assets/timing.json`) or
+  times on the CURRENT voice (v2, `assets/timing.json`, 77.76 s; the last page ends exactly on it: checked by
+  `engine-numbers --check` and `gen-scenes`). Regenerate: `node scripts/gen-captions.mjs` (pages from `assets/timing.json`) or
   `node scripts/gen-captions.mjs --storyboard` (paging + multi-word highlights from `docs/storyboard.json`, times
   re-derived from timing.json; the current file). Overrides: `src/data/captions.overrides.json` (by page index).
 - Motion (measured, applied in `SkyCaptions`): page change = whole stack scrolls up (clip height + 20) in 0.45 s
@@ -199,7 +227,7 @@ Outgoing and incoming scenes keep rendering through overlaps (they hold their en
 | `<Ink d at? dur? width? color? order='seq'\|'all' pace='spec'\|'free' open? taper? dash?>` | pen draw-on. **Spec pacing**: every subpath is one stroke of 0.10–0.20 s whatever its length, successive strokes start 1 frame apart (3–6 in flight). `dur` only spreads the stroke starts. Long strokes taper. Un-build: lines loosen, then retract. `inkDrawTime(d, dur?)` = total time. |
 | `<Fill d\|rect color at? mode dir? dur? offset? exitMode? opacity? lookExempt?>` | flat fill, misregistered (`misreg`) by default, relit by the current `<Tod>`. Modes: `pop` (default: 20%→100% about its centre in 0.12 s), `snap` (1 frame), `wipe` (linear, 0.12 s; `dir`), `grow` (from an edge, out-expo 0.2 s), `spring` (7% overshoot), `none`. Exit: shrinks to its centre; fills covering ≥ ~55% of the frame are the slab (wipe down, last). |
 | `<Drawn d fill at ...ink>` | ink + its fill landing 0.13–0.27 s after the outline STARTS (seeded). |
-| `<Look fills='paper'\|'none'\|'color' ink? cascade={{at, origin, speed}}>` | render states: paper = ink on white fills (frame 0 / loop frame), `ink={false}` = fills only, `cascade` = paper until a wave from `origin` (the VP) reaches each fill (the opening fill cascade, ~0.3 s). The World sky keeps its colour. Raw-SVG (cine) rows do not read Look / exit: wrap them (KitDemo `CineRow`). |
+| `<Look fills='paper'\|'none'\|'color' ink? cascade={{at, origin, speed}}>` | render states: paper = ink on white fills (frame 0 / loop frame), `ink={false}` = fills only, `cascade` = paper until a wave from `origin` (the VP) reaches each fill (the opening fill cascade, ~0.3 s; `at` may be negative so the loop seam is mid-motion). The World sky keeps its colour. Raw-SVG (cine) rows do not read Look / exit: wrap them (KitDemo `CineRow`). |
 | sketch (`lib/sketch.ts`) | `line hline vline rect poly smooth circle ellipse blob arc wire wirePoint crown crownTicks glint hatch arrow check cross textLines wallTicks speedLines scribble` (ink paths: overshoot, drift, breaks, seeded) + closed fills `rectPath roundRect polyPath torso blob crown`. Memoised: calling them every frame is cheap. |
 | `<Plane quad w h>` + `wallQuad({vp, x, top, bottom, depth})`, `groundQuad(...)`, `frontQuad(...)`, `rayPoint(vp, p, k)` | **one-point perspective**: draw anything flat in plane-local px, it is projected onto the receding quad; strokes keep screen widths. Only Ink/Fill (and kit built from them) are projected. |
 | `XG`, `mat`, `Place` | affine groups that also work inside a Plane (folded into the projection). |
@@ -213,8 +241,9 @@ Outgoing and incoming scenes keep rendering through overlaps (they hold their en
 | `<Rise at dist=140 dur=0.33>` / `<Sink at>` | rise ~own height from below with out(exp) 0.33 s; sink = exit 0.2 s ease-in. Hide the entry behind something. |
 | `<Move from to at dur arc>`, `<Walk>`, `<Wobble>` (idle), `<Shake>`, `<Tween>` | slides, walks, idle life. |
 | `<Appear at outAt>` | 1-frame pop in/out. |
-| `<UnBuild at dur=0.5>` / `<NoExit>` / `useExit()` | local un-build with the measured recipe (loosen → fills shrink → ink retracts → slab collapses). The mascot ignores it: drive `<Elephant draw={1 - exit}>` yourself. |
-| Camera vocabulary | `MOTION.camera`: `ease` (default move), `slow` (4–6 s moves), `reveal` (crane / tilt), `settle` (starts in motion), `push` (per-shot zoom). The cine `CAM` presets are the same idea (see the table in 14). |
+| `<UnBuild at dur=0.5>` / `<NoExit>` / `useExit()` | local un-build with the measured recipe (loosen → fills shrink → ink retracts → slab collapses). |
+| `<ExitShrink x y>` | raw-SVG characters (the MASCOT) un-build by shrinking to their FEET anchor with the fills' ease-in window (~0.18 s of a 0.5 s un-build; a reversed pop). **Never** drive `<Elephant draw={1 - exit}>` / `drawOut` for an un-build: `draw < 1` ramps the mascot's fill OPACITY (a fade, rule 3). |
+| Camera vocabulary | `MOTION.camera` = THE vocabulary for both kits (the cine `CAM` presets carry identical values): `ease` in-out cubic (default move), `slow` in-out sine (4–6 s moves), `reveal` = cruise trapezoid(0.25, 0.35) (crane / tilt: peak 1.43 x its average speed), `settle` out-cubic (starts in motion), `push` (per-shot zoom), `peakPxPerFrame` 18 (flat ink strobes above ~15-20 px / frame: size long moves so the PEAK stays under it). `cruiseEase(acc, dec)` builds other cruises. |
 
 ## 9. The sun (a character)
 
@@ -235,8 +264,15 @@ Outgoing and incoming scenes keep rendering through overlaps (they hold their en
   'left'|'right'|false = reference 2's 3 px pure-white strip inside the outline (default 'left' for heroes). `walk={steps/s}`
   walks in place (move x / y / s yourself to walk into depth).
 - `Crowd` (rows far→near, depth ink via `crowdInk(s)`, far rows fill-only blobs, `build`, `order`, `limit`;
-  **`jitter={{x, y, scale: [min, max]}}`** for an organic queue (children, tall adults, overlapping pairs, feet on the
-  ground), **`rim`** for people with s ≥ 0.6, `heroFrom` (default 0.7) for sleeves / hands).
+  **`eye={{horizon, ratio?}}`**: rows' `y` are FEET lines and every scale comes from the eye-level camera (section 2b;
+  legs on every row); **`jitter={{x, y, scale: [min, max]}}`** for an organic queue (children, tall adults,
+  overlapping pairs, feet on the ground), **`rim`** for people with s ≥ 0.6, `heroFrom` (default 0.7) for sleeves /
+  hands). **`build='rise'`** fills front → back by default and a person RISES only where the entry is hidden (the row in
+  front already stands, or the front row's feet are at the frame bottom / `occluded`); everyone else pops, so nobody
+  sprouts out of bare pavement (`order='back'` + `'rise'` therefore needs an occluder to actually rise).
+- `Person` hero heads (lod 0, head > 60 px): a notched nape hairline and hair strands on light hair (never a smooth
+  skin-coloured disc); caps at hero size drop the strap opening and keep a non-skin nape; scarves sit below the
+  collar line (a scarf right under the head read as a beard under a face).
 - `Building` (+ **`lightAt` / `lit` / `litColor`**: windows switch on one by one at night), `Wall`, `Ground`, `Window`,
   `WindowGrid`, `Door`, `Tree`, `Bike`, `Bird`, `BirdsOnWire`, `LampPost`, `Festoon` (string lights, plane-safe),
   `UtilityPole`, **Town** (`Palm`, `Fronds` (also top-corner framing), `WaterTower`, `Car` (back view, `lightsOn`)),
@@ -244,21 +280,31 @@ Outgoing and incoming scenes keep rendering through overlaps (they hold their en
   `Cloud`, `Server`, `Laptop`, `Place`. Every component takes `at` (omit = already built) and a `seed`.
 - Built-in wipers: `FigureWiper` (a hooded passer-by), `PoleWiper`, `FoliageWiper` (each with `captionRegions`).
 
-Reference figure (`src/dev/KitDemo.tsx`): eye-level street, far city (cine `Skyline` rows) + far town on the lawns,
-an organic queue that starts at the camera with two hero walkers, corner fronds, day → dusk → night relight, loop.
+Reference figure (`src/dev/KitDemo.tsx` v3, copy its CAMERA block): an EYE-LEVEL street (lens 1.1 x person height,
+horizon world.horizon): every head in the band just under the horizon, a queue converging on the horizon line
+(`Crowd eye`), two hero walkers (0.30-0.34 H) and a passer-by cut by the left edge and the frame bottom, the mascot at
+the walkers' feet, a huge low sun flanked by far palms, a far skyline under the caption band, single-storey houses
+(left) and a long low row behind a picket fence (right) on receding planes, string lights, corner fronds,
+day → dusk → night (per-object relight), and an un-build that loops mid-motion.
 
 ## 11. Preview and check commands
 
 ```bash
 npx tsc --noEmit                                         # must be clean
 scripts/still.sh <Comp> <sec> out.png [--scale=0.5]      # one frame (Comp = Main, S01..S13, KitDemo, CineDemo, ...)
+#   still / sheet / strip bundle ONLY what the composition needs (render-frames --entry=auto): a dev composition gets a
+#   generated entry with just its own file, Main / S01.. use src/entry-film.ts (no dev previews), so another lane's
+#   half-written file can't break your previews. --entry=full = src/index.ts (everything, like the Studio).
 scripts/sheet.sh <Comp> <t0> <t1> <n> out.png [--scale=0.35] [--cols=N] [--no-capcheck]   # contact sheet + caption check
 scripts/strip.sh <Comp> <t0> <t1> out.png [--crop=WxH+X+Y] [--scale=0.5] [--step=1]  # EVERY frame: check motion
 node scripts/capcheck.mjs Main                           # caption legibility: 4 frames per scene + every transition window
 node scripts/capcheck.mjs S07 --verbose --viz=/tmp/cc    # one scene; --viz paints failing background pixels magenta
-node scripts/engine-numbers.mjs [--check]                # regenerate / verify the numbers block of this page
+node scripts/engine-numbers.mjs [--check]                # regenerate / verify the numbers block of this page; --check
+                                                         # also fails (STALE) if scenes.json / captions.json do not end
+                                                         # on the voice or a relight row vanishes into its sky
 node scripts/gen-captions.mjs --storyboard               # captions.json from storyboard paging + timing.json
-node scripts/gen-scenes.mjs                              # scenes.json from docs/storyboard.json (+ overrides)
+node scripts/gen-scenes.mjs                              # scenes.json from docs/storyboard_v2voice.json (+ overrides);
+                                                         # refuses to write unless the cut list ends on the voice
 npx remotion render src/index.ts Main out/main.mp4       # full render (shared 4-CPU machine: render ranges)
 ```
 
@@ -272,8 +318,9 @@ Look at your frames next to `assets/ref2/f_*.png` and `assets/ref/f_*.png` befor
 
 ## 12. Performance rules
 
-Measured (concurrency 2, 1080×1920): KitDemo v2.1 (crowd ~110 figures with hero detail, 2 planes, 4 festoons, cine
-skyline rows, palms) **~113 ms/frame**, **~167 ms/frame** during a time-of-day wipe (the scene is drawn twice for 0.45 s).
+Measured (concurrency 2, 1080×1920, incl. page setup): KitDemo v3 (two eye-level crowds ~90 figures, 4 hero-size
+people, 3 planes, 3 festoons, cine skyline rows, 7 palms) **~130-150 ms/frame** (40 spread frames: 149), the same
+during a time-of-day relight (objects flip, nothing is drawn twice).
 - No filters, blur, gradients, masks with soft edges, `<foreignObject>`. Clip paths only where needed.
 - Path generators are memoised; still, build static geometry once (module scope or `useMemo`) and **merge static
   linework into one `<Ink d={a + b + c}>`** instead of hundreds of elements.
@@ -294,10 +341,11 @@ card `opacity` animate opacity, are `@deprecated` and must not be used in the fi
 | need | use | not |
 |---|---|---|
 | scene root, sky, time of day | core `<World sky={[{t, tod, wipe}]}>` (one sky, relights every Fill; accepts a cine `TOD.x` as `sky`) | a second sky: a cine `<Sky>` inside a World that already has one |
-| relight raw-SVG cine pieces | pass `tod={useTod()}` | a fixed `tod` that ignores the World's wipe |
+| relight raw-SVG cine pieces | pass `tod={useTod([cx, cy])}` (the piece's centre: it flips when the sky edge reaches it) | a fixed `tod` that ignores the World's wipe |
 | gentle per-shot push | World `push` (flat scenes) / `<ShotCam push>` (layers) | hand-rolled zoom tweens |
 | multiplane camera moves | `<ShotCam keys>` = cine `CineCamera` + transition camera (`stage`) | CineCamera without `stage` inside `<World stage="context">` (drops the transition move) |
-| camera eases | `MOTION.camera.{ease, slow, reveal, settle, push}` (cine `CAM.*` are the same roles) | ad-hoc beziers |
+| camera eases | `MOTION.camera.{ease, slow, reveal, settle, push}` (cine `CAM.*` carry the same values) | ad-hoc beziers, inOutQuart reveals (4 x peak speed: strobes) |
+| placing people / props in depth | `eyeLevel()` camera (2b) + `Crowd eye` | hand-tuned `s` per row (drifts to a high, diorama camera) |
 | string lights | core `Festoon` (`at` build, `lightAt` or the cine-style `on={{at, dur}}` switch-on; Ink/Fill: projects on Planes, relights, un-builds) | cine `StringLights` (`at`, `on={at, dur}`, sway, tod palette: raw SVG) for cine vistas |
 | crowds | core `Crowd` for anything ≥ ~20 px tall (back-view Person, depth ink, jitter, rim); cine `TinyCrowd` for thousands of specks | Crowd for specks (slow) |
 | perspective | core `Plane` + `wallQuad` (projects whole kit components) | cine `quadMap` / `persp1` (point math for cine geometry) |
