@@ -18,17 +18,23 @@
 //                    artist's ruled crossing pair marks the block's corner (f_9.0's top-left).
 //            bleed   colour covers the corner and runs off both edges (the emptiest corner: usually sky).
 //            square  the body's corner; one painted top corner gets the ruled crossing pair.
-//   bites    big straight-sided bites where the paint did not reach: the one visible-zone gesture on the left side
-//            (y 880-1460; medium / loose, only where the scene has drawing there) and the bottom under the app UI.
-//            The line art inside a bite is complete (the sketch keeps the block's edge).
-//   tongues  stretches where the colour runs off the frame (the ground off the bottom, a slant like a ground plane).
+//   bites    big straight-sided bites where the paint did not reach: the visible-zone gesture on the left side
+//            (y 680-1460; medium / loose), one on the right between the caption and the rail (loose), and the
+//            bottom under the app UI; only where the scene has drawing there. The line art inside a bite is complete
+//            (the sketch keeps the block's edge). No corner can go bare: the bottom's drawing gets a bite instead.
+//   tongues  stretches where the colour runs off the frame (the ground off the bottom, one end a long slant like a
+//            ground plane), only where the paper is deep enough for a real step (on a thin margin: a shelf).
 //   keep     hints.keep rects (a hero, the mascot and the ground under it, a lamp and its halo) are always in colour:
-//            corners shrink or change role, bites and tongues keep clear, and a last block guarantees it. A figure is
-//            never half colour, half line art.
+//            corners shrink or change role, bites and tongues keep clear, and a last block guarantees it (running off
+//            the frame on a side it comes within 110 px of). A figure is never half colour, half line art.
+//   clean-up every white notch narrower than 160 px along a side, and every white stretch shorter than 240 px between
+//            two stretches of colour at the edge, becomes colour (a 1-D morphological opening of each side's paper
+//            depth); any paper the union encloses is filled (a 1 px raster). No specks, slivers or pockets.
 // The INK layer (the scene as line art on paper, EdgeTreatment) is clipped to the body's SKETCH plus a reach band
-// along every edge. Along one edge the reach RISES THEN FALLS (one peak, or one run-off end and one perpendicular cut),
-// so a scene line running parallel to an edge shows on ONE stretch and ends once: no dashes. Lines crossing an edge
-// end 26-66 px past the colour at varied points, or run off the frame.
+// along every edge. Along one edge the reach RISES THEN FALLS (one peak, or one run-off end and one perpendicular cut);
+// where two reach bands meet (a block corner, a step), every gap under 60 px on a line parallel to the frame is bridged.
+// A scene line running parallel to an edge shows on ONE stretch and ends once: no dashes. Lines crossing an edge end
+// 18-66 px past the colour at varied points, or run off the frame.
 //
 // One knob: LOOSENESS (0.6 subtle, 1 medium, 1.6 loose; up to ~2). Every distance, count and role follows from it;
 // a seed's random draws come from per-element forks, so the presets of one seed are the same painting, looser.
