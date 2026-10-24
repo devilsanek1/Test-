@@ -168,3 +168,11 @@ the storyboard's word anchors.
 samples). Verified word-for-word against `docs/script/final_script_elevenlabs.txt`: 180/180 words match. This is the voice of
 the video. `assets/timing.json` is being rebuilt for it (the previous takes' timings are kept as timing_v1.json/timing_v2.json).
 The storyboard is docs/storyboard_v3.* (word-anchored); resolve its anchors against the new timing with scripts/anchor/resolve.py.
+
+## EDGE TREATMENT (user decision, latest)
+The user picked the TRIM direction and wants it looser: "a default white base and then we paint on top of it in a somewhat
+messy, incomplete way, like in the very first video, with the edges around the page even more loose and messy." A
+"paint" edge variant (white paper base, colour painted on top with loose, incomplete edges, ink running past the colour)
+is being developed in src/lib/edges (docs/EDGES.md). It is applied GLOBALLY at assembly (Film wraps the scene layers;
+captions stay outside it). Scene builders work under the clean edge and must not draw their own frame treatment. They
+should keep a little visual interest near the frame edges, because a loose painted edge will reveal paper there.
