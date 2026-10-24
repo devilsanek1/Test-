@@ -12,7 +12,8 @@
 //   type CaptionBeat = {s, e?, lines: {text, s}[], highlights?: {text, s}[], style?: 'punch' | 'hook'}
 
 import React, {useId} from 'react';
-import {captionTones, CaptionTone, card, highlightBox, palette, skyCaption, type as typeTok} from './theme';
+import {getInputProps} from 'remotion';
+import {captionTones, CaptionTone, card, highlightBox, palette, skyCaption, skyHighlightBox, type as typeTok} from './theme';
 import {clamp, ease as E, prog, useGlobalTime} from './time';
 import {highlightDur, MOTION} from './spec';
 import {captionFontStack, measureCaption, useCaptionFont} from './font';
@@ -161,23 +162,38 @@ export const Captions: React.FC<CaptionsProps> = ({beats, range, carry = true, i
 
 // =====================================================================================================================
 // SkyCaptions (v2, full-bleed): captions in the SKY, screen space, calibrated to docs/motion_spec.md section 4.
-//  - Patrick Hand 82 px centred on x 540; baselines 330 / 426 (theme skyCaption); a one-line page sits at 378;
-//    lines wider than 860 px shrink the page's font.
+//  - Patrick Hand theme skyCaption.size (98 px) centred on skyCaption.cx; baselines skyCaption.line1 / line2 (387 / 510);
+//    a one-line page sits at skyCaption.oneLine; lines wider than skyCaption.maxWidth shrink the page's font.
 //  - PAGE CHANGE: the whole stack scrolls up by (clip height + 20) in 0.45 s, cubic-bezier(0, 0.7, 0.12, 1); the old
 //    page is gone in 2-3 frames, the new one decelerates into place. Starts 0.04 s before the page's first word.
 //  - LINE 2 rises ~1.15 line pitches from below the window in 0.42 s (same curve), 0.08 s before its first word.
-//  - HIGHLIGHT: peach box wipes L->R, bezier(0.3, 0.3, 0.1, 1), 0.19 s + 0.3 ms/px, 0.10 s before its word; it
+//  - HIGHLIGHT: peach box (theme skyHighlightBox: reference 2's square box, 0.19 em padding both sides, ascenders and
+//    trailing punctuation inside) wipes L->R, bezier(0.3, 0.3, 0.1, 1), 0.19 s + 0.3 ms/px, 0.10 s before its word; it
 //    scrolls with its line and never wipes out. The word stays ink on the box in both tones.
-//  - TONE: 'dark' = ink text (light skies), 'light' = white text (dusk / night skies). Switches in one frame.
+//  - TONE: 'dark' = ink text (light skies), 'light' = white text (dusk / night skies). Switches in one frame, or
+//    SPATIALLY: `split` (one vertical edge, e.g. a wipe) or `regions` (any rects / paths, painted in order) render the
+//    text once per region, clipped, so the colour flips exactly at a wipe edge or over a dark foreground element.
 //  - No opacity, no scale, no blur. Before the first page starts, the first page shows settled (the hook frame).
+//  - capcheck: with input prop {capcheck: 'mask'} it draws a black frame with code colours (dark-tone text #FF0000,
+//    light-tone text #00FF00, highlight boxes #0000FF) for scripts/capcheck.mjs; {capcheck: 'bg'} hides captions.
 // Data times are WORD STARTS (src/data/captions.json, generated from assets/timing.json); the leads are applied here.
 //
 //   <SkyCaptions beats={captions} tone={(T) => (T > 50 ? 'light' : 'dark')} loopAt={70.4} />
+//   <SkyCaptions beats={captions} split={{x: (T) => wipeEdge(T), left: 'light', right: 'dark'}} />
+
+/** A screen-space tone region: a rect [x0, y0, x1, y1] or a path `d` (with an optional SVG transform). */
+export type ToneRegion = {tone: CaptionTone; rect?: [number, number, number, number]; d?: string; transform?: string};
+export type ToneSplit = {x: (T: number) => number; left: CaptionTone; right: CaptionTone};
 
 export type SkyCaptionsProps = {
   beats: CaptionBeat[];
   /** Tone now: fixed, or a function of timeline seconds. Default 'dark'. */
   tone?: CaptionTone | ((T: number) => CaptionTone);
+  /** Two tones split at a vertical screen edge x(T) (a wipe): left of it `left`, right of it `right`. Applied while
+   *  0 < x(T) < 1080; otherwise the side that covers the frame wins. */
+  split?: ToneSplit;
+  /** Tone regions now (painted in order: later regions win where they overlap). null / [] = use `tone`. */
+  regions?: (T: number) => ToneRegion[] | null | undefined;
   /** Only beats starting in [from, to) (+ the one active at `from`, shown settled). Scene previews. */
   range?: [number, number];
   /** Before the first page starts, show it settled (frame 0 = hook). Default true. */
@@ -191,10 +207,33 @@ export type SkyCaptionsProps = {
   motion?: 'scroll' | 'pop';
 };
 
+/** Caption-check render mode from the input props ({capcheck: 'mask' | 'bg'}), null in normal renders. */
+export function capcheckMode(): 'mask' | 'bg' | null {
+  try {
+    const p = getInputProps() as {capcheck?: unknown} | undefined;
+    return p && (p.capcheck === 'mask' || p.capcheck === 'bg') ? p.capcheck : null;
+  } catch {
+    return null;
+  }
+}
+/** Mask code colours (scripts/capcheck.py reads them). */
+export const CAPCHECK_COLORS = {dark: '#FF0000', light: '#00FF00', box: '#0000FF'} as const;
+
+/** Regions for a vertical split at x. */
+export function splitRegions(x: number, left: CaptionTone, right: CaptionTone): ToneRegion[] {
+  if (x <= 0) return [{tone: right}];
+  if (x >= 1080) return [{tone: left}];
+  return [
+    {tone: left, rect: [-200, -200, x, 2200]},
+    {tone: right, rect: [x, -200, 1300, 2200]},
+  ];
+}
+
 type SkyLine = {text: string; start: number; baseline: number; boxes: (Box & {start: number; dur: number})[]};
 type SkyPage = {start: number; size: number; lines: SkyLine[]};
 
 const SKY_D = skyCaption.clipBottom - skyCaption.clipTop + 20;
+const PUNCT = /[.,!?;:…]/;
 
 function layoutSky(b: CaptionBeat, baseSize: number): SkyPage {
   const n = b.lines.length;
@@ -208,6 +247,7 @@ function layoutSky(b: CaptionBeat, baseSize: number): SkyPage {
   const pageStart = b.s - MOTION.captionScroll.lead;
   const used = new Set<CaptionHighlight>();
   const cx = skyCaption.cx;
+  const HB = skyHighlightBox;
   const lines: SkyLine[] = b.lines.map((ln, i) => {
     const lineStart = i === 0 || ln.s <= b.s + 0.04 ? pageStart : Math.max(pageStart, ln.s - MOTION.captionLine2.lead);
     const boxes: SkyLine['boxes'] = [];
@@ -219,15 +259,19 @@ function layoutSky(b: CaptionBeat, baseSize: number): SkyPage {
       if (idx < 0) idx = ln.text.toLowerCase().indexOf(want.toLowerCase());
       if (idx < 0 || !want) continue;
       used.add(h);
+      // reference 2 boxes include trailing punctuation ('asking.', 'cool.', 'jobs,')
+      let end = idx + want.length;
+      if (HB.includePunct) while (end < ln.text.length && PUNCT.test(ln.text[end])) end++;
       const x0 = cx - lw / 2 + measureCaption(ln.text.slice(0, idx), size);
-      const x1 = x0 + measureCaption(ln.text.slice(idx, idx + want.length), size);
-      const w = x1 - x0 + (highlightBox.padLeftEm + highlightBox.padRightEm) * size;
+      const x1 = x0 + measureCaption(ln.text.slice(idx, end), size);
+      const pad = HB.padEm * size;
+      const w = x1 - x0 + 2 * pad;
       boxes.push({
-        x: x0 - highlightBox.padLeftEm * size,
-        y: baselines[i] - highlightBox.topEm * size,
+        x: x0 - pad,
+        y: baselines[i] - HB.topEm * size,
         w,
-        h: (highlightBox.topEm + highlightBox.bottomEm) * size,
-        r: highlightBox.radiusEm * size,
+        h: (HB.topEm + HB.bottomEm) * size,
+        r: HB.radiusEm * size,
         s: h.s,
         start: Math.max(lineStart, h.s - MOTION.highlight.lead),
         dur: highlightDur(w),
@@ -240,8 +284,11 @@ function layoutSky(b: CaptionBeat, baseSize: number): SkyPage {
 
 const textStyle: React.CSSProperties = {fontKerning: 'normal', fontVariantLigatures: 'common-ligatures contextual', letterSpacing: typeTok.letterSpacing};
 
-const SkyPageG: React.FC<{page: SkyPage; T: number; dy: number; instantUntil: number; tone: CaptionTone; uid: string; pop?: boolean}> = ({page, T, dy, instantUntil, tone, uid, pop}) => {
-  const col = captionTones[tone];
+type ToneCols = {text: string; highlight: string; highlightText: string};
+const toneCols = (tone: CaptionTone, mask: boolean): ToneCols =>
+  mask ? {text: CAPCHECK_COLORS[tone], highlight: CAPCHECK_COLORS.box, highlightText: CAPCHECK_COLORS.box} : captionTones[tone];
+
+const SkyPageG: React.FC<{page: SkyPage; T: number; dy: number; instantUntil: number; col: ToneCols; uid: string; pop?: boolean}> = ({page, T, dy, instantUntil, col, uid, pop}) => {
   const pitch = (skyCaption.line2 - skyCaption.line1) * (page.size / skyCaption.size);
   return (
     <g transform={dy ? `translate(0 ${dy.toFixed(2)})` : undefined}>
@@ -286,11 +333,14 @@ const SkyPageG: React.FC<{page: SkyPage; T: number; dy: number; instantUntil: nu
   );
 };
 
-export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', range, hookAtStart = true, loopAt, instantWithin = 0.35, size = skyCaption.size, motion = skyCaption.motion}) => {
+export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', split, regions, range, hookAtStart = true, loopAt, instantWithin = 0.35, size = skyCaption.size, motion = skyCaption.motion}) => {
   const pop = motion === 'pop';
   const T = useGlobalTime();
   const fontOk = useCaptionFont();
   const uid = 'sc' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const mode = capcheckMode();
+  if (mode === 'bg') return null;
+  const mask = mode === 'mask';
   const sorted = beats.slice().sort((a, b) => a.s - b.s);
   let list = range ? sorted.filter((b) => b.s >= range[0] && b.s < range[1]) : sorted.slice();
   if (range && isFinite(range[0])) {
@@ -324,17 +374,41 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', r
   const tn: CaptionTone = typeof tone === 'function' ? tone(T) : tone;
   // the hook frame: the first page's line 1 shows settled before anything starts; later lines/boxes keep their times
   const iu = settledAll || (hookAtStart && k === 0) ? Math.max(instantUntil, cur.start) : instantUntil;
+  const regs = (regions ? regions(T) : null) ?? (split ? splitRegions(split.x(T), split.left, split.right) : null);
+  const stack = (t: CaptionTone, sfx: string) => (
+    <>
+      {prev && !instant && u < 1 ? <SkyPageG key={`p${k - 1}`} page={prev} T={T} dy={-SKY_D * q} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}a`} pop={pop} /> : null}
+      <SkyPageG key={`p${k}`} page={cur} T={settledAll ? Math.max(T, cur.start) : T} dy={SKY_D * (1 - q)} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}b`} pop={pop} />
+    </>
+  );
+  const body =
+    regs && regs.length > 1 ? (
+      regs.map((r, i) =>
+        r.rect || r.d ? (
+          <React.Fragment key={i}>
+            <defs>
+              <clipPath id={`${uid}g${i}`} clipPathUnits="userSpaceOnUse">
+                {r.rect ? <rect x={r.rect[0]} y={r.rect[1]} width={Math.max(0, r.rect[2] - r.rect[0])} height={Math.max(0, r.rect[3] - r.rect[1])} transform={r.transform} /> : <path d={r.d} transform={r.transform} />}
+              </clipPath>
+            </defs>
+            <g clipPath={`url(#${uid}g${i})`}>{stack(r.tone, `r${i}`)}</g>
+          </React.Fragment>
+        ) : (
+          <React.Fragment key={i}>{stack(r.tone, `r${i}`)}</React.Fragment>
+        ),
+      )
+    ) : (
+      stack(regs && regs.length === 1 ? regs[0].tone : tn, '')
+    );
   return (
     <svg width={1080} height={1920} viewBox="0 0 1080 1920" style={{position: 'absolute', left: 0, top: 0, visibility: fontOk ? undefined : 'hidden'}}>
+      {mask ? <rect x={0} y={0} width={1080} height={1920} fill="#000000" /> : null}
       <defs>
         <clipPath id={uid}>
           <rect x={0} y={skyCaption.clipTop} width={1080} height={skyCaption.clipBottom - skyCaption.clipTop} />
         </clipPath>
       </defs>
-      <g clipPath={`url(#${uid})`}>
-        {prev && !instant && u < 1 ? <SkyPageG key={`p${k - 1}`} page={prev} T={T} dy={-SKY_D * q} instantUntil={iu} tone={tn} uid={`${uid}a`} pop={pop} /> : null}
-        <SkyPageG key={`p${k}`} page={cur} T={settledAll ? Math.max(T, cur.start) : T} dy={SKY_D * (1 - q)} instantUntil={iu} tone={tn} uid={`${uid}b`} pop={pop} />
-      </g>
+      <g clipPath={`url(#${uid})`}>{body}</g>
     </svg>
   );
 };
