@@ -203,8 +203,9 @@ def resolve_doc(sb, timing, log):
             except ValueError:
                 return None, False
             amap[path] = {'w': node['w'], 'dt': node.get('dt', 0), 't': t}
-            if node.get('edge') == 'e':
-                amap[path]['edge'] = 'e'
+            for k in ('edge', 'gap'):
+                if k in node:
+                    amap[path][k] = node[k]
             return t, False
         return node, True
 

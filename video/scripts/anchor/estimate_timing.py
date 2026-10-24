@@ -419,7 +419,7 @@ def validate_take(raw_path, pace):
             'startErrMean': round(sum(errs) / len(errs), 3), 'startErrRms': round(rms, 3),
             'startErrMax': round(max(errs, key=abs), 3),
             'endPredicted': round(vo_end + off, 2), 'endMeasured': round(d['words'][-1]['e'], 2),
-            'driftAtSentenceStarts': sent_ends}
+            'driftAtSentenceEnds': sent_ends}
 
 
 # ---------------------------------------------------------------- main

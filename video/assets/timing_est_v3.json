@@ -2594,7 +2594,7 @@
    "startErrMax": -0.985,
    "endPredicted": 55,
    "endMeasured": 54.56,
-   "driftAtSentenceStarts": [
+   "driftAtSentenceEnds": [
     -0.39,
     -0.68,
     -0.61,
