@@ -14,9 +14,9 @@ export type InkOpts = {
 };
 
 export type Layer =
-  | {k: 'fill'; pts: Pt[]; color: string; misreg?: number; opacity?: number}
-  | ({k: 'ink'; pts: Pt[]; seed: number; color?: string; opacity?: number} & InkOpts)
-  | {k: 'solid'; pts: Pt[]; color: string; opacity?: number} // registered fill (eyes, tufts, nostrils)
+  | {k: 'fill'; pts: Pt[]; color: string; misreg?: number}
+  | ({k: 'ink'; pts: Pt[]; seed: number; color?: string} & InkOpts)
+  | {k: 'solid'; pts: Pt[]; color: string} // registered fill (eyes, tufts, mouth): no misregistration
   | {k: 'node'; at: Pt; rot: number; node: React.ReactNode}
   | {k: 'clip'; x: number; on: boolean}; // start/stop clipping everything left of x
 
@@ -25,11 +25,11 @@ export class Pen {
   private n = 0;
   constructor(public seed: number, public c: Colorway) {}
 
-  fill(pts: Pt[], color: string, misreg = 1, opacity?: number) {
-    this.layers.push({k: 'fill', pts, color, misreg, opacity});
+  fill(pts: Pt[], color: string, misreg = 1) {
+    this.layers.push({k: 'fill', pts, color, misreg});
   }
-  solid(pts: Pt[], color?: string, opacity?: number) {
-    this.layers.push({k: 'solid', pts, color: color ?? this.c.ink, opacity});
+  solid(pts: Pt[], color?: string) {
+    this.layers.push({k: 'solid', pts, color: color ?? this.c.ink});
   }
   ink(pts: Pt[], o: InkOpts = {}) {
     this.n += 1;

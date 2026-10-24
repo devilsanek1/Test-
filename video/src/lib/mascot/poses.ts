@@ -267,7 +267,7 @@ const eye = (pen: Pen, e: Pt, expr: Expression, bl: number, side: 1 | -1, sizeK 
   }
 };
 
-const cheek = (pen: Pen, p: Pt, rx = 4.6, ry = 2.9) => pen.fill(ellipsePts(p[0], p[1], rx, ry, 0, 14), pen.c.cheek, 0.4, 0.95);
+const cheek = (pen: Pen, p: Pt, rx = 4.6, ry = 2.9) => pen.fill(ellipsePts(p[0], p[1], rx, ry, 0, 14), pen.c.cheek, 0.4);
 
 const smile = (pen: Pen, a: Pt, k = 1) =>
   pen.line([[a[0], a[1]], [a[0] + 2.4 * k, a[1] + 2.2], [a[0] + 5 * k, a[1] + 0.6]], {w: 0.75, over: 0, tipIn: 0.6, tipOut: 0.3});
@@ -718,17 +718,17 @@ const sleep = (pen: Pen, ctx: PoseCtx) => {
   ear(pen, hp([-3, -6]), 1, 26 + Math.sin(t * 0.9) * 1.2 * idle, 'side', 0.96);
   eye(pen, hp([9.6, -3]), 'closed', 0, 1);
   cheek(pen, hp([11.5, 6]), 4.2, 2.8);
-  // floating z's
+  // floating z's: each one pops in small, drifts up while growing, and shrinks away (no opacity)
   for (let i = 0; i < 3; i++) {
     const p = (t / 2.6 + i / 3) % 1;
-    const op = Math.sin(Math.PI * p);
-    if (op < 0.05) continue;
-    const s = lerp(3.2, 6.4, p);
+    const k = Math.min(1, p / 0.12, (1 - p) / 0.14);
+    if (k < 0.08) continue;
+    const s = lerp(3.2, 6.4, p) * (0.35 + 0.65 * Math.sin((k * Math.PI) / 2));
     const base: Pt = [H[0] + 8 + p * 16, H[1] - 26 - p * 26];
     let z: Pt[] = [[0, 0], [s, -0.2], [0.2, s], [s * 1.05, s]];
     if (flip) z = z.map(([a, b]) => [s - a, b] as Pt);
     const pts = z.map((q) => add(q, base));
-    pen.layers.push({k: 'ink', pts, seed: seed * 3 + i * 17 + Math.floor(t / 2.6 + i / 3) * 5, w: 0.85, over: 0, tipIn: 0.6, tipOut: 0.4, opacity: op});
+    pen.layers.push({k: 'ink', pts, seed: seed * 3 + i * 17 + Math.floor(t / 2.6 + i / 3) * 5, w: 0.85, over: 0, tipIn: 0.6, tipOut: 0.4});
   }
 };
 

@@ -17,10 +17,17 @@ export const popIn = (t: number, t0: number, dur = 0.45) => {
   return {scale: Math.max(0, s), squash, visible: true};
 };
 
-/** Draw-on entrance: 0..1 for <Elephant draw>. Lines draw first, fills land in the last ~40%. */
-export const drawIn = (t: number, t0: number, dur = 1.0) => clamp((t - t0) / dur);
+/** Draw-on entrance: 0..1 for <Elephant draw>. Strokes draw on one after another; each flat fill grows
+ *  20% -> 100% about its centre ~0.15 s after its outline starts. No opacity anywhere. */
+export const drawIn = (t: number, t0: number, dur = 0.9) => clamp((t - t0) / dur);
 
-/** Reverse of drawIn (un-build): 1..0. */
+/** Un-build progress 0..1 for <Elephant exit>: fills shrink to their centres (small first, ease-in), then the ink
+ *  retracts. Same phases as the engine's MOTION.unbuild (0.5 s). No opacity anywhere. */
+export const unbuild = (t: number, t0: number, dur = 0.5) => clamp((t - t0) / dur);
+
+/** @deprecated kept for old callers: returns the EXIT progress, but as a `draw` value it now plays the build in
+ *  reverse (fills shrink back, strokes retract from their ends). Prefer <Elephant exit={unbuild(t, t0)} />, which
+ *  follows the engine's un-build order and timing. Opacity-free either way. */
 export const drawOut = (t: number, t0: number, dur = 0.7) => 1 - clamp((t - t0) / dur);
 
 export type HopOpts = {

@@ -418,6 +418,8 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
   const layers: Layer[] = [];
   const overlays: React.ReactNode[] = [];
   const end = filmDuration(scenes);
+  // the loop seam: the timeline time that wraps to frame 0 (the composition is ceil(end * fps) frames long)
+  const seam = Math.ceil(end * fps - 1e-6) / fps;
 
   const pushLayer = (s: FilmScene, i: number, o: {offset?: number; cam?: StageCam; clip?: string; exit?: number; z: number; trans?: TransitionInfo | null; key?: string}) => {
     const Comp = comp(s.id);
@@ -560,7 +562,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
         trans = {type: 'unbuild', phase: 'out', p: exit};
         if (!only && s.transitionOut.loop !== false && scenes.length > 1 && T >= s.end - d) {
           // the opening scene, at its t < 0 state, waits underneath
-          pushLayer(scenes[0], 0, {offset: end, z: z - 5, key: 'loop'});
+          pushLayer(scenes[0], 0, {offset: seam, z: z - 5, key: 'loop'});
         }
       }
     }
@@ -571,11 +573,13 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
   const tone = (t: number) => toneAt(scenes, t);
   const regions = (t: number) => (only ? sceneToneRegions(scenes.find((x) => x.id === only), t) : toneRegionsAt(scenes, t, wipers));
   const last = scenes[scenes.length - 1];
-  // the captions roll back to page 1 for the loop (unless captions.json already ends on an explicit loop page)
+  // the captions roll back to page 1 for the loop. An explicit loop page at the end of captions.json (the first page's
+  // line 1 again) only sets WHEN: SkyCaptions replaces it with page 1 laid out as at frame 0 (no one-line re-centring).
   const firstText = captions[0]?.lines[0]?.text;
   const lastCap = captions[captions.length - 1];
   const explicitLoopPage = captions.length > 1 && lastCap.lines.length === 1 && lastCap.lines[0].text === firstText && lastCap.s > end - 1.5;
-  const loopAt = !only && !explicitLoopPage && last?.transitionOut?.type === 'unbuild' && last.transitionOut.loop !== false ? last.transitionOut.captionAt ?? end - 0.22 : undefined;
+  const loops = last?.transitionOut?.type === 'unbuild' && last.transitionOut.loop !== false;
+  const loopAt = only ? undefined : explicitLoopPage ? lastCap.s - MOTION.captionScroll.lead : loops ? last.transitionOut!.captionAt ?? end - 0.22 : undefined;
   const onlyIdx = only ? scenes.findIndex((s) => s.id === only) : -1;
   const range: [number, number] | undefined = only && onlyIdx >= 0 ? [scenes[onlyIdx].start, scenes[onlyIdx + 1]?.start ?? Infinity] : undefined;
 
@@ -586,7 +590,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
           <React.Fragment key={l.key}>{l.node}</React.Fragment>
         ))}
         {overlays}
-        {showCaptions ? <SkyCaptions beats={captions} tone={tone} regions={regions} loopAt={loopAt} range={range} hookAtStart={!only} /> : null}
+        {showCaptions ? <SkyCaptions beats={captions} tone={tone} regions={regions} loopAt={loopAt} loopEnd={seam} range={range} hookAtStart={!only} /> : null}
       </AbsoluteFill>
       {audio ? <Audio src={staticFile(audioFile())} trimBefore={offset > 0 ? Math.round(offset * fps) : undefined} /> : null}
     </TimeProvider>
@@ -648,6 +652,7 @@ export const Standalone: React.FC<{
             tone={(t) => toneAt([scene], loopT(t))}
             regions={regions}
             loopAt={loop ? loop.at - 0.3 : undefined}
+            loopEnd={loop?.at}
           />
         ) : null}
       </AbsoluteFill>

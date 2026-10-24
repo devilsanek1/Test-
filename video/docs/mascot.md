@@ -52,7 +52,7 @@ hex values there are the body and shade per colorway; everything else is a theme
 ## 3. API
 
 ```tsx
-import {Elephant, ElephantTimeline, hop, popIn, drawIn, drawOut, walkSpeed} from '../lib/mascot';
+import {Elephant, ElephantTimeline, hop, popIn, drawIn, unbuild, walkSpeed} from '../lib/mascot';
 
 <Elephant
   x={430} y={395}          // FEET anchor in card space (where it sits / stands)
@@ -65,11 +65,13 @@ import {Elephant, ElephantTimeline, hop, popIn, drawIn, drawOut, walkSpeed} from
   expression="neutral"     // neutral | happy | wide | worried | meh | closed (poses pick sensible defaults)
   amount={undefined}       // pose-specific 0..1, see table
   idle={1}                 // 0..1 idle-life multiplier (0 = frozen)
-  draw={1}                 // 0..1 draw-on: lines draw stroke by stroke, fills land a beat later
+  draw={1}                 // 0..1 build: strokes draw on one by one, each fill GROWS 20%->100% ~0.15 s after its outline starts
+  exit={0}                 // 0..1 un-build: fills shrink to their centres (small first), then the ink retracts
   squash={0}               // + squash / - stretch about the feet (from hop / popIn / popSwitch)
   rotate={0}               // degrees about the feet
-  opacity={1}
-  ink={1} fill={1}         // linework / fill opacity: fill={0} = ink-only (loop frame), ink={0} = fills-only
+  ink={1} fill={1}         // states: fill={0} = ink-only (loop frame), ink={0} = fills-only. Intermediate values
+                           //   retract strokes / shrink fills: they are NEVER opacities
+  // opacity: deprecated. Nothing fades: < 0.5 = not drawn, otherwise fully drawn.
   prop={<Flashlight/>}     // node held at the trunk tip ('hold'; carried in side poses)
   propRot={0}              // extra rotation for the prop (it also follows the trunk's sway)
   walkRate={1.25}          // walk cycles / s for 'walk-side'
@@ -84,7 +86,7 @@ carry it forward.
 ### Pose switching, entrances, hops, walking
 
 ```tsx
-// pose changes on a schedule, with a squash-and-stretch pop at each switch (or mode="fade")
+// pose changes on a schedule, with a squash-and-stretch pop at each switch (mode="fade" is deprecated = pop)
 <ElephantTimeline x={600} y={392} scale={0.9} t={t} seed={4}
   keys={[{t: 0, pose: 'sit-back'}, {t: 3.2, pose: 'trunk-up', expression: 'wide'}, {t: 4.4, pose: 'ears-cover'}]} />
 
@@ -92,9 +94,11 @@ carry it forward.
 const p = popIn(t, 1.0);          // {scale, squash, visible}
 {p.visible && <Elephant x={x} y={y} scale={0.9 * p.scale} squash={p.squash} pose="sit-front" t={t} />}
 
-// draw-on entrance / un-build
-<Elephant ... draw={drawIn(t, 0.2, 1.0)} />
-<Elephant ... draw={drawOut(t, 69.0, 0.7)} />
+// draw-on entrance (0.9 s) / un-build exit (0.5 s, the engine's recipe)
+<Elephant ... draw={drawIn(t, 0.2)} />
+<Elephant ... exit={unbuild(t, 69.0)} />            // or exit={useExit()} inside the engine's <UnBuild>
+// (drawOut() still works: as `draw` it plays the build in reverse. Also opacity-free.)
+// The engine's <ExitShrink x y> (whole mascot shrinks to its feet) is the other approved exit.
 
 // hop onto a ledge: 0.14 s crouch, leap, landing squash (dur = airtime)
 const h = hop({t, t0: 8.1, dur: 0.42, from: {x: 500, y: 960}, to: {x: 520, y: 390}, height: 50});
@@ -106,7 +110,7 @@ const x = x0 + (t - t0) * walkSpeed(1.25) * 0.9;
 <Elephant x={x} y={groundY} scale={0.9} pose="walk-side" walkRate={1.25} t={t} />
 ```
 
-Other exports: `popSwitch(t, tSwitch)` (the pop squash curve), `poseAt(keys, t)`, `POSES`, `POSE_BOUNDS`
+Other exports: `unbuild(t, t0, dur = 0.5)` (exit progress), `BUILD` (build timing), `popSwitch(t, tSwitch)` (the pop squash curve), `poseAt(keys, t)`, `POSES`, `POSE_BOUNDS`
 (approximate local bounds per pose, feet at y = 0), `WALK`, `MASCOT`, `COLORWAYS`, idle functions
 (`blink`, `earFlap`, `tailSwish`, `trunkSway`, `breath`). All motion is a pure function of seconds (30/60 fps safe).
 
@@ -135,6 +139,25 @@ neighbouring instances different seeds.
 
 `docs/mascot_motion.png`: draw-on, hop, timeline pops, walk. `docs/mascot_walk.png`: 8 walk phases + idle.
 
+### No fades (project rule, QUALITY GATES)
+
+Nothing in the mascot ever animates opacity. Build = strokes draw on (the brush polygon is cut along its
+centerline, the equivalent of a dash-offset) and every flat fill, eye and prop GROWS from 20% about its own centre
+over 0.12 draw units (3-4 frames at the default `drawIn` speed), landing `BUILD.fillLag` = 0.16 (~4-5 frames) after
+its own outline starts, matching the engine's `MOTION.fillLag` / `MOTION.fillGrow`. Un-build = fills shrink to their
+centres (ease-in, small first), then the ink retracts, in the engine's `MOTION.unbuild` phases. Pose changes pop
+(squash-and-stretch), z's in `sleep` pop by scale, cheeks are opaque. Every pixel is fully opaque except the
+1-px anti-aliased edges.
+
+Evidence: `docs/mascot_evidence/drawin_frames.png` (every frame of a real rendered draw-in, f14-f37: fills grow solid),
+`docs/mascot_build.png` (frame strips: draw-in every 2nd frame, un-build every frame, legacy drawOut,
+the ink/fill states, `mode="fade"` mid-switch, sleep z's, prop build) and the alpha check on the same strips rendered
+on a transparent canvas, `docs/mascot_evidence/build_alpha.png`: 0 translucent regions (no 3x3 block of partial
+alpha). All 1,070 remaining partial-alpha non-ink pixels are 1-px anti-aliased seams touching an opaque pixel (largest
+component 20 px, no 2x2 block). Negative control `docs/mascot_evidence/control_translucent.png` (the same elephant inside
+`opacity 0.5`): 64,052 translucent-core pixels, so the test does catch fades. Re-run:
+`npx remotion still src/index.ts MascotSheet docs/mascot_evidence/build_alpha.png --frame=0 --props='{"mode":"build","alpha":true}'`.
+
 ## 5. Size and placement guidance
 
 - **Wide / mid shots: `scale` 0.9-1.0 (≈ 86-96 px sitting)**, matching the cat (85-92 px; style bible §9).
@@ -156,6 +179,8 @@ npx remotion still src/index.ts MascotSheet docs/mascot_colorways.png --frame=10
 npx remotion still src/index.ts MascotSheet docs/mascot_scene.png --frame=10 --props='{"mode":"scene"}'
 npx remotion still src/index.ts MascotSheet docs/mascot_walk.png --frame=10 --props='{"mode":"walk"}'
 npx remotion render src/index.ts MascotSheet out/mascot_motion.mp4 --props='{"mode":"motion"}'    # 8 s motion demo
+npx remotion still src/index.ts MascotSheet docs/mascot_build.png --frame=0 --props='{"mode":"build"}'   # build / un-build strips
+#   add "alpha":true for a transparent canvas (alpha check), "control":true for the translucent negative control
 ```
 
 ## 7. Notes for other streams

@@ -10,15 +10,17 @@ import {
   POSES,
   PoseName,
   drawIn,
+  drawOut,
   hop,
+  unbuild,
   popIn,
   walkSpeed,
 } from '../lib/mascot';
 import {brush, spline, Pt} from '../lib/mascot/ink';
 
 // Dev sheet for the mascot (character stream). Modes via --props='{"mode":"..."}':
-//   sheet (default) | colorways | scene | motion | walk
-type Mode = 'sheet' | 'colorways' | 'scene' | 'motion' | 'walk';
+//   sheet (default) | colorways | scene | motion | walk | build (frame strips; add "alpha":true for a transparent canvas)
+type Mode = 'sheet' | 'colorways' | 'scene' | 'motion' | 'walk' | 'build';
 
 const useCaptionFont = () => {
   const [handle] = useState(() => delayRender('caption font'));
@@ -350,14 +352,105 @@ const Walk: React.FC<{t: number}> = ({t}) => {
   );
 };
 
-export const MascotSheet: React.FC<{mode?: Mode; pose?: PoseName}> = ({mode = 'sheet', pose}) => {
+// ---------------- build / un-build frame strips (no-fade evidence) ----------------
+const Build: React.FC<{alpha: boolean; control?: boolean}> = ({alpha, control}) => {
+  if (control) {
+    // NEGATIVE CONTROL for the alpha check: what an opacity fade would look like (never used in the film)
+    return (
+      <svg width={1080} height={1920}>
+        <g opacity={0.5}>
+          <Elephant x={540} y={900} scale={3} pose="sit-front" t={1.3} idle={0} />
+        </g>
+      </svg>
+    );
+  }
+  const fps = 30;
+  const cols = 7;
+  const colW = 1080 / cols;
+  const rowH = 158;
+  const rows: {title: string; items: {label: string; el: (x: number, y: number) => React.ReactNode}[]}[] = [];
+  const frames = (n: number, step: number) => Array.from({length: n}, (_, i) => Math.round(i * step) + 1);
+  rows.push({
+    title: 'draw-in: draw={drawIn(t, 0)} (0.9 s), every 2nd frame',
+    items: frames(14, 2).map((f) => ({label: `f${f}`, el: (x, y) => <Elephant x={x} y={y} pose="sit-front" t={1.3} idle={0} seed={3} draw={drawIn(f / fps, 0)} />})),
+  });
+  rows.push({
+    title: 'un-build: exit={unbuild(t, 0)} (0.5 s), every frame',
+    items: frames(14, 1).map((f) => ({label: `f${f}`, el: (x, y) => <Elephant x={x} y={y} pose="sit-back" t={1.3} idle={0} seed={3} exit={unbuild(f / fps, 0)} />})),
+  });
+  rows.push({
+    title: 'legacy draw={drawOut(t, 0)} (0.7 s, reverse build), every 1.5 frames',
+    items: frames(14, 1.5).map((f) => ({label: `f${f}`, el: (x, y) => <Elephant x={x} y={y} pose="stand-side" t={1.3} idle={0} seed={3} draw={drawOut(f / fps, 0)} />})),
+  });
+  rows.push({
+    title: 'states: fill=0, ink=0, fill=.5, ink=.5, opacity=.3 (deprecated: hidden), timeline mode="fade" mid-switch x2',
+    items: [
+      {label: 'fill 0', el: (x, y) => <Elephant x={x} y={y} pose="sit-front" t={1.3} idle={0} fill={0} />},
+      {label: 'ink 0', el: (x, y) => <Elephant x={x} y={y} pose="sit-front" t={1.3} idle={0} ink={0} />},
+      {label: 'fill .5', el: (x, y) => <Elephant x={x} y={y} pose="sit-front" t={1.3} idle={0} fill={0.5} />},
+      {label: 'ink .5', el: (x, y) => <Elephant x={x} y={y} pose="sit-front" t={1.3} idle={0} ink={0.5} />},
+      {label: 'opac .3', el: (x, y) => <Elephant x={x} y={y} pose="sit-front" t={1.3} idle={0} opacity={0.3} />},
+      ...[0.98, 1.06].map((tt) => ({
+        label: `fade@${tt}`,
+        el: (x: number, y: number) => (
+          <ElephantTimeline x={x} y={y} t={tt} idle={0} mode="fade" keys={[{t: 0, pose: 'sit-front'}, {t: 1.0, pose: 'trunk-up'}]} />
+        ),
+      })),
+    ],
+  });
+  rows.push({
+    title: 'sleep z\'s (scale pop, no opacity) + hold prop build',
+    items: [
+      ...[0.1, 0.5, 0.9, 1.4, 2.2].map((tt) => ({label: `t${tt}`, el: (x: number, y: number) => <Elephant x={x} y={y} pose="sleep" t={tt} seed={3} />})),
+      ...[0.62, 0.8].map((d) => ({label: `d${d}`, el: (x: number, y: number) => <Elephant x={x} y={y} pose="hold" t={1} idle={0} draw={d} prop={<Wrench />} />})),
+    ],
+  });
+  let y = 30;
+  const out: React.ReactNode[] = [];
+  rows.forEach((r, ri) => {
+    if (!alpha) out.push(<Label key={`t${ri}`} x={20} y={y + 26} size={26} anchor="start">{r.title}</Label>);
+    y += 40;
+    r.items.forEach((it, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const cx = colW * col + colW / 2 - 4;
+      const by = y + row * rowH + 118;
+      if (!alpha) {
+        out.push(<rect key={`g${ri}-${i}`} x={colW * col + 4} y={y + row * rowH} width={colW - 8} height={rowH - 8} fill={ri % 2 ? palette.mintPale : palette.cream} />);
+        out.push(<Label key={`l${ri}-${i}`} x={colW * col + 12} y={y + row * rowH + 24} size={20} anchor="start">{it.label}</Label>);
+      }
+      out.push(<g key={`e${ri}-${i}`}>{it.el(cx, by)}</g>);
+    });
+    y += Math.ceil(r.items.length / cols) * rowH + 8;
+  });
+  return (
+    <svg width={1080} height={1920}>
+      {alpha ? null : <rect width={1080} height={1920} fill={palette.card} />}
+      {out}
+    </svg>
+  );
+};
+
+export const MascotSheet: React.FC<{mode?: Mode; pose?: PoseName; alpha?: boolean; control?: boolean}> = ({mode = 'sheet', pose, alpha = false, control}) => {
   useCaptionFont();
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const t = frame / fps;
   return (
-    <AbsoluteFill style={{background: palette.bg}}>
-      {mode === 'colorways' ? <Colorways t={t} /> : mode === 'scene' ? <Scene t={t} pose={pose} /> : mode === 'motion' ? <Motion t={t} /> : mode === 'walk' ? <Walk t={t} /> : <Sheet t={t} />}
+    <AbsoluteFill style={{background: mode === 'build' && alpha ? 'transparent' : palette.bg}}>
+      {mode === 'colorways' ? (
+        <Colorways t={t} />
+      ) : mode === 'scene' ? (
+        <Scene t={t} pose={pose} />
+      ) : mode === 'motion' ? (
+        <Motion t={t} />
+      ) : mode === 'walk' ? (
+        <Walk t={t} />
+      ) : mode === 'build' ? (
+        <Build alpha={alpha} control={control} />
+      ) : (
+        <Sheet t={t} />
+      )}
     </AbsoluteFill>
   );
 };

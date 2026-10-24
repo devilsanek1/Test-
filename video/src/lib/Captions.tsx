@@ -198,8 +198,15 @@ export type SkyCaptionsProps = {
   range?: [number, number];
   /** Before the first page starts, show it settled (frame 0 = hook). Default true. */
   hookAtStart?: boolean;
-  /** At this timeline time the stack scrolls to the FIRST page (line 1) so the end loops into frame 0. */
+  /** At this timeline time the stack scrolls back to the FIRST page so the end loops into frame 0. The roll brings
+   *  page 1 exactly as the hook frame shows it: laid out by its FINAL line count (line 1 on the same baseline as at
+   *  frame 0, never re-centred as a one-line page), with the lines and highlight boxes that frame 0 shows (boxes
+   *  already drawn) and the later ones (line 2, its box) hidden: they rise after the seam at their own times. */
   loopAt?: number;
+  /** The loop seam: the timeline time that wraps to frame 0 (= the composition end, durationInFrames / fps). With
+   *  `loopAt`, the roll back to page 1 has settled by then: when loopAt leaves less than the 0.45 s scroll, the scroll
+   *  is time-compressed (same curve) to land on the seam, so frame 0 continues it without a step. */
+  loopEnd?: number;
   /** Things that started before range[0] + this are shown settled (no roll). Default 0.35 s. */
   instantWithin?: number;
   size?: number;
@@ -244,8 +251,9 @@ export function splitRegions(x: number, left: CaptionTone, right: CaptionTone): 
   ];
 }
 
-type SkyLine = {text: string; start: number; baseline: number; boxes: (Box & {start: number; dur: number})[]};
-type SkyPage = {start: number; size: number; lines: SkyLine[]};
+type SkyLine = {text: string; start: number; baseline: number; boxes: (Box & {start: number; dur: number; hl: CaptionHighlight})[]};
+/** scrollDur: this page's scroll duration when it differs from MOTION.captionScroll.dur (the loop roll, see loopEnd). */
+type SkyPage = {start: number; size: number; lines: SkyLine[]; scrollDur?: number};
 
 const SKY_D = skyCaption.clipBottom - skyCaption.clipTop + 20;
 const PUNCT = /[.,!?;:…]/;
@@ -290,6 +298,7 @@ function layoutSky(b: CaptionBeat, baseSize: number): SkyPage {
         s: h.s,
         start: Math.max(lineStart, h.s - MOTION.highlight.lead),
         dur: highlightDur(w),
+        hl: h,
       });
     }
     return {text: ln.text, start: lineStart, baseline: baselines[i], boxes};
@@ -348,7 +357,7 @@ const SkyPageG: React.FC<{page: SkyPage; T: number; dy: number; instantUntil: nu
   );
 };
 
-export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', split, regions, range, hookAtStart = true, loopAt, instantWithin = 0.35, size = skyCaption.size, motion = skyCaption.motion}) => {
+export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', split, regions, range, hookAtStart = true, loopAt, loopEnd, instantWithin = 0.35, size = skyCaption.size, motion = skyCaption.motion}) => {
   const pop = motion === 'pop';
   const T = useGlobalTime();
   const fontOk = useCaptionFont();
@@ -362,15 +371,43 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
     const prev = sorted.filter((b) => b.s < range[0]).pop();
     if (prev) list = [prev, ...list];
   }
+  // the loop roll: page 1 as the hook frame (frame 0) shows it, see `loopAt`
+  let loopBeat: CaptionBeat | null = null;
+  const preDrawn = new Set<CaptionHighlight>();
   if (loopAt !== undefined && sorted.length) {
     const first = sorted[0];
-    const l1 = first.lines[0];
-    const hl = (first.highlights ?? []).filter((h) => l1 && l1.text.toLowerCase().includes(h.text.replace(TRAILING, '').toLowerCase()) && h.s <= (first.lines[1]?.s ?? Infinity));
-    list = list.filter((b) => b.s < loopAt + MOTION.captionScroll.lead);
-    list.push({...first, s: loopAt + MOTION.captionScroll.lead, lines: l1 ? [{text: l1.text, s: loopAt}] : [], highlights: hl.map((h) => ({...h, s: loopAt}))});
+    const fp = layoutSky(first, size);
+    // what frame 0 shows settled: everything that starts with page 1 (or before frame 0)
+    const hookT = Math.max(fp.start, 0);
+    const s0 = loopAt + MOTION.captionScroll.lead;
+    const onAtHook = new Set<CaptionHighlight>();
+    fp.lines.forEach((ln) => {
+      if (ln.start <= hookT) for (const bx of ln.boxes) if (bx.start <= hookT) onAtHook.add(bx.hl);
+    });
+    loopBeat = {
+      ...first,
+      s: s0,
+      // same lines => same layout (line count, font size, baselines); a line not yet on screen at frame 0 never starts
+      lines: first.lines.map((ln, i) => ({text: ln.text, s: i === 0 || fp.lines[i].start <= hookT ? s0 : Infinity})),
+      highlights: (first.highlights ?? []).map((h) => {
+        if (!onAtHook.has(h)) return {...h, s: Infinity};
+        const c = {...h, s: s0};
+        preDrawn.add(c);
+        return c;
+      }),
+    };
+    list = list.filter((b) => b.s < s0);
+    list.push(loopBeat);
   }
   if (!list.length) return null;
-  const pages = list.map((b) => layoutSky(b, size));
+  const pages = list.map((b) => {
+    const pg = layoutSky(b, size);
+    if (b !== loopBeat) return pg;
+    // boxes frame 0 shows full roll in already drawn; the roll lands on the seam (frame 0 holds it settled)
+    const lines = pg.lines.map((ln) => ({...ln, boxes: ln.boxes.map((bx) => (preDrawn.has(bx.hl) ? {...bx, start: -Infinity} : bx))}));
+    const room = loopEnd !== undefined ? loopEnd - pg.start : Infinity;
+    return {...pg, lines, scrollDur: room < MOTION.captionScroll.dur ? Math.max(room, 1e-3) : undefined};
+  });
   const instantUntil = range && isFinite(range[0]) ? range[0] + instantWithin : -Infinity;
   let k = -1;
   for (let i = 0; i < pages.length; i++) if (pages[i].start <= T) k = i;
@@ -384,7 +421,7 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
   const prev = k > 0 ? pages[k - 1] : null;
   // the first page never scrolls in when it is the hook (it is already on screen at frame 0)
   const instant = pop || settledAll || cur.start <= instantUntil || (hookAtStart && k === 0);
-  const u = clamp((T - cur.start) / MOTION.captionScroll.dur);
+  const u = clamp((T - cur.start) / (cur.scrollDur ?? MOTION.captionScroll.dur));
   const q = instant ? 1 : MOTION.captionScroll.ease(u);
   const tn: CaptionTone = typeof tone === 'function' ? tone(T) : tone;
   // the hook frame: the first page's line 1 shows settled before anything starts; later lines/boxes keep their times

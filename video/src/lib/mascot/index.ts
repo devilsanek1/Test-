@@ -1,10 +1,10 @@
-export {Elephant} from './Elephant';
+export {Elephant, BUILD} from './Elephant';
 export type {ElephantProps} from './Elephant';
 export {ElephantTimeline} from './ElephantTimeline';
 export type {ElephantTimelineProps} from './ElephantTimeline';
 export {POSES, POSE_BOUNDS, WALK, walkSpeed} from './poses';
 export type {PoseName, Expression} from './poses';
-export {hop, popIn, drawIn, drawOut, popSwitch, poseAt} from './motion';
+export {hop, popIn, drawIn, drawOut, unbuild, popSwitch, poseAt} from './motion';
 export type {HopOpts, PoseKey} from './motion';
 export {MASCOT, COLORWAYS, MASCOT_COLORWAY} from './colors';
 export type {Colorway, ColorwayKey} from './colors';
