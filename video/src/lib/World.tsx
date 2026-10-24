@@ -18,6 +18,12 @@
 //   by height; no clip edge through figures, no double render). A key with only `tod` takes its colour from
 //   theme.todSky. Never a fade. Pair a dark sky with captionTone 'light' (scenes.json; give the tone key the same
 //   `wipe` so the caption colour follows the edge too).
+//   A key WITHOUT `tod` only recolours the sky (it inherits the light): a stepped UNIFORM tween (no wipe edge through
+//   the captions) is consecutive `snap` keys with explicit colours, the last one carrying the new `tod` (every object
+//   relights in that one frame, nothing relights on the colour-only steps):
+//     [{t: 0, tod: 'golden'}, {t: 5.0, color: '#A0C7B5', wipe: 'snap'}, {t: 5.15, color: '#94BDAA', wipe: 'snap'},
+//      {t: 5.3, color: '#88B3A0', wipe: 'snap'}, {t: 5.45, color: '#7CA995', wipe: 'snap'},
+//      {t: 5.6, color: '#709F8B', tod: 'dusk', wipe: 'snap'}]
 //
 // CAMERA: `push` = the per-shot gentle zoom reference 2 gives every shot (default 1.00 -> 1.06 over 2 s from t 0,
 //   ease in-out sine, about world.vp). After an incoming PULL-BACK (push-through, camera-continuous 'out') the default
@@ -246,14 +252,19 @@ export const World: React.FC<WorldProps> = ({sky = skies.day, tod, horizon = wor
   const keys = skyKeys(sky, tod);
   // time of day: the current key's light; while its wipe runs, a relight WAVE: every object flips whole (one frame)
   // when the sky edge reaches its centre (lib/tod.tsx), so the scene is drawn once and no edge cuts through a figure
+  // The LIGHT follows only the keys that change `tod`: a colour-only key (e.g. the steps of a stepped uniform tween:
+  // consecutive `snap` keys with explicit colours) inherits the time of day and never relights, and never cuts a
+  // running relight wave short. A `snap` key that carries a new `tod` relights every object in its one frame.
   let cur = 0;
   for (let i = 1; i < keys.length; i++) if (t >= keys[i].t) cur = i;
+  let light = 0;
+  for (let i = 1; i <= cur; i++) if (keys[i].tod !== keys[i - 1].tod) light = i;
   const curTod = keys[cur].tod;
-  const prevTod = cur > 0 ? keys[cur - 1].tod : curTod;
-  const p = cur > 0 ? wipeP(keys[cur], t) : 1;
+  const prevTod = light > 0 ? keys[light - 1].tod : curTod;
+  const p = light > 0 ? wipeP(keys[light], t) : 1;
   let relit: React.ReactNode;
   if (prevTod !== curTod && p < 1) {
-    const wave: TodWave = {from: prevTod, to: curTod, p, wipe: keys[cur].wipe, rect, inv: mat.inv(m)};
+    const wave: TodWave = {from: prevTod, to: curTod, p, wipe: keys[light].wipe, rect, inv: mat.inv(m)};
     const vpTod = p >= waveEdgeP(wave, world.vp[0], world.vp[1]) ? curTod : prevTod;
     relit = (
       <Tod value={vpTod} wave={wave}>

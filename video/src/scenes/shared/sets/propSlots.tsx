@@ -18,8 +18,9 @@ import {Noticeboard} from '../../../lib/kit';
 import {Seed} from '../../../lib/rng';
 import {popK, PopAt} from './common';
 import {BackSoonTag, Bit, Bollard, BrowserChrome, Calendar, CalPage, CheckFlag, CheckMark, Citizen, EdgeOnlooker, ElephantEmblem, ElephantPlaque, ElephantStamp, Lock, LockProps, Magnifier, MailSlot, Maker, PaneRect, QuestionMark, RailBoard, RollerShutter, ShutterPadlock, TargetRing, WrenchGlyph, WrenchTag} from '../props';
+import type {BackSoonTagProps, BrowserChromeProps, ShutterPadlockProps} from '../props';
 import type {Acc, Hair} from '../../../lib/kit';
-export type {LockProps, CalPage, PaneRect};
+export type {LockProps, CalPage, PaneRect, BackSoonTagProps, ShutterPadlockProps};
 
 // ---------------------------------------------------------------- elephant emblem (P2 ElephantEmblem stand-in)
 
@@ -65,10 +66,12 @@ export type ChromeSlotProps = {
   seed?: Seed;
   /** Glass colour of the plain window state. */
   glass?: string;
+  /** Screen content (screen-local coords) replacing the default lit page (the plaza's CRT power-off overlay). */
+  content?: BrowserChromeProps['content'];
 };
 
 /** -> props BrowserChrome (P4). `chrome={false}` = a plain window forever. */
-export const ChromeSlot: React.FC<ChromeSlotProps> = ({x, y, w, h, chromeAt, chrome = true, screenOnAt, offAt, lod = 'full', width = stroke.ink, seed = 'chrome', glass = palette.sage}) => (
+export const ChromeSlot: React.FC<ChromeSlotProps> = ({x, y, w, h, chromeAt, chrome = true, screenOnAt, offAt, lod = 'full', width = stroke.ink, seed = 'chrome', glass = palette.sage, content}) => (
   <BrowserChrome
     x={x}
     y={y}
@@ -82,6 +85,7 @@ export const ChromeSlot: React.FC<ChromeSlotProps> = ({x, y, w, h, chromeAt, chr
     mode={lod === 'dots' ? 'dots' : 'window'}
     ink={width}
     glass={glass}
+    content={content}
     seed={seed}
   />
 );
@@ -115,10 +119,10 @@ export const ShutterSlot: React.FC<{x: number; y: number; w: number; h: number; 
 );
 
 /** -> props ShutterPadlock (P5): 24 x 28, sand body, ink shackle, cream glint (distinct from the door lock). */
-export const PadlockSlot: React.FC<{x: number; y: number; size?: number; at?: number; glintAt?: number; seed?: Seed}> = ({x, y, size = 28, at, glintAt, seed = 'pl'}) => <ShutterPadlock x={x} y={y} size={size} at={at} glintAt={glintAt} seed={seed} />;
+export const PadlockSlot: React.FC<{x: number; y: number; size?: number; at?: number; glintAt?: number; seed?: Seed; extra?: Partial<ShutterPadlockProps>}> = ({x, y, size = 28, at, glintAt, seed = 'pl', extra}) => <ShutterPadlock x={x} y={y} size={size} at={at} glintAt={glintAt} seed={seed} {...extra} />;
 
 /** -> props BackSoonTag (P5): white 30 x 36 tag with an ink clock, hung from (x, y); swings from `at`, again on `tapAt`. */
-export const BackSoonSlot: React.FC<{x: number; y: number; at?: number; tapAt?: number; seed?: Seed}> = ({x, y, at, tapAt, seed = 'tag'}) => <BackSoonTag x={x} y={y} at={at} tapAt={tapAt} seed={seed} />;
+export const BackSoonSlot: React.FC<{x: number; y: number; at?: number; tapAt?: number | number[]; seed?: Seed; extra?: Partial<BackSoonTagProps>}> = ({x, y, at, tapAt, seed = 'tag', extra}) => <BackSoonTag x={x} y={y} at={at} tapAt={tapAt} seed={seed} {...extra} />;
 
 // ---------------------------------------------------------------- P17 Bollard
 

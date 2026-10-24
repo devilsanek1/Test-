@@ -16,6 +16,7 @@ Cue file (JSON list):  [{"t": 35.35, "sfx": "pop_mid", "gain_db": -12, "pan": 0}
            -12 puts a pop ~15 dB under the voice (momentary loudness); -10..-20 is the useful range
   pan      -1 (left) .. +1 (right), constant-power
 Optional per-cue keys: "offset" (s, skip into the file), "dur" (s, truncate with a 20 ms fade),
+  "reverse": true (play the file backwards), "stepped": true (advance in short mechanical steps),
   "loop": true + "dur" (tile a loopable ambience such as air_bed / city_bed; "fade_in"/"fade_out" s),
   "prio" (A = core, B = optional; filter with --prio A), "why" (free text, ignored).
 
@@ -25,6 +26,7 @@ Signal flow
               attack 30 ms, release 250 ms, 200 ms hold, default -12 dB) -> margin guard (extra smoothed
               reduction only where the bed would still come within 12 dB of the voice)
   SFX bus   -> gentle 2.5 kHz dip + -3 dB duck while the voice speaks + 9 dB make-up (sits under the VO)
+              -> SFX guard: a cue that would come within 8 dB of the speaking voice is pulled down there
   master    -> 25 Hz HPF -> glue comp (1.5:1, circular so the loop seam is seamless)
             -> loudness to -14 LUFS -> true-peak limiter (4x oversampled detector) <= -1.0 dBTP
 The whole chain is circular: the duck envelope, SFX tails and the master dynamics all wrap around
@@ -144,6 +146,16 @@ def tp_limit(y, ceiling_db=-1.0, release_ms=80.0, look_ms=1.5):
     return y * g[:, None]
 
 
+def stepped_gate(x, rate_hz=11.0, duty=0.62, ramp_ms=4.0):
+    """'Stepped' playback for the rewind: the sound advances in short mechanical steps (a smoothed square gate)."""
+    n = len(x)
+    t = np.arange(n) / SR
+    g = ((t * rate_hz) % 1.0 < duty).astype(float)
+    k = max(1, int(ramp_ms * 1e-3 * SR))
+    g = np.convolve(g, np.ones(k) / k, mode="same")
+    return x * g[:, None]
+
+
 def load_cues(path):
     if path is None or not Path(path).exists():
         return []
@@ -160,8 +172,14 @@ def render_sfx(cues, wrap=True):
         if p not in cache:
             cache[p] = load(p)
         x = cache[p]
+        if c.get("reverse"):
+            x = x[::-1].copy()                       # e.g. the S12 rewind: whoosh / ticker played backwards
+        if c.get("stepped"):
+            x = stepped_gate(x)
         off = int(c.get("offset", 0) * SR)
         x = x[off:]
+        if off > 0 and not c.get("loop"):
+            fi = min(len(x) // 3, int(0.15 * SR)); x = x.copy(); x[:fi] *= np.linspace(0, 1, fi)[:, None]
         if c.get("loop"):
             m = int(c.get("dur", len(x) / SR) * SR)
             x = np.concatenate([x] * (m // len(x) + 1))[:m].copy()
@@ -170,7 +188,7 @@ def render_sfx(cues, wrap=True):
             if fo: x[-fo:] *= np.cos(np.linspace(0, np.pi / 2, fo))[:, None] ** 2
         elif "dur" in c:
             m = int(c["dur"] * SR); x = x[:m].copy()
-            f = min(len(x), int(0.02 * SR)); x[-f:] *= np.linspace(1, 0, f)[:, None]
+            f = min(len(x), int((0.4 if off > 0 else 0.02) * SR)); x[-f:] *= np.linspace(1, 0, f)[:, None]
         x = pan_stereo(x, c.get("pan", 0.0)) * db2a(c.get("gain_db", -12.0))
         i = int(round(c["t"] * SR))
         if i < 0:
@@ -228,7 +246,8 @@ def make_placeholder_cues(path):
 
 # ---------------------------------------------------------------------------- main mix
 def mix(music, cues, vo_path, out, duck_db=None, music_db="auto", target_lufs=-14.0, ceiling=-1.0,
-        sfx_duck_db=3.0, wrap=True, stems=False, report=True, min_gap_db=12.0, base_lu=None, sfx_bus_db=9.0):
+        sfx_duck_db=3.0, wrap=True, stems=False, report=True, min_gap_db=12.0, base_lu=None, sfx_bus_db=9.0,
+        sfx_min_gap_db=8.0):
     mode = "lu"
     if music in BEDS:
         mp, mode, lvl, dk = BEDS[music]
@@ -274,6 +293,13 @@ def mix(music, cues, vo_path, out, duck_db=None, music_db="auto", target_lufs=-1
         from pedalboard import Pedalboard, PeakFilter
         sfx = Pedalboard([PeakFilter(2500, -2.0, 0.8)])(sfx.T.astype(np.float32), SR).T.astype(np.float64)
         sfx = sfx * sfx_duck[:, None] * db2a(sfx_bus_db)
+        # SFX guard: storyboard gains are animator estimates; where a cue (or a stack of cues) would come within
+        # `sfx_min_gap_db` of the speaking voice, pull just that moment down (smoothed) so SFX stay under the VO
+        sguard = np.ones(N_TOTAL)
+        if sfx_min_gap_db:
+            for _ in range(3):
+                sguard *= margin_guard(vo_st, sfx * sguard[:, None], sfx_min_gap_db + 0.5)
+            sfx = sfx * sguard[:, None]
 
     pre = vo_st + m_d + sfx
     y = circular(pre, glue)
@@ -299,6 +325,11 @@ def mix(music, cues, vo_path, out, duck_db=None, music_db="auto", target_lufs=-1
                     "duck_depth_dB": duck_db,
                     "margin_guard_extra_dB_max": round(float(-guard_db.min()), 1),
                     "margin_guard_active_pct": round(float((guard_db < -0.5).mean() * 100), 1)})
+    if np.any(sfx):
+        sg = speech_gap(vo_st, sfx)
+        res.update({"voice_over_sfx_median_dB": round(float(np.median(sg)), 1),
+                    "voice_over_sfx_min_dB": round(float(sg.min()), 1),
+                    "sfx_guard_extra_dB_max": round(float(-a2db(sguard).min()), 1)})
     if stems:
         gm = g  # same master gain (pre-limiter) for reference stems
         save(Path(out).with_name(Path(out).stem + "_stem_vo.wav"), vo_st * gm)
@@ -347,6 +378,8 @@ def main():
                     help="un-ducked bed level in LU under the voice (bed default 6); for near_silent a dB trim")
     ap.add_argument("--min-gap", type=float, default=12.0, help="voice-over-music margin to guarantee (dB)")
     ap.add_argument("--sfx-duck-db", type=float, default=3.0)
+    ap.add_argument("--sfx-min-gap", type=float, default=8.0,
+                    help="keep SFX at least this far under the speaking voice (momentary dB); 0 = off")
     ap.add_argument("--sfx-bus-db", type=float, default=9.0,
                     help="SFX bus make-up: with it a pop at gain_db -12 lands ~15 dB under the voice")
     ap.add_argument("--lufs", type=float, default=-14.0)
@@ -364,7 +397,8 @@ def main():
         cues = [c for c in cues if str(c.get("prio", "A")) in a.prio]
     mix(a.music, cues, a.vo, a.out, duck_db=a.duck_db, music_db=a.music_db, target_lufs=a.lufs,
         ceiling=a.ceiling, sfx_duck_db=a.sfx_duck_db, wrap=not a.no_wrap, stems=a.stems,
-        min_gap_db=a.min_gap, base_lu=a.music_lu, sfx_bus_db=a.sfx_bus_db)
+        min_gap_db=a.min_gap, base_lu=a.music_lu, sfx_bus_db=a.sfx_bus_db,
+        sfx_min_gap_db=a.sfx_min_gap)
 
 
 if __name__ == "__main__":

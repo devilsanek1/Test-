@@ -1,257 +1,1631 @@
 [
  {
   "t": 0.0,
-  "sfx": "city_bed",
-  "gain_db": -26,
+  "sfx": "switch_toggle",
+  "gain_db": -16.0,
   "pan": 0.0,
-  "prio": "A",
-  "provisional": true,
-  "anchor": {
-   "word": "Governments",
-   "offset": -0.16
-  },
-  "why": "distant city hum under the opening; it dies with the shutdown",
-  "loop": true,
-  "dur": 2.05,
-  "fade_in": 0.0,
-  "fade_out": 0.15
+  "provisional": false,
+  "scene": "S01",
+  "why": "-16 dB, the press releases (the click of the power button; the S12 rewind whirr wraps into it)",
+  "src_t": 0.0
  },
  {
-  "t": 0.05,
-  "sfx": "pencil_scratch_medium",
-  "gain_db": -21,
-  "pan": 0.0,
-  "prio": "A",
-  "provisional": true,
-  "anchor": {
-   "word": "Governments",
-   "offset": -0.11
-  },
-  "why": "opening line art draws on from frame 1"
- },
- {
-  "t": 2.02,
+  "t": 0.63,
   "sfx": "power_off_thunk",
-  "gain_db": -14,
+  "gain_db": -24.0,
   "pan": 0.0,
-  "prio": "A",
   "provisional": true,
-  "anchor": {
-   "word": "down",
-   "offset": 0.02
-  },
-  "why": "'shut DOWN' - sites switch off"
+  "scene": "S01",
+  "why": "-24 dB, govA screen off",
+  "src_t": 0.63
  },
  {
-  "t": 12.17,
-  "sfx": "pop_mid",
-  "gain_db": -15,
-  "pan": -0.2,
-  "prio": "B",
-  "provisional": true,
-  "anchor": {
-   "word": "about7",
-   "offset": 0.41
-  },
-  "why": "'seven' (out of ten)"
- },
- {
-  "t": 12.76,
-  "sfx": "pop_high",
-  "gain_db": -17,
-  "pan": 0.2,
-  "prio": "B",
-  "provisional": true,
-  "anchor": {
-   "word": "of10",
-   "offset": 0.2
-  },
-  "why": "'ten'"
- },
- {
-  "t": 13.97,
-  "sfx": "fg_wipe",
-  "gain_db": -19,
+  "t": 0.885,
+  "sfx": "power_off_thunk",
+  "gain_db": -26.0,
   "pan": 0.0,
-  "prio": "B",
   "provisional": true,
-  "anchor": {
-   "word": "This",
-   "offset": -0.35
-  },
-  "why": "0.46 s pause before 'This bug was in there' - transition"
+  "scene": "S01",
+  "why": "-26 dB, govC screen off",
+  "src_t": 0.885
  },
  {
-  "t": 15.63,
-  "sfx": "pop_mid",
-  "gain_db": -15,
+  "t": 1.155,
+  "sfx": "typing_tick",
+  "gain_db": -24.0,
   "pan": 0.0,
-  "prio": "B",
   "provisional": true,
-  "anchor": {
-   "word": "like14",
-   "offset": 0.27
-  },
-  "why": "'fourteen' (years)"
+  "scene": "S01",
+  "why": "-24 dB, far silhouettes step dark (3 offsets)",
+  "src_t": 1.155
  },
  {
-  "t": 26.66,
+  "t": 1.235,
+  "sfx": "typing_tick",
+  "gain_db": -25.5,
+  "pan": -0.25,
+  "provisional": true,
+  "scene": "S01",
+  "why": "-24 dB, far silhouettes step dark (3 offsets)",
+  "src_t": 1.155
+ },
+ {
+  "t": 1.315,
+  "sfx": "typing_tick",
+  "gain_db": -27.0,
+  "pan": 0.25,
+  "provisional": true,
+  "scene": "S01",
+  "why": "-24 dB, far silhouettes step dark (3 offsets)",
+  "src_t": 1.155
+ },
+ {
+  "t": 1.565,
+  "sfx": "click_light",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S01",
+  "why": "-20 dB, glyph glint",
+  "src_t": 1.565
+ },
+ {
+  "t": 1.71,
   "sfx": "pop_low",
-  "gain_db": -13,
+  "gain_db": -18.0,
   "pan": 0.0,
-  "prio": "A",
   "provisional": true,
-  "anchor": {
-   "word": "Cloudflare",
-   "offset": 0.02
-  },
-  "why": "'Cloudflare' lands (the bed's soft accent is on the bar line before it)"
+  "scene": "S01",
+  "why": "govB shutter",
+  "src_t": 1.71
  },
  {
-  "t": 29.3,
-  "sfx": "counter_ticker",
-  "gain_db": -14,
-  "pan": 0.1,
-  "prio": "A",
+  "t": 1.98,
+  "sfx": "pop_low",
+  "gain_db": -18.0,
+  "pan": 0.0,
   "provisional": true,
-  "anchor": {
-   "word": "tens",
-   "offset": 0.02
-  },
-  "why": "'tens of thousands' counting up (~2 s)"
+  "scene": "S01",
+  "why": "-18 dB, govA shutter",
+  "src_t": 1.98
  },
  {
-  "t": 31.49,
+  "t": 2.35,
+  "sfx": "pop_low",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S01",
+  "why": "-20 dB, govC half shutter",
+  "src_t": 2.35
+ },
+ {
+  "t": 2.685,
+  "sfx": "power_off_thunk",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S01",
+  "why": "-18 dB, lantern",
+  "src_t": 2.685
+ },
+ {
+  "t": 3.385,
+  "sfx": "lock_click",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S01",
+  "why": "-16 dB, padlocks x3",
+  "src_t": 3.385
+ },
+ {
+  "t": 3.465,
+  "sfx": "lock_click",
+  "gain_db": -17.5,
+  "pan": -0.25,
+  "provisional": true,
+  "scene": "S01",
+  "why": "-16 dB, padlocks x3",
+  "src_t": 3.385
+ },
+ {
+  "t": 3.545,
+  "sfx": "lock_click",
+  "gain_db": -19.0,
+  "pan": 0.25,
+  "provisional": true,
+  "scene": "S01",
+  "why": "-16 dB, padlocks x3",
+  "src_t": 3.385
+ },
+ {
+  "t": 3.695,
+  "sfx": "pop_mid",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S01",
+  "why": "-20 dB, tags swing",
+  "src_t": 3.695
+ },
+ {
+  "t": 4.385,
+  "sfx": "whoosh_soft",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S01",
+  "why": "the dive",
+  "src_t": 4.385
+ },
+ {
+  "t": 4.715,
+  "sfx": "pencil_scratch_medium",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S02",
+  "why": "-18 dB, on the cut: lines draw outward",
+  "src_t": 4.715
+ },
+ {
+  "t": 4.955,
+  "sfx": "card_flip",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S02",
+  "why": "-22 dB, cover hinge",
+  "src_t": 4.955
+ },
+ {
+  "t": 5.105,
+  "sfx": "click_light",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S02",
+  "why": "-18 dB, bolt stops short",
+  "src_t": 5.105
+ },
+ {
+  "t": 5.305,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S02",
+  "why": "gap bracket",
+  "src_t": 5.305
+ },
+ {
+  "t": 5.355,
   "sfx": "pop_high",
-  "gain_db": -15,
+  "gain_db": -20.0,
   "pan": 0.0,
-  "prio": "B",
   "provisional": true,
-  "anchor": {
-   "word": "in45",
-   "offset": 0.21
-  },
-  "why": "'forty-five' (minutes)"
+  "scene": "S02",
+  "why": "-20 dB, Bit",
+  "src_t": 5.355
  },
  {
-  "t": 32.98,
+  "t": 5.775,
   "sfx": "pop_mid",
-  "gain_db": -12,
+  "gain_db": -26.0,
   "pan": 0.0,
-  "prio": "A",
   "provisional": true,
-  "anchor": {
-   "word": "millions",
-   "offset": 0.02
-  },
-  "why": "'millions'"
+  "scene": "S02",
+  "why": "-26 dB, L1 tag",
+  "src_t": 5.775
  },
  {
-  "t": 34.3,
+  "t": 5.825,
+  "sfx": "whoosh_soft",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S02",
+  "why": "-24 dB, hand in",
+  "src_t": 5.825
+ },
+ {
+  "t": 6.42,
+  "sfx": "lock_click",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S02",
+  "why": "thumb-turn",
+  "src_t": 6.42
+ },
+ {
+  "t": 6.57,
+  "sfx": "pop_mid",
+  "gain_db": -26.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S02",
+  "why": "-26 dB, L2 tag",
+  "src_t": 6.57
+ },
+ {
+  "t": 6.635,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S02",
+  "why": "-20 dB, hatching + flag",
+  "src_t": 6.635
+ },
+ {
+  "t": 7.275,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S02",
+  "why": "-20 dB, key cross",
+  "src_t": 7.275
+ },
+ {
+  "t": 8.273,
+  "sfx": "whoosh_soft",
+  "gain_db": -26.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S02",
+  "why": "-26 dB, hand out",
+  "src_t": 8.273
+ },
+ {
+  "t": 8.393,
+  "sfx": "whoosh_soft",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S03",
+  "why": "-22 dB, the hard cut",
+  "src_t": 8.393
+ },
+ {
+  "t": 8.605,
+  "sfx": "pencil_scratch_medium",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-20 dB, grid",
+  "src_t": 8.605
+ },
+ {
+  "t": 8.83,
+  "sfx": "pop_low",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S03",
+  "why": "stamp slam",
+  "src_t": 8.83
+ },
+ {
+  "t": 9.26,
+  "sfx": "pop_mid",
+  "gain_db": -26.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-26 dB, label card",
+  "src_t": 9.26
+ },
+ {
+  "t": 9.46,
+  "sfx": "paper_flip",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S03",
+  "why": "pop-up city (one file)",
+  "src_t": 9.46
+ },
+ {
+  "t": 11.105,
+  "sfx": "pop_mid",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-24 dB, Pip puffs up",
+  "src_t": 11.105
+ },
+ {
+  "t": 11.605,
+  "sfx": "pop_mid",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-22 dB, sign swings",
+  "src_t": 11.605
+ },
+ {
+  "t": 11.955,
+  "sfx": "pop_high",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-18 dB counting ticks x7, 0.08 s apart",
+  "src_t": 11.955
+ },
+ {
+  "t": 12.035,
+  "sfx": "pop_high",
+  "gain_db": -19.5,
+  "pan": -0.25,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-18 dB counting ticks x7, 0.08 s apart",
+  "src_t": 11.955
+ },
+ {
+  "t": 12.115,
+  "sfx": "pop_high",
+  "gain_db": -21.0,
+  "pan": 0.25,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-18 dB counting ticks x7, 0.08 s apart",
+  "src_t": 11.955
+ },
+ {
+  "t": 12.195,
+  "sfx": "pop_high",
+  "gain_db": -22.5,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-18 dB counting ticks x7, 0.08 s apart",
+  "src_t": 11.955
+ },
+ {
+  "t": 12.275,
+  "sfx": "pop_high",
+  "gain_db": -24.0,
+  "pan": -0.25,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-18 dB counting ticks x7, 0.08 s apart",
+  "src_t": 11.955
+ },
+ {
+  "t": 12.355,
+  "sfx": "pop_high",
+  "gain_db": -25.5,
+  "pan": 0.25,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-18 dB counting ticks x7, 0.08 s apart",
+  "src_t": 11.955
+ },
+ {
+  "t": 12.435,
+  "sfx": "pop_high",
+  "gain_db": -27.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-18 dB counting ticks x7, 0.08 s apart",
+  "src_t": 11.955
+ },
+ {
+  "t": 12.505,
+  "sfx": "card_flip",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-24 dB, the card flips",
+  "src_t": 12.505
+ },
+ {
+  "t": 12.55,
+  "sfx": "pop_low",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S03",
+  "why": "-16 dB, 3 blank plates + pie",
+  "src_t": 12.55
+ },
+ {
+  "t": 13.945,
+  "sfx": "whoosh_soft",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S03",
+  "why": "sun glide-hop",
+  "src_t": 13.945
+ },
+ {
+  "t": 14.17,
+  "sfx": "whoosh_soft",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S04",
+  "why": "-22 dB, the sun crosses the cut",
+  "src_t": 14.17
+ },
+ {
+  "t": 14.395,
+  "sfx": "pop_mid",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S04",
+  "why": "-22 dB, sun touches down",
+  "src_t": 14.395
+ },
+ {
+  "t": 14.6,
+  "sfx": "pop_mid",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S04",
+  "why": "-20 dB, Bit hop",
+  "src_t": 14.6
+ },
+ {
+  "t": 15.085,
+  "sfx": "counter_ticker",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S04",
+  "why": "-18 dB, under the 14 tears",
+  "src_t": 15.085
+ },
+ {
+  "t": 15.085,
+  "sfx": "paper_flip",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S04",
+  "why": "-20 dB, first tear",
+  "src_t": 15.085
+ },
+ {
+  "t": 15.39,
+  "sfx": "paper_flip",
+  "gain_db": -26.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S04",
+  "why": "-26 dB, tag swings in",
+  "src_t": 15.39
+ },
+ {
+  "t": 15.59,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S04",
+  "why": "-24 dB, cobweb",
+  "src_t": 15.59
+ },
+ {
+  "t": 16.26,
+  "sfx": "whoosh_soft",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S04",
+  "why": "dive into the lock",
+  "src_t": 16.26
+ },
+ {
+  "t": 16.59,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S05",
+  "why": "-22 dB, on the cut: the annotation settles",
+  "src_t": 16.59
+ },
+ {
+  "t": 16.775,
+  "sfx": "pop_mid",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S05",
+  "why": "-18 dB, team A rise",
+  "src_t": 16.775
+ },
+ {
+  "t": 17.125,
+  "sfx": "pop_mid",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S05",
+  "why": "-18 dB, team B rise",
+  "src_t": 17.125
+ },
+ {
+  "t": 17.435,
+  "sfx": "paper_flip",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S05",
+  "why": "-22 dB, calendar",
+  "src_t": 17.435
+ },
+ {
+  "t": 17.645,
+  "sfx": "bubble_pop",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S05",
+  "why": "sparkles",
+  "src_t": 17.645
+ },
+ {
+  "t": 17.955,
+  "sfx": "whoosh_soft",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S05",
+  "why": "-16 dB, scan sweep",
+  "src_t": 17.955
+ },
+ {
+  "t": 18.105,
+  "sfx": "pop_mid",
+  "gain_db": -26.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S05",
+  "why": "-26 dB, slip",
+  "src_t": 18.105
+ },
+ {
+  "t": 18.535,
+  "sfx": "ding",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S05",
+  "why": "found",
+  "src_t": 18.535
+ },
+ {
+  "t": 18.87,
+  "sfx": "pencil_scratch_medium",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S05",
+  "why": "-20 dB, the hand redraws",
+  "src_t": 18.87
+ },
+ {
+  "t": 19.215,
+  "sfx": "alert_ping",
+  "gain_db": -14.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S05",
+  "why": "-14 dB, Pip wakes",
+  "src_t": 19.215
+ },
+ {
+  "t": 19.473,
+  "sfx": "whoosh_soft",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S05",
+  "why": "-20 dB, cut on action",
+  "src_t": 19.473
+ },
+ {
+  "t": 19.773,
+  "sfx": "whoosh_soft",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S06",
+  "why": "-20 dB, on the cut on action",
+  "src_t": 19.773
+ },
+ {
+  "t": 19.98,
+  "sfx": "pop_mid",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S06",
+  "why": "-18 dB, seal pops",
+  "src_t": 19.98
+ },
+ {
+  "t": 20.285,
+  "sfx": "pop_mid",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S06",
+  "why": "-22 dB, sign swings",
+  "src_t": 20.285
+ },
+ {
+  "t": 21.285,
+  "sfx": "pop_high",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S06",
+  "why": "-18 dB, three heads pop up (3 offsets)",
+  "src_t": 21.285
+ },
+ {
+  "t": 21.365,
+  "sfx": "click_light",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S06",
+  "why": "-18 dB, mail slot flap",
+  "src_t": 21.365
+ },
+ {
+  "t": 21.365,
+  "sfx": "pop_high",
+  "gain_db": -19.5,
+  "pan": -0.25,
+  "provisional": true,
+  "scene": "S06",
+  "why": "-18 dB, three heads pop up (3 offsets)",
+  "src_t": 21.285
+ },
+ {
+  "t": 21.445,
+  "sfx": "pop_high",
+  "gain_db": -21.0,
+  "pan": 0.25,
+  "provisional": true,
+  "scene": "S06",
+  "why": "-18 dB, three heads pop up (3 offsets)",
+  "src_t": 21.285
+ },
+ {
+  "t": 21.535,
+  "sfx": "paper_flip",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S06",
+  "why": "-20 dB, the sheet flutters in",
+  "src_t": 21.535
+ },
+ {
+  "t": 21.985,
   "sfx": "fg_wipe",
-  "gain_db": -19,
+  "gain_db": -18.0,
   "pan": 0.0,
-  "prio": "B",
-  "provisional": true,
-  "anchor": {
-   "word": "But",
-   "offset": -0.42
-  },
-  "why": "the turn: 0.49 s pause before 'But even with the fix out'"
+  "provisional": false,
+  "scene": "S07",
+  "why": "on the cut: the paper lens wipe",
+  "src_t": 21.985
  },
  {
-  "t": 34.75,
-  "sfx": "light_shimmer",
-  "gain_db": -24,
-  "pan": 0.0,
-  "prio": "B",
-  "provisional": true,
-  "anchor": {
-   "word": "But",
-   "offset": 0.03
-  },
-  "why": "breathing room on the turn"
- },
- {
-  "t": 36.2,
-  "sfx": "air_bed",
-  "gain_db": -27,
-  "pan": 0.0,
-  "prio": "B",
-  "provisional": true,
-  "anchor": {
-   "word": "somebody",
-   "offset": -0.04
-  },
-  "why": "air under 'somebody still has to install it on every single server'",
-  "loop": true,
-  "dur": 3.1,
-  "fade_in": 0.6,
-  "fade_out": 0.6
- },
- {
-  "t": 37.38,
-  "sfx": "typing_burst",
-  "gain_db": -18,
-  "pan": 0.2,
-  "prio": "B",
-  "provisional": true,
-  "anchor": {
-   "word": "install",
-   "offset": 0.02
-  },
-  "why": "'install it'"
- },
- {
-  "t": 40.74,
+  "t": 22.105,
   "sfx": "pop_mid",
-  "gain_db": -14,
+  "gain_db": -22.0,
   "pan": 0.0,
-  "prio": "A",
   "provisional": true,
-  "anchor": {
-   "word": "half",
-   "offset": 0.02
-  },
-  "why": "'HALF' of PHP sites"
+  "scene": "S07",
+  "why": "-22 dB, pin + Pip lands",
+  "src_t": 22.105
  },
  {
-  "t": 49.06,
-  "sfx": "switch_toggle",
-  "gain_db": -9,
+  "t": 22.255,
+  "sfx": "pop_mid",
+  "gain_db": -26.0,
   "pan": 0.0,
-  "prio": "A",
   "provisional": true,
-  "anchor": {
-   "word": "off.",
-   "offset": 0.02
-  },
-  "why": "'just turn it OFF'"
+  "scene": "S07",
+  "why": "-26 dB, L7 tag",
+  "src_t": 22.255
  },
  {
-  "t": 53.46,
-  "sfx": "switch_toggle",
-  "gain_db": -13,
+  "t": 22.505,
+  "sfx": "click_light",
+  "gain_db": -18.0,
   "pan": 0.0,
-  "prio": "B",
   "provisional": true,
-  "anchor": {
-   "word": "did",
-   "offset": 0.02
-  },
-  "why": "'did it' - soft callback to the opening shutdown"
+  "scene": "S07",
+  "why": "-18 dB, rail lights",
+  "src_t": 22.505
  },
  {
-  "t": 54.05,
+  "t": 22.565,
+  "sfx": "paper_flip",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S07",
+  "why": "-20 dB, clones 4 / 8",
+  "src_t": 22.565
+ },
+ {
+  "t": 22.665,
+  "sfx": "pop_mid",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S07",
+  "why": "flyer slap",
+  "src_t": 22.665
+ },
+ {
+  "t": 22.875,
+  "sfx": "whoosh_soft",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S07",
+  "why": "-24 dB, copies ride the wires",
+  "src_t": 22.875
+ },
+ {
+  "t": 23.165,
+  "sfx": "counter_ticker",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S07",
+  "why": "-18 dB, clock spins",
+  "src_t": 23.165
+ },
+ {
+  "t": 23.695,
+  "sfx": "whoosh_soft",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S07",
+  "why": "-18 dB, tilt-up",
+  "src_t": 23.695
+ },
+ {
+  "t": 24.095,
+  "sfx": "whoosh_soft",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S08",
+  "why": "-18 dB, on the cut: the crane",
+  "src_t": 24.095
+ },
+ {
+  "t": 24.82,
+  "sfx": "handle_rattle",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-18 dB, rattlers",
+  "src_t": 24.82
+ },
+ {
+  "t": 25.445,
+  "sfx": "door_knock",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-22 dB",
+  "src_t": 25.445
+ },
+ {
+  "t": 26.095,
+  "sfx": "light_shimmer",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-24 dB, the glow rings",
+  "src_t": 26.095
+ },
+ {
+  "t": 26.54,
   "sfx": "pencil_scratch_long",
-  "gain_db": -21,
+  "gain_db": -16.0,
   "pan": 0.0,
-  "prio": "A",
   "provisional": true,
-  "anchor": {
-   "word": "fix.",
-   "offset": -0.67
-  },
-  "why": "un-build to the opening line art; tail wraps across the loop"
+  "scene": "S08",
+  "why": "-16 dB, the dome arc",
+  "src_t": 26.54
+ },
+ {
+  "t": 26.64,
+  "sfx": "pop_low",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-18 dB, the board rises",
+  "src_t": 26.64
+ },
+ {
+  "t": 27.29,
+  "sfx": "pop_low",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-20 dB, watchtower",
+  "src_t": 27.29
+ },
+ {
+  "t": 27.605,
+  "sfx": "switch_toggle",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-16 dB, searchlight",
+  "src_t": 27.605
+ },
+ {
+  "t": 28.345,
+  "sfx": "click_light",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-16 dB, start flag",
+  "src_t": 28.345
+ },
+ {
+  "t": 28.345,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-22 dB, tally gates (re-triggered per gate, to the scene end)",
+  "src_t": 28.345
+ },
+ {
+  "t": 29.095,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -22.5,
+  "pan": -0.25,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-22 dB, tally gates (re-triggered per gate, to the scene end)",
+  "src_t": 28.345
+ },
+ {
+  "t": 29.845,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -23.0,
+  "pan": 0.25,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-22 dB, tally gates (re-triggered per gate, to the scene end)",
+  "src_t": 28.345
+ },
+ {
+  "t": 30.595,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -23.5,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-22 dB, tally gates (re-triggered per gate, to the scene end)",
+  "src_t": 28.345
+ },
+ {
+  "t": 31.345,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -24.0,
+  "pan": -0.25,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-22 dB, tally gates (re-triggered per gate, to the scene end)",
+  "src_t": 28.345
+ },
+ {
+  "t": 31.425,
+  "sfx": "counter_ticker",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-18 dB, the 45-minute wedge",
+  "src_t": 31.425
+ },
+ {
+  "t": 32.015,
+  "sfx": "pop_low",
+  "gain_db": -14.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-14 dB, stamp 1",
+  "src_t": 32.015
+ },
+ {
+  "t": 32.095,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -24.5,
+  "pan": 0.25,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-22 dB, tally gates (re-triggered per gate, to the scene end)",
+  "src_t": 28.345
+ },
+ {
+  "t": 32.785,
+  "sfx": "crowd_murmur",
+  "gain_db": -26.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-26 dB, very light, to the scene end",
+  "src_t": 32.785,
+  "offset": 1.0,
+  "dur": 1.698
+ },
+ {
+  "t": 32.785,
+  "sfx": "door_knock",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "layered with the rattle (-16 dB + door_knock layered, the burst)",
+  "src_t": 32.785
+ },
+ {
+  "t": 32.785,
+  "sfx": "handle_rattle",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-16 dB + door_knock layered, the burst",
+  "src_t": 32.785
+ },
+ {
+  "t": 32.845,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -25.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-22 dB, tally gates (re-triggered per gate, to the scene end)",
+  "src_t": 28.345
+ },
+ {
+  "t": 32.855,
+  "sfx": "pop_low",
+  "gain_db": -14.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-14 dB, stamp 2",
+  "src_t": 32.855
+ },
+ {
+  "t": 33.535,
+  "sfx": "low_swell",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-24 dB",
+  "src_t": 33.535
+ },
+ {
+  "t": 33.535,
+  "sfx": "whoosh_soft",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-18 dB, sunset",
+  "src_t": 33.535
+ },
+ {
+  "t": 33.595,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -25.5,
+  "pan": -0.25,
+  "provisional": true,
+  "scene": "S08",
+  "why": "-22 dB, tally gates (re-triggered per gate, to the scene end)",
+  "src_t": 28.345
+ },
+ {
+  "t": 34.483,
+  "sfx": "whoosh_soft",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S09",
+  "why": "-22 dB, on the cut: the match",
+  "src_t": 34.483
+ },
+ {
+  "t": 35.145,
+  "sfx": "light_shimmer",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S09",
+  "why": "-18 dB, dawn wipe + sunrise",
+  "src_t": 35.145
+ },
+ {
+  "t": 35.445,
+  "sfx": "pop_low",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S09",
+  "why": "-18 dB, crate lid",
+  "src_t": 35.445
+ },
+ {
+  "t": 35.795,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S09",
+  "why": "-20 dB, the sign scribble",
+  "src_t": 35.795
+ },
+ {
+  "t": 36.082,
+  "sfx": "pop_mid",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S09",
+  "why": "-20 dB, on the hard cut: keeper rises",
+  "src_t": 36.082
+ },
+ {
+  "t": 36.23,
+  "sfx": "lock_click",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S09",
+  "why": "-16 dB, old lock drops (clunk)",
+  "src_t": 36.23
+ },
+ {
+  "t": 36.765,
+  "sfx": "pop_mid",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S09",
+  "why": "new lock on",
+  "src_t": 36.765
+ },
+ {
+  "t": 36.805,
+  "sfx": "ding",
+  "gain_db": -14.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S09",
+  "why": "-14 dB, fixed",
+  "src_t": 36.805
+ },
+ {
+  "t": 36.915,
+  "sfx": "whoosh_soft",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S09",
+  "why": "-16 dB, the pull-back",
+  "src_t": 36.915
+ },
+ {
+  "t": 38.505,
+  "sfx": "bubble_pop",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S09",
+  "why": "-16 dB, the flag",
+  "src_t": 38.505
+ },
+ {
+  "t": 38.605,
+  "sfx": "pop_high",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S09",
+  "why": "-24 dB, check-box tag wave (one file, 6 offsets 0.1 s)",
+  "src_t": 38.605
+ },
+ {
+  "t": 38.865,
+  "sfx": "light_shimmer",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S09",
+  "why": "-20 dB, the sun crests",
+  "src_t": 38.865
+ },
+ {
+  "t": 39.634,
+  "sfx": "fg_wipe",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S10",
+  "why": "on the cut: the tram (the wipe centre)",
+  "src_t": 39.634
+ },
+ {
+  "t": 40.095,
+  "sfx": "pop_mid",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-18 dB, sites x3",
+  "src_t": 40.095
+ },
+ {
+  "t": 40.175,
+  "sfx": "pop_mid",
+  "gain_db": -19.5,
+  "pan": -0.25,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-18 dB, sites x3",
+  "src_t": 40.095
+ },
+ {
+  "t": 40.255,
+  "sfx": "pop_mid",
+  "gain_db": -21.0,
+  "pan": 0.25,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-18 dB, sites x3",
+  "src_t": 40.095
+ },
+ {
+  "t": 40.505,
+  "sfx": "pop_high",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-22 dB, second row",
+  "src_t": 40.505
+ },
+ {
+  "t": 40.755,
+  "sfx": "pop_low",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-16 dB, the 1/2 pie",
+  "src_t": 40.755
+ },
+ {
+  "t": 41.305,
+  "sfx": "pop_mid",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-20 dB, plaques swing",
+  "src_t": 41.305
+ },
+ {
+  "t": 41.555,
+  "sfx": "paper_flip",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-22 dB, notice sign",
+  "src_t": 41.555
+ },
+ {
+  "t": 42.245,
+  "sfx": "card_flip",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-18 dB, plaque flips old",
+  "src_t": 42.245
+ },
+ {
+  "t": 42.495,
+  "sfx": "card_flip",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-24 dB, second-row flips",
+  "src_t": 42.495
+ },
+ {
+  "t": 42.88,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-22 dB, cobweb",
+  "src_t": 42.88
+ },
+ {
+  "t": 43.205,
+  "sfx": "pop_low",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-20 dB, cane",
+  "src_t": 43.205
+ },
+ {
+  "t": 43.355,
+  "sfx": "whoosh_soft",
+  "gain_db": -26.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-26 dB, the cart rolls in",
+  "src_t": 43.355
+ },
+ {
+  "t": 44.025,
+  "sfx": "click_light",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-18 dB, tick (siteL)",
+  "src_t": 44.025
+ },
+ {
+  "t": 44.39,
+  "sfx": "click_light",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-18 dB, tick (siteR)",
+  "src_t": 44.39
+ },
+ {
+  "t": 44.49,
+  "sfx": "alert_ping",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-16 dB, Pip hey",
+  "src_t": 44.49
+ },
+ {
+  "t": 44.985,
+  "sfx": "typing_tick",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S10",
+  "why": "-22 dB, the update stalls",
+  "src_t": 44.985
+ },
+ {
+  "t": 45.618,
+  "sfx": "pop_mid",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S11",
+  "why": "-24 dB, on the hard cut",
+  "src_t": 45.618
+ },
+ {
+  "t": 46.035,
+  "sfx": "typing_tick",
+  "gain_db": -26.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "-26 dB, ring hiccup",
+  "src_t": 46.035
+ },
+ {
+  "t": 46.735,
+  "sfx": "pop_mid",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "-24 dB, tape strips x4",
+  "src_t": 46.735
+ },
+ {
+  "t": 46.815,
+  "sfx": "pop_mid",
+  "gain_db": -25.5,
+  "pan": -0.25,
+  "provisional": true,
+  "scene": "S11",
+  "why": "-24 dB, tape strips x4",
+  "src_t": 46.735
+ },
+ {
+  "t": 46.895,
+  "sfx": "pop_mid",
+  "gain_db": -27.0,
+  "pan": 0.25,
+  "provisional": true,
+  "scene": "S11",
+  "why": "-24 dB, tape strips x4",
+  "src_t": 46.735
+ },
+ {
+  "t": 46.975,
+  "sfx": "pop_mid",
+  "gain_db": -28.5,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "-24 dB, tape strips x4",
+  "src_t": 46.735
+ },
+ {
+  "t": 47.315,
+  "sfx": "typing_tick",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "-22 dB, bar step",
+  "src_t": 47.315
+ },
+ {
+  "t": 47.995,
+  "sfx": "typing_tick",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "-24 dB, stall",
+  "src_t": 47.995
+ },
+ {
+  "t": 48.265,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "-20 dB, glyph",
+  "src_t": 48.265
+ },
+ {
+  "t": 48.69,
+  "sfx": "switch_toggle",
+  "gain_db": -14.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "the press",
+  "src_t": 48.69
+ },
+ {
+  "t": 48.905,
+  "sfx": "pop_low",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "shutter",
+  "src_t": 48.905
+ },
+ {
+  "t": 49.065,
+  "sfx": "power_off_thunk",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "lights out",
+  "src_t": 49.065
+ },
+ {
+  "t": 49.205,
+  "sfx": "lock_click",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "-16 dB, padlock + tag",
+  "src_t": 49.205
+ },
+ {
+  "t": 50.185,
+  "sfx": "paper_flip",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "-20 dB, the note slaps on",
+  "src_t": 50.185
+ },
+ {
+  "t": 51.755,
+  "sfx": "pencil_scratch_short",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "-18 dB, the strike-through",
+  "src_t": 51.755
+ },
+ {
+  "t": 51.945,
+  "sfx": "whoosh_soft",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S11",
+  "why": "-22 dB, hop out",
+  "src_t": 51.945
+ },
+ {
+  "t": 52.163,
+  "sfx": "whoosh_soft",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S12",
+  "why": "-22 dB, on the hard cut",
+  "src_t": 52.163
+ },
+ {
+  "t": 52.43,
+  "sfx": "pop_mid",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S12",
+  "why": "-24 dB, Pip lands",
+  "src_t": 52.43
+ },
+ {
+  "t": 52.51,
+  "sfx": "pop_mid",
+  "gain_db": -24.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S12",
+  "why": "-24 dB, tags swing",
+  "src_t": 52.51
+ },
+ {
+  "t": 53.51,
+  "sfx": "click_light",
+  "gain_db": -20.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S12",
+  "why": "-20 dB, padlocks glint",
+  "src_t": 53.51
+ },
+ {
+  "t": 53.71,
+  "sfx": "counter_ticker",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S12",
+  "why": "-18 dB, REVERSED and stepped, under the rewind",
+  "src_t": 53.71,
+  "reverse": true,
+  "stepped": true
+ },
+ {
+  "t": 53.71,
+  "sfx": "whoosh_soft",
+  "gain_db": -16.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S12",
+  "why": "-16 dB, REVERSED: the rewind whirr (existing file played backwards)",
+  "src_t": 53.71,
+  "reverse": true
+ },
+ {
+  "t": 54.225,
+  "sfx": "pop_low",
+  "gain_db": -18.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S12",
+  "why": "-18 dB, REVERSED, shutters roll up (3 offsets)",
+  "src_t": 54.225,
+  "reverse": true
+ },
+ {
+  "t": 54.305,
+  "sfx": "pop_low",
+  "gain_db": -19.5,
+  "pan": -0.25,
+  "provisional": true,
+  "scene": "S12",
+  "why": "-18 dB, REVERSED, shutters roll up (3 offsets)",
+  "src_t": 54.225,
+  "reverse": true
+ },
+ {
+  "t": 54.385,
+  "sfx": "pop_low",
+  "gain_db": -21.0,
+  "pan": 0.25,
+  "provisional": true,
+  "scene": "S12",
+  "why": "-18 dB, REVERSED, shutters roll up (3 offsets)",
+  "src_t": 54.225,
+  "reverse": true
+ },
+ {
+  "t": 54.725,
+  "sfx": "click_light",
+  "gain_db": -22.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S12",
+  "why": "-22 dB, the glyph pops back",
+  "src_t": 54.725
+ },
+ {
+  "t": 55.01,
+  "sfx": "typing_tick",
+  "gain_db": -26.0,
+  "pan": 0.0,
+  "provisional": true,
+  "scene": "S12",
+  "why": "-26 dB, REVERSED, the last step (wraps into the frame-0 click)",
+  "src_t": 55.01,
+  "reverse": true
  }
 ]

@@ -14,3 +14,4 @@ export * from './Street';
 export * from './Figures';
 export * from './Tablet';
 export * from './Vehicles';
+export * from './Labels';

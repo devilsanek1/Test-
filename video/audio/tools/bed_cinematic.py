@@ -164,8 +164,10 @@ def compose(seed=44):
     for p, v in ((90, 46), (95, 40)):
         add("celesta", p, v, bar_f, fb - STARTS[bar_f - 1], 2.0, human=False)
     add("celesta", 98, 32, 17, 0, 1.5, human=False)
-    # -------- the one soft scale accent: Cloudflare (bar 12 downbeat); the note is a trigger for the renderer
-    add("accent", 30, 100, 12, 0, 1.0, human=False)
+    # -------- the one soft scale accent: Cloudflare; the note is a trigger for the renderer
+    # v5: on bar 12's SECOND beat (after the beat-lock ~26.6 s): inside the voice pause before "Cloudflare" and on
+    # the storyboard's reveal (dome arc 26.54 / board rises 26.64), not on top of "...use it."
+    add("accent", 30, 100, 12, 1.0, 1.0, human=False)
 
     # -------- write MIDI (ticks are the truth; tempo = base grid) + sidecar
     bpm = 60.0 / BEAT

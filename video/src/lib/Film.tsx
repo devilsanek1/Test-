@@ -35,8 +35,19 @@
 //   unbuild          the outgoing scene un-builds (MOTION.unbuild recipe) over [c - dur, c] on top of the incoming
 //                    scene, which is already rendered underneath (its local time is negative: show its line-art
 //                    state at t < 0). {dur = 0.5}
-//   transitionOut (LAST scene only): {type: 'unbuild', dur = 0.5, loop = true} un-builds the final scene before its
-//   end and reveals the FIRST scene underneath at its t < 0 state; the captions scroll back to the first page.
+//   CAMERA: cut, matchcut and foreground-wipe add NO camera move (v3: every camera move belongs to a scene key). A
+//   foreground wipe only clips the two scenes at its edge and draws the element; `drift: 50` (px) restores v2's
+//   parallax drift of both scenes under it. camera-continuous and push-through are the only transitions that move a
+//   camera (v2 grammar; not used by the v3 storyboard).
+//   transitionOut (LAST scene only), the LOOP back to frame 0:
+//     {type: 'unbuild', dur = 0.5, loop = true, captionAt?}  un-builds the final scene before its end and reveals the
+//       FIRST scene underneath at its t < 0 state (v1 / v2: the line-art loop).
+//     {type: 'cut', loop = true, captionAt?}  a FULL-COLOUR seam (v3: the rewind): the last scene plays to its end
+//       untouched (no un-build, no underlay: the first scene is never shown at t < 0); its last frame must equal
+//       frame 0, and the cut back to frame 0 is the loop.
+//     Either way the captions roll back to page 1 at captionAt (default end - 0.22), are LOOP_SEAM_PX (24) short of
+//     rest at the seam, and frame 0 (= "end + 1 frame") continues that roll and settles it ~0.15 s later
+//     (SkyCaptions `loopAt` / `loopEnd`).
 // Scenes keep rendering (holding their end state) through any overlap after their own end.
 
 import React from 'react';
@@ -73,6 +84,9 @@ export type FilmTransition =
       color?: string;
       /** Caption tone over the wiper element (default: the wiper's captionRegions, else derived from `color`). */
       captionTone?: CaptionTone;
+      /** Parallax drift of both scenes under the element (px, eased like the edge). Default 0: a transition adds no
+       *  camera (v3). 50 = the v2 drift. */
+      drift?: number;
     }
   | {type: 'push-through'; dur?: number; from?: Pt; to?: Pt; zoom?: number; bridge?: string}
   | {type: 'unbuild'; dur?: number};
@@ -83,12 +97,24 @@ export type FilmScene = {
   start: number;
   end: number;
   transitionIn?: FilmTransition;
-  /** Last scene only. loop: reveal the first scene underneath; captionAt: VO time the captions roll back to page 1
-   *  (default end - 0.22). */
-  transitionOut?: {type: 'unbuild'; dur?: number; loop?: boolean; captionAt?: number};
+  /** Last scene only: the loop back to frame 0 (see FilmTransitionOut). */
+  transitionOut?: FilmTransitionOut;
   captionTone?: ToneKey[];
   note?: string;
 };
+
+/** The LAST scene's way back to frame 0. 'unbuild': un-builds over its last `dur` s and reveals the first scene
+ *  underneath at its t < 0 state (the v1 / v2 line-art loop). 'cut' (or 'matchcut'): a full-colour seam (the v3
+ *  rewind): the last scene plays to its end untouched, nothing is revealed underneath, and its last frame must equal
+ *  frame 0. loop (default true): roll the captions back to page 1 at `captionAt` (VO s, default end - 0.22). */
+export type FilmTransitionOut = {type: 'unbuild' | 'cut' | 'matchcut'; dur?: number; loop?: boolean; captionAt?: number};
+
+/** Does this (last) scene loop back to frame 0, and how. null = no loop. */
+export function filmLoop(last: FilmScene | undefined): {unbuild: boolean; captionAt?: number} | null {
+  const to = last?.transitionOut;
+  if (!to || to.loop === false) return null;
+  return {unbuild: to.type === 'unbuild', captionAt: to.captionAt};
+}
 
 export const FILM_DEFAULT_DUR: Record<FilmTransition['type'], number> = {
   cut: 0,
@@ -229,8 +255,9 @@ function wipeElement(tr: Extract<FilmTransition, {type: 'foreground-wipe'}>, out
  *  (cine wipeEdgeX: in-out sine from -half - 30 to W + half + 30, so the element enters and leaves without a velocity
  *  step). */
 const wipeX = (p: number, dir: 'left' | 'right', half: number): number => wipeEdgeX(p, dir, half);
-/** The 50 px parallax drift of both scenes under a foreground wipe, eased like the edge (0 -> 1). */
-const wipeDrift = (p: number) => 50 * E.inOutSine(clamp(p));
+/** The optional parallax drift of both scenes under a foreground wipe (`drift` px, default 0: no transition camera),
+ *  eased like the edge (0 -> 1). */
+const wipeDrift = (p: number, amount = 0) => amount * E.inOutSine(clamp(p));
 
 // ---------------------------------------------------------------- built-in wipers (screen px)
 
@@ -541,8 +568,8 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
           const x = wipeX(p, dir, wipeElement(tin, scenes[i - 1].id, wipers).half);
           const cx = clamp(x, 0, world.w);
           clip = dir === 'right' ? `inset(0px ${(world.w - cx).toFixed(1)}px 0px 0px)` : `inset(0px 0px 0px ${cx.toFixed(1)}px)`;
-          const drift = (dir === 'right' ? 1 : -1) * (50 - wipeDrift(p));
-          cam = {ox: drift, oy: 0, zoom: 1, rot: 0};
+          const amt = tin.drift ?? 0;
+          if (amt) cam = {ox: (dir === 'right' ? 1 : -1) * (amt - wipeDrift(p, amt)), oy: 0, zoom: 1, rot: 0};
           trans = {type: tin.type, phase: 'in', p};
         }
       } else if (tin.type === 'unbuild' && T < cIn) {
@@ -574,8 +601,8 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
           const x = wipeX(p, dir, half);
           const cx = clamp(x, 0, world.w);
           clip = dir === 'right' ? `inset(0px 0px 0px ${cx.toFixed(1)}px)` : `inset(0px ${(world.w - cx).toFixed(1)}px 0px 0px)`;
-          const drift = (dir === 'right' ? 1 : -1) * wipeDrift(p);
-          cam = {ox: -drift, oy: 0, zoom: 1, rot: 0};
+          const amt = tout.drift ?? 0;
+          if (amt) cam = {ox: -(dir === 'right' ? 1 : -1) * wipeDrift(p, amt), oy: 0, zoom: 1, rot: 0};
           trans = {type: tout.type, phase: 'out', p};
           // the element itself, above both scenes
           if (p < 1)
@@ -599,7 +626,8 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
         if (Math.abs(q) <= pt.hold / 2 + 1e-6) overlays.push(<AbsoluteFill key={`bridge${i}`} style={{background: tout.bridge}} />);
       }
     }
-    // own transitionOut (last scene / previews): un-build (+ loop underlay)
+    // own transitionOut (last scene / previews): un-build (+ loop underlay). A 'cut' loop (the v3 full-colour rewind)
+    // does nothing here: the scene plays to its last frame untouched and nothing waits underneath.
     if (!next && s.transitionOut?.type === 'unbuild') {
       const d = tdur(s.transitionOut);
       exit = Math.max(exit, prog(T, s.end - d, d));
@@ -623,8 +651,9 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
   const firstText = captions[0]?.lines[0]?.text;
   const lastCap = captions[captions.length - 1];
   const explicitLoopPage = captions.length > 1 && lastCap.lines.length === 1 && lastCap.lines[0].text === firstText && lastCap.s > end - 1.5;
-  const loops = last?.transitionOut?.type === 'unbuild' && last.transitionOut.loop !== false;
-  const loopAt = only ? undefined : explicitLoopPage ? lastCap.s - MOTION.captionScroll.lead : loops ? last.transitionOut!.captionAt ?? end - 0.22 : undefined;
+  // any looping transitionOut ('unbuild' or the full-colour 'cut') rolls the captions back to page 1 at captionAt
+  const loop = filmLoop(last);
+  const loopAt = only ? undefined : explicitLoopPage ? lastCap.s - MOTION.captionScroll.lead : loop ? loop.captionAt ?? end - 0.22 : undefined;
   const onlyIdx = only ? scenes.findIndex((s) => s.id === only) : -1;
   const range: [number, number] | undefined = only && onlyIdx >= 0 ? [scenes[onlyIdx].start, scenes[onlyIdx + 1]?.start ?? Infinity] : undefined;
 

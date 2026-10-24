@@ -1,12 +1,61 @@
-# Sound plan: php2shell explainer (70.7 s loop)
+# Sound plan: php2shell explainer (55.37 s loop)
 
 Owner: sound stream. Lane: `audio/**`, `docs/sound_plan.md`, `docs/sound_credits.md`.
 Sources and licences: `docs/sound_credits.md`. This version follows the brief's **CINEMATIC DIRECTION** and its
 **BALANCE NOTE**: a warm, modern explainer at the core, with a touch of space, and nothing trailer-like.
 
-## CURRENT STATE: v4, FINAL voice (`assets/vo_v3_final.wav`, 55.36 s, new script)
+## CURRENT STATE: v5, beat-locked to the FINAL cut list
 
-Everything below this section is history (v1 MP3 voice, v2/v3 78 s take). Where it conflicts with this section, this section wins.
+Everything below this section is history. Where it conflicts with this section, this section wins.
+
+- **Timeline.** The loop is **55.3667 s** = 1661 frames at 30 fps (`common.VIDEO_DUR` default). Remotion's `durationInFrames = ceil(55.36 x 30)`, and
+  `beatsync --end-time film` uses the same end. Override with `SOUND_VIDEO_DUR` only if the film length changes.
+- **Beat-lock.** Cuts come from `src/data/scenes.json` (12 scenes, 11 cuts):
+  ```
+  python3 scripts/qa/beatsync.py --fit-tempo --end-time film --write-midi audio/music_cinematic_retimed.mid
+  python3 audio/tools/beatlock.py          # half-beat lock for any cut beatsync drops -> audio/music_cinematic_retimed.mid
+  python3 audio/tools/bed_cinematic.py --render-only --midi audio/music_cinematic_retimed.mid
+  python3 audio/mix.py --music cinematic --out audio/mix.wav
+  ```
+  - Before the bend, 0 of 11 cuts were on a beat (max 293 ms). beatsync's fit put 10 of 11 on beats and dropped S07.
+  - S07 (the foreground-wipe centre at 22.000 s) sits 2.20 s after S06 and 2.11 s before S08. That is 3.5 + 3.4 beats, so no whole-beat count fits within ±8 %.
+    `audio/tools/beatlock.py` re-solves that segment so S07 lands exactly on the half-beat (the "&" of bar 10, beat 1).
+  - Result (`python3 scripts/qa/beatsync.py --midi audio/music_cinematic_retimed.mid`): 10 of 11 cuts at 0 ms off-beat, and S07 at +304 ms off-beat but 0 ms off the half-beat.
+    With `--grid half`, all 11 are at 0 ms. Tempo is 90.9-103.0 BPM, with at most 3.3 % change per beat (`audio/tempo_map_beatlocked.json`).
+- **Placements after the bend** (all still land):
+
+  | Moment | Time |
+  |---|---|
+  | Hook: air only | 0-14.20 s |
+  | Piano pulse, on "This bug was in there" | 14.21 s ("This" at 14.40) |
+  | Leak creep | 21.70 s ("but" at 22.05) |
+  | One soft accent | 26.63 s (bar 12, beat 2), in the voice pause before "Cloudflare" (26.79) and on the storyboard's dome reveal (26.54/26.64) |
+  | Suspension | 32.52 s |
+  | Breath, on "But even with the fix out" | 34.50 s (S09) |
+  | Rebuild, on "Plus" | 39.67 s (S10) |
+  | Quiet air-only close | 52.17 s (S12) |
+  | Loop | 55.367 s |
+
+  The accent moved from bar 12, beat 1, which the bend would have put on top of "...use it.".
+- **Cues** (`audio/cues.json`) are built from the storyboard with `python3 audio/tools/cues_from_storyboard.py`, which reads `docs/storyboard_v3_resolved.json` `scenes[].sfx`, already resolved on `assets/timing.json`.
+  - 162 cues come from 135 storyboard entries. 13 are final (on cuts) and 149 are `"provisional": true`. Each cue keeps its `scene`, the storyboard note (`why`) and `src_t`.
+  - The old word-anchored list is backed up at `cues_v4_words.json` in the sound scratchpad.
+  - **Rewind** (S12):
+    - `whoosh_soft` REVERSED at 53.71 s (-16 dB), plus `counter_ticker` REVERSED and **stepped** at 53.71 s (-18 dB, gated at 11 Hz). Both wrap into the frame-0 `switch_toggle`.
+    - Also reversed: `pop_low` x3 at 54.23 s and `typing_tick` at 55.01 s.
+  - New cue keys in `mix.py`: `"reverse": true` and `"stepped": true`.
+- **SFX guard** (new in `mix.py`, `--sfx-min-gap`, default 8 dB). The storyboard gains are animator estimates. Where a cue, or a stack of cues, would come within 8 dB of the speaking voice, the mixer pulls only that moment down (by up to 7.4 dB).
+  This catches, for example, `lock_click` + `pop_mid` at 36.1 s, which would otherwise come within 1.8 dB of the voice.
+  SFX under the voice: median 20.9 dB, minimum 8.5 dB.
+- **Renders:** `audio/mix.wav`, `public/mix.wav` and `review/audio/mix_v5_beatlocked.mp3` (320 kb/s).
+  - All three measure **-14.0 LUFS and -1.2 dBTP**, 55.367 s, 0 clipped samples. The loop seam is clean.
+  - Music under the voice: median 27.1 dB, p5 18.0, minimum 12.8.
+  - The bed alone: -20 LUFS, -2.5 dBTP.
+- `marimba` and `near_silent` are still on the old 70.7 s timeline (`mix.py` warns).
+
+## HISTORY: v4, FINAL voice (`assets/vo_v3_final.wav`, 55.36 s, new script)
+
+Superseded by v5 above (the beat-lock, the 55.3667 s loop and the storyboard cues).
 
 - **Timeline.** The loop is **55.5 s** (`common.VIDEO_DUR`; speech runs 0.06-55.23 s). This is provisional until the storyboard sets the film length.
 - **Voice.** `audio/vo_clean.wav` comes from the APPROVED v4 chain, unchanged (`python3 audio/tools/vo_clean.py`). The previous take's file is kept as `audio/vo_clean_v2.wav`.

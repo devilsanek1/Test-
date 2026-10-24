@@ -26,7 +26,7 @@
 
 import React from 'react';
 import {palette} from '../../../lib/theme';
-import {ease as E, osc, prog, useTime} from '../../../lib/time';
+import {clamp, ease as E, osc, prog, TimeProvider, useTime} from '../../../lib/time';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {Look, useLook} from '../../../lib/exit';
@@ -37,12 +37,26 @@ import {Bird} from '../../../lib/kit';
 import {brickHints, cornice, HALF, LayerWrap, LightsOut, noWrap, OnlyWhilePaper, PaperUntilCascade, SetPlace, SI} from './common';
 import {Foreground, ForegroundSpec, groundMarks, GroundMarks} from './ground';
 import {BackSoonSlot, BitSlot, BollardSlot, ChromeSlot, CitizenSlot, LockSlot, OnlookerSlot, PadlockSlot, PlaqueSlot, ShutterSlot} from './propSlots';
+import type {BackSoonTagProps, ShutterPadlockProps} from './propSlots';
 import {FacadeDoor} from './SiteFacade';
 
 // ---------------------------------------------------------------- layout (anchors for scenes)
 
 export type GovId = 'govA' | 'govB' | 'govC' | 'govD';
 type R4 = [number, number, number, number];
+
+/** Far civic skyline in the sun gap (storyboard v3 `farCivic`): six fill-only silhouettes (domes, pediments, clock
+ *  spires) in the two day haze tiers, each >= 40 px wide where the gap shows it (x 640-790), listed LEFT TO RIGHT (the
+ *  order `civicOffAt` steps them dark; `civicOnAt` relights them right to left). tier 0 = the far tier (#98C0AE), 1 = the
+ *  nearer tier (#84B09C); `top` = the silhouette's highest point (all under the power glyph's lower edge, y 957). */
+export const PLAZA_CIVIC = [
+  {id: 'templeF', kind: 'temple', tier: 1, x0: 640, x1: 698, top: 1086, cx: 669},
+  {id: 'domeB', kind: 'dome', tier: 0, x0: 652, x1: 700, top: 960, cx: 676, lantern: true},
+  {id: 'domeF', kind: 'dome', tier: 1, x0: 694, x1: 750, top: 1052, cx: 722, lantern: true},
+  {id: 'templeB', kind: 'temple', tier: 0, x0: 698, x1: 756, top: 978, cx: 727},
+  {id: 'spireF', kind: 'spire', tier: 1, x0: 746, x1: 790, top: 1050, cx: 768},
+  {id: 'spireB', kind: 'spire', tier: 0, x0: 748, x1: 790, top: 952, cx: 769},
+] as const;
 
 /** PEAK-1 layout (review 5): the architecture is ~1.35x taller than storyboard v1 (bases y 1400-1470 instead of
  *  1200-1290) under the same y-600 ceiling, the horizon / VP sits low (0.72 H) so the tiny citizens stand at the feet of
@@ -103,6 +117,10 @@ export const PLAZA = {
   dive: {cam: [535, 1264] as Pt, zoom: 2.4},
   /** Layer nearness (storyboard depths). */
   layers: {far: 0.1, sun: 0.12, buildings: 0.55, govD: 0.62, ground: 0.7, light: 0.7, near: 1.0},
+  /** Storyboard v3: the far civic silhouettes (left to right), see PLAZA_CIVIC. */
+  civic: PLAZA_CIVIC,
+  /** Storyboard v3 frame 0 (= S12's last frame): the sun at the bottom of its SunPress (0.88) in its rest slot. */
+  frame0: {sun: {x: 720, y: 900, r: 155}, press: 0.88},
 } as const;
 
 export type GovEvents = {
@@ -121,9 +139,38 @@ export type GovEvents = {
   padlockAt?: number;
   /** Padlock glint (two ink diagonals for 0.3 s). */
   glintAt?: number;
+  // ---- storyboard v3 (S01 power-off wave, S12 rewind). Reversed events are stepped like a tape (set `rewindFps`).
+  /** The browser screen powers off like a CRT: lit -> bright horizontal line -> dot -> dark (0.15 s). The building
+   *  itself stays lit (`offAt` steps it darker). From a held line (`screenLineAt`) it continues from the line. */
+  screenOffAt?: number;
+  /** From here the screen IS the bright horizontal line (the frame-0 state: govB mid power-off). From a dark screen it
+   *  steps back dot -> line (rewind-stepped). */
+  screenLineAt?: number;
+  /** The roller shutter rolls back UP: the slam reversed, stepped (S12 rewind). */
+  liftAt?: number;
+  /** Duration of the reversed slam (default 0.25 s). */
+  liftDur?: number;
+  /** Lights back on: the building pops one palette step lighter again (undoes `offAt`). */
+  onAt?: number;
+  /** The shutter drops only this fraction of the window (govC: 0.5; default 1). The padlock and tag ride its rail. */
+  shutterStop?: number;
+  /** Alias of `shutterStop` (a FRACTION, like props RollerShutter `stopAt`). */
+  stopAt?: number;
+  /** The tag swings back up and pops off (S12 rewind, stepped). */
+  tagOutAt?: number;
+  /** The padlock pops off (S12 rewind). */
+  padlockOutAt?: number;
+  /** govB's dome lantern: cream -> sand ('purpose') and back on (the rewind). Omit both = it follows offAt / onAt. */
+  lanternOffAt?: number;
+  lanternOnAt?: number;
+  /** Extra props for the props-lane tag / padlock (e.g. the lettered 'back soon' variant once it lands). */
+  tagProps?: Partial<BackSoonTagProps>;
+  padlockProps?: Partial<ShutterPadlockProps>;
 };
 
-export type PlazaState = 'lineArt' | 'built' | 'off';
+/** 'frame0' (storyboard v3) = 'built' with govB's screen held as the bright horizontal line (mid power-off; pass
+ *  gov.govB.screenOffAt to release it), every other screen lit, no shutters: frame 0 = S12's last frame. */
+export type PlazaState = 'lineArt' | 'built' | 'off' | 'frame0';
 
 export type GovernmentPlazaProps = {
   state?: PlazaState;
@@ -140,8 +187,10 @@ export type GovernmentPlazaProps = {
   pennantWaveAt?: number;
   /** Citizens rise in (0.33 s out-exp, 0.05 s stagger, left to right). Omit = standing. false = none. */
   citizensAt?: number | false;
-  /** Two citizens raise phones. */
-  phonesAt?: number;
+  /** Two citizens raise phones (one time or several). */
+  phonesAt?: number | number[];
+  /** ...and lower them again (the latest raise / lower event wins). */
+  phonesDownAt?: number | number[];
   /** The edge onlookers (one in the visible band at the left edge, two cropped in the bottom corners). Default true. */
   onlookers?: boolean;
   /** Extra foreground framing (ground.tsx presets, a list, or a node). Default none: the plaza frames itself (lamp
@@ -149,6 +198,20 @@ export type GovernmentPlazaProps = {
   foreground?: ForegroundSpec;
   /** Lamp lantern cream -> sand. */
   lanternOffAt?: number;
+  /** Lamp lantern relights (S12 rewind). */
+  lanternOnAt?: number;
+  /** Storyboard v3 far civic skyline in the sun gap (PLAZA_CIVIC: domes, pediments, clock spires as whole fill-only
+   *  silhouettes) instead of the generic block city with window dots and cranes. Default true. */
+  farCivic?: boolean;
+  /** The civic silhouettes step one fill darker as WHOLE shapes: one time = left to right, 0.06 s apart; an array =
+   *  per silhouette, left to right (PLAZA_CIVIC order). 'off' state: dark from the start. */
+  civicOffAt?: number | number[];
+  /** ...and relight (S12 rewind): one time = right to left, 0.06 s apart; an array = per silhouette (left to right). */
+  civicOnAt?: number | number[];
+  /** Two far domes' lit lanterns pop off (0.06 s apart); they relight with their dome's civicOnAt. */
+  civicLanternsOffAt?: number;
+  /** Steps per second of the reversed (rewind) events: liftAt, screenOnAt after an off, screenLineAt from dark, tagOutAt. */
+  rewindFps?: number;
   /** Pigeons land on the crossbar / scatter. Omit landing = absent (default), true = sitting. */
   pigeonsAt?: number | boolean;
   pigeonsFlyAt?: number;
@@ -377,6 +440,189 @@ const G = (() => {
   const pit = `M998 1558a60 14 0 1 0 120 0a60 14 0 1 0 -120 0Z`;
   return {pathFar, farEdges, A, colsA, CW, ped, tymp, aInk, colInk, colFill, colShade, flutes, steps, stepInk, B, bSteps, domeFill, domeInk, ribs, domeRim, lantern, lanternInk, bInk, drumThin, C, cInk, D, gridInk, cells, cellsDark, dInk, pilotis, farA, farB, farDots, cranes, ground, kerbs, pathPoly, pathEdges, wedgeB, wedgeD, benches, lampInk, lampFill, lanternRect, crownD, treeTicks, trunk, trunkInk, pit};
 })();
+
+// ---------------------------------------------------------------- far civic skyline (v3)
+
+/** Haze steps of the civic tiers: [lit, dark] per tier (far tier #98C0AE -> #7CA995, nearer #84B09C -> sage). */
+const CIVIC_FILL: [string, string][] = [
+  ['#98C0AE', '#7CA995'],
+  ['#84B09C', palette.sage],
+];
+
+const CIV = (() => {
+  const base = PLAZA.horizon + 4;
+  const f = (n: number) => n.toFixed(1);
+  return PLAZA_CIVIC.map((c) => {
+    const {x0, x1, top, cx} = c;
+    let d = '';
+    let lantern = '';
+    let face = '';
+    if (c.kind === 'dome') {
+      // drum with a cornice lip, a half-ellipse dome, a lantern with a pointed cap up to `top`
+      const rx = (x1 - x0) / 2 - 3;
+      const ry = 30;
+      const lanH = 18;
+      const domeTop = top + lanH + 6;
+      const drumTop = domeTop + ry;
+      d =
+        `M${f(x0)} ${base}L${f(x0)} ${f(drumTop + 5)}L${f(x0 - 3)} ${f(drumTop + 5)}L${f(x0 - 3)} ${f(drumTop)}` +
+        `L${f(cx - rx)} ${f(drumTop)}A${f(rx)} ${ry} 0 0 1 ${f(cx + rx)} ${f(drumTop)}` +
+        `L${f(x1 + 3)} ${f(drumTop)}L${f(x1 + 3)} ${f(drumTop + 5)}L${f(x1)} ${f(drumTop + 5)}L${f(x1)} ${base}Z` +
+        `M${f(cx - 5)} ${f(domeTop + 3)}L${f(cx - 5)} ${f(top + 6)}L${f(cx)} ${f(top)}L${f(cx + 5)} ${f(top + 6)}L${f(cx + 5)} ${f(domeTop + 3)}Z`;
+      lantern = rectPath(cx - 2.5, top + 8, 5, 9);
+    } else if (c.kind === 'temple') {
+      // a pediment over a cornice lip on a plain block (the colonnade reads as a stepped silhouette)
+      const corn = top + 22;
+      d =
+        `M${f(x0)} ${base}L${f(x0)} ${f(corn + 6)}L${f(x0 - 4)} ${f(corn + 6)}L${f(x0 - 4)} ${f(corn)}L${f(cx)} ${f(top)}` +
+        `L${f(x1 + 4)} ${f(corn)}L${f(x1 + 4)} ${f(corn + 6)}L${f(x1)} ${f(corn + 6)}L${f(x1)} ${base}Z` +
+        // a stylobate step at the colonnade's foot, 40 px under the cornice
+        `M${f(x0 - 3)} ${f(corn + 46)}h${f(x1 - x0 + 6)}v6h${f(-(x1 - x0 + 6))}Z`;
+    } else {
+      // clock spire: tower, belfry lip, a tall pointed spire up to `top`; a round clock face one step lighter
+      const bel = top + 34;
+      d =
+        `M${f(x0 + 4)} ${base}L${f(x0 + 4)} ${f(bel + 6)}L${f(x0)} ${f(bel + 6)}L${f(x0)} ${f(bel)}L${f(cx)} ${f(top)}` +
+        `L${f(x1)} ${f(bel)}L${f(x1)} ${f(bel + 6)}L${f(x1 - 4)} ${f(bel + 6)}L${f(x1 - 4)} ${base}Z`;
+      const fy = bel + 26;
+      face = `M${f(cx - 8)} ${f(fy)}a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z`;
+    }
+    return {...c, d, lantern, face};
+  });
+})();
+
+/** Per-silhouette dark state at t (latest event wins). */
+function civicTimes(v: number | number[] | undefined, dir: 'lr' | 'rl'): (number | undefined)[] {
+  const n = PLAZA_CIVIC.length;
+  if (v === undefined) return new Array(n).fill(undefined);
+  if (Array.isArray(v)) return PLAZA_CIVIC.map((_, i) => v[i]);
+  return PLAZA_CIVIC.map((_, i) => v + (dir === 'lr' ? i : n - 1 - i) * 0.06);
+}
+
+const FarCivic: React.FC<{off: boolean; offAt?: number | number[]; onAt?: number | number[]; lanternsOffAt?: number; seed: string}> = ({off, offAt, onAt, lanternsOffAt, seed}) => {
+  const t = useTime();
+  const offs = civicTimes(offAt, 'lr');
+  const ons = civicTimes(onAt, 'rl');
+  let li = 0;
+  return (
+    <>
+      {CIV.map((c, i) => {
+        const dark = latestState(t, [offs[i]], [ons[i]], off);
+        const [lit, drk] = CIVIC_FILL[c.tier];
+        const col = dark ? drk : lit;
+        let lanternOn = false;
+        if ('lantern' in c && c.lantern) {
+          // with civicLanternsOffAt a lantern stays lit through its dome's step until then (S01: the domes step on
+          // 'Europe', the lanterns go 0.25 s later) and relights with its dome; without it, it follows the dome
+          const lOff = lanternsOffAt !== undefined ? lanternsOffAt + li * 0.06 : undefined;
+          li++;
+          lanternOn = lanternsOffAt !== undefined ? !latestState(t, [lOff], [ons[i]], off) : !dark;
+        }
+        return (
+          <React.Fragment key={c.id}>
+            <Fill d={c.d} color={col} offset={false} mode="none" seed={`${seed}/civ${i}`} />
+            {c.face ? <Fill d={c.face} color={dark ? lit : HALF.daySky} offset={false} mode="none" seed={`${seed}/civf${i}`} /> : null}
+            {lanternOn ? <Fill d={c.lantern} color={palette.cream} offset={false} mode="none" seed={`${seed}/civl${i}`} /> : null}
+          </React.Fragment>
+        );
+      })}
+      <OnlyWhilePaper p={[710, 1150]}>
+        <Ink d={CIV.map((c) => c.d).join('')} width={HAIR} taper={false} seed={`${seed}/civE`} />
+      </OnlyWhilePaper>
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- v3 event helpers
+
+const arr = (v?: number | number[]): number[] => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
+
+/** Latest-event toggle: true after a `trueAt` time, false after a `falseAt` time (the most recent one <= t wins; a tie
+ *  goes to false), `init` before any. */
+export function latestState(t: number, trueAt: (number | undefined)[], falseAt: (number | undefined)[], init: boolean): boolean {
+  let best = -Infinity;
+  let s = init;
+  for (const a of trueAt) if (a !== undefined && a <= t && a >= best) (best = a), (s = true);
+  for (const a of falseAt) if (a !== undefined && a <= t && a >= best) (best = a), (s = false);
+  return s;
+}
+
+/** Rewind-stepped progress 0..1 of a reversed move over `dur`, held in steps of 1 / fps (the first step lands ON the
+ *  event, so a rewind never shows a dead frame at its start). */
+export function rewindStep(t: number, at: number, dur: number, fps = 12): number {
+  if (t < at) return 0;
+  const n = Math.floor((t - at) * fps + 1e-6) + 1;
+  return Math.min(1, n / Math.max(1, dur * fps));
+}
+
+/** CRT phases of a browser screen: u 0 = lit, CRT_LINE = the bright horizontal line, 1 = dark. Forward (power-off)
+ *  runs CRT_DUR (0.15 s, smooth); backward (the rewind) runs CRT_REV per full sweep, stepped at `fps`. */
+export const CRT = {dur: 0.15, rev: 0.17, line: 0.4, dot: 0.75} as const;
+
+const crtOnIsReverse = (ev: GovEvents) =>
+  ev.screenOnAt !== undefined && ((ev.screenOffAt !== undefined && ev.screenOffAt < ev.screenOnAt) || (ev.screenLineAt !== undefined && ev.screenLineAt < ev.screenOnAt));
+
+/** The screen's CRT phase u at t from the v3 screen events (pure). */
+export function crtPhase(t: number, ev: GovEvents, fps = 12, init = 0): number {
+  const evs: {t: number; to: number}[] = [];
+  if (ev.screenOffAt !== undefined) evs.push({t: ev.screenOffAt, to: 1});
+  if (ev.screenLineAt !== undefined) evs.push({t: ev.screenLineAt, to: CRT.line});
+  if (ev.screenOnAt !== undefined && crtOnIsReverse(ev)) evs.push({t: ev.screenOnAt, to: 0});
+  evs.sort((a, b) => a.t - b.t);
+  let from = init;
+  let to = init;
+  let t0 = -Infinity;
+  const at = (tt: number) => {
+    if (t0 === -Infinity || from === to) return from;
+    const dt = tt - t0;
+    if (to > from) return Math.min(to, from + dt / CRT.dur);
+    const n = Math.floor(dt * fps + 1e-6) + 1;
+    return Math.max(to, from - n / (fps * CRT.rev));
+  };
+  for (const e of evs) {
+    if (e.t > t) break;
+    from = at(e.t);
+    t0 = e.t;
+    to = e.to;
+  }
+  return at(t);
+}
+
+/** The CRT overlay drawn as the window's screen content (screen-local coords): tealDark glass with the bright band
+ *  (u < line: the lit screen squashing to a line), the line (shrinking to a dot), the dot (shrinking to nothing). Opaque
+ *  stepped glow (cream halo, white core): no fades. */
+const crtContent = (u: number, seed: string) => ({w, h}: {w: number; h: number}) => {
+  const cx = w / 2;
+  const cy = h / 2;
+  const lh = Math.max(3.5, h * 0.05);
+  let core = '';
+  let halo = '';
+  if (u < CRT.line) {
+    const p = E.inQuad(u / CRT.line);
+    const bh = lh + (h - lh) * (1 - p);
+    core = rectPath(0, cy - bh / 2, w, bh);
+    halo = rectPath(0, cy - (bh / 2 + lh * 0.9), w, bh + lh * 1.8);
+  } else if (u < CRT.dot) {
+    const p = (u - CRT.line) / (CRT.dot - CRT.line);
+    const bw = Math.max(lh * 2, (w - 8) * (1 - E.outQuad(p)));
+    core = rectPath(cx - bw / 2, cy - lh / 2, bw, lh);
+    halo = rectPath(cx - bw / 2 - lh * 0.6, cy - lh * 1.4, bw + lh * 1.2, lh * 2.8);
+  } else {
+    const r = lh * 1.1 * (1 - (u - CRT.dot) / (1 - CRT.dot));
+    if (r > 0.4) {
+      core = `M${cx - r} ${cy}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`;
+      const R = r * 2;
+      halo = `M${cx - R} ${cy}a${R} ${R} 0 1 0 ${2 * R} 0a${R} ${R} 0 1 0 ${-2 * R} 0Z`;
+    }
+  }
+  return (
+    <>
+      <Fill d={rectPath(-1, -1, w + 5, h + 5)} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/crtg`} />
+      {halo ? <Fill d={halo} color={palette.cream} offset={false} mode="none" seed={`${seed}/crth`} /> : null}
+      {core ? <Fill d={core} color={palette.white} offset={false} mode="none" seed={`${seed}/crtc`} /> : null}
+    </>
+  );
+};
 
 // ---------------------------------------------------------------- shared window hardware (chrome + shutter + lock + tag)
 

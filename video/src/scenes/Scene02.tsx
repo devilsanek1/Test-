@@ -1,18 +1,20 @@
-// PLACEHOLDER (core lane) — proves camera-continuous in and a scene-provided Wiper; the S02 agent replaces this file.
 import React from 'react';
-import {World, Sun, Fill, Ink, Bug, hline, palette, skies, world, stroke, PoleWiper, WiperComponent} from '../lib';
+import {World, Sun, XG, useTime, useScene} from '../lib';
+import {BlueprintWall} from './shared/sets';
+import {camAt, camMat} from './scene02/camera';
 
-const Scene02: React.FC = () => (
-  <World sky={skies.day} push>
-    <Sun cx={540} cy={800} horizon={world.horizon} beats={[1.5, 3.4]} drift={[10, 0]} />
-    <Fill rect={[-200, world.horizon, 1480, 1300]} color={palette.sand} offset={false} />
-    <Ink d={hline(-60, 1140, world.horizon, {seed: 's2h'})} width={stroke.ink} />
-    <Bug x={540} y={1200} size={160} at={0.8} crawl seed="s2bug" />
-  </World>
-);
+const Scene02: React.FC = () => {
+  const t = useTime();
+  const sc = useScene();
+  const dur = sc ? sc.end - sc.start : 3.678;
+  const cam = camAt(t, dur);
+  return (
+    <World sky={[{t: 0, tod: 'day'}]}>
+      <Sun cx={870} cy={740} r={110} />
+      <XG m={camMat(cam)}>
+        <BlueprintWall drawAt={0} lock={{at: 1e6}} />
+      </XG>
+    </World>
+  );
+};
 export default Scene02;
-
-/** Example: this scene's own foreground element for a {type: 'foreground-wipe', element: 'scene'} out of S02, with
- *  the caption tone over it (where it covers the caption band and which tone reads on it). */
-export const Wiper: WiperComponent = (p) => <PoleWiper {...p} color={palette.teal} />;
-Wiper.captionRegions = (p) => PoleWiper.captionRegions!({...p, color: palette.teal});

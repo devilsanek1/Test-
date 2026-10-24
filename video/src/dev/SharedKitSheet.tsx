@@ -22,6 +22,7 @@ import {
   Bollard,
   BrowserChrome,
   Calendar,
+  LabelTag,
   Caretaker,
   CheckFlag,
   CheckMark,
@@ -181,8 +182,9 @@ export type SharedKitSheetProps = {
   unbuildAt?: number;
   /** 'context' = props at FILM SIZE on plain walls (1:1 check); 'lock' = the P1 bolt test at 200 px (S02 close-up) and
    *  100 px on a teal door, no bracket, + the fixed / blueprint / paper variants; 'heads' = back-view heads at film and
-   *  phone size. Both loop on a 5 s clock. */
-  mode?: 'sheet' | 'context' | 'lock' | 'heads';
+   *  phone size. 'v3' = the storyboard-v3 pieces (labels, rewind, counter board, diagram, tags, notes) in big cells.
+   *  All loop on a 5 s clock. */
+  mode?: 'sheet' | 'context' | 'lock' | 'heads' | 'v3';
   /** false = skip the set thumbnails (props-only cost check). */
   thumbs?: boolean;
 };
@@ -304,8 +306,80 @@ const LockMode: React.FC = () => {
   );
 };
 
+
+/** A big labelled cell for the v3 page (its own 5 s clock; children in cell-local px). */
+const BigCell: React.FC<{x: number; y: number; w: number; h: number; label: string; bg?: string; period?: number; children?: React.ReactNode}> = ({x, y, w, h, label, bg = palette.cream, period = 5, children}) => {
+  const t = useTime();
+  const id = `big${x}_${y}`;
+  return (
+    <g>
+      <defs>
+        <clipPath id={id}>
+          <rect x={x + 3} y={y + 3} width={w - 6} height={h - 6} />
+        </clipPath>
+      </defs>
+      <rect x={x + 3} y={y + 3} width={w - 6} height={h - 6} fill={bg} />
+      <g clipPath={`url(#${id})`}>
+        <TimeProvider global={t % period} offset={0}>
+          <XG m={mat.translate(x, y)}>{children}</XG>
+        </TimeProvider>
+      </g>
+      <rect x={x + 3} y={y + h - 33} width={w - 6} height={30} fill={palette.white} />
+      <text x={x + w / 2} y={y + h - 11} fontFamily={captionFontStack} fontSize={20} fill={palette.ink} textAnchor="middle">
+        {label}
+      </text>
+    </g>
+  );
+};
+
+/** Storyboard v3 pieces at (near) film size: labels in every kind, the rewind kit, the counter board, the diagram, tags. */
+const V3Mode: React.FC = () => {
+  const C = 540;
+  const R = 300;
+  const Y = 76;
+  return (
+    <>
+      <rect width={1080} height={1920} fill={palette.white} />
+      <text x={540} y={52} fontFamily={captionFontStack} fontSize={40} fill={palette.ink} textAnchor="middle">
+        Shared kit v3: labels, rewind, board, diagram, tags
+      </text>
+      {/* row 0: LabelTag tag (L5 on a lock) + card with a leader (L2) */}
+      <BigCell x={0} y={Y} w={C} h={R} label="LabelTag tag (L5, swings) + card + leader (L1, L2)" bg={palette.sand}>
+        <Lock x={70} y={70} size={60} seed="v3l5" />
+        <LabelTag kind="tag" x={150} y={104} hang={[86, 98]} text={['in the code since', 'at least 2012']} fontSize={30} at={0.4} swing={2.6} seed="v3L5" />
+        <LabelTag kind="card" box={[250, 20, 525, 64]} text="PHP2Shell · two linked flaws" fontSize={28} at={0.9} seed="v3L1" />
+        <LabelTag kind="card" box={[250, 120, 520, 200]} text={['no password ·', 'control of the site and its data']} fontSize={26} at={1.3} leader={[520, 236]} seed="v3L2" />
+      </BigCell>
+      <BigCell x={C} y={Y} w={C} h={R} label="slip (L6, clip) + notice (L14, 4 tapes)" bg={palette.teal}>
+        <LabelTag kind="slip" box={[24, 30, 300, 110]} text={['found with AI help ·', 'reported privately in August']} fontSize={30} at={0.5} seed="v3L6" />
+        <LabelTag kind="notice" x={390} y={180} text={['FBI · NSA', 'UK NCSC · CERT-EU']} fontSize={30} at={0.9} seed="v3L14" />
+      </BigCell>
+      {/* row 1: sign (L13) + card flip (L3 -> L4) + stamps */}
+      <BigCell x={0} y={Y + R} w={C} h={R} label="sign: A-frame (L13, 5 lines @ 24)" bg={palette.mintPale}>
+        <LabelTag kind="sign" box={[110, 24, 380, 200]} fontSize={24} text={['Rough estimate from', 'W3Techs data · only sites', 'that show their version ·', 'some hosts patch old', 'versions themselves']} at={0.6} seed="v3L13" />
+      </BigCell>
+      <BigCell x={C} y={Y + R} w={C} h={R} label="card flip L3 -> L4, stamps slam (L10, L11)" bg={palette.cream}>
+        <LabelTag kind="card" box={[20, 20, 330, 110]} text={['PHP · the code most', 'websites are built with']} fontSize={30} at={0.4} flipTo={{at: 1.8, text: ['of sites whose server', 'language is known · W3Techs']}} seed="v3L3" />
+        <LabelTag kind="stamp" x={250} y={175} text="first 45 min: tens of thousands" fontSize={26} at={1.2} seed="v3L10" />
+        <LabelTag kind="stamp" x={380} y={232} text="millions · within a day" fontSize={26} at={2.2} outAt={4.4} seed="v3L11" />
+      </BigCell>
+    </>
+  );
+};
+
 export const SharedKitSheet: React.FC<SharedKitSheetProps> = ({look, unbuildAt, mode, thumbs = true}) => {
   useCaptionFont();
+  if (mode === 'v3') {
+    return (
+      <AbsoluteFill style={{background: palette.white}}>
+        <svg width={1080} height={1920} viewBox="0 0 1080 1920">
+          <Modes look={look} unbuildAt={unbuildAt}>
+            <V3Mode />
+          </Modes>
+        </svg>
+      </AbsoluteFill>
+    );
+  }
   if (mode === 'context' || mode === 'lock' || mode === 'heads') {
     return (
       <AbsoluteFill style={{background: skies.day}}>

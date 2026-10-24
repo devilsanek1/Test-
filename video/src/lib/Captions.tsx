@@ -204,8 +204,10 @@ export type SkyCaptionsProps = {
    *  already drawn) and the later ones (line 2, its box) hidden: they rise after the seam at their own times. */
   loopAt?: number;
   /** The loop seam: the timeline time that wraps to frame 0 (= the composition end, durationInFrames / fps). With
-   *  `loopAt`, the roll back to page 1 has settled by then: when loopAt leaves less than the 0.45 s scroll, the scroll
-   *  is time-compressed (same curve) to land on the seam, so frame 0 continues it without a step. */
+   *  `loopAt`, the roll back to page 1 is "end + 1 frame" continuous across the seam: it keeps the measured scroll
+   *  curve, time-scaled (between 0.2 s and the measured 0.45 s) so the page is LOOP_SEAM_PX (24 px) short of rest at
+   *  the seam, and frame 0 shows page 1 that 24 px low and settles it (~0.15 s for a roll that starts 0.1 s before
+   *  the seam; always by ~0.25 s). Same page, same layout, same curve on both sides of the seam: no step, no jump. */
   loopEnd?: number;
   /** Things that started before range[0] + this are shown settled (no roll). Default 0.35 s. */
   instantWithin?: number;
@@ -257,6 +259,31 @@ type SkyPage = {start: number; size: number; lines: SkyLine[]; scrollDur?: numbe
 
 const SKY_D = skyCaption.clipBottom - skyCaption.clipTop + 20;
 const PUNCT = /[.,!?;:…]/;
+
+/** The loop seam (storyboard v1 / v3): frame 0 shows page 1 this many px below rest, still finishing the roll back to
+ *  page 1 that started at the loop's captionAt, and settles it in the first frames. */
+export const LOOP_SEAM_PX = 24;
+/** Shortest loop roll (s): a captionAt right at the seam still scrolls over 6 frames instead of jumping. */
+const LOOP_ROLL_MIN = 0.2;
+/** Progress u of the scroll curve at which the page is LOOP_SEAM_PX short of rest (bisection; the curve is monotone). */
+const LOOP_SEAM_U = (() => {
+  const want = 1 - LOOP_SEAM_PX / SKY_D;
+  let lo = 0;
+  let hi = 1;
+  for (let i = 0; i < 40; i++) {
+    const m = (lo + hi) / 2;
+    if (MOTION.captionScroll.ease(m) < want) lo = m;
+    else hi = m;
+  }
+  return (lo + hi) / 2;
+})();
+/** Duration of the loop roll when it starts `room` s before the seam: the measured curve time-scaled so the page is
+ *  LOOP_SEAM_PX short at the seam, kept within [LOOP_ROLL_MIN, MOTION.captionScroll.dur] (a roll with more room than
+ *  that lands closer than 24 px, or before the seam; with less, further away). */
+export function loopRollDur(room: number): number {
+  if (!(room > 0)) return MOTION.captionScroll.dur;
+  return clamp(room / LOOP_SEAM_U, LOOP_ROLL_MIN, MOTION.captionScroll.dur);
+}
 
 function layoutSky(b: CaptionBeat, baseSize: number): SkyPage {
   const n = b.lines.length;
@@ -403,10 +430,9 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
   const pages = list.map((b) => {
     const pg = layoutSky(b, size);
     if (b !== loopBeat) return pg;
-    // boxes frame 0 shows full roll in already drawn; the roll lands on the seam (frame 0 holds it settled)
+    // boxes frame 0 shows roll in already drawn; the roll is LOOP_SEAM_PX short at the seam and frame 0 continues it
     const lines = pg.lines.map((ln) => ({...ln, boxes: ln.boxes.map((bx) => (preDrawn.has(bx.hl) ? {...bx, start: -Infinity} : bx))}));
-    const room = loopEnd !== undefined ? loopEnd - pg.start : Infinity;
-    return {...pg, lines, scrollDur: room < MOTION.captionScroll.dur ? Math.max(room, 1e-3) : undefined};
+    return {...pg, lines, scrollDur: loopEnd !== undefined ? loopRollDur(loopEnd - pg.start) : undefined};
   });
   const instantUntil = range && isFinite(range[0]) ? range[0] + instantWithin : -Infinity;
   let k = -1;
@@ -423,6 +449,14 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
   const instant = pop || settledAll || cur.start <= instantUntil || (hookAtStart && k === 0);
   const u = clamp((T - cur.start) / (cur.scrollDur ?? MOTION.captionScroll.dur));
   const q = instant ? 1 : MOTION.captionScroll.ease(u);
+  // the loop seam, frame 0 side: the first frames are "end + 1 frame" of the roll back to page 1, so page 1 is still
+  // finishing that roll (LOOP_SEAM_PX low at frame 0) and the film's last page is leaving above it
+  let tail: {q: number; prev: SkyPage | null} | null = null;
+  if (loopBeat && loopEnd !== undefined && hookAtStart && !pop && k === 0 && T >= 0) {
+    const lp = pages[pages.length - 1];
+    const lu = (T + loopEnd - lp.start) / (lp.scrollDur ?? MOTION.captionScroll.dur);
+    if (loopEnd > lp.start && T < lp.start && lu < 1) tail = {q: MOTION.captionScroll.ease(clamp(lu)), prev: pages.length > 1 ? pages[pages.length - 2] : null};
+  }
   const tn: CaptionTone = typeof tone === 'function' ? tone(T) : tone;
   // the hook frame: the first page's line 1 shows settled before anything starts; later lines/boxes keep their times
   const iu = settledAll || (hookAtStart && k === 0) ? Math.max(instantUntil, cur.start) : instantUntil;
@@ -430,7 +464,10 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
   const stack = (t: CaptionTone, sfx: string) => (
     <>
       {prev && !instant && u < 1 ? <SkyPageG key={`p${k - 1}`} page={prev} T={T} dy={-SKY_D * q} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}a`} pop={pop} /> : null}
-      <SkyPageG key={`p${k}`} page={cur} T={settledAll ? Math.max(T, cur.start) : T} dy={SKY_D * (1 - q)} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}b`} pop={pop} />
+      {tail?.prev && tail.q < 1 ? (
+        <SkyPageG key="ptail" page={tail.prev} T={loopEnd! + T} dy={-SKY_D * tail.q} instantUntil={instantUntil} col={toneCols(t, mask)} uid={`${uid}${sfx}t`} pop={pop} />
+      ) : null}
+      <SkyPageG key={`p${k}`} page={cur} T={settledAll ? Math.max(T, cur.start) : T} dy={SKY_D * (1 - q) + (tail ? SKY_D * (1 - tail.q) : 0)} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}b`} pop={pop} />
     </>
   );
   const body =

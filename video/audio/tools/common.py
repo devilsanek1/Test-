@@ -19,7 +19,7 @@ SR = 48000
 # seconds, the video (and loop) length. FINAL voice (assets/vo_v3_final.wav, 55.36 s, speech 0.06-55.23 s)
 # -> 55.5 s loop until the storyboard fixes the film length (then set SOUND_VIDEO_DUR / re-fit with beatsync).
 # History: v1 voice 70.7 s, v2 voice 78.0 s.
-VIDEO_DUR = float(os.environ.get("SOUND_VIDEO_DUR", "55.5"))
+VIDEO_DUR = float(os.environ.get("SOUND_VIDEO_DUR", str(1661 / 30)))  # final film: 1661 frames @30 = 55.3667 s
 N_TOTAL = int(round(VIDEO_DUR * SR))  # 3,393,600 samples
 
 ROOT = Path(__file__).resolve().parents[2]  # /home/user/Test-/video

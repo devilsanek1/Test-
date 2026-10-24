@@ -1,6 +1,6 @@
 {
  "generated_by": "scripts/qa/beatsync.py --fit-tempo",
- "generated_at": "2026-10-24T20:59:41",
+ "generated_at": "2026-10-24T21:02:21",
  "what": "Tempo map proposal: the voice decides the cuts and the music bends. Beats (and, where possible, downbeats) land exactly on the cut frames; the tempo varies smoothly within +-8 % of the base tempo; the loop length is kept.",
  "grid_source": "MIDI audio/music_cinematic.mid (96.22 BPM, 89 beats, 22 bars, end 55.500 s)",
  "cuts_source": "src/data/scenes.json",

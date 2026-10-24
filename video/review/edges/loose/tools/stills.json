@@ -1,14 +1,134 @@
 [
-{"props": {"variant": "trim", "shot": "street"}, "out": "review/edges/loose/stills/trim_street.png"},
-{"props": {"variant": "trim", "shot": "monument"}, "out": "review/edges/loose/stills/trim_monument.png"},
-{"props": {"variant": "trim", "shot": "vista"}, "out": "review/edges/loose/stills/trim_vista.png"},
-{"props": {"variant": "paint-subtle", "shot": "street"}, "out": "review/edges/loose/stills/paint-subtle_street.png"},
-{"props": {"variant": "paint-subtle", "shot": "monument"}, "out": "review/edges/loose/stills/paint-subtle_monument.png"},
-{"props": {"variant": "paint-subtle", "shot": "vista"}, "out": "review/edges/loose/stills/paint-subtle_vista.png"},
-{"props": {"variant": "paint-medium", "shot": "street"}, "out": "review/edges/loose/stills/paint-medium_street.png"},
-{"props": {"variant": "paint-medium", "shot": "monument"}, "out": "review/edges/loose/stills/paint-medium_monument.png"},
-{"props": {"variant": "paint-medium", "shot": "vista"}, "out": "review/edges/loose/stills/paint-medium_vista.png"},
-{"props": {"variant": "paint-loose", "shot": "street"}, "out": "review/edges/loose/stills/paint-loose_street.png"},
-{"props": {"variant": "paint-loose", "shot": "monument"}, "out": "review/edges/loose/stills/paint-loose_monument.png"},
-{"props": {"variant": "paint-loose", "shot": "vista"}, "out": "review/edges/loose/stills/paint-loose_vista.png"}
+ {
+  "props": {
+   "variant": "trim",
+   "shot": "street"
+  },
+  "out": "review/edges/loose/stills/trim_street.png"
+ },
+ {
+  "props": {
+   "variant": "trim",
+   "shot": "monument"
+  },
+  "out": "review/edges/loose/stills/trim_monument.png"
+ },
+ {
+  "props": {
+   "variant": "trim",
+   "shot": "vista"
+  },
+  "out": "review/edges/loose/stills/trim_vista.png"
+ },
+ {
+  "props": {
+   "variant": "paint-subtle",
+   "shot": "street"
+  },
+  "out": "review/edges/loose/stills/paint-subtle_street.png"
+ },
+ {
+  "props": {
+   "variant": "paint-subtle",
+   "shot": "monument"
+  },
+  "out": "review/edges/loose/stills/paint-subtle_monument.png"
+ },
+ {
+  "props": {
+   "variant": "paint-subtle",
+   "shot": "vista"
+  },
+  "out": "review/edges/loose/stills/paint-subtle_vista.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street"
+  },
+  "out": "review/edges/loose/stills/paint-medium_street.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "monument"
+  },
+  "out": "review/edges/loose/stills/paint-medium_monument.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "vista"
+  },
+  "out": "review/edges/loose/stills/paint-medium_vista.png"
+ },
+ {
+  "props": {
+   "variant": "paint-loose",
+   "shot": "street"
+  },
+  "out": "review/edges/loose/stills/paint-loose_street.png"
+ },
+ {
+  "props": {
+   "variant": "paint-loose",
+   "shot": "monument"
+  },
+  "out": "review/edges/loose/stills/paint-loose_monument.png"
+ },
+ {
+  "props": {
+   "variant": "paint-loose",
+   "shot": "vista"
+  },
+  "out": "review/edges/loose/stills/paint-loose_vista.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "seed": "film"
+  },
+  "out": "review/edges/loose/stills/seeds/paint-medium_film.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "seed": "scene-01"
+  },
+  "out": "review/edges/loose/stills/seeds/paint-medium_scene-01.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "seed": "scene-02"
+  },
+  "out": "review/edges/loose/stills/seeds/paint-medium_scene-02.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "seed": "scene-03"
+  },
+  "out": "review/edges/loose/stills/seeds/paint-medium_scene-03.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "seed": "scene-04"
+  },
+  "out": "review/edges/loose/stills/seeds/paint-medium_scene-04.png"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "seed": "scene-05"
+  },
+  "out": "review/edges/loose/stills/seeds/paint-medium_scene-05.png"
+ }
 ]

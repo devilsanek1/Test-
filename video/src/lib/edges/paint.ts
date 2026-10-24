@@ -21,8 +21,8 @@
 //   - square    the band's corner.
 // The INK layer (the scene as line art on paper, see EdgeTreatment) is clipped to the same blocks in their SKETCH
 // state (notches closed: the drawing is complete there, only the paint is missing; unpainted corners half drawn) plus
-// a comb along every block edge: stretches of 20-70 px where the line art runs 14-66 px past the colour and ENDS in
-// the white, between stretches where it runs off the screen (more of those where the paper is thin).
+// a band along every block edge: runs of 80-220 px where the line art reaches 14-66 px past the colour (a wandering,
+// slanting reach) and ENDS in the white, between runs where it runs off the screen (always where the paper is thin).
 //
 // One knob: LOOSENESS (0 none, 0.5 subtle, 1 medium, 1.6 loose; up to ~2). Every distance, count and corner role
 // follows from it, and a seed's random structure is SHARED across looseness (each element draws from its own fork):
@@ -110,9 +110,9 @@ const ANCHORS: [number, Params][] = [
   [
     1,
     {
-      base: [42, 22, 70, 34],
-      wander: [16, 8, 36, 12],
-      bandStep: [12, 30],
+      base: [42, 22, 72, 40],
+      wander: [16, 8, 36, 14],
+      bandStep: [12, 32],
       ov: [30, 80],
       tilt: 12,
       kneeP: 0.45,
@@ -138,9 +138,9 @@ const ANCHORS: [number, Params][] = [
   [
     1.6,
     {
-      base: [60, 28, 108, 46],
-      wander: [26, 10, 60, 18],
-      bandStep: [18, 46],
+      base: [74, 30, 124, 62],
+      wander: [30, 10, 64, 22],
+      bandStep: [18, 48],
       ov: [30, 90],
       tilt: 20,
       kneeP: 0.6,
@@ -338,12 +338,15 @@ function build(seed: Seed, L: number): PaintGeometry {
   const r = rng(`${seed}/paint`);
 
   // 1. corner roles (shared across looseness): one unpainted corner, then bleed, lip, a second unpainted when loose
+  // (the second unpainted corner is diagonal to the first, so the bare paper balances across the frame)
   const perm = r.fork('roles').shuffle([0, 1, 2, 3]);
+  const diag = (perm[0] + 2) % 4;
+  const [ca, cb] = perm.filter((k) => k !== perm[0] && k !== diag);
   const roles: Role[] = ['square', 'square', 'square', 'square'];
   roles[perm[0]] = 'unpainted';
-  if (L >= 0.75) roles[perm[1]] = 'bleed';
-  if (L >= 0.3) roles[perm[2]] = 'lip';
-  if (L >= 1.3) roles[perm[3]] = 'unpainted';
+  if (L >= 0.75) roles[ca] = 'bleed';
+  if (L >= 0.3) roles[cb] = 'lip';
+  if (L >= 1.3) roles[diag] = 'unpainted';
 
   // 2. band boundaries: the first just under the caption block (the top band holds it), more as it loosens
   const rsp = r.fork('splits');
@@ -438,11 +441,14 @@ function build(seed: Seed, L: number): PaintGeometry {
     }
     return null;
   };
-  // keep features clear of the unpainted corners (they stay bare)
+  // keep features clear of the unpainted corners (they stay bare) and of the bleed blocks (no slivers between blocks)
+  const keep = (role: Role) => (role === 'unpainted' ? P.chamfer[1] + 80 : role === 'bleed' ? P.bleed[1] * 1.2 + 70 : role === 'lip' ? P.lip[1] + 60 : 0);
+  // ... and of the seams between bands on the sides (a block ending right at a seam leaves a speck of paper)
+  const seams = (s: number): [number, number][] => (s === 1 || s === 3 ? splits.map((y) => (s === 1 ? y : H - y)).map((u) => [u - P.ov[1] - 50, u + P.ov[1] + 50] as [number, number]) : []);
   const cornerKeep = (s: number): [number, number][] => {
     const out: [number, number][] = [];
-    if (roles[s] === 'unpainted') out.push([-1e4, P.chamfer[1] + 80]);
-    if (roles[(s + 1) % 4] === 'unpainted') out.push([LEN[s] - P.chamfer[1] - 80, 1e4]);
+    if (keep(roles[s])) out.push([-1e4, keep(roles[s])]);
+    if (keep(roles[(s + 1) % 4])) out.push([LEN[s] - keep(roles[(s + 1) % 4]), 1e4]);
     return out;
   };
   const zoneForbid = (s: number): [number, number][] => ZONES[s].filter((z) => z[2] < 200).map(([a, b]) => [a - 30, b + 30]);
@@ -451,9 +457,9 @@ function build(seed: Seed, L: number): PaintGeometry {
   for (let i = 0; i < 5; i++) {
     const rf = r.fork(`notch${i}`);
     const s = rf.weighted([
-      [3, 0.45],
-      [2, 0.25],
-      [0, 0.2],
+      [3, 0.5],
+      [2, 0.3],
+      [0, 0.1],
       [1, 0.1],
     ] as const);
     const w = lerpR(P.notchW, rf.next());
@@ -467,7 +473,7 @@ function build(seed: Seed, L: number): PaintGeometry {
     if (i >= nN) continue;
     // a frame-facing band edge on side s with room for it
     const cands = bands.map((b, bi) => ({bi, k: b.k[s], frame: b.frame[s]})).filter((c) => c.frame);
-    const fr = cands.flatMap((c) => free(s, c.k[0].u + 70, c.k[c.k.length - 1].u - 70, w, [...zoneForbid(s), ...cornerKeep(s)]));
+    const fr = cands.flatMap((c) => free(s, c.k[0].u + 70, c.k[c.k.length - 1].u - 70, w, [...zoneForbid(s), ...cornerKeep(s), ...seams(s)]));
     const at = pickIn(fr, t);
     if (at === null) continue;
     const c = cands.find((cc) => at >= cc.k[0].u + 69 && at + w <= cc.k[cc.k.length - 1].u - 69);
@@ -612,7 +618,7 @@ function build(seed: Seed, L: number): PaintGeometry {
       const reach = rf.range(30, 80);
       const jit = Array.from({length: 9}, () => rf.jitter(1.5));
       if (i >= n) continue;
-      const forbid = [...cornerKeep(s), ...(kind === 'shelf' ? zoneForbid(s) : [])];
+      const forbid = [...cornerKeep(s), ...seams(s), ...(kind === 'shelf' ? zoneForbid(s) : [])];
       const at = pickIn(free(s, 60, LEN[s] - 60, w, forbid), t);
       if (at === null) continue;
       taken[s].push([at, at + w]);
@@ -658,6 +664,9 @@ function build(seed: Seed, L: number): PaintGeometry {
     const ty = n[1] > 1e-6 ? (H - p[1]) / n[1] : n[1] < -1e-6 ? -p[1] / n[1] : Infinity;
     return Math.min(tx, ty);
   };
+  let ends = true;
+  let runLeft = 0;
+  let cur = lerpR(P.over, 0.5);
   for (const poly of sketchPolys) {
     const m = poly.length;
     const lastOver: number[] = [];
@@ -671,20 +680,33 @@ function build(seed: Seed, L: number): PaintGeometry {
       const dx = (b[0] - a[0]) / len;
       const dy = (b[1] - a[1]) / len;
       const n: Pt = [dy, -dx]; // outward for a clockwise (screen) polygon
+      // the reach wanders (a random walk through P.over, knots every 20-70 px, straight between them), and whole runs
+      // of 80-220 px either END in the white or run off: a scene line parallel to the edge is cut once at a run's end,
+      // not chopped into dashes, and lines crossing the edge end at varied, slanting points
       const comb: Pt[] = [a];
+      const reach = (t: number, short: number) => {
+        const p: Pt = [a[0] + dx * t, a[1] + dy * t];
+        const D = toFrame(p, n);
+        const over = D < 16 || !ends ? D + OFF : Math.max(8, Math.min(cur, D - short));
+        return [p[0] + n[0] * over, p[1] + n[1] * over, over] as const;
+      };
       let t = 0;
-      while (t < len - 0.5) {
-        const t1 = Math.min(len, t + lerpR(P.stretch, ri.next()));
-        const ends = ri.next() < P.endP;
-        const o = lerpR(P.over, ri.next());
-        const short = ri.range(6, 22);
-        const mid: Pt = [a[0] + dx * (t + t1) * 0.5, a[1] + dy * (t + t1) * 0.5];
-        const D = toFrame(mid, n);
-        const over = D < 16 || !ends ? D + OFF : Math.max(8, Math.min(o, D - short));
-        if (t === 0) firstOver[i] = over;
+      let first = true;
+      while (t <= len) {
+        if (runLeft <= 0) {
+          ends = ri.next() < P.endP;
+          runLeft = ri.range(80, 220);
+        }
+        cur = Math.min(P.over[1], Math.max(P.over[0], cur + ri.jitter(0.4 * (P.over[1] - P.over[0]))));
+        const [x, y, over] = reach(t, ri.range(6, 22));
+        if (first) firstOver[i] = over;
+        first = false;
         lastOver[i] = over;
-        comb.push([a[0] + dx * t + n[0] * over, a[1] + dy * t + n[1] * over], [a[0] + dx * t1 + n[0] * over, a[1] + dy * t1 + n[1] * over]);
-        t = t1;
+        comb.push([x, y]);
+        if (t >= len) break;
+        const st = lerpR(P.stretch, ri.next());
+        runLeft -= st;
+        t = Math.min(len, t + st);
       }
       comb.push(b);
       inkPolys.push(cw(comb));
@@ -712,15 +734,18 @@ function build(seed: Seed, L: number): PaintGeometry {
   const rs = r.fork('ruled');
   const topK = [0, 1].filter((k) => roles[k] === 'square' || roles[k] === 'lip');
   const pickK = rs.chance(0.5) ? 0 : 1;
-  if (topK.length && L >= 0.3) {
-    const k = topK.length > 1 ? pickK : topK[0];
-    const q = roles[k] === 'lip' ? lipCorner[k] : cornerQ(k);
+  const kR = topK.length > 1 ? pickK : topK[0];
+  const qR = kR === undefined ? null : roles[kR] === 'lip' ? lipCorner[kR] : cornerQ(kR);
+  if (qR && L >= 0.3 && qR[1] < STROKE_MAX_Y - 60) {
+    const k = kR;
+    const q = qR;
     const sx: 1 | -1 = k === 0 ? 1 : -1;
     const side = k === 0 ? q[0] : W - q[0];
     strokes.push(
       ...ruledCorner(rs, `${seed}pnt${k}`, q, sx, {
         h: {len: [150, 260], over: Math.max(6, Math.min(side - 8, rs.range(16, 26) * Math.min(1.3, L)))},
-        v: {len: [140, Math.max(160, STROKE_MAX_Y - q[1])], over: 40},
+        // the vertical stops above the caption block (it sits inside the caption block's x range when the side is deep)
+        v: {len: [Math.min(140, STROKE_MAX_Y - q[1] - 20), STROKE_MAX_Y - q[1]], over: 40},
       }),
     );
   }
