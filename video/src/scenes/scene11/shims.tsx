@@ -2,19 +2,18 @@
 // shipped yet. Same names and the props the requests describe, so a later fix round swaps the import to
 // '../shared/props' and deletes this file:
 //   StickyNote  (request: cream note, slapAt (flutter in + slap squash), strikeAt + strike substring; lettering >= 24 px)
-//   BackSoonTag (request: LETTERED 'back soon' variant, CaptionHand >= 22 px on screen, tag >= 80 px wide; liftAt / outAt)
 // House rules kept: no opacity anywhere (pops, springs, draw-ons, squashes, pendulums), flat fills misregistered in SCREEN
 // px, ink weights given in SCREEN px and divided by the accumulated camera scale (so a push keeps the pen).
 
 import React from 'react';
 import {palette} from '../../lib/theme';
-import {ease as E, lerp, prog, springAt, springs, useTime} from '../../lib/time';
+import {ease as E, lerp, prog, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {captionFontStack, useCaptionFont} from '../../lib/font';
-import {circle, line, polyPath, Pt} from '../../lib/sketch';
+import {captionFontStack, measureCaption, useCaptionFont} from '../../lib/font';
+import {line, polyPath, Pt} from '../../lib/sketch';
 import {mat, useXf, XG} from '../../lib/xf';
-import {matScale, misregScreen, pendulum} from '../shared/props/common';
+import {matScale, misregScreen} from '../shared/props/common';
 
 const useScreenK = () => Math.max(1e-4, matScale(useXf()));
 
@@ -78,7 +77,7 @@ export const StickyNote: React.FC<StickyNoteProps> = ({x, y, w, h, lines, size, 
   // ---- the corner curl (bottom right)
   const curls = curlAt === undefined ? [] : Array.isArray(curlAt) ? curlAt : [curlAt];
   let c = 0;
-  for (const ca of curls) if (t >= ca && t < ca + 0.4) c = Math.max(c, Math.sin(prog(t, ca, 0.4) * Math.PI) * Math.min(w, h) * 0.22);
+  for (const ca of curls) if (t >= ca && t < ca + 0.42) c = Math.max(c, Math.sin(prog(t, ca, 0.42, E.outQuad) * Math.PI) * Math.min(w, h) * 0.34);
   const x0 = -w / 2;
   const y0 = -h / 2;
   const x1 = w / 2;
@@ -92,7 +91,7 @@ export const StickyNote: React.FC<StickyNoteProps> = ({x, y, w, h, lines, size, 
   // strike-through: one ink line across the struck line's text width (estimated), drawn on in 0.15 s
   let strikeNode: React.ReactNode = null;
   if (strikeIdx >= 0 && strikeAt !== undefined && t >= strikeAt) {
-    const sw = lines[strikeIdx].length * size * 0.43;
+    const sw = measureCaption(lines[strikeIdx], size);
     const ly = ty0 + strikeIdx * lh - size * 0.3;
     strikeNode = <Ink d={line(-sw / 2 - 3, ly + 1.5, sw / 2 + 3, ly - 1.5, {seed: `${seed}/st`, over: [2, 5]})} at={strikeAt} dur={0.15} width={iw * 1.25} seed={`${seed}/sti`} />;
   }
@@ -125,69 +124,6 @@ export const StickyNote: React.FC<StickyNoteProps> = ({x, y, w, h, lines, size, 
         : null}
       {strikeNode}
       {slapMarks}
-    </XG>
-  );
-};
-
-// ---------------------------------------------------------------- BackSoonTag (lettered)
-
-export type BackSoonTagProps = {
-  /** Hang point (the string's top); the tag hangs below it. */
-  x: number;
-  y: number;
-  /** Tag width (world px). Height = 0.8 w (incl. the notched top). */
-  size?: number;
-  /** Pops in and swings -16 -> 0 deg (0.5 s pendulum). */
-  at?: number;
-  /** Extra swings (taps / breeze). */
-  tapAt?: number | number[];
-  /** Twirls once about its string (0.45 s: the blank back shows edge-on, no fade). */
-  twirlAt?: number | number[];
-  lettered?: boolean;
-  text?: [string, string];
-  inkPx?: number;
-  seed?: string;
-};
-
-export const BackSoonTag: React.FC<BackSoonTagProps> = ({x, y, size = 52, at, tapAt, twirlAt, lettered = true, text = ['back', 'soon'], inkPx = 2.2, seed = 'tagL'}) => {
-  const t = useTime();
-  useCaptionFont();
-  const k = useScreenK();
-  if (at !== undefined && t < at) return null;
-  const iw = inkPx / k;
-  const W = size;
-  const H = size * 0.8;
-  const str = size * 0.16;
-  let a = pendulum(t, at, -16, 0.5, 0.8);
-  const taps = tapAt === undefined ? [] : Array.isArray(tapAt) ? tapAt : [tapAt];
-  for (const tp of taps) a += pendulum(t, tp, 12, 0.55, 0.9);
-  const twirls = twirlAt === undefined ? [] : Array.isArray(twirlAt) ? twirlAt : [twirlAt];
-  let tw = 1;
-  for (const tr of twirls) if (t >= tr && t < tr + 0.45) tw = Math.cos(prog(t, tr, 0.45, E.inOutSine) * Math.PI * 2);
-  const pop = at !== undefined ? Math.min(1, 0.3 + springAt(t, at, springs.pop) * 0.7) : 1;
-  const n = W * 0.16;
-  const tag = polyPath([[-W / 2, str + n], [-W / 2 + n, str], [W / 2 - n, str], [W / 2, str + n], [W / 2, str + H], [-W / 2, str + H]]);
-  const mr = misregScreen(seed);
-  const fs = size * 0.27;
-  const sx = Math.abs(tw) < 0.08 ? 0.08 : tw;
-  return (
-    <XG m={mat.compose(mat.translate(x, y), mat.rotate(a), mat.scale(pop))}>
-      <Ink d={line(0, 0, 0, str + n * 0.6, {over: [0, 0], seed: `${seed}/str`})} width={iw * 0.6} taper={false} seed={`${seed}/str`} />
-      <XG m={mat.scale(sx, 1)}>
-        <Fill d={tag} color={palette.white} offset={[mr[0] / k / Math.abs(sx), mr[1] / k]} mode="none" seed={`${seed}/f`} />
-        <Ink d={tag} width={iw / Math.max(0.3, Math.abs(sx))} taper={false} vary={0} seed={`${seed}/o`} />
-        <path d={circle(0, str + n * 0.75, size * 0.045, {seed: `${seed}/h`})} fill="none" stroke={palette.ink} strokeWidth={iw * 0.6} />
-        {lettered && tw > 0.35 ? (
-          <>
-            <text x={0} y={str + n * 0.9 + fs * 1.08} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink} textAnchor="middle">
-              {text[0]}
-            </text>
-            <text x={0} y={str + n * 0.9 + fs * 2.06} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink} textAnchor="middle">
-              {text[1]}
-            </text>
-          </>
-        ) : null}
-      </XG>
     </XG>
   );
 };

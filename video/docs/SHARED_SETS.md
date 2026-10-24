@@ -496,3 +496,44 @@ cascade. Storyboard v1 says plain windows in line art: pass `chrome={false}` to 
 whose beats need an empty street (S04 "nobody did") must pass `people={false}`; the storyboard may want to name the
 walkers' `riseAt` / `walk` per scene.
 
+
+## 9. Storyboard v3 additions (docs/storyboard_v3.json `requests.sets`)
+
+Everything below is ADDITIVE: every v1 / review-5 export, prop and default keeps working. Preview variants (demo times
+on the recorded take, `sets/catalog.tsx`): `plaza` `v3` (S01) and `rewind` (S12).
+
+### GovernmentPlaza (S01, S11, S12)
+
+```tsx
+<GovernmentPlaza state="frame0" sun={...}                       // frame 0: govB's screen IS the bright line, all else lit
+  gov={{govB: {screenOffAt: 0, shutterAt: 1.71, offAt: 1.85, padlockAt: 3.38, tagAt: 3.69, lanternOffAt: 3.96},
+        govA: {screenOffAt: 0.63, shutterAt: 1.98, offAt: 2.12, padlockAt: 3.44, tagAt: 3.74},
+        govC: {screenOffAt: 0.89, shutterAt: 2.35, shutterStop: 0.5, padlockAt: 3.5, tagAt: 3.79}}}
+  civicOffAt={1.16} civicLanternsOffAt={1.41} phonesAt={1.41} phonesDownAt={3.04} lanternOffAt={2.69} />   // S01
+const g = plazaShutdownGov(-1);                                  // S12: the state S01 left (every event already happened)
+<GovernmentPlaza state="built" idleOffset={-sceneDur} civicOffAt={-1} civicLanternsOffAt={-1} lanternOffAt={-1} phonesAt={-1}
+  gov={{govA: {...g.govA, tagOutAt, padlockOutAt, liftAt, onAt, screenOnAt},
+        govB: {...g.govB, tagOutAt, padlockOutAt, lanternOnAt, liftAt, onAt, screenLineAt},   // ends on the bright line
+        govC: {...g.govC, tagOutAt, padlockOutAt, liftAt, screenOnAt}}}
+  civicOnAt={2.24} lanternOnAt={1.94} phonesDownAt={0.86} />
+```
+- `farCivic` (default true): the far city in the sun gap is now `PLAZA_CIVIC` = 6 fill-only civic silhouettes, left to
+  right templeF, domeB, domeF, templeB, spireF, spireB (two tiers: far #A2C8B6, nearer #84B09C; each 40-58 px wide, tops
+  952-1086, all under the power glyph). `civicOffAt` (number = left to right 0.06 s apart, or an array per silhouette)
+  steps each WHOLE shape one fill darker (#88B3A0 / sage); `civicOnAt` relights them (number = right to left).
+  `civicLanternsOffAt`: the two domes' cream lanterns pop off (0.06 s apart; they relight with their dome). The old
+  block city with window dots and cranes: `farCivic={false}`.
+- Per building (`gov.govX`), new: `screenOffAt` = CRT power-off of the browser screen (lit -> bright horizontal line ->
+  dot -> dark, 0.15 s; the building stays lit until `offAt`); `screenLineAt` = from here the screen IS the bright line
+  (from dark it steps back dot -> line); `screenOnAt` after an off = the reversed CRT (stepped); `liftAt` (+ `liftDur`
+  0.25) = the shutter's slam played backwards, stepped; `onAt` = lights back on (undoes `offAt`); `shutterStop` (alias
+  `stopAt`, a FRACTION) = a partial shutter (govC 0.5), the padlock and tag ride its rail; `tagOutAt` = the tag swings
+  back up and pops off; `padlockOutAt` = the padlock pops off; `lanternOffAt` / `lanternOnAt` = govB's dome lantern on
+  its own switch (else it follows the building); `tagProps` / `padlockProps` = extra props passed to the props-lane tag /
+  padlock (the lettered 'back soon' tag once it lands). Without the v3 screen events the v1 behaviour is unchanged
+  (`offAt` darkens the screen with the building).
+- Set level, new: `state="frame0"`, `lanternOnAt` (the lamp), `phonesAt` / `phonesDownAt` (number or list; latest
+  wins), `rewindFps` (12: the rewind's tape steps), `idleOffset` (seconds added to the idle clocks of Bit, the tree sway and
+  the onlookers: S12 passes `-duration` so its last frame is pixel-identical to S01's frame 0; checked: 0 px differ).
+- Helpers: `plazaShutdownGov(at)`, `crtPhase(t, ev)`, `CRT` {dur 0.15, rev 0.17, line 0.4}, `rewindStep(t, at, dur,
+  fps)`, `latestState(t, on[], off[], init)`, `PLAZA.civic`, `PLAZA.frame0` (sun (720, 900) r155, press 0.88).

@@ -26,7 +26,7 @@
 
 import React from 'react';
 import {palette} from '../../../lib/theme';
-import {clamp, ease as E, osc, prog, TimeProvider, useTime} from '../../../lib/time';
+import {clamp, ease as E, osc, prog, TimeProvider, TimeShift, useTime} from '../../../lib/time';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {Look, useLook} from '../../../lib/exit';
@@ -212,6 +212,9 @@ export type GovernmentPlazaProps = {
   civicLanternsOffAt?: number;
   /** Steps per second of the reversed (rewind) events: liftAt, screenOnAt after an off, screenLineAt from dark, tagOutAt. */
   rewindFps?: number;
+  /** Seconds added to the clock of the idle-only pieces (Bit's idle, the tree sway, the edge onlookers' breathing). The
+   *  loop seam: S12 passes -(its duration) so its last frame idles exactly like S01's frame 0. Default 0. */
+  idleOffset?: number;
   /** Pigeons land on the crossbar / scatter. Omit landing = absent (default), true = sitting. */
   pigeonsAt?: number | boolean;
   pigeonsFlyAt?: number;
@@ -444,9 +447,11 @@ const G = (() => {
 
 // ---------------------------------------------------------------- far civic skyline (v3)
 
-/** Haze steps of the civic tiers: [lit, dark] per tier (far tier #98C0AE -> #7CA995, nearer #84B09C -> sage). */
+/** Haze steps of the civic tiers: [lit, dark] per tier. The far tier sits one haze step lighter than the old far city
+ *  (#A2C8B6, against the sun disc) so the two tiers read as separate shapes (1.33:1), and each switch-off is one step
+ *  (1.27-1.32:1): far #A2C8B6 -> #88B3A0, nearer #84B09C -> sage. */
 const CIVIC_FILL: [string, string][] = [
-  ['#98C0AE', '#7CA995'],
+  ['#A2C8B6', '#88B3A0'],
   ['#84B09C', palette.sage],
 ];
 
@@ -492,7 +497,12 @@ const CIV = (() => {
   });
 })();
 
-/** Per-silhouette dark state at t (latest event wins). */
+/** Paint order: the far tier first, then the nearer tier (indices into CIV, which is left to right). */
+const CIV_DRAW = CIV.map((c, i) => [c.tier, i] as const)
+  .sort((a, b) => a[0] - b[0] || a[1] - b[1])
+  .map((q) => q[1]);
+
+/** Per-silhouette event times (left-to-right order). */
 function civicTimes(v: number | number[] | undefined, dir: 'lr' | 'rl'): (number | undefined)[] {
   const n = PLAZA_CIVIC.length;
   if (v === undefined) return new Array(n).fill(undefined);
@@ -504,10 +514,12 @@ const FarCivic: React.FC<{off: boolean; offAt?: number | number[]; onAt?: number
   const t = useTime();
   const offs = civicTimes(offAt, 'lr');
   const ons = civicTimes(onAt, 'rl');
-  let li = 0;
+  // lantern index (left to right) for the lanternsOffAt stagger
+  const lanternIdx = CIV.map((c, i) => CIV.slice(0, i).filter((q) => 'lantern' in q && q.lantern).length);
   return (
     <>
-      {CIV.map((c, i) => {
+      {CIV_DRAW.map((i) => {
+        const c = CIV[i];
         const dark = latestState(t, [offs[i]], [ons[i]], off);
         const [lit, drk] = CIVIC_FILL[c.tier];
         const col = dark ? drk : lit;
@@ -515,8 +527,7 @@ const FarCivic: React.FC<{off: boolean; offAt?: number | number[]; onAt?: number
         if ('lantern' in c && c.lantern) {
           // with civicLanternsOffAt a lantern stays lit through its dome's step until then (S01: the domes step on
           // 'Europe', the lanterns go 0.25 s later) and relights with its dome; without it, it follows the dome
-          const lOff = lanternsOffAt !== undefined ? lanternsOffAt + li * 0.06 : undefined;
-          li++;
+          const lOff = lanternsOffAt !== undefined ? lanternsOffAt + lanternIdx[i] * 0.06 : undefined;
           lanternOn = lanternsOffAt !== undefined ? !latestState(t, [lOff], [ons[i]], off) : !dark;
         }
         return (
@@ -595,7 +606,7 @@ export function crtPhase(t: number, ev: GovEvents, fps = 12, init = 0): number {
 const crtContent = (u: number, seed: string) => ({w, h}: {w: number; h: number}) => {
   const cx = w / 2;
   const cy = h / 2;
-  const lh = Math.max(3.5, h * 0.05);
+  const lh = Math.max(4, h * 0.065);
   let core = '';
   let halo = '';
   if (u < CRT.line) {
@@ -920,7 +931,7 @@ const FarCity: React.FC<{seed: string; civic?: React.ReactNode}> = ({seed, civic
   civic ? (
     <>
       {/* v3: the civic silhouettes ARE the far city in the gap (the back band keeps the sun's lower edge off the horizon) */}
-      <Fill d={G.civicBand} color={HAZE[1]} offset={false} seed={`${seed}/farA`} />
+      <Fill d={G.civicBand} color={CIVIC_FILL[0][0]} offset={false} seed={`${seed}/farA`} />
       {civic}
     </>
   ) : (
@@ -1017,11 +1028,11 @@ const Onlookers: React.FC<{seed: string}> = ({seed}) => (
   </>
 );
 
-const Near: React.FC<{lanternOffAt?: number; lanternOnAt?: number; off: boolean; pigeonsAt?: number | boolean; pigeonsFlyAt?: number; bollard: boolean; onlookers: boolean; seed: string}> = ({lanternOffAt, lanternOnAt, off, pigeonsAt, pigeonsFlyAt, bollard, onlookers, seed}) => {
+const Near: React.FC<{lanternOffAt?: number; lanternOnAt?: number; off: boolean; pigeonsAt?: number | boolean; pigeonsFlyAt?: number; bollard: boolean; onlookers: boolean; idle: number; seed: string}> = ({lanternOffAt, lanternOnAt, off, pigeonsAt, pigeonsFlyAt, bollard, onlookers, idle, seed}) => {
   const t = useTime();
   const lanternOff = latestState(t, [lanternOffAt], [lanternOnAt], off);
   const pigeons = !off && (pigeonsAt === true || (typeof pigeonsAt === 'number' && t >= pigeonsAt));
-  const sway = osc(t, 0.3, 1.2) * 0.6;
+  const sway = osc(t + idle, 0.3, 1.2) * 0.6;
   return (
     <>
       {/* lamp post at the left edge (cut by it) with a crossbar where 3 pigeons land */}
@@ -1043,7 +1054,11 @@ const Near: React.FC<{lanternOffAt?: number; lanternOnAt?: number; off: boolean;
         <Ink d={G.treeTicks} width={MID} taper={false} />
       </XG>
       {bollard ? <BollardSlot x={PLAZA.bollard.x} y={PLAZA.bollard.y} w={PLAZA.bollard.w} h={PLAZA.bollard.h} seed={`${seed}/bollard`} /> : null}
-      {onlookers ? <Onlookers seed={seed} /> : null}
+      {onlookers ? (
+        <TimeShift by={-idle}>
+          <Onlookers seed={seed} />
+        </TimeShift>
+      ) : null}
     </>
   );
 };
@@ -1072,6 +1087,7 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
   civicOnAt,
   civicLanternsOffAt,
   rewindFps = 12,
+  idleOffset = 0,
   detail = 'wide',
   sun,
   bollard = true,
@@ -1111,7 +1127,11 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
           <GovC ev={ev('govC')} {...bp} />
           <GovA ev={ev('govA')} {...bp} />
           <GovB ev={ev('govB')} {...bp} />
-          {bit ? <BitSlot x={PLAZA.bit[0]} y={PLAZA.bit[1]} size={PLAZA.bitSize} seed={`${seed}/bit`} /> : null}
+          {bit ? (
+            <TimeShift by={-idleOffset}>
+              <BitSlot x={PLAZA.bit[0]} y={PLAZA.bit[1]} size={PLAZA.bitSize} seed={`${seed}/bit`} />
+            </TimeShift>
+          ) : null}
           {(pennantUp || pennantTimes.length) && !lineArt
             ? (['govA', 'govB', 'govC'] as GovId[]).map((id, i) => <Pennant key={id} i={i} root={PLAZA.gov[id].pennant} at={pennantTimes[i]} up={pennantUp} waveAt={pennantWaveAt} seed={seed} />)
             : null}
@@ -1137,7 +1157,7 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
         'near',
         L.near,
         <>
-          <Near lanternOffAt={lineArt ? undefined : lanternOffAt} lanternOnAt={lineArt ? undefined : lanternOnAt} off={off} pigeonsAt={lineArt ? undefined : pigeonsAt} pigeonsFlyAt={pigeonsFlyAt} bollard={bollard} onlookers={onlookers} seed={seed} />
+          <Near lanternOffAt={lineArt ? undefined : lanternOffAt} lanternOnAt={lineArt ? undefined : lanternOnAt} off={off} pigeonsAt={lineArt ? undefined : pigeonsAt} pigeonsFlyAt={pigeonsFlyAt} bollard={bollard} onlookers={onlookers} idle={idleOffset} seed={seed} />
           <Foreground spec={foreground} seed={`${seed}/fg`} />
         </>,
       )}

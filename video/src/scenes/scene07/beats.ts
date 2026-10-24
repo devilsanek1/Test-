@@ -37,7 +37,7 @@ export const ABS = {
   end: SCENE.end,
 } as const;
 
-export type Beats = {[K in keyof typeof ABS]: number};
+export type Beats = {-readonly [K in keyof typeof ABS]: number};
 
 /** Scene-local beat times (s). */
 export function useBeats(): Beats {

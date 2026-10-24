@@ -19,11 +19,15 @@ import {misregScreen, pendulum} from '../shared/props/common';
 
 // ---------------------------------------------------------------- CRT power-off (BrowserChrome + collapse overlay)
 
+/** A dead screen: flat teal glass (one step lighter than the tealDark shutter that slams over it, so the curtain reads). */
+export const DEAD_SCREEN = palette.teal;
+
 /** Title-bar height BrowserChrome uses for a window of height h. */
 const barOf = (h: number) => Math.min(30, h * 0.27);
 
 /** The CRT collapse of a browser screen, starting at `at`: [0, 0.05) the lit screen squashes to a bright WHITE line,
- *  [0.05, 0.10) the line shrinks to a dot, [0.10, 0.15) the dot shrinks away; the screen is tealDark from `at` on.
+ *  [0.05, 0.10) the line shrinks to a dot, [0.10, 0.15) the dot shrinks away; from `at` on the screen is dead.
+ *  The dead screen is flat teal glass with a white glare tick.
  *  Pass a negative `at` to start mid-collapse (frame 0: govB's screen IS the bright line at t = 0). */
 export const CrtOff: React.FC<{x: number; y: number; w: number; h: number; at?: number; ink: number; seed: string}> = ({x, y, w, h, at, ink, seed}) => {
   const t = useTime();
@@ -52,9 +56,13 @@ export const CrtOff: React.FC<{x: number; y: number; w: number; h: number; at?: 
     const r = lerp(4.5, 0.5, E.inQuad((dt - 0.1) / 0.05));
     band = <circle cx={cx} cy={cy} r={r} fill={palette.white} />;
   }
+  const gx = sx + sw * 0.78;
+  const gy = sy + sh * 0.22;
+  const glare = `M${gx} ${gy + sh * 0.22}L${gx + sh * 0.16} ${gy}M${gx + sh * 0.14} ${gy + sh * 0.22}L${gx + sh * 0.26} ${gy + sh * 0.05}`;
   return (
     <>
-      <Fill rect={[sx, sy, sw, sh]} color={palette.tealDark} offset={false} mode="snap" seed={`${seed}/crt`} />
+      <Fill rect={[sx, sy, sw, sh]} color={DEAD_SCREEN} offset={false} mode="snap" seed={`${seed}/crt`} />
+      {dt >= 0.15 ? <Ink d={glare} width={ink * 0.7} color={palette.white} taper={false} seed={`${seed}/gl`} /> : null}
       {band}
     </>
   );
@@ -89,21 +97,21 @@ const spire = (x0: number, x1: number, top: number, sx: number, apex: number): s
 /** World coords of the S01 rest camera. The sun's glyph ring bottom sits at y ~960: back tops stay below it inside the
  *  glyph's span, the spire rises only right of the ring. Each silhouette is >= 40 px wide on screen. */
 const SHAPES: Civic[] = [
-  // back tier (#98C0AE): dome / temple / clock spire
-  {d: dome(644, 708, 1012, 30), tier: 'back', col: 0, win: [652, 1024, 50, 150], lantern: [672, 972, 8, 12]},
-  {d: temple(708, 754, 1008, 988), tier: 'back', col: 1, win: [712, 1020, 38, 130]},
-  {d: spire(754, 802, 1000, 779, 944), tier: 'back', col: 2, win: [760, 1034, 36, 120], clock: [779, 1016]},
+  // back tier (#98C0AE): dome / temple / clock spire, silhouetted against the lower sun disc
+  {d: dome(644, 716, 1004, 34), tier: 'back', col: 0, win: [652, 1020, 56, 110], lantern: [676, 956, 8, 15]},
+  {d: temple(716, 760, 1010, 990), tier: 'back', col: 1, win: [721, 1024, 36, 100]},
+  {d: spire(760, 804, 996, 782, 946), tier: 'back', col: 2, win: [765, 1034, 34, 90], clock: [782, 1013]},
   // front tier (#84B09C): low dome / stepped ministry / pediment
-  {d: dome(640, 694, 1096, 24), tier: 'front', col: 0, win: [646, 1108, 44, 230], lantern: [663, 1062, 7, 11]},
-  {d: rectPath(694, 1082, 52, HZ - 1082) + rectPath(704, 1068, 32, 16), tier: 'front', col: 1, win: [698, 1094, 44, 240]},
-  {d: temple(746, 802, 1086, 1066), tier: 'front', col: 2, win: [750, 1098, 48, 240]},
+  {d: dome(638, 692, 1140, 22), tier: 'front', col: 0, win: [645, 1152, 42, 200], lantern: [661, 1106, 7, 12]},
+  {d: rectPath(692, 1124, 50, HZ - 1124) + rectPath(702, 1110, 30, 16), tier: 'front', col: 1, win: [697, 1138, 42, 210]},
+  {d: temple(742, 802, 1134, 1112), tier: 'front', col: 2, win: [747, 1146, 50, 200]},
 ];
 
 /** Lit windows of a silhouette: 3 x 5 px cream slits on a seeded grid (they go out with the whole-shape step). */
 const windowsOf = (r: [number, number, number, number], seed: string): string => {
   const g = rng(`civic/${seed}`);
   let d = '';
-  for (let yy = r[1]; yy < r[1] + r[3]; yy += 14) for (let xx = r[0]; xx < r[0] + r[2] - 3; xx += 9) if (g.chance(0.42)) d += rectPath(xx, yy, 3, 5);
+  for (let yy = r[1]; yy < r[1] + r[3]; yy += 16) for (let xx = r[0]; xx < r[0] + r[2] - 3; xx += 10) if (g.chance(0.34)) d += rectPath(xx, yy, 4, 6);
   return d;
 };
 const WINDOWS = SHAPES.map((s, i) => windowsOf(s.win, `w${i}`));
@@ -127,7 +135,8 @@ export const FarCivic: React.FC<{civicOffAt?: number[]; lanternOffAt?: number[];
             <Fill d={s.d} color={col} offset={false} mode="snap" seed={`${seed}/s${i}`} />
             {!dark ? <Fill d={WINDOWS[i]} color={palette.cream} offset={false} mode="snap" seed={`${seed}/w${i}`} /> : null}
             {s.lantern ? <Fill rect={s.lantern} color={lanternOn ? palette.cream : col} offset={false} mode="snap" seed={`${seed}/l${i}`} /> : null}
-            {s.clock ? <circle cx={s.clock[0]} cy={s.clock[1]} r={6} fill={palette.white} /> : null}
+            {s.clock ? <Fill d={circle(s.clock[0], s.clock[1], 8, {seed: `${seed}/ck`})} color={palette.white} offset={false} mode="snap" seed={`${seed}/ck`} /> : null}
+            {s.clock ? <Ink d={`M${s.clock[0]} ${s.clock[1]}V${s.clock[1] - 6}M${s.clock[0]} ${s.clock[1]}L${s.clock[0] + 4} ${s.clock[1] + 2}`} width={1.4} taper={false} seed={`${seed}/ckh`} /> : null}
           </React.Fragment>
         );
       })}

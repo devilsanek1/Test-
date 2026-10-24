@@ -23,6 +23,8 @@ import {
   BrowserChrome,
   Calendar,
   LabelTag,
+  RewindGlyph,
+  CounterBoard,
   Caretaker,
   CheckFlag,
   CheckMark,
@@ -335,8 +337,10 @@ const BigCell: React.FC<{x: number; y: number; w: number; h: number; label: stri
 /** Storyboard v3 pieces at (near) film size: labels in every kind, the rewind kit, the counter board, the diagram, tags. */
 const V3Mode: React.FC = () => {
   const C = 540;
-  const R = 300;
+  const R = 280;
   const Y = 76;
+  const Y3 = Y + 3 * R;
+  const R3 = 420;
   return (
     <>
       <rect width={1080} height={1920} fill={palette.white} />
@@ -362,6 +366,41 @@ const V3Mode: React.FC = () => {
         <LabelTag kind="card" box={[20, 20, 330, 110]} text={['PHP · the code most', 'websites are built with']} fontSize={30} at={0.4} flipTo={{at: 1.8, text: ['of sites whose server', 'language is known · W3Techs']}} seed="v3L3" />
         <LabelTag kind="stamp" x={250} y={175} text="first 45 min: tens of thousands" fontSize={26} at={1.2} seed="v3L10" />
         <LabelTag kind="stamp" x={380} y={232} text="millions · within a day" fontSize={26} at={2.2} outAt={4.4} seed="v3L11" />
+      </BigCell>
+      {/* row 2: the S01 / S12 rewind kit */}
+      <BigCell x={0} y={Y + 2 * R} w={C} h={R} label="shutter slam + lettered tag, half (stopAt), rewind lift" bg={palette.sand}>
+        <BrowserChrome x={20} y={40} w={150} h={104} seed="v3w1" />
+        <RollerShutter x={20} y={40} w={150} h={104} slamAt={0.4} liftAt={3.6} liftMode="reverse" seed="v3s1" />
+        <ShutterPadlock x={95} y={160} at={0.8} outAt={3.4} outMode="pop" seed="v3p1" />
+        <BackSoonTag x={130} y={150} lettered size={88} at={1.0} liftAt={3.2} seed="v3t1" />
+        <BrowserChrome x={250} y={40} w={150} h={104} seed="v3w2" />
+        <RollerShutter x={250} y={40} w={150} h={104} slamAt={0.6} stopAt={0.5} seed="v3s2" />
+        <BackSoonTag x={470} y={60} lettered size={60} at={1.2} tapAt={2.4} twirlAt={2.9} seed="v3t2" />
+      </BigCell>
+      <BigCell x={C} y={Y + 2 * R} w={C} h={R} label="press release (frame 0) | rewind glyph, reverse press" bg={skies.day}>
+        <SunPress mode="release" at={0.5} cx={130} cy={130} r={90}>
+          <Sun cx={130} cy={130} r={90} drift={[0, 0]}>{(r) => <PowerGlyph r={r} />}</Sun>
+        </SunPress>
+        <SunPress mode="reverse" at={3.4} cx={390} cy={130} r={90}>
+          <Sun cx={390} cy={130} r={90} drift={[0, 0]}>
+            {(r) => (
+              <>
+                <PowerGlyph r={r} outAt={0.8} seed="v3pg1" />
+                <RewindGlyph r={r} at={0.86} outAt={2.9} nudgeAt={[1.6, 2.2]} />
+                <PowerGlyph r={r} at={2.96} seed="v3pg2" />
+              </>
+            )}
+          </Sun>
+        </SunPress>
+      </BigCell>
+      {/* row 3: the S08 counter board at film size (world 460 x 360) */}
+      <BigCell x={0} y={Y3} w={C} h={R3} label="CounterBoard: rise, header, flag + note, gates, stamps, footer" bg={palette.tan}>
+        <CounterBoard box={[40, 16, 500, 376]} riseAt={0.2} header={['Cloudflare · sits in front', 'of about 1 in 5 websites']}
+          flagAt={0.9} note={['counted from the', 'public announcement', 'attempts, not break-ins']}
+          footer={['Matthew Prince, Cloudflare CEO, on X', "Cloudflare's own count"]} footerAt={1.2}
+          gatesAt={[1.0, 1.4, 1.7, 1.8, 1.9, 2.3, 2.4, 2.8, 3.3]}
+          stamps={[{at: 2.6, text: 'first 45 min: tens of thousands'}, {at: 3.4, text: 'millions · within a day'}]} seed="v3cb" />
+        <rect x={0} y={386} width={540} height={40} fill={palette.sand} />
       </BigCell>
     </>
   );

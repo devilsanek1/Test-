@@ -9,7 +9,7 @@ import {rand} from '../../lib/rng';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {Bird} from '../../lib/kit';
-import {blob, circle, hline, rectPath, smooth, Pt} from '../../lib/sketch';
+import {blob, circle, rectPath, smooth, Pt} from '../../lib/sketch';
 import {mat, useXf, XG} from '../../lib/xf';
 import {BrowserChrome, ProgressStep} from '../shared/props';
 import {matScale} from '../shared/props/common';
@@ -227,6 +227,8 @@ export type GovBWindowProps = {
   reloadAt?: number[];
   /** The page shakes 'no' (0.22 s). */
   shakeAt?: number;
+  /** The page's three content bars draw on (it is still loading). */
+  barsAt?: number[];
   /** The fill edge flickers (cream tick, 3 frames on / off) without moving. */
   flickerAt?: number;
   inkW: number;
@@ -248,34 +250,43 @@ export function pillGeom(w: number, h: number) {
   return {bar, px, py, pw, ph, ringR, ringX: px + pw + bar * 0.25 + ringR, ringY: bar / 2};
 }
 
-const Page: React.FC<{w: number; h: number; reloadAt: number[]; shakeAt?: number; seed: string}> = ({w, h, reloadAt, shakeAt, seed}) => {
+const Page: React.FC<{w: number; h: number; reloadAt: number[]; shakeAt?: number; barsAt: number[]; seed: string}> = ({w, h, reloadAt, shakeAt, barsAt, seed}) => {
   const t = useTime();
-  // the latest reload that has started
+  // the latest reload that has started: the page blanks for one frame and rebuilds (header wipe, button pop)
   let ra: number | undefined;
   for (const r of reloadAt) if (t >= r) ra = r;
   const blank = ra !== undefined && t < ra + 1 / 30;
-  const dx = shakeAt !== undefined && t >= shakeAt && t < shakeAt + 0.24 ? Math.sin(prog(t, shakeAt, 0.24) * Math.PI * 3) * 4 * (1 - prog(t, shakeAt, 0.24)) : 0;
+  const dx = shakeAt !== undefined && t >= shakeAt && t < shakeAt + 0.24 ? Math.sin(prog(t, shakeAt, 0.24) * Math.PI * 3) * 5 * (1 - prog(t, shakeAt, 0.24)) : 0;
   if (blank) return null;
   const pad = Math.max(5, w * 0.07);
   const hh = h * 0.24;
   const wipe = ra !== undefined ? prog(t, ra + 1 / 30, 0.16, E.outCubic) : 1;
-  const gy = (h - pad * 2 - hh) / 4;
-  let d = '';
-  [0.86, 0.7, 0.5].forEach((f, i) => {
-    const yy = pad + hh + gy * (i + 1);
-    d += hline(pad, pad + (w - pad * 2) * f * wipe, yy, {over: [0, 2], seed: `${seed}/hl${i}`});
+  const btnK = ra !== undefined ? springAt(t, ra + 0.2, springs.pop) : 1;
+  // content bars (the page still loading): each draws on L -> R at its time; a reload hides them again
+  const gy = (h - pad * 2 - hh) / 3.6;
+  const bars: React.ReactNode[] = [];
+  [0.84, 0.62, 0.74].forEach((f, i) => {
+    const at = barsAt[i];
+    if (at === undefined || t < at || (ra !== undefined && ra > at)) return;
+    const q = prog(t, at, 0.14, E.outCubic);
+    const yy = pad + hh + gy * (i + 0.75);
+    bars.push(<Fill key={i} d={rectPath(pad, yy - 3, (w - pad * 2) * f * q, 6.5)} color={i === 1 ? palette.sage : palette.sand} offset={false} mode="none" seed={`${seed}/bar${i}`} />);
   });
   return (
     <XG m={mat.translate(dx, 0)}>
       <Fill d={rectPath(pad, pad, (w - pad * 2) * wipe, hh)} color={palette.peach} offset={false} mode="none" seed={`${seed}/hdr`} />
-      {/* a sage 'update' button block on the header's right end: the thing that cannot finish */}
-      {wipe > 0.85 ? <Fill d={rectPath(w - pad - hh * 1.9, pad + hh * 0.22, hh * 1.6, hh * 0.56)} color={palette.sage} offset={false} mode="none" seed={`${seed}/btn`} /> : null}
-      <Ink d={d} width={1.2} taper={false} vary={0} seed={`${seed}/hair`} />
+      {/* a sage 'update' button on the header's right end: the thing that cannot finish */}
+      {wipe > 0.85 && btnK > 0.01 ? (
+        <XG m={mat.about(mat.scale(btnK), w - pad - hh * 1.1, pad + hh * 0.5)}>
+          <Fill d={rectPath(w - pad - hh * 1.9, pad + hh * 0.22, hh * 1.6, hh * 0.56)} color={palette.sage} offset={false} mode="none" seed={`${seed}/btn`} />
+        </XG>
+      ) : null}
+      {bars}
     </XG>
   );
 };
 
-export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reloadAt = [], shakeAt, flickerAt, inkW, children, seed = 's11/govB'}) => {
+export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reloadAt = [], shakeAt, barsAt = [], flickerAt, inkW, children, seed = 's11/govB'}) => {
   const t = useTime();
   const [x, y, w, h] = r;
   const g = pillGeom(w, h);
@@ -290,7 +301,7 @@ export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reload
   }
   return (
     <>
-      <BrowserChrome x={x} y={y} w={w} h={h} ink={inkW} progress={{steps}} ring={{at: 1e6}} content={({w: sw, h: sh}) => <Page w={sw} h={sh} reloadAt={reloadAt} shakeAt={shakeAt} seed={seed} />} seed={seed}>
+      <BrowserChrome x={x} y={y} w={w} h={h} ink={inkW} progress={{steps}} ring={{at: 1e6}} content={({w: sw, h: sh}) => <Page w={sw} h={sh} reloadAt={reloadAt} shakeAt={shakeAt} barsAt={barsAt} seed={seed} />} seed={seed}>
         {null}
       </BrowserChrome>
       {flick}

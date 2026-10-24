@@ -220,7 +220,7 @@ export const Flyer: React.FC<{B: Beats; from: Pt}> = ({B, from}) => {
   }
   return (
     <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(s * sx, s * sy))}>
-      <LeakSheet x={0} y={0} w={74} h={94} pin={false} depth="mid" seed="s7flyer" />
+      <LeakSheet x={0} y={0} w={64} h={82} pin={false} depth="mid" seed="s7flyer" />
     </XG>
   );
 };
@@ -246,7 +246,7 @@ export const PhoneCopy: React.FC<{x: number; y: number; at: number; rot?: number
   const k = springAt(t, at, springs.pop);
   return (
     <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(k))}>
-      <LeakSheet x={0} y={0} w={17} h={22} pin={false} depth="hair" seed="s7phone" />
+      <LeakSheet x={0} y={0} w={16} h={21} pin={false} depth="hair" seed="s7phone" />
     </XG>
   );
 };

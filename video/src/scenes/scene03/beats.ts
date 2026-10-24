@@ -55,7 +55,7 @@ const ABS = {
   pipHop: 14.05, //             cut(it)-0.12: Pip hops off the stamp toward the stoop (crosses the cut)
 } as const;
 
-export type Beats = {[K in keyof typeof ABS]: number};
+export type Beats = {-readonly [K in keyof typeof ABS]: number};
 
 /** Scene-local beat times for a scene that starts at `start` (VO seconds). */
 export function beats(start: number = S03_START): Beats {

@@ -1,14 +1,13 @@
-// scene07/shims.tsx — LOCAL STAND-INS for shared-kit pieces requested in docs/storyboard_v3.json "requests" that do
-// not exist in src/scenes/shared yet. Same names / props as requested, so a later fix round swaps in the shared ones:
-//   LabelTag  (props request: tag / card / slip / notice / sign / stamp; `at`, `outAt`, `flipTo`, `swing`)
-//             -> this shim implements the 'tag' style only (a pinned cream card that hangs from its pin and swings).
-//   BlindSign (sets request: MakersLane / Workshop `blindSign` slot, 'still fixing...' on the shop-window blind)
-// Both follow labelStyle: CaptionHand ink #2B1B0F on cream paper, a ~2.2 px ink outline on screen, the fill
-// misregistered ~3 px, slightly soft corners; pop with the 7 % spring, hanging tags add the pendulum (-16 -> 0, 0.5 s).
-// Never a fade. Text is linework: it hides with the ink (<Look ink={false}>).
+// scene07/shims.tsx — LOCAL STAND-IN for a shared-kit piece requested in docs/storyboard_v3.json "requests" that does
+// not exist in src/scenes/shared yet. Same name / purpose as requested, so a later fix round swaps in the shared one:
+//   BlindSign (sets request: MakersLane / Workshop `blindSign` slot, 'still fixing...' on the shop-window blind, used by
+//             S06 and the S07 corner preset; the same sign hangs on the MakersCart in S09)
+// (LabelTag was shimmed here too until the props lane shipped it: S07 now uses the shared LabelTag.)
+// labelStyle: CaptionHand ink on paper, a ~2 px ink outline on screen, the fill misregistered ~3 px, slightly soft
+// corners. Never a fade. The lettering is linework: it hides with the ink (<Look ink={false}>).
 
 import React from 'react';
-import {captionFontStack, Fill, Ink, mat, palette, roundRect, line, springAt, springs, useCaptionFont, useLook, useTime, useXf, XG, ease as E, prog} from '../../lib';
+import {captionFontStack, Fill, Ink, mat, palette, roundRect, line, useCaptionFont, useLook, useTime, useXf, XG} from '../../lib';
 import {pendulum} from '../shared/props';
 
 const matScale = (m: [number, number, number, number, number, number]) => Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2]));
@@ -26,54 +25,6 @@ const Lettering: React.FC<{lines: string[]; size: number; y0: number; lead?: num
         </tspan>
       ))}
     </text>
-  );
-};
-
-export type LabelTagProps = {
-  /** Only 'tag' is implemented by this shim (a pinned card hanging from its pin). */
-  style?: 'tag' | 'card' | 'slip' | 'notice' | 'sign' | 'stamp';
-  /** The pin (attachment point), parent coordinates. The card hangs below it. */
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  lines: string[];
-  /** Font size in parent units (aim for 34-40 px on screen). */
-  size?: number;
-  at?: number;
-  /** 1-frame shrink pop out. */
-  outAt?: number;
-  /** Hanging tags swing in (pendulum -16 -> 0, 0.5 s). Default true. */
-  swing?: boolean;
-  /** Rest tilt (deg). */
-  rot?: number;
-  /** How far above the pin the card's top edge sits (the pin is ON the card). Default 10. */
-  pinInset?: number;
-  seed?: string;
-};
-
-/** LabelTag 'tag' stand-in: cream card, ink outline, misregistered fill, an ink pin dot, two lines of CaptionHand. */
-export const LabelTag: React.FC<LabelTagProps> = ({x, y, w, h, lines, size = 38, at, outAt, swing = true, rot = 0, pinInset = 10, seed = 'label'}) => {
-  const t = useTime();
-  const m = useXf();
-  if (at !== undefined && t < at) return null;
-  if (outAt !== undefined && t >= outAt + 1 / 30) return null;
-  const k = Math.max(1e-3, matScale(m));
-  const pop = at !== undefined ? springAt(t, at, springs.pop) : 1;
-  const out = outAt !== undefined && t >= outAt ? 0.4 : 1;
-  const sw = swing ? pendulum(t, at, -16, 0.5, 0.8) : 0;
-  const top = -pinInset;
-  const card = roundRect(-w / 2, top, w, h, 7);
-  const ink = 2.2 / k;
-  return (
-    <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot + sw), mat.scale(pop * out))}>
-      <Fill d={card} color={palette.cream} offset={[3 / k, 2 / k]} mode="none" seed={`${seed}/f`} />
-      <Ink d={roundRect(-w / 2, top, w, h, 7, {seed: `${seed}/o`})} width={ink} taper={false} seed={`${seed}/o`} />
-      <Lettering lines={lines} size={size} y0={top + h * 0.5 - (lines.length - 1) * size * 0.5 + size * 0.33} />
-      {/* the pin: an ink head with a cream glint */}
-      <Fill d={roundRect(-6, -6, 12, 12, 6)} color={palette.ink} offset={false} mode="none" seed={`${seed}/pin`} />
-      <Fill d={roundRect(-3.5, -3.5, 3.5, 3.5, 1.75)} color={palette.cream} offset={false} mode="none" seed={`${seed}/pg`} />
-    </XG>
   );
 };
 
@@ -109,6 +60,3 @@ export const BlindSign: React.FC<BlindSignProps> = ({x, y, w = 112, h = 70, line
     </XG>
   );
 };
-
-/** Small helper: 0..1 eased progress (re-exported for parts.tsx). */
-export const eased = (t: number, a: number, d: number) => prog(t, a, d, E.outCubic);

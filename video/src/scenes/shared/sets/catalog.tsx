@@ -79,7 +79,7 @@ export const SET_CATALOG: SetEntry[] = [
         ) : v === 'v3' ? (
           <GovernmentPlaza state="frame0" gov={S01_V3} civicOffAt={1.16} civicLanternsOffAt={1.41} phonesAt={1.41} phonesDownAt={3.04} lanternOffAt={2.69} pigeonsAt={0.89} pigeonsFlyAt={2.75} sun={<DemoSun cx={PLAZA.sun.x} cy={PLAZA.sun.y} r={PLAZA.sun.r} glyph />} />
         ) : v === 'rewind' ? (
-          <GovernmentPlaza state="built" gov={S12_V3} civicOffAt={-1} civicOnAt={2.24} civicLanternsOffAt={-1} lanternOffAt={-1} lanternOnAt={1.94} phonesAt={-1} phonesDownAt={0.86} sun={<DemoSun cx={PLAZA.sun.x} cy={PLAZA.sun.y} r={PLAZA.sun.r} glyph />} />
+          <GovernmentPlaza state="built" gov={S12_V3} idleOffset={-3.2} civicOffAt={-1} civicOnAt={2.24} civicLanternsOffAt={-1} lanternOffAt={-1} lanternOnAt={1.94} phonesAt={-1} phonesDownAt={0.86} sun={<DemoSun cx={PLAZA.sun.x} cy={PLAZA.sun.y} r={PLAZA.sun.r} glyph />} />
         ) : v === 'lineArt' ? (
           <GovernmentPlaza state="lineArt" sun={<DemoSun cx={PLAZA_REST.sunFrame0.x} cy={PLAZA_REST.sunFrame0.y} r={PLAZA_REST.sunFrame0.r} glyph />} />
         ) : v === 'off' ? (

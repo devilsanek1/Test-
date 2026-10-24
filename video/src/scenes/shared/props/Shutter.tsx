@@ -5,6 +5,8 @@
 //   <RollerShutter ... state="down" peephole={{x: 375, y: 935, r: 12}} />           // S11: the bar still crawls behind it
 //   <ShutterPadlock x={375} y={1015} at={3.64} glintAt={4.28} />                    // 24 x 28, centre of the body
 //   <BackSoonTag x={405} y={1006} at={3.70} tapAt={58.2} />                         // hang point; tag 30 x 36 below it
+//   <BackSoonTag x={518} y={1124} lettered size={88} at={3.69} liftAt={53.9} />       // v3: 'back soon' lettered, rewind
+//   <RollerShutter ... slamAt={2.35} stopAt={0.5} />  <RollerShutter ... liftAt={54.2} liftMode="reverse" />   // v3
 //
 // Roller shutter: an 18 px box above the window (tealDark, ink), the curtain unrolls from it: tealDark slats with ink
 // ribs every 14 px, a sand bottom rail. slamAt: drops in 0.16 s (gravity) with a 6 px bounce. liftAt rolls it up (0.3 s).
@@ -19,9 +21,9 @@ import {Fill} from '../../../lib/Fill';
 import {ExitFade, UnBuild} from '../../../lib/exit';
 import {MOTION} from '../../../lib/spec';
 import {captionFontStack, measureCaption, useCaptionFont} from '../../../lib/font';
-import {blob, circle, hline, line, rect, rectPath, roundRect} from '../../../lib/sketch';
-import {mat, XG} from '../../../lib/xf';
-import {bt, Depth, DEPTH_INK, misregScreen, pendulum, withOut} from './common';
+import {blob, circle, hline, line, poly, Pt, rect, rectPath, roundRect} from '../../../lib/sketch';
+import {mat, useXf, XG} from '../../../lib/xf';
+import {bt, Depth, DEPTH_INK, matScale, misregScreen, pendulum, withOut} from './common';
 
 export type RollerShutterProps = {
   /** The window rect the curtain covers (world px). The box sits above it (y - box .. y). */
@@ -156,6 +158,10 @@ export type ShutterPadlockProps = {
   depth?: Depth;
   width?: number;
   seed?: Seed;
+  /** Out (S12 rewind): 'unbuild' (default, the measured un-build over outDur) | 'pop' (one shrunken frame, gone). */
+  outAt?: number;
+  outDur?: number;
+  outMode?: 'pop' | 'unbuild';
 };
 
 /** The shutter padlock: sand body, ink shackle, cream glint. Pops on, the shackle clicks shut. */
@@ -189,40 +195,149 @@ export type BackSoonTagProps = {
   /** Hang point (the string's top). The tag hangs below it. */
   x: number;
   y: number;
-  /** Tag width (height = 1.2 x). Default 30. */
+  /** Tag width (height = 1.2 x for the clock tag; the lettered tag fits its words). Default 30 (lettered: 84). */
   size?: number;
+  /** Alias of `size` (scene shims). */
+  w?: number;
   /** Appears and swings -16 -> 0 deg over 0.5 s. */
   at?: number;
   /** Swing again (a tap). */
   tapAt?: number | number[];
+  /** Twirls once about its string (0.45 s: scaleX through edge-on, the blank back shows; no fade). */
+  twirlAt?: number | number[];
   /** Extra static tilt (deg). */
   tilt?: number;
+  /** v3: the LETTERED tag: 'back soon' in CaptionHand (one line on a wide tag, 'back' / 'soon' otherwise) instead of
+   *  the clock icon. Keep it >= 80 px wide and the lettering >= 22 px ON SCREEN (S01 govB). */
+  lettered?: boolean;
+  /** Lettered text (default 'back soon'; a pair = two lines). */
+  text?: string | [string, string];
+  /** Lettering size in world px (default: the largest that fits the width). */
+  font?: number;
+  /** S12 rewind: the tag swings back UP (0 -> -16 deg, stepped at `step` Hz, 0.17 s), then one shrunken frame, gone. */
+  liftAt?: number;
+  /** Out: 'pop' = one shrunken frame, then gone (default when lettered or with liftAt) | 'unbuild' = the measured
+   *  un-build over outDur (the v2 behaviour, default for the clock tag). */
+  outAt?: number;
+  outDur?: number;
+  outMode?: 'pop' | 'unbuild';
+  /** Tape-step rate for liftAt (Hz). Default 12; 0 = smooth. */
+  step?: number;
   depth?: Depth;
   width?: number;
+  /** Ink in SCREEN px (divided by the camera scale). Overrides width / depth. */
+  inkPx?: number;
   seed?: Seed;
 };
 
-/** White "back soon" tag with an ink clock icon on a short string. */
-const BackSoonTagBase: React.FC<BackSoonTagProps> = ({x, y, size = 30, at, tapAt, tilt = 0, depth, width, seed = 'tag'}) => {
+/** White "back soon" tag on a short string: an ink clock icon (v2) or LETTERED 'back soon' (v3). */
+const BackSoonTagBase: React.FC<BackSoonTagProps & {k: number}> = ({x, y, size: sizeIn, w: wIn, at, tapAt, twirlAt, tilt = 0, lettered = false, text = 'back soon', font, liftAt, step = 12, depth, width, inkPx, seed = 'tag', k}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
-  const s = size / 30;
-  const iw = (width ?? DEPTH_INK[depth ?? 'far']) / s;
   let a = pendulum(t, at, -16, 0.5, 0.8) + tilt;
   const taps = tapAt === undefined ? [] : Array.isArray(tapAt) ? tapAt : [tapAt];
   for (const tp of taps) a += pendulum(t, tp, 14, 0.5, 0.9);
-  const pop = at !== undefined ? Math.min(1, 0.3 + springAt(t, at, springs.pop) * 0.7) : 1;
-  const tag = 'M-15 14L-9 8H9L15 14V50H-15Z';
+  let lift = 1;
+  if (liftAt !== undefined && t >= liftAt) {
+    const SW = 0.17;
+    if (t >= liftAt + SW + 1 / 30) return null;
+    if (t >= liftAt + SW) lift = 0.55;
+    a += -16 * Math.min(1, (stepTime(t, liftAt, step) - liftAt) / SW);
+  }
+  const twirls = twirlAt === undefined ? [] : Array.isArray(twirlAt) ? twirlAt : [twirlAt];
+  let tw = 1;
+  for (const tr of twirls) if (t >= tr && t < tr + 0.45) tw = Math.cos(prog(t, tr, 0.45, E.inOutSine) * Math.PI * 2);
+  const twx = Math.abs(tw) < 0.06 ? 0.06 : tw;
+  const pop = (at !== undefined ? Math.min(1, 0.3 + springAt(t, at, springs.pop) * 0.7) : 1) * lift;
   const off = misregScreen(seed);
+  if (!lettered) {
+    const size = sizeIn ?? wIn ?? 30;
+    const s = size / 30;
+    const iw = (inkPx !== undefined ? inkPx / k : width ?? DEPTH_INK[depth ?? 'far']) / s;
+    const tag = 'M-15 14L-9 8H9L15 14V50H-15Z';
+    return (
+      <XG m={mat.compose(mat.translate(x, y), mat.scale(s), mat.rotate(a), mat.scale(pop))}>
+        <Ink d={line(0, 0, 0, 11, {over: [0, 0], seed: `${seed}/str`})} width={iw * 0.6} taper={false} seed={`${seed}/str`} />
+        <XG m={mat.scale(twx, 1)}>
+          <Fill d={tag} color={palette.white} offset={[off[0] / s / k, off[1] / s / k]} seed={`${seed}/f`} />
+          <Ink d={tag} width={iw} taper={false} seed={`${seed}/o`} />
+          <Ink d={circle(0, 12.5, 2.2, {seed: `${seed}/h`})} width={iw * 0.6} taper={false} seed={`${seed}/h`} />
+          {tw > 0.3 ? <Ink d={circle(0, 33, 9, {seed: `${seed}/c`, overlap: 12}) + 'M0 33V26.5M0 33L4.5 35.5'} width={iw * 0.85} taper={false} seed={`${seed}/c`} /> : null}
+        </XG>
+      </XG>
+    );
+  }
+  // lettered: W wide, clipped top corners, an eyelet, the words in CaptionHand
+  const W = sizeIn ?? wIn ?? 84;
+  const iw = inkPx !== undefined ? inkPx / k : width ?? DEPTH_INK[depth ?? 'far'];
+  const one = typeof text === 'string' ? text : text.join(' ');
+  const two: [string, string] = typeof text === 'string' ? (text.includes(' ') ? [text.slice(0, text.indexOf(' ')), text.slice(text.indexOf(' ') + 1)] : [text, '']) : text;
+  const m1 = measureCaption(one, 100) / 100;
+  const m2 = Math.max(measureCaption(two[0], 100), measureCaption(two[1], 100)) / 100;
+  const fit1 = (W * 0.84) / m1;
+  const fit2 = (W * 0.8) / m2;
+  const useOne = typeof text === 'string' && (font !== undefined ? font * m1 <= W * 0.9 : fit1 >= Math.max(20, W * 0.24));
+  const fs = font ?? (useOne ? Math.min(fit1, W * 0.34) : Math.min(fit2, W * 0.34));
+  const n = Math.min(W * 0.14, fs * 0.6);
+  const str = Math.max(6, fs * 0.36);
+  const H = n + fs * 0.42 + (useOne ? fs * 1.02 : fs * 2.0) + fs * 0.28;
+  const body: Pt[] = [
+    [-W / 2, str + n],
+    [-W / 2 + n, str],
+    [W / 2 - n, str],
+    [W / 2, str + n],
+    [W / 2, str + H],
+    [-W / 2, str + H],
+  ];
+  const bodyD = `M${body.map((q) => `${q[0].toFixed(1)} ${q[1].toFixed(1)}`).join('L')}Z`;
+  const ey = str + n * 0.62;
+  const er = Math.max(1.8, fs * 0.1);
+  const ty = str + n + fs * 0.32 + fs * 0.72;
   return (
-    <XG m={mat.compose(mat.translate(x, y), mat.scale(s), mat.rotate(a), mat.scale(pop))}>
-      <Ink d={line(0, 0, 0, 11, {over: [0, 0], seed: `${seed}/str`})} width={iw * 0.6} taper={false} seed={`${seed}/str`} />
-      <Fill d={tag} color={palette.white} offset={[off[0] / s, off[1] / s]} seed={`${seed}/f`} />
-      <Ink d={tag} width={iw} taper={false} seed={`${seed}/o`} />
-      <Ink d={circle(0, 12.5, 2.2, {seed: `${seed}/h`})} width={iw * 0.6} taper={false} seed={`${seed}/h`} />
-      <Ink d={circle(0, 33, 9, {seed: `${seed}/c`, overlap: 12}) + 'M0 33V26.5M0 33L4.5 35.5'} width={iw * 0.85} taper={false} seed={`${seed}/c`} />
+    <XG m={mat.compose(mat.translate(x, y), mat.rotate(a), mat.scale(pop))}>
+      <Ink d={line(0, 0, 0, ey - er, {over: [0, 0], seed: `${seed}/str`})} width={iw * 0.6} taper={false} seed={`${seed}/str`} />
+      <XG m={mat.scale(twx, 1)}>
+        <Fill d={bodyD} color={palette.white} offset={[off[0] / k, off[1] / k]} seed={`${seed}/f`} />
+        <Ink d={poly(body, {closed: true, over: 2, seed: `${seed}/o`})} width={iw} taper={false} seed={`${seed}/o`} />
+        <Ink d={circle(0, ey, er, {seed: `${seed}/h`})} width={iw * 0.6} taper={false} seed={`${seed}/h`} />
+        {tw > 0.3 ? (
+          <ExitFade x={0} y={str + H / 2}>
+            {useOne ? (
+              <text x={0} y={ty} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink} textAnchor="middle">
+                {one}
+              </text>
+            ) : (
+              <>
+                <text x={0} y={ty} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink} textAnchor="middle">
+                  {two[0]}
+                </text>
+                <text x={0} y={ty + fs * 0.98} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink} textAnchor="middle">
+                  {two[1]}
+                </text>
+              </>
+            )}
+          </ExitFade>
+        ) : null}
+      </XG>
     </XG>
   );
+};
+
+/** "back soon" tag (P5). v2: white tag with an ink clock; v3 `lettered`: the words in CaptionHand, `liftAt` / `outAt`
+ *  for the S12 rewind. `outAt` pops it off in one shrunken frame (lettered / liftAt) or un-builds it (clock tag). */
+export const BackSoonTag: React.FC<BackSoonTagProps> = (p) => {
+  useCaptionFont();
+  const k = Math.max(1e-4, matScale(useXf()));
+  const t = useTime();
+  const mode = p.outMode ?? (p.lettered || p.liftAt !== undefined ? 'pop' : 'unbuild');
+  const el = <BackSoonTagBase {...p} k={k} />;
+  if (p.outAt === undefined) return el;
+  if (mode === 'pop') {
+    if (t < p.outAt) return el;
+    if (t >= p.outAt + 1 / 30) return null;
+    return <XG m={mat.about(mat.scale(0.55), p.x, p.y)}>{el}</XG>;
+  }
+  return <UnBuild at={p.outAt} dur={p.outDur ?? MOTION.unbuild.total}>{el}</UnBuild>;
 };
 
 /** Window-switch-off helper: the 1-frame "lights out" step map (cream -> sand -> tan, mintPale -> sage, glow -> tealDark). */
@@ -237,5 +352,13 @@ export const LIGHTS_OUT: Record<string, string> = {
 export const lightsOut = (c: string) => LIGHTS_OUT[c] ?? c;
 
 // build-out (outAt / outDur) for props that have no own exit
-export const ShutterPadlock = withOut(ShutterPadlockBase, 'ShutterPadlock');
-export const BackSoonTag = withOut(BackSoonTagBase, 'BackSoonTag');
+const ShutterPadlockOut = withOut(ShutterPadlockBase, 'ShutterPadlock');
+/** The shutter padlock (P5); `outAt` un-builds it, or pops it off in one shrunken frame with outMode 'pop'. */
+export const ShutterPadlock: React.FC<ShutterPadlockProps> = (p) => {
+  const t = useTime();
+  if (p.outAt === undefined || (p.outMode ?? 'unbuild') === 'unbuild') return <ShutterPadlockOut {...p} />;
+  const {outAt, outDur, outMode, ...rest} = p;
+  if (t < outAt) return <ShutterPadlockBase {...rest} />;
+  if (t >= outAt + 1 / 30) return null;
+  return <XG m={mat.about(mat.scale(0.55), p.x, p.y)}><ShutterPadlockBase {...rest} /></XG>;
+};

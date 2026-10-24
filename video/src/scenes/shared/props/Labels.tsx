@@ -50,15 +50,16 @@ const DESC = 0.26;
 
 export const labelLines = (t: LabelText | undefined): string[] => (t === undefined ? [] : Array.isArray(t) ? t : t.split('\n'));
 
-export type TextLayout = {fs: number; w: number; h: number; lines: string[]; widths: number[]; base0: number; padX: number};
+export type TextLayout = {fs: number; w: number; h: number; lines: string[]; widths: number[]; base0: number; padX: number; pitch?: number};
 
 /** Lay out lines at font size fs inside paper padding (padX, padTop, padBot in em). With `box` [w, h] the font shrinks
  *  to fit and the block is centred vertically in it. */
-export function layoutText(lines: string[], fs: number, pad: {x: number; top: number; bot: number}, box?: [number, number]): TextLayout {
+export function layoutText(lines: string[], fs: number, pad: {x: number; top: number; bot: number; pitch?: number}, box?: [number, number]): TextLayout {
   const raw = lines.map((l) => measureCaption(l, 100) / 100);
   const m = Math.max(0.5, ...raw);
   const n = Math.max(1, lines.length);
-  const blockEm = (n - 1) * PITCH + CAP + DESC;
+  const pitch = pad.pitch ?? PITCH;
+  const blockEm = (n - 1) * pitch + CAP + DESC;
   let f = fs;
   if (box) {
     f = Math.min(fs, box[0] / (m + 2 * pad.x), box[1] / (blockEm + pad.top + pad.bot));
@@ -69,11 +70,12 @@ export function layoutText(lines: string[], fs: number, pad: {x: number; top: nu
   // centre the block in the space left after the top pad (keeps the attachment's room at the top)
   const free = h - f * (pad.top + pad.bot + blockEm);
   const base0 = f * (pad.top + CAP) + Math.max(0, free) / 2;
-  return {fs: f, w, h, lines, widths: raw.map((r) => r * f), base0, padX: pad.x * f};
+  return {fs: f, w, h, lines, widths: raw.map((r) => r * f), base0, padX: pad.x * f, pitch};
 }
 
-/** Ink text block (CaptionHand) at local (0, 0) = paper top-left. Hairline placeholders below 7 px on screen. */
-const TextBlock: React.FC<{L: TextLayout; align: 'center' | 'left'; color: string; k: number; seed: Seed; strike?: {line: number; from: number; to: number; p: number; width: number}}> = ({L, align, color, k, seed, strike}) => {
+/** Ink text block (CaptionHand) laid out by `layoutText`, at local (0, 0) = the block's paper top-left. Hairline
+ *  placeholders below 7 px on screen; hidden in the fills-only Look; shrinks with the un-build. */
+export const InkTextBlock: React.FC<{L: TextLayout; align: 'center' | 'left'; color: string; k: number; seed: Seed; strike?: {line: number; from: number; to: number; p: number; width: number}}> = ({L, align, color, k, seed, strike}) => {
   const look = useLook();
   if (!look.ink) return null;
   const onScreen = L.fs * k;
@@ -82,7 +84,7 @@ const TextBlock: React.FC<{L: TextLayout; align: 'center' | 'left'; color: strin
     L.lines.forEach((ln, i) => {
       const lw = L.widths[i] * 0.92;
       const x0 = align === 'center' ? (L.w - lw) / 2 : L.padX;
-      const y = L.base0 + i * PITCH * L.fs - L.fs * 0.25;
+      const y = L.base0 + i * (L.pitch ?? PITCH) * L.fs - L.fs * 0.25;
       d += `M${x0.toFixed(1)} ${y.toFixed(1)}h${lw.toFixed(1)}`;
     });
     return <path d={d} stroke={color} strokeWidth={Math.max(0.6, L.fs * 0.14)} strokeLinecap="round" fill="none" />;
@@ -91,13 +93,13 @@ const TextBlock: React.FC<{L: TextLayout; align: 'center' | 'left'; color: strin
   return (
     <ExitFade x={L.w / 2} y={L.h / 2}>
       {L.lines.map((ln, i) => (
-        <text key={i} x={x} y={L.base0 + i * PITCH * L.fs} fontFamily={captionFontStack} fontSize={L.fs} fill={color} textAnchor={align === 'center' ? 'middle' : 'start'}>
+        <text key={i} x={x} y={L.base0 + i * (L.pitch ?? PITCH) * L.fs} fontFamily={captionFontStack} fontSize={L.fs} fill={color} textAnchor={align === 'center' ? 'middle' : 'start'}>
           {ln}
         </text>
       ))}
       {strike && strike.p > 0 ? (
         <path
-          d={`M${strike.from.toFixed(1)} ${(L.base0 + strike.line * PITCH * L.fs - L.fs * 0.27).toFixed(1)}L${lerp(strike.from, strike.to, strike.p).toFixed(1)} ${(L.base0 + strike.line * PITCH * L.fs - L.fs * 0.3 + strike.p * L.fs * 0.03).toFixed(1)}`}
+          d={`M${strike.from.toFixed(1)} ${(L.base0 + strike.line * (L.pitch ?? PITCH) * L.fs - L.fs * 0.27).toFixed(1)}L${lerp(strike.from, strike.to, strike.p).toFixed(1)} ${(L.base0 + strike.line * (L.pitch ?? PITCH) * L.fs - L.fs * 0.3 + strike.p * L.fs * 0.03).toFixed(1)}`}
           stroke={color}
           strokeWidth={strike.width}
           strokeLinecap="round"
@@ -372,7 +374,7 @@ const LabelTagInner: React.FC<LabelTagProps & {t: number}> = (p) => {
   }
 
   // text
-  parts.push(<TextBlock key="tx" L={L} align={align} color={textCol} k={F.k * k} seed={seed} />);
+  parts.push(<InkTextBlock key="tx" L={L} align={align} color={textCol} k={F.k * k} seed={seed} />);
 
   // attachments over the paper
   if (kind === 'card') {

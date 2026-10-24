@@ -23,7 +23,8 @@ render_strip() { # <CompId> <times> <tile>
 # Scenes first (once scene production starts), then the toolkit demos.
 for s in $(node -e "try{for(const s of require('./src/data/scenes.json'))console.log(s.id)}catch(e){}" 2>/dev/null); do
   n="${s#S}"
-  if ls src/scenes/Scene${n}.tsx src/scenes/S${n}.tsx >/dev/null 2>&1 && ! grep -q "PLACEHOLDER" src/scenes/Scene${n}.tsx 2>/dev/null; then
+  f=""; [ -f src/scenes/Scene${n}.tsx ] && f=src/scenes/Scene${n}.tsx; [ -f src/scenes/S${n}.tsx ] && f=src/scenes/S${n}.tsx
+  if [ -n "$f" ] && ! grep -q "PLACEHOLDER" "$f"; then
     dur=$(node -e "const s=require('./src/data/scenes.json').find(x=>x.id==='$s');console.log((s.end-s.start).toFixed(2))")
     t=$(python3 -c "d=$dur; print(','.join(f'{d*k/6:.2f}' for k in range(6)))")
     render_strip "$s" "$t" 6x1

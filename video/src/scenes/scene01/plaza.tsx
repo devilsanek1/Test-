@@ -104,8 +104,9 @@ const Hardware: React.FC = () => {
   const gA = PLAZA.gov.govA;
   return (
     <>
+      <ShutterPadlock x={458} y={gB.window[1] + gB.window[3] + 5} at={B.padlocks[0]} seed="s01/plB" />
       <ShutterPadlock x={866} y={cRail + 6} at={B.padlocks[2]} seed="s01/plC" />
-      <BackSoonTag x={575} y={gB.window[1] + gB.window[3] - 2} w={96} at={B.tags[0]} seed="s01/tagB" />
+      <BackSoonTag x={566} y={gB.window[1] + gB.window[3] - 2} w={112} font={25} at={B.tags[0]} seed="s01/tagB" />
       <BackSoonTag x={237} y={gA.window[1] + gA.window[3] - 2} w={68} at={B.tags[1]} seed="s01/tagA" />
       <BackSoonTag x={912} y={cRail - 2} w={60} at={B.tags[2]} tilt={2} seed="s01/tagC" />
     </>
@@ -162,7 +163,7 @@ export const PlazaShutdown: React.FC = () => {
   );
   const gov = {
     govA: {shutterAt: B.slamA, offAt: B.slamA + SLAM_DUR, padlockAt: B.padlocks[1]},
-    govB: {shutterAt: B.slamB, offAt: B.slamB + SLAM_DUR, padlockAt: B.padlocks[0]},
+    govB: {shutterAt: B.slamB, offAt: B.slamB + SLAM_DUR},
     govC: {},
     govD: {},
   };

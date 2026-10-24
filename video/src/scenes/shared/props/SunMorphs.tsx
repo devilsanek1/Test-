@@ -3,6 +3,8 @@
 //
 //   <Sun cx={630} cy={800} r={150}>{(r) => <PowerGlyph r={r} glintAt={2.155} />}</Sun>        // bold frame-0 glyph
 //   <SunPress at={2.28} cx={630} cy={800} r={150}><Sun .../></SunPress>                       // pressed like a button
+//   <SunPress mode="release" at={0} .../>  <SunPress mode="reverse" at={55.0} .../>             // v3 frame 0 / S12 end
+//   <Sun ...>{(r) => <RewindGlyph r={r} at={53.4} outAt={54.9} />}</Sun>                      // v3 S12 rewind button
 //   <Sun ...>{(r) => <SunPie r={r} n={10} cream={3} spokesAt={8.97} slicesAt={9.82} />}</Sun>  // 7/10 (S02), n=3 cream=1 (S12)
 //   <Sun ...>{(r) => <HoursClock r={r} at={33.9} spinAt={34.0} outAt={35.2} />}</Sun>          // S07 "hours"
 //   <Sun ...>{(r) => <MinuteWedge r={r} at={39.2} />}</Sun>                                   // S08 "45 minutes" (peach sweep)
@@ -23,6 +25,7 @@ import {ExitFade, useLook} from '../../../lib/exit';
 import {arc, crown, line, smooth, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {DEPTH_INK, pendulum, withOut} from './common';
+import {stepTime} from './Shutter';
 import {ElephantEmblem} from './Elephant';
 
 const D2R = Math.PI / 180;
@@ -108,6 +111,58 @@ export const PowerGlyph: React.FC<PowerGlyphProps> = ({r = 150, ring: ringIn, wi
   );
 };
 
+// ---------------------------------------------------------------- RewindGlyph (S12)
+
+export type RewindGlyphProps = {
+  /** Sun radius: the glyph matches the PowerGlyph's size and weight (ring 56/150 r, stroke 10/150 r). */
+  r?: number;
+  /** Explicit glyph half-height (= the power ring radius) / stroke width (world px), overriding r. */
+  ring?: number;
+  width?: number;
+  /** Centre (sun-local 0, 0 by default). */
+  x?: number;
+  y?: number;
+  color?: string;
+  /** Pops on (7 % overshoot). Omit = already there. */
+  at?: number;
+  /** Shrinks away (0.12 s), like the PowerGlyph. */
+  outAt?: number;
+  /** Optional nudges: the triangles jab left once (0.16 s) at each time (a "rewinding" tick). */
+  nudgeAt?: number | number[];
+  seed?: Seed;
+};
+
+/** The bold cream REWIND glyph: two left-pointing triangles (solid, corners rounded by a stroke of the PowerGlyph
+ *  weight), the same button language as the power glyph. Swap: <PowerGlyph outAt={T} /> + <RewindGlyph at={T + 0.06}
+ *  outAt={F} /> + <PowerGlyph at={F + 0.06} />. */
+export const RewindGlyph: React.FC<RewindGlyphProps> = ({r = 150, ring: ringIn, width: wIn, x = 0, y = 0, color = palette.cream, at, outAt, nudgeAt, seed = 'rew'}) => {
+  const t = useTime();
+  if (at !== undefined && t < at) return null;
+  const R = ringIn ?? (r * 56) / 150;
+  const w = wIn ?? (R * 10) / 56;
+  const pop = at !== undefined ? springAt(t, at, springs.pop) : 1;
+  const outK = outAt !== undefined ? 1 - E.inCubic(prog(t, outAt, 0.12)) : 1;
+  const k = pop * outK;
+  if (k <= 0.001) return null;
+  const nudges = nudgeAt === undefined ? [] : Array.isArray(nudgeAt) ? nudgeAt : [nudgeAt];
+  let nx = 0;
+  for (const n of nudges) if (t >= n && t < n + 0.16) nx -= R * 0.12 * Math.sin(Math.PI * ((t - n) / 0.16));
+  // two triangles, each R * 0.95 wide and 2 * R * 0.78 tall, the second overlapping the first's base a little
+  const hh = R * 0.8;
+  const tw = R * 0.98;
+  const gap = R * 0.06;
+  const x0 = -tw + gap / 2;
+  const tri = (tipX: number) => `M${tipX.toFixed(2)} 0L${(tipX + tw).toFixed(2)} ${(-hh).toFixed(2)}L${(tipX + tw).toFixed(2)} ${hh.toFixed(2)}Z`;
+  const d = tri(x0 - tw * 0.02) + tri(x0 + tw - gap);
+  return (
+    <XG m={mat.compose(mat.translate(x + nx, y), mat.scale(k))}>
+      <ExitFade x={0} y={0}>
+        <path d={d} fill={color} stroke={color} strokeWidth={w * 0.8} strokeLinejoin="round" />
+      </ExitFade>
+    </XG>
+  );
+};
+
 // ---------------------------------------------------------------- SunPress (+ ripple)
 
 /** Press scale at t: squash to 1 - amount over 0.08 s, release over 0.2 s (slight overshoot). */
@@ -130,18 +185,49 @@ export type SunPressProps = {
   r: number;
   /** 0.12 = the press (S01 / S11); 0.06 = the S13 echo. */
   amount?: number;
-  /** 'press' (uniform about the centre) | 'land' (S06: -10 % y anchored at the disc bottom, in place). */
-  mode?: 'press' | 'land';
-  /** Ink ripple ring r -> r + 40 over 0.2 s. Default true for 'press'. */
+  /** 'press' (uniform about the centre) | 'land' (S06: -10 % y anchored at the disc bottom, in place) |
+   *  'release' (v3 frame 0: AT `at` the sun sits at the bottom of the squash with the ripple ring at its emission radius
+   *  r, and releases over 0.2 s while the ripple runs out to r + 40; before `at` it holds that bottom state) |
+   *  'reverse' (v3 S12 end: from `at` the release plays BACKWARDS over `dur`, stepped at `step` Hz, and HOLDS the bottom
+   *  of the squash with the ripple at r: the frame-0 state). release / reverse take one `at`. */
+  mode?: 'press' | 'land' | 'release' | 'reverse';
+  /** Ink ripple ring r -> r + 40 over 0.2 s. Default true for 'press' / 'release' / 'reverse'. */
   ripple?: boolean;
+  /** 'reverse': length of the backwards release (default 0.2 s = the release). */
+  dur?: number;
+  /** 'reverse': tape-step rate (Hz, default 12; 0 = smooth). */
+  step?: number;
   width?: number;
   children?: React.ReactNode;
 };
 
+/** Release phase u (0 = the bottom of the squash, 1 = released) -> [scale, ripple radius offset, ripple width factor]. */
+export function releaseState(u: number, amount = 0.12, grow = 40): [number, number, number] {
+  const q = Math.max(0, Math.min(1, u));
+  const up = E.outBack(1.8)(q);
+  return [1 - amount * (1 - up), grow * E.outCubic(q), 1 - q];
+}
+
 /** Wrap a <Sun> (or <BigSun>) to press it like a power button. */
-export const SunPress: React.FC<SunPressProps> = ({at, cx, cy, r, amount, mode = 'press', ripple, width = DEPTH_INK.mid, children}) => {
+export const SunPress: React.FC<SunPressProps> = ({at, cx, cy, r, amount, mode = 'press', ripple, dur = 0.2, step = 12, width = DEPTH_INK.mid, children}) => {
   const t = useTime();
   const amt = amount ?? (mode === 'land' ? 0.1 : 0.12);
+  if (mode === 'release' || mode === 'reverse') {
+    const a0 = Array.isArray(at) ? at[0] : at;
+    let u = 1;
+    if (a0 !== undefined) {
+      if (mode === 'release') u = t < a0 ? 0 : prog(t, a0, 0.2);
+      else u = t < a0 ? 1 : 1 - Math.min(1, (stepTime(t, a0, step) - a0) / Math.max(1e-3, dur));
+    }
+    const [sc, rg, rw] = releaseState(u, amt);
+    const showRipple = (ripple ?? true) && u < 1 && rw > 0.02;
+    return (
+      <>
+        <XG m={sc === 1 ? mat.I : mat.about(mat.scale(sc), cx, cy)}>{children}</XG>
+        {showRipple ? <circle cx={cx} cy={cy} r={r + rg} fill="none" stroke={palette.ink} strokeWidth={width * rw + 0.01} /> : null}
+      </>
+    );
+  }
   const s = pressScale(t, at, amt);
   const m = mode === 'land' ? mat.about(mat.scale(1 + (1 - s) * 0.5, s), cx, cy + r) : mat.about(mat.scale(s), cx, cy);
   const ats = at === undefined ? [] : Array.isArray(at) ? at : [at];

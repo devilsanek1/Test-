@@ -9,12 +9,12 @@
 // Beat table: scene07/beats.ts. Local stand-ins (LabelTag, BlindSign): scene07/shims.tsx. Notes: docs/scenes/S07.md.
 
 import React from 'react';
-import {World, Sun, XG, mat, useTime} from '../lib';
+import {World, Sun, XG, mat, palette, useTime, ease as E} from '../lib';
 import {NoticeboardCorner, NOTICE_CORNER, WORKSHOP_CORNER} from './shared/sets';
-import {EdgeOnlooker, HoursClock, LeakClones, LeakSheet} from './shared/props';
+import {EdgeOnlooker, HoursClock, LabelTag, LeakClones, LeakSheet} from './shared/props';
 import {useBeats} from './scene07/beats';
 import {camAt, camMat, Flyer, InkReveal, PhoneCopy, Pigeon, PinDot, PipS07, RevealPass, tiltPx, WireCopy, WireCopySpec} from './scene07/parts';
-import {BlindSign, LabelTag} from './scene07/shims';
+import {BlindSign} from './scene07/shims';
 
 // ---------------------------------------------------------------- layout (world px at camera rest)
 
@@ -24,6 +24,11 @@ const NOTICE = {x: 295, y: 1140, w: 210, h: 270, rot: -2};
 const PIN: [number, number] = [NOTICE.x + 118.8 * Math.sin((NOTICE.rot * Math.PI) / 180), NOTICE.y - 118.8 * Math.cos((NOTICE.rot * Math.PI) / 180)];
 
 const S7_READERS = NOTICE_CORNER.readers;
+/** On 'fix' the sun lifts a little so the whole clock face reads over the wall top (it sinks back as the tilt starts,
+ *  so it is half behind the wall top again on the cut: S08's (640, 1021) match). */
+const CLOCK_LIFT = 70;
+/** Reader 1's phone screen once raised (world, measured on the render at t 1.5). */
+const PHONE: [number, number] = [296, 1238];
 
 const Scene07: React.FC = () => {
   const t = useTime();
@@ -36,7 +41,17 @@ const Scene07: React.FC = () => {
   const sunM = mat.mul(mat.inv(M), mat.translate(0, tilt));
   const sun = (
     <XG m={sunM}>
-      <Sun cx={420} cy={985} r={110} drift={[0, 0]} hops={[{t: B.before - 1.0, to: [640, 820], h: 74, air: 1.0}]}>
+      <Sun
+        cx={420}
+        cy={985}
+        r={110}
+        drift={[0, 0]}
+        hops={[{t: B.before - 1.0, to: [640, 820], h: 74, air: 1.0}]}
+        moves={[
+          {at: B.fix - 0.03, dur: 0.2, y: 820 - CLOCK_LIFT, ease: E.outBack(1.4)},
+          {at: B.tilt, dur: 0.3, y: 820, ease: E.inOutSine},
+        ]}
+      >
         {(r) => <HoursClock r={r} at={B.fix} spinAt={B.fix + 0.04} spinDur={0.48} turns={2.5} hourSteps={3} outAt={B.tilt} seed="s7clock" />}
       </Sun>
     </XG>
@@ -56,10 +71,10 @@ const Scene07: React.FC = () => {
 
   // ---- copies lift off the board, peg onto the wires on 'before' and travel left over the rooftops (into S08)
   const copies: WireCopySpec[] = [
-    {from: [560, 1040], liftAt: B.before - 0.2, wire: 0, x: 500, pegAt: B.before, speed: 360, seed: 's7wc0'},
-    {from: [620, 1140], liftAt: B.before - 0.14, wire: 1, x: 640, pegAt: B.before + 0.06, speed: 360, bit: true, seed: 's7wc1'},
-    {from: [500, 1250], liftAt: B.before - 0.08, wire: 2, x: 430, pegAt: B.before + 0.12, speed: 360, seed: 's7wc2'},
-    {from: [650, 1220], liftAt: B.before - 0.02, wire: 1, x: 880, pegAt: B.before + 0.18, speed: 360, seed: 's7wc3'},
+    {from: [560, 1040], liftAt: B.before - 0.2, wire: 0, x: 500, pegAt: B.before, speed: 280, seed: 's7wc0'},
+    {from: [620, 1140], liftAt: B.before - 0.14, wire: 1, x: 640, pegAt: B.before + 0.06, speed: 280, bit: true, seed: 's7wc1'},
+    {from: [500, 1250], liftAt: B.before - 0.08, wire: 2, x: 430, pegAt: B.before + 0.12, speed: 260, seed: 's7wc2'},
+    {from: [240, 1000], liftAt: B.before - 0.02, wire: 1, x: 420, pegAt: B.before + 0.18, speed: 240, seed: 's7wc3'},
   ];
 
   const set = (pass: RevealPass) => (
@@ -74,6 +89,10 @@ const Scene07: React.FC = () => {
       />
       {/* J4: the makers' blind is still down: 'still fixing...' (on the blind's left half, clear of the right rail) */}
       <BlindSign x={WORKSHOP_CORNER.shop[0] + 58} y={WORKSHOP_CORNER.shop[1] + 12} swingAt={[B.fix]} seed="s7blind" />
+      {/* pigeons on the wires: they hop over the passing pegs; one flaps up on 'was' */}
+      <Pigeon wire={0} x={470} hopAt={[B.before - 0.02]} seed="s7pg0" />
+      <Pigeon wire={0} x={428} hopAt={[B.before + 0.12]} flip color={palette.sand} seed="s7pg1" />
+      <Pigeon wire={0} x={318} flyAt={B.was - 0.02} flyTo={[-240, -150]} seed="s7pg2" />
     </>
   );
 
@@ -87,16 +106,13 @@ const Scene07: React.FC = () => {
         <PinDot x={PIN[0]} y={PIN[1]} at={B.pinPip + 0.06} />
         <LeakClones spots={clones} seed="s7clone" />
 
-        {/* the wires: pigeons hop over the passing pegs; one flaps up on 'was'; copies travel left (Bit rides one) */}
-        <Pigeon wire={0} x={470} hopAt={[B.before + 0.02]} seed="s7pg0" />
-        <Pigeon wire={0} x={428} hopAt={[B.before + 0.13]} flip color="#D9BBA1" seed="s7pg1" />
-        <Pigeon wire={1} x={700} flyAt={B.was - 0.02} flyTo={[-240, -150]} seed="s7pg2" />
+        {/* copies travel left along the wires (Bit rides one) */}
         {copies.map((c) => (
           <WireCopy key={c.seed} c={c} />
         ))}
 
         {/* L7 on the board's bottom rail */}
-        <LabelTag x={470} y={1352} w={346} h={92} lines={['word leaked Oct 20 ·', 'fix out Oct 21']} size={38} at={B.label} seed="s7L7" />
+        <LabelTag kind="card" box={[300, 1338, 640, 1436]} text={['word leaked Oct 20 ·', 'fix out Oct 21']} fontSize={36} swing at={B.label} seed="s7L7" />
 
         {/* Pip on the board top + the flyer gag */}
         <PipS07 B={B} />
@@ -118,7 +134,7 @@ const Scene07: React.FC = () => {
             seed={`nc/rd${i}`}
           />
         ))}
-        <PhoneCopy x={0} y={0} at={B.was} />
+        <PhoneCopy x={PHONE[0]} y={PHONE[1]} at={B.was} rot={4} />
 
         {/* the lens wipe: the printed sheet at the lens shrinks into the notice (on top of everything until it lands) */}
         {t < B.pinPip + 0.06 ? (

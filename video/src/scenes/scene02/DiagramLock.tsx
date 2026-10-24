@@ -102,29 +102,33 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
   const knobRot = 90 * turn;
 
   const mech: React.ReactNode[] = [];
-  // cavity outline + guide + strike "C" round the socket + socket inner edge
+  // the SECTION: a flat teal cavity (the shared Lock's colours, white instead of sand), white guide and strike, the
+  // tealDark socket lined with a cream rim (the hole the bolt never reaches = the highest-contrast thing), a cream bar
+  mech.push(<Fill key="cavF" d={`M${cx0} ${cy0}H${cx0 + cw}V${cy0 + ch}H${cx0}Z`} color={palette.teal} offset={false} mode="none" seed={`${seed}/cvf`} />);
+  mech.push(<Fill key="housF" d={`M${hx} ${hy0}H${hb}V${hy0 + hh}H${hx}Z`} color={palette.white} offset={false} mode="none" seed={`${seed}/hsf`} />);
+  mech.push(<Fill key="strikeF" d={`M${st[0]} ${st[1]}H${st[0] + st[2]}V${st[1] + st[3]}H${st[0]}Z`} color={palette.white} offset={false} mode="none" seed={`${seed}/stf`} />);
+  mech.push(<Fill key="rimF" d={`M${rm[0]} ${rm[1]}H${rm[0] + rm[2]}V${rm[1] + rm[3]}H${rm[0]}Z`} color={palette.cream} offset={false} mode="none" seed={`${seed}/rmf`} />);
+  mech.push(<Fill key="slotF" d={`M${sl[0]} ${sl[1]}H${sl[0] + sl[2]}V${sl[1] + sl[3]}H${sl[0]}Z`} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/slf`} />);
   mech.push(<Ink key="cav" d={`M${cx0} ${cy0}H${cx0 + cw}V${cy0 + ch}H${cx0}Z`} width={W * 0.55} taper={false} vary={0} seed={`${seed}/cav`} />);
   const strikeI = `M${st[0]} ${st[1]}H${st[0] + st[2]}V${st[1] + st[3]}H${st[0]}V${rm[1] + rm[3]}H${rm[0] + rm[2]}V${rm[1]}H${st[0]}Z`;
-  mech.push(<Fill key="strikeF" d={`M${st[0]} ${st[1]}H${st[0] + st[2]}V${st[1] + st[3]}H${st[0]}Z`} color={palette.white} offset={false} mode="none" seed={`${seed}/stf`} />);
-  mech.push(<Ink key="mech" d={`M${hx} ${hy0}H${hb}V${hy0 + hh}H${hx}Z` + strikeI} width={W * 0.62} taper={false} vary={0} seed={`${seed}/mech`} />);
-  mech.push(<Ink key="slot" d={`M${sl[0]} ${sl[1]}H${sl[0] + sl[2]}V${sl[1] + sl[3]}H${sl[0]}`} width={W * 0.42} taper={false} vary={0} seed={`${seed}/slot`} />);
-  // centre line (dash-dot) through the bolt axis
-  mech.push(<Ink key="cl" d={`M-48 0H-40M-36 0H-34M-30 0H-20M-16 0H-14M-10 0H0M4 0H6M10 0H20M24 0H26M30 0H40M44 0H48`} width={W * 0.3} taper={false} order="all" vary={0} seed={`${seed}/cl`} />);
-  // the bar bolt: white with an ink outline and a groove line
+  mech.push(<Ink key="mech" d={`M${hx} ${hy0}H${hb}V${hy0 + hh}H${hx}Z` + strikeI} width={W * 0.55} taper={false} vary={0} seed={`${seed}/mech`} />);
+  // centre line (dash-dot) on the bolt axis: only its blueprint ticks outside the box
+  mech.push(<Ink key="cl" d={`M-50 0H-42M50 0H42`} width={W * 0.3} taper={false} order="all" vary={0} seed={`${seed}/cl`} />);
+  // the bar bolt: cream with an ink outline and a groove line
   if (boltL > 0.3) {
-    mech.push(<Fill key="boltF" d={barD(hb, tip) + 'Z'} color={palette.white} offset={false} mode="none" seed={`${seed}/bf`} />);
-    mech.push(<Ink key="bolt" d={barD(hb, tip) + (boltL > 8 ? `M${hb + 2} ${f2(-br + 3.4)}H${f2(tip - 4)}` : '')} width={W * 0.62} taper={false} vary={0} seed={`${seed}/bolt`} />);
+    mech.push(<Fill key="boltF" d={barD(hb, tip) + 'Z'} color={palette.cream} offset={false} mode="none" seed={`${seed}/bf`} />);
+    mech.push(<Ink key="bolt" d={barD(hb, tip) + (boltL > 8 ? `M${hb + 2} ${f2(-br + 3.4)}H${f2(tip - 4)}` : '')} width={W * 0.55} taper={false} vary={0} seed={`${seed}/bolt`} />);
   }
-  // cam link: thumb-turn pivot down to the bolt's top edge (it follows the bolt)
+  // cam link: thumb-turn pivot down to the bolt's top edge (it follows the bolt); cream on the teal cavity
   const linkX = Math.max(hb + 1.5, Math.min(tip - 6, THUMB[0] + 4));
-  mech.push(<Ink key="link" d={`M${THUMB[0]} ${THUMB[1]}L${f2(linkX)} ${-br}`} width={W * 0.45} taper={false} vary={0} seed={`${seed}/lk`} />);
+  mech.push(<Ink key="link" d={`M${THUMB[0]} ${THUMB[1]}L${f2(linkX)} ${-br}`} width={W * 0.5} color={palette.cream} taper={false} vary={0} seed={`${seed}/lk`} />);
   // thumb-turn: a disc with a bar knob (vertical at rest, turns 90 deg)
   mech.push(
     <XG key="thumb" m={mat.compose(mat.translate(THUMB[0], THUMB[1]), mat.rotate(knobRot))}>
       <Fill d={`M-5.5 0a5.5 5.5 0 1 0 11 0a5.5 5.5 0 1 0 -11 0Z`} color={palette.white} offset={false} mode="none" seed={`${seed}/tdF`} />
-      <Ink d={circle(0, 0, 5.5, {seed: `${seed}/td`, overlap: 8})} width={W * 0.5} taper={false} vary={0} seed={`${seed}/td`} />
-      <Fill d={roundRect(-2.6, -9.5, 5.2, 19, 2.6)} color={palette.white} offset={false} mode="none" seed={`${seed}/tkF`} />
-      <Ink d={roundRect(-2.6, -9.5, 5.2, 19, 2.6)} width={W * 0.55} taper={false} vary={0} seed={`${seed}/tk`} />
+      <Ink d={circle(0, 0, 5.5, {seed: `${seed}/td`, overlap: 8})} width={W * 0.45} taper={false} vary={0} seed={`${seed}/td`} />
+      <Fill d={roundRect(-3, -10, 6, 20, 3)} color={palette.cream} offset={false} mode="none" seed={`${seed}/tkF`} />
+      <Ink d={roundRect(-3, -10, 6, 20, 3)} width={W * 0.5} taper={false} vary={0} seed={`${seed}/tk`} />
     </XG>,
   );
 
@@ -168,16 +172,18 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
     );
   }
 
-  // ---- gap bracket + ring
+  // ---- gap bracket (cream, on the cavity) + a big ring round the gap (ink over a cream halo: reads on white AND teal)
   const marks: React.ReactNode[] = [];
   if (gapMarkAt !== undefined && t >= gapMarkAt) {
     const x0 = LOCK.tip.short;
     const x1 = st[0];
-    const yb = st[1] - 5;
-    let dash = `M${x0} ${yb - 3.5}V${yb + 3.5}M${x1} ${yb - 3.5}V${yb + 3.5}`;
+    const yb = st[1] - 6;
+    let dash = `M${x0} ${yb - 4}V${yb + 4}M${x1} ${yb - 4}V${yb + 4}`;
     for (let xx = x0 + 1.3; xx < x1 - 1; xx += 3.4) dash += `M${xx.toFixed(1)} ${yb}H${Math.min(x1 - 1.3, xx + 1.8).toFixed(1)}`;
-    marks.push(<Ink key="gapB" d={dash} at={gapMarkAt} dur={0.1} width={W * 0.5} taper={false} seed={`${seed}/gb`} order="all" />);
-    marks.push(<Ink key="gapR" d={circle(LOCK.gap[0] - 1, 1, 15, {seed: `${seed}/gr`, overlap: 26})} at={gapMarkAt + 0.04} dur={0.13} width={W * 0.62} taper={false} seed={`${seed}/gr`} />);
+    marks.push(<Ink key="gapB" d={dash} at={gapMarkAt} dur={0.1} width={W * 0.5} color={palette.cream} taper={false} seed={`${seed}/gb`} order="all" />);
+    const ring = circle(LOCK.gap[0], 2, 22, {seed: `${seed}/gr`, overlap: 30});
+    marks.push(<Ink key="gapRh" d={ring} at={gapMarkAt + 0.04} dur={0.13} width={W * 1.25} color={palette.cream} taper={false} seed={`${seed}/grh`} />);
+    marks.push(<Ink key="gapR" d={ring} at={gapMarkAt + 0.04} dur={0.13} width={W * 0.62} taper={false} seed={`${seed}/gr`} />);
   }
 
   // ---- cover (closed plate with the keyhole; swinging; then a dashed outline at its open position + swing arc)
