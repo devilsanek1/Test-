@@ -15,7 +15,8 @@ import {Ease, ease as E, lerp, osc, prog, useTime} from '../time';
 import {Sun, SunMove, SunProps} from '../Sun';
 import type {Pt} from '../sketch';
 import {Tod, TodPalette, todPal} from './atmosphere';
-import {PathBuf, r1} from './util';
+import {mix, PathBuf, r1} from './util';
+import {palette} from '../theme';
 
 // ---------------------------------------------------------------- Glow
 
@@ -62,8 +63,11 @@ export type BigSunProps = Omit<SunProps, 'children'> & {
   tod?: Tod | TodPalette;
   /** Set / rise path: keys of position (and radius) over scene time (converted to core Sun moves). */
   path?: SunKey[];
-  /** Stepped halo discs behind the disc (0 = none). Default 3. They follow every Sun behaviour (hops, beats). */
+  /** Halo discs behind the disc (0 = none). Default 2. They follow every Sun behaviour (hops, beats). */
   glow?: number;
+  /** 'rings' (default, style_bible_ref2 8): OPAQUE flat rings at r x1.25 (sun/peach mix #F19160) and x1.5 (peach), more
+   *  rings continue the steps toward the sky. 'stack': translucent discs whose overlaps make the steps. */
+  glowMode?: 'rings' | 'stack';
   glowSpread?: number;
   glowColor?: string;
   glowOpacity?: number;
@@ -92,14 +96,29 @@ export function sunState(t: number, cx: number, cy: number, r: number, moves: Su
 }
 
 /** Stepped halo rings in sun-local coordinates (for a Sun child). */
-const SunHalo: React.FC<{r: number; rings: number; spread: number; color: string; opacity: number}> = ({r, rings, spread, color, opacity}) => (
-  <>
-    {Array.from({length: rings}, (_, j) => {
-      const i = rings - 1 - j;
-      return <circle key={i} cx={0} cy={0} r={r1(r * (1 + (spread * (i + 1)) / rings))} fill={color} opacity={opacity} />;
-    })}
-  </>
-);
+const SunHalo: React.FC<{r: number; rings: number; spread: number; color: string; opacity: number; mode: 'rings' | 'stack'}> = ({r, rings, spread, color, opacity, mode}) => {
+  if (mode === 'rings') {
+    // measured proposal: x1.25 in mix(sun, peach) then x1.5 in peach; further rings step toward `color`
+    const cols = [mix(palette.sun, palette.peach, 0.5), palette.peach];
+    for (let i = 2; i < rings; i++) cols.push(mix(palette.peach, color, Math.min(1, (i - 1) / (rings - 1))));
+    return (
+      <>
+        {cols
+          .slice(0, rings)
+          .map((c, i) => <circle key={i} cx={0} cy={0} r={r1(r * (1 + 0.25 * (i + 1)))} fill={c} />)
+          .reverse()}
+      </>
+    );
+  }
+  return (
+    <>
+      {Array.from({length: rings}, (_, j) => {
+        const i = rings - 1 - j;
+        return <circle key={i} cx={0} cy={0} r={r1(r * (1 + (spread * (i + 1)) / rings))} fill={color} opacity={opacity} />;
+      })}
+    </>
+  );
+};
 
 /** The huge orange disc on the horizon (r 150 by default). Wraps the core <Sun> (beats, bounce, hops, drift, rise,
  *  moves, set behind a horizon line, overlays via children(r)) and adds stepped glow discs behind it that follow
@@ -111,7 +130,8 @@ export const BigSun: React.FC<BigSunProps> = ({
   tod = 'dusk',
   path,
   breathe = 0.008,
-  glow = 3,
+  glow = 2,
+  glowMode = 'rings',
   glowSpread = 0.9,
   glowColor,
   glowOpacity = 0.14,
@@ -130,7 +150,7 @@ export const BigSun: React.FC<BigSunProps> = ({
     <>
       {glow > 0 ? (
         <Sun {...common} color="none">
-          {(rad: number) => <SunHalo r={rad} rings={glow} spread={glowSpread} color={glowColor ?? p.glow} opacity={glowOpacity} />}
+          {(rad: number) => <SunHalo r={rad} rings={glow} spread={glowSpread} color={glowColor ?? (glowMode === 'rings' ? p.skyBands[p.skyBands.length - 1] : p.glow)} opacity={glowOpacity} mode={glowMode} />}
         </Sun>
       ) : null}
       <Sun {...common} color={color ?? p.sunColor}>

@@ -91,6 +91,12 @@ def exciter(x, target_12_16=-29.5):
     nl = np.abs(s) + 0.35 * s ** 3
     h = ss.sosfiltfilt(ss.butter(6, 8500, "highpass", fs=SR, output="sos"), nl)
     h = ss.sosfiltfilt(ss.butter(8, 16500, "lowpass", fs=SR, output="sos"), h)
+    # crest limiter on the air band: an isolated stop burst must not turn into a sharp HF tick
+    fast = np.abs(ss.hilbert(h))
+    slow = np.sqrt(np.maximum(ss.fftconvolve(h ** 2, np.ones(int(0.012 * SR)) / int(0.012 * SR), mode="same"), 0)) + 1e-12
+    cg = np.minimum(1.0, 1.8 * slow / (fast + 1e-12))
+    cg = ss.fftconvolve(cg, np.hanning(int(0.0015 * SR)) / np.hanning(int(0.0015 * SR)).sum(), mode="same")
+    h = h * cg
     # calibrate: how much air to add so that 12-16 kHz of (x + g*h) hits the target
     base = band_rel_db(x, 12000, 16000)
     best, g = None, 0.0

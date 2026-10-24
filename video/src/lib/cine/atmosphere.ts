@@ -83,7 +83,8 @@ function make(name: Tod, o: Omit<TodPalette, keyof Base | 'name'>): TodPalette {
 export const TOD: Record<Tod, TodPalette> = {
   day: make('day', {
     skyBands: [P.sky, P.sky, mix(P.sky, P.mintPale, 0.3)],
-    haze: mix(P.sky, P.mintPale, 0.3),
+    // ref 2 day: far layers step from sage toward the sky (#98C0AE ~ mix(sky, sage, 0.25)), never lighter than it
+    haze: P.sky,
     horizonGlow: mix(P.sky, P.mintPale, 0.55),
     glow: P.mintPale,
     sunColor: P.sun,
@@ -148,8 +149,10 @@ export const TOD: Record<Tod, TodPalette> = {
     hazeMax: 0.8,
   }),
   night: make('night', {
-    skyBands: [deep.teal60, deep.teal78, P.tealDark, P.teal],
-    haze: mix(P.teal, P.tealDark, 0.35),
+    // never darker than teal behind the captions (style_bible_ref2 8); a little lighter toward the horizon (city glow)
+    skyBands: [P.teal, mix(P.teal, P.sage, 0.3), mix(P.teal, P.sage, 0.55)],
+    // ref 2 night far step #4B706B = mix(teal, tealDark, 0.5)
+    haze: mix(P.teal, P.tealDark, 0.5),
     horizonGlow: P.teal,
     glow: P.sage,
     sunColor: P.sun,

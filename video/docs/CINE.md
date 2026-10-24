@@ -9,7 +9,10 @@ no animated opacity: things pop, wipe, grow or switch).
 import {CineCamera, Layer, Sky, BigSun, EndlessCity, TOD, ...} from '../lib/cine';
 ```
 
-Demo: `src/dev/CineDemo.tsx` (composition `CineDemo`, 18 s, three shots + wipes + sky captions).
+Demo: `src/dev/CineDemo.tsx` (composition `CineDemo`, 18 s, three shots + wipes + sky captions). Contact sheet:
+`docs/cine_demo.png`.
+
+![CineDemo](cine_demo.png)
 
 ```
 scripts/sheet.sh CineDemo 0 17.9 12 out.png --cols=6        # contact sheet of the demo
@@ -17,7 +20,7 @@ npx remotion still src/index.ts CineDemo s.png --frame=75 --props='{"mode":"stre
 npx remotion still src/index.ts CineDemo t.png --frame=75 --props='{"mode":"tower"}'    # Tower / Silhouette / LitWindows check
 ```
 
-Speed: CineDemo renders at **~133 ms/frame** (full 1080 x 1920, concurrency 2, 30 frames spread over all three shots),
+Speed: CineDemo renders at **~127-137 ms/frame** (full 1080 x 1920, concurrency 2, 30 frames spread over all three shots),
 including thousands of windows, two masks (rim lights) and the captions.
 
 ---
@@ -75,13 +78,16 @@ deep.teal78 / teal60 / teal45     // night steps: tealDark at lower value (same 
 shade(hex, k), mix(a, b, t)       // flat colour helpers (memoised)
 ```
 
-Measured anchors: ref 2 dusk sky = sage, night sky = teal, lit bulbs peach with a sage halo; night ramps toward deep
-teal; lit windows peach / cream. Caption tone: `TOD[x].text` (ink on day / golden / dawn, white on dusk / night).
+Measured anchors (`docs/style_bible_ref2.md` 4, 8): day haze = the sky itself (far layers step from sage toward it,
+never lighter), night far step = mix(teal, tealDark) #4B706B, lit bulbs peach with a sage halo, lit windows peach /
+cream. Night skies never go darker than teal behind the captions (a little lighter toward the horizon instead); the
+deep teals (`deep.*`) are for silhouettes, walls and dark windows. Caption tone: `TOD[x].text` (ink on day / golden / dawn, white on dusk / night).
 
 ## 3. Sky (`sky.tsx`)
 
 ```tsx
-<Sky tod="dusk" horizon={1010} />                    // flat value steps, top -> horizon (colors / edges / span overridable)
+<Sky tod="dusk" horizon={1010} />                    // flat value steps, top -> horizon; by default every step sits below
+                                                     // y 600 so the caption zone is one flat value (colors / edges / span)
 <SkyCloud x y w tod drift at />                     // ref 2 cloud: 3 bumps, flat base; inked white (day) or flat (dusk)
 <Streaks y tod n color />                            // thin sunset streak clouds near the horizon
 <Stars tod region={[x0, y0, x1, y1]} at span n />    // dots + sparkles, pop in one by one, twinkle by SIZE
@@ -93,10 +99,12 @@ teal; lit windows peach / cream. Caption tone: `TOD[x].text` (ink on day / golde
 ## 4. Big sun + light (`light.tsx`)
 
 ```tsx
-<BigSun cx={610} cy={1030} r={150} horizon={1070} tod="dusk"
-  path={[{t: 0, y: 1030}, {t: 6, y: 1080}]}           // set / rise path (-> core Sun moves)
-  beats={[0.32, {t: 1.33, amp: 0.1}]} hops={...} bounce={...} drift={[8, 0]}   // all core Sun character behaviours
-  glow={3} glowSpread={1.1} />                         // stepped halo discs that FOLLOW hops / beats (2nd invisible Sun)
+<BigSun cx={600} cy={1040} r={300} horizon={1090} tod="dusk"   // r default 150; ref 2 baseline 94-120, PEAKS 270-490
+  path={[{t: 0, y: 1040}, {t: 6, y: 1100}]}           // set / rise path (-> core Sun moves)
+  beats={[0.32, {t: 1.33, amp: 0.06}]} hops={...} bounce={...} drift={[8, 0]}   // all core Sun character behaviours
+  glow={2} glowMode="rings" />                         // opaque stepped rings r x1.25 (#F19160) and x1.5 (peach), measured
+                                                       // proposal; 'stack' = translucent discs (night). Rings FOLLOW
+                                                       // hops / beats (they ride on a 2nd, invisible Sun)
 <Glow cx cy r rings spread color opacity core at />   // stepped concentric flat discs (a bulb, a lamp, a screen)
 <LightShaft from={[x, y]} angle={118} length w0 w1 beams={3} opacity={0.13} sweep={1.5} at />  // flat translucent beams
 <RimLight rect={[x, y, w, h]} side="right" width color />   // lit strip on one side
@@ -153,10 +161,11 @@ lane's `<Plane>` in `src/lib/persp.tsx` projects Ink/Fill point by point.)
 
 ## 7. Recipes (what the demo proves)
 
-**Arcane vista (feel small).** Sky bands + stars + giant low sun behind the far rows; `EndlessCity` 6 rows with
-colossal `landmarks` in rows 1-2 (thin far needles, a stepped tower); a `Ledge` at depth -0.45 with a back-view
-`Person` and the mascot (`sit-back`) wrapped in `Rimmed` (peach rim = backlit); `StringLights` at depth -0.8 framing the
-top; slow `push` 0 -> 0.22 anchored in the city; windows switching on across the city all shot long.
+**Arcane vista (feel small, a PEAK shot in style_bible_ref2 8).** Sky bands kept below y 600 (captions sit on one flat
+teal) + stars + a half-set r 300 sun with two opaque glow rings behind the far rows; `EndlessCity` 6 rows with
+colossal `landmarks` in rows 1-2 (thin far needles, a stepped tower); a `Ledge` at depth -0.45 with a small back-view
+`Person` (~150 px) and the mascot (`sit-back`, scale 0.85) wrapped in `Rimmed` (peach rim = backlit); `StringLights` at depth -0.8 framing the
+top; `push` 0 -> 0.28 over 4.6 s anchored in the city, then a settle; windows switching on across the city all shot long.
 
 **Worm's-eye crane.** `Monument` far wider than the frame (`bw` 1750, taper 0.42) so verticals converge; tiny people
 on the steps and a `TinyCrowd` on the plaza; a `LightShaft` that shoots on; a near back-view figure and the mascot on

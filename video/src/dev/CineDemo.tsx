@@ -64,14 +64,14 @@ const ShotA: React.FC = () => {
   const t = useTime();
   const P = TOD.dusk;
   return (
-    <CineCamera keys={[{t: 0, push: 0, anchor: [560, 1180]}, {t: 6.4, push: 0.22, anchor: [560, 1180], ease: CAM.slow}]} handheld={1.5} seed="A">
+    <CineCamera keys={[{t: 0, push: 0, anchor: [560, 1180]}, {t: 4.6, push: 0.28, anchor: [560, 1180], ease: CAM.slow}, {t: 6.4, push: 0.31, anchor: [560, 1180], ease: CAM.settle}]} handheld={1.5} seed="A">
       <Layer depth={1}>
         <Sky tod={P} horizon={HZ} />
         <Stars tod={P} region={[-100, -100, 1180, 560]} at={0.2} span={5.5} n={80} />
         <SkyCloud x={-40} y={560} w={330} tod={P} color={mix(P.teal, P.sage, 0.5)} drift={5} seed="ca1" />
         <SkyCloud x={720} y={690} w={250} tod={P} color={P.sage} drift={7} seed="ca2" />
         <Streaks y={HZ - 30} tod={P} n={4} color={P.horizonGlow} />
-        <BigSun cx={610} cy={HZ + 20} r={150} horizon={HZ + 60} tod={P} path={[{t: 0, y: HZ + 20}, {t: 6, y: HZ + 70}]} beats={[0.32, {t: 1.33, amp: 0.1}]} glowSpread={1.1} />
+        <BigSun cx={600} cy={HZ + 30} r={300} horizon={HZ + 80} tod={P} path={[{t: 0, y: HZ + 30}, {t: 6, y: HZ + 90}]} beats={[0.32, {t: 1.33, amp: 0.06}]} />
         <Birds at={0.6} from={[-80, 780]} to={[1160, 600]} dur={6.5} n={5} size={16} />
       </Layer>
       <EndlessCity
@@ -84,17 +84,17 @@ const ShotA: React.FC = () => {
         beacons={0.9}
         rowProps={(r) => ({
           hRange: r.i < 2 ? [260, 700] : r.i < 4 ? [160, 480] : [90, 300],
-          landmarks: r.i === 1 ? [{x: 330, w: 210, h: 3500, kind: 'spire'}, {x: 980, w: 170, h: 2600, kind: 'step'}] : r.i === 2 ? [{x: 770, w: 190, h: 2100, kind: 'tower'}] : undefined,
+          landmarks: r.i === 1 ? [{x: 330, w: 210, h: 3000, kind: 'spire'}, {x: 980, w: 170, h: 2600, kind: 'step'}] : r.i === 2 ? [{x: 770, w: 190, h: 2100, kind: 'tower'}] : undefined,
         })}
         windows={{initial: 0.12, blinds: 0.12, events: [{at: 0.2, dur: 5.5, to: 'on', pattern: 'random', fraction: 0.55}, {at: 1.5, dur: 4, to: 'off', pattern: 'random', fraction: 0.06}]}}
       />
       <Layer depth={-0.45}>
         <Ledge y={1450} tod={P} floor={deep.teal60} />
         <Rimmed color={palette.peach} dx={4} dy={-3}>
-          <Person x={400} y={1462} s={1.4} seed="vista-fig" hair="short" body={deep.teal60} hairColor={palette.ink} acc={['strap']} idle={1.2} />
+          <Person x={420} y={1462} s={1.15} seed="vista-fig" hair="short" body={deep.teal60} hairColor={palette.ink} acc={['strap']} idle={1.2} />
         </Rimmed>
         <Rimmed color={palette.peach} dx={3} dy={-4}>
-          <Elephant x={612} y={1462} scale={1.0} pose="sit-back" t={t} seed={3} look={0.35} />
+          <Elephant x={590} y={1462} scale={0.85} pose="sit-back" t={t} seed={3} look={0.35} />
         </Rimmed>
       </Layer>
       <Layer depth={-0.8}>
@@ -182,7 +182,7 @@ const ShotC: React.FC = () => {
       <Layer depth={1}>
         <Sky tod={P} horizon={1180} />
         <Stars tod={P} region={[500, -200, 1300, 1100]} n={90} at={0.5} span={3} />
-        <BigSun cx={900} cy={1185} r={110} horizon={1180} tod={P} path={[{t: 0, y: 1185}, {t: 6, y: 1265}]} glow={3} />
+        <BigSun cx={900} cy={1185} r={110} horizon={1180} tod={P} path={[{t: 0, y: 1185}, {t: 6, y: 1265}]} glow={3} glowMode="stack" glowOpacity={0.2} />
       </Layer>
       <EndlessCity horizon={1180} nearY={1500} rows={4} farS={0.12} nearS={0.4} tod={P} seed="far" x0={500} x1={1500} haze={0.35} windows={{initial: 0.5, events: [{at: 3.5, dur: 2, to: 'off', pattern: 'sweep', dir: 180, fraction: 0.8}]}} />
       <Layer depth={0}>

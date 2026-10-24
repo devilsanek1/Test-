@@ -30,7 +30,8 @@ export type SkyProps = {
   colors?: string[];
   /** Band top edges as distances above the horizon (px), top -> bottom; length = colors.length - 1. */
   edges?: number[];
-  /** Total height of the stepped part above the horizon (default 1150). */
+  /** Total height of the stepped part above the horizon. Default keeps every step below y 600, so the caption zone
+   *  (y 280-570) sits on ONE flat value (style_bible_ref2 8): min(1150, horizon - 600), at least 160. */
   span?: number;
   /** How far the last band continues below the horizon (default 500). */
   below?: number;
@@ -40,12 +41,13 @@ export type SkyProps = {
 };
 
 /** Flat, horizontally banded sky (a few value steps, darkest at the top). */
-export const Sky: React.FC<SkyProps> = ({tod = 'day', horizon, colors, edges, span = 1150, below = 500, x0 = WIDE.x0, x1 = WIDE.x1, top = -4000}) => {
+export const Sky: React.FC<SkyProps> = ({tod = 'day', horizon, colors, edges, span: spanIn, below = 500, x0 = WIDE.x0, x1 = WIDE.x1, top = -4000}) => {
   const p = todPal(tod);
   const cols = colors ?? p.skyBands;
   const n = cols.length;
+  const span = spanIn ?? Math.max(160, Math.min(1150, horizon - 600));
   // default edges: geometric toward the horizon (thin bands near it, like a low sun's glow steps); last edge 110 px
-  const ratio = n > 2 ? Math.pow(110 / span, 1 / (n - 2)) : 1;
+  const ratio = n > 2 ? Math.pow(Math.min(110, span * 0.5) / span, 1 / (n - 2)) : 1;
   const e = edges ?? Array.from({length: n - 1}, (_, i) => span * Math.pow(ratio, i));
   const out: React.ReactNode[] = [];
   for (let i = 0; i < n; i++) {
@@ -333,5 +335,3 @@ export const Birds: React.FC<BirdsProps> = ({at, from, to, dur = 5, n = 5, sprea
   return pb.empty ? null : <path d={pb.d} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" />;
 };
 
-/** Seeded pseudo-random in [0,1) for (seed, key) — re-exported for scene code. */
-export const srand = rand;

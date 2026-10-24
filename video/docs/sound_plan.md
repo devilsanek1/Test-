@@ -16,6 +16,11 @@ Sources and licences: `docs/sound_credits.md`. This version follows the brief's 
   `--prio A` keeps only the core cues. `--music marimba|near_silent|none` switches the bed.
 - `audio/vo_clean.wav` is sample-aligned with `assets/vo.mp3` (cross-correlation lag 0), so every time in `assets/timing.json` holds.
 - Remotion: copy `audio/mix.wav` into `public/` (the orchestrator's lane) and use it in place of `vo.mp3` as the single audio track.
+- **v2 (user feedback):** the user picked `cinematic` and asked for it "a tiny bit more subtle". The bed now sits 8.5 LU (was 6) under the voice with a 14 dB duck (was 12).
+  The voice gets a restoration chain: de-box, presence and air, with sibilance and artifacts measured (section 2).
+  Review files are in `review/audio/`: `vo_ab_1_original.wav`, `vo_ab_2_eq.wav`, `vo_ab_3_eq_air.wav` (20 s, loudness-matched) and `mix_cinematic_v2.mp3` (320 kb/s).
+- **Better source later?** `python3 audio/tools/swap_vo.py NEW_FILE` checks whether it is the same edit (offset/drift) or not (it lists where the edits differ).
+  `--apply` writes `assets/vo_hq.wav`, aligned to the old timeline, and reruns the voice chain. `--remix` also re-renders the mix.
 
 ## 1. Reference audio analysis
 
@@ -34,21 +39,75 @@ No sustained partials are independent of the speech f0, and there are no transie
 So sound must stay discreet: the bed sits 12 dB or more under the voice at every speaking moment, SFX are sparse,
 and there is a `near_silent` bed that is essentially reference 2's room tone plus a few swells.
 
-## 2. VO treatment (`assets/vo.mp3` -> `audio/vo_clean.wav`) (unchanged)
+## 2. VO restoration and treatment (`assets/vo.mp3` -> `audio/vo_clean.wav`), v2
 
-| Measure | Source | Notes |
+Source: MP3 at 192 kb/s, mono 44.1 kHz, 70.64 s decoded (the 25 ms container offset is stripped, so t=0 matches `timing.json`).
+It measures -14.6 LUFS and -1.7 dBTP. The noise floor is about -74 dBFS, and the male f0 has a median of 136 Hz.
+The user found it "pretty low quality". `audio/tools/vo_metrics.py` measures it on speech frames only, in dB relative to the 300 Hz-3 kHz average.
+To decide what to change, I compared 1/3-octave long-term spectra (LTAS) against **both references** (the same artist family):
+
+| Region | vo.mp3 against the references | Decision |
 |---|---|---|
-| Format | MP3 192 kb/s, mono 44.1 kHz, 70.64 s decoded | The 25 ms container offset is stripped by the decoder. t=0 matches `timing.json`. |
-| Loudness | -14.6 LUFS, TP -1.7 dBTP, LRA 2.4 LU | Already leveled. |
-| Noise floor | about -74 dBFS. 13 digital-silence runs (0.41 s in total) | Clean. No denoise needed. |
-| Rumble | 20-60 Hz is -46 dB relative to the full band | None. Male f0: median 136 Hz (p10-p90 is 105-234 Hz). |
-| Sibilance | 5-10 kHz p99 sits 5.6 dB under the body p99. The reference has 8.5 dB. | About 3 dB hotter than the reference, so a gentle de-ess. |
+| 150-300 Hz | 5-8 dB **lighter** than the references | **No cut here.** "Boomy" by the 300-3k-average metric, but relative to the references this region is already thin, so cutting it would make the voice smaller. |
+| 500-650 Hz | +2.5 to +3 dB (boxy) | de-box: -2.5 dB at 560 Hz (Q 1) |
+| 1-1.3 kHz | -2.5 to -4.6 dB | +1 dB at 1.15 kHz |
+| 3.2-4 kHz | -6 dB (no presence) | presence +3.5 dB at 3.5 kHz (Q 1) |
+| 5-6.4 kHz | +3.5 dB (sibilant bump) | -3.5 dB at 5.8 kHz (Q 1.3) |
+| 10-13 kHz | -6 to -10 dB (dull) | +3 dB at 10 kHz (Q 1.1) plus the air stage |
+| above 15.2 kHz | nothing (MP3 low-pass) | air stage (bandwidth extension) |
 
-Chain (`audio/tools/vo_clean.py`): soxr to 48 kHz, then a 70 Hz 4th-order high-pass.
-Next a **split-band de-esser**: only the band above 5 kHz is turned down, on 15 % of speech, by 1.7 dB on average and 5 dB at most.
-Then a **light RMS leveler**: 2:1 above -15 dBFS, 1.5 dB mean gain reduction.
-Last, the stem is normalised to **-17 LUFS (mono)**, about -14 LUFS when centred in stereo, and padded to 70.7 s.
-Result: TP -1.4 dBTP, sibilance p99 now 6.5 dB under the body. No gating, no noise reduction: the read stays natural.
+Chain (`audio/tools/vo_clean.py --chain full`):
+1. 48 kHz, then a 70 Hz high-pass, then the tone EQ above.
+2. **Air stage.** A harmonic exciter fed only from the cleanly coded 2.5-7.5 kHz band. That band is level-compressed first, so sibilants cannot dominate.
+   It is rectified and given a cubic term (2nd/3rd harmonics), band-passed to 8.5-16.5 kHz, and passed through a **crest limiter**
+   (so stop bursts do not become HF ticks). It is mixed in so 12-16 kHz reaches about -29.5 dB before the de-esser.
+   The MP3's own 12-15 kHz content, where codec swirl lives, is never boosted.
+3. **Split-band de-esser**, placed after the air stage so it governs the new air too: 4:1 above the 91st percentile, at most 6 dB.
+   It is active on 28 % of speech, at 2.6 dB on average.
+4. **Light leveler**: 2:1 above -15 dBFS, 15/200 ms, 1.2 dB mean gain reduction (p95 2.2 dB), so no pumping.
+5. -17 LUFS (mono), then a true-peak safety limiter at -1.5 dBTP. It acts on 1.1 % of samples by more than 0.5 dB (max 2.7 dB, rare plosive overs only).
+
+**Before and after** (whole file, speech frames; reference 2 in the last column):
+
+| Metric | vo.mp3 | v1 clean | **v2 clean** | ref 2 |
+|---|---|---|---|---|
+| 400-800 Hz | +6.1 | +6.1 | **+5.5** | +3.8 |
+| 1-2 kHz | -8.4 | -8.3 | **-6.3** | -6.1 |
+| 3-5 kHz (presence) | -15.0 | -14.6 | **-12.7** | -10.7 |
+| 5-8 kHz (sibilant region) | -10.8 | -11.5 | **-12.8** | -14.5 |
+| 8-12 kHz | -25.0 | -25.6 | **-23.0** | -19.7 |
+| 12-16 kHz | -39.1 | -39.3 | **-31.9** | -31.4 |
+| 16-20 kHz | -74.5 | -73.5 | **-52.9** | -82.3 |
+| Bandwidth (-60 dB) | 15.2 kHz | 15.2 kHz | **17.2 kHz** | (AAC) |
+| Sibilance (5-10k p99 minus body p99) | -5.7 | -6.6 | **-7.8** (less sibilant) | -9.7 |
+| HF artifact index (8-16k flux) | 0.210 | 0.210 | **0.210** (unchanged) | 0.212 |
+
+Control experiments show the artifact index responds to damage. A plain +12 dB shelf at 11 kHz reaches the same 12-16 kHz level, but sibilance gets worse (-4.7) and the index rises to 0.213.
+Adding -40 dB of 8-16 kHz noise raises the index to 0.221. The exciter route adds air with no rise in the index and with less sibilance.
+Click-type events in v2 are the source's stop-consonant bursts, which now extend to about 17 kHz (checked on zoomed spectrograms). The crest limiter halved how many get flagged.
+
+**A/B** (first 20 s, loudness-matched at -16 LUFS, 24-bit WAV, same true-peak safety on all):
+- `review/audio/vo_ab_1_original.wav`
+- `review/audio/vo_ab_2_eq.wav` (EQ, de-esser and leveler, no air)
+- `review/audio/vo_ab_3_eq_air.wav` (the full chain now in use)
+
+**Speech-enhancement model: not used.** DeepFilterNet is a denoiser, and this read has a -74 dBFS floor, so there is nothing to remove. It does not
+rebuild bandwidth that the MP3 removed. Its torch dependency is about 1-2 GB on a shared 4-CPU box. The bandwidth-extension models (AudioSR, resemble-enhance, VoiceFixer)
+fetch weights from Hugging Face or Zenodo, which are blocked here, and are known to change timbre. The measured DSP chain is safer and fully reversible (`--chain basic` restores v1).
+
+**The real fix is a better source.** If an uncompressed or 320 kb/s original exists, `audio/tools/swap_vo.py` drops it in.
+- It aligns the new file with a global GCC-PHAT lag, then windowed normalised cross-correlation (3 s windows) on 150 Hz-4 kHz.
+- It fits offset plus drift, then sorts the file into one of three outcomes:
+  - same edit: writes `assets/vo_hq.wav`, aligned sample-accurately, and reruns the chain;
+  - same edit with drift: corrects the drift by resampling, then does the same;
+  - different edit: lists the lag steps with timeline times and words, and exits with code 2.
+- With a wide-band source the chain skips its air stage automatically.
+
+| Test | Expected | Measured |
+|---|---|---|
+| AAC 256k, 44.1 kHz, EQ, +237 ms offset | same edit, 237 ms | **same_edit**, offset +236.94 ms, drift -0.8 ppm. After --apply the residual is 0.003 ms. |
+| 200 ppm clock drift, +100 ms offset | drift 200 ppm, 100 ms | **same_edit_with_drift**, 199.5 ppm, +100.04 ms. After --apply the residual is 0.001 ms. |
+| 0.4 s cut at 30 s, 0.25 s insert at 50 s | different edit at 30 s and 50 s | **different** (exit 2). Steps 0 to -400 ms between 28.5 and 33.0 s ("…knew. Except, the details…"), and -400 to -150 ms between 48.0 and 52.5 s. |
 
 ## 3. Music: three beds, on one story grid
 
@@ -116,7 +175,7 @@ Use **`marimba`** if the picture stays brighter and more playful. Use **`near_si
 python3 audio/mix.py --music cinematic --out audio/mix.wav          # cues default: audio/cues.json
 python3 audio/mix.py --music marimba --cues audio/cues_placeholder.json --out audio/demo_marimba.wav
 python3 audio/mix.py --make-cues audio/cues_placeholder.json        # placeholder cues from timing.json
-options: --duck-db (bed default: 12; near_silent 6)  --music-lu (bed default 6)  --min-gap 12  --sfx-bus-db 9
+options: --duck-db (bed default: cinematic 14, marimba 12, near_silent 6)  --music-lu (cinematic 8.5, marimba 6)  --min-gap 12  --sfx-bus-db 9
          --sfx-duck-db 3  --lufs -14  --ceiling -1.0  --prio A  --no-wrap  --stems
 ```
 Cue: `{"t": 35.62, "sfx": "pop_low", "gain_db": -12, "pan": 0}`.
@@ -124,8 +183,8 @@ Optional keys: `offset`, `dur`, `prio`, `why`, and `"loop": true` with `dur` / `
 
 Signal flow:
 - **VO**: centred.
-- **Music**: set 6 LU under the voice, or at its absolute level for `near_silent`. Then a side-chain duck from the VO: 20 ms look-ahead,
-  **30 ms attack, 250 ms release**, 200 ms hold, **-12 dB**. Then a **margin guard**: wherever the ducked bed would still come within 12 dB of the voice
+- **Music**: set under the voice by a per-bed amount (cinematic **8.5 LU** in v2, which the user asked to be "a tiny bit more subtle"; marimba 6 LU), or at its absolute level for `near_silent`.
+  Then a side-chain duck from the VO: 20 ms look-ahead, **30 ms attack, 250 ms release**, 200 ms hold, **-14 dB for cinematic** (-12 for marimba). Then a **margin guard**: wherever the ducked bed would still come within 12 dB of the voice
   (K-weighted, 400 ms), it adds a smoothed extra reduction (60/500 ms).
 - **SFX bus**: a 2.5 kHz dip of 2 dB, a 3 dB duck under speech, and 9 dB make-up (a pop at -12 dB lands about 15 dB under the voice).
 - **Master**: 25 Hz HPF, then circular glue compression (1.5:1), then -14 LUFS, then a look-ahead **true-peak limiter** with a 4x-oversampled detector and a -1.2 dB ceiling.
@@ -133,12 +192,15 @@ Signal flow:
 
 | File | Cues | Integrated | True peak | Voice over music in speech (median / p5 / min) | Guard (max / active) |
 |---|---|---|---|---|---|
-| `audio/mix.wav` (cinematic) | `cues.json` (28) | **-14.0 LUFS** | **-1.2 dBTP** | 19.0 / 14.0 / **12.6 dB** | 12.1 dB / 39 % |
-| `audio/demo_cinematic.wav` | placeholder (28) | -14.0 | -1.2 | 19.0 / 14.0 / 12.6 | 12.1 dB / 39 % |
-| `audio/demo_marimba.wav` | placeholder | -14.0 | -1.2 | 18.5 / 14.0 / 12.8 | 9.4 dB / 48 % |
-| `audio/demo_near_silent.wav` | placeholder | -14.0 | -1.2 | 53.9 / 31.8 / 19.8 | not needed |
+| `audio/mix.wav` (cinematic, v2) | `cues.json` (28) | **-14.0 LUFS** | **-1.2 dBTP** | **22.6 / 16.1 / 12.8 dB** (v1: 19.0 / 14.0 / 12.6) | 6.9 dB / 14 % (v1: 12.1 dB / 39 %) |
+| `review/audio/mix_cinematic_v2.mp3` | the same, MP3 at 320 kb/s | -14.0 | -1.2 | | |
+| `audio/demo_cinematic.wav` | placeholder (28) | -14.0 | -1.2 | 22.6 / 16.1 / 12.8 | 6.9 dB / 14 % |
+| `audio/demo_marimba.wav` | placeholder | -14.0 | -1.2 | 18.5 / 13.9 / 12.8 | 8.9 dB / 50 % |
+| `audio/demo_near_silent.wav` | placeholder | -14.0 | -1.2 | 53.8 / 31.8 / 19.7 | not needed |
 
-ffmpeg `ebur128=peak=true` agrees on every file: I = -14.0 LUFS, true peak -1.2 dBFS, LRA 1.7-1.8 LU.
+v2 change on cinematic: the music is 2.5 dB lower in pauses and about 3.6 dB lower under speech (median), and the margin guard now rarely has to step in.
+The two scale accents and the arrangement are unchanged. All mixes were re-rendered with the v2 voice.
+ffmpeg `ebur128=peak=true` agrees on every file: I = -14.0 LUFS, true peak -1.2 dBFS, LRA 1.7 LU.
 "In speech" means 400 ms frames where the voice is within 6 LU of its integrated level.
 
 ## 5. SFX kit (`audio/sfx/*.wav`, 30 sounds)
@@ -239,12 +301,13 @@ It is deliberately busier than the curated sheet.
 
 | Path | What |
 |---|---|
-| `audio/vo_clean.wav` | treated VO (mono, 48 kHz, 70.7 s) |
+| `audio/vo_clean.wav` | restored and treated VO, v2 chain (mono, 48 kHz, 70.7 s) |
+| `review/audio/vo_ab_{1_original,2_eq,3_eq_air}.wav`, `review/audio/mix_cinematic_v2.mp3` | A/B review files (20 s, loudness-matched) and the 320 kb/s review mix |
 | `audio/music_{cinematic,marimba,near_silent}.wav` / `.mid` | beds, 48 kHz stereo, loop-safe. Cinematic and marimba are at -20 LUFS; near_silent keeps absolute levels. The marimba MIDI uses quarter = 142.6, so 12/8 bars line up. |
 | `audio/sfx/*.wav` | 30-sound kit |
 | `audio/mix.py`, `audio/cues.json`, `audio/cues_placeholder.json` | mixer, curated cues, placeholder cues |
 | `audio/mix.wav`, `audio/demo_{cinematic,marimba,near_silent}.wav` | final mix and demo mixes |
-| `audio/tools/` | `vo_clean.py`, `bed_{cinematic,marimba,near_silent}.py` (with `bedkit.py`, `sampler.py`, `instruments.py`), `make_sfx.py`, `qc.py`, `common.py`. `retired/` holds the old pizzicato and lofi scripts. |
+| `audio/tools/` | `vo_clean.py` (+ `vo_metrics.py`, `swap_vo.py`), `bed_{cinematic,marimba,near_silent}.py` (with `bedkit.py`, `sampler.py`, `instruments.py`), `make_sfx.py`, `qc.py`, `common.py`. `retired/` holds the old pizzicato and lofi scripts. |
 
 To rebuild, put the sample libraries in `$SOUND_SAMPLES` (sparse git clones; see `sound_credits.md`), then run in order:
 `vo_clean.py`, `make_sfx.py`, `bed_cinematic.py`, `bed_marimba.py`, `bed_near_silent.py`, `mix.py --music cinematic --out audio/mix.wav`.
