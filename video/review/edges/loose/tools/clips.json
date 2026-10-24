@@ -1,0 +1,41 @@
+[
+ {
+  "props": {
+   "variant": "paint-subtle",
+   "shot": "street",
+   "from": 3.2,
+   "cam": true
+  },
+  "frames": [
+   0,
+   179
+  ],
+  "out": "review/edges/loose/clips/paint-subtle_street.mp4"
+ },
+ {
+  "props": {
+   "variant": "paint-medium",
+   "shot": "street",
+   "from": 3.2,
+   "cam": true
+  },
+  "frames": [
+   0,
+   179
+  ],
+  "out": "review/edges/loose/clips/paint-medium_street.mp4"
+ },
+ {
+  "props": {
+   "variant": "paint-loose",
+   "shot": "street",
+   "from": 3.2,
+   "cam": true
+  },
+  "frames": [
+   0,
+   179
+  ],
+  "out": "review/edges/loose/clips/paint-loose_street.mp4"
+ }
+]

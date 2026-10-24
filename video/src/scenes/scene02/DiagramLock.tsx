@@ -195,9 +195,13 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
     cover.push(<Ink key="covE" d={`M${cx0} ${cy0 + 2}V${cy0 + ch - 2}`} width={W * 0.7} taper={false} vary={0} seed={`${seed}/ce`} />);
   }
   if (coverOpenAt !== undefined && t >= coverOpenAt + 0.1) {
-    // the swing arc: from the free edge round the hinge (dashed, drawn on with the swing)
-    const r = cw * 0.92;
-    cover.push(<Ink key="arc" d={arc(cx0, cy0 - 2, r, -8, -172, {seed: `${seed}/arc`})} width={W * 0.38} dash="2.6 2.4" taper={false} seed={`${seed}/arc`} />);
+    // the swing arc: the free edge's path over the top of the box, ending in a small arrowhead at the open position
+    const xa = cx0 + cw - 3;
+    const xb = cx0 - cw * 0.3;
+    const xc = (xa + xb) / 2;
+    const rx = (xa - xb) / 2;
+    cover.push(<Ink key="arc" d={arc(xc, cy0 - 2, rx, 9, -4, -176, {seed: `${seed}/arc`})} width={W * 0.36} dash="2.6 2.4" taper={false} seed={`${seed}/arc`} />);
+    cover.push(<Ink key="arcH" d={`M${f2(xb - 3.5)} ${f2(cy0 - 7)}L${f2(xb)} ${f2(cy0 - 1)}L${f2(xb + 4.5)} ${f2(cy0 - 5.5)}`} width={W * 0.36} taper={false} seed={`${seed}/arcH`} />);
   }
   if (swung) {
     const ow = cw * 0.3;

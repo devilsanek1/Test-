@@ -626,20 +626,79 @@ const crtContent = (u: number, seed: string) => ({w, h}: {w: number; h: number})
 
 // ---------------------------------------------------------------- shared window hardware (chrome + shutter + lock + tag)
 
-type WinCtx = {id: GovId; ev: GovEvents; off: boolean; chrome: boolean; seed: string; windowSlot?: GovernmentPlazaProps['windowSlot']; k?: number};
+type WinCtx = {id: GovId; ev: GovEvents; off: boolean; chrome: boolean; seed: string; windowSlot?: GovernmentPlazaProps['windowSlot']; k?: number; fps?: number};
 
-const WindowRig: React.FC<WinCtx> = ({id, ev, off, chrome, seed, windowSlot, k = 1}) => {
+/** The reversed slam's forward window (the drop without its bounce), replayed backwards by `liftAt`. */
+const SLAM_DROP = 0.16;
+
+/** The shutter (props RollerShutter via the slot), with the v3 extras done here: a partial drop (`shutterStop`) is a
+ *  shutter over the top fraction of the window; `liftAt` replays the slam backwards, stepped like a tape. */
+const ShutterRig: React.FC<{x: number; y: number; w: number; h: number; ev: GovEvents; off: boolean; fps: number; width: number; seed: string}> = ({x, y, w, h, ev, off, fps, width, seed}) => {
+  const t = useTime();
+  if (!off && ev.liftAt !== undefined && t >= ev.liftAt) {
+    const D = ev.liftDur ?? 0.25;
+    if (t >= ev.liftAt + D) return <ShutterSlot x={x} y={y} w={w} h={h} width={width} seed={seed} />;
+    const q = rewindStep(t, ev.liftAt, D, fps);
+    return (
+      <TimeProvider global={(1 - q) * SLAM_DROP} offset={0}>
+        <ShutterSlot x={x} y={y} w={w} h={h} slamAt={0} width={width} seed={seed} />
+      </TimeProvider>
+    );
+  }
+  return <ShutterSlot x={x} y={y} w={w} h={h} slamAt={ev.shutterAt} down={off} width={width} seed={seed} />;
+};
+
+/** The 'back soon' tag; `outAt` = it swings back up (0 -> -16 deg, stepped) and pops off (S12 rewind). */
+const TagRig: React.FC<{x: number; y: number; at?: number; tapAt?: number; outAt?: number; fps: number; extra?: Partial<BackSoonTagProps>; seed: string}> = ({x, y, at, tapAt, outAt, fps, extra, seed}) => {
+  const t = useTime();
+  const tag = <BackSoonSlot x={x} y={y} at={at} tapAt={tapAt} extra={extra} seed={seed} />;
+  if (outAt === undefined || t < outAt) return tag;
+  const SW = 0.17;
+  if (t >= outAt + SW + 1 / fps) return null;
+  if (t >= outAt + SW) return <XG m={mat.about(mat.compose(mat.rotate(-16), mat.scale(0.55)), x, y)}>{tag}</XG>;
+  return <XG m={mat.about(mat.rotate(-16 * rewindStep(t, outAt, SW, fps)), x, y)}>{tag}</XG>;
+};
+
+/** The shutter padlock; `outAt` = one shrunken step, then gone (a pop off). */
+const PadlockRig: React.FC<{x: number; y: number; at?: number; glintAt?: number; outAt?: number; fps: number; extra?: Partial<ShutterPadlockProps>; seed: string}> = ({x, y, at, glintAt, outAt, fps, extra, seed}) => {
+  const t = useTime();
+  const pl = <PadlockSlot x={x} y={y} at={at} glintAt={glintAt} extra={extra} seed={seed} />;
+  if (outAt === undefined || t < outAt) return pl;
+  if (t >= outAt + 1 / fps) return null;
+  return <XG m={mat.about(mat.scale(0.55), x, y)}>{pl}</XG>;
+};
+
+const WindowRig: React.FC<WinCtx> = ({id, ev, off, chrome, seed, windowSlot, k = 1, fps = 12}) => {
+  const t = useTime();
   const g = PLAZA.gov[id];
   const [x, y, w, h] = g.window;
+  const stop = clamp(ev.shutterStop ?? ev.stopAt ?? 1, 0.05, 1);
+  // padlock / tag hang from the shutter's bottom rail: a partial shutter carries them up with it
+  const dy = (stop - 1) * h;
+  // the screen: v1 = chrome offAt (with the building's lights out); v3 = the CRT phase from the screen events
+  const crt = !off && (ev.screenOffAt !== undefined || ev.screenLineAt !== undefined);
+  const u = off ? 1 : crt ? crtPhase(t, ev, fps) : 0;
+  const v1On = ev.screenOnAt !== undefined && !crtOnIsReverse(ev) ? ev.screenOnAt : undefined;
+  const chromeOff = off ? -1e6 : crt ? (u >= 0.999 ? -1e6 : undefined) : ev.offAt;
+  const content = crt && u > 0.001 && u < 0.999 ? crtContent(u, `${seed}/${id}/crt`) : undefined;
+  const showTag = off || ev.tagAt !== undefined;
+  const showLock = off || ev.padlockAt !== undefined;
   return (
     <>
-      {windowSlot ? windowSlot(id, g.window) : <ChromeSlot x={x} y={y} w={w} h={h} chrome={chrome} chromeAt={off ? undefined : ev.chromeAt} screenOnAt={off ? undefined : ev.screenOnAt} offAt={off ? -1e6 : ev.offAt} width={MID * k} seed={`${seed}/${id}/bw`} />}
-      <ShutterSlot x={x} y={y} w={w} h={h} slamAt={ev.shutterAt} down={off} width={MID * k} seed={`${seed}/${id}/sh`} />
-      {off || ev.tagAt !== undefined ? <BackSoonSlot x={g.tag[0]} y={g.tag[1]} at={off ? undefined : ev.tagAt} tapAt={ev.tagTapAt} seed={`${seed}/${id}/tag`} /> : null}
-      {off || ev.padlockAt !== undefined ? <PadlockSlot x={g.padlock[0]} y={g.padlock[1]} at={off ? undefined : ev.padlockAt} glintAt={ev.glintAt} seed={`${seed}/${id}/pl`} /> : null}
+      {windowSlot ? (
+        windowSlot(id, g.window)
+      ) : (
+        <ChromeSlot x={x} y={y} w={w} h={h} chrome={chrome} chromeAt={off ? undefined : ev.chromeAt} screenOnAt={off ? undefined : v1On} offAt={chromeOff} content={content} width={MID * k} seed={`${seed}/${id}/bw`} />
+      )}
+      <ShutterRig x={x} y={y} w={w} h={h * stop} ev={ev} off={off} fps={fps} width={MID * k} seed={`${seed}/${id}/sh`} />
+      {showTag ? <TagRig x={g.tag[0]} y={g.tag[1] + dy} at={off ? undefined : ev.tagAt} tapAt={ev.tagTapAt} outAt={off ? undefined : ev.tagOutAt} fps={fps} extra={ev.tagProps} seed={`${seed}/${id}/tag`} /> : null}
+      {showLock ? <PadlockRig x={g.padlock[0]} y={g.padlock[1] + dy} at={off ? undefined : ev.padlockAt} glintAt={ev.glintAt} outAt={off ? undefined : ev.padlockOutAt} fps={fps} extra={ev.padlockProps} seed={`${seed}/${id}/pl`} /> : null}
     </>
   );
 };
+
+/** Lights out (`offAt`) and back on (`onAt`): the latest one wins; the 'off' state starts dark. */
+const isDark = (t: number, ev: GovEvents, off: boolean) => latestState(t, [ev.offAt], [ev.onAt], off);
 
 const DoorRig: React.FC<{id: GovId; seed: string; inkW: number}> = ({id, seed, inkW}) => {
   const g = PLAZA.gov[id];
