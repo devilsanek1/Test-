@@ -51,8 +51,9 @@ export const B = {
   slamB: 1.55,
   // 'down' w6: govA's shutter slams, lands on the word
   slamA: 1.82,
-  // 'bunch' w8: govC's shutter drops only HALF way (~0.15 s to its stop) and jolts ON the word
-  slamC: 2.2,
+  // 'bunch' w8: govC's shutter drops only HALF way (gravity fall 0.16 x sqrt(0.5) = 0.113 s to its stop) and its
+  // 1-frame jolt lands ON the word (fix round 2: 2.35 - 0.113)
+  slamC: 2.237,
   // 'of' w9: a citizen points up at govC; a pigeon shuffles
   point: 2.565,
   shuffle: 2.565,

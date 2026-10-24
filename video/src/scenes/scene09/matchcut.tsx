@@ -14,7 +14,7 @@
 import React, {useId} from 'react';
 import {Fill, Ink, palette, useTime, line, rect, rectPath, polyPath, XG} from '../../lib';
 import {STOOP, SI, cornice, FacadeDoor, TERRACE} from '../shared/sets';
-import {PlaqueSlot} from '../shared/sets/propSlots';
+import {ChromeSlot, PlaqueSlot} from '../shared/sets/propSlots';
 import {Lock} from '../shared/props';
 import {B} from './beats';
 import {a2ToBMat, camAt} from './camera';
@@ -120,8 +120,8 @@ export const A2Ground: React.FC = () => {
   );
 };
 
-/** House #4's door (and plaque) as A2 drew them, until the door turns 'fixed'. Draw it in TerraceHill's 'house4' wrap,
- *  after the house (B world). */
+/** House #4's front (browser window, door, plaque) as A2 drew them, until the door turns 'fixed'. Draw it in
+ *  TerraceHill's 'house4' wrap, after the house (B world). */
 export const DoorMatch: React.FC = () => {
   const t = useTime();
   if (t < B.hidden || t >= DOOR_MATCH_UNTIL) return null;
@@ -130,10 +130,11 @@ export const DoorMatch: React.FC = () => {
   const shade = H4.facade[0] + H4.facade[2] * 0.22; // the tan shade strip's right edge (502.3)
   return (
     <>
-      {/* cover house #4's own door ink (its overshoots reach ~8 units past the door) and its plaque */}
-      <Fill rect={[shade - 8.3, 1432, 8.3, 29]} color={palette.tan} offset={false} mode="snap" seed="s9dm/t" />
-      <Fill rect={[shade, 1427, 58, 64]} color={palette.sand} offset={false} mode="snap" seed="s9dm/s" />
+      {/* cover house #4's own window + door ink (their 3-8 unit overshoots are 18-48 px at zoom 6) and its plaque */}
+      <Fill rect={[shade - 12.3, 1356, 12.3, 135]} color={palette.tan} offset={false} mode="snap" seed="s9dm/t" />
+      <Fill rect={[shade, 1356, 68, 135]} color={palette.sand} offset={false} mode="snap" seed="s9dm/s" />
       <XG m={a2ToBMat}>
+        <ChromeSlot x={STOOP.browser[0]} y={STOOP.browser[1]} w={STOOP.browser[2]} h={STOOP.browser[3]} width={inkFloor(SI.mid, 1.9, zoom)} seed="stoop/hbw" />
         <FacadeDoor r={STOOP.door4} seed="stoop/door4" width={inkFloor(SI.mid, 1.9, zoom)} />
         <PlaqueSlot x={STOOP.plaque4.x} y={STOOP.plaque4.y} size={STOOP.plaque4.size} seed="stoop/pq4" width={inkFloor(SI.far, 1.4, zoom)} />
       </XG>

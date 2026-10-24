@@ -6,6 +6,10 @@
 //   cut(was)-0.30 -> cut     truck-right (540 -> 690, 960, 1.13), in(sine): follows the messenger out of frame right; a
 //                            FIXED 0.30 s ending on the cut, exiting at pi/2 x 150 / 0.30 x 1.13 = ~888 screen px/s
 // Zoom is interpolated in log space. Every segment meets the next at zero velocity except the cut-on-action exit.
+// MULTIPLANE (fix round 1): every set layer sees its own camera x = 540 + f x (cam.x - 540) (zoom and y shared, so the
+// t = 0 lock / L5 match and the whole hold are unchanged): the steps plane (teams, messenger, Pip in the air) is the
+// match plane f = 1 (~29.6 px/frame at the cut, = S06's messenger plane), the facade and banner 0.67 (~19.8 px/frame,
+// S06's houses run at 0.6 = ~17), the wing 0.4, the foreground heads 1.3, the sun 0.05 (screen space, Scene05.tsx).
 
 import {ease as E, lerp, prog} from '../../lib/time';
 import {mat, Mat} from '../../lib/xf';
@@ -28,6 +32,12 @@ export function camAt(t: number, end: number): Cam {
   const q = prog(t, end - TRUCK, TRUCK, E.inSine);
   return {x: lerp(K_LOCK.x, K_EXIT.x, q), y: K_LOCK.y, zoom: K_LOCK.zoom};
 }
+
+/** Parallax factor per BlueprintWall layer (the set's own `n` is a draw order, not a depth: ignored). */
+export const LAYER_F: Record<string, number> = {wing: 0.4, facade: 0.67, banner: 0.67, steps: 1, foreground: 1.3};
+
+/** The camera a layer with parallax factor f sees. */
+export const layerCam = (c: Cam, f: number): Cam => ({x: K_LOCK.x + f * (c.x - K_LOCK.x), y: c.y, zoom: c.zoom});
 
 /** World -> screen matrix of a camera. */
 export const camMat = (c: Cam): Mat => mat.compose(mat.translate(540, 960), mat.scale(c.zoom), mat.translate(-c.x, -c.y));

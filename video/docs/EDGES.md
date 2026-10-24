@@ -15,7 +15,9 @@ This pass refined all three from the two judges' round-3 notes (subtle 6.5 / 5, 
 bigger, hand-laid gestures (no jog, shelf or tab under 26-48 px); a corner left bare only where the scene has line art
 there (scene hints); keep rects, so a hero, the mascot or a lamp is never half colour, half line art; no dashed ink; and
 one decisive gesture in the phone's visible zone. `trim` / `panel` / `clean` are unchanged. Review material:
-`review/edges/loose/final/` (section 8). The film default is still `clean` (`FILM_EDGES`); the user picks.
+`review/edges/loose/final/` (section 8). The user picked **`paint-subtle`** to start (22:30, `docs/BRIEF.md`: "let's start
+with subtle", it may move up to medium); the core lane made it the house default (`FILM_EDGES`) and wraps Film's scene stack
+in `<FilmEdges scene={edgeScene}>`.
 
 Round 2 (kept below for reference): three candidates, `clean` (control), `trim` and `panel`, refined from the judges'
 round-1 ranking (trim 26.5, panel 26.0, rough-tb 20, clean 20, construction 19.5, vignette 15.5); material in
@@ -40,7 +42,7 @@ nonzero rule unions same-wound subpaths, so no polygon boolean is needed):
 | bare corner | the paint did not reach it: an irregular diagonal run with two soft knees. The drawing half covers it and its lines run on into the white. ONLY where the scene has line art there (`hints.ink` >= 0.3), never through a keep rect (it shrinks in height or width, or the role moves to another corner) | "allow a deep bare corner only where the line-art layer is dense (rule out flat skies)"; "the vista's top-right: a blank white trapezoid" |
 | step corner | a partly bare TOP corner (medium / loose): the block stops short in a tilted L, the line art fills it, the ruled crossing pair marks the block's corner | "leave one top corner partly bare when the scene has ink there"; "a crossing pair of strokes, like f_9.0's top-left" |
 | bleed corner | colour covers the emptiest corner (usually flat sky) and runs off both edges; its ends are clean cuts | "otherwise turn it into a bleed corner" |
-| bites | the visible-zone gesture: one straight-sided bite in the left side, y 680-1460 (medium 92-124 px from the frame, loose 128-166), one on the right between the caption and the rail (loose), bites in the bottom under the UI. Only where there is drawing (`hints.ink.left` / `right` >= 0.3, `bottom` >= 0.25); the drawing inside a bite is complete. A scene where no corner can go bare gets a bottom bite instead | "one deep bite of 80-160 px on the left at y 900-1450, with the line art running on into it, like the bikes in f_5.5"; "limit visible-zone bites to shallow, straight ones" (medium) |
+| bites | the visible-zone gesture: one straight-sided bite in the left side, y 680-1460 (medium 92-124 px from the frame, loose 128-166), one on the right between the caption and the rail (loose), bites in the bottom under the UI. Only where there is drawing (`hints.ink.left` / `right` >= 0.3, measured: a scene without hints gets no visible-zone bite; `bottom` >= 0.25); the drawing inside a bite is complete. A scene where no corner can go bare gets a bottom bite instead | "one deep bite of 80-160 px on the left at y 900-1450, with the line art running on into it, like the bikes in f_5.5"; "limit visible-zone bites to shallow, straight ones" (medium) |
 | tongues | colour runs off the frame for a stretch (the ground off the bottom, one end a long slant), only where the paper is deep enough for a real step | "colour still reaches the edge at the bottom-right" |
 | keep rects | `hints.keep`: hero figures, the mascot + the ground under it, a lamp + halo, a banner, a pillar. Always in colour: corners, bites and tongues keep 60-180 px clear, and a last block guarantees it (running off a frame side the rect comes within 110 px of) | "keep-out boxes so block edges never cut the hero or mascot"; "each figure either fully line art or fully coloured" |
 | clean-up | every white notch narrower than 160 px along a side, and every white stretch shorter than 240 px between two stretches of colour at the edge, becomes colour; any paper the union encloses is filled | "a block running to the edge right next to a white bite"; "sub-40 px notches look glitchy" |
@@ -68,17 +70,21 @@ block outline ruled in. The lab shots:
 - `edgelab/vista`: the flat sky becomes a bleed corner. The hero and the mascot are kept, and the left bite holds the
   city's line art.
 
-**The presets** ({{CHECK_N}}; amount 1 = the preset; 40 seeds x 4 scenes (the three lab shots' hints and no hints);
+**The presets** (amount 1 = the preset; 40 seeds x 4 scenes (the three lab shots' hints and no hints);
 `final/check-paint.txt`; p5 / median / p95):
 
-{{PRESET_TABLE}}
+| preset | looseness | in plain words | paper, % of frame (of y 180-1520) | paper depth left / right (y 200-1500) | top / bottom | bare corners | ink past the colour |
+|---|---|---|---|---|---|---|---|
+| `paint-subtle` | 0.6 | **trim, painted.** Each side one long, slightly tilted edge with one clear step (>= 26 px); ONE bare corner where the scene has drawing (if none can go bare: one bite in the bottom's drawing); the ruled crossing at a painted top corner. The phone's visible zone stays as calm as trim | 4 / 7 / 10 (2 / 5 / 6) | 0 / 25 / 61, 14 / 18 / 20 | 14 / 20 / 25, 0 / 19 / 159 | 0 / 1 / 1 | 18-38 px |
+| `paint-medium` | 1 | **clearly painted, still calm where the phone shows it.** Blocks meet in >= 40 px steps; a bare corner and a partly bare top corner where there is drawing (branches, a crowd), a bleed on the emptiest corner; one left bite (92-124 px from the frame) holding the scene's line art; a bite in the bottom's drawing under the UI | 7 / 10 / 20 (3 / 7 / 8) | 0 / 29 / 109, 10 / 12 / 52 | 0 / 38 / 190, 0 / 27 / 264 | 0 / 1 / 1 | 26-56 px |
+| `paint-loose` | 1.6 | **as messy as reference 1 dares.** Two bare corners (diagonal when both hold drawing), a deep left bite (128-166 px) and a right bite between the caption and the rail, >= 48 px steps, the bottom broken up under the UI, the f_9.0 ruled crossing overshooting 40-60 px | 9 / 13 / 25 (3 / 9 / 11) | 0 / 32 / 142, 10 / 15 / 76 | 0 / 72 / 213, 0 / 0 / 313 | 0 / 1 / 2 | 32-66 px |
 
 (Depth 0 = colour at the frame edge: a bleed, a tongue, a keep block.) A seed's random structure is shared across
 looseness (each element draws from its own fork), so `paint-subtle`, `-medium` and `-loose` of one seed are the same
 painting getting looser. With the hints, one scene's paintings share their bare corners (the scene decides where the
 drawing is) and differ in their sides and bottom (`final/paint_seeds.png`).
 
-**Phone-aware limits** (`PAINT_LIMITS`, `PHONE_UI` in `shared.ts`; {{CHECK_N}}, 0 failures):
+**Phone-aware limits** (`PAINT_LIMITS`, `PHONE_UI` in `shared.ts`; `final/check-paint.txt`: 2400 edges = 3 presets x amounts 0.6-1.4 x 4 scenes x 40 seeds, 0 failures):
 
 - The colour contains the caption block (`CAPTION_SAFE`), and no stroke enters it.
 - Beside the caption block the paper is <= 38 px on the left and <= 77 px on the right (the caption bands are clamped,
@@ -86,8 +92,8 @@ drawing is) and differ in their sides and bottom (`final/paint_seeds.png`).
 - Under the right rail (y 860-1540) the paper is 10-18 px.
 - Every keep rect is inside the colour.
 - No enclosed paper and no paper hairline under 6 px along a frame edge.
-- {{JOGS}}
-- {{GAPS}}
+- Jogs (a 6-24 px level change between flat stretches of a side's paper): with no hints, at amount 1, 0.03 / 0.13 / 0.10 per edge (subtle / medium / loose), against 1.50 / 1.35 / 0.75 in the first pass the judges scored. Over all amounts and scenes it is 1.2 / 1.0 / 0.7, almost all where a keep block or a bleed reaches the frame across the 10-18 px rail band or a thin bottom strip (section 7).
+- Ink gaps under 60 px on a line parallel to an edge (a scene line drawn as dashes): with no hints, at amount 1, 0 / 0 / 0.05 per edge, against 1.5 / 3.6 / 5.2 in the first pass. Over all amounts it is 0.1-0.5, mostly at looseness 1.2-2.2.
 
 The deepest work (bare corners, the bottom) sits under the top ~180 px and bottom ~400 px app UI. The visible zone
 carries a single decisive gesture: the left bite, plus the right bite at loose. `final/paint_phone.png` draws the app UI
@@ -207,11 +213,12 @@ or flicker. Captions are not part of the treatment; render them after it.
 
 ## 5. Using it in the film (do not edit Film yourself: core lane)
 
-The one-line integration in `src/lib/Film.tsx` (core lane): wrap the SCENE STACK, not the captions:
+The one-line integration, in `src/lib/Film.tsx` since 22:39 (core lane): the SCENE STACK is wrapped, not the captions,
+and the scene on screen is passed:
 
 ```tsx
-// Film's return, inside <AbsoluteFill>: the layers + transition overlays (wipers, bridges) go inside, SkyCaptions stays after it (above)
-<FilmEdges>{layers.map((l) => <React.Fragment key={l.key}>{l.node}</React.Fragment>)}{overlays}</FilmEdges>
+// Film's return, inside <AbsoluteFill>: the layers + transition overlays go inside, SkyCaptions stays after it (above)
+{edges ? <FilmEdges scene={edgeScene}>{stack}</FilmEdges> : stack}
 {showCaptions ? <SkyCaptions ... /> : null}
 ```
 
@@ -220,12 +227,17 @@ and the same around `Standalone`'s two scene blocks (the loop underlay + the sce
 make it the house look by setting `FILM_EDGES` in `src/lib/edges/config.tsx` (e.g. `{variant: 'trim', seed: 'film', amount: 1}`
 or `{variant: 'paint-medium', seed: 'film', amount: 1}`); `--props='{"edges":"paint-loose"}'` works too.
 
-**For paint, the one line is `<FilmEdges scene={currentSceneId}>`** (core lane): one painting per scene (the scene id is
-appended to the seed, so the edge changes on the cut and never within a scene) and the scene's `EDGE_HINTS` entry applied
-(bare only where there is drawing, keep rects never cut). Each scene owner adds its entry to `src/lib/edges/hints.ts`
-(measure: render the scene clean at 1-3 frames of the shot, `python3 review/edges/loose/final/tools/scan_hints.py
-<scene-id> f1.png f2.png`, then add hero figures / key props to `keep` by hand); a scene without one still gets a sound
-edge (every region allowed, a bare corner's block outline ruled in).
+**For paint, the one line is `<FilmEdges scene={currentSceneId}>`**: one painting per scene, and the scene's `EDGE_HINTS`
+entry applied (bare only where there is drawing, keep rects never cut). Appending the scene id to the seed changes the
+edge on the cut and never within a scene.
+
+**Still to do (each scene's owner, or the core lane): add the scene's entry to `src/lib/edges/hints.ts`.** Render the
+scene clean at 1-3 frames of its shot, run `python3 review/edges/loose/final/tools/scan_hints.py <scene-id> f1.png
+f2.png`, paste the printed entry, and add hero figures, figures at the frame edges and key props to `keep` by hand.
+
+Until then a scene gets the hint-less edge (`final/stills/nohints/`). It is sound: no visible-zone bites, every corner
+allowed, and a bare corner's block outline ruled in. But a figure standing at the frame edge can be trimmed by the
+paper margin, as trim's sliver would trim it.
 
 ## 6. Render cost
 
@@ -239,19 +251,19 @@ Frames only (PNG), full 1080x1920, concurrency 2, 30 spread frames, best of two 
 
 With H.264 encoding (the final clips): clean 96, trim 132, panel 120 ms/frame.
 
-**paint** (round 3, `review/edges/loose/bench_fullres.txt`; same method, 4 rotated rounds, best of 4; the machine was
-shared with other lanes' renders, load 10-13 on 4 cores, so absolute numbers are inflated and noisy):
+**paint** (round 3 refined, `review/edges/loose/final/bench_fullres.txt`). Frames only, full res, the street with the lab
+camera move, 8 spread frames per job, concurrency 1, six rotated rounds. Other lanes were rendering on the same machine
+(load 6-11 on 4 cores), so each variant's minimum is the estimate:
 
 | shot | clean | trim | paint-subtle | paint-medium | paint-loose |
 |---|---|---|---|---|---|
-| KitDemo street + lab camera move | 135 ms/frame | 184 (+36 %) | 195 (+44 %) | 166 (+23 %) | 202 (+50 %) |
-| CineDemo monument (crane) | 146 | 203 (+39 %) | 211 (+45 %) | 191 (+31 %) | 227 (+55 %) |
+| KitDemo street + lab camera move | 219 ms/frame | 306 (+40 %) | 314 (+43 %) | 300 (+37 %) | 318 (+45 %) |
 
-paint costs what trim costs: the same second (line-art) render; the presets differ only in clip geometry and their
-spread is within the noise. Geometry: ~3 ms per (seed, looseness), once per scene; clip paths 0.5 KB (colour, 7
-blocks) and 5-9 KB (ink). The second render costs +20-45 %, not
-2x: page capture and encoding are paid once. In Film, the cost applies to every layer inside `FilmEdges` (during a
-transition both scenes render twice).
+paint costs what trim costs: the same second (line-art) render. The presets differ only in clip geometry (colour 0.3-0.7
+KB, ink 4-13 KB), and their spread is within the noise. The geometry costs ~55 ms per (seed, looseness, hints) on first
+use (the raster hole fill), memoised, so once per scene. The second render costs +20-45 %, not 2x: page capture and
+encoding are paid once. In Film, the cost applies to every layer inside `FilmEdges` (during a transition both scenes
+render twice).
 
 ## 7. Limitations
 
@@ -304,11 +316,12 @@ transition both scenes render twice).
 | `clips/paint-{subtle,medium,loose}_street.mp4` | 6 s, 1080x1920, 30 fps: the street (KitDemo 3.2-9.2 s, day -> dusk) with the lab push x1.07 + 40 px pan, captions on top |
 | `clips/trim_street.mp4`, `clips/clean_street.mp4` | the same clip with trim (the 4-panel's reference) and clean (the edgecheck baseline) |
 | `clips/side_by_side_street.mp4` | trim / paint-subtle / paint-medium / paint-loose side by side (4 x 432 px), labelled |
-| `check-paint.txt` | the geometry check ({{CHECK_N}}, 0 failures) and the per-preset stats in section 0 |
-| `edgecheck.txt` | contour stability in the clips (section 8 of round 3: the contour has no time input) |
+| `check-paint.txt` | the geometry check (2400 edges, 0 failures) and the per-preset stats in section 0 |
+| `edgecheck.txt` | contour stability in the clips against the clean clip: 93-99 % of scanline samples within 2 px of their position, per-frame mean drift 0.8-7 px (scene content crossing the cut: the string lights at dusk at the top, people at the bottom); the contour has no time input |
 | `bench_fullres.txt`, `bench_raw.txt` | the cost table in section 6 |
+| `stills/nohints/` | paint-subtle / -medium on the three shots WITHOUT hints: what a film scene gets before its `EDGE_HINTS` entry exists (calm visible zone; a figure at the frame edge can be trimmed by the margin) |
 | `stills/` | the full-resolution stills behind the sheets (`seeds/`; `scan/` = the clean frames the lab hints were measured on) |
-| `tools/` | `stills.json`, `seeds.json`, `clips.json`, `clean_clip.json`, `bench.json`, `clean.json` (render-lab / render-clips jobs), `final_sheets.py` (`grid` / `phone` / `corners` / `ref` / `seeds` / `labels`), `check-paint.ts` (`--quick`: amount 1, 10 seeds; `--where`: print jog / dash locations), `scan_hints.py` (a scene's `EDGE_HINTS` entry from clean renders), `dump-paint.ts` + `sim.py` (a quick simulated composite of the edge over a clean still, no Chrome) |
+| `tools/` | `stills.json`, `seeds.json`, `nohints.json`, `clips.json`, `clean_clip.json`, `bench.json`, `clean.json` (render-lab / render-clips jobs), `final_sheets.py` (`grid` / `phone` / `corners` / `ref` / `seeds` / `labels`), `check-paint.ts` (`--quick`: amount 1, 10 seeds; `--where`: print jog / dash locations), `scan_hints.py` (a scene's `EDGE_HINTS` entry from clean renders), `dump-paint.ts` + `sim.py` (a quick simulated composite of the edge over a clean still, no Chrome) |
 
 ```bash
 node review/edges/tools/render-lab.mjs review/edges/loose/final/tools/stills.json --scale=1 --concurrency=2   # + seeds.json
@@ -318,7 +331,7 @@ npx esbuild review/edges/loose/final/tools/check-paint.ts --bundle --platform=no
 python3 review/edges/loose/final/tools/scan_hints.py scene-04 clean_a.png clean_b.png        # a scene's hints
 ```
 
-`review/edges/loose/` (round 3 first pass, paint; the geometry the judges scored, code at commit a23deea):
+`review/edges/loose/` (round 3 first pass, paint; the geometry the judges scored, code at commit 1d0b2a6):
 
 | file | what |
 |---|---|
@@ -332,6 +345,7 @@ python3 review/edges/loose/final/tools/scan_hints.py scene-04 clean_a.png clean_
 | `check-paint.txt` | the geometry check (600 edges, 0 failures) and the per-preset stats in section 0 |
 | `edgecheck.txt` | contour stability in the clips: 85-98 % of scanline samples within 2 px of their position, per-frame mean drift 0.7-7 px (scene content crossing the cut; the deep loose bottom / top see the most people and lights cross it); debug-contour probe at lab t 0 / 2.5 / 5.9 s: 1-81 of 166-1119 hairline pixels differ (anti-aliasing over moving colour; no time input) |
 | `bench_fullres.txt`, `bench_raw.txt` | the cost table in section 6 |
+| `stills/nohints/` | paint-subtle / -medium on the three shots WITHOUT hints: what a film scene gets before its `EDGE_HINTS` entry exists (calm visible zone; a figure at the frame edge can be trimmed by the margin) |
 | `stills/`, `stills/seeds/` | the full-resolution stills behind the sheets |
 | `tools/` | `stills.json`, `clips.json`, `bench.json` (render-lab / render-clips jobs), `loose_sheets.py` (`grid` / `corners` / `ref` / `seeds` / `labels`), `check-paint.ts`, `dump-paint.ts` + `geom.py` (a 0.25x geometry preview of the blocks for any seeds, no render), `probe.json` + `probe/` (the debug-contour probe) |
 

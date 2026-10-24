@@ -42,7 +42,7 @@ export type EdgeTreatmentProps = {
   /** Shape seed (default 'edge'): change it for a differently cut edge. */
   seed?: Seed;
   /** 0 = none, 1 = the designed amount, up to ~1.4 (margins, snips, overshoots and stroke reach scale with it).
-   *  'paint': the LOOSENESS (0.5 subtle, 1 medium, 1.6 loose); a 'paint-*' preset multiplies its own looseness. */
+   *  'paint': the LOOSENESS (0.6 subtle, 1 medium, 1.6 loose); a 'paint-*' preset multiplies its own looseness. */
   amount?: number;
   /** Screen vanishing point for perspective guides (construction). Default world.vp. */
   vp?: Pt;
