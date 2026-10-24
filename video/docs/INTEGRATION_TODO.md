@@ -34,8 +34,10 @@ their scenes, so none of this is done mid-flight; each item names the scenes it 
 
 ## Other
 
-- Edge treatment: wire `FilmEdges` into `Film` with the preset the user picks (captions outside it), then
-  re-run framecheck and capcheck on Main.
+- Edge treatment: DONE, `paint-subtle` is wired into `Film` (full film only, captions above, one painting per scene).
+  Still to do: generate per-scene `EDGE_HINTS` (src/lib/edges/hints.ts) with
+  `review/edges/loose/final/tools/scan_hints.py` on the final scenes, so bare corners land where there is drawing and
+  never cut actors or the mascot. Then re-run framecheck and capcheck on Main.
 - `scripts/qa/holds.json`: no deliberate holds needed so far (every scene's longest dead run is <= 0.37 s).
 - S09 pull-back speed (~76 px/frame against the strobe limit of 18): check in the Main QA run.
 - Re-run the mixer with cues nudged to the final scene times, then the final high-quality render.

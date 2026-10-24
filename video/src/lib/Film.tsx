@@ -68,6 +68,7 @@ import {World} from './World';
 import {Sun} from './Sun';
 import {captionFontStack} from './font';
 import {FigureWiper} from './FigureWiper';
+import {FilmEdges} from './edges';
 import {CINE_WIPE_HALF, CINE_WIPERS, wipeEdgeX} from './cine/wipers';
 
 // ---------------------------------------------------------------- data types
@@ -479,9 +480,12 @@ export type FilmProps = {
   audio?: boolean;
   /** Draw captions. Default true. */
   showCaptions?: boolean;
+  /** Wrap the scene stack in the house edge treatment (edges/config FILM_EDGES; captions stay above it). Default: on for
+   *  the full film, off for single-scene previews (`only`), so scene builders work under 'clean'. */
+  edges?: boolean;
 };
 
-export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers = {}, captions, offset = 0, only, audio = true, showCaptions = true}) => {
+export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers = {}, captions, offset = 0, only, audio = true, showCaptions = true, edges = !only}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const T = frame / fps + offset;
@@ -658,13 +662,21 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
   const onlyIdx = only ? scenes.findIndex((s) => s.id === only) : -1;
   const range: [number, number] | undefined = only && onlyIdx >= 0 ? [scenes[onlyIdx].start, scenes[onlyIdx + 1]?.start ?? Infinity] : undefined;
 
+  // one painting per scene: the edge follows the scene whose start T has passed, so it changes on the cut
+  const edgeScene = only ?? scenes.reduce<FilmScene | undefined>((acc, s) => (T >= s.start - 1e-6 ? s : acc), scenes[0])?.id;
+  const stack = (
+    <>
+      {layers.map((l) => (
+        <React.Fragment key={l.key}>{l.node}</React.Fragment>
+      ))}
+      {overlays}
+    </>
+  );
+
   return (
     <TimeProvider global={T} offset={0}>
       <AbsoluteFill style={{background: palette.sky, overflow: 'hidden'}}>
-        {layers.map((l) => (
-          <React.Fragment key={l.key}>{l.node}</React.Fragment>
-        ))}
-        {overlays}
+        {edges ? <FilmEdges scene={edgeScene}>{stack}</FilmEdges> : stack}
         {showCaptions ? <SkyCaptions beats={captions} tone={tone} regions={regions} loopAt={loopAt} loopEnd={seam} range={range} hookAtStart={!only} /> : null}
       </AbsoluteFill>
       {audio ? <Audio src={staticFile(audioFile())} trimBefore={offset > 0 ? Math.round(offset * fps) : undefined} /> : null}

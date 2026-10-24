@@ -20,11 +20,15 @@ import type {Pt} from '../../lib/sketch';
 // ---------------------------------------------------------------- Pip
 
 const PIP_SCALE = 1.2;
-/** Where S02's hop-off has carried Pip at the cut: S02 hops him off its rod perch (screen ~(843, 770)) up-left toward the
- *  lens at cut(password)-0.04; on its last frame he is at screen ~(839, 749) still rising. S03 picks him up there:
- *  screen (836, 748) = world (836, 738) under this scene's rest camera, moving up (vy0) and falling onto the plan. */
-const PIP_FROM: Pt = [836, 738];
-const PIP_AT: Pt = [BLUEPRINT.pip[0], BLUEPRINT.pip[1]];
+/** Where Pip is on the hard cut: S02 hops him off its rod perch toward the lens at cut(password)-0.04; this being a
+ *  hard cut, S03 picks him up already lower and closer (world (700, 1000) = screen (700, 1010) at the rest camera),
+ *  still rising a little (vy0) and dropping onto the plan: dx 270, dy 405 in 0.362 s, g ~7,000 px/s2, landing at
+ *  ~80 px/frame (motion_spec #25: g 3,000-8,000, <= ~93 px/frame). */
+const PIP_FROM: Pt = [700, 1000];
+/** Fix round 1: Pip sits on the stamp's RUMP (its right end), not its centre (BLUEPRINT.pip (350, 1420) hid ~80 % of
+ *  the print): the reversed-out elephant faces left, so its trunk, ear and legs stay clear. Screen at the 1.04 lock:
+ *  (420.4, 1438.4), where he crouches on the cut (S04 continues from there). */
+export const PIP_AT: Pt = [430, 1405];
 
 /** Ballistic drop with an initial upward kick vy0 (px/s) landing exactly at `to` after T. */
 function drop(t: number, t0: number, T: number, from: Pt, to: Pt, vy0: number): Pt {
@@ -185,14 +189,16 @@ export function walkersFor(b: Beats): Walker[] {
   const e = b.everyone;
   return [
     // the doorway walker: R4's door, steps out and heads up the street toward the press house
-    {id: 'door', x: 800, y: 1228, h: 58, at: b.doorway, walkAt: b.doorway + 0.25, pace: 0.05, body: palette.tan, hair: 'bun'},
+    // fix round 1: x1.4 (the press-house door is 170 px: they were figurines beside it), re-placed clear of Pip on the
+    // stamp's rump, the title card, the sticker and the count badges
+    {id: 'door', x: 800, y: 1228, h: 80, at: b.doorway, walkAt: b.doorway + 0.25, pace: 0.05, body: palette.tan, hair: 'bun'},
     // the six: pop up out of the plan near -> far, alternating sides (0.05 s apart)
-    {id: 'a', x: 404, y: 1322, h: 104, at: e, body: palette.teal, hair: 'short', acc: ['backpack']},
-    {id: 'b', x: 712, y: 1312, h: 100, at: e + 0.05, walkAt: e + 0.4, pace: 0.05, body: palette.brown, hair: 'long'},
-    {id: 'c', x: 468, y: 1282, h: 86, at: e + 0.1, body: palette.sage, hair: 'curly', waveAt: b.heads},
-    {id: 'd', x: 650, y: 1270, h: 82, at: e + 0.15, walkAt: e + 0.3, stop: b.looksUp, lookUpAt: b.looksUp, pace: 0.07, body: palette.tealDark, hair: 'bun'},
-    {id: 'e', x: 388, y: 1250, h: 70, at: e + 0.2, walkAt: e + 0.35, pace: 0.05, body: palette.tan, hair: 'short'},
-    {id: 'f', x: 760, y: 1258, h: 72, at: e + 0.25, body: palette.teal, hair: 'beanie'},
+    {id: 'a', x: 318, y: 1296, h: 146, at: e, body: palette.teal, hair: 'short', acc: ['backpack']},
+    {id: 'b', x: 716, y: 1298, h: 140, at: e + 0.05, walkAt: e + 0.4, pace: 0.05, body: palette.brown, hair: 'long'},
+    {id: 'c', x: 545, y: 1290, h: 120, at: e + 0.1, body: palette.sage, hair: 'curly', waveAt: b.heads},
+    {id: 'd', x: 652, y: 1268, h: 115, at: e + 0.15, walkAt: e + 0.3, stop: b.looksUp, lookUpAt: b.looksUp, pace: 0.07, body: palette.tealDark, hair: 'bun'},
+    {id: 'e', x: 400, y: 1248, h: 98, at: e + 0.2, walkAt: e + 0.35, pace: 0.05, body: palette.tan, hair: 'short'},
+    {id: 'f', x: 758, y: 1256, h: 101, at: e + 0.25, body: palette.teal, hair: 'beanie'},
   ];
 }
 
@@ -222,10 +228,10 @@ export const NearWalkers: React.FC<{b: Beats}> = ({b}) => {
   return (
     <>
       <XG m={mat.compose(mat.translate(slide(-1, 0) , bobY(0)), mat.about(mat.rotate(turn(-1)), L[0], L[1] + 400))}>
-        <EdgeOnlooker x={L[0]} y={L[1]} head={104} hair="short" body={palette.teal} rim="right" seed="s03/nearL" />
+        <EdgeOnlooker x={L[0]} y={L[1]} head={104} hair="short" body={palette.teal} rim="right" arms={false} seed="s03/nearL" />
       </XG>
       <XG m={mat.compose(mat.translate(slide(1, 0.04), bobY(0.04)), mat.about(mat.rotate(turn(1)), R[0], R[1] + 400))}>
-        <EdgeOnlooker x={R[0]} y={R[1]} head={112} hair="bun" body={palette.tan} rim="left" seed="s03/nearR" />
+        <EdgeOnlooker x={R[0]} y={R[1]} head={112} hair="bun" body={palette.tan} rim="left" arms={false} seed="s03/nearR" />
       </XG>
     </>
   );

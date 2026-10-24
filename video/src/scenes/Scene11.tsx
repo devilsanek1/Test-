@@ -46,7 +46,7 @@ const TAG = {x: PLAZA.gov.govB.tag[0], y: PLAZA.gov.govB.tag[1] - 20, size: 48, 
 const SNAIL_AT: Pt = [634, SILL_Y];
 const NOTICE = {x: 549, y: 1082, w: 140, h: 56}; // L14, inside the lower part of the browser screen, clear of Pip's ear
 const NOTE = {x: 553, y: 1026, w: 118, h: 92}; // J6 on the closed shutter's right part, above the tag's nail and Bit
-const NOTE_FROM: Pt = [905, 990]; // off the right edge (the breeze)
+const NOTE_FROM: Pt = [880, 985]; // across the right edge (the breeze): ~18 px / frame over 1.0 s
 const CORNICE_PIGEON: Pt = [640, 904];
 const BOX_PIGEON: Pt = [454, 952];
 const PIGEON_S = 0.8;
@@ -224,7 +224,7 @@ const Scene11: React.FC = () => {
         />
         {/* on the closed shutter: the sticky note (J6), then the lettered 'back soon' tag on its nail and the padlock on
             the rail (drawn here, OVER govB's sill ink: stand-ins for the set's rigs) */}
-        <NoteFlight x={NOTE.x} y={NOTE.y} from={NOTE_FROM} arriveAt={slapAt} dur={0.8}>
+        <NoteFlight x={NOTE.x} y={NOTE.y} from={NOTE_FROM} arriveAt={slapAt} dur={1.0} lift={14} spin={14}>
           {noteEl(false)}
         </NoteFlight>
         <NoteBreeze x={NOTE.x} y={NOTE.y} h={NOTE.h} flutterAt={[b.noteCurl - 0.02, b.strike + 0.18]} joltAt={b.strike}>

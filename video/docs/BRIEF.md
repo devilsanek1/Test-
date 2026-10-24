@@ -176,3 +176,10 @@ messy, incomplete way, like in the very first video, with the edges around the p
 is being developed in src/lib/edges (docs/EDGES.md). It is applied GLOBALLY at assembly (Film wraps the scene layers;
 captions stay outside it). Scene builders work under the clean edge and must not draw their own frame treatment. They
 should keep a little visual interest near the frame edges, because a loose painted edge will reveal paper there.
+
+**PICKED (22:30): `paint-subtle`** ("let's start with subtle", so it may move up to medium later). It is the house default
+`FILM_EDGES` in src/lib/edges/config.tsx. `Film` wraps the full film's scene stack in `FilmEdges`, with one painting
+per scene (the seed is film/<scene id>; the edge changes on the cut), and captions sit above it. Single-scene previews
+(`only`) stay clean (`edges = !only`). Try another level without a code change: `--props='{"edges":"paint-medium"}'`.
+Per-scene EDGE_HINTS (bare corners only where the scene has drawing, keep rects for actors) still need generating
+with review/edges/loose/final/tools/scan_hints.py once the scenes are final (docs/INTEGRATION_TODO.md).

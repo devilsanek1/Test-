@@ -22,7 +22,8 @@ import {BlueprintStreet, BLUEPRINT, blueprintAnchors, PopUp, SideId, BlueprintId
 import {LabelTag, Sticker, SunPie} from './shared/props';
 import {beats, Beats, local, S03_START, W} from './scene03/beats';
 import {camAt, camMat} from './scene03/camera';
-import {CountPing, FarPlain, Footprints, PressScreen, RoofSign, SideScreens, VentPuffs} from './scene03/plan';
+import {CountPing, FarPlain, Footprints, PressScreen, RoofSign, SheetFrame, SideOverlays, SideRows, VentPuffs} from './scene03/plan';
+import {StampS03} from './scene03/stamp';
 import {BitOnSign, NearWalkers, PipS03, StreetLife} from './scene03/cast';
 
 // ---------------------------------------------------------------- labels (final_script section 6)
@@ -43,11 +44,13 @@ function tables(b: Beats) {
   const popAt = {} as Record<SideId, number>;
   // the nine side buildings: near -> far, alternating sides, 0.035 s apart, the first right after the press house
   SIDE_ORDER.forEach((id, i) => (popAt[id] = +(b.popUp + 0.04 + i * 0.035).toFixed(4)));
+  // count badges over the side doors (scene-owned, 30-44 px): the 6 PHP sites tick on with the count (P is already on
+  // the press house: it re-pulses with a ping instead), the 3 blank plates pop on 'ten'
   const plaqueAt: Partial<Record<BlueprintId, number>> = {};
   const countAt = {} as Record<BlueprintId, number>;
   COUNT.forEach((id, i) => (countAt[id] = +(b.count + i * 0.08).toFixed(4)));
   COUNT.forEach((id) => {
-    if (id !== 'P') plaqueAt[id] = countAt[id]; // P is already on the press house: it re-pulses (a ping) instead
+    if (id !== 'P') plaqueAt[id] = countAt[id];
   });
   BLANK.forEach((id, i) => (plaqueAt[id] = +(b.ten + i * 0.05).toFixed(4)));
   // screens: dark until their beat; the 3 non-PHP sites light with their blank plates ('ten'), the 7 PHP sites in a
@@ -74,16 +77,37 @@ const Scene03: React.FC = () => {
   // the sun: SCREEN space (690, 700) r110, pinned (no idle drift: it is S04's match object), the 7/10 pie, then the
   // low glide-hop: take-off at end(it), mid-air at (810, 680) on the cut, touch-down on 'This' at (930, 690)
   const sunHopAir = local(W.this, start) - b.sunHop; // end(it) -> 'This': 0.45 s, its midpoint is the cut
+  // the pie: the three cream slices are three single-slice SunPies (the prop staggers its solid shrink 0.03 s per
+  // slice; one slice each = no stagger), so the pie COMPLETES on 'ten' (slices from ten-0.05, 0.03 apart: whole by
+  // ~12.70) and goes back to solid as ONE pop that is clean before 'it.' (all three shrink 13.705 -> 13.825, the spokes
+  // retract 13.675 -> 13.825): the disc is solid one frame before the word and before the take-off's anticipation
+  // squash (13.845)
+  const SLICES = [7, 8, 9];
+  const pie = (r: number) => (
+    <>
+      {SLICES.map((i, j) => (
+        <SunPie key={i} r={r} n={10} cream={[i]} spokesAt={1e6} slicesAt={b.ten - 0.05 + j * 0.03} solidAt={b.solid - 0.15} seed={`s03/pie${i}`} />
+      ))}
+      <SunPie r={r} n={10} cream={0} spokesAt={b.spokes} spokesOutAt={b.solid - 0.18} seed="s03/pie" />
+    </>
+  );
   const sun = (
     <XG m={mat.inv(M)}>
       <Sun cx={690} cy={700} r={110} drift={[0, 0]} hops={[{t: b.sunHop, to: [930, 690], h: 15, air: sunHopAir}]}>
-        {(r: number) => <SunPie r={r} n={10} cream={3} spokesAt={b.spokes} slicesAt={b.ten} sliceStagger={0.05} solidAt={b.solid} spokesOutAt={b.solid + 0.03} seed="s03/pie" />}
+        {pie}
       </Sun>
     </XG>
   );
 
   // layers injected into the set (each at its own depth)
   const wrap: LayerWrap = (name, _n, node) => {
+    // the roof-vent sheets fly BEHIND the sun (the vent sits at the disc's lower-left edge) and up-left, away from it
+    if (name === 'sun') return (
+      <>
+        <VentPuffs times={[b.pipSettle, b.swing]} />
+        {node}
+      </>
+    );
     if (name === 'far') return (
       <>
         <FarPlain gridAt={b.grid} />
@@ -94,45 +118,41 @@ const Scene03: React.FC = () => {
     if (name === 'ground') return (
       <>
         {node}
+        <SheetFrame />
         <Footprints />
+        <StampS03 slamAt={b.stamp} />
       </>
     );
     if (name === 'press') return (
       <>
-        {/* the set's own pen-nib sign hangs right of the press house, where R4 hides it once R4 is up: keep it out of the
-            frame while R4 pops (S03 hangs a visible sign on the roof instead, RoofSign) */}
-        {t < T.popAt.R4 + 0.2 ? <g clipPath="url(#s03pressClip)">{node}</g> : node}
-        <defs>
-          <clipPath id="s03pressClip" clipPathUnits="userSpaceOnUse">
-            <path clipRule="evenodd" d="M-500 -500H1600V2500H-500Z M768 600H900V1180H768Z" />
-          </clipPath>
-        </defs>
+        {node}
         <PopUp at={T.pressAt} x={560} y={BLUEPRINT.press.base}>
           <PressScreen lightAt={b.pressScreen} pulseAt={b.websites} />
           <Sticker x={648} y={1040} w={124} seed="s03/sticker" />
-          <CountPing x={anchors.P.plaque.x} y={anchors.P.plaque.y} r={34} at={T.countAt.P} />
+          <CountPing x={anchors.P.plaque.x} y={anchors.P.plaque.y} r={36} at={T.countAt.P} />
           <RoofSign swingAt={b.swing} />
           <BitOnSign swingAt={b.swing} twitchAt={b.doorway} />
-          <VentPuffs times={[b.pipSettle, b.swing, b.run]} />
         </PopUp>
       </>
     );
-    if (name === 'sides') return (
-      <>
-        {/* the set's bleed slivers (beyond the frame edges) stand from frame 0: keep their ink overshoot out of the
-            frame until the near buildings pop up over them */}
-        {t < T.popAt.L1 ? <g clipPath="url(#s03sidesClip)">{node}</g> : node}
-        <defs>
-          <clipPath id="s03sidesClip" clipPathUnits="userSpaceOnUse">
-            <rect x={2} y={-2000} width={1076} height={6000} />
-          </clipPath>
-        </defs>
-        <SideScreens popAt={T.popAt} lightAt={T.lightAt} />
-        {(['L1', 'R1', 'L2', 'R2', 'L4', 'R3'] as SideId[]).map((id) => (
-          <CountPing key={id} x={anchors[id].plaque.x} y={anchors[id].plaque.y} r={Math.max(14, anchors[id].plaque.size * 1.4)} at={T.countAt[id]} width={2.6} />
-        ))}
-      </>
-    );
+    if (name === 'sides') {
+      // S03 draws the set's two side rows itself (same layout, seeds, pop-ups and ink; re-coloured, no tiny plaques,
+      // no PHP lock on the 3 non-PHP doors), plus the per-building overlays (screens, pages, awnings, count badges)
+      const rows = <SideRows popAt={T.popAt} />;
+      return (
+        <>
+          {/* the bleed slivers (beyond the frame edges) stand from frame 0: keep their ink overshoot out of the frame
+              until the near buildings pop up over them */}
+          {t < T.popAt.L1 ? <g clipPath="url(#s03sidesClip)">{rows}</g> : rows}
+          <defs>
+            <clipPath id="s03sidesClip" clipPathUnits="userSpaceOnUse">
+              <rect x={2} y={-2000} width={1076} height={6000} />
+            </clipPath>
+          </defs>
+          <SideOverlays popAt={T.popAt} lightAt={T.lightAt} badgeAt={T.plaqueAt} />
+        </>
+      );
+    }
     if (name === 'people') return (
       <>
         <StreetLife b={b} />
@@ -149,10 +169,9 @@ const Scene03: React.FC = () => {
         <BlueprintStreet
           pressAt={T.pressAt}
           popAt={T.popAt}
-          plaqueAt={T.plaqueAt}
           gridAt={b.grid}
-          stampAt={b.stamp}
-          signSwingAt={b.swing}
+          stampAt={false}
+          sign={false}
           people={false}
           titleBlock={(box) => <LabelTag kind="card" box={box} text={L3} fontSize={38 / 1.04} at={b.L3} flipTo={{at: b.flip, text: L4, fontSize: 36 / 1.04}} seed="s03/card" />}
           sun={sun}

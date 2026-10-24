@@ -72,7 +72,7 @@ def grid(rows=ROWS, out='paint_sheet.png', ui=False):
             x = lab + gap + j * (w + gap)
             d.rounded_rectangle((x - 9, y - 9, x + w + 9, y + h + 9), radius=14, fill=BEZEL)
             S.paste(im, (x, y))
-    d.text((18, H - 34), 'Full frames, 1080x1920 at 0.4 on a dark phone bezel. Captions render above the treatment. Seed "film", amount 1 (the preset); each shot with its EDGE_HINTS (line-art density, keep rects).' + (' Phone app UI drawn on top.' if ui else ''), fill=MUTED, font=font(17))
+    d.text((18, H - 34), ('Phone app UI drawn on top (status bar + header 180 px, description 400 px, action rail). ' if ui else '') + 'Seed "film", amount 1; each shot with its EDGE_HINTS (line-art density, keep rects).', fill=MUTED, font=font(17))
     p = os.path.join(OUT, out)
     S.save(p)
     print(p, S.size)

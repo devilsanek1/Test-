@@ -46,19 +46,18 @@ export const NoteBreeze: React.FC<{
 // ---------------------------------------------------------------- NoteFlight
 
 /** Carries `children` (the note drawn at its rest centre (x, y), already stuck on) along a breeze arc from `from` to the
- *  rest centre, arriving at `arriveAt` (the slap). Near-linear speed (no ease-out spike), a lift arc, a tumble (scaleX
- *  through edge-on and back) and a spin that settles to 0. Nothing before `arriveAt - dur`, nothing after `arriveAt`
+ *  rest centre, arriving at `arriveAt` (the slap). Linear speed (no ease-out spike), a lift arc, one slow tumble (scaleX
+ *  1 -> 0.55 -> 1) and a spin that settles to 0. Nothing before `arriveAt - dur`, nothing after `arriveAt`
  *  (the slapping note takes over). */
-export const NoteFlight: React.FC<{x: number; y: number; from: Pt; arriveAt: number; dur: number; lift?: number; spin?: number; children?: React.ReactNode}> = ({x, y, from, arriveAt, dur, lift = 34, spin = 50, children}) => {
+export const NoteFlight: React.FC<{x: number; y: number; from: Pt; arriveAt: number; dur: number; lift?: number; spin?: number; children?: React.ReactNode}> = ({x, y, from, arriveAt, dur, lift = 24, spin = 32, children}) => {
   const t = useTime();
   if (t < arriveAt - dur || t >= arriveAt) return null;
   const q = (t - (arriveAt - dur)) / dur;
-  // 75 % linear + 25 % in-out: even on-screen speed, a hint of float at the start
-  const e = 0.75 * q + 0.25 * E.inOutSine(q);
-  const px = from[0] + (x - from[0]) * e;
-  const py = from[1] + (y - from[1]) * e - Math.sin(q * Math.PI) * lift + Math.sin(q * Math.PI * 2.4) * 6 * (1 - q);
-  const a = spin * (1 - q) * Math.cos(q * Math.PI * 1.3);
-  const sx = 0.32 + 0.68 * Math.abs(Math.cos(q * Math.PI * 1.5));
+  // linear: an even on-screen speed (the peak IS the average), a lift arc, one slow tumble (scaleX 1 -> 0.75 -> 1)
+  const px = from[0] + (x - from[0]) * q;
+  const py = from[1] + (y - from[1]) * q - Math.sin(q * Math.PI) * lift;
+  const a = spin * (1 - q) * Math.cos(q * Math.PI * 1.2);
+  const sx = 0.75 + 0.25 * Math.abs(Math.cos(q * Math.PI));
   return <XG m={mat.compose(mat.translate(px, py), mat.rotate(a), mat.scale(sx, 0.92 + 0.08 * q), mat.translate(-x, -y))}>{children}</XG>;
 };
 

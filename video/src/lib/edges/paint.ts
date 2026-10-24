@@ -1001,14 +1001,14 @@ function fillHoles(polys: Pt[][]): Pt[][] {
  *  a step): it shows on one stretch and ends once. */
 function bridgeInk(colour: Pt[][], ink: Pt[][], gap: number): Pt[][] {
   const out: Pt[][] = [];
-  const hh = 1.6;
+  const hh = 1.15;
   for (let s = 0; s < 4; s++) {
     const vertical = s === 1 || s === 3;
     const len = vertical ? H : W;
     type G = {rows: [number, number, number][]};
     let open: G[] = [];
     const done: G[] = [];
-    for (let dd = 2; dd <= 360; dd += 3) {
+    for (let dd = 2; dd <= 360; dd += 2) {
       const c = s === 0 ? dd : s === 1 ? W - dd : s === 2 ? H - dd : dd;
       const col = scanSpans(colour, c, vertical);
       const cov = scanSpans(ink, c, vertical);
@@ -1031,7 +1031,7 @@ function bridgeInk(colour: Pt[][], ink: Pt[][], gap: number): Pt[][] {
       for (const g of gaps) {
         const grp = open.find((o) => {
           const l = o.rows[o.rows.length - 1];
-          return l[0] === c - (s === 1 || s === 2 ? -3 : 3) && l[1] < g[1] && g[0] < l[2] && !next.includes(o);
+          return l[0] === c - (s === 1 || s === 2 ? -2 : 2) && l[1] < g[1] && g[0] < l[2] && !next.includes(o);
         });
         if (grp) {
           grp.rows.push([c, g[0], g[1]]);

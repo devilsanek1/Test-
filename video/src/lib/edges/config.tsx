@@ -14,8 +14,9 @@ import {EDGE_HINTS} from './hints';
 
 export type EdgeConfig = Omit<EdgeTreatmentProps, 'children'>;
 
-/** House default for the film. 'clean' until the user picks one (docs/EDGES.md: 'trim', 'panel' or a 'paint-*' preset). */
-export const FILM_EDGES: EdgeConfig = {variant: 'clean', seed: 'film', amount: 1};
+/** House default for the film: 'paint-subtle', the user's pick (docs/BRIEF.md, EDGE TREATMENT). Film applies it to the full
+ *  film only; single-scene previews stay 'clean'. Override per render with --props='{"edges":"paint-medium"}'. */
+export const FILM_EDGES: EdgeConfig = {variant: 'paint-subtle', seed: 'film', amount: 1};
 
 const EdgeCtx = createContext<EdgeConfig | null>(null);
 export const EdgeProvider: React.FC<{value: EdgeConfig; children?: React.ReactNode}> = ({value, children}) => <EdgeCtx.Provider value={value}>{children}</EdgeCtx.Provider>;

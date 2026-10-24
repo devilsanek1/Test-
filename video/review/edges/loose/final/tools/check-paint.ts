@@ -23,6 +23,7 @@ const W = 1080;
 const H = 1920;
 const [cx0, cy0, cx1, cy1] = CAPTION_SAFE;
 const WHERE = process.argv.includes('--where');
+const QUICK = process.argv.includes('--quick'); // amount 1, 10 seeds
 
 /** Covered intervals of the union along a scanline (horizontal: y = c, vertical: x = c). */
 function spans(polys: Pt[][], c: number, vertical: boolean): [number, number][] {
@@ -61,12 +62,12 @@ const fail = (m: string) => {
 };
 const variants: EdgeVariant[] = ['paint-subtle', 'paint-medium', 'paint-loose'];
 const scenes: [string, EdgeHints | undefined][] = [['no hints', undefined], ...(['street', 'monument', 'vista'].map((s) => [s, EDGE_HINTS[`edgelab/${s}`]]) as [string, EdgeHints][])];
-type St = {paper: number[]; vis: number[]; L: number[]; R: number[]; T: number[]; B: number[]; bare: number[]; inkKB: number[]; jogs: number; dashes: number; dashLines: number; holes: number; hair: number};
+type St = {gapHist: number[]; paper: number[]; vis: number[]; L: number[]; R: number[]; T: number[]; B: number[]; bare: number[]; inkKB: number[]; jogs: number; dashes: number; dashLines: number; holes: number; hair: number};
 const stats: Record<string, St> = {};
 for (const v of variants) {
-  for (const amount of [0.6, 0.8, 1, 1.2, 1.4]) {
+  for (const amount of QUICK ? [1] : [0.6, 0.8, 1, 1.2, 1.4]) {
     for (const [sceneName, hints] of scenes) {
-      for (let s = 0; s < 40; s++) {
+      for (let s = 0; s < (QUICK ? 10 : 40); s++) {
         const seed = s === 0 ? 'film' : `scene-${String(s).padStart(2, '0')}`;
         const spec = edgeSpec(v, seed, amount, {hints});
         const polys = spec.colourPolys!;
@@ -198,6 +199,7 @@ for (const v of variants) {
               for (let i = 1; i < cov.length; i++) {
                 const gap = cov[i][0] - cov[i - 1][1];
                 if (gap > 1 && gap < 60) {
+                  (stats[v] ??= {gapHist: [0, 0, 0, 0], paper: [], vis: [], L: [], R: [], T: [], B: [], bare: [], inkKB: [], jogs: 0, dashes: 0, dashLines: 0, holes: 0, hair: 0}).gapHist[gap < 4 ? 0 : gap < 12 ? 1 : gap < 30 ? 2 : 3]++;
                   dashes++;
                   lineDash = true;
                   if (WHERE && amount === 1 && s < 2 && dashes <= 6) console.log(`  dash ${v} ${seed} [${sceneName}] side ${side} depth ${dd}: gap ${cov[i - 1][1].toFixed(0)}-${cov[i][0].toFixed(0)}`);
@@ -208,7 +210,7 @@ for (const v of variants) {
           }
         }
         const key = v;
-        const st = (stats[key] ??= {paper: [], vis: [], L: [], R: [], T: [], B: [], bare: [], inkKB: [], jogs: 0, dashes: 0, dashLines: 0, holes: 0, hair: 0});
+        const st = (stats[key] ??= {gapHist: [0, 0, 0, 0], paper: [], vis: [], L: [], R: [], T: [], B: [], bare: [], inkKB: [], jogs: 0, dashes: 0, dashLines: 0, holes: 0, hair: 0});
         st.jogs += jogs;
         st.dashes += dashes;
         st.dashLines += dashLines;
@@ -236,6 +238,6 @@ console.log(`${n} paint edges checked (3 presets x 5 amounts x 4 scenes (3 lab s
 const r = (v: number[]) => `${pct(v, 0.05).toFixed(0)} / ${pct(v, 0.5).toFixed(0)} / ${pct(v, 0.95).toFixed(0)}`;
 console.log('preset @ amount 1 (4 scenes x 40 seeds): p5 / median / p95; jogs / dashes over all amounts');
 for (const [k, s] of Object.entries(stats)) {
-  console.log(`${k}: paper ${r(s.paper)} % of the frame (${r(s.vis)} % of y 180-1520); depth left ${r(s.L)}, right ${r(s.R)} (y 200-1500), top ${r(s.T)}, bottom ${r(s.B)} px; bare corners ${r(s.bare)}; ink clip ${r(s.inkKB)} KB; jogs 6-24 px ${s.jogs} (${(s.jogs / 200).toFixed(2)} per edge); dash gaps < 60 px ${s.dashes} (on ${s.dashLines} scanlines); edges with holes ${s.holes}, with hairlines ${s.hair}`);
+  console.log(`${k}: paper ${r(s.paper)} % of the frame (${r(s.vis)} % of y 180-1520); depth left ${r(s.L)}, right ${r(s.R)} (y 200-1500), top ${r(s.T)}, bottom ${r(s.B)} px; bare corners ${r(s.bare)}; ink clip ${r(s.inkKB)} KB; jogs 6-24 px ${s.jogs} (${(s.jogs / (QUICK ? 40 : 800)).toFixed(2)} per edge); ink gaps < 60 px on lines parallel to an edge ${s.dashes} (${(s.dashes / (QUICK ? 40 : 800)).toFixed(2)} per edge; by width 1-4 / 4-12 / 12-30 / 30-60 px: ${s.gapHist.join(' / ')}); edges with holes ${s.holes}, with hairlines ${s.hair}`);
 }
 process.exit(fails ? 1 : 0);
