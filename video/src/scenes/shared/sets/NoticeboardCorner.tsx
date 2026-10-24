@@ -122,10 +122,13 @@ export type NoticeboardCornerProps = {
   x?: number;
   y?: number;
   scale?: number;
+  /** Un-build just this set from here (s), over outDur (default 0.5). */
+  outAt?: number;
+  outDur?: number;
   seed?: string;
 };
 
-export const NoticeboardCorner: React.FC<NoticeboardCornerProps> = ({sun, board = {}, workshop, readers = true, pigeons = true, pigeonsFlyAt, band = true, wrap = noWrap, x = 0, y = 0, scale = 1, seed = 'nc'}) => {
+export const NoticeboardCorner: React.FC<NoticeboardCornerProps> = ({sun, board = {}, workshop, readers = true, pigeons = true, pigeonsFlyAt, band = true, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'nc'}) => {
   useTime();
   const W = NOTICE_CORNER.wall;
   const B = NOTICE_CORNER.board;
@@ -157,7 +160,7 @@ export const NoticeboardCorner: React.FC<NoticeboardCornerProps> = ({sun, board 
   const boardNode = board === false ? null : <NoticeboardSlot x={B.frame[0]} y={B.frame[1]} w={B.frame[2]} h={B.frame[3]} legsY={B.legsY} rail={B.rail} seed={`${seed}/board`} {...board} />;
   const rd = readers === false ? null : NOTICE_CORNER.readers.map((r, i) => <OnlookerSlot key={i} x={r.head[0]} y={r.head[1]} head={82} hair={r.hair} body={r.body} acc={r.acc} riseAt={typeof readers === 'object' && readers.riseAt !== undefined ? readers.riseAt + i * 0.06 : undefined} raisePhoneAt={typeof readers === 'object' && readers.phonesAt !== undefined ? readers.phonesAt + i * 0.1 : undefined} rim={i < 2 ? 'left' : 'right'} seed={`${seed}/rd${i}`} />);
   return (
-    <SetPlace x={x} y={y} scale={scale}>
+    <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
       {wrap('far', 0.05, far)}
       {sun ? wrap('sun', 0.1, sun) : null}
       {wrap('roofs', 0.2, roofs)}

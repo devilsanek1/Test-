@@ -79,8 +79,14 @@ type BGeo = {
   band: string;
   rim: string;
   awning: string;
+  /** roof TOP faces (we look down on roofs below the horizon), drawn before the facades */
+  tops: string;
+  /** small fills on inked rows: plants on sills, balcony slabs */
+  extras: string;
   ink: string;
   inkThin: string;
+  /** stroke width class of this building's hand (0.85 / 1 / 1.18 x) */
+  wc: number;
   /** cells [c0, c1) of the row's window list */
   c0: number;
   c1: number;
@@ -90,7 +96,10 @@ type BGeo = {
 
 type RowGeo = {blds: BGeo[]; mass: string; cells: WinCell[]; cellB: Int32Array; all: Batch};
 
-type Batch = {fills: Map<number, string>; roofs: Map<number, string>; shades: Map<number, string>; bands: Map<number, string>; rim: string; awning: string; ink: string; inkThin: string; outline: string};
+type Batch = {fills: Map<number, string>; roofs: Map<number, string>; shades: Map<number, string>; bands: Map<number, string>; rim: string; awning: string; tops: string; extras: string; ink: string[]; inkThin: string[]; outline: string};
+
+/** Stroke width multipliers of the three hands a row's buildings are drawn with. */
+const WCLASS = [0.85, 1, 1.18];
 
 export type RowParams = {
   base: number;
@@ -117,9 +126,19 @@ export type RowParams = {
   frames?: boolean;
   /** Shop fronts / awnings on the ground floor. Default: rows with s >= 0.7. */
   shops?: boolean;
+  /** Vanishing point of the view (x, horizon y): roofs whose top edge is BELOW the horizon get their top face (a thin
+   *  parallelogram toward the VP: we look down on them). Omit = no roof faces. */
+  vp?: Pt;
+  /** Rim on the roof edges too (backlight: the sun-facing back edge of each roof). */
+  rimTop?: boolean;
+  /** Window variety (skipped cells, sill plants, a balcony band per building). Default: inked rows with s >= 0.42. */
+  variety?: boolean;
 };
 
-export type Landmark = {x: number; w: number; h: number; kind?: Kind; ci?: number};
+/** A landmark replacing whatever stood in its footprint. kind 'colossal': a stepped, finned super-tower with a spire;
+ *  `quietAbove` (world y) drops its windows above that line (it can rise through the caption band as a flat field);
+ *  `color` overrides its paint (e.g. one atmospheric step from the sky, fill-only). */
+export type Landmark = {x: number; w: number; h: number; kind?: Kind | 'colossal'; ci?: number; color?: string; quietAbove?: number};
 
 function rowGeo(p: RowParams): RowGeo {
   const key = JSON.stringify(p);
@@ -134,7 +153,7 @@ const WTYPES: [number, number][] = [
   [0.74, 0.44], // wide / ribbon
 ];
 
-type Proto = {x: number; w: number; h: number; kind: Kind; tower: boolean; ci: number; roofCi: number};
+type Proto = {x: number; w: number; h: number; kind: Kind | 'colossal'; tower: boolean; ci: number; roofCi: number; lm?: Landmark; setback?: boolean};
 
 function buildRow(p: RowParams): RowGeo {
   const {base, s, x0, x1} = p;
@@ -153,7 +172,9 @@ function buildRow(p: RowParams): RowGeo {
     const kind: Kind = tower ? r.pick<Kind>(['tower', 'spire', 'step', 'dome']) : r.weighted<Kind>([['flat', 5], ['step', 1.4], ['gable', 1.6], ['dome', 0.5], ['spire', 0.3]]);
     let h = r.range(h0, h1) * s * (tower ? r.range(1.8, 2.8) : 1);
     if (kind === 'gable') h *= 0.75;
-    protos.push({x, w, h, kind, tower, ci: r.int(0, nC - 1), roofCi: r.int(0, nC - 1)});
+    // ~30 % of the flat mid / near buildings get a setback upper storey (irregular silhouettes, not boxes)
+    const setback = kind === 'flat' && s >= 0.12 && r.chance(0.32);
+    protos.push({x, w, h, kind, tower, ci: r.int(0, nC - 1), roofCi: r.int(0, nC - 1), setback});
     x += w + r.range(-2, 14) * s;
   }
   // colossal landmarks replace whatever stood in their footprint
@@ -161,7 +182,7 @@ function buildRow(p: RowParams): RowGeo {
     const lw = lm.w * s;
     const lx = lm.x - lw / 2;
     for (let i = protos.length - 1; i >= 0; i--) if (protos[i].x < lx + lw && protos[i].x + protos[i].w > lx) protos.splice(i, 1);
-    protos.push({x: lx, w: lw, h: lm.h * s, kind: lm.kind ?? 'step', tower: true, ci: lm.ci ?? 0, roofCi: lm.ci ?? 0});
+    protos.push({x: lx, w: lw, h: lm.h * s, kind: lm.kind ?? 'step', tower: true, ci: lm.ci ?? 0, roofCi: lm.ci ?? 0, lm});
   }
   protos.sort((a, b) => a.x - b.x);
 
@@ -182,19 +203,37 @@ function buildRow(p: RowParams): RowGeo {
     const BA = new PathBuf();
     const RIM = new PathBuf();
     const AW = new PathBuf();
+    const TOP = new PathBuf();
+    const EX = new PathBuf();
     const INK = new PathBuf();
     const THIN = new PathBuf();
+    const wc = br.int(0, 2);
     const tiers: [number, number, number, number][] = [];
     const top = base - b.h;
     let roof: Pt[] | null = null;
     const ww = b.kind === 'tower' || b.kind === 'spire' ? b.w * 0.72 : b.w;
     const bx = b.x + (b.w - ww) / 2;
-    if (b.kind === 'step') {
+    if (b.kind === 'colossal') {
+      // a super-tower: wide podium, a long shaft, two setbacks, a crown and a needle (added below as the roof)
+      const hP = b.h * 0.12;
+      const hS = b.h * 0.56;
+      const hT = b.h * 0.2;
+      tiers.push([bx, base - hP, ww, hP]);
+      tiers.push([bx + ww * 0.1, base - hP - hS, ww * 0.8, hS]);
+      tiers.push([bx + ww * 0.22, base - hP - hS - hT, ww * 0.56, hT]);
+      tiers.push([bx + ww * 0.33, top + b.h * 0.0, ww * 0.34, b.h - hP - hS - hT]);
+    } else if (b.kind === 'step') {
       const hA = b.h * br.range(0.55, 0.68);
       const hB = b.h * br.range(0.2, 0.28);
       tiers.push([bx, base - hA, ww, hA]);
       tiers.push([bx + ww * 0.14, base - hA - hB, ww * 0.72, hB]);
       tiers.push([bx + ww * 0.3, top, ww * 0.4, b.h - hA - hB]);
+    } else if (b.setback) {
+      const hA = b.h * br.range(0.66, 0.82);
+      const inset = br.range(0.14, 0.26);
+      const left = br.chance(0.5);
+      tiers.push([bx, base - hA, ww, hA]);
+      tiers.push([bx + ww * (left ? 0 : inset), top, ww * (1 - inset), b.h - hA]);
     } else tiers.push([bx, top, ww, b.h]);
     const T = tiers[tiers.length - 1];
     const [tx, ty, tw] = T;
@@ -216,6 +255,15 @@ function buildRow(p: RowParams): RowGeo {
       }
       pts.splice(7, 0, [cx - rx * 0.12, ty - ry * 0.98], [cx - rx * 0.12, ty - ry * 1.25], [cx, ty - ry * 1.7], [cx + rx * 0.12, ty - ry * 1.25], [cx + rx * 0.12, ty - ry * 0.98]);
       roof = pts;
+    } else if (b.kind === 'colossal') {
+      const sh = tw * 1.6;
+      roof = [
+        [tx + tw * 0.38, ty],
+        [tx + tw * 0.47, ty - sh * 0.55],
+        [tx + tw * 0.5, ty - sh],
+        [tx + tw * 0.53, ty - sh * 0.55],
+        [tx + tw * 0.62, ty],
+      ];
     } else if (b.kind === 'spire' || b.kind === 'tower') {
       const sh = tw * (b.kind === 'spire' ? br.range(1.2, 2.0) : br.range(0.25, 0.5));
       roof =
@@ -237,6 +285,20 @@ function buildRow(p: RowParams): RowGeo {
     const sd = `${p.seed}/${bi}`;
     // ---- fills (misregistered)
     for (const [qx, qy, qw, qh] of tiers) {
+      // the roof's top face: below the horizon we look DOWN on it (a thin parallelogram converging on the VP)
+      if (p.vp && qy > p.vp[1] + 2) {
+        const kd = 0.16 * Math.min(1, (qy - p.vp[1]) / 60);
+        const bl: Pt = [qx + (p.vp[0] - qx) * kd, qy + (p.vp[1] - qy) * kd];
+        const brr: Pt = [qx + qw + (p.vp[0] - qx - qw) * kd, qy + (p.vp[1] - qy) * kd];
+        TOP.poly([
+          [qx + ox, qy + oy + 1],
+          [qx + qw + ox, qy + oy + 1],
+          [brr[0] + ox, brr[1] + oy],
+          [bl[0] + ox, bl[1] + oy],
+        ]);
+        if (inkW) THIN.raw(line(bl[0], bl[1], brr[0], brr[1], {seed: `${p.seed}/${bi}/tf${Math.round(qy)}`, over: [1, 3 + 3 * s], breaks: false}));
+        if (p.rimTop) RIM.poly([bl, brr, [brr[0], brr[1] + Math.max(1.2, 3.5 * s)], [bl[0], bl[1] + Math.max(1.2, 3.5 * s)]]);
+      } else if (p.rimTop) RIM.rect(qx + ox, qy + oy, qw, Math.max(1.2, 3.5 * s));
       F.rect(qx + ox, qy + oy, qw, qh + 2);
       if (p.rimSide !== 'left') SH.rect(qx + ox, qy + oy, qw * 0.18, qh + 2);
       else SH.rect(qx + ox + qw * 0.82, qy + oy, qw * 0.18, qh + 2);
@@ -282,6 +344,9 @@ function buildRow(p: RowParams): RowGeo {
     const bandEvery = br.pick([3, 4, 4, 5]);
     const pairs = br.chance(0.3);
     const frameO = s * br.range(3, 8);
+    const variety = p.variety ?? (inkW > 0 && s >= 0.42);
+    const balconyRow = variety && br.chance(0.45) ? br.int(1, 4) : -1;
+    const quietY = b.lm?.quietAbove;
     tiers.forEach(([qx, qy, qw, qh], ti) => {
       const m = 9 * s * cellK;
       const cols = Math.floor((qw - 2 * m) / cw);
@@ -299,12 +364,30 @@ function buildRow(p: RowParams): RowGeo {
           continue;
         }
         const [fw, fh] = isGround ? [0.82, 0.62] : WTYPES[ri % 5 === 4 ? tB : tA];
+        if (quietY !== undefined && wy0 < quietY) continue;
+        if (ri === balconyRow && !isGround && ti === 0) {
+          // one balcony band: a slab with a railing (ink ticks) across the facade
+          const by = wy0 + ch * fh * 0.9;
+          EX.rect(qx + ox - 3 * s, by + oy, qw + 6 * s, Math.max(1.5, 4 * s));
+          if (inkW) {
+            THIN.raw(line(qx - 5 * s, by, qx + qw + 5 * s, by, {seed: `${sd}bal`, over: [2, 4], breaks: false}) + line(qx - 3 * s, by - ch * 0.32, qx + qw + 3 * s, by - ch * 0.32, {seed: `${sd}bal2`, over: [1, 3], breaks: false}));
+            for (let rx = qx + 6 * s; rx < qx + qw - 4 * s; rx += 7 * s) THIN.raw(`M${r1(rx)} ${r1(by)}L${r1(rx)} ${r1(by - ch * 0.32)}`);
+          }
+        }
         for (let c = 0; c < cols; c++) {
           if (pairs && !isGround && c % 3 === 2) continue;
+          // variety: some cells stay wall
+          if (variety && !isGround && wr.next() < 0.1) continue;
           const wx = ox2 + c * cw + (cw * (1 - fw)) / 2;
           const wy = wy0 + (isGround ? ch * 0.3 : 0);
           const w = cw * fw;
           const h = ch * fh;
+          if (variety && !isGround && wr.next() < 0.08) {
+            // a plant on the sill (a little crown blob over the window's bottom edge)
+            const pr = w * 0.3;
+            EX.circle(wx + w * 0.7 + ox, wy + h - pr * 0.4 + oy, pr);
+            EX.circle(wx + w * 0.5 + ox, wy + h - pr * 0.2 + oy, pr * 0.75);
+          }
           cells.push({u: wx / 1080, v: wy / 1920, k: wr.next(), k2: wr.next(), k3: wr.next(), rect: [wx, wy, w, h]});
           cellB.push(bi);
           if (frames) {
@@ -329,12 +412,27 @@ function buildRow(p: RowParams): RowGeo {
     });
     // ---- ink: sides overshooting the roof, roof lines
     if (inkW) {
+      // the hand: endpoints jittered +-(0.6-1.2 % of the length), verticals drift 0.5-1.4 deg, ~15 % of the long
+      // verticals broken into two strokes
+      const hj = (len: number) => br.sign() * len * br.range(0.006, 0.012);
+      const vert = (x: number, y0: number, y1: number, key: string, over: [number, number]) => {
+        const len = Math.abs(y1 - y0);
+        const xa = x + hj(len);
+        const xb = x + hj(len);
+        if (len > 90 && br.chance(0.15)) {
+          const k = br.range(0.35, 0.65);
+          const g = br.range(5, 11) * Math.max(0.5, s);
+          const ym = y0 + (y1 - y0) * k;
+          return line(xa, y0, xa + (xb - xa) * k, ym + g / 2, {seed: `${key}a`, over: [over[0], 0], breaks: false, drift: br.range(1.2, 3.5)}) + line(xa + (xb - xa) * k, ym - g / 2, xb, y1, {seed: `${key}b`, over: [0, over[1]], breaks: false, drift: br.range(1.2, 3.5)});
+        }
+        return line(xa, y0, xb, y1, {seed: key, over, breaks: false, drift: br.range(1.2, 3.5)});
+      };
       for (let i = 0; i < tiers.length; i++) {
         const [qx, qy, qw, qh] = tiers[i];
         const bot = qy + qh;
-        INK.raw(line(qx, bot, qx, qy, {seed: `${sd}l${i}`, over: [0, 6 + 10 * s], breaks: false}));
-        INK.raw(line(qx + qw, bot, qx + qw, qy, {seed: `${sd}r${i}`, over: [0, 4 + 8 * s], breaks: false}));
-        INK.raw(line(qx, qy, qx + qw, qy, {seed: `${sd}t${i}`, over: [4 * s + 2, 8 * s + 4], breaks: false}));
+        INK.raw(vert(qx, bot, qy, `${sd}l${i}`, [0, 6 + 10 * s]));
+        INK.raw(vert(qx + qw, bot, qy, `${sd}r${i}`, [0, 4 + 8 * s]));
+        INK.raw(line(qx + hj(qw), qy + hj(qw), qx + qw + hj(qw), qy + hj(qw), {seed: `${sd}t${i}`, over: [4 * s + 2, 8 * s + 4], breaks: false}));
       }
       if (roof && b.kind === 'dome') INK.raw(arc(tx + tw / 2, ty, tw * 0.4, (ty - roofTop) / 1.7, 182, 358, {seed: `${sd}d`}));
       else if (roof) for (let i = 0; i < roof.length - 1; i++) INK.raw(line(roof[i][0], roof[i][1], roof[i + 1][0], roof[i + 1][1], {seed: `${sd}p${i}`, over: [0, 3 + 4 * s], breaks: false}));
@@ -352,8 +450,11 @@ function buildRow(p: RowParams): RowGeo {
       band: BA.d,
       rim: RIM.d,
       awning: AW.d,
+      tops: TOP.d,
+      extras: EX.d,
       ink: INK.d,
       inkThin: THIN.d,
+      wc,
       c0,
       c1: cells.length,
       beacon,
@@ -372,8 +473,10 @@ function batch(blds: BGeo[], idx: number[]): Batch {
   const bands = new Map<number, string[]>();
   const rim: string[] = [];
   const aw: string[] = [];
-  const ink: string[] = [];
-  const thin: string[] = [];
+  const tops: string[] = [];
+  const ex: string[] = [];
+  const ink: string[][] = [[], [], []];
+  const thin: string[][] = [[], [], []];
   const push = (m: Map<number, string[]>, k: number, d: string) => {
     if (!d) return;
     let a = m.get(k);
@@ -388,12 +491,14 @@ function batch(blds: BGeo[], idx: number[]): Batch {
     push(bands, b.ci, b.band);
     if (b.rim) rim.push(b.rim);
     if (b.awning) aw.push(b.awning);
-    if (b.ink) ink.push(b.ink);
-    if (b.inkThin) thin.push(b.inkThin);
+    if (b.tops) tops.push(b.tops);
+    if (b.extras) ex.push(b.extras);
+    if (b.ink) ink[b.wc].push(b.ink);
+    if (b.inkThin) thin[b.wc].push(b.inkThin);
   }
   const j = (m: Map<number, string[]>) => new Map([...m.entries()].map(([k, v]) => [k, v.join('')]));
   const F = j(fills);
-  return {fills: F, roofs: j(roofs), shades: j(shades), bands: j(bands), rim: rim.join(''), awning: aw.join(''), ink: ink.join(''), inkThin: thin.join(''), outline: [...F.values(), ...j(roofs).values()].join('')};
+  return {fills: F, roofs: j(roofs), shades: j(shades), bands: j(bands), rim: rim.join(''), awning: aw.join(''), tops: tops.join(''), extras: ex.join(''), ink: ink.map((a) => a.join('')), inkThin: thin.map((a) => a.join('')), outline: [...F.values(), ...j(roofs).values()].join('')};
 }
 
 // ---------------------------------------------------------------- Skyline (one row)

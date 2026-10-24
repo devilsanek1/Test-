@@ -40,6 +40,9 @@ without a World (the props lane's `SharedKitSheet` draws them in its bottom band
 - **World coordinates = canvas px at that scene's camera rest** (the storyboard numbers, 1080 x 1920). Sets author
   `world.bleed` past the frame edges for pushes, cranes and camera-continuous transitions. `x / y / scale` on a set only
   offset the whole set (thumbnails, reuse); they never change its layout.
+- **Build-out on every set:** `outAt` / `outDur` (default `MOTION.unbuild.total`) run the measured un-build (lines
+  loosen, fills shrink, slab collapses) on just that set, like every prop's `outAt`; scene-wide exits still use the
+  engine's `ExitProvider` / `UnBuild` around the whole scene. Shared base type: `SetBase` in `common.tsx`.
 - **Seconds, every event a prop.** Nothing is hard-coded: build-ins are `at` / `drawAt` / named `...At` props in scene
   seconds. Convention: a missing BUILD time = already built; a missing EVENT time = never happens.
 - **No fades.** Pop-ups (scaleY 0 -> 1.06 -> 1), 1-frame pops, wipes, draw-ons, swings. Static translucency only for light

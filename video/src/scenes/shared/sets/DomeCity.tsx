@@ -285,10 +285,13 @@ export type DomeCityProps = {
   x?: number;
   y?: number;
   scale?: number;
+  /** Un-build just this set from here (s), over outDur (default 0.5). */
+  outAt?: number;
+  outDur?: number;
   seed?: Seed;
 };
 
-export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, glassAt, footprintAt, dotsAt, duskAt, towerAt, searchAt, searchAngle, tallies = 0, guard = true, sky = skies.golden, wrap = noWrap, x = 0, y = 0, scale = 1, seed = 'dome'}) => {
+export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, glassAt, footprintAt, dotsAt, duskAt, towerAt, searchAt, searchAngle, tallies = 0, guard = true, sky = skies.golden, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'dome'}) => {
   const t = useTime();
   const clipId = 'dm' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const sd = String(seed);
@@ -375,7 +378,7 @@ export const DomeCity: React.FC<DomeCityProps> = ({sun, domeAt, domeDur = 1.1, g
     </>
   );
   return (
-    <SetPlace x={x} y={y} scale={scale}>
+    <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
       <defs>
         <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
           <path d={G.interior} />

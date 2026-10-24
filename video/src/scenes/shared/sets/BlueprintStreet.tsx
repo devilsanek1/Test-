@@ -219,10 +219,13 @@ export type BlueprintStreetProps = {
   x?: number;
   y?: number;
   scale?: number;
+  /** Un-build just this set from here (s), over outDur (default 0.5). */
+  outAt?: number;
+  outDur?: number;
   seed?: string;
 };
 
-export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pressAt, plaqueAt = {}, gridAt, stampAt, ventAt, signSwingAt, blinkAt, lock = {}, sun, wrap = noWrap, x = 0, y = 0, scale = 1, seed = 'bp'}) => {
+export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pressAt, plaqueAt = {}, gridAt, stampAt, ventAt, signSwingAt, blinkAt, lock = {}, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bp'}) => {
   const t = useTime();
   const P = BLUEPRINT.press;
   const [wx, wy, ww, wh] = BLUEPRINT.window;
@@ -278,7 +281,7 @@ export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pre
   );
 
   return (
-    <SetPlace x={x} y={y} scale={scale}>
+    <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
       {sun ? wrap('sun', 0.12, sun) : null}
       {wrap('far', 0.1, far)}
       {wrap('ground', 0.8, ground)}

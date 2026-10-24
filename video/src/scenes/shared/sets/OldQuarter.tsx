@@ -122,10 +122,13 @@ export type OldQuarterProps = {
   x?: number;
   y?: number;
   scale?: number;
+  /** Un-build just this set from here (s), over outDur (default 0.5). */
+  outAt?: number;
+  outDur?: number;
   seed?: string;
 };
 
-export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaqueSwingAt, oldPlaque = {}, secondPlaques = true, board = false, audience = false, bollard = true, band = true, site = {}, wrap = noWrap, x = 0, y = 0, scale = 1, seed = 'oq'}) => {
+export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaqueSwingAt, oldPlaque = {}, secondPlaques = true, board = false, audience = false, bollard = true, band = true, site = {}, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'oq'}) => {
   const t = useTime();
   const S = OLD_QUARTER.sites;
   const far = (
@@ -204,7 +207,7 @@ export const OldQuarter: React.FC<OldQuarterProps> = ({sun, sitePopAt = [], plaq
       ? null
       : OLD_QUARTER.audience.map((a, i) => <OnlookerSlot key={i} x={a.head[0]} y={a.head[1]} head={84} hair={a.hair} body={a.body} acc={a.acc} riseAt={typeof audience === 'object' && audience.riseAt !== undefined ? audience.riseAt + i * 0.06 : undefined} rim={i < 2 ? 'left' : 'right'} seed={`${seed}/aud${i}`} />);
   return (
-    <SetPlace x={x} y={y} scale={scale}>
+    <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
       {wrap('far', 0.05, far)}
       {sun ? wrap('sun', 0.1, sun) : null}
       {wrap('second', 0.3, second)}

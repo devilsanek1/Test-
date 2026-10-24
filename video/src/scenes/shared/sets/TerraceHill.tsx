@@ -240,10 +240,13 @@ export type TerraceHillProps = {
   x?: number;
   y?: number;
   scale?: number;
+  /** Un-build just this set from here (s), over outDur (default 0.5). */
+  outAt?: number;
+  outDur?: number;
   seed?: Seed;
 };
 
-export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFloor, plaqueWaveAt, bitWaveAt, waveStep = 0.06, extendAt, flagAt, ringsAt, house4Lock = {}, sun, wrap = noWrap, x = 0, y = 0, scale = 1, seed = 'terr'}) => {
+export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFloor, plaqueWaveAt, bitWaveAt, waveStep = 0.06, extendAt, flagAt, ringsAt, house4Lock = {}, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'terr'}) => {
   const t = useTime();
   const m = useXf();
   const zoom = Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2])) * scale || 1;
@@ -287,7 +290,7 @@ export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFl
     </>
   );
   return (
-    <SetPlace x={x} y={y} scale={scale}>
+    <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
       {sun ? wrap('sun', 0.05, sun) : null}
       {wrap('street', 0.9, street)}
       {wrap('hill', 0.6, <>{nodes}</>)}

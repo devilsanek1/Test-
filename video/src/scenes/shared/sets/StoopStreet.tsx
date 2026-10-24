@@ -324,6 +324,9 @@ export type StoopStreetProps = {
   x?: number;
   y?: number;
   scale?: number;
+  /** Un-build just this set from here (s), over outDur (default 0.5). */
+  outAt?: number;
+  outDur?: number;
   seed?: string;
 };
 
@@ -348,6 +351,8 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
   x = 0,
   y = 0,
   scale = 1,
+  outAt,
+  outDur,
   seed = 'stoop',
 }) => {
   const t = useTime();
@@ -453,7 +458,7 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
   );
 
   return (
-    <SetPlace x={x} y={y} scale={scale}>
+    <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
       {sun ? wrap('sun', 0.12, sun) : null}
       {wrap('far', 0.1, farLayer)}
       {wrap('ground', 0.4, ground)}

@@ -330,7 +330,8 @@ export const Person: React.FC<PersonProps> = (props) => {
   const k = (n: string) => `${sd}/${n}`;
   const skinLike = S.hairColor === palette.sand || S.hairColor === palette.tan;
   // a cap leaves only a strip of hair at the nape: never skin-coloured (it would read as a face under a cap)
-  const headColor = S.line ? palette.card : S.hair === 'bald' ? palette.sand : S.hair === 'cap' && skinLike ? palette.brown : S.hairColor;
+  const capNape = S.hat === palette.brown ? palette.ink : palette.brown;
+  const headColor = S.line ? palette.card : S.hair === 'bald' ? palette.sand : S.hair === 'cap' && (skinLike || S.hairColor === S.hat) ? capNape : S.hairColor;
   const bigHead = lod === 0 && !S.line && 2 * S.hr * s > 60;
   const lightHair = headColor !== palette.ink && headColor !== palette.tealDark;
 
@@ -456,7 +457,7 @@ export const Person: React.FC<PersonProps> = (props) => {
     push(<Fill key="capF" d={P.capFill} color={S.line ? palette.card : S.hat} at={tm(0.3)} mode={fillMode} offset={false} seed={k('cap')} />);
     // the strap opening only at small sizes: at hero size it reads as a face under the cap
     if (P.capHole && !bigHead) push(<Fill key="capH" d={P.capHole} color={S.line ? palette.card : S.hairColor} at={tm(0.34)} mode={fillMode} offset={false} seed={k('capH')} />);
-    if (inked) push(<Ink key="cap" d={bigHead ? P.capBand : P.capInk} at={tm(0.22)} width={W * 0.9} seed={k('capI')} />);
+    if (inked) push(<Ink key="cap" d={bigHead && P.capBand ? P.capBand : P.capInk} at={tm(0.22)} width={W * 0.9} seed={k('capI')} />);
     if (P.capBtn && lod === 0 && inked) push(<Ink key="capB" d={P.capBtn} at={tm(0.34)} width={W * 0.8} seed={k('capB')} />);
     if (P.pomFill) {
       push(<Fill key="pomF" d={P.pomFill} color={S.line ? palette.card : S.hat} at={tm(0.36)} mode={fillMode} offset={false} seed={k('pom')} />);

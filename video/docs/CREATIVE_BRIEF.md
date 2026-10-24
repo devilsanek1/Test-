@@ -140,3 +140,24 @@ their original (see docs/script/original_annotated.md, which produced the curren
   exactly as the user would paste it into ElevenLabs (cues + text, nothing else). Also keep a plain no-cue version in
   final_script.md for captions and timing.
 - Rewrites (rewrite_*.md) should include cues too, so the user can compare deliveries.
+
+## RULE #1 FOR EVERY LINE (user, latest; outranks style and cleverness): SOUND LIKE A REAL PERSON TALKING, NOT LIKE AI
+"Evaluate each sentence and the flow for AI-like wording. It MUST first and foremost sound approachable and as everyday
+speaking as possible."
+Test every sentence: would a normal person say exactly these words out loud to a friend? If not, rewrite it the way they would.
+AI tells to hunt down and remove (flag each one by name):
+- Contrast templates: "X. Not Y." / "Not X. Y." / "It's not X, it's Y." / "Not a hack." / "This isn't about X. It's about Y."
+- Staccato dramatic fragments and one-word punches: "On purpose." "No password." "Within a day… millions." "Gone."
+- Tidy aphorisms and zingers: "The internet's bad at secrets." "Turns out, X is the easy part."
+- Stock reveal phrases: "Here's the thing", "Here's the catch", "The catch?", "The kicker?", "Problem is,", "Plot twist",
+  "Turns out", "Enter X", "Let that sink in", "Make no mistake", "Simply put", "In other words", "And that's the point",
+  "And that's exactly why", "The real story", "there's no X button", "quietly", "in secret", "the uncomfortable truth".
+- Self-answered rhetorical questions ("The result? X."), colon reveals ("the advice: take it offline"), rule-of-three
+  lists, perfectly parallel sentences, em-dashes and semicolons, mic-drop endings that echo the opening too neatly.
+- Writerly compression nobody says aloud ("whoever runs each server", "PHP no longer releases fixes for them",
+  "attempts hit tens of thousands").
+What to do instead: write it the way a smart friend actually tells you a story over dinner. Natural connective tissue
+(so, and, but, which means, basically, like, pretty much), full relaxed sentences that flow into each other, everyday
+verbs and nouns, contractions, mild natural hedges where a person would use them ("a bunch of", "pretty much"), and
+humour that comes from the situation, not from a crafted punchline. Fewer full stops, more "and"/"so". Read it out loud;
+if it sounds like a script, a LinkedIn post or a trailer, it's wrong. Accuracy rules still apply.

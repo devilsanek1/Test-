@@ -17,7 +17,8 @@ import {Tod as TodCtx} from '../../../lib/tod';
 import {mat, useXf, XG} from '../../../lib/xf';
 import {line, rect as sketchRect, wallTicks, Pt} from '../../../lib/sketch';
 import {Ink} from '../../../lib/Ink';
-import {Look, useLook} from '../../../lib/exit';
+import {Look, UnBuild, useLook} from '../../../lib/exit';
+import {MOTION} from '../../../lib/spec';
 import {Fill} from '../../../lib/Fill';
 import {Place} from '../../../lib/kit/common';
 import {rng, Seed} from '../../../lib/rng';
@@ -121,13 +122,19 @@ export const Between: React.FC<{at?: number; outAt?: number; children?: React.Re
 
 // ---------------------------------------------------------------- placement / screen space
 
-/** Offsets a whole set (thumbnails, reuse). Identity when x = y = 0 and scale = 1. */
-export const SetPlace: React.FC<{x?: number; y?: number; scale?: number; children?: React.ReactNode}> = ({x = 0, y = 0, scale = 1, children}) =>
-  x === 0 && y === 0 && scale === 1 ? <>{children}</> : (
+/** Offsets a whole set (thumbnails, reuse; identity when x = y = 0 and scale = 1) and runs its build-out: the measured
+ *  un-build of just this set from `outAt` over `outDur` (default 0.5 s), like every prop's outAt. */
+export const SetPlace: React.FC<{x?: number; y?: number; scale?: number; outAt?: number; outDur?: number; children?: React.ReactNode}> = ({x = 0, y = 0, scale = 1, outAt, outDur, children}) => {
+  const inner = outAt !== undefined ? <UnBuild at={outAt} dur={outDur ?? MOTION.unbuild.total}>{children}</UnBuild> : <>{children}</>;
+  return x === 0 && y === 0 && scale === 1 ? inner : (
     <Place x={x} y={y} s={scale}>
-      {children}
+      {inner}
     </Place>
   );
+};
+
+/** Props every set takes (placement + build-out). */
+export type SetBase = {x?: number; y?: number; scale?: number; seed?: Seed; /** Un-build just this set from here (s). */ outAt?: number; outDur?: number};
 
 /** Uniform screen scale of the current subtree (camera zoom x layer scale x set scale). */
 export const useZoom = () => {

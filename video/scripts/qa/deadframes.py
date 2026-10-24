@@ -142,13 +142,26 @@ def allowed(run, scene, allow, fps, t0):
     return None
 
 
+def slow_motion(rows, opt):
+    """Frames kept alive by SLOW, STEADY motion (a pipe drawing on, a slow slide): the last 4 single-frame energies are
+    all quiet but non-zero (dead_px/8 .. dead_px) and the camera-compensated change over those 4 frames reaches
+    1.5 x dead_px. Idle jitter (bobs, codec flicker) and the quiet frame right after a burst do not qualify."""
+    D = opt['dead_px']
+    life = np.array([r['life'] for r in rows], float)
+    life4 = np.nan_to_num(np.array([r.get('life4', float('nan')) for r in rows], float), nan=0.0)
+    q = (life >= D / 8) & (life < D)
+    steady = np.zeros(len(rows), bool)
+    for i in range(3, len(rows)):
+        steady[i] = q[i - 3:i + 1].all()
+    return steady & (life4 >= 1.5 * D)
+
+
 def score_scenes(rows, scenes, events, cap_events, fps, opt, allow, t0, grace=True):
     n = len(rows)
     life = np.array([r['life'] for r in rows], float)
     band = np.array([r['band'] for r in rows], float)
-    life4 = np.array([r.get('life4', float('nan')) for r in rows], float)
-    slow = np.nan_to_num(life4, nan=0.0) >= opt['dead_px']          # slow steady motion keeps a frame alive
-    dead = np.where(np.isnan(life), False, (life < opt['dead_px']) & ~slow)
+    dead = np.where(np.isnan(life), False, life < opt['dead_px'])
+    dead &= ~slow_motion(rows, opt)
     trans = np.zeros(n, bool)
     for sc in scenes:
         for (w0, w1, ty) in sc.trans:

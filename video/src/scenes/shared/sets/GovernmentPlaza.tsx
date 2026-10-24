@@ -129,6 +129,9 @@ export type GovernmentPlazaProps = {
   x?: number;
   y?: number;
   scale?: number;
+  /** Un-build just this set from here (s), over outDur (default 0.5). */
+  outAt?: number;
+  outDur?: number;
   seed?: string;
 };
 
@@ -671,6 +674,8 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
   x = 0,
   y = 0,
   scale = 1,
+  outAt,
+  outDur,
   seed = 'plaza',
 }) => {
   const off = state === 'off';
@@ -727,7 +732,7 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
     scene
   );
   return (
-    <SetPlace x={x} y={y} scale={scale}>
+    <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
       {looked}
     </SetPlace>
   );

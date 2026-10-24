@@ -36,6 +36,8 @@ export type SwitchEvent = {
   fraction?: number;
   /** Randomness mixed into the order (0..1). Default 0.25 (random pattern ignores it). */
   noise?: number;
+  /** Only cells whose u/v lie inside [u0, v0, u1, v1] take part (a district lighting up in one sweep). */
+  region?: [number, number, number, number];
 };
 
 /** One window: u/v = position in its grid / facade (0..1, used by patterns); shape = rect [x, y, w, h] or quad. */
@@ -73,7 +75,9 @@ export function switchTimes(cells: WinCell[], events: SwitchEvent[], seed: Seed)
     let maxD = 1e-6;
     let minS = Infinity;
     let maxS = -Infinity;
+    const inR = (c: WinCell) => !ev.region || (c.u >= ev.region[0] && c.v >= ev.region[1] && c.u <= ev.region[2] && c.v <= ev.region[3]);
     for (const c of cells) {
+      if (!inR(c)) continue; // a region event spreads its timing over the region only
       maxD = Math.max(maxD, Math.hypot(c.u - ou, c.v - ov));
       const s = c.u * cd + c.v * sd;
       minS = Math.min(minS, s);
@@ -82,7 +86,7 @@ export function switchTimes(cells: WinCell[], events: SwitchEvent[], seed: Seed)
     const frac = ev.fraction ?? 1;
     for (let i = 0; i < cells.length; i++) {
       const c = cells[i];
-      if (frac < 1 && rand(seed, `f${ei}/${i}`) > frac) {
+      if ((frac < 1 && rand(seed, `f${ei}/${i}`) > frac) || (ev.region && (c.u < ev.region[0] || c.v < ev.region[1] || c.u > ev.region[2] || c.v > ev.region[3]))) {
         out[i] = NaN;
         continue;
       }

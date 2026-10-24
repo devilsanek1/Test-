@@ -100,10 +100,13 @@ export type BlueprintWallProps = {
   x?: number;
   y?: number;
   scale?: number;
+  /** Un-build just this set from here (s), over outDur (default 0.5). */
+  outAt?: number;
+  outDur?: number;
   seed?: string;
 };
 
-export const BlueprintWall: React.FC<BlueprintWallProps> = ({drawAt, lock = {}, stampAt, calendar, sun, wrap = noWrap, x = 0, y = 0, scale = 1, seed = 'bpw'}) => {
+export const BlueprintWall: React.FC<BlueprintWallProps> = ({drawAt, lock = {}, stampAt, calendar, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bpw'}) => {
   const F = BLUEPRINT_WALL.facade;
   const [bx, by, bw, bh] = BLUEPRINT_WALL.sheet;
   const L = BLUEPRINT_WALL.lock;
@@ -158,7 +161,7 @@ export const BlueprintWall: React.FC<BlueprintWallProps> = ({drawAt, lock = {}, 
     </>
   );
   return (
-    <SetPlace x={x} y={y} scale={scale}>
+    <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
       {sun ? wrap('sun', 0.1, sun) : null}
       {wrap('wing', 0.3, wing)}
       {wrap('facade', 0.5, facade)}

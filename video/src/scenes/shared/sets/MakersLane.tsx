@@ -238,10 +238,13 @@ export type MakersLaneProps = {
   x?: number;
   y?: number;
   scale?: number;
+  /** Un-build just this set from here (s), over outDur (default 0.5). */
+  outAt?: number;
+  outDur?: number;
   seed?: string;
 };
 
-export const MakersLane: React.FC<MakersLaneProps> = ({sun, curtainsAt, workshop, band = true, wrap = noWrap, x = 0, y = 0, scale = 1, seed = 'lane'}) => {
+export const MakersLane: React.FC<MakersLaneProps> = ({sun, curtainsAt, workshop, band = true, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'lane'}) => {
   const t = useTime();
   const VP = MAKERS_LANE.vp;
   const curtains = curtainsAt === undefined || t >= curtainsAt;
@@ -260,7 +263,7 @@ export const MakersLane: React.FC<MakersLaneProps> = ({sun, curtainsAt, workshop
   );
   const houses = <PerspRow layout={LEFT} lit={curtains} litColor={palette.sand} stagger={0} seed={`${seed}/L`} />;
   return (
-    <SetPlace x={x} y={y} scale={scale}>
+    <SetPlace x={x} y={y} scale={scale} outAt={outAt} outDur={outDur}>
       {wrap('far', 0.05, far)}
       {sun ? wrap('sun', 0.1, sun) : null}
       {wrap('roofs', 0.1, farRoofs)}

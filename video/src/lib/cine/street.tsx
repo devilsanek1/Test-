@@ -17,7 +17,7 @@ import {darker} from './city';
 import {persp1, quadMap, Quad} from './persp';
 import {gridCells, SwitchEvent, switchTimes, windowPaths} from './windows';
 import {personInk, PERSON_FEET, PERSON_H, tinyFigure} from './figures';
-import {PathBuf, r1} from './util';
+import {brokenLine, PathBuf, r1} from './util';
 import {Person} from '../kit';
 import {exitScale, inkGone, inkOn, isPaper, lookPaint, useCineState} from './state';
 
@@ -572,3 +572,76 @@ export const PerspectiveStreet: React.FC<PerspectiveStreetProps> = ({
   return <g transform={`translate(0 1920) scale(1 ${k.toFixed(4)}) translate(0 -1920)`}>{body}</g>;
 };
 
+
+// ---------------------------------------------------------------- GroundPlane
+
+export type GroundPlaneProps = {
+  /** Vanishing point (the horizon y = vp[1]; it may sit behind a building). */
+  vp: Pt;
+  /** Visible from this screen y down (the plaza's far edge, e.g. the foot of the steps). */
+  y0: number;
+  f?: number;
+  camH?: number;
+  /** Paving: cross joints every `every` world units of depth, radial joints every `radial` world units across. */
+  every?: number;
+  radial?: number;
+  /** Lateral extent (world units). */
+  half?: number;
+  color?: string;
+  tod?: TodLike | TodPalette;
+  seed?: Seed;
+  /** Dash specks (3-10 px). Default 40. */
+  specks?: number;
+};
+
+/** A paved plaza / square in one-point perspective (PerspectiveStreet's ground ink on its own): flat fill from y0 down,
+ *  radial joints converging on the vanishing point and cross joints foreshortening toward it, all broken into pen
+ *  strokes (reference 1), plus dash specks. Ink thins with distance; none past the far third. */
+export const GroundPlane: React.FC<GroundPlaneProps> = ({vp, y0, f = 900, camH = 160, every = 300, radial = 260, half = 6000, color, tod, seed = 'ground', specks = 40}) => {
+  const C = useCineState();
+  const p = useTodPal(tod);
+  const ink = useMemo(() => {
+    const P = persp1({vx: vp[0], vy: vp[1], f, camH});
+    const r = rng(`gp/${seed}`);
+    const z0 = (f * camH) / Math.max(1, y0 - vp[1]);
+    const zN = (f * camH) / Math.max(1, 2100 - vp[1]);
+    const near = new PathBuf();
+    const far = new PathBuf();
+    // cross joints (depth z): lines across, every `every`, from the frame bottom back to the plaza's far edge
+    for (let z = Math.ceil(zN / every) * every; z < z0; z += every) {
+      const a = P(-half, 0, z);
+      const b = P(half, 0, z);
+      const xa = Math.max(-80, a[0]);
+      const xb = Math.min(1160, b[0]);
+      const buf = z < z0 * 0.55 ? near : far;
+      buf.raw(brokenLine(xa, a[1], xb, b[1] + r.jitter(1.5), {seed: `${seed}/c${z}`, every: [90, 200], gap: [6, 16]}));
+    }
+    // radial joints: toward the VP, from the frame bottom to the far edge
+    for (let x = -half; x <= half; x += radial) {
+      const a = P(x, 0, zN);
+      const b = P(x, 0, z0);
+      if (Math.max(a[0], b[0]) < -60 || Math.min(a[0], b[0]) > 1140) continue;
+      near.raw(brokenLine(a[0], a[1], b[0], b[1], {seed: `${seed}/r${x}`, every: [90, 220], gap: [8, 18]}));
+    }
+    for (let i = 0; i < specks; i++) {
+      const z = zN * Math.pow(r.range(1, z0 / zN), 0.8);
+      const x = r.range(-half * 0.3, half * 0.3);
+      const [sx, sy, k] = P(x, 0, z);
+      if (sx < -20 || sx > 1100 || sy < y0 + 4) continue;
+      const len = Math.min(10, Math.max(3, k * r.range(14, 28)));
+      near.raw(`M${r1(sx - len / 2)} ${r1(sy)}h${r1(len)}`);
+    }
+    return {near: near.d, far: far.d};
+  }, [vp[0], vp[1], y0, f, camH, every, radial, half, seed, specks]);
+  const k = exitScale(C.e, 0.5, 0.7);
+  if (k <= 0) return null;
+  const paint = lookPaint(C, ambient(color ?? palette.cream, p), [vp[0], y0 + 100]);
+  const body = (
+    <>
+      {paint !== 'none' ? <rect x={-1600} y={y0} width={4280} height={3000} fill={paint} /> : null}
+      {inkOn(C, 0.3) ? <path d={ink.near} fill="none" stroke={palette.ink} strokeWidth={stroke.inkThin} strokeLinecap="round" /> : null}
+      {inkOn(C, 0.3) && ink.far ? <path d={ink.far} fill="none" stroke={palette.ink} strokeWidth={stroke.inkHair} strokeLinecap="round" /> : null}
+    </>
+  );
+  return k >= 1 ? body : <g transform={`translate(0 1920) scale(1 ${k.toFixed(4)}) translate(0 -1920)`}>{body}</g>;
+};
