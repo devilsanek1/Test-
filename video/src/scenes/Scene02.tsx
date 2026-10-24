@@ -76,7 +76,7 @@ const GAP = 7;
 const PIP_PERCH = BLUEPRINT_WALL.perch;
 const PIP_SCALE = 1.2 / 1.3; // 1.2 on screen at the 1.30 landing (~115 px)
 // the diagram hand
-const HAND = {angle: -40, turn: 18, scale: 1.2, from: 560, exitTravel: 380, exitDur: 0.18, ink: 3.2, dash: [6, 5] as [number, number]};
+const HAND = {angle: -40, turn: 18, scale: 1.2, from: 430, exitTravel: 380, exitDur: 0.18, ink: 3.2, dash: [6, 5] as [number, number]};
 const PINCH: Pt = [KNOB[0], KNOB[1] - 3];
 // solid ink contact strokes on the index and thumb tips (DiagramHand local units: fingertips at the origin)
 const TIPS = 'M4.5 -10.6C0.4 -9.6 -1.6 -6 1.6 -2.8' + 'M6.2 9.2C1.6 8.2 -1.2 4.8 2.6 1.8';
