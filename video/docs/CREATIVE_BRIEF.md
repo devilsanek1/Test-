@@ -109,3 +109,16 @@ So: the user WANTS a deliberately provocative, comment-bait line about how big P
    flagged with its risk: by mainstream rankings that's Python or JavaScript, so the top comment may be a correction.
    Offer the closest-to-literal wording that is still true (e.g. "the most used language for building websites").
 The user decides; present both clearly in the final deliverable.
+
+## ENGAGEMENT LAYER (approved by the user, latest)
+The user LOVES and APPROVED this line's bait: "PHP, the language everyone loves to call dead, still runs about 7 in 10
+websites" (or a tighter variant). Use it.
+Goal: growth, maximizing engagement, by sneaking in VERY SUBTLE, defensible engagement hooks wherever they fit naturally.
+Mechanisms to use (1–3 in the script, never more than feels natural):
+- Comment bait: a true claim that experts and fans love to argue about (the narrator is right; the comments do the rest).
+- Open loops: set up a question early that the payoff closes, so viewers stay to the end and rewatch.
+- "Wait, seriously?" facts phrased so viewers want to quote them in the comments or send them to someone.
+- Share triggers that feel natural, never needy (no "comment below", no "follow for more", no "send this to...").
+- A loop-friendly last line that flows back into the first line (the video loops).
+Rules: never false or misleading (the brief's accuracy rules still win), never punch down, keep neutrality, no begging.
+In every rewrite and the final table, tag each bait line with its mechanism.

@@ -12,6 +12,12 @@ one with `scripts/timewarp.py` (word-anchored, piecewise-linear). The video is n
 APPROVED BY THE USER: the treated voice (`audio/vo_clean.wav`, chain in `audio/tools/vo_clean.py`) and the subtler
 cinematic bed (`audio/music_cinematic.wav`; near-silent first ~10.7 s). Don't change the voice chain without asking.
 
+## ENGAGEMENT LAYER (user-approved goal: growth / maximum engagement, done subtly)
+The script will carry 1–3 subtle, true engagement hooks (see docs/CREATIVE_BRIEF.md "ENGAGEMENT LAYER"). The visuals carry
+their own, quietly: REWATCH BAIT such as Bit the ink beetle hidden somewhere in every scene (a "spot the bug" game that
+rewards a second watch), small true-to-story jokes on signs and screens for pausers, a first frame that already tells the
+story (silent autoplay), and a seamless loop so the replay feels like one continuous video. Never cluttered, never needy.
+
 ## BALANCE NOTE (from the user, latest; read this first): "Don't overdo it. It should be nuanced, and we still target TikTok / Reels."
 How to apply the cinematic direction below with restraint:
 - The BASE stays the references' look and feel: bright, warm, legible, charming editorial illustration with snappy
