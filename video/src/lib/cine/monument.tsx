@@ -81,6 +81,10 @@ export type MonumentProps = MonumentGeo & {
   build?: {at: number; dur?: number};
   /** People rise onto the steps over [at, at + span] (front to back). Omit = there. */
   peopleAt?: {at: number; span?: number};
+  /** Banners unroll from the entablature between the columns, one by one (a counting build, e.g. on "four"). */
+  banners?: {at: number; n?: number; stagger?: number; color?: string};
+  /** The bronze door opens (warm light inside) at this time. */
+  doorAt?: number;
 };
 
 type PaintKey = 'stone' | 'lit' | 'shade' | 'dark' | 'door' | 'transom' | 'dome' | 'domeShade' | 'rim' | 'disc';
@@ -349,6 +353,8 @@ export const Monument: React.FC<MonumentProps> = ({
   emblemAt,
   build,
   peopleAt,
+  banners,
+  doorAt,
 }) => {
   const S = useCineState();
   const t = S.t;
@@ -416,6 +422,46 @@ export const Monument: React.FC<MonumentProps> = ({
       ),
     );
   });
+
+  // the door opens: warm light in the doorway (one pop), door leaves folded to the sides
+  if (doorAt !== undefined && t >= doorAt && st[1].k >= 1 && S.look.fills === 'color') {
+    const q = (X: number, Y: number) => M.at(X, Y);
+    const a = q(465, 215);
+    const b = q(535, 215);
+    const c = q(535, 355);
+    const d = q(465, 355);
+    const kk = E.outBack(1.6)(prog(t, doorAt, 0.2));
+    const cx = (a[0] + b[0]) / 2;
+    const sx = (x: number) => cx + (x - cx) * kk;
+    out.push(<path key="door" d={`M${r1(sx(a[0]))} ${r1(a[1])}L${r1(sx(b[0]))} ${r1(b[1])}L${r1(sx(c[0]))} ${r1(c[1])}L${r1(sx(d[0]))} ${r1(d[1])}Z`} fill={palette.peach} />);
+  }
+  // banners between the columns, unrolling down from the entablature
+  if (banners && S.look.fills !== 'none') {
+    const n = banners.n ?? 4;
+    const cs2 = 880 / (columns - 1);
+    const slots = Array.from({length: columns - 1}, (_, i) => 60 + cs2 * (i + 0.5));
+    const pick = Array.from({length: n}, (_, i) => slots[Math.round(((i + 0.5) / n) * (slots.length - 1) + (i % 2 ? 0.3 : -0.3))]);
+    pick.forEach((X, i) => {
+      const t0 = banners.at + i * (banners.stagger ?? 0.14);
+      if (t < t0 || st[2 + columns] === undefined || st[2 + columns].k < 1) return;
+      const u = E.outBack(1.3)(prog(t, t0, 0.3)) * exitScale(S.e, jit(i + 3), 0.05);
+      if (u <= 0.01) return;
+      const bw = 34;
+      const top = 990;
+      const bot = top - 420 * u;
+      const pts = [M.at(X - bw, top), M.at(X + bw, top), M.at(X + bw, bot + 30), M.at(X, bot), M.at(X - bw, bot + 30)];
+      const d = pts.map((pt, k) => `${k ? 'L' : 'M'}${r1(pt[0])} ${r1(pt[1])}`).join('') + 'Z';
+      const disc = M.at(X, top - 150 * u);
+      const dr = M.scale(X, top - 150) * 18 * u;
+      out.push(
+        <React.Fragment key={`ban${i}`}>
+          <path d={d} fill={banners.color ?? palette.peach} transform="translate(2 1.5)" />
+          {S.look.ink ? <path d={d} fill="none" stroke={palette.ink} strokeWidth={stroke.inkThin} strokeLinejoin="round" /> : null}
+          <circle cx={disc[0]} cy={disc[1]} r={dr} fill={palette.cream} />
+        </React.Fragment>,
+      );
+    });
+  }
 
   // emblem: with its part, or popping at emblemAt
   const ep = st[G.emblemPart];

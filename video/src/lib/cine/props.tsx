@@ -369,6 +369,12 @@ export type WindowCloseupProps = {
   chair?: boolean;
   /** Desk + monitor (default true). */
   desk?: boolean;
+  /** The web page on the monitor refreshes every `screenTick` s (its text lines re-flow: a small pop). */
+  screenTick?: number;
+  /** The room light switches on at this time (dark before). */
+  onAt?: number;
+  /** The curtain is drawn closed at this time (a pop). */
+  curtainAt?: number;
 };
 
 /** One lit window up close: frame, transom, curtain, pendant lamp with a stepped glow, a desk with a monitor showing
@@ -379,9 +385,10 @@ export const WindowCloseup: React.FC<WindowCloseupProps> = (props) => (
   </ExitShrink>
 );
 
-const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod = 'night', offAt, screenOffAt, seed = 'wc', person, lit = true, chair, desk = true}) => {
+const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod = 'night', offAt, screenOffAt, seed = 'wc', person, lit: lit0 = true, chair, desk = true, screenTick, onAt, curtainAt}) => {
   const t = useTime();
   const p = todPal(tod);
+  const lit = lit0 && (onAt === undefined || t >= onAt);
   const on = lit && (offAt === undefined || t < offAt);
   const scrOn = lit && t < (screenOffAt ?? (offAt === undefined ? Infinity : offAt + 0.35));
   const showChair = chair ?? !!person;
@@ -398,7 +405,7 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod 
   const frameC = on || lit ? palette.cream : palette.sage;
   const ink = rect(-fr, -fr, w + fr * 2, h + fr * 2, {seed: `${seed}/o`, over: 'medium'}) + rect(0, 0, w, h, {seed: `${seed}/i`, over: 'small'}) + hline(-fr - 30, w + fr + 30, h + fr + 14, {seed: `${seed}/s`, over: [20, 30]}) + hline(-fr - 24, w + fr + 24, h + fr + 30, {seed: `${seed}/s2`, over: [10, 20]});
   const tr = hline(0, w, h * 0.3, {seed: `${seed}/tr`, over: [2, 4]}) + hline(0, w, h * 0.3 + 14, {seed: `${seed}/tr2`, over: [2, 4]});
-  const curtainW = lit ? 0.17 : rr.range(0.3, 0.46);
+  const curtainW = curtainAt !== undefined && t >= curtainAt ? 0.86 : lit ? 0.17 : rr.range(0.3, 0.46);
   const curtain = `M0 0L${w * curtainW} 0Q${w * (curtainW + 0.03)} ${h * 0.4} ${w * (curtainW - 0.04)} ${h * 0.72}L0 ${h * 0.74}Z`;
   const chairX = w * 0.3;
   const chairW = w * 0.3;
@@ -406,7 +413,8 @@ const WindowCloseupBody: React.FC<WindowCloseupProps> = ({w = 420, h = 760, tod 
   const chairH = h * 0.12;
   const chairInk = rect(chairX - chairW / 2, chairY, chairW, chairH, {seed: `${seed}/ch`, over: 'small'}) + `M${chairX - chairW * 0.36} ${chairY + chairH}L${chairX - chairW * 0.36} ${h}M${chairX + chairW * 0.36} ${chairY + chairH}L${chairX + chairW * 0.36} ${h}`;
   const lamp = `M${lampX - 34} ${h * 0.2}L${lampX + 34} ${h * 0.2}L${lampX + 20} ${h * 0.14}L${lampX - 20} ${h * 0.14}Z`;
-  const web = textLines(mon.x + 16, mon.y + 38, mon.w - 32, {seed: `${seed}/web`, n: 3, gap: 16});
+  const tick = screenTick ? Math.max(0, Math.floor(t / screenTick)) : 0;
+  const web = textLines(mon.x + 16, mon.y + 38, mon.w - 32, {seed: `${seed}/web${tick}`, n: 3, gap: 16});
   const plant = crown(w * 0.8, h + fr - 46, 38, 30, {seed: `${seed}/pl`, bumps: 7});
   return (
     <>
