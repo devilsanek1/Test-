@@ -13,6 +13,7 @@ import {Fill} from '../Fill';
 import {Shake} from '../motion';
 import {poly, roundRect} from '../sketch';
 import {At, b} from './common';
+import {mat, XG} from '../xf';
 
 export type PadlockProps = {
   x: number;
@@ -28,7 +29,7 @@ export type PadlockProps = {
   width?: number;
 };
 
-export const Padlock: React.FC<PadlockProps> = ({x, y, size = 130, at, seed = 'lock', color = palette.sun, shackleColor = palette.grey, lockAt, openAt, breakAt, width = stroke.ink}) => {
+export const Padlock: React.FC<PadlockProps> = ({x, y, size = 130, at, seed = 'lock', color = palette.sun, shackleColor = palette.sand, lockAt, openAt, breakAt, width = stroke.ink}) => {
   const t = useTime();
   const bw = size;
   const bh = size * 0.8;
@@ -53,7 +54,7 @@ export const Padlock: React.FC<PadlockProps> = ({x, y, size = 130, at, seed = 'l
     fx = size * 0.9 * p;
     dy += -size * 1.1 * Math.sin(p * Math.PI * 0.6);
     rot += 70 * p;
-    fo = 1 - prog(t, breakAt + 0.4, 0.4);
+    fo = t < breakAt + 0.6 ? 1 : 0; // the flying shackle pops out (no fade)
   }
   const keyhole = `M${x} ${y - bh * 0.12}m-${size * 0.07} 0a${size * 0.07} ${size * 0.07} 0 1 0 ${size * 0.14} 0a${size * 0.07} ${size * 0.07} 0 1 0 -${size * 0.14} 0M${x - size * 0.035} ${y - bh * 0.08}L${x - size * 0.06} ${y + bh * 0.18}L${x + size * 0.06} ${y + bh * 0.18}L${x + size * 0.035} ${y - bh * 0.08}Z`;
   const pivotX = x - sw / 2;
@@ -68,10 +69,10 @@ export const Padlock: React.FC<PadlockProps> = ({x, y, size = 130, at, seed = 'l
   return (
     <>
       {fo > 0.01 ? (
-        <g transform={`translate(${fx} ${dy}) rotate(${rot} ${pivotX} ${top})`} opacity={fo < 1 ? fo : undefined}>
+        <XG m={mat.compose(mat.translate(fx, dy), mat.about(mat.rotate(rot), pivotX, top))}>
           <Ink d={shackle} at={b(at, 0.2)} dur={0.4} width={band + width * 2} color={palette.ink} />
           <Ink d={shackle} at={b(at, 0.25)} dur={0.4} width={band} color={shackleColor} />
-        </g>
+        </XG>
       ) : null}
       {breakAt !== undefined ? (
         <Shake at={breakAt} dur={0.6} amp={size * 0.06} rot={4} x={x} y={y}>

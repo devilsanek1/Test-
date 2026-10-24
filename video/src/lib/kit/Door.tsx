@@ -11,6 +11,7 @@ import {Ink} from '../Ink';
 import {Fill} from '../Fill';
 import {glint, hline, line, rect, roundRect} from '../sketch';
 import {At, b} from './common';
+import {mat, XG} from '../xf';
 
 export type DoorProps = {
   x: number;
@@ -50,7 +51,7 @@ export const Door: React.FC<DoorProps> = ({
   frameW = 16,
   glass = true,
   openAt,
-  inside = palette.olive,
+  inside = palette.tealDark,
   width = stroke.ink,
 }) => {
   const t = useTime();
@@ -67,22 +68,22 @@ export const Door: React.FC<DoorProps> = ({
     const lx = x + i * lw;
     const k = i === 0 ? 1 - open * 0.82 : 1 - open * 0.82; // leaf width while swinging (fake 3D)
     const ox = i === 0 ? lx : lx + lw; // hinge side
-    const tr = open > 0 ? `translate(${ox} 0) scale(${k} 1) translate(${-ox} 0)` : undefined;
+    const tr = open > 0 ? mat.about(mat.scale(k, 1), ox, 0) : mat.I;
     const px = lw * 0.14;
     const gy = y + h * 0.08;
     const gh = h * 0.5;
     const py = y + h * 0.66;
     const ph = h * 0.26;
     out.push(
-      <g key={`leaf${i}`} transform={tr}>
+      <XG key={`leaf${i}`} m={tr}>
         <Fill rect={[lx, y, lw, h]} color={color} at={b(at, 0.35 + i * 0.05)} mode="grow" seed={`${seed}/l${i}`} />
-        {glass ? <Fill rect={[lx + px, gy, lw - px * 2, gh]} color={glassColor} at={b(at, 0.55)} mode="fade" offset={false} seed={`${seed}/g${i}`} /> : null}
-        <Fill rect={[lx + px, py, lw - px * 2, ph]} color={panelColor} at={b(at, 0.6)} mode="fade" offset={false} seed={`${seed}/p${i}`} />
+        {glass ? <Fill rect={[lx + px, gy, lw - px * 2, gh]} color={glassColor} at={b(at, 0.55)} mode="snap" offset={false} seed={`${seed}/g${i}`} /> : null}
+        <Fill rect={[lx + px, py, lw - px * 2, ph]} color={panelColor} at={b(at, 0.6)} mode="snap" offset={false} seed={`${seed}/p${i}`} />
         {glass ? <Ink d={rect(lx + px, gy, lw - px * 2, gh, {over: 2, seed: `${seed}/gi${i}`})} at={b(at, 0.45)} dur={0.25} width={width * 0.8} /> : null}
         {glass ? <Ink d={glint(lx + px + (lw - px * 2) * 0.25, gy + gh * 0.3, gh * 0.22, {seed: `${seed}/gl${i}`})} at={b(at, 0.75)} dur={0.12} width={width * 0.7} order="all" /> : null}
         <Ink d={roundRect(i === 0 ? lx + lw - lw * 0.1 - 6 : lx + lw * 0.1, y + h * 0.4, 7, h * 0.2, 3.5, {closed: false})} at={b(at, 0.7)} dur={0.2} width={width * 0.75} />
         <Fill d={roundRect(i === 0 ? lx + lw - lw * 0.1 - 6 : lx + lw * 0.1, y + h * 0.4, 7, h * 0.2, 3.5)} color={palette.mintPale} at={b(at, 0.8)} offset={false} seed={`${seed}/h${i}`} />
-      </g>,
+      </XG>,
     );
   }
   out.push(<Ink key="edges" d={line(x, y, x, y + h, {seed: `${seed}/e1`}) + line(x + w, y, x + w, y + h, {seed: `${seed}/e2`}) + hline(x, x + w, y, {seed: `${seed}/e3`})} at={b(at, 0.15)} dur={0.35} width={width} />);

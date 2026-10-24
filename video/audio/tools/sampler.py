@@ -147,6 +147,22 @@ def load_instrument(name, pattern, parse, *, normalize_layers=None, **kw) -> Ins
     return inst
 
 
+def even_out(inst: Instrument, slope_db_per_semi=-0.15, win_s=0.3):
+    """Equalise uneven sample sets: scale each zone so its attack RMS follows a straight line
+    (per velocity layer) through the layer's median level, with a gentle natural high-note roll-off."""
+    import numpy as _np
+    for layer in {z.vel for z in inst.zones}:
+        zs = [z for z in inst.zones if z.vel == layer]
+        lv = _np.array([20 * _np.log10(_np.sqrt((z.data[: int(win_s * SR)] ** 2).mean()) + 1e-12) for z in zs])
+        roots = _np.array([z.root for z in zs])
+        med_l, med_r = _np.median(lv), _np.median(roots)
+        for z, l in zip(zs, lv):
+            target = med_l + slope_db_per_semi * (z.root - med_r)
+            z.data = (z.data * db2a(target - l)).astype(_np.float32)
+    inst._cache.clear()
+    return inst
+
+
 class Track:
     """Stereo buffer you can drop notes into."""
 

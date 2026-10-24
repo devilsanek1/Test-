@@ -1,4 +1,15 @@
 [
-  {"id": "S01", "start": 0, "end": 4.8, "transitionIn": {"type": "cut"}, "note": "placeholder: gov websites switch off"},
-  {"id": "S02", "start": 4.8, "end": 10.9, "transitionIn": {"type": "flip", "dur": 1.1}, "transitionOut": {"type": "unbuild", "dur": 1.4}, "note": "placeholder: PHP bug street; flips in, un-builds out"}
+  {"id": "S01", "start": 0, "end": 4.8, "transitionIn": {"type": "cut"}, "captionTone": [{"t": 0, "tone": "dark"}], "note": "placeholder cut list (storyboard drafts); scene owners set transitions + tones"},
+  {"id": "S02", "start": 4.8, "end": 10.88, "transitionIn": {"type": "camera-continuous", "dur": 1.4, "dir": "in"}, "captionTone": [{"t": 0, "tone": "dark"}]},
+  {"id": "S03", "start": 10.88, "end": 15.76, "transitionIn": {"type": "foreground-wipe", "dur": 0.8, "element": "figure", "dir": "right"}},
+  {"id": "S04", "start": 15.76, "end": 21.68, "transitionIn": {"type": "matchcut"}},
+  {"id": "S05", "start": 21.68, "end": 25.44, "transitionIn": {"type": "camera-continuous", "dur": 1.4, "dir": "up"}},
+  {"id": "S06", "start": 25.44, "end": 30.64, "transitionIn": {"type": "camera-continuous", "dur": 1.2, "dir": "right"}},
+  {"id": "S07", "start": 30.64, "end": 35.6, "transitionIn": {"type": "push-through", "dur": 1.1, "from": [540, 900], "zoom": 7, "bridge": "#A6CABB"}},
+  {"id": "S08", "start": 35.6, "end": 43.76, "transitionIn": {"type": "foreground-wipe", "dur": 0.7, "element": "pole", "dir": "left"}},
+  {"id": "S09", "start": 43.76, "end": 47.84, "transitionIn": {"type": "matchcut"}, "captionTone": [{"t": 0, "tone": "light"}]},
+  {"id": "S10", "start": 47.84, "end": 54.56, "transitionIn": {"type": "camera-continuous", "dur": 1.4, "dir": "out"}, "captionTone": [{"t": 0, "tone": "dark"}]},
+  {"id": "S11", "start": 54.56, "end": 60.56, "transitionIn": {"type": "push-through", "dur": 1.1, "from": [540, 1000], "zoom": 6}},
+  {"id": "S12", "start": 60.56, "end": 66.64, "transitionIn": {"type": "foreground-wipe", "dur": 0.8, "element": "foliage", "dir": "right"}},
+  {"id": "S13", "start": 66.64, "end": 70.687, "transitionIn": {"type": "camera-continuous", "dur": 1.2, "dir": "in"}, "transitionOut": {"type": "unbuild", "dur": 0.5, "loop": true}}
 ]

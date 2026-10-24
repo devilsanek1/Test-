@@ -159,12 +159,15 @@ def circular_process(y, plugins, preroll=3.0):
     return z[p:p + len(y)]
 
 
-def finish(bed: Bed, mixdown, out_wav, target_lufs=-20.0):
-    """mixdown: stereo (T+TAIL). Wrap, glue, normalise, report."""
+def finish(bed: Bed, mixdown, out_wav, target_lufs=-20.0, normalize=True, glue=True):
+    """mixdown: stereo (T+TAIL). Wrap, glue, normalise, report. normalize=False keeps absolute levels
+    (used by the near-silent bed, whose level is set relative to the -17 LUFS VO stem)."""
     y = loop_wrap(mixdown)
-    y = circular_process(y, [Compressor(threshold_db=-22, ratio=1.6, attack_ms=30, release_ms=250),
-                             Limiter(threshold_db=-3.0, release_ms=150)])
-    y = y * db2a(target_lufs - lufs(y))
+    if glue:
+        y = circular_process(y, [Compressor(threshold_db=-22, ratio=1.6, attack_ms=30, release_ms=250),
+                                 Limiter(threshold_db=-3.0, release_ms=150)])
+    if normalize:
+        y = y * db2a(target_lufs - lufs(y))
     tp = true_peak_db(y)
     if tp > -2.0:
         y = y * db2a(-2.0 - tp)

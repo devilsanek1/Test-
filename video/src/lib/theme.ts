@@ -68,13 +68,13 @@ export const type = {
 /** Fill misregistration: fills sit offset from their linework like a slightly misaligned print. */
 export const misreg = {dx: 1.5, dy: 1, jitter: 3} as const;
 
-/** Default motion timings (seconds). */
+/** Default motion timings (seconds), calibrated to docs/motion_spec.md (see also lib/spec.ts MOTION). */
 export const timing = {
-  fillDelay: 0.12, // fill lands this long after its linework finishes
-  fillDur: 0.32,
-  captionRoll: 0.42, // whole caption rolls up/out as the next rolls in
-  captionLine: 0.37, // line 2 rolls in when its word is spoken
-  highlightWipe: 0.25, // ease-out
+  fillDelay: 0.18, // a fill lands 0.13-0.27 s after its OUTLINE STARTS (ink-first mode)
+  fillDur: 0.12, // grow 20% -> 100% over 3-4 frames (or a 1-frame pop)
+  captionRoll: 0.45, // page change: whole stack scrolls up
+  captionLine: 0.42, // line 2 rises
+  highlightWipe: 0.19, // + 0.3 ms per px of box width
 } as const;
 
 // ---- style-bible additions (docs/style_bible.md, docs/theme_proposal.json)
@@ -87,3 +87,62 @@ export const cardSurface = {grain: false, shadow: false} as const;
 
 /** How far ink may run past the panel block (px). */
 export const overshoot = {maxSide: 60, maxTop: 80, maxBottom: 50, structural: [30, 62], medium: [6, 15], small: [3, 8]} as const;
+
+// ---- engine v2: FULL-BLEED world (docs/BRIEF.md "CINEMATIC DIRECTION"). New keys only.
+
+/** The full-bleed world: world coordinates = canvas pixels at camera rest (0..1080 x 0..1920). */
+export const world = {
+  w: 1080,
+  h: 1920,
+  /** Default eye-level horizon (y). Low camera: towers rise into the sky above it. */
+  horizon: 880,
+  /** Default vanishing point. */
+  vp: [540, 880] as [number, number],
+  /** Author scenes this far past every frame edge (camera-continuous / push transitions zoom out by up to ~12%). */
+  bleed: 140,
+} as const;
+
+/** Platform UI safe zones (canvas px). Captions + key action inside `action`; the bottom holds ground/foreground only. */
+export const safe = {
+  top: 180,
+  bottom: 1520,
+  /** Right-rail buttons cover x > rail.x for y in [rail.y0, rail.y1]. */
+  rail: {x: 950, y0: 900, y1: 1500},
+  action: {x0: 90, x1: 990, y0: 200, y1: 1480},
+} as const;
+
+/** The sun in full-bleed scenes: big and low, sitting on the horizon (reference 2: r ~150 at 1080 wide). */
+export const sunWorld = {cx: 540, cy: 840, r: 150} as const;
+
+/** Captions in the SKY (screen space, upper third). Baselines in canvas px. */
+export const skyCaption = {
+  cx: 540,
+  line1: 330,
+  line2: 426,
+  /** A one-line page sits centred between the two slots (motion spec 4). */
+  oneLine: 378,
+  size: 82,
+  maxWidth: 860,
+  /** Roll window: text outside [clipTop, clipBottom] is hidden (lines rise into it; pages scroll out of it). */
+  clipTop: 236,
+  clipBottom: 476,
+} as const;
+
+/** Caption tones: dark ink on light skies, white on dark (dusk/night) skies. The highlight word is ink on peach in both. */
+export const captionTones = {
+  dark: {text: palette.ink, highlight: palette.highlight, highlightText: palette.ink},
+  light: {text: palette.white, highlight: palette.highlight, highlightText: palette.ink},
+} as const;
+export type CaptionTone = keyof typeof captionTones;
+
+/** Ink weight by depth (style bible 3 + 6): on-screen px. Far things get no ink at all (fill-only). */
+export const depthInk = {front: 4.8, mid: 3.4, far: 2.2, hair: 1.6} as const;
+
+/** Sky colours for the time of day (flat; switch with a pop or a wipe, never a fade). */
+export const skies = {
+  day: palette.sky,
+  golden: palette.cream,
+  dusk: palette.sage,
+  night: palette.teal,
+  deep: palette.tealDark,
+} as const;

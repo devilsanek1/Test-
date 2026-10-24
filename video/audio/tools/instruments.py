@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent))
-from sampler import load_instrument, name_to_midi  # noqa: E402
+from sampler import load_instrument, name_to_midi, even_out  # noqa: E402
 
 VSCO = "VSCO-2-CE"
 VCSL = "VCSL"
@@ -72,6 +72,24 @@ def p_glock(name):
     return yam(m.group(2)), lay[m.group(1)], int(m.group(3))
 
 
+def p_vel_only(name):
+    m = yam(name)
+    v = re.search(r"_v(\d)", name)
+    return m, (int(v.group(1)) if v else 1), 1
+
+
+def p_vibes_bowed(name):
+    return yam(name), 1, 1
+
+
+GLASS_TUNE = {"D#4": 0.31, "F#4": -0.09, "A#4": 0.61, "D5": 0.11}  # measured (pyin), semitones
+
+
+def p_glass(name):
+    n = re.search(r"glass\d_([A-G]#?\d)_", name).group(1)
+    return yam(n) + GLASS_TUNE.get(n, 0.0), 1, 1
+
+
 @lru_cache(None)
 def get(name):
     L = load_instrument
@@ -90,7 +108,9 @@ def get(name):
     if name == "vln_trem":
         return L(name, f"{VSCO}/Strings/Violin Section/Trem/*.wav", p_strings, sustained=True, release=0.6)
     if name == "piano":
-        return L(name, f"{VSCO}/Keys/Upright Piano/Player_dyn*_rr1_*.wav", p_piano, sustained=True, release=0.35)
+        # the soft layer is very uneven (e.g. 13 dB between neighbouring zones): level it
+        return even_out(L(name, f"{VSCO}/Keys/Upright Piano/Player_dyn*_rr1_*.wav", p_piano, sustained=True,
+                          release=0.35))
     if name == "marimba":
         return L(name, f"{VCSL}/Idiophones/Struck Idiophones/Marimba/*.wav", p_marimba, release=0.2, max_len=3.0)
     if name == "kalimba":
@@ -99,6 +119,22 @@ def get(name):
                  release=0.25, max_len=3.0)
     if name == "glock":
         return L(name, f"{VCSL}/Idiophones/Struck Idiophones/Glockenspiel/*.wav", p_glock, release=0.3, max_len=3.0)
+    if name == "vln_sus":
+        return L(name, f"{VSCO}/Strings/Violin Section/susVib/*.wav", p_vel_only, sustained=True, release=1.2)
+    if name == "vla_sus":
+        return L(name, f"{VSCO}/Strings/Viola Section/susvib/*.wav", p_susvib, sustained=True, release=1.2)
+    if name == "cb_sus":
+        return L(name, f"{VSCO}/Strings/Solo Contrabass/SusNV/*.wav", p_strings, sustained=True, release=1.2)
+    if name == "vc_spic":
+        return L(name, f"{VSCO}/Strings/Cello Section/spic/*.wav", p_strings, release=0.08, max_len=0.6)
+    if name == "vla_spic":
+        return L(name, f"{VSCO}/Strings/Viola Section/spic/*.wav", p_strings, release=0.08, max_len=0.6)
+    if name == "vibes_bowed":
+        return L(name, f"{VCSL}/Idiophones/Struck Idiophones/Vibraphone/Bowed/*.wav", p_vibes_bowed,
+                 sustained=True, release=1.5)
+    if name == "glass":
+        return L(name, f"{VCSL}/Idiophones/Friction Idiophones/Wine Glasses/Sustains/Slow/*.wav", p_glass,
+                 sustained=True, release=1.5)
     raise KeyError(name)
 
 

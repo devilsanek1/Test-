@@ -2,8 +2,9 @@
 """php2shell mixer: VO + music bed (side-chain ducked) + SFX cues -> mastered, loop-safe stereo mix.
 
 Usage
-  python3 audio/mix.py --music pizzicato --out audio/mix.wav                 # uses audio/cues.json if present
-  python3 audio/mix.py --music lofi --cues my_cues.json --out /tmp/x.wav
+  python3 audio/mix.py --music cinematic --out audio/mix.wav                 # uses audio/cues.json if present
+  python3 audio/mix.py --music marimba --cues my_cues.json --out /tmp/x.wav
+  python3 audio/mix.py --music near_silent --out /tmp/minimal.wav
   python3 audio/mix.py --music none --out audio/vo_sfx_only.wav
   python3 audio/mix.py --make-cues audio/cues_placeholder.json               # cue list from assets/timing.json
 
@@ -15,6 +16,7 @@ Cue file (JSON list):  [{"t": 35.35, "sfx": "pop_mid", "gain_db": -12, "pan": 0}
            -12 puts a pop ~15 dB under the voice (momentary loudness); -10..-20 is the useful range
   pan      -1 (left) .. +1 (right), constant-power
 Optional per-cue keys: "offset" (s, skip into the file), "dur" (s, truncate with a 20 ms fade),
+  "loop": true + "dur" (tile a loopable ambience such as air_bed / city_bed; "fade_in"/"fade_out" s),
   "prio" (A = core, B = optional; filter with --prio A), "why" (free text, ignored).
 
 Signal flow
@@ -44,8 +46,13 @@ sys.path.insert(0, str(HERE / "tools"))
 from common import (SR, N_TOTAL, VIDEO_DUR, ASSETS, load, save, lufs, true_peak_db, db2a, a2db,  # noqa: E402
                     short_term_lufs, words)
 
-BEDS = {"pizzicato": HERE / "music_pizzicato.wav", "lofi": HERE / "music_lofi.wav",
-        "marimba": HERE / "music_marimba.wav"}
+# name -> (file, level mode, level, duck dB)
+#   "lu":  bed is set `level` LU under the voice (integrated), then ducked, then margin-guarded
+#   "abs": bed is played at its rendered level (gain `level` dB), for the near-silent bed whose
+#          room tone must stay at an absolute floor (~ -60 dBFS after mastering)
+BEDS = {"cinematic": (HERE / "music_cinematic.wav", "lu", 6.0, 12.0),
+        "marimba": (HERE / "music_marimba.wav", "lu", 6.0, 12.0),
+        "near_silent": (HERE / "music_near_silent.wav", "abs", 0.0, 6.0)}
 
 
 # ---------------------------------------------------------------------------- utilities
@@ -154,7 +161,13 @@ def render_sfx(cues, wrap=True):
         x = cache[p]
         off = int(c.get("offset", 0) * SR)
         x = x[off:]
-        if "dur" in c:
+        if c.get("loop"):
+            m = int(c.get("dur", len(x) / SR) * SR)
+            x = np.concatenate([x] * (m // len(x) + 1))[:m].copy()
+            fi = min(m // 2, int(c.get("fade_in", 0.3) * SR)); fo = min(m // 2, int(c.get("fade_out", 0.5) * SR))
+            if fi: x[:fi] *= np.sin(np.linspace(0, np.pi / 2, fi))[:, None] ** 2
+            if fo: x[-fo:] *= np.cos(np.linspace(0, np.pi / 2, fo))[:, None] ** 2
+        elif "dur" in c:
             m = int(c["dur"] * SR); x = x[:m].copy()
             f = min(len(x), int(0.02 * SR)); x[-f:] *= np.linspace(1, 0, f)[:, None]
         x = pan_stereo(x, c.get("pan", 0.0)) * db2a(c.get("gain_db", -12.0))
@@ -181,7 +194,7 @@ def render_sfx(cues, wrap=True):
 # ---------------------------------------------------------------------------- placeholder cues
 def make_placeholder_cues(path):
     """Demo spotting from assets/timing.json: a soft pop on stressed numbers, a quiet swish in the
-    sentence gaps (a card flip in the long ones), and the leak riser into 'Cloudflare'."""
+    sentence gaps (a foreground wipe in the long ones), and the leak riser into 'Cloudflare'."""
     tj = ASSETS / "timing.json"
     cues = []
     if tj.exists():
@@ -195,7 +208,7 @@ def make_placeholder_cues(path):
             if p["kind"] != "sentence":
                 continue
             big = p["dur"] >= 0.3
-            cues.append({"t": round(p["s"] + 0.01, 3), "sfx": "card_flip" if big else "whoosh_soft",
+            cues.append({"t": round(p["s"] + 0.01, 3), "sfx": "fg_wipe" if big else "whoosh_soft",
                          "gain_db": -18 if big else -22, "pan": 0, "why": f"sentence boundary ({p['dur']:.2f}s gap)"})
     else:  # fall back to raw ASR words
         ws = words(prefer_refined=False)
@@ -213,8 +226,17 @@ def make_placeholder_cues(path):
 
 
 # ---------------------------------------------------------------------------- main mix
-def mix(music, cues, vo_path, out, duck_db=12.0, music_db="auto", target_lufs=-14.0, ceiling=-1.0,
-        sfx_duck_db=3.0, wrap=True, stems=False, report=True, min_gap_db=12.0, base_lu=6.0, sfx_bus_db=9.0):
+def mix(music, cues, vo_path, out, duck_db=None, music_db="auto", target_lufs=-14.0, ceiling=-1.0,
+        sfx_duck_db=3.0, wrap=True, stems=False, report=True, min_gap_db=12.0, base_lu=None, sfx_bus_db=9.0):
+    mode = "lu"
+    if music in BEDS:
+        mp, mode, lvl, dk = BEDS[music]
+        base_lu = lvl if base_lu is None else base_lu
+        duck_db = dk if duck_db is None else duck_db
+    else:
+        mp = Path(music) if music and music != "none" else None
+    base_lu = 6.0 if base_lu is None else base_lu
+    duck_db = 12.0 if duck_db is None else duck_db
     vo = fit(load(vo_path, mono=True))
     act, hop = speech_envelope(vo)
     env_ctrl = one_pole_db(-duck_db * act, 30.0, 250.0, SR / hop)          # dB, circular
@@ -222,10 +244,12 @@ def mix(music, cues, vo_path, out, duck_db=12.0, music_db="auto", target_lufs=-1
     sfx_duck = db2a(ctrl_to_audio(env_ctrl * (sfx_duck_db / max(duck_db, 1e-6)), hop, N_TOTAL))
 
     vo_st = np.stack([vo, vo], axis=1)
-    if music and music != "none":
-        mp = BEDS.get(music, Path(music))
+    if mp is not None:
         m = fit(load(mp))
-        m = m * db2a(lufs(vo_st) - base_lu - lufs(m))      # bed sits `base_lu` LU under the voice
+        if mode == "lu":
+            m = m * db2a(lufs(vo_st) - base_lu - lufs(m))  # bed sits `base_lu` LU under the voice
+        else:
+            m = m * db2a(base_lu)                           # absolute level (near-silent room tone)
         if music_db != "auto":
             m *= db2a(float(music_db))
         m_d = m * duck[:, None]
@@ -262,7 +286,7 @@ def mix(music, cues, vo_path, out, duck_db=12.0, music_db="auto", target_lufs=-1
     save(out, z)
     res = {"file": str(out), "lufs_I": round(lufs(z), 2), "true_peak_dBTP": round(true_peak_db(z), 2),
            "sample_peak_dBFS": round(float(a2db(np.abs(z).max())), 2), "duration_s": round(len(z) / SR, 3)}
-    if music and music != "none":
+    if mp is not None:
         gap = speech_gap(vo_st, m_d)
         res.update({"voice_over_music_median_dB": round(float(np.median(gap)), 1),
                     "voice_over_music_p5_dB": round(float(np.percentile(gap, 5)), 1),
@@ -308,14 +332,14 @@ def speech_gap(vo_st, music):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--music", default="pizzicato", help="pizzicato | lofi | marimba | none | path.wav")
+    ap.add_argument("--music", default="cinematic", help="cinematic | marimba | near_silent | none | path.wav")
     ap.add_argument("--out", default=str(HERE / "mix.wav"))
     ap.add_argument("--cues", default=str(HERE / "cues.json"))
     ap.add_argument("--vo", default=str(HERE / "vo_clean.wav"))
-    ap.add_argument("--duck-db", type=float, default=12.0, help="music duck depth under speech (10-14)")
+    ap.add_argument("--duck-db", type=float, default=None, help="music duck depth under speech (bed default: 12; near_silent 6)")
     ap.add_argument("--music-db", default="auto", help="'auto' or a dB trim on top of --music-lu")
-    ap.add_argument("--music-lu", type=float, default=6.0,
-                    help="un-ducked bed level in LU under the voice (before duck + margin guard)")
+    ap.add_argument("--music-lu", type=float, default=None,
+                    help="un-ducked bed level in LU under the voice (bed default 6); for near_silent a dB trim")
     ap.add_argument("--min-gap", type=float, default=12.0, help="voice-over-music margin to guarantee (dB)")
     ap.add_argument("--sfx-duck-db", type=float, default=3.0)
     ap.add_argument("--sfx-bus-db", type=float, default=9.0,

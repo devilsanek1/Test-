@@ -1,4 +1,5 @@
-// Crowd — rows of back-view people in perspective, filling in with staggered pops (far rows simplified).
+// Crowd — rows of back-view people in perspective, filling in with staggered pops / rises. Layered by depth with the
+// style bible's ink ladder: front rows 4.8 px, mid 3.4, far 2.2, and the farthest rows are FILL-ONLY blobs (no ink).
 //
 //   <Crowd far={{y: 560, x0: 300, x1: 660, s: 0.28}} near={{y: 1040, x0: 90, x1: 870, s: 0.95}}
 //          rows={8} at={1.0} span={2.5} order="back" signs={0.08} />
@@ -10,6 +11,7 @@ import React, {useMemo} from 'react';
 import {rand, Seed} from '../rng';
 import {Person, PersonProps} from './Person';
 import {At} from './common';
+import {depthInk} from '../theme';
 
 export type CrowdRow = {y: number; x0: number; x1: number; s: number};
 
@@ -37,7 +39,14 @@ export type CrowdProps = {
   limit?: number;
   /** Extra props for every person. */
   person?: Partial<PersonProps>;
+  /** 'depth' (default): on-screen ink by row scale (depthInk front/mid/far, none for the far blobs); or a fixed px. */
+  ink?: 'depth' | number;
 };
+
+/** On-screen ink weight for a figure drawn at scale s (style bible 3/6): 4.8 front, 3.4 mid, 2.2 far, 0 = fill-only. */
+export const crowdInk = (s: number) => (s >= 0.75 ? depthInk.front : s >= 0.45 ? depthInk.mid : s >= 0.28 ? depthInk.far : 0);
+/** Level of detail for a figure at scale s. */
+export const crowdLod = (s: number): 0 | 1 | 2 => (s < 0.28 ? 2 : s < 0.45 ? 1 : 0);
 
 type Slot = {key: string; x: number; y: number; s: number; row: number; rank: number; sign: boolean; legs: boolean};
 
@@ -58,6 +67,7 @@ export const Crowd: React.FC<CrowdProps> = ({
   build = 'pop',
   limit = 1,
   person,
+  ink = 'depth',
 }) => {
   const slots = useMemo(() => {
     const out: Slot[] = [];
@@ -105,7 +115,8 @@ export const Crowd: React.FC<CrowdProps> = ({
     <>
       {slots.map((sl) => {
         if (sl.rank > limit + 1e-9) return null;
-        const lod = sl.s < 0.3 ? 2 : sl.s < 0.5 ? 1 : 0;
+        const lod = crowdLod(sl.s);
+        const w = ink === 'depth' ? crowdInk(sl.s) : ink;
         return (
           <Person
             key={sl.key}
@@ -120,6 +131,7 @@ export const Crowd: React.FC<CrowdProps> = ({
             at={at === undefined ? undefined : at + sl.rank * span}
             idle={idle * sl.s}
             acc={sl.sign ? ['sign'] : undefined}
+            ink={w}
             {...person}
           />
         );

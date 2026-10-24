@@ -18,6 +18,7 @@ import {Pop} from '../motion';
 import {ExitFade} from '../exit';
 import {arc, blob, circle, glint, hline, line, poly, polyPath, rect, roundRect, textLines, Pt} from '../sketch';
 import {At, b} from './common';
+import {mat, XG} from '../xf';
 
 // ---------------------------------------------------------------- Noticeboard
 
@@ -65,7 +66,7 @@ export const Noticeboard: React.FC<NoticeboardProps> = ({x, y, w = 420, h = 300,
     );
   }
   // frame + glass
-  out.push(<Fill key="frameF" rect={[x, y, w, h]} color={frame} at={b(at, 0.35)} mode="fade" seed={`${seed}/ff`} />);
+  out.push(<Fill key="frameF" rect={[x, y, w, h]} color={frame} at={b(at, 0.18)} mode="snap" seed={`${seed}/ff`} />);
   for (let i = 0; i < doors; i++) {
     out.push(<Fill key={`g${i}`} rect={[x + fb + i * (gw + gap), y + fb, gw, gh]} color={glass} at={b(at, 0.5 + i * 0.08)} mode="wipe" dir="down" offset={false} seed={`${seed}/g${i}`} />);
   }
@@ -76,12 +77,12 @@ export const Noticeboard: React.FC<NoticeboardProps> = ({x, y, w = 420, h = 300,
       const hinge = i === 0 ? gx : gx + gw;
       const k = 1 - open * 0.85;
       out.push(
-        <g key={`tint${i}`} transform={open > 0 ? `translate(${hinge} 0) scale(${k} 1) translate(${-hinge} 0)` : undefined}>
+        <XG key={`tint${i}`} m={open > 0 ? mat.about(mat.scale(k, 1), hinge, 0) : mat.I}>
           <Fill rect={[gx, y + fb, gw, gh]} color={glass} opacity={tint} at={b(at, 0.8)} offset={false} seed={`${seed}/t${i}`} />
           <Ink d={rect(gx, y + fb, gw, gh, {over: 2, seed: `${seed}/gi${i}`})} at={b(at, 0.3 + i * 0.1)} dur={0.4} width={width * 0.85} />
           <Ink d={glint(gx + gw * 0.2, y + fb + gh * 0.4, gh * 0.22, {seed: `${seed}/gl${i}`})} at={b(at, 1.0 + i * 0.1)} dur={0.15} width={width * 0.7} order="all" />
           <Fill d={roundRect(i === 0 ? gx + gw - 9 : gx + 2, y + h / 2 - 22, 7, 44, 3.5)} color={palette.ink} at={b(at, 0.95)} offset={false} seed={`${seed}/hd${i}`} />
-        </g>,
+        </XG>,
       );
     }
   }
@@ -146,17 +147,13 @@ export const Paper: React.FC<PaperProps> = ({x, y, w = 150, h = 200, rot = 0, at
   const stampO = stamp ? (stamp === true ? {} : stamp) : null;
   const inner = (
     <>
-      <Fill d={polyPath(outline)} color={color} at={b(A, 0.3)} mode="fade" seed={`${seed}/f`} offset={[-3, 2]} />
+      <Fill d={polyPath(outline)} color={color} at={b(A, 0.16)} seed={`${seed}/f`} offset={[-3, 2]} />
       {fold ? <Fill d={polyPath([[w - f, 0], [w - f, f], [w, f]])} color={palette.tan} at={b(A, 0.5)} offset={false} seed={`${seed}/fold`} /> : null}
       <Ink d={poly(outline, {closed: true, seed: `${seed}/o`, over: 2.5})} at={A} dur={0.5} width={width} />
       {fold ? <Ink d={`M${w - f} 0L${w - f + 1} ${f}L${w} ${f}`} at={b(A, 0.45)} dur={0.15} width={width * 0.8} /> : null}
       <Ink d={hline(w * 0.18, w * 0.18 + w * r.range(0.25, 0.4), h * 0.2, {over: 0, seed: `${seed}/hd`})} at={b(A, 0.55)} dur={0.15} width={width * 1.7} />
       <Ink d={textLines(w * 0.14, h * 0.34, w * 0.7, {n: lines, gap: (h * 0.5) / Math.max(1, lines), heading: false, seed: `${seed}/tl`})} at={b(A, 0.6)} dur={0.45} width={width * 0.8} />
-      {pin ? (
-        <ExitFade>
-          <circle cx={w / 2} cy={h * 0.07} r={Math.max(3, w * 0.035)} fill={palette.ink} />
-        </ExitFade>
-      ) : null}
+      {pin ? <Fill d={blob(w / 2, h * 0.07, Math.max(3, w * 0.035), Math.max(3, w * 0.035), {seed: `${seed}/pin`})} color={palette.ink} at={b(A, 0.4)} mode="snap" offset={false} seed={`${seed}/pin`} /> : null}
       {stampO ? <Stamp x={w * 0.66} y={h * 0.64} r={w * 0.22} at={stampO.at ?? b(at, 0.9)} color={stampO.color} seed={`${seed}/st`} /> : null}
     </>
   );
@@ -164,21 +161,18 @@ export const Paper: React.FC<PaperProps> = ({x, y, w = 150, h = 200, rot = 0, at
   let dx = 0;
   let dy = 0;
   let dr = 0;
-  let op = 1;
   if (at !== undefined && entry === 'drop') {
     const s1 = springAt(t, at, {stiffness: 140, damping: 12});
     dy = lerp(-260, 0, s1);
     dr = lerp(r.sign() * 14, 0, springAt(t, at + 0.05, springs.wobbly));
-    op = prog(t, at, 0.15);
   }
   if (at !== undefined && entry === 'slide') {
     dx = lerp(-180, 0, prog(t, at, 0.5, E.outCubic));
-    op = prog(t, at, 0.3);
   }
   const body = (
-    <g transform={`translate(${(x + dx).toFixed(2)} ${(y + dy).toFixed(2)}) rotate(${(rot + dr).toFixed(2)} ${w / 2} ${h / 2})`} opacity={op < 1 ? op : undefined}>
+    <XG m={mat.compose(mat.translate(x + dx, y + dy), mat.about(mat.rotate(rot + dr), w / 2, h / 2))}>
       {inner}
-    </g>
+    </XG>
   );
   if (at !== undefined && entry === 'pop') {
     return (

@@ -1,8 +1,20 @@
 [
  {
+  "t": 0.0,
+  "sfx": "city_bed",
+  "gain_db": -25,
+  "pan": 0.0,
+  "prio": "A",
+  "why": "distant city hum under the opening; it dies with the lights at 3.45",
+  "loop": true,
+  "dur": 3.55,
+  "fade_in": 0.0,
+  "fade_out": 0.15
+ },
+ {
   "t": 0.06,
   "sfx": "pencil_scratch_medium",
-  "gain_db": -19,
+  "gain_db": -21,
   "pan": 0.0,
   "prio": "A",
   "why": "opening line art draws on from frame 1"
@@ -37,7 +49,7 @@
   "gain_db": -16,
   "pan": 0.0,
   "prio": "B",
-  "why": "'two steps' - the two-step card"
+  "why": "'two steps'"
  },
  {
   "t": 13.12,
@@ -57,11 +69,11 @@
  },
  {
   "t": 18.18,
-  "sfx": "card_flip",
-  "gain_db": -17,
+  "sfx": "fg_wipe",
+  "gain_db": -18,
   "pan": 0.0,
   "prio": "A",
-  "why": "0.39 s pause before 'And for 14 years' - card flip"
+  "why": "0.39 s pause before 'And for 14 years' - foreground-wipe transition"
  },
  {
   "t": 18.87,
@@ -88,20 +100,12 @@
   "why": "'found it' - the discovery"
  },
  {
-  "t": 31.71,
-  "sfx": "riser_leak",
-  "gain_db": -18,
-  "pan": 0.0,
-  "prio": "A",
-  "why": "leak build: 3.64 s riser peaking at 35.35 (bar line before 'Cloudflare')"
- },
- {
   "t": 35.62,
   "sfx": "pop_low",
-  "gain_db": -12,
+  "gain_db": -13,
   "pan": 0.0,
   "prio": "A",
-  "why": "'Cloudflare' lands on the riser peak"
+  "why": "'Cloudflare' lands (the bed's soft sub accent is at 35.35)"
  },
  {
   "t": 38.82,
@@ -137,11 +141,19 @@
  },
  {
   "t": 45.4,
-  "sfx": "card_flip",
-  "gain_db": -18,
+  "sfx": "fg_wipe",
+  "gain_db": -19,
   "pan": 0.0,
   "prio": "A",
-  "why": "breath / 'So now comes step two' - scene flip"
+  "why": "breath / 'So now comes step two' - transition"
+ },
+ {
+  "t": 45.55,
+  "sfx": "light_shimmer",
+  "gain_db": -24,
+  "pan": 0.0,
+  "prio": "B",
+  "why": "dawn / light shaft on the breath"
  },
  {
   "t": 46.4,
@@ -150,6 +162,18 @@
   "pan": 0.0,
   "prio": "B",
   "why": "'two'"
+ },
+ {
+  "t": 47.84,
+  "sfx": "air_bed",
+  "gain_db": -27,
+  "pan": 0.0,
+  "prio": "A",
+  "why": "air under the '22 million doors' vista (47.84-54.56)",
+  "loop": true,
+  "dur": 6.72,
+  "fade_in": 0.8,
+  "fade_out": 0.8
  },
  {
   "t": 48.47,

@@ -1,4 +1,5 @@
-// timeline.tsx — scene framework. Sequences scenes on the VO timeline inside the polaroid card, runs the
+// timeline.tsx — LEGACY (v1, card layout). Main v2 uses lib/Film.tsx (full-bleed). Kept for card-based previews.
+// Sequences scenes on the VO timeline inside the polaroid card, runs the
 // transitions, renders captions inside the card (so they flip with it) and plays the VO.
 //
 // Data (src/data/scenes.json):  [{id, start, end, transitionIn?: Transition, transitionOut?: Transition}]
@@ -22,7 +23,8 @@
 //   <Timeline scenes={scenes} components={sceneComponents} captions={captions} />   // Main
 //   <Timeline ... only="S03" offset={scene.start} />                                  // one-scene preview
 
-import React, {createContext, useContext} from 'react';
+import React from 'react';
+import {SceneProvider} from './stage';
 import {Audio, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {Art, Card, CardXf, flipIn, flipOut, FLIP_POST, FLIP_PRE, Page, pushIn, pushOut, PushDir, sheetRect, swipeIn, swipeOut, SWIPE_SLIDE} from './Card';
 import {Captions, CaptionBeat} from './Captions';
@@ -62,21 +64,19 @@ const SHEET_DEFAULT: [number, number, number, number] = [panel.x + panel.w / 2 -
 
 // ---------------------------------------------------------------- scene context
 
-export type SceneInfo = {id: string; start: number; end: number; dur: number};
-const SceneCtx = createContext<SceneInfo>({id: 'none', start: 0, end: 0, dur: 0});
-/** Info about the scene being rendered (id, start, end, dur in seconds). */
-export const useScene = () => useContext(SceneCtx);
+export {useScene} from './stage';
+export type {SceneInfo} from './stage';
 
 /** Renders one scene component with its local time, exit value and art transform. */
 export const SceneLayer: React.FC<{scene: SceneDef; Comp: React.FC; exit?: number; zoom?: {s: number; x: number; y: number}; opacity?: number}> = ({scene, Comp, exit = 0, zoom, opacity = 1}) => (
   <TimeProvider offset={scene.start}>
-    <SceneCtx.Provider value={{id: scene.id, start: scene.start, end: scene.end, dur: scene.end - scene.start}}>
+    <SceneProvider value={{id: scene.id, start: scene.start, end: scene.end, dur: scene.end - scene.start}}>
       <ExitProvider value={exit}>
         <Art zoom={zoom} opacity={opacity}>
           <Comp />
         </Art>
       </ExitProvider>
-    </SceneCtx.Provider>
+    </SceneProvider>
   </TimeProvider>
 );
 

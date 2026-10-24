@@ -3,3 +3,4 @@ out/
 previews/
 audio/demo_*.wav
 audio/mix*.wav
+public/mix.wav

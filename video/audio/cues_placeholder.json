@@ -64,7 +64,7 @@
  },
  {
   "t": 18.179,
-  "sfx": "card_flip",
+  "sfx": "fg_wipe",
   "gain_db": -18,
   "pan": 0,
   "why": "sentence boundary (0.39s gap)"
@@ -78,7 +78,7 @@
  },
  {
   "t": 21.267,
-  "sfx": "card_flip",
+  "sfx": "fg_wipe",
   "gain_db": -18,
   "pan": 0,
   "why": "sentence boundary (0.35s gap)"
@@ -92,7 +92,7 @@
  },
  {
   "t": 30.142,
-  "sfx": "card_flip",
+  "sfx": "fg_wipe",
   "gain_db": -18,
   "pan": 0,
   "why": "sentence boundary (0.48s gap)"

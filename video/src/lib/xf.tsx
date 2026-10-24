@@ -51,13 +51,44 @@ const XfCtx = createContext<Mat>(mat.I);
 /** Accumulated transform (card coords <- local coords) of the current subtree. */
 export const useXf = () => useContext(XfCtx);
 
-/** <g transform> that also records the accumulated matrix for descendants. Skips the <g> for identity. */
+// ---------------------------------------------------------------- projective (perspective) context
+// A <Plane> (lib/persp.tsx) maps its children's local rectangle onto any quadrilateral with a 3x3 homography.
+// Ink and Fill read this context and rewrite their path data through it; XG transforms inside a plane are folded
+// into the homography instead of emitting <g transform> (so Place/Pop/Move keep working on a receding facade).
+
+/** Row-major 3x3 homography [a b c d e f g h i]: x' = (ax+by+c)/(gx+hy+i), y' = (dx+ey+f)/(gx+hy+i). */
+export type Homography = [number, number, number, number, number, number, number, number, number];
+export type ProjV = {H: Homography; key: string};
+const ProjCtx = createContext<ProjV | null>(null);
+/** The active projection (null outside any <Plane>). */
+export const useProj = () => useContext(ProjCtx);
+export const ProjProvider = ProjCtx.Provider;
+
+/** H * affine(m): apply m first, then H. */
+export function composeHA(H: Homography, m: Mat): Homography {
+  const [a, b, c, d, e, f] = m; // x' = a x + c y + e ; y' = b x + d y + f
+  const A: Homography = [a, c, e, b, d, f, 0, 0, 1];
+  const r: number[] = [];
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) r.push(H[i * 3] * A[j] + H[i * 3 + 1] * A[3 + j] + H[i * 3 + 2] * A[6 + j]);
+  return r as Homography;
+}
+export const homKey = (H: Homography) => H.map((v) => +v.toPrecision(6)).join(',');
+
+/** <g transform> that also records the accumulated matrix for descendants. Skips the <g> for identity.
+ *  Inside a <Plane> it folds the matrix into the projection instead. */
 export const XG: React.FC<{m: Mat; opacity?: number; children?: React.ReactNode}> = ({m, opacity, children}) => {
   const parent = useContext(XfCtx);
+  const proj = useContext(ProjCtx);
   const ident = mat.isIdentity(m, 1e-6) && Math.abs(m[4]) < 1e-6 && Math.abs(m[5]) < 1e-6;
-  if (ident && (opacity === undefined || opacity >= 1)) return <>{children}</>;
+  const op = opacity !== undefined && opacity < 1 ? opacity : undefined;
+  if (proj && !ident) {
+    const H = composeHA(proj.H, m);
+    const inner = <ProjCtx.Provider value={{H, key: homKey(H)}}>{children}</ProjCtx.Provider>;
+    return op !== undefined ? <g opacity={op}>{inner}</g> : inner;
+  }
+  if (ident && op === undefined) return <>{children}</>;
   return (
-    <g transform={ident ? undefined : mat.str(m)} opacity={opacity !== undefined && opacity < 1 ? opacity : undefined}>
+    <g transform={ident ? undefined : mat.str(m)} opacity={op}>
       <XfCtx.Provider value={ident ? parent : mat.mul(parent, m)}>{children}</XfCtx.Provider>
     </g>
   );

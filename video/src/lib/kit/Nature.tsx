@@ -7,7 +7,7 @@
 
 import React from 'react';
 import {palette, stroke} from '../theme';
-import {ease as E, osc, prog, springAt, springs, useTime} from '../time';
+import {ease as E, lerp, osc, prog, springAt, springs, useTime} from '../time';
 import {rand, rng, Seed} from '../rng';
 import {Ink} from '../Ink';
 import {Fill} from '../Fill';
@@ -15,6 +15,7 @@ import {Pop, Wobble} from '../motion';
 import {ExitFade} from '../exit';
 import {blob, circle, crown, crownTicks, line, poly, polyPath, wire, wirePoint, Pt} from '../sketch';
 import {At, b, inkW, Place} from './common';
+import {mat, XG} from '../xf';
 
 // ---------------------------------------------------------------- Tree
 
@@ -146,15 +147,13 @@ export const Bird: React.FC<{x: number; y: number; s?: number; seed?: Seed; at?:
     <Place x={x} y={y + hop} s={s * pop} flip={flip}>
       <Fill d={birdBody(sd)} color={color} offset={[-2, -1]} seed={`${sd}/f`} />
       <Ink d={`M-11 -16Q-2 -21 6 -18M-12 -4Q-4 1 8 -2M-12 -7L-24 -2`} width={inkW(s) * 0.85} seed={`${sd}/i`} />
-      <g transform={`rotate(${look} 9 -16)`}>
+      <XG m={look ? mat.about(mat.rotate(look), 9, -16) : mat.I}>
         <Fill d={blob(10, -19, 6.5, 6, {seed: `${sd}/h`})} color={color} offset={false} seed={`${sd}/hf`} />
         <Ink d={circle(10, -19, 6.5, {seed: `${sd}/h`, overlap: 12})} width={inkW(s) * 0.85} />
-        <ExitFade>
-          <path d="M16 -19L21 -18L16 -16.5" fill={palette.sun} stroke="none" />
-          <circle cx={12} cy={-20.5} r={1.1} fill={palette.ink} />
-        </ExitFade>
-      </g>
-      <Fill d={`M-6 -14Q2 -16 6 -10Q0 -6 -8 -9Z`} color={palette.tan} offset={false} seed={`${sd}/w`} opacity={0.8} />
+        <Fill d="M16 -19L21 -18L16 -16.5Z" color={palette.sun} offset={false} mode="snap" seed={`${sd}/bk`} />
+        <Fill d={blob(12, -20.5, 1.2, 1.2, {seed: `${sd}/eye`})} color={palette.ink} offset={false} seed={`${sd}/ey`} />
+      </XG>
+      <Fill d={`M-6 -14Q2 -16 6 -10Q0 -6 -8 -9Z`} color={palette.tan} offset={false} seed={`${sd}/w`} />
     </Place>
   );
 };
@@ -207,14 +206,17 @@ export const LampPost: React.FC<LampPostProps> = ({x, y, h = 320, at, seed = 'la
     [ax + 9, top - 18],
     [ax + 18, top + 6],
   ];
-  const lit = lightAt !== undefined ? prog(t, lightAt, 0.35, E.outCubic) : 0;
-  const flick = lightAt !== undefined && t > lightAt && t < lightAt + 0.35 ? (Math.sin((t - lightAt) * 60) > 0 ? 1 : 0.4) : 1;
+  // switches on with a 1-frame flicker (on, off, on): never a fade. The cone is a static translucent flat polygon.
+  const dt = lightAt !== undefined ? t - lightAt : -1;
+  const lit = dt >= 0 && !(dt > 0.07 && dt < 0.14) ? 1 : 0;
+  const flick = 1;
   return (
     <>
       {lit > 0 ? (
         <ExitFade>
           <Fill d={polyPath([[ax - 14, top + 6], [ax + 14, top + 6], [ax + 80, y], [ax - 80, y]])} color={palette.cream} opacity={0.38 * lit * flick} offset={false} seed={`${seed}/cone`} />
-          <circle cx={ax} cy={top + 8} r={26} fill={palette.sun} opacity={0.22 * lit * flick} />
+          <circle cx={ax} cy={top + 8} r={30} fill={palette.peach} opacity={0.3 * lit * flick} />
+          <circle cx={ax} cy={top + 8} r={18} fill={palette.peach} opacity={0.3 * lit * flick} />
         </ExitFade>
       ) : null}
       <Fill d={`M${x - 4} ${y}L${x - 4} ${top}L${x + 4} ${top}L${x + 4} ${y}Z`} color={color} at={b(at, 0.4)} mode="grow" offset={false} seed={`${seed}/pf`} />
@@ -230,3 +232,71 @@ export const LampPost: React.FC<LampPostProps> = ({x, y, h = 320, at, seed = 'la
   );
 };
 
+
+// ---------------------------------------------------------------- String lights (reference 2)
+
+export type StringLightsProps = {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  /** Sag (px, positive = down). */
+  sag?: number;
+  /** Number of bulbs. Default: one per ~70 px. */
+  n?: number;
+  /** Bulb radius (px). [near, far] interpolates along the wire (a strand receding in perspective). Default 9. */
+  bulb?: number | [number, number];
+  at?: At;
+  /** Bulbs switch on L->R (1 frame apart), each a 1-frame pop to peach with a stepped halo. */
+  lightAt?: number;
+  seed?: Seed;
+  /** Wire ink width (on screen). Default inkThin. */
+  width?: number;
+  color?: string;
+  litColor?: string;
+};
+
+/** A festoon of bulbs on a sagging wire. Wire draws, bulbs pop in L->R, then light up. Built from Ink/Fill only, so
+ *  it works inside a <Plane> and un-builds with the scene. */
+export const StringLights: React.FC<StringLightsProps> = ({x1, y1, x2, y2, sag = 30, n, bulb = 9, at, lightAt, seed = 'lights', width = stroke.inkThin, color = palette.white, litColor = palette.peach}) => {
+  const t = useTime();
+  const len = Math.hypot(x2 - x1, y2 - y1);
+  const count = n ?? Math.max(3, Math.round(len / 70));
+  const [b0, b1] = Array.isArray(bulb) ? bulb : [bulb, bulb];
+  const out: React.ReactNode[] = [<Ink key="w" d={wire(x1, y1, x2, y2, sag, {seed: `${seed}/w`})} at={at} width={width} />];
+  for (let i = 0; i < count; i++) {
+    const u = (i + 0.5) / count;
+    const [bx, by0] = wirePoint(x1, y1, x2, y2, sag, u);
+    const r = lerp(b0, b1, u);
+    const by = by0 + r * 1.25;
+    const bAt = b(at, 0.15 + i * (1 / 30));
+    const on = lightAt !== undefined && t >= lightAt + i * (1 / 30);
+    out.push(
+      <React.Fragment key={i}>
+        {on ? <Fill d={blob(bx, by, r * 2.5, r * 2.5, {seed: `${seed}/h${i}`})} color={litColor} opacity={0.22} offset={false} seed={`${seed}/hf${i}`} /> : null}
+        {on ? <Fill d={blob(bx, by, r * 1.7, r * 1.7, {seed: `${seed}/g${i}`})} color={litColor} opacity={0.3} offset={false} seed={`${seed}/gf${i}`} /> : null}
+        <Fill d={blob(bx, by, r, r * 1.08, {seed: `${seed}/b${i}`})} color={on ? litColor : color} at={bAt} mode="snap" offset={[r * 0.15, r * 0.12]} seed={`${seed}/bf${i}`} />
+        {r > 3 ? <Ink d={`M${bx.toFixed(1)} ${(by0 - 1).toFixed(1)}L${bx.toFixed(1)} ${(by - r * 0.8).toFixed(1)}` + circle(bx, by, r, {seed: `${seed}/bi${i}`, overlap: 8})} at={bAt} width={Math.min(width, r * 0.35)} /> : null}
+      </React.Fragment>,
+    );
+  }
+  return <>{out}</>;
+};
+
+// ---------------------------------------------------------------- Utility pole
+
+/** A wooden utility / light pole: ochre shaft, crossbar, two insulators. x = centre, y = ground. */
+export const UtilityPole: React.FC<{x: number; y: number; h?: number; s?: number; at?: At; seed?: Seed; bar?: boolean; width?: number; color?: string}> = ({x, y, h = 620, s = 1, at, seed = 'pole', bar = true, width = stroke.ink, color = palette.brown}) => {
+  const w = 14;
+  const W = inkW(s, width);
+  const top = -h;
+  return (
+    <Place x={x} y={y} s={s}>
+      <Fill rect={[-w / 2, top, w, h]} color={color} at={b(at, 0.12)} mode="wipe" dir="up" offset={[2, 1]} seed={`${seed}/f`} />
+      <Ink d={line(-w / 2, 0, -w / 2, top, {over: [0, 6], seed: `${seed}/l`}) + line(w / 2, 0, w / 2, top + 4, {over: [0, 3], seed: `${seed}/r`})} at={at} width={W} order="all" />
+      {bar ? <Fill rect={[-62, top + 40, 124, 10]} color={color} at={b(at, 0.22)} mode="snap" offset={[2, 1]} seed={`${seed}/bf`} /> : null}
+      {bar ? <Ink d={line(-66, top + 40, 66, top + 40, {over: [3, 6], seed: `${seed}/b1`}) + line(-62, top + 50, 62, top + 50, {over: [2, 4], seed: `${seed}/b2`})} at={b(at, 0.1)} width={W * 0.9} /> : null}
+      {bar ? <Ink d={line(-52, top + 40, -52, top + 26, {over: 0, seed: `${seed}/i1`}) + line(52, top + 40, 52, top + 26, {over: 0, seed: `${seed}/i2`})} at={b(at, 0.2)} width={W * 1.3} /> : null}
+    </Place>
+  );
+};

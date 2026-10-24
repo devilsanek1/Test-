@@ -1,11 +1,13 @@
 // motion.tsx — SVG motion wrappers (all render <XG>, i.e. <g transform> + transform context; compose freely;
 // times in scene seconds). Children are authored at their FINAL (rest) position; motion props are offsets.
 //
-//   <Pop at={1.2} x={300} y={800}> ... </Pop>                  // springy scale-in about (x,y); hidden before `at`
-//   <Rise at={1} y={1040} dist={120}> <Person .../> </Rise>    // springs up from below (audience rows)
+// Calibrated to docs/motion_spec.md: NOTHING animates opacity. Things pop, scale, wipe, slide or rise.
+//   <Pop at={1.2} x={300} y={800}> ... </Pop>                  // scale-in about (x,y), 7% overshoot; hidden before `at`
+//   <Rise at={1} dist={140}> <Person .../> </Rise>             // rises ~its own height from below: out(exp) 0.33 s
+//   <Sink at={6} dist={160}> ... </Sink>                       // exits by sinking (0.2 s ease-in), then gone
 //   <Move from={[-400, 0]} at={2} dur={0.8}> ... </Move>       // slide in from 400px left to rest
 //   <Walk from={[500, 0]} at={3} dur={2.5}> <Person .../> </Walk>   // translate + step bob + sway
-//   <Appear at={1} dur={0.3}> ... </Appear>                      // opacity
+//   <Appear at={1} outAt={4}> ... </Appear>                      // 1-frame pop in (and out)
 //   <Wobble amp={2} rot={1.5} x={480} y={600} seed="tree"> ... </Wobble>   // idle micro-motion
 //   <Shake at={4} dur={0.5} amp={6}> ... </Shake>
 //   <Tween at={1} dur={0.6} from={{y: 40, opacity: 0}} to={{}} ox={..} oy={..}> ... </Tween>
@@ -16,6 +18,7 @@ import {Ease, clamp, ease as E, lerp, osc, prog, springAt, springs, SpringCfg, u
 import {rand, Seed} from './rng';
 import {mat, Mat, XG} from './xf';
 import {panel} from './theme';
+import {MOTION} from './spec';
 
 type Children = {children?: React.ReactNode};
 
@@ -57,14 +60,24 @@ export const Pop: React.FC<
   return <XG m={xfMat({s, r, ox: x, oy: y})}>{children}</XG>;
 };
 
-// ---------------------------------------------------------------- Rise (spring up from below)
+// ---------------------------------------------------------------- Rise / Sink
 
-/** Springs children up from `dist` px below (the reference audience rows pop up one by one in ~0.25 s). */
-export const Rise: React.FC<Children & {at: number; dist?: number; spring?: SpringCfg; keep?: boolean}> = ({at, dist = 120, spring = springs.snappy, keep = false, children}) => {
+/** Rises children ~their own height from below (people, placards: "they never walk in, they rise").
+ *  Default out(exp) over 0.33 s (50% in the first frame); pass `spring` for the {damping 40, stiffness 700} feel.
+ *  Put it behind something (a crowd row, the frame edge, a wall) so the entry is hidden. */
+export const Rise: React.FC<Children & {at: number; dist?: number; dur?: number; spring?: SpringCfg; keep?: boolean}> = ({at, dist = 140, dur = MOTION.rise.dur, spring, keep = false, children}) => {
   const t = useTime();
   if (t < at && !keep) return null;
-  const k = springAt(t, at, spring);
+  const k = spring ? springAt(t, at, spring) : prog(t, at, dur, MOTION.rise.ease);
   return <XG m={mat.translate(0, (1 - k) * dist)}>{children}</XG>;
+};
+
+/** Exit by sinking: children drop `dist` px over `dur` (ease-in) starting at `at`, then unmount. */
+export const Sink: React.FC<Children & {at: number; dist?: number; dur?: number}> = ({at, dist = 160, dur = MOTION.sink.dur, children}) => {
+  const t = useTime();
+  const k = prog(t, at, dur, E.inCubic);
+  if (k >= 1) return null;
+  return <XG m={mat.translate(0, k * dist)}>{children}</XG>;
 };
 
 // ---------------------------------------------------------------- Move
@@ -122,23 +135,21 @@ export const Walk: React.FC<
 
 // ---------------------------------------------------------------- Appear
 
+/** Hard 1-frame pop in at `at` (and out at `outAt`). No opacity (the reference never fades). `dur`/`outDur` are
+ *  accepted for old code and ignored. */
 export const Appear: React.FC<
   Children & {
     at: number;
     dur?: number;
-    /** Optional fade-out start (s). */
     outAt?: number;
     outDur?: number;
-    /** Keep rendering before `at` (invisible). Default false. */
     keep?: boolean;
   }
-> = ({at, dur = 0.3, outAt, outDur = 0.3, keep = false, children}) => {
+> = ({at, outAt, children}) => {
   const t = useTime();
-  if (t < at && !keep) return null;
-  let o = prog(t, at, dur, E.outCubic);
-  if (outAt !== undefined) o *= 1 - prog(t, outAt, outDur, E.inOutCubic);
-  if (o <= 0.001) return null;
-  return <XG m={mat.I} opacity={o}>{children}</XG>;
+  if (t < at) return null;
+  if (outAt !== undefined && t >= outAt) return null;
+  return <>{children}</>;
 };
 
 // ---------------------------------------------------------------- Wobble (idle)
@@ -192,6 +203,7 @@ export const Shake: React.FC<Children & {at: number; dur?: number; amp?: number;
 
 // ---------------------------------------------------------------- Tween (general)
 
+/** opacity is treated as a visibility switch (>= 0.5 = visible), never a fade. */
 export type TweenState = {x?: number; y?: number; s?: number; r?: number; opacity?: number};
 
 export const Tween: React.FC<
@@ -209,10 +221,10 @@ export const Tween: React.FC<
   const t = useTime();
   const p = prog(t, at, dur, ease);
   const v = (k: keyof TweenState, def: number) => lerp(from[k] ?? def, to[k] ?? def, p);
-  const o = v('opacity', 1);
-  if (o <= 0.001) return null;
+  // opacity is a visibility switch (>= 0.5 visible): the reference never fades
+  if (v('opacity', 1) < 0.5) return null;
   return (
-    <XG m={xfMat({x: v('x', 0), y: v('y', 0), s: v('s', 1), r: v('r', 0), ox, oy})} opacity={o}>
+    <XG m={xfMat({x: v('x', 0), y: v('y', 0), s: v('s', 1), r: v('r', 0), ox, oy})}>
       {children}
     </XG>
   );

@@ -1,4 +1,5 @@
-"""Bed 2 "lofi": lo-fi nylon plucks + tine electric piano + upright bass + soft brushed kick.
+"""RETIRED (pre-cinematic direction; kept for reference, renders deleted).
+Bed 2 "lofi": lo-fi nylon plucks + tine electric piano + upright bass + soft brushed kick.
 F minor, 71.29 BPM, swung 16ths. 22 bars: 4/4 except two 2/4 'hiccup' bars (bar 11 = the beat before
 "Cloudflare", bar 15 = the breath "So now comes step two") so every story beat lands on a downbeat:
 bar 10 = 30.30 s (leak), bar 12 = 35.35 s (Cloudflare), bar 14 beat 2 = 42.93 s (suspension),
@@ -8,7 +9,7 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # retired: tools/ is one level up
 from bedkit import (Bed, Grid, chord, tones, nearest, automation, fx, reverb_send, voice_carve, finish, TAIL,
                     HighpassFilter, LowpassFilter, HighShelfFilter, LowShelfFilter, PeakFilter, Compressor)  # noqa
 from common import AUDIO, SR, VIDEO_DUR, db2a  # noqa: E402

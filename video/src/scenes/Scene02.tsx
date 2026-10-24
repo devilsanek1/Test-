@@ -1,37 +1,16 @@
-// PLACEHOLDER (engine stream) — proves flip-in + un-build; the scene agent for S02 replaces this file.
-// "They were fixing a security bug in PHP, the programming language behind WordPress and about 7 out of 10 websites."
+// PLACEHOLDER (core lane) — proves camera-continuous in and a scene-provided Wiper; the S02 agent replaces this file.
 import React from 'react';
-import {Panel, Sun, Building, Ground, Tree, BrowserWindow, Bug, Window, useTime, palette, Fill} from '../lib';
-
-const MiniSites: React.FC<{at: number; fillAt: number}> = ({at, fillAt}) => {
-  const t = useTime();
-  return (
-    <>
-      {Array.from({length: 10}, (_, i) => {
-        const x = 130 + (i % 5) * 140;
-        const y = 760 + Math.floor(i / 5) * 140;
-        const hot = i < 7;
-        return (
-          <React.Fragment key={i}>
-            <Window x={x} y={y} w={110} h={100} at={at + i * 0.06} seed={`ms${i}`} glass={palette.card} glint={false} />
-            {hot && t > fillAt ? <Fill rect={[x, y, 110, 100]} color={palette.sun} at={fillAt + i * 0.08} mode="wipe" dir="up" seed={`mf${i}`} /> : null}
-          </React.Fragment>
-        );
-      })}
-    </>
-  );
-};
+import {World, Sun, Fill, Ink, Bug, hline, palette, skies, world, stroke, PoleWiper, WiperProps} from '../lib';
 
 const Scene02: React.FC = () => (
-  <>
-    <Panel />
-    <Sun />
-    <Ground y={700} />
-    <Building x={70} y={700} w={260} floors={4} floorH={105} seed="s2b1" balconies={[2]} roof="cornice" />
-    <Tree x={800} y={700} size={62} seed="s2t" at={0.4} />
-    <BrowserWindow x={360} y={260} w={420} h={400} at={0.2} url="php.net" content="code" seed="s2code" accent={palette.sun} />
-    <Bug x={640} y={520} size={70} at={1.0} crawl seed="s2bug" />
-    <MiniSites at={3.2} fillAt={4.25} />
-  </>
+  <World sky={skies.day}>
+    <Sun cx={540} cy={800} horizon={world.horizon} beats={[1.5, 3.4]} drift={[10, 0]} />
+    <Fill rect={[-200, world.horizon, 1480, 1300]} color={palette.sand} offset={false} />
+    <Ink d={hline(-60, 1140, world.horizon, {seed: 's2h'})} width={stroke.ink} />
+    <Bug x={540} y={1200} size={160} at={0.8} crawl seed="s2bug" />
+  </World>
 );
 export default Scene02;
+
+/** Example: this scene's own foreground element for a {type: 'foreground-wipe', element: 'scene'} out of S02. */
+export const Wiper: React.FC<WiperProps> = (p) => <PoleWiper {...p} color={palette.teal} />;

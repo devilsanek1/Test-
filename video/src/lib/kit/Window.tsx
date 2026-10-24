@@ -44,7 +44,7 @@ export const Window: React.FC<WindowProps> = ({x, y, w, h, at, seed = `${Math.ro
   const T = (dt: number) => b(at, dt * k);
   const fb = frame ? Math.max(5, Math.min(14, w * 0.09)) : 0;
   const parts: React.ReactNode[] = [];
-  if (frame) parts.push(<Fill key="fr" rect={[x - fb, y - fb, w + fb * 2, h + fb * 2]} color={frame} at={T(0.3)} mode="fade" seed={`${seed}/fr`} />);
+  if (frame) parts.push(<Fill key="fr" rect={[x - fb, y - fb, w + fb * 2, h + fb * 2]} color={frame} at={T(0.3)} mode="snap" seed={`${seed}/fr`} />);
   parts.push(<Fill key="gl" rect={[x, y, w, h]} color={g} at={T(0.38)} mode="wipe" dir="down" seed={`${seed}/gl`} offset={frame ? false : undefined} />);
   if (blind > 0) parts.push(<Fill key="bl" rect={[x, y, w, h * blind]} color={palette.tan} at={T(0.5)} mode="wipe" dir="down" seed={`${seed}/bl`} offset={false} />);
   parts.push(<Ink key="fr" d={rect(x, y, w, h, {seed: `${seed}/f`})} at={T(0)} dur={0.4 * k} width={width} seed={`${seed}/f`} />);

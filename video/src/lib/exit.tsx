@@ -1,14 +1,20 @@
-// exit.tsx — "un-build" support. A SceneExit value (0..1) flows down the tree; every <Ink> and <Fill>
-// reads it and dismantles itself automatically: small fills drain/collapse first, then lines retract, and
-// the biggest fills (walls, sky) collapse last, like the reference. Each element gets a seeded offset.
+// exit.tsx — "un-build" support. A SceneExit value e (0..1) flows down the tree; every <Ink> and <Fill> reads it and
+// dismantles itself with the measured recipe (docs/motion_spec.md T6, MOTION.unbuild), all ease-in, NO fades:
+//   1. e 0.00-0.20  lines go LOOSE: every stroke extends past its corners (+~25%) and skews a hair
+//   2. e 0.10-0.65  fills SHRINK to their centres (small first, seeded order)
+//   3. e 0.36-0.70  ink RETRACTS (strokes undraw)
+//   4. e 0.60-0.92  the big background SLAB (sky, a wall: any fill covering >= 55% of the frame) COLLAPSES DOWNWARD
+// The default un-build lasts MOTION.unbuild.total (0.5 s); the phases scale with the duration you give it.
 //
 //   Main sets it for 'unbuild' transitions. Inside a scene you can un-build any group locally:
-//   <UnBuild at={6.2} dur={1.2}> ...old props... </UnBuild>
-//   <NoExit> <Cat/> </NoExit>                    // persistent objects survive the un-build
-//   <ExitProvider value={0.5}> ... </ExitProvider> // drive it yourself
+//   <UnBuild at={6.2}> ...old props... </UnBuild>          // 0.5 s
+//   <NoExit> <Elephant .../> </NoExit>                    // persistent objects survive the un-build
+//   <ExitProvider value={0.5}> ... </ExitProvider>        // drive it yourself
 
 import React, {createContext, useContext} from 'react';
 import {clamp, ease, prog, useTime} from './time';
+import {MOTION} from './spec';
+import {mat, XG} from './xf';
 
 const ExitCtx = createContext(0);
 
@@ -21,30 +27,66 @@ export const ExitProvider: React.FC<{value: number; children: React.ReactNode}> 
   return <ExitCtx.Provider value={Math.max(parent, clamp(value))}>{children}</ExitCtx.Provider>;
 };
 
-/** Un-build children over [at, at+dur] (scene seconds). */
-export const UnBuild: React.FC<{at: number; dur?: number; children: React.ReactNode}> = ({at, dur = 0.8, children}) => {
+/** Un-build children over [at, at+dur] (scene seconds). Default dur = MOTION.unbuild.total (0.5 s). */
+export const UnBuild: React.FC<{at: number; dur?: number; children: React.ReactNode}> = ({at, dur = MOTION.unbuild.total, children}) => {
   const t = useTime();
-  return <ExitProvider value={prog(t, at, dur, ease.inOutSine)}>{children}</ExitProvider>;
+  return <ExitProvider value={prog(t, at, dur)}>{children}</ExitProvider>;
 };
 
 /** Children ignore any exit from above. */
 export const NoExit: React.FC<{children: React.ReactNode}> = ({children}) => <ExitCtx.Provider value={0}>{children}</ExitCtx.Provider>;
 
-/** Fill drain progress for exit value e. jitter 0..1 (seeded per element); size 0..1 = sqrt(area / panel area).
- *  Order like the reference un-build: small fills drain first, then lines retract, the big backdrop last. */
+/** Fills at or above this size (sqrt of area share of the frame) are the background SLAB: they collapse last. */
+export const SLAB_SIZE = 0.74;
+
+/** Fill un-build progress (LINEAR 0..1; apply an ease-in) for exit value e. jitter 0..1 (seeded per element);
+ *  size 0..1 = sqrt(area / frame area). Small fills shrink first, the slab collapses last. */
 export const exitFillProgress = (e: number, jitter = 0, size = 0) => {
   if (e <= 0) return 0;
-  const start = 0.02 + jitter * 0.12 + Math.min(1, size) * 0.5;
-  return prog(e, start, Math.min(0.42, 1 - start), ease.inOutCubic);
+  if (size >= SLAB_SIZE) return prog(e, 0.6, 0.32);
+  return prog(e, 0.1 + jitter * 0.1 + Math.min(1, size) * 0.12, 0.36);
 };
 
-/** Ink retract progress for exit value e. */
-export const exitInkProgress = (e: number, jitter = 0) => (e <= 0 ? 0 : prog(e, 0.2 + jitter * 0.22, 0.4, ease.inOutCubic));
+/** Ink retract progress (LINEAR 0..1) for exit value e. */
+export const exitInkProgress = (e: number, jitter = 0) => (e <= 0 ? 0 : prog(e, 0.36 + jitter * 0.08, 0.26));
 
-/** Fades raw SVG children (circles, text...) out together with the fills during an un-build. */
-export const ExitFade: React.FC<{children?: React.ReactNode; jitter?: number}> = ({children, jitter = 0.5}) => {
+/** How loose the lines are (0..1): ramps up at the start of an un-build and holds until the ink retracts. */
+export const exitLoose = (e: number) => (e <= 0 ? 0 : prog(e, 0, 0.2, ease.outCubic));
+
+/** Raw SVG children (circles, text...) leave with the fills: they shrink about (x, y) if given, else pop out
+ *  (1 frame) halfway through their drain. Never an opacity fade. */
+export const ExitFade: React.FC<{children?: React.ReactNode; jitter?: number; x?: number; y?: number}> = ({children, jitter = 0.5, x, y}) => {
   const e = useExit();
-  const o = 1 - exitFillProgress(e, jitter);
-  if (o <= 0.001) return null;
-  return o < 1 ? <g opacity={o}>{children}</g> : <>{children}</>;
+  const d = exitFillProgress(e, jitter);
+  if (d <= 0) return <>{children}</>;
+  if (x === undefined || y === undefined) return d >= 0.5 ? null : <>{children}</>;
+  const k = 1 - ease.inCubic(d);
+  if (k <= 0.001) return null;
+  return <XG m={mat.about(mat.scale(k), x, y)}>{children}</XG>;
+};
+
+/** Alias of ExitFade (the name is historical: nothing fades). */
+export const ExitPop = ExitFade;
+
+// ---------------------------------------------------------------- Look: ink-only / fills-only / paper states
+
+export type LookV = {
+  /** false = no linework at all (the "fills only" state). */
+  ink: boolean;
+  /** 'color' (normal) | 'paper' (every fill white: the ink-only / loop frame look) | 'none' (no fills). */
+  fills: 'color' | 'paper' | 'none';
+  /** Paper until a radiating wave reaches the fill's centre: colour floods out from `origin` at `speed` px/s from `at`
+   *  (the reference's opening fill cascade: ~2-3 regions per frame from the vanishing point). */
+  cascade?: {at: number; origin: [number, number]; speed?: number};
+};
+const LookCtx = createContext<LookV>({ink: true, fills: 'color'});
+export const useLook = () => useContext(LookCtx);
+
+/** Render states the style bible requires (section 3): <Look fills="paper"> = ink on white fills (frame 0 / loop),
+ *  <Look ink={false}> = flat fills only, <Look cascade={{at: 0.03, origin: [540, 880]}}> = paper, then colour
+ *  floods out from the vanishing point. The sky (<World sky>) keeps its colour. */
+export const Look: React.FC<Partial<LookV> & {children?: React.ReactNode}> = ({ink, fills, cascade, children}) => {
+  const parent = useContext(LookCtx);
+  const v: LookV = {ink: ink ?? parent.ink, fills: fills ?? parent.fills, cascade: cascade ?? parent.cascade};
+  return <LookCtx.Provider value={v}>{children}</LookCtx.Provider>;
 };

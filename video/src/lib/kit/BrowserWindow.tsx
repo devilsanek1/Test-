@@ -17,6 +17,7 @@ import {ExitFade} from '../exit';
 import {arc, circle, hline, line, poly, rect, rectPath, roundRect, textLines} from '../sketch';
 import {captionFontStack} from '../font';
 import {At, b} from './common';
+import {mat, XG} from '../xf';
 
 export type BrowserContent = 'gov' | 'blog' | 'shop' | 'code' | 'blank';
 
@@ -79,13 +80,13 @@ function Content({kind, w, h, at, seed, accent, width}: {kind: BrowserContent; w
     for (let i = 0; i < 4; i++) {
       const gx = pad + (i % cols) * (gw + pad);
       const gy = pad + Math.floor(i / cols) * (gh + pad);
-      const col = r.pick([palette.peach, palette.sage, palette.salmon, palette.cream]);
+      const col = r.pick([palette.peach, palette.sage, palette.peach, palette.cream]);
       out.push(<Fill key={`g${i}`} rect={[gx, gy, gw, gh * 0.62]} color={col} at={b(at, 0.2 + i * 0.1)} mode="pop" offset={false} seed={`${seed}/g${i}`} />);
       out.push(<Ink key={`gi${i}`} d={rect(gx, gy, gw, gh * 0.62, {over: 2, seed: `${seed}/gi${i}`}) + hline(gx, gx + gw * 0.7, gy + gh * 0.76, {over: 0, seed: `${seed}/p${i}`}) + hline(gx, gx + gw * 0.35, gy + gh * 0.9, {over: 0, seed: `${seed}/q${i}`})} at={b(at, 0.15 + i * 0.1)} dur={0.35} width={W * 0.85} />);
     }
   } else if (kind === 'code') {
     const n = Math.floor((h - pad) / 26);
-    const cols = [palette.teal, palette.salmon, palette.ink, palette.sage, palette.brown];
+    const cols = [palette.teal, palette.peach, palette.ink, palette.sage, palette.brown];
     for (let i = 0; i < n; i++) {
       const ind = i === 0 ? 0 : r.pick([0, 1, 1, 2, 2, 3]) * 26;
       let cx = pad + ind;
@@ -105,42 +106,41 @@ export const BrowserWindow: React.FC<BrowserWindowProps> = ({x, y, w, h, at, see
   const t = useTime();
   const cw = w;
   const ch = h - TB;
-  // switch-off
-  const q1 = offAt !== undefined ? prog(t, offAt, 0.22, E.inCubic) : 0;
-  const q2 = offAt !== undefined ? prog(t, offAt + 0.2, 0.18, E.inCubic) : 0;
-  const q3 = offAt !== undefined ? prog(t, offAt + 0.24, 0.4, E.outCubic) : 0;
+  // switch-off (old CRT): the content squashes to a line (0.2 s, ease-in), the line shrinks to a dot (0.15 s), the
+  // screen pops dark and the power icon pops in. No fades.
+  const q1 = offAt !== undefined ? prog(t, offAt, 0.2, E.inCubic) : 0;
+  const q2 = offAt !== undefined ? prog(t, offAt + 0.2, 0.15, E.inCubic) : 0;
+  const dark = offAt !== undefined && t >= offAt + 0.36;
   const sy = 1 - q1 * 0.985;
   const sx = 1 - q2;
   const ccx = x + cw / 2;
   const ccy = y + TB + ch / 2;
-  const contentXf = q1 > 0 ? `translate(${ccx} ${ccy}) scale(${Math.max(0.001, sx)} ${sy}) translate(${-ccx} ${-ccy})` : undefined;
   const area = {w: cw, h: ch};
-  const showContent = q2 < 1;
+  const showContent = q2 < 1 && !dark;
   return (
     <>
-      <Fill rect={[x, y, w, h]} color={palette.card} at={b(at, 0.2)} mode="fade" seed={`${seed}/bg`} />
-      <Fill rect={[x, y, w, TB]} color={palette.grey} at={b(at, 0.3)} mode="wipe" dir="right" offset={false} seed={`${seed}/tb`} />
+      <Fill rect={[x, y, w, h]} color={palette.card} at={b(at, 0.12)} mode="snap" seed={`${seed}/bg`} />
+      <Fill rect={[x, y, w, TB]} color={palette.sand} at={b(at, 0.16)} mode="wipe" dir="right" offset={false} seed={`${seed}/tb`} />
       {showContent ? (
-        <g transform={contentXf}>
-          <g transform={`translate(${x} ${y + TB})`}>
-            {q1 > 0.6 ? <rect x={0} y={0} width={cw} height={ch} fill={palette.card} /> : null}
-            <Content kind={content} w={cw} h={ch} at={b(at, 0.6)} seed={String(seed)} accent={accent} width={width} />
+        <XG m={q1 > 0 ? mat.about(mat.scale(Math.max(0.001, sx), sy), ccx, ccy) : mat.I}>
+          <XG m={mat.translate(x, y + TB)}>
+            {q1 > 0.5 ? <rect x={0} y={0} width={cw} height={ch} fill={palette.card} /> : null}
+            <Content kind={content} w={cw} h={ch} at={b(at, 0.3)} seed={String(seed)} accent={accent} width={width} />
             {typeof children === 'function' ? children(area) : children}
-          </g>
-          {q1 > 0 ? <rect x={x} y={y + TB} width={cw} height={ch} fill={palette.card} opacity={q1} /> : null}
-        </g>
+          </XG>
+        </XG>
       ) : null}
-      {q3 > 0 ? <Fill rect={[x, y + TB, cw, ch]} color={palette.olive} opacity={q3} offset={false} seed={`${seed}/off`} /> : null}
+      {dark ? <Fill rect={[x, y + TB, cw, ch]} color={palette.tealDark} at={offAt! + 0.36} mode="wipe" dir="down" dur={0.1} offset={false} seed={`${seed}/off`} /> : null}
       {q2 > 0 && q2 < 1 ? <circle cx={ccx} cy={ccy} r={6 * (1 - q2) + 2} fill={palette.card} /> : null}
       {offAt !== undefined && offIcon ? (
-        <Pop at={offAt + 0.6} x={ccx} y={ccy}>
-          <Ink d={arc(ccx, ccy + 2, 26, 26, -55, 235, {seed: `${seed}/pw`})} at={offAt + 0.65} dur={0.4} width={stroke.inkBold} color={palette.grey} />
-          <Ink d={line(ccx, ccy - 34, ccx, ccy - 6, {over: 0, seed: `${seed}/pw2`})} at={offAt + 0.95} dur={0.15} width={stroke.inkBold} color={palette.grey} />
+        <Pop at={offAt + 0.5} x={ccx} y={ccy}>
+          <Ink d={arc(ccx, ccy + 2, 26, 26, -55, 235, {seed: `${seed}/pw`})} at={offAt + 0.52} width={stroke.inkBold} color={palette.sand} />
+          <Ink d={line(ccx, ccy - 34, ccx, ccy - 6, {over: 0, seed: `${seed}/pw2`})} at={offAt + 0.6} width={stroke.inkBold} color={palette.sand} />
         </Pop>
       ) : null}
       <Ink d={rect(x, y, w, h, {seed: `${seed}/frame`})} at={at} dur={0.5} width={width} />
       <Ink d={hline(x, x + w, y + TB, {seed: `${seed}/tbl`, over: [2, 8]})} at={b(at, 0.3)} dur={0.25} width={width} />
-      {[palette.salmon, palette.sun, palette.sage].map((c, i) => (
+      {[palette.peach, palette.sun, palette.sage].map((c, i) => (
         <Pop key={i} at={b(at, 0.45 + i * 0.07) ?? -10} x={x + 24 + i * 22} y={y + TB / 2}>
           <ExitFade>
             <circle cx={x + 24 + i * 22} cy={y + TB / 2} r={7} fill={c} />

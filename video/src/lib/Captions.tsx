@@ -12,8 +12,9 @@
 //   type CaptionBeat = {s, e?, lines: {text, s}[], highlights?: {text, s}[], style?: 'punch' | 'hook'}
 
 import React, {useId} from 'react';
-import {card, highlightBox, palette, type as typeTok} from './theme';
-import {ease as E, prog, useGlobalTime} from './time';
+import {captionTones, CaptionTone, card, highlightBox, palette, skyCaption, type as typeTok} from './theme';
+import {clamp, ease as E, prog, useGlobalTime} from './time';
+import {highlightDur, MOTION} from './spec';
 import {captionFontStack, measureCaption, useCaptionFont} from './font';
 
 export type CaptionLine = {text: string; s: number};
@@ -153,6 +154,183 @@ export const Captions: React.FC<CaptionsProps> = ({beats, range, carry = true, i
       <g clipPath={`url(#${id})`}>
         {prev && prevDy !== null ? <Block key={`b${k - 1}`} beat={prev} dy={prevDy} {...common} /> : null}
         <Block key={`b${k}`} beat={cur} dy={curDy} {...common} />
+      </g>
+    </svg>
+  );
+};
+
+// =====================================================================================================================
+// SkyCaptions (v2, full-bleed): captions in the SKY, screen space, calibrated to docs/motion_spec.md section 4.
+//  - Patrick Hand 82 px centred on x 540; baselines 330 / 426 (theme skyCaption); a one-line page sits at 378;
+//    lines wider than 860 px shrink the page's font.
+//  - PAGE CHANGE: the whole stack scrolls up by (clip height + 20) in 0.45 s, cubic-bezier(0, 0.7, 0.12, 1); the old
+//    page is gone in 2-3 frames, the new one decelerates into place. Starts 0.04 s before the page's first word.
+//  - LINE 2 rises ~1.15 line pitches from below the window in 0.42 s (same curve), 0.08 s before its first word.
+//  - HIGHLIGHT: peach box wipes L->R, bezier(0.3, 0.3, 0.1, 1), 0.19 s + 0.3 ms/px, 0.10 s before its word; it
+//    scrolls with its line and never wipes out. The word stays ink on the box in both tones.
+//  - TONE: 'dark' = ink text (light skies), 'light' = white text (dusk / night skies). Switches in one frame.
+//  - No opacity, no scale, no blur. Before the first page starts, the first page shows settled (the hook frame).
+// Data times are WORD STARTS (src/data/captions.json, generated from assets/timing.json); the leads are applied here.
+//
+//   <SkyCaptions beats={captions} tone={(T) => (T > 50 ? 'light' : 'dark')} loopAt={70.4} />
+
+export type SkyCaptionsProps = {
+  beats: CaptionBeat[];
+  /** Tone now: fixed, or a function of timeline seconds. Default 'dark'. */
+  tone?: CaptionTone | ((T: number) => CaptionTone);
+  /** Only beats starting in [from, to) (+ the one active at `from`, shown settled). Scene previews. */
+  range?: [number, number];
+  /** Before the first page starts, show it settled (frame 0 = hook). Default true. */
+  hookAtStart?: boolean;
+  /** At this timeline time the stack scrolls to the FIRST page (line 1) so the end loops into frame 0. */
+  loopAt?: number;
+  /** Things that started before range[0] + this are shown settled (no roll). Default 0.35 s. */
+  instantWithin?: number;
+  size?: number;
+};
+
+type SkyLine = {text: string; start: number; baseline: number; boxes: (Box & {start: number; dur: number})[]};
+type SkyPage = {start: number; size: number; lines: SkyLine[]};
+
+const SKY_D = skyCaption.clipBottom - skyCaption.clipTop + 20;
+
+function layoutSky(b: CaptionBeat, baseSize: number): SkyPage {
+  const n = b.lines.length;
+  const style = b.style ?? 'normal';
+  let size = baseSize * (style === 'punch' ? typeTok.punchScale : style === 'hook' ? typeTok.hookScale : 1);
+  const widest = Math.max(1, ...b.lines.map((l) => measureCaption(l.text, size)));
+  if (widest > skyCaption.maxWidth) size = Math.floor((size * skyCaption.maxWidth) / widest);
+  const pitch = (skyCaption.line2 - skyCaption.line1) * (size / baseSize);
+  const mid = skyCaption.oneLine;
+  const baselines = n === 1 ? [mid] : b.lines.map((_, i) => (style === 'normal' && n === 2 ? [skyCaption.line1, skyCaption.line2][i] : mid - ((n - 1) * pitch) / 2 + i * pitch));
+  const pageStart = b.s - MOTION.captionScroll.lead;
+  const used = new Set<CaptionHighlight>();
+  const cx = skyCaption.cx;
+  const lines: SkyLine[] = b.lines.map((ln, i) => {
+    const lineStart = i === 0 || ln.s <= b.s + 0.04 ? pageStart : Math.max(pageStart, ln.s - MOTION.captionLine2.lead);
+    const boxes: SkyLine['boxes'] = [];
+    const lw = measureCaption(ln.text, size);
+    for (const h of b.highlights ?? []) {
+      if (used.has(h) || !h.text) continue;
+      const want = h.text.replace(TRAILING, '');
+      let idx = ln.text.indexOf(want);
+      if (idx < 0) idx = ln.text.toLowerCase().indexOf(want.toLowerCase());
+      if (idx < 0 || !want) continue;
+      used.add(h);
+      const x0 = cx - lw / 2 + measureCaption(ln.text.slice(0, idx), size);
+      const x1 = x0 + measureCaption(ln.text.slice(idx, idx + want.length), size);
+      const w = x1 - x0 + (highlightBox.padLeftEm + highlightBox.padRightEm) * size;
+      boxes.push({
+        x: x0 - highlightBox.padLeftEm * size,
+        y: baselines[i] - highlightBox.topEm * size,
+        w,
+        h: (highlightBox.topEm + highlightBox.bottomEm) * size,
+        r: highlightBox.radiusEm * size,
+        s: h.s,
+        start: Math.max(lineStart, h.s - MOTION.highlight.lead),
+        dur: highlightDur(w),
+      });
+    }
+    return {text: ln.text, start: lineStart, baseline: baselines[i], boxes};
+  });
+  return {start: pageStart, size, lines};
+}
+
+const textStyle: React.CSSProperties = {fontKerning: 'normal', fontVariantLigatures: 'common-ligatures contextual', letterSpacing: typeTok.letterSpacing};
+
+const SkyPageG: React.FC<{page: SkyPage; T: number; dy: number; instantUntil: number; tone: CaptionTone; uid: string}> = ({page, T, dy, instantUntil, tone, uid}) => {
+  const col = captionTones[tone];
+  const pitch = (skyCaption.line2 - skyCaption.line1) * (page.size / skyCaption.size);
+  return (
+    <g transform={dy ? `translate(0 ${dy.toFixed(2)})` : undefined}>
+      {page.lines.map((ln, i) => {
+        const settled = ln.start <= instantUntil;
+        if (!settled && T < ln.start) return null;
+        const rises = i > 0 && ln.start > page.start + 0.001;
+        const ldy = rises && !settled ? pitch * MOTION.captionLine2.pitch * (1 - MOTION.captionLine2.ease(clamp((T - ln.start) / MOTION.captionLine2.dur))) : 0;
+        const boxes = ln.boxes
+          .map((bx) => ({bx, p: bx.start <= instantUntil ? 1 : MOTION.highlight.ease(clamp((T - bx.start) / bx.dur))}))
+          .filter(({p}) => p > 0);
+        const needsInk = boxes.length > 0 && col.text !== col.highlightText;
+        const textEl = (fill: string, clip?: string) => (
+          <text x={skyCaption.cx} y={ln.baseline} textAnchor="middle" fontFamily={captionFontStack} fontSize={page.size} fontWeight={typeTok.weight} fill={fill} clipPath={clip} style={textStyle}>
+            {ln.text}
+          </text>
+        );
+        const cid = `${uid}l${i}`;
+        return (
+          <g key={i} transform={ldy > 0.01 ? `translate(0 ${ldy.toFixed(2)})` : undefined}>
+            {boxes.map(({bx, p}, j) => (
+              <rect key={j} x={bx.x} y={bx.y} width={bx.w * p} height={bx.h} rx={Math.min(bx.r, (bx.w * p) / 2)} fill={col.highlight} />
+            ))}
+            {needsInk ? (
+              <defs>
+                <clipPath id={`${cid}in`}>
+                  {boxes.map(({bx, p}, j) => (
+                    <rect key={j} x={bx.x} y={bx.y} width={bx.w * p} height={bx.h} />
+                  ))}
+                </clipPath>
+                <clipPath id={`${cid}out`}>
+                  <path clipRule="evenodd" d={`M-10 -10H1090V1930H-10Z` + boxes.map(({bx, p}) => `M${bx.x} ${bx.y}h${bx.w * p}v${bx.h}h${-bx.w * p}Z`).join('')} />
+                </clipPath>
+              </defs>
+            ) : null}
+            {textEl(col.text, needsInk ? `url(#${cid}out)` : undefined)}
+            {needsInk ? textEl(col.highlightText, `url(#${cid}in)`) : null}
+          </g>
+        );
+      })}
+    </g>
+  );
+};
+
+export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', range, hookAtStart = true, loopAt, instantWithin = 0.35, size = skyCaption.size}) => {
+  const T = useGlobalTime();
+  const fontOk = useCaptionFont();
+  const uid = 'sc' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const sorted = beats.slice().sort((a, b) => a.s - b.s);
+  let list = range ? sorted.filter((b) => b.s >= range[0] && b.s < range[1]) : sorted.slice();
+  if (range && isFinite(range[0])) {
+    const prev = sorted.filter((b) => b.s < range[0]).pop();
+    if (prev) list = [prev, ...list];
+  }
+  if (loopAt !== undefined && sorted.length) {
+    const first = sorted[0];
+    const l1 = first.lines[0];
+    const hl = (first.highlights ?? []).filter((h) => l1 && l1.text.toLowerCase().includes(h.text.replace(TRAILING, '').toLowerCase()) && h.s <= (first.lines[1]?.s ?? Infinity));
+    list = list.filter((b) => b.s < loopAt + MOTION.captionScroll.lead);
+    list.push({...first, s: loopAt + MOTION.captionScroll.lead, lines: l1 ? [{text: l1.text, s: loopAt}] : [], highlights: hl.map((h) => ({...h, s: loopAt}))});
+  }
+  if (!list.length) return null;
+  const pages = list.map((b) => layoutSky(b, size));
+  const instantUntil = range && isFinite(range[0]) ? range[0] + instantWithin : -Infinity;
+  let k = -1;
+  for (let i = 0; i < pages.length; i++) if (pages[i].start <= T) k = i;
+  let settledAll = false;
+  if (k < 0) {
+    if (!hookAtStart) return null;
+    k = 0;
+    settledAll = true;
+  }
+  const cur = pages[k];
+  const prev = k > 0 ? pages[k - 1] : null;
+  // the first page never scrolls in when it is the hook (it is already on screen at frame 0)
+  const instant = settledAll || cur.start <= instantUntil || (hookAtStart && k === 0);
+  const u = clamp((T - cur.start) / MOTION.captionScroll.dur);
+  const q = instant ? 1 : MOTION.captionScroll.ease(u);
+  const tn: CaptionTone = typeof tone === 'function' ? tone(T) : tone;
+  // the hook frame: the first page's line 1 shows settled before anything starts; later lines/boxes keep their times
+  const iu = settledAll || (hookAtStart && k === 0) ? Math.max(instantUntil, cur.start) : instantUntil;
+  return (
+    <svg width={1080} height={1920} viewBox="0 0 1080 1920" style={{position: 'absolute', left: 0, top: 0, visibility: fontOk ? undefined : 'hidden'}}>
+      <defs>
+        <clipPath id={uid}>
+          <rect x={0} y={skyCaption.clipTop} width={1080} height={skyCaption.clipBottom - skyCaption.clipTop} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${uid})`}>
+        {prev && !instant && u < 1 ? <SkyPageG key={`p${k - 1}`} page={prev} T={T} dy={-SKY_D * q} instantUntil={iu} tone={tn} uid={`${uid}a`} /> : null}
+        <SkyPageG key={`p${k}`} page={cur} T={settledAll ? Math.max(T, cur.start) : T} dy={SKY_D * (1 - q)} instantUntil={iu} tone={tn} uid={`${uid}b`} />
       </g>
     </svg>
   );

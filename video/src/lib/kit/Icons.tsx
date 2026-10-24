@@ -17,6 +17,7 @@ import {Pop} from '../motion';
 import {ExitFade} from '../exit';
 import {blob, check, crown, ellipse, hline, line, polyPath, rect, roundRect, Pt} from '../sketch';
 import {At, b} from './common';
+import {mat, XG} from '../xf';
 
 // ---------------------------------------------------------------- Bug
 
@@ -56,7 +57,7 @@ export const Bug: React.FC<{x: number; y: number; size?: number; at?: At; seed?:
     return <circle key={i} cx={x + dx} cy={dy} r={s * 0.045} fill={palette.ink} />;
   });
   return (
-    <g transform={rot ? `rotate(${rot} ${x} ${y})` : undefined}>
+    <XG m={rot ? mat.about(mat.rotate(rot), x, y) : mat.I}>
       <Pop at={b(at, 0) ?? -10} x={x} y={y}>
         {legs}
         <Ink d={`M${x - s * 0.08} ${y - s * 0.42}Q${x - s * 0.16} ${y - s * 0.62} ${x - s * 0.3} ${y - s * 0.64}M${x + s * 0.08} ${y - s * 0.42}Q${x + s * 0.16} ${y - s * 0.62} ${x + s * 0.3} ${y - s * 0.64}`} at={b(at, 0.45)} dur={0.2} width={width * 0.9} />
@@ -66,7 +67,7 @@ export const Bug: React.FC<{x: number; y: number; size?: number; at?: At; seed?:
         <Ink d={line(x, y - s * 0.26, x, y + s * 0.44, {over: [0, 0], seed: `${seed}/sp`})} at={b(at, 0.3)} dur={0.15} width={width * 0.9} />
         <ExitFade>{dots}</ExitFade>
       </Pop>
-    </g>
+    </XG>
   );
 };
 
@@ -139,7 +140,7 @@ export const Server: React.FC<{x: number; y: number; w?: number; h?: number; uni
       const c = k === 0 ? palette.sage : palette.sun;
       out.push(
         <ExitFade key={`l${i}${k}`}>
-          <circle cx={x + w - 34 + k * 14} cy={uy + uh / 2} r={4.5} fill={on ? c : palette.olive} opacity={at !== undefined && t < at + 0.8 ? 0 : 1} />
+          <circle cx={x + w - 34 + k * 14} cy={uy + uh / 2} r={4.5} fill={on ? c : palette.tealDark} opacity={at !== undefined && t < at + 0.8 ? 0 : 1} />
         </ExitFade>,
       );
     }
@@ -168,11 +169,11 @@ export const Laptop: React.FC<{x: number; y: number; w?: number; at?: At; seed?:
   ];
   return (
     <>
-      <Fill d={roundRect(x, y, w, sh, 8)} color={palette.olive} at={b(at, 0.3)} mode="grow" seed={`${seed}/lid`} />
+      <Fill d={roundRect(x, y, w, sh, 8)} color={palette.tealDark} at={b(at, 0.3)} mode="grow" seed={`${seed}/lid`} />
       <Fill rect={[x + 12, y + 12, w - 24, sh - 24]} color={screen} at={b(at, 0.45)} mode="wipe" dir="down" offset={false} seed={`${seed}/scr`} />
       <g>{children}</g>
       <Ink d={roundRect(x, y, w, sh, 8, {closed: false, seed: `${seed}/li`})} at={at} dur={0.45} width={width} />
-      <Fill d={polyPath(base)} color={palette.grey} at={b(at, 0.4)} mode="fade" seed={`${seed}/base`} />
+      <Fill d={polyPath(base)} color={palette.sand} at={b(at, 0.4)} mode="snap" seed={`${seed}/base`} />
       <Ink d={`M${base[0][0]} ${base[0][1]}L${base[1][0]} ${base[1][1]}L${base[2][0]} ${base[2][1]}L${base[3][0]} ${base[3][1]}Z`} at={b(at, 0.3)} dur={0.35} width={width} />
     </>
   );

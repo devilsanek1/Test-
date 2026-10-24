@@ -399,6 +399,163 @@ def crowd_murmur():
     return y * e[:, None]
 
 
+# ------------------------------------------------------------------ cinematic seasoning (subtle, sparse)
+VSCO_P = SAMPLES / "VSCO-2-CE" / "Percussion"
+VCSL_M = SAMPLES / "VCSL" / "Membranophones" / "Struck Membranophones"
+
+
+def circ_noise(n, lo, hi, seed, tilt_db_oct=0.0):
+    """Circular (perfectly loopable) band-limited noise via FFT shaping of an n-sample block."""
+    r = np.random.default_rng(seed)
+    X = np.fft.rfft(r.standard_normal(n))
+    f = np.fft.rfftfreq(n, 1 / SR)
+    w = 1.0 / np.sqrt(1 + (lo / np.maximum(f, 1e-3)) ** 4) / np.sqrt(1 + (f / hi) ** 4)
+    if tilt_db_oct:
+        w *= (np.maximum(f, 20) / 1000.0) ** (tilt_db_oct / 6.02)
+    y = np.fft.irfft(X * w, n)
+    return y / (np.std(y) + 1e-12)
+
+
+def periodic_env(n, cycles_amps, seed):
+    """Smooth envelope that is exactly periodic over n samples (integer cycles)."""
+    r = np.random.default_rng(seed)
+    t = np.arange(n) / n
+    e = np.zeros(n)
+    for k, a in cycles_amps:
+        e += a * np.sin(2 * np.pi * k * t + r.uniform(0, 2 * np.pi))
+    return e
+
+
+def sub_impact(f_end=41.2):
+    """Soft sub impact for a scale reveal: sine gliding from 1.45x down to f_end (default E1 = 41.2 Hz;
+    beds pass their own root/fifth so the 'boom' is in key), soft 8 ms attack, 2nd harmonic for phone
+    speakers, real VCSL concert bass drum (pp) for body, faint air tail. Not a trailer boom."""
+    n = int(2.2 * SR); t = np.arange(n) / SR
+    f = f_end + 0.45 * f_end * np.exp(-t / 0.12)
+    env = np.minimum(1, t / 0.008) * np.exp(-t / 0.45)
+    sub = chirp_tone(f, env) + 0.25 * chirp_tone(2 * f, env * np.exp(-t / 0.25))
+    bd = sample(VCSL_M / "Bass Drum 2/bassdrum_hit_pp1.wav")
+    bd = lp(hp(bd, 30), 450)[:n]
+    bd = np.pad(bd, (0, n - len(bd))) / (np.abs(bd).max() + 1e-9)
+    air = lp(hp(np.random.default_rng(91).standard_normal(n), 200), 900) * np.minimum(1, t / 0.03) * np.exp(-t / 0.6)
+    y = sub * 0.9 + bd * 0.5 + air * 0.04
+    return stereo(y, width=0.3)
+
+
+def low_swell(sub_from=30.9, sub_to=41.2):
+    """4 s gentle low swell that peaks at its END (lead it into a reveal): bowed cymbal (real, VSCO),
+    a rising filtered-noise band and a soft sub rising sub_from -> sub_to Hz (default B0 -> E1; beds pass
+    in-key values). Ends with a 0.25 s settle, no hard cut."""
+    dur = 4.0; n = int(dur * SR); t = np.arange(n) / SR
+    curve = (t / dur) ** 2.4
+    cy = sample(VSCO_P / "susCymb1-bow-1.wav", mono=False)
+    seg = hp(cy[int(1.0 * SR): int(1.0 * SR) + n].T, 300).T
+    seg = np.pad(seg, ((0, n - len(seg)), (0, 0))) / (np.abs(seg).max() + 1e-9)
+    nz = tv_filter(np.random.default_rng(93).standard_normal(n), 220 + 1300 * curve, bw_oct=0.7)
+    nz /= np.abs(nz).max() + 1e-9
+    sub = chirp_tone(sub_from + (sub_to - sub_from) * curve, curve) * 0.6
+    y = stereo(nz * 0.5 + sub, width=0.6) * curve[:, None] + seg * (curve ** 1.3)[:, None] * 0.45
+    settle = int(0.25 * SR)
+    y[-settle:] *= np.cos(np.linspace(0, np.pi / 2, settle))[:, None] ** 2
+    return y
+
+
+def light_shimmer():
+    """Light-shaft shimmer (3 s): real bowed vibraphone + wine glass (E and B: sits in E minor, B minor,
+    G and D major), high sine twinkles and 6-12 kHz air. Swells in 0.7 s, out over 1.5 s."""
+    import instruments as INS
+    n = int(3.0 * SR); t = np.arange(n) / SR
+    env = np.minimum(1, t / 0.7) ** 1.5 * np.where(t > 1.5, np.cos(np.clip((t - 1.5) / 1.5, 0, 1) * np.pi / 2), 1.0)
+    vib = INS.get("vibes_bowed").render(88, 70, 2.6)[:n]
+    gl = INS.get("glass").render(83, 70, 2.6)[:n]
+    vib = np.pad(vib, ((0, n - len(vib)), (0, 0))); gl = np.pad(gl, ((0, n - len(gl)), (0, 0)))
+    r = np.random.default_rng(95)
+    tw = np.zeros(n)
+    for k in range(70):
+        st = r.integers(0, n - 4000); fr = r.uniform(4500, 9500); L = r.integers(1200, 3600)
+        g = np.hanning(L) * np.sin(2 * np.pi * fr * np.arange(L) / SR) * r.uniform(0.2, 1.0)
+        tw[st:st + L] += g
+    air = bp(r.standard_normal(n), 6000, 12000) * 0.5
+    y = (vib / (np.abs(vib).max() + 1e-9) * 0.6 + gl / (np.abs(gl).max() + 1e-9) * 0.45
+         + stereo(tw * 0.12 + air * 0.25, width=0.8)) * env[:, None]
+    return hp(y.T, 400).T
+
+
+def fg_wipe():
+    """Close foreground pass (something crosses the lens): quick dark whoosh, fast L->R."""
+    n = int(0.5 * SR)
+    a = swish(0.5, 180, 2200, peak=0.48, seed=97, bw=0.8)
+    body = lp(np.random.default_rng(98).standard_normal(n), 300) * bell_env(n, 0.5, 3.0) * 0.5
+    y = a + body
+    p = np.linspace(-0.9, 0.9, n) ** 3; th = (p + 1) * np.pi / 4
+    return np.stack([y * np.cos(th), y * np.sin(th)], axis=1) * np.sqrt(2)
+
+
+LOOP_DUR = 16.0
+
+
+def air_bed():
+    """Loopable 16 s air/wind bed for vast vistas: gentle broadband air with slow gusts, a faint
+    whistle band and high hiss. Built circularly (FFT noise + integer-cycle envelopes): loops seamlessly."""
+    n = int(LOOP_DUR * SR)
+    out = np.zeros((n, 2))
+    for ch in range(2):
+        gust = 0.65 + 0.35 * np.tanh(1.5 * periodic_env(n, [(2, 0.6), (3, 0.35), (5, 0.2), (9, 0.1)], 300 + ch))
+        a = circ_noise(n, 300, 5000, 310 + ch, tilt_db_oct=-1.5)
+        b = circ_noise(n, 700, 1400, 320 + ch)
+        c = circ_noise(n, 3000, 10000, 330 + ch)
+        out[:, ch] = a * gust * 0.8 + b * gust ** 3 * 0.22 + c * (1.1 - 0.5 * gust) * 0.16
+    # leave the narrator's 1-4 kHz pocket clear (circular: process 3 copies, keep the middle one)
+    from pedalboard import Pedalboard, PeakFilter
+    z = np.concatenate([out, out, out]).T.astype(np.float32)
+    z = Pedalboard([PeakFilter(2200, -7.0, 0.6)])(z, SR).T.astype(np.float64)
+    return z[n:2 * n]
+
+
+def city_bed():
+    """Loopable 16 s distant-city ambience: soft traffic rumble (HP 80 Hz, nothing muddy), far activity
+    band, two distant car passes and a far, muffled murmur. Circular construction -> seamless loop."""
+    n = int(LOOP_DUR * SR); t = np.arange(n) / n
+    out = np.zeros((n, 2))
+    vo = load(ASSETS / "vo.mp3", SR, mono=True)
+    r = np.random.default_rng(401)
+    mur = np.zeros(n)
+    for k in range(10):
+        s0 = r.uniform(1, len(vo) / SR - LOOP_DUR - 1)
+        seg = vo[int(s0 * SR): int(s0 * SR) + n][::-1]
+        seg = soxr.resample(seg, SR * 2 ** (r.uniform(-4, 3) / 12), SR, quality="HQ")[:n]
+        mur += np.roll(np.pad(seg, (0, n - len(seg))), r.integers(0, n)) * r.uniform(0.4, 1.0)
+    mur = np.fft.irfft(np.fft.rfft(mur) * (1 / np.sqrt(1 + (np.fft.rfftfreq(n, 1 / SR) / 700) ** 4))
+                       * (1 / np.sqrt(1 + (250 / np.maximum(np.fft.rfftfreq(n, 1 / SR), 1)) ** 4)), n)
+    mur /= np.std(mur) + 1e-9
+    for ch in range(2):
+        traffic = 0.7 + 0.3 * periodic_env(n, [(1, 0.5), (3, 0.3), (7, 0.15)], 410 + ch)
+        rum = circ_noise(n, 80, 400, 420 + ch, tilt_db_oct=-1) * traffic
+        act = circ_noise(n, 400, 3000, 430 + ch, tilt_db_oct=-2)
+        # two car passes (raised-cosine bumps, circular)
+        pas = np.zeros(n)
+        for c0, w_ in [(0.22 + 0.03 * ch, 0.12), (0.71 - 0.02 * ch, 0.16)]:
+            d = np.minimum(np.abs(t - c0), 1 - np.abs(t - c0))
+            pas += np.where(d < w_, 0.5 * (1 + np.cos(np.pi * d / w_)), 0)
+        car = circ_noise(n, 250, 1600, 440 + ch, tilt_db_oct=-3) * pas
+        out[:, ch] = rum * 0.35 + act * 0.16 + car * 0.25 + mur * 0.12
+    from pedalboard import Pedalboard, PeakFilter, HighpassFilter
+    z = np.concatenate([out, out, out]).T.astype(np.float32)
+    z = Pedalboard([HighpassFilter(70), PeakFilter(2200, -5.0, 0.6)])(z, SR).T.astype(np.float64)
+    return z[n:2 * n]
+
+
+def finalize_loop(name, y, desc=""):
+    """Loopable ambience: no trimming, no fades (the file is circular); DC-free; peak -6 dBFS."""
+    y = np.asarray(y, dtype=np.float64)
+    y = y - y.mean(axis=0)
+    y = y / (np.abs(y).max() + 1e-12) * db2a(-6.0)
+    save(OUT / f"{name}.wav", y)
+    seam = np.abs(y[0] - y[-1]).max() / (np.median(np.abs(np.diff(y, axis=0))) + 1e-12)
+    CATALOG.append((name, len(y) / SR, 0, desc + f" [loopable; seam step {seam:.1f}x median step]"))
+    return y
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     make_pencils()
@@ -424,6 +581,13 @@ def main():
     finalize("coin_chink", coins(), 80, desc="a few coins clinking (cash)")
     finalize("ding", ding(), 150, desc="bright 'idea' ding (real glockenspiel, ~2.1 kHz + a touch of triangle)")
     finalize("riser_leak", riser(), 20, desc="3.6 s riser: real cymbal crescendo + rising noise/tone; peak at end")
+    # cinematic seasoning (subtle, sparse)
+    finalize("sub_impact", sub_impact(), 300, thr_db=-70, desc="soft sub impact for a big scale reveal (60->41 Hz, E1, + soft bass drum)")
+    finalize("low_swell", low_swell(), 20, desc="4 s gentle low swell, peaks at its end (lead into a reveal)")
+    finalize("light_shimmer", light_shimmer(), 200, desc="light-shaft shimmer: bowed vibes + wine glass (E/B) + twinkles + air")
+    finalize("fg_wipe", fg_wipe(), 40, desc="close foreground pass / wipe transition (replaces the retired card flip)")
+    finalize_loop("air_bed", air_bed(), desc="16 s air/wind for vast vistas")
+    finalize_loop("city_bed", city_bed(), desc="16 s distant city ambience")
     print(f"{'name':22s} {'dur':>6s} clicks  description")
     for nm, d, c, desc in CATALOG:
         print(f"{nm:22s} {d:6.2f} {c:6d}  {desc}")

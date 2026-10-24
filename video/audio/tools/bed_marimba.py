@@ -1,6 +1,9 @@
-"""Bed 3 "marimba": minimal kalimba + marimba ostinato in 12/8 (dotted quarter = 95.05), E minor, 28 bars.
-Interlocking mbira-style kalimba (low 'pulse' thumb + high 'answer' thumb), soft marimba bass,
-cello drone for the leak/urgency, real shaker + bass-drum heartbeat for the Cloudflare numbers."""
+"""Bed "marimba" (v2, depth + air): minimal kalimba + marimba ostinato in 12/8 (dotted quarter = 95.05),
+E minor, 28 bars. Interlocking mbira-style kalimba (low 'pulse' thumb + high 'answer' thumb), soft marimba bass,
+cello drone for the leak/urgency, real shaker + bass-drum heartbeat for the Cloudflare numbers.
+v2 adds a touch of space: a soft contrabass (non-vibrato) floor under the harmony, airy bowed-vibraphone /
+wine-glass halos, a longer room, and exactly two soft 'scale' accents (gentle low swell + soft sub impact):
+into Cloudflare (35.35) and across the loop point (close -> hook at 0.0)."""
 import sys
 from pathlib import Path
 
@@ -12,8 +15,10 @@ from bedkit import (Bed, Grid, chord, tones, nearest, automation, fx, reverb_sen
 from common import AUDIO, SR, VIDEO_DUR, db2a  # noqa: E402
 from sampler import load_instrument  # noqa: E402
 import instruments as I  # noqa: E402
+import make_sfx as SFX  # noqa: E402
 
 g = Grid([4] * 28)  # 4 dotted-quarter beats per 12/8 bar
+PAD_DB, AIR_DB, ACC_DB = 8.0, 6.0, -16.0  # v2 layer trims (set after measuring)
 bed = Bed("marimba", g, seed=23)
 CH = {1: "Emadd9", 2: "Cmaj7", 3: "G", 4: "D/F#", 5: "Emadd9", 6: "Cmaj7", 7: "G", 8: "D", 9: "C", 10: "G/B",
       11: "Am7", 12: "Dsus4", 13: "Cmaj7", 14: "B7sus4", 15: "Em", 16: "Em/D", 17: "Cmaj7#11", 18: "B7sus4",
@@ -144,6 +149,25 @@ bed.note("vc_sus", vcs, 47, 50, 18, 0, 3.7)
 bed.note("glock", glk, 91, 40, 10, 3.67, 1.0); bed.note("glock", glk, 95, 34, 10, 3.67, 1.0)
 bed.note("glock", glk, 88, 34, 25, 0, 1.0)
 
+# ---------------- v2: depth (soft low floor) + air (halos) + two scale accents
+cbs, vib, gls = I.get("cb_sus"), I.get("vibes_bowed"), I.get("glass")
+bed.track("pad", 43, pan=0.0); bed.track("air", 11, pan=0.0); bed.track("accent", 0, pan=0.0)
+for bar in range(1, 29):
+    s_ = sec(bar)
+    if s_ in ("S1", "S2", "S3", "S5", "S8", "S9"):
+        _, pcs, bass = ch(bar)
+        bed.note("pad", cbs, nearest(bass, 36), 44 if s_ != "S5" else 50, bar, 0, 4.0)
+for bar, src, vel in [(1, vib, 46), (3, vib, 44), (5, vib, 44), (7, vib, 44), (9, gls, 50), (11, gls, 50),
+                      (21, vib, 44), (23, vib, 44), (25, gls, 48), (27, vib, 42)]:
+    _, pcs, _ = ch(bar)
+    top = tones(pcs, 76, 88)
+    bed.note("air", src, top[-1] if src is vib else top[len(top) // 2], vel, bar, 0, 7.5,
+             pan=-0.3 if bar % 4 == 1 else 0.3)
+swell, imp = SFX.low_swell(30.9, 41.2), SFX.sub_impact(41.2)  # in-key sub (F#1 / E1)
+for t_hit in (g.t(15), VIDEO_DUR):            # Cloudflare, and the loop point (wraps onto the hook at 0.0)
+    bed.tracks["accent"].add(swell, t_hit - len(swell) / SR)
+    bed.tracks["accent"].add(imp, t_hit)
+
 T = bed.tracks
 n = len(T["mar"].buf)
 T["vc_sus"].buf *= automation(n, [(g.t(13, 2), -14), (g.t(15, 0), -1), (g.t(18, 0), -3), (g.t(18, 4), -30)])[:, None]
@@ -155,13 +179,17 @@ stems = {
     "glock": fx(T["glock"].buf, [LowpassFilter(9000)]) * db2a(2),
     "shaker": fx(T["shaker"].buf, [HighpassFilter(1500), LowpassFilter(9000)]) * db2a(4),
     "kick": fx(T["kick"].buf, [LowpassFilter(1200)]) * db2a(8),
+    "pad": fx(T["pad"].buf, [HighpassFilter(38), LowpassFilter(650)]) * db2a(PAD_DB),
+    "air": fx(T["air"].buf, [HighpassFilter(900), LowpassFilter(9000)]) * db2a(AIR_DB),
+    "accent": fx(T["accent"].buf, [HighpassFilter(28)]) * db2a(ACC_DB),
 }
-sends = {"kal_lo": 0.3, "kal_hi": 0.45, "mar": 0.25, "vc_sus": 0.3, "glock": 0.6, "shaker": 0.15, "kick": 0.05}
+sends = {"kal_lo": 0.35, "kal_hi": 0.5, "mar": 0.3, "vc_sus": 0.35, "glock": 0.6, "shaker": 0.15, "kick": 0.05,
+         "pad": 0.25, "air": 0.7, "accent": 0.2}
 dry = sum(stems.values())
-wet = reverb_send(sum(stems[k] * sends[k] for k in stems), room=0.6, damp=0.5)
+wet = reverb_send(sum(stems[k] * sends[k] for k in stems), room=0.74, damp=0.45)
 arc = automation(n, [(0, -1), (g.t(5), 0), (g.t(13), -1), (g.t(15), 1.5), (g.t(18), 0), (g.t(19), -3),
                      (g.t(21), 0), (g.t(25), -0.5), (VIDEO_DUR, -1), (VIDEO_DUR + TAIL, -1)])
-mix = voice_carve((dry + wet * 0.55) * arc[:, None])
+mix = voice_carve((dry + wet * 0.62) * arc[:, None])
 
 if __name__ == "__main__":
     for k, v in stems.items():

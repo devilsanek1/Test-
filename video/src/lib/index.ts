@@ -1,15 +1,22 @@
-// Engine barrel. Scene code:  import {useTime, prog, Ink, Fill, rect, Sun, Person, ...} from '../lib';
+// Engine barrel. Scene code:  import {World, useTime, prog, Ink, Fill, rect, Sun, Person, ...} from '../lib';
+// Full-bleed v2: World (scene root), Film (sequencer), SkyCaptions, persp (Plane), spec (MOTION). Card v1 stays.
 export * from './theme';
+export * from './spec';
 export * from './time';
 export * from './rng';
 export * from './sketch';
+export * from './xf';
 export * from './exit';
+export * from './persp';
+export * from './stage';
 export * from './Ink';
 export * from './Fill';
 export * from './motion';
 export * from './Card';
+export * from './World';
 export * from './Sun';
 export * from './font';
 export * from './Captions';
 export * from './timeline';
+export * from './Film';
 export * from './kit';

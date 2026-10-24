@@ -73,7 +73,8 @@ export const Building: React.FC<BuildingProps> = ({
   const shopO: ShopOpts | null = shop ? (shop === true ? {} : shop) : null;
 
   // wall fill + outline
-  out.push(<Fill key="wall" rect={[x, top, w, H]} color={color} at={T(0.35)} mode="grow" dur={0.55} seed={`${seed}/wall`} />);
+  // large base fill: linear wipe bottom -> top in 3-4 frames (motion spec #10), landing after the outline starts
+  out.push(<Fill key="wall" rect={[x, top, w, H]} color={color} at={T(0.2)} mode="wipe" dir="up" dur={0.12} seed={`${seed}/wall`} />);
   out.push(
     <Ink
       key="outline"
@@ -262,7 +263,7 @@ export type WallProps = {
 export const Wall: React.FC<WallProps> = ({x, y, w, h, at, seed = 'wall', color = palette.cream, cornice = true, ticks, ground = 0, width = stroke.ink}) => {
   const r = rng(`wall/${seed}`);
   const out: React.ReactNode[] = [];
-  out.push(<Fill key="f" rect={[x, y, w, h]} color={color} at={b(at, 0.15)} mode="grow" dur={0.6} offset={false} seed={`${seed}/f`} />);
+  out.push(<Fill key="f" rect={[x, y, w, h]} color={color} at={b(at, 0.15)} mode="wipe" dir="up" dur={0.13} offset={false} seed={`${seed}/f`} />);
   if (cornice) {
     out.push(<Fill key="cb" rect={[x, y + 14, w, 18]} color={palette.tan} at={b(at, 0.45)} mode="wipe" dir="right" offset={false} seed={`${seed}/cb`} />);
     out.push(

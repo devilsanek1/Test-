@@ -1,4 +1,5 @@
-"""Bed 1 "pizzicato": curious string pizzicato + felt piano. D minor, 95.05 BPM, 4/4, 28 bars = 70.7 s.
+"""RETIRED (pre-cinematic direction; kept for reference, renders deleted).
+Bed 1 "pizzicato": curious string pizzicato + felt piano. D minor, 95.05 BPM, 4/4, 28 bars = 70.7 s.
 
 Arc (bar: time):  1-4 intrigue (0-10.1) | 5-8 setup | 9-12 discovery (F major colour) |
 13-14 leak build (30.3, "Except") | 15-17 urgency (35.35 "Cloudflare") | 18 suspension (42.9) |
@@ -9,7 +10,7 @@ from pathlib import Path
 
 import numpy as np
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # retired: tools/ is one level up
 from bedkit import (Bed, Grid, chord, tones, nearest, automation, fx, reverb_send, voice_carve, finish, TAIL,
                     HighpassFilter, LowpassFilter, HighShelfFilter, LowShelfFilter, PeakFilter, Compressor)  # noqa
 from common import AUDIO, SR, db2a  # noqa: E402

@@ -1,17 +1,20 @@
-// PLACEHOLDER (engine stream) — proves the framework; the scene agent for S01 replaces this file.
-// "Government websites in four countries just switched themselves off."
+// PLACEHOLDER (core lane) — proves the v2 full-bleed framework; the scene agent for S01 replaces this file.
+// "Government websites in four countries just switched themselves off. Nobody hacked them."
 import React from 'react';
-import {Panel, Sun, PowerSymbol, BrowserWindow, Person, Ground, palette} from '../lib';
+import {World, Sun, Fill, Ink, Plane, wallQuad, Building, BrowserWindow, hline, palette, skies, world, stroke} from '../lib';
+
+const VP: [number, number] = [540, world.horizon];
 
 const Scene01: React.FC = () => (
-  <>
-    <Panel />
-    <Ground y={1000} fillH={95} />
-    <Sun pulse={[3.3]}>{(r) => <PowerSymbol r={r} at={3.3} />}</Sun>
-    <BrowserWindow x={100} y={250} w={430} h={330} at={0.0} url="gov.fr" content="gov" offAt={2.5} seed="g1" />
-    <BrowserWindow x={440} y={380} w={420} h={320} at={0.35} url="gov.de" content="blog" offAt={2.8} seed="g2" accent={palette.teal} />
-    <BrowserWindow x={170} y={620} w={450} h={330} at={0.7} url="gov.it" content="gov" offAt={3.1} seed="g3" />
-    <Person x={760} y={1095} s={1} at={1.4} build="rise" style="line" acc={['phone']} seed="s1p" />
-  </>
+  <World sky={skies.day}>
+    <Sun rise={{at: 0, from: [540, 1000]}} cx={540} cy={820} horizon={world.horizon} beats={[1.33, 2.28]} drift={[8, 0]} />
+    <Fill rect={[-200, world.horizon, 1480, 1300]} color={palette.mintPale} offset={false} />
+    <Ink d={hline(-60, 1140, world.horizon, {seed: 's1h'})} width={stroke.ink} at={0.05} />
+    <Plane quad={wallQuad({vp: VP, x: -40, top: 360, bottom: 1500, depth: 0.62})} w={1500} h={1140}>
+      <Building x={0} y={1140} w={520} floors={4} floorH={260} at={0.1} seed="s1a" color={palette.cream} roof="cornice" />
+      <Building x={560} y={1140} w={460} floors={5} floorH={210} at={0.4} seed="s1b" color={palette.tan} roof="flat" />
+    </Plane>
+    <BrowserWindow x={600} y={980} w={380} h={300} at={0.6} url="gov.example" content="gov" offAt={2.5} seed="s1w" />
+  </World>
 );
 export default Scene01;
