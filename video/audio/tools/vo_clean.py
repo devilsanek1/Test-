@@ -155,6 +155,120 @@ def process(x, chain="full", report=None):
     return x, report
 
 
+# ---------------------------------------------------------------------------- v3 ("still a bit cheap")
+REF2 = ASSETS / "ref2" / "reference2.mp4"
+
+
+def warm_eq(x):
+    """v3 tone: restore warmth/proximity (150-300 Hz measured 5-8 dB lighter than both references; a broad
+    +3.5 dB bell at 210 Hz corrects about half), keep the de-box, a BROAD presence lift instead of a peaky one,
+    the sibilant dip, and a gentle top (no synthetic air)."""
+    b = Pedalboard([PeakFilter(210, 3.5, 0.7), PeakFilter(560, -2.0, 1.0), PeakFilter(3200, 2.5, 0.6),
+                    PeakFilter(5800, -3.0, 1.3), PeakFilter(10000, 2.0, 1.0)])
+    return b(x[None, :].astype(np.float32), SR)[0].astype(np.float64)
+
+
+def ltas_db(x, nfft=8192):
+    """Speech-frame long-term spectrum (dB), normalised to its 300 Hz-3 kHz average."""
+    f, t, Z = ss.stft(x, SR, nperseg=nfft, noverlap=nfft * 3 // 4, boundary=None, padded=False)
+    P = np.abs(Z) ** 2
+    e = 10 * np.log10(P.sum(axis=0) + 1e-20)
+    m = e > np.percentile(e, 90) - 25
+    Ps = P[:, m].mean(axis=1)
+    return f, 10 * np.log10(Ps / Ps[(f >= 300) & (f < 3000)].mean() + 1e-20)
+
+
+def match_eq(x, ref, cap_db=6.0, lo_hz=100.0, hi_hz=11000.0, ntaps=4095, report=None):
+    """Matching EQ toward a reference voice: 1/3-octave-smoothed LTAS difference, capped at +-cap_db,
+    faded to 0 dB below lo_hz (no rumble boost) and above hi_hz (never boost the MP3 swirl band).
+    Linear-phase FIR (gentle curve -> negligible pre-ring)."""
+    f, a = ltas_db(x)
+    _, r = ltas_db(ref)
+    d = r - a
+    lf = np.log2(np.maximum(f, 1.0))
+    sm = np.array([d[np.abs(lf - l) <= 1 / 6].mean() for l in lf])          # 1/3-octave smoothing
+    sm = np.clip(sm, -cap_db, cap_db)
+    w = np.clip((lf - np.log2(lo_hz * 0.7)) / np.log2(1 / 0.7), 0, 1) * np.clip((np.log2(hi_hz * 1.3) - lf) / np.log2(1.3), 0, 1)
+    sm = sm * w
+    sm -= np.mean(sm[(f >= 300) & (f < 3000)])                              # keep the 300-3k reference level
+    gains = db2a(sm)
+    fir = ss.firwin2(ntaps, f / (SR / 2), gains)
+    y = ss.fftconvolve(x, fir, mode="full")[ntaps // 2: ntaps // 2 + len(x)]
+    if report is not None:
+        pts = [125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 2000, 3150, 4000, 5000, 6300, 8000, 10000]
+        report["match_eq_dB"] = {p: round(float(np.interp(p, f, sm)), 1) for p in pts}
+    return y
+
+
+def parallel_comp(x, mix_db=-9.0, report=None):
+    """Light parallel ('New York') compression: a 4:1 fast copy, level-matched, blended 9 dB down.
+    Adds density/intimacy without pumping (the dry signal is never gain-modulated)."""
+    from pedalboard import Compressor
+    g = db2a(-20.0 - lufs(x))
+    xn = x * g
+    c = Pedalboard([Compressor(threshold_db=-36, ratio=4.0, attack_ms=6, release_ms=120)])(
+        xn[None, :].astype(np.float32), SR)[0].astype(np.float64)
+    c *= db2a(lufs(xn) - lufs(c))
+    y = (xn + db2a(mix_db) * c) / g
+    if report is not None:
+        report["parallel_comp"] = {"blend_db": mix_db, "ratio": 4.0}
+    return y
+
+
+def saturate(x, drive=1.6, bias=0.12, report=None):
+    """Very light tube-style saturation (asymmetric tanh -> mostly 2nd harmonic), 4x oversampled."""
+    import soxr
+    pk = np.percentile(np.abs(x), 99.9) + 1e-12
+    u = soxr.resample(x / pk * 0.5, SR, SR * 4, quality="HQ")
+    y = (np.tanh(drive * (u + bias)) - np.tanh(drive * bias)) / (drive * (1 - np.tanh(drive * bias) ** 2))
+    y = soxr.resample(y, SR * 4, SR, quality="HQ")[: len(x)] * pk / 0.5
+    y = ss.sosfilt(ss.butter(2, 20, "highpass", fs=SR, output="sos"), y)
+    if report is not None:
+        t = np.arange(SR) / SR
+        sine = 0.5 * np.sin(2 * np.pi * 200 * t)
+        s2 = (np.tanh(drive * (sine + bias)) - np.tanh(drive * bias)) / (drive * (1 - np.tanh(drive * bias) ** 2))
+        S = np.abs(np.fft.rfft(s2 * np.hanning(len(s2))))
+        h1, h2, h3 = S[200], S[400], S[600]
+        report["saturation"] = {"H2_dB": round(float(20 * np.log10(h2 / h1)), 1),
+                                "H3_dB": round(float(20 * np.log10(h3 / h1)), 1), "at_level": "-6 dBFS peaks"}
+    return y
+
+
+def leveler_light(x, report):
+    lvl = rms_db(x, 20)
+    thr_c, ratio, knee = -14.0, 1.6, 8.0
+    over = lvl - thr_c
+    gr = np.where(over <= -knee / 2, 0.0,
+                  np.where(over >= knee / 2, over * (1 - 1 / ratio),
+                           (1 - 1 / ratio) * (over + knee / 2) ** 2 / (2 * knee)))
+    gr = smooth_gain(gr, 20.0, 250.0)
+    sp = lvl > -40
+    report["leveler"] = {"mean_gr_db": round(float(gr[sp].mean()), 2), "p95_gr_db": round(float(np.percentile(gr[sp], 95)), 2),
+                         "max_gr_db": round(float(gr.max()), 2)}
+    return x * db2a(-gr)
+
+
+def process_v3(x, variant="A", report=None, air_frac_db=-9.5):
+    """A = warm broadcast (no exciter); B = A + exciter at ~1/3 amplitude; C = matching EQ to reference 2 + A dynamics."""
+    report = {} if report is None else report
+    x = x - x.mean()
+    x = ss.sosfilt(ss.butter(4, 70, "highpass", fs=SR, output="sos"), x)
+    if variant == "C":
+        x = match_eq(x, load(REF2, SR, mono=True), report=report)
+    else:
+        x = warm_eq(x)
+    if variant == "B" and not has_air(x):
+        full, info = exciter(x)
+        x = x + db2a(air_frac_db) * (full - x)
+        info["strength"] = f"{air_frac_db} dB (~1/3 amplitude)"
+        report["air"] = info
+    x = deess(x, report)
+    x = parallel_comp(x, report=report)
+    x = saturate(x, report=report)
+    x = leveler_light(x, report)
+    return x, report
+
+
 def finalize(y, n_total=N_TOTAL, target=-17.0, ceiling=-1.5):
     y = y * db2a(target - lufs(y))
     if true_peak_db(y) > ceiling:               # rare plosive/sibilant overs after the presence lift
@@ -198,14 +312,14 @@ def write_ab(src):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", default=str(ASSETS / "vo.mp3"))
-    ap.add_argument("--chain", default="full", choices=["full", "eq", "basic"])
+    ap.add_argument("--chain", default="full", choices=["full", "eq", "basic", "A", "B", "C"])
     ap.add_argument("--out", default=str(AUDIO / "vo_clean.wav"))
     ap.add_argument("--ab", action="store_true")
     a = ap.parse_args()
     src = load(a.src, SR, mono=True)
     print(f"source {a.src}: {len(src) / SR:.3f} s, {lufs(src):.2f} LUFS, TP {true_peak_db(src):.2f} dBTP, "
           f"air present: {has_air(src)}")
-    y, rep = process(src, a.chain)
+    y, rep = process_v3(src, a.chain) if a.chain in ("A", "B", "C") else process(src, a.chain)
     for k, v in rep.items():
         print(f"  {k}: {v}")
     out = finalize(y)

@@ -5,6 +5,11 @@ A 70.7-second vertical video (TikTok / Instagram Reels / YouTube Shorts) built o
 in the visual style, animation language and motion design of the supplied reference video.
 Quality bar: top-tier editorial motion design that people rewatch and share. Every frame should be worth pausing on.
 
+## VOICEOVER v2 (latest): the user replaced the voice with a new take: `assets/vo_v2_eleven.wav` (ElevenLabs, WAV 48 kHz,
+lossless, 77.76 s; same script, slower pacing, about +7 s by the end). `assets/timing.json` is being rebuilt for it (the old
+take's timing is kept as `assets/timing_v1.json`). Anything timed to the old take (storyboard, cues) is mapped onto the new
+one with `scripts/timewarp.py` (word-anchored, piecewise-linear). The video is now ~78 s long.
+
 ## BALANCE NOTE (from the user, latest; read this first): "Don't overdo it. It should be nuanced, and we still target TikTok / Reels."
 How to apply the cinematic direction below with restraint:
 - The BASE stays the references' look and feel: bright, warm, legible, charming editorial illustration with snappy

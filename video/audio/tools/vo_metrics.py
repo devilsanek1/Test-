@@ -62,9 +62,43 @@ def metrics(x, sr=SR):
     A = np.sqrt(P[hb])
     dA = np.maximum(A[:, 1:] - A[:, :-1], 0).sum(axis=0) / (A[:, 1:].sum(axis=0) + 1e-12)
     out["hf_flux_8-16k"] = round(float(np.median(dA[m[1:]])), 3)
+    # dynamics: crest factor (p99.95 |x| over speech RMS) and momentary-loudness spread
+    from common import short_term_lufs
+    spx = np.repeat(speech_mask(x, 480), 480)[: len(x)]
+    xs = x[: len(spx)][spx]
+    out["crest_dB"] = round(float(20 * np.log10(np.percentile(np.abs(xs), 99.95) / (np.sqrt(np.mean(xs ** 2)) + 1e-12))), 1)
+    tm, lm = short_term_lufs(x, win=0.4, hop=0.1)
+    sp4 = lm > np.percentile(lm, 90) - 15
+    out["momentary_std_LU"] = round(float(np.std(lm[sp4])), 2)
+    # plosive pops: 20-90 Hz band peaks (10 ms) relative to the median speech level
+    lfb = ss.sosfiltfilt(ss.butter(4, [20, 90], "bandpass", fs=sr, output="sos"), x)
+    lf = 10 * np.log10(ss.fftconvolve(lfb ** 2, np.ones(480) / 480, mode="same")[::240] + 1e-14)
+    sp_med = np.median(full[sp])
+    out["plosive_LF_peak_rel_dB"] = round(float(lf.max() - sp_med), 1)
+    out["tonal_dist_to_refavg_dB"] = None
     out["LUFS"] = round(lufs(x), 2)
     out["TP_dBTP"] = round(true_peak_db(x), 2)
     return out
+
+
+def third_oct(x, sr=SR):
+    nfft, hop = 4096, 1024
+    f, t, Z = ss.stft(x, sr, nperseg=nfft, noverlap=nfft - hop, boundary=None, padded=False)
+    P = np.abs(Z) ** 2
+    m = speech_mask(x, hop)[: P.shape[1]]
+    m = np.pad(m, (0, P.shape[1] - len(m)))
+    Ps = P[:, m].mean(axis=1)
+    cs = np.array([100 * 2 ** (k / 3) for k in range(0, 24)])
+    lv = np.array([10 * np.log10(Ps[(f >= c * 2 ** (-1 / 6)) & (f < c * 2 ** (1 / 6))].sum() + 1e-20) for c in cs])
+    return cs, lv - 10 * np.log10(Ps[(f >= 300) & (f < 3000)].sum())
+
+
+def tonal_distance(x, refs):
+    """RMS dB difference (125 Hz-10 kHz, 1/3 octave) between x and the average of the reference curves."""
+    cs, a = third_oct(x)
+    r = np.mean([third_oct(y)[1] for y in refs], axis=0)
+    sel = (cs >= 125) & (cs <= 10200)
+    return float(np.sqrt(np.mean((a[sel] - r[sel]) ** 2)))
 
 
 def main():
@@ -72,12 +106,17 @@ def main():
     ap.add_argument("files", nargs="+")
     ap.add_argument("--t0", type=float, default=0.0)
     ap.add_argument("--t1", type=float, default=None)
+    ap.add_argument("--refs", nargs="*", default=[], help="reference files for the tonal-distance metric")
     a = ap.parse_args()
     rows = []
     for fpath in a.files:
         x = load(fpath, mono=True)
         x = x[int(a.t0 * SR): int(a.t1 * SR) if a.t1 else None]
-        rows.append((Path(fpath).name, metrics(x)))
+        mtr = metrics(x)
+        if a.refs:
+            refs = [load(r, mono=True) for r in a.refs]
+            mtr["tonal_dist_to_refavg_dB"] = round(tonal_distance(x, refs), 2)
+        rows.append((Path(fpath).name, mtr))
     keys = list(rows[0][1].keys())
     print(f"{'metric':34s}" + "".join(f"{n[:22]:>24s}" for n, _ in rows))
     for k in keys:
