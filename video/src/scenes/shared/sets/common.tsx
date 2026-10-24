@@ -1,6 +1,7 @@
 // sets/common.tsx — shared plumbing for the SETS lane (src/scenes/shared/sets/**): palette steps, the lights-out and
 // pop-up states, screen-space helpers, batched linework and a few drawing helpers every set uses (brick hints, shade
-// planes, kerbs, one-point paving, hand-drawn windows merged into ONE ink path per facade).
+// planes, kerbs, hand-drawn windows merged into ONE ink path per facade, the glass / night-ground relights, opaque glow
+// discs). Ground marks and foreground presets live in ground.tsx.
 //
 // Conventions (every set):
 //   - World coordinates = canvas px at camera rest (1080 x 1920). Sets draw in those coordinates; x / y / scale on a
@@ -59,7 +60,8 @@ const STEP_LIGHT: Record<string, string> = {
   ['#ACD1BF']: palette.mintPale,
   [palette.peach.toUpperCase()]: palette.cream,
 };
-/** One palette step lighter (the dome glass: tan -> sand -> cream -> white, sage -> sky, teal -> sage). */
+/** One full palette step lighter (tan -> sand -> cream -> white, sage -> sky, teal -> sage). The dome glass uses
+ *  `glassStep` (half steps for the light tones, so nothing turns paper-white). */
 export const stepLighter = (c: string): string => (c && c[0] === '#' ? STEP_LIGHT[c.toUpperCase()] ?? c : c);
 
 /** Half palette steps (50/50 mixes of neighbouring tokens, style_bible_ref2 8's haze rule). */
@@ -130,7 +132,7 @@ export const LightsOut: React.FC<{at?: number; on?: boolean; children?: React.Re
   return <TodCtx map={stepDarker}>{children}</TodCtx>;
 };
 
-/** Glass: every <Fill> inside steps one palette step lighter (the dome interior). */
+/** Every <Fill> inside steps one full palette step lighter (`stepLighter`). */
 export const Lighter: React.FC<{on?: boolean; children?: React.ReactNode}> = ({on = true, children}) =>
   on ? <TodCtx map={stepLighter}>{children}</TodCtx> : <>{children}</>;
 
@@ -260,7 +262,8 @@ export function cornice(x0: number, x1: number, y: number, gap: number, seed: Se
 }
 
 /** One-point perspective ground joints: lines from points on the bottom edge toward the vanishing point, cut at
- *  `yTop`, plus cross joints at perspective depths. */
+ *  `yTop`, plus cross joints at perspective depths. A full tile GRID: only for drawn-on grids (a blueprint sheet); real
+ *  ground uses ground.tsx `groundMarks` (a few broken lines that die toward the viewer + specks). */
 export function pavingJoints(vp: Pt, yTop: number, yBot: number, x0: number, x1: number, n: number, cross: number, seed: Seed, skip?: (x: number) => boolean): string {
   let d = '';
   const ray = (xb: number, y: number) => vp[0] + ((xb - vp[0]) * (y - vp[1])) / (yBot - vp[1]);

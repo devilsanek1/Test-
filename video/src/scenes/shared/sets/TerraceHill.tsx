@@ -43,7 +43,8 @@ import {atmos} from '../../../lib/cine/atmosphere';
 import {LayerWrap, noWrap, SetPlace} from './common';
 import {ChromeSlot, CheckFlagSlot, LockProps, PlaqueSlot, TargetRingSlot} from './propSlots';
 import {Lock} from '../props';
-import {FacadeDoor, shadeOf} from './SiteFacade';
+import {FacadeDoor} from './SiteFacade';
+import {Foreground, ForegroundSpec} from './ground';
 
 type Mode = 'hill' | 'flat';
 
@@ -416,6 +417,9 @@ export type TerraceHillProps = {
   house4Lock?: Partial<LockProps>;
   /** Rows from here are haze bands (default hill 8, flat 6). */
   hazeFrom?: number;
+  /** Foreground framing on the near street (ground.tsx presets, world coords: it slides out of frame during the pull-back
+   *  zoom). Default none: S10's bollard + kerb are screen-space scene props. */
+  foreground?: ForegroundSpec;
   sun?: React.ReactNode;
   wrap?: LayerWrap;
   x?: number;
@@ -427,7 +431,7 @@ export type TerraceHillProps = {
   seed?: Seed;
 };
 
-export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFloor, plaqueWaveAt, bitWaveAt, waveStep = 0.06, extendAt, flagAt, fixedAt, house4Lock = {}, hazeFrom, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'terr'}) => {
+export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFloor, plaqueWaveAt, bitWaveAt, waveStep = 0.06, extendAt, flagAt, fixedAt, house4Lock = {}, hazeFrom, foreground, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'terr'}) => {
   const t = useTime();
   const m = useXf();
   const zoom = Math.sqrt(Math.abs(m[0] * m[3] - m[1] * m[2])) * scale || 1;
@@ -508,6 +512,7 @@ export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFl
         </>,
       )}
       {wrap('house4', 0.6, house4)}
+      {foreground ? wrap('foreground', 1.0, <Foreground spec={foreground} seed={`${sd}/fg`} />) : null}
     </SetPlace>
   );
 };

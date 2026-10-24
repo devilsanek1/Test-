@@ -249,10 +249,10 @@ def chart(path, rows, scenes, dead, trans, events, fps, opt, title, t0):
     ncol = 1 if ns <= 3 else 2
     nrow = int(math.ceil(ns / ncol))
     W = max(9.6, 7.4 * ncol)
-    ph, top_in, bot_in = 1.62, 1.1, 0.62
+    ph, top_in, bot_in = 1.62, 1.1, 0.95
     H = top_in + bot_in + ph * nrow
     fig = plt.figure(figsize=(W, H), facecolor=C['surface'])
-    gs = fig.add_gridspec(nrow, ncol, left=0.06 if ncol > 1 else 0.085, right=0.985, top=1 - top_in / H, bottom=bot_in / H,
+    gs = fig.add_gridspec(nrow, ncol, left=0.06 if ncol > 1 else 0.085, right=0.985, top=1 - top_in / H, bottom=(bot_in - 0.05) / H,
                           hspace=0.95, wspace=0.12)
     floor = 10.0
     ymax = max(opt['dead_px'] * 60, float(np.nanmax(life)) * 2.0 if len(life) else 1)
@@ -302,8 +302,9 @@ def chart(path, rows, scenes, dead, trans, events, fps, opt, title, t0):
         fl = [r for r in sc['dead_runs'] if r['flagged']]
         if fl:
             r = max(fl, key=lambda r: r['frames'])
-            ax.text(r['local_f1'] + 1, ymax * 0.12, f"{r['frames']} dead f (f{r['local_f0']}\u2013f{r['local_f1']})", fontsize=7.2,
-                    color=C['critical'], va='center', zorder=5, fontweight='bold')
+            right = r['local_f1'] > 0.62 * (f1 - f0)
+            ax.text(r['local_f1'] - 1 if right else r['local_f1'] + 1, ymax * 0.12, f"{r['frames']} dead f (f{r['local_f0']}\u2013f{r['local_f1']})",
+                    fontsize=7.2, color=C['critical'], va='center', ha='right' if right else 'left', zorder=5, fontweight='bold')
     handles = [Patch(color=C['good'], label='alive'), Patch(color=C['critical'], label='dead'),
                Patch(color=C['trans'], label='dead, but inside a transition (excused)'),
                Patch(color=C['flag'], label=f'dead run > {opt["dead_limit"]:.2f}s (flagged)'),
@@ -317,7 +318,7 @@ def chart(path, rows, scenes, dead, trans, events, fps, opt, title, t0):
             'Score = 10 \u00d7 (0.45\u00b7density + 0.35\u00b7coverage + 0.20\u00b7gap); density = min(1, events/s \u00f7 5); coverage = 1 \u2212 flagged dead frames \u00f7 frames;',
             'gap = 1 if the longest gap between event onsets \u2264 1 s, falling to 0 at 2 s.  PASS = score \u2265 8 and no dead run over the limit.']
     for k, t in enumerate(foot):
-        fig.text(0.5, (0.42 - 0.14 * k) / H, t, ha='center', fontsize=6.8, color=C['text2'])
+        fig.text(0.5, (0.36 - 0.13 * k) / H, t, ha='center', fontsize=6.8, color=C['text2'])
     fig.savefig(path, dpi=125, facecolor=C['surface'])
     plt.close(fig)
 

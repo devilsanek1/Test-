@@ -1,13 +1,15 @@
 // OldQuarter — S9 (S12 "too old to fix", S13 board finale + un-build). Golden. Canvas coords at S12 rest.
 //
 // Door-height eye level (y 1150): we look UP at three website sites built with <SiteFacade/>: siteL (30, 690, 315, 610,
-// six storeys, cream), siteM (360, 820, 280, 480, four storeys, sand: the OLD one, an ordinary building), siteR
-// (740, 700, 310, 600, six storeys, mintPale). Each has a browser window, a door (y 1150-1300) with a stoop and a lock,
+// six storeys, sand: its top meets the golden sky, so it sits a step off it), siteM (360, 820, 280, 480, four storeys,
+// cream: the OLD one, an ordinary building), siteR (740, 700, 310, 600, six storeys, mintPale). Each has a browser window, a door (y 1150-1300) with a stoop and a lock,
 // and a HANGING PLAQUE sign on a bracket at eye level (y 1190): siteL (300, 1190), siteM (590, 1190) = the plaque that
 // turns old (tan, chipped, cobweb, dust, cane), siteR (800, 1190). A street gap x 640-740 recedes to the horizon with a
-// second row of 9 buildings (every third plaque old) and the far city; a flat peach band only in the gap. Near layer: a
-// street tree cropped at the right edge, kerb (y 1500), a bollard (700, 1450, Pip). The sites pop up on "one / in /
-// three". S13 adds the noticeboard slot (300, 1090, 500, 310; rail 380, 1060, 340, 28) and edge-audience slots.
+// second row of 9 sand / tan buildings (every third plaque old) and the far city; a flat peach band only in the gap.
+// Ground: one flat field per band (sidewalk, street) with a few broken paving lines + specks. Near layer: a street tree
+// cropped at the right edge standing in a tree pit at kerb height, kerb (y 1500), a bollard (700, 1450, Pip), and the
+// default foreground (a low railing cut by the left edge). The sites pop up on "one / in / three". S13 adds the
+// noticeboard slot (300, 1090, 500, 310; rail 380, 1060, 340, 28) and edge-audience slots (no railing then).
 //
 //   <OldQuarter sun={<Sun cx={500} cy={690} r={110}/>} sitePopAt={[61.2, 61.5, 61.8]} plaqueSwingAt={62.4}
 //     oldPlaque={{flipOldAt: 63.6, cobwebAt: 64.4, dustAt: 64.5, caneAt: 64.7}} />

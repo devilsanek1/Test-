@@ -45,8 +45,9 @@ npx esbuild speed.ts --bundle --platform=node --log-level=error > /tmp/speed.cjs
 Flat inked art strobes above ~15-20 px / frame: every move stays at or under that (C's cruise is the limit; the old
 24x -> 1x in 4 s ran at 48-53 px / frame).
 
-Speed: ~120-135 ms / frame (full 1080 x 1920, concurrency 2, 20 frames per shot: A 118, D 125, B 133, C 122; on a
-machine shared with the other lanes a 90-frame run measured 204 ms / frame).
+Speed (full 1080 x 1920, concurrency 2, 20 frames per shot, incl. page setup): A 118, D 125, B 133, C 122 ms / frame
+with the machine at load ~3-6; ~200-250 ms / frame (60 frames over the demo: 197) while the other lanes rendered too
+(load ~8-10). The heaviest pieces: the plaza + steps Persons in B (~75 kit Persons) and the close-up ring in C.
 
 ---
 
@@ -284,8 +285,8 @@ camera cranes up 160 px; a GroundPlane plaza with 44 back-view people walking up
 silhouette at the lens; banners on "four", lanterns popping one by one, the door opens on "Nobody".
 
 **Pull-back (PEAK).** `WallOfWindows` 56 x 30 on `wallQuadVP`; 8x -> 1.3x over 5.3 s (cruise <= 20 px / frame) anchored
-on the hero, which ends framed at (440, 1110), 35 x 41 px; the 24 neighbours + the hero as close-ups degrading by screen
-size; keepDark on the caption LINE boxes with hysteresis; an on-wave from the hero, then the switch-off: the block under
+on the hero, which ends framed at (440, 1110), 35 x 41 px; the hero and every cell the 8x opening shows (9 rows x 7
+cols) as close-ups degrading by screen size (flat dark glass behind the caption words); keepDark on the caption LINE boxes with hysteresis; an on-wave from the hero, then the switch-off: the block under
 "switch it off" goes first, darkness closes in on the hero (a ragged collapse wave) punctuated by whole blocks of floors
 going dark inside the final framing, the stragglers, and the hero last on "did." (0.55 s before the cut); our own
 rooftop (Ledge with detail) rises into the frame and the mascot watches the blocks go dark, glances at us, and turns to

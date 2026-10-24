@@ -5,9 +5,11 @@
 //   govB Domed Capitol (x 250..500, lantern tip 600; the hero: hero window 270,860,210,150, lock box (400,1135) 16x20)
 //   govC Clock Tower (x 770..960, behind govD; white clock face r26 at (865,650) that stays white when dark)
 //   govD Modern Ministry (x 760..1240, roof 860, base 1290, cropped by the right edge)
-// + the far city band in the gap, the plaza paving to VP (630,1150), the flat cream sun path with sage shadow wedges,
-// a lamp post with a crossbar and 3 pigeons, a foreground tree, Pip's bollard (760,1440), 4 abstract pennants,
-// 9 citizens and 3 big onlookers at the frame sides. World coordinates = S01 camera rest.
+// + the far city in the gap (two fill-only haze tiers, lower and smaller than the buildings), the plaza (one flat field
+// with a few broken paving lines + specks toward VP (630,1150)), the flat cream sun path with sage shadow wedges, a lamp
+// post with a crossbar and 3 pigeons, a foreground tree in a tree pit, Pip's bollard (760,1440), 4 abstract pennants,
+// 9 ~40 px citizens (doors are >= 3x a citizen) and 3 onlookers cropped to heads + shoulders in the bottom corners.
+// World coordinates = S01 camera rest.
 //
 //   <GovernmentPlaza state="built" cascadeAt={0.03} sun={<Sun .../>}
 //     gov={{govA: {chromeAt: 0.54, screenOnAt: 0.9, shutterAt: 2.4, offAt: 2.4, tagAt: 3.4, padlockAt: 3.64}, ...}}

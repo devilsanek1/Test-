@@ -1,7 +1,7 @@
 // NoticeboardCorner — S6 (S07 "pinned for everyone", the town square corner). Golden. Canvas coords at S07 rest.
 //
-// A sand public wall x 0-780 (cornice 840-880, tan shade plane on its left 30 %), far rooftop silhouettes behind its top
-// (fill-only tan, y 780-860) where the sun sits half hidden, a flat peach horizon band; the makers' WORKSHOP corner at
+// A sand public wall x 0-780 (tan cornice 840-880 + bold roof line, tan shade plane on its left 30 %), far rooftop
+// silhouettes behind its top (fill-only half-sand #E6CEB6, y 780-860, a half step off the golden sky) where the sun sits half hidden, a flat peach horizon band; the makers' WORKSHOP corner at
 // the right edge (the same <Workshop/> as S06, preset WORKSHOP_CORNER); a pole on its roof at (1000, 620-700) with three
 // TELEPHONE WIRES sweeping left across the sky (y 700 / 730 / 760 at frame centre; the same wire spec continues in S08 at
 // y 1211 / 1235.5 / 1260 at zoom 1.3: `TelephoneWires`, `WIRES`) with pigeons; the noticeboard slot (frame 140, 930,

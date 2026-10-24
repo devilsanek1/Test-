@@ -153,6 +153,7 @@ def caption_check(img, a, band, thr_low=3.0, tone_hint=None):
         cand[tone] = t
     cand['light'] = drop_enclosed(cand['light'], cand['dark'])
     cand['dark'] = drop_enclosed(cand['dark'], cand['light'])
+    boxed = sum(int((cand[k] & boxfill).sum()) for k in cand)
     for k in cand:
         cand[k] = cand[k] & ~boxfill
     areas = {k: int(v.sum()) for k, v in cand.items()}
@@ -196,6 +197,9 @@ def caption_check(img, a, band, thr_low=3.0, tone_hint=None):
         busy = float(ed[bg].mean())
         res.append({'tone': tone, 'glyph_px': area, 'text_lum': round(tl, 4), 'median_contrast': round(float(np.median(c)), 2),
                     'low_frac': round(low, 4), 'busy': round(busy, 4)})
+    if not res and boxed >= 0.25 * em * em:
+        # the whole caption is highlighted words (ink on peach boxes): legible by design
+        res.append({'tone': 'boxed', 'glyph_px': boxed, 'text_lum': 0.0128, 'median_contrast': 8.0, 'low_frac': 0.0, 'busy': 0.0})
     return res or None
 
 

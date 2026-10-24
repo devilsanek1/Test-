@@ -1,15 +1,19 @@
 // DomeCity — S7 (S08 "the dome and the flood", PEAK 2, the film's only rooftop vista). Canvas coords at S08 rest.
 //
-// An endless city of websites in four rows on an atmosphere ladder (golden: row 0 sand / cream fill-only on the horizon
-// y 1000 with a small TERRACED-HILL silhouette far left (S10 set-up), row 1 sand fill-only with window dots, row 2
-// tan / sage with ink 1.6-2.2 and tiny browser-window dots, row 3 near rooftops tan / teal with ink 3.4). Over ~80 % of
-// it a glass shield DOME, mirrored so the action sits left: ONE bold 4.8 ink arc from (260, 1300) over the apex
-// (730, 700) to (1200, 1300), drawn from both feet up to the apex; inside it every fill steps one palette step lighter,
-// an 8-10 px cream rim strip, 3 white glint bars, 6 meridians + 3 parallels in hair; no logo, no cloud shape.
+// An endless city of websites in four rows on the golden atmosphere ladder (sky cream -> row 0 half-sand / sand
+// fill-only on the horizon y 1000 with a small TERRACED-HILL silhouette far left (S10 set-up) -> row 1 sand fill-only
+// with window dots -> row 2 tan / sage with ink 1.6-2.2 and tiny browser-window dots -> row 3 near rooftops tan / teal
+// with ink 3.4). Every row is BACK-FILLED (the band under its lowest roof, in the colour of the row behind) and the sun
+// slot is clipped to y < row 0's base, so nothing behind the city shows below the first skyline. Over ~80 % of it a
+// glass shield DOME, mirrored so the action sits left: ONE bold 4.8 ink arc from (260, 1300) over the apex (730, 700)
+// to (1200, 1300), drawn from both feet up to the apex; inside it every fill takes the GLASS step (`glassStep`: a full
+// step lighter for mid / dark tones, half a step for light ones, so nothing turns paper-white: the glass sky is
+// #F9F0E5 on a golden sky), an 8-10 px cream rim strip, 3 white glint bars, 6 meridians + 3 parallels in hair.
 // The uncovered strip x 90-260 keeps normal values, with its nearest doors at y 1400-1480 (rattler slots); a dashed
 // "big chunk" footprint line along the rooftops. A lattice WATCHTOWER x 160-220 (y 800-1500) rises in: cabin with a
-// 40 px back-view guard, a searchlight from (190, 830) (flat cream at a FIXED partial opacity, dashed edges, sweeping
-// -20 .. +40 deg), a white tally board. Foreground roof ledge (y 1480+) with chimney pots, an antenna (the only
+// 34 px back-view guard (shoulders, head, peaked cap) in a sage window, a searchlight from (190, 830) (flat cream at a
+// FIXED partial opacity, dashed edges, sweeping -20 .. +40 deg; drawn UNDER the dome's ink), a white tally board (the
+// tally marks are the <DomeTallies n/> overlay). Foreground roof ledge (y 1480+) with chimney pots, an antenna (the only
 // tealDark) and Pip's perch (560, 1470). Golden -> dusk: windows pop peach from the horizon outward on `duskAt`.
 //
 //   <DomeCity sun={<Sun cx={700} cy={990} r={165}/>} domeAt={36.2} towerAt={37.0} searchAt={37.3}

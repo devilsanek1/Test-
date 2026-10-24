@@ -5,12 +5,16 @@
 // (385,1040,70,80), and the two-step STOOP (exported on its own: <Stoop/>). Rows of website houses recede on both sides
 // (10+ doors per side: stoop, plaque, lock, browser dots), far towers beyond the VP (fill-only), 3 street trees + a near
 // tree with season palettes, a lamp post cropped at the left edge with a telephone wire and 2 pigeons, pavement, kerb,
-// bollard. Time of day: 'day' | 'morning' | 'night' (teal sky is the World's; this set adds 8 cream stars, peach lit
-// windows, tealDark far towers with peach dots, lamp heads with stepped glow discs, 2 extra lamps; facades KEEP their day
-// fills) | 'dawn' (a flat peach horizon band; the World sky wipes up to cream).
+// bollard; the pavement is one flat field with a few broken paving lines + specks, and the default foreground is a near
+// kerb with two bollards and a drain grate (ground.tsx). Time of day: 'day' | 'morning' | 'night' (teal sky is the
+// World's; this set adds 8 cream stars, peach lit windows, tealDark far towers with peach dots, lamp heads with OPAQUE
+// stepped glow discs, 2 extra lamps; facades KEEP their day fills while the ground plane, road, sidewalk and kerb take
+// the night mapping: mintPale -> sage, cream -> sand, sand -> tan) | 'dawn' (a flat peach horizon band).
+// The storyboard beats on the stoop (riser glyphs, tower, check, peach riser, ledge) are the <StoopBeats/> overlay,
+// passed in `heroSlot` so it sits in the hero layer.
 //
-//   <StoopStreet tod="day" stoop={{step1At: 1.9, step2At: 2.3, magnifierAt: 2.4, wrenchAt: 3.1}} sun={<Sun .../>} />
-//   <StoopStreet tod="night" nightUntil={1.6} stoop={{checkAt: 2.6, peachAt: 2.68, ledgeAt: 3.2}} />
+//   <StoopStreet tod="day" stoop={{step1At: 1.9, step2At: 2.3}} heroSlot={<StoopBeats magnifierAt={2.4} wrenchAt={3.1} />} />
+//   <StoopStreet tod="night" nightUntil={1.6} heroSlot={<StoopBeats checkAt={2.6} peachAt={2.68} ledgeAt={3.2} />} />
 //   stoopStreetDoors()  // [{id: '#4', overDoor, lock, plaque, h, side, i}, ...] near -> far, for ripples / "?" / tags
 //
 // Use the World sky with a plain colour key at night (NOT tod: 'night'), so the facades keep their day fills.

@@ -452,9 +452,10 @@ const WFH = 0.72;
 const HERO: [number, number] = [28, 3];
 /** The hero goes dark on "did." (21.45 s), the last light on the wall; the cut follows ~0.55 s later. */
 const HERO_OFF = 21.45 - T_C[0];
-/** 5 x 5 block around the hero drawn as close-ups (level of detail by screen size). */
+/** The block around the hero drawn as close-ups (level of detail by screen size). */
 const LOD: [number, number][] = [];
-for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) if (dr || dc) LOD.push([HERO[0] + dr, HERO[1] + dc]);
+// 9 rows x 7 cols: every cell the 8x opening frame shows is a close-up (no detailed patch among flat panes)
+for (let dr = -4; dr <= 4; dr++) for (let dc = -3; dc <= 3; dc++) if ((dr || dc) && HERO[1] + dc >= 0) LOD.push([HERO[0] + dr, HERO[1] + dc]);
 const HQ = windowQuad(WALL, ROWS, COLS, HERO[0], HERO[1], WFW, WFH);
 const HC: Pt = [(HQ[0][0] + HQ[2][0]) / 2, (HQ[0][1] + HQ[2][1]) / 2];
 const HERO_GLASS = Math.hypot(HQ[1][0] - HQ[0][0], HQ[1][1] - HQ[0][1]);
@@ -614,7 +615,9 @@ const CloseupRing: React.FC = () => {
         if (!hero && z <= LOD_ABOVE) return null;
         const st = wallCellState(WALL_SPEC, r, c, t, {darkFrom, override: heroOverride});
         const j = hero ? 0.5 : ((r * 7 + c * 13) % 10) / 10;
-        const detail = detailFor(HERO_GLASS * z, j);
+        // behind the caption words: flat dark glass only (no frame / curtain / room ink through the glyphs)
+        const underWords = !hero && !!darkFrom && darkFrom[r * COLS + c] <= t;
+        const detail = underWords ? 'glass' : detailFor(HERO_GLASS * z, j);
         const lit = P.windowLit[Math.min(P.windowLit.length - 1, Math.floor(st.k3 * P.windowLit.length))];
         const seed = hero ? 'hero' : `nb${r}/${c}`;
         const withPerson = hero || (r * 7 + c * 3) % 3 === 0;
