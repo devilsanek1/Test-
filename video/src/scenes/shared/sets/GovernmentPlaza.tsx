@@ -1,22 +1,24 @@
 // GovernmentPlaza — S1 (S01 hook, S11 close-up + hard cut, S13 un-build underlay = frame 0). PEAK 1.
 //
-// Four monumental government buildings ("four countries") around a deep gap where the low sun sits:
-//   govA Columned Hall (x -120..250, pediment apex (65, 610), cropped by the left edge)
-//   govB Domed Capitol (x 250..500, lantern tip 600; the hero: hero window 270,860,210,150, lock box (400,1135) 16x20)
-//   govC Clock Tower (x 770..960, behind govD; white clock face r26 at (865,650) that stays white when dark)
-//   govD Modern Ministry (x 760..1240, roof 860, base 1290, cropped by the right edge)
-// + the far city in the gap (two fill-only haze tiers, lower and smaller than the buildings), the plaza (one flat field
-// with a few broken paving lines + specks toward VP (630,1150)), the flat cream sun path with sage shadow wedges, a lamp
-// post with a crossbar and 3 pigeons, a foreground tree in a tree pit, Pip's bollard (760,1440), 4 abstract pennants,
-// 9 ~40 px citizens (doors are >= 3x a citizen) and 3 onlookers cropped to heads + shoulders in the bottom corners.
-// World coordinates = S01 camera rest.
+// Four monumental government buildings ("four countries") around a narrow gap where the low sun sits. PEAK-1 layout
+// (review 5): ~1.35x taller under the same y-600 ceiling, bases y 1400-1470, horizon / VP (720, 1384) = 0.72 H:
+//   govA Columned Hall (x -40..400: the FULL order, 2 column pairs, window + door in the wide central bay, 3 steps)
+//   govB Domed Capitol (x 396..640, lantern tip 600, tall drum; the hero: window 414,970,208,146, lock box (543,1318) 22x27)
+//   govC Clock Tower (x 800..1000, behind govD; white clock face r26 at (870,670) that stays white when dark)
+//   govD Modern Ministry (x 790..1240, roof 880, base 1470, cut by the right edge): the nearest, biggest mass
+// + the far city in the gap (two fill-only haze tiers on the horizon), the plaza (one flat field with a few broken
+// paving lines + specks), the flat cream sun path with sage shadow wedges, a lamp post at the left edge with a crossbar
+// and 3 pigeons, a foreground tree in a tree pit, Pip's bollard (812,1426), 4 abstract pennants, 6 readable 55-75 px
+// citizens on the VP axis + 4 far ones, an onlooker cropped by the left edge INSIDE the visible band and 2 heads in the
+// bottom corners. World coordinates = S01 camera rest. docs/SHARED_SETS.md section 8 lists the anchors this moved.
 //
 //   <GovernmentPlaza state="built" cascadeAt={0.03} sun={<Sun .../>}
 //     gov={{govA: {chromeAt: 0.54, screenOnAt: 0.9, shutterAt: 2.4, offAt: 2.4, tagAt: 3.4, padlockAt: 3.64}, ...}}
 //     pennantsAt={[1.23, 1.38, 1.53, 1.68]} citizensAt={1.06} lanternOffAt={3.25} pigeonsAt={1.7} pigeonsFlyAt={3.3} />
-//   <GovernmentPlaza state="lineArt" />      // frame 0 / the S13 un-build underlay (ink on white, white tombstones)
+//   <GovernmentPlaza state="lineArt" />      // frame 0 / the S13 un-build underlay (ink on white, white tombstones,
+//                                            // ink-only browser chrome; chrome={false} = plain windows)
 //   <GovernmentPlaza state="off" />          // the S01 end state (S11 hard cut): shutters down, padlocked, tagged, dark
-//   <GovernmentPlaza detail="close" ... />   // S11 govB close-up (zoom 1.85 on (375,793)): extra stone detail
+//   <GovernmentPlaza detail="close" ... />   // S11 govB close-up (PLAZA.closeup: zoom 1.6 on (518,826)): stone detail
 //   wrap={(name, nearness, node) => <Layer depth={1 - nearness}>{node}</Layer>}   // multiplane split
 //
 // The three states share every path and seed, so the geometry is pixel-identical across them. Every event time is a

@@ -12,9 +12,9 @@ transitions, Person moves and anything hand-animated:
            (a foreground layer, a person, a wiper: whatever moves fastest)
   dv       frame-to-frame change of the camera speed (canvas px / frame per frame): a step = a stall, a slam or a whip
 
-FAIL (exit 1) when, OUTSIDE the allow-listed windows, the camera or the fastest edge motion runs above --limit
-(default peakPxPerFrame = 18) for --min-run frames or more, or the camera speed steps by more than --dv-limit
-(default 2.5). Film transitions are allow-listed automatically (push-through runs > 100 px / frame by design): for Main
+FAIL (exit 1) when, OUTSIDE the allow-listed windows, the camera runs above --limit (default peakPxPerFrame = 18) for
+--min-run frames or more, or the camera speed steps by more than --dv-limit (default 2.5). Fast LOCAL motion above the
+limit is a WARN (a designed rise moves 50 % of its height in frame 1; --strict-edges makes it fail). Film transitions are allow-listed automatically (push-through runs > 100 px / frame by design): for Main
 from src/data/scenes.json, for a per-scene composition S07 its own transitionIn window at its start. Add your own with
 --allow=t0-t1[,t0-t1...] (composition seconds).
 
@@ -178,6 +178,7 @@ def main(argv=None):
     ap.add_argument('--json', default=None, help='write per-frame numbers as JSON')
     ap.add_argument('--keep', action='store_true', help='keep the rendered frames (prints the directory)')
     ap.add_argument('--keep-captions', action='store_true', help='include the caption band (y 280-600) in the edge motion')
+    ap.add_argument('--strict-edges', action='store_true', help='fast LOCAL motion fails too (default: a warning)')
     o = ap.parse_args(argv)
     limit = o.limit if o.limit is not None else spec_peak()
     t0 = o.t0 or 0.0
@@ -209,11 +210,13 @@ def main(argv=None):
     cam = [r['cam'] if r['cam'] == r['cam'] else 0.0 for r in rows]
     fast = [r['fast'] for r in rows]
     problems = []
-    for name, vals in (('camera', cam), ('fastest edge motion', fast)):
+    warnings = []
+    for name, vals, out in (('camera', cam, problems), ('fast local motion', fast, problems if o.strict_edges else warnings)):
         masked = [0.0 if allowed(rows[k]['t']) else v for k, v in enumerate(vals)]
         for (a, b) in runs_over(masked, limit, o.min_run):
             pk = max(vals[a:b + 1])
-            problems.append(f'{name} {pk:.1f} px/frame > {limit:g} at {rows[a]["t"]:.2f}-{rows[b]["t"]:.2f} s ({b - a + 1} frames): flat ink strobes')
+            why = 'flat ink strobes' if name == 'camera' else 'check it is a designed rise / pop / wipe (optical flow also misreads grids of identical windows switching)'
+            out.append(f'{name} {pk:.1f} px/frame > {limit:g} at {rows[a]["t"]:.2f}-{rows[b]["t"]:.2f} s ({b - a + 1} frames): {why}')
     for k in range(1, len(cam)):
         dv = cam[k] - cam[k - 1]
         r = rows[k]
@@ -231,10 +234,12 @@ def main(argv=None):
         print(f'  allowed {a:.2f}-{b:.2f} s  {why}')
     for p in problems:
         print('  FAIL ' + p)
+    for p in warnings:
+        print('  WARN ' + p)
     if not problems:
         print('  OK: no strobing speed and no velocity step outside the allowed windows')
     if o.json:
-        json.dump({'limit': limit, 'rows': rows, 'allow': allow, 'problems': problems}, open(o.json, 'w'), indent=1)
+        json.dump({'limit': limit, 'rows': rows, 'allow': allow, 'problems': problems, 'warnings': warnings}, open(o.json, 'w'), indent=1)
     if o.chart and rows:
         import matplotlib
         matplotlib.use('Agg')

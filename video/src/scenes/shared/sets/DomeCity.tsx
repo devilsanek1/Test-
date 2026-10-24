@@ -9,12 +9,15 @@
 // to (1200, 1300), drawn from both feet up to the apex; inside it every fill takes the GLASS step (`glassStep`: a full
 // step lighter for mid / dark tones, half a step for light ones, so nothing turns paper-white: the glass sky is
 // #F9F0E5 on a golden sky), an 8-10 px cream rim strip, 3 white glint bars, 6 meridians + 3 parallels in hair.
-// The uncovered strip x 90-260 keeps normal values, with its nearest doors at y 1400-1480 (rattler slots); a dashed
-// "big chunk" footprint line along the rooftops. A lattice WATCHTOWER x 160-220 (y 800-1500) rises in: cabin with a
-// 34 px back-view guard (shoulders, head, peaked cap) in a sage window, a searchlight from (190, 830) (flat cream at a
+// The uncovered strip x 90-260 keeps normal values, with its nearest doors at y 1384-1436 (rattler slots); a dashed
+// "big chunk" footprint line along the rooftops. Rows 2-3 carry 6-8 real BrowserChrome windows; the window grids are
+// jittered (drop-outs, partial fills). A lattice WATCHTOWER x 160-220 (y 790-1500) rises in: a 124 x 86 cabin with a
+// 56 px back-view guard (shoulders, head, peaked cap) in a sage window, a searchlight from (190, 800) (flat cream at a
 // FIXED partial opacity, dashed edges, sweeping -20 .. +40 deg; drawn UNDER the dome's ink), a white tally board (the
-// tally marks are the <DomeTallies n/> overlay). Foreground roof ledge (y 1480+) with chimney pots, an antenna (the only
-// tealDark) and Pip's perch (560, 1470). Golden -> dusk: windows pop peach from the horizon outward on `duskAt`.
+// tally marks are the <DomeTallies n/> overlay). The near layer is a real ROOFTOP: a parapet cut by both frame edges
+// (cream coping 1452 -> 1440, tan face to 1600, our sand deck below), a chimney stack and the antenna (the only tealDark)
+// on the coping, Pip's perch (500, 1448) and a back-view observer. Golden -> dusk: windows pop peach from the horizon
+// outward on `duskAt`.
 //
 //   <DomeCity sun={<Sun cx={700} cy={990} r={165}/>} domeAt={36.2} towerAt={37.0} searchAt={37.3}
 //     duskAt={42.7} sky="golden" />

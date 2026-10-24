@@ -5,8 +5,9 @@
 // (385,1040,70,80), and the two-step STOOP (exported on its own: <Stoop/>). Rows of website houses recede on both sides
 // (10+ doors per side: stoop, plaque, lock, browser dots), far towers beyond the VP (fill-only), 3 street trees + a near
 // tree with season palettes, a lamp post cropped at the left edge with a telephone wire and 2 pigeons, pavement, kerb,
-// bollard; the pavement is one flat field with a few broken paving lines + specks, and the default foreground is a near
-// kerb with two bollards and a drain grate (ground.tsx). Time of day: 'day' | 'morning' | 'night' (teal sky is the
+// bollard; the pavement is one flat field with a few broken paving lines + specks; the default foreground is a near kerb
+// (two bollards, a drain grate) + a back-view figure cropped by the left edge INSIDE the visible band (ground.tsx); the
+// people layer (STOOP.walkers) and street furniture (a planter, a bike) give the street life (life.tsx). Time of day: 'day' | 'morning' | 'night' (teal sky is the
 // World's; this set adds 8 cream stars, peach lit windows, tealDark far towers with peach dots, lamp heads with OPAQUE
 // stepped glow discs, 2 extra lamps; facades KEEP their day fills while the ground plane, road, sidewalk and kerb take
 // the night mapping: mintPale -> sage, cream -> sand, sand -> tan) | 'dawn' (a flat peach horizon band).

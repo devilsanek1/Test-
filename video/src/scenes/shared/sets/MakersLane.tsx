@@ -4,9 +4,11 @@
 // The lane: vanishing point (430, 1040) at the lane's end where the scene's sun sits (420, 985, r120) with far-roof
 // silhouettes across its lower part (fill-only tan); a flat peach horizon band (920-1040); the neighbours' houses on the
 // left (sand / tan: their roofline meets the golden sky) receding from x -140 (roof 700, base 1700) to x 330 (roof 900,
-// base 1120) with curtains that pop drawn and two "Zzz" windows; the lane is ONE flat sand field with 4 thin, broken tan
-// shadow bands (long shadows cast toward us by the low sun) and sparse cobble specks. The Workshop sits on a cream kerb /
-// step plane whose left end follows the lane's ray from the VP.
+// base 1120) carrying teal glass, shutters and awnings, with curtains that pop as peach lit panes and two "Zzz" windows;
+// the lane is ONE flat sand field with a teal shade wedge over the left third and two wide tan shadow wedges from the sun
+// (review 5: light, not road markings) and sparse cobble specks. The Workshop sits on a cream kerb / step plane and a
+// sand pavement brought forward to y 1646, whose left ends follow the lane's ray from the VP. Passers and the parked
+// makers' cart live on the lane (MAKERS_LANE.walkers / .furniture).
 // The WORKSHOP (exported on its own, two layout presets): 3-storey tan brick, browser window upstairs, a round elephant
 // sign on a bracket (pendulum swing), a shop window with a peach stepped glow, three makers at a bench and a crate, a
 // roller blind (half down, then rolls up), a teal door with a mail slot and an ink lock tick (doorOpenAt).

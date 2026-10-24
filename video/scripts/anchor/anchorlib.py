@@ -30,10 +30,12 @@ END_KEYS = ('e', 'end', 't1')
 
 
 def rel(p):
+    """Path relative to the project root when inside it, else absolute."""
     try:
-        return os.path.relpath(p, ROOT)
+        r = os.path.relpath(os.path.abspath(p), ROOT)
     except ValueError:
-        return p
+        return os.path.abspath(p)
+    return os.path.abspath(p) if r.startswith('..') else r
 
 
 def load_json(p):

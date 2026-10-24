@@ -1,0 +1,65 @@
+{
+ "note": "TOY word-anchored storyboard for scripts/anchor/selftest.py and the README examples (3 scenes, 22 words).",
+ "fps": 30,
+ "wordsRef": "Cities switched off their sites, on purpose. A tiny bug hid for fourteen years. Now somebody has to fix every single server.",
+ "duration": {"w": "END", "dt": 0},
+ "coverFrame": {"w": 6, "dt": 0.1, "word": "purpose."},
+ "loop": {"t0": {"w": "END", "dt": -0.5}, "t1": {"w": "END", "dt": 0}, "captionAt": {"w": "END", "dt": -0.2}},
+ "scenes": [
+  {
+   "id": "T01",
+   "title": "Switch-off",
+   "start": {"w": "START", "dt": 0},
+   "end": {"w": 7, "dt": -0.1},
+   "transitionIn": {"type": "loop-start"},
+   "camera": [
+    {"t0": {"w": "START", "dt": 0}, "t1": {"w": 2, "dt": 0, "edge": "e"}, "move": "push-in",
+     "from": {"x": 540, "y": 960, "zoom": 1.0}, "to": {"x": 560, "y": 980, "zoom": 1.04}}
+   ],
+   "beats": [
+    {"t": {"w": 1, "dt": -0.1, "word": "switched"}, "action": "the sun is pressed (lead 0.10 s)"},
+    {"t": {"w": 6, "dt": 0, "word": "purpose."}, "action": "the shutters slam"}
+   ],
+   "sunKeys": [{"t": {"w": 6, "dt": 0}, "kind": "pulse", "word": 6, "x": 630, "y": 800, "r": 150}],
+   "captions": [
+    {"lines": [{"text": "Cities switched off"}, {"text": "their sites,"}], "highlights": [{"text": "switched"}], "tone": "dark"},
+    {"lines": [{"text": "on purpose."}], "highlights": [{"text": "purpose."}], "tone": "dark"}
+   ]
+  },
+  {
+   "id": "T02",
+   "title": "The bug",
+   "start": {"w": 7, "dt": -0.1},
+   "end": {"w": 14, "dt": -0.15},
+   "transitionIn": {"type": "camera-continuous", "t0": {"w": 7, "dt": -0.6}, "t1": {"w": 7, "dt": 0.4}, "dur": "auto",
+                    "notes": "the camera trucks right at matching speed"},
+   "beats": [
+    {"t": {"w": 9, "dt": -0.1, "word": "bug"}, "action": "Bit peeks out"},
+    {"t": {"w": 12, "dt": -0.25}, "action": "the calendar starts tearing (big build leads 0.25 s)"}
+   ],
+   "captions": [
+    {"s": {"w": 7, "dt": 0}, "e": {"w": 12, "dt": 0},
+     "lines": [{"text": "A tiny bug", "s": {"w": 7, "dt": 0}}, {"text": "hid for", "s": {"w": 10, "dt": 0}}],
+     "highlights": [{"text": "bug", "s": {"w": 9, "dt": 0}}], "tone": "dark"},
+    {"lines": [{"text": "fourteen years."}], "highlights": [{"text": "fourteen"}], "tone": "light",
+     "toneAt": [{"t": {"w": 13, "dt": 0}, "tone": "dark", "wipe": "down", "dur": 0.4}]}
+   ]
+  },
+  {
+   "id": "T03",
+   "title": "Every server",
+   "start": {"w": 14, "dt": -0.15},
+   "end": {"w": "END", "dt": 0},
+   "transitionIn": {"type": "foreground-wipe", "dur": 0.4, "notes": "a passer-by crosses right to left"},
+   "beats": [
+    {"t": {"w": 15, "dt": -0.1, "word": "somebody"}, "action": "the keeper steps in"},
+    {"t": {"w": 18, "dt": -0.1}, "action": "the fix pops on"},
+    {"t": {"w": 20, "dt": 0, "word": "single"}, "action": "one door glows"},
+    {"t": {"w": 21, "dt": 0.05, "edge": "e"}, "action": "pull-back settles after the last word"}
+   ],
+   "captions": [
+    {"lines": [{"text": "Now somebody has to"}, {"text": "fix every single server."}], "highlights": [{"text": "every"}]}
+   ]
+  }
+ ]
+}

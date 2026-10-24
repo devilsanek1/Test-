@@ -18,8 +18,9 @@
 // ROW 0 HOUSE #4 is the hidden-match object: facade x 482.5-572.5 (y 1342-1500), window (500, 1372, 55, 35), door (515,
 // 1439.5, 30, 50), lock centred (540, 1464.5) 8.5 x 10.5; at the Part B start camera (540, 1407) zoom 6.0 it lands exactly
 // where Part A's door #4, window, lock and cornice line (screen y 570) were. It is THE FIXED DOOR: from `fixedAt`
-// (default = flagAt) it carries one colour accent (a stepped sage glow arch + a sage door) and the cream check flag on its
-// cornice, flying over the (tan) house above it.
+// (default = flagAt) it carries the colour accent (two opaque stepped glow rings, cream + peach, a sage door, a cream path
+// strip down the street) and the 60 px cream check flag on its cornice, flying over the (tan) house above it. Two
+// back-view standers on the near street look up the hill (`people`).
 // Rows pop in as the caption floor (screen y 570, `revealFloor`) passes their tops during the pull-back. Waves: plaque
 // dots row 0 -> ridge (the haze bands blink sand plaque specks), Bit silhouettes in every near lock; the edges extend
 // outward (`extendAt`). Beat overlays live OUTSIDE the set: <TerraceRings/> (the 12 target rings, TERRACE.rings).
