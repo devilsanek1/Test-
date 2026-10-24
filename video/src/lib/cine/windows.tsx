@@ -19,6 +19,7 @@ import {rand, rng, Seed} from '../rng';
 import type {Pt} from '../sketch';
 import {Quad, quadMap} from './persp';
 import {PathBuf} from './util';
+import {inkOn, useCineState} from './state';
 
 export type SwitchPattern = 'random' | 'rows' | 'cols' | 'sweep' | 'wave' | 'collapse';
 
@@ -121,8 +122,15 @@ function scaleQuad(q: Quad, s: number): Quad {
 
 export type WindowPaths = {dark: string; lit: string[]; blinds: string};
 
+export type WindowFilter = {
+  /** Draw cell i at all (e.g. only the windows of buildings that have finished building, or not the LOD cells). */
+  keep?: (i: number) => boolean;
+  /** Force cell i dark this frame (e.g. a caption-safe band, or windows switched off by an un-build). */
+  dark?: (i: number) => boolean;
+};
+
 /** Build batched paths for the windows at time t. `times` from switchTimes(). */
-export function windowPaths(cells: WinCell[], events: SwitchEvent[], times: Float64Array[], t: number, look: WindowLook = {}, precision = 1): WindowPaths {
+export function windowPaths(cells: WinCell[], events: SwitchEvent[], times: Float64Array[], t: number, look: WindowLook = {}, precision = 1, filter: WindowFilter = {}): WindowPaths {
   const litCols = look.lit ?? [palette.peach, palette.cream];
   const initial = look.initial ?? 0;
   const popK = look.pop ?? 0.35;
@@ -132,8 +140,11 @@ export function windowPaths(cells: WinCell[], events: SwitchEvent[], times: Floa
   const lit = litCols.map(() => new PathBuf(precision));
   const bl = new PathBuf(precision);
   const nE = events.length;
+  const keep = filter.keep;
+  const force = filter.dark;
   for (let i = 0; i < cells.length; i++) {
     const c = cells[i];
+    if (keep && !keep(i)) continue;
     let on = c.k < initial;
     let since = -1e9;
     for (let e = 0; e < nE; e++) {
@@ -146,6 +157,7 @@ export function windowPaths(cells: WinCell[], events: SwitchEvent[], times: Floa
         }
       }
     }
+    if (on && force && force(i)) on = false;
     const dt = t - since;
     let s = 1;
     if (on && dt < POP && popK > 0) s = 1 + popK * Math.sin((Math.PI * dt) / POP);
@@ -249,7 +261,8 @@ export type LitWindowsProps = WindowLook & {
 };
 
 export const LitWindows: React.FC<LitWindowsProps> = ({grid, quad, cells: cellsIn, events = [], seed = 'lw', offset = [1.2, 0.8], ink, ...look}) => {
-  const t = useTime();
+  const S = useCineState();
+  const t = S.t;
   const cells = useMemo(() => cellsIn ?? (grid ? gridCells(grid, seed, quad) : []), [cellsIn, JSON.stringify(grid), JSON.stringify(quad), seed]);
   const times = useMemo(() => switchTimes(cells, events, seed), [cells, JSON.stringify(events), seed]);
   const inkD = useMemo(() => {
@@ -266,15 +279,18 @@ export const LitWindows: React.FC<LitWindowsProps> = ({grid, quad, cells: cellsI
     }
     return pb.d;
   }, [cells, !!ink]);
-  const P = windowPaths(cells, events, times, t, look);
+  // un-build: every window switches off at once (a 1-frame event), then the panes go with the fills
+  const off = S.e > 0.05;
+  const P = windowPaths(cells, events, times, t, look, 1, off ? {dark: () => true} : {});
   const lit = look.lit ?? [palette.peach, palette.cream];
   const tr = offset[0] || offset[1] ? `translate(${offset[0]} ${offset[1]})` : undefined;
+  const color = S.look.fills === 'color' && S.e < 0.4;
   return (
     <>
-      {P.dark ? <path d={P.dark} fill={look.dark ?? palette.tealDark} transform={tr} /> : null}
-      {P.lit.map((d, i) => (d ? <path key={i} d={d} fill={lit[i]} transform={tr} /> : null))}
-      {P.blinds ? <path d={P.blinds} fill={look.blindColor ?? palette.tan} transform={tr} /> : null}
-      {inkD ? <path d={inkD} fill="none" stroke={ink?.color ?? palette.ink} strokeWidth={ink?.width ?? 1.6} strokeLinecap="round" strokeLinejoin="round" /> : null}
+      {color && P.dark ? <path d={P.dark} fill={look.dark ?? palette.tealDark} transform={tr} /> : null}
+      {color ? P.lit.map((d, i) => (d ? <path key={i} d={d} fill={lit[i]} transform={tr} /> : null)) : null}
+      {color && P.blinds ? <path d={P.blinds} fill={look.blindColor ?? palette.tan} transform={tr} /> : null}
+      {inkD && inkOn(S) ? <path d={inkD} fill="none" stroke={ink?.color ?? palette.ink} strokeWidth={ink?.width ?? 1.6} strokeLinecap="round" strokeLinejoin="round" /> : null}
     </>
   );
 };

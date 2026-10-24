@@ -76,10 +76,10 @@ class Bed:
             self.programs[name] = (program, is_drum)
         return self.tracks[name]
 
-    def note(self, tname, inst, pitch, vel, bar, beat, dur_beats, pan=None, human=True, gain_db=0.0):
+    def note(self, tname, inst, pitch, vel, bar, beat, dur_beats, pan=None, human=True, gain_db=0.0, vmax=127):
         t0 = self.g.t(bar, beat)
         dt = self.rng.normal(0, 0.005) if human else 0.0
-        v = int(np.clip(vel + (self.rng.normal(0, 3) if human else 0), 1, 127))
+        v = int(np.clip(vel + (self.rng.normal(0, 3) if human else 0), 1, vmax))
         dur = dur_beats * self.g.beat
         tr = self.tracks[tname]
         tr.add(inst.render(pitch, v, dur), max(0.0, t0 + dt), pan, gain_db)

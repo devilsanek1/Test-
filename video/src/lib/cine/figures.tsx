@@ -5,6 +5,9 @@
 //
 //   <TinyCrowd n={80} area={[120, 1250, 960, 1420]} horizon={1010} k={0.07} at={0.5} span={2} walk={0.25} tod="golden" />
 //   <TinyFigure x={540} y={1300} h={22} coat={palette.teal} hair={palette.ink} />
+// Figures taller than `personAbove` (40 px, the legibility floor) are drawn as the kit <Person> (inked, legs, back
+// view), depth-sorted far -> near after the tiny ones. Tiny ones are batched in small depth-sorted chunks, so a head
+// never lands on a nearer body. Un-build: they sink into their feet (small first). Look: paper = white + hairline.
 
 import React, {useMemo} from 'react';
 import {palette} from '../theme';
@@ -12,6 +15,9 @@ import {springAt, springs, useTime} from '../time';
 import {rng, Seed} from '../rng';
 import {atmos, Tod, TodPalette} from './atmosphere';
 import {PathBuf, r1} from './util';
+import {Person} from '../kit';
+import {FlatColor} from './light';
+import {exitScale, isPaper, useCineState} from './state';
 
 const COATS = [palette.teal, palette.sage, palette.tan, palette.sand, palette.cream, palette.brown, palette.tealDark, palette.peach] as const;
 const HAIR = [palette.ink, palette.brown, palette.tan, palette.tealDark, palette.ink, palette.sand] as const;
@@ -82,7 +88,15 @@ export type TinyCrowdProps = {
   /** Single-colour silhouettes (backlit). */
   silhouette?: string;
   seed?: Seed;
+  /** Figures at least this tall (px, layer units) become kit Persons with ink and legs. Default 40. 0 = never. */
+  personAbove?: number;
 };
+
+/** Height of a kit Person with legs at s = 1 (head top to soles), and its feet below its `y` (hip line). */
+export const PERSON_H = 205;
+export const PERSON_FEET = 60;
+/** On-screen ink for a person of height h px (style bible ladder, by size = depth). */
+export const personInk = (h: number) => (h >= 260 ? 4.8 : h >= 120 ? 3.4 : h >= 70 ? 2.2 : 1.6);
 
 type Fig = {x: number; y: number; h: number; coat: number; hair: number; legs: number; at: number; walk: boolean; ph: number; spd: number};
 
@@ -103,8 +117,10 @@ export const TinyCrowd: React.FC<TinyCrowdProps> = ({
   tod = 'day',
   silhouette,
   seed = 'tc',
+  personAbove = 40,
 }) => {
-  const t = useTime();
+  const S = useCineState();
+  const t = S.t;
   const figs = useMemo(() => {
     const r = rng(`tc/${seed}`);
     const raw = spots ?? Array.from({length: n}, () => ({x: r.range(area[0], area[2]), y: area[1] + (area[3] - area[1]) * Math.pow(r.next(), 0.8), h: undefined as number | undefined}));
@@ -132,19 +148,43 @@ export const TinyCrowd: React.FC<TinyCrowdProps> = ({
   const coats = COATS.map((c) => silhouette ?? atmos(c, depth, tod));
   const hairs = HAIR.map((c) => silhouette ?? atmos(c, depth, tod));
   const legsC = LEGS.map((c) => silhouette ?? atmos(c, depth, tod));
-  const bufs = {
-    head: hairs.map(() => new PathBuf()),
-    body: coats.map(() => new PathBuf()),
-    legs: legsC.map(() => new PathBuf()),
-  };
   const dir = (walkDir * Math.PI) / 180;
-  for (const f of figs) {
+  const out: React.ReactNode[] = [];
+  const big: {f: Fig; x: number; y: number; sy: number; i: number}[] = [];
+  // tiny figures: depth-sorted chunks, each chunk batched by colour (legs, then bodies, then heads)
+  const CH = 10;
+  let chunk: {f: Fig; x: number; y: number; sy: number}[] = [];
+  let ci = 0;
+  const flush = () => {
+    if (!chunk.length) return;
+    const cx = chunk.reduce((a, c) => a + c.x, 0) / chunk.length;
+    const cy = chunk.reduce((a, c) => a + c.y, 0) / chunk.length;
+    const paper = isPaper(S, [cx, cy]);
+    const head = hairs.map(() => new PathBuf());
+    const body = coats.map(() => new PathBuf());
+    const legs = legsC.map(() => new PathBuf());
+    for (const c of chunk) tinyFigure(head[c.f.hair], body[c.f.coat], legs[c.f.legs], c.x, c.y, c.f.h, c.sy);
+    const key = `c${ci++}`;
+    if (S.look.fills === 'none') return void (chunk = []);
+    if (paper) {
+      const d = [...legs, ...body, ...head].filter((b) => !b.empty).map((b) => b.d).join('');
+      out.push(<path key={key} d={d} fill={palette.white} stroke={S.look.ink ? palette.ink : 'none'} strokeWidth={1} />);
+    } else {
+      legs.forEach((b, i) => !b.empty && out.push(<path key={`${key}l${i}`} d={b.d} fill={legsC[i]} />));
+      body.forEach((b, i) => !b.empty && out.push(<path key={`${key}b${i}`} d={b.d} fill={coats[i]} />));
+      head.forEach((b, i) => !b.empty && out.push(<path key={`${key}h${i}`} d={b.d} fill={hairs[i]} />));
+    }
+    chunk = [];
+  };
+  figs.forEach((f, i) => {
     let sy = 1;
     if (at !== undefined) {
       const a0 = at + f.at * span;
-      if (t < a0) continue;
+      if (t < a0) return;
       sy = springAt(t, a0, springs.snappy);
     }
+    sy *= exitScale(S.e, f.ph / 6.28, 0.01);
+    if (sy <= 0.002) return;
     let x = f.x;
     let y = f.y;
     if (f.walk) {
@@ -156,11 +196,36 @@ export const TinyCrowd: React.FC<TinyCrowdProps> = ({
     } else {
       y -= Math.max(0, Math.sin(t * 0.9 + f.ph * 3)) * f.h * 0.02;
     }
-    tinyFigure(bufs.head[f.hair], bufs.body[f.coat], bufs.legs[f.legs], x, y, f.h, sy);
+    if (personAbove > 0 && f.h >= personAbove) {
+      big.push({f, x, y, sy, i});
+      return;
+    }
+    chunk.push({f, x, y, sy});
+    if (chunk.length >= CH) flush();
+  });
+  flush();
+  // big ones: kit Persons (figs are already sorted far -> near)
+  if (big.length) {
+    const people = big.map(({f, x, y, sy, i}) => {
+      const s = (f.h / PERSON_H) * Math.min(1, sy);
+      return (
+        <Person
+          key={`p${i}`}
+          x={x}
+          y={y - PERSON_FEET * s}
+          s={s}
+          legs
+          seed={`${seed}/p${i}`}
+          body={silhouette ?? COATS[f.coat]}
+          hairColor={silhouette ?? (HAIR[f.hair] === palette.sand ? palette.tan : HAIR[f.hair])}
+          legsColor={silhouette ?? LEGS[f.legs]}
+          ink={silhouette ? 0 : personInk(f.h)}
+          idle={f.walk ? 0 : f.h * 0.01}
+          lod={f.h < 70 ? 1 : 0}
+        />
+      );
+    });
+    out.push(silhouette ? <FlatColor key="ppl" color={silhouette}>{people}</FlatColor> : <React.Fragment key="ppl">{people}</React.Fragment>);
   }
-  const out: React.ReactNode[] = [];
-  bufs.legs.forEach((b, i) => !b.empty && out.push(<path key={`l${i}`} d={b.d} fill={legsC[i]} />));
-  bufs.body.forEach((b, i) => !b.empty && out.push(<path key={`b${i}`} d={b.d} fill={coats[i]} />));
-  bufs.head.forEach((b, i) => !b.empty && out.push(<path key={`h${i}`} d={b.d} fill={hairs[i]} />));
   return <>{out}</>;
 };

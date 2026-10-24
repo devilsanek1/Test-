@@ -50,7 +50,8 @@ from common import (SR, N_TOTAL, VIDEO_DUR, ASSETS, load, save, lufs, true_peak_
 #   "lu":  bed is set `level` LU under the voice (integrated), then ducked, then margin-guarded
 #   "abs": bed is played at its rendered level (gain `level` dB), for the near-silent bed whose
 #          room tone must stay at an absolute floor (~ -60 dBFS after mastering)
-BEDS = {"cinematic": (HERE / "music_cinematic.wav", "lu", 8.5, 14.0),   # v2: user asked "a tiny bit more subtle"
+BEDS = {"cinematic": (HERE / "music_cinematic.wav", "lu", 10.5, 14.0),  # v3: "more subtle" again (-2 dB more)
+        # NOTE: marimba / near_silent are still fitted to the v1 voice (70.7 s); re-fit before using them
         "marimba": (HERE / "music_marimba.wav", "lu", 6.0, 12.0),
         "near_silent": (HERE / "music_near_silent.wav", "abs", 0.0, 6.0)}
 
@@ -245,7 +246,11 @@ def mix(music, cues, vo_path, out, duck_db=None, music_db="auto", target_lufs=-1
 
     vo_st = np.stack([vo, vo], axis=1)
     if mp is not None:
-        m = fit(load(mp))
+        m = load(mp)
+        if abs(len(m) - N_TOTAL) > SR // 10:
+            print(f"WARNING: bed {mp} is {len(m) / SR:.2f} s but the timeline is {N_TOTAL / SR:.2f} s "
+                  f"(bed not fitted to this voice)", file=sys.stderr)
+        m = fit(m)
         if mode == "lu":
             m = m * db2a(lufs(vo_st) - base_lu - lufs(m))  # bed sits `base_lu` LU under the voice
         else:
@@ -335,7 +340,7 @@ def main():
     ap.add_argument("--music", default="cinematic", help="cinematic | marimba | near_silent | none | path.wav")
     ap.add_argument("--out", default=str(HERE / "mix.wav"))
     ap.add_argument("--cues", default=str(HERE / "cues.json"))
-    ap.add_argument("--vo", default=str(HERE / "vo_clean.wav"))
+    ap.add_argument("--vo", default=str(HERE / "vo_clean.wav"))  # v4 chain on assets/vo_v2_eleven.wav
     ap.add_argument("--duck-db", type=float, default=None, help="music duck depth under speech (bed default: 12; near_silent 6)")
     ap.add_argument("--music-db", default="auto", help="'auto' or a dB trim on top of --music-lu")
     ap.add_argument("--music-lu", type=float, default=None,

@@ -6,6 +6,11 @@
 //   <WallOfWindows quad={Q} rows={80} cols={44} tod="night" initial={1}
 //     events={[{at: 2, dur: 2.4, to: 'off', pattern: 'wave', origin: [0.95, 0.4], noise: 0.3}]} />
 //   const hero = windowQuad(Q, 80, 44, 41, 3);                               // row 41, col 3
+//   const Q2 = wallQuadVP({vp: [1000, 1180], near: [-170, -1000, 2600], farX: 690});  // edges converge on the horizon
+//   <WallOfWindows ... keepDark={{y0: 260, y1: 590}} lod={{cells: [[39, 3], [39, 4]], above: 3}} />
+// keepDark: windows whose SCREEN centre falls in the caption band stay dark (or switch off as the camera brings them
+// in), so captions always sit on flat wall. lod: those cells are left out of the batched grid while the layer is
+// zoomed past `above` (draw them as WindowCloseup yourself; useLayerZoom() tells you when).
 
 import React, {useMemo} from 'react';
 import {palette} from '../theme';
@@ -17,6 +22,26 @@ import {darker} from './city';
 import {Quad, quadMap} from './persp';
 import {gridCells, SwitchEvent, switchTimes, windowPaths, WindowLook} from './windows';
 import {PathBuf} from './util';
+import {exitScale, inkOn, isPaper, lookPaint, toScreen, useCineState, xfScale} from './state';
+import type {Mat} from '../xf';
+import {useXf} from '../xf';
+
+/** A receding wall whose horizontal lines converge on the vanishing point `vp` (on the horizon): the near edge is
+ *  vertical at x = near[0] from y near[1] (top) to near[2] (bottom); the far edge is vertical at farX. */
+export function wallQuadVP(o: {vp: Pt; near: [number, number, number]; farX: number}): Quad {
+  const [vx, vy] = o.vp;
+  const [nx, nt, nb] = o.near;
+  const k = (o.farX - nx) / (vx - nx);
+  return [
+    [nx, nt],
+    [o.farX, nt + (vy - nt) * k],
+    [o.farX, nb + (vy - nb) * k],
+    [nx, nb],
+  ];
+}
+
+/** Uniform screen scale of the current layer (1 = rest). */
+export const useLayerZoom = () => xfScale(useXf());
 
 export const WALL_FW = 0.56;
 export const WALL_FH = 0.6;
@@ -51,17 +76,30 @@ export type WallOfWindowsProps = WindowLook & {
   fh?: number;
   /** Path precision (decimals). Use 2-3 when a camera zooms 10x+ into the wall. Default 2. */
   precision?: number;
+  /** Caption-safe band (SCREEN y): windows whose screen centre is inside stay dark on every frame. */
+  keepDark?: {y0: number; y1: number; x0?: number; x1?: number};
+  /** Level of detail: these cells are skipped while the layer's screen scale is above `above` (draw closeups). */
+  lod?: {cells: [number, number][]; above: number};
 };
 
-export const WallOfWindows: React.FC<WallOfWindowsProps> = ({quad, rows, cols, tod = 'night', wall, events = [], seed = 'wall', exclude = [], bandEvery = 4, pierEvery = 6, inkW = 1.6, farDepth = 0.5, fw = WALL_FW, fh = WALL_FH, precision = 2, ...look}) => {
-  const t = useTime();
+export const WallOfWindows: React.FC<WallOfWindowsProps> = ({quad, rows, cols, tod = 'night', wall, events = [], seed = 'wall', exclude = [], bandEvery = 4, pierEvery = 6, inkW = 1.6, farDepth = 0.5, fw = WALL_FW, fh = WALL_FH, precision = 2, keepDark, lod, ...look}) => {
+  const S = useCineState();
+  const t = S.t;
   const p = todPal(tod);
   const ex = new Set(exclude.map(([r, c]) => `${r},${c}`));
-  const cells = useMemo(() => {
+  const {cells, rc} = useMemo(() => {
     const all = gridCells({rows, cols, fw, fh, jitter: 0}, seed, quad);
     // gridCells walks row-major without skips here, so index -> (row, col)
-    return all.filter((_, i) => !ex.has(`${Math.floor(i / cols)},${i % cols}`));
+    const keepI = all.map((_, i) => i).filter((i) => !ex.has(`${Math.floor(i / cols)},${i % cols}`));
+    return {cells: keepI.map((i) => all[i]), rc: keepI.map((i) => [Math.floor(i / cols), i % cols] as [number, number])};
   }, [JSON.stringify(quad), rows, cols, seed, fw, fh, exclude.join('|')]);
+  const lodSet = useMemo(() => {
+    if (!lod) return null;
+    const want = new Set(lod.cells.map(([r, c]) => `${r},${c}`));
+    const out = new Uint8Array(cells.length);
+    rc.forEach(([r, c], i) => (out[i] = want.has(`${r},${c}`) ? 1 : 0));
+    return out;
+  }, [rc, lod?.cells.map((x) => x.join(',')).join('|')]);
   const times = useMemo(() => switchTimes(cells, events, `${seed}/sw`), [cells, JSON.stringify(events), seed]);
   const geo = useMemo(() => {
     const m = quadMap(quad);
@@ -91,18 +129,51 @@ export const WallOfWindows: React.FC<WallOfWindowsProps> = ({quad, rows, cols, t
     }
     return {ink: ink.d, shade: shade.d, far: far.d, outline: new PathBuf(precision).quad(...quad).d};
   }, [JSON.stringify(quad), rows, cols, bandEvery, pierEvery, seed, precision]);
-  const W = windowPaths(cells, events, times, t, {lit: p.windowLit, dark: p.windowDark, ...look}, precision);
+  const zoom = xfScale(S.m);
+  const skipLod = lodSet && zoom > lod!.above ? (i: number) => lodSet[i] === 0 : undefined;
+  const darkBand = keepDark ? bandTest(S.m, cells, keepDark) : undefined;
+  const switchOff = S.e > 0.05; // un-build: every window switches off at once
+  const W = windowPaths(cells, events, times, t, {lit: p.windowLit, dark: p.windowDark, ...look}, precision, {keep: skipLod, dark: switchOff ? () => true : darkBand});
   const wallC = wall ?? ambient(palette.teal, p);
   const lit = look.lit ?? p.windowLit;
-  return (
+  // the wall is a slab-sized piece: it collapses toward its base edge late in an un-build
+  const size = Math.min(1, xfScale(S.m) * 0.9);
+  const k = exitScale(S.e, 0.4, size);
+  if (k <= 0) return null;
+  const mid: Pt = [(quad[0][0] + quad[2][0]) / 2, (quad[0][1] + quad[2][1]) / 2];
+  const paper = isPaper(S, mid);
+  const wallPaint = lookPaint(S, wallC, mid);
+  const color = !paper && S.look.fills === 'color';
+  const body = (
     <>
-      <path d={geo.outline} fill={wallC} />
-      <path d={geo.far} fill={atmos(wallC, farDepth, p, {raw: true})} />
-      {geo.shade ? <path d={geo.shade} fill={darker(palette.teal) === wallC ? atmos(palette.tealDark, 0, p) : ambient(darker(palette.teal), p)} /> : null}
-      {W.dark ? <path d={W.dark} fill={look.dark ?? p.windowDark} /> : null}
-      {W.lit.map((d, i) => (d ? <path key={i} d={d} fill={lit[i % lit.length]} /> : null))}
-      {W.blinds ? <path d={W.blinds} fill={ambient(look.blindColor ?? palette.tan, p)} /> : null}
-      {inkW > 0 && geo.ink ? <path d={geo.ink} fill="none" stroke={palette.ink} strokeWidth={inkW} strokeLinecap="round" /> : null}
+      {wallPaint !== 'none' ? <path d={geo.outline} fill={wallPaint} /> : null}
+      {color ? <path d={geo.far} fill={atmos(wallC, farDepth, p, {raw: true, clear: 0})} /> : null}
+      {color && geo.shade ? <path d={geo.shade} fill={darker(palette.teal) === wallC ? atmos(palette.tealDark, 0, p) : ambient(darker(palette.teal), p)} /> : null}
+      {color && W.dark ? <path d={W.dark} fill={look.dark ?? p.windowDark} /> : null}
+      {color ? W.lit.map((d, i) => (d ? <path key={i} d={d} fill={lit[i % lit.length]} /> : null)) : null}
+      {color && W.blinds ? <path d={W.blinds} fill={ambient(look.blindColor ?? palette.tan, p)} /> : null}
+      {inkW > 0 && geo.ink && inkOn(S, 0.4) ? <path d={geo.ink} fill="none" stroke={palette.ink} strokeWidth={inkW} strokeLinecap="round" /> : null}
+      {paper && inkOn(S) ? <path d={geo.outline} fill="none" stroke={palette.ink} strokeWidth={inkW || 1.6} /> : null}
     </>
   );
+  if (k >= 1) return body;
+  const by = Math.max(quad[2][1], quad[3][1]);
+  return <g transform={`translate(0 ${by}) scale(1 ${k.toFixed(4)}) translate(0 ${-by})`}>{body}</g>;
 };
+
+/** Cells whose screen quad overlaps a screen band. */
+function bandTest(m: Mat, cells: {quad?: Quad}[], b: {y0: number; y1: number; x0?: number; x1?: number}) {
+  const x0 = b.x0 ?? -1e9;
+  const x1 = b.x1 ?? 1e9;
+  return (i: number) => {
+    const q = cells[i].quad;
+    if (!q) return false;
+    const a = toScreen(m, q[0]);
+    const c = toScreen(m, q[2]);
+    const ymin = Math.min(a[1], c[1]);
+    const ymax = Math.max(a[1], c[1]);
+    const xmin = Math.min(a[0], c[0]);
+    const xmax = Math.max(a[0], c[0]);
+    return ymax >= b.y0 && ymin <= b.y1 && xmax >= x0 && xmin <= x1;
+  };
+}

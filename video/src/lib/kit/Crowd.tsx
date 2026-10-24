@@ -4,6 +4,7 @@
 //   <Crowd far={{y: 560, x0: 300, x1: 660, s: 0.28}} near={{y: 1040, x0: 90, x1: 870, s: 0.95}}
 //          rows={8} at={1.0} span={2.5} order="back" signs={0.08} />
 //   <Crowd ... limit={prog(t, 4, 2)} />    // animate growth by revealing more of the fill order
+//   <Crowd ... jitter={{x: 0.3, y: 0.15, scale: [0.6, 1.1]}} rim="left" />   // an organic queue (ref 2), rim-lit
 //
 // y = hip line of the row. Draw order far -> near. Each person seeded `${seed}/${row}/${i}` (stable).
 
@@ -34,13 +35,22 @@ export type CrowdProps = {
   legRows?: number;
   idle?: number;
   style?: 'color' | 'line';
-  build?: 'pop' | 'rise' | 'draw' | 'fade';
+  /** 'fade' is @deprecated (a 1-frame pop: nothing fades). */
+  build?: 'pop' | 'rise' | 'draw' | /** @deprecated = 'pop' without the spring */ 'fade';
   /** Show only the first `limit` fraction of the fill order (0..1). Default 1. */
   limit?: number;
   /** Extra props for every person. */
   person?: Partial<PersonProps>;
   /** 'depth' (default): on-screen ink by row scale (depthInk front/mid/far, none for the far blobs); or a fixed px. */
   ink?: 'depth' | number;
+  /** Organic placement (reference 2's queue, not a marching formation): x = fraction of the slot step, y = fraction of
+   *  the row gap, scale = [min, max] size multiplier skewed toward 1 (a few children, some tall adults; feet stay on the
+   *  ground). Default {x: 0.175, y: 0, scale: [0.94, 1.06]}. */
+  jitter?: {x?: number; y?: number; scale?: [number, number]};
+  /** Rim light (Person `rim`) for people with s >= 0.6. Default false. */
+  rim?: 'left' | 'right' | false;
+  /** People at or above this scale get Person's hero detail (sleeves, hands, hood). Default 0.7. */
+  heroFrom?: number;
 };
 
 /** On-screen ink weight for a figure drawn at scale s (style bible 3/6): 4.8 front, 3.4 mid, 2.2 far, 0 = fill-only. */
@@ -68,17 +78,28 @@ export const Crowd: React.FC<CrowdProps> = ({
   limit = 1,
   person,
   ink = 'depth',
+  jitter,
+  rim = false,
+  heroFrom = 0.7,
 }) => {
+  const jx = jitter?.x ?? 0.175;
+  const jy = jitter?.y ?? 0;
+  const [sm0, sm1] = jitter?.scale ?? [0.94, 1.06];
   const slots = useMemo(() => {
     const out: Slot[] = [];
     const ratio = near.s / far.s;
     const cx = (near.x0 + near.x1) / 2;
     const width = near.x1 - near.x0;
+    const rowY = (r: number) => {
+      const s = far.s * Math.pow(ratio, rows === 1 ? 1 : r / (rows - 1));
+      return far.y + (near.y - far.y) * ((s - far.s) / (near.s - far.s || 1));
+    };
     for (let r = 0; r < rows; r++) {
       const u = rows === 1 ? 1 : r / (rows - 1);
       const s = far.s * Math.pow(ratio, u);
       const k = (s - far.s) / (near.s - far.s || 1);
       const y = far.y + (near.y - far.y) * k;
+      const gap = rows === 1 ? 0 : r > 0 ? y - rowY(r - 1) : rowY(1) - y;
       const x0 = far.x0 + (near.x0 - far.x0) * k;
       const x1 = far.x1 + (near.x1 - far.x1) * k;
       const step = 92 * s * spacing;
@@ -87,9 +108,11 @@ export const Crowd: React.FC<CrowdProps> = ({
       for (let i = 0; i < n + (r % 2 ? 0 : 1); i++) {
         const key = `${seed}/${r}/${i}`;
         if (rand(key, 'd') > density) continue;
-        const x = x0 + off + i * step + (rand(key, 'x') - 0.5) * step * 0.35;
+        const x = x0 + off + i * step + (rand(key, 'x') - 0.5) * step * 2 * jx;
         if (x < x0 - step * 0.2 || x > x1 + step * 0.2) continue;
-        const yy = y + (rand(key, 'y') - 0.5) * 8 * s;
+        const m = sm0 + (sm1 - sm0) * Math.pow(rand(key, 's'), jitter?.scale ? 0.35 : 1);
+        // feet stay on the ground: a smaller person's hip line sits lower
+        const yy = y + (rand(key, 'y') - 0.5) * (jy ? 2 * jy * gap : 8 * s) + 62 * s * (1 - m);
         const jr = rand(key, 'o');
         const rank =
           order === 'front'
@@ -103,13 +126,14 @@ export const Crowd: React.FC<CrowdProps> = ({
                   : order === 'right'
                     ? ((near.x1 - x) / width) * 6 + jr * 1.2
                     : jr;
-        out.push({key, x, y: yy, s: s * (0.94 + rand(key, 's') * 0.12), row: r, rank, sign: s > 0.35 && rand(key, 'sg') < signs, legs: r >= rows - legRows});
+        out.push({key, x, y: yy, s: s * m, row: r, rank, sign: s > 0.35 && rand(key, 'sg') < signs, legs: r >= rows - legRows});
       }
     }
     const sorted = out.slice().sort((a, b) => a.rank - b.rank);
     const idx = new Map(sorted.map((sl, i) => [sl.key, i]));
-    return out.map((sl) => ({...sl, rank: idx.get(sl.key)! / Math.max(1, out.length - 1)}));
-  }, [far.y, far.x0, far.x1, far.s, near.y, near.x0, near.x1, near.s, rows, seed, density, spacing, signs, legRows, order]);
+    // draw far -> near by the feet line (jittered rows interleave)
+    return out.map((sl) => ({...sl, rank: idx.get(sl.key)! / Math.max(1, out.length - 1)})).sort((a, b) => a.y - b.y);
+  }, [far.y, far.x0, far.x1, far.s, near.y, near.x0, near.x1, near.s, rows, seed, density, spacing, signs, legRows, order, jx, jy, sm0, sm1]);
 
   return (
     <>
@@ -132,6 +156,8 @@ export const Crowd: React.FC<CrowdProps> = ({
             idle={idle * sl.s}
             acc={sl.sign ? ['sign'] : undefined}
             ink={w}
+            hero={lod === 0 && sl.s >= heroFrom}
+            rim={rim && sl.s >= 0.6 ? rim : false}
             {...person}
           />
         );

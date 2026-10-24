@@ -219,6 +219,21 @@ export function capcheckMode(): 'mask' | 'bg' | null {
 /** Mask code colours (scripts/capcheck.py reads them). */
 export const CAPCHECK_COLORS = {dark: '#FF0000', light: '#00FF00', box: '#0000FF'} as const;
 
+/** WCAG relative luminance of a #RRGGBB colour. */
+export function luminance(hex: string): number {
+  const v = hex.replace('#', '');
+  const c = [0, 2, 4].map((i) => parseInt(v.slice(i, i + 2), 16) / 255).map((x) => (x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)));
+  return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+}
+/** WCAG contrast ratio of two colours. */
+export const contrast = (a: string, b: string) => {
+  const la = luminance(a);
+  const lb = luminance(b);
+  return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+};
+/** The caption tone that reads best on a flat background colour. */
+export const toneOn = (bg: string): CaptionTone => (contrast(captionTones.dark.text, bg) >= contrast(captionTones.light.text, bg) ? 'dark' : 'light');
+
 /** Regions for a vertical split at x. */
 export function splitRegions(x: number, left: CaptionTone, right: CaptionTone): ToneRegion[] {
   if (x <= 0) return [{tone: right}];

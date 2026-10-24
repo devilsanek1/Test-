@@ -8,8 +8,13 @@
 //   <Person ... ink={4.8} />                                               // on-screen ink weight (depthInk.front)
 //
 // build: 'draw' (ink strokes draw, fills pop 0.13-0.27 s later; default) | 'pop' (7% spring from the feet) |
-// 'rise' (rises its own height from behind its base line, out-expo 0.33 s) | 'fade' (= a 1-frame pop; nothing fades).
+// 'rise' (rises its own height from behind its base line, out-expo 0.33 s) | 'fade' (@deprecated: = a 1-frame pop).
 // lod: 0 full, 1 simplified, 2 flat fill-only blob (far crowd: no ink at all).
+// HERO detail (reference 2's foreground figures; default for s >= 1.2, `hero` forces it): arms in sleeves (inner ink
+// seams from the shoulder to the hem, inset 18 % of the torso width each side), cuffs, a waistband, sand hands at the
+// hem, an optional hood ('hood' accessory), and the measured RIM: a 3 px pure-white strip just inside the outline on
+// one side (`rim` 'left' | 'right' | false; default 'left' for heroes) over ~55 % of the edge, on the arm seam and leg.
+//   <Person x={160} y={1700} s={1.6} legs legH={120} hero rim="left" ink={4.8} />
 
 import React, {useId, useMemo} from 'react';
 import {palette} from '../theme';
@@ -24,7 +29,7 @@ import {At, b, inkW, Place} from './common';
 import {mat, XG} from '../xf';
 
 export type Hair = 'short' | 'long' | 'bun' | 'cap' | 'beanie' | 'bald' | 'curly';
-export type Acc = 'backpack' | 'headphones' | 'strap' | 'phone' | 'scarf' | 'sign' | 'collar';
+export type Acc = 'backpack' | 'headphones' | 'strap' | 'phone' | 'scarf' | 'sign' | 'collar' | 'hood';
 
 /** Coats / tops (style bible 6): sand, clay, cream, sage, teal, ochre, peach, occasionally white. Never orange. */
 export const PERSON_BODIES = [palette.sand, palette.tan, palette.cream, palette.sage, palette.teal, palette.brown, palette.peach, palette.sand, palette.teal] as const;
@@ -44,7 +49,8 @@ export type PersonProps = {
   y?: number;
   s?: number;
   at?: At;
-  build?: 'draw' | 'pop' | 'rise' | 'fade';
+  /** 'fade' is @deprecated: a 1-frame pop (nothing fades). */
+  build?: 'draw' | 'pop' | 'rise' | /** @deprecated nothing fades: a 1-frame pop */ 'fade';
   seed?: Seed;
   style?: 'color' | 'line';
   hair?: Hair;
@@ -58,6 +64,12 @@ export type PersonProps = {
   legs?: boolean;
   /** Torso height override (px, local). Long torsos for people cut by the frame bottom. */
   torsoH?: number;
+  /** Leg length override (px, local; default 0.62 x torso height). Long legs for foreground walkers (ref 2 ~1.2 x). */
+  legH?: number;
+  /** Hero detail: arms in sleeves, cuffs, waistband, hands, hood (see header). Default s >= 1.2. */
+  hero?: boolean;
+  /** Rim light: a 3 px white strip inside the outline on this side. Default 'left' for heroes, else none. */
+  rim?: 'left' | 'right' | false;
   lod?: 0 | 1 | 2;
   flip?: boolean;
   /** Idle bob amplitude in px (default 0). */
@@ -84,6 +96,8 @@ function makeSpec(p: PersonProps) {
     if ((hair === 'short' || hair === 'bun' || hair === 'curly') && r.chance(0.16)) acc.push('headphones');
     if (r.chance(0.08)) acc.push('scarf');
     if (!acc.includes('backpack') && r.chance(0.35)) acc.push('collar');
+    // hoodies (ref 2 f_1, f_42): only drawn at hero size
+    if (!acc.includes('backpack') && hair !== 'long' && r.chance(0.3)) acc.push('hood');
   }
   acc = acc.slice();
   const body = p.body ?? (line_ ? palette.card : r.pick(PERSON_BODIES));
@@ -105,10 +119,22 @@ function makeSpec(p: PersonProps) {
     hat: r.pick(HAT_COLORS.filter((c) => c !== body)),
     signColor: p.signColor ?? r.pick(SIGN_COLORS),
     seedStr: `person/${p.seed ?? 0}`,
-    legH: h * 0.62,
+    legH: p.legH ?? h * 0.62,
     phase: r.range(0, 6.28),
     hz: r.range(0.45, 0.8),
   };
+}
+
+/** Rim strip polygon (local px): `wpx` wide, just inside the segment a -> b on the side away from `inward`. */
+function rimStrip(a: Pt, b: Pt, inset: number, wpx: number, from: number, to: number, inwardSign: number): string {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const L = Math.hypot(dx, dy) || 1;
+  const nx = (-dy / L) * inwardSign;
+  const ny = (dx / L) * inwardSign;
+  const p = (u: number, o: number): Pt => [a[0] + dx * u + nx * o, a[1] + dy * u + ny * o];
+  const q = [p(from, inset), p(to, inset), p(to, inset + wpx), p(from, inset + wpx)];
+  return q.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`).join('') + 'Z';
 }
 
 function makePaths(S: Spec) {
@@ -216,6 +242,37 @@ function makePaths(S: Spec) {
       P.signInk = `M${px - 56} ${top - 76}L${px + 58} ${top - 76}M${px - 56} ${top - 78}L${px - 56} ${top + 2}`;
     }
   }
+  // ---- hero detail (arms in sleeves, cuffs, waistband, hands, hood) and the rim strips
+  {
+    const hw = w / 2;
+    const bx = hw * 1.07;
+    const R = Math.min(w * round, h * 0.8);
+    const d = w * 0.18; // arm width (inset of the seam)
+    const xAt = (y: number) => -hw - ((bx - hw) * (y - (-h + R))) / (h - R); // left side x at y (straight part)
+    const yTop = -h + R - Math.sqrt(Math.max(0, R * R - (R - d) * (R - d))) + w * 0.03;
+    const yCuff = -h * 0.075;
+    const seamL = `M${-hw + d} ${yTop}Q${-hw + d - w * 0.012} ${(yTop + yCuff) / 2} ${xAt(yCuff) + d} ${yCuff}L${xAt(0) + d + 1} ${-1}`;
+    const seamR = `M${hw - d} ${yTop}Q${hw - d + w * 0.012} ${(yTop + yCuff) / 2} ${-xAt(yCuff) - d} ${yCuff}L${-xAt(0) - d - 1} ${-1}`;
+    P.seams = seamL + seamR;
+    P.cuffs = `M${xAt(yCuff) + 1} ${yCuff}L${xAt(yCuff) + d} ${yCuff}M${-xAt(yCuff) - 1} ${yCuff}L${-xAt(yCuff) - d} ${yCuff}`;
+    P.waist = `M${xAt(yCuff) + d} ${yCuff - h * 0.02}Q0 ${yCuff - h * 0.005} ${-xAt(yCuff) - d} ${yCuff - h * 0.02}`;
+    let ticks = '';
+    const wx0 = xAt(yCuff) + d + 6;
+    const wx1 = -xAt(yCuff) - d - 6;
+    for (let k = 0, n = 7; k <= n; k++) {
+      const x = wx0 + ((wx1 - wx0) * k) / n;
+      ticks += `M${x.toFixed(1)} ${(yCuff - h * 0.015).toFixed(1)}L${x.toFixed(1)} ${(-h * 0.008).toFixed(1)}`;
+    }
+    P.waistTicks = ticks;
+    const hx = xAt(0) + d / 2;
+    P.hands = blob(hx, h * 0.04, w * 0.072, w * 0.095, {seed: `${sd}/hl`}) + blob(-hx, h * 0.04, w * 0.072, w * 0.095, {seed: `${sd}/hr`});
+    P.rimGeo = JSON.stringify({hw, bx, R, d, yTop, yCuff, xc: xAt(yCuff)});
+    if (S.acc.includes('hood')) {
+      const top = -h;
+      P.hoodFill = `M${-hr * 1.32} ${top + hr * 0.25}Q${-hr * 1.4} ${top - hr * 0.55} 0 ${top - hr * 0.62}Q${hr * 1.4} ${top - hr * 0.55} ${hr * 1.32} ${top + hr * 0.25}Q${hr * 0.9} ${top + hr * 1.3} 0 ${top + hr * 1.32}Q${-hr * 0.9} ${top + hr * 1.3} ${-hr * 1.32} ${top + hr * 0.25}Z`;
+      P.hoodInk = P.hoodFill + `M0 ${top + hr * 1.32}L0 ${top + hr * 0.75}`;
+    }
+  }
   if (!S.line) {
     const lw = w * 0.31;
     const g = w * 0.05;
@@ -232,9 +289,11 @@ function makePaths(S: Spec) {
 
 export const Person: React.FC<PersonProps> = (props) => {
   const {x = 0, y = 0, s = 1, at, build = 'draw', lod = 0, flip, legs, idle = 0, ink} = props;
+  const hero = (props.hero ?? s >= 1.2) && lod === 0;
+  const rimSide = props.rim === undefined ? (hero ? 'left' : false) : props.rim;
   const t = useTime();
   const clipId = 'pr' + useId().replace(/[^a-zA-Z0-9]/g, '');
-  const S = useMemo(() => makeSpec(props), [props.seed, props.style, props.hair, props.acc?.join(), props.body, props.hairColor, props.legsColor, props.packColor, props.signColor, props.legs, props.torsoH]);
+  const S = useMemo(() => makeSpec(props), [props.seed, props.style, props.hair, props.acc?.join(), props.body, props.hairColor, props.legsColor, props.packColor, props.signColor, props.legs, props.torsoH, props.legH]);
   const P = useMemo(() => makePaths(S), [S]);
   if (at !== undefined && t < at) return null;
 
@@ -262,6 +321,18 @@ export const Person: React.FC<PersonProps> = (props) => {
   } else if (legs && S.line && inked) {
     push(<Ink key="legI" d={P.legInk} at={tm(0.06)} width={W * 0.9} seed={k('legI')} />);
   }
+  // rim strips: 3 px on screen, pure white, just inside the outline (reference 2 measured), ~55 % of the edge
+  const rimW = 3 / Math.max(0.05, s);
+  const rimInset = W / 2 + 0.6 / Math.max(0.05, s);
+  const rimOn = !!rimSide && !S.line && lod === 0 && W > 0;
+  const rg = P.rimGeo ? (JSON.parse(P.rimGeo) as {hw: number; bx: number; R: number; d: number; yTop: number; yCuff: number; xc: number}) : null;
+  const sg = rimSide === 'right' ? -1 : 1; // mirror for the right side
+  if (rimOn && legs && P.legs) {
+    const lw = S.w * 0.31;
+    const g = S.w * 0.05;
+    const ex = -sg * (g + lw);
+    push(<Fill key="rimLeg" d={rimStrip([ex, 0], [ex, S.legH], rimInset * 0.8, rimW, 0.08, 0.72, -sg)} color={palette.white} at={tm(0.3)} mode={drawMode ? 'snap' : 'none'} offset={false} seed={k('rimLeg')} />);
+  }
   // sign (behind the head)
   if (P.pole && lod < 2) {
     push(<Ink key="pole" d={P.pole} at={tm(0.3)} color={palette.brown} width={Math.max(W, 2) * 2} seed={k('pole')} />);
@@ -276,9 +347,29 @@ export const Person: React.FC<PersonProps> = (props) => {
     push(<Fill key="earF" d={P.earFill} color={S.line ? palette.card : palette.sand} at={tm(0.24)} mode={fillMode} offset={false} seed={k('ear')} />);
     if (inked && lod === 0) push(<Ink key="earI" d={P.earInk} at={tm(0.14)} width={W * 0.85} order="all" seed={k('earI')} />);
   }
+  // hands hang below the sleeves (behind the torso hem)
+  if (hero && inked) {
+    push(<Fill key="handsF" d={P.hands} color={S.line ? palette.card : palette.sand} at={tm(0.3)} mode={fillMode} offset={false} seed={k('hands')} />);
+    push(<Ink key="hands" d={P.hands} at={tm(0.22)} width={W * 0.85} order="all" seed={k('handsI')} />);
+  }
   // torso
   push(<Fill key="torsoF" d={P.torso} color={S.body} at={tm(0.16)} mode={drawMode ? 'pop' : 'none'} seed={k('torso')} offset={lod === 2 ? false : S.line ? [-2, -1.5] : undefined} />);
+  if (rimOn && rg) {
+    const a: Pt = [-sg * rg.hw, -S.h + rg.R];
+    const bb: Pt = [-sg * rg.bx, 0];
+    let d = rimStrip(a, bb, rimInset, rimW, 0.12, 0.67, -sg);
+    if (hero) d += rimStrip([-sg * (rg.hw - rg.d), rg.yTop], [-sg * (-rg.xc - rg.d), rg.yCuff], rimInset * 0.7, rimW, 0.18, 0.78, sg);
+    push(<Fill key="rim" d={d} color={palette.white} at={tm(0.3)} mode={drawMode ? 'snap' : 'none'} offset={false} seed={k('rim')} />);
+  }
   if (inked) push(<Ink key="torso" d={P.torso} at={tm(0)} width={W} seed={k('torso')} />);
+  if (hero && inked) {
+    push(<Ink key="seams" d={P.seams + P.cuffs + P.waist} at={tm(0.12)} width={W * 0.85} order="all" seed={k('seams')} />);
+    if (s >= 1.4) push(<Ink key="ticks" d={P.waistTicks} at={tm(0.3)} width={W * 0.55} order="all" seed={k('ticks')} />);
+  }
+  if (hero && P.hoodFill) {
+    push(<Fill key="hoodF" d={P.hoodFill} color={S.body} at={tm(0.22)} mode={fillMode} offset={false} seed={k('hood')} />);
+    if (inked) push(<Ink key="hood" d={P.hoodInk} at={tm(0.18)} width={W * 0.9} seed={k('hoodI')} />);
+  }
   // back accessories
   if (P.strap && lod === 0 && inked) push(<Ink key="strap" d={P.strap} at={tm(0.2)} width={W * 0.85} order="all" seed={k('strap')} />);
   if (P.packFill && lod < 2) {

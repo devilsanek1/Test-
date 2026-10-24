@@ -4,6 +4,63 @@ Owner: sound stream. Lane: `audio/**`, `docs/sound_plan.md`, `docs/sound_credits
 Sources and licences: `docs/sound_credits.md`. This version follows the brief's **CINEMATIC DIRECTION** and its
 **BALANCE NOTE**: a warm, modern explainer at the core, with a touch of space, and nothing trailer-like.
 
+## CURRENT STATE: v3, new ElevenLabs voice (`assets/vo_v2_eleven.wav`)
+
+Sections 1-8 below describe the v1/v2 work on the old MP3 voice. Wherever they conflict with this section, this section wins.
+
+- **Timeline.** The loop is now **78.0 s** (`common.VIDEO_DUR`; the VO runs 0-77.76 s and its last word ends at about 77.4 s).
+  - Override with `SOUND_VIDEO_DUR` if the film length changes, then re-render the bed and the mix.
+  - The `marimba` and `near_silent` beds are still fitted to the old 70.7 s timeline, and `mix.py` warns if they are used.
+  - The old `demo_*.wav` were deleted. `assets/timing.json` has not been rebuilt yet, so `cues_placeholder.json` and `--make-cues` still follow the v1 timing.
+- **Final mix:** `audio/mix.wav` (and `review/audio/mix_v3_newvoice.mp3`, 320 kb/s): **-14.0 LUFS, -1.2 dBTP, LRA 2.5 LU**, 78.000 s. ffmpeg agrees.
+
+**Voice chain v4** (`python3 audio/tools/vo_clean.py`, which defaults to `--src assets/vo_v2_eleven.wav --chain v4`):
+1. Repair the 1 clipped sample, then a 60 Hz high-pass.
+2. **Matching EQ toward the average of both reference voices**: 1/3-octave smoothed, capped at ±6 dB, flat below 100 Hz and above 13 kHz, linear-phase.
+   It applies +3.8 dB around 160-250 Hz (the take measured 9-13 dB thinner than the references there), -5 to -6 dB at 500-630 Hz (boxy),
+   +3.8 dB at 3-4 kHz (presence) and +3.8 dB at 8-10 kHz.
+3. **No exciter.** With a 1/3-strength exciter the tonal distance only moved from 2.93 to 2.83 dB, the artifact index rose from 0.207 to 0.211,
+   and TTS top ends can turn harsh.
+4. A relative de-esser (acts only when 5-10 kHz comes within 8 dB of the body): active on 19 % of speech, 1.9 dB on average.
+5. Parallel compression: a 4:1 copy blended 6 dB down.
+6. Very light even-harmonic saturation: H2 -32 dB, H3 -40 dB at -6 dBFS peaks.
+7. A light leveler: 0.8 dB mean gain reduction.
+8. Look-ahead peak control at -3 dBTP: it moves 2 % of samples by more than 1 dB (max 3.6 dB), with no pumping.
+
+| Metric (speech; dB relative to 300 Hz-3 kHz) | raw take | **v4 treated** | ref 1 | ref 2 |
+|---|---|---|---|---|
+| 150-300 Hz (warmth) | +2.1 | **+9.3** | +14.0 | +11.9 |
+| 400-800 Hz (box) | +6.7 | **+4.3** | +4.4 | +3.8 |
+| 3-5 kHz (presence) | -19.6 | **-12.2** | -14.5 | -10.7 |
+| 8-12 kHz | -31.1 | **-22.8** | -12.2 | -19.7 |
+| Tonal distance to the reference average (1/3 oct, 125 Hz-10 kHz) | 7.26 dB | **2.71 dB** | 2.66 | 2.66 |
+| Sibilance (5-10k p99 minus body p99) | -14.6 | **-9.2** | -8.5 | -9.7 |
+| Crest factor | 15.3 dB | **12.9 dB** | 11.0 | 11.1 |
+| Momentary-loudness spread | 3.94 LU | **3.15 LU** | 3.59 | 3.73 |
+| HF artifact index (8-16k flux) | 0.208 | **0.207** | 0.217 | 0.212 |
+
+**A/B files** (20 s, -16 LUFS, WAV), all in `review/audio/`: `new_vo_raw.wav`, `new_vo_treated.wav`, and `ref2_voice_20s.wav` for comparison.
+
+**Music, cinematic v3:**
+- **Re-fit.** The bed is re-fitted at **95.4 BPM** with phrase-end 5/4 and 6/4 bars, so its section lines sit on the new word times:
+  leak 32.71 ("Except," 33.12), Cloudflare 38.37 (38.72), suspension 46.55 ("evening." 46.72), breath 49.69 ("So" 49.76),
+  rebuild 55.36, close 66.68 ("And" 66.88).
+- **Subtler.**
+  - The hook (0-10.7 s) is **air only**: 39 dB under the voice.
+  - The piano pulse enters softly at 10.69 s, under "…websites.", just before "Fixing a bug".
+  - The loop-point swell and thump are **gone**. The Cloudflare accent stays, 5 dB softer.
+  - The close thins back to air, so the loop seam is air into air.
+  - The bed level in the mix is 2 dB lower again (10.5 LU under the voice, 14 dB duck).
+  - Piano velocities are capped inside the soft layer, so no note jumps into the 12 dB louder layer.
+- **Measured** in `mix.wav` (music under the voice, 400 ms medians): hook 39 dB, setup 25 dB, leak 22 dB, Cloudflare 22 dB, breath 29 dB, close 29 dB.
+  In speech the minimum is 12.7 dB and the median 26.0 dB. The bed alone: hook -31.5, setup -18.7, Cloudflare -14.7, close -23.1 LUFS. Loop seam within 1.5 dB.
+
+**Cues.** `audio/cues.json` is re-timed to the new take.
+- A word-anchored warp (`audio/tools/warp.py`, 223 anchors) does the mapping. Numbers and transitions were then snapped to the new word onsets and measured pauses.
+- Ambience lengths follow the new words: `air_bed` runs 52.64-59.92 ("Someone" to "If").
+- Each cue keeps its old time as `t_v1`.
+- Once the timing stream's `scripts/timewarp.py` and the new `timing.json` land, re-check the cues against them.
+
 ## TL;DR for the orchestrator
 
 - **Final audio:** `audio/mix.wav` is 48 kHz stereo, 24-bit, exactly 70.700 s. It measures **-14.0 LUFS integrated and -1.2 dBTP true peak** (ffmpeg ebur128 agrees), with LRA 1.8 LU. It uses the recommended bed **`cinematic`** and the curated cue sheet `audio/cues.json`. It loops seamlessly: the music, the SFX tails and the master dynamics are all circular.

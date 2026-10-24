@@ -1,8 +1,10 @@
 // cine/props.tsx — foreground framing pieces for full-bleed shots: a rooftop Ledge (parapet) to sit the mascot
-// and back-view figures on, and a WipePass (something passes close to the lens: a cut hides behind it).
+// and back-view figures on, a stone Balustrade end / Plinth to perch on, a WindowCloseup (one window up close), and
+// foreground wipes: something passes close to the lens and the cut rides on its edge.
 //
 //   <Ledge y={1460} tod="dusk" at={0.1} />                       // parapet across the frame, cropped by its edges
-//   <WipePass at={5.8} dur={0.5} dir="right" color={deep.teal60} />  // the cut sits at at + dur/2
+//   <WipeCut at={5.6} dur={0.55} dir="right" kind="column" tod="dusk" a={<Shot ...>} b={<Shot ...>} />
+//   <WipePass at={5.6} dur={0.55} dir="right" kind="figure" />   // the element alone (screen space)
 
 import React from 'react';
 import {palette, stroke} from '../theme';
@@ -14,6 +16,10 @@ import {ambient, Tod, TodPalette, todPal} from './atmosphere';
 import {darker} from './city';
 import {Glow} from './light';
 import {PathBuf, r1} from './util';
+import {ExitShrink, exitScale, inkOn, lookPaint, useCineState} from './state';
+import {FigureWiper, FoliageWiper, PoleWiper} from '../Film';
+import {NoExit} from '../exit';
+import {useId} from 'react';
 
 export type LedgeProps = {
   /** Back edge of the top surface (where things sit). */
@@ -36,13 +42,15 @@ export type LedgeProps = {
 /** A rooftop parapet seen from behind and slightly above: lit top surface, shaded front face, inked edges that
  *  overshoot past the frame, brick ticks. Everything below it is the roof floor. */
 export const Ledge: React.FC<LedgeProps> = ({y, x0 = -60, x1 = 1140, top = 30, face = 110, tod = 'day', color, at, seed = 'ledge', width = stroke.inkBold, floor}) => {
-  const t = useTime();
+  const S = useCineState();
+  const t = S.t;
   const p = todPal(tod);
   const r = rng(`ledge/${seed}`);
   const c = color ?? ambient(palette.sand, p);
   const shadeC = ambient(darker(palette.sand), p);
   const floorC = floor ?? ambient(palette.tan, p);
-  const fp = at === undefined ? 1 : prog(t, at + 0.25, 0.01);
+  const fp = (at === undefined ? 1 : prog(t, at + 0.25, 0.01)) * exitScale(S.e, 0.6, 0.5);
+  const P = (c: string) => lookPaint(S, c, [540, y]);
   const ink =
     hline(x0, x1, y, {seed: `${seed}/a`, over: 'structural'}) +
     hline(x0 + 20, x1 - 10, y + top, {seed: `${seed}/b`, over: 'structural'}) +
@@ -51,58 +59,148 @@ export const Ledge: React.FC<LedgeProps> = ({y, x0 = -60, x1 = 1140, top = 30, f
   const ticks = wallTicks(x0 + 80, y + top + 22, x1 - x0 - 160, face - 40, {seed: `${seed}/t`, n: 7, size: 26});
   return (
     <>
-      {fp > 0 ? (
-        <>
-          <rect x={x0 - 400} y={y + top + face} width={x1 - x0 + 800} height={1400} fill={floorC} />
-          <rect x={x0 - 400} y={y + top} width={x1 - x0 + 800} height={face} fill={shadeC} />
-          <rect x={x0 - 400} y={y + 3} width={x1 - x0 + 800} height={top} fill={c} />
-        </>
+      {fp > 0 && S.look.fills !== 'none' ? (
+        <g transform={fp < 1 ? `translate(0 ${r1(y + top + face)}) scale(1 ${fp.toFixed(4)}) translate(0 ${r1(-(y + top + face))})` : undefined}>
+          <rect x={x0 - 400} y={y + top + face} width={x1 - x0 + 800} height={1400} fill={P(floorC)} />
+          <rect x={x0 - 400} y={y + top} width={x1 - x0 + 800} height={face} fill={P(shadeC)} />
+          <rect x={x0 - 400} y={y + 3} width={x1 - x0 + 800} height={top} fill={P(c)} />
+        </g>
       ) : null}
-      <Ink d={ink} at={at} width={width} exit={false} />
-      <Ink d={ticks} at={at === undefined ? undefined : at + 0.3} width={stroke.ink} order="all" exit={false} />
+      <Ink d={ink} at={at} width={width} />
+      <Ink d={ticks} at={at === undefined ? undefined : at + 0.3} width={stroke.ink} order="all" />
     </>
   );
 };
 
+export type WipeKind = 'column' | 'figure' | 'pole' | 'foliage' | 'slab';
+
 export type WipePassProps = {
   at: number;
-  /** Seconds to cross the frame. The cut should sit at at + dur / 2 (the frame is fully covered then). */
+  /** Seconds to cross the frame (0.45-0.6 reads as "something passing close"). The edge crosses the centre at at + dur/2. */
   dur?: number;
   dir?: 'left' | 'right';
+  /** What passes the lens: a stone 'column' with a capital (default), a back-view passer-by ('figure', the core
+   *  FigureWiper), a 'pole', 'foliage', or the old flat 'slab'. All are opaque over the edge +-90 px, full height. */
+  kind?: WipeKind;
+  tod?: Tod | TodPalette;
+  /** Body colour (default tealDark, the darkest fill allowed). */
   color?: string;
-  /** Lighter edge strip on the leading side. */
+  /** Lit edge strip on the leading side (default the tod rim / peach). */
   rim?: string;
+  /** Parallax scale-up over the pass (default 0.08 = +8 %). */
+  grow?: number;
+  /** Custom element (screen px) centred on the edge x; p = 0..1 through the pass. */
+  children?: (x: number, p: number) => React.ReactNode;
+  /** @deprecated (slab only) */
   width?: number;
   seed?: Seed;
 };
 
-/** A dark foreground slab (a pillar, a lamp post, a passer-by) whipping across the lens. It covers the whole frame
- *  for ~0.1 s around at + dur/2: put the cut there. Screen space: render it outside any Layer. */
-export const WipePass: React.FC<WipePassProps> = ({at, dur = 0.5, dir = 'right', color = palette.tealDark, rim, width = 1500, seed = 'wipe'}) => {
-  const t = useTime();
-  const u = prog(t, at, dur, E.inOutSine);
-  if (u <= 0 || u >= 1) return null;
-  const r = rng(`wipe/${seed}`);
-  const W = 1080;
-  const lead = dir === 'right' ? -width + (W + width) * u : W - (W + width) * u;
-  const pb = new PathBuf();
-  const tilt = r.range(40, 90);
-  pb.poly([
-    [lead, -50],
-    [lead + width, -50],
-    [lead + width + tilt, 1970],
-    [lead + tilt, 1970],
-  ]);
-  const edgeX = dir === 'right' ? lead + width : lead;
+/** Half-width of each wiper (the edge travels from -half to W + half). */
+const WIPE_HALF: Record<WipeKind, number> = {column: 230, figure: 660, pole: 120, foliage: 460, slab: 760};
+
+/** Screen x of the wipe edge at time t, or null outside the pass. The edge eases in-out across the frame. */
+export function wipeEdge(t: number, at: number, dur: number, dir: 'left' | 'right', kind: WipeKind = 'column'): {x: number; p: number} | null {
+  const p = prog(t, at, dur);
+  if (p <= 0 || p >= 1) return null;
+  const half = WIPE_HALF[kind];
+  const x = -half - 30 + (1080 + 2 * half + 60) * E.inOutSine(p);
+  return {x: dir === 'right' ? x : 1080 - x, p};
+}
+
+/** A near-lens stone column: shaft with fill-only flutes, capital and base mouldings in doubled ink, a lit rim on the
+ *  leading side. Screen px, centred on x. */
+export const ColumnWiper: React.FC<{x: number; p: number; dir: 'left' | 'right'; color?: string; rim?: string; light?: string}> = ({x, dir, color = palette.tealDark, rim = palette.peach, light = palette.teal}) => {
+  const w = 300;
+  const L = x - w / 2;
+  const lead = dir === 'right' ? 1 : -1;
+  const fl = new PathBuf();
+  for (const f of [0.2, 0.42, 0.64]) fl.rect(L + w * f, 210, w * 0.08, 1560);
+  const capW = 400;
+  const ink =
+    line(L, 170, L, 1820, {seed: 'cw/l', over: [0, 0], breaks: false}) +
+    line(L + w, 170, L + w, 1820, {seed: 'cw/r', over: [0, 0], breaks: false}) +
+    line(x - capW / 2 - 10, 110, x + capW / 2 + 10, 110, {seed: 'cw/c1', over: [6, 12], breaks: false}) +
+    line(x - capW / 2, 128, x + capW / 2, 128, {seed: 'cw/c2', over: [4, 8], breaks: false}) +
+    line(x - capW / 2 + 20, 190, x + capW / 2 - 20, 190, {seed: 'cw/c3', over: [4, 8], breaks: false}) +
+    line(x - capW / 2 + 20, 1830, x + capW / 2 - 20, 1830, {seed: 'cw/b1', over: [4, 8], breaks: false}) +
+    line(x - capW / 2, 1852, x + capW / 2, 1852, {seed: 'cw/b2', over: [6, 12], breaks: false});
+  const rx = lead > 0 ? L + w - 12 : L;
   return (
-    <g>
-      <path d={pb.d} fill={color} />
-      {rim ? <path d={new PathBuf().poly([[edgeX - (dir === 'right' ? 26 : 0), -50], [edgeX + (dir === 'right' ? 0 : 26), -50], [edgeX + tilt + (dir === 'right' ? 0 : 26), 1970], [edgeX + tilt - (dir === 'right' ? 26 : 0), 1970]]).d} fill={rim} /> : null}
-      <path d={line(edgeX, -60, edgeX + tilt, 1980, {seed: `${seed}/e`, over: [0, 0]})} fill="none" stroke={palette.ink} strokeWidth={9} strokeLinecap="round" />
-    </g>
+    <>
+      <rect x={L} y={-60} width={w} height={2040} fill={color} />
+      <path d={fl.d} fill={light} />
+      <rect x={x - capW / 2} y={110} width={capW} height={80} fill={color} />
+      <rect x={x - capW / 2} y={1830} width={capW} height={150} fill={color} />
+      <rect x={rx} y={190} width={12} height={1640} fill={rim} />
+      <rect x={lead > 0 ? x + capW / 2 - 14 : x - capW / 2} y={128} width={14} height={62} fill={rim} />
+      <path d={ink} fill="none" stroke={palette.ink} strokeWidth={stroke.inkBold + 1} strokeLinecap="round" />
+    </>
   );
 };
 
+/** The element passing the lens (screen space, outside any Layer). Use WipeCut to also split the two shots on its edge. */
+export const WipePass: React.FC<WipePassProps> = ({at, dur = 0.55, dir = 'right', kind = 'column', tod = 'dusk', color, rim, grow = 0.08, children, seed = 'wipe'}) => {
+  const t = useTime();
+  const P = todPal(tod);
+  const E0 = wipeEdge(t, at, dur, dir, kind);
+  if (!E0) return null;
+  const {x, p} = E0;
+  const body = color ?? palette.tealDark;
+  const rimC = rim ?? (P.rim === palette.white ? palette.cream : P.rim);
+  let el: React.ReactNode;
+  if (children) el = children(x, p);
+  else if (kind === 'figure') el = <FigureWiper x={x} p={p} dir={dir} color={body} />;
+  else if (kind === 'pole') el = <PoleWiper x={x} p={p} dir={dir} color={body} />;
+  else if (kind === 'foliage') el = <FoliageWiper x={x} p={p} dir={dir} color={color ?? palette.teal} />;
+  else if (kind === 'slab') {
+    const half = WIPE_HALF.slab;
+    el = (
+      <>
+        <rect x={x - half} y={-60} width={half * 2} height={2040} fill={body} />
+        <rect x={dir === 'right' ? x + half - 26 : x - half} y={-60} width={26} height={2040} fill={rimC} />
+        <path d={line(dir === 'right' ? x + half : x - half, -60, dir === 'right' ? x + half : x - half, 1980, {seed: `${seed}/e`, over: [0, 0]})} fill="none" stroke={palette.ink} strokeWidth={9} strokeLinecap="round" />
+      </>
+    );
+  } else el = <ColumnWiper x={x} p={p} dir={dir} color={body} rim={rimC} />;
+  const k = 1 + grow * p;
+  return (
+    <NoExit>
+      <g transform={`translate(${r1(x)} 1920) scale(${k.toFixed(4)}) translate(${r1(-x)} -1920)`}>{el}</g>
+    </NoExit>
+  );
+};
+
+/** A foreground-wipe cut between two shots: `a` (outgoing) stays on the unswept side of the moving edge, `b`
+ *  (incoming) is revealed behind it, and the element passing the lens covers the edge. Render a and b as <Shot>s
+ *  whose ranges overlap [at, at + dur]. Screen space (CineFrame root). */
+export const WipeCut: React.FC<Omit<WipePassProps, 'children'> & {a: React.ReactNode; b: React.ReactNode; element?: WipePassProps['children']}> = ({a, b, element, ...w}) => {
+  const t = useTime();
+  const id = 'wc' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const dur = w.dur ?? 0.55;
+  const dir = w.dir ?? 'right';
+  const E0 = wipeEdge(t, w.at, dur, dir, w.kind ?? 'column');
+  if (!E0) return <>{t < w.at + dur / 2 ? a : b}</>;
+  const x = Math.max(0, Math.min(1080, E0.x));
+  // dir right: the edge moves right; the new shot appears on its left
+  const rb: [number, number] = dir === 'right' ? [-100, x] : [x, 1180];
+  const ra: [number, number] = dir === 'right' ? [x, 1180] : [-100, x];
+  return (
+    <>
+      <defs>
+        <clipPath id={`${id}a`} clipPathUnits="userSpaceOnUse">
+          <rect x={ra[0]} y={-100} width={Math.max(0, ra[1] - ra[0])} height={2120} />
+        </clipPath>
+        <clipPath id={`${id}b`} clipPathUnits="userSpaceOnUse">
+          <rect x={rb[0]} y={-100} width={Math.max(0, rb[1] - rb[0])} height={2120} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id}a)`}>{a}</g>
+      <g clipPath={`url(#${id}b)`}>{b}</g>
+      <WipePass {...w}>{element}</WipePass>
+    </>
+  );
+};
 
 // ---------------------------------------------------------------- Plinth
 

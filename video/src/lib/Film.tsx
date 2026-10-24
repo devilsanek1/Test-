@@ -5,18 +5,27 @@
 //                         captionTone?: [{t, tone}], note?}]
 //   start = the CUT (VO seconds) where this scene takes over; transitions are centred on / anchored to it.
 //   captionTone: t is SCENE-LOCAL seconds; tone 'dark' (ink, light skies) | 'light' (white, dusk/night skies). The
-//   first entry also applies before its t. Default 'dark'. The caption colour switches in exactly one frame at t.
+//   first entry also applies before its t. Default 'dark'. The caption colour switches in exactly one frame at t, or,
+//   with `wipe: 'down' | 'up'` (+ dur, default 0.4), follows the sky wipe's edge across the caption band (give it the
+//   same t / wipe / dur as the World sky key).
+// CAPTION TONE ACROSS TRANSITIONS: during a foreground wipe the captions are split at the wipe edge (old scene's tone
+//   on the unswept side, new scene's tone on the swept side) and take the WIPER's own tone over the element
+//   (`captionRegions` of the wiper component; built-ins: figure head / pole -> 'light', foliage per crown). During an
+//   un-build the new tone follows the collapsing slab's top edge. Override with transition `captionTone`.
 //
 // Transition types (transitionIn of the INCOMING scene; c = its start):
 //   cut              hard cut at c.
 //   matchcut         hard cut at c; the two scenes put their shared object (sun, horizon, a door) in the same place.
-//   camera-continuous  the outgoing camera move accelerates into the cut and the incoming scene continues it and
-//                    settles: {dur = 1.4, dir: 'in' | 'out' | 'up' | 'down' | 'left' | 'right' = 'in', amount?,
+//   camera-continuous  the outgoing camera move accelerates into the cut (last third of dur, ease-in cubic) and the
+//                    incoming scene continues it with the SAME velocity and decelerates over the other two thirds
+//                    (out-cubic, n = 3): one weighty move, no whip-and-stop. {dur = 1.4, dir: 'in' | 'out' | 'up' |
+//                    'down' | 'left' | 'right' = 'in', amount? (incoming travel: zoom factor <= 1.15 or px <= 150),
 //                    focus?: [x, y] (outgoing push target), to?: [x, y] (incoming push target)}. The incoming scene
 //                    starts zoomed out / offset by up to ~12%: author it with world.bleed (140 px) past every edge.
 //   foreground-wipe  something passes close to the lens and the new scene is behind it: {dur = 0.8,
 //                    element: 'figure' | 'pole' | 'foliage' | 'scene' = 'figure', dir: 'left' | 'right' = 'right',
-//                    color?}. 'scene' uses the OUTGOING scene module's exported `Wiper` component (WiperProps).
+//                    color?, captionTone?}. 'scene' uses the OUTGOING scene module's exported `Wiper` component
+//                    (WiperProps; give it a static `captionRegions` for its caption tone over the element).
 //   push-through     zoom into a point of the outgoing scene until it fills the frame, (optional flat `bridge` colour
 //                    for 3 frames), then the incoming scene pulls back out of its own point:
 //                    {dur = 1.1, from: [x, y], to?: [x, y] (default centre), zoom = 7, bridge?: colour}.
@@ -33,7 +42,8 @@ import {Audio, AbsoluteFill, getStaticFiles, staticFile, useCurrentFrame, useVid
 import {CaptionTone, palette, stroke, world} from './theme';
 import {clamp, ease as E, lerp, osc, prog, TimeProvider} from './time';
 import {ExitProvider, NoExit} from './exit';
-import {CaptionBeat, SkyCaptions} from './Captions';
+import {capcheckMode, CaptionBeat, SkyCaptions, ToneRegion, toneOn} from './Captions';
+import {exitFillProgress} from './exit';
 import {SceneInfo, StageCam, StageContexts, STAGE_REST, TransitionInfo, zoomAbout} from './stage';
 import {Ink} from './Ink';
 import {Fill} from './Fill';
@@ -51,10 +61,19 @@ export type FilmTransition =
   | {type: 'cut'; dur?: number}
   | {type: 'matchcut'; dur?: number}
   | {type: 'camera-continuous'; dur?: number; dir?: CamDir; amount?: number; focus?: Pt; to?: Pt}
-  | {type: 'foreground-wipe'; dur?: number; element?: 'figure' | 'pole' | 'foliage' | 'scene'; dir?: 'left' | 'right'; color?: string}
+  | {
+      type: 'foreground-wipe';
+      dur?: number;
+      element?: 'figure' | 'pole' | 'foliage' | 'scene';
+      dir?: 'left' | 'right';
+      color?: string;
+      /** Caption tone over the wiper element (default: the wiper's captionRegions, else derived from `color`). */
+      captionTone?: CaptionTone;
+    }
   | {type: 'push-through'; dur?: number; from?: Pt; to?: Pt; zoom?: number; bridge?: string}
   | {type: 'unbuild'; dur?: number};
-export type ToneKey = {t: number; tone: CaptionTone};
+/** Caption tone key (scene-local t). `wipe` makes the switch follow a sky wipe edge across the caption band. */
+export type ToneKey = {t: number; tone: CaptionTone; wipe?: 'down' | 'up' | 'snap'; dur?: number};
 export type FilmScene = {
   id: string;
   start: number;
@@ -80,6 +99,10 @@ const tdur = (t?: FilmTransition | FilmScene['transitionOut']) => (t ? t.dur ?? 
 /** Props of a foreground wiper (built-in or a scene's exported `Wiper`): draw in SCREEN px, centred on the boundary x.
  *  It MUST be opaque over [x - 90, x + 90] for the full frame height. p = 0..1 through the wipe. */
 export type WiperProps = {x: number; p: number; dir: 'left' | 'right'; color?: string};
+/** A wiper component with an optional static `captionRegions`: where (screen px) the element covers the caption band
+ *  and which caption tone reads on it there (painted in order, later wins). Without it Film assumes x +- 90 and a tone
+ *  derived from the wipe colour. */
+export type WiperComponent = React.FC<WiperProps> & {captionRegions?: (p: WiperProps) => ToneRegion[]};
 
 // ---------------------------------------------------------------- transition math
 
@@ -87,30 +110,32 @@ const C: Pt = [world.w / 2, world.h / 2];
 const PT_HOLD = 0.1;
 
 function camCont(tr: Extract<FilmTransition, {type: 'camera-continuous'}>): {dOut: number; dIn: number; out: (u: number) => StageCam; in: (v: number) => StageCam} {
+  // One continuous, weighty move: the outgoing leg (last third) accelerates with ease-in cubic, the incoming leg (two
+  // thirds) continues at the SAME velocity and decelerates with out-cubic (n = 3), so the settle lasts 2/3 of dur.
+  // Matched velocity at the cut: 3 * travelOut / dOut = n * travelIn / dIn  =>  travelOut = travelIn * dOut / dIn.
+  // The incoming travel is bounded by the bleed (world.bleed 140 px, ~12 % zoom); the outgoing one follows from it.
   const d = tdur(tr);
-  const dOut = d * 0.5;
-  const dIn = d * 0.5;
+  const dOut = d / 3;
+  const dIn = d - dOut;
+  const n = 3;
   const dir = tr.dir ?? 'in';
+  const k = Math.min(1, d / 1.4);
   if (dir === 'in' || dir === 'out') {
-    // defaults scale with the duration: a 0.25 s continuation is a nudge, a 1.4 s one a real push
-    const k = Math.min(1, d / 1.4);
-    const A = tr.amount ?? 1 + 0.45 * k; // outgoing zoom factor
-    const B = 1 + 0.12 * k; // incoming starts 1/B (in) or B (out)
-    const n = clamp((3 * Math.log(A) * dIn) / (dOut * Math.log(B)), 1.5, 9);
+    // a 0.25 s continuation is a nudge, a 1.4 s one a real push
+    const lnB = Math.log(clamp(tr.amount ?? 1 + 0.12 * k, 1.001, 1.15));
+    const lnA = (lnB * n * dOut) / (3 * dIn);
     const sgn = dir === 'in' ? 1 : -1;
     const f: Pt = tr.focus ?? C;
     const to: Pt = tr.to ?? C;
     return {
       dOut,
       dIn,
-      out: (u) => zoomAbout(f, Math.exp(sgn * Math.log(A) * E.inCubic(u)), f),
-      in: (v) => zoomAbout(to, Math.exp(-sgn * Math.log(B) * Math.pow(1 - v, n)), to),
+      out: (u) => zoomAbout(f, Math.exp(sgn * lnA * E.inCubic(u)), f),
+      in: (v) => zoomAbout(to, Math.exp(-sgn * lnB * Math.pow(1 - v, n)), to),
     };
   }
-  const kd = Math.min(1, d / 1.4);
-  const D = tr.amount ?? 380 * kd;
-  const Din = 150 * kd;
-  const n = clamp((3 * D * dIn) / (dOut * Din), 1.5, 9);
+  const Din = clamp(tr.amount ?? 150 * k, 1, 150);
+  const D = (Din * n * dOut) / (3 * dIn);
   const [vx, vy] = dir === 'up' ? [0, -1] : dir === 'down' ? [0, 1] : dir === 'left' ? [-1, 0] : [1, 0];
   return {
     dOut,
@@ -157,12 +182,13 @@ function wipeX(p: number, dir: 'left' | 'right', half: number): number {
 // ---------------------------------------------------------------- built-in wipers (screen px)
 
 /** A giant back-view passer-by right in front of the lens (head + shoulders fill the frame height). */
-export const FigureWiper: React.FC<WiperProps> = ({x, p, dir, color = palette.tealDark}) => {
-  const bob = osc(p * 1.6, 1) * 14;
-  const lean = (dir === 'right' ? 1 : -1) * 1.5;
+const figureGeo = (x: number, p: number, dir: 'left' | 'right') => ({hy: 330 + osc(p * 1.6, 1) * 14, lean: (dir === 'right' ? 1 : -1) * 1.5, R: 385});
+/** Plain SVG ellipse path (clip shapes). */
+const ellipseD = (cx: number, cy: number, rx: number, ry: number) => `M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0Z`;
+
+export const FigureWiper: WiperComponent = ({x, p, dir, color = palette.tealDark}) => {
+  const {hy, lean, R} = figureGeo(x, p, dir);
   const hx = x;
-  const hy = 330 + bob;
-  const R = 385;
   const W = 1320;
   return (
     <g transform={`rotate(${lean} ${x} 1920)`}>
@@ -179,8 +205,18 @@ export const FigureWiper: React.FC<WiperProps> = ({x, p, dir, color = palette.te
   );
 };
 
+/** Over the caption band the figure is its dark head (white captions) with sand ears at its sides (ink captions). */
+FigureWiper.captionRegions = ({x, p, dir}) => {
+  const {hy, lean, R} = figureGeo(x, p, dir);
+  const transform = `rotate(${lean} ${x} 1920)`;
+  return [
+    {tone: 'dark', d: ellipseD(x - R * 0.96, hy + 40, 72, 107) + ellipseD(x + R * 0.96, hy + 40, 72, 107), transform},
+    {tone: 'light', d: ellipseD(x, hy, R + 3, R + 3), transform},
+  ];
+};
+
 /** A near-camera post sliding past (lateral truck). */
-export const PoleWiper: React.FC<WiperProps> = ({x, dir, color = palette.tealDark}) => {
+export const PoleWiper: WiperComponent = ({x, dir, color = palette.tealDark}) => {
   const w = 230;
   const rim = dir === 'right' ? x + w / 2 - 26 : x - w / 2;
   return (
@@ -196,15 +232,19 @@ export const PoleWiper: React.FC<WiperProps> = ({x, dir, color = palette.tealDar
   );
 };
 
+PoleWiper.captionRegions = ({x, color = palette.tealDark}) => [{tone: toneOn(color), rect: [x - 130, -200, x + 130, 2200]}];
+
+const foliageItems = (color: string): [number, number, number, string][] => [
+  [-60, 120, 380, palette.sage],
+  [80, 560, 420, color],
+  [-90, 1020, 430, palette.sage],
+  [60, 1480, 420, color],
+  [-40, 1900, 400, palette.sage],
+];
+
 /** Leaves right in front of the lens: a column of big two-tone crowns. */
-export const FoliageWiper: React.FC<WiperProps> = ({x, color = palette.teal}) => {
-  const items: [number, number, number, string][] = [
-    [-60, 120, 380, palette.sage],
-    [80, 560, 420, color],
-    [-90, 1020, 430, palette.sage],
-    [60, 1480, 420, color],
-    [-40, 1900, 400, palette.sage],
-  ];
+export const FoliageWiper: WiperComponent = ({x, color = palette.teal}) => {
+  const items = foliageItems(color);
   return (
     <>
       {items.map(([dx, y, r, c], i) => (
@@ -218,7 +258,13 @@ export const FoliageWiper: React.FC<WiperProps> = ({x, color = palette.teal}) =>
   );
 };
 
-export const BUILTIN_WIPERS: Record<string, React.FC<WiperProps>> = {figure: FigureWiper, pole: PoleWiper, foliage: FoliageWiper};
+/** Each crown takes the caption tone that reads best on its own colour (sage: ink, teal: white). */
+FoliageWiper.captionRegions = ({x, color = palette.teal}) =>
+  foliageItems(color)
+    .filter(([, y, r]) => y - r < 600)
+    .map(([dx, y, r, c], i) => ({tone: toneOn(c), d: crown(x + dx, y, r, r * 0.9, {seed: `fol${i}`, bumps: 9})}));
+
+export const BUILTIN_WIPERS: Record<string, WiperComponent> = {figure: FigureWiper, pole: PoleWiper, foliage: FoliageWiper};
 
 // ---------------------------------------------------------------- helpers
 
@@ -233,6 +279,96 @@ export function toneAt(scenes: FilmScene[], T: number): CaptionTone {
   let tone = keys[0].tone;
   for (const k of keys) if (t >= k.t) tone = k.tone;
   return tone;
+}
+
+/** Caption tone of ONE scene at timeline T (its keys are scene-local; before its first key, the first key). */
+export function sceneToneAt(s: FilmScene | undefined, T: number): CaptionTone {
+  const keys = s?.captionTone;
+  if (!s || !keys || !keys.length) return 'dark';
+  const t = T - s.start;
+  let tone = keys[0].tone;
+  for (const k of keys) if (t >= k.t) tone = k.tone;
+  return tone;
+}
+
+const FULL: [number, number, number, number] = [-200, -200, 1300, 2200];
+/** Screen y of a sky-wipe edge at progress p (the World sky rect at rest is y -60 .. 1980). */
+const skyEdgeY = (p: number) => -60 + 2040 * clamp(p);
+const uniform = (r: ToneRegion[]) => r.every((x) => x.tone === r[0].tone);
+
+/** One scene's own tone switch in progress (a tone key with `wipe`), as regions; else null. */
+export function sceneToneRegions(s: FilmScene | undefined, T: number): ToneRegion[] | null {
+  const keys = s?.captionTone;
+  if (!s || !keys || keys.length < 2) return null;
+  const t = T - s.start;
+  for (let i = 1; i < keys.length; i++) {
+    const k = keys[i];
+    if (!k.wipe || k.wipe === 'snap') continue;
+    const dur = k.dur ?? 0.4;
+    if (t < k.t || t >= k.t + dur) continue;
+    const before = keys[i - 1].tone;
+    if (before === k.tone) return null;
+    const e = skyEdgeY((t - k.t) / dur);
+    return k.wipe === 'down'
+      ? [{tone: before, rect: FULL}, {tone: k.tone, rect: [-200, -200, 1300, e]}]
+      : [{tone: before, rect: FULL}, {tone: k.tone, rect: [-200, 1980 - (e + 60), 1300, 2200]}];
+  }
+  return null;
+}
+
+/** Caption tone REGIONS at timeline T: split at a foreground wipe's edge (with the wiper's own tone over the element),
+ *  at an un-build slab's edge, or at a scene's own tone wipe. null = one tone everywhere (toneAt). */
+export function toneRegionsAt(scenes: FilmScene[], T: number, wipers: Record<string, React.FC<WiperProps>> = {}): ToneRegion[] | null {
+  for (let i = 1; i < scenes.length; i++) {
+    const s = scenes[i];
+    const tr = s.transitionIn;
+    if (!tr) continue;
+    const prev = scenes[i - 1];
+    if (tr.type === 'foreground-wipe') {
+      const d = tdur(tr);
+      const p = (T - s.start + d / 2) / d;
+      if (p <= 0 || p >= 1) continue;
+      const dir = tr.dir ?? 'right';
+      const el = tr.element ?? 'figure';
+      const x = wipeX(p, dir, WIPE_HALF[el]);
+      const cx = clamp(x, -1, world.w + 1);
+      const tOld = sceneToneAt(prev, T);
+      const tNew = sceneToneAt(s, T);
+      const sides: ToneRegion[] =
+        dir === 'right'
+          ? [{tone: tNew, rect: [-200, -200, cx, 2200]}, {tone: tOld, rect: [cx, -200, 1300, 2200]}]
+          : [{tone: tOld, rect: [-200, -200, cx, 2200]}, {tone: tNew, rect: [cx, -200, 1300, 2200]}];
+      const W = (el === 'scene' ? wipers[prev.id] : BUILTIN_WIPERS[el]) as WiperComponent | undefined;
+      const props: WiperProps = {x, p, dir, color: tr.color};
+      let wr: ToneRegion[] = W?.captionRegions ? W.captionRegions(props) : [{tone: tr.color ? toneOn(tr.color) : 'light', rect: [x - 90, -200, x + 90, 2200]}];
+      if (tr.captionTone) wr = wr.map((r) => ({...r, tone: tr.captionTone!}));
+      const all = [...sides, ...wr];
+      return uniform(all) ? null : all;
+    }
+    if (tr.type === 'unbuild') {
+      const d = tdur(tr);
+      if (T < s.start - d || T >= s.start) continue;
+      const k = E.inCubic(exitFillProgress(prog(T, s.start - d, d), 0, 1));
+      if (k <= 0) continue;
+      const all: ToneRegion[] = [{tone: sceneToneAt(prev, T), rect: FULL}, {tone: sceneToneAt(s, s.start), rect: [-200, -200, 1300, skyEdgeY(k)]}];
+      return uniform(all) ? null : all;
+    }
+  }
+  const last = scenes[scenes.length - 1];
+  const to = last?.transitionOut;
+  if (last && to?.type === 'unbuild' && to.loop !== false && scenes.length > 1) {
+    const d = tdur(to);
+    if (T >= last.end - d && T < last.end) {
+      const k = E.inCubic(exitFillProgress(prog(T, last.end - d, d), 0, 1));
+      if (k > 0) {
+        const all: ToneRegion[] = [{tone: sceneToneAt(last, T), rect: FULL}, {tone: sceneToneAt(scenes[0], scenes[0].start), rect: [-200, -200, 1300, skyEdgeY(k)]}];
+        return uniform(all) ? null : all;
+      }
+    }
+  }
+  let cur: FilmScene | undefined;
+  for (const s of scenes) if (T >= s.start) cur = s;
+  return sceneToneRegions(cur ?? scenes[0], T);
 }
 
 /** public/mix.wav if present, else public/vo.mp3. */
@@ -286,6 +422,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
   const T = frame / fps + offset;
   const scenes = scenesIn.slice().sort((a, b) => a.start - b.start);
   const comp = (id: string): React.FC => components[id] ?? (() => <MissingScene id={id} />);
+  const capMask = capcheckMode() === 'mask'; // scripts/capcheck.mjs: captions only (no scenes)
   const layers: Layer[] = [];
   const overlays: React.ReactNode[] = [];
   const end = filmDuration(scenes);
@@ -311,6 +448,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
   };
 
   scenes.forEach((s, i) => {
+    if (capMask) return;
     if (only && s.id !== only) return;
     const next = only ? undefined : scenes[i + 1];
     const tin = only || i === 0 ? undefined : s.transitionIn;
@@ -438,6 +576,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
 
   layers.sort((a, b) => a.z - b.z);
   const tone = (t: number) => toneAt(scenes, t);
+  const regions = (t: number) => (only ? sceneToneRegions(scenes.find((x) => x.id === only), t) : toneRegionsAt(scenes, t, wipers));
   const last = scenes[scenes.length - 1];
   // the captions roll back to page 1 for the loop (unless captions.json already ends on an explicit loop page)
   const firstText = captions[0]?.lines[0]?.text;
@@ -454,7 +593,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
           <React.Fragment key={l.key}>{l.node}</React.Fragment>
         ))}
         {overlays}
-        {showCaptions ? <SkyCaptions beats={captions} tone={tone} loopAt={loopAt} range={range} hookAtStart={!only} /> : null}
+        {showCaptions ? <SkyCaptions beats={captions} tone={tone} regions={regions} loopAt={loopAt} range={range} hookAtStart={!only} /> : null}
       </AbsoluteFill>
       {audio ? <Audio src={staticFile(audioFile())} trimBefore={offset > 0 ? Math.round(offset * fps) : undefined} /> : null}
     </TimeProvider>
@@ -481,22 +620,33 @@ export const Standalone: React.FC<{
   const exit = unbuild ? prog(T, unbuild.at, unbuild.dur ?? MOTION.unbuild.total) : 0;
   const scene: FilmScene = {id: 'standalone', start: 0, end: 1e9, captionTone: tone};
   const info = {id: 'standalone', start: 0, end: 1e9, dur: 1e9};
+  const loopT = (t: number) => (loop && t >= loop.at - 0.35 ? t - loop.at : t);
+  const capMask = capcheckMode() === 'mask';
   return (
     <TimeProvider global={T} offset={0}>
       <AbsoluteFill style={{background: palette.sky, overflow: 'hidden'}}>
-        {loop && unbuild && T >= unbuild.at ? (
+        {!capMask && loop && unbuild && T >= unbuild.at ? (
           <TimeProvider offset={loop.at}>
             <StageContexts scene={info}>
               <AbsoluteFill>{children}</AbsoluteFill>
             </StageContexts>
           </TimeProvider>
         ) : null}
-        <StageContexts scene={info} cam={cam ? cam(T) : STAGE_REST}>
-          <ExitProvider value={exit}>
-            <AbsoluteFill>{children}</AbsoluteFill>
-          </ExitProvider>
-        </StageContexts>
-        {captions ? <SkyCaptions beats={captions} tone={(t) => toneAt([scene], loop && t >= loop.at - 0.35 ? t - loop.at : t)} loopAt={loop ? loop.at - 0.3 : undefined} /> : null}
+        {capMask ? null : (
+          <StageContexts scene={info} cam={cam ? cam(T) : STAGE_REST}>
+            <ExitProvider value={exit}>
+              <AbsoluteFill>{children}</AbsoluteFill>
+            </ExitProvider>
+          </StageContexts>
+        )}
+        {captions ? (
+          <SkyCaptions
+            beats={captions}
+            tone={(t) => toneAt([scene], loopT(t))}
+            regions={(t) => sceneToneRegions(scene, loopT(t))}
+            loopAt={loop ? loop.at - 0.3 : undefined}
+          />
+        ) : null}
       </AbsoluteFill>
     </TimeProvider>
   );

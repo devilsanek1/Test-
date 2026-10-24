@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // render-frames.mjs — render arbitrary frames of a composition in ONE bundle + ONE browser session.
 // Used by still.sh and sheet.sh. Usage:
-//   node scripts/render-frames.mjs <CompId> <outDir> <t1,t2,...> [--scale=0.5] [--fps-override=..] [--concurrency=2]
+//   node scripts/render-frames.mjs <CompId> <outDir> <t1,t2,...> [--scale=0.5] [--concurrency=2] [--props='{"k":1}']
+// --props: input props (JSON) for the composition, e.g. '{"capcheck":"mask"}' (caption mask for scripts/capcheck.mjs).
 // Times are seconds; they are converted with the composition's fps and clamped to its duration.
 // Prints one line per frame: "<seconds> <frame> <file>". Also prints ms/frame.
 import path from 'node:path';
@@ -16,7 +17,12 @@ if (!compId || !outDirArg || !timesArg) {
   console.error('usage: render-frames.mjs <CompId> <outDir> <t1,t2,...> [--scale=0.5] [--concurrency=2]');
   process.exit(2);
 }
-const opt = Object.fromEntries(rest.filter((a) => a.startsWith('--')).map((a) => a.slice(2).split('=')));
+const opt = Object.fromEntries(rest.filter((a) => a.startsWith('--')).map((a) => {
+  const k = a.slice(2);
+  const i = k.indexOf('=');
+  return i < 0 ? [k, 'true'] : [k.slice(0, i), k.slice(i + 1)];
+}));
+const inputProps = opt.props ? JSON.parse(opt.props) : {};
 const scale = opt.scale ? Number(opt.scale) : 1;
 const concurrency = opt.concurrency ? Number(opt.concurrency) : 2;
 const browserExecutable = '/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell';
@@ -35,7 +41,7 @@ const serveUrl = await bundle({
   onProgress: () => undefined,
 });
 const tS = Date.now();
-const composition = await selectComposition({serveUrl, id: compId, inputProps: {}, browserExecutable, chromiumOptions, logLevel: 'error'});
+const composition = await selectComposition({serveUrl, id: compId, inputProps, browserExecutable, chromiumOptions, logLevel: 'error'});
 const fps = composition.fps;
 const times = timesArg.split(',').map(Number);
 const frameOf = (s) => Math.max(0, Math.min(composition.durationInFrames - 1, Math.round(s * fps)));
@@ -45,7 +51,7 @@ const tR = Date.now();
 await renderFrames({
   composition,
   serveUrl,
-  inputProps: {},
+  inputProps,
   frames,
   outputDir: tmp,
   imageFormat: 'png',

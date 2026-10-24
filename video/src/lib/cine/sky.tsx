@@ -17,6 +17,9 @@ import {rand, rng, Seed} from '../rng';
 import {line, Pt} from '../sketch';
 import {Tod, TodPalette, todPal} from './atmosphere';
 import {memoize, PathBuf, r1} from './util';
+import {exitScale, inkOn, isPaper, lookPaint, toScreen, useCineState, xfScale} from './state';
+import {exitFillProgress} from '../exit';
+import {ease as E} from '../time';
 
 const WIDE = {x0: -1600, x1: 2680};
 
@@ -40,9 +43,21 @@ export type SkyProps = {
   top?: number;
 };
 
-/** Flat, horizontally banded sky (a few value steps, darkest at the top). */
-export const Sky: React.FC<SkyProps> = ({tod = 'day', horizon, colors, edges, span: spanIn, below = 500, x0 = WIDE.x0, x1 = WIDE.x1, top = -4000}) => {
+/** Flat, horizontally banded sky (a few value steps, darkest at the top). It is the background SLAB of the un-build:
+ *  it collapses downward last (its top edge falls from the screen top to the bottom). It keeps its colour in the
+ *  paper / cascade Looks (like the World sky). */
+export const Sky: React.FC<SkyProps> = ({tod = 'day', horizon, colors, edges, span: spanIn, below = 500, x0 = WIDE.x0, x1 = WIDE.x1, top: top0 = -4000}) => {
   const p = todPal(tod);
+  const S = useCineState();
+  let top = top0;
+  if (S.e > 0) {
+    const k = E.inCubic(exitFillProgress(S.e, 0, 1));
+    if (k >= 1) return null;
+    // screen y of the falling edge -> this layer's y (layers never rotate much: use the inverse of y only)
+    const sy = -60 + (1920 + 120) * k;
+    const sc = xfScale(S.m) || 1;
+    top = Math.max(top0, (sy - S.m[5]) / sc);
+  }
   const cols = colors ?? p.skyBands;
   const n = cols.length;
   const span = spanIn ?? Math.max(160, Math.min(1150, horizon - 600));
@@ -51,9 +66,9 @@ export const Sky: React.FC<SkyProps> = ({tod = 'day', horizon, colors, edges, sp
   const e = edges ?? Array.from({length: n - 1}, (_, i) => span * Math.pow(ratio, i));
   const out: React.ReactNode[] = [];
   for (let i = 0; i < n; i++) {
-    const y0 = i === 0 ? top : horizon - e[i - 1];
+    const y0 = Math.max(top, i === 0 ? top : horizon - e[i - 1]);
     const y1 = horizon + below;
-    out.push(<rect key={i} x={x0} y={y0} width={x1 - x0} height={y1 - y0} fill={cols[i]} />);
+    if (y1 > y0) out.push(<rect key={i} x={x0} y={y0} width={x1 - x0} height={y1 - y0} fill={cols[i]} />);
   }
   return <>{out}</>;
 };
@@ -126,17 +141,22 @@ export type SkyCloudProps = {
 
 /** Reference-style cloud: three scalloped bumps, flat bottom; white with ink on top (day) or fill-only (dusk). */
 export const SkyCloud: React.FC<SkyCloudProps> = ({x, y, w = 240, h, tod = 'day', color, ink, inkColor = palette.ink, width = stroke.ink, drift = 0, at, seed = 'c'}) => {
-  const t = useTime();
+  const S = useCineState();
+  const t = S.t;
   const p = todPal(tod);
   const g = cloudGeo(0, 0, w, h ?? w * 0.42, seed);
   if (at !== undefined && t < at) return null;
-  const s = at === undefined ? 1 : springAt(t, at, springs.pop);
+  const ex = exitScale(S.e, 0.3, 0.15);
+  if (ex <= 0) return null;
+  const s = (at === undefined ? 1 : springAt(t, at, springs.pop)) * ex;
   const dx = drift * t;
-  const showInk = ink ?? p.cloudInk;
+  const paper = isPaper(S, [x + w / 2, y]);
+  const showInk = (ink ?? p.cloudInk) || paper;
+  const fill = lookPaint(S, color ?? p.cloud, [x + w / 2, y]);
   return (
     <g transform={`translate(${r1(x + dx)} ${r1(y)})${s !== 1 ? ` translate(${w / 2} 0) scale(${s.toFixed(3)}) translate(${-w / 2} 0)` : ''}`}>
-      <path d={g.fill} fill={color ?? p.cloud} transform={showInk ? 'translate(3 2)' : undefined} />
-      {showInk ? <path d={g.top + g.bottom} fill="none" stroke={inkColor} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" /> : null}
+      {fill !== 'none' ? <path d={g.fill} fill={fill} transform={showInk ? 'translate(3 2)' : undefined} /> : null}
+      {showInk && inkOn(S) ? <path d={g.top + g.bottom} fill="none" stroke={inkColor} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" /> : null}
     </g>
   );
 };
@@ -168,6 +188,8 @@ export const Streaks: React.FC<{y: number; tod?: Tod | TodPalette; color?: strin
     }
     return pb.d;
   }, [y, n, x0, x1, seed, thick]);
+  const S = useCineState();
+  if (S.look.fills !== 'color' || exitScale(S.e, 0.2, 0.1) < 0.5) return null;
   return <path d={d} fill={color ?? p.horizonGlow} transform={drift ? `translate(${r1(drift * t)} 0)` : undefined} />;
 };
 
@@ -187,14 +209,22 @@ export type StarsProps = {
   twinkle?: number;
   seed?: Seed;
   size?: number;
+  /** Boxes [x0, y0, x1, y1] (layer coords) kept free of stars. Default: the caption band [80, 270, 1000, 580]
+   *  (skyCaption clip window + 10 px), so no dot ever reads as punctuation. Pass [] to allow everywhere. */
+  avoid?: [number, number, number, number][];
 };
 
+/** The caption band (screen px) that stars, shafts and busy detail stay out of (skyCaption clipTop/clipBottom + 10). */
+export const CAPTION_BAND: [number, number, number, number] = [80, 270, 1000, 580];
+
 /** Small cream dots and a few 4-point sparkles; pop in (spring scale), twinkle by size. One path. */
-export const Stars: React.FC<StarsProps> = ({tod = 'night', color, region, n, at, span = 3, twinkle = 0.35, seed = 'stars', size = 1}) => {
-  const t = useTime();
+export const Stars: React.FC<StarsProps> = ({tod = 'night', color, region, n, at, span = 3, twinkle = 0.35, seed = 'stars', size = 1, avoid = [CAPTION_BAND]}) => {
+  const S = useCineState();
+  const t = S.t;
   const p = todPal(tod);
   const [x0, y0, x1, y1] = region;
   const count = n ?? Math.round(((x1 - x0) * (y1 - y0) * p.stars) / 5200);
+  const avoidKey = avoid.map((a) => a.join(',')).join('|');
   const stars = useMemo(() => {
     const r = rng(`stars/${seed}`);
     return Array.from({length: count}, (_, i) => ({
@@ -206,12 +236,14 @@ export const Stars: React.FC<StarsProps> = ({tod = 'night', color, region, n, at
       hz: r.range(0.25, 0.7),
       ph: r.range(0, 6.28),
       at: at === undefined ? -1 : at + r.next() * span,
-    }));
-  }, [count, x0, y0, x1, y1, seed, at, span, twinkle, size]);
+      j: r.next(),
+    })).filter((s) => !avoid.some(([a, b, c, d]) => s.x > a - 6 && s.x < c + 6 && s.y > b - 6 && s.y < d + 6));
+  }, [count, x0, y0, x1, y1, seed, at, span, twinkle, size, avoidKey]);
+  if (S.look.fills !== 'color') return null;
   const pb = new PathBuf();
   for (const s of stars) {
     if (t < s.at) continue;
-    let k = s.at < 0 ? 1 : springAt(t, s.at, springs.wobbly);
+    let k = (s.at < 0 ? 1 : springAt(t, s.at, springs.wobbly)) * exitScale(S.e, s.j, 0.01);
     if (s.tw) k *= 0.75 + 0.35 * (osc(t, s.hz, s.ph) > 0.55 ? 1 : 0.5 + 0.5 * osc(t, s.hz * 2.3, s.ph));
     const rr = s.r * k;
     if (rr <= 0.2) continue;
@@ -265,6 +297,8 @@ export const HazeBand: React.FC<{y: number; h: number; color: string; opacity?: 
     const pts = wavyTop(x0, x1, y, wave, seed, 60, 1.6);
     return smoothPts(pts) + `L${x1} ${y + h}L${x0} ${y + h}Z`;
   }, [y, h, wave, seed, x0, x1]);
+  const S = useCineState();
+  if (S.look.fills !== 'color' || exitScale(S.e, 0.1, 0.3) < 0.5) return null;
   return <path d={d} fill={color} opacity={opacity < 1 ? opacity : undefined} />;
 };
 
@@ -286,12 +320,18 @@ export const Hills: React.FC<{y: number; amp?: number; color: string; bottom?: n
     const topD = smoothPts(pts);
     return {top: topD, fill: topD + `L${x1} ${bottom ?? y + 900}L${x0} ${bottom ?? y + 900}Z`};
   }, [y, amp, bottom, seed, freq, x0, x1]);
-  return (
+  const S = useCineState();
+  const ex = exitScale(S.e, 0.2, 0.45);
+  if (ex <= 0) return null;
+  const paper = isPaper(S, [540, y]);
+  const paint = lookPaint(S, color, [540, y]);
+  const body = (
     <>
-      <path d={fill} fill={color} />
-      {ink ? <path d={top} fill="none" stroke={inkColor} strokeWidth={ink} strokeLinecap="round" /> : null}
+      {paint !== 'none' ? <path d={fill} fill={paint} /> : null}
+      {(ink || paper) && inkOn(S) ? <path d={top} fill="none" stroke={inkColor} strokeWidth={ink || 1.6} strokeLinecap="round" /> : null}
     </>
   );
+  return ex < 1 ? <g transform={`translate(0 ${r1(y)}) scale(1 ${ex.toFixed(4)}) translate(0 ${r1(-y)})`}>{body}</g> : body;
 };
 
 // ---------------------------------------------------------------- birds
@@ -321,7 +361,8 @@ export const Birds: React.FC<BirdsProps> = ({at, from, to, dur = 5, n = 5, sprea
     const r = rng(`birds/${seed}`);
     return Array.from({length: n}, (_, i) => ({dx: i === 0 ? 0 : -r.range(0.3, 1) * spread, dy: r.jitter(spread * 0.45), lag: r.range(0, 0.4), ph: r.range(0, 6.28), s: r.range(0.75, 1.15), bob: r.range(4, 10)}));
   }, [n, spread, seed]);
-  if (t < at || t > at + dur + 0.6) return null;
+  const S = useCineState();
+  if (t < at || t > at + dur + 0.6 || S.e > 0.15 || !S.look.ink) return null;
   const pb = new PathBuf();
   for (const b of birds) {
     const u = prog(t, at + b.lag, dur);

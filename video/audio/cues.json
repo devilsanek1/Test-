@@ -7,228 +7,256 @@
   "prio": "A",
   "why": "distant city hum under the opening; it dies with the lights at 3.45",
   "loop": true,
-  "dur": 3.55,
+  "dur": 3.435,
   "fade_in": 0.0,
-  "fade_out": 0.15
+  "fade_out": 0.15,
+  "t_v1": 0.0
  },
  {
-  "t": 0.06,
+  "t": 0.051,
   "sfx": "pencil_scratch_medium",
   "gain_db": -21,
   "pan": 0.0,
   "prio": "A",
-  "why": "opening line art draws on from frame 1"
+  "why": "opening line art draws on from frame 1",
+  "t_v1": 0.06
  },
  {
-  "t": 3.45,
+  "t": 3.318,
   "sfx": "power_off_thunk",
   "gain_db": -12,
   "pan": 0.0,
   "prio": "A",
-  "why": "end of 'switched themselves OFF.' - lights out; hum tail fills the pause"
+  "why": "end of 'switched themselves OFF.' - lights out; hum tail fills the pause",
+  "t_v1": 3.45
  },
  {
-  "t": 9.19,
+  "t": 9.7,
   "sfx": "pop_mid",
   "gain_db": -15,
   "pan": -0.2,
   "prio": "B",
-  "why": "'7' (out of 10) pops in"
+  "why": "'7' (out of 10) pops in",
+  "t_v1": 9.19
  },
  {
-  "t": 9.83,
+  "t": 10.34,
   "sfx": "pop_high",
   "gain_db": -17,
   "pan": 0.2,
   "prio": "B",
-  "why": "'10'"
+  "why": "'10'",
+  "t_v1": 9.83
  },
  {
-  "t": 12.26,
+  "t": 13.14,
   "sfx": "pop_low",
   "gain_db": -16,
   "pan": 0.0,
   "prio": "B",
-  "why": "'two steps'"
+  "why": "'two steps'",
+  "t_v1": 12.26
  },
  {
-  "t": 13.12,
+  "t": 14.08,
   "sfx": "pencil_scratch_short",
   "gain_db": -18,
   "pan": -0.15,
   "prio": "B",
-  "why": "'First' - check mark / circle drawn"
+  "why": "'First' - check mark / circle drawn",
+  "t_v1": 13.12
  },
  {
-  "t": 14.25,
+  "t": 15.38,
   "sfx": "pencil_scratch_short",
   "gain_db": -18,
   "pan": 0.15,
   "prio": "B",
-  "why": "'Then' - second mark"
+  "why": "'Then' - second mark",
+  "t_v1": 14.25
  },
  {
-  "t": 18.18,
+  "t": 19.95,
   "sfx": "fg_wipe",
   "gain_db": -18,
   "pan": 0.0,
   "prio": "A",
-  "why": "0.39 s pause before 'And for 14 years' - foreground-wipe transition"
+  "why": "0.39 s pause before 'And for 14 years' - foreground-wipe transition",
+  "t_v1": 18.18
  },
  {
-  "t": 18.87,
+  "t": 20.88,
   "sfx": "pop_mid",
   "gain_db": -14,
   "pan": 0.0,
   "prio": "B",
-  "why": "'14'"
+  "why": "'14'",
+  "t_v1": 18.87
  },
  {
-  "t": 21.27,
+  "t": 23.15,
   "sfx": "whoosh_soft",
   "gain_db": -21,
   "pan": 0.0,
   "prio": "B",
-  "why": "pause after 'nobody did.' - time jump to August"
+  "why": "pause after 'nobody did.' - time jump to August",
+  "t_v1": 21.27
  },
  {
-  "t": 24.98,
+  "t": 27.22,
   "sfx": "ding",
   "gain_db": -16,
   "pan": 0.25,
   "prio": "A",
-  "why": "'found it' - the discovery"
+  "why": "'found it' - the discovery",
+  "t_v1": 24.98
  },
  {
-  "t": 35.62,
+  "t": 38.87,
   "sfx": "pop_low",
   "gain_db": -13,
   "pan": 0.0,
   "prio": "A",
-  "why": "'Cloudflare' lands (the bed's soft sub accent is at 35.35)"
+  "why": "'Cloudflare' lands (the bed's soft accent is at 38.37)",
+  "t_v1": 35.62
  },
  {
-  "t": 38.82,
+  "t": 42.26,
   "sfx": "counter_ticker",
   "gain_db": -14,
   "pan": 0.1,
   "prio": "A",
-  "why": "'tens of thousands' counting up (runs ~2 s, stops before '45')"
+  "why": "'tens of thousands' counting up (runs ~2 s, stops before '45')",
+  "t_v1": 38.82
  },
  {
-  "t": 41.06,
+  "t": 44.52,
   "sfx": "pop_high",
   "gain_db": -15,
   "pan": 0.0,
   "prio": "B",
-  "why": "'45' minutes"
+  "why": "'45' minutes",
+  "t_v1": 41.06
  },
  {
-  "t": 42.48,
+  "t": 45.92,
   "sfx": "pop_mid",
   "gain_db": -12,
   "pan": 0.0,
   "prio": "A",
-  "why": "'millions'"
+  "why": "'millions'",
+  "t_v1": 42.48
  },
  {
-  "t": 45.13,
+  "t": 49.136,
   "sfx": "lock_click",
   "gain_db": -17,
   "pan": 0.0,
   "prio": "B",
-  "why": "'got in.' - a tiny button on the line"
+  "why": "'got in.' - a tiny button on the line",
+  "t_v1": 45.13
  },
  {
-  "t": 45.4,
+  "t": 49.3,
   "sfx": "fg_wipe",
   "gain_db": -19,
   "pan": 0.0,
   "prio": "A",
-  "why": "breath / 'So now comes step two' - transition"
+  "why": "breath / 'So now comes step two' - transition",
+  "t_v1": 45.4
  },
  {
-  "t": 45.55,
+  "t": 49.79,
   "sfx": "light_shimmer",
   "gain_db": -24,
   "pan": 0.0,
   "prio": "B",
-  "why": "dawn / light shaft on the breath"
+  "why": "dawn / light shaft on the breath",
+  "t_v1": 45.55
  },
  {
-  "t": 46.4,
+  "t": 50.96,
   "sfx": "pop_low",
   "gain_db": -16,
   "pan": 0.0,
   "prio": "B",
-  "why": "'two'"
+  "why": "'two'",
+  "t_v1": 46.4
  },
  {
-  "t": 47.84,
+  "t": 52.64,
   "sfx": "air_bed",
   "gain_db": -27,
   "pan": 0.0,
   "prio": "A",
-  "why": "air under the '22 million doors' vista (47.84-54.56)",
+  "why": "air under the '22 million doors' vista (52.64-59.92)",
   "loop": true,
-  "dur": 6.72,
+  "dur": 7.28,
   "fade_in": 0.8,
-  "fade_out": 0.8
+  "fade_out": 0.8,
+  "t_v1": 47.84
  },
  {
-  "t": 48.47,
+  "t": 53.35,
   "sfx": "typing_burst",
   "gain_db": -18,
   "pan": 0.2,
   "prio": "B",
-  "why": "'install that fix' - quiet keystrokes"
+  "why": "'install that fix' - quiet keystrokes",
+  "t_v1": 48.47
  },
  {
-  "t": 51.09,
+  "t": 56.15,
   "sfx": "pop_mid",
   "gain_db": -14,
   "pan": 0.0,
   "prio": "A",
-  "why": "'22' million"
+  "why": "'22' million",
+  "t_v1": 51.09
  },
  {
-  "t": 58.03,
+  "t": 63.63,
   "sfx": "switch_toggle",
   "gain_db": -7,
   "pan": 0.0,
   "prio": "A",
-  "why": "'switch it OFF'"
+  "why": "'switch it OFF'",
+  "t_v1": 58.03
  },
  {
-  "t": 60.75,
+  "t": 67.15,
   "sfx": "pop_mid",
   "gain_db": -15,
   "pan": -0.2,
   "prio": "B",
-  "why": "'one' in three"
+  "why": "'one' in three",
+  "t_v1": 60.75
  },
  {
-  "t": 61.11,
+  "t": 67.51,
   "sfx": "pop_high",
   "gain_db": -16,
   "pan": 0.2,
   "prio": "B",
-  "why": "'three'"
+  "why": "'three'",
+  "t_v1": 61.11
  },
  {
-  "t": 68.0,
+  "t": 75.04,
   "sfx": "switch_toggle",
   "gain_db": -10,
   "pan": 0.0,
   "prio": "B",
-  "why": "'switch off' (callback, softer)"
+  "why": "'switch off' (callback, softer)",
+  "t_v1": 68.0
  },
  {
-  "t": 69.3,
+  "t": 76.6,
   "sfx": "pencil_scratch_long",
   "gain_db": -20,
   "pan": 0.0,
   "prio": "A",
-  "why": "un-build back to the opening line art; tail wraps across the loop"
+  "why": "un-build back to the opening line art; tail wraps across the loop",
+  "t_v1": 69.3
  }
 ]
