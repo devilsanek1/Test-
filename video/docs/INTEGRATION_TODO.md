@@ -49,6 +49,8 @@ Polish-pass results (look / motion, last review; "+fix" = a final fix round ran 
   = stubble), the heap reads as black teardrops floating on the peach band. Its fix r2 gets these; if it is still < 8
   after it, S08 gets a dedicated redesign pass (more rounds, PEAK-2 brief: Arcane scale, depth-stepped crowd values).
   EDGE_HINTS['S08'] keep rect [0,900,470,1110] for the heap (phase A2).
+- 08:15 A1 done for S03 (8 / 8 PASS), S04 (8 / 8.5 +fix, 1 major), S05 (8 / 8.5 +fix, 1 major). Phase A2 (edge
+  hints) started for the settled scenes S01-S06, S11, S12: wf_c90c1d9d-76b. S07-S10 still in A1 (wf_f6eafcb1-f45).
 The integration pass re-reviews every "+fix" scene and every scene under 8.
 
 
