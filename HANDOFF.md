@@ -106,10 +106,10 @@ Everything that agent knew is in this repo. This file is the map; the details li
    - **Then:** a synthesis into `video/docs/look/COZY_AND_SCALE.md` (rules with numbers, a shot grammar, the cozy-to-scale
      rhythm, how it applies to v2, and what to build at G3/G4/G5), followed by a critic pass.
    - The playbook already records both rules (Visual style).
-3. **Answer the owner on Reels upload quality.** They asked: "Is there anything we can do to ensure the quality of a video
+3. **DONE 2026-10-25 (checklist in `video/docs/POSTING_KIT.md`; a 1440x2560 YouTube master of v1 was offered, awaiting a yes). Answer the owner on Reels upload quality.** They asked: "Is there anything we can do to ensure the quality of a video
    we upload to reels is the highest possible." The research is done (findings below). Next, write an "Upload
    checklist" into `video/docs/POSTING_KIT.md` and a playbook line, then offer a 1440x2560 YouTube master of v1.
-4. **Answer the owner on linking TikTok and Instagram.** They asked: "am I able to link my TikTok account and my
+4. **DONE 2026-10-25 (answered; notes in POSTING_KIT, "Linking the accounts"). Answer the owner on linking TikTok and Instagram.** They asked: "am I able to link my TikTok account and my
    Instagram account somehow?" (asked during the handoff).
    - TikTok: Edit profile has a field to add an Instagram account, which shows an icon on the TikTok profile.
    - Instagram: add the TikTok URL under Edit profile → Links.
