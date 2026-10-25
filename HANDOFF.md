@@ -87,7 +87,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
 
 ## 2b. Update 2026-10-25 20:00 UTC: two agents, split by video
 
-- **Video 2 (Google DeepMind resignations) is produced by ANOTHER agent.** This session does not touch `video/docs/v2/`
+- **Video 2 (Google DeepMind resignations) is produced by session https://claude.ai/code/session_01BGZ47aBhF9yKpEaeiLeCPQ**
+  (the original session; the owner said "continue with video 2" at 20:20 UTC). The video 3 session does not touch `video/docs/v2/`
   or the v2 queue item below.
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
@@ -96,7 +97,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
 
 ## 3. The queue (in order) at handoff
 
-1. **PAUSED by the owner at 2026-10-25 19:52 UTC (stopped before any agent finished; nothing produced). Relaunch the v2 G0 workflow from `context/workflows/v2-g0-angles-wf_b7b190a7-4fe.js` when the owner says go;** output `video/docs/v2/G0_ANGLES.md`. Present the top 3; the owner picks.
+1. **RUNNING again since 2026-10-25 20:20 UTC** (the owner: "continue with video 2"). **The v2 G0 workflow** `context/workflows/v2-g0-angles-wf_b7b190a7-4fe.js` (now with the hook-sound and palette lines); output `video/docs/v2/G0_ANGLES.md`. Present the top 3; the owner picks.
 2. **PAUSED by the owner at 2026-10-25 19:52 UTC (nothing produced). When the owner says go, relaunch `context/workflows/look-cozy-and-scale-wf_ee30e562-0c7.js` to research the "cozy + scale" look** (owner, 2026-10-25 17:32). Output `video/docs/look/COZY_AND_SCALE.md` plus `video/docs/look/research/*.md`. It must also follow the palette direction in `video/docs/look/PALETTE.md` (owner, after the pause).
    - **What the owner said:**
      - "I do like the bigger scale scenes occasionally, we did it great here, keep going, taking inspiration from

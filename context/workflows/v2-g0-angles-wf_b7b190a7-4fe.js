@@ -48,6 +48,7 @@ const RULES = `Rules:
 - Everyday spoken language, like a person talking to a friend. No AI-sounding phrasing ("delve", "in a world where", "here's the thing", rhetorical triplets).
 - End close to the payoff, with a last line that makes people comment or rewatch. No "follow for more".
 - Visuals are drawn in our hand-drawn ink, flat-colour style (we can draw anything: offices, badges, contracts, drones, a ticking clock). Name the key image per beat. No gore, no real war footage.
+- Sound: the owner wants a sound people link with their phone (a notification ding, a like pop, a message whoosh) in the first second. Say which one and how it fits the hook; it can be ironic for a serious story (e.g. a message ding on a resignation email), never cheerful about war.
 - The 2 angles must be genuinely different (a different hook, structure or emotional core), not variants of one idea.`
 
 const ANGLES = {
@@ -61,13 +62,14 @@ const ANGLES = {
         frame0_text: { type: 'string', description: 'on-screen text on the very first frame, max 7 words' },
         hooks: { type: 'array', minItems: 3, maxItems: 3, items: { type: 'string' }, description: '3 alternative spoken first lines (first 2-3 s)' },
         visual_hook: { type: 'string', description: 'what the viewer sees in the first 2 s' },
+        hook_sound: { type: 'string', description: 'the phone-like sound in the first second and why it fits' },
         beats: { type: 'array', items: { type: 'object', properties: { t: { type: 'string' }, vo: { type: 'string' }, visual: { type: 'string' } }, required: ['t', 'vo', 'visual'] } },
         vo_draft: { type: 'string', description: 'the full voice-over draft, 85-115 words' },
         ending: { type: 'string', description: 'the last line, and why viewers comment, rewatch or share' },
         facts: { type: 'array', items: { type: 'object', properties: { claim: { type: 'string' }, source: { type: 'string' } }, required: ['claim', 'source'] } },
         risks: { type: 'string' },
       },
-      required: ['title', 'logline', 'frame0_text', 'hooks', 'visual_hook', 'beats', 'vo_draft', 'ending', 'facts', 'risks'],
+      required: ['title', 'logline', 'frame0_text', 'hooks', 'visual_hook', 'hook_sound', 'beats', 'vo_draft', 'ending', 'facts', 'risks'],
     } },
   },
   required: ['angles'],
@@ -128,7 +130,7 @@ log(`top: ${ranking.slice(0, 3).map(r => `${r.id} ${r.score80}`).join(', ')}`)
 
 phase('Synthesis')
 const synth = await agent(
-  `${CTX}\n\nYou are the head writer. 5 writers proposed ${angles.length} angles and 3 judges (growth strategist, standards editor + media lawyer, creative director) scored them. First read ${SRC}, the research files ${files}, and in ${PLAYBOOK} the sections "Script and voice" and "Hook and pacing".\n\nRanking (average weighted score out of 80; hook and truth count double):\n${JSON.stringify(ranking)}\n\nJudge verdicts:\n${JSON.stringify(judged.filter(Boolean))}\n\nAll angles (JSON):\n${JSON.stringify(angles)}\n\nWrite the owner's G0 decision doc to ${V2}/G0_ANGLES.md:\n1. "Pick one" (must fit one phone screen, max 35 lines): 3 options, each with a short name; the frame-0 on-screen text; the spoken hook line plus 2 alternates; the story in 2 lines; why it should work (cite the judges' scores); the main risk. Then one line with your recommendation and why.\n2. Per option: a beat table (time / voice-over / what we see); the full voice-over draft (85-115 words, everyday spoken language, with delivery cues in brackets such as [quieter, close to the mic]); the ending and the comment prompt; the facts used, each with its source; fairness notes (where Google's response sits).\n3. The score table for all angles (id, title, writer lens, score, truth), the best unused hook lines, and 2-3 runner-up ideas worth keeping.\n4. If the story is bigger than one 45 s video, one short paragraph on how it could be a 2-3 part series.\nBuild the 3 options from the top-ranked angles, grafting the best ideas from the others. Make them genuinely different choices (a different emotional core or structure) unless the scores clearly say otherwise. Never use an angle whose average truth score is below 7 without fixing its overclaim.\n${RULES}\n\nDon't commit. Return at most 15 lines: the 3 options (name + hook line) and your recommendation.`,
+  `${CTX}\n\nYou are the head writer. 5 writers proposed ${angles.length} angles and 3 judges (growth strategist, standards editor + media lawyer, creative director) scored them. First read ${SRC}, the research files ${files}, and in ${PLAYBOOK} the sections "Script and voice" and "Hook and pacing".\n\nRanking (average weighted score out of 80; hook and truth count double):\n${JSON.stringify(ranking)}\n\nJudge verdicts:\n${JSON.stringify(judged.filter(Boolean))}\n\nAll angles (JSON):\n${JSON.stringify(angles)}\n\nWrite the owner's G0 decision doc to ${V2}/G0_ANGLES.md:\n1. "Pick one" (must fit one phone screen, max 35 lines): 3 options, each with a short name; the frame-0 on-screen text; the spoken hook line plus 2 alternates; the story in 2 lines; why it should work (cite the judges' scores); the main risk. Then one line with your recommendation and why.\n2. Per option: a beat table (time / voice-over / what we see); the full voice-over draft (85-115 words, everyday spoken language, with delivery cues in brackets such as [quieter, close to the mic]); the ending and the comment prompt; the facts used, each with its source; fairness notes (where Google's response sits).\n3. The score table for all angles (id, title, writer lens, score, truth), the best unused hook lines, and 2-3 runner-up ideas worth keeping.\n4. If the story is bigger than one 45 s video, one short paragraph on how it could be a 2-3 part series.\n5. Per option, one line: the hook sound (from the angle) and a suggested palette from our house family in ${ROOT}/docs/look/PALETTE.md (pick by name, e.g. Dusk for serious, Sage Study for cozy interiors), with why.\nBuild the 3 options from the top-ranked angles, grafting the best ideas from the others. Make them genuinely different choices (a different emotional core or structure) unless the scores clearly say otherwise. Never use an angle whose average truth score is below 7 without fixing its overclaim.\n${RULES}\n\nDon't commit. Return at most 15 lines: the 3 options (name + hook line) and your recommendation.`,
   { label: 'synthesis', phase: 'Synthesis' })
 
 phase('Fact-check')
