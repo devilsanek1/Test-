@@ -17,7 +17,7 @@ import type {Acc, Hair} from '../../lib/kit';
 import {DEPTH_INK, EdgeOnlooker} from '../shared/props';
 import type {Beats} from './beats';
 
-type Head = {x: number; y: number; head: number; hair: Hair; hairColor?: string; body: string; acc?: Acc[]; rim: 'left' | 'right'; react?: 'look' | 'turn'; seed: string; bun?: boolean};
+type Head = {x: number; y: number; head: number; hair: Hair; hairColor?: string; body: string; acc?: Acc[]; rim: 'left' | 'right'; react?: 'look' | 'turn'; seed: string; bun?: boolean; tail?: string};
 
 /** Back row first (drawn first), then the front row. Screen at rest: x' = (x - 540) 1.13 + 540, y' = (y - 940) 1.13 +
  *  960. The fifth of each row is off frame right at rest and slides in with the exit truck.
@@ -39,7 +39,9 @@ export const HEADS: Head[] = [
   {x: 1170, y: 1601, head: 130, hair: 'curly', hairColor: palette.brown, body: palette.sage, acc: ['collar'], rim: 'left', seed: 's5au/b5'},
   // front row: heads 182-196 (~210 px), centres ~1705 (screen ~1825), the outer two cropped by the frame edges
   {x: 60, y: 1697, head: 192, hair: 'short', hairColor: palette.tan, body: palette.sage, acc: ['hood'], rim: 'right', seed: 's5au/f1'},
-  {x: 280, y: 1717, head: 182, hair: 'short', bun: true, hairColor: palette.tan, body: palette.sage, acc: ['collar'], rim: 'right', react: 'turn', seed: 's5au/f2'},
+  // A1 fix round (review: two identical tan buns stacked diagonally with b1, one flat value mass, copy-paste): f2 is an
+  // OCHRE head with a low PONYTAIL down the back of the coat and a cream tie (a different silhouette and value step)
+  {x: 280, y: 1717, head: 182, hair: 'short', tail: palette.cream, hairColor: palette.brown, body: palette.sage, acc: ['collar'], rim: 'right', react: 'turn', seed: 's5au/f2'},
   {x: 808, y: 1709, head: 186, hair: 'cap', body: palette.tan, rim: 'left', react: 'look', seed: 's5au/f3'},
   {x: 1012, y: 1691, head: 196, hair: 'long', hairColor: palette.brown, body: palette.teal, acc: ['collar'], rim: 'left', seed: 's5au/f4'},
   {x: 1290, y: 1705, head: 188, hair: 'short', hairColor: palette.tan, body: palette.sand, acc: ['hood'], rim: 'left', seed: 's5au/f5'},
@@ -67,6 +69,33 @@ const Bun: React.FC<{h: Head}> = ({h}) => {
       <Ink d={ring} width={W} seed={`${h.seed}/bunR`} />
       <Fill d={tie} color={palette.peach} offset={false} mode="none" seed={`${h.seed}/tieF`} />
       <Ink d={tie} width={W * 0.7} taper={false} vary={0} seed={`${h.seed}/tieI`} />
+    </>
+  );
+};
+
+/** A low ponytail (A1 fix round): from the back of the skull's lower half down over the collar onto the coat, tapering,
+ *  swung a touch toward the rim side, with a tie of colour `h.tail` at its root (fill + ink at the onlooker's weight). */
+const Ponytail: React.FC<{h: Head}> = ({h}) => {
+  const t = useTime();
+  const hr = h.head / 2;
+  const cx = h.x;
+  const cy = h.y + bobAt(t, h.seed);
+  const sd = h.rim === 'right' ? 1 : -1;
+  const y0 = cy + hr * 0.28;
+  const y1 = cy + hr * 1.95;
+  const w = hr * 0.3;
+  const tip = cx + sd * hr * 0.16;
+  const tail = `M${cx - w} ${y0}C${cx - w * 1.25} ${y0 + hr * 0.7} ${tip - w * 0.7} ${y1 - hr * 0.45} ${tip} ${y1}C${tip + w * 0.8} ${y1 - hr * 0.5} ${cx + w * 1.3} ${y0 + hr * 0.7} ${cx + w} ${y0}Z`;
+  const strand = `M${cx + w * 0.05} ${y0 + hr * 0.35}C${cx + w * 0.1} ${y0 + hr * 0.9} ${tip - w * 0.15} ${y1 - hr * 0.55} ${tip - w * 0.05} ${y1 - hr * 0.22}`;
+  const tie = roundRect(cx - w * 1.15, y0 + hr * 0.02, w * 2.3, hr * 0.2, hr * 0.07);
+  const W = DEPTH_INK.front;
+  return (
+    <>
+      <Fill d={tail} color={h.hairColor ?? palette.brown} offset={false} mode="none" seed={`${h.seed}/ptF`} />
+      <Ink d={tail} width={W} seed={`${h.seed}/ptI`} />
+      <Ink d={strand} width={W * 0.55} taper={false} seed={`${h.seed}/ptS`} />
+      <Fill d={tie} color={h.tail ?? palette.cream} offset={false} mode="none" seed={`${h.seed}/ptT`} />
+      <Ink d={tie} width={W * 0.7} taper={false} vary={0} seed={`${h.seed}/ptTI`} />
     </>
   );
 };
@@ -118,12 +147,20 @@ export const Audience: React.FC<{b: Beats}> = ({b}) => {
           </>
         );
         const m = poseM(h, t, b);
+        // the ponytail hangs from the head across the neck line: drawn whole, through the head's pose (it swings with it)
+        const tail = h.tail ? m ? <XG m={m}><Ponytail h={h} /></XG> : <Ponytail h={h} /> : null;
         return m ? (
-          <NeckSplit key={h.seed} x={h.x} y={h.y + neckK(h) * h.head} m={m}>
-            {node}
-          </NeckSplit>
+          <React.Fragment key={h.seed}>
+            <NeckSplit x={h.x} y={h.y + neckK(h) * h.head} m={m}>
+              {node}
+            </NeckSplit>
+            {tail}
+          </React.Fragment>
         ) : (
-          <React.Fragment key={h.seed}>{node}</React.Fragment>
+          <React.Fragment key={h.seed}>
+            {node}
+            {tail}
+          </React.Fragment>
         );
       })}
     </>

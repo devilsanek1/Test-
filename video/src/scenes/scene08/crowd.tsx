@@ -33,48 +33,71 @@ const latest = (ts: number[], t: number): number | undefined => {
   return r;
 };
 
-// ---------------------------------------------------------------- the bust (head + shoulders, back view)
+// ---------------------------------------------------------------- the hooded bust (head + shoulders, back view)
 
-/** A back-view head-and-shoulders silhouette, base centre (x, y), height h (base to head top): shoulders 0.66 h wide
- *  rising in a hump to the neck, a round head (r 0.2 h) and, with `hood`, a small hood peak leaning to one side. */
-export function bust(x: number, y: number, h: number, hood: boolean, lean = 1): string {
-  const sw = 0.33 * h;
-  const r = 0.2 * h;
-  const hy = y - h + r + (hood ? 0.05 * h : 0);
-  const sh = y - 0.5 * h; // shoulder top
-  const k = 0.5523 * r;
-  let d =
-    `M${f1(x - sw)} ${f1(y)}V${f1(sh + 0.16 * h)}C${f1(x - sw)} ${f1(sh + 0.02 * h)} ${f1(x - 0.24 * h)} ${f1(sh - 0.02 * h)} ${f1(x - 0.12 * h)} ${f1(sh - 0.03 * h)}` +
-    `H${f1(x + 0.12 * h)}C${f1(x + 0.24 * h)} ${f1(sh - 0.02 * h)} ${f1(x + sw)} ${f1(sh + 0.02 * h)} ${f1(x + sw)} ${f1(sh + 0.16 * h)}V${f1(y)}Z`;
-  // the head (a circle as 4 cubics)
-  d += `M${f1(x - r)} ${f1(hy)}C${f1(x - r)} ${f1(hy - k)} ${f1(x - k)} ${f1(hy - r)} ${f1(x)} ${f1(hy - r)}C${f1(x + k)} ${f1(hy - r)} ${f1(x + r)} ${f1(hy - k)} ${f1(x + r)} ${f1(hy)}C${f1(x + r)} ${f1(hy + k)} ${f1(x + k)} ${f1(hy + r * 1.25)} ${f1(x)} ${f1(hy + r * 1.25)}C${f1(x - k)} ${f1(hy + r * 1.25)} ${f1(x - r)} ${f1(hy + k)} ${f1(x - r)} ${f1(hy)}Z`;
+/** A1 fix round 1 (the reviewers: the 'millions' payoff read as a cheering concert crowd): every attempter's HOOD is the
+ *  dominant silhouette: a cowl with a POINTED peak ~0.2 h above where a bare head would end, filled ink-dark (one value
+ *  darker than the coat), over a coat hump. `coat` and `head` are separate paths so the two values batch apart; `lite`
+ *  = the far LOD (quads only, the peak at 1.27 h: >= 2.5 px at 10 px); `rot` (deg, + = leaning right) tilts the whole
+ *  bust about its base centre. Without `hood`: a round ink head (hair). Base centre (x, y), height h (base to the top
+ *  of a bare head). */
+export function bustParts(x: number, y: number, h: number, hood: boolean, lean = 1, lite = false, rot = 0): {coat: string; head: string} {
+  const c = Math.cos((rot * Math.PI) / 180);
+  const sn = Math.sin((rot * Math.PI) / 180);
+  const P = (dx: number, dy: number) => {
+    const u = dx * h;
+    const v = -dy * h;
+    return `${f1(x + u * c - v * sn)} ${f1(y + u * sn + v * c)}`;
+  };
+  const coat = lite
+    ? `M${P(-0.33, 0)}L${P(-0.33, 0.36)}Q${P(-0.33, 0.53)} ${P(0, 0.53)}Q${P(0.33, 0.53)} ${P(0.33, 0.36)}L${P(0.33, 0)}Z`
+    : `M${P(-0.33, 0)}L${P(-0.33, 0.34)}C${P(-0.33, 0.48)} ${P(-0.24, 0.52)} ${P(-0.12, 0.53)}L${P(0.12, 0.53)}C${P(0.24, 0.52)} ${P(0.33, 0.48)} ${P(0.33, 0.34)}L${P(0.33, 0)}Z`;
+  let head: string;
   if (hood) {
-    // the hood: a slightly bigger cowl over the head with a small peak (lean = which side the tip falls)
-    const R = r * 1.12;
-    d += `M${f1(x - R)} ${f1(hy + r * 0.5)}C${f1(x - R * 1.02)} ${f1(hy - r * 0.7)} ${f1(x - r * 0.5)} ${f1(hy - r * 1.15)} ${f1(x + lean * r * 0.25)} ${f1(hy - r * 1.42)}C${f1(x + r * 0.55)} ${f1(hy - r * 1.05)} ${f1(x + R * 1.02)} ${f1(hy - r * 0.6)} ${f1(x + R)} ${f1(hy + r * 0.5)}Z`;
+    const l = lean;
+    head = lite
+      ? `M${P(-0.21, 0.42)}Q${P(-0.3, 0.98)} ${P(0.06 * l, 1.27)}Q${P(0.3, 0.98)} ${P(0.21, 0.42)}Z`
+      : `M${P(-0.21, 0.4)}C${P(-0.265, 0.62)} ${P(-0.255, 0.9)} ${P(-0.11 + 0.03 * l, 1.05)}L${P(0.07 * l, 1.21)}L${P(0.12 + 0.03 * l, 1.04)}C${P(0.255, 0.9)} ${P(0.265, 0.62)} ${P(0.21, 0.4)}Z`;
+  } else {
+    head = lite
+      ? `M${P(-0.2, 0.8)}Q${P(-0.2, 1)} ${P(0, 1)}Q${P(0.2, 1)} ${P(0.2, 0.8)}Q${P(0.2, 0.56)} ${P(0, 0.56)}Q${P(-0.2, 0.56)} ${P(-0.2, 0.8)}Z`
+      : `M${P(-0.2, 0.8)}C${P(-0.2, 0.91)} ${P(-0.11, 1)} ${P(0, 1)}C${P(0.11, 1)} ${P(0.2, 0.91)} ${P(0.2, 0.8)}C${P(0.2, 0.69)} ${P(0.11, 0.55)} ${P(0, 0.55)}C${P(-0.11, 0.55)} ${P(-0.2, 0.69)} ${P(-0.2, 0.8)}Z`;
   }
-  return d;
+  return {coat, head};
 }
 
-/** bustLite: the far LOD of bust() (fix round 3b: the flood packs ~1500 figures): a shoulder hump of two quads, the head
- *  as two arcs and, with `hood`, a small peak triangle leaning to one side: a third of bust()'s path. */
-export function bustLite(x: number, y: number, h: number, hood: boolean, lean = 1): string {
-  const sw = 0.33 * h;
-  const r = 0.2 * h;
-  const hy = y - h + r + (hood ? 0.05 * h : 0);
-  const sh = y - 0.5 * h;
-  let d = `M${f1(x - sw)} ${f1(y)}V${f1(sh + 0.14 * h)}Q${f1(x - sw)} ${f1(sh - 0.03 * h)} ${f1(x)} ${f1(sh - 0.03 * h)}Q${f1(x + sw)} ${f1(sh - 0.03 * h)} ${f1(x + sw)} ${f1(sh + 0.14 * h)}V${f1(y)}Z`;
-  d += `M${f1(x - r)} ${f1(hy)}A${f1(r)} ${f1(r)} 0 1 1 ${f1(x + r)} ${f1(hy)}A${f1(r)} ${f1(r * 1.15)} 0 1 1 ${f1(x - r)} ${f1(hy)}Z`;
-  if (hood) d += `M${f1(x - r * 0.75)} ${f1(hy - r * 0.55)}L${f1(x + lean * r * 0.3)} ${f1(hy - r * 1.45)}L${f1(x + r * 0.75)} ${f1(hy - r * 0.55)}Z`;
-  return d;
+/** One closed path (coat + head) for the fill-only uses (the small rattlers). */
+export function bust(x: number, y: number, h: number, hood: boolean, lean = 1): string {
+  const b = bustParts(x, y, h, hood, lean);
+  return b.coat + b.head;
 }
 
-/** bustLite's rim: one thin crescent stroke path (stroke it, rw wide) down the sun side of the head and the shoulder. */
-export function bustLiteRim(x: number, y: number, h: number, s: number): string {
-  const r = 0.2 * h;
-  const hy = y - h + r + 0.025 * h;
-  const sh = y - 0.5 * h;
-  return `M${f1(x + s * r * 0.2)} ${f1(hy - r * 0.95)}Q${f1(x + s * r * 0.95)} ${f1(hy - r * 0.8)} ${f1(x + s * r * 0.92)} ${f1(hy + r * 0.2)}M${f1(x + s * 0.18 * h)} ${f1(sh - 0.01 * h)}Q${f1(x + s * 0.3 * h)} ${f1(sh + 0.01 * h)} ${f1(x + s * 0.31 * h)} ${f1(sh + 0.2 * h)}`;
+/** The sun-side rim of bustParts as a STROKE path (stroke it cream, rw wide): down the sun side `s` of the hood / head
+ *  and the outer shoulder, kept half a stroke inside the silhouette. */
+export function hoodRim(x: number, y: number, h: number, s: number, hood: boolean, rw: number, rot = 0): string {
+  const c = Math.cos((rot * Math.PI) / 180);
+  const sn = Math.sin((rot * Math.PI) / 180);
+  const o = (-s * rw * 0.5) / h;
+  const P = (dx: number, dy: number) => {
+    const u = (dx + o) * h;
+    const v = -dy * h;
+    return `${f1(x + u * c - v * sn)} ${f1(y + u * sn + v * c)}`;
+  };
+  const top = hood ? `M${P(s * 0.11, 1.06)}Q${P(s * 0.265, 0.88)} ${P(s * 0.21, 0.5)}` : `M${P(s * 0.03, 0.98)}Q${P(s * 0.2, 0.96)} ${P(s * 0.19, 0.74)}`;
+  return top + `M${P(s * 0.17, 0.52)}Q${P(s * 0.33, 0.5)} ${P(s * 0.33, 0.3)}`;
+}
+
+/** A REACHING arm (A1 fix round 1: replaces the straight raised arms that read as cheering): from the shoulder on side s
+ *  out and forward-up at ~40 deg toward the dome / the city (a stroke path; `k` < 1 pulls it in). */
+export function armReach(x: number, y: number, h: number, s: number, k = 1, rot = 0): string {
+  const c = Math.cos((rot * Math.PI) / 180);
+  const sn = Math.sin((rot * Math.PI) / 180);
+  const P = (dx: number, dy: number) => {
+    const u = dx * h;
+    const v = -dy * h;
+    return `${f1(x + u * c - v * sn)} ${f1(y + u * sn + v * c)}`;
+  };
+  return `M${P(s * 0.22, 0.46)}L${P(s * (0.22 + 0.2 * k), 0.46 + 0.1 * k)}L${P(s * (0.22 + 0.36 * k), 0.46 + 0.3 * k)}`;
 }
 
 /** The bust's rim strip (rw wide) on side s (+1 right, -1 left): around the head / hood and down the outer shoulder. */
