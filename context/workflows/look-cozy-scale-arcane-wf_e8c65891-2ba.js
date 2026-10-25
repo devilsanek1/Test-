@@ -1,0 +1,41 @@
+export const meta = {
+  name: 'look-cozy-scale-arcane',
+  description: 'Look research: enclosure/coziness and Arcane-style scale camera grammar for 9:16, with 2D recipes, a kit audit, an Arcane clip list for the owner; synthesis into COZY_AND_SCALE.md + critic',
+  phases: [
+    { title: 'Research', detail: '5 lanes: enclosure, coziness, Arcane camera, vertical short-form, kit audit' },
+    { title: 'Synthesis', detail: 'docs/look/COZY_AND_SCALE.md' },
+    { title: 'Critic', detail: 'is it usable at G3/G4/G5 and true to the sources' },
+  ],
+}
+
+const ROOT = '/home/user/Test-/video'
+const LOOK = ROOT + '/docs/look'
+const OUT = LOOK + '/research'
+const CTX = `Context: today is 2026-10-25. We make 30-45 s vertical (1080x1920) explainers for "What's All the Fuss About?", drawn in hand-drawn ink with flat colour, built in Remotion (2D, SVG layers, our own camera kit). The owner wants two visual twists: (1) SCALE: occasional moments that make the viewer feel small, inspired by Arcane's camera work and staging (not its footage); they liked v1's scale scenes; (2) COZINESS through a "sense of enclosure": framed, street-like or room-like spaces whose walls hold the subject (their reference image: ${LOOK}/ref_sense_of_enclosure.jpg, an urban-design reel; the Arcane reference collage: ${ROOT}/assets/ref_cinematic/arcane_collage.jpg). The next video (v3, "AI is making your next laptop pricier") already plans a cozy desk nook at night (bookshelf, frosty window, lamp pool) with an AI data center outside the window, and a scale moment pulling back to the data center rising tower-tall. Our existing cinematic kit is documented in ${ROOT}/docs/CINE.md and ${ROOT}/docs/style_bible_ref2.md (read only the sections you need). Use WebSearch (load with ToolSearch "select:WebSearch,WebFetch") and cite sources with URLs; mark claims VERIFIED / REPORTED / UNCERTAIN. Never download or reproduce copyrighted footage; describe shots in words. Don't commit.`
+
+const LANES = [
+  { key: 'enclosure', brief: `The urban-design and architecture science of a "sense of enclosure": height-to-width ratios (1:1, 1:2, 1:3, 1:4 and what each feels like), Maertens' viewing angles (45°/27°/18°), Gordon Cullen's Townscape (serial vision, "here and there"), Camillo Sitte, Christopher Alexander's A Pattern Language (e.g. positive outdoor space, window place, alcoves, light on two sides), Ewing & Handy's measured urban design qualities (enclosure, human scale), prospect-refuge theory (Appleton). Turn each into a concrete framing rule for a 9:16 drawn shot (where walls sit in the frame, how much sky, what the viewer stands in), with numbers.` },
+  { key: 'coziness', brief: `The psychology and design of coziness: hygge research, Project Horseshoe's 2017 "Coziness in games" report (its components: safety, abundance, softness, the threat outside), Studio Ghibli interiors and other animation that feels cozy, warm light pools against a cold outside, small-scale clutter and textures, rain/snow outside a window, the "lit window at night" effect. Turn it into concrete rules for drawn shots: palette temperature contrast, light shapes, object density, framing, sound (room tone, rain), and how coziness can sit next to a serious topic without trivialising it.` },
+  { key: 'arcane', brief: `Arcane's (Fortiche, Netflix 2021/2024) camera grammar of scale, from interviews, behind-the-scenes, cinematography and storyboard breakdowns, and analysis articles/videos (summaries): crane and drone-like reveals of Piltover/Zaun, low angles on towers, tiny figures against huge architecture, haze and atmospheric depth, multiplane parallax, slow pushes, how the camera settles, shot lengths and the rhythm between intimate close-ups and huge wides, colour (warm vs cold districts), and how they mix 2D and 3D. For each technique: a 2D recipe we can build (layers, parallax ratios, camera path, easing, duration ranges, haze). ALSO produce a "clip list for the owner": 8-12 specific Arcane moments (season, episode, approximate scene description, and timestamp only if a source gives one) that best show these moves, so the owner can screen-record 10-40 s clips for us to measure frame by frame.` },
+  { key: 'vertical', brief: `Cozy and scale in 9:16 short-form: how vertical framing changes scale (tall walls, towers, looking up, stacking foreground/background), what top animated explainer and short-form creators do for scale on TikTok/Reels/Shorts, readability at phone size and with platform UI overlays (caption band, right-side buttons, bottom text), how long a scale move can last before retention drops, and how to use these moments respectfully on serious topics. Concrete do/don't rules with numbers where sources give them.` },
+  { key: 'audit', brief: `Audit our own kit and v1's scale scenes for cozy + scale. Read ${ROOT}/docs/CINE.md, ${ROOT}/docs/ENGINE.md, ${ROOT}/docs/style_bible_ref2.md and skim ${ROOT}/src/lib/cine/ and ${ROOT}/src/lib/ShotCam.tsx (file headers and exports only; don't render anything). List what exists (camera moves, parallax, haze, scale props, light) with file paths and how to call them, which v1 scenes used scale and how (from docs/scenes/ notes), and what's MISSING to do enclosure framing, warm light pools, a cozy interior set, and Arcane-style crane/tower reveals in 9:16. End with a prioritised build list (each item: what, why, rough effort).` },
+]
+
+phase('Research')
+const res = await parallel(LANES.map(l => () => agent(
+  `${CTX}\n\nYour lane: ${l.brief}\n\nWrite ${OUT}/${l.key}.md (max ~150 lines, grouped, sources with URLs and tags). Return at most 10 lines: the most useful rules or findings.`,
+  { label: `research:${l.key}`, phase: 'Research' })))
+const ok = LANES.filter((l, i) => res[i]).map(l => `${OUT}/${l.key}.md`)
+log(`lanes done: ${ok.length}/5`)
+
+phase('Synthesis')
+const synth = await agent(
+  `${CTX}\n\nYou are the look director. Read the research files: ${ok.join(', ')}.\n\nWrite ${LOOK}/COZY_AND_SCALE.md, the rulebook the storyboard (G3), look (G4) and blocking (G5) gates will use. Keep it tight (max ~170 lines), concrete and numeric:\n1. Principles (5-8 lines): what coziness and scale mean for us, and the rhythm between them (cozy holds the viewer, scale makes them feel the stakes; how often a scale moment, how long).\n2. Enclosure framing rules for 9:16 (ratios, angles, where walls/edges sit, sky share, foreground frames), with tiny ASCII thumbnails if helpful.\n3. Cozy rules (light pools, temperature contrast, density, sound).\n4. Scale shot grammar: a numbered library of 6-10 shots/moves inspired by Arcane (name, what it does emotionally, 2D recipe: layers, parallax ratios, camera path, easing, duration, haze), each marked EXISTS in our kit (with the file) or TO BUILD.\n5. Vertical short-form rules (readability, UI-safe zones, duration limits).\n6. How it applies to v3 (the nook frame 0, the data-center scale pull-back, the cozy ending), shot by shot in 5-8 lines.\n7. Build list for G3-G5 (prioritised).\n8. The Arcane clip list for the owner (from the arcane lane), and what we'll measure from each clip (camera curves, easing, parallax, framing, shot length).\nCite sources inline briefly. Return at most 10 lines.`,
+  { label: 'look-director', phase: 'Synthesis' })
+
+phase('Critic')
+const crit = await agent(
+  `${CTX}\n\nYou are a sceptical animation director and a fact-checker in one. Read ${LOOK}/COZY_AND_SCALE.md and spot-check it against the research files ${ok.join(', ')}. Fix in place: claims the sources don't support, rules too vague to build (add numbers or cut them), recipes our 2D kit can't do as written, anything that would hurt readability at phone size, and contradictions with the owner's rules (no paper edge at the top of the frame, pop captions, scale only occasionally). Keep it under ~170 lines. Return at most 8 lines: what you changed.`,
+  { label: 'critic', phase: 'Critic' })
+
+return { lanes: res.map((r, i) => r && { lane: LANES[i].key, summary: r }), synthesis: synth, critic: crit }
