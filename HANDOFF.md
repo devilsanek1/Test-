@@ -85,6 +85,15 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Next:** show the owner the top 3 angles on one screen. After their pick, G1 is a radio cut (TTS voice over plain
   paper with big captions) with 3 hook variants.
 
+## 2b. Update 2026-10-25 20:00 UTC: two agents, split by video
+
+- **Video 2 (Google DeepMind resignations) is produced by ANOTHER agent.** This session does not touch `video/docs/v2/`
+  or the v2 queue item below.
+- **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
+  scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
+  `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
+- Both push to `video-production`: pull before pushing, and keep each video's files in its own `docs/vN/` folder.
+
 ## 3. The queue (in order) at handoff
 
 1. **PAUSED by the owner at 2026-10-25 ~20:15 UTC (stopped before any agent finished; nothing produced). Relaunch the v2 G0 workflow from `context/workflows/v2-g0-angles-wf_b7b190a7-4fe.js` when the owner says go;** output `video/docs/v2/G0_ANGLES.md`. Present the top 3; the owner picks.
