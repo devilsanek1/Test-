@@ -77,9 +77,12 @@ const DISC_R = 58;
  *  callout with Bit's hop into the socket (same 0.2 s in-out sine: the hot spot follows the bug), stays peach through
  *  the build (the bug's hot spot, rhyming with the caption highlight) and turns WHITE on 'out' (`whiteAt`, with the
  *  found ring): the 'found' flash (a 1-frame x 1.08 pop, merging with the callout glow). */
-export const SheetLock: React.FC<{from?: DiscSpot; moveAt?: number; moveDur?: number; whiteAt?: number}> = ({from, moveAt = 0, moveDur = 0.2, whiteAt = 0}) => {
+export const SheetLock: React.FC<{from?: DiscSpot; moveAt?: number; moveDur?: number; whiteAt?: number; whiteFor?: number}> = ({from, moveAt = 0, moveDur = 0.2, whiteAt = 0, whiteFor = Infinity}) => {
   const t = useTime();
-  const white = t >= whiteAt;
+  // final polish (review: the disc stayed white from 'out' on, so the found lock lost its warm accent through 'how bad'):
+  // the white is a FLASH (`whiteFor`, 3 frames inside the callout glow), then the disc is peach again: the found lock
+  // stays the warmest spot on the plan through 'bad'
+  const white = t >= whiteAt && t < whiteAt + whiteFor;
   const pop = white && t < whiteAt + 1 / 30 ? 1.08 : 1;
   const u = from ? E.inOutSine(prog(t, moveAt, moveDur)) : 1;
   const cx = from ? lerp(from.x, L.x, u) : L.x;
@@ -133,27 +136,42 @@ export const CalloutGlow: React.FC<{at: number; stepAt: number}> = ({at, stepAt}
  *  free edge grows taller (+9 -> +20 world: it comes toward us), and a cream DOOR-THICKNESS strip (12 world) runs along
  *  the free edge on the gap side, so 'opened' reads from the leaf itself. */
 const LEAF = {x0: 488, x1: 624, y0: 818, y1: 1168};
-const SWING = {narrow: 0.64, grow: 20, dur: 0.2, thick: 12};
+/** Final polish (review major: the 35 world tealDark gap ran through the found ring and the callout as a solid slab: with
+ *  the ring it read as a crosshair / pause glyph, the darkest shape on the plan): the leaf narrows less (0.72: the gap
+ *  is ~26 world, ~60 % of the old one) and its edges angle toward us in the film's LOW angle: the top edge ~10 deg (the
+ *  free edge's top 18 world higher over the 98 world leaf), the bottom edge, near the eye line, only ~3.5 deg (6 world:
+ *  it also keeps clear of awake Pip's ears on the rail below); the thickness strip is 10 world. */
+const SWING = {narrow: 0.72, grow: 18, growBot: 6, dur: 0.2, thick: 10};
+/** The found ring's footprint (FoundRing r92: ~97-104 world across x, ~87-94 in y, rotated -10 deg) + a margin: the
+ *  gap's flat fill stays OUTSIDE it (only its hatch crosses the ring). */
+const RING_HOLE = {rx: 106, ry: 100};
 /** Swing amount at t: 0 (shut) .. 1 (ajar), a 0.2 s out-back (the leaf knocks open a touch past and settles). */
 export const swingAt = (t: number, at: number) => (t < at ? 0 : E.outBack(1.6)(prog(t, at, SWING.dur)));
 
 /** The leaf's map at swing q: x narrows toward the hinge, the free edge grows taller (it comes toward us). */
 function leafMap(q: number) {
   const k = 1 - (1 - SWING.narrow) * q;
-  const d = SWING.grow * q;
   const yc = (LEAF.y0 + LEAF.y1) / 2;
   const hy = (LEAF.y1 - LEAF.y0) / 2;
   return (x: number, y: number): Pt => {
     const u = (LEAF.x1 - x) / (LEAF.x1 - LEAF.x0);
+    const d = (y < yc ? SWING.grow : SWING.growBot) * q;
     return [LEAF.x1 - (LEAF.x1 - x) * k, y + ((y - yc) / hy) * d * u];
   };
 }
 const quad = (m: (x: number, y: number) => Pt, r: [number, number, number, number]): Pt[] => [m(r[0], r[1]), m(r[0] + r[2], r[1]), m(r[0] + r[2], r[1] + r[3]), m(r[0], r[1] + r[3])];
 const quadInk = (P: Pt[], seed: string) => P.map((p, i) => line(p[0], p[1], P[(i + 1) % 4][0], P[(i + 1) % 4][1], {seed: `${seed}${i}`, over: 3})).join('');
 
-/** 'bad', after the bolt clears: the plan's right door leaf swings ajar (narrowed, its free edge taller) and the
- *  opening behind it shows as ONE flat tealDark gap (~33 world = 37 px on screen) from the mullion to the free edge,
- *  above and below the callout. It stays open. */
+/** Short diagonal hatch strokes (a cluster of n, 45 deg, `gap` apart) inside the vertical strip x0..x1 from y. */
+const hatchCluster = (x0: number, x1: number, y: number, n: number, gap = 9) =>
+  Array.from({length: n}, (_, i) => `M${(x0 + 1.5).toFixed(1)} ${(y + i * gap + (x1 - x0) - 3).toFixed(1)}L${(x1 - 1.5).toFixed(1)} ${(y + i * gap).toFixed(1)}`).join('');
+
+/** 'bad', after the bolt clears: the plan's right door leaf swings ajar (narrowed, its top and bottom edges angled toward
+ *  us, a cream thickness strip on its free edge) and the opening behind it shows the way the plan draws a void (final
+ *  polish, review major): a flat palette.bg strip (one step under the paper) from the mullion to the thickness strip,
+ *  ~26 world wide, with clusters of short inkHair hatch strokes. The flat fill stops OUTSIDE the found ring (only the
+ *  hatch crosses it; the callout disc covers the middle), so the ring and the gap no longer form a crosshair. A threshold
+ *  tick under the opening says 'door, opened'. It stays open. */
 export const DoorSwing: React.FC<{at: number}> = ({at}) => {
   const t = useTime();
   const q = swingAt(t, at);
@@ -167,17 +185,36 @@ export const DoorSwing: React.FC<{at: number}> = ({at}) => {
   const th = SWING.thick * q;
   const T: Pt[] = [P[0], P[3], [P[3][0] - th, P[3][1] - th * 0.3], [P[0][0] - th, P[0][1] + th * 0.3]];
   const thInk = line(T[2][0], T[2][1], T[3][0], T[3][1], {seed: 's5thI', over: 2}) + line(T[3][0], T[3][1], P[0][0], P[0][1], {seed: 's5thT', over: 1}) + line(T[2][0], T[2][1], P[3][0], P[3][1], {seed: 's5thB', over: 1});
+  // the void: from the mullion to the thickness strip's far edge, minus the found ring's footprint
+  const gx0 = LEAF.x0 + 1.6;
+  const gx1 = Math.max(gx0 + 1, Math.min(T[2][0], T[3][0]) + 0.5);
+  const gy0 = LEAF.y0 + 1.6;
+  const gy1 = LEAF.y1 - 1.6;
+  const {rx, ry} = RING_HOLE;
+  // the strip above and below the ring's footprint (its cut edges follow the ellipse: the gap is narrow, so a chord)
+  const ey = (x: number) => ry * Math.sqrt(Math.max(0, 1 - ((x - L.x) / rx) ** 2));
+  const strip = polyPath([[gx0, gy0], [gx1, gy0], [gx1, L.y - ey(gx1)], [gx0, L.y - ey(gx0)]]) + polyPath([[gx0, L.y + ey(gx0)], [gx1, L.y + ey(gx1)], [gx1, gy1], [gx0, gy1]]);
+  const hatch = gx1 - gx0 > 6 ? hatchCluster(gx0, gx1, gy0 + 8, 3) + hatchCluster(gx0, gx1, L.y - 82, 2) + hatchCluster(gx0, gx1, L.y + 64, 2) + hatchCluster(gx0, gx1, gy1 - 62, 4) : '';
+  // the threshold tick under the opening only (the sill line + two end ticks, from the mullion to past the leaf's foot;
+  // it stops short of Pip's ears on the rail below the hinge side)
+  const ty = LEAF.y1 + 6;
+  const tx1 = P[3][0] + 14;
+  const tick = `M${LEAF.x0 + 3} ${ty}H${tx1.toFixed(1)}M${LEAF.x0 + 3} ${ty - 5}V${ty + 4}M${tx1.toFixed(1)} ${ty - 5}V${ty + 4}`;
   return (
     <>
-      {/* the dark opening (inside the frame lines: the lintel, sill and right jamb stay the set's) */}
-      <Fill d={rectPath(LEAF.x0 + 1.6, LEAF.y0 + 1.6, LEAF.x1 - LEAF.x0 - 3.6, LEAF.y1 - LEAF.y0 - 3.2)} color={palette.tealDark} offset={false} mode="none" seed="s5gap" />
+      {/* the opening (inside the frame lines: the lintel, sill and right jamb stay the set's): the paper first (it hides
+          the shut leaf's lines), then the void's flat strip outside the ring */}
+      <Fill d={rectPath(gx0, gy0, LEAF.x1 - LEAF.x0 - 3.6, gy1 - gy0)} color={PAPER} offset={false} mode="none" seed="s5gapP" />
+      <Fill d={strip} color={palette.bg} offset={false} mode="none" seed="s5gap" />
+      {hatch ? <Ink d={hatch} width={SI.hair} taper={false} vary={0} seed="s5gapH" /> : null}
       {/* the leaf, swung toward us, and its thickness */}
       <Fill d={polyPath(P)} color={PAPER} offset={false} mode="none" seed="s5leafF" />
       <Fill d={polyPath(lr)} color={palette.cream} offset={false} mode="none" seed="s5leafP" />
       {th > 0.5 ? <Fill d={polyPath(T)} color={palette.cream} offset={false} mode="none" seed="s5thF" /> : null}
-      <Ink d={quadInk(P, 's5lf')} width={SI.far} taper={false} seed="s5leafI" />
+      <Ink d={quadInk(P, 's5lf')} width={SI.mid} taper={false} seed="s5leafI" />
       {th > 0.5 ? <Ink d={thInk} width={SI.far} taper={false} seed="s5thK" /> : null}
       <Ink d={quadInk(ur, 's5ur') + quadInk(lr, 's5lr')} width={SI.far} taper={false} seed="s5leafJ" />
+      {q > 0.6 ? <Ink d={tick} width={SI.far} taper={false} vary={0} seed="s5thr" /> : null}
     </>
   );
 };

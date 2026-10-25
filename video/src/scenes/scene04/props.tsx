@@ -87,6 +87,7 @@ export const SeasonIvy: React.FC<{steps: {t: number; n: number}[]; seasons: {t: 
   // a bare step: the leaves still on the vine keep the season before's tones until their wave lets go
   const tones = IVY_TONES[bare ? prevSeason : season];
   let twigs = '';
+  let buds = '';
   // settled leaves are drawn NODE BY NODE (that node's two fills, then its ink), from the root up: a nearer / newer
   // leaf's fill covers the outline of the one under it (fix round 1: one batched ink pass let back outlines show through)
   const settled: React.ReactNode[] = [];
@@ -106,13 +107,16 @@ export const SeasonIvy: React.FC<{steps: {t: number; n: number}[]; seasons: {t: 
       const j = `${i}${side}`;
       const a = dir + side * (62 + rand(seed, `a${j}`) * 26);
       const sz = 15 + rand(seed, `s${j}`) * 6 + (i < 4 ? 3 : 0);
-      if (bare && (i + (side > 0 ? 1 : 0)) % 2 === 0) {
-        const rr = (a * Math.PI) / 180;
-        twigs += `M${p[0].toFixed(1)} ${p[1].toFixed(1)}l${(Math.cos(rr) * 7).toFixed(1)} ${(Math.sin(rr) * 7).toFixed(1)}`;
+      if (bare) {
+        // A1 fix round 2 (the bare vine's short straight spurs read as barbed wire): on every other leaf spot a
+        // tendril that HOOKS back into a small curl, on the others a bud dot
+        if ((i + (side > 0 ? 1 : 0)) % 2 === 0) twigs += tendril(p, a, side);
+        else buds += bud(p, a);
       }
       if (!tones || t < start) continue;
-      // a bare step: the falling four are IvyDrops'; the rest let go in two waves (odd leaves two frames later)
-      if (bare && (isDrop(i, side) || t >= ts + ((i + (side > 0 ? 1 : 0)) % 2 ? 2 * FRAME : 0))) continue;
+      // a bare step: the falling four are IvyDrops'; the rest let go in two waves (odd leaves two frames later),
+      // except the few that cling on at the lintel (winter ivy keeps a leaf or two)
+      if (bare && (isDrop(i, side) || (!isCling(i, side) && t >= ts + ((i + (side > 0 ? 1 : 0)) % 2 ? 2 * FRAME : 0)))) continue;
       const L = leafD(p, a, sz);
       const useA = (i + (side > 0 ? 0 : 1)) % 2 === 0;
       if (q < 1) {
@@ -139,7 +143,9 @@ export const SeasonIvy: React.FC<{steps: {t: number; n: number}[]; seasons: {t: 
   });
   return (
     <>
-      <Ink d={vine + twigs} width={2.2} taper={false} seed={`${seed}/vine`} />
+      <Ink d={vine} width={2.2} taper={false} seed={`${seed}/vine`} />
+      {twigs ? <Ink d={twigs} width={1.25} taper={false} seed={`${seed}/tendrils`} /> : null}
+      {buds ? <Fill d={buds} color={palette.ink} offset={false} mode="none" seed={`${seed}/buds`} /> : null}
       {settled}
       {popping}
       <IvyDrops seasons={seasons} n={n} seed={seed} />
@@ -157,6 +163,30 @@ const IVY_DROPS: [number, number][] = [
   [13, -1],
 ];
 const isDrop = (i: number, side: number) => IVY_DROPS.some(([di, ds]) => di === i && ds === side);
+/** The leaves that CLING on through a bare step (A1 fix round 2): three on the lintel (node, side), none of them a drop;
+ *  on the first bare step only node 12 exists, by the last (the cut) all three. They keep the season before's tones (tan). */
+const IVY_CLING: [number, number][] = [
+  [12, 1],
+  [15, -1],
+  [17, 1],
+];
+const isCling = (i: number, side: number) => IVY_CLING.some(([ci, cs]) => ci === i && cs === side);
+
+/** A bare-vine tendril at node p along angle a (deg): a short stem that hooks back into a small curl (toward `side`). */
+function tendril(p: Pt, a: number, side: number): string {
+  const r = (a * Math.PI) / 180;
+  const u: Pt = [Math.cos(r), Math.sin(r)];
+  const v: Pt = [-u[1] * side, u[0] * side];
+  const P = (s: number, q: number) => `${(p[0] + u[0] * s + v[0] * q).toFixed(1)} ${(p[1] + u[1] * s + v[1] * q).toFixed(1)}`;
+  return `M${P(0, 0)}C${P(4, 0)} ${P(8, -0.6)} ${P(9.5, 2.2)}C${P(10.6, 4.8)} ${P(7.2, 6.4)} ${P(6.2, 4.1)}C${P(5.6, 2.8)} ${P(7.2, 2.2)} ${P(7.8, 3.2)}`;
+}
+/** A bare-vine bud: a small dot a little way out along angle a. */
+function bud(p: Pt, a: number): string {
+  const r = (a * Math.PI) / 180;
+  const cx = p[0] + Math.cos(r) * 4.2;
+  const cy = p[1] + Math.sin(r) * 4.2;
+  return `M${(cx - 1.7).toFixed(1)} ${cy.toFixed(1)}a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0Z`;
+}
 /** A leaf drop's flight (s). */
 const DROP_LIFE = 0.2;
 
@@ -256,7 +286,9 @@ function yearScribble(cx: number, cy: number, ww: number, a: number, year: numbe
  *  'year' on it (no numerals), twelve separate month blocks (3 x 4, with gaps), each a small box with a sand title strip;
  *  `curl` = the dog-ear on its bottom-right corner (the pad's top page). */
 const YearPage: React.FC<{w: number; h: number; seed: string; year: number; curl?: boolean}> = ({w, h, seed, year, curl = false}) => {
-  const band = h * 0.13;
+  // A1 fix round 2: a bolder header (taller band, the scribbled year twice as heavy) so a page reads as a YEAR page at a
+  // glance, at phone size, without numerals
+  const band = h * 0.17;
   const mx = w * 0.08;
   const gx = w * 0.05;
   const top = band + h * 0.07;
@@ -280,7 +312,7 @@ const YearPage: React.FC<{w: number; h: number; seed: string; year: number; curl
       <Fill d={rectPath(0, 0, w, band)} color={palette.tan} offset={false} mode="none" seed={`${seed}/b`} />
       <Fill d={strips} color={palette.sand} offset={false} mode="none" seed={`${seed}/s`} />
       <Ink d={boxes} width={1.1} taper={false} seed={`${seed}/g`} />
-      <Ink d={yearScribble(w / 2, band * 0.6, w * 0.5, band * 0.4, year)} width={1.3} taper={false} seed={`${seed}/yr${year % 4}`} />
+      <Ink d={yearScribble(w / 2, band * 0.62, w * 0.56, band * 0.42, year)} width={2.6} taper={false} seed={`${seed}/yr${year % 4}`} />
       <Ink d={`M0 ${band.toFixed(1)}H${w}M0 0H${w}V${curl ? h - ce : h}${curl ? `M${w - ce} ${h}` : ''}H0Z`} width={CAL_INK * 0.8} taper={false} seed={`${seed}/o`} />
       {curl ? (
         <>
@@ -423,9 +455,14 @@ function LiftPose({i, seed}: {i: number; seed: string}) {
 
 /** The torn pages (fix round 2: the old flip laid a blank 145 x 95 px lid over the calendar on almost every frame).
  *  Each tear: ONE frame of the page lifted over the binding (`LiftPose`, fix round 3: the page front, wider at its free
- *  top edge, two alternating poses); from the next frame the page is off the pad, front out (its year grid and
- *  scribbled year), fluttering up and a little right while it shrinks away. Nothing ever covers the next page's title
- *  band. None is left in the air when the dive starts (`until`). */
+ *  top edge, two alternating poses); from the next frame the page is off the pad, front out (its year grid and its
+ *  bold scribbled year), BLOWN TOWARD THE LENS (A1 fix round 2: they used to shrink to nothing in a ~450 x 400 px patch
+ *  round the door, 'papers fluttering by a door' at phone size): it GROWS 1.0x -> 1.3x while it flutters up and out
+ *  over the wall right of the door, the fourteen pages fanning out (each its own direction, up-right through right:
+ *  screen x ~600-900, y ~900-1250, well under the caption band), then turns EDGE-ON over its last two frames (paper
+ *  turning away; no fade, no one-frame vanish). Nothing ever covers the next page's title band. None is left in the air
+ *  when the dive starts (`until`). */
+const FLY_FAN = [-28, -62, -12, -46, 4, -36, -70, -20, -54, -4, -40, -66, -16, -50];
 export const YearFlyers: React.FC<{tears: number[]; until: number; life?: number; seed?: string}> = ({tears, until, life = 0.32, seed = 's4fly'}) => {
   const t = useTime();
   const w = CAL[2];
@@ -440,15 +477,17 @@ export const YearFlyers: React.FC<{tears: number[]; until: number; life?: number
       out.push(<LiftPose key={i} i={i} seed={seed} />);
       return;
     }
-    // (the last tears' flights are compressed so they finish their fly-off by `until`, not cut mid-air)
+    // (the last tears' flights are compressed so they finish by `until`, not cut mid-air)
     const q = (t - ta - FRAME) / (end - ta - FRAME);
-    // off the pad, front out: from just above the header, up and a little right, shrinking away, fluttering
-    const cx = CAL[0] + w / 2 + 4 + lerp(0, 26 + r('x') * 48, E.outCubic(q));
-    const cy = bind - 34 - lerp(0, 46 + r('y') * 40, E.outQuad(q)) + 16 * q * q;
-    const rot = (r('r') - 0.4) * 36 * q + 7 * Math.sin(q * 9 + r('p') * 6);
-    // A1 fix round: it shrinks to nothing over its last two frames (it used to be removed at 0.30 in one frame)
-    const sc = (0.72 - 0.42 * E.outQuad(q)) * Math.min(1, (end - t) / (2 * FRAME));
-    const fl = 0.55 + 0.4 * Math.abs(Math.sin(q * 7 + 0.4 + r('f') * 2));
+    // off the pad, front out: from just above the header, out along this page's fan direction, growing toward the lens
+    const ang = ((FLY_FAN[i % FLY_FAN.length] + (r('a') - 0.5) * 8) * Math.PI) / 180;
+    const dist = (88 + r('d') * 42) * E.outCubic(q);
+    const cx = CAL[0] + w / 2 + 10 + Math.cos(ang) * dist + 4 * Math.sin(q * 8 + r('p') * 6);
+    const cy = bind - 50 + Math.sin(ang) * dist - 10 * E.outQuad(q);
+    const rot = (r('r') - 0.4) * 30 * q + 6 * Math.sin(q * 9 + r('p') * 6);
+    const sc = 0.82 * (1 + 0.3 * E.inOutSine(q));
+    // the flutter (the page tilting about its long axis) and, over the last two frames, edge-on
+    const fl = (0.6 + 0.35 * Math.abs(Math.sin(q * 7 + 0.4 + r('f') * 2))) * Math.min(1, (end - t) / (2 * FRAME));
     out.push(
       <XG key={i} m={mat.compose(mat.translate(cx, cy), mat.rotate(rot), mat.scale(sc, sc * fl), mat.translate(-w / 2, -h / 2))}>
         <YearPage w={w} h={h} seed={`${seed}/${i % 3}`} year={i} />

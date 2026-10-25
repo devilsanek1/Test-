@@ -110,9 +110,9 @@ const CITIZEN_ORDER = S01_CITIZENS.map((c, i) => [c.y, i] as [number, number]).s
  *  the padlocks pop (3.30-3.70). */
 const PG = PLAZA.pigeons;
 export const S01_PIGEONS: PigeonPlan[] = [
-  {x: PG[0][0], y: PG[0][1], seed: 'pg0', color: palette.brown, landAt: 0.12, inDur: B.pigeonsLand - 0.12, fromAbs: [-70, 1180], via: [220, 1090], flyAt: B.pigeonsFly, flyTo: [-300, -250], backAt: B.pigeonBack, backFrom: [-150, -250]},
-  {x: PG[1][0], y: PG[1][1], seed: 'pg1', color: palette.brown, landAt: 0.17, inDur: B.pigeonsLand + 0.06 - 0.17, fromAbs: [-70, 1232], via: [250, 1124], shuffleAt: B.shuffle, shuffleDx: -10, flyAt: B.pigeonsFly + 0.05, flyTo: [-330, -330]},
-  {x: PG[2][0], y: PG[2][1], seed: 'pg2', color: palette.brown, flip: true, landAt: 0.22, inDur: B.pigeonsLand + 0.12 - 0.22, fromAbs: [-70, 1150], via: [285, 1066], flyAt: B.pigeonsFly + 0.1, flyTo: [-360, -290]},
+  {x: PG[0][0], y: PG[0][1], seed: 'pg0', color: palette.cream, landAt: 0.12, inDur: B.pigeonsLand - 0.12, fromAbs: [-70, 1180], via: [220, 1090], flyAt: B.pigeonsFly, flyTo: [-300, -250], backAt: B.pigeonBack, backFrom: [-150, -250]},
+  {x: PG[1][0], y: PG[1][1], seed: 'pg1', color: palette.cream, landAt: 0.17, inDur: B.pigeonsLand + 0.06 - 0.17, fromAbs: [-70, 1232], via: [250, 1124], shuffleAt: B.shuffle, shuffleDx: -10, flyAt: B.pigeonsFly + 0.05, flyTo: [-330, -330]},
+  {x: PG[2][0], y: PG[2][1], seed: 'pg2', color: palette.cream, flip: true, landAt: 0.22, inDur: B.pigeonsLand + 0.12 - 0.22, fromAbs: [-70, 1150], via: [285, 1066], flyAt: B.pigeonsFly + 0.1, flyTo: [-360, -290]},
 ];
 
 // ---------------------------------------------------------------- Pip (frame 0: sit-back, look 0, seed 11, idle clock t = 0)

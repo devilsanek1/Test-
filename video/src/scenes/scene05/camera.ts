@@ -6,8 +6,8 @@
 //                            (x 0.68 per frame); the lock on Main's first S05 frame is S04's last-frame size (~60 px).
 //                            y has its OWN zero-velocity ease (fix round 3): 960 -> 940 in-out(sine) over 0.05 -> 0.65
 //                            s, so the lock (world y 960) holds its screen spot through the match; peak ~1.2 px/frame.
-//                            The 20 world px rise (fix round 2) puts the cornice ink at screen >= 585, under the caption
-//                            band (ENGINE 10)
+//                            The 20 world px rise (fix round 2) puts the cornice ink at screen ~587, under the caption
+//                            band (ENGINE 10; 950 was tried in the final polish and failed the caption check)
 //   +0.40 -> cut(was)-0.30   hold (540, 940, 1.13): locked while the teams, tablets, beams and the ring build
 //   cut(was)-0.30 -> cut     truck-right (540 -> 690, 940, 1.13), in(sine): follows the messenger out of frame right; a
 //                            FIXED 0.30 s ending on the cut, exiting at pi/2 x 150 / 0.30 x 1.13 = ~888 screen px/s
@@ -15,8 +15,8 @@
 // MULTIPLANE (fix round 1): every set layer sees its own camera x = 540 + f x (cam.x - 540) (zoom and y shared, so the
 // t = 0 lock / L5 match and the whole hold are unchanged): the steps plane (teams, messenger, Pip in the air) is the
 // match plane f = 1 (~29.6 px/frame at the cut, = S06's messenger plane), the facade and banner 0.67 (~19.8 px/frame,
-// S06's houses run at 0.6 = ~17), the wing 0.4, the foreground audience 1.12 (fix round 2: ~32 px/frame at the cut, was
-// 1.3 = ~38), the sun 0.05 (screen space, Scene05.tsx).
+// S06's houses run at 0.6 = ~17), the wing 0.4, the foreground audience 1.0 (final polish: its big flat heads strobed at
+// 32.7 px/frame with 1.12; fix round 2: was 1.3 = ~38), the sun 0.05 (screen space, Scene05.tsx).
 
 import {ease as E, lerp, prog} from '../../lib/time';
 import {mat, Mat} from '../../lib/xf';
@@ -32,6 +32,10 @@ export type Cam = {x: number; y: number; zoom: number};
  *  ends at 0.84 /s, scene04/camera.ts), and the lock on Main's first S05 frame is ~60.6 px wide (S04's last: 59 px plus
  *  one frame of its zoom = 60.7). */
 export const K_LAND: Cam = {x: 540, y: 960, zoom: 1.033};
+/** Final polish: a review asked to take back 10-15 px of the y rise (the teams' feet sit at screen ~1559, in the bottom
+ *  UI band) "if the cornice allows". Tried 950: the cornice ink came to ~576 and the caption check failed (f63, the
+ *  'how bad it was.' roll: 8 % of its box under 3:1; f24 warned), so the rise stays 20 world (feet ~1559, foreground
+ *  framing; the key reads are above y 1480). */
 export const K_LOCK: Cam = {x: 540, y: 940, zoom: 1.13};
 export const K_EXIT: Cam = {x: 690, y: 940, zoom: 1.13};
 /** A1 fix round: 0.30 -> 0.40 s with K 5 -> 6.67 (the same per-frame decay), so the landing's residual rate when it
@@ -58,7 +62,7 @@ export function camAt(t: number, end: number): Cam {
 }
 
 /** Parallax factor per BlueprintWall layer (the set's own `n` is a draw order, not a depth: ignored). */
-export const LAYER_F: Record<string, number> = {wing: 0.4, facade: 0.67, banner: 0.67, steps: 1, foreground: 1.12};
+export const LAYER_F: Record<string, number> = {wing: 0.4, facade: 0.67, banner: 0.67, steps: 1, foreground: 1.0};
 
 /** The camera a layer with parallax factor f sees. */
 export const layerCam = (c: Cam, f: number): Cam => ({x: K_LOCK.x + f * (c.x - K_LOCK.x), y: c.y, zoom: c.zoom});

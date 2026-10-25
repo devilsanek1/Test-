@@ -43,7 +43,10 @@ const ABS = {
   //                        big ink sparkle pops above it (+0.02) on its stepped glow disc (+0.08): up as 'AI' is heard
   twinkle: 17.77, //        w58+0.065 'AI' (fix round 4): team A's sparkle twinkles once on the highlight (B 0.07 s later)
   beams: 17.955, //         w58+0.25: two scan beams shoot out and sweep the banner from opposite sides
-  l6: 18.175, //            w59-0.02 'figured' (A1 fix round: was 18.24, legible only from 18.32, 1.45 s to the cut, under the
+  l6: 18.07, //             w58+0.365 'AI': one frame before the storyboard's w58+0.40 (final polish: was w59-0.02 = 18.175,
+  //                        on screen only ~1.55 s of which 1.25 s static; at 18.105 the shared slip's spring was only ~30 %
+  //                        on its 2nd visible frame): ~30 / 55 / 85 % on f46 / f47 / f48, legible by ~18.19, ~1.7 s on
+  //                        screen; it lands with the converge / look pose swaps (18.115). History: A1 fix round: was 18.24, legible only from 18.32, 1.45 s to the cut, under the
   //                        1.5 s label floor; A1 polish: 18.30; fix round 4: was w58+0.40-0.08 = 18.025, before the beams
   //                        found anything): L6 pops as a slip clipped to the banner's top edge as the beams converge
   //                        (narrowing 50 % at 18.225), before the ring (18.475): the label follows the scan; its 2-frame
@@ -68,8 +71,9 @@ const ABS = {
   pull: 19.3, //            w64-0.025 'was.' (fix round 4: was 19.25): the messenger raises the envelope to his right
   //                        shoulder (S06's carry)
   was: 19.325, //           w64 'was.': the messenger pops into his run (3/4-back stride) and starts the dash right
-  bitLeap: 19.34, //        w64+0.015 (fix round 4: was 19.29): Bit leaps from the lock box onto the messenger's collar
-  //                        (0.24 s); the '!' pops off
+  bitLeap: 19.3, //         w64-0.025 (final polish: was 19.34 with a 0.24 s leap, ~70 px / frame, he read as specks;
+  //                        fix round 4: was 19.29): Bit leaps from the lock box onto the messenger's collar (0.33 s, ~48 px
+  //                        / frame); the '!' pops off
   headTurn: 19.45, //       w64+0.125 'was.' (fix round 4: was 19.36, after the run pop): one audience head turns to its
   //                        neighbour (1-frame pose swap, foreground band) as the messenger breaks away
   envelope: 19.425, //      w64+0.10 'was.': the dashed hand retracts

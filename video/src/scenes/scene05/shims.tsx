@@ -115,6 +115,14 @@ export type InvestigatorProps = Frame & {
   chestAt?: number;
   /** A1 polish: trouser colour (the kit's seeded pick otherwise; B1's was ink-black, the darkest block in the frame). */
   legsColor?: string;
+  /** Final polish (review: nothing marked the figures as researchers until the tablets rose): a cream ID CARD on the
+   *  lanyard, worn turned round onto the upper back (the strap a V from the neck to the card: readable from behind),
+   *  >= 12 x 16 world (~14 x 18 px). 'back' (default) | 'pack' (hung from the backpack's top handle) | 'side' (swung
+   *  right of a ponytail) | false. */
+  idCard?: 'back' | 'pack' | 'side' | false;
+  /** Final polish (review: the 'AI' raise read as the tablet appearing): with a `raiseAt`, the tablet is already held at
+   *  chest height from the pop (the chest pose), and the raise LIFTS it from there. */
+  holdChest?: boolean;
 };
 
 /** World centre of an investigator's raised tablet (for beams). */
@@ -218,15 +226,30 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
   const ts = p.tabletSize ?? 60;
   const sh: Pt = [side * g.w * 0.34, -g.h * 0.8];
   const up = liftUp(p.tabletLift, side, g);
-  const down: Pt = [side * g.w * 0.5, -g.h * 0.05];
+  // held at the chest before the raise: the hand comes up from the elbow-out point past the coat's side
+  const down: Pt = p.holdChest ? [side * g.w * 0.6, -g.h * 0.45] : [side * g.w * 0.5, -g.h * 0.05];
   const hand: Pt = [lerp(down[0], up[0], q), lerp(down[1], up[1], q)];
-  const chest = p.chestAt !== undefined && t >= p.chestAt && q > 0.02;
+  const chest = (p.chestAt !== undefined && t >= p.chestAt && q > 0.02) || (!!p.holdChest && p.raiseAt !== undefined && q <= 0.02);
   const by = -g.h * 0.62;
   const shield = `M${-11} ${by - 13}Q0 ${by - 17} 11 ${by - 13}L11 ${by}Q9 ${by + 11} 0 ${by + 16}Q-9 ${by + 11} -11 ${by}Z`;
   // the lanyard: its strap seen from behind, a shallow U round the nape from shoulder-neck to shoulder-neck (~2 px)
   const ny = -g.h;
   const lan = `M${(-g.hr * 0.95).toFixed(1)} ${(ny + g.hr * 0.12).toFixed(1)}Q0 ${(ny + g.hr * 0.62).toFixed(1)} ${(g.hr * 0.95).toFixed(1)} ${(ny + g.hr * 0.12).toFixed(1)}`;
-  const lanOn = p.lanyard ?? (p.hair !== 'long' && !p.ponytail);
+  const card = p.idCard === undefined ? 'back' : p.idCard;
+  const lanOn = !card && (p.lanyard ?? (p.hair !== 'long' && !p.ponytail));
+  // the ID card (world 13 x 17 -> person units): a cream card, a sand photo square, two ink 'text' lines, its lanyard a
+  // V from the neck sides (or, on a backpack, a short loop from the pack's top handle)
+  const cw = 13 / s;
+  const chh = 17 / s;
+  const cardC: Pt | null = !card ? null : card === 'pack' ? [-g.w * 0.08, -g.h * 0.62] : card === 'side' ? [g.w * 0.2, -g.h + g.hr * 1.55] : [0, -g.h + g.hr * 1.45];
+  const cardD = cardC ? roundRect(cardC[0] - cw / 2, cardC[1] - chh / 2, cw, chh, 1.6 / s) : '';
+  const photo = cardC ? roundRect(cardC[0] - cw * 0.3, cardC[1] - chh * 0.32, cw * 0.6, chh * 0.34, 0.8 / s) : '';
+  const cardText = cardC ? `M${(cardC[0] - cw * 0.28).toFixed(1)} ${(cardC[1] + chh * 0.16).toFixed(1)}h${(cw * 0.56).toFixed(1)}M${(cardC[0] - cw * 0.2).toFixed(1)} ${(cardC[1] + chh * 0.32).toFixed(1)}h${(cw * 0.4).toFixed(1)}` : '';
+  const cord = !cardC
+    ? ''
+    : card === 'pack'
+      ? `M${(cardC[0] - cw * 0.2).toFixed(1)} ${(cardC[1] - chh / 2).toFixed(1)}L${(cardC[0] + g.w * 0.02).toFixed(1)} ${(-g.h * 0.8).toFixed(1)}L${(cardC[0] + cw * 0.2).toFixed(1)} ${(cardC[1] - chh / 2).toFixed(1)}`
+      : `M${(-g.hr * 0.8).toFixed(1)} ${(ny + g.hr * 0.1).toFixed(1)}L${(cardC[0] - cw * 0.3).toFixed(1)} ${(cardC[1] - chh / 2).toFixed(1)}M${(g.hr * 0.8).toFixed(1)} ${(ny + g.hr * 0.1).toFixed(1)}L${(cardC[0] + cw * 0.3).toFixed(1)} ${(cardC[1] - chh / 2).toFixed(1)}`;
   const shoesOn = p.shoes ?? true;
   // the ponytail: a tapered tail from the back of the head down over the collar, its tie at the root
   const pt = p.ponytail
@@ -311,6 +334,15 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
         </>
       ) : null}
       {lanOn ? <Ink d={lan} width={W * 0.62} taper={false} seed={`${seed}/lan`} /> : null}
+      {cardC ? (
+        <>
+          <Ink d={cord} width={W * 0.55} taper={false} vary={0} seed={`${seed}/cord`} />
+          <Fill d={cardD} color={palette.cream} offset={false} mode="none" seed={`${seed}/idF`} />
+          <Fill d={photo} color={palette.sand} offset={false} mode="none" seed={`${seed}/idP`} />
+          <Ink d={cardD} width={W * 0.62} taper={false} vary={0} seed={`${seed}/idI`} />
+          <Ink d={cardText} width={W * 0.42} taper={false} vary={0} seed={`${seed}/idT`} />
+        </>
+      ) : null}
       {p.badge ? <Ink d={shield + `M0 ${by - 9}V${by + 9}M-6 ${by - 2}H6`} width={W * 0.75} seed={`${seed}/badge`} /> : null}
       {after}
       {q > 0.02 && !chest ? (

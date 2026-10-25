@@ -12,6 +12,7 @@ import {ElephantTimeline, hop} from '../../lib/mascot';
 import {BLUEPRINT_WALL} from '../shared/sets';
 import {AlertMark, Bit, bitPath, DEPTH_INK, LOCK} from '../shared/props';
 import type {Acc, Hair} from '../../lib/kit';
+import {speedLines} from '../../lib/sketch';
 import type {Pt} from '../../lib/sketch';
 import type {Beats} from './beats';
 import {camAt, layerCam, LAYER_F, toScreen, toWorld} from './camera';
@@ -60,10 +61,11 @@ export const TEAM_A: Member[] = [
   {x: 274, rise: 2, h: 140 * K, seed: 's5a2', body: palette.tan, hair: 'short', hairColor: palette.brown, acc: ['backpack'], tablet: 'right'},
 ];
 /** Fix round 4: team B shifted left (B1 586 -> 548, B3 644 -> 616, B2 702 -> 690) so B1's bigger, higher tablet (held
- *  up and OUT to the left) and its glow clear sleeping Pip's trunk on the rail. */
+ *  up and OUT to the left) and its glow clear sleeping Pip's trunk on the rail. Final polish (review: the glow disc still
+ *  touched Pip's trunk): B1 548 -> 530 (the glow's right edge ~25 px clear of him). */
 export const TEAM_B: Member[] = [
   {x: 616, rise: 1, h: 116 * K, seed: 's5b3', body: palette.tan, hair: 'cap', back: true},
-  {x: 548, rise: 0, h: 128 * K, seed: 's5b1', body: palette.sand, hair: 'short', hairColor: palette.brown, tie: palette.peach, tablet: 'left', legs: palette.tealDark},
+  {x: 530, rise: 0, h: 128 * K, seed: 's5b1', body: palette.sand, hair: 'short', hairColor: palette.brown, tie: palette.peach, tablet: 'left', legs: palette.tealDark},
   {x: 690, rise: 2, h: 136 * K, seed: 's5b2', body: palette.sage, hair: 'short', hairColor: palette.brown, acc: ['strap'], pose: 'hips'},
 ];
 /** Fix round 4: the tablets 1.4 x (60 world wide in the tablet's frame: held landscape = 85 x 60 world, ~96 x 68 px) and
@@ -79,7 +81,10 @@ const tabletOf = (m: Member) => tabletCentre({x: m.x, y: feetOf(m), h: m.h, seed
 
 /** Lean toward the lock on 'how': the TORSO and head only, about the hip line (the legs stay planted): 7 deg with an
  *  out-back overshoot, settled in 0.2 s. */
-const lean = (t: number, at: number, dir: number) => dir * 7 * E.outBack(1.8)(prog(t, at, 0.2));
+const lean = (t: number, at: number, dir: number) => dir * 7 * E.outBack(1.8)(prog(t, at, LEAN_DUR));
+/** Final polish (review: the lean still settled at ~18.845, overlapping the hand's draw-on for 'bad'): 0.16 s from
+ *  'how'-0.12 (the last member +0.04), settled by 18.785, before the '!' (18.79). */
+const LEAN_DUR = 0.16;
 
 /** Pop-up about the feet with no 'pancake' first frame: a uniform 0.6 -> 1 grow (0.16 s out-cubic) with the pop-up
  *  book's scaleY overshoot on top (1.07 -> 1 over the next 0.1 s). Frame 1 is already a whole (small) person. */
@@ -137,6 +142,8 @@ const TeamMember: React.FC<{m: Member; riseAt: number; raiseAt?: number; chestAt
           raiseAt={raiseAt}
           chestAt={raiseAt !== undefined ? chestAt : undefined}
           legsColor={m.legs}
+          idCard={m.acc?.includes('backpack') ? 'pack' : m.tie ? 'side' : 'back'}
+          holdChest={!!m.tablet}
           arm={m.tablet}
           tabletSize={TABLET}
           tabletLift={LIFT}
@@ -176,7 +183,7 @@ const sparkOf = (b: Beats, k: number): Spark => ({
  *  everyone leans in toward the lock (torso + head about the hips), settled before 'bad' (its ONE focal event), and the
  *  two tablets pose-swap down to chest height (A1 polish: the raised white cards and glow discs competed with 'bad'). */
 export const Teams: React.FC<{b: Beats}> = ({b}) => {
-  const lean0 = b.how - 0.1;
+  const lean0 = b.how - 0.12;
   const order = (team: Member[]) => [...team].sort((p, q) => Number(!!q.back) - Number(!!p.back));
   return (
     <>
@@ -221,7 +228,7 @@ export const MessengerDash: React.FC<{b: Beats}> = ({b}) => <MessengerRun b={b} 
  *  moved each far edge ~27 world/frame, and the sweep added to it): the narrowing is driven HERE (w1 170 -> 10 over
  *  NARROW s, in-out sine, from 'figured'-0.04) and the sweep (6 deg) is damped to 0 over the 0.24 s before it starts, so
  *  the two motions never add. */
-const W1 = 170;
+// (the far width during the scan is W1_SCAN below; final polish: was W1 = 170, both beams aimed at the lock)
 const SWEEP = 6;
 /** A1 polish: 0.42 -> 0.30 s (the narrowing was only ~19 % done on 'figured' and finished as the beams retracted: they
  *  never HELD converged). Now 50 % one frame after 'figured' (18.225), done at 18.375, held 0.12 s before the retract
@@ -260,14 +267,39 @@ const LightBeam: React.FC<{from: Pt; to: Pt; w0: number; w1: number; at: number;
   const strips = `M${f(A)}L${f(D)}L${f(P(L, w1 + so, -1))}L${f(P(0, w0 + so, -1))}Z` + `M${f(B)}L${f(C)}L${f(P(L, w1 + so, 1))}L${f(P(0, w0 + so, 1))}Z`;
   const poly = `M${f(A)}L${f(B)}L${f(C)}L${f(D)}Z`;
   const edges = `M${f(A)}L${f(D)}M${f(B)}L${f(C)}`;
+  // final polish (review: each wedge ended mid-plan in a hard slanted cut, a white paper pennant laid on the plan): the
+  // beam ENDS in a flat oval FOOTPRINT of light where it falls on the paper (across the beam w1, along it FOOT_K x w1),
+  // its palette.bg edge ring and a dashed ink rim on its far half (the near half is inside the beam)
+  const Ec: Pt = [from[0] + d[0] * L, from[1] + d[1] * L];
+  const oval = (rx: number, ry: number, th0: number, th1: number, steps: number): Pt[] =>
+    Array.from({length: steps + 1}, (_, i) => {
+      const th = th0 + ((th1 - th0) * i) / steps;
+      return [Ec[0] + n[0] * rx * Math.cos(th) + d[0] * ry * Math.sin(th), Ec[1] + n[1] * rx * Math.cos(th) + d[1] * ry * Math.sin(th)] as Pt;
+    });
+  const rx = w1 / 2;
+  const ry = Math.max(3, w1 * FOOT_K);
+  const path = (Q: Pt[], close: boolean) => Q.map((p, i) => `${i ? 'L' : 'M'}${f(p)}`).join('') + (close ? 'Z' : '');
+  const footRing = path(oval(rx + EDGE_STRIP, ry + EDGE_STRIP * 0.7, 0, 2 * Math.PI, 28), true);
+  const foot = path(oval(rx, ry, 0, 2 * Math.PI, 28), true);
+  const rim = path(oval(rx, ry, 0, Math.PI, 16), false);
   return (
     <>
-      <path d={strips} fill={palette.bg} />
-      <path d={poly} fill={palette.white} />
-      <path d={edges} fill="none" stroke={palette.ink} strokeWidth={DEPTH_INK.far} strokeDasharray="9 8" strokeLinecap="round" />
+      <path d={strips + footRing} fill={palette.bg} />
+      <path d={poly + foot} fill={palette.white} />
+      <path d={edges + rim} fill="none" stroke={palette.ink} strokeWidth={DEPTH_INK.far} strokeDasharray="9 8" strokeLinecap="round" />
     </>
   );
 };
+
+/** The footprint oval's depth along the beam (x its width). */
+const FOOT_K = 0.24;
+/** Final polish (review: during the sweep the two wedges crossed into a W / X): each beam sweeps ITS OWN half of the plan
+ *  (team A the left half, team B the right half, in opposite phase, so they swing toward and away from each other but
+ *  never cross), and only the converge brings both onto the lock. World px. */
+const HALF_A: Pt = [372, 930];
+const HALF_B: Pt = [606, 930];
+/** The sweep width during the scan (world, far end): narrower than the old 170 so the two halves keep a clear gap. */
+const W1_SCAN = 132;
 
 export const Beams: React.FC<{b: Beats}> = ({b}) => {
   const t = useTime();
@@ -276,12 +308,16 @@ export const Beams: React.FC<{b: Beats}> = ({b}) => {
   const off = TABLET * 0.5; // the top edge of a landscape tablet
   const outAt = b.ring + 0.02;
   const n0 = b.converge - 0.04;
-  const w1 = lerp(W1, 10, E.inOutSine(prog(t, n0, NARROW)));
+  const w1 = lerp(W1_SCAN, 10, E.inOutSine(prog(t, n0, NARROW)));
   const amp = SWEEP * (1 - E.inOutSine(prog(t, n0 - 0.24, 0.24)));
+  // the aim slides from each half onto the lock over the sweep's damping + the narrowing (0.54 s, in-out sine): the far
+  // edges peak at ~19 px/frame
+  const k = E.inOutSine(prog(t, n0 - 0.24, 0.24 + NARROW));
+  const aim = (h: Pt): Pt => [lerp(h[0], LOCK_C[0], k), lerp(h[1], LOCK_C[1], k)];
   return (
     <>
-      <LightBeam from={[pa[0] + 3, pa[1] - off]} to={LOCK_C} w0={W0} w1={w1} at={b.beams} amp={amp} hz={1.1} outAt={outAt} seed="s5beamA" />
-      <LightBeam from={[pb[0] - 3, pb[1] - off]} to={LOCK_C} w0={W0} w1={w1} at={b.beams + BEAM_STAGGER} amp={-amp} hz={1.1} outAt={outAt} seed="s5beamB" />
+      <LightBeam from={[pa[0] + 3, pa[1] - off]} to={aim(HALF_A)} w0={W0} w1={w1} at={b.beams} amp={amp} hz={1.1} outAt={outAt} seed="s5beamA" />
+      <LightBeam from={[pb[0] - 3, pb[1] - off]} to={aim(HALF_B)} w0={W0} w1={w1} at={b.beams + BEAM_STAGGER} amp={-amp} hz={1.1} outAt={outAt} seed="s5beamB" />
     </>
   );
 };
@@ -299,7 +335,12 @@ export const PIP_SCALE = 1.2 / 1.13;
  *  steady ~46 px/frame dash across the frame, so on the cut he is half out of frame RIGHT (centre screen ~(1050, 1180)),
  *  falling fast, and S06 brings him in at its left edge (screen y ~1300-1340, S06 19.97). He rises over the stamp
  *  (feet at world ~1190 as he passes its centre). */
-export const pipHop = (b: Beats) => ({t0: b.truck - 0.03, dur: 0.45, to: {x: 1420, y: 1440}, height: 196});
+export const pipHop = (b: Beats) => ({t0: b.truck - 0.097, dur: 0.517, to: {x: 1420, y: 1440}, height: 196});
+/** Final polish (review: the dash crossed at ~46 px / frame with no smear): take-off 2 frames earlier (19.376) on a
+ *  0.517 s leap to the same landing (~35-40 px / frame across the frame, still half out of frame right on the cut), and
+ *  the film's smear (3 speed lines trailing him, S10 / S11 / S12's language) on the fast frames. The crouch before it is
+ *  0.10 s (was 0.14: it would start inside the wake jolt). */
+const PIP_CROUCH = 0.1;
 /** The leap's x lag (x eases k^PIP_XLAG: up first, then out). */
 const PIP_XLAG = 1.3;
 
@@ -327,7 +368,7 @@ export const PipOnRail: React.FC<{b: Beats}> = ({b}) => {
   const H = pipHop(b);
   if (t >= H.t0) return null;
   const h = hop({t, t0: H.t0, dur: H.dur, from: {x: PIP_RAIL[0], y: PIP_RAIL[1]}, to: H.to, height: H.height});
-  const crouch = t >= H.t0 - 0.14;
+  const crouch = t >= H.t0 - PIP_CROUCH;
   const jolt = t >= b.pipWake ? -10 * Math.sin(Math.PI * clamp((t - b.pipWake) / 0.16)) : 0;
   const ro = rollOver(t);
   const el = <ElephantTimeline x={h.x} y={h.y + jolt} scale={PIP_SCALE} t={t} seed={5} keys={pipKeys(b, H.t0)} squash={(crouch ? h.squash : 0) + ro.sq} rotate={0} flip={t < b.pipWake} />;
@@ -342,11 +383,45 @@ export const PipHop: React.FC<{b: Beats}> = ({b}) => {
   if (t < H.t0) return null;
   const c0 = camAt(H.t0, b.end);
   const fromX = PIP_RAIL[0] + (1 - LAYER_F.banner) * (c0.x - 540);
-  const h = hop({t, t0: H.t0, dur: H.dur, from: {x: fromX, y: PIP_RAIL[1]}, to: H.to, height: H.height});
-  // the leap goes UP first (x lags: k^1.3), so he rises over the elephant stamp before he crosses it
-  const k = clamp((t - H.t0) / H.dur);
-  const x = h.airborne ? lerp(fromX, H.to.x, Math.pow(k, PIP_XLAG)) : h.x;
-  return <ElephantTimeline x={x} y={h.y} scale={PIP_SCALE} t={t} seed={5} keys={pipKeys(b, H.t0)} squash={h.squash} rotate={h.rotate} amount={h.airborne ? h.spread : undefined} />;
+  const at = (tt: number) => {
+    const h = hop({t: tt, t0: H.t0, dur: H.dur, from: {x: fromX, y: PIP_RAIL[1]}, to: H.to, height: H.height});
+    // the leap goes UP first (x lags: k^1.3), so he rises over the elephant stamp before he crosses it
+    const k = clamp((tt - H.t0) / H.dur);
+    return {h, x: h.airborne ? lerp(fromX, H.to.x, Math.pow(k, PIP_XLAG)) : h.x};
+  };
+  const {h, x} = at(t);
+  // his on-screen velocity (steps plane, the trucking camera included), back in world units for the smear
+  const dt = 1 / 30;
+  const prev = at(t - dt);
+  const cA = layerCam(camAt(t - dt, b.end), LAYER_F.steps);
+  const cB = layerCam(camAt(t, b.end), LAYER_F.steps);
+  const sA = toScreen(cA, [prev.x, prev.h.y]);
+  const sB = toScreen(cB, [x, h.y]);
+  const v: Pt = [(sB[0] - sA[0]) / dt / cB.zoom, (sB[1] - sA[1]) / dt / cB.zoom];
+  return (
+    <>
+      {h.airborne && t - H.t0 > dt ? <PipSmear x={x} y={h.y} vx={v[0]} vy={v[1]} sc={PIP_SCALE} zoom={cB.zoom} /> : null}
+      <ElephantTimeline x={x} y={h.y} scale={PIP_SCALE} t={t} seed={5} keys={pipKeys(b, H.t0)} squash={h.squash} rotate={h.rotate} amount={h.airborne ? h.spread : undefined} />
+    </>
+  );
+};
+
+/** Speed lines behind a fast Pip (the film's smear language: S10 / S11 / S12, copied here, never imported across
+ *  scenes). WORLD px: (x, y) = his feet, (vx, vy) = his on-screen velocity in world px / s, `sc` = his scale. 3 short ink
+ *  lines anchored behind his body centre along -velocity, their length growing with his speed; drawn only above
+ *  SMEAR_MIN screen px / frame. */
+const SMEAR_MIN = 22;
+const PipSmear: React.FC<{x: number; y: number; vx: number; vy: number; sc: number; zoom: number}> = ({x, y, vx, vy, sc, zoom}) => {
+  const sp = Math.hypot(vx, vy);
+  const pxf = (sp * zoom) / 30;
+  if (pxf < SMEAR_MIN) return null;
+  const ux = -vx / sp;
+  const uy = -vy / sp;
+  const cx = x + ux * 50 * sc;
+  const cy = y - 46 * sc + uy * 50 * sc;
+  const len = Math.max(20, Math.min(50, pxf * 0.8)) / zoom;
+  const ang = (Math.atan2(uy, ux) * 180) / Math.PI;
+  return <Ink d={speedLines(cx, cy, {n: 3, len, gap: 15 * sc, angle: ang, seed: 's5pipSpd/l'})} width={2.6 / zoom} taper={false} seed="s5pipSpd/i" />;
 };
 
 // ---------------------------------------------------------------- S04's leaf (continuity) and the z
@@ -431,7 +506,9 @@ const TOP: Pt = lp(16.7, -50);
 const TOP_SIZE = 28;
 const HOP_IN = 0.2;
 /** The leap onto the messenger's collar (S06: Bit hides in the collar and peeks out on 'gave'). */
-const LEAP = {dur: 0.24, height: 150, sit: 0.05, duck: 0.1};
+/** Final polish (review: 550 px in 0.24 s, ~70 px / frame, he read as disconnected specks): 0.33 s (~48 px / frame), a
+ *  0.03 s sit and a 0.08 s duck, so he is in the collar by 19.74 (the cut 19.773). */
+const LEAP = {dur: 0.33, height: 150, sit: 0.03, duck: 0.08};
 
 function bitOnLockAt(t: number, inAt: number, outAt: number): {x: number; y: number; size: number; flip: boolean; out: boolean; air: boolean} {
   const arc = (a: Pt, c: Pt, u: number, hgt: number): Pt => [lerp(a[0], c[0], u), lerp(a[1], c[1], u) - hgt * 4 * u * (1 - u)];

@@ -15,10 +15,10 @@
 // 'out':
 // ONE hand-circling ink ring strokes on round the lock (found) and the beams retract; 'how': it pulses, the teams lean in
 // (torso + head); 'bad': ONE focal event: S02's dashed hooded hand (its hood point on the cuff) redraws over the lock and turns it, the bolt slides
-// all the way back and the plan's door swings AJAR (a dark gap), Bit (posing as part of the drawing) gets an ink '!' and
+// all the way back and the plan's door swings AJAR (a hatched void), Bit (posing as part of the drawing) gets an ink '!' and
 // hops out onto the lock box; an audience head turns to its neighbour; 'it': Pip jolts awake, the leaf flicks off; 'was.':
 // the messenger raises the envelope to his right shoulder, Bit leaps onto his collar and he breaks into a run out right,
-// the camera trucking with him (0.30 s, MULTIPLANE: steps 1.0, banner / facade 0.67, wing 0.4, audience 1.12: the cut on
+// the camera trucking with him (0.30 s, MULTIPLANE: steps 1.0, banner / facade 0.67, wing 0.4, audience 1.0: the cut on
 // action into S06); Pip leaps off the rail to follow.
 //
 // Camera: scene05/camera.ts (each set layer gets its own camera matrix in `wrap`). The sun is SCREEN space in its notch
@@ -56,9 +56,11 @@ const L5_BOX: [number, number, number, number] = [435.5, 1002, 735.5, 1110];
  *  centred block sits low enough that the paper clip (LabelTag: at 24 % of the width, reaching 0.73 em below the top)
  *  ends > 6 px above the cap height of 'found'). Its foot (805) overlaps the door elevation's head line by 9. */
 const L6_BOX: [number, number, number, number] = [205, 679, 650, 805];
-/** The calendar, 1.2 x and nudged in from the frame edge (its summer page centre at screen ~105), right edge just short
- *  of the banner's frame (x 200). */
-const CAL: [number, number, number, number] = [114, 748, 84, 108];
+/** The calendar on the left pilaster's face, right edge at the banner's frame (x 200). Final polish (review: the summer
+ *  page sat at screen x 57-155, in the edge margin the paint-subtle edge eats into, and its 15 px 'AUG' did not read on a
+ *  phone): narrower and taller (60 x 120 world: screen x ~88-156, y ~723-858) so its left edge is inside the 90 px margin,
+ *  'AUG' lettered at 26 px UNDER the summer picture and a bolder sun on it. */
+const CAL: [number, number, number, number] = [140, 740, 60, 120];
 
 /** The sun (A1 fix round, review: its bottom kissed the wing's roofline for the whole shot, the rod's ring end sat on its
  *  left limb and the flagpole rode its right edge): SCREEN space, set lower and left in the notch so the wing roof crops
@@ -96,16 +98,34 @@ const OnSheet: React.FC<{children: React.ReactNode}> = ({children}) => {
   );
 };
 
-/** 'AUG' lettered on the calendar's summer page (pausers: L6's 'reported privately in August'), ink on peach, 21 world
- *  = 24 px on screen; it is on the page once the tear has cleared it. */
+/** 'AUG' lettered on the calendar's summer page (pausers: L6's 'reported privately in August'), ink on peach, 23 world
+ *  = 26 px on screen, centred under the page's horizon line; and a BOLD sun over the page's small sun ring (an orange
+ *  disc, ink rim, eight ray ticks: the summer cue at thumbnail size). On the page once the tear has cleared it. */
 const AugMark: React.FC<{at: number}> = ({at}) => {
   const t = useTime();
   useCaptionFont();
   if (t < at) return null;
+  const [x, y, w, h] = CAL;
+  // the Calendar's summer page: its sun ring at (w/2 + 0.18 u, cy - 0.2 u), u = min(w, page h), cy = the page's centre
+  const head = h * 0.2;
+  const u = Math.min(w, h - head);
+  const cy = y + head + (h - head) / 2;
+  const sx = x + w / 2 + u * 0.18;
+  const sy = cy - u * 0.2;
+  const r = 8;
+  const rays = Array.from({length: 8}, (_, i) => {
+    const a = (i / 8) * Math.PI * 2 + 0.2;
+    return `M${(sx + Math.cos(a) * (r + 2.5)).toFixed(1)} ${(sy + Math.sin(a) * (r + 2.5)).toFixed(1)}L${(sx + Math.cos(a) * (r + 6)).toFixed(1)} ${(sy + Math.sin(a) * (r + 6)).toFixed(1)}`;
+  }).join('');
+  const disc = `M${sx - r} ${sy}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`;
   return (
-    <text x={CAL[0] + 7} y={CAL[1] + CAL[3] * 0.2 + 21} fontFamily={captionFontStack} fontSize={21} fill={palette.ink}>
-      AUG
-    </text>
+    <>
+      <Fill d={disc} color={palette.sun} offset={[0.8, 0.6]} seed="s5calSun" />
+      <Ink d={disc + rays} width={1.8} taper={false} vary={0} seed="s5calSunI" />
+      <text x={x + w / 2} y={y + h - 5} textAnchor="middle" fontFamily={captionFontStack} fontSize={23} fill={palette.ink}>
+        AUG
+      </text>
+    </>
   );
 };
 
@@ -219,7 +239,7 @@ const Scene05: React.FC = () => {
           <Look fills="none">{node}</Look>
           {/* 'bad': the right leaf swings ajar behind the callout */}
           <DoorSwing at={b.door} />
-          <SheetLock from={discFrom} moveAt={b.bitIn} moveDur={0.2} whiteAt={b.ring + 0.02} />
+          <SheetLock from={discFrom} moveAt={b.bitIn} moveDur={0.2} whiteAt={b.ring + 0.02} whiteFor={GLOW_HOLD - 0.02} />
           <CalloutKeyhole />
           {/* L5 rides across the match-cut as the lock's annotation tag; pops off on 'using' */}
           <LabelTag kind="tag" box={L5_BOX} hang={[LOCK_C[0] + 24, LOCK_C[1] + 36]} text={L5} fontSize={36} outAt={b.l5Out} seed="s5L5" />
@@ -235,8 +255,8 @@ const Scene05: React.FC = () => {
           </OnSheet>
           {/* Bit over the hand (he is the one being caught), his '!' balloon over everything on the sheet */}
           <BitOnLock inAt={b.bitIn} alertAt={b.bad} balloonAt={b.balloon} leapAt={b.bitLeap} />
-          {/* L6: the clipped slip on the banner's clean top edge (fix round 4: pops right after the beams converge on the
-              lock, before the ring: the label follows the scan) */}
+          {/* L6: the clipped slip on the banner's clean top edge (final polish: back on the storyboard's w58+0.40, one
+              frame early so the slip's spring is legible by ~18.19, as the beams converge on the lock) */}
           <LabelTag kind="slip" box={L6_BOX} text={L6} fontSize={38 / ZOOM} at={b.l6} seed="s5L6" />
           <PipOnRail b={b} />
           <LeafOnCrown b={b} />
@@ -267,7 +287,9 @@ const Scene05: React.FC = () => {
     if (name === 'wing')
       return (
         <>
-          <Flagpole snaps={[b.teamA, b.calendar]} slack={[b.balloon, b.door + 0.2]} />
+          {/* final polish (review: the flag went slack ON the '!' balloon, motion outside 'bad''s focal box): it drops
+              slack on 'how' (busy anyway) and stays slack, waving at a third, through 'bad' */}
+          <Flagpole snaps={[b.teamA, b.calendar]} slack={[b.how - 0.05, b.door + 0.2]} />
           {node}
           <WingDetails />
         </>

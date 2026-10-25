@@ -17,8 +17,10 @@ import {matScale} from '../shared/props/common';
 
 type R4 = [number, number, number, number];
 
-/** The ink-dark glass. Its spill past the window (it tucks under the frame to hide the fill's misregistration) is a
- *  fixed size in SCREEN px: fills are never ink-compensated, so a world-unit spill grew x2.9 in the dive into a 17 px
+/** The dead glass, INK-dark on purpose (kept after the S12 A1 review asked for teal, orchestrator 07:55: a black screen
+ *  reads instantly as 'switched off', the hook's message in its first frames; teal read as a dim screen and govC's half
+ *  shutter read less clearly; side-by-side in docs/scenes/S01.md). Its spill past the window (it tucks under
+ *  the frame to hide the fill's misregistration) is a fixed size in SCREEN px: fills are never ink-compensated, so a world-unit spill grew x2.9 in the dive into a 17 px
  *  bar at govB's window edge. A component (BrowserChrome calls `content()` as a plain function, so no hook there). */
 const Glass: React.FC<{w: number; h: number; seed: string}> = ({w, h, seed}) => {
   const k = Math.max(1e-3, matScale(useXf()));

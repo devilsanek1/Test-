@@ -224,6 +224,9 @@ export type GhostSpec = {
   /** A1 fix round (a pair read as two white blocks): one member per pair gets sand trousers or a sand bag. */
   trousers?: string;
   bag?: string;
+  /** A1 fix round 2: the pop's anchor. 'feet' (default: the nearer pair members pop behind the planter's bush) or
+   *  'hips' (the farther members, whose feet are in the bottom UI zone: their small first pop frames sit above it). */
+  popAt?: 'feet' | 'hips';
 };
 
 /** The passers-by's camera: horizon at the street's VP, lens 1.7 x a person (the shot is taken from the stoop's top
@@ -462,7 +465,7 @@ export const Passer: React.FC<{x: number; y: number; H: number; t: number; hz: n
 };
 
 /** The passers-by alive at t (far first). They walk away up the road, never looking at the door; pop in 20 % -> 100 %
- *  (pop spring), out in one frame (a shrink pop, then gone). */
+ *  (pop spring, about the feet or the hips: `popAt`), out in one frame (a shrink pop, then gone). */
 export const Ghosts: React.FC<{list: GhostSpec[]}> = ({list}) => {
   const t = useTime();
   const live = list.filter((g) => t >= g.in && t < g.out);
@@ -474,8 +477,11 @@ export const Ghosts: React.FC<{list: GhostSpec[]}> = ({list}) => {
         const H = GHOST_EYE.height(fy);
         const last = g.out - t < 1 / 30 + 1e-6;
         const sc = last ? 0.82 : 0.2 + 0.8 * springAt(t, g.in, springs.pop);
+        // A1 fix round 2: the farther pair members pop about their hips (popAt 'hips'): the 'like' pair's farther member's
+        // first pop frame (20 %, feet at screen ~1565) was a small figure entirely inside the bottom UI zone
+        const ay = g.popAt === 'hips' ? fy - H * 0.45 : fy;
         return (
-          <XG key={g.seed} m={mat.about(mat.scale(g.mirror ? -sc : sc, sc), fx, fy)}>
+          <XG key={g.seed} m={mat.about(mat.scale(g.mirror ? -sc : sc, sc), fx, ay)}>
             <Passer x={fx} y={fy} H={H} t={t} hz={g.hz ?? 1.9} hair={g.hair} acc={g.acc ?? []} ink={g.depth === 'hair' ? SI.hair : SI.far} seed={g.seed} trousers={g.trousers} bag={g.bag} />
           </XG>
         );
@@ -497,10 +503,12 @@ export function ghostList(b: Beats, tears: number[]): GhostSpec[] {
   const out: GhostSpec[] = [
     // 'was': a pair, walking away up the street (one at the hero house's corner, one a step ahead and farther)
     {x: roadEdgeX(1338) - 4, y: 1338, in: b.ghosts1 - 0.1, out: tears[1], seed: 'g4a', pace: 0.06, hz: 1.9, hair: 'short', acc: ['backpack'], bag: palette.sand},
-    {x: roadEdgeX(1290) - 4, y: 1290, in: b.ghosts1 - 0.06, out: tears[2], seed: 'g4b', pace: 0.06, hz: 2.1, hair: 'long', acc: ['strap'], trousers: palette.sand},
+    {x: roadEdgeX(1290) - 4, y: 1290, in: b.ghosts1 - 0.06, out: tears[2], seed: 'g4b', pace: 0.06, hz: 2.1, hair: 'long', acc: ['strap'], trousers: palette.sand, popAt: 'hips'},
     // 'like': a second pair strides past (faster legs, faster into depth)
-    {x: roadEdgeX(1336) - 4, y: 1336, in: b.ghosts2 - 0.1, out: tears[8], seed: 'g4c', pace: 0.12, hz: 2.8, hair: 'headphones', acc: []},
-    {x: roadEdgeX(1290) - 4, y: 1290, in: b.ghosts2 - 0.05, out: tears[9], seed: 'g4d', pace: 0.12, hz: 2.9, hair: 'bun', acc: ['phone'], mirror: true, trousers: palette.sand},
+    // (A1 fix round 2: the near member 20 world further up the road, 1336 -> 1316: its pop blob sat mostly in the bottom
+    // UI zone on f35; its shoes stay behind the planter's bush)
+    {x: roadEdgeX(1316) - 4, y: 1316, in: b.ghosts2 - 0.1, out: tears[8], seed: 'g4c', pace: 0.12, hz: 2.8, hair: 'headphones', acc: []},
+    {x: roadEdgeX(1290) - 4, y: 1290, in: b.ghosts2 - 0.05, out: tears[9], seed: 'g4d', pace: 0.12, hz: 2.9, hair: 'bun', acc: ['phone'], mirror: true, trousers: palette.sand, popAt: 'hips'},
   ];
   // the time-lapse flickers: up the road (hair ink), one at a time, only while at most one pair member is on screen;
   // fix round 2 (framecheck: they stood in the right rail, x ~945-985): a little nearer (y 1264-1274) and on the row's

@@ -25,7 +25,7 @@ import {line} from '../../lib/sketch';
 
 // ---------------------------------------------------------------- a lantern switching off
 
-/** Ink-dark glass over a lantern's glass rect (inset inside its ink frame) from `at`, popping on with a one-frame
+/** Ink-dark (dead) glass over a lantern's glass rect (same fill as the dead screens) (inset inside its ink frame) from `at`, popping on with a one-frame
  *  squash (1.2 x 0.84 -> 1 in 0.1 s), plus one cream glint stroke like the dead screens. */
 export const LanternOff: React.FC<{r: [number, number, number, number]; at: number; seed: string}> = ({r, at, seed}) => {
   const t = useTime();

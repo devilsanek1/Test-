@@ -54,6 +54,16 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
 
 ## Cross-lane findings scene agents can't fix (polish pass)
 
+- DONE (core, 07:50): loop-seam edge paint. The last scene of a full-colour loop wears the FIRST scene's painting
+  (Film edgeId), so the paper edge no longer pops at the loop. Main f1660 vs f0: 0 px outside the caption band (24.1k
+  px before, at half scale). From S12's handoff patch.
+- DONE (data, 07:50): S11's last page ('tech support's answer / to everything.') `out` 52.06 ('everything.' ends
+  51.895, cut 52.163), so S12 opens on an empty band and 'And some of those' rolls in on 'And' (52.43).
+- PARTLY TAKEN (S01, 07:55): S12's request to make S01's dead glass + lantern teal was NOT taken (black = off reads
+  instantly in the hook; see docs/scenes/S01.md). Pigeons brown -> cream taken. Loop seam still 0 px.
+- OPEN (captions, minor): (1) on page rolls the outgoing line and its highlight box should clip at one mask edge
+  below the descender bottom (S12 f48-f50 'governments did it' sliced mid-glyph); (2) 1-2 stray i-dots / apostrophes
+  of an outgoing line for 1 frame at the band top (Main 52.40, 55.30, 45.58). SkyCaptions clip polish for phase C.
 - DONE (data, 06:05): S10's last caption page ('they're not officially / supported anymore.') no longer hangs over
   S11's government window after the hard cut: page 22 `out` 45.48 ('anymore.' ends 45.385, cut 45.618), so the band is
   empty on S11 f0 until 'Even' rolls in at 45.85 (S11 A1 art + motion reviews).
@@ -102,6 +112,7 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
 
 ## Sound re-lock notes (phase D)
 
+- S12: `typing_tick` 55.01 -> 55.063 (f87) (S12 A1 review).
 - S03's A1 retimes moved beats; the SFX cues (audio/cues.json) still sit on the old times (S03 motion review, 06:00).
   Phase D must re-derive every cue from the FINAL scene beats (each scene's beats.ts), not only from the storyboard.
 

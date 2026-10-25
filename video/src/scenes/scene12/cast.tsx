@@ -58,7 +58,14 @@ export const SB_SEED = 's01/sB';
  *  wall with little value separation): sleeve w 28 (~11.5 px on screen, was 21), the full 2.2 px ink tier on the sleeve
  *  outline (was 0.85 x), and a HAND that points: a sand fist with an extended index finger along the forearm line (on
  *  to govB's padlock), ~24 px from the fist's back to the fingertip (`SbHand`); the 1.8 px cream rim follows it. */
-const SB_POINT = {at: pc(B.point), downAt: pc(B.pointDown), hand: [-105, -245] as [number, number], w: 28, bend: 12} as const;
+/** A1 fix round 2 (review: at phone size the point read as holding up a cone / torch: the rim wrapped fist + short
+ *  finger into one blob, and the ~25 deg arm did not land on govB's shuttered window up-left): the arm swings further
+ *  LEFT (chord 29 deg off vertical in the figure, bend 8: was a fixed hand point ~23 deg with bend 12), so the forearm
+ *  + finger line runs ~31 deg on screen straight on to govB's padlock (f33), the fingertip ~10 px clear of the door's
+ *  right frame; the rim stays on the SLEEVE only (SbRim), and the index finger is ~18 px past the fist with its own
+ *  full-tier ink outline (SbHand). `reach` / `ang` place the hand (wrist) from the shoulder, person units / degrees off
+ *  vertical. */
+const SB_POINT = {at: pc(B.point), downAt: pc(B.pointDown), reach: 184, ang: 29, w: 28, bend: 8} as const;
 const FIG = {TORSO: 95, LEG: 62, H: 199} as const;
 export const SbPoint: React.FC<{p: CitizenPlan; rim?: boolean}> = ({p, rim}) => {
   const t = useTime();
@@ -71,7 +78,9 @@ export const SbPoint: React.FC<{p: CitizenPlan; rim?: boolean}> = ({p, rim}) => 
   const gw = rng(`person/${p.seed}`).range(86, 100);
   const sh: [number, number] = [-gw * 0.36, -FIG.TORSO * 0.8];
   const down: [number, number] = [-gw * 0.5, -FIG.TORSO * 0.1];
-  const hand: [number, number] = [lerp(down[0], SB_POINT.hand[0], q), lerp(down[1], SB_POINT.hand[1], q)];
+  const a = (SB_POINT.ang * Math.PI) / 180;
+  const up_: [number, number] = [sh[0] - SB_POINT.reach * Math.sin(a), sh[1] - SB_POINT.reach * Math.cos(a)];
+  const hand: [number, number] = [lerp(down[0], up_[0], q), lerp(down[1], up_[1], q)];
   // the elbow as FigureArm places it (bend about the chord, outward = -x), passed explicitly so rim and arm agree
   const dx = hand[0] - sh[0];
   const dy = hand[1] - sh[1];
@@ -90,7 +99,7 @@ export const SbPoint: React.FC<{p: CitizenPlan; rim?: boolean}> = ({p, rim}) => 
         <SbRim sh={sh} el={el} hand={hand} w={SB_POINT.w} />
       ) : (
         <>
-          <SbHand el={el} hand={hand} w={SB_POINT.w} W={W * 0.85} seed={`${p.seed}/pt12`} />
+          <SbHand el={el} hand={hand} w={SB_POINT.w} W={W} seed={`${p.seed}/pt12`} />
           <FigureArm sh={sh} hand={hand} elbow={el} w={SB_POINT.w} coat={p.body ?? palette.brown} W={W} hand2={false} seed={`${p.seed}/pt12`} />
         </>
       )}
@@ -101,23 +110,30 @@ export const SbPoint: React.FC<{p: CitizenPlan; rim?: boolean}> = ({p, rim}) => 
  *  from the elbow out), a sand FIST just past the cuff (1.24 w x 1.0 w) with a thumb bump on its upper side and the
  *  INDEX FINGER extended along the forearm line (to 1.5 w past the fist centre, 0.34 w thick), inked; drawn before the
  *  sleeve so the cuff overlaps the fist's root. `handGeom` is shared with the rim so the two agree. */
+/** A1 fix round 2: the finger is a CAPSULE (straight sides, round tip, a slight taper) from inside the fist to 2.2 w past
+ *  the fist centre (~18 screen px past the fist's edge), 0.36 w thick at the root; the fist a little smaller (1.1 w x
+ *  0.9 w) so the finger, not the fist, is the shape that reads. */
 const handGeom = (el: [number, number], hand: [number, number], w: number) => {
   const fx = hand[0] - el[0];
   const fy = hand[1] - el[1];
   const fL = Math.hypot(fx, fy) || 1;
-  const c: [number, number] = [hand[0] + (fx / fL) * w * 0.5, hand[1] + (fy / fL) * w * 0.5];
+  const c: [number, number] = [hand[0] + (fx / fL) * w * 0.48, hand[1] + (fy / fL) * w * 0.48];
   return {
     c,
     ang: (Math.atan2(fy, fx) * 180) / Math.PI,
-    fist: {rx: w * 0.62, ry: w * 0.5},
-    finger: {cx: w * 0.98, cy: -w * 0.12, rx: w * 0.55, ry: w * 0.17},
-    thumb: {cx: w * 0.05, cy: -w * 0.46, rx: w * 0.26, ry: w * 0.17},
+    fist: {rx: w * 0.56, ry: w * 0.45},
+    finger: {x0: w * 0.1, tip: w * 2.2, cy: -w * 0.1, h0: w * 0.2, h1: w * 0.17},
+    thumb: {cx: w * 0.02, cy: -w * 0.42, rx: w * 0.24, ry: w * 0.16},
   };
+};
+const fingerPath = ({x0, tip, cy, h0, h1}: {x0: number; tip: number; cy: number; h0: number; h1: number}) => {
+  const f = (v: number) => v.toFixed(2);
+  return `M${f(x0)} ${f(cy - h0)}L${f(tip - h1)} ${f(cy - h1)}A${f(h1)} ${f(h1)} 0 0 1 ${f(tip - h1)} ${f(cy + h1)}L${f(x0)} ${f(cy + h0)}Z`;
 };
 const SbHand: React.FC<{el: [number, number]; hand: [number, number]; w: number; W: number; seed: string}> = ({el, hand, w, W, seed}) => {
   const {c, ang, fist, finger, thumb} = handGeom(el, hand, w);
   const fistD = blob(0, 0, fist.rx, fist.ry, {seed: `${seed}/fist`, wobble: 0.03});
-  const fingerD = blob(finger.cx, finger.cy, finger.rx, finger.ry, {seed: `${seed}/idx`, wobble: 0.02});
+  const fingerD = fingerPath(finger);
   const thumbD = blob(thumb.cx, thumb.cy, thumb.rx, thumb.ry, {seed: `${seed}/thb`, wobble: 0.03});
   return (
     <XG m={mat.compose(mat.translate(c[0], c[1]), mat.rotate(ang))}>
@@ -130,23 +146,40 @@ const SbHand: React.FC<{el: [number, number]; hand: [number, number]; w: number;
     </XG>
   );
 };
-/** The cream rim behind sB's point arm: the sleeve (shoulder -> elbow -> wrist), the fist, thumb and finger, `px` screen
- *  px out. */
+/** The cream rim behind sB's point arm, `px` screen px out: A1 fix round 2, the SLEEVE only (FigureArm's tapered
+ *  outline: w at the shoulder, 0.9 w at the elbow, 0.74 w at the wrist), ending flush with the cuff, so the sand fist and
+ *  finger sit on the wall with their own ink and do not merge into one cream-ringed blob. */
 const SbRim: React.FC<{sh: [number, number]; el: [number, number]; hand: [number, number]; w: number; px?: number}> = ({sh, el, hand, w, px = 1.8}) => {
   const k = Math.max(1e-4, matScale(useXf()));
   const r = px / k;
-  const {c, ang, fist, finger, thumb} = handGeom(el, hand, w);
-  const e = r * 1.4;
-  return (
-    <>
-      <path d={`M${sh[0]} ${sh[1]}L${el[0]} ${el[1]}L${hand[0]} ${hand[1]}`} fill="none" stroke={palette.cream} strokeWidth={w + 2 * r} strokeLinecap="round" strokeLinejoin="round" />
-      <XG m={mat.compose(mat.translate(c[0], c[1]), mat.rotate(ang))}>
-        <ellipse cx={0} cy={0} rx={fist.rx + e} ry={fist.ry + e} fill={palette.cream} />
-        <ellipse cx={finger.cx} cy={finger.cy} rx={finger.rx + e} ry={finger.ry + e} fill={palette.cream} />
-        <ellipse cx={thumb.cx} cy={thumb.cy} rx={thumb.rx + e} ry={thumb.ry + e} fill={palette.cream} />
-      </XG>
-    </>
-  );
+  const nrm = (a0: [number, number], b0: [number, number]): [number, number] => {
+    const L = Math.hypot(b0[0] - a0[0], b0[1] - a0[1]) || 1;
+    return [-(b0[1] - a0[1]) / L, (b0[0] - a0[0]) / L];
+  };
+  const fx = hand[0] - el[0];
+  const fy = hand[1] - el[1];
+  const fL = Math.hypot(fx, fy) || 1;
+  // the wrist end pulled back by r, so the rim's round join ends at the cuff line
+  const wr: [number, number] = [hand[0] - (fx / fL) * r, hand[1] - (fy / fL) * r];
+  const n1 = nrm(sh, el);
+  const n2 = nrm(el, wr);
+  const mx0 = n1[0] + n2[0];
+  const my0 = n1[1] + n2[1];
+  const mL = Math.hypot(mx0, my0) || 1;
+  const [mx, my] = [mx0 / mL, my0 / mL];
+  const h0 = w / 2;
+  const h1 = h0 * 0.9;
+  const h2 = h0 * 0.74;
+  const P = [
+    [sh[0] + n1[0] * h0, sh[1] + n1[1] * h0],
+    [el[0] + mx * h1, el[1] + my * h1],
+    [wr[0] + n2[0] * h2, wr[1] + n2[1] * h2],
+    [wr[0] - n2[0] * h2, wr[1] - n2[1] * h2],
+    [el[0] - mx * h1, el[1] - my * h1],
+    [sh[0] - n1[0] * h0, sh[1] - n1[1] * h0],
+  ];
+  const d = 'M' + P.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join('L') + 'Z';
+  return <path d={d} fill={palette.cream} stroke={palette.cream} strokeWidth={2 * r} strokeLinejoin="round" />;
 };
 export const P_CITIZENS: CitizenPlan[] = S01_CITIZENS.map((c) => ({...c, ...(P_OVERRIDES[c.seed] ?? {})}));
 /** R phase: S01's own plans (played backwards by the clock). */
@@ -172,11 +205,21 @@ const PERCH_X = [undefined, 124, 154] as const;
 export const R_PIGEONS: PigeonPlan[] = S01_PIGEONS.map(({flyAt: _f, flyTo: _ft, backAt: _b, backFrom: _bf, shuffleAt: _s, shuffleDx: _sd, ...p}, i) => ({...p, x: PERCH_X[i] ?? p.x}));
 /** P phase: the pigeon that circled back in S01 sits on the dark crossbar from the cut; on 'those' the other two land
  *  (fly-ins from the left edge, S01's routes); one flutters (a hop in place) on 'governments'+0.25. */
+/** A1 fix round 2 (review: the second lander overshot its perch along S01's route, flapped ~6 frames beside govA's
+ *  'back soon' tag, its wing grazing the tag's left edge; S01's routes also made the two cross over each other): both
+ *  'those' landers come in as a PAIR on two parallel descending arcs from the left edge (~30-70 px apart, no crossing),
+ *  above the lamp's lantern and below govA's sill, never right of their perches (>= 20 px clear of the tag): the right
+ *  perch's bird (S01's pg2) leads and is drawn perched on f19, the left one (pg1) follows, perched on f20. Both land
+ *  facing right (the way they flew); pg2 hop-turns to S01's perched facing later (PigeonP, B.pigeonTurn). World coords. */
+const P_ARCS: Record<number, {fromAbs: [number, number]; via: [number, number]; land: number}> = {
+  1: {fromAbs: [-70, 930], via: [72, 960], land: B.pigeonsLand[1]},
+  2: {fromAbs: [-50, 960], via: [110, 990], land: B.pigeonsLand[0]},
+};
 export const P_PIGEONS: PigeonPlan[] = R_PIGEONS.map((p, i) => {
-  const {landAt: _l, inDur: _d, ...rest} = p;
-  if (i === 0) return rest;
-  const land = B.pigeonsLand[i - 1];
-  return {...rest, landAt: pc(land - B.pigeonFly), inDur: B.pigeonFly};
+  const {landAt: _l, inDur: _d, via: _v, fromAbs: _f, ...rest} = p;
+  const arc = P_ARCS[i];
+  if (!arc) return rest;
+  return {...rest, landAt: pc(arc.land - B.pigeonFly), inDur: B.pigeonFly, fromAbs: arc.fromAbs, via: arc.via};
 });
 /** A1 fix round 1 (review: the 'governments' tail was near-still; the old flap was S01's 6 px shuffle hop with dx 0, a
  *  speck at phone size): the first 'those' lander FLUTTER-HOPS on 'governments' + 0.25: three frames off the bar with
@@ -221,10 +264,44 @@ const FlapFlyer: React.FC<{x: number; y: number; s: number; up: number; color: s
     </XG>
   );
 };
-/** A P-phase pigeon: S01's Pigeon, except the flutter-hop of FLAP_SEED (its own frames, then a landing squash). */
+/** A1 fix round 2: the second lander's hop-turn (TURN_SEED): a crouch, a hop with the body edge-on (x 0.5, turning),
+ *  coming down already facing S01's way, then a short landing squash. */
+const TURN_SEED = S01_PIGEONS[2].seed;
+const TURN_POSES = [
+  {lift: 0, sx: 1, sy: 0.86, turned: false},
+  {lift: 7, sx: 0.5, sy: 1.04, turned: true},
+  {lift: 3, sx: 1, sy: 1.02, turned: true},
+];
+const PigeonTurn: React.FC<{p: PigeonPlan}> = ({p}) => {
+  const w = useTime();
+  const at = pc(B.pigeonTurn);
+  const facing = {...p, flip: !p.flip}; // as it flew in (facing right)
+  if (w < at) return <Pigeon p={facing} />;
+  const i = Math.floor((w - at) * 30 + 1e-6);
+  if (i < TURN_POSES.length) {
+    const {lift, sx, sy, turned} = TURN_POSES[i];
+    return (
+      <XG m={mat.compose(mat.translate(0, -lift), mat.about(mat.scale(sx, sy), p.x, p.y))}>
+        <Pigeon p={turned ? p : facing} />
+      </XG>
+    );
+  }
+  const d = w - at - TURN_POSES.length / 30;
+  const sq = d < 0.12 ? 1 - 0.15 * Math.sin(Math.PI * clamp(d / 0.12)) : 1;
+  return sq === 1 ? (
+    <Pigeon p={p} />
+  ) : (
+    <XG m={mat.about(mat.scale(1 / Math.sqrt(sq), sq), p.x, p.y)}>
+      <Pigeon p={p} />
+    </XG>
+  );
+};
+/** A P-phase pigeon: S01's Pigeon, except the flutter-hop of FLAP_SEED (its own frames, then a landing squash) and the
+ *  hop-turn of TURN_SEED. */
 export const PigeonP: React.FC<{p: PigeonPlan}> = ({p}) => {
   const w = useTime(); // the S01 clock (P phase: pClock)
   const at = pc(B.pigeonFlap);
+  if (p.seed === TURN_SEED) return <PigeonTurn p={p} />;
   if (p.seed !== FLAP_SEED || w < at) return <Pigeon p={p} />;
   const i = Math.floor((w - at) * 30 + 1e-6);
   if (i < FLAP_POSES.length) {

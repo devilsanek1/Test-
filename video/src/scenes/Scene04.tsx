@@ -23,8 +23,7 @@
 import React from 'react';
 import {World, useScene, useTime, skies} from '../lib';
 import {Sun} from '../lib/Sun';
-import type {SunMove} from '../lib/Sun';
-import {ease as E, lerp, springAt, springs} from '../lib/time';
+import {ease as E, lerp, prog, springAt, springs} from '../lib/time';
 import {mat, XG} from '../lib/xf';
 import {Ink} from '../lib/Ink';
 import {Fill} from '../lib/Fill';
@@ -38,8 +37,8 @@ import {camAt, camMat, diveK, DIVE} from './scene04/camera';
 import type {Cam} from './scene04/camera';
 import {above, BAND_OFF, BandInk, ClipG, except, GroundS04, HairWeb, HeroBrowser, ivyNode, SeasonIvy, seasonKeys, siteAt, SplitInk, StepTones, WindowLife, YearCalendar, YearFlyers} from './scene04/props';
 import type {BandState, Box} from './scene04/props';
-import {bitHopAt, BitS04, BugSpot, ghostList, Ghosts, HOP_DUR, Leaf, LockGlint, PipS04, spotAt, spotOff} from './scene04/cast';
-import {DivePigeons, DiveTicks, WireWhip} from './scene04/dive';
+import {bitHopAt, BitS04, BugSpot, ghostList, Ghosts, HOP_DUR, Leaf, LockGlint, PipS04, SPOT, spotAt, spotOff} from './scene04/cast';
+import {DivePigeons, DiveRipple, WireWhip} from './scene04/dive';
 
 // ---------------------------------------------------------------- labels (final_script section 6)
 
@@ -61,15 +60,12 @@ const L5_CUT = {box: [300, 1152, 472, 1215] as [number, number, number, number],
 const LOCK_TL: [number, number] = [LK.x - (LK.h * 0.8) / 2, LK.y - LK.h / 2];
 const LOCK_TR: [number, number] = [LK.x + (LK.h * 0.8) / 2, LK.y - LK.h / 2];
 const LOCK_PIVOT: [number, number] = [LK.x, LK.y - LK.h / 2 + 4];
-/** lock4's centre (the dive's speed ticks converge on it). */
-const LOCK_MID: [number, number] = [LK.x, LK.y];
 /** The 'fourteen' cobweb's radius (world): r 15 = ~23 px at zoom 1.5, ~28 px at the cut. */
 const WEB_R = 15;
-/** The sun: its slot in this shot (it sinks 7 px into it after the touch-down), and S05's notch (where the dive slides
- *  it: S05's first frame has it at (930, 725)). */
+/** The sun's slot in this shot (S03's hop lands here; S04 bends the landing to SUN_LAND.touch, then it slides back in
+ *  and sinks 7 px into the slot, behind the left row's roofline, and holds there to the cut). */
 const SUN_SLOT: [number, number] = [930, 690];
 const SUN_SINK = 7;
-const SUN_S05: [number, number] = [930, 725];
 /** The dive's flatten line: everything of the set above world y 990 (the cornice, both upper window rows, the browser
  *  window, the wire, the rows' upper storeys and rooflines) goes fill-only on the dive's first frame, in one unit. World
  *  990 is below every object that enters the caption band during the dive (the band's bottom maps to world ~935 at the
@@ -89,25 +85,37 @@ const TREE_BOX = rectPath(560, 930, 190, 470);
  *  everything of the sun below this roofline is behind the row anyway. */
 const SUN_SKY = `M-4000 -4000H4000V${STOOP.vp[1]}H${STOOP.vp[0]}L520 660H-4000Z`;
 const TREE_DX = 70;
+/** The underlay behind the hero / left-row seam (world rect; A1 fix round 2): x 512-526 sits under the hero cornice
+ *  (which reaches x 526) above the roofline and under the hero facade / the row's first house below it, so it only
+ *  shows where the dive's zoom opens a sliver between them; y 664 (under the cornice, just below the roofline's start at
+ *  660) to the pavement. */
+const SEAM_UNDERLAY: [number, number, number, number] = [512, 664, 14, STOOP.pavementY - 664];
+/** The cornice soffit (world rect): a tan band behind the cornice's lower edge (680) and the facade fill's top (A1 fix
+ *  round 2: a 4 px strip of sky ran between them). */
+const SOFFIT: [number, number, number, number] = [STOOP.hero.x, 674, STOOP.hero.w, 14];
 /** The planter (the set's furniture[0]), 42 world right for S04 (A1 fix round): its bush now hides the pairs' NEAR
  *  members' shoes (feet at world ~(537-545, 1326-1338), screen y ~1600, in the bottom UI zone) as they walk behind it. */
 const PLANTER = {...STOOP.furniture[0], x: STOOP.furniture[0].x + 42};
 /** The dive's caption band, ROW BY ROW (A1 fix round: fix round 3 softened the whole set above world 990 to tan on one
  *  frame early in the dive, so the upper rows were tan-lined and the door dark ink with the split across the house
  *  mid-frame; and once in the band the tan mullions and the browser's dots / pill were still busy behind the glyphs).
- *  Each row of the facade is a unit: its ink turns tan on the frame its top reaches screen y BAND_TAN (just under the
- *  band, 570) and its lines go altogether (fill-only) once its top is BAND_FLAT deep in the band. `top` = the row's top
+ *  Each row of the facade is a unit: its ink turns TAN on the frame its top reaches screen y BAND_TAN (just under the
+ *  band, 570), and its lines go altogether (FILL-ONLY) only once the WHOLE unit is inside the band (its bottom above
+ *  BAND_FLAT; A1 fix round 2: units went flat as soon as their top was 80 px deep, so a unit straddling the band edge
+ *  was half ink-less and the receding row's verticals started abruptly on a horizontal line well under the band; now a
+ *  straddling unit stays tan: the ink lightens toward the band instead of stopping on a line). `top` = the row's top
  *  (world), `y` = the boundary under it (no object crosses it): the cornice (its lower line 680, boundary 700), the upper
  *  window row (frames from 706, boundary 835: between the rows), the second window row (frames from 856, boundary 990:
- *  above the door and the calendar). The hero browser (760-900, it straddles 835) is its own unit (`BROWSER_BOX`), and
- *  its bar goes flat (one teal field, no dots, no pill) when it reaches BAND_TAN. Nothing below world 990 ever changes. */
+ *  above the door and the calendar; it straddles the band at the cut, so it ends tan). The hero browser (760-900, it
+ *  straddles 835) is its own unit (`BROWSER_BOX`), and its bar goes flat (one teal field, no dots, no pill) when it
+ *  reaches BAND_TAN. Nothing below world 990 ever changes. */
 const BAND_ROWS = [
   {top: 680, y: 700},
   {top: 706, y: 835},
   {top: 856, y: 990},
 ];
 const BAND_TAN = 600;
-const BAND_FLAT = 520;
+const BAND_FLAT = 600;
 const BROWSER_BOX: Box = [STOOP.browser[0] - 5, STOOP.browser[1] - 5, STOOP.browser[0] + STOOP.browser[2] + 5, STOOP.browser[1] + STOOP.browser[3] + 5];
 /** The near layer only takes the band rows down to the upper window row's boundary (835): the lamp's head and crossbar
  *  (world ~640-660) soften with the cornice; the lantern (960-1006) is never split. */
@@ -120,37 +128,42 @@ function bandState(cam: Cam, on: boolean, cap = Infinity): BandState {
   for (const r of BAND_ROWS) {
     if (r.y > cap) break;
     if (sy(r.top) < BAND_TAN) tanY = r.y;
-    if (sy(r.top) < BAND_FLAT) flatY = r.y;
+    if (sy(r.y) < BAND_FLAT) flatY = r.y;
   }
-  const bt = sy(BROWSER_BOX[1]);
-  return {tanY, flatY, bTan: bt < BAND_TAN, bFlat: bt < BAND_FLAT};
+  return {tanY, flatY, bTan: sy(BROWSER_BOX[1]) < BAND_TAN, bFlat: sy(BROWSER_BOX[3]) < BAND_FLAT};
 }
-/** The sun's z-swap (in front of the set mid-hop, the S03 match object; in the sky slot behind the left row's roofline
- *  from the landing) is a 3-frame SWEEP (fix round 3; 47 % of the disc vanished on one frame before). From `this - lead`
- *  both copies draw and the front one is clipped to the SKY side of a line PARALLEL to the roofline (world (520, 660) ->
- *  the VP) that starts `d` world deep in the facade (past the disc's deepest point: nothing cut) and closes onto the
- *  roofline over `dur`. A1 fix round: the sweep edge was a vertical line (screen x 826 -> 1048), so on its first frame
- *  the landing disc was a D with a straight vertical side; now the cut edge always has the roofline's slope and reads
- *  as the disc settling behind the roof. */
-const SUN_SWEEP = {lead: 0.045, dur: 0.1, d: 60};
-const ROOF_A: [number, number] = [520, 660];
-/** The roofline's unit direction (toward the VP) and its normal INTO the facade (lower-left). */
-const ROOF_U: [number, number] = (() => {
-  const dx = STOOP.vp[0] - ROOF_A[0];
-  const dy = STOOP.vp[1] - ROOF_A[1];
-  const l = Math.hypot(dx, dy);
-  return [dx / l, dy / l];
-})();
-const ROOF_N: [number, number] = [-ROOF_U[1], ROOF_U[0]];
-/** The sky side of the roofline moved `d` world into the facade (world polygon). */
-const roofSky = (d: number) => {
-  const o: [number, number] = [ROOF_A[0] + ROOF_N[0] * d, ROOF_A[1] + ROOF_N[1] * d];
-  const P = (u: number, n: number) => `${(o[0] + ROOF_U[0] * u - ROOF_N[0] * n).toFixed(1)} ${(o[1] + ROOF_U[1] * u - ROOF_N[1] * n).toFixed(1)}`;
-  return `M${P(-3000, 0)}L${P(3000, 0)}L${P(3000, 4000)}L${P(-3000, 4000)}Z`;
-};
+/** The sun's landing and z-swap (A1 fix round 2: the roofline-parallel clip SWEEP is gone; its edge lay on no drawn
+ *  line, so for two frames the landing disc was a lemon / D shape floating over the hero house). The glide (S03's hop,
+ *  replayed with the same key: identical on the cut) is bent after the cut so it TOUCHES DOWN on 'This' at `touch`,
+ *  where the disc is fully clear of the hero house and of the left row's roofline (~3 px of sky between the disc and the
+ *  roofline's ink); the z-order swaps on that frame (nothing overlaps the disc there but the wire, which is drawn over
+ *  both copies, and the far towers, which are behind both copies: the swap is invisible). From the touch-down the
+ *  landing squash plays and the disc SLIDES down-left into its slot behind the row (`slide` s, in-out sine, from one
+ *  frame after the touch-down) and sinks 7 px into it: the bite grows from zero and is always bounded by the inked
+ *  roofline. The bend is a cubic Hermite offset added to the hop (zero at the cut with zero slope, so position and
+ *  velocity match S03; its end slope `land` cancels most of the hop's sideways speed at the touch-down: the disc lands
+ *  moving ~4 px / frame, not 18). Screen px. */
+const SUN_LAND = {touch: [990, 668] as [number, number], land: [-413, 39] as [number, number], slide: 0.26, delay: 1 / 30};
+/** The sun's screen offset from S03's hop path at scene time t (the hop lands at SUN_SLOT on 'This'). */
+function sunOffset(t: number, touchAt: number): [number, number] {
+  const dx = SUN_LAND.touch[0] - SUN_SLOT[0];
+  const dy = SUN_LAND.touch[1] - SUN_SLOT[1];
+  if (t <= 0) return [0, 0];
+  if (t <= touchAt) {
+    const u = t / touchAt;
+    const h01 = 3 * u * u - 2 * u * u * u;
+    const h11 = u * u * u - u * u;
+    return [dx * h01 + touchAt * SUN_LAND.land[0] * h11, dy * h01 + touchAt * SUN_LAND.land[1] * h11];
+  }
+  const e = prog(t, touchAt + SUN_LAND.delay, SUN_LAND.slide, E.inOutSine);
+  return [dx * (1 - e), dy * (1 - e) + SUN_SINK * e];
+}
 /** L5's entry pendulum (fix round 3: -16 -> -12 deg, with the paper 2 world higher and 4 shorter: its swing no longer
  *  dips past the 1480 label box). */
 const L5_SWING = -12;
+/** The dive's spot re-pop leads the dive's first frame by 0.05 s (rule-5 lead; its pop spring reaches full size ~0.14 s
+ *  after the pop). */
+const SPOT_REPOP_LEAD = 0.05;
 
 /** The lock box rattles about its top screw: +-5 deg for 0.15 s when Bit kicks off on 'bug', +-3 deg for 0.12 s when he
  *  lands back on it. */
@@ -176,29 +189,24 @@ const Scene04: React.FC = () => {
   const site = siteAt(tears, t);
 
   // ---- the sun, SCREEN space the whole scene (a sky object at infinity does not move in a dolly): S03's glide-hop
-  // continued (take-off at end(it), mid-air at (810, 680) on the cut, lands on 'This' in its slot and sinks 7 px into
-  // it), then during the dive it slides down toward S05's notch (930, 725). Z-order: IN FRONT of the set while mid-hop
-  // (the match object stays whole on the cut), then in the set's SKY slot (behind the towers, the rows' rooflines and
-  // the wire) from the touch-down frame on 'This' (fix round 2: the swap one frame early cut a quarter of the moving
-  // disc in one frame; now it lands inside the impact squash) to the end. Fix round 2 (major): it stays in the sky slot
-  // through the dive (it was brought forward over the facades, a flat disc on house fronts at the cut): the receding
-  // row slides up over it and S05's notch sun is simply there on the cut (legal on a cut).
-  const sunMoves: SunMove[] = [
-    {at: b.this, dur: 0.1, y: SUN_SLOT[1] + SUN_SINK, ease: E.outCubic},
-    {at: diveAt, dur: DIVE, x: SUN_S05[0], y: SUN_S05[1], ease: E.inOutSine},
-  ];
+  // continued (take-off at end(it), mid-air at (810, 680) on the cut), bent after the cut so it touches down on 'This'
+  // in clear sky right of the hero house (SUN_LAND), then slides down-left into its slot behind the left row and sinks
+  // 7 px into it; it holds there to the end (A1 fix round 2: it no longer slides toward S05's notch in the dive, where
+  // the rising roofline and the stepped far towers cut it into a jagged shard; the receding row slides up over it and
+  // S05's notch sun is simply there on the cut). Z-order: IN FRONT of the hero and the rows while mid-hop (the match
+  // object stays whole on the cut), behind them from the touch-down frame, where nothing overlaps the disc. Both copies
+  // sit in FRONT of the far towers (drawn after the far layer) and BEHIND the wire and the near layer (the front copy is
+  // drawn at the start of the near layer), so neither the towers nor the wire ever change sides of the disc.
   const sunHops = [{t: b.sunTakeOff, to: SUN_SLOT, h: 15, air: b.this - b.sunTakeOff}];
-  const sweep0 = b.this - SUN_SWEEP.lead;
-  const sunFront = t < sweep0 + SUN_SWEEP.dur;
-  const sunBack = t >= sweep0;
+  const sunFront = t < b.this;
+  const [sox, soy] = sunOffset(t, b.this);
   const sun = (
     <XG m={mat.inv(M)}>
-      <Sun cx={690} cy={700} r={110} drift={[0, 0]} hops={sunHops} moves={sunMoves} />
+      <XG m={mat.translate(sox, soy)}>
+        <Sun cx={690} cy={700} r={110} drift={[0, 0]} hops={sunHops} />
+      </XG>
     </XG>
   );
-  // during the sweep the front copy keeps only the sky side of a roofline-parallel edge closing onto the roofline
-  const sweepD = SUN_SWEEP.d * (1 - Math.max(0, Math.min(1, (t - sweep0) / SUN_SWEEP.dur)));
-  const sunFrontNode = sunFront ? sunBack ? <ClipG d={roofSky(sweepD)}>{sun}</ClipG> : sun : null;
 
   // ---- the year calendar: 15 pages, 14 tears (the page swaps at the tear; the torn page flips up and flies off)
   const calendar = <YearCalendar tears={tears} />;
@@ -223,11 +231,13 @@ const Scene04: React.FC = () => {
       <SeasonIvy steps={ivySteps} seasons={seasons} />
       {/* 'bug': a peach spot with an ink ring and glint ticks behind the lock box and Bit */}
       <BugSpot at={spotAt(b)} off={spotOff(b)} word={b.bug} />
-      {/* the dive (fix round 2: it read as a tilt-down with sound off): the same spot RE-POPS behind lock4 on the dive's
-          first frame, 10 % bigger, and holds to the cut, so the eye locks onto the target */}
-      <BugSpot at={diveAt} off={end + 1} word={-10} k={1.1} />
-      {/* fix round 3: seven hair speed ticks converge on lock4 through the dive's fastest four frames */}
-      <DiveTicks at={diveAt + 0.1} cam={cam} target={LOCK_MID} />
+      {/* the dive (fix round 2: it read as a tilt-down with sound off): the same spot RE-POPS behind lock4, 10 % bigger,
+          and holds to the cut, so the eye locks onto the target (A1 fix round 2: it pops 0.05 s before the dive's first
+          frame, so it is full size by dive frame 3 instead of frame 5) */}
+      <BugSpot at={diveAt - SPOT_REPOP_LEAD} off={end + 1} word={-10} k={1.1} />
+      {/* A1 fix round 2: a broken ink ring ripples outward from the full-size spot on dive frames 3-6 (the hair speed
+          ticks of fix round 3 read as pen scratches over the calendar and the door glass) */}
+      <DiveRipple at={diveAt + 0.078} cam={cam} target={SPOT.c} spotR={SPOT.r * 1.1} />
       {/* lock4 (the set's own hero lock, drawn here so it can rattle about its top screw when Bit kicks off on 'bug') */}
       <XG m={mat.about(mat.rotate(rattle(t, hopAt, hopAt + HOP_DUR)), LOCK_PIVOT[0], LOCK_PIVOT[1])}>
         <Lock x={LK.x} y={LK.y} size={LK.h} seed="stoop/lock4" ink={SI.far} glintAt={b.bug} />
@@ -251,11 +261,32 @@ const Scene04: React.FC = () => {
   const wrap: LayerWrap = (name, _n, node) => {
     // the ground: its fills, its kerb lines, kerb-stone joints, a drain grate, a few specks
     if (name === 'ground') return <GroundS04 node={node} />;
-    if (name === 'rows') return <BandInk s={band} B={BROWSER_BOX} node={node} />;
+    // the sun's back copy: after the far towers (they never cut the disc: A1 fix round 2, in the dive their stepped
+    // roofs rose over it as a jagged shard), behind everything else, clipped to the sky above the left row's roofline
+    if (name === 'far')
+      return (
+        <>
+          {node}
+          {sunFront ? null : <ClipG d={SUN_SKY}>{sun}</ClipG>}
+        </>
+      );
+    if (name === 'rows')
+      return (
+        <>
+          {/* A1 fix round 2: an underlay behind the hero / left-row seam (world x 512-526, under the hero cornice's
+              reach, from just under the roofline's start to the pavement): in the dive the zoom opened a 2-4 px sliver of
+              sky between the hero facade fill and the receding row along the whole house height */}
+          <Fill rect={SEAM_UNDERLAY} color={palette.sand} offset={false} mode="none" seed="s4/seam" />
+          <BandInk s={band} B={BROWSER_BOX} node={node} />
+        </>
+      );
     if (name === 'hero') {
       const rimmed = (
         <>
           <Fill rect={[STOOP.hero.x - 6, STOOP.hero.y - 6, STOOP.hero.w + 12, 7]} color={palette.cream} offset={false} mode="none" seed="s4/rim" />
+          {/* A1 fix round 2: the soffit under the cornice (the facade fill's misregistration left a 4 px strip of SKY
+              between the cornice band and the wall, so the cornice floated): a tan shadow band behind them */}
+          <Fill rect={SOFFIT} color={palette.tan} offset={false} mode="none" seed="s4/soffit" />
           <ClipG d={except(above(RIM_CLIP))}>{node}</ClipG>
         </>
       );
@@ -272,6 +303,8 @@ const Scene04: React.FC = () => {
     if (name === 'near')
       return (
         <>
+          {/* the sun's front copy (mid-hop, until the touch-down): over the hero and the rows, under the wire */}
+          {sunFront ? sun : null}
           {/* the wire snaps on the dive's first frame (everything of the layer right of x 90 above 990 goes flat: the
               wire's ink; WireWhip draws it whipping away); the lamp's head and crossbar soften with the cornice row */}
           <ClipG d={except(TREE_BOX)}>{diving ? <SplitInk y={FLAT_Y} x0={FLAT_NEAR_X0} node={<BandInk s={bandNear} B={BROWSER_BOX} node={node} />} /> : node}</ClipG>
@@ -294,14 +327,12 @@ const Scene04: React.FC = () => {
           foreground={false}
           furniture={[PLANTER]}
           pigeons={false}
-          sun={sunBack ? <ClipG d={SUN_SKY}>{sun}</ClipG> : null}
           calendar={calendar}
           heroLock={false}
           heroSlot={heroSlot}
           wrap={wrap}
           seed="stoop"
         />
-        {sunFrontNode}
       </XG>
     </World>
   );

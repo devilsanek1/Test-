@@ -673,6 +673,9 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
 
   // one painting per scene: the edge follows the scene whose start T has passed, so it changes on the cut
   const edgeScene = only ?? scenes.reduce<FilmScene | undefined>((acc, s) => (T >= s.start - 1e-6 ? s : acc), scenes[0])?.id;
+  // the loop seam: the last scene of a full-colour ('cut' / 'matchcut') loop ends ON frame 0 (S12 = S01's frame 0), so
+  // it wears the FIRST scene's painting (seed + EDGE_HINTS): otherwise the edge paint pops at every loop
+  const edgeId = !only && loop && !loop.unbuild && last && edgeScene === last.id ? scenes[0].id : edgeScene;
   const stack = (
     <>
       {layers.map((l) => (
@@ -685,7 +688,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
   return (
     <TimeProvider global={T} offset={0}>
       <AbsoluteFill style={{background: palette.sky, overflow: 'hidden'}}>
-        {edges ? <FilmEdges scene={edgeScene}>{stack}</FilmEdges> : stack}
+        {edges ? <FilmEdges scene={edgeId}>{stack}</FilmEdges> : stack}
         {showCaptions ? <SkyCaptions beats={captions} tone={tone} regions={regions} loopAt={loopAt} loopEnd={seam} range={range} hookAtStart={!only} /> : null}
       </AbsoluteFill>
       {audio ? <Audio src={staticFile(audioFile())} trimBefore={offset > 0 ? Math.round(offset * fps) : undefined} /> : null}

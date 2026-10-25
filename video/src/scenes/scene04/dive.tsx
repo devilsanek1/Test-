@@ -5,8 +5,8 @@
 //    LEFT edge in four frames on a screen path under the caption band (fix round 3: they vanished mid-frame);
 //  - the telephone wire SNAPS at the lamp end on the same frame and whips right, out of frame, in two frames (the lamp
 //    keeps its stub: the near layer left of world x 90 stays inked);
-//  - fix round 3 (with sound off the dive read as a crane-down): seven short hair SPEED TICKS converge on lock4 for four
-//    frames through the dive's fastest stretch, around the re-popped peach spot.
+//  - the RIPPLE (A1 fix round 2; fix round 3's seven hair ticks read as pen scratches): one broken ink ring steps
+//    outward from the re-popped peach spot on dive frames 3-6.
 // All world space (they ride the dive), placed through the camera where they follow a screen path.
 
 import React from 'react';
@@ -95,26 +95,36 @@ export const WireWhip: React.FC<{diveAt: number}> = ({diveAt}) => {
   return <Ink d={d1} width={SI.far} taper={false} seed="s4/whip" />;
 };
 
-/** Seven short hair speed ticks around lock4 converging on it (screen space through the camera), for `frames` frames
- *  from `at`: each a radial stroke ~40 px long that steps ~28 px inward per frame; none below the lock (the L5 tag
- *  hangs there) and all far under the caption band. */
-const TICK_ANGLES = [-162, -126, -92, -58, -22, 14, 196];
-export const DiveTicks: React.FC<{at: number; cam: Cam; target: Pt; frames?: number}> = ({at, cam, target, frames = 4}) => {
+/** The dive's RIPPLE (A1 fix round 2: the seven hair speed ticks of fix round 3 were ~1 px on screen, 30-40 px long and
+ *  scattered over the calendar grid and the door glass: stray pen scratches, invisible at phone size). Every straight
+ *  lane out of the lock crosses the door glass, the calendar grid or the tag's lettering, so the burst is a RING, not
+ *  ticks: one broken ink ring (three arcs, 15 deg gaps) concentric with the re-popped peach spot, at the mid ink
+ *  weight (3.0 -> 2.2 px on SCREEN), stepping OUTWARD with the dive's optical flow from 1.3x to 2.4x the spot's radius
+ *  on four frames (dive frames 3-6, once the spot is full size), turning a little each frame. A clean circle around the
+ *  target reads as 'here, into this' with the sound off and cannot be mistaken for marks on the wall. Its top stays at
+ *  screen y >= ~930, far under the caption band. Screen space through the camera; `spotR` = the spot's world radius. */
+const RIPPLE = [
+  {k: 1.3, w: 3.0},
+  {k: 1.65, w: 2.8},
+  {k: 2.0, w: 2.5},
+  {k: 2.4, w: 2.2},
+];
+export const DiveRipple: React.FC<{at: number; cam: Cam; target: Pt; spotR: number}> = ({at, cam, target, spotR}) => {
   const t = useTime();
   const d = t - at;
-  if (d < 0 || d >= frames * FRAME) return null;
-  const k = Math.floor(d / FRAME);
+  if (d < -0.5 * FRAME || d >= (RIPPLE.length - 0.5) * FRAME) return null;
+  const i = Math.max(0, Math.round(d / FRAME));
+  const {k, w} = RIPPLE[i];
   const c = toScreen(cam, target);
+  const r = spotR * cam.zoom * k;
   let path = '';
-  TICK_ANGLES.forEach((a, i) => {
-    const r = (a * Math.PI) / 180;
-    const ux = Math.cos(r);
-    const uy = Math.sin(r);
-    const r1 = 205 - 28 * k + (i % 3) * 14;
-    const r0 = r1 - 36 - (i % 2) * 10;
-    const p0 = toWorld(cam, [c[0] + ux * r1, c[1] + uy * r1]);
-    const p1 = toWorld(cam, [c[0] + ux * r0, c[1] + uy * r0]);
-    path += `M${p0[0].toFixed(1)} ${p0[1].toFixed(1)}L${p1[0].toFixed(1)} ${p1[1].toFixed(1)}`;
-  });
-  return <Ink d={path} width={2.2 / cam.zoom} taper={false} seed="s4/ticks" />;
+  for (let j = 0; j < 3; j++) {
+    const a0 = ((-80 + 12 * i + j * 120) * Math.PI) / 180;
+    const a1 = a0 + (105 * Math.PI) / 180;
+    const p0 = toWorld(cam, [c[0] + Math.cos(a0) * r, c[1] + Math.sin(a0) * r]);
+    const p1 = toWorld(cam, [c[0] + Math.cos(a1) * r, c[1] + Math.sin(a1) * r]);
+    const rw = r / cam.zoom;
+    path += `M${p0[0].toFixed(1)} ${p0[1].toFixed(1)}A${rw.toFixed(1)} ${rw.toFixed(1)} 0 0 1 ${p1[0].toFixed(1)} ${p1[1].toFixed(1)}`;
+  }
+  return <Ink d={path} width={w / cam.zoom} taper={false} seed={`s4/ripple${i}`} />;
 };

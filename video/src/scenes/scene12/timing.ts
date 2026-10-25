@@ -50,8 +50,10 @@ export const B = {
   pipApex: -0.03,
   // 'some' w166: the lettered 'back soon' tags swing once (govB, then govA, 0.05 s apart): these ones did it
   tagSwing: [W.some - 0.04, W.some + 0.01],
-  // 'those' w168: two pigeons land on the dark lamp crossbar (touch-down ON the word; the fly-in leads it)
-  pigeonsLand: [W.those - 0.02, W.those + 0.05],
+  // 'those' w168: two pigeons land on the dark lamp crossbar (touch-down ON the word; the fly-in leads it). A1 fix round
+  // 2: a pair on parallel arcs; the leader (right perch) is drawn perched on f19, the follower (left perch) at +0.02
+  // (was +0.05) on f20
+  pigeonsLand: [W.those - 0.02, W.those + 0.02],
   pigeonFly: 0.34, // fly-in duration
   // w168+0.20: a citizen (sB) points at govB; lowers it before 'did' (fix round 1: 1.10 -> down by 1.30 = 53.46, one
   // frame before Pip's nod and the 'did' tags / sparkles, so it no longer competes with them; was 1.24 -> 53.60)
@@ -79,6 +81,10 @@ export const B = {
   // A1 fix round 1: the crossbar pigeon's flap on 'governments' + 0.25 is a wings-open flutter-hop (3 frames in the air,
   // cast.tsx PigeonP + FlapFlyer), not the 6 px shuffle hop of a ~25 px bird
   pigeonFlapDur: 0.1,
+  // A1 fix round 2: the second 'those' pigeon lands FACING RIGHT (its arc comes in from the left, no overshoot past the
+  // perch) and hop-turns to face its neighbour (S01's perched pose, flip) right after that one's flutter-hop: f37-f39,
+  // the reaction to it, in the quiet run before 'did'
+  pigeonTurn: L(53.39),
   // 'did' w170: Pip nods (sit-back squash pulse +0.08 -> 0, 0.2 s); the padlocks glint at once
   nod: W.did - 0.02,
   glint: W.did,

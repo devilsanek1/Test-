@@ -24,7 +24,7 @@
   {"s":43.605,"e":45.85,"lines":[{"text":"they're not officially","s":43.605},{"text":"supported anymore.","s":44.39}],"highlights":[{"text":"not officially","s":43.855}],"out":45.48},
   {"s":45.85,"e":48.365,"lines":[{"text":"Even the FBI said if","s":45.85},{"text":"you can't update yet,","s":47.235}],"highlights":[{"text":"FBI","s":46.195}]},
   {"s":48.365,"e":50.235,"lines":[{"text":"just turn it off,","s":48.365},{"text":"which is basically","s":49.63}],"highlights":[{"text":"turn it off,","s":48.69}]},
-  {"s":50.235,"e":52.43,"lines":[{"text":"tech support's answer","s":50.235},{"text":"to everything.","s":51.345}],"highlights":[]},
+  {"s":50.235,"e":52.43,"lines":[{"text":"tech support's answer","s":50.235},{"text":"to everything.","s":51.345}],"highlights":[],"out":52.06},
   {"s":52.43,"e":53.76,"lines":[{"text":"And some of those","s":52.43},{"text":"governments did it","s":53.015}],"highlights":[{"text":"did it","s":53.51}]},
   {"s":53.76,"e":55.36,"lines":[{"text":"before there was","s":53.76},{"text":"even a fix.","s":54.395}],"highlights":[{"text":"before","s":53.76}]}
 ]
