@@ -87,8 +87,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
 
 ## 3. The queue (in order) at handoff
 
-1. **RUNNING since 2026-10-25 ~20:10 UTC (run wf_35be2fad-d8f): relaunched the v2 G0 workflow.** If it died, relaunch it from its script; output `video/docs/v2/G0_ANGLES.md`. Present the top 3; the owner picks.
-2. **RUNNING since 2026-10-25 ~20:10 UTC (run wf_ee30e562-0c7, script `context/workflows/look-cozy-and-scale-wf_ee30e562-0c7.js`): research the "cozy + scale" look** (owner, 2026-10-25 17:32). Output `video/docs/look/COZY_AND_SCALE.md` plus `video/docs/look/research/*.md`.
+1. **PAUSED by the owner at 2026-10-25 ~20:15 UTC (stopped before any agent finished; nothing produced). Relaunch the v2 G0 workflow from `context/workflows/v2-g0-angles-wf_b7b190a7-4fe.js` when the owner says go;** output `video/docs/v2/G0_ANGLES.md`. Present the top 3; the owner picks.
+2. **PAUSED by the owner at 2026-10-25 ~20:15 UTC (nothing produced). When the owner says go, relaunch `context/workflows/look-cozy-and-scale-wf_ee30e562-0c7.js` to research the "cozy + scale" look** (owner, 2026-10-25 17:32). Output `video/docs/look/COZY_AND_SCALE.md` plus `video/docs/look/research/*.md`.
    - **What the owner said:**
      - "I do like the bigger scale scenes occasionally, we did it great here, keep going, taking inspiration from
        scenes in Arcane: not the footage but camera work, to feel small and scale."
