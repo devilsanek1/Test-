@@ -62,12 +62,16 @@ scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 -
   factor (`const ks = useInkScale()` at the component's top level, `strokeWidth={w * ks}`): Lock (ghost outline, glint,
   `LockSpecks`), BrowserChrome's `LoadingRing` / `TargetRing` (ink circles, spinner, ripple), SunMorphs (PowerGlyph glints,
   RewindGlyph, SunPress / PressRipple ripples, SunPie rims, HoursClock, MinuteWedge), Shutter (peephole ink ring), Figures
-  (Citizen paper outline, CollarBand mask holes, Attempter), Labels (`InkTextBlock` bars + strike, `CheckBoxTags`,
-  StickyNote slap marks), Glyphs (MarkRing ping, QuestionMark ink rim), Bit (eye / shell highlight lines), Diagram
-  (SiteIcon), Elephant (plaque pulse rings, `PlaqueSpecks`), FixSign, Tablet (ScanBeam). Deliberately NOT compensated
-  (body geometry drawn as a stroke, not ink): the ring's coloured band, the peephole's cream rim, the QuestionMark's cream
-  body, the Attempter's arm. Factor 1 = pixel-identical (S01/S02/S05/S07/S08/S10/S11/S12 frames checked). The props
-  S01's dive shows (Lock, BrowserChrome frame, RollerShutter) were already compensated: their linework is `<Ink>`.
+  (Citizen paper outline, CollarBand mask holes, Attempter), Labels (`InkTextBlock` strike, `CheckBoxTags`,
+  StickyNote slap marks), Glyphs (MarkRing ping, QuestionMark ink rim + its dot's ink rim), Bit (eye / shell highlight
+  lines), Diagram (SiteIcon), Elephant (plaque pulse rings, `PlaqueSpecks`), Tablet (ScanBeam). Hub dots shrink with
+  their lines, like the core ClockHands hub: HoursClock `r = sw * 0.95 * ks`, MinuteWedge `r = w * 1.3 * ks`.
+  Deliberately NOT compensated: body geometry drawn as a stroke, not ink (the ring's coloured band, the peephole's cream
+  rim, the QuestionMark's cream body, the Attempter's arm); the sub-7 px text stand-in bars (`InkTextBlock`, FixSign
+  rows and 'fixed!'), which must match the `<text>` they swap to at 7 px (text is never compensated, so a thinned bar
+  would jump in weight at the swap); and all fills. Factor 1 = pixel-identical (S01/S02/S05/S07/S08/S10/S11/S12 frames
+  checked). The props S01's dive shows (Lock, BrowserChrome frame, RollerShutter) were already compensated: their
+  linework is `<Ink>`.
 - **LOD by on-screen size** (the same `useXf()` scale as `screenSize`/`toScreen` in `lib/cine/state.tsx`): each prop drops
   detail below its thresholds (listed per prop) and becomes a flat dot / bar far away.
 - **Render states**: `<Look fills="paper">` turns every fill white (frame 0 / loop line art; Bit, the sun and its overlays stay

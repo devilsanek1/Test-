@@ -11,7 +11,7 @@
 //    rolls out right on 'anymore' (sine ramp to 500 px/s: <= 18 px / frame on screen).
 // S09's 'still fixing... / fixed!' card (the shared FixSign, the SAME object as S06 / S07 / S09) hangs flat on a short post
 // on the cart's camera-facing side over the wheel, fs 21 ('fixed!' 24.7 px on screen), between siteM's plaque bottom
-// (1224) and the stoops (1300). The satchel of tags hangs at the maker's left hip.
+// (1224) and the stoops (1300). The satchel of tags hangs at the maker's right hip.
 
 import React from 'react';
 import {palette} from '../../lib/theme';
@@ -149,7 +149,7 @@ export const Cart: React.FC<{T: CartTimes}> = ({T}) => {
   return (
     <PopUp at={t0} x={x} y={CART.y} over={0.06}>
       <MakersCart x={x0} y={CART.y} size={CART.size} crates={1} roll={roll} pusher sign={sign} signPost={22} signX={-2 / CS} seed="s10/cart" />
-      <Satchel x={xm - 19} y={HIP_Y + 8} w={22} pullAt={[T.toss1 - RAISE, T.toss2 - RAISE]} pullDur={0.06} seed="s10/satchel" />
+      <Satchel x={xm + 17} y={HIP_Y + 8} w={22} pullAt={[T.toss1 - RAISE, T.toss2 - RAISE]} pullDur={0.06} seed="s10/satchel" />
       <ThrowArms T={T} xm={xm} />
     </PopUp>
   );

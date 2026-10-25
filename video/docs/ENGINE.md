@@ -229,13 +229,15 @@ and your own `inkCompFactor(zoomNow, k, from)` follow the zoom live instead (bac
 `useScreenWidth(depth)(px)` (CINE.md) is no longer screen-constant inside a flagged camera when fed to `<Ink>` (Ink
 multiplies by the layer factor): divide it by `useInkScale()` there.
 
-**Coverage gaps (raw strokes).** Only the pieces listed above read the factor. A raw `<path strokeWidth>` in shared code
-stays uncompensated even inside an opted-in InkScale: props SunMorphs (12 uses), Figures (9), BrowserChrome (5), Labels
-(5), Lock (4), Glyphs (3), Bit / Diagram / Elephant props / FixSign / Shutter (2 each), Tablet (1); sets
-GovernmentPlaza's chevron (~l. 914), DomeCity (1); core `FigureWiper` (screen space, never zoomed: fine) and the
-lib/cine pieces (city, street, props, monument, sky, tower, wall, wipers, lens, light, windows, figures). The owning lanes wire them
-by multiplying the width by `useInkScale()` (requests in SHARED_PROPS.md 1 / SHARED_SETS.md 1); for S01 the dive shows
-BrowserChrome (the `windowSlot` windows inside `{node}`), Lock and SunMorphs, so those three come first.
+**Coverage gaps (raw strokes).** Only the pieces listed above read the factor. A raw `<path strokeWidth>` stays
+uncompensated even inside an opted-in InkScale unless its width is multiplied by `useInkScale()`. The shared props and
+sets are DONE (every raw ink width in `scenes/shared/props/**` and `sets/**` reads the factor, incl. BrowserChrome, Lock,
+SunMorphs and GovernmentPlaza's pennant chevron; the deliberate exceptions are listed in SHARED_PROPS.md 1 /
+SHARED_SETS.md 1). Still raw: core `FigureWiper` (screen space, never zoomed: fine) and the lib/cine pieces (city,
+street, props, monument, sky, tower, wall, wipers, lens, light, windows, figures). **Fills are never compensated**: a
+fill sized in world units to tuck under a line (a bleed / spill past an edge) grows with the zoom and can read as a
+heavy bar next to a thinned line; size such a spill in screen px (`/ matScale(useXf())`, in a component, not a plain
+render callback) instead.
 
 Verified (temporary lab entries, removed): CineCamera keys 1 -> 3x: a 4 px line 12 px -> 6 px, held after the
 segment; World push 2.5x: 10 -> 6 px; push-through x7 at u 0.9: 20 -> 8 px; S01 with the opt-in (below): the set's

@@ -1,30 +1,31 @@
-// S05 LOCAL STAND-INS for two props-lane figures (src/scenes/shared/props/Figures.tsx), same names, a superset of the
-// shared props. Swap back to `import {Investigator, Messenger} from '../shared/props'` once the props lane adds:
+// S05 LOCAL STAND-IN for a props-lane figure (src/scenes/shared/props/Figures.tsx), same name, a superset of the shared
+// prop. Swap back to `import {Investigator} from '../shared/props'` once the props lane adds:
 //   Investigator: `tabletSize` (world px, default 60), `tabletLift` ('overhead' | 'head': the raised hand beside the
 //                 head instead of above it), `pose` (a second arm: 'point' at a world target from `poseAt`, 'shade' (a
 //                 hand at the brow, elbow out: looking up), 'hips' (both hands on the hips), 'clipboard' (held at the
-//                 side)).
-//   Messenger:    `side` ('left' | 'right', default right: the hand that pulls the envelope), `lift` ('shoulder' |
-//                 'high': the envelope raised above the head on that side).
-// The figure geometry, coat, badge, sleeve and tablet are the shared ones (personGeo / Arm / SparkleTablet / Envelope
-// mirrored from Figures.tsx), so a swap is invisible. Feet anchor (x, y), h = total height (world px).
+//                 side)), `acc` (kit accessories: backpack, headphones, strap...), `lanyard` (fix round 2: the badge is
+//                 NOT drawn on the back any more: only its strap, a thin ink line round the nape) and `badge` (default
+//                 false here; the shared prop always draws its back shield).
+// The messenger is the SHARED props Messenger again (fix round 2: ink hair + collar band, the right hand's envelope at
+// the shoulder: exactly S06's), run pose in scene05/messenger.tsx. The figure geometry, coat, sleeve and tablet are the
+// shared ones (personGeo / SparkleTablet mirrored from Figures.tsx). Feet anchor (x, y), h = total height (world px).
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {ease as E, lerp, osc, prog, useTime} from '../../lib/time';
 import {rand, rng, Seed} from '../../lib/rng';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {Hair, Person} from '../../lib/kit';
+import {Acc, Hair, Person} from '../../lib/kit';
 import {blob, polyPath, roundRect, Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
-import {Envelope, SparkleTablet} from '../shared/props';
+import {SparkleTablet} from '../shared/props';
 
-const TORSO = 95;
-const LEG = 62;
+export const TORSO = 95;
+export const LEG = 62;
 export const FIG_H = 199;
 
 /** Mirrors Figures.tsx personGeo (the kit Person's first random draws for a seed). */
-function personGeo(seed: Seed, torsoH = TORSO) {
+export function personGeo(seed: Seed, torsoH = TORSO) {
   const r = rng(`person/${seed}`);
   const w = r.range(86, 100);
   const hr = w * r.range(0.23, 0.26);
@@ -108,6 +109,14 @@ export type InvestigatorProps = Frame & {
   tabletLift?: 'overhead' | 'head';
   pose?: InvestigatorPose;
   walk?: number;
+  /** Kit accessories (default none: no kit V collar). */
+  acc?: Acc[];
+  /** Hair colour (passed to the kit: pick one that never reads as skin). */
+  hairColor?: string;
+  /** The lanyard strap round the nape (default true unless the hair is long: it would sit on the hair). */
+  lanyard?: boolean;
+  /** The old back shield badge (default false: badges hang in FRONT). */
+  badge?: boolean;
 };
 
 /** World centre of an investigator's raised tablet (for beams). */
@@ -137,6 +146,10 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
   const hand: Pt = [lerp(down[0], up[0], q), lerp(down[1], up[1], q)];
   const by = -g.h * 0.62;
   const shield = `M${-11} ${by - 13}Q0 ${by - 17} 11 ${by - 13}L11 ${by}Q9 ${by + 11} 0 ${by + 16}Q-9 ${by + 11} -11 ${by}Z`;
+  // the lanyard: its strap seen from behind, a shallow U round the nape from shoulder-neck to shoulder-neck (~2 px)
+  const ny = -g.h;
+  const lan = `M${(-g.hr * 0.95).toFixed(1)} ${(ny + g.hr * 0.12).toFixed(1)}Q0 ${(ny + g.hr * 0.62).toFixed(1)} ${(g.hr * 0.95).toFixed(1)} ${(ny + g.hr * 0.12).toFixed(1)}`;
+  const lanOn = p.lanyard ?? p.hair !== 'long';
   // the second arm's pose: drawn BEFORE the body when it is mostly behind it (hands on the hips, a hand at the brow:
   // only the elbow shows past the coat, the back-view read), after it when it is out in front (point, clipboard)
   const before: React.ReactNode[] = [];
@@ -177,60 +190,14 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
   return (
     <FigFrame b={p}>
       {before}
-      <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={coat} hair={p.hair} acc={['collar']} ink={W} walk={p.walk} />
-      <Ink d={shield + `M0 ${by - 9}V${by + 9}M-6 ${by - 2}H6`} width={W * 0.75} seed={`${seed}/badge`} />
+      <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={coat} hair={p.hair} hairColor={p.hairColor} acc={p.acc ?? []} ink={W} walk={p.walk} />
+      {lanOn ? <Ink d={lan} width={W * 0.62} taper={false} seed={`${seed}/lan`} /> : null}
+      {p.badge ? <Ink d={shield + `M0 ${by - 9}V${by + 9}M-6 ${by - 2}H6`} width={W * 0.75} seed={`${seed}/badge`} /> : null}
       {after}
       {q > 0.02 ? (
         <>
           <Arm sh={sh} hand={hand} coat={coat} W={W * 0.85} seed={`${seed}/arm`} />
           <SparkleTablet x={hand[0]} y={hand[1] - (ts * 0.6) / s} size={ts / s} rot={side * (1 - q) * -30} twinkle={p.twinkle ?? true} ink={W * 0.8} seed={`${seed}/tab`} />
-        </>
-      ) : null}
-    </FigFrame>
-  );
-};
-
-// ---------------------------------------------------------------- Messenger
-
-export type MessengerProps = Frame & {
-  pullAt?: number;
-  holdEnvelope?: boolean;
-  envelopeSize?: number;
-  /** The hand that pulls the envelope (default right, the shared prop's). */
-  side?: 'left' | 'right';
-  /** 'shoulder' (shared) | 'high' (above the head on that side: the reveal). */
-  lift?: 'shoulder' | 'high';
-  walk?: number;
-};
-
-/** World centre of the messenger's envelope once it is up. */
-export function messengerEnvelope(p: Pick<MessengerProps, 'x' | 'y' | 'h' | 'seed' | 'side' | 'lift'>): Pt {
-  const s = p.h / FIG_H;
-  const g = personGeo(p.seed ?? 'msg');
-  const sd = p.side === 'left' ? -1 : 1;
-  const up: Pt = p.lift === 'high' ? [sd * g.w * 0.55, g.hy - g.hr * 2.1] : [sd * g.w * 0.7, -g.h * 0.92];
-  return [p.x + (up[0] + sd * 6) * s, p.y - LEG * s + (up[1] - 16) * s];
-}
-
-export const Messenger: React.FC<MessengerProps> = (p) => {
-  const t = useTime();
-  const seed = String(p.seed ?? 'msg');
-  const s = p.h / FIG_H;
-  const g = personGeo(seed);
-  const W = inkFor(p.h) / s;
-  const q = p.holdEnvelope ? 1 : raiseQ(t, p.pullAt);
-  const sd = p.side === 'left' ? -1 : 1;
-  const sh: Pt = [sd * g.w * 0.34, -g.h * 0.8];
-  const lo: Pt = [sd * g.w * 0.48, -g.h * 0.2];
-  const up: Pt = p.lift === 'high' ? [sd * g.w * 0.55, g.hy - g.hr * 2.1] : [sd * g.w * 0.7, -g.h * 0.92];
-  const hand: Pt = [lerp(lo[0], up[0], q), lerp(lo[1], up[1], q)];
-  return (
-    <FigFrame b={p}>
-      <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={palette.teal} hair="short" acc={['collar']} ink={W} walk={p.walk} />
-      {q > 0.02 ? (
-        <>
-          <Envelope x={hand[0] + sd * 6} y={hand[1] - 16} size={(p.envelopeSize ?? 60) / s} rot={sd * lerp(30, -8, q)} carry={p.walk ? {} : undefined} depth="mid" seed={`${seed}/env`} />
-          <Arm sh={sh} hand={hand} coat={palette.teal} W={W * 0.85} seed={`${seed}/arm`} />
         </>
       ) : null}
     </FigFrame>

@@ -73,7 +73,14 @@ row); `DemoSun` is pinned (`drift={[0, 0]}`) so a preview frame shows the sun SL
   (lib/inkComp.tsx) so camera ink compensation reaches it (core `<Ink>` / `<Drawn>` lines get it already; 1 by default).
   **Done (kitv3b core review request)**: GovernmentPlaza's pennant chevron mark and DomeCity's searchlight beam edges
   read `useInkScale()`; the props placed through `propSlots` / `windowSlot` (BrowserChrome, Lock, shutters) honour it too
-  (SHARED_PROPS.md), so everything inside S01's plaza `<InkScale>` is compensated. No raw `strokeWidth` is left in `sets/**`.
+  (SHARED_PROPS.md), so every ink STROKE inside S01's plaza `<InkScale>` is compensated. No raw `strokeWidth` is left in
+  `sets/**`. **Fills are never compensated**: a fill that spills past an edge in world units grows x2.9 in S01's dive.
+  Open (S01 lane): `scene01/screens.tsx` draws its ink-dark CRT / dead-screen glass as `rectPath(-1, -1, w + 5, h + 5)`;
+  at 4.70 that 4-unit spill merges with govB's right window edge into a 17 px ink bar (left edge 5 px). Fix: render
+  the glass as a small component that sizes the spill in screen px (`k = matScale(useXf())`, `rectPath(-1 / k, -1 / k,
+  w + 5 / k, h + 5 / k)`); a component, because BrowserChrome calls `content()` as a plain function. The set's own
+  `crtContent` (GovernmentPlaza, tealDark glass) has the same world-unit spill; S01 does not use it (it passes
+  `windowSlot`), but give it the same treatment before a scene zooms into it under an `<InkScale>`.
 - **Haze ladder** (style_bible_ref2 8): far layers are fill-only and step toward the sky, day `#84B09C` -> `#98C0AE` ->
   sky; on golden skies `HALF.sand` (#E6CEB6). No per-house rects under ~6 px at rest: distant rows collapse into stepped
   skyline bands with a few >= 3 px window dots (TerraceHill, the plaza's far city).

@@ -116,7 +116,7 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
     const crawlAt = p.bit.at + 0.1;
     const arrive = crawlAt + 0.32;
     if (t < arrive) {
-      face.push(<Bit key="bit" x={path[0][0]} y={path[0][1]} size={bs} state="scuttle" crawl={{at: crawlAt, path, speed: 205}} at={p.bit.at} seed={`${seed}/bit`} />);
+      face.push(<Bit key="bit" x={path[0][0]} y={path[0][1]} size={bs} state="scuttle" crawl={{at: crawlAt, path, speed: 240}} at={p.bit.at} seed={`${seed}/bit`} />);
     } else {
       const d = t - arrive;
       // struggle bursts: right after he is caught, on 'old', on 'not' and on 'anymore' (a beat each)
