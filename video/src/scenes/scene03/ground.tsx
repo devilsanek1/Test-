@@ -215,7 +215,7 @@ const KNOCK_PIVOT: Pt = [(CARD_BOX[0] + CARD_BOX[2]) / 2, CARD_BOX[1] + (38 / 1.
  *  hairline box on the perspective plan, a blank placeholder): it arrives WITH the card, on the card's own pop spring
  *  about the card's pivot, so the hole grows with the paper. */
 const knockXf = (t: number, at: number | undefined) => {
-  if (at === undefined || t >= at + 0.6) return mat.identity();
+  if (at === undefined || t >= at + 0.6) return mat.I;
   const k = Math.max(0.001, springAt(t, at, springs.pop));
   return mat.about(mat.scale(k), KNOCK_PIVOT[0], KNOCK_PIVOT[1]);
 };
@@ -232,7 +232,7 @@ export const CardKnock: React.FC<{at?: number; children: React.ReactNode}> = ({a
     <>
       <defs>
         <clipPath id={id} clipPathUnits="userSpaceOnUse">
-          <path d={KNOCK} clipRule="evenodd" transform={`matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`} />
+          <path d={KNOCK} clipRule="evenodd" transform={`matrix(${m.join(" ")})`} />
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>{children}</g>
@@ -261,7 +261,7 @@ export const GroundS03: React.FC<{gridAt: number; streetAt?: number; knockAt?: n
   return (
     <>
       {streetK > 0.001 ? (
-        <XG m={streetK === 1 ? mat.identity() : mat.about(mat.scale(1, streetK), 0, 1180)}>
+        <XG m={streetK === 1 ? mat.I : mat.about(mat.scale(1, streetK), 0, 1180)}>
           <Fill rect={[-160, 1180, 1400, 900]} color={palette.sand} offset={false} mode="snap" seed={`${seed}/street`} />
         </XG>
       ) : null}
