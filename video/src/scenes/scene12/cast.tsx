@@ -16,9 +16,11 @@ import {Fill} from '../../lib/Fill';
 import {mat, useXf, XG} from '../../lib/xf';
 import {palette} from '../../lib/theme';
 import {S01_PADLOCK_SIZE} from '../scene01/shims';
-import {CitizenPlan, leanAt, OnlookerPhoneArm, PigeonPlan} from '../scene01/cast';
+import {CitizenPlan, leanAt, OnlookerPhoneArm, Pigeon, PigeonPlan} from '../scene01/cast';
+import {NoteBack, NoteBreeze, NoteFlight} from '../scene11/shims';
+import {useInkScale} from '../../lib/inkComp';
 import {NearPlan, ONL_DX, ONLOOKERS, S01_BIT, S01_CITIZENS, S01_GOV, S01_NEAR, S01_PIGEONS, S01_PIP, S01_PIP_SEED} from '../scene01/plaza';
-import {B, pClock, R0, stepIndex} from './timing';
+import {B, pClock, R0, REWIND_FPS, S12_START, stepIndex} from './timing';
 
 const pc = pClock;
 
@@ -52,7 +54,11 @@ export const SB_SEED = 's01/sB';
  *  (~184 person units), tilted ~23 deg toward govB's shuttered window (~25 deg on screen with his -2 lean), so the line
  *  of the arm runs on to the shutter; a MITTEN hand (`SbMitten`, longer than wide, along the forearm) at the tip with
  *  the 1.8 px cream rim. */
-const SB_POINT = {at: pc(B.point), downAt: pc(B.pointDown), hand: [-105, -245] as [number, number], w: 21, bend: 12} as const;
+/** A1 fix round 1 (review: ~8-10 px wide with a small mitten it read as a baton, and the brown sleeve sat on govB's tan
+ *  wall with little value separation): sleeve w 28 (~11.5 px on screen, was 21), the full 2.2 px ink tier on the sleeve
+ *  outline (was 0.85 x), and a HAND that points: a sand fist with an extended index finger along the forearm line (on
+ *  to govB's padlock), ~24 px from the fist's back to the fingertip (`SbHand`); the 1.8 px cream rim follows it. */
+const SB_POINT = {at: pc(B.point), downAt: pc(B.pointDown), hand: [-105, -245] as [number, number], w: 28, bend: 12} as const;
 const FIG = {TORSO: 95, LEG: 62, H: 199} as const;
 export const SbPoint: React.FC<{p: CitizenPlan; rim?: boolean}> = ({p, rim}) => {
   const t = useTime();
@@ -84,47 +90,60 @@ export const SbPoint: React.FC<{p: CitizenPlan; rim?: boolean}> = ({p, rim}) => 
         <SbRim sh={sh} el={el} hand={hand} w={SB_POINT.w} />
       ) : (
         <>
-          <SbMitten el={el} hand={hand} w={SB_POINT.w} W={W * 0.8} seed={`${p.seed}/pt12`} />
-          <FigureArm sh={sh} hand={hand} elbow={el} w={SB_POINT.w} coat={p.body ?? palette.brown} W={W * 0.85} hand2={false} seed={`${p.seed}/pt12`} />
+          <SbHand el={el} hand={hand} w={SB_POINT.w} W={W * 0.85} seed={`${p.seed}/pt12`} />
+          <FigureArm sh={sh} hand={hand} elbow={el} w={SB_POINT.w} coat={p.body ?? palette.brown} W={W} hand2={false} seed={`${p.seed}/pt12`} />
         </>
       )}
     </XG>
   );
 };
-/** The pointing mitten (fix round 3): a sand mitten past the cuff, along the forearm (1.35 w long, 0.94 w wide, a thumb bump
- *  on the upper side), inked; drawn before the sleeve so the cuff overlaps its root. */
-const mittenGeom = (el: [number, number], hand: [number, number], w: number) => {
+/** The pointing hand (A1 fix round 1; fix round 3 had a plain mitten): in the forearm's frame (+x = along the forearm,
+ *  from the elbow out), a sand FIST just past the cuff (1.24 w x 1.0 w) with a thumb bump on its upper side and the
+ *  INDEX FINGER extended along the forearm line (to 1.5 w past the fist centre, 0.34 w thick), inked; drawn before the
+ *  sleeve so the cuff overlaps the fist's root. `handGeom` is shared with the rim so the two agree. */
+const handGeom = (el: [number, number], hand: [number, number], w: number) => {
   const fx = hand[0] - el[0];
   const fy = hand[1] - el[1];
   const fL = Math.hypot(fx, fy) || 1;
-  const L = w * 1.35;
-  const c: [number, number] = [hand[0] + (fx / fL) * L * 0.42, hand[1] + (fy / fL) * L * 0.42];
-  return {c, ang: (Math.atan2(fy, fx) * 180) / Math.PI, rx: L / 2, ry: w * 0.47};
+  const c: [number, number] = [hand[0] + (fx / fL) * w * 0.5, hand[1] + (fy / fL) * w * 0.5];
+  return {
+    c,
+    ang: (Math.atan2(fy, fx) * 180) / Math.PI,
+    fist: {rx: w * 0.62, ry: w * 0.5},
+    finger: {cx: w * 0.98, cy: -w * 0.12, rx: w * 0.55, ry: w * 0.17},
+    thumb: {cx: w * 0.05, cy: -w * 0.46, rx: w * 0.26, ry: w * 0.17},
+  };
 };
-const SbMitten: React.FC<{el: [number, number]; hand: [number, number]; w: number; W: number; seed: string}> = ({el, hand, w, W, seed}) => {
-  const {c, ang, rx, ry} = mittenGeom(el, hand, w);
-  const body = blob(0, 0, rx, ry, {seed: `${seed}/mit`, wobble: 0.03});
-  const thumb = blob(-rx * 0.25, -ry * 0.95, rx * 0.34, ry * 0.42, {seed: `${seed}/thb`, wobble: 0.03});
+const SbHand: React.FC<{el: [number, number]; hand: [number, number]; w: number; W: number; seed: string}> = ({el, hand, w, W, seed}) => {
+  const {c, ang, fist, finger, thumb} = handGeom(el, hand, w);
+  const fistD = blob(0, 0, fist.rx, fist.ry, {seed: `${seed}/fist`, wobble: 0.03});
+  const fingerD = blob(finger.cx, finger.cy, finger.rx, finger.ry, {seed: `${seed}/idx`, wobble: 0.02});
+  const thumbD = blob(thumb.cx, thumb.cy, thumb.rx, thumb.ry, {seed: `${seed}/thb`, wobble: 0.03});
   return (
     <XG m={mat.compose(mat.translate(c[0], c[1]), mat.rotate(ang))}>
-      <Fill d={thumb} color={palette.sand} offset={false} mode="none" seed={`${seed}/thf`} />
-      <Ink d={thumb} width={W} taper={false} seed={`${seed}/thi`} />
-      <Fill d={body} color={palette.sand} offset={false} mode="none" seed={`${seed}/mf`} />
-      <Ink d={body} width={W} taper={false} seed={`${seed}/mi`} />
+      <Fill d={fingerD} color={palette.sand} offset={false} mode="none" seed={`${seed}/idf`} />
+      <Ink d={fingerD} width={W} taper={false} seed={`${seed}/idi`} />
+      <Fill d={thumbD} color={palette.sand} offset={false} mode="none" seed={`${seed}/thf`} />
+      <Ink d={thumbD} width={W} taper={false} seed={`${seed}/thi`} />
+      <Fill d={fistD} color={palette.sand} offset={false} mode="none" seed={`${seed}/mf`} />
+      <Ink d={fistD} width={W} taper={false} seed={`${seed}/mi`} />
     </XG>
   );
 };
-/** The cream rim behind sB's point arm: the sleeve (shoulder -> elbow -> wrist) and the hand blob, `px` screen px out. */
+/** The cream rim behind sB's point arm: the sleeve (shoulder -> elbow -> wrist), the fist, thumb and finger, `px` screen
+ *  px out. */
 const SbRim: React.FC<{sh: [number, number]; el: [number, number]; hand: [number, number]; w: number; px?: number}> = ({sh, el, hand, w, px = 1.8}) => {
   const k = Math.max(1e-4, matScale(useXf()));
   const r = px / k;
-  const {c, ang, rx, ry} = mittenGeom(el, hand, w);
+  const {c, ang, fist, finger, thumb} = handGeom(el, hand, w);
+  const e = r * 1.4;
   return (
     <>
       <path d={`M${sh[0]} ${sh[1]}L${el[0]} ${el[1]}L${hand[0]} ${hand[1]}`} fill="none" stroke={palette.cream} strokeWidth={w + 2 * r} strokeLinecap="round" strokeLinejoin="round" />
       <XG m={mat.compose(mat.translate(c[0], c[1]), mat.rotate(ang))}>
-        <ellipse cx={0} cy={0} rx={rx + r * 1.4} ry={ry + r * 1.4} fill={palette.cream} />
-        <ellipse cx={-rx * 0.25} cy={-ry * 0.95} rx={rx * 0.34 + r * 1.4} ry={ry * 0.42 + r * 1.4} fill={palette.cream} />
+        <ellipse cx={0} cy={0} rx={fist.rx + e} ry={fist.ry + e} fill={palette.cream} />
+        <ellipse cx={finger.cx} cy={finger.cy} rx={finger.rx + e} ry={finger.ry + e} fill={palette.cream} />
+        <ellipse cx={thumb.cx} cy={thumb.cy} rx={thumb.rx + e} ry={thumb.ry + e} fill={palette.cream} />
       </XG>
     </>
   );
@@ -157,15 +176,82 @@ export const P_PIGEONS: PigeonPlan[] = R_PIGEONS.map((p, i) => {
   const {landAt: _l, inDur: _d, ...rest} = p;
   if (i === 0) return rest;
   const land = B.pigeonsLand[i - 1];
-  return {...rest, landAt: pc(land - B.pigeonFly), inDur: B.pigeonFly, ...(i === 1 ? {shuffleAt: pc(B.pigeonFlap), shuffleDx: 0} : {})};
+  return {...rest, landAt: pc(land - B.pigeonFly), inDur: B.pigeonFly};
 });
+/** A1 fix round 1 (review: the 'governments' tail was near-still; the old flap was S01's 6 px shuffle hop with dx 0, a
+ *  speck at phone size): the first 'those' lander FLUTTER-HOPS on 'governments' + 0.25: three frames off the bar with
+ *  its wings open (up 7 px wings raised, up 13 px wings spread, up 6 px wings coming down), then a landing squash on
+ *  the perch (0.15 s). The flying pose is S01's Flyer drawing (scene01/cast.tsx, not exported: copied in `FlapFlyer`),
+ *  with the wing angle given per frame instead of its 7 Hz flap. */
+const FLAP_SEED = S01_PIGEONS[1].seed;
+const FLAP_POSES = [
+  {lift: 7, up: 1},
+  {lift: 13, up: 0.45},
+  {lift: 6, up: 0.05},
+];
+const FlapFlyer: React.FC<{x: number; y: number; s: number; up: number; color: string; flip?: boolean}> = ({x, y, s, up, color, flip}) => {
+  const ks = useInkScale();
+  const wing = color === palette.tan ? palette.sand : palette.tan;
+  const belly = 'M12.6 -9.6Q8 -5.7 -2 -6.5Q-7.5 -6.6 -11 -8.6Q-1 -9.4 12.6 -9.6Z';
+  const L = 33;
+  const W = (2.1 / s) * ks;
+  const wingD = `M4.5 0Q8 ${(-L * 0.55).toFixed(1)} 1 ${-L}Q-5 ${(-L * 0.66).toFixed(1)} -6.5 -2Q-3 1 4.5 0Z`;
+  const bFar = lerp(-150, -12, up) - 10;
+  const bNear = lerp(-150, -12, up) + 12;
+  const body = 'M-14 -10Q-6 -17.5 6 -15.5Q13 -14.5 14.5 -10Q9 -5 -2 -6Q-10 -6 -14 -10Z';
+  const tail = 'M-13 -11.5L-24 -16L-23 -5L-13 -8.5Z';
+  const head = 'M8.6 -14a5.2 5.2 0 1 0 10.4 0a5.2 5.2 0 1 0 -10.4 0Z';
+  const common = {stroke: palette.ink, strokeWidth: W, strokeLinejoin: 'round' as const, strokeLinecap: 'round' as const};
+  return (
+    <XG m={mat.compose(mat.translate(x, y), mat.scale(flip ? -s : s, s))}>
+      <XG m={mat.compose(mat.translate(1, -13), mat.rotate(bFar))}>
+        <path d={wingD} fill={wing} {...common} />
+      </XG>
+      <path d={tail} fill={color} {...common} />
+      <path d={body} fill={color} stroke="none" />
+      <path d={belly} fill={palette.cream} stroke="none" />
+      <path d={body} fill="none" {...common} />
+      <path d={head} fill={palette.tealDark} {...common} />
+      <path d="M18.6 -15L23.5 -13.6L18.6 -12.4Z" fill={palette.sun} stroke="none" />
+      <path d="M14.6 -15.4a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0 -2.6 0Z" fill={palette.cream} stroke="none" />
+      <XG m={mat.compose(mat.translate(-2, -11), mat.rotate(bNear))}>
+        <path d={wingD} fill={wing} {...common} />
+        <path d={`M0 ${(-L * 0.42).toFixed(1)}L-3.5 ${(-L * 0.62).toFixed(1)}`} fill="none" {...common} strokeWidth={W * 0.7} />
+      </XG>
+    </XG>
+  );
+};
+/** A P-phase pigeon: S01's Pigeon, except the flutter-hop of FLAP_SEED (its own frames, then a landing squash). */
+export const PigeonP: React.FC<{p: PigeonPlan}> = ({p}) => {
+  const w = useTime(); // the S01 clock (P phase: pClock)
+  const at = pc(B.pigeonFlap);
+  if (p.seed !== FLAP_SEED || w < at) return <Pigeon p={p} />;
+  const i = Math.floor((w - at) * 30 + 1e-6);
+  if (i < FLAP_POSES.length) {
+    const {lift, up} = FLAP_POSES[i];
+    return <FlapFlyer x={p.x} y={p.y - lift} s={0.8} up={up} color={p.color} flip={p.flip} />;
+  }
+  const d = w - at - B.pigeonFlapDur;
+  const sq = d < 0.15 ? 1 - 0.18 * Math.sin(Math.PI * clamp(d / 0.15)) : 1;
+  return sq === 1 ? (
+    <Pigeon p={p} />
+  ) : (
+    <XG m={mat.about(mat.scale(1 / Math.sqrt(sq), sq), p.x, p.y)}>
+      <Pigeon p={p} />
+    </XG>
+  );
+};
 
 // ---------------------------------------------------------------- padlocks + tags (S01Shutter events)
 
 type Gid = 'govA' | 'govB' | 'govC';
-/** govB's padlock 10 px further left than S01's (fix round 1: at 452 its right side touched the lower-left corner of
- *  S11's note; S12 only: S01 has no note, and S12's last frame has no padlock). */
-const GOVB_PADLOCK_X = (S01_GOV.govB?.padlockProps?.x ?? PLAZA.gov.govB.padlock[0]) - 10;
+/** govB's padlock further left than S01's (fix round 1: 10 left, at 452 its right side touched the lower-left corner of
+ *  S11's note; S12 only: S01 has no note, and S12's last frame has no padlock). A1 fix round 1: 24 left (428): S11's
+ *  note moved 7 world left in S11's A1 fix round 2 (left edge ~451 px on screen at the cut), and the slot between the
+ *  window's left jamb (~397 px) and the note is 53 px for a ~48 px body (S01Shutter sizes it by building, so x is the
+ *  only lever): no position leaves air on both sides. So the padlock hangs off the rail's left end IN FRONT of the jamb
+ *  (a clear ~9 px overlap, drawn over the frame) and keeps ~15 px of slats to the note; Bit on its shackle ~24 px. */
+const GOVB_PADLOCK_X = (S01_GOV.govB?.padlockProps?.x ?? PLAZA.gov.govB.padlock[0]) - 24;
 const govB = S01_GOV.govB as GovEvents;
 /** R phase: S01's events without the padlock glints (their 'PURPOSE' glints would replay at the rewind's first step). */
 export const R_GOV: Record<Gid, GovEvents> = {
@@ -356,6 +442,12 @@ const BitRim: React.FC<{x: number; y: number; size: number; px?: number}> = ({x,
     </XG>
   );
 };
+/** A1 fix round 1 (review: on the padlocks' tape step Bit jumped ~340 px from govB's shackle to govA's cornice in one
+ *  frame, so a rewatcher following him lost him): S11's hop onto the shackle plays BACKWARDS in its own poses: on the
+ *  first two frames of tape step 3 (f54-f55) he is mid-arc between the shackle and the cornice (u 0.55 of the way, 46
+ *  world above the chord), nose DOWN as in S11's forward hop (the tape's backwards physics), stretched along the arc,
+ *  with his cream rim; from f56 he sits on govA's cornice (BIT_AWAY). */
+const BIT_HOP = {frames: 2, u: 0.55, lift: 46, rot: 24, stretch: 1.12} as const;
 /** Bit walks BACKWARDS home (facing right, moving left) over B.bitWalk: the film's last motion, done 0.04 s before END. */
 export const BitHome: React.FC<{t: number}> = ({t}) => {
   const [t0, t1] = B.bitWalk;
@@ -365,6 +457,21 @@ export const BitHome: React.FC<{t: number}> = ({t}) => {
       <TimeProvider global={bitClock(t)} offset={0}>
         <BitRim x={x} y={y} size={PLAZA.bitSize} />
         <Bit x={x} y={y} size={PLAZA.bitSize} seed="plaza/bit" state="idle" look="up" />
+      </TimeProvider>
+    );
+  }
+  const hop0 = R0 + BIT_SHACKLE_STEP / REWIND_FPS;
+  if (t < hop0 + BIT_HOP.frames / 30 - 1e-6) {
+    const [sx, sy] = bitOnShackle();
+    const x = lerp(sx, BIT_AWAY[0], BIT_HOP.u);
+    const y = lerp(sy, BIT_AWAY[1], BIT_HOP.u) - BIT_HOP.lift;
+    const c = PLAZA.bitSize * 0.25; // about his shell's middle
+    return (
+      <TimeProvider global={bitClock(t)} offset={0}>
+        <XG m={mat.about(mat.compose(mat.rotate(BIT_HOP.rot), mat.scale(1 / Math.sqrt(BIT_HOP.stretch), BIT_HOP.stretch)), x, y - c)}>
+          <BitRim x={x} y={y} size={PLAZA.bitSize} />
+          <Bit x={x} y={y} size={PLAZA.bitSize} seed="plaza/bit" state="idle" look="down" />
+        </XG>
       </TimeProvider>
     );
   }
@@ -384,21 +491,76 @@ export const BitHome: React.FC<{t: number}> = ({t}) => {
  *  plaza world coords, size, tilt, lettering and seed). The wide opens with it there (continuity across the hard cut);
  *  the rewind takes it off FIRST, the S11 event being the latest one: on 'before' it un-slaps and flutters back up-left
  *  in two tape steps (StickyNote's own flutter, played backwards), then it is gone; S01's tags and padlocks follow. */
-export const S11_NOTE = {x: 545, y: 1028, w: 146, h: 112, rot: -4, fs: 24.5, lines: ['Turn it off', 'and on again']} as const;
-const NOTE_SLAP = 100; // the note's own clock: stuck on from 100
-const NOTE_FLUTTER = 0.36;
-/** Its clock per tape step from 'before': the un-slap squash, mid-flight, nearly back at the flutter start, gone. */
-const NOTE_STEPS = [NOTE_SLAP + 0.03, NOTE_SLAP - 0.14, NOTE_SLAP - 0.3];
-/** The note's corner curls in the breeze on 'of' and after 'governments' (its clock runs NOTE_SLAP + 1 + t in P). */
-const NOTE_CURLS = [NOTE_SLAP + 1 + B.noteCurl[0], NOTE_SLAP + 1 + B.noteCurl[1]];
-const noteClock = (t: number) => (t < R0 ? NOTE_SLAP + 1 + t : NOTE_STEPS[stepIndex(t)] ?? -1);
+/** A1 fix round 1: S11's A1 fix round 2 numbers (Scene11.tsx NOTE / NOTE_FS / NOTE_ROT; was {545, 1028, 146, 112, -4,
+ *  24.5}). */
+export const S11_NOTE = {x: 538, y: 1031, w: 144, h: 100, rot: -2, fs: 25, lines: ['Turn it off', 'and on again']} as const;
+/** S11's drop (Scene11.tsx NoteFlight): the breeze tips the sheet up over govB's cornice-ledge lip (NOTE_LIP) and it
+ *  flutters down (back showing, paper-flip to the face at the end) onto the shutter: 0.52 s (lift 0.1, flip 0.15),
+ *  slapping on at 50.215; its back is NOTE_BACK. */
+const NOTE_LIP: [number, number] = [578, 904];
+const NOTE_BACK = {w: 120, h: 100, fs: 19} as const;
+const NOTE_FLIGHT = {dur: 0.52, lift: 0.1, flip: 0.15} as const;
+/** S11's film times for the note: the slap, the last breeze flutter and corner curl (both still running at S11's last
+ *  frame: S12 picks them up mid-way, so the note sways and curls on across the cut). */
+const S11_T = {slap: 50.215, breeze: 51.955, curl: 51.975} as const;
+const NOTE_SLAP = 100; // the note's own clock: it slaps on at 100 (= film 50.215)
+/** P phase: the note's clock runs with the film (S12-local t -> note clock). */
+const noteP = (t: number) => NOTE_SLAP + (S12_START + t - S11_T.slap);
+const noteAbs = (abs: number) => NOTE_SLAP + (abs - S11_T.slap);
+/** Corner curls: S11's last one (in progress at the cut), then on 'of' and after 'governments'; each curl with a breeze
+ *  flutter 0.02 s before it (S11's pairing; the 'governments' one also feeds the f30-f40 lull). */
+const NOTE_CURLS = [noteAbs(S11_T.curl), noteP(B.noteCurl[0]), noteP(B.noteCurl[1])];
+const NOTE_BREEZE = [noteAbs(S11_T.breeze), noteP(B.noteCurl[0] - 0.02), noteP(B.noteCurl[1] - 0.02)];
+/** The rewind (A1 fix round 1, review: the note un-slapped, fluttered up-left and blinked out in mid-air over govB's
+ *  drum): S11's own drop plays BACKWARDS, one pose per tape step from 'before', and the note goes back where it came
+ *  from: k0 the un-slap squash (+ slap ticks), k1 lifting off the shutter with its back turning toward us (mid-flip,
+ *  ~0.8 wide, ~50 world up), k2 tipped back over govB's cornice-ledge lip (half height, 9 deg), k3 a thin sheet lying
+ *  down onto the ledge (~0.2 height) -> gone from k4 ('there', f57): it lies flat on the ledge, out of sight from the
+ *  street, as before S11's breeze lifted it. */
+const NOTE_STEPS = [NOTE_SLAP + 0.03, NOTE_SLAP - 0.12, NOTE_SLAP - 0.43, NOTE_SLAP - 0.512];
+const noteClock = (t: number) => (t < R0 ? noteP(t) : NOTE_STEPS[stepIndex(t)] ?? -1);
 export const S11Note: React.FC<{t: number}> = ({t}) => {
   const c = noteClock(t);
-  if (c < NOTE_SLAP - NOTE_FLUTTER) return null;
+  if (c < NOTE_SLAP - NOTE_FLIGHT.dur) return null;
   const N = S11_NOTE;
+  const face = (stuck: boolean) => (
+    <StickyNote
+      x={N.x}
+      y={N.y}
+      w={N.w}
+      h={N.h}
+      lines={[...N.lines]}
+      size={N.fs}
+      slapAt={stuck ? NOTE_SLAP : undefined}
+      flutter={false}
+      strike={stuck ? 'and on again' : undefined}
+      strikeAt={stuck ? NOTE_SLAP - 50 : undefined}
+      curlAt={NOTE_CURLS}
+      rot={N.rot}
+      inkPx={3}
+      seed="s11/J6"
+    />
+  );
   return (
     <TimeProvider global={c} offset={0}>
-      <StickyNote x={N.x} y={N.y} w={N.w} h={N.h} lines={[...N.lines]} size={N.fs} slapAt={NOTE_SLAP} flutter={{from: [N.x - 200, N.y - 230], dur: NOTE_FLUTTER}} strike="and on again" strikeAt={NOTE_SLAP - 50} curlAt={NOTE_CURLS} rot={N.rot} inkPx={3} seed="s11/J6" />
+      {c < NOTE_SLAP ? (
+        <NoteFlight
+          x={N.x}
+          y={N.y}
+          h={N.h}
+          lip={NOTE_LIP}
+          arriveAt={NOTE_SLAP}
+          dur={NOTE_FLIGHT.dur}
+          liftDur={NOTE_FLIGHT.lift}
+          flipDur={NOTE_FLIGHT.flip}
+          back={<NoteBack x={N.x} y={N.y} w={NOTE_BACK.w} h={NOTE_BACK.h} rot={N.rot} lines={[...N.lines]} fontSize={NOTE_BACK.fs} inkPx={3} />}
+          face={face(false)}
+        />
+      ) : (
+        <NoteBreeze x={N.x} y={N.y} h={N.h} flutterAt={NOTE_BREEZE}>
+          {face(true)}
+        </NoteBreeze>
+      )}
     </TimeProvider>
   );
 };

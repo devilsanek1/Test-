@@ -70,9 +70,15 @@ export const B = {
   tagTwirlA: W.governments + 0.12,
   // S11's sticky note (carried into the wide) curls its corner in the breeze on 'of' and after 'governments'
   noteCurl: [W.of - 0.04, W.governments + 0.3],
-  // the near observer leans in toward govB on 'those', straightens on 'did'
+  // the near observer leans in toward govB on 'those' and straightens on the tail of 'governments' (A1 fix round 1,
+  // review: f28-f38 after the phones were near-still, 700-3,700 px^2 / frame; the largest figure in the frame now moves
+  // over f31-f37, staggered with the pigeon's flutter-hop f34-f36, so 'did' keeps its own focal: tags, sparkles, Pip's
+  // nod; was did - 0.06)
   nearLean: W.those - 0.1,
-  nearBack: W.did - 0.06,
+  nearBack: W.governments + 0.18,
+  // A1 fix round 1: the crossbar pigeon's flap on 'governments' + 0.25 is a wings-open flutter-hop (3 frames in the air,
+  // cast.tsx PigeonP + FlapFlyer), not the 6 px shuffle hop of a ~25 px bird
+  pigeonFlapDur: 0.1,
   // 'did' w170: Pip nods (sit-back squash pulse +0.08 -> 0, 0.2 s); the padlocks glint at once
   nod: W.did - 0.02,
   glint: W.did,

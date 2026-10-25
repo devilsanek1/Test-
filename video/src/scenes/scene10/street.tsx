@@ -177,7 +177,8 @@ export const StreetGround: React.FC<{wedgeAt: number}> = ({wedgeAt}) => (
     <GroundMarks marks={GND.walk} width={SI.far} seed="oq/gw" />
     <Ink d={GND.joints} width={SI.hair} taper={false} seed="s10/joints" />
     <GroundMarks marks={GND.street} width={SI.far} seed="oq/gs" />
-    <Fill d={GND.setts} color={palette.cream} offset={false} mode="snap" seed="s10/setts" />
+    {/* A1 FR1: sand setts (were cream, ~invisible on the pale street): a mid value along the kerb from the cut */}
+    <Fill d={GND.setts} color={palette.sand} offset={false} mode="snap" seed="s10/setts" />
     <Ink d={GND.settInk} width={SI.hair} taper={false} seed="s10/settI" />
     <Fill d={GND.railGroove} color={palette.tan} offset={false} mode="snap" seed="s10/railG" />
     <Ink d={GND.railHead} width={SI.mid} seed="s10/railH" />
@@ -204,7 +205,9 @@ export const GapReturns: React.FC<{atM: number; atR: number}> = ({atM, atR}) => 
 /** The A-frame's face box from the set's noticeSign slot: 6 px lower (a >= 20 px band of wall under siteL's raised
  *  plaque) and, fix round 2b, 12 px further left and 24 px narrower (L13 still at full size), so its back leg clears the
  *  maker parked on the open pavement. */
-export const signBox = (box: [number, number, number, number]): [number, number, number, number] => [box[0] - 12, box[1] + 6, box[2] - 36, box[3] + 6];
+/** A1 FR1: L13 drops to 28 px on screen (was 30) and the board shrinks around it (22 px lower top, 24 px narrower on the
+ *  right): it was the brightest, biggest rectangle in the frame, above the plaques it annotates. */
+export const signBox = (box: [number, number, number, number]): [number, number, number, number] => [box[0] - 12, box[1] + 28, box[2] - 60, box[3] + 6];
 const AF = {fw: 13, tp: 12};
 /** The A-frame's hinge cap: its right end x and its top y (world), for the slot box `box` (signBox applied). */
 export const aFrameCap = (box: [number, number, number, number]) => ({right: box[2] + AF.fw - AF.tp + 6, top: box[1] - AF.fw - 12});
@@ -232,7 +235,8 @@ export const SandwichBoard: React.FC<{box: [number, number, number, number]; gro
   // the back board's edge (3/4 view, right side): from the hinge down and out to its own foot; open triangle between
   const hinge: Pt = [x1 + fw - tp + 2, top + 4];
   // fix round 3: the back board splays less (+26, was +44): its edge stays left of the parked maker's body
-  const backFoot: Pt = [x1 + fw + 26, ground];
+  // A1 FR1: +18 (was +26): the board's back edge stays clear of the parked maker's left rim
+  const backFoot: Pt = [x1 + fw + 18, ground];
   const back: Pt[] = [[hinge[0] - 2, hinge[1]], [hinge[0] + 9, hinge[1] + 2], [backFoot[0] + 4, backFoot[1]], [backFoot[0] - 9, backFoot[1]]];
   const chainY = (y0 + y1) / 2 + 40;
   const fx = (yy: number) => x1 + fw + 2 * ((yy - top) / (bot - top)); // the front board's right edge at yy
@@ -298,10 +302,29 @@ function paperInk([x0, y0, x1, y1]: [number, number, number, number]): string {
 
 // ---------------------------------------------------------------- BottomCrowd
 
-/** Two back-view heads + shoulders cropped by the frame bottom, right of the railing's end (ref/f_9.0, ref2/f_12). */
-export const BottomCrowd: React.FC = () => (
-  <>
-    <EdgeOnlooker x={1066} y={1792} head={104} hair="bun" body={palette.sand} acc={['scarf']} rim={false} arms="near" bob={1.2} seed="s10/onl2" />
-    <EdgeOnlooker x={884} y={1772} head={118} hair="curly" body={palette.teal} acc={[]} rim="left" arms="both" bob={1.6} seed="s10/onl1" />
-  </>
-);
+/** Two back-view heads + shoulders cropped by the frame bottom, right of the railing's end (ref/f_9.0, ref2/f_12).
+ *  A1 FR1: the nearer one (x 884, left of the rail zone) WATCHES the hand-out: on 'not' he turns toward the maker
+ *  (the figure leans 4.5 deg left about a point 300 px under his head and narrows 4 %: the shoulders turning, S11's
+ *  onlooker-turn language, local copy), follows the high lob to the right (+3 deg) and settles back on 'anymore'. Each
+ *  turn is sprung (snappy): small, isolated onsets inside the hand-out chain. */
+export const BottomCrowd: React.FC<{turns?: [number, number][]}> = ({turns = []}) => {
+  const t = useTime();
+  let ang = 0;
+  let prev = 0;
+  for (const [at, target] of turns) {
+    ang += (target - prev) * springAt(t, at, springs.snappy);
+    prev = target;
+  }
+  const hx = 884;
+  const py = 1772 + 300;
+  const nar = 1 - 0.04 * Math.min(1, Math.abs(ang) / 4.5);
+  const m = Math.abs(ang) < 1e-3 ? mat.I : mat.compose(mat.about(mat.rotate(ang), hx, py), mat.about(mat.scale(nar, 1), hx, py));
+  return (
+    <>
+      <EdgeOnlooker x={1066} y={1792} head={104} hair="bun" body={palette.sand} acc={['scarf']} rim={false} arms="near" bob={1.2} seed="s10/onl2" />
+      <XG m={m}>
+        <EdgeOnlooker x={hx} y={1772} head={118} hair="curly" body={palette.teal} acc={[]} rim="left" arms="both" bob={1.6} seed="s10/onl1" />
+      </XG>
+    </>
+  );
+};

@@ -20,32 +20,42 @@ import React, {useId} from 'react';
 import {Fill, Ink, Sun, Bird, Tod, palette, useTime, ease as E, prog, lerp, clamp, mat, XG, rectPath, line, springAt, springs, wirePoint, smooth, arc, polyPath, measureCaption} from '../../lib';
 import {mix} from '../../lib/cine/util';
 import {Elephant, hop, popSwitch, PoseName, Expression} from '../../lib/mascot';
-import {StoopStreet, STOOP, paneFill, windowInk, SI, HALF, Foreground, EdgeFigure, LayerWrap} from '../shared/sets';
+import {StoopStreet, STOOP, paneFill, windowInk, SI, HALF, Foreground, LayerWrap} from '../shared/sets';
+import {OnlookerSlot} from '../shared/sets/propSlots';
 import type {WalkerAnchor} from '../shared/sets';
-import {Bit, CheckBoxTag, Keeper, Lock, LockCrate, MakersCart, NewLockIcon, FixSign} from '../shared/props';
+import {Bit, CheckBoxTag, EdgeOnlooker, Keeper, Lock, MakersCart, NewLockIcon, FixSign} from '../shared/props';
 import {B} from './beats';
 import {ClipOut, WIRE_HOLE} from './matchcut';
+import {crateGeom, CrateBack, CrateFront, CrateLocks, InkRing} from './crate';
+import {KeeperDetail, keeperCarryHand} from './keeper';
+import type {KeeperSpec} from './keeper';
 
 // ---------------------------------------------------------------- anchors (Part A world)
 
 export const PA = {
   pip: {x: 125, y: 1230, scale: 1.1},
-  /** On the pavement at the left edge, in frame from the cut (A1 screen (42, 1312), half behind the edge onlooker's
-   *  head, the lamp post in front): he crouches from frame 0 and leaps up onto the ledge, in the air on 'But'. */
-  pipStart: {x: 62, y: 1372},
-  crate: {x: 232, y: 1226, size: 85},
+  /** Polish A1 (S08 -> S09 match cut, Pip is in its persist list): he starts EXACTLY where S08's last frame leaves him,
+   *  sitting front-on, worried, at S08's size (screen (392, 1480), ~75 px = world (412, 1540) at the A1 camera, scale
+   *  0.75), on the near pavement; on 'But' he hops back up onto the facade ledge, growing 0.75 -> 1.1 in the air. */
+  pipStart: {x: 412, y: 1540, scale: 0.75},
+  /** Polish A1: the scene's crate (crate.tsx), 1.4x the old 85 px kit crate: left end at 192 (as before, clear of Pip's
+   *  ear), right end at 310 (clear of the old lock's drop column x 313-347). */
+  crate: {x: 251, y: 1226, size: 118},
   lock: {x: STOOP.lock4.x, y: STOOP.lock4.y, size: STOOP.lock4.h},
   dropDist: 76,
   /** Bit sits on the old lock (lock-local units: 42 px lock = 100 units), body length 16 world: 16 px in A1, 24 px in A2
    *  (his eye gets its pupil from 24 px). */
   bitSize: 16,
   bitFrame: [349, 1080] as [number, number],
-  keeper: {x: 420, y: 1300, h: 186},
+  keeper: {x: 398, y: 1300, h: 186},
   /** Keeper walks (Part B) to door #5: A2 coords of B-world (652, 1507). */
   keeperTo: [778, 1300] as [number, number],
   cart: {x: 760, y: 1432, size: 150},
-  /** J5 sign (shared FixSign) in the cart's sign slot: hook = the top of a 132 px post (world (812, 1236)). */
-  sign: {w: 224, fs: 36, post: 132},
+  /** J5 sign (shared FixSign) in the cart's sign slot: hook = the top of a 154 px post. Polish A1 (reviewer: 'fixed!' was
+   *  ~30 px at phone size, the beat's only other carrier): fs 36 -> 44 (1.22x: 'fixed!' lettering 49 px, glyphs ~37 px),
+   *  the card's proportions kept (w = 6.22 fs, FixSign's own rows and line breaks), the post 22 px taller so the bigger
+   *  card's bottom stays clear of the cart's crates. */
+  sign: {w: 274, fs: 44, post: 154},
   /** Where Pip's hold-pose trunk tip carries the new lock (world, measured on the render). */
   trunkTip: [166, 1128] as [number, number],
 };
@@ -118,6 +128,19 @@ const BitOnPip: React.FC = () => {
   return <Bit x={head[0]} y={head[1]} size={PA.bitSize} state="ride" hopAt={BIT_LEAP + BIT_LEAP_DUR - 0.3} hopH={0} seed="s9bit" />;
 };
 
+/** Polish A1 ('new vs old' must read at phone size): the new lock's cream check tag at 2x the kit's (hung from the same
+ *  loop, over the kit's own tag), its tick stroking on with the lock's check. Lock-local loop point (props LOCK.loop). */
+const NewTag: React.FC<{x: number; y: number; size: number}> = ({x, y, size}) => {
+  const u = size / 100;
+  // hung on a short string from the lock's loop, out beside the box (the lock's face stays clear)
+  return (
+    <>
+      <Ink d={`M${(x + 36 * u).toFixed(1)} ${(y - 50 * u).toFixed(1)}L${(x + 64 * u).toFixed(1)} ${(y - 38 * u).toFixed(1)}`} width={SI.far * 0.8} taper={false} vary={0} seed="s9newtag/str" />
+      <CheckBoxTag x={x + 64 * u} y={y - 38 * u} size={64 * u} tickAt={B.check} ink={SI.far} seed="s9newtag" />
+    </>
+  );
+};
+
 /** The new lock in the air: flung from Pip's trunk on an arc, landing ON the door as the pop-on. */
 const FlyingLock: React.FC = () => {
   const t = useTime();
@@ -126,95 +149,136 @@ const FlyingLock: React.FC = () => {
   const [x0, y0] = PA.trunkTip;
   const x = lerp(x0, PA.lock.x, q);
   const y = lerp(y0, PA.lock.y, q) - Math.sin(Math.PI * q) * 70;
-  return <Lock x={x} y={y} size={PA.lock.size * (0.9 + 0.1 * q)} state="fixed" ink={SI.far} rot={-25 + 25 * q + Math.sin(q * Math.PI) * -40} checkAt={B.check} seed="s9newlock" />;
+  const size = PA.lock.size * (0.9 + 0.1 * q);
+  const rot = -25 + 25 * q + Math.sin(q * Math.PI) * -40;
+  return (
+    <>
+      <Lock x={x} y={y} size={size} state="fixed" ink={SI.far} rot={rot} checkAt={B.check} seed="s9newlock" />
+      <XG m={mat.about(mat.rotate(rot), x, y)}>
+        <NewTag x={x} y={y} size={size} />
+      </XG>
+    </>
+  );
 };
 
 /** The new lock ON the door: it lands from the toss with a squash and the 7 % spring (never from zero: the flying lock
  *  hands over at full size), then its check strokes on. */
+const landedXf = (t: number) => {
+  const k = 0.84 + 0.16 * springAt(t, TOSS.land, springs.pop);
+  const sq = t < TOSS.land + 0.07 ? 1.08 : 1;
+  return mat.about(mat.scale(k * sq, k / sq), PA.lock.x, PA.lock.y);
+};
 const LandedLock: React.FC = () => {
   const t = useTime();
   if (t < TOSS.land) return null;
-  const k = 0.84 + 0.16 * springAt(t, TOSS.land, springs.pop);
-  const sq = t < TOSS.land + 0.07 ? 1.08 : 1;
   return (
-    <XG m={mat.about(mat.scale(k * sq, k / sq), PA.lock.x, PA.lock.y)}>
+    <XG m={landedXf(t)}>
       <Lock x={PA.lock.x} y={PA.lock.y} size={PA.lock.size} state="fixed" ink={SI.far} checkAt={B.check} seed="s9newlock" />
     </XG>
   );
 };
+/** The landed lock's big tag, drawn AFTER the keeper (his gripping hand is behind it: it must stay readable). */
+const LandedTag: React.FC = () => {
+  const t = useTime();
+  if (t < TOSS.land) return null;
+  return (
+    <XG m={landedXf(t)}>
+      <NewTag x={PA.lock.x} y={PA.lock.y} size={PA.lock.size} />
+    </XG>
+  );
+};
 
-// ---------------------------------------------------------------- the crate's new locks + check tags (fix round 2b)
+// ---------------------------------------------------------------- the crate of new locks (polish A1: crate.tsx)
 
-/** Crate-local units (the LockCrate: 80 wide, rim at -50, bottom centre = its (x, y)) -> Part A world. */
-const CRATE_K = PA.crate.size / 80;
-const crateP = (lx: number, ly: number): [number, number] => [PA.crate.x + lx * CRATE_K, PA.crate.y + ly * CRATE_K];
+/** The crate (crate.tsx): a slatted sage crate, 1.4x the old kit crate, its left end where the old one's was (clear of
+ *  Pip's ear), its right end clear of the old lock's drop column (x 313-347). */
+const CRATE_G = crateGeom(PA.crate.x, PA.crate.y, PA.crate.size);
+const CRATE_TOP = CRATE_G.y - CRATE_G.h;
+export const LID_AT = B.fix - 0.08;
 /** ONE new lock stands up above the rim at the crate's left end (the one Pip lifts on 'somebody': gone at B.lift), so
- *  'a crate of new locks' reads at phone size; it bobs up into place with the lid. */
-const RAISED = {lx: -21, ly: -66, size: 36, rot: -9};
-/** Three EMPTY check tags on short sticks inside the crate's silhouette, right of the raised lock and clear of the
- *  elephant plaque (x < 200) and Pip's ear: [crate-local x, hang y, lean]. The kit LockCrate's own tag fan (n + 1 cards on
- *  long sticks) is off (`tags={0}`). */
+ *  'a crate of new locks' reads at phone size; it bobs up into place with the lid. Lock size = door #4's lock (42). */
+const RAISED = {x: PA.crate.x - PA.crate.size * 0.3, y: CRATE_TOP - 16, size: PA.lock.size, rot: -9};
+/** Three EMPTY check tags (30 px) on sticks from the rim, hung over the open lid's peach face, right of the raised
+ *  lock: [x, hang y, lean]. */
 const CRATE_TAGS: [number, number, number][] = [
-  [3, -82, -3],
-  [19, -77, 2],
-  [33, -72, 6],
+  [PA.crate.x - 14, CRATE_TOP - 62, -4],
+  [PA.crate.x + 15, CRATE_TOP - 74, 2],
+  [PA.crate.x + 42, CRATE_TOP - 56, 5],
 ];
-const CRATE_TAG_SIZE = 19;
+const CRATE_TAG_SIZE = 30;
 
 const CrateExtras: React.FC = () => {
   const t = useTime();
   const uid = 's9cr' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const out: React.ReactNode[] = [];
-  const lidAt = B.fix - 0.08;
+  // the three tags: sticks from the rim, the cards springing up 0.04 s apart (settled on 'out'), behind the locks
+  const tagsAt = B.out - 0.14;
+  CRATE_TAGS.forEach(([hx0, hy, lean], i) => {
+    const at = tagsAt + i * 0.04;
+    if (t < at) return;
+    const k = springAt(t, at, springs.pop);
+    const by = CRATE_TOP + 2;
+    const hx = hx0 + lean * k;
+    const hyw = by + (hy - by) * k;
+    out.push(
+      <React.Fragment key={i}>
+        <Ink d={`M${hx0.toFixed(1)} ${by.toFixed(1)}L${hx.toFixed(1)} ${(hyw + 3).toFixed(1)}`} width={SI.far} taper={false} vary={0} seed={`s9crate/ts${i}`} />
+        <CheckBoxTag x={hx} y={hyw} size={CRATE_TAG_SIZE} at={at} ink={SI.far} seed={`s9crate/tg${i}`} />
+      </React.Fragment>,
+    );
+  });
   // the raised lock: rises out of the crate (clipped at the rim) 0.06 s after the lid flips
-  if (t >= lidAt + 0.06 && t < B.lift) {
-    const k = springAt(t, lidAt + 0.06, springs.pop);
-    const [x, y] = crateP(RAISED.lx, RAISED.ly + (1 - k) * 30);
-    const rim = crateP(0, -47)[1];
+  if (t >= LID_AT + 0.06 && t < B.lift) {
+    const k = springAt(t, LID_AT + 0.06, springs.pop);
+    const x = RAISED.x;
+    const y = RAISED.y + (1 - k) * 40;
     out.push(
       <React.Fragment key="raised">
         <defs>
           <clipPath id={uid} clipPathUnits="userSpaceOnUse">
-            <rect x={x - 80} y={rim - 200} width={160} height={200} />
+            <rect x={x - 80} y={CRATE_TOP + 3 - 200} width={160} height={200} />
           </clipPath>
         </defs>
         <g clipPath={`url(#${uid})`}>
-          <Lock x={x} y={y} size={RAISED.size * CRATE_K} state="fixed" ink={SI.far} rot={RAISED.rot} seed="s9crate/raised" />
+          <Lock x={x} y={y} size={RAISED.size} state="fixed" ink={SI.far} rot={RAISED.rot} seed="s9crate/raised" />
         </g>
       </React.Fragment>,
     );
   }
-  // the three tags: short sticks from the rim, the cards springing up 0.04 s apart (settled on 'out')
-  const tagsAt = B.out - 0.14;
-  CRATE_TAGS.forEach(([lx, hy, lean], i) => {
-    const at = tagsAt + i * 0.04;
-    if (t < at) return;
-    const k = springAt(t, at, springs.pop);
-    const [bx, by] = crateP(lx, -50);
-    const [hx, hyw] = crateP(lx + lean, -50 + (hy + 50) * k);
-    out.push(
-      <React.Fragment key={i}>
-        <Ink d={`M${bx.toFixed(1)} ${by.toFixed(1)}L${hx.toFixed(1)} ${(hyw + 3).toFixed(1)}`} width={SI.far * 0.8} taper={false} vary={0} seed={`s9crate/ts${i}`} />
-        <CheckBoxTag x={hx} y={hyw} size={CRATE_TAG_SIZE * CRATE_K} at={at} ink={SI.far * 0.8} seed={`s9crate/tg${i}`} />
-      </React.Fragment>,
-    );
-  });
   return <>{out}</>;
 };
 
+/** The whole crate in draw order: the open lid's peach face, the tags, the raised lock, the two locks in the opening, the
+ *  sage body (+ the shut lid until LID_AT), then ONE ink ring pulse on the lid pop. */
+const Crate: React.FC = () => (
+  <>
+    <CrateBack g={CRATE_G} lidAt={LID_AT} ink={SI.far} seed="s9crate" />
+    <CrateExtras />
+    <CrateLocks g={CRATE_G} lidAt={LID_AT} ink={SI.far} seed="s9crate" />
+    <CrateFront g={CRATE_G} lidAt={LID_AT} ink={SI.far} seed="s9crate" />
+    <InkRing x={PA.crate.x} y={CRATE_TOP - 18} r={72} at={LID_AT} w={SI.mid} />
+  </>
+);
+
 // ---------------------------------------------------------------- Pip (Part A world)
 
-export type PipState = {x: number; y: number; pose: PoseName; squash: number; rotate: number; amount?: number; look?: number; expression?: Expression; prop?: React.ReactNode; walkRate?: number; flip?: boolean};
+export type PipState = {x: number; y: number; pose: PoseName; squash: number; rotate: number; amount?: number; look?: number; expression?: Expression; prop?: React.ReactNode; walkRate?: number; flip?: boolean; scale?: number};
 
 /** Pip in Part A world coordinates at scene time t (also used, mapped, at the start of Part B). */
 export function pipA(t: number): PipState {
-  // the leap in from off-frame left: crouch off-frame, take off 0.10 s before 'But' (in the air ON the word)
+  // polish A1: from S08's last spot (sitting, worried, scale 0.75): a short crouch, take off 0.10 s before 'But' (in the
+  // air ON the word), a hop back-left and up onto the ledge, the scale easing 0.75 -> 1.1 in the air
   const hopT0 = B.but - 0.1;
   const air = 0.42;
+  if (t < hopT0) {
+    const c = clamp((t - (hopT0 - 0.1)) / 0.1);
+    return {x: PA.pipStart.x, y: PA.pipStart.y, scale: PA.pipStart.scale, pose: 'sit-front', squash: 0.16 * Math.sin((c * Math.PI) / 2), rotate: 0, look: -0.2, expression: 'worried'};
+  }
   if (t < hopT0 + air + 0.32) {
-    const h = hop({t, t0: hopT0, dur: air, from: PA.pipStart, to: {x: PA.pip.x, y: PA.pip.y}, height: 40});
+    const h = hop({t, t0: hopT0, dur: air, from: PA.pipStart, to: {x: PA.pip.x, y: PA.pip.y}, height: 70});
     const pose: PoseName = h.k < 1 ? 'stand-side' : 'sit-front';
-    return {x: h.x, y: h.y, pose, squash: h.squash, rotate: h.rotate, amount: h.spread, look: 0.3};
+    const scale = lerp(PA.pipStart.scale, PA.pip.scale, E.inOutSine(clamp((t - hopT0) / air)));
+    return {x: h.x, y: h.y, scale, pose, squash: h.squash, rotate: h.rotate, amount: h.spread, look: 0.3, flip: h.k < 1};
   }
   // settled on the ledge: stretch at dawn ('the'), look at the crate on 'fix', lift a new lock, toss it on 'STILL'
   let squash = 0;
@@ -265,42 +329,48 @@ export function pipRidePoint(st: PipState, scale: number): [number, number] {
 }
 
 export const PipFigure: React.FC<{st: PipState; scale: number; t: number}> = ({st, scale, t}) => (
-  <Elephant x={st.x} y={st.y} scale={scale} pose={st.pose} t={t} seed={9} squash={st.squash} rotate={st.rotate} amount={st.amount} look={st.look} expression={st.expression} prop={st.prop} walkRate={st.walkRate} flip={st.flip} />
+  <Elephant x={st.x} y={st.y} scale={st.scale ?? scale} pose={st.pose} t={t} seed={9} squash={st.squash} rotate={st.rotate} amount={st.amount} look={st.look} expression={st.expression} prop={st.prop} walkRate={st.walkRate} flip={st.flip} />
 );
 
 // ---------------------------------------------------------------- the A2 actors (shared with Part B through the map)
 
-/** The keeper's hand: a tan cuff band + a sand mitten blob with ink (back view, no fingers), angled along the raised
- *  arm (person-local units: the Keeper's `holding` slot sits at the hand). */
-const MITTEN_ANG = (Math.atan2(-0.38 * 95, 0.32 * 93) * 180) / Math.PI; // the raised arm's direction (TORSO 95, w ~93)
-const Mitten: React.FC = () => (
-  <XG m={mat.compose(mat.translate(0, 6), mat.rotate(MITTEN_ANG + 90))}>
-    <Fill d="M-11 2h22v-8h-22Z" color={palette.tan} offset={false} mode="none" seed="s9mit/c" />
-    <Fill d="M-9 -6C-12 -16 -8 -27 0 -27C8 -27 12 -16 9 -6Z" color={palette.sand} offset={false} mode="none" seed="s9mit/h" />
-    <Ink d="M-11 2h22M-11 -6h22M-9 -6C-12 -16 -8 -27 0 -27C8 -27 12 -16 9 -6" width={5} taper={false} seed="s9mit/i" />
-  </XG>
-);
-
 /** The keeper: rises on the hard cut, reaches left to door #4 and installs; in Part B he lowers his arm, walks to door
- *  #5 (dotted path behind him) and kneels there to install the next one. Fix round 2b ('one at a time' must read at rest):
- *  he grows 1.3x about his feet while the pull-back zooms out (2.9 -> 3.8 s, invisible inside a 3x zoom: ~60 px tall at
- *  rest), and carries a small toolbox (on step 1 beside him in A2, in his hand from 'to', set down as he kneels). */
-const KEEPER_GROW = {from: 2.9, to: 3.8, k: 1.3};
+ *  #5 (dotted path behind him) and kneels there to install the next one. Fix round 2b ('one at a time' must read at
+ *  rest): he grows about his feet while the pull-back zooms out (2.9 -> 3.8 s, invisible inside a 3x zoom) and carries a
+ *  small toolbox. Polish A1: the kit Keeper + the scene's detail overlay (keeper.tsx: yoke, sleeves, skirt + vent, a
+ *  proper raised sleeve and a hand with a thumb that grips the new lock), 22 px nearer the door so that hand closes on
+ *  the lock's edge; the toolbox hangs from his other hand; a shoulder-set bounce ON 'somebody'; 1.6x larger at rest
+ *  (reviewer: ~35 px kneeling at door #5 was invisible at phone size). */
+const KEEPER_GROW = {from: 2.9, to: 3.8, k: 2.05};
 const keeperFeetX = (t: number) => lerp(PA.keeper.x, PA.keeperTo[0], clamp((t - B.to) / (B.kneel - B.to)));
 const TOOLBOX = {w: 38, h: 24};
 const toolboxPath = (x: number, y: number) => {
   const {w, h} = TOOLBOX;
   return {box: rectPath(x - w / 2, y - h, w, h), lid: rectPath(x - w / 2 - 2, y - h - 5, w + 4, 6), handle: `M${x - 9} ${y - h - 5}V${y - h - 13}H${x + 9}V${y - h - 5}`};
 };
+/** The kit Keeper's spec (one object for the kit figure and the overlay). */
+const KEEPER_SPEC: KeeperSpec = {
+  x: PA.keeper.x,
+  y: PA.keeper.y,
+  h: PA.keeper.h,
+  seed: 's9keeper',
+  riseAt: B.cutA2 - 0.24,
+  reachAt: B.lift - 0.05,
+  lowerAt: B.hidden + 0.15,
+  installAt: B.lockOn,
+  installDur: 0.32,
+  walk: {at: B.to, hz: 2.4, to: PA.keeperTo, dur: B.kneel - B.to},
+  gripAt: B.lockOn,
+};
+const KEEPER_SPEC2: KeeperSpec = {...KEEPER_SPEC, reachAt: B.kneel + 0.04, lowerAt: undefined, installAt: B.kneel + 0.18, installDur: 0.8, gripAt: B.kneel + 0.2};
 const Toolbox: React.FC = () => {
   const t = useTime();
   const k = PA.keeper;
-  // carried at his right side (hand height; his raised arm is the left one), swinging a little with the walk; set down
-  // beside him as he kneels at door #5
-  const fx = keeperFeetX(t);
+  // carried in his hanging hand (by the handle), swinging a little with the walk; set down beside him as he kneels
+  const [hx, hy] = keeperCarryHand(t, KEEPER_SPEC);
   const walking = t >= B.to && t < B.kneel;
-  let x = fx + 46;
-  let y = k.y - 60 + (walking ? Math.abs(Math.sin((t - B.to) * 2.4 * Math.PI)) * 4 : 0);
+  let x = hx;
+  let y = hy + 13 + 5 + TOOLBOX.h + (walking ? Math.abs(Math.sin((t - B.to) * 2.4 * Math.PI)) * 3 : 0);
   if (t >= B.kneel) {
     const q = E.inOutSine(clamp((t - B.kneel) / 0.12));
     x = lerp(x, PA.keeperTo[0] + 60, q);
@@ -316,6 +386,13 @@ const Toolbox: React.FC = () => {
   );
 };
 
+/** The shoulder-set beat ON 'somebody' (cutA2 + 0.08): a 7 % vertical spring bounce about his feet. */
+const SET_AT = B.cutA2 + 0.08;
+const setBounce = (t: number) => {
+  const d = t - SET_AT;
+  return d < 0 || d > 0.45 ? 0 : 0.07 * Math.exp(-d * 9) * Math.sin(d * Math.PI * 2 * 3);
+};
+
 const KeeperA: React.FC = () => {
   const t = useTime();
   const k = PA.keeper;
@@ -323,24 +400,14 @@ const KeeperA: React.FC = () => {
   const second = t >= B.kneel;
   const grow = 1 + (KEEPER_GROW.k - 1) * E.inOutSine(clamp((t - KEEPER_GROW.from) / (KEEPER_GROW.to - KEEPER_GROW.from)));
   const fx = keeperFeetX(t);
+  const sp = second ? KEEPER_SPEC2 : KEEPER_SPEC;
+  const b = setBounce(t);
   return (
-    <XG m={mat.about(mat.scale(grow), fx, k.y)}>
+    <XG m={mat.compose(mat.about(mat.scale(grow), fx, k.y), mat.about(mat.scale(1 - b * 0.5, 1 + b), fx, k.y))}>
       <Toolbox />
       <XG m={mat.about(mat.scale(1, 1 - 0.2 * kneel), PA.keeperTo[0], k.y)}>
-        <Keeper
-          x={k.x}
-          y={k.y}
-          h={k.h}
-          flip
-          riseAt={B.cutA2 - 0.24}
-          reachAt={second ? B.kneel + 0.04 : B.lift - 0.05}
-          lowerAt={second ? undefined : B.hidden + 0.15}
-          installAt={second ? B.kneel + 0.18 : B.lockOn}
-          installDur={second ? 0.8 : 0.32}
-          holding={<Mitten />}
-          walk={{at: B.to, hz: 2.4, to: PA.keeperTo, dur: B.kneel - B.to}}
-          seed="s9keeper"
-        />
+        <Keeper x={sp.x} y={sp.y} h={sp.h} flip riseAt={sp.riseAt} reachAt={sp.reachAt} lowerAt={sp.lowerAt} installAt={sp.installAt} installDur={sp.installDur} walk={sp.walk} seed={sp.seed} />
+        <KeeperDetail {...sp} />
       </XG>
     </XG>
   );
@@ -357,12 +424,12 @@ export const A2Actors: React.FC<{partB?: boolean}> = ({partB = false}) => {
   const pip = !partB || t < B.install;
   return (
     <>
-      {props ? <LockCrate x={PA.crate.x} y={PA.crate.y} size={PA.crate.size} lid lidAt={B.fix - 0.08} tagsAt={B.out - 0.14} tags={0} ink={SI.far} seed="s9crate" /> : null}
-      {props ? <CrateExtras /> : null}
+      {props ? <Crate /> : null}
       {props ? <OldLock /> : null}
       {props ? <LandedLock /> : null}
       <BitRun />
       {t >= B.cutA2 ? <KeeperA /> : null}
+      {props ? <LandedTag /> : null}
       {pip ? <PipFigure st={st} scale={PA.pip.scale} t={t} /> : null}
       <BitOnPip />
       <FlyingLock />
@@ -403,11 +470,18 @@ const DuskDawn: React.FC = () => {
         </React.Fragment>,
       );
     }
-  } else if (t < B.cutA2) {
-    // dawn (A1 only): a peach rim on step 2's sun side (the hero's own rim is the set's STOOP.dawnRims[0])
-    out.push(<Fill key="rimS2" rect={[396, 1232, 13, 66]} color={palette.peach} offset={false} mode="snap" seed="s9rim2" />);
   }
   return <>{out}</>;
+};
+
+/** Polish A1 (the 10 px peach strip down the hero's whole right edge read as a drainpipe, the riser bar as a stray
+ *  stick): the hero's dawn rim per the playbook, 4 px, only on the cornice's sun-side end and the top third of the
+ *  sun-side edge (the set's STOOP.dawnRims[0] is off), from the dawn's second step. Drawn in the 'hero' wrap, so the
+ *  Part B ghost (frozen on A2's last frame) shows it too. */
+const HERO_RIMS = rectPath(STOOP.hero.x + STOOP.hero.w - 4.5, STOOP.hero.y + 14, 4.5, 196) + rectPath(STOOP.hero.x + STOOP.hero.w - 120, STOOP.hero.y - 3, 124, 4);
+const HeroRims: React.FC = () => {
+  const t = useTime();
+  return t >= NIGHT_UNTIL ? <Fill d={HERO_RIMS} color={palette.peach} offset={false} mode="snap" seed="s9herorim" /> : null;
 };
 
 // ---------------------------------------------------------------- the cart (A1 only: the maker has left before A2)
@@ -421,13 +495,15 @@ const DuskDawn: React.FC = () => {
  *  fixing...' is struck at out - 0.26 and 'fixed!' writes on out - 0.16 .. out (film 35.54-35.80). */
 const STRIKE_AT = B.out - 0.26;
 const SCRIBBLE = {at: B.out - 0.16, dur: 0.16};
+const SIGN_TAP = B.out;
 const ScribbleSign: React.FC = () => {
   const t = useTime();
   const uid = 's9sc' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const {w, fs} = PA.sign;
-  const base = <FixSign x={0} y={0} w={w} fs={fs} strikeAt={STRIKE_AT} ink={SI.far} seed="s9sign" />;
+  // polish A1: the maker taps the card as 'fixed!' finishes ON 'out' (one pendulum swing, both copies identical)
+  const base = <FixSign x={0} y={0} w={w} fs={fs} strikeAt={STRIKE_AT} swingAt={[SIGN_TAP]} ink={SI.far} seed="s9sign" />;
   if (t < SCRIBBLE.at) return base;
-  const done = <FixSign x={0} y={0} w={w} fs={fs} strikeAt={STRIKE_AT} fixedAt={SCRIBBLE.at - 0.2} ink={SI.far} seed="s9sign" />;
+  const done = <FixSign x={0} y={0} w={w} fs={fs} strikeAt={STRIKE_AT} swingAt={[SIGN_TAP]} fixedAt={SCRIBBLE.at - 0.2} ink={SI.far} seed="s9sign" />;
   const q = (t - SCRIBBLE.at) / SCRIBBLE.dur;
   if (q >= 1) return done;
   // the glyph's span (FixSign: centred at x + 0.04 w, 1.12 fs lettering, -4 deg), with a little slack for the slant
@@ -530,22 +606,31 @@ const SunLayer: React.FC = () => {
  *  where S08's sun set and this sun rises; the flanking towers [604, 44] (right edge 648) and [818, 62] stay. Ends above
  *  the set's horizon strip (y 1058). */
 const SKY_SLOT: [number, number, number, number] = [649, 640, 168, 417];
-/** The horizon glow at the street's end, BEHIND the sun (the rows in front crop it to the V at the VP):
- *  - the DAWN glow from the dawn's second step: a horizontal strip;
- *  - (Afterglow, fix round 3) the AFTERGLOW of S08's sunset, the match-cut's warm accent at the set point: a thin peach
- *    strip at screen ~(600-800, 995-1005), the height of S08's, until the first window pops off (But + 0.12). */
-const AFTERGLOW: [number, number, number, number] = [620, 1055, 200, 10];
+/** The horizon glow at the street's end, BEHIND the sun (the rows in front crop it to the V at the VP): the DAWN glow
+ *  from the dawn's second step, a horizontal strip. */
 const HORIZON_GLOW: [number, number, number, number] = [600, 1043, 260, 19];
 const HorizonGlow: React.FC = () => {
   const t = useTime();
   if (t >= NIGHT_UNTIL) return <Fill rect={HORIZON_GLOW} color={palette.peach} offset={false} mode="snap" seed="s9hglow" />;
   return null;
 };
-/** The afterglow is drawn over the rows' far ends (in the 'rows' wrap): behind them it would only show in the V's few
- *  px at the VP, and the match needs the strip's full width to carry S08's warm accent across the cut. */
+/** Polish A1: the AFTERGLOW of S08's sunset (the match cut's warm accent at the set point) is LIGHT, not a bar: a 2-step
+ *  flat half-disc in the sky layer, BEHIND the far skyline, in S08's own two tones (HALF.peach outer r 140, peach inner
+ *  r 92), its base on the VP's horizon (screen y ~1002, x 700): the far towers' edges and the two rows' rooflines clip it
+ *  to the V at the street's end (the cleared VP slot shows its dome). It steps down once on 'But' (outer off) and is gone
+ *  at But + 0.12 (the first window pops off). */
+const AFTERGLOW = {cx: STOOP.vp[0], base: STOOP.vp[1] + 2, r1: 140, r2: 92};
+const halfDisc = (cx: number, base: number, r: number) => `M${cx - r} ${base}A${r} ${r} 0 0 1 ${cx + r} ${base}Z`;
 const Afterglow: React.FC = () => {
   const t = useTime();
-  return t < B.win1 ? <Fill rect={AFTERGLOW} color={palette.peach} offset={false} mode="snap" seed="s9aglow" /> : null;
+  if (t >= B.win1) return null;
+  const {cx, base, r1, r2} = AFTERGLOW;
+  return (
+    <>
+      {t < B.but ? <Fill d={halfDisc(cx, base, r1)} color={HALF.peach} offset={false} mode="snap" seed="s9aglow1" /> : null}
+      <Fill d={halfDisc(cx, base, t < B.but ? r2 : r2 * 0.82)} color={palette.peach} offset={false} mode="snap" seed="s9aglow2" />
+    </>
+  );
 };
 
 /** Night (before NIGHT_UNTIL): the set keeps the road wedge at its day sand while every other ground goes night sage, and
@@ -629,23 +714,24 @@ const groundStep = (t: number, node: React.ReactNode): React.ReactNode => {
 };
 
 /** A1's foreground: the set's near kerb + two back-view onlookers cropped by the bottom edges, heads in the visible band
- *  (left ~(26, 1360) as before, Pip crouching half behind its head at the cut; fix round 3: a second one at the bottom
- *  right (~(1014, 1380)) so the relit bottom band has weight), watching the dawn up the street. */
+ *  (left ~(26, 1360), right ~(1014, 1380): the relit bottom band has weight), watching the dawn up the street. Polish A1
+ *  (reviewer: the bare peach hands beside the coats read as eggs): hands in their pockets (no hanging arms). */
 const A1_FOREGROUND = (
   <>
     <Foreground spec="kerb" seed="stoop/fg/kerb" />
-    <EdgeFigure side="L" x={40} y={1420} head={128} seed="s9edge" />
-    <EdgeFigure side="R" x={1046} y={1446} head={122} body={palette.brown} hair="bun" acc={['scarf']} seed="s9edgeR" />
+    <OnlookerSlot x={40} y={1420} head={128} hair="short" body={palette.teal} acc={['hood']} rim="right" arms={false} seed="s9edge" />
+    <OnlookerSlot x={1046} y={1446} head={122} hair="bun" body={palette.brown} acc={['scarf']} rim="left" arms={false} seed="s9edgeR" />
   </>
 );
 /** A2's foreground (fix round 3, the reviewer's head-and-shoulders pair): the SAME left onlooker (world-consistent: A2
  *  screen ~(105, 1740), head ~190 px) and a second one near the stoop's right end (screen ~(945, 1770)), both cropped by
- *  the bottom edge, left and right of the action column (crate, lock, keeper at screen x 330-765). In the Part B ghost
- *  they leave with the near layer on the build's first step. */
+ *  the bottom edge, left and right of the action column. Polish A1: the right one's head is a flat hair mass (the
+ *  'short' hero strands read as meridians on a coconut at 186 px): long ochre hair in a low ponytail mass. In the Part B
+ *  ghost they leave with the near layer on the build's first step. */
 const A2_FOREGROUND = (
   <>
-    <EdgeFigure side="L" x={40} y={1420} head={128} seed="s9edge" />
-    <EdgeFigure side="R" x={604} y={1444} head={124} body={palette.sand} hair="short" acc={['scarf']} seed="s9edgeA2" />
+    <OnlookerSlot x={40} y={1420} head={128} hair="short" body={palette.teal} acc={['hood']} rim="right" arms={false} seed="s9edge" />
+    <EdgeOnlooker x={604} y={1444} head={124} hair="long" hairColor={palette.brown} body={palette.sand} acc={['scarf']} rim="left" arms={false} seed="s9edgeA2" />
   </>
 );
 
@@ -706,20 +792,16 @@ export const PartA: React.FC<{ghost?: boolean; ghostStep?: number}> = ({ghost = 
     if (name === 'far') return (
       <>
         <HorizonGlow />
+        {ghost ? null : <Afterglow />}
         {ghost ? null : <SunLayer />}
         <ClipOut holes={[SKY_SLOT]}>{groundStep(t, node)}</ClipOut>
-      </>
-    );
-    if (name === 'rows') return (
-      <>
-        {node}
-        <Afterglow />
       </>
     );
     if (name === 'hero') return (
       <>
         <Neighbour />
         {node}
+        <HeroRims />
       </>
     );
     if (name === 'ground') return (
@@ -739,7 +821,7 @@ export const PartA: React.FC<{ghost?: boolean; ghostStep?: number}> = ({ghost = 
         tod="night"
         nightUntil={NIGHT_UNTIL}
         glowFlickerAt={B.win1}
-        dawnRims={[0, 1, 4]}
+        dawnRims={[1, 4]}
         wrap={wrap}
         heroLock={false}
         calendar={false}

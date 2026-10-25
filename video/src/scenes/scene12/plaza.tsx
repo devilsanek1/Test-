@@ -19,7 +19,7 @@ import {DOME_GLASS, LanternOff, S01Shutter} from '../scene01/shims';
 import {DoorLanterns, PressTicks, S01Branch, S01Glyph, SunRipple, TreeTicks} from '../scene01/dressing';
 import {layerMat} from './camera';
 import {B, DOME_LANTERN_R, inRewind, pigeonClockR, pipClockR, s01Clock, WALKER_SEED, walkerClockR} from './timing';
-import {BitHome, CITIZEN_ORDER, DidSparkles, OnlookersP, P_CITIZENS, P_GOV, P_PIGEONS, PipP, P_NEAR, R_CITIZENS, R_GOV, R_NEAR, R_PIGEONS, R_PIP, S11Note, SB_SEED, SbPoint} from './cast';
+import {BitHome, CITIZEN_ORDER, DidSparkles, OnlookersP, P_CITIZENS, P_GOV, P_PIGEONS, PipP, P_NEAR, PigeonP, R_CITIZENS, R_GOV, R_NEAR, R_PIGEONS, R_PIP, S11Note, SB_SEED, SbPoint} from './cast';
 
 const SUN = PLAZA.sun; // (720, 900) r155
 const VP = PLAZA.vp as [number, number];
@@ -112,7 +112,7 @@ export const PlazaRewind: React.FC = () => {
             ))}
           </TimeProvider>
         ) : (
-          pigeons.map((p) => <Pigeon key={p.seed} p={p} />)
+          pigeons.map((p) => <PigeonP key={p.seed} p={p} />)
         )}
         {rew ? (
           <TimeProvider global={pipClockR(t)} offset={0}>

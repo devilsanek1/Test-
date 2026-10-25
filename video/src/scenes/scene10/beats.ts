@@ -50,23 +50,29 @@ export const ABS = {
   //   the wave's faces swap from -0.05 and land inside 'versions')
   cobweb: W.so - 0.1, // a cobweb draws across the old plaque's corner (rule-5 lead: it reads ON 'so'): Bit is caught in it
   dust: W.so + 0.02, // dust specks pop under the old plaque
-  cane: W.old, // the old emblem leans on a tiny cane
+  cane: W.old - 0.1, // the old emblem leans on a tiny cane (A1 FR1: rule-5 lead for a small element, was ON 'old')
   cartPark: W.not - 0.27, // the maker + cart walk out from behind the A-frame (fix round 3: hidden until the cobweb / Bit
   //   beat is over: the bed's nose shows from ~43.09, the maker from ~43.3; 16.5 px / frame on screen) and brake into the
   //   park spot on the open pavement 0.11 s before his first arm rises: the park and the throw are separate beats
   droop: W.theyre, // the old emblem's ear droops (it sags further on its cane); a dust speck drifts down
   not: W.not, // Bit struggles in the web; the maker reaches into the satchel
   lookCart: W.theyre + 0.1, // Pip turns to the parked cart
-  toss1: W.not - 0.06, // his LEFT arm (raised 0.1 s before) lobs a tag back-left at siteL's plaque (0.23 s flight)
-  tick1: W.officially, // it lands on siteL's plaque: tick
-  toss2: W.officially - 0.125, // his RIGHT arm (straight up) lobs the second tag high OVER siteM's old plaque (0.5 s)
-  skipNudge: W.officially + 0.1, // siteM's old plaque nudges as the tag sails over it (the skip, as an event)
-  tick2: W.supported + 0.01, // lands on siteR's plaque: tick + one stepped ink ring pulse
+  // A1 FR1 (rule 5: check marks land ON the word): every hand-out beat moved earlier by the tick's delta, so the flight
+  // durations (0.23 s / 0.5 s) are unchanged and the check (tickAt = landing + 0.03, 0.17 s draw) completes on the word
+  toss1: W.not - 0.1, // his LEFT arm (raised 0.1 s before) lobs a tag back-left at siteL's plaque (0.23 s flight)
+  tick1: W.officially - 0.04, // it lands beside siteL's plaque: tick (was ON the word: the check showed +0.075 s late)
+  toss2: W.supported - 0.59, // his RIGHT arm (raised up over his head) lobs the second tag high OVER siteM's old plaque
+  //   (A1 FR1: 0.53 s, was 0.5: the tag now lands BESIDE siteR's plate, 100 px further right, ~48 px / frame + the trail;
+  //   released 0.045 s after the left toss, so the two tags are never in his hands together for more than a frame)
+  skipNudge: W.officially + 0.02, // siteM's old plaque nudges as the tag sails over it (the lob crosses x 590 at 48 %)
+  tick2: W.supported - 0.06, // lands beside siteR's plaque: tick + one stepped ink ring pulse (was +0.01: +0.11 s late)
   wave: W.supported + 0.06, // tiny tags pop onto the CURRENT second-row plaques, skipping the old ones
   hey: W.supported + 0.1, // GAG: Pip trunk-up 'hey!' at siteM's plaque (it was skipped)
   heyEnd: W.anymoreEnd - 0.21, // = pipOut - 0.12: Pip turns side-on (facing right) into the crouch of his hop out
   update: W.anymore, // siteM's browser starts an update: the bar stalls at ~10 %, ring spinning
-  rollOut: W.anymore + 0.05, // the cart rolls out right (sine ramp, <= 18 px / frame)
+  rollOut: W.supported + 0.33, // the cart rolls out right (sine ramp, <= 18 px / frame). A1 FR1: once the lob's trail has
+  //   retracted and the arm is down (was 'anymore' + 0.05: by the cut it had moved only ~130 px and sat mid-frame); it
+  //   is ~x 890 at the cut, leaving on 'anymore'
   wobble: W.anymoreEnd - 0.1, // the old emblem's cane wobbles; the ring keeps spinning
   pipOut: W.anymoreEnd - 0.09, // Pip hops out past the right edge (0.30 s: gone one frame before the cut, into S11)
 } as const;

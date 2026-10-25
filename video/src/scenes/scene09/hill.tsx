@@ -87,9 +87,10 @@ export const rowInk = (k: number, zoom: number) => {
 };
 const tint = (c: string, k: number) => (k <= 2 ? c : atmos(c, Math.min(1, k / (HAZE + 3)), 'day', {clear: 0.2}));
 
-/** Stair columns: the set's (x ~612, rows 1-6) and two more (rows 1-5). */
+/** Stair columns: the set's (x ~612) and two more. Polish A1 (reviewer: the flights sliced the hill into four columns of
+ *  heavy '/\\' wedges that read as cracks or rafters): rows 1-3 only (the far rows 4+ stay a calm field of houses). */
 const MY_STAIRS = [168, 912];
-const STAIR_ROWS = 6;
+const STAIR_ROWS = 3;
 const stairJ = (k: number, tx: number) => Math.round((tx - ROWS[k].x0 - ROWS[k].w / 2) / ROWS[k].w);
 
 // ---------------------------------------------------------------- per-house cells
@@ -106,7 +107,7 @@ function cellsOf(k: number): Cell[] {
     const cx = x + R.w / 2;
     if (cx < EXT[0] || cx > EXT[1]) continue;
     const setStair = k >= 1 && k <= STAIR_ROWS && Math.abs(cx - setStairX(k)) < R.w * 0.5;
-    const mine = k >= 1 && k <= 5 && MY_STAIRS.some((tx) => stairJ(k, tx) === j);
+    const mine = k >= 1 && k <= STAIR_ROWS && MY_STAIRS.some((tx) => stairJ(k, tx) === j);
     const ci = k === 1 && j === 0 ? 2 : Math.floor(rand(SEED, `hill/${k}/${j}`) * COLORS.length);
     out.push({j, x, cx, ci, stair: setStair || mine, d: bowAt(k, cx), core: Math.abs(cx - 540) <= halfW(k)});
   }
@@ -180,8 +181,9 @@ function rowGeo(k: number, pick: (c: Cell) => boolean): RowGeo {
       // the stair column: wall face top to bottom + a zig-zag flight from this row's walkway up to the next coping
       P.slotWall.rect(c.x - 0.2, top - 2 * u, R.w + 0.4, R.h + 2 * u);
       const dir = (k % 2 ? -1 : 1) * (c.cx < 400 ? 1 : c.cx > 700 ? -1 : 1);
-      const xa = c.cx - dir * R.w * 0.36;
-      const xb = c.cx + dir * R.w * 0.34;
+      // polish A1: ~40 % narrower than before (0.70 -> 0.42 of the house width)
+      const xa = c.cx - dir * R.w * 0.22;
+      const xb = c.cx + dir * R.w * 0.2;
       const yA = base - 1.5 * u;
       const yB = top - (3 + GAP) * u * 0.8 - 1.5 * u; // the upper row's coping (its walkway)
       const n = 9;
@@ -512,6 +514,9 @@ const RowNode: React.FC<{k: number; zoom: number; parts: RowPart[]}> = ({k, zoom
   const wall = atmos(mix(palette.tan, palette.brown, 0.45), depth, 'day', {clear: 0.1});
   const sliver = atmos(mix(palette.tan, palette.tealDark, 0.6), depth, 'day', {clear: 0.1});
   const coping = tint(HALF.sand, k);
+  // polish A1: the stair slot's wall one haze step lighter than the retaining walls (toward the coping), so a flight reads
+  // as a light stair in a recess, not a brown sawtooth
+  const slotWall = atmos(mix(HALF.sand, palette.tan, 0.4), depth, 'day', {clear: 0.1});
   const off: [number, number] | false = k <= 3 ? [misreg.dx / zoom, misreg.dy / zoom] : false;
   const near = k <= 3;
   const cols = near ? COLORS.map((c) => tint(c, k)) : [tint(mix(palette.cream, palette.sand, 0.25), k), tint(palette.sand, k), tint(palette.tan, k)];
@@ -543,7 +548,7 @@ const RowNode: React.FC<{k: number; zoom: number; parts: RowPart[]}> = ({k, zoom
             {xf(
               p.rv,
               <>
-                {g.slotWall ? <Fill d={g.slotWall} color={wall} offset={false} mode="snap" seed={`s9h/sw${k}/${i}`} /> : null}
+                {g.slotWall ? <Fill d={g.slotWall} color={slotWall} offset={false} mode="snap" seed={`s9h/sw${k}/${i}`} /> : null}
                 {g.fac.map((d, ci) => (d ? <Fill key={ci} d={d} color={cols[ci]} offset={off} mode="snap" seed={`s9h/f${k}/${i}/${ci}`} /> : null))}
                 {g.shade ? <Fill d={g.shade} color={tint(palette.sand, k)} offset={false} mode="snap" seed={`s9h/sh${k}/${i}`} /> : null}
                 {g.roofs ? <Fill d={g.roofs} color={tint(mix(palette.tan, palette.tealDark, 0.25), k)} offset={false} mode="snap" seed={`s9h/rf${k}/${i}`} /> : null}

@@ -40,12 +40,15 @@ const CAP = aFrameCap(signBox(OLD_QUARTER.noticeSign));
 /** Cart line (wheel ground y), bed length, the park spot (cart centre), the walk-out from behind the A-frame (start x,
  *  hidden: the nose at 412 behind the board's face; cruise speed 471 px/s = 16.5 px / frame on screen; braking time),
  *  the roll-out. */
-export const CART = {y: 1395, size: 100, parkX: 556, x0: 362, v: 471, brake: 0.22, vMax: 500, acc: 0.5};
+/** A1 FR1: the cart line steps 40 px toward the lens (y 1395 -> 1435) and the cart grows 1.04x, so the maker's torso sits
+ *  on the pale pavement / stoop, not over siteM's dark-teal door; the walk-out start moves 22 px left with the A-frame's
+ *  narrower board (L13 at 28 px). */
+export const CART = {y: 1435, size: 104, parkX: 552, x0: 340, v: 471, brake: 0.22, vMax: 500, acc: 0.5};
 const CS = CART.size / 140; // MakersCart local -> world
 /** The maker stands this far behind the cart centre (his hands on the grip, in front of his back-view body). */
-export const MAKER_DX = -99;
+export const MAKER_DX = -101;
 /** The maker's height (world) and figure frame (hip = feet - 62 x figure scale). */
-export const MAKER_H = 154;
+export const MAKER_H = 166;
 const SF = MAKER_H / FIG_H;
 const HIP_Y = CART.y - 62 * SF;
 
@@ -86,7 +89,10 @@ export function cartX(t: number, T: CartTimes): number {
  *  arm goes straight UP (the hand over his head) for the high lob, so the tag leaves well left of siteM's plaque. */
 const SHOULDER = (side: number): Pt => [side * 32, -76];
 const HAND_DOWN = (side: number): Pt => [side * 38, -8];
-const HAND_UP = (side: number): Pt => (side < 0 ? [-58, -152] : [-6, -164]);
+/** A1 FR1: the right hand rises up over his head a little left of centre ([-22, -168], was [-6, -164]) so the high lob
+ *  leaves >= 38 px clear of Bit with the 1.2x plaques; the left hand further out ([-72, -146], was [-58, -152]) so the two
+ *  raised tags do not stack above his head. */
+const HAND_UP = (side: number): Pt => (side < 0 ? [-72, -146] : [-22, -168]);
 const RAISE = 0.1;
 const HOLD = 0.07;
 const LOWER = 0.12;
@@ -118,7 +124,7 @@ function tossPos(t: number, t0: number, t1: number, a: Pt, b: Pt, h: number): {p
 /** The high lob as a cubic Bezier (steep launch from the raised hand, apex over siteM's plaque, a falling approach onto
  *  siteR's), walked at an even speed (arc-length table): `at(s)` for s = 0..1 of the path length. */
 function lobPath(a: Pt, b: Pt): (s: number) => Pt {
-  const c1: Pt = [a[0] - 10, a[1] - LOB.rise];
+  const c1: Pt = [a[0] - 45, a[1] - LOB.rise];
   const c2: Pt = [b[0] - 51, b[1] - LOB.fall];
   const bz = (u: number): Pt => {
     const v = 1 - u;
@@ -147,10 +153,11 @@ function lobPath(a: Pt, b: Pt): (s: number) => Pt {
     return bz(us[i - 1] + (us[i] - us[i - 1]) * f);
   };
 }
-/** The high lob's Bezier handles: straight up from the hand over his head (x 475), over siteM's plaque, down into
- *  siteR's. Measured on the path (tag body 42 x 34): >= 6 px clear of Bit (dangling off the plaque's top-left), >= 21 px
- *  clear of the plaque face, apex 989 (115 px above its top); 513 px long = 34 px / frame over the 0.5 s flight. */
-export const LOB = {rise: 307, fall: 190};
+/** The high lob's Bezier handles (A1 FR1, with the 1.2x plaques, the tags beside the plates and the cart line at 1435):
+ *  up from the hand over his head (x 439) leaning left, over siteM's plaque, down beside siteR's. Measured on the path
+ *  (tag centre to obstacle box): 38 px clear of Bit, 66 px of the plate face, 61 px of the bracket, apex 928; 760 px
+ *  long = 48 px / frame over the 0.53 s flight (the dashed trail carries it). */
+export const LOB = {rise: 430, fall: 220};
 
 export type CartProps = {
   T: CartTimes;
@@ -201,6 +208,44 @@ const MAKER_PHASE = (() => {
 })();
 const WALK_HZ = 2.3;
 
+/** A1 FR1: a 4 px cream RIM strip just inside the maker's LEFT contour (the kit Person's rim language, cream: the shared
+ *  Maker has no rim option), so his back-view silhouette separates from siteM's door / the A-frame's teal by value at
+ *  phone size. Person-local geometry mirrors the kit's (personGeo: w, hr, round from rng(person/seed); torso 95; the
+ *  rim inset = ink / 2 + 0.6 px), with the kit walk bob (-|sin| x legH x 0.035 at the walk phase) while he walks. */
+const MAKER_GEO = (() => {
+  const r = rng(`person/${MAKER_SEED}`);
+  const w = r.range(86, 100);
+  r.range(0.23, 0.26);
+  const round = r.range(0.36, 0.45);
+  const h = 95;
+  const hw = w / 2;
+  return {hw, bx: hw * 1.07, R: Math.min(w * round, h * 0.8), h};
+})();
+const MakerRim: React.FC<{xm: number; walkAt?: number}> = ({xm, walkAt}) => {
+  const t = useTime();
+  const g = MAKER_GEO;
+  const s = SF;
+  const inset = (3.4 / 2 + 0.6) / s;
+  const wpx = 4 / s;
+  const a: Pt = [-g.hw, -g.h + g.R];
+  const b: Pt = [-g.bx, 0];
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const L = Math.hypot(dx, dy);
+  // inward normal (to the right of the left edge)
+  const nx = dy / L;
+  const ny = -dx / L;
+  const p = (u: number, o: number): Pt => [a[0] + dx * u + nx * o, a[1] + dy * u + ny * o];
+  const q = [p(0.03, inset), p(0.88, inset), p(0.88, inset + wpx), p(0.03, inset + wpx)];
+  const d = q.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(2)} ${y.toFixed(2)}`).join('') + 'Z';
+  const bob = walkAt !== undefined ? -Math.abs(Math.sin(t * WALK_HZ * Math.PI + MAKER_PHASE)) * 62 * 0.035 : 0;
+  return (
+    <XG m={mat.compose(mat.translate(xm, HIP_Y + bob * s), mat.scale(s))}>
+      <path d={d} fill={palette.cream} />
+    </XG>
+  );
+};
+
 /** Cart speed (world px/s) at t (central difference). */
 const cartSpeed = (t: number, T: CartTimes) => (cartX(t + 0.01, T) - cartX(t - 0.01, T)) / 0.02;
 
@@ -248,6 +293,7 @@ export const Cart: React.FC<{T: CartTimes}> = ({T}) => {
   const maker = (
     <g transform={gait}>
       <Maker x={xm} y={CART.y} h={MAKER_H} walk={moving ? {at: t < T.rollAt ? t0 : T.rollAt, hz: WALK_HZ} : undefined} seed={MAKER_SEED} />
+      <MakerRim xm={xm} walkAt={moving ? (t < T.rollAt ? t0 : T.rollAt) : undefined} />
     </g>
   );
   // the card, pinned flat on the cart's side: it rides the cart and gives a small jolt (about its bottom edge) as each
@@ -288,7 +334,8 @@ export const Cart: React.FC<{T: CartTimes}> = ({T}) => {
 /** The lob's dashed trail (fix round 3): inkThin+ (2.5 world = 2.6 on screen), dash 8 / 10 (round caps: ~10.5 / 7.5 on
  *  screen), a cream knockout under each dash; it holds the whole arc for TRAIL_HOLD s after the landing, then retracts
  *  from its tail in TRAIL_OUT s. */
-const TRAIL = {w: 2.5, dash: '8 10', knock: 3, hold: 0.35, out: 0.1};
+/** A1 FR1: 3.4 px ink, dash 12 / 10 (was 2.5, 8 / 10: a faint dotted hairline at phone size). */
+const TRAIL = {w: 3.4, dash: '12 10', knock: 3, hold: 0.35, out: 0.1};
 /** The 3 px cream knockout rim around a flying tag (it passes in front of siteM's browser window). */
 const KNOCK = 3;
 

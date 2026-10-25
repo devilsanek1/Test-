@@ -44,9 +44,14 @@ export const Satchel: React.FC<{x: number; y: number; w?: number; pullAt?: numbe
     );
   });
   const bag = roundRect(x0, y0, w, h, w * 0.14, {seed: `${seed}/b`});
+  // A1 FR1: a PEACH strap loop over the bag's top (its hang loop on the cart handle): a warm accent at the maker's hip
+  // that reads at phone size (ink edges, a 4.5 px peach band)
+  const strap = `M${x0 + w * 0.12} ${y0 + 2}C${x0 + w * 0.05} ${y0 - h * 0.85} ${x0 + w * 0.95} ${y0 - h * 0.85} ${x0 + w * 0.88} ${y0 + 2}`;
   const flap = `M${x0} ${y0 + h * 0.08}Q${x} ${y0 + h * 0.62} ${x0 + w} ${y0 + h * 0.08}Z`;
   return (
     <>
+      <path d={strap} fill="none" stroke={palette.ink} strokeWidth={4.5 + ink * 1.2} strokeLinecap="round" />
+      <path d={strap} fill="none" stroke={palette.peach} strokeWidth={4.5} strokeLinecap="round" />
       {tags}
       <Fill d={bag} color={palette.sand} offset={[2, 1.5]} seed={`${seed}/bag`} />
       <Fill d={flap} color={palette.tan} offset={false} mode="none" seed={`${seed}/flap`} />

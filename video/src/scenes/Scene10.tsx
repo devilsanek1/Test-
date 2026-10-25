@@ -17,7 +17,7 @@ import scenesJson from '../data/scenes.json';
 import {LabelTag, OldQuarter, PopUp, SunPie} from './scene10/kit';
 import {localBeats, SCENE, W} from './scene10/beats';
 import {SecondRow} from './scene10/secondRow';
-import {Plaques, plaqueRest, Sites, SiteSketch, StatusBadges, Stoops, TAG_HANG} from './scene10/sites';
+import {Plaques, plaqueRest, Sites, SiteSketch, Stoops, TAG_HANG} from './scene10/sites';
 import {plaqueFacePoint, TAG_W, tagBodyOffset} from './scene10/plaques';
 import {Cart, CartTimes, Tosses} from './scene10/cart';
 import {Pip} from './scene10/pip';
@@ -103,7 +103,7 @@ const Scene10: React.FC = () => {
           const box = signBox(slot);
           return (
             <SandwichBoard box={box} ground={box[3] + 30} at={b.label}>
-              <LabelTag kind="sign" box={box} fontSize={30 / 1.05} legH={30} frame={false} ink={0} text={L13} seed="s10/L13" />
+              <LabelTag kind="sign" box={box} fontSize={28 / 1.05} minFont={28 / 1.05} legH={30} frame={false} ink={0} text={L13} seed="s10/L13" />
             </SandwichBoard>
           );
         }}
@@ -111,7 +111,7 @@ const Scene10: React.FC = () => {
           // the empty street has a horizon from the cut: pavement to the eye line + a thin fill-only skyline
           if (name === 'far') return <FarStreet skylineAt={b.siteL} />;
           if (name === 'ground') return <StreetGround wedgeAt={wedgeAt} />;
-          if (name === 'second') return <SecondRow popAt={b.second} flipAt={b.flip2} dropAt={b.dust + 0.1} windowAt={b.pieSolid} tagsAt={b.wave} />;
+          if (name === 'second') return <SecondRow popAt={b.second} flipAt={b.flip2} dropAt={b.dust + 0.1} windowAt={W.of - start} tagsAt={b.wave} />;
           if (name === 'sites')
             return (
               <>
@@ -123,7 +123,6 @@ const Scene10: React.FC = () => {
                 <SiteSketch at={[b.sketch, b.sketch + 0.06, b.sketch + 0.12]} />
                 <Sites popAt={sitePops} updateAt={b.update} wobbleAt={b.wobble} />
                 <GapReturns atM={sitePops[1]} atR={sitePops[2]} />
-                <StatusBadges atL={b.tick1 + 0.03} atR={b.tick2 + 0.03} />
               </>
             );
           if (name === 'sign')
@@ -155,7 +154,7 @@ const Scene10: React.FC = () => {
             return (
               <>
                 {node}
-                <BottomCrowd />
+                <BottomCrowd turns={[[W.not - start, -4.5], [W.officially + 0.2 - start, 3], [W.anymore - start, 0]]} />
               </>
             );
           return node;

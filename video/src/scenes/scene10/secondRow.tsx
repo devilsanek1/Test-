@@ -19,7 +19,7 @@ import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {blob, circle, line, polyPath, rect, rectPath, Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
-import {Cobweb, OLD_QUARTER, PopUp, SI, SupportTag} from './kit';
+import {OLD_QUARTER, PopUp, SI, SupportTag} from './kit';
 import {plateFace} from './plate';
 
 const EYE = OLD_QUARTER.eye; // 1150: the far row stands on the eye line
@@ -32,7 +32,11 @@ type B = {x: number; w: number; top: number; roof: Roof; color: string; plate?: 
 const DROP_DEG = 9;
 const SAG_DEG = 3;
 /** Far plate size (world px; 46 px on screen at the 1.05 push). */
-export const FAR_PLATE = 44;
+/** A1 FR1: 33 (was 44: each far plate was ~5 far windows wide, a sticker on the skyline; a near plaque is ~2.4 near
+ *  windows wide). */
+export const FAR_PLATE = 33;
+/** Far plate ink (world px): the far layer's thin weight. */
+const FAR_INK = 2;
 /** Pop stagger back to front (fix round 2b: 0.04 -> 0.03, with the row leading 'like' by 0.30 s, so all nine pops start
  *  0.571-0.811 local and settle by ~1.01: after the gap wedge, before the sun's spoke and its cream half on 'HALF'). */
 const STAGGER = 0.03;
@@ -41,13 +45,16 @@ const STAGGER = 0.03;
 const DEF: B[] = [
   // b0: P0 centred on the wall right of siteL's mansard (its slope is at x <= 353 down to the mansard base 690 + 6 px
   // of ink overshoot): the plate spans 359-403, clear of it even after its crooked drop (fix round 2b: was x 369)
-  {x: 338, w: 66, top: 646, roof: 'flat', color: palette.sage, plate: {x: 381, y: 674, old: true, hang: 'tr'}},
+  // A1 FR1: b0's 45 px sliver beside the mansard (next to the sun) is left EMPTY: P0 is dropped (C carries the third old
+  // plate of the row: siteM, B, C)
+  {x: 338, w: 66, top: 646, roof: 'flat', color: palette.sage},
   {x: 398, w: 52, top: 792, roof: 'flat', color: palette.sand},
   {x: 450, w: 54, top: 776, roof: 'gable', color: palette.tan},
   {x: 504, w: 50, top: 790, roof: 'step', color: palette.cream},
   {x: 554, w: 48, top: 774, roof: 'chimney', color: palette.sage},
-  {x: 602, w: 80, top: 662, roof: 'step', color: palette.tan, plate: {x: 654, y: 708, old: false}},
-  {x: 682, w: 62, top: 648, roof: 'flat', color: palette.sage, plate: {x: 713, y: 706, old: true}},
+  // A1 FR1: every far plate sits fully inside ONE visible facade, below its roofline, >= 12 px from its edges
+  {x: 602, w: 80, top: 662, roof: 'step', color: palette.tan, plate: {x: 646, y: 712, old: false}},
+  {x: 682, w: 62, top: 648, roof: 'flat', color: palette.sage, plate: {x: 711, y: 708, old: true}},
   // the street gap (x 640-740): a cream gabled house behind a lower tan one (nearer, so drawn later)
   {x: 640, w: 100, top: 776, roof: 'gable', color: palette.cream, plate: {x: 690, y: 820, old: true, hang: 'tr'}},
   {x: 640, w: 100, top: 868, roof: 'flat', color: palette.tan, plate: {x: 690, y: 914, old: false}},
@@ -164,9 +171,9 @@ const FarPlate: React.FC<{p: Plate; flipAt: number; sagAt: number; shudderAt?: n
     <>
       {dropped ? <Ink d={circle(hole[0], hole[1], 2.3, {seed: `${seed}/hole`})} width={1.5} taper={false} vary={0} seed={`${seed}/hole`} /> : null}
       <XG m={mat.compose(mat.translate(0, hop), mat.about(mat.rotate(rot), pivot[0], pivot[1]))}>
-      <XG m={mat.compose(mat.translate(p.x, p.y), mat.scale(s * sx, s))}>{plateFace({old, W: SI.far / s, seed, offset: [3, 2.2], screws: !old})}</XG>
-      {old && t >= sagAt ? <Cobweb x={p.x + dir * (P / 2 - 1)} y={p.y - P * 0.3} r={P * 0.4} corner={dir > 0 ? 'tr' : 'tl'} at={sagAt + 0.04} dur={0.2} width={1.4} color={palette.cream} seed={`${seed}/w`} /> : null}
-      {tagAt !== undefined && t >= tagAt ? <SupportTag x={p.x + 6} y={p.y - P / 2 + 3} size={30} at={tagAt} checkAt={tagAt + 0.05} seed={`${seed}/tag`} /> : null}
+      <XG m={mat.compose(mat.translate(p.x, p.y), mat.scale(s * sx, s))}>{plateFace({old, W: FAR_INK / s, seed, offset: [3, 2.2], screws: !old})}</XG>
+      {/* A1 FR1: no cobweb tufts on the far plates (dark + crooked is enough); the wave's tags are 24 px */}
+      {tagAt !== undefined && t >= tagAt ? <SupportTag x={p.x + 5} y={p.y - P / 2 + 2} size={24} at={tagAt} checkAt={tagAt + 0.05} seed={`${seed}/tag`} /> : null}
       </XG>
       {old ? (
         <>

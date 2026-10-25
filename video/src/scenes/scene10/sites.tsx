@@ -210,14 +210,19 @@ export type SitesProps = {
   wobbleAt?: number;
 };
 
-/** Face-local hang points of the support tags (100-unit face coords): tied to the top corner screw, siteL's top-right,
- *  siteR's top-left, so the (58 px) tag hangs over the plate's edge and covers little of the emblem. */
-export const TAG_HANG: Record<'L' | 'R', Pt> = {L: [50, -50], R: [-50, -50]};
-export const PLAQUE_SIZE: Record<SiteId, number> = {L: 112, M: 120, R: 112};
-/** Fix round 2: the three plaques hang 26 px higher than the set's anchors (y 1190 -> 1164): a >= 20 px band of wall
- *  between siteL's plaque and the A-frame's top bar, and room under the plaques (bottoms 1220-1224) for the cart's sign
- *  card above the stoops (1300). */
-export const PLAQUE_DY = -26;
+/** A1 FR1: the plaques hang at 1.2x (were 112 / 120 / 112: the story objects were the smallest things in the action band)
+ *  and 20 px higher (PLAQUE_DY -26 -> -46), so siteL's plate stays clear above the A-frame's top. */
+export const PLAQUE_SIZE: Record<SiteId, number> = {L: 134, M: 144, R: 134};
+/** Face-local hang points of the support tags (100-unit face coords). A1 FR1: each tag hangs on a short twine from the
+ *  plate's OUTER top corner screw (siteL: top-left, siteR: top-right) with its body BESIDE the plate (it covered half of
+ *  each elephant emblem when it hung over the plate's corner): hang point = 3 units outside the edge + half a tag. */
+const tagFace = (id: 'L' | 'R') => 58 / (PLAQUE_SIZE[id] / 100);
+export const TAG_HANG: Record<'L' | 'R', Pt> = {L: [-(50 + tagFace('L') / 2 + 3), -46], R: [50 + tagFace('R') / 2 + 3, -46]};
+/** The corner screws the twines are tied to (plateFace's current-plate screw positions). */
+export const TAG_SCREW: Record<'L' | 'R', Pt> = {L: [-46.5, -46.5], R: [46.5, -46.5]};
+/** The three plaques hang 46 px higher than the set's anchors (y 1190 -> 1144): a band of wall between siteL's plaque and
+ *  the A-frame's top bar. */
+export const PLAQUE_DY = -46;
 /** A plaque's face centre (world, at rest). */
 export const plaqueRest = (id: SiteId) => ({x: S[id].sign.x, y: S[id].sign.y + PLAQUE_DY, size: PLAQUE_SIZE[id]});
 
@@ -276,31 +281,6 @@ export const Sites: React.FC<SitesProps> = ({popAt, updateAt, wobbleAt}) => {
   );
 };
 
-/** Fix round 3: when a support tag lands on a current site's plaque, that site's browser window answers with a small
- *  sage status badge (cream tick, ink rim) popping on its top-right corner: 'supported' on the screen too, while siteM's
- *  window gets nothing (and later stalls). Each badge is its own beat away from the hand-out (the tracker had merged the
- *  tosses, the lob and the landings into one 0.8 s chain). */
-export const StatusBadges: React.FC<{atL: number; atR: number}> = ({atL, atR}) => {
-  const t = useTime();
-  const out: React.ReactNode[] = [];
-  ([['L', atL], ['R', atR]] as [SiteId, number][]).forEach(([id, at]) => {
-    if (t < at) return;
-    const b = S[id].browser!;
-    const cx = b[0] + b[2] - 6;
-    const cy = b[1] + 6;
-    const k = popK(t, at, 0.18, 0.2);
-    const r = 14;
-    out.push(
-      <XG key={id} m={mat.about(mat.scale(k), cx, cy)}>
-        <Fill d={circlePath(cx, cy, r)} color={palette.sage} offset={false} mode="none" seed={`s10/badge${id}`} />
-        <Ink d={circlePath(cx, cy, r)} width={SI.far} taper={false} vary={0} seed={`s10/badgeI${id}`} />
-        <Ink d={`M${cx - 6.5} ${cy + 0.5}L${cx - 2} ${cy + 5}L${cx + 6.5} ${cy - 5.5}`} at={at + 0.04} dur={0.12} width={3.2} color={palette.cream} taper={false} vary={0} seed={`s10/badgeT${id}`} />
-      </XG>,
-    );
-  });
-  return <>{out}</>;
-};
-const circlePath = (x: number, y: number, r: number) => `M${x - r} ${y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`;
 
 /** The near row as LINE ART first (fix round 2b): under the tram wipe, from 'Plus', the three facades draw on as thin
  *  construction lines (edges overshooting the top, cornice and base lines, storey ticks, door, browser window and
@@ -347,7 +327,7 @@ const SKETCH = (() => {
 export const SiteSketch: React.FC<{at: [number, number, number]; dur?: number}> = ({at, dur = 0.26}) => (
   <>
     {IDS.map((id, i) => (
-      <Ink key={id} d={SKETCH[id]} at={at[i]} dur={dur} order="all" width={SI.hair * 1.2} taper={false} seed={`s10sk/${id}`} />
+      <Ink key={id} d={SKETCH[id]} at={at[i]} dur={dur} order="all" width={2.6} taper={false} seed={`s10sk/${id}`} />
     ))}
   </>
 );
@@ -381,9 +361,9 @@ export const Plaques: React.FC<PlaquesProps> = ({plaqueAt, old, tagL, tagR}) => 
   const sg = (id: SiteId) => ({...S[id].sign, y: S[id].sign.y + PLAQUE_DY});
   return (
     <>
-      <HangPlaque x={sg('L').x} y={sg('L').y} size={PLAQUE_SIZE.L} wallX={sg('L').wallX} at={plaqueAt[0]} tag={tagL ? {...tagL, hang: TAG_HANG.L} : undefined} seed="s10/plqL" />
+      <HangPlaque x={sg('L').x} y={sg('L').y} size={PLAQUE_SIZE.L} wallX={sg('L').wallX} at={plaqueAt[0]} tag={tagL ? {...tagL, hang: TAG_HANG.L, screw: TAG_SCREW.L} : undefined} seed="s10/plqL" />
       <HangPlaque x={sg('M').x} y={sg('M').y} size={PLAQUE_SIZE.M} wallX={sg('M').wallX} at={plaqueAt[1]} {...old} seed="s10/plqM" />
-      <HangPlaque x={sg('R').x} y={sg('R').y} size={PLAQUE_SIZE.R} wallX={sg('R').wallX} at={plaqueAt[2]} tag={tagR ? {...tagR, hang: TAG_HANG.R} : undefined} seed="s10/plqR" />
+      <HangPlaque x={sg('R').x} y={sg('R').y} size={PLAQUE_SIZE.R} wallX={sg('R').wallX} at={plaqueAt[2]} tag={tagR ? {...tagR, hang: TAG_HANG.R, screw: TAG_SCREW.R} : undefined} seed="s10/plqR" />
     </>
   );
 };

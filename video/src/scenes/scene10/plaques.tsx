@@ -39,7 +39,7 @@ const BIT_EDGE_Y = -41;
 const BIT_EDGE_X = -53;
 /** Where he hangs, stuck (fix round 3, face units): his feet 14 units left of the plate's left edge, so his idle body
  *  (22 px, facing left, tipped 16 deg) sits on siteM's cream wall clear of the ochre plate. */
-const BIT_HANG: Pt = [-64, -35];
+const BIT_HANG: Pt = [-62, -35];  // A1 FR1: -62 (was -64): 17 px off the 1.2x plate's edge, as at 1x
 
 export type HangPlaqueProps = {
   /** Face centre (world) + size (face side, world px) + the wall point of the bracket. */
@@ -60,7 +60,7 @@ export type HangPlaqueProps = {
   wobbleAt?: number;
   /** A support tag lands at this face-local hang point (100-unit face coords) at `at`, its check at `tickAt`; `ringAt`
    *  = one stepped ink ring pulse around it (two rings, 0.08 s apart, thinning as they grow: no fade). */
-  tag?: {at: number; tickAt: number; hang: Pt; size?: number; ringAt?: number};
+  tag?: {at: number; tickAt: number; hang: Pt; size?: number; ringAt?: number; /** A1 FR1: the corner screw its twine is tied to (face units) */ screw?: Pt};
   /** Small nudges of the whole plate (pendulum 4 deg, 0.3 s): the 'skip' as a tag sails over it. */
   nudgeAt?: number[];
   /** Bit: pops on the hook at `at`, crawls down the chain onto the face and into the web corner (arrives at + 0.4). */
@@ -239,9 +239,15 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
     else if (t < da + TAG_DISC.pop + TAG_DISC.hold) dk = 1;
     else dk = 1 - E.inCubic(prog(t, da + TAG_DISC.pop + TAG_DISC.hold, TAG_DISC.out));
     const disc = dk > 0.01 ? <circle cx={hx} cy={hy + tagBodyOffset(tw)} r={tw * TAG_DISC.r * dk} fill={palette.peach} /> : null;
+    // A1 FR1: the twine from the plate's outer corner screw to the tag's eyelet (a slight sag), so the tag hangs BESIDE
+    // the plate, not over its emblem
+    const sc: Pt | undefined = p.tag.screw ? [hookX + p.tag.screw[0], chain + 50 + p.tag.screw[1]] : undefined;
+    const twine = sc ? `M${sc[0].toFixed(1)} ${sc[1].toFixed(1)}Q${((sc[0] + hx) / 2).toFixed(1)} ${(Math.max(sc[1], hy) + 7).toFixed(1)} ${hx.toFixed(1)} ${hy.toFixed(1)}` : '';
     tag = (
       <>
         {disc}
+        {twine ? <Ink d={twine} width={1.9 / s} color={palette.brown} taper={false} vary={0} seed={`${seed}/twine`} /> : null}
+        {sc ? <Fill d={blob(sc[0], sc[1], 4.2, 4.2, {seed: `${seed}/knot`})} color={palette.ink} mode="none" offset={false} seed={`${seed}/knot`} /> : null}
         {rings}
         {/* landed at FULL size (the flying tag hands over to it: a pop from 0 left 1-2 frames with no tag), swinging
             -16 -> 0 about its hang point like the kit tag's entry */}
