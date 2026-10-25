@@ -340,6 +340,9 @@ export type GovBWindowProps = {
   flickerAt?: number;
   /** Loading-ring radius (world; the chrome's own is ~10). */
   ringR?: number;
+  /** The loader gives up: a peach '!' badge springs onto the ring's centre (covering the spinner) and holds (the shutter
+   *  covers it). */
+  alertAt?: number;
   inkW: number;
   children?: React.ReactNode;
   seed?: string;
@@ -380,9 +383,13 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
   // ---- the value: steps, an up-step's spring past its value, the reload regrow
   let v = stepAt(steps, t);
   let flash = false;
+  // a DOWN step (the regression on 'yet'): the whole trough flashes peach for 2 frames as the fill snaps back, the one
+  // readable sound-off cue of "can't update yet" at phone size (with the ring's '!' badge)
+  let regress = false;
   for (let i = 1; i < steps.length; i++) {
     const st = steps[i];
     const d = t - st.t;
+    if (d >= 0 && d < 2 / 30 && steps[i].v < steps[i - 1].v) regress = true;
     if (d < 0 || steps[i].v <= steps[i - 1].v) continue;
     if (d < 0.1) v += 0.025 * Math.sin((d / 0.1) * (Math.PI / 2));
     else if (d < 0.35) v += 0.025 * Math.cos(((d - 0.1) / 0.25) * (Math.PI / 2)) ** 2;
@@ -448,14 +455,33 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
       ) : null}
       {/* the fat bar: white trough, teal fill (cream for two frames on an up-step) */}
       <Fill d={roundRect(bx, PAGE.by, PAGE.bw, PAGE.bh, 4)} color={palette.white} offset={false} mode="none" seed={`${seed}/trough`} />
-      {!flickOff && v > 0.002 ? <Fill d={rectPath(bx + 2.5, PAGE.by + 2.5, (PAGE.bw - 5) * Math.min(1, v), PAGE.bh - 5)} color={flash ? palette.cream : palette.teal} offset={false} mode="none" seed={`${seed}/fill`} /> : null}
+      {!flickOff && v > 0.002 ? <Fill d={rectPath(bx + 2.5, PAGE.by + 2.5, (PAGE.bw - 5) * (regress ? 1 : Math.min(1, v)), PAGE.bh - 5)} color={regress ? palette.peach : flash ? palette.cream : palette.teal} offset={false} mode="none" seed={`${seed}/fill`} /> : null}
       <Ink d={roundRect(bx, PAGE.by, PAGE.bw, PAGE.bh, 4, {closed: false, seed: `${seed}/troughi`})} width={iw * 0.8} taper={false} vary={0} seed={`${seed}/troughi`} />
       {bars}
     </XG>
   );
 };
 
-export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reloadAt = [], shakeAt, barsAt = [], barsX0, flickerAt, ringR, inkW, children, seed = 's11/govB'}) => {
+/** The loader's '!' badge: a peach disc with an ink rim and a lettered '!' that springs in at `at` (scale 0 -> 1.18 -> 1
+ *  over 0.2 s, about its centre) and holds. */
+export const AlertBadge: React.FC<{x: number; y: number; r: number; at: number; inkW: number; seed: string}> = ({x, y, r, at, inkW, seed}) => {
+  useCaptionFont();
+  const t = useTime();
+  if (t < at) return null;
+  const d = t - at;
+  const s = d < 0.08 ? 0.35 + 0.83 * E.outCubic(d / 0.08) : 1 + 0.18 * Math.exp(-(d - 0.08) * 14) * Math.cos((d - 0.08) * Math.PI * 2 * 3);
+  return (
+    <XG m={mat.compose(mat.translate(x, y), mat.scale(s))}>
+      <Fill d={blob(0, 0, r, r, {seed: `${seed}/d`})} color={palette.peach} offset={false} mode="none" seed={`${seed}/f`} />
+      <Ink d={circle(0, 0, r, {seed: `${seed}/i`})} width={inkW} taper={false} vary={0} seed={`${seed}/i`} />
+      <text x={0} y={r * 0.58} fontFamily={captionFontStack} fontSize={r * 1.75} fill={palette.ink} textAnchor="middle">
+        !
+      </text>
+    </XG>
+  );
+};
+
+export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reloadAt = [], shakeAt, barsAt = [], barsX0, flickerAt, ringR, alertAt, inkW, children, seed = 's11/govB'}) => {
   const [x, y, w, h] = r;
   const g = pillGeom(w, h);
   const rr = ringR ?? g.ringR;
@@ -475,6 +501,7 @@ export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reload
         {null}
       </BrowserChrome>
       <HiccupRing x={x + w - rr * 1.3 - 1.5} y={y + g.ringY} r={rr} hiccups={hiccups} fastAt={reloadAt} inkW={inkW * 0.5} />
+      {alertAt !== undefined ? <AlertBadge x={x + w - rr * 1.3 - 1.5} y={y + g.ringY} r={rr * 0.98} at={alertAt} inkW={inkW * 0.6} seed={`${seed}/alert`} /> : null}
       {children}
     </>
   );
@@ -520,18 +547,30 @@ export const crtContent = (u: number, seed: string, coreColor: string = palette.
 
 // ---------------------------------------------------------------- plain panes (govC / govD at the right edge)
 
-/** A plain lit window pane for the edge buildings (govC / govD are cut by the right edge in the close-up: their browser
- *  chrome read as stray dots and bars there). Cream glow + an ink frame; `crt` (0..1, the set's CRT phase) plays the
- *  power-off (tealDark glass, the bright band -> line -> dot) and then holds the dark screen. */
+/** A plain window pane for the edge buildings (govC / govD are cut by the right edge in the close-up: their browser
+ *  chrome read as stray dots and bars there). Fix round 1: GLASS, not a blank cream card: mintPale glass, a thin mullion
+ *  cross and two white diagonal glints (reference 1's noticeboard glass) inside an ink frame; `crt` (0..1, the set's CRT
+ *  phase) plays the power-off (tealDark glass, the bright band -> line -> dot) and then holds the dark screen (one glint
+ *  stays on the dark glass). */
 export const PlainPane: React.FC<{r: [number, number, number, number]; inkW: number; crt?: number; seed: string}> = ({r, inkW, crt = 0, seed}) => {
   const [x, y, w, h] = r;
   const dark = crt >= 0.999;
   // at the frame edge: the first visible frame is an already-squashed band, cream core / peach halo (no white block)
   const cu = Math.max(crt, CRT.line * 0.85);
+  const k = Math.max(1e-4, matScale(useXf()));
+  const mx = x + w * 0.5;
+  const my = y + h * 0.46;
+  const mull = `M${mx.toFixed(1)} ${y}L${(mx + 0.6).toFixed(1)} ${y + h}M${x} ${my.toFixed(1)}L${x + w} ${(my - 0.8).toFixed(1)}`;
+  // two short parallel glints in the upper-left light of the pane (white, ~3 px on screen), one in the lower-right
+  const gl = (gx: number, gy: number, L: number) => `M${gx.toFixed(1)} ${(gy + L).toFixed(1)}L${(gx + L * 0.8).toFixed(1)} ${gy.toFixed(1)}`;
+  const glints = gl(x + w * 0.12, y + h * 0.1, h * 0.22) + gl(x + w * 0.2, y + h * 0.12, h * 0.13) + gl(x + w * 0.62, y + h * 0.58, h * 0.16);
   return (
     <>
-      <Fill d={rectPath(x, y, w, h)} color={dark ? palette.tealDark : palette.cream} offset={false} mode="none" seed={`${seed}/pane`} />
+      <Fill d={rectPath(x, y, w, h)} color={dark ? palette.tealDark : palette.mintPale} offset={false} mode="none" seed={`${seed}/pane`} />
       {crt > 0.001 && !dark ? <XG m={mat.translate(x, y)}>{crtContent(cu, `${seed}/crt`, palette.cream, palette.peach)({w, h})}</XG> : null}
+      {crt <= 0.001 ? <path d={glints} fill="none" stroke={palette.white} strokeWidth={3.2 / k} strokeLinecap="round" /> : null}
+      {dark ? <path d={gl(x + w * 0.12, y + h * 0.1, h * 0.2)} fill="none" stroke={palette.sage} strokeWidth={2.6 / k} strokeLinecap="round" /> : null}
+      <Ink d={mull} width={inkW * 0.55} taper={false} vary={0.05} seed={`${seed}/mull`} />
       <Ink d={rectPath(x, y, w, h)} width={inkW} taper={false} vary={0} seed={`${seed}/frame`} />
     </>
   );

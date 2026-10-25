@@ -39,7 +39,8 @@
 //   CAMERA: cut, matchcut and foreground-wipe add NO camera move (v3: every camera move belongs to a scene key). A
 //   foreground wipe only clips the two scenes at its edge and draws the element; `drift: 50` (px) restores v2's
 //   parallax drift of both scenes under it. camera-continuous and push-through are the only transitions that move a
-//   camera (v2 grammar; not used by the v3 storyboard).
+//   camera (v2 grammar; not used by the v3 storyboard). Either takes an opt-in `inkComp` (0.6 = house): the engine's
+//   strokes are drawn at width x zoom^-inkComp while it zooms (StageCam.ink, lib/inkComp.tsx). Default off.
 //   transitionOut (LAST scene only), the LOOP back to frame 0:
 //     {type: 'unbuild', dur = 0.5, loop = true, captionAt?}  un-builds the final scene before its end and reveals the
 //       FIRST scene underneath at its t < 0 state (v1 / v2: the line-art loop).
@@ -60,6 +61,7 @@ import {capcheckMode, CaptionBeat, SkyCaptions, ToneRegion, toneOn} from './Capt
 import {exitFillProgress} from './exit';
 import {SceneInfo, SceneTransitionIn, StageCam, StageContexts, STAGE_REST, TransitionInfo, zoomAbout} from './stage';
 import {Ink} from './Ink';
+import {inkCompFactor} from './inkComp';
 import {bbox, Fill} from './Fill';
 import {blob, circle, crown, crownTicks, line, torso} from './sketch';
 import type {Pt} from './sketch';
@@ -77,7 +79,7 @@ export type CamDir = 'in' | 'out' | 'up' | 'down' | 'left' | 'right';
 export type FilmTransition =
   | {type: 'cut'; dur?: number}
   | {type: 'matchcut'; dur?: number}
-  | {type: 'camera-continuous'; dur?: number; dir?: CamDir; amount?: number; focus?: Pt; to?: Pt}
+  | {type: 'camera-continuous'; dur?: number; dir?: CamDir; amount?: number; focus?: Pt; to?: Pt; /** Opt-in ink compensation exponent (0.6 = house): strokes x zoom^-inkComp while the camera zooms (lib/inkComp.tsx). Default off. */ inkComp?: number}
   | {
       type: 'foreground-wipe';
       dur?: number;
@@ -90,7 +92,7 @@ export type FilmTransition =
        *  camera (v3). 50 = the v2 drift. */
       drift?: number;
     }
-  | {type: 'push-through'; dur?: number; from?: Pt; to?: Pt; zoom?: number; bridge?: string}
+  | {type: 'push-through'; dur?: number; from?: Pt; to?: Pt; zoom?: number; bridge?: string; /** Opt-in ink compensation exponent (0.6 = house): strokes x zoom^-inkComp on both legs (lib/inkComp.tsx). Default off. */ inkComp?: number}
   | {type: 'unbuild'; dur?: number};
 /** Caption tone key (scene-local t). `wipe` makes the switch follow a sky wipe edge across the caption band. */
 export type ToneKey = {t: number; tone: CaptionTone; wipe?: 'down' | 'up' | 'snap'; dur?: number};
@@ -546,6 +548,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
 
     // ---- camera, clip, exit
     let cam: StageCam = STAGE_REST;
+    let camK: number | undefined; // the moving transition's inkComp (opt-in)
     let clip: string | undefined;
     let exit = 0;
     let trans: TransitionInfo | null = null;
@@ -556,6 +559,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
         const cc = camCont(tin);
         if (q < cc.dIn) {
           cam = cc.in(clamp(q / cc.dIn));
+          camK = tin.inkComp;
           trans = {type: tin.type, phase: 'in', p: clamp(q / cc.dIn)};
         }
       } else if (tin.type === 'push-through') {
@@ -563,6 +567,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
         const v = (q - pt.hold / 2) / pt.dIn;
         if (v < 1) {
           cam = pt.in(clamp(v));
+          camK = tin.inkComp;
           trans = {type: tin.type, phase: 'in', p: clamp(v)};
         }
       } else if (tin.type === 'foreground-wipe') {
@@ -588,6 +593,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
         const cc = camCont(tout);
         if (q > -cc.dOut) {
           cam = cc.out(clamp((q + cc.dOut) / cc.dOut));
+          camK = tout.inkComp;
           trans = {type: tout.type, phase: 'out', p: clamp((q + cc.dOut) / cc.dOut)};
         }
       } else if (tout.type === 'push-through') {
@@ -595,6 +601,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
         const u = (q + pt.hold / 2 + pt.dOut) / pt.dOut;
         if (u > 0) {
           cam = pt.out(clamp(u));
+          camK = tout.inkComp;
           trans = {type: tout.type, phase: 'out', p: clamp(u)};
         }
       } else if (tout.type === 'foreground-wipe') {
@@ -644,6 +651,8 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
         }
       }
     }
+    // opt-in ink compensation of a flagged camera transition: zoom^-k (both legs start / end at zoom 1: no width step)
+    if (camK) cam = {...cam, ink: inkCompFactor(cam.zoom, camK)};
     pushLayer(s, i, {cam, clip, exit, z, trans});
   });
 

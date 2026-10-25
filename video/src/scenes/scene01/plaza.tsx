@@ -9,15 +9,16 @@ import {palette} from '../../lib/theme';
 import {useTime} from '../../lib/time';
 import {Sun} from '../../lib/Sun';
 import {Pt} from '../../lib/sketch';
-import {XG} from '../../lib/xf';
+import {mat, XG} from '../../lib/xf';
+import {InkScale} from '../../lib/inkComp';
 import {GovEvents, GovernmentPlaza, GovId, PLAZA} from '../shared/sets';
-import {Bit, EdgeOnlooker, MarkRing, PowerGlyph, SunPress} from '../shared/props';
-import {inkComp, layerMat} from './camera';
+import {Bit, EdgeOnlooker, PowerGlyph, SunPress} from '../shared/props';
+import {inkComp, layerMat, toScreen, zoomAt} from './camera';
 import {B} from './timing';
-import {CitizenPlan, OnlookerPhoneArm, PigeonPlan, PipPlan, PipS01, PlazaCitizen, Pigeon} from './cast';
+import {CitizenPlan, leanAt, OnlookerPhoneArm, PigeonPlan, PipLeap, PipPlan, PipS01, PlazaCitizen, Pigeon} from './cast';
 import {s01WindowSlot} from './screens';
 import {DOME_GLASS, LanternOff, S01_PADLOCK_SIZE, S01Shutter} from './shims';
-import {DoorLanterns, S01Branch, SunRipple, TreeTicks} from './dressing';
+import {DoorLanterns, LockRing, S01Branch, SunRipple, TreeTicks} from './dressing';
 
 const SUN = PLAZA.sun; // (720, 900) r155
 const VP = PLAZA.vp as Pt;
@@ -35,8 +36,12 @@ const SLAM_DUR = 0.16;
  *  readers), they glint on 'PURPOSE'. */
 export const S01_GOV: Partial<Record<GovId, GovEvents>> = {
   govA: {screenOffAt: B.crtA, shutterAt: B.slamA, offAt: B.slamA + SLAM_DUR, padlockAt: B.padlocks[1], padlockProps: {x: 152, y: 994, size: S01_PADLOCK_SIZE.govA}, glintAt: B.padlockGlint[1], tagAt: B.tags[1], tagProps: {lettered: true, size: 74, x: 226}},
-  govB: {screenOffAt: 0, shutterAt: B.slamB, offAt: B.slamB + SLAM_DUR, padlockAt: B.padlocks[0], padlockProps: {x: 462, y: 1096, size: S01_PADLOCK_SIZE.govB}, glintAt: B.padlockGlint[0], tagAt: B.tags[0], tagProps: {lettered: true, size: 138, x: 566, y: 1104}, lanternOffAt: B.domeLanternOff},
-  govC: {screenOffAt: B.crtC, shutterAt: B.slamC, shutterStop: 0.5, padlockAt: B.padlocks[2], padlockProps: {x: 838, y: 767, size: S01_PADLOCK_SIZE.govC}, glintAt: B.padlockGlint[2], tagAt: B.tags[2], tagProps: {lettered: true, size: 62, x: 900}},
+  // fix round 4: govB's tag 130 wide at x 552, hung 14 px higher (1090): it clears the door pediment's apex and govB's
+  // right wall line (review: two tangents on the cover frame); the padlock moves 10 left (452) to keep an 8 px gap
+  govB: {screenOffAt: 0, shutterAt: B.slamB, offAt: B.slamB + SLAM_DUR, padlockAt: B.padlocks[0], padlockProps: {x: 452, y: 1096, size: S01_PADLOCK_SIZE.govB}, glintAt: B.padlockGlint[0], tagAt: B.tags[0], tagProps: {lettered: true, size: 130, x: 552, y: 1090}, lanternOffAt: B.domeLanternOff},
+  // fix round 4: govC keeps its padlock only (review: its 62 px tag's 14 px letters were illegible and cluttered the
+  // half-shutter read; J1 reads on govB and govA)
+  govC: {screenOffAt: B.crtC, shutterAt: B.slamC, shutterStop: 0.5, padlockAt: B.padlocks[2], padlockProps: {x: 838, y: 767, size: S01_PADLOCK_SIZE.govC}, glintAt: B.padlockGlint[2]},
 };
 
 /** What the SET draws: S01_GOV minus every shutter / padlock / tag / glint, which `S01Shutter` (shims.tsx) draws on top
@@ -79,12 +84,15 @@ export const S01_CITIZENS: CitizenPlan[] = [
   {x: 130, y: 1442, h: 52, seed: 'plaza/cit7'},
   {x: 744, y: 1402, h: 26, seed: 'plaza/cit8', silhouette: true},
 ];
-/** NEAR observer (fix round 2, PEAK-1 depth, ref2 f_1 / ref f_9.0): one big back-view figure on the VP axis cut by
- *  the bottom edge (0.29 H, head top ~y 1500), left of Pip's bollard column, in the near layer (it leaves the dive
- *  fast, down and out). Leans toward govB on 'Governments', straightens on 'PURPOSE' (no 3/4 head swap: at this size
- *  the cheek patch read as a mask). */
-export const S01_NEAR: CitizenPlan[] = [
-  {x: 600, y: 2075, h: 560, seed: 's01/nA', hair: 'short', hairColor: palette.ink, acc: ['headphones'], body: palette.tealDark, ink: 4.8, lean: [{t: B.heads + 0.08, a: -3}, {t: B.headsBack + 0.04, a: 0}], bob: 1.2},
+/** NEAR observer (PEAK-1 depth, ref2 f_1 / ref f_9.0): one big back-view figure cut by the bottom edge, left of Pip's
+ *  bollard column, in the near layer (it leaves the dive fast, down and out). Fix round 4 (review: a flat tealDark
+ *  tombstone with an ink-black ball head, the least drawn and darkest mass of the hook frame): the kit's tier-A
+ *  foreground figure `EdgeOnlooker` (hood, hanging arms with sleeve seams and cuffs running off the bottom edge, the
+ *  white rim strip, open contour) in a teal coat with ochre hair, plus the scene's tealDark shade wedge on the right of
+ *  the back (`NearShade`). Leans toward govB on 'Governments', straightens on 'PURPOSE'. */
+export type NearPlan = {x: number; y: number; head: number; seed: string; hair: 'short'; hairColor: string; body: string; acc: ('hood' | 'collar')[]; rim: 'left' | 'right'; lean: {t: number; a: number}[]; bob: number};
+export const S01_NEAR: NearPlan[] = [
+  {x: 566, y: 1572, head: 112, seed: 's01/nA', hair: 'short', hairColor: palette.brown, body: palette.teal, acc: ['hood'], rim: 'left', lean: [{t: B.heads + 0.08, a: -3}, {t: B.headsBack + 0.04, a: 0}], bob: 1.2},
 ];
 
 /** Paint order: far first, then by feet y. */
@@ -92,19 +100,23 @@ const CITIZEN_ORDER = S01_CITIZENS.map((c, i) => [c.y, i] as [number, number]).s
 
 // ---------------------------------------------------------------- pigeons on the lamp crossbar
 
-/** They fly in UNDER govA's window band (y 906-1014) and swing back onto the bar (fix round 1: the old route crossed
- *  the browser window and the bare 'v' ticks read as UI chevrons). */
+/** They fly in UNDER govA's window band (y 906-1014) and swing back onto the bar (fix round 1). Fix round 4: bird
+ *  silhouettes (Flyer: filled wings, tealDark head; perched heads tealDark too), sand / tan instead of white, and the
+ *  scatter goes UP and LEFT out of the frame (off the left edge within ~0.35 s), so nothing crosses govA's shutter while
+ *  the padlocks pop (3.30-3.70). */
 const PG = PLAZA.pigeons;
 export const S01_PIGEONS: PigeonPlan[] = [
-  {x: PG[0][0], y: PG[0][1], seed: 'pg0', color: palette.white, landAt: 0.12, inDur: B.pigeonsLand - 0.12, fromAbs: [-70, 1180], via: [220, 1090], flyAt: B.pigeonsFly, flyTo: [190, -380], backAt: B.pigeonBack, backFrom: [-150, -250]},
-  {x: PG[1][0], y: PG[1][1], seed: 'pg1', color: palette.sand, landAt: 0.17, inDur: B.pigeonsLand + 0.06 - 0.17, fromAbs: [-70, 1232], via: [250, 1124], shuffleAt: B.shuffle, shuffleDx: -10, flyAt: B.pigeonsFly + 0.05, flyTo: [260, -330]},
-  {x: PG[2][0], y: PG[2][1], seed: 'pg2', color: palette.white, flip: true, landAt: 0.22, inDur: B.pigeonsLand + 0.12 - 0.22, fromAbs: [-70, 1150], via: [285, 1066], flyAt: B.pigeonsFly + 0.1, flyTo: [330, -300]},
+  {x: PG[0][0], y: PG[0][1], seed: 'pg0', color: palette.sand, landAt: 0.12, inDur: B.pigeonsLand - 0.12, fromAbs: [-70, 1180], via: [220, 1090], flyAt: B.pigeonsFly, flyTo: [-300, -250], backAt: B.pigeonBack, backFrom: [-150, -250]},
+  {x: PG[1][0], y: PG[1][1], seed: 'pg1', color: palette.tan, landAt: 0.17, inDur: B.pigeonsLand + 0.06 - 0.17, fromAbs: [-70, 1232], via: [250, 1124], shuffleAt: B.shuffle, shuffleDx: -10, flyAt: B.pigeonsFly + 0.05, flyTo: [-330, -330]},
+  {x: PG[2][0], y: PG[2][1], seed: 'pg2', color: palette.sand, flip: true, landAt: 0.22, inDur: B.pigeonsLand + 0.12 - 0.22, fromAbs: [-70, 1150], via: [285, 1066], flyAt: B.pigeonsFly + 0.1, flyTo: [-360, -290]},
 ];
 
 // ---------------------------------------------------------------- Pip (frame 0: sit-back, look 0, seed 11, idle clock t = 0)
 
 export const S01_PIP_SEED = 11;
-export const S01_PIP: PipPlan = {x: PLAZA.pip[0], y: PLAZA.pip[1], flinchAt: B.pipFlinch, lookAt: B.heads, look: -0.55, hopAt: B.pipHop, landAt: B.pipLand, backAt: B.pipBack, exitAt: B.dive + 0.045, exitTo: [1100, 900], lookBackAt: B.headsBack + 0.05};
+/** Fix round 4: Pip sits 12 px lower on the bollard cap (review: govD's ground line at y 1380 ran exactly along the
+ *  bottom of his ears, a line through his neck at phone size; now it passes behind the ear lobes). */
+export const S01_PIP: PipPlan = {x: PLAZA.pip[0], y: PLAZA.pip[1] + 12, flinchAt: B.pipFlinch, lookAt: B.heads, look: -0.55, hopAt: B.pipHop, landAt: B.pipLand, backAt: B.pipBack, exitAt: B.pipExit, lookBackAt: B.headsBack + 0.05};
 
 // ---------------------------------------------------------------- Bit: seated ON govA's cornice ledge line
 
@@ -114,13 +126,18 @@ export const S01_BIT: [number, number] = [PLAZA.bit[0], PLAZA.bit[1] + 6];
 // ---------------------------------------------------------------- the edge onlookers (PLAZA.onlookers, re-acted)
 
 /** The left onlooker raises a phone along an elbow arc (the scene draws that arm: OnlookerPhoneArm); the phone ends
- *  right of his head at screen x ~165, clear of the lamp post, its lit screen showing a mini govB. */
-const ONL_PHONE = {up: B.phonesUp + 0.06, hand: [202, 1471] as [number, number]};
+ *  right of his head at screen x ~165, clear of the lamp post, its lit screen showing a mini govB. Fix round 4: he
+ *  lowers it on the pause before the dive (4.03 -> 4.28), so his arm hangs again when the dive pulls him out (review:
+ *  his body left the frame ahead of the raised arm: a 'cane' hook for 5 frames). Onlooker [1] (the bottom-left bun
+ *  head) is dropped (review: five framing elements in the bottom band; the left onlooker is the one side crop). */
+const ONL_PHONE = {up: B.phonesUp + 0.06, down: B.onlookerPhoneDown, hand: [202, 1471] as [number, number]};
+const ONLOOKERS = [0, 2];
 const Onlookers: React.FC = () => {
   const t = useTime();
   return (
     <>
-      {PLAZA.onlookers.map((o, i) => {
+      {ONLOOKERS.map((i) => {
+        const o = PLAZA.onlookers[i];
         const head = 60 * o.s * 1.05;
         const body = [palette.tan, palette.sand, palette.sage][i];
         const raised = i === 0 && t >= ONL_PHONE.up;
@@ -137,7 +154,7 @@ const Onlookers: React.FC = () => {
               arms={i === 0 ? (raised ? false : 'near') : 'both'}
               seed={`plaza/onl${i}`}
             />
-            {i === 0 ? <OnlookerPhoneArm x={o.head[0]} y={o.head[1]} head={head} seed={`plaza/onl${i}`} coat={body} up={ONL_PHONE.up} hand={ONL_PHONE.hand} /> : null}
+            {i === 0 ? <OnlookerPhoneArm x={o.head[0]} y={o.head[1]} head={head} seed={`plaza/onl${i}`} coat={body} up={ONL_PHONE.up} down={ONL_PHONE.down} hand={ONL_PHONE.hand} /> : null}
           </React.Fragment>
         );
       })}
@@ -145,31 +162,38 @@ const Onlookers: React.FC = () => {
   );
 };
 
+/** The near observer (S01_NEAR): kit EdgeOnlooker leaning about a point below the frame, plus a tealDark shade wedge
+ *  down the right side of the back (one light step, ref2 1.7). */
+const NearObserver: React.FC<{p: NearPlan}> = ({p}) => {
+  const t = useTime();
+  const lean = leanAt(t, p.lean);
+  return (
+    <XG m={mat.about(mat.rotate(lean), p.x, 2080)}>
+      <EdgeOnlooker x={p.x} y={p.y} head={p.head} hair={p.hair} hairColor={p.hairColor} body={p.body} acc={p.acc} rim={p.rim} arms="both" bob={p.bob} seed={p.seed} />
+    </XG>
+  );
+};
+
 // ---------------------------------------------------------------- the shot
 
 export const PlazaShutdown: React.FC = () => {
   const t = useTime();
-  // the dive's ink compensation for everything the scene draws (the set's own strokes still scale: core / sets lane)
-  const ink = inkComp(t, 'buildings');
-  const inkNear = inkComp(t, 'near');
   const extra: Record<string, React.ReactNode> = {
     buildings: (
       <>
         {(['govC', 'govA', 'govB'] as const).map((id) => (
-          <S01Shutter key={id} id={id} ev={S01_GOV[id] as GovEvents} ink={ink} />
+          <S01Shutter key={id} id={id} ev={S01_GOV[id] as GovEvents} />
         ))}
         <LanternOff r={DOME_GLASS} at={B.domeLanternOff} seed="s01/domeOff" />
-        <DoorLanterns offAt={[B.lampOff, B.lampOff + 0.06]} ink={ink} />
+        <DoorLanterns offAt={[B.lampOff, B.lampOff + 0.06]} />
         <Bit x={S01_BIT[0]} y={S01_BIT[1]} size={PLAZA.bitSize} seed="plaza/bit" state="idle" />
-        {/* fix round 3: the ring's ink is compensated in the dive like the shutters (2.4 -> ~1.3 world at the cut =
-            ~4 px on screen, S02's detail circle is ~4 px) */}
-        <MarkRing x={PLAZA.gov.govB.lock[0]} y={PLAZA.gov.govB.lock[1]} r={24} at={B.lockRing} dur={0.12} width={2.4 * ink} seed="s01/ring" />
+        <LockRing x={PLAZA.gov.govB.lock[0]} y={PLAZA.gov.govB.lock[1]} at={B.lockRing} dive={B.dive} cut={B.cut} />
       </>
     ),
     light: (
       <>
         {CITIZEN_ORDER.map((i) => (
-          <PlazaCitizen key={i} p={S01_CITIZENS[i]} vp={VP} horizon={HZ} inkK={ink} />
+          <PlazaCitizen key={i} p={S01_CITIZENS[i]} vp={VP} horizon={HZ} />
         ))}
       </>
     ),
@@ -179,19 +203,23 @@ export const PlazaShutdown: React.FC = () => {
         {S01_PIGEONS.map((p) => (
           <Pigeon key={p.seed} p={p} />
         ))}
-        <PipS01 p={S01_PIP} seed={S01_PIP_SEED} inkK={inkNear} />
+        <PipS01 p={S01_PIP} seed={S01_PIP_SEED} />
         {S01_NEAR.map((c) => (
-          <PlazaCitizen key={c.seed} p={c} vp={VP} horizon={HZ} inkK={inkNear} />
+          <NearObserver key={c.seed} p={c} />
         ))}
         <Onlookers />
         <S01Branch />
       </>
     ),
   };
+  // every layer (the set's strokes AND the scene's extras) draws its ink compensated in the dive (ENGINE.md 4b:
+  // (zoom / zoom at 4.385)^-0.6 per layer, exactly 1 up to the dive start), so the cut lands at ~3-6 px like S02
   const wrap = (name: string, _nearness: number, node: React.ReactNode) => (
     <XG m={layerMat(t, name)}>
-      {node}
-      {extra[name] ?? null}
+      <InkScale value={inkComp(t, name)}>
+        {node}
+        {extra[name] ?? null}
+      </InkScale>
     </XG>
   );
   // frame 0 = the bottom of the SunPress (0.88) with the ripple at its emission radius; it releases over 0.2 s while
@@ -203,24 +231,33 @@ export const PlazaShutdown: React.FC = () => {
           {(r: number) => <PowerGlyph r={r} glintAt={B.glint} seed="s01/pwr" />}
         </Sun>
       </SunPress>
-      {/* fix round 3: the ripple in the glyph's cream (the kit's ink ring read as an outline around the sun) */}
+      {/* the ripple in the glyph's cream (the kit's ink ring read as an outline around the sun) */}
       <SunRipple cx={SUN.x} cy={SUN.y} r={SUN.r} at={B.rippleAt} />
     </>
   );
   return (
-    <GovernmentPlaza
-      state="frame0"
-      sun={sun}
-      gov={S01_GOV_SET}
-      windowSlot={S01_WINDOWS}
-      civicOffAt={B.civicOff[0]}
-      civicLanternsOffAt={B.civicLanterns[0]}
-      citizensAt={false}
-      onlookers={false}
-      bit={false}
-      lanternOffAt={B.lampOff}
-      wrap={wrap}
-      seed="plaza"
-    />
+    <>
+      <GovernmentPlaza
+        state="frame0"
+        sun={sun}
+        gov={S01_GOV_SET}
+        windowSlot={S01_WINDOWS}
+        civicOffAt={B.civicOff[0]}
+        civicLanternsOffAt={B.civicLanterns[0]}
+        citizensAt={false}
+        onlookers={false}
+        bit={false}
+        lanternOffAt={B.lampOff}
+        wrap={wrap}
+        seed="plaza"
+      />
+      {/* Pip's leap across the matchcut, in SCREEN space (outside the camera): from the bollard top where the near
+          layer had him at take-off to S02's pickup state (handoff.ts) */}
+      <PipLeap p={S01_PIP} from={PIP_TAKEOFF} fromScale={PIP_TAKEOFF_SCALE} />
+    </>
   );
 };
+
+/** Pip's take-off point on screen (the bollard top in the near layer at B.pipExit) and his screen scale there. */
+const PIP_TAKEOFF = toScreen(B.pipExit, [S01_PIP.x, S01_PIP.y], 'near') as Pt;
+const PIP_TAKEOFF_SCALE = zoomAt(B.pipExit, 'near');

@@ -1,7 +1,7 @@
 // stage.tsx — contexts shared by the sequencer (Film / Timeline) and the scene roots (World / Card).
 //
 //   useScene()      -> {id, start, end, dur}          the scene being rendered (seconds on the VO timeline)
-//   useStageCam()   -> {ox, oy, zoom, rot}            the TRANSITION camera Film applies to this scene right now
+//   useStageCam()   -> {ox, oy, zoom, rot, ink?}      the TRANSITION camera Film applies to this scene right now
 //                                                     (rest = {0, 0, 1, 0}). <World> applies it flat by default;
 //                                                     a scene camera can take it over with <World stage="context">.
 //   useStageKind()  -> 'world' | 'card'               which layout the primitives are inside (Sun defaults etc.)
@@ -34,7 +34,9 @@ export const SceneProvider = SceneCtx.Provider;
 
 // ---------------------------------------------------------------- stage camera (transitions)
 
-export type StageCam = {ox: number; oy: number; zoom: number; rot: number};
+/** `ink` (optional): the stroke-width factor of a transition flagged with `inkComp` (Film sets it; lib/inkComp.tsx).
+ *  A flat <World> applies it with the camera (as an <InkScale>); <CineCamera stage> folds it into its Layers. */
+export type StageCam = {ox: number; oy: number; zoom: number; rot: number; ink?: number};
 export const STAGE_REST: StageCam = {ox: 0, oy: 0, zoom: 1, rot: 0};
 const StageCamCtx = createContext<StageCam>(STAGE_REST);
 /** The transition camera for the current scene (rest outside transitions). */

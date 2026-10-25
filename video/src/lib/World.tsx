@@ -30,6 +30,8 @@
 //   becomes the matching pull-out (1 / 1.06, stage.pushTo): the leg lands into a slow continuing pull-back. An explicit
 //   `to` that runs AGAINST the incoming leg waits until that leg has settled (stage.pushStart): no camera bounce, no
 //   reversal a beat after the cut. For multiplane moves use <ShotCam> / cine <CineCamera stage> inside.
+// INK: `push.inkComp` (and a Film transition flagged `inkComp`, applied here in flat mode) draws the engine's strokes at
+//   width x zoom^-k (lib/inkComp.tsx). Default off.
 // stage="flat" (default): the transition camera moves the whole scene as one plane and is CONSUMED here (children see
 //   useStageCam() = rest, so a <CineCamera stage> inside can never apply it twice). stage="context": World does not
 //   apply it; your <CineCamera stage> / <ShotCam> folds it in with real parallax. useWorldStage() tells which.
@@ -44,6 +46,7 @@ import {Ease, ease as E, clamp, prog, useTime} from './time';
 import {exitFillProgress, SlabEdge, useExit} from './exit';
 import {Tod, TodWave, waveEdgeP} from './tod';
 import {MOTION} from './spec';
+import {InkScale, inkCompFactor} from './inkComp';
 import type {Pt} from './sketch';
 
 export type SkyWipe = 'down' | 'up' | 'left' | 'right' | 'snap';
@@ -77,6 +80,9 @@ export type WorldPush = {
   anchor?: Pt;
   /** Default in-out sine (reference 2 measured). */
   ease?: Ease;
+  /** Opt-in ink compensation exponent (0.6 = house): strokes drawn at width x pushZoom^-inkComp (lib/inkComp.tsx).
+   *  Default off (a 1.06 push needs none; meant for a big push). */
+  inkComp?: number;
 };
 
 export type WorldProps = {
@@ -248,6 +254,10 @@ export const World: React.FC<WorldProps> = ({sky = skies.day, tod, horizon = wor
   const scene = useScene();
   const pm = worldPushMat(push, t, scene);
   const m = stage === 'flat' ? mat.mul(stageMat(cam), pm) : pm;
+  // opt-in ink compensation (lib/inkComp.tsx): a flagged transition camera (flat only: a 'context' World passes it on
+  // to <CineCamera stage>) x a flagged push (pm is a pure zoom: pm[0] = its zoom). 1 by default.
+  const pk = push && push !== true ? push.inkComp : undefined;
+  const inkF = (stage === 'flat' ? cam.ink ?? 1 : 1) * (pk ? inkCompFactor(pm[0], pk) : 1);
   const rect = visibleRectOf(m, 60);
   const keys = skyKeys(sky, tod);
   // time of day: the current key's light; while its wipe runs, a relight WAVE: every object flips whole (one frame)
@@ -283,7 +293,9 @@ export const World: React.FC<WorldProps> = ({sky = skies.day, tod, horizon = wor
                   <XG m={m}>
                     <SkyLayer keys={keys} rect={rect} horizon={horizon} uid={uid} />
                     {/* slab fills (a bleed ground, a big wall) collapse under the sky's own falling edge: one slab */}
-                    <SlabEdge value={{rect, m}}>{relit}</SlabEdge>
+                    <SlabEdge value={{rect, m}}>
+                      <InkScale value={inkF}>{relit}</InkScale>
+                    </SlabEdge>
                   </XG>
                   {overlay}
                 </FrameArea>
@@ -296,10 +308,15 @@ export const World: React.FC<WorldProps> = ({sky = skies.day, tod, horizon = wor
   );
 };
 
-/** Children drawn in SCREEN space inside a <World> (they ignore the transition camera and the push): HUD-like layers. */
+/** Children drawn in SCREEN space inside a <World> (they ignore the transition camera and the push): HUD-like layers.
+ *  No camera zooms them, so no camera ink compensation either (InkScale reset to 1). */
 export const ScreenSpace: React.FC<{children?: React.ReactNode}> = ({children}) => {
   const m = useAppliedStageMat();
-  return <XG m={mat.inv(m)}>{children}</XG>;
+  return (
+    <XG m={mat.inv(m)}>
+      <InkScale reset>{children}</InkScale>
+    </XG>
+  );
 };
 
 /** Progress helper for sky-synced events: 0..1 over a sky key's wipe. */

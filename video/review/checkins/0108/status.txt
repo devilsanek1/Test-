@@ -1,0 +1,14 @@
+ok   S01
+ok   S02
+ok   S03
+ok   S04
+ok   S05
+ok   S06
+FAIL S07 (see S07.log)
+ok   S08
+ok   S09
+ok   S10
+ok   S11
+ok   CineDemo
+ok   KitDemo
+ok   SharedKitSheet

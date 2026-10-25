@@ -37,13 +37,15 @@ export const SCENE = {start: 45.618, end: 52.163};
 /** Absolute beat times (storyboard S11 beats; leads per ENGINE rule 5 already applied by the storyboard). */
 export const ABS = {
   cut: 45.618,
-  pipLand: W.even - 0.01, // Pip touches down on the sill's left end ON 'Even' (his hop enters past the left edge at f0)
+  pipLand: W.even - 0.01, // Pip touches down on the sill's left end ON 'Even' (his hop is still past the left edge / behind the
+  // near lamp post at f0: only his trunk tip shows on the cut)
   ringHiccup1: W.the, // the loading ring hiccups; a pigeon on the cornice shuffles
   barFlicker: W.fbi, // the bar's fill edge flickers without moving
   earFlick: W.fbi + 0.25, // Pip's ear flicks toward the window
-  notice: W.said - 0.1, // L14 taped up inside the window (4 tape strips 0.04 s apart): fully up as 'said' is heard
+  notice: W.said - 0.16, // L14 taped up inside the window: LabelTag's grow lands the paper full ON 'said' (46.735), the 4
+  // tape strips pop on the word
   lookNotice: W.if, // Pip looks up at the notice
-  snailShell: W.you, // the snail's shell appears at the sill's right edge
+  snailShell: W.you - 0.08, // the snail's shell is up ON 'you' (its pop lands 2-3 frames after `at`); the bar step owns "can't"
   barStep: W.cant, // bar 8 % -> 9 %, stalls
   snailCrawl: W.update, // the snail crawls onto the sill (slow)
   cornShuffle: W.update + 0.25, // the cornice pigeon's second shuffle: splits the 'update' -> 'yet' gap
@@ -54,11 +56,13 @@ export const ABS = {
   shutter: W.it, // govB's shutter rolls down clean (0.16 s + 6 px bounce), covering the bar and the notice
   lightsOut: W.off, // govB one palette step darker
   offCut: 49.515, // cut(off): the comma pause after 'off,' (gap anchor): the lean into the joke starts here
-  padlock: W.off + 0.14, // padlock pops + the lettered 'back soon' tag swings in
+  padlock: W.off + 0.04, // the padlock pops (ShutterPadlock's grow: full at ~49.21, ON the lock_click at 49.205) ...
+  tag: W.off + 0.08, // ... and the lettered 'back soon' tag swings in on its nail
   // the switch-off spreads, AFTER the padlock beat (the padlock + tag are the only focal event on 'off'):
   govAScreen: W.is + 0.02, // govA's screen CRT-collapses on 'is', with its shutter (S12 opens with it dark) ...
   govAShutter: W.is + 0.06, // ... its shutter slams on 'is' ...
-  govAOff: W.is + 0.2, // ... and govA steps one palette step darker
+  lampOff: W.is + 0.2, // ... and the near plaza lamp's lantern pops off (cream -> sand) at the left edge. govA does NOT step
+  // darker (fix round 1: after 'off' the frame keeps its pale left third; govB's one step is the story beat)
   govCScreen: W.basically, // govC's screen collapses at the right edge on 'basically' ...
   govCShutter: W.basically + 0.14, // ... and its shutter drops half way (S12: govC half shut)
   civicOff: W.supports + 0.03, // the far civic silhouettes step dark left to right (0.1 s apart) from "support's" ...
@@ -67,7 +71,7 @@ export const ABS = {
   pigeonLand: W.which, // the lean-in starts; a pigeon lands on the shutter box
   tagTwirl: W.is - 0.12, // the tag twirls once in a breeze (its first narrowing lands on 'is')
   antennae: W.basically, // the snail pokes one antenna out, then the other (span 0.4)
-  noteDrop: W.basically - 0.08, // the note drops from behind govB's cornice (blank back, tumbling; visible from ~'basically')
+  noteDrop: W.is + 0.06, // the note slips out from behind govB's cornice (blank back, swaying down on the breeze over 0.42 s)
   noteSlap: W.tech - 0.05, // ... flips to its lettered face and slaps flat onto the closed shutter (J6)
   noteCurl: W.supports, // the note's corner curls once; Bit looks up at it
   preen: W.supports + 0.25, // a pigeon on the cornice preens; the tag stills
@@ -77,7 +81,10 @@ export const ABS = {
   strike: W.everything + 0.01, // 'and on again' gets one ink strike-through (0.15 s) ON the word; the corner flutters after
   pipOut: W.everythingEnd + 0.05, // Pip hops off the sill toward the lens; the snail peeks out
   tagSway: SCENE.end - 0.1, // the tag sways
-  pigeonFly: SCENE.end - 0.3, // the box pigeon crouches and takes off up-left (whole bird, flapping): clear of the box by the cut
+  pigeonFly: 51.99, // the box pigeon crouches and takes off up-left (whole bird, flapping) with the tag sway: clear of the box by
+  // the cut, AFTER Pip's hop-off (51.945), so the two departures do not share a frame
+  phonesUp1: W.offEnd - 0.05, // the bottom-right onlookers' phones go up (under the UI: decoration, sets up S12's 'phones up')
+  phonesUp2: W.which + 0.12,
 } as const;
 
 export type Beats = {-readonly [K in keyof typeof ABS]: number};

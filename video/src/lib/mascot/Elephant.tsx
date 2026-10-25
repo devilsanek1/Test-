@@ -1,5 +1,6 @@
 import React, {useId} from 'react';
 import {stroke} from '../theme';
+import {useInkScale} from '../inkComp';
 import {COLORWAYS, Colorway, ColorwayKey, MASCOT} from './colors';
 import {Pt, brush, clamp, polyPath, rand} from './ink';
 import {Layer, Pen} from './pen';
@@ -42,6 +43,7 @@ export type ElephantProps = {
   /** walk cycles per second for 'walk-side' (see walkSpeed()) */
   walkRate?: number;
   colorway?: ColorwayKey | Colorway;
+  /** Line weight factor (default 1). Multiplied by the enclosing <InkScale> (lib/inkComp.tsx; 1 by default). */
   lineWeight?: number;
   /** 0..1 how much of the linework is drawn (0 = fills-only state). Strokes retract; never an opacity. */
   ink?: number;
@@ -113,13 +115,14 @@ export const Elephant: React.FC<ElephantProps> = ({
   fill = 1,
 }) => {
   const rawId = useId();
+  const inkScale = useInkScale(); // opt-in camera ink compensation (lib/inkComp.tsx): 1 outside an <InkScale>
   const clipId = `ele-clip-${rawId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
   if (opacity < 0.5 || draw <= 0 || exit >= 1 || scale <= 0) return null;
   const c: Colorway = colorway === undefined ? MASCOT : typeof colorway === 'string' ? COLORWAYS[colorway] : colorway;
   const pen = new Pen(seed, c);
   POSE_BUILDERS[pose](pen, {t, seed, look, idle, amount, expression, prop, propRot, walkRate, flip});
 
-  const baseW = (stroke.ink * 1.12 * lineWeight) / scale;
+  const baseW = (stroke.ink * 1.12 * lineWeight * inkScale) / scale;
   const fx = flip ? -1 : 1;
   const mx = (MISREG.x * fx) / scale;
   const my = MISREG.y / scale;

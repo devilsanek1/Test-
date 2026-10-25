@@ -201,8 +201,10 @@ export type SharedKitSheetProps = {
    *  'v3fix' = the v3 review round: FixSign (J3 -> J5) + the MakersCart sign slot, LockCrate lid + tags, the lettered
    *  BackSoonTag width ladder, the CounterBoard footer zone, LabelTag minFont (paper growth).
    *  'figures' = every back-view figure preset at film size: hair discs, collar bands, jointed arms, phone raises.
+   *  'figfix' = the figures fix round: collar bands cut around long hair / hero napes, band never the hair colour,
+   *  clay plain discs below hero-head size, crowd hair variety.
    *  All loop on a 5 s clock. */
-  mode?: 'sheet' | 'context' | 'lock' | 'heads' | 'v3' | 'v3fix' | 'figures';
+  mode?: 'sheet' | 'context' | 'lock' | 'heads' | 'v3' | 'v3fix' | 'figures' | 'figfix';
   /** false = skip the set thumbnails (props-only cost check). */
   thumbs?: boolean;
 };
@@ -322,6 +324,40 @@ const FiguresMode: React.FC = () => {
       <EdgeOnlooker x={640} y={1560} head={100} seed="ho4" raisePhoneAt={0.65} phoneSide="left" />
       <EdgeOnlooker x={900} y={1540} head={82} hair="cap" body={palette.sage} acc={['collar']} raisePhoneAt={0.7} arms="near" rim="right" seed="nc/rd2" />
       <EdgeOnlooker x={1010} y={1500} head={82} hair="long" body={palette.brown} raisePhoneAt={0.75} arms="near" rim="right" seed="nc/rd3" />
+    </TimeProvider>
+  );
+};
+
+/** The figures fix round (kitv3b review): row 1 the collar band over LONG hair (Investigator 'inv3' and S05's 's5b1'
+ *  long-haired sand coat, a long-haired Messenger, an EdgeOnlooker 'collar' + 'long'): the band goes behind the hair;
+ *  row 2 S03's near walkers (tan coat + ochre bun + 'collar': band tealDark, cut around the hero nape) and S02's
+ *  onlookers at 53 px (seeded clay 'short' head -> ochre / ink-brown) and 2x; row 3 a citizen crowd (hair variety). */
+const FigFixMode: React.FC = () => {
+  const t = useTime() % 5;
+  return (
+    <TimeProvider global={t} offset={0}>
+      <rect width={1080} height={1920} fill={skies.day} />
+      <rect x={0} y={0} width={1080} height={720} fill={palette.mintPale} />
+      <Investigator x={120} y={700} h={260} raiseAt={0.5} hair="long" seed="inv3" />
+      <Investigator x={330} y={700} h={260} hair="long" body={palette.sand} arm="left" raiseAt={0.5} seed="s5b1" />
+      <Messenger x={540} y={700} h={260} hair="long" hairColor={palette.brown} pullAt={0.5} seed="msgL" />
+      <EdgeOnlooker x={790} y={420} head={110} hair="long" body={palette.sage} acc={['collar']} rim="left" arms="near" seed="figfixL" frameBottom={720} />
+      <EdgeOnlooker x={985} y={460} head={90} hair="short" body={palette.teal} acc={['collar']} rim="right" arms="near" seed="figfixS" frameBottom={720} />
+      <rect x={0} y={720} width={1080} height={520} fill={palette.cream} />
+      <EdgeOnlooker x={150} y={900} head={104} hair="short" acc={['hood', 'strap']} body={palette.teal} rim="right" arms="near" seed="s03/nearL" frameBottom={1240} />
+      <EdgeOnlooker x={400} y={900} head={112} hair="bun" acc={['collar']} body={palette.tan} rim="left" arms="near" seed="s03/nearR" frameBottom={1240} />
+      <EdgeOnlooker x={650} y={910} head={112} hair="bun" acc={['collar']} body={palette.sand} rim="left" arms="near" seed="s03/nearR" frameBottom={1240} />
+      <EdgeOnlooker x={900} y={930} head={60} hair="short" acc={['collar']} body={palette.sage} rim="left" arms="near" seed="figfix60" frameBottom={1240} />
+      <rect x={0} y={1240} width={1080} height={360} fill={palette.sand} />
+      <XG m={mat.about(mat.scale(2), 460, 1440)}>
+        <EdgeOnlooker x={336} y={1434} head={53} hair="short" acc={['headphones']} body={palette.white} rim={false} depth="mid" bob={1.2} seed="s2on/a" frameBottom={1510} />
+        <EdgeOnlooker x={462} y={1444} head={50} hair="long" acc={[]} body={palette.white} rim={false} depth="mid" bob={1.2} seed="s2on/b" frameBottom={1510} />
+        <EdgeOnlooker x={590} y={1430} head={54} hair="cap" acc={['strap']} body={palette.white} rim={false} depth="mid" bob={1.2} seed="s2on/c" frameBottom={1510} />
+      </XG>
+      <rect x={0} y={1600} width={1080} height={320} fill={palette.mintPale} />
+      {['fc13', 'fc45', 'fc51', 'fc59', 'fc11', 'fc6', 'fc1', 'fc49', 'fc10', 'fc3', 'fc7', 'fc22'].map((sd, i) => (
+        <Citizen key={sd} x={50 + i * 89} y={1880} h={i % 2 ? 150 : 130} seed={sd} />
+      ))}
     </TimeProvider>
   );
 };
@@ -611,12 +647,12 @@ export const SharedKitSheet: React.FC<SharedKitSheetProps> = ({look, unbuildAt, 
       </AbsoluteFill>
     );
   }
-  if (mode === 'context' || mode === 'lock' || mode === 'heads' || mode === 'figures') {
+  if (mode === 'context' || mode === 'lock' || mode === 'heads' || mode === 'figures' || mode === 'figfix') {
     return (
       <AbsoluteFill style={{background: skies.day}}>
         <svg width={1080} height={1920} viewBox="0 0 1080 1920">
           <Modes look={look} unbuildAt={unbuildAt}>
-            {mode === 'lock' ? <LockMode /> : mode === 'heads' ? <HeadsMode /> : mode === 'figures' ? <FiguresMode /> : <ContextMode />}
+            {mode === 'lock' ? <LockMode /> : mode === 'heads' ? <HeadsMode /> : mode === 'figures' ? <FiguresMode /> : mode === 'figfix' ? <FigFixMode /> : <ContextMode />}
           </Modes>
         </svg>
       </AbsoluteFill>

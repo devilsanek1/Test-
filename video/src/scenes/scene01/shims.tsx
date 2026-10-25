@@ -12,13 +12,15 @@
 // edge it read as a glitch; the set's cream -> sand step stays, the 'their' light event moved to govA's door).
 import React from 'react';
 import {palette} from '../../lib/theme';
-import {clamp, ease as E, useTime} from '../../lib/time';
+import {clamp, ease as E, springAt, springs, useTime} from '../../lib/time';
 import {Fill} from '../../lib/Fill';
 import {Ink} from '../../lib/Ink';
 import {rectPath, roundRect} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import {GovEvents, PLAZA, SI} from '../shared/sets';
-import {BackSoonTag, DEPTH_INK, RollerShutter} from '../shared/props';
+import {BackSoonTag, DEPTH_INK, pendulum, RollerShutter} from '../shared/props';
+import {measureCaption} from '../../lib/font';
+import {line} from '../../lib/sketch';
 
 // ---------------------------------------------------------------- a lantern switching off
 
@@ -86,6 +88,28 @@ export const S01Padlock: React.FC<{x: number; y: number; size: number; at?: numb
 
 // ---------------------------------------------------------------- the shutter hardware, drawn by the scene
 
+/** The lettered tag's string run down THROUGH the eyelet, on top of the tag (props BackSoonTag draws the string before
+ *  the tag's white fill, so it stops at the tag's top edge; fix round 4 review). Mirrors BackSoonTagBase's lettered
+ *  layout (one line 'back soon', width `size`) and its swing (pendulum -16 deg, 0.5 s, 0.8; spring pop), so it rides
+ *  the tag exactly. Drop when the kit draws its string after the fill. */
+const TagString: React.FC<{x: number; y: number; size: number; at: number; tapAt?: number | number[]; width: number; seed: string}> = ({x, y, size: W, at, tapAt, width, seed}) => {
+  const t = useTime();
+  if (t < at) return null;
+  let a = pendulum(t, at, -16, 0.5, 0.8);
+  for (const tp of tapAt === undefined ? [] : Array.isArray(tapAt) ? tapAt : [tapAt]) a += pendulum(t, tp, 14, 0.5, 0.9);
+  const pop = Math.min(1, 0.3 + springAt(t, at, springs.pop) * 0.7);
+  const m1 = measureCaption('back soon', 100) / 100;
+  const fs = Math.min((W * 0.84) / m1, W * 0.34);
+  const n = Math.min(W * 0.14, fs * 0.6);
+  const str = Math.max(6, fs * 0.36);
+  const ey = str + n * 0.62;
+  return (
+    <XG m={mat.compose(mat.translate(x, y), mat.rotate(a), mat.scale(pop))}>
+      <Ink d={line(0, str - 2, 0, ey + 1, {over: [0, 0], seed: `${seed}/str2`})} width={width * 0.6} taper={false} seed={`${seed}/str2`} />
+    </XG>
+  );
+};
+
 /** Padlock size (total height) per building: govB (the dive target) 58, govA / govC 52. */
 export const S01_PADLOCK_SIZE: Record<'govA' | 'govB' | 'govC', number> = {govA: 52, govB: 58, govC: 52};
 /** The lock click (shackle snap + curtain jolt) after each padlock's pop starts. */
@@ -104,7 +128,7 @@ const jolt = (t: number, at?: number) => {
  *  1-frame jolt +5 / -2 px), the lettered tag hanging from the rail (same props / seeds as the set's BackSoonSlot), and
  *  `S01Padlock` over the rail. The padlock's click jolts the curtain 3 px (the rail, tag and lock ride it). `ink` =
  *  stroke factor (the dive compensation). */
-export const S01Shutter: React.FC<{id: 'govA' | 'govB' | 'govC'; ev: GovEvents; ink?: number; seed?: string}> = ({id, ev, ink = 1, seed = 'plaza'}) => {
+export const S01Shutter: React.FC<{id: 'govA' | 'govB' | 'govC'; ev: GovEvents; seed?: string}> = ({id, ev, seed = 'plaza'}) => {
   const t = useTime();
   const g = PLAZA.gov[id];
   const [x, y, w, h] = g.window;
@@ -117,12 +141,17 @@ export const S01Shutter: React.FC<{id: 'govA' | 'govB' | 'govC'; ev: GovEvents; 
   return (
     <>
       {stop < 1 ? (
-        <RollerShutter x={x} y={y} w={w} h={h + j / stop} box={18} slamAt={ev.shutterAt} stopAt={stop} width={SI.mid * ink} seed={`${seed}/${id}/sh`} />
+        <RollerShutter x={x} y={y} w={w} h={h + j / stop} box={18} slamAt={ev.shutterAt} stopAt={stop} width={SI.mid} seed={`${seed}/${id}/sh`} />
       ) : (
-        <RollerShutter x={x} y={y} w={w} h={h + j} box={18} slamAt={ev.shutterAt} width={SI.mid * ink} seed={`${seed}/${id}/sh`} />
+        <RollerShutter x={x} y={y} w={w} h={h + j} box={18} slamAt={ev.shutterAt} width={SI.mid} seed={`${seed}/${id}/sh`} />
       )}
-      {ev.tagAt !== undefined ? <BackSoonTag at={ev.tagAt} tapAt={ev.tagTapAt} width={DEPTH_INK.far * ink} seed={`${seed}/${id}/tag`} {...ev.tagProps} x={ev.tagProps?.x ?? g.tag[0]} y={ev.tagProps?.y !== undefined ? ev.tagProps.y + j : g.tag[1] + dy} /> : null}
-      {ev.padlockAt !== undefined ? <S01Padlock x={px} y={rail - 20} size={S01_PADLOCK_SIZE[id]} at={ev.padlockAt} lockAt={click} glintAt={ev.glintAt} ink={ink} seed={`s01/${id}/pl`} /> : null}
+      {ev.tagAt !== undefined ? (
+        <>
+          <BackSoonTag at={ev.tagAt} tapAt={ev.tagTapAt} width={DEPTH_INK.far} seed={`${seed}/${id}/tag`} {...ev.tagProps} x={ev.tagProps?.x ?? g.tag[0]} y={ev.tagProps?.y !== undefined ? ev.tagProps.y + j : g.tag[1] + dy} />
+          {ev.tagProps?.lettered ? <TagString at={ev.tagAt} tapAt={ev.tagTapAt} size={ev.tagProps?.size ?? 100} width={DEPTH_INK.far} x={ev.tagProps?.x ?? g.tag[0]} y={ev.tagProps?.y !== undefined ? ev.tagProps.y + j : g.tag[1] + dy} seed={`${seed}/${id}/tag`} /> : null}
+        </>
+      ) : null}
+      {ev.padlockAt !== undefined ? <S01Padlock x={px} y={rail - 20} size={S01_PADLOCK_SIZE[id]} at={ev.padlockAt} lockAt={click} glintAt={ev.glintAt} seed={`s01/${id}/pl`} /> : null}
     </>
   );
 };

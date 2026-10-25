@@ -83,11 +83,45 @@ function kitPicks(seed: Seed, hair?: Hair, body?: string) {
 
 /** A hair colour that never reads as SKIN (S06 review: a sand head disc next to sand ears and neck reads as a bald head
  *  or a face, not the back of a head): sand -> ochre (ink-brown on an ochre coat); clay (tan) too when the hair is a
- *  plain disc (`style` 'short' / 'bun': no strands at preset sizes). Long / curly shapes read as hair in any colour. */
-export const skinSafeHair = (c: string, coat?: string, style?: Hair) => {
-  const skin = c === palette.sand || (c === palette.tan && (style === 'short' || style === 'bun'));
-  return !skin ? c : coat === palette.brown ? palette.ink : palette.brown;
+ *  plain disc (`style` 'short' / 'bun': no strands at preset sizes). Long / curly shapes read as hair in any colour.
+ *  With `seed` (fix round: crowd variety), clay goes to ochre OR ink-brown by a seeded coin (ink-brown on an ochre
+ *  coat), so a crowd's swapped heads are not all ochre; without it clay -> ochre as before. */
+export const skinSafeHair = (c: string, coat?: string, style?: Hair, seed?: Seed) => {
+  const sand = c === palette.sand;
+  const clay = c === palette.tan && (style === 'short' || style === 'bun');
+  if (!sand && !clay) return c;
+  const dark = coat === palette.brown || (clay && seed !== undefined && rand(seed, 'hairfix') < 0.5);
+  return dark ? palette.ink : palette.brown;
 };
+
+/** The kit Person's per-person hero-head threshold (head diameter in px at its lod scale; mirror of Person.tsx headT):
+ *  the kit ramps hero strands + a notched nape in over headT -5 .. +5. */
+const kitHeadT = (seed: Seed) => 60 * (1 + 0.1 * (rand(`person/${seed}`, 'lodN') - 0.5));
+/** How far the kit's hero head (strands + notched nape) is in for a head of `headPx` (mirror of Person.tsx headA). */
+const kitHeadA = (seed: Seed, headPx: number) => Math.max(0, Math.min(1, (headPx - (kitHeadT(seed) - 5)) / 10));
+
+/** The kit Person's head and hair outline(s) for `seed` (person-local units, torso `torsoH`), for cutting a collar band
+ *  around them: the head disc, plus the 'long' hair shape / the 'curly' crown, plus the hero nape notch scaled like the
+ *  kit's (`headA`). Paths are filled AND stroked by the caller at the ink width (so the band stops at the outline). */
+function kitHeadHoles(seed: Seed, hair: Hair | undefined, body: string | undefined, torsoH: number, headA = 0): string[] {
+  const kp = kitPicks(seed, hair, body);
+  const hr = kp.hr;
+  const sd = `person/${seed}`;
+  const hy = -torsoH - hr * 0.86;
+  // the kit's own head fill + ink circle (same seeds as Person.tsx / HairOver)
+  const out = [blob(0, hy, hr, hr, {seed: `${sd}/head`}), circle(0, hy, hr, {seed: `${sd}/head`, overlap: 18})];
+  if (kp.style === 'long') {
+    const pts: Pt[] = [[-hr * 0.98, hy + hr * 1.75], [-hr * 1.08, hy + hr * 0.6], [-hr * 0.95, hy - hr * 0.55], [0, hy - hr * 1.05], [hr * 0.95, hy - hr * 0.55], [hr * 1.08, hy + hr * 0.6], [hr * 0.98, hy + hr * 1.75], [hr * 0.5, hy + hr * 1.9], [-hr * 0.5, hy + hr * 1.9]];
+    out.push(smooth(pts, {closed: true}));
+  }
+  if (kp.style === 'curly') out.push(crown(0, hy - 2, hr * 1.1, hr * 1.06, {seed: `${sd}/curl`, bumps: 9, round: 0.7}));
+  if (headA > 0.02 && (kp.style === 'short' || kp.style === 'bun' || kp.style === 'cap' || kp.style === 'curly')) {
+    const top = hy + hr * 0.55;
+    const Y = (k: number) => top + (hy + hr * k - top) * headA;
+    out.push(polyPath([[-hr * 0.72, top], [hr * 0.72, top], [hr * 0.72, Y(0.7)], [hr * 0.36, Y(1.14)], [0, Y(1.0)], [-hr * 0.36, Y(1.14)], [-hr * 0.72, Y(0.7)]]));
+  }
+  return out;
+}
 
 /** The kit Person's walk bob (local units, presets' legH) at time t for a seed walking at hz (0 when not walking). */
 const kitWalkBob = (seed: Seed, t: number, hz: number | undefined, hair: Hair | undefined, body: string | undefined, legs = true) =>
@@ -377,7 +411,9 @@ export type EdgeOnlookerProps = {
   head?: number;
   seed?: Seed;
   hair?: Hair;
-  /** Hair colour. Default: the kit's seeded pick, except a sand (skin-coloured) pick, which becomes ochre / ink-brown. */
+  /** Hair colour. Default: the kit's seeded pick, except a sand (skin-coloured) pick, which becomes ochre / ink-brown,
+   *  and a clay pick on a 'short' / 'bun' head below the kit's hero-head size (~60-66 px), which becomes ochre or
+   *  ink-brown by a seeded coin. */
   hairColor?: string;
   /** Accessories of the kit Person ('backpack' is dropped: it scales with the cropped torso; 'phone' = holding it up;
    *  'collar' = a straight collar band one step darker than the coat, not the kit's V). */
@@ -428,10 +464,15 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
   const hyUse = capOn ? -torsoH - g.hr * lift : g.hy;
   const hairUse: Hair = capOn ? 'bald' : hair ?? rng(`onl/${seed}`).pick<Hair>(['short', 'short', 'long', 'bun', 'curly', 'beanie']);
   const coat = body ?? personCoat(seed, true);
-  // a seeded sand (skin) hair pick becomes ochre / ink-brown: passed to the kit only then (it re-seeds the kit's later
-  // draws, which for an onlooker only moves the scarf colour), so every other onlooker is unchanged
+  // a seeded sand (skin) hair pick becomes ochre / ink-brown; so does clay on a plain disc ('short' / 'bun') while the
+  // head is below the kit's hero-head size (fix round, S02 's2on/a' at 53 px: no strands, no nape, a clay disc read as a
+  // bald head): only at >= the kit's per-person threshold + 3 px (~60-66 px, hero head >= 80 % in) do the hero strands +
+  // notched nape make clay read as hair. Passed to the kit only then (it re-seeds the kit's later draws, which for an
+  // onlooker only moves the hat / scarf colour), so every other onlooker is unchanged
   const kitHair = kitPicks(seed, hairUse, coat).hairColor;
-  const hairFix = capOn ? undefined : hairColor ?? (skinSafeHair(kitHair, coat) !== kitHair ? skinSafeHair(kitHair, coat) : undefined);
+  const headA = kitHeadA(seed, head);
+  const safeHair = skinSafeHair(kitHair, coat, headA < 0.8 ? hairUse : undefined, seed);
+  const hairFix = capOn ? undefined : hairColor ?? (safeHair !== kitHair ? safeHair : undefined);
   const capHair = coat === palette.brown ? palette.tan : palette.brown;
   const capColor = coat === palette.teal || coat === palette.sage ? palette.tealDark : palette.teal;
   const hoodOn = !!acc?.includes('hood') && hairUse !== 'long' && !capOn;
@@ -528,6 +569,17 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
     );
   }
   const local = mat.compose(mat.translate(x, hipY), mat.scale(s));
+  // a swapped DARK hair disc gets the exact disc under the kit's misregistered one (as HairOver does): the gap between
+  // the offset fill and the outline otherwise reads as a light highlight / cowlick on an ink-brown head
+  const darkUnder = hairFix !== undefined && (hairFix === palette.ink || hairFix === palette.tealDark) && (hairUse === 'short' || hairUse === 'bun' || hairUse === 'curly') ? (
+    <XG m={local}>
+      <TodAnchor at={[0, -torsoH * 0.5]}>
+        <ExitSync seed={`person/${seed}/exit`}>
+          <Fill d={blob(0, g.hy, g.hr, g.hr, {seed: `person/${seed}/head`})} color={hairFix} offset={false} seed={`person/${seed}/head0`} />
+        </ExitSync>
+      </TodAnchor>
+    </XG>
+  ) : null;
   let hood: React.ReactNode = null;
   if (hoodOn) {
     // the hood lies over the coat and under the head: draw it, then the head again (the same Person clipped to the head)
@@ -555,13 +607,14 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
   }
   return (
     <XG m={mat.translate(0, rise)}>
+      {darkUnder}
       {person}
       {hood}
       <XG m={local}>
         {rimD ? <Fill d={rimD} color={palette.white} offset={false} mode="none" seed={`${seed}/rim`} /> : null}
-        {collarOn ? <CollarBand top={-torsoH} hr={g.hr} coat={coat} W={W} seed={`${seed}/cb`} /> : null}
+        {collarOn ? <CollarBand top={-torsoH} hr={g.hr} coat={coat} W={W} hair={hairFix ?? kitHair} holes={kitHeadHoles(seed, hairUse, coat, torsoH, headA)} seed={`${seed}/cb`} /> : null}
         {capOn ? (
-          <BackHead hy={hyUse} hr={g.hr} hair={capHair} cap={capColor} W={W} neckTo={-torsoH + g.hr * 0.2} seed={String(seed)} under={<CollarBand top={-torsoH} hr={g.hr} coat={coat} W={W} seed={String(seed)} />} />
+          <BackHead hy={hyUse} hr={g.hr} hair={capHair} cap={capColor} W={W} neckTo={-torsoH + g.hr * 0.2} seed={String(seed)} under={<CollarBand top={-torsoH} hr={g.hr} coat={coat} W={W} hair={capHair} seed={String(seed)} />} />
         ) : null}
         {parts}
       </XG>
@@ -604,7 +657,7 @@ export const Citizen: React.FC<CitizenProps> = (p) => {
   const walking = walkPos(t, p).walking;
   const seed = p.seed ?? 'cit';
   const kp = kitPicks(seed, p.hair, p.body);
-  const hc = p.hairColor ?? skinSafeHair(kp.hairColor, kp.coat, kp.style);
+  const hc = p.hairColor ?? skinSafeHair(kp.hairColor, kp.coat, kp.style, seed);
   const hz = walking ? p.walk?.hz ?? 1.8 : undefined;
   const W = inkFor(p.h, p.depth) / s;
   return (
@@ -649,14 +702,14 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
   const shield = `M${-11} ${by - 13}Q0 ${by - 17} 11 ${by - 13}L11 ${by}Q9 ${by + 11} 0 ${by + 16}Q-9 ${by + 11} -11 ${by}Z`;
   const collar = p.collar ?? 'band';
   const kp = kitPicks(seed, p.hair, coat);
-  const hc = p.hairColor ?? skinSafeHair(kp.hairColor, coat, kp.style);
+  const hc = p.hairColor ?? skinSafeHair(kp.hairColor, coat, kp.style, seed);
   const hz = walking ? p.walk?.hz ?? 1.8 : undefined;
   return (
     <FigFrame b={p} s={s}>
       <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={coat} hair={p.hair} acc={collar === 'v' ? ['collar'] : []} ink={W} walk={hz} />
       {collar === 'band' ? (
         <XG m={mat.translate(0, kitWalkBob(seed, t, hz, p.hair, coat))}>
-          <CollarBand top={-TORSO} hr={g.hr} coat={coat} W={W} seed={`${seed}/cb`} />
+          <CollarBand top={-TORSO} hr={g.hr} coat={coat} W={W} hair={hc} holes={kitHeadHoles(seed, p.hair, coat, TORSO)} seed={`${seed}/cb`} />
         </XG>
       ) : null}
       {hc !== kp.hairColor ? <HairOver seed={seed} hair={p.hair} body={coat} color={hc} W={W} walkHz={hz} /> : null}
@@ -707,7 +760,7 @@ export const Messenger: React.FC<MessengerProps> = (p) => {
       <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={palette.teal} hair={hair} acc={collar === 'v' ? ['collar'] : []} ink={W} walk={hz} />
       {collar === 'band' ? (
         <XG m={mat.translate(0, kitWalkBob(seed, t, hz, hair, palette.teal))}>
-          <CollarBand top={-TORSO} hr={g.hr} coat={palette.teal} W={W} seed={`${seed}/cb`} />
+          <CollarBand top={-TORSO} hr={g.hr} coat={palette.teal} W={W} hair={p.hairColor ?? palette.ink} holes={kitHeadHoles(seed, hair, palette.teal, TORSO)} seed={`${seed}/cb`} />
         </XG>
       ) : null}
       <HairOver seed={seed} hair={hair} body={palette.teal} color={p.hairColor ?? palette.ink} W={W} walkHz={hz} />
@@ -758,7 +811,7 @@ export const Maker: React.FC<MakerProps> = (p) => {
   const bow = `M0 ${wy}q-12 -10 -14 0q2 9 14 0q12 -10 14 0q-2 9 -14 0M-3 ${wy + 2}l-6 14M3 ${wy + 2}l6 14`;
   const hair = rng(`mk/${seed}`).pick<Hair>(['short', 'bun', 'curly', 'short']);
   const kp = kitPicks(seed, hair, palette.teal);
-  const hc = p.hairColor ?? skinSafeHair(kp.hairColor, palette.teal, hair);
+  const hc = p.hairColor ?? skinSafeHair(kp.hairColor, palette.teal, hair, seed);
   const hz = walking ? p.walk?.hz ?? 1.8 : undefined;
   return (
     <FigFrame b={p} s={s} feetBelowHip={p.bust ? 0 : LEG}>
@@ -864,9 +917,22 @@ const BackHead: React.FC<{
   return <>{parts}</>;
 };
 
-/** A straight coat collar band on the shoulders (person-local: torso top at y = top), a step darker than the coat; the
- *  neck goes in behind it. Replaces the V chevron on cap wearers (a V reads as a shirt front). */
-const CollarBand: React.FC<{top: number; hr: number; coat: string; W: number; seed: string; at?: number}> = ({top, hr, coat, W, seed, at}) => {
+/** The collar band colour: one palette step darker than the coat, unless that is the HAIR colour (fix round, S03
+ *  'nearR': a tan coat's ochre band under an ochre bun merged into one ochre mass) or the coat itself: then tealDark
+ *  (ink-brown when the hair or coat is tealDark). */
+const bandColor = (coat: string, hair?: string) => {
+  const c = darker(coat);
+  if (c !== hair && c !== coat) return c;
+  return hair === palette.tealDark || coat === palette.tealDark ? palette.ink : palette.tealDark;
+};
+
+/** A straight coat collar band on the shoulders (person-local: torso top at y = top), a step darker than the coat (never
+ *  the hair colour: `hair`); the neck goes in behind it. Replaces the V chevron on cap wearers (a V reads as a shirt
+ *  front). `holes` (person-local paths, filled + stroked at the ink width) are cut out of it, so a band drawn AFTER the
+ *  kit Person still goes BEHIND its head, hero nape and long hair (fix round: it painted across long hair like a strap
+ *  and hid the notched nape). */
+const CollarBand: React.FC<{top: number; hr: number; coat: string; W: number; seed: string; at?: number; hair?: string; holes?: string[]}> = ({top, hr, coat, W, seed, at, hair, holes}) => {
+  const id = 'cb' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const f = (v: number) => v.toFixed(2);
   const hw = hr * 1.05;
   const y0 = top - hr * 0.04;
@@ -874,10 +940,26 @@ const CollarBand: React.FC<{top: number; hr: number; coat: string; W: number; se
   const sag = hr * 0.07;
   const d = `M${f(-hw)} ${f(y0 + sag)}Q0 ${f(y0 - sag)} ${f(hw)} ${f(y0 + sag)}L${f(hw)} ${f(y1 + sag)}Q0 ${f(y1 - sag)} ${f(-hw)} ${f(y1 + sag)}Z`;
   const ink = `M${f(-hw)} ${f(y0 + sag)}Q0 ${f(y0 - sag)} ${f(hw)} ${f(y0 + sag)}M${f(-hw)} ${f(y1 + sag)}Q0 ${f(y1 - sag)} ${f(hw)} ${f(y1 + sag)}`;
+  const band = (
+    <>
+      <Fill d={d} color={bandColor(coat, hair)} offset={false} mode="none" seed={`${seed}/collar`} />
+      <Ink d={ink} at={at} width={W * 0.8} taper={false} seed={`${seed}/collarI`} />
+    </>
+  );
+  if (!holes || !holes.length) return band;
+  // a luminance mask (white = band, black = the head shapes) in the band's own user space
+  const m = hw + W * 2;
   return (
     <>
-      <Fill d={d} color={darker(coat)} offset={false} mode="none" seed={`${seed}/collar`} />
-      <Ink d={ink} at={at} width={W * 0.8} taper={false} seed={`${seed}/collarI`} />
+      <defs>
+        <mask id={id} maskUnits="userSpaceOnUse" x={-m} y={y0 - sag - hr - W * 2} width={m * 2} height={y1 - y0 + hr * 2 + sag * 2 + W * 4}>
+          <rect x={-m} y={y0 - sag - hr - W * 2} width={m * 2} height={y1 - y0 + hr * 2 + sag * 2 + W * 4} fill="#fff" />
+          {holes.map((h, i) => (
+            <path key={i} d={h} fill="#000" stroke="#000" strokeWidth={W} strokeLinejoin="round" />
+          ))}
+        </mask>
+      </defs>
+      <g mask={`url(#${id})`}>{band}</g>
     </>
   );
 };
@@ -940,7 +1022,7 @@ const BackBody: React.FC<BackBodyProps> = ({g, seed, coat, legs, shoes = palette
         <Ink d={legInk} at={T(0.14)} width={W * 0.9} seed={`${seed}/legI`} />
         <Fill d={torsoD} color={coat} seed={`${seed}/torso`} />
         <Ink d={torsoD} at={T(0)} width={W} seed={`${seed}/torsoI`} />
-        <BackHead hy={hy} hr={hr} hair={hair} cap={cap ?? false} W={W} neckTo={-h + hr * 0.2} detail={detail} seed={seed} at={T(0.1)} strands={strands} bun={bun} under={<CollarBand top={-h} hr={hr} coat={coat} W={W} seed={seed} at={T(0.18)} />} />
+        <BackHead hy={hy} hr={hr} hair={hair} cap={cap ?? false} W={W} neckTo={-h + hr * 0.2} detail={detail} seed={seed} at={T(0.1)} strands={strands} bun={bun} under={<CollarBand top={-h} hr={hr} coat={coat} W={W} hair={hair} seed={seed} at={T(0.18)} />} />
       </XG>
     </TodAnchor>
   );

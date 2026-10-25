@@ -17,6 +17,7 @@ import {blob, circle, crown, crownTicks, line, poly, polyPath, wire, wirePoint, 
 import {At, b, inkW, Place} from './common';
 import {mat, XG} from '../xf';
 import {TodAnchor, useTod} from '../tod';
+import {useInkScale} from '../inkComp';
 
 // ---------------------------------------------------------------- Tree
 
@@ -124,6 +125,7 @@ export const Bird: React.FC<{x: number; y: number; s?: number; seed?: Seed; at?:
   flip,
 }) => {
   const t = useTime();
+  const ks = useInkScale(); // opt-in camera ink compensation (lib/inkComp.tsx)
   const sd = String(seed);
   const ph = rand(sd, 'ph') * 6.28;
   if (at !== undefined && t < at) return null;
@@ -140,7 +142,7 @@ export const Bird: React.FC<{x: number; y: number; s?: number; seed?: Seed; at?:
     const d = `M-16 ${-6 - flap}Q-8 -2 0 0Q8 -2 16 ${-6 - flap}`;
     return (
       <Place x={x + fx} y={y + fy - 12} s={s * (1 - fly * 0.4)}>
-        <path d={d} fill="none" stroke={palette.ink} strokeWidth={inkW(s) * 0.9} strokeLinecap="round" strokeLinejoin="round" />
+        <path d={d} fill="none" stroke={palette.ink} strokeWidth={inkW(s) * 0.9 * ks} strokeLinecap="round" strokeLinejoin="round" />
       </Place>
     );
   }

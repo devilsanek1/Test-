@@ -22,6 +22,7 @@ import {exitInkProgress, exitInkSyncProgress, exitLoose, useExit, useExitSync, u
 import {rand, Seed} from './rng';
 import {MOTION, strokeDur} from './spec';
 import {useProjected} from './persp';
+import {useInkScale} from './inkComp';
 
 // ---------------------------------------------------------------- length cache
 
@@ -108,7 +109,8 @@ export type InkProps = {
   dur?: number;
   /** Easing of each stroke. Default: inOut(sin) for short strokes, ease-out for long ones (> 300 px). */
   ease?: Ease;
-  /** Stroke width (px). Default stroke.ink (3.4). Ladder: inkBold 4.8 front, ink 3.4 mid, inkThin 2.2 far, inkHair 1.6. */
+  /** Stroke width (px). Default stroke.ink (3.4). Ladder: inkBold 4.8 front, ink 3.4 mid, inkThin 2.2 far, inkHair 1.6.
+   *  Multiplied by the enclosing <InkScale> factor (camera ink compensation, inkComp.tsx; 1 by default). */
   width?: number;
   color?: string;
   /** Multi-subpath: 'seq' draws pieces one after another (default), 'all' together. */
@@ -160,11 +162,12 @@ export const Ink: React.FC<InkProps> = ({
   const sync = useExitSync();
   const look = useLook();
   const d = useProjected(dIn);
+  const ks = useInkScale(); // opt-in camera ink compensation (inkComp.tsx): 1 outside an <InkScale>
   const jit = useMemo(() => rand(seed ?? dIn.slice(0, 40), 'ink'), [seed, dIn]);
   if (!look.ink) return null;
   // un-build: retract after the fills (recipe), or WITH its group's fills inside an <ExitSync> (a figure in a crowd)
   const retract = sync ? exitInkSyncProgress(e, sync.jitter) : exitInkProgress(e, jit);
-  const w = width * (1 + (jit * 2 - 1) * vary);
+  const w = width * ks * (1 + (jit * 2 - 1) * vary);
   const common = {fill: 'none', stroke: color, strokeLinecap: cap, strokeLinejoin: join, opacity, style} as const;
 
   if (dash) {

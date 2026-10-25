@@ -535,20 +535,30 @@ const g = plazaShutdownGov(-1, S01_GOV);                         // S12: EXACTLY
 ```
 - `farCivic` (default true): the far city in the sun gap is `PLAZA_CIVIC` = 6 fill-only civic silhouettes. **Kit v3b
   layout** (S01 review: the old dark step was ~1.3:1, the lanterns 5 x 9 px, and a ~150 x 280 px teal slab ran down to
-  the plaza and merged with it on 'Europe'): left to right templeM, domeF, spireB, spireM, domeB, templeF in THREE depth
-  tiers that shrink with distance (`depth` 0 back: spireB / domeB, 20-34 px wide, tops 966-982; 1 mid: templeM / spireM,
+  the plaza and merged with it on 'Europe'): in WAVE order (left to right by what shows in the gap) **domeF, templeM,
+  spireB, spireM, domeB, templeF** (fix round: domeF, the first big mass right of govB, LEADS so the step on S01's
+  'Europe' is a visible event; templeM sits almost wholly behind govB and domeF; the domes are indices **0 and 4**) in
+  THREE depth tiers that shrink with distance (`depth` 0 back: spireB / domeB, 20-34 px wide, tops 966-982; 1 mid: templeM / spireM,
   30-48 px, tops 996-1030; 2 near: domeF / templeF, 60-64 px, tops 1036-1060), each standing on its depth's low roofline
   band (`PLAZA.civicBands` tops 1058 / 1092 / 1126; each silhouette owns a stretch `band` of it, with one raised roof
-  block), all ending on the far city's HORIZON LINE `PLAZA.civicBase` = y 1166. Below it the plaza's far steps (a cream
+  block), all ending on the far city's HORIZON LINE `PLAZA.civicBase` = y 1166. Each depth's outermost stretches and
+  the far steps run on to `PLAZA.civicExtent` = world x 560 / 1080, hidden behind govB / govD at rest (fix round:
+  S01's 2.4x dive opened a sky strip right of the old x 840 edge in its last frames; now the low roofline, two more
+  raised blocks and a few window dots show there). Below it the plaza's far steps (a cream
   coping = the horizon line, three flights shrinking with distance, 8 / 12 / 20 px steps, cream nosings over half-sand
   risers, cream landings) run down to the plaza horizon (1384): a quiet light field under the skyline, no slab.
   Lit / dark per depth: back #A2C8B6 -> #6E9A88, mid #93BCAA -> #5E897A, near #84B09C -> #4E786A (a clear 1.7-2.1:1
   step; the depths ~1.2:1 apart when dark). Each silhouette's lit windows (drum windows, colonnade slits, clock face,
-  band dots, >= 3 px) and its lantern (near dome 10 x 14 glazing, back dome 5 x 9) are cream and turn tealDark on the
-  same step. `civicOffAt` (number = left to right 0.06 s apart, or an array per silhouette, PLAZA_CIVIC order: S11's
+  band dots, >= 3 px) and its lantern (near dome 10 x 14 glazing, back dome 8 x 11; was 5 x 9) are cream and turn
+  tealDark on the same step. Paper / `lineArt` / pre-cascade: each depth's whole path is inked at 2x hairline UNDER its
+  own (white) fills, back to front, so only the union silhouette's outline shows and nearer tiers occlude farther ones
+  (no band edges through the domes, no floating roof blocks); the far steps keep 4 lines (the coping + each flight's top
+  edge). `civicOffAt` (number = left to right 0.06 s apart, or an array per silhouette, PLAZA_CIVIC order: S11's
   6-array keeps working) steps each WHOLE shape (silhouette + its band stretch); `civicOnAt` relights them (number =
-  right to left). `civicLanternsOffAt`: the two domes' lanterns turn tealDark (0.06 s apart; they relight with their
-  dome). `tier` (0 / 1) is kept on each entry for old readers; `depth` drives size and colour. The old block city with
+  right to left). `civicLanternsOffAt`: the two domes' lanterns turn tealDark (domeF at `civicLanternsOffAt`, domeB 0.06 s
+  later; they relight with their dome), **never before their own dome steps** (fix round: each lantern goes at
+  `max(civicLanternsOffAt + k * 0.06, its dome's civicOffAt step)`; with S01's 1.155 / 1.215 domeF's lantern pops
+  1.215, one step after its dome, and domeB's goes WITH its dome at 1.395 instead of 0.12 s early on a lit dome). `tier` (0 / 1) is kept on each entry for old readers; `depth` drives size and colour. The old block city with
   window dots and cranes: `farCivic={false}` (unchanged).
 - Per building (`gov.govX`), new: `screenOffAt` = CRT power-off of the browser screen (lit -> bright horizontal line ->
   dot -> dark, 0.15 s; the building stays lit until `offAt`); `screenLineAt` = from here the screen IS the bright line
@@ -751,23 +761,30 @@ Everything stays backward compatible (every export / prop kept); the DEFAULTS th
 |---|---|---|
 | GovernmentPlaza z-order | govB's window sill strokes were drawn after its tag + padlock rigs (they struck through both). `WindowRig` now has `part` 'window' (screen + shutter) / 'hardware' (tag + padlock) / 'all'; every building draws its hardware LAST (govB: window -> sill -> hardware). govA / govC / govD already drew the rig last: no same-facade stroke crosses them. (govC's default unlettered tag in the full-shutter 'off' state still dips behind govD's roof fascia: that is govD in FRONT of govC, a depth occlusion, not a stroke; S01's half-shutter lettered tag hangs clear.) | no |
 | GovernmentPlaza `ground` | `'light'` = mintPale plaza + ONE sage shade wedge from govA's side (~27 % of the visible plaza) + the cream sun path; `'sage'` = the review-5 two-wedge look (~60 %). S01 / S11 / S12 share it. | **yes: 'light'** (was the sage look) |
-| GovernmentPlaza far city | `PLAZA_CIVIC` re-laid in 3 depth tiers that shrink with distance on a horizon line (`PLAZA.civicBase` 1166, `PLAZA.civicBands`), two-value dark step per depth, cream windows / clock faces / lanterns -> tealDark on the same step, bigger near-dome lantern (10 x 14); the plaza's far steps below the horizon line replace the teal slab. `civicOffAt` / `civicOnAt` / `civicLanternsOffAt` unchanged (6 silhouettes, left to right). | look only (same API) |
+| GovernmentPlaza far city | `PLAZA_CIVIC` re-laid in 3 depth tiers that shrink with distance on a horizon line (`PLAZA.civicBase` 1166, `PLAZA.civicBands`), two-value dark step per depth, cream windows / clock faces / lanterns -> tealDark on the same step, bigger lanterns (near 10 x 14, back 8 x 11); the plaza's far steps below the horizon line replace the teal slab. Fix round: wave ORDER changed (domeF leads, then templeM: **the domes are now indices 0 and 4**), a lantern never goes dark before its dome, the far city + steps run on to `PLAZA.civicExtent` (x 560-1080) behind the flanks, the paper outline is the per-depth union silhouette. `civicOffAt` / `civicOnAt` / `civicLanternsOffAt` same API (6 silhouettes). | look + order (same API) |
 | GovernmentPlaza govA columns | ONE flute per column (a long broken pen stroke right of centre) instead of three: no barcode in S01's 3x dive. | look only |
 | StoopStreet dawn rims | tower rims [1..4] moved to the far layer (after the sun slot), clipped to the tower silhouettes; new `dawnRims` (true / false / index list). | no (all rims still on) |
 | TerraceHill check boxes | 1.4 x size with on-screen floors (22 / 17 / 13 / 10 px rows 0-3), cream card + ink outline + ~2 px ink box + tealDark loop (min ink 1.6 px on screen), each row springs in (7 % overshoot); door #4's ticked tag at the same size, springing with row 0. `checkBoxWaveAt` / `checkBoxStep` unchanged; `TERRACE.checkBox` gains `k` / `minScreen`. | look only |
 | ElephantStamp (props, `Elephant.tsx`) | `print="solid"` rubber-stamp print (see docs/SHARED_PROPS.md 3) + `flip`; BlueprintStreet's ground stamp uses it, new `stampFlip`; BlueprintWall's corner badge passes `print="line"` (S02 / S05 unchanged, checked: 0 px differ in S05). | **yes: ElephantStamp `print` 'solid'** (BlueprintWall keeps 'line') |
 
-Scene-side stand-ins these make redundant (scene lanes, not edited here):
-- S01 `scene01/shims.tsx` `S01FarCivic`: draws the OLD civic geometry (bases at y 1388) with its own two-value dark step
-  over the set's far layer from 'Europe' on, so until it is dropped the old teal slab comes back after 'Europe' over the
-  new far steps. The set now does the two-value step itself: drop `S01FarCivic` (and `LanternOff` on the far domes if
-  any; the lamp / govB dome lanterns are separate).
-- S11 `scene11/shims.tsx` `S11Padlock` / `S11Tag`: the set's govB tag + padlock now draw over the sill (`gov.govB.padlockAt`
-  / `tagAt` / `tagProps`), as the shim's comment asks.
-- S09 `scene09/tags.tsx` `BigTags` (rows 0-3 at 26 units on top of the set's tags): the set's own tags are now that size
-  (26.6 units row 0) with the floors above; `PartA.tsx` RIMS_HOLE: no longer needed (harmless).
-- S03 `scene03/stamp.tsx` `StampS03`: the set's stamp (`stampAt`, `stampFlip`) is now the same solid print.
+Scene-side stand-ins (checked against the scene code after the fix round; scene lanes, not edited here):
+- **Done:** S01 dropped `S01FarCivic` (scene01/shims.tsx: the kit's far city is used from frame 0 through the dive,
+  no slab after 'Europe'). S09 uses the set's check boxes (scene09/tags.tsx `BigTags` is gone) and PartA passes
+  `dawnRims={[0]}` (hero rim only).
+- **Still scene-side:** S11's own govB padlock + tag (Scene11.tsx: `ShutterPadlock` / `BackSoonTag` inside the
+  scene11/shims `PadlockRock` / `TagTwirl` motion wrappers; the set's `gov.govB.padlockAt` / `tagAt` / `tagProps` now draw
+  over the sill if S11 wants to hand them back), and S03's `StampS03` (scene03/stamp.tsx; the set's `stampAt` /
+  `stampFlip` draw the same solid print).
+- **PLAZA_CIVIC indices changed in the fix round** (domeF 0, templeM 1, spireB 2, spireM 3, domeB 4, templeF 5; the
+  domes are 0 and 4, were 1 and 4 in v3b and 1 and 2 before it): anyone passing a per-silhouette `civicOffAt` /
+  `civicOnAt` array or timing lanterns to a silhouette index must re-check. S11's uniform 0.1 s array is unaffected. The
+  S01 comment in scene01/timing.ts ('domeB is silhouette 2, domeF 3') is stale: with S01's `civicOffAt` 1.155 the
+  steps are domeF 1.155, templeM 1.215, spireB 1.275, spireM 1.335, domeB 1.395, templeF 1.455, and with
+  `civicLanternsOffAt` 1.215 the lanterns pop at 1.215 (domeF, one step after its dome) and 1.395 (domeB, with its
+  dome).
 
 Renders checked (scale 0.5, scratchpad kitv3b/sets): S01 (0.3 / 1.5 / 3.95 / 4.6), S11 (1.0 / 4.5 / 5.7 / 6.4), S09
 (0.9 / 1.3 / 1.55 dawn, 4.2 / 4.6 / 5.1 tags), S02 / S05 / S03 (stamp unaffected), set previews plaza v3 / off / lineArt,
-stoop v3, terrace v3 / v3rest, blueprint.
+stoop v3, terrace v3 / v3rest, blueprint. Fix round (scratchpad kitv3b/sets/fr1): S01 (0.5, 1.167-1.42 the
+'Europe' wave + lanterns, 4.6 / 4.69 the dive's right edge), S11 (1.0 / 4.5 / 5.7 / 6.4), plaza lineArt (full scale),
+plaza v3 / off / rewind.

@@ -31,6 +31,8 @@ export type ShotPush = {
   /** World point (reference plane) that stays put. Default world.vp. */
   anchor?: Pt;
   ease?: Ease;
+  /** Opt-in ink compensation exponent for the push (CamKey.inkComp, lib/inkComp.tsx). Default off. */
+  inkComp?: number;
 };
 
 export type ShotCamProps = {
@@ -53,7 +55,7 @@ export function pushKeys(p: ShotPush | boolean = true, scene?: SceneInfo): CamKe
   const anchor = o.anchor ?? world.vp;
   return [
     {t: at, push: 0, anchor},
-    {t: at + (o.dur ?? MOTION.camera.push.dur), push: 1 - 1 / to, anchor, ease: o.ease ?? MOTION.camera.push.ease},
+    {t: at + (o.dur ?? MOTION.camera.push.dur), push: 1 - 1 / to, anchor, ease: o.ease ?? MOTION.camera.push.ease, ...(o.inkComp ? {inkComp: o.inkComp} : {})},
   ];
 }
 

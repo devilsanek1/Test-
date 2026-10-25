@@ -32,6 +32,11 @@
 //             with the horizon off-frame (or the ground's far edge on a depth ~1 layer); otherwise use `tilt`.
 //   anchor    [x, y] world point (in the layer of depth anchorDepth, default 0) kept at screen anchorTo
 //             (default: where it is at rest). Overrides x / y for that key.
+//   inkComp   OPT-IN ink compensation for the segment ARRIVING at this key (like `ease`): while it runs, every <Layer>
+//             draws the engine's strokes at width x (layer scale now / layer scale at the segment start)^-inkComp
+//             (lib/inkComp.tsx; house value 0.6: a 3x dive lands at ~1.55x line weight, not 3x). Exactly 1 at the
+//             segment start (no width step); the factor HOLDS after the segment ends; flagged segments multiply (a
+//             flagged dive in and a flagged pull-back out cancel). Handheld / `add` are not compensated.
 // Missing values inherit from the previous key. Times are scene seconds (useTime) unless you pass `t`.
 
 import React, {createContext, useContext} from 'react';
@@ -42,6 +47,7 @@ import {rand, Seed} from '../rng';
 import type {Pt} from '../sketch';
 import {drift} from './util';
 import {STAGE_REST, useStageCam} from '../stage';
+import {InkScale} from '../inkComp';
 
 export const SCREEN = {w: canvas.width, h: canvas.height, cx: canvas.width / 2, cy: canvas.height / 2} as const;
 
@@ -93,6 +99,8 @@ export type CamKey = {
   pan?: number;
   /** Camera tilt (px on screen, + = look up: everything, the sky included, shifts down by the same amount). */
   tilt?: number;
+  /** Opt-in ink compensation exponent for the segment ARRIVING at this key (0.6 = house value). Default off. */
+  inkComp?: number;
 };
 
 /** Camera state. `pan` / `tilt` (screen px) are optional so older literals stay valid. */
@@ -287,6 +295,34 @@ export function camAt(keys: CamKey[], t: number, interp: CamInterp = 'spline'): 
   return R[R.length - 1];
 }
 
+/** A started ink-compensated segment: the camera's zoom / dolly at its start and now (clamped to its end). */
+export type CamInkSeg = {z0: number; p0: number; z1: number; p1: number; k: number};
+
+/** Does any key flag its segment for ink compensation? */
+export const hasInkComp = (keys: CamKey[]) => keys.some((k) => !!k.inkComp);
+
+/** The ink-compensated segments (CamKey.inkComp) that have started by time t. */
+export function camInkSegs(keys: CamKey[], t: number, interp: CamInterp = 'spline'): CamInkSeg[] {
+  const out: CamInkSeg[] = [];
+  for (let i = 1; i < keys.length; i++) {
+    const k = keys[i].inkComp;
+    if (!k || t <= keys[i - 1].t) continue;
+    const a = camAt(keys, keys[i - 1].t, interp);
+    const b = camAt(keys, Math.min(t, keys[i].t), interp);
+    out.push({z0: a.zoom, p0: a.push, z1: b.zoom, p1: b.push, k});
+  }
+  return out;
+}
+
+/** Stroke-width factor of a layer at `depth` for those segments (1 = none): per segment
+ *  (layer scale now / layer scale at its start)^-k, multiplied. */
+export function camInkFactor(segs: CamInkSeg[], depth: number): number {
+  let f = 1;
+  const pf = 1 - depth;
+  for (const s of segs) f *= Math.pow(s.z1 / pushDen(s.p1, pf) / (s.z0 / pushDen(s.p0, pf)), -s.k);
+  return f;
+}
+
 /** Subtle deterministic handheld drift: amp px at the reference plane (+ amp * 0.035 deg roll). */
 export function handheldAt(t: number, amp: number, seed: Seed = 'hh'): CamState {
   if (!amp) return CAM_REST;
@@ -299,6 +335,8 @@ export function handheldAt(t: number, amp: number, seed: Seed = 'hh'): CamState 
 // ---------------------------------------------------------------- React
 
 const CamCtx = createContext<CamState>(CAM_REST);
+/** Ink compensation of the enclosing CineCamera (null = none: its Layers render exactly as before). */
+const CamInkCtx = createContext<{segs: CamInkSeg[]; stage: number} | null>(null);
 
 /** Current camera state (rest outside a CineCamera). */
 export const useCam = () => useContext(CamCtx);
@@ -315,7 +353,8 @@ export type CineCameraProps = {
   /** 'spline' (default): velocity-continuous through the keys. 'ease': each segment eases on its own. */
   interp?: CamInterp;
   /** Fold in the core TRANSITION camera (useStageCam) with full multiplane parallax. Use it inside
-   *  <World stage="context"> (a flat World already applies the stage camera to everything: leave this false). */
+   *  <World stage="context"> (a flat World already applies the stage camera to everything: leave this false).
+   *  A transition flagged with `inkComp` (StageCam.ink) is folded into every Layer's ink factor too. */
   stage?: boolean;
   children?: React.ReactNode;
 };
@@ -336,17 +375,32 @@ export const CineCamera: React.FC<CineCameraProps> = ({keys = [], handheld = 0, 
     pan: (base.pan ?? 0) + (add?.pan ?? 0),
     tilt: (base.tilt ?? 0) + (add?.tilt ?? 0),
   };
-  return <CamCtx.Provider value={cam}>{children}</CamCtx.Provider>;
+  // opt-in ink compensation (CamKey.inkComp, a flagged transition's StageCam.ink): static per camera whether it is on,
+  // so the Layers' tree keeps its shape
+  const flagged = hasInkComp(keys);
+  const ink = flagged || stage ? {segs: flagged ? camInkSegs(keys, t, interp) : [], stage: stage ? sc.ink ?? 1 : 1} : null;
+  return (
+    <CamCtx.Provider value={cam}>
+      <CamInkCtx.Provider value={ink}>{children}</CamInkCtx.Provider>
+    </CamCtx.Provider>
+  );
 };
 
 /** A multiplane layer: children are authored in world coordinates (= screen at rest) and parallax by depth.
  *  depth 1 = infinitely far (sky), 0 = reference plane, < 0 = in front of it (foreground framing). */
 export const Layer: React.FC<{depth?: number; children?: React.ReactNode}> = ({depth = 0, children}) => {
   const c = useCam();
-  return <XG m={layerMat(c, depth)}>{children}</XG>;
+  const ink = useContext(CamInkCtx);
+  if (!ink) return <XG m={layerMat(c, depth)}>{children}</XG>;
+  return (
+    <XG m={layerMat(c, depth)}>
+      <InkScale value={camInkFactor(ink.segs, depth) * ink.stage}>{children}</InkScale>
+    </XG>
+  );
 };
 
-/** Screen-constant stroke width inside a layer: pass the width you want ON SCREEN. */
+/** Screen-constant stroke width inside a layer: pass the width you want ON SCREEN. (Under a flagged `inkComp` camera an
+ *  <Ink> also multiplies it by the layer's factor: divide by useInkScale() to stay exactly screen-constant.) */
 export const useScreenWidth = (depth: number) => {
   const c = useCam();
   const s = layerScale(c, depth);

@@ -8,10 +8,10 @@
 //                 and the sky ceiling), swaying: the hook frame's top-edge framing (every ref2 frame has one).
 import React from 'react';
 import {palette} from '../../lib/theme';
-import {osc, prog, useTime} from '../../lib/time';
+import {clamp, ease as E, lerp, osc, prog, useTime} from '../../lib/time';
 import {Fill} from '../../lib/Fill';
 import {Ink} from '../../lib/Ink';
-import {rectPath} from '../../lib/sketch';
+import {circle, crownTicks, rectPath} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import {releaseState} from '../shared/props';
 import {LanternOff} from './shims';
@@ -36,14 +36,14 @@ export const DOOR_LANTERNS: {cx: number; glass: [number, number, number, number]
   {cx: 124, glass: [115, 1238, 18, 26]},
   {cx: 256, glass: [247, 1238, 18, 26]},
 ];
-export const DoorLanterns: React.FC<{offAt: number[]; ink?: number}> = ({offAt, ink = 1}) => (
+export const DoorLanterns: React.FC<{offAt: number[]}> = ({offAt}) => (
   <>
     {DOOR_LANTERNS.map(({cx, glass}, i) => {
       const [gx, gy, gw, gh] = glass;
       const cap = `M${cx - 13} ${gy}L${cx} ${gy - 13}L${cx + 13} ${gy}Z`;
       const base = rectPath(cx - 11, gy + gh, 22, 5);
       const plate = rectPath(cx - 6, gy + gh + 13, 12, 7);
-      const W = 2.4 * ink;
+      const W = 2.4;
       return (
         <React.Fragment key={i}>
           <Fill d={cap + base + plate} color={palette.tealDark} offset={false} mode="none" seed={`s01/dl${i}/f`} />
@@ -100,28 +100,64 @@ export const S01Branch: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------- govD's tree: break the 'smiling face'
+// ---------------------------------------------------------------- govD's tree: break the 'sleeping face'
 
-/** Two more leaf ticks on the tree crown at other heights and angles (review: its two level 'smile' arcs at ~(1035,1370)
- *  / (1065,1385) read as a closed-eyed face on the right edge; style bible: 3-5 ticks per crown, never two level).
- *  Same sway as the set's tree (rotate osc(t, 0.3, 1.2) x 0.6 deg about the trunk foot (1058, 1558)), MID ink. */
-const CROWN_TICKS: [number, number, number][] = [
-  [1006, 1268, 24],
-  [1052, 1226, -14],
+/** The set's tree crown carries 4 seeded ticks (crownTicks(1078, 1300, 112, 124, 'gp/treek')); the two in frame sit
+ *  level at ~(1035, 1370) / (1065, 1385) as a pair of 'smiles', and fix round 3's two extra ticks above them made the
+ *  'closed eyes' (review: a sleeping face on the right edge). Fix round 4: the set's ticks are painted out with the
+ *  crown's own sage (same path, a 10 px sage stroke, same sway), and three ticks of our own run ALONG the left rim
+ *  ('(' contours tangent to the crown edge at three heights, none level with another, none a smile). Same sway as the
+ *  set's tree: rotate osc(t, 0.3, 1.2) x 0.6 deg about the trunk foot (1058, 1558). Sets lane: drop when the set's
+ *  ticks are re-seeded. */
+const SET_TICKS = crownTicks(1078, 1300, 112, 124, {seed: 'gp/treek', n: 4, size: 13});
+/** Rim ticks: angle on the crown ellipse (deg, 180 = left), radius fraction, half-length. */
+const RIM_TICKS: [number, number, number][] = [
+  [196, 0.8, 15],
+  [158, 0.74, 13],
+  [128, 0.7, 12],
 ];
 export const TreeTicks: React.FC = () => {
   const t = useTime();
   const sway = osc(t, 0.3, 1.2) * 0.6;
   let d = '';
-  for (const [x, y, a] of CROWN_TICKS) {
-    const c = Math.cos((a * Math.PI) / 180);
-    const s = Math.sin((a * Math.PI) / 180);
-    const P = (u: number, v: number) => `${(x + u * c - v * s).toFixed(1)} ${(y + u * s + v * c).toFixed(1)}`;
-    d += `M${P(-12, 0)}Q${P(0, 9)} ${P(12, 0)}`;
+  for (const [deg, f, L] of RIM_TICKS) {
+    const a = (deg * Math.PI) / 180;
+    const cx = 1078 + Math.cos(a) * 112 * f;
+    const cy = 1300 + Math.sin(a) * 124 * f;
+    // tangent of the ellipse and the inward normal
+    const tx = -Math.sin(a) * 112;
+    const ty = Math.cos(a) * 124;
+    const tl = Math.hypot(tx, ty);
+    const ux = tx / tl;
+    const uy = ty / tl;
+    const nx = -Math.cos(a);
+    const ny = -Math.sin(a);
+    const P = (u: number, v: number) => `${(cx + ux * u + nx * v).toFixed(1)} ${(cy + uy * u + ny * v).toFixed(1)}`;
+    d += `M${P(-L, 0)}Q${P(0, -6)} ${P(L, 0)}`;
   }
   return (
     <XG m={mat.about(mat.rotate(sway), 1058, 1558)}>
+      <path d={SET_TICKS} fill="none" stroke={palette.sage} strokeWidth={10} strokeLinecap="round" />
       <Ink d={d} width={3.4} taper={false} seed="s01/treeTicks" />
+    </XG>
+  );
+};
+
+// ---------------------------------------------------------------- the ring on govB's lock
+
+/** The ink ring around govB's lock box (fix round 4, review: drawn on from nothing in 0.12 s at r 24 / 2.4 px it was
+ *  first visible 1-2 frames before the dive and too thin to settle on): fully drawn, it POPS 0.3 -> 1.15 -> 1 (0.13 s,
+ *  like S01Padlock) at r 30 with 3.4 px ink, so it reads by f126 and holds ~0.2 s. In the dive its radius eases to
+ *  23.2 (x 3.19 = 74 px at the cut = S02's callout ring r 64 x 1.15), so the matchcut ring keeps its size. */
+export const LockRing: React.FC<{x: number; y: number; at: number; dive: number; cut: number; r?: number}> = ({x, y, at, dive, cut, r = 30}) => {
+  const t = useTime();
+  if (t < at) return null;
+  const u = t - at;
+  const pop = u < 0.05 ? 0.3 + 0.85 * E.outCubic(u / 0.05) : u < 0.13 ? 1.15 - 0.15 * E.inOutSine((u - 0.05) / 0.08) : 1;
+  const rr = lerp(r, 23.2, E.inOutSine(clamp((t - dive) / (cut - dive))));
+  return (
+    <XG m={mat.about(mat.scale(pop), x, y)}>
+      <Ink d={circle(x, y, rr, {seed: 's01/ring', overlap: 22})} width={3.4} taper={false} seed="s01/ring" />
     </XG>
   );
 };

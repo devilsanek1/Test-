@@ -6,13 +6,16 @@ import {palette, skies} from '../../lib/theme';
 import {clamp, ease as E, lerp, osc, prog, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {arc, blob, polyPath, rectPath, roundRect, Pt} from '../../lib/sketch';
+import {arc, blob, circle, polyPath, rectPath, roundRect, Pt} from '../../lib/sketch';
 import {rand, rng} from '../../lib/rng';
 import {mat, XG} from '../../lib/xf';
 import {Person, Bird, PERSON_BODIES} from '../../lib/kit';
+import {inkW} from '../../lib/kit/common';
+import {useInkScale} from '../../lib/inkComp';
 import type {Acc, Hair} from '../../lib/kit/Person';
 import {Elephant, popSwitch} from '../../lib/mascot';
 import {Citizen} from '../shared/props';
+import {pickup, PICKUP_T, S02_PIP, s02PipState} from './handoff';
 
 // ---------------------------------------------------------------- shared bits: elbow arm, lit phone, head turn
 
@@ -175,7 +178,7 @@ function walked(t: number, w: NonNullable<CitizenPlan['walk']>): number {
   return w.speed * (s0 + u - (u * u) / (2 * span));
 }
 
-const leanAt = (t: number, keys?: {t: number; a: number}[]) => {
+export const leanAt = (t: number, keys?: {t: number; a: number}[]) => {
   if (!keys || !keys.length) return 0;
   let a = 0;
   for (const k of keys) if (t >= k.t) a = lerp(a, k.a, E.outBack(1.4)(clamp((t - k.t) / 0.2)));
@@ -196,7 +199,7 @@ const turnAt = (t: number, keys?: {t: number; d: 1 | 0 | -1}[]): {d: 1 | -1; k: 
 
 /** One back-view plaza citizen (kit Person with legs) with the S01 acting: walk away and stop, lean, swap to a 3/4 head
  *  toward govB, phone up / down (lit screen), point up. (x, y) = feet. */
-export const PlazaCitizen: React.FC<{p: CitizenPlan; vp: Pt; horizon: number; inkK?: number}> = ({p, vp, horizon, inkK = 1}) => {
+export const PlazaCitizen: React.FC<{p: CitizenPlan; vp: Pt; horizon: number}> = ({p, vp, horizon}) => {
   const t = useTime();
   if (p.silhouette) return <Citizen x={p.x} y={p.y} h={p.h} silhouette seed={p.seed} />;
   // walking away along the ray to the VP: feet move toward it, the figure shrinks with perspective
@@ -215,8 +218,8 @@ export const PlazaCitizen: React.FC<{p: CitizenPlan; vp: Pt; horizon: number; in
   const s = h / FIG_H;
   const bob = p.bob ? osc(t, 0.55) * p.bob : 0; // phase 0: frame 0 = standing
   const lean = leanAt(t, p.lean);
-  // inkK: the dive's ink compensation (camera.ts inkComp; 1 outside the dive)
-  const W = ((p.ink ?? inkFor(p.h)) * inkK) / s;
+  // the dive's ink compensation comes from the enclosing <InkScale> (plaza.tsx wrap)
+  const W = (p.ink ?? inkFor(p.h)) / s;
   const g = headGeo(p.seed);
   const coat = p.body ?? coatOf(p.seed, p.hair !== undefined);
   const parts: React.ReactNode[] = [];
@@ -339,20 +342,60 @@ const BACK_DUR = 0.34;
 
 const quadPt = (a: Pt, c: Pt, b: Pt, q: number): Pt => [(1 - q) * (1 - q) * a[0] + 2 * (1 - q) * q * c[0] + q * q * b[0], (1 - q) * (1 - q) * a[1] + 2 * (1 - q) * q * c[1] + q * q * b[1]];
 
-/** A flying pigeon (fix round 1: a bare ink 'v' read as a UI chevron): body + head + tail in the pigeon's colour with
- *  ink, and two flapping wing strokes, so it reads as a bird at phone size. Faces right (flip = left). */
-const Flyer: React.FC<{x: number; y: number; s: number; t: number; ph: number; color: string; flip?: boolean; seed: string}> = ({x, y, s, t, ph, color, flip, seed}) => {
-  const f = osc(t, 7, ph); // -1 (down) .. 1 (up)
-  const wy = -12 - 13 * f;
-  const body = `M-13 -10Q-4 -16 7 -13Q13 -12 14 -9Q9 -5 -2 -6Q-9 -6 -13 -10Z`;
-  const tail = `M-12 -10L-21 -13L-20 -7Z`;
-  const wings = `M-5 -11Q-6 ${(wy - 2).toFixed(1)} -14 ${(wy - 6 * f).toFixed(1)}M2 -12Q5 ${(wy - 4).toFixed(1)} 13 ${(wy - 2 - 7 * f).toFixed(1)}`;
+/** A flying pigeon (fix round 4, review: the white fish body with two bare ink strokes rising from its back read as an
+ *  insect, a false Bit sighting): a BIRD silhouette, faces right (flip = left). Body in the pigeon's colour, a tealDark
+ *  head with a sun beak and a cream eye, a fanned tail, and two FILLED wings (~1.2 x the body, the other light step,
+ *  ink outline) hinged at mid-back that flap at 7 Hz between a raised 'V' and a lowered 'Λ': no bare stroke sticks up.
+ *  The far wing is drawn behind the body, the near wing in front. Raw paths (the shape changes every frame), stroke x
+ *  the InkScale factor. */
+const Flyer: React.FC<{x: number; y: number; s: number; t: number; ph: number; color: string; flip?: boolean; seed: string}> = ({x, y, s, t, ph, color, flip}) => {
+  const ks = useInkScale();
+  const up = (osc(t, 7, ph) + 1) / 2; // 0 = wings down (Λ), 1 = wings up (V)
+  const wing = color === palette.tan ? palette.sand : palette.tan;
+  const L = 33;
+  const W = (2.1 / s) * ks;
+  // a wing in its own frame: hinge at (0, 0), pointing along -y, leading edge on +x; placed by rotating -y by b degrees
+  // (b -15 = up and a little back, -90 = straight back, -150 = down and back)
+  const wingD = `M4.5 0Q8 ${(-L * 0.55).toFixed(1)} 1 ${-L}Q-5 ${(-L * 0.66).toFixed(1)} -6.5 -2Q-3 1 4.5 0Z`;
+  const bFar = lerp(-150, -12, up) - 10;
+  const bNear = lerp(-150, -12, up) + 12;
+  const body = 'M-14 -10Q-6 -17.5 6 -15.5Q13 -14.5 14.5 -10Q9 -5 -2 -6Q-10 -6 -14 -10Z';
+  const tail = 'M-13 -11.5L-24 -16L-23 -5L-13 -8.5Z';
+  const head = 'M8.6 -14a5.2 5.2 0 1 0 10.4 0a5.2 5.2 0 1 0 -10.4 0Z';
+  const common = {stroke: palette.ink, strokeWidth: W, strokeLinejoin: 'round' as const, strokeLinecap: 'round' as const};
   return (
     <XG m={mat.compose(mat.translate(x, y), mat.scale(flip ? -s : s, s))}>
-      <Fill d={body + tail} color={color} offset={false} mode="none" seed={`${seed}/fb`} />
-      <Fill d={blob(14, -13, 4.2, 4, {seed: `${seed}/fh`})} color={color} offset={false} mode="none" seed={`${seed}/fhf`} />
-      <path d={body + tail + `M10 -13a4.2 4 0 1 0 8.4 0a4.2 4 0 1 0 -8.4 0`} fill="none" stroke={palette.ink} strokeWidth={1.7 / s} strokeLinejoin="round" />
-      <path d={wings} fill="none" stroke={palette.ink} strokeWidth={2.5 / s} strokeLinecap="round" />
+      <XG m={mat.compose(mat.translate(1, -13), mat.rotate(bFar))}>
+        <path d={wingD} fill={wing} {...common} />
+      </XG>
+      <path d={tail} fill={color} {...common} />
+      <path d={body} fill={color} {...common} />
+      <path d={head} fill={palette.tealDark} {...common} />
+      <path d="M18.6 -15L23.5 -13.6L18.6 -12.4Z" fill={palette.sun} stroke="none" />
+      <path d="M14.6 -15.4a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0 -2.6 0Z" fill={palette.cream} stroke="none" />
+      <XG m={mat.compose(mat.translate(-2, -11), mat.rotate(bNear))}>
+        <path d={wingD} fill={wing} {...common} />
+        <path d={`M0 ${(-L * 0.42).toFixed(1)}L-3.5 ${(-L * 0.62).toFixed(1)}`} fill="none" {...common} strokeWidth={W * 0.7} />
+      </XG>
+    </XG>
+  );
+};
+
+/** The perched pigeon's head in tealDark (the flyer's head colour), drawn over the kit Bird's own head with the Bird's
+ *  exact transform (Place(x, y + hop, s, flip), its idle hop and head turn: same `rand(seed, 'ph')` clock). */
+const PerchedHead: React.FC<{x: number; y: number; s: number; t: number; seed: string; flip?: boolean}> = ({x, y, s, t, seed, flip}) => {
+  const ph = rand(seed, 'ph') * 6.28;
+  const look = Math.sin(t * 1.3 + ph) > 0.75 ? -10 : 0;
+  const hop = Math.max(0, osc(t, 0.23, ph)) > 0.97 ? -3 : 0;
+  const W = inkW(s) * 0.85;
+  return (
+    <XG m={mat.compose(mat.translate(x, y + hop), mat.scale(flip ? -s : s, s))}>
+      <XG m={look ? mat.about(mat.rotate(look), 9, -16) : mat.I}>
+        <Fill d={blob(10, -19, 6.5, 6, {seed: `${seed}/h`})} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/hf2`} />
+        <Ink d={circle(10, -19, 6.5, {seed: `${seed}/h`, overlap: 12})} width={W} taper={false} seed={`${seed}/hi2`} />
+        <Fill d="M16 -19L21 -18L16 -16.5Z" color={palette.sun} offset={false} mode="none" seed={`${seed}/bk2`} />
+        <Fill d={blob(12, -20.5, 1.3, 1.3, {seed: `${seed}/eye2`})} color={palette.cream} offset={false} mode="none" seed={`${seed}/ey2`} />
+      </XG>
     </XG>
   );
 };
@@ -399,6 +442,7 @@ export const Pigeon: React.FC<{p: PigeonPlan; s?: number}> = ({p, s = 0.8}) => {
   return (
     <XG m={mat.about(mat.scale(1 / Math.sqrt(sq), sq), x, p.y)}>
       <Bird x={x} y={p.y + hopY} s={s} seed={p.seed} color={p.color} flip={p.flip} />
+      <PerchedHead x={x} y={p.y + hopY} s={s} t={t} seed={p.seed} flip={p.flip} />
     </XG>
   );
 };
@@ -417,9 +461,9 @@ export type PipPlan = {
   hopAt: number;
   landAt: number;
   backAt: number;
-  /** The leap toward the lens on the dive: takeoff time (a 2-frame side-pose crouch before it). */
+  /** The leap toward the lens on the dive: takeoff time (a 2-frame side-pose crouch before it). From here Pip is drawn
+   *  in SCREEN space by `PipLeap` (PipS01 draws nothing). */
   exitAt: number;
-  exitTo: Pt;
   /** Looks back at the plaza (stays sit-back). */
   lookBackAt?: number;
 };
@@ -443,29 +487,17 @@ const StartleTicks: React.FC<{x: number; y: number; at: number; until: number}> 
 /** The burst centre relative to Pip's feet in the flipped stand-side pose (above the head, facing left). */
 const PIP_HEAD: Pt = [-40, -92];
 
-const EXIT_CROUCH = 0.075; // 2 frames at 30 fps (f131, f132 before the 4.43 take-off)
-const EXIT_AIR = 0.34;
+const EXIT_CROUCH = 0.075; // 2 frames at 30 fps (f130, f131 before the 4.35 take-off)
 
-/** Pip on his bollard, scale 1.0 (the hop gag must read in the vista). No look to camera. */
-export const PipS01: React.FC<{p: PipPlan; seed?: number; inkK?: number}> = ({p, seed = 11, inkK = 1}) => {
+/** Pip on his bollard, scale 1.0 (the hop gag must read in the vista). No look to camera. Drawn in the set's NEAR
+ *  layer up to the take-off; the leap itself is `PipLeap` (screen space). */
+export const PipS01: React.FC<{p: PipPlan; seed?: number}> = ({p, seed = 11}) => {
   const t = useTime();
-  const lw = inkK; // the dive's ink compensation (Elephant lineWeight; 1 outside the dive)
-  // the dive exit: a 2-frame crouch in the side pose on the bollard (squash +0.12: the anticipation), then the leap
-  // toward the lens (up-right): a -0.08 stretch at take-off, growing 1.0 -> 1.3 along the arc, so he crosses the cut
-  // toward S02's rod
+  if (t >= p.exitAt) return null;
+  // the dive exit: a 2-frame crouch in the side pose on the bollard (squash +0.12: the anticipation), then PipLeap
   if (t >= p.exitAt - EXIT_CROUCH) {
-    if (t < p.exitAt) {
-      const k = (t - (p.exitAt - EXIT_CROUCH)) / EXIT_CROUCH;
-      return <Elephant x={p.x} y={p.y} scale={1} t={t} seed={seed} pose="stand-side" amount={0} squash={0.12 * Math.sin((Math.PI / 2) * Math.min(1, k * 1.6))} look={0.2} lineWeight={lw} />;
-    }
-    const k = clamp((t - p.exitAt) / EXIT_AIR);
-    const top = Math.min(p.y, p.exitTo[1]) - 110;
-    const cy = 2 * top - (p.y + p.exitTo[1]) / 2;
-    const x = lerp(p.x, p.exitTo[0], E.outQuad(k));
-    const y = (1 - k) * (1 - k) * p.y + 2 * (1 - k) * k * cy + k * k * p.exitTo[1];
-    const squash = -0.08 * (1 - E.outCubic(clamp(k / 0.5)));
-    const grow = 1 + 0.3 * E.inOutSine(k);
-    return <Elephant x={x} y={y} scale={grow} t={t} seed={seed} pose="stand-side" amount={Math.sqrt(Math.sin(Math.PI * Math.min(1, k * 0.9 + 0.1)))} squash={squash} rotate={-10 * Math.cos(Math.PI * k)} look={0.2} lineWeight={lw} />;
+    const k = (t - (p.exitAt - EXIT_CROUCH)) / EXIT_CROUCH;
+    return <Elephant x={p.x} y={p.y} scale={1} t={t} seed={seed} pose="stand-side" amount={0} squash={0.12 * Math.sin((Math.PI / 2) * Math.min(1, k * 1.6))} look={0.2} />;
   }
   // the startle hop (fix round 2: no look to camera): an instant pop into the PROFILE facing govB (stand-side, flipped
   // to face left), eyes wide, a quick vertical hop with the legs spread and the ears + tail up (the leap `amount`),
@@ -505,4 +537,47 @@ export const PipS01: React.FC<{p: PipPlan; seed?: number; inkK?: number}> = ({p,
     squash += popSwitch(t, p.lookBackAt) * 1.4;
   }
   return <Elephant x={p.x} y={p.y} scale={1} t={t} seed={seed} pose="sit-back" look={look} squash={squash} />;
+};
+
+// ---------------------------------------------------------------- Pip's leap across the matchcut (screen space)
+
+const hermite = (a: number, ma: number, b: number, mb: number, s: number) => {
+  const s2 = s * s;
+  const s3 = s2 * s;
+  return (2 * s3 - 3 * s2 + 1) * a + (s3 - 2 * s2 + s) * ma + (-2 * s3 + 3 * s2) * b + (s3 - s2) * mb;
+};
+
+/** Pip's leap toward the lens on the dive, drawn in SCREEN space (fix round 4, review: driven in world space on the
+ *  near layer, the dive's zoom flung him off the right rail 6 frames before the cut at ~230 px / frame, and S02 brought
+ *  him back moving left). Render it AFTER the set, outside the camera. From the take-off point on the bollard (`from` =
+ *  the bollard top on screen at `p.exitAt`, scale `fromScale`) one Hermite curve per coordinate ARRIVES at S02's pickup
+ *  state on S02's first frame (handoff.ts: position, velocity, scale and its rate): ~51-65 px per frame, on screen on
+ *  every S01 frame (feet x <= ~1036). He takes off facing right (nose up, legs spread), and turns to face left (S02's
+ *  facing) in the frame where his x velocity reverses (~f140); from there squash / rotate / spread follow S02's hop
+ *  formulas extrapolated, so f141 -> f142 is one continuous hop. Seed 22 = S02's Pip. */
+export const PipLeap: React.FC<{p: PipPlan; from: Pt; fromScale: number; v0?: Pt}> = ({p, from, fromScale, v0 = [600, -1700]}) => {
+  const t = useTime();
+  if (t < p.exitAt || t >= PICKUP_T) return null;
+  const D = PICKUP_T - p.exitAt;
+  const s = (t - p.exitAt) / D;
+  const {p: P1, v: V1, vs} = pickup;
+  const x = hermite(from[0], v0[0] * D, P1.x, V1[0] * D, s);
+  const y = hermite(from[1], v0[1] * D, P1.y, V1[1] * D, s);
+  const x2 = hermite(from[0], v0[0] * D, P1.x, V1[0] * D, Math.min(1, s + 0.01));
+  const scale = hermite(fromScale, 0.4 * D, P1.scale, vs * D, s);
+  const left = x2 < x; // the x velocity has reversed: face S02's way
+  let squash: number;
+  let rotate: number;
+  let amount: number;
+  if (left) {
+    const q = s02PipState(t - S02_PIP.start);
+    squash = q.squash;
+    rotate = q.rotate;
+    amount = Math.max(0.6, q.amount);
+  } else {
+    squash = lerp(-0.12, -0.09, s);
+    rotate = -12 * (1 - s);
+    amount = Math.sqrt(clamp(s / 0.18));
+  }
+  return <Elephant x={x} y={y} scale={scale} t={t} seed={S02_PIP.seed} pose="stand-side" flip={left} amount={amount} squash={squash} rotate={rotate} look={left ? 0 : 0.2} />;
 };

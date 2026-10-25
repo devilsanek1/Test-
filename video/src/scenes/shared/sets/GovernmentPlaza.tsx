@@ -48,14 +48,18 @@ type R4 = [number, number, number, number];
 
 /** Far civic skyline in the sun gap (storyboard v3 `farCivic`, kit v3b layout): six fill-only silhouettes (domes,
  *  pediments, clock spires) in THREE depth tiers that shrink with distance, standing on the far city's horizon line
- *  (`PLAZA.civicBase`, world y 1166) at the top of the plaza's far steps. Listed LEFT TO RIGHT (the order `civicOffAt`
- *  steps them dark; `civicOnAt` relights them right to left). `depth` 0 = back (smallest, lightest), 1 = mid, 2 = near
- *  (biggest); each owns the stretch `band` [x0, x1] of its depth's low roofline band (`PLAZA.civicBands[depth]`), so a
- *  whole tier steps dark with its two silhouettes. `tier` = the v3 colour family (0 far, 1 nearer), kept for old readers.
- *  `top` = the silhouette's highest point (all under the power glyph's lower edge, y 957). */
+ *  (`PLAZA.civicBase`, world y 1166) at the top of the plaza's far steps. Listed in WAVE order = left to right by what
+ *  shows in the gap (the order `civicOffAt` steps them dark; `civicOnAt` relights them right to left): domeF (near, the
+ *  first big mass right of govB) LEADS, so the step on S01's 'Europe' is a visible event; templeM (cx 648) sits almost
+ *  wholly behind govB and domeF, so it goes second. The domes are indices 0 (domeF) and 4 (domeB). `depth` 0 = back
+ *  (smallest, lightest), 1 = mid, 2 = near (biggest); each owns the stretch `band` [x0, x1] of its depth's low roofline
+ *  band (`PLAZA.civicBands[depth]`), so a whole tier steps dark with its two silhouettes (the outermost stretches run on,
+ *  hidden behind govB / govD at rest, to `PLAZA.civicExtent`: no sky strip when parallax opens the gap). `tier` = the v3
+ *  colour family (0 far, 1 nearer), kept for old readers. `top` = the silhouette's highest point (all under the power
+ *  glyph's lower edge, y 957). */
 export const PLAZA_CIVIC = [
-  {id: 'templeM', kind: 'temple', tier: 1, depth: 1, x0: 624, x1: 672, top: 1030, cx: 648, band: [590, 692]},
   {id: 'domeF', kind: 'dome', tier: 1, depth: 2, x0: 640, x1: 704, top: 1036, cx: 672, lantern: true, band: [590, 716]},
+  {id: 'templeM', kind: 'temple', tier: 1, depth: 1, x0: 624, x1: 672, top: 1030, cx: 648, band: [590, 692]},
   {id: 'spireB', kind: 'spire', tier: 0, depth: 0, x0: 680, x1: 700, top: 966, cx: 690, band: [590, 720]},
   {id: 'spireM', kind: 'spire', tier: 1, depth: 1, x0: 700, x1: 730, top: 996, cx: 715, band: [692, 840]},
   {id: 'domeB', kind: 'dome', tier: 0, depth: 0, x0: 728, x1: 762, top: 982, cx: 745, lantern: true, band: [720, 840]},
@@ -124,13 +128,16 @@ export const PLAZA = {
   dive: {cam: [535, 1264] as Pt, zoom: 2.4},
   /** Layer nearness (storyboard depths). */
   layers: {far: 0.1, sun: 0.12, buildings: 0.55, govD: 0.62, ground: 0.7, light: 0.7, near: 1.0},
-  /** Storyboard v3: the far civic silhouettes (left to right), see PLAZA_CIVIC. */
+  /** Storyboard v3: the far civic silhouettes (wave order, domeF first), see PLAZA_CIVIC. */
   civic: PLAZA_CIVIC,
   /** Kit v3b: the far city ends on this horizon line (the top of the plaza's far steps); below it, in the gap, the far
    *  steps (3 flights shrinking with distance, cream / half-sand) run down to the plaza horizon (1384). */
   civicBase: 1166,
   /** Top of each depth's low roofline band (back, mid, near): each tier shows a ~35 px strip over the one in front. */
   civicBands: [1058, 1092, 1126] as readonly number[],
+  /** World x the far city (its outermost band stretches + the far steps) runs to on each side, hidden behind govB / govD
+   *  at rest: S01's 2.4x dive (far layer 0.1 vs buildings 0.55) opens up to ~100 px right of the old x 840 edge. */
+  civicExtent: [560, 1080] as readonly [number, number],
   /** Storyboard v3 frame 0 (= S12's last frame): the sun at the bottom of its SunPress (0.88) in its rest slot. */
   frame0: {sun: {x: 720, y: 900, r: 155}, press: 0.88},
 } as const;
@@ -487,6 +494,10 @@ const CIV = (() => {
   const base = CB + 30;
   const f = (n: number) => n.toFixed(1);
   const R = (x: number, y: number, w: number, h: number) => rectPath(x, y, w, h);
+  // each depth's outermost band stretches run on to PLAZA.civicExtent (hidden behind govB / govD at rest)
+  const [ex0, ex1] = PLAZA.civicExtent;
+  const minX = (dp: number) => Math.min(...PLAZA_CIVIC.filter((q) => q.depth === dp).map((q) => q.band[0]));
+  const maxX = (dp: number) => Math.max(...PLAZA_CIVIC.filter((q) => q.depth === dp).map((q) => q.band[1]));
   return PLAZA_CIVIC.map((c) => {
     const {x0, x1, top, cx, depth} = c;
     const near = depth === 2;
@@ -495,17 +506,32 @@ const CIV = (() => {
     const r = rng(`gp/civ/${c.id}`);
     // the low roofline band this silhouette owns (+ one raised roof block so it never reads as a flat slab)
     const [bx0, bx1] = c.band;
-    let d = R(bx0, bandTop, bx1 - bx0 + 0.5, base - bandTop);
+    const lx0 = bx0 === minX(depth) ? Math.min(bx0, ex0) : bx0;
+    const lx1 = bx1 === maxX(depth) ? Math.max(bx1, ex1) : bx1;
+    let d = R(lx0, bandTop, lx1 - lx0 + 0.5, base - bandTop);
     const bw = r.range(16, 26);
     const bxs = r.range(bx0 + 6, bx1 - bw - 6);
     d += R(bxs, bandTop - r.range(7, 12), bw, 14);
+    // the run-on past the old edge: two more raised blocks + a few window dots (own rng: the visible part is unchanged)
+    const rr = rng(`gp/civx/${c.id}`);
+    const extDots: number[] = [];
+    if (lx1 > bx1) {
+      for (let k = 0; k < 2; k++) {
+        const w = rr.range(22, 40);
+        const xs = bx1 + 16 + k * ((lx1 - bx1) / 2) + rr.range(0, (lx1 - bx1) / 2 - w - 24);
+        const y = bandTop - rr.range(8, 16);
+        d += R(xs, y, w, 18);
+      }
+      for (let x = bx1 + rr.range(10, 20); x < lx1 - 8; x += rr.range(18, 28)) if (rr.chance(0.42)) extDots.push(x);
+    }
     let lantern = '';
     let dots = '';
     const dot = (x: number, y: number, w: number, h: number) => (dots += R(x, y, w, h));
     if (c.kind === 'dome') {
       // drum with a cornice lip, a half-ellipse dome, a lantern (glazed: the lit window that pops off) with a pointed cap
-      const lanW = near ? 14 : 9;
-      const lanH = near ? 18 : 13;
+      // (fix round: the back dome's glazing 8 x 11, was 5 x 9; the near dome's 10 x 14)
+      const lanW = near ? 14 : 12;
+      const lanH = near ? 18 : 15;
       const rx = (x1 - x0) / 2 - 3;
       const ry = near ? 26 : 20;
       const domeTop = top + 6 + lanH;
@@ -549,14 +575,13 @@ const CIV = (() => {
     const dw = near ? 5 : back ? 3 : 4;
     const dh = near ? 6 : back ? 4 : 5;
     for (let x = bx0 + r.range(6, 14); x < bx1 - 8; x += r.range(16, 26)) if (r.chance(0.42)) dot(x, bandTop + (near ? 10 : 8), dw, dh);
+    extDots.forEach((x) => dot(x, bandTop + (near ? 10 : 8), dw, dh));
     return {...c, d, lantern, dots};
   });
 })();
 
-/** Paint order: back -> mid -> near (indices into CIV, which is left to right). */
-const CIV_DRAW = CIV.map((c, i) => [c.depth, i] as const)
-  .sort((a, b) => a[0] - b[0] || a[1] - b[1])
-  .map((q) => q[1]);
+/** Paint order: back -> mid -> near, each depth's indices into CIV (wave order). */
+const CIV_DEPTHS = [0, 1, 2].map((depth) => ({depth, idx: CIV.map((c, i) => (c.depth === depth ? i : -1)).filter((i) => i >= 0)}));
 
 /** The plaza's far steps under the far city's horizon line (kit v3b): a cream coping (the horizon line) and three
  *  flights that shrink with distance (8 / 12 / 20 px steps, cream nosings over half-sand risers: a quiet light field
@@ -564,11 +589,13 @@ const CIV_DRAW = CIV.map((c, i) => [c.depth, i] as const)
  *  last riser runs on under the plaza (hidden by it). */
 const FAR_STEPS = (() => {
   const CB = PLAZA.civicBase;
-  const x0 = 590;
-  const w = 250;
+  // x 590..840 is what shows at rest; the steps run on to PLAZA.civicExtent behind govB / govD (parallax under a dive)
+  const [x0, xe] = PLAZA.civicExtent;
+  const w = xe - x0;
   let cream = rectPath(x0, CB, w, 5);
   let half = '';
   let sand = '';
+  // paper outline (fix round): the coping (the horizon line) + the top edge of each of the 3 flights, not every nosing
   let lines = `M${x0} ${CB}H${x0 + w}`;
   let y = CB + 5;
   const flights: [number, number, 'half' | 'sand', number][] = [
@@ -577,17 +604,16 @@ const FAR_STEPS = (() => {
     [6, 20, 'half', 0],
   ];
   flights.forEach(([n, h, riser, landing]) => {
+    lines += `M${x0} ${y.toFixed(1)}H${x0 + w}`;
     for (let i = 0; i < n; i++) {
       const nose = Math.max(3, Math.round(h * 0.34));
       cream += rectPath(x0, y, w, nose);
       if (riser === 'sand') sand += rectPath(x0, y + nose, w, h - nose + 0.5);
       else half += rectPath(x0, y + nose, w, h - nose + 0.5);
-      lines += `M${x0} ${(y + nose).toFixed(1)}H${x0 + w}`;
       y += h;
     }
     if (landing) {
       cream += rectPath(x0, y, w, landing);
-      lines += `M${x0} ${y.toFixed(1)}H${x0 + w}`;
       y += landing;
     }
   });
@@ -602,7 +628,7 @@ const FarSteps: React.FC<{seed: string}> = ({seed}) => (
     <Fill d={FAR_STEPS.half} color={HALF.sand} offset={false} mode="none" seed={`${seed}/fstH`} />
     <Fill d={FAR_STEPS.cream} color={palette.cream} offset={false} mode="none" seed={`${seed}/fstC`} />
     <OnlyWhilePaper p={[715, 1260]}>
-      <Ink d={FAR_STEPS.lines} width={HAIR} taper={false} seed={`${seed}/fstE`} />
+      <Ink d={FAR_STEPS.lines} width={HAIR} taper={false} vary={0} seed={`${seed}/fstE`} />
     </OnlyWhilePaper>
   </>
 );
@@ -623,28 +649,36 @@ const FarCivic: React.FC<{off: boolean; offAt?: number | number[]; onAt?: number
   const lanternIdx = CIV.map((c, i) => CIV.slice(0, i).filter((q) => 'lantern' in q && q.lantern).length);
   return (
     <>
-      {CIV_DRAW.map((i) => {
-        const c = CIV[i];
-        const dark = latestState(t, [offs[i]], [ons[i]], off);
-        const [lit, drk] = CIVIC_FILL[c.depth];
-        let lanternOn = false;
-        if ('lantern' in c && c.lantern) {
-          // with civicLanternsOffAt a lantern stays lit through its dome's step until then (S01: the domes step on
-          // 'Europe', the lanterns go 0.25 s later) and relights with its dome; without it, it follows the dome
-          const lOff = lanternsOffAt !== undefined ? lanternsOffAt + lanternIdx[i] * 0.06 : undefined;
-          lanternOn = lanternsOffAt !== undefined ? !latestState(t, [lOff], [ons[i]], off) : !dark;
-        }
-        return (
-          <React.Fragment key={c.id}>
-            <Fill d={c.d} color={dark ? drk : lit} offset={false} mode="none" seed={`${seed}/civ${i}`} />
-            <Fill d={c.dots} color={dark ? palette.tealDark : palette.cream} offset={false} mode="none" seed={`${seed}/civd${i}`} />
-            {c.lantern ? <Fill d={c.lantern} color={lanternOn ? palette.cream : palette.tealDark} offset={false} mode="none" seed={`${seed}/civl${i}`} /> : null}
-          </React.Fragment>
-        );
-      })}
-      <OnlyWhilePaper p={[710, 1100]}>
-        <Ink d={CIV.map((c) => c.d).join('')} width={HAIR} taper={false} seed={`${seed}/civE`} />
-      </OnlyWhilePaper>
+      {CIV_DEPTHS.map(({depth, idx}) => (
+        <React.Fragment key={depth}>
+          {/* paper / line-art outline (fix round): the depth's whole path inked at 2x hairline UNDER its own fills, so
+              the fills (white while paper) keep only the outer half of the union outline (no band edges through the
+              domes, no roof blocks floating as boxes) and every nearer depth occludes the farther outlines */}
+          <OnlyWhilePaper p={[710, 1100]}>
+            <Ink d={idx.map((i) => CIV[i].d).join('')} width={HAIR * 2} taper={false} vary={0} seed={`${seed}/civE${depth}`} />
+          </OnlyWhilePaper>
+          {idx.map((i) => {
+            const c = CIV[i];
+            const dark = latestState(t, [offs[i]], [ons[i]], off);
+            const [lit, drk] = CIVIC_FILL[c.depth];
+            let lanternOn = false;
+            if ('lantern' in c && c.lantern) {
+              // with civicLanternsOffAt a lantern stays lit through its dome's step until then (S01: the domes step on
+              // 'Europe', the lanterns after) and relights with its dome; without it, it follows the dome. Fix round:
+              // a lantern NEVER goes dark before its own dome (the lanternsOffAt stagger is clamped to the dome's step)
+              const lOff = lanternsOffAt !== undefined ? Math.max(lanternsOffAt + lanternIdx[i] * 0.06, offs[i] ?? -Infinity) : undefined;
+              lanternOn = lanternsOffAt !== undefined ? !latestState(t, [lOff], [ons[i]], off) : !dark;
+            }
+            return (
+              <React.Fragment key={c.id}>
+                <Fill d={c.d} color={dark ? drk : lit} offset={false} mode="none" seed={`${seed}/civ${i}`} />
+                <Fill d={c.dots} color={dark ? palette.tealDark : palette.cream} offset={false} mode="none" seed={`${seed}/civd${i}`} />
+                {c.lantern ? <Fill d={c.lantern} color={lanternOn ? palette.cream : palette.tealDark} offset={false} mode="none" seed={`${seed}/civl${i}`} /> : null}
+              </React.Fragment>
+            );
+          })}
+        </React.Fragment>
+      ))}
     </>
   );
 };

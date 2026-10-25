@@ -90,6 +90,7 @@ Model: parallax factor `f = 1 - depth`; on screen `C + T + R(rot) * s_f * (p - C
 | `rot` | roll, degrees |
 | `anchor`, `anchorDepth`, `anchorTo` | keep world point `anchor` (in the layer of `anchorDepth`) at screen `anchorTo` (default: its rest position). Two consecutive keys with the same anchor keep it pinned through the move. **Anchor a push on the FAR city / the VP** (`anchorDepth` 0.8+) so the world grows and the foreground slides out |
 | `ease` | ease of a segment whose ends are both at rest. Default `CAM.ease` (inOutCubic); `CAM.slow` (inOutSine), `CAM.reveal` (trapezoid: sine ramp 25 %, cruise, soft landing 35 %; peak 1.43x the average speed), `CAM.settle` (outCubic: first segment only) |
+| `inkComp` | OPT-IN ink compensation for the segment arriving at this key (like `ease`; 0.6 = house): every `<Layer>` draws the engine's strokes at width x (layer scale now / at the segment start)^-inkComp, held after the segment (ENGINE.md 4b). Default off |
 
 **Crane vs tilt.** A `y` crane with the horizon in frame moves the depth-0 ground (and its vanishing lines) while the
 depth-1 sky and sun stay put: the horizon slides against the sun. Crane only with the horizon off-frame (shot B), or use

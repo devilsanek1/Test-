@@ -28,6 +28,8 @@ import {BackSoonTag, Bit, LabelTag, PowerGlyph, ShutterPadlock, StickyNote, SunP
 import {ABS, localBeats, SCENE} from './scene11/beats';
 import {camAt, camKeys, camMat, toScreen} from './scene11/camera';
 import {crtContent, GovBWindow, Pigeon, PlainPane, SillSnail} from './scene11/actors';
+import {BandClip, NearLamp, StepTreads} from './scene11/near';
+import {EdgeOnlooker} from './shared/props';
 import {backSoonW, NoteBreeze, NoteFlight, NoteStrike, PadlockRock, padlockShackleTop, Sparkle, StepRipple, TagTwirl} from './scene11/shims';
 import {Fill} from '../lib/Fill';
 import {Ink} from '../lib/Ink';
@@ -46,7 +48,9 @@ const PIP_W: Pt = [387, SILL_Y]; // the sill's left end (16 left of v1: his ear 
 // jamb), so he sits squarely on a ledge instead of hanging in front of govA's column
 const SILL = {x0: 404, x1: 632, horn: 350, depth: 9};
 const PIP_S = 1.2; // on-screen scale at zoom 1.6 (grows with the push like the sill)
-const BIT_SILL: Pt = [594, SILL_Y];
+// Bit waits on the sill between the padlock's spot (462) and the tag's left edge (~527): never under the tag's lettering
+// when it swings in, and his hop onto the shackle is a short one to the LEFT that never crosses the tag
+const BIT_SILL: Pt = [505, SILL_Y];
 const BIT_SIZE = 11; // world: ~18 px on screen
 // S01's govB padlock and tag (scene01/plaza.tsx S01_GOV.govB: padlock x 462 size 36, the lettered tag at x 566): the
 // SAME props (ShutterPadlock / BackSoonTag), the same seeds the set's rigs use ('plaza/govB/pl', 'plaza/govB/tag'), so
@@ -64,14 +68,15 @@ const SNAIL_AT: Pt = [641, SILL_Y]; // the sill's right end: its eye stalks stay
 // paper the notice's padding needs for 'UK NCSC · CERT-EU' at that size is 178 wide), right edge on the screen's right
 // frame, left edge with clear air to Pip's ear (Pip sits 8 world further left than v2 and leans less toward it)
 const NOTICE = {x: 534, y: 1083, w: 178, h: 63, fs: 20.5};
-// J6 on the closed shutter's right part: 132 x 103 world, 22 world lettering (~38 px at 1.71); its bottom (1080, the
-// tilted corner 1084) stays above the tag's nail (1094), its right edge clear of the jamb (622) and the cornice pigeon
-const NOTE = {x: 545, y: 1028, w: 132, h: 103};
+// J6 on the closed shutter's right part: 146 x 112 world, 24.5 world lettering (~42 px at 1.71: the joke reads at phone
+// size); right edge 618 < the jamb (622), top 972 > the box line (970), the tilted bottom corner ~1088 < the tag's nail
+// (1094)
+const NOTE = {x: 545, y: 1028, w: 146, h: 112};
 const NOTE_LINES = ['Turn it off', 'and on again'];
-const NOTE_FS = 22;
+const NOTE_FS = 24.5;
 const NOTE_ROT = -4;
 // the drop: from behind govB's cornice (its lower edge at world y 926 hides it), just left of the cornice pigeon
-const NOTE_FROM: Pt = [580, 896]; // fully hidden at the start (inside the cornice's span, x 396-640)
+const NOTE_FROM: Pt = [570, 890]; // fully hidden at the start (the tipped sheet x 497-643, bottom < 926: behind the cornice)
 const CORNICE_B = 926;
 const CORNICE_PIGEON: Pt = [640, 904];
 const BOX_PIGEON: Pt = [454, 952];
@@ -118,14 +123,23 @@ const Scene11: React.FC = () => {
       const ev = crtEv[id];
       const u = ev ? crtPhase(t, ev) : 0;
       // govC / govD are cut by the right edge: plain lit panes (their chrome dots and bars read as clutter there)
-      if (id !== 'govA') return <PlainPane r={r} inkW={id === 'govD' ? MID_CLOSE * (4 / 3.4) : MID_CLOSE} crt={u} seed={`s11/${id}/pane`} />;
+      // govC's brown shade strip (world x 800-840) read as an ochre patch beside the sun: painted in govC's facade tan
+      // under the pane (drawn in the slot, so the pane and its frame stay on top)
+      if (id === 'govC')
+        return (
+          <>
+            <Fill d={rectPath(802, 713, 38, 198)} color={palette.tan} offset={false} mode="none" seed="s11/govC/shade" />
+            <PlainPane r={r} inkW={MID_CLOSE * 0.85} crt={u} seed={`s11/${id}/pane`} />
+          </>
+        );
+      if (id !== 'govA') return <PlainPane r={r} inkW={MID_CLOSE} crt={u} seed={`s11/${id}/pane`} />;
       // govA's collapse sits at the left frame edge, on 'is' under its slamming shutter: the first visible frame is an
       // already-squashed band with a cream core and a peach halo (no full white screen popping at the edge)
       const content = u > 0.001 && u < 0.999 ? crtContent(Math.max(u, CRT.line * 0.85), `s11/${id}/crt`, palette.cream, palette.peach) : undefined;
       return <ChromeSlot x={r[0]} y={r[1]} w={r[2]} h={r[3]} width={MID_CLOSE} offAt={u >= 0.999 ? -1e6 : undefined} content={content} seed={`s11/${id}/bw`} />;
     }
     return (
-      <GovBWindow r={r} steps={steps} hiccups={[b.ringHiccup1, b.barBack]} barsAt={[b.ringHiccup1 - 0.12, b.barFlicker - 0.03, b.earFlick - 0.03]} barsX0={NOTICE.x - NOTICE.w / 2 - r[0] + 3} reloadAt={[b.snailCrawl + 0.05]} shakeAt={b.barBack} flickerAt={b.barFlicker} ringR={12.5} inkW={MID_CLOSE} seed="s11/govB">
+      <GovBWindow r={r} steps={steps} hiccups={[b.ringHiccup1, b.barBack]} barsAt={[b.ringHiccup1 - 0.12, b.barFlicker - 0.03, b.earFlick - 0.03]} barsX0={NOTICE.x - NOTICE.w / 2 - r[0] + 3} reloadAt={[b.snailCrawl + 0.05]} shakeAt={b.barBack} flickerAt={b.barFlicker} ringR={12.5} alertAt={b.barBack} inkW={MID_CLOSE} seed="s11/govB">
         <LabelTag kind="notice" x={NOTICE.x} y={NOTICE.y} w={NOTICE.w} h={NOTICE.h} lines={['FBI · NSA', 'UK NCSC · CERT-EU']} fontSize={NOTICE.fs} minFont={20.5} at={b.notice} rot={-1} inkPx={2.2} seed="s11/L14" />
       </GovBWindow>
     );
@@ -170,7 +184,7 @@ const Scene11: React.FC = () => {
     {t: b.glanceSun, pose: 'sit-back', look: 1, rot: 3, up: 0.08},
     {t: b.press - 0.2, pose: 'sit-back', look: 1, rot: 7, up: 0.03}, // braces, leaning toward the sun as it gets pressed
     {t: b.shutter + 0.06, pose: 'sit-back', look: 0.2, rot: -5},
-    {t: b.padlock + 0.04, pose: 'sit-back', look: 0.6, rot: 4}, // the click: he glances at the padlock
+    {t: b.padlock + 0.1, pose: 'sit-back', look: 0.6, rot: 4}, // the click: he glances at the padlock
     {t: b.pigeonLand + 0.08, pose: 'sit-back', look: 0.3, rot: -2, up: 0.08}, // a pigeon lands right above him: he looks up
     {t: b.noteSlap + 0.2, pose: 'sit-back', look: 1, rot: 7},
     {t: b.shrug, pose: 'shrug', look: 0.8, expression: 'meh', rot: 3},

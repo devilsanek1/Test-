@@ -53,8 +53,9 @@ export const NoteBreeze: React.FC<{
  *  opens toward the shutter as it falls (scaleY -> 1, one flutter dip), sways on the breeze and settles its spin; it shows its BLANK
  *  BACK the whole way (no lettering in flight: the words are the punchline on 'tech') and paper-flips to the lettered
  *  face over the last `flipDur` (scaleX 1 -> 0 -> 1), arriving at `arriveAt` where the slapping note takes over.
- *  Motion: y falls with gravity (0.75 q + 0.25 q^2), x is pushed by the breeze and eases out (1 - (1 - q)^2): no linear
- *  tween, the speed stays <= ~30 px / frame at this zoom. Nothing before `arriveAt - dur` or after `arriveAt`. */
+ *  Motion: y falls with a light gravity (0.85 q + 0.15 q^2), x is pushed by the breeze and eases out (1 - (1 - q)^2) with
+ *  1.5 sways and a decaying spin: no linear tween, the fall stays <= ~20 px / frame at this zoom (the 0.15 s flip's
+ *  edges are faster: a paper flip). Nothing before `arriveAt - dur` or after `arriveAt`. */
 export const NoteFlight: React.FC<{
   /** Rest centre (world). */
   x: number;
@@ -70,15 +71,17 @@ export const NoteFlight: React.FC<{
   back: React.ReactNode;
   face: React.ReactNode;
   id?: string;
-}> = ({x, y, from, arriveAt, dur, clipY, flipDur = 0.1, back, face, id = 's11-noteclip'}) => {
+}> = ({x, y, from, arriveAt, dur, clipY, flipDur = 0.15, back, face, id = 's11-noteclip'}) => {
   const t = useTime();
   if (t < arriveAt - dur || t >= arriveAt) return null;
   const q = (t - (arriveAt - dur)) / dur;
   const fx = 1 - (1 - q) * (1 - q);
-  const fy = 0.75 * q + 0.25 * q * q;
-  const px = from[0] + (x - from[0]) * fx + 7 * Math.sin(q * Math.PI * 2) * (1 - q);
+  // fix round 1: a flatter fall (0.85 q + 0.15 q^2: the end speed is only 1.15 x the mean, <= ~20 px / frame at 1.69 over
+  // the 0.42 s drop) and TWO sways on the breeze (x and spin), so it reads as a sheet fluttering down, not a dropped card
+  const fy = 0.85 * q + 0.15 * q * q;
+  const px = from[0] + (x - from[0]) * fx + 7 * Math.sin(q * Math.PI * 3) * (1 - q);
   const py = from[1] + (y - from[1]) * fy;
-  const a = 9 * (1 - q) * Math.cos(q * Math.PI * 1.5);
+  const a = 7 * (1 - q) * Math.cos(q * Math.PI * 2.5);
   // tipped back as it slips out (scaleY 0.45), opening toward the shutter as it falls, with one flutter dip
   const sy = Math.min(1, 0.45 + 0.55 * E.outCubic(Math.min(1, q / 0.75)) - 0.12 * Math.sin(Math.min(1, q / 0.75) * Math.PI));
   // the paper flip: back folds edge-on, the lettered face unfolds

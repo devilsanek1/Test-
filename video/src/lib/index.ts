@@ -10,6 +10,7 @@ export * from './exit';
 export * from './persp';
 export * from './stage';
 export * from './Ink';
+export * from './inkComp';
 export * from './Fill';
 export * from './motion';
 export * from './Card';

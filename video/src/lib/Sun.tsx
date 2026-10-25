@@ -25,6 +25,7 @@ import {Ink} from './Ink';
 import {arc, line} from './sketch';
 import {MOTION} from './spec';
 import {useStageKind} from './stage';
+import {useInkScale} from './inkComp';
 
 export type SunMove = {at: number; dur?: number; x?: number; y?: number; r?: number; ease?: Ease};
 export type SunBeat = number | {t: number; amp?: number};
@@ -243,6 +244,7 @@ export const ClockHands: React.FC<{r: number; at?: number; speed?: number; color
   ticks = true,
 }) => {
   const t = useTime();
+  const w = width * useInkScale(); // opt-in camera ink compensation (inkComp.tsx)
   if (t < at) return null;
   const pop = springAt(t, at, springs.pop);
   const run = Math.max(0, t - at - 0.3);
@@ -258,12 +260,12 @@ export const ClockHands: React.FC<{r: number; at?: number; speed?: number; color
         {ticks
           ? [0, 90, 180, 270].map((a) => {
               const rad = (a * Math.PI) / 180;
-              return <line key={a} x1={Math.cos(rad) * r * 0.72} y1={Math.sin(rad) * r * 0.72} x2={Math.cos(rad) * r * 0.84} y2={Math.sin(rad) * r * 0.84} stroke={color} strokeWidth={width * 0.8} strokeLinecap="round" />;
+              return <line key={a} x1={Math.cos(rad) * r * 0.72} y1={Math.sin(rad) * r * 0.72} x2={Math.cos(rad) * r * 0.84} y2={Math.sin(rad) * r * 0.84} stroke={color} strokeWidth={w * 0.8} strokeLinecap="round" />;
             })
           : null}
-        <path d={hand(hA, r * 0.38)} stroke={color} strokeWidth={width * 1.15} strokeLinecap="round" fill="none" />
-        <path d={hand(mA, r * 0.6)} stroke={color} strokeWidth={width} strokeLinecap="round" fill="none" />
-        <circle r={width * 0.9} fill={color} />
+        <path d={hand(hA, r * 0.38)} stroke={color} strokeWidth={w * 1.15} strokeLinecap="round" fill="none" />
+        <path d={hand(mA, r * 0.6)} stroke={color} strokeWidth={w} strokeLinecap="round" fill="none" />
+        <circle r={w * 0.9} fill={color} />
       </g>
     </ExitFade>
   );

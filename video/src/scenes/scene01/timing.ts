@@ -39,8 +39,9 @@ export const B = {
   pigeonsLand: 0.885,
   // 'Europe' w3: the far civic skyline steps dark as WHOLE shapes, left to right, 0.06 s apart
   civicOff: [1.155, 1.215, 1.275],
-  // the two far domes' lanterns pop off ON their dome's step (domeB is silhouette 2, domeF 3 of the left-to-right wave),
-  // so each step is one visible light event (fix round 1; was w3+0.25)
+  // the two far domes' lanterns: kit v3b PLAZA_CIVIC wave order (domeF 0, templeM 1, spireB 2, spireM 3, domeB 4,
+  // templeF 5) steps domeF 1.155 ... templeF 1.455; with civicLanternsOffAt 1.215 domeF's lantern pops 1.215 (one step
+  // after its dome) and domeB's WITH its dome at 1.395 (the kit never darkens a lantern before its dome)
   civicLanterns: [1.215, 1.275],
   // w3+0.25: a citizen and the left edge onlooker raise phones (lit screens)
   phonesUp: 1.405,
@@ -76,8 +77,15 @@ export const B = {
   domeLanternOff: 3.955,
   headsBack: 3.955,
   padlockGlint: [3.955, 3.985, 4.015],
-  // cut(purpose)-0.45: a small ink ring pops around govB's lock box
-  lockRing: 4.265,
+  // the left edge onlooker lowers his phone in the pause before the dive (fix round 4: down by 4.28, so his arm hangs
+  // again when the dive pulls him out of frame)
+  onlookerPhoneDown: 4.03,
+  // cut(purpose)-0.53: an ink ring POPS around govB's lock box (fix round 4: 0.08 s earlier than the resolved 4.265
+  // anchor and a pop instead of a draw-on, so it reads fully by f126 and holds ~0.2 s before the dive)
+  lockRing: 4.185,
+  // Pip's take-off toward the lens (fix round 4: after a 2-frame crouch from 4.275; 1 frame before the dive so the
+  // screen-space leap reaches S02's pickup at ~51-65 px per frame)
+  pipExit: 4.35,
   // cut(purpose)-0.33: the dive (fixed 0.33 s, in(quad)); Pip hops toward the lens
   dive: 4.385,
   cut: 4.715,
