@@ -144,6 +144,19 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
 - 09:35: wave 1 run wf_47287152-c9b done: S01|S02 PASS 8.5, S03|S04 PASS 9 (minors: the sun disc clips the right
   frame edge by 10-25 px around touch-down f431-436 (optional: GLIDE.touch -> ~(965, 672)); the S03/S04 notes say
   the caption out is 'requested', it is applied). Wave 2 S02|S03 launched early: wf_b47a06a5-d94 (both sides free).
+- ~09:45: WEEKLY USAGE LIMIT hit (resets 2026-10-26 10:00 UTC). Every running agent failed:
+  - S05|S06: the owner finished (Pip's leap now carries across the cut, apex on the cut; S05 shim Messenger gone);
+    its verifier died. The orchestrator applied its CROSS-LANE (page 9 `out` 19.77 ('was.' ends 19.565); EDGE_HINTS.S06
+    keep [0,990,270,1700]) and checked Main f586-f601 by eye: Pip in colour at the left edge on S06 f594, band empty
+    from f594, 'They gave the PHP' rolls in at f599. Still owed: an independent verify.
+  - S11|S12 verified PASS 8 (7 minors). S01|S02 PASS 8.5, S03|S04 PASS 9.
+  - S02|S03 owner died after 40 s (no edits).
+  - A1: S09 fix r2 died mid-round (its edits so far are committed; tsc clean; renders checked in the 10:06 check-in).
+    S10 fix r2 done, never re-reviewed. Final A1 scores: S07 8 / 8.5, S08 7 / 8.5, S09 8 / 8, S10 7.5 / 8.5 (+fix).
+  - S08 dedicated pass: its round-1 reviewers died, nothing changed.
+  RESUME PLAN (after the reset): (1) S09 scene-polish prebuilt, rounds 2 (fresh review of the half-done fix r2);
+  (2) S08 dedicated pass (same args as wf_e36892f5-1e2); (3) S10 re-review (scene-polish, rounds 1); (4) verify
+  S05|S06; (5) S02|S03; (6) A2b edge hints S07/S09/S10; (7) remaining cuts: S09|S10, S07|S08, then wave 2.
 - Sound (phase D): S03|S04 owner notes two `whoosh_soft` cues 0.225 s apart for the one sun hop (13.945 and 14.17):
   keep 13.945, drop or soften 14.17.
 

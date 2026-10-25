@@ -8,7 +8,7 @@
   {"s":11.795,"e":14.395,"lines":[{"text":"about seven out of ten","s":11.795},{"text":"websites run on it.","s":12.905}],"highlights":[{"text":"seven out of ten","s":11.955}],"out":14.04},
   {"s":14.395,"e":16.61,"lines":[{"text":"This bug was in there","s":14.395},{"text":"for like fourteen years","s":15.195}],"highlights":[{"text":"fourteen years","s":15.49}]},
   {"s":16.61,"e":18.705,"lines":[{"text":"before researchers","s":16.61},{"text":"using AI figured out","s":17.435}],"highlights":[{"text":"AI","s":17.705}]},
-  {"s":18.705,"e":19.98,"lines":[{"text":"how bad it was.","s":18.705}],"highlights":[{"text":"bad","s":18.87}]},
+  {"s":18.705,"e":19.98,"lines":[{"text":"how bad it was.","s":18.705}],"highlights":[{"text":"bad","s":18.87}],"out":19.77},
   {"s":19.98,"e":22.05,"lines":[{"text":"They gave the PHP","s":19.98},{"text":"people a heads-up,","s":20.92}],"highlights":[{"text":"heads-up,","s":21.285}]},
   {"s":22.05,"e":24.095,"lines":[{"text":"but word got out before","s":22.05},{"text":"the fix was ready,","s":23.055}],"highlights":[{"text":"word got out","s":22.155}]},
   {"s":24.095,"e":26.79,"lines":[{"text":"and hackers were","s":24.095},{"text":"already trying to use it.","s":24.92}],"highlights":[{"text":"already","s":24.92}]},

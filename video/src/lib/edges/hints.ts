@@ -107,7 +107,9 @@ export const EDGE_HINTS: Record<string, EdgeHints> = {
     // bare corner: bottom-right (the shrub and the bench as line art). Measured without the white page of the last
     // 0.15 s (paper on a white page does not show). bl 0.2 by hand: under the kept cart there is only flat pavement
     ink: {tl: 0.3, tr: 0.26, br: 0.49, bl: 0.2, left: 1, right: 1, bottom: 0},
-    keep: [[0, 1240, 270, 1700]], // the messenger entering at the left edge, the cart, Pip on it
+    // the messenger entering at the left edge, the cart, Pip on it, and Pip's leap in above the messenger's head
+    // (19.80-20.07, cut S05|S06)
+    keep: [[0, 990, 270, 1700]],
   },
   S11: {
     // bare corner: bottom-right (govC's steps). bl 0.25 by hand: the lamp's foot and the onlookers fill it, so it
