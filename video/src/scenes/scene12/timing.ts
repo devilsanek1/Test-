@@ -122,6 +122,11 @@ export const P_W0 = 4.45;
  *  (54.96, was 55.04) and frame 0 on f87 (film 55.063, +1.6 frames from the storyboard's 55.01, was +3.6), held 9 frames.
  *  Pip's reversed startle hop runs on its own 3-pose tape from 'there' (PIP_R_STEPS below), so steps 4-5 only carry
  *  the rest of the plaza.
+ *  Fix round 3: step 14 is W 0.115 (was 0.30, S01's ripple was already gone, so the ring and the press ticks popped in
+ *  on f84 near their emission radius): f82 shows the ring out at ~r185 with the sun nearly released, f84 (W 0.02)
+ *  ~r160 / ~0.93, f87 (W 0) r155 / 0.88: a three-pose reversed press. The crossbar pigeons and the front walker fC run
+ *  on their own stepped clocks (PIGEON_R_STEPS from 'even', WALKER_R_STEPS from 'a', below), so their reversed beats
+ *  land on their storyboard words instead of following the tape's S01 order.
  *    k  local  film   word      W     the pose
  *    0  1.547  53.71  'before'  4.45  the plaza as S01 left it (the rewind glyph pops in)
  *    1  1.630  53.79            3.80  the tags swing back UP (govA's shrinking, govB's swinging)
@@ -135,14 +140,16 @@ export const P_W0 = 4.45;
  *    7  2.130  54.29            1.66  govA's up (govA one step lighter); govB's half way
  *    8  2.213  54.38  'even'    1.36  govB's up; the far civic silhouettes relight right to left (two lit)
  *    9  2.297  54.46            1.20  five lit
- *   10  2.380  54.54  'a'       0.98  all lit; govC's screen un-collapses (dot); the first pigeon lifts off backwards
- *   11  2.463  54.63            0.82  govC's screen lit; the pigeons fly backwards off the crossbar
+ *   10  2.380  54.54  'a'       0.98  all lit; govC's screen un-collapses (dot) (the front walker's own tape starts:
+ *                                     WALKER_R_STEPS)
+ *   11  2.463  54.63            0.82  govC's screen lit
  *   12  2.547  54.71  'fix.'    0.70  govA's screen comes back as the bright line
  *   13  2.630  54.79            0.55  govA's screen lit
- *   14  2.713  54.88            0.30  heads swap back, the walker walks backwards, the pigeons fly out backwards,
- *                                     Pip's look at govB undone; govB's screen still dark
+ *   14  2.713  54.88            0.115 heads swap back, Pip's look at govB undone; govB's screen the dot; the ripple
+ *                                     ring out at ~r185, the sun nearly released (fix round 3: was 0.30)
  *   15  2.797  54.96  END-0.40  0.02  ONE STEP BEFORE THE PRESS: govB's dot grows back to the line, the sun squashes
- *                                     DOWN (release scale ~0.93, half way to 0.88), the ripple contracts
+ *                                     DOWN (release scale ~0.93, half way to 0.88), the ripple contracts to ~r160, the
+ *                                     press ticks back
  *   16  2.880  55.04            0     frame 0 (first drawn f87, 55.063): the bottom of the press (0.88), ripple + press
  *                                     ticks at their emission radius; held 9 frames to the seam (only Bit and the
  *                                     caption roll move)
@@ -162,7 +169,7 @@ export const R_STEPS: number[] = [
   S01.crtC - 0.065,
   S01.crtA + 0.07,
   S01.crtA - 0.08,
-  S01.heads - 0.04,
+  S01.pipFlinch - 0.005,
   0.02,
   0,
 ];
@@ -177,6 +184,29 @@ export const DOME_LANTERN_R = (S01.pipHop + S01.pipLand) / 2 + 0.01;
  *  shared tape again (sit-back, the hop undone). */
 export const PIP_R0 = W.there - 0.02;
 export const PIP_R_STEPS: number[] = [S01.pipLand - 0.01, (S01.pipHop + S01.pipLand) / 2, S01.pipHop + 0.03];
+
+/** A stepped own clock for one actor (12 fps from `r0`, one S01 time per step); after its last step it follows the shared
+ *  tape but never runs back up past that step (min), so it lands on W 0 with everything else. */
+function ownTape(t: number, r0: number, steps: number[]): number {
+  if (t < r0) return s01Clock(t);
+  const k = Math.floor((t - r0) * REWIND_FPS + 1e-6);
+  return k < steps.length ? steps[k] : Math.min(steps[steps.length - 1], s01Clock(t));
+}
+
+/** Fix round 3 (review: on the shared tape the pigeons' reversed landing played on 'a' / 'fix.' and the walker's on step
+ *  14, 5-15 frames after their storyboard words, because the tape replays S01's true event order). The crossbar pigeons
+ *  get their OWN tape from 'even' - 0.02 (f67): wings out on the perch (W 0.85, S01's last instant of the fly-in), mid
+ *  flight back along the arc (0.5), at the left edge (0.2), gone (0.02: no pigeon before S01's landAt 0.12). */
+export const PIGEON_R0 = W.even - 0.02;
+export const PIGEON_R_STEPS: number[] = [S01.pigeonsLand - 0.035, 0.5, 0.2, 0.02];
+export const pigeonClockR = (t: number) => ownTape(t, PIGEON_R0, PIGEON_R_STEPS);
+/** The front walker fC (S01: walking away at frame 0, slows 0.26, stops 0.38 on 'Governments' with a 3/4 head toward
+ *  govB) gets his own tape from 'a' - 0.02 (f72): un-stopped, head back to the back view, leaning upright (0.30), then
+ *  two walk-cycle poses backwards (0.15, 0.02); W 0 with the rest on f87. */
+export const WALKER_SEED = 's01/fC';
+export const WALKER_R0 = W.a - 0.02;
+export const WALKER_R_STEPS: number[] = [S01.heads - 0.04, 0.15, 0.02];
+export const walkerClockR = (t: number) => ownTape(t, WALKER_R0, WALKER_R_STEPS);
 
 /** The tape step index at S12-local t (0 on 'before'). */
 export const stepIndex = (t: number) => Math.floor((t - R0) * REWIND_FPS + 1e-6);

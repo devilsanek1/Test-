@@ -619,23 +619,35 @@ const groundStep = (t: number, node: React.ReactNode): React.ReactNode => {
   return <Tod map={t < GROUND_B_AT ? GROUND_A : GROUND_B}>{node}</Tod>;
 };
 
-/** A1's foreground: the set's near kerb + a back-view onlooker cropped by the bottom-left edge, head inside the visible
- *  band (screen ~(26, 1360)), facing up the street toward the dawn. A2 has none (it would be cut away by the match). */
+/** A1's foreground: the set's near kerb + two back-view onlookers cropped by the bottom edges, heads in the visible band
+ *  (left ~(26, 1360) as before, Pip crouching half behind its head at the cut; fix round 3: a second one at the bottom
+ *  right (~(1014, 1380)) so the relit bottom band has weight), watching the dawn up the street. */
 const A1_FOREGROUND = (
   <>
     <Foreground spec="kerb" seed="stoop/fg/kerb" />
     <EdgeFigure side="L" x={40} y={1420} head={128} seed="s9edge" />
+    <EdgeFigure side="R" x={1046} y={1446} head={122} body={palette.brown} hair="bun" acc={['scarf']} seed="s9edgeR" />
+  </>
+);
+/** A2's foreground (fix round 3, the reviewer's head-and-shoulders pair): the SAME left onlooker (world-consistent: A2
+ *  screen ~(105, 1740), head ~190 px) and a second one near the stoop's right end (screen ~(945, 1770)), both cropped by
+ *  the bottom edge, left and right of the action column (crate, lock, keeper at screen x 330-765). In the Part B ghost
+ *  they leave with the near layer on the build's first step. */
+const A2_FOREGROUND = (
+  <>
+    <EdgeFigure side="L" x={40} y={1420} head={128} seed="s9edge" />
+    <EdgeFigure side="R" x={604} y={1444} head={124} body={palette.sand} hair="short" acc={['scarf']} seed="s9edgeA2" />
   </>
 );
 
-/** The walker kept off the sun's column: a small figure on the right pavement walking up toward the VP, and two
- *  back-view pedestrians on the near pavement below the stoop (A1 screen y ~1330-1480, the action-safe band; left of the
- *  cart's maker), walking up the street toward the dawn. They stop just before the hidden cut (the A2 frame keeps their
- *  heads at its bottom edge, and the Part B ghost freezes on exactly that frame). */
+/** The people layer, all walking up the RIGHT pavement toward the dawn (kept off the sun's column, out of the A2 close):
+ *  a far figure, and (fix round 3, scale by depth) the two pedestrians moved up-street behind the cart line, at adult
+ *  height for their depth (0.68 x the feet's depth under the eye line at screen 1000: 138 / 156 px at feet screen ~1202 /
+ *  ~1230; the far figure 104 px at 1132). They stop just before the hidden cut. */
 const WALKERS: WalkerAnchor[] = [
   {x: 842, y: 1192, h: 104, go: 'vp', pace: 0.04, body: palette.teal, hair: 'short'},
-  {x: 300, y: 1544, h: 140, go: 'vp', pace: 0.05, body: palette.brown, hair: 'bun'},
-  {x: 452, y: 1528, h: 128, go: 'vp', pace: 0.05, body: palette.sage, hair: 'short', acc: ['backpack']},
+  {x: 884, y: 1262, h: 138, go: 'vp', pace: 0.05, body: palette.brown, hair: 'bun'},
+  {x: 972, y: 1290, h: 156, go: 'vp', pace: 0.05, body: palette.sage, hair: 'short', acc: ['backpack']},
 ];
 export const GHOST_AT = B.hidden - 1 / 30;
 
@@ -717,7 +729,7 @@ export const PartA: React.FC<{ghost?: boolean; ghostStep?: number}> = ({ghost = 
         heroLock={false}
         calendar={false}
         pigeons={false}
-        foreground={a2 ? false : A1_FOREGROUND}
+        foreground={a2 ? A2_FOREGROUND : A1_FOREGROUND}
         furniture={[{kind: 'bike', x: 930, y: 1462, s: 0.95}]}
         people={{walkers: WALKERS, walk: 0, stop: GHOST_AT}}
         heroSlot={

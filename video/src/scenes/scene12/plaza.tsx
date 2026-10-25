@@ -18,7 +18,7 @@ import {Pigeon, PipS01, PlazaCitizen} from '../scene01/cast';
 import {DOME_GLASS, LanternOff, S01Shutter} from '../scene01/shims';
 import {DoorLanterns, PressTicks, S01Branch, S01Glyph, SunRipple, TreeTicks} from '../scene01/dressing';
 import {layerMat} from './camera';
-import {B, DOME_LANTERN_R, inRewind, pipClockR, s01Clock} from './timing';
+import {B, DOME_LANTERN_R, inRewind, pigeonClockR, pipClockR, s01Clock, WALKER_SEED, walkerClockR} from './timing';
 import {BitHome, CITIZEN_ORDER, DidSparkles, OnlookersP, P_CITIZENS, P_GOV, P_PIGEONS, PipP, P_NEAR, R_CITIZENS, R_GOV, R_NEAR, R_PIGEONS, R_PIP, S11Note, SB_SEED, SbPoint} from './cast';
 
 const SUN = PLAZA.sun; // (720, 900) r155
@@ -82,10 +82,19 @@ export const PlazaRewind: React.FC = () => {
       <>
         {CITIZEN_ORDER.map((i) => {
           const sb = !rew && citizens[i].seed === SB_SEED;
+          // fix round 3: the front walker plays back on his own tape from 'a' (timing.ts WALKER_R_STEPS)
+          const own = rew && citizens[i].seed === WALKER_SEED;
+          const fig = <PlazaCitizen p={citizens[i]} vp={VP} horizon={HZ} />;
           return (
             <React.Fragment key={i}>
               {sb ? <SbPoint p={citizens[i]} rim /> : null}
-              <PlazaCitizen p={citizens[i]} vp={VP} horizon={HZ} />
+              {own ? (
+                <TimeProvider global={walkerClockR(t)} offset={0}>
+                  {fig}
+                </TimeProvider>
+              ) : (
+                fig
+              )}
               {sb ? <SbPoint p={citizens[i]} /> : null}
             </React.Fragment>
           );
@@ -95,9 +104,16 @@ export const PlazaRewind: React.FC = () => {
     near: (
       <>
         <TreeTicks />
-        {pigeons.map((p) => (
-          <Pigeon key={p.seed} p={p} />
-        ))}
+        {/* fix round 3: in the rewind the crossbar pigeons play back on their own tape from 'even' (PIGEON_R_STEPS) */}
+        {rew ? (
+          <TimeProvider global={pigeonClockR(t)} offset={0}>
+            {pigeons.map((p) => (
+              <Pigeon key={p.seed} p={p} />
+            ))}
+          </TimeProvider>
+        ) : (
+          pigeons.map((p) => <Pigeon key={p.seed} p={p} />)
+        )}
         {rew ? (
           <TimeProvider global={pipClockR(t)} offset={0}>
             <PipS01 p={R_PIP} seed={S01_PIP_SEED} />

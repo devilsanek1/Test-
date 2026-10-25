@@ -11,7 +11,8 @@ import {GovEvents, PLAZA} from '../shared/sets';
 import {Bit, bitPath, EdgeOnlooker, FigureArm, StickyNote} from '../shared/props';
 import {matScale} from '../shared/props/common';
 import {Ink} from '../../lib/Ink';
-import {speedLines} from '../../lib/sketch';
+import {blob, speedLines} from '../../lib/sketch';
+import {Fill} from '../../lib/Fill';
 import {mat, useXf, XG} from '../../lib/xf';
 import {palette} from '../../lib/theme';
 import {S01_PADLOCK_SIZE} from '../scene01/shims';
@@ -47,7 +48,11 @@ export const SB_SEED = 's01/sB';
  *  neighbour's backpack edge it grazes at the shoulder. Mirrors PlazaCitizen's figure frame (scene01/
  *  cast.tsx: TORSO 95, LEG 62, FIG_H 199, the person rng's torso width, ink by height, the point raise / lower eases).
  *  Reads the S01 clock (P phase). */
-const SB_POINT = {at: pc(B.point), downAt: pc(B.pointDown), hand: [-60, -218] as [number, number], w: 21, bend: 12} as const;
+/** Fix round 3 (review: ~58 px and ~12 deg off vertical read as a raised hand, not a point at govB): ~75 px on screen
+ *  (~184 person units), tilted ~23 deg toward govB's shuttered window (~25 deg on screen with his -2 lean), so the line
+ *  of the arm runs on to the shutter; a MITTEN hand (`SbMitten`, longer than wide, along the forearm) at the tip with
+ *  the 1.8 px cream rim. */
+const SB_POINT = {at: pc(B.point), downAt: pc(B.pointDown), hand: [-105, -245] as [number, number], w: 21, bend: 12} as const;
 const FIG = {TORSO: 95, LEG: 62, H: 199} as const;
 export const SbPoint: React.FC<{p: CitizenPlan; rim?: boolean}> = ({p, rim}) => {
   const t = useTime();
@@ -75,7 +80,37 @@ export const SbPoint: React.FC<{p: CitizenPlan; rim?: boolean}> = ({p, rim}) => 
   const W = (p.h >= 120 ? 3.4 : p.h >= 70 ? 2.2 : 1.6) / s;
   return (
     <XG m={m}>
-      {rim ? <SbRim sh={sh} el={el} hand={hand} w={SB_POINT.w} /> : <FigureArm sh={sh} hand={hand} elbow={el} w={SB_POINT.w} coat={p.body ?? palette.brown} W={W * 0.85} seed={`${p.seed}/pt12`} />}
+      {rim ? (
+        <SbRim sh={sh} el={el} hand={hand} w={SB_POINT.w} />
+      ) : (
+        <>
+          <SbMitten el={el} hand={hand} w={SB_POINT.w} W={W * 0.8} seed={`${p.seed}/pt12`} />
+          <FigureArm sh={sh} hand={hand} elbow={el} w={SB_POINT.w} coat={p.body ?? palette.brown} W={W * 0.85} hand2={false} seed={`${p.seed}/pt12`} />
+        </>
+      )}
+    </XG>
+  );
+};
+/** The pointing mitten (fix round 3): a sand mitten past the cuff, along the forearm (1.35 w long, 0.94 w wide, a thumb bump
+ *  on the upper side), inked; drawn before the sleeve so the cuff overlaps its root. */
+const mittenGeom = (el: [number, number], hand: [number, number], w: number) => {
+  const fx = hand[0] - el[0];
+  const fy = hand[1] - el[1];
+  const fL = Math.hypot(fx, fy) || 1;
+  const L = w * 1.35;
+  const c: [number, number] = [hand[0] + (fx / fL) * L * 0.42, hand[1] + (fy / fL) * L * 0.42];
+  return {c, ang: (Math.atan2(fy, fx) * 180) / Math.PI, rx: L / 2, ry: w * 0.47};
+};
+const SbMitten: React.FC<{el: [number, number]; hand: [number, number]; w: number; W: number; seed: string}> = ({el, hand, w, W, seed}) => {
+  const {c, ang, rx, ry} = mittenGeom(el, hand, w);
+  const body = blob(0, 0, rx, ry, {seed: `${seed}/mit`, wobble: 0.03});
+  const thumb = blob(-rx * 0.25, -ry * 0.95, rx * 0.34, ry * 0.42, {seed: `${seed}/thb`, wobble: 0.03});
+  return (
+    <XG m={mat.compose(mat.translate(c[0], c[1]), mat.rotate(ang))}>
+      <Fill d={thumb} color={palette.sand} offset={false} mode="none" seed={`${seed}/thf`} />
+      <Ink d={thumb} width={W} taper={false} seed={`${seed}/thi`} />
+      <Fill d={body} color={palette.sand} offset={false} mode="none" seed={`${seed}/mf`} />
+      <Ink d={body} width={W} taper={false} seed={`${seed}/mi`} />
     </XG>
   );
 };
@@ -83,15 +118,14 @@ export const SbPoint: React.FC<{p: CitizenPlan; rim?: boolean}> = ({p, rim}) => 
 const SbRim: React.FC<{sh: [number, number]; el: [number, number]; hand: [number, number]; w: number; px?: number}> = ({sh, el, hand, w, px = 1.8}) => {
   const k = Math.max(1e-4, matScale(useXf()));
   const r = px / k;
-  const fx = hand[0] - el[0];
-  const fy = hand[1] - el[1];
-  const fL = Math.hypot(fx, fy) || 1;
-  const hc: [number, number] = [hand[0] + (fx / fL) * w * 0.28, hand[1] + (fy / fL) * w * 0.28];
-  const hr = w * 0.44 + r;
+  const {c, ang, rx, ry} = mittenGeom(el, hand, w);
   return (
     <>
       <path d={`M${sh[0]} ${sh[1]}L${el[0]} ${el[1]}L${hand[0]} ${hand[1]}`} fill="none" stroke={palette.cream} strokeWidth={w + 2 * r} strokeLinecap="round" strokeLinejoin="round" />
-      <path d={`M${hc[0] - hr} ${hc[1]}a${hr} ${hr} 0 1 0 ${2 * hr} 0a${hr} ${hr} 0 1 0 ${-2 * hr} 0Z`} fill={palette.cream} />
+      <XG m={mat.compose(mat.translate(c[0], c[1]), mat.rotate(ang))}>
+        <ellipse cx={0} cy={0} rx={rx + r * 1.4} ry={ry + r * 1.4} fill={palette.cream} />
+        <ellipse cx={-rx * 0.25} cy={-ry * 0.95} rx={rx * 0.34 + r * 1.4} ry={ry * 0.42 + r * 1.4} fill={palette.cream} />
+      </XG>
     </>
   );
 };
@@ -160,27 +194,41 @@ export const padlockAt = (id: Gid, ev: GovEvents): [number, number] => {
 /** The phone-readable 'did' glint (fix round 1: S01's padlock glint rays are ~3 px ticks at phone size): a cream
  *  4-point sparkle with an ink rim (the sketch 'glint' language, as S11's lock sparkle) pops full size for one frame at
  *  the upper-right corner of each padlock body, then shrinks away by scale over 0.2 s. `t` = S12-local. */
-const Sparkle: React.FC<{x: number; y: number; r: number; at: number; t: number}> = ({x, y, r, at, t}) => {
+/** Fix round 3 (review: ~20-30 px thin stars on cream padlocks were specks at phone size): `r` is in SCREEN px (26: about
+ *  2x), a 2.5 px ink rim, a fuller waist; on its full-size frame a white glare slash also crosses the padlock body
+ *  (`glare`: the body's local frame, S01Padlock's 40 x 30 body, scale `ps`). */
+const Sparkle: React.FC<{x: number; y: number; r: number; at: number; t: number; glare?: {x: number; y: number; ps: number}}> = ({x, y, r: rPx, at, t, glare}) => {
   const k = Math.max(1e-4, matScale(useXf()));
   if (t < at || t >= at + 1 / 30 + 0.2) return null;
-  const s = t < at + 1 / 30 ? 1 : 1 - E.inQuad(prog(t, at + 1 / 30, 0.2));
+  const full = t < at + 1 / 30;
+  const s = full ? 1 : 1 - E.inQuad(prog(t, at + 1 / 30, 0.2));
   if (s <= 0.04) return null;
-  const w = r * 0.26;
-  const d = `M0 ${-r}Q${w * 0.35} ${-w * 0.35} ${r} 0Q${w * 0.35} ${w * 0.35} 0 ${r}Q${-w * 0.35} ${w * 0.35} ${-r} 0Q${-w * 0.35} ${-w * 0.35} 0 ${-r}Z`;
+  const r = rPx / k;
+  const c = r * 0.13;
+  const d = `M0 ${-r}Q${c} ${-c} ${r} 0Q${c} ${c} 0 ${r}Q${-c} ${c} ${-r} 0Q${-c} ${-c} 0 ${-r}Z`;
   return (
-    <XG m={mat.compose(mat.translate(x, y), mat.rotate(8), mat.scale(s))}>
-      <path d={d} fill={palette.cream} stroke={palette.ink} strokeWidth={1.8 / (k * Math.max(0.2, s))} strokeLinejoin="round" />
-    </XG>
+    <>
+      {full && glare ? (
+        <XG m={mat.compose(mat.translate(glare.x, glare.y), mat.scale(glare.ps))}>
+          <path d="M-15 9L-6 -11L-1.5 -11L-10.5 9Z" fill={palette.white} />
+          <path d="M-5 9L1 -4L3.4 -4L-2.6 9Z" fill={palette.white} />
+        </XG>
+      ) : null}
+      <XG m={mat.compose(mat.translate(x, y), mat.rotate(8), mat.scale(s))}>
+        <path d={d} fill={palette.cream} stroke={palette.ink} strokeWidth={2.5 / (k * Math.max(0.2, s))} strokeLinejoin="round" />
+      </XG>
+    </>
   );
 };
+/** 'did': one sparkle per padlock, LEFT TO RIGHT govA -> govB -> govC, 0.03 s apart (fix round 3: was 0.02). */
 export const DidSparkles: React.FC<{t: number}> = ({t}) => {
-  if (t < B.sparkle || t > B.sparkle + 0.3) return null;
+  if (t < B.sparkle || t > B.sparkle + 0.35) return null;
   return (
     <>
       {(['govA', 'govB', 'govC'] as const).map((id, i) => {
         const [x, y] = padlockAt(id, P_GOV[id]);
         const s = S01_PADLOCK_SIZE[id] / 50;
-        return <Sparkle key={id} x={x + 22 * s} y={y - 17 * s} r={15} at={B.sparkle + i * 0.02} t={t} />;
+        return <Sparkle key={id} x={x + 22 * s} y={y - 17 * s} r={26} at={B.sparkle + i * 0.03} t={t} glare={{x, y, ps: s}} />;
       })}
     </>
   );
@@ -222,7 +270,9 @@ export const OnlookersP: React.FC = () => (
 /** R phase: S01's Pip plan without the dive exit (S12 never leaves for S02). */
 export const R_PIP = {...S01_PIP, exitAt: 1e9};
 
-const PIP_FALL = {h: 92, dx: 150} as const;
+/** Fix round 3 (review: camspeed WARN, 23.6 px / frame for f0-f6, 27.8 at touch-down): h 92 -> 70, touch-down vy ~20.6
+ *  -> ~15.7 px / frame (the 16.8 px / frame sideways drift unchanged), apex still at -0.03, landing still on 'And'. */
+const PIP_FALL = {h: 70, dx: 150} as const;
 /** Fix round 2 (review: 19-29 px / frame on flat ink with no smear, and a 323 px jump from S11's last Pip): 3 short ink
  *  speed lines trail UP-LEFT behind Pip on every falling frame after the cut (f1-f8, the S03 FR3 smear language), their
  *  length growing with his speed (~28 -> ~40 px), anchored just behind his back along -velocity; they also lead the eye
