@@ -27,8 +27,13 @@ Format: **rule** — why / evidence (video, date).
 - **Mix to -14 LUFS / -1 dBTP, with the voice always on top**; SFX land on visual hits (slams, punches). — v1.
 
 ## Visual style
-- **Style: hand-drawn ink, flat colour, like reference video 1; scale moments ("make me feel small", Arcane-like) from
-  reference video 2, but nuanced: don't overdo it, it is still TikTok content.** — v1, 2026-10-24.
+- **Style: hand-drawn ink, flat colour, like reference video 1.** — v1, 2026-10-24.
+- **Scale moments, occasionally: keep making the viewer feel small,** inspired by Arcane's camera work and staging (not
+  its footage); nuanced, since it is still TikTok content. The owner liked v1's scale scenes ("we did it great").
+  — v1 2026-10-24, reconfirmed 2026-10-25.
+- **Second visual twist: coziness, through a sense of enclosure** (framed, street-like spaces whose walls hold the
+  subject, as in the owner's reference `docs/look/ref_sense_of_enclosure.jpg`). Rules: `docs/look/COZY_AND_SCALE.md`.
+  — owner, 2026-10-25.
 - **Edges: hand-drawn paper edges ('paint-subtle') are liked, BUT never at the top of the frame or beside the caption
   band.** A white strip at the top looked like a screen recording under the phone's status bar. — v1, posted reel, 2026-10-25.
 - **Profile identity: the mascot Pip (the purple PHP elephant) in the film's style;** the avatar in use is the
