@@ -540,7 +540,7 @@ export function roofBand(
   x1: number,
   h: [number, number],
   at: number[],
-  o: {ranks?: number; rankFrom?: number; clump?: [number, number]; empty?: number; arms?: number; skip?: (x: number, y: number, h: number) => boolean; span?: number; order?: 'ltr' | {from: number}; rank0?: number; dy?: number; cgap?: number; jy?: number; xj?: number} = {},
+  o: {ranks?: number; rankFrom?: number; clump?: [number, number]; empty?: number; arms?: number; skip?: (x: number, y: number, h: number) => boolean; span?: number; order?: 'ltr' | {from: number}; rank0?: number; dy?: number; cgap?: number; jy?: number; xj?: number; rag?: number} = {},
 ): CrowdFig[] {
   const out: CrowdFig[] = [];
   const ranks = o.ranks ?? 2;
@@ -555,10 +555,12 @@ export function roofBand(
       let n = c0 + Math.floor(rand(seed, `n${Math.round(b.x)}/${r}/0`) * (c1 - c0 + 1));
       while (x < b.x + b.w - 1 && x < x1) {
         const k = `${Math.round(b.x)}/${r}/${i}`;
-        const hh = lerp(h[0], h[1], rand(seed, `h${k}`)) * (1 - 0.08 * r);
+        // wrap-up r2: `rag` = the front rank's ragged top (y +-rag, size x0.8-1.2): no even-topped bleacher strip
+        const rg = !r && o.rag ? o.rag : 0;
+        const hh = lerp(h[0], h[1], rand(seed, `h${k}`)) * (1 - 0.08 * r) * (rg ? 0.8 + 0.4 * rand(seed, `rs${k}`) : 1);
         // A1 fix round 3: `jy` = an extra per-figure step BACK from the roof edge (up only: they stay on the roof), `xj` =
         // per-figure x jitter (fraction of h): no straight ranks along the roof edge
-        const y = b.top + (o.dy ?? 0.5) - r * 0.3 * hm * (0.7 + 0.6 * rand(seed, `ry${k}`)) + (rand(seed, `y${k}`) - 0.5) * (r ? 0.24 * hm : 1.2) - rand(seed, `jy${k}`) * (o.jy ?? 0);
+        const y = b.top + (o.dy ?? 0.5) - r * 0.3 * hm * (0.7 + 0.6 * rand(seed, `ry${k}`)) + (rand(seed, `y${k}`) - 0.5) * (r ? 0.24 * hm : 1.2) - rand(seed, `jy${k}`) * (o.jy ?? 0) + (rg ? (rand(seed, `rg${k}`) - 0.5) * 2 * rg : 0);
         const fx = Math.max(b.x + 1, Math.min(b.x + b.w - 1, x + (rand(seed, `xj${k}`) - 0.5) * 2 * (o.xj ?? 0) * hh));
         if (x >= x0 && !(o.skip && o.skip(fx, y, hh))) {
           const ord = o.order;
@@ -579,6 +581,32 @@ export function roofBand(
   return out;
 }
 
+/** Wrap-up r2: 2-3 figures per roof of row `ri` STEPPING OVER the front edge (spilling down the facade): a pair, one
+ *  0.45 h below the roof edge and one a step lower and half a shoulder across, plus a third elsewhere on wider roofs. */
+export function roofSpill(seed: string, ri: number, x0: number, x1: number, h: [number, number], at: number, o: {skip?: (x: number, y: number, h: number) => boolean; rank?: number} = {}): CrowdFig[] {
+  const out: CrowdFig[] = [];
+  for (const b of ROOFS[ri]) {
+    if (b.low || b.x + b.w < x0 || b.x > x1 || b.w < 1.6 * h[1]) continue;
+    const kb = `${Math.round(b.x)}`;
+    const n = b.w > 4 * h[1] && rand(seed, `n${kb}`) < 0.6 ? 3 : 2;
+    const xa = b.x + b.w * (0.2 + 0.6 * rand(seed, `xa${kb}`));
+    const side = rand(seed, `sd${kb}`) < 0.5 ? -1 : 1;
+    const spots: [number, number][] = [
+      [xa, 0.45],
+      [xa + side * 0.5 * h[1], 0.95],
+    ];
+    if (n === 3) spots.push([b.x + b.w * (xa - b.x > b.w / 2 ? 0.2 : 0.8), 0.5]);
+    spots.forEach(([x, dv], i) => {
+      const hh = lerp(h[0], h[1], rand(seed, `h${kb}/${i}`));
+      const fx = Math.max(b.x + 0.3 * hh, Math.min(b.x + b.w - 0.3 * hh, x));
+      const y = b.top + dv * hh;
+      if (fx < x0 || fx > x1 || (o.skip && o.skip(fx, y, hh))) return;
+      out.push({x: fx, y, h: hh, at, rank: o.rank ?? 9, fill: (i % 2) as 0 | 1, hood: true});
+    });
+  }
+  return out;
+}
+
 /** Hood colours of the nearer flood tiers (A1 fix round 2: ~1/4 each of ink, tealDark, ochre and clay, so the crowd
  *  reads as varied heads, not as dark bristle) and their coats (teal, tealDark, ochre, sand). */
 const FLOOD_HOODS = [palette.ink, palette.tealDark, palette.brown, palette.tan];
@@ -592,24 +620,13 @@ const MID_HOODS = [palette.teal, palette.tealDark, palette.brown, palette.tan];
 const FAR0 = [palette.tan, palette.tan, '#C9AE8E', '#BBB5A4', palette.sand];
 const FAR1 = ['#9D9D8E', '#B5946E', '#A8AB97', '#C3A58B', '#A39C8C'];
 
-/** Row 1's figure: round-shouldered body + a round dot head (base centre x, y; height h). */
-function dotFig(x: number, y: number, h: number): {body: string; head: string} {
-  const w = Math.max(3, 0.6 * h);
-  const bh = 0.58 * h;
-  const rr = w * 0.32;
-  const hr = Math.max(1.4, 0.2 * h);
-  const hy = y - bh - hr * 0.75;
-  return {
-    body: `M${f1(x - w / 2)} ${f1(y)}V${f1(y - bh + rr)}Q${f1(x - w / 2)} ${f1(y - bh)} ${f1(x - w / 2 + rr)} ${f1(y - bh)}H${f1(x + w / 2 - rr)}Q${f1(x + w / 2)} ${f1(y - bh)} ${f1(x + w / 2)} ${f1(y - bh + rr)}V${f1(y)}Z`,
-    head: `M${f1(x - hr)} ${f1(hy)}a${f1(hr)} ${f1(hr)} 0 1 0 ${f1(2 * hr)} 0a${f1(hr)} ${f1(hr)} 0 1 0 ${f1(-2 * hr)} 0Z`,
-  };
-}
-
-/** Row 0's figure: a round-topped capsule (base centre x, y; height h). */
-function blobFig(x: number, y: number, h: number): string {
-  const w = Math.max(2.2, 0.5 * h);
-  const r = w / 2;
-  return `M${f1(x - r)} ${f1(y)}V${f1(y - h + r)}A${f1(r)} ${f1(r)} 0 0 1 ${f1(x + r)} ${f1(y - h + r)}V${f1(y)}Z`;
+/** Row 0's figure: a round-topped capsule (base centre x, y; height h). Wrap-up r2 (the reviewers: a comb of narrow
+ *  spikes = grass on the skyline): `w` defaults to 0.5 h; the far rows pass a width >= the figure spacing so the
+ *  neighbours OVERLAP 1-2 px and the tops form one scalloped crowd mass. */
+function blobFig(x: number, y: number, h: number, wIn?: number): string {
+  const w = Math.max(2.2, wIn ?? 0.5 * h);
+  const r = Math.min(w / 2, h);
+  return `M${f1(x - w / 2)} ${f1(y)}V${f1(y - h + r)}A${f1(w / 2)} ${f1(r)} 0 0 1 ${f1(x + w / 2)} ${f1(y - h + r)}V${f1(y)}Z`;
 }
 
 /** The flood: per rank the reaching arms, the coats, the hoods and the cream rims (sun side), back ranks first (A1 fix
@@ -647,16 +664,18 @@ export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string
     const fx = f.vx ? f.x + f.vx * (t - f.at) : f.x;
     const r = f.rank;
     const u = rand(seed, `c${i}`);
+    // wrap-up r2: the far tiers as OVERLAPPING round-topped blobs (width 0.9-0.95 h > the 0.62-0.81 h spacing): a
+    // scalloped crowd mass (row 1: shoulders + a round head bump), no comb of spikes
     if (tier === 0) {
-      add(fills, r, FAR0[Math.floor(u * FAR0.length)], blobFig(fx, y, h * 0.62));
+      add(fills, r, FAR0[Math.floor(u * FAR0.length)], blobFig(fx, y, h * 0.7, h * 0.9));
       return;
     }
     const lean = f.vx ? (Math.sign(f.vx) as 1 | -1) : rand(seed, `l${i}`) < 0.5 ? -1 : 1;
     if (tier === 1) {
-      const b = dotFig(fx, y, h * 0.85);
       const ci = Math.floor(u * FAR1.length);
-      add(fills, r, FAR1[ci], b.body);
-      add(hoods, r, FAR1[(ci + 1 + Math.floor(rand(seed, `hc${i}`) * 3)) % FAR1.length], b.head);
+      const hr = 0.24 * h;
+      add(fills, r, FAR1[ci], blobFig(fx, y, h * 0.6, h * 0.95));
+      add(hoods, r, FAR1[(ci + 1 + Math.floor(rand(seed, `hc${i}`) * 3)) % FAR1.length], `M${f1(fx - hr)} ${f1(y - 0.6 * h)}a${f1(hr)} ${f1(hr)} 0 1 0 ${f1(2 * hr)} 0a${f1(hr)} ${f1(hr)} 0 1 0 ${f1(-2 * hr)} 0Z`);
       return;
     }
     const lite = tier === 2 && f.h < 12;
