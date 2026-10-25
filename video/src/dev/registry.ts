@@ -12,6 +12,7 @@ import {FontTest} from './FontTest';
 import {CineDemo} from './CineDemo';
 import {SharedKitSheet} from './SharedKitSheet';
 import {EdgeLab} from './EdgeLab';
+import {ProfilePic} from './ProfilePic';
 
 export const devCompositions = [
   {id: 'KitDemo', component: KitDemo, durationSeconds: 12},
@@ -20,4 +21,5 @@ export const devCompositions = [
   {id: 'CineDemo', component: CineDemo, durationSeconds: 22},
   {id: 'SharedKitSheet', component: SharedKitSheet, durationSeconds: 10},
   {id: 'EdgeLab', component: EdgeLab, durationSeconds: 6},
+  {id: 'ProfilePic', component: ProfilePic, durationSeconds: 1},
 ];
