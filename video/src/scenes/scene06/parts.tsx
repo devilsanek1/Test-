@@ -234,10 +234,11 @@ function legsGeo(ph: number, bobWorld: number): LegsGeo {
 }
 
 /** Speed lines off his back (left) edge on the cut on action (~1100 px/s on screen: S05's run-out speed): three short
- *  ink dashes trailing the coat and a leg for the first frames, retracting into him by cut + 0.17 (person units). */
+ *  ink dashes trailing the coat and a leg (his back edge is at the frame edge for the first frames, so they hold to
+ *  cut + 0.15 and retract into him by cut + 0.21, the speed down to ~600 px/s by then; person units). */
 function speedLines(d: number): string {
-  if (d < 0 || d >= 0.17) return '';
-  const k = d < 0.11 ? 1 : 1 - (d - 0.11) / 0.06;
+  if (d < 0 || d >= 0.21) return '';
+  const k = d < 0.15 ? 1 : 1 - (d - 0.15) / 0.06;
   const edge = -MSG_DRAWS.w * 0.535 - 8 / S;
   let out = '';
   for (const [y, Lpx, o] of [[-TORSO * 0.74, 66, 0], [-TORSO * 0.36, 88, 10], [LEG * 0.55, 52, 22]] as const) {

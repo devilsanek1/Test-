@@ -248,23 +248,39 @@ const HRY = 0.066;
 function figPaths(H: number, ph: number, hair: PasserHair, acc: PasserAcc[]) {
   const P = (x: number, y: number) => `${fmt(x * H)} ${fmt(y * H)}`;
   const R = (v: number) => fmt(v * H);
-  // ---- legs: closed trouser shapes (slight taper), the lifted foot (heel up) alternating with the step phase
+  // ---- legs (fix round 2: they read as straight tubes): tapered trousers (hem ~70 % of the hip width) in two segments,
+  // thigh and shin; on the stride the lifted leg's heel comes up (a shorter shin from behind) and its shin breaks
+  // inward at the knee by up to 5 deg, so every step shows a knee
   const lift = [Math.max(0, Math.sin(ph)) * 0.045, Math.max(0, Math.sin(ph + Math.PI)) * 0.045];
   let legs = '';
   let shoes = '';
   [-1, 1].forEach((s, i) => {
     const bot = -0.035 - lift[i];
-    const sw = s * lift[i] * 0.25; // the lifted leg's foot tucks in a little
-    legs += `M${P(s * 0.008, -0.5)}L${P(s * 0.124, -0.5)}C${P(s * 0.124, -0.36)} ${P(s * 0.106 + sw, -0.2)} ${P(s * 0.1 + sw, bot)}L${P(s * 0.036 + sw, bot)}C${P(s * 0.032 + sw, -0.2)} ${P(s * 0.02, -0.36)} ${P(s * 0.012, -0.415)}Z`;
-    const cx = s * 0.068 + sw;
+    const th = ((s * 5 * lift[i]) / 0.045) * (Math.PI / 180); // the knee break (rad), the foot tucks toward the centre
+    const kx = s * 0.068;
+    const ky = -0.27;
+    const rot = (x: number, y: number): [number, number] => {
+      const dx = x - kx;
+      const dy = y - ky;
+      return [kx + dx * Math.cos(th) - dy * Math.sin(th), ky + dx * Math.sin(th) + dy * Math.cos(th)];
+    };
+    const aO = rot(s * 0.106, bot);
+    const aI = rot(s * 0.028, bot);
+    legs +=
+      `M${P(s * 0.012, -0.415)}L${P(s * 0.008, -0.5)}L${P(s * 0.124, -0.5)}` +
+      `C${P(s * 0.126, -0.42)} ${P(s * 0.114, -0.33)} ${P(s * 0.111, ky)}` +
+      `L${P(aO[0], aO[1])}L${P(aI[0], aI[1])}L${P(s * 0.025, ky)}` +
+      `C${P(s * 0.022, -0.33)} ${P(s * 0.016, -0.38)} ${P(s * 0.012, -0.415)}Z`;
+    const [cx, cyy] = rot(s * 0.067, bot);
     const sh = 0.026 + lift[i] * 0.25; // a raised heel shows a little more sole
-    shoes += `M${P(cx - 0.042, bot)}Q${P(cx, bot - 0.02)} ${P(cx + 0.042, bot)}L${P(cx + 0.04, bot + sh)}Q${P(cx, bot + sh + 0.01)} ${P(cx - 0.04, bot + sh)}Z`;
+    shoes += `M${P(cx - 0.042, cyy)}Q${P(cx, cyy - 0.02)} ${P(cx + 0.042, cyy)}L${P(cx + 0.04, cyy + sh)}Q${P(cx, cyy + sh + 0.01)} ${P(cx - 0.04, cyy + sh)}Z`;
   });
-  // ---- the jacket: a soft bell. Round sloped shoulders (radius ~0.1 H = a third of the width), near-straight sides,
-  // a soft curved hem
+  // ---- the jacket: a soft bell (fix round 2: the hem was a flat box edge). Round sloped shoulders (radius ~0.1 H), the
+  // sides in a little at the waist and out to the hem, ROUNDED hem corners and a hem that dips at the middle
   const half = (s: number) =>
-    `C${P(s * 0.085, -0.848)} ${P(s * 0.145, -0.83)} ${P(s * 0.153, -0.772)}C${P(s * 0.16, -0.71)} ${P(s * 0.146, -0.62)} ${P(s * 0.14, -0.56)}C${P(s * 0.137, -0.52)} ${P(s * 0.139, -0.49)} ${P(s * 0.143, -0.468)}`;
-  const torso = `M${P(-0.03, -0.846)}${half(-1)}Q${P(0, -0.448)} ${P(0.143, -0.468)}` + `C${P(0.139, -0.49)} ${P(0.137, -0.52)} ${P(0.14, -0.56)}C${P(0.146, -0.62)} ${P(0.16, -0.71)} ${P(0.153, -0.772)}C${P(0.145, -0.83)} ${P(0.085, -0.848)} ${P(0.03, -0.846)}Z`;
+    `C${P(s * 0.085, -0.848)} ${P(s * 0.145, -0.83)} ${P(s * 0.153, -0.772)}C${P(s * 0.16, -0.71)} ${P(s * 0.142, -0.62)} ${P(s * 0.142, -0.56)}C${P(s * 0.142, -0.52)} ${P(s * 0.152, -0.49)} ${P(s * 0.15, -0.476)}Q${P(s * 0.148, -0.458)} ${P(s * 0.124, -0.455)}`;
+  const halfR = `Q${P(0.148, -0.458)} ${P(0.15, -0.476)}C${P(0.152, -0.49)} ${P(0.142, -0.52)} ${P(0.142, -0.56)}C${P(0.142, -0.62)} ${P(0.16, -0.71)} ${P(0.153, -0.772)}C${P(0.145, -0.83)} ${P(0.085, -0.848)} ${P(0.03, -0.846)}Z`;
+  const torso = `M${P(-0.03, -0.846)}${half(-1)}Q${P(0, -0.432)} ${P(0.124, -0.455)}${halfR}`;
   // the neck (two short lines from under the hair into the collar) and the collar band at the nape (convex up, like
   // the kit's CollarBand: a back collar, never a V or a centre seam)
   const neck = `M${P(-0.026, -0.83)}L${P(-0.025, HC + 0.05)}M${P(0.026, -0.83)}L${P(0.025, HC + 0.05)}`;
@@ -280,12 +296,17 @@ function figPaths(H: number, ph: number, hair: PasserHair, acc: PasserAcc[]) {
     const Q = (u: number, v: number) => P(sx0 + u * c - v * sn, sy0 + u * sn + v * c);
     const sleeve = `M${Q(-0.03, -0.01)}C${Q(-0.032, 0.1)} ${Q(-0.026, 0.2)} ${Q(-0.023, 0.27)}L${Q(0.023, 0.27)}C${Q(0.026, 0.2)} ${Q(0.032, 0.1)} ${Q(0.03, -0.01)}Q${Q(0, -0.03)} ${Q(-0.03, -0.01)}Z`;
     const hand = `M${Q(-0.019, 0.268)}C${Q(-0.022, 0.3)} ${Q(-0.01, 0.318)} ${Q(0, 0.318)}C${Q(0.012, 0.318)} ${Q(0.022, 0.3)} ${Q(0.019, 0.268)}Z`;
-    return {sleeve, hand};
+    // fix round 2 (the sleeves' inner edges ran down the jacket like side seams): the ink is the OUTER edge, the cuff and
+    // only the forearm's inner edge (the upper arm merges into the jacket's side)
+    const o = s < 0 ? -1 : 1;
+    const sleeveInk = `M${Q(o * 0.03, -0.01)}C${Q(o * 0.032, 0.1)} ${Q(o * 0.026, 0.2)} ${Q(o * 0.023, 0.27)}L${Q(-o * 0.023, 0.27)}L${Q(-o * 0.027, 0.15)}`;
+    return {sleeve, sleeveInk, hand};
   };
   const sw = Math.sin(ph) * 8;
   const phone = acc.includes('phone');
   const aL = arm(-1, sw);
   let arms = aL.sleeve;
+  let armsInk = aL.sleeveInk;
   let hands = aL.hand;
   let armR = '';
   let phoneD = '';
@@ -299,6 +320,7 @@ function figPaths(H: number, ph: number, hair: PasserHair, acc: PasserAcc[]) {
   } else {
     const aR = arm(1, -sw);
     arms += aR.sleeve;
+    armsInk += aR.sleeveInk;
     hands += aR.hand;
   }
   // ---- head (its back) + ears; the hair is a MASS over the top and back, the hairline crosses at the nape
@@ -377,7 +399,7 @@ function figPaths(H: number, ph: number, hair: PasserHair, acc: PasserAcc[]) {
     accFill += strap + bag;
     accInk += strap + bag + `M${P(0.096, -0.52)}Q${P(0.152, -0.535)} ${P(0.214, -0.52)}`;
   }
-  return {legs, shoes, torso, neck, collar, arms, hands, armR, phoneD, head, ears, hairFill, hairInk, darkFill, capFill, accFill, accInk};
+  return {legs, shoes, torso, neck, collar, arms, armsInk, hands, armR, phoneD, head, ears, hairFill, hairInk, darkFill, capFill, accFill, accInk};
 }
 
 /** One passer-by: a complete back-view line-art figure (white paper fills, ink outlines; closed trouser legs and
@@ -398,8 +420,14 @@ export const Passer: React.FC<{x: number; y: number; H: number; t: number; hz: n
       </React.Fragment>
     ) : null;
   const long = hair === 'long';
+  // fix round 2: a sand misregistered under-print on the shadow side (left, away from the sun) separates the white
+  // figure from the cream road, the way Bit's under-print separates him from the door
+  const UP = H * 0.008;
   return (
     <XG m={mat.translate(x + sway, y + bob)}>
+      <XG m={mat.translate(-UP, UP * 0.75)}>
+        <Fill d={g.legs + g.torso + g.head + (long ? g.hairFill : '')} color={palette.sand} offset={false} mode="none" seed={`${seed}/up`} />
+      </XG>
       {layer(g.legs, 'lg')}
       <Fill d={g.shoes} color={palette.ink} offset={false} mode="none" seed={`${seed}/sh`} />
       <XG m={mat.about(mat.rotate(roll), 0, -0.47 * H)}>
@@ -407,7 +435,8 @@ export const Passer: React.FC<{x: number; y: number; H: number; t: number; hz: n
         <Ink d={g.neck} width={ink * 0.8} taper={false} seed={`${seed}/nk`} />
         {long ? null : layer(g.collar, 'co', W, ink * 0.8)}
         {layer(g.accFill ? g.accInk : '', 'ac')}
-        {layer(g.arms, 'ar')}
+        <Fill d={g.arms} color={W} offset={false} mode="none" seed={`${seed}/arf`} />
+        <Ink d={g.armsInk} width={ink} taper={false} seed={`${seed}/ari`} />
         {layer(g.hands, 'hn', palette.sand, ink * 0.8)}
         <Ink d={g.ears} width={ink * 0.8} taper={false} seed={`${seed}/ea`} />
         {layer(g.head, 'hd')}
@@ -457,24 +486,25 @@ const roadEdgeX = (y: number) => 520 + ((1370 - y) / (1370 - VP[1])) * (VP[0] - 
 export function ghostList(b: Beats, tears: number[]): GhostSpec[] {
   const out: GhostSpec[] = [
     // 'was': a pair, walking away up the street (one at the hero house's corner, one a step ahead and farther)
-    {x: roadEdgeX(1336) + 2, y: 1336, in: b.ghosts1 - 0.1, out: tears[1], seed: 'g4a', pace: 0.06, hz: 1.9, hair: 'short', acc: ['backpack']},
-    {x: roadEdgeX(1278) + 2, y: 1278, in: b.ghosts1 - 0.06, out: tears[2], seed: 'g4b', pace: 0.06, hz: 2.1, hair: 'long', acc: ['strap']},
+    {x: roadEdgeX(1338) - 4, y: 1338, in: b.ghosts1 - 0.1, out: tears[1], seed: 'g4a', pace: 0.06, hz: 1.9, hair: 'short', acc: ['backpack']},
+    {x: roadEdgeX(1290) - 4, y: 1290, in: b.ghosts1 - 0.06, out: tears[2], seed: 'g4b', pace: 0.06, hz: 2.1, hair: 'long', acc: ['strap']},
     // 'like': a second pair strides past (faster legs, faster into depth)
-    {x: roadEdgeX(1334) + 2, y: 1334, in: b.ghosts2 - 0.1, out: tears[8], seed: 'g4c', pace: 0.12, hz: 2.8, hair: 'headphones', acc: []},
-    {x: roadEdgeX(1276) + 2, y: 1276, in: b.ghosts2 - 0.05, out: tears[9], seed: 'g4d', pace: 0.12, hz: 2.9, hair: 'bun', acc: ['phone'], mirror: true},
+    {x: roadEdgeX(1336) - 4, y: 1336, in: b.ghosts2 - 0.1, out: tears[8], seed: 'g4c', pace: 0.12, hz: 2.8, hair: 'headphones', acc: []},
+    {x: roadEdgeX(1290) - 4, y: 1290, in: b.ghosts2 - 0.05, out: tears[9], seed: 'g4d', pace: 0.12, hz: 2.9, hair: 'bun', acc: ['phone'], mirror: true},
   ];
-  // the time-lapse flickers: far up the road (hair ink), one at a time, only while at most one pair member is on screen;
-  // feet on the road edge (+0..8: the far road lies inside the rail, kept as tight to its edge as the ground allows)
+  // the time-lapse flickers: up the road (hair ink), one at a time, only while at most one pair member is on screen;
+  // fix round 2 (framecheck: they stood in the right rail, x ~945-985): a little nearer (y 1264-1274) and on the row's
+  // foot line (-8..-12 world), so their bodies stay at screen x <= ~940
   const flick = [1, 2, 9, 10, 11, 12, 13];
   const hairs: PasserHair[] = ['cap', 'bun', 'short', 'long', 'headphones', 'short', 'cap'];
   flick.forEach((i, k) => {
     const ta = tears[i];
     if (ta === undefined) return;
     const r = (q: string) => rand('s4ghost', `${i}${q}`);
-    const y = lerp(1236, 1252, r('y'));
+    const y = lerp(1264, 1274, r('y'));
     // consecutive flickers swap in the same frame (one at a time: a time-lapse jump), a lone one lives 0.1 s
     const next = flick[k + 1] === i + 1 ? tears[i + 1] : ta + 0.1;
-    out.push({x: roadEdgeX(y) + lerp(0, 8, r('x')), y, in: ta, out: next, seed: `g4t${i}`, pace: 0.2, hz: 2.4, depth: 'hair', hair: hairs[k], acc: r('a') > 0.5 ? ['strap'] : []});
+    out.push({x: roadEdgeX(y) - 8 - lerp(0, 4, r('x')), y, in: ta, out: next, seed: `g4t${i}`, pace: 0.2, hz: 2.4, depth: 'hair', hair: hairs[k], acc: r('a') > 0.5 ? ['strap'] : []});
   });
   return out;
 }

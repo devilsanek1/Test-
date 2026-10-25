@@ -3,12 +3,14 @@
 // left mid-stride, the camera trucking right at S05's exit speed, the frame-filling layers too, decelerating over a
 // fixed 0.63 s with multiplane parallax), Pip leaping in BEHIND him; on 'They' the low lane-end sun presses and pops a
 // wax seal along a dotted arc onto the envelope (a private letter); Bit peeks out of the messenger's collar on 'gave'; on
-// 'PHP' the elephant sign swings and the slit under the blind glows (the makers are in); Pip goes 'shh'; the neighbours'
-// curtains are drawn as the messenger reaches the door; the upstairs browser window lights on 'people' while he leans in
+// 'PHP' the elephant sign swings and the slit under the blind glows (the makers are in); Pip goes 'shh'; a neighbour
+// draws a curtain as the messenger reaches the door; the upstairs browser window lights on 'people' while he leans in
 // and knocks twice, a pigeon lands on the cornice; on 'a' the envelope goes through the mail slot (Bit hops onto the
 // sill) and on 'heads-up' three makers' heads pop UP in the browser window (a literal heads-up) while the blind ('still
 // fixing...', J3) jolts and the wire pigeons hop; then a gust blows the printed leak sheet in from the left and lifts
 // it at the lens: S07's lens wipe (this module's exported Wiper, scene06/page.tsx).
+// Fix round 3: the lens hand-over runs S07's lensOutAt from the hold (no pop at the cut), the seal pops from the sun's
+// upper-right rim with a cream ring, festoon lights frame the top, the messenger walks on his own legs (scene06/parts).
 // Beats: scene06/beats.ts. Camera: scene06/camera.ts. Parts: scene06/parts.tsx. Dressing: scene06/dress.tsx. Seal +
 // sun press: scene06/seal.tsx. Page + Wiper: scene06/page.tsx. Messenger hero detail: scene06/msgDetail.tsx. Shims
 // (listed in docs/scenes/S06.md): SunPressS06 / WaxSealS06 (seal.tsx), LensSheet (page.tsx), MessengerDetail, and the

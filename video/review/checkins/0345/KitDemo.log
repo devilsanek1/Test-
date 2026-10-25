@@ -1,0 +1,7 @@
+1 30 /home/user/Test-/video/review/checkins/0345/KitDemo/f00030.png
+3 90 /home/user/Test-/video/review/checkins/0345/KitDemo/f00090.png
+5 150 /home/user/Test-/video/review/checkins/0345/KitDemo/f00150.png
+7 210 /home/user/Test-/video/review/checkins/0345/KitDemo/f00210.png
+9 270 /home/user/Test-/video/review/checkins/0345/KitDemo/f00270.png
+11 330 /home/user/Test-/video/review/checkins/0345/KitDemo/f00330.png
+[render-frames] KitDemo (node_modules/.cache/render-entry/KitDemo.js): bundle 14.5s, 6 frames in 1.6s (264 ms/frame incl. page setup, concurrency 2, scale 0.5)

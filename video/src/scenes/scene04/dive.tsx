@@ -55,7 +55,7 @@ export const DivePigeons: React.FC<{diveAt: number; seed?: string}> = ({diveAt, 
       {PIGEONS.map(({p, color}, i) => {
         if (d < 0) return <Bird key={i} x={p[0]} y={p[1]} s={0.85} seed={`${seed}/pg${i}`} color={color} />;
         const first = d < FRAME;
-        const off: Pt = first ? [-24 - 6 * i, -12 - 3 * i] : [-78 - 10 * i, -26 - 6 * i];
+        const off: Pt = first ? [-24 - 6 * i, -9 - 3 * i] : [-84 - 10 * i, -12 - 4 * i];
         return <Flapper key={i} x={p[0] + off[0]} y={p[1] + off[1]} s={first ? 0.85 : 0.75} up={first} color={color} seed={`s4pg${i}`} />;
       })}
     </>
@@ -69,11 +69,11 @@ export const WireWhip: React.FC<{diveAt: number}> = ({diveAt}) => {
   const d = t - diveAt;
   if (d < 0 || d >= 2 * FRAME) return null;
   const first = d < FRAME;
-  const [fx, fy] = first ? [360, 628] : [610, 642];
+  const [fx, fy] = first ? [360, 652] : [610, 664];
   // the free end curls up and back (the whip), then the wire runs on in a deep sag to the far pole
   const c1: Pt = [fx + 40, fy + 58];
   const c2: Pt = [fx + (WB[0] - fx) * 0.45, WB[1] + SAG * 1.4];
-  const curl = `M${fx - 18} ${fy - 14}Q${fx - 14} ${fy + 4} ${fx} ${fy}`;
+  const curl = `M${fx - 16} ${fy - 8}Q${fx - 13} ${fy + 4} ${fx} ${fy}`;
   const d1 = `${curl}C${c1[0]} ${c1[1]} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${WB[0]} ${WB[1]}`;
   return <Ink d={d1} width={SI.far} taper={false} seed="s4/whip" />;
 };

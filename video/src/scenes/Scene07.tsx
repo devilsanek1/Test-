@@ -4,21 +4,22 @@
 // its linework draws on top -> bottom), the board's address-bar rail goes online, clones 2 -> 4 -> 8 on pane 2 and the
 // wall, a copy slaps onto Pip's face, four clones lift off to the wires and fan out left of the sun (Bit rides one,
 // right at the sun's left limb), readers rise and raise phones, the sun lands behind the wall top and becomes an hours
-// clock (the fix is not ready) that no copy ever covers, the workshop's blind stays down ('still fixing...', J4: the
+// clock (the fix is not ready: one fast minute turn, three hour ticks; clipped to the sky, so it sinks behind the far
+// roofs with the disc) that no copy ever covers, the workshop's blind stays down ('still fixing...', J4: the
 // shared FixSign, the same sign as S06's J3 and S09's J5), then a fixed 0.40 s tilt-up follows the copies into S08 (wires
 // at screen 896 / 928 / 960, the sun arriving at (640, 1021) with S08's slide speed, the copies at S08's first-frame pegs
 // and on-screen speeds). Label L7 on the board's bottom rail.
 // Beat table: scene07/beats.ts. Parts: scene07/parts.tsx. Pen reveal: scene07/reveal.tsx. Lens out phase for S06's
 // Wiper: scene07/lens.ts. No shims. Isolated preview entry: scene07/entry.tsx. Notes: docs/scenes/S07.md.
 
-import React from 'react';
-import {World, Sun, sunPoseAt, XG, mat, palette, useTime, useGlobalTime, ease as E, Pt} from '../lib';
+import React, {useId} from 'react';
+import {World, Sun, sunPoseAt, Tod, XG, mat, palette, useTime, useGlobalTime, ease as E, Pt} from '../lib';
 import type {SunHop, SunMove} from '../lib';
 import {NoticeboardCorner, NOTICE_CORNER} from './shared/sets';
 import type {LayerWrap} from './shared/sets';
 import {EdgeOnlooker, FixSign, HoursClock, LabelTag, LeakSheet} from './shared/props';
 import {useBeats} from './scene07/beats';
-import {BoardClones, camAt, camMat, CLONE, CloneSpot, cruiseFor, FarRoofDetails, Flyer, GroundDetails, PaneGlass, PhoneCopy, PhoneScreen, Pigeon, PinDot, PipS07, PUSHED, RiseFromLow, SpinWedge, WallDetails, WireCopy, WireCopySpec} from './scene07/parts';
+import {BoardClones, BoardShade, camAt, camMat, CLOCK_SKY_CLIP, ClockFace, CLONE, CloneSpot, cruiseFor, DownSleeve, FarRoofDetails, Flyer, GroundDetails, LatchCover, litWall, PaneGlass, PhoneCopy, PhoneScreen, Pigeon, PinDot, PipS07, PUSHED, RiseFromLow, SpinWedge, WallDetails, WireCopy, WireCopySpec} from './scene07/parts';
 import {PenReveal, RevealPass, s07Strokes, wire0InkedAt} from './scene07/reveal';
 // S06's leak page (the lens wipe's ONE trajectory, pageAt): S07 draws its own copy of the lens sheet with it, so the S07
 // composition and the film (where S06's Wiper draws the same page above both scenes) can never show two sheets.
@@ -37,8 +38,14 @@ const S7_READERS = NOTICE_CORNER.readers;
  *  raised phone arm passes right of its cap instead of across it. */
 const RIGHT_HEADS: Pt[] = [
   [835, 1255],
-  [944, 1236],
+  // fix round 3: reader 3 is a shoulder-and-bun SLIVER at the right frame edge (head centre at screen ~1085 after the push,
+  // no phone): his raised phone covered the round elephant sign as it swung on 'fix' and his head sat under the right-rail
+  // UI (x > 950) for no read; reader 2 carries the right side
+  [994, 1262],
 ];
+/** Fix round 3: reader 0 (teal hood) 55 px left, so his raised phone arm rises from his own shoulder (hand at screen x
+ *  ~170) instead of out of the top of reader 1's bun; his phone stays left of the notice's Bit ring. */
+const R0_DX = -55;
 /** Reader 3 (brown coat): the set's 'long' hair read as a featureless tan dome on a flat slab from behind; a dark bun +
  *  a collar band give it a back of the head and a shoulder line like the left readers. */
 const READER3 = {hair: 'bun' as const, hairColor: palette.ink, acc: ['collar' as const]};
@@ -85,9 +92,8 @@ const PHONE: Pt = [728, 1156];
 /** The other three raised phones' white faces (world; measured on the full-res render at t 1.6, settled after the pop):
  *  they get a teal-dark screen (PhoneScreen) so only reader 2's phone (the leak + its ring) stays in the white family. */
 const SCREENS = [
-  {i: 0, x: 187.1, y: 1184.0, w: 36.8, h: 67.9},
+  {i: 0, x: 187.1 + R0_DX, y: 1184.0, w: 36.8, h: 67.9},
   {i: 1, x: 297.0, y: 1234.4, w: 39.6, h: 70.8},
-  {i: 3, x: 839.4, y: 1142.5, w: 35.8, h: 64.2},
 ];
 const SCREEN_TREF = 1.6;
 /** J4 'still fixing...' (props FixSign, fs 25 = 26.5 px lettering on screen): hung from a nail on the blind's top-left so
@@ -101,6 +107,9 @@ const J4 = {x: 798, y: 958, fs: 25};
  *  into the kit's 0.3 s outBack(1.3) curve, where it first reaches the raised pose (u = 1 - 1.3 / 2.3), so the first
  *  frame shows the raised pose and the next frames run the kit's own ~6 % overshoot and settle: no in-between poses. */
 const POP_SKIP = 0.3 * (1 - 1.3 / 2.3) + 0.001;
+/** L7's pop starts this long before the card is first drawn: the kit's 7 % pop spring (LabelTag 'card') is at 20 % after
+ *  0.037 s, so the first frame shows a 20-50 % card (motion spec fill pop) instead of a 0-17 % speck. */
+const L7_PRE = 0.037;
 
 const Scene07: React.FC = () => {
   const t = useTime();
@@ -111,7 +120,9 @@ const Scene07: React.FC = () => {
   // ---- the hours clock on the sun (pops on 'fix' (word - 0.04), pops off as the tilt starts). One minute-hand turn in
   //      0.42 s (<= 45 deg a frame at the inOut(sine) peak, a peach speed wedge trailing the hand while it is fast) and
   //      ONE hour-hand tick with it: an hour passes, the fix is not ready (fix round 1: 3 ticks against 1 turn).
-  const CLK = {at: B.fix, spinAt: B.fix + 0.02, spinDur: 0.42, turns: 1, outAt: B.tilt - 0.08};
+  // Fix round 3: THREE hour-hand ticks (storyboard: 'the hour hand steps 3 ticks: hours pass') during the one fast minute
+  // turn (the kit spaces them spinAt + (i + 0.6) x 0.14 s). The face still pops off at the tilt (storyboard 23.70).
+  const CLK = {at: B.fix, spinAt: B.fix + 0.02, spinDur: 0.42, turns: 1, hourSteps: 3, outAt: B.tilt - 0.08};
 
   // ---- the sun: screen space (the push does not move it). It lifts on 'fix' so the clock face clears the roofline, then
   //      comes down to S08's (640, 1021) over the last 0.6 s (rel to the wall top, see SUN_RET).
@@ -156,19 +167,33 @@ const Scene07: React.FC = () => {
     </XG>
   );
   // the clock face is a graphic overlay ON the sun, drawn after the set (fix round 2: the three wires crossed its hub and
-  // hands): same pose as the disc (sunPoseAt + the Sun's bottom-anchored squash), screen space
+  // hands): same pose as the disc (sunPoseAt + the Sun's bottom-anchored squash), screen space. Fix round 3: (1) an opaque
+  // sun-orange FACE inside the ring (ClockFace), so the wires that cross the sun pass BEHIND the dial, never through the
+  // hub; (2) the whole overlay is CLIPPED to the sky above the far roofs (CLOCK_SKY_CLIP, world px inside the camera group:
+  // it rides the push and the tilt), so it sinks behind the roofs with the disc instead of floating over the town.
+  const clipId = 's7clk' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const clock = (() => {
     if (t < CLK.at || t > CLK.outAt + 0.2) return null;
     const pose = sunPoseAt(t, SUNP);
     const by = pose.y + pose.r;
     const y = by - pose.r * pose.sq.sy;
     return (
-      <XG m={mat.inv(M)}>
-        <g transform={`translate(${pose.x.toFixed(2)} ${y.toFixed(2)}) scale(${pose.sq.sx.toFixed(4)} ${pose.sq.sy.toFixed(4)})`}>
-          <SpinWedge r={pose.r} at={CLK.at} spinAt={CLK.spinAt} spinDur={CLK.spinDur} turns={CLK.turns} outAt={CLK.outAt} />
-          <HoursClock r={pose.r} at={CLK.at} spinAt={CLK.spinAt} spinDur={CLK.spinDur} turns={CLK.turns} hourSteps={1} outAt={CLK.outAt} seed="s7clock" />
+      <>
+        <defs>
+          <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+            <path d={CLOCK_SKY_CLIP} />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${clipId})`}>
+          <XG m={mat.inv(M)}>
+            <g transform={`translate(${pose.x.toFixed(2)} ${y.toFixed(2)}) scale(${pose.sq.sx.toFixed(4)} ${pose.sq.sy.toFixed(4)})`}>
+              <ClockFace r={pose.r} at={CLK.at} outAt={CLK.outAt} />
+              <SpinWedge r={pose.r} at={CLK.at} spinAt={CLK.spinAt} spinDur={CLK.spinDur} turns={CLK.turns} outAt={CLK.outAt} />
+              <HoursClock r={pose.r} at={CLK.at} spinAt={CLK.spinAt} spinDur={CLK.spinDur} turns={CLK.turns} hourSteps={CLK.hourSteps} outAt={CLK.outAt} seed="s7clock" />
+            </g>
+          </XG>
         </g>
-      </XG>
+      </>
     );
   })();
 
@@ -179,7 +204,8 @@ const Scene07: React.FC = () => {
   const g1 = B.got - 0.08;
   const g3 = B.out + 0.16;
   // fix round 2: a pile, not a grid: 2 large (C, D: full sheets), 3 medium, 3 small (A on the wall; two TUCKED behind the
-  // notice's bottom-left corner and its right edge, drawn under it)
+  // notice, drawn under it). Fix round 3: the tucked two showed as 25-40 px slivers; they now stick out ABOVE the notice's
+  // top edge either side of its pin (~70 x 50 px each, the heading bar and the dog-ear showing): a pile behind it
   const SRC = {
     C: {x: 530, y: 1032, at: g1, rot: -6, s: 0.92, liftAt: lift.C},
     A: {x: 78, y: 1004, at: g1, rot: 6, s: 0.5, liftAt: lift.A},
@@ -195,8 +221,8 @@ const Scene07: React.FC = () => {
     {x: 604, y: 1128, at: g3, rot: -3, s: 0.62},
   ];
   const tucked: CloneSpot[] = [
-    {x: 212, y: 1290, at: g3 + 1 / 30, rot: -8, s: 0.44},
-    {x: 404, y: 1066, at: g3 + 1 / 30, rot: 7, s: 0.44},
+    {x: 232, y: 994, at: g3 + 1 / 30, rot: -8, s: 0.56},
+    {x: 364, y: 999, at: g3 + 1 / 30, rot: 6, s: 0.6},
   ];
   // the board keeps every clone (no liftAt: the copies are duplicates peeling off)
   const boardClones: CloneSpot[] = clones.map(({liftAt: _l, ...c}) => c);
@@ -228,7 +254,11 @@ const Scene07: React.FC = () => {
     spec(SRC.D, 1, 370, B.before + 0.18, S08_COPIES.w1, 's7wc3'),
   ];
 
-  // far roof details go into the set's roofs layer (behind the wall); quiet details on the left wall field
+  // far roof details go into the set's roofs layer (behind the wall); quiet details on the left wall field.
+  // Fix round 3 (palette value: the lower 55 % read as a brown mass): the lit walls go up one step, clay -> sand (a <Tod
+  // map> on the layer), keeping clay only for the shade planes: the public wall's cornice band stays as drawn (the map runs
+  // below y 880 only), the board's recess band (BoardShade) is added left of the board, and the workshop keeps its kit
+  // shade plane (its left 20 %, x 780-868, drawn unmapped) as its one flat shade polygon.
   const wrap: LayerWrap = (name, _z, node) =>
     name === 'roofs' ? (
       <>
@@ -237,8 +267,35 @@ const Scene07: React.FC = () => {
       </>
     ) : name === 'wall' ? (
       <>
-        {node}
+        <defs>
+          <clipPath id="s7wallCorn" clipPathUnits="userSpaceOnUse">
+            <rect x={-400} y={-400} width={1800} height={1280} />
+          </clipPath>
+          <clipPath id="s7wallLit" clipPathUnits="userSpaceOnUse">
+            <rect x={-400} y={880} width={1800} height={1400} />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#s7wallCorn)">{node}</g>
+        <g clipPath="url(#s7wallLit)">
+          <Tod map={litWall}>{node}</Tod>
+        </g>
+        <BoardShade />
         <WallDetails />
+      </>
+    ) : name === 'corner' ? (
+      <>
+        <defs>
+          <clipPath id="s7wsShade" clipPathUnits="userSpaceOnUse">
+            <rect x={-400} y={-400} width={1268} height={2800} />
+          </clipPath>
+          <clipPath id="s7wsLit" clipPathUnits="userSpaceOnUse">
+            <rect x={868} y={-400} width={1000} height={2800} />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#s7wsShade)">{node}</g>
+        <g clipPath="url(#s7wsLit)">
+          <Tod map={litWall}>{node}</Tod>
+        </g>
       </>
     ) : name === 'ground' ? (
       <>
@@ -249,7 +306,7 @@ const Scene07: React.FC = () => {
       node
     );
 
-  const set = (_pass: RevealPass) => (
+  const set = (pass: RevealPass) => (
     <>
       <NoticeboardCorner
         sun={sun}
@@ -264,6 +321,8 @@ const Scene07: React.FC = () => {
         wrap={wrap}
         seed="nc"
       />
+      {/* fills pass only: hide the latch's ink-coloured bars until the pen inks the stile (fix round 3) */}
+      {pass === 'fills' ? <LatchCover board={NOTICE_CORNER.board.frame} /> : null}
       {/* J4: the makers' blind is still down: 'still fixing...' (props FixSign: the one sign of J3 / J4 / J5). Hung from a
           nail on the blind's top-left, drawn after the set so the window frame and the round sign's bracket stay behind it */}
       <FixSign x={J4.x} y={J4.y} fs={J4.fs} swingAt={[B.fix]} seed="s7J4" />
@@ -285,27 +344,34 @@ const Scene07: React.FC = () => {
 
   // readers at the frame sides: the left two wait low from the cut and rise on 'out', the right two pop up on 'the';
   // four phones go up. arms 'near': the phone arm is the only arm drawn (no hand left floating at the hip).
-  const RAISE = [B.the, B.the + 0.15, B.the + 0.05, B.the + 0.2];
+  // Fix round 3: three phones (reader 3 is an edge sliver, no phone); the hanging near arm ends at the sleeve cuff, no hand
+  // (DownSleeve: the kit's seam + cuff; the kit draws its arms={false} reader with no hanging arm at all).
+  const RAISE: (number | undefined)[] = [B.the, B.the + 0.15, B.the + 0.05, undefined];
   const reader = (i: number) => {
     const r = S7_READERS[i];
-    const head = i < 2 ? r.head : RIGHT_HEADS[i - 2];
+    const head: Pt = i < 2 ? [r.head[0] + (i === 0 ? R0_DX : 0), r.head[1]] : RIGHT_HEADS[i - 2];
     const look = i === 3 ? READER3 : {hair: r.hair, hairColor: undefined, acc: r.acc};
+    const riseAt = i < 2 ? undefined : B.the - 0.06 + (i - 2) * 0.06;
+    const ra = RAISE[i];
+    const up = ra !== undefined && t >= ra;
     return (
-      <EdgeOnlooker
-        key={i}
-        x={head[0]}
-        y={head[1]}
-        head={82}
-        hair={look.hair}
-        hairColor={look.hairColor}
-        body={r.body}
-        acc={[...look.acc]}
-        riseAt={i < 2 ? undefined : B.the - 0.06 + (i - 2) * 0.06}
-        raisePhoneAt={t >= RAISE[i] ? RAISE[i] - POP_SKIP : undefined}
-        arms="near"
-        rim={i < 2 ? 'left' : 'right'}
-        seed={`nc/rd${i}`}
-      />
+      <React.Fragment key={i}>
+        <EdgeOnlooker
+          x={head[0]}
+          y={head[1]}
+          head={82}
+          hair={look.hair}
+          hairColor={look.hairColor}
+          body={r.body}
+          acc={[...look.acc]}
+          riseAt={riseAt}
+          raisePhoneAt={up ? ra - POP_SKIP : undefined}
+          arms={false}
+          rim={i < 2 ? 'left' : 'right'}
+          seed={`nc/rd${i}`}
+        />
+        {up ? null : <DownSleeve x={head[0]} y={head[1]} head={82} cap={look.hair === 'cap'} riseAt={riseAt} seed={`nc/rd${i}`} />}
+      </React.Fragment>
     );
   };
   // fill-first reveal: the set arrives as flat fills and its linework is drawn on by pen strokes, top -> bottom
@@ -329,8 +395,9 @@ const Scene07: React.FC = () => {
           <WireCopy key={c.seed} c={c} />
         ))}
 
-        {/* L7 on the board's bottom rail */}
-        <LabelTag kind="card" box={[300, 1338, 640, 1436]} text={['word leaked Oct 20', 'fix out Oct 21']} fontSize={36} swing at={B.label} seed="s7L7" />
+        {/* L7 on the board's bottom rail (fix round 3: on the storyboard's w73+0.10; it pops from ~20 %: the kit's spring is
+            started L7_PRE early and the card is drawn from B.label, so its first frame already reads) */}
+        {t >= B.label ? <LabelTag kind="card" box={[300, 1338, 640, 1436]} text={['word leaked Oct 20', 'fix out Oct 21']} fontSize={36} swing at={B.label - L7_PRE} seed="s7L7" /> : null}
 
         {/* Pip on the board top + the flyer gag */}
         <PipS07 B={B} />
@@ -341,12 +408,11 @@ const Scene07: React.FC = () => {
             {reader(i)}
           </RiseFromLow>
         ))}
-        {/* the right pair far -> near: reader 3 (brown, head higher) behind reader 2, so its phone arm passes behind
-            reader 2's cap instead of across it */}
+        {/* the right pair far -> near: reader 3 (the brown edge sliver) behind reader 2 */}
         {[3, 2].map((i) => reader(i))}
         <PhoneCopy x={PHONE[0]} y={PHONE[1]} at={B.was - 0.1} ringAt={B.was - 0.06} rot={-3} ringR={39} />
         {SCREENS.map((p) => (
-          <PhoneScreen key={p.i} x={p.x} y={p.y} w={p.w} h={p.h} at={RAISE[p.i] + 0.17} tRef={SCREEN_TREF} seed={`nc/rd${p.i}`} />
+          <PhoneScreen key={p.i} x={p.x} y={p.y} w={p.w} h={p.h} at={RAISE[p.i]! + 0.17} tRef={SCREEN_TREF} seed={`nc/rd${p.i}`} />
         ))}
 
         {/* the lens wipe: the printed sheet at the lens shrinks into the notice, on top of everything until it lands: S06's

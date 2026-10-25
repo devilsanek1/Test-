@@ -75,6 +75,11 @@ const RIM_CLIP = 640.5;
 /** The near street tree, shifted 70 world right for S04 (fix round: the dive's sun crossed its crown): its box in the
  *  near layer (nothing else of that layer is in it). */
 const TREE_BOX = rectPath(560, 930, 190, 470);
+/** The sky the sun can show in once it is in the set's sky slot (world): above the hero house and the left row's
+ *  roofline (the row's quad top runs from (520, 660) to the VP). Fix round 2: in the dive the flat (ink-less) facades
+ *  leave hairline seams between houses and the sun, behind them, showed through as thin orange slivers at the cut;
+ *  everything of the sun below this roofline is behind the row anyway. */
+const SUN_SKY = `M-4000 -4000H4000V${STOOP.vp[1]}H${STOOP.vp[0]}L520 660H-4000Z`;
 const TREE_DX = 70;
 
 /** The lock box rattles about its top screw: +-5 deg for 0.15 s when Bit kicks off on 'bug', +-3 deg for 0.12 s when he
@@ -203,7 +208,7 @@ const Scene04: React.FC = () => {
           foreground={false}
           furniture={[STOOP.furniture[0]]}
           pigeons={false}
-          sun={sunFront ? null : sun}
+          sun={sunFront ? null : <ClipG d={SUN_SKY}>{sun}</ClipG>}
           calendar={calendar}
           heroLock={false}
           heroSlot={heroSlot}

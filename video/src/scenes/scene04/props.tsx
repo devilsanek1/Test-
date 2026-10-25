@@ -154,19 +154,39 @@ export const CAL: [number, number, number, number] = [360, 1015, 95, 105];
 const CAL_HEAD = CAL[3] * 0.2;
 const PAGE_H = CAL[3] - CAL_HEAD;
 const CAL_INK = SI.far;
+const FRAME = 1 / 30;
 
-/** One YEAR page in page-local coords (0,0 = its top-left), w x h: cream paper, a solid tan title band (no numerals),
- *  twelve separate month blocks (3 x 4, with gaps), each a small box with a sand title strip. */
-const YearPage: React.FC<{w: number; h: number; seed: string; back?: boolean}> = ({w, h, seed, back = false}) => {
-  if (back) {
-    // the page's back (seen while it flips up over the binding): plain paper
-    return (
-      <>
-        <Fill d={rectPath(0, 0, w, h)} color={palette.cream} offset={false} mode="none" seed={`${seed}/bk`} />
-        <Ink d={`M0 0H${w}V${h}H0Z`} width={CAL_INK * 0.8} taper={false} seed={`${seed}/bko`} />
-      </>
-    );
+/** A hand-scribbled, illegible 'year' on a page's tan title band (fix round 2: the pad read as an intercom panel; no
+ *  numerals, the storyboard's rule): four cursive marks (loops and humps) whose heights and kinds change with `year`,
+ *  so every torn page is visibly a new year. Page-local, centred on (cx, cy), width ww, x-height a. */
+function yearScribble(cx: number, cy: number, ww: number, a: number, year: number): string {
+  const r = (k: string) => rand('s4yr', `${year}${k}`);
+  const n = 4;
+  const step = ww / n;
+  let x = cx - ww / 2;
+  let d = `M${x.toFixed(1)} ${(cy + a * 0.35).toFixed(1)}`;
+  for (let i = 0; i < n; i++) {
+    const h = a * (0.75 + r(`h${i}`) * 0.6);
+    const xm = x + step * 0.55;
+    const xb = x + step;
+    if (r(`k${i}`) > 0.42) {
+      // a loop (like an 'l' or 'e'): up and back, crossing itself, on to the next mark
+      d += `C${xm.toFixed(1)} ${(cy + a * 0.35).toFixed(1)} ${(xm + step * 0.32).toFixed(1)} ${(cy - h).toFixed(1)} ${xm.toFixed(1)} ${(cy - h).toFixed(1)}`;
+      d += `C${(xm - step * 0.3).toFixed(1)} ${(cy - h).toFixed(1)} ${(xm - step * 0.08).toFixed(1)} ${(cy + a * 0.45).toFixed(1)} ${xb.toFixed(1)} ${(cy + a * 0.25).toFixed(1)}`;
+    } else {
+      // a hump (like an 'n' / 'm' stroke)
+      d += `C${(x + step * 0.15).toFixed(1)} ${(cy - h * 0.7).toFixed(1)} ${(xb - step * 0.25).toFixed(1)} ${(cy - h * 0.8).toFixed(1)} ${(xb - step * 0.1).toFixed(1)} ${(cy + a * 0.35).toFixed(1)}`;
+      d += `Q${(xb - step * 0.04).toFixed(1)} ${(cy + a * 0.5).toFixed(1)} ${xb.toFixed(1)} ${(cy + a * 0.2).toFixed(1)}`;
+    }
+    x = xb;
   }
+  return d;
+}
+
+/** One YEAR page in page-local coords (0,0 = its top-left), w x h: cream paper, a tan title band with the scribbled
+ *  'year' on it (no numerals), twelve separate month blocks (3 x 4, with gaps), each a small box with a sand title strip;
+ *  `curl` = the dog-ear on its bottom-right corner (the pad's top page). */
+const YearPage: React.FC<{w: number; h: number; seed: string; year: number; curl?: boolean}> = ({w, h, seed, year, curl = false}) => {
   const band = h * 0.13;
   const mx = w * 0.08;
   const gx = w * 0.05;
@@ -183,30 +203,63 @@ const YearPage: React.FC<{w: number; h: number; seed: string; back?: boolean}> =
       boxes += rectPath(x, y, bw, bh);
       strips += rectPath(x, y, bw, bh * 0.32);
     }
+  const ce = w * 0.1;
+  const flap = `M${w - ce} ${h}L${w} ${h - ce}L${w - ce * 0.92} ${h - ce * 0.92}Z`;
   return (
     <>
       <Fill d={rectPath(0, 0, w, h)} color={palette.cream} offset={false} mode="none" seed={`${seed}/p`} />
       <Fill d={rectPath(0, 0, w, band)} color={palette.tan} offset={false} mode="none" seed={`${seed}/b`} />
       <Fill d={strips} color={palette.sand} offset={false} mode="none" seed={`${seed}/s`} />
       <Ink d={boxes} width={1.1} taper={false} seed={`${seed}/g`} />
-      <Ink d={`M0 ${band.toFixed(1)}H${w}M0 0H${w}V${h}H0Z`} width={CAL_INK * 0.8} taper={false} seed={`${seed}/o`} />
+      <Ink d={yearScribble(w / 2, band * 0.6, w * 0.5, band * 0.4, year)} width={1.3} taper={false} seed={`${seed}/yr${year % 4}`} />
+      <Ink d={`M0 ${band.toFixed(1)}H${w}M0 0H${w}V${curl ? h - ce : h}${curl ? `M${w - ce} ${h}` : ''}H0Z`} width={CAL_INK * 0.8} taper={false} seed={`${seed}/o`} />
+      {curl ? (
+        <>
+          <Fill d={flap} color={palette.sand} offset={false} mode="none" seed={`${seed}/cf`} />
+          <Ink d={flap} width={CAL_INK * 0.6} taper={false} seed={`${seed}/ci`} />
+        </>
+      ) : null}
     </>
   );
 };
 
+/** The torn-stub fringe left at the binding once pages have been torn: small paper teeth along the header's bottom
+ *  edge (page-local of the calendar, y = the binding). */
+const stubFringe = (w: number, y: number, n: number): string => {
+  let d = `M1.5 ${y}`;
+  const k = 16;
+  for (let i = 1; i <= k; i++) {
+    const x = 1.5 + ((w - 3) * i) / k;
+    const dep = 1.2 + rand('s4stub', `${n % 4}${i}`) * 1.7;
+    d += `L${(x - (w - 3) / k / 2).toFixed(1)} ${(y + dep).toFixed(1)}L${x.toFixed(1)} ${y}`;
+  }
+  return d + 'Z';
+};
+
 /** The tear-off YEAR calendar (scene-local: the kit Calendar draws its year page as one grid): nail + string, a sand
- *  header with two rings, the current year page. A tear swaps the page in one frame (the torn one is YearFlyers'). */
+ *  header with two rings, the current year page (dog-eared) on a pad (the next page peeks out under it); after the
+ *  first tear a torn-stub fringe at the binding. A tear swaps the page in one frame (the torn one is YearFlyers'). */
 export const YearCalendar: React.FC<{tears: number[]; seed?: string}> = ({tears, seed = 's4cal'}) => {
   const t = useTime();
   const [x, y, w, h] = CAL;
   const torn = tears.filter((ta) => t >= ta).length;
+  const stack = `M${w + 1.8} ${CAL_HEAD + 3}V${CAL_HEAD + PAGE_H + 2.6}H3`;
   return (
     <XG m={mat.translate(x, y)}>
       <Ink d={`M${w * 0.2} 0L${w / 2} ${-h * 0.11}L${w * 0.8} 0`} width={CAL_INK * 0.6} seed={`${seed}/str`} />
       <Fill d={`M${w / 2 - 2.4} ${-h * 0.11}a2.4 2.4 0 1 0 4.8 0a2.4 2.4 0 1 0 -4.8 0Z`} color={palette.ink} offset={false} mode="none" seed={`${seed}/nail`} />
+      {/* the pad: the next pages peek out under the top one (right and bottom edges) */}
+      <Fill d={rectPath(2, CAL_HEAD + 2, w, PAGE_H + 0.8)} color={palette.cream} offset={false} mode="none" seed={`${seed}/stk`} />
+      <Ink d={stack} width={CAL_INK * 0.55} taper={false} seed={`${seed}/stki`} />
       <XG m={mat.translate(0, CAL_HEAD)}>
-        <YearPage w={w} h={PAGE_H} seed={`${seed}/pg${torn % 3}`} />
+        <YearPage w={w} h={PAGE_H} seed={`${seed}/pg${torn % 3}`} year={torn} curl />
       </XG>
+      {torn > 0 ? (
+        <>
+          <Fill d={stubFringe(w, CAL_HEAD - 0.5, torn)} color={palette.cream} offset={false} mode="none" seed={`${seed}/stub`} />
+          <Ink d={stubFringe(w, CAL_HEAD - 0.5, torn)} width={CAL_INK * 0.4} taper={false} seed={`${seed}/stubi`} />
+        </>
+      ) : null}
       <Fill d={rectPath(0, 0, w, CAL_HEAD + 2)} color={palette.sand} seed={`${seed}/hd`} />
       <Ink d={`M-3 0H${w + 3}M0 0V${CAL_HEAD}M${w} 0V${CAL_HEAD}M-2 ${CAL_HEAD}H${w + 2}`} width={CAL_INK} seed={`${seed}/hdo`} />
       <Ink d={`M${w * 0.3 - 3} ${CAL_HEAD * 0.5}a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M${w * 0.7 - 3} ${CAL_HEAD * 0.5}a3 3 0 1 0 6 0a3 3 0 1 0 -6 0`} width={CAL_INK * 0.6} seed={`${seed}/rings`} />
@@ -214,42 +267,55 @@ export const YearCalendar: React.FC<{tears: number[]; seed?: string}> = ({tears,
   );
 };
 
-/** The torn pages: each one first FLIPS UP over the binding (2 frames: it folds up about its top edge, showing its
- *  back), then flutters up and a little right off the wall, shrinking away, so it reads as a page torn off THAT
- *  calendar. Several are in the air at once (the time-lapse). None is left in the air when the dive starts (`until`). */
+/** The torn pages (fix round 2: the old flip laid a blank 145 x 95 px lid over the calendar on almost every frame).
+ *  Each tear: ONE frame of the page LIFTED from its bottom edge over the binding, seen from behind as a foreshortened
+ *  trapezoid above the header (top edge pinned at the binding, its far edge ~34 % shorter), the title band's tan strip
+ *  showing through the back as a misregistered band at its foot; from the next frame the page is off the pad, front out
+ *  (its year grid and scribbled year), fluttering up and a little right while it shrinks away. Nothing ever covers the
+ *  pad's own title band (the tears are 2.1 frames apart, so every other frame shows the pad bare). None is left in the
+ *  air when the dive starts (`until`). */
 export const YearFlyers: React.FC<{tears: number[]; until: number; life?: number; seed?: string}> = ({tears, until, life = 0.32, seed = 's4fly'}) => {
   const t = useTime();
   const w = CAL[2];
   const h = PAGE_H;
-  const top: Pt = [CAL[0], CAL[1] + CAL_HEAD];
-  const FLIP = 0.067;
+  const bind = CAL[1] + CAL_HEAD;
   const out: React.ReactNode[] = [];
   tears.forEach((ta, i) => {
     const end = Math.min(ta + life, until);
     if (t < ta || t >= end) return;
     const r = (k: string) => rand(seed, `${i}${k}`);
-    if (t < ta + FLIP) {
-      // the flip up over the binding: scaleY 1 -> -0.7 about the top edge (frame 1: edge-on-ish, frame 2: its back)
-      const q = (t - ta) / FLIP;
-      const sy = 1 - 1.7 * E.outCubic(Math.min(1, q + 0.5));
+    if (t < ta + FRAME) {
+      // the lift: the page's back, standing up over the binding and leaning away (bottom edge up and back: shorter)
+      const hp = h * 0.6;
+      const ins = w * 0.17;
+      const x0 = CAL[0];
+      // paper, not a lid: the far edge twists a little right and bows (the page bends as it is pulled), the sides bow in
+      const sk = 4 + r('sk') * 4;
+      const fL: Pt = [x0 + ins + sk, bind - hp];
+      const fR: Pt = [x0 + w - ins + sk, bind - hp + 3];
+      const trap = `M${x0} ${bind}L${x0 + w} ${bind}Q${x0 + w - ins * 0.35} ${bind - hp * 0.5} ${fR[0]} ${fR[1]}Q${(fL[0] + fR[0]) / 2} ${bind - hp - 7} ${fL[0]} ${fL[1]}Q${x0 + ins * 0.75} ${bind - hp * 0.5} ${x0} ${bind}Z`;
+      const bh = 4.5;
+      const bi = (ins * bh) / hp;
+      const band = polyPath([[x0 + 2.2, bind - 1.6], [x0 + w + 1.8, bind - 1.6], [x0 + w - bi + 1.8, bind - 1.6 - bh], [x0 + bi + 2.2, bind - 1.6 - bh]]);
       out.push(
-        <XG key={i} m={mat.compose(mat.translate(top[0], top[1]), mat.scale(1, sy))}>
-          <YearPage w={w} h={h} seed={`${seed}/${i % 3}`} back={sy < 0} />
-        </XG>,
+        <React.Fragment key={i}>
+          <Fill d={trap} color={palette.cream} offset={false} mode="none" seed={`${seed}/bk${i % 3}`} />
+          <Fill d={band} color={palette.tan} offset={false} mode="none" seed={`${seed}/bb${i % 3}`} />
+          <Ink d={trap} width={CAL_INK * 0.8} taper={false} seed={`${seed}/bki${i % 3}`} />
+        </React.Fragment>,
       );
       return;
     }
-    const q = (t - ta - FLIP) / (life - FLIP);
-    // it turns over to its FRONT (the year grid) within the first 30 % and flutters (front out), drifting up and a
-    // little right while it shrinks away (into the distance): a page off THAT calendar, not a loose leaflet
-    const dx = lerp(0, 24 + r('x') * 46, E.outCubic(q));
-    const dy = lerp(-h * 0.7, -(h * 0.7 + 40 + r('y') * 40), E.outQuad(q)) + 20 * q * q;
-    const rot = (r('r') - 0.4) * 40 * q + 8 * Math.sin(q * 9 + r('p') * 6);
-    const sc = 1 - 0.68 * E.outQuad(q);
-    const fl = q < 0.3 ? lerp(-0.7, 0.9, E.inOutSine(q / 0.3)) : 0.9 - 0.25 * Math.abs(Math.sin((q - 0.3) * 8 + r('f') * 6));
+    const q = (t - ta - FRAME) / (life - FRAME);
+    // off the pad, front out: from just above the header, up and a little right, shrinking away, fluttering
+    const cx = CAL[0] + w / 2 + 4 + lerp(0, 26 + r('x') * 48, E.outCubic(q));
+    const cy = bind - 34 - lerp(0, 46 + r('y') * 40, E.outQuad(q)) + 16 * q * q;
+    const rot = (r('r') - 0.4) * 36 * q + 7 * Math.sin(q * 9 + r('p') * 6);
+    const sc = 0.72 - 0.42 * E.outQuad(q);
+    const fl = 0.55 + 0.4 * Math.abs(Math.sin(q * 7 + 0.4 + r('f') * 2));
     out.push(
-      <XG key={i} m={mat.compose(mat.translate(top[0] + dx + (w * (1 - sc)) / 2, top[1] + dy), mat.rotate(rot), mat.scale(sc, sc * fl))}>
-        <YearPage w={w} h={h} seed={`${seed}/${i % 3}`} back={fl < 0} />
+      <XG key={i} m={mat.compose(mat.translate(cx, cy), mat.rotate(rot), mat.scale(sc, sc * fl), mat.translate(-w / 2, -h / 2))}>
+        <YearPage w={w} h={h} seed={`${seed}/${i % 3}`} year={i} />
       </XG>,
     );
   });
@@ -389,16 +455,55 @@ const GRATE_INK = (() => {
   return d;
 })();
 
+/** Fix round 2 (the dive leaves the bottom quarter of the cut frame a barren mint band): perspective paving joints on
+ *  the near pavement, hair-weight and broken, converging on the street's VP (world y 1420-1660: screen ~1530-1990 at the
+ *  cut, under the platform UI, so all of it is low-contrast). */
+const PAVE_JOINTS = (() => {
+  // short broken strokes only (style bible: texture strokes short and sparse; long rays read as scratches): per joint
+  // two ~24 world dashes toward the VP, plus a few short slab joints parallel to the kerb
+  let d = '';
+  const at = (X: number, y: number) => VP[0] + ((X - VP[0]) * (y - VP[1])) / (1700 - VP[1]);
+  [-180, 640].forEach((X, i) => {
+    const y0 = 1452 + i * 30;
+    d += line(at(X, y0), y0, at(X, y0 + 22), y0 + 22, {seed: `s4pj${i}a`, over: 0});
+    d += line(at(X, y0 + 40), y0 + 40, at(X, y0 + 58), y0 + 58, {seed: `s4pj${i}b`, over: 0});
+  });
+  [[40, 1514, 34], [376, 1572, 30]].forEach(([x, y, l], i) => {
+    d += line(x, y, x + l, y + 1, {seed: `s4ps${i}`, over: 0});
+  });
+  return d;
+})();
+/** The sand kerb shadows (the sun is up right: they fall a little left): under the stoop's bottom step and the planter. */
+const KERB_SHADOWS =
+  polyPath([[148, STOOP.pavementY + 1], [436, STOOP.pavementY + 1], [428, STOOP.pavementY + 8], [140, STOOP.pavementY + 8]]) +
+  polyPath([[452, STOOP.furniture[0].y - 1], [512, STOOP.furniture[0].y - 1], [506, STOOP.furniture[0].y + 6], [444, STOOP.furniture[0].y + 6]]);
+/** Two fallen tan leaves on the pavement (the season cue's callback): (x, y, rot, size). */
+const FALLEN: [number, number, number, number][] = [
+  [292, 1482, -28, 9],
+  [574, 1536, 34, 8],
+];
+const fallenD = (x: number, y: number, a: number, k: number) => {
+  const r = (a * Math.PI) / 180;
+  const P = (u: number, v: number) => `${(x + (u * Math.cos(r) - v * Math.sin(r)) * k).toFixed(1)} ${(y + (u * Math.sin(r) + v * Math.cos(r)) * k).toFixed(1)}`;
+  return {d: `M${P(-1, 0)}C${P(-0.5, -0.8)} ${P(0.55, -0.75)} ${P(1, 0)}C${P(0.55, 0.75)} ${P(-0.5, 0.8)} ${P(-1, 0)}Z`, rib: `M${P(-1.25, 0.05)}L${P(0.7, 0)}`};
+};
+const FALLEN_D = FALLEN.map(([x, y, a, k]) => fallenD(x, y, a, k));
+
 /** The ground layer, re-inked: the set's ground FILLS (road, pavements) with its own kerb lines, the kerb-stone joints,
- *  a drain grate and a few specks instead of its long paving rays. */
+ *  a drain grate and a few specks instead of its long paving rays; fix round 2: paving joints toward the VP, sand kerb
+ *  shadows under the stoop and the planter, two fallen tan leaves. */
 export const GroundS04: React.FC<{node: React.ReactNode}> = ({node}) => (
   <>
     <Look ink={false}>{node}</Look>
+    <Fill d={KERB_SHADOWS} color={palette.sand} offset={false} mode="none" seed="s4ks" />
     <Ink d={KERB_INK} width={SI.front} seed="stoop/kerb" />
     <Ink d={KERB_JOINTS} width={SI.far} taper={false} seed="s4kj" />
+    <Ink d={PAVE_JOINTS} width={SI.hair} taper={false} seed="s4pj" />
     <Ink d={SPECKS} width={SI.far} taper={false} seed="s4sp" />
     <Fill rect={GRATE} color={palette.tealDark} offset={false} mode="none" seed="s4gr" />
     <Ink d={GRATE_INK} width={SI.far} taper={false} seed="s4gri" />
+    <Fill d={FALLEN_D.map((f) => f.d).join('')} color={palette.tan} offset={false} mode="none" seed="s4fl" />
+    <Ink d={FALLEN_D.map((f) => f.d + f.rib).join('')} width={SI.hair * 0.8} taper={false} seed="s4fli" />
   </>
 );
 

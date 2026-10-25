@@ -4,9 +4,9 @@
 // wedge. The fill-first pen reveal is scene07/reveal.tsx.
 
 import React from 'react';
-import {ease as E, Fill, Ink, lerp, mat, Mat, osc, palette, prog, springAt, springs, Tod, useTime, XG, clamp, Pt, hline, poly, polyPath, line} from '../../lib';
+import {canvas, ease as E, Fill, Ink, lerp, mat, Mat, MOTION, osc, palette, prog, springAt, springs, Tod, useInkScale, useTime, useXf, world, XG, clamp, Pt, hline, poly, polyPath, line} from '../../lib';
 import {Elephant, hop} from '../../lib/mascot';
-import {rand} from '../../lib/rng';
+import {rand, rng} from '../../lib/rng';
 import {Bird} from '../../lib/kit';
 import {Bit, DEPTH_INK, LeakSheet, MarkRing, misregScreen} from '../shared/props';
 import type {PaneRect} from '../shared/props';
@@ -221,8 +221,10 @@ export const Pigeon: React.FC<{wire: 0 | 1 | 2; x: number; at?: number; hopAt?: 
 /** entry: a flatter, longer leap in from off-frame left (hidden under the lens sheet for its first frames; <= ~60 px a
  *  frame on screen at the landing). exit (fix round 1): an arc UP and out of the right frame edge over the workshop's
  *  window box (feet never below the board top y 928, so it never crosses J4 or the round sign; Pip is fully past the
- *  frame edge, world x 989 + his 62 px tail, by local ~1.98; every step <= ~60 px a frame incl. the tilt). */
-export const PIP = {x: 705, y: 928, s: 1.2, entry: [-40, 1150] as Pt, inAir: 0.5, inH: 60, exit: [1085, 905] as Pt, offLead: 0.02, offAir: 0.32, offH: 36};
+ *  frame edge, world x 989 + his 62 px tail, by local ~1.98; every step <= ~60 px a frame incl. the tilt). Fix round 3:
+ *  the landing point 905 -> 760 world, so the hop RISES out of the frame: it crosses the right edge with his feet at
+ *  screen y ~780 (above the like / comment rail, y 900-1500), over the workshop's upper floor, not through the rail. */
+export const PIP = {x: 705, y: 928, s: 1.2, entry: [-40, 1150] as Pt, inAir: 0.5, inH: 60, exit: [1085, 760] as Pt, offLead: 0.02, offAir: 0.32, offH: 30};
 /** The flyer is flicked off this long before the word 'was' (frame 1 already moves ~30 %: out(cubic)). Fix round 2:
  *  0.08 -> 0.14 so the head shake after it gets a full 0.2 s before the hop-off crouch. */
 export const PEEL_LEAD = 0.14;
@@ -420,10 +422,24 @@ export const FarRoofDetails: React.FC<{seed?: string}> = ({seed = 's7roofs'}) =>
   for (const [x, y, w, h] of chim) stacks += `M${x} ${y}V${y - h}H${x + w}V${y}Z`;
   let caps = '';
   for (const [x, y, w, h] of chim) caps += `M${x - 3} ${y - h}H${x + w + 3}V${y - h - 4}H${x - 3}Z`;
-  // aerials: a mast and two cross bars
-  const aer = (x: number, y: number, h: number, k: string) =>
-    line(x, y, x, y - h, {over: 0, seed: `${seed}/a${k}`}) + line(x - 9, y - h + 5, x + 9, y - h + 5, {over: 0, seed: `${seed}/b${k}`}) + line(x - 6, y - h + 12, x + 6, y - h + 12, {over: 0, seed: `${seed}/c${k}`});
-  const aerials = aer(66, 772, 30, '0') + aer(338, 784, 26, '1') + aer(512, 787, 24, '2') + aer(176, 790, 22, '3');
+  // TV aerials (fix round 3: a mast with two equal bars read as the glyph '‡' at phone size): a mast leaning a hair, a
+  // long boom near the top TILTED 8-15 deg, a shorter bar and a stub below it (three unequal elements), and a lead
+  // sagging from the mast down to the roof beside its foot. Three of them, all left of the sun (none crosses the clock).
+  const aer = (x: number, y: number, h: number, tilt: number, dir: 1 | -1, k: string) => {
+    const lean = dir * h * 0.04;
+    const top: Pt = [x + lean, y - h];
+    const at = (f: number): Pt => [x + lean * f, y - h * f];
+    const bar = (f: number, l0: number, l1: number, deg: number, kk: string) => {
+      const [cx, cy] = at(f);
+      const a = (deg * Math.PI) / 180;
+      return line(cx - Math.cos(a) * l0, cy - Math.sin(a) * l0, cx + Math.cos(a) * l1, cy + Math.sin(a) * l1, {over: 0, seed: `${seed}/${kk}${k}`});
+    };
+    const mid = at(0.55);
+    const foot: Pt = [x + dir * 15, y];
+    const lead = `M${mid[0].toFixed(1)} ${mid[1].toFixed(1)}Q${(x + dir * 12).toFixed(1)} ${(mid[1] + h * 0.42).toFixed(1)} ${foot[0].toFixed(1)} ${foot[1].toFixed(1)}`;
+    return line(x, y, top[0], top[1], {over: 0, seed: `${seed}/a${k}`}) + bar(0.92, 8, 13, dir * tilt, 'b') + bar(0.74, 5, 8, 0, 'c') + bar(0.6, 2, 4, 0, 'd') + lead;
+  };
+  const aerials = aer(66, 772, 30, 12, 1, '0') + aer(176, 790, 24, 9, -1, '1') + aer(338, 784, 27, 14, 1, '2');
   // the far pole (x 262 on the 808 roof) and its two lines sagging on to the left edge (under the town wires)
   const P = {x: 262, base: 808, top: 774};
   const pole = line(P.x, P.base, P.x, P.top, {over: 0, seed: `${seed}/p`}) + line(P.x - 10, P.top + 4, P.x + 10, P.top + 4, {over: 0, seed: `${seed}/pb`});
@@ -523,7 +539,7 @@ export const GroundDetails: React.FC<{seed?: string}> = ({seed = 's7ground'}) =>
     line(468, 1590, 480, 1586, {over: 0, seed: `${seed}/t1`}) +
     line(702, 1569, 721, 1570, {over: 0, seed: `${seed}/t2`}) +
     line(762, 1624, 774, 1620, {over: 0, seed: `${seed}/t3`}) +
-    line(515, 1648, 531, 1649, {over: 0, seed: `${seed}/t4`}) +
+    line(452, 1657, 466, 1655, {over: 0, seed: `${seed}/t4`}) + // fix round 3: off the set's ground ray at x ~521 (it read as a '⊢')
     line(652, 1660, 662, 1655, {over: 0, seed: `${seed}/t5`}) +
     line(806, 1590, 820, 1592, {over: 0, seed: `${seed}/t6`}) +
     line(392, 1612, 400, 1607, {over: 0, seed: `${seed}/t7`});
@@ -570,6 +586,120 @@ export const SpinWedge: React.FC<{r: number; at: number; spinAt: number; spinDur
     <g transform={`scale(${k.toFixed(4)})`}>
       <path d={d} fill={palette.peach} />
     </g>
+  );
+};
+
+/** The clock's FACE (fix round 3): an opaque sun-orange disc inside the cream ring, scaled with the HoursClock's own pop /
+ *  out (same maths as the kit: 7 % spring pop, inBack(1.4) out over 0.16 s), drawn under the ring and the hands. The
+ *  three wires cross the sun right where the clock sits (wire 1 passes 7 px under the hub on the lifted pose, wire 2
+ *  through it as the sun goes down): the face hides them inside the ring, so the hub and hands are never skewered. */
+export const ClockFace: React.FC<{r: number; at: number; outAt: number}> = ({r, at, outAt}) => {
+  const t = useTime();
+  const ks = useInkScale();
+  if (t < at) return null;
+  const k = Math.max(0, springAt(t, at, springs.pop) * (1 - E.inBack(1.4)(prog(t, outAt, 0.16))));
+  if (k <= 0.002) return null;
+  const R = r * 0.818;
+  const sw = r * 0.07 * ks;
+  return <circle r={(R - sw * 0.5 + 0.6) * k} fill={palette.sun} />;
+};
+
+/** The sky above everything that hides the sun (fix round 3: the clock overlay is clipped to it, so it sinks behind the
+ *  far roofs with the disc): WORLD px (apply it inside the camera group, it rides the push and the tilt). The top contour
+ *  of the set's far roofs (NoticeboardCorner G.roofs, x -160..780) with FarRoofDetails' two chimney stacks near the sun
+ *  (418, 700) cut in, the workshop's roof line (704) right of x 776; 0.5 px above each edge. The wall cornice (840) lies
+ *  under the roofs everywhere, so the roofs are the envelope. */
+export const CLOCK_SKY_CLIP = (() => {
+  const top: Pt[] = [
+    [-400, 812], [-60, 812], [-60, 790], [40, 790], [60, 772], [80, 790], [190, 790], [190, 808], [300, 808], [300, 784], [372, 784], [372, 800],
+    [415, 800], [415, 780], [435, 780], [435, 800], [470, 800], [500, 780], [530, 800], [640, 800], [640, 812],
+    [697, 812], [697, 788], [719, 788], [719, 812], [776, 812], [776, 700], [1500, 700],
+  ];
+  return 'M-400 -4000L1500 -4000' + top.reverse().map(([x, y]) => `L${x} ${y - 0.5}`).join('') + 'Z';
+})();
+
+/** Golden relight helper (fix round 3, palette value): clay -> sand for the lit wall fields (map for <Tod map>). */
+const TAN_UC = palette.tan.toUpperCase();
+export const litWall = (c: string) => (c.toUpperCase() === TAN_UC ? palette.sand : c);
+
+/** The one shade plane left on the public wall (fix round 3): a flat clay band, no outline, down the wall LEFT of the
+ *  board (light from the right, style bible 6 'shading'): the board stands off the wall, its recess / shadow side. */
+export const BoardShade: React.FC<{seed?: string}> = ({seed = 's7bshade'}) => (
+  <Fill d={polyPath([[121, 922], [140, 922], [140, 1500], [124, 1500]])} color={palette.tan} offset={false} seed={seed} />
+);
+
+/** The board's centre latch is two INK-coloured fills (kit Noticeboard handles): the fills-only pass of the pen reveal
+ *  showed them from the cut, floating on the panes like a pause icon (fix round 3). In that pass they are covered with
+ *  the glass they sit on (PaneGlass' day mintPale + the kit's 12 % tint, relit); the pen inks them with the stile. */
+export const LatchCover: React.FC<{board: readonly [number, number, number, number]}> = ({board}) => {
+  const [x, y, w, h] = board;
+  const fb = 13;
+  const gw = (w - fb * 2 - 7) / 2;
+  const rects: [number, number, number, number][] = [
+    [x + fb + gw - 11, y + h / 2 - 24, 11, 48],
+    [x + fb + gw + 7, y + h / 2 - 24, 11, 48],
+  ];
+  return (
+    <>
+      {rects.map((r, i) => (
+        <React.Fragment key={i}>
+          <Tod value="day">
+            <Fill rect={r} color={palette.mintPale} offset={false} mode="snap" seed={`s7latch${i}`} />
+          </Tod>
+          <Fill rect={r} color={palette.mintPale} opacity={0.12} offset={false} mode="snap" seed={`s7latcht${i}`} />
+        </React.Fragment>
+      ))}
+    </>
+  );
+};
+
+/** A back-view reader's HANGING near arm without a hand (fix round 3: the kit's puffy sand hand under the cuff read as a
+ *  mitten; style bible: no drawn hands on back-view figures): the kit EdgeOnlooker's own sleeve seam + cuff line, same
+ *  geometry and seeds (mirrors Figures.tsx personGeo / torsoSides / the arms block: the torso length follows the frame
+ *  bottom read from the transform, the rise, the idle bob), for a reader drawn with arms={false}. Draw it right after
+ *  that EdgeOnlooker, with the same props, while its phone arm is down. */
+export const DownSleeve: React.FC<{x: number; y: number; head: number; seed: string; cap?: boolean; riseAt?: number; bob?: number}> = ({x, y, head, seed, cap, riseAt, bob = 1.5}) => {
+  const t = useTime();
+  const m = useXf();
+  if (riseAt !== undefined && t < riseAt) return null;
+  const geo = (torsoH: number) => {
+    const r = rng(`person/${seed}`);
+    const w = r.range(86, 100);
+    const hr = w * r.range(0.23, 0.26);
+    const round = r.range(0.36, 0.45);
+    return {w, hr, round, h: torsoH, hy: -torsoH - hr * 0.86};
+  };
+  const g0 = geo(95);
+  const s = head / (g0.hr * 2);
+  const iv = mat.inv(m);
+  const Y = canvas.height + 40;
+  const yb = Math.max(world.h + world.bleed, iv[3] * Y + iv[5], iv[1] * canvas.width + iv[3] * Y + iv[5]);
+  const lift = cap ? 1.32 : 0.86;
+  const need = (yb + 30 - y) / s - g0.hr * lift;
+  const torsoH = Math.min(8000, Math.max(220, Math.ceil(need / 64) * 64));
+  const g = geo(torsoH);
+  const hyUse = cap ? -torsoH - g.hr * lift : g.hy;
+  const rise = riseAt !== undefined ? (1 - MOTION.rise.ease(prog(t, riseAt, MOTION.rise.dur))) * head * 2.2 : 0;
+  const hipY = y - hyUse * s + (bob ? osc(t, 0.5, rand(seed, 'b') * 6) * bob : 0);
+  const W = DEPTH_INK.front / s;
+  const sx = m[0] * x + m[2] * y + m[4];
+  const sd: 1 | -1 = sx < canvas.width / 2 ? 1 : -1;
+  const hw = g.w / 2;
+  const bx = hw * 1.07;
+  const R = Math.min(g.w * g.round, g.h * 0.8);
+  const xAt = (yy: number) => hw + ((bx - hw) * (yy - (-g.h + R))) / (g.h - R);
+  const d = g.w * 0.18;
+  const yTop = -g.h + R - Math.sqrt(Math.max(0, R * R - (R - d) * (R - d))) + g.w * 0.03;
+  const yCuff = -g.h + g.w * 1.05;
+  const xc = xAt(yCuff);
+  const seam = `M${(sd * (hw - d)).toFixed(2)} ${yTop.toFixed(2)}Q${(sd * (hw - d + g.w * 0.012)).toFixed(2)} ${((yTop + yCuff) / 2).toFixed(2)} ${(sd * (xc - d)).toFixed(2)} ${yCuff.toFixed(2)}`;
+  const cuff = `M${(sd * (xc - 0.5)).toFixed(2)} ${yCuff.toFixed(2)}L${(sd * (xc - d)).toFixed(2)} ${(yCuff + 0.6).toFixed(2)}`;
+  return (
+    <XG m={mat.translate(0, rise)}>
+      <XG m={mat.compose(mat.translate(x, hipY), mat.scale(s))}>
+        <Ink d={seam + cuff} width={W * 0.85} taper={false} seed={`${seed}/seam${sd}`} />
+      </XG>
+    </XG>
   );
 };
 

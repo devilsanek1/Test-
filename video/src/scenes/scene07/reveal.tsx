@@ -52,11 +52,15 @@ export function s07Strokes(jx: number): PenStroke[] {
     {d: rows(872, 1058, [788, 830, 872]), w: 48, f: 3, dur: 0.16},
     // the wall's cornice + bold roof line, left -> right
     {d: P([[-150, 860], [792, 860]]), w: 80, f: 3, dur: 0.18},
-    // the board: address rail, the frame round its rectangle, the drainpipe down the wall's left end
+    // the board: the frame round its rectangle and its legs (fix round 3: f4 0.2 s -> f3 0.14 s, legs f8 -> f3, so the frame
+    // and legs are inked by ~0.25 local, before L7 pops on the bottom rail at w73+0.10), the address rail, the drainpipe
+    {d: P([[142, 935], [738, 935], [738, 1358], [142, 1358], [142, 935]]), w: 46, f: 3, dur: 0.14},
+    {d: P([[205, 1356], [205, 1502]]), w: 40, f: 3, dur: 0.1},
+    {d: P([[672, 1356], [672, 1502]]), w: 40, f: 3, dur: 0.1},
     {d: P([[214, 915], [666, 915]]), w: 44, f: 4, dur: 0.12},
-    {d: P([[142, 935], [738, 935], [738, 1358], [142, 1358], [142, 935]]), w: 46, f: 4, dur: 0.2},
     {d: P([[14, 872], [14, 1556]]), w: 46, f: 4, dur: 0.2},
-    // pane divider + handle; J4's lettering written left -> right; the blind's slats hatched; the first window
+    // pane divider + the centre latch (its two ink bars are covered in the fills pass until this stroke inks them, fix
+    // round 3); J4's lettering written left -> right; the blind's slats hatched; the first window
     {d: P([[440, 935], [440, 1358]]), w: 40, f: 5, dur: 0.14},
     {d: P([[752 + dj, 1000], [898 + dj, 1000]]), w: 92, f: 5, dur: 0.14},
     {d: rows(786, 950, [932, 985, 1038, 1092]), w: 56, f: 5, dur: 0.18},
@@ -71,9 +75,7 @@ export function s07Strokes(jx: number): PenStroke[] {
     {d: rows(790, 934, [1150, 1222, 1294, 1366, 1438, 1480]), w: 80, f: 7, dur: 0.18},
     {d: P([[988, 1150], [988, 1264]]), w: 82, f: 7, dur: 0.12},
     {d: P([[1062, 990], [1062, 1310]]), w: 50, f: 7, dur: 0.14},
-    // the board's legs, the wall's base line, the kerb (right -> left), the ground marks hatched
-    {d: P([[205, 1356], [205, 1502]]), w: 40, f: 8, dur: 0.1},
-    {d: P([[672, 1356], [672, 1502]]), w: 40, f: 8, dur: 0.1},
+    // the wall's base line, the kerb (right -> left), the ground marks hatched
     {d: P([[-160, 1502], [1240, 1502]]), w: 34, f: 8, dur: 0.14},
     {d: P([[1240, 1534], [-160, 1534]]), w: 56, f: 9, dur: 0.16},
     {d: rows(-20, 1100, [1590, 1680, 1770, 1860]), w: 100, f: 9, dur: 0.16},

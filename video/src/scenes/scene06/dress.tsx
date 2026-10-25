@@ -13,9 +13,12 @@
 //                          near house at 2.2 / 1.3) and mullions + side curtains on its blank browser panes
 //   floor    (F.floor)     fix round 2: the set's first tan 'post shadow' wedge (it ran from the passer at (455, 1300) to
 //                          the frame bottom: a median strip) painted over: Shadows (parts.tsx) draws every figure's
-//                          shadow with one length rule instead
+//                          shadow with one length rule instead; fix round 3: the second wedge too (bottom-right, it
+//                          pointed up-left at the sun with no caster)
+//   houses   (F.houses)    fix round 3: ONE neighbour draws a curtain (PaneCurtain) instead of the set's row-wide pop
 //   fg       (F.fg)        a shrub in its tub cropped by the right frame edge, low (the bollard is gone: it read as a
-//                          tombstone)
+//                          tombstone); fix round 3: a festoon of lights across the top of the frame (ref2 f_12 / f_33
+//                          top framing), lowest ~y 240 on screen
 // Nothing here enters the caption band (screen y 280-570): the near pole's top is world 610 (screen >= 578).
 
 import React from 'react';
@@ -361,7 +364,7 @@ export const PaneCurtain: React.FC<{at: number}> = ({at}) => {
  *  right, lowest ~y 230 on screen (the caption band from 280 stays clean), cream bulbs on short stems every ~120 px; the
  *  string sways a hair (2.5 px, 0.55 Hz) and each bulb swings on its stem. World x -320 .. 1480 covers the frame through
  *  the truck. */
-const FESTOON = {x0: -320, y0: 70, x1: 1480, y1: 52, sag: 196, n: 15, r: 9.5};
+const FESTOON = {x0: -320, y0: 70, x1: 1480, y1: 52, sag: 192, n: 15, r: 11.5};
 const festoonAt = (u: number, sag: number): Pt => {
   const x = lerp(FESTOON.x0, FESTOON.x1, u);
   const y = lerp(FESTOON.y0, FESTOON.y1, u) + sag * 4 * u * (1 - u);
