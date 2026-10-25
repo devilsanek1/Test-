@@ -120,6 +120,20 @@ export const EDGE_HINTS: Record<string, EdgeHints> = {
       [652, 794, 868, 995], // Pip on the blind / sign
     ],
   },
+  S08: {
+    // the counted heap on the dome's left flank, the roof count clumps and the near rattlers sit at the left edge:
+    // kept in colour (the left paper strip used to bleach the heap at the count beat). Rects from S08's wrap-up fix r1
+    ink: {tl: 0, tr: 0, br: 1, bl: 1, left: 1, right: 0, bottom: 0.74},
+    keep: [
+      [0, 930, 280, 1145], // the counted heap
+      [0, 1060, 440, 1180], // the roof count clumps
+      [280, 1256, 454, 1533], // Pip on the parapet
+      [400, 895, 912, 1475], // the counter board
+      [0, 1270, 340, 1490], // the near rattlers / queues / near crowd
+      [0, 1480, 460, 1920], // the bottom-left neighbour
+      [880, 1580, 1080, 1920], // the beanie onlooker at the bottom right
+    ],
+  },
   S09: {
     ink: {tl: 0, tr: 0, br: 0.76, bl: 0.6, left: 0.66, right: 0, bottom: 0},
     keep: [
@@ -127,6 +141,13 @@ export const EDGE_HINTS: Record<string, EdgeHints> = {
       [17, 1051, 180, 1232], // Pip at the left edge (the hidden match cut from S08)
       [822, 1387, 947, 1549], // Pip on the pier
       [830, 850, 954, 994], // Pip's tram-boarding leap
+    ],
+  },
+  S10: {
+    ink: {tl: 0, tr: 0, br: 1, bl: 1, left: 0.52, right: 0.65, bottom: 1},
+    keep: [
+      [939, 584, 1058, 736], // Pip arriving at the right (the tram hand-over)
+      [606, 1307, 791, 1528], // Pip on the bollard + the 'hey!' gag
     ],
   },
   S11: {
