@@ -120,3 +120,14 @@ and locked to the shape, so it moves with the camera.
    - the texture vanishing after compression (then raise the contrast slightly or the pitch to about 8 px);
    - lines staying crisp at phone size.
 4. The owner picks.
+
+**Preview test, 2026-10-25** (`review/look/texture/`; regenerate with `python3 scripts/look/texture_test.py && node scripts/look/texture_shoot.cjs`):
+- **What was rendered:** variants A (flat), B (dots 6 % + key lines), C (dots 10 % + key lines) and D (dots 10 % + full
+  outlines), in palettes 2 and 7.
+- **Outputs:**
+  - `texture_sheet.png`: 1:1 crops;
+  - `full_B_p2_p7.png`: the full frames;
+  - `motion_master.mp4` and `motion_reels_sim.mp4`: a 5 s camera push from 1.0 to 1.22, with the texture locked to
+    the shapes, re-encoded at 3.5 Mbps.
+- **Result:** the halftone survives Reels-like compression, at rest and mid-push, and no moiré was visible in the stills.
+- **Waiting on the owner:** pick B or C (or in between), confirm key lines vs outlines, and check for shimmer on the phone.
