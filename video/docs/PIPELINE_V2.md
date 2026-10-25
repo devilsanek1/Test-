@@ -22,7 +22,7 @@ a full scene round. Background research: `docs/PIPELINE_RESEARCH.md`.
 **The cost driver is long, image-heavy agent sessions repeated on finished-looking scenes.** Every turn re-reads the
 whole context, and every rendered frame an agent looks at stays in that context. Reading docs was a minor cost.
 
-## The loop: gates G0-G8
+## The loop: gates G0-G8 (with G0.5, the core line)
 
 Start every video by reading `docs/OWNER_PLAYBOOK.md` (the owner's rules), and add any new feedback to it at every gate.
 
@@ -33,6 +33,7 @@ one is approved.
 | Gate | Owner plays / sees | Owner approves | Frozen after | Budget |
 |---|---|---|---|---|
 | G0 Angle | 1 screen of text | topic, audience, takeaway, length | topic, length band | 15 min, orchestrator only |
+| **G0.5 Core line** (owner, 2026-10-25) | the top 3 candidate lines on one screen, plus a short playable clip of each as its frame-0 card with voice and the phone sound | **the one sentence** the whole video exists to land, the one that gets the biggest emotional reaction (v3 example: "AI is making your PC more expensive") | the core line: it becomes the frame-0 text, the hook's seed, the cover and title text and the payoff's callback, and every script line must serve it | 1 h, after the facts are locked |
 | G1 Radio cut | TTS voice over plain paper with big captions, plus **3 hook-line variants** | every word, hook line | meaning and order of lines | 1 h, then 15 min per round |
 | G2 Voice lock | the radio cut with the final take | voice, pace | the clock (word timings) | 30 min |
 | **G3 Sketch animatic** | the whole film as line sketches timed to the voice, rough camera, **every transition labelled**, 2 hook-visual variants | **story in pictures**: shot per line, cuts, transitions, peaks | scene list, cut points, shot content, transition types | first cut 2 h; rounds 30 min |
@@ -51,7 +52,13 @@ building, and it decides the outcome:
 - **G0 angle and hook:** 4-6 independent writers with different lenses (retention editor, storyteller, sceptical
   expert, comedian, viewer), each proposing angles and hook lines. A judge panel of 3 scores them, and one synthesis
   agent merges the winner with the best grafts. The owner picks from the top 3.
-- **G1 script:** 2-3 competing drafts plus an AI-wording critic before the radio cut.
+- **G0.5 core line (its own step, owner rule):** once the topic is picked and the facts are locked, distil the single key
+  sentence. Brainstorm: 5-6 writers, each pulling a different emotional lever (loss, unfairness, reversal, personal,
+  curiosity, headline punch), 6-8 lines each, plus the owner's own suggestion. Critique: judges score every line for gut
+  reaction, truth, read-at-a-glance clarity and whether the video can pay it off; a viewer-persona panel gives gut
+  rankings; sceptics try to refute the finalists as misleading. Pick: the owner picks from the top 3. Workflow:
+  `context/workflows/v3-g05-core-line*.js`.
+- **G1 script:** 2-3 competing drafts **built around the locked core line**, plus an AI-wording critic before the radio cut.
 - **G3 animatic:** 2-3 visual concepts for the hook and the peaks (the whole film in one concept, the alternatives
   for the key moments). The owner picks at the gate.
 - **G4 look:** 2-4 style-frame directions when the topic needs a new look.

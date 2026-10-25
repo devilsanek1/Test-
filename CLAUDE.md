@@ -12,6 +12,7 @@ the playbook if its Maintenance trigger fires (7+ days since "Last compacted" wi
 
 Top rules (details in the playbook):
 - Show playable video at every stage, never only stills. Lock the story (sketch animatic) before building; polish last.
+- Every video gets ONE core line (its own step, G0.5: brainstorm, critique, owner picks) before the script is written.
 - The first 2-5 s matter most: state the payoff in words on frame 0. Target 30-45 s.
 - Everyday spoken language, no AI-sounding phrasing; scripts come with detailed emotional cues.
 - Captions pop in place (no clipped roll-ins). No paper edge at the top of the frame.
