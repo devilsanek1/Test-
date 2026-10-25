@@ -1,0 +1,718 @@
+{
+ "label": "v3 G1 radio cut \u00b7 H2 \u00b7 stand-in voice",
+ "audio": "v3/radio_h2.wav",
+ "durationSec": 36.628,
+ "frame0": "AI IS MAKING YOUR NEXT LAPTOP PRICIER",
+ "frame0Until": 3.6430000000000002,
+ "words": [
+  {
+   "w": "Buying",
+   "s": 0.5,
+   "e": 0.951,
+   "line": 0
+  },
+  {
+   "w": "a",
+   "s": 0.951,
+   "e": 1.101,
+   "line": 0
+  },
+  {
+   "w": "laptop",
+   "s": 1.101,
+   "e": 1.551,
+   "line": 0
+  },
+  {
+   "w": "soon?",
+   "s": 1.551,
+   "e": 1.942,
+   "line": 0
+  },
+  {
+   "w": "AI's",
+   "s": 1.942,
+   "e": 2.272,
+   "line": 0
+  },
+  {
+   "w": "making",
+   "s": 2.272,
+   "e": 2.722,
+   "line": 0
+  },
+  {
+   "w": "it",
+   "s": 2.722,
+   "e": 2.933,
+   "line": 0
+  },
+  {
+   "w": "pricier",
+   "s": 2.933,
+   "e": 3.443,
+   "line": 0
+  },
+  {
+   "w": "You're",
+   "s": 3.643,
+   "e": 4.056,
+   "line": 1
+  },
+  {
+   "w": "up",
+   "s": 4.056,
+   "e": 4.249,
+   "line": 1
+  },
+  {
+   "w": "against",
+   "s": 4.249,
+   "e": 4.716,
+   "line": 1
+  },
+  {
+   "w": "AI",
+   "s": 4.716,
+   "e": 4.909,
+   "line": 1
+  },
+  {
+   "w": "data",
+   "s": 4.909,
+   "e": 5.211,
+   "line": 1
+  },
+  {
+   "w": "centers",
+   "s": 5.211,
+   "e": 5.679,
+   "line": 1
+  },
+  {
+   "w": "for",
+   "s": 5.679,
+   "e": 5.927,
+   "line": 1
+  },
+  {
+   "w": "memory",
+   "s": 5.927,
+   "e": 6.339,
+   "line": 1
+  },
+  {
+   "w": "chips",
+   "s": 6.339,
+   "e": 6.697,
+   "line": 1
+  },
+  {
+   "w": "and",
+   "s": 6.697,
+   "e": 6.944,
+   "line": 1
+  },
+  {
+   "w": "losing",
+   "s": 6.944,
+   "e": 7.357,
+   "line": 1
+  },
+  {
+   "w": "In",
+   "s": 7.607,
+   "e": 7.822,
+   "line": 2
+  },
+  {
+   "w": "the",
+   "s": 7.822,
+   "e": 8.098,
+   "line": 2
+  },
+  {
+   "w": "US",
+   "s": 8.098,
+   "e": 8.312,
+   "line": 2
+  },
+  {
+   "w": "computers",
+   "s": 8.312,
+   "e": 8.957,
+   "line": 2
+  },
+  {
+   "w": "are",
+   "s": 8.957,
+   "e": 9.233,
+   "line": 2
+  },
+  {
+   "w": "up",
+   "s": 9.233,
+   "e": 9.447,
+   "line": 2
+  },
+  {
+   "w": "almost",
+   "s": 9.447,
+   "e": 9.907,
+   "line": 2
+  },
+  {
+   "w": "10%",
+   "s": 9.907,
+   "e": 10.183,
+   "line": 2
+  },
+  {
+   "w": "in",
+   "s": 10.183,
+   "e": 10.398,
+   "line": 2
+  },
+  {
+   "w": "a",
+   "s": 10.398,
+   "e": 10.551,
+   "line": 2
+  },
+  {
+   "w": "year",
+   "s": 10.551,
+   "e": 10.889,
+   "line": 2
+  },
+  {
+   "w": "after",
+   "s": 10.889,
+   "e": 11.287,
+   "line": 2
+  },
+  {
+   "w": "20",
+   "s": 11.287,
+   "e": 11.502,
+   "line": 2
+  },
+  {
+   "w": "years",
+   "s": 11.502,
+   "e": 11.901,
+   "line": 2
+  },
+  {
+   "w": "of",
+   "s": 11.901,
+   "e": 12.115,
+   "line": 2
+  },
+  {
+   "w": "getting",
+   "s": 12.115,
+   "e": 12.637,
+   "line": 2
+  },
+  {
+   "w": "cheaper",
+   "s": 12.637,
+   "e": 13.158,
+   "line": 2
+  },
+  {
+   "w": "give",
+   "s": 13.158,
+   "e": 13.495,
+   "line": 2
+  },
+  {
+   "w": "or",
+   "s": 13.495,
+   "e": 13.71,
+   "line": 2
+  },
+  {
+   "w": "take",
+   "s": 13.71,
+   "e": 14.047,
+   "line": 2
+  },
+  {
+   "w": "a",
+   "s": 14.047,
+   "e": 14.201,
+   "line": 2
+  },
+  {
+   "w": "pandemic",
+   "s": 14.201,
+   "e": 14.783,
+   "line": 2
+  },
+  {
+   "w": "Mostly",
+   "s": 14.983,
+   "e": 15.412,
+   "line": 3
+  },
+  {
+   "w": "because",
+   "s": 15.412,
+   "e": 15.897,
+   "line": 3
+  },
+  {
+   "w": "memory",
+   "s": 15.897,
+   "e": 16.325,
+   "line": 3
+  },
+  {
+   "w": "chips",
+   "s": 16.325,
+   "e": 16.697,
+   "line": 3
+  },
+  {
+   "w": "cost",
+   "s": 16.697,
+   "e": 17.011,
+   "line": 3
+  },
+  {
+   "w": "about",
+   "s": 17.011,
+   "e": 17.382,
+   "line": 3
+  },
+  {
+   "w": "5x",
+   "s": 17.382,
+   "e": 17.582,
+   "line": 3
+  },
+  {
+   "w": "last",
+   "s": 17.582,
+   "e": 17.896,
+   "line": 3
+  },
+  {
+   "w": "year's",
+   "s": 17.896,
+   "e": 18.324,
+   "line": 3
+  },
+  {
+   "w": "price",
+   "s": 18.324,
+   "e": 18.696,
+   "line": 3
+  },
+  {
+   "w": "AI",
+   "s": 18.896,
+   "e": 19.082,
+   "line": 4
+  },
+  {
+   "w": "data",
+   "s": 19.082,
+   "e": 19.374,
+   "line": 4
+  },
+  {
+   "w": "centers",
+   "s": 19.374,
+   "e": 19.826,
+   "line": 4
+  },
+  {
+   "w": "need",
+   "s": 19.826,
+   "e": 20.119,
+   "line": 4
+  },
+  {
+   "w": "mountains",
+   "s": 20.119,
+   "e": 20.678,
+   "line": 4
+  },
+  {
+   "w": "of",
+   "s": 20.678,
+   "e": 20.864,
+   "line": 4
+  },
+  {
+   "w": "them",
+   "s": 20.864,
+   "e": 21.156,
+   "line": 4
+  },
+  {
+   "w": "and",
+   "s": 21.156,
+   "e": 21.396,
+   "line": 4
+  },
+  {
+   "w": "they",
+   "s": 21.396,
+   "e": 21.688,
+   "line": 4
+  },
+  {
+   "w": "pay",
+   "s": 21.688,
+   "e": 21.928,
+   "line": 4
+  },
+  {
+   "w": "more",
+   "s": 21.928,
+   "e": 22.22,
+   "line": 4
+  },
+  {
+   "w": "It's",
+   "s": 22.52,
+   "e": 22.761,
+   "line": 5
+  },
+  {
+   "w": "less",
+   "s": 22.761,
+   "e": 23.002,
+   "line": 5
+  },
+  {
+   "w": "of",
+   "s": 23.002,
+   "e": 23.155,
+   "line": 5
+  },
+  {
+   "w": "a",
+   "s": 23.155,
+   "e": 23.264,
+   "line": 5
+  },
+  {
+   "w": "shortage",
+   "s": 23.264,
+   "e": 23.68,
+   "line": 5
+  },
+  {
+   "w": "more",
+   "s": 23.68,
+   "e": 23.921,
+   "line": 5
+  },
+  {
+   "w": "of",
+   "s": 23.921,
+   "e": 24.074,
+   "line": 5
+  },
+  {
+   "w": "an",
+   "s": 24.074,
+   "e": 24.227,
+   "line": 5
+  },
+  {
+   "w": "auction",
+   "s": 24.227,
+   "e": 24.599,
+   "line": 5
+  },
+  {
+   "w": "and",
+   "s": 24.599,
+   "e": 24.796,
+   "line": 5
+  },
+  {
+   "w": "you're",
+   "s": 24.796,
+   "e": 25.124,
+   "line": 5
+  },
+  {
+   "w": "bidding",
+   "s": 25.124,
+   "e": 25.496,
+   "line": 5
+  },
+  {
+   "w": "against",
+   "s": 25.496,
+   "e": 25.868,
+   "line": 5
+  },
+  {
+   "w": "a",
+   "s": 25.868,
+   "e": 25.977,
+   "line": 5
+  },
+  {
+   "w": "building",
+   "s": 25.977,
+   "e": 26.393,
+   "line": 5
+  },
+  {
+   "w": "The",
+   "s": 26.743,
+   "e": 26.957,
+   "line": 6
+  },
+  {
+   "w": "bids",
+   "s": 26.957,
+   "e": 27.218,
+   "line": 6
+  },
+  {
+   "w": "are",
+   "s": 27.218,
+   "e": 27.432,
+   "line": 6
+  },
+  {
+   "w": "still",
+   "s": 27.432,
+   "e": 27.741,
+   "line": 6
+  },
+  {
+   "w": "climbing",
+   "s": 27.741,
+   "e": 28.192,
+   "line": 6
+  },
+  {
+   "w": "so",
+   "s": 28.192,
+   "e": 28.358,
+   "line": 6
+  },
+  {
+   "w": "the",
+   "s": 28.358,
+   "e": 28.572,
+   "line": 6
+  },
+  {
+   "w": "cheap",
+   "s": 28.572,
+   "e": 28.88,
+   "line": 6
+  },
+  {
+   "w": "laptops",
+   "s": 28.88,
+   "e": 29.284,
+   "line": 6
+  },
+  {
+   "w": "drop",
+   "s": 29.284,
+   "e": 29.545,
+   "line": 6
+  },
+  {
+   "w": "out",
+   "s": 29.545,
+   "e": 29.759,
+   "line": 6
+  },
+  {
+   "w": "first",
+   "s": 29.759,
+   "e": 30.068,
+   "line": 6
+  },
+  {
+   "w": "Experts",
+   "s": 30.218,
+   "e": 30.584,
+   "line": 7
+  },
+  {
+   "w": "give",
+   "s": 30.584,
+   "e": 30.821,
+   "line": 7
+  },
+  {
+   "w": "it",
+   "s": 30.821,
+   "e": 30.971,
+   "line": 7
+  },
+  {
+   "w": "a",
+   "s": 30.971,
+   "e": 31.079,
+   "line": 7
+  },
+  {
+   "w": "year",
+   "s": 31.079,
+   "e": 31.316,
+   "line": 7
+  },
+  {
+   "w": "or",
+   "s": 31.316,
+   "e": 31.466,
+   "line": 7
+  },
+  {
+   "w": "two",
+   "s": 31.466,
+   "e": 31.66,
+   "line": 7
+  },
+  {
+   "w": "That's",
+   "s": 31.96,
+   "e": 32.313,
+   "line": 8
+  },
+  {
+   "w": "how",
+   "s": 32.313,
+   "e": 32.525,
+   "line": 8
+  },
+  {
+   "w": "a",
+   "s": 32.525,
+   "e": 32.643,
+   "line": 8
+  },
+  {
+   "w": "data",
+   "s": 32.643,
+   "e": 32.902,
+   "line": 8
+  },
+  {
+   "w": "center",
+   "s": 32.902,
+   "e": 33.255,
+   "line": 8
+  },
+  {
+   "w": "ends",
+   "s": 33.255,
+   "e": 33.515,
+   "line": 8
+  },
+  {
+   "w": "up",
+   "s": 33.515,
+   "e": 33.679,
+   "line": 8
+  },
+  {
+   "w": "on",
+   "s": 33.679,
+   "e": 33.844,
+   "line": 8
+  },
+  {
+   "w": "your",
+   "s": 33.844,
+   "e": 34.103,
+   "line": 8
+  },
+  {
+   "w": "next",
+   "s": 34.103,
+   "e": 34.362,
+   "line": 8
+  },
+  {
+   "w": "laptop's",
+   "s": 34.362,
+   "e": 34.81,
+   "line": 8
+  },
+  {
+   "w": "price",
+   "s": 34.81,
+   "e": 35.116,
+   "line": 8
+  },
+  {
+   "w": "tag",
+   "s": 35.116,
+   "e": 35.328,
+   "line": 8
+  }
+ ],
+ "lines": [
+  {
+   "s": 0.5,
+   "e": 3.443,
+   "image": "FRAME 0, cozy desk nook at night: the thumb taps Add to cart under a new laptop on the phone and its price tag ticks up; the old laptop on the desk; an AI DATA CENTER tower pressed against the frosty window, scooping memory chips"
+  },
+  {
+   "s": 3.643,
+   "e": 7.357,
+   "image": "conveyor outside, close and low: the viewer's hand and the data center's giant scoop reach for one glowing chip; the scoop is served first, the hand still gets its chip, but the chip's tag ticks up"
+  },
+  {
+   "s": 7.607,
+   "e": 14.783,
+   "image": "price line drawn on the fogged window hooks up, brass tag +9.7% (US, BLS); pull back along the long slide from 2005 to 2025, one small 2021 bump wearing a face mask"
+  },
+  {
+   "s": 14.983,
+   "e": 18.696,
+   "image": "inside the new laptop: the memory + storage pie slice swells from ~15% to almost 40%; one memory chip lifts out alone and its tag flips x2, x3, x4, about 5x"
+  },
+  {
+   "s": 18.896,
+   "e": 22.22,
+   "image": "SCALE MOMENT: pull back over the snowy town to the AI data center rising into haze; a mountain of chips slides into its loading door; one rack beside ~1,300 tiny laptops"
+  },
+  {
+   "s": 22.52,
+   "e": 26.393,
+   "image": "a SHORTAGE shelf swings open onto a warm auction hall, LOT 1: MEMORY CHIPS; the polite giant data center raises a billboard paddle, the tiny viewer holds up their phone"
+  },
+  {
+   "s": 26.743,
+   "e": 30.068,
+   "image": "COZY ENCLOSURE, back in the nook: a price updated card pops on the phone; the cheapest laptop listings grey out one by one, no longer available"
+  },
+  {
+   "s": 30.218,
+   "e": 31.66,
+   "image": "a paper wall calendar flips 2026, 2027, 2028 by the frosty window; the data center glows outside"
+  },
+  {
+   "s": 31.96,
+   "e": 35.328,
+   "image": "close on the phone: the price tag turns over and shows a tiny ink data center on its back; the thumb drifts back over Add to cart, hard cut to frame 0"
+  }
+ ],
+ "sfx": [
+  {
+   "src": "v3/phone_cart_add.wav",
+   "t": 0.07,
+   "gain": 0.5
+  }
+ ],
+ "hideCaptions": false
+}

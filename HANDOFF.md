@@ -93,6 +93,12 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
   `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
+- **v3 status (2026-10-25 23:00 UTC):** topic locked (`docs/v3/G0_TOPICS.md`), core line locked at the new G0.5 step
+  ("AI is making your next laptop pricier", `docs/v3/CORE_LINE.md`), G1 script `docs/v3/script/script_g1.md`, radio cuts
+  `video/deliverables/v3/v3_g1_radio_h{1,2,3}.mp4` sent, waiting for the owner's hook pick and word notes. Rejected
+  options live in `docs/v3/archive/` (no prompt reads it). Tooling: `src/entry-v3.tsx` (RadioH1-3, Core1-3),
+  `scripts/v3/build_radio.py` (stand-in TTS Kokoro: kokoro.onnx + voices.bin from the kokoro-onnx GitHub release
+  model-files-v1.0, `pip install kokoro-onnx`).
 - Both push to `video-production`: pull before pushing, and keep each video's files in its own `docs/vN/` folder.
 
 ## 3. The queue (in order) at handoff
