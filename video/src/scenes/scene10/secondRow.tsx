@@ -32,7 +32,7 @@ export const FAR_PLATE = 44;
 
 // Order = draw order (back to front) = pop order (0.04 s stagger). Roof peaks stay >= 640 (screen >= 603: rule 10).
 const DEF: B[] = [
-  {x: 338, w: 60, top: 650, roof: 'flat', color: palette.sage, plate: {x: 365, y: 684, old: true}},
+  {x: 338, w: 60, top: 646, roof: 'flat', color: palette.sage, plate: {x: 369, y: 680, old: true}},
   {x: 398, w: 52, top: 792, roof: 'flat', color: palette.sand},
   {x: 450, w: 54, top: 776, roof: 'gable', color: palette.tan},
   {x: 504, w: 50, top: 790, roof: 'step', color: palette.cream},

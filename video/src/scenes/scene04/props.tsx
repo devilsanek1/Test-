@@ -1,17 +1,20 @@
 // S04 local props: the season ivy on door #4's frame (THE season cue: it creeps up one node per step and recolours every
-// two tears: green, peach, tan, bare), the torn year pages flying off the tear-off calendar (several in the air at once:
-// the time-lapse), and the season clock shared by the ivy and the near tree.
+// two tears: green, peach, tan, bare), the YEAR calendar (a bigger body than the kit's, a year page of twelve month
+// blocks) and its torn pages (each flips up over the binding, then flies off: several in the air at once: the
+// time-lapse), the neighbours' windows, the stoop's step tones, the ground marks, and the clip helpers the scene uses
+// for the fill-only cornice top, the dive's one-unit flatten and the near tree's shift.
 
-import React from 'react';
-import {palette, skies} from '../../lib/theme';
+import React, {useId} from 'react';
+import {palette} from '../../lib/theme';
+import {Look} from '../../lib/exit';
 import {ease as E, lerp, prog, springAt, springs, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {rand} from '../../lib/rng';
-import {rectPath, Pt} from '../../lib/sketch';
+import {line, polyPath, rectPath, Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import type {Season} from '../shared/sets';
-import {STOOP} from '../shared/sets';
+import {SI, STOOP} from '../shared/sets';
 
 // ---------------------------------------------------------------- seasons
 
@@ -140,70 +143,113 @@ function smoothVine(pts: Pt[]): string {
 /** The world point of ivy node i (the falling leaf starts there). */
 export const ivyNode = (i: number): Pt => IVY_NODES[Math.min(IVY_NODES.length - 1, i)];
 
-// ---------------------------------------------------------------- the torn year pages
+// ---------------------------------------------------------------- the year calendar and its torn pages
 
-const CAL = STOOP.calendar; // [x, y, w, h]: the 70 x 80 body, header 20 % (pages under it)
+/** The calendar body in S04 (fix round: the kit slot's 70 x 80 read as one month at phone size): 95 x 105 world
+ *  (~145 x 160 px), grown up and left into the free wall above the slot, its right edge clear of the small window
+ *  (466, 1132). Header band 20 %, the year page under it. */
+export const CAL: [number, number, number, number] = [360, 1015, 95, 105];
+const CAL_HEAD = CAL[3] * 0.2;
+const PAGE_H = CAL[3] - CAL_HEAD;
+const CAL_INK = SI.far;
 
-/** One year page (3 x 4 month grid, no numerals) in page-local coords (0,0 = its top-left), w x h. */
-const YearPage: React.FC<{w: number; h: number; seed: string}> = ({w, h, seed}) => {
-  const gx = w * 0.14;
-  const gw = w * 0.72;
-  const gy = h * 0.14;
-  const gh = h * 0.72;
-  let d = '';
-  for (let c = 0; c <= 3; c++) d += `M${(gx + (gw * c) / 3).toFixed(1)} ${gy.toFixed(1)}V${(gy + gh).toFixed(1)}`;
-  for (let r = 0; r <= 4; r++) d += `M${gx.toFixed(1)} ${(gy + (gh * r) / 4).toFixed(1)}H${(gx + gw).toFixed(1)}`;
+/** One YEAR page in page-local coords (0,0 = its top-left), w x h: cream paper, a solid tan title band (no numerals),
+ *  twelve separate month blocks (3 x 4, with gaps), each a small box with a sand title strip. */
+const YearPage: React.FC<{w: number; h: number; seed: string; back?: boolean}> = ({w, h, seed, back = false}) => {
+  if (back) {
+    // the page's back (seen while it flips up over the binding): plain paper
+    return (
+      <>
+        <Fill d={rectPath(0, 0, w, h)} color={palette.cream} offset={false} mode="none" seed={`${seed}/bk`} />
+        <Ink d={`M0 0H${w}V${h}H0Z`} width={CAL_INK * 0.8} taper={false} seed={`${seed}/bko`} />
+      </>
+    );
+  }
+  const band = h * 0.13;
+  const mx = w * 0.08;
+  const gx = w * 0.05;
+  const top = band + h * 0.07;
+  const gy = h * 0.045;
+  const bw = (w - 2 * mx - 2 * gx) / 3;
+  const bh = (h - top - h * 0.06 - 3 * gy) / 4;
+  let boxes = '';
+  let strips = '';
+  for (let r = 0; r < 4; r++)
+    for (let c = 0; c < 3; c++) {
+      const x = mx + c * (bw + gx);
+      const y = top + r * (bh + gy);
+      boxes += rectPath(x, y, bw, bh);
+      strips += rectPath(x, y, bw, bh * 0.32);
+    }
   return (
     <>
       <Fill d={rectPath(0, 0, w, h)} color={palette.cream} offset={false} mode="none" seed={`${seed}/p`} />
-      <Ink d={d} width={1.3} taper={false} seed={`${seed}/g`} />
-      <Ink d={`M0 0H${w}V${h}H0Z`} width={2.0} taper={false} seed={`${seed}/o`} />
+      <Fill d={rectPath(0, 0, w, band)} color={palette.tan} offset={false} mode="none" seed={`${seed}/b`} />
+      <Fill d={strips} color={palette.sand} offset={false} mode="none" seed={`${seed}/s`} />
+      <Ink d={boxes} width={1.1} taper={false} seed={`${seed}/g`} />
+      <Ink d={`M0 ${band.toFixed(1)}H${w}M0 0H${w}V${h}H0Z`} width={CAL_INK * 0.8} taper={false} seed={`${seed}/o`} />
     </>
   );
 };
 
-/** The torn pages: each one flips up off the calendar's top edge, flutters up and to the right (seeded fan) and shrinks
- *  away into the distance over `life` s. Several are in the air at once (the time-lapse). */
-export const YearFlyers: React.FC<{tears: number[]; life?: number; seed?: string}> = ({tears, life = 0.36, seed = 's4fly'}) => {
+/** The tear-off YEAR calendar (scene-local: the kit Calendar draws its year page as one grid): nail + string, a sand
+ *  header with two rings, the current year page. A tear swaps the page in one frame (the torn one is YearFlyers'). */
+export const YearCalendar: React.FC<{tears: number[]; seed?: string}> = ({tears, seed = 's4cal'}) => {
+  const t = useTime();
+  const [x, y, w, h] = CAL;
+  const torn = tears.filter((ta) => t >= ta).length;
+  return (
+    <XG m={mat.translate(x, y)}>
+      <Ink d={`M${w * 0.2} 0L${w / 2} ${-h * 0.11}L${w * 0.8} 0`} width={CAL_INK * 0.6} seed={`${seed}/str`} />
+      <Fill d={`M${w / 2 - 2.4} ${-h * 0.11}a2.4 2.4 0 1 0 4.8 0a2.4 2.4 0 1 0 -4.8 0Z`} color={palette.ink} offset={false} mode="none" seed={`${seed}/nail`} />
+      <XG m={mat.translate(0, CAL_HEAD)}>
+        <YearPage w={w} h={PAGE_H} seed={`${seed}/pg${torn % 3}`} />
+      </XG>
+      <Fill d={rectPath(0, 0, w, CAL_HEAD + 2)} color={palette.sand} seed={`${seed}/hd`} />
+      <Ink d={`M-3 0H${w + 3}M0 0V${CAL_HEAD}M${w} 0V${CAL_HEAD}M-2 ${CAL_HEAD}H${w + 2}`} width={CAL_INK} seed={`${seed}/hdo`} />
+      <Ink d={`M${w * 0.3 - 3} ${CAL_HEAD * 0.5}a3 3 0 1 0 6 0a3 3 0 1 0 -6 0M${w * 0.7 - 3} ${CAL_HEAD * 0.5}a3 3 0 1 0 6 0a3 3 0 1 0 -6 0`} width={CAL_INK * 0.6} seed={`${seed}/rings`} />
+    </XG>
+  );
+};
+
+/** The torn pages: each one first FLIPS UP over the binding (2 frames: it folds up about its top edge, showing its
+ *  back), then flutters up and a little right off the wall, shrinking away, so it reads as a page torn off THAT
+ *  calendar. Several are in the air at once (the time-lapse). None is left in the air when the dive starts (`until`). */
+export const YearFlyers: React.FC<{tears: number[]; until: number; life?: number; seed?: string}> = ({tears, until, life = 0.32, seed = 's4fly'}) => {
   const t = useTime();
   const w = CAL[2];
-  const head = CAL[3] * 0.2;
-  const h = CAL[3] - head;
-  const top: Pt = [CAL[0], CAL[1] + head];
+  const h = PAGE_H;
+  const top: Pt = [CAL[0], CAL[1] + CAL_HEAD];
+  const FLIP = 0.067;
   const out: React.ReactNode[] = [];
   tears.forEach((ta, i) => {
-    const q = (t - ta) / life;
-    if (q < 0 || q >= 1) return;
+    const end = Math.min(ta + life, until);
+    if (t < ta || t >= end) return;
     const r = (k: string) => rand(seed, `${i}${k}`);
-    // flip up about the top edge (scaleY 1 -> -0.5 over the first 40 %), then flutter
-    const flip = 1 - 1.5 * E.outCubic(Math.min(1, q / 0.4));
-    const dx = lerp(0, 70 + r('x') * 90, E.outCubic(q));
-    const dy = lerp(0, -(90 + r('y') * 70), E.outQuad(q)) + 30 * q * q;
-    const rot = (r('r') - 0.35) * 70 * q + 12 * Math.sin(q * 9 + r('p') * 6);
-    const sc = 1 - 0.75 * E.inQuad(q);
+    if (t < ta + FLIP) {
+      // the flip up over the binding: scaleY 1 -> -0.7 about the top edge (frame 1: edge-on-ish, frame 2: its back)
+      const q = (t - ta) / FLIP;
+      const sy = 1 - 1.7 * E.outCubic(Math.min(1, q + 0.5));
+      out.push(
+        <XG key={i} m={mat.compose(mat.translate(top[0], top[1]), mat.scale(1, sy))}>
+          <YearPage w={w} h={h} seed={`${seed}/${i % 3}`} back={sy < 0} />
+        </XG>,
+      );
+      return;
+    }
+    const q = (t - ta - FLIP) / (life - FLIP);
+    const dx = lerp(0, 30 + r('x') * 60, E.outCubic(q));
+    const dy = lerp(-h * 0.7, -(h * 0.7 + 60 + r('y') * 50), E.outQuad(q)) + 24 * q * q;
+    const rot = (r('r') - 0.4) * 50 * q + 10 * Math.sin(q * 9 + r('p') * 6);
+    const sc = 1 - 0.7 * E.inQuad(q);
+    const fl = -0.7 + 0.5 * Math.sin(q * 7 + r('f') * 6);
     out.push(
-      <XG key={i} m={mat.compose(mat.translate(top[0] + dx, top[1] + dy), mat.rotate(rot), mat.scale(sc, sc * flip))}>
-        <YearPage w={w} h={h} seed={`${seed}/${i % 3}`} />
+      <XG key={i} m={mat.compose(mat.translate(top[0] + dx + (w * (1 - sc)) / 2, top[1] + dy), mat.rotate(rot), mat.scale(sc, sc * fl))}>
+        <YearPage w={w} h={h} seed={`${seed}/${i % 3}`} back={fl < 0} />
       </XG>,
     );
   });
   return <>{out}</>;
-};
-
-/** A tiny 1-frame "tear" tick: the two binding holes' paper stubs left on the header after a tear (life). */
-export const TearStubs: React.FC<{tears: number[]}> = ({tears}) => {
-  const t = useTime();
-  const n = tears.filter((x) => t >= x).length;
-  if (!n) return null;
-  // a few ragged stub marks under the header, more after more tears (max 5)
-  const k = Math.min(5, Math.ceil(n / 3));
-  let d = '';
-  for (let i = 0; i < k; i++) {
-    const x = CAL[0] + 8 + i * 12;
-    const y = CAL[1] + CAL[3] * 0.2;
-    d += `M${x} ${y}l3 4l3 -3l3 4`;
-  }
-  return <Ink d={d} width={1.2} taper={false} />;
 };
 
 /** Pop scale (7 % spring) for an element appearing at `at`, 0 before. */
@@ -212,9 +258,9 @@ export const popK = (t: number, at: number) => (t < at ? 0 : springAt(t, at, spr
 /** 0..1 over [a, a + d] with an ease. */
 export const pr = (t: number, a: number, d: number, e = E.inOutSine) => prog(t, a, d, e);
 
-// ---------------------------------------------------------------- the dive's calm caption band
+// ---------------------------------------------------------------- the neighbours' windows (time-lapse life)
 
-/** The hero house's windows (StoopStreet's own list) and frame. */
+/** The hero house's windows (StoopStreet's own list, without the small one right of the calendar). */
 const HERO_WINS: [number, number, number, number][] = [
   [70, 712, 62, 92],
   [70, 862, 62, 92],
@@ -222,98 +268,6 @@ const HERO_WINS: [number, number, number, number][] = [
   [428, 712, 62, 92],
   [428, 862, 62, 92],
 ];
-
-/** The shade strip on the hero facade's left quarter (tan; the rest of the wall is sand). */
-const SHADE_X = STOOP.hero.x + STOOP.hero.w * 0.25;
-/** A wall-coloured cover over [x, y, w, h] that follows the shade strip (tan left of it, sand right of it). */
-const wallCover = (x: number, y: number, w: number, h: number): {tan: string; sand: string} => {
-  const x1 = x + w;
-  if (x1 <= SHADE_X) return {tan: rectPath(x, y, w, h), sand: ''};
-  if (x >= SHADE_X) return {tan: '', sand: rectPath(x, y, w, h)};
-  return {tan: rectPath(x, y, SHADE_X - x, h), sand: rectPath(SHADE_X, y, x1 - SHADE_X, h)};
-};
-
-type FlatObj = {id: string; top: number; draw: () => {tan: string; sand: string; cream: string; sage: string; lite: string; sky: string}};
-
-/** The objects of the hero facade that cross the caption band during the dive, each with its FLAT (no-ink) version:
- *  the cornice (tan band + cream rim; its ink overshoots covered with sky above the left row's roof), every window
- *  (wall margin, cream frame, sage glass, pale lite), the browser window (flattened to the WALL: it melts into the
- *  facade instead of becoming a plate behind the caption). `top` = the object's world top (incl. its ink). */
-const FLAT_OBJS: FlatObj[] = (() => {
-  const H = STOOP.hero;
-  const B = STOOP.browser;
-  const out: FlatObj[] = [];
-  out.push({
-    id: 'cornice',
-    top: H.y - 16,
-    draw: () => {
-      const below = wallCover(H.x, H.y + 38, H.w, 12);
-      // the overshoot ends: sky left of the house; on the right only ABOVE the left row's roofline (y = 660 + 2 (x - 520))
-      const sky = rectPath(H.x - 44, H.y - 16, 38, 70) + `M${H.x + H.w + 6} ${H.y - 16}H${H.x + H.w + 50}V${H.y + 54}H${H.x + H.w + 17}L${H.x + H.w + 6} ${H.y + 32}Z`;
-      // the lower line's end stubs: sky left of the house, the left row's cream facade right of it
-      const stubs = rectPath(H.x - 6, H.y + 38, 6, 16);
-      return {tan: rectPath(H.x - 6, H.y, H.w + 12, 40) + below.tan, sand: below.sand, cream: rectPath(H.x - 6, H.y - 7, H.w + 12, 8) + rectPath(H.x + H.w, H.y + 38, 8, 14), sage: '', lite: '', sky: sky + stubs + rectPath(H.x - 6, H.y - 16, H.w + 12, 9)};
-    },
-  });
-  HERO_WINS.forEach(([x, y, w, h], i) => {
-    out.push({
-      id: `w${i}`,
-      top: y - 16,
-      draw: () => {
-        const m = wallCover(x - 16, y - 16, w + 32, h + 32);
-        return {tan: m.tan, sand: m.sand, cream: rectPath(x - 6, y - 6, w + 12, h + 12), sage: rectPath(x, y, w, h), lite: rectPath(x + 1, y, w - 2, h * 0.58), sky: ''};
-      },
-    });
-  });
-  out.push({
-    id: 'browser',
-    top: B[1] - 16,
-    draw: () => {
-      const m = wallCover(B[0] - 36, B[1] - 16, B[2] + 54, B[3] + 32);
-      return {tan: m.tan, sand: m.sand, cream: '', sage: '', lite: '', sky: ''};
-    },
-  });
-  return out;
-})();
-
-/** During the dive the hero facade sweeps up through the caption band (y 280-570). From `from` on, every object that
- *  has ENTERED the band (its screen top above `bandBottom`) pops WHOLE to its flat no-ink version on the first frame
- *  it is in (a per-object LOD swap: any seam follows the object's own edges, never a screen line). Outside the dive
- *  nothing changes. */
-export const DiveFlat: React.FC<{cam: {y: number; zoom: number}; from: number; bandBottom?: number; seed?: string}> = ({cam, from, bandBottom = 588, seed = 's4flat'}) => {
-  const t = useTime();
-  if (t < from) return null;
-  let tan = '';
-  let sand = '';
-  let cream = '';
-  let sage = '';
-  let lite = '';
-  let sky = '';
-  for (const o of FLAT_OBJS) {
-    const top = (o.top - cam.y) * cam.zoom + 960;
-    if (top >= bandBottom) continue;
-    const d = o.draw();
-    tan += d.tan;
-    sand += d.sand;
-    cream += d.cream;
-    sage += d.sage;
-    lite += d.lite;
-    sky += d.sky;
-  }
-  const f = (d: string, color: string, k: string) => (d ? <Fill d={d} color={color} offset={false} mode="none" exit={false} seed={`${seed}/${k}`} /> : null);
-  return (
-    <>
-      {f(sky, skies.day, 'k')}
-      {f(tan, palette.tan, 't')}
-      {f(sand, palette.sand, 's')}
-      {f(cream, palette.cream, 'c')}
-      {f(sage, palette.sage, 'g')}
-      {f(lite, palette.mintPale, 'l')}
-    </>
-  );
-};
-
-// ---------------------------------------------------------------- the neighbours' windows (time-lapse life)
 
 type WinState = 'none' | 'blind' | 'curtain' | 'plant';
 const WIN_CYCLE: WinState[] = ['none', 'blind', 'curtain', 'plant'];
@@ -365,3 +319,107 @@ export const WindowLife: React.FC<{tears: number[]; seed?: string}> = ({tears, s
     </>
   );
 };
+
+// ---------------------------------------------------------------- the stoop's step tones
+
+const TREAD = 9; // StoopStreet's tread depth
+/** Re-tones the set's two steps so the stoop reads as STEPS, not a podium (fix round: treads and risers were one cream
+ *  value): cream treads (lit from above), sand risers a step darker, misregistered right / down a little; then the
+ *  stoop's own ink is redrawn on top (the same `line` calls and seeds as the set's Stoop, so it is pixel-identical).
+ *  Draw it first in the hero slot (over the set's Stoop, under everything on the steps). */
+export const StepTones: React.FC<{seed?: string}> = ({seed = 'stoop/stoop'}) => {
+  const [s2x, s2y, s2w, s2h] = STOOP.step2;
+  const [s1x, s1y, s1w, s1h] = STOOP.step1;
+  const tread = (x: number, y: number, w: number) => polyPath([[x - 6, y - TREAD], [x + w + 6, y - TREAD], [x + w, y], [x, y]]);
+  const ink2 = line(s2x - 8, s2y - TREAD, s2x + s2w + 8, s2y - TREAD, {seed: `${seed}/i2a`, over: [3, 6]}) + line(s2x - 2, s2y, s2x + s2w + 4, s2y, {seed: `${seed}/i2b`, over: [2, 4]}) + line(s2x, s2y, s2x, s2y + s2h, {seed: `${seed}/i2c`, over: [0, 0]}) + line(s2x + s2w, s2y, s2x + s2w, s2y + s2h, {seed: `${seed}/i2d`, over: [0, 0]});
+  const ink1 = line(s1x - 8, s1y - TREAD, s1x + s1w + 8, s1y - TREAD, {seed: `${seed}/i1a`, over: [3, 6]}) + line(s1x - 2, s1y, s1x + s1w + 4, s1y, {seed: `${seed}/i1d`, over: [2, 4]}) + line(s1x, s1y, s1x, s1y + s1h, {seed: `${seed}/i1e`, over: [0, 0]}) + line(s1x + s1w, s1y, s1x + s1w, s1y + s1h, {seed: `${seed}/i1g`, over: [0, 0]});
+  return (
+    <>
+      <Fill d={tread(s2x, s2y, s2w)} color={palette.cream} offset={false} mode="none" seed="s4/t2" />
+      <Fill d={rectPath(s2x + 1, s2y + 1, s2w - 2, s2h - 1)} color={palette.sand} offset={[3, 2]} mode="none" seed="s4/r2" />
+      <Ink d={ink2} width={SI.mid} seed="s4/i2" />
+      <Fill d={tread(s1x, s1y, s1w)} color={palette.cream} offset={false} mode="none" seed="s4/t1" />
+      <Fill d={rectPath(s1x + 1, s1y + 1, s1w - 2, s1h - 1)} color={palette.sand} offset={[3, 0]} mode="none" seed="s4/r1" />
+      <Ink d={ink1} width={SI.mid} seed="s4/i1" />
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- the ground's ink
+
+const VP = STOOP.vp;
+const kerbR = (yy: number) => VP[0] + ((980 - VP[0]) * (yy - VP[1])) / (STOOP.pavementY - VP[1]);
+/** The set's kerb lines, exactly (StoopStreet's G.kerbInk: same calls and seeds). */
+const KERB_INK =
+  line(VP[0] + 2, VP[1] + 2, kerbR(1372), 1372, {seed: 'stp/kr', over: [0, 0], breaks: false}) +
+  line(-150, STOOP.pavementY, 1230, STOOP.pavementY, {seed: 'stp/kn', over: [0, 0]}) +
+  line(-150, STOOP.pavementY + 18, 1230, STOOP.pavementY + 20, {seed: 'stp/kn2', over: [0, 0]});
+/** Kerb-stone joints along the near kerb. */
+const KERB_JOINTS = (() => {
+  let d = '';
+  for (let x = -40; x <= 720; x += 64) d += line(x, STOOP.pavementY + 2, x - 1, STOOP.pavementY + 17, {seed: `s4kj${x}`, over: 0});
+  return d;
+})();
+/** A few short, sparse ground specks on the near pavement (style bible: texture strokes short and sparse; fix round:
+ *  the set's long paving rays read as scratches at this zoom). */
+const SPECKS = [
+  [118, 1438, 12, -0.25],
+  [262, 1486, 9, 0.3],
+  [612, 1452, 11, -0.15],
+  [404, 1530, 8, 0.1],
+  [700, 1505, 10, 0.35],
+].reduce((d, [x, y, l, a], i) => d + line(x, y, x + l * Math.cos(a), y + l * Math.sin(a), {seed: `s4sp${i}`, over: 0}), '');
+const GRATE: [number, number, number, number] = [470, 1452, 74, 26];
+const GRATE_INK = (() => {
+  const [x, y, w, h] = GRATE;
+  let d = rectPath(x, y, w, h);
+  for (let i = 1; i < 6; i++) d += `M${(x + (w * i) / 6).toFixed(1)} ${y + 4}V${y + h - 4}`;
+  return d;
+})();
+
+/** The ground layer, re-inked: the set's ground FILLS (road, pavements) with its own kerb lines, the kerb-stone joints,
+ *  a drain grate and a few specks instead of its long paving rays. */
+export const GroundS04: React.FC<{node: React.ReactNode}> = ({node}) => (
+  <>
+    <Look ink={false}>{node}</Look>
+    <Ink d={KERB_INK} width={SI.front} seed="stoop/kerb" />
+    <Ink d={KERB_JOINTS} width={SI.far} taper={false} seed="s4kj" />
+    <Ink d={SPECKS} width={SI.far} taper={false} seed="s4sp" />
+    <Fill rect={GRATE} color={palette.tealDark} offset={false} mode="none" seed="s4gr" />
+    <Ink d={GRATE_INK} width={SI.far} taper={false} seed="s4gri" />
+  </>
+);
+
+// ---------------------------------------------------------------- clips (world space, hard edges)
+
+const BIG = rectPath(-4000, -4000, 9000, 9000);
+/** The region above world y (from x0 rightward). */
+export const above = (y: number, x0 = -4000) => rectPath(x0, -4000, 9000, y + 4000);
+/** Everything except `d` (even-odd). */
+export const except = (d: string) => BIG + d;
+
+/** Children clipped to the path `d` (even-odd, world space: the clip is in the user space of this group). */
+export const ClipG: React.FC<{d: string; children?: React.ReactNode}> = ({d, children}) => {
+  const id = 's4clip' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  return (
+    <>
+      <defs>
+        <clipPath id={id}>
+          <path d={d} clipRule="evenodd" />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>{children}</g>
+    </>
+  );
+};
+
+/** `node` drawn FLAT (fills only, <Look ink={false}>) above world y `y` (from x0 rightward) and inked below it: two
+ *  copies, each clipped; the inked one overlaps the seam by 1.5 px so no hairline opens. One switch for a whole layer. */
+export const SplitInk: React.FC<{y: number; x0?: number; node: React.ReactNode}> = ({y, x0, node}) => (
+  <>
+    <ClipG d={above(y + 1.5, x0)}>
+      <Look ink={false}>{node}</Look>
+    </ClipG>
+    <ClipG d={except(above(y, x0))}>{node}</ClipG>
+  </>
+);

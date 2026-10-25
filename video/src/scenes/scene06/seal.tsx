@@ -31,7 +31,8 @@ export const SunPressS06: React.FC<{at: number; cx: number; cy: number; r: numbe
 
 export type WaxSealS06Props = {from: Pt; to: Pt; at: number; dur?: number; arc?: number; r?: number; sun?: Pt; seed?: string};
 
-const POP_T = 0.1;
+/** Emission pop before the flight (fix round 2: 0.08, so the seal lands at 'They' + 0.33 = 20.31, before the shh). */
+const POP_T = 0.08;
 
 /** When the seal lands (film-local seconds). */
 export const sealLandAt = (at: number, dur: number) => at + POP_T + dur;

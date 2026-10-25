@@ -154,8 +154,8 @@ export const Beams: React.FC<{b: Beats}> = ({b}) => {
   const outAt = b.ring + 0.02;
   return (
     <>
-      <ScanBeam from={[pa[0] + 3, pa[1] - off]} to={LOCK_C} w0={14} w1={170} at={b.beams} sweep={{amp: 11, hz: 1.1}} convergeAt={b.converge} outAt={outAt} color={palette.white} opacity={1} depth="far" />
-      <ScanBeam from={[pb[0] - 3, pb[1] - off]} to={LOCK_C} w0={14} w1={170} at={b.beams + 0.05} sweep={{amp: -11, hz: 1.1}} convergeAt={b.converge} outAt={outAt} color={palette.white} opacity={1} depth="far" />
+      <ScanBeam from={[pa[0] + 3, pa[1] - off]} to={LOCK_C} w0={14} w1={170} at={b.beams} sweep={{amp: 9, hz: 1.1}} convergeAt={b.converge} outAt={outAt} color={palette.white} opacity={1} depth="far" />
+      <ScanBeam from={[pb[0] - 3, pb[1] - off]} to={LOCK_C} w0={14} w1={170} at={b.beams + 0.05} sweep={{amp: -9, hz: 1.1}} convergeAt={b.converge} outAt={outAt} color={palette.white} opacity={1} depth="far" />
     </>
   );
 };
@@ -207,7 +207,10 @@ export const PipHop: React.FC<{b: Beats}> = ({b}) => {
   const c0 = camAt(H.t0, b.end);
   const fromX = PIP_RAIL[0] + (1 - LAYER_F.banner) * (c0.x - 540);
   const h = hop({t, t0: H.t0, dur: H.dur, from: {x: fromX, y: PIP_RAIL[1]}, to: H.to, height: H.height});
-  return <ElephantTimeline x={h.x} y={h.y} scale={PIP_SCALE} t={t} seed={5} keys={pipKeys(b, H.t0)} squash={h.squash} rotate={h.rotate} amount={h.airborne ? h.spread : undefined} />;
+  // the leap goes UP first (x lags: k^1.6), so he rises clear of the elephant stamp before he crosses it
+  const k = clamp((t - H.t0) / H.dur);
+  const x = h.airborne ? lerp(fromX, H.to.x, Math.pow(k, 1.6)) : h.x;
+  return <ElephantTimeline x={x} y={h.y} scale={PIP_SCALE} t={t} seed={5} keys={pipKeys(b, H.t0)} squash={h.squash} rotate={h.rotate} amount={h.airborne ? h.spread : undefined} />;
 };
 
 // ---------------------------------------------------------------- S04's leaf (continuity) and the z

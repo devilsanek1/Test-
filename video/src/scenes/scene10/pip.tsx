@@ -114,7 +114,7 @@ export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
     ...(T.lookFar !== undefined ? [{t: T.lookFar, pose: 'sit-back' as const, look: -0.15}] : []),
     ...(T.lookWeb !== undefined ? [{t: T.lookWeb, pose: 'sit-back' as const, look: -0.9}] : []),
     ...(T.lookCart !== undefined ? [{t: T.lookCart, pose: 'sit-back' as const, look: -1}] : []),
-    ...(T.lookLob !== undefined ? [{t: T.lookLob, pose: 'sit-back' as const, look: 0.1}] : []),
+    ...(T.lookLob !== undefined ? [{t: T.lookLob, pose: 'sit-back' as const, look: 0.45}] : []),
     // GAG: mirrored so the raised trunk points up-left AT siteM's plaque; look +0.6 before the mirror = toward it
     {t: T.hey, pose: 'trunk-up', expression: 'wide', look: 0.6},
     // straight from the 'hey' into the hop's own pose (side-on, facing right): its crouch frames come right before the

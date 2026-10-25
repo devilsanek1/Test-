@@ -28,17 +28,20 @@ const ABS = {
   cut: S04_START, //        cut(it): MATCH on the sun (mid-glide); door #4 at medium-close; the slow creep begins
   pipTakeOff: 14.19, //     S03 hand-off: Pip's take-off, right after the cut
   this: 14.395, //          w46 'This': the sun touches down in its slot (930, 690); Pip lands on step 2's tread
-  yawn: 14.515, //          w46+0.12: Pip yawns
-  bug: 14.6, //             w47 'bug': Bit does a small hop on the lock box (he is 'this bug')
+  yawn: 14.76, //           w48-0.025 'was' (fix round: was w46+0.12 = 14.515, inside 'bug'): Pip yawns once Bit has
+  //                        had the 'bug' window to himself (he stands, settled, from 'This' until here)
+  bug: 14.6, //             w47 'bug': Bit does a hop on the lock box (he is 'this bug'): take-off w47-0.15 so the apex
+  //                        is ON the word; a peach spot + ink ring around his seat draws on w47-0.12
   ghosts1: 14.785, //       w48 'was': two ink-only ghost passers-by pop on the pavement, never looking at the door
-  ivy: 14.935, //           w49 'in': the ivy creeps up the door frame one step (green)
+  ivy: 14.835, //           w49-0.10 'in' (rule-5 lead): the ivy creeps up the door frame one step (green)
   lapse: 15.085, //         w50+0.05 'there': the time-lapse: 14 YEAR pages tear 0.07 s apart; the ivy steps a season
   //                        every 2 tears; ghosts pop in and out (~1 per tear)
   sleep: 15.295, //         w51+0.10 'for': Pip curls up asleep on the step (sleep pose, z's float)
   ghosts2: 15.375, //       w52 'like': a second pair of ghosts strides past; Bit yawns and blinks (he does not move)
   l5: 15.39, //             w53-0.10 'fourteen': label L5 swings in as a tag hanging from lock4 (pendulum -16 -> 0)
   cobweb: 15.59, //         w53+0.10 'fourteen': a cobweb draws over the lock box corner (0.3 s); Bit does not move
-  leaf: 15.69, //           w53+0.20 'fourteen': a tan leaf drifts down toward sleeping Pip; the last year pages tear
+  leaf: 15.55, //           w53+0.06 'fourteen' (storyboard w53+0.20, started 0.14 s early so it lands 0.3 s before the
+  //                        dive and is seen at rest): a tan leaf drifts down onto sleeping Pip's crown
   dive: 16.26, //           cut(years)-0.33 'years': the camera dives into lock4 (in(quad), fixed 0.33 s); the leaf
   //                        lands on sleeping Pip's ear
   end: S04_END, //          cut(years): match-cut into S05 on the lock (65 x 80 px at screen (483, 960))

@@ -17,12 +17,12 @@ import React, {useId} from 'react';
 import {palette, Sun, useGlobalTime, useTime, World, XG} from '../lib';
 import {MakersLane, MAKERS_LANE, People, Furniture, WORKSHOP_LANE} from './shared/sets';
 import type {FurnitureItem, WalkerAnchor} from './shared/sets';
-import {chromeScreen, LabelTag} from './shared/props';
+import {chromeScreen, FixSign} from './shared/props';
 import {useBeats} from './scene06/beats';
 import {camAt, F, fOf, layerM, REST, toScreen, truckPx} from './scene06/camera';
 import type {Layer} from './scene06/camera';
-import {BitS06, BlindJolt, envSealWorld, MakerHeads, MessengerS06, pipAt, PipS06, Shadows, ShhMark} from './scene06/parts';
-import {DoorDressing, FarSkyline, ForegroundRight, PolesAndWires} from './scene06/dress';
+import {BitS06, BlindJolt, envSealWorld, MakerHeads, MessengerS06, pipAt, PipS06, Shadows, SHH_HOLD, ShhMark, shhTipWorld} from './scene06/parts';
+import {DoorDressing, FarSkyline, FloorCover, ForegroundRight, LeftRowDetail, NeighbourRight, PolesAndWires} from './scene06/dress';
 import {sealLandAt, SunPressS06, WaxSealS06} from './scene06/seal';
 import {LeakPage} from './scene06/page';
 
@@ -63,7 +63,10 @@ const Scene06: React.FC = () => {
 
   // ---- the wax seal: out of the sun along a low dotted arc onto the envelope (aimed where the envelope will be when it
   //      lands, then riding it into the slot)
-  const SEAL_DUR = 0.4;
+  // fix round 2: the seal lands BEFORE Pip's shh (pop 0.08 + 0.25 s flight: 20.31), launched from the sun's lower-right
+  // edge (15 deg below its horizontal: nearer the envelope, so the flight keeps its per-frame steps <= ~60 px)
+  const SEAL_DUR = 0.25;
+  const SEAL_FROM: [number, number] = [sx + SUN.r * Math.cos(0.26), SUN.y + SUN.r * Math.sin(0.26)];
   const sealLand = sealLandAt(B.they, SEAL_DUR);
   const sealAt = (tt: number) => {
     const e = envSealWorld(tt, B);
@@ -79,12 +82,19 @@ const Scene06: React.FC = () => {
       <XG key={name} m={layerM(cam, layerOf(name))}>
         {node}
         {name === 'roofs' ? <FarSkyline /> : null}
-        {name === 'houses' ? <PolesAndWires hopAt={B.headsUp} /> : null}
+        {name === 'floor' ? <FloorCover /> : null}
+        {name === 'houses' ? (
+          <>
+            <LeftRowDetail />
+            <PolesAndWires hopAt={B.headsUp} />
+          </>
+        ) : null}
         {name === 'workshop' ? (
           <>
+            <NeighbourRight />
             <DoorDressing pigeonAt={B.people + 0.13} />
             <BlindJolt x0={WORKSHOP_LANE.shop[0]} x1={WORKSHOP_LANE.shop[0] + WORKSHOP_LANE.shop[2]} y={WORKSHOP_LANE.blindTo} at={B.headsUp} />
-            <MakerHeads screen={SCREEN} at={B.headsUp} />
+            <MakerHeads screen={SCREEN} at={B.headsUp - 0.07} tickAt={B.headsUp} />
           </>
         ) : null}
       </XG>
@@ -105,8 +115,9 @@ const Scene06: React.FC = () => {
           signSwingAt: B.php,
           slotClickAt: B.click,
           screenOnAt: B.people,
-          // J3 'still fixing...' (the shared blindSign slot) on the half-down blind; it jolts on 'heads-up'
-          blindSign: (a) => <LabelTag kind="card" x={a.x} y={a.y + 16} text={['still', 'fixing...']} fontSize={27} swing={[B.headsUp]} seed="s6J3" />,
+          // J3 'still fixing...': props FixSign, THE one sign of J3 / J4 / J5 (S07's blind, S09's cart, S10), hung from the
+          // blind's nail (the set's blindSign anchor); it swings on 'heads-up'. fs 26 = S07's J4 (~27 px on screen)
+          blindSign: (a) => <FixSign x={a.x} y={a.y} fs={26} swingAt={[B.headsUp]} seed="s6J3" />,
         }}
         people={false}
         furniture={false}
@@ -116,7 +127,7 @@ const Scene06: React.FC = () => {
 
       {/* life on the lane floor (same parallax as the floor): the low sun's shadows first, then the passers, furniture */}
       <XG m={layerM(cam, 'floor')}>
-        <Shadows B={B} dx={(fOf(cam, 'floor') - fOf(cam, 'near')) * (cam.x - REST.x)} />
+        <Shadows B={B} dx={(fOf(cam, 'floor') - fOf(cam, 'near')) * (cam.x - REST.x)} walkers={WALKERS} />
         <People anchors={WALKERS} vp={MAKERS_LANE.vp} spec={{walk: 0}} seed="s6ppl" />
         <Furniture items={FURNITURE} seed="s6furn" />
       </XG>
@@ -124,8 +135,8 @@ const Scene06: React.FC = () => {
       {/* the reference plane: Pip (behind, feet 1480), the messenger (feet 1520), Bit on his shoulder, the 'shh' */}
       <XG m={layerM(cam, 'near')}>
         <PipS06 B={B} />
-        <ShhMark x={pipShh.x + 84} y={pipShh.y - 132} at={B.shh + 0.06} outAt={B.shh + 0.42} />
-        <MessengerS06 B={B} />
+        <ShhMark x={pipShh.x + 140} y={pipShh.y - 122} at={B.shh + 0.06} outAt={B.shh + SHH_HOLD - 0.05} tail={shhTipWorld(B.shh + 0.1, B)} />
+        <MessengerS06 B={B} zoom={cam.z} />
         <BitS06 B={B} />
       </XG>
 
@@ -145,7 +156,7 @@ const Scene06: React.FC = () => {
             </defs>
           ) : null}
           <g clipPath={sealNow.clipY !== null ? `url(#${sealClip})` : undefined}>
-            <WaxSealS06 from={[sx + SUN.r * 0.86, SUN.y - SUN.r * 0.72]} to={sealTo.p} at={B.they} dur={SEAL_DUR} arc={26} r={23} sun={[sx, SUN.y]} />
+            <WaxSealS06 from={SEAL_FROM} to={sealTo.p} at={B.they} dur={SEAL_DUR} arc={18} r={23} sun={[sx, SUN.y]} />
           </g>
         </>
       ) : null}

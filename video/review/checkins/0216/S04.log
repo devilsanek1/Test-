@@ -1,0 +1,105 @@
+[Tab 1, node_modules/react-dom/cjs/react-dom.production.min.js:187] TypeError: (0 , cast_namespaceObject.pipEarWorld) is not a function
+    at Scene04 (http://localhost:3000/bundle.js:13426:51)
+    at Nh (http://localhost:3000/bundle.js:32421:137)
+    at Vk (http://localhost:3000/bundle.js:32550:337)
+    at Uk (http://localhost:3000/bundle.js:32540:389)
+    at Tk (http://localhost:3000/bundle.js:32540:320)
+    at Ik (http://localhost:3000/bundle.js:32540:180)
+    at Nk (http://localhost:3000/bundle.js:32531:88)
+    at Gk (http://localhost:3000/bundle.js:32528:429)
+    at J (http://localhost:3000/bundle.js:32770:203)
+    at MessagePort.R (http://localhost:3000/bundle.js:32771:128)
+[Tab 0, node_modules/react-dom/cjs/react-dom.production.min.js:187] TypeError: (0 , cast_namespaceObject.pipEarWorld) is not a function
+    at Scene04 (http://localhost:3000/bundle.js:13426:51)
+    at Nh (http://localhost:3000/bundle.js:32421:137)
+    at Vk (http://localhost:3000/bundle.js:32550:337)
+    at Uk (http://localhost:3000/bundle.js:32540:389)
+    at Tk (http://localhost:3000/bundle.js:32540:320)
+    at Ik (http://localhost:3000/bundle.js:32540:180)
+    at Nk (http://localhost:3000/bundle.js:32531:88)
+    at Gk (http://localhost:3000/bundle.js:32528:429)
+    at J (http://localhost:3000/bundle.js:32770:203)
+    at MessagePort.R (http://localhost:3000/bundle.js:32771:128)
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+SymbolicateableError [TypeError]: (0 , cast_namespaceObject.pipEarWorld) is not a function
+    at Scene04 (http://localhost:3000/bundle.js:13426:51)
+    at Nh (http://localhost:3000/bundle.js:32421:137)
+    at Vk (http://localhost:3000/bundle.js:32550:337)
+    at Uk (http://localhost:3000/bundle.js:32540:389)
+    at Tk (http://localhost:3000/bundle.js:32540:320)
+    at Ik (http://localhost:3000/bundle.js:32540:180)
+    at Nk (http://localhost:3000/bundle.js:32531:88)
+    at Gk (http://localhost:3000/bundle.js:32528:429)
+    at J (http://localhost:3000/bundle.js:32770:203)
+    at MessagePort.R (http://localhost:3000/bundle.js:32771:128) {
+  stackFrame: [
+    {
+      columnNumber: 50,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Scene04',
+      lineNumber: 13425
+    },
+    {
+      columnNumber: 136,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Nh',
+      lineNumber: 32420
+    },
+    {
+      columnNumber: 336,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Vk',
+      lineNumber: 32549
+    },
+    {
+      columnNumber: 388,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Uk',
+      lineNumber: 32539
+    },
+    {
+      columnNumber: 319,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Tk',
+      lineNumber: 32539
+    },
+    {
+      columnNumber: 179,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Ik',
+      lineNumber: 32539
+    },
+    {
+      columnNumber: 87,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Nk',
+      lineNumber: 32530
+    },
+    {
+      columnNumber: 428,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Gk',
+      lineNumber: 32527
+    },
+    {
+      columnNumber: 202,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'J',
+      lineNumber: 32769
+    },
+    {
+      columnNumber: 127,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'R',
+      lineNumber: 32770
+    }
+  ],
+  delayRenderCall: null,
+  frame: 0,
+  chunk: null
+}
+
+Node.js v22.22.0

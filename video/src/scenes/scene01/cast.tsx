@@ -9,7 +9,7 @@ import {Fill} from '../../lib/Fill';
 import {arc, blob, circle, polyPath, rectPath, roundRect, Pt} from '../../lib/sketch';
 import {rand, rng} from '../../lib/rng';
 import {mat, useXf, XG} from '../../lib/xf';
-import {Person, Bird, PERSON_BODIES} from '../../lib/kit';
+import {Person, PERSON_BODIES} from '../../lib/kit';
 import {inkW} from '../../lib/kit/common';
 import {useInkScale} from '../../lib/inkComp';
 import type {Acc, Hair} from '../../lib/kit/Person';
@@ -352,6 +352,8 @@ const Flyer: React.FC<{x: number; y: number; s: number; t: number; ph: number; c
   const ks = useInkScale();
   const up = (osc(t, 7, ph) + 1) / 2; // 0 = wings down (Λ), 1 = wings up (V)
   const wing = color === palette.tan ? palette.sand : palette.tan;
+  // fix round 5: a cream belly band under the body (the body is the dark ochre now: it separates from the sand facade)
+  const belly = 'M12.6 -9.6Q8 -5.7 -2 -6.5Q-7.5 -6.6 -11 -8.6Q-1 -9.4 12.6 -9.6Z';
   const L = 33;
   const W = (2.1 / s) * ks;
   // a wing in its own frame: hinge at (0, 0), pointing along -y, leading edge on +x; placed by rotating -y by b degrees
@@ -369,7 +371,9 @@ const Flyer: React.FC<{x: number; y: number; s: number; t: number; ph: number; c
         <path d={wingD} fill={wing} {...common} />
       </XG>
       <path d={tail} fill={color} {...common} />
-      <path d={body} fill={color} {...common} />
+      <path d={body} fill={color} stroke="none" />
+      <path d={belly} fill={palette.cream} stroke="none" />
+      <path d={body} fill="none" {...common} />
       <path d={head} fill={palette.tealDark} {...common} />
       <path d="M18.6 -15L23.5 -13.6L18.6 -12.4Z" fill={palette.sun} stroke="none" />
       <path d="M14.6 -15.4a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0 -2.6 0Z" fill={palette.cream} stroke="none" />
@@ -381,18 +385,32 @@ const Flyer: React.FC<{x: number; y: number; s: number; t: number; ph: number; c
   );
 };
 
-/** The perched pigeon's head in tealDark (the flyer's head colour), drawn over the kit Bird's own head with the Bird's
- *  exact transform (Place(x, y + hop, s, flip), its idle hop and head turn: same `rand(seed, 'ph')` clock). */
-const PerchedHead: React.FC<{x: number; y: number; s: number; t: number; seed: string; flip?: boolean}> = ({x, y, s, t, seed, flip}) => {
+/** A perched pigeon (fix round 5, review: the kit Bird's sand / tan body has no closed outline, so against govA's sand
+ *  columns only the dark heads read: 'three dark dots'): a CLOSED ink outline (~2 px on screen) round an ochre body, a
+ *  cream belly, a tan wing patch, a fanned tail, little legs on the bar, and the tealDark head with a sun beak and a
+ *  cream eye. Same transform, idle hop and head-turn clock as the kit Bird (rand(seed, 'ph')), so the perched life is
+ *  unchanged. (x, y) = feet on the bar; faces right (flip = left). */
+const PerchedPigeon: React.FC<{x: number; y: number; s: number; t: number; seed: string; color: string; flip?: boolean}> = ({x, y, s, t, seed, color, flip}) => {
   const ph = rand(seed, 'ph') * 6.28;
   const look = Math.sin(t * 1.3 + ph) > 0.75 ? -10 : 0;
   const hop = Math.max(0, osc(t, 0.23, ph)) > 0.97 ? -3 : 0;
-  const W = inkW(s) * 0.85;
+  const W = 2.2 / s;
+  const body = blob(0, -10, 13, 9, {seed: `${seed}/b`, wobble: 0.04});
+  const tail = 'M-10 -11.5L-24 -7L-22.5 -2.5L-10 -6.5Z';
+  const belly = 'M-6.5 -3.2Q3 -0.8 11.8 -7.2Q11.2 -3 4.5 -1.5Q-2 -0.6 -6.5 -3.2Z';
+  const wing = 'M-9 -12.5Q1 -16.5 7 -11Q1 -6.5 -10 -8.6Z';
   return (
     <XG m={mat.compose(mat.translate(x, y + hop), mat.scale(flip ? -s : s, s))}>
+      <Ink d="M-2 -2L-3.2 1.6M3 -2L3.4 1.6" width={W * 0.8} taper={false} seed={`${seed}/legs`} />
+      <Fill d={tail} color={color} offset={false} mode="none" seed={`${seed}/tf`} />
+      <Fill d={body} color={color} offset={false} mode="none" seed={`${seed}/bf`} />
+      <Fill d={belly} color={palette.cream} offset={false} mode="none" seed={`${seed}/be`} />
+      <Fill d={wing} color={palette.tan} offset={false} mode="none" seed={`${seed}/wf`} />
+      <Ink d={tail + body} width={W} taper={false} seed={`${seed}/bi`} />
+      <Ink d={wing} width={W * 0.75} taper={false} seed={`${seed}/wi`} />
       <XG m={look ? mat.about(mat.rotate(look), 9, -16) : mat.I}>
         <Fill d={blob(10, -19, 6.5, 6, {seed: `${seed}/h`})} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/hf2`} />
-        <Ink d={circle(10, -19, 6.5, {seed: `${seed}/h`, overlap: 12})} width={W} taper={false} seed={`${seed}/hi2`} />
+        <Ink d={circle(10, -19, 6.5, {seed: `${seed}/h`, overlap: 12})} width={W * 0.9} taper={false} seed={`${seed}/hi2`} />
         <Fill d="M16 -19L21 -18L16 -16.5Z" color={palette.sun} offset={false} mode="none" seed={`${seed}/bk2`} />
         <Fill d={blob(12, -20.5, 1.3, 1.3, {seed: `${seed}/eye2`})} color={palette.cream} offset={false} mode="none" seed={`${seed}/ey2`} />
       </XG>
@@ -442,8 +460,7 @@ export const Pigeon: React.FC<{p: PigeonPlan; s?: number}> = ({p, s = 0.8}) => {
   const x = back ? p.x : perch[0];
   return (
     <XG m={mat.about(mat.scale(1 / Math.sqrt(sq), sq), x, p.y)}>
-      <Bird x={x} y={p.y + hopY} s={s} seed={p.seed} color={p.color} flip={p.flip} />
-      <PerchedHead x={x} y={p.y + hopY} s={s} t={t} seed={p.seed} flip={p.flip} />
+      <PerchedPigeon x={x} y={p.y + hopY} s={s} t={t} seed={p.seed} color={p.color} flip={p.flip} />
     </XG>
   );
 };
@@ -551,22 +568,33 @@ const hermite = (a: number, ma: number, b: number, mb: number, s: number) => {
 /** Pip's leap toward the lens on the dive, drawn in SCREEN space (fix round 4, review: driven in world space on the
  *  near layer, the dive's zoom flung him off the right rail 6 frames before the cut at ~230 px / frame, and S02 brought
  *  him back moving left). Render it AFTER the set, outside the camera. From the take-off point on the bollard (`from` =
- *  the bollard top on screen at `p.exitAt`, scale `fromScale`) one Hermite curve per coordinate ARRIVES at S02's pickup
- *  state on S02's first frame (handoff.ts: position, velocity, scale and its rate): ~51-65 px per frame, on screen on
- *  every S01 frame (feet x <= ~1036). He takes off facing right (nose up, legs spread), and turns to face left (S02's
- *  facing) in the frame where his x velocity reverses (~f140); from there squash / rotate / spread follow S02's hop
- *  formulas extrapolated, so f141 -> f142 is one continuous hop. Seed 22 = S02's Pip. */
-export const PipLeap: React.FC<{p: PipPlan; from: Pt; fromScale: number; v0?: Pt}> = ({p, from, fromScale, v0 = [600, -1700]}) => {
+ *  the bollard top on screen at `p.exitAt`, scale `fromScale`) it ARRIVES at S02's pickup state on S02's first frame
+ *  (handoff.ts: position, velocity, scale and its rate). y and the scale are one Hermite curve each (take-off velocity
+ *  `v0`). Fix round 5 (review: the x apex at ~1036 sat in the right UI rail and the paint edge clipped his trunk at
+ *  f139-f140; he mirror-popped to face left at f140): x is TWO Hermite pieces joined at `LEAP_X.t` (position pickup.x +
+ *  `dx`, velocity `v`): he keeps drifting right ever slower and reverses only in the last frame, so the apex drops to
+ *  ~1016 (f139-f141 at ~1000 / 1012 / 1015; S02's own pickup x 996.5 moving left at 1063 px/s sets the floor: an apex
+ *  <= ~990 needs S02's pickup ~40 px further left). He takes off facing right and TURNS to face S02's way (left) over
+ *  `LEAP_TURN` (x scale 1 -> 0.5 -> -0.5 -> -1 on f138-f141: a turn, not a mirror pop); from the turn on squash / rotate /
+ *  spread follow S02's hop formulas, so f141 -> f142 is one continuous hop. Seed 22 = S02's Pip. */
+export const LEAP_X = {t: 4.66, dx: 13.5, v: 275} as const;
+export const LEAP_TURN = {at: 4.6, dur: 0.1} as const;
+export const PipLeap: React.FC<{p: PipPlan; from: Pt; fromScale: number; v0?: Pt}> = ({p, from, fromScale, v0 = [150, -1900]}) => {
   const t = useTime();
   if (t < p.exitAt || t >= PICKUP_T) return null;
   const D = PICKUP_T - p.exitAt;
   const s = (t - p.exitAt) / D;
   const {p: P1, v: V1, vs} = pickup;
-  const x = hermite(from[0], v0[0] * D, P1.x, V1[0] * D, s);
+  const xT = P1.x + LEAP_X.dx;
+  const d1 = LEAP_X.t - p.exitAt;
+  const d2 = PICKUP_T - LEAP_X.t;
+  const x = t <= LEAP_X.t ? hermite(from[0], v0[0] * d1, xT, LEAP_X.v * d1, (t - p.exitAt) / d1) : hermite(xT, LEAP_X.v * d2, P1.x, V1[0] * d2, (t - LEAP_X.t) / d2);
   const y = hermite(from[1], v0[1] * D, P1.y, V1[1] * D, s);
-  const x2 = hermite(from[0], v0[0] * D, P1.x, V1[0] * D, Math.min(1, s + 0.01));
   const scale = hermite(fromScale, 0.4 * D, P1.scale, vs * D, s);
-  const left = x2 < x; // the x velocity has reversed: face S02's way
+  // the turn: x scale cos(pi u) through the facing switch
+  const tu = clamp((t - LEAP_TURN.at) / LEAP_TURN.dur);
+  const sx = Math.cos(Math.PI * tu);
+  const left = sx < 0;
   let squash: number;
   let rotate: number;
   let amount: number;
@@ -580,7 +608,9 @@ export const PipLeap: React.FC<{p: PipPlan; from: Pt; fromScale: number; v0?: Pt
     rotate = -12 * (1 - s);
     amount = Math.sqrt(clamp(s / 0.18));
   }
-  return <Elephant x={x} y={y} scale={scale} t={t} seed={S02_PIP.seed} pose="stand-side" flip={left} amount={amount} squash={squash} rotate={rotate} look={left ? 0 : 0.2} />;
+  const pip = <Elephant x={x} y={y} scale={scale} t={t} seed={S02_PIP.seed} pose="stand-side" flip={left} amount={amount} squash={squash} rotate={rotate} look={left ? 0 : 0.2} />;
+  const k = Math.abs(sx);
+  return k > 0.999 ? pip : <XG m={mat.about(mat.scale(Math.max(0.12, k), 1), x, y)}>{pip}</XG>;
 };
 
 // ---------------------------------------------------------------- the near observer's shade (on a props EdgeOnlooker)

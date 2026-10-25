@@ -30,15 +30,20 @@ import {camMat, Cam, K_REST, toScreen, toWorld} from './camera';
 /** Pip's on-screen scale at the cut (S03: 1.2 under its 1.04 lock zoom) and his world scale under this camera. */
 const PIP_SCREEN = 1.2 * S03_CAM.zoom;
 export const PIP_WORLD_SCALE = PIP_SCREEN / K_REST.zoom;
+/** His on-screen scale never grows past S05's sleeping Pip (~1.30 on screen): through the dive (zoom 1.55 -> 1.9) he
+ *  holds that size instead of growing to 1.58, so the match cut does not change his size (fix round, cut review). */
+export const PIP_SCREEN_MAX = 1.3;
+export const pipScreenScale = (cam: Cam) => Math.min(PIP_WORLD_SCALE * cam.zoom, PIP_SCREEN_MAX);
 /** Where S03 leaves him: crouching on the blueprint stamp's rump, S03's PIP_AT under S03's lock camera (screen
  *  (410.0, 1438.4) today). Imported, so the hand-off cannot drift when S03 moves him. */
 export const PIP_CUT_SCREEN: Pt = s03Screen(S03_CAM, S03_PIP_AT);
 export const PIP_FROM: Pt = toWorld(K_REST, PIP_CUT_SCREEN);
-/** His spot on step 2's tread, at its left end (his tail at the step's edge): the L5 tag hangs right of him, almost
- *  straight under lock4, its blank bottom-left corner behind his head. */
+/** His spot on step 2's tread, at its left end: the L5 tag hangs right of him, almost straight under lock4. He curls
+ *  up asleep FACING LEFT (flipped), rump to the tag's blank bottom-left corner, so his head, his z's and the leaf on
+ *  his crown are all left of the tag, over the door's left frame (fix round: head-to-tag crowded one 350 x 150 px spot). */
 export const PIP_AT: Pt = [218, STOOP.step2[1]];
-/** The sleeping ear (sleep pose, local px at scale 1, feet = (0, 0)), measured on the pose. */
-export const SLEEP_EAR: Pt = [14, -25];
+/** The sleeping crown (sleep pose, FLIPPED, local px at scale 1, feet = (0, 0)): where the leaf lands. */
+export const SLEEP_CROWN: Pt = [-24, -45];
 
 type PipState = {x: number; y: number; squash: number; rotate: number; pose: PoseName; expression?: Expression; amount?: number; look?: number; flip?: boolean};
 
@@ -53,32 +58,38 @@ function pipState(t: number, b: Beats): PipState {
   // from S03's spot (already over step 2) a small settle-hop onto the tread
   const h = hop({t, t0: b.pipTakeOff, dur: air, from: {x: PIP_FROM[0], y: PIP_FROM[1]}, to: {x: PIP_AT[0], y: PIP_AT[1]}, height: 18});
   const base = {x: h.x, y: h.y, rotate: h.rotate};
+  // fix round: the yawn waits until 'was' (it fired on 'bug' beside the lock: 150 px of the brightest colour stole the
+  // beat from Bit). Until then he stands settled on the step (landing squash, then the pose's idle breathing).
   const yawnAt = b.yawn;
-  const drowsyAt = b.yawn + 0.4;
+  const drowsyAt = b.yawn + 0.33;
   if (t < yawnAt) return {...base, squash: h.squash + popSwitch(t, yawnAt), pose: 'stand-side', amount: h.spread};
   if (t < drowsyAt) {
     // the yawn: trunk up, eyes shut, a long stretch (mouth open)
     const u = clamp((t - yawnAt) / (drowsyAt - yawnAt));
-    return {...base, squash: h.squash + popSwitch(t, yawnAt) + popSwitch(t, drowsyAt) - 0.16 * Math.sin(Math.PI * Math.min(1, u * 1.25)), pose: 'trunk-up', expression: 'closed'};
+    return {...base, squash: popSwitch(t, yawnAt) + popSwitch(t, drowsyAt) - 0.16 * Math.sin(Math.PI * Math.min(1, u * 1.25)), pose: 'trunk-up', expression: 'closed'};
   }
   if (t < b.sleep) {
     // drowsy: heavy lids, one slow nod
     const u = clamp((t - drowsyAt) / (b.sleep - drowsyAt));
     return {...base, squash: popSwitch(t, drowsyAt) + popSwitch(t, b.sleep) + 0.04 * Math.sin(Math.PI * u), rotate: 4 * Math.sin(Math.PI * u), pose: 'sit-front', expression: 'meh'};
   }
-  // asleep (curls up on 'for'); breathing is the pose's own idle
-  return {...base, squash: popSwitch(t, b.sleep), rotate: 0, pose: 'sleep'};
+  // asleep (curls up on 'for', turning to face left); breathing is the pose's own idle
+  return {...base, squash: popSwitch(t, b.sleep), rotate: 0, pose: 'sleep', flip: true};
 }
 
-/** Pip's sleeping ear in WORLD coords (where the leaf lands). */
-export const pipEarWorld = (): Pt => [PIP_AT[0] + SLEEP_EAR[0] * PIP_WORLD_SCALE, PIP_AT[1] + SLEEP_EAR[1] * PIP_WORLD_SCALE];
+/** Pip's sleeping crown in WORLD coords under camera `cam` (his screen scale is clamped in the dive, so the point is
+ *  derived from his drawn size, not from the world scale): where the leaf sits. Also returns the leaf's scale factor. */
+export const pipCrownWorld = (cam: Cam): {p: Pt; k: number} => {
+  const ws = pipScreenScale(cam) / cam.zoom;
+  return {p: [PIP_AT[0] + SLEEP_CROWN[0] * ws, PIP_AT[1] + SLEEP_CROWN[1] * ws], k: ws / PIP_WORLD_SCALE};
+};
 
 /** Pip, in screen space (render inside the world camera: this undoes it). */
 export const PipS04: React.FC<{b: Beats; cam: Cam}> = ({b, cam}) => {
   const t = useTime();
   const s = pipState(t, b);
   const [sx, sy] = toScreen(cam, [s.x, s.y]);
-  const scale = PIP_WORLD_SCALE * cam.zoom;
+  const scale = pipScreenScale(cam);
   return (
     <XG m={mat.inv(camMat(cam))}>
       <Elephant x={sx} y={sy} scale={scale} pose={s.pose} expression={s.expression} amount={s.amount} look={s.look} squash={s.squash} rotate={s.rotate} flip={s.flip} t={t} seed={3} />
@@ -89,58 +100,91 @@ export const PipS04: React.FC<{b: Beats; cam: Cam}> = ({b, cam}) => {
 // ---------------------------------------------------------------- Bit
 
 /** Bit sits on lock4's box top (its right half), in plain sight: 16 world = 24 px on screen at the 1.5 zoom (the size
- *  from which his eye gets a pupil, so the 'like' blink reads; fix round 1: 16 px was a speck on a phone). */
+ *  from which his eye gets a pupil, so the 'like' blink reads). */
 const LOCK_TOP = STOOP.lock4.y - STOOP.lock4.h / 2;
 export const BIT_AT: Pt = [STOOP.lock4.x + 7, LOCK_TOP];
 export const BIT_SIZE = 16;
-/** The hop on 'bug': take-off 0.10 s early (ENGINE rule 5) so the apex lands on the word; 1.2 body lengths high. */
-const HOP_DUR = 0.3;
-export const bitHopAt = (b: Beats) => b.bug - 0.1;
+/** The hop on 'bug' (fix round: the most stressed word got the weakest event): take-off 0.15 s early so the APEX is on
+ *  the word (HOP_DUR / 2), two body lengths high (48 px on screen). */
+export const HOP_DUR = 0.3;
+export const bitHopAt = (b: Beats) => b.bug - HOP_DUR / 2;
+/** The 'bug' spot: a peach disc (the caption highlight's paint) with a mid-weight ink ring and five glint ticks around
+ *  Bit's seat and the lock box's top (behind the lock), drawn on from w47-0.12 in 0.12 s, held 0.35 s, popped off. */
+export const SPOT = {c: [330, 1112] as Pt, r: 30, lead: 0.12, draw: 0.12, hold: 0.35};
+export const spotAt = (b: Beats) => b.bug - SPOT.lead;
+export const spotOff = (b: Beats) => b.bug + SPOT.hold;
 
-/** Bit: a hop on 'bug' (anticipation, apex on the word, landing squash), an ink attention ring around his seat on the
- *  word; on 'like' a yawn (a long stretch up, then a squash) and a blink; otherwise still. A cream misregistered
- *  under-print (offset down-right) separates the ink beetle from the teal door behind him. */
+/** Bit: a hop on 'bug' (anticipation, apex on the word, landing squash); on 'like' a yawn (a long stretch up, then a
+ *  squash) and a blink; otherwise still. A cream misregistered under-print (offset down-right) separates the ink beetle
+ *  from the teal door behind him. */
 export const BitS04: React.FC<{b: Beats}> = ({b}) => {
   const t = useTime();
   const h0 = bitHopAt(b);
-  const lift = hopY(t, h0, HOP_DUR, 1.2 * BIT_SIZE);
-  const [lsx, lsy] = landSquash(t, h0 + HOP_DUR, 0.74);
-  const antic = t >= h0 - 0.07 && t < h0 ? 1 - 0.18 * Math.sin((Math.PI * (t - (h0 - 0.07))) / 0.07) : 1;
+  const lift = hopY(t, h0, HOP_DUR, 2.0 * BIT_SIZE);
+  const [lsx, lsy] = landSquash(t, h0 + HOP_DUR, 0.7);
+  const antic = t >= h0 - 0.07 && t < h0 ? 1 - 0.2 * Math.sin((Math.PI * (t - (h0 - 0.07))) / 0.07) : 1;
   const air = t > h0 && t < h0 + HOP_DUR;
-  // 'like': the yawn (stretch up, then a settle squash)
-  const y0 = b.ghosts2;
+  // in the air: a stretch on the way up and down, round at the apex
+  const u0 = air ? (t - h0) / HOP_DUR : 0;
+  const st = air ? 0.16 * Math.abs(Math.cos(Math.PI * u0)) : 0;
+  // 'like' (rule-5 lead): the yawn (stretch up, then a settle squash)
+  const y0 = b.ghosts2 - 0.1;
   const u = clamp((t - y0) / 0.42);
   const stretch = t >= y0 && u < 0.7 ? Math.sin(Math.PI * (u / 0.7)) : 0;
   const settle = t >= y0 + 0.29 && t < y0 + 0.42 ? Math.sin(Math.PI * ((t - y0 - 0.29) / 0.13)) : 0;
-  const sx = (1 - 0.1 * stretch + 0.1 * settle) * lsx * (antic < 1 ? 2 - antic : 1);
-  const sy = (1 + 0.24 * stretch - 0.12 * settle) * lsy * antic;
+  const sx = (1 - 0.1 * stretch + 0.1 * settle - st * 0.5) * lsx * (antic < 1 ? 2 - antic : 1);
+  const sy = (1 + 0.24 * stretch - 0.12 * settle + st) * lsy * antic;
   const [bx, by] = BIT_AT;
   const under = bitPath(bx + 1.5, by + 0.6, BIT_SIZE * 1.06);
   return (
-    <>
-      <AttentionRing at={b.bug - 0.03} c={[bx + 1, by - 5]} />
-      <XG m={mat.compose(mat.translate(0, lift), mat.about(mat.scale(sx, sy), bx, by))}>
-        <Fill d={under} color={palette.cream} offset={false} mode="none" seed="s4/bitu" />
-        <Bit x={bx} y={by} size={BIT_SIZE} blinkAt={[y0 + 0.12, y0 + 0.5]} look={air || (t >= y0 && t < y0 + 0.3) ? 'up' : 'auto'} seed="s04/bit" />
-      </XG>
-    </>
+    <XG m={mat.compose(mat.translate(0, lift), mat.about(mat.scale(sx, sy), bx, by))}>
+      <Fill d={under} color={palette.cream} offset={false} mode="none" seed="s4/bitu" />
+      <Bit x={bx} y={by} size={BIT_SIZE} blinkAt={[y0 + 0.12, y0 + 0.5]} look={air || (t >= y0 && t < y0 + 0.3) ? 'up' : 'auto'} seed="s04/bit" />
+    </XG>
   );
 };
 
-/** An ink attention ring around Bit's seat on 'bug' (the lock glint as a drawn mark): a ring + three glint ticks draw on
- *  in 0.1 s, grow a little, and are gone after 0.24 s (one frame, no fade). */
-const AttentionRing: React.FC<{at: number; c: Pt}> = ({at, c}) => {
+/** The 'bug' spot behind lock4 (draw it BEFORE the lock): a peach disc pops (20 % -> 100 %, pop spring) while a full
+ *  ink ring (2.3 world = 3.4 px, the mid weight) draws on around it in 0.12 s with five glint ticks; held, then popped
+ *  off (one frame at 85 %, then gone; no fade). ~90 px across on screen. */
+export const BugSpot: React.FC<{at: number; off: number}> = ({at, off}) => {
   const t = useTime();
-  if (t < at || t >= at + 0.24) return null;
-  const k = 1 + 0.25 * E.outCubic(clamp((t - at) / 0.24));
-  const r = 15 * k;
-  const ring = `M${(c[0] + r).toFixed(1)} ${c[1]}A${r} ${r} 0 1 0 ${(c[0] - r).toFixed(1)} ${c[1]}A${r} ${r} 0 1 0 ${(c[0] + r).toFixed(1)} ${c[1]}`;
+  if (t < at || t >= off) return null;
+  const [cx, cy] = SPOT.c;
+  const last = off - t < 1 / 30 + 1e-6;
+  const k = last ? 0.85 : 0.2 + 0.8 * springAt(t, at, springs.pop);
+  const r = SPOT.r;
+  const ring = `M${(cx + r).toFixed(1)} ${cy}A${r} ${r} 0 1 0 ${(cx - r).toFixed(1)} ${cy}A${r} ${r} 0 1 0 ${(cx + r).toFixed(1)} ${cy}`;
   let ticks = '';
-  for (const a of [-140, -90, -40]) {
+  for (const a of [-165, -125, -90, -55, -15]) {
     const q = (a * Math.PI) / 180;
-    ticks += `M${(c[0] + Math.cos(q) * (r + 4)).toFixed(1)} ${(c[1] + Math.sin(q) * (r + 4)).toFixed(1)}L${(c[0] + Math.cos(q) * (r + 10)).toFixed(1)} ${(c[1] + Math.sin(q) * (r + 10)).toFixed(1)}`;
+    ticks += `M${(cx + Math.cos(q) * (r + 5)).toFixed(1)} ${(cy + Math.sin(q) * (r + 5)).toFixed(1)}L${(cx + Math.cos(q) * (r + 17)).toFixed(1)} ${(cy + Math.sin(q) * (r + 17)).toFixed(1)}`;
   }
-  return <Ink d={ring + ticks} at={at} dur={0.1} pace="free" width={1.7} taper={false} seed="s4/ring" />;
+  return (
+    <XG m={mat.about(mat.scale(k), cx, cy)}>
+      <Fill d={`M${cx - r} ${cy}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`} color={palette.peach} offset={false} mode="none" seed="s4/spot" />
+      <Ink d={ring} at={at} dur={SPOT.draw} pace="free" width={2.3} taper={false} seed="s4/ring" />
+      <Ink d={ticks} at={at + 0.04} dur={SPOT.draw} pace="free" width={2.3} taper={false} seed="s4/ticks" />
+    </XG>
+  );
+};
+
+/** A 3-frame glint star on lock4's box (its top-right corner) on 'bug': a cream four-point star with an ink outline
+ *  pops 0 -> 1.15 -> 0.6, then gone. */
+export const LockGlint: React.FC<{at: number; p: Pt; size?: number}> = ({at, p, size = 13}) => {
+  const t = useTime();
+  const dt = t - at;
+  if (dt < 0 || dt >= 0.1) return null;
+  const k = dt < 0.033 ? 0.7 : dt < 0.067 ? 1.15 : 0.6;
+  const s = size;
+  const w = s * 0.24;
+  const star = `M0 ${-s}Q${w} ${-w} ${s} 0Q${w} ${w} 0 ${s}Q${-w} ${w} ${-s} 0Q${-w} ${-w} 0 ${-s}Z`;
+  return (
+    <XG m={mat.compose(mat.translate(p[0], p[1]), mat.scale(k), mat.rotate(12))}>
+      <Fill d={star} color={palette.cream} offset={false} mode="none" seed="s4/gl" />
+      <Ink d={star} width={1.6} taper={false} seed="s4/gli" />
+    </XG>
+  );
 };
 
 // ---------------------------------------------------------------- the passers-by
@@ -179,119 +223,189 @@ export function ghostFeet(g: GhostSpec, t: number): Pt {
   return [VP[0] + (g.x - VP[0]) * k, VP[1] + (g.y - VP[1]) * k];
 }
 
-/** Path helpers in a figure's local frame (units of its height H, feet at (0, 0), y up = negative). */
+/** Path helpers in a figure's local frame (units of its height H, feet at (0, 0), y up = negative). Reference 1's
+ *  back-view readers (f_9.0) given legs: a round head whose top and back are a HAIR MASS (hairline at the nape, strands
+ *  from the crown down to it, never free dashes mid-head), the neck in two short lines into a collar band (no centre
+ *  seam: from behind there is no placket), a soft bell of a jacket with round sloped shoulders, sleeves that swing with
+ *  the walk, closed trouser legs and dark shoes. */
 const fmt = (v: number) => v.toFixed(1);
+/** Head centre / radii (units of H). */
+const HC = -0.916;
+const HRX = 0.06;
+const HRY = 0.066;
 function figPaths(H: number, ph: number, hair: PasserHair, acc: PasserAcc[]) {
   const P = (x: number, y: number) => `${fmt(x * H)} ${fmt(y * H)}`;
-  // legs: closed trouser shapes, the lifted foot (heel up) alternates with the step phase
-  const lift = [Math.max(0, Math.sin(ph)) * 0.04, Math.max(0, Math.sin(ph + Math.PI)) * 0.04];
+  const R = (v: number) => fmt(v * H);
+  // ---- legs: closed trouser shapes (slight taper), the lifted foot (heel up) alternating with the step phase
+  const lift = [Math.max(0, Math.sin(ph)) * 0.045, Math.max(0, Math.sin(ph + Math.PI)) * 0.045];
   let legs = '';
   let shoes = '';
   [-1, 1].forEach((s, i) => {
     const bot = -0.035 - lift[i];
-    legs += `M${P(s * 0.006, -0.5)}L${P(s * 0.122, -0.5)}L${P(s * 0.104, bot)}L${P(s * 0.03, bot)}L${P(s * 0.012, -0.41)}Z`;
-    const cx = s * 0.067;
+    const sw = s * lift[i] * 0.25; // the lifted leg's foot tucks in a little
+    legs += `M${P(s * 0.008, -0.5)}L${P(s * 0.124, -0.5)}C${P(s * 0.124, -0.36)} ${P(s * 0.106 + sw, -0.2)} ${P(s * 0.1 + sw, bot)}L${P(s * 0.036 + sw, bot)}C${P(s * 0.032 + sw, -0.2)} ${P(s * 0.02, -0.36)} ${P(s * 0.012, -0.415)}Z`;
+    const cx = s * 0.068 + sw;
     const sh = 0.026 + lift[i] * 0.25; // a raised heel shows a little more sole
-    shoes += `M${P(cx - 0.042, bot)}Q${P(cx, bot - 0.022)} ${P(cx + 0.042, bot)}L${P(cx + 0.04, bot + sh)}Q${P(cx, bot + sh + 0.01)} ${P(cx - 0.04, bot + sh)}Z`;
+    shoes += `M${P(cx - 0.042, bot)}Q${P(cx, bot - 0.02)} ${P(cx + 0.042, bot)}L${P(cx + 0.04, bot + sh)}Q${P(cx, bot + sh + 0.01)} ${P(cx - 0.04, bot + sh)}Z`;
   });
-  // the jacket: sloped shoulders from the neck, a slight waist, a soft curved hem
-  const torso = `M${P(-0.13, -0.47)}C${P(-0.128, -0.53)} ${P(-0.12, -0.6)} ${P(-0.128, -0.66)}C${P(-0.138, -0.72)} ${P(-0.152, -0.745)} ${P(-0.148, -0.772)}C${P(-0.14, -0.812)} ${P(-0.08, -0.832)} ${P(-0.034, -0.842)}L${P(0.034, -0.842)}C${P(0.08, -0.832)} ${P(0.14, -0.812)} ${P(0.148, -0.772)}C${P(0.152, -0.745)} ${P(0.138, -0.72)} ${P(0.128, -0.66)}C${P(0.12, -0.6)} ${P(0.128, -0.53)} ${P(0.13, -0.47)}Q${P(0, -0.452)} ${P(-0.13, -0.47)}Z`;
-  const seam = `M${P(0, -0.835)}L${P(0.002, -0.75)}M${P(-0.118, -0.535)}Q${P(-0.08, -0.528)} ${P(-0.05, -0.532)}`;
-  // arms: closed sleeves from the shoulders, hanging a little outward (a sliver of air at the hands), swinging in
+  // ---- the jacket: a soft bell. Round sloped shoulders (radius ~0.1 H = a third of the width), near-straight sides,
+  // a soft curved hem
+  const half = (s: number) =>
+    `C${P(s * 0.085, -0.848)} ${P(s * 0.145, -0.83)} ${P(s * 0.153, -0.772)}C${P(s * 0.16, -0.71)} ${P(s * 0.146, -0.62)} ${P(s * 0.14, -0.56)}C${P(s * 0.137, -0.52)} ${P(s * 0.139, -0.49)} ${P(s * 0.143, -0.468)}`;
+  const torso = `M${P(-0.03, -0.846)}${half(-1)}Q${P(0, -0.448)} ${P(0.143, -0.468)}` + `C${P(0.139, -0.49)} ${P(0.137, -0.52)} ${P(0.14, -0.56)}C${P(0.146, -0.62)} ${P(0.16, -0.71)} ${P(0.153, -0.772)}C${P(0.145, -0.83)} ${P(0.085, -0.848)} ${P(0.03, -0.846)}Z`;
+  // the neck (two short lines from under the hair into the collar) and the collar band at the nape (convex up, like
+  // the kit's CollarBand: a back collar, never a V or a centre seam)
+  const neck = `M${P(-0.026, -0.83)}L${P(-0.025, HC + 0.05)}M${P(0.026, -0.83)}L${P(0.025, HC + 0.05)}`;
+  const collar = `M${P(-0.07, -0.828)}Q${P(0, -0.86)} ${P(0.07, -0.828)}L${P(0.074, -0.808)}Q${P(0, -0.838)} ${P(-0.074, -0.808)}Z`;
+  // ---- arms: tapered sleeves from the shoulders with a sand hand, hanging a little outward and swinging +-8 deg in
   // antiphase with the legs
   const arm = (s: number, swing: number) => {
-    // local sleeve: u across, v down from the shoulder, rotated so the hand hangs outward (+ the swing)
-    const a = ((-s * 7 + swing) * Math.PI) / 180;
+    const a = ((-s * 4 + swing) * Math.PI) / 180;
     const c = Math.cos(a);
     const sn = Math.sin(a);
-    const sx0 = s * 0.13;
+    const sx0 = s * 0.132;
     const sy0 = -0.79;
     const Q = (u: number, v: number) => P(sx0 + u * c - v * sn, sy0 + u * sn + v * c);
-    return `M${Q(-0.028, 0)}C${Q(-0.03, 0.1)} ${Q(-0.024, 0.2)} ${Q(-0.022, 0.29)}Q${Q(0, 0.315)} ${Q(0.022, 0.29)}C${Q(0.024, 0.2)} ${Q(0.03, 0.1)} ${Q(0.028, 0)}Z`;
+    const sleeve = `M${Q(-0.03, -0.01)}C${Q(-0.032, 0.1)} ${Q(-0.026, 0.2)} ${Q(-0.023, 0.27)}L${Q(0.023, 0.27)}C${Q(0.026, 0.2)} ${Q(0.032, 0.1)} ${Q(0.03, -0.01)}Q${Q(0, -0.03)} ${Q(-0.03, -0.01)}Z`;
+    const hand = `M${Q(-0.019, 0.268)}C${Q(-0.022, 0.3)} ${Q(-0.01, 0.318)} ${Q(0, 0.318)}C${Q(0.012, 0.318)} ${Q(0.022, 0.3)} ${Q(0.019, 0.268)}Z`;
+    return {sleeve, hand};
   };
-  const sw = Math.sin(ph) * 5;
+  const sw = Math.sin(ph) * 8;
   const phone = acc.includes('phone');
-  let arms = arm(-1, sw);
+  const aL = arm(-1, sw);
+  let arms = aL.sleeve;
+  let hands = aL.hand;
   let armR = '';
   let phoneD = '';
   if (phone) {
     // on a call: the right arm bent up, hand at the ear, the phone's back to us
-    const upper = `M${P(0.12, -0.815)}L${P(0.2, -0.74)}Q${P(0.225, -0.715)} ${P(0.21, -0.69)}L${P(0.165, -0.69)}L${P(0.105, -0.75)}Z`;
-    const fore = `M${P(0.175, -0.7)}L${P(0.2, -0.705)}L${P(0.118, -0.9)}L${P(0.09, -0.885)}Z`;
+    const upper = `M${P(0.118, -0.815)}C${P(0.16, -0.8)} ${P(0.2, -0.76)} ${P(0.214, -0.715)}Q${P(0.218, -0.69)} ${P(0.196, -0.684)}L${P(0.16, -0.69)}L${P(0.104, -0.752)}Z`;
+    const fore = `M${P(0.172, -0.694)}L${P(0.205, -0.705)}L${P(0.124, -0.892)}L${P(0.092, -0.878)}Z`;
     armR = fore + upper;
-    phoneD = `M${P(0.072, -0.97)}L${P(0.112, -0.965)}L${P(0.104, -0.875)}L${P(0.066, -0.88)}Z`;
-  } else arms += arm(1, -sw);
-  // head (the back of it) + hair
-  const hr = 0.062;
-  const hc = -0.925;
-  const head = `M${P(-hr, hc)}C${P(-hr, hc - 0.11)} ${P(hr, hc - 0.11)} ${P(hr, hc)}C${P(hr, hc + 0.07)} ${P(0.03, hc + 0.085)} ${P(0, hc + 0.085)}C${P(-0.03, hc + 0.085)} ${P(-hr, hc + 0.07)} ${P(-hr, hc)}Z`;
+    hands += `M${P(0.09, -0.875)}C${P(0.08, -0.9)} ${P(0.1, -0.918)} ${P(0.118, -0.905)}L${P(0.124, -0.89)}Z`;
+    phoneD = `M${P(0.072, -0.975)}L${P(0.114, -0.968)}L${P(0.106, -0.878)}L${P(0.064, -0.884)}Z`;
+  } else {
+    const aR = arm(1, -sw);
+    arms += aR.sleeve;
+    hands += aR.hand;
+  }
+  // ---- head (its back) + ears; the hair is a MASS over the top and back, the hairline crosses at the nape
+  const head = `M${P(-HRX, HC)}C${P(-HRX, HC - HRY * 1.36)} ${P(HRX, HC - HRY * 1.36)} ${P(HRX, HC)}C${P(HRX, HC + HRY * 0.86)} ${P(0.028, HC + HRY * 1.0)} ${P(0, HC + HRY * 1.0)}C${P(-0.028, HC + HRY * 1.0)} ${P(-HRX, HC + HRY * 0.86)} ${P(-HRX, HC)}Z`;
+  const ears = `M${P(-HRX + 0.003, HC + 0.004)}C${P(-HRX - 0.016, HC + 0.0)} ${P(-HRX - 0.016, HC + 0.036)} ${P(-HRX + 0.006, HC + 0.04)}M${P(HRX - 0.003, HC + 0.004)}C${P(HRX + 0.016, HC + 0.0)} ${P(HRX + 0.016, HC + 0.036)} ${P(HRX - 0.006, HC + 0.04)}`;
+  // the hair mass: the skull's top + back grown by `g`, down to the hairline at `ny` (its nape point dips `dip`)
+  const mass = (g: number, ny: number, dip: number) => {
+    const rx = HRX + g;
+    const top = HC - HRY * 1.36 - g * 1.5;
+    return `M${P(-rx, ny - 0.004)}C${P(-rx - 0.002, HC - 0.02)} ${P(-rx * 0.98, top)} ${P(0, top)}C${P(rx * 0.98, top)} ${P(rx + 0.002, HC - 0.02)} ${P(rx, ny - 0.004)}C${P(rx * 0.7, ny + dip * 0.2)} ${P(0.03, ny + dip * 0.4)} ${P(0, ny + dip)}C${P(-0.03, ny + dip * 0.4)} ${P(-rx * 0.7, ny + dip * 0.2)} ${P(-rx, ny - 0.004)}Z`;
+  };
+  // strands: long sweeps from the crown down to the hairline (they follow the skull, so they read as hair, not features)
+  const strands = (ny: number, k = 1) =>
+    `M${P(-0.008, HC - 0.068)}C${P(-0.034, HC - 0.05)} ${P(-0.05 * k, HC - 0.01)} ${P(-0.046 * k, ny - 0.006)}` +
+    `M${P(0.006, HC - 0.07)}C${P(0.028, HC - 0.05)} ${P(0.048 * k, HC - 0.012)} ${P(0.044 * k, ny - 0.008)}` +
+    `M${P(-0.002, HC - 0.07)}C${P(-0.008, HC - 0.03)} ${P(-0.012, HC + 0.0)} ${P(-0.01, ny + 0.002)}`;
   let hairFill = '';
   let hairInk = '';
   let darkFill = '';
-  if (hair === 'bun') {
-    hairFill = `M${P(-0.034, hc - 0.085)}a${fmt(0.036 * H)} ${fmt(0.032 * H)} 0 1 1 ${fmt(0.068 * H)} 0a${fmt(0.036 * H)} ${fmt(0.032 * H)} 0 1 1 ${fmt(-0.068 * H)} 0Z`;
-    hairInk = hairFill + `M${P(-0.04, hc - 0.05)}Q${P(-0.01, hc - 0.02)} ${P(-0.02, hc + 0.05)}M${P(0.04, hc - 0.05)}Q${P(0.012, hc - 0.02)} ${P(0.022, hc + 0.05)}`;
+  let capFill = '';
+  if (hair === 'short' || hair === 'headphones' || hair === 'bun') {
+    const ny = HC + 0.03;
+    hairFill = mass(0.005, ny, 0.018);
+    hairInk = hairFill + strands(ny);
+    if (hair === 'bun') {
+      const bun = `M${P(-0.03, HC - 0.088)}C${P(-0.032, HC - 0.13)} ${P(0.032, HC - 0.13)} ${P(0.03, HC - 0.088)}C${P(0.03, HC - 0.07)} ${P(-0.03, HC - 0.07)} ${P(-0.03, HC - 0.088)}Z`;
+      hairFill += bun;
+      hairInk += bun + `M${P(-0.012, HC - 0.112)}Q${P(0.004, HC - 0.1)} ${P(0.014, HC - 0.112)}`;
+    }
+    if (hair === 'headphones') {
+      // a band over the crown (just outside the hair), cups over the ears
+      const rb = HRX + 0.016;
+      const tb = HC - HRY * 1.36 - 0.026;
+      darkFill =
+        `M${P(-rb, HC + 0.004)}C${P(-rb, HC - 0.04)} ${P(-rb * 0.96, tb)} ${P(0, tb)}C${P(rb * 0.96, tb)} ${P(rb, HC - 0.04)} ${P(rb, HC + 0.004)}` +
+        `L${P(rb - 0.012, HC + 0.004)}C${P(rb - 0.012, HC - 0.036)} ${P((rb - 0.012) * 0.96, tb + 0.012)} ${P(0, tb + 0.012)}C${P(-(rb - 0.012) * 0.96, tb + 0.012)} ${P(-(rb - 0.012), HC - 0.036)} ${P(-(rb - 0.012), HC + 0.004)}Z` +
+        `M${P(-rb - 0.008, HC - 0.012)}Q${P(-rb - 0.012, HC + 0.024)} ${P(-rb - 0.004, HC + 0.05)}L${P(-rb + 0.018, HC + 0.05)}L${P(-rb + 0.018, HC - 0.016)}Z` +
+        `M${P(rb + 0.008, HC - 0.012)}Q${P(rb + 0.012, HC + 0.024)} ${P(rb + 0.004, HC + 0.05)}L${P(rb - 0.018, HC + 0.05)}L${P(rb - 0.018, HC - 0.016)}Z`;
+    }
   } else if (hair === 'long') {
-    hairFill = `M${P(-0.074, hc - 0.01)}C${P(-0.08, hc + 0.06)} ${P(-0.082, hc + 0.12)} ${P(-0.07, hc + 0.15)}L${P(0.07, hc + 0.15)}C${P(0.082, hc + 0.12)} ${P(0.08, hc + 0.06)} ${P(0.074, hc - 0.01)}Z`;
-    hairInk = hairFill + `M${P(-0.028, hc + 0.04)}Q${P(-0.034, hc + 0.09)} ${P(-0.036, hc + 0.14)}M${P(0.026, hc + 0.05)}Q${P(0.03, hc + 0.1)} ${P(0.03, hc + 0.14)}`;
+    // long hair: one mass from the crown over the head and down past the shoulders (it hides the neck and collar),
+    // three long strands, a softly uneven ends line
+    const rx = HRX + 0.012;
+    const top = HC - HRY * 1.36 - 0.012;
+    const bot = HC + 0.18;
+    hairFill = `M${P(-rx, HC)}C${P(-rx, HC - 0.04)} ${P(-rx * 0.96, top)} ${P(0, top)}C${P(rx * 0.96, top)} ${P(rx, HC - 0.04)} ${P(rx, HC)}C${P(rx + 0.006, HC + 0.08)} ${P(rx + 0.014, bot - 0.04)} ${P(rx + 0.008, bot)}Q${P(0.04, bot + 0.012)} ${P(0.012, bot - 0.004)}Q${P(-0.02, bot + 0.014)} ${P(-rx - 0.008, bot)}C${P(-rx - 0.014, bot - 0.04)} ${P(-rx - 0.006, HC + 0.08)} ${P(-rx, HC)}Z`;
+    hairInk = hairFill + `M${P(-0.03, HC - 0.04)}C${P(-0.046, HC + 0.03)} ${P(-0.05, HC + 0.1)} ${P(-0.046, bot - 0.012)}M${P(0.004, HC - 0.06)}C${P(-0.004, HC + 0.02)} ${P(0.004, HC + 0.1)} ${P(0.0, bot - 0.006)}M${P(0.032, HC - 0.04)}C${P(0.048, HC + 0.03)} ${P(0.052, HC + 0.1)} ${P(0.05, bot - 0.012)}`;
   } else if (hair === 'cap') {
-    hairInk = `M${P(-hr, hc - 0.012)}Q${P(0, hc + 0.012)} ${P(hr, hc - 0.012)}M${P(-0.022, hc - 0.002)}Q${P(0, hc - 0.03)} ${P(0.022, hc - 0.002)}`;
-    darkFill = `M${P(-0.012, hc - 0.1)}a${fmt(0.012 * H)} ${fmt(0.01 * H)} 0 1 1 ${fmt(0.024 * H)} 0a${fmt(0.012 * H)} ${fmt(0.01 * H)} 0 1 1 ${fmt(-0.024 * H)} 0Z`;
-  } else if (hair === 'headphones') {
-    darkFill =
-      `M${P(-0.078, hc + 0.005)}C${P(-0.08, hc - 0.13)} ${P(0.08, hc - 0.13)} ${P(0.078, hc + 0.005)}L${P(0.062, hc + 0.005)}C${P(0.062, hc - 0.105)} ${P(-0.062, hc - 0.105)} ${P(-0.062, hc + 0.005)}Z` +
-      `M${P(-0.094, hc - 0.02)}h${fmt(0.034 * H)}v${fmt(0.06 * H)}h${fmt(-0.034 * H)}Z` +
-      `M${P(0.06, hc - 0.02)}h${fmt(0.034 * H)}v${fmt(0.06 * H)}h${fmt(-0.034 * H)}Z`;
-    hairInk = `M${P(-0.03, hc - 0.04)}L${P(-0.022, hc + 0.0)}M${P(0.01, hc - 0.05)}L${P(0.014, hc - 0.01)}`;
-  } else {
-    hairInk = `M${P(-0.045, hc + 0.02)}l${fmt(0.012 * H)} ${fmt(0.025 * H)}M${P(-0.008, hc + 0.03)}l${fmt(0.004 * H)} ${fmt(0.028 * H)}M${P(0.035, hc + 0.02)}l${fmt(-0.008 * H)} ${fmt(0.026 * H)}`;
+    // a cap over the top ~60 %: its band sags gently, the back strap is an arch cut up into it (hair shows through),
+    // a button on top; a short hairline under it
+    const by = HC + 0.008;
+    const rx = HRX + 0.006;
+    const top = HC - HRY * 1.36 - 0.01;
+    capFill = `M${P(-rx, by)}C${P(-rx, HC - 0.04)} ${P(-rx * 0.96, top)} ${P(0, top)}C${P(rx * 0.96, top)} ${P(rx, HC - 0.04)} ${P(rx, by)}Q${P(0, by + 0.014)} ${P(-rx, by)}Z`;
+    const ny = HC + 0.034;
+    hairFill = mass(0.003, ny, 0.014);
+    hairInk = hairFill;
+    const aw = 0.022;
+    const ab = by + 0.004;
+    const archTop = by - 0.03;
+    darkFill = `M${P(-0.004, top - 0.012)}a${R(0.008)} ${R(0.006)} 0 1 1 ${R(0.016)} 0a${R(0.008)} ${R(0.006)} 0 1 1 ${R(-0.016)} 0Z`;
+    hairInk += `M${P(-aw, ab)}L${P(-aw, by - 0.008)}C${P(-aw, archTop)} ${P(aw, archTop)} ${P(aw, by - 0.008)}L${P(aw, ab)}M${P(-aw - 0.008, by - 0.006)}L${P(aw + 0.008, by - 0.006)}`;
   }
-  // accessories on the back
+  // ---- accessories on the back
   let accFill = '';
   let accInk = '';
   if (acc.includes('backpack')) {
-    const bp = `M${P(-0.092, -0.78)}Q${P(0, -0.81)} ${P(0.092, -0.78)}L${P(0.098, -0.56)}Q${P(0, -0.54)} ${P(-0.098, -0.56)}Z`;
+    const bp = `M${P(-0.094, -0.775)}C${P(-0.094, -0.81)} ${P(0.094, -0.81)} ${P(0.094, -0.775)}L${P(0.1, -0.575)}Q${P(0.1, -0.55)} ${P(0.07, -0.548)}L${P(-0.07, -0.548)}Q${P(-0.1, -0.55)} ${P(-0.1, -0.575)}Z`;
     accFill += bp;
-    accInk += bp + `M${P(-0.07, -0.66)}Q${P(0, -0.675)} ${P(0.07, -0.66)}`;
+    // the flap, a zip pull, and the shoulder straps running up over the shoulders
+    accInk += bp + `M${P(-0.09, -0.7)}Q${P(0, -0.722)} ${P(0.09, -0.7)}M${P(0.0, -0.712)}l${R(0.004)} ${R(0.026)}M${P(-0.07, -0.8)}Q${P(-0.1, -0.84)} ${P(-0.11, -0.826)}M${P(0.07, -0.8)}Q${P(0.1, -0.84)} ${P(0.11, -0.826)}`;
   }
   if (acc.includes('strap')) {
-    const strap = `M${P(-0.118, -0.81)}L${P(-0.09, -0.83)}L${P(0.15, -0.545)}L${P(0.125, -0.52)}Z`;
-    const bag = `M${P(0.09, -0.56)}L${P(0.215, -0.565)}L${P(0.21, -0.43)}Q${P(0.15, -0.415)} ${P(0.095, -0.43)}Z`;
+    const strap = `M${P(-0.124, -0.8)}L${P(-0.1, -0.826)}L${P(0.152, -0.55)}L${P(0.13, -0.526)}Z`;
+    const bag = `M${P(0.09, -0.565)}Q${P(0.152, -0.58)} ${P(0.216, -0.565)}L${P(0.212, -0.44)}Q${P(0.152, -0.418)} ${P(0.096, -0.436)}Z`;
     accFill += strap + bag;
-    accInk += strap + bag;
+    accInk += strap + bag + `M${P(0.096, -0.52)}Q${P(0.152, -0.535)} ${P(0.214, -0.52)}`;
   }
-  return {legs, shoes, torso, seam, arms, armR, phoneD, head, hairFill, hairInk, darkFill, accFill, accInk};
+  return {legs, shoes, torso, neck, collar, arms, hands, armR, phoneD, head, ears, hairFill, hairInk, darkFill, capFill, accFill, accInk};
 }
 
 /** One passer-by: a complete back-view line-art figure (white paper fills, ink outlines; closed trouser legs and
- *  sleeves, an identity detail), reference 1's readers (f_9.0) given legs. (x, y) = feet, H = height (world px). */
+ *  sleeves, an identity detail), reference 1's readers (f_9.0) given legs. (x, y) = feet, H = height (world px). The
+ *  upper body rolls +-1.5 deg with the gait. */
 export const Passer: React.FC<{x: number; y: number; H: number; t: number; hz: number; hair: PasserHair; acc: PasserAcc[]; ink: number; seed: string}> = ({x, y, H, t, hz, hair, acc, ink, seed}) => {
   const ph = t * hz * Math.PI + rand(seed, 'ph') * 6.28;
   const bob = -Math.abs(Math.sin(ph)) * 0.012 * H;
   const sway = Math.sin(ph) * 0.006 * H;
+  const roll = Math.sin(ph) * 1.5;
   const g = figPaths(H, ph, hair, acc);
   const W = palette.white;
-  const layer = (d: string, k: string, fill = W) =>
+  const layer = (d: string, k: string, fill = W, w = ink) =>
     d ? (
       <React.Fragment key={k}>
         <Fill d={d} color={fill} offset={false} mode="none" seed={`${seed}/${k}f`} />
-        <Ink d={d} width={ink} taper={false} seed={`${seed}/${k}i`} />
+        <Ink d={d} width={w} taper={false} seed={`${seed}/${k}i`} />
       </React.Fragment>
     ) : null;
+  const long = hair === 'long';
   return (
     <XG m={mat.translate(x + sway, y + bob)}>
       {layer(g.legs, 'lg')}
       <Fill d={g.shoes} color={palette.ink} offset={false} mode="none" seed={`${seed}/sh`} />
-      {layer(g.torso, 'to')}
-      <Ink d={g.seam} width={ink * 0.7} taper={false} seed={`${seed}/se`} />
-      {layer(g.accFill ? g.accInk : '', 'ac')}
-      {layer(g.arms, 'ar')}
-      {layer(g.head, 'hd')}
-      {g.hairFill ? <Fill d={g.hairFill} color={W} offset={false} mode="none" seed={`${seed}/hf`} /> : null}
-      {g.hairInk ? <Ink d={g.hairInk} width={ink * 0.8} taper={false} seed={`${seed}/hi`} /> : null}
-      {g.darkFill ? <Fill d={g.darkFill} color={palette.ink} offset={false} mode="none" seed={`${seed}/dk`} /> : null}
-      {layer(g.armR, 'aR')}
-      {layer(g.phoneD, 'ph')}
+      <XG m={mat.about(mat.rotate(roll), 0, -0.47 * H)}>
+        {layer(g.torso, 'to')}
+        <Ink d={g.neck} width={ink * 0.8} taper={false} seed={`${seed}/nk`} />
+        {long ? null : layer(g.collar, 'co', W, ink * 0.8)}
+        {layer(g.accFill ? g.accInk : '', 'ac')}
+        {layer(g.arms, 'ar')}
+        {layer(g.hands, 'hn', palette.sand, ink * 0.8)}
+        <Ink d={g.ears} width={ink * 0.8} taper={false} seed={`${seed}/ea`} />
+        {layer(g.head, 'hd')}
+        {g.hairFill ? <Fill d={g.hairFill} color={W} offset={false} mode="none" seed={`${seed}/hf`} /> : null}
+        {g.hairInk ? <Ink d={g.hairInk} width={ink * 0.85} taper={false} seed={`${seed}/hi`} /> : null}
+        {layer(g.capFill, 'cp')}
+        {g.darkFill ? <Fill d={g.darkFill} color={palette.ink} offset={false} mode="none" seed={`${seed}/dk`} /> : null}
+        {layer(g.armR, 'aR')}
+        {layer(g.phoneD, 'ph')}
+      </XG>
     </XG>
   );
 };
@@ -322,59 +436,70 @@ export const Ghosts: React.FC<{list: GhostSpec[]}> = ({list}) => {
 /** The road's left edge (the left row's foot line) at world y: feet must be at or right of it. */
 const roadEdgeX = (y: number) => 520 + ((1370 - y) / (1370 - VP[1])) * (VP[0] - 520);
 
-/** The passers-by. At most two on screen at any frame, never on top of each other: the pair on 'was' (rule-5 leads),
- *  far flickers up the road on alternate tears when no pair is there, the striding pair on 'like'. Every one's feet are
- *  on the road at the base of the left row, right of the hero house (screen x ~825-990), behind the planter. */
+/** The passers-by. At most two on screen at any frame: the pair on 'was' (rule-5 leads), far flickers up the road on
+ *  alternate tears when no pair is there, the striding pair on 'like'. Every one's feet are on the road at the base of
+ *  the left row, right of the hero house, behind the planter. Fix round: the pairs walk in a little NEARER (lower,
+ *  further left on the road edge: the road edge runs right as it recedes), so each body stays at screen x <= ~945 out
+ *  of the right rail while they walk away; the feet sit on the edge line (+2 / +4), the farther member half behind the
+ *  nearer one's shoulder. */
 export function ghostList(b: Beats, tears: number[]): GhostSpec[] {
   const out: GhostSpec[] = [
-    // 'was': a pair, walking away up the street (one near the hero house's corner, one a step ahead and farther)
-    {x: roadEdgeX(1328) + 6, y: 1328, in: b.ghosts1 - 0.1, out: tears[1], seed: 'g4a', pace: 0.08, hz: 1.9, hair: 'short', acc: ['backpack']},
-    {x: roadEdgeX(1285) + 25, y: 1285, in: b.ghosts1 - 0.06, out: tears[2], seed: 'g4b', pace: 0.08, hz: 2.1, hair: 'long', acc: ['strap']},
+    // 'was': a pair, walking away up the street (one at the hero house's corner, one a step ahead and farther)
+    {x: roadEdgeX(1336) + 2, y: 1336, in: b.ghosts1 - 0.1, out: tears[1], seed: 'g4a', pace: 0.06, hz: 1.9, hair: 'short', acc: ['backpack']},
+    {x: roadEdgeX(1302) + 4, y: 1302, in: b.ghosts1 - 0.06, out: tears[2], seed: 'g4b', pace: 0.06, hz: 2.1, hair: 'long', acc: ['strap']},
     // 'like': a second pair strides past (faster legs, faster into depth)
-    {x: roadEdgeX(1322) + 6, y: 1322, in: b.ghosts2 - 0.1, out: tears[8], seed: 'g4c', pace: 0.16, hz: 2.8, hair: 'headphones', acc: []},
-    {x: roadEdgeX(1281) + 25, y: 1281, in: b.ghosts2 - 0.05, out: tears[9], seed: 'g4d', pace: 0.16, hz: 2.9, hair: 'bun', acc: ['phone']},
+    {x: roadEdgeX(1334) + 2, y: 1334, in: b.ghosts2 - 0.1, out: tears[8], seed: 'g4c', pace: 0.12, hz: 2.8, hair: 'headphones', acc: []},
+    {x: roadEdgeX(1298) + 4, y: 1298, in: b.ghosts2 - 0.05, out: tears[9], seed: 'g4d', pace: 0.12, hz: 2.9, hair: 'bun', acc: ['phone']},
   ];
-  // the time-lapse flickers: far up the road (half size, hair ink), one at a time, only while at most one pair member is
-  // on screen
+  // the time-lapse flickers: far up the road (hair ink), one at a time, only while at most one pair member is on screen;
+  // feet on the road edge (+0..8: the far road lies inside the rail, kept as tight to its edge as the ground allows)
   const flick = [1, 2, 9, 10, 11, 12, 13];
   const hairs: PasserHair[] = ['cap', 'bun', 'short', 'long', 'headphones', 'short', 'cap'];
   flick.forEach((i, k) => {
     const ta = tears[i];
     if (ta === undefined) return;
     const r = (q: string) => rand('s4ghost', `${i}${q}`);
-    const y = lerp(1228, 1246, r('y'));
+    const y = lerp(1236, 1252, r('y'));
     // consecutive flickers swap in the same frame (one at a time: a time-lapse jump), a lone one lives 0.1 s
     const next = flick[k + 1] === i + 1 ? tears[i + 1] : ta + 0.1;
-    out.push({x: roadEdgeX(y) + lerp(8, 20, r('x')), y, in: ta, out: next, seed: `g4t${i}`, pace: 0.2, hz: 2.4, depth: 'hair', hair: hairs[k], acc: r('a') > 0.5 ? ['strap'] : []});
+    out.push({x: roadEdgeX(y) + lerp(0, 8, r('x')), y, in: ta, out: next, seed: `g4t${i}`, pace: 0.2, hz: 2.4, depth: 'hair', hair: hairs[k], acc: r('a') > 0.5 ? ['strap'] : []});
   });
   return out;
 }
 
 // ---------------------------------------------------------------- the leaf
 
-/** A small orange autumn leaf: lets go of the ivy over the lintel, drifts down across door #4's teal glass (pendulum
- *  sway, a slow flip) and lands on sleeping Pip's ear (a 3-frame squash on the still camera); it stays there and rides
- *  the dive. ~30 px on screen. */
-export const Leaf: React.FC<{from: Pt; to: Pt; at: number; land: number}> = ({from, to, at, land}) => {
+/** The leaf's half length (world): ~40 px long on screen at the 1.5 zoom. */
+const LEAF_S = 13;
+const leafD = (s: number) => `M${-s} 0C${-s * 0.5} ${-s * 0.8} ${s * 0.55} ${-s * 0.75} ${s} 0C${s * 0.55} ${s * 0.75} ${-s * 0.5} ${s * 0.8} ${-s} 0Z`;
+const leafRib = (s: number) => `M${-s * 1.3} 0.6L${s * 0.75} 0M${-s * 0.1} 0L${s * 0.25} ${-s * 0.32}M${-s * 0.1} 0L${s * 0.25} ${s * 0.32}`;
+/** Its resting pose on Pip's crown (deg, flip). */
+export const LEAF_REST = {rot: -14, flip: 0.62};
+
+/** The last TAN autumn leaf (storyboard: tan, ink outline): lets go of the ivy on the door's left frame as the vine goes
+ *  bare, drifts down (pendulum sway, a slow flip) and lands on sleeping Pip's crown (a 3-frame squash on the still
+ *  camera) ~0.3 s before the dive, so it is seen at rest; then it rides his head through the dive (his drawn size, see
+ *  pipCrownWorld). ~40 px on screen. */
+export const Leaf: React.FC<{from: Pt; at: number; land: number; cam: Cam}> = ({from, at, land, cam}) => {
   const t = useTime();
   if (t < at) return null;
+  const crown = pipCrownWorld(cam);
+  const to = crown.p;
   const u = clamp((t - at) / (land - at));
-  // down with a sideways pendulum (dying out), every curve continuous into the landing (u = 1: flat, at rest)
-  const sway = Math.sin(u * Math.PI * 2.5) * 16 * (1 - u);
+  // down with a sideways pendulum (dying out), every curve continuous into the landing (u = 1: at rest)
+  const sway = Math.sin(u * Math.PI * 2.5) * 14 * (1 - u);
   const x = lerp(from[0], to[0], E.inOutSine(u)) + sway;
   const y = lerp(from[1], to[1], u * (0.55 + 0.45 * u));
-  const rot = -20 + 36 * Math.sin(u * Math.PI * 2.5) * (1 - u * 0.7);
-  const flip = 0.74 + 0.26 * Math.cos(u * Math.PI * 3.0);
-  // landing squash (the leaf settles on the ear): 2-3 frames
+  const rot = lerp(-30, LEAF_REST.rot, u) + 34 * Math.sin(u * Math.PI * 2.5) * (1 - u * 0.7);
+  const flip = lerp(0.74 + 0.26 * Math.cos(u * Math.PI * 3.0), LEAF_REST.flip, u * u);
+  // landing squash (the leaf settles on the crown): 3 frames
   const d = t - land;
-  const sq = d >= 0 && d < 0.14 ? 0.3 * Math.sin(Math.PI * (d / 0.1)) * (d < 0.1 ? 1 : 0) : 0;
-  const s = 10.5;
-  const leaf = `M${-s} 0C${-s * 0.5} ${-s * 0.8} ${s * 0.55} ${-s * 0.75} ${s} 0C${s * 0.55} ${s * 0.75} ${-s * 0.5} ${s * 0.8} ${-s} 0Z`;
-  const rib = `M${-s * 1.3} 0.6L${s * 0.75} 0M${-s * 0.1} 0L${s * 0.25} ${-s * 0.32}M${-s * 0.1} 0L${s * 0.25} ${s * 0.32}`;
+  const sq = d >= 0 && d < 0.1 ? 0.3 * Math.sin(Math.PI * (d / 0.1)) : 0;
+  const s = LEAF_S * (u >= 1 ? crown.k : 1);
   return (
-    <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(1 + sq * 0.6, flip * (1 - sq)))}>
-      <Fill d={leaf} color={palette.sun} offset={false} mode="none" seed="s4leaf" />
-      <Ink d={leaf + rib} width={1.4} taper={false} seed="s4leafi" />
+    <XG m={mat.compose(mat.translate(x, y - 2 * (u >= 1 ? crown.k : 1)), mat.rotate(rot), mat.scale(1 + sq * 0.6, flip * (1 - sq)))}>
+      <Fill d={leafD(s)} color={palette.tan} offset={false} mode="none" seed="s4leaf" />
+      <Ink d={leafD(s) + leafRib(s)} width={1.6} taper={false} seed="s4leafi" />
     </XG>
   );
 };

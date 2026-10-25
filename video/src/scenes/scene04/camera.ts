@@ -7,8 +7,9 @@
 //   cut(years)-0.33 -> cut(years) dive (330, 891.6, 1.55) -> (360, 1130, 1.90): a FIXED 0.33 s ending on the cut.
 //                                Log zoom in(quad) (rate 2 x ln(1.9 / 1.55) / 0.33 = 1.23 /s at the cut, S05 lands at
 //                                ~1.05 /s); lock4's SCREEN position travels (540, 1330) -> (483, 960) with an in-out
-//                                sine over the first 70 % of the dive, so the last ~3 frames are a pure log zoom about
-//                                the lock (the exit speed is the zoom alone, ~20-40 px / frame, into S05's landing).
+//                                sine over the first 85 % of the dive (fix round: 70 % made the screen speed dip to
+//                                ~37 px / frame and re-accelerate to ~42 on the zoom alone; at 85 % it falls
+//                                monotonically 92 -> 85 -> 71 -> 51 -> 42 px / frame into the cut).
 // The creep ends at zero velocity and the dive starts from zero velocity: velocity-continuous, no step.
 
 import {ease as E, lerp, prog} from '../../lib/time';
@@ -33,7 +34,7 @@ export const toScreen = (c: Cam, p: Pt): Pt => [(p[0] - c.x) * c.zoom + 540, (p[
 export const toWorld = (c: Cam, p: Pt): Pt => [(p[0] - 540) / c.zoom + c.x, (p[1] - 960) / c.zoom + c.y];
 
 /** The share of the dive over which lock4's screen position travels (the rest is a pure zoom about the lock). */
-export const TRAVEL = 0.7;
+export const TRAVEL = 0.85;
 
 /** Dive progress 0..1 (0 before the dive). */
 export const diveK = (t: number, end: number) => prog(t, end - DIVE, DIVE, E.linear);

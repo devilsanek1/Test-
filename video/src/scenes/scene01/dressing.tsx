@@ -1,7 +1,14 @@
 // S01 set dressing the scene adds to GovernmentPlaza (fix round 3, docs/scenes/S01.md). All pure functions of scene
 // time; S12 (the loop seam) must draw the same pieces at their t = 0 state:
-//   SunRipple     the press ripple in the glyph's CREAM (review: the kit's ink ring around the sun read as a sketched
-//                 outline in the hook frame): r155 -> r195, thinning out over 0.2 s, same curve as SunPress 'release'.
+//   SunRipple     the press ripple: a 5 px CREAM band with 1.5 px ink edges (fix round 5, review: the 2-3 px cream line
+//                 was ~1.3:1 on the mint sky, invisible on a phone): r155 -> r195, thinning out over 0.2 s, same curve as
+//                 SunPress 'release'.
+//   PressTicks    (fix round 5) three short ink 'press' ticks off the rim in the clear sky above the gap (r168-196 at
+//                 114 / 90 / 66 deg), full on frame 0, retracting outward and gone by 0.1 s: the button caught at the
+//                 bottom of its press. S12's last reversed step draws them (and the ripple) at their t = 0 state.
+//   S01Glyph      (fix round 5) the power glyph with the 'just' glint ON the glyph: a 1 -> 1.12 -> 1 scale pop and three
+//                 cream sparks (6 px) around the top of its bar, on the orange disc (the kit's two thin ink ticks were
+//                 lost under govB's slam).
 //   DoorLanterns  two wall lanterns flanking govA's door (lit cream glass) that switch off on 'their' (the lamp's own
 //                 lantern is cropped by the frame edge and eaten by the paint edge in the film).
 //   S01Branch     a leafy plane-tree branch entering the TOP-RIGHT corner (x > 975, y < 250: outside the caption band
@@ -17,19 +24,89 @@ import {Fill} from '../../lib/Fill';
 import {Ink} from '../../lib/Ink';
 import {circle, crownTicks, rectPath} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
-import {releaseState} from '../shared/props';
+import {PowerGlyph, releaseState} from '../shared/props';
+import {useInkScale} from '../../lib/inkComp';
 import {LanternOff} from './shims';
 
 // ---------------------------------------------------------------- the press ripple, in cream
 
-/** The SunPress 'release' ripple (pass `ripple={false}` to SunPress) drawn in cream, 3.8 px at its emission radius:
- *  light leaving the button, not an outline. Frame 0 (u = 0) = the ring at r, full width. */
-export const SunRipple: React.FC<{cx: number; cy: number; r: number; at: number; width?: number}> = ({cx, cy, r, at, width = 3.8}) => {
+/** The SunPress 'release' ripple (pass `ripple={false}` to SunPress): a cream band with ink edges, 5 px of cream between
+ *  two 1.5 px ink lines at its emission radius (fix round 5): light leaving the button, readable on the mint sky. Frame
+ *  0 (u = 0) = the ring at r, full width; it runs out to r + 40 and thins to nothing in 0.2 s. */
+export const SunRipple: React.FC<{cx: number; cy: number; r: number; at: number; width?: number; edge?: number}> = ({cx, cy, r, at, width = 5, edge = 1.5}) => {
   const t = useTime();
+  const ks = useInkScale();
   const u = t < at ? 0 : prog(t, at, 0.2);
   const [, rg, rw] = releaseState(u, 0.12);
   if (u >= 1 || rw <= 0.02) return null;
-  return <circle cx={cx} cy={cy} r={r + rg} fill="none" stroke={palette.cream} strokeWidth={width * rw + 0.01} />;
+  const w = width * rw;
+  const e = edge * Math.min(1, rw * 1.5) * ks;
+  return (
+    <>
+      <circle cx={cx} cy={cy} r={r + rg} fill="none" stroke={palette.ink} strokeWidth={w + 2 * e} />
+      <circle cx={cx} cy={cy} r={r + rg} fill="none" stroke={palette.cream} strokeWidth={w + 0.01} />
+    </>
+  );
+};
+
+/** The press ticks (fix round 5, review: the 0.88 squash is hidden behind govB's dome and govC's tower, so frame 0 read as
+ *  a resting icon): three short radial ink ticks off the rim in the clear sky above the gap, at 114 / 90 / 66 deg (the
+ *  free arc between the dome and the clock tower), r 168 -> 196, 3.4 px. Frame 0 = full length; they ride out with the
+ *  ripple and retract toward their outer ends, gone at at + 0.1 (3 frames: f0 full, f1, f2). */
+export const PRESS_TICKS = {angles: [114, 90, 66], r0: 168, r1: 196, life: 0.1} as const;
+export const PressTicks: React.FC<{cx: number; cy: number; at: number; width?: number}> = ({cx, cy, at, width = 3.4}) => {
+  const t = useTime();
+  const u = t < at ? 0 : (t - at) / PRESS_TICKS.life;
+  if (u >= 1) return null;
+  const [, rg] = releaseState(t < at ? 0 : prog(t, at, 0.2), 0.12);
+  const out = rg * 0.5;
+  const r1 = PRESS_TICKS.r1 + out;
+  const r0 = lerp(PRESS_TICKS.r0 + out, r1 - 4, E.inQuad(u));
+  let d = '';
+  for (const deg of PRESS_TICKS.angles) {
+    const a = (deg * Math.PI) / 180;
+    const c = Math.cos(a);
+    const s = -Math.sin(a);
+    d += `M${(cx + c * r0).toFixed(1)} ${(cy + s * r0).toFixed(1)}L${(cx + c * r1).toFixed(1)} ${(cy + s * r1).toFixed(1)}`;
+  }
+  return <Ink d={d} width={width} taper={false} seed="s01/pressTicks" />;
+};
+
+/** The power glyph with the 'just' glint on the glyph itself (fix round 5): from `glintAt` a scale pop 1 -> 1.12 (0.045 s,
+ *  out(cubic)) -> 1 (by +0.12, inOut(sine)) about the glyph's centre, and three cream sparks (6 px, round caps) around
+ *  the top of the bar on the orange disc, growing outward (0.05 s) then retracting toward their tips (gone by +0.22).
+ *  Sun-local units (origin = the disc centre), `r` = the Sun's render-prop radius. */
+export const S01Glyph: React.FC<{r: number; glintAt: number; seed: string}> = ({r, glintAt, seed}) => {
+  const t = useTime();
+  const ks = useInkScale();
+  const u = t - glintAt;
+  const pop = u < 0 ? 1 : u < 0.045 ? 1 + 0.12 * E.outCubic(u / 0.045) : u < 0.12 ? 1.12 - 0.12 * E.inOutSine((u - 0.045) / 0.075) : 1;
+  const ring = (r * 56) / 150;
+  const sparks: React.ReactNode[] = [];
+  const su = u - 0.015;
+  if (su >= 0 && su < 0.22) {
+    const grow = E.outCubic(clamp(su / 0.05));
+    const back = E.inQuad(clamp((su - 0.08) / 0.14));
+    let d = '';
+    // three rays from just above the bar's top end (0, -1.22 ring): up-left, up, up-right
+    const c0: [number, number] = [0, -ring * 1.22];
+    for (const [deg, L] of [[-135, 0.36], [-90, 0.42], [-45, 0.36]] as [number, number][]) {
+      const a = (deg * Math.PI) / 180;
+      const rIn = ring * 0.26;
+      const rOut = rIn + ring * L * grow;
+      const rA = lerp(rIn, rOut - 0.5, back);
+      d += `M${(c0[0] + Math.cos(a) * rA).toFixed(2)} ${(c0[1] + Math.sin(a) * rA).toFixed(2)}L${(c0[0] + Math.cos(a) * rOut).toFixed(2)} ${(c0[1] + Math.sin(a) * rOut).toFixed(2)}`;
+    }
+    sparks.push(<path key="sp" d={d} fill="none" stroke={palette.cream} strokeWidth={6 * ks} strokeLinecap="round" />);
+  }
+  return (
+    <>
+      <XG m={pop === 1 ? mat.I : mat.about(mat.scale(pop), 0, -ring * 0.2)}>
+        <PowerGlyph r={r} seed={seed} />
+      </XG>
+      {sparks}
+    </>
+  );
 };
 
 // ---------------------------------------------------------------- govA's door lanterns ('their')

@@ -12,13 +12,13 @@ import {Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import {InkScale} from '../../lib/inkComp';
 import {GovEvents, GovernmentPlaza, GovId, PLAZA} from '../shared/sets';
-import {Bit, EdgeOnlooker, PowerGlyph, SunPress} from '../shared/props';
+import {Bit, EdgeOnlooker, SunPress} from '../shared/props';
 import {inkComp, layerMat, toScreen, zoomAt} from './camera';
 import {B} from './timing';
 import {CitizenPlan, leanAt, OnlookerPhoneArm, OnlookerShade, PigeonPlan, PipLeap, PipPlan, PipS01, PlazaCitizen, Pigeon} from './cast';
 import {s01WindowSlot} from './screens';
 import {DOME_GLASS, LanternOff, S01_PADLOCK_SIZE, S01Shutter} from './shims';
-import {DoorLanterns, LockRing, S01Branch, SunRipple, TreeTicks} from './dressing';
+import {DoorLanterns, LockRing, PressTicks, S01Branch, S01Glyph, SunRipple, TreeTicks} from './dressing';
 
 const SUN = PLAZA.sun; // (720, 900) r155
 const VP = PLAZA.vp as Pt;
@@ -60,23 +60,25 @@ export const S01_WINDOWS = s01WindowSlot(S01_GOV, true);
 
 // ---------------------------------------------------------------- citizens: the watching crowd (fix round 1)
 
-/** Three rows of back-view people facing the plaza (the references' signature: rows shrinking toward the steps):
- *  a FRONT row of four readable 134-192 px figures on the plaza (feet y 1494-1540), a SECOND row of two ~110 px
- *  (feet ~1472), the far row of 50-66 px at the steps and one silhouette deep on the sun path. Every front / second-row
- *  figure acts in head swaps (back view -> 3/4 toward govB: cheek and ear appear) and turns back on 'PURPOSE'.
- *  Kept clear of govB's door and lock box (x 470-620, y 1230-1400: the dive target), of Pip (x 760-870) and of the
- *  edge onlooker's phone. */
+/** Three rows of back-view people facing the plaza (the references' signature: rows shrinking toward the steps). Fix
+ *  round 5 (review: a 134-190 px front row sat visually on the step band, so the eye compared people with the ~790 px
+ *  facades at ~4:1, handsome but not monumental): the FRONT row is ~0.75 x (h 100-142: fA 142, fC 134, fD 100, all on
+ *  one perspective line h ~ (feet y - 1381)), the SECOND row ~80 px, the far row 50-66 px at the steps (about 10:1
+ *  against the facades), and the fB walker is dropped so open plaza floor shows between the near observer and the
+ *  steps. The near observer stays the single big foreground figure. fA and fC are the two readable citizens; every
+ *  front / second-row figure acts in head swaps (back view -> 3/4 toward govB: cheek and ear appear) and turns back on
+ *  'PURPOSE'. Kept clear of govB's door and lock box (x 470-620, y 1230-1400: the dive target), of Pip (x 760-870) and
+ *  of the edge onlooker's phone. */
 export const S01_CITIZENS: CitizenPlan[] = [
   // FRONT row. fA: raises a phone toward govB on w3+0.25 (lit screen: a mini govB), lowers it on 'websites'
-  {x: 300, y: 1540, h: 190, seed: 's01/fA', hair: 'bun', acc: ['backpack'], body: palette.sand, phone: {up: B.phonesUp, down: B.phoneDown, side: 1}, turn: [{t: B.heads + 0.1, d: 1}, {t: B.headsBack + 0.03, d: 0}], lean: [{t: B.heads + 0.1, a: 3}, {t: B.headsBack + 0.03, a: 0}], bob: 0.6},
-  // fB, fC: walking away at frame 0 (the seam is mid-motion); they stop on 'Governments' and swap to a 3/4 head toward govB
-  {x: 415, y: 1514, h: 162, seed: 's01/fB', hair: 'short', acc: ['collar'], body: palette.peach, walk: {speed: 12, hz: 2.1, slowAt: B.heads - 0.12, stopAt: B.heads}, turn: [{t: B.heads, d: 1}, {t: B.headsBack, d: 0}], lean: [{t: B.heads, a: 8}, {t: B.headsBack, a: 0}]},
-  {x: 712, y: 1532, h: 180, seed: 's01/fC', hair: 'curly', acc: ['strap'], body: palette.cream, walk: {speed: 11, hz: 2.0, slowAt: B.heads - 0.08, stopAt: B.heads + 0.04}, turn: [{t: B.heads + 0.04, d: -1}, {t: B.headsBack + 0.05, d: 0}], lean: [{t: B.heads + 0.04, a: -8}, {t: B.headsBack + 0.05, a: 0}]},
+  {x: 318, y: 1540, h: 142, seed: 's01/fA', hair: 'bun', acc: ['backpack'], body: palette.sand, phone: {up: B.phonesUp, down: B.phoneDown, side: 1}, turn: [{t: B.heads + 0.1, d: 1}, {t: B.headsBack + 0.03, d: 0}], lean: [{t: B.heads + 0.1, a: 3}, {t: B.headsBack + 0.03, a: 0}], bob: 0.6},
+  // fC: walking away at frame 0 (the seam is mid-motion); stops on 'Governments' and swaps to a 3/4 head toward govB
+  {x: 712, y: 1532, h: 134, seed: 's01/fC', hair: 'curly', acc: ['strap'], body: palette.cream, walk: {speed: 9, hz: 2.0, slowAt: B.heads - 0.08, stopAt: B.heads + 0.04}, turn: [{t: B.heads + 0.04, d: -1}, {t: B.headsBack + 0.05, d: 0}], lean: [{t: B.heads + 0.04, a: -8}, {t: B.headsBack + 0.05, a: 0}]},
   // fD: looks at govB, then on 'of' points straight up at govC's clock tower (head back up), lowers it on 'PURPOSE'
-  {x: 905, y: 1494, h: 134, seed: 's01/fD', hair: 'short', acc: ['collar'], body: palette.tan, turn: [{t: B.heads + 0.16, d: -1}, {t: B.point, d: 0}], point: {at: B.point, side: 1, hand: [20, -178], downAt: B.headsBack}, lean: [{t: B.heads + 0.16, a: -4}, {t: B.point, a: 2}, {t: B.headsBack, a: 0}]},
-  // SECOND row: turn on 'all' / 'over'
-  {x: 255, y: 1474, h: 112, seed: 's01/sA', hair: 'short', acc: [], body: palette.sage, turn: [{t: B.crtA, d: 1}, {t: B.headsBack + 0.08, d: 0}], bob: 0.5},
-  {x: 645, y: 1470, h: 108, seed: 's01/sB', hair: 'bun', acc: ['backpack'], body: palette.brown, turn: [{t: B.crtC, d: -1}, {t: B.headsBack + 0.06, d: 0}], lean: [{t: B.crtC, a: -4}, {t: B.headsBack + 0.06, a: 0}]},
+  {x: 905, y: 1494, h: 100, seed: 's01/fD', hair: 'short', acc: ['collar'], body: palette.tan, turn: [{t: B.heads + 0.16, d: -1}, {t: B.point, d: 0}], point: {at: B.point, side: 1, hand: [20, -178], downAt: B.headsBack}, lean: [{t: B.heads + 0.16, a: -4}, {t: B.point, a: 2}, {t: B.headsBack, a: 0}]},
+  // SECOND row (~80 px): turn on 'all' / 'over'
+  {x: 172, y: 1474, h: 82, seed: 's01/sA', hair: 'short', acc: [], body: palette.sage, turn: [{t: B.crtA, d: 1}, {t: B.headsBack + 0.08, d: 0}], bob: 0.5},
+  {x: 640, y: 1470, h: 80, seed: 's01/sB', hair: 'bun', acc: ['backpack'], body: palette.brown, turn: [{t: B.crtC, d: -1}, {t: B.headsBack + 0.06, d: 0}], lean: [{t: B.crtC, a: -4}, {t: B.headsBack + 0.06, a: 0}]},
   // FAR row at the steps (the set's citizen seeds): a walker who slows on 'all' and stops, idlers
   {x: 600, y: 1436, h: 62, seed: 'plaza/cit0', walk: {speed: 9, hz: 1.9, slowAt: B.crtA, stopAt: B.crtA + 0.5}, lean: [{t: B.crtA + 0.5, a: -4}, {t: B.headsBack, a: 0}]},
   {x: 548, y: 1446, h: 66, seed: 'plaza/cit4', bob: 0.7},
@@ -100,15 +102,17 @@ const CITIZEN_ORDER = S01_CITIZENS.map((c, i) => [c.y, i] as [number, number]).s
 
 // ---------------------------------------------------------------- pigeons on the lamp crossbar
 
-/** They fly in UNDER govA's window band (y 906-1014) and swing back onto the bar (fix round 1). Fix round 4: bird
- *  silhouettes (Flyer: filled wings, tealDark head; perched heads tealDark too), sand / tan instead of white, and the
+/** They fly in UNDER govA's window band (y 906-1014) and swing back onto the bar (fix round 1). Fix round 5: ochre
+ *  bodies with a cream belly and a closed ~2 px ink outline, perched (PerchedPigeon) and flying (Flyer), so they
+ *  separate from govA's sand columns (the perch is the set's lamp crossbar: it stays at PLAZA.pigeons). Fix round 4: bird
+ *  silhouettes (Flyer: filled wings, tealDark head; perched heads tealDark too), no white birds, and the
  *  scatter goes UP and LEFT out of the frame (off the left edge within ~0.35 s), so nothing crosses govA's shutter while
  *  the padlocks pop (3.30-3.70). */
 const PG = PLAZA.pigeons;
 export const S01_PIGEONS: PigeonPlan[] = [
-  {x: PG[0][0], y: PG[0][1], seed: 'pg0', color: palette.sand, landAt: 0.12, inDur: B.pigeonsLand - 0.12, fromAbs: [-70, 1180], via: [220, 1090], flyAt: B.pigeonsFly, flyTo: [-300, -250], backAt: B.pigeonBack, backFrom: [-150, -250]},
-  {x: PG[1][0], y: PG[1][1], seed: 'pg1', color: palette.tan, landAt: 0.17, inDur: B.pigeonsLand + 0.06 - 0.17, fromAbs: [-70, 1232], via: [250, 1124], shuffleAt: B.shuffle, shuffleDx: -10, flyAt: B.pigeonsFly + 0.05, flyTo: [-330, -330]},
-  {x: PG[2][0], y: PG[2][1], seed: 'pg2', color: palette.sand, flip: true, landAt: 0.22, inDur: B.pigeonsLand + 0.12 - 0.22, fromAbs: [-70, 1150], via: [285, 1066], flyAt: B.pigeonsFly + 0.1, flyTo: [-360, -290]},
+  {x: PG[0][0], y: PG[0][1], seed: 'pg0', color: palette.brown, landAt: 0.12, inDur: B.pigeonsLand - 0.12, fromAbs: [-70, 1180], via: [220, 1090], flyAt: B.pigeonsFly, flyTo: [-300, -250], backAt: B.pigeonBack, backFrom: [-150, -250]},
+  {x: PG[1][0], y: PG[1][1], seed: 'pg1', color: palette.brown, landAt: 0.17, inDur: B.pigeonsLand + 0.06 - 0.17, fromAbs: [-70, 1232], via: [250, 1124], shuffleAt: B.shuffle, shuffleDx: -10, flyAt: B.pigeonsFly + 0.05, flyTo: [-330, -330]},
+  {x: PG[2][0], y: PG[2][1], seed: 'pg2', color: palette.brown, flip: true, landAt: 0.22, inDur: B.pigeonsLand + 0.12 - 0.22, fromAbs: [-70, 1150], via: [285, 1066], flyAt: B.pigeonsFly + 0.1, flyTo: [-360, -290]},
 ];
 
 // ---------------------------------------------------------------- Pip (frame 0: sit-back, look 0, seed 11, idle clock t = 0)
@@ -130,8 +134,12 @@ export const S01_BIT: [number, number] = [PLAZA.bit[0], PLAZA.bit[1] + 6];
  *  lowers it on the pause before the dive (4.03 -> 4.28), so his arm hangs again when the dive pulls him out (review:
  *  his body left the frame ahead of the raised arm: a 'cane' hook for 5 frames). Onlooker [1] (the bottom-left bun
  *  head) is dropped (review: five framing elements in the bottom band; the left onlooker is the one side crop). */
-const ONL_PHONE = {up: B.phonesUp + 0.06, down: B.onlookerPhoneDown, hand: [202, 1471] as [number, number]};
+const ONL_PHONE = {up: B.phonesUp + 0.06, down: B.onlookerPhoneDown, hand: [232, 1468] as [number, number]};
 export const ONLOOKERS = [0, 2];
+/** Fix round 5 (review: the film's paint edge took the fill off his hood and head: a half-erased ghost at the left
+ *  edge of frame 0): the left onlooker stands 36 px further in (head x 88), so the loose edge bares paper on the ground
+ *  around him, not on him. S12: the same offset. */
+export const ONL_DX: number[] = [36, 0, 0];
 export const Onlookers: React.FC = () => {
   const t = useTime();
   return (
@@ -144,7 +152,7 @@ export const Onlookers: React.FC = () => {
         return (
           <React.Fragment key={i}>
             <EdgeOnlooker
-              x={o.head[0]}
+              x={o.head[0] + ONL_DX[i]}
               y={o.head[1]}
               head={head}
               hair={(['short', 'bun', 'cap'] as const)[i]}
@@ -154,7 +162,7 @@ export const Onlookers: React.FC = () => {
               arms={i === 0 ? (raised ? false : 'near') : 'both'}
               seed={`plaza/onl${i}`}
             />
-            {i === 0 ? <OnlookerPhoneArm x={o.head[0]} y={o.head[1]} head={head} seed={`plaza/onl${i}`} coat={body} up={ONL_PHONE.up} down={ONL_PHONE.down} hand={ONL_PHONE.hand} /> : null}
+            {i === 0 ? <OnlookerPhoneArm x={o.head[0] + ONL_DX[i]} y={o.head[1]} head={head} seed={`plaza/onl${i}`} coat={body} up={ONL_PHONE.up} down={ONL_PHONE.down} hand={ONL_PHONE.hand} /> : null}
           </React.Fragment>
         );
       })}
@@ -229,11 +237,13 @@ export const PlazaShutdown: React.FC = () => {
     <>
       <SunPress mode="release" at={B.rippleAt} cx={SUN.x} cy={SUN.y} r={SUN.r} width={MID} ripple={false}>
         <Sun cx={SUN.x} cy={SUN.y} r={SUN.r} drift={[0, 0]}>
-          {(r: number) => <PowerGlyph r={r} glintAt={B.glint} seed="s01/pwr" />}
+          {(r: number) => <S01Glyph r={r} glintAt={B.glintPop} seed="s01/pwr" />}
         </Sun>
       </SunPress>
-      {/* the ripple in the glyph's cream (the kit's ink ring read as an outline around the sun) */}
+      {/* the ripple: a cream band with ink edges (the kit's ink ring read as an outline around the sun), and the three
+          press ticks in the clear sky above the gap (frame 0 only: gone by 0.1 s) */}
       <SunRipple cx={SUN.x} cy={SUN.y} r={SUN.r} at={B.rippleAt} />
+      <PressTicks cx={SUN.x} cy={SUN.y} at={B.rippleAt} />
     </>
   );
   return (

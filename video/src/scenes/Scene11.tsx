@@ -7,18 +7,21 @@
 // 'back soon' tag of S01 arrive (now explained), and a cream sticky note on the closed shutter makes the tech-support
 // joke (J6: 'Turn it off ~~and on again~~'). Pip watches from the sill's left end and shrugs on 'answer'; the snail is
 // the running gag; Bit hops onto the padlock's shackle (rewatch spot: he guards the lock that keeps the bug out).
-// Near plane (fix round 1): the plaza lamp post cropped by the left edge (Pip hops in behind it) and two back-view
-// onlookers with phones at the bottom right (under the UI); govA keeps its lit tone (only govB steps darker).
+// Near plane: the plaza lamp post at the left edge (its whole lantern head in frame; Pip hops in behind it) and two quiet
+// back-view onlookers at the bottom right (under the UI, brown / tan hair, no phones); govA keeps its lit tone (only govB
+// steps darker). Fix round 2: the switch-off spreads as ONE outward ripple from govB in the pause after 'off,' (govA,
+// govC, the far civic skyline, the lanterns: all done by 'is'), so 'is' .. 'everything' carries only the joke's events;
+// Pip shrugs toward the sun, settles facing us, and leaps up-right toward the lens (stand-side) at the end.
 //
 // Hard cut in and out (no transition camera). Camera: a 4 % push from rest, locked, a 3 % lean into the joke, hold.
 // Local helpers: ./scene11/* (beats, camera, actors: pigeons, snail, govB's window with its fat 'updating... 8%' bar, the
-// CRT screen for govA, plain panes for govC / govD at the right edge; shims: NoteFlight (the J6 drop from behind the
-// cornice, blank back, flip to the face on the slap) / NoteBreeze / NoteStrike (one ~4 px marker stroke) around the shared
+// plain glass panes with a CRT power-off for govA / govC / govD at the frame edges; shims: NoteFlight (the J6 drop from behind the
+// cornice, blank back, flip to the face on the slap) / NoteBreeze / NoteStrike (one 5.2 px marker stroke) around the shared
 // StickyNote, StepRipple (the press ring, stepped width), a Sparkle, PadlockRock / TagTwirl (motion around S01's own
 // padlock and lettered tag); entry = an isolated preview entry). Shared kit: GovernmentPlaza (far civic skyline,
 // shutters, lights out), LabelTag (L14 notice), StickyNote (J6), ShutterPadlock + BackSoonTag (S01's govB padlock and
-// one-line white 'back soon' tag, S01's seeds), PowerGlyph, SunPress, Bit, EdgeOnlooker. scene11/near: NearLamp,
-// StepTreads (ink on the far steps), BandClip (the top-to-bottom lights-out cascade).
+// one-line white 'back soon' tag, S01's seeds), PowerGlyph, SunPress, Bit (+ scene11 BitRim), EdgeOnlooker. scene11/near:
+// NearLamp, StepTreads (ink on the far steps), BandClip (the top-to-bottom lights-out cascade).
 
 import React, {useMemo} from 'react';
 import {World, Sun, useTime, useScene, mat, XG} from '../lib';

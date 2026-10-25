@@ -45,8 +45,10 @@ export const B = {
   civicLanterns: [1.215, 1.275],
   // w3+0.25: a citizen and the left edge onlooker raise phones (lit screens)
   phonesUp: 1.405,
-  // 'just' w4: the power glyph glints
+  // 'just' w4: the power glyph glints (fix round 5: ON the glyph, a 1 -> 1.12 -> 1 scale pop from 1.52 peaking 1.565 on
+  // the word, cream sparks from 1.535; sun beats may lead their word by <= 0.05 s; the slam starts 1.55)
   glint: 1.565,
+  glintPop: 1.52,
   // 'shut' w5: govB's shutter SLAMS: the 0.16 s drop LANDS on the word (ENGINE rule 5: a big motion completes ON the
   // word; the pop_low cue sits on the word), govB one step darker on landing
   slamB: 1.55,

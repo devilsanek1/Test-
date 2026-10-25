@@ -31,7 +31,7 @@ const wipeP = (t: number) => (t + WIPE.dur / 2) / WIPE.dur;
 const tramX = (t: number) => wipeEdgeX(wipeP(t), 'right', WIPE.half);
 
 /** The sun's hand-off hop height (fix round 2: 60 -> 14) and its shrink r 150 -> 110 now out-cubic (was in-out sine), so
- *  the disc top stays near the caption floor (measured top 550-562 for 0.3 s, was 514-520 for 0.4 s; the hop's take-off
+ *  the disc top stays at the caption floor (measured: 554 on the cut, 564 at +0.067 s, >= 568 from +0.1 s; was 514-520 for 0.4 s; the take-off
  *  stretch alone lifts it to 552 on the cut). S09's own hop (h 60) is only on screen until the wipe edge passes the disc,
  *  ~0.06 s after the cut, when both suns are still at their take-off stretch: the two sides of the wipe still match. */
 const SUN_HOP_H = 14;
@@ -126,7 +126,7 @@ const Scene10: React.FC = () => {
             return (
               <>
                 {node}
-                <Pip T={{leap: b.pipHop, leapFrom: [hand.x, hand.y], leapScale: hand.scale, leapV: handV, perk: b.pipPerk, lookPlaque: b.walker, lookFar: b.flip2 + 0.04, lookWeb: b.cobweb + 0.1, lookCart: b.cartIn + 0.05, hey: b.hey, sparkEnd: b.hey + 0.46, heyEnd: b.heyEnd, out: b.pipOut}} />
+                <Pip T={{leap: b.pipHop, leapFrom: [hand.x, hand.y], leapScale: hand.scale, leapV: handV, perk: b.pipPerk, lookPlaque: b.walker, lookFar: b.flip2 + 0.04, lookWeb: b.cobweb + 0.1, lookCart: b.cartIn + 0.345, lookLob: b.toss2 + 0.12, hey: b.hey, sparkEnd: b.hey + 0.46, heyEnd: b.heyEnd, out: b.pipOut}} />
               </>
             );
           if (name === 'foreground')

@@ -5,17 +5,24 @@
 //                          motif), two pigeons on a wire that hop on 'heads-up'
 //   roofs    (F.far)       a varied far skyline over the roof boxes: chimneys, a water tower over the sun, a clock spire,
 //                          a tree crown
-//   workshop (F.workshop)  a cream stoop step under the door (the door sat 50 px above the pavement), a potted plant and
-//                          a crate by the door, a pigeon that lands on the cornice
-//   fg       (F.fg)        a planter + bollard cropped by the right frame edge, low (the frame edge carries interest
-//                          under the loose paint edge)
+//   workshop (F.workshop)  fix round 2: the set's long cream kerb slab + sand pavement plinth (read as a loading dock)
+//                          painted over with the lane's sand; ONE door-wide step under the door (one tread), the wall's
+//                          foot line, a potted plant and a crate by the door, a pigeon that lands on the cornice, and a
+//                          quiet cropped neighbour facade right of the workshop (sand wall, drainpipe, part of a window)
+//   houses   (F.houses)    fix round 2: the left row's ink scaled with depth (3.4 px near -> 2.2 far: the set draws the
+//                          near house at 2.2 / 1.3) and mullions + side curtains on its blank browser panes
+//   floor    (F.floor)     fix round 2: the set's first tan 'post shadow' wedge (it ran from the passer at (455, 1300) to
+//                          the frame bottom: a median strip) painted over: Shadows (parts.tsx) draws every figure's
+//                          shadow with one length rule instead
+//   fg       (F.fg)        a shrub in its tub cropped by the right frame edge, low (the bollard is gone: it read as a
+//                          tombstone)
 // Nothing here enters the caption band (screen y 280-570): the near pole's top is world 610 (screen >= 578).
 
 import React from 'react';
 import {Bird} from '../../lib/kit';
 import {blob, crown, ease as E, Fill, Ink, line, lerp, mat, osc, palette, polyPath, prog, Pt, rectPath, useTime, XG} from '../../lib';
-import {Bollard} from '../shared/props';
-import {SI} from '../shared/sets';
+import type {Quad} from '../../lib/persp';
+import {MAKERS_LANE, perspRowLayout, SI, WORKSHOP_LANE} from '../shared/sets';
 
 // ---------------------------------------------------------------- poles + wires (houses layer)
 
@@ -183,8 +190,22 @@ const CornicePigeon: React.FC<{landAt: number}> = ({landAt}) => {
   );
 };
 
+/** The set's workshop kerb plane + forward pavement (MakersLane G.kerbTop / kerbFace / pave / paveFace(2) / kerbInk:
+ *  x from the lane ray through (600, 1500) to 1240, y 1500-1676), painted over with the lane's flat sand (the floor is
+ *  one flat sand field there, so the parallax step between the layers never shows). */
+const KERB_COVER = (() => {
+  const VP = MAKERS_LANE.vp;
+  const W = WORKSHOP_LANE;
+  const kx = (y: number) => VP[0] + ((W.x0 - VP[0]) * (y - VP[1])) / (W.base - VP[1]);
+  return polyPath([[W.x0 - 8, W.base - 3], [1260, W.base - 3], [1260, 1688], [kx(1688) - 8, 1688]]);
+})();
+/** The wall's foot (the workshop and its neighbour stand straight on the lane). */
+const FOOT_INK = line(WORKSHOP_LANE.x0 - 2, WORKSHOP_LANE.base, 1250, WORKSHOP_LANE.base + 1, {seed: 's6foot', over: [3, 0], breaks: false});
+
 export const DoorDressing: React.FC<{pigeonAt: number}> = ({pigeonAt}) => (
   <>
+    <Fill d={KERB_COVER} color={palette.sand} offset={false} mode="none" seed="s6kerbC" />
+    <Ink d={FOOT_INK} width={SI.mid} taper={false} seed="s6footI" />
     <Fill d={DOOR_G.face} color={palette.sand} offset={false} mode="none" seed="s6stpF" />
     <Fill d={DOOR_G.tread} color={palette.cream} offset={false} mode="none" seed="s6stpT" />
     <Ink d={DOOR_G.ink} width={SI.mid} taper={false} order="all" seed="s6stpI" />
@@ -197,6 +218,97 @@ export const DoorDressing: React.FC<{pigeonAt: number}> = ({pigeonAt}) => (
     <CornicePigeon landAt={pigeonAt} />
   </>
 );
+
+// ---------------------------------------------------------------- the neighbour right of the workshop (workshop layer)
+
+/** A quiet cropped neighbour facade (fix round 2: the frame right of the workshop wall was an inkless sand slab under
+ *  the peach band): a sand wall from x 1004 (just right of the workshop's wall line) behind the right rail UI, its own
+ *  cornice at 880, a brown drainpipe with two brackets, and the left part of a teal window (mullion, sill). Low detail,
+ *  2.2-3 px ink. */
+const NB = {x0: 1004, top: 880, base: WORKSHOP_LANE.base, pipeX: 1020, win: [1046, 1046, 70, 112] as [number, number, number, number]};
+const NB_G = (() => {
+  const wall = polyPath([[NB.x0, NB.top], [1260, NB.top], [1260, NB.base], [NB.x0, NB.base]]);
+  const cornice = polyPath([[NB.x0 - 2, NB.top - 12], [1260, NB.top - 12], [1260, NB.top + 4], [NB.x0 - 2, NB.top + 4]]);
+  const [wx, wy, ww, wh] = NB.win;
+  const glass = rectPath(wx, wy, ww, wh);
+  const pipe = rectPath(NB.pipeX - 4, NB.top + 4, 8, NB.base - NB.top - 4);
+  const ink = line(NB.x0 - 4, NB.top - 12, 1260, NB.top - 13, {seed: 's6nb1', over: [3, 0], breaks: false}) + line(NB.x0, NB.top + 4, 1260, NB.top + 5, {seed: 's6nb2', over: 0, breaks: false}) + line(NB.x0 - 1, NB.top - 12, NB.x0, NB.top + 4, {seed: 's6nb3', over: 0});
+  const winInk = line(wx, wy, wx + ww + 30, wy, {seed: 's6nbw1', over: [2, 0]}) + line(wx, wy, wx, wy + wh, {seed: 's6nbw2', over: [0, 2]}) + line(wx - 6, wy + wh + 4, wx + ww + 30, wy + wh + 5, {seed: 's6nbw3', over: [3, 0]}) + line(wx + ww * 0.52, wy + 2, wx + ww * 0.52, wy + wh - 2, {seed: 's6nbw4', over: 0}) + line(wx + 2, wy + wh * 0.5, wx + ww + 28, wy + wh * 0.5, {seed: 's6nbw5', over: 0});
+  const pipeInk = line(NB.pipeX - 4, NB.top + 6, NB.pipeX - 4, NB.base - 2, {seed: 's6nbp1', over: 0}) + line(NB.pipeX + 4, NB.top + 6, NB.pipeX + 4, NB.base - 2, {seed: 's6nbp2', over: 0}) + rectPath(NB.pipeX - 7, 1010, 14, 6) + rectPath(NB.pipeX - 7, 1330, 14, 6);
+  // a curtain in the window's left half (a partial fill: the reference panes are never blank)
+  const curtain = `M${wx} ${wy}L${wx + ww * 0.4} ${wy}Q${wx + ww * 0.22} ${wy + wh * 0.45} ${wx + ww * 0.3} ${wy + wh}L${wx} ${wy + wh}Z`;
+  return {wall, cornice, glass, pipe, ink, winInk, pipeInk, curtain};
+})();
+
+export const NeighbourRight: React.FC = () => (
+  <>
+    <Fill d={NB_G.wall} color={palette.sand} offset={false} mode="none" seed="s6nbW" />
+    <Fill d={NB_G.cornice} color={palette.tan} offset={false} mode="none" seed="s6nbC" />
+    <Fill d={NB_G.glass} color={palette.teal} seed="s6nbG" />
+    <Fill d={NB_G.curtain} color={palette.peach} offset={false} mode="none" seed="s6nbCu" />
+    <Fill d={NB_G.pipe} color={palette.brown} offset={false} mode="none" seed="s6nbP" />
+    <Ink d={NB_G.ink + NB_G.winInk} width={SI.far * 1.2} taper={false} order="all" seed="s6nbI" />
+    <Ink d={NB_G.pipeInk} width={SI.far} taper={false} order="all" seed="s6nbPI" />
+  </>
+);
+
+// ---------------------------------------------------------------- the left row: ink by depth + pane detail (houses)
+
+/** The SAME layout MakersLane draws (memoised by spec: identical geometry and seeds). */
+const LEFT = perspRowLayout({quad: [[-140, 700], [330, 900], [330, 1120], [-140, 1700]], n: 6, H: 700, hw: 700 * 0.5, storeys: 3, side: 'left', seed: 'laneL', colors: [palette.sand, palette.tan, palette.sand, palette.sand, palette.tan, palette.sand], litFraction: 0.8});
+/** Ink by depth (world px; the set draws every full-tier house at 2.2 and its thin lines at 1.3): near 3.4 -> 2.2. */
+const ROW_INK = [3.4, 2.8, 2.4];
+const lerpPt = (a: Pt, b: Pt, u: number): Pt => [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u];
+/** Bilinear point in a screen quad (TL, TR, BR, BL). */
+const inQuad = (q: Quad, u: number, v: number): Pt => lerpPt(lerpPt(q[0], q[1], u), lerpPt(q[3], q[2], u), v);
+
+const ROW_G = (() => {
+  const out: {ink: string; thin: string; w: number; curtains: string; mull: string}[] = [];
+  LEFT.houses.forEach((h, i) => {
+    if (i >= ROW_INK.length || h.tier === 'fill' || h.tier === 'dots') return;
+    // the browser window's screen (below its bar: the lower 76 % of h.browser)
+    const b = h.browser;
+    const sq: Quad = [inQuad(b, 0, 0.24), inQuad(b, 1, 0.24), b[2], b[3]];
+    const P = (u: number, v: number) => inQuad(sq, u, v);
+    const poly = (pts: Pt[]) => polyPath(pts);
+    // side curtains: ~30 % each, the inner edge tied back in a curve (40-70 % of the pane stays lit)
+    const cl = poly([P(0, 0), P(0.3, 0), P(0.2, 0.42), P(0.27, 1), P(0, 1)]);
+    const cr = poly([P(1, 0), P(0.7, 0), P(0.8, 0.42), P(0.73, 1), P(1, 1)]);
+    const m0 = P(0.5, 0);
+    const m1 = P(0.5, 1);
+    const n0 = P(0, 0.52);
+    const n1 = P(1, 0.52);
+    const mull = line(m0[0], m0[1], m1[0], m1[1], {seed: `s6m${i}a`, over: 0}) + line(n0[0], n0[1], n1[0], n1[1], {seed: `s6m${i}b`, over: 0});
+    out.push({ink: h.g.ink, thin: h.g.thin, w: ROW_INK[i], curtains: cl + cr, mull});
+  });
+  return out;
+})();
+
+export const LeftRowDetail: React.FC = () => (
+  <>
+    {ROW_G.map((g, i) => (
+      <React.Fragment key={i}>
+        <Fill d={g.curtains} color={palette.tan} offset={false} mode="none" seed={`s6rc${i}`} />
+        <Ink d={g.mull} width={g.w * 0.7} taper={false} order="all" seed={`s6rm${i}`} />
+        {g.ink ? <Ink d={g.ink} width={g.w} taper={false} seed={`lane/L/i${i}`} /> : null}
+        {g.thin ? <Ink d={g.thin} width={g.w * 0.72} taper={false} seed={`lane/L/t${i}`} /> : null}
+      </React.Fragment>
+    ))}
+  </>
+);
+
+// ---------------------------------------------------------------- the floor: the set's first post-shadow wedge (floor)
+
+/** MakersLane G.bandsTan's first wedge ([x 470 at the frame bottom, half width 78, y 1300 -> 2060] on a ray from the
+ *  VP), 3 px wider each side, painted over with the lane's sand. */
+const BAND_COVER = (() => {
+  const VP = MAKERS_LANE.vp;
+  const rayAt = (xb: number, y: number) => VP[0] + ((xb - VP[0]) * (y - VP[1])) / (1920 - VP[1]);
+  const [xb, hw, y0, y1] = [470, 78, 1300, 2060];
+  return polyPath([[rayAt(xb - hw * 0.35, y0) - 3, y0 - 3], [rayAt(xb + hw * 0.35, y0) + 3, y0 - 3], [rayAt(xb + hw, y1) + 4, y1 + 4], [rayAt(xb - hw, y1) - 4, y1 + 4]]);
+})();
+
+export const FloorCover: React.FC = () => <Fill d={BAND_COVER} color={palette.sand} offset={false} mode="none" seed="s6bandC" />;
 
 // ---------------------------------------------------------------- cropped foreground (fg layer)
 
@@ -213,6 +325,5 @@ export const ForegroundRight: React.FC = () => (
     <Ink d={FG_G.shrub} width={SI.front} taper={false} seed="s6fgSI" />
     <Fill d={FG_G.box} color={palette.tan} offset={false} mode="none" seed="s6fgB" />
     <Ink d={FG_G.boxInk} width={SI.front} taper={false} order="all" seed="s6fgBI" />
-    <Bollard x={846} y={1905} w={58} h={112} seed="s6bol" />
   </>
 );

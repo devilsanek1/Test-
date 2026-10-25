@@ -1,20 +1,29 @@
 // scene06/parts.tsx — S06 local helpers: the messenger's walk (warped walk clock, stops on a planted stride), his raised
-// arm + envelope (mirrors props Messenger so the hand-over is invisible), the door beat (lean, two knocks, the envelope
-// lining up with the slot), his hair + collar (local shim over props Messenger's skin-coloured 'short' head), Bit the
-// stowaway, the makers' heads popping UP into the upstairs browser window, Pip (hop in, tiptoe, 'shh', ear twitch, leap
-// after the sheet), the 'shh' mark, the blind's jolt ticks, the low-sun shadows of the messenger and Pip.
+// arm (props FigureArm, the kit's own) + envelope (one state function: carried, lined up with the slot BEFORE 'a', slid
+// in on 'a'), the door beat (lean, two knocks), his hero detail (scene06/msgDetail: satchel, seams, soles, peach rim),
+// Bit the stowaway, the makers' heads popping UP into the upstairs browser window, Pip (leaps in BEHIND the messenger,
+// tiptoes, 'shh' with a J-curled trunk on his lips, ear twitch, leap after the sheet), the 'shh' mark, the blind's jolt
+// ticks, and the low sun's shadows (one length rule for everyone on the lane, radial from the sun's ground point).
 
 import React, {useId} from 'react';
-import {captionFontStack, clamp, ease as E, Fill, Ink, lerp, line, mat, Mat, osc, palette, prog, Pt, rng, springAt, springs, useCaptionFont, useTime, XG, blob, polyPath, TimeShift, PERSON_HAIR} from '../../lib';
-import {Elephant, hop, MASCOT, popSwitch, walkSpeed} from '../../lib/mascot';
+import {captionFontStack, clamp, ease as E, Fill, Ink, lerp, line, mat, Mat, osc, palette, prog, Pt, rng, springAt, springs, stroke, useCaptionFont, useTime, XG, polyPath, TimeShift, PERSON_HAIR} from '../../lib';
+import {useInkScale} from '../../lib/inkComp';
+import {Elephant, hop, MASCOT, popSwitch, walkSpeed, breath, trunkSway} from '../../lib/mascot';
 import type {PoseName, Expression} from '../../lib/mascot';
-import {Bit, Envelope, Maker, Messenger, messengerHand} from '../shared/props';
+import {brush, spline, tp, tpt, polyPath as mPoly} from '../../lib/mascot/ink';
+import type {Pt as MPt} from '../../lib/mascot/ink';
+import {cappedTube} from '../../lib/mascot/pen';
+import {Bit, bitPath, Envelope, FigureArm, Maker, Messenger, messengerHand} from '../shared/props';
+import {MAKERS_LANE, walkerAt} from '../shared/sets';
+import type {WalkerAnchor} from '../shared/sets';
+import {MessengerDetail} from './msgDetail';
 import type {Beats} from './beats';
 
 // ---------------------------------------------------------------- the messenger (props Messenger, 260 px)
 
-/** The S05 messenger (src/scenes/scene05/cast.tsx MESSENGER.seed 's5msg': same coat, trousers), closer now. */
-export const MSG = {seed: 's5msg', h: 260, y: 1520, x0: -140, hair: palette.ink} as const;
+/** The S05 messenger (src/scenes/scene05/messenger.tsx MESSENGER.seed 's5msg': same coat, trousers, ink hair, collar
+ *  band: the props Messenger defaults), closer now. */
+export const MSG = {seed: 's5msg', h: 260, y: 1520, x0: -140} as const;
 /** props Figures.tsx constants (FIG_H / LEG / TORSO) for the mirrored arm and envelope. */
 const FIG_H = 199;
 const LEG = 62;
@@ -33,6 +42,11 @@ export const MSG_X1 = SLOT[0] - HAND0[0];
 /** Braking profile: x = x0 + L (1 - (1 - u)^P). P 2.4 enters at ~1100 px/s on screen (S05 exits at ~1200), and still
  *  comes to rest with zero speed on the door beat. */
 const BRAKE_P = 2.4;
+/** Envelope (60 world wide, 2/3 high). */
+const ENV_W = 60;
+const ENV_H = ENV_W * 0.66;
+/** The slot squeezes it to 92 % of the slot width (props Envelope `slot`). */
+const ENV_SX = Math.min(1, (50 * 0.92) / ENV_W);
 
 /** The kit Person's random draws for a seed (mirrors kit/Person makeSpec's draw order with torsoH, hair, acc, body
  *  given: w, hr, round, hairColor, legsColor, shoeColor, packColor, hat, signColor, phase). */
@@ -46,7 +60,6 @@ function personDraws(seed: string) {
   return {w, hr, hairColor, phase: r.range(0, 6.28)};
 }
 const personPhase = (seed: string) => personDraws(seed).phase;
-const MSG_HR = personDraws(MSG.seed).hr;
 
 export type MsgWalk = {x: number; tau: number; hz: number; walking: boolean};
 
@@ -67,10 +80,16 @@ export function msgWalk(t: number, B: Beats): MsgWalk {
   return {x, tau, hz, walking: u < 1};
 }
 
+/** The kit walk phase (lib/kit/Person: ph = t * walk * PI + phase) on the messenger's own clock. */
+const msgPh = (w: MsgWalk) => w.tau * w.hz * Math.PI + personPhase(MSG.seed);
+
 // ---- the door beat (fix round 1): he leans in, knocks twice with the envelope hand, lines the envelope up with the slot
 
 /** Knock times (film-relative to the beats): on 'people' and 0.12 s later. */
 export const knocks = (B: Beats) => [B.people + 0.08, B.people + 0.2];
+/** The line-up window (fix round 2: the mail-slot hiccup): the envelope reaches the slot's top BEFORE 'a', so the slide
+ *  starts on 'a' with nothing to correct (the props Envelope `slot` align phase used to start below its clip line). */
+const alignWin = (B: Beats) => [knocks(B)[1] + 0.02, B.a] as const;
 
 /** Lean toward the door (deg, about his feet): in on the knocks, back upright by 'a' (the slot motion needs him square). */
 function leanAt(t: number, B: Beats): number {
@@ -79,7 +98,7 @@ function leanAt(t: number, B: Beats): number {
 }
 
 /** The envelope hand's offset (person units) and the envelope's extra rotation: a 1-frame jab toward the door per knock
- *  (back in 2 frames), then a small wiggle that lines the envelope up with the slot, square by 'a'. */
+ *  (back in 2 frames), then a small wiggle that squares the envelope to the slot by 'a'. */
 function handFx(t: number, B: Beats): {dx: number; dy: number; rot: number} {
   let dx = 0;
   let dy = 0;
@@ -91,9 +110,9 @@ function handFx(t: number, B: Beats): {dx: number; dy: number; rot: number} {
       dy += -2 * j;
     }
   }
-  const w0 = knocks(B)[1] + 0.06;
-  const wq = prog(t, w0, B.a - w0);
-  const rot = wq > 0 && wq < 1 ? 7 * Math.sin(wq * Math.PI * 2.5) * (1 - wq) : 0;
+  const [w0, w1] = alignWin(B);
+  const wq = prog(t, w0, w1 - w0);
+  const rot = wq > 0 && wq < 1 ? 6 * Math.sin(wq * Math.PI * 2) * (1 - wq) : 0;
   return {dx, dy, rot};
 }
 
@@ -103,108 +122,51 @@ const leanMat = (t: number, B: Beats, w: MsgWalk): Mat => {
   return a === 0 ? mat.I : mat.about(mat.rotate(a), w.x, MSG.y);
 };
 
-/** Envelope centre (world, before the lean) while carried: props Envelope `carry` bob (hz 1.7, amp 3 figure units) on
- *  the walk clock; at rest once he stops (the props carry is off when he stands), plus the door beat's jabs. */
-function carried(t: number, B: Beats, w: MsgWalk): {x: number; y: number; rot: number} {
-  if (!w.walking) {
+export type EnvState = {x: number; y: number; rot: number; sx: number; clipY: number | null; slide: number};
+
+/** THE envelope state (world, before the lean), or null once it is through the slot:
+ *   walking   the props Envelope `carry` bob (hz 1.7, amp 3 figure units) on the walk clock
+ *   stopped   at the hand + the knock jabs
+ *   lining up [knocks[1] + 0.02, 'a']: centre -> (slot x, slot y - h/2) (its bottom edge ON the slot line), square,
+ *             squeezed to the slot width, all inOut(sine): at 'a' nothing is left to correct
+ *   'a'       slides straight down through the slot (0.22 s, in(quad)), clipped at the slot line. */
+export function envState(t: number, B: Beats, w = msgWalk(t, B)): EnvState | null {
+  let x: number;
+  let y: number;
+  let rot: number;
+  if (w.walking) {
+    const bob = -Math.abs(osc(w.tau, 0.85)) * 3 * S;
+    x = w.x + HAND0[0];
+    y = HAND0[1] + bob;
+    rot = -8 + osc(w.tau, 0.85, 1) * 2;
+  } else {
     const f = handFx(t, B);
-    return {x: w.x + HAND0[0] + f.dx * S, y: HAND0[1] + f.dy * S, rot: -8 + f.rot};
+    x = w.x + HAND0[0] + f.dx * S;
+    y = HAND0[1] + f.dy * S;
+    rot = -8 + f.rot;
   }
-  const bob = -Math.abs(osc(w.tau, 0.85)) * 3 * S;
-  return {x: w.x + HAND0[0], y: HAND0[1] + bob, rot: -8 + osc(w.tau, 0.85, 1) * 2};
+  const [a0, a1] = alignWin(B);
+  const q = E.inOutSine(prog(t, a0, a1 - a0));
+  const top = SLOT[1] - ENV_H / 2;
+  x = lerp(x, SLOT[0], q);
+  y = lerp(y, top, q);
+  rot = lerp(rot, 0, q);
+  const sx = lerp(1, ENV_SX, q);
+  if (t < B.a) return {x, y, rot, sx, clipY: null, slide: 0};
+  const b = E.inQuad(prog(t, B.a, 0.22));
+  if (b >= 1) return null;
+  return {x: SLOT[0], y: top + b * ENV_H, rot: 0, sx: ENV_SX, clipY: SLOT[1], slide: b};
 }
 
 const applyM = (m: Mat, p: Pt): Pt => [m[0] * p[0] + m[2] * p[1] + m[4], m[1] * p[0] + m[3] * p[1] + m[5]];
 
-/** Where the wax seal sits on the envelope (world), or null once the envelope is through the slot. Mirrors props
- *  Envelope's slot motion (align 40 %, then slide down 60 %, clipped at the slot line). */
+/** Where the wax seal sits on the envelope (world), or null once the envelope is through the slot. */
 export function envSealWorld(t: number, B: Beats): {p: Pt; clipY: number | null; sx: number} | null {
   const w = msgWalk(t, B);
-  const c = carried(t, B, w);
-  const h = 60 * 0.66;
-  let x = c.x;
-  let y = c.y;
-  let sx = 1;
-  let clipY: number | null = null;
-  if (t >= B.a) {
-    const dur = 0.25;
-    const a = prog(t, B.a, dur * 0.4, E.inOutSine);
-    const b = prog(t, B.a + dur * 0.4, dur * 0.6, E.inCubic);
-    if (b >= 1) return null;
-    x = lerp(x, SLOT[0], a);
-    y = lerp(y, SLOT[1] - h / 2, a) + b * h;
-    sx = lerp(1, Math.min(1, (50 * 0.92) / 60), a);
-    clipY = SLOT[1];
-  }
-  return {p: applyM(leanMat(t, B, w), [x, y + 60 * 0.03]), clipY, sx};
+  const e = envState(t, B, w);
+  if (!e) return null;
+  return {p: applyM(leanMat(t, B, w), [e.x, e.y + ENV_W * 0.03]), clipY: e.clipY, sx: e.sx};
 }
-
-/** A sleeve from the shoulder to the hand (person units): mirrors the props Messenger's arm. */
-const Arm: React.FC<{sh: Pt; hand: Pt; w?: number; coat: string; W: number; seed: string}> = ({sh, hand, w = 19, coat, W, seed}) => {
-  const dx = hand[0] - sh[0];
-  const dy = hand[1] - sh[1];
-  const L = Math.hypot(dx, dy) || 1;
-  const nx = (-dy / L) * (w / 2);
-  const ny = (dx / L) * (w / 2);
-  const tipW = 0.85;
-  const poly: Pt[] = [
-    [sh[0] + nx, sh[1] + ny],
-    [hand[0] + nx * tipW, hand[1] + ny * tipW],
-    [hand[0] - nx * tipW, hand[1] - ny * tipW],
-    [sh[0] - nx, sh[1] - ny],
-  ];
-  const f = (v: number) => v.toFixed(1);
-  return (
-    <>
-      <Fill d={blob(hand[0] + (dx / L) * 4, hand[1] + (dy / L) * 4, w * 0.42, w * 0.46, {seed: `${seed}/h`})} color={palette.sand} offset={false} mode="none" seed={`${seed}/hf`} />
-      <Fill d={polyPath(poly)} color={coat} offset={false} mode="none" seed={`${seed}/af`} />
-      <Ink d={`M${f(poly[0][0])} ${f(poly[0][1])}L${f(poly[1][0])} ${f(poly[1][1])}M${f(poly[2][0])} ${f(poly[2][1])}L${f(poly[3][0])} ${f(poly[3][1])}M${f(poly[1][0])} ${f(poly[1][1])}L${f(poly[2][0])} ${f(poly[2][1])}`} width={W} taper={false} seed={`${seed}/ai`} />
-    </>
-  );
-};
-
-/** LOCAL SHIM (props lane request: Messenger `hair` passthrough + a straight collar band): props Messenger hard-codes
- *  hair 'short', which for seed 's5msg' is a sand (skin-coloured) disc, and a V collar: from behind he read bald and
- *  faceless. Drawn over the kit head in person units: a full hair-colour cap over the top ~70 % of the head (a nape
- *  sliver of sand stays), and a straight tealDark collar band (props CollarBand geometry) over the V. */
-const HairCollar: React.FC<{W: number; hair: string; seed: string}> = ({W, hair, seed}) => {
-  const hr = MSG_HR;
-  const hy = -TORSO - hr * 0.86;
-  const f = (v: number) => v.toFixed(2);
-  // hair cap: the head circle above a hairline at hy + 0.4 hr that dips to a soft nape point
-  const R = hr * 1.02;
-  const yl = hy + hr * 0.4;
-  const xl = Math.sqrt(Math.max(0, R * R - (yl - hy) * (yl - hy)));
-  const a0 = Math.atan2(yl - hy, xl);
-  const a1 = Math.PI - a0;
-  const pts: Pt[] = [];
-  for (let i = 0; i <= 20; i++) {
-    const a = a0 - (i / 20) * (2 * Math.PI - (a1 - a0));
-    pts.push([Math.cos(a) * R, hy + Math.sin(a) * R]);
-  }
-  const capD = `M${pts.map(([x, y]) => `${f(x)} ${f(y)}`).join('L')}Q${f(-xl * 0.4)} ${f(yl + hr * 0.16)} 0 ${f(yl + hr * 0.22)}Q${f(xl * 0.4)} ${f(yl + hr * 0.16)} ${f(pts[0][0])} ${f(pts[0][1])}Z`;
-  const capInk = `M${pts.map(([x, y]) => `${f(x)} ${f(y)}`).join('L')}`;
-  const strands = `M${f(-hr * 0.2)} ${f(hy - hr * 0.8)}Q${f(-hr * 0.46)} ${f(hy - hr * 0.3)} ${f(-hr * 0.4)} ${f(hy + hr * 0.3)}M${f(hr * 0.28)} ${f(hy - hr * 0.72)}Q${f(hr * 0.5)} ${f(hy - hr * 0.2)} ${f(hr * 0.42)} ${f(hy + hr * 0.28)}`;
-  // collar: cover the kit V (coat), then a straight band one step darker
-  const top = -TORSO;
-  const vCover = polyPath([[-hr * 0.74, top + hr * 0.1], [hr * 0.74, top + hr * 0.1], [hr * 0.12, top + hr * 1.12], [-hr * 0.12, top + hr * 1.12]]);
-  const hw = hr * 1.05;
-  const y0 = top - hr * 0.04;
-  const y1 = top + hr * 0.34;
-  const sag = hr * 0.07;
-  const band = `M${f(-hw)} ${f(y0 + sag)}Q0 ${f(y0 - sag)} ${f(hw)} ${f(y0 + sag)}L${f(hw)} ${f(y1 + sag)}Q0 ${f(y1 - sag)} ${f(-hw)} ${f(y1 + sag)}Z`;
-  const bandInk = `M${f(-hw)} ${f(y0 + sag)}Q0 ${f(y0 - sag)} ${f(hw)} ${f(y0 + sag)}M${f(-hw)} ${f(y1 + sag)}Q0 ${f(y1 - sag)} ${f(hw)} ${f(y1 + sag)}`;
-  return (
-    <>
-      <Fill d={vCover} color={palette.teal} offset={false} mode="none" seed={`${seed}/vc`} />
-      <Fill d={band} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/band`} />
-      <Ink d={bandInk} width={W * 0.8} taper={false} seed={`${seed}/bandI`} />
-      <Fill d={capD} color={hair} offset={false} mode="none" seed={`${seed}/cap`} />
-      <Ink d={capInk} width={W} taper={false} seed={`${seed}/capI`} />
-      <Ink d={strands} width={W * 0.55} color={palette.tealDark} taper={false} seed={`${seed}/str`} />
-    </>
-  );
-};
 
 /** Two short ink knock ticks at the door beside the envelope, 0.12 s each. */
 const KnockTicks: React.FC<{B: Beats}> = ({B}) => {
@@ -224,50 +186,70 @@ const KnockTicks: React.FC<{B: Beats}> = ({B}) => {
   return <>{parts}</>;
 };
 
-/** The messenger: props Messenger (holding the envelope up) while he walks; from the door beat the arm + envelope are
- *  drawn here with the same geometry so the hand can knock, the envelope can line up and go through the slot (props
- *  Envelope `slot`) and the arm can drop. Hair + collar shim on top; the whole figure leans in on the knocks. */
-export const MessengerS06: React.FC<{B: Beats}> = ({B}) => {
+/** The messenger's body bob from the kit Person walk (so Bit and the detail ride it), world px. */
+function msgBob(w: MsgWalk): number {
+  if (!w.walking) return 0;
+  return -Math.abs(Math.sin(msgPh(w))) * LEG * 0.035 * S;
+}
+
+/** The messenger: props Messenger (ink hair, collar band: the kit defaults; holding the envelope up) while he walks;
+ *  from the door beat the arm (props FigureArm, the kit's own arm: no shape change at the hand-over) + envelope are
+ *  drawn here so the hand can knock, the envelope can line up and go through the slot and the arm can drop. His hero
+ *  detail (satchel, seams, soles, peach rim) rides on top; the whole figure leans in on the knocks. */
+export const MessengerS06: React.FC<{B: Beats; zoom?: number}> = ({B, zoom = 1.05}) => {
   const t = useTime();
+  const id = 'm6' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const w = msgWalk(t, B);
   const own = !w.walking;
   const W = 4.8 / S; // props inkFor(260) = front 4.8, in person units
   const sh: Pt = [GW * 0.34, -TORSO * 0.8];
   const up: Pt = [GW * 0.7, -TORSO * 0.92];
   const down: Pt = [GW * 0.48, -TORSO * 0.2];
-  // after posting, the arm drops (0.25 s)
+  const e = envState(t, B, w);
+  // the hand holds the envelope's lower-left (props: envelope centre = hand + (6, -16), exactly the kit arm's hand at
+  // the hand-over); from 'a' it stays at the slot plate while the envelope slides in, then the arm drops (0.25 s)
   const q = 1 - prog(t, B.a + 0.27, 0.25, E.inOutCubic);
-  const fx = handFx(t, B);
-  const hand: Pt = [lerp(down[0], up[0] + fx.dx, q), lerp(down[1], up[1] + fx.dy, q)];
-  const c = carried(t, B, w);
+  const eh = t < B.a ? e : envState(B.a - 1e-4, B, w);
+  const hold: Pt = eh ? [(eh.x - w.x) / S - 6, (eh.y - HIP_Y) / S + 16] : up;
+  const hand: Pt = [lerp(down[0], hold[0], q), lerp(down[1], hold[1], q)];
   const bob = msgBob(w);
+  const k = S * zoom;
+  const slotY = (SLOT[1] - HIP_Y) / S;
   return (
     <>
       <XG m={leanMat(t, B, w)}>
         <TimeShift by={t - w.tau}>
           <Messenger x={w.x} y={MSG.y} h={MSG.h} holdEnvelope={!own} walk={{hz: w.hz}} seed={MSG.seed} />
         </TimeShift>
-        <XG m={mat.compose(mat.translate(w.x, HIP_Y + bob), mat.scale(S))}>
-          <HairCollar W={W} hair={MSG.hair} seed={`${MSG.seed}/hc`} />
-        </XG>
-        {own ? (
+        {own && e ? (
           <XG m={mat.compose(mat.translate(w.x, HIP_Y), mat.scale(S))}>
-            <Envelope x={(c.x - w.x) / S} y={(c.y - HIP_Y) / S} size={60 / S} rot={c.rot} slot={{at: B.a, x: (SLOT[0] - w.x) / S, y: (SLOT[1] - HIP_Y) / S, w: 50 / S}} depth="mid" seed={`${MSG.seed}/env`} />
-            {q > 0.02 ? <Arm sh={sh} hand={hand} coat={palette.teal} W={W * 0.85} seed={`${MSG.seed}/arm`} /> : null}
+            {e.clipY !== null ? (
+              <defs>
+                <clipPath id={id}>
+                  <rect x={-2000} y={-2000} width={4000} height={2000 + slotY} />
+                </clipPath>
+              </defs>
+            ) : null}
+            <g clipPath={e.clipY !== null ? `url(#${id})` : undefined}>
+              <XG m={mat.about(mat.scale(e.sx, 1), (e.x - w.x) / S, (e.y - HIP_Y) / S)}>
+                <Envelope x={(e.x - w.x) / S} y={(e.y - HIP_Y) / S} size={ENV_W / S} rot={e.rot} depth="mid" seed={`${MSG.seed}/env`} />
+              </XG>
+            </g>
           </XG>
         ) : null}
+        {own && q > 0.02 ? (
+          <XG m={mat.compose(mat.translate(w.x, HIP_Y), mat.scale(S))}>
+            <FigureArm sh={sh} hand={hand} coat={palette.teal} W={W * 0.85} seed={`${MSG.seed}/arm`} />
+          </XG>
+        ) : null}
+        <XG m={mat.compose(mat.translate(w.x, HIP_Y + bob), mat.scale(S))}>
+          <MessengerDetail seed={MSG.seed} k={k} ph={w.walking ? msgPh(w) : undefined} arm={own ? (q > 0.6 ? {sh, hand} : undefined) : {sh, hand: up}} />
+        </XG>
       </XG>
       <KnockTicks B={B} />
     </>
   );
 };
-
-/** The messenger's body bob from the kit Person walk (so Bit and the hair ride it). */
-function msgBob(w: MsgWalk): number {
-  if (!w.walking) return 0;
-  const ph = w.tau * w.hz * Math.PI + personPhase(MSG.seed);
-  return -Math.abs(Math.sin(ph)) * LEG * 0.035 * S;
-}
 
 // ---------------------------------------------------------------- shadows (low sun at the lane end)
 
@@ -278,36 +260,54 @@ const SHADE: Pt[] = (() => {
   return [[330, 1121], [rayAt(150, 1121), 1121], [rayAt(150, 2060), 2060], [-200, 2060], [-200, 1760], [baseX(1700), 1700]];
 })();
 
-/** Flat clay shadow wedges cast toward the camera by the messenger and Pip (the sun sits at the lane end, behind them),
- *  fill only, on the floor layer (dx = near -> floor world offset during the truck), clipped out of the row's shade. */
-export const Shadows: React.FC<{B: Beats; dx: number}> = ({B, dx}) => {
+/** The sun's ground point: every shadow runs radially away from it (toward the camera). */
+export const SUN_GROUND: Pt = [420, 1040];
+/** ONE length rule for everybody on the lane (the sun sits on the horizon ahead): the shadow's length along its ray is
+ *  2.13 x the figure's height x (depth below the horizon / 260)^1.2, so a nearer, taller figure throws a much longer
+ *  shadow: the passer at (455, 1300) ends at y ~1600, Pip and the messenger run off the bottom edge. */
+export const shadowLen = (h: number, footY: number) => 2.13 * h * Math.pow(Math.max(1, footY - SUN_GROUND[1]) / 260, 1.2);
+
+/** A figure's flat shadow on the lane: a band from the feet along the ray away from the sun's ground point, widening
+ *  with the perspective toward the camera, shoulders at 70 %, a rounded head at the tip. */
+export function shadowPath(fx: number, fy: number, h: number, hw0: number): string {
+  const ux0 = fx - SUN_GROUND[0];
+  const uy0 = fy - SUN_GROUND[1];
+  const n = Math.hypot(ux0, uy0) || 1;
+  const [ux, uy] = [ux0 / n, uy0 / n];
+  const [px, py] = [-uy, ux];
+  const L = shadowLen(h, fy);
+  const d0 = fy - SUN_GROUND[1];
+  const wAt = (s: number) => hw0 * Math.min(2.6, (d0 + uy * L * s) / d0);
+  const P = (s: number, o: number): Pt => [fx + ux * L * s + px * o, fy + uy * L * s + py * o];
+  const pts: Pt[] = [P(0, -wAt(0)), P(0.55, -wAt(0.55) * 1.12), P(0.74, -wAt(0.74) * 1.22), P(0.8, -wAt(0.8) * 0.78), P(0.93, -wAt(0.93) * 0.62), P(1, 0), P(0.93, wAt(0.93) * 0.62), P(0.8, wAt(0.8) * 0.78), P(0.74, wAt(0.74) * 1.22), P(0.55, wAt(0.55) * 1.12), P(0, wAt(0))];
+  return polyPath(pts);
+}
+
+/** The passers' anchors (same as the People layer: walkers walk up the lane into the sun). */
+export type ShadowCaster = {anchors: WalkerAnchor[]};
+
+/** Flat tan shadows of everyone on the lane (the messenger, Pip, the passers), fill only, on the floor layer (dx = near
+ *  -> floor world offset during the truck), clipped out of the row's teal shade. */
+export const Shadows: React.FC<{B: Beats; dx: number; walkers: WalkerAnchor[]}> = ({B, dx, walkers}) => {
   const t = useTime();
   const id = 's6sh' + useId().replace(/[^a-zA-Z0-9]/g, '');
-  const VP: Pt = [430, 1040];
-  const wedge = (fx: number, fy: number, hw0: number, hw1: number, L: number) => {
-    const ux = fx - VP[0];
-    const uy = fy - VP[1];
-    const n = Math.hypot(ux, uy) || 1;
-    const [ax, ay] = [ux / n, uy / n];
-    const [px, py] = [-ay, ax];
-    return polyPath([
-      [fx - px * hw0, fy - py * hw0],
-      [fx + px * hw0, fy + py * hw0],
-      [fx + ax * L + px * hw1, fy + ay * L + py * hw1],
-      [fx + ax * L - px * hw1, fy + ay * L - py * hw1],
-    ]);
-  };
+  let d = '';
+  // passers (floor layer already)
+  for (const a of walkers) {
+    const p = walkerAt(a, MAKERS_LANE.vp, t, 0);
+    d += shadowPath(p.x, p.y - 2, p.h, p.h * 0.17);
+  }
   const w = msgWalk(t, B);
-  let d = wedge(w.x + dx, MSG.y - 4, 34, 46, 175);
+  d += shadowPath(w.x + dx, MSG.y - 4, MSG.h, MSG.h * 0.17);
   const p = pipAt(t, B);
   const air = clamp(1 - (PIP.y - p.y) / 160);
-  if (air > 0.05) d += wedge(p.x + dx, PIP.y - 3, 26 * air, 32 * air, 92 * air);
+  if (air > 0.05) d += shadowPath(p.x + dx, PIP.y - 3, PIP_H * air, 40 * air);
   const shade = polyPath(SHADE);
   return (
     <>
       <defs>
         <clipPath id={id}>
-          <path d={`M-400 600H1500V2200H-400Z${shade}`} clipRule="evenodd" />
+          <path d={`M-400 600H1500V2400H-400Z${shade}`} clipRule="evenodd" />
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>
@@ -317,17 +317,22 @@ export const Shadows: React.FC<{B: Beats; dx: number}> = ({B, dx}) => {
   );
 };
 
-// ---------------------------------------------------------------- Bit, the stowaway (20 px)
+// ---------------------------------------------------------------- Bit, the stowaway (22 px)
 
-/** Bit: hidden in the messenger's collar, peeks out on 'gave' and rides his right shoulder; on 'a' he hops onto the
- *  mail slot's plate (the sill) and watches the envelope go in. */
-export const BitS06: React.FC<{B: Beats; size?: number}> = ({B, size = 20}) => {
+/** Bit: hidden in the messenger's collar, peeks out on 'gave' and rides on the TOP LINE of his right shoulder (his shell
+ *  breaks the silhouette against the lane, a 2 px cream rim keeps him off the dark coat and hair); on 'a' he hops onto
+ *  the mail slot's plate (the sill) and watches the envelope go in. */
+export const BIT_SIZE = 22;
+const BitRim: React.FC<{x: number; y: number; size: number; flip?: boolean}> = ({x, y, size, flip}) => <Ink d={bitPath(x, y, size, flip)} width={4.4} color={palette.cream} taper={false} seed="s6bitrim" />;
+
+export const BitS06: React.FC<{B: Beats; size?: number}> = ({B, size = BIT_SIZE}) => {
   const t = useTime();
   const id = 'b6' + useId().replace(/[^a-zA-Z0-9]/g, '');
   if (t < B.gave) return null;
   const w = msgWalk(t, B);
-  // on the shoulder curve, right of the collar (person units -> world)
-  const shoulder: Pt = [w.x + GW * 0.3 * S, HIP_Y - (TORSO - 6.5) * S + msgBob(w)];
+  // on the shoulder's top line, right of the collar band (person units -> world), 8 px out and 6 px up of the collar
+  const shoulderAt = (x: number, bob: number): Pt => [x + GW * 0.3 * S + 7, HIP_Y - TORSO * S - 1.5 + bob];
+  const shoulder = shoulderAt(w.x, msgBob(w));
   const hopAt = B.a + 0.02;
   const hopDur = 0.3;
   if (t < hopAt) {
@@ -342,13 +347,14 @@ export const BitS06: React.FC<{B: Beats; size?: number}> = ({B, size = 20}) => {
           </clipPath>
         </defs>
         <g clipPath={k < 1 ? `url(#${id})` : undefined}>
+          <BitRim x={shoulder[0]} y={shoulder[1] + rise} size={size} />
           <Bit x={shoulder[0]} y={shoulder[1] + rise} size={size} state="ride" look={k < 1 ? 'up' : 'forward'} seed="s6bit" />
         </g>
       </XG>
     );
   }
   // hop from the shoulder onto the sill (ballistic, landing squash), then sit facing the slot
-  const from: Pt = [MSG_X1 + GW * 0.3 * S, HIP_Y - (TORSO - 6.5) * S];
+  const from = shoulderAt(MSG_X1, 0);
   const u = prog(t, hopAt, hopDur);
   const x = lerp(from[0], SILL[0], E.inOutSine(u));
   const apex = Math.min(from[1], SILL[1]) - 34;
@@ -358,6 +364,7 @@ export const BitS06: React.FC<{B: Beats; size?: number}> = ({B, size = 20}) => {
   const sq = land >= 0 && land < 0.16 ? 1 - 0.22 * Math.sin((land / 0.16) * Math.PI) : u < 1 && u > 0 ? 1.08 : 1;
   return (
     <XG m={mat.about(mat.scale(2 - sq, sq), x, y)}>
+      <BitRim x={x} y={y} size={size} flip={u >= 1} />
       <Bit x={x} y={y} size={size} flip={u >= 1} state={u < 1 ? 'hop' : 'idle'} look={u >= 1 ? 'forward' : 'up'} seed="s6bit" />
     </XG>
   );
@@ -385,9 +392,10 @@ const MAKER_SEEDS = (() => {
 })();
 
 /** Three makers (props Maker, waist-up, back view) pop UP into the browser window's screen: rise 0.2 s (outBack: the
- *  hair tops overshoot ~9 px over the browser bar), 0.06 s apart, middle first; three ink pop ticks above them. Clipped
- *  to the screen rect widened up over the bar (the window frame stays in front of their shoulders). */
-export const MakerHeads: React.FC<{screen: {x: number; y: number; w: number; h: number; bar?: number}; at: number}> = ({screen, at}) => {
+ *  hair tops overshoot ~9 px over the browser bar), 0.06 s apart, middle first, led so the middle one's overshoot lands
+ *  ON 'heads'; three ink pop ticks above them. Then they lean toward the door below (-6 deg about the hip, 5 px down:
+ *  looking down at the mail slot, still back view). Clipped to the screen rect widened up over the bar. */
+export const MakerHeads: React.FC<{screen: {x: number; y: number; w: number; h: number; bar?: number}; at: number; tickAt?: number}> = ({screen, at, tickAt = at}) => {
   const t = useTime();
   const id = 'mh' + useId().replace(/[^a-zA-Z0-9]/g, '');
   if (t < at) return null;
@@ -398,7 +406,7 @@ export const MakerHeads: React.FC<{screen: {x: number; y: number; w: number; h: 
   const xs = [screen.x + screen.w * 0.19, screen.x + screen.w * 0.5, screen.x + screen.w * 0.81];
   const order = [1, 0, 2]; // the middle one first
   const tick = (() => {
-    const d = t - at;
+    const d = t - tickAt;
     if (d < 0 || d > 0.17) return null;
     const g = E.outCubic(d / 0.08);
     const o = 8 + 10 * E.outCubic(d / 0.17);
@@ -421,9 +429,12 @@ export const MakerHeads: React.FC<{screen: {x: number; y: number; w: number; h: 
           const a = at + order[i] * 0.06;
           if (t < a) return null;
           const k = prog(t, a, 0.2, E.outBack(1.7));
+          // look down at the door (it is below-left of the window): a lean about the hip once they are up
+          const look = E.inOutSine(prog(t, a + 0.24, 0.22));
+          const hy = hipY + (i === 1 ? -3 : 3);
           return (
-            <XG key={i} m={mat.translate(0, (1 - k) * 96)}>
-              <Maker x={x} y={hipY + (i === 1 ? -3 : 3)} h={h} bust work={1.6 + i * 0.35} flip={i === 2} seed={MAKER_SEEDS[i]} />
+            <XG key={i} m={mat.compose(mat.translate(0, (1 - k) * 96 + 5 * look), mat.about(mat.rotate(-6 * look), x, hy))}>
+              <Maker x={x} y={hy} h={h} bust work={1.6 + i * 0.35} flip={i === 2} seed={MAKER_SEEDS[i]} />
             </XG>
           );
         })}
@@ -435,32 +446,41 @@ export const MakerHeads: React.FC<{screen: {x: number; y: number; w: number; h: 
 
 // ---------------------------------------------------------------- Pip
 
-export const PIP = {scale: 1.2, y: 1480, land: [300, 1480] as Pt, hopFrom: [-100, 1350] as Pt} as const;
+/** Pip (scale 1.2) on the reference plane, behind the messenger in depth (feet 1480). Fix round 2 (cut on action): he
+ *  is off frame LEFT on S06's first frame, BEHIND the messenger (S05 has him trailing), and leaps in after him: one long
+ *  low leap from (-480, 1350) that lands at (172, 1480) at cut + 0.30, clear of the messenger's legs (his left leg is
+ *  at ~273 then: never occluded), then tiptoes. PIP_H = his standing height (px) for the shadow rule. */
+export const PIP = {scale: 1.2, y: 1480, hopFrom: [-480, 1350] as Pt, land: [172, 1480] as Pt, landAt: 0.3, hopDur: 0.39} as const;
+export const PIP_H = 110;
 
 type PipState = {x: number; y: number; pose: PoseName; flip: boolean; squash: number; rotate: number; amount?: number; expression?: Expression; walkRate?: number; look?: number; shh?: boolean};
 
-/** Pip's choreography (world, f = 1): mid-leap at the cut (he jumped off S05's rail to follow), lands behind the
- *  messenger, tiptoes; 'shh' (trunk raised straight up across his mouth like a finger to the lips, eyes open, glancing
- *  at the messenger) after the seal; tiptoes on; ear twitch at the sheet (he turns to it); leaps after it. */
+/** How long Pip holds the 'shh' (the mark stays from shh + 0.06 to shh + 0.55). */
+export const SHH_HOLD = 0.52;
+
+/** Pip's choreography (world, f = 1): leaps in behind the messenger, tiptoes (walk-side, rate 1.0); 'shh' (stand-side,
+ *  the trunk J-curled back onto his lips, eyes closed: knowing) after the seal lands; tiptoes on; ear twitch at the
+ *  sheet (he turns to it); leaps after it. */
 export function pipAt(t: number, B: Beats): PipState {
-  const landT = B.pipLand + 0.05;
-  const hopDur = 0.3;
-  const rate = 0.8;
+  const landT = B.cut + PIP.landAt;
+  const hopDur = PIP.hopDur;
+  const rate = 1.0;
   const v = walkSpeed(rate) * PIP.scale;
-  const shhEnd = B.shh + 0.46;
+  const shhEnd = B.shh + SHH_HOLD;
   const leapT = B.sheet + 0.2;
   // x along the tiptoe (it pauses during the shh)
   const walked = (until: number) => Math.max(0, Math.min(until, B.shh) - landT) + Math.max(0, until - shhEnd);
   const xAt = (tt: number) => PIP.land[0] + v * walked(tt);
+  const hop1 = (tt: number) => hop({t: tt, t0: landT - hopDur, dur: hopDur, from: {x: PIP.hopFrom[0], y: PIP.hopFrom[1]}, to: {x: PIP.land[0], y: PIP.land[1]}, height: 70});
   if (t < landT) {
-    const h = hop({t, t0: landT - hopDur, dur: hopDur, from: {x: PIP.hopFrom[0], y: PIP.hopFrom[1]}, to: {x: PIP.land[0], y: PIP.land[1]}, height: 60});
+    const h = hop1(t);
     return {x: h.x, y: h.y, pose: 'stand-side', flip: false, squash: h.squash, rotate: h.rotate, amount: h.spread};
   }
   if (t < B.shh) {
-    const h = hop({t, t0: landT - hopDur, dur: hopDur, from: {x: PIP.hopFrom[0], y: PIP.hopFrom[1]}, to: {x: PIP.land[0], y: PIP.land[1]}, height: 60});
+    const h = hop1(t);
     return {x: xAt(t), y: PIP.y, pose: 'walk-side', flip: false, squash: h.squash + popSwitch(t, B.shh), rotate: 0, walkRate: rate};
   }
-  if (t < shhEnd) return {x: xAt(t), y: PIP.y, pose: 'trunk-up', flip: false, squash: popSwitch(t, B.shh) + popSwitch(t, shhEnd), rotate: 0, expression: 'neutral', look: 0.55, shh: true};
+  if (t < shhEnd) return {x: xAt(t), y: PIP.y, pose: 'stand-side', flip: false, squash: popSwitch(t, B.shh) + popSwitch(t, shhEnd), rotate: 0, expression: 'closed', look: 0.3, shh: true};
   if (t < B.sheet) return {x: xAt(t), y: PIP.y, pose: 'walk-side', flip: false, squash: popSwitch(t, shhEnd) + popSwitch(t, B.sheet), rotate: 0, walkRate: rate};
   const x0 = xAt(B.sheet);
   if (t < leapT - 0.14) return {x: x0, y: PIP.y, pose: 'stand-side', flip: true, squash: popSwitch(t, B.sheet), rotate: 0, expression: 'wide', amount: 0.25};
@@ -468,69 +488,137 @@ export function pipAt(t: number, B: Beats): PipState {
   return {x: h.x, y: h.y, pose: 'stand-side', flip: true, squash: h.squash, rotate: h.rotate, amount: Math.max(0.25, h.spread), expression: 'wide'};
 }
 
-/** The 'shh' face on the trunk-up rig (local, the mascot has no shush pose): the raised trunk is the finger at the
- *  lips; the trumpet marks at its tip are clipped away (a wedge right of the tip) and the open mouth is closed (a body-
- *  colour patch + a small pursed 'o'). Local elephant units: head centre (look 1.6, -69), tilt -7 + 2 look. */
-function shhGeo(look: number) {
-  const tilt = ((-7 + look * 2) * Math.PI) / 180;
-  const H: Pt = [look * 1.6, -69];
-  const hp = (p: Pt): Pt => [H[0] + p[0] * Math.cos(tilt) - p[1] * Math.sin(tilt), H[1] + p[0] * Math.sin(tilt) + p[1] * Math.cos(tilt)];
-  const tb = hp([look * 1.4, 8.5]);
-  const rel: Pt = [15.5, -44];
-  const tip: Pt = [tb[0] + rel[0] * Math.cos(tilt) - rel[1] * Math.sin(tilt), tb[1] + rel[0] * Math.sin(tilt) + rel[1] * Math.cos(tilt)];
-  return {tip, mouth: hp([0.5, 16]), tilt};
+/** The side rig's head + trunk frame when standing (lib/mascot/poses sideRig, not walking): head centre H, tilt, the
+ *  trunk base tb, the sway (deg per segment) and the mouth. */
+function sideHead(t: number, seed: number, look: number, idle = 1) {
+  const br = breath(t, seed) * idle;
+  const bob = br * 0.5;
+  const headBob = -br * 0.6;
+  const H: MPt = [27 + look * 0.8, -58 + bob + headBob * 0.6];
+  const tilt = look * 3;
+  const hp = (p: MPt): MPt => tpt(p, {x: H[0], y: H[1], rot: tilt});
+  return {H, tilt, hp, tb: hp([15, 1]), sway: trunkSway(t, seed) * idle * 3, mouth: hp([8.6, 12.4])};
 }
+
+/** progressively rotate each segment (mascot poses bendCtrl). */
+const bendCtrl = (ctrl: MPt[], degPerSeg: number): MPt[] => {
+  const out: MPt[] = [ctrl[0]];
+  let acc = 0;
+  for (let i = 1; i < ctrl.length; i++) {
+    acc += degPerSeg;
+    const seg: MPt = [ctrl[i][0] - ctrl[i - 1][0], ctrl[i][1] - ctrl[i - 1][1]];
+    const r = tpt(seg, {rot: acc});
+    out.push([out[i - 1][0] + r[0], out[i - 1][1] + r[1]]);
+  }
+  return out;
+};
+
+/** The 'shh' trunk: the side rig's own trunk root, then a J curl that hooks back UP onto the lips (the finger on the
+ *  lips), drawn like the mascot's trunk (lib/mascot/poses trunk(): capped tube, body fill misregistered, brush ink, two
+ *  wrinkles). Control points relative to the trunk base, before tilt and sway; the first four are the rig's own, so
+ *  the root below the cut line continues the original exactly. */
+const SHH_TRUNK: MPt[] = [[0, 0], [5, 8], [7.4, 18], [6.6, 27], [3.4, 31.8], [-2.2, 32.2], [-6.6, 28.2], [-7.8, 21.6], [-6.4, 15.2]];
+/** Local cut line (y below the head centre) between the rig's trunk root and ours. */
+const SHH_CUT = 11;
 
 export const PipS06: React.FC<{B: Beats}> = ({B}) => {
   const t = useTime();
   const id = 'p6' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const inkScale = useInkScale();
   const p = pipAt(t, B);
-  const el = <Elephant x={p.x} y={p.y} scale={PIP.scale} pose={p.pose} flip={p.flip} t={t} seed={6} squash={p.squash} rotate={p.rotate} amount={p.amount} expression={p.expression} walkRate={p.walkRate ?? 0.8} look={p.look ?? 0} />;
+  const el = <Elephant x={p.x} y={p.y} scale={PIP.scale} pose={p.pose} flip={p.flip} t={t} seed={6} squash={p.squash} rotate={p.rotate} amount={p.amount} expression={p.expression} walkRate={p.walkRate ?? 1} look={p.look ?? 0} />;
   if (!p.shh) return el;
-  const g = shhGeo(p.look ?? 0);
+  // ---- the shh: clip the rig's hanging trunk below the cut line, draw the J-curl in its place
   const sc = PIP.scale;
-  const W = (lx: number, ly: number): Pt => [p.x + lx * sc, p.y + ly * sc];
-  // the trumpet-mark wedge: right of the tip, r 6.5..20, -80..+28 deg
-  const wedge: Pt[] = [];
-  for (let i = 0; i <= 8; i++) {
-    const a = ((-80 + (108 * i) / 8) * Math.PI) / 180;
-    wedge.push(W(g.tip[0] + Math.cos(a) * 21, g.tip[1] + Math.sin(a) * 21));
-  }
-  for (let i = 8; i >= 0; i--) {
-    const a = ((-80 + (108 * i) / 8) * Math.PI) / 180;
-    wedge.push(W(g.tip[0] + Math.cos(a) * 6.8, g.tip[1] + Math.sin(a) * 6.8));
-  }
-  const m = W(g.mouth[0], g.mouth[1]);
+  const sx = 1 + p.squash * 0.55;
+  const sy = 1 - p.squash;
+  const look = p.look ?? 0;
+  const g = sideHead(t, 6, look);
+  const cutY = g.H[1] + SHH_CUT;
+  const W = (lx: number, ly: number): Pt => [p.x + lx * sc * sx, p.y + ly * sc * sy];
+  // the region the rig's trunk hangs into (right of the mouth, under the head); nothing else of Pip is there
+  const exclude: Pt[] = [W(40.6, cutY), W(95, cutY), W(95, 12), W(36.4, 12), W(36.4, g.mouth[1] + 2.4), W(40.6, g.mouth[1] + 2.4)];
+  const ctrl = tp(bendCtrl(SHH_TRUNK, g.sway), {x: g.tb[0], y: g.tb[1], rot: g.tilt});
+  const center = spline(ctrl, false, 6);
+  const {left, right, loop} = cappedTube(center, 12.4, 7.0);
+  const baseW = (stroke.ink * 1.12 * inkScale) / sc;
+  const inkD = brush(loop, {w: baseW, seed: 6 * 31.7 + 3.1, over: 0, tipIn: 0.1, tipOut: 0.1});
+  let wr = '';
+  const n = center.length;
+  [0.2, 0.28].forEach((f, j) => {
+    const i = Math.round(f * (n - 1));
+    const a = left[i];
+    const b = right[i];
+    const m: MPt = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    const nxt = center[Math.min(n - 1, i + 2)];
+    const dl = Math.hypot(nxt[0] - center[i][0], nxt[1] - center[i][1]) || 1;
+    const bow: MPt = [m[0] + ((nxt[0] - center[i][0]) / dl) * 0.9, m[1] + ((nxt[1] - center[i][1]) / dl) * 0.9];
+    wr += brush(spline([[lerp(a[0], b[0], 0.3), lerp(a[1], b[1], 0.3)], bow, [lerp(a[0], b[0], 0.72), lerp(a[1], b[1], 0.72)]], false, 6), {w: baseW * 0.6, seed: 77 + j, over: 0, tipIn: 0.5, tipOut: 0.35});
+  });
+  const misreg: Pt = [3 / sc, 2 / sc];
   return (
     <>
       <defs>
-        <clipPath id={id}>
-          <path d={`M${p.x - 400} ${p.y - 600}H${p.x + 400}V${p.y + 200}H${p.x - 400}Z${polyPath(wedge)}`} clipRule="evenodd" />
+        <clipPath id={`${id}a`}>
+          <path d={`M${p.x - 500} ${p.y - 700}H${p.x + 500}V${p.y + 300}H${p.x - 500}Z${polyPath(exclude)}`} clipRule="evenodd" />
+        </clipPath>
+        <clipPath id={`${id}b`}>
+          <rect x={p.x - 500} y={W(0, cutY)[1]} width={1000} height={600} />
         </clipPath>
       </defs>
-      <g clipPath={`url(#${id})`}>{el}</g>
-      <Fill d={blob(m[0], m[1] + 0.3 * sc, 5.2 * sc, 4.5 * sc, {seed: 's6pipm'})} color={MASCOT.body} offset={false} mode="none" seed="s6pipmf" />
-      <Ink d={blob(m[0], m[1], 1.7 * sc, 1.9 * sc, {seed: 's6pipo'})} width={2.2} taper={false} seed="s6pipo" />
+      <g clipPath={`url(#${id}a)`}>{el}</g>
+      <g clipPath={`url(#${id}b)`}>
+        <XG m={mat.compose(mat.translate(p.x, p.y), mat.scale(sc * sx, sc * sy))}>
+          <path d={mPoly(loop)} fill={MASCOT.body} transform={`translate(${misreg[0].toFixed(2)} ${misreg[1].toFixed(2)})`} />
+          <path d={inkD + wr} fill={MASCOT.ink} />
+        </XG>
+      </g>
     </>
   );
 };
 
-/** 'shh' lettered beside Pip's trunk: pops in (7 % spring), shrinks away in 0.12 s. */
-export const ShhMark: React.FC<{x: number; y: number; at: number; outAt: number; size?: number}> = ({x, y, at, outAt, size = 50}) => {
+/** 'shh' lettered beside Pip in CaptionHand (64 px world = ~44 px x-height-to-ascender on screen), a short ink tail
+ *  pointing at his trunk tip, two hush ticks: pops in with the 7 % spring, holds, shrinks away in 0.12 s. */
+export const ShhMark: React.FC<{x: number; y: number; at: number; outAt: number; tail?: Pt; size?: number}> = ({x, y, at, outAt, tail, size = 64}) => {
   const t = useTime();
   useCaptionFont();
   if (t < at || t >= outAt + 0.12) return null;
   const k = springAt(t, at, springs.pop) * (1 - E.inCubic(prog(t, outAt, 0.12)));
   if (k <= 0.01) return null;
+  // the tail: from under the lettering's left end toward the trunk tip (stops 30 px short of it), in the mark's frame
+  let tailD = '';
+  if (tail) {
+    // the target in the mark's own (rotated -8 deg) frame: local = R(+8 deg) . (world - anchor)
+    const r = (8 * Math.PI) / 180;
+    const tx0 = tail[0] - x;
+    const ty0 = tail[1] - y;
+    const tL: Pt = [tx0 * Math.cos(r) - ty0 * Math.sin(r), tx0 * Math.sin(r) + ty0 * Math.cos(r)];
+    const s0: Pt = [-size * 0.5, size * 0.2];
+    const L = Math.hypot(tL[0] - s0[0], tL[1] - s0[1]) || 1;
+    const run = Math.max(16, L - 30);
+    const e: Pt = [s0[0] + ((tL[0] - s0[0]) / L) * run, s0[1] + ((tL[1] - s0[1]) / L) * run];
+    const c: Pt = [(s0[0] + e[0]) / 2 + 6, (s0[1] + e[1]) / 2 - 2];
+    tailD = `M${s0[0].toFixed(1)} ${s0[1].toFixed(1)}Q${c[0].toFixed(1)} ${c[1].toFixed(1)} ${e[0].toFixed(1)} ${e[1].toFixed(1)}`;
+  }
   return (
     <XG m={mat.compose(mat.translate(x, y), mat.rotate(-8), mat.scale(k))}>
       <text x={0} y={0} textAnchor="middle" fontFamily={captionFontStack} fontSize={size} fill={palette.ink}>
         shh
       </text>
-      <Ink d={line(size * 0.95, -size * 0.62, size * 1.25, -size * 0.85, {over: 0, seed: 's6shh1'}) + line(size * 1.0, -size * 0.25, size * 1.4, -size * 0.3, {over: 0, seed: 's6shh2'})} width={2.6} taper={false} seed="s6shhi" />
+      <Ink d={line(size * 0.82, -size * 0.6, size * 1.1, -size * 0.82, {over: 0, seed: 's6shh1'}) + line(size * 0.86, -size * 0.25, size * 1.22, -size * 0.3, {over: 0, seed: 's6shh2'})} width={3.2} taper={false} seed="s6shhi" />
+      {tailD ? <Ink d={tailD} width={3.0} taper={false} seed="s6shht" /> : null}
     </XG>
   );
 };
+
+/** Where the 'shh' trunk tip is (world) while Pip holds the pose (for the mark's tail). */
+export function shhTipWorld(t: number, B: Beats): Pt {
+  const p = pipAt(t, B);
+  const g = sideHead(t, 6, p.look ?? 0.3);
+  const ctrl = tp(SHH_TRUNK, {x: g.tb[0], y: g.tb[1], rot: g.tilt});
+  const tip = ctrl[ctrl.length - 1];
+  return [p.x + tip[0] * PIP.scale, p.y + tip[1] * PIP.scale];
+}
 
 // ---------------------------------------------------------------- blind jolt
 

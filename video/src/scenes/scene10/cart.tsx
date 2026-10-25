@@ -1,7 +1,7 @@
 // S10 the makers' cart on the stoop line (y 1306, just behind the stoops' fronts; behind the stoops, the A-frame sign, the
 // hanging plaques and the bollard). Fix round 2 staging, so the hand-out and the SKIP are seen whole:
 //  - on 'old' + 0.15 the maker + cart pop up beside the A-frame's right edge and step out (<= 14 px / frame, out-quad),
-//    then PARK with the maker in the clear wall between siteL's plaque and siteM's plaque (x 455: nothing in front of him
+//    (0.28 s, still 4 frames before the first arm moves), then PARK with the maker in the clear wall between siteL's plaque and siteM's plaque (x 455: nothing in front of him
 //    but the A-frame's thin back edge), the cart under siteM's plaque;
 //  - each toss is thrown from a RAISED arm (FigureArm, the tag in the hand, released a head above him, clear of every
 //    plaque): the LEFT arm flicks a short lob back-left onto siteL's plaque (tick on 'officially'), then the RIGHT arm
@@ -24,7 +24,7 @@ import {Satchel} from './shims';
 import {tagBodyOffset, TAG_W} from './plaques';
 
 /** Cart line (feet y), bed length, the park spot (cart centre), the step-out, the roll-out. */
-export const CART = {y: 1306, size: 100, parkX: 562, stepIn: 95, stepDur: 0.45, vMax: 500, acc: 0.5};
+export const CART = {y: 1306, size: 100, parkX: 562, stepIn: 64, stepDur: 0.28, vMax: 500, acc: 0.5};
 const CS = CART.size / 140; // MakersCart local -> world
 /** The maker walks this far behind the cart centre (MakersCart: 150 local units). */
 export const MAKER_DX = -150 * CS;
@@ -60,11 +60,11 @@ export function cartX(t: number, T: CartTimes): number {
 const SHOULDER = (side: number): Pt => [side * 32, -76];
 const HAND_DOWN = (side: number): Pt => [side * 38, -8];
 const HAND_UP = (side: number): Pt => [side * 58, -152];
-const RAISE = 0.13;
+const RAISE = 0.1;
 const HOLD = 0.07;
 const LOWER = 0.12;
 
-/** Arm raise 0..1 for a toss released at `toss` (raise 0.13 s out-cubic, hold, lower 0.12 s). */
+/** Arm raise 0..1 for a toss released at `toss` (raise 0.1 s out-cubic, hold, lower 0.12 s). */
 function armQ(t: number, toss: number): number {
   if (t < toss - RAISE || t >= toss + HOLD + LOWER) return 0;
   if (t < toss) return E.outCubic(prog(t, toss - RAISE, RAISE));
