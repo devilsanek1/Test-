@@ -95,6 +95,10 @@ Format: **rule** — why / evidence (video, date).
   brainstorms, competing ideas with judges, design and style explorations, and hook variants are excellent use of tokens.
   "Waste" means rework, reviews of things that will still change, polish before the story is locked, and lost work.
   — owner, 2026-10-25.
+- **Once a step is locked, only the locked choice goes forward:** move the rejected options (other topics, core lines,
+  hooks, drafts, scores, panels) to the video's `archive/` folder, trim the gate doc to the locked choice, and never put
+  rejected options into later prompts or re-discuss them. Unused topics go to `docs/IDEAS_BANK.md` for future videos.
+  — owner, v3, 2026-10-25.
 - **No wasted tokens or time:** no reviews or polish on things that will change, short prompts, lean docs; cut what
   doesn't help (see the measured waste in `docs/PIPELINE_V2.md`). — v1, 2026-10-25.
 - **Once the owner says "final", don't redo it.** Log ideas for the next video instead. — v1, 2026-10-25.

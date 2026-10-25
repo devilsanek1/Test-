@@ -86,6 +86,10 @@ stages (building, fixing, polishing), where the measured waste happened.
 9. **Lean orchestrator.** Keep the task list short, use short check-in prompts, read agents' final summaries rather than full
    journals, and write handoff notes as a short WRAPUP-style doc instead of a growing log.
 
+10. **Locked means dropped (owner, 2026-10-25).** When a gate locks, move the rejected options to `docs/vN/archive/`
+    (no prompt reads it), trim the gate doc to the locked choice, and point later prompts only at locked docs and
+    the fact files. Unused topics go to `docs/IDEAS_BANK.md`. Superseded drafts are archived at the next gate.
+
 ## Agent prompt rules
 
 - Context: the gate's brief plus the scene's own data. **Point to sections, never "read all docs fully".**
