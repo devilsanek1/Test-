@@ -41,6 +41,9 @@ Format: **rule** — why / evidence (video, date).
 - **The hook is a concrete, surprising claim with stakes (names / numbers / a curiosity gap), stronger than a plain
   news headline** ("Engineers are leaving Google!" was the owner's starting point, asked to be made more powerful);
   **every hook fact is verified against the primary source before the hook is locked.** — v2 topic, 2026-10-25.
+- **When a news item is small, research the bigger story around it** (history, the pattern across companies, what's
+  at stake) and lead with the most powerful TRUE framing (v2: "engineers resigning and afraid to speak", not just "people
+  leaving Google"). — owner, 2026-10-25.
 - **Target 30-45 s and end close to the payoff.** Viewers who passed the hook stayed until about 40 s, then left once
   the story felt resolved. — same insights.
 - **Every frame should be at least 8/10, with no dead frames, and cuts locked to the beat** (the owner's creator-reel tips). — v1.
