@@ -56,16 +56,18 @@ export const MinuteWedge: React.FC<{r: number; at?: number; dur?: number; fracti
   const R = r * 0.9;
   const w = width ?? Math.max(4.8, r * 0.035);
   const [hx, hy] = polar(end + tick, R * 0.92);
+  const fk = at === undefined ? 1 : springAt(t, at, springs.pop);
+  // A1 fix round 2: the quarter ticks ride the FACE spring (they sat at full radius around a 30 px ring for 2 frames
+  // while the face popped): placed at fk x their radius, and only once the face is past 85 % of its size
   let ticks = '';
   [-90, 0, 90, 180].forEach((a, i) => {
     const k = at === undefined ? 1 : springAt(t, at + i * 0.04, springs.pop);
-    if (k <= 0.01) return;
-    const [x0, y0] = polar(a, R * (1 - 0.2 * k));
-    const [x1, y1] = polar(a, R * 0.97);
+    if (k <= 0.01 || fk < 0.85) return;
+    const [x0, y0] = polar(a, R * fk * (1 - 0.2 * k));
+    const [x1, y1] = polar(a, R * fk * 0.97);
     ticks += `M${x0.toFixed(1)} ${y0.toFixed(1)}L${x1.toFixed(1)} ${y1.toFixed(1)}`;
   });
   const [sx, sy] = polar(-90, R);
-  const fk = at === undefined ? 1 : springAt(t, at, springs.pop);
   return (
     <ExitFade x={cx} y={cy}>
       <g transform={`translate(${cx} ${cy}) scale(${outK.toFixed(4)})`}>

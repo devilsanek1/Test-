@@ -127,12 +127,17 @@ export const beamHit = (deg: number): {p: Pt; foot: boolean} => {
  *  (half `core` deg, fixed 0.85) inside a stepped HALO (half `half` deg, fixed 0.4), both halo edges thin solid ink, full
  *  length in 2 frames (0.07 s) with a 3-frame lamp flash, a flat cream lit spot where the centre line meets the glass.
  *  Constant translucency all scene (the old 0.7 -> 0.5 step on 'day' is gone). Clip it to the dome interior. */
-export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; half?: number; core?: number}> = ({at, angle, half = 13, core = 7}) => {
+export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; half?: number; core?: number; flareAt?: number}> = ({at, angle, half: half0 = 13, core: core0 = 7, flareAt}) => {
   const t = useTime();
   const look = useLook();
   if (t < at || look.fills !== 'color') return null;
   const o = TOWER8.light;
   const a = angle(t);
+  // A1 fix round 2: the CATCH ('hacking'): the beam flares for 3 frames as it lands (core 1.7x, halo 1.35x, the lamp
+  // flashes), then steps back
+  const flare = flareAt !== undefined && t >= flareAt && t < flareAt + 0.1;
+  const half = flare ? half0 * 1.35 : half0;
+  const core = flare ? core0 * 1.7 : core0;
   const grow = E.outCubic(prog(t, at, 0.07));
   const end = (deg: number): Pt => {
     const r = (deg * Math.PI) / 180;
@@ -143,7 +148,7 @@ export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; h
   const up = end(a - half);
   const lo = end(a + half);
   const mid = end(a);
-  const flash = t < at + 0.1;
+  const flash = t < at + 0.1 || flare;
   const hit = beamHit(a);
   const tan = (a * Math.PI) / 180;
   return (

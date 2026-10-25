@@ -58,18 +58,17 @@ const LOW = [1670 - S7_READERS[0].head[1], 1695 - S7_READERS[1].head[1]];
  *  floor). */
 const CLOCK_LIFT = 100;
 /** The sun's screen y on the cut (S08's match: (640, 1021) r110, half behind the wall top) and its speed there: S08 keeps
- *  sliding it down 6 px in 0.12 s out(cubic) (Scene08.tsx SUN_MOVES[0]) = 150 px/s on its first frame. */
+ *  braking it down with its far plane (Scene08.tsx farBrake). */
 const SUN_CUT_Y = 1021;
-const SUN_CUT_V = 150;
-/** The sun's way down to the cut (fix round 2: no bob). Its screen y is written as the wall top's screen y (the tilt
- *  moves the wall down 197 px) + `rel`, the sun centre's offset from the wall top: rel eases from the lifted clock pose
- *  (-123) down to REL_DIP (the centre a hair below the wall top: never more than half hidden) by the last SUN_SNAP s,
- *  then over SUN_SNAP s to the cut's -20 (S08's (640, 1021) half behind its skyline) arriving at S08's 150 px/s slide.
- *  (Fix round 1's single Hermite dropped the centre 30 px BELOW the wall top at 23.92 and re-rose 43 px: a visible
- *  bob.) The re-rise left is 28 px in 4 frames while the wall itself slides down ~70 px: the sun keeps moving down. */
-const SUN_RET = 0.6;
-const REL_DIP = 8;
-const SUN_SNAP = 0.12;
+/** The sun's way down to the cut. Its screen y is written as the wall top's screen y (the tilt moves the wall down 197 px)
+ *  + `rel`, the sun centre's offset from the wall top. A1 fix round 2 (the review's 'sun starts sinking 0.2 s before the
+ *  tilt' and 'peek-and-drop at the cut'): the return starts AT the tilt (the sun holds the clock pose until the camera
+ *  moves, so the clock is never cut by the roofline before it pops off) and rel eases MONOTONICALLY (smoothstep) from the
+ *  lifted clock pose (-123) to the cut's -19.4 (S08's (640, 1021) half behind its skyline) with zero rel speed on the
+ *  cut: the sun leaves S07 riding the wall at the tilt's ~26 px / frame, its exposed cap constant over the last frames
+ *  (no re-rise). S08's far plane (sun + skyline together, Scene08.tsx farBrake: 41 px out(cubic) over 0.3 s) takes it
+ *  from there at ~12 px / frame with the same cap. */
+const SUN_RET = 0.4;
 
 /** Screen x of S08's pegged copies on its first frame (src/scenes/Scene08.tsx COPIES / BIT_COPY x0 at its crane start
  *  (540, 1260) zoom 1.3: screen = 540 + (x0 - 540) x 1.3) and their slide (v0 + the residual drift vr, S08 world px/s
@@ -135,32 +134,24 @@ const Scene07: React.FC = () => {
   //      ONE hour-hand tick with it: an hour passes, the fix is not ready (fix round 1: 3 ticks against 1 turn).
   // Fix round 3: THREE hour-hand ticks (storyboard: 'the hour hand steps 3 ticks: hours pass') during the one fast minute
   // turn (the kit spaces them spinAt + (i + 0.6) x 0.14 s). The face still pops off at the tilt (storyboard 23.70).
-  const CLK = {at: B.fix, spinAt: B.fix + 0.02, spinDur: 0.42, turns: 1, hourSteps: 3, outAt: B.tilt - 0.08};
+  // A1 fix round 2: the face pops off over the kit's 0.16 s inBack(1.4) out ENDING on the tilt (the ring is gone on the
+  // 23.700 film frame, the storyboard's 23.70), while the sun still holds the clock pose (its return starts at the tilt)
+  const CLK = {at: B.fix, spinAt: B.fix + 0.02, spinDur: 0.42, turns: 1, hourSteps: 3, outAt: B.tilt - 0.16};
 
   // ---- the sun: screen space (the push does not move it). It lifts on 'fix' so the clock face clears the roofline, then
-  //      comes down to S08's (640, 1021) over the last 0.6 s (rel to the wall top, see SUN_RET).
+  //      comes down to S08's (640, 1021) with the 0.40 s tilt (rel to the wall top, see SUN_RET).
   const wallTop = (tt: number) => {
     const c = camAt(tt, B);
     return (840 - c.y) * c.z + 960;
   };
   const Y_LIFT = 820 - CLOCK_LIFT;
-  const RET0 = B.end - SUN_RET;
+  const RET0 = B.tilt;
   const relAt = (() => {
     const r0 = Y_LIFT - wallTop(RET0);
     const rEnd = SUN_CUT_Y - wallTop(B.end);
-    const vWall = (wallTop(B.end) - wallTop(B.end - 1e-3)) / 1e-3;
-    const m1 = (SUN_CUT_V - vWall) * SUN_SNAP; // Hermite end tangent (px per unit u)
-    const tm = B.end - SUN_SNAP;
     return (tt: number) => {
-      if (tt <= tm) {
-        const u = Math.max(0, Math.min(1, (tt - RET0) / (tm - RET0)));
-        return r0 + (REL_DIP - r0) * u * u * (3 - 2 * u);
-      }
-      const u = Math.min(1, (tt - tm) / SUN_SNAP);
-      const h00 = 2 * u * u * u - 3 * u * u + 1;
-      const h01 = -2 * u * u * u + 3 * u * u;
-      const h11 = u * u * u - u * u;
-      return h00 * REL_DIP + h01 * rEnd + h11 * m1;
+      const u = Math.max(0, Math.min(1, (tt - RET0) / (B.end - RET0)));
+      return r0 + (rEnd - r0) * u * u * (3 - 2 * u);
     };
   })();
   const sunReturnEase = (u: number) => (wallTop(RET0 + u * SUN_RET) + relAt(RET0 + u * SUN_RET) - Y_LIFT) / (SUN_CUT_Y - Y_LIFT);
@@ -200,6 +191,10 @@ const Scene07: React.FC = () => {
         <g clipPath={`url(#${clipId})`}>
           <XG m={mat.inv(M)}>
             <g transform={`translate(${pose.x.toFixed(2)} ${y.toFixed(2)}) scale(${pose.sq.sx.toFixed(4)} ${pose.sq.sy.toFixed(4)})`}>
+              {/* A1 fix round 2: while the clock is up the WHOLE disc is the overlay (the sun's own circle, redrawn over
+                  the wires): the three wires stop at the disc's edge instead of crossing its exposed orange rim either
+                  side of the ring; from the face's pop-off the wires run over the sun again */}
+              {t < CLK.outAt + 0.16 ? <circle r={pose.r} fill={palette.sun} /> : null}
               <ClockFace r={pose.r} at={CLK.at} outAt={CLK.outAt} />
               <SpinWedge r={pose.r} at={CLK.at} spinAt={CLK.spinAt} spinDur={CLK.spinDur} turns={CLK.turns} outAt={CLK.outAt} />
               <HoursClock r={pose.r} at={CLK.at} spinAt={CLK.spinAt} spinDur={CLK.spinDur} turns={CLK.turns} hourSteps={CLK.hourSteps} outAt={CLK.outAt} seed="s7clock" />
@@ -311,7 +306,9 @@ const Scene07: React.FC = () => {
       <NoticeboardCorner
         sun={sun}
         board={{
-          railLightAt: B.got,
+          // A1 fix round 2 (ENGINE rule 5, a small element leads its word): the dots pop 22.385 / 22.425 / 22.465 (film
+          // frames 22.4 / 22.433 / 22.467), the cream pill wipes 22.445 -> 22.645 and is lit on 'out' (22.665)
+          railLightAt: B.got - 0.12,
           pane1: (r) => <PaneGlass r={r} corner="tl" seed="s7pane1" />,
           pane2: (r) => <PaneGlass r={r} corner="tr" seed="s7pane2" />,
         }}
@@ -361,7 +358,9 @@ const Scene07: React.FC = () => {
     const r = S7_READERS[i];
     const head: Pt = i < 2 ? [r.head[0] + (i === 0 ? R0_DX : 0), r.head[1]] : RIGHT_HEADS[i - 2];
     const look = i === 3 ? READER3 : {hair: r.hair, hairColor: undefined, acc: r.acc};
-    const riseAt = i < 2 ? undefined : B.the - 0.06 + (i - 2) * 0.06;
+    // A1 fix round 2: reader 3 (the brown edge sliver, at screen x > 950) is present and STATIC from the cut: his rise
+    // landed under the like / comment column, where it read as nothing; reader 2's rise carries 'the' at the right
+    const riseAt = i === 2 ? B.the - 0.06 : undefined;
     const ra = RAISE[i];
     const up = ra !== undefined && t >= ra;
     return (

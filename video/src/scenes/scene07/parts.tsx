@@ -224,13 +224,17 @@ export const Pigeon: React.FC<{wire: 0 | 1 | 2; x: number; at?: number; hopAt?: 
 
 // ---------------------------------------------------------------- Pip (scale 1.2 on the board top) + the flyer gag
 
-/** entry: a flatter, longer leap in from off-frame left (hidden under the lens sheet for its first frames; <= ~60 px a
- *  frame on screen at the landing). exit (fix round 1): an arc UP and out of the right frame edge over the workshop's
- *  window box (feet never below the board top y 928, so it never crosses J4 or the round sign; Pip is fully past the
- *  frame edge, world x 989 + his 62 px tail, by local ~1.98; every step <= ~60 px a frame incl. the tilt). Fix round 3:
- *  the landing point 905 -> 760 world, so the hop RISES out of the frame: it crosses the right edge with his feet at
- *  screen y ~780 (above the like / comment rail, y 900-1500), over the workshop's upper floor, not through the rail. */
-export const PIP = {x: 705, y: 928, s: 1.2, entry: [-40, 1150] as Pt, inAir: 0.5, inH: 60, exit: [1085, 760] as Pt, offLead: 0.02, offAir: 0.32, offH: 30};
+/** entry (A1 fix round 2): the lens sheet covers the whole frame until ~22.05 and its right edge only clears the board's
+ *  right end (x ~745) on the 22.067 film frame, so a leap from the LEFT was never seen (his first visible frame was the
+ *  landing). He now drops in from off-frame RIGHT over the workshop's upper floor (the way he leaves at the tilt), a low
+ *  0.3 s arc that comes out from behind the shrinking sheet: film frames 22.067 / 22.1 / 22.133 show him airborne at
+ *  x ~806 / 757 / 707 (~50 px a frame), landing at `landLag` after pinPip (22.135, on the sheet's pin frame, 0.02 s
+ *  before 'word'); he holds the side pose through the landing squash for `holdSide` s, then turns to sit-back with a
+ *  0.1 s turn squash. exit (fix round 1): an arc UP and out of the right frame edge over the workshop's window box (feet
+ *  never below the board top y 928, so it never crosses J4 or the round sign). Fix round 3: the landing point 905 -> 760
+ *  world, so the hop RISES out of the frame: it crosses the right edge with his feet at screen y ~780 (above the like /
+ *  comment rail, y 900-1500), over the workshop's upper floor, not through the rail. */
+export const PIP = {x: 705, y: 928, s: 1.2, entry: [1150, 880] as Pt, inAir: 0.3, inH: 20, landLag: 0.03, holdSide: 0.065, exit: [1085, 760] as Pt, offLead: 0.02, offAir: 0.32, offH: 30};
 /** The flyer is flicked off this long before the word 'was' (frame 1 already moves ~30 %: out(cubic)). Fix round 2:
  *  0.08 -> 0.14 so the head shake after it got a full 0.2 s before the hop-off crouch; A1 fix round 1: 0.14 -> 0.09
  *  (ENGINE rule 5's small-element lead): the face clears on ~film frame 23.500, the shake straddles 'was' (23.545) with
@@ -246,7 +250,7 @@ const FACE: Pt = [0, -67];
 
 export const PipS07: React.FC<{B: Beats}> = ({B}) => {
   const t = useTime();
-  const land = B.pinPip;
+  const land = B.pinPip + PIP.landLag;
   const inAir = PIP.inAir;
   const offT0 = B.tilt - PIP.offLead; // hop-off take-off as the tilt starts (crouch from offT0 - 0.08)
   const entry = (tt: number) => hop({t: tt, t0: land - inAir, dur: inAir, from: {x: PIP.entry[0], y: PIP.entry[1]}, to: {x: PIP.x, y: PIP.y}, height: PIP.inH});
@@ -254,11 +258,11 @@ export const PipS07: React.FC<{B: Beats}> = ({B}) => {
   // carries on through the hop-off crouch (A1 fix round 1)
   const sh = t - (B.was - PEEL_LEAD + SHAKE.lead);
   const shake = sh > 0 && sh < SHAKE.dur ? Math.sin(sh * Math.PI * 2 * SHAKE.hz) * (1 - (0.5 * sh) / SHAKE.dur) : 0;
-  // 1) leap in from off-frame left after the sheet
+  // 1) drop in from off-frame right (behind the lens sheet until it clears), facing left
   if (t < land) {
     const h = entry(t);
-    if (!h.airborne && h.k === 0 && t < land - inAir) return null;
-    return <Elephant x={h.x} y={h.y} scale={PIP.s} pose="stand-side" amount={h.spread} squash={h.squash} rotate={h.rotate} t={t} seed={7} expression="wide" />;
+    if (!h.airborne) return null; // still off frame (no crouch drawn off-screen)
+    return <Elephant x={h.x} y={h.y} scale={PIP.s} flip pose="stand-side" amount={h.spread} squash={h.squash} rotate={h.rotate} t={t} seed={7} expression="wide" />;
   }
   // 3) hop off the board: up-right over the window box and out of the right frame edge
   if (t >= offT0 - 0.08) {
@@ -267,15 +271,18 @@ export const PipS07: React.FC<{B: Beats}> = ({B}) => {
     if (h.airborne || t >= offT0) return <Elephant x={h.x} y={h.y} scale={PIP.s} pose="stand-side" amount={h.spread} squash={h.squash} rotate={h.rotate} t={t} seed={7} expression="meh" />;
     return <Elephant x={h.x} y={h.y} scale={PIP.s} pose="sit-front" look={shake} rotate={shake * SHAKE.roll} squash={h.squash} t={t} seed={7} expression="meh" />;
   }
-  // 2) on the board top: sit-back watching the notice; on the 'out' rustle (the copy leaves pane 2, B.out) he turns to
+  // 2) on the board top: the landing in the side pose (A1 fix round 2: 2 frames of the land squash), then sit-back
+  //    watching the notice (a 0.1 s turn squash); on the 'out' rustle (the copy leaves pane 2, B.out) he turns to
   //    sit-front, so the copy lands on his FACE 0.1 s later (fix round 2: he turned on the slap, the copy hit the back of
   //    his head first); head shake after the peel
   const landSq = entry(t).squash;
+  const turnBack = land + PIP.holdSide;
+  if (t < turnBack) return <Elephant x={PIP.x} y={PIP.y} scale={PIP.s} flip pose="stand-side" squash={landSq} t={t} seed={7} expression="wide" />;
   const front = t >= B.out;
   const sw = (dt: number) => (dt > -0.1 && dt < 0.45 ? (dt < 0 ? 0.14 * prog(dt, -0.1, 0.1) : 0.14 * Math.exp(-dt * 9) * Math.cos(dt * Math.PI * 2 * 3.4)) : 0);
-  // a small turn squash on the flip (one 0.1 s dip), then the slap's squash
-  const turn = t >= B.out && t < B.out + 0.1 ? 0.06 * Math.sin(((t - B.out) / 0.1) * Math.PI) : 0;
-  const sq = landSq + sw(t - B.slap) * 1.4 + turn;
+  // a small turn squash on each flip (one 0.1 s dip), then the slap's squash
+  const turnSq = (t0: number) => (t >= t0 && t < t0 + 0.1 ? 0.06 * Math.sin(((t - t0) / 0.1) * Math.PI) : 0);
+  const sq = landSq + sw(t - B.slap) * 1.4 + turnSq(B.out) + turnSq(turnBack);
   const look = front ? shake : -0.55;
   const expr = front ? (t < B.was - PEEL_LEAD ? 'wide' : 'meh') : undefined;
   return <Elephant x={PIP.x} y={PIP.y} scale={PIP.s} pose={front ? 'sit-front' : 'sit-back'} look={look} rotate={front ? shake * SHAKE.roll : 0} expression={expr} squash={sq} t={t} seed={7} />;
@@ -633,10 +640,41 @@ export const GroundDetails: React.FC<{seed?: string}> = ({seed = 's7ground'}) =>
     [366, 1632, 9], [668, 1640, 10], [492, 1702, 8], [742, 1712, 9],
   ];
   const ticks = DASHES.map(([x, y, l], i) => dash(x, y, l, `${i}`)).join('') + COMMAS.map(([x, y, h], i) => comma(x, y, h, `${i}`)).join('');
+  // A1 fix round 2 (eye level, 'feel a little small': the pavement was a flat strip of ticks between S06's deep lane and
+  // S08's crane): four paving seams converging on a vanishing point at (480, 800) (behind the board, on the eye line),
+  // spreading wider toward the frame bottom, each a hand-ruled line broken once; and short slab joints between them,
+  // their spacing growing toward us. Static, far ink, in the set's ground layer (the pen's ground rows draw them on).
+  const VP: Pt = [480, 800];
+  const seamX = (xk: number, y: number) => VP[0] + ((xk - VP[0]) * (y - VP[1])) / (1548 - VP[1]);
+  const SEAMS = [128, 352, 604, 846];
+  let seams = '';
+  SEAMS.forEach((xk, i) => {
+    const r = rng(`${seed}/sm${i}`);
+    const yb = 1548 + r.range(70, 130); // the one break
+    const g = r.range(10, 18);
+    seams += line(seamX(xk, 1548), 1548, seamX(xk, yb), yb, {over: 0, seed: `${seed}/sa${i}`});
+    seams += line(seamX(xk, yb + g), yb + g, seamX(xk, 1930), 1930, {over: 0, seed: `${seed}/sb${i}`});
+  });
+  // slab joints: a short cross line in some of the bays, nearer = lower and further apart
+  const JOINTS: [number, number, number][] = [
+    [0, 1606, 0.55],
+    [1, 1652, 0.6],
+    [2, 1596, 0.5],
+    [1, 1790, 0.5],
+    [2, 1738, 0.62],
+  ];
+  JOINTS.forEach(([b, y, f], i) => {
+    const xa = seamX(SEAMS[b], y);
+    const xb = seamX(SEAMS[b + 1], y);
+    const w = (xb - xa) * f;
+    const x0 = xa + (xb - xa - w) * (i % 2 ? 0.2 : 0.65);
+    seams += line(x0, y, x0 + w, y + 1.5, {over: 0, seed: `${seed}/j${i}`});
+  });
   return (
     <>
       <Fill d={shadow + legs} color={palette.sand} seed={`${seed}/sh`} />
       <Fill d={strip} color={HALF.sand} offset={false} seed={`${seed}/st`} />
+      <Ink d={seams} width={SI.far} taper={false} seed={`${seed}/sm`} />
       <XG m={mat.compose(mat.translate(C.x, C.y), mat.rotate(C.rot))}>
         <Fill d={polyPath(sheet)} color={palette.white} seed={`${seed}/cf`} />
         <Ink d={poly(sheet, {closed: true, seed: `${seed}/co`, over: 1.5})} width={SI.far} taper={false} seed={`${seed}/co`} />

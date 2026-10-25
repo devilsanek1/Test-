@@ -231,13 +231,49 @@ or `{variant: 'paint-medium', seed: 'film', amount: 1}`); `--props='{"edges":"pa
 entry applied (bare only where there is drawing, keep rects never cut). Appending the scene id to the seed changes the
 edge on the cut and never within a scene.
 
-**Still to do (each scene's owner, or the core lane): add the scene's entry to `src/lib/edges/hints.ts`.** Render the
-scene clean at 1-3 frames of its shot, run `python3 review/edges/loose/final/tools/scan_hints.py <scene-id> f1.png
-f2.png`, paste the printed entry, and add hero figures, figures at the frame edges and key props to `keep` by hand.
+**Each scene's entry lives in `src/lib/edges/hints.ts`** (section 5.1: S01-S06, S11, S12 done; S07-S10 still to do).
+Render the scene clean at 5-6 frames of its shot (the first and last 0.2 s, every camera extreme), run `python3
+review/edges/loose/final/tools/scan_hints.py <scene-id> f1.png f2.png ...`, paste the printed entry, add hero figures,
+figures at the frame edges and key props to `keep` by hand, then look at Main with edges (section 5.1).
 
 Until then a scene gets the hint-less edge (`final/stills/nohints/`). It is sound: no visible-zone bites, every corner
 allowed, and a bare corner's block outline ruled in. But a figure standing at the frame edge can be trimmed by the
 paper margin, as trim's sliver would trim it.
+
+### 5.1 The film's hints (phase A2, `paint-subtle`)
+
+`paint-subtle` leaves ONE corner bare: the densest corner (`ink` + a seeded jitter) that has `ink >= 0.3` and fits
+around the keep rects; with none, the best corner with `ink >= 0.12` (its block outline ruled in); with none of those,
+a bite in the bottom's drawing (`bottom >= 0.3`, if it fits between the keep rects). It has no visible-zone bites, so
+`left` / `right` only matter from `paint-medium` up. A bare corner with `ink < 0.5` gets its block outline ruled in
+(two thin crossing strokes). Measured per scene on 6-7 clean full-res frames (first / last 0.2 s, camera extremes),
+Pip's bbox every 0.1 s, and the ink inside the bare corner's own triangle (a top corner is only 180-260 x 90-130 px at
+subtle, a bottom one 180-260 x 300-400 px: the scan's corner regions are bigger, so a building or a lamp post beside the
+corner can score high while the corner itself is flat pavement). Then checked on Main with edges, 4+ frames per scene.
+
+| scene | bare corner | ink set by hand (and why) | keep rects |
+|---|---|---|---|
+| S01 (+ S12) | top-right: the hanging leaves, the stem in the white, its block outline ruled in | `tr` 0.45 (leaves measure 0.63-0.73; under 0.5 so the outline is ruled: S01's dive swings flat sky through the corner for 4.45-4.6 s) | left onlooker (phone raised), near observer (grows in the dive), cap onlooker, the lamp at the left edge (S01: head at x 10-75), Pip on the bollard, Pip's leap out at the right edge (4.45-4.7 s) |
+| S02 | bottom-left: the board's leg and the ground lines | - | Pip (landing from S01 at the right edge, then on the board's corner), the three audience heads, the site plaque at the left edge |
+| S03 | none: flat sky at the top, the near walkers fill both bottom corners, the bottom is the flat plan (0.13: no bite) | - | both near walkers, Pip (arrival, disc) |
+| S04 | none | `br` / `bl` 0.1: the scan's 0.48 / 0.16 come from the house and the lamp post; the corner triangles hold flat pavement, and nothing in the dive (a bare corner read as a blank trapezoid) | Pip (steps -> window; interior) |
+| S05 | none: the foreground audience fills the whole bottom | - | the audience (the world runs off the bottom in colour), the team at the left edge, the messenger running in at the right, Pip at the board and on the exit, the AUG calendar at the left edge |
+| S06 | bottom-right: the shrub and the bench as line art | `bl` 0.2: under the kept cart there is only flat pavement. Measured without the white page of the last 0.15 s (paper on a white page does not show) | the messenger entering at the left edge + the cart + Pip on it (one rect) |
+| S11 | bottom-right: govC's steps | `bl` 0.25: the lamp's foot and the onlookers fill it, so it must not go bare | Pip hopping in at the left edge, Pip at govB's window, the two onlookers |
+| S12 | wears S01's painting (Film, for the loop seam), so S01's entry is the union over both shots; `EDGE_HINTS.S12` is the same object | | |
+
+Lessons:
+- **A keep rect within 110 px of a frame side runs off that side** (colour to the edge). A rect for a lamp post at the
+  left edge takes the whole left paper below it away: S11's lamp sits at x 95-180, clear of the 46-62 px paper, so it
+  gets no rect; `bl` is held down instead, so no corner can cut it.
+- **Steering by `ink`:** below 0.3 a corner never goes bare when another dense corner fits; below 0.12 it is not even
+  the fallback. Write the reason next to every hand-set value.
+- **Keep blocks meet the thin margins in a step** (the 10-24 px rail band, the bottom strip): 3.6 jogs per edge for
+  the film's entries at subtle (section 7). The film's geometry check (`check-paint.ts` with these entries and seeds
+  `film/<id>`, 3 presets x 10 seeds): 0 failures (caption block, keep rects, rail, holes, hairlines).
+- **The loop seam** is unchanged: Main 55.3333 s vs 0 s differ only in the caption band (0 px below y 600).
+- What is still half colour, half line art: S03's tree crown at the left edge (y 1010-1250, cut by the 46-62 px
+  paper, f_5.5's half-filled crown read), a 10-20 px teal sliver at the left of S06's shrub in its bare corner.
 
 ## 6. Render cost
 

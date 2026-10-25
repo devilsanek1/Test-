@@ -12,6 +12,23 @@
 
 import type {EdgeHints} from './shared';
 
+/** S01 (Government Plaza) and S12 (its rewind): Film puts S01's painting (seed + these hints) on S12 too, since S12
+ *  ends ON S01's frame 0 (the loop seam), so the keep rects are the union over both shots. Ink: the min over S01 0-4.4 s
+ *  and all of S12. tr 0.45: the hanging leaves (0.63-0.73 measured) make the top-right the bare corner; held under 0.5
+ *  so its block outline is ruled in, because S01's dive (4.45-4.6 s) swings flat sky through it. bl / br are dense but
+ *  their figures are kept, so they cannot go bare. */
+const S01_HINTS: EdgeHints = {
+  ink: {tl: 0, tr: 0.45, br: 1, bl: 0.62, left: 1, right: 0.13, bottom: 0.69},
+  keep: [
+    [0, 1380, 260, 1920], // the onlooker at the left frame edge (phone raised from 1.5 s; S12 too)
+    [360, 1380, 760, 1920], // the near observer (grows in S01's dive)
+    [910, 1700, 1080, 1920], // the cap onlooker at the bottom right
+    [732, 1232, 907, 1511], // Pip on the bollard + hop
+    [915, 750, 1080, 1040], // Pip's leap out at S01's end (4.45-4.7 s)
+    [0, 990, 100, 1470], // the lamp at the left frame edge (S01: head at x 10-75)
+  ],
+};
+
 export const EDGE_HINTS: Record<string, EdgeHints> = {
   // EdgeLab shots (src/dev/EdgeLab.tsx), measured on review/edges/loose/final/stills/clean_*.png (+ the street clip)
   'edgelab/street': {
@@ -38,4 +55,66 @@ export const EDGE_HINTS: Record<string, EdgeHints> = {
       [0, 1555, 360, 1920], // the foreground hero (bottom left)
     ],
   },
+
+  // ---- the film (Film: <FilmEdges scene={id}>, paint-subtle, seed 'film/<id>'). Measured with scan_hints.py on 6-7
+  // clean full-res frames per scene (first / last 0.2 s and the camera extremes) + Pip's bbox every 0.1 s; keep rects
+  // are the union over the scene's motion. paint-subtle leaves ONE corner bare (the densest corner that fits around the
+  // keep rects); ink < 0.3 never goes bare, < 0.12 not even as the fallback. Checked on Main renders (docs/EDGES.md 0.1).
+  // S07-S10: not yet (their scenes were still being polished).
+  S01: S01_HINTS,
+  S02: {
+    // bare corner: bottom-left (the board's leg and the ground lines run into it)
+    ink: {tl: 0, tr: 0, br: 0.9, bl: 1, left: 0.74, right: 1, bottom: 1},
+    keep: [
+      [830, 620, 1075, 905], // Pip landing from S01 at the right edge, then on the board's corner
+      [270, 1640, 790, 1920], // the three audience heads
+      [20, 860, 130, 1020], // the site plaque at the left frame edge
+    ],
+  },
+  S03: {
+    // no bare corner: the top is flat sky and the near walkers fill both bottom corners (bottom: flat plan, no bite)
+    ink: {tl: 0, tr: 0, br: 0.32, bl: 0.46, left: 0.92, right: 0.12, bottom: 0.13},
+    keep: [
+      [0, 1320, 140, 1920], // the near walker at the left frame edge
+      [940, 1310, 1080, 1920], // the near walker at the right frame edge
+      [289, 1277, 479, 1511], // Pip on the disc
+      [684, 820, 890, 1086], // Pip arriving from S02
+    ],
+  },
+  S04: {
+    // no bare corner: br / bl set by hand to 0.1 (the scan's 0.48 / 0.16 come from the house and the lamp post; the
+    // corner triangles themselves hold flat pavement, and nothing at all in the dive: a bare corner read as a blank)
+    ink: {tl: 0, tr: 0, br: 0.1, bl: 0.1, left: 1, right: 0.51, bottom: 0.02},
+    keep: [[187, 1057, 472, 1540]], // Pip (steps -> window)
+  },
+  S05: {
+    // no bare corner: the foreground audience fills the whole bottom (kept: the world runs off the bottom in colour)
+    ink: {tl: 0, tr: 0, br: 1, bl: 1, left: 1, right: 0.58, bottom: 1},
+    keep: [
+      [0, 1550, 1080, 1920], // the foreground audience
+      [0, 1350, 200, 1550], // the team at the left frame edge
+      [890, 1340, 1080, 1580], // the messenger running in at the right (last 0.3 s)
+      [935, 1065, 1080, 1265], // Pip's exit right
+      [528, 1200, 714, 1418], // Pip at the board
+      [0, 690, 90, 890], // the AUG calendar at the left frame edge
+    ],
+  },
+  S06: {
+    // bare corner: bottom-right (the shrub and the bench as line art). Measured without the white page of the last
+    // 0.15 s (paper on a white page does not show). bl 0.2 by hand: under the kept cart there is only flat pavement
+    ink: {tl: 0.3, tr: 0.26, br: 0.49, bl: 0.2, left: 1, right: 1, bottom: 0},
+    keep: [[0, 1240, 270, 1700]], // the messenger entering at the left edge, the cart, Pip on it
+  },
+  S11: {
+    // bare corner: bottom-right (govC's steps). bl 0.25 by hand: the lamp's foot and the onlookers fill it, so it
+    // must not go bare (the lamp at x 95-180 needs no keep rect otherwise: it sits clear of the paper)
+    ink: {tl: 0, tr: 0, br: 0.84, bl: 0.25, left: 1, right: 1, bottom: 1},
+    keep: [
+      [0, 1280, 135, 1470], // Pip hopping in at the left frame edge
+      [229, 1159, 441, 1539], // Pip at govB's window
+      [150, 1700, 500, 1920], // the two onlookers
+    ],
+  },
+  // Film puts S01's painting (seed + hints) on S12 for the loop seam; this entry is the same, for a lookup by id
+  S12: S01_HINTS,
 };

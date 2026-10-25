@@ -51,6 +51,10 @@ Polish-pass results (look / motion, last review; "+fix" = a final fix round ran 
   EDGE_HINTS['S08'] keep rect [0,900,470,1110] for the heap (phase A2).
 - 08:15 A1 done for S03 (8 / 8 PASS), S04 (8 / 8.5 +fix, 1 major), S05 (8 / 8.5 +fix, 1 major). Phase A2 (edge
   hints) started for the settled scenes S01-S06, S11, S12: wf_c90c1d9d-76b. S07-S10 still in A1 (wf_f6eafcb1-f45).
+- 08:40 A1 r2 reviews (look / motion): S07 8 / 8.5 (1 major each, both the paint edge, see below), S08 7 / 8.5
+  (3 majors: dome scale, flood haze ladder, heap; its fix r2 carries the PEAK-2 redesign notes), S09 8 / 8 (2 majors:
+  Pip leaps 9 frames before the tram shows; the paper edge covers the tram cue), S10 7.5 / 8.5 (2 majors: old vs
+  current sites don't read at thumbnail size; Pip's 'hey!' reads happy, not skipped). Fix r2 running for all four.
 The integration pass re-reviews every "+fix" scene and every scene under 8.
 
 
@@ -61,6 +65,11 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
 
 ## Cross-lane findings scene agents can't fix (polish pass)
 
+- OPEN (edges, phase A2 for S07-S10, 08:40): EDGE_HINTS for S07 must keep the bottom-left foreground readers
+  inked (paint-subtle leaves the left ~50 px strip and the bottom-left corner as bare paper and bleaches them, film
+  22.07-24.10). S09 needs a keep rect over the tram cue at the left edge (film 39.00-39.38: PartB.tsx TramCue's
+  headlamp half-disc centred at x=-2 is covered by the white paper edge, so the leap has no visible cause). S08: the
+  heap keep rect [0,900,470,1110]. S10: check the maker and cart at the left.
 - DONE (core, 07:50): loop-seam edge paint. The last scene of a full-colour loop wears the FIRST scene's painting
   (Film edgeId), so the paper edge no longer pops at the loop. Main f1660 vs f0: 0 px outside the caption band (24.1k
   px before, at half scale). From S12's handoff patch.
@@ -117,6 +126,11 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
   wf_c49e57be-ed9 (S11 -> S12), wf_757a8d7d-ce1 (S03, S05, S04), wf_f6eafcb1-f45 (S08, S07, S09, S10); 2 rounds each.
   Half-res preview of the whole film rendering to out/preview_0540.mp4 (killed by its 50 min timeout under load).
 - 08:20: out/preview_v1.mp4 (40 %, 432x768, 55.38 s, AAC, peak -1.3 dB) delivered to the user as a WIP snapshot.
+- 08:45: phase B wave 1 started early for the cuts between settled scenes (no agent touches S07-S10):
+  wf_47287152-c9b (S01|S02, S03|S04) and wf_975aef91-984 (S05|S06, S11|S12), script workflows/scripts/cut-continuity
+  (owner fixes both sides -> independent verifier -> one fix round + re-verify). Cross-lane requests (captions, edge
+  hints, shared props) come back in the result and are applied by the orchestrator. Still to run: wave 1 S07|S08 and
+  S09|S10 (after A1 / the S08 redesign), wave 2 (S02|S03, S04|S05, S06|S07, S08|S09, S10|S11, S12|S01).
 
 ## Sound re-lock notes (phase D)
 
