@@ -210,9 +210,9 @@ export type SitesProps = {
   wobbleAt?: number;
 };
 
-/** Face-local hang points of the support tags (100-unit face coords): tied to the top screw on the side the cart comes
- *  from... siteL's top-right, siteR's top-left, so the tag hangs over the plate's edge, clear of the A-frame sign. */
-export const TAG_HANG: Record<'L' | 'R', Pt> = {L: [44, -40], R: [-44, -40]};
+/** Face-local hang points of the support tags (100-unit face coords): tied to the top corner screw, siteL's top-right,
+ *  siteR's top-left, so the (58 px) tag hangs over the plate's edge and covers little of the emblem. */
+export const TAG_HANG: Record<'L' | 'R', Pt> = {L: [50, -50], R: [-50, -50]};
 export const PLAQUE_SIZE: Record<SiteId, number> = {L: 112, M: 120, R: 112};
 /** Fix round 2: the three plaques hang 26 px higher than the set's anchors (y 1190 -> 1164): a >= 20 px band of wall
  *  between siteL's plaque and the A-frame's top bar, and room under the plaques (bottoms 1220-1224) for the cart's sign

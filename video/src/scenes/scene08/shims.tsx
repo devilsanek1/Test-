@@ -109,8 +109,10 @@ function roughRect(w: number, h: number, seed: string): string {
 }
 
 /** An ink stamp print in a slot `box` (world rect): hidden before `at`, then the print slams from s0 x to 1 x
- *  (inCubic: it accelerates into the board) and LANDS at `land`; 2 frames of squash on the landing. */
-export const InkStamp: React.FC<{box: [number, number, number, number]; text: LabelText; fontSize: number; at: number; land: number; s0: number; rot?: number; paper?: string; border?: string; seed: string}> = ({
+ *  (inCubic: it accelerates into the board) and LANDS at `land`; 2 frames of squash on the landing. `origin` (fix round
+ *  3b) = where along the print's width (0 left .. 1 right) the slam scales about: < 0.5 keeps the oversized print off
+ *  whatever stands left of the slot (Pip). */
+export const InkStamp: React.FC<{box: [number, number, number, number]; text: LabelText; fontSize: number; at: number; land: number; s0: number; rot?: number; paper?: string; border?: string; origin?: number; seed: string}> = ({
   box,
   text,
   fontSize,
@@ -120,6 +122,7 @@ export const InkStamp: React.FC<{box: [number, number, number, number]; text: La
   rot = -4,
   paper = palette.peach,
   border = palette.sun,
+  origin = 0.5,
   seed,
 }) => {
   useCaptionFont();
@@ -134,7 +137,8 @@ export const InkStamp: React.FC<{box: [number, number, number, number]; text: La
   let sq = 1;
   if (t >= land && t < land + 0.067) sq = 0.94;
   if (t < land) k = Math.max(1, k);
-  const m = mat.compose(mat.translate(cx, cy), mat.rotate(rot), mat.scale(k * (2 - sq), k * sq), mat.translate(-w / 2, -h / 2));
+  const ox = (origin - 0.5) * w;
+  const m = mat.compose(mat.translate(cx, cy), mat.rotate(rot), mat.translate(ox, 0), mat.scale(k * (2 - sq), k * sq), mat.translate(-w / 2 - ox, -h / 2));
   const fill = roughRect(w, h, seed);
   const b1 = rect(5, 5, w - 10, h - 10, {seed: `${seed}/b1`, over: 2});
   const b2 = rect(9.5, 9.5, w - 19, h - 19, {seed: `${seed}/b2`, over: 1});

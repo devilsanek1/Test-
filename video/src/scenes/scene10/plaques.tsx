@@ -21,8 +21,11 @@ export function bracketFor(x: number, y: number, size: number, wallX: number): {
   return {x: x - (side === 'right' ? 1 : -1) * arm * 0.66, y: y - (66 * size) / 100, side, arm};
 }
 
-/** Support tag width (world px; props SupportTag: body w x 0.82 w under a 0.16 w loop). */
-export const TAG_W = 42;
+/** Support tag width (world px; props SupportTag: body w x 0.82 w under a 0.16 w loop). Fix round 3: 58 (was 42) for the
+ *  near plaques and the two lobs, so 'tick / no tick / tick' reads at thumbnail size (the far wave keeps 30). */
+export const TAG_W = 58;
+/** The flat peach backing disc behind a landed tag: radius (x tag width), pop, hold, shrink (s). */
+export const TAG_DISC = {r: 0.74, pop: 0.12, hold: 0.3, out: 0.1};
 /** Hang point -> the tag body's centre (props SupportTag geometry). */
 export const tagBodyOffset = (w: number) => w * (0.16 + 0.41);
 
@@ -34,6 +37,9 @@ const TUFT_TIE: Pt = [-50 + Math.cos((45 * Math.PI) / 180) * TUFT_R * 0.38, -50 
  *  cornice line (y -41 keeps the head >= 4 px above it). */
 const BIT_EDGE_Y = -41;
 const BIT_EDGE_X = -53;
+/** Where he hangs, stuck (fix round 3, face units): his feet 14 units left of the plate's left edge, so his idle body
+ *  (22 px, facing left, tipped 16 deg) sits on siteM's cream wall clear of the ochre plate. */
+const BIT_HANG: Pt = [-64, -35];
 
 export type HangPlaqueProps = {
   /** Face centre (world) + size (face side, world px) + the wall point of the bracket. */
@@ -109,7 +115,7 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
   // He lunges down against the strand in short bursts.
   if (p.bit && t >= p.bit.at) {
     const bs = p.bit.size / s;
-    const stuck: Pt = [BIT_EDGE_X, BIT_EDGE_Y];
+    const stuck: Pt = BIT_HANG;
     const path: Pt[] = [
       [-19, -66],
       [-21.5, -51],
@@ -131,34 +137,50 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
         if (d >= bt && d < bt + 0.32) burst = Math.max(burst, Math.sin(((d - bt) / 0.32) * Math.PI));
         if (d >= bt) last = bt;
       }
-      // a lunge down (away from the web) that the strand yanks back, a sideways WIGGLE (+-3 px world, 8 Hz) and the
-      // body rocking: a visible struggle at phone size
+      // fix round 3: between the bursts he is BIT as in every other scene (idle, legs tucked, shell highlight, eye
+      // looking forward), facing away from the web, tipped 16 deg head-down on the strand that holds him by his back,
+      // with one cream strand wrapped across his shell: visibly stuck, not the web's spider. In a burst he lunges down
+      // against the strand, wiggles, rocks, and only then SPLAYS four flailing legs.
       const lunge = 3.4 * burst * (0.5 + 0.5 * Math.sin(d * 2 * Math.PI * 6));
       const wig = (3 / s) * burst * Math.sin(d * 2 * Math.PI * 8);
-      const rock = -12 * burst * Math.sin(d * 2 * Math.PI * 7);
+      const rock = 12 * burst * Math.sin(d * 2 * Math.PI * 7);
       // between the bursts he is stuck STILL (his clock frozen at the end of the last burst): crisp beats, no idle fidget
       const still = burst <= 0 && last >= 0 ? arrive + last + 0.32 : undefined;
-      const bx = stuck[0] + Math.min(0, wig);
-      const by = stuck[1] + lunge;
-      // facing down (flip + rot -90: his underside toward the plate, +x); the shell's dome on the cream wall
-      const bitNode = <Bit x={bx} y={by} size={bs} flip state={burst > 0.2 ? 'scuttle' : 'idle'} rot={-90 + rock} look="forward" blink={false} seed={`${seed}/bit`} />;
-      // SPLAYED legs (fix round 2b): four thin legs fanned out from his underside into the gap, flailing in a burst,
-      // so the round shell + antennae + legs read as a beetle, not a speck
+      const bx = BIT_HANG[0] + wig;
+      const by = BIT_HANG[1] + lunge;
+      const rot = -16 + rock;
       const k = bs / 20;
+      const m = mat.compose(mat.translate(bx, by), mat.rotate(rot), mat.scale(-1, 1));
+      // Bit-local (facing right, feet at y 0) -> face coords
+      const ra = (rot * Math.PI) / 180;
+      const toFace = (q: Pt): Pt => {
+        const qx = -q[0];
+        return [bx + qx * Math.cos(ra) - q[1] * Math.sin(ra), by + qx * Math.sin(ra) + q[1] * Math.cos(ra)];
+      };
+      // the strand from his back (rear top of the shell) into the tuft's outer ring
+      const rear = toFace([-8 * k, -9 * k]);
+      face.push(<Ink key="strand" d={`M${rear[0].toFixed(1)} ${rear[1].toFixed(1)}L${TUFT_TIE[0].toFixed(1)} ${TUFT_TIE[1].toFixed(1)}`} width={1.5 / s} color={palette.cream} taper={false} vary={0} seed={`${seed}/strand`} />);
+      const bitNode = <Bit x={0} y={0} size={bs} state={burst > 0.2 ? 'scuttle' : 'idle'} look="forward" blink={false} seed={`${seed}/bit`} />;
       let legsD = '';
-      [[-5, -38], [-1.5, -12], [2, 14], [5.5, 40]].forEach(([along, ang], i) => {
-        const a = ((ang + (burst > 0 ? 18 * Math.sin(d * 2 * Math.PI * 9 + i * 1.7) : 0)) * Math.PI) / 180;
-        const r0: Pt = [bx + 0.4 * k, by + along * k];
-        const len = 6.5 * k;
-        const mid: Pt = [r0[0] + Math.cos(a) * len * 0.55, r0[1] + Math.sin(a) * len * 0.55];
-        const tip: Pt = [mid[0] + Math.cos(a + (ang < 0 ? -0.5 : 0.5)) * len * 0.55, mid[1] + Math.sin(a + (ang < 0 ? -0.5 : 0.5)) * len * 0.55];
-        legsD += `M${r0[0].toFixed(2)} ${r0[1].toFixed(2)}L${mid[0].toFixed(2)} ${mid[1].toFixed(2)}L${tip[0].toFixed(2)} ${tip[1].toFixed(2)}`;
-      });
-      // the one strand: from his back end (up, at his rear) into the tuft's outer ring (taut in a lunge)
-      const leg: Pt = [bx - 1.5, by - bs * 0.42];
-      face.push(<Ink key="strand" d={`M${leg[0].toFixed(1)} ${leg[1].toFixed(1)}L${TUFT_TIE[0].toFixed(1)} ${TUFT_TIE[1].toFixed(1)}`} width={1.5 / s} color={palette.cream} taper={false} vary={0} seed={`${seed}/strand`} />);
-      face.push(<Ink key="bitlegs" d={legsD} width={1.3 / s} taper={false} vary={0} seed={`${seed}/bitlegs`} />);
-      face.push(still !== undefined ? <TimeShift key="bit" by={t - still}>{bitNode}</TimeShift> : <React.Fragment key="bit">{bitNode}</React.Fragment>);
+      if (burst > 0.05) {
+        [[-5, -38], [-1.5, -12], [2, 14], [5.5, 40]].forEach(([along, ang], i) => {
+          const a = ((90 + ang + 18 * Math.sin(d * 2 * Math.PI * 9 + i * 1.7)) * Math.PI) / 180;
+          const r0: Pt = [along * k, -0.8 * k];
+          const len = 6.5 * k * Math.min(1, burst * 1.6);
+          const bend = ang < 0 ? -0.5 : 0.5;
+          const mid: Pt = [r0[0] + Math.cos(a) * len * 0.55, r0[1] + Math.sin(a) * len * 0.55];
+          const tip: Pt = [mid[0] + Math.cos(a + bend) * len * 0.55, mid[1] + Math.sin(a + bend) * len * 0.55];
+          legsD += `M${r0[0].toFixed(2)} ${r0[1].toFixed(2)}L${mid[0].toFixed(2)} ${mid[1].toFixed(2)}L${tip[0].toFixed(2)} ${tip[1].toFixed(2)}`;
+        });
+      }
+      face.push(
+        <XG key="bit" m={m}>
+          {legsD ? <Ink d={legsD} width={1.3 / s} taper={false} vary={0} seed={`${seed}/bitlegs`} /> : null}
+          {still !== undefined ? <TimeShift by={t - still}>{bitNode}</TimeShift> : bitNode}
+          {/* one cream strand wrapped across his shell */}
+          <Ink d={`M${(-9 * k).toFixed(2)} ${(-2.4 * k).toFixed(2)}Q${(-2.5 * k).toFixed(2)} ${(-14.5 * k).toFixed(2)} ${(6.2 * k).toFixed(2)} ${(-8.6 * k).toFixed(2)}`} width={1.6 / s} color={palette.cream} taper={false} vary={0} seed={`${seed}/wrap`} />
+        </XG>,
+      );
     }
   }
   // the flip shakes a puff of dust off the plate (specks fly out and shrink away: no fade)
@@ -205,8 +227,17 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
         if (q >= 0 && q < 1) rings.push(<circle key={`rg${i}`} cx={hx} cy={hy + tagBodyOffset(tw)} r={tw * (0.62 + 0.5 * qs)} fill="none" stroke={palette.ink} strokeWidth={(3.2 / s) * (1 - qs)} />);
       }
     }
+    // the flat peach backing disc (fix round 3): pops with a 7 % overshoot on the landing, holds 0.3 s behind the tick,
+    // then shrinks away (no fade)
+    const da = p.tag.at;
+    let dk = 0;
+    if (t < da + TAG_DISC.pop) dk = popK(t, da, 0.07, TAG_DISC.pop);
+    else if (t < da + TAG_DISC.pop + TAG_DISC.hold) dk = 1;
+    else dk = 1 - E.inCubic(prog(t, da + TAG_DISC.pop + TAG_DISC.hold, TAG_DISC.out));
+    const disc = dk > 0.01 ? <circle cx={hx} cy={hy + tagBodyOffset(tw)} r={tw * TAG_DISC.r * dk} fill={palette.peach} /> : null;
     tag = (
       <>
+        {disc}
         {rings}
         <SupportTag x={hx} y={hy} size={tw} at={p.tag.at} checkAt={p.tag.tickAt} seed={`${seed}/tag`} />
       </>

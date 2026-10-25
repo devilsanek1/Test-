@@ -43,15 +43,17 @@ export const ABS = {
   pieSolid: W.sites - 0.3, // the pie settles (cream shrinks, spoke retracts); a second-row window lights
   walker: W.sites, // the walker heads up the street gap; Pip looks up at siteM's plaque
   walkerOut: W.old, // ... and has turned off behind siteR's wall (the gap is clear before the cart steps out)
-  flipM: W.run - 0.05, // siteM's plaque paper-flips to the OLD version
-  bitIn: W.run + 0.22, // Bit drops onto the old plaque's chain and crawls to its corner
-  flip2: W.versions, // five second-row plaques flip old (alternating, 0.04 s apart) + dust puffs
+  flipM: W.run - 0.15, // siteM's plaque paper-flips to the OLD version (fix round 3: the 0.2 s flip swaps its face at
+  //   -0.05 and settles at +0.05: complete ON 'run', rule 5; was -0.05, settling 0.135 s after the word)
+  bitIn: W.run + 0.12, // Bit drops onto the old plaque's chain and crawls to its corner (= flipM + 0.27, as before)
+  flip2: W.versions - 0.1, // five second-row plaques flip old (alternating, 0.04 s apart) + dust puffs (fix round 3: -0.10,
+  //   the wave's faces swap from -0.05 and land inside 'versions')
   cobweb: W.so - 0.1, // a cobweb draws across the old plaque's corner (rule-5 lead: it reads ON 'so'): Bit is caught in it
   dust: W.so + 0.02, // dust specks pop under the old plaque
   cane: W.old, // the old emblem leans on a tiny cane
-  cartPark: W.not - 0.29, // the maker + cart walk out from behind the A-frame (moving from 42.86, the bed's nose visible from
-  //   ~42.96, the maker from ~43.3) and brake into the park spot on the open pavement 0.13 s before his first arm rises
-  //   (sign 'fixed!' on its post): the park and the throw are separate beats
+  cartPark: W.not - 0.27, // the maker + cart walk out from behind the A-frame (fix round 3: hidden until the cobweb / Bit
+  //   beat is over: the bed's nose shows from ~43.09, the maker from ~43.3; 16.5 px / frame on screen) and brake into the
+  //   park spot on the open pavement 0.11 s before his first arm rises: the park and the throw are separate beats
   droop: W.theyre, // the old emblem's ear droops (it sags further on its cane); a dust speck drifts down
   not: W.not, // Bit struggles in the web; the maker reaches into the satchel
   lookCart: W.theyre + 0.1, // Pip turns to the parked cart

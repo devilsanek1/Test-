@@ -22,16 +22,29 @@ const latest = (ts: number[], t: number): number | undefined => {
 
 // ---------------------------------------------------------------- paper specks (the copies landing in the streets)
 
+/** The copies landing in the far streets (fix round 3b: 10-16 px sheets that TUMBLE down 22 px over 0.3 s, flipping
+ *  between a face-on and an edge-on step every 2 frames, then lie flat: an event the detector can see). */
 export const PaperSpecks: React.FC<{spots: {x: number; y: number; at: number; s?: number}[]}> = ({spots}) => {
   const t = useTime();
   let d = '';
   for (const p of spots) {
     if (t < p.at) continue;
-    const s = (p.s ?? 6) * (t < p.at + 0.067 ? 1.3 : 1);
-    d += `M${(p.x - s / 2).toFixed(1)} ${(p.y - s * 0.6).toFixed(1)}h${s.toFixed(1)}v${(s * 0.75).toFixed(1)}h${(-s).toFixed(1)}Z`;
+    const s = p.s ?? 10;
+    const q = Math.min(1, (t - p.at) / 0.3);
+    const y = p.y - 22 * (1 - E.inQuad(q));
+    const flat = q >= 1;
+    const step = Math.floor((t - p.at) / 0.067) % 3;
+    const w = flat ? s : step === 1 ? s * 0.3 : s * (step === 0 ? 1 : 0.75);
+    const hh = flat ? s * 0.4 : s * 0.75;
+    const rot = flat ? 0 : (step - 1) * 0.35;
+    const cx = p.x + (flat ? 0 : Math.sin((t - p.at) * 14) * 4);
+    const c = Math.cos(rot);
+    const sn = Math.sin(rot);
+    const pt = (u: number, v: number) => `${(cx + u * c - v * sn).toFixed(1)} ${(y + u * sn + v * c).toFixed(1)}`;
+    d += `M${pt(-w / 2, -hh)}L${pt(w / 2, -hh)}L${pt(w / 2, 0)}L${pt(-w / 2, 0)}Z`;
   }
   if (!d) return null;
-  return <path d={d} fill={palette.white} stroke={palette.ink} strokeWidth={0.9} />;
+  return <path d={d} fill={palette.white} stroke={palette.ink} strokeWidth={1.1} strokeLinejoin="round" />;
 };
 
 // ---------------------------------------------------------------- the leaked copies on the wires
@@ -89,9 +102,16 @@ export const WireCopy: React.FC<CopySpec & {children?: React.ReactNode}> = (c) =
   const [px, py] = copyPeg(c, c.unpegAt);
   const x = px - 80 * dt - Math.sin(dt * 9) * 12;
   const y = py + HANG + 120 * E.inQuad(q) + 30 * q;
-  const k = s * (1 - 0.86 * E.outQuad(q));
-  const rot = copyLean(c, c.unpegAt) + Math.sin(dt * 11 + rand(c.seed, 'r') * 6) * 28 * (0.4 + q);
-  return <LeakSheet x={x} y={y} scale={k} rot={rot} pin={false} depth="far" seed={c.seed} />;
+  const k = s * (1 - 0.8 * E.inOutSine(q));
+  // fix round 3b: a bigger paper TUMBLE (it reads as an event at 0.9-1.1 s): +-60 deg swings and an edge-on flip (the
+  // sheet narrows to a third every ~0.2 s: it turns over as it falls)
+  const rot = copyLean(c, c.unpegAt) + Math.sin(dt * 11 + rand(c.seed, 'r') * 6) * 60 * (0.4 + q);
+  const flip = 0.3 + 0.7 * Math.abs(Math.cos(dt * 8 + rand(c.seed, 'f') * 3));
+  return (
+    <XG m={mat.about(mat.scale(flip, 1), x, y)}>
+      <LeakSheet x={x} y={y} scale={k} rot={rot} pin={false} depth="far" seed={c.seed} />
+    </XG>
+  );
 };
 
 // ---------------------------------------------------------------- pigeons on the chimney

@@ -2,9 +2,10 @@
 // The dome district moved left of the board, so the set's v3 tower (fixed at x 600-650, on the board's top edge) is
 // switched off (towerAt far in the future, no searchAt) and the scene draws its own tower INSIDE the glass by the right
 // flank: an INK-DARK silhouette (lattice + cabin) against the peach band with a one-sided peach rim (sun side), no guard.
-// The light: a wide flat CREAM cone (half 15 deg) at a FIXED ~0.7 translucency (static light shaft: no fades), both edges
-// inked (upper solid, lower dashed), switching on in 2 frames with a 3-frame lamp flash, a flat cream lit spot where it
-// lands (on the glass, or on the crowd at the dome's foot: BeamSpot); one step quieter on 'day'.
+// The light (fix round 3b, the playbook's light-shaft recipe): a CORE cone (half 7 deg) of cream at a fixed 0.85 inside
+// one stepped HALO (half 13 deg: ~1.8x the core) of cream at a fixed 0.4 (static translucency: a light shaft; no fades,
+// no opacity change all scene), both halo edges thin SOLID ink, switching on in 2 frames with a 3-frame lamp flash, a
+// flat cream lit spot where it lands (on the glass, or a lit POOL on the crowd at the dome's foot: BeamSpot).
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {ease as E, prog, useTime} from '../../lib/time';
@@ -121,11 +122,11 @@ export const beamHit = (deg: number): {p: Pt; foot: boolean} => {
   return {p: e, foot: e[1] >= DOME8.by - 0.5};
 };
 
-/** The searchlight cone (pointing LEFT across the dome; angle = degrees BELOW the horizontal). Fix round 3: half 15 deg,
- *  flat cream at a fixed 0.7 (0.5 after `duskAt`), both edges inked (upper solid, lower dashed), full length in 2
- *  frames (0.07 s) with a 3-frame lamp flash, a flat cream lit spot where the centre line meets the glass. Clip it to
- *  the dome interior in the scene. */
-export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; duskAt?: number; half?: number}> = ({at, angle, duskAt, half = 15}) => {
+/** The searchlight (pointing LEFT across the dome; angle = degrees BELOW the horizontal). Fix round 3b: a cream CORE
+ *  (half `core` deg, fixed 0.85) inside a stepped HALO (half `half` deg, fixed 0.4), both halo edges thin solid ink, full
+ *  length in 2 frames (0.07 s) with a 3-frame lamp flash, a flat cream lit spot where the centre line meets the glass.
+ *  Constant translucency all scene (the old 0.7 -> 0.5 step on 'day' is gone). Clip it to the dome interior. */
+export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; half?: number; core?: number}> = ({at, angle, half = 13, core = 7}) => {
   const t = useTime();
   const look = useLook();
   if (t < at || look.fills !== 'color') return null;
@@ -137,34 +138,34 @@ export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; d
     const s = rayToGlass(o, deg) * grow;
     return [o[0] - Math.cos(r) * s, o[1] + Math.sin(r) * s];
   };
+  const fan = (hw: number) => poly([o, end(a - hw), end(a - hw * 0.5), end(a), end(a + hw * 0.5), end(a + hw)]);
   const up = end(a - half);
-  const mid = end(a);
   const lo = end(a + half);
-  const q1 = end(a - half * 0.5);
-  const q2 = end(a + half * 0.5);
-  const dusk = duskAt !== undefined && t >= duskAt;
+  const mid = end(a);
   const flash = t < at + 0.1;
   const hit = beamHit(a);
   const tan = (a * Math.PI) / 180;
   return (
     <>
-      <path d={poly([o, up, q1, mid, q2, lo])} fill={palette.cream} opacity={dusk ? 0.5 : 0.7} />
-      {grow >= 0.999 && !hit.foot ? <ellipse cx={mid[0]} cy={mid[1]} rx={13} ry={7} transform={`rotate(${((-tan * 180) / Math.PI + 90).toFixed(1)} ${mid[0].toFixed(1)} ${mid[1].toFixed(1)})`} fill={palette.cream} /> : null}
-      <path d={`M${o[0]} ${o[1]}L${up[0].toFixed(1)} ${up[1].toFixed(1)}`} fill="none" stroke={palette.ink} strokeWidth={2} strokeLinecap="round" />
-      <path d={`M${o[0]} ${o[1]}L${lo[0].toFixed(1)} ${lo[1].toFixed(1)}`} fill="none" stroke={palette.ink} strokeWidth={1.6} strokeLinecap="round" strokeDasharray="9 7" />
+      <path d={fan(half)} fill={palette.cream} opacity={0.4} />
+      <path d={fan(core)} fill={palette.cream} opacity={0.85} />
+      {grow >= 0.999 && !hit.foot ? <ellipse cx={mid[0]} cy={mid[1]} rx={14} ry={7} transform={`rotate(${((-tan * 180) / Math.PI + 90).toFixed(1)} ${mid[0].toFixed(1)} ${mid[1].toFixed(1)})`} fill={palette.cream} /> : null}
+      <path d={`M${o[0]} ${o[1]}L${up[0].toFixed(1)} ${up[1].toFixed(1)}M${o[0]} ${o[1]}L${lo[0].toFixed(1)} ${lo[1].toFixed(1)}`} fill="none" stroke={palette.ink} strokeWidth={1.6} strokeLinecap="round" />
       {flash ? <circle cx={o[0] - 3} cy={o[1]} r={11} fill={palette.cream} stroke={palette.ink} strokeWidth={1.6} /> : <circle cx={o[0] - 3} cy={o[1]} r={3.6} fill={palette.cream} />}
     </>
   );
 };
 
-/** The lit spot on the crowd in front of the dome's foot while the beam points down past the foot line: a flat cream
- *  pool (drawn under the pile's figures). */
-export const BeamSpot: React.FC<{at: number; angle: (t: number) => number; until?: number}> = ({at, angle, until}) => {
+/** The lit POOL on the crowd in front of the dome's foot while the beam points down past the foot line: a flat cream
+ *  ellipse (drawn under the pile's figures; fix round 3b: 2x the core's width, popping 1.25x for 2 frames at `popAt`,
+ *  the beam landing on 'hacking'). */
+export const BeamSpot: React.FC<{at: number; angle: (t: number) => number; until?: number; popAt?: number}> = ({at, angle, until, popAt}) => {
   const t = useTime();
   const look = useLook();
   if (t < at + 0.07 || (until !== undefined && t >= until) || look.fills !== 'color') return null;
   const hit = beamHit(angle(t));
   if (!hit.foot) return null;
+  const k = popAt !== undefined && t >= popAt && t < popAt + 0.067 ? 1.25 : 1;
   // on the foot where the beam meets it (over the plinth and the glass's bottom), the caught heads in front of it
-  return <ellipse cx={hit.p[0]} cy={DOME8.by - 3} rx={32} ry={10} fill={palette.cream} />;
+  return <ellipse cx={hit.p[0]} cy={DOME8.by - 2} rx={46 * k} ry={13 * k} fill={palette.cream} />;
 };

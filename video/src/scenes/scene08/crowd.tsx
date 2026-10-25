@@ -408,57 +408,61 @@ export function clumpBand(
   return out;
 }
 
-/** A band of busts: `ranks` rows (back rank higher and smaller), shoulder to shoulder with a 2-4 px gap over x0..x1,
- *  base at yBase (+- jy); pop times = at + (the figure's share of span) in `order` (rand | ltr | out-from x). Fill
- *  alternates ink / tealDark per figure; `arms` raised arms per rank. `skip` drops figures (inside the dome, behind the
- *  board ...). */
-export function crowdBand(
+/** Skip helper: outside-the-dome only (a figure's head inside the glass is dropped). */
+export const outsideDome = (x: number, y: number, h: number) => inDome(x, y - h * 0.4) || inDome(x - h * 0.33, y - h * 0.5) || inDome(x + h * 0.33, y - h * 0.5) || inDome(x, y - h);
+
+/** Fix round 3b: a packed ROOFTOP crowd on row `ri` (roofs.ts: the set's own buildings) over x0..x1: `ranks` ranks per
+ *  roof (rank 0 = the front, its base on the roof edge; every further rank 0.3 h higher, 8 % smaller and half a
+ *  shoulder across), shoulder to shoulder in clumps of `clump` with 1-5 px gaps, a seeded share of roofs left empty
+ *  (`empty`), every `arms`-th figure with a raised arm. Rank r pops at at[r] (one frame per rank: the burst), or at
+ *  at[r] + the figure's share of `span` in `order`; `rankFrom` skips the front ranks (a later wave adds the back rank).
+ *  `skip` drops figures (behind the board, inside the dome). */
+export function roofBand(
   seed: string,
+  ri: number,
   x0: number,
   x1: number,
-  yBase: number,
-  h0: number,
-  h1: number,
-  ranks: number,
-  at: number,
-  span: number,
-  o: {jy?: number; gap?: number; order?: 'rand' | 'ltr' | {from: number}; skip?: (x: number, y: number, h: number) => boolean; rank0?: number; arms?: number; hoods?: number} = {},
+  h: [number, number],
+  at: number[],
+  o: {ranks?: number; rankFrom?: number; clump?: [number, number]; empty?: number; arms?: number; skip?: (x: number, y: number, h: number) => boolean; span?: number; order?: 'ltr' | {from: number}; rank0?: number; dy?: number} = {},
 ): CrowdFig[] {
   const out: CrowdFig[] = [];
-  for (let r = ranks - 1; r >= 0; r--) {
-    const hm = lerp(h0, h1, 0.5) * (1 - r * 0.1);
-    let x = x0 + rand(seed, `s${r}`) * hm * 0.4 + (r % 2 ? hm * 0.33 : 0);
-    let i = 0;
-    const row: CrowdFig[] = [];
-    while (x < x1) {
-      const h = lerp(h0, h1, rand(seed, `h${r}/${i}`)) * (1 - r * 0.1);
-      const y = yBase - r * hm * 0.45 + (rand(seed, `y${r}/${i}`) - 0.5) * 2 * (o.jy ?? 1.5);
-      const gapHere = o.gap !== undefined && rand(seed, `g${r}/${Math.floor(i / 5)}`) < o.gap;
-      if (!gapHere && !(o.skip && o.skip(x, y, h))) {
-        const ord = o.order ?? 'rand';
-        const u = ord === 'ltr' ? (x - x0) / (x1 - x0) : ord === 'rand' ? rand(seed, `a${r}/${i}`) : Math.min(1, Math.abs(x - ord.from) / 700);
-        row.push({x, y, h, at: at + u * span, rank: (o.rank0 ?? 0) + (ranks - 1 - r), fill: (i % 2) as 0 | 1, hood: rand(seed, `hd${r}/${i}`) < (o.hoods ?? 0.6)});
+  const ranks = o.ranks ?? 2;
+  const [c0, c1] = o.clump ?? [3, 8];
+  for (const b of ROOFS[ri]) {
+    if (b.x + b.w < x0 || b.x > x1) continue;
+    if (rand(seed, `e${Math.round(b.x)}`) < (o.empty ?? 0.1)) continue;
+    for (let r = ranks - 1; r >= (o.rankFrom ?? 0); r--) {
+      const hm = lerp(h[0], h[1], 0.5) * (1 - 0.08 * r);
+      let x = b.x + 1 + (r % 2 ? hm * 0.33 : 0) + rand(seed, `s${Math.round(b.x)}/${r}`) * hm * 0.3;
+      let i = 0;
+      let n = c0 + Math.floor(rand(seed, `n${Math.round(b.x)}/${r}/0`) * (c1 - c0 + 1));
+      while (x < b.x + b.w - 1 && x < x1) {
+        const k = `${Math.round(b.x)}/${r}/${i}`;
+        const hh = lerp(h[0], h[1], rand(seed, `h${k}`)) * (1 - 0.08 * r);
+        const y = b.top + (o.dy ?? 0.5) - r * 0.3 * hm + (rand(seed, `y${k}`) - 0.5) * (r ? 0.24 * hm : 1.2);
+        if (x >= x0 && !(o.skip && o.skip(x, y, hh))) {
+          const ord = o.order;
+          const u = !ord ? 0 : ord === 'ltr' ? (x - x0) / (x1 - x0) : Math.min(1, Math.abs(x - ord.from) / 700);
+          const arm = o.arms && rand(seed, `ar${k}`) < 1 / o.arms ? ((rand(seed, `as${k}`) < 0.5 ? -1 : 1) as -1 | 1) : undefined;
+          out.push({x, y, h: hh, at: (at[r] ?? at[at.length - 1]) + u * (o.span ?? 0), rank: (o.rank0 ?? 0) + (ranks - 1 - r), fill: ((i + r) % 2) as 0 | 1, hood: rand(seed, `hd${k}`) < 0.65, arm});
+        }
+        x += hh * 0.62 + 0.4 + rand(seed, `p${k}`) * 1.2;
+        i++;
+        if (--n <= 0) {
+          x += 1 + rand(seed, `g${k}`) * 4;
+          n = c0 + Math.floor(rand(seed, `n${k}`) * (c1 - c0 + 1));
+        }
       }
-      x += h * 0.66 + 2 + rand(seed, `p${r}/${i}`) * 2;
-      i++;
     }
-    // one or two raised arms per rank (seeded picks, spread out)
-    const na = Math.min(row.length, o.arms ?? 2);
-    for (let a = 0; a < na; a++) {
-      const j = Math.floor(((a + 0.3 + rand(seed, `ar${r}/${a}`) * 0.4) / na) * row.length);
-      if (row[j]) row[j].arm = rand(seed, `as${r}/${a}`) < 0.5 ? -1 : 1;
-    }
-    out.push(...row);
   }
   return out;
 }
 
-/** Skip helper: outside-the-dome only (a figure's head inside the glass is dropped). */
-export const outsideDome = (x: number, y: number, h: number) => inDome(x, y - h * 0.4) || inDome(x - h * 0.33, y - h * 0.5) || inDome(x + h * 0.33, y - h * 0.5) || inDome(x, y - h);
-
 /** The flood: per rank the ink bodies, the tealDark bodies, the raised arms and the cream rims (sun side), back ranks
- *  first. Pops 1.25x for 2 frames; after `flickerAt` a seeded third of the crowd bobs 1-2 px in 0.1 s steps (it
- *  seethes), the raised arms pump. */
+ *  first. Pops 1.3x for 2 frames; drifting figures walk toward the dome (a 1-step bob every 0.2 s); after `flickerAt`
+ *  a seeded third of the crowd bobs 1-2 px in 0.1 s steps (it seethes), the raised arms pump. Figures under 12 px use
+ *  bustLite + a stroked rim (fix round 3b: ~1500 figures). */
 export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string}> = ({figs, flickerAt, seed}) => {
   const t = useTime();
   const look = useLook();
@@ -467,25 +471,33 @@ export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string
   const b0: string[] = [];
   const b1: string[] = [];
   const rims: string[] = [];
+  const rimL: string[] = [];
+  const rimW: number[] = [];
   const arms: string[] = [];
   const aw: number[] = [];
   figs.forEach((f, i) => {
     if (t < f.at) return;
-    const k = t < f.at + 0.067 ? 1.25 : 1;
+    const k = t < f.at + 0.067 ? 1.3 : 1;
     const h = f.h * k;
     // drifting figures WALK (a 1-step bob every 0.2 s, phase per figure); after `flickerAt` a third of the rest bob too
     const walk = f.vx ? (Math.floor((t - f.at) / 0.2 + rand(seed, `w${i}`) * 2) % 2 ? -Math.max(0.6, h * 0.05) : 0) : 0;
     const bob = walk || (step >= 0 && rand(seed, `f${i}`) < 0.35 && (step + i) % 2 === 0 ? -Math.max(1, h * 0.06) : 0);
     const y = f.y + bob;
     const fx = f.vx ? f.x + f.vx * (t - f.at) : f.x;
-    const d = bust(fx, y, h, f.hood, f.vx ? (Math.sign(f.vx) as 1 | -1) : rand(seed, `l${i}`) < 0.5 ? -1 : 1);
+    const lean = f.vx ? (Math.sign(f.vx) as 1 | -1) : rand(seed, `l${i}`) < 0.5 ? -1 : 1;
+    const lite = f.h < 12;
+    const d = lite ? bustLite(fx, y, h, f.hood, lean) : bust(fx, y, h, f.hood, lean);
     if (f.fill) b1[f.rank] = (b1[f.rank] ?? '') + d;
     else b0[f.rank] = (b0[f.rank] ?? '') + d;
-    rims[f.rank] = (rims[f.rank] ?? '') + bustRim(fx, y, h, fx < SUN_X ? 1 : -1, Math.max(1.1, h * 0.09), f.hood);
+    const s = fx < SUN_X ? 1 : -1;
+    if (lite) {
+      rimL[f.rank] = (rimL[f.rank] ?? '') + bustLiteRim(fx, y, h, s);
+      rimW[f.rank] = Math.max(0.9, f.h * 0.09);
+    } else rims[f.rank] = (rims[f.rank] ?? '') + bustRim(fx, y, h, s, Math.max(1.1, h * 0.09), f.hood);
     if (f.arm) {
       const pump = Math.floor((t - f.at) / 0.2 + rand(seed, `ap${i}`) * 2) % 2;
       arms[f.rank] = (arms[f.rank] ?? '') + armUp(fx, y, h, f.arm, pump ? 0.75 : 1).d;
-      aw[f.rank] = Math.max(1.2, h * 0.12);
+      aw[f.rank] = Math.max(1.2, f.h * 0.12);
     }
   });
   const out: React.ReactNode[] = [];
@@ -495,6 +507,7 @@ export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string
     if (b0[r]) out.push(<path key={`b${r}`} d={b0[r]} fill={palette.ink} />);
     if (b1[r]) out.push(<path key={`c${r}`} d={b1[r]} fill={palette.tealDark} />);
     if (rims[r]) out.push(<path key={`r${r}`} d={rims[r]} fill={palette.cream} />);
+    if (rimL[r]) out.push(<path key={`q${r}`} d={rimL[r]} stroke={palette.cream} strokeWidth={rimW[r]} strokeLinecap="round" fill="none" />);
   }
   return out.length ? <>{out}</> : null;
 };
@@ -503,9 +516,11 @@ export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string
 
 export type NearFig = {x: number; y: number; h: number; at: number; fill: 0 | 1; hood: boolean; arm?: -1 | 1; seed: string};
 
-/** Big busts (90-120 px) pushing in behind our coping (their lower half hidden by it): spring pop, ink outline 2.4,
- *  a cream rim on the sun side, a raised fist that pumps; they sway 1-2 px. */
-export const NearCrowd: React.FC<{figs: NearFig[]}> = ({figs}) => {
+/** Big busts (90-112 px) RISING from behind our coping on 'millions' (fix round 3b: in the fg layer, clipped above the
+ *  coping by the scene, so they rise ON the word at the push framing instead of being revealed by the pull-back's
+ *  parallax): each rises its own height + 10 px in 0.2 s out(expo), ink outline 2.4, a cream rim on the sun side, a
+ *  raised fist that pumps; they sway 1-2 px. */
+export const NearCrowd: React.FC<{figs: NearFig[]; rise?: number}> = ({figs, rise = 0.2}) => {
   const t = useTime();
   const look = useLook();
   const color = look.fills === 'color';
@@ -513,18 +528,19 @@ export const NearCrowd: React.FC<{figs: NearFig[]}> = ({figs}) => {
     <>
       {figs.map((f) => {
         if (t < f.at) return null;
-        const k = springAt(t, f.at, springs.pop);
+        const up = E.outExpo(prog(t, f.at, rise));
         const sway = Math.sin(t * 2.1 + rand(f.seed, 'ph') * 6) * 1.5;
         const x = f.x + sway;
         const h = f.h;
+        const y = f.y + (1 - up) * (h + 10);
         const s = x < SUN_X ? 1 : -1;
-        const d = bust(x, f.y, h, f.hood, s);
-        const arm = f.arm ? armUp(x, f.y, h, f.arm, Math.floor((t - f.at) / 0.22) % 2 ? 0.7 : 1) : undefined;
+        const d = bust(x, y, h, f.hood, s);
+        const arm = f.arm ? armUp(x, y, h, f.arm, Math.floor((t - f.at) / 0.22) % 2 ? 0.7 : 1) : undefined;
         return (
-          <g key={f.seed} transform={k < 1 ? `translate(${f1(x)} ${f1(f.y)}) scale(${k.toFixed(3)}) translate(${f1(-x)} ${f1(-f.y)})` : undefined}>
+          <g key={f.seed}>
             {arm ? <path d={arm.d} stroke={palette.ink} strokeWidth={h * 0.11} strokeLinecap="round" strokeLinejoin="round" fill="none" /> : null}
             <path d={d} fill={color ? (f.fill ? palette.tealDark : palette.ink) : palette.white} stroke={palette.ink} strokeWidth={2.4} strokeLinejoin="round" />
-            {color ? <path d={bustRim(x, f.y, h, s, Math.max(2.4, h * 0.05), f.hood)} fill={palette.cream} /> : null}
+            {color ? <path d={bustRim(x, y, h, s, Math.max(2.4, h * 0.05), f.hood)} fill={palette.cream} /> : null}
           </g>
         );
       })}

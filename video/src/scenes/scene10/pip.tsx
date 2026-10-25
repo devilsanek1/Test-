@@ -45,11 +45,11 @@ export const LEAP_DUR = CROUCH + ARC;
 const OUT_DUR = 0.3;
 /** The take-off (fix round 2b): a DOWNWARD push off the roof (+700 px/s, no upward kick, so he never hangs in the sky
  *  at the frame edge after the tram has gone), then constant gravity g = 2 (dy - VY0 ARC) / ARC^2 (~1,770 px/s^2): he
- *  lands at ~62 px / frame (was 75-93 with the kick and g ~4,950), consecutive silhouettes overlapping. x keeps S09's
- *  roof velocity through the crouch (decaying over TAU_V: he never steps back left), and the push-off gives him a
- *  constant leftward speed (ballistic: x linear in the air), so he leaves the edge at once. */
+ *  lands at ~62 px / frame (was 75-93 with the kick and g ~4,950), consecutive silhouettes overlapping. */
 const VY0 = 700;
-const TAU_V = 0.08;
+/** Fix round 3: the tram's inherited velocity decays in ONE frame (was 0.08 s), and x runs linearly toward the perch
+ *  from the first frame of the crouch (~-490 px/s): he leaves the right edge at once instead of drifting right first. */
+const TAU_V = 1 / 30;
 
 /** Where his trunk tip is in the mirrored trunk-up pose (world): the 'hey' spark radiates from here at the plaque. */
 const HEY_TIP: Pt = [662, 1306];
@@ -89,7 +89,8 @@ export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
     const [x0, y0] = T.leapFrom;
     const vx0 = T.leapV ?? 0;
     const k = Math.max(0, (tau - CROUCH) / ARC);
-    const x = x0 + vx0 * tau * Math.exp(-tau / TAU_V) + (px - x0) * k;
+    const kx = tau / (CROUCH + ARC);
+    const x = x0 + vx0 * TAU_V * (1 - Math.exp(-tau / TAU_V)) + (px - x0 - vx0 * TAU_V) * kx;
     if (tau < CROUCH) {
       return <Elephant x={x} y={y0} scale={s0} pose="stand-side" flip amount={0.15} squash={0.24} rotate={4} t={t} seed={PIP.seed} />;
     }

@@ -118,6 +118,8 @@ export const CELLS = ROWS.slice(0, HAZE).map((_, k) => cellsOf(k));
 
 type RowGeo = {
   wall: string;
+  /** The stair column's full-height wall face (drawn with the houses, never ahead of its flight). */
+  slotWall: string;
   joints: string;
   fac: string[]; // rows 0-3: by colour; rows 4-7: three flat tones
   roofs: string;
@@ -140,13 +142,13 @@ type RowGeo = {
   shrubInk: string;
 };
 
-function rowGeo(k: number, part: 'core' | 'edge'): RowGeo {
+function rowGeo(k: number, pick: (c: Cell) => boolean): RowGeo {
   const R = ROWS[k];
   const u = R.s;
-  const g: RowGeo = {wall: '', joints: '', fac: ['', '', '', ''], roofs: '', shade: '', screens: '', bars: '', barDots: '', doors: '', plaques: '', locks: '', ink: '', detail: '', sliver: '', coping: '', lip: '', rail: '', flight: '', flightInk: '', shrubs: '', shrubInk: ''};
-  const cells = CELLS[k].filter((c) => (part === 'core' ? c.core : !c.core));
+  const g: RowGeo = {wall: '', slotWall: '', joints: '', fac: ['', '', '', ''], roofs: '', shade: '', screens: '', bars: '', barDots: '', doors: '', plaques: '', locks: '', ink: '', detail: '', sliver: '', coping: '', lip: '', rail: '', flight: '', flightInk: '', shrubs: '', shrubInk: ''};
+  const cells = CELLS[k].filter(pick);
   if (!cells.length) return g;
-  const P = {wall: new PathBuf(2), fac: [0, 1, 2, 3].map(() => new PathBuf(2)), roofs: new PathBuf(2), shade: new PathBuf(2), screens: new PathBuf(2), bars: new PathBuf(2), barDots: new PathBuf(2), doors: new PathBuf(2), plaques: new PathBuf(2), locks: new PathBuf(2), flight: new PathBuf(2), sliver: new PathBuf(2), coping: new PathBuf(2), shrubs: new PathBuf(2)};
+  const P = {wall: new PathBuf(2), slotWall: new PathBuf(2), fac: [0, 1, 2, 3].map(() => new PathBuf(2)), roofs: new PathBuf(2), shade: new PathBuf(2), screens: new PathBuf(2), bars: new PathBuf(2), barDots: new PathBuf(2), doors: new PathBuf(2), plaques: new PathBuf(2), locks: new PathBuf(2), flight: new PathBuf(2), sliver: new PathBuf(2), coping: new PathBuf(2), shrubs: new PathBuf(2)};
   const near = k <= 3;
   const inked = k <= 3;
   for (const c of cells) {
@@ -159,7 +161,10 @@ function rowGeo(k: number, part: 'core' | 'edge'): RowGeo {
     const r = rng(`${hs}/i`);
     // the retaining wall face under the row: from its feet down past the lower row's roof (the lower row covers the
     // rest); it shows in the terrace gap, taller where the bow opens it
-    P.wall.rect(c.x - 0.2, base, R.w + 0.4, (3 + GAP) * u + 70 * u);
+    // (fix round 3: only as deep as the gap down to the lower row's bowed top + a few px, so a strip that pops ahead of
+    // the lower row's outer houses is a thin band, never a slab hanging into their empty slots)
+    const bowGap = Math.max(bowAt(k - 1, c.x) - bowAt(k, c.x), bowAt(k - 1, c.x + R.w) - bowAt(k, c.x + R.w), 0);
+    P.wall.rect(c.x - 0.2, base, R.w + 0.4, (3 + GAP) * u + bowGap + 6);
     if (inked && k <= 3) {
       // stone joints: short vertical ticks in the wall band, ~2 per house
       for (let i = 0; i < 2; i++) {
@@ -173,7 +178,7 @@ function rowGeo(k: number, part: 'core' | 'edge'): RowGeo {
     if (inked) g.lip += line(c.x, base + COPING * u, c.x + R.w, base + COPING * u, {seed: `${hs}/lp`, over: [r.range(1, 5) * u, r.range(1, 5) * u], breaks: false, drift: 0.3});
     if (c.stair) {
       // the stair column: wall face top to bottom + a zig-zag flight from this row's walkway up to the next coping
-      P.wall.rect(c.x - 0.2, top - 2 * u, R.w + 0.4, R.h + 2 * u);
+      P.slotWall.rect(c.x - 0.2, top - 2 * u, R.w + 0.4, R.h + 2 * u);
       const dir = (k % 2 ? -1 : 1) * (c.cx < 400 ? 1 : c.cx > 700 ? -1 : 1);
       const xa = c.cx - dir * R.w * 0.36;
       const xb = c.cx + dir * R.w * 0.34;
@@ -258,6 +263,7 @@ function rowGeo(k: number, part: 'core' | 'edge'): RowGeo {
     }
   }
   g.wall = P.wall.d;
+  g.slotWall = P.slotWall.d;
   g.fac = P.fac.map((b) => b.d);
   g.roofs = P.roofs.d;
   g.shade = P.shade.d;
@@ -273,7 +279,16 @@ function rowGeo(k: number, part: 'core' | 'edge'): RowGeo {
   g.shrubs = P.shrubs.d;
   return g;
 }
-const GEO = ROWS.slice(0, HAZE).map((_, k) => ({core: rowGeo(k, 'core'), edge: rowGeo(k, 'edge')}));
+/** Fix round 3 (no one-frame 1080 x 430 block): the near rows' houses pop in RINGS from the centre outward, one frame
+ *  apart (|cx - 540| < 100, < 200, beyond), after their terrace strip (wall face, coping, rail), which pops as ITS top
+ *  (the rail) passes the caption floor, a few frames before the row's own top. */
+const RING_R = [100, 200];
+const NRING = 3;
+const ringOf = (k: number, c: Cell) => (k >= 1 && k <= 3 ? RING_R.filter((r) => Math.abs(c.cx - 540) >= r).length : 0);
+const GEO = ROWS.slice(0, HAZE).map((_, k) => ({
+  rings: Array.from({length: NRING}, (_, i) => rowGeo(k, (c) => c.core && ringOf(k, c) === i)),
+  edge: rowGeo(k, (c) => !c.core),
+}));
 
 // ---------------------------------------------------------------- the haze bands (rows >= 8), bowed
 
@@ -359,6 +374,10 @@ export const RIDGE = (() => {
   return {fill: fill.d, rim: rim.d, top: ty - legH - tankH - 13};
 })();
 
+/** Fix round 3: the silhouettes one haze step DARKER than the far band (in the palest tone they read as holes punched
+ *  in the orange disc, not as things standing in front of it). */
+const RIDGE_FILL = '#84B09C';
+
 // ---------------------------------------------------------------- camera helpers
 
 /** The highest visible top of row k (its bowed sides at the frame edges) on screen. */
@@ -379,8 +398,18 @@ const DRAW_AT = B.every;
 // ---------------------------------------------------------------- the check-box tags (the empty wave + door #4's tick)
 
 const TAG_STEP = 0.075;
-const TAG_K = [1.58, 1.5, 1.4, 1.4, 1.4, 1.4, 1.4, 1.4];
-const tagSize = (k: number, zoom: number) => Math.max(TAG_K[k] * 19 * ROWS[k].s, (TERRACE.checkBox.minScreen[k] ?? 0) / zoom, 4);
+/** Fix round 3 (the one tick among hundreds must read at phone size): tag widths at rest (screen px = world px at the
+ *  rest zoom 1): row 0 44, row 1 32, then ~0.75 per row down to an 8 px floor (the kit's TerraceHill boxes are >= 22 px
+ *  on the near rows; these hang on the scene's own bowed rows, so the scene keeps its own wave). */
+const TAG_PX = [44, 32, 24, 18, 14, 11, 9, 8];
+const tagSize = (k: number, zoom: number) => Math.max(TAG_PX[k] ?? 8, (TERRACE.checkBox.minScreen[k] ?? 0) / zoom);
+/** Screen ink of the inked rows' tags: [card outline, box]. */
+const TAG_INK: [number, number][] = [
+  [3.4, 3.0],
+  [3.4, 3.0],
+  [2.4, 2.2],
+  [1.8, 1.6],
+];
 const rot = (hx: number, hy: number, a: number) => {
   const c = Math.cos(a);
   const sn = Math.sin(a);
@@ -432,9 +461,9 @@ const RowTags: React.FC<{k: number; zoom: number; extended: boolean}> = ({k, zoo
       {inked ? null : <Fill d={box} color={tint(palette.sand, k)} offset={false} mode="snap" seed={`s9tg${k}/x`} />}
       {inked ? (
         <>
-          <Ink d={loop} width={sc(1.6)} color={palette.tealDark} taper={false} vary={0} seed={`s9tg${k}/lp`} />
-          <Ink d={body} width={sc(k <= 1 ? 1.8 : 1.4)} taper={false} vary={0} seed={`s9tg${k}/o`} />
-          <Ink d={box} width={sc(k === 0 ? 2.6 : k === 1 ? 2.2 : 1.6)} taper={false} vary={0} seed={`s9tg${k}/xi`} />
+          <Ink d={loop} width={sc(k <= 1 ? 2.2 : 1.6)} color={palette.tealDark} taper={false} vary={0} seed={`s9tg${k}/lp`} />
+          <Ink d={body} width={sc(TAG_INK[k][0])} taper={false} vary={0} seed={`s9tg${k}/o`} />
+          <Ink d={box} width={sc(TAG_INK[k][1])} taper={false} vary={0} seed={`s9tg${k}/xi`} />
         </>
       ) : null}
     </>
@@ -458,20 +487,26 @@ export const House4Tag: React.FC = () => {
   return (
     <>
       <Fill d={tagQuad(hx, hy, s)} color={palette.white} offset={false} mode="snap" seed="s9h4tag/b" />
-      <Ink d={tagLoop(hx, hy, s)} width={1.6 / zoom} color={palette.tealDark} taper={false} vary={0} seed="s9h4tag/lp" />
-      <Ink d={tagQuad(hx, hy, s)} width={1.8 / zoom} taper={false} vary={0} seed="s9h4tag/o" />
-      <Ink d={tagBox(hx, hy, s)} width={2.6 / zoom} taper={false} vary={0} seed="s9h4tag/xi" />
-      <Ink d={tick} at={B.single - 0.12} dur={0.12} width={3 / zoom} taper={false} seed="s9h4tag/tick" />
+      <Ink d={tagLoop(hx, hy, s)} width={2.2 / zoom} color={palette.tealDark} taper={false} vary={0} seed="s9h4tag/lp" />
+      <Ink d={tagQuad(hx, hy, s)} width={3.4 / zoom} taper={false} vary={0} seed="s9h4tag/o" />
+      <Ink d={tagBox(hx, hy, s)} width={3 / zoom} taper={false} vary={0} seed="s9h4tag/xi" />
+      <Ink d={tick} at={B.single - 0.12} dur={0.12} width={5 / zoom} taper={false} seed="s9h4tag/tick" />
     </>
   );
 };
 
 // ---------------------------------------------------------------- one row (houses + its terrace)
 
-/** `stairs` = the flights (which climb into the terrace gap above the row) and their landing shrubs: only once the row
- *  above is there, so a flight never climbs into the empty sky during the pull-back. */
-const RowNode: React.FC<{k: number; zoom: number; extended: boolean; stairs: boolean}> = ({k, zoom, extended, stairs}) => {
-  const parts = extended ? [GEO[k].core, GEO[k].edge] : [GEO[k].core];
+/** One chunk of a row (a ring of its core houses, or its frame-edge houses) with the reveal of its houses (`rv`) and of
+ *  its terrace strip (`strip`). */
+type RowPart = {g: RowGeo; rv: number; strip: number};
+
+/** One row: the terrace strip's back (retaining wall face + joints) as soon as the strip is revealed; each chunk's houses
+ *  with their stair slots (wall face + the flight's tread / stringer fill + the landing shrubs: fix round 3, the slot is
+ *  never a blank brown column) when that chunk pops; the strip's front (coping, lip, rail) over the facade feet; the
+ *  flights' ink last (it draws on on 'every'). */
+const RowNode: React.FC<{k: number; zoom: number; parts: RowPart[]}> = ({k, zoom, parts}) => {
+  const R = ROWS[k];
   const iw = rowInk(k, zoom);
   const depth = Math.min(1, k / (HAZE + 1));
   const wall = atmos(mix(palette.tan, palette.brown, 0.45), depth, 'day', {clear: 0.1});
@@ -482,33 +517,78 @@ const RowNode: React.FC<{k: number; zoom: number; extended: boolean; stairs: boo
   const cols = near ? COLORS.map((c) => tint(c, k)) : [tint(mix(palette.cream, palette.sand, 0.25), k), tint(palette.sand, k), tint(palette.tan, k)];
   const door = k <= 4 ? palette.teal : tint(palette.teal, k);
   const dw = k <= 2 && iw > 0 ? Math.max(1.5 / zoom, iw * 0.66) : 0;
+  const xf = (rv: number, node: React.ReactNode) => revealXf(rv, R.base, node);
   return (
     <>
-      {parts.map((g, i) => (
-        <React.Fragment key={i}>
-          {g.wall ? <Fill d={g.wall} color={wall} offset={false} mode="snap" seed={`s9h/w${k}/${i}`} /> : null}
-          {iw > 0 && g.joints ? <Ink d={g.joints} width={iw * 0.55} taper={false} vary={0} seed={`s9h/j${k}/${i}`} /> : null}
-          {g.fac.map((d, ci) => (d ? <Fill key={ci} d={d} color={cols[ci]} offset={off} mode="snap" seed={`s9h/f${k}/${i}/${ci}`} /> : null))}
-          {g.shade ? <Fill d={g.shade} color={tint(palette.sand, k)} offset={false} mode="snap" seed={`s9h/sh${k}/${i}`} /> : null}
-          {g.roofs ? <Fill d={g.roofs} color={tint(mix(palette.tan, palette.tealDark, 0.25), k)} offset={false} mode="snap" seed={`s9h/rf${k}/${i}`} /> : null}
-          {g.screens ? <Fill d={g.screens} color={palette.cream} offset={false} mode="snap" seed={`s9h/s${k}/${i}`} /> : null}
-          {g.bars ? <Fill d={g.bars} color={palette.tealDark} offset={false} mode="snap" seed={`s9h/b${k}/${i}`} /> : null}
-          {g.barDots ? <Fill d={g.barDots} color={palette.cream} offset={false} mode="snap" seed={`s9h/bd${k}/${i}`} /> : null}
-          {g.doors ? <Fill d={g.doors} color={door} offset={false} mode="snap" seed={`s9h/d${k}/${i}`} /> : null}
-          {g.plaques ? <Fill d={g.plaques} color={palette.sand} offset={false} mode="snap" seed={`s9h/p${k}/${i}`} /> : null}
-          {g.locks ? <Fill d={g.locks} color={palette.sand} offset={false} mode="snap" seed={`s9h/l${k}/${i}`} /> : null}
-          {iw > 0 && g.ink ? <Ink d={g.ink} width={iw} taper={false} vary={0.05} seed={`s9h/i${k}/${i}`} /> : null}
-          {dw > 0 && g.detail ? <Ink d={g.detail} width={dw} taper={false} vary={0.05} seed={`s9h/di${k}/${i}`} /> : null}
-          {g.sliver ? <Fill d={g.sliver} color={sliver} offset={false} mode="snap" seed={`s9h/sv${k}/${i}`} /> : null}
-          {g.coping ? <Fill d={g.coping} color={coping} offset={off} mode="snap" seed={`s9h/cp${k}/${i}`} /> : null}
-          {iw > 0 && g.lip ? <Ink d={g.lip} at={DRAW_AT + k * 0.03} order="all" width={iw} taper={false} vary={0.05} seed={`s9h/lp${k}/${i}`} /> : null}
-          {iw > 0 && g.rail ? <Ink d={g.rail} at={DRAW_AT + 0.03 + k * 0.03} order="all" width={Math.max(iw * 0.62, 1.1 / zoom)} taper={false} vary={0} seed={`s9h/rl${k}/${i}`} /> : null}
-          {stairs && g.flight ? <Fill d={g.flight} color={tint(palette.cream, k)} offset={false} mode="snap" seed={`s9h/fl${k}/${i}`} /> : null}
-          {stairs && g.flightInk && iw > 0 ? <Ink d={g.flightInk} at={DRAW_AT + 0.02 + k * 0.05} order="all" width={Math.max(iw * 0.8, 1.3 / zoom)} taper={false} vary={0} seed={`s9h/fi${k}/${i}`} /> : null}
-          {stairs && g.shrubs ? <Fill d={g.shrubs} color={k <= 2 ? palette.teal : tint(palette.sage, k)} offset={false} mode="snap" seed={`s9h/sb${k}/${i}`} /> : null}
-          {stairs && iw > 0 && g.shrubInk ? <Ink d={g.shrubInk} width={iw * 0.8} taper={false} vary={0} seed={`s9h/sbi${k}/${i}`} /> : null}
-        </React.Fragment>
-      ))}
+      {parts.map((p, i) => {
+        const g = p.g;
+        if (p.strip <= 0 || !g.wall) return null;
+        return (
+          <React.Fragment key={`b${i}`}>
+            {xf(
+              p.strip,
+              <>
+                <Fill d={g.wall} color={wall} offset={false} mode="snap" seed={`s9h/w${k}/${i}`} />
+                {iw > 0 && g.joints ? <Ink d={g.joints} width={iw * 0.55} taper={false} vary={0} seed={`s9h/j${k}/${i}`} /> : null}
+              </>,
+            )}
+          </React.Fragment>
+        );
+      })}
+      {parts.map((p, i) => {
+        const g = p.g;
+        if (p.rv <= 0) return null;
+        return (
+          <React.Fragment key={`h${i}`}>
+            {xf(
+              p.rv,
+              <>
+                {g.slotWall ? <Fill d={g.slotWall} color={wall} offset={false} mode="snap" seed={`s9h/sw${k}/${i}`} /> : null}
+                {g.fac.map((d, ci) => (d ? <Fill key={ci} d={d} color={cols[ci]} offset={off} mode="snap" seed={`s9h/f${k}/${i}/${ci}`} /> : null))}
+                {g.shade ? <Fill d={g.shade} color={tint(palette.sand, k)} offset={false} mode="snap" seed={`s9h/sh${k}/${i}`} /> : null}
+                {g.roofs ? <Fill d={g.roofs} color={tint(mix(palette.tan, palette.tealDark, 0.25), k)} offset={false} mode="snap" seed={`s9h/rf${k}/${i}`} /> : null}
+                {g.screens ? <Fill d={g.screens} color={palette.cream} offset={false} mode="snap" seed={`s9h/s${k}/${i}`} /> : null}
+                {g.bars ? <Fill d={g.bars} color={palette.tealDark} offset={false} mode="snap" seed={`s9h/b${k}/${i}`} /> : null}
+                {g.barDots ? <Fill d={g.barDots} color={palette.cream} offset={false} mode="snap" seed={`s9h/bd${k}/${i}`} /> : null}
+                {g.doors ? <Fill d={g.doors} color={door} offset={false} mode="snap" seed={`s9h/d${k}/${i}`} /> : null}
+                {g.plaques ? <Fill d={g.plaques} color={palette.sand} offset={false} mode="snap" seed={`s9h/p${k}/${i}`} /> : null}
+                {g.locks ? <Fill d={g.locks} color={palette.sand} offset={false} mode="snap" seed={`s9h/l${k}/${i}`} /> : null}
+                {iw > 0 && g.ink ? <Ink d={g.ink} width={iw} taper={false} vary={0.05} seed={`s9h/i${k}/${i}`} /> : null}
+                {dw > 0 && g.detail ? <Ink d={g.detail} width={dw} taper={false} vary={0.05} seed={`s9h/di${k}/${i}`} /> : null}
+                {g.sliver ? <Fill d={g.sliver} color={sliver} offset={false} mode="snap" seed={`s9h/sv${k}/${i}`} /> : null}
+                {g.flight ? <Fill d={g.flight} color={tint(palette.cream, k)} offset={false} mode="snap" seed={`s9h/fl${k}/${i}`} /> : null}
+                {g.shrubs ? <Fill d={g.shrubs} color={k <= 2 ? palette.teal : tint(palette.sage, k)} offset={false} mode="snap" seed={`s9h/sb${k}/${i}`} /> : null}
+              </>,
+            )}
+          </React.Fragment>
+        );
+      })}
+      {parts.map((p, i) => {
+        const g = p.g;
+        if (p.strip <= 0 || !g.coping) return null;
+        return (
+          <React.Fragment key={`c${i}`}>
+            {xf(
+              p.strip,
+              <>
+                <Fill d={g.coping} color={coping} offset={off} mode="snap" seed={`s9h/cp${k}/${i}`} />
+                {iw > 0 && g.lip ? <Ink d={g.lip} at={DRAW_AT + k * 0.03} order="all" width={iw} taper={false} vary={0.05} seed={`s9h/lp${k}/${i}`} /> : null}
+                {iw > 0 && g.rail ? <Ink d={g.rail} at={DRAW_AT + 0.03 + k * 0.03} order="all" width={Math.max(iw * 0.62, 1.1 / zoom)} taper={false} vary={0} seed={`s9h/rl${k}/${i}`} /> : null}
+              </>,
+            )}
+          </React.Fragment>
+        );
+      })}
+      {parts.map((p, i) => {
+        const g = p.g;
+        if (p.rv < 1 || iw <= 0 || (!g.flightInk && !g.shrubInk)) return null;
+        return (
+          <React.Fragment key={`fi${i}`}>
+            {g.flightInk ? <Ink d={g.flightInk} at={DRAW_AT + 0.02 + k * 0.05} order="all" width={Math.max(iw * 0.8, 1.3 / zoom)} taper={false} vary={0} seed={`s9h/fi${k}/${i}`} /> : null}
+            {g.shrubInk ? <Ink d={g.shrubInk} width={iw * 0.8} taper={false} vary={0} seed={`s9h/sbi${k}/${i}`} /> : null}
+          </React.Fragment>
+        );
+      })}
     </>
   );
 };
@@ -530,7 +610,7 @@ export const Hill: React.FC = () => {
           rr,
           RIDGE_Y(700),
           <>
-            <Fill d={RIDGE.fill} color={TERRACE_HAZE[2]} offset={false} mode="snap" seed="s9h/ridge" />
+            <Fill d={RIDGE.fill} color={RIDGE_FILL} offset={false} mode="snap" seed="s9h/ridge" />
             {t >= B.server ? <Fill d={RIDGE.rim} color={palette.peach} offset={false} mode="snap" seed="s9h/ridgeRim" /> : null}
           </>,
         )}
@@ -560,18 +640,28 @@ export const Hill: React.FC = () => {
       </React.Fragment>,
     );
   }
-  // rows far -> near (each with its terrace), then the tags
-  const reveal = ROWS.slice(0, HAZE).map((R, k) => (k === 0 ? 1 : revealOf(t, R.top - (3 + GAP) * R.s, k)));
+  // rows far -> near (each with its terrace), then the tags. Fix round 3: a row's terrace strip pops as its rail top
+  // passes the caption floor; its houses pop ring by ring from the centre outward, one frame apart, as the row's top
+  // (+ the gap above it) has passed it (ring i = the reveal one frame-step i later on the camera path).
+  const rings = ROWS.slice(0, HAZE).map((R, k) => Array.from({length: NRING}, (_, i) => (k === 0 ? 1 : revealOf(t - i / 30, R.top - (3 + GAP) * R.s, k))));
+  // a strip never floats over the row below's still-empty slots: it waits for that row's last ring
+  const strip = ROWS.slice(0, HAZE).map((R, k) => (k === 0 ? 1 : rings[k - 1][NRING - 1] < 1 ? 0 : revealOf(t, R.base - RAIL * R.s, k)));
   const ext = ROWS.slice(0, HAZE).map((_, k) => extendedAt(t, k));
+  const partsOf = (k: number): RowPart[] => {
+    const ps: RowPart[] = GEO[k].rings.map((g, i) => ({g, rv: rings[k][i], strip: strip[k]}));
+    if (ext[k] || k === 0) ps.push({g: GEO[k].edge, rv: rings[k][0], strip: strip[k]});
+    return ps;
+  };
   for (let k = HAZE - 1; k >= 1; k--) {
-    if (reveal[k] <= 0) continue;
-    out.push(<React.Fragment key={`r${k}`}>{revealXf(reveal[k], ROWS[k].base, <RowNode k={k} zoom={zoom} extended={ext[k]} stairs={k + 1 >= HAZE || reveal[k + 1] >= 1} />)}</React.Fragment>);
+    if (strip[k] <= 0 && rings[k][0] <= 0) continue;
+    out.push(<RowNode key={`r${k}`} k={k} zoom={zoom} parts={partsOf(k)} />);
   }
-  out.push(<React.Fragment key="r0">{<RowNode k={0} zoom={zoom} extended stairs={false} />}</React.Fragment>);
+  out.push(<RowNode key="r0" k={0} zoom={zoom} parts={partsOf(0)} />);
   out.push(<NearLodRow0 key="n0" />);
   for (let k = HAZE - 1; k >= 0; k--) {
-    if (reveal[k] <= 0) continue;
-    out.push(<React.Fragment key={`tg${k}`}>{revealXf(reveal[k], ROWS[k].base, <RowTags k={k} zoom={zoom} extended={ext[k]} />)}</React.Fragment>);
+    const rv = rings[k][NRING - 1];
+    if (rv <= 0) continue;
+    out.push(<React.Fragment key={`tg${k}`}>{revealXf(rv, ROWS[k].base, <RowTags k={k} zoom={zoom} extended={ext[k]} />)}</React.Fragment>);
   }
   return <>{out}</>;
 };
@@ -590,6 +680,21 @@ export const NearLodRow0: React.FC = () => {
   const x1 = c.x + 540 / zoom + R.w;
   const W = Math.max(0.85, 1.9 / zoom);
   const WS = Math.max(0.85, 3.4 / zoom);
+  // fix round 3: the browser page at the near LOD like house #4's (a peach header + two text hairlines), the hairlines a
+  // screen-constant 1.9 px (the kit page's hairlines are world-wide: 7-9 px black bars at zoom ~3)
+  const hair = 1.9 / zoom;
+  const page = ({w, h: sh}: {w: number; h: number}) => {
+    const pad = Math.max(5, w * 0.07);
+    const hh = sh * 0.3;
+    const y1 = pad + hh + (sh - pad - hh) * 0.36;
+    const y2 = pad + hh + (sh - pad - hh) * 0.7;
+    return (
+      <>
+        <Fill rect={[pad, pad, w - pad * 2, hh]} color={palette.peach} offset={false} mode="snap" seed="s9n0/hdr" />
+        <path d={`M${f2(pad)} ${f2(y1)}H${f2(pad + (w - pad * 2) * 0.84)}M${f2(pad)} ${f2(y2)}H${f2(pad + (w - pad * 2) * 0.56)}`} stroke={palette.ink} strokeWidth={hair} strokeLinecap="round" fill="none" />
+      </>
+    );
+  };
   const out: React.ReactNode[] = [];
   for (const h of CELLS[0]) {
     if (h.j === 0 || h.x + R.w < x0 || h.x > x1) continue;
@@ -605,7 +710,7 @@ export const NearLodRow0: React.FC = () => {
         <Fill rect={[h.x, top, R.w + 0.3, R.h]} color={col} offset={[misreg.dx / zoom, misreg.dy / zoom]} mode="snap" seed={`${sd}/f`} />
         {col !== palette.tan ? <Fill rect={[h.x, top, R.w * 0.18, R.h]} color={palette.sand} offset={false} mode="snap" seed={`${sd}/s`} /> : null}
         <Ink d={line(h.x, R.base, h.x, top, {seed: `${sd}/w`, over: [0, 3]}) + line(h.x + 3, top + 8, h.x + R.w - 3, top + 8, {seed: `${sd}/c`, over: [1, 3]})} width={WS} taper={false} vary={0} seed={`${sd}/wi`} />
-        <ChromeSlot x={h.x + 17.5} y={top + 30} w={55} h={35} width={W} seed={`${sd}/bw`} />
+        <ChromeSlot x={h.x + 17.5} y={top + 30} w={55} h={35} width={W} seed={`${sd}/bw`} content={page} />
         <FacadeDoor r={[h.x + 32.5, top + 97.5, 30, 50]} width={W} seed={`${sd}/d`} />
         <XG m={mat.about(mat.scale(blinkK), px, py)}>
           <PlaqueSlot x={px} y={py} size={8} width={Math.max(0.4, 1 / zoom)} seed={`${sd}/p`} />

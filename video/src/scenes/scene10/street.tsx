@@ -67,13 +67,18 @@ const FARGROUND = {
   rails: line(-160, 1238, 1240, 1239, {seed: 's10/fr1', over: 0, breaks: false}) + line(-160, 1256, 1240, 1257, {seed: 's10/fr2', over: 0, breaks: false}),
 };
 
-export const FarStreet: React.FC = () => (
+/** `skylineAt` (fix round 3): the fill-only skyline pops up from the eye line WITH siteL (scaleY 0 -> 1.06 -> 1), so the
+ *  frames after the tram show only the near row's ink construction lines over bare ground (reference 1's clean
+ *  line-art-on-paper state), not line art over an already-filled skyline (a double exposure). */
+export const FarStreet: React.FC<{skylineAt?: number}> = ({skylineAt}) => (
   <>
     <Fill rect={[-160, OQ.eye, 1400, OQ.base - OQ.eye + 2]} color={palette.mintPale} offset={false} seed="s10/farground" />
     <Fill d={FARGROUND.kerb} color={palette.sand} offset={false} mode="snap" seed="s10/farkerb" />
     <Ink d={FARGROUND.kerbInk + FARGROUND.rails} width={SI.hair} taper={false} seed="s10/farI" />
-    <Fill d={FAR.d} color={palette.sage} offset={false} mode="snap" seed="s10/skyline" />
-    <Fill d={FAR.win} color={palette.mintPale} offset={false} mode="snap" seed="s10/skywin" />
+    <PopUp at={skylineAt} x={540} y={OQ.eye}>
+      <Fill d={FAR.d} color={palette.sage} offset={false} mode="snap" seed="s10/skyline" />
+      <Fill d={FAR.win} color={palette.mintPale} offset={false} mode="snap" seed="s10/skywin" />
+    </PopUp>
   </>
 );
 
@@ -83,7 +88,7 @@ const GND = (() => {
   const s = 'oq';
   const VP = OQ.vp;
   return {
-    wedge: polyPath([[640, OQ.base], [740, OQ.base], [VP[0] + 3, VP[1]], [VP[0] - 3, VP[1]]]),
+    ...sideStreet(VP),
     kerb: line(-160, OQ.kerb, 1240, OQ.kerb + 2, {seed: `${s}/k`, over: 0}) + line(-160, OQ.kerb + 20, 1240, OQ.kerb + 23, {seed: `${s}/k2`, over: 0}),
     walk: groundMarks({vp: [690, 1150], top: OQ.base + 30, bottom: OQ.kerb - 6, x0: -700, x1: 2000, rays: 4, cross: 1, specks: 8, reach: 0.9, seed: `${s}/gw`}),
     // fix round 2b: paving joints (two broken cross joints + three extra rays to the VP) and the building line's shadow
@@ -99,6 +104,37 @@ const GND = (() => {
     ...railsAndSetts(),
   };
 })();
+
+/** Fix round 3: the street gap as a SIDE STREET in the reference's language (it was a cream ink-less wedge tapering to a
+ *  point at the VP, which read as a spotlight cone / a cream tent): a sand roadway between two inkThin kerb lines that
+ *  converge on the VP (open ends, 6-8 px overshoot), four short sett ticks across it, cut flat at y 1160 with a far-kerb
+ *  dash (no point). Pavement either side is the set's mintPale. siteM's return face (`ret`, a tan strip ~14 px wide down
+ *  its right jamb, in perspective to the VP) is drawn with the near row (Scene10 'sites'). */
+function sideStreet(VP: Pt) {
+  const B = OQ.base;
+  const tipY = 1160;
+  const xAt = (x0: number, y: number) => x0 + ((VP[0] - x0) * (B - y)) / (B - VP[1]);
+  const L0 = 652;
+  const R0 = 728;
+  const road = polyPath([[L0, B + 1], [R0, B + 1], [xAt(R0, tipY), tipY], [xAt(L0, tipY), tipY]]);
+  // kerbs: from 8 px below the base line (open, over the near pavement) to 6 px past the far end
+  const kerbs = line(xAt(L0, B + 8), B + 8, xAt(L0, tipY - 6), tipY - 6, {seed: 's10/gk1', over: 0, breaks: false}) + line(xAt(R0, B + 8), B + 8, xAt(R0, tipY - 6), tipY - 6, {seed: 's10/gk2', over: 0, breaks: false});
+  // the far kerb: one flat dash across the cut-off end, overshooting both kerbs
+  const far = line(xAt(L0, tipY) - 5, tipY + 0.5, xAt(R0, tipY) + 6, tipY - 0.5, {seed: 's10/gk3', over: 0, breaks: false});
+  // sett ticks: short, staggered, across the roadway (shorter with the distance)
+  let setts = '';
+  [[1284, -0.42, 0.05], [1250, 0.0, 0.48], [1217, -0.5, -0.08], [1190, 0.06, 0.5]].forEach(([y, a, b], i) => {
+    const hw = ((R0 - L0) / 2) * ((y - VP[1]) / (B - VP[1]));
+    setts += line(VP[0] + a * hw, y, VP[0] + b * hw, y + 0.6, {seed: `s10/gs${i}`, over: 0, breaks: false});
+  });
+  // siteM's return face down its right jamb (x 640), receding to the VP: the side street's left wall
+  const top = 832;
+  const w = 14;
+  const k = w / (VP[0] - 640);
+  const ret = polyPath([[640, top], [640 + w, top + (VP[1] - top) * k], [640 + w, B - (B - VP[1]) * k], [640, B]]);
+  const retInk = line(640 + w, top + (VP[1] - top) * k - 4, 640 + w, B - (B - VP[1]) * k + 3, {seed: 's10/ret', over: 0, breaks: false});
+  return {road, kerbs, farKerb: far, gapSetts: setts, ret, retInk};
+}
 
 /** Fix round 2: the empty street after the tram is not a bare stage: a row of kerb setts along the kerb's street side and
  *  the tram's RAIL PAIR across the street (the tram just passed), a tan groove strip under an ink rail head each. */
@@ -116,13 +152,15 @@ function railsAndSetts() {
   return {setts, settInk, railGroove: rails.map((r) => r.groove).join(''), railHead: rails.map((r) => r.head).join('')};
 }
 
-/** The set's ground layer, the street-gap wedge popping up from the base line at `wedgeAt` (with siteR). */
+/** The set's ground layer, the side street in the gap popping up from the base line at `wedgeAt` (with siteR). */
 export const StreetGround: React.FC<{wedgeAt: number}> = ({wedgeAt}) => (
   <>
     <Fill rect={[-160, OQ.base, 1400, 800]} color={palette.mintPale} offset={false} seed="oq/pave" />
     <Fill d={GND.shade} color={palette.sky} offset={false} mode="snap" seed="s10/shade" />
     <PopUp at={wedgeAt} x={690} y={OQ.base}>
-      <Fill d={GND.wedge} color={palette.cream} offset={false} seed="oq/gap" />
+      <Fill d={GND.road} color={palette.sand} offset={false} seed="oq/gap" />
+      <Ink d={GND.kerbs + GND.farKerb} width={SI.far} taper={false} seed="s10/gapk" />
+      <Ink d={GND.gapSetts} width={SI.hair} taper={false} seed="s10/gaps" />
     </PopUp>
     <Fill rect={[-160, OQ.kerb, 1400, 22]} color={palette.sand} offset={false} seed="oq/kerbF" />
     <Ink d={GND.kerb} width={SI.front} seed="oq/kerb" />
@@ -134,6 +172,14 @@ export const StreetGround: React.FC<{wedgeAt: number}> = ({wedgeAt}) => (
     <Fill d={GND.railGroove} color={palette.tan} offset={false} mode="snap" seed="s10/railG" />
     <Ink d={GND.railHead} width={SI.mid} seed="s10/railH" />
   </>
+);
+
+/** siteM's return face (the side street's left wall), popping with siteM: drawn after the near row's facades. */
+export const SiteMReturn: React.FC<{at: number}> = ({at}) => (
+  <PopUp at={at} x={647} y={OQ.base}>
+    <Fill d={GND.ret} color={palette.tan} offset={false} mode="none" seed="s10/ret" />
+    <Ink d={GND.retInk} width={SI.far} taper={false} seed="s10/retI" />
+  </PopUp>
 );
 
 // ---------------------------------------------------------------- SandwichBoard
@@ -168,7 +214,8 @@ export const SandwichBoard: React.FC<{box: [number, number, number, number]; gro
   const legR: Pt[] = [[x1 + 1, bot - 2], [x1 + fw + 2, bot - 2], [x1 + fw + 9, ground], [x1 + 6, ground]];
   // the back board's edge (3/4 view, right side): from the hinge down and out to its own foot; open triangle between
   const hinge: Pt = [x1 + fw - tp + 2, top + 4];
-  const backFoot: Pt = [x1 + fw + 44, ground];
+  // fix round 3: the back board splays less (+26, was +44): its edge stays left of the parked maker's body
+  const backFoot: Pt = [x1 + fw + 26, ground];
   const back: Pt[] = [[hinge[0] - 2, hinge[1]], [hinge[0] + 9, hinge[1] + 2], [backFoot[0] + 4, backFoot[1]], [backFoot[0] - 9, backFoot[1]]];
   const chainY = (y0 + y1) / 2 + 40;
   const fx = (yy: number) => x1 + fw + 2 * ((yy - top) / (bot - top)); // the front board's right edge at yy
@@ -184,27 +231,53 @@ export const SandwichBoard: React.FC<{box: [number, number, number, number]; gro
       <Fill d={polyPath(legL) + polyPath(legR)} color={palette.teal} offset={off} seed="s10/ab/legs" />
       <Fill d={polyPath(outer)} color={palette.teal} offset={off} seed="s10/ab/frame" />
       <Fill d={rectPath(x0 - 10, ground - 5, 14, 5) + rectPath(x1 - 4, ground - 5, 14, 5)} color={palette.tealDark} offset={false} mode="none" seed="s10/ab/feet" />
+      {/* fix round 3: the frame outline at ink (3.4), the legs keep the front weight (4.8): the board sits back */}
       <Ink
         d={
           line(outer[0][0], outer[0][1], outer[3][0], outer[3][1], {over: [2, 0], seed: 's10/ab/f1'}) +
           line(outer[1][0], outer[1][1], outer[2][0], outer[2][1], {over: [2, 0], seed: 's10/ab/f2'}) +
-          line(outer[3][0] + 1, bot, outer[2][0] - 1, bot, {over: [0, 0], seed: 's10/ab/f3'}) +
+          line(outer[3][0] + 1, bot, outer[2][0] - 1, bot, {over: [0, 0], seed: 's10/ab/f3'})
+        }
+        width={SI.mid}
+        taper={false}
+        seed="s10/ab/fi"
+      />
+      <Ink
+        d={
           line(legL[3][0], legL[3][1], outer[3][0], bot, {over: [0, 0], seed: 's10/ab/l1'}) +
           line(legL[2][0], legL[2][1], legL[1][0], legL[1][1], {over: [0, 0], seed: 's10/ab/l2'}) +
           line(legR[2][0], legR[2][1], outer[2][0], bot, {over: [0, 0], seed: 's10/ab/l3'}) +
           line(legR[3][0], legR[3][1], legR[0][0], legR[0][1], {over: [0, 0], seed: 's10/ab/l4'})
         }
-        width={SI.mid * 1.1}
+        width={SI.front}
         taper={false}
-        seed="s10/ab/fi"
+        seed="s10/ab/li"
       />
       {/* the hinge cap across the top, two hinge knuckles */}
       <Fill d={cap} color={palette.tealDark} offset={off} seed="s10/ab/cap" />
       <Ink d={roundRect(cx - (x1 - x0) / 2 - fw + tp - 6, top - 12, x1 - x0 + 2 * fw - 2 * tp + 12, 14, 6, {seed: 's10/ab/capi', closed: false}) + `M${cx - 70} ${top - 5}h18M${cx + 52} ${top - 5}h18`} width={SI.mid} taper={false} seed="s10/ab/capi" />
-      {children}
+      {/* the paper, hand-inked (fix round 3): the cream fill (the LabelTag, outline-less) misregistered 3 px right and
+          2 px down from its own ink outline, the outline left OPEN at the top-right corner, two short edge overshoots */}
+      <XG m={mat.translate(PAPER_MIS[0], PAPER_MIS[1])}>{children}</XG>
+      <Ink d={paperInk(box)} width={SI.far} taper={false} seed="s10/ab/paper" />
     </XG>
   );
 };
+
+/** The paper fill's misregistration from its ink outline (world px). */
+const PAPER_MIS: [number, number] = [3, 2];
+
+/** The A-frame paper's hand-inked outline for the box [x0, y0, x1, y1]: the top edge stops ~26 px short of the right
+ *  corner and the right edge starts ~22 px below it (the corner left open), the top edge overshoots the left corner by
+ *  7 px and the bottom edge the right corner by 8 px. */
+function paperInk([x0, y0, x1, y1]: [number, number, number, number]): string {
+  return (
+    line(x1 - 26, y0 + 0.5, x0 - 7, y0 - 0.5, {seed: 's10/ab/pt', over: 0, breaks: false}) +
+    line(x0, y0 - 2, x0 + 0.8, y1 + 1, {seed: 's10/ab/pl', over: 0, breaks: false}) +
+    line(x0 - 1, y1, x1 + 8, y1 - 0.8, {seed: 's10/ab/pb', over: 0, breaks: false}) +
+    line(x1, y1 + 1, x1 - 0.6, y0 + 22, {seed: 's10/ab/pr', over: 0, breaks: false})
+  );
+}
 
 // ---------------------------------------------------------------- BottomCrowd
 

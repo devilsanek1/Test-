@@ -4,14 +4,16 @@
 //     doors for the 86-92 px rattlers.
 //   - WireSpans: the three wires continue PAST the rooftop pole to the right frame edge along S07's own curves (mapped
 //     through the cut), so the whole wire set matches on the cut; the pole is a junction (the board covers the middle).
-//   - DistrictTowers: 5 browser-chrome towers inside the glass (one glass step lighter), the protected sites.
+//   - DistrictTowers: 5 browser-chrome towers inside the glass (no glass step), the protected sites; they pop on the
+//     glass frame, their browser windows a beat later (fix round 3b).
 //   - DeckClutter: our roof deck between the two neighbours (hatch, vent pipes, drain, tar seams).
 //   - Neighbours: two back-view rooftop neighbours cropped by the bottom edge (EdgeOnlooker, 300-420 px), in their own
-//     NEAR layer (parallax factor 1.2: they drop away faster than the parapet during the crane); one raises a phone on
-//     'millions'.
+//     NEAR layer (parallax factor 1.2: they drop away faster than the parapet during the crane); fix round 3b: clearly
+//     different people from S07's readers (curly hair / sage coat, ochre beanie / tan coat); on 'millions' the left one
+//     flinches, the right one puts both hands on its head.
 import React from 'react';
 import {palette} from '../../lib/theme';
-import {ease as E, lerp, osc, prog, springAt, springs, useTime} from '../../lib/time';
+import {ease as E, lerp, osc, prog, useTime} from '../../lib/time';
 import {mat, XG} from '../../lib/xf';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
@@ -88,29 +90,29 @@ export const WireSpans: React.FC = () => <Ink d={SPANS} width={SI.far} taper={fa
 // ---------------------------------------------------------------- the protected district (inside the glass)
 
 const TOWERS = [
-  {x: 150, y: 962, w: 58, h: 118},
-  {x: 196, y: 918, w: 66, h: 162},
-  {x: 262, y: 942, w: 60, h: 138},
-  {x: 300, y: 990, w: 56, h: 90},
-  {x: 386, y: 1000, w: 30, h: 80},
+  {x: 104, y: 1004, w: 36, h: 76},
+  {x: 144, y: 958, w: 60, h: 122},
+  {x: 208, y: 922, w: 64, h: 158},
+  {x: 350, y: 972, w: 58, h: 108},
+  {x: 412, y: 1000, w: 40, h: 80},
 ];
 
-/** Five browser-chrome towers inside the dome, popping with the glass after the arc closes. Clip them to the dome
- *  interior in the scene. Fix round 3: drawn WITHOUT the glass step (one value darker than before: teal / sage on the
- *  pale glass), so the protected district reads as one distinct block inside, the crowd as another outside. */
-export const DistrictTowers: React.FC<{at: number}> = ({at}) => {
+/** Five browser-chrome towers inside the (fix round 3b: broad shield) dome. Clip them to the dome interior in the
+ *  scene. Fix round 3b: the tower bodies POP on the glass frame (`at`: 1.08x for 2 frames, no growing from zero: the
+ *  glass never shows an empty bowl), their browser windows pop at `chromeAt` (a later onset); teal / sage (no glass
+ *  step): the protected district reads as one distinct block inside, the crowd as another outside. */
+export const DistrictTowers: React.FC<{at: number; chromeAt?: number}> = ({at, chromeAt = at}) => {
   const t = useTime();
   if (t < at) return null;
+  const k = t < at + 0.067 ? 1.08 : 1;
   return (
     <>
       {TOWERS.map((q, i) => {
-        const k = springAt(t, at + i * 0.04, springs.pop);
-        if (k <= 0.01) return null;
         const body = rectPath(q.x, q.y + 4, q.w, q.h);
         return (
-          <g key={i} transform={k < 1 ? `translate(${q.x + q.w / 2} ${q.y + q.h}) scale(1 ${k.toFixed(3)}) translate(${-(q.x + q.w / 2)} ${-(q.y + q.h)})` : undefined}>
+          <g key={i} transform={k !== 1 ? `translate(${q.x + q.w / 2} ${q.y + q.h}) scale(1 ${k}) translate(${-(q.x + q.w / 2)} ${-(q.y + q.h)})` : undefined}>
             <Fill d={body} color={i % 2 ? palette.sage : palette.teal} offset={false} mode="snap" seed={`s8/dt${i}`} />
-            {q.w >= 50 ? <BrowserChrome x={q.x + 4} y={q.y + 10} w={q.w - 8} h={Math.min(46, q.h * 0.36)} depth="hair" seed={`s8/dtc${i}`} /> : null}
+            {q.w >= 50 && t >= chromeAt ? <BrowserChrome x={q.x + 4} y={q.y + 10} w={q.w - 8} h={Math.min(46, q.h * 0.36)} depth="hair" seed={`s8/dtc${i}`} /> : null}
             <Ink d={rect(q.x, q.y + 4, q.w, q.h, {seed: `s8/dti${i}`, edges: 'tlr', over: 'small'})} width={SI.hair} taper={false} seed={`s8/dti${i}`} />
           </g>
         );
@@ -191,45 +193,37 @@ function crescent(cx: number, cy: number, r: number, a0: number, a1: number, w: 
   return `M${pt(a0, r)}A${r} ${r} 0 ${big} ${sw} ${pt(a1, r)}L${pt(a1, r - w * 0.3)}A${r - w} ${r - w} 0 ${big} ${1 - sw} ${pt(a0, r - w * 0.3)}Z`;
 }
 
-/** The detail the kit leaves out at this size (fix round 3; ref2 f_33's near heads): sand ear fills (behind the head),
- *  a one-sided CREAM rim on the sun side, hair strands / a hair tie (bun) or cap panel seams + nape strands (cap). */
+/** The detail the kit leaves out at this size (fix round 3; ref2 f_33's near heads): sand ear fills (behind the head). */
 const HeadBack: React.FC<{c: {x: number; y: number; head: number}}> = ({c}) => {
   const r = c.head / 2;
   const ears = blob(c.x - 0.99 * r, c.y + 0.1 * r, 0.15 * r, 0.26 * r, {seed: 's8/earL'}) + blob(c.x + 0.99 * r, c.y + 0.1 * r, 0.15 * r, 0.26 * r, {seed: 's8/earR'});
   return <Fill d={ears} color={palette.sand} offset={false} mode="none" seed="s8/ears" />;
 };
 
-const BUN = (() => {
+/** One-sided cream rims on the sun side of each head (fix round 3). */
+const RIM_L = (() => {
   const {x, y, head} = NB.L;
   const r = head / 2;
-  // two cream highlight strands on the sun side + two ink strands sweeping up to the bun, a hair tie at the bun's base
-  const strandsC = `M${x + 0.62 * r} ${y + 0.62 * r}Q${x + 0.72 * r} ${y - 0.1 * r} ${x + 0.22 * r} ${y - 0.74 * r}M${x + 0.36 * r} ${y + 0.78 * r}Q${x + 0.46 * r} ${y + 0.05 * r} ${x + 0.1 * r} ${y - 0.7 * r}`;
-  const strandsI = `M${x - 0.66 * r} ${y + 0.55 * r}Q${x - 0.7 * r} ${y - 0.2 * r} ${x - 0.2 * r} ${y - 0.74 * r}M${x - 0.12 * r} ${y + 0.86 * r}Q${x - 0.2 * r} ${y + 0.1 * r} ${x - 0.04 * r} ${y - 0.7 * r}`;
-  const tie = `M${x - 0.26 * r} ${y - 0.86 * r}Q${x} ${y - 0.74 * r} ${x + 0.26 * r} ${y - 0.86 * r}`;
-  const rim = crescent(x, y, r * 0.99, -70, 62, Math.max(5, r * 0.08));
-  return {strandsC, strandsI, tie, rim};
+  return crescent(x, y, r * 1.0, -70, 62, Math.max(5, r * 0.08));
 })();
-
-const CAP = (() => {
+const RIM_R = (() => {
   const {x, y, head} = NB.R;
   const r = head / 2;
-  const by = y + 0.42 * r; // the cap band
-  // two panel seams from the button down to the band, five short nape strands under the band, a cream rim on the
-  // sun (left) side of the cap dome
-  const seams = `M${x - 0.08 * r} ${y - 0.95 * r}Q${x - 0.5 * r} ${y - 0.55 * r} ${x - 0.58 * r} ${by - 2}M${x + 0.08 * r} ${y - 0.95 * r}Q${x + 0.5 * r} ${y - 0.55 * r} ${x + 0.58 * r} ${by - 2}`;
-  let nape = '';
-  [-0.62, -0.36, -0.08, 0.2, 0.48].forEach((u, i) => {
-    const x0 = x + u * r;
-    nape += `M${x0.toFixed(1)} ${(by + 0.1 * r).toFixed(1)}q${(0.05 * r).toFixed(1)} ${(0.16 * r).toFixed(1)} ${((i % 2 ? -0.02 : 0.04) * r).toFixed(1)} ${(0.3 * r).toFixed(1)}`;
-  });
-  const rim = crescent(x, y, r * 1.02, 190, 318, Math.max(5, r * 0.08));
-  return {seams, nape, rim};
+  return crescent(x, y, r * 1.02, 190, 318, Math.max(5, r * 0.08));
+})();
+/** The beanie's ribbed fold: three short tealDark ticks along its turned-up band. */
+const BEANIE_RIB = (() => {
+  const {x, y, head} = NB.R;
+  const r = head / 2;
+  let d = '';
+  for (const u of [-0.5, -0.17, 0.17, 0.5]) d += `M${(x + u * r).toFixed(1)} ${(y + 0.06 * r).toFixed(1)}l${(0.02 * r).toFixed(1)} ${(0.2 * r).toFixed(1)}`;
+  return d;
 })();
 
 /** Fix round 3: the right neighbour's reaction on 'millions' (replaces the raised white phone: it sat in the right
  *  rail and was the brightest thing in the frame): BOTH hands to the head (the arms swing up from below the frame,
- *  0.25 s outBack, elbows out); jointed sleeves (FigureArm) in the coat colour, sand hands on the cap's sides. */
-const HandsToHead: React.FC<{at: number}> = ({at}) => {
+ *  0.25 s outBack, elbows out); jointed sleeves (FigureArm) in the coat colour, sand hands on the beanie's sides. */
+const HandsToHead: React.FC<{at: number; coat: string}> = ({at, coat}) => {
   const t = useTime();
   if (t < at) return null;
   const {x, y, head} = NB.R;
@@ -240,7 +234,7 @@ const HandsToHead: React.FC<{at: number}> = ({at}) => {
     const down: [number, number] = [sh[0] + sd * 10, 2160];
     const up: [number, number] = [x + sd * 0.98 * r, y + 0.02 * r];
     const hand: [number, number] = [lerp(down[0], up[0], q), lerp(down[1], up[1], q)];
-    return <FigureArm key={sd} sh={sh} hand={hand} w={0.5 * r} coat={palette.teal} W={DEPTH_INK.front} side={sd} bend={70} seed={`s8/nbRarm${sd}`} />;
+    return <FigureArm key={sd} sh={sh} hand={hand} w={0.5 * r} coat={coat} W={DEPTH_INK.front} side={sd} bend={70} seed={`s8/nbRarm${sd}`} />;
   };
   return (
     <>
@@ -250,34 +244,33 @@ const HandsToHead: React.FC<{at: number}> = ({at}) => {
   );
 };
 
+/** The near pair's look. Fix round 3b: clearly DIFFERENT people from S07's side readers (the bun / tan-hair reader and
+ *  the teal-cap reader at ~75 px heads: the same identity at 2.3x across the match cut read as a pop on the people), so
+ *  the cut reads as a new place: dark curly hair over a sage coat (left), an ochre beanie over a tan coat (right). */
+const NB_LOOK = {L: {hair: 'curly' as const, hairColor: palette.ink, body: palette.sage}, R: {hair: 'beanie' as const, hairColor: palette.brown, body: palette.tan}};
+
 /** Two back-view neighbours watching the city from our deck, cropped by the bottom edge (EdgeOnlooker: the coat always
- *  runs off the frame). Fix round 3: MIRRORED to continue S07's readers across the match cut (the bun / tan-hair reader
- *  on the LEFT, the teal-cap reader on the RIGHT), the left one moved in so its head clears the bottom-left paint
- *  corner; front ink (4.8, the heaviest in the frame), ear fills, a cream rim on the sun side, strands / cap seams; the
- *  left one flinches on 'millions', the right one puts both hands on its head. Each bobs on its own (1.2 px). */
+ *  runs off the frame). Front ink (4.8, the heaviest in the frame), ear fills, a cream rim on the sun side; the left one
+ *  flinches on 'millions', the right one puts both hands on its head. Each bobs on its own (1.2 px). */
 export const Neighbours: React.FC<{reactAt: number; flinchAt: number}> = ({reactAt, flinchAt}) => {
   const t = useTime();
   const bobL = osc(t, 0.5, 0.7) * 1.2;
   const bobR = osc(t, 0.45, 2.3) * 1.2;
-  const fl = t >= flinchAt && t < flinchAt + 0.3 ? -Math.sin(((t - flinchAt) / 0.3) * Math.PI) * 9 : 0;
+  // a sharp flinch: down 14 px in 0.08 s, back over 0.22 s
+  const fl = t >= flinchAt && t < flinchAt + 0.3 ? (t - flinchAt < 0.08 ? E.outCubic((t - flinchAt) / 0.08) : 1 - E.inOutSine((t - flinchAt - 0.08) / 0.22)) * 14 : 0;
   const jolt = t >= reactAt && t < reactAt + 0.2 ? -Math.sin(((t - reactAt) / 0.2) * Math.PI) * 6 : 0;
   return (
     <>
       <XG m={mat.translate(0, bobL + fl)}>
         <HeadBack c={NB.L} />
-        <EdgeOnlooker x={NB.L.x} y={NB.L.y} head={NB.L.head} hair="bun" hairColor={palette.tan} body={palette.brown} acc={['collar']} rim="right" arms="near" depth="front" bob={0} seed="s8/nbL" />
-        <Fill d={BUN.rim} color={palette.cream} offset={false} mode="none" seed="s8/nbLrim" />
-        <Ink d={BUN.strandsI} width={2.2} seed="s8/nbLsi" />
-        <Ink d={BUN.strandsC} width={2.6} color={palette.cream} seed="s8/nbLsc" />
-        <Ink d={BUN.tie} width={3.4} taper={false} seed="s8/nbLtie" />
+        <EdgeOnlooker x={NB.L.x} y={NB.L.y} head={NB.L.head} hair={NB_LOOK.L.hair} hairColor={NB_LOOK.L.hairColor} body={NB_LOOK.L.body} acc={['collar']} rim="right" arms="near" depth="front" bob={0} seed="s8/nbL" />
+        <Fill d={RIM_L} color={palette.cream} offset={false} mode="none" seed="s8/nbLrim" />
       </XG>
       <XG m={mat.translate(0, bobR + jolt)}>
-        <HeadBack c={NB.R} />
-        <EdgeOnlooker x={NB.R.x} y={NB.R.y} head={NB.R.head} hair="cap" body={palette.teal} rim="left" arms={t >= reactAt ? false : 'near'} depth="front" bob={0} seed="s8/nbR" />
-        <Fill d={CAP.rim} color={palette.cream} offset={false} mode="none" seed="s8/nbRrim" />
-        <Ink d={CAP.seams} width={2.2} seed="s8/nbRse" />
-        <Ink d={CAP.nape} width={2} color={palette.tealDark} order="all" seed="s8/nbRna" />
-        <HandsToHead at={reactAt} />
+        <EdgeOnlooker x={NB.R.x} y={NB.R.y} head={NB.R.head} hair={NB_LOOK.R.hair} hairColor={NB_LOOK.R.hairColor} body={NB_LOOK.R.body} rim="left" arms={t >= reactAt ? false : 'near'} depth="front" bob={0} seed="s8/nbR" />
+        <Fill d={RIM_R} color={palette.cream} offset={false} mode="none" seed="s8/nbRrim" />
+        <Ink d={BEANIE_RIB} width={2.4} color={palette.ink} order="all" taper={false} seed="s8/nbRrib" />
+        <HandsToHead at={reactAt} coat={NB_LOOK.R.body} />
       </XG>
     </>
   );

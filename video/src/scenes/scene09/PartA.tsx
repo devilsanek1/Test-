@@ -13,7 +13,7 @@
 // no wipe edge crosses the captions); the set's night dressing pops off on the second step (nightUntil) and the ground
 // relights in two more flat steps behind the sky (GROUND_A / GROUND_B), never in one big flash. The sun rises in front of
 // the far towers with ONE near tower re-drawn in front of it from the first frame of the rise (its depth never changes);
-// the near tree, the far towers' dawn rims (kit v3b `dawnRims={[0]}`: the hero's own rim only) and the walker are kept
+// the near tree, the far towers' dawn rims (kit v3b `dawnRims={[0, 1, 4]}`: the hero's own rim only) and the walker are kept
 // off the sun's column.
 
 import React, {useId} from 'react';
@@ -415,16 +415,19 @@ const DuskDawn: React.FC = () => {
 /** J5 'fixed!' WRITES ON (fix round 2b): the kit FixSign wipes its clip across the whole card (0.16 s, out-cubic), so the
  *  word (the card's middle third) appeared in one frame. Here the sign is drawn twice with the same props and seeds: the
  *  struck card without the word, and over it the card WITH the word (finished before this wipe starts) clipped to a
- *  LINEAR wipe over the glyph's own span, 0.18 s (5-6 frames) right after the strike lands; pixel-identical outside the
+ *  LINEAR wipe over the glyph's own span, 0.16 s (5 frames) right after the strike; pixel-identical outside the
  *  word. (Props-lane request: wipe over the glyph span, linear, ~0.2 s.) */
-const SCRIBBLE = {at: B.fix + 0.1, dur: 0.18};
+/** Fix round 3 (on 'out' as the storyboard writes J5, and on the take's pencil_scratch_short at 35.795): 'still
+ *  fixing...' is struck at out - 0.26 and 'fixed!' writes on out - 0.16 .. out (film 35.54-35.80). */
+const STRIKE_AT = B.out - 0.26;
+const SCRIBBLE = {at: B.out - 0.16, dur: 0.16};
 const ScribbleSign: React.FC = () => {
   const t = useTime();
   const uid = 's9sc' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const {w, fs} = PA.sign;
-  const base = <FixSign x={0} y={0} w={w} fs={fs} strikeAt={B.fix} ink={SI.far} seed="s9sign" />;
+  const base = <FixSign x={0} y={0} w={w} fs={fs} strikeAt={STRIKE_AT} ink={SI.far} seed="s9sign" />;
   if (t < SCRIBBLE.at) return base;
-  const done = <FixSign x={0} y={0} w={w} fs={fs} strikeAt={B.fix} fixedAt={SCRIBBLE.at - 0.2} ink={SI.far} seed="s9sign" />;
+  const done = <FixSign x={0} y={0} w={w} fs={fs} strikeAt={STRIKE_AT} fixedAt={SCRIBBLE.at - 0.2} ink={SI.far} seed="s9sign" />;
   const q = (t - SCRIBBLE.at) / SCRIBBLE.dur;
   if (q >= 1) return done;
   // the glyph's span (FixSign: centred at x + 0.04 w, 1.12 fs lettering, -4 deg), with a little slack for the slant
@@ -511,9 +514,10 @@ const Pigeons: React.FC = () => {
 
 /** The rise (fix round 2b: ONE move, so the film's one sunrise never stalls and restarts): from just under the horizon
  *  at the VP to world y 822 (screen ~(700, 756), top ~641: under the caption floor) in 0.85 s, out-cubic, so its speed
- *  falls steadily to rest and the disc's bottom clears the two rooflines' V (~y 870 at x 588-812). The disc is drawn in
- *  front of the far towers (as before) with NO tower re-drawn over it: its edge stays a clean circle while it rises
- *  (the near-tower copy took a rectangular bite out of its rim). Gone in A2. */
+ *  falls steadily to rest. Fix round 3: the sun is the FARTHEST layer from the first frame of the rise to the hard cut:
+ *  drawn BEHIND the far skyline (no z-swap at the night -> day step), rising in the cleared VP slot (SKY_SLOT) between
+ *  the two flanking towers, whose VP-facing edges bite its lower sides as clean silhouette edges (with their peach dawn
+ *  rims); the rows' rooflines crop its bottom to the street's V. Gone in A2. */
 const SUN_RISE = 0.85;
 const SunLayer: React.FC = () => {
   const t = useTime();
@@ -521,22 +525,27 @@ const SunLayer: React.FC = () => {
   return <Sun cx={STOOP.vp[0]} cy={STOOP.vp[1] + 114} r={112} horizon={STOOP.vp[1]} drift={[0, 0]} moves={[{at: B.dawn, dur: SUN_RISE, y: 822, ease: E.outCubic}]} />;
 };
 
-/** The far towers [664, 58] and [748, 46] leave a 26 px slit (world x 722-748) right under the rising disc, and the set's
- *  peach dawn band showed through it as a stick holding the sun up: a lower block closes the slit (the towers' own night
- *  / day fills), and the dawn glow reads HORIZONTAL instead: a peach strip in front of the tower bases across the street's
- *  end (the rows in front crop it to the V at the VP). */
-const TOWER_GAP: [number, number, number, number] = [720, 902, 30, 162];
-const TOWER_DAY = '#84B09C';
+/** The VP slot (fix round 3): the two far towers right behind the rise point ([664, 58] and [748, 46], and the slit
+ *  between them) are clipped out of the set's far layer from the first frame, so the sky at the street's end is open
+ *  where S08's sun set and this sun rises; the flanking towers [604, 44] (right edge 648) and [818, 62] stay. Ends above
+ *  the set's horizon strip (y 1058). */
+const SKY_SLOT: [number, number, number, number] = [649, 640, 168, 417];
+/** The horizon glow at the street's end, BEHIND the sun (the rows in front crop it to the V at the VP):
+ *  - the DAWN glow from the dawn's second step: a horizontal strip;
+ *  - (Afterglow, fix round 3) the AFTERGLOW of S08's sunset, the match-cut's warm accent at the set point: a thin peach
+ *    strip at screen ~(600-800, 995-1005), the height of S08's, until the first window pops off (But + 0.12). */
+const AFTERGLOW: [number, number, number, number] = [620, 1055, 200, 10];
 const HORIZON_GLOW: [number, number, number, number] = [600, 1043, 260, 19];
-const FarDress: React.FC = () => {
+const HorizonGlow: React.FC = () => {
   const t = useTime();
-  const night = t < NIGHT_UNTIL;
-  return (
-    <>
-      <Fill rect={TOWER_GAP} color={night ? palette.tealDark : TOWER_DAY} offset={false} mode="snap" seed="s9tgap" />
-      {night ? null : <Fill rect={HORIZON_GLOW} color={palette.peach} offset={false} mode="snap" seed="s9hglow" />}
-    </>
-  );
+  if (t >= NIGHT_UNTIL) return <Fill rect={HORIZON_GLOW} color={palette.peach} offset={false} mode="snap" seed="s9hglow" />;
+  return null;
+};
+/** The afterglow is drawn over the rows' far ends (in the 'rows' wrap): behind them it would only show in the V's few
+ *  px at the VP, and the match needs the strip's full width to carry S08's warm accent across the cut. */
+const Afterglow: React.FC = () => {
+  const t = useTime();
+  return t < B.win1 ? <Fill rect={AFTERGLOW} color={palette.peach} offset={false} mode="snap" seed="s9aglow" /> : null;
 };
 
 /** Night (before NIGHT_UNTIL): the set keeps the road wedge at its day sand while every other ground goes night sage, and
@@ -696,9 +705,15 @@ export const PartA: React.FC<{ghost?: boolean; ghostStep?: number}> = ({ghost = 
     if (name === 'dawn') return null;
     if (name === 'far') return (
       <>
-        {groundStep(t, node)}
-        <FarDress />
+        <HorizonGlow />
         {ghost ? null : <SunLayer />}
+        <ClipOut holes={[SKY_SLOT]}>{groundStep(t, node)}</ClipOut>
+      </>
+    );
+    if (name === 'rows') return (
+      <>
+        {node}
+        <Afterglow />
       </>
     );
     if (name === 'hero') return (
@@ -724,7 +739,7 @@ export const PartA: React.FC<{ghost?: boolean; ghostStep?: number}> = ({ghost = 
         tod="night"
         nightUntil={NIGHT_UNTIL}
         glowFlickerAt={B.win1}
-        dawnRims={[0]}
+        dawnRims={[0, 1, 4]}
         wrap={wrap}
         heroLock={false}
         calendar={false}
