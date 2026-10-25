@@ -283,8 +283,6 @@ export function shadowPath(fx: number, fy: number, h: number, hw0: number): stri
   return polyPath(pts);
 }
 
-/** The passers' anchors (same as the People layer: walkers walk up the lane into the sun). */
-export type ShadowCaster = {anchors: WalkerAnchor[]};
 
 /** Flat tan shadows of everyone on the lane (the messenger, Pip, the passers), fill only, on the floor layer (dx = near
  *  -> floor world offset during the truck), clipped out of the row's teal shade. */
