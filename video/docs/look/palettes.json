@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "dna_summary": "One family, many tools. Every palette keeps our v1 DNA: a soft, light background (never saturated or dark) filling 50-80 % of the frame, soft mids from our clay family (cream, peach, sand, tan, sage), a dark warm ink for lines and captions (at least 7:1 on the background), and from the owner's references one saturated HERO on the subject (5-15 %), a deep tinted ANCHOR instead of black (~5 %) and at most one tiny hot POP for 'look here' (1-3 %). #1 is v1 as shipped, #2 the incremental polish, #3-8 sister palettes for different stories. Pick one per video (a sister palette may carry a deliberate shift, e.g. a cozy interior vs a dusk exterior); extend or add palettes when a topic needs it.",
+  "palettes": [
+    {"name": "1 Mint & Clay (v1)", "baseline": true, "mood": "As shipped in video 1. The reference point; the owner loves it.",
+     "colors": {"bg": "#A6CABB", "ground": "#EBF6E5", "disc": "#EC6B2E", "hl": "#F6B892", "line": "#547977", "skin": "#D9BBA1", "hero": "#547977", "anchor": "#3E605F", "pop": "#EC6B2E", "ink": "#2B1B0A"}},
+    {"name": "2 Mint & Clay 1.1", "mood": "The incremental polish of v1: same world, a cleaner saturated teal hero, a deeper anchor, a tiny marigold pop.",
+     "colors": {"bg": "#A6CABB", "ground": "#EBF6E5", "disc": "#EC6B2E", "hl": "#F6B892", "line": "#547977", "skin": "#D9BBA1", "hero": "#00857F", "anchor": "#203A3B", "pop": "#F9A31B", "ink": "#2B1B0A"}},
+    {"name": "3 Cream & Cobalt", "mood": "Our cream as the page (like the references), cobalt hero, our orange as the pop. Tech, clear explainers.",
+     "colors": {"bg": "#F3E6D6", "ground": "#D9BBA1", "disc": "#F6B892", "hl": "#F6B892", "line": "#BA977E", "skin": "#E3A57F", "hero": "#3F7FE0", "anchor": "#2B2A44", "pop": "#EC6B2E", "ink": "#2B1B0A"}},
+    {"name": "4 Blush & Pip", "mood": "Blush page, periwinkle hero (Pip's colour), aubergine anchor. Human, light, brand moments.",
+     "colors": {"bg": "#F5E3DC", "ground": "#E9CBBF", "disc": "#F6B892", "hl": "#F7C9D9", "line": "#C99A8A", "skin": "#D9A27E", "hero": "#6A70F7", "anchor": "#34244A", "pop": "#FA9306", "ink": "#2B1B0A"}},
+    {"name": "5 Sage Study", "mood": "Cozy enclosure: a lamp-lit interior, sage and oat, deep forest anchor, amber pop. Home, desk, quiet scenes.",
+     "colors": {"bg": "#EEF0E3", "ground": "#D7E0C8", "disc": "#F2D49B", "hl": "#F2D49B", "line": "#9DB39A", "skin": "#D9A27E", "hero": "#1F8A78", "anchor": "#22332C", "pop": "#F2A541", "ink": "#2B1B0A"}},
+    {"name": "6 Dusk", "mood": "Evening version of the family: cool mist, a low peach sun, indigo hero, coral pop. Serious, night, high stakes.",
+     "colors": {"bg": "#D9DEE5", "ground": "#BAC3CE", "disc": "#F3B27E", "hl": "#F3B27E", "line": "#8A9AA8", "skin": "#C98F7A", "hero": "#3E5BD0", "anchor": "#1F2433", "pop": "#FF7A4D", "ink": "#1C1A26"}},
+    {"name": "7 Autumn Ochre", "mood": "Our clay family turned warmer: ochre sun, burnt-orange hero, a small cool blue pop (a screen glow). Money, everyday life.",
+     "colors": {"bg": "#F3E6D3", "ground": "#D9BBA1", "disc": "#E9B66B", "hl": "#F6B892", "line": "#88652F", "skin": "#C98A64", "hero": "#D05D38", "anchor": "#3A2A22", "pop": "#2F8EEB", "ink": "#2B1B0A"}},
+    {"name": "8 Harbour", "mood": "Cool, fresh page with a warm coral hero, deep sea anchor, sunny pop. Science, health, the outdoors.",
+     "colors": {"bg": "#E4EEF0", "ground": "#C9DCD8", "disc": "#F6D9A8", "hl": "#F6D9A8", "line": "#7FA3A4", "skin": "#D9A27E", "hero": "#E8593D", "anchor": "#24414A", "pop": "#FFC23D", "ink": "#1E2A2E"}}
+  ]
+}

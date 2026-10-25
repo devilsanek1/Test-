@@ -35,31 +35,52 @@ theme and the proposed direction.
 6. **Secondary elements as line-only drawings:** in ref 1 the house and trees are single-colour olive line art, so the
    subject is the only solid mass.
 
-## The rule: be tactical, one palette card per video (owner, 2026-10-25)
+## The house palette family: tools, not a cage (owner, 2026-10-25)
 
-> "It's not that we should mix ALL these colours in the same video, then we get a complete mess, but be tactical about it."
+**The owner's direction, in three messages:**
+- "It's not that we should mix ALL these colours in the same video, then we get a complete mess, but be tactical about it."
+- "The idea is to have multiple 'similar-ish' stylistic ones that we can pick and choose for each video, that would all
+  have the same general style, but be slightly different and unique."
+- "I frankly like our colours too. It's not that we should change it completely, but see if we can make a next
+  incremental shift and polish, and ultimately have multiple palettes as tools available for various use cases, but
+  not get completely stuck in the given set of colours: expand if needed and where relevant."
 
-- **Every video is the shared house base plus ONE accent card, chosen at G4 to fit the story.**
-  - The base is the same in every video: the warm off-white or cream background, soft mids (sand, peach, tan) and
-    dark-brown ink for lines and captions.
-  - The card has 3 colours, no more:
-    - **1 hero colour** at 5-15 % of the frame, on the subject or the story's object, in the same hue for the whole video;
-    - **1 dark anchor** at about 5 %, for weight and the darkest large shapes;
-    - **at most 1 hot pop** at 1-3 %, only on what the eye must hit first (the frame-0 hook detail, a key reveal).
-- **Every colour has one job and keeps it all video long.** For example: hero = what the story is about,
-  anchor = weight / threat, pop = "look here". Don't recolour roles mid-video.
-- **Never bring in reference colours outside the card.** No second hero, no confetti of accents. Any frame shows the
-  base neutrals plus at most the card's 3 colours.
-- **Example cards** (see `palette_refs/swatches.png`):
+**The board** is `palette_family.png`: the same small scene drawn in each of the 8 palettes. The data (role → hex) is in
+`palettes.json`. Regenerate the board after any change, with
+`python3 scripts/look/palette_board.py && node scripts/look/shoot.cjs` (run from `video/`). The Python step also checks
+every palette against the DNA below.
 
-  | Card | Hero | Anchor | Pop | Suits |
-  |---|---|---|---|---|
-  | A Pip periwinkle | periwinkle `#6A70F7` | aubergine `#34244A` | orange `#FA9306` | the brand default; tech explainers (Pip is periwinkle) |
-  | B Cobalt + coral | cobalt `#509EFB` | aubergine `#34244A` | coral `#FA582F` | serious / alarm stories (the cool hero against a warm alarm pop) |
-  | C Autumn warm | burnt orange `#D05D38` | charcoal `#211E1E` | olive `#AC933A` (soft, as the pop) | cozy, human, everyday-life stories |
-  | D Pink wash | pink wash `#FCB4E2` (large, soft) | aubergine `#37274F` | periwinkle `#6872F9` | light or celebratory topics; use rarely |
+**The house DNA** keeps the palettes one family. The numbers are CIE L* (lightness) and C (colourfulness):
+- **Background:** soft and light (L* >= 75, C <= 20), never saturated or dark. It fills 50-80 % of the frame.
+- **Mids:** soft, from our clay family (cream, peach, sand, tan, sage) or the palette's own tints. Background props can
+  be single-colour line drawings.
+- **Ink:** dark and warm (L* <= 25), never pure black, for lines and captions. At least 7:1 contrast on the background.
+- **The references' trick, used tactically:**
+  - **one hero** (C >= 30): saturated, on the subject or the story's object, 5-15 % of the frame;
+  - **one dark anchor** (L* <= 40): tinted, instead of black, about 5 %;
+  - **at most one hot pop** (C >= 50): 1-3 %, only on "look here" (the frame-0 hook detail, a notification, a reveal).
+- **Texture:** a very light stipple grain on fills (it must survive Reels compression). Thin interior lines.
 
-- **Also from the references:** a fine stipple grain on the hero and anchor fills (check it survives Reels compression),
-  thin interior lines only, and background props as single-colour line drawings so the subject is the only solid mass.
-- **The G4 look gate:** render 2-4 cards on the same style frame. The owner picks one card for the whole video, and it
-  is frozen with the look.
+**The family (v1):**
+
+| # | Palette | What it is | Use cases |
+|---|---|---|---|
+| 1 | Mint & Clay (v1) | video 1 as shipped; the reference point | anything; our signature |
+| 2 | Mint & Clay 1.1 | **the incremental polish of v1:** same world, a saturated teal hero `#00857F`, a deeper anchor `#203A3B`, a tiny marigold pop `#F9A31B` | the default from video 2 on, unless a story asks for another |
+| 3 | Cream & Cobalt | our cream as the page, cobalt hero, our orange as the pop | tech, clear explainers |
+| 4 | Blush & Pip | blush page, periwinkle hero (Pip's colour), aubergine anchor | human, light, brand moments |
+| 5 | Sage Study | sage and oat, lamp light, forest anchor, amber pop | cozy enclosure: home, desk, quiet interiors |
+| 6 | Dusk | cool mist, low peach sun, indigo hero, coral pop | serious, night, high stakes |
+| 7 | Autumn Ochre | our clay family warmer, burnt-orange hero, a small cool blue pop | money, everyday life |
+| 8 | Harbour | a cool, fresh page with a warm coral hero and a deep sea anchor | science, health, the outdoors |
+
+**How to use it:**
+- **Each video picks one main palette** at G4, by rendering style frames in 2-3 candidates. A sister palette may carry a
+  deliberate shift inside the story, for example a Sage Study interior followed by a Dusk exterior for the scale
+  reveal, because they share the DNA. Never mix many at once.
+- **Within a video, colours keep their jobs:** hero = what the story is about, anchor = weight, pop = "look here".
+- **Don't get stuck:**
+  - add a colour when the story needs one (a brand colour, a map, a warning sign) and give it a role;
+  - make a new palette by copying the closest one, changing the background tint and the hero / anchor / pop, running
+    the DNA check, and adding it to `palettes.json` with its mood and use cases.
+- The palettes evolve: polish the existing ones with each video's lessons (owner feedback goes in the playbook).
