@@ -85,6 +85,10 @@ Format: **rule** — why / evidence (video, date).
 - **When a news item is small, research the bigger story around it** (history, the pattern across companies, what's
   at stake) and lead with the most powerful TRUE framing (v2: "engineers resigning and afraid to speak", not just "people
   leaving Google"). — owner, 2026-10-25.
+- **Personal framings must feel natural, not over the top:** "You're up against AI data centers… and losing" was too much
+  for the owner ("how would people react hearing this?"). Don't cast the viewer as a loser or a competitor in a contest they
+  don't feel; test any "you" claim with a viewer panel for eye-rolls before it's locked. — owner, v3 G2, 2026-10-25.
+- **v3 hook pick: H2, the question ("Buying a laptop soon? AI's making it pricier.")** over the verbatim core line. — owner, v3 G2, 2026-10-25.
 - **Target 30-45 s and end close to the payoff.** Viewers who passed the hook stayed until about 40 s, then left once
   the story felt resolved. — same insights.
 - **Every frame should be at least 8/10, with no dead frames, and cuts locked to the beat** (the owner's creator-reel tips). — v1.
