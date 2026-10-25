@@ -9,11 +9,11 @@
 //   21.732  ZOOM_AT        the gust lifts it at the lens: T-MATCH zoom to the hold in 4 frames, the spec's accelerating
 //                          steps (x1.35, x1.8, x2.0, then the full page), position and rotation on the same log-scale
 //                          progress
-//   21.865 -> 21.967       the full page, printed side to us (fix round 3: x7.8 at HOLD.focus (390, 920), +4 deg: the
-//                          RINGED BIT DOODLE whole between x ~480 and ~1055, the LOCK SKETCH's short bolt from the left
-//                          edge to its tip, the gap and the socket (x ~0-420) beside it, the bottom text lines below; the
-//                          page still covers every frame corner by >= 25 px), creeping +4 % and -0.4 deg about the
-//                          doodle; S06's own copy never leaves this hold
+//   21.865 -> 21.967       the full page, printed side to us (fix round 3: x7.8 at HOLD.focus (420, 940), +7 deg: the
+//                          RINGED BIT DOODLE whole between x ~490 and ~1060, the LOCK SKETCH's short bolt from the left
+//                          edge to its tip, the gap and the socket (x ~0-440) beside it, the bottom text lines below; the
+//                          white paper still covers every frame corner by >= 24 px, dog-ear outside), creeping +4 % and
+//                          -0.4 deg about the doodle; S06's own copy never leaves this hold
 //   21.967 -> 22.165       (fix round 3, the lens hand-over pop) the OUT phase of S07's lane, scene07/lens.ts
 //                          lensOutAt, started FROM the hold state on S06's last frame (f659): a lens pull-back about a
 //                          fixed point (no re-centring), per-frame scale ratios ~0.61 / 0.64 / 0.66 / 0.70 / 0.75, eased
@@ -47,11 +47,12 @@ export const ZOOM_AT = S07_PIN - (MZ.in + MZ.hold + MZ.out);
 /** When the page reaches the full-frame hold. */
 export const PAGE_FULL = ZOOM_AT + MZ.in;
 /** S06's hold (frames 656-659). Fix round 3 (the hold read 'a bug drawing on white': the lock sketch was cut in half):
- *  x7.8 at (390, 920), +4 deg, so the lock's short bolt runs from the left frame edge to its tip with the gap and the
- *  socket beside it (screen x ~0-420) while the ringed Bit doodle stays whole (x ~480-1055) below the caption band; the
- *  dog-eared top-right corner stays outside the frame (every frame corner >= 25 px inside the paper through the creep);
- *  it creeps +4 % / -0.4 deg about the doodle. (x8.5 cannot hold both: bolt housing to ring edge is 142 page units.) */
-const HOLD = {s: 7.8, focus: [390, 920] as Pt, rot: 4, creep: 0.04, creepRot: -0.4};
+ *  x7.8 at (420, 940), +7 deg, so the lock's short bolt runs in from the left frame edge to its tip with the gap and the
+ *  socket beside it (screen x ~0-440) while the ringed Bit doodle stays whole (x ~490-1060) below the caption band; the
+ *  folded dog-ear stays outside the top-right frame corner (every frame corner and the whole top edge >= 24 px inside
+ *  the white paper through the creep: the +7 deg tilt is what clears the ear); it creeps +4 % / -0.4 deg about the
+ *  doodle. (x8.5 cannot hold both: bolt housing to ring edge is 142 page units = 1210 px.) */
+const HOLD = {s: 7.8, focus: [420, 940] as Pt, rot: 7, creep: 0.04, creepRot: -0.4};
 const DOODLE: Pt = [S07_SHEET.w * 0.25, S07_SHEET.h * 0.22];
 
 /** The gust (screen px): from just off the left edge to the left third, still moving at the end. */
