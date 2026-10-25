@@ -15,7 +15,6 @@ import {B} from './beats';
 import {a2ToB, a2ToBMat, camAt, toScreen} from './camera';
 import {A2Actors, PA, pipA, PipFigure} from './PartA';
 import {A2Ground, DoorMatch} from './matchcut';
-import {BigTags} from './tags';
 import {Glint} from './shims';
 
 // ---------------------------------------------------------------- small B-world beats
@@ -268,7 +267,6 @@ export const PartBWorld: React.FC = () => {
         wrap={wrap}
         seed="terr"
       />
-      {t >= B.tags ? <BigTags at={B.tags} step={0.075} /> : null}
       <RidgeRims />
       <KeeperPath />
       <XG m={a2ToBMat}>

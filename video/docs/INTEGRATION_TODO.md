@@ -53,6 +53,14 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
 - S01 in lane (if its fix rounds don't get to it): padlocks 52-60 px, 3.4 px ink, cream/ochre body, overlapping the
   shutter's bottom rail.
 
+## Run log
+
+- 00:05: a usage limit stopped ~37 agents mid-task across the 4 scene workflows and kit v3b; their last fix rounds were
+  lost. 00:40: tree checked (tsc clean, Main renders). Kit v3b resumed (sets/props builds kept). Scenes relaunched as
+  4 `scene-polish` workflows (scripts/scene-polish.js): fresh review of the current state, fix rounds carry the kit
+  notes, S12 built after S01. Workflow resume does NOT replay concurrent scene runs (call order changes), so after
+  any future interruption relaunch scene-polish for the unfinished scenes instead of resuming.
+
 ## Other
 
 - Edge treatment: DONE, `paint-subtle` is wired into `Film` (full film only, captions above, one painting per scene).

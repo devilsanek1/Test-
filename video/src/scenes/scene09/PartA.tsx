@@ -13,7 +13,8 @@
 // no wipe edge crosses the captions); the set's night dressing pops off on the second step (nightUntil) and the ground
 // relights in two more flat steps behind the sky (GROUND_A / GROUND_B), never in one big flash. The sun rises in front of
 // the far towers with ONE near tower re-drawn in front of it from the first frame of the rise (its depth never changes);
-// the near tree, the far towers' dawn rims and the walker are kept off the sun's column.
+// the near tree, the far towers' dawn rims (kit v3b `dawnRims={[0]}`: the hero's own rim only) and the walker are kept
+// off the sun's column.
 
 import React from 'react';
 import {Fill, Ink, Sun, Bird, Tod, palette, useTime, ease as E, prog, lerp, clamp, mat, XG, rectPath, line, springAt, springs, wirePoint} from '../../lib';
@@ -400,9 +401,6 @@ type Rect = [number, number, number, number];
 
 /** The near tree (STOOP.nearTree: crown + trunk, x 585-725) stands exactly in the sunrise's column: kept out. */
 const TREE_HOLE: Rect = [574, 944, 162, 442];
-/** The far towers' dawn rims (STOOP.dawnRims[1..4], x 640-824, y 760-1016) would stand in front of the sun: kept out
- *  (the hero's own rim [0] stays). Nothing else of the hero layer lives in that box. */
-const RIMS_HOLE: Rect = [634, 752, 198, 270];
 
 const mapOf = (m: Record<string, string>) => {
   const u: Record<string, string> = {};
@@ -446,7 +444,7 @@ export const PartA: React.FC = () => {
     if (name === 'hero') return (
       <>
         <Neighbour />
-        <ClipOut holes={[RIMS_HOLE]}>{node}</ClipOut>
+        {node}
       </>
     );
     if (name === 'ground') return groundStep(t, node);
@@ -459,6 +457,7 @@ export const PartA: React.FC = () => {
         tod="night"
         nightUntil={NIGHT_UNTIL}
         glowFlickerAt={B.win1}
+        dawnRims={[0]}
         wrap={wrap}
         heroLock={false}
         calendar={false}
