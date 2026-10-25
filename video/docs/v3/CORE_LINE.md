@@ -6,6 +6,8 @@ Nothing is committed.
 
 ## 1. Pick one
 
+**OWNER PICKED B (2026-10-25): "AI is making your next laptop pricier." Frame 0 / cover: AI IS MAKING YOUR NEXT LAPTOP PRICIER.** Locked.
+
 **A (recommended). "Don't use AI? It's still raising laptop prices."** Lever: unfairness. 8 words.
 - Frame 0 / cover, ALL CAPS, 8 words: **DON'T USE AI? IT'S STILL RAISING LAPTOP PRICES**. Keep STILL: without it, the caps line can read as "Don't use AI, it's raising laptop prices", i.e. your own AI use causes it, which we never say.
 - Hook seed, 0-2 s: "Don't use AI? It's STILL raising laptop prices." [dry, indignant on their behalf, quick; beat after the question; lean on STILL]. By ~5 s: "AI data centers are buying up the memory chips."
