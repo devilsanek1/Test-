@@ -80,6 +80,7 @@ Format: **rule** — why / evidence (video, date).
 - **Accounts: Instagram `what.the.fuss.is.about`** (Creator account, Education); TikTok and YouTube Shorts under the same
   name, handle and avatar. Posting texts per video: `docs/POSTING_KIT.md`. — 2026-10-25.
 - **AI label ON** (AI narration voice) on every platform. — 2026-10-25.
+- **Upload at the highest quality and natively on each platform** (checklist in `docs/POSTING_KIT.md`; owner asked, 2026-10-25).
 - **No paid boost until 3-5 posts exist;** then boost the best organic performer for profile visits. — 2026-10-25.
 
 ## Performance log (one line per video and check)
