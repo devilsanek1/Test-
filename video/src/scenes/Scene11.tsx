@@ -39,7 +39,7 @@ import {ABS, localBeats, SCENE} from './scene11/beats';
 import {camAt, camKeys, camMat, toScreen} from './scene11/camera';
 import {GovBWindow, Pigeon, PlainPane, SillSnail} from './scene11/actors';
 import {BandClip, LitGlass, NearLamp, StepTreads} from './scene11/near';
-import {backSoonW, BitRim, NoteBack, NoteBreeze, NoteFlight, NoteStrike, PadlockRock, padlockShackleTop, Sparkle, StepRipple, TagTwirl} from './scene11/shims';
+import {backSoonFont, backSoonW, BitRim, NoteBack, NoteBreeze, NoteFlight, NoteStrike, PadlockRock, padlockShackleTop, PipHopSmear, ShutterStreaks, Sparkle, StepRipple, TagTwirl} from './scene11/shims';
 import {Fill} from '../lib/Fill';
 import {Ink} from '../lib/Ink';
 import {palette, stroke} from '../lib/theme';
@@ -100,6 +100,7 @@ const MID_CLOSE = 3.4 * 0.7;
 
 // govB's bands (GovernmentPlaza G.B): dome base 792, cornice bottom 926, x 396-640
 const G_B = {x0: 396, x1: 640, domeBase: 792, cornB: 926};
+const GOVB_WIN = PLAZA.gov.govB.window; // [414, 970, 208, 146]: the shutter's curtain rect
 
 // Pip's exit hop toward the lens (feet anchor, SCREEN px from his sill point; tau = s after b.pipOut): x = x0 + vx tau,
 // y = y0 + vy tau + g tau^2, scale = PIP_S' (1 + grow tau), rotate = rot0 + rotV tau (deg), pose sit-front (happy)
@@ -112,7 +113,11 @@ const ONL = [
   {x: 228, y: 1840, head: 104},
   {x: 408, y: 1798, head: 110},
 ];
-const PIP_EXIT = {vx: 150, vy: -1000, g: 1800, grow: 1.4, rot0: -12, rotV: 20};
+// A1 polish (review: S11's last frame was still rising at -7 px / frame while S12 picks him up already falling): the
+// leap's APEX is now at the cut (vy = -2 g tau_c, tau_c = 52.163 - 51.945 = 0.218 s) with the SAME rise at the cut
+// (132.5 px), so the last frame's position is unchanged within 2.4 px (feet y 1323.8, was 1326.2) and his vertical
+// speed there is ~-2 px / frame (was -8.6): S12's first frame (just past the apex, falling) follows on
+const PIP_EXIT = {vx: 150, vy: -1215.2, g: 2787.2, grow: 1.4, rot0: -12, rotV: 20};
 
 const Scene11: React.FC = () => {
   useCaptionFont();
@@ -142,9 +147,9 @@ const Scene11: React.FC = () => {
           {(r) => <PowerGlyph r={r} inkOnAt={b.glyph} seed="s11/pwr" />}
         </Sun>
       </SunPress>
-      {/* fix round 3: a flat peach band r 124 -> 146 -> 168 (12 / 8 / 4 px, 2 frames each), its top at screen y >= 530:
-          under the caption lines (their descenders end ~500), in the band's calm bottom strip for 4 frames */}
-      <StepRipple cx={SUN.x + SUN_DRIFT * b.press} cy={SUN.y} at={b.press} />
+      {/* a flat peach band stepping r 118 -> 128 -> 138 (10 / 6 / 3 px, 2 frames each). A1 polish (review: the 146 / 168
+          steps put peach at screen y 530-552, inside the caption band): its outer edge stays at r <= 140, top >= 560 */}
+      <StepRipple cx={SUN.x + SUN_DRIFT * b.press} cy={SUN.y} at={b.press} radii={[118, 128, 138]} widths={[10, 6, 3]} />
     </XG>
   );
 
@@ -169,7 +174,7 @@ const Scene11: React.FC = () => {
       return <PlainPane r={r} inkW={MID_CLOSE} crt={u} seed={`s11/${id}/pane`} />;
     }
     return (
-      <GovBWindow r={r} steps={steps} hiccups={[b.ringHiccup1, b.barBack]} barsAt={[b.ringHiccup1 - 0.12, b.barFlicker - 0.03, b.earFlick - 0.03]} barsX0={NOTICE.x - NOTICE.w / 2 - r[0] + 3} reloadAt={[b.snailCrawl + 0.05]} shakeAt={b.barBack} flickerAt={b.barFlicker} ringR={12.5} alertAt={b.barBack} inkW={MID_CLOSE} seed="s11/govB">
+      <GovBWindow r={r} steps={steps} hiccups={[b.ringHiccup1, b.barBack]} barsAt={[b.ringHiccup1 - 0.12, b.barFlicker - 0.03, b.earFlick - 0.03]} barsX0={NOTICE.x - NOTICE.w / 2 - r[0] + 3} reloadAt={[b.snailCrawl + 0.05]} shakeAt={b.barBack} flickerAt={b.barFlicker} ringR={12.5} alertAt={b.alert} inkW={MID_CLOSE} seed="s11/govB">
         <LabelTag kind="notice" x={NOTICE.x} y={NOTICE.y} w={NOTICE.w} h={NOTICE.h} lines={['FBI · NSA', 'UK NCSC · CERT-EU']} fontSize={NOTICE.fs} minFont={NOTICE.fs} at={b.notice} rot={-1} inkPx={2.2} paper={palette.white} seed="s11/L14" />
       </GovBWindow>
     );
@@ -219,8 +224,11 @@ const Scene11: React.FC = () => {
     {t: b.earFlick, pose: 'sit-back', look: 0.6, rot: 1},
     {t: b.lookNotice, pose: 'sit-back', look: 0.75, rot: 0}, // no lean: his ear keeps clear air to the notice's tape
     {t: b.snailCrawl + 0.06, pose: 'sit-back', look: 0.95, rot: 0, up: 0.06}, // the page tries again: he perks up at the bar
-    {t: b.glanceSun, pose: 'sit-back', look: 1, rot: 3, up: 0.08},
-    {t: b.press - 0.2, pose: 'sit-back', look: 1, rot: 7, up: 0.03}, // braces, leaning toward the sun as it gets pressed
+    // A1 polish (review: 1-7 deg leans of the back view do not read at phone size): a SILHOUETTE change. On end(yet) he
+    // gets up on the sill in profile facing the sun (stand-side, facing right), nose and trunk tipped up toward it, and
+    // holds it through the press (braced, eyes wide); the shutter's slam drops him back to sit-back (startle)
+    {t: b.glanceSun, pose: 'stand-side', look: 0.4, rot: -14, up: 0.12},
+    {t: b.press - 0.2, pose: 'stand-side', look: 0.4, expression: 'wide', rot: -17, up: -0.08}, // braces (a crouch, eyes wide) as it gets pressed
     {t: b.shutter + 0.06, pose: 'sit-back', look: 0.2, rot: -5},
     {t: b.padlock + 0.1, pose: 'sit-back', look: 0.6, rot: 4}, // the click: he glances at the padlock
     {t: b.pigeonLand + 0.08, pose: 'sit-back', look: 0.3, rot: -2, up: 0.08}, // a pigeon lands right above him: he looks up
@@ -257,11 +265,24 @@ const Scene11: React.FC = () => {
   // govA's column base and the lamp post, never on govA's window glass)
   const inHop = hop({t, t0: b.pipLand - 0.34, dur: 0.34, from: {x: -270, y: 1500}, to: {x: pipAnchor[0], y: pipAnchor[1]}, height: 32});
   if (t < b.pipLand) {
-    pip = inHop.k > 0 || t >= b.pipLand - 0.5 ? <Elephant x={inHop.x} y={inHop.y} scale={pipScale} pose="stand-side" amount={inHop.spread} squash={inHop.squash} rotate={inHop.rotate} t={t} seed={11} /> : null;
+    // A1 polish: 3 ink speed lines trail him on the fast frames (f1-f5, ~55 px / frame), S12's fall-smear language
+    let smear: React.ReactNode = null;
+    if (inHop.airborne && t >= 1 / 30 - 1e-4 && inHop.k < 0.88) {
+      const h0 = hop({t: t - 0.005, t0: b.pipLand - 0.34, dur: 0.34, from: {x: -270, y: 1500}, to: {x: pipAnchor[0], y: pipAnchor[1]}, height: 32});
+      smear = <PipHopSmear x={inHop.x} y={inHop.y} vx={(inHop.x - h0.x) / 0.005} vy={(inHop.y - h0.y) / 0.005} scale={pipScale} />;
+    }
+    pip =
+      inHop.k > 0 || t >= b.pipLand - 0.5 ? (
+        <>
+          {smear}
+          <Elephant x={inHop.x} y={inHop.y} scale={pipScale} pose="stand-side" amount={inHop.spread} squash={inHop.squash} rotate={inHop.rotate} t={t} seed={11} />
+        </>
+      ) : null;
   } else if (t < b.pipOut) {
-    // hops off the sill toward the lens: a crouch first
+    // hops off the sill toward the lens: a crouch first (A1 polish: 0.09 s, from the strike's end: it no longer runs
+    // under the strike)
     const t0 = b.pipOut;
-    const crouch = t >= t0 - 0.12 ? 0.2 * Math.sin((Math.min(1, (t - (t0 - 0.12)) / 0.12) * Math.PI) / 2) : 0;
+    const crouch = t >= t0 - 0.09 ? 0.2 * Math.sin((Math.min(1, (t - (t0 - 0.09)) / 0.09) * Math.PI) / 2) : 0;
     pip = <ElephantTimeline x={pipAnchor[0]} y={pipAnchor[1]} scale={pipScale} t={t} seed={11} keys={pipKeys} squash={inHop.squash + crouch - pipUp} rotate={pipRot} amount={shrugAmt} />;
   } else {
     // fix round 2: a real LEAP up and toward the lens, facing right (S12's bollard side): the profile leap pose
@@ -291,7 +312,7 @@ const Scene11: React.FC = () => {
       size={NOTE_FS}
       slapAt={slap ? slapAt : undefined}
       flutter={false}
-      curlAt={[b.noteCurl, b.strike + 0.2]}
+      curlAt={[b.noteCurl, b.strike + 0.27]}
       rot={NOTE_ROT}
       inkPx={3.4}
       seed="s11/J6"
@@ -351,6 +372,8 @@ const Scene11: React.FC = () => {
             {plaza(LO.lantern)}
           </BandClip>
         ) : null}
+        {/* A1 polish: cream motion streaks on the slamming shutter's fastest frames (f101-f103: its ribs alias) */}
+        <ShutterStreaks x={GOVB_WIN[0]} y={GOVB_WIN[1]} w={GOVB_WIN[2]} h={GOVB_WIN[3]} slamAt={b.shutter} />
         {/* govB's lit glass (drum slots, lantern core): lit until the cascade, then dark (lantern f104, drum f106) */}
         <LitGlass lanternAt={LO.lantern} drumAt={LO.drum} />
         {/* govC's clock face sat as a half-cropped white disc at the right edge beside the sun: S11 paints the turret plain
@@ -362,11 +385,12 @@ const Scene11: React.FC = () => {
         {/* on the closed shutter: the sticky note (J6), then S01's lettered 'back soon' tag on its nail and S01's padlock
             on the rail (drawn by the scene: they rock / twirl and they sit over the bold near-plane strokes) */}
         <NoteFlight x={NOTE.x} y={NOTE.y} from={NOTE_FROM} arriveAt={slapAt} dur={slapAt - b.noteDrop} flipDur={0.15} clipY={CORNICE_B} back={<NoteBack x={NOTE.x} y={NOTE.y} w={NOTE_BACK.w} h={NOTE_BACK.h} rot={NOTE_ROT} lines={NOTE_LINES} fontSize={NOTE_BACK.fs} inkPx={3.4} />} face={noteEl(false)} />
-        <NoteBreeze x={NOTE.x} y={NOTE.y} h={NOTE.h} flutterAt={[b.noteCurl - 0.02, b.strike + 0.18]} joltAt={b.strike}>
+        <NoteBreeze x={NOTE.x} y={NOTE.y} h={NOTE.h} flutterAt={[b.noteCurl - 0.02, b.strike + 0.25]} joltAt={b.strike}>
           {noteEl(true)}
           {t >= slapAt ? <NoteStrike x={NOTE.x} y={NOTE.y} w={NOTE.w} h={NOTE.h} lines={NOTE_LINES} fontSize={NOTE_FS} strike="and on again" rot={NOTE_ROT} at={b.strike} widthPx={5.2} overPx={8} seed="s11/J6/strike" /> : null}
         </NoteBreeze>
-        <TagTwirl x={TAG.x} y={TAG.y} twirlAt={[b.tagTwirl]}>
+        {/* A1 polish: on the twirl's edge-on frames (narrower than 35 %) the same tag with no lettering (the paper edge) */}
+        <TagTwirl x={TAG.x} y={TAG.y} twirlAt={[b.tagTwirl]} edge={<BackSoonTag x={TAG.x} y={TAG.y} lettered text=" " font={backSoonFont(tagW)} size={tagW} at={b.tag} tapAt={[b.tagTwirl + 0.45, b.tagSway]} inkPx={3.4} seed="plaza/govB/tag" />}>
           <BackSoonTag x={TAG.x} y={TAG.y} lettered text="back soon" size={tagW} minFont={10} at={b.tag} tapAt={[b.tagTwirl + 0.45, b.tagSway]} inkPx={3.4} seed="plaza/govB/tag" />
         </TagTwirl>
         {t >= b.tag ? <path d={blob(TAG.x, TAG.y - 0.4, 1.6, 1.6, {seed: 's11/nail'})} fill={palette.ink} /> : null}
@@ -375,9 +399,9 @@ const Scene11: React.FC = () => {
         </PadlockRock>
         <Sparkle x={PAD[0] + 15} y={PAD[1] - 5} r={7} at={[b.glint]} />
         {/* the sill: the snail (running gag), Bit; the pigeons on the cornice and on the shutter box */}
-        <SillSnail x={SNAIL_AT[0]} y={SNAIL_AT[1]} size={28} shellAt={b.snailShell} crawlAt={b.snailCrawl} hideAt={b.snailHide} antennaeAt={b.antennae} peekAt={b.pipOut} seed="s11/snail" />
+        <SillSnail x={SNAIL_AT[0]} y={SNAIL_AT[1]} size={28} shellAt={b.snailShell} crawlAt={b.snailCrawl} hideAt={b.snailHide} antennaeAt={b.antennae} peekAt={b.pipOut} speed={5} seed="s11/snail" />
         {bit}
-        <Pigeon x={CORNICE_PIGEON[0]} y={CORNICE_PIGEON[1]} s={PIGEON_S} shuffle={[{at: b.ringHiccup1, dx: -9}, {at: b.cornShuffle, dx: 6}, {at: b.barBack + 0.17, dx: 4}, {at: b.antennae + 0.08, dx: -3}]} hopAt={[b.press + 0.05, b.glint + 0.17]} preenAt={b.preen} seed="s11/pg1" />
+        <Pigeon x={CORNICE_PIGEON[0]} y={CORNICE_PIGEON[1]} s={PIGEON_S} shuffle={[{at: b.ringHiccup1, dx: -9}, {at: b.cornShuffle, dx: 6}, {at: b.barBack + 0.17, dx: 4}, {at: b.antennae + 0.08, dx: -3}]} hopAt={[b.cornShuffle, b.press + 0.05, b.glint + 0.17]} preenAt={b.preen} seed="s11/pg1" />
         {/* the box pigeon: crouch, then off up-left (the whole bird, flapping, 20 -> 28 px / frame) with the tag sway,
             after Pip's hop-off: clear of the box by the cut, mid-flight on the last frame */}
         <Pigeon x={BOX_PIGEON[0]} y={BOX_PIGEON[1]} s={PIGEON_S} land={{at: b.pigeonLand, from: [175, 875], dur: 0.45}} shuffle={[{at: b.noteSlap + 0.18, dx: 5}]} hopAt={[b.glint - 0.03]} hopH={20} flyAt={b.pigeonFly} flyTo={[-300, -200]} flySpeed={[20, 28]} seed="s11/pg2" />
@@ -389,7 +413,7 @@ const Scene11: React.FC = () => {
           Fix round 2: brown / tan hair and NO phones in S11 (S12 opens on the wide with the phones already up) */}
       {pip}
       <NearLamp offAt={b.lampOff} />
-      <EdgeOnlooker x={ONL[0].x} y={ONL[0].y} head={ONL[0].head} hair="bun" hairColor={palette.brown} body={palette.sage} acc={['collar']} rim="right" seed="s11/onl1" />
+      <EdgeOnlooker x={ONL[0].x} y={ONL[0].y} head={ONL[0].head} hair="long" hairColor={palette.brown} body={palette.sage} acc={['collar']} rim="right" seed="s11/onl1" />
       <EdgeOnlooker x={ONL[1].x} y={ONL[1].y} head={ONL[1].head} hair="short" hairColor={palette.tan} body={palette.teal} acc={['hood']} rim="right" seed="s11/onl2" />
     </World>
   );

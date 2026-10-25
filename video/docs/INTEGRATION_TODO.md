@@ -40,6 +40,8 @@ Polish-pass results (look / motion, last review; "+fix" = a final fix round ran 
 - S01 8 / 9 PASS (final). S12 8.5 / 8.5 +fix (3 majors). S11 7.5 / 8.5 +fix.
 - 04:25 Phase A1 launched: wf_34d20713-34f (S11 then S12, 2 rounds), wf_ca272923-5e3 (S03, S05 incl. the S05->S06
   messenger continuity, 2 rounds). Still in their first polish workflows: S04, S06-S10.
+- 04:55 S06 8.5 / 8.5 PASS (final). S07 7.5 / 7.5 +fix (5 majors), S08 7.5 / 8 +fix (3 majors): phase A1 launched,
+  wf_c15ed1e0-115 (S07, S08, 2 rounds). Still in first polish: S04, S09, S10 (wf_ccd455f9-f0f).
 The integration pass re-reviews every "+fix" scene and every scene under 8.
 
 

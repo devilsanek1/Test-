@@ -6,6 +6,8 @@
 //                 side)), `acc` (kit accessories: backpack, headphones, strap...), `lanyard` (fix round 2: the badge is
 //                 NOT drawn on the back any more: only its strap, a thin ink line round the nape) and `badge` (default
 //                 false here; the shared prop always draws its back shield).
+// A1 polish: the arms are the SHARED props FigureArm (jointed sleeve, taper, cuff, sand hand), the bent ones FigureArm with
+// an explicit elbow point (the local straight Arm / BentArm are gone), as S06 does.
 // The messenger is the SHARED props Messenger again (fix round 2: ink hair + collar band, the right hand's envelope at
 // the shoulder: exactly S06's), run pose in scene05/messenger.tsx. The figure geometry, coat, sleeve and tablet are the
 // shared ones (personGeo / SparkleTablet mirrored from Figures.tsx). Feet anchor (x, y), h = total height (world px).
@@ -18,7 +20,7 @@ import {Fill} from '../../lib/Fill';
 import {Acc, Hair, Person} from '../../lib/kit';
 import {blob, polyPath, roundRect, Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
-import {SparkleTablet, sparklePath} from '../shared/props';
+import {FigureArm, SparkleTablet, sparklePath} from '../shared/props';
 
 export const TORSO = 95;
 export const LEG = 62;
@@ -36,36 +38,9 @@ export function personGeo(seed: Seed, torsoH = TORSO) {
 
 const inkFor = (h: number) => (h >= 260 ? 4.8 : h >= 120 ? 3.4 : h >= 70 ? 2.2 : 1.6);
 
-/** Mirrors Figures.tsx Arm: a sleeve from the shoulder to the hand (local person units). */
-const Arm: React.FC<{sh: Pt; hand: Pt; w?: number; coat: string; W: number; seed: string; hand2?: boolean}> = ({sh, hand, w = 19, coat, W, seed, hand2 = true}) => {
-  const dx = hand[0] - sh[0];
-  const dy = hand[1] - sh[1];
-  const L = Math.hypot(dx, dy) || 1;
-  const nx = (-dy / L) * (w / 2);
-  const ny = (dx / L) * (w / 2);
-  const tipW = 0.85;
-  const poly: Pt[] = [
-    [sh[0] + nx, sh[1] + ny],
-    [hand[0] + nx * tipW, hand[1] + ny * tipW],
-    [hand[0] - nx * tipW, hand[1] - ny * tipW],
-    [sh[0] - nx, sh[1] - ny],
-  ];
-  const f = (p: Pt) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
-  return (
-    <>
-      {hand2 ? <Fill d={blob(hand[0] + (dx / L) * 4, hand[1] + (dy / L) * 4, w * 0.42, w * 0.46, {seed: `${seed}/h`})} color={palette.sand} offset={false} mode="none" seed={`${seed}/hf`} /> : null}
-      <Fill d={polyPath(poly)} color={coat} offset={false} mode="none" seed={`${seed}/af`} />
-      <Ink d={`M${f(poly[0])}L${f(poly[1])}M${f(poly[2])}L${f(poly[3])}M${f(poly[1])}L${f(poly[2])}`} width={W} taper={false} seed={`${seed}/ai`} />
-    </>
-  );
-};
-
-/** An arm with an elbow (upper arm + forearm), hand at the end. */
+/** An arm with an elbow (upper arm + forearm), hand at the end: the shared FigureArm with an explicit elbow point. */
 const BentArm: React.FC<{sh: Pt; elbow: Pt; hand: Pt; coat: string; W: number; seed: string}> = ({sh, elbow, hand, coat, W, seed}) => (
-  <>
-    <Arm sh={sh} hand={elbow} coat={coat} W={W} seed={`${seed}/u`} hand2={false} />
-    <Arm sh={elbow} hand={hand} w={17} coat={coat} W={W} seed={`${seed}/f`} />
-  </>
+  <FigureArm sh={sh} hand={hand} elbow={elbow} coat={coat} W={W} seed={seed} />
 );
 
 /** 0 (down) .. 1 (up), 0.3 s out-back; then back down over 0.25 s (mirrors Figures.tsx raiseQ). */
@@ -134,6 +109,12 @@ export type InvestigatorProps = Frame & {
   /** Fix round 4: a big four-point INK sparkle just above the raised tablet (r in WORLD px, white keyline) + two tick
    *  stars: pops (spring) at `at`, twinkles once (size) at `twinkleAt`, pops off (one shrunken frame) at `outAt`. */
   sparkle?: {at: number; twinkleAt: number; outAt: number; r?: number};
+  /** A1 polish: from this time the raised tablet is held DOWN at chest height in front of the body (a 1-frame pose swap:
+   *  the arm and the tablet, tilted flat, go behind the coat; only the elbow and the card's edge show past the side) and
+   *  the glow steps off. */
+  chestAt?: number;
+  /** A1 polish: trouser colour (the kit's seeded pick otherwise; B1's was ink-black, the darkest block in the frame). */
+  legsColor?: string;
 };
 
 /** World centre of an investigator's raised tablet (for beams). */
@@ -239,6 +220,7 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
   const up = liftUp(p.tabletLift, side, g);
   const down: Pt = [side * g.w * 0.5, -g.h * 0.05];
   const hand: Pt = [lerp(down[0], up[0], q), lerp(down[1], up[1], q)];
+  const chest = p.chestAt !== undefined && t >= p.chestAt && q > 0.02;
   const by = -g.h * 0.62;
   const shield = `M${-11} ${by - 13}Q0 ${by - 17} 11 ${by - 13}L11 ${by}Q9 ${by + 11} 0 ${by + 16}Q-9 ${by + 11} -11 ${by}Z`;
   // the lanyard: its strap seen from behind, a shallow U round the nape from shoulder-neck to shoulder-neck (~2 px)
@@ -277,7 +259,7 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
     const hd: Pt = [sd * g.w * 0.5, -g.h * 0.05];
     const hu: Pt = [shp[0] + dir[0] * 84, shp[1] + dir[1] * 84];
     const hp: Pt = [lerp(hd[0], hu[0], k), lerp(hd[1], hu[1], k)];
-    after.push(<Arm key="point" sh={shp} hand={hp} coat={coat} W={W * 0.85} seed={`${seed}/pt`} />);
+    after.push(<FigureArm key="point" sh={shp} hand={hp} bend={6} coat={coat} W={W * 0.85} seed={`${seed}/pt`} />);
     if (k > 0.6) after.push(<Ink key="finger" d={`M${(hp[0] + dir[0] * 6).toFixed(1)} ${(hp[1] + dir[1] * 6).toFixed(1)}l${(dir[0] * 13).toFixed(1)} ${(dir[1] * 13).toFixed(1)}`} width={W * 1.4} taper={false} vary={0} seed={`${seed}/fg`} />);
   } else if (P?.kind === 'clipboard') {
     const sd = P.side === 'left' ? -1 : 1;
@@ -290,7 +272,23 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
           <Ink d={roundRect(-15, -22, 30, 40, 3) + 'M-6 -9H6M-6 -2H7M-6 5H4'} width={W * 0.7} taper={false} vary={0} seed={`${seed}/cbI`} />
           <Fill d={roundRect(-6, -25, 12, 6, 1.5)} color={palette.ink} offset={false} mode="none" seed={`${seed}/cbC`} />
         </XG>
-        <Arm sh={[sd * g.w * 0.34, -g.h * 0.8]} hand={hd} coat={coat} W={W * 0.85} seed={`${seed}/cba`} />
+        <FigureArm sh={[sd * g.w * 0.34, -g.h * 0.8]} hand={hd} coat={coat} W={W * 0.85} seed={`${seed}/cba`} />
+      </g>,
+    );
+  }
+  // A1 polish: the tablet held down at chest height in front of the body (behind the coat from our side): the elbow
+  // bent out past the side, the card tilted flat (foreshortened) so only its outer edge peeks past the coat
+  if (chest) {
+    const cHand: Pt = [side * g.w * 0.28, -g.h * 0.5];
+    const cElbow: Pt = [side * g.w * 0.64, -g.h * 0.44];
+    const cTab: Pt = [side * g.w * 0.16, -g.h * 0.58];
+    before.push(
+      <g key="chest">
+        <XG m={mat.about(mat.rotate(side * 6), cTab[0], cTab[1])}>
+          <Fill d={roundRect(cTab[0] - (ts * 0.71) / s, cTab[1] - (ts * 0.13) / s, (ts * 1.42) / s, (ts * 0.26) / s, (ts * 0.07) / s)} color={palette.white} offset={false} mode="none" seed={`${seed}/ctF`} />
+          <Ink d={roundRect(cTab[0] - (ts * 0.71) / s, cTab[1] - (ts * 0.13) / s, (ts * 1.42) / s, (ts * 0.26) / s, (ts * 0.07) / s)} width={W * 0.8} taper={false} seed={`${seed}/ctI`} />
+        </XG>
+        <FigureArm sh={sh} hand={cHand} elbow={cElbow} coat={coat} W={W * 0.85} seed={`${seed}/arm`} />
       </g>,
     );
   }
@@ -300,9 +298,9 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
   return (
     <FigFrame b={p}>
       {shoesOn ? <Sliver w={g.w} seed={seed} /> : null}
-      {p.glow && p.raiseAt !== undefined && q > 0.02 ? <TabletGlow c={tabC} r={[p.glow[0] / s, p.glow[1] / s]} at={p.raiseAt + 0.08} stepAt={p.glowStepAt} seed={`${seed}/glow`} /> : null}
+      {p.glow && p.raiseAt !== undefined && q > 0.02 && !chest ? <TabletGlow c={tabC} r={[p.glow[0] / s, p.glow[1] / s]} at={p.raiseAt + 0.08} stepAt={p.glowStepAt} seed={`${seed}/glow`} /> : null}
       {before}
-      <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={coat} hair={p.hair} hairColor={p.hairColor} acc={p.acc ?? []} ink={W} walk={p.walk} />
+      <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={coat} hair={p.hair} hairColor={p.hairColor} legsColor={p.legsColor} acc={p.acc ?? []} ink={W} walk={p.walk} />
       {shoesOn ? <Sneakers w={g.w} W={W} seed={seed} /> : null}
       {pt ? (
         <>
@@ -315,9 +313,9 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
       {lanOn ? <Ink d={lan} width={W * 0.62} taper={false} seed={`${seed}/lan`} /> : null}
       {p.badge ? <Ink d={shield + `M0 ${by - 9}V${by + 9}M-6 ${by - 2}H6`} width={W * 0.75} seed={`${seed}/badge`} /> : null}
       {after}
-      {q > 0.02 ? (
+      {q > 0.02 && !chest ? (
         <>
-          <Arm sh={sh} hand={hand} coat={coat} W={W * 0.85} seed={`${seed}/arm`} />
+          <FigureArm sh={sh} hand={hand} coat={coat} W={W * 0.85} seed={`${seed}/arm`} />
           <SparkleTablet x={tabC[0]} y={tabC[1]} size={ts / s} rot={(p.landscape ? 90 : 0) + side * (1 - q) * -30} twinkle={p.twinkle ?? true} ink={W * 0.8} seed={`${seed}/tab`} />
           {p.sparkle ? <TabletSparkle top={tabTop} r={(p.sparkle.r ?? 22) / s} at={p.sparkle.at} twinkleAt={p.sparkle.twinkleAt} outAt={p.sparkle.outAt} side={side} seed={`${seed}/spk`} /> : null}
         </>

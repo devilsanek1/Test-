@@ -1,7 +1,7 @@
 // S05 camera (storyboard v3, ONE owner per move: this scene's own keys; Film adds no camera on a 'matchcut').
 // screen = (world - cam) x zoom + (540, 960)
-//   cut(years) -> +0.30      push-in zoom 1.07 -> 1.13 (fix round 4: was 1.08), 1 - 2^(-6u) (fix round 4: was out(expo),
-//                            exponent 10): the S04 dive lands still moving IN (log-zoom ~0.77 /s at the cut vs the
+//   cut(years) -> +0.30      push-in zoom 1.055 -> 1.13 (A1: was 1.07 / 1.08), 1 - 2^(-8u) (A1: was 2^(-6u); fix round 4:
+//                            was out(expo), exponent 10): the S04 dive lands still moving IN (log-zoom ~0.77 /s at the cut vs the
 //                            dive's ~1.23 /s; Main's first S05 frame shows the lock at S04's last-frame size, ~65 px)
 //                            and settles. y has its OWN zero-velocity ease (fix round
 //                            3): 960 -> 940 in-out(sine) over 0.05 -> 0.65 s, so the lock (world y 960) holds its screen
@@ -25,18 +25,20 @@ import type {Pt} from '../../lib/sketch';
 export type Cam = {x: number; y: number; zoom: number};
 
 /** Fix round 4: 1.08 -> 1.07 (Main's first S05 frame is t = 0.01, already into the landing: the lock grew ~9 % across
- *  the cut against S04's last drawn frame). */
-export const K_LAND: Cam = {x: 540, y: 960, zoom: 1.07};
+ *  the cut against S04's last drawn frame). A1 polish: 1.07 -> 1.055 with the steeper LAND_K 8, so the landing keeps
+ *  more of the dive's log-zoom rate on Main's first S05 frame (~0.79 /s, a 1.37 x drop from S04's last pair instead of
+ *  2.0 x) while the lock on that frame stays ~64.4 px wide (S04: 65). */
+export const K_LAND: Cam = {x: 540, y: 960, zoom: 1.055};
 export const K_LOCK: Cam = {x: 540, y: 940, zoom: 1.13};
 export const K_EXIT: Cam = {x: 690, y: 940, zoom: 1.13};
 export const LAND = 0.3;
 export const TRUCK = 0.3;
 /** The y rise: in-out(sine) from RISE[0] over RISE[1] s (zero velocity at both ends). */
 export const RISE: [number, number] = [0.05, 0.6];
-/** Fix round 4: the landing's ease, 1 - 2^(-6u) normalised (was out(expo), exponent 10: a 1.3-frame time constant, the
- *  log-zoom rate halved every frame after the cut and read as a soft stop): first-frame log rate ~0.77 /s, a gentler
- *  tail. */
-const LAND_K = 6;
+/** Fix round 4: the landing's ease, 1 - 2^(-K u) normalised (was out(expo), exponent 10: a 1.3-frame time constant, the
+ *  log-zoom rate halved every frame after the cut and read as a soft stop). A1 polish: K 6 -> 8 with K_LAND 1.055 (one
+ *  decelerating push across the matchcut, ~1.4 x rate drop at the cut). */
+const LAND_K = 8;
 const landEase = (u: number) => (u >= 1 ? 1 : (1 - Math.pow(2, -LAND_K * u)) / (1 - Math.pow(2, -LAND_K)));
 
 /** Camera at scene time t; `end` = the scene length (the cut on action). */

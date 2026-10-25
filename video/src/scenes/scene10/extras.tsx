@@ -56,13 +56,14 @@ export const HalfSweep: React.FC<{r: number; at: number; solidAt?: number; dur?:
   );
 };
 
-/** World geometry of the leaf patch over the set tree's tick cluster (crown (1040, 1050) 110 x 135; the ticks sit in its
- *  lower-left, ~(950-1036, 1094-1156) world). */
+/** World geometry of the leaf patch over the set tree's four ticks (crown (1040, 1050) 110 x 135; the ticks sit in its
+ *  lower-left at (986, 1098), (997, 1110), (1027, 1149) world; the fourth, (1120, 1074), is under the UI rail),
+ *  inside the crown's ink outline. */
 const LEAF = {
-  patch: blob(994, 1124, 46, 34, {seed: 's10/leafp'}),
+  patch: blob(1004, 1122, 50, 38, {seed: 's10/leafp'}),
   arcs:
-    // three leaf arcs at different angles and lengths, off-centre (no pair of 'eyes' over a 'mouth')
-    'M958 1101q9 8 21 3' + 'M1003 1117q6 11 19 9' + 'M972 1146q11 3 17 -7',
+    // three leaf arcs on one DIAGONAL (no two at the same height: no 'eyes', no 'mouth'), each a different angle and length
+    'M953 1090q8 9 20 5' + 'M984 1112q3 11 14 15' + 'M1018 1138q10 4 18 -4',
 };
 
 /** Covers the set tree's smiley ticks (draw after the set's 'near' node). */

@@ -13,7 +13,7 @@ import {ElephantTimeline, PoseKey, popSwitch, poseAt} from '../../lib/mascot';
 import {BLUEPRINT, popUpK} from '../shared/sets';
 import {Bit, Citizen, EdgeOnlooker} from '../shared/props';
 import type {Acc, Hair} from '../../lib/kit';
-import {beats, S03_START, W, type Beats} from './beats';
+import {beats, S03_START, type Beats} from './beats';
 import {CAM_REST} from './camera';
 import {ROOF_SIGN, signAngle} from './plan';
 import type {Pt} from '../../lib/sketch';
@@ -21,68 +21,73 @@ import type {Pt} from '../../lib/sketch';
 // ---------------------------------------------------------------- Pip
 
 const PIP_SCALE = 1.2;
-/** Fix round 3 (finding: Pip braked from ~56 to ~16 px/frame across the S02 -> S03 hard cut, then sped up again: S02's
- *  0.127 s Hermite had to drop from the rod perch (feet at screen y ~770) to ~906 and brake into S03's old pickup):
- *  ONE ballistic arc from S02's rod perch to the stamp, g = 4,500 px/s2 (motion_spec #25: 3,000-8,000), constant vx.
- *  He takes off from the perch at PIP_TAKEOFF (8.12, S02's ears-cover gag keeps 7.77-8.08), peaks INSIDE S02 (~8.21),
- *  and on the cut he is already falling at ~+815 px/s with his feet at screen ~(705, 825), just under the sun's
- *  lower rim (he grazes it, a periwinkle silhouette on orange, for ~3 frames), landing on the stamp's rump on 'in'.
- *  `pipDropState(tl)` gives the same arc for any tl from the take-off (tl = PIP_TAKEOFF - S03_START) to the landing:
- *  S02 draws its hop-out from it, so position AND velocity match on every frame across the cut. */
-/** S02's rod perch: Pip's FEET in SCREEN px under S02's camera at the take-off (scene02: BLUEPRINT_WALL.perch +
- *  (58, 0) through camAt(8.12 - 4.715): (920.4, 770.0); its camera creeps < 0.2 px over the hop). */
-export const PIP_PERCH_SCREEN: Pt = [920.4, 770.0];
-/** Absolute take-off time from S02's perch (the arc's apex is at ~8.21, inside S02). */
-export const PIP_TAKEOFF = 8.12;
-/** The arc's gravity (screen px/s2 at S03's rest zoom 1.0). */
-export const PIP_G = 4500;
+/** A1 polish (blocker: S02 still steers its hop-out to the FR2 pickup, so S03's FR3 arc, which started higher on a
+ *  different parabola, made Pip jump ~(-172, -74) px against his fall on the cut): S03 now picks Pip up EXACTLY where
+ *  S02's live hop-out leaves him. On S02's last film frame (8.3667, scene02 LAST_FRAME_ABS) S02's Hermite ends at its
+ *  `S03_PICKUP.screen` (860, 906) (his FEET, screen px; S03's rest framing = S02's at the cut). From there S03 runs ONE
+ *  ballistic arc (gravity PIP_G, the sideways speed easing up from S02's) onto the stamp's rump on 'in'. S02's last vertical step is ~+32 px/frame
+ *  (its Hermite brakes into the pickup: +45, +56, +32), so the arc's first step is chosen to CONTINUE that step (~+30,
+ *  then rising every frame to ~+59 at contact) rather than S02's instantaneous end tangent (+257 px/s = +9 px/frame,
+ *  which braked to +12-16 on S03's first frames, the earlier finding). Horizontally -31 (S02's last step) easing up to
+ *  -48 px per frame at contact. If S02 moves its pickup, update PIP_HANDOFF here (or S02 imports it). */
+export const PIP_HANDOFF = {
+  /** absolute time of S02's last film frame (30 fps): frame 251 */
+  t: Math.floor(S03_START * 30 - 1e-6) / 30,
+  /** Pip's FEET on that frame, SCREEN px (scene02 S03_PICKUP.screen) */
+  screen: [860, 906] as Pt,
+};
+/** The arc's gravity (screen px/s2 at S03's rest zoom 1.0): ~physical for a 115 px elephant; chosen so the first S03
+ *  step continues S02's last one (~30 px/frame) and the landing still falls on 'in'. */
+export const PIP_G = 2400;
 /** Fix round 1: Pip sits on the stamp's RUMP (its right end), not its centre (BLUEPRINT.pip (350, 1420) hid ~80 % of
  *  the print): the reversed-out elephant faces left, so its trunk, ear and legs stay clear. Fix round 3: the stamp and
  *  Pip moved 22 px left (STAMP in stamp.tsx) so the title card clears his rump and the print's tip by >= 30 px. Screen
  *  at the 1.04 lock: (387.1, 1438.4), where he crouches on the cut (S04 imports this and continues from there). */
 export const PIP_AT: Pt = [398, 1405];
-/** The arc at the cut (scene-local 0), derived from the perch, the take-off, g and the landing on 'in' (world =
- *  screen - (0, 10) under S03's rest camera): PIP_FROM ~ (705.3, 814.9) world, PIP_VY0 ~ +815 px/s. */
+/** S02's last horizontal step (its Hermite's feet, -9, -19, -31 px over film f248-f251): the arc starts at this
+ *  sideways speed and eases up to ~-48 px/frame at contact (a constant -40 jumped the centroid step from S02's -24 to
+ *  S03's -41 on the cut). */
+const PIP_VX_HANDOFF = -930;
+/** The arc, from S02's last frame (world = screen - (0, 10) under S03's rest camera): position p0 at scene-local tL,
+ *  velocity v0, constant acceleration acc (x: the sideways ease-up, y: gravity), landing on the stamp's rump at
+ *  b.pipLand ('in'). */
 const ARC = (() => {
-  const p0: Pt = [PIP_PERCH_SCREEN[0] - 540 + CAM_REST.x, PIP_PERCH_SCREEN[1] - 960 + CAM_REST.y];
-  const T = W.in - PIP_TAKEOFF;
-  const vx = (PIP_AT[0] - p0[0]) / T;
-  const vy0 = (PIP_AT[1] - p0[1] - 0.5 * PIP_G * T * T) / T;
-  const tc = S03_START - PIP_TAKEOFF;
-  return {from: [p0[0] + vx * tc, p0[1] + vy0 * tc + 0.5 * PIP_G * tc * tc] as Pt, vy: vy0 + PIP_G * tc};
+  const b = beats();
+  const p0: Pt = [PIP_HANDOFF.screen[0] - 540 + CAM_REST.x, PIP_HANDOFF.screen[1] - 960 + CAM_REST.y];
+  const tL = PIP_HANDOFF.t - S03_START; // S02's last frame, scene-local (~ -0.026)
+  const T = b.pipLand - tL;
+  const ax = (2 * (PIP_AT[0] - p0[0] - PIP_VX_HANDOFF * T)) / (T * T);
+  const vyL = (PIP_AT[1] - p0[1] - 0.5 * PIP_G * T * T) / T;
+  return {p0, tL, T, v0: [PIP_VX_HANDOFF, vyL] as Pt, acc: [ax, PIP_G] as Pt};
 })();
+/** Pip on the arc at scene-local `tl` (world feet + velocity, world px/s); clamped to [tL, landing]. */
+function arcAt(tl: number): {p: Pt; v: Pt} {
+  const tau = Math.min(Math.max(tl - ARC.tL, 0), ARC.T);
+  return {
+    p: [ARC.p0[0] + ARC.v0[0] * tau + 0.5 * ARC.acc[0] * tau * tau, ARC.p0[1] + ARC.v0[1] * tau + 0.5 * ARC.acc[1] * tau * tau],
+    v: [ARC.v0[0] + ARC.acc[0] * tau, ARC.v0[1] + ARC.acc[1] * tau],
+  };
+}
 /** Where Pip is on the hard cut (world, = screen - (0, 10) at the rest camera) and his vertical speed there. */
-export const PIP_FROM: Pt = ARC.from;
-export const PIP_VY0 = ARC.vy;
+export const PIP_FROM: Pt = arcAt(beats().cut).p;
+export const PIP_VY0 = arcAt(beats().cut).v[1];
 /** Pip faces LEFT (flip) in his hop-off crouch at the cut (polish round 1): S04 must keep `flip` true through its
  *  settle-hop so he never flips across the cut (import this). */
 export const PIP_CUT_FLIP = true;
 
+/** Pip's body tilt into the fall at contact (screen deg, feet first). */
+const FALL_TILT = 20;
+
 /** Max total squash (incl. the pose pops) so Pip's head keeps its silhouette (sy >= 0.75). */
 const SQUASH_CAP = 0.25;
 
-/** Ballistic drop with an initial upward kick vy0 (px/s) landing exactly at `to` after T. */
-function drop(t: number, t0: number, T: number, from: Pt, to: Pt, vy0: number): Pt {
-  const u = clamp((t - t0) / T);
-  const tau = u * T;
-  const g = (2 * (to[1] - from[1] - vy0 * T)) / (T * T);
-  return [lerp(from[0], to[0], u), from[1] + vy0 * tau + 0.5 * g * tau * tau];
-}
-
-/** Pip's arc at scene-local time `tl` (negative = before the cut: valid back to the take-off, tl = PIP_TAKEOFF -
- *  S03_START = -0.273, where it returns PIP_PERCH_SCREEN), in SCREEN px under S03's rest camera (540, 950, 1.0) = S02's
- *  framing of the same screen, and his velocity (screen px/s). Fix round 3: S02 draws its whole hop-out from it
- *  (`pipDropState(t_abs - S03_START)` for t_abs in [PIP_TAKEOFF, LAST_FRAME_ABS], converted to S02's world with its
- *  camera), so the arc is ONE function on both sides of the cut. At S02's last frame (8.3667, tl -0.0263): screen
- *  ~(726.0, 803.5), v ~(-788, +697). */
+/** Pip's arc at scene-local time `tl` (valid from S02's last frame, tl = PIP_HANDOFF.t - S03_START ~ -0.026, where it
+ *  returns PIP_HANDOFF.screen, to the landing), in SCREEN px under S03's rest camera (540, 950, 1.0) = S02's framing
+ *  of the same screen, and his velocity (screen px/s). A Phase-B cut agent can give S02's Hermite this end velocity
+ *  (`pipDropState(PIP_HANDOFF.t - S03_START).v`, ~(-930, +850)) so its last frames stop braking. */
 export function pipDropState(tl: number): {screen: Pt; v: Pt} {
-  const b = beats();
-  const T = b.pipLand - b.cut;
-  const vx = (PIP_AT[0] - PIP_FROM[0]) / T;
-  const g = (2 * (PIP_AT[1] - PIP_FROM[1] - PIP_VY0 * T)) / (T * T);
-  const x = PIP_FROM[0] + vx * tl;
-  const y = PIP_FROM[1] + PIP_VY0 * tl + 0.5 * g * tl * tl;
-  return {screen: [x - CAM_REST.x + 540, y - CAM_REST.y + 960], v: [vx * CAM_REST.zoom, (PIP_VY0 + g * tl) * CAM_REST.zoom]};
+  const {p, v} = arcAt(tl);
+  return {screen: [p[0] - CAM_REST.x + 540, p[1] - CAM_REST.y + 960], v: [v[0] * CAM_REST.zoom, v[1] * CAM_REST.zoom]};
 }
 
 /** Pip's pose on the arc at the cut (what S02's hop-out arrives at on its last frame): stand-side, spread 0.85, FLIPPED
@@ -143,21 +148,20 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
   let rotate = 0;
   let smear: React.ReactNode = null;
   if (t < b.pipLand) {
-    // the drop: S02's arc continued (one ballistic arc from the rod perch, constant vx, g 4,500), falling down-left onto
-    // the bare plan. Fix round 3 (finding: the last frames moved ~75 px/frame on flat ink, a jump-cut): the body STRETCHES
-    // along the velocity as he speeds up (-0.2 at the cut, S02's hand-off, -> -0.28 at contact; the pose key's
-    // anticipation squash is cancelled here, it would fight the stretch) and its axis turns into the fall (screen +6 deg
-    // at the cut -> the velocity's angle, ~18 deg from vertical, at contact: feet first); 3 short ink speed lines trail
-    // above him on the last 3 frames.
+    // the drop: S02's live hop-out continued from its last frame (PIP_HANDOFF: one arc, g 2,400, the sideways speed easing up from S02's),
+    // falling down-left onto the bare plan. Fix round 3 (finding: the last frames moved ~75 px/frame on flat ink, a
+    // jump-cut): the body STRETCHES along the velocity as he speeds up (-0.2 at the cut, S02's hand-off, -> -0.28 at
+    // contact; the pose key's anticipation squash is cancelled here, it would fight the stretch) and its axis turns into
+    // the fall (screen +6 deg at the cut, S02's hand-off pose, -> FALL_TILT 20 deg at contact: feet first; the velocity's
+    // own angle, ~34 deg, tipped him too far); 3 short ink speed lines trail above him on the last 3 frames.
     const T = b.pipLand - t0;
-    [x, y] = drop(t, t0, T, PIP_FROM, PIP_AT, PIP_VY0);
+    const arc = arcAt(t);
+    [x, y] = arc.p;
     const u = clamp((t - t0) / T);
     squash = -0.2 - 0.08 * E.inCubic(u) - popSwitch(t, b.pipLand);
-    const vx = (PIP_AT[0] - PIP_FROM[0]) / T;
-    const g = (2 * (PIP_AT[1] - PIP_FROM[1] - PIP_VY0 * T)) / (T * T);
-    const vy = PIP_VY0 + g * (u * T);
+    const [vx, vy] = arc.v;
     const velAng = (Math.atan2(-vx, vy) * 180) / Math.PI; // screen deg the body's up axis leans (clockwise +)
-    const screenRot = lerp(6, velAng, E.inQuad(u));
+    const screenRot = lerp(6, Math.min(velAng, FALL_TILT), E.inQuad(u));
     rotate = -screenRot; // flipped while he falls: the ElephantTimeline gets -rotate (below)
     if (t >= b.pipLand - 0.1) {
       const sp = Math.hypot(vx, vy);
@@ -170,8 +174,8 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
       smear = <Ink d={speedLines(sx, sy, {n: 3, len: 40, gap: 15, angle: ang, seed: 's03/pipSpd'})} width={2.2} taper={false} seed="s03/pipSpdI" />;
     }
   } else {
-    // the impact: his fall tilt (screen ~18 deg) comes back upright over 2 frames under the landing squash
-    rotate = 18 * (1 - E.outQuad(prog(t, b.pipLand, 0.067)));
+    // the impact: his fall tilt (screen FALL_TILT) comes back upright over 2 frames under the landing squash
+    rotate = FALL_TILT * (1 - E.outQuad(prog(t, b.pipLand, 0.067)));
     y -= bounce(t, b1.at, b1.T, b1.h) + bounce(t, b2.at, b2.T, b2.h);
     if (t >= b1.at && t < b1.at + b1.T) squash = -0.12 * Math.sin(Math.PI * clamp((t - b1.at) / b1.T));
     squash += landSq(t, b.pipLand, 0.26) + landSq(t, b2.at, 0.18) + landSq(t, settle, 0.12);

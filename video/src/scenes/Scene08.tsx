@@ -7,17 +7,21 @@
 //      district (~1/5), the counter board rises on our parapet (L8 holds alone 1.7 s), the count starts at 'announced'
 //      (start flag + L9a, hand-drawn tally gates, no digits), L9b footer; the counted attempters pile up against the
 //      dome's flank in steps with the gates; the sun hops up as a clock and sweeps the 45-minute wedge; stamp 1 (L10).
-//   3. PAYOFF: on 'millions' an ink-dark crowd floods every row of the city outside the dome and climbs its flanks, and
-//      the camera pulls back to the vista; stamp 2 (L11); the sun sets in two steps at screen x 700 (S09's sunrise
-//      point) while the sky steps golden -> sage dusk and the far rows relight to dusk haze.
+//   3. PAYOFF: on 'millions' an ink-dark crowd floods every rooftop and street of the city outside the dome in three
+//      stepped one-frame waves out from the dome (fix round 3b), climbs onto the dome's shoulder and rises behind our own
+//      coping, and the camera pulls back to the vista; stamp 2 (L11); the sun sets in two steps at screen x 700 (S09's
+//      sunrise point) while the sky steps golden -> sage dusk and the far rows relight to dusk haze.
 // Match-cut IN from S07 (its 0.40 s tilt): the three wires at screen y 896 / 928 / 960 and the sun at (640, 1021) r110
 // half behind the skyline. Match-cut OUT to S09: the sun set at screen x 700 (S09's VP).
 //
-// Set: the shared DomeCity v3 with the dome slid left of the board (scene08/layout.ts DOME8; fix round 1), its layers
+// Set: the shared DomeCity v3 with a broad shield dome left of the board (scene08/layout.ts DOME8; fix round 3b: its
+// right flank runs behind the board), its layers
 // mapped onto this scene's multiplane depths through `wrap` with the scene's overlays injected per layer; the set's
 // own watchtower / searchlight are off (they stood at x 600-650, on the board's top edge): scene08/tower.tsx draws them
-// inside the glass. Shared props: CounterBoard, TelephoneWires (WIRES.S08, pole at x 540), Attempter, LeakSheet, Bit,
-// SunGlowSteps, InkTextBlock. Local stand-ins (scene08/shims.tsx): MinuteWedge + ease, InkStamp (stampPaper).
+// inside the glass. Shared props: CounterBoard, TelephoneWires (WIRES.S08, pole at x 540), LeakSheet, Bit, FigureArm,
+// EdgeOnlooker, SunGlowSteps, InkTextBlock. Local stand-ins (scene08/shims.tsx): MinuteWedge + ease / face, InkStamp
+// (clamped start scale, landing time, scale origin), BoardNote. The rooftop flood stands on the set's own buildings
+// (scene08/roofs.ts replays the set's row generator).
 import React, {useId} from 'react';
 import {World, Sun, palette, skies} from '../lib';
 import {sunPoseAt} from '../lib/Sun';
@@ -229,11 +233,12 @@ const door3 = (i: number) => DOORS3[i];
 const R3 = (i: number, h: number) => ({x: door3(i).x, y: door3(i).y, dh: door3(i).h, h});
 const RATTLERS3: RattlerSpec[] = [
   // 'ALREADY': three pop (the two nearest at 86-92 px), a fourth on the second beat; on 'attempts' A gives up and hops
-  // to the edge door, and D takes A's door (a chain of two hops)
-  {...R3(0, 86), at: T.already, rattles: [T.already + 0.04, T.rattleA, T.itWas + 0.06, T.thousands + 0.1, T.millions, T.wave2 + 0.2], hop: {at: T.attempts, to: door3(4).x, toY: door3(4).y}, coat: palette.tealDark, legs: palette.sage, seed: 'r3a'},
+  // to the edge door, and D takes A's door (a chain of two hops). Fix round 3b: D rattles between 'says' and 'that'
+  // (3.35) and after 'it was' (4.10): fresh medium onsets in the thin 3-5 s stretch
+  {...R3(0, 86), at: T.already, rattles: [T.already + 0.04, T.rattleA, T.footer + 0.05, T.thousands + 0.1, T.millions, T.wave2 + 0.2], hop: {at: T.attempts, to: door3(4).x, toY: door3(4).y}, coat: palette.tealDark, legs: palette.sage, seed: 'r3a'},
   {...R3(2, 92), at: T.already + 0.05, rattles: [T.already + 0.09, T.says + 0.05, T.itWas, T.thousands + 0.15, T.attempts + 0.42, T.comma, T.millions + 0.05], coat: palette.brown, legs: palette.tan, seed: 'r3b'},
   {...R3(3, 62), at: T.already + 0.1, rattles: [T.already + 0.14, T.trying + 0.2], coat: palette.teal, legs: palette.sand, seed: 'r3c'},
-  {...R3(1, 90), at: T.already2, rattles: [T.already2 + 0.04, T.rattleA + 0.05, T.they + 0.2, T.hacking, T.comma + 0.05, T.wave2], hop: {at: T.attempts + 0.12, to: door3(0).x, toY: door3(0).y}, coat: palette.tealDark, legs: palette.tan, seed: 'r3d'},
+  {...R3(1, 90), at: T.already2, rattles: [T.already2 + 0.04, T.rattleA + 0.05, T.says + 0.15, T.itWas + 0.14, T.they + 0.2, T.hacking, T.comma + 0.05, T.wave2], hop: {at: T.attempts + 0.12, to: door3(0).x, toY: door3(0).y}, coat: palette.tealDark, legs: palette.tan, seed: 'r3d'},
 ];
 // row 2 (doors across the whole width, 32-40 px) on 'trying'; one extra rattle at 2.25 s (the crane's settle: a fresh
 // onset in the gap before the end of 'it')
@@ -323,14 +328,14 @@ const FLOOD = (() => {
   // 7-12 px, row 2 at 13-19 px, 3 ranks on the burst + a 4th on wave 2 (the far skyline: silhouettes on the peach band
   // and against the sun); plus street clumps at the foot of rows 0 / 1 / 2 (seen in the gaps between the nearer
   // roofs) that walk toward the dome; a mid tier of 20-30 px raised-arm busts on the row-3 roofs either side of the board.
-  // 'use it' (fix round 3b: the 4-8 px specks read as grass): four clumps of 10-14 px figures on row-2 ROOFTOPS right
-  // of the dome, visible at rest; they stay and become part of the flood
+  // 'use it' (fix round 3b: the 4-8 px specks read as grass): four clumps of 11-15 px figures (two ranks) on row-2
+  // ROOFTOPS right of the dome, visible at rest, popping 0.08 s apart; they stay and become part of the flood
   const useIt = [
     [496, 566],
     [628, 700],
     [902, 966],
     [998, 1060],
-  ].flatMap(([x0, x1], k) => roofBand(`s8/u${k}`, 2, x0, x1, [10, 14], [T.useIt + k * 0.06], {ranks: 1, clump: [3, 5], empty: 0, arms: 4, rank0: 3}));
+  ].flatMap(([x0, x1], k) => roofBand(`s8/u${k}`, 2, x0, x1, [11, 15], [T.useIt + k * 0.08, T.useIt + k * 0.08], {ranks: 2, clump: [5, 7], empty: 0, arms: 4, rank0: 3}));
   const row2 = [
     ...roofBand('s8/r2', 2, -40, 1120, [13, 19], [WAVE.row2, WAVE.row2, WAVE.row2], {ranks: 3, rank0: 1, arms: 7, empty: 0.05, skip: behindBoard2}),
     ...roofBand('s8/r2w', 2, -40, 1120, [13, 19], [0, 0, 0, T.wave2], {ranks: 4, rankFrom: 3, rank0: 0, empty: 0.05, skip: behindBoard2, span: 0.2, order: 'ltr'}),

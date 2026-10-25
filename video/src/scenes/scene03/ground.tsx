@@ -14,13 +14,14 @@
 
 import React from 'react';
 import {palette} from '../../lib/theme';
-import {useTime} from '../../lib/time';
+import {springAt, springs, useTime} from '../../lib/time';
+import {mat, XG} from '../../lib/xf';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {arrow, circle, line, polyPath, rect, Pt} from '../../lib/sketch';
 import {rng} from '../../lib/rng';
 import {captionFontStack, useCaptionFont} from '../../lib/font';
-import {BLUEPRINT, SI} from '../shared/sets';
+import {BLUEPRINT, popUpK, SI} from '../shared/sets';
 import {STAMP} from './stamp';
 import {CARD_BOX} from './card';
 
@@ -88,7 +89,52 @@ const G = (() => {
     gridMid += broken(xAt(1330), 1330, xAt(1560), 1560, `${s}/r${i}/1`);
     for (let g = 0; g < 3; g++) near[g] += broken(xAt(NEAR_CUTS[g]), NEAR_CUTS[g], xAt(NEAR_CUTS[g + 1]), NEAR_CUTS[g + 1], `${s}/r${i}/2${g}`);
   }
-  const gridNear = near;
+  // A1 (finding: full-length 2.2 px converging rays + cross lines over the bottom third read as big plaza tiles at
+  // phone size, heavier than the street; ref-2's ground carries only sparse broken ticks): the near group is rebuilt
+  // (its own rng, so the far / mid lines above keep their breaks) as a light PENCIL plan at inkHair 1.6: each ray in
+  // 2-3 pieces with a 30-60 px gap ACROSS every near cross line (the intersections stay open), each cross line in 3-4
+  // pieces with 30-60 px gaps. Same three depth bands for the draw-on wave (a piece belongs to the band of its middle).
+  void near;
+  const rn = rng('s03/nearPencil');
+  const nearRows: number[] = [];
+  for (let k = 9; k >= 1; k--) {
+    const y = VP[1] + (2060 - VP[1]) * Math.pow(k / 10, 1.6);
+    if (y > 1560) nearRows.push(y);
+  }
+  const pencil = ['', '', ''];
+  const bandOf = (y: number) => (y < NEAR_CUTS[1] ? 0 : y < NEAR_CUTS[2] ? 1 : 2);
+  const piece = (x0: number, y0: number, x1: number, y1: number, key: string) =>
+    (pencil[bandOf((y0 + y1) / 2)] += line(x0, y0, x1, y1, {seed: key, over: 0, breaks: false, drift: 0.15}));
+  for (const [j, y] of nearRows.entries()) {
+    // a cross line in 3-4 pieces with 30-60 px gaps
+    const xa = sL(y) - rn.range(30, 60);
+    const xb = sR(y) + rn.range(30, 60);
+    const n = rn.int(3, 4);
+    const len = xb - xa;
+    let a = xa;
+    for (let i = 0; i < n; i++) {
+      const gap = i ? rn.range(30, 60) : 0;
+      const b = i === n - 1 ? xb : a + gap + ((xb - a - gap) / (n - i)) * rn.range(0.8, 1.2);
+      if (b - (a + gap) > 20) piece(a + gap, y, b, y, `s03/nx${j}/${i}`);
+      a = b;
+      void len;
+    }
+  }
+  for (let i = 0; i <= 22; i++) {
+    const xb = -1500 + i * 190;
+    const xAt = (y: number) => VP[0] + ((xb - VP[0]) * (y - VP[1])) / (2060 - VP[1]);
+    if (xAt(yF) < sL(yF) + 10 || xAt(yF) > sR(yF) - 10) continue;
+    // the ray from the mid group's end (1560) to the sheet's foot, open across each near cross line
+    let y0 = 1560;
+    const cuts = nearRows.slice().sort((p, q) => p - q);
+    for (const [c, yc] of cuts.entries()) {
+      const g = rn.range(30, 60) / 2; // half the gap, measured along y (the rays are steep: ~ along the ray)
+      if (yc - g - y0 > 18) piece(xAt(y0), y0, xAt(yc - g), yc - g, `s03/nr${i}/${c}`);
+      y0 = yc + g;
+    }
+    if (2060 - y0 > 18) piece(xAt(y0), y0, xAt(2060), 2060, `s03/nr${i}/e`);
+  }
+  const gridNear = pencil;
   const dimL = arrow(sL(1250) + 34, 1250, sL(1480) + 40, 1480, {seed: `${s}/dl1`, head: 14}) + arrow(sL(1480) + 40, 1480, sL(1250) + 34, 1250, {seed: `${s}/dl2`, head: 14});
   const dimR = arrow(sR(1250) - 34, 1250, sR(1480) - 40, 1480, {seed: `${s}/dr1`, head: 14}) + arrow(sR(1480) - 40, 1480, sR(1250) - 34, 1250, {seed: `${s}/dr2`, head: 14});
   return {sheet, dogEar, edgeInk, margin, gridNear, gridMid, gridFar, dims: dimL + dimR};
@@ -162,18 +208,37 @@ const FURNITURE = (() => {
   return {reg, dim, yd, north, needle, NA, notes, foot, fx, fy, fw, fh};
 })();
 
+/** The card's pop pivot (LabelTag 'card': the paper's top centre + 0.22 x the font size; the card's paper box is
+ *  CARD_BOX, L3 at 38 px on screen = 36.5 world px). */
+const KNOCK_PIVOT: Pt = [(CARD_BOX[0] + CARD_BOX[2]) / 2, CARD_BOX[1] + (38 / 1.04) * 0.22];
+/** The knock-out's scale at t: A1 (finding: before L3 popped the knock-out showed for 0.87 s as an empty, screen-aligned
+ *  hairline box on the perspective plan, a blank placeholder): it arrives WITH the card, on the card's own pop spring
+ *  about the card's pivot, so the hole grows with the paper. */
+const knockXf = (t: number, at: number | undefined) => {
+  if (at === undefined || t >= at + 0.6) return mat.identity();
+  const k = Math.max(0.001, springAt(t, at, springs.pop));
+  return mat.about(mat.scale(k), KNOCK_PIVOT[0], KNOCK_PIVOT[1]);
+};
+
 /** Clips its children OUT of the card's knock-out (CARD_BOX + 14 px): the plan's lines stop short of the card. Use it
- *  for every plan line that crosses the card's spot (the grid, margin, kerb dimensions, sheet edge, the frame band). */
-export const CardKnock: React.FC<{children: React.ReactNode}> = ({children}) => (
-  <>
-    <defs>
-      <clipPath id="s03knock" clipPathUnits="userSpaceOnUse">
-        <path d={KNOCK} clipRule="evenodd" />
-      </clipPath>
-    </defs>
-    <g clipPath="url(#s03knock)">{children}</g>
-  </>
-);
+ *  for every plan line that crosses the card's spot (the grid, margin, kerb dimensions, sheet edge, the frame band).
+ *  `at`: the card's pop (L3): before it nothing is knocked out, from it the hole grows with the card. */
+export const CardKnock: React.FC<{at?: number; children: React.ReactNode}> = ({at, children}) => {
+  const t = useTime();
+  if (at !== undefined && t < at) return <>{children}</>;
+  const m = knockXf(t, at);
+  const id = at === undefined ? 's03knock' : `s03knock${Math.round(at * 1000)}`;
+  return (
+    <>
+      <defs>
+        <clipPath id={id} clipPathUnits="userSpaceOnUse">
+          <path d={KNOCK} clipRule="evenodd" transform={`matrix(${m.a} ${m.b} ${m.c} ${m.d} ${m.e} ${m.f})`} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>{children}</g>
+    </>
+  );
+};
 
 /** The near grid's draw-on: three depth bands, far -> near, 0.03 s apart, each drawing in 0.09 s (all its strokes
  *  together): gridAt 8.445 -> done at 8.595, on 'It's' (8.605). */
@@ -185,27 +250,38 @@ const NEAR_DUR = 0.09;
  *  Polish round 1: the sand street exists only from `streetAt` (the pop-up: the pavement springs up with the city);
  *  before it the bare plan is all paper (FarPlain's cream + grid show round the sheet, to the horizon). The grid weights
  *  thin with depth from 2.2 (near) through 1.9 (mid) to inkHair 1.6 (far), continuing into the far plain's 1.6. */
-export const GroundS03: React.FC<{gridAt: number; streetAt?: number; seed?: string}> = ({gridAt, streetAt, seed = 'bp'}) => {
+export const GroundS03: React.FC<{gridAt: number; streetAt?: number; knockAt?: number; seed?: string}> = ({gridAt, streetAt, knockAt, seed = 'bp'}) => {
   useCaptionFont();
   const t = useTime();
   const F = FURNITURE;
   const nearOn = t >= gridAt;
+  // A1 (finding: the paving popped in as a flat full-width slab one frame BEFORE the press house showed): the street
+  // grows DOWN from the press house's base (y 1180) with the house's own pop-up curve, so it is one gesture with it
+  const streetK = streetAt === undefined ? 1 : Math.min(1, popUpK(t, streetAt));
   return (
     <>
-      {streetAt === undefined || t >= streetAt ? <Fill rect={[-160, 1180, 1400, 900]} color={palette.sand} offset={false} mode="snap" seed={`${seed}/street`} /> : null}
+      {streetK > 0.001 ? (
+        <XG m={streetK === 1 ? mat.identity() : mat.about(mat.scale(1, streetK), 0, 1180)}>
+          <Fill rect={[-160, 1180, 1400, 900]} color={palette.sand} offset={false} mode="snap" seed={`${seed}/street`} />
+        </XG>
+      ) : null}
       <Fill d={G.sheet} color={palette.cream} offset={false} mode="snap" seed={`${seed}/sheet`} />
       <Fill d={G.dogEar} color={palette.white} offset={false} mode="snap" seed={`${seed}/ear`} />
-      <CardKnock>
+      <CardKnock at={knockAt}>
         <Ink d={G.edgeInk} width={SI.far} taper={false} seed={`${seed}/edge`} />
         <Ink d={G.margin} width={SI.hair * 0.8} taper={false} seed={`${seed}/margin`} />
         <Ink d={G.gridFar} width={SI.hair} taper={false} seed={`${seed}/gF`} />
-        <Ink d={G.gridMid} width={1.9} taper={false} seed={`${seed}/gM`} />
+        <Ink d={G.gridMid} width={SI.hair} taper={false} seed={`${seed}/gM`} />
         {nearOn
-          ? G.gridNear.map((d, i) => <Ink key={i} d={d} width={SI.far} at={gridAt + i * NEAR_STAGGER} dur={NEAR_DUR} pace="free" order="all" taper={false} seed={`${seed}/gN${i}`} />)
+          ? G.gridNear.map((d, i) => <Ink key={i} d={d} width={SI.hair} at={gridAt + i * NEAR_STAGGER} dur={NEAR_DUR} pace="free" order="all" taper={false} seed={`${seed}/gN${i}`} />)
           : null}
         <Ink d={G.dims} width={SI.far} taper={false} seed={`${seed}/dim`} />
       </CardKnock>
-      <Ink d={TB_FRAME} width={SI.hair} taper={false} seed={`${seed}/tb3`} />
+      {knockAt === undefined || t >= knockAt ? (
+        <XG m={knockXf(t, knockAt)}>
+          <Ink d={TB_FRAME} width={SI.hair} taper={false} seed={`${seed}/tb3`} />
+        </XG>
+      ) : null}
       {/* plan furniture */}
       <Ink d={F.reg + F.dim + F.north + F.foot} width={1.6} taper={false} seed="s03/furn" />
       <Fill d={F.needle} color={palette.ink} offset={false} mode="none" seed="s03/needle" />

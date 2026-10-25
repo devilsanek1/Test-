@@ -238,7 +238,10 @@ export const SillSnail: React.FC<SillSnailProps> = ({x, y, size = 24, flip = tru
   const iw = 2.2 / (k * s); // ~2.2 px on screen
   // distance crawled (stops when it hides)
   const crawlEnd = hideAt ?? 1e9;
-  const dist = t >= crawlAt ? (Math.min(t, crawlEnd) - crawlAt) * speed : 0;
+  // A1 polish (review: 7 world px/s = ~0.4 px / frame never read as motion): a lurch out of the shell first, 20 world
+  // px/s (~1.1 px / frame) for 0.3 s, slowing linearly to `speed` by 0.6 s, then the slow crawl
+  const crawled = (d: number) => (d <= 0.3 ? 20 * d : d <= 0.6 ? 6 + (20 * (d - 0.3) - ((20 - speed) / 0.3) * (d - 0.3) ** 2 / 2) : 6 + 0.15 * (20 + speed) + speed * (d - 0.6));
+  const dist = t >= crawlAt ? crawled(Math.min(t, crawlEnd) - crawlAt) : 0;
   const moving = t >= crawlAt && t < crawlEnd;
   // body extension 0 (tucked) .. 1 (out)
   // fix round 3: the head + stalks are out ON the word (the emergence leads `crawlAt` by 0.06 s over a 0.14 s ramp: out
@@ -327,7 +330,8 @@ export type GovBWindowProps = {
   /** Progress steps (fraction): the page's ONE fat bar + its flip-tile % readout (fix round 3: the address pill shows
    *  the lettered 'updating...' instead of a second bar). An UP step JUMPS past its value (+5 %: 8 -> ~14 %, then sags
    *  back to the value over 0.35 s), flashes the fill cream for 2 frames and scale-pops the % tile 1.2x; a down step
-   *  snaps (the whole trough flashes peach for 2 frames). */
+   *  snaps (A1 polish: the fill sliver and the trough's outline flash peach for 2 frames and the bar row jolts -/+6 px;
+   *  the trough is never filled: a full peach bar read as 100 % / done). */
   steps: ProgressStep[];
   /** Ring hiccups. */
   hiccups: number[];
@@ -393,13 +397,18 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
   // ---- the value: steps, an up-step's jump past its value
   let v = stepAt(steps, t);
   let flash = false;
-  // a DOWN step (the regression on 'yet'): the whole trough flashes peach for 2 frames as the fill snaps back, the one
-  // readable sound-off cue of "can't update yet" at phone size (with the ring's '!' badge)
+  // a DOWN step (the regression on 'yet'): the fill SLIVER and the trough's outline flash peach for 2 frames as the
+  // fill snaps back and the bar row jolts (-6 / +6 px on the 2 frames), the sound-off cue of "can't update yet" with the
+  // ring's '!' badge and the tile's flip (A1 polish: the whole trough flashing peach read as a full bar = done)
   let regress = false;
+  let jolt = 0;
   for (let i = 1; i < steps.length; i++) {
     const st = steps[i];
     const d = t - st.t;
-    if (d >= 0 && d < 2 / 30 && steps[i].v < steps[i - 1].v) regress = true;
+    if (d >= 0 && d < 2 / 30 && steps[i].v < steps[i - 1].v) {
+      regress = true;
+      jolt = (d < 1 / 30 ? -6 : 6) / k;
+    }
     if (d < 0 || steps[i].v <= steps[i - 1].v) continue;
     // the jump: 8 -> ~14 % in 0.1 s, then it sags back to the step's value (a stall you can see at phone size)
     if (d < 0.1) v += 0.05 * Math.sin((d / 0.1) * (Math.PI / 2));
@@ -449,14 +458,17 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
       </XG>,
     );
   });
-  const fillW = (bw - 5) * (regress ? 1 : Math.min(1, v));
+  const fillW = (bw - 5) * Math.min(1, v);
   const fillShown = flickOff ? Math.max(0, fillW - 5) : fillW;
   return (
     <XG m={mat.translate(dx, 0)}>
       {bars}
-      {/* the fat bar: white trough, teal fill (cream for two frames on an up-step, the whole trough peach on 'yet') */}
+      <SiteHeader seed={seed} />
+      <XG m={jolt ? mat.translate(jolt, 0) : mat.I}>
+      {/* the fat bar: white trough, teal fill (cream for two frames on an up-step; on 'yet' the sliver + outline peach) */}
       <Fill d={roundRect(bx, by, bw, bh, 5)} color={palette.white} offset={false} mode="none" seed={`${seed}/trough`} />
       {fillShown > 0.3 ? <Fill d={rectPath(bx + 2.5, by + 2.5, fillShown, bh - 5)} color={regress ? palette.peach : flash ? palette.cream : palette.teal} offset={false} mode="none" seed={`${seed}/fill`} /> : null}
+      {regress ? <path d={roundRect(bx - 1.2, by - 1.2, bw + 2.4, bh + 2.4, 6)} fill="none" stroke={palette.peach} strokeWidth={iw * 1.6} strokeLinejoin="round" /> : null}
       <Ink d={roundRect(bx, by, bw, bh, 5, {closed: false, seed: `${seed}/troughi`})} width={iw * 0.85} taper={false} vary={0} seed={`${seed}/troughi`} />
       {/* the % flip tile, right of the bar */}
       <XG m={tileM}>
@@ -466,7 +478,29 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
           {`${pct}%`}
         </text>
       </XG>
+      </XG>
     </XG>
+  );
+};
+
+/** The page's header from frame 0 (A1 polish: the page under the bar was blank white until the first content bar at
+ *  0.30 s, and nothing marked the site as a GOVERNMENT one): a small ink crest (a domed capitol: dome + lantern tick,
+ *  entablature, three columns, plinth; ~18 world = ~30 px on screen) in the gap LEFT of the progress trough (local
+ *  x 2-20, clear of Pip's ear, which covers local x < 12 only below y ~43), and one short tealDark title bar under the
+ *  bar row (local x 34-108, y 44.5-50: the notice covers it from 0.96 s). Page-local, world px. */
+const SiteHeader: React.FC<{seed: string}> = ({seed}) => {
+  const k = Math.max(1e-4, matScale(useXf()));
+  const w = 2 / k; // ~2 px ink
+  const cx = 11;
+  const dome = `M${cx - 5.6} 18.6A5.6 6.4 0 0 1 ${cx + 5.6} 18.6Z`;
+  const ink = `M${cx} 12.4L${cx} 9.2M${cx - 7} 19.6L${cx + 7} 19.6M${cx - 4.6} 20.4L${cx - 4.6} 26.4M${cx} 20.4L${cx} 26.4M${cx + 4.6} 20.4L${cx + 4.6} 26.4M${cx - 8} 27.6L${cx + 8} 27.6`;
+  return (
+    <>
+      <Fill d={dome} color={palette.teal} offset={false} mode="none" seed={`${seed}/crestF`} />
+      <path d={dome} fill="none" stroke={palette.ink} strokeWidth={w} strokeLinejoin="round" />
+      <path d={ink} fill="none" stroke={palette.ink} strokeWidth={w} strokeLinecap="round" />
+      <Fill d={rectPath(34, 44.5, 74, 5.5)} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/title`} />
+    </>
   );
 };
 

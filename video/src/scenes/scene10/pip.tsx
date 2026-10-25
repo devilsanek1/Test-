@@ -39,7 +39,8 @@ export type PipTimes = {
 };
 
 /** The crouch on the roof (2 frames), then the drop to the bollard. */
-const CROUCH = 0.05;
+/** One frame (fix round 3: was 2): the push-off starts at once. */
+const CROUCH = 1 / 30;
 const ARC = 0.66;
 export const LEAP_DUR = CROUCH + ARC;
 const OUT_DUR = 0.3;
@@ -55,7 +56,7 @@ const TAU_V = 1 / 30;
 const HEY_TIP: Pt = [662, 1306];
 /** Spark directions (deg), toward siteM's plaque (its centre is at -113 deg from the tip), and the stroke span along
  *  them (fix round 2b: 40-72 px from the tip, was 24-52: the spark sits ~30 px higher, on the clear wall between the
- *  plaque's bottom (1224) and the cart's card (top 1285), clear of both). */
+ *  plaque's bottom (1224) and the cart's card (top ~1313 since fix round 3), clear of both). */
 const HEY_ANGLES = [-134, -112, -90];
 const HEY_R: [number, number] = [40, 72];
 

@@ -38,18 +38,22 @@ const ABS = {
   //                        summer page, AUG lettered on it as 'using' is heard
   pigeon: 17.375, //        w57-0.06 'using': a pigeon in the audience's aisle hops
   l5Out: 17.605, //         w57+0.17: the L5 annotation pops off
-  tablets: 17.645, //       w58-0.06 'AI': one tablet per team is raised (0.07 s apart); each one's big ink sparkle pops
-  //                        above it (+0.02) on its stepped glow disc (+0.08)
+  tablets: 17.53, //        w58-0.175 'AI' (A1 polish: was w58-0.06 = 17.645, so the 0.33 s raise and the sparkles completed
+  //                        3 frames AFTER the word; rule 5 lead): one tablet per team is raised (0.07 s apart); each one's
+  //                        big ink sparkle pops above it (+0.02) on its stepped glow disc (+0.08): up as 'AI' is heard
   twinkle: 17.77, //        w58+0.065 'AI' (fix round 4): team A's sparkle twinkles once on the highlight (B 0.07 s later)
   beams: 17.955, //         w58+0.25: two scan beams shoot out and sweep the banner from opposite sides
-  l6: 18.3, //              w59+0.105 'figured' (fix round 4: was w58+0.40-0.08 = 18.025, before the beams found
-  //                        anything): L6 pops as a slip clipped to the banner's top edge right after the beams converge
-  //                        on the lock, before the ring (18.475): the label follows the scan
+  l6: 18.24, //             w59+0.045 'figured' (A1 polish: was 18.30, on screen 1.47 s < the 1.5 s label floor; fix round 4:
+  //                        was w58+0.40-0.08 = 18.025, before the beams found anything): L6 pops as a slip clipped to the
+  //                        banner's top edge just after the beams' converge midpoint (18.225), before the ring (18.475):
+  //                        the label follows the scan; 1.53 s on screen
   converge: 18.115, //      w59-0.08 'figured': both beams converge on the lock detail (narrow by ~figured+0.1)
   look: 18.115, //          w59-0.08 'figured' (fix round 4: rule 5 lead, was ON the word): two audience heads tilt up
   //                        and team A's back-row member points at the lock (1-frame pose swaps)
   ring: 18.475, //          w60-0.06 'out': the ink target ring strokes on round the lock (0.17 s, closed ~18.645): found
   how: 18.705, //           w61 'how': the ring pulses once; the teams lean in (torso + head, about the hips)
+  tabletsDown: 18.605, //   w61-0.10 'how' (A1 polish): on the lean both tablets pose-swap down to chest height (1 frame, held
+  //                        in front, behind the body) and the glow discs step off: 'looking closer', 'bad' owns the frame
   balloon: 18.79, //        w62-0.08 'bad': Bit's ink '!' balloon pops (readable ON the word)
   bad: 18.87, //            w62 'bad': ONE focal event: the S02 dashed hand (drawn from bad-0.10) is on the lock; Bit hops
   //                        out of the socket onto the lock box

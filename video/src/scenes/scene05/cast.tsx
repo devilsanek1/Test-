@@ -10,7 +10,7 @@ import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {ElephantTimeline, hop} from '../../lib/mascot';
 import {BLUEPRINT_WALL} from '../shared/sets';
-import {AlertMark, Bit, LOCK, ScanBeam} from '../shared/props';
+import {AlertMark, Bit, DEPTH_INK, LOCK} from '../shared/props';
 import type {Acc, Hair} from '../../lib/kit';
 import type {Pt} from '../../lib/sketch';
 import type {Beats} from './beats';
@@ -44,6 +44,8 @@ type Member = {
   pose?: 'point' | 'clipboard' | 'hips';
   /** Fix round 3: a ponytail with a hair tie of this colour (was long hair: tan on a tan coat read as a bald capsule). */
   tie?: string;
+  /** A1 polish: trouser colour (B1's seeded pick was ink-black: the darkest block in the frame, under her tablet). */
+  legs?: string;
 };
 
 /** Team A (x 130-320) and team B (x 545-735; the messenger right of them): two depths (a back-row member behind each
@@ -61,7 +63,7 @@ export const TEAM_A: Member[] = [
  *  up and OUT to the left) and its glow clear sleeping Pip's trunk on the rail. */
 export const TEAM_B: Member[] = [
   {x: 616, rise: 1, h: 116 * K, seed: 's5b3', body: palette.tan, hair: 'cap', back: true},
-  {x: 548, rise: 0, h: 128 * K, seed: 's5b1', body: palette.sand, hair: 'short', hairColor: palette.brown, tie: palette.peach, tablet: 'left'},
+  {x: 548, rise: 0, h: 128 * K, seed: 's5b1', body: palette.sand, hair: 'short', hairColor: palette.brown, tie: palette.peach, tablet: 'left', legs: palette.tealDark},
   {x: 690, rise: 2, h: 136 * K, seed: 's5b2', body: palette.sage, hair: 'short', hairColor: palette.brown, acc: ['strap'], pose: 'hips'},
 ];
 /** Fix round 4: the tablets 1.4 x (60 world wide in the tablet's frame: held landscape = 85 x 60 world, ~96 x 68 px) and
@@ -116,7 +118,7 @@ const HipLean: React.FC<{x: number; hipY: number; deg: number; children: React.R
 
 type Spark = {at: number; twinkleAt: number; outAt: number; glowStepAt: number};
 
-const TeamMember: React.FC<{m: Member; riseAt: number; raiseAt?: number; poseAt: number; leanAt: number; leanDir: number; spark?: Spark}> = ({m, riseAt, raiseAt, poseAt, leanAt, leanDir, spark}) => {
+const TeamMember: React.FC<{m: Member; riseAt: number; raiseAt?: number; chestAt?: number; poseAt: number; leanAt: number; leanDir: number; spark?: Spark}> = ({m, riseAt, raiseAt, chestAt, poseAt, leanAt, leanDir, spark}) => {
   const t = useTime();
   const a = lean(t, leanAt, leanDir);
   const fy = feetOf(m);
@@ -133,6 +135,8 @@ const TeamMember: React.FC<{m: Member; riseAt: number; raiseAt?: number; poseAt:
           y={fy}
           h={m.h}
           raiseAt={raiseAt}
+          chestAt={raiseAt !== undefined ? chestAt : undefined}
+          legsColor={m.legs}
           arm={m.tablet}
           tabletSize={TABLET}
           tabletLift={LIFT}
@@ -169,7 +173,8 @@ const sparkOf = (b: Beats, k: number): Spark => ({
 
 /** Both teams (back row first). Team A pops up on 'researchers' (0.10 s stagger), team B 0.35 s later (0.08 s); on 'AI'
  *  one tablet per team is raised (0.07 s apart); team A's back-row member points at the lock on 'figured'; on 'how'
- *  everyone leans in toward the lock (torso + head about the hips), settled before 'bad' (its ONE focal event). */
+ *  everyone leans in toward the lock (torso + head about the hips), settled before 'bad' (its ONE focal event), and the
+ *  two tablets pose-swap down to chest height (A1 polish: the raised white cards and glow discs competed with 'bad'). */
 export const Teams: React.FC<{b: Beats}> = ({b}) => {
   const lean0 = b.how - 0.1;
   const order = (team: Member[]) => [...team].sort((p, q) => Number(!!q.back) - Number(!!p.back));
@@ -178,12 +183,12 @@ export const Teams: React.FC<{b: Beats}> = ({b}) => {
       {order(TEAM_A).map((m) => {
         const i = m.rise;
         const spark = m.tablet ? sparkOf(b, 0) : undefined;
-        return <TeamMember key={m.seed} m={m} riseAt={b.teamA + i * 0.1} raiseAt={m.tablet ? b.tablets : undefined} poseAt={b.look} leanAt={lean0 + i * 0.02} leanDir={1} spark={spark} />;
+        return <TeamMember key={m.seed} m={m} riseAt={b.teamA + i * 0.1} raiseAt={m.tablet ? b.tablets : undefined} chestAt={b.tabletsDown} poseAt={b.look} leanAt={lean0 + i * 0.02} leanDir={1} spark={spark} />;
       })}
       {order(TEAM_B).map((m) => {
         const i = m.rise;
         const spark = m.tablet ? sparkOf(b, 1) : undefined;
-        return <TeamMember key={m.seed} m={m} riseAt={b.teamB + i * 0.08} raiseAt={m.tablet ? b.tablets + TAB_STAGGER : undefined} poseAt={b.look} leanAt={lean0 + i * 0.02} leanDir={-1} spark={spark} />;
+        return <TeamMember key={m.seed} m={m} riseAt={b.teamB + i * 0.08} raiseAt={m.tablet ? b.tablets + TAB_STAGGER : undefined} chestAt={b.tabletsDown} poseAt={b.look} leanAt={lean0 + i * 0.02} leanDir={-1} spark={spark} />;
       })}
     </>
   );
@@ -218,7 +223,52 @@ export const MessengerDash: React.FC<{b: Beats}> = ({b}) => <MessengerRun b={b} 
  *  the two motions never add. */
 const W1 = 170;
 const SWEEP = 6;
-const NARROW = 0.42;
+/** A1 polish: 0.42 -> 0.30 s (the narrowing was only ~19 % done on 'figured' and finished as the beams retracted: they
+ *  never HELD converged). Now 50 % one frame after 'figured' (18.225), done at 18.375, held 0.12 s before the retract
+ *  (18.495); peak far-edge speed ~16 px/frame. */
+const NARROW = 0.3;
+/** A1 polish: the beam's width at the tablet (was 14 world = 16 px: converged, the two beams read as thin drafting
+ *  leader lines): 28 world = ~32 px, so the converged cone still reads as light from the tablet meeting on the lock. */
+const W0 = 28;
+/** A1 polish: a flat strip one palette step darker than the paper (palette.bg) just outside each dashed edge, so the
+ *  white wedge separates from the mintPale paper at phone size (white on mintPale is a tiny value step). World px. */
+const EDGE_STRIP = 7;
+
+/** The shared ScanBeam's geometry (props Tablet.tsx: wipe on 0.25 s out(cubic), retract 0.2 s in(cubic), sweep about the
+ *  source), drawn here as: two palette.bg edge strips, the opaque white wedge, the dashed ink edges (A1 polish: the shared
+ *  prop has no edge strip). The narrowing is driven by the caller through w1 (no convergeAt). */
+const LightBeam: React.FC<{from: Pt; to: Pt; w0: number; w1: number; at: number; amp: number; hz: number; outAt: number; seed: string}> = ({from, to, w0, w1, at, amp, hz, outAt}) => {
+  const t = useTime();
+  if (t < at) return null;
+  const grow = E.outCubic(prog(t, at, 0.25));
+  const shrink = 1 - E.inCubic(prog(t, outAt, 0.2));
+  if (shrink <= 0.002) return null;
+  const sw = amp * osc(t, hz);
+  const dx0 = to[0] - from[0];
+  const dy0 = to[1] - from[1];
+  const a = Math.atan2(dy0, dx0) + (sw * Math.PI) / 180;
+  const L = Math.hypot(dx0, dy0) * grow * shrink;
+  const d: Pt = [Math.cos(a), Math.sin(a)];
+  const n: Pt = [-d[1], d[0]];
+  const P = (dist: number, w: number, side: number): Pt => [from[0] + d[0] * dist + (n[0] * side * w) / 2, from[1] + d[1] * dist + (n[1] * side * w) / 2];
+  const f = (p: Pt) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+  const A = P(0, w0, -1);
+  const B = P(0, w0, 1);
+  const C = P(L, w1, 1);
+  const D = P(L, w1, -1);
+  const so = EDGE_STRIP * 2;
+  const strips = `M${f(A)}L${f(D)}L${f(P(L, w1 + so, -1))}L${f(P(0, w0 + so, -1))}Z` + `M${f(B)}L${f(C)}L${f(P(L, w1 + so, 1))}L${f(P(0, w0 + so, 1))}Z`;
+  const poly = `M${f(A)}L${f(B)}L${f(C)}L${f(D)}Z`;
+  const edges = `M${f(A)}L${f(D)}M${f(B)}L${f(C)}`;
+  return (
+    <>
+      <path d={strips} fill={palette.bg} />
+      <path d={poly} fill={palette.white} />
+      <path d={edges} fill="none" stroke={palette.ink} strokeWidth={DEPTH_INK.far} strokeDasharray="9 8" strokeLinecap="round" />
+    </>
+  );
+};
+
 export const Beams: React.FC<{b: Beats}> = ({b}) => {
   const t = useTime();
   const pa = tabletOf(TEAM_A.find((m) => m.tablet)!);
@@ -230,8 +280,8 @@ export const Beams: React.FC<{b: Beats}> = ({b}) => {
   const amp = SWEEP * (1 - E.inOutSine(prog(t, n0 - 0.24, 0.24)));
   return (
     <>
-      <ScanBeam from={[pa[0] + 3, pa[1] - off]} to={LOCK_C} w0={14} w1={w1} at={b.beams} sweep={{amp, hz: 1.1}} outAt={outAt} color={palette.white} opacity={1} depth="far" />
-      <ScanBeam from={[pb[0] - 3, pb[1] - off]} to={LOCK_C} w0={14} w1={w1} at={b.beams + BEAM_STAGGER} sweep={{amp: -amp, hz: 1.1}} outAt={outAt} color={palette.white} opacity={1} depth="far" />
+      <LightBeam from={[pa[0] + 3, pa[1] - off]} to={LOCK_C} w0={W0} w1={w1} at={b.beams} amp={amp} hz={1.1} outAt={outAt} seed="s5beamA" />
+      <LightBeam from={[pb[0] - 3, pb[1] - off]} to={LOCK_C} w0={W0} w1={w1} at={b.beams + BEAM_STAGGER} amp={-amp} hz={1.1} outAt={outAt} seed="s5beamB" />
     </>
   );
 };
@@ -247,10 +297,13 @@ export const PIP_SCALE = 1.2 / 1.13;
  *  the cut, travelling right faster than the truck. */
 export const pipHop = (b: Beats) => ({t0: b.truck + 0.04, dur: 0.45, to: {x: 1180, y: 1440}, height: 196});
 
+/** A1 polish: the 'stand-side' key moved from take-off - 0.14 to take-off, so the wake gag face (trunk-up, wide) holds
+ *  f79-f88 (0.30 s) and no Pip pose pop lands on the messenger's envelope / run pops (f82 / f83); the anticipation stays
+ *  as the hop's crouch squash on the trunk-up pose. */
 const pipKeys = (b: Beats, t0: number) => [
   {t: -10, pose: 'sleep' as const},
   {t: b.pipWake, pose: 'trunk-up' as const, expression: 'wide' as const},
-  {t: t0 - 0.14, pose: 'stand-side' as const, expression: 'wide' as const},
+  {t: t0, pose: 'stand-side' as const, expression: 'wide' as const},
 ];
 
 /** The roll-over settle on the match cut (S04 leaves him asleep elsewhere on screen: the pop reads as him rolling over

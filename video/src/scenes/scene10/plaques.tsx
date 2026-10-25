@@ -157,9 +157,13 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
         const qx = -q[0];
         return [bx + qx * Math.cos(ra) - q[1] * Math.sin(ra), by + qx * Math.sin(ra) + q[1] * Math.cos(ra)];
       };
-      // the strand from his back (rear top of the shell) into the tuft's outer ring
+      // the strand from his back (rear top of the shell) into the tuft's outer ring: a thin INK thread over siteM's cream
+      // wall (a cream one vanished there and he seemed to float), cream where it crosses onto the dark plate
       const rear = toFace([-8 * k, -9 * k]);
-      face.push(<Ink key="strand" d={`M${rear[0].toFixed(1)} ${rear[1].toFixed(1)}L${TUFT_TIE[0].toFixed(1)} ${TUFT_TIE[1].toFixed(1)}`} width={1.5 / s} color={palette.cream} taper={false} vary={0} seed={`${seed}/strand`} />);
+      const qx = (-50 - rear[0]) / (TUFT_TIE[0] - rear[0]);
+      const edge: Pt = [-50, rear[1] + (TUFT_TIE[1] - rear[1]) * qx];
+      face.push(<Ink key="strand0" d={`M${rear[0].toFixed(1)} ${rear[1].toFixed(1)}L${edge[0].toFixed(1)} ${edge[1].toFixed(1)}`} width={1.2 / s} taper={false} vary={0} seed={`${seed}/strand0`} />);
+      face.push(<Ink key="strand" d={`M${edge[0].toFixed(1)} ${edge[1].toFixed(1)}L${TUFT_TIE[0].toFixed(1)} ${TUFT_TIE[1].toFixed(1)}`} width={1.5 / s} color={palette.cream} taper={false} vary={0} seed={`${seed}/strand`} />);
       const bitNode = <Bit x={0} y={0} size={bs} state={burst > 0.2 ? 'scuttle' : 'idle'} look="forward" blink={false} seed={`${seed}/bit`} />;
       let legsD = '';
       if (burst > 0.05) {
@@ -178,7 +182,7 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
           {legsD ? <Ink d={legsD} width={1.3 / s} taper={false} vary={0} seed={`${seed}/bitlegs`} /> : null}
           {still !== undefined ? <TimeShift by={t - still}>{bitNode}</TimeShift> : bitNode}
           {/* one cream strand wrapped across his shell */}
-          <Ink d={`M${(-9 * k).toFixed(2)} ${(-2.4 * k).toFixed(2)}Q${(-2.5 * k).toFixed(2)} ${(-14.5 * k).toFixed(2)} ${(6.2 * k).toFixed(2)} ${(-8.6 * k).toFixed(2)}`} width={1.6 / s} color={palette.cream} taper={false} vary={0} seed={`${seed}/wrap`} />
+          <Ink d={`M${(-8.6 * k).toFixed(2)} ${(-1.6 * k).toFixed(2)}Q${(-1.2 * k).toFixed(2)} ${(-4.6 * k).toFixed(2)} ${(5.4 * k).toFixed(2)} ${(-11.2 * k).toFixed(2)}`} width={1.8 / s} color={palette.cream} taper={false} vary={0} seed={`${seed}/wrap`} />
         </XG>,
       );
     }
@@ -239,7 +243,11 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
       <>
         {disc}
         {rings}
-        <SupportTag x={hx} y={hy} size={tw} at={p.tag.at} checkAt={p.tag.tickAt} seed={`${seed}/tag`} />
+        {/* landed at FULL size (the flying tag hands over to it: a pop from 0 left 1-2 frames with no tag), swinging
+            -16 -> 0 about its hang point like the kit tag's entry */}
+        <XG m={mat.about(mat.rotate(pendulum(t, p.tag.at, -16, 0.5, 0.8)), hx, hy)}>
+          <SupportTag x={hx} y={hy} size={tw} checkAt={p.tag.tickAt} seed={`${seed}/tag`} />
+        </XG>
       </>
     );
   }

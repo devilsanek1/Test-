@@ -1,7 +1,8 @@
 // S10 street pieces (fix round 1), each replacing or extending one OldQuarter layer through the set's `wrap`:
 //  - FarStreet ('far'): the empty street has a horizon from the cut: the pavement runs on to the eye line (1150) and a
 //    thin fill-only sage skyline sits on it (no ink: far), so the sites pop up IN FRONT of something;
-//  - StreetGround ('ground'): the set's ground (same seeds / geometry) with the street-gap wedge popping up WITH siteR
+//  - StreetGround ('ground'): the set's ground (same seeds / geometry) with the side street in the gap (fix round 3: a
+//    sand lane between converging kerbs, cut flat at the far cross street, was a cream wedge) popping up WITH siteR
 //    instead of floating in the empty street from the cut;
 //  - SandwichBoard: the A-frame under L13 drawn as a sandwich board (slight trapezoid, hinge cap, splayed legs, the back
 //    board's edge seen 3/4 with the open triangle), the LabelTag paper (frame={false}) on it, popping with it;
@@ -106,13 +107,16 @@ const GND = (() => {
 })();
 
 /** Fix round 3: the street gap as a SIDE STREET in the reference's language (it was a cream ink-less wedge tapering to a
- *  point at the VP, which read as a spotlight cone / a cream tent): a sand roadway between two inkThin kerb lines that
- *  converge on the VP (open ends, 6-8 px overshoot), four short sett ticks across it, cut flat at y 1160 with a far-kerb
- *  dash (no point). Pavement either side is the set's mintPale. siteM's return face (`ret`, a tan strip ~14 px wide down
- *  its right jamb, in perspective to the VP) is drawn with the near row (Scene10 'sites'). */
+ *  point at the VP, which read as a spotlight cone / a cream tent). A sand roadway between two inkThin kerb lines that
+ *  converge on the VP (open ends, 6-8 px overshoot), two short sett ticks across it, cut FLAT where it meets the far
+ *  cross street's near rail (y 1256: 54 px wide there, no point, the far kerb dash overshooting both kerbs); both near
+ *  sites show their RETURN faces down the gap (siteM's right jamb tan, siteR's left jamb sage, ~14 px, receding to the
+ *  VP), so the gap is a lane between two walls. Kerb lines that ran on to the eye line read as a ladder / an easel with
+ *  the far rails crossing them, so the lane stops at the cross street. The return faces are drawn with the near row
+ *  (Scene10 'sites'). */
 function sideStreet(VP: Pt) {
   const B = OQ.base;
-  const tipY = 1160;
+  const tipY = 1256;
   const xAt = (x0: number, y: number) => x0 + ((VP[0] - x0) * (B - y)) / (B - VP[1]);
   const L0 = 652;
   const R0 = 728;
@@ -120,20 +124,26 @@ function sideStreet(VP: Pt) {
   // kerbs: from 8 px below the base line (open, over the near pavement) to 6 px past the far end
   const kerbs = line(xAt(L0, B + 8), B + 8, xAt(L0, tipY - 6), tipY - 6, {seed: 's10/gk1', over: 0, breaks: false}) + line(xAt(R0, B + 8), B + 8, xAt(R0, tipY - 6), tipY - 6, {seed: 's10/gk2', over: 0, breaks: false});
   // the far kerb: one flat dash across the cut-off end, overshooting both kerbs
-  const far = line(xAt(L0, tipY) - 5, tipY + 0.5, xAt(R0, tipY) + 6, tipY - 0.5, {seed: 's10/gk3', over: 0, breaks: false});
-  // sett ticks: short, staggered, across the roadway (shorter with the distance)
+  const far = line(xAt(L0, tipY) - 6, tipY + 0.5, xAt(R0, tipY) + 7, tipY - 0.5, {seed: 's10/gk3', over: 0, breaks: false});
+  // sett ticks: short, staggered, across the roadway
   let setts = '';
-  [[1284, -0.42, 0.05], [1250, 0.0, 0.48], [1217, -0.5, -0.08], [1190, 0.06, 0.5]].forEach(([y, a, b], i) => {
+  [[1286, -0.5, -0.05], [1270, 0.1, 0.55]].forEach(([y, a, b], i) => {
     const hw = ((R0 - L0) / 2) * ((y - VP[1]) / (B - VP[1]));
     setts += line(VP[0] + a * hw, y, VP[0] + b * hw, y + 0.6, {seed: `s10/gs${i}`, over: 0, breaks: false});
   });
-  // siteM's return face down its right jamb (x 640), receding to the VP: the side street's left wall
-  const top = 832;
+  // the two return faces down the jambs (x 640 / 740), receding to the VP: the lane's walls
   const w = 14;
-  const k = w / (VP[0] - 640);
-  const ret = polyPath([[640, top], [640 + w, top + (VP[1] - top) * k], [640 + w, B - (B - VP[1]) * k], [640, B]]);
-  const retInk = line(640 + w, top + (VP[1] - top) * k - 4, 640 + w, B - (B - VP[1]) * k + 3, {seed: 's10/ret', over: 0, breaks: false});
-  return {road, kerbs, farKerb: far, gapSetts: setts, ret, retInk};
+  const face = (xj: number, top: number, dir: number) => {
+    const k = w / Math.abs(VP[0] - xj);
+    const xi = xj + dir * w;
+    return {
+      d: polyPath([[xj, top], [xi, top + (VP[1] - top) * k], [xi, B - (B - VP[1]) * k], [xj, B]]),
+      ink: line(xi, top + (VP[1] - top) * k - 4, xi, B - (B - VP[1]) * k + 3, {seed: `s10/ret${xj}`, over: 0, breaks: false}),
+    };
+  };
+  const retM = face(640, 832, 1);
+  const retR = face(740, 712, -1);
+  return {road, kerbs, farKerb: far, gapSetts: setts, retM, retR};
 }
 
 /** Fix round 2: the empty street after the tram is not a bare stage: a row of kerb setts along the kerb's street side and
@@ -174,12 +184,19 @@ export const StreetGround: React.FC<{wedgeAt: number}> = ({wedgeAt}) => (
   </>
 );
 
-/** siteM's return face (the side street's left wall), popping with siteM: drawn after the near row's facades. */
-export const SiteMReturn: React.FC<{at: number}> = ({at}) => (
-  <PopUp at={at} x={647} y={OQ.base}>
-    <Fill d={GND.ret} color={palette.tan} offset={false} mode="none" seed="s10/ret" />
-    <Ink d={GND.retInk} width={SI.far} taper={false} seed="s10/retI" />
-  </PopUp>
+/** The near sites' return faces down the street gap (the lane's walls), popping with their sites (siteM, siteR): drawn
+ *  after the near row's facades. */
+export const GapReturns: React.FC<{atM: number; atR: number}> = ({atM, atR}) => (
+  <>
+    <PopUp at={atM} x={647} y={OQ.base}>
+      <Fill d={GND.retM.d} color={palette.tan} offset={false} mode="none" seed="s10/retM" />
+      <Ink d={GND.retM.ink} width={SI.far} taper={false} seed="s10/retMI" />
+    </PopUp>
+    <PopUp at={atR} x={733} y={OQ.base}>
+      <Fill d={GND.retR.d} color={palette.sage} offset={false} mode="none" seed="s10/retR" />
+      <Ink d={GND.retR.ink} width={SI.far} taper={false} seed="s10/retRI" />
+    </PopUp>
+  </>
 );
 
 // ---------------------------------------------------------------- SandwichBoard

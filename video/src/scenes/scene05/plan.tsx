@@ -66,9 +66,17 @@ const SECTION_D = rectPath(LOCK.cover[0], LOCK.cover[1], LOCK.cover[2], LOCK.cov
 export const SECTION = palette.bg;
 const LOCK_M = mat.compose(mat.translate(L.x, L.y), mat.scale(L.h / LOCK.h));
 
-export const SheetLock: React.FC = () => (
+/** A1 polish: the callout disc OPENS in S04's peach (its lock spot, same place and radius on the matchcut: the same lock,
+ *  now drawn on the plan) and steps to white with a 1-frame fill pop (x 1.06) on Bit's hop into the socket. */
+export const SheetLock: React.FC<{whiteAt?: number}> = ({whiteAt = 0}) => {
+  const t = useTime();
+  const white = t >= whiteAt;
+  const pop = white && t < whiteAt + 1 / 30 ? 1.06 : 1;
+  return (
   <>
-    <Fill d={DISC} color={palette.white} seed="s5disc" />
+    <XG m={pop !== 1 ? mat.about(mat.scale(pop), L.x, L.y) : mat.I}>
+      <Fill d={DISC} color={white ? palette.white : palette.peach} seed="s5disc" />
+    </XG>
     <XG m={LOCK_M}>
       <Fill d={BOX_D} color={palette.white} offset={false} seed="s5box" />
       <Fill d={SECTION_D} color={SECTION} seed="s5sect" />
@@ -78,7 +86,8 @@ export const SheetLock: React.FC = () => (
       <Lock x={L.x} y={L.y} size={L.h} state="blueprint" seed="bpw/lock" ink={SI.mid} />
     </Look>
   </>
-);
+  );
+};
 
 // ---------------------------------------------------------------- the door swings ajar ('bad')
 

@@ -20,9 +20,9 @@ export const depthOf = (name: string) => 1 - (F[name] ?? 1);
  *  spans screen 437-943 at the 1.15 push (left of the right rail) and 440-880 at rest, and the dome district + its
  *  watchtower stand CLEAR of it on the left (>= 20 px of air at rest and at the push). */
 export const BOARD = {x0: 440, x1: 880, y0: 1046, y1: 1436};
-/** The baseline push target (camera x). Fix round 3b: 555 (was 530) keeps the board's right edge at screen x <= 915 and
+/** The baseline push target (camera x). Fix round 3b: 560 (was 530) keeps the board's right edge at screen x <= 910 and
  *  the tally gates / the L10 stamp <= 890 at the 1.15 push (clear of the platform's right rail, x > 950). */
-export const PUSH_X = 555;
+export const PUSH_X = 560;
 
 /** The district dome, LEFT of the board. Fix round 3b: a broad SHIELD profile (rx 200 / ry 212: feet (80, 1080) /
  *  (480, 1080), apex (280, 868), ~1.9:1) instead of the 1.2:1 bell jar: its right flank runs BEHIND the board's left edge

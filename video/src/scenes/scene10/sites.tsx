@@ -12,7 +12,7 @@ import {captionFontStack, useCaptionFont} from '../../lib/font';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {crown, line, polyPath, Pt, rect, rectPath, roundRect} from '../../lib/sketch';
-import {BrowserChrome, OLD_QUARTER, PopUp, SI, SiteFacade, siteFacadeLayout} from './kit';
+import {BrowserChrome, OLD_QUARTER, PopUp, popK, SI, SiteFacade, siteFacadeLayout} from './kit';
 import {HangPlaque, HangPlaqueProps} from './plaques';
 
 type SiteId = 'L' | 'M' | 'R';
@@ -275,6 +275,32 @@ export const Sites: React.FC<SitesProps> = ({popAt, updateAt, wobbleAt}) => {
     </>
   );
 };
+
+/** Fix round 3: when a support tag lands on a current site's plaque, that site's browser window answers with a small
+ *  sage status badge (cream tick, ink rim) popping on its top-right corner: 'supported' on the screen too, while siteM's
+ *  window gets nothing (and later stalls). Each badge is its own beat away from the hand-out (the tracker had merged the
+ *  tosses, the lob and the landings into one 0.8 s chain). */
+export const StatusBadges: React.FC<{atL: number; atR: number}> = ({atL, atR}) => {
+  const t = useTime();
+  const out: React.ReactNode[] = [];
+  ([['L', atL], ['R', atR]] as [SiteId, number][]).forEach(([id, at]) => {
+    if (t < at) return;
+    const b = S[id].browser!;
+    const cx = b[0] + b[2] - 6;
+    const cy = b[1] + 6;
+    const k = popK(t, at, 0.18, 0.2);
+    const r = 14;
+    out.push(
+      <XG key={id} m={mat.about(mat.scale(k), cx, cy)}>
+        <Fill d={circlePath(cx, cy, r)} color={palette.sage} offset={false} mode="none" seed={`s10/badge${id}`} />
+        <Ink d={circlePath(cx, cy, r)} width={SI.far} taper={false} vary={0} seed={`s10/badgeI${id}`} />
+        <Ink d={`M${cx - 6.5} ${cy + 0.5}L${cx - 2} ${cy + 5}L${cx + 6.5} ${cy - 5.5}`} at={at + 0.04} dur={0.12} width={3.2} color={palette.cream} taper={false} vary={0} seed={`s10/badgeT${id}`} />
+      </XG>,
+    );
+  });
+  return <>{out}</>;
+};
+const circlePath = (x: number, y: number, r: number) => `M${x - r} ${y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`;
 
 /** The near row as LINE ART first (fix round 2b): under the tram wipe, from 'Plus', the three facades draw on as thin
  *  construction lines (edges overshooting the top, cornice and base lines, storey ticks, door, browser window and

@@ -21,12 +21,11 @@ import React from 'react';
 import {World, useScene, useTime, skies} from '../lib';
 import {Sun} from '../lib/Sun';
 import {mat, XG} from '../lib/xf';
-import {palette} from '../lib/theme';
-import {BlueprintStreet, BLUEPRINT, blueprintAnchors, PopUp, popUpK, SideId, BlueprintId, LayerWrap} from './shared/sets';
+import {BlueprintStreet, BLUEPRINT, PopUp, popUpK, SideId, BlueprintId, LayerWrap} from './shared/sets';
 import {Sticker, SunPie} from './shared/props';
 import {beats, Beats, local, S03_START, W} from './scene03/beats';
 import {camAt, camMat} from './scene03/camera';
-import {AtticVent, BirdWire, CountPing, EdgeTree, FarPlain, Footprints, PressElevation, PressScreen, QuestionScribble, RoofSign, S03_BLANK, SheetFrame, SideElevations, SideOverlays, SideRows, VENT_HIDE, VentPatch, VentPuffs, VentS03} from './scene03/plan';
+import {AtticVent, BirdWire, EdgeTree, FarPlain, Footprints, PressElevation, PRESS_SCREEN, PressScreen, QuestionScribble, RoofSign, S03_BLANK, SheetFrame, SideElevations, SideOverlays, SideRows, TickFlash, TickRing, VENT_HIDE, VentPatch, VentPuffs, VentS03} from './scene03/plan';
 import {CardKnock, GroundS03} from './scene03/ground';
 import {TitleCard} from './scene03/card';
 import {StampS03} from './scene03/stamp';
@@ -36,16 +35,17 @@ import {BitOnSign, FarCrowd, NearWalkers, PipS03, PipShadow, StreetLife} from '.
 
 const L3 = ['PHP · the code most', 'websites are built with'];
 const L4 = ['of sites whose server', 'language is known · W3Techs'];
-/** Plaque / door anchors of every building (static). */
-const anchors = blueprintAnchors();
 
 // ---------------------------------------------------------------- timing tables (scene-local, from the beats)
 
 const SIDE_ORDER: SideId[] = ['L1', 'R1', 'L2', 'R2', 'L3', 'R3', 'L4', 'R4', 'L5'];
-/** The seven PHP sites in count order: the storyboard's P (re-pulse), L1, R1, L2, R2, L4, R3, near -> far, alternating
- *  (fix round 2b: the three non-PHP sites are the storyboard's mid-depth L3, R4, L5 again, see plan.tsx S03_BLANK; L1 /
- *  R1 at the frame edges are PHP: a partly hidden elephant page does not hurt a majority). */
-const COUNT: BlueprintId[] = ['P', 'L1', 'R1', 'L2', 'R2', 'L4', 'R3'];
+/** The seven PHP sites in count order. A1 (finding: the first two side ticks landed on the extreme frame edges, L1 cut
+ *  by the frame and R1 under the UI rail, so the count did not register): CENTRE-OUT, P, then R3, L4, R2, L2, R1, L1,
+ *  so the wave travels outward from the press house, where the eye already is (was the storyboard's near -> far P, L1,
+ *  R1, L2, R2, L4, R3). The three non-PHP sites are the storyboard's mid-depth L3, R4, L5 (plan.tsx S03_BLANK). */
+const COUNT: BlueprintId[] = ['P', 'R3', 'L4', 'R2', 'L2', 'R1', 'L1'];
+/** Gap between count ticks (A1: 0.08 -> 0.06 s, so the wave is done by 12.255, before the card's flip at 12.30). */
+const COUNT_GAP = 0.06;
 const BLANK: SideId[] = S03_BLANK; // L3, R4, L5: the screens go dark on 'ten' (near -> far)
 
 function tables(b: Beats) {
@@ -57,7 +57,7 @@ function tables(b: Beats) {
   // screen re-pulses), then the six side PHP screens light with the elephant page + an orange ping; 'ten': the three
   // non-PHP screens blink and go dark (0.05 s apart); 'websites': the seven PHP pages re-pulse in a wave (0.02 s)
   const countAt = {} as Record<BlueprintId, number>;
-  COUNT.forEach((id, i) => (countAt[id] = +(b.count + i * 0.08).toFixed(4)));
+  COUNT.forEach((id, i) => (countAt[id] = +(b.count + i * COUNT_GAP).toFixed(4)));
   const onAt: Partial<Record<SideId, number>> = {};
   const pulseAt: Partial<Record<SideId, number>> = {};
   COUNT.forEach((id, i) => {
@@ -125,8 +125,8 @@ const Scene03: React.FC = () => {
       // S03 draws the plan itself (scene03/ground.tsx: far rows + furniture inked from the cut, far -> near grid, no
       // stray `tb` box); the set's ground node is not used
       <XG m={mat.translate(0, jolt)}>
-        <GroundS03 gridAt={b.grid} streetAt={T.pressAt} />
-        <CardKnock>
+        <GroundS03 gridAt={b.grid} streetAt={T.pressAt} knockAt={b.L3} />
+        <CardKnock at={b.L3}>
           <SheetFrame />
         </CardKnock>
         <Footprints tickAt={T.lotTick} />
@@ -151,14 +151,17 @@ const Scene03: React.FC = () => {
           <VentPatch />
           <AtticVent />
           <VentS03 />
-          <PressScreen lightAt={b.pressScreen} pulseAt={[T.countAt.P, b.websites]} />
+          {/* A1: the press house's count tick is its SCREEN (the same cream flash + inked ring as the side screens, and
+              its page switches to the elephant page): no plaque ping */}
+          <TickFlash x={PRESS_SCREEN.x + PRESS_SCREEN.w / 2} y={PRESS_SCREEN.y + PRESS_SCREEN.h / 2} rx={PRESS_SCREEN.w * 0.66} ry={PRESS_SCREEN.h * 0.95} at={T.countAt.P} />
+          <PressScreen lightAt={b.pressScreen} pulseAt={[T.countAt.P, b.websites]} pageAt={T.countAt.P + 0.067} />
           <Sticker x={648} y={1040} w={124} question={false} seed="s03/sticker" />
           <QuestionScribble x={727} y={1013} />
-          <CountPing x={anchors.P.plaque.x} y={anchors.P.plaque.y} r={42} at={T.countAt.P} color={palette.sun} />
+          <TickRing x={PRESS_SCREEN.x + PRESS_SCREEN.w / 2} y={PRESS_SCREEN.y + PRESS_SCREEN.h / 2} r={PRESS_SCREEN.w * 0.42} at={T.countAt.P} />
           <RoofSign swingAt={b.swing} />
           <BitOnSign swingAt={b.swing} twitchAt={b.doorway} />
         </PopUp>
-        <VentPuffs times={[b.pipSettle, b.swing]} n={3} />
+        <VentPuffs puffs={[{at: b.pipSettle, n: 3}, {at: b.swing, n: 2, fly: 0.45}]} />
       </>
     );
     if (name === 'sides') {

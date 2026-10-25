@@ -511,24 +511,27 @@ const seg = (q: Q4, u0: number, u1: number, v: number) => {
   return `M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b[0].toFixed(1)} ${b[1].toFixed(1)}`;
 };
 
-/** Where a PHP page's elephant (and the count ping) sits in its screen, per site (default: centred, u 0.5). Fix round
+/** Where a PHP page's elephant (and the count tick) sits in its screen, per site (default: centred, u 0.5). Fix round
  *  2b: R2's screen (x 926-980 on screen) is half under the right UI rail (x > 950): its elephant shrinks to 0.8 and
- *  shifts toward the street (u 0.4), its ping ring is centred at u 0.25 (~13 px further left), so the tick's centroid
- *  moves off the rail. */
-const PAGE_AT: Partial<Record<SideId, {u: number; k: number; pingU: number; v?: number; pingV?: number}>> = {
+ *  shifts toward the street (u 0.4), its tick ring is centred at u 0.25 (~13 px further left), so the tick's centroid
+ *  moves off the rail. `hd`: the page's peach header band [v0, v1] (default [0.08, 0.26]). */
+const PAGE_AT: Partial<Record<SideId, {u: number; k: number; pingU: number; v?: number; pingV?: number; hd?: [number, number]}>> = {
   R2: {u: 0.4, k: 0.8, pingU: 0.25},
-  // fix round 3 (finding: R1's page and ping sat entirely under the right UI rail, x 1012-1076 on screen): R1's elephant
-  // and ping are pulled to its screen's street-side top corner (u 0.2, the elephant raised to v 0.5, the ping centred
-  // at v 0.25: screen ~(1020, 900)), so the tick's ring rises above the rail's top (y 900) as it expands
-  R1: {u: 0.22, k: 0.8, pingU: 0.15, v: 0.52, pingV: 0.22},
+  // A1 (finding: R1's page and tick sat in the right UI rail, x > 950 / y 900-1500, so with the platform UI on top the
+  // street counted 6 + the press house): R1's whole screen is at x 1012-1076 (no bay of R1 lies left of x 950), but its
+  // top 30 px are ABOVE the rail (y 869-900). Its page is pulled up there: a thin header (v 0.05-0.13) and the
+  // elephant at v 0.34 (its back above y 900), and its tick is centred on the screen's top street-side corner (screen
+  // ~(1012, 880)): the cream flash and the inked ring burst up and left over R2's facade and the sky gap, a visible echo
+  // left of x 950 and above the rail
+  R1: {u: 0.3, k: 0.78, pingU: 0.0, v: 0.34, pingV: 0.08, hd: [0.05, 0.13]},
   // L1 (cut by the left frame edge, x -7..57 on screen; the film's paint edge eats the outer ~30 px): its elephant and
-  // ping sit at the street side of its screen (u 0.72)
+  // tick sit at the street side of its screen (u 0.72)
   L1: {u: 0.72, k: 0.85, pingU: 0.72},
 };
 
 /** A lit PHP page in a side screen: a peach header across the top and a BIG solid ink elephant filling the page width
  *  (>= 36 px on screen), popping in with the 7 % spring from `at` (the count tick). */
-const Page: React.FC<{q: Q4; at: number; u?: number; v?: number; k?: number; seed: string}> = ({q, at, u = 0.5, v = 0.64, k: ks = 1, seed}) => {
+const Page: React.FC<{q: Q4; at: number; u?: number; v?: number; k?: number; hd?: [number, number]; seed: string}> = ({q, at, u = 0.5, v = 0.64, k: ks = 1, hd = [0.08, 0.26], seed}) => {
   const t = useTime();
   const w = Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1]);
   const h = Math.hypot(q[3][0] - q[0][0], q[3][1] - q[0][1]);
@@ -537,7 +540,7 @@ const Page: React.FC<{q: Q4; at: number; u?: number; v?: number; k?: number; see
   const k = Math.max(0.001, springAt(t, at, springs.pop));
   return (
     <>
-      <Fill d={sub(q, 0.08, 0.08, 0.92, 0.26)} color={palette.peach} offset={false} mode="none" seed={`${seed}/hd`} />
+      <Fill d={sub(q, 0.08, hd[0], 0.92, hd[1])} color={palette.peach} offset={false} mode="none" seed={`${seed}/hd`} />
       <XG m={mat.about(mat.scale(k), c[0], c[1])}>
         <ElephantEmblem x={c[0]} y={c[1]} size={es} mode="solid" color={palette.ink} seed={`${seed}/el`} />
       </XG>
@@ -563,7 +566,7 @@ const DarkPane: React.FC<{q: Q4; seed: string}> = ({q, seed}) => {
 /** One side screen: unlit sage glass until `onAt` (never, when `onAt` is undefined). PHP sites: peach for two frames at
  *  it (the glow pop), then the elephant page; re-pulses peach for two frames at `pulseAt` ('websites'). Non-PHP sites
  *  (fix round 2b): on 'ten' a 2-frame cream blink, then the screen goes DARK (tealDark pane + glint) and stays dark. */
-const ScreenState: React.FC<{d: string; onAt?: number; pulseAt?: number; php: boolean; page?: {u: number; k: number; v?: number}; seed: string}> = ({d, onAt, pulseAt, php, page, seed}) => {
+const ScreenState: React.FC<{d: string; onAt?: number; pulseAt?: number; php: boolean; page?: {u: number; k: number; v?: number; hd?: [number, number]}; seed: string}> = ({d, onAt, pulseAt, php, page, seed}) => {
   const t = useTime();
   if (onAt === undefined || t < onAt) return <Fill d={d} color={palette.sage} offset={false} mode="none" seed={seed} />;
   if (!php) {
@@ -571,7 +574,7 @@ const ScreenState: React.FC<{d: string; onAt?: number; pulseAt?: number; php: bo
     return <DarkPane q={quadOf(d)} seed={`${seed}/dk`} />;
   }
   if (t < onAt + GLOW || (pulseAt !== undefined && t >= pulseAt && t < pulseAt + GLOW)) return <Fill d={d} color={palette.peach} offset={false} mode="none" seed={`${seed}/p`} />;
-  return <Page q={quadOf(d)} at={onAt} u={page?.u} v={page?.v} k={page?.k} seed={`${seed}/pg`} />;
+  return <Page q={quadOf(d)} at={onAt} u={page?.u} v={page?.v} k={page?.k} hd={page?.hd} seed={`${seed}/pg`} />;
 };
 
 // ---------------------------------------------------------------- flower boxes (static detail, ride the pop-ups)
@@ -617,15 +620,16 @@ const FLOWERS = (() => {
   } as Partial<Record<SideId, {box: string; leaves: string; flowers: string}>>;
 })();
 
-/** Centre and width (world) of a side house's screen: the count ping's anchor. */
-function screenCentre(h: RowHouse, u = 0.5, v = 0.5): {c: Pt; w: number} {
+/** Centre, width and height (world) of a side house's screen: the count tick's anchor. */
+function screenCentre(h: RowHouse, u = 0.5, v = 0.5): {c: Pt; w: number; h: number} {
   const q = quadOf(h.g.screen);
-  return {c: bil(q, u, v), w: Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1])};
+  return {c: bil(q, u, v), w: Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1]), h: Math.hypot(q[3][0] - q[0][0], q[3][1] - q[0][1])};
 }
 
-/** Per side house: its screen state + page (+ the count's orange ping on the PHP screens), an awning (L2 / R2), window
- *  boxes (L2, R3). `onAt`: the PHP screens light on 'seven' (the count: polish round 1, the screens ARE the street's
- *  count, no blade signs), the three non-PHP screens go dark on 'ten'; `pulseAt`: the PHP pages re-pulse on 'websites'. */
+/** Per side house: its screen state + page (+ the count's tick on the PHP screens: a 2-frame cream flash BEHIND the
+ *  screen and an inked orange ring in front), an awning (L2 / R2), window boxes (L2, R3). `onAt`: the PHP screens light
+ *  on 'seven' (the count: polish round 1, the screens ARE the street's count, no blade signs), the three non-PHP
+ *  screens go dark on 'ten'; `pulseAt`: the PHP pages re-pulse on 'websites'. */
 export const SideOverlays: React.FC<{popAt: Record<SideId, number>; onAt: Partial<Record<SideId, number>>; pulseAt: Partial<Record<SideId, number>>; awnings?: SideId[]}> = ({popAt, onAt, pulseAt, awnings = ['L2', 'R2']}) => (
   <>
     {SIDE_HOUSES.map(({id, h}) => {
@@ -634,8 +638,10 @@ export const SideOverlays: React.FC<{popAt: Record<SideId, number>; onAt: Partia
       const pa = PAGE_AT[id];
       const sc = screenCentre(h, pa?.pingU, pa?.pingV);
       const on = onAt[id];
+      const tick = php && on !== undefined;
       return (
         <PopUp key={id} at={popAt[id]} x={h.base[0]} y={h.base[1]}>
+          {tick ? <TickFlash x={sc.c[0]} y={sc.c[1]} rx={sc.w * 1.05} ry={sc.h * 0.62} at={on} /> : null}
           <ScreenState d={h.g.screen} onAt={on} pulseAt={php ? pulseAt[id] : undefined} php={php} page={pa} seed={`s03/scr${id}`} />
           {awnings.includes(id) && h.g.awning ? (
             <>
@@ -651,7 +657,7 @@ export const SideOverlays: React.FC<{popAt: Record<SideId, number>; onAt: Partia
               <Ink d={fb.box + fb.leaves} width={1.3} taper={false} seed={`s03/fbi${id}`} />
             </>
           ) : null}
-          {php && on !== undefined ? <CountPing x={sc.c[0]} y={sc.c[1]} r={sc.w * 0.8} at={on} color={palette.sun} /> : null}
+          {tick ? <TickRing x={sc.c[0]} y={sc.c[1]} r={sc.w * 0.8} at={on} /> : null}
         </PopUp>
       );
     })}
@@ -659,27 +665,63 @@ export const SideOverlays: React.FC<{popAt: Record<SideId, number>; onAt: Partia
 );
 
 /** The press house's screen (BrowserChrome screen rect under its bar): unlit, peach pop, the set's page; re-pulses
- *  (peach, 2 frames) at each `pulseAt` (its count tick on 'seven', 'websites'). */
-export const PressScreen: React.FC<{lightAt: number; pulseAt?: number[]}> = ({lightAt, pulseAt = []}) => {
-  const t = useTime();
+ *  (peach, 2 frames) at each `pulseAt` (its count tick on 'seven', 'websites'). A1 (finding: the press house, counted
+ *  first, kept its generic text page, so a viewer counting elephant screens got 6 against 3): from `pageAt` (its count
+ *  tick) it shows the SAME elephant page as the six side PHP screens: a peach header and a big solid ink elephant
+ *  (springing in 7 %), so all seven PHP sites share one glyph. */
+export const PRESS_SCREEN = (() => {
   const [wx, wy, ww, wh] = BLUEPRINT.window;
-  const s = chromeScreen(wx, wy, ww, wh);
+  return chromeScreen(wx, wy, ww, wh);
+})();
+export const PressScreen: React.FC<{lightAt: number; pulseAt?: number[]; pageAt?: number}> = ({lightAt, pulseAt = [], pageAt}) => {
+  const t = useTime();
+  const s = PRESS_SCREEN;
   const d = `M${s.x} ${s.y}H${s.x + s.w}V${s.y + s.h}H${s.x}Z`;
   const pulse = pulseAt.some((p) => t >= p && t < p + GLOW);
   if (t < lightAt) return <Fill d={d} color={palette.sage} offset={false} mode="none" seed="s03/scrP" />;
   if (t < lightAt + GLOW || pulse) return <Fill d={d} color={palette.peach} offset={false} mode="none" seed="s03/scrPp" />;
-  return null;
+  if (pageAt === undefined || t < pageAt) return null;
+  const pad = Math.max(5, s.w * 0.07);
+  const hh = s.h * 0.24;
+  const cy = s.y + pad + hh + (s.h - pad - hh) / 2 + 1;
+  const cx = s.x + s.w / 2;
+  const k = Math.max(0.001, springAt(t, pageAt, springs.pop));
+  return (
+    <>
+      <Fill rect={[s.x + 1.5, s.y + 1, s.w - 3, s.h - 2.5]} color={palette.cream} offset={false} mode="none" seed="s03/scrPg" />
+      <Fill rect={[s.x + pad, s.y + pad, s.w - pad * 2, hh]} color={palette.peach} offset={false} mode="none" seed="s03/scrPh" />
+      <XG m={mat.about(mat.scale(k), cx, cy)}>
+        <ElephantEmblem x={cx} y={cy} size={(s.h - pad - hh) * 0.98} mode="solid" color={palette.ink} seed="s03/scrPel" />
+      </XG>
+    </>
+  );
 };
 
-// ---------------------------------------------------------------- count pings
+// ---------------------------------------------------------------- count ticks
 
-/** A ring that pops at r and expands to 1.8 r while thinning to nothing (0.32 s): a count "tick" (ink, or orange). */
-export const CountPing: React.FC<{x: number; y: number; r: number; at: number; width?: number; color?: string}> = ({x, y, r, at, width = 3.4, color = palette.ink}) => {
+/** A count tick's flash (A1, finding: a thin 3.4 px orange ring on peach / tan facades all but vanished at phone
+ *  size): a cream disc (ellipse rx x ry) behind the screen for two frames. */
+export const TickFlash: React.FC<{x: number; y: number; rx: number; ry: number; at: number}> = ({x, y, rx, ry, at}) => {
+  const t = useTime();
+  if (t < at || t >= at + GLOW) return null;
+  return <ellipse cx={x} cy={y} rx={rx} ry={ry} fill={palette.cream} />;
+};
+
+/** A count tick's ring (A1): an ORANGE 4.8 px ring with a 2 px ink outline each side, popping at r and expanding to
+ *  1.8 r while thinning (0.26 s): reads on peach, tan, mint and sky alike. */
+export const TickRing: React.FC<{x: number; y: number; r: number; at: number; width?: number; color?: string}> = ({x, y, r, at, width = 4.8, color = palette.sun}) => {
   const t = useTime();
   if (t < at) return null;
-  const p = prog(t, at, 0.32, E.outCubic);
+  const p = prog(t, at, 0.26, E.outCubic);
   if (p >= 1) return null;
-  return <circle cx={x} cy={y} r={r * (1 + 0.8 * p)} fill="none" stroke={color} strokeWidth={width * (1 - p * 0.85) + 0.01} />;
+  const rr = r * (1 + 0.8 * p);
+  const w = width * (1 - p * 0.8);
+  return (
+    <>
+      <circle cx={x} cy={y} r={rr} fill="none" stroke={palette.ink} strokeWidth={w + 4 * (1 - p * 0.5)} />
+      <circle cx={x} cy={y} r={rr} fill="none" stroke={color} strokeWidth={w} />
+    </>
+  );
 };
 
 // ---------------------------------------------------------------- S03's roof vent (moved off the sun's edge)
@@ -759,11 +801,35 @@ export const VentS03: React.FC = () => {
  *  apart (left-low, middle-high, right-mid) so they never overlap; apex below screen y ~610 (caption floor 570). The
  *  second puff (end(loves)) is gone by ~12.49, before the card flip (12.505). */
 const PUFF = {fly: 0.6, out: 0.12, gap: 0.08, ends: [[-148, 98], [-104, 140], [-64, 112]] as [number, number][]};
-export const VentPuffs: React.FC<{times: number[]; n?: number; seed?: string}> = ({times, n = 3, seed = 's03/vent'}) => {
+/** One printed sheet, 22 x 27, centred on (x, y): A1 (finding: the house corner overshoot, ~8-10 px on all four corners,
+ *  made each sheet a '#' / tic-tac-toe glyph at phone size): a DOG-EARED page (top-right corner folded down, the fold a
+ *  small tan triangle), its bottom edge slightly curled, ink overshoot on ONE corner only (bottom-left, <= 2.5 px), and two
+ *  short print lines. */
+const SHEET_W = 22;
+const SHEET_H = 27;
+const EAR = 6;
+function sheetPaths(x: number, y: number, seed: string): {paper: string; fold: string; ink: string; text: string} {
+  const x0 = x - SHEET_W / 2;
+  const y0 = y - SHEET_H / 2;
+  const x1 = x + SHEET_W / 2;
+  const y1 = y + SHEET_H / 2;
+  const r = rng(seed);
+  const curl = r.range(1.2, 2.2); // the bottom edge bows down a touch (paper, not a box)
+  const paper = `M${x0} ${y0}L${x1 - EAR} ${y0}L${x1} ${y0 + EAR}L${x1} ${y1}Q${x} ${y1 + curl} ${x0} ${y1}Z`;
+  const fold = `M${x1 - EAR} ${y0}L${x1 - EAR + 0.6} ${y0 + EAR - 0.6}L${x1} ${y0 + EAR}Z`;
+  const o = r.range(1.6, 2.5);
+  const ink =
+    `M${x1 - EAR} ${y0}L${x0} ${y0}L${x0} ${y1 + o}` + // top edge, left edge running past the bottom-left corner
+    `M${x0 - o * 0.8} ${y1}Q${x} ${y1 + curl} ${x1} ${y1}L${x1} ${y0 + EAR}L${x1 - EAR} ${y0}` + // bottom (past the corner), right, the fold's diagonal
+    `M${x1 - EAR} ${y0}L${x1 - EAR + 0.6} ${y0 + EAR - 0.6}L${x1} ${y0 + EAR}`; // the fold's inner edges
+  const text = `M${x0 + 4} ${y - 3}L${x1 - 7} ${y - 3}M${x0 + 4} ${y + 3}L${x1 - 4} ${y + 3}M${x0 + 4} ${y + 9}L${x + 2} ${y + 9}`;
+  return {paper, fold, ink, text};
+}
+export const VentPuffs: React.FC<{puffs: {at: number; n?: number; fly?: number}[]; seed?: string}> = ({puffs, seed = 's03/vent'}) => {
   const t = useTime();
   const V = VENT;
   const out: React.ReactNode[] = [];
-  times.forEach((at, j) => {
+  puffs.forEach(({at, n = 3, fly = PUFF.fly}, j) => {
     const r = rng(`${seed}/${j}`);
     for (let i = 0; i < n; i++) {
       const t0 = at + i * PUFF.gap;
@@ -772,19 +838,22 @@ export const VentPuffs: React.FC<{times: number[]; n?: number; seed?: string}> =
       const rise = e[1] + r.range(-5, 5);
       if (t < t0) continue;
       const tau = t - t0;
-      if (tau >= PUFF.fly + PUFF.out) continue;
-      const u = tau / PUFF.fly;
+      if (tau >= fly + PUFF.out) continue;
+      const u = tau / fly;
       // outQuad over the flight + a linear tail (the end velocity stays ~0.25 x the mean, never zero)
       const p = 0.75 * E.outQuad(Math.min(1, u)) + 0.25 * u;
-      const k = tau <= PUFF.fly ? 1 : 1 - E.inQuad((tau - PUFF.fly) / PUFF.out);
+      const k = tau <= fly ? 1 : 1 - E.inQuad((tau - fly) / PUFF.out);
       if (k <= 0.02) continue;
       const x = V[0] + dx * p + Math.sin(u * 6 + i + j) * 5;
       const y = V[1] - 30 - rise * p;
       const rot = -50 * p + Math.sin(u * 8 + i) * 16;
+      const P = sheetPaths(x, y, `${seed}/s${j}${i}`);
       out.push(
         <XG key={`${j}/${i}`} m={mat.compose(mat.about(mat.scale(k), x, y), mat.about(mat.rotate(rot), x, y))}>
-          <Fill rect={[x - 11, y - 13.5, 22, 27]} color={palette.white} offset={false} mode="snap" seed={`${seed}/f${j}${i}`} />
-          <Ink d={rect(x - 11, y - 13.5, 22, 27, {seed: `${seed}/i${j}${i}`, over: 'small'}) + `M${x - 7} ${y - 6}L${x + 6} ${y - 6}M${x - 7} ${y}L${x + 7} ${y}M${x - 7} ${y + 6}L${x + 3} ${y + 6}`} width={1.6} taper={false} seed={`${seed}/k${j}${i}`} />
+          <Fill d={P.paper} color={palette.white} offset={false} mode="none" seed={`${seed}/f${j}${i}`} />
+          <Fill d={P.fold} color={palette.tan} offset={false} mode="none" seed={`${seed}/fo${j}${i}`} />
+          <Ink d={P.ink} width={1.6} taper={false} vary={0} seed={`${seed}/k${j}${i}`} />
+          <Ink d={P.text} width={1.3} taper={false} vary={0} seed={`${seed}/tx${j}${i}`} />
         </XG>,
       );
     }

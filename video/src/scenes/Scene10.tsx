@@ -17,13 +17,13 @@ import scenesJson from '../data/scenes.json';
 import {LabelTag, OldQuarter, PopUp, SunPie} from './scene10/kit';
 import {localBeats, SCENE, W} from './scene10/beats';
 import {SecondRow} from './scene10/secondRow';
-import {Plaques, plaqueRest, Sites, SiteSketch, Stoops, TAG_HANG} from './scene10/sites';
+import {Plaques, plaqueRest, Sites, SiteSketch, StatusBadges, Stoops, TAG_HANG} from './scene10/sites';
 import {plaqueFacePoint, TAG_W, tagBodyOffset} from './scene10/plaques';
 import {Cart, CartTimes, Tosses} from './scene10/cart';
 import {Pip} from './scene10/pip';
 import {HalfSweep, TreeLeafPatch} from './scene10/extras';
 import {GAP_WALKER, GapWalker} from './scene10/walker';
-import {BottomCrowd, FarStreet, SandwichBoard, signBox, SiteMReturn, StreetGround} from './scene10/street';
+import {BottomCrowd, FarStreet, SandwichBoard, signBox, GapReturns, StreetGround} from './scene10/street';
 // S09's tram (its exported Wiper): read-only, to hand Pip over from its roof and to preview the wipe standalone
 import {TRAM as S09_TRAM, TramWiper, tramPipAt} from './scene09/TramWiper';
 import type {Pt} from '../lib/sketch';
@@ -75,7 +75,7 @@ const Scene10: React.FC = () => {
   const hand = tramPipAt(start + b.pipHop);
   const handV = (hand.x - tramPipAt(start + b.pipHop - 1 / 30).x) * 30;
   // the A-frame's box (street.tsx signBox: 12 px left, 24 px narrower, 6 px lower than the set's slot)
-  // the street-gap wedge and its walker pop up with siteR (not floating in the empty street from the cut)
+  // the side street in the gap and its walker pop up with siteR (not floating in the empty street from the cut)
   const sitePops: [number, number, number] = [b.siteL, b.siteL + 0.1, b.siteL + 0.2];
   const wedgeAt = sitePops[2];
 
@@ -116,13 +116,14 @@ const Scene10: React.FC = () => {
             return (
               <>
                 {/* the gap walker is FARTHER than the near row: drawn before it, so siteR's wall covers his exit (he
-                    walks off up the gap and right, gone by 'old'); he pops up with the gap wedge (siteR) */}
+                    walks off up the gap and right, gone by 'old'); he pops up with the side street (siteR) */}
                 <PopUp at={wedgeAt} x={GAP_WALKER.x} y={GAP_WALKER.y}>
                   <GapWalker walkAt={b.walker} outAt={b.walkerOut} />
                 </PopUp>
                 <SiteSketch at={[b.sketch, b.sketch + 0.06, b.sketch + 0.12]} />
                 <Sites popAt={sitePops} updateAt={b.update} wobbleAt={b.wobble} />
-                <SiteMReturn at={sitePops[1]} />
+                <GapReturns atM={sitePops[1]} atR={sitePops[2]} />
+                <StatusBadges atL={b.tick1 + 0.03} atR={b.tick2 + 0.03} />
               </>
             );
           if (name === 'sign')
@@ -133,7 +134,7 @@ const Scene10: React.FC = () => {
                 <Stoops popAt={sitePops} />
                 <Plaques
                   plaqueAt={[b.plaques, b.plaques + 0.06, b.plaques + 0.12]}
-                  old={{flipOldAt: b.flipM, cobwebAt: b.cobweb, dustAt: b.dust, caneAt: b.cane, droopAt: b.droop, wobbleAt: b.wobble, nudgeAt: [b.skipNudge, b.hey + 0.04], bit: {at: b.bitIn, size: 22, bursts: [0, b.cane, b.not, b.update].map((x) => x - (b.bitIn + 0.4))}}}
+                  old={{flipOldAt: b.flipM, cobwebAt: b.cobweb, dustAt: b.dust, caneAt: b.cane, droopAt: b.droop, wobbleAt: b.wobble, nudgeAt: [b.skipNudge, b.hey + 0.04], bit: {at: b.bitIn, size: 22, bursts: [0, ...[b.cane, b.not, b.update].map((x) => x - (b.bitIn + 0.42))]}}}
                   tagL={{at: b.tick1, tickAt: b.tick1 + 0.03, ringAt: b.tick1 + 0.03}}
                   tagR={{at: b.tick2, tickAt: b.tick2 + 0.03, ringAt: b.tick2 + 0.03}}
                 />

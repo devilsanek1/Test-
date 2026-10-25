@@ -201,7 +201,7 @@ export const Rattler: React.FC<RattlerSpec> = ({x, y, h, dh: dhIn, at, rattles, 
   const door = doorPaths(dx, dy, dh);
   const [hx, hy] = door.handle;
   const mw = Math.max(2.2, h * 0.034);
-  const L = h * 0.13;
+  const L = Math.max(7, h * 0.13);
   let marks = '';
   if (marksOn && !air) {
     if (shake % 2 === 0) {

@@ -11,10 +11,11 @@ import {ease as E, lerp, prog, springAt, springs, useTime} from '../../lib/time'
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {rand} from '../../lib/rng';
-import {line, polyPath, rectPath, Pt} from '../../lib/sketch';
+import {circle, hline, line, polyPath, rect, rectPath, roundRect, Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import type {Season} from '../shared/sets';
 import {SI, STOOP} from '../shared/sets';
+import {PropRoot, usePropFrame} from '../shared/props';
 
 // ---------------------------------------------------------------- seasons
 
@@ -267,13 +268,96 @@ export const YearCalendar: React.FC<{tears: number[]; seed?: string}> = ({tears,
   );
 };
 
+/** The lift pose of a torn page (fix round 3: the old one-frame lift was the page's blank BACK as a trapezoid that
+ *  narrowed upward with a tan band at its foot: on a pause a lampshade on the calendar, strobing every other frame). The
+ *  page is swung up about the binding toward the camera, so its free (bottom) edge is now ON TOP and NEARER the camera:
+ *  WIDER than the hinge (perspective), the page FRONT showing, squashed (its 3 x 4 month grid with the blocks' sand title
+ *  strips, mirrored: the strips sit at each block's foot), a dog-eared top corner (sand: the paper's back), a
+ *  misregistered cream fill and an inkThin outline whose free edge bows like bent paper. Two poses alternate tear by
+ *  tear so no single shape strobes: 'a' ~45 % squash, free edge 12 % wider, dog-ear right; 'b' flatter (~30 %), 16 %
+ *  wider, its free edge curling back (a sliver of the sand back shows), dog-ear left. World coords; the hinge spans the
+ *  calendar's width on the binding. Nothing covers the next page or its title band (the pose sits above the binding,
+ *  over the pad's header). */
+function LiftPose({i, seed}: {i: number; seed: string}) {
+  const w = CAL[2];
+  const h = PAGE_H;
+  const x0 = CAL[0];
+  const bind = CAL[1] + CAL_HEAD;
+  const r = (k: string) => rand(seed, `${i}${k}`);
+  const b = i % 2 === 1;
+  const hp = h * (b ? 0.3 : 0.45) * (0.94 + r('h') * 0.12);
+  const spread = b ? 0.16 : 0.12;
+  const sk = (b ? -3 : 3) + (r('sk') - 0.5) * 3;
+  const cx = x0 + w / 2;
+  // page-local (u across 0..w, v from the hinge 0..h) -> world: the far rows (nearer the camera) a little taller
+  const f = (s: number) => (s * 1.3) / (1 + 0.3 * s);
+  const P = (u: number, v: number): Pt => {
+    const s = f(v / h);
+    return [cx + (u - w / 2) * (1 + spread * s) + sk * s, bind - hp * s - (b ? 2.5 : 1.5) * Math.sin(Math.PI * (u / w)) * s];
+  };
+  const quad = (u0: number, v0: number, u1: number, v1: number) => polyPath([P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)]);
+  const fmt = (p: Pt) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+  // the outline: hinge, a side, the free edge bowing up (paper bending as it is pulled), the other side
+  const ce = w * 0.13; // the dog-ear's leg (page-local)
+  const earR = !b;
+  const tl = P(0, h);
+  const tr = P(w, h);
+  const mid = P(w / 2, h);
+  const bow: Pt = [mid[0], mid[1] - (b ? 5 : 3)];
+  const earA = earR ? P(w - ce, h) : P(ce, h);
+  const earB = earR ? P(w, h - ce * 1.4) : P(0, h - ce * 1.4);
+  const outline = earR
+    ? `M${fmt(P(0, 0))}L${fmt(P(w, 0))}L${fmt(earB)}L${fmt(earA)}Q${fmt(bow)} ${fmt(tl)}Z`
+    : `M${fmt(P(0, 0))}L${fmt(P(w, 0))}L${fmt(tr)}Q${fmt(bow)} ${fmt(earA)}L${fmt(earB)}Z`;
+  // the fold: the corner turned over toward the camera (its back, sand), a small triangle inside the corner
+  const corner = earR ? tr : tl;
+  // the corner reflected across the fold line earA-earB (pulled in 15 %: the flap stands a little off the page)
+  const fold: Pt = (() => {
+    const dx = earB[0] - earA[0];
+    const dy = earB[1] - earA[1];
+    const k = ((corner[0] - earA[0]) * dx + (corner[1] - earA[1]) * dy) / (dx * dx + dy * dy);
+    const fx = earA[0] + k * dx;
+    const fy = earA[1] + k * dy;
+    return [fx + (fx - corner[0]) * 0.85, fy + (fy - corner[1]) * 0.85];
+  })();
+  const ear = `M${fmt(earA)}L${fmt(earB)}L${fmt(fold)}Z`;
+  // the 3 x 4 month blocks, squashed and mirrored (block title strips at each block's foot, nearer the hinge)
+  const band = h * 0.13;
+  const mx = w * 0.08;
+  const gx = w * 0.05;
+  const top = band + h * 0.07;
+  const gy = h * 0.045;
+  const bw = (w - 2 * mx - 2 * gx) / 3;
+  const bh = (h - top - h * 0.06 - 3 * gy) / 4;
+  let boxes = '';
+  let strips = '';
+  for (let rr = 0; rr < 4; rr++)
+    for (let c = 0; c < 3; c++) {
+      const u = mx + c * (bw + gx);
+      const v = top + rr * (bh + gy);
+      if (earR ? c === 2 && rr === 3 : c === 0 && rr === 3) continue; // under the dog-ear
+      boxes += quad(u, v, u + bw, v + bh);
+      strips += quad(u, v, u + bw, v + bh * 0.32);
+    }
+  // pose b curls its free edge back: a sliver of the sand back along the top
+  const curl = b ? `M${fmt(P(w * 0.08, h))}Q${fmt([mid[0], mid[1] - 9])} ${fmt(P(w * 0.92, h))}Q${fmt([mid[0], mid[1] - 4])} ${fmt(P(w * 0.08, h))}Z` : '';
+  return (
+    <>
+      <Fill d={outline} color={palette.cream} mode="none" seed={`${seed}/lf${i % 4}`} />
+      <Fill d={strips} color={palette.sand} offset={false} mode="none" seed={`${seed}/ls${i % 4}`} />
+      <Ink d={boxes} width={1.0} taper={false} seed={`${seed}/lg${i % 4}`} />
+      {curl ? <Fill d={curl} color={palette.sand} offset={false} mode="none" seed={`${seed}/lc${i % 4}`} /> : null}
+      <Fill d={ear} color={palette.sand} offset={false} mode="none" seed={`${seed}/le${i % 4}`} />
+      <Ink d={outline + ear + (curl ? curl : '')} width={CAL_INK} taper={false} seed={`${seed}/lo${i % 4}`} />
+    </>
+  );
+}
+
 /** The torn pages (fix round 2: the old flip laid a blank 145 x 95 px lid over the calendar on almost every frame).
- *  Each tear: ONE frame of the page LIFTED from its bottom edge over the binding, seen from behind as a foreshortened
- *  trapezoid above the header (top edge pinned at the binding, its far edge ~34 % shorter), the title band's tan strip
- *  showing through the back as a misregistered band at its foot; from the next frame the page is off the pad, front out
- *  (its year grid and scribbled year), fluttering up and a little right while it shrinks away. Nothing ever covers the
- *  pad's own title band (the tears are 2.1 frames apart, so every other frame shows the pad bare). None is left in the
- *  air when the dive starts (`until`). */
+ *  Each tear: ONE frame of the page lifted over the binding (`LiftPose`, fix round 3: the page front, wider at its free
+ *  top edge, two alternating poses); from the next frame the page is off the pad, front out (its year grid and
+ *  scribbled year), fluttering up and a little right while it shrinks away. Nothing ever covers the next page's title
+ *  band. None is left in the air when the dive starts (`until`). */
 export const YearFlyers: React.FC<{tears: number[]; until: number; life?: number; seed?: string}> = ({tears, until, life = 0.32, seed = 's4fly'}) => {
   const t = useTime();
   const w = CAL[2];
@@ -285,25 +369,7 @@ export const YearFlyers: React.FC<{tears: number[]; until: number; life?: number
     if (t < ta || t >= end) return;
     const r = (k: string) => rand(seed, `${i}${k}`);
     if (t < ta + FRAME) {
-      // the lift: the page's back, standing up over the binding and leaning away (bottom edge up and back: shorter)
-      const hp = h * 0.6;
-      const ins = w * 0.17;
-      const x0 = CAL[0];
-      // paper, not a lid: the far edge twists a little right and bows (the page bends as it is pulled), the sides bow in
-      const sk = 4 + r('sk') * 4;
-      const fL: Pt = [x0 + ins + sk, bind - hp];
-      const fR: Pt = [x0 + w - ins + sk, bind - hp + 3];
-      const trap = `M${x0} ${bind}L${x0 + w} ${bind}Q${x0 + w - ins * 0.35} ${bind - hp * 0.5} ${fR[0]} ${fR[1]}Q${(fL[0] + fR[0]) / 2} ${bind - hp - 7} ${fL[0]} ${fL[1]}Q${x0 + ins * 0.75} ${bind - hp * 0.5} ${x0} ${bind}Z`;
-      const bh = 4.5;
-      const bi = (ins * bh) / hp;
-      const band = polyPath([[x0 + 2.2, bind - 1.6], [x0 + w + 1.8, bind - 1.6], [x0 + w - bi + 1.8, bind - 1.6 - bh], [x0 + bi + 2.2, bind - 1.6 - bh]]);
-      out.push(
-        <React.Fragment key={i}>
-          <Fill d={trap} color={palette.cream} offset={false} mode="none" seed={`${seed}/bk${i % 3}`} />
-          <Fill d={band} color={palette.tan} offset={false} mode="none" seed={`${seed}/bb${i % 3}`} />
-          <Ink d={trap} width={CAL_INK * 0.8} taper={false} seed={`${seed}/bki${i % 3}`} />
-        </React.Fragment>,
-      );
+      out.push(<LiftPose key={i} i={i} seed={seed} />);
       return;
     }
     const q = (t - ta - FRAME) / (life - FRAME);
@@ -344,16 +410,15 @@ const WIN_CYCLE: WinState[] = ['none', 'blind', 'curtain', 'plant'];
 const WIN_START: WinState[] = ['curtain', 'none', 'plant', 'blind', 'none'];
 const WIN_ORDER = [3, 0, 4, 1, 2, 0, 3];
 
-/** The hero house's windows live through the fourteen years: on every other tear one window changes (a blind comes
- *  down, curtains are drawn, a plant appears on the sill, or it is bare again), one-frame pops like a time-lapse. */
-export const WindowLife: React.FC<{tears: number[]; flatAbove?: number; seed?: string}> = ({tears, flatAbove, seed = 's4win'}) => {
+/** The hero house's windows live through the fourteen years: on every other tear one window changes (a sand blind
+ *  comes down, curtains are drawn, a plant appears on the sill, or it is bare again), one-frame pops like a time-lapse. */
+export const WindowLife: React.FC<{tears: number[]; seed?: string}> = ({tears, seed = 's4win'}) => {
   const t = useTime();
   const state = [...WIN_START];
   WIN_ORDER.forEach((w, k) => {
     const at = tears[k * 2];
     if (at !== undefined && t >= at) state[w] = WIN_CYCLE[(WIN_CYCLE.indexOf(state[w]) + 1 + (k % 2)) % WIN_CYCLE.length];
   });
-  let peach = '';
   let blindSand = '';
   let cream = '';
   let tan = '';
@@ -363,10 +428,9 @@ export const WindowLife: React.FC<{tears: number[]; flatAbove?: number; seed?: s
     const s = state[i];
     if (s === 'blind') {
       const bh = h * (0.38 + rand(seed, `b${i}`) * 0.14);
-      // fix round 2: in the dive the windows above the flatten line slide up through the caption band, where peach
-      // belongs only to the caption highlight: their blinds repaint sand with the flatten (one unit, its first frame)
-      if (flatAbove !== undefined && y < flatAbove) blindSand += rectPath(x + 2, y + 2, w - 4, bh);
-      else peach += rectPath(x + 2, y + 2, w - 4, bh);
+      // fix round 3: SAND for the whole scene (was peach, repainted sand on the dive's first frame): on 'bug' the
+      // spot is the only peach under the captions, and nothing repaints in the dive
+      blindSand += rectPath(x + 2, y + 2, w - 4, bh);
       ink += `M${x + 1} ${(y + bh + 2).toFixed(1)}H${x + w - 1}M${x + w / 2} ${y + 2}V${(y + bh + 2).toFixed(1)}M${(x + w * 0.72).toFixed(1)} ${(y + bh + 2).toFixed(1)}v8`;
     } else if (s === 'curtain') {
       const a = w * 0.3;
@@ -385,7 +449,6 @@ export const WindowLife: React.FC<{tears: number[]; flatAbove?: number; seed?: s
   });
   return (
     <>
-      {peach ? <Fill d={peach} color={palette.peach} offset={false} mode="none" seed={`${seed}/p`} /> : null}
       {blindSand ? <Fill d={blindSand} color={palette.sand} offset={false} mode="none" seed={`${seed}/p`} /> : null}
       {cream ? <Fill d={cream} color={palette.cream} offset={false} mode="none" seed={`${seed}/c`} /> : null}
       {tan ? <Fill d={tan} color={palette.tan} offset={false} mode="none" seed={`${seed}/t`} /> : null}
@@ -541,38 +604,67 @@ export const SplitInk: React.FC<{y: number; x0?: number; node: React.ReactNode}>
   </>
 );
 
-// ---------------------------------------------------------------- the browser window's flat chrome (dive)
+// ---------------------------------------------------------------- soft ink (the dive)
 
-/** During the dive the hero's browser window is flat with the rest of the upper facade, and its chrome bar crosses the
- *  captions: the kit's tealDark bar under ink lettering is ~2.4:1 (framecheck: 8 % of the band below 3:1), so in the
- *  dive the bar is repainted one step lighter (teal, ~3.6:1) with its three dots and the address pill on top: still the
- *  browser's chrome (the 'this is a website' cue never disappears), legible under the text. Fix round 2 (major: the
- *  peach headline block slid in behind 'like' / 'bug was in there' and read as a second, misplaced highlight box): the
- *  page under the bar is ONE cream field (inside the caption band peach belongs only to the caption highlight), and the
- *  third dot is sand, not peach. Geometry = BrowserChrome's (bar min(30, 0.27 h), dots r 0.25 bar at 0.47 bar + i x
- *  0.63 bar, the pill after them). Draw it in the hero slot from the dive's first frame: it only shows in the flat copy
- *  (above the flatten line). */
-export const FlatChrome: React.FC<{on: boolean}> = ({on}) => {
-  if (!on) return null;
+/** `node` with its ink SOFTENED to tan above world y `y` (from x0 rightward), unchanged below: two clipped copies, one
+ *  switch for a whole layer. Fix round 3 (the dive's flatten dropped every ink line above world 990 in one frame and the
+ *  browser / windows changed content: a repaint, not motion): every line, mullion, curtain edge, browser hairline and
+ *  window frame stays exactly where it is, only its colour steps from ink to tan (a CSS rule on the copy: SVG presentation
+ *  attributes lose to any style rule), so silhouettes and content are identical and the caption band only ever sees tan
+ *  lines (tan behind ink lettering is ~6:1). */
+export const SoftInk: React.FC<{y: number; x0?: number; node: React.ReactNode; color?: string}> = ({y, x0, node, color = palette.tan}) => {
+  const cls = 's4soft' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  return (
+    <>
+      <style>{`.${cls} path[stroke="${palette.ink}" i]{stroke:${color}}`}</style>
+      <ClipG d={above(y + 1.5, x0)}>
+        <g className={cls}>{node}</g>
+      </ClipG>
+      <ClipG d={except(above(y, x0))}>{node}</ClipG>
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- the hero browser window (whole scene)
+
+/** The hero house's browser window re-toned for S04 (fix round 3), drawn OVER the set's own (StoopStreet's ChromeSlot:
+ *  same geometry, seeds and misregistration, so every line lands on the set's): for the WHOLE scene, never switched,
+ *  - the screen's header block is SAND (the kit's peach block was the strongest accent under the captions on 'bug',
+ *    pulling the eye off lock4's spot);
+ *  - the title bar is TEAL, one step lighter than the kit's tealDark (it crosses the captions in the dive: tealDark under
+ *    ink lettering is ~2.4:1, teal ~3.6:1), its dots cream / sage / SAND (no peach inside the caption band but the
+ *    highlight), the cream address pill, the bar line and the frame redrawn on top.
+ *  The screen's ink hairlines stay the set's. */
+export const HeroBrowser: React.FC<{seed?: string}> = ({seed = 'stoop/hbw'}) => {
   const [x, y, w, h] = STOOP.browser;
+  const F = usePropFrame({ink: SI.mid, seed, defDepth: 'mid'});
+  const W = F.W;
   const bar = Math.min(30, h * 0.27);
+  const sh = h - bar;
+  const pad = Math.max(5, w * 0.07);
+  const hh = sh * 0.24;
   const dr = bar * 0.25;
   const sp = bar * 0.63;
   const d0 = bar * 0.47;
-  const cy = y + bar / 2;
   const px = d0 + 2 * sp + dr + bar * 0.38;
   const pw = Math.max(bar, w - px - bar * 0.35);
   const ph = bar * 0.6;
-  const dot = (i: number) => `M${x + d0 + i * sp - dr} ${cy}a${dr} ${dr} 0 1 0 ${2 * dr} 0a${dr} ${dr} 0 1 0 ${-2 * dr} 0Z`;
-  const pill = `M${x + px + ph / 2} ${cy - ph / 2}H${x + px + pw - ph / 2}a${ph / 2} ${ph / 2} 0 0 1 0 ${ph}H${x + px + ph / 2}a${ph / 2} ${ph / 2} 0 0 1 0 ${-ph}Z`;
+  const py = (bar - ph) / 2;
+  const dots = [palette.cream, palette.sage, palette.sand];
   return (
-    <>
-      <Fill d={rectPath(x - 4, y + bar - 1, w + 8, h - bar + 5)} color={palette.cream} offset={false} mode="none" seed="s4/fcs" />
-      <Fill d={rectPath(x - 3, y - 3, w + 6, bar + 4)} color={palette.teal} offset={false} mode="none" seed="s4/fc" />
-      <Fill d={dot(0)} color={palette.cream} offset={false} mode="none" seed="s4/fc0" />
-      <Fill d={dot(1)} color={palette.sage} offset={false} mode="none" seed="s4/fc1" />
-      <Fill d={dot(2)} color={palette.sand} offset={false} mode="none" seed="s4/fc2" />
-      <Fill d={pill} color={palette.cream} offset={false} mode="none" seed="s4/fcp" />
-    </>
+    <PropRoot x={x} y={y}>
+      <Fill rect={[pad, bar + pad, w - pad * 2, hh]} color={palette.sand} offset={false} mode="none" seed={`${seed}/hdr`} />
+      <Fill rect={[0, 0, w, bar]} color={palette.teal} offset={F.off} mode="none" seed={`${seed}/bar`} />
+      {dots.map((c, i) => (
+        <React.Fragment key={i}>
+          <Fill d={roundRect(d0 + i * sp - dr, bar / 2 - dr, dr * 2, dr * 2, dr)} color={c} offset={false} mode="none" seed={`${seed}/d${i}`} />
+          <Ink d={circle(d0 + i * sp, bar / 2, dr, {seed: `${seed}/di${i}`, overlap: 8})} width={W * 0.5} taper={false} seed={`${seed}/di${i}`} />
+        </React.Fragment>
+      ))}
+      <Fill d={roundRect(px, py, pw, ph, ph / 2)} color={palette.cream} offset={false} mode="none" seed={`${seed}/pill`} />
+      <Ink d={roundRect(px, py, pw, ph, ph / 2, {closed: false, seed: `${seed}/pi`})} width={W * 0.55} seed={`${seed}/pi`} />
+      <Ink d={hline(0, w, bar, {seed: `${seed}/bl`, over: [2, 6]})} width={W * 0.8} seed={`${seed}/bl`} />
+      <Ink d={rect(0, 0, w, h, {seed: `${seed}/fr`, over: 6})} width={W} seed={`${seed}/fr`} />
+    </PropRoot>
   );
 };

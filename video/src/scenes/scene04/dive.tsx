@@ -18,6 +18,10 @@ import {wirePoint} from '../../lib/sketch';
 import type {Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import {SI, STOOP} from '../shared/sets';
+import {Cam, K_CREEP, toScreen, toWorld} from './camera';
+
+/** The camera the pigeons perched under (the creep's end = the dive's start). */
+const K_PERCH: Cam = K_CREEP;
 
 const FRAME = 1 / 30;
 const W = STOOP.wire;
@@ -47,18 +51,30 @@ const Flapper: React.FC<{x: number; y: number; s: number; up: boolean; color: st
   );
 };
 
-/** The pigeons: perched until `diveAt`, then a two-frame take-off to the left (world offsets), gone from frame 3. */
-export const DivePigeons: React.FC<{diveAt: number; seed?: string}> = ({diveAt, seed = 'stoop'}) => {
+/** The pigeons: perched until `diveAt` (w54 'years': the camera's dive starts on that frame, still almost at rest, so
+ *  their take-off is the word-locked anticipation beat), then they fly out of the shot to the LEFT. Fix round 3: they
+ *  used to vanish mid-frame (screen x ~600) on the dive's third frame; now each follows a SCREEN path (placed through the
+ *  camera, so the dive does not drag them up into the captions): (493, 650) -> out past the left edge in four frames,
+ *  accelerating ~120 -> ~300 px / frame, rising only ~10 px a frame (always under the caption band, y > 600), wings
+ *  alternating up / down per frame. */
+export const DivePigeons: React.FC<{diveAt: number; cam: Cam; seed?: string}> = ({diveAt, cam, seed = 'stoop'}) => {
   const t = useTime();
   const d = t - diveAt;
-  if (d >= 2 * FRAME) return null;
+  if (d >= 5 * FRAME) return null;
   return (
     <>
       {PIGEONS.map(({p, color}, i) => {
         if (d < 0) return <Bird key={i} x={p[0]} y={p[1]} s={0.85} seed={`${seed}/pg${i}`} color={color} />;
-        const first = d < FRAME;
-        const off: Pt = first ? [-24 - 6 * i, -9 - 3 * i] : [-84 - 10 * i, -12 - 4 * i];
-        return <Flapper key={i} x={p[0] + off[0]} y={p[1] + off[1]} s={first ? 0.85 : 0.75} up={first} color={color} seed={`s4pg${i}`} />;
+        const k = d / FRAME + 0.6; // frames into the flight (the first frame already off the wire)
+        const s0 = toScreen(cam, p);
+        const home = toScreen(K_PERCH, p);
+        const sx = home[0] - (95 * k + 32 * k * k) - 18 * i;
+        const sy = Math.max(605, home[1] - 9 * k - 6 * i);
+        if (sx < -60) return null;
+        const q = toWorld(cam, [sx, sy]);
+        void s0;
+        const up = Math.floor(d / FRAME) % 2 === 0;
+        return <Flapper key={i} x={q[0]} y={q[1]} s={0.85 - 0.04 * k} up={up} color={color} seed={`s4pg${i}`} />;
       })}
     </>
   );

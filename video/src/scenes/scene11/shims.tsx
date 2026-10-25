@@ -12,8 +12,11 @@
 //   PadlockRock the S01 padlock (the shared ShutterPadlock, S01's size / seed) rocking on its shackle (+-6 deg): Bit's
 //               weight / tap. ShutterPadlock has no rock of its own.
 //   TagTwirl    the S01 lettered 'back soon' tag (the shared BackSoonTag, one line, white) twirling in the breeze as a
-//               NARROWING (to 15 % width and back, then a smaller one): never past edge-on, so the lettering never
-//               leaves a blank card (BackSoonTag's own twirlAt shows its blank back for ~4 frames).
+//               NARROWING (to 15 % width and back, then a smaller one): never past edge-on (BackSoonTag's own twirlAt
+//               shows its blank back for ~4 frames); below 35 % width it draws the unlettered edge (backSoonFont).
+//   PipHopSmear 3 short ink speed lines trailing Pip's fast in-hop (S12's PipFallSmear language).
+//   ShutterStreaks cream motion streaks on govB's shutter during the slam's fastest frames (its evenly spaced ribs
+//               moving 60-80 px / frame alias: they read as static or creeping).
 //   backSoonW   the width of a one-line lettered BackSoonTag whose total drop (string + tag) is a given height.
 //   BitRim      a cream rim under the shared Bit (on the dark shutter he read as a speck; Bit has no rim option).
 
@@ -22,12 +25,12 @@ import {palette} from '../../lib/theme';
 import {ease as E, prog, springAt, springs, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {blob, Pt} from '../../lib/sketch';
+import {blob, Pt, speedLines} from '../../lib/sketch';
 import {mat, useXf, XG} from '../../lib/xf';
 import {captionFontStack, measureCaption, useCaptionFont} from '../../lib/font';
 import {matScale} from '../shared/props/common';
 import {layoutText} from '../shared/props/Labels';
-import {bitPath} from '../shared/props';
+import {bitPath, slamCurve} from '../shared/props';
 
 // ---------------------------------------------------------------- NoteBreeze
 
@@ -246,8 +249,10 @@ export const PadlockRock: React.FC<{x: number; y: number; size: number; rockAt: 
 
 /** The 'back soon' tag twirling in a breeze WITHOUT ever turning its blank back to us: a narrowing about its hang point
  *  (x) to 15 % width and back over 0.25 s, then a smaller one (to 55 %) over 0.2 s. The first narrowest point is at
- *  `at + 0.125`. The lettering stays on (narrowed): no blank card. */
-export const TagTwirl: React.FC<{x: number; y: number; twirlAt: number[]; children?: React.ReactNode}> = ({x, y, twirlAt, children}) => {
+ *  `at + 0.125`. A1 polish (review: at the narrowest frames the squashed glyphs read as a barcode / render glitch): while
+ *  the tag is narrower than 35 % (`EDGE_ON`, ~3-4 frames) it draws `edge` instead (the same tag with no lettering: the
+ *  paper edge sliver with its ink outline); the lettering returns as it turns back. */
+export const TagTwirl: React.FC<{x: number; y: number; twirlAt: number[]; edge?: React.ReactNode; children?: React.ReactNode}> = ({x, y, twirlAt, edge, children}) => {
   const t = useTime();
   let sx = 1;
   for (const a of twirlAt) {
@@ -256,8 +261,16 @@ export const TagTwirl: React.FC<{x: number; y: number; twirlAt: number[]; childr
     else if (d >= 0.25 && d < 0.45) sx = 1 - 0.45 * Math.sin(((d - 0.25) / 0.2) * Math.PI);
   }
   if (sx === 1) return <>{children}</>;
-  return <XG m={mat.about(mat.scale(sx, 1), x, y)}>{children}</XG>;
+  return <XG m={mat.about(mat.scale(sx, 1), x, y)}>{Math.abs(sx) < EDGE_ON && edge !== undefined ? edge : children}</XG>;
 };
+const EDGE_ON = 0.35;
+
+/** The lettering size BackSoonTag picks for a ONE-line lettered tag `W` wide (props layout: min(0.84 W / m, 0.34 W)):
+ *  passed as `font` with text ' ' it draws the SAME tag body with no lettering (TagTwirl's edge-on frames). */
+export function backSoonFont(W: number, text = 'back soon'): number {
+  const m1 = measureCaption(text, 100) / 100;
+  return Math.min((W * 0.84) / m1, W * 0.34);
+}
 
 // ---------------------------------------------------------------- backSoonW
 
@@ -288,4 +301,41 @@ export const BitRim: React.FC<{x: number; y: number; size: number; rot?: number;
       <path d={d} fill={color} stroke={color} strokeWidth={(2 * px) / (k * s)} strokeLinejoin="round" />
     </XG>
   );
+};
+
+// ---------------------------------------------------------------- PipHopSmear
+
+/** A1 polish (review: the in-hop crosses ~55 px / frame for 6 frames, the fastest unsmeared figure motion in the scene):
+ *  3 short ink speed lines trailing Pip's hop (S12's PipFallSmear language, scaled with him), anchored behind his body
+ *  centre along -velocity, their length growing with his speed. SCREEN space: (x, y) = his feet, (vx, vy) = px / s,
+ *  `scale` = his on-screen scale (1 = the ~92 px stand-side body). */
+export const PipHopSmear: React.FC<{x: number; y: number; vx: number; vy: number; scale: number}> = ({x, y, vx, vy, scale}) => {
+  const sp = Math.hypot(vx, vy) || 1;
+  const ux = -vx / sp;
+  const uy = -vy / sp;
+  const cx = x + ux * 50 * scale;
+  const cy = y - 42 * scale + uy * 50 * scale;
+  const len = Math.max(24, Math.min(48, (sp / 30) * 0.85));
+  const ang = (Math.atan2(uy, ux) * 180) / Math.PI;
+  return <Ink d={speedLines(cx, cy, {n: 3, len, gap: 16 * scale, angle: ang, seed: 's11/pipSpd'})} width={2.6} taper={false} seed="s11/pipSpdI" />;
+};
+
+// ---------------------------------------------------------------- ShutterStreaks
+
+/** A1 polish (review: on the slam's fastest frames the shutter's evenly spaced ribs move 60-80 px / frame and alias,
+ *  reading as static or creeping while only the bottom edge drops): 4 cream motion streaks on the curtain just above its
+ *  falling bottom edge, each as long as ~80 % of the edge's travel over the last frame (capped), drawn only while the
+ *  drop is fast (slam u 0.05-0.16 s: f101-f103). The curtain = govB's window rect (x, y, w, h, world), the set's slam
+ *  curve (props slamCurve: 0.16 s in(quad)). */
+export const ShutterStreaks: React.FC<{x: number; y: number; w: number; h: number; slamAt: number}> = ({x, y, w, h, slamAt}) => {
+  const t = useTime();
+  const k = Math.max(1e-4, matScale(useXf()));
+  const u = t - slamAt;
+  if (u < 0.05 || u >= 0.16) return null;
+  const bottom = y + h * slamCurve(u)[0];
+  const travel = h * (slamCurve(u)[0] - slamCurve(u - 1 / 30)[0]);
+  const L = Math.min(70, travel * 0.8);
+  const cols: [number, number][] = [[0.18, 1], [0.39, 0.7], [0.61, 0.9], [0.82, 0.6]];
+  const d = cols.map(([f, l]) => `M${(x + w * f).toFixed(1)} ${(bottom - 5 / k - L * l).toFixed(1)}L${(x + w * f).toFixed(1)} ${(bottom - 5 / k).toFixed(1)}`).join('');
+  return <path d={d} fill="none" stroke={palette.cream} strokeWidth={3 / k} strokeLinecap="round" />;
 };

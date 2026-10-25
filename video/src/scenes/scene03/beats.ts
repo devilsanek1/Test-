@@ -43,24 +43,28 @@ const ABS = {
   pipSettle: 9.915, //          end(PHP)+0.10: Pip settles on the stamp; the roof vent puffs two sheets
   birdHop: 10.07, //            w32-0.065 'the': a bird on the new wire hops and turns round (polish round 1: life in the
   //                            calm after the pop-up; the frame otherwise holds for the bait)
-  pressScreen: 10.135, //       w32 'the': the press house's browser window lights
+  pressScreen: 10.06, //        w32-0.075 'the' (A1: was the raw word time, its first frame landed 1 frame late; ENGINE
+  //                            rule 5 small-element lead, ~2 frames): the press house's browser window lights
   doorway: 10.305, //           w33+0.10 'language': a far walker steps out of a doorway; Bit's antennae twitch
   everyone: 10.54, //           w34-0.10 'everyone': six tiny walkers pop up (0.05 s); the two near walkers slide in
-  loves: 11.105, //             w35 'loves': Pip puffs up proudly, smug (half-lidded, closed smile, chin up -12 deg, chest
+  loves: 11.04, //              w35-0.065 'loves' (A1 lead, ~2 frames): Pip puffs up proudly, smug (half-lidded, closed smile, chin up -12 deg, chest
   //                            1.0 -> 1.14 -> 1.04 and held)
   proudOff: 11.695, //          w37-0.10 'about' (fix round 3; was end(loves)+0.10): the puff releases, eyes open, he looks up
   //                            at the sun as its spokes draw: the gag's button, then he watches the count
-  looksUp: 11.355, //           w35+0.25: a far walker stops and looks up at the press house
+  looksUp: 11.30, //            w35+0.195 (A1: was +0.25; the bait's longest gap between event onsets was 0.73 s): a far
+  //                            walker stops, leans back and lifts a hand to the brow to look up at the press house
   swing: 11.605, //             end(loves): the pen-nib sign swings, Bit riding it; the vent puffs
   spokes: 11.695, //            w37-0.10 'about': ten spokes draw across the sun (0.15 s)
-  count: 11.955, //             w38 'seven': the count, near -> far, 0.08 s apart: P (plaque ping + screen re-pulse), then
-  //                            the PHP screens L1, R1, L2, R2, L4, R3 light (elephant page + orange ping) (the storyboard's
-  //                            order; fix round 2b: the non-PHP sites are the mid-depth L3, R4, L5 again)
-  flip: 12.505, //              w39+0.10 'out': the title-block card paper-flips to L4 (0.2 s)
+  count: 11.955, //             w38 'seven': the count, CENTRE-OUT (A1), 0.06 s apart: P (its screen switches to the
+  //                            elephant page), then the PHP screens R3, L4, R2, L2, R1, L1 (elephant page + a cream flash
+  //                            disc + an inked orange ring): a wave travelling outward from the press house, done 12.255
+  //                            (fix round 2b: the non-PHP sites are the mid-depth L3, R4, L5)
+  flip: 12.30, //               count+0.35 (A1: was w39+0.10 = 12.505, on the same frames as the 7/10 sun slices at the
+  //                            other corner): the title-block card paper-flips to L4 (0.2 s), settled when the slices pop
   ten: 12.55, //                w41-0.10 'ten': the non-PHP screens L3, R4, L5 blink and go dark (0.05 s apart) + 3 cream sun slices
-  websites: 12.905, //          w42 'websites': the seven PHP pages re-pulse in a wave (0.02 s)
+  websites: 12.83, //           w42-0.075 'websites' (A1 lead, ~2 frames): the seven PHP pages re-pulse in a wave (0.02 s)
   heads: 13.205, //             w42+0.30: the near walkers turn their heads; a far walker waves
-  run: 13.485, //               w43 'run': walkers bob; Pip glances down the street (open eyes, look 0.7, +5 deg lean) (no vent puff here: fix
+  run: 13.42, //                w43-0.065 'run' (A1 lead, ~2 frames): walkers bob; Pip glances down the street (open eyes, look 0.7, +5 deg lean) (no vent puff here: fix
   //                            round 1, it flew through the pie and the take-off)
   solid: 13.81, //              w45-0.045 'it.': the pie pops back to solid in ONE frame (slices + spokes gone together):
   //                            f162 (13.793) full pie, f163 (13.826) solid: 0.03 s before 'it.' (13.855, f164; ENGINE rule 5
