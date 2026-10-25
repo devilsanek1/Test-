@@ -308,7 +308,7 @@ function armTo(x: number, y: number, h: number, s: number, to: [number, number],
   return {d: `M${f1(sx)} ${f1(sy)}L${f1(ex)} ${f1(ey)}L${f1(fx)} ${f1(fy)}`, fist: [fx, fy]};
 }
 
-export type HeapSlot = {x: number; y: number; h: number; wall: boolean; rot: number; d: number};
+export type HeapSlot = {x: number; y: number; h: number; wall: boolean; rot: number; d: number; row?: number};
 
 /** A1 fix round 1 (the reviewers: 'the counted pile looks INSIDE the glass dome, a stadium crowd'): the counted
  *  attempters HEAP UP against the OUTSIDE of the dome's left flank, a mound of hooded backs (hands on the glass), never
@@ -340,7 +340,7 @@ export function heapSlots(o: {seed: string; base: number; top: number; left: num
         const wall = xj > xm - 0.5 * h;
         const [r0, r1] = o.rot ?? [8, 12];
         const rot = r0 + rand(o.seed, `r${j}/${i}`) * (r1 - r0);
-        out.push({x: xj, y, h, wall, rot, d: Math.hypot((corner - xj) * 0.85, o.base - y)});
+        out.push({x: xj, y, h, wall, rot, d: Math.hypot((corner - xj) * 0.85, o.base - y), row: j});
       }
       // A1 fix round 2: a 2-3 px gap between neighbours (coat width 0.66 h)
       x += 0.66 * h + o.gap + rand(o.seed, `p${j}/${i}`) * 1.2;

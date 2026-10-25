@@ -111,6 +111,24 @@ export const EDGE_HINTS: Record<string, EdgeHints> = {
     // (19.80-20.07, cut S05|S06)
     keep: [[0, 990, 270, 1700]],
   },
+  S07: {
+    // measured without the white opening page (the pen-like reveal starts on paper). The bottom-left readers raise
+    // their phones at the frame edge: keep them in colour (the left paper strip used to bleach them, A1 r2 review)
+    ink: {tl: 0, tr: 0, br: 0.97, bl: 1, left: 1, right: 0.81, bottom: 0.26},
+    keep: [
+      [0, 1180, 330, 1920], // the bottom-left readers (phones raised)
+      [652, 794, 868, 995], // Pip on the blind / sign
+    ],
+  },
+  S09: {
+    ink: {tl: 0, tr: 0, br: 0.76, bl: 0.6, left: 0.66, right: 0, bottom: 0},
+    keep: [
+      [132, 1251, 458, 1536], // Pip: stoop crouch + leap
+      [17, 1051, 180, 1232], // Pip at the left edge (the hidden match cut from S08)
+      [822, 1387, 947, 1549], // Pip on the pier
+      [830, 850, 954, 994], // Pip's tram-boarding leap
+    ],
+  },
   S11: {
     // bare corner: bottom-right (govC's steps). bl 0.25 by hand: the lamp's foot and the onlookers fill it, so it
     // must not go bare (the lamp at x 95-180 needs no keep rect otherwise: it sits clear of the paper). No rect for

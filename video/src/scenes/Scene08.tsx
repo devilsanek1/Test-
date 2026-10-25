@@ -231,7 +231,7 @@ const SunInSky: React.FC = () => (
 
 /** 'hacking': the beam swings down onto the HEAP outside the left flank (A1 fix round 1): its centre line meets the glass
  *  where the heap presses at y CATCH_Y, the lit pool falls on the people outside. */
-const CATCH_Y = 1032;
+const CATCH_Y = 1080;
 const CATCH_PT: [number, number] = [flankX(CATCH_Y, -1), CATCH_Y];
 const CATCH_DEG = (Math.atan2(CATCH_PT[1] - TOWER8.light[1], TOWER8.light[0] - CATCH_PT[0]) * 180) / Math.PI;
 const SWEEP: [number, number][] = [
@@ -288,9 +288,16 @@ const RATTLERS2: RattlerSpec[] = R2.map((q, i) => ({
 // A1 fix round 3: the base 12 px lower (row 2's roofline cuts it), every figure at screen x >= 60 (world 72: clear of
 // the left paper edge through the push), slots jittered +-6 / +-5 px, leaning 5-10 deg into the glass; the
 // 'millions' shoulder climbers are gone (a human ruler up the dome's outline): the heap stays at the dome's foot.
+// Wrap-up r2 (the heap's 25-32 px people, twice row 2's crowd, made the dome ~10 people tall): a LOW WIDE MOUND at the
+// foot, 15-19 px (~1.1x row 2), 9 px tiers, its top at ~1010; only the glass-side figure of each tier has a hand on it.
 const HEAP_BASE = 1136;
+const HEAP_TOP = 1010;
 const PILE: PileFig[] = (() => {
-  const slots = heapSlots({seed: 's8/heap', base: HEAP_BASE, top: 930, left: -130, h: [25, 32], dy: 15, gap: 2.2, minX: 72, jx: 6, jy: 5, rot: [5, 10]}).filter((q) => q.y - q.h > 952);
+  const slots = heapSlots({seed: 's8/heap', base: HEAP_BASE, top: HEAP_TOP, left: -130, h: [15, 19], dy: 9, gap: 1.5, minX: 72, jx: 4, jy: 3, rot: [5, 10]}).filter((q) => q.y - q.h > HEAP_TOP - 8);
+  // the glass-side figure of each tier
+  const glassSide = new Map<number, (typeof slots)[number]>();
+  for (const q of slots) if (q.wall && (!glassSide.has(q.row!) || glassSide.get(q.row!)!.x < q.x)) glassSide.set(q.row!, q);
+  const onGlass = new Set(glassSide.values());
   const byD = [...slots].sort((a, b) => a.d - b.d);
   const order = new Map(byD.map((q, i) => [q, i]));
   const N = slots.length;
@@ -303,8 +310,9 @@ const PILE: PileFig[] = (() => {
     const at =
       stage === 0 ? T.they + i * 0.012 : stage === 1 ? T.tens + (i - WAVES[0]) * 0.008 : stage === 2 ? T.thousands + ((i - WAVES[1]) / n2) * 0.25 : stage === 3 ? T.hacking + (i - WAVES[2]) * 0.011 : T.millions + (i % 3) * 0.033;
     const reachY = q.y - 0.95 * q.h;
-    const reachTo: [number, number] | undefined = q.wall ? [flankX(reachY, -1) + 1, reachY] : undefined;
-    const hit = q.wall && stage <= 2 && Math.abs(reachY - CATCH_Y) < 26;
+    const wall = onGlass.has(q);
+    const reachTo: [number, number] | undefined = wall ? [flankX(reachY, -1) + 1, reachY] : undefined;
+    const hit = wall && stage <= 2 && Math.abs(reachY - CATCH_Y) < 16;
     return {
       x: q.x,
       y: q.y,
@@ -315,7 +323,7 @@ const PILE: PileFig[] = (() => {
       fill: Math.floor(rand('s8/pc', `${idx}`) * 6),
       dark: rand('s8/pd', `${idx}`) < 0.15,
       reachTo,
-      reach: !q.wall && rand('s8/pr', `${idx}`) < 0.3,
+      reach: !wall && rand('s8/pr', `${idx}`) < 0.3,
       taps: [at + 0.02, ...(stage < 2 ? [T.thousands + (i % 4) * 0.05] : []), T.in + (i % 5) * 0.04, T.stamp1Ring + ((i * 3) % 7) * 0.03, T.millions + (i % 5) * 0.05, T.within + (i % 4) * 0.08],
       flash: hit ? T.hacking : undefined,
     };
@@ -328,13 +336,13 @@ const PILE: PileFig[] = (() => {
  *  as the count grows ('they' < 'tens' < 'thousands'), plus 'in' and 'millions'. */
 const pulseAt = (y: number) => ({x: flankX(y, -1) + 3, y});
 const PULSES = [
-  {at: T.they + 0.04, ...pulseAt(1076), r: 16},
-  {at: T.tens + 0.04, ...pulseAt(1056), r: 26},
-  {at: T.thousands + 0.06, ...pulseAt(1022), r: 38},
+  {at: T.they + 0.04, ...pulseAt(1100), r: 16},
+  {at: T.tens + 0.04, ...pulseAt(1088), r: 26},
+  {at: T.thousands + 0.06, ...pulseAt(1064), r: 38},
   // A1 fix round 2: 'hacking' (the searchlight's catch) rings the glass where the beam lands on the heap
   {at: T.hacking + 0.02, ...pulseAt(CATCH_Y), r: 30},
-  {at: T.in + 0.02, ...pulseAt(1040), r: 20},
-  {at: T.millions + 0.04, ...pulseAt(980), r: 34},
+  {at: T.in + 0.02, ...pulseAt(1072), r: 20},
+  {at: T.millions + 0.04, ...pulseAt(1040), r: 34},
 ];
 
 // ---------------------------------------------------------------- the flood ('millions'): crowds OUTSIDE the dome
