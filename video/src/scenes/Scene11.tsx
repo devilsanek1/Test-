@@ -38,13 +38,15 @@ import {BackSoonTag, Bit, EdgeOnlooker, LabelTag, PowerGlyph, ShutterPadlock, St
 import {ABS, localBeats, SCENE} from './scene11/beats';
 import {camAt, camKeys, camMat, toScreen} from './scene11/camera';
 import {GovBWindow, Pigeon, PlainPane, SillSnail} from './scene11/actors';
-import {BandClip, LitGlass, NearLamp, StepTreads} from './scene11/near';
-import {backSoonFont, backSoonW, BitRim, NoteBack, NoteBreeze, NoteFlight, NoteStrike, PadlockRock, padlockShackleTop, PipHopSmear, ShutterStreaks, Sparkle, StepRipple, TagTwirl} from './scene11/shims';
+import {BandClip, GovAQuiet, LitGlass, NearLamp, StepTreads} from './scene11/near';
+import {CivicHaze} from './scene11/civic';
+import {backSoonFont, backSoonW, BitRim, NoteBack, NoteBreeze, NoteFlight, NoteStrike, OnlookerHairMarks, OnlookerTurn, PadlockRock, padlockShackleTop, PipHopSmear, ShutterStreaks, Sparkle, StepRipple, TagTwirl} from './scene11/shims';
 import {Fill} from '../lib/Fill';
 import {Ink} from '../lib/Ink';
-import {palette, stroke} from '../lib/theme';
+import {palette, skies, stroke} from '../lib/theme';
 import {blob, line, rectPath} from '../lib/sketch';
 import {useCaptionFont} from '../lib/font';
+import {layoutText} from './shared/props/Labels';
 import type {Pt} from '../lib/sketch';
 
 // ---------------------------------------------------------------- anchors (world = S01 camera rest)
@@ -75,24 +77,33 @@ const TAG = {x: 566, y: 1094, bottom: 1140};
 const SNAIL_AT: Pt = [641, SILL_Y]; // the sill's right end: its eye stalks stay clear of the notice's 'EU'
 // L14, inside the lower part of the browser screen (world x 414-622), under the page's bar row (local y < 40), left edge
 // with clear air to Pip's ear.
-// fix round 3: inset INSIDE the glass like a shop notice: paper ~x 420-700 on screen at 1.66 (world 446-614, clear of the
-// right jamb at 713), bottom ~1425 (world 1106, 10 world above the window's bottom frame), so 19.5 world lettering
-// (~32 px; the notice's padding needs 8.7 em of paper for 'UK NCSC · CERT-EU')
-const NOTICE = {x: 530, y: 1076, w: 169, h: 60, fs: 19.5};
-// J6 on the closed shutter's right part: 146 x 112 world, 24.5 world lettering (~42 px at 1.71: the joke reads at phone
-// size); right edge 618 < the jamb (622), top 972 > the box line (970), the tilted bottom corner ~1088 < the tag's nail
-// (1094)
-const NOTE = {x: 545, y: 1028, w: 146, h: 112};
+// fix round 3: inset INSIDE the glass like a shop notice, bottom ~1425 (world 1106, 10 world above the window's bottom
+// frame). A1 fix round 1 (review: 32 px lettering, the storyboard asks 36, house range 34-40): 21.7 world lettering
+// (~36 px at 1.66) on a paper sized to its text (the notice's padding needs 8.7 em for 'UK NCSC · CERT-EU' = 189 world,
+// wider than the glass leaves between Pip's ear and the right jamb), drawn 0.93x condensed in x (`sx`): paper ~175 world
+// = x 440-615 (screen ~408-699 at 1.66: 16 px of air to Pip's ear at ~392, 11 px to the jamb at ~710)
+const NOTICE = {x: 527, y: 1076, fs: 21.7, sx: 0.93};
+const NOTICE_LINES = ['FBI · NSA', 'UK NCSC · CERT-EU'];
+// J6 on the closed shutter: A1 fix round 1 (review: at ~250 x 190 px with 42 px lettering the whole joke was ~2.4 % of
+// the frame and competed with the white tag and the padlock): 1.18x, 172 x 136 world (~294 x 233 px at 1.71), 29 world
+// lettering (~50 px), anchored HIGHER: its top overlaps the shutter box (y 935-948, the box is 952-970) so the bottom
+// stays above the padlock / tag row (bottom-left corner ~(455, 1083): ~16 px above Bit on the shackle; over the tag's
+// left end ~1078 < its nail 1094); right corner ~626 just over the jamb (622). S12 (cast.tsx S11_NOTE) must use these
+// numbers.
+const NOTE = {x: 536, y: 1009, w: 172, h: 136};
 const NOTE_LINES = ['Turn it off', 'and on again'];
-const NOTE_FS = 24.5;
+const NOTE_FS = 29;
 const NOTE_ROT = -4;
-// its BACK while it falls (fix round 3): squarer, 124 x 118 world (~210 x 200 px at 1.69), the show-through at 19 world
-const NOTE_BACK = {w: 124, h: 118, fs: 19};
+// its BACK while it falls (fix round 3): squarer, 143 x 136 world (A1 fix round 1: 1.15x with the face), the show-through
+// at 22 world
+const NOTE_BACK = {w: 143, h: 136, fs: 22};
 // the drop: from behind govB's cornice (its lower edge at world y 926 hides it), just left of the cornice pigeon
-const NOTE_FROM: Pt = [570, 890]; // fully hidden at the start (the tipped sheet x 497-643, bottom < 926: behind the cornice)
+const NOTE_FROM: Pt = [566, 884]; // hidden at the start (the tipped sheet's bottom ~ the cornice's lower edge 926)
 const CORNICE_B = 926;
 const CORNICE_PIGEON: Pt = [640, 904];
-const BOX_PIGEON: Pt = [454, 952];
+// A1 fix round 1: 42 world left (was 454), on the box's left end: the bigger note's top-left corner (~446, 948) keeps
+// ~20 px of air to the pigeon, which now sits right above Pip
+const BOX_PIGEON: Pt = [412, 952];
 const PIGEON_S = 0.8;
 
 // govA / govC / govD keep their normal lit chrome (the same params the set's own WindowRig uses at detail 'close')
@@ -109,9 +120,13 @@ const GOVB_WIN = PLAZA.gov.govB.window; // [414, 970, 208, 146]: the shutter's c
 // the scale, carries the motion
 const SHRUG_DUR = 0.5;
 // the near onlookers (SCREEN px, head centre + diameter): bottom left, inside the film edge's colour (x >= 54, y <= 1895)
+// A1 fix round 1 (review: the long-haired head read as an arched door / tombstone with no neck or shoulders, both froze
+// for 6.5 s, and onlooker 2's crown touched govB's elephant plaque): both raised ~42 px so collars and shoulders show
+// (still inside the edge's colour: x >= 54, y <= 1895); onlooker 2 sits over the plaque (an overlap, no tangent) and
+// turns toward govB on the shutter's slam, back on 'tech' (OnlookerTurn)
 const ONL = [
-  {x: 228, y: 1840, head: 104},
-  {x: 408, y: 1798, head: 110},
+  {x: 222, y: 1798, head: 104},
+  {x: 420, y: 1756, head: 110},
 ];
 // A1 polish (review: S11's last frame was still rising at -7 px / frame while S12 picks him up already falling): the
 // leap's APEX is now at the cut (vy = -2 g tau_c, tau_c = 52.163 - 51.945 = 0.218 s) with the SAME rise at the cut
@@ -133,6 +148,8 @@ const Scene11: React.FC = () => {
   const Minv = mat.inv(M);
 
   // ---- the window's progress bar: 8 %, a flicker on 'FBI', 9 % on "can't", back to 8 % on 'yet'
+  // the L14 paper's on-screen width (world): its text layout x the condensing
+  const noticeW = layoutText(NOTICE_LINES, NOTICE.fs, {x: 0.48, top: 0.4, bot: 0.32}).w * NOTICE.sx;
   const steps = [
     {t: -10, v: 0.08},
     {t: b.barStep, v: 0.09},
@@ -147,9 +164,11 @@ const Scene11: React.FC = () => {
           {(r) => <PowerGlyph r={r} inkOnAt={b.glyph} seed="s11/pwr" />}
         </Sun>
       </SunPress>
-      {/* a flat peach band stepping r 118 -> 128 -> 138 (10 / 6 / 3 px, 2 frames each). A1 polish (review: the 146 / 168
-          steps put peach at screen y 530-552, inside the caption band): its outer edge stays at r <= 140, top >= 560 */}
-      <StepRipple cx={SUN.x + SUN_DRIFT * b.press} cy={SUN.y} at={b.press} radii={[118, 128, 138]} widths={[10, 6, 3]} />
+      {/* a flat peach band stepping r 118 -> 128 -> 138 (2 frames each), then gone in one frame. A1 polish (review: the
+          146 / 168 steps put peach at screen y 530-552, inside the caption band): its outer edge stays at r <= 140.5, top
+          >= 559. A1 fix round 1 (review: a 3 px last step thinned away like a fade): widths 10 / 7 / 5, still solid when
+          it vanishes */}
+      <StepRipple cx={SUN.x + SUN_DRIFT * b.press} cy={SUN.y} at={b.press} radii={[118, 128, 138]} widths={[10, 7, 5]} />
     </XG>
   );
 
@@ -174,8 +193,10 @@ const Scene11: React.FC = () => {
       return <PlainPane r={r} inkW={MID_CLOSE} crt={u} seed={`s11/${id}/pane`} />;
     }
     return (
-      <GovBWindow r={r} steps={steps} hiccups={[b.ringHiccup1, b.barBack]} barsAt={[b.ringHiccup1 - 0.12, b.barFlicker - 0.03, b.earFlick - 0.03]} barsX0={NOTICE.x - NOTICE.w / 2 - r[0] + 3} reloadAt={[b.snailCrawl + 0.05]} shakeAt={b.barBack} flickerAt={b.barFlicker} ringR={12.5} alertAt={b.alert} inkW={MID_CLOSE} seed="s11/govB">
-        <LabelTag kind="notice" x={NOTICE.x} y={NOTICE.y} w={NOTICE.w} h={NOTICE.h} lines={['FBI · NSA', 'UK NCSC · CERT-EU']} fontSize={NOTICE.fs} minFont={NOTICE.fs} at={b.notice} rot={-1} inkPx={2.2} paper={palette.white} seed="s11/L14" />
+      <GovBWindow r={r} steps={steps} hiccups={[b.ringHiccup1, b.barBack]} barsAt={[b.ringHiccup1 - 0.12, b.barFlicker - 0.03, b.earFlick - 0.03]} barsX0={NOTICE.x - noticeW / 2 - r[0] + 3} reloadAt={[b.snailCrawl + 0.05]} shakeAt={b.barBack} flickerAt={b.barFlicker} ringR={12.5} alertAt={b.alert} inkW={MID_CLOSE} seed="s11/govB">
+        <XG m={mat.about(mat.scale(NOTICE.sx, 1), NOTICE.x, NOTICE.y)}>
+          <LabelTag kind="notice" x={NOTICE.x} y={NOTICE.y} lines={NOTICE_LINES} fontSize={NOTICE.fs} minFont={NOTICE.fs} at={b.notice} rot={-1} inkPx={2.2} paper={palette.white} seed="s11/L14" />
+        </XG>
       </GovBWindow>
     );
   };
@@ -296,7 +317,17 @@ const Scene11: React.FC = () => {
     const grow = 1 + PIP_EXIT.grow * tau;
     const stretch = -0.22 * Math.exp(-tau * 7) - 0.04;
     const spread = Math.sqrt(Math.min(1, tau / 0.12));
-    pip = <Elephant x={x} y={y} scale={pipScale * grow} pose="stand-side" amount={spread} expression="happy" squash={stretch} rotate={PIP_EXIT.rot0 + PIP_EXIT.rotV * tau} t={t} seed={11} />;
+    // A1 fix round 1 (review: the takeoff runs 34-39 px / frame unsmeared on f190-f193, the one fast figure move with no
+    // speed lines): the in-hop's PipHopSmear trails him over the fast part of the leap (tau 0.02-0.12), along his real
+    // velocity (vy = PIP_EXIT.vy + 2 g tau, px / s)
+    const smear =
+      tau > 0.02 && tau < 0.12 ? <PipHopSmear x={x} y={y} vx={PIP_EXIT.vx} vy={PIP_EXIT.vy + 2 * PIP_EXIT.g * tau} scale={pipScale * grow} /> : null;
+    pip = (
+      <>
+        {smear}
+        <Elephant x={x} y={y} scale={pipScale * grow} pose="stand-side" amount={spread} expression="happy" squash={stretch} rotate={PIP_EXIT.rot0 + PIP_EXIT.rotV * tau} t={t} seed={11} />
+      </>
+    );
   }
 
   // ---- J6: the sticky note drops from behind govB's cornice (blank back), flips to its lettered face and slaps onto the
@@ -334,6 +365,16 @@ const Scene11: React.FC = () => {
   );
   const tagW = backSoonW(TAG.bottom - TAG.y);
 
+  const civicOffTimes = [0, 1, 2, 3, 4, 5].map((i) => b.civicOff + i * 0.04);
+  const civicWrap = (name: string, _n: number, node: React.ReactNode) =>
+    name === 'far' ? (
+      <>
+        {node}
+        <CivicHaze offAt={civicOffTimes} lanternsOffAt={b.civicLanterns} />
+      </>
+    ) : (
+      node
+    );
   // the plaza; `govBOffAt` = when govB's body steps darker (the lantern has its own switch at 'off')
   const plaza = (govBOffAt: number) => (
     <GovernmentPlaza
@@ -352,8 +393,10 @@ const Scene11: React.FC = () => {
         govC: {shutterAt: b.govCShutter, shutterStop: 0.5},
       }}
       windowSlot={windowSlot}
-      civicOffAt={[0, 1, 2, 3, 4, 5].map((i) => b.civicOff + i * 0.04)}
-      civicLanternsOffAt={b.civicLanterns}
+      // A1 fix round 1 (review: the set's two-step civic 'off' made a dark-teal mass beside the note, darker than the near
+      // facades): the set's skyline stays lit and S11's CivicHaze (scene11/civic.tsx) steps it ONE haze step in the far
+      // slot, same 0.04 s left-to-right cadence, dots + lanterns dark
+      wrap={civicWrap}
       seed="plaza"
     />
   );
@@ -372,6 +415,9 @@ const Scene11: React.FC = () => {
             {plaza(LO.lantern)}
           </BandClip>
         ) : null}
+        {/* A1 fix round 1: govA quieted in the close shot (sky gap to govB's dome / drum, two frieze lines cut short, flute
+            breaks): scene11/near GovAQuiet */}
+        <GovAQuiet sky={skies.day} domeDarkAt={LO.dome} />
         {/* A1 polish: cream motion streaks on the slamming shutter's fastest frames (f101-f103: its ribs alias) */}
         <ShutterStreaks x={GOVB_WIN[0]} y={GOVB_WIN[1]} w={GOVB_WIN[2]} h={GOVB_WIN[3]} slamAt={b.shutter} />
         {/* govB's lit glass (drum slots, lantern core): lit until the cascade, then dark (lantern f104, drum f106) */}
@@ -387,7 +433,7 @@ const Scene11: React.FC = () => {
         <NoteFlight x={NOTE.x} y={NOTE.y} from={NOTE_FROM} arriveAt={slapAt} dur={slapAt - b.noteDrop} flipDur={0.15} clipY={CORNICE_B} back={<NoteBack x={NOTE.x} y={NOTE.y} w={NOTE_BACK.w} h={NOTE_BACK.h} rot={NOTE_ROT} lines={NOTE_LINES} fontSize={NOTE_BACK.fs} inkPx={3.4} />} face={noteEl(false)} />
         <NoteBreeze x={NOTE.x} y={NOTE.y} h={NOTE.h} flutterAt={[b.noteCurl - 0.02, b.strike + 0.25]} joltAt={b.strike}>
           {noteEl(true)}
-          {t >= slapAt ? <NoteStrike x={NOTE.x} y={NOTE.y} w={NOTE.w} h={NOTE.h} lines={NOTE_LINES} fontSize={NOTE_FS} strike="and on again" rot={NOTE_ROT} at={b.strike} widthPx={5.2} overPx={8} seed="s11/J6/strike" /> : null}
+          {t >= slapAt ? <NoteStrike x={NOTE.x} y={NOTE.y} w={NOTE.w} h={NOTE.h} lines={NOTE_LINES} fontSize={NOTE_FS} strike="and on again" rot={NOTE_ROT} at={b.strike} widthPx={6.5} overPx={9} seed="s11/J6/strike" /> : null}
         </NoteBreeze>
         {/* A1 polish: on the twirl's edge-on frames (narrower than 35 %) the same tag with no lettering (the paper edge) */}
         <TagTwirl x={TAG.x} y={TAG.y} twirlAt={[b.tagTwirl]} edge={<BackSoonTag x={TAG.x} y={TAG.y} lettered text=" " font={backSoonFont(tagW)} size={tagW} at={b.tag} tapAt={[b.tagTwirl + 0.45, b.tagSway]} inkPx={3.4} seed="plaza/govB/tag" />}>
@@ -414,7 +460,10 @@ const Scene11: React.FC = () => {
       {pip}
       <NearLamp offAt={b.lampOff} />
       <EdgeOnlooker x={ONL[0].x} y={ONL[0].y} head={ONL[0].head} hair="long" hairColor={palette.brown} body={palette.sage} acc={['collar']} rim="right" seed="s11/onl1" />
-      <EdgeOnlooker x={ONL[1].x} y={ONL[1].y} head={ONL[1].head} hair="short" hairColor={palette.tan} body={palette.teal} acc={['hood']} rim="right" seed="s11/onl2" />
+      <OnlookerHairMarks x={ONL[0].x} y={ONL[0].y} head={ONL[0].head} hair={palette.brown} />
+      <OnlookerTurn x={ONL[1].x} y={ONL[1].y} turnAt={b.shutter + 0.03} backAt={b.noteSlap}>
+        <EdgeOnlooker x={ONL[1].x} y={ONL[1].y} head={ONL[1].head} hair="short" hairColor={palette.tan} body={palette.teal} acc={['hood']} rim="right" seed="s11/onl2" />
+      </OnlookerTurn>
     </World>
   );
 };

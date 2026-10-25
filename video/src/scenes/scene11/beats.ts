@@ -87,12 +87,15 @@ export const ABS = {
   glint: W.to, // the padlock glints; the pigeon on the shutter box hops
   // A1 polish (review: the strike started 0.05 s after the word and Pip's crouch overlapped it): the strike runs ON
   // 'everything' (51.705-51.855), Bit's tap (a 0.12 s peck) is done just before it, Pip's crouch starts when it ends
-  bitTap: W.everything - 0.14, // Bit taps the padlock's shackle (the peck ends 51.685, the strike starts 51.705)
+  // A1 fix round 1 (review: 51.565 sat 2.7 frames off the resolved 51.655): the peck now ENDS exactly as the strike
+  // starts (51.585 + 0.12 = 51.705), 2.1 frames from the storyboard time
+  bitTap: W.everything - 0.12, // Bit taps the padlock's shackle (the peck ends 51.705, ON the strike's first frame)
   strike: W.everything, // 'and on again' gets one ink strike-through (0.15 s) ON the word; the corner flutters after
   pipOut: W.everythingEnd + 0.05, // Pip hops off the sill toward the lens; the snail peeks out
   tagSway: SCENE.end - 0.1, // the tag sways
-  pigeonFly: 51.99, // the box pigeon crouches and takes off up-left (whole bird, flapping) with the tag sway: clear of the box by
-  // the cut, AFTER Pip's hop-off (51.945), so the two departures do not share a frame
+  pigeonFly: 52.02, // the box pigeon crouches and takes off up-left (whole bird, flapping) with the tag sway: clear of the box by
+  // the cut, 2+ frames AFTER Pip's hop-off (51.945), so the two departures do not share a frame (A1 fix round 1: was 51.99,
+  // 2.2 frames before the resolved 52.063; now 1.3 frames)
 } as const;
 
 export type Beats = {-readonly [K in keyof typeof ABS]: number};

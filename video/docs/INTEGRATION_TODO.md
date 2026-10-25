@@ -52,6 +52,9 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
 
 ## Cross-lane findings scene agents can't fix (polish pass)
 
+- DONE (data, 06:05): S10's last caption page ('they're not officially / supported anymore.') no longer hangs over
+  S11's government window after the hard cut: page 22 `out` 45.48 ('anymore.' ends 45.385, cut 45.618), so the band is
+  empty on S11 f0 until 'Even' rolls in at 45.85 (S11 A1 art + motion reviews).
 - DONE (core, 23:40): S01 caption over the dive. `out` on caption pages; page 2 leaves at 4.285, page 3 rolls in on
   the cut at 4.715 (docs/ENGINE.md).
 - Core: ink weight jumps across S01 -> S02 because the dive scales every stroke by up to 3.07x (8-10 px at the cut
@@ -94,6 +97,11 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
   05:35: tree OK (tsc clean); relaunched A1 as 3 workflows (lower concurrency, fewer agents to lose):
   wf_c49e57be-ed9 (S11 -> S12), wf_757a8d7d-ce1 (S03, S05, S04), wf_f6eafcb1-f45 (S08, S07, S09, S10); 2 rounds each.
   Half-res preview of the whole film rendering to out/preview_0540.mp4.
+
+## Sound re-lock notes (phase D)
+
+- S03's A1 retimes moved beats; the SFX cues (audio/cues.json) still sit on the old times (S03 motion review, 06:00).
+  Phase D must re-derive every cue from the FINAL scene beats (each scene's beats.ts), not only from the storyboard.
 
 ## Other
 

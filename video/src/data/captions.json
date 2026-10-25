@@ -21,7 +21,7 @@
   {"s":38.21,"e":39.705,"lines":[{"text":"every single server.","s":38.21}],"highlights":[{"text":"every single server.","s":38.21}]},
   {"s":39.705,"e":42.295,"lines":[{"text":"Plus something like","s":39.705},{"text":"half of PHP sites","s":40.755}],"highlights":[{"text":"half","s":40.755}]},
   {"s":42.295,"e":43.605,"lines":[{"text":"run versions so old","s":42.295}],"highlights":[]},
-  {"s":43.605,"e":45.85,"lines":[{"text":"they're not officially","s":43.605},{"text":"supported anymore.","s":44.39}],"highlights":[{"text":"not officially","s":43.855}]},
+  {"s":43.605,"e":45.85,"lines":[{"text":"they're not officially","s":43.605},{"text":"supported anymore.","s":44.39}],"highlights":[{"text":"not officially","s":43.855}],"out":45.48},
   {"s":45.85,"e":48.365,"lines":[{"text":"Even the FBI said if","s":45.85},{"text":"you can't update yet,","s":47.235}],"highlights":[{"text":"FBI","s":46.195}]},
   {"s":48.365,"e":50.235,"lines":[{"text":"just turn it off,","s":48.365},{"text":"which is basically","s":49.63}],"highlights":[{"text":"turn it off,","s":48.69}]},
   {"s":50.235,"e":52.43,"lines":[{"text":"tech support's answer","s":50.235},{"text":"to everything.","s":51.345}],"highlights":[]},

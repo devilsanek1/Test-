@@ -12,7 +12,7 @@ import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {blob, circle, rectPath, roundRect, smooth, Pt} from '../../lib/sketch';
 import {mat, useXf, XG} from '../../lib/xf';
-import {captionFontStack, useCaptionFont} from '../../lib/font';
+import {captionFontStack, measureCaption, useCaptionFont} from '../../lib/font';
 import {BrowserChrome, ProgressStep} from '../shared/props';
 import {matScale} from '../shared/props/common';
 import {CRT} from '../shared/sets';
@@ -504,25 +504,48 @@ const SiteHeader: React.FC<{seed: string}> = ({seed}) => {
   );
 };
 
-/** 'updating...' lettered INSIDE the address pill (fix round 3: it replaces BrowserChrome's progress stub there), the
- *  dots cycling every 0.3 s, re-lettering u, up, upd ... after a reload (0.25 s, no blank frames). Window-local. */
-const PillText: React.FC<{w: number; h: number; reloadAt: number[]; shakeAt?: number}> = ({w, h, reloadAt, shakeAt}) => {
+/** 'updating' lettered INSIDE the address pill (fix round 3: it replaces BrowserChrome's progress stub there).
+ *  A1 fix round 1 (review: at ~24 px it was the only on-screen word naming "can't update" and did not read at phone
+ *  scale): S11 draws a TALLER pill over the chrome's (24 world tall, the ring's height, was 18: same x span, cream, the
+ *  chrome's pill ink) so the lettering is 18 world = ~30 px; the ellipsis is three ink DOTS that pop in one by one (one
+ *  more every 0.3 s, then none: 3 pops per 1.2 s) instead of font periods. After a reload the word re-letters u, up,
+ *  upd ... over 0.25 s (no blank frames), dots hidden until it is whole. Window-local. */
+const PillText: React.FC<{w: number; h: number; reloadAt: number[]; shakeAt?: number; inkW: number}> = ({w, h, reloadAt, shakeAt, inkW}) => {
   useCaptionFont();
   const t = useTime();
   const g = pillGeom(w, h);
   let ra: number | undefined;
   for (const r of reloadAt) if (t >= r) ra = r;
-  const dots = '.'.repeat(1 + (Math.floor(t / 0.3) % 3));
-  const word = 'updating' + dots;
-  const nTxt = ra !== undefined && t < ra + 0.25 ? 1 + Math.floor(prog(t, ra, 0.25) * (word.length - 1)) : word.length;
-  const fs = g.ph * 0.82;
+  const word = 'updating';
+  const relettering = ra !== undefined && t < ra + 0.25;
+  const nTxt = relettering ? 1 + Math.floor(prog(t, ra!, 0.25) * (word.length - 1)) : word.length;
+  const nDots = relettering ? 0 : Math.floor(t / 0.3) % 4;
+  const py = 3;
+  const ph = g.bar - 2 * py;
+  const padL = 7;
+  const dotR = 1.7;
+  const dotGap = 5.2;
+  const m = measureCaption(word, 100) / 100;
+  const fs = Math.min(18, (g.pw - padL - 6 - dotGap * 3.4) / m);
+  const tw = m * fs;
   const dx = shakeAt !== undefined && t >= shakeAt && t < shakeAt + 0.24 ? Math.sin(prog(t, shakeAt, 0.24) * Math.PI * 3) * 2.5 * (1 - prog(t, shakeAt, 0.24)) : 0;
+  const x0 = g.px + padL + dx;
+  const base = py + ph / 2 + fs * 0.28;
+  let dots = '';
+  for (let i = 0; i < nDots; i++) dots += circlePath(x0 + tw + dotGap * (0.7 + i), base - dotR, dotR);
   return (
-    <text x={g.px + g.ph * 0.5 + dx} y={g.py + g.ph * 0.5 + fs * 0.34} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink}>
-      {word.slice(0, nTxt)}
-    </text>
+    <>
+      <Fill d={roundRect(g.px, py, g.pw, ph, ph / 2)} color={palette.cream} offset={false} mode="none" seed="s11/pill" />
+      <Ink d={roundRect(g.px, py, g.pw, ph, ph / 2, {closed: false, seed: 's11/pilli'})} width={inkW * 0.55} taper={false} vary={0} seed="s11/pilli" />
+      <text x={x0} y={base} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink}>
+        {word.slice(0, nTxt)}
+      </text>
+      {dots ? <path d={dots} fill={palette.ink} /> : null}
+    </>
   );
 };
+
+const circlePath = (cx: number, cy: number, r: number) => `M${(cx - r).toFixed(2)} ${cy.toFixed(2)}a${r} ${r} 0 1 0 ${(2 * r).toFixed(2)} 0a${r} ${r} 0 1 0 ${(-2 * r).toFixed(2)} 0Z`;
 
 /** The loader's '!' badge: a peach disc with an ink rim and a lettered '!' that springs in at `at` (scale 0 -> 1.18 -> 1
  *  over 0.2 s, about its centre) and holds. */
@@ -562,7 +585,7 @@ export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reload
         {null}
       </BrowserChrome>
       <XG m={mat.translate(x, y)}>
-        <PillText w={w} h={h} reloadAt={reloadAt} shakeAt={shakeAt} />
+        <PillText w={w} h={h} reloadAt={reloadAt} shakeAt={shakeAt} inkW={inkW} />
       </XG>
       <HiccupRing x={x + w - rr * 1.3 - 1.5} y={y + g.ringY} r={rr} hiccups={hiccups} fastAt={reloadAt} inkW={inkW * 0.5} />
       {/* fix round 2: the badge 1.3x (it reads at phone size on 'yet') */}

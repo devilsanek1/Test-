@@ -339,3 +339,49 @@ export const ShutterStreaks: React.FC<{x: number; y: number; w: number; h: numbe
   const d = cols.map(([f, l]) => `M${(x + w * f).toFixed(1)} ${(bottom - 5 / k - L * l).toFixed(1)}L${(x + w * f).toFixed(1)} ${(bottom - 5 / k).toFixed(1)}`).join('');
   return <path d={d} fill="none" stroke={palette.cream} strokeWidth={3 / k} strokeLinecap="round" />;
 };
+
+// ---------------------------------------------------------------- OnlookerTurn
+
+/** A1 fix round 1 (review: both near onlookers froze for 6.5 s; ref 1's bottom heads have small gestures): a back-view
+ *  onlooker (the shared EdgeOnlooker, head centre x, y, SCREEN px) turns toward govB (screen right) on the shutter's slam
+ *  and back on 'tech': the whole figure leans +4.5 deg about a point 300 px under the head (the head travels ~24 px
+ *  right) and narrows 4 % (the shoulders turning), sprung (snappy) both ways. EdgeOnlooker has no head turn. */
+export const OnlookerTurn: React.FC<{x: number; y: number; turnAt: number; backAt: number; children?: React.ReactNode}> = ({x, y, turnAt, backAt, children}) => {
+  const t = useTime();
+  const q = springAt(t, turnAt, springs.snappy) - springAt(t, backAt, springs.snappy);
+  if (Math.abs(q) < 1e-3) return <>{children}</>;
+  const py = y + 300;
+  return <XG m={mat.compose(mat.about(mat.rotate(4.5 * q), x, py), mat.about(mat.scale(1 - 0.04 * q, 1), x, py))}>{children}</XG>;
+};
+
+// ---------------------------------------------------------------- OnlookerHairMarks
+
+/** A1 fix round 1 (review: the long-haired back-view head read as an arched door / tombstone: a rounded brown block with
+ *  two straight strands): pen marks over the shared EdgeOnlooker's 'long' hair (SCREEN px, head centre x, y, diameter
+ *  `head`): a parting from the crown, a wave break (one lock curling out at the hem) and a sand ear tucked out on the
+ *  sun side, so it reads as a person's head from behind. EdgeOnlooker has no hair-detail option. */
+export const OnlookerHairMarks: React.FC<{x: number; y: number; head: number; hair: string; side?: 1 | -1; inkPx?: number}> = ({x, y, head, hair, side = 1, inkPx = 3.2}) => {
+  const r = head / 2;
+  const f = (n: number) => n.toFixed(1);
+  // the parting: crown -> down and away from the ear side
+  const part = `M${f(x + side * 3)} ${f(y - r + 4)}Q${f(x - side * 4)} ${f(y - r * 0.62)} ${f(x - side * 9)} ${f(y - r * 0.18)}`;
+  // a lock at the hem on the far side, curling outward (the wave break)
+  const hx = x - side * r * 0.62;
+  const hy = y + r * 1.42;
+  const lock = `M${f(hx + side * 10)} ${f(hy - 30)}Q${f(hx - side * 2)} ${f(hy - 12)} ${f(hx + side * 4)} ${f(hy)}Q${f(hx + side * 9)} ${f(hy + 7)} ${f(hx + side * 15)} ${f(hy + 2)}`;
+  // the ear: a sand half-ellipse out of the hair's edge, its inner fold
+  const ex = x + side * r * 0.99;
+  const ey = y + r * 0.1;
+  const ear = `M${f(ex - side * 3)} ${f(ey - 13)}Q${f(ex + side * 11)} ${f(ey - 13)} ${f(ex + side * 9)} ${f(ey + 2)}Q${f(ex + side * 7)} ${f(ey + 13)} ${f(ex - side * 3)} ${f(ey + 11)}Z`;
+  const fold = `M${f(ex + side * 1)} ${f(ey - 6)}Q${f(ex + side * 6)} ${f(ey - 5)} ${f(ex + side * 4)} ${f(ey + 4)}`;
+  return (
+    <>
+      <path d={ear} fill={palette.sand} stroke={palette.ink} strokeWidth={inkPx} strokeLinejoin="round" />
+      <path d={fold} fill="none" stroke={palette.ink} strokeWidth={inkPx * 0.7} strokeLinecap="round" />
+      {/* the hair runs over the ear's root: a hair-coloured wedge from the head's edge */}
+      <path d={`M${f(ex - side * 6)} ${f(ey - 16)}L${f(ex - side * 2)} ${f(ey - 16)}Q${f(ex + side * 1)} ${f(ey)} ${f(ex - side * 2)} ${f(ey + 15)}L${f(ex - side * 6)} ${f(ey + 15)}Z`} fill={hair} />
+      <path d={part} fill="none" stroke={palette.ink} strokeWidth={inkPx * 0.85} strokeLinecap="round" />
+      <path d={lock} fill="none" stroke={palette.ink} strokeWidth={inkPx * 0.85} strokeLinecap="round" />
+    </>
+  );
+};

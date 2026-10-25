@@ -1,0 +1,7 @@
+0 0 /home/user/Test-/video/review/checkins/0600/S04/f00000.png
+0.4 12 /home/user/Test-/video/review/checkins/0600/S04/f00012.png
+0.81 24 /home/user/Test-/video/review/checkins/0600/S04/f00024.png
+1.21 36 /home/user/Test-/video/review/checkins/0600/S04/f00036.png
+1.61 48 /home/user/Test-/video/review/checkins/0600/S04/f00048.png
+2.02 61 /home/user/Test-/video/review/checkins/0600/S04/f00061.png
+[render-frames] S04 (src/entry-film.ts): bundle 4.5s, 6 frames in 2.5s (412 ms/frame incl. page setup, concurrency 2, scale 0.5)

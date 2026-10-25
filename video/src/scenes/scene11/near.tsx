@@ -15,7 +15,8 @@ import {palette, stroke} from '../../lib/theme';
 import {useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {blob, line, polyPath, rectPath} from '../../lib/sketch';
+import {LightsOut} from '../shared/sets';
+import {arc, blob, line, polyPath, rectPath} from '../../lib/sketch';
 
 // ---------------------------------------------------------------- NearLamp (screen px)
 
@@ -115,6 +116,63 @@ export const LitGlass: React.FC<{lanternAt: number; drumAt: number; seed?: strin
     <>
       {t < drumAt ? <Fill d={slots} color={palette.peach} offset={false} mode="none" seed={`${seed}/slots`} /> : null}
       <Fill d={rectPath(511, 616, 14, 32)} color={t < lanternAt ? palette.peach : palette.tealDark} offset={false} mode="none" seed={`${seed}/lantern`} />
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- GovAQuiet (world)
+
+// govB's dome outline as the set draws it (GovernmentPlaza G.domeInk's arc: same geometry + seed)
+const DOME_ARC = arc(518, 792, 90, 140, 180, 360, {seed: 'gp/dm', wobble: 0.01});
+const DOME_FILL = 'M428 792A90 140 0 0 1 608 792Z';
+
+/** A1 fix round 1 (review, minors): scene-side masks over the set's govA in the close shot, flat patches in the colour
+ *  that is already under them (no new shapes, no fades); local stand-in until GovernmentPlaza has a `detail="close"`
+ *  govA option.
+ *  (1) The sky gap between govA and govB's dome / drum (world x ~404-453, y 690-806) is painted back to the flat day sky:
+ *      govA's frieze lines (753, 772, 794) no longer run on into govB's dome-base / drum-top line at the same y (the dome
+ *      read as sitting on govA's architrave), and govA's raking cornice + cornice band stop at x 418 instead of touching
+ *      the dome's left contour (clearance >= 14.6 world = ~24 px at 1.66, was ~0).
+ *  (2) Two of govA's long frieze lines (753, 774) stop short of the frame edge (they start right of / behind the lamp's
+ *      lantern): the left third had six full-width rules.
+ *  (3) govA's one flute per column gets two breaks each (16 world gaps, staggered): with the column edges, shade edges
+ *      and govA's double right edge the left third read as a ruled hatch of ~12 full-height verticals. */
+export const GovAQuiet: React.FC<{sky: string; domeDarkAt: number; seed?: string}> = ({sky, domeDarkAt, seed = 's11/govAq'}) => {
+  const t = useTime();
+  // the dome's left contour (GovernmentPlaza G.B.dome: cx 518, base 792, rx 90, ry 140): the patch runs 5 world PAST the
+  // contour (govA's lines showed through the dome fill's misregistration sliver as ticks on the outline); inside the
+  // patch the dome's own fill (same path, seed and offset, its lights-out step) and outline (the set's arc, same seed
+  // and width) are drawn again, so only govA's line ends change
+  const domeL = (y: number) => 518 - 90 * Math.sqrt(Math.max(0, 1 - ((792 - y) / 140) ** 2)) + 5;
+  const pts: [number, number][] = [[418, 690]];
+  for (let y = 690; y <= 790; y += 10) pts.push([domeL(y), y]);
+  pts.push([423.5, 792], [422.5, 792], [422.5, 806], [403.5, 806], [403.5, 750], [418, 750]);
+  const gap = polyPath(pts);
+  // (2) frieze lines cut short: [x0, x1, y, h]
+  const cuts = rectPath(150, 749.5, 150, 9.5) + rectPath(150, 768.5, 124, 11);
+  // (3) flute breaks: the flute runs at column centre + 7 (cols 298, 352), on the cream column face
+  let breaks = '';
+  for (const [cx, ys] of [[298, [985, 1235]], [352, [935, 1215]]] as [number, number[]][]) for (const y of ys) breaks += rectPath(cx + 3, y, 8.5, 16);
+  return (
+    <>
+      <Fill d={gap} color={sky} offset={false} mode="none" seed={`${seed}/gap`} />
+      <Fill d={cuts + breaks} color={palette.cream} offset={false} mode="none" seed={`${seed}/cuts`} />
+      <defs>
+        <clipPath id="s11-govAq-gap">
+          <path d={gap} />
+        </clipPath>
+        <clipPath id="s11-govAq-dome">
+          <rect x={380} y={640} width={85} height={152} />
+        </clipPath>
+      </defs>
+      <g clipPath="url(#s11-govAq-gap)">
+        <LightsOut on={t >= domeDarkAt}>
+          <Fill d={DOME_FILL} color={palette.sand} seed="plaza/bdome" />
+        </LightsOut>
+      </g>
+      <g clipPath="url(#s11-govAq-dome)">
+        <Ink d={DOME_ARC} width={3.4 * 0.7} seed="plaza/bdomeink" />
+      </g>
     </>
   );
 };
