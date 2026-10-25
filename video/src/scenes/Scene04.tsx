@@ -21,7 +21,7 @@
 
 import React from 'react';
 import {World, useScene, useTime, skies} from '../lib';
-import {Sun, sunPoseAt} from '../lib/Sun';
+import {Sun} from '../lib/Sun';
 import type {SunMove} from '../lib/Sun';
 import {ease as E, lerp, springAt, springs} from '../lib/time';
 import {mat, XG} from '../lib/xf';
@@ -36,6 +36,7 @@ import {beats, S04_START, S04_END, tearTimes} from './scene04/beats';
 import {camAt, camMat, diveK, DIVE} from './scene04/camera';
 import {above, ClipG, except, FlatChrome, GroundS04, ivyNode, SeasonIvy, seasonKeys, SplitInk, StepTones, WindowLife, YearCalendar, YearFlyers} from './scene04/props';
 import {bitHopAt, BitS04, BugSpot, ghostList, Ghosts, HOP_DUR, Leaf, LockGlint, PipS04, spotAt, spotOff} from './scene04/cast';
+import {DivePigeons, WireWhip} from './scene04/dive';
 
 // ---------------------------------------------------------------- labels (final_script section 6)
 
@@ -43,12 +44,13 @@ const L5 = ['in the code since', 'at least 2012'];
 const LK = STOOP.lock4;
 /** lock4's bottom screw (the string's top). */
 const L5_HANG: [number, number] = [LK.x + 3, LK.y + LK.h / 2 - 3];
-/** L5's paper at rest (world, ~36 px lettering at the 1.5 zoom): fix round: raised 15 and 4 world shorter (paper screen
+/** L5's paper at rest (world; fix round 2: 26.5 world = 40 px lettering at the 1.5 zoom, the storyboard's size, the
+ *  paper 20 world wider so 'in the code since' keeps its margins). Fix round 1: raised 15 and 4 world shorter (paper screen
  *  bottom ~1478 at the end of the creep, inside the label box y <= 1480, clear of the bottom UI from ~1520), its top ~6
  *  world under the lock (a ~27 px string), its eyelet 12 world right of the screw; at the cut (world under the end
  *  camera: it lands on S05's annotation tag, paper screen ~(425-752, 1000-1120), ~38 px lettering). Lerped through the
  *  dive. */
-const L5_REST = {box: [248, 1157, 442, 1225] as [number, number, number, number], fs: 24};
+const L5_REST = {box: [240, 1155, 454, 1229] as [number, number, number, number], fs: 26.5};
 const L5_CUT = {box: [300, 1152, 472, 1215] as [number, number, number, number], fs: 20};
 /** lock4's box top-left corner (the cobweb's corner), its top-right corner (the glint) and its mount (the rattle's
  *  pivot: the top screw). */
@@ -97,26 +99,21 @@ const Scene04: React.FC = () => {
 
   // ---- the sun, SCREEN space the whole scene (a sky object at infinity does not move in a dolly): S03's glide-hop
   // continued (take-off at end(it), mid-air at (810, 680) on the cut, lands on 'This' in its slot and sinks 7 px into
-  // it), then during the dive it slides down into S05's notch (930, 725). Z-order: IN FRONT of the set while mid-hop (the
-  // match object stays whole on the cut), behind the roofline and the wire from one frame before the touch-down (the
-  // roofline covers it on the landing squash and the sink), and in front of the facades again from the dive's 3rd frame
-  // (the camera already at ~54 px / frame) with a 0.15 s squash-pop 'lift' on the whoosh that motivates the swap; then
-  // it stays behind the near layer (wire, lamp, the shifted tree).
+  // it), then during the dive it slides down toward S05's notch (930, 725). Z-order: IN FRONT of the set while mid-hop
+  // (the match object stays whole on the cut), then in the set's SKY slot (behind the towers, the rows' rooflines and
+  // the wire) from the touch-down frame on 'This' (fix round 2: the swap one frame early cut a quarter of the moving
+  // disc in one frame; now it lands inside the impact squash) to the end. Fix round 2 (major): it stays in the sky slot
+  // through the dive (it was brought forward over the facades, a flat disc on house fronts at the cut): the receding
+  // row slides up over it and S05's notch sun is simply there on the cut (legal on a cut).
   const sunMoves: SunMove[] = [
     {at: b.this, dur: 0.1, y: SUN_SLOT[1] + SUN_SINK, ease: E.outCubic},
     {at: diveAt, dur: DIVE, x: SUN_S05[0], y: SUN_S05[1], ease: E.inOutSine},
   ];
   const sunHops = [{t: b.sunTakeOff, to: SUN_SLOT, h: 15, air: b.this - b.sunTakeOff}];
-  const sunSwap = diveAt + 0.067;
-  const sunFront = t < b.this - 1 / 30;
-  const sunDive = t >= sunSwap;
-  const lift = sunDive && t < sunSwap + 0.15 ? Math.sin((Math.PI * (t - sunSwap)) / 0.15) : 0;
-  const sp = sunPoseAt(t, {cx: 690, cy: 700, r: 110, moves: sunMoves, hops: sunHops});
+  const sunFront = t < b.this;
   const sun = (
     <XG m={mat.inv(M)}>
-      <XG m={lift ? mat.about(mat.scale(1 - 0.04 * lift, 1 + 0.08 * lift), sp.x, sp.y + sp.r) : mat.I}>
-        <Sun cx={690} cy={700} r={110} drift={[0, 0]} hops={sunHops} moves={sunMoves} />
-      </XG>
+      <Sun cx={690} cy={700} r={110} drift={[0, 0]} hops={sunHops} moves={sunMoves} />
     </XG>
   );
 
@@ -137,10 +134,13 @@ const Scene04: React.FC = () => {
     <>
       <StepTones />
       <FlatChrome on={diving} />
-      <WindowLife tears={tears} />
+      <WindowLife tears={tears} flatAbove={diving ? FLAT_Y : undefined} />
       <SeasonIvy steps={ivySteps} seasons={seasons} />
       {/* 'bug': a peach spot with an ink ring and glint ticks behind the lock box and Bit */}
       <BugSpot at={spotAt(b)} off={spotOff(b)} word={b.bug} />
+      {/* the dive (fix round 2: it read as a tilt-down with sound off): the same spot RE-POPS behind lock4 on the dive's
+          first frame, 10 % bigger, and holds to the cut, so the eye locks onto the target */}
+      <BugSpot at={diveAt} off={end + 1} word={-10} k={1.1} />
       {/* lock4 (the set's own hero lock, drawn here so it can rattle about its top screw when Bit kicks off on 'bug') */}
       <XG m={mat.about(mat.rotate(rattle(t, hopAt, hopAt + HOP_DUR)), LOCK_PIVOT[0], LOCK_PIVOT[1])}>
         <Lock x={LK.x} y={LK.y} size={LK.h} seed="stoop/lock4" ink={SI.far} glintAt={b.bug} />
@@ -183,11 +183,13 @@ const Scene04: React.FC = () => {
     if (name === 'near')
       return (
         <>
-          {sunDive ? sun : null}
           <ClipG d={except(TREE_BOX)}>{diving ? <SplitInk y={FLAT_Y} x0={FLAT_NEAR_X0} node={node} /> : node}</ClipG>
           <XG m={mat.translate(TREE_DX, 0)}>
             <ClipG d={TREE_BOX}>{node}</ClipG>
           </XG>
+          {/* the pigeons (the set's own, pixel-identical) take off and the wire snaps on the dive's first frame */}
+          <DivePigeons diveAt={diveAt} />
+          <WireWhip diveAt={diveAt} />
         </>
       );
     return node;
@@ -200,7 +202,8 @@ const Scene04: React.FC = () => {
           people={false}
           foreground={false}
           furniture={[STOOP.furniture[0]]}
-          sun={sunFront || sunDive ? null : sun}
+          pigeons={false}
+          sun={sunFront ? null : sun}
           calendar={calendar}
           heroLock={false}
           heroSlot={heroSlot}

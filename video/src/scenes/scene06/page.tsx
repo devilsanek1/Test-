@@ -2,20 +2,23 @@
 // T-MATCH), plus the exported `Wiper` (Film foreground-wipe element 'scene' for S07's transitionIn).
 //
 // ONE paper, one SCREEN-space trajectory as a pure function of FILM time (pageAt), drawn by S06 (its own last frames,
-// also in the S06-only composition) and by the Wiper (above both scenes during the wipe window):
+// also in the S06-only composition), by the Wiper (above both scenes during the wipe window) and by S07 (its own copy,
+// Scene07.tsx imports LeakPage), so the copies can never disagree:
 //   21.500  'heads-up'+0.25 (lead 0.035)  a gust blows it in from just off the LEFT edge (tumbling, ~0.6 x), fast at
 //                          first and still drifting toward the lens (~9 px / frame) when the zoom takes over
-//   21.732  S07_LENS.at    the gust lifts it at the lens: T-MATCH zoom to x8.5 in 4 frames, the spec's accelerating
-//                          steps (x1.35, x1.8, x2.0, then x2.6 to the full page), position and rotation on the same
-//                          log-scale progress
-//   21.865 -> 21.985       the full page, printed side to us (fix round 2: x8.5 at HOLD.focus (230, 830), +1 deg: the
-//                          RINGED BIT DOODLE sits whole between x 90 and 990, under the caption band, with the right half
-//                          of the lock sketch beside it and the heading bar cropped at the top left; the page still covers
-//                          every frame corner by >= 23 px), creeping +4 % and -0.4 deg about the doodle; S06's own
-//                          copy never leaves this hold (the Wiper drawn above both scenes does the rest)
-//   21.985 -> 22.165       the Wiper draws EXACTLY S07's lens sheet (S07 NOTICE + lensWipeAt with S07's parameters,
-//                          mirrored below) as it shrinks into the notice pinned on S07's board; S07's own copy is
-//                          underneath and identical (same footprint), and at S07's pin (22.165) S07 takes over.
+//   21.732  ZOOM_AT        the gust lifts it at the lens: T-MATCH zoom to the hold in 4 frames, the spec's accelerating
+//                          steps (x1.35, x1.8, x2.0, then the full page), position and rotation on the same log-scale
+//                          progress
+//   21.865 -> 21.967       the full page, printed side to us (fix round 3: x7.8 at HOLD.focus (390, 920), +4 deg: the
+//                          RINGED BIT DOODLE whole between x ~480 and ~1055, the LOCK SKETCH's short bolt from the left
+//                          edge to its tip, the gap and the socket (x ~0-420) beside it, the bottom text lines below; the
+//                          page still covers every frame corner by >= 25 px), creeping +4 % and -0.4 deg about the
+//                          doodle; S06's own copy never leaves this hold
+//   21.967 -> 22.165       (fix round 3, the lens hand-over pop) the OUT phase of S07's lane, scene07/lens.ts
+//                          lensOutAt, started FROM the hold state on S06's last frame (f659): a lens pull-back about a
+//                          fixed point (no re-centring), per-frame scale ratios ~0.61 / 0.64 / 0.66 / 0.70 / 0.75, eased
+//                          rotation and skew, landing on S07's notice (295, 1140) x1 -2 deg at its pin (22.165), where
+//                          S07's own pinned notice takes over.
 // FIX ROUND 1 (the white strobe): the zoomed page is no hairline-on-white field: from x2.2 up it is drawn here as the
 // LensSheet (same layout and seeds as props LeakSheet), its ink scaling with the zoom (sqrt(s): lock strokes ~9 px at x8,
 // the Bit doodle's weight), the heading a SOLID ink bar, the two text rules only below x4. Under x2.2 it is the real
@@ -23,27 +26,32 @@
 // FIX ROUND 2 (paper colour flicker white -> cream -> white across the wipe): the LensSheet is on the LeakSheet's own
 // WHITE paper (style bible: paper is #FFFFFF), so the sheet is one paper from the blow-in to S07's pinned notice.
 // The wipe EDGE jumps across the whole frame between two 30 fps frames (Wiper.half = 6000), and the Wiper holds the
-// full page until the cut (21.985), so even a 60 fps in-between frame never shows the edge or S06 strips.
-// If S07 retimes its lens sheet, update S07_LENS / S07_SHEET here (they mirror src/scenes/Scene07.tsx).
+// full page until S06's last frame, so even a 60 fps in-between frame never shows the edge or S06 strips.
+// If S07 retimes its lens sheet, update S07_SHEET / S07_PIN here (they mirror src/scenes/Scene07.tsx) and LENS_OUT in
+// scene07/lens.ts.
 
 import React from 'react';
 import {Fill, hline, Ink, lerp, mat, MOTION, palette, poly, polyPath, Pt, rand, useGlobalTime, XG} from '../../lib';
 import type {WiperComponent} from '../../lib';
-import {Bit, DEPTH_INK, LeakSheet, lensWipeAt, Lock, MarkRing, misregScreen} from '../shared/props';
-import {ABS, SCENE} from './beats';
+import {Bit, DEPTH_INK, LeakSheet, Lock, MarkRing, misregScreen} from '../shared/props';
+import {LENS_OUT, lensOutAt} from '../scene07/lens';
+import {ABS} from './beats';
 
 /** S07's notice (src/scenes/Scene07.tsx NOTICE; S07 world = screen while its camera is at rest). */
 export const S07_SHEET = {x: 295, y: 1140, w: 210, h: 270, rot: -2, seed: 's7notice'} as const;
 const MZ = MOTION.matchZoom; // in 4 f, hold 3 f, out 6 f
-/** S07's pin (w73 'word' 22.155 - 0.05 + 0.06) = where its lens sheet lands; its lens wipe starts in+hold+out before. */
+/** S07's pin (w73 'word' 22.155 - 0.05 + 0.06) = where its lens sheet lands (scene07/lens.ts LENS_OUT.t1). */
 export const S07_PIN = 22.155 - 0.05 + 0.06;
-export const S07_LENS = {at: S07_PIN - (MZ.in + MZ.hold + MZ.out), from: [-260, 1250] as Pt, fromS: 1.6, peak: 8, focus: [540, 960] as Pt};
+/** The T-MATCH zoom starts in+hold+out before S07's pin (S07's lens start). */
+export const ZOOM_AT = S07_PIN - (MZ.in + MZ.hold + MZ.out);
 /** When the page reaches the full-frame hold. */
-export const PAGE_FULL = S07_LENS.at + MZ.in;
-/** S06's hold (frames 656-659): x8.5, +1 deg, centred left of the frame centre so the ringed Bit doodle is whole (the
- *  doodle's ring: local (w 0.25, h 0.22) r w 0.17) and the dog-eared top-right corner stays outside the frame (every
- *  frame corner >= 23 px inside the paper through the creep); it creeps +4 % / -0.4 deg about the doodle. */
-const HOLD = {s: 8.5, focus: [230, 830] as Pt, rot: 1, creep: 0.04, creepRot: -0.4};
+export const PAGE_FULL = ZOOM_AT + MZ.in;
+/** S06's hold (frames 656-659). Fix round 3 (the hold read 'a bug drawing on white': the lock sketch was cut in half):
+ *  x7.8 at (390, 920), +4 deg, so the lock's short bolt runs from the left frame edge to its tip with the gap and the
+ *  socket beside it (screen x ~0-420) while the ringed Bit doodle stays whole (x ~480-1055) below the caption band; the
+ *  dog-eared top-right corner stays outside the frame (every frame corner >= 25 px inside the paper through the creep);
+ *  it creeps +4 % / -0.4 deg about the doodle. (x8.5 cannot hold both: bolt housing to ring edge is 142 page units.) */
+const HOLD = {s: 7.8, focus: [390, 920] as Pt, rot: 4, creep: 0.04, creepRot: -0.4};
 const DOODLE: Pt = [S07_SHEET.w * 0.25, S07_SHEET.h * 0.22];
 
 /** The gust (screen px): from just off the left edge to the left third, still moving at the end. */
@@ -51,7 +59,7 @@ const FLUTTER = {at: ABS.sheet - 0.035, from: [-62, 1296] as Pt, to: [150, 1175]
 
 export type PageState = {x: number; y: number; s: number; rot: number; skew: number};
 
-const FL_D = S07_LENS.at - FLUTTER.at;
+const FL_D = ZOOM_AT - FLUTTER.at;
 /** The flutter's velocity at its end (px/s): toward the hold centre. */
 const V_END: Pt = (() => {
   const dx = HOLD.focus[0] - FLUTTER.to[0];
@@ -89,13 +97,13 @@ function zoomS(q: number, s0: number, peak: number): number {
 }
 
 /** Where the page is at film time T (screen px), or null when it is not on screen. `own` = S06's own copy, which never
- *  leaves the full-frame hold (only the Wiper follows S07's shrink). */
+ *  leaves the full-frame hold (only the Wiper and S07's copy follow the shrink). */
 export function pageAt(T: number, own = false): PageState | null {
   if (T < FLUTTER.at) return null;
-  if (T < S07_LENS.at) return flutterAt(T);
+  if (T < ZOOM_AT) return flutterAt(T);
   if (T < PAGE_FULL) {
-    const a = flutterAt(S07_LENS.at);
-    const dt = T - S07_LENS.at;
+    const a = flutterAt(ZOOM_AT);
+    const dt = T - ZOOM_AT;
     const s = zoomS(dt / MZ.in, a.s, HOLD.s);
     const ql = Math.log(s / a.s) / Math.log(HOLD.s / a.s);
     // the gust's own drift carries on and fades as the lens pull takes over
@@ -111,7 +119,7 @@ export function pageAt(T: number, own = false): PageState | null {
       skew: lerp(a.skew, 0, ql),
     };
   }
-  if (own || T < SCENE.end) {
+  if (own || T <= LENS_OUT.t0) {
     // the hold still creeps toward the lens (+4 % over its 4 frames, a hair of turn) about the doodle: never a dead frame
     const k = Math.min(1, (T - PAGE_FULL) / 0.12);
     const r0 = (HOLD.rot * Math.PI) / 180;
@@ -122,10 +130,14 @@ export function pageAt(T: number, own = false): PageState | null {
     const dy = HOLD.focus[1] - rc[1];
     return {x: rc[0] + ks * (dx * Math.cos(dr) - dy * Math.sin(dr)), y: rc[1] + ks * (dx * Math.sin(dr) + dy * Math.cos(dr)), s: HOLD.s * ks, rot: HOLD.rot + HOLD.creepRot * k, skew: 0};
   }
-  if (T >= S07_PIN) return null; // landed: S07's own pinned notice takes over
-  const L = lensWipeAt(T, S07_LENS, [S07_SHEET.x, S07_SHEET.y], 1);
-  return {x: L.x, y: L.y, s: L.s, rot: S07_SHEET.rot, skew: 0};
+  // fix round 3: the out phase pulls back FROM the hold exactly as drawn on S06's last frame (no pop at the cut); null
+  // from S07's pin on (S07's own pinned notice takes over)
+  return lensOutAt(T, holdEnd());
 }
+
+let HOLD_END: PageState | null = null;
+/** The hold state on S06's last frame (LENS_OUT.t0), where the out phase starts. */
+const holdEnd = (): PageState => (HOLD_END ??= pageAt(LENS_OUT.t0, true)!);
 
 /** Above this zoom the page is the local LensSheet (cream, solid heading); below it the real LeakSheet. */
 const LENS_FROM = 2.2;
@@ -178,7 +190,7 @@ export const LeakPage: React.FC<{T: number; own?: boolean}> = ({T, own = false})
       </XG>
     );
   }
-  // S07 draws LeakSheet at (X, Y) with `scale`; lensWipeAt moves its centre. Same here: translate to the sheet's rest
+  // S07 draws LeakSheet at (X, Y) with `scale`; the trajectory moves its centre. Same here: translate to the sheet's rest
   // centre inverse, so LeakSheet's own transform (translate rotate scale) lands exactly where S07's does; the ink grows
   // with the zoom by drawing it at s / k inside a k x scale (k = 1 at rest).
   const k = inkK(st.s);

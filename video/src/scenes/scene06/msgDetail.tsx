@@ -12,7 +12,7 @@
 // Exported for S05 (same seed 's5msg', so the satchel and rim carry across the cut on action): pass the same props.
 
 import React from 'react';
-import {Fill, Ink, palette, polyPath, Pt, rng, roundRect, blob} from '../../lib';
+import {Fill, Ink, mat, palette, polyPath, Pt, rng, roundRect, blob, XG} from '../../lib';
 
 const TORSO = 95;
 const LEG = 62;
@@ -117,10 +117,15 @@ export type MessengerDetailProps = {
   arm?: {sh: Pt; hand: Pt};
   /** Rim colour (default peach). false = no rim. */
   rim?: string | false;
+  /** Fix round 3 (S06's own walking legs, parts.tsx): each foot's x shift and bottom width (person units, [left, right])
+   *  and how far the feet sit below the kit's foot line (the body bob with the planted foot on the ground). */
+  feet?: {dx: [number, number]; bw: [number, number]; drop: number};
+  /** Fix round 3: the satchel lags the body by a frame: a swing (deg, about the strap's foot) and a y lag (person units). */
+  bag?: {rot: number; dy: number};
 };
 
 /** Draw INSIDE the Messenger's person frame (translate(feet x, hip y + walk bob) scale(h / 199)). */
-export const MessengerDetail: React.FC<MessengerDetailProps> = ({seed, k, ph, arm, rim = palette.peach}) => {
+export const MessengerDetail: React.FC<MessengerDetailProps> = ({seed, k, ph, arm, rim = palette.peach, feet, bag: bagFx}) => {
   const g = kitGeo(seed);
   const {w, h, hr, round, legH} = g;
   const hw = w / 2;
@@ -145,7 +150,10 @@ export const MessengerDetail: React.FC<MessengerDetailProps> = ({seed, k, ph, ar
   const bag = {x0: -w * 0.37, x1: -w * 0.02, y0: -h * 0.3, y1: h * 0.07};
   const sw = 10.5 / k / 1.0; // ~10.5 px on screen at the reference k
   const s0: Pt = [w * 0.3, top - 0.5];
-  const s1: Pt = [bag.x0 + (bag.x1 - bag.x0) * 0.42, bag.y0 + 1];
+  const s1o: Pt = [bag.x0 + (bag.x1 - bag.x0) * 0.42, bag.y0 + 1];
+  // the bag's swing / lag about the strap's foot; the strap's foot rides it
+  const bagM = bagFx && (bagFx.rot !== 0 || bagFx.dy !== 0) ? mat.compose(mat.translate(0, bagFx.dy), mat.about(mat.rotate(bagFx.rot), s1o[0], s1o[1])) : mat.I;
+  const s1: Pt = [bagM[0] * s1o[0] + bagM[2] * s1o[1] + bagM[4], bagM[1] * s1o[0] + bagM[3] * s1o[1] + bagM[5]];
   const sl = Math.hypot(s1[0] - s0[0], s1[1] - s0[1]) || 1;
   const snx = (-(s1[1] - s0[1]) / sl) * (sw / 2);
   const sny = ((s1[0] - s0[0]) / sl) * (sw / 2);
@@ -165,12 +173,14 @@ export const MessengerDetail: React.FC<MessengerDetailProps> = ({seed, k, ph, ar
   const sn = ph === undefined ? 0 : Math.sin(ph);
   const lL = Math.max(0, sn) * legH * 0.16;
   const lR = Math.max(0, -sn) * legH * 0.16;
-  const sole = (x0: number, lift: number) => {
+  const sole = (i: 0 | 1, x0k: number, lift: number) => {
     const th = (3.6 + 3.2 * (lift / (legH * 0.16))) / (k / 1.37);
-    const yb = legH - lift + 2;
-    return polyPath([[x0, yb - th], [x0 + lw + 3, yb - th], [x0 + lw + 3, yb], [x0, yb]]);
+    const bw = feet ? feet.bw[i] : lw;
+    const x0 = x0k + (feet ? feet.dx[i] + (lw - bw) / 2 : 0);
+    const yb = legH - lift + 2 + (feet ? feet.drop : 0);
+    return polyPath([[x0, yb - th], [x0 + bw + 3, yb - th], [x0 + bw + 3, yb], [x0, yb]]);
   };
-  const soles = sole(-gg - lw - 1, lL) + sole(gg - 2, lR);
+  const soles = sole(0, -gg - lw - 1, lL) + sole(1, gg - 2, lR);
   // ---- rims: shoulders (outline top, both sides, stopping at the collar), head top, raised arm top
   let rimD = '';
   if (rim) {
@@ -213,11 +223,13 @@ export const MessengerDetail: React.FC<MessengerDetailProps> = ({seed, k, ph, ar
       {/* coat detail */}
       <Ink d={seamL + cuffL + hem + vent} width={fine} taper={false} order="all" seed={`${seed}/dseam`} />
       {/* the satchel and its strap */}
-      <Fill d={bagD} color={palette.tan} seed={`${seed}/dbag`} />
-      <Fill d={flap} color={palette.brown} offset={false} mode="none" seed={`${seed}/dflap`} />
-      <Ink d={bagD + flapInk} width={mid} taper={false} seed={`${seed}/dbagI`} />
-      <Fill d={buckle} color={palette.cream} offset={false} mode="none" seed={`${seed}/dbk`} />
-      <Ink d={buckle} width={fine * 0.8} taper={false} seed={`${seed}/dbkI`} />
+      <XG m={bagM}>
+        <Fill d={bagD} color={palette.tan} seed={`${seed}/dbag`} />
+        <Fill d={flap} color={palette.brown} offset={false} mode="none" seed={`${seed}/dflap`} />
+        <Ink d={bagD + flapInk} width={mid} taper={false} seed={`${seed}/dbagI`} />
+        <Fill d={buckle} color={palette.cream} offset={false} mode="none" seed={`${seed}/dbk`} />
+        <Ink d={buckle} width={fine * 0.8} taper={false} seed={`${seed}/dbkI`} />
+      </XG>
       <Fill d={strap} color={palette.brown} seed={`${seed}/dstrap`} />
       <Ink d={strapInk} width={mid} taper={false} order="all" seed={`${seed}/dstrapI`} />
       {rimD ? <Fill d={rimD} color={rim as string} offset={false} mode="none" seed={`${seed}/drim`} /> : null}

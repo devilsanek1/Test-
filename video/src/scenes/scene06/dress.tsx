@@ -297,18 +297,107 @@ export const LeftRowDetail: React.FC = () => (
   </>
 );
 
-// ---------------------------------------------------------------- the floor: the set's first post-shadow wedge (floor)
+// ---------------------------------------------------------------- the floor: the set's post-shadow wedges (floor)
 
-/** MakersLane G.bandsTan's first wedge ([x 470 at the frame bottom, half width 78, y 1300 -> 2060] on a ray from the
- *  VP), 3 px wider each side, painted over with the lane's sand. */
+/** MakersLane G.bandsTan's two wedges ([x at the frame bottom, half width there, y0 -> y1] on rays from the VP), 3-4 px
+ *  wider each side, painted over with the lane's sand: (1) [470, 78, 1300 -> 2060] ran from the passer at (455, 1300) to
+ *  the frame bottom (a median strip); (2) fix round 3: [1080, 120, 1700 -> 2060] sat alone at the bottom-right pointing
+ *  up-left at the sun (against the scene's radial rule) with no caster on frame 0. The cropped shrub's own shadow runs
+ *  from its tub base (y 1990, below the frame) down-right, off frame: nothing to draw. */
 const BAND_COVER = (() => {
   const VP = MAKERS_LANE.vp;
   const rayAt = (xb: number, y: number) => VP[0] + ((xb - VP[0]) * (y - VP[1])) / (1920 - VP[1]);
-  const [xb, hw, y0, y1] = [470, 78, 1300, 2060];
-  return polyPath([[rayAt(xb - hw * 0.35, y0) - 3, y0 - 3], [rayAt(xb + hw * 0.35, y0) + 3, y0 - 3], [rayAt(xb + hw, y1) + 4, y1 + 4], [rayAt(xb - hw, y1) - 4, y1 + 4]]);
+  const wedge = (xb: number, hw: number, y0: number, y1: number) =>
+    polyPath([[rayAt(xb - hw * 0.35, y0) - 3, y0 - 3], [rayAt(xb + hw * 0.35, y0) + 3, y0 - 3], [rayAt(xb + hw, y1) + 4, y1 + 4], [rayAt(xb - hw, y1) - 4, y1 + 4]]);
+  return wedge(470, 78, 1300, 2060) + wedge(1080, 120, 1700, 2060);
 })();
 
 export const FloorCover: React.FC = () => <Fill d={BAND_COVER} color={palette.sand} offset={false} mode="none" seed="s6bandC" />;
+
+// ---------------------------------------------------------------- one neighbour draws a curtain (houses layer)
+
+/** Fix round 3 (the set's curtainsAt popped ~8 panes peach at once: lights switching on, not a curtain): ONE near upper
+ *  pane of the left row (house 1's upper-left window, the same quad the set's PerspRow draws: screen ~x 63-92, y 858-956
+ *  at rest) gets a peach curtain that slides across it from the left in 0.1 s (an ink leading edge, one fold), and one
+ *  ink tick flicks off its right side as it closes. Sets request: MakersLane curtainsAt {t, panes: [i]}. */
+const PANE = (() => {
+  const h = LEFT.houses[1];
+  const m = /M(-?[\d.]+) (-?[\d.]+)L(-?[\d.]+) (-?[\d.]+)L(-?[\d.]+) (-?[\d.]+)L(-?[\d.]+) (-?[\d.]+)Z/.exec(h.g.lit);
+  const n = m ? m.slice(1).map(Number) : [104.4, 872.1, 131.2, 878.5, 131.2, 965.5, 104.4, 966.3];
+  return [[n[0], n[1]], [n[2], n[3]], [n[4], n[5]], [n[6], n[7]]] as Quad;
+})();
+
+export const PaneCurtain: React.FC<{at: number}> = ({at}) => {
+  const t = useTime();
+  if (t < at) return null;
+  const q = E.outCubic(prog(t, at, 0.1));
+  const P = (u: number, v: number) => inQuad(PANE, u, v);
+  const e0 = P(q, 0);
+  const e1 = P(q, 1);
+  const body = polyPath([P(0, 0), e0, e1, P(0, 1)]);
+  const fold = q > 0.3 ? line(P(q * 0.45, 0.04)[0], P(q * 0.45, 0.04)[1], P(q * 0.5, 0.96)[0], P(q * 0.5, 0.96)[1], {over: 0, seed: 's6pcF'}) : '';
+  const edge = line(e0[0], e0[1] + 1, e1[0], e1[1] - 1, {over: 0, seed: 's6pcE'});
+  // one tick off the pane's right side as the curtain closes (0.06-0.18 s)
+  const d = t - at - 0.06;
+  let tick = '';
+  if (d >= 0 && d < 0.12) {
+    const r = P(1, 0.35);
+    const L = 11 * Math.sin((d / 0.12) * Math.PI);
+    tick = `M${(r[0] + 6).toFixed(1)} ${r[1].toFixed(1)}l${L.toFixed(1)} ${(-L * 0.45).toFixed(1)}`;
+  }
+  return (
+    <>
+      <Fill d={body} color={palette.peach} offset={false} mode="none" seed="s6pcB" />
+      <Ink d={edge + fold} width={2.2} taper={false} order="all" seed="s6pcI" />
+      {tick ? <Ink d={tick} width={2.6} taper={false} seed="s6pcT" /> : null}
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- festoon lights across the top (fg layer)
+
+/** Fix round 3 (the top of the frame was bare flat mint in every frame; ref2 f_12 / f_33 crop a string of lights across
+ *  the top): one festoon strung across the lane close to the camera (fg layer), sagging from off-frame left to off-frame
+ *  right, lowest ~y 230 on screen (the caption band from 280 stays clean), cream bulbs on short stems every ~120 px; the
+ *  string sways a hair (2.5 px, 0.55 Hz) and each bulb swings on its stem. World x -320 .. 1480 covers the frame through
+ *  the truck. */
+const FESTOON = {x0: -320, y0: 70, x1: 1480, y1: 52, sag: 196, n: 15, r: 9.5};
+const festoonAt = (u: number, sag: number): Pt => {
+  const x = lerp(FESTOON.x0, FESTOON.x1, u);
+  const y = lerp(FESTOON.y0, FESTOON.y1, u) + sag * 4 * u * (1 - u);
+  return [x, y];
+};
+
+export const FestoonLights: React.FC = () => {
+  const t = useTime();
+  const sag = FESTOON.sag + 2.5 * Math.sin(t * 2 * Math.PI * 0.55);
+  let wire = '';
+  const N = 24;
+  for (let i = 0; i <= N; i++) {
+    const p = festoonAt(i / N, sag);
+    wire += `${i ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+  }
+  let stems = '';
+  let bulbs = '';
+  for (let k = 0; k < FESTOON.n; k++) {
+    const u = (k + 0.5) / FESTOON.n;
+    const [x, y] = festoonAt(u, sag);
+    const a = ((5 * Math.sin(t * 2 * Math.PI * 0.8 + k * 1.7)) * Math.PI) / 180;
+    const L = 10;
+    const bx = x + Math.sin(a) * (L + FESTOON.r);
+    const by = y + Math.cos(a) * (L + FESTOON.r);
+    stems += `M${x.toFixed(1)} ${y.toFixed(1)}L${(x + Math.sin(a) * L).toFixed(1)} ${(y + Math.cos(a) * L).toFixed(1)}`;
+    bulbs += blob(bx, by, FESTOON.r, FESTOON.r * 1.06, {seed: `s6fb${k}`});
+  }
+  return (
+    <>
+      <Ink d={wire} width={2.6} taper={false} seed="s6fW" />
+      <Ink d={stems} width={3.2} taper={false} order="all" seed="s6fS" />
+      <Fill d={bulbs} color={palette.cream} offset={false} mode="none" seed="s6fBf" />
+      <Ink d={bulbs} width={2.6} taper={false} seed="s6fBi" />
+    </>
+  );
+};
 
 // ---------------------------------------------------------------- cropped foreground (fg layer)
 

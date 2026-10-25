@@ -8,11 +8,13 @@
 // still creeping IN (1.08 -> 1.13, out(expo), 0.30 s; it rises 20 world px so the cornice clears the caption band), then
 // locked. The landing hits the banner: it sways once on its rod. 'before': a z floats up from Pip (asleep on the banner's
 // bottom rail, S04's leaf still on his ear); 'researchers': team A pops up, then team B (two depths); 'using': the facade
-// calendar tears to its summer page (AUG), a pigeon hops; L5 pops off; 'AI': one sparkle tablet per team is raised, the
-// scan beams (opaque white light under the plan's ink) shoot out and sweep the banner, L6 pops as a clipped slip;
-// 'figured': the beams converge on the lock, team A's back-row member points at it, two audience heads look up; 'out':
+// calendar tears to its summer page (AUG), a pigeon hops; L5 pops off; 'AI': one tablet per team is raised high (1.4 x,
+// on a stepped glow disc) with a big ink sparkle that twinkles on the highlight, then the scan beams (opaque white light
+// under the plan's ink) shoot out of them and sweep the banner; 'figured': the beams converge on the lock, team A's
+// back-row member points at it, two audience heads look up, and L6 pops as a clipped slip (the label follows the scan);
+// 'out':
 // ONE hand-circling ink ring strokes on round the lock (found) and the beams retract; 'how': it pulses, the teams lean in
-// (torso + head); 'bad': ONE focal event: S02's dashed hooded hand redraws over the lock and turns it, the bolt slides
+// (torso + head); 'bad': ONE focal event: S02's dashed hooded hand (its hood point on the cuff) redraws over the lock and turns it, the bolt slides
 // all the way back and the plan's door swings AJAR (a dark gap), Bit (posing as part of the drawing) gets an ink '!' and
 // hops out onto the lock box; an audience head turns to its neighbour; 'it': Pip jolts awake, the leaf flicks off; 'was.':
 // the messenger raises the envelope to his right shoulder, Bit leaps onto his collar and he breaks into a run out right,
@@ -25,6 +27,7 @@
 import React, {useId} from 'react';
 import {World, useScene, useTime, skies, palette} from '../lib';
 import {Ink} from '../lib/Ink';
+import {Fill} from '../lib/Fill';
 import {prog} from '../lib/time';
 import {Sun} from '../lib/Sun';
 import {Look} from '../lib/exit';
@@ -42,8 +45,9 @@ import {Flagpole} from './scene05/flag';
 // ---------------------------------------------------------------- labels (final_script section 6)
 
 const L5 = ['in the code since', 'at least 2012'];
-/** Both lines centred (fix round 3: no padding spaces). */
-const L6 = ['found with AI help ·', 'reported privately in August'];
+/** Both lines centred (fix round 3: no padding spaces; fix round 4: no trailing interpunct on the 2-line layout, it
+ *  dangled at the end of line 1 like a stray mark). */
+const L6 = ['found with AI help', 'reported privately in August'];
 const ZOOM = 1.13;
 /** L5 continues S04's tag: where S04's dive leaves it on the cut (screen ~(426-749, 1004-1106) at zoom 1.9 around
  *  lock4), in S05 world at the 1.08 landing; hung from the lock's bottom-right corner. 36 world = 39-41 px on screen. */
@@ -134,6 +138,29 @@ const ArmBreak: React.FC<{drawAt: number; undrawAt: number; dur: number; childre
   );
 };
 
+/** S02's hood cue (Scene02.tsx 'the hood cue', the same path in DiagramHand's local units: fingertips at the origin, the
+ *  forearm along +x): the Attempter's HOOD POINT, a small dashed tealDark peak standing on the cuff seam, so the sleeve
+ *  reads as the SAME hooded hacker's hand from the takeover diagram (fix round 4). x 1.3 about its foot on the seam: this
+ *  hand is drawn at 0.85 (S02's at 1.2), so the cue keeps ~30 px on screen. It shows with the cuff's dashes (q >= 0.6 of
+ *  the draw-on) and goes with them, inside the ArmBreak group so it turns with the hand. */
+const HOOD = 'M113 -33.5Q112 -46 125 -58Q139 -47 141 -35.2';
+const HOOD_FILL = HOOD + 'L118 -34Z';
+const HOOD_K = 1.3;
+const HoodCue: React.FC<{drawAt: number; undrawAt: number; dur: number}> = ({drawAt, undrawAt, dur}) => {
+  const t = useTime();
+  let q = prog(t, drawAt, dur);
+  if (t >= undrawAt) q = Math.min(q, 1 - prog(t, undrawAt, dur));
+  if (q < 0.6) return null;
+  const iw = 1 / (HAND_SCALE * HOOD_K);
+  const m = mat.compose(mat.translate(PINCH[0], PINCH[1]), mat.rotate(HAND_ANGLE), mat.scale(HAND_SCALE), mat.about(mat.scale(HOOD_K), 127, -34));
+  return (
+    <XG m={m}>
+      <Fill d={HOOD_FILL} color={palette.tealDark} offset={[1.2, 0.8]} mode="none" seed="s5hoodF" />
+      <Ink d={HOOD} width={3.0 * 0.8 * iw} dash={`${(5 * iw).toFixed(2)} ${(3.6 * iw).toFixed(2)}`} taper={false} vary={0} seed="s5hood" />
+    </XG>
+  );
+};
+
 const Scene05: React.FC = () => {
   const t = useTime();
   const scene = useScene();
@@ -180,13 +207,15 @@ const Scene05: React.FC = () => {
             <XG m={mat.about(mat.rotate(turn), PINCH[0], PINCH[1])}>
               <ArmBreak drawAt={HAND_AT(b)} undrawAt={b.envelope} dur={0.15}>
                 <DiagramHand x={PINCH[0]} y={PINCH[1]} angle={HAND_ANGLE} scale={HAND_SCALE} drawAt={HAND_AT(b)} drawDur={0.15} undrawAt={b.envelope} ink={3.0} handFill={palette.white} seed="s5hand" />
+                <HoodCue drawAt={HAND_AT(b)} undrawAt={b.envelope} dur={0.15} />
               </ArmBreak>
             </XG>
           </OnSheet>
           {/* Bit over the hand (he is the one being caught), his '!' balloon over everything on the sheet */}
           <BitOnLock inAt={b.bitIn} alertAt={b.bad} balloonAt={b.balloon} leapAt={b.bitLeap} />
-          {/* L6: the clipped slip on the banner's clean top margin (leads its beat: in full by 'AI'+0.40) */}
-          <LabelTag kind="slip" box={L6_BOX} text={L6} fontSize={38 / ZOOM} at={b.l6 - 0.08} seed="s5L6" />
+          {/* L6: the clipped slip on the banner's clean top edge (fix round 4: pops right after the beams converge on the
+              lock, before the ring: the label follows the scan) */}
+          <LabelTag kind="slip" box={L6_BOX} text={L6} fontSize={38 / ZOOM} at={b.l6} seed="s5L6" />
           <PipOnRail b={b} />
           <LeafOnCrown b={b} />
           <BigZ at={b.zzz} />

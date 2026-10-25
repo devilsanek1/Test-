@@ -1,11 +1,12 @@
 // S10 "Half on versions too old" (storyboard v3: cut(server @0.8) -> cut(anymore), 39.634-45.618 on the take).
 // VO: "Plus something like half of PHP sites run versions so old they're not officially supported anymore."
-// The Old Quarter at day from door height: S09's tram wipes the hillside away, the three sites pop up on 'something',
-// the far row on 'like', the sun becomes a 1/2 pie on 'HALF', the elephant plaques swing out on 'PHP' (L13 on the
-// sandwich board), siteM's plaque turns old (flip, cobweb with Bit caught in it, cane, droop), three far plates flip old
-// and sag, the maker + cart step out from behind the A-frame and hand out support tags, SKIPPING the old site (the lob
-// arcs over it), Pip goes 'hey!' at it, and siteM's update stalls at 10 % on 'anymore'. Depth on the cart line: walker <
-// cart < stoops < hanging plaques < A-frame < flying tags < Pip. Camera: hold through the wipe, one 5 % sine push
+// The Old Quarter at day from door height: S09's tram wipes the hillside away and the near row draws on as line art
+// under it, the three sites pop up into their outlines on 'something', the far row before 'HALF', the sun becomes a 1/2
+// pie on 'HALF', the elephant plaques swing out on 'PHP' (L13 on the sandwich board), siteM's plaque turns old (flip,
+// cobweb with Bit caught in it, cane, droop), three far plates flip old and drop crooked, the maker + cart walk out from
+// behind the A-frame onto the open pavement and hand out support tags, SKIPPING the old site (the lob arcs over it), Pip
+// goes 'hey!' at it, and siteM's update stalls at 10 % on 'anymore'. Depth: walker < stoops < hanging plaques < cart
+// (open pavement, y 1395) < A-frame < flying tags < Pip. Camera: hold through the wipe, one 5 % sine push
 // (anchored so the A-frame's paper lands on screen 91-413 x 1262-1472), locked from 'of'. Docs: docs/scenes/S10.md.
 
 import React from 'react';
@@ -15,12 +16,12 @@ import scenesJson from '../data/scenes.json';
 import {LabelTag, OldQuarter, PopUp, SunPie} from './scene10/kit';
 import {localBeats, SCENE, W} from './scene10/beats';
 import {SecondRow} from './scene10/secondRow';
-import {Plaques, plaqueRest, Sites, Stoops, TAG_HANG} from './scene10/sites';
+import {Plaques, plaqueRest, Sites, SiteSketch, Stoops, TAG_HANG} from './scene10/sites';
 import {plaqueFacePoint, TAG_W, tagBodyOffset} from './scene10/plaques';
 import {Cart, CartTimes, Tosses} from './scene10/cart';
 import {Pip} from './scene10/pip';
 import {GAP_WALKER, GapWalker} from './scene10/walker';
-import {BottomCrowd, FarStreet, SandwichBoard, StreetGround} from './scene10/street';
+import {BottomCrowd, FarStreet, SandwichBoard, signBox, StreetGround} from './scene10/street';
 // S09's tram (its exported Wiper): read-only, to hand Pip over from its roof and to preview the wipe standalone
 import {TRAM as S09_TRAM, TramWiper, tramPipAt} from './scene09/TramWiper';
 import type {Pt} from '../lib/sketch';
@@ -61,10 +62,7 @@ const Scene10: React.FC = () => {
   // (backward difference inside S09's roof window)
   const hand = tramPipAt(start + b.pipHop);
   const handV = (hand.x - tramPipAt(start + b.pipHop - 1 / 30).x) * 30;
-  // the A-frame: 6 px lower than the set's slot box (a >= 20 px band of wall under siteL's raised plaque) and, fix round
-  // 2b, 12 px further left and 24 px narrower (L13 still at full size), so its back leg clears the maker parked on the
-  // open pavement by >= 7 px
-  const signBox = (box: [number, number, number, number]): [number, number, number, number] => [box[0] - 12, box[1] + 6, box[2] - 36, box[3] + 6];
+  // the A-frame's box (street.tsx signBox: 12 px left, 24 px narrower, 6 px lower than the set's slot)
   // the street-gap wedge and its walker pop up with siteR (not floating in the empty street from the cut)
   const sitePops: [number, number, number] = [b.siteL, b.siteL + 0.1, b.siteL + 0.2];
   const wedgeAt = sitePops[2];
@@ -102,6 +100,7 @@ const Scene10: React.FC = () => {
                 <PopUp at={wedgeAt} x={GAP_WALKER.x} y={GAP_WALKER.y}>
                   <GapWalker walkAt={b.walker} outAt={b.walkerOut} />
                 </PopUp>
+                <SiteSketch at={[b.sketch, b.sketch + 0.06, b.sketch + 0.12]} />
                 <Sites popAt={sitePops} updateAt={b.update} wobbleAt={b.wobble} />
               </>
             );

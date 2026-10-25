@@ -11,14 +11,14 @@
 // shared ones (personGeo / SparkleTablet mirrored from Figures.tsx). Feet anchor (x, y), h = total height (world px).
 import React from 'react';
 import {palette} from '../../lib/theme';
-import {ease as E, lerp, osc, prog, useTime} from '../../lib/time';
+import {ease as E, lerp, osc, prog, springAt, springs, useTime} from '../../lib/time';
 import {rand, rng, Seed} from '../../lib/rng';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {Acc, Hair, Person} from '../../lib/kit';
 import {blob, polyPath, roundRect, Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
-import {SparkleTablet} from '../shared/props';
+import {SparkleTablet, sparklePath} from '../shared/props';
 
 export const TORSO = 95;
 export const LEG = 62;
@@ -105,8 +105,9 @@ export type InvestigatorProps = Frame & {
   arm?: 'left' | 'right';
   /** Tablet width in world px (height x 1.42). Shared default 60. */
   tabletSize?: number;
-  /** 'overhead' (shared: the hand above the head) | 'head' (the hand beside the head: the tablet at head height). */
-  tabletLift?: 'overhead' | 'head';
+  /** 'overhead' (shared: the hand above the head) | 'head' (the hand beside the head: the tablet at head height) |
+   *  'high' (fix round 4: the arm up and OUT to the side, the tablet clear above the head line). */
+  tabletLift?: 'overhead' | 'head' | 'high';
   pose?: InvestigatorPose;
   walk?: number;
   /** Kit accessories (default none: no kit V collar). */
@@ -125,6 +126,14 @@ export type InvestigatorProps = Frame & {
   /** Fix round 3: a PONYTAIL hanging from the back of the head down the coat (hair colour, ink outline) with a hair tie
    *  of this colour at its root (ref 2 f_33): the hair separates from the coat. Use with a 'short' head. */
   ponytail?: string;
+  /** Fix round 4: a stepped flat GLOW behind the raised tablet (WORLD px radii [inner white, outer mintPale], no blur, no
+   *  opacity): the tablet reads as a light source at thumbnail size. Pops (spring) as the tablet comes up; `glowStepAt`
+   *  steps it down to the inner disc (one frame). */
+  glow?: [number, number];
+  glowStepAt?: number;
+  /** Fix round 4: a big four-point INK sparkle just above the raised tablet (r in WORLD px, white keyline) + two tick
+   *  stars: pops (spring) at `at`, twinkles once (size) at `twinkleAt`, pops off (one shrunken frame) at `outAt`. */
+  sparkle?: {at: number; twinkleAt: number; outAt: number; r?: number};
 };
 
 /** World centre of an investigator's raised tablet (for beams). */
@@ -133,9 +142,16 @@ export function tabletCentre(p: Pick<InvestigatorProps, 'x' | 'y' | 'h' | 'seed'
   const g = personGeo(p.seed);
   const side = p.arm === 'left' ? -1 : 1;
   const ts = p.tabletSize ?? 60;
-  const up: Pt = p.tabletLift === 'head' ? [side * g.w * 0.66, g.hy] : [side * g.w * 0.62, g.hy - g.hr * 1.7];
+  const up = liftUp(p.tabletLift, side, g);
   const hipY = p.y - LEG * s;
   return [p.x + up[0] * s, hipY + up[1] * s - ts * tabletRise(p.landscape)];
+}
+
+/** The raised hand (person-local units) for a lift. */
+function liftUp(lift: InvestigatorProps['tabletLift'], side: number, g: ReturnType<typeof personGeo>): Pt {
+  if (lift === 'head') return [side * g.w * 0.66, g.hy];
+  if (lift === 'high') return [side * g.w * 0.78, g.hy - g.hr * 1.4];
+  return [side * g.w * 0.62, g.hy - g.hr * 1.7];
 }
 
 /** The tablet centre above the hand (x its width): the hand overlaps the bottom edge (portrait 0.71, landscape 0.5). */
@@ -166,6 +182,49 @@ const Sneakers: React.FC<{w: number; W: number; seed: string}> = ({w, W, seed}) 
   );
 };
 
+/** Fix round 4: the stepped flat glow behind a raised tablet (person-local units: centre c, radii r = [white, mintPale]):
+ *  pops with a spring at `at`, steps down to the white disc at `stepAt`. */
+const TabletGlow: React.FC<{c: Pt; r: [number, number]; at: number; stepAt?: number; seed: string}> = ({c, r, at, stepAt, seed}) => {
+  const t = useTime();
+  const k = springAt(t, at, springs.pop);
+  if (k <= 0.01) return null;
+  const outer = stepAt === undefined || t < stepAt;
+  return (
+    <XG m={mat.about(mat.scale(k), c[0], c[1])}>
+      {outer ? <Fill d={blob(c[0], c[1], r[1], r[1] * 0.94, {seed: `${seed}/go`})} color={palette.mintPale} offset={false} mode="none" seed={`${seed}/goF`} /> : null}
+      <Fill d={blob(c[0], c[1], r[0], r[0] * 0.92, {seed: `${seed}/gi`})} color={palette.white} offset={false} mode="none" seed={`${seed}/giF`} />
+    </XG>
+  );
+};
+
+/** One four-point ink star with a white keyline (so it reads over the plan's linework), centre (x, y), radius r. */
+const Star: React.FC<{x: number; y: number; r: number; k: number; seed: string}> = ({x, y, r, k, seed}) => (
+  <XG m={mat.about(mat.scale(k), x, y)}>
+    <Fill d={sparklePath(x, y, r + Math.max(3.2, r * 0.22), 0.34)} color={palette.white} offset={false} mode="none" seed={`${seed}/kl`} />
+    <Fill d={sparklePath(x, y, r, 0.26)} color={palette.ink} offset={false} mode="none" seed={`${seed}/st`} />
+  </XG>
+);
+
+/** Fix round 4: the big 'AI' sparkle just above a raised tablet (person-local units: the tablet's top centre `top`, the
+ *  star radius r): pops (spring) at `at` with two tick stars (0.04 s later), twinkles once by SIZE at `twinkleAt` (the
+ *  ticks 0.04 s after), and pops off (one 0.72 frame) at `outAt`. `side` puts the ticks on the tablet's outer side. */
+const TabletSparkle: React.FC<{top: Pt; r: number; at: number; twinkleAt: number; outAt: number; side: number; seed: string}> = ({top, r, at, twinkleAt, outAt, side, seed}) => {
+  const t = useTime();
+  if (t < at || t >= outAt + 1 / 30) return null;
+  const off = t >= outAt ? 0.72 : 1;
+  const tw = (t0: number, a: number) => 1 + a * Math.sin(Math.PI * prog(t, t0, 0.16));
+  const k = springAt(t, at, springs.pop) * tw(twinkleAt, 0.42) * off;
+  const k2 = springAt(t, at + 0.04, springs.pop) * tw(twinkleAt + 0.04, 0.7) * off;
+  const c: Pt = [top[0], top[1] - r * 1.15];
+  return (
+    <>
+      <Star x={c[0] + side * r * 1.55} y={c[1] - r * 0.55} r={r * 0.3} k={k2} seed={`${seed}/t1`} />
+      <Star x={c[0] + side * r * 1.1} y={c[1] + r * 0.72} r={r * 0.22} k={k2} seed={`${seed}/t2`} />
+      <Star x={c[0]} y={c[1]} r={r} k={k} seed={`${seed}/s`} />
+    </>
+  );
+};
+
 export const Investigator: React.FC<InvestigatorProps> = (p) => {
   const t = useTime();
   const seed = String(p.seed ?? 'inv');
@@ -177,7 +236,7 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
   const side = p.arm === 'left' ? -1 : 1;
   const ts = p.tabletSize ?? 60;
   const sh: Pt = [side * g.w * 0.34, -g.h * 0.8];
-  const up: Pt = p.tabletLift === 'head' ? [side * g.w * 0.66, g.hy] : [side * g.w * 0.62, g.hy - g.hr * 1.7];
+  const up = liftUp(p.tabletLift, side, g);
   const down: Pt = [side * g.w * 0.5, -g.h * 0.05];
   const hand: Pt = [lerp(down[0], up[0], q), lerp(down[1], up[1], q)];
   const by = -g.h * 0.62;
@@ -235,9 +294,13 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
       </g>,
     );
   }
+  // the tablet's centre and top (person-local), for the glow and the sparkle
+  const tabC: Pt = [hand[0], hand[1] - (ts * tabletRise(p.landscape)) / s];
+  const tabTop: Pt = [tabC[0], tabC[1] - (p.landscape ? ts : ts * 1.42) / 2 / s];
   return (
     <FigFrame b={p}>
       {shoesOn ? <Sliver w={g.w} seed={seed} /> : null}
+      {p.glow && p.raiseAt !== undefined && q > 0.02 ? <TabletGlow c={tabC} r={[p.glow[0] / s, p.glow[1] / s]} at={p.raiseAt + 0.08} stepAt={p.glowStepAt} seed={`${seed}/glow`} /> : null}
       {before}
       <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={coat} hair={p.hair} hairColor={p.hairColor} acc={p.acc ?? []} ink={W} walk={p.walk} />
       {shoesOn ? <Sneakers w={g.w} W={W} seed={seed} /> : null}
@@ -255,7 +318,8 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
       {q > 0.02 ? (
         <>
           <Arm sh={sh} hand={hand} coat={coat} W={W * 0.85} seed={`${seed}/arm`} />
-          <SparkleTablet x={hand[0]} y={hand[1] - (ts * tabletRise(p.landscape)) / s} size={ts / s} rot={(p.landscape ? 90 : 0) + side * (1 - q) * -30} twinkle={p.twinkle ?? true} ink={W * 0.8} seed={`${seed}/tab`} />
+          <SparkleTablet x={tabC[0]} y={tabC[1]} size={ts / s} rot={(p.landscape ? 90 : 0) + side * (1 - q) * -30} twinkle={p.twinkle ?? true} ink={W * 0.8} seed={`${seed}/tab`} />
+          {p.sparkle ? <TabletSparkle top={tabTop} r={(p.sparkle.r ?? 22) / s} at={p.sparkle.at} twinkleAt={p.sparkle.twinkleAt} outAt={p.sparkle.outAt} side={side} seed={`${seed}/spk`} /> : null}
         </>
       ) : null}
     </FigFrame>

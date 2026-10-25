@@ -1,12 +1,16 @@
 // scene06/seal.tsx — the 'They' beat: the sun's in-place press (with one visible rebound) and the wax seal it pops.
 // LOCAL SHIMS (props lane requests, docs/scenes/S06.md): props SunPress 'land' has no rebound control (outBack 1.8 on a
-// -10 % squash: imperceptible at phone size) and props WaxSeal has no `ease` / trail options (inQuad over a tall arc:
-// the 32 px seal jumped 4-6 diameters a frame and its dotted trail lingered as specks). Same look as the props pieces
-// (crown fill in the sun's orange, an ink arc, the solid elephant emblem); here:
+// -10 % squash: imperceptible at phone size) and props WaxSeal has no `ease` / trail / ring options (inQuad over a tall
+// arc: the 32 px seal jumped 4-6 diameters a frame and its dotted trail lingered as specks). Same look as the props
+// pieces (crown fill in the sun's orange, an ink arc, the solid elephant emblem); here:
 //   SunPressS06  -14 % y anchored at the disc bottom, then a damped spring with one clear +5 % rebound
-//   WaxSealS06   ~48 px on screen, pops 0.3 -> 1.3 -> 1 on emission with three ink pop ticks at the sun's edge, travels a
-//                low arc with inOut(sine) (largest step <= ~55 px / frame), the dotted trail is eaten from its tail and
-//                is gone 0.1 s after landing; lands with the props squash + pendulum wobble.
+//   WaxSealS06   fix round 3 (orange on orange / peach read as a blob): a 3 px CREAM ring inside a 3 px INK outline round
+//                the orange crown, so it reads on the sun, the peach band and the lane alike; emitted from the sun's
+//                UPPER-RIGHT rim against the mint sky (Scene06 SEAL_FROM), popped 0.3 -> 1.5 x in one frame and held 1.5 x
+//                for two frames with three ink pop ticks, then down to 1 x in flight; a low arc with inOut(sine), the
+//                dotted trail in 6 px ink dots eaten from its tail and gone 0.1 s after landing; lands ~38 px on screen
+//                centred on the envelope's flap point (the flap X stays visible round it) with the props squash +
+//                pendulum wobble.
 
 import React from 'react';
 import {arc, crown, ease as E, Fill, Ink, lerp, mat, palette, prog, Pt, useTime, XG} from '../../lib';
@@ -50,18 +54,19 @@ export const WaxSealS06: React.FC<WaxSealS06Props> = ({from, to, at, dur = 0.4, 
   const [sx, sy] = t < at + POP_T ? from : P(u);
   const landT = sealLandAt(at, dur);
   const d = t - at;
-  const pop = d < 0.06 ? lerp(0.3, 1.3, E.outCubic(d / 0.06)) : d < 0.17 ? lerp(1.3, 1, E.inOutSine((d - 0.06) / 0.11)) : 1;
+  // 0.3 -> 1.5 in one frame, 1.5 held for two frames, back to 1 in flight (0.1 s)
+  const pop = d < 0.025 ? lerp(0.3, 1.5, E.outCubic(d / 0.025)) : d < 0.09 ? 1.5 : d < 0.19 ? lerp(1.5, 1, E.inOutSine((d - 0.09) / 0.1)) : 1;
   const sq = t >= landT && t < landT + 0.14 ? 1 - 0.18 * Math.sin(((t - landT) / 0.14) * Math.PI) : 1;
   const rot = pendulum(t, landT, -16, 0.5, 0.8);
   // the dotted trail: a window behind the seal while it travels, eaten from the tail; gone 0.1 s after landing
   const tail = t < landT ? Math.max(0, u - 0.42) : lerp(Math.max(0, 1 - 0.42), 1, prog(t, landT, 0.1));
   const dots: React.ReactNode[] = [];
-  const n = 18;
+  const n = 14;
   for (let i = 1; i < n; i++) {
     const v = i / n;
-    if (v > u - 0.03 || v < tail) continue;
+    if (v > u - 0.04 || v < tail) continue;
     const [dx, dy] = P(v);
-    dots.push(<circle key={i} cx={dx} cy={dy} r={2.4} fill={palette.ink} />);
+    dots.push(<circle key={i} cx={dx} cy={dy} r={3} fill={palette.ink} />);
   }
   // emission pop ticks at the sun's edge (radial)
   let ticks: React.ReactNode = null;
@@ -70,7 +75,7 @@ export const WaxSealS06: React.FC<WaxSealS06Props> = ({from, to, at, dur = 0.4, 
     const ay = from[1] - sun[1];
     const nn = Math.hypot(ax, ay) || 1;
     const g = E.outCubic(d / 0.07);
-    const o = 26 + 16 * E.outCubic(d / 0.15);
+    const o = 33 + 12 * E.outCubic(d / 0.15);
     const L = 15 * g * (1 - Math.max(0, (d - 0.09) / 0.06));
     let dd = '';
     for (const da of [-0.62, 0, 0.62]) {
@@ -83,14 +88,20 @@ export const WaxSealS06: React.FC<WaxSealS06Props> = ({from, to, at, dur = 0.4, 
     ticks = L > 0.5 ? <Ink d={dd} width={3.2} taper={false} order="all" seed={`${seed}/tk`} /> : null;
   }
   const blobD = crown(0, 0, r, r, {seed: `${seed}/c`, bumps: 8, round: 0.72});
+  // the orange crown inset 4.5 px inside the cream disc: 3 px of cream show inside the 3 px ink outline
+  const ins = Math.max(0.5, (r - 4.5) / r);
   return (
     <>
       {dots}
       {ticks}
       <XG m={mat.compose(mat.translate(sx, sy), mat.rotate(rot), mat.scale(pop * (2 - sq), pop * sq))}>
-        <Fill d={blobD} color={palette.sun} offset={[1.5, 1.5]} seed={`${seed}/f`} lookExempt />
-        <Ink d={arc(0, 0, r * 0.64, r * 0.64, -20, 300, {seed: `${seed}/i`})} width={2.2} taper={false} seed={`${seed}/i`} />
-        <ElephantEmblem size={r * 1.05} mode="solid" color={palette.ink} seed={`${seed}/e`} />
+        <Fill d={blobD} color={palette.cream} offset={false} mode="none" seed={`${seed}/fc`} lookExempt />
+        <XG m={mat.scale(ins)}>
+          <Fill d={blobD} color={palette.sun} offset={false} mode="none" seed={`${seed}/f`} lookExempt />
+        </XG>
+        <Ink d={blobD} width={3} taper={false} seed={`${seed}/o`} />
+        <Ink d={arc(0, 0, r * 0.6, r * 0.6, -20, 300, {seed: `${seed}/i`})} width={1.8} taper={false} seed={`${seed}/i`} />
+        <ElephantEmblem size={r * 0.98} mode="solid" color={palette.ink} seed={`${seed}/e`} />
       </XG>
     </>
   );

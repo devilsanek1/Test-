@@ -29,6 +29,7 @@ export const SCENE = {start: 39.634, end: 45.618};
 /** Absolute beat times (storyboard S10 beats; leads per ENGINE rule 5 are applied here). */
 export const ABS = {
   cut: SCENE.start, // tram wipe centre (S09's Wiper); behind it the empty street in full day
+  sketch: W.plus, // under the wipe the near row draws on as line art (siteL, siteM, siteR 0.06 s apart)
   pipHop: W.plus + 0.1, // Pip leaps off the tram's tail onto the bollard
   siteL: W.something - 0.1, // siteL pops up (scaleY 0 -> 1.06 -> 1), siteM +0.10, siteR +0.20 (with the gap wedge + walker)
   sunLand: W.something, // the sun lands over siteM ON the word
@@ -48,14 +49,15 @@ export const ABS = {
   cobweb: W.so - 0.1, // a cobweb draws across the old plaque's corner (rule-5 lead: it reads ON 'so'): Bit is caught in it
   dust: W.so + 0.02, // dust specks pop under the old plaque
   cane: W.old, // the old emblem leans on a tiny cane
-  cartPark: W.not - 0.14, // the maker + cart, walking out from behind the A-frame since ~43.0 (visible from ~43.15), brake
-  //   into the park spot on the open pavement as his first arm rises (sign 'fixed!' on its post)
+  cartPark: W.not - 0.29, // the maker + cart walk out from behind the A-frame (moving from 42.86, the bed's nose visible from
+  //   ~42.96, the maker from ~43.3) and brake into the park spot on the open pavement 0.13 s before his first arm rises
+  //   (sign 'fixed!' on its post): the park and the throw are separate beats
   droop: W.theyre, // the old emblem's ear droops (it sags further on its cane); a dust speck drifts down
   not: W.not, // Bit struggles in the web; the maker reaches into the satchel
   lookCart: W.theyre + 0.1, // Pip turns to the parked cart
   toss1: W.not - 0.06, // his LEFT arm (raised 0.1 s before) lobs a tag back-left at siteL's plaque (0.23 s flight)
   tick1: W.officially, // it lands on siteL's plaque: tick
-  toss2: W.officially - 0.075, // his RIGHT arm (straight up) lobs the second tag high OVER siteM's old plaque (0.45 s)
+  toss2: W.officially - 0.125, // his RIGHT arm (straight up) lobs the second tag high OVER siteM's old plaque (0.5 s)
   skipNudge: W.officially + 0.1, // siteM's old plaque nudges as the tag sails over it (the skip, as an event)
   tick2: W.supported + 0.01, // lands on siteR's plaque: tick + one stepped ink ring pulse
   wave: W.supported + 0.06, // tiny tags pop onto the CURRENT second-row plaques, skipping the old ones

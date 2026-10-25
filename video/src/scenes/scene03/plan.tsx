@@ -143,6 +143,19 @@ const PLAIN = (() => {
   return {rays, cross};
 })();
 const HLINE = line(-120, HORIZON, 1200, HORIZON, {seed: 's03/hz', over: 0});
+/** Fix round 3 (finding: the band between the horizon and the caption floor was empty mint with no edge): a 1 px RULER
+ *  along the horizon: minor ticks (4 px) every 24 px rising from the horizon line, major ticks (10 px) every 120 px, and
+ *  a dashed 1 px line along the major ticks' tops (dash 12, gap 7): the plan's scale bar, the bare band's edge. */
+const RULER = (() => {
+  let ticks = '';
+  for (let x = -96, i = 0; x <= 1176; x += 24, i++) {
+    const hgt = i % 5 === 0 ? 10 : 4;
+    ticks += `M${x} ${HORIZON - 0.5}L${(x + 0.4).toFixed(1)} ${HORIZON - hgt}`;
+  }
+  let dash = '';
+  for (let x = -96; x < 1176; x += 19) dash += `M${x} ${HORIZON - 10}L${Math.min(x + 12, 1176)} ${HORIZON - 10.3}`;
+  return {ticks, dash};
+})();
 
 /** The bare plan's far half: cream paper from the horizon down (under the ground layer), the sand horizon band, the
  *  horizon line and the plan's grid running to it (inked from the cut). */
@@ -151,6 +164,7 @@ export const FarPlain: React.FC = () => (
     <Fill rect={[-260, HORIZON, 1600, 2200 - HORIZON]} color={palette.cream} offset={false} mode="none" seed="s03/plain" />
     <Fill rect={[-260, HORIZON, 1600, 8]} color={palette.sand} offset={false} mode="none" seed="s03/plainH" />
     <Ink d={HLINE} width={1.6} taper={false} seed="s03/hzi" />
+    <Ink d={RULER.ticks + RULER.dash} width={1} taper={false} vary={0} seed="s03/ruler" />
     <Ink d={PLAIN.rays + PLAIN.cross} width={1.6} taper={false} seed="s03/plainG" />
   </>
 );
@@ -287,7 +301,7 @@ export const Footprints: React.FC<{tickAt?: number[]}> = ({tickAt = []}) => {
   const ticking = LOT_GEO.outline.filter((_, i) => tickAt[i] !== undefined && t >= tickAt[i] && t < tickAt[i] + GLOW).join('');
   return (
     <>
-      <Fill d={LOT_GEO.fill} color={palette.sand} offset={[3, 2]} mode="none" seed="s03/lots" />
+      <Fill d={LOT_GEO.fill} color={palette.tan} offset={[3, 2]} mode="none" seed="s03/lots" />
       <Ink d={LOT_GEO.inner} width={1.4} taper={false} seed="s03/footw" />
       <Ink d={LOT_GEO.light} width={2.2} taper={false} seed="s03/footL" />
       <Ink d={LOT_GEO.heavy} width={3.4} taper={false} seed="s03/foot" />
@@ -338,6 +352,115 @@ export const SheetFrame: React.FC = () => (
     <Ink d={SHEET.earInk} width={1.6} taper={false} seed="s03/earI" />
   </>
 );
+
+// ---------------------------------------------------------------- construction elevations (the bare plan's top half)
+
+/** An open-cornered hairline edge from a to b: it stops `gap` px short of both corners (ref 1's construction lines never
+ *  close a corner) and a long edge is drawn as two pieces with a small break. Drawn from a toward b. */
+function openEdge(a: Pt, b: Pt, seed: string, gap = 7): string {
+  const L = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const r = rng(seed);
+  const at = (u: number): Pt => [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u];
+  const piece = (u0: number, u1: number, k: string) => {
+    const p = at(u0);
+    const q = at(u1);
+    return line(p[0], p[1], q[0], q[1], {seed: `${seed}/${k}`, over: 0, breaks: false, drift: 0.25});
+  };
+  const g0 = gap / L;
+  const g1 = 1 - (gap * r.range(0.6, 1.4)) / L;
+  if (L < 240) return piece(g0, g1, 'a');
+  const m = r.range(0.4, 0.62);
+  const hg = r.range(9, 20) / L;
+  return piece(g0, m - hg / 2, 'a') + piece(m + hg / 2, g1, 'b');
+}
+
+/** Fix round 3 (finding: the bare-plan opener (f0-f32, 18 % of the scene) was the weakest composition: an empty mint
+ *  band over a dead-centre horizon, a beige floor at phone size): reference 1's grammar, linework first, fills later.
+ *  From the cut, HAIRLINE (1.4 px) construction elevations draw UP from the footprints, outline only, broken and
+ *  open-cornered: the press house's gable (both walls bottom -> top, then the eaves and roof slopes, then its door and
+ *  browser-window outlines) and the first two bays of each side row (L1 L2, R1 R2: their walls' verticals, then the
+ *  rooflines toward the VP and one storey line). The 1.07 s pop-up fills and solidifies them: each building rises over
+ *  its own outline, which is dropped once that building is fully up (covered: never a fade). */
+const ELEV = (() => {
+  const P = BLUEPRINT.press;
+  const [wx, wy, ww, wh] = BLUEPRINT.window;
+  const [dx, dy, dw, dh] = BLUEPRINT.door;
+  // every edge is its own path (drawn on as one pen stroke, its broken pieces in sequence: never a floating piece)
+  const press = {
+    walls: [openEdge([P.x0, P.base], [P.x0, P.eaves], 's03/ce/pw0'), openEdge([P.x1, P.base], [P.x1, P.eaves], 's03/ce/pw1')],
+    roof: [openEdge([P.x0 - 16, P.eaves + 6], P.apex, 's03/ce/pr0'), openEdge([P.x1 + 16, P.eaves + 6], P.apex, 's03/ce/pr1'), openEdge([P.x0, P.eaves], [P.x1, P.eaves], 's03/ce/pe')],
+    openings: [
+      openEdge([dx, dy + dh], [dx, dy], 's03/ce/pd0', 5) + openEdge([dx, dy], [dx + dw, dy], 's03/ce/pd1', 5) + openEdge([dx + dw, dy], [dx + dw, dy + dh], 's03/ce/pd2', 5),
+      openEdge([wx, wy + wh], [wx, wy], 's03/ce/pq0', 5) + openEdge([wx, wy], [wx + ww, wy], 's03/ce/pq1', 5) + openEdge([wx + ww, wy], [wx + ww, wy + wh], 's03/ce/pq2', 5) + openEdge([wx + ww, wy + wh], [wx, wy + wh], 's03/ce/pq3', 5),
+    ],
+  };
+  // side bays: L1 = leftQuads[1], L2 = leftQuads[2], R1 = rightQuads[1], R2 = rightQuads[2]
+  const bay = (q: Quad, left: boolean, id: string) => {
+    // each bay draws its street-side (far) vertical only (left row: q[1]-q[2]; right row: q[0]-q[3]): the second bay's
+    // near vertical IS the first bay's far one, and the first bay's near edge is the frame edge
+    const farTop = left ? q[1] : q[0];
+    const farBot = left ? q[2] : q[3];
+    const nearTop = left ? q[0] : q[1];
+    const nearBot = left ? q[3] : q[2];
+    const storey = (v: number, k: string) => {
+      const s0: Pt = [nearTop[0] + (nearBot[0] - nearTop[0]) * v, nearTop[1] + (nearBot[1] - nearTop[1]) * v];
+      const s1: Pt = [farTop[0] + (farBot[0] - farTop[0]) * v, farTop[1] + (farBot[1] - farTop[1]) * v];
+      return openEdge(s0, s1, `s03/ce/${id}${k}`, 9);
+    };
+    return {
+      wall: openEdge(farBot, farTop, `s03/ce/${id}v`),
+      roof: openEdge(nearTop, farTop, `s03/ce/${id}r`, 5),
+      storeys: storey(0.28, 's1') + storey(0.52, 's2'),
+    };
+  };
+  return {press, L1: bay(leftQuads[1], true, 'L1'), L2: bay(leftQuads[2], true, 'L2'), R1: bay(rightQuads[1], false, 'R1'), R2: bay(rightQuads[2], false, 'R2')};
+})();
+const CE_W = 1.4;
+
+/** One construction edge drawn on as a single pen stroke (its pieces in sequence) from `at` over `dur`. */
+const CE: React.FC<{d: string; at: number; dur: number; w?: number; seed: string}> = ({d, at, dur, w = CE_W, seed}) => (
+  <Ink d={d} at={at} dur={dur} order="seq" pace="free" width={w} taper={false} seed={seed} />
+);
+
+/** The press house's construction elevation (render in the press layer, before the set's node): walls bottom -> top
+ *  from -0.10, the roof slopes (eaves -> apex) and the eaves line from 0.10, door + window from 0.18; dropped once the
+ *  house is fully up (pressAt + 0.22). */
+export const PressElevation: React.FC<{pressAt: number}> = ({pressAt}) => {
+  const t = useTime();
+  if (t >= pressAt + 0.22) return null;
+  const E0 = ELEV.press;
+  return (
+    <>
+      {E0.walls.map((d, i) => <CE key={`w${i}`} d={d} at={-0.1 + i * 0.03} dur={0.22} seed={`s03/ce/pW${i}`} />)}
+      {E0.roof.map((d, i) => <CE key={`r${i}`} d={d} at={0.1 + i * 0.03} dur={0.14} seed={`s03/ce/pR${i}`} />)}
+      {E0.openings.map((d, i) => <CE key={`o${i}`} d={d} at={0.18 + i * 0.04} dur={0.16} w={1.2} seed={`s03/ce/pO${i}`} />)}
+    </>
+  );
+};
+
+/** The first two bays of each side row (render in the sides layer, before the rows): the walls draw up from the
+ *  footprints (L1 / R1 from -0.06, L2 / R2 0.04 s later), then the rooflines (from the frame edge toward the VP) and two
+ *  storey lines; each bay is dropped once its building is up (popAt + 0.22). */
+export const SideElevations: React.FC<{popAt: Record<SideId, number>}> = ({popAt}) => {
+  const t = useTime();
+  const ids: ('L1' | 'R1' | 'L2' | 'R2')[] = ['L1', 'R1', 'L2', 'R2'];
+  return (
+    <>
+      {ids.map((id, i) => {
+        if (t >= popAt[id] + 0.22) return null;
+        const B = ELEV[id];
+        const d0 = i < 2 ? -0.06 : -0.02;
+        return (
+          <React.Fragment key={id}>
+            <CE d={B.wall} at={d0} dur={0.24} seed={`s03/ce/${id}W`} />
+            <CE d={B.roof} at={0.16 + i * 0.02} dur={0.14} seed={`s03/ce/${id}R`} />
+            <CE d={B.storeys} at={0.24 + i * 0.02} dur={0.18} w={1.2} seed={`s03/ce/${id}S`} />
+          </React.Fragment>
+        );
+      })}
+    </>
+  );
+};
 
 // ---------------------------------------------------------------- a street tree at the near left edge (charm, colour)
 
@@ -392,15 +515,24 @@ const seg = (q: Q4, u0: number, u1: number, v: number) => {
  *  2b: R2's screen (x 926-980 on screen) is half under the right UI rail (x > 950): its elephant shrinks to 0.8 and
  *  shifts toward the street (u 0.4), its ping ring is centred at u 0.25 (~13 px further left), so the tick's centroid
  *  moves off the rail. */
-const PAGE_AT: Partial<Record<SideId, {u: number; k: number; pingU: number}>> = {R2: {u: 0.4, k: 0.8, pingU: 0.25}};
+const PAGE_AT: Partial<Record<SideId, {u: number; k: number; pingU: number; v?: number; pingV?: number}>> = {
+  R2: {u: 0.4, k: 0.8, pingU: 0.25},
+  // fix round 3 (finding: R1's page and ping sat entirely under the right UI rail, x 1012-1076 on screen): R1's elephant
+  // and ping are pulled to its screen's street-side top corner (u 0.2, the elephant raised to v 0.5, the ping centred
+  // at v 0.25: screen ~(1020, 900)), so the tick's ring rises above the rail's top (y 900) as it expands
+  R1: {u: 0.22, k: 0.8, pingU: 0.15, v: 0.52, pingV: 0.22},
+  // L1 (cut by the left frame edge, x -7..57 on screen; the film's paint edge eats the outer ~30 px): its elephant and
+  // ping sit at the street side of its screen (u 0.72)
+  L1: {u: 0.72, k: 0.85, pingU: 0.72},
+};
 
 /** A lit PHP page in a side screen: a peach header across the top and a BIG solid ink elephant filling the page width
  *  (>= 36 px on screen), popping in with the 7 % spring from `at` (the count tick). */
-const Page: React.FC<{q: Q4; at: number; u?: number; k?: number; seed: string}> = ({q, at, u = 0.5, k: ks = 1, seed}) => {
+const Page: React.FC<{q: Q4; at: number; u?: number; v?: number; k?: number; seed: string}> = ({q, at, u = 0.5, v = 0.64, k: ks = 1, seed}) => {
   const t = useTime();
   const w = Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1]);
   const h = Math.hypot(q[3][0] - q[0][0], q[3][1] - q[0][1]);
-  const c = bil(q, u, 0.64);
+  const c = bil(q, u, v);
   const es = Math.min(w * 0.92, h * 0.62) * ks;
   const k = Math.max(0.001, springAt(t, at, springs.pop));
   return (
@@ -431,7 +563,7 @@ const DarkPane: React.FC<{q: Q4; seed: string}> = ({q, seed}) => {
 /** One side screen: unlit sage glass until `onAt` (never, when `onAt` is undefined). PHP sites: peach for two frames at
  *  it (the glow pop), then the elephant page; re-pulses peach for two frames at `pulseAt` ('websites'). Non-PHP sites
  *  (fix round 2b): on 'ten' a 2-frame cream blink, then the screen goes DARK (tealDark pane + glint) and stays dark. */
-const ScreenState: React.FC<{d: string; onAt?: number; pulseAt?: number; php: boolean; page?: {u: number; k: number}; seed: string}> = ({d, onAt, pulseAt, php, page, seed}) => {
+const ScreenState: React.FC<{d: string; onAt?: number; pulseAt?: number; php: boolean; page?: {u: number; k: number; v?: number}; seed: string}> = ({d, onAt, pulseAt, php, page, seed}) => {
   const t = useTime();
   if (onAt === undefined || t < onAt) return <Fill d={d} color={palette.sage} offset={false} mode="none" seed={seed} />;
   if (!php) {
@@ -439,7 +571,7 @@ const ScreenState: React.FC<{d: string; onAt?: number; pulseAt?: number; php: bo
     return <DarkPane q={quadOf(d)} seed={`${seed}/dk`} />;
   }
   if (t < onAt + GLOW || (pulseAt !== undefined && t >= pulseAt && t < pulseAt + GLOW)) return <Fill d={d} color={palette.peach} offset={false} mode="none" seed={`${seed}/p`} />;
-  return <Page q={quadOf(d)} at={onAt} u={page?.u} k={page?.k} seed={`${seed}/pg`} />;
+  return <Page q={quadOf(d)} at={onAt} u={page?.u} v={page?.v} k={page?.k} seed={`${seed}/pg`} />;
 };
 
 // ---------------------------------------------------------------- flower boxes (static detail, ride the pop-ups)
@@ -486,9 +618,9 @@ const FLOWERS = (() => {
 })();
 
 /** Centre and width (world) of a side house's screen: the count ping's anchor. */
-function screenCentre(h: RowHouse, u = 0.5): {c: Pt; w: number} {
+function screenCentre(h: RowHouse, u = 0.5, v = 0.5): {c: Pt; w: number} {
   const q = quadOf(h.g.screen);
-  return {c: bil(q, u, 0.5), w: Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1])};
+  return {c: bil(q, u, v), w: Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1])};
 }
 
 /** Per side house: its screen state + page (+ the count's orange ping on the PHP screens), an awning (L2 / R2), window
@@ -500,7 +632,7 @@ export const SideOverlays: React.FC<{popAt: Record<SideId, number>; onAt: Partia
       const php = !isBlank(id);
       const fb = FLOWERS[id];
       const pa = PAGE_AT[id];
-      const sc = screenCentre(h, pa?.pingU);
+      const sc = screenCentre(h, pa?.pingU, pa?.pingV);
       const on = onAt[id];
       return (
         <PopUp key={id} at={popAt[id]} x={h.base[0]} y={h.base[1]}>

@@ -19,7 +19,7 @@ import {DOME_GLASS, LanternOff, S01Shutter} from '../scene01/shims';
 import {DoorLanterns, PressTicks, S01Branch, S01Glyph, SunRipple, TreeTicks} from '../scene01/dressing';
 import {layerMat} from './camera';
 import {B, DOME_LANTERN_R, inRewind, s01Clock} from './timing';
-import {BitHome, CITIZEN_ORDER, OnlookersP, P_CITIZENS, P_GOV, P_PIGEONS, PipP, P_NEAR, R_CITIZENS, R_GOV, R_NEAR, R_PIGEONS, R_PIP, S11Note} from './cast';
+import {BitHome, CITIZEN_ORDER, DidSparkles, OnlookersP, P_CITIZENS, P_GOV, P_PIGEONS, PipP, P_NEAR, R_CITIZENS, R_GOV, R_NEAR, R_PIGEONS, R_PIP, S11Note} from './cast';
 
 const SUN = PLAZA.sun; // (720, 900) r155
 const VP = PLAZA.vp as [number, number];
@@ -36,6 +36,12 @@ const GOV_SET: Partial<Record<GovId, GovEvents>> = (() => {
   return {...S01_GOV, govA: strip(S01_GOV.govA), govB: {...strip(S01_GOV.govB), lanternOffAt: DOME_LANTERN_R}, govC: strip(S01_GOV.govC)};
 })();
 
+/** The REWIND glyph sits in the OPEN part of the disc (fix round 1: centred on the sun at full power-glyph size its back
+ *  edge was tangent to govD's cornice strokes and its top-right corner cut by govD's overshoot): 0.9 x, up-left of the
+ *  centre (sun-local px), so its back edge stays >= 8 px left of govD's cornice overshoots and its tip, nudges included,
+ *  stays well above govB's cornice line. */
+const REW = {k: 0.9, x: -20, y: -28} as const;
+
 /** The sun's glyph: S01's own (S01Glyph, S01 clock) until 'before'; then on S12's clock the power glyph shrinks out, the
  *  bold cream REWIND glyph pops in (nudging left on 'there' / 'was' / 'even') and pops back to the power glyph on
  *  'fix.'; once that pop has settled the glyph is S01's own again (at W = 0: S01's frame-0 glyph, to the pixel). */
@@ -44,7 +50,7 @@ const Glyph: React.FC<{r: number; t: number}> = ({r, t}) => {
   return (
     <TimeProvider global={t} offset={0}>
       {t < B.powerOut + 0.13 ? <PowerGlyph r={r} outAt={B.powerOut} seed="s01/pwr" /> : null}
-      <RewindGlyph r={r} at={B.rewindIn} outAt={B.rewindOut} nudgeAt={[...B.rewindNudge]} seed="s12/rew" />
+      <RewindGlyph r={r * REW.k} x={REW.x} y={REW.y} at={B.rewindIn} outAt={B.rewindOut} nudgeAt={[...B.rewindNudge]} seed="s12/rew" />
       <PowerGlyph r={r} at={B.powerIn} seed="s01/pwr" />
     </TimeProvider>
   );
@@ -66,6 +72,7 @@ export const PlazaRewind: React.FC = () => {
         <LanternOff r={DOME_GLASS} at={DOME_LANTERN_R} seed="s01/domeOff" />
         <DoorLanterns offAt={[S01B.lampOff, S01B.lampOff + 0.06]} />
         <S11Note t={t} />
+        <DidSparkles t={t} />
         <BitHome t={t} />
       </>
     ),

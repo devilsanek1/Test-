@@ -23,7 +23,7 @@ import {useBeats} from './scene06/beats';
 import {camAt, F, fOf, layerM, REST, toScreen, truckPx} from './scene06/camera';
 import type {Layer} from './scene06/camera';
 import {BitS06, BlindJolt, envSealWorld, MakerHeads, MessengerS06, pipAt, PipS06, Shadows, SHH_HOLD, ShhMark, shhTipWorld} from './scene06/parts';
-import {DoorDressing, FarSkyline, FloorCover, ForegroundRight, LeftRowDetail, NeighbourRight, PolesAndWires} from './scene06/dress';
+import {DoorDressing, FarSkyline, FestoonLights, FloorCover, ForegroundRight, LeftRowDetail, NeighbourRight, PaneCurtain, PolesAndWires} from './scene06/dress';
 import {sealLandAt, SunPressS06, WaxSealS06} from './scene06/seal';
 import {LeakPage} from './scene06/page';
 
@@ -32,6 +32,8 @@ export {Wiper} from './scene06/page';
 // ---------------------------------------------------------------- layout (world px at camera rest)
 
 const SUN = {x: 420, y: 985, r: 120};
+/** The sun's idle drift (px/s, screen): ENGINE 9, the sun is never perfectly still (S07 does not match-cut on it). */
+const SUN_DRIFT = 8;
 /** Passers walking up the lane into the sun, sized on the messenger's camera (260 px at feet 1520: h = (y - 1040) /
  *  1.846), so nobody behind him reads as a giant; plus a far queue of tiny ones toward the sun (fix round 1: ref2 f_1's
  *  people converge on the vanishing point). The set's stander is dropped (Pip's lane). */
@@ -54,20 +56,23 @@ const Scene06: React.FC = () => {
   const cam = camAt(t, B);
   const sealClip = 's6seal' + useId().replace(/[^a-zA-Z0-9]/g, '');
 
-  // ---- the sun: screen space at the lane end, parallax x0.1 of the truck; 'They' = an in-place press squash
+  // ---- the sun: screen space at the lane end, parallax x0.1 of the truck, an 8 px/s idle drift (fix round 3: never
+  //      perfectly still); 'They' = an in-place press squash that BOTTOMS OUT on the word (led 0.06 s: rule 5)
   const sx = SUN.x + F.sun * truckPx(cam);
+  const sxd = sx + SUN_DRIFT * t;
   const sun = (
-    <SunPressS06 at={B.they} cx={sx} cy={SUN.y} r={SUN.r}>
-      <Sun cx={sx} cy={SUN.y} r={SUN.r} drift={[0, 0]} />
+    <SunPressS06 at={B.they - 0.06} cx={sxd} cy={SUN.y} r={SUN.r}>
+      <Sun cx={sx} cy={SUN.y} r={SUN.r} drift={[SUN_DRIFT, 0]} />
     </SunPressS06>
   );
 
   // ---- the wax seal: out of the sun along a low dotted arc onto the envelope (aimed where the envelope will be when it
   //      lands, then riding it into the slot)
-  // fix round 2: the seal lands BEFORE Pip's shh (pop 0.08 + 0.25 s flight: 20.31), launched from the sun's lower-right
-  // edge (15 deg below its horizontal: nearer the envelope, so the flight keeps its per-frame steps <= ~60 px)
+  // fix round 2: the seal lands BEFORE Pip's shh (pop 0.08 + 0.25 s flight: 20.31). Fix round 3: it pops out of the
+  // sun's UPPER-RIGHT rim (40 deg above its horizontal, 4 px outside the rim) against the mint sky, not into the peach
+  // band and the far roofs (orange on orange read as a blob)
   const SEAL_DUR = 0.25;
-  const SEAL_FROM: [number, number] = [sx + SUN.r * Math.cos(0.26), SUN.y + SUN.r * Math.sin(0.26)];
+  const SEAL_FROM: [number, number] = [sxd + (SUN.r + 4) * Math.cos(-0.7), SUN.y + (SUN.r + 4) * Math.sin(-0.7)];
   const sealLand = sealLandAt(B.they, SEAL_DUR);
   const sealAt = (tt: number) => {
     const e = envSealWorld(tt, B);
@@ -87,6 +92,7 @@ const Scene06: React.FC = () => {
         {name === 'houses' ? (
           <>
             <LeftRowDetail />
+            <PaneCurtain at={B.door} />
             <PolesAndWires hopAt={B.headsUp} />
           </>
         ) : null}
@@ -107,7 +113,9 @@ const Scene06: React.FC = () => {
     <World sky={[{t: 0, tod: 'golden'}]}>
       <MakersLane
         sun={sun}
-        curtainsAt={B.door}
+        // fix round 3: no set-wide pane pop (it read as lights switching on); ONE neighbour draws a curtain instead
+        // (PaneCurtain in the houses layer below). Sets request: curtainsAt {t, panes: [i]}
+        curtainsAt={1e9}
         workshop={{
           glowAt: B.php,
           makersAt: false,
@@ -136,7 +144,8 @@ const Scene06: React.FC = () => {
       {/* the reference plane: Pip (behind, feet 1480), the messenger (feet 1520), Bit on his shoulder, the 'shh' */}
       <XG m={layerM(cam, 'near')}>
         <PipS06 B={B} />
-        <ShhMark x={pipShh.x + 140} y={pipShh.y - 122} at={B.shh + 0.06} outAt={B.shh + SHH_HOLD - 0.05} tail={shhTipWorld(B.shh + 0.1, B)} />
+        {/* fix round 3: the hush ticks re-flick mid-hold (20.72: the quiet pocket between the curtain and the screen) */}
+        <ShhMark x={pipShh.x + 140} y={pipShh.y - 122} at={B.shh + 0.06} outAt={B.shh + SHH_HOLD - 0.05} flickAt={B.door + 0.055} tail={shhTipWorld(B.shh + 0.1, B)} />
         <MessengerS06 B={B} zoom={cam.z} />
         <BitS06 B={B} />
       </XG>
@@ -144,6 +153,7 @@ const Scene06: React.FC = () => {
       {/* the cropped foreground at the bottom-right edge */}
       <XG m={layerM(cam, 'fg')}>
         <ForegroundRight />
+        <FestoonLights />
       </XG>
 
       {/* screen space: the seal (clipped by the slot while the envelope goes in), the leak page */}
@@ -157,7 +167,7 @@ const Scene06: React.FC = () => {
             </defs>
           ) : null}
           <g clipPath={sealNow.clipY !== null ? `url(#${sealClip})` : undefined}>
-            <WaxSealS06 from={SEAL_FROM} to={sealTo.p} at={B.they} dur={SEAL_DUR} arc={18} r={23} sun={[sx, SUN.y]} />
+            <WaxSealS06 from={SEAL_FROM} to={sealTo.p} at={B.they} dur={SEAL_DUR} arc={18} r={19} sun={[sxd, SUN.y]} />
           </g>
         </>
       ) : null}

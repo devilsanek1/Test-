@@ -441,11 +441,11 @@ const RowTags: React.FC<{k: number; zoom: number; extended: boolean}> = ({k, zoo
   );
 };
 
-/** Door #4's tag: the same white tag + empty box, popping on 'single' - 0.06, and the ONE tick (ink, drawn on, over-
- *  shooting the box) that completes ON 'single'; the empty wave follows from single + 0.10. */
+/** Door #4's tag: the same white tag + empty box, its own pop at 'single' - 0.18, and the ONE tick (ink, drawn on,
+ *  overshooting the box) that completes ON 'single'; the empty wave follows from single + 0.10. */
 export const House4Tag: React.FC = () => {
   const t = useTime();
-  const at = B.single - 0.06;
+  const at = B.single - 0.18;
   if (t < at) return null;
   const zoom = camAt(t).zoom;
   const pop = springAt(t, at, springs.pop);
@@ -468,7 +468,9 @@ export const House4Tag: React.FC = () => {
 
 // ---------------------------------------------------------------- one row (houses + its terrace)
 
-const RowNode: React.FC<{k: number; zoom: number; extended: boolean}> = ({k, zoom, extended}) => {
+/** `stairs` = the flights (which climb into the terrace gap above the row) and their landing shrubs: only once the row
+ *  above is there, so a flight never climbs into the empty sky during the pull-back. */
+const RowNode: React.FC<{k: number; zoom: number; extended: boolean; stairs: boolean}> = ({k, zoom, extended, stairs}) => {
   const parts = extended ? [GEO[k].core, GEO[k].edge] : [GEO[k].core];
   const iw = rowInk(k, zoom);
   const depth = Math.min(1, k / (HAZE + 1));
@@ -501,10 +503,10 @@ const RowNode: React.FC<{k: number; zoom: number; extended: boolean}> = ({k, zoo
           {g.coping ? <Fill d={g.coping} color={coping} offset={off} mode="snap" seed={`s9h/cp${k}/${i}`} /> : null}
           {iw > 0 && g.lip ? <Ink d={g.lip} at={DRAW_AT + k * 0.03} order="all" width={iw} taper={false} vary={0.05} seed={`s9h/lp${k}/${i}`} /> : null}
           {iw > 0 && g.rail ? <Ink d={g.rail} at={DRAW_AT + 0.03 + k * 0.03} order="all" width={Math.max(iw * 0.62, 1.1 / zoom)} taper={false} vary={0} seed={`s9h/rl${k}/${i}`} /> : null}
-          {g.flight ? <Fill d={g.flight} color={tint(palette.cream, k)} offset={false} mode="snap" seed={`s9h/fl${k}/${i}`} /> : null}
-          {g.flightInk && iw > 0 ? <Ink d={g.flightInk} at={DRAW_AT + 0.02 + k * 0.05} order="all" width={Math.max(iw * 0.8, 1.3 / zoom)} taper={false} vary={0} seed={`s9h/fi${k}/${i}`} /> : null}
-          {g.shrubs ? <Fill d={g.shrubs} color={k <= 2 ? palette.teal : tint(palette.sage, k)} offset={false} mode="snap" seed={`s9h/sb${k}/${i}`} /> : null}
-          {iw > 0 && g.shrubInk ? <Ink d={g.shrubInk} width={iw * 0.8} taper={false} vary={0} seed={`s9h/sbi${k}/${i}`} /> : null}
+          {stairs && g.flight ? <Fill d={g.flight} color={tint(palette.cream, k)} offset={false} mode="snap" seed={`s9h/fl${k}/${i}`} /> : null}
+          {stairs && g.flightInk && iw > 0 ? <Ink d={g.flightInk} at={DRAW_AT + 0.02 + k * 0.05} order="all" width={Math.max(iw * 0.8, 1.3 / zoom)} taper={false} vary={0} seed={`s9h/fi${k}/${i}`} /> : null}
+          {stairs && g.shrubs ? <Fill d={g.shrubs} color={k <= 2 ? palette.teal : tint(palette.sage, k)} offset={false} mode="snap" seed={`s9h/sb${k}/${i}`} /> : null}
+          {stairs && iw > 0 && g.shrubInk ? <Ink d={g.shrubInk} width={iw * 0.8} taper={false} vary={0} seed={`s9h/sbi${k}/${i}`} /> : null}
         </React.Fragment>
       ))}
     </>
@@ -563,9 +565,9 @@ export const Hill: React.FC = () => {
   const ext = ROWS.slice(0, HAZE).map((_, k) => extendedAt(t, k));
   for (let k = HAZE - 1; k >= 1; k--) {
     if (reveal[k] <= 0) continue;
-    out.push(<React.Fragment key={`r${k}`}>{revealXf(reveal[k], ROWS[k].base, <RowNode k={k} zoom={zoom} extended={ext[k]} />)}</React.Fragment>);
+    out.push(<React.Fragment key={`r${k}`}>{revealXf(reveal[k], ROWS[k].base, <RowNode k={k} zoom={zoom} extended={ext[k]} stairs={k + 1 >= HAZE || reveal[k + 1] >= 1} />)}</React.Fragment>);
   }
-  out.push(<React.Fragment key="r0">{<RowNode k={0} zoom={zoom} extended />}</React.Fragment>);
+  out.push(<React.Fragment key="r0">{<RowNode k={0} zoom={zoom} extended stairs={false} />}</React.Fragment>);
   out.push(<NearLodRow0 key="n0" />);
   for (let k = HAZE - 1; k >= 0; k--) {
     if (reveal[k] <= 0) continue;

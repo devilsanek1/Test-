@@ -34,27 +34,39 @@ const ABS = {
   zzz: 16.76, //            w55+0.15 'before': a z floats up from sleeping Pip
   teamA: 16.775, //         w56-0.05 'researchers': team A pops up at the foot of the steps (0.10 s stagger)
   teamB: 17.125, //         w56+0.30: team B pops up (0.08 s stagger)
-  calendar: 17.435, //      w57 'using': the facade calendar tears to its summer page (AUG)
-  pigeon: 17.475, //        w57+0.04 'using': a pigeon in the audience's aisle hops
+  calendar: 17.335, //      w57-0.10 'using' (fix round 4: rule 5 lead, was ON the word): the facade calendar tears to its
+  //                        summer page, AUG lettered on it as 'using' is heard
+  pigeon: 17.375, //        w57-0.06 'using': a pigeon in the audience's aisle hops
   l5Out: 17.605, //         w57+0.17: the L5 annotation pops off
-  tablets: 17.645, //       w58-0.06 'AI': one tablet per team is raised (0.07 s apart), sparkles twinkle
+  tablets: 17.645, //       w58-0.06 'AI': one tablet per team is raised (0.07 s apart); each one's big ink sparkle pops
+  //                        above it (+0.02) on its stepped glow disc (+0.08)
+  twinkle: 17.77, //        w58+0.065 'AI' (fix round 4): team A's sparkle twinkles once on the highlight (B 0.07 s later)
   beams: 17.955, //         w58+0.25: two scan beams shoot out and sweep the banner from opposite sides
-  l6: 18.105, //            w58+0.40: L6 pops as a slip clipped to the banner's top margin
+  l6: 18.3, //              w59+0.105 'figured' (fix round 4: was w58+0.40-0.08 = 18.025, before the beams found
+  //                        anything): L6 pops as a slip clipped to the banner's top edge right after the beams converge
+  //                        on the lock, before the ring (18.475): the label follows the scan
   converge: 18.115, //      w59-0.08 'figured': both beams converge on the lock detail (narrow by ~figured+0.1)
-  look: 18.195, //          w59 'figured': two audience heads tilt up (1-frame pose swaps)
+  look: 18.115, //          w59-0.08 'figured' (fix round 4: rule 5 lead, was ON the word): two audience heads tilt up
+  //                        and team A's back-row member points at the lock (1-frame pose swaps)
   ring: 18.475, //          w60-0.06 'out': the ink target ring strokes on round the lock (0.17 s, closed ~18.645): found
   how: 18.705, //           w61 'how': the ring pulses once; the teams lean in (torso + head, about the hips)
   balloon: 18.79, //        w62-0.08 'bad': Bit's ink '!' balloon pops (readable ON the word)
   bad: 18.87, //            w62 'bad': ONE focal event: the S02 dashed hand (drawn from bad-0.10) is on the lock; Bit hops
   //                        out of the socket onto the lock box
-  turn: 18.97, //           w62+0.10: the hand turns the thumb-turn; the bolt slides all the way back (0.22 s)
-  door: 19.09, //           w62+0.22: the blueprint door's right leaf swings ajar (0.2 s): a dark gap opens. No key.
-  headTurn: 19.36, //       w64+0.035 'was.' (fix round 3: was 18.99, inside 'bad', the ONE focal event): one audience
-  //                        head turns to its neighbour (1-frame pose swap, foreground band) as the messenger breaks away
-  pipWake: 19.215, //       w63+0.05 'it': GAG: Pip jolts awake on the rail (trunk-up, wide); the leaf flicks off his ear
-  pull: 19.25, //           w64-0.075 'was.': the messenger raises the envelope to his right shoulder (S06's carry)
-  bitLeap: 19.29, //        w64-0.035: Bit leaps from the lock box onto the messenger's collar (0.24 s); the '!' pops off
+  turn: 18.92, //           w62+0.05: the hand (fully drawn on by now) turns the thumb-turn; the bolt slides all the way
+  //                        back (0.20 s; fix round 4: was 18.97 / 0.22 s, so the door can swing earlier and still follow
+  //                        the bolt)
+  door: 18.99, //           w62+0.12 (fix round 4: was 19.09): the blueprint door's right leaf swings ajar (0.2 s out-back,
+  //                        settled by ~19.19): a dark gap opens, done BEFORE the wake pop on 'it'. No key.
+  pipWake: 19.215, //       w63+0.05 'it': GAG: Pip jolts awake on the rail (trunk-up, wide); the leaf flicks off his ear.
+  //                        Fix round 4: ~0.09 s of clean air after it (nothing else starts until the envelope at 19.30)
+  pull: 19.3, //            w64-0.025 'was.' (fix round 4: was 19.25): the messenger raises the envelope to his right
+  //                        shoulder (S06's carry)
   was: 19.325, //           w64 'was.': the messenger pops into his run (3/4-back stride) and starts the dash right
+  bitLeap: 19.34, //        w64+0.015 (fix round 4: was 19.29): Bit leaps from the lock box onto the messenger's collar
+  //                        (0.24 s); the '!' pops off
+  headTurn: 19.45, //       w64+0.125 'was.' (fix round 4: was 19.36, after the run pop): one audience head turns to its
+  //                        neighbour (1-frame pose swap, foreground band) as the messenger breaks away
   envelope: 19.425, //      w64+0.10 'was.': the dashed hand retracts
   truck: 0, //              cut(was)-0.30: the camera trucks with him (0.30 s); Pip leaps off the rail to follow
   end: 0, //                cut(was): CUT ON ACTION into S06

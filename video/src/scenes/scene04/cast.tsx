@@ -20,7 +20,7 @@ import type {Expression, PoseName} from '../../lib/mascot';
 import {Bit, bitPath, hopY, landSquash} from '../shared/props';
 import {eyeLevel} from '../../lib/persp';
 import {SI, STOOP} from '../shared/sets';
-import {PIP_AT as S03_PIP_AT} from '../scene03/cast';
+import {PIP_AT as S03_PIP_AT, PIP_CUT_FLIP} from '../scene03/cast';
 import {CAM_LOCK as S03_CAM, toScreen as s03Screen} from '../scene03/camera';
 import type {Beats} from './beats';
 import {camMat, Cam, K_REST, toScreen, toWorld} from './camera';
@@ -50,18 +50,24 @@ type PipState = {x: number; y: number; squash: number; rotate: number; pose: Pos
 function pipState(t: number, b: Beats): PipState {
   const crouchFrom = b.pipCrouch; // S03 pops him to stand-side and crouches from cut(it)-0.12
   const air = b.this - b.pipTakeOff;
+  // fix round 2 (blocker: he flipped to face right on the cut and hopped backwards): S03 leaves him facing LEFT
+  // (PIP_CUT_FLIP, the contract) and his settle-hop travels left, so he faces left from the cut through the stand, the
+  // yawn and the drowsy nod into his (flipped) sleep: one facing for the whole scene. hop() already leans him along
+  // his travel (screen space); the drowsy nod is mirrored with him.
+  const flip = PIP_CUT_FLIP;
+  const fr = (r: number) => (flip ? -r : r);
   if (t < b.pipTakeOff) {
     // S03's crouch, continued exactly (same curve as S03's PipS03), plus the stand-side pop's settle
     const sq = 0.2 * Math.sin((Math.min(1, (t - crouchFrom) / 0.14) * Math.PI) / 2) + popSwitch(t, crouchFrom);
-    return {x: PIP_FROM[0], y: PIP_FROM[1], squash: sq, rotate: 0, pose: 'stand-side', amount: 0};
+    return {x: PIP_FROM[0], y: PIP_FROM[1], squash: sq, rotate: 0, pose: 'stand-side', amount: 0, flip};
   }
   // from S03's spot (already over step 2) a small settle-hop onto the tread
   const h = hop({t, t0: b.pipTakeOff, dur: air, from: {x: PIP_FROM[0], y: PIP_FROM[1]}, to: {x: PIP_AT[0], y: PIP_AT[1]}, height: 18});
-  const base = {x: h.x, y: h.y, rotate: h.rotate};
+  const base = {x: h.x, y: h.y, rotate: h.rotate, flip};
   // fix round: the yawn waits until 'was' (it fired on 'bug' beside the lock: 150 px of the brightest colour stole the
   // beat from Bit). Until then he stands settled on the step (landing squash, then the pose's idle breathing).
   const yawnAt = b.yawn;
-  const drowsyAt = b.yawn + 0.33;
+  const drowsyAt = b.drowsy;
   if (t < yawnAt) return {...base, squash: h.squash + popSwitch(t, yawnAt), pose: 'stand-side', amount: h.spread};
   if (t < drowsyAt) {
     // the yawn: trunk up, eyes shut, a long stretch (mouth open)
@@ -71,9 +77,9 @@ function pipState(t: number, b: Beats): PipState {
   if (t < b.sleep) {
     // drowsy: heavy lids, one slow nod
     const u = clamp((t - drowsyAt) / (b.sleep - drowsyAt));
-    return {...base, squash: popSwitch(t, drowsyAt) + popSwitch(t, b.sleep) + 0.04 * Math.sin(Math.PI * u), rotate: 4 * Math.sin(Math.PI * u), pose: 'sit-front', expression: 'meh'};
+    return {...base, squash: popSwitch(t, drowsyAt) + popSwitch(t, b.sleep) + 0.04 * Math.sin(Math.PI * u), rotate: fr(4 * Math.sin(Math.PI * u)), pose: 'sit-front', expression: 'meh'};
   }
-  // asleep (curls up on 'for', turning to face left); breathing is the pose's own idle
+  // asleep (curls up on 'for', still facing left); breathing is the pose's own idle
   return {...base, squash: popSwitch(t, b.sleep), rotate: 0, pose: 'sleep', flip: true};
 }
 
@@ -147,14 +153,14 @@ export const BitS04: React.FC<{b: Beats}> = ({b}) => {
 /** The 'bug' spot behind lock4 (draw it BEFORE the lock): a peach disc pops (20 % -> 100 %, pop spring) while a full
  *  ink ring (2.3 world = 3.4 px, the mid weight) draws on around it in 0.12 s with five glint ticks; held, then popped
  *  off (one frame at 85 %, then gone; no fade). ~90 px across on screen. */
-export const BugSpot: React.FC<{at: number; off: number; word: number}> = ({at, off, word}) => {
+export const BugSpot: React.FC<{at: number; off: number; word: number; k?: number}> = ({at, off, word, k: size = 1}) => {
   const t = useTime();
   if (t < at || t >= off) return null;
   const [cx, cy] = SPOT.c;
   const last = off - t < 1 / 30 + 1e-6;
   // ON the word (Bit at his apex) the spot pings once: the disc swells 12 % and the ticks flash 50 % longer (0.16 s)
   const ping = t >= word && t < word + 0.16 ? Math.sin((Math.PI * (t - word)) / 0.16) : 0;
-  const k = last ? 0.85 : (0.2 + 0.8 * springAt(t, at, springs.pop)) * (1 + 0.12 * ping);
+  const k = size * (last ? 0.85 : (0.2 + 0.8 * springAt(t, at, springs.pop)) * (1 + 0.12 * ping));
   const r = SPOT.r;
   const ring = `M${(cx + r).toFixed(1)} ${cy}A${r} ${r} 0 1 0 ${(cx - r).toFixed(1)} ${cy}A${r} ${r} 0 1 0 ${(cx + r).toFixed(1)} ${cy}`;
   let ticks = '';

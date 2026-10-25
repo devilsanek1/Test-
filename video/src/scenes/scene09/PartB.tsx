@@ -238,11 +238,14 @@ type PipShot = {x: number; y: number; scale: number; pose: PoseName; squash: num
 /** The boarding (fix round 2b): the sigh, then a crouch, then the take-off ~0.04 s before the tram's nose enters, so the
  *  ~880 px rise to the roof spans 8 frames (<= ~150 px/frame, a stretched leap on the fastest frames) and he is above the
  *  roof line before the nose reaches his x (~5.11 s); he lands on the roof at boardLand (the Wiper's hand-over). */
-const SIGH_AT = B.sigh - 0.19;
+const SIGH_AT = B.sigh - 0.27;
 const CROUCH_AT = B.board - 0.25;
 const TAKEOFF = B.board - 0.15;
-const APEX_AT = B.boardLand - 0.05;
+/** His feet reach the roof line just before the nose passes his x (f154): the apex IS the roof (8 px over it), so his
+ *  head never rises higher than it rides on the tram. */
+const APEX_AT = B.boardLand - 0.04;
 const ROOF_Y = 602;
+const APEX_Y = ROOF_Y - 8;
 
 function pipShot(t: number): PipShot | null {
   const t0 = B.install;
@@ -260,12 +263,12 @@ function pipShot(t: number): PipShot | null {
     if (t < APEX_AT) {
       const k = (t - TAKEOFF) / (APEX_AT - TAKEOFF);
       const f = 1 - Math.pow(1 - k, 1.35);
-      const y = lerp(to.y, ROOF_Y - 10, f);
+      const y = lerp(to.y, APEX_Y, f);
       const squash = k < 0.55 ? -0.3 * (1 - k / 0.55) - 0.05 : -0.05;
       return {x: to.x, y, scale: NEAR.pip.scale, pose: 'stand-side', amount: Math.sqrt(Math.min(1, k * 1.4)), squash, look: -0.4, rotate: 0, lw: 1};
     }
     const k = (t - APEX_AT) / (B.boardLand - APEX_AT);
-    return {x: to.x, y: lerp(ROOF_Y - 10, ROOF_Y, k * k), scale: NEAR.pip.scale, pose: 'stand-side', amount: 1, squash: -0.04, look: -0.4, rotate: 0, lw: 1};
+    return {x: to.x, y: lerp(APEX_Y, ROOF_Y, k * k), scale: NEAR.pip.scale, pose: 'stand-side', amount: 1, squash: -0.04, look: -0.4, rotate: 0, lw: 1};
   }
   const st0 = pipA(t0);
   const c0 = camAt(t0);
@@ -276,7 +279,7 @@ function pipShot(t: number): PipShot | null {
   const e = E.inOutSine(k);
   if (h.k < 1) return {x: h.x, y: h.y, scale: lerp(s0, NEAR.pip.scale, e), pose: 'stand-side', amount: h.spread, squash: h.squash, rotate: h.rotate, lw: lerp(0.25 * c0.zoom, 1, e)};
   // on the pier, watching the hill; the sigh (a slow sit-back squash pulse) before the boarding crouch
-  const sigh = t >= SIGH_AT ? 0.09 * Math.sin(Math.min(1, (t - SIGH_AT) / 0.2) * Math.PI) : 0;
+  const sigh = t >= SIGH_AT ? 0.09 * Math.sin(Math.min(1, (t - SIGH_AT) / 0.18) * Math.PI) : 0;
   // he looks up the hill at the flag on 'single', then along the rows of empty tags on 'server'
   const look = t < B.single + 0.1 ? -0.25 : t < B.server + 0.18 ? -0.7 : 0.45;
   const turn = popSwitch(t, B.single + 0.1) * 0.6 + popSwitch(t, B.server + 0.18) * 0.6;

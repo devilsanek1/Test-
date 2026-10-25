@@ -7,22 +7,26 @@
 //    rises;
 //  - each toss is thrown from a RAISED arm (FigureArm, the tag in the hand, released above his head): the LEFT arm flicks
 //    a short lob back-left onto siteL's plaque (tick on 'officially'), then the RIGHT arm, raised straight up, lobs the
-//    second tag high OVER siteM's old plaque (a steep launch, clear of its corner, apex ~75 px above its top, dashed trail)
-//    onto siteR's (tick on 'supported'); the lob runs at an even ~33 px / frame along its path;
+//    second tag high OVER siteM's old plaque (a steep launch, clear of Bit and the plate, apex ~115 px above its top,
+//    dashed trail) onto siteR's (tick on 'supported'); the lob runs at an even ~34 px / frame along its path;
 //  - he stays parked through Pip's 'hey!' and rolls out right on 'anymore' (sine ramp to 500 px/s: <= 18 px / frame).
 // S09's 'still fixing... / fixed!' card (the shared FixSign, the SAME object as S06 / S07 / S09) is pinned flat on a short
 // post in the bed, under siteM's plaque with clear wall above it (Pip's spark sits there). The satchel of tags rides on
 // the bed's back end.
 
-import React from 'react';
+import React, {useId} from 'react';
 import {palette} from '../../lib/theme';
 import {useTime, prog, ease as E} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import type {Pt} from '../../lib/sketch';
-import {FIG_H, FigureArm, FixSign, Maker, MakersCart, SI, SupportTag} from './kit';
+import {FIG_H, FigureArm, FixSign, Maker, MakersCart, OLD_QUARTER, SI, SupportTag} from './kit';
 import {mat, XG} from '../../lib/xf';
 import {Satchel} from './shims';
 import {tagBodyOffset, TAG_W} from './plaques';
+import {aFrameCap, signBox} from './street';
+
+/** The A-frame's hinge cap (right end, top) in this scene's layout. */
+const CAP = aFrameCap(signBox(OLD_QUARTER.noticeSign));
 
 /** Cart line (wheel ground y), bed length, the park spot (cart centre), the walk-out from behind the A-frame (start x,
  *  cruise speed, braking time), the roll-out. */
@@ -72,7 +76,7 @@ export function cartX(t: number, T: CartTimes): number {
  *  arm goes straight UP (the hand over his head) for the high lob, so the tag leaves well left of siteM's plaque. */
 const SHOULDER = (side: number): Pt => [side * 32, -76];
 const HAND_DOWN = (side: number): Pt => [side * 38, -8];
-const HAND_UP = (side: number): Pt => (side < 0 ? [-58, -152] : [12, -162]);
+const HAND_UP = (side: number): Pt => (side < 0 ? [-58, -152] : [-6, -164]);
 const RAISE = 0.1;
 const HOLD = 0.07;
 const LOWER = 0.12;
@@ -104,8 +108,8 @@ function tossPos(t: number, t0: number, t1: number, a: Pt, b: Pt, h: number): {p
 /** The high lob as a cubic Bezier (steep launch from the raised hand, apex over siteM's plaque, a falling approach onto
  *  siteR's), walked at an even speed (arc-length table): `at(s)` for s = 0..1 of the path length. */
 function lobPath(a: Pt, b: Pt): (s: number) => Pt {
-  const c1: Pt = [a[0] + 8, a[1] - LOB.rise];
-  const c2: Pt = [b[0] - 50, b[1] - LOB.fall];
+  const c1: Pt = [a[0] - 10, a[1] - LOB.rise];
+  const c2: Pt = [b[0] - 51, b[1] - LOB.fall];
   const bz = (u: number): Pt => {
     const v = 1 - u;
     const k0 = v * v * v;
@@ -133,8 +137,10 @@ function lobPath(a: Pt, b: Pt): (s: number) => Pt {
     return bz(us[i - 1] + (us[i] - us[i - 1]) * f);
   };
 }
-/** The high lob's Bezier handles: up from the hand, down into siteR's plaque (apex ~1030, siteM's plaque top 1104). */
-export const LOB = {rise: 205, fall: 190};
+/** The high lob's Bezier handles: straight up from the hand over his head (x 475), over siteM's plaque, down into
+ *  siteR's. Measured on the path (tag body 42 x 34): >= 6 px clear of Bit (dangling off the plaque's top-left), >= 21 px
+ *  clear of the plaque face, apex 989 (115 px above its top); 513 px long = 34 px / frame over the 0.5 s flight. */
+export const LOB = {rise: 307, fall: 190};
 
 export type CartProps = {
   T: CartTimes;
@@ -179,6 +185,7 @@ const ThrowArms: React.FC<{T: CartTimes; xm: number}> = ({T, xm}) => {
  *  the stoops and the hanging plaques and before the A-frame (it walks out from behind the board). */
 export const Cart: React.FC<{T: CartTimes}> = ({T}) => {
   const t = useTime();
+  const clipId = 's10cartclip' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const t0 = cartGoAt(T.parkAt);
   if (t < t0) return null;
   const x = cartX(t, T);
@@ -195,9 +202,24 @@ export const Cart: React.FC<{T: CartTimes}> = ({T}) => {
       : {at: T.rollAt, to: [x1, CART.y] as Pt, dur: tEnd - T.rollAt, ease: (q: number) => (cartX(T.rollAt + q * (tEnd - T.rollAt), T) - x0) / (x1 - x0)};
   const moving = t < T.parkAt - 0.04 || t >= T.rollAt + 0.06;
   const sign = <FixSign x={0} y={0} fs={21} w={114} string={false} rot={-2} strikeAt={-10} fixedAt={-10} ink={2.2} seed="s10/csign" />;
+  // while he walks behind the A-frame, his bun would glide along the board's top as a dark knob: clip him to the right
+  // of the board's hinge cap above its top (the board itself hides the rest)
+  const hide = xm - 30 < CAP.right;
+  const maker = <Maker x={xm} y={CART.y} h={MAKER_H} walk={moving ? {at: t < T.rollAt ? t0 : T.rollAt, hz: 2.3} : undefined} seed="s9cart/maker" />;
   return (
     <>
-      <Maker x={xm} y={CART.y} h={MAKER_H} walk={moving ? {at: t < T.rollAt ? t0 : T.rollAt, hz: 2.3} : undefined} seed="s10/cart/maker" />
+      {hide ? (
+        <>
+          <defs>
+            <clipPath id={clipId}>
+              <path d={`M-2000 -2000H4000V4000H-2000ZM-2000 -2000V${CAP.top + 14}H${CAP.right}V-2000Z`} clipRule="evenodd" />
+            </clipPath>
+          </defs>
+          <g clipPath={`url(#${clipId})`}>{maker}</g>
+        </>
+      ) : (
+        maker
+      )}
       <MakersCart x={x0} y={CART.y} size={CART.size} crates={0} roll={roll} sign={sign} signPost={CART_SIGN.post} signX={CART_SIGN.x} seed="s10/cart" />
       <Satchel x={x - 34 * CS * 1.4} y={CART.y - 60 * CS} w={24} pullAt={[T.toss1 - RAISE, T.toss2 - RAISE]} pullDur={0.06} seed="s10/satchel" />
       <ThrowArms T={T} xm={xm} />

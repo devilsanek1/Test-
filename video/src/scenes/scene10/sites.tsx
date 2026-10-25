@@ -12,7 +12,7 @@ import {captionFontStack, useCaptionFont} from '../../lib/font';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {crown, line, polyPath, Pt, rect, rectPath, roundRect} from '../../lib/sketch';
-import {BrowserChrome, OLD_QUARTER, PopUp, SI, SiteFacade} from './kit';
+import {BrowserChrome, OLD_QUARTER, PopUp, SI, SiteFacade, siteFacadeLayout} from './kit';
 import {HangPlaque, HangPlaqueProps} from './plaques';
 
 type SiteId = 'L' | 'M' | 'R';
@@ -275,6 +275,56 @@ export const Sites: React.FC<SitesProps> = ({popAt, updateAt, wobbleAt}) => {
     </>
   );
 };
+
+/** The near row as LINE ART first (fix round 2b): under the tram wipe, from 'Plus', the three facades draw on as thin
+ *  construction lines (edges overshooting the top, cornice and base lines, storey ticks, door, browser window and
+ *  roof outlines, each site 0.06 s after the last, as the wipe uncovers it); on 'something' the filled sites pop up
+ *  INTO their outlines (scaleY from the base) and cover them; only the overshoots stay, like the reference's pen
+ *  construction. Drawn behind the Sites, in the 'sites' layer. */
+const SKETCH = (() => {
+  const s = 's10sk';
+  const out: Record<SiteId, string> = {L: '', M: '', R: ''};
+  const B = OLD_QUARTER.base;
+  for (const id of IDS) {
+    const c = S[id];
+    const x0 = c.x;
+    const x1 = c.x + c.w;
+    const top = c.top;
+    const sh = (B - top) / c.storeys;
+    let d = line(x0, B + 6, x0, top - 9, {seed: `${s}/${id}l`, over: 0, breaks: false}) + line(x1, B + 6, x1, top - 9, {seed: `${s}/${id}r`, over: 0, breaks: false});
+    d += line(x0 - 11, top, x1 + 11, top, {seed: `${s}/${id}t`, over: 0, breaks: false}) + line(x0 - 14, B, x1 + 14, B, {seed: `${s}/${id}b`, over: 0, breaks: false});
+    for (let k = 1; k < c.storeys; k++) {
+      const y = B - k * sh;
+      d += `M${x0 + 2} ${y.toFixed(1)}h14M${x1 - 2} ${y.toFixed(1)}h-14`;
+    }
+    // the window grid as open pen boxes (the same layout SiteFacade fills, so the pop lands on them)
+    const lay = siteFacadeLayout({x: c.x, y: B, w: c.w, storeys: c.storeys, storeyH: sh, browser: c.browser, door: c.door, plaque: false, cols: c.w > 300 ? 3 : 2});
+    lay.windows.forEach((r, k) => {
+      d += rect(r[0], r[1], r[2], r[3], {seed: `${s}/${id}win${k}`, over: 1.5, edges: k % 2 ? 'tlb' : 'tlr'});
+    });
+    const [dx, dy, dw, dh] = c.door;
+    d += rect(dx, dy, dw, dh, {seed: `${s}/${id}d`, over: 1, edges: 'tlr'});
+    if (c.browser) {
+      const [bx, by, bw, bh] = c.browser;
+      d += rect(bx, by, bw, bh, {seed: `${s}/${id}w`, over: 2});
+    }
+    out[id] = d;
+  }
+  const M = OLD_QUARTER.roofs.mansard;
+  out.L += line(M.x0 - 4, M.base + 3, M.x0 + M.inset, M.top, {seed: `${s}/ml`, over: [0, 4], breaks: false}) + line(M.x0 + M.inset - 6, M.top, M.x1 - M.inset + 6, M.top, {seed: `${s}/mt`, over: 0, breaks: false}) + line(M.x1 - M.inset, M.top, M.x1 + 4, M.base + 3, {seed: `${s}/mr`, over: [4, 0], breaks: false});
+  out.M += rect(368, 798, 16, 22, {seed: `${s}/ch`, over: 2, edges: 'tlr'});
+  const T = OLD_QUARTER.roofs.tank;
+  out.R += rect(T.x - T.w / 2, T.y, T.w, T.h, {seed: `${s}/tk`, over: 2}) + `M${T.x - T.w / 2 + 6} ${T.y + T.h}L${T.x - T.w / 2 + 2} ${T.legs}M${T.x + T.w / 2 - 6} ${T.y + T.h}L${T.x + T.w / 2 - 2} ${T.legs}`;
+  return out;
+})();
+
+export const SiteSketch: React.FC<{at: [number, number, number]; dur?: number}> = ({at, dur = 0.26}) => (
+  <>
+    {IDS.map((id, i) => (
+      <Ink key={id} d={SKETCH[id]} at={at[i]} dur={dur} order="all" width={SI.hair * 1.2} taper={false} seed={`s10sk/${id}`} />
+    ))}
+  </>
+);
 
 /** The three stoops, popping with their sites. Drawn IN FRONT of the cart line (Scene10's 'sign' layer): the cart rolls
  *  just behind the stoops' front edge, so its wheels and the maker's feet pass behind them (and clear of Pip's ears). */

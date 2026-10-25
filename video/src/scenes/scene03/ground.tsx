@@ -21,6 +21,8 @@ import {arrow, circle, line, polyPath, rect, Pt} from '../../lib/sketch';
 import {rng} from '../../lib/rng';
 import {captionFontStack, useCaptionFont} from '../../lib/font';
 import {BLUEPRINT, SI} from '../shared/sets';
+import {STAMP} from './stamp';
+import {CARD_BOX} from './card';
 
 const G = (() => {
   const s = 'bps';
@@ -92,9 +94,18 @@ const G = (() => {
   return {sheet, dogEar, edgeInk, margin, gridNear, gridMid, gridFar, dims: dimL + dimR};
 })();
 
+/** Fix round 3 (finding: the cream card on the cream plan, with the grid and the frame band running into its border,
+ *  read as text printed on the floor): the plan is KNOCKED OUT round the card (CARD_BOX + 14 px: no grid, margin,
+ *  kerb dimension or frame-band line enters it) and the title block's frame is ONE hairline rect at that knock-out's
+ *  edge (was two rects at 8 / 16 px round the set's box), so the white card with its tan offset sits in a clean field. */
+const KO = 14;
+const KNOCK = (() => {
+  const [x0, y0, x1, y1] = CARD_BOX;
+  return `M-3000 -3000H4000V6000H-3000Z M${x0 - KO} ${y0 - KO}V${y1 + KO}H${x1 + KO}V${y0 - KO}Z`;
+})();
 const TB_FRAME = (() => {
-  const [x0, y0, x1, y1] = BLUEPRINT.titleBlock;
-  return rect(x0 - 8, y0 - 8, x1 - x0 + 16, y1 - y0 + 16, {seed: 'bp/tbf1', over: 'small'}) + rect(x0 - 16, y0 - 16, x1 - x0 + 32, y1 - y0 + 32, {seed: 'bp/tbf2', over: 'small'});
+  const [x0, y0, x1, y1] = CARD_BOX;
+  return rect(x0 - KO, y0 - KO, x1 - x0 + 2 * KO, y1 - y0 + 2 * KO, {seed: 'bp/tbf2', over: 'small'});
 })();
 
 // ---------------------------------------------------------------- plan furniture (S03's own, static from the cut)
@@ -113,7 +124,7 @@ function scribble(x: number, y: number, w: number, seed: string): string {
   return d;
 }
 
-const S = BLUEPRINT.stamp; // (330, 1400) rx 160 ry 60
+const S = STAMP; // S03's stamp spot (stamp.tsx): (308, 1400) rx 160 ry 60
 const regMark = (x: number, y: number, seed: string) => circle(x, y, 8, {seed}) + `M${x - 14} ${y}L${x + 14} ${y}M${x} ${y - 14}L${x} ${y + 14}`;
 
 const FURNITURE = (() => {
@@ -151,6 +162,19 @@ const FURNITURE = (() => {
   return {reg, dim, yd, north, needle, NA, notes, foot, fx, fy, fw, fh};
 })();
 
+/** Clips its children OUT of the card's knock-out (CARD_BOX + 14 px): the plan's lines stop short of the card. Use it
+ *  for every plan line that crosses the card's spot (the grid, margin, kerb dimensions, sheet edge, the frame band). */
+export const CardKnock: React.FC<{children: React.ReactNode}> = ({children}) => (
+  <>
+    <defs>
+      <clipPath id="s03knock" clipPathUnits="userSpaceOnUse">
+        <path d={KNOCK} clipRule="evenodd" />
+      </clipPath>
+    </defs>
+    <g clipPath="url(#s03knock)">{children}</g>
+  </>
+);
+
 /** The near grid's draw-on: three depth bands, far -> near, 0.03 s apart, each drawing in 0.09 s (all its strokes
  *  together): gridAt 8.445 -> done at 8.595, on 'It's' (8.605). */
 const NEAR_STAGGER = 0.03;
@@ -171,14 +195,16 @@ export const GroundS03: React.FC<{gridAt: number; streetAt?: number; seed?: stri
       {streetAt === undefined || t >= streetAt ? <Fill rect={[-160, 1180, 1400, 900]} color={palette.sand} offset={false} mode="snap" seed={`${seed}/street`} /> : null}
       <Fill d={G.sheet} color={palette.cream} offset={false} mode="snap" seed={`${seed}/sheet`} />
       <Fill d={G.dogEar} color={palette.white} offset={false} mode="snap" seed={`${seed}/ear`} />
-      <Ink d={G.edgeInk} width={SI.far} taper={false} seed={`${seed}/edge`} />
-      <Ink d={G.margin} width={SI.hair * 0.8} taper={false} seed={`${seed}/margin`} />
-      <Ink d={G.gridFar} width={SI.hair} taper={false} seed={`${seed}/gF`} />
-      <Ink d={G.gridMid} width={1.9} taper={false} seed={`${seed}/gM`} />
-      {nearOn
-        ? G.gridNear.map((d, i) => <Ink key={i} d={d} width={SI.far} at={gridAt + i * NEAR_STAGGER} dur={NEAR_DUR} pace="free" order="all" taper={false} seed={`${seed}/gN${i}`} />)
-        : null}
-      <Ink d={G.dims} width={SI.far} taper={false} seed={`${seed}/dim`} />
+      <CardKnock>
+        <Ink d={G.edgeInk} width={SI.far} taper={false} seed={`${seed}/edge`} />
+        <Ink d={G.margin} width={SI.hair * 0.8} taper={false} seed={`${seed}/margin`} />
+        <Ink d={G.gridFar} width={SI.hair} taper={false} seed={`${seed}/gF`} />
+        <Ink d={G.gridMid} width={1.9} taper={false} seed={`${seed}/gM`} />
+        {nearOn
+          ? G.gridNear.map((d, i) => <Ink key={i} d={d} width={SI.far} at={gridAt + i * NEAR_STAGGER} dur={NEAR_DUR} pace="free" order="all" taper={false} seed={`${seed}/gN${i}`} />)
+          : null}
+        <Ink d={G.dims} width={SI.far} taper={false} seed={`${seed}/dim`} />
+      </CardKnock>
       <Ink d={TB_FRAME} width={SI.hair} taper={false} seed={`${seed}/tb3`} />
       {/* plan furniture */}
       <Ink d={F.reg + F.dim + F.north + F.foot} width={1.6} taper={false} seed="s03/furn" />

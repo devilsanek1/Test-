@@ -34,6 +34,13 @@ their scenes, so none of this is done mid-flight; each item names the scenes it 
 
 ## Scenes still under 8/10 after their fix rounds
 
+Polish-pass results (look / motion, last review; "+fix" = a final fix round ran after it, not yet re-reviewed):
+- S02 8 / 8.5 PASS. S01 8 / 9 PASS. S06 8.5 / 8 PASS.
+- S03 8 / 8.5 +fix (3 major findings went into fix r3). S05 8 / 8.5 +fix (1 major). S11 7.5 / 8.5 +fix (r3).
+- Still running at 03:25: S04, S07, S08, S09, S10, S12.
+The integration pass re-reviews every "+fix" scene and every scene under 8.
+
+
 The scene workflows stop after 3 review/fix rounds. Any scene whose lowest reviewer score is still under 8 gets a
 polish pass (same two reviewer lenses, plus a cross-scene continuity reviewer) before the final render. Scores at
 22:58, round 1 -> round 2: S01 art 7/7, motion 6.5/8 (one caption-legibility gate error in the dive); S11 art 7/7.5;

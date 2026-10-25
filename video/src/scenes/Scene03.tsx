@@ -23,13 +23,14 @@ import {Sun} from '../lib/Sun';
 import {mat, XG} from '../lib/xf';
 import {palette} from '../lib/theme';
 import {BlueprintStreet, BLUEPRINT, blueprintAnchors, PopUp, popUpK, SideId, BlueprintId, LayerWrap} from './shared/sets';
-import {LabelTag, Sticker, SunPie} from './shared/props';
+import {Sticker, SunPie} from './shared/props';
 import {beats, Beats, local, S03_START, W} from './scene03/beats';
 import {camAt, camMat} from './scene03/camera';
-import {AtticVent, BirdWire, CountPing, EdgeTree, FarPlain, Footprints, PressScreen, QuestionScribble, RoofSign, S03_BLANK, SheetFrame, SideOverlays, SideRows, VENT_HIDE, VentPatch, VentPuffs, VentS03} from './scene03/plan';
-import {GroundS03} from './scene03/ground';
+import {AtticVent, BirdWire, CountPing, EdgeTree, FarPlain, Footprints, PressElevation, PressScreen, QuestionScribble, RoofSign, S03_BLANK, SheetFrame, SideElevations, SideOverlays, SideRows, VENT_HIDE, VentPatch, VentPuffs, VentS03} from './scene03/plan';
+import {CardKnock, GroundS03} from './scene03/ground';
+import {TitleCard} from './scene03/card';
 import {StampS03} from './scene03/stamp';
-import {BitOnSign, NearWalkers, PipS03, PipShadow, StreetLife} from './scene03/cast';
+import {BitOnSign, FarCrowd, NearWalkers, PipS03, PipShadow, StreetLife} from './scene03/cast';
 
 // ---------------------------------------------------------------- labels (final_script section 6)
 
@@ -125,7 +126,9 @@ const Scene03: React.FC = () => {
       // stray `tb` box); the set's ground node is not used
       <XG m={mat.translate(0, jolt)}>
         <GroundS03 gridAt={b.grid} streetAt={T.pressAt} />
-        <SheetFrame />
+        <CardKnock>
+          <SheetFrame />
+        </CardKnock>
         <Footprints tickAt={T.lotTick} />
         <PipShadow b={b} />
         <StampS03 slamAt={b.stamp} />
@@ -135,6 +138,9 @@ const Scene03: React.FC = () => {
       <>
         {/* the set's roof vent (its cap poked into the sun's lower-left edge) is clipped out; S03's vent sits on the
             left slope (VentS03) and VentPatch redraws the roof band where the old one was */}
+        {/* fix round 3: the gable's hairline construction elevation, drawn up from its footprint from the cut; the house
+            pops up over it at 1.07 s */}
+        <PressElevation pressAt={T.pressAt} />
         <g clipPath="url(#s03pressClip)">{node}</g>
         <defs>
           <clipPath id="s03pressClip" clipPathUnits="userSpaceOnUse">
@@ -165,6 +171,8 @@ const Scene03: React.FC = () => {
       return (
         <>
           {sunFront ? null : sun}
+          {/* fix round 3: the first two bays of each row as hairline construction elevations from the cut */}
+          <SideElevations popAt={T.popAt} />
           {/* the bleed slivers (beyond the frame edges) stand from frame 0: keep their ink overshoot out of the frame
               until the near buildings pop up over them */}
           {t < T.popAt.L1 ? <g clipPath="url(#s03sidesClip)">{rows}</g> : rows}
@@ -182,6 +190,7 @@ const Scene03: React.FC = () => {
     }
     if (name === 'people') return (
       <>
+        <FarCrowd b={b} />
         <StreetLife b={b} />
         <PipS03 b={b} />
         <NearWalkers b={b} />
@@ -200,7 +209,7 @@ const Scene03: React.FC = () => {
           stampAt={false}
           sign={false}
           people={false}
-          titleBlock={(box) => <LabelTag kind="card" box={box} text={L3} fontSize={38 / 1.04} at={b.L3} flipTo={{at: b.flip, text: L4, fontSize: 36 / 1.04}} seed="s03/card" />}
+          titleBlock={() => <TitleCard text={L3} fontSize={38 / 1.04} at={b.L3} flipTo={{at: b.flip, text: L4, fontSize: 36 / 1.04}} />}
           wrap={wrap}
           seed="bp"
         />

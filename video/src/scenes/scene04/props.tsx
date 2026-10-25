@@ -20,10 +20,12 @@ import {SI, STOOP} from '../shared/sets';
 
 export const SEASON_FILL: Record<Season, string | null> = {green: palette.sage, peach: palette.peach, tan: palette.tan, bare: null};
 
-/** The season keys: green until the time-lapse, then one step every two tears (tears 2, 4, ... 12: peach, tan, bare,
- *  green, peach, tan): fourteen years end in autumn (tan), the leaf's season. */
+/** The season keys: green until the time-lapse, then one step every two tears (tears 2, 4, ... 10: tan, bare, green,
+ *  tan, bare; fix round 2: the last tan leaf lets go one frame after the vine turns tan on tear 8 (index 7) and the vine
+ *  goes bare on tear 10 while it falls: the leaf never falls through green or peach ivy). Two years of autumn -> winter
+ *  -> spring; it stays bare (the last leaf is on Pip) to the cut. */
 export function seasonKeys(tears: number[]): {t: number; s: Season}[] {
-  const order: Season[] = ['peach', 'tan', 'bare', 'green', 'peach', 'tan'];
+  const order: Season[] = ['tan', 'bare', 'green', 'tan', 'bare'];
   return [{t: -10, s: 'green'}, ...order.map((s, i) => ({t: tears[i * 2 + 1], s}))];
 }
 
@@ -278,7 +280,7 @@ const WIN_ORDER = [3, 0, 4, 1, 2, 0, 3];
 
 /** The hero house's windows live through the fourteen years: on every other tear one window changes (a blind comes
  *  down, curtains are drawn, a plant appears on the sill, or it is bare again), one-frame pops like a time-lapse. */
-export const WindowLife: React.FC<{tears: number[]; seed?: string}> = ({tears, seed = 's4win'}) => {
+export const WindowLife: React.FC<{tears: number[]; flatAbove?: number; seed?: string}> = ({tears, flatAbove, seed = 's4win'}) => {
   const t = useTime();
   const state = [...WIN_START];
   WIN_ORDER.forEach((w, k) => {
@@ -286,6 +288,7 @@ export const WindowLife: React.FC<{tears: number[]; seed?: string}> = ({tears, s
     if (at !== undefined && t >= at) state[w] = WIN_CYCLE[(WIN_CYCLE.indexOf(state[w]) + 1 + (k % 2)) % WIN_CYCLE.length];
   });
   let peach = '';
+  let blindSand = '';
   let cream = '';
   let tan = '';
   let sage = '';
@@ -294,7 +297,10 @@ export const WindowLife: React.FC<{tears: number[]; seed?: string}> = ({tears, s
     const s = state[i];
     if (s === 'blind') {
       const bh = h * (0.38 + rand(seed, `b${i}`) * 0.14);
-      peach += rectPath(x + 2, y + 2, w - 4, bh);
+      // fix round 2: in the dive the windows above the flatten line slide up through the caption band, where peach
+      // belongs only to the caption highlight: their blinds repaint sand with the flatten (one unit, its first frame)
+      if (flatAbove !== undefined && y < flatAbove) blindSand += rectPath(x + 2, y + 2, w - 4, bh);
+      else peach += rectPath(x + 2, y + 2, w - 4, bh);
       ink += `M${x + 1} ${(y + bh + 2).toFixed(1)}H${x + w - 1}M${x + w / 2} ${y + 2}V${(y + bh + 2).toFixed(1)}M${(x + w * 0.72).toFixed(1)} ${(y + bh + 2).toFixed(1)}v8`;
     } else if (s === 'curtain') {
       const a = w * 0.3;
@@ -314,6 +320,7 @@ export const WindowLife: React.FC<{tears: number[]; seed?: string}> = ({tears, s
   return (
     <>
       {peach ? <Fill d={peach} color={palette.peach} offset={false} mode="none" seed={`${seed}/p`} /> : null}
+      {blindSand ? <Fill d={blindSand} color={palette.sand} offset={false} mode="none" seed={`${seed}/p`} /> : null}
       {cream ? <Fill d={cream} color={palette.cream} offset={false} mode="none" seed={`${seed}/c`} /> : null}
       {tan ? <Fill d={tan} color={palette.tan} offset={false} mode="none" seed={`${seed}/t`} /> : null}
       {sage ? <Fill d={sage} color={palette.sage} offset={false} mode="none" seed={`${seed}/s`} /> : null}
@@ -434,9 +441,12 @@ export const SplitInk: React.FC<{y: number; x0?: number; node: React.ReactNode}>
 /** During the dive the hero's browser window is flat with the rest of the upper facade, and its chrome bar crosses the
  *  captions: the kit's tealDark bar under ink lettering is ~2.4:1 (framecheck: 8 % of the band below 3:1), so in the
  *  dive the bar is repainted one step lighter (teal, ~3.6:1) with its three dots and the address pill on top: still the
- *  browser's chrome (the 'this is a website' cue never disappears), legible under the text. Geometry = BrowserChrome's
- *  (bar min(30, 0.27 h), dots r 0.25 bar at 0.47 bar + i x 0.63 bar, the pill after them). Draw it in the hero slot
- *  from the dive's first frame: it only shows in the flat copy (above the flatten line). */
+ *  browser's chrome (the 'this is a website' cue never disappears), legible under the text. Fix round 2 (major: the
+ *  peach headline block slid in behind 'like' / 'bug was in there' and read as a second, misplaced highlight box): the
+ *  page under the bar is ONE cream field (inside the caption band peach belongs only to the caption highlight), and the
+ *  third dot is sand, not peach. Geometry = BrowserChrome's (bar min(30, 0.27 h), dots r 0.25 bar at 0.47 bar + i x
+ *  0.63 bar, the pill after them). Draw it in the hero slot from the dive's first frame: it only shows in the flat copy
+ *  (above the flatten line). */
 export const FlatChrome: React.FC<{on: boolean}> = ({on}) => {
   if (!on) return null;
   const [x, y, w, h] = STOOP.browser;
@@ -452,10 +462,11 @@ export const FlatChrome: React.FC<{on: boolean}> = ({on}) => {
   const pill = `M${x + px + ph / 2} ${cy - ph / 2}H${x + px + pw - ph / 2}a${ph / 2} ${ph / 2} 0 0 1 0 ${ph}H${x + px + ph / 2}a${ph / 2} ${ph / 2} 0 0 1 0 ${-ph}Z`;
   return (
     <>
+      <Fill d={rectPath(x - 4, y + bar - 1, w + 8, h - bar + 5)} color={palette.cream} offset={false} mode="none" seed="s4/fcs" />
       <Fill d={rectPath(x - 3, y - 3, w + 6, bar + 4)} color={palette.teal} offset={false} mode="none" seed="s4/fc" />
       <Fill d={dot(0)} color={palette.cream} offset={false} mode="none" seed="s4/fc0" />
       <Fill d={dot(1)} color={palette.sage} offset={false} mode="none" seed="s4/fc1" />
-      <Fill d={dot(2)} color={palette.peach} offset={false} mode="none" seed="s4/fc2" />
+      <Fill d={dot(2)} color={palette.sand} offset={false} mode="none" seed="s4/fc2" />
       <Fill d={pill} color={palette.cream} offset={false} mode="none" seed="s4/fcp" />
     </>
   );

@@ -7,13 +7,13 @@ import {palette} from '../../lib/theme';
 import {clamp, ease as E, lerp, prog, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {blob} from '../../lib/sketch';
+import {blob, speedLines} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import {ElephantTimeline, PoseKey, popSwitch, poseAt} from '../../lib/mascot';
 import {BLUEPRINT, popUpK} from '../shared/sets';
 import {Bit, Citizen, EdgeOnlooker} from '../shared/props';
 import type {Acc, Hair} from '../../lib/kit';
-import {beats, type Beats} from './beats';
+import {beats, S03_START, W, type Beats} from './beats';
 import {CAM_REST} from './camera';
 import {ROOF_SIGN, signAngle} from './plan';
 import type {Pt} from '../../lib/sketch';
@@ -21,21 +21,39 @@ import type {Pt} from '../../lib/sketch';
 // ---------------------------------------------------------------- Pip
 
 const PIP_SCALE = 1.2;
-/** Where Pip is on the hard cut: S02 hops him off its rod perch (screen ~(843, 689)) toward the lens at
- *  cut(password)-0.04. Fix round 2: S03 picks him up HIGH, against the far haze above the horizon (world (830, 905) =
- *  screen (830, 915) at the rest camera, clear of the sun's disc; was (700, 1010), on the horizon line, where he read as
- *  a small elephant standing far away), already falling and dropping onto the stamp's rump: dx -410, dy 500 in 0.362 s.
- *  Fix round 2b (finding: his fall lost speed across the cut, ~54 -> ~14 px/frame, a 3-frame float): vy0 +700 px/s
- *  (was +400), so g ~3,760 px/s2 (motion_spec #25: 3,000-8,000) and one frame before the cut he is already falling at
- *  ~+600 px/s; landing at ~69 px/frame on 'in'. S02 aims its hop-out at `pipDropState` (one ballistic arc: S02 must
- *  re-read it, see docs/scenes/S03.md).
- *  His shadow grows on the plan under the landing point while he falls (PipShadow). */
-export const PIP_FROM: Pt = [830, 905];
-export const PIP_VY0 = 700;
+/** Fix round 3 (finding: Pip braked from ~56 to ~16 px/frame across the S02 -> S03 hard cut, then sped up again: S02's
+ *  0.127 s Hermite had to drop from the rod perch (feet at screen y ~770) to ~906 and brake into S03's old pickup):
+ *  ONE ballistic arc from S02's rod perch to the stamp, g = 4,500 px/s2 (motion_spec #25: 3,000-8,000), constant vx.
+ *  He takes off from the perch at PIP_TAKEOFF (8.12, S02's ears-cover gag keeps 7.77-8.08), peaks INSIDE S02 (~8.21),
+ *  and on the cut he is already falling at ~+815 px/s with his feet at screen ~(705, 825), just under the sun's
+ *  lower rim (he grazes it, a periwinkle silhouette on orange, for ~3 frames), landing on the stamp's rump on 'in'.
+ *  `pipDropState(tl)` gives the same arc for any tl from the take-off (tl = PIP_TAKEOFF - S03_START) to the landing:
+ *  S02 draws its hop-out from it, so position AND velocity match on every frame across the cut. */
+/** S02's rod perch: Pip's FEET in SCREEN px under S02's camera at the take-off (scene02: BLUEPRINT_WALL.perch +
+ *  (58, 0) through camAt(8.12 - 4.715): (920.4, 770.0); its camera creeps < 0.2 px over the hop). */
+export const PIP_PERCH_SCREEN: Pt = [920.4, 770.0];
+/** Absolute take-off time from S02's perch (the arc's apex is at ~8.21, inside S02). */
+export const PIP_TAKEOFF = 8.12;
+/** The arc's gravity (screen px/s2 at S03's rest zoom 1.0). */
+export const PIP_G = 4500;
 /** Fix round 1: Pip sits on the stamp's RUMP (its right end), not its centre (BLUEPRINT.pip (350, 1420) hid ~80 % of
- *  the print): the reversed-out elephant faces left, so its trunk, ear and legs stay clear (and his ear clears the title
- *  card). Screen at the 1.04 lock: (410.0, 1438.4), where he crouches on the cut (S04 continues from there). */
-export const PIP_AT: Pt = [420, 1405];
+ *  the print): the reversed-out elephant faces left, so its trunk, ear and legs stay clear. Fix round 3: the stamp and
+ *  Pip moved 22 px left (STAMP in stamp.tsx) so the title card clears his rump and the print's tip by >= 30 px. Screen
+ *  at the 1.04 lock: (387.1, 1438.4), where he crouches on the cut (S04 imports this and continues from there). */
+export const PIP_AT: Pt = [398, 1405];
+/** The arc at the cut (scene-local 0), derived from the perch, the take-off, g and the landing on 'in' (world =
+ *  screen - (0, 10) under S03's rest camera): PIP_FROM ~ (705.3, 814.9) world, PIP_VY0 ~ +815 px/s. */
+const ARC = (() => {
+  const p0: Pt = [PIP_PERCH_SCREEN[0] - 540 + CAM_REST.x, PIP_PERCH_SCREEN[1] - 960 + CAM_REST.y];
+  const T = W.in - PIP_TAKEOFF;
+  const vx = (PIP_AT[0] - p0[0]) / T;
+  const vy0 = (PIP_AT[1] - p0[1] - 0.5 * PIP_G * T * T) / T;
+  const tc = S03_START - PIP_TAKEOFF;
+  return {from: [p0[0] + vx * tc, p0[1] + vy0 * tc + 0.5 * PIP_G * tc * tc] as Pt, vy: vy0 + PIP_G * tc};
+})();
+/** Where Pip is on the hard cut (world, = screen - (0, 10) at the rest camera) and his vertical speed there. */
+export const PIP_FROM: Pt = ARC.from;
+export const PIP_VY0 = ARC.vy;
 /** Pip faces LEFT (flip) in his hop-off crouch at the cut (polish round 1): S04 must keep `flip` true through its
  *  settle-hop so he never flips across the cut (import this). */
 export const PIP_CUT_FLIP = true;
@@ -51,9 +69,12 @@ function drop(t: number, t0: number, T: number, from: Pt, to: Pt, vy0: number): 
   return [lerp(from[0], to[0], u), from[1] + vy0 * tau + 0.5 * g * tau * tau];
 }
 
-/** Pip's drop at scene-local time `tl` (negative = before the cut, e.g. S02's last frame), in SCREEN px under S03's rest
- *  camera (540, 950, 1.0), and his velocity (screen px/s): the hand-off point S02's hop-out must land on (position AND
- *  velocity), e.g. `pipDropState(LAST_FRAME_ABS - 8.393)`. */
+/** Pip's arc at scene-local time `tl` (negative = before the cut: valid back to the take-off, tl = PIP_TAKEOFF -
+ *  S03_START = -0.273, where it returns PIP_PERCH_SCREEN), in SCREEN px under S03's rest camera (540, 950, 1.0) = S02's
+ *  framing of the same screen, and his velocity (screen px/s). Fix round 3: S02 draws its whole hop-out from it
+ *  (`pipDropState(t_abs - S03_START)` for t_abs in [PIP_TAKEOFF, LAST_FRAME_ABS], converted to S02's world with its
+ *  camera), so the arc is ONE function on both sides of the cut. At S02's last frame (8.3667, tl -0.0263): screen
+ *  ~(726.0, 803.5), v ~(-788, +697). */
 export function pipDropState(tl: number): {screen: Pt; v: Pt} {
   const b = beats();
   const T = b.pipLand - b.cut;
@@ -63,6 +84,10 @@ export function pipDropState(tl: number): {screen: Pt; v: Pt} {
   const y = PIP_FROM[1] + PIP_VY0 * tl + 0.5 * g * tl * tl;
   return {screen: [x - CAM_REST.x + 540, y - CAM_REST.y + 960], v: [vx * CAM_REST.zoom, (PIP_VY0 + g * tl) * CAM_REST.zoom]};
 }
+
+/** Pip's pose on the arc at the cut (what S02's hop-out arrives at on its last frame): stand-side, spread 0.85, FLIPPED
+ *  (facing left), stretch -0.2, screen rotation +6 deg (the body axis leaning into the fall), scale 1.2 on screen. */
+export const PIP_CUT_POSE = {pose: 'stand-side', amount: 0.85, flip: true, squash: -0.2, rotate: 6, scale: PIP_SCALE} as const;
 
 /** Bounce in place: height h, airtime T, from t0. Returns the lift (px, up positive) and the airborne flag. */
 const bounce = (t: number, t0: number, T: number, h: number) => {
@@ -101,12 +126,14 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
   const keys: PoseKey[] = [
     {t: -10, pose: 'stand-side', amount: 0.85},
     {t: b.pipLand, pose: 'sit-back', look: 0.25},
-    // 'loves': pride, straight-faced: sit-front, happy (closed eyes-smile + closed smile), the lean back + chest stretch
-    {t: b.loves, pose: 'sit-front', expression: 'happy', look: 0},
-    {t: b.proudOff, pose: 'sit-front', expression: 'happy', look: 0.3},
-    // 'run': the glance down the street (fix round 2b: 'happy' closed eye-smiles hid the look: open eyes, look 0.7, and a
-    // +5 deg lean toward the VP below)
-    {t: b.run, pose: 'sit-front', expression: 'neutral', look: 0.7},
+    // 'loves': pride, straight-faced (fix round 3: SMUG, not happy: the 'happy' U-arc eyes + pink cheeks read as a
+    // generic happy face): sit-front, half-lidded ('meh' heavy lids over open eyes) + the closed smile, chin up, chest out
+    {t: b.loves, pose: 'sit-front', expression: 'meh', look: 0},
+    // 'about' (fix round 3): the gag's button: he drops the pose, eyes open, and looks up-right at the sun pie, so he
+    // watches the count
+    {t: b.proudOff, pose: 'sit-front', expression: 'neutral', look: 0.55},
+    // 'run': the glance down the street (open eyes, look 0.85, and a +5 deg lean toward the VP below)
+    {t: b.run, pose: 'sit-front', expression: 'neutral', look: 0.85},
     {t: b.pipHop, pose: 'stand-side', amount: 0},
   ];
 
@@ -114,23 +141,51 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
   let y = PIP_AT[1];
   let squash = 0;
   let rotate = 0;
+  let smear: React.ReactNode = null;
   if (t < b.pipLand) {
-    // the drop from S02's rod: falling down-left onto the bare plan, nose dipping
-    [x, y] = drop(t, t0, b.pipLand - t0, PIP_FROM, PIP_AT, PIP_VY0);
-    const u = clamp((t - t0) / (b.pipLand - t0));
-    squash = -0.16 * (1 - u) - 0.04;
-    rotate = lerp(-6, 14, u);
+    // the drop: S02's arc continued (one ballistic arc from the rod perch, constant vx, g 4,500), falling down-left onto
+    // the bare plan. Fix round 3 (finding: the last frames moved ~75 px/frame on flat ink, a jump-cut): the body STRETCHES
+    // along the velocity as he speeds up (-0.2 at the cut, S02's hand-off, -> -0.28 at contact; the pose key's
+    // anticipation squash is cancelled here, it would fight the stretch) and its axis turns into the fall (screen +6 deg
+    // at the cut -> the velocity's angle, ~18 deg from vertical, at contact: feet first); 3 short ink speed lines trail
+    // above him on the last 3 frames.
+    const T = b.pipLand - t0;
+    [x, y] = drop(t, t0, T, PIP_FROM, PIP_AT, PIP_VY0);
+    const u = clamp((t - t0) / T);
+    squash = -0.2 - 0.08 * E.inCubic(u) - popSwitch(t, b.pipLand);
+    const vx = (PIP_AT[0] - PIP_FROM[0]) / T;
+    const g = (2 * (PIP_AT[1] - PIP_FROM[1] - PIP_VY0 * T)) / (T * T);
+    const vy = PIP_VY0 + g * (u * T);
+    const velAng = (Math.atan2(-vx, vy) * 180) / Math.PI; // screen deg the body's up axis leans (clockwise +)
+    const screenRot = lerp(6, velAng, E.inQuad(u));
+    rotate = -screenRot; // flipped while he falls: the ElephantTimeline gets -rotate (below)
+    if (t >= b.pipLand - 0.1) {
+      const sp = Math.hypot(vx, vy);
+      const ux = -vx / sp;
+      const uy = -vy / sp; // the trailing direction (up-right)
+      const reach = 108 * PIP_SCALE; // just past the top of his stretched head
+      const sx = x + ux * reach;
+      const sy = y + uy * reach;
+      const ang = (Math.atan2(uy, ux) * 180) / Math.PI;
+      smear = <Ink d={speedLines(sx, sy, {n: 3, len: 40, gap: 15, angle: ang, seed: 's03/pipSpd'})} width={2.2} taper={false} seed="s03/pipSpdI" />;
+    }
   } else {
+    // the impact: his fall tilt (screen ~18 deg) comes back upright over 2 frames under the landing squash
+    rotate = 18 * (1 - E.outQuad(prog(t, b.pipLand, 0.067)));
     y -= bounce(t, b1.at, b1.T, b1.h) + bounce(t, b2.at, b2.T, b2.h);
     if (t >= b1.at && t < b1.at + b1.T) squash = -0.12 * Math.sin(Math.PI * clamp((t - b1.at) / b1.T));
     squash += landSq(t, b.pipLand, 0.26) + landSq(t, b2.at, 0.18) + landSq(t, settle, 0.12);
     // the slam's impact jolt AT contact (two frames squashed), as the bounce launches him
     if (t >= printLand && t < printLand + 0.07) squash += 0.16 * Math.sin(Math.PI * ((t - printLand) / 0.07));
-    // 'loves': the proud puff, straight-faced (polish round 1: sit-front, closed happy smile; trunk-up's open mouth and
-    // trumpet marks read as a cheer): chest out (a 1.10 -> 1.0 stretch over 0.3 s on top of the pose pop) and chin up (a
-    // -7 deg lean back, out-back in, held to proudOff, then back)
-    if (t >= b.loves && t < b.loves + 0.3) squash += -0.1 * (1 - E.outCubic((t - b.loves) / 0.3));
-    if (t >= b.loves) rotate = -7 * E.outBack(1.6)(prog(t, b.loves, 0.16)) * (1 - E.inOutSine(prog(t, b.proudOff, 0.14)));
+    // 'loves': the proud PUFF as one clear beat (fix round 3: the 1.10 stretch and -7 deg lean hardly showed at phone
+    // size): the chest swells 1.0 -> 1.14 in 3 frames (out-quad, on top of the pose pop's anticipation squash), settles
+    // to 1.04 by +0.25 s and HOLDS (the pose stays puffed), chin up -12 deg (out-back); both release on 'about'
+    if (t >= b.loves) {
+      const d = t - b.loves;
+      const puff = d < 0.1 ? -0.14 * E.outQuad(d / 0.1) : lerp(-0.14, -0.04, E.inOutSine(clamp((d - 0.1) / 0.15)));
+      squash += puff * (1 - E.inOutSine(prog(t, b.proudOff, 0.12)));
+      rotate = -12 * E.outBack(1.6)(prog(t, b.loves, 0.16)) * (1 - E.inOutSine(prog(t, b.proudOff, 0.14)));
+    }
     // 'run': the glance down the street: a +5 deg lean toward the VP (out-back, 0.25 s), eased back in the 0.1 s before
     // the hop-off pop
     if (t >= b.run) rotate += 5 * E.outBack(1.6)(prog(t, b.run, 0.25)) * (1 - E.inOutSine(prog(t, b.pipHop - 0.1, 0.1)));
@@ -148,7 +203,12 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
   // faces left while dropping in; polish round 1: faces LEFT again from the hop-off pop, the way S04 carries him (S04's
   // settle-hop travels left, screen x ~425 -> ~374): PIP_CUT_FLIP is the contract (S04 keeps flip = true to its landing)
   const flip = t < b.pipLand || (PIP_CUT_FLIP && t >= b.pipHop);
-  return <ElephantTimeline x={x} y={y} scale={PIP_SCALE} t={t} seed={3} keys={keys} squash={squash} rotate={flip ? -rotate : rotate} flip={flip} />;
+  return (
+    <>
+      {smear}
+      <ElephantTimeline x={x} y={y} scale={PIP_SCALE} t={t} seed={3} keys={keys} squash={squash} rotate={flip ? -rotate : rotate} flip={flip} />
+    </>
+  );
 };
 
 // ---------------------------------------------------------------- Bit on the pen-nib sign
@@ -204,6 +264,31 @@ function walkerPos(w: Walker, t: number): {x: number; y: number; h: number; walk
   return {x: VP[0] + (w.x - VP[0]) * k, y: VP[1] + (w.y - VP[1]) * k, h: w.h * k, walking: w.stop === undefined || t < w.stop};
 }
 
+/** A mitten in local coords (origin = the wrist, -y = along the forearm toward the fingertips): an oval 1.9 wd long,
+ *  1.25 wd wide, with a thumb nub on the inner side (side: the arm's side of the body). */
+const mitten = (wd: number, side: number): string => {
+  const L = wd * 1.9;
+  const W = wd * 0.62;
+  const tx = -side * W * 0.95;
+  return (
+    `M${-W} ${-wd * 0.2}C${-W} ${-L * 0.75} ${-W * 0.7} ${-L} 0 ${-L}C${W * 0.7} ${-L} ${W} ${-L * 0.75} ${W} ${-wd * 0.2}` +
+    `C${W} ${wd * 0.3} ${-W} ${wd * 0.3} ${-W} ${-wd * 0.2}Z` +
+    `M${tx} ${-L * 0.28}c${-side * wd * 0.42} ${-wd * 0.12} ${-side * wd * 0.5} ${-wd * 0.62} ${-side * wd * 0.12} ${-wd * 0.8}c${side * wd * 0.2} ${-wd * 0.08} ${side * wd * 0.3} ${wd * 0.1} ${side * wd * 0.3} ${wd * 0.3}Z`
+  );
+};
+
+/** Two tiny motion ticks beside a waving hand at `hd` (sleeve width wd), on side `dir` (+1 right, -1 left): short arcs
+ *  that read as 'waving' at phone size. */
+const waveTicks = (hd: Pt, wd: number, dir: number): string => {
+  const at = (rr: number, deg: number): string => {
+    const a = (deg * Math.PI) / 180;
+    return `${(hd[0] + dir * rr * Math.cos(a)).toFixed(1)} ${(hd[1] + rr * Math.sin(a)).toFixed(1)}`;
+  };
+  let d = '';
+  for (const rr of [wd * 2.1, wd * 3.2]) d += `M${at(rr, -64)}L${at(rr * 1.04, -45)}L${at(rr, -26)}`;
+  return d;
+};
+
 /** One small walker: pops up out of the plan (scaleY 0 -> 1.06 -> 1 about the feet), walks / stops / looks up / waves /
  *  bobs on 'run'. */
 const SmallWalker: React.FC<{w: Walker; bobAt: number}> = ({w, bobAt}) => {
@@ -230,7 +315,14 @@ const SmallWalker: React.FC<{w: Walker; bobAt: number}> = ({w, bobAt}) => {
       <>
         <Ink d={`M${sh[0].toFixed(1)} ${sh[1].toFixed(1)}L${hd[0].toFixed(1)} ${hd[1].toFixed(1)}`} width={wd + 3.2} color={palette.ink} taper={false} cap="round" seed={`s03/arm${w.id}o`} />
         <Ink d={`M${sh[0].toFixed(1)} ${sh[1].toFixed(1)}L${hd[0].toFixed(1)} ${hd[1].toFixed(1)}`} width={wd} color={w.body ?? palette.teal} taper={false} cap="round" seed={`s03/arm${w.id}i`} />
-        <Fill d={blob(hd[0], hd[1], wd * 0.75, wd * 0.8, {seed: `s03/hand${w.id}`})} color={palette.sand} offset={false} mode="none" seed={`s03/hand${w.id}`} />
+        {/* fix round 3 (finding: a pale disc on a stick arm read as a lollipop): the hand is a MITTEN in the sleeve
+            colour, outlined, and two tiny motion ticks flick on the side the wave swings toward */}
+        <XG m={mat.compose(mat.translate(hd[0], hd[1]), mat.rotate(ang + 90))}>
+          {/* the mitten: an oval along the arm (its long axis = the forearm's), a thumb nub on the inner side */}
+          <Fill d={mitten(wd, side)} color={w.body ?? palette.teal} offset={false} mode="none" seed={`s03/hand${w.id}`} />
+          <Ink d={mitten(wd, side)} width={1.5} taper={false} seed={`s03/handI${w.id}`} />
+        </XG>
+        {raise > 0.6 ? <Ink d={waveTicks(hd, wd, Math.cos((t - w.waveAt) * Math.PI * 2 * 3) >= 0 ? side : -side)} width={1.5} taper={false} seed={`s03/wv${w.id}`} /> : null}
       </>
     );
   }
@@ -259,6 +351,41 @@ export function walkersFor(b: Beats): Walker[] {
     {id: 'f', x: 758, y: 1256, h: 101, at: e + 0.25, body: palette.teal, hair: 'beanie'},
   ];
 }
+
+/** Fix round 3 (finding: six 98-146 px walkers + two corner onlookers made 'everyone' land weakly next to reference
+ *  1's crowded street; the middle distance by the press house was empty pavement): NINE tiny far figures (44-64 px,
+ *  back view, hairline ink by size) along both building lines and at the press house's steps, popping up out of the
+ *  plan in the same 0.05 s stagger on 'everyone' (interleaved with the six walkers), then STILL (the kit's small idle
+ *  bob only), so the bait frame stays calm. All clear of the sticker, the sign and the card (world feet / heights at
+ *  the 1.04 lock). Far first in the list. */
+const FAR_CROWD: {x: number; y: number; h: number; body: string; hair: Hair; acc?: Acc[]}[] = [
+  {x: 488, y: 1186, h: 44, body: palette.sage, hair: 'short'},
+  {x: 590, y: 1190, h: 46, body: palette.peach, hair: 'long'},
+  {x: 432, y: 1192, h: 50, body: palette.tan, hair: 'bun'},
+  {x: 676, y: 1194, h: 50, body: palette.teal, hair: 'curly'},
+  {x: 742, y: 1202, h: 54, body: palette.brown, hair: 'short', acc: ['backpack']},
+  {x: 352, y: 1208, h: 56, body: palette.tealDark, hair: 'beanie'},
+  {x: 616, y: 1214, h: 56, body: palette.sand, hair: 'bun'},
+  {x: 776, y: 1232, h: 60, body: palette.sage, hair: 'long'},
+  {x: 312, y: 1236, h: 64, body: palette.teal, hair: 'curly'},
+];
+export const FarCrowd: React.FC<{b: Beats}> = ({b}) => {
+  const t = useTime();
+  if (t < b.everyone) return null;
+  return (
+    <>
+      {FAR_CROWD.map((f, i) => {
+        const k = popUpK(t, b.everyone + 0.025 + i * 0.05, 0.08);
+        if (k <= 0.001) return null;
+        return (
+          <XG key={i} m={mat.about(mat.scale(1, k), f.x, f.y)}>
+            <Citizen x={f.x} y={f.y} h={f.h} body={f.body} hair={f.hair} acc={f.acc} bob={0.6} seed={`s03/far${i}`} />
+          </XG>
+        );
+      })}
+    </>
+  );
+};
 
 export const StreetLife: React.FC<{b: Beats}> = ({b}) => {
   const ws = walkersFor(b);
@@ -333,7 +460,7 @@ export const NearWalkers: React.FC<{b: Beats}> = ({b}) => {
   return (
     <>
       <XG m={mat.compose(mat.translate(slide(-1, 0), bobY(0) + idle(0.4)), mat.about(mat.rotate(turn(-1)), ...neck(L, 104)))}>
-        <EdgeOnlooker x={L[0]} y={L[1]} head={104} hair="short" acc={['hood', 'strap']} body={palette.teal} rim="right" arms="near" bob={0} seed="s03/nearL" />
+        <EdgeOnlooker x={L[0]} y={L[1]} head={104} hair="short" hairColor={palette.brown} acc={['hood', 'strap']} body={palette.teal} rim="right" arms="near" bob={0} seed="s03/nearL" />
         <SleevePocket x={L[0]} y={L[1]} band={NEAR_CUFF.L} coat={palette.teal} seed="s03/pocketL" />
       </XG>
       <XG m={mat.compose(mat.translate(slide(1, 0.04), bobY(0.04) + idle(2.1)), mat.about(mat.rotate(turn(1)), ...neck(R, 112)))}>

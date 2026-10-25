@@ -46,8 +46,10 @@ const ABS = {
   pressScreen: 10.135, //       w32 'the': the press house's browser window lights
   doorway: 10.305, //           w33+0.10 'language': a far walker steps out of a doorway; Bit's antennae twitch
   everyone: 10.54, //           w34-0.10 'everyone': six tiny walkers pop up (0.05 s); the two near walkers slide in
-  loves: 11.105, //             w35 'loves': Pip puffs up proudly (trunk-up toot, chin up, 1.10 -> 1.0 chest stretch, happy)
-  proudOff: 11.705, //          end(loves)+0.10: back to sit-front (happy)
+  loves: 11.105, //             w35 'loves': Pip puffs up proudly, smug (half-lidded, closed smile, chin up -12 deg, chest
+  //                            1.0 -> 1.14 -> 1.04 and held)
+  proudOff: 11.695, //          w37-0.10 'about' (fix round 3; was end(loves)+0.10): the puff releases, eyes open, he looks up
+  //                            at the sun as its spokes draw: the gag's button, then he watches the count
   looksUp: 11.355, //           w35+0.25: a far walker stops and looks up at the press house
   swing: 11.605, //             end(loves): the pen-nib sign swings, Bit riding it; the vent puffs
   spokes: 11.695, //            w37-0.10 'about': ten spokes draw across the sun (0.15 s)
@@ -73,7 +75,9 @@ export type Beats = {-readonly [K in keyof typeof ABS]: number};
 /** Scene-local beat times for a scene that starts at `start` (VO seconds). */
 export function beats(start: number = S03_START): Beats {
   const out = {} as Beats;
-  for (const k of Object.keys(ABS) as (keyof typeof ABS)[]) out[k] = +(ABS[k] - start).toFixed(4);
+  // fix round 3: 1 ms under the word time before rounding, so a beat that falls exactly on the 30 fps grid of the
+  // scene's own preview (e.g. L3 0.8667 = f26) fires on its own frame, not one late (4-decimal rounding put it at 0.867)
+  for (const k of Object.keys(ABS) as (keyof typeof ABS)[]) out[k] = +(ABS[k] - start - 1e-3).toFixed(4);
   return out;
 }
 

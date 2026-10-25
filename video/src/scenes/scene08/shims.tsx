@@ -163,7 +163,7 @@ export const stampPrintSize = (text: LabelText, fontSize: number) => {
 
 /** A painted note block in a zone (world rect), popping (7 % spring) about its left middle at `at`. Used for L9a so it
  *  can hold 28 px across the note + gutter (the shared CounterBoard's note zone holds ~26 px at this board width). */
-export const BoardNote: React.FC<{zone: [number, number, number, number]; text: LabelText; fontSize: number; at: number; seed: string}> = ({zone, text, fontSize, at, seed}) => {
+export const BoardNote: React.FC<{zone: [number, number, number, number]; text: LabelText; fontSize: number; at: number; seed: string; underline?: {line: number; at: number}}> = ({zone, text, fontSize, at, seed, underline}) => {
   useCaptionFont();
   const t = useTime();
   if (t < at) return null;
@@ -171,9 +171,21 @@ export const BoardNote: React.FC<{zone: [number, number, number, number]; text: 
   if (k <= 0.001) return null;
   const L = layoutText(labelLines(text), fontSize, {x: 0.02, top: 0.05, bot: 0.05, pitch: 1.05}, [zone[2] - zone[0], zone[3] - zone[1]]);
   const cy = (zone[3] - zone[1]) / 2;
+  // fix round 3: one hand-drawn ink stroke under the qualifier line ('attempts, not break-ins': the line that keeps the
+  // claim true), drawing on left to right after the note pops
+  let ul: React.ReactNode = null;
+  if (underline && t >= underline.at) {
+    const i = underline.line;
+    const yb = L.base0 + i * (L.pitch ?? 1.05) * L.fs + L.fs * 0.17;
+    const x0 = L.padX - 2;
+    const x1 = L.padX + L.widths[i] + 3;
+    const d = `M${x0.toFixed(1)} ${(yb + 1.2).toFixed(1)}Q${((x0 + x1) / 2).toFixed(1)} ${(yb - 1.6).toFixed(1)} ${x1.toFixed(1)} ${(yb + 0.6).toFixed(1)}`;
+    ul = <Ink d={d} width={2.6} at={underline.at} dur={0.14} seed={`${seed}/ul`} />;
+  }
   return (
     <XG m={mat.compose(mat.translate(zone[0], zone[1]), mat.about(mat.scale(k), 0, cy))}>
       <InkTextBlock L={L} align="left" color={palette.ink} k={k} seed={seed} />
+      {ul}
     </XG>
   );
 };

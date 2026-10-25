@@ -24,7 +24,8 @@ import {plateFace} from './plate';
 
 const EYE = OLD_QUARTER.eye; // 1150: the far row stands on the eye line
 type Roof = 'flat' | 'gable' | 'step' | 'chimney';
-type Plate = {x: number; y: number; old: boolean};
+/** `hang`: the screw an old plate keeps (it drops crooked about it; default 'tl'). */
+type Plate = {x: number; y: number; old: boolean; hang?: 'tl' | 'tr'};
 type B = {x: number; w: number; top: number; roof: Roof; color: string; plate?: Plate};
 
 /** The old far plates' crooked drop onto their one screw + the sag on 'so' (deg). */
@@ -40,7 +41,7 @@ const STAGGER = 0.03;
 const DEF: B[] = [
   // b0: P0 centred on the wall right of siteL's mansard (its slope is at x <= 353 down to the mansard base 690 + 6 px
   // of ink overshoot): the plate spans 359-403, clear of it even after its crooked drop (fix round 2b: was x 369)
-  {x: 338, w: 66, top: 646, roof: 'flat', color: palette.sage, plate: {x: 381, y: 674, old: true}},
+  {x: 338, w: 66, top: 646, roof: 'flat', color: palette.sage, plate: {x: 381, y: 674, old: true, hang: 'tr'}},
   {x: 398, w: 52, top: 792, roof: 'flat', color: palette.sand},
   {x: 450, w: 54, top: 776, roof: 'gable', color: palette.tan},
   {x: 504, w: 50, top: 790, roof: 'step', color: palette.cream},
@@ -48,7 +49,7 @@ const DEF: B[] = [
   {x: 602, w: 80, top: 662, roof: 'step', color: palette.tan, plate: {x: 654, y: 708, old: false}},
   {x: 682, w: 62, top: 648, roof: 'flat', color: palette.sage, plate: {x: 713, y: 706, old: true}},
   // the street gap (x 640-740): a cream gabled house behind a lower tan one (nearer, so drawn later)
-  {x: 640, w: 100, top: 776, roof: 'gable', color: palette.cream, plate: {x: 690, y: 820, old: true}},
+  {x: 640, w: 100, top: 776, roof: 'gable', color: palette.cream, plate: {x: 690, y: 820, old: true, hang: 'tr'}},
   {x: 640, w: 100, top: 868, roof: 'flat', color: palette.tan, plate: {x: 690, y: 914, old: false}},
 ];
 
@@ -145,24 +146,26 @@ const FarPlate: React.FC<{p: Plate; flipAt: number; sagAt: number; shudderAt?: n
   const sx = q > 0 && q < 1 ? Math.max(0.03, Math.abs(Math.cos(Math.PI * q))) : 1;
   // the crooked drop starts at the swap (flipAt + 0.1), outBack; the sag on 'so'. Fix round 2b: 9 + 3 deg (was 16 + 5:
   // at 25-30 deg the dark plates read as diamonds / stickers in mid-air, not plates on a wall)
-  let rot = old ? DROP_DEG * prog(t, flipAt + 0.1, 0.24, E.outBack(2.2)) + SAG_DEG * prog(t, sagAt, 0.22, E.outBack(1.8)) : 0;
+  // P0 and C keep their top-RIGHT screw (P0's free corner swings away from siteL's mansard), B its top-left
+  const dir = p.hang === 'tr' ? -1 : 1;
+  let rot = old ? dir * (DROP_DEG * prog(t, flipAt + 0.1, 0.24, E.outBack(2.2)) + SAG_DEG * prog(t, sagAt, 0.22, E.outBack(1.8))) : 0;
   let hop = 0;
   if (shudderAt !== undefined && t >= shudderAt && t < shudderAt + 0.2) {
     const d = t - shudderAt;
     rot += 6 * Math.exp(-d * 14) * Math.sin(d * 2 * Math.PI * 9);
     hop = -4 * Math.sin(Math.PI * Math.min(1, d / 0.12));
   }
-  const pivot: Pt = [p.x - 38 * s, p.y - 38 * s];
+  const pivot: Pt = [p.x - dir * 38 * s, p.y - 38 * s];
   // the old plate hangs on its ONE remaining screw (a fat ink screw head at the pivot, on the wall) and the empty hole
   // of the second screw stays on the wall where the plate's top-right corner was (an ink ring): a plate that dropped
   const dropped = old && t >= flipAt + 0.1;
-  const hole: Pt = [p.x + 38 * s, p.y - 38 * s];
+  const hole: Pt = [p.x + dir * 38 * s, p.y - 38 * s];
   return (
     <>
       {dropped ? <Ink d={circle(hole[0], hole[1], 2.3, {seed: `${seed}/hole`})} width={1.5} taper={false} vary={0} seed={`${seed}/hole`} /> : null}
       <XG m={mat.compose(mat.translate(0, hop), mat.about(mat.rotate(rot), pivot[0], pivot[1]))}>
       <XG m={mat.compose(mat.translate(p.x, p.y), mat.scale(s * sx, s))}>{plateFace({old, W: SI.far / s, seed, offset: [3, 2.2], screws: !old})}</XG>
-      {old && t >= sagAt ? <Cobweb x={p.x + P / 2 - 1} y={p.y - P * 0.3} r={P * 0.4} corner="tr" at={sagAt + 0.04} dur={0.2} width={1.4} color={palette.cream} seed={`${seed}/w`} /> : null}
+      {old && t >= sagAt ? <Cobweb x={p.x + dir * (P / 2 - 1)} y={p.y - P * 0.3} r={P * 0.4} corner={dir > 0 ? 'tr' : 'tl'} at={sagAt + 0.04} dur={0.2} width={1.4} color={palette.cream} seed={`${seed}/w`} /> : null}
       {tagAt !== undefined && t >= tagAt ? <SupportTag x={p.x + 6} y={p.y - P / 2 + 3} size={30} at={tagAt} checkAt={tagAt + 0.05} seed={`${seed}/tag`} /> : null}
       </XG>
       {old ? (

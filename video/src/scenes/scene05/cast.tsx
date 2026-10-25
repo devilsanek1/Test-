@@ -51,20 +51,29 @@ type Member = {
  *  backpack, a cap, a ponytail, a bag strap) and the lanyard strap at the nape (no back badges). One tablet per team,
  *  held at HEAD height. */
 export const TEAM_A: Member[] = [
-  {x: 214, rise: 1, h: 117 * K, seed: 's5a3', body: palette.teal, hair: 'curly', hairColor: palette.ink, acc: ['headphones'], back: true, pose: 'point'},
+  // fix round 4: A3 / A2 no longer ink-black heads (the row read as three black dots): tan curls, an ochre 'short' head
+  // (its three strands and the ears); the messenger keeps his ink hair (S06 continuity)
+  {x: 214, rise: 1, h: 117 * K, seed: 's5a3', body: palette.teal, hair: 'curly', hairColor: palette.tan, acc: ['headphones'], back: true, pose: 'point'},
   {x: 156, rise: 0, h: 130 * K, seed: 's5a1', body: palette.sage, hair: 'bun', hairColor: palette.brown, pose: 'clipboard'},
-  {x: 274, rise: 2, h: 140 * K, seed: 's5a2', body: palette.tan, hair: 'short', hairColor: palette.ink, acc: ['backpack'], tablet: 'right'},
+  {x: 274, rise: 2, h: 140 * K, seed: 's5a2', body: palette.tan, hair: 'short', hairColor: palette.brown, acc: ['backpack'], tablet: 'right'},
 ];
+/** Fix round 4: team B shifted left (B1 586 -> 548, B3 644 -> 616, B2 702 -> 690) so B1's bigger, higher tablet (held
+ *  up and OUT to the left) and its glow clear sleeping Pip's trunk on the rail. */
 export const TEAM_B: Member[] = [
-  {x: 644, rise: 1, h: 116 * K, seed: 's5b3', body: palette.tan, hair: 'cap', back: true},
-  {x: 586, rise: 0, h: 128 * K, seed: 's5b1', body: palette.sand, hair: 'short', hairColor: palette.brown, tie: palette.peach, tablet: 'left'},
-  {x: 702, rise: 2, h: 136 * K, seed: 's5b2', body: palette.sage, hair: 'short', hairColor: palette.brown, acc: ['strap'], pose: 'hips'},
+  {x: 616, rise: 1, h: 116 * K, seed: 's5b3', body: palette.tan, hair: 'cap', back: true},
+  {x: 548, rise: 0, h: 128 * K, seed: 's5b1', body: palette.sand, hair: 'short', hairColor: palette.brown, tie: palette.peach, tablet: 'left'},
+  {x: 690, rise: 2, h: 136 * K, seed: 's5b2', body: palette.sage, hair: 'short', hairColor: palette.brown, acc: ['strap'], pose: 'hips'},
 ];
-const TABLET = 42;
+/** Fix round 4: the tablets 1.4 x (60 world wide in the tablet's frame: held landscape = 85 x 60 world, ~96 x 68 px) and
+ *  held HIGH (up and out), so the cards break above the rail onto the banner's paper; a stepped glow disc (white r42 over
+ *  mintPale r56 world) backs each one and a big ink sparkle pops above it on the raise. */
+const TABLET = 60;
+const LIFT = 'high' as const;
+const GLOW: [number, number] = [42, 56];
 
 const feetOf = (m: Member) => (m.back ? FEET_BACK : FEET);
 /** Fix round 3: the tablets are held LANDSCAPE (they no longer rhyme with the portrait lock box above them). */
-const tabletOf = (m: Member) => tabletCentre({x: m.x, y: feetOf(m), h: m.h, seed: m.seed, arm: m.tablet, tabletSize: TABLET, tabletLift: 'head', landscape: true});
+const tabletOf = (m: Member) => tabletCentre({x: m.x, y: feetOf(m), h: m.h, seed: m.seed, arm: m.tablet, tabletSize: TABLET, tabletLift: LIFT, landscape: true});
 
 /** Lean toward the lock on 'how': the TORSO and head only, about the hip line (the legs stay planted): 7 deg with an
  *  out-back overshoot, settled in 0.2 s. */
@@ -105,7 +114,9 @@ const HipLean: React.FC<{x: number; hipY: number; deg: number; children: React.R
   );
 };
 
-const TeamMember: React.FC<{m: Member; riseAt: number; raiseAt?: number; poseAt: number; leanAt: number; leanDir: number}> = ({m, riseAt, raiseAt, poseAt, leanAt, leanDir}) => {
+type Spark = {at: number; twinkleAt: number; outAt: number; glowStepAt: number};
+
+const TeamMember: React.FC<{m: Member; riseAt: number; raiseAt?: number; poseAt: number; leanAt: number; leanDir: number; spark?: Spark}> = ({m, riseAt, raiseAt, poseAt, leanAt, leanDir, spark}) => {
   const t = useTime();
   const a = lean(t, leanAt, leanDir);
   const fy = feetOf(m);
@@ -117,11 +128,44 @@ const TeamMember: React.FC<{m: Member; riseAt: number; raiseAt?: number; poseAt:
   return (
     <PopRise at={riseAt} x={m.x} y={fy}>
       <HipLean x={m.x} hipY={hipY} deg={a}>
-        <Investigator x={m.x} y={fy} h={m.h} raiseAt={raiseAt} arm={m.tablet} tabletSize={TABLET} tabletLift="head" landscape pose={pose} body={m.body} hair={m.hair} hairColor={m.hairColor} ponytail={m.tie} acc={m.acc} bob={1.2} seed={m.seed} />
+        <Investigator
+          x={m.x}
+          y={fy}
+          h={m.h}
+          raiseAt={raiseAt}
+          arm={m.tablet}
+          tabletSize={TABLET}
+          tabletLift={LIFT}
+          landscape
+          glow={raiseAt !== undefined ? GLOW : undefined}
+          glowStepAt={spark?.glowStepAt}
+          sparkle={spark ? {at: spark.at, twinkleAt: spark.twinkleAt, outAt: spark.outAt, r: 22} : undefined}
+          pose={pose}
+          body={m.body}
+          hair={m.hair}
+          hairColor={m.hairColor}
+          ponytail={m.tie}
+          acc={m.acc}
+          bob={1.2}
+          seed={m.seed}
+        />
       </HipLean>
     </PopRise>
   );
 };
+
+/** Team B's tablet follows team A's by this (s); its beam by BEAM_STAGGER. */
+const TAB_STAGGER = 0.07;
+const BEAM_STAGGER = 0.05;
+/** The 'AI' sparkle of team `k` (0 = A, 1 = B): pops as its tablet comes up (raise + 0.02), twinkles once on the 'AI'
+ *  highlight (b.twinkle, B 0.07 s later), pops off as its beam shoots out of the tablet; the glow steps down when the
+ *  beams retract. */
+const sparkOf = (b: Beats, k: number): Spark => ({
+  at: b.tablets + k * TAB_STAGGER + 0.02,
+  twinkleAt: b.twinkle + k * TAB_STAGGER,
+  outAt: b.beams + k * BEAM_STAGGER,
+  glowStepAt: b.ring + 0.02,
+});
 
 /** Both teams (back row first). Team A pops up on 'researchers' (0.10 s stagger), team B 0.35 s later (0.08 s); on 'AI'
  *  one tablet per team is raised (0.07 s apart); team A's back-row member points at the lock on 'figured'; on 'how'
@@ -133,11 +177,13 @@ export const Teams: React.FC<{b: Beats}> = ({b}) => {
     <>
       {order(TEAM_A).map((m) => {
         const i = m.rise;
-        return <TeamMember key={m.seed} m={m} riseAt={b.teamA + i * 0.1} raiseAt={m.tablet ? b.tablets : undefined} poseAt={b.look} leanAt={lean0 + i * 0.02} leanDir={1} />;
+        const spark = m.tablet ? sparkOf(b, 0) : undefined;
+        return <TeamMember key={m.seed} m={m} riseAt={b.teamA + i * 0.1} raiseAt={m.tablet ? b.tablets : undefined} poseAt={b.look} leanAt={lean0 + i * 0.02} leanDir={1} spark={spark} />;
       })}
       {order(TEAM_B).map((m) => {
         const i = m.rise;
-        return <TeamMember key={m.seed} m={m} riseAt={b.teamB + i * 0.08} raiseAt={m.tablet ? b.tablets + 0.07 : undefined} poseAt={b.look} leanAt={lean0 + i * 0.02} leanDir={-1} />;
+        const spark = m.tablet ? sparkOf(b, 1) : undefined;
+        return <TeamMember key={m.seed} m={m} riseAt={b.teamB + i * 0.08} raiseAt={m.tablet ? b.tablets + TAB_STAGGER : undefined} poseAt={b.look} leanAt={lean0 + i * 0.02} leanDir={-1} spark={spark} />;
       })}
     </>
   );
@@ -163,18 +209,29 @@ export const MessengerDash: React.FC<{b: Beats}> = ({b}) => <MessengerRun b={b} 
 
 /** The two scan beams: from each raised tablet's top to the lock detail; they shoot out on 'AI'+0.25, sweep the banner in
  *  opposite phase, converge on the lock on 'figured' and retract the moment the ring finds it ('out'-0.04). OPAQUE white
- *  light wedges drawn in the BANNER layer OVER the plan's cream panels and title block (fix round 3: under them the
- *  title block hid beam A's narrow end and the panels chopped both cones) and under its re-stroked ink (paper < cream <
- *  beam < ink: every pixel a palette colour). The camera is locked while they live, so the two planes agree. */
+ *  light wedges drawn in the BANNER layer OVER the plan's cream panels and title block and under its re-stroked ink
+ *  (paper < cream < beam < ink: every pixel a palette colour). The camera is locked while they live, so the two planes
+ *  agree.
+ *  Fix round 4 (camspeed WARN 29.8 px/frame at 1.53-1.60 s: ScanBeam's own converge, 170 -> 10 in 0.3 s in-out cubic,
+ *  moved each far edge ~27 world/frame, and the sweep added to it): the narrowing is driven HERE (w1 170 -> 10 over
+ *  NARROW s, in-out sine, from 'figured'-0.04) and the sweep (6 deg) is damped to 0 over the 0.24 s before it starts, so
+ *  the two motions never add. */
+const W1 = 170;
+const SWEEP = 6;
+const NARROW = 0.42;
 export const Beams: React.FC<{b: Beats}> = ({b}) => {
+  const t = useTime();
   const pa = tabletOf(TEAM_A.find((m) => m.tablet)!);
   const pb = tabletOf(TEAM_B.find((m) => m.tablet)!);
   const off = TABLET * 0.5; // the top edge of a landscape tablet
   const outAt = b.ring + 0.02;
+  const n0 = b.converge - 0.04;
+  const w1 = lerp(W1, 10, E.inOutSine(prog(t, n0, NARROW)));
+  const amp = SWEEP * (1 - E.inOutSine(prog(t, n0 - 0.24, 0.24)));
   return (
     <>
-      <ScanBeam from={[pa[0] + 3, pa[1] - off]} to={LOCK_C} w0={14} w1={170} at={b.beams} sweep={{amp: 9, hz: 1.1}} convergeAt={b.converge} outAt={outAt} color={palette.white} opacity={1} depth="far" />
-      <ScanBeam from={[pb[0] - 3, pb[1] - off]} to={LOCK_C} w0={14} w1={170} at={b.beams + 0.05} sweep={{amp: -9, hz: 1.1}} convergeAt={b.converge} outAt={outAt} color={palette.white} opacity={1} depth="far" />
+      <ScanBeam from={[pa[0] + 3, pa[1] - off]} to={LOCK_C} w0={14} w1={w1} at={b.beams} sweep={{amp, hz: 1.1}} outAt={outAt} color={palette.white} opacity={1} depth="far" />
+      <ScanBeam from={[pb[0] - 3, pb[1] - off]} to={LOCK_C} w0={14} w1={w1} at={b.beams + BEAM_STAGGER} sweep={{amp: -amp, hz: 1.1}} outAt={outAt} color={palette.white} opacity={1} depth="far" />
     </>
   );
 };
@@ -278,21 +335,24 @@ export const LeafFall: React.FC<{b: Beats}> = ({b}) => {
   return <LeafShape x={x} y={y} rot={u < 1 ? rot : 8} fy={fy} />;
 };
 
-/** A big hand-drawn 'z' floats up from sleeping Pip on 'before' (grows, rises, pops off): from his head, which is on
- *  the LEFT (he sleeps facing left, as S04 leaves him). */
+/** A z floats up from sleeping Pip on 'before' (fix round 4: in PIP'S OWN z style, not a heavy annotation Z: the mascot's
+ *  sleep-pose glyph, top bar / diagonal / bottom bar, mirrored as he sleeps facing left, the same tapered thin stroke,
+ *  1.6 x his biggest z = 18 world = 20 px): it pops in small beside his own z's, rises along the rail band while it
+ *  grows, and pops off (one shrunken frame) before it reaches the door elevation's foot line (world 1190). */
+const Z_SIZE = 18;
+const Z_DUR = 0.6;
 export const BigZ: React.FC<{at: number}> = ({at}) => {
   const t = useTime();
-  if (t < at || t > at + 0.75) return null;
-  const q = prog(t, at, 0.75, E.outCubic);
-  const s = lerp(0.4, 1.1, E.outBack(1.6)(prog(t, at, 0.2)));
-  const x = PIP_RAIL[0] - 50 - 16 * q + 4 * osc(t, 3, 0.3);
-  const y = PIP_RAIL[1] - 66 - 70 * q;
-  const z = 'M-10 -10H10L-10 10H10';
-  return (
-    <XG m={mat.compose(mat.translate(x, y), mat.rotate(-12), mat.scale(s * 1.4))}>
-      <Ink d={z} width={2.6} taper={false} vary={0} order="all" seed="s5z" />
-    </XG>
-  );
+  if (t < at || t >= at + Z_DUR + 1 / 30) return null;
+  const q = prog(t, at, Z_DUR, E.outQuad);
+  const off = t >= at + Z_DUR ? 0.72 : 1;
+  const s = Z_SIZE * lerp(0.55, 1, E.outBack(1.4)(prog(t, at, 0.22))) * off;
+  const x = PIP_RAIL[0] - 44 - 28 * q + 2.5 * osc(t, 3, 0.3);
+  const y = PIP_RAIL[1] - 58 - 30 * q;
+  // the mascot's z polyline (poses.ts sleep), flipped: [s - a, b]
+  const P = (a: number, c: number) => `${(x + (s - a) - s / 2).toFixed(1)} ${(y + c - s / 2).toFixed(1)}`;
+  const z = `M${P(0, 0)}L${P(s, -0.2)}L${P(0.2, s)}L${P(s * 1.05, s)}`;
+  return <Ink d={z} width={2.9} vary={0.1} seed="s5z" />;
 };
 
 // ---------------------------------------------------------------- Bit: in the drawing, caught on 'bad', stows away

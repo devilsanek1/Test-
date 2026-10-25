@@ -6,7 +6,7 @@
 // ticks, and the low sun's shadows (one length rule for everyone on the lane, radial from the sun's ground point).
 
 import React, {useId} from 'react';
-import {captionFontStack, clamp, ease as E, Fill, Ink, lerp, line, mat, Mat, osc, palette, prog, Pt, rng, springAt, springs, stroke, useCaptionFont, useTime, XG, polyPath, TimeShift, PERSON_HAIR} from '../../lib';
+import {captionFontStack, clamp, ease as E, Fill, Ink, lerp, line, mat, Mat, osc, palette, prog, Pt, rng, springAt, springs, stroke, useCaptionFont, useTime, XG, polyPath, TimeShift, PERSON_HAIR, PERSON_LEGS, PERSON_SHOES} from '../../lib';
 import {useInkScale} from '../../lib/inkComp';
 import {Elephant, hop, MASCOT, popSwitch, walkSpeed, breath, trunkSway} from '../../lib/mascot';
 import type {PoseName, Expression} from '../../lib/mascot';
@@ -56,8 +56,10 @@ function personDraws(seed: string) {
   const hr = w * r.range(0.23, 0.26);
   r.range(0.36, 0.45);
   const hairColor = r.pick(PERSON_HAIR as unknown as string[]);
-  for (let i = 0; i < 5; i++) r.next();
-  return {w, hr, hairColor, phase: r.range(0, 6.28)};
+  const legsColor = r.pick(PERSON_LEGS as unknown as string[]);
+  const shoeColor = r.pick(PERSON_SHOES as unknown as string[]);
+  for (let i = 0; i < 3; i++) r.next();
+  return {w, hr, hairColor, legsColor, shoeColor, phase: r.range(0, 6.28)};
 }
 const personPhase = (seed: string) => personDraws(seed).phase;
 
@@ -91,10 +93,10 @@ export const knocks = (B: Beats) => [B.people + 0.08, B.people + 0.2];
  *  starts on 'a' with nothing to correct (the props Envelope `slot` align phase used to start below its clip line). */
 const alignWin = (B: Beats) => [knocks(B)[1] + 0.02, B.a] as const;
 
-/** Lean toward the door (deg, about his feet): in on the knocks, back upright by 'a' (the slot motion needs him square). */
+/** Lean toward the door (deg, about his feet): fix round 3, in as he arrives (door + 0.06, 0.2 s: it fills the quiet
+ *  pocket between the curtain and the screen), held through the knocks, back upright by 'a' (the slot needs him square). */
 function leanAt(t: number, B: Beats): number {
-  const k0 = knocks(B)[0];
-  return 3.2 * (E.outCubic(prog(t, k0 - 0.06, 0.1)) - E.inOutSine(prog(t, B.a - 0.12, 0.12)));
+  return 3.2 * (E.outCubic(prog(t, B.door + 0.06, 0.2)) - E.inOutSine(prog(t, B.a - 0.12, 0.12)));
 }
 
 /** The envelope hand's offset (person units) and the envelope's extra rotation: a 1-frame jab toward the door per knock
@@ -192,10 +194,67 @@ function msgBob(w: MsgWalk): number {
   return -Math.abs(Math.sin(msgPh(w))) * LEG * 0.035 * S;
 }
 
+// ---- his walking legs (fix round 3: "two rigid parallel leg rectangles that only alternate a small lift")
+
+const MSG_DRAWS = personDraws(MSG.seed);
+/** The lifted foot swings in toward the midline by up to 7 px (world) and its leg tapers 16 % at the foot (the bent knee
+ *  foreshortens it); the kit's lift (0.16 leg) stays; the planted foot stays ON the ground while the body bobs. */
+const FOOT_DX = 7 / S;
+const LEG_TAPER = 0.16;
+
+type LegsGeo = {legs: string; shoes: string; ink: string; dx: [number, number]; bw: [number, number]; drop: number};
+
+/** Both legs (person units: feet x / hip y origin, under the body bob), mirroring the kit Person's back-view walk
+ *  (lib/kit/Person: lw 0.31 w, gap 0.05 w, lift 0.16 legH on sin(ph)) plus the foot shift, the taper and the drop. */
+function legsGeo(ph: number, bobWorld: number): LegsGeo {
+  const lw = MSG_DRAWS.w * 0.31;
+  const g = MSG_DRAWS.w * 0.05;
+  const sn = Math.sin(ph);
+  const f: [number, number] = [Math.max(0, sn), Math.max(0, -sn)];
+  const drop = -bobWorld / S;
+  let legs = '';
+  let shoes = '';
+  let ink = '';
+  const dx: [number, number] = [0, 0];
+  const bw: [number, number] = [lw, lw];
+  ([0, 1] as const).forEach((i) => {
+    const x0 = i === 0 ? -g - lw : g;
+    const lift = f[i] * LEG * 0.16;
+    dx[i] = (i === 0 ? 1 : -1) * FOOT_DX * f[i];
+    bw[i] = lw * (1 - LEG_TAPER * f[i]);
+    const yb = LEG - lift + drop;
+    const bl = x0 + dx[i] + (lw - bw[i]) / 2;
+    legs += polyPath([[x0, -2], [x0 + lw, -2], [bl + bw[i], yb], [bl, yb]]);
+    shoes += polyPath([[bl - (i === 0 ? 1 : 2), yb - 12], [bl - (i === 0 ? 1 : 2) + bw[i] + 3, yb - 12], [bl - (i === 0 ? 1 : 2) + bw[i] + 3, yb + 2], [bl - (i === 0 ? 1 : 2), yb + 2]]);
+    const inner = i === 0 ? [x0 + lw, bl + bw[i]] : [x0, bl];
+    const outer = i === 0 ? [x0, bl] : [x0 + lw, bl + bw[i]];
+    ink += `M${outer[0].toFixed(2)} 0L${outer[1].toFixed(2)} ${yb.toFixed(2)}M${inner[0].toFixed(2)} 0L${inner[1].toFixed(2)} ${(yb - 2).toFixed(2)}`;
+  });
+  return {legs, shoes, ink, dx, bw, drop};
+}
+
+/** Speed lines off his back (left) edge on the cut on action (~1100 px/s on screen: S05's run-out speed): three short
+ *  ink dashes trailing the coat and a leg for the first frames, retracting into him by cut + 0.17 (person units). */
+function speedLines(d: number): string {
+  if (d < 0 || d >= 0.17) return '';
+  const k = d < 0.11 ? 1 : 1 - (d - 0.11) / 0.06;
+  const edge = -MSG_DRAWS.w * 0.535 - 8 / S;
+  let out = '';
+  for (const [y, Lpx, o] of [[-TORSO * 0.74, 66, 0], [-TORSO * 0.36, 88, 10], [LEG * 0.55, 52, 22]] as const) {
+    const L = (Lpx / S) * k;
+    const x = edge + o / S;
+    out += `M${x.toFixed(2)} ${y.toFixed(2)}L${(x - L).toFixed(2)} ${(y + L * 0.03).toFixed(2)}`;
+  }
+  return out;
+}
+
 /** The messenger: props Messenger (ink hair, collar band: the kit defaults; holding the envelope up) while he walks;
  *  from the door beat the arm (props FigureArm, the kit's own arm: no shape change at the hand-over) + envelope are
  *  drawn here so the hand can knock, the envelope can line up and go through the slot and the arm can drop. His hero
- *  detail (satchel, seams, soles, peach rim) rides on top; the whole figure leans in on the knocks. */
+ *  detail (satchel, seams, soles, peach rim) rides on top; the whole figure leans in at the door.
+ *  Fix round 3: while he walks, the kit's legs are clipped off below the coat hem and drawn here (legsGeo: the lifted
+ *  foot swings in, its leg tapers, the planted foot stays down while the body bobs), the satchel lags the body by a
+ *  frame (a 2.6 deg swing + the bob lag), and three speed lines trail his back edge on the cut. */
 export const MessengerS06: React.FC<{B: Beats; zoom?: number}> = ({B, zoom = 1.05}) => {
   const t = useTime();
   const id = 'm6' + useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -215,12 +274,36 @@ export const MessengerS06: React.FC<{B: Beats; zoom?: number}> = ({B, zoom = 1.0
   const bob = msgBob(w);
   const k = S * zoom;
   const slotY = (SLOT[1] - HIP_Y) / S;
+  // walking legs + the satchel's one-frame lag
+  const legs = w.walking ? legsGeo(msgPh(w), bob) : null;
+  const wPrev = msgWalk(t - 1 / 30, B);
+  const bagFx = w.walking || wPrev.walking ? {rot: 2.6 * Math.sin(msgPh(wPrev)), dy: (msgBob(wPrev) - bob) / S} : undefined;
+  const speed = speedLines(t - B.cut);
+  const body = (
+    <TimeShift by={t - w.tau}>
+      <Messenger x={w.x} y={MSG.y} h={MSG.h} holdEnvelope={!own} walk={{hz: w.hz}} seed={MSG.seed} />
+    </TimeShift>
+  );
   return (
     <>
       <XG m={leanMat(t, B, w)}>
-        <TimeShift by={t - w.tau}>
-          <Messenger x={w.x} y={MSG.y} h={MSG.h} holdEnvelope={!own} walk={{hz: w.hz}} seed={MSG.seed} />
-        </TimeShift>
+        {legs ? (
+          <>
+            <XG m={mat.compose(mat.translate(w.x, HIP_Y + bob), mat.scale(S))}>
+              <Fill d={legs.legs} color={MSG_DRAWS.legsColor} offset={false} mode="none" seed={`${MSG.seed}/s6legs`} />
+              <Fill d={legs.shoes} color={MSG_DRAWS.shoeColor} offset={false} mode="none" seed={`${MSG.seed}/s6shoes`} />
+              <Ink d={legs.ink} width={W * 0.9} seed={`${MSG.seed}/s6legI`} />
+            </XG>
+            <defs>
+              <clipPath id={`${id}h`}>
+                <rect x={w.x - 1000} y={HIP_Y + bob - 2000} width={2000} height={2000 + 2.6 * S} />
+              </clipPath>
+            </defs>
+            <g clipPath={`url(#${id}h)`}>{body}</g>
+          </>
+        ) : (
+          body
+        )}
         {own && e ? (
           <XG m={mat.compose(mat.translate(w.x, HIP_Y), mat.scale(S))}>
             {e.clipY !== null ? (
@@ -243,7 +326,8 @@ export const MessengerS06: React.FC<{B: Beats; zoom?: number}> = ({B, zoom = 1.0
           </XG>
         ) : null}
         <XG m={mat.compose(mat.translate(w.x, HIP_Y + bob), mat.scale(S))}>
-          <MessengerDetail seed={MSG.seed} k={k} ph={w.walking ? msgPh(w) : undefined} arm={own ? (q > 0.6 ? {sh, hand} : undefined) : {sh, hand: up}} />
+          <MessengerDetail seed={MSG.seed} k={k} ph={w.walking ? msgPh(w) : undefined} arm={own ? (q > 0.6 ? {sh, hand} : undefined) : {sh, hand: up}} feet={legs ? {dx: legs.dx, bw: legs.bw, drop: legs.drop} : undefined} bag={bagFx} />
+          {speed ? <Ink d={speed} width={3.4 / S} taper={false} order="all" seed="s6speed" /> : null}
         </XG>
       </XG>
       <KnockTicks B={B} />
@@ -326,7 +410,9 @@ const BitRim: React.FC<{x: number; y: number; size: number; flip?: boolean}> = (
 export const BitS06: React.FC<{B: Beats; size?: number}> = ({B, size = BIT_SIZE}) => {
   const t = useTime();
   const id = 'b6' + useId().replace(/[^a-zA-Z0-9]/g, '');
-  if (t < B.gave) return null;
+  // fix round 3 (rule 5): a small element leads its word by 0.10 s, so his shell clears the collar AS 'gave' is said
+  const peekAt = B.gave - 0.1;
+  if (t < peekAt) return null;
   const w = msgWalk(t, B);
   // on the shoulder's top line, right of the collar band (person units -> world), 8 px out and 6 px up of the collar
   const shoulderAt = (x: number, bob: number): Pt => [x + GW * 0.3 * S + 7, HIP_Y - TORSO * S - 1.5 + bob];
@@ -335,7 +421,7 @@ export const BitS06: React.FC<{B: Beats; size?: number}> = ({B, size = BIT_SIZE}
   const hopDur = 0.3;
   if (t < hopAt) {
     // peek: rises out from behind the shoulder line (clipped), then rides
-    const k = prog(t, B.gave, 0.2, E.outBack(1.6));
+    const k = prog(t, peekAt, 0.2, E.outBack(1.6));
     const rise = (1 - k) * size * 0.75;
     return (
       <XG m={leanMat(t, B, w)}>
@@ -389,10 +475,12 @@ const MAKER_SEEDS = (() => {
   return [s0, s1, s2];
 })();
 
-/** Three makers (props Maker, waist-up, back view) pop UP into the browser window's screen: rise 0.2 s (outBack: the
- *  hair tops overshoot ~9 px over the browser bar), 0.06 s apart, middle first, led so the middle one's overshoot lands
- *  ON 'heads'; three ink pop ticks above them. Then they lean toward the door below (-6 deg about the hip, 5 px down:
- *  looking down at the mail slot, still back view). Clipped to the screen rect widened up over the bar. */
+/** Three makers (props Maker, waist-up, back view) pop UP into the browser window's screen: rise 0.2 s, 0.06 s apart,
+ *  middle first, led so the middle one's overshoot lands ON 'heads'; three ink pop ticks above the window. Then they lean
+ *  toward the door below (-6 deg about the hip, 5 px down: looking down at the mail slot, still back view).
+ *  Fix round 3 (the heads rose into the chrome bar and covered the traffic-light dots: the window stopped reading as a
+ *  browser): clipped to the CONTENT rect below the chrome bar, the heads rest 6 px under it (the outer two 10 px) and the
+ *  overshoot is capped (outBack 1.3: ~6 px), so a head top reaches the bar line at most and is never flattened. */
 export const MakerHeads: React.FC<{screen: {x: number; y: number; w: number; h: number; bar?: number}; at: number; tickAt?: number}> = ({screen, at, tickAt = at}) => {
   const t = useTime();
   const id = 'mh' + useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -400,7 +488,7 @@ export const MakerHeads: React.FC<{screen: {x: number; y: number; w: number; h: 
   const h = 135;
   // bust: s = h / (FIG_H 0.62); head top = hip - (TORSO + hr 1.86) s, hr ~ 23: the head tops rest 3 px under the bar
   const sB = h / (FIG_H * 0.62);
-  const hipY = screen.y + 3 + (TORSO + 23 * 1.86) * sB;
+  const hipY = screen.y + 6 + (TORSO + 23 * 1.86) * sB;
   const xs = [screen.x + screen.w * 0.19, screen.x + screen.w * 0.5, screen.x + screen.w * 0.81];
   const order = [1, 0, 2]; // the middle one first
   const tick = (() => {
@@ -419,17 +507,17 @@ export const MakerHeads: React.FC<{screen: {x: number; y: number; w: number; h: 
     <>
       <defs>
         <clipPath id={id}>
-          <rect x={screen.x} y={screen.y - 16} width={screen.w} height={screen.h + 16} />
+          <rect x={screen.x} y={screen.y} width={screen.w} height={screen.h} />
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>
         {xs.map((x, i) => {
           const a = at + order[i] * 0.06;
           if (t < a) return null;
-          const k = prog(t, a, 0.2, E.outBack(1.7));
+          const k = prog(t, a, 0.2, E.outBack(1.3));
           // look down at the door (it is below-left of the window): a lean about the hip once they are up
           const look = E.inOutSine(prog(t, a + 0.24, 0.22));
-          const hy = hipY + (i === 1 ? -3 : 3);
+          const hy = hipY + (i === 1 ? 0 : 4);
           return (
             <XG key={i} m={mat.compose(mat.translate(0, (1 - k) * 96 + 5 * look), mat.about(mat.rotate(-6 * look), x, hy))}>
               <Maker x={x} y={hy} h={h} bust work={1.6 + i * 0.35} flip={i === 2} seed={MAKER_SEEDS[i]} />
@@ -577,12 +665,14 @@ export const PipS06: React.FC<{B: Beats}> = ({B}) => {
 
 /** 'shh' lettered beside Pip in CaptionHand (64 px world = ~44 px x-height-to-ascender on screen), a short ink tail
  *  pointing at his trunk tip, two hush ticks: pops in with the 7 % spring, holds, shrinks away in 0.12 s. */
-export const ShhMark: React.FC<{x: number; y: number; at: number; outAt: number; tail?: Pt; size?: number}> = ({x, y, at, outAt, tail, size = 64}) => {
+export const ShhMark: React.FC<{x: number; y: number; at: number; outAt: number; flickAt?: number; tail?: Pt; size?: number}> = ({x, y, at, outAt, flickAt, tail, size = 64}) => {
   const t = useTime();
   useCaptionFont();
   if (t < at || t >= outAt + 0.12) return null;
   const k = springAt(t, at, springs.pop) * (1 - E.inCubic(prog(t, outAt, 0.12)));
   if (k <= 0.01) return null;
+  // fix round 3: the two hush ticks re-flick once mid-hold (snap to 0.6 of their length, back to 1 in 0.1 s)
+  const fk = flickAt !== undefined && t >= flickAt && t < flickAt + 0.1 ? lerp(0.6, 1, E.outCubic((t - flickAt) / 0.1)) : 1;
   // the tail: from under the lettering's left end toward the trunk tip (stops 30 px short of it), in the mark's frame
   let tailD = '';
   if (tail) {
@@ -603,7 +693,7 @@ export const ShhMark: React.FC<{x: number; y: number; at: number; outAt: number;
       <text x={0} y={0} textAnchor="middle" fontFamily={captionFontStack} fontSize={size} fill={palette.ink}>
         shh
       </text>
-      <Ink d={line(size * 0.82, -size * 0.6, size * 1.1, -size * 0.82, {over: 0, seed: 's6shh1'}) + line(size * 0.86, -size * 0.25, size * 1.22, -size * 0.3, {over: 0, seed: 's6shh2'})} width={3.2} taper={false} seed="s6shhi" />
+      <Ink d={line(size * 0.82, -size * 0.6, size * (0.82 + 0.28 * fk), -size * (0.6 + 0.22 * fk), {over: 0, seed: 's6shh1'}) + line(size * 0.86, -size * 0.25, size * (0.86 + 0.36 * fk), -size * (0.25 + 0.05 * fk), {over: 0, seed: 's6shh2'})} width={3.2} taper={false} seed="s6shhi" />
       {tailD ? <Ink d={tailD} width={3.0} taper={false} seed="s6shht" /> : null}
     </XG>
   );

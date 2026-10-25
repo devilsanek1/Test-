@@ -3,7 +3,7 @@
 // the frame's left / right edges, a narrow aisle left open in the centre (the plaza, the shade wedge and the pigeons
 // show through it). They are the props EdgeOnlooker (tier A heads, coat running off the bottom), drawn in the
 // `foreground` layer (parallax 1.12). They react with 1-frame pose swaps: two heads tilt UP on 'figured', one turns to
-// its neighbour on 'bad'. Plus the plaza's pigeons (steps layer). World px, scene seconds.
+// its neighbour on 'was.' (19.45). Plus the plaza's pigeons (steps layer). World px, scene seconds.
 import React, {useId} from 'react';
 import {palette} from '../../lib/theme';
 import {osc, prog, useTime} from '../../lib/time';

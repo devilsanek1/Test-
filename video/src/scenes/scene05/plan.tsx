@@ -167,9 +167,12 @@ export const FoundRing: React.FC<{x: number; y: number; r: number; at: number; p
  *  units) and the bar's tail shows left of the guide. */
 const BOLT = {from: LOCK.tip.short, to: -27, len: 30};
 
+/** The turn (s): fix round 4 0.22 -> 0.20 (the turn starts 0.05 s earlier and the door swings at 'bad'+0.12). */
+export const TURN_DUR = 0.2;
+
 /** The thumb-turn the dashed hand redraws and turns (90 deg, `dur`), and the bolt sliding all the way back with it:
  *  the lock opens with no key (S02's 'take over', recalled on 'bad'). Drawn over the lock. */
-export const LockTurn: React.FC<{drawAt: number; turnAt: number; undrawAt: number; dur?: number}> = ({drawAt, turnAt, undrawAt, dur = 0.22}) => {
+export const LockTurn: React.FC<{drawAt: number; turnAt: number; undrawAt: number; dur?: number}> = ({drawAt, turnAt, undrawAt, dur = TURN_DUR}) => {
   const t = useTime();
   const id = 'lt5' + useId().replace(/[^a-zA-Z0-9]/g, '');
   if (t < drawAt) return null;
@@ -225,8 +228,9 @@ export const LockTurn: React.FC<{drawAt: number; turnAt: number; undrawAt: numbe
   );
 };
 
-/** The hand's turn (deg) about its pinch point: 12 deg over 0.22 s in-out sine (the sleeve end stays < ~16 px/frame). */
-export const handTurn = (t: number, at: number, deg = 12, dur = 0.22) => deg * E.inOutSine(prog(t, at, dur));
+/** The hand's turn (deg) about its pinch point: 12 deg over TURN_DUR in-out sine (the sleeve's break end, ~250 world
+ *  out, peaks at ~15.5 px/frame). */
+export const handTurn = (t: number, at: number, deg = 12, dur = TURN_DUR) => deg * E.inOutSine(prog(t, at, dur));
 
 // ---------------------------------------------------------------- the steps and the plaza
 
@@ -250,11 +254,24 @@ const STEP_G = (() => {
   const x1 = STEPS.x1;
   let treads = rectPath(X0, STEPS.landing[0], X1 - X0, STEPS.landing[1] - STEPS.landing[0]);
   for (let i = 0; i < STEPS.n; i++) treads += rectPath(X0, STEPS.y0 + i * STEPS.pitch, x1 - X0, STEPS.tread);
-  // the cheek block under the wing (the flight stops against it), its cream coping and face ink
-  const cheek = rectPath(x1, STEPS.y0 - 2, X1 - x1, STEPS.landing[0] - STEPS.y0 + 2);
-  const coping = rectPath(x1 - 4, STEPS.y0 - 4, X1 - x1 + 4, 11);
-  const cheekInk = line(x1 - 4, STEPS.y0 - 4, X1, STEPS.y0 - 3, {seed: 's5chT', over: [0, 0]}) + line(x1 - 4, STEPS.y0 + 7, X1, STEPS.y0 + 8, {seed: 's5chC', over: [0, 0]}) + line(x1, STEPS.y0 + 7, x1 + 1, STEPS.landing[0], {seed: 's5chE', over: [0, 2]});
-  return {base: rectPath(X0, STEPS.y0 - 2, X1 - X0, STEPS.plinth - STEPS.y0 + 2), treads, cheek, coping, cheekInk};
+  // the cheek block under the wing (the flight stops against it), its cream coping and face ink. Fix round 4 (it read
+  // as a blank slab): a deeper cream coping that overhangs the block's left face, its lines OVERSHOOTING with open
+  // corners (the reference's hand), a darker riser band along its foot (ochre, the plinth's shadow step) and two
+  // clusters of short ink hatch ticks on the face (worn stone); no new focal element
+  const y0 = STEPS.y0;
+  const yF = STEPS.landing[0];
+  const cheek = rectPath(x1, y0 - 2, X1 - x1, yF - y0 + 2);
+  const coping = rectPath(x1 - 11, y0 - 6, X1 - x1 + 11, 15);
+  const foot = rectPath(x1, yF - 9, X1 - x1, 9);
+  const cheekInk =
+    line(x1 - 19, y0 - 6, X1, y0 - 5, {seed: 's5chT', over: [0, 0]}) +
+    line(x1 - 14, y0 + 9, X1, y0 + 10, {seed: 's5chC', over: [0, 0]}) +
+    line(x1 - 11, y0 - 3, x1 - 10.5, y0 + 6.5, {seed: 's5chL', over: [0, 0]}) +
+    line(x1, y0 + 13, x1 + 1, yF - 2, {seed: 's5chE', over: [0, 0]}) +
+    line(x1 - 6, yF - 9, X1, yF - 8, {seed: 's5chF', over: [0, 0]});
+  const tick = (x: number, y: number, n: number) => Array.from({length: n}, (_, i) => `M${x + i * 7} ${y + i * 1.5}l-7 9`).join('');
+  const hatch = tick(884, 1346, 3) + tick(966, 1392, 2) + tick(912, 1404, 2);
+  return {base: rectPath(X0, y0 - 2, X1 - X0, STEPS.plinth - y0 + 2), treads, cheek, coping, foot, cheekInk, hatch};
 })();
 
 /** The nosing lines with the gaps open at t (segments between the cuts; each line keeps its own seed). */
@@ -291,8 +308,10 @@ export const StepsOverlay: React.FC<{gaps?: StepGap[]}> = ({gaps = []}) => {
       <Fill d={STEP_G.treads} color={palette.cream} seed="s5stT" />
       <Fill d={STEP_G.cheek} color={palette.tan} offset={false} mode="none" seed="s5chk" />
       <Fill d={STEP_G.coping} color={palette.cream} offset={false} mode="none" seed="s5cop" />
+      <Fill d={STEP_G.foot} color={palette.brown} offset={false} mode="none" seed="s5chFt" />
       <Ink d={stepInk(t, gaps)} width={SI.mid} seed="s5stI" />
       <Ink d={STEP_G.cheekInk} width={SI.mid} seed="s5chI" />
+      <Ink d={STEP_G.hatch} width={SI.hair} taper={false} seed="s5chH" />
     </>
   );
 };

@@ -8,7 +8,7 @@
 // World px (steps layer, parallax 1.0), scene seconds.
 import React, {useId} from 'react';
 import {palette} from '../../lib/theme';
-import {clamp, useTime} from '../../lib/time';
+import {clamp, ease as E, lerp, prog, useTime} from '../../lib/time';
 import {rng} from '../../lib/rng';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
@@ -125,8 +125,12 @@ const CoatTail: React.FC<{f: number}> = ({f}) => {
   );
 };
 
-/** Lean of the upper body into the run (deg), the pose pop at 'was.' + a quick settle. */
+/** Lean of the upper body into the run (deg), the pose pop at 'was.'. Fix round 4 (the cut snapped from this lean to
+ *  S06's upright walk): it eases down to LEAN_CUT over 0.14 s and holds it for the last 4 frames (a brisk stride into
+ *  the cut, not a dash). */
 const LEAN = 9;
+const LEAN_CUT = 3.5;
+const leanAt = (t: number, b: Beats) => lerp(LEAN, LEAN_CUT, E.inOutSine(prog(t, b.end - 0.27, 0.14)));
 
 export type MsgState = {x: number; running: boolean; hip: Pt; lean: number; drop: number; idx: number};
 
@@ -138,7 +142,7 @@ export function messengerState(t: number, b: Beats): MsgState {
   if (!running) return {x, running, hip: [x, FEET - LEG * S], lean: 0, drop: 0, idx: -1};
   const idx = poseIdx(t, b);
   const drop = bodyDrop(POSES[idx]);
-  return {x, running, hip: [x, FEET - LEG * S + drop * S], lean: LEAN, drop, idx};
+  return {x, running, hip: [x, FEET - LEG * S + drop * S], lean: leanAt(t, b), drop, idx};
 }
 
 /** The right collar point (world): where Bit lands and ducks in (S06's stowaway spot). */

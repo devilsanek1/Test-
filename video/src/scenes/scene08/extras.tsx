@@ -11,11 +11,12 @@
 //     'millions'.
 import React from 'react';
 import {palette} from '../../lib/theme';
-import {springAt, springs, useTime} from '../../lib/time';
+import {ease as E, lerp, osc, prog, springAt, springs, useTime} from '../../lib/time';
+import {mat, XG} from '../../lib/xf';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {ellipse, line, rect, rectPath} from '../../lib/sketch';
-import {BrowserChrome, EdgeOnlooker} from '../shared/props';
+import {blob, ellipse, line, rect, rectPath} from '../../lib/sketch';
+import {BrowserChrome, DEPTH_INK, EdgeOnlooker, FigureArm} from '../shared/props';
 import {SI, WIRES, wireAt} from '../shared/sets';
 import {DOME8, DOORS3, R2} from './layout';
 import {doorPaths} from './crowd';
@@ -178,15 +179,106 @@ export const DeckClutter: React.FC = () => (
 /** Parallax factor of the neighbours' layer (depth 1 - f): nearer than our parapet. */
 export const NEIGHBOUR_F = 1.2;
 
-/** Two back-view neighbours watching the city from our deck, cropped by the bottom edge (EdgeOnlooker: the coat always
- *  runs off the frame). Fix round 3: MIRRORED to continue S07's readers across the match cut (the bun / tan-hair reader
- *  on the LEFT, the teal-cap reader on the RIGHT), the left one moved in so its head clears the bottom-left paint corner. */
-export const Neighbours: React.FC<{reactAt: number}> = ({reactAt}) => (
-  <>
-    <EdgeOnlooker x={NB.L.x} y={NB.L.y} head={NB.L.head} hair="bun" hairColor={palette.tan} body={palette.brown} acc={['collar']} rim="right" arms="near" depth="mid" bob={0} seed="s8/nbL" />
-    <EdgeOnlooker x={NB.R.x} y={NB.R.y} head={NB.R.head} hair="cap" body={palette.teal} rim="left" arms="near" depth="mid" bob={0} seed="s8/nbR" />
-  </>
-);
-
 /** Head centres / diameters (world, the neighbours' own layer). */
 export const NB = {L: {x: 250, y: 1684, head: 164}, R: {x: 950, y: 1690, head: 170}};
+
+/** A crescent rim on one side of a head (centre c, radius r): outer arc from angle a0 to a1 (deg, 0 = right, 90 =
+ *  down), back along an inner arc w px in. */
+function crescent(cx: number, cy: number, r: number, a0: number, a1: number, w: number): string {
+  const pt = (a: number, rr: number) => `${(cx + Math.cos((a * Math.PI) / 180) * rr).toFixed(1)} ${(cy + Math.sin((a * Math.PI) / 180) * rr).toFixed(1)}`;
+  const big = Math.abs(a1 - a0) > 180 ? 1 : 0;
+  const sw = a1 > a0 ? 1 : 0;
+  return `M${pt(a0, r)}A${r} ${r} 0 ${big} ${sw} ${pt(a1, r)}L${pt(a1, r - w * 0.3)}A${r - w} ${r - w} 0 ${big} ${1 - sw} ${pt(a0, r - w * 0.3)}Z`;
+}
+
+/** The detail the kit leaves out at this size (fix round 3; ref2 f_33's near heads): sand ear fills (behind the head),
+ *  a one-sided CREAM rim on the sun side, hair strands / a hair tie (bun) or cap panel seams + nape strands (cap). */
+const HeadBack: React.FC<{c: {x: number; y: number; head: number}}> = ({c}) => {
+  const r = c.head / 2;
+  const ears = blob(c.x - 0.99 * r, c.y + 0.1 * r, 0.15 * r, 0.26 * r, {seed: 's8/earL'}) + blob(c.x + 0.99 * r, c.y + 0.1 * r, 0.15 * r, 0.26 * r, {seed: 's8/earR'});
+  return <Fill d={ears} color={palette.sand} offset={false} mode="none" seed="s8/ears" />;
+};
+
+const BUN = (() => {
+  const {x, y, head} = NB.L;
+  const r = head / 2;
+  // two cream highlight strands on the sun side + two ink strands sweeping up to the bun, a hair tie at the bun's base
+  const strandsC = `M${x + 0.62 * r} ${y + 0.62 * r}Q${x + 0.72 * r} ${y - 0.1 * r} ${x + 0.22 * r} ${y - 0.74 * r}M${x + 0.36 * r} ${y + 0.78 * r}Q${x + 0.46 * r} ${y + 0.05 * r} ${x + 0.1 * r} ${y - 0.7 * r}`;
+  const strandsI = `M${x - 0.66 * r} ${y + 0.55 * r}Q${x - 0.7 * r} ${y - 0.2 * r} ${x - 0.2 * r} ${y - 0.74 * r}M${x - 0.12 * r} ${y + 0.86 * r}Q${x - 0.2 * r} ${y + 0.1 * r} ${x - 0.04 * r} ${y - 0.7 * r}`;
+  const tie = `M${x - 0.26 * r} ${y - 0.86 * r}Q${x} ${y - 0.74 * r} ${x + 0.26 * r} ${y - 0.86 * r}`;
+  const rim = crescent(x, y, r * 0.99, -70, 62, Math.max(5, r * 0.08));
+  return {strandsC, strandsI, tie, rim};
+})();
+
+const CAP = (() => {
+  const {x, y, head} = NB.R;
+  const r = head / 2;
+  const by = y + 0.42 * r; // the cap band
+  // two panel seams from the button down to the band, five short nape strands under the band, a cream rim on the
+  // sun (left) side of the cap dome
+  const seams = `M${x - 0.08 * r} ${y - 0.95 * r}Q${x - 0.5 * r} ${y - 0.55 * r} ${x - 0.58 * r} ${by - 2}M${x + 0.08 * r} ${y - 0.95 * r}Q${x + 0.5 * r} ${y - 0.55 * r} ${x + 0.58 * r} ${by - 2}`;
+  let nape = '';
+  [-0.62, -0.36, -0.08, 0.2, 0.48].forEach((u, i) => {
+    const x0 = x + u * r;
+    nape += `M${x0.toFixed(1)} ${(by + 0.1 * r).toFixed(1)}q${(0.05 * r).toFixed(1)} ${(0.16 * r).toFixed(1)} ${((i % 2 ? -0.02 : 0.04) * r).toFixed(1)} ${(0.3 * r).toFixed(1)}`;
+  });
+  const rim = crescent(x, y, r * 1.02, 190, 318, Math.max(5, r * 0.08));
+  return {seams, nape, rim};
+})();
+
+/** Fix round 3: the right neighbour's reaction on 'millions' (replaces the raised white phone: it sat in the right
+ *  rail and was the brightest thing in the frame): BOTH hands to the head (the arms swing up from below the frame,
+ *  0.25 s outBack, elbows out); jointed sleeves (FigureArm) in the coat colour, sand hands on the cap's sides. */
+const HandsToHead: React.FC<{at: number}> = ({at}) => {
+  const t = useTime();
+  if (t < at) return null;
+  const {x, y, head} = NB.R;
+  const r = head / 2;
+  const q = E.outBack(1.4)(prog(t, at, 0.25));
+  const arm = (sd: -1 | 1) => {
+    const sh: [number, number] = [x + sd * 1.32 * r, 1955];
+    const down: [number, number] = [sh[0] + sd * 10, 2160];
+    const up: [number, number] = [x + sd * 0.98 * r, y + 0.02 * r];
+    const hand: [number, number] = [lerp(down[0], up[0], q), lerp(down[1], up[1], q)];
+    return <FigureArm key={sd} sh={sh} hand={hand} w={0.5 * r} coat={palette.teal} W={DEPTH_INK.front} side={sd} bend={70} seed={`s8/nbRarm${sd}`} />;
+  };
+  return (
+    <>
+      {arm(-1)}
+      {arm(1)}
+    </>
+  );
+};
+
+/** Two back-view neighbours watching the city from our deck, cropped by the bottom edge (EdgeOnlooker: the coat always
+ *  runs off the frame). Fix round 3: MIRRORED to continue S07's readers across the match cut (the bun / tan-hair reader
+ *  on the LEFT, the teal-cap reader on the RIGHT), the left one moved in so its head clears the bottom-left paint
+ *  corner; front ink (4.8, the heaviest in the frame), ear fills, a cream rim on the sun side, strands / cap seams; the
+ *  left one flinches on 'millions', the right one puts both hands on its head. Each bobs on its own (1.2 px). */
+export const Neighbours: React.FC<{reactAt: number; flinchAt: number}> = ({reactAt, flinchAt}) => {
+  const t = useTime();
+  const bobL = osc(t, 0.5, 0.7) * 1.2;
+  const bobR = osc(t, 0.45, 2.3) * 1.2;
+  const fl = t >= flinchAt && t < flinchAt + 0.3 ? -Math.sin(((t - flinchAt) / 0.3) * Math.PI) * 9 : 0;
+  const jolt = t >= reactAt && t < reactAt + 0.2 ? -Math.sin(((t - reactAt) / 0.2) * Math.PI) * 6 : 0;
+  return (
+    <>
+      <XG m={mat.translate(0, bobL + fl)}>
+        <HeadBack c={NB.L} />
+        <EdgeOnlooker x={NB.L.x} y={NB.L.y} head={NB.L.head} hair="bun" hairColor={palette.tan} body={palette.brown} acc={['collar']} rim="right" arms="near" depth="front" bob={0} seed="s8/nbL" />
+        <Fill d={BUN.rim} color={palette.cream} offset={false} mode="none" seed="s8/nbLrim" />
+        <Ink d={BUN.strandsI} width={2.2} seed="s8/nbLsi" />
+        <Ink d={BUN.strandsC} width={2.6} color={palette.cream} seed="s8/nbLsc" />
+        <Ink d={BUN.tie} width={3.4} taper={false} seed="s8/nbLtie" />
+      </XG>
+      <XG m={mat.translate(0, bobR + jolt)}>
+        <HeadBack c={NB.R} />
+        <EdgeOnlooker x={NB.R.x} y={NB.R.y} head={NB.R.head} hair="cap" body={palette.teal} rim="left" arms={t >= reactAt ? false : 'near'} depth="front" bob={0} seed="s8/nbR" />
+        <Fill d={CAP.rim} color={palette.cream} offset={false} mode="none" seed="s8/nbRrim" />
+        <Ink d={CAP.seams} width={2.2} seed="s8/nbRse" />
+        <Ink d={CAP.nape} width={2} color={palette.tealDark} order="all" seed="s8/nbRna" />
+        <HandsToHead at={reactAt} />
+      </XG>
+    </>
+  );
+};

@@ -44,24 +44,29 @@ export const W = {
 export const B = {
   // 'And' w165: Pip lands on his bollard (from S11's leap toward the lens), scale 1.0
   pipLand: W.and,
-  pipApex: 0.05,
+  // fix round 1: the apex is just BEFORE the cut, so the first frame is already falling (S11 hands him off rising; the
+  // wide picks him up over the top of the arc, drifting right onto the bollard)
+  pipApex: -0.03,
   // 'some' w166: the lettered 'back soon' tags swing once (govB, then govA, 0.05 s apart): these ones did it
   tagSwing: [W.some - 0.04, W.some + 0.01],
   // 'those' w168: two pigeons land on the dark lamp crossbar (touch-down ON the word; the fly-in leads it)
   pigeonsLand: [W.those - 0.02, W.those + 0.05],
   pigeonFly: 0.34, // fly-in duration
-  // w168+0.20: a citizen (sB) points at govB; lowers it before 'did' (fix round 1: down by ~53.40, so it does not
-  // compete with Pip's nod and the 'did' beat)
+  // w168+0.20: a citizen (sB) points at govB; lowers it before 'did' (fix round 1: 1.10 -> down by 1.30 = 53.46, one
+  // frame before Pip's nod and the 'did' tags / sparkles, so it no longer competes with them; was 1.24 -> 53.60)
   point: L(53.005) - 0.05,
-  pointDown: 1.12,
-  // 'governments' w169: the citizens lower their phones (fA on the word; [1] unused; the big left edge onlooker's phone
-  // leads it by rule 5's small-element lead (fix round 1: it is the largest move, so it fills the gap after 'those'))
-  phonesDown: [W.governments - 0.05, W.governments + 0.03, W.governments - 0.085],
+  pointDown: 1.1,
+  // 'governments' w169: the citizens lower their phones: fA just before the word; [1] unused; the big left edge
+  // onlooker's phone (the largest move in the frame) leads it like a big build (rule 5: -0.25..-0.40 completes on the
+  // word; -0.17 + its 0.22 s ease lands at 'governments' + 0.05). Fix round 1: was +0.06, so f20-f28 after the
+  // pigeons' touch-down were dead / near-dead; now its arm fills f21-f27)
+  phonesDown: [W.governments - 0.05, W.governments + 0.03, W.governments - 0.17],
   // heads turn back to the plaza after the phones are down (back-view before the rewind starts)
   headsBack: [W.governments + 0.2, W.governments + 0.26, W.governments + 0.32, W.governments + 0.38],
-  // w169+0.25: a pigeon flaps (a flutter-hop on the bar); govA's tag twirls once more (a second swing)
+  // w169+0.25: a pigeon flaps (a flutter-hop on the bar); govA's tag twirls once more (a second swing; fix round 1: at
+  // w169+0.12, so it fills the lull after the phones and the point, f30-f33; the flap keeps +0.25)
   pigeonFlap: L(53.265),
-  tagTwirlA: L(53.265) - 0.02,
+  tagTwirlA: W.governments + 0.12,
   // S11's sticky note (carried into the wide) curls its corner in the breeze on 'of' and after 'governments'
   noteCurl: [W.of - 0.04, W.governments + 0.3],
   // the near observer leans in toward govB on 'those', straightens on 'did'
@@ -70,6 +75,10 @@ export const B = {
   // 'did' w170: Pip nods (sit-back squash pulse +0.08 -> 0, 0.2 s); the padlocks glint at once
   nod: W.did - 0.02,
   glint: W.did,
+  // fix round 1, the phone-readable 'did' focal: both lettered tags kick together (pendulum 14 deg, 0.5 s) and a big
+  // cream sparkle pops on each padlock, ON the word
+  tagDid: W.did - 0.03,
+  sparkle: W.did - 0.02,
   // 'before' w172-0.05: THE REWIND. The power glyph shrinks out, the bold cream REWIND glyph pops in; S01 starts
   // playing backwards (the R phase below)
   powerOut: L(53.71) - 0.06,

@@ -36,12 +36,15 @@ const ABS = {
   ivy: 14.835, //           w49-0.10 'in' (rule-5 lead): the ivy creeps up the door frame one step (green)
   lapse: 15.085, //         w50+0.05 'there': the time-lapse: 14 YEAR pages tear 0.07 s apart; the ivy steps a season
   //                        every 2 tears; ghosts pop in and out (~1 per tear)
-  sleep: 15.295, //         w51+0.10 'for': Pip curls up asleep on the step (sleep pose, z's float)
+  drowsy: 15.0, //          yawn+0.24: drowsy (sit-front, heavy lids, one slow nod) until he curls up
+  sleep: 15.145, //         w51-0.05 'for' (fix round 2: the storyboard's w51+0.10 trailed the word; rule-5 lead): Pip
+  //                        curls up asleep on the step (sleep pose, z's float)
   ghosts2: 15.375, //       w52 'like': a second pair of ghosts strides past; Bit yawns and blinks (he does not move)
   l5: 15.39, //             w53-0.10 'fourteen': label L5 swings in as a tag hanging from lock4 (pendulum -16 -> 0)
   cobweb: 15.59, //         w53+0.10 'fourteen': a cobweb draws over the lock box corner (0.3 s); Bit does not move
-  leaf: 15.55, //           w53+0.06 'fourteen' (storyboard w53+0.20, started 0.14 s early so it lands 0.3 s before the
-  //                        dive and is seen at rest): a tan leaf drifts down onto sleeping Pip's crown
+  leaf: 15.61, //           w53+0.12 'fourteen' = tear 7 + 0.035 (storyboard w53+0.20; fix round 2: one frame after the
+  //                        ivy turns tan on tear 7, and it goes bare on tear 9 while the leaf falls; lands 0.3 s before
+  //                        the dive, seen at rest): the last tan leaf drifts down onto sleeping Pip's crown
   dive: 16.26, //           cut(years)-0.33 'years': the camera dives into lock4 (in(quad), fixed 0.33 s); the leaf
   //                        lands on sleeping Pip's ear
   end: S04_END, //          cut(years): match-cut into S05 on the lock (65 x 80 px at screen (483, 960))

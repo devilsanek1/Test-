@@ -113,8 +113,25 @@ const Rings: React.FC<{at: number; outAt: number; goneAt: number}> = ({at, outAt
   );
 };
 
+/** Fix round 3: S09 opens on a sage dusk with cream stars; three of them (at S09's own screen spots, measured on its
+ *  frame 0) pop in S08's last 0.35 s, one by one, so the stars are already out across the cut. Screen space. */
+const STARS = [
+  {x: 241, y: 153, r: 4.4, at: T.day + 0.06},
+  {x: 669, y: 129, r: 3.1, at: T.day + 0.14},
+  {x: 989, y: 175, r: 4.1, at: T.day + 0.22},
+];
+const Stars: React.FC = () => {
+  const t = useTimeLocal();
+  return (
+    <>
+      {STARS.map((s) => (t >= s.at ? <circle key={s.x} cx={s.x} cy={s.y} r={t < s.at + 0.067 ? s.r * 1.5 : s.r} fill={palette.cream} /> : null))}
+    </>
+  );
+};
+
 const SunInSky: React.FC = () => (
   <>
+    <Stars />
     {/* fix round 3: the rings pop off in 3 frames straight into the hop's anticipation (one action ending on
         'forty-five'; they used to shrink 0.3 s early, in the gap between 'attempts' and 'in') */}
     <Rings at={T.settle} outAt={T.hopOff - 0.2} goneAt={T.hopOff - 0.1} />
@@ -367,6 +384,69 @@ const DuskBand: React.FC<{glass?: boolean}> = ({glass}) => {
   return glass ? <g clipPath="url(#s8domeclip)">{node}</g> : node;
 };
 
+/** Fix round 3 (the S07 -> S08 seam): S07's golden band ends at screen ~934 on its last frame (its tilt moves 26 px /
+ *  frame), the set's band top (world 880) sat at screen 856 on our first: a 78 px jump UP while everything else moved
+ *  down. The band's top now starts at world 960 (= screen 960 at the crane's 1.3 lens: where S07's band edge lands
+ *  next) and settles to 880 with an inOutSine over the crane (starting STILL, as a horizon should under a crane): a
+ *  sky-coloured cover over the band's top part, gone at the crane's end. */
+const CutBand: React.FC = () => {
+  const t = useTimeLocal();
+  if (t >= T.craneEnd) return null;
+  const y1 = 960 - 80 * E.inOutSine(prog(t, 0, T.craneEnd));
+  if (y1 <= DOME.band[0] + 0.5) return null;
+  return <path d={`M-300 ${DOME.band[0] - 2}H1400V${y1.toFixed(1)}H-300Z`} fill={skies.golden} />;
+};
+
+/** Fix round 3: after the sun has gone ('day'), a thin STEPPED peach afterglow stays on the horizon at the set point
+ *  (x 700: S09's sunrise point): two flat half-discs (half-peach, peach), popping in one frame; the last warmth of the
+ *  peak scene, handing over to S09's lamp glows. */
+const Afterglow: React.FC<{at: number}> = ({at}) => {
+  const t = useTimeLocal();
+  if (t < at) return null;
+  const k = t < at + 0.067 ? 0.8 : 1;
+  const half = (rx: number, ry: number) => `M${700 - rx * k} 1004A${rx * k} ${ry * k} 0 0 1 ${700 + rx * k} 1004Z`;
+  return (
+    <>
+      <path d={half(255, 30)} fill="#F5CCAF" />
+      <path d={half(150, 19)} fill={palette.peach} />
+    </>
+  );
+};
+
+/** Fix round 3: the 'windows pop peach across the city' beat ('within'): three clearly peach windows per row, from the
+ *  horizon outward (row 0, then row 1, then row 2), on building faces clear of the board, the dome and the right rail.
+ *  Flat peach (row 2 with a hair ink edge), popping (1.3x for 2 frames). */
+const DUSK_WINDOWS: Record<string, {x: number; y: number; w: number; h: number; at: number}[]> = {
+  row0: [
+    {x: 566, y: 1013, w: 6, h: 8, at: T.within + 0.04},
+    {x: 812, y: 1015, w: 6, h: 8, at: T.within + 0.1},
+    {x: 1004, y: 1012, w: 6, h: 8, at: T.within + 0.16},
+  ],
+  row1: [
+    {x: 540, y: 1080, w: 8, h: 11, at: T.within + 0.22},
+    {x: 784, y: 1077, w: 8, h: 11, at: T.within + 0.28},
+    {x: 1012, y: 1079, w: 8, h: 11, at: T.within + 0.34},
+  ],
+  row2: [
+    {x: 72, y: 1214, w: 12, h: 16, at: T.within + 0.4},
+    {x: 300, y: 1232, w: 12, h: 16, at: T.within + 0.46},
+    {x: 912, y: 1206, w: 12, h: 16, at: T.within + 0.52},
+  ],
+};
+const DuskWindows: React.FC<{row: string}> = ({row}) => {
+  const t = useTimeLocal();
+  let d = '';
+  for (const q of DUSK_WINDOWS[row] ?? []) {
+    if (t < q.at) continue;
+    const k = t < q.at + 0.067 ? 1.3 : 1;
+    const w = q.w * k;
+    const h = q.h * k;
+    d += `M${(q.x - w / 2).toFixed(1)} ${(q.y - h / 2).toFixed(1)}h${w.toFixed(1)}v${h.toFixed(1)}h${(-w).toFixed(1)}Z`;
+  }
+  if (!d) return null;
+  return <path d={d} fill={palette.peach} stroke={row === 'row2' ? palette.ink : undefined} strokeWidth={row === 'row2' ? 1.4 : undefined} />;
+};
+
 /** On 'day' the far rows relight to DUSK HAZE: every fill of rows 0-1 snaps to one flat haze step above the sky (row 0
  *  #84A895, row 1 #7A9B8A; their glass copies inside the dome one step lighter); the lit (peach) windows stay the only
  *  warm accents. A flat colour override of the set's fills (CSS on the layer group: no filter, no fade). */
@@ -430,8 +510,19 @@ const DuskStep: React.FC<{on: boolean; children?: React.ReactNode}> = ({on, chil
 
 /** Overlays injected into the DomeCity v3 layers (by its layer names). */
 const EXTRAS: Record<string, React.ReactNode> = {
-  sky: <DuskBand />,
-  row0: <Flood figs={FLOOD.row0} flickerAt={T.duskIdle} seed="s8/f0" />,
+  sky: (
+    <>
+      <CutBand />
+      <DuskBand />
+      <Afterglow at={T.day + 0.03} />
+    </>
+  ),
+  row0: (
+    <>
+      <DuskWindows row="row0" />
+      <Flood figs={FLOOD.row0} flickerAt={T.duskIdle} seed="s8/f0" />
+    </>
+  ),
   domeGlass: (
     <>
       <defs>
@@ -451,6 +542,7 @@ const EXTRAS: Record<string, React.ReactNode> = {
         <DistrictTowers at={T.cloudflare + 0.42} />
       </g>
       <StreetStrip />
+      <DuskWindows row="row1" />
       <Flood figs={FLOOD.row1} flickerAt={T.duskIdle} seed="s8/ff" />
     </>
   ),
@@ -466,6 +558,7 @@ const EXTRAS: Record<string, React.ReactNode> = {
   row2: (
     <>
       <PaperSpecks spots={PAPER} />
+      <DuskWindows row="row2" />
       <LightDoors row={2} />
       {RATTLERS2.map((r) => (
         <Rattler key={r.seed} {...r} />
@@ -507,7 +600,7 @@ const EXTRAS: Record<string, React.ReactNode> = {
           footerH={FOOTER_H}
           seed="s8/board"
         />
-        <BoardNote zone={NOTE_ZONE} text={['counted from the', 'public announcement', 'attempts, not break-ins']} fontSize={28} at={T.announced + 0.08} seed="s8/note" />
+        <BoardNote zone={NOTE_ZONE} text={['counted from the', 'public announcement', 'attempts, not break-ins']} fontSize={28} at={T.announced + 0.08} underline={{line: 2, at: T.announced + 0.3}} seed="s8/note" />
         <SlotRule box={ZONES.stamps[0]} at={T.board + 0.4} />
         <SlotRule box={ZONES.stamps[1]} at={T.board + 0.4} />
       </AboveCoping>
@@ -549,7 +642,7 @@ const wrap = (name: string, _nearness: number, node: React.ReactNode) =>
         // the rooftop neighbours: nearer than our parapet (they drop away faster during the crane)
         <Layer depth={1 - NEIGHBOUR_F}>
           <DuskStep on>
-            <Neighbours reactAt={T.millions + 0.32} />
+            <Neighbours reactAt={T.millions + 0.32} flinchAt={T.millions + 0.05} />
           </DuskStep>
         </Layer>
       ) : null}

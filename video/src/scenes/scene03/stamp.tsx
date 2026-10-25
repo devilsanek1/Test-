@@ -19,7 +19,12 @@ import {mat, XG} from '../../lib/xf';
 import {BLUEPRINT} from '../shared/sets';
 import {ElephantEmblem} from '../shared/props';
 
-const S = BLUEPRINT.stamp; // (330, 1400) rx 160 ry 60
+/** S03's stamp spot: BLUEPRINT.stamp moved 22 px LEFT (fix round 3, finding: the print's right tip and Pip's rump sat
+ *  ~7 px from the title card's left edge, a tangent; with the card 8 px right they clear it by >= 30 px on screen).
+ *  (308, 1400) rx 160 ry 60. Pip sits on its rump (cast.tsx PIP_AT), the plan's registration marks and dimension line
+ *  sit round it (ground.tsx). */
+export const STAMP = {...BLUEPRINT.stamp, x: BLUEPRINT.stamp.x - 22};
+const S = STAMP;
 const ell = (rx: number, ry: number) => `M${S.x - rx} ${S.y}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0Z`;
 /** The border ring (cream) inset 11 px, 4.5 px wide (both radii scaled by the ellipse's squash). */
 const SQ = S.ry / S.rx;
