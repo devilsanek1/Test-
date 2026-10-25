@@ -44,6 +44,11 @@ Polish-pass results (look / motion, last review; "+fix" = a final fix round ran 
   wf_c15ed1e0-115 (S07, S08, 2 rounds). Still in first polish: S04, S09, S10 (wf_ccd455f9-f0f).
 - 07:30 S03 8 / 8 PASS (A1 r2, 0 blocker/major). S11 A1 done: 8.5 / 8 +fix r2 (1 major into the fix). PASS so far:
   S01, S02, S03, S06.
+- 08:05 S08 stuck at look 7 (3 majors, A1 r2): the dome reads as a small greenhouse (foot on the row-2 roofs, towers
+  at row-2 scale, only the third-biggest shape), the 'millions' flood breaks the haze ladder (ink hoods to the horizon
+  = stubble), the heap reads as black teardrops floating on the peach band. Its fix r2 gets these; if it is still < 8
+  after it, S08 gets a dedicated redesign pass (more rounds, PEAK-2 brief: Arcane scale, depth-stepped crowd values).
+  EDGE_HINTS['S08'] keep rect [0,900,470,1110] for the heap (phase A2).
 The integration pass re-reviews every "+fix" scene and every scene under 8.
 
 

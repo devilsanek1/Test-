@@ -1,0 +1,8 @@
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/home/user/Test-/video/node_modules/.cache/webpack/remotion-production-4.0.538/d34a776e2977687e65bfbb6794468701/1.pack_' -> '/home/user/Test-/video/node_modules/.cache/webpack/remotion-production-4.0.538/d34a776e2977687e65bfbb6794468701/1.pack'
+0 0 /home/user/Test-/video/review/checkins/0808/S05/f00000.png
+0.53 16 /home/user/Test-/video/review/checkins/0808/S05/f00016.png
+1.06 32 /home/user/Test-/video/review/checkins/0808/S05/f00032.png
+1.59 48 /home/user/Test-/video/review/checkins/0808/S05/f00048.png
+2.12 64 /home/user/Test-/video/review/checkins/0808/S05/f00064.png
+2.65 80 /home/user/Test-/video/review/checkins/0808/S05/f00080.png
+[render-frames] S05 (src/entry-film.ts): bundle 5.8s, 6 frames in 3.2s (532 ms/frame incl. page setup, concurrency 2, scale 0.5)

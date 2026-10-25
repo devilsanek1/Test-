@@ -4,8 +4,9 @@
 // Stoop Street, close on door #4 (shared StoopStreet, people={false}: nobody looks at the door): the same PHP lock (lock4)
 // with Bit sitting on it in plain sight, the tear-off calendar of YEAR pages beside the door, ivy on the door frame. A
 // locked-off time-lapse: everything changes except the lock. MATCH-CUT in on the sun (S03's low glide-hop is mid-air at
-// screen (810, 680) on the cut, drawn IN FRONT of the roofline until it touches down in its slot (930, 690) on 'This',
-// then it sinks 7 px behind the roofline); Pip settles onto step 2 ('This'); 'bug': Bit hops (apex on the word) out of
+// screen (810, 680) on the cut, drawn IN FRONT of the hero and the rows until it touches down in clear sky on 'This',
+// then it slides down-left into its slot (930, 690) behind the left row's roofline and sinks 7 px into it); Pip settles
+// onto step 2 ('This'); 'bug': Bit hops (apex on the word) out of
 // a peach spot with an ink ring, the lock box rattles and glints; 'was': a pair of passers-by walks away up the road and
 // Pip yawns; the ivy creeps a step ('in'); 'there': 14 YEAR pages flip up and fly off the calendar 0.07 s apart, the ivy
 // steps a season every two tears (fills only; a bare step is a leaf drop), the hero site is redesigned every other tear
@@ -14,8 +15,9 @@
 // draws on the lock box's OUTER top-left corner ('fourteen'); the last tan leaf drops off the ivy as it goes bare and
 // lands on sleeping Pip's crown 0.3 s before the camera dives into lock4 ('years': 0.365 s ending on the cut, lock4
 // lands 65 x 80 at screen (483, 960) where S05's blueprint lock is; the L5 tag rides across to S05's annotation; the
-// sun stays in the sky slot and the receding row slides up over it). In the dive the facade is treated for the caption
-// band ROW BY ROW: each row's ink turns tan as it reaches the band and goes fill-only once inside it (BandInk).
+// sun holds in its slot and the receding row slides up over it; a broken ink ring ripples out of the re-popped spot).
+// In the dive the facade is treated for the caption band ROW BY ROW: each row's ink turns tan as it reaches the band
+// and goes fill-only once the whole row is inside it (BandInk).
 //
 // Camera: scene04/camera.ts (a 3 % log-zoom creep about the cornice, then the dive). The sun is SCREEN space for the
 // whole scene. Notes: docs/scenes/S04.md.
@@ -116,6 +118,9 @@ const BAND_ROWS = [
 ];
 const BAND_TAN = 600;
 const BAND_FLAT = 600;
+/** The browser goes flat when its bottom frame line is within 10 px of the band edge (f69: 605 px; its tan frame and
+ *  text bars behind caption line 1 were the one busy-band frame). */
+const BAND_FLAT_BROWSER = 610;
 const BROWSER_BOX: Box = [STOOP.browser[0] - 5, STOOP.browser[1] - 5, STOOP.browser[0] + STOOP.browser[2] + 5, STOOP.browser[1] + STOOP.browser[3] + 5];
 /** The near layer only takes the band rows down to the upper window row's boundary (835): the lamp's head and crossbar
  *  (world ~640-660) soften with the cornice; the lantern (960-1006) is never split. */
@@ -130,7 +135,7 @@ function bandState(cam: Cam, on: boolean, cap = Infinity): BandState {
     if (sy(r.top) < BAND_TAN) tanY = r.y;
     if (sy(r.y) < BAND_FLAT) flatY = r.y;
   }
-  return {tanY, flatY, bTan: sy(BROWSER_BOX[1]) < BAND_TAN, bFlat: sy(BROWSER_BOX[3]) < BAND_FLAT};
+  return {tanY, flatY, bTan: sy(BROWSER_BOX[1]) < BAND_TAN, bFlat: sy(BROWSER_BOX[3]) < BAND_FLAT_BROWSER};
 }
 /** The sun's landing and z-swap (A1 fix round 2: the roofline-parallel clip SWEEP is gone; its edge lay on no drawn
  *  line, so for two frames the landing disc was a lemon / D shape floating over the hero house). The glide (S03's hop,
