@@ -8,6 +8,8 @@ replace it).
 
 Format: **rule** — why / evidence (video, date).
 
+**Last compacted: 2026-10-25 · size budget: <= 150 lines** (see Maintenance at the end).
+
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — the target from day one (v1, 2026-10-24).
 - **Growth matters: maximise engagement with subtle, defensible hooks** (bait that is true, e.g. "the language everyone
@@ -68,3 +70,13 @@ Format: **rule** — why / evidence (video, date).
 
 ## Retired rules
 (none yet)
+
+## Maintenance (keep this file short)
+Compact when, at the start of a session, **it has been 7+ days since "Last compacted" and entries were added since**,
+or **the file is over 150 lines**. The orchestrator does it in one pass, with no agents:
+1. Merge duplicate and near-duplicate rules into one; cluster by area; one line per rule, with the evidence shortened to (video, date).
+2. Turn rules that several videos confirmed into short principles; drop wording that only mattered for one video.
+3. Performance log: keep the last ~5 raw lines; fold older ones into a "Trends" paragraph (what the numbers keep saying).
+4. Retired: keep the 10 most recent, one line each; drop older ones (git history keeps them).
+5. Update "Last compacted", then commit "Compact owner playbook".
+
