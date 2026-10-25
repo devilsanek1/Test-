@@ -1,6 +1,6 @@
 # Posting kit
 
-Video: `out/php2shell_final.mp4` (1080x1920, 30 fps, 55.37 s, loops seamlessly). Cover: `out/cover.png`.
+Video: `out/php2shell_final.mp4` (1080x1920, 30 fps, 55.37 s, loops seamlessly). Cover: `deliverables/cover.png` (frame at 1.8 s, 'shut down').
 
 ## Caption (TikTok / Reels)
 
@@ -30,5 +30,5 @@ literally "turn it off" 😅 Which part surprised you most: the 14 years, or the
 
 - Upload the file as-is (no in-app filters or re-encode settings); the captions are burned in, so keep the app's
   auto-captions off.
-- The first frame doubles as the loop seam; pick the cover in-app from ~1.8 s ('shut down') if `out/cover.png` isn't
+- The first frame doubles as the loop seam; pick the cover in-app from ~1.8 s ('shut down') if `deliverables/cover.png` isn't
   used.

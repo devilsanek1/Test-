@@ -1,5 +1,7 @@
 # Wrap-up (replaces INTEGRATION_PLAN.md + INTEGRATION_TODO.md, 2026-10-25)
 
+**STATUS (13:58 UTC): DELIVERED.** `out/php2shell_final.mp4` (1080x1920, 30 fps, 55.38 s, H.264 CRF 14 yuv420p tv-range BT.709, AAC 320k, faststart, -14.0 LUFS / -1.2 dB peak), cover `deliverables/cover.png`, posting kit `docs/POSTING_KIT.md`. Hook pass 2 done (0-10 s). Accepted quirks: S08 / S10 at 7.5 on look; S03 side houses touch the caption band ~4 frames at 9.2 s; beatsync tool still reads the v2 storyboard.
+
 Goal: finish. A 55.37 s film (Main, 1661 f @ 30 fps) where every scene is >= 8/10, the cuts read as one motion, the QA
 gate passes on Main, the sound is re-locked, and the final render is delivered. Keep passes short: one round unless a
 blocker remains. Git history has the full logs (INTEGRATION_TODO.md before this commit).
