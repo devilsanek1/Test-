@@ -38,10 +38,10 @@ const KeeperPath: React.FC = () => {
   // the keeper's x now (same walk as Keeper: linear from B.to over (kneel - to))
   const kx = lerp(x0 + 4, x1, clamp((t - B.to) / (B.kneel - B.to)));
   const reach = Math.max(x0, kx - 10);
-  // polish A1: 5 px dashes on screen (were 3 px: invisible at phone size), 8 world px long, 14 apart
+  // A1 FR2: 6 px tealDark dashes on screen (the keeper's coat colour), 8 world px long, 14 apart
   let d = '';
   for (let x = x0; x <= reach; x += 14) d += `M${(x - 4).toFixed(1)} ${y.toFixed(1)}h8`;
-  return d ? <path d={d} stroke={palette.ink} strokeWidth={Math.max(1.2, 5 / zoom)} strokeLinecap="round" fill="none" /> : null;
+  return d ? <path d={d} stroke={palette.tealDark} strokeWidth={Math.max(1.2, 6 / zoom)} strokeLinecap="round" fill="none" /> : null;
 };
 
 /** One ink ring pulse around the check flag (scale-out, the stroke thins to nothing: no fade). */
@@ -408,14 +408,17 @@ const BitRide: React.FC = () => {
  *  are 400-600 px tall. A flock of five pigeons flies in from the near left ACROSS that band and away up the hill (screen
  *  space: nearer than the hill), shrinking with distance (1.0 -> 0.35), ~30 -> 10 px / frame, never above y 610; they
  *  pop off, tiny, at 3.55, and the roof pigeons on rows 4-5 pop on 'every' (where they landed). */
-const FLOCK_AT = B.to - 0.04;
-const FLOCK_DUR = 0.86;
+/** A1 FR2 (reviewer: on a pause at 3.27-3.40 the flock's arcs sat right over the first row-2 house's two upper windows:
+ *  eyebrows, an angry face): the flock flies earlier and a shorter path, and every bird has popped off (tiny) by 3.25,
+ *  before row 2's first ring pops at ~3.27. */
+const FLOCK_AT = B.to - 0.1;
+const FLOCK_DUR = 0.54;
 const FLOCK: {dx: number; dy: number; dt: number; s: number}[] = [
   {dx: 0, dy: 0, dt: 0, s: 1},
-  {dx: -70, dy: 34, dt: 0.03, s: 0.9},
-  {dx: -40, dy: -30, dt: 0.06, s: 0.95},
-  {dx: -130, dy: 10, dt: 0.09, s: 0.85},
-  {dx: -100, dy: 62, dt: 0.12, s: 0.8},
+  {dx: -70, dy: 34, dt: 0.02, s: 0.9},
+  {dx: -40, dy: -30, dt: 0.04, s: 0.95},
+  {dx: -130, dy: 10, dt: 0.06, s: 0.85},
+  {dx: -100, dy: 62, dt: 0.08, s: 0.8},
 ];
 const BandFlock: React.FC = () => {
   const t = useTime();
@@ -428,8 +431,8 @@ const BandFlock: React.FC = () => {
     // a gentle deceleration (35 -> 19 px / frame on screen: farther = slower), never a CSS ease
     const e = q * (1.3 - 0.3 * q);
     // from the near left (in at the left edge) up and away toward the hill's middle, shrinking with distance
-    const x = lerp(-40 + b.dx, 640 + b.dx * 0.3, e);
-    const y = lerp(880 + b.dy, 640 + b.dy * 0.3, e);
+    const x = lerp(-40 + b.dx, 520 + b.dx * 0.3, e);
+    const y = lerp(860 + b.dy, 650 + b.dy * 0.3, e);
     const sc = b.s * lerp(1, 0.35, e);
     const flap = osc(t, 6.5, i * 1.7) * 14 * sc;
     const w = 28 * sc;

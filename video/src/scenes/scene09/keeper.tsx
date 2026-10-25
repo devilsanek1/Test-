@@ -18,6 +18,13 @@ import {FigureArm} from '../shared/props';
 const LEG = 62;
 const TORSO = 95;
 
+/** A1 FR2 (reviewer: the keeper's sand coat sat on sand / tan facades with no value contrast: invisible at phone size):
+ *  his work coat is tealDark (KEEPER_COAT_MAP over the kit Keeper + this overlay); his hands keep the skin tone, passed as
+ *  SKIN (the same sand, spelled in lower case so the coat map leaves it alone). */
+export const SKIN = palette.sand.toLowerCase();
+export const KEEPER_COAT = palette.tealDark;
+export const KEEPER_COAT_MAP = (c: string) => (c === palette.sand ? KEEPER_COAT : c);
+
 /** The kit Person's torso width, head radius and shoulder rounding for a seed (props Figures personGeo, mirrored). */
 export function keeperGeo(seed: string) {
   const r = rng(`person/${seed}`);
@@ -40,6 +47,8 @@ export type KeeperSpec = {
   walk: {at: number; hz: number; to: Pt; dur: number};
   /** The hand closes on the new lock from here (it lands on the door). */
   gripAt: number;
+  /** A1 FR2: from here a cream rim strip runs down his sun-side (screen-right) shoulder and back. */
+  rimAt?: number;
 };
 
 /** The kit Keeper's raise (props Figures raiseQ). */
@@ -86,10 +95,10 @@ const GripHand: React.FC<{grip: number; W: number; seed: string}> = ({grip, W, s
   return (
     <>
       <XG m={thumbM}>
-        <Fill d={th} color={palette.sand} offset={false} mode="none" seed={`${seed}/thf`} />
+        <Fill d={th} color={SKIN} offset={false} mode="none" seed={`${seed}/thf`} />
         <Ink d={th} width={W * 0.8} taper={false} seed={`${seed}/thi`} />
       </XG>
-      <Fill d={palm + knuckles} color={palette.sand} offset={false} mode="none" seed={`${seed}/pf`} />
+      <Fill d={palm + knuckles} color={SKIN} offset={false} mode="none" seed={`${seed}/pf`} />
       <Ink d={palm + knuckles} width={W * 0.8} taper={false} seed={`${seed}/pi`} />
       {grip > 0.5 ? <Ink d={`M-5 -15q5 2 10 0`} width={W * 0.55} taper={false} vary={0} seed={`${seed}/crease`} /> : null}
       <Fill d={cuff} color={palette.tan} offset={false} mode="none" seed={`${seed}/cf`} />
@@ -131,11 +140,14 @@ export const KeeperDetail: React.FC<KeeperSpec> = (p) => {
       {/* skirt + vent (under the arms, over the legs' tops) */}
       <Fill d={skirt} color={palette.sand} offset={false} mode="none" seed={`${p.seed}/skirt`} />
       <Ink d={skirtI} width={W} taper={false} seed={`${p.seed}/skirtI`} />
+      {p.rimAt !== undefined && t >= p.rimAt ? (
+        <Ink d={`M${-(hw - 4)} -12V${ys}Q${-(hw - 4)} ${-h + 4} ${-(hw - R * 0.9)} ${-h + 4}`} width={W * 0.95} color={palette.cream} taper={false} vary={0} seed={`${p.seed}/rim`} />
+      ) : null}
       {/* the back yoke seam across the shoulders */}
       <Ink d={`M${-(hw - 6)} ${ys}Q0 ${ys + 8} ${hw - 6} ${ys}`} width={W * 0.75} taper={false} seed={`${p.seed}/yoke`} />
       {/* the hanging sleeve + hand */}
       <Ink d={seam + folds + `M${-(hw + 0.5)} ${cuffY}L${-(hw - 13)} ${cuffY + 1}`} width={W * 0.75} taper={false} seed={`${p.seed}/sleeve`} />
-      <Fill d={hand} color={palette.sand} offset={false} mode="none" seed={`${p.seed}/hhf`} />
+      <Fill d={hand} color={SKIN} offset={false} mode="none" seed={`${p.seed}/hhf`} />
       <Ink d={hand + thumbNotch} width={W * 0.8} taper={false} seed={`${p.seed}/hhi`} />
       {q > 0.02 ? (
         <>

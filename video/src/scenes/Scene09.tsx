@@ -30,9 +30,11 @@ import {TramWiper} from './scene09/TramWiper';
  *  the set's night mode relights only the ground (stepped back up in PartA) and lights the lamps. */
 const SKY: SkyKey[] = [
   {t: 0, color: '#709F8B'},
-  {t: B.dawn, color: '#84B09C', wipe: 'snap'},
-  {t: B.dawn + 0.12, color: '#98C0AE', wipe: 'snap'},
-  {t: B.dawn + 0.24, color: skies.day, tod: 'dawn', wipe: 'snap'},
+  // A1 FR2: led by 0.12 s (motion_spec 7: the colour field arrives early, the build completes on the word): the 'dawn'
+  // key lands at 'with' + 0.12, the night dressing / ground steps follow (PartA NIGHT_UNTIL = with, GROUND_B_AT = +0.12)
+  {t: B.dawn - 0.12, color: '#84B09C', wipe: 'snap'},
+  {t: B.dawn, color: '#98C0AE', wipe: 'snap'},
+  {t: B.dawn + 0.12, color: skies.day, tod: 'dawn', wipe: 'snap'},
 ];
 
 const Scene09: React.FC = () => {

@@ -28,7 +28,9 @@ import {Bit, CheckBoxTag, EdgeOnlooker, Keeper, Lock, MakersCart, NewLockIcon, F
 import {B} from './beats';
 import {ClipOut, WIRE_HOLE} from './matchcut';
 import {crateGeom, CrateBack, CrateFront, CrateLocks, InkRing} from './crate';
-import {KeeperDetail, keeperCarryHand} from './keeper';
+import {KeeperDetail, keeperCarryHand, KEEPER_COAT_MAP} from './keeper';
+import {InkScale} from '../../lib/inkComp';
+import {camAt} from './camera';
 import type {KeeperSpec} from './keeper';
 
 // ---------------------------------------------------------------- anchors (Part A world)
@@ -70,10 +72,10 @@ export const LAND_T = DROP_AT + DROP_FALL;
 export const TOSS = {at: B.still - 0.1, land: B.lockOn};
 
 /** The set's night dressing (stars, lamp glows, lit windows, night ground) pops off on the dawn's second sky step. */
-export const NIGHT_UNTIL = B.dawn + 0.12;
+export const NIGHT_UNTIL = B.dawn;
 /** The ground relights behind the sky in two flat steps (A: haze, B: half a step under day) and STOPS there: the lower
  *  frame keeps its tone (no bleached mintPale band) until S10's tram brings the day relight. */
-const GROUND_B_AT = B.dawn + 0.24;
+const GROUND_B_AT = B.dawn + 0.12;
 
 // ---------------------------------------------------------------- the old lock + Bit, the flying new lock
 
@@ -202,9 +204,10 @@ const RAISED = {x: PA.crate.x - PA.crate.size * 0.3, y: CRATE_TOP - 16, size: PA
 /** Three EMPTY check tags (30 px) on sticks from the rim, hung over the open lid's peach face, right of the raised
  *  lock: [x, hang y, lean]. */
 const CRATE_TAGS: [number, number, number][] = [
-  [PA.crate.x - 14, CRATE_TOP - 62, -4],
-  [PA.crate.x + 15, CRATE_TOP - 74, 2],
-  [PA.crate.x + 42, CRATE_TOP - 56, 5],
+  // A1 FR2: 18 px higher (clear of door #4's lock and the plaque: three cream cards against the teal door)
+  [PA.crate.x - 14, CRATE_TOP - 80, -4],
+  [PA.crate.x + 15, CRATE_TOP - 92, 2],
+  [PA.crate.x + 42, CRATE_TOP - 74, 5],
 ];
 const CRATE_TAG_SIZE = 30;
 
@@ -251,15 +254,27 @@ const CrateExtras: React.FC = () => {
 
 /** The whole crate in draw order: the open lid's peach face, the tags, the raised lock, the two locks in the opening, the
  *  sage body (+ the shut lid until LID_AT), then ONE ink ring pulse on the lid pop. */
-const Crate: React.FC = () => (
-  <>
-    <CrateBack g={CRATE_G} lidAt={LID_AT} ink={SI.far} seed="s9crate" />
-    <CrateExtras />
-    <CrateLocks g={CRATE_G} lidAt={LID_AT} ink={SI.far} seed="s9crate" />
-    <CrateFront g={CRATE_G} lidAt={LID_AT} ink={SI.far} seed="s9crate" />
-    <InkRing x={PA.crate.x} y={CRATE_TOP - 18} r={72} at={LID_AT} w={SI.mid} />
-  </>
-);
+/** A1 FR2 (reviewer: the lid pop barely registered at phone size): the WHOLE crate squash-pops 7 % on the lid flip
+ *  (wide + low, then a damped spring back about its feet) and the ink ring is bigger (r 96, was 72). */
+const crateSquash = (t: number) => {
+  const d = t - LID_AT;
+  return d < 0 || d > 0.45 ? 0 : 0.07 * Math.exp(-d * 9) * Math.cos(d * Math.PI * 2 * 3);
+};
+const Crate: React.FC = () => {
+  const t = useTime();
+  const q = crateSquash(t);
+  return (
+    <>
+      <XG m={mat.about(mat.scale(1 + q, 1 - q), PA.crate.x, PA.crate.y)}>
+        <CrateBack g={CRATE_G} lidAt={LID_AT} ink={SI.far} seed="s9crate" />
+        <CrateExtras />
+        <CrateLocks g={CRATE_G} lidAt={LID_AT} ink={SI.far} seed="s9crate" />
+        <CrateFront g={CRATE_G} lidAt={LID_AT} ink={SI.far} seed="s9crate" />
+      </XG>
+      <InkRing x={PA.crate.x} y={CRATE_TOP - 18} r={96} at={LID_AT} w={SI.mid} />
+    </>
+  );
+};
 
 // ---------------------------------------------------------------- Pip (Part A world)
 
@@ -363,7 +378,7 @@ const KEEPER_SPEC: KeeperSpec = {
   walk: {at: B.to, hz: 2.4, to: PA.keeperTo, dur: B.kneel - B.to},
   gripAt: B.lockOn,
 };
-const KEEPER_SPEC2: KeeperSpec = {...KEEPER_SPEC, reachAt: B.kneel + 0.04, lowerAt: undefined, installAt: B.kneel + 0.18, installDur: 0.8, gripAt: B.kneel + 0.2};
+const KEEPER_SPEC2: KeeperSpec = {...KEEPER_SPEC, reachAt: B.kneel + 0.04, lowerAt: undefined, installAt: B.kneel + 0.18, installDur: 0.8, gripAt: B.kneel + 0.2, rimAt: B.to};
 const Toolbox: React.FC = () => {
   const t = useTime();
   const k = PA.keeper;
@@ -394,23 +409,33 @@ const setBounce = (t: number) => {
   return d < 0 || d > 0.45 ? 0 : 0.07 * Math.exp(-d * 9) * Math.sin(d * Math.PI * 2 * 3);
 };
 
-const KeeperA: React.FC = () => {
+const KeeperA: React.FC<{partB?: boolean}> = ({partB = false}) => {
   const t = useTime();
   const k = PA.keeper;
   const kneel = t >= B.kneel ? E.outCubic(prog(t, B.kneel, 0.16)) : 0;
   const second = t >= B.kneel;
   const grow = 1 + (KEEPER_GROW.k - 1) * E.inOutSine(clamp((t - KEEPER_GROW.from) / (KEEPER_GROW.to - KEEPER_GROW.from)));
   const fx = keeperFeetX(t);
-  const sp = second ? KEEPER_SPEC2 : KEEPER_SPEC;
+  const sp0 = second ? KEEPER_SPEC2 : KEEPER_SPEC;
+  // A1 FR2: the sun-side cream rim from the 'to' build on (Part B only: the hill's sun is behind the ridge, up-right)
+  const sp = partB ? {...sp0, rimAt: B.to} : sp0;
   const b = setBounce(t);
+  // A1 FR2: in Part B his lines never drop under the A2 screen weight (3.4 px): through the hidden-cut map (x0.25) at
+  // the camera's zoom and his growth, the factor is 1 at the cut (zoom 6: x1.5 on screen) and ~1.96 at rest
+  const onScreen = 0.25 * camAt(t).zoom * grow;
+  const inkK = partB ? Math.max(1, 1 / onScreen) : 1;
   return (
-    <XG m={mat.compose(mat.about(mat.scale(grow), fx, k.y), mat.about(mat.scale(1 - b * 0.5, 1 + b), fx, k.y))}>
-      <Toolbox />
-      <XG m={mat.about(mat.scale(1, 1 - 0.2 * kneel), PA.keeperTo[0], k.y)}>
-        <Keeper x={sp.x} y={sp.y} h={sp.h} flip riseAt={sp.riseAt} reachAt={sp.reachAt} lowerAt={sp.lowerAt} installAt={sp.installAt} installDur={sp.installDur} walk={sp.walk} seed={sp.seed} />
-        <KeeperDetail {...sp} />
-      </XG>
-    </XG>
+    <Tod map={KEEPER_COAT_MAP}>
+      <InkScale value={inkK}>
+        <XG m={mat.compose(mat.about(mat.scale(grow), fx, k.y), mat.about(mat.scale(1 - b * 0.5, 1 + b), fx, k.y))}>
+          <Toolbox />
+          <XG m={mat.about(mat.scale(1, 1 - 0.2 * kneel), PA.keeperTo[0], k.y)}>
+            <Keeper x={sp.x} y={sp.y} h={sp.h} flip riseAt={sp.riseAt} reachAt={sp.reachAt} lowerAt={sp.lowerAt} installAt={sp.installAt} installDur={sp.installDur} walk={sp.walk} seed={sp.seed} />
+            <KeeperDetail {...sp} />
+          </XG>
+        </XG>
+      </InkScale>
+    </Tod>
   );
 };
 
@@ -429,7 +454,7 @@ export const A2Actors: React.FC<{partB?: boolean}> = ({partB = false}) => {
       {props ? <OldLock /> : null}
       {props ? <LandedLock /> : null}
       <BitRun />
-      {t >= B.cutA2 ? <KeeperA /> : null}
+      {t >= B.cutA2 ? <KeeperA partB={partB} /> : null}
       {props ? <LandedTag /> : null}
       {pip ? <PipFigure st={st} scale={PA.pip.scale} t={t} /> : null}
       <BitOnPip />
@@ -444,8 +469,8 @@ export const A2Actors: React.FC<{partB?: boolean}> = ({partB = false}) => {
 const WINDOW_OFF: [number, number][] = [
   [5, 0.1], //      [466, 1132]: the small stair window goes dark first
   [4, B.win1], //   [428, 862]: the last lit window in the row
-  [3, B.even], //   [428, 712]
-  [0, B.even + 0.07], // [70, 712]
+  [3, B.even - 0.1], //   [428, 712] (A1 FR2: led by 0.10, ENGINE rule 5)
+  [0, B.even - 0.03], // [70, 712]
 ];
 const HERO_WINS: [number, number, number, number][] = [
   [70, 712, 62, 92],
@@ -524,17 +549,18 @@ const ScribbleSign: React.FC = () => {
   );
 };
 
-const CART_GO = B.out - 0.05;
-const CART_DUR = 0.45;
+/** A1 FR2 (reviewer: the cart started at full speed, ~27 px / frame from a standstill): pushed from REST with an in-out
+ *  sine over 0.5 s from out - 0.12 (~92 % of the trip done by the 1.599 hard cut). */
+const CART_GO = B.out - 0.12;
+const CART_DUR = 0.5;
 
 const CartA: React.FC = () => {
   const t = useTime();
   if (t >= B.cutA2) return null;
   const c = PA.cart;
   // rolls off toward the VP on 'out' (makers ship, they don't install): one-point perspective = a scale about the VP,
-  // out-cubic over 0.45 s from out-0.05, so ~90 % of the trip happens before the hard cut (the 'fixed!' card has been
-  // complete since 1.37 and rides along, shrinking)
-  const q = E.outCubic(clamp((t - CART_GO) / CART_DUR));
+  // from rest (in-out sine, 0.5 s from out - 0.12), ~92 % of the trip before the hard cut ('fixed!' rides along, shrinking)
+  const q = E.inOutSine(clamp((t - CART_GO) / CART_DUR));
   const k = 1 - 0.32 * q;
   return (
     <XG m={mat.about(mat.scale(k, k), STOOP.vp[0], STOOP.vp[1])}>
@@ -545,7 +571,7 @@ const CartA: React.FC = () => {
         crates={2}
         pusher
         seed="s9cart"
-        roll={{at: CART_GO, to: [c.x + 26, c.y], dur: CART_DUR, ease: E.outCubic}}
+        roll={{at: CART_GO, to: [c.x + 26, c.y], dur: CART_DUR, ease: E.inOutSine}}
         signPost={PA.sign.post}
         sign={<ScribbleSign />}
       />
@@ -615,21 +641,22 @@ const HorizonGlow: React.FC = () => {
   if (t >= NIGHT_UNTIL) return <Fill rect={HORIZON_GLOW} color={palette.peach} offset={false} mode="snap" seed="s9hglow" />;
   return null;
 };
-/** Polish A1: the AFTERGLOW of S08's sunset (the match cut's warm accent at the set point) is LIGHT, not a bar: a 2-step
- *  flat half-disc in the sky layer, BEHIND the far skyline, in S08's own two tones (HALF.peach outer r 140, peach inner
- *  r 92), its base on the VP's horizon (screen y ~1002, x 700): the far towers' edges and the two rows' rooflines clip it
- *  to the V at the street's end (the cleared VP slot shows its dome). It steps down once on 'But' (outer off) and is gone
- *  at But + 0.12 (the first window pops off). */
-const AFTERGLOW = {cx: STOOP.vp[0], base: STOOP.vp[1] + 2, r1: 140, r2: 92};
-const halfDisc = (cx: number, base: number, r: number) => `M${cx - r} ${base}A${r} ${r} 0 0 1 ${cx + r} ${base}Z`;
+/** The AFTERGLOW of S08's sunset (the match cut's warm accent at the set point) is LIGHT, not a bar, in the sky layer
+ *  BEHIND the far skyline (the far towers' edges and the rows' rooflines clip it to the V at the street's end). A1 FR2
+ *  (reviewer: S08 now ends on a flat 2-step LENS on its horizon, ~35 px tall, while S09 opened on a ~240 px half-disc:
+ *  the same warm spot jumped 5x in height on the cut): the same 2-step lens in S08's own tones and place (HALF.peach top
+ *  966, peach band 976-1002 on screen, centre x 700, base on the VP's horizon); it steps down once on 'But' (the light
+ *  top off, the band thinner) and is gone at But + 0.12 (the first window pops off). */
+const AFTERGLOW = {cx: STOOP.vp[0], base: STOOP.vp[1] + 2, rx1: 270, ry1: 36, rx2: 262, ry2: 26};
+const halfLens = (cx: number, base: number, rx: number, ry: number) => `M${cx - rx} ${base}A${rx} ${ry} 0 0 1 ${cx + rx} ${base}Z`;
 const Afterglow: React.FC = () => {
   const t = useTime();
   if (t >= B.win1) return null;
-  const {cx, base, r1, r2} = AFTERGLOW;
+  const {cx, base, rx1, ry1, rx2, ry2} = AFTERGLOW;
   return (
     <>
-      {t < B.but ? <Fill d={halfDisc(cx, base, r1)} color={HALF.peach} offset={false} mode="snap" seed="s9aglow1" /> : null}
-      <Fill d={halfDisc(cx, base, t < B.but ? r2 : r2 * 0.82)} color={palette.peach} offset={false} mode="snap" seed="s9aglow2" />
+      {t < B.but ? <Fill d={halfLens(cx, base, rx1, ry1)} color={HALF.peach} offset={false} mode="snap" seed="s9aglow1" /> : null}
+      <Fill d={halfLens(cx, base, t < B.but ? rx2 : rx2 * 0.8, t < B.but ? ry2 : ry2 * 0.6)} color={palette.peach} offset={false} mode="snap" seed="s9aglow2" />
     </>
   );
 };

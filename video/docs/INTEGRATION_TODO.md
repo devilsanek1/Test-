@@ -141,6 +141,9 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
   across the dive), S03|S04 owner done (shared sun glide path scene03/sunglide.ts, Pip take-off at the cut), S11|S12
   owner done (onlooker 2 restyled so she isn't read as S12's near observer; set diff 0 px). S08 dedicated pass
   launched: wf_e36892f5-1e2 (scene-polish, rounds 3, PEAK-2 notes).
+- 09:35: wave 1 run wf_47287152-c9b done: S01|S02 PASS 8.5, S03|S04 PASS 9 (minors: the sun disc clips the right
+  frame edge by 10-25 px around touch-down f431-436 (optional: GLIDE.touch -> ~(965, 672)); the S03/S04 notes say
+  the caption out is 'requested', it is applied). Wave 2 S02|S03 launched early: wf_b47a06a5-d94 (both sides free).
 - Sound (phase D): S03|S04 owner notes two `whoosh_soft` cues 0.225 s apart for the one sun hop (13.945 and 14.17):
   keep 13.945, drop or soften 14.17.
 
