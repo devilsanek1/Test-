@@ -14,6 +14,8 @@ Format: **rule** — why / evidence (video, date).
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — the target from day one (v1, 2026-10-24).
 - **Growth matters: maximise engagement with subtle, defensible hooks** (bait that is true, e.g. "the language everyone
   loves"). Never misleading. — v1 script round, 2026-10-24.
+- **Topic picks lean to the everyday wallet consequence:** for v3 the owner chose "AI is outbidding you for the memory in
+  your laptop" (prices) over the recommended, higher-scored Meta $25B story. Weight "what it costs me" when ranking topics. — v3 G0, 2026-10-25.
 
 ## Script and voice
 - **Everyday spoken language. Check every sentence for AI-sounding wording**; it must sound approachable, like a person
