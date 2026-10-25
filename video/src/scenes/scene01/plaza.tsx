@@ -30,7 +30,8 @@ const MID = 3.4;
 
 const SLAM_DUR = 0.16;
 /** The power-off wave and the closures. govB: frame 0 holds its screen as the bright line (state 'frame0') and
- *  screenOffAt 0 releases it; govD stays lit ('a bunch of', not all). The slams LAND on 'shut' / 'down' / 'bunch'
+ *  screenOffAt B.crtB ('Governments' 0.19, under shutdown ring 1) releases it (S12's rewind relights it there too);
+ *  govD stays lit ('a bunch of', not all). The slams LAND on 'shut' / 'down' / 'bunch'
  *  (offAt = landing). Lettered tags are shifted apart on the rails (the kit's default slots overlap once the tag is
  *  lettered). Fix round 3: the padlocks are the scene's BIG CREAM S01Padlock (52-58 px, body centre 20 px above the
  *  bottom rail's bottom edge, so it covers the rail and the last slats: `padlockProps` mirrors x / y / size for kit
@@ -39,7 +40,7 @@ export const S01_GOV: Partial<Record<GovId, GovEvents>> = {
   govA: {screenOffAt: B.crtA, shutterAt: B.slamA, offAt: B.slamA + SLAM_DUR, padlockAt: B.padlocks[1], padlockProps: {x: 152, y: 994, size: S01_PADLOCK_SIZE.govA}, glintAt: B.padlockGlint[1], tagAt: B.tags[1], tagProps: {lettered: true, size: 74, x: 226}},
   // fix round 4: govB's tag 124 wide at x 546, hung 14 px higher (1090): it clears the door pediment's apex and govB's
   // right wall line (review: two tangents on the cover frame); the padlock moves 10 left (452) to keep an 8 px gap
-  govB: {screenOffAt: 0, shutterAt: B.slamB, offAt: B.slamB + SLAM_DUR, padlockAt: B.padlocks[0], padlockProps: {x: 452, y: 1096, size: S01_PADLOCK_SIZE.govB}, glintAt: B.padlockGlint[0], tagAt: B.tags[0], tagProps: {lettered: true, size: 124, x: 546, y: 1090}, lanternOffAt: B.domeLanternOff},
+  govB: {screenOffAt: B.crtB, shutterAt: B.slamB, offAt: B.slamB + SLAM_DUR, padlockAt: B.padlocks[0], padlockProps: {x: 452, y: 1096, size: S01_PADLOCK_SIZE.govB}, glintAt: B.padlockGlint[0], tagAt: B.tags[0], tagProps: {lettered: true, size: 124, x: 546, y: 1090}, lanternOffAt: B.domeLanternOff},
   // fix round 4: govC keeps its padlock only (review: its 62 px tag's 14 px letters were illegible and cluttered the
   // half-shutter read; J1 reads on govB and govA)
   govC: {screenOffAt: B.crtC, shutterAt: B.slamC, shutterStop: 0.5, padlockAt: B.padlocks[2], padlockProps: {x: 838, y: 767, size: S01_PADLOCK_SIZE.govC}, glintAt: B.padlockGlint[2]},

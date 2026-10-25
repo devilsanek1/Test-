@@ -1,8 +1,9 @@
 // S01 hook pass 2 (the first 1.5 s and 'on PURPOSE'), drawn through plaza.tsx:
 //   ShutdownRings  each later power press (timing.ts B.ring) emits a SHUTDOWN RING from the sun's rim: a cream band
-//                  with 2 px ink edges (SunRipple, profile outQuad), drawn in SCREEN space over the facades and the
-//                  ground, under the crowd and the near layer, CLIPPED to screen y >= 590 (the caption band above stays
-//                  calm sky). Centre = the sun's screen centre each frame (it rides the camera with the sun layer).
+//                  with 3.4 px ink edges (SunRipple, profile outQuad), drawn in SCREEN space over the facades and the
+//                  ground, under the crowd and the near layer, CLIPPED to the plaza's silhouettes (buildings, govD,
+//                  ground, far skyline: each arc ends at a roofline, never in open sky) and to screen y >= 590 (the
+//                  caption band above stays calm sky). Centre = the sun's screen centre each frame.
 //   SlatTag        govB's big lettered 'back soon' tag hung ON the shutter slats (string up to the shutter box), clear
 //                  of the padlock and of the door's lock box: pops on swinging (lifted off the shutter: foreshortened)
 //                  on 'on' and SLAPS flat against the slats ON 'PURPOSE' (squash + impact ticks).
@@ -26,7 +27,53 @@ import {SunRipple} from './dressing';
 
 /** Screen y the rings are clipped to (the caption band is y 280-570: nothing new draws above 590). */
 export const RING_CLIP_Y = 590;
-const RING_EDGE = 2;
+/** Fix round (hook review: a 6 px band with 2 px edges read as a pencil hairline over the beige facades): the house ink
+ *  weight on both edges, the band 12 px (timing.ts B.ring w), thinning only to 75 %. */
+const RING_EDGE = 3.4;
+const RING_THIN_TO = 0.75;
+
+// The plaza's silhouettes (world px of their layer: GovernmentPlaza's G / CIV / FAR_STEPS fills, traced): the rings ride
+// ONLY over architecture and paving, so each arc ends at a roofline / skyline edge, never in a flat cut in open sky
+// (hook review). Each list is clipped through its own layer matrix (multiplane parallax), unioned, then intersected with
+// screen y >= RING_CLIP_Y.
+type P2 = [number, number];
+const sp = (pts: P2[]) => `M${pts.map((q) => `${q[0]} ${q[1]}`).join('L')}Z`;
+const rct = (x: number, y: number, w: number, h: number) => sp([[x, y], [x + w, y], [x + w, y + h], [x, y + h]]);
+const LOW = 1500; // every silhouette runs down under the plaza horizon (1384), where the ground takes over
+const halfDome = (cx: number, by: number, rx: number, ry: number) => `M${cx - rx} ${by}A${rx} ${ry} 0 0 1 ${cx + rx} ${by}Z`;
+const SIL: Record<'buildings' | 'govD' | 'ground' | 'far', string[]> = {
+  buildings: [
+    // govA: pediment + cornice (pedL -64 .. pedR 424, cornT 712 .. cornB 748), the facade x -40 .. 400 to the steps
+    sp([[-64, 712], [180, 614], [424, 712], [424, 748], [400, 748], [400, LOW], [-200, LOW], [-200, 748], [-64, 748]]),
+    // govB: lantern + cap (to y 600), the dome (cx 518, by 792, rx 90, ry 140), the drum, the cornice, the facade
+    sp([[505, 612], [518, 600], [531, 612], [528, 612], [528, 660], [508, 660], [508, 612]]),
+    halfDome(518, 793, 90, 141),
+    rct(424, 790, 188, 116),
+    rct(384, 904, 268, 22),
+    rct(396, 924, 244, LOW - 924),
+    // govC: spire roof (to y 606), turret, cornice, the tower (behind govD from y 880)
+    sp([[829, 640], [870, 606], [911, 640]]),
+    rct(835, 638, 70, 64),
+    rct(794, 700, 212, 14),
+    rct(800, 712, 200, 200),
+  ],
+  // govD: the modern ministry, roof 880, cut by the right edge
+  govD: [rct(790, 880, 600, LOW - 880)],
+  // the plaza floor from the horizon down
+  ground: [rct(-400, 1384, 2000, 800)],
+  // the far civic skyline in the gap (far layer): the back band (top 1058, the raised blocks ignored) + the silhouettes
+  // that rise over it (PLAZA_CIVIC: domeF's lantern, templeM's pediment, the two spires, domeB), and the far steps
+  far: [
+    rct(560, 1058, 520, LOW - 1058),
+    sp([[665, 1060], [665, 1042], [672, 1036], [679, 1042], [679, 1060]]),
+    sp([[620, 1060], [620, 1044], [648, 1030], [676, 1044], [676, 1060]]),
+    sp([[680, 1060], [680, 996], [690, 966], [700, 996], [700, 1060]]),
+    sp([[700, 1060], [700, 1030], [715, 996], [730, 1030], [730, 1060]]),
+    halfDome(745, 1024, 14, 21),
+    sp([[725, 1060], [725, 1023], [765, 1023], [765, 1060]]),
+    sp([[739, 1004], [739, 988], [745, 982], [751, 988], [751, 1004]]),
+  ],
+};
 
 /** All four rings, in SCREEN px, for a layer whose matrix is `layer` (the rings undo it). */
 export const ShutdownRings: React.FC<{layer: string}> = ({layer}) => {
@@ -38,15 +85,23 @@ export const ShutdownRings: React.FC<{layer: string}> = ({layer}) => {
   return (
     <XG m={mat.inv(layerMat(t, layer))}>
       <defs>
-        <clipPath id="s01-shutdown-rings">
+        <clipPath id="s01-shutdown-band">
           <rect x={-200} y={RING_CLIP_Y} width={1480} height={2000} />
         </clipPath>
+        <clipPath id="s01-shutdown-sil">
+          {(Object.keys(SIL) as (keyof typeof SIL)[]).flatMap((k) => {
+            const tr = mat.str(layerMat(t, k));
+            return SIL[k].map((d, i) => <path key={`${k}${i}`} d={d} transform={tr} />);
+          })}
+        </clipPath>
       </defs>
-      <g clipPath="url(#s01-shutdown-rings)">
-        {live.map((r) => (
-          // r0 = the rim on screen at the emission (the sun layer's zoom then)
-          <SunRipple key={r.at} cx={cx} cy={cy} r={sun.r * zoomAt(r.at, 'sun')} r1={r.r1} at={r.at} dur={r.dur} profile="outQuad" thinTo={0.4} width={r.w} edge={RING_EDGE} hold={false} />
-        ))}
+      <g clipPath="url(#s01-shutdown-band)">
+        <g clipPath="url(#s01-shutdown-sil)">
+          {live.map((r) => (
+            // r0 = the rim on screen at the emission (the sun layer's zoom then)
+            <SunRipple key={r.at} cx={cx} cy={cy} r={sun.r * zoomAt(r.at, 'sun')} r1={r.r1} at={r.at} dur={r.dur} profile="outQuad" thinTo={RING_THIN_TO} width={r.w} edge={RING_EDGE} hold={false} />
+          ))}
+        </g>
       </g>
     </XG>
   );

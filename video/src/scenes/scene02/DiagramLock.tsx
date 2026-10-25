@@ -38,10 +38,12 @@ export type DiagramBit = {
   size?: number;
   /** He slides out of the socket into the gap (0.2 s, outBack). */
   peekAt?: number;
-  /** Hook pass 2 ('bug': Bit IS the bug): from peekAt he pops x1 -> x1.35 (out(cubic)), peaking ON hitAt with an
-   *  antenna FLICK (his head and antennae snap up 16 deg about his feet, the antenna tips reach the thumb-turn), then
-   *  settles to x1.15 (a damped bounce, ~0.15 s) and stays that size. */
+  /** Hook pass 2 ('bug': Bit IS the bug): from peekAt he pops x1 -> x2.0 (out(cubic)), peaking ON hitAt with an
+   *  antenna FLICK (his head and antennae snap up 16 deg about his feet), then settles to x1.5 (a damped bounce,
+   *  ~0.15 s) and holds it (the bug ring scales with him). */
   hitAt?: number;
+  /** Fix round (hook review): from here he eases x1.5 -> x1.15 (0.125 s out(cubic)) and stays that size. */
+  settleAt?: number;
   /** Antennae down / cower (squash about his feet) and a look up at the hand. */
   cowerAt?: number;
   /** He ducks back into the socket (0.14 s). */
@@ -216,6 +218,28 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
   // thumb-turn: a disc with a bar knob (vertical at rest, turns 90 deg)
   mech.push(knob);
 
+  // ---- the 'bug' hit (fix round, hook review: Bit IS the bug, he must read at phone size): scale pop x1 -> x2.0 ON
+  // hitAt, a damped bounce down to x1.5 held through 'hackers' (settleAt), then x1.15 by the hand's arrival; and the
+  // antenna flick (a head-up snap about his feet, peaking ON hitAt, sprung back with one small overshoot); Bit faces
+  // left, so + deg lifts his head. The bug ring scales with him (x pop / 1.15, never below its own size).
+  let pop = 1;
+  let flick = 0;
+  if (bit && bit.hitAt !== undefined && bit.peekAt !== undefined && t >= bit.peekAt) {
+    if (t < bit.hitAt) {
+      const q = prog(t, bit.peekAt, bit.hitAt - bit.peekAt, E.outCubic);
+      pop = 1 + 1.0 * q;
+      flick = 16 * prog(t, bit.hitAt - 0.05, 0.05, E.outCubic);
+    } else {
+      const u = t - bit.hitAt;
+      pop = 1.5 + 0.5 * Math.exp(-u / 0.05) * Math.cos((2 * Math.PI * u) / 0.2);
+      flick = 16 * Math.exp(-u / 0.045) * Math.cos((2 * Math.PI * u) / 0.16);
+      if (bit.settleAt !== undefined && t >= bit.settleAt) pop = lerp(pop, 1.15, prog(t, bit.settleAt, 0.125, E.outCubic));
+    }
+  }
+  const ringK = Math.max(1, pop / 1.15);
+  // his feet once out of the socket (out = 1.1): the point he and the ring scale about
+  const bitFeet: Pt = [sl[0] - 0.1 * (bit?.size ?? 26) * 0.62, 9];
+
   // ---- Bit in the socket (clipped at the socket mouth: the part inside the strike is hidden)
   let bitNode: React.ReactNode = null;
   if (bit) {
@@ -240,26 +264,11 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
     const mouth = sl[0];
     const ax = mouth + L * 0.62 - out * L * 0.62;
     const cowering = bit.cowerAt !== undefined && t >= bit.cowerAt;
-    // the 'bug' hit: scale pop (x1.35 ON hitAt, settling to x1.15) and the antenna flick (a head-up snap about his feet,
-    // peaking ON hitAt, sprung back with one small overshoot); Bit faces left, so + deg lifts his head
-    let pop = 1;
-    let flick = 0;
-    if (bit.hitAt !== undefined && bit.peekAt !== undefined && t >= bit.peekAt) {
-      if (t < bit.hitAt) {
-        const q = prog(t, bit.peekAt, bit.hitAt - bit.peekAt, E.outCubic);
-        pop = 1 + 0.35 * q;
-        flick = 16 * prog(t, bit.hitAt - 0.05, 0.05, E.outCubic);
-      } else {
-        const u = t - bit.hitAt;
-        pop = 1.15 + 0.2 * Math.exp(-u / 0.05) * Math.cos((2 * Math.PI * u) / 0.2);
-        flick = 16 * Math.exp(-u / 0.045) * Math.cos((2 * Math.PI * u) / 0.16);
-      }
-    }
     bitNode = (
       <g key="bit">
         <defs>
           <clipPath id={`${uid}b`}>
-            <rect x={-60} y={-60} width={mouth + 60 + 0.4} height={120} />
+            <rect x={-60} y={-95} width={mouth + 60 + 0.4} height={190} />
           </clipPath>
         </defs>
         <g clipPath={`url(#${uid}b)`}>
@@ -299,7 +308,7 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
       );
     }
     // an open pen loop with a 14 deg tail overlapping outside its start (polish: was a near-perfect ellipse)
-    const ring = penRing(LOCK.gap[0], 2, 22, 14, `${seed}/gr`);
+    const ring = penRing(bitFeet[0] + (LOCK.gap[0] - bitFeet[0]) * ringK, bitFeet[1] + (2 - bitFeet[1]) * ringK, 22 * ringK, 14, `${seed}/gr`);
     marks.push(<Ink key="gapRh" d={ring} at={gapMarkAt + 0.04} dur={0.13} width={W * 1.25} color={palette.cream} taper={false} vary={0} seed={`${seed}/grh`} />);
     marks.push(<Ink key="gapR" d={ring} at={gapMarkAt + 0.04} dur={0.13} width={W * 0.62} taper vary={0.25} seed={`${seed}/gr`} />);
   }

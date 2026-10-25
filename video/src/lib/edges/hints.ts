@@ -71,7 +71,7 @@ export const EDGE_HINTS: Record<string, EdgeHints> = {
     // no rect for Pip: he lands from S01 at x 939-1049 (f142) and stays left of that, clear of the 18-24 px right paper
     // (from x ~1060 at his height); a rect within 110 px of the side runs off it, and his only cut the paper at y 600-900
     keep: [
-      [270, 1640, 790, 1920], // the three audience heads
+      [110, 1640, 790, 1920], // the three audience heads (from x 110: onlooker A's head stays whole in the 'take over' push)
       [20, 860, 130, 1020], // the site plaque at the left frame edge
     ],
   },

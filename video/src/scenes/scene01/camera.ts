@@ -24,7 +24,10 @@ import {B} from './timing';
 //   click    0 -> 0.12      x1.025 out(cubic): the frame-0 press's click
 //   punch    0.19 -> 0.36   x1.035 out(cubic): 'Governments', landing with shutdown ring 1 (as heads turn at 0.34)
 //   creep    0.12 -> dive   inOut(sine), so click x punch x creep = 1.16 at the dive (as before)
-//   purpose  3.84 -> 3.955  x1.04 out(cubic): lands ON 'PURPOSE' (hook pass 2), with an 8 px jolt
+//   purpose  3.885 -> 3.955 x1.10 out(cubic): a SNAP landing ON 'PURPOSE' (with govB's tag slap), then it relaxes
+//            3.955 -> 4.25  to x1.04 inOut(sine) (fix round, hook review: the old x1.04 punch was ~17 px of motion at
+//                           the tag, weaker than the shutter slams), with a 14 px jolt; net x1.04, so the zoom at the
+//                           dive (1.2245), the dive maths, the lock across the cut and Pip's leap are unchanged
 //   drift    3.84 -> dive   x1.015, velocity ~ (1 - u^4): the camera keeps creeping after the punch, slowing only in
 //                          the last frames into the dive's zero-velocity start (3.96-4.38 is never still)
 // and an impact JOLT on each shutter slam. The dive is built on the ACTUAL push matrix at B.dive (P0 = the lock box's
@@ -34,12 +37,12 @@ export const CAM = {
   click: {t0: 0, t1: 0.12, z: 1.025},
   punch: {t0: B.ring[0].at, t1: 0.36, z: 1.035},
   creep: {t0: 0.12, t1: B.dive, z: 1.16 / (1.025 * 1.035)},
-  purpose: {t0: 3.84, t1: B.purposeSlap, z: 1.04},
+  purpose: {t0: B.purposeSlap - 0.07, t1: B.purposeSlap, z: 1.1, settle: 4.25, zEnd: 1.04},
   drift: {t0: 3.84, t1: B.dive, z: 1.015},
   dive: {t0: B.dive, t1: B.cut, zEnd: 3.19},
 } as const;
 /** Shutter landings (timing.ts: slamB/slamA drop 0.16 s, slamC 0.113 s half drop): screen-space jolt, px. */
-const JOLTS: [number, number][] = [[B.slamB + 0.16, 9], [B.slamA + 0.16, 7], [B.slamC + 0.113, 4], [B.purposeSlap, 8]];
+const JOLTS: [number, number][] = [[B.slamB + 0.16, 9], [B.slamA + 0.16, 7], [B.slamC + 0.113, 4], [B.purposeSlap, 14]];
 export const joltY = (t: number) => {
   let y = 0;
   for (const [ti, a] of JOLTS) if (t >= ti && t < ti + 0.2) y += a * Math.exp(-(t - ti) * 22) * Math.cos(2 * Math.PI * 11 * (t - ti));
@@ -65,7 +68,8 @@ const pushLogZ = (t: number) =>
   Math.log(CAM.click.z) * E.outCubic(seg(t, CAM.click)) +
   Math.log(CAM.punch.z) * E.outCubic(seg(t, CAM.punch)) +
   Math.log(CAM.creep.z) * pushQ(t) +
-  Math.log(CAM.purpose.z) * E.outCubic(seg(t, CAM.purpose)) +
+  Math.log(CAM.purpose.z) * E.outCubic(seg(t, CAM.purpose)) -
+  Math.log(CAM.purpose.z / CAM.purpose.zEnd) * E.inOutSine(seg(t, {t0: CAM.purpose.t1, t1: CAM.purpose.settle})) +
   Math.log(CAM.drift.z) * driftQ(seg(t, CAM.drift));
 /** The push matrix of a layer (exponent f0) at t: the zoom about S, then the screen-space jolt. Constant from B.dive on. */
 const pushMat = (t: number, f0: number): Mat => {

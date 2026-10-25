@@ -127,7 +127,7 @@ const lockNode = (ink: number, knobOnly = false) => (
     turnAt={B.turn}
     knobOnly={knobOnly}
     plate={PLATE}
-    bit={{size: 24, peekAt: B.bitPeek, hitAt: B.bitHit, cowerAt: B.could, hideAt: B.bitHide, popAt: B.bitPop}}
+    bit={{size: 24, peekAt: B.bitPeek, hitAt: B.bitHit, settleAt: B.bitSettle, cowerAt: B.could, hideAt: B.bitHide, popAt: B.bitPop}}
   />
 );
 

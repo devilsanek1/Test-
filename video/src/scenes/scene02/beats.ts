@@ -35,8 +35,10 @@ const ABS = {
   boltTest: 5.005, //                       w17-0.10 'this': the bolt shoots out, SLAMS to a stop short of the socket
   bug: 5.205, //                            w18-0.10 'bug': peach gap + bold bracket + ring draw on; the camera PUNCH
   //                                        starts (camera.ts: +6 % in 0.10 s, lands ON 'bug' 5.305 with a jolt)
-  bitPeek: 5.235, //                        w18-0.07 'bug': Bit peeks out of the socket, antennae up, popping x1.35
-  bitHit: 5.305, //                         w18 'bug': ... ON the word (scale peak + antenna flick), settles to x1.15
+  bitPeek: 5.235, //                        w18-0.07 'bug': Bit peeks out of the socket, antennae up, popping x2.0
+  bitHit: 5.305, //                         w18 'bug': ... ON the word (x2.0 peak + antenna flick), settles to x1.5
+  bitSettle: 5.875, //                      w20 'hackers' (fix round): Bit holds x1.5 from 'bug' to here, then eases to
+  //                                        x1.15 (0.125 s out(cubic)) by the hand's arrival at 6.0
   site: 5.695, //                           w19 'where': site icon draws on, connector runs lock -> icon
   L1: 5.775, //                             w19+0.08 'where': label L1 (static title-block tag)
   handIn: 5.775, //                         w20-0.10 'hackers' (polish: was w20-0.05 in 0.3 s out(cubic), a 3-frame pop):

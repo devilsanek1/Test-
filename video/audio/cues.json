@@ -10,14 +10,34 @@
   "src_t": 0.0
  },
  {
-  "t": 0.02,
+  "t": 0.19,
   "sfx": "power_off_thunk",
   "gain_db": -21.0,
   "pan": 0.0,
   "provisional": false,
   "scene": "S01",
   "why": "hook pass: low power-down thunk under the frame-0 click (the camera punch-in)",
-  "src_t": 0.02
+  "src_t": 0.19
+ },
+ {
+  "t": 0.19,
+  "sfx": "switch_toggle",
+  "gain_db": -21,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S01",
+  "why": "hook pass 2: power-button press + shutdown ring",
+  "src_t": 0.19
+ },
+ {
+  "t": 0.537,
+  "sfx": "switch_toggle",
+  "gain_db": -23,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S01",
+  "why": "hook pass 2: power-button press + shutdown ring",
+  "src_t": 0.537
  },
  {
   "t": 0.63,
@@ -28,6 +48,16 @@
   "scene": "S01",
   "why": "-24 dB, govA screen off",
   "src_t": 0.63
+ },
+ {
+  "t": 0.873,
+  "sfx": "switch_toggle",
+  "gain_db": -23,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S01",
+  "why": "hook pass 2: power-button press + shutdown ring",
+  "src_t": 0.873
  },
  {
   "t": 0.885,
@@ -47,6 +77,16 @@
   "provisional": true,
   "scene": "S01",
   "why": "-24 dB, far silhouettes step dark (3 offsets)",
+  "src_t": 1.155
+ },
+ {
+  "t": 1.155,
+  "sfx": "switch_toggle",
+  "gain_db": -19,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S01",
+  "why": "hook pass 2: power-button press + shutdown ring",
   "src_t": 1.155
  },
  {
@@ -160,6 +200,16 @@
   "src_t": 3.695
  },
  {
+  "t": 3.955,
+  "sfx": "pop_low",
+  "gain_db": -15,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S01",
+  "why": "hook pass 2: 'PURPOSE' slap of the big back-soon tag + camera snap",
+  "src_t": 3.955
+ },
+ {
   "t": 4.385,
   "sfx": "whoosh_soft",
   "gain_db": -18.0,
@@ -210,6 +260,16 @@
   "src_t": 5.305
  },
  {
+  "t": 5.305,
+  "sfx": "pop_low",
+  "gain_db": -19,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S02",
+  "why": "hook pass 2: 'bug' camera punch, Bit pops x2",
+  "src_t": 5.305
+ },
+ {
   "t": 5.355,
   "sfx": "pop_high",
   "gain_db": -20.0,
@@ -240,6 +300,16 @@
   "src_t": 5.825
  },
  {
+  "t": 6.3,
+  "sfx": "whoosh_soft",
+  "gain_db": -23,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S02",
+  "why": "hook pass 2: push onto 'take over a site'",
+  "src_t": 6.3
+ },
+ {
   "t": 6.42,
   "sfx": "lock_click",
   "gain_db": -16.0,
@@ -248,16 +318,6 @@
   "scene": "S02",
   "why": "thumb-turn",
   "src_t": 6.42
- },
- {
-  "t": 6.57,
-  "sfx": "pop_mid",
-  "gain_db": -26.0,
-  "pan": 0.0,
-  "provisional": true,
-  "scene": "S02",
-  "why": "-26 dB, L2 tag",
-  "src_t": 6.57
  },
  {
   "t": 6.635,
@@ -270,6 +330,16 @@
   "src_t": 6.635
  },
  {
+  "t": 6.98,
+  "sfx": "whoosh_soft",
+  "gain_db": -25,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S02",
+  "why": "hook pass 2: pull back to the board",
+  "src_t": 6.98
+ },
+ {
   "t": 7.275,
   "sfx": "pencil_scratch_short",
   "gain_db": -20.0,
@@ -278,6 +348,16 @@
   "scene": "S02",
   "why": "-20 dB, key cross",
   "src_t": 7.275
+ },
+ {
+  "t": 7.45,
+  "sfx": "pop_mid",
+  "gain_db": -26.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S02",
+  "why": "-26 dB, L2 tag",
+  "src_t": 7.45
  },
  {
   "t": 8.273,
@@ -320,24 +400,24 @@
   "src_t": 8.99
  },
  {
-  "t": 9.26,
-  "sfx": "pop_mid",
-  "gain_db": -26.0,
-  "pan": 0.0,
-  "provisional": true,
-  "scene": "S03",
-  "why": "-26 dB, label card",
-  "src_t": 9.26
- },
- {
-  "t": 9.46,
+  "t": 9.03,
   "sfx": "paper_flip",
   "gain_db": -20.0,
   "pan": 0.0,
-  "provisional": true,
+  "provisional": false,
   "scene": "S03",
   "why": "pop-up city (one file)",
-  "src_t": 9.46
+  "src_t": 9.03
+ },
+ {
+  "t": 9.567,
+  "sfx": "pop_mid",
+  "gain_db": -26.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S03",
+  "why": "-26 dB, label card",
+  "src_t": 9.567
  },
  {
   "t": 11.04,
