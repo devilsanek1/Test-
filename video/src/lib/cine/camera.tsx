@@ -36,7 +36,8 @@
 //             draws the engine's strokes at width x (layer scale now / layer scale at the segment start)^-inkComp
 //             (lib/inkComp.tsx; house value 0.6: a 3x dive lands at ~1.55x line weight, not 3x). Exactly 1 at the
 //             segment start (no width step); the factor HOLDS after the segment ends; flagged segments multiply (a
-//             flagged dive in and a flagged pull-back out cancel). Handheld / `add` are not compensated.
+//             flagged dive in and a flagged pull-back out cancel). If the camera comes back, flag the return key
+//             too, or the lines stay thinner than nominal at rest. Handheld / `add` are not compensated.
 // Missing values inherit from the previous key. Times are scene seconds (useTime) unless you pass `t`.
 
 import React, {createContext, useContext} from 'react';
@@ -99,7 +100,8 @@ export type CamKey = {
   pan?: number;
   /** Camera tilt (px on screen, + = look up: everything, the sky included, shifts down by the same amount). */
   tilt?: number;
-  /** Opt-in ink compensation exponent for the segment ARRIVING at this key (0.6 = house value). Default off. */
+  /** Opt-in ink compensation exponent for the segment ARRIVING at this key (0.6 = house value). Default off. The factor
+   *  is HELD after the segment: if the camera comes back, flag the return key too (else lines stay thin at rest). */
   inkComp?: number;
 };
 
@@ -400,7 +402,8 @@ export const Layer: React.FC<{depth?: number; children?: React.ReactNode}> = ({d
 };
 
 /** Screen-constant stroke width inside a layer: pass the width you want ON SCREEN. (Under a flagged `inkComp` camera an
- *  <Ink> also multiplies it by the layer's factor: divide by useInkScale() to stay exactly screen-constant.) */
+ *  <Ink> also multiplies it by the layer's factor: divide by useInkScale() to stay exactly screen-constant; a raw
+ *  <path strokeWidth> is not compensated, so use the value as is.) */
 export const useScreenWidth = (depth: number) => {
   const c = useCam();
   const s = layerScale(c, depth);

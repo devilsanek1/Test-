@@ -24,12 +24,11 @@ import {Elephant, ElephantTimeline, hop} from '../lib/mascot';
 import type {PoseKey} from '../lib/mascot';
 import {CRT, crtPhase, GovernmentPlaza, PLAZA, GovId} from './shared/sets';
 import {ChromeSlot} from './shared/sets/propSlots';
-import {BackSoonTag, Bit, LabelTag, PowerGlyph, ShutterPadlock, StickyNote, SunPress} from './shared/props';
+import {BackSoonTag, Bit, EdgeOnlooker, LabelTag, PowerGlyph, ShutterPadlock, StickyNote, SunPress} from './shared/props';
 import {ABS, localBeats, SCENE} from './scene11/beats';
 import {camAt, camKeys, camMat, toScreen} from './scene11/camera';
 import {crtContent, GovBWindow, Pigeon, PlainPane, SillSnail} from './scene11/actors';
 import {BandClip, NearLamp, StepTreads} from './scene11/near';
-import {EdgeOnlooker} from './shared/props';
 import {backSoonW, NoteBreeze, NoteFlight, NoteStrike, PadlockRock, padlockShackleTop, Sparkle, StepRipple, TagTwirl} from './scene11/shims';
 import {Fill} from '../lib/Fill';
 import {Ink} from '../lib/Ink';
@@ -209,9 +208,10 @@ const Scene11: React.FC = () => {
     }
   }
   let pip: React.ReactNode;
-  // the hop in from past the left edge (S10 sends him off its right edge): at f0 he is mid-air at the edge (feet x ~30,
-  // the front half of him in frame); a low arc (~43 px / frame across), touching down ON 'Even'
-  const inHop = hop({t, t0: b.pipLand - 0.4, dur: 0.4, from: {x: -200, y: 1300}, to: {x: pipAnchor[0], y: pipAnchor[1]}, height: 25});
+  // the hop in from past the left edge (S10 sends him off its right edge, fully out at 45.595): on f0 his feet are at
+  // x ~-90, so only his trunk tip could show, and that is behind the near lamp post (x 0-30); a low arc (~60 px / frame
+  // across: a ballistic leap, motion_spec 25), first readable on f1-f2, touching down ON 'Even'
+  const inHop = hop({t, t0: b.pipLand - 0.34, dur: 0.34, from: {x: -300, y: 1290}, to: {x: pipAnchor[0], y: pipAnchor[1]}, height: 25});
   if (t < b.pipLand) {
     pip = inHop.k > 0 || t >= b.pipLand - 0.5 ? <Elephant x={inHop.x} y={inHop.y} scale={pipScale} pose="stand-side" amount={inHop.spread} squash={inHop.squash} rotate={inHop.rotate} t={t} seed={11} /> : null;
   } else if (t < b.pipOut) {
@@ -220,15 +220,16 @@ const Scene11: React.FC = () => {
     const crouch = t >= t0 - 0.12 ? 0.2 * Math.sin((Math.min(1, (t - (t0 - 0.12)) / 0.12) * Math.PI) / 2) : 0;
     pip = <ElephantTimeline x={pipAnchor[0]} y={pipAnchor[1]} scale={pipScale} t={t} seed={11} keys={pipKeys} squash={inHop.squash + crouch - pipUp} rotate={pipRot} amount={shrugAmt} />;
   } else {
-    // a hop UP and AT the lens: he grows ~1.5x by the cut (comes at the camera), drifts a little right (the
-    // left-to-right travel of S10 -> S11 -> S12's bollard side) and is already falling at the cut. He stays left of the
-    // padlock / tag / note, so the last frame keeps the payoff clear. S12 continues the fall onto his bollard on 'And'.
+    // a hop UP and AT the lens: he turns to face us on takeoff (sit-front: ears out, soles toward the camera, happy) and
+    // grows ~1.5x by the cut (he comes at the camera), drifting a little right (the left-to-right travel of S10 -> S11
+    // -> S12's bollard side), already falling at the cut. He stays left of the padlock / tag / note, so the last frame
+    // keeps the payoff clear. S12 continues: he drops in onto his bollard on 'And' (hand-off numbers: docs/scenes/S11.md).
     const tau = t - b.pipOut;
-    const x = pipAnchor[0] + 60 * tau;
-    const y = pipAnchor[1] - 800 * tau + 2800 * tau * tau;
-    const grow = 1 + 2.4 * tau;
-    const stretch = -0.18 * Math.exp(-tau * 8);
-    pip = <Elephant x={x} y={y} scale={pipScale * grow} pose="stand-side" amount={Math.min(1, tau * 6)} squash={stretch} rotate={-6 + 40 * tau} t={t} seed={11} />;
+    const x = pipAnchor[0] + PIP_EXIT.vx * tau;
+    const y = pipAnchor[1] + PIP_EXIT.vy * tau + PIP_EXIT.g * tau * tau;
+    const grow = 1 + PIP_EXIT.grow * tau;
+    const stretch = -0.2 * Math.exp(-tau * 8);
+    pip = <Elephant x={x} y={y} scale={pipScale * grow} pose="sit-front" expression="happy" look={0.15} squash={stretch} rotate={PIP_EXIT.rot0 + PIP_EXIT.rotV * tau} t={t} seed={11} />;
   }
 
   // ---- J6: the sticky note drops from behind govB's cornice (blank back), flips to its lettered face and slaps onto the
@@ -294,15 +295,15 @@ const Scene11: React.FC = () => {
         {nearPlane}
         {/* on the closed shutter: the sticky note (J6), then S01's lettered 'back soon' tag on its nail and S01's padlock
             on the rail (drawn by the scene: they rock / twirl and they sit over the bold near-plane strokes) */}
-        <NoteFlight x={NOTE.x} y={NOTE.y} from={NOTE_FROM} arriveAt={slapAt} dur={slapAt - b.noteDrop} clipY={CORNICE_B} back={noteEl(false, true)} face={noteEl(false)} />
+        <NoteFlight x={NOTE.x} y={NOTE.y} from={NOTE_FROM} arriveAt={slapAt} dur={slapAt - b.noteDrop} flipDur={0.15} clipY={CORNICE_B} back={noteEl(false, true)} face={noteEl(false)} />
         <NoteBreeze x={NOTE.x} y={NOTE.y} h={NOTE.h} flutterAt={[b.noteCurl - 0.02, b.strike + 0.18]} joltAt={b.strike}>
           {noteEl(true)}
-          {t >= slapAt ? <NoteStrike x={NOTE.x} y={NOTE.y} w={NOTE.w} h={NOTE.h} lines={NOTE_LINES} fontSize={NOTE_FS} strike="and on again" rot={NOTE_ROT} at={b.strike} widthPx={4} overPx={7} seed="s11/J6/strike" /> : null}
+          {t >= slapAt ? <NoteStrike x={NOTE.x} y={NOTE.y} w={NOTE.w} h={NOTE.h} lines={NOTE_LINES} fontSize={NOTE_FS} strike="and on again" rot={NOTE_ROT} at={b.strike} widthPx={5.2} overPx={8} seed="s11/J6/strike" /> : null}
         </NoteBreeze>
         <TagTwirl x={TAG.x} y={TAG.y} twirlAt={[b.tagTwirl]}>
-          <BackSoonTag x={TAG.x} y={TAG.y} lettered text="back soon" size={tagW} minFont={10} at={b.padlock + 0.04} tapAt={[b.tagTwirl + 0.45, b.tagSway]} inkPx={3.4} seed="plaza/govB/tag" />
+          <BackSoonTag x={TAG.x} y={TAG.y} lettered text="back soon" size={tagW} minFont={10} at={b.tag} tapAt={[b.tagTwirl + 0.45, b.tagSway]} inkPx={3.4} seed="plaza/govB/tag" />
         </TagTwirl>
-        {t >= b.padlock + 0.04 ? <path d={blob(TAG.x, TAG.y - 0.4, 1.6, 1.6, {seed: 's11/nail'})} fill={palette.ink} /> : null}
+        {t >= b.tag ? <path d={blob(TAG.x, TAG.y - 0.4, 1.6, 1.6, {seed: 's11/nail'})} fill={palette.ink} /> : null}
         <PadlockRock x={PAD[0]} y={PAD[1]} size={PAD_SIZE} rockAt={[b.glint - 0.02, b.bitTap]}>
           <ShutterPadlock x={PAD[0]} y={PAD[1]} size={PAD_SIZE} at={b.padlock} glintAt={b.glint} width={3.4 / cam.z} seed="plaza/govB/pl" />
         </PadlockRock>
@@ -311,9 +312,9 @@ const Scene11: React.FC = () => {
         <SillSnail x={SNAIL_AT[0]} y={SNAIL_AT[1]} size={28} shellAt={b.snailShell} crawlAt={b.snailCrawl} hideAt={b.bitHop} antennaeAt={b.antennae} peekAt={b.pipOut} seed="s11/snail" />
         {bit}
         <Pigeon x={CORNICE_PIGEON[0]} y={CORNICE_PIGEON[1]} s={PIGEON_S} shuffle={[{at: b.ringHiccup1, dx: -9}, {at: b.cornShuffle, dx: 6}, {at: b.barBack + 0.17, dx: 4}, {at: b.antennae + 0.08, dx: -3}]} hopAt={[b.press + 0.05, b.glint + 0.17]} preenAt={b.preen} seed="s11/pg1" />
-        {/* the box pigeon: crouch, then off up-left (the whole bird, flapping, 16 -> 24 px / frame): clear of the box by
-            the cut, mid-flight on the last frame */}
-        <Pigeon x={BOX_PIGEON[0]} y={BOX_PIGEON[1]} s={PIGEON_S} land={{at: b.pigeonLand, from: [175, 875], dur: 0.45}} shuffle={[{at: b.noteSlap + 0.18, dx: 5}]} hopAt={[b.glint - 0.03]} hopH={20} flyAt={b.pigeonFly} flyTo={[-300, -200]} flySpeed={[16, 24]} seed="s11/pg2" />
+        {/* the box pigeon: crouch, then off up-left (the whole bird, flapping, 20 -> 28 px / frame) with the tag sway,
+            after Pip's hop-off: clear of the box by the cut, mid-flight on the last frame */}
+        <Pigeon x={BOX_PIGEON[0]} y={BOX_PIGEON[1]} s={PIGEON_S} land={{at: b.pigeonLand, from: [175, 875], dur: 0.45}} shuffle={[{at: b.noteSlap + 0.18, dx: 5}]} hopAt={[b.glint - 0.03]} hopH={20} flyAt={b.pigeonFly} flyTo={[-300, -200]} flySpeed={[20, 28]} seed="s11/pg2" />
       </XG>
       {pip}
     </World>
