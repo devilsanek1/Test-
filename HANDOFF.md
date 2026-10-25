@@ -88,7 +88,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
 ## 3. The queue (in order) at handoff
 
 1. **PAUSED by the owner at 2026-10-25 ~20:15 UTC (stopped before any agent finished; nothing produced). Relaunch the v2 G0 workflow from `context/workflows/v2-g0-angles-wf_b7b190a7-4fe.js` when the owner says go;** output `video/docs/v2/G0_ANGLES.md`. Present the top 3; the owner picks.
-2. **PAUSED by the owner at 2026-10-25 ~20:15 UTC (nothing produced). When the owner says go, relaunch `context/workflows/look-cozy-and-scale-wf_ee30e562-0c7.js` to research the "cozy + scale" look** (owner, 2026-10-25 17:32). Output `video/docs/look/COZY_AND_SCALE.md` plus `video/docs/look/research/*.md`.
+2. **PAUSED by the owner at 2026-10-25 ~20:15 UTC (nothing produced). When the owner says go, relaunch `context/workflows/look-cozy-and-scale-wf_ee30e562-0c7.js` to research the "cozy + scale" look** (owner, 2026-10-25 17:32). Output `video/docs/look/COZY_AND_SCALE.md` plus `video/docs/look/research/*.md`. It must also follow the palette direction in `video/docs/look/PALETTE.md` (owner, after the pause).
    - **What the owner said:**
      - "I do like the bigger scale scenes occasionally, we did it great here, keep going, taking inspiration from
        scenes in Arcane: not the footage but camera work, to feel small and scale."
@@ -249,6 +249,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
 | 10-25 14:33 | `context/uploads/inline/2026-10-25_143321_6.jpg` | "I don't like this white part at the top of the reel; looks like it was screen recorded" | removed the top paper edge; playbook rule |
 | 10-25 16:19 | `context/uploads/5c49279a-ScreenRecording_10-25-2026_16-18-22_1.mp4` | "check out the text capture. Is it intentional effect?" (captions clipping as they roll in) | playbook: pop captions |
 | 10-25 16:46 | `context/uploads/inline/2026-10-25_164635_7.png`, `_8.png` | Instagram insights after about 30-45 min | Performance log, hook rules |
+| 10-25 ~20:20 | `video/docs/look/palette_refs/1-5.webp` (editorial flat illustrations: WSJ giant, croissant + dog, couple with lights, autumn walk, confetti) | "let's play with the colour palettes ... I love our soft, warm, no screaming colours ... the background is very similar to ours, but some details have a bit more contrast" | `video/docs/look/PALETTE.md` (measured palettes + v2 proposal), playbook Visual style |
 | 10-25 17:32 | `context/uploads/inline/2026-10-25_173226_9.jpg` (= `video/docs/look/ref_sense_of_enclosure.jpg`) | "Sense of Enclosure": coziness as a visual twist; keep Arcane-like scale | queue item 2 |
 
 Other screenshots in `context/uploads/` (`*-image.png`) are the same Instagram screens as uploaded files.

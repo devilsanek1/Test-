@@ -39,6 +39,10 @@ Format: **rule** — why / evidence (video, date).
   — owner, 2026-10-25.
 - **Edges: hand-drawn paper edges ('paint-subtle') are liked, BUT never at the top of the frame or beside the caption
   band.** A white strip at the top looked like a screen recording under the phone's status bar. — v1, posted reel, 2026-10-25.
+- **Palette: keep our soft, warm, "no screaming colours" base (the owner loves it) and play with it: a few details get
+  more contrast:** one saturated hero colour (~5-15 % of the frame), a deep dark anchor (aubergine rather than black)
+  and tiny hot pops. The background stays a warm off-white. References: `docs/look/palette_refs/`; analysis and the
+  proposal: `docs/look/PALETTE.md`. Explore palettes at every G4. — owner, 2026-10-25.
 - **Profile identity: the mascot Pip (the purple PHP elephant) in the film's style;** the avatar in use is the
   power-button sun one (`video/deliverables/profile/pip_power_button.png`). — 2026-10-25.
 
