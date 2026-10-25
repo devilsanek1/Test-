@@ -230,31 +230,72 @@ export const handTurn = (t: number, at: number, deg = 12, dur = 0.22) => deg * E
 
 // ---------------------------------------------------------------- the steps and the plaza
 
-/** The flight re-drawn over the set's stripes (fix round 1): four steps (cream tread band + sand riser, ONE ink nosing
- *  line each, running off both frame sides) and the deep bottom tread / landing the front row stands on (feet 1470),
- *  its sand plinth riser above the forecourt. The back row stands on the landing's back edge (feet 1446). */
-export const STEPS = {y0: 1320, pitch: 30, n: 4, tread: 9, landing: [1440, 1474] as [number, number], plinth: 1488};
+/** The flight re-drawn over the set's stripes (fix round 3: ACROSS THE FACADE ONLY, stopping at the corner pilaster):
+ *  four steps (cream tread band + sand riser, ONE ink nosing line each) from the frame's left edge to the corner
+ *  pilaster's base (x 846), a tan cheek block under the wing (cream coping, its face ink) where the flight stops; the
+ *  deep bottom tread / landing the front row stands on (feet 1470) and its sand plinth riser run the full width (the
+ *  pavement). The back row stands on the landing's back edge (feet 1446). The nosing lines are CUT where a figure's legs
+ *  cross them (`gaps`, from the figure's pop): no hairline runs through a leg. */
+export const STEPS = {y0: 1320, pitch: 30, n: 4, tread: 9, landing: [1440, 1474] as [number, number], plinth: 1488, x1: 846};
 const X0 = -170;
 const X1 = 1300;
+/** A cut in the nosing lines: lines with y0 < y < y1 skip [x0, x1] while from <= t < to. */
+export type StepGap = {x0: number; x1: number; y0: number; y1: number; from: number; to?: number};
+const STEP_LINES: {y: number; x0: number; x1: number; seed: string; dy: number}[] = [
+  ...Array.from({length: STEPS.n}, (_, i) => ({y: STEPS.y0 + i * STEPS.pitch, x0: X0, x1: STEPS.x1, seed: `s5st${i}`, dy: 1})),
+  {y: STEPS.landing[0], x0: X0, x1: X1, seed: 's5stL', dy: 1.5},
+  {y: STEPS.landing[1], x0: X0, x1: X1, seed: 's5stP', dy: 2},
+];
 const STEP_G = (() => {
+  const x1 = STEPS.x1;
   let treads = rectPath(X0, STEPS.landing[0], X1 - X0, STEPS.landing[1] - STEPS.landing[0]);
-  let ink = '';
-  for (let i = 0; i < STEPS.n; i++) {
-    const y = STEPS.y0 + i * STEPS.pitch;
-    treads += rectPath(X0, y, X1 - X0, STEPS.tread);
-    ink += line(X0, y, X1, y + 1.5, {seed: `s5st${i}`, over: [0, 0]});
-  }
-  ink += line(X0, STEPS.landing[0], X1, STEPS.landing[0] + 1.5, {seed: 's5stL', over: [0, 0]}) + line(X0, STEPS.landing[1], X1, STEPS.landing[1] + 2, {seed: 's5stP', over: [0, 0]});
-  return {base: rectPath(X0, STEPS.y0 - 2, X1 - X0, STEPS.plinth - STEPS.y0 + 2), treads, ink};
+  for (let i = 0; i < STEPS.n; i++) treads += rectPath(X0, STEPS.y0 + i * STEPS.pitch, x1 - X0, STEPS.tread);
+  // the cheek block under the wing (the flight stops against it), its cream coping and face ink
+  const cheek = rectPath(x1, STEPS.y0 - 2, X1 - x1, STEPS.landing[0] - STEPS.y0 + 2);
+  const coping = rectPath(x1 - 4, STEPS.y0 - 4, X1 - x1 + 4, 11);
+  const cheekInk = line(x1 - 4, STEPS.y0 - 4, X1, STEPS.y0 - 3, {seed: 's5chT', over: [0, 0]}) + line(x1 - 4, STEPS.y0 + 7, X1, STEPS.y0 + 8, {seed: 's5chC', over: [0, 0]}) + line(x1, STEPS.y0 + 7, x1 + 1, STEPS.landing[0], {seed: 's5chE', over: [0, 2]});
+  return {base: rectPath(X0, STEPS.y0 - 2, X1 - X0, STEPS.plinth - STEPS.y0 + 2), treads, cheek, coping, cheekInk};
 })();
 
-export const StepsOverlay: React.FC = () => (
-  <>
-    <Fill d={STEP_G.base} color={palette.sand} offset={false} seed="s5stB" />
-    <Fill d={STEP_G.treads} color={palette.cream} seed="s5stT" />
-    <Ink d={STEP_G.ink} width={SI.mid} seed="s5stI" />
-  </>
-);
+/** The nosing lines with the gaps open at t (segments between the cuts; each line keeps its own seed). */
+function stepInk(t: number, gaps: StepGap[]): string {
+  let d = '';
+  for (const L of STEP_LINES) {
+    const cuts = gaps
+      .filter((g) => t >= g.from && (g.to === undefined || t < g.to) && L.y > g.y0 && L.y < g.y1)
+      .map((g) => [Math.max(L.x0, g.x0), Math.min(L.x1, g.x1)] as [number, number])
+      .filter(([a, c]) => c > a)
+      .sort((p, q) => p[0] - q[0]);
+    let x = L.x0;
+    const segs: [number, number][] = [];
+    for (const [a, c] of cuts) {
+      if (a > x + 4) segs.push([x, a]);
+      x = Math.max(x, c);
+    }
+    if (L.x1 > x + 4) segs.push([x, L.x1]);
+    const span = L.x1 - L.x0;
+    segs.forEach(([a, c], i) => {
+      const ya = L.y + (L.dy * (a - L.x0)) / span;
+      const yc = L.y + (L.dy * (c - L.x0)) / span;
+      d += line(a, ya, c, yc, {seed: `${L.seed}/${i}`, over: [0, 0]});
+    });
+  }
+  return d;
+}
+
+export const StepsOverlay: React.FC<{gaps?: StepGap[]}> = ({gaps = []}) => {
+  const t = useTime();
+  return (
+    <>
+      <Fill d={STEP_G.base} color={palette.sand} offset={false} seed="s5stB" />
+      <Fill d={STEP_G.treads} color={palette.cream} seed="s5stT" />
+      <Fill d={STEP_G.cheek} color={palette.tan} offset={false} mode="none" seed="s5chk" />
+      <Fill d={STEP_G.coping} color={palette.cream} offset={false} mode="none" seed="s5cop" />
+      <Ink d={stepInk(t, gaps)} width={SI.mid} seed="s5stI" />
+      <Ink d={STEP_G.cheekInk} width={SI.mid} seed="s5chI" />
+    </>
+  );
+};
 
 /** The forecourt in front of the steps (fix round 2): ONE flat mintPale field (the set's broken paving hairlines read as
  *  scratches: covered) and one flat sand shade wedge cast by the facade, a diagonal from the steps' left end down
@@ -264,5 +305,52 @@ export const PlazaGround: React.FC = () => (
   <>
     <Fill d={rectPath(-400, PLAZA.top, 1900, 520)} color={palette.mintPale} offset={false} mode="none" seed="s5plaza" />
     <Fill d={polyPath(PLAZA.wedge)} color={palette.sand} offset={false} mode="none" seed="s5wedge" />
+  </>
+);
+
+// ---------------------------------------------------------------- the keyhole glyph (fix round 3)
+
+/** A solid ink keyhole in the callout's white margin, left of the lock box (lock units: x -58, the box edge is -40,
+ *  the white disc ~-77), 1.25 x the Lock's own keyhole: the callout now reads 'LOCK', not 'another tablet'. */
+const KEYHOLE = 'M0 -13a7 7 0 1 0 0.01 0Z' + 'M-3.4 -2L-5.5 13H5.5L3.4 -2Z';
+export const CalloutKeyhole: React.FC = () => {
+  const [kx, ky] = lp(-58, 2);
+  const k = (L.h / 100) * 1.25;
+  return (
+    <XG m={mat.compose(mat.translate(kx, ky), mat.scale(k))}>
+      <Fill d={KEYHOLE} color={palette.ink} offset={false} mode="none" seed="s5kh" />
+    </XG>
+  );
+};
+
+// ---------------------------------------------------------------- the cornice's underside (fix round 3)
+
+/** The cornice seen from below (the low angle's tell): the set's flat tan band (world 610-650) becomes a tan fascia
+ *  (610-622), a tealDark soffit strip (622-633) and a dentil row (633-648: cream blocks on tealDark), re-inked. Screen
+ *  ~587-632 at the 1.13 lock. Facade layer (parallax 0.67). */
+const CORN = {x0: -180, x1: 819.6, top: BLUEPRINT_WALL.facade.corn[0], fascia: 622, soffit: 633, bot: BLUEPRINT_WALL.facade.corn[1] - 2};
+const CORNICE_G = (() => {
+  const {x0, x1, fascia, soffit, bot, top} = CORN;
+  let blocks = '';
+  let blockInk = '';
+  for (let x = x0 + 6; x + 15 < x1; x += 27) {
+    blocks += rectPath(x, soffit, 15, bot - soffit);
+    blockInk += `M${x.toFixed(1)} ${soffit}V${bot}M${(x + 15).toFixed(1)} ${soffit}V${bot}`;
+  }
+  const ink =
+    line(x0, top, x1 + 6, top, {seed: 's5cnT', over: [0, 3]}) +
+    line(x0, fascia, x1 + 4, fascia, {seed: 's5cnF', over: [0, 2]}) +
+    line(x0, soffit, x1 + 2, soffit, {seed: 's5cnS', over: [0, 1]}) +
+    line(x0, bot + 1, x1, bot + 1, {seed: 's5cnB', over: [0, 1]}) +
+    line(x1, top, x1, bot + 1, {seed: 's5cnE', over: [1, 1]});
+  return {fascia: rectPath(x0, top, x1 - x0, fascia - top), soffit: rectPath(x0, fascia, x1 - x0, bot + 1 - fascia), blocks, ink, blockInk};
+})();
+export const CorniceSoffit: React.FC = () => (
+  <>
+    <Fill d={CORNICE_G.fascia} color={palette.tan} offset={false} mode="none" seed="s5cnf" />
+    <Fill d={CORNICE_G.soffit} color={palette.tealDark} offset={false} mode="none" seed="s5cns" />
+    <Fill d={CORNICE_G.blocks} color={palette.cream} offset={false} mode="none" seed="s5cnb" />
+    <Ink d={CORNICE_G.ink} width={SI.mid} seed="s5cnI" />
+    <Ink d={CORNICE_G.blockInk} width={SI.hair} taper={false} vary={0} seed="s5cnbI" />
   </>
 );

@@ -3,7 +3,7 @@
 // panes kept mintPale under the golden relight, the far-roof details and the clock's speed wedge.
 
 import React, {useId} from 'react';
-import {ease as E, Fill, Ink, lerp, Look, mat, Mat, palette, prog, springAt, springs, Tod, useTime, XG, clamp, Pt, hline, poly, polyPath, line} from '../../lib';
+import {ease as E, Fill, Ink, lerp, mat, Mat, osc, palette, prog, springAt, springs, Tod, useTime, XG, clamp, Pt, hline, poly, polyPath, line} from '../../lib';
 import {Elephant, hop} from '../../lib/mascot';
 import {rand} from '../../lib/rng';
 import {Bird} from '../../lib/kit';
@@ -45,35 +45,6 @@ export function tiltPx(t: number, B: Beats): number {
   const c = camAt(t, B);
   return (PUSHED.y - c.y) * c.z;
 }
-
-// ---------------------------------------------------------------- fill-first reveal (motion spec T-MATCH 4-5)
-// The new scene arrives as flat fills only, then its linework draws on top -> bottom. Rendered as two passes while the
-// reveal runs: the fills-only pass for the part not yet revealed, and above it the WHOLE render (fills and ink in their
-// true z-order) clipped to everything above a falling edge, so the ink of an object at the back never shows through the
-// fill of one in front of it (fix round 1: the blind's slats struck through J4 and the round sign). One pass before /
-// after the reveal.
-
-export type RevealPass = 'all' | 'fills';
-
-export const InkReveal: React.FC<{at: number; dur: number; y0: number; y1: number; render: (pass: RevealPass) => React.ReactNode}> = ({at, dur, y0, y1, render}) => {
-  const t = useTime();
-  const id = 'rv' + useId().replace(/[^a-zA-Z0-9]/g, '');
-  if (t >= at + dur) return <>{render('all')}</>;
-  const fills = <Look ink={false}>{render('fills')}</Look>;
-  if (t < at) return fills;
-  const edge = lerp(y0, y1, prog(t, at, dur, E.inOutSine));
-  return (
-    <>
-      {fills}
-      <defs>
-        <clipPath id={id} clipPathUnits="userSpaceOnUse">
-          <rect x={-3000} y={-4000} width={7000} height={edge + 4000} />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${id})`}>{render('all')}</g>
-    </>
-  );
-};
 
 // ---------------------------------------------------------------- wire copies (they carry on into S08)
 
@@ -229,7 +200,7 @@ export const BoardClones: React.FC<{spots: CloneSpot[]; seed: string}> = ({spots
 
 // ---------------------------------------------------------------- pigeons on the wires (hop over a passing peg)
 
-export const Pigeon: React.FC<{wire: 0 | 1 | 2; x: number; hopAt?: number[]; flyAt?: number; flyTo?: Pt; flip?: boolean; color?: string; seed: string}> = ({wire, x, hopAt = [], flyAt, flyTo, flip, color = palette.white, seed}) => {
+export const Pigeon: React.FC<{wire: 0 | 1 | 2; x: number; at?: number; hopAt?: number[]; flyAt?: number; flyTo?: Pt; flip?: boolean; color?: string; seed: string}> = ({wire, x, at, hopAt = [], flyAt, flyTo, flip, color = palette.white, seed}) => {
   const t = useTime();
   const p = wireAt(WIRES.S07, wire, x);
   let dy = 0;
@@ -239,7 +210,7 @@ export const Pigeon: React.FC<{wire: 0 | 1 | 2; x: number; hopAt?: number[]; fly
   }
   return (
     <XG m={mat.translate(0, dy)}>
-      <Bird x={p[0]} y={p[1] + 1} s={0.8} seed={seed} flyAt={flyAt} flyTo={flyTo} color={color} flip={flip} />
+      <Bird x={p[0]} y={p[1] + 1} s={0.8} seed={seed} at={at} flyAt={flyAt} flyTo={flyTo} color={color} flip={flip} />
     </XG>
   );
 };
@@ -251,8 +222,12 @@ export const Pigeon: React.FC<{wire: 0 | 1 | 2; x: number; hopAt?: number[]; fly
  *  window box (feet never below the board top y 928, so it never crosses J4 or the round sign; Pip is fully past the
  *  frame edge, world x 989 + his 62 px tail, by local ~1.98; every step <= ~60 px a frame incl. the tilt). */
 export const PIP = {x: 705, y: 928, s: 1.2, entry: [-40, 1150] as Pt, inAir: 0.5, inH: 60, exit: [1085, 905] as Pt, offLead: 0.02, offAir: 0.32, offH: 36};
-/** The flyer is flicked off this long before the word 'was' (frame 1 already moves ~30 %: out(cubic)). */
-export const PEEL_LEAD = 0.08;
+/** The flyer is flicked off this long before the word 'was' (frame 1 already moves ~30 %: out(cubic)). Fix round 2:
+ *  0.08 -> 0.14 so the head shake after it gets a full 0.2 s before the hop-off crouch. */
+export const PEEL_LEAD = 0.14;
+/** The head shake after the peel: one 5 Hz swing pair (each half-swing 3 frames), look +-1 decaying to 0.5, with a head
+ *  roll of SHAKE.roll deg on the same curve (the sit-front `look` alone moved the face a few px: invisible at 7 Hz). */
+const SHAKE = {lead: 0.005, dur: 0.2, hz: 5, roll: 6};
 const PEEL_DUR = 0.25;
 
 /** Pip's face centre in sit-front (local head centre (0, -67) at scale 1). */
@@ -277,16 +252,21 @@ export const PipS07: React.FC<{B: Beats}> = ({B}) => {
     if (h.airborne || t >= offT0) return <Elephant x={h.x} y={h.y} scale={PIP.s} pose="stand-side" amount={h.spread} squash={h.squash} rotate={h.rotate} t={t} seed={7} expression="meh" />;
     return <Elephant x={h.x} y={h.y} scale={PIP.s} pose="sit-front" squash={h.squash} t={t} seed={7} expression="meh" />;
   }
-  // 2) on the board top: sit-back watching the notice; the slap flips him to sit-front behind the flyer; head shake
+  // 2) on the board top: sit-back watching the notice; on the 'out' rustle (the copy leaves pane 2, B.out) he turns to
+  //    sit-front, so the copy lands on his FACE 0.1 s later (fix round 2: he turned on the slap, the copy hit the back of
+  //    his head first); head shake after the peel
   const landSq = entry(t).squash;
-  const front = t >= B.slap;
+  const front = t >= B.out;
   const sw = (dt: number) => (dt > -0.1 && dt < 0.45 ? (dt < 0 ? 0.14 * prog(dt, -0.1, 0.1) : 0.14 * Math.exp(-dt * 9) * Math.cos(dt * Math.PI * 2 * 3.4)) : 0);
-  const sq = landSq + sw(t - B.slap) * 1.4;
-  // the shake after the peel: look swings left / right, decaying
-  const sh = t - (B.was - PEEL_LEAD + 0.02);
-  const look = front ? (sh > 0 && sh < 0.16 ? 0.95 * Math.sin(sh * Math.PI * 2 * 7) * (1 - sh / 0.16) : 0) : -0.55;
+  // a small turn squash on the flip (one 0.1 s dip), then the slap's squash
+  const turn = t >= B.out && t < B.out + 0.1 ? 0.06 * Math.sin(((t - B.out) / 0.1) * Math.PI) : 0;
+  const sq = landSq + sw(t - B.slap) * 1.4 + turn;
+  // the shake after the peel: look swings right / left at 5 Hz (3 frames a half-swing), decaying, with a head roll
+  const sh = t - (B.was - PEEL_LEAD + SHAKE.lead);
+  const shake = sh > 0 && sh < SHAKE.dur ? Math.sin(sh * Math.PI * 2 * SHAKE.hz) * (1 - (0.5 * sh) / SHAKE.dur) : 0;
+  const look = front ? shake : -0.55;
   const expr = front ? (t < B.was - PEEL_LEAD ? 'wide' : 'meh') : undefined;
-  return <Elephant x={PIP.x} y={PIP.y} scale={PIP.s} pose={front ? 'sit-front' : 'sit-back'} look={look} expression={expr} squash={sq} t={t} seed={7} />;
+  return <Elephant x={PIP.x} y={PIP.y} scale={PIP.s} pose={front ? 'sit-front' : 'sit-back'} look={look} rotate={front ? shake * SHAKE.roll : 0} expression={expr} squash={sq} t={t} seed={7} />;
 };
 
 /** The copy that slaps onto Pip's face on 'out' (from pane 2), sticks, and is flicked away on 'was'. */
@@ -337,10 +317,11 @@ export const Flyer: React.FC<{B: Beats; from: Pt}> = ({B, from}) => {
 
 // ---------------------------------------------------------------- the pin dot and the phone copy
 
+/** The notice's pin: grows 20 % -> 100 % (motion spec fill pop) with the 7 % spring, so it reads on its first frames. */
 export const PinDot: React.FC<{x: number; y: number; at: number}> = ({x, y, at}) => {
   const t = useTime();
   if (t < at) return null;
-  const k = springAt(t, at, springs.pop);
+  const k = 0.2 + 0.8 * springAt(t, at, springs.pop);
   return (
     <g transform={`translate(${x} ${y}) scale(${k.toFixed(4)})`}>
       <circle r={7.5} fill={palette.ink} />
@@ -368,6 +349,27 @@ export const PhoneCopy: React.FC<{x: number; y: number; at: number; rot?: number
         </XG>
       ) : null}
     </>
+  );
+};
+
+/** A raised phone's screen taken out of the white-paper family (fix round 2: four white phones + the notice + 8 clones +
+ *  4 wire copies + 2 cards made the board a white mosaic): a teal-dark screen inset in the kit phone's white face (22 x
+ *  38 local, scaled with the reader) with a tiny peach copy glyph, lit 0.17 s after the raise pop (once the kit's
+ *  overshoot has settled: the screen wakes). (x, y) = the kit phone face centre (world, measured at rest), dy = the
+ *  reader's own idle bob (EdgeOnlooker: osc(t, 0.5, rand(seed, 'b') x 6) x 1.5). */
+export const PhoneScreen: React.FC<{x: number; y: number; s: number; at: number; seed: string}> = ({x, y, s, at, seed}) => {
+  const t = useTime();
+  if (t < at) return null;
+  const dy = osc(t, 0.5, rand(seed, 'b') * 6) * 1.5;
+  const k = 0.2 + 0.8 * springAt(t, at, springs.pop);
+  const w = 16.6 * s;
+  const h = 30 * s;
+  return (
+    <XG m={mat.compose(mat.translate(x, y + dy), mat.scale(k))}>
+      <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={2.4 * s} fill={palette.tealDark} />
+      <rect x={-w * 0.22} y={-h * 0.2} width={w * 0.44} height={h * 0.42} fill={palette.peach} />
+      <path d={`M${(-w * 0.14).toFixed(2)} ${(-h * 0.08).toFixed(2)}h${(w * 0.24).toFixed(2)}`} stroke={palette.tealDark} strokeWidth={Math.max(1, s * 1.1)} strokeLinecap="round" />
+    </XG>
   );
 };
 
@@ -469,6 +471,61 @@ export const WallDetails: React.FC<{seed?: string}> = ({seed = 's7wall'}) => {
         <Ink d={rules} width={SI.far * 0.8} taper={false} seed={`${seed}/qr`} />
         <circle cx={Q.x + 5} cy={Q.y + 5} r={2.6} fill={palette.ink} />
       </XG>
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- the ground in front of the wall (fix round 2)
+// The board stood on a bare cream plane. Static, in the set's 'ground' layer (so the pen reveal draws its marks): the
+// wall's flat contact shadow (backlit: it falls toward us), misregistered, its lower edge stepped; a short cast strip
+// under each board leg; a pale pavement strip between the set's two kerb lines; a dropped copy lying flat, a fallen
+// leaf and loose cobble ticks in y 1555-1660 (the empty lower centre, above the bottom UI zone).
+
+export const GroundDetails: React.FC<{seed?: string}> = ({seed = 's7ground'}) => {
+  const shadow = polyPath([
+    [-160, 1499],
+    [790, 1499],
+    [812, 1516],
+    [560, 1517],
+    [548, 1524],
+    [180, 1525],
+    [168, 1519],
+    [-150, 1520],
+  ]);
+  const legs = [205, 672].map((x) => polyPath([[x - 8, 1499], [x + 8, 1499], [x + 30, 1531], [x + 14, 1531]])).join('');
+  const strip = polyPath([[-160, 1521], [1240, 1523], [1240, 1543], [-160, 1541]]);
+  // the dropped copy: a small sheet lying flat on the paving (a flattened, turned rectangle), heading bar + a rule
+  const C = {x: 585, y: 1606, w: 62, h: 24, rot: -9};
+  const sheet: Pt[] = [
+    [-C.w / 2, -C.h / 2],
+    [C.w / 2 - 8, -C.h / 2],
+    [C.w / 2, -C.h / 2 + 4],
+    [C.w / 2, C.h / 2],
+    [-C.w / 2, C.h / 2],
+  ];
+  const leaf = `M424 1636Q432 1622 447 1625Q442 1640 424 1636Z`;
+  const ticks =
+    line(350, 1574, 366, 1572, {over: 0, seed: `${seed}/t0`}) +
+    line(468, 1590, 480, 1586, {over: 0, seed: `${seed}/t1`}) +
+    line(702, 1569, 721, 1570, {over: 0, seed: `${seed}/t2`}) +
+    line(762, 1624, 774, 1620, {over: 0, seed: `${seed}/t3`}) +
+    line(515, 1648, 531, 1649, {over: 0, seed: `${seed}/t4`}) +
+    line(652, 1660, 662, 1655, {over: 0, seed: `${seed}/t5`}) +
+    line(806, 1590, 820, 1592, {over: 0, seed: `${seed}/t6`}) +
+    line(392, 1612, 400, 1607, {over: 0, seed: `${seed}/t7`});
+  return (
+    <>
+      <Fill d={shadow + legs} color={palette.sand} seed={`${seed}/sh`} />
+      <Fill d={strip} color={HALF.sand} offset={false} seed={`${seed}/st`} />
+      <XG m={mat.compose(mat.translate(C.x, C.y), mat.rotate(C.rot))}>
+        <Fill d={polyPath(sheet)} color={palette.white} seed={`${seed}/cf`} />
+        <Ink d={poly(sheet, {closed: true, seed: `${seed}/co`, over: 1.5})} width={SI.far} taper={false} seed={`${seed}/co`} />
+        <Ink d={hline(-C.w * 0.36, -C.w * 0.02, -C.h * 0.18, {over: 0, seed: `${seed}/ch`})} width={SI.far * 1.8} taper={false} seed={`${seed}/ch`} />
+        <Ink d={hline(-C.w * 0.36, C.w * 0.2, C.h * 0.16, {over: 0, seed: `${seed}/cr`})} width={SI.hair} taper={false} seed={`${seed}/cr`} />
+      </XG>
+      <Fill d={leaf} color={palette.brown} seed={`${seed}/lf`} />
+      <Ink d={leaf + 'M426 1635Q436 1630 444 1626'} width={SI.hair} taper={false} seed={`${seed}/li`} />
+      <Ink d={ticks} width={SI.far} taper={false} seed={`${seed}/tk`} />
     </>
   );
 };

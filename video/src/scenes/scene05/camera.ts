@@ -1,8 +1,11 @@
 // S05 camera (storyboard v3, ONE owner per move: this scene's own keys; Film adds no camera on a 'matchcut').
 // screen = (world - cam) x zoom + (540, 960)
-//   cut(years) -> +0.30      push-in (540, 960, 1.08) -> (540, 940, 1.13), out(expo): the S04 dive lands still moving IN
-//                            (log-zoom ~1.05 /s at the cut vs the dive's ~1.23 /s) and settles; the 20 world px rise in y
-//                            (fix round 2) puts the cornice ink at screen >= 585, under the caption band (ENGINE 10)
+//   cut(years) -> +0.30      push-in zoom 1.08 -> 1.13, out(expo): the S04 dive lands still moving IN (log-zoom ~1.05 /s
+//                            at the cut vs the dive's ~1.23 /s) and settles. y has its OWN zero-velocity ease (fix round
+//                            3): 960 -> 940 in-out(sine) over 0.05 -> 0.65 s, so the lock (world y 960) holds its screen
+//                            spot through the match (S04's dive brings lock4 to rest: an out(expo) y started at ~13
+//                            px/frame and bounced it DOWN on the cut); peak ~1.2 px/frame. The 20 world px rise (fix
+//                            round 2) puts the cornice ink at screen >= 585, under the caption band (ENGINE 10)
 //   +0.30 -> cut(was)-0.30   hold (540, 940, 1.13): locked while the teams, tablets, beams and the ring build
 //   cut(was)-0.30 -> cut     truck-right (540 -> 690, 940, 1.13), in(sine): follows the messenger out of frame right; a
 //                            FIXED 0.30 s ending on the cut, exiting at pi/2 x 150 / 0.30 x 1.13 = ~888 screen px/s
@@ -24,15 +27,18 @@ export const K_LOCK: Cam = {x: 540, y: 940, zoom: 1.13};
 export const K_EXIT: Cam = {x: 690, y: 940, zoom: 1.13};
 export const LAND = 0.3;
 export const TRUCK = 0.3;
+/** The y rise: in-out(sine) from RISE[0] over RISE[1] s (zero velocity at both ends). */
+export const RISE: [number, number] = [0.05, 0.6];
 
 /** Camera at scene time t; `end` = the scene length (the cut on action). */
 export function camAt(t: number, end: number): Cam {
+  const y = lerp(K_LAND.y, K_LOCK.y, prog(t, RISE[0], RISE[1], E.inOutSine));
   if (t < LAND) {
     const q = prog(t, 0, LAND, E.outExpo);
-    return {x: K_LAND.x, y: lerp(K_LAND.y, K_LOCK.y, q), zoom: Math.exp(lerp(Math.log(K_LAND.zoom), Math.log(K_LOCK.zoom), q))};
+    return {x: K_LAND.x, y, zoom: Math.exp(lerp(Math.log(K_LAND.zoom), Math.log(K_LOCK.zoom), q))};
   }
   const q = prog(t, end - TRUCK, TRUCK, E.inSine);
-  return {x: lerp(K_LOCK.x, K_EXIT.x, q), y: K_LOCK.y, zoom: K_LOCK.zoom};
+  return {x: lerp(K_LOCK.x, K_EXIT.x, q), y, zoom: K_LOCK.zoom};
 }
 
 /** Parallax factor per BlueprintWall layer (the set's own `n` is a draw order, not a depth: ignored). */

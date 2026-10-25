@@ -15,9 +15,9 @@ import type {Acc, Hair} from '../../lib/kit';
 import type {Pt} from '../../lib/sketch';
 import type {Beats} from './beats';
 import {camAt, layerCam, LAYER_F, toScreen, toWorld} from './camera';
-import {Investigator, InvestigatorPose, LEG, tabletCentre} from './shims';
-import {LOCK_C, lp} from './plan';
-import {collarAt, MessengerRun} from './messenger';
+import {Investigator, InvestigatorPose, LEG, personGeo, FIG_H, tabletCentre} from './shims';
+import {LOCK_C, lp, StepGap} from './plan';
+import {collarAt, MESSENGER, MessengerRun} from './messenger';
 
 export {LOCK_C};
 
@@ -42,6 +42,8 @@ type Member = {
   back?: boolean;
   tablet?: 'left' | 'right';
   pose?: 'point' | 'clipboard' | 'hips';
+  /** Fix round 3: a peach hair tie at the nape (long hair: the ponytail read). */
+  tie?: string;
 };
 
 /** Team A (x 130-320) and team B (x 545-735; the messenger right of them): two depths (a back-row member behind each
@@ -55,13 +57,14 @@ export const TEAM_A: Member[] = [
 ];
 export const TEAM_B: Member[] = [
   {x: 644, rise: 1, h: 116 * K, seed: 's5b3', body: palette.tan, hair: 'cap', back: true},
-  {x: 586, rise: 0, h: 128 * K, seed: 's5b1', body: palette.sand, hair: 'long', hairColor: palette.tan, tablet: 'left'},
+  {x: 586, rise: 0, h: 128 * K, seed: 's5b1', body: palette.sand, hair: 'long', hairColor: palette.brown, tie: palette.peach, tablet: 'left'},
   {x: 702, rise: 2, h: 136 * K, seed: 's5b2', body: palette.sage, hair: 'short', hairColor: palette.brown, acc: ['strap'], pose: 'hips'},
 ];
 const TABLET = 42;
 
 const feetOf = (m: Member) => (m.back ? FEET_BACK : FEET);
-const tabletOf = (m: Member) => tabletCentre({x: m.x, y: feetOf(m), h: m.h, seed: m.seed, arm: m.tablet, tabletSize: TABLET, tabletLift: 'head'});
+/** Fix round 3: the tablets are held LANDSCAPE (they no longer rhyme with the portrait lock box above them). */
+const tabletOf = (m: Member) => tabletCentre({x: m.x, y: feetOf(m), h: m.h, seed: m.seed, arm: m.tablet, tabletSize: TABLET, tabletLift: 'head', landscape: true});
 
 /** Lean toward the lock on 'how': the TORSO and head only, about the hip line (the legs stay planted): 7 deg with an
  *  out-back overshoot, settled in 0.2 s. */
@@ -114,7 +117,7 @@ const TeamMember: React.FC<{m: Member; riseAt: number; raiseAt?: number; poseAt:
   return (
     <PopRise at={riseAt} x={m.x} y={fy}>
       <HipLean x={m.x} hipY={hipY} deg={a}>
-        <Investigator x={m.x} y={fy} h={m.h} raiseAt={raiseAt} arm={m.tablet} tabletSize={TABLET} tabletLift="head" pose={pose} body={m.body} hair={m.hair} hairColor={m.hairColor} acc={m.acc} bob={1.2} seed={m.seed} />
+        <Investigator x={m.x} y={fy} h={m.h} raiseAt={raiseAt} arm={m.tablet} tabletSize={TABLET} tabletLift="head" landscape pose={pose} body={m.body} hair={m.hair} hairColor={m.hairColor} hairTie={m.tie} acc={m.acc} bob={1.2} seed={m.seed} />
       </HipLean>
     </PopRise>
   );
@@ -140,17 +143,33 @@ export const Teams: React.FC<{b: Beats}> = ({b}) => {
   );
 };
 
+/** Where the steps' nosing lines are cut (plan.tsx StepsOverlay): across each figure's legs (hip line to soles, the
+ *  leg span + a 3-unit margin), from its pop; the messenger's only while he stands (from 'was.' he runs off). */
+export function stepGaps(b: Beats): StepGap[] {
+  const gap = (x: number, feet: number, h: number, seed: string, from: number, to?: number): StepGap => {
+    const s = h / FIG_H;
+    const half = (personGeo(seed).w * 0.36 + 3) * s;
+    return {x0: x - half, x1: x + half, y0: feet - LEG * s - 2, y1: feet + 4, from, to};
+  };
+  return [
+    ...TEAM_A.map((m) => gap(m.x, feetOf(m), m.h, m.seed, b.teamA + m.rise * 0.1)),
+    ...TEAM_B.map((m) => gap(m.x, feetOf(m), m.h, m.seed, b.teamB + m.rise * 0.08)),
+    gap(MESSENGER.x, FEET, MESSENGER.h, MESSENGER.seed, b.teamB + 0.24, b.was),
+  ];
+}
+
 /** The messenger (scene05/messenger.tsx), popping up with team B. */
 export const MessengerDash: React.FC<{b: Beats}> = ({b}) => <MessengerRun b={b} Pop={PopRise} />;
 
 /** The two scan beams: from each raised tablet's top to the lock detail; they shoot out on 'AI'+0.25, sweep the banner in
- *  opposite phase, converge on the lock on 'figured' and retract the moment the ring finds it ('out'-0.04). Fix round 2:
- *  OPAQUE white light wedges drawn in the BANNER layer under the plan's cream panels and its re-stroked ink (paper <
- *  beam < cream < ink: every pixel a palette colour). The camera is locked while they live, so the two planes agree. */
+ *  opposite phase, converge on the lock on 'figured' and retract the moment the ring finds it ('out'-0.04). OPAQUE white
+ *  light wedges drawn in the BANNER layer OVER the plan's cream panels and title block (fix round 3: under them the
+ *  title block hid beam A's narrow end and the panels chopped both cones) and under its re-stroked ink (paper < cream <
+ *  beam < ink: every pixel a palette colour). The camera is locked while they live, so the two planes agree. */
 export const Beams: React.FC<{b: Beats}> = ({b}) => {
   const pa = tabletOf(TEAM_A.find((m) => m.tablet)!);
   const pb = tabletOf(TEAM_B.find((m) => m.tablet)!);
-  const off = TABLET * 0.71;
+  const off = TABLET * 0.5; // the top edge of a landscape tablet
   const outAt = b.ring + 0.02;
   return (
     <>
@@ -178,14 +197,15 @@ const pipKeys = (b: Beats, t0: number) => [
 ];
 
 /** The roll-over settle on the match cut (S04 leaves him asleep elsewhere on screen: the pop reads as him rolling over
- *  in his sleep): -14 deg and a squash that settle in 0.18 s. */
+ *  in his sleep): 14 deg (toward his head: he sleeps FACING LEFT, as S04 leaves him) and a squash that settle in 0.18 s. */
 const rollOver = (t: number) => {
   const u = clamp(t / 0.18);
-  return {rot: -14 * (1 - E.outCubic(u)), sq: 0.12 * (1 - E.outCubic(u))};
+  return {rot: 14 * (1 - E.outCubic(u)), sq: 0.12 * (1 - E.outCubic(u))};
 };
 
-/** Pip ON THE RAIL (banner layer, riding its sway and its parallax): asleep (callback to S04, its leaf still on his
- *  ear), jolts awake on 'it' (trunk-up, wide), crouches; gone at take-off (<PipHop> takes over in the steps plane). */
+/** Pip ON THE RAIL (banner layer, riding its sway and its parallax): asleep FACING LEFT (flipped, exactly as S04 leaves
+ *  him, S04's tan leaf still on his crown), jolts awake on 'it' turning right toward the messenger (trunk-up, wide: the
+ *  pose pop carries the turn), crouches; gone at take-off (<PipHop> takes over in the steps plane). */
 export const PipOnRail: React.FC<{b: Beats}> = ({b}) => {
   const t = useTime();
   const H = pipHop(b);
@@ -194,7 +214,7 @@ export const PipOnRail: React.FC<{b: Beats}> = ({b}) => {
   const crouch = t >= H.t0 - 0.14;
   const jolt = t >= b.pipWake ? -10 * Math.sin(Math.PI * clamp((t - b.pipWake) / 0.16)) : 0;
   const ro = rollOver(t);
-  const el = <ElephantTimeline x={h.x} y={h.y + jolt} scale={PIP_SCALE} t={t} seed={5} keys={pipKeys(b, H.t0)} squash={(crouch ? h.squash : 0) + ro.sq} rotate={0} />;
+  const el = <ElephantTimeline x={h.x} y={h.y + jolt} scale={PIP_SCALE} t={t} seed={5} keys={pipKeys(b, H.t0)} squash={(crouch ? h.squash : 0) + ro.sq} rotate={0} flip={t < b.pipWake} />;
   return ro.rot !== 0 ? <XG m={mat.about(mat.rotate(ro.rot), PIP_RAIL[0], PIP_RAIL[1])}>{el}</XG> : el;
 };
 
@@ -215,31 +235,32 @@ export const PipHop: React.FC<{b: Beats}> = ({b}) => {
 
 // ---------------------------------------------------------------- S04's leaf (continuity) and the z
 
-/** The sleeping ear (sleep pose, local px at scale 1, feet = (0, 0)): S04 scene04/cast.tsx SLEEP_EAR. */
-const SLEEP_EAR: Pt = [14, -25];
-/** S04's orange leaf at its landing pose (rot -9, flip 0.48), the same on-screen size relative to Pip. */
-const LEAF_S = 12;
+/** The sleeping crown (sleep pose, FLIPPED, local px at scale 1, feet = (0, 0)): S04 scene04/cast.tsx SLEEP_CROWN. */
+const SLEEP_CROWN: Pt = [-24, -45];
+/** S04's TAN leaf at its resting pose on the crown (scene04/cast.tsx LEAF_REST: rot -14, flip 0.62; LEAF_S 13). */
+const LEAF_S = 13;
+const LEAF_REST = {rot: -14, flip: 0.62};
 const leafD = (s: number) => `M${-s} 0C${-s * 0.5} ${-s * 0.8} ${s * 0.55} ${-s * 0.75} ${s} 0C${s * 0.55} ${s * 0.75} ${-s * 0.5} ${s * 0.8} ${-s} 0Z`;
 const leafRib = (s: number) => `M${-s * 1.3} 0.6L${s * 0.75} 0M${-s * 0.1} 0L${s * 0.25} ${-s * 0.32}M${-s * 0.1} 0L${s * 0.25} ${s * 0.32}`;
 const LeafShape: React.FC<{x: number; y: number; rot: number; fy: number}> = ({x, y, rot, fy}) => (
   <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(1, fy))}>
-    <Fill d={leafD(LEAF_S)} color={palette.sun} offset={false} mode="none" seed="s5leaf" />
+    <Fill d={leafD(LEAF_S)} color={palette.tan} offset={false} mode="none" seed="s5leaf" />
     <Ink d={leafD(LEAF_S) + leafRib(LEAF_S)} width={1.6} taper={false} seed="s5leafi" />
   </XG>
 );
-const EAR: Pt = [PIP_RAIL[0] + SLEEP_EAR[0] * PIP_SCALE, PIP_RAIL[1] + SLEEP_EAR[1] * PIP_SCALE];
+const CROWN: Pt = [PIP_RAIL[0] + SLEEP_CROWN[0] * PIP_SCALE, PIP_RAIL[1] + SLEEP_CROWN[1] * PIP_SCALE - 2];
 /** Where the flicked leaf lands: the second tread, right of the rail's end of the stamp. */
 const LEAF_LAND: Pt = [668, 1352];
 const LEAF_FALL = 0.25;
 
-/** The leaf on Pip's ear (banner layer, riding the sway and his roll-over) until he jolts awake on 'it'. */
-export const LeafOnEar: React.FC<{b: Beats}> = ({b}) => {
+/** The leaf on Pip's crown (banner layer, riding the sway and his roll-over) until he jolts awake on 'it'. */
+export const LeafOnCrown: React.FC<{b: Beats}> = ({b}) => {
   const t = useTime();
   if (t >= b.pipWake) return null;
   const ro = rollOver(t);
   return (
     <XG m={ro.rot !== 0 ? mat.about(mat.rotate(ro.rot), PIP_RAIL[0], PIP_RAIL[1]) : mat.I}>
-      <LeafShape x={EAR[0]} y={EAR[1]} rot={-9} fy={0.48} />
+      <LeafShape x={CROWN[0]} y={CROWN[1]} rot={LEAF_REST.rot} fy={LEAF_REST.flip} />
     </XG>
   );
 };
@@ -249,20 +270,21 @@ export const LeafFall: React.FC<{b: Beats}> = ({b}) => {
   const t = useTime();
   if (t < b.pipWake) return null;
   const u = clamp((t - b.pipWake) / LEAF_FALL);
-  const x = lerp(EAR[0], LEAF_LAND[0], E.outQuad(u));
-  const y = lerp(EAR[1], LEAF_LAND[1], u * u) - 46 * Math.sin(Math.PI * Math.min(1, u * 1.15)) * (1 - u * 0.4);
-  const rot = -9 + 300 * E.outCubic(u);
-  const fy = u < 1 ? 0.48 + 0.5 * Math.abs(Math.sin(u * Math.PI * 2.2)) : 0.42;
+  const x = lerp(CROWN[0], LEAF_LAND[0], E.outQuad(u));
+  const y = lerp(CROWN[1], LEAF_LAND[1], u * u) - 46 * Math.sin(Math.PI * Math.min(1, u * 1.15)) * (1 - u * 0.4);
+  const rot = LEAF_REST.rot + 300 * E.outCubic(u);
+  const fy = u < 1 ? LEAF_REST.flip + 0.36 * Math.abs(Math.sin(u * Math.PI * 2.2)) : 0.42;
   return <LeafShape x={x} y={y} rot={u < 1 ? rot : 8} fy={fy} />;
 };
 
-/** A big hand-drawn 'z' floats up from sleeping Pip on 'before' (grows, rises, pops off). */
+/** A big hand-drawn 'z' floats up from sleeping Pip on 'before' (grows, rises, pops off): from his head, which is on
+ *  the LEFT (he sleeps facing left, as S04 leaves him). */
 export const BigZ: React.FC<{at: number}> = ({at}) => {
   const t = useTime();
   if (t < at || t > at + 0.75) return null;
   const q = prog(t, at, 0.75, E.outCubic);
   const s = lerp(0.4, 1.1, E.outBack(1.6)(prog(t, at, 0.2)));
-  const x = PIP_RAIL[0] + 44 + 16 * q + 4 * osc(t, 3, 0.3);
+  const x = PIP_RAIL[0] - 50 - 16 * q + 4 * osc(t, 3, 0.3);
   const y = PIP_RAIL[1] - 66 - 70 * q;
   const z = 'M-10 -10H10L-10 10H10';
   return (
@@ -282,30 +304,42 @@ const SOCKET: Pt = (() => {
 })();
 const EDGE: Pt = lp(-33, -50);
 const HOP_OUT = 0.22;
+/** Fix round 3: where S04 leaves him on the cut: sitting on the lock box's top, right half (S04 BIT_AT = lock4 + 7 world
+ *  at 0.42 world / lock unit = +16.7 units), 16 world x the dive's 1.9 zoom = 30 px = 28 world here at the 1.08 landing.
+ *  On 'before' he hops DOWN into the socket (shrinking to the drawing's 18: posing as part of it). */
+const TOP: Pt = lp(16.7, -50);
+const TOP_SIZE = 28;
+const HOP_IN = 0.2;
 /** The leap onto the messenger's collar (S06: Bit hides in the collar and peeks out on 'gave'). */
 const LEAP = {dur: 0.24, height: 150, sit: 0.05, duck: 0.1};
 
-function bitOnLockAt(t: number, outAt: number): {x: number; y: number; size: number; flip: boolean; out: boolean} {
+function bitOnLockAt(t: number, inAt: number, outAt: number): {x: number; y: number; size: number; flip: boolean; out: boolean; air: boolean} {
   const arc = (a: Pt, c: Pt, u: number, hgt: number): Pt => [lerp(a[0], c[0], u), lerp(a[1], c[1], u) - hgt * 4 * u * (1 - u)];
-  if (t < outAt) return {x: SOCKET[0], y: SOCKET[1], size: 18, flip: true, out: false};
+  if (t < inAt) return {x: TOP[0], y: TOP[1], size: TOP_SIZE, flip: false, out: true, air: false};
+  if (t < inAt + HOP_IN) {
+    const u = E.inOutSine((t - inAt) / HOP_IN);
+    const p = arc(TOP, SOCKET, u, 22);
+    return {x: p[0], y: p[1], size: lerp(TOP_SIZE, 18, u), flip: u > 0.5, out: true, air: true};
+  }
+  if (t < outAt) return {x: SOCKET[0], y: SOCKET[1], size: 18, flip: true, out: false, air: false};
   if (t < outAt + HOP_OUT) {
     const u = E.inOutSine((t - outAt) / HOP_OUT);
     const p = arc(SOCKET, EDGE, u, 26);
-    return {x: p[0], y: p[1], size: lerp(18, 21, u), flip: true, out: true};
+    return {x: p[0], y: p[1], size: lerp(18, 21, u), flip: true, out: true, air: true};
   }
-  return {x: EDGE[0], y: EDGE[1], size: 21, flip: false, out: true};
+  return {x: EDGE[0], y: EDGE[1], size: 21, flip: false, out: true, air: false};
 }
 
 /** Bit poses as part of the lock drawing in the socket mouth (banner layer). Caught on 'bad': his ink '!' balloon pops
  *  0.08 s BEFORE the word (readable on it) and he hops OUT onto the lock box's top-left edge ON the word, looking up at
  *  the hand; at `leapAt` he leaves the plan (<BitLeap> takes over in the steps layer) and the balloon pops off. */
-export const BitOnLock: React.FC<{alertAt: number; balloonAt: number; leapAt: number}> = ({alertAt, balloonAt, leapAt}) => {
+export const BitOnLock: React.FC<{inAt: number; alertAt: number; balloonAt: number; leapAt: number}> = ({inAt, alertAt, balloonAt, leapAt}) => {
   const t = useTime();
-  const s = bitOnLockAt(t, alertAt);
+  const s = bitOnLockAt(t, inAt, alertAt);
   const showAlert = t >= balloonAt && t < leapAt;
   return (
     <>
-      {t < leapAt ? <Bit x={s.x} y={s.y} size={s.size} flip={s.flip} look={s.out ? 'up' : 'forward'} seed="s5bit" /> : null}
+      {t < leapAt ? <Bit x={s.x} y={s.y} size={s.size} flip={s.flip} state={s.air ? 'hop' : undefined} look={t < inAt ? 'auto' : s.out ? 'up' : 'forward'} seed="s5bit" /> : null}
       {showAlert ? <AlertBubble x={ALERT[0]} y={ALERT[1]} tail={[EDGE[0], EDGE[1] - 12]} at={balloonAt} /> : null}
     </>
   );

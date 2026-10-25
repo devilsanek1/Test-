@@ -1,8 +1,8 @@
 // S06 "A heads-up" — "They gave the PHP people a heads-up," (cut(was) -> cut(heads-up); 19.773-21.985 s).
 // Makers' Lane at golden hour (MakersLane + Workshop, WORKSHOP_LANE): a CUT ON ACTION from S05 (the messenger enters
 // left mid-stride, the camera trucking right at S05's exit speed, the frame-filling layers too, decelerating over a
-// fixed 0.63 s with multiplane parallax), Pip mid-leap behind him; on 'They' the low lane-end sun presses and pops a wax
-// seal along a dotted arc onto the envelope (a private letter); Bit peeks out of the messenger's collar on 'gave'; on
+// fixed 0.63 s with multiplane parallax), Pip leaping in BEHIND him; on 'They' the low lane-end sun presses and pops a
+// wax seal along a dotted arc onto the envelope (a private letter); Bit peeks out of the messenger's collar on 'gave'; on
 // 'PHP' the elephant sign swings and the slit under the blind glows (the makers are in); Pip goes 'shh'; the neighbours'
 // curtains are drawn as the messenger reaches the door; the upstairs browser window lights on 'people' while he leans in
 // and knocks twice, a pigeon lands on the cornice; on 'a' the envelope goes through the mail slot (Bit hops onto the
@@ -10,8 +10,9 @@
 // fixing...', J3) jolts and the wire pigeons hop; then a gust blows the printed leak sheet in from the left and lifts
 // it at the lens: S07's lens wipe (this module's exported Wiper, scene06/page.tsx).
 // Beats: scene06/beats.ts. Camera: scene06/camera.ts. Parts: scene06/parts.tsx. Dressing: scene06/dress.tsx. Seal +
-// sun press: scene06/seal.tsx. Page + Wiper: scene06/page.tsx. Shims (listed in docs/scenes/S06.md): the messenger's
-// hair + collar (parts.tsx HairCollar), SunPressS06 / WaxSealS06 (seal.tsx). Isolated previews: scene06/entry.tsx.
+// sun press: scene06/seal.tsx. Page + Wiper: scene06/page.tsx. Messenger hero detail: scene06/msgDetail.tsx. Shims
+// (listed in docs/scenes/S06.md): SunPressS06 / WaxSealS06 (seal.tsx), LensSheet (page.tsx), MessengerDetail, and the
+// set overrides in dress.tsx. Isolated previews: scene06/entry.tsx.
 
 import React, {useId} from 'react';
 import {palette, Sun, useGlobalTime, useTime, World, XG} from '../lib';

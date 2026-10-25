@@ -1,16 +1,16 @@
 // S03 "Built from one blueprint" (storyboard v3, docs/storyboard_v3.md S03; cut(password) -> cut(it), 8.393-14.17 s).
 // VO: "It's in PHP, the language everyone loves, and about seven out of ten websites run on it."
 //
-// Blueprint Street (shared BlueprintStreet, wide): a HARD CUT onto the bare plan (ten inked footprints with door swings,
-// the sheet framed in S02's teal band, the plain running to a hazy horizon, the sun already in its wide slot); the grid
-// draws on (lead into 'It's'), Pip drops in and lands ('in'), the solid tealDark elephant stamp slams under him ('PHP')
+// Blueprint Street (shared BlueprintStreet, wide): a HARD CUT onto the bare plan (ten flat sand footprints with inked
+// edges and door swings: the figure; the sheet framed in S02's teal band, a sparse grid on the plain running to the
+// horizon: the ground; the sun already in its wide slot); the near grid draws on far -> near (lead into 'It's'), Pip drops in and lands ('in'), the solid tealDark elephant stamp slams under him ('PHP')
 // and he settles on its rump, L3 pops on the title-block card, and in the ellipsis the whole street springs out of the
 // plan in one gesture (press house, then L1 R1 L2 R2 L3 R3 L4 R4 L5). The bait ('the language everyone loves') plays on
 // a calm frame: one screen lights, the street fills ('everyone'), Pip puffs up proudly ('loves'), the pen-nib sign
 // swings with Bit on it. The count (polish round 1: ONE street encoding, the screens): ten spokes on the sun ('about');
-// 'seven': the press plaque pings, then the six side PHP screens light near -> far with an elephant page and an orange
-// ping; the card flips to the W3Techs footnote L4; 'ten': blank cream pages on the three non-PHP screens + three cream
-// sun slices (the 7/10 pie); 'websites': the seven PHP pages re-pulse. 'it.': the pie pops back to solid and the sun
+// 'seven': the press plaque pings, then the six side PHP screens (L1 R1 L2 R2 L4 R3) light near -> far with an elephant
+// page and an orange ping; the card flips to the W3Techs footnote L4; 'ten': the three non-PHP screens (L3 R4 L5) blink
+// and go dark + three cream sun slices (the 7/10 pie); 'websites': the seven PHP pages re-pulse. 'it.': the pie pops back to solid and the sun
 // takes off on its low glide-hop to S04 (mid-air at screen (810, 680) on the cut); Pip crouches to hop to the stoop.
 //
 // Camera: this scene's own keys (screen = (world - cam) x zoom + (540, 960)): a 4 % in-out-sine breath from rest
@@ -26,7 +26,7 @@ import {BlueprintStreet, BLUEPRINT, blueprintAnchors, PopUp, popUpK, SideId, Blu
 import {LabelTag, Sticker, SunPie} from './shared/props';
 import {beats, Beats, local, S03_START, W} from './scene03/beats';
 import {camAt, camMat} from './scene03/camera';
-import {BirdWire, CountPing, EdgeTree, FarPlain, Footprints, PressScreen, QuestionScribble, RoofSign, S03_BLANK, SheetFrame, SideOverlays, SideRows, VENT_HIDE, VentPatch, VentPuffs, VentS03} from './scene03/plan';
+import {AtticVent, BirdWire, CountPing, EdgeTree, FarPlain, Footprints, PressScreen, QuestionScribble, RoofSign, S03_BLANK, SheetFrame, SideOverlays, SideRows, VENT_HIDE, VentPatch, VentPuffs, VentS03} from './scene03/plan';
 import {GroundS03} from './scene03/ground';
 import {StampS03} from './scene03/stamp';
 import {BitOnSign, NearWalkers, PipS03, PipShadow, StreetLife} from './scene03/cast';
@@ -41,10 +41,11 @@ const anchors = blueprintAnchors();
 // ---------------------------------------------------------------- timing tables (scene-local, from the beats)
 
 const SIDE_ORDER: SideId[] = ['L1', 'R1', 'L2', 'R2', 'L3', 'R3', 'L4', 'R4', 'L5'];
-/** The seven PHP sites in count order (the press house, then near -> far, alternating; polish round 1: L1 / R1, cut by
- *  the frame edge / under the right UI rail, are non-PHP, see plan.tsx S03_BLANK). */
-const COUNT: BlueprintId[] = ['P', 'L2', 'R2', 'L3', 'R3', 'L4', 'R4'];
-const BLANK: SideId[] = S03_BLANK; // L1, R1, L5: blank cream pages on 'ten' (near -> far)
+/** The seven PHP sites in count order: the storyboard's P (re-pulse), L1, R1, L2, R2, L4, R3, near -> far, alternating
+ *  (fix round 2b: the three non-PHP sites are the storyboard's mid-depth L3, R4, L5 again, see plan.tsx S03_BLANK; L1 /
+ *  R1 at the frame edges are PHP: a partly hidden elephant page does not hurt a majority). */
+const COUNT: BlueprintId[] = ['P', 'L1', 'R1', 'L2', 'R2', 'L4', 'R3'];
+const BLANK: SideId[] = S03_BLANK; // L3, R4, L5: the screens go dark on 'ten' (near -> far)
 
 function tables(b: Beats) {
   const pressAt = b.popUp;
@@ -52,8 +53,8 @@ function tables(b: Beats) {
   // the nine side buildings: near -> far, alternating sides, 0.035 s apart, the first right after the press house
   SIDE_ORDER.forEach((id, i) => (popAt[id] = +(b.popUp + 0.04 + i * 0.035).toFixed(4)));
   // the count (polish round 1: the screens ARE the street's count): 'seven', 0.08 s apart: P (its plaque pings, its lit
-  // screen re-pulses), then the six side PHP screens light with the elephant page + an orange ping; 'ten': blank cream
-  // pages pop on the three non-PHP screens (0.05 s apart); 'websites': the seven PHP pages re-pulse in a wave (0.02 s)
+  // screen re-pulses), then the six side PHP screens light with the elephant page + an orange ping; 'ten': the three
+  // non-PHP screens blink and go dark (0.05 s apart); 'websites': the seven PHP pages re-pulse in a wave (0.02 s)
   const countAt = {} as Record<BlueprintId, number>;
   COUNT.forEach((id, i) => (countAt[id] = +(b.count + i * 0.08).toFixed(4)));
   const onAt: Partial<Record<SideId, number>> = {};
@@ -64,7 +65,9 @@ function tables(b: Beats) {
     pulseAt[id as SideId] = +(b.websites + i * 0.02).toFixed(4);
   });
   BLANK.forEach((id, i) => (onAt[id] = +(b.ten + i * 0.05).toFixed(4)));
-  return {pressAt, popAt, countAt, onAt, pulseAt};
+  // each footprint ticks (heavy outline, 2 frames) as its building pops up on it (lot order = the pop order)
+  const lotTick = [pressAt, ...SIDE_ORDER.map((id) => popAt[id])];
+  return {pressAt, popAt, countAt, onAt, pulseAt, lotTick};
 }
 
 // ---------------------------------------------------------------- the scene
@@ -123,7 +126,7 @@ const Scene03: React.FC = () => {
       <XG m={mat.translate(0, jolt)}>
         <GroundS03 gridAt={b.grid} streetAt={T.pressAt} />
         <SheetFrame />
-        <Footprints />
+        <Footprints tickAt={T.lotTick} />
         <PipShadow b={b} />
         <StampS03 slamAt={b.stamp} />
       </XG>
@@ -140,6 +143,7 @@ const Scene03: React.FC = () => {
         </defs>
         <PopUp at={T.pressAt} x={560} y={BLUEPRINT.press.base}>
           <VentPatch />
+          <AtticVent />
           <VentS03 />
           <PressScreen lightAt={b.pressScreen} pulseAt={[T.countAt.P, b.websites]} />
           <Sticker x={648} y={1040} w={124} question={false} seed="s03/sticker" />

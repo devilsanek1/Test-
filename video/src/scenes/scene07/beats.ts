@@ -25,7 +25,8 @@ export const SCENE = {start: 21.985, end: 24.095};
 export const ABS = {
   cut: 21.985, // lens wipe centre (foreground-wipe window cut -0.21 .. +0.21)
   pinPip: W.word - 0.05, // 22.105: the pin dot pops on the notice; Pip lands on the board top
-  label: W.word + 0.1, // 22.255: L7 tag pops on the board's bottom rail
+  label: W.word + 0.23, // 22.385: L7 tag pops on the board's bottom rail (fix round 2: storyboard w73+0.10 -> +0.23, after
+  // the pen has inked the board frame and legs around it, before the 'got' clones at 22.425; un-stacked from the pin pop)
   got: W.got, // 22.505: the address-bar rail lights; two clones pop
   out: W.out - 0.1, // 22.565: clones x4 (x8 0.16 s later); the first two readers rise
   slap: W.out, // 22.665: GAG: a copy slaps onto Pip's face (sfx 'flyer slap')

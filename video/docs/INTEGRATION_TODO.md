@@ -63,7 +63,7 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
   spireB, spireM, domeB, templeF; lanterns can no longer go dark before their dome).
 - S11: still draws its own padlock and tag (PadlockRock / TagTwirl); fine if it matches S01/S12. S03: still StampS03.
 - DONE: raw strokeWidth in shared props/sets reads inkComp (wf_1036d3ea-5c5; pixel-identical outside InkScale).
-- APPLY WHEN S01's polish workflow is done (it was editing scene01 at 02:00): the S01 dive ends with a 17 px ink bar at
+- DONE 02:50 (orchestrator, after S01's polish finished; S01 gate PASS, dive end checked): APPLY WHEN S01's polish workflow is done (it was editing scene01 at 02:00): the S01 dive ends with a 17 px ink bar at
   govB's window right edge. `scene01/screens.tsx` l.46 and l.63 draw the dead-screen / CRT glass as
   `<Fill d={rectPath(-1, -1, w + 5, h + 5)} .../>`: a world-unit spill that grows x2.9 in the dive (fills are never
   compensated). Fix (tested in a scratch copy: the bar becomes normal 6 px and 5 px lines at 4.70, 4.385 unchanged):

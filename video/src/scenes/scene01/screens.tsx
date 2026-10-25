@@ -12,8 +12,18 @@ import {Fill} from '../../lib/Fill';
 import {rectPath} from '../../lib/sketch';
 import {BrowserChrome} from '../shared/props';
 import {crtPhase, CRT, GovEvents, GovId, PLAZA, SI} from '../shared/sets';
+import {useXf} from '../../lib/xf';
+import {matScale} from '../shared/props/common';
 
 type R4 = [number, number, number, number];
+
+/** The ink-dark glass. Its spill past the window (it tucks under the frame to hide the fill's misregistration) is a
+ *  fixed size in SCREEN px: fills are never ink-compensated, so a world-unit spill grew x2.9 in the dive into a 17 px
+ *  bar at govB's window edge. A component (BrowserChrome calls `content()` as a plain function, so no hook there). */
+const Glass: React.FC<{w: number; h: number; seed: string}> = ({w, h, seed}) => {
+  const k = Math.max(1e-3, matScale(useXf()));
+  return <Fill d={rectPath(-1 / k, -1 / k, w + 5 / k, h + 5 / k)} color={palette.ink} offset={false} mode="none" seed={seed} />;
+};
 
 /** The set's CRT overlay (GovernmentPlaza crtContent: tealDark glass, the lit screen squashing to a bright line, the line
  *  to a dot, the dot to nothing), with the INK-dark glass. Screen-local coords. */
@@ -43,7 +53,7 @@ const crtContent = (u: number, seed: string) => ({w, h}: {w: number; h: number})
   }
   return (
     <>
-      <Fill d={rectPath(-1, -1, w + 5, h + 5)} color={palette.ink} offset={false} mode="none" seed={`${seed}/crtg`} />
+      <Glass w={w} h={h} seed={`${seed}/crtg`} />
       {halo ? <Fill d={halo} color={palette.cream} offset={false} mode="none" seed={`${seed}/crth`} /> : null}
       {core ? <Fill d={core} color={palette.white} offset={false} mode="none" seed={`${seed}/crtc`} /> : null}
     </>
@@ -60,7 +70,7 @@ const deadContent = (seed: string) => ({w, h}: {w: number; h: number}) => {
   const glint = `M${x0} ${y0}L${x1} ${y1}L${x1 + g} ${y1}L${x0 + g} ${y0}Z`;
   return (
     <>
-      <Fill d={rectPath(-1, -1, w + 5, h + 5)} color={palette.ink} offset={false} mode="none" seed={`${seed}/dg`} />
+      <Glass w={w} h={h} seed={`${seed}/dg`} />
       <Fill d={glint} color={palette.cream} offset={false} mode="none" seed={`${seed}/dgl`} />
     </>
   );

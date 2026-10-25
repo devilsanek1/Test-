@@ -8,16 +8,21 @@
 // shared FixSign, the same sign as S06's J3 and S09's J5), then a fixed 0.40 s tilt-up follows the copies into S08 (wires
 // at screen 896 / 928 / 960, the sun arriving at (640, 1021) with S08's slide speed, the copies at S08's first-frame pegs
 // and on-screen speeds). Label L7 on the board's bottom rail.
-// Beat table: scene07/beats.ts. Parts: scene07/parts.tsx. No shims.
-// Isolated preview entry: scene07/entry.tsx. Notes: docs/scenes/S07.md.
+// Beat table: scene07/beats.ts. Parts: scene07/parts.tsx. Pen reveal: scene07/reveal.tsx. Lens out phase for S06's
+// Wiper: scene07/lens.ts. No shims. Isolated preview entry: scene07/entry.tsx. Notes: docs/scenes/S07.md.
 
 import React from 'react';
-import {World, Sun, XG, mat, palette, useTime, ease as E, Pt} from '../lib';
+import {World, Sun, sunPoseAt, XG, mat, palette, useTime, useGlobalTime, ease as E, Pt} from '../lib';
+import type {SunHop, SunMove} from '../lib';
 import {NoticeboardCorner, NOTICE_CORNER} from './shared/sets';
 import type {LayerWrap} from './shared/sets';
 import {EdgeOnlooker, FixSign, HoursClock, LabelTag, LeakSheet} from './shared/props';
 import {useBeats} from './scene07/beats';
-import {BoardClones, camAt, camMat, CLONE, CloneSpot, cruiseFor, FarRoofDetails, Flyer, InkReveal, PaneGlass, PhoneCopy, Pigeon, PinDot, PipS07, PUSHED, RevealPass, RiseFromLow, SpinWedge, WallDetails, WireCopy, WireCopySpec} from './scene07/parts';
+import {BoardClones, camAt, camMat, CLONE, CloneSpot, cruiseFor, FarRoofDetails, Flyer, GroundDetails, PaneGlass, PhoneCopy, PhoneScreen, Pigeon, PinDot, PipS07, PUSHED, RiseFromLow, SpinWedge, WallDetails, WireCopy, WireCopySpec} from './scene07/parts';
+import {PenReveal, RevealPass, s07Strokes, wire0InkedAt} from './scene07/reveal';
+// S06's leak page (the lens wipe's ONE trajectory, pageAt): S07 draws its own copy of the lens sheet with it, so the S07
+// composition and the film (where S06's Wiper draws the same page above both scenes) can never show two sheets.
+import {LeakPage, S07_PIN} from './scene06/page';
 
 // ---------------------------------------------------------------- layout (world px at camera rest)
 
@@ -46,13 +51,16 @@ const CLOCK_LIFT = 100;
  *  sliding it down 6 px in 0.12 s out(cubic) (Scene08.tsx SUN_MOVES[0]) = 150 px/s on its first frame. */
 const SUN_CUT_Y = 1021;
 const SUN_CUT_V = 150;
-/** The sun's way down to the cut: from the clock's lift (screen y 720) to SUN_CUT_Y over SUN_RET s, a cubic Hermite that
- *  starts at rest and ends at SUN_CUT_V: peak ~24 px / frame (the camera's own exit speed), no stop-start at the cut. */
+/** The sun's way down to the cut (fix round 2: no bob). Its screen y is written as the wall top's screen y (the tilt
+ *  moves the wall down 197 px) + `rel`, the sun centre's offset from the wall top: rel eases from the lifted clock pose
+ *  (-123) down to REL_DIP (the centre a hair below the wall top: never more than half hidden) by the last SUN_SNAP s,
+ *  then over SUN_SNAP s to the cut's -20 (S08's (640, 1021) half behind its skyline) arriving at S08's 150 px/s slide.
+ *  (Fix round 1's single Hermite dropped the centre 30 px BELOW the wall top at 23.92 and re-rose 43 px: a visible
+ *  bob.) The re-rise left is 28 px in 4 frames while the wall itself slides down ~70 px: the sun keeps moving down. */
 const SUN_RET = 0.6;
-const sunReturnEase = (() => {
-  const m1 = (SUN_CUT_V * SUN_RET) / (SUN_CUT_Y - (820 - CLOCK_LIFT));
-  return (u: number) => (m1 - 2) * u * u * u + (3 - m1) * u * u;
-})();
+const REL_DIP = 8;
+const SUN_SNAP = 0.12;
+
 /** Screen x of S08's pegged copies on its first frame (src/scenes/Scene08.tsx COPIES / BIT_COPY x0 at its crane start
  *  (540, 1260) zoom 1.3: screen = 540 + (x0 - 540) x 1.3) and their slide (v0 + the residual drift vr, S08 world px/s
  *  at zoom 1.3): S07's copies end exactly there, at exactly that screen speed. If S08 moves or retimes its copies,
@@ -74,11 +82,17 @@ const cutWorldX = (sx: number) => PUSHED.x + (sx - 540) / PUSHED.z;
  *  (fix round 1: reader 1's phone + its ring piled up on the notice's lock sketch and ringed Bit doodle). World, measured
  *  on the render at t 1.6 (raised and settled from 1.42). */
 const PHONE: Pt = [728, 1156];
-/** J4 'still fixing...' (props FixSign, fs 26 = 27.6 px lettering on screen): hung from a nail on the blind's top-left so
- *  the card hangs over the shop window's top-left corner, above the round elephant sign and left of the right rail after
- *  the push (card right edge ~ screen 975). Drawn after the set (not in the blind slot: the window frame would cross
- *  the part of the card left of the blind). */
-const J4 = {x: 822, y: 958, fs: 26};
+/** J4 'still fixing...' (props FixSign, fs 25 = 26.5 px lettering on screen): hung from a nail on the blind's top-left so
+ *  the card hangs over the shop window's top-left corner, above the round elephant sign. Fix round 2: 24 world px left
+ *  and fs 26 -> 25 so the ellipsis ends left of screen x 945 after the push (it sat under the TikTok / Reels like rail
+ *  at ~975). Drawn after the set (not in the blind slot: the window frame would cross the part of the card left of the
+ *  blind). */
+const J4 = {x: 798, y: 958, fs: 25};
+/** Phone raises (fix round 2): the kit's jointed raise swings the arm SIDEWAYS through horizontal (a windmill that
+ *  crossed L7 and the board). From behind, a phone raise reads as a POP to the raised pose: the raise starts POP_SKIP s
+ *  into the kit's 0.3 s outBack(1.3) curve, where it first reaches the raised pose (u = 1 - 1.3 / 2.3), so the first
+ *  frame shows the raised pose and the next frames run the kit's own ~6 % overshoot and settle: no in-between poses. */
+const POP_SKIP = 0.3 * (1 - 1.3 / 2.3) + 0.001;
 
 const Scene07: React.FC = () => {
   const t = useTime();
@@ -92,29 +106,63 @@ const Scene07: React.FC = () => {
   const CLK = {at: B.fix, spinAt: B.fix + 0.02, spinDur: 0.42, turns: 1, outAt: B.tilt - 0.08};
 
   // ---- the sun: screen space (the push does not move it). It lifts on 'fix' so the clock face clears the roofline, then
-  //      comes down to S08's (640, 1021) over the last 0.6 s (Hermite: from rest, arriving at S08's slide speed).
+  //      comes down to S08's (640, 1021) over the last 0.6 s (rel to the wall top, see SUN_RET).
+  const wallTop = (tt: number) => {
+    const c = camAt(tt, B);
+    return (840 - c.y) * c.z + 960;
+  };
+  const Y_LIFT = 820 - CLOCK_LIFT;
+  const RET0 = B.end - SUN_RET;
+  const relAt = (() => {
+    const r0 = Y_LIFT - wallTop(RET0);
+    const rEnd = SUN_CUT_Y - wallTop(B.end);
+    const vWall = (wallTop(B.end) - wallTop(B.end - 1e-3)) / 1e-3;
+    const m1 = (SUN_CUT_V - vWall) * SUN_SNAP; // Hermite end tangent (px per unit u)
+    const tm = B.end - SUN_SNAP;
+    return (tt: number) => {
+      if (tt <= tm) {
+        const u = Math.max(0, Math.min(1, (tt - RET0) / (tm - RET0)));
+        return r0 + (REL_DIP - r0) * u * u * (3 - 2 * u);
+      }
+      const u = Math.min(1, (tt - tm) / SUN_SNAP);
+      const h00 = 2 * u * u * u - 3 * u * u + 1;
+      const h01 = -2 * u * u * u + 3 * u * u;
+      const h11 = u * u * u - u * u;
+      return h00 * REL_DIP + h01 * rEnd + h11 * m1;
+    };
+  })();
+  const sunReturnEase = (u: number) => (wallTop(RET0 + u * SUN_RET) + relAt(RET0 + u * SUN_RET) - Y_LIFT) / (SUN_CUT_Y - Y_LIFT);
+  const SUNP = {
+    cx: 420,
+    cy: 985,
+    r: 110,
+    hops: [{t: B.before - 1.0, to: [640, 820], h: 74, air: 1.0}] as SunHop[],
+    moves: [
+      {at: B.fix + 0.01, dur: 0.26, y: Y_LIFT, ease: E.outBack(1.4)},
+      {at: RET0, dur: SUN_RET, y: SUN_CUT_Y, ease: sunReturnEase},
+    ] as SunMove[],
+  };
   const sun = (
     <XG m={mat.inv(M)}>
-      <Sun
-        cx={420}
-        cy={985}
-        r={110}
-        drift={[0, 0]}
-        hops={[{t: B.before - 1.0, to: [640, 820], h: 74, air: 1.0}]}
-        moves={[
-          {at: B.fix + 0.01, dur: 0.26, y: 820 - CLOCK_LIFT, ease: E.outBack(1.4)},
-          {at: B.end - SUN_RET, dur: SUN_RET, y: SUN_CUT_Y, ease: sunReturnEase},
-        ]}
-      >
-        {(r) => (
-          <>
-            <SpinWedge r={r} at={CLK.at} spinAt={CLK.spinAt} spinDur={CLK.spinDur} turns={CLK.turns} outAt={CLK.outAt} />
-            <HoursClock r={r} at={CLK.at} spinAt={CLK.spinAt} spinDur={CLK.spinDur} turns={CLK.turns} hourSteps={1} outAt={CLK.outAt} seed="s7clock" />
-          </>
-        )}
-      </Sun>
+      <Sun {...SUNP} drift={[0, 0]} />
     </XG>
   );
+  // the clock face is a graphic overlay ON the sun, drawn after the set (fix round 2: the three wires crossed its hub and
+  // hands): same pose as the disc (sunPoseAt + the Sun's bottom-anchored squash), screen space
+  const clock = (() => {
+    if (t < CLK.at || t > CLK.outAt + 0.2) return null;
+    const pose = sunPoseAt(t, SUNP);
+    const by = pose.y + pose.r;
+    const y = by - pose.r * pose.sq.sy;
+    return (
+      <XG m={mat.inv(M)}>
+        <g transform={`translate(${pose.x.toFixed(2)} ${y.toFixed(2)}) scale(${pose.sq.sx.toFixed(4)} ${pose.sq.sy.toFixed(4)})`}>
+          <SpinWedge r={pose.r} at={CLK.at} spinAt={CLK.spinAt} spinDur={CLK.spinDur} turns={CLK.turns} outAt={CLK.outAt} />
+          <HoursClock r={pose.r} at={CLK.at} spinAt={CLK.spinAt} spinDur={CLK.spinDur} turns={CLK.turns} hourSteps={1} outAt={CLK.outAt} seed="s7clock" />
+        </g>
+      </XG>
+    );
+  })();
 
   // ---- clones 2 -> 4 -> 8 on pane 2 and the wall (never on the notice's lock sketch), in GROUPS on the beat: 2 just
   //      before 'got', 2 more on 'out', 4 more 0.16 s later (two frames). Four of them hand a copy up to the wires: the
@@ -122,21 +170,25 @@ const Scene07: React.FC = () => {
   const lift = {A: B.before - 0.2, Bit: B.before - 0.14, C: B.before - 0.08, D: B.before - 0.02};
   const g1 = B.got - 0.08;
   const g3 = B.out + 0.16;
+  // fix round 2: a pile, not a grid: 2 large (C, D: full sheets), 3 medium, 3 small (A on the wall; two TUCKED behind the
+  // notice's bottom-left corner and its right edge, drawn under it)
   const SRC = {
-    C: {x: 530, y: 1032, at: g1, rot: -6, s: 0.8, liftAt: lift.C},
-    A: {x: 78, y: 1004, at: g1, rot: 6, s: 0.62, liftAt: lift.A},
-    Bit: {x: 628, y: 1214, at: B.out, rot: 5, s: 0.75, liftAt: lift.Bit},
-    D: {x: 548, y: 1252, at: g3, rot: -4, s: 0.9, liftAt: lift.D},
+    C: {x: 530, y: 1032, at: g1, rot: -6, s: 0.92, liftAt: lift.C},
+    A: {x: 78, y: 1004, at: g1, rot: 6, s: 0.5, liftAt: lift.A},
+    Bit: {x: 640, y: 1206, at: B.out, rot: 5, s: 0.72, liftAt: lift.Bit},
+    D: {x: 538, y: 1250, at: g3, rot: -4, s: 1.0, liftAt: lift.D},
   };
   const clones: CloneSpot[] = [
     SRC.C,
     SRC.A,
-    {x: 655, y: 1048, at: B.out, rot: 4, s: 0.7}, // the flyer shoots off this one
+    {x: 655, y: 1048, at: B.out, rot: 4, s: 0.72}, // the flyer shoots off this one
     SRC.Bit,
     SRC.D,
-    {x: 592, y: 1130, at: g3, rot: -3, s: 0.6},
-    {x: 690, y: 1296, at: g3 + 1 / 30, rot: 7, s: 0.5},
-    {x: 172, y: 1304, at: g3 + 1 / 30, rot: -6, s: 0.5},
+    {x: 604, y: 1128, at: g3, rot: -3, s: 0.62},
+  ];
+  const tucked: CloneSpot[] = [
+    {x: 212, y: 1290, at: g3 + 1 / 30, rot: -8, s: 0.44},
+    {x: 404, y: 1066, at: g3 + 1 / 30, rot: 7, s: 0.44},
   ];
   // the board keeps every clone (no liftAt: the copies are duplicates peeling off)
   const boardClones: CloneSpot[] = clones.map(({liftAt: _l, ...c}) => c);
@@ -180,6 +232,11 @@ const Scene07: React.FC = () => {
         {node}
         <WallDetails />
       </>
+    ) : name === 'ground' ? (
+      <>
+        {node}
+        <GroundDetails />
+      </>
     ) : (
       node
     );
@@ -202,16 +259,25 @@ const Scene07: React.FC = () => {
       {/* J4: the makers' blind is still down: 'still fixing...' (props FixSign: the one sign of J3 / J4 / J5). Hung from a
           nail on the blind's top-left, drawn after the set so the window frame and the round sign's bracket stay behind it */}
       <FixSign x={J4.x} y={J4.y} fs={J4.fs} swingAt={[B.fix]} seed="s7J4" />
-      {/* pigeons on the wires: they hop as copies peg below them (x 384 / 330 = S08's WIRE_PIGEONS, scene08/cast.tsx: they
-          carry over the cut on the same screen spot); one flaps up on 'was' as the first copy reaches it */}
-      <Pigeon wire={0} x={384} hopAt={[B.before + 0.18]} seed="s7pg0" />
-      <Pigeon wire={0} x={330} hopAt={[B.before + 0.12]} flip color={palette.sand} seed="s7pg1" />
-      <Pigeon wire={0} x={70} flyAt={B.was - 0.02} flyTo={[-240, -150]} seed="s7pg2" />
+    </>
+  );
+  // pigeons on the wires (outside the reveal): each pops (wobbly spring) one frame after the pen has inked its wire under
+  // it, so no pigeon ever sits in empty sky; they hop as copies peg below them (x 384 / 330 = S08's WIRE_PIGEONS,
+  // scene08/cast.tsx: they carry over the cut on the same screen spot); one flaps up on 'was' as the first copy reaches it
+  const REVEAL = {at: B.cut + 0.05};
+  const strokes = s07Strokes(J4.x);
+  const pg = (x: number) => wire0InkedAt(REVEAL.at, x) + 1 / 30;
+  const pigeonsNode = (
+    <>
+      <Pigeon wire={0} x={384} at={pg(384)} hopAt={[B.before + 0.18]} seed="s7pg0" />
+      <Pigeon wire={0} x={330} at={pg(330)} hopAt={[B.before + 0.12]} flip color={palette.sand} seed="s7pg1" />
+      <Pigeon wire={0} x={70} at={pg(70)} flyAt={B.was - 0.02} flyTo={[-240, -150]} seed="s7pg2" />
     </>
   );
 
   // readers at the frame sides: the left two wait low from the cut and rise on 'out', the right two pop up on 'the';
   // four phones go up. arms 'near': the phone arm is the only arm drawn (no hand left floating at the hip).
+  const RAISE = [B.the, B.the + 0.15, B.the + 0.05, B.the + 0.2];
   const reader = (i: number) => {
     const r = S7_READERS[i];
     const head = i < 2 ? r.head : RIGHT_HEADS[i - 2];
@@ -227,25 +293,27 @@ const Scene07: React.FC = () => {
         body={r.body}
         acc={[...look.acc]}
         riseAt={i < 2 ? undefined : B.the - 0.06 + (i - 2) * 0.06}
-        raisePhoneAt={[B.the, B.the + 0.15, B.the + 0.05, B.the + 0.2][i]}
+        raisePhoneAt={t >= RAISE[i] ? RAISE[i] - POP_SKIP : undefined}
         arms="near"
         rim={i < 2 ? 'left' : 'right'}
         seed={`nc/rd${i}`}
       />
     );
   };
-  // fill-first reveal: the linework draws on top -> bottom (ground marks included). The low left readers are NOT in it:
-  // they are the foreground from the cut, fully drawn (in the film the paint edge's bare corner keeps their ink).
-  const REVEAL = {at: B.cut + 0.05, dur: 0.48, y0: 560, y1: 1900};
+  // fill-first reveal: the set arrives as flat fills and its linework is drawn on by pen strokes, top -> bottom
+  // (reveal.tsx). The low left readers are NOT in it: they are the foreground from the cut, fully drawn.
+  const T = useGlobalTime();
 
   return (
     <World sky={[{t: 0, tod: 'golden'}]}>
       <XG m={M}>
-        <InkReveal {...REVEAL} render={set} />
+        <PenReveal at={REVEAL.at} strokes={strokes} render={set} />
+        {pigeonsNode}
+        {clock}
 
-        {/* the board: the notice (after the lens wipe lands), its pin, the clones */}
+        {/* the board: two clones tucked under the notice, the notice (after the lens wipe lands), its pin, the clones */}
+        <BoardClones spots={tucked} seed="s7tuck" />
         {t >= B.pinPip + 0.06 ? <LeakSheet x={NOTICE.x} y={NOTICE.y} w={NOTICE.w} h={NOTICE.h} rot={NOTICE.rot} pin={false} depth="mid" seed="s7notice" /> : null}
-        <PinDot x={PIN[0]} y={PIN[1]} at={B.pinPip + 0.06} />
         <BoardClones spots={boardClones} seed="s7clone" />
 
         {/* copies travel left along the wires (Bit rides one) */}
@@ -254,7 +322,7 @@ const Scene07: React.FC = () => {
         ))}
 
         {/* L7 on the board's bottom rail */}
-        <LabelTag kind="card" box={[300, 1338, 640, 1436]} text={['word leaked Oct 20 ·', 'fix out Oct 21']} fontSize={36} swing at={B.label} seed="s7L7" />
+        <LabelTag kind="card" box={[300, 1338, 640, 1436]} text={['word leaked Oct 20', 'fix out Oct 21']} fontSize={36} swing at={B.label} seed="s7L7" />
 
         {/* Pip on the board top + the flyer gag */}
         <PipS07 B={B} />
@@ -270,10 +338,15 @@ const Scene07: React.FC = () => {
         {[3, 2].map((i) => reader(i))}
         <PhoneCopy x={PHONE[0]} y={PHONE[1]} at={B.was - 0.1} ringAt={B.was - 0.06} rot={-3} ringR={39} />
 
-        {/* the lens wipe: the printed sheet at the lens shrinks into the notice (on top of everything until it lands) */}
-        {t < B.pinPip + 0.06 ? (
-          <LeakSheet x={NOTICE.x} y={NOTICE.y} w={NOTICE.w} h={NOTICE.h} rot={NOTICE.rot} pin={false} depth="mid" lensWipe={{at: B.pinPip + 0.06 - 0.433, from: [-260, 1250], fromS: 1.6, peak: 8, focus: [540, 960]}} seed="s7notice" />
+        {/* the lens wipe: the printed sheet at the lens shrinks into the notice, on top of everything until it lands: S06's
+            page itself (screen space), exactly what S06's Wiper draws above both scenes in the film */}
+        {T < S07_PIN ? (
+          <XG m={mat.inv(M)}>
+            <LeakPage T={T} />
+          </XG>
         ) : null}
+        {/* the pin pops on the sheet's landing frame (above the lens sheet for that one frame) */}
+        <PinDot x={PIN[0]} y={PIN[1]} at={B.pinPip + 0.06 - 1 / 30} />
       </XG>
     </World>
   );

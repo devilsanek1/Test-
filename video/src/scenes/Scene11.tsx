@@ -7,21 +7,26 @@
 // 'back soon' tag of S01 arrive (now explained), and a cream sticky note on the closed shutter makes the tech-support
 // joke (J6: 'Turn it off ~~and on again~~'). Pip watches from the sill's left end and shrugs on 'answer'; the snail is
 // the running gag; Bit hops onto the padlock's shackle (rewatch spot: he guards the lock that keeps the bug out).
-// Near plane: the plaza lamp post at the left edge (its whole lantern head in frame; Pip hops in behind it) and two quiet
-// back-view onlookers at the bottom right (under the UI, brown / tan hair, no phones); govA keeps its lit tone (only govB
-// steps darker). Fix round 2: the switch-off spreads as ONE outward ripple from govB in the pause after 'off,' (govA,
-// govC, the far civic skyline, the lanterns: all done by 'is'), so 'is' .. 'everything' carries only the joke's events;
-// Pip shrugs toward the sun, settles facing us, and leaps up-right toward the lens (stand-side) at the end.
+// Near plane: the plaza lamp post near the left edge (its whole lantern head in frame, x >= 73: clear of the film edge's
+// bare left strip; Pip hops in behind it) and two quiet back-view onlookers at the bottom LEFT (under the UI, brown / tan
+// hair, no phones; fix round 3: moved from the bottom right, where S10's last frame has its own head); govA keeps its lit
+// tone (only govB steps darker). Fix round 2: the switch-off spreads as ONE outward ripple from govB in the pause after
+// 'off,' (govA, govC, the far civic skyline, the lanterns: all done by 'is'), so 'is' .. 'everything' carries only the
+// joke's events; Pip shrugs toward the sun, settles facing us, and leaps up-right toward the lens (stand-side) at the end.
+// Fix round 3: 'updating...' lives in the address pill and the page has ONE fat bar + a big % tile; 'off' is light going
+// out (govB's drum slots and lantern glass start lit peach and pop to tealDark in the cascade; the near lamp's glass goes
+// tealDark); the press ripple is a flat peach stepped band; the note's back is a sticky-note back while it falls.
 //
 // Hard cut in and out (no transition camera). Camera: a 4 % push from rest, locked, a 3 % lean into the joke, hold.
-// Local helpers: ./scene11/* (beats, camera, actors: pigeons, snail, govB's window with its fat 'updating... 8%' bar, the
-// plain glass panes with a CRT power-off for govA / govC / govD at the frame edges; shims: NoteFlight (the J6 drop from behind the
-// cornice, blank back, flip to the face on the slap) / NoteBreeze / NoteStrike (one 5.2 px marker stroke) around the shared
-// StickyNote, StepRipple (the press ring, stepped width), a Sparkle, PadlockRock / TagTwirl (motion around S01's own
-// padlock and lettered tag); entry = an isolated preview entry). Shared kit: GovernmentPlaza (far civic skyline,
-// shutters, lights out), LabelTag (L14 notice), StickyNote (J6), ShutterPadlock + BackSoonTag (S01's govB padlock and
-// one-line white 'back soon' tag, S01's seeds), PowerGlyph, SunPress, Bit (+ scene11 BitRim), EdgeOnlooker. scene11/near:
-// NearLamp, StepTreads (ink on the far steps), BandClip (the top-to-bottom lights-out cascade).
+// Local helpers: ./scene11/* (beats, camera, actors: pigeons, snail, govB's window ('updating...' pill, one fat bar + %
+// flip tile), the plain glass panes with a CRT power-off for govA / govC / govD at the frame edges; shims: NoteFlight
+// (the J6 drop from behind the cornice, NoteBack while it falls, flip to the face on the slap) / NoteBreeze / NoteStrike
+// (one 5.2 px marker stroke) around the shared StickyNote, StepRipple (the press ring: a flat peach stepped band), a
+// Sparkle, PadlockRock / TagTwirl (motion around S01's own padlock and lettered tag); entry = an isolated preview entry).
+// Shared kit: GovernmentPlaza (far civic skyline, shutters, lights out), LabelTag (L14 notice), StickyNote (J6),
+// ShutterPadlock + BackSoonTag (S01's govB padlock and one-line white 'back soon' tag, S01's seeds), PowerGlyph, SunPress,
+// Bit (+ scene11 BitRim), EdgeOnlooker. scene11/near: NearLamp, StepTreads (ink on the far steps), BandClip (the
+// top-to-bottom lights-out cascade), LitGlass (govB's lit drum slots + lantern glass until the cascade).
 
 import React, {useMemo} from 'react';
 import {World, Sun, useTime, useScene, mat, XG} from '../lib';
@@ -33,8 +38,8 @@ import {BackSoonTag, Bit, EdgeOnlooker, LabelTag, PowerGlyph, ShutterPadlock, St
 import {ABS, localBeats, SCENE} from './scene11/beats';
 import {camAt, camKeys, camMat, toScreen} from './scene11/camera';
 import {GovBWindow, Pigeon, PlainPane, SillSnail} from './scene11/actors';
-import {BandClip, NearLamp, StepTreads} from './scene11/near';
-import {backSoonW, BitRim, NoteBreeze, NoteFlight, NoteStrike, PadlockRock, padlockShackleTop, Sparkle, StepRipple, TagTwirl} from './scene11/shims';
+import {BandClip, LitGlass, NearLamp, StepTreads} from './scene11/near';
+import {backSoonW, BitRim, NoteBack, NoteBreeze, NoteFlight, NoteStrike, PadlockRock, padlockShackleTop, Sparkle, StepRipple, TagTwirl} from './scene11/shims';
 import {Fill} from '../lib/Fill';
 import {Ink} from '../lib/Ink';
 import {palette, stroke} from '../lib/theme';
@@ -68,10 +73,12 @@ const SHACKLE_TOP: Pt = [PAD[0], PAD[1] + padlockShackleTop(PAD_SIZE)];
 // world = ~29 px on screen (S01 hangs a 138-wide one from y 1104 at zoom ~1.03: the same shape, colour and lettering)
 const TAG = {x: 566, y: 1094, bottom: 1140};
 const SNAIL_AT: Pt = [641, SILL_Y]; // the sill's right end: its eye stalks stay clear of the notice's 'EU'
-// L14, inside the lower part of the browser screen (world x 414-622): 20.5 world lettering (~34 px on screen at 1.66; the
-// paper the notice's padding needs for 'UK NCSC · CERT-EU' at that size is 178 wide), right edge on the screen's right
-// frame, left edge with clear air to Pip's ear (Pip sits 8 world further left than v2 and leans less toward it)
-const NOTICE = {x: 534, y: 1083, w: 178, h: 63, fs: 20.5};
+// L14, inside the lower part of the browser screen (world x 414-622), under the page's bar row (local y < 40), left edge
+// with clear air to Pip's ear.
+// fix round 3: inset INSIDE the glass like a shop notice: paper ~x 420-700 on screen at 1.66 (world 446-614, clear of the
+// right jamb at 713), bottom ~1425 (world 1106, 10 world above the window's bottom frame), so 19.5 world lettering
+// (~32 px; the notice's padding needs 8.7 em of paper for 'UK NCSC · CERT-EU')
+const NOTICE = {x: 530, y: 1076, w: 169, h: 60, fs: 19.5};
 // J6 on the closed shutter's right part: 146 x 112 world, 24.5 world lettering (~42 px at 1.71: the joke reads at phone
 // size); right edge 618 < the jamb (622), top 972 > the box line (970), the tilted bottom corner ~1088 < the tag's nail
 // (1094)
@@ -79,6 +86,8 @@ const NOTE = {x: 545, y: 1028, w: 146, h: 112};
 const NOTE_LINES = ['Turn it off', 'and on again'];
 const NOTE_FS = 24.5;
 const NOTE_ROT = -4;
+// its BACK while it falls (fix round 3): squarer, 124 x 118 world (~210 x 200 px at 1.69), the show-through at 19 world
+const NOTE_BACK = {w: 124, h: 118, fs: 19};
 // the drop: from behind govB's cornice (its lower edge at world y 926 hides it), just left of the cornice pigeon
 const NOTE_FROM: Pt = [570, 890]; // fully hidden at the start (the tipped sheet x 497-643, bottom < 926: behind the cornice)
 const CORNICE_B = 926;
@@ -98,6 +107,11 @@ const G_B = {x0: 396, x1: 640, domeBase: 792, cornB: 926};
 // ~85 px on f193 and are still rising at the cut (~130 px up); the growth is capped (~1.3x at the cut) so the hop, not
 // the scale, carries the motion
 const SHRUG_DUR = 0.5;
+// the near onlookers (SCREEN px, head centre + diameter): bottom left, inside the film edge's colour (x >= 54, y <= 1895)
+const ONL = [
+  {x: 228, y: 1840, head: 104},
+  {x: 408, y: 1798, head: 110},
+];
 const PIP_EXIT = {vx: 150, vy: -1000, g: 1800, grow: 1.4, rot0: -12, rotV: 20};
 
 const Scene11: React.FC = () => {
@@ -128,8 +142,9 @@ const Scene11: React.FC = () => {
           {(r) => <PowerGlyph r={r} inkOnAt={b.glyph} seed="s11/pwr" />}
         </Sun>
       </SunPress>
-      {/* grow 28: the ring's top stays at screen y >= 562, under the caption band (bottom 570) */}
-      <StepRipple cx={SUN.x + SUN_DRIFT * b.press} cy={SUN.y} r={SUN.r} at={b.press} grow={28} />
+      {/* fix round 3: a flat peach band r 124 -> 146 -> 168 (12 / 8 / 4 px, 2 frames each), its top at screen y >= 530:
+          under the caption lines (their descenders end ~500), in the band's calm bottom strip for 4 frames */}
+      <StepRipple cx={SUN.x + SUN_DRIFT * b.press} cy={SUN.y} at={b.press} />
     </XG>
   );
 
@@ -155,7 +170,7 @@ const Scene11: React.FC = () => {
     }
     return (
       <GovBWindow r={r} steps={steps} hiccups={[b.ringHiccup1, b.barBack]} barsAt={[b.ringHiccup1 - 0.12, b.barFlicker - 0.03, b.earFlick - 0.03]} barsX0={NOTICE.x - NOTICE.w / 2 - r[0] + 3} reloadAt={[b.snailCrawl + 0.05]} shakeAt={b.barBack} flickerAt={b.barFlicker} ringR={12.5} alertAt={b.barBack} inkW={MID_CLOSE} seed="s11/govB">
-        <LabelTag kind="notice" x={NOTICE.x} y={NOTICE.y} w={NOTICE.w} h={NOTICE.h} lines={['FBI · NSA', 'UK NCSC · CERT-EU']} fontSize={NOTICE.fs} minFont={20.5} at={b.notice} rot={-1} inkPx={2.2} paper={palette.white} seed="s11/L14" />
+        <LabelTag kind="notice" x={NOTICE.x} y={NOTICE.y} w={NOTICE.w} h={NOTICE.h} lines={['FBI · NSA', 'UK NCSC · CERT-EU']} fontSize={NOTICE.fs} minFont={NOTICE.fs} at={b.notice} rot={-1} inkPx={2.2} paper={palette.white} seed="s11/L14" />
       </GovBWindow>
     );
   };
@@ -235,10 +250,12 @@ const Scene11: React.FC = () => {
     }
   }
   let pip: React.ReactNode;
-  // the hop in from past the left edge (S10 sends him off its right edge, fully out at 45.595): on f0 his feet are at
-  // x ~-90, so only his trunk tip could show, and that is behind the near lamp post (x 0-30); a low arc (~60 px / frame
-  // across: a ballistic leap, motion_spec 25), first readable on f1-f2, touching down ON 'Even'
-  const inHop = hop({t, t0: b.pipLand - 0.34, dur: 0.34, from: {x: -300, y: 1290}, to: {x: pipAnchor[0], y: pipAnchor[1]}, height: 25});
+  // the hop in from past the left edge (S10 sends him off its right edge, fully out at 45.595): on f0 nothing of him
+  // shows; a low arc (~55 px / frame across: a ballistic leap, motion_spec 25), first readable on f1-f2, passing behind
+  // the lamp post, touching down ON 'Even'
+  // fix round 3: a LOWER arc (feet ~1430-1500, body under govA's window sill at y >= ~1300 on f1-f2: he reads against
+  // govA's column base and the lamp post, never on govA's window glass)
+  const inHop = hop({t, t0: b.pipLand - 0.34, dur: 0.34, from: {x: -270, y: 1500}, to: {x: pipAnchor[0], y: pipAnchor[1]}, height: 32});
   if (t < b.pipLand) {
     pip = inHop.k > 0 || t >= b.pipLand - 0.5 ? <Elephant x={inHop.x} y={inHop.y} scale={pipScale} pose="stand-side" amount={inHop.spread} squash={inHop.squash} rotate={inHop.rotate} t={t} seed={11} /> : null;
   } else if (t < b.pipOut) {
@@ -264,17 +281,17 @@ const Scene11: React.FC = () => {
   // ---- J6: the sticky note drops from behind govB's cornice (blank back), flips to its lettered face and slaps onto the
   // closed shutter on 'tech'; the strike (S11's heavier NoteStrike) on 'everything'
   const slapAt = b.noteSlap + 0.03;
-  const noteEl = (slap: boolean, blank = false) => (
+  const noteEl = (slap: boolean) => (
     <StickyNote
       x={NOTE.x}
       y={NOTE.y}
       w={NOTE.w}
       h={NOTE.h}
-      lines={blank ? [] : NOTE_LINES}
+      lines={NOTE_LINES}
       size={NOTE_FS}
       slapAt={slap ? slapAt : undefined}
       flutter={false}
-      curlAt={blank ? undefined : [b.noteCurl, b.strike + 0.2]}
+      curlAt={[b.noteCurl, b.strike + 0.2]}
       rot={NOTE_ROT}
       inkPx={3.4}
       seed="s11/J6"
@@ -334,6 +351,8 @@ const Scene11: React.FC = () => {
             {plaza(LO.lantern)}
           </BandClip>
         ) : null}
+        {/* govB's lit glass (drum slots, lantern core): lit until the cascade, then dark (lantern f104, drum f106) */}
+        <LitGlass lanternAt={LO.lantern} drumAt={LO.drum} />
         {/* govC's clock face sat as a half-cropped white disc at the right edge beside the sun: S11 paints the turret plain
             (its tan, inside its ink edges), so the strip keeps one simple vertical edge shape */}
         <Fill d={rectPath(838, 641, 64, 58)} color={palette.tan} offset={false} mode="none" seed="s11/clockpatch" />
@@ -342,7 +361,7 @@ const Scene11: React.FC = () => {
         {nearPlane}
         {/* on the closed shutter: the sticky note (J6), then S01's lettered 'back soon' tag on its nail and S01's padlock
             on the rail (drawn by the scene: they rock / twirl and they sit over the bold near-plane strokes) */}
-        <NoteFlight x={NOTE.x} y={NOTE.y} from={NOTE_FROM} arriveAt={slapAt} dur={slapAt - b.noteDrop} flipDur={0.15} clipY={CORNICE_B} back={noteEl(false, true)} face={noteEl(false)} />
+        <NoteFlight x={NOTE.x} y={NOTE.y} from={NOTE_FROM} arriveAt={slapAt} dur={slapAt - b.noteDrop} flipDur={0.15} clipY={CORNICE_B} back={<NoteBack x={NOTE.x} y={NOTE.y} w={NOTE_BACK.w} h={NOTE_BACK.h} rot={NOTE_ROT} lines={NOTE_LINES} fontSize={NOTE_BACK.fs} inkPx={3.4} />} face={noteEl(false)} />
         <NoteBreeze x={NOTE.x} y={NOTE.y} h={NOTE.h} flutterAt={[b.noteCurl - 0.02, b.strike + 0.18]} joltAt={b.strike}>
           {noteEl(true)}
           {t >= slapAt ? <NoteStrike x={NOTE.x} y={NOTE.y} w={NOTE.w} h={NOTE.h} lines={NOTE_LINES} fontSize={NOTE_FS} strike="and on again" rot={NOTE_ROT} at={b.strike} widthPx={5.2} overPx={8} seed="s11/J6/strike" /> : null}
@@ -356,22 +375,22 @@ const Scene11: React.FC = () => {
         </PadlockRock>
         <Sparkle x={PAD[0] + 15} y={PAD[1] - 5} r={7} at={[b.glint]} />
         {/* the sill: the snail (running gag), Bit; the pigeons on the cornice and on the shutter box */}
-        <SillSnail x={SNAIL_AT[0]} y={SNAIL_AT[1]} size={28} shellAt={b.snailShell} crawlAt={b.snailCrawl} hideAt={b.bitHop} antennaeAt={b.antennae} peekAt={b.pipOut} seed="s11/snail" />
+        <SillSnail x={SNAIL_AT[0]} y={SNAIL_AT[1]} size={28} shellAt={b.snailShell} crawlAt={b.snailCrawl} hideAt={b.snailHide} antennaeAt={b.antennae} peekAt={b.pipOut} seed="s11/snail" />
         {bit}
         <Pigeon x={CORNICE_PIGEON[0]} y={CORNICE_PIGEON[1]} s={PIGEON_S} shuffle={[{at: b.ringHiccup1, dx: -9}, {at: b.cornShuffle, dx: 6}, {at: b.barBack + 0.17, dx: 4}, {at: b.antennae + 0.08, dx: -3}]} hopAt={[b.press + 0.05, b.glint + 0.17]} preenAt={b.preen} seed="s11/pg1" />
         {/* the box pigeon: crouch, then off up-left (the whole bird, flapping, 20 -> 28 px / frame) with the tag sway,
             after Pip's hop-off: clear of the box by the cut, mid-flight on the last frame */}
         <Pigeon x={BOX_PIGEON[0]} y={BOX_PIGEON[1]} s={PIGEON_S} land={{at: b.pigeonLand, from: [175, 875], dur: 0.45}} shuffle={[{at: b.noteSlap + 0.18, dx: 5}]} hopAt={[b.glint - 0.03]} hopH={20} flyAt={b.pigeonFly} flyTo={[-300, -200]} flySpeed={[20, 28]} seed="s11/pg2" />
       </XG>
-      {/* the near layer (screen space): two quiet back-view onlookers at the bottom right (under the platform UI: depth +
-          scale, as in ref 1 f_9.0), Pip, then the plaza lamp post at the left edge (Pip hops in behind it). Fix round 2:
-          brown / tan hair (ink-black heads were the highest-contrast shapes in the frame) and NO phones in S11 (the white
-          phones and a raised arm crossing a head pulled the eye into the corner): S12 opens on the wide with the
-          citizens' phones already up, across the hard cut */}
-      <EdgeOnlooker x={846} y={1842} head={104} hair="bun" hairColor={palette.brown} body={palette.sage} acc={['collar']} rim="right" seed="s11/onl1" />
-      <EdgeOnlooker x={1034} y={1786} head={110} hair="short" hairColor={palette.tan} body={palette.teal} acc={['hood']} rim="left" seed="s11/onl2" />
+      {/* the near layer (screen space): Pip, the plaza lamp post near the left edge (Pip hops in behind it), then two
+          quiet back-view onlookers at the BOTTOM LEFT, at the base of govA's columns (under the platform UI: depth +
+          scale, as in ref 1 f_9.0). Fix round 3: moved from the bottom right, where S10's last frame has its own
+          back-view head (a jump cut of identities on the hard cut) and where the film edge's bare corner cut them.
+          Fix round 2: brown / tan hair and NO phones in S11 (S12 opens on the wide with the phones already up) */}
       {pip}
       <NearLamp offAt={b.lampOff} />
+      <EdgeOnlooker x={ONL[0].x} y={ONL[0].y} head={ONL[0].head} hair="bun" hairColor={palette.brown} body={palette.sage} acc={['collar']} rim="right" seed="s11/onl1" />
+      <EdgeOnlooker x={ONL[1].x} y={ONL[1].y} head={ONL[1].head} hair="short" hairColor={palette.tan} body={palette.teal} acc={['hood']} rim="right" seed="s11/onl2" />
     </World>
   );
 };

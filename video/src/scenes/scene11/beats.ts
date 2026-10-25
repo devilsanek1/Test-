@@ -70,7 +70,9 @@ export const ABS = {
   civicLanterns: W.offEnd + 0.32, // their lanterns pop off right after the last step (domeF 49.72, domeB 49.78)
   lampOff: W.offEnd + 0.32, // the near plaza lamp's lantern pops off (cream -> sand) at the left edge. govA does NOT step
   // darker (fix round 1: after 'off' the frame keeps its pale left third; govB's one step is the story beat)
-  bitHop: W.offEnd + 0.05, // Bit hops onto the padlock's shackle; the snail pulls into its shell
+  bitHop: W.offEnd + 0.05, // Bit hops onto the padlock's shackle
+  snailHide: W.off + 0.14, // the snail SNAPS into its shell on the padlock's clunk (lock_click 49.205; fix round 3: was with
+  // Bit's hop at 49.45, an eased pull-in that only showed 4-5 frames late)
   pigeonLand: W.which, // the lean-in starts; a pigeon lands on the shutter box
   tagTwirl: W.is - 0.12, // the tag twirls once in a breeze (its first narrowing lands on 'is')
   antennae: W.basically, // the snail pokes one antenna out, then the other (span 0.4)

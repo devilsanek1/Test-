@@ -34,7 +34,7 @@ import {Cobweb, LabelTag, Lock, pendulum} from './shared/props';
 import {SI} from './shared/sets';
 import {beats, S04_START, S04_END, tearTimes} from './scene04/beats';
 import {camAt, camMat, diveK, DIVE} from './scene04/camera';
-import {above, ClipG, except, GroundS04, ivyNode, SeasonIvy, seasonKeys, SplitInk, StepTones, WindowLife, YearCalendar, YearFlyers} from './scene04/props';
+import {above, ClipG, except, FlatChrome, GroundS04, ivyNode, SeasonIvy, seasonKeys, SplitInk, StepTones, WindowLife, YearCalendar, YearFlyers} from './scene04/props';
 import {bitHopAt, BitS04, BugSpot, ghostList, Ghosts, HOP_DUR, Leaf, LockGlint, PipS04, spotAt, spotOff} from './scene04/cast';
 
 // ---------------------------------------------------------------- labels (final_script section 6)
@@ -136,10 +136,11 @@ const Scene04: React.FC = () => {
   const heroSlot = (
     <>
       <StepTones />
+      <FlatChrome on={diving} />
       <WindowLife tears={tears} />
       <SeasonIvy steps={ivySteps} seasons={seasons} />
       {/* 'bug': a peach spot with an ink ring and glint ticks behind the lock box and Bit */}
-      <BugSpot at={spotAt(b)} off={spotOff(b)} />
+      <BugSpot at={spotAt(b)} off={spotOff(b)} word={b.bug} />
       {/* lock4 (the set's own hero lock, drawn here so it can rattle about its top screw when Bit kicks off on 'bug') */}
       <XG m={mat.about(mat.rotate(rattle(t, hopAt, hopAt + HOP_DUR)), LOCK_PIVOT[0], LOCK_PIVOT[1])}>
         <Lock x={LK.x} y={LK.y} size={LK.h} seed="stoop/lock4" ink={SI.far} glintAt={b.bug} />

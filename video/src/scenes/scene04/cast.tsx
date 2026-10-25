@@ -147,18 +147,21 @@ export const BitS04: React.FC<{b: Beats}> = ({b}) => {
 /** The 'bug' spot behind lock4 (draw it BEFORE the lock): a peach disc pops (20 % -> 100 %, pop spring) while a full
  *  ink ring (2.3 world = 3.4 px, the mid weight) draws on around it in 0.12 s with five glint ticks; held, then popped
  *  off (one frame at 85 %, then gone; no fade). ~90 px across on screen. */
-export const BugSpot: React.FC<{at: number; off: number}> = ({at, off}) => {
+export const BugSpot: React.FC<{at: number; off: number; word: number}> = ({at, off, word}) => {
   const t = useTime();
   if (t < at || t >= off) return null;
   const [cx, cy] = SPOT.c;
   const last = off - t < 1 / 30 + 1e-6;
-  const k = last ? 0.85 : 0.2 + 0.8 * springAt(t, at, springs.pop);
+  // ON the word (Bit at his apex) the spot pings once: the disc swells 12 % and the ticks flash 50 % longer (0.16 s)
+  const ping = t >= word && t < word + 0.16 ? Math.sin((Math.PI * (t - word)) / 0.16) : 0;
+  const k = last ? 0.85 : (0.2 + 0.8 * springAt(t, at, springs.pop)) * (1 + 0.12 * ping);
   const r = SPOT.r;
   const ring = `M${(cx + r).toFixed(1)} ${cy}A${r} ${r} 0 1 0 ${(cx - r).toFixed(1)} ${cy}A${r} ${r} 0 1 0 ${(cx + r).toFixed(1)} ${cy}`;
   let ticks = '';
+  const tl = 12 * (1 + 0.5 * ping);
   for (const a of [-165, -125, -90, -55, -15]) {
     const q = (a * Math.PI) / 180;
-    ticks += `M${(cx + Math.cos(q) * (r + 5)).toFixed(1)} ${(cy + Math.sin(q) * (r + 5)).toFixed(1)}L${(cx + Math.cos(q) * (r + 17)).toFixed(1)} ${(cy + Math.sin(q) * (r + 17)).toFixed(1)}`;
+    ticks += `M${(cx + Math.cos(q) * (r + 5)).toFixed(1)} ${(cy + Math.sin(q) * (r + 5)).toFixed(1)}L${(cx + Math.cos(q) * (r + 5 + tl)).toFixed(1)} ${(cy + Math.sin(q) * (r + 5 + tl)).toFixed(1)}`;
   }
   return (
     <XG m={mat.about(mat.scale(k), cx, cy)}>
@@ -210,12 +213,15 @@ export type GhostSpec = {
   acc?: PasserAcc[];
   /** 'far' = the pairs (ink SI.far, the left row's depth); 'hair' = the far flickers up the road. */
   depth?: 'far' | 'hair';
+  /** Mirrored (a back view mirrored is still a back view): the phone arm on the side toward the partner. */
+  mirror?: boolean;
 };
 
-/** The passers-by's camera: horizon at the street's VP, lens 1.45 x a person (the shot is taken from about the stoop's
- *  top step, a little above a passer-by's eyes): a pair member on the road's edge right of the hero house is ~250-280
- *  px on screen (Pip ~150), and the heads stay under the near tree's crown. */
-const GHOST_EYE = eyeLevel({horizon: VP[1], vpx: VP[0], ratio: 1.45});
+/** The passers-by's camera: horizon at the street's VP, lens 1.7 x a person (the shot is taken from the stoop's top
+ *  step, above a passer-by's eyes): a pair member on the road's edge right of the hero house is ~190-245 px on screen
+ *  (Pip ~150). Fix round: 1.45 made the pair so wide on the road's narrow strip that the farther member stood in the
+ *  right rail or hid behind the nearer one. */
+const GHOST_EYE = eyeLevel({horizon: VP[1], vpx: VP[0], ratio: 1.7});
 
 /** Feet (world) of a passer-by at t (walking away along its ray to the VP at `pace` of the way per second). */
 export function ghostFeet(g: GhostSpec, t: number): Pt {
@@ -378,7 +384,7 @@ export const Passer: React.FC<{x: number; y: number; H: number; t: number; hz: n
   const roll = Math.sin(ph) * 1.5;
   const g = figPaths(H, ph, hair, acc);
   const W = palette.white;
-  const layer = (d: string, k: string, fill = W, w = ink) =>
+  const layer = (d: string, k: string, fill: string = W, w = ink) =>
     d ? (
       <React.Fragment key={k}>
         <Fill d={d} color={fill} offset={false} mode="none" seed={`${seed}/${k}f`} />
@@ -424,7 +430,7 @@ export const Ghosts: React.FC<{list: GhostSpec[]}> = ({list}) => {
         const last = g.out - t < 1 / 30 + 1e-6;
         const sc = last ? 0.82 : 0.2 + 0.8 * springAt(t, g.in, springs.pop);
         return (
-          <XG key={g.seed} m={mat.about(mat.scale(sc), fx, fy)}>
+          <XG key={g.seed} m={mat.about(mat.scale(g.mirror ? -sc : sc, sc), fx, fy)}>
             <Passer x={fx} y={fy} H={H} t={t} hz={g.hz ?? 1.9} hair={g.hair} acc={g.acc ?? []} ink={g.depth === 'hair' ? SI.hair : SI.far} seed={g.seed} />
           </XG>
         );
@@ -446,10 +452,10 @@ export function ghostList(b: Beats, tears: number[]): GhostSpec[] {
   const out: GhostSpec[] = [
     // 'was': a pair, walking away up the street (one at the hero house's corner, one a step ahead and farther)
     {x: roadEdgeX(1336) + 2, y: 1336, in: b.ghosts1 - 0.1, out: tears[1], seed: 'g4a', pace: 0.06, hz: 1.9, hair: 'short', acc: ['backpack']},
-    {x: roadEdgeX(1302) + 4, y: 1302, in: b.ghosts1 - 0.06, out: tears[2], seed: 'g4b', pace: 0.06, hz: 2.1, hair: 'long', acc: ['strap']},
+    {x: roadEdgeX(1278) + 2, y: 1278, in: b.ghosts1 - 0.06, out: tears[2], seed: 'g4b', pace: 0.06, hz: 2.1, hair: 'long', acc: ['strap']},
     // 'like': a second pair strides past (faster legs, faster into depth)
     {x: roadEdgeX(1334) + 2, y: 1334, in: b.ghosts2 - 0.1, out: tears[8], seed: 'g4c', pace: 0.12, hz: 2.8, hair: 'headphones', acc: []},
-    {x: roadEdgeX(1298) + 4, y: 1298, in: b.ghosts2 - 0.05, out: tears[9], seed: 'g4d', pace: 0.12, hz: 2.9, hair: 'bun', acc: ['phone']},
+    {x: roadEdgeX(1276) + 2, y: 1276, in: b.ghosts2 - 0.05, out: tears[9], seed: 'g4d', pace: 0.12, hz: 2.9, hair: 'bun', acc: ['phone'], mirror: true},
   ];
   // the time-lapse flickers: far up the road (hair ink), one at a time, only while at most one pair member is on screen;
   // feet on the road edge (+0..8: the far road lies inside the rail, kept as tight to its edge as the ground allows)

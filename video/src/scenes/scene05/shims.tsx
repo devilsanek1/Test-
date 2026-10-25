@@ -117,18 +117,53 @@ export type InvestigatorProps = Frame & {
   lanyard?: boolean;
   /** The old back shield badge (default false: badges hang in FRONT). */
   badge?: boolean;
+  /** Fix round 3: the tablet held LANDSCAPE (rotated 90 deg: it stops rhyming with the portrait lock box above). */
+  landscape?: boolean;
+  /** Fix round 3: white sneakers over the kit's shoe blocks and a flat sand contact sliver under the soles (the figure
+   *  stands ON the tread). Default true. */
+  shoes?: boolean;
+  /** Fix round 3: a hair tie (this colour) across a long-hair head at the nape (the ponytail read). */
+  hairTie?: string;
 };
 
 /** World centre of an investigator's raised tablet (for beams). */
-export function tabletCentre(p: Pick<InvestigatorProps, 'x' | 'y' | 'h' | 'seed' | 'arm' | 'tabletSize' | 'tabletLift'>): Pt {
+export function tabletCentre(p: Pick<InvestigatorProps, 'x' | 'y' | 'h' | 'seed' | 'arm' | 'tabletSize' | 'tabletLift' | 'landscape'>): Pt {
   const s = p.h / FIG_H;
   const g = personGeo(p.seed);
   const side = p.arm === 'left' ? -1 : 1;
   const ts = p.tabletSize ?? 60;
   const up: Pt = p.tabletLift === 'head' ? [side * g.w * 0.66, g.hy] : [side * g.w * 0.62, g.hy - g.hr * 1.7];
   const hipY = p.y - LEG * s;
-  return [p.x + up[0] * s, hipY + up[1] * s - ts * 0.6];
+  return [p.x + up[0] * s, hipY + up[1] * s - ts * tabletRise(p.landscape)];
 }
+
+/** The tablet centre above the hand (x its width): the hand overlaps the bottom edge (portrait 0.71, landscape 0.5). */
+const tabletRise = (landscape?: boolean) => (landscape ? 0.42 : 0.6);
+
+/** Fix round 3: white sneakers seen from behind (heel caps over the kit's shoe blocks, a sole line) and the flat sand
+ *  contact sliver under them (person-local units: hip line 0, soles at LEG). */
+const legX = (w: number) => {
+  const lw = w * 0.31;
+  const g = w * 0.05;
+  return [[-g - lw, -g], [g, g + lw]] as [number, number][];
+};
+const Sliver: React.FC<{w: number; seed: string}> = ({w, seed}) => (
+  <Fill d={blob(0, LEG + 1.5, w * 0.52, 4.2, {seed: `${seed}/cs`})} color={palette.sand} offset={false} mode="none" seed={`${seed}/csf`} />
+);
+const Sneakers: React.FC<{w: number; W: number; seed: string}> = ({w, W, seed}) => {
+  const d = legX(w)
+    .map(([a, b]) => roundRect(a - 2.5, LEG - 13, b - a + 5, 15.5, 5))
+    .join('');
+  const sole = legX(w)
+    .map(([a, b]) => `M${(a - 1.5).toFixed(1)} ${(LEG - 3).toFixed(1)}H${(b + 1.5).toFixed(1)}`)
+    .join('');
+  return (
+    <>
+      <Fill d={d} color={palette.white} offset={false} mode="none" seed={`${seed}/snF`} />
+      <Ink d={d + sole} width={W * 0.75} taper={false} vary={0} seed={`${seed}/snI`} />
+    </>
+  );
+};
 
 export const Investigator: React.FC<InvestigatorProps> = (p) => {
   const t = useTime();
@@ -150,6 +185,10 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
   const ny = -g.h;
   const lan = `M${(-g.hr * 0.95).toFixed(1)} ${(ny + g.hr * 0.12).toFixed(1)}Q0 ${(ny + g.hr * 0.62).toFixed(1)} ${(g.hr * 0.95).toFixed(1)} ${(ny + g.hr * 0.12).toFixed(1)}`;
   const lanOn = p.lanyard ?? p.hair !== 'long';
+  const shoesOn = p.shoes ?? true;
+  // the hair tie: a short peach band across the long hair at the nape (ponytail), ink outlined
+  const tieY = g.hy + g.hr * 0.95;
+  const tie = p.hairTie && p.hair === 'long' ? roundRect(-g.hr * 0.3, tieY - g.hr * 0.11, g.hr * 0.6, g.hr * 0.22, g.hr * 0.08) : '';
   // the second arm's pose: drawn BEFORE the body when it is mostly behind it (hands on the hips, a hand at the brow:
   // only the elbow shows past the coat, the back-view read), after it when it is out in front (point, clipboard)
   const before: React.ReactNode[] = [];
@@ -189,15 +228,23 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
   }
   return (
     <FigFrame b={p}>
+      {shoesOn ? <Sliver w={g.w} seed={seed} /> : null}
       {before}
       <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={coat} hair={p.hair} hairColor={p.hairColor} acc={p.acc ?? []} ink={W} walk={p.walk} />
+      {shoesOn ? <Sneakers w={g.w} W={W} seed={seed} /> : null}
+      {tie ? (
+        <>
+          <Fill d={tie} color={p.hairTie ?? palette.peach} offset={false} mode="none" seed={`${seed}/tieF`} />
+          <Ink d={tie} width={W * 0.6} taper={false} vary={0} seed={`${seed}/tieI`} />
+        </>
+      ) : null}
       {lanOn ? <Ink d={lan} width={W * 0.62} taper={false} seed={`${seed}/lan`} /> : null}
       {p.badge ? <Ink d={shield + `M0 ${by - 9}V${by + 9}M-6 ${by - 2}H6`} width={W * 0.75} seed={`${seed}/badge`} /> : null}
       {after}
       {q > 0.02 ? (
         <>
           <Arm sh={sh} hand={hand} coat={coat} W={W * 0.85} seed={`${seed}/arm`} />
-          <SparkleTablet x={hand[0]} y={hand[1] - (ts * 0.6) / s} size={ts / s} rot={side * (1 - q) * -30} twinkle={p.twinkle ?? true} ink={W * 0.8} seed={`${seed}/tab`} />
+          <SparkleTablet x={hand[0]} y={hand[1] - (ts * tabletRise(p.landscape)) / s} size={ts / s} rot={(p.landscape ? 90 : 0) + side * (1 - q) * -30} twinkle={p.twinkle ?? true} ink={W * 0.8} seed={`${seed}/tab`} />
         </>
       ) : null}
     </FigFrame>

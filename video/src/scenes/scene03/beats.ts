@@ -52,13 +52,13 @@ const ABS = {
   swing: 11.605, //             end(loves): the pen-nib sign swings, Bit riding it; the vent puffs
   spokes: 11.695, //            w37-0.10 'about': ten spokes draw across the sun (0.15 s)
   count: 11.955, //             w38 'seven': the count, near -> far, 0.08 s apart: P (plaque ping + screen re-pulse), then
-  //                            the PHP screens L2, R2, L3, R3, L4, R4 light (elephant page + orange ping) (polish round 1:
-  //                            the screens are the street's count; L1 / R1 at the frame edges are non-PHP with L5)
+  //                            the PHP screens L1, R1, L2, R2, L4, R3 light (elephant page + orange ping) (the storyboard's
+  //                            order; fix round 2b: the non-PHP sites are the mid-depth L3, R4, L5 again)
   flip: 12.505, //              w39+0.10 'out': the title-block card paper-flips to L4 (0.2 s)
-  ten: 12.55, //                w41-0.10 'ten': blank cream pages on L1, R1, L5 (0.05 s apart) + 3 cream sun slices
+  ten: 12.55, //                w41-0.10 'ten': the non-PHP screens L3, R4, L5 blink and go dark (0.05 s apart) + 3 cream sun slices
   websites: 12.905, //          w42 'websites': the seven PHP pages re-pulse in a wave (0.02 s)
   heads: 13.205, //             w42+0.30: the near walkers turn their heads; a far walker waves
-  run: 13.485, //               w43 'run': walkers bob; Pip glances down the street (look 0.7) (no vent puff here: fix
+  run: 13.485, //               w43 'run': walkers bob; Pip glances down the street (open eyes, look 0.7, +5 deg lean) (no vent puff here: fix
   //                            round 1, it flew through the pie and the take-off)
   solid: 13.81, //              w45-0.045 'it.': the pie pops back to solid in ONE frame (slices + spokes gone together):
   //                            f162 (13.793) full pie, f163 (13.826) solid: 0.03 s before 'it.' (13.855, f164; ENGINE rule 5

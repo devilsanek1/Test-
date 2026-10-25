@@ -24,6 +24,8 @@
 
 import React, {useId} from 'react';
 import {World, useScene, useTime, skies, palette} from '../lib';
+import {Ink} from '../lib/Ink';
+import {prog} from '../lib/time';
 import {Sun} from '../lib/Sun';
 import {Look} from '../lib/exit';
 import {captionFontStack, useCaptionFont} from '../lib/font';
@@ -32,22 +34,24 @@ import {BlueprintWall, BLUEPRINT_WALL, LayerWrap} from './shared/sets';
 import {Calendar, DiagramHand, LabelTag, yearPages} from './shared/props';
 import {beats, S05_START, S05_END} from './scene05/beats';
 import {camAt, camMat, layerCam, LAYER_F} from './scene05/camera';
-import {Beams, BigZ, BitLeap, BitOnLock, LeafFall, LeafOnEar, MessengerDash, PipHop, PipOnRail, Teams} from './scene05/cast';
-import {DoorSwing, FoundRing, handTurn, KNOB, LOCK_C, LockTurn, PlazaGround, SHEET_IN, SheetLock, SheetPanels, SheetTint, StepsOverlay} from './scene05/plan';
+import {Beams, BigZ, BitLeap, BitOnLock, LeafFall, LeafOnCrown, MessengerDash, PipHop, PipOnRail, stepGaps, Teams} from './scene05/cast';
+import {CalloutKeyhole, CorniceSoffit, DoorSwing, FoundRing, handTurn, KNOB, LOCK_C, LockTurn, PlazaGround, SHEET_IN, SheetLock, SheetPanels, SheetTint, StepsOverlay} from './scene05/plan';
 import {Audience, Pigeons} from './scene05/audience';
+import {Flagpole} from './scene05/flag';
 
 // ---------------------------------------------------------------- labels (final_script section 6)
 
-/** L6's first line starts after the slip's paper clip (at 24 % of the slip's width): three en spaces push the centred
- *  line right so the clip sits in its margin, clear of the 'f' of 'found'. */
 const L5 = ['in the code since', 'at least 2012'];
-const L6 = ['   found with AI help ·', 'reported privately in August'];
+/** Both lines centred (fix round 3: no padding spaces). */
+const L6 = ['found with AI help ·', 'reported privately in August'];
 const ZOOM = 1.13;
 /** L5 continues S04's tag: where S04's dive leaves it on the cut (screen ~(426-749, 1004-1106) at zoom 1.9 around
  *  lock4), in S05 world at the 1.08 landing; hung from the lock's bottom-right corner. 36 world = 39-41 px on screen. */
 const L5_BOX: [number, number, number, number] = [435.5, 1002, 735.5, 1110];
-/** L6 on the banner's clean top margin (storyboard (205-650, 688-760), 24 px taller so two 38 px lines fit). */
-const L6_BOX: [number, number, number, number] = [205, 688, 650, 784];
+/** L6 clipped over the banner's top edge (fix round 3: the slip's top at the sheet's top edge, 679, and 126 tall, so the
+ *  centred block sits low enough that the paper clip (LabelTag: at 24 % of the width, reaching 0.73 em below the top)
+ *  ends > 6 px above the cap height of 'found'). Its foot (805) overlaps the door elevation's head line by 9. */
+const L6_BOX: [number, number, number, number] = [205, 679, 650, 805];
 /** The calendar, 1.2 x and nudged in from the frame edge (its summer page centre at screen ~105), right edge just short
  *  of the banner's frame (x 200). */
 const CAL: [number, number, number, number] = [114, 748, 84, 108];
@@ -96,6 +100,39 @@ const HAND_AT = (b: {bad: number}) => b.bad - 0.1;
 /** The pinch point and the forearm angle: -15 deg, so the teal sleeve enters the sheet's right edge below the L6 slip. */
 const PINCH: [number, number] = [KNOB[0] + 3, KNOB[1] - 2];
 const HAND_ANGLE = -15;
+const HAND_SCALE = 0.85;
+/** The drafting break across the sleeve (fix round 3: the OnSheet clip sliced the sleeve with a hard vertical at the
+ *  sheet's frame): the sleeve ENDS inside the sheet at screen x ~760 (world 735 at rest, 249 along the forearm) in a
+ *  dashed zig-zag break line, in the hand's own frame (it turns with it). */
+const BREAK_D = (735 - PINCH[0]) / Math.cos((HAND_ANGLE * Math.PI) / 180);
+/** Sleeve half-width there (DiagramHand SLEEVE: 32 at 98 -> 70 at 640 local units) + 7 world of overshoot. */
+const BREAK_H = (32 + ((BREAK_D / HAND_SCALE - 98) / 542) * 38) * HAND_SCALE + 7;
+const ArmBreak: React.FC<{drawAt: number; undrawAt: number; dur: number; children: React.ReactNode}> = ({drawAt, undrawAt, dur, children}) => {
+  const t = useTime();
+  const id = 'ab5' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const a = (HAND_ANGLE * Math.PI) / 180;
+  const u: [number, number] = [Math.cos(a), Math.sin(a)];
+  const n: [number, number] = [-u[1], u[0]];
+  const P = (along: number, across: number) => `${(PINCH[0] + u[0] * along + n[0] * across).toFixed(1)} ${(PINCH[1] + u[1] * along + n[1] * across).toFixed(1)}`;
+  const D = BREAK_D;
+  const z = 7;
+  const clip = `M${P(D, -900)}L${P(D, -9)}L${P(D - z, -3)}L${P(D + z, 3)}L${P(D, 9)}L${P(D, 900)}L${P(-900, 900)}L${P(-900, -900)}Z`;
+  const brk = `M${P(D, -BREAK_H)}L${P(D, -9)}L${P(D - z, -3)}L${P(D + z, 3)}L${P(D, 9)}L${P(D, BREAK_H)}`;
+  // the break shows with the sleeve's ink (DiagramHand: the sleeve's dashes draw over q 0.6 -> 1)
+  let q = prog(t, drawAt, dur);
+  if (t >= undrawAt) q = Math.min(q, 1 - prog(t, undrawAt, dur));
+  return (
+    <>
+      <defs>
+        <clipPath id={id} clipPathUnits="userSpaceOnUse">
+          <path d={clip} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>{children}</g>
+      {q >= 0.6 ? <Ink d={brk} width={2.4} dash="6 4.5" color={palette.ink} seed="s5brk" /> : null}
+    </>
+  );
+};
 
 const Scene05: React.FC = () => {
   const t = useTime();
@@ -128,27 +165,30 @@ const Scene05: React.FC = () => {
           {node}
           {/* the paper tone, the scan beams' light, the cream accents, then the set's ink again on top */}
           <SheetTint />
-          <Beams b={b} />
           <SheetPanels />
+          <Beams b={b} />
           <Look fills="none">{node}</Look>
           {/* 'bad': the right leaf swings ajar behind the callout */}
           <DoorSwing at={b.door} />
           <SheetLock />
+          <CalloutKeyhole />
           {/* L5 rides across the match-cut as the lock's annotation tag; pops off on 'using' */}
           <LabelTag kind="tag" box={L5_BOX} hang={[LOCK_C[0] + 24, LOCK_C[1] + 36]} text={L5} fontSize={36} outAt={b.l5Out} seed="s5L5" />
           <LockTurn drawAt={HAND_AT(b)} turnAt={b.turn} undrawAt={b.envelope} />
           <FoundRing x={LOCK_C[0]} y={LOCK_C[1]} r={92} at={b.ring} pulseAt={b.how} width={4.8} />
           <OnSheet>
             <XG m={mat.about(mat.rotate(turn), PINCH[0], PINCH[1])}>
-              <DiagramHand x={PINCH[0]} y={PINCH[1]} angle={HAND_ANGLE} scale={0.85} drawAt={HAND_AT(b)} drawDur={0.15} undrawAt={b.envelope} ink={3.0} handFill={palette.white} seed="s5hand" />
+              <ArmBreak drawAt={HAND_AT(b)} undrawAt={b.envelope} dur={0.15}>
+                <DiagramHand x={PINCH[0]} y={PINCH[1]} angle={HAND_ANGLE} scale={HAND_SCALE} drawAt={HAND_AT(b)} drawDur={0.15} undrawAt={b.envelope} ink={3.0} handFill={palette.white} seed="s5hand" />
+              </ArmBreak>
             </XG>
           </OnSheet>
           {/* Bit over the hand (he is the one being caught), his '!' balloon over everything on the sheet */}
-          <BitOnLock alertAt={b.bad} balloonAt={b.balloon} leapAt={b.bitLeap} />
+          <BitOnLock inAt={b.bitIn} alertAt={b.bad} balloonAt={b.balloon} leapAt={b.bitLeap} />
           {/* L6: the clipped slip on the banner's clean top margin (leads its beat: in full by 'AI'+0.40) */}
           <LabelTag kind="slip" box={L6_BOX} text={L6} fontSize={38 / ZOOM} at={b.l6 - 0.08} seed="s5L6" />
           <PipOnRail b={b} />
-          <LeafOnEar b={b} />
+          <LeafOnCrown b={b} />
           <BigZ at={b.zzz} />
         </XG>
       );
@@ -156,7 +196,7 @@ const Scene05: React.FC = () => {
       return (
         <>
           {node}
-          <StepsOverlay />
+          <StepsOverlay gaps={stepGaps(b)} />
           <PlazaGround />
           <Teams b={b} />
           <MessengerDash b={b} />
@@ -164,6 +204,20 @@ const Scene05: React.FC = () => {
           <LeafFall b={b} />
           <PipHop b={b} />
           <BitLeap b={b} leapAt={b.bitLeap} />
+        </>
+      );
+    if (name === 'facade')
+      return (
+        <>
+          {node}
+          <CorniceSoffit />
+        </>
+      );
+    if (name === 'wing')
+      return (
+        <>
+          <Flagpole snaps={[b.teamA, b.calendar]} slack={[b.balloon, b.door + 0.2]} />
+          {node}
         </>
       );
     return node;

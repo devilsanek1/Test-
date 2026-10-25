@@ -29,6 +29,8 @@ const ABS = {
   cut: S05_START, //        cut(years): MATCH on the lock (S04's dive lands): the blueprint lock where lock4 was; L5 rides
   //                        across as a blueprint annotation; the camera keeps creeping IN (1.08 -> 1.13, 0.30 s)
   sway: S05_START + 0.02, // cut+0.02: the landing 'hits' the banner: it sways once on its rod (real motion on f1-f5)
+  bitIn: 16.67, //          w55+0.06 'before': Bit (sitting on the lock box's top where S04 leaves him) hops DOWN into the
+  //                        socket, posing as part of the drawing (0.2 s)
   zzz: 16.76, //            w55+0.15 'before': a z floats up from sleeping Pip
   teamA: 16.775, //         w56-0.05 'researchers': team A pops up at the foot of the steps (0.10 s stagger)
   teamB: 17.125, //         w56+0.30: team B pops up (0.08 s stagger)
@@ -47,7 +49,8 @@ const ABS = {
   //                        out of the socket onto the lock box
   turn: 18.97, //           w62+0.10: the hand turns the thumb-turn; the bolt slides all the way back (0.22 s)
   door: 19.09, //           w62+0.22: the blueprint door's right leaf swings ajar (0.2 s): a dark gap opens. No key.
-  headTurn: 18.99, //       w62+0.12: one audience head turns to its neighbour (1-frame pose swap, foreground band)
+  headTurn: 19.36, //       w64+0.035 'was.' (fix round 3: was 18.99, inside 'bad', the ONE focal event): one audience
+  //                        head turns to its neighbour (1-frame pose swap, foreground band) as the messenger breaks away
   pipWake: 19.215, //       w63+0.05 'it': GAG: Pip jolts awake on the rail (trunk-up, wide); the leaf flicks off his ear
   pull: 19.25, //           w64-0.075 'was.': the messenger raises the envelope to his right shoulder (S06's carry)
   bitLeap: 19.29, //        w64-0.035: Bit leaps from the lock box onto the messenger's collar (0.24 s); the '!' pops off

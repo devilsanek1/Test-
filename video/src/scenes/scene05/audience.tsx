@@ -6,31 +6,65 @@
 // its neighbour on 'bad'. Plus the plaza's pigeons (steps layer). World px, scene seconds.
 import React, {useId} from 'react';
 import {palette} from '../../lib/theme';
-import {prog, useTime} from '../../lib/time';
+import {osc, prog, useTime} from '../../lib/time';
+import {rand} from '../../lib/rng';
+import {Ink} from '../../lib/Ink';
+import {Fill} from '../../lib/Fill';
+import {blob, circle, roundRect} from '../../lib/sketch';
 import {mat, Mat, XG} from '../../lib/xf';
 import {Bird} from '../../lib/kit';
 import type {Acc, Hair} from '../../lib/kit';
-import {EdgeOnlooker} from '../shared/props';
+import {DEPTH_INK, EdgeOnlooker} from '../shared/props';
 import type {Beats} from './beats';
 
-type Head = {x: number; y: number; head: number; hair: Hair; hairColor?: string; body: string; acc?: Acc[]; rim: 'left' | 'right'; react?: 'look' | 'turn'; seed: string};
+type Head = {x: number; y: number; head: number; hair: Hair; hairColor?: string; body: string; acc?: Acc[]; rim: 'left' | 'right'; react?: 'look' | 'turn'; seed: string; bun?: boolean};
 
 /** Back row first (drawn first), then the front row. Screen at rest: x' = (x - 540) 1.13 + 540, y' = (y - 940) 1.13 +
- *  960. The fifth of each row is off frame right at rest and slides in with the exit truck. */
+ *  960. The fifth of each row is off frame right at rest and slides in with the exit truck.
+ *  Fix round 3 (ref 2 f_33: mid-value backs, one parting / tie, collars): no ink-black head in the frame at rest (the
+ *  one ink head, b5, slides in on the truck); every torso has a collar band, a hood edge or a scarf; the buns are LOCAL
+ *  (`bun`: the kit's 'short' head, whose three strands follow the skull, plus a registered bun and a peach hair tie): the
+ *  kit's bun drew its parting across the strands (an X) and its ring 10-15 px off its fill. */
 export const HEADS: Head[] = [
   // back row: heads 128-134 (~147 px), centres ~1556 (screen ~1656, tops ~1582)
-  {x: 150, y: 1560, head: 130, hair: 'bun', hairColor: palette.brown, body: palette.sand, acc: ['scarf'], rim: 'right', seed: 's5au/b1'},
+  {x: 150, y: 1560, head: 130, hair: 'short', bun: true, hairColor: palette.brown, body: palette.sand, acc: ['scarf'], rim: 'right', seed: 's5au/b1'},
   {x: 392, y: 1552, head: 128, hair: 'curly', hairColor: palette.tan, body: palette.sage, acc: ['collar'], rim: 'right', react: 'look', seed: 's5au/b2'},
-  {x: 690, y: 1558, head: 132, hair: 'beanie', body: palette.sand, rim: 'left', seed: 's5au/b3'},
-  {x: 935, y: 1548, head: 134, hair: 'short', hairColor: palette.ink, body: palette.tan, acc: ['collar'], rim: 'left', seed: 's5au/b4'},
-  {x: 1170, y: 1556, head: 130, hair: 'bun', hairColor: palette.tan, body: palette.sage, rim: 'left', seed: 's5au/b5'},
+  {x: 690, y: 1558, head: 132, hair: 'beanie', hairColor: palette.brown, body: palette.sand, acc: ['collar'], rim: 'left', seed: 's5au/b3'},
+  {x: 935, y: 1548, head: 134, hair: 'short', hairColor: palette.brown, body: palette.tan, acc: ['collar'], rim: 'left', seed: 's5au/b4'},
+  {x: 1170, y: 1556, head: 130, hair: 'curly', hairColor: palette.ink, body: palette.sage, acc: ['collar'], rim: 'left', seed: 's5au/b5'},
   // front row: heads 182-196 (~210 px), centres ~1660 (screen ~1774), the outer two cropped by the frame edges
   {x: 60, y: 1652, head: 192, hair: 'short', hairColor: palette.brown, body: palette.teal, acc: ['hood'], rim: 'right', seed: 's5au/f1'},
-  {x: 280, y: 1672, head: 182, hair: 'bun', hairColor: palette.tan, body: palette.sage, acc: ['collar'], rim: 'right', react: 'turn', seed: 's5au/f2'},
+  {x: 280, y: 1672, head: 182, hair: 'short', bun: true, hairColor: palette.tan, body: palette.sage, acc: ['collar'], rim: 'right', react: 'turn', seed: 's5au/f2'},
   {x: 808, y: 1664, head: 186, hair: 'cap', body: palette.tan, rim: 'left', react: 'look', seed: 's5au/f3'},
-  {x: 1012, y: 1646, head: 196, hair: 'long', hairColor: palette.brown, body: palette.teal, rim: 'left', seed: 's5au/f4'},
-  {x: 1290, y: 1660, head: 188, hair: 'short', hairColor: palette.ink, body: palette.sand, acc: ['hood'], rim: 'left', seed: 's5au/f5'},
+  {x: 1012, y: 1646, head: 196, hair: 'long', hairColor: palette.brown, body: palette.teal, acc: ['collar'], rim: 'left', seed: 's5au/f4'},
+  {x: 1290, y: 1660, head: 188, hair: 'short', hairColor: palette.tan, body: palette.sand, acc: ['hood'], rim: 'left', seed: 's5au/f5'},
 ];
+
+/** EdgeOnlooker's idle bob (props Figures.tsx: osc(t, 0.5, rand(seed, 'b') x 6) x bob): the bun rides it. */
+const BOB = 1.2;
+const bobAt = (t: number, seed: string) => osc(t, 0.5, rand(seed, 'b') * 6) * BOB;
+
+/** A bun on top of the head (kit proportions: centre 1.12 r above the head centre, r 0.38), REGISTERED (fill and ring
+ *  on one path), and a peach hair tie at its base. Ink at the onlooker's depth weight (front 4.8 screen px). */
+const Bun: React.FC<{h: Head}> = ({h}) => {
+  const t = useTime();
+  const hr = h.head / 2;
+  const cx = h.x;
+  const cy = h.y + bobAt(t, h.seed) - hr * 1.1;
+  const br = hr * 0.37;
+  const W = DEPTH_INK.front; // the onlooker head outline weight (world px, as EdgeOnlooker passes it)
+  const d = blob(cx, cy, br, br * 0.94, {seed: `${h.seed}/bun`});
+  const ring = circle(cx, cy, br, {seed: `${h.seed}/bunI`, overlap: 6});
+  const tie = roundRect(cx - br * 0.62, cy + br * 0.62, br * 1.24, br * 0.42, br * 0.16);
+  return (
+    <>
+      <Fill d={d} color={h.hairColor ?? palette.brown} offset={false} mode="none" seed={`${h.seed}/bunF`} />
+      <Ink d={ring} width={W} seed={`${h.seed}/bunR`} />
+      <Fill d={tie} color={palette.peach} offset={false} mode="none" seed={`${h.seed}/tieF`} />
+      <Ink d={tie} width={W * 0.7} taper={false} vary={0} seed={`${h.seed}/tieI`} />
+    </>
+  );
+};
 
 /** The neck line (head centre + this x head diameter): the split between the head (posed) and the coat (still). */
 const neckK = (h: Head) => (h.hair === 'cap' ? 0.6 : 0.42);
@@ -72,7 +106,12 @@ export const Audience: React.FC<{b: Beats}> = ({b}) => {
   return (
     <>
       {HEADS.map((h) => {
-        const node = <EdgeOnlooker x={h.x} y={h.y} head={h.head} hair={h.hair} hairColor={h.hairColor} body={h.body} acc={h.acc} rim={h.rim} arms="near" bob={1.2} seed={h.seed} />;
+        const node = (
+          <>
+            <EdgeOnlooker x={h.x} y={h.y} head={h.head} hair={h.hair} hairColor={h.hairColor} body={h.body} acc={h.acc} rim={h.rim} arms="near" bob={BOB} seed={h.seed} />
+            {h.bun ? <Bun h={h} /> : null}
+          </>
+        );
         const m = poseM(h, t, b);
         return m ? (
           <NeckSplit key={h.seed} x={h.x} y={h.y + neckK(h) * h.head} m={m}>

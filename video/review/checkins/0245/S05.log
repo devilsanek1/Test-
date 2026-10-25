@@ -1,0 +1,112 @@
+[Tab 0, node_modules/react-dom/cjs/react-dom.production.min.js:187] Error: Minified React error #130; visit https://reactjs.org/docs/error-decoder.html?invariant=130&args[]=undefined&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at Rg (http://localhost:3000/bundle.js:33350:64)
+    at q (http://localhost:3000/bundle.js:33186:464)
+    at n (http://localhost:3000/bundle.js:33189:331)
+    at J (http://localhost:3000/bundle.js:33193:334)
+    at Xi (http://localhost:3000/bundle.js:33239:308)
+    at Vk (http://localhost:3000/bundle.js:33338:201)
+    at Uk (http://localhost:3000/bundle.js:33327:389)
+    at Tk (http://localhost:3000/bundle.js:33327:320)
+    at Ik (http://localhost:3000/bundle.js:33327:180)
+    at Nk (http://localhost:3000/bundle.js:33318:88)
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+SymbolicateableError: Minified React error #130; visit https://reactjs.org/docs/error-decoder.html?invariant=130&args[]=undefined&args[]= for the full message or use the non-minified dev environment for full errors and additional helpful warnings.
+    at Rg (http://localhost:3000/bundle.js:33350:64)
+    at q (http://localhost:3000/bundle.js:33186:464)
+    at n (http://localhost:3000/bundle.js:33189:331)
+    at J (http://localhost:3000/bundle.js:33193:334)
+    at Xi (http://localhost:3000/bundle.js:33239:308)
+    at Vk (http://localhost:3000/bundle.js:33338:201)
+    at Uk (http://localhost:3000/bundle.js:33327:389)
+    at Tk (http://localhost:3000/bundle.js:33327:320)
+    at Ik (http://localhost:3000/bundle.js:33327:180)
+    at Nk (http://localhost:3000/bundle.js:33318:88) {
+  stackFrame: [
+    {
+      columnNumber: 63,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Rg',
+      lineNumber: 33349
+    },
+    {
+      columnNumber: 463,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'q',
+      lineNumber: 33185
+    },
+    {
+      columnNumber: 330,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'n',
+      lineNumber: 33188
+    },
+    {
+      columnNumber: 333,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'J',
+      lineNumber: 33192
+    },
+    {
+      columnNumber: 307,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Xi',
+      lineNumber: 33238
+    },
+    {
+      columnNumber: 200,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Vk',
+      lineNumber: 33337
+    },
+    {
+      columnNumber: 388,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Uk',
+      lineNumber: 33326
+    },
+    {
+      columnNumber: 319,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Tk',
+      lineNumber: 33326
+    },
+    {
+      columnNumber: 179,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Ik',
+      lineNumber: 33326
+    },
+    {
+      columnNumber: 87,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Nk',
+      lineNumber: 33317
+    },
+    {
+      columnNumber: 428,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'Gk',
+      lineNumber: 33314
+    },
+    {
+      columnNumber: 202,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'J',
+      lineNumber: 33556
+    },
+    {
+      columnNumber: 127,
+      fileName: 'http://localhost:3000/bundle.js',
+      functionName: 'R',
+      lineNumber: 33557
+    }
+  ],
+  delayRenderCall: null,
+  frame: 0,
+  chunk: null
+}
+
+Node.js v22.22.0

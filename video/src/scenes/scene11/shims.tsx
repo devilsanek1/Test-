@@ -1,11 +1,14 @@
 // S11 local pieces around shared kit pieces. No opacity anywhere: rotations, scales, pops.
 //   NoteBreeze  the J6 sticky note flutters on its adhesive top edge in a breeze (a damped swing about its top) and jolts
 //               under the pen as the strike starts. Applied OUTSIDE the shared StickyNote so the prop stays untouched.
-//   NoteFlight  the note's drop from behind govB's cornice (clipped there), blank back out, flipping to the lettered
+//   NoteFlight  the note's drop from behind govB's cornice (clipped there), its back out, flipping to the lettered
 //               face on the slap (the shared StickyNote's flutter shows the lettering in flight and pops in mid-air).
+//   NoteBack    the note's back for the flight: a squarer sheet, sand glue band, the lettering showing through mirrored
+//               in flat sand, a curled corner (fix round 3: the plain cream back read as an empty placeholder card).
 //   NoteStrike  the J6 strike-through: ONE marker stroke (~4 px) along the x-height centre (StickyNote's own is ~3 px
 //               and has no width option), the letters stay readable above and below it.
-//   StepRipple  the SunPress ripple with a stepped width (PressRipple thins to sub-pixel grey: reads as a fade).
+//   StepRipple  the SunPress ripple as a flat peach band expanding in 3 discrete steps (12 / 8 / 4 px): the house glow
+//               language (PressRipple is an ink ring thinning to sub-pixel grey: reads as a fade / a UI outline).
 //   PadlockRock the S01 padlock (the shared ShutterPadlock, S01's size / seed) rocking on its shackle (+-6 deg): Bit's
 //               weight / tap. ShutterPadlock has no rock of its own.
 //   TagTwirl    the S01 lettered 'back soon' tag (the shared BackSoonTag, one line, white) twirling in the breeze as a
@@ -106,6 +109,46 @@ export const NoteFlight: React.FC<{
   );
 };
 
+// ---------------------------------------------------------------- NoteBack
+
+/** The J6 note's BACK, shown while it falls (fix round 3: the plain cream card read as an empty placeholder): a squarer
+ *  sheet (`w` x `h` world, ~210 x 200 px on screen), the sand adhesive band across its top ~20 % (the glue is on the
+ *  back), the face's lettering showing through MIRRORED as flat sand glyphs (no opacity: a flat colour one step off the
+ *  paper), one curled corner (bottom-left: the face's bottom-right, seen from behind) and the ink outline. Drawn about
+ *  its rest centre (x, y) with the note's tilt, like the StickyNote it flips to. */
+export const NoteBack: React.FC<{x: number; y: number; w: number; h: number; rot: number; lines: string[]; fontSize: number; inkPx: number; seed?: string}> = ({x, y, w, h, rot, lines, fontSize, inkPx, seed = 's11/noteback'}) => {
+  useCaptionFont();
+  const k = Math.max(1e-4, matScale(useXf()));
+  const iw = inkPx / k;
+  const x0 = -w / 2;
+  const y0 = -h / 2;
+  const x1 = w / 2;
+  const y1 = h / 2;
+  const c = Math.min(w, h) * 0.17; // the curl
+  const body = `M${x0} ${y0}L${x1} ${y0}L${x1} ${y1}L${x0 + c} ${y1}L${x0} ${y1 - c}Z`;
+  const flap = `M${x0 + c} ${y1}L${x0} ${y1 - c}L${x0 + c * 0.92} ${y1 - c * 0.92}Z`;
+  const band = `M${x0} ${y0}L${x1} ${y0}L${x1} ${y0 + h * 0.2}L${x0} ${y0 + h * 0.2}Z`;
+  // the show-through: the face's two lines, mirrored, centred under the band
+  const pitch = fontSize * 1.08;
+  const top = y0 + h * 0.2 + (h * 0.8 - pitch * (lines.length - 1)) / 2 + fontSize * 0.3;
+  return (
+    <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot))}>
+      <Fill d={body} color={palette.cream} offset={false} mode="none" seed={`${seed}/p`} />
+      <Fill d={band} color={palette.sand} offset={false} mode="none" seed={`${seed}/band`} />
+      <g transform="scale(-1 1)">
+        {lines.map((ln, i) => (
+          <text key={i} x={0} y={top + i * pitch} fontFamily={captionFontStack} fontSize={fontSize} fill={palette.sand} textAnchor="middle">
+            {ln}
+          </text>
+        ))}
+      </g>
+      <Ink d={body} width={iw} taper={false} vary={0} open={0.06} seed={`${seed}/o`} />
+      <Fill d={flap} color={palette.sand} offset={false} mode="none" seed={`${seed}/fl`} />
+      <Ink d={flap} width={iw * 0.8} taper={false} vary={0} seed={`${seed}/fli`} />
+    </XG>
+  );
+};
+
 // ---------------------------------------------------------------- NoteStrike
 
 /** The J6 strike-through drawn by the scene: ONE marker stroke at `widthPx` (screen px, ~4: inkBold-ish) along the
@@ -152,15 +195,15 @@ export const NoteStrike: React.FC<{
 
 // ---------------------------------------------------------------- StepRipple
 
-/** The SunPress ripple ring with a STEPPED width (the shared PressRipple thins to sub-pixel and anti-aliases into a
- *  translucent grey ring: reads as a fade). r -> r + grow over `dur`; width per frame from `widths` (screen px when drawn
- *  in screen space), then gone in one frame. */
-export const StepRipple: React.FC<{cx: number; cy: number; r: number; at: number; grow?: number; dur?: number; widths?: number[]}> = ({cx, cy, r, at, grow = 40, dur = 0.2, widths = [3.4, 3.4, 2.6, 2.6, 1.8, 1.8]}) => {
+/** The SunPress ripple in the house glow language (fix round 3: a flat stepped band, not an ink hairline): a flat PEACH
+ *  ring band that expands in discrete steps, one radius + width per step (`radii` / `widths`, screen px when drawn in
+ *  screen space), each held `dur / steps` (2 frames at the default 0.2 s), then gone in one frame. No ink, no fade. */
+export const StepRipple: React.FC<{cx: number; cy: number; at: number; radii?: number[]; widths?: number[]; dur?: number; color?: string}> = ({cx, cy, at, radii = [124, 146, 168], widths = [12, 8, 4], dur = 0.2, color = palette.peach}) => {
   const t = useTime();
   if (t < at || t >= at + dur) return null;
-  const q = E.outCubic((t - at) / dur);
-  const i = Math.min(widths.length - 1, Math.floor(((t - at) / dur) * widths.length));
-  return <circle cx={cx} cy={cy} r={r + grow * q} fill="none" stroke={palette.ink} strokeWidth={widths[i]} />;
+  const n = Math.min(radii.length, widths.length);
+  const i = Math.min(n - 1, Math.floor(((t - at) / dur) * n));
+  return <circle cx={cx} cy={cy} r={radii[i]} fill="none" stroke={color} strokeWidth={widths[i]} />;
 };
 
 // ---------------------------------------------------------------- Sparkle

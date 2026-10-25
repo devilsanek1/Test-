@@ -1,9 +1,9 @@
 // S11 near-plane and depth helpers (fix round 1):
-//   NearLamp     the plaza's lamp post at the LEFT frame edge (SCREEN space: a foreground layer the 4 % push / 3 % lean
-//                barely moves): a slim tealDark post from below the frame to a WHOLE cream lantern head at screen x ~3-77,
-//                y 832-962 (under the caption band; fix round 2: the head is fully in frame and the post stands 29 px in
-//                from the edge, so it reads as a lamp, not a frame border), a short crossbar (the bar S12's pigeons land
-//                on). Its lantern pops off (cream -> sand) with the switch-off ripple. Pip's in-hop passes BEHIND it.
+//   NearLamp     the plaza's lamp post near the LEFT frame edge (SCREEN space: a foreground layer the 4 % push / 3 % lean
+//                barely moves): a slim tealDark post from below the frame to a WHOLE cream lantern head at screen x ~73-151,
+//                y 832-962 (under the caption band; fix round 3: moved in from x 3-77, clear of the film edge's bare left
+//                strip), a short crossbar (the bar S12's pigeons land on). Its lantern goes dark (cream -> tealDark) with
+//                the switch-off ripple. Pip's in-hop passes BEHIND it.
 //   StepTreads   ink for the plaza's far steps in the gap between govB and govD (world): the set leaves them as flat
 //                cream / sand stripes in colour (its step lines are paper-only), which at zoom 1.7 read as blinds. Three
 //                broken tread lines + a kerb line in the set's hand turn them back into steps.
@@ -19,7 +19,10 @@ import {blob, line, polyPath, rectPath} from '../../lib/sketch';
 
 // ---------------------------------------------------------------- NearLamp (screen px)
 
-const LAMP = {x: 40, w: 22, lantern: [878, 962] as [number, number], lw: 58, roofTop: 832, barY: 1012, barX1: 122};
+// fix round 3: the whole lamp stands at x >= 73 (post 101-123, roof 73-151, crossbar to 194). The film's paint edge
+// (FILM_EDGES paint-subtle, no S11 hints yet) leaves a bare strip at x < 54 on the left: at x 3-77 the lantern and post
+// were cut lengthways into line art and colour (EDGES.md: a lamp is never half colour, half line art)
+const LAMP = {x: 112, w: 22, lantern: [878, 962] as [number, number], lw: 58, roofTop: 832, barY: 1012, barX1: 194};
 
 export const NearLamp: React.FC<{offAt?: number; seed?: string}> = ({offAt, seed = 's11/lamp'}) => {
   const t = useTime();
@@ -53,7 +56,8 @@ export const NearLamp: React.FC<{offAt?: number; seed?: string}> = ({offAt, seed
   return (
     <>
       <Fill d={post + bar} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/post`} />
-      <Fill d={rectPath(x - lw / 2, ly0, lw, ly1 - ly0)} color={off ? palette.sand : palette.cream} offset={false} mode="none" seed={`${seed}/glass`} />
+      {/* lit: cream glass; off (fix round 3): the glass goes DARK (tealDark), a light going out, not a shade step */}
+      <Fill d={rectPath(x - lw / 2, ly0, lw, ly1 - ly0)} color={off ? palette.tealDark : palette.cream} offset={false} mode="none" seed={`${seed}/glass`} />
       <Fill d={roof + collar} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/roof`} />
       {/* a white glint stroke on the lit glass (off: none) */}
       {!off ? <path d={`M${x + 6} ${ly0 + 40}L${x + 18} ${ly0 + 14}`} fill="none" stroke={palette.white} strokeWidth={3.4} strokeLinecap="round" /> : null}
@@ -95,3 +99,22 @@ export const BandClip: React.FC<{y: number; x0: number; x1: number; id: string; 
     <g clipPath={`url(#${id})`}>{children}</g>
   </>
 );
+
+// ---------------------------------------------------------------- LitGlass (world)
+
+/** govB's lit glass for the lights-out beat (fix round 3: in daylight a one-step darker facade read as a passing cloud;
+ *  'off' now reads as LIGHT going out): the six drum window slots (the set's `drumSlits`: x 442 + 29 i, y 822, 9 x 34)
+ *  and the dome lantern's glass (inset inside the set's lantern ink, (508, 612, 20, 40)) are drawn LIT (peach slots, a
+ *  peach lantern core) over the set until their cascade frame; then the lantern core pops to tealDark (`lanternAt`) and
+ *  the slots hand back to the set's own tealDark slits (`drumAt`). Flat colours, one-frame pops. */
+export const LitGlass: React.FC<{lanternAt: number; drumAt: number; seed?: string}> = ({lanternAt, drumAt, seed = 's11/lit'}) => {
+  const t = useTime();
+  let slots = '';
+  for (let i = 0; i < 6; i++) slots += rectPath(442 + i * 29, 822, 9, 34);
+  return (
+    <>
+      {t < drumAt ? <Fill d={slots} color={palette.peach} offset={false} mode="none" seed={`${seed}/slots`} /> : null}
+      <Fill d={rectPath(511, 616, 14, 32)} color={t < lanternAt ? palette.peach : palette.tealDark} offset={false} mode="none" seed={`${seed}/lantern`} />
+    </>
+  );
+};

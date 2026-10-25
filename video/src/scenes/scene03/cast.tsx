@@ -9,11 +9,12 @@ import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {blob} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
-import {ElephantTimeline, PoseKey} from '../../lib/mascot';
+import {ElephantTimeline, PoseKey, popSwitch, poseAt} from '../../lib/mascot';
 import {BLUEPRINT, popUpK} from '../shared/sets';
 import {Bit, Citizen, EdgeOnlooker} from '../shared/props';
 import type {Acc, Hair} from '../../lib/kit';
-import type {Beats} from './beats';
+import {beats, type Beats} from './beats';
+import {CAM_REST} from './camera';
 import {ROOF_SIGN, signAngle} from './plan';
 import type {Pt} from '../../lib/sketch';
 
@@ -23,12 +24,14 @@ const PIP_SCALE = 1.2;
 /** Where Pip is on the hard cut: S02 hops him off its rod perch (screen ~(843, 689)) toward the lens at
  *  cut(password)-0.04. Fix round 2: S03 picks him up HIGH, against the far haze above the horizon (world (830, 905) =
  *  screen (830, 915) at the rest camera, clear of the sun's disc; was (700, 1010), on the horizon line, where he read as
- *  a small elephant standing far away), already falling (vy0 +400 px/s: S02's down-left take-off continued) and dropping
- *  onto the stamp's rump: dx -410, dy 500 in 0.362 s, g ~5,300 px/s2, landing at ~78 px/frame (motion_spec #25: g
- *  3,000-8,000, <= ~93 px/frame).
+ *  a small elephant standing far away), already falling and dropping onto the stamp's rump: dx -410, dy 500 in 0.362 s.
+ *  Fix round 2b (finding: his fall lost speed across the cut, ~54 -> ~14 px/frame, a 3-frame float): vy0 +700 px/s
+ *  (was +400), so g ~3,760 px/s2 (motion_spec #25: 3,000-8,000) and one frame before the cut he is already falling at
+ *  ~+600 px/s; landing at ~69 px/frame on 'in'. S02 aims its hop-out at `pipDropState` (one ballistic arc: S02 must
+ *  re-read it, see docs/scenes/S03.md).
  *  His shadow grows on the plan under the landing point while he falls (PipShadow). */
-const PIP_FROM: Pt = [830, 905];
-const PIP_VY0 = 400;
+export const PIP_FROM: Pt = [830, 905];
+export const PIP_VY0 = 700;
 /** Fix round 1: Pip sits on the stamp's RUMP (its right end), not its centre (BLUEPRINT.pip (350, 1420) hid ~80 % of
  *  the print): the reversed-out elephant faces left, so its trunk, ear and legs stay clear (and his ear clears the title
  *  card). Screen at the 1.04 lock: (410.0, 1438.4), where he crouches on the cut (S04 continues from there). */
@@ -37,12 +40,28 @@ export const PIP_AT: Pt = [420, 1405];
  *  settle-hop so he never flips across the cut (import this). */
 export const PIP_CUT_FLIP = true;
 
+/** Max total squash (incl. the pose pops) so Pip's head keeps its silhouette (sy >= 0.75). */
+const SQUASH_CAP = 0.25;
+
 /** Ballistic drop with an initial upward kick vy0 (px/s) landing exactly at `to` after T. */
 function drop(t: number, t0: number, T: number, from: Pt, to: Pt, vy0: number): Pt {
   const u = clamp((t - t0) / T);
   const tau = u * T;
   const g = (2 * (to[1] - from[1] - vy0 * T)) / (T * T);
   return [lerp(from[0], to[0], u), from[1] + vy0 * tau + 0.5 * g * tau * tau];
+}
+
+/** Pip's drop at scene-local time `tl` (negative = before the cut, e.g. S02's last frame), in SCREEN px under S03's rest
+ *  camera (540, 950, 1.0), and his velocity (screen px/s): the hand-off point S02's hop-out must land on (position AND
+ *  velocity), e.g. `pipDropState(LAST_FRAME_ABS - 8.393)`. */
+export function pipDropState(tl: number): {screen: Pt; v: Pt} {
+  const b = beats();
+  const T = b.pipLand - b.cut;
+  const vx = (PIP_AT[0] - PIP_FROM[0]) / T;
+  const g = (2 * (PIP_AT[1] - PIP_FROM[1] - PIP_VY0 * T)) / (T * T);
+  const x = PIP_FROM[0] + vx * tl;
+  const y = PIP_FROM[1] + PIP_VY0 * tl + 0.5 * g * tl * tl;
+  return {screen: [x - CAM_REST.x + 540, y - CAM_REST.y + 960], v: [vx * CAM_REST.zoom, (PIP_VY0 + g * tl) * CAM_REST.zoom]};
 }
 
 /** Bounce in place: height h, airtime T, from t0. Returns the lift (px, up positive) and the airborne flag. */
@@ -79,6 +98,18 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
   const b2 = {at: printLand + 0.4, T: 0.25, h: 16};
   const settle = b2.at + b2.T;
 
+  const keys: PoseKey[] = [
+    {t: -10, pose: 'stand-side', amount: 0.85},
+    {t: b.pipLand, pose: 'sit-back', look: 0.25},
+    // 'loves': pride, straight-faced: sit-front, happy (closed eyes-smile + closed smile), the lean back + chest stretch
+    {t: b.loves, pose: 'sit-front', expression: 'happy', look: 0},
+    {t: b.proudOff, pose: 'sit-front', expression: 'happy', look: 0.3},
+    // 'run': the glance down the street (fix round 2b: 'happy' closed eye-smiles hid the look: open eyes, look 0.7, and a
+    // +5 deg lean toward the VP below)
+    {t: b.run, pose: 'sit-front', expression: 'neutral', look: 0.7},
+    {t: b.pipHop, pose: 'stand-side', amount: 0},
+  ];
+
   let x = PIP_AT[0];
   let y = PIP_AT[1];
   let squash = 0;
@@ -100,18 +131,20 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
     // -7 deg lean back, out-back in, held to proudOff, then back)
     if (t >= b.loves && t < b.loves + 0.3) squash += -0.1 * (1 - E.outCubic((t - b.loves) / 0.3));
     if (t >= b.loves) rotate = -7 * E.outBack(1.6)(prog(t, b.loves, 0.16)) * (1 - E.inOutSine(prog(t, b.proudOff, 0.14)));
+    // 'run': the glance down the street: a +5 deg lean toward the VP (out-back, 0.25 s), eased back in the 0.1 s before
+    // the hop-off pop
+    if (t >= b.run) rotate += 5 * E.outBack(1.6)(prog(t, b.run, 0.25)) * (1 - E.inOutSine(prog(t, b.pipHop - 0.1, 0.1)));
     // the hop-off crouch (S04 owns the leap: take-off after the cut)
     if (t >= b.pipHop) squash += 0.2 * Math.sin((Math.min(1, (t - b.pipHop) / 0.14) * Math.PI) / 2);
   }
-  const keys: PoseKey[] = [
-    {t: -10, pose: 'stand-side', amount: 0.85},
-    {t: b.pipLand, pose: 'sit-back', look: 0.25},
-    // 'loves': pride, straight-faced: sit-front, happy (closed eyes-smile + closed smile), the lean back + chest stretch
-    {t: b.loves, pose: 'sit-front', expression: 'happy', look: 0},
-    {t: b.proudOff, pose: 'sit-front', expression: 'happy', look: 0.3},
-    {t: b.run, pose: 'sit-front', expression: 'happy', look: 0.7},
-    {t: b.pipHop, pose: 'stand-side', amount: 0},
-  ];
+  // fix round 2b (finding: on the landing frames the sit-back pop (0.14) + the landing squash (0.26) flattened his head
+  // into his body, ~55 % head height): the TOTAL squash, the timeline's pose pops included, is capped at 0.25, so he
+  // stays on model on the impact frame
+  {
+    const {cur, prev, next} = poseAt(keys, t);
+    const pops = (prev ? popSwitch(t, cur.t) : 0) + (next ? popSwitch(t, next.t) : 0);
+    squash = Math.min(squash, SQUASH_CAP - pops);
+  }
   // faces left while dropping in; polish round 1: faces LEFT again from the hop-off pop, the way S04 carries him (S04's
   // settle-hop travels left, screen x ~425 -> ~374): PIP_CUT_FLIP is the contract (S04 keeps flip = true to its landing)
   const flip = t < b.pipLand || (PIP_CUT_FLIP && t >= b.pipHop);
@@ -240,22 +273,38 @@ export const StreetLife: React.FC<{b: Beats}> = ({b}) => {
   );
 };
 
-/** The near walkers' sleeve ends (polish round 1: the kit's hanging hand read as a bare circle under a hairline cuff at
- *  this size): a cuff band one step darker than the coat across the sleeve, just above the hand (the hand comes out of
- *  it). Offsets from the head centre, from the kit EdgeOnlooker geometry for these seeds / head sizes (personGeo:
- *  's03/nearL' w 90.1, s 2.323, the near (right) sleeve x +67..+105, sleeve end +264.6; 's03/nearR' w 99.4, s 2.191, the
- *  near (left) sleeve x -109..-70, sleeve end +276.7). If the seed, head size or kit geometry changes, re-measure. */
-const NEAR_CUFF = {L: {x0: 66, x1: 107, y: 264.6}, R: {x0: -110, x1: -69, y: 276.7}};
-const SleeveCuff: React.FC<{x: number; y: number; band: {x0: number; x1: number; y: number}; color: string; seed: string}> = ({x, y, band, color, seed}) => {
-  const x0 = x + band.x0;
-  const x1 = x + band.x1;
-  const yb = y + band.y + 2;
-  const yt = yb - 15;
-  const d = `M${x0} ${yt}L${x1} ${yt + 1}L${x1 - 1} ${yb}Q${(x0 + x1) / 2} ${yb + 3} ${x0 + 1} ${yb}Z`;
+/** The near walkers' sleeve ends. Fix round 2b (finding: each sleeve ended in a bare sand disc under a cuff band, a
+ *  'lollipop' hand; ref-2's back-view people show no hands, style bible 6): the hand is TUCKED: a coat-coloured patch
+ *  covers the kit's hand disc below the sleeve end (the kit's cuff line stays as the sleeve's edge) and a short pocket
+ *  welt under it, slanting toward the body, so the hand reads as in the coat pocket. Offsets from the head centre, from
+ *  the kit EdgeOnlooker geometry for these seeds / head sizes (personGeo: 's03/nearL' w 90.1, s 2.323, the near (right)
+ *  sleeve x +67..+105, sleeve end +264.6, hand disc to ~+305; 's03/nearR' w 99.4, s 2.191, the near (left) sleeve x
+ *  -109..-70, sleeve end +276.7, hand disc to ~+318). If the seed, head size or kit geometry changes, re-measure. */
+const NEAR_CUFF = {
+  // seam: the sleeve's inner seam line (kept), rim: the white rim strip (redrawn over the patch), outer: the coat's
+  // outline (kept), y: the sleeve end (the kit's cuff line, redrawn); measured from renders (fix round 2b)
+  L: {seam: 68.4, rim: [100.4, 102.4], outer: 103.2, y: 264.6, side: 1},
+  R: {seam: -71.6, rim: [-108.4, -105.6], outer: -109.2, y: 276.7, side: -1},
+};
+const SleevePocket: React.FC<{x: number; y: number; band: (typeof NEAR_CUFF)['L']; coat: string; seed: string}> = ({x, y, band, coat, seed}) => {
+  const sx = band.side;
+  const xs = x + band.seam;
+  const xo = x + band.outer;
+  const yc = y + band.y;
+  const [xa, xb] = [Math.min(xs, xo), Math.max(xs, xo)];
+  // the patch: from just above the cuff line (the disc's top showed over it) to below the hand disc's ink, between the
+  // seam and the outline (both kept)
+  const patch = `M${xa} ${yc - 6}L${xb} ${yc - 6}L${xb} ${yc + 46}L${xa} ${yc + 46}Z`;
+  const rim = `M${x + band.rim[0]} ${yc - 7}L${x + band.rim[1]} ${yc - 7}L${x + band.rim[1]} ${yc + 47}L${x + band.rim[0]} ${yc + 47}Z`;
+  const cuff = `M${xs} ${yc + 0.6}L${xo - sx * 1.5} ${yc}`;
+  // the pocket welt: a short slanted stroke under the sleeve end, running in toward the body
+  const welt = sx > 0 ? `M${xs - 18} ${yc + 17}Q${(xs + xo) / 2 - 8} ${yc + 13} ${xo - 3} ${yc + 8}` : `M${xo + 3} ${yc + 8}Q${(xs + xo) / 2 + 8} ${yc + 13} ${xs + 18} ${yc + 17}`;
   return (
     <>
-      <Fill d={d} color={color} offset={false} mode="none" seed={`${seed}/f`} />
-      <Ink d={`M${x0 + 1} ${yb}Q${(x0 + x1) / 2} ${yb + 3} ${x1 - 1} ${yb}M${x0 + 2} ${yt}L${x1 - 2} ${yt + 1}`} width={3.2} taper={false} seed={`${seed}/i`} />
+      <Fill d={patch} color={coat} offset={false} mode="none" seed={`${seed}/f`} />
+      <Fill d={rim} color={palette.white} offset={false} mode="none" seed={`${seed}/r`} />
+      <Ink d={cuff} width={2.9} taper={false} seed={`${seed}/c`} />
+      <Ink d={welt} width={3.2} taper={false} seed={`${seed}/i`} />
     </>
   );
 };
@@ -268,7 +317,8 @@ const SleeveCuff: React.FC<{x: number; y: number; band: {x0: number; x1: number;
  *  Fix round 2 (they read as flat slabs): both carry their arms again (the near arm: sleeve seam, cuff, sand hand), the
  *  left one a HOOD over short hair and a diagonal bag STRAP, the right one her bun over a coat COLLAR; each has the 3 px
  *  white rim strip on its sun side (the sun is between them: the left figure's right edge, the right figure's left
- *  edge); and both sit 40 px lower so the corners hold head + shoulders + upper arm. */
+ *  edge); and both sit 40 px lower so the corners hold head + shoulders + upper arm.
+ *  Fix round 2b: no hand discs: the hands are tucked into the coat pockets (SleevePocket). */
 export const NearWalkers: React.FC<{b: Beats}> = ({b}) => {
   const t = useTime();
   const slide = (side: number, delay: number) => (1 - E.outCubic(prog(t, b.everyone + delay, 0.3))) * 260 * side;
@@ -284,11 +334,11 @@ export const NearWalkers: React.FC<{b: Beats}> = ({b}) => {
     <>
       <XG m={mat.compose(mat.translate(slide(-1, 0), bobY(0) + idle(0.4)), mat.about(mat.rotate(turn(-1)), ...neck(L, 104)))}>
         <EdgeOnlooker x={L[0]} y={L[1]} head={104} hair="short" acc={['hood', 'strap']} body={palette.teal} rim="right" arms="near" bob={0} seed="s03/nearL" />
-        <SleeveCuff x={L[0]} y={L[1]} band={NEAR_CUFF.L} color={palette.tealDark} seed="s03/cuffL" />
+        <SleevePocket x={L[0]} y={L[1]} band={NEAR_CUFF.L} coat={palette.teal} seed="s03/pocketL" />
       </XG>
       <XG m={mat.compose(mat.translate(slide(1, 0.04), bobY(0.04) + idle(2.1)), mat.about(mat.rotate(turn(1)), ...neck(R, 112)))}>
         <EdgeOnlooker x={R[0]} y={R[1]} head={112} hair="bun" acc={['collar']} body={palette.tan} rim="left" arms="near" bob={0} seed="s03/nearR" />
-        <SleeveCuff x={R[0]} y={R[1]} band={NEAR_CUFF.R} color={palette.brown} seed="s03/cuffR" />
+        <SleevePocket x={R[0]} y={R[1]} band={NEAR_CUFF.R} coat={palette.tan} seed="s03/pocketR" />
       </XG>
     </>
   );

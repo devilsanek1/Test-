@@ -238,11 +238,13 @@ export const YearFlyers: React.FC<{tears: number[]; until: number; life?: number
       return;
     }
     const q = (t - ta - FLIP) / (life - FLIP);
-    const dx = lerp(0, 30 + r('x') * 60, E.outCubic(q));
-    const dy = lerp(-h * 0.7, -(h * 0.7 + 60 + r('y') * 50), E.outQuad(q)) + 24 * q * q;
-    const rot = (r('r') - 0.4) * 50 * q + 10 * Math.sin(q * 9 + r('p') * 6);
-    const sc = 1 - 0.7 * E.inQuad(q);
-    const fl = -0.7 + 0.5 * Math.sin(q * 7 + r('f') * 6);
+    // it turns over to its FRONT (the year grid) within the first 30 % and flutters (front out), drifting up and a
+    // little right while it shrinks away (into the distance): a page off THAT calendar, not a loose leaflet
+    const dx = lerp(0, 24 + r('x') * 46, E.outCubic(q));
+    const dy = lerp(-h * 0.7, -(h * 0.7 + 40 + r('y') * 40), E.outQuad(q)) + 20 * q * q;
+    const rot = (r('r') - 0.4) * 40 * q + 8 * Math.sin(q * 9 + r('p') * 6);
+    const sc = 1 - 0.68 * E.outQuad(q);
+    const fl = q < 0.3 ? lerp(-0.7, 0.9, E.inOutSine(q / 0.3)) : 0.9 - 0.25 * Math.abs(Math.sin((q - 0.3) * 8 + r('f') * 6));
     out.push(
       <XG key={i} m={mat.compose(mat.translate(top[0] + dx + (w * (1 - sc)) / 2, top[1] + dy), mat.rotate(rot), mat.scale(sc, sc * fl))}>
         <YearPage w={w} h={h} seed={`${seed}/${i % 3}`} back={fl < 0} />
@@ -324,7 +326,8 @@ export const WindowLife: React.FC<{tears: number[]; seed?: string}> = ({tears, s
 
 const TREAD = 9; // StoopStreet's tread depth
 /** Re-tones the set's two steps so the stoop reads as STEPS, not a podium (fix round: treads and risers were one cream
- *  value): cream treads (lit from above), sand risers a step darker, misregistered right / down a little; then the
+ *  value): cream treads (lit from above), a sand strip a step darker across each riser's top (the shadow under the
+ *  nosing), misregistered right / down a little, over the cream riser face; then the
  *  stoop's own ink is redrawn on top (the same `line` calls and seeds as the set's Stoop, so it is pixel-identical).
  *  Draw it first in the hero slot (over the set's Stoop, under everything on the steps). */
 export const StepTones: React.FC<{seed?: string}> = ({seed = 'stoop/stoop'}) => {
@@ -333,13 +336,15 @@ export const StepTones: React.FC<{seed?: string}> = ({seed = 'stoop/stoop'}) => 
   const tread = (x: number, y: number, w: number) => polyPath([[x - 6, y - TREAD], [x + w + 6, y - TREAD], [x + w, y], [x, y]]);
   const ink2 = line(s2x - 8, s2y - TREAD, s2x + s2w + 8, s2y - TREAD, {seed: `${seed}/i2a`, over: [3, 6]}) + line(s2x - 2, s2y, s2x + s2w + 4, s2y, {seed: `${seed}/i2b`, over: [2, 4]}) + line(s2x, s2y, s2x, s2y + s2h, {seed: `${seed}/i2c`, over: [0, 0]}) + line(s2x + s2w, s2y, s2x + s2w, s2y + s2h, {seed: `${seed}/i2d`, over: [0, 0]});
   const ink1 = line(s1x - 8, s1y - TREAD, s1x + s1w + 8, s1y - TREAD, {seed: `${seed}/i1a`, over: [3, 6]}) + line(s1x - 2, s1y, s1x + s1w + 4, s1y, {seed: `${seed}/i1d`, over: [2, 4]}) + line(s1x, s1y, s1x, s1y + s1h, {seed: `${seed}/i1e`, over: [0, 0]}) + line(s1x + s1w, s1y, s1x + s1w, s1y + s1h, {seed: `${seed}/i1g`, over: [0, 0]});
+  // the strip: the riser's top ~30 % (the shadow under the tread's nosing), misregistered a little right / down
+  const strip = (x: number, y: number, w: number, h: number) => rectPath(x + 1, y + 1, w - 2, h * 0.3);
   return (
     <>
       <Fill d={tread(s2x, s2y, s2w)} color={palette.cream} offset={false} mode="none" seed="s4/t2" />
-      <Fill d={rectPath(s2x + 1, s2y + 1, s2w - 2, s2h - 1)} color={palette.sand} offset={[3, 2]} mode="none" seed="s4/r2" />
+      <Fill d={strip(s2x, s2y, s2w, s2h)} color={palette.sand} offset={[3, 2]} mode="none" seed="s4/r2" />
       <Ink d={ink2} width={SI.mid} seed="s4/i2" />
       <Fill d={tread(s1x, s1y, s1w)} color={palette.cream} offset={false} mode="none" seed="s4/t1" />
-      <Fill d={rectPath(s1x + 1, s1y + 1, s1w - 2, s1h - 1)} color={palette.sand} offset={[3, 0]} mode="none" seed="s4/r1" />
+      <Fill d={strip(s1x, s1y, s1w, s1h)} color={palette.sand} offset={[3, 2]} mode="none" seed="s4/r1" />
       <Ink d={ink1} width={SI.mid} seed="s4/i1" />
     </>
   );
@@ -423,3 +428,35 @@ export const SplitInk: React.FC<{y: number; x0?: number; node: React.ReactNode}>
     <ClipG d={except(above(y, x0))}>{node}</ClipG>
   </>
 );
+
+// ---------------------------------------------------------------- the browser window's flat chrome (dive)
+
+/** During the dive the hero's browser window is flat with the rest of the upper facade, and its chrome bar crosses the
+ *  captions: the kit's tealDark bar under ink lettering is ~2.4:1 (framecheck: 8 % of the band below 3:1), so in the
+ *  dive the bar is repainted one step lighter (teal, ~3.6:1) with its three dots and the address pill on top: still the
+ *  browser's chrome (the 'this is a website' cue never disappears), legible under the text. Geometry = BrowserChrome's
+ *  (bar min(30, 0.27 h), dots r 0.25 bar at 0.47 bar + i x 0.63 bar, the pill after them). Draw it in the hero slot
+ *  from the dive's first frame: it only shows in the flat copy (above the flatten line). */
+export const FlatChrome: React.FC<{on: boolean}> = ({on}) => {
+  if (!on) return null;
+  const [x, y, w, h] = STOOP.browser;
+  const bar = Math.min(30, h * 0.27);
+  const dr = bar * 0.25;
+  const sp = bar * 0.63;
+  const d0 = bar * 0.47;
+  const cy = y + bar / 2;
+  const px = d0 + 2 * sp + dr + bar * 0.38;
+  const pw = Math.max(bar, w - px - bar * 0.35);
+  const ph = bar * 0.6;
+  const dot = (i: number) => `M${x + d0 + i * sp - dr} ${cy}a${dr} ${dr} 0 1 0 ${2 * dr} 0a${dr} ${dr} 0 1 0 ${-2 * dr} 0Z`;
+  const pill = `M${x + px + ph / 2} ${cy - ph / 2}H${x + px + pw - ph / 2}a${ph / 2} ${ph / 2} 0 0 1 0 ${ph}H${x + px + ph / 2}a${ph / 2} ${ph / 2} 0 0 1 0 ${-ph}Z`;
+  return (
+    <>
+      <Fill d={rectPath(x - 3, y - 3, w + 6, bar + 4)} color={palette.teal} offset={false} mode="none" seed="s4/fc" />
+      <Fill d={dot(0)} color={palette.cream} offset={false} mode="none" seed="s4/fc0" />
+      <Fill d={dot(1)} color={palette.sage} offset={false} mode="none" seed="s4/fc1" />
+      <Fill d={dot(2)} color={palette.peach} offset={false} mode="none" seed="s4/fc2" />
+      <Fill d={pill} color={palette.cream} offset={false} mode="none" seed="s4/fcp" />
+    </>
+  );
+};

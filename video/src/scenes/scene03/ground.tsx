@@ -3,8 +3,9 @@
 //     rows, the dimension arrows along the kerbs and the title-block frame are inked from frame 0, plus plan furniture (two
 //     registration marks where the stamp will land, a dimension line under it, a north arrow, a few note lines, a small
 //     dimensioned footprint detail where the set's old title block was);
-//   - only the NEAR grid rows draw on, on the 'It's' lead (gridAt, 0.3 s): the plan completes far -> near, from the press
-//     house toward the viewer (storyboard 'It's'; the set draws near -> far);
+//   - only the NEAR grid rows draw on, on the 'It's' lead (gridAt): three depth bands, far -> near, 0.03 s apart (fix
+//     round 2b), done on 'It's': the plan completes as a wave from the press house toward the viewer (storyboard 'It's';
+//     the set draws near -> far); the far rows keep every second ray only (fix round 2b: the field thins with depth);
 //   - the set's old inked title block `tb` (world 190-470 x 1700-1860, a stray empty box once the v3 title-block CARD
 //     exists) is NOT drawn (sets request: skip `tb` when `titleBlock` is given).
 // The geometry (sheet, dog-ear, edge ink, margin, the three grid groups, the kerb dimension arrows, the title-block
@@ -47,8 +48,14 @@ const G = (() => {
     margin += `M${(x - 6).toFixed(1)} ${y.toFixed(1)}L${(x + 6).toFixed(1)} ${(y - 2).toFixed(1)}`;
   }
   const r = rng(`${s}/grid`);
-  const groups = ['', '', ''];
-  const grp = (y: number) => (y > 1560 ? 0 : y > 1330 ? 1 : 2);
+  // fix round 2b: the near group is split into three DEPTH BANDS (far -> near) that draw on 0.03 s apart (a wave rolling
+  // toward the lens on 'It's', not every near stroke at once: f2 read as a scatter of dashes); the far group keeps only
+  // every second ray (the field toward the horizon thins out: the footprints are the figure, the grid the ground)
+  const NEAR_CUTS = [1560, 1690, 1830, 2060];
+  const near = ['', '', ''];
+  let gridMid = '';
+  let gridFar = '';
+  const band = (y: number) => (y < NEAR_CUTS[1] ? 0 : y < NEAR_CUTS[2] ? 1 : 2);
   const broken = (x0: number, y0: number, x1: number, y1: number, key: string) => {
     const n = r.int(2, 4);
     let d = '';
@@ -64,17 +71,22 @@ const G = (() => {
   for (let k = 9; k >= 1; k--) {
     const y = VP[1] + (2060 - VP[1]) * Math.pow(k / 10, 1.6);
     if (y < yF + 30) continue;
-    groups[grp(y)] += broken(sL(y) - r.range(30, 60), y, sR(y) + r.range(30, 60), y, `${s}/x${k}`);
+    const d = broken(sL(y) - r.range(30, 60), y, sR(y) + r.range(30, 60), y, `${s}/x${k}`);
+    if (y > 1560) near[band(y)] += d;
+    else if (y > 1330) gridMid += d;
+    else gridFar += d;
   }
   for (let i = 0; i <= 22; i++) {
     const xb = -1500 + i * 190;
     const xAt = (y: number) => VP[0] + ((xb - VP[0]) * (y - VP[1])) / (2060 - VP[1]);
     if (xAt(yF) < sL(yF) + 10 || xAt(yF) > sR(yF) - 10) continue;
     const yT = yF - r.range(30, 60) * 0.5;
-    const cuts = [yT, 1330, 1560, 2060];
-    for (let g = 0; g < 3; g++) groups[2 - g] += broken(xAt(cuts[g]), cuts[g], xAt(cuts[g + 1]), cuts[g + 1], `${s}/r${i}/${g}`);
+    const far = broken(xAt(yT), yT, xAt(1330), 1330, `${s}/r${i}/0`);
+    if (i % 2 === 0) gridFar += far;
+    gridMid += broken(xAt(1330), 1330, xAt(1560), 1560, `${s}/r${i}/1`);
+    for (let g = 0; g < 3; g++) near[g] += broken(xAt(NEAR_CUTS[g]), NEAR_CUTS[g], xAt(NEAR_CUTS[g + 1]), NEAR_CUTS[g + 1], `${s}/r${i}/2${g}`);
   }
-  const [gridNear, gridMid, gridFar] = groups;
+  const gridNear = near;
   const dimL = arrow(sL(1250) + 34, 1250, sL(1480) + 40, 1480, {seed: `${s}/dl1`, head: 14}) + arrow(sL(1480) + 40, 1480, sL(1250) + 34, 1250, {seed: `${s}/dl2`, head: 14});
   const dimR = arrow(sR(1250) - 34, 1250, sR(1480) - 40, 1480, {seed: `${s}/dr1`, head: 14}) + arrow(sR(1480) - 40, 1480, sR(1250) - 34, 1250, {seed: `${s}/dr2`, head: 14});
   return {sheet, dogEar, edgeInk, margin, gridNear, gridMid, gridFar, dims: dimL + dimR};
@@ -139,6 +151,11 @@ const FURNITURE = (() => {
   return {reg, dim, yd, north, needle, NA, notes, foot, fx, fy, fw, fh};
 })();
 
+/** The near grid's draw-on: three depth bands, far -> near, 0.03 s apart, each drawing in 0.09 s (all its strokes
+ *  together): gridAt 8.445 -> done at 8.595, on 'It's' (8.605). */
+const NEAR_STAGGER = 0.03;
+const NEAR_DUR = 0.09;
+
 /** S03's plan (replaces the set's 'ground' node): street, sheet, edges, margin, far + mid grid, kerb dimensions, the
  *  title-block frame and the furniture from the cut; the near grid rows draw on from `gridAt` (far -> near).
  *  Polish round 1: the sand street exists only from `streetAt` (the pop-up: the pavement springs up with the city);
@@ -158,7 +175,9 @@ export const GroundS03: React.FC<{gridAt: number; streetAt?: number; seed?: stri
       <Ink d={G.margin} width={SI.hair * 0.8} taper={false} seed={`${seed}/margin`} />
       <Ink d={G.gridFar} width={SI.hair} taper={false} seed={`${seed}/gF`} />
       <Ink d={G.gridMid} width={1.9} taper={false} seed={`${seed}/gM`} />
-      {nearOn ? <Ink d={G.gridNear} width={SI.far} at={gridAt} dur={0.3} order="all" taper={false} seed={`${seed}/gN`} /> : null}
+      {nearOn
+        ? G.gridNear.map((d, i) => <Ink key={i} d={d} width={SI.far} at={gridAt + i * NEAR_STAGGER} dur={NEAR_DUR} pace="free" order="all" taper={false} seed={`${seed}/gN${i}`} />)
+        : null}
       <Ink d={G.dims} width={SI.far} taper={false} seed={`${seed}/dim`} />
       <Ink d={TB_FRAME} width={SI.hair} taper={false} seed={`${seed}/tb3`} />
       {/* plan furniture */}

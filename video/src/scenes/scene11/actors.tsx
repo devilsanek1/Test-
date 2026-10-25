@@ -1,7 +1,7 @@
 // S11 local actors: the cornice / shutter-box pigeons (small ink birds), the sill snail (with its one-antenna-then-the-other
-// gag), govB's window (BrowserChrome + the page: a FAT lettered progress bar 'updating... 8%' that can't finish, a
-// hiccuping loading ring in the chrome bar, content bars that keep reloading), and the CRT power-off screen used for the
-// govA / govC windows (the set's crtContent, which a windowSlot override bypasses).
+// gag), govB's window (BrowserChrome + the page: 'updating...' lettered in the address pill, ONE fat progress bar with a
+// big % flip tile that can't finish, a hiccuping loading ring in the chrome bar, content bars that keep reloading), and
+// the CRT power-off screen used for the govA / govC windows (the set's crtContent, which a windowSlot override bypasses).
 // All world coordinates (GovernmentPlaza, S01 camera rest); times in scene seconds.
 
 import React from 'react';
@@ -198,7 +198,7 @@ export type SillSnailProps = {
   /** The body comes out and it crawls (world px/s). */
   crawlAt: number;
   speed?: number;
-  /** Pulls into its shell (0.2 s, at the clunk). */
+  /** Pulls into its shell (a 0.10 s snap, at the clunk). */
   hideAt?: number;
   /** One eye stalk pokes out, then the other (+0.2 s). */
   antennaeAt?: number;
@@ -241,9 +241,12 @@ export const SillSnail: React.FC<SillSnailProps> = ({x, y, size = 24, flip = tru
   const dist = t >= crawlAt ? (Math.min(t, crawlEnd) - crawlAt) * speed : 0;
   const moving = t >= crawlAt && t < crawlEnd;
   // body extension 0 (tucked) .. 1 (out)
+  // fix round 3: the head + stalks are out ON the word (the emergence leads `crawlAt` by 0.06 s over a 0.14 s ramp: out
+  // ~0.85 on the word's frame; was a 0.25 s ramp from the word, nothing visible for 2-3 frames), and the startled
+  // pull-in SNAPS at its start (outCubic over 0.10 s; was an inCubic 0.16 s that barely moved for 2 frames)
   let out = 0;
-  if (t >= crawlAt) out = prog(t, crawlAt, 0.25, E.outCubic);
-  if (hideAt !== undefined && t >= hideAt) out = Math.min(out, 1 - prog(t, hideAt, 0.16, E.inCubic));
+  if (t >= crawlAt - 0.06) out = prog(t, crawlAt - 0.06, 0.14, E.outCubic);
+  if (hideAt !== undefined && t >= hideAt) out = Math.min(out, 1 - prog(t, hideAt, 0.1, E.outCubic));
   if (peekAt !== undefined && t >= peekAt) out = Math.max(out, 0.55 * prog(t, peekAt, 0.25, E.outBack(1.4)));
   // eye stalks: full while out; after hiding, one then the other pokes out of the shell mouth
   let st1 = out > 0.6 ? 1 : 0;
@@ -321,9 +324,10 @@ export const HiccupRing: React.FC<{x: number; y: number; r: number; hiccups: num
 
 export type GovBWindowProps = {
   r: [number, number, number, number];
-  /** Progress steps (fraction): the address pill AND the page's fat bar + its flip-tile % readout. An UP step JUMPS
-   *  past its value (+5 %: 8 -> ~14 %, then sags back to the value over 0.35 s), flashes the fill cream for 2 frames and
-   *  scale-pops the % tile 1.3x; a down step snaps. */
+  /** Progress steps (fraction): the page's ONE fat bar + its flip-tile % readout (fix round 3: the address pill shows
+   *  the lettered 'updating...' instead of a second bar). An UP step JUMPS past its value (+5 %: 8 -> ~14 %, then sags
+   *  back to the value over 0.35 s), flashes the fill cream for 2 frames and scale-pops the % tile 1.2x; a down step
+   *  snaps (the whole trough flashes peach for 2 frames). */
   steps: ProgressStep[];
   /** Ring hiccups. */
   hiccups: number[];
@@ -337,7 +341,8 @@ export type GovBWindowProps = {
   /** Screen-local x where the content bars start (default: the page margin). S11 starts them under the notice's left
    *  edge, so once the notice is taped up they are all under it (no bar ends poking out between Pip's ear and it). */
   barsX0?: number;
-  /** The fill (and the % tile) flickers on / off every 2 frames for 0.27 s without moving. */
+  /** The fill's leading edge (its last ~8 px) flickers on / off every 2 frames for 0.27 s without moving; the % tile
+   *  stays drawn and ticks once (1 frame). */
   flickerAt?: number;
   /** Loading-ring radius (world; the chrome's own is ~10). */
   ringR?: number;
@@ -363,8 +368,12 @@ export function pillGeom(w: number, h: number) {
   return {bar, px, py, pw, ph, ringR, ringX: px + pw + bar * 0.25 + ringR, ringY: bar / 2};
 }
 
-/** The page's readout layout (screen-local): lettering row, then the fat bar (180 x 15 world = ~290 x 25 px on screen). */
-export const PAGE = {fs: 20, ty: 23, by: 30, bh: 15, bw: 176, barsY: [58, 76, 94]} as const;
+/** The page's readout row (screen-local, world px; fix round 3): ONE fat progress bar (116 x 20.5 world = ~193 x 34 px on
+ *  screen at 1.66) with a big white % flip tile at its RIGHT end (57 x 37 world = ~95 x 61 px, lettering 31 world = ~51 px);
+ *  'updating...' moved up into the address pill (it replaced the pill's own progress stub: one bar in the window, not
+ *  two). The row sits above the L14 notice (its paper starts at local y 46). `barsY`: the content bars (under the
+ *  notice once it is up). */
+export const PAGE = {bx: 22, by: 10.5, bh: 20.5, bw: 116, tile: {x: 144, y: 2, w: 57, h: 37}, tfs: 31, barsY: [58, 76, 94]} as const;
 
 const stepAt = (steps: ProgressStep[], t: number) => {
   let v = steps[0]?.v ?? 0;
@@ -372,16 +381,16 @@ const stepAt = (steps: ProgressStep[], t: number) => {
   return v;
 };
 
-const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: number[]; shakeAt?: number; barsAt: number[]; barsX0?: number; flickerAt?: number; inkW: number; seed: string}> = ({w, h, steps, reloadAt, shakeAt, barsAt, barsX0, flickerAt, inkW, seed}) => {
+const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: number[]; shakeAt?: number; barsAt: number[]; barsX0?: number; flickerAt?: number; inkW: number; seed: string}> = ({w, steps, reloadAt, shakeAt, barsAt, barsX0, flickerAt, inkW, seed}) => {
   useCaptionFont();
   const t = useTime();
   const k = Math.max(1e-4, matScale(useXf()));
-  // the latest reload that has started: the lettering re-letters (no blank frames); the fill and the % hold
+  // the latest reload that has started: the content bars are gone (reloading); the fill and the % hold
   let ra: number | undefined;
   for (const r of reloadAt) if (t >= r) ra = r;
   const dx = shakeAt !== undefined && t >= shakeAt && t < shakeAt + 0.24 ? Math.sin(prog(t, shakeAt, 0.24) * Math.PI * 3) * 5 * (1 - prog(t, shakeAt, 0.24)) : 0;
-  const bx = w - PAGE.bw - 10; // a wider left margin: Pip's ear sits by the window's lower-left corner
-  // ---- the value: steps, an up-step's spring past its value, the reload regrow
+  const {bx, by, bh, bw} = PAGE;
+  // ---- the value: steps, an up-step's jump past its value
   let v = stepAt(steps, t);
   let flash = false;
   // a DOWN step (the regression on 'yet'): the whole trough flashes peach for 2 frames as the fill snaps back, the one
@@ -397,17 +406,20 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
     else if (d < 0.45) v += 0.05 * Math.cos(((d - 0.1) / 0.35) * (Math.PI / 2)) ** 2;
     if (d < 2 / 30) flash = true;
   }
+  // 'FBI': ONLY the fill's leading edge flickers (its last 5 world = ~8 px drop out every other 2 frames) without the
+  // fill moving; the % tile stays drawn (fix round 3: a tile blinking out read as a render glitch) and ticks once
   const flickOff = flickerAt !== undefined && t >= flickerAt && t < flickerAt + 0.27 && Math.floor((t - flickerAt) * 15) % 2 === 0;
+  const tick = flickerAt !== undefined && t >= flickerAt && t < flickerAt + 1 / 30 ? -7 : 0;
   // ---- the % tile: a paper flip (old digits fold shut, new ones unfold) at each change of the shown number
   const shown = (tt: number) => Math.round(stepAt(steps, tt) * 100);
   let pct = shown(t);
   let flipY = 1;
-  // an UP step scale-pops the tile 1.3x about its centre (with the flip): the 8 -> 9 % reads on a phone
+  // an UP step scale-pops the tile 1.2x about its centre (with the flip): the 8 -> 9 % reads on a phone
   let tilePop = 1;
   for (let i = 1; i < steps.length; i++) {
     const d = t - steps[i].t;
     if (d < 0 || d >= 0.45 || steps[i].v <= steps[i - 1].v) continue;
-    tilePop = 1 + 0.3 * (d < 0.06 ? Math.sin((d / 0.06) * (Math.PI / 2)) : Math.exp(-(d - 0.06) * 9) * Math.cos((d - 0.06) * Math.PI * 2 * 1.6));
+    tilePop = 1 + 0.2 * (d < 0.06 ? Math.sin((d / 0.06) * (Math.PI / 2)) : Math.exp(-(d - 0.06) * 9) * Math.cos((d - 0.06) * Math.PI * 2 * 1.6));
   }
   for (let i = 1; i < steps.length; i++) {
     const d = t - steps[i].t;
@@ -418,16 +430,10 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
     } else flipY = (d - 0.08) / 0.08;
   }
   const iw = inkW;
-  // the % tile sits at the LEFT end (over the fill it reports; away from the spinning ring), 'updating...' after it
-  const tileW = 34;
-  const tileH = 24;
-  const tileX = bx + PAGE.bw - tileW - 32;
-  const tileY = PAGE.ty - 19;
-  const txtX = bx;
-  const dots = '.'.repeat(1 + (Math.floor(t / 0.3) % 3));
-  // re-lettering after a reload: 'u', 'up', 'upd', ... over 0.25 s
-  const word = 'updating' + dots;
-  const nTxt = ra !== undefined && t < ra + 0.25 ? 1 + Math.floor(prog(t, ra, 0.25) * (word.length - 1)) : word.length;
+  const T = PAGE.tile;
+  const tcx = T.x + T.w / 2;
+  const tcy = T.y + T.h / 2;
+  const tileM = mat.compose(mat.about(mat.rotate(tick), tcx, tcy), flipY !== 1 || tilePop !== 1 ? mat.about(mat.scale(tilePop, tilePop * Math.max(0.04, flipY)), tcx, tcy) : mat.I);
   // content bars (the page still loading): each draws on L -> R at its time; a reload hides them again
   const bars: React.ReactNode[] = [];
   [0.84, 0.62, 0.74].forEach((f, i) => {
@@ -436,35 +442,51 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
     const q = 0.2 + 0.8 * prog(t, at, 0.067, E.outCubic);
     const yy = PAGE.barsY[i];
     const x0 = barsX0 ?? bx;
-    const bw = (w - bx - x0) * f;
+    const cw = (w - 10 - x0) * f;
     bars.push(
-      <XG key={i} m={mat.about(mat.scale(q), x0 + bw / 2, yy)}>
-        <Fill d={rectPath(x0, yy - 5.5, bw, 11)} color={i === 1 ? palette.sage : palette.tan} offset={false} mode="none" seed={`${seed}/bar${i}`} />
+      <XG key={i} m={mat.about(mat.scale(q), x0 + cw / 2, yy)}>
+        <Fill d={rectPath(x0, yy - 5.5, cw, 11)} color={i === 1 ? palette.sage : palette.tan} offset={false} mode="none" seed={`${seed}/bar${i}`} />
       </XG>,
     );
   });
+  const fillW = (bw - 5) * (regress ? 1 : Math.min(1, v));
+  const fillShown = flickOff ? Math.max(0, fillW - 5) : fillW;
   return (
     <XG m={mat.translate(dx, 0)}>
-      {/* 'updating...' */}
-      <text x={txtX} y={PAGE.ty} fontFamily={captionFontStack} fontSize={PAGE.fs} fill={palette.ink}>
-        {word.slice(0, nTxt)}
-      </text>
-      {/* the % flip tile */}
-      {!flickOff ? (
-        <XG m={flipY !== 1 || tilePop !== 1 ? mat.about(mat.scale(tilePop, tilePop * Math.max(0.04, flipY)), tileX + tileW / 2, tileY + tileH / 2) : mat.I}>
-          <Fill d={roundRect(tileX, tileY, tileW, tileH, 3)} color={palette.white} offset={[1.6 / k, 1.2 / k]} mode="none" seed={`${seed}/tile`} />
-          <Ink d={roundRect(tileX, tileY, tileW, tileH, 3, {closed: false, seed: `${seed}/tilei`})} width={iw * 0.7} taper={false} vary={0} seed={`${seed}/tilei`} />
-          <text x={tileX + tileW / 2} y={PAGE.ty} fontFamily={captionFontStack} fontSize={PAGE.fs} fill={palette.ink} textAnchor="middle">
-            {`${pct}%`}
-          </text>
-        </XG>
-      ) : null}
-      {/* the fat bar: white trough, teal fill (cream for two frames on an up-step) */}
-      <Fill d={roundRect(bx, PAGE.by, PAGE.bw, PAGE.bh, 4)} color={palette.white} offset={false} mode="none" seed={`${seed}/trough`} />
-      {!flickOff && v > 0.002 ? <Fill d={rectPath(bx + 2.5, PAGE.by + 2.5, (PAGE.bw - 5) * (regress ? 1 : Math.min(1, v)), PAGE.bh - 5)} color={regress ? palette.peach : flash ? palette.cream : palette.teal} offset={false} mode="none" seed={`${seed}/fill`} /> : null}
-      <Ink d={roundRect(bx, PAGE.by, PAGE.bw, PAGE.bh, 4, {closed: false, seed: `${seed}/troughi`})} width={iw * 0.8} taper={false} vary={0} seed={`${seed}/troughi`} />
       {bars}
+      {/* the fat bar: white trough, teal fill (cream for two frames on an up-step, the whole trough peach on 'yet') */}
+      <Fill d={roundRect(bx, by, bw, bh, 5)} color={palette.white} offset={false} mode="none" seed={`${seed}/trough`} />
+      {fillShown > 0.3 ? <Fill d={rectPath(bx + 2.5, by + 2.5, fillShown, bh - 5)} color={regress ? palette.peach : flash ? palette.cream : palette.teal} offset={false} mode="none" seed={`${seed}/fill`} /> : null}
+      <Ink d={roundRect(bx, by, bw, bh, 5, {closed: false, seed: `${seed}/troughi`})} width={iw * 0.85} taper={false} vary={0} seed={`${seed}/troughi`} />
+      {/* the % flip tile, right of the bar */}
+      <XG m={tileM}>
+        <Fill d={roundRect(T.x, T.y, T.w, T.h, 4)} color={palette.white} offset={[1.6 / k, 1.2 / k]} mode="none" seed={`${seed}/tile`} />
+        <Ink d={roundRect(T.x, T.y, T.w, T.h, 4, {closed: false, seed: `${seed}/tilei`})} width={iw * 0.8} taper={false} vary={0} seed={`${seed}/tilei`} />
+        <text x={tcx} y={T.y + T.h / 2 + PAGE.tfs * 0.36} fontFamily={captionFontStack} fontSize={PAGE.tfs} fill={palette.ink} textAnchor="middle">
+          {`${pct}%`}
+        </text>
+      </XG>
     </XG>
+  );
+};
+
+/** 'updating...' lettered INSIDE the address pill (fix round 3: it replaces BrowserChrome's progress stub there), the
+ *  dots cycling every 0.3 s, re-lettering u, up, upd ... after a reload (0.25 s, no blank frames). Window-local. */
+const PillText: React.FC<{w: number; h: number; reloadAt: number[]; shakeAt?: number}> = ({w, h, reloadAt, shakeAt}) => {
+  useCaptionFont();
+  const t = useTime();
+  const g = pillGeom(w, h);
+  let ra: number | undefined;
+  for (const r of reloadAt) if (t >= r) ra = r;
+  const dots = '.'.repeat(1 + (Math.floor(t / 0.3) % 3));
+  const word = 'updating' + dots;
+  const nTxt = ra !== undefined && t < ra + 0.25 ? 1 + Math.floor(prog(t, ra, 0.25) * (word.length - 1)) : word.length;
+  const fs = g.ph * 0.82;
+  const dx = shakeAt !== undefined && t >= shakeAt && t < shakeAt + 0.24 ? Math.sin(prog(t, shakeAt, 0.24) * Math.PI * 3) * 2.5 * (1 - prog(t, shakeAt, 0.24)) : 0;
+  return (
+    <text x={g.px + g.ph * 0.5 + dx} y={g.py + g.ph * 0.5 + fs * 0.34} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink}>
+      {word.slice(0, nTxt)}
+    </text>
   );
 };
 
@@ -499,13 +521,15 @@ export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reload
         w={w}
         h={h}
         ink={inkW}
-        progress={{steps}}
         ring={{at: 1e6}}
         content={({w: sw, h: sh}) => <Page w={sw} h={sh} steps={steps} reloadAt={reloadAt} shakeAt={shakeAt} barsAt={barsAt} barsX0={barsX0} flickerAt={flickerAt} inkW={inkW} seed={seed} />}
         seed={seed}
       >
         {null}
       </BrowserChrome>
+      <XG m={mat.translate(x, y)}>
+        <PillText w={w} h={h} reloadAt={reloadAt} shakeAt={shakeAt} />
+      </XG>
       <HiccupRing x={x + w - rr * 1.3 - 1.5} y={y + g.ringY} r={rr} hiccups={hiccups} fastAt={reloadAt} inkW={inkW * 0.5} />
       {/* fix round 2: the badge 1.3x (it reads at phone size on 'yet') */}
       {alertAt !== undefined ? <AlertBadge x={x + w - rr * 1.3 - 1.5} y={y + g.ringY} r={rr * 1.27} at={alertAt} inkW={inkW * 0.7} seed={`${seed}/alert`} /> : null}
