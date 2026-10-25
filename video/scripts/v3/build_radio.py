@@ -37,6 +37,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--tts-dir', required=True)
     ap.add_argument('--input', default=str(INP))
+    ap.add_argument('--prefix', default='radio_h', help="output name prefix: radio_h (G1) or core_ (G0.5 cards)")
     a = ap.parse_args()
     k = Kokoro(str(Path(a.tts_dir) / 'kokoro.onnx'), str(Path(a.tts_dir) / 'voices.bin'))
     spec = json.loads(Path(a.input).read_text())
@@ -52,7 +53,7 @@ def main():
         return cache[key]
 
     for n, hook in enumerate(spec['hooks'], 1):
-        lines = [{'vo': hook['vo'], 'tts': hook.get('tts', hook['vo']), 'image': hook['image'], 'pause': hook.get('pause', 0.25)}] + spec['body']
+        lines = [{'vo': hook['vo'], 'tts': hook.get('tts', hook['vo']), 'image': hook['image'], 'pause': hook.get('pause', 0.25)}] + spec.get('body', [])
         t = spec.get('lead', 0.08)
         audio = [np.zeros(int(t * SR))]
         words, segs = [], []
@@ -71,19 +72,19 @@ def main():
         audio.append(np.zeros(int(tail * SR)))
         y = np.concatenate(audio)
         y = y / (np.abs(y).max() + 1e-9) * 0.89
-        sf.write(OUT / f'radio_h{n}.wav', y, SR)
+        sf.write(OUT / f'{a.prefix}{n}.wav', y, SR)
         data = {
-            'label': f"v3 G1 radio cut · H{n} · stand-in voice",
-            'audio': f'v3/radio_h{n}.wav',
+            'label': hook.get('label', f"v3 G1 radio cut · H{n} · stand-in voice"),
+            'audio': f'v3/{a.prefix}{n}.wav',
             'durationSec': round(len(y) / SR, 3),
             'frame0': hook['frame0'],
-            'frame0Until': segs[0]['e'] + 0.2,
+            'frame0Until': round(len(y) / SR, 3) if hook.get('frame0Hold') else segs[0]['e'] + 0.2,
             'words': words,
             'lines': segs,
             'sfx': spec.get('sfx', []),
         }
-        (OUT / f'radio_h{n}.json').write_text(json.dumps(data, indent=1))
-        print(f'H{n}: {data["durationSec"]:.1f} s, {len(words)} words')
+        (OUT / f'{a.prefix}{n}.json').write_text(json.dumps(data, indent=1))
+        print(f'{a.prefix}{n}: {data["durationSec"]:.1f} s, {len(words)} words')
 
 
 if __name__ == '__main__':
