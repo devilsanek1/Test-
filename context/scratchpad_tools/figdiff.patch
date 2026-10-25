@@ -1,0 +1,522 @@
+commit dd0335a6cf6b89ad58430802bd2e40009a3f6eb6
+Author: Claude <noreply@anthropic.com>
+Date:   Sun Oct 25 00:32:31 2026 +0000
+
+    WIP at usage-limit interruption: scene fix rounds, kit v3b sets+props builds (unreviewed)
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_01BGZ47aBhF9yKpEaeiLeCPQ
+
+diff --git a/video/src/scenes/shared/props/Figures.tsx b/video/src/scenes/shared/props/Figures.tsx
+index 1d83c84..6d5727c 100644
+--- a/video/src/scenes/shared/props/Figures.tsx
++++ b/video/src/scenes/shared/props/Figures.tsx
+@@ -22,12 +22,12 @@ import {ease as E, lerp, osc, prog, springAt, springs, useTime} from '../../../l
+ import {rng, rand, Seed} from '../../../lib/rng';
+ import {Ink} from '../../../lib/Ink';
+ import {Fill} from '../../../lib/Fill';
+-import {Look, ExitFade, useLook} from '../../../lib/exit';
++import {Look, ExitFade, ExitSync, useLook} from '../../../lib/exit';
+ import {MOTION} from '../../../lib/spec';
+-import {Acc, Hair, Person, PERSON_BODIES} from '../../../lib/kit';
++import {Acc, Hair, Person, PERSON_BODIES, PERSON_HAIR} from '../../../lib/kit';
+ import {tinyFigure} from '../../../lib/cine/figures';
+ import {PathBuf} from '../../../lib/cine/util';
+-import {arc, blob, circle, line, polyPath, rectPath, roundRect, torso, Pt} from '../../../lib/sketch';
++import {arc, blob, circle, crown, line, polyPath, rectPath, roundRect, smooth, torso, Pt} from '../../../lib/sketch';
+ import {mat, useXf, XG} from '../../../lib/xf';
+ import {TodAnchor} from '../../../lib/tod';
+ import {Depth, DEPTH_INK} from './common';
+@@ -62,6 +62,88 @@ function personCoat(seed: Seed, hairGiven: boolean): string {
+   return r.pick(PERSON_BODIES);
+ }
+ 
++/** The kit Person's hair-style weights (mirror of makeSpec). */
++const KIT_HAIR: (readonly [Hair, number])[] = [['short', 5], ['long', 2.2], ['bun', 1], ['cap', 1], ['beanie', 0.9], ['curly', 1.2]];
++
++/** The kit Person's seeded picks for a preset figure (torsoH and acc always given, hairColor / legsColor / packColor /
++ *  signColor never given): mirrors makeSpec's draw order w, hr, round, [hair], [body], hairColor (+ its coat-clash
++ *  swap), legs, shoes, pack, hat, sign, phase. */
++function kitPicks(seed: Seed, hair?: Hair, body?: string) {
++  const r = rng(`person/${seed}`);
++  const w = r.range(86, 100);
++  const hr = w * r.range(0.23, 0.26);
++  r.next(); // round
++  const style: Hair = hair ?? r.weighted<Hair>(KIT_HAIR);
++  const coat = body ?? r.pick(PERSON_BODIES);
++  let hairColor: string = r.pick(PERSON_HAIR);
++  if (hairColor === coat) hairColor = hairColor === palette.ink ? palette.tan : palette.ink;
++  for (let i = 0; i < 5; i++) r.next(); // legs, shoes, pack, hat, sign
++  return {w, hr, style, coat, hairColor, phase: r.range(0, 6.28)};
++}
++
++/** A hair colour that never reads as SKIN (S06 review: a sand head disc next to sand ears and neck reads as a bald head
++ *  or a face, not the back of a head): sand -> ochre (ink-brown on an ochre coat); clay (tan) too when the hair is a
++ *  plain disc (`style` 'short' / 'bun': no strands at preset sizes). Long / curly shapes read as hair in any colour. */
++export const skinSafeHair = (c: string, coat?: string, style?: Hair) => {
++  const skin = c === palette.sand || (c === palette.tan && (style === 'short' || style === 'bun'));
++  return !skin ? c : coat === palette.brown ? palette.ink : palette.brown;
++};
++
++/** The kit Person's walk bob (local units, presets' legH) at time t for a seed walking at hz (0 when not walking). */
++const kitWalkBob = (seed: Seed, t: number, hz: number | undefined, hair: Hair | undefined, body: string | undefined, legs = true) =>
++  hz && legs ? -Math.abs(Math.sin(t * hz * Math.PI + kitPicks(seed, hair, body).phase)) * LEG * 0.035 : 0;
++
++/** Redraws the kit Person's hair for `seed` in `color`, right after that Person (person-local units, torso `torsoH`):
++ *  the kit's own geometry and seeds, so the misregistered fill and the open ink circle land exactly on the kit's. The
++ *  head disc ('short'; 'bun' + its bun and part line; 'curly' + its crown) or the 'long' hair shape; 'cap' / 'beanie' /
++ *  'bald' draw nothing. It does NOT pass `hairColor` to the kit (that skips a seeded draw and re-seeds the trousers,
++ *  shoes and walk phase: S05 -> S06 continuity, S06's planted stride); it rides the kit's walk bob, relights at the
++ *  kit's anchor and un-builds in the kit's ExitSync group. */
++const HairOver: React.FC<{seed: Seed; hair?: Hair; body?: string; color: string; W: number; torsoH?: number; lod?: 0 | 1; walkHz?: number; legs?: boolean}> = ({seed, hair, body, color, W, torsoH = TORSO, lod = 0, walkHz, legs = true}) => {
++  const t = useTime();
++  // `hair` / `body` exactly as given to the kit Person (undefined = its seeded pick): they set its draw order
++  const kp = kitPicks(seed, hair, body);
++  const style = kp.style;
++  if (style === 'cap' || style === 'beanie' || style === 'bald') return null;
++  const hr = kp.hr;
++  const sd = `person/${seed}`;
++  const k = (n: string) => `${sd}/${n}`;
++  const hy = -torsoH - hr * 0.86;
++  const inked = W > 0;
++  const bob = kitWalkBob(seed, t, walkHz, hair, body, legs);
++  const parts: React.ReactNode[] = [];
++  if (style === 'long') {
++    const pts: Pt[] = [[-hr * 0.98, hy + hr * 1.75], [-hr * 1.08, hy + hr * 0.6], [-hr * 0.95, hy - hr * 0.55], [0, hy - hr * 1.05], [hr * 0.95, hy - hr * 0.55], [hr * 1.08, hy + hr * 0.6], [hr * 0.98, hy + hr * 1.75]];
++    parts.push(<Fill key="hairF" d={smooth(pts, {closed: true})} color={color} seed={k('hair')} />);
++    if (inked) parts.push(<Ink key="hair" d={smooth([...pts, [-hr * 0.5, hy + hr * 1.9], [-hr * 0.98, hy + hr * 1.75]] as Pt[], {})} width={W} seed={k('hairI')} />);
++    if (inked && lod === 0) parts.push(<Ink key="hairD" d={`M${-hr * 0.35} ${hy - hr * 0.4}L${-hr * 0.4} ${hy + hr * 1.35}M${hr * 0.3} ${hy - hr * 0.3}L${hr * 0.33} ${hy + hr * 1.25}`} width={W * 0.8} order="all" seed={k('hairD')} />);
++  } else {
++    const headD = blob(0, hy, hr, hr, {seed: `${sd}/head`});
++    parts.push(<Fill key="headF" d={headD} color={color} seed={k('head')} />);
++    // dark hair: also the exact disc, so the misregistration gap never leaves the outline floating as a separate arc
++    // over the head (it read as a cowlick at 260 px); the kit's offset disc stays covered by the first fill
++    if (color === palette.ink || color === palette.tealDark) parts.push(<Fill key="headF0" d={headD} color={color} offset={false} seed={k('head0')} />);
++    if (inked) parts.push(<Ink key="head" d={circle(0, hy, hr, {seed: `${sd}/head`, overlap: 18})} width={W} open={0.12} seed={k('head')} />);
++    if (style === 'curly') {
++      const cd = crown(0, hy - 2, hr * 1.1, hr * 1.06, {seed: `${sd}/curl`, bumps: 9, round: 0.7});
++      parts.push(<Fill key="hairF" d={cd} color={color} seed={k('hair')} />);
++      if (inked) parts.push(<Ink key="hair" d={cd} width={W} seed={k('hairI')} />);
++    }
++    if (style === 'bun') {
++      if (inked && lod === 0) parts.push(<Ink key="part" d={line(-hr * 0.1, hy - hr * 0.62, hr * 0.32, hy - hr * 0.1, {over: [0, 0], seed: `${sd}/part`})} width={W * 0.85} seed={k('hairI')} />);
++      parts.push(<Fill key="bunF" d={blob(0, hy - hr * 1.12, hr * 0.38, hr * 0.36, {seed: `${sd}/bun`})} color={color} seed={k('bun')} />);
++      if (inked) parts.push(<Ink key="bun" d={circle(0, hy - hr * 1.12, hr * 0.38, {seed: `${sd}/bun`, overlap: 10})} width={W} seed={k('bunI')} />);
++    }
++  }
++  return (
++    <XG m={mat.translate(0, bob)}>
++      <TodAnchor at={[0, -torsoH * 0.5]}>
++        <ExitSync seed={`${sd}/exit`}>{parts}</ExitSync>
++      </TodAnchor>
++    </XG>
++  );
++};
++
+ /** Outline of the kit torso (sketch `torso`, flare 0.07): straight sides from the shoulder curve to the hip. */
+ function torsoSides(g: {w: number; h: number; round: number}) {
+   const hw = g.w / 2;
+@@ -111,28 +193,133 @@ const RiseClip: React.FC<{at?: number; dist: number; clipY: number; children?: R
+   );
+ };
+ 
+-/** A sleeve from the shoulder to the hand (local person units): coat-coloured polygon + ink sides + sand hand. */
+-const Arm: React.FC<{sh: Pt; hand: Pt; w?: number; coat: string; W: number; seed: string; hand2?: boolean}> = ({sh, hand, w = 19, coat, W, seed, hand2 = true}) => {
++export type FigureArmProps = {
++  /** Shoulder and hand (wrist end of the sleeve), person-local units. */
++  sh: Pt;
++  hand: Pt;
++  /** Sleeve width at the shoulder (default 19); it tapers to 0.9 x at the elbow and 0.74 x at the wrist. */
++  w?: number;
++  coat: string;
++  /** Local ink width. */
++  W: number;
++  seed: string;
++  /** Sand hand at the wrist, behind the cuff (default true). false = the caller draws the hand (`PhoneGrip`). */
++  hand2?: boolean;
++  /** Elbow bend in degrees (the angle between upper arm and forearm directions). Default: FOLLOWS THE RAISE, 0 while
++   *  the arm hangs, easing to 30 once the hand is level with the shoulder or above. */
++  bend?: number;
++  /** Which side the elbow goes to: +1 = out toward +x on a raised arm (down on a level one). Default: the shoulder's
++   *  side (sign of sh[0]), i.e. always outward / down. */
++  side?: 1 | -1;
++  /** Explicit elbow point (overrides `bend` / `side`): for arms driven by joint angles (EdgeOnlooker's phone raise). */
++  elbow?: Pt;
++};
++
++/** A jointed sleeve from the shoulder to the hand (local person units; S07 review: no more straight tubes swung as
++ *  rigid sticks). Upper arm and forearm are straight and meet at an ELBOW pushed off the shoulder-hand chord by the
++ *  bend (outward / down, so it never cuts into the body), its outer corner rounded, its inner corner tighter with a
++ *  small crease; the sleeve TAPERS 1 -> 0.9 -> 0.74 toward the wrist, a CUFF line crosses it near the end and a sand
++ *  hand (inked) sits behind the cuff. The hand point is where the sleeve ends, as before, so held things (tablet, keys,
++ *  envelope, phone) keep their positions. */
++export const FigureArm: React.FC<FigureArmProps> = ({sh, hand, w = 19, coat, W, seed, hand2 = true, bend, side, elbow}) => {
+   const dx = hand[0] - sh[0];
+   const dy = hand[1] - sh[1];
+-  const L = Math.hypot(dx, dy) || 1;
+-  const nx = (-dy / L) * (w / 2);
+-  const ny = (dx / L) * (w / 2);
+-  const tipW = 0.85;
+-  const poly: Pt[] = [
+-    [sh[0] + nx, sh[1] + ny],
+-    [hand[0] + nx * tipW, hand[1] + ny * tipW],
+-    [hand[0] - nx * tipW, hand[1] - ny * tipW],
+-    [sh[0] - nx, sh[1] - ny],
+-  ];
++  const d = Math.hypot(dx, dy) || 1e-6;
++  const ux = dx / d;
++  const uy = dy / d;
++  const sd = side ?? (sh[0] < 0 ? -1 : 1);
++  // the raise: 0 hanging .. PI straight up; the bend eases in from ~20 deg to ~100 deg of elevation
++  const elev = Math.acos(Math.max(-1, Math.min(1, uy)));
++  const bendDeg = Math.max(0, Math.min(80, bend ?? 30 * E.inOutSine(Math.max(0, Math.min(1, (elev - 0.35) / 1.45)))));
++  const off = (d / 2) * Math.tan((bendDeg * Math.PI) / 360);
++  const pv: Pt = [sd * -uy, sd * ux];
++  const El: Pt = elbow ?? [sh[0] + dx * 0.5 + pv[0] * off, sh[1] + dy * 0.5 + pv[1] * off];
++  const nrm = (a0: Pt, b0: Pt): Pt => {
++    const L = Math.hypot(b0[0] - a0[0], b0[1] - a0[1]) || 1;
++    return [-(b0[1] - a0[1]) / L, (b0[0] - a0[0]) / L];
++  };
++  const n1 = nrm(sh, El);
++  const n2 = nrm(El, hand);
++  let mx = n1[0] + n2[0];
++  let my = n1[1] + n2[1];
++  const mL = Math.hypot(mx, my) || 1;
++  mx /= mL;
++  my /= mL;
++  const ml = Math.min(2.2, 1 / Math.max(0.45, mx * n1[0] + my * n1[1]));
++  const h0 = w / 2;
++  const h1 = h0 * 0.9;
++  const h2 = h0 * 0.74;
++  const A: Pt[] = [[sh[0] + n1[0] * h0, sh[1] + n1[1] * h0], [El[0] + mx * h1 * ml, El[1] + my * h1 * ml], [hand[0] + n2[0] * h2, hand[1] + n2[1] * h2]];
++  const B: Pt[] = [[sh[0] - n1[0] * h0, sh[1] - n1[1] * h0], [El[0] - mx * h1 * ml, El[1] - my * h1 * ml], [hand[0] - n2[0] * h2, hand[1] - n2[1] * h2]];
++  // which side is the outer (convex) one: the forearm turns away from it
++  const cr = (El[0] - sh[0]) * (hand[1] - El[1]) - (El[1] - sh[1]) * (hand[0] - El[0]);
++  const outerA = mx * n1[0] + my * n1[1] > 0 ? cr < 0 : cr > 0;
++  const f = (p: Pt) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
++  const toward = (a: Pt, b: Pt, r: number): Pt => {
++    const L = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
++    const k = Math.min(0.45, r / L);
++    return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k];
++  };
++  /** one sleeve side: straight, a rounded corner at the elbow (radius r), straight */
++  const sideD = (P: Pt[], r: number, rev = false) => {
++    const pa = toward(P[1], P[0], r);
++    const pb = toward(P[1], P[2], r);
++    return rev ? `L${f(P[2])}L${f(pb)}Q${f(P[1])} ${f(pa)}L${f(P[0])}` : `M${f(P[0])}L${f(pa)}Q${f(P[1])} ${f(pb)}L${f(P[2])}`;
++  };
++  const rA = outerA ? w * 0.7 : w * 0.22;
++  const rB = outerA ? w * 0.22 : w * 0.7;
++  const fillD = sideD(A, rA) + sideD(B, rB, true) + 'Z';
++  const at = (P: Pt[], u: number): Pt => [P[1][0] + (P[2][0] - P[1][0]) * u, P[1][1] + (P[2][1] - P[1][1]) * u];
++  const cuff = `M${f(at(A, 0.8))}L${f(at(B, 0.8))}`;
++  const inner = outerA ? B : A;
++  const outer = outerA ? A : B;
++  const crease = bendDeg > 12 || elbow ? `M${f(inner[1])}L${f([inner[1][0] + (outer[1][0] - inner[1][0]) * 0.3, inner[1][1] + (outer[1][1] - inner[1][1]) * 0.3])}` : '';
++  const fx = hand[0] - El[0];
++  const fy = hand[1] - El[1];
++  const fL = Math.hypot(fx, fy) || 1;
++  const handD = hand2 ? blob(hand[0] + (fx / fL) * w * 0.28, hand[1] + (fy / fL) * w * 0.28, w * 0.4, w * 0.44, {seed: `${seed}/h`}) : '';
+   return (
+     <>
+-      {hand2 ? <Fill d={blob(hand[0] + (dx / L) * 4, hand[1] + (dy / L) * 4, w * 0.42, w * 0.46, {seed: `${seed}/h`})} color={palette.sand} offset={false} mode="none" seed={`${seed}/hf`} /> : null}
+-      <Fill d={polyPath(poly)} color={coat} offset={false} mode="none" seed={`${seed}/af`} />
+-      <Ink d={`M${poly[0][0].toFixed(1)} ${poly[0][1].toFixed(1)}L${poly[1][0].toFixed(1)} ${poly[1][1].toFixed(1)}M${poly[2][0].toFixed(1)} ${poly[2][1].toFixed(1)}L${poly[3][0].toFixed(1)} ${poly[3][1].toFixed(1)}M${poly[1][0].toFixed(1)} ${poly[1][1].toFixed(1)}L${poly[2][0].toFixed(1)} ${poly[2][1].toFixed(1)}`} width={W} taper={false} seed={`${seed}/ai`} />
++      {hand2 ? <Fill d={handD} color={palette.sand} offset={false} mode="none" seed={`${seed}/hf`} /> : null}
++      {hand2 ? <Ink d={handD} width={W * 0.8} taper={false} seed={`${seed}/hi`} /> : null}
++      <Fill d={fillD} color={coat} offset={false} mode="none" seed={`${seed}/af`} />
++      <Ink d={`${sideD(A, rA)}${sideD(B, rB)}M${f(A[2])}L${f(B[2])}`} width={W} taper={false} seed={`${seed}/ai`} />
++      <Ink d={cuff + crease} width={W * 0.75} taper={false} seed={`${seed}/ac`} />
+     </>
+   );
+ };
++const Arm = FigureArm;
++
++/** The hand around a held phone, in the phone's frame (phone x -11..11, y -42..-4, the wrist at 0, 0): `back` = the
++ *  palm behind the phone, cupping its lower edge (draw before the phone); front = the thumb and two finger tips
++ *  wrapping its sides near the bottom (draw after). `thumb` = the side the thumb is on (toward the body's midline). */
++const PhoneGrip: React.FC<{W: number; seed: string; thumb: 1 | -1; back?: boolean}> = ({W, seed, thumb, back}) => {
++  if (back) {
++    const palm = blob(0, -5, 12.5, 9, {seed: `${seed}/palm`});
++    return (
++      <>
++        <Fill d={palm} color={palette.sand} offset={false} mode="none" seed={`${seed}/palmF`} />
++        <Ink d={palm} width={W * 0.75} taper={false} seed={`${seed}/palmI`} />
++      </>
++    );
++  }
++  const th = blob(thumb * 11.5, -10, 3.6, 5.8, {seed: `${seed}/th`});
++  const fg = blob(-thumb * 11.8, -15.5, 3.3, 3.9, {seed: `${seed}/f1`}) + blob(-thumb * 11.8, -8.5, 3.3, 3.7, {seed: `${seed}/f2`});
++  return (
++    <>
++      <Fill d={th + fg} color={palette.sand} offset={false} mode="none" seed={`${seed}/gf`} />
++      <Ink d={th + fg} width={W * 0.6} taper={false} seed={`${seed}/gi`} />
++    </>
++  );
++};
++
++/** The quadratic p0 -> p2 (control p1) cut at u (de Casteljau), as a path. */
++const quadTo = (p0: Pt, p1: Pt, p2: Pt, u: number): string => {
++  const a: Pt = [lerp(p0[0], p1[0], u), lerp(p0[1], p1[1], u)];
++  const b: Pt = [lerp(p1[0], p2[0], u), lerp(p1[1], p2[1], u)];
++  const c: Pt = [lerp(a[0], b[0], u), lerp(a[1], b[1], u)];
++  return `M${p0[0].toFixed(2)} ${p0[1].toFixed(2)}Q${a[0].toFixed(2)} ${a[1].toFixed(2)} ${c[0].toFixed(2)} ${c[1].toFixed(2)}`;
++};
+ 
+ /** Raise angle helper: 0 (down, hidden) .. 1 (up) over 0.3 s. */
+ const raiseQ = (t: number, at?: number, downAt?: number) => (at === undefined ? 0 : prog(t, at, 0.3, E.outBack(1.3)) * (downAt === undefined ? 1 : 1 - prog(t, downAt, 0.25, E.inOutCubic)));
+@@ -190,7 +377,10 @@ export type EdgeOnlookerProps = {
+   head?: number;
+   seed?: Seed;
+   hair?: Hair;
+-  /** Accessories of the kit Person ('backpack' is dropped: it scales with the cropped torso; 'phone' = holding it up). */
++  /** Hair colour. Default: the kit's seeded pick, except a sand (skin-coloured) pick, which becomes ochre / ink-brown. */
++  hairColor?: string;
++  /** Accessories of the kit Person ('backpack' is dropped: it scales with the cropped torso; 'phone' = holding it up;
++   *  'collar' = a straight collar band one step darker than the coat, not the kit's V). */
+   acc?: Acc[];
+   body?: string;
+   riseAt?: number;
+@@ -213,7 +403,7 @@ export type EdgeOnlookerProps = {
+ 
+ /** Big back-view head + shoulders at a frame side in a long coat that runs off the bottom of the frame (no hem, no legs:
+  *  it can never end inside the frame), arms hanging at the sides (sleeve seam, cuff, sand hand), a white rim strip. */
+-export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, seed = 'onl', hair, acc, body, riseAt, bob = 1.5, raisePhoneAt, lowerPhoneAt, phoneSide, arms = 'both', depth = 'front', rim = 'left', frameBottom}) => {
++export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, seed = 'onl', hair, hairColor, acc, body, riseAt, bob = 1.5, raisePhoneAt, lowerPhoneAt, phoneSide, arms = 'both', depth = 'front', rim = 'left', frameBottom}) => {
+   const t = useTime();
+   const m = useXf();
+   const g0 = personGeo(seed);
+@@ -238,6 +428,10 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
+   const hyUse = capOn ? -torsoH - g.hr * lift : g.hy;
+   const hairUse: Hair = capOn ? 'bald' : hair ?? rng(`onl/${seed}`).pick<Hair>(['short', 'short', 'long', 'bun', 'curly', 'beanie']);
+   const coat = body ?? personCoat(seed, true);
++  // a seeded sand (skin) hair pick becomes ochre / ink-brown: passed to the kit only then (it re-seeds the kit's later
++  // draws, which for an onlooker only moves the scarf colour), so every other onlooker is unchanged
++  const kitHair = kitPicks(seed, hairUse, coat).hairColor;
++  const hairFix = capOn ? undefined : hairColor ?? (skinSafeHair(kitHair, coat) !== kitHair ? skinSafeHair(kitHair, coat) : undefined);
+   const capHair = coat === palette.brown ? palette.tan : palette.brown;
+   const capColor = coat === palette.teal || coat === palette.sage ? palette.tealDark : palette.teal;
+   const hoodOn = !!acc?.includes('hood') && hairUse !== 'long' && !capOn;
+@@ -246,7 +440,9 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
+   const q = holdPhone ? 1 : raiseQ(t, raisePhoneAt, lowerPhoneAt);
+   const jolt = raisePhoneAt !== undefined && t >= raisePhoneAt && t < raisePhoneAt + 0.2 ? -Math.sin(((t - raisePhoneAt) / 0.2) * Math.PI) * 6 : 0;
+   const hipY = y - hyUse * s + jolt + (bob ? osc(t, 0.5, rand(seed, 'b') * 6) * bob : 0);
+-  const accs: Acc[] = (acc ?? []).filter((a) => a !== 'phone' && a !== 'backpack' && a !== 'hood');
++  // 'collar' = our straight CollarBand (the kit's V reads as a shirt front; under a cap BackHead already draws it)
++  const collarOn = !!acc?.includes('collar') && !capOn;
++  const accs: Acc[] = (acc ?? []).filter((a) => a !== 'phone' && a !== 'backpack' && a !== 'hood' && a !== 'collar');
+   const rise = riseAt !== undefined ? (1 - MOTION.rise.ease(prog(t, riseAt, MOTION.rise.dur))) * head * 2.2 : 0;
+   if (riseAt !== undefined && t < riseAt) return null;
+ 
+@@ -277,28 +473,46 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
+     );
+   }
+   if (q > 0.02) {
+-    // the phone arm swings about the shoulder from hanging to raised (mirrored for the left arm)
++    // the phone arm is driven by JOINT ANGLES (right-hand frame, mirrored for the left arm): the upper arm swings up
++    // about the shoulder while the elbow folds the forearm up ahead of it (bend 30 deg at rest up, +30 deg mid-swing),
++    // then the arm extends: hanging and raised poses (and so every phone's resting place) are exactly the old ones;
++    // the palm cups the phone's lower edge, thumb + fingers wrap its sides, the phone follows the forearm
+     const sh: Pt = [hw - d * 0.5, -g.h + R * 0.55];
+     const hd: Pt = [xc - d * 0.5, yCuff + g.w * 0.06];
+     const hu: Pt = [g.w * 0.62, hyUse - g.hr * 1.25];
+     const a0 = Math.atan2(hd[1] - sh[1], hd[0] - sh[0]);
+     const a1 = Math.atan2(hu[1] - sh[1], hu[0] - sh[0]);
+-    const L = lerp(Math.hypot(hd[0] - sh[0], hd[1] - sh[1]), Math.hypot(hu[0] - sh[0], hu[1] - sh[1]), Math.min(1, q));
+-    const a = a0 + (a1 - a0) * q;
+-    const hand: Pt = [pside * (sh[0] + Math.cos(a) * L), sh[1] + Math.sin(a) * L];
+-    const rot = (pside * (a - a1) * 180) / Math.PI;
++    const qc = Math.max(0, Math.min(1, q));
++    const B1 = Math.PI / 6;
++    const beta = B1 * q + (Math.PI / 6) * Math.sin(Math.PI * qc);
++    const lseg = lerp(Math.hypot(hd[0] - sh[0], hd[1] - sh[1]) / 2, Math.hypot(hu[0] - sh[0], hu[1] - sh[1]) / (2 * Math.cos(B1 / 2)), qc);
++    const au = a0 + (a1 + B1 / 2 - a0) * q;
++    const af = au - beta;
++    const elR: Pt = [sh[0] + Math.cos(au) * lseg, sh[1] + Math.sin(au) * lseg];
++    const handR: Pt = [elR[0] + Math.cos(af) * lseg, elR[1] + Math.sin(af) * lseg];
++    const hand: Pt = [pside * handR[0], handR[1]];
++    const elbowP: Pt = [pside * elR[0], elR[1]];
++    const rot = (pside * (af - (a1 - B1 / 2)) * 180) / Math.PI;
++    const phoneM = mat.compose(mat.translate(hand[0], hand[1]), mat.rotate(rot));
++    // the coat's tension fold from the raised arm's armpit toward the spine: it draws on with the raise
++    const fold = quadTo([pside * (hw - d * 1.1), -g.h + R * 1.0], [pside * hw * 0.5, -g.h + R + g.w * 0.26], [pside * hw * 0.16, -g.h + R + g.w * 0.56], qc);
+     parts.push(
+       <g key="phoneArm">
+-        <Arm sh={[pside * sh[0], sh[1]]} hand={hand} w={d * 1.05} coat={coat} W={W * 0.9} seed={`${seed}/parm`} />
+-        <XG m={mat.compose(mat.translate(hand[0], hand[1]), mat.rotate(rot))}>
++        {qc > 0.05 ? <Ink d={fold} width={W * 0.7} seed={`${seed}/fold`} /> : null}
++        <XG m={phoneM}>
++          <PhoneGrip W={W} thumb={-pside as 1 | -1} back seed={`${seed}/grip`} />
++        </XG>
++        <Arm sh={[pside * sh[0], sh[1]]} hand={hand} elbow={elbowP} w={d * 1.05} coat={coat} W={W * 0.9} hand2={false} seed={`${seed}/parm`} />
++        <XG m={phoneM}>
+           <Fill d={roundRect(-11, -42, 22, 38, 4)} color={palette.card} offset={false} mode="none" seed={`${seed}/ph`} />
+           <Ink d={roundRect(-11, -42, 22, 38, 4, {seed: `${seed}/phi`}) + `M-5 -34H5`} width={W * 0.85} taper={false} seed={`${seed}/phi`} />
++          <PhoneGrip W={W} thumb={-pside as 1 | -1} seed={`${seed}/grip`} />
+         </XG>
+       </g>,
+     );
+   }
+   const rimD = rim ? rimStripD(g, rim === 'left' ? -1 : 1, W, px, g.w * 2.2) : '';
+-  let person: React.ReactNode = <Person x={x} y={hipY} s={s} seed={seed} hair={hairUse} acc={accs} body={coat} torsoH={torsoH} ink={DEPTH_INK[depth]} hero={false} rim={false} />;
++  let person: React.ReactNode = <Person x={x} y={hipY} s={s} seed={seed} hair={hairUse} hairColor={hairFix} acc={accs} body={coat} torsoH={torsoH} ink={DEPTH_INK[depth]} hero={false} rim={false} />;
+   if (capOn) {
+     // only the coat of the kit Person (its head is replaced by the BackHead + collar band below)
+     const cid = clipId + 'c';
+@@ -345,6 +559,7 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
+       {hood}
+       <XG m={local}>
+         {rimD ? <Fill d={rimD} color={palette.white} offset={false} mode="none" seed={`${seed}/rim`} /> : null}
++        {collarOn ? <CollarBand top={-torsoH} hr={g.hr} coat={coat} W={W} seed={`${seed}/cb`} /> : null}
+         {capOn ? (
+           <BackHead hy={hyUse} hr={g.hr} hair={capHair} cap={capColor} W={W} neckTo={-torsoH + g.hr * 0.2} seed={String(seed)} under={<CollarBand top={-torsoH} hr={g.hr} coat={coat} W={W} seed={String(seed)} />} />
+         ) : null}
+@@ -356,7 +571,16 @@ export const EdgeOnlooker: React.FC<EdgeOnlookerProps> = ({x, y, head = 110, see
+ 
+ // ---------------------------------------------------------------- Citizen
+ 
+-export type CitizenProps = FigBase & {silhouette?: boolean; color?: string; body?: string; hair?: Hair; acc?: Acc[]};
++export type CitizenProps = FigBase & {
++  silhouette?: boolean;
++  color?: string;
++  body?: string;
++  hair?: Hair;
++  /** Hair colour (default: the kit's seeded pick, a sand = skin-coloured pick becomes ochre / ink-brown). Redrawn over
++   *  the kit head, so the figure's other seeded picks (trousers, shoes, walk phase) never change. */
++  hairColor?: string;
++  acc?: Acc[];
++};
+ 
+ /** 40-55 px back-view citizen with legs (kit Person); `silhouette` = a flat sage cut-out (fill only). */
+ export const Citizen: React.FC<CitizenProps> = (p) => {
+@@ -378,18 +602,35 @@ export const Citizen: React.FC<CitizenProps> = (p) => {
+     );
+   }
+   const walking = walkPos(t, p).walking;
++  const seed = p.seed ?? 'cit';
++  const kp = kitPicks(seed, p.hair, p.body);
++  const hc = p.hairColor ?? skinSafeHair(kp.hairColor, kp.coat, kp.style);
++  const hz = walking ? p.walk?.hz ?? 1.8 : undefined;
++  const W = inkFor(p.h, p.depth) / s;
+   return (
+     <FigFrame b={p} s={s}>
+-      <Person seed={p.seed ?? 'cit'} legs torsoH={TORSO} legH={LEG} body={p.body} hair={p.hair} acc={p.acc ?? []} ink={inkFor(p.h, p.depth) / s} walk={walking ? p.walk?.hz ?? 1.8 : undefined} hero={false} lod={p.h < 34 ? 1 : 0} />
++      <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={p.body} hair={p.hair} acc={p.acc ?? []} ink={W} walk={hz} hero={false} lod={p.h < 34 ? 1 : 0} />
++      {hc !== kp.hairColor ? <HairOver seed={seed} hair={p.hair} body={p.body} color={hc} W={W} lod={p.h < 34 ? 1 : 0} walkHz={hz} /> : null}
+     </FigFrame>
+   );
+ };
+ 
+ // ---------------------------------------------------------------- Investigator (S05)
+ 
+-export type InvestigatorProps = FigBase & {body?: string; hair?: Hair; raiseAt?: number; lowerAt?: number; twinkle?: boolean; arm?: 'left' | 'right'};
++export type InvestigatorProps = FigBase & {
++  body?: string;
++  hair?: Hair;
++  /** Hair colour (default: the kit's seeded pick, a sand = skin-coloured pick becomes ochre / ink-brown). */
++  hairColor?: string;
++  /** Collar: a straight band one step darker than the coat (default), the kit's V chevron ('v', the old look), none. */
++  collar?: 'band' | 'v' | false;
++  raiseAt?: number;
++  lowerAt?: number;
++  twinkle?: boolean;
++  arm?: 'left' | 'right';
++};
+ 
+-/** Full-body investigator: an ink shield badge on the back, a raised sparkle tablet (raiseAt). */
++/** Full-body investigator: an ink shield badge on the back, a straight collar band, a raised sparkle tablet (raiseAt). */
+ export const Investigator: React.FC<InvestigatorProps> = (p) => {
+   const t = useTime();
+   const seed = p.seed ?? 'inv';
+@@ -406,9 +647,19 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
+   const walking = walkPos(t, p).walking;
+   const by = -g.h * 0.62;
+   const shield = `M${-11} ${by - 13}Q0 ${by - 17} 11 ${by - 13}L11 ${by}Q9 ${by + 11} 0 ${by + 16}Q-9 ${by + 11} -11 ${by}Z`;
++  const collar = p.collar ?? 'band';
++  const kp = kitPicks(seed, p.hair, coat);
++  const hc = p.hairColor ?? skinSafeHair(kp.hairColor, coat, kp.style);
++  const hz = walking ? p.walk?.hz ?? 1.8 : undefined;
+   return (
+     <FigFrame b={p} s={s}>
+-      <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={coat} hair={p.hair} acc={['collar']} ink={W} walk={walking ? p.walk?.hz ?? 1.8 : undefined} />
++      <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={coat} hair={p.hair} acc={collar === 'v' ? ['collar'] : []} ink={W} walk={hz} />
++      {collar === 'band' ? (
++        <XG m={mat.translate(0, kitWalkBob(seed, t, hz, p.hair, coat))}>
++          <CollarBand top={-TORSO} hr={g.hr} coat={coat} W={W} seed={`${seed}/cb`} />
++        </XG>
++      ) : null}
++      {hc !== kp.hairColor ? <HairOver seed={seed} hair={p.hair} body={coat} color={hc} W={W} walkHz={hz} /> : null}
+       <Ink d={shield + `M0 ${by - 9}V${by + 9}M-6 ${by - 2}H6`} width={W * 0.75} seed={`${seed}/badge`} />
+       {q > 0.02 ? (
+         <>
+@@ -422,9 +673,22 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
+ 
+ // ---------------------------------------------------------------- Messenger (S05 -> S06)
+ 
+-export type MessengerProps = FigBase & {pullAt?: number; holdEnvelope?: boolean; envelopeSize?: number};
++export type MessengerProps = FigBase & {
++  pullAt?: number;
++  holdEnvelope?: boolean;
++  envelopeSize?: number;
++  /** Kit hair style (default 'short'). */
++  hair?: Hair;
++  /** Hair colour, default ink-brown (palette.ink): from behind the head is a FULL hair-colour disc (S06 review: the
++   *  seeded sand pick read as a bald / skin disc). Redrawn over the kit head, so his trousers, shoes and walk phase stay
++   *  the kit's seeded ones (S05 -> S06 continuity, S06's planted stride). */
++  hairColor?: string;
++  /** Collar: a straight tealDark band (default), the kit's V chevron ('v', the old look), none. */
++  collar?: 'band' | 'v' | false;
++};
+ 
+-/** Teal-coated messenger; pulls an envelope from his coat (pullAt) and carries it at shoulder height. */
++/** Teal-coated messenger (ink-brown hair disc, straight tealDark collar band); pulls an envelope from his coat (pullAt)
++ *  and carries it at shoulder height. */
+ export const Messenger: React.FC<MessengerProps> = (p) => {
+   const t = useTime();
+   const seed = p.seed ?? 'msg';
+@@ -435,9 +699,18 @@ export const Messenger: React.FC<MessengerProps> = (p) => {
+   const sh: Pt = [g.w * 0.34, -g.h * 0.8];
+   const hand: Pt = [lerp(g.w * 0.48, g.w * 0.7, q), lerp(-g.h * 0.2, -g.h * 0.92, q)];
+   const walking = walkPos(t, p).walking;
++  const hair = p.hair ?? 'short';
++  const collar = p.collar ?? 'band';
++  const hz = walking ? p.walk?.hz ?? 1.8 : undefined;
+   return (
+     <FigFrame b={p} s={s}>
+-      <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={palette.teal} hair="short" acc={['collar']} ink={W} walk={walking ? p.walk?.hz ?? 1.8 : undefined} />
++      <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={palette.teal} hair={hair} acc={collar === 'v' ? ['collar'] : []} ink={W} walk={hz} />
++      {collar === 'band' ? (
++        <XG m={mat.translate(0, kitWalkBob(seed, t, hz, hair, palette.teal))}>
++          <CollarBand top={-TORSO} hr={g.hr} coat={palette.teal} W={W} seed={`${seed}/cb`} />
++        </XG>
++      ) : null}
++      <HairOver seed={seed} hair={hair} body={palette.teal} color={p.hairColor ?? palette.ink} W={W} walkHz={hz} />
+       {q > 0.02 ? (
+         <>
+           <Envelope x={hand[0] + 6} y={hand[1] - 16} size={(p.envelopeSize ?? 60) / s} rot={lerp(30, -8, q)} carry={walking ? {} : undefined} depth="mid" seed={`${seed}/env`} />
+@@ -458,6 +731,8 @@ export function messengerHand(x: number, y: number, h: number, seed: Seed = 'msg
+ // ---------------------------------------------------------------- Maker
+ 
+ export type MakerProps = FigBase & {
++  /** Hair colour (default: the kit's seeded pick, a sand = skin-coloured pick becomes ochre / ink-brown). */
++  hairColor?: string;
+   /** Waist-up at the bench (no legs; the bench hides the rest). */
+   bust?: boolean;
+   /** Working at the bench: head + shoulders nod and the elbows move (hz). */
+@@ -481,10 +756,15 @@ export const Maker: React.FC<MakerProps> = (p) => {
+   const yj = -g.h * 0.52;
+   const straps = `M${-hw * 0.46} ${-g.h * 0.98}L0 ${yj}M${hw * 0.46} ${-g.h * 0.98}L0 ${yj}L0 ${wy - 4}`;
+   const bow = `M0 ${wy}q-12 -10 -14 0q2 9 14 0q12 -10 14 0q-2 9 -14 0M-3 ${wy + 2}l-6 14M3 ${wy + 2}l6 14`;
++  const hair = rng(`mk/${seed}`).pick<Hair>(['short', 'bun', 'curly', 'short']);
++  const kp = kitPicks(seed, hair, palette.teal);
++  const hc = p.hairColor ?? skinSafeHair(kp.hairColor, palette.teal, hair);
++  const hz = walking ? p.walk?.hz ?? 1.8 : undefined;
+   return (
+     <FigFrame b={p} s={s} feetBelowHip={p.bust ? 0 : LEG}>
+       <XG m={mat.translate(0, nod)}>
+-        <Person seed={seed} legs={!p.bust} torsoH={TORSO} legH={LEG} body={palette.teal} hair={rng(`mk/${seed}`).pick<Hair>(['short', 'bun', 'curly', 'short'])} acc={[]} ink={W} walk={walking ? p.walk?.hz ?? 1.8 : undefined} />
++        <Person seed={seed} legs={!p.bust} torsoH={TORSO} legH={LEG} body={palette.teal} hair={hair} acc={[]} ink={W} walk={hz} />
++        {hc !== kp.hairColor ? <HairOver seed={seed} hair={hair} body={palette.teal} color={hc} W={W} walkHz={hz} legs={!p.bust} /> : null}
+         <Fill d={polyPath([[-hw * 1.02, wy - 6], [-hw * 0.82, wy - 6], [-hw * 0.84, 0], [-hw * 1.07, 0]]) + polyPath([[hw * 1.02, wy - 6], [hw * 0.82, wy - 6], [hw * 0.84, 0], [hw * 1.07, 0]])} color={palette.cream} offset={false} mode="none" seed={`${seed}/ap`} />
+         <Ink d={straps} width={W * 1.7} color={palette.ink} taper={false} seed={`${seed}/st0`} />
+         <Ink d={straps} width={W * 0.9} color={palette.cream} taper={false} seed={`${seed}/st1`} />

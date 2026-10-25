@@ -72,8 +72,8 @@ stages (building, fixing, polishing), where the measured waste happened.
 5. **Lower concurrency, checkpoint every agent.** 66 agents died at usage limits. Run at most about 4 agents at once, commit
    after every agent, and keep each agent's task small enough to restart.
 6. **Precise numbers only at G5 or later.** The G3 storyboard is data plus a video, never an 800-line prose spec with px/s values.
-7. **The hook goes first at every gate**, as a swappable segment (the first 3-5 s), with variants at G1 (line) and G3
-   (visual). It is never polished last.
+7. **The hook goes first at every gate**, as a swappable segment (the first 3-5 s), with its sound cue from G1 on (a
+   positive phone sound in the first second, per the playbook), and with variants at G1 (line) and G3 (visual). It is never polished last.
 8. **One deliverable per gate, no status reels.** Drop the 30-minute strips of every composition. The owner gets the gate video;
    between gates, one line, and only when something is blocked.
 9. **Lean orchestrator.** Keep the task list short, use short check-in prompts, read agents' final summaries rather than full

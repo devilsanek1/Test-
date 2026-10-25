@@ -1,5 +1,7 @@
 # Project: short-form explainer videos (TikTok / Reels / Shorts)
 
+**New agent picking this up? Read `HANDOFF.md` first**: the full state, the queue, and where all past context lives (`context/`).
+
 The video project lives in `video/` (Remotion). Before starting or continuing any video:
 1. Read `video/docs/OWNER_PLAYBOOK.md`: every piece of the owner's feedback, as rules. It is the memory across videos.
 2. Follow `video/docs/PIPELINE_V2.md`: gates G0-G8, with a playable low-res video with voice at every gate.

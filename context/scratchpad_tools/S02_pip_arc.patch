@@ -1,0 +1,70 @@
+--- src/scenes/Scene02.tsx	2026-10-25 01:23:15.822832568 +0000
++++ src/scenes/Scene02.tsx	2026-10-25 03:33:55.404190772 +0000
+@@ -22,6 +22,8 @@
+ import {Onlookers} from './scene02/Onlookers';
+ import {S02Steps} from './scene02/Steps';
+ import type {Pt} from '../lib/sketch';
++import {PIP_CUT_POSE, pipDropState} from './scene03/cast';
++import {S03_START} from './scene03/beats';
+ 
+ const DUR = S02_END - S02_START;
+ const L = BLUEPRINT_WALL.lock;
+@@ -300,34 +302,19 @@
+   );
+ };
+ 
+-// ---- Pip's hop OUT, handed to S03 (fix round 2). S03's pickup as of its fix round 2 (src/scenes/scene03/cast.tsx,
+-// read-only here): at S03's t0 Pip is at world (830, 905) = screen (830, 915) under S03's rest camera, already FALLING
+-// down-left (vx -1133, vy0 +400 px/s, g ~5,400), scale 1.2, stand-side spread 0.85, flipped, nose up ~6 deg, stretch
+-// -0.2; S03's first frame (8.400) shows him at ~(822, 918). S02's last film frame (8.3667) is one S03 frame before:
+-// S03's own ballistic extrapolation puts him at (860, 906) moving (-1133, +257) px/s. Polish: S02 now lands EXACTLY on
+-// that (position and velocity: no speed step across the cut). The perch moved right (screen x ~910), so the short
+-// Hermite (takeoff end(password)+0.06, D 0.127 s) runs monotonically left: no back-swing. The ears-cover gag holds
+-// 0.43 s (7.77 -> 8.20), the ears pop up, a 0.04 s crouch, takeoff. Retune S03_PICKUP if S03 moves its pickup again.
+-const S03_PICKUP = {screen: [860, 906] as Pt, v: [-1133, 257] as Pt, scale: 1.2, rotate: 6, amount: 0.85, squash: -0.2};
++// ---- Pip's hop OUT, handed to S03. S03 fix round 3: the hop-out IS S03's arc (src/scenes/scene03/cast.tsx,
++// read-only here): ONE ballistic arc from this rod perch to S03's stamp (g 4,500 px/s2, constant vx, apex ~8.21 inside
++// S02), so position AND velocity match on every frame across the hard cut. pipDropState(t_abs - S03_START) gives his
++// SCREEN feet position on that arc (S03's rest framing = S02's at the cut); it starts on this perch at PIP_TAKEOFF
++// (8.12). The pose arrives at S03's on the last frame (PIP_CUT_POSE: stand-side 0.85, flipped, stretch -0.2, +6 deg).
++const S03_PICKUP = {scale: PIP_CUT_POSE.scale, rotate: PIP_CUT_POSE.rotate, amount: PIP_CUT_POSE.amount, squash: PIP_CUT_POSE.squash};
+ const T_LAST = +(LAST_FRAME_ABS - S02_START).toFixed(4);
+ const CAM_LAST = camAt(T_LAST, DUR);
+-const PIP_OUT = {
+-  t0: B.pipHop,
+-  t1: T_LAST,
+-  p0: PIP_PERCH,
+-  p1: [(S03_PICKUP.screen[0] - 540) / CAM_LAST.zoom + CAM_LAST.x, (S03_PICKUP.screen[1] - 960) / CAM_LAST.zoom + CAM_LAST.y] as Pt,
+-  v0: [0, -480] as Pt, // world px/s: a small hop up off the rod
+-  v1: [S03_PICKUP.v[0] / CAM_LAST.zoom, S03_PICKUP.v[1] / CAM_LAST.zoom] as Pt,
+-};
+-const hermite = (p0: number, p1: number, m0: number, m1: number, D: number, s: number) =>
+-  (2 * s ** 3 - 3 * s ** 2 + 1) * p0 + (s ** 3 - 2 * s ** 2 + s) * D * m0 + (-2 * s ** 3 + 3 * s ** 2) * p1 + (s ** 3 - s ** 2) * D * m1;
+-/** Pip's position on the hop out (world) and its progress 0..1 (past 1: extrapolated, only S02's own preview sees it). */
++/** Pip's position on the hop out (world, under S02's camera at t) and its progress 0..1. */
+ const pipOutAt = (t: number): {p: Pt; s: number} => {
+-  const {t0, t1, p0, p1, v0, v1} = PIP_OUT;
+-  const D = t1 - t0;
+-  if (t >= t1) return {p: [p1[0] + v1[0] * (t - t1), p1[1] + v1[1] * (t - t1)], s: 1};
+-  const s = clamp((t - t0) / D);
+-  return {p: [hermite(p0[0], p1[0], v0[0], v1[0], D, s), hermite(p0[1], p1[1], v0[1], v1[1], D, s)], s};
++  const {screen} = pipDropState(t + S02_START - S03_START);
++  const c = camAt(Math.min(t, T_LAST), DUR);
++  return {p: [(screen[0] - 540) / c.zoom + c.x, (screen[1] - 960) / c.zoom + c.y], s: clamp((t - B.pipHop) / (T_LAST - B.pipHop))};
+ };
+ // the ears-cover gag reads at thumbnail size: Pip leans and looks down at the crossed key first (0.1 s), then the pose
+ // pops x1.3 (the front ears-cover rig is ~30 % smaller than sit-back), shivers, and big worry marks flick out round
+--- src/scenes/scene02/beats.ts	2026-10-25 01:13:35.238092493 +0000
++++ src/scenes/scene02/beats.ts	2026-10-25 03:33:55.404294101 +0000
+@@ -62,9 +62,9 @@
+   flutter: 8.03, //                         end(password)-0.15: the flag flutters; the cross ink settles
+   handOut: 8.03, //                         end(password)-0.15 (fix round 2; storyboard cut-0.12): the hand pulls back out
+   //                                        past the sheet edge, in(cubic) 0.34 s: visible over ~9 frames, gone by 8.36
+-  pipEars: 8.20, //                         end(password)+0.02 (polish: the ears-cover gag now holds 0.43 s): Pip lifts his
++  pipEars: 8.08, //                         end(password)+0.02 (polish: the ears-cover gag now holds 0.43 s): Pip lifts his
+   //                                        ears (stand-side, wide) and crouches 0.04 s
+-  pipHop: 8.24, //                          end(password)+0.06 (storyboard cut-0.04 = 8.353): takeoff; on S02's last frame
++  pipHop: 8.12, //                          end(password)+0.06 (storyboard cut-0.04 = 8.353): takeoff; on S02's last frame
+   //                                        he is ON S03's ballistic drop, at its position and velocity (Scene02 PIP_OUT)
+   bitPop: 8.273, //                         cut(password)-0.12: Bit pops back up in the socket
+ } as const;

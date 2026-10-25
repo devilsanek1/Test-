@@ -25,6 +25,9 @@ Format: **rule** — why / evidence (video, date).
 ## Music and sound
 - **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — v1.
 - **Mix to -14 LUFS / -1 dBTP, with the voice always on top**; SFX land on visual hits (slams, punches). — v1.
+- **More sound effects, especially ones people link with something good on their phone** (a like / heart pop, a
+  notification ding, a message-sent swoosh), **with one in the first second.** The owner likes our SFX. We make our own
+  sounds that evoke these; never Apple's or Instagram's actual sounds. — owner, 2026-10-25.
 
 ## Visual style
 - **Style: hand-drawn ink, flat colour, like reference video 1.** — v1, 2026-10-24.
