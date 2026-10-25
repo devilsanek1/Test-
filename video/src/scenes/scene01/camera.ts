@@ -18,16 +18,28 @@ import {clamp, ease as E} from '../../lib/time';
 import {mat, Mat} from '../../lib/xf';
 import {B} from './timing';
 
+// Hook pass (wrap-up): the opening must hit physically and never sit still before the dive. Frame 0 is unchanged (zoom
+// 1, the loop seam with S12). Then: a PUNCH-IN on the press's click (0 -> 0.25 s, +6 %, out(cubic)), a continuous
+// CREEP to the dive (+10 % more by 4.385, inOut(sine): zero velocity into the dive's in(quad)), both about S at the
+// bottom of the caption band (roofs barely rise into the band) over govB, and an impact JOLT on each shutter slam.
 export const CAM = {
-  push: {t0: 0, t1: B.dive - 2.405, z: 1.04, S: [852, 1272] as [number, number]}, // t1 = 1.98 ('down')
-  dive: {t0: B.dive, t1: B.cut, z: 3.19 / 1.04},
+  punch: {t1: 0.25, z: 1.06},
+  push: {t0: 0.25, t1: B.dive, z: 1.16, S: [600, 560] as [number, number]},
+  dive: {t0: B.dive, t1: B.cut, z: 3.19 / 1.16},
 } as const;
+/** Shutter landings (timing.ts: slamB/slamA drop 0.16 s, slamC 0.113 s half drop): screen-space jolt, px. */
+const JOLTS: [number, number][] = [[B.slamB + 0.16, 9], [B.slamA + 0.16, 7], [B.slamC + 0.113, 4]];
+export const joltY = (t: number) => {
+  let y = 0;
+  for (const [ti, a] of JOLTS) if (t >= ti && t < ti + 0.2) y += a * Math.exp(-(t - ti) * 22) * Math.cos(2 * Math.PI * 11 * (t - ti));
+  return y;
+};
 
 /** The dive's match point: govB's lock box (top-left, world (543,1318)) on screen at the hold camera and at the cut. */
 const LOCK_W: [number, number] = [543, 1318];
-const P0: [number, number] = [(LOCK_W[0] - 552) * 1.04 + 540, (LOCK_W[1] - 972) * 1.04 + 960]; // (530.64, 1319.84)
-const P1: [number, number] = [560, 1150];
 const PUSH_S = CAM.push.S;
+const P0: [number, number] = [PUSH_S[0] + (LOCK_W[0] - PUSH_S[0]) * CAM.push.z, PUSH_S[1] + (LOCK_W[1] - PUSH_S[1]) * CAM.push.z];
+const P1: [number, number] = [560, 1150];
 
 /** Parallax exponents per set layer (GovernmentPlaza wrap names) during the push / hold. */
 export const PARALLAX: Record<string, number> = {sun: 0.43, far: 0.43, buildings: 1, govD: 1, ground: 1, light: 1, near: 1.43};
@@ -39,6 +51,8 @@ const DIVE_RAMP: Record<string, number> = {sun: 1.15};
 const DIVE_LIFT: Record<string, number> = {sun: -400};
 
 export const pushQ = (t: number) => E.inOutSine(clamp((t - CAM.push.t0) / (CAM.push.t1 - CAM.push.t0)));
+/** Log zoom of the opening (punch + creep), 0 at frame 0. */
+const pushLogZ = (t: number) => Math.log(CAM.punch.z) * E.outCubic(clamp(t / CAM.punch.t1)) + Math.log(CAM.push.z / CAM.punch.z) * pushQ(t);
 const diveU = (t: number) => clamp((t - CAM.dive.t0) / (CAM.dive.t1 - CAM.dive.t0));
 /** The dive's zoom curve (log zoom, in(quad)). */
 export const diveQ = (t: number) => E.inQuad(diveU(t));
@@ -48,8 +62,10 @@ export const diveS = (t: number) => E.inOutSine(diveU(t));
 /** World -> screen matrix of a layer at scene time t (layer = a GovernmentPlaza wrap name, or an exponent). */
 export function layerMat(t: number, layer: string | number = 1): Mat {
   const f0 = typeof layer === 'number' ? layer : PARALLAX[layer] ?? 1;
-  const pz = Math.exp(Math.log(CAM.push.z) * pushQ(t) * f0);
-  const push = pz === 1 ? mat.I : mat.about(mat.scale(pz), PUSH_S[0], PUSH_S[1]);
+  const pz = Math.exp(pushLogZ(t) * f0);
+  const jy = joltY(t);
+  const push0 = pz === 1 ? mat.I : mat.about(mat.scale(pz), PUSH_S[0], PUSH_S[1]);
+  const push = jy ? mat.mul(mat.translate(0, jy), push0) : push0;
   if (t <= CAM.dive.t0) return push;
   const q = diveQ(t);
   const ramp = typeof layer === 'string' ? DIVE_RAMP[layer] : undefined;
