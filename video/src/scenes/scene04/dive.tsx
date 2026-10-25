@@ -32,15 +32,17 @@ export const PIGEONS: {p: Pt; color: string}[] = STOOP.pigeons.map((p, i) => {
   return {p: [q[0], q[1] + 1] as Pt, color: i ? palette.sand : palette.white};
 });
 
-/** A pigeon in flight: a small body and two wing strokes (`up` = wings raised). */
+/** A pigeon in flight, heading LEFT: a small body with its head forward and two wing strokes, raised in a deep V (`up`)
+ *  or swept down under the body. */
 const Flapper: React.FC<{x: number; y: number; s: number; up: boolean; color: string; seed: string}> = ({x, y, s, up, color, seed}) => {
-  const f = up ? 11 : -5;
-  const wings = `M-17 ${-8 - f}Q-8 -6 0 -4Q8 -6 17 ${-8 - f}`;
-  const body = 'M-11 -6C-9 -12 6 -12 11 -7C8 -2 -6 -1 -11 -6Z';
+  const wings = up ? 'M-20 -26Q-9 -14 1 -8Q9 -16 22 -27' : 'M-19 3Q-9 -10 1 -8Q10 -10 21 2';
+  const body = 'M-12 -8C-10 -13 6 -12 13 -7C7 -3 -6 -3 -12 -8Z';
+  const head = 'M-17 -9a4 4 0 1 0 8 0a4 4 0 1 0 -8 0Z';
   return (
-    <XG m={mat.compose(mat.translate(x, y), mat.scale(-s, s))}>
-      <Fill d={body} color={color} offset={false} mode="none" seed={`${seed}/b`} />
-      <Ink d={body + wings} width={1.7} taper={false} seed={`${seed}/w`} />
+    <XG m={mat.compose(mat.translate(x, y), mat.scale(s))}>
+      <Fill d={body + head} color={color} offset={false} mode="none" seed={`${seed}/b`} />
+      <Ink d={body + head} width={1.5} taper={false} seed={`${seed}/o`} />
+      <Ink d={wings} width={2.1} taper={false} seed={`${seed}/w`} />
     </XG>
   );
 };
