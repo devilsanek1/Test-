@@ -42,7 +42,8 @@ Format: **rule** — why / evidence (video, date).
 - **Palette: keep our soft, warm, "no screaming colours" base (the owner loves it) and play with it: a few details get
   more contrast:** one saturated hero colour (~5-15 % of the frame), a deep dark anchor (aubergine rather than black)
   and tiny hot pops. The background stays a warm off-white. References: `docs/look/palette_refs/`; analysis and the
-  proposal: `docs/look/PALETTE.md`. Explore palettes at every G4. — owner, 2026-10-25.
+  proposal: `docs/look/PALETTE.md`. Be tactical: **one accent card per video** (1 hero + 1 dark anchor + at most 1 pop, each with one job), never all the
+  reference colours together ("we get a complete mess"). Pick the card at G4. — owner, 2026-10-25.
 - **Profile identity: the mascot Pip (the purple PHP elephant) in the film's style;** the avatar in use is the
   power-button sun one (`video/deliverables/profile/pip_power_button.png`). — 2026-10-25.
 
