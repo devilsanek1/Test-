@@ -12,6 +12,7 @@
 //               NARROWING (to 15 % width and back, then a smaller one): never past edge-on, so the lettering never
 //               leaves a blank card (BackSoonTag's own twirlAt shows its blank back for ~4 frames).
 //   backSoonW   the width of a one-line lettered BackSoonTag whose total drop (string + tag) is a given height.
+//   BitRim      a cream rim under the shared Bit (on the dark shutter he read as a speck; Bit has no rim option).
 
 import React from 'react';
 import {palette} from '../../lib/theme';
@@ -23,6 +24,7 @@ import {mat, useXf, XG} from '../../lib/xf';
 import {captionFontStack, measureCaption, useCaptionFont} from '../../lib/font';
 import {matScale} from '../shared/props/common';
 import {layoutText} from '../shared/props/Labels';
+import {bitPath} from '../shared/props';
 
 // ---------------------------------------------------------------- NoteBreeze
 
@@ -186,11 +188,13 @@ export const Sparkle: React.FC<{x: number; y: number; r: number; at: number[]; d
 export const padlockShackleTop = (size: number) => (-9 - 6.5 - 1) * (size / 28);
 
 /** Rocks its child (the shared ShutterPadlock at body centre x, y) about the shackle top, where it hangs from the rail:
- *  +-6 deg, 1.5 swings, decaying over 0.5 s at each `rockAt`. */
-export const PadlockRock: React.FC<{x: number; y: number; size: number; rockAt: number[]; children?: React.ReactNode}> = ({x, y, size, rockAt, children}) => {
+ *  +-6 deg, 1.5 swings, decaying over 0.5 s at each `rockAt`; `tapAt` = a small quick rock (+-3 deg, gone in 0.25 s:
+ *  Bit's tap, so it is settled before the strike starts). */
+export const PadlockRock: React.FC<{x: number; y: number; size: number; rockAt: number[]; tapAt?: number[]; children?: React.ReactNode}> = ({x, y, size, rockAt, tapAt = [], children}) => {
   const t = useTime();
   let rot = 0;
   for (const r of rockAt) if (t >= r && t < r + 0.5) rot += 6 * Math.sin(prog(t, r, 0.5) * Math.PI * 3) * Math.exp(-(t - r) * 6);
+  for (const r of tapAt) if (t >= r && t < r + 0.25) rot += 3 * Math.sin(prog(t, r, 0.25) * Math.PI * 2) * (1 - prog(t, r, 0.25));
   if (rot === 0) return <>{children}</>;
   return <XG m={mat.about(mat.rotate(rot), x, y + padlockShackleTop(size))}>{children}</XG>;
 };
@@ -226,3 +230,19 @@ export function backSoonW(drop: number, text = 'back soon'): number {
   for (let i = 0; i < 6; i++) W *= drop / dropOf(W);
   return W;
 }
+
+// ---------------------------------------------------------------- BitRim
+
+/** A cream rim (`px` screen px outside his shell + head silhouette) drawn UNDER the shared Bit, with Bit's own outer
+ *  transform (feet at x, y, `rot`, `flip`, body length `size`): on the tealDark shutter the ink beetle on the shackle
+ *  read as a dark speck; the rim (as on other dark grounds) gives him a readable silhouette. Bit has no rim option. */
+export const BitRim: React.FC<{x: number; y: number; size: number; rot?: number; flip?: boolean; px?: number; color?: string}> = ({x, y, size, rot = 0, flip = false, px = 1.8, color = palette.cream}) => {
+  const k = Math.max(1e-4, matScale(useXf()));
+  const s = size / 20;
+  const d = bitPath(0, 0, 20, false);
+  return (
+    <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(flip ? -s : s, s))}>
+      <path d={d} fill={color} stroke={color} strokeWidth={(2 * px) / (k * s)} strokeLinejoin="round" />
+    </XG>
+  );
+};

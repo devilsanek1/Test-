@@ -28,9 +28,9 @@ export const tagBodyOffset = (w: number) => w * (0.16 + 0.41);
 
 /** The cobweb tuft radius (face units) and where Bit's strand ties into its outer ring; Bit's spot on the top edge. */
 const TUFT_R = 32;
-const TUFT_TIE: Pt = [-50 + Math.cos((70 * Math.PI) / 180) * TUFT_R * 0.66, -50 + Math.sin((70 * Math.PI) / 180) * TUFT_R * 0.66];
+const TUFT_TIE: Pt = [-50 + Math.cos((45 * Math.PI) / 180) * TUFT_R * 0.38, -50 + Math.sin((45 * Math.PI) / 180) * TUFT_R * 0.38];
 /** Bit's spot on the plate's left edge (face y): just below the tuft, above siteM's door. */
-const BIT_EDGE_Y = -22;
+const BIT_EDGE_Y = -33;
 
 export type HangPlaqueProps = {
   /** Face centre (world) + size (face side, world px) + the wall point of the bracket. */

@@ -30,9 +30,10 @@ const WIPE = {dur: 0.5, half: TramWiper.half ?? S09_TRAM.L / 2 + 8};
 const wipeP = (t: number) => (t + WIPE.dur / 2) / WIPE.dur;
 const tramX = (t: number) => wipeEdgeX(wipeP(t), 'right', WIPE.half);
 
-/** The sun's hand-off hop height (fix round 2: 60 -> 14, so the disc top stays near the caption floor). S09's own hop
- *  (h 60) is only on screen until the wipe edge passes the disc, ~0.06 s after the cut, while both hops are still in
- *  their 0.1 s anticipation squash: the two sides of the wipe still match. */
+/** The sun's hand-off hop height (fix round 2: 60 -> 14) and its shrink r 150 -> 110 now out-cubic (was in-out sine), so
+ *  the disc top stays near the caption floor (measured top 550-562 for 0.3 s, was 514-520 for 0.4 s; the hop's take-off
+ *  stretch alone lifts it to 552 on the cut). S09's own hop (h 60) is only on screen until the wipe edge passes the disc,
+ *  ~0.06 s after the cut, when both suns are still at their take-off stretch: the two sides of the wipe still match. */
 const SUN_HOP_H = 14;
 
 const L13 = ['Rough estimate from', 'W3Techs data · only sites', 'that show their version ·', 'some hosts patch old', 'versions themselves'];
@@ -72,7 +73,7 @@ const Scene10: React.FC = () => {
       <OldQuarter
         sun={
           <ScreenSpace>
-            <Sun cx={700} cy={720} r={150} drift={[5, 0]} hops={[{t: b.cut, to: [500, 690], h: SUN_HOP_H, air: sunAir}]} moves={[{at: b.cut, dur: sunAir, r: 110, ease: E.inOutSine}]}>
+            <Sun cx={700} cy={720} r={150} drift={[5, 0]} hops={[{t: b.cut, to: [500, 690], h: SUN_HOP_H, air: sunAir}]} moves={[{at: b.cut, dur: sunAir, r: 110, ease: E.outCubic}]}>
               {(r) => <SunPie r={r} n={2} cream={1} spokesAt={b.pieSpoke} slicesAt={b.pieCream} solidAt={b.pieSolid} width={2.6} seed="s10/pie" />}
             </Sun>
           </ScreenSpace>

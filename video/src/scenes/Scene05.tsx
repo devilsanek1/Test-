@@ -2,18 +2,22 @@
 // VO: "before researchers using AI figured out how bad it was."
 //
 // The blueprint wall (shared BlueprintWall, the film's one gentle LOW ANGLE): the PHP master blueprint hangs as a tall
-// banner from the cornice of a civic facade; two research teams rise at the foot of the steps, backs to us. MATCH-CUT in:
-// S04's dive into lock4 lands on the SAME lock drawn in ink on the blueprint (same screen spot and size), the L5 tag
-// riding across as an annotation, the camera still creeping IN (1.08 -> 1.13, out(expo), 0.30 s), then locked.
-// 'before': a z floats up from Pip (asleep on the banner's bottom rail) and the banner sways once; 'researchers': team A
-// pops up, then team B (two depths); 'using': the facade calendar tears to its summer page (August); L5 pops off; 'AI':
-// one sparkle tablet per team is raised, the scan beams shoot out and sweep the banner, L6 pops as a clipped slip;
-// 'figured': the beams converge on the lock, team A's back-row member points at it; 'out': ONE hand-circling ink ring
-// strokes on round the lock (found) and the beams retract; 'how': it pulses, the teams lean in; 'bad': ONE focal event:
-// S02's dashed hooded hand redraws over the lock and turns it, Bit (posing as part of the drawing) gets an ink '!' and
-// hops out onto the lock box; 'it': Pip jolts awake; 'was.': the messenger raises the envelope over his left shoulder and
-// dashes out right, the camera trucks with him (0.30 s, MULTIPLANE: steps 1.0, banner / facade 0.67, wing 0.4, heads
-// 1.3: the cut on action into S06), Pip hops off the rail to follow.
+// banner from the cornice of a civic facade; two research teams pop up at the foot of the steps, backs to us, and a big
+// back-view audience fills the bottom band (ref 2's framing layer). MATCH-CUT in: S04's dive into lock4 lands on the SAME
+// lock drawn in ink on the blueprint (same screen spot and size), the L5 tag riding across as an annotation, the camera
+// still creeping IN (1.08 -> 1.13, out(expo), 0.30 s; it rises 20 world px so the cornice clears the caption band), then
+// locked. The landing hits the banner: it sways once on its rod. 'before': a z floats up from Pip (asleep on the banner's
+// bottom rail, S04's leaf still on his ear); 'researchers': team A pops up, then team B (two depths); 'using': the facade
+// calendar tears to its summer page (AUG), a pigeon hops; L5 pops off; 'AI': one sparkle tablet per team is raised, the
+// scan beams (opaque white light under the plan's ink) shoot out and sweep the banner, L6 pops as a clipped slip;
+// 'figured': the beams converge on the lock, team A's back-row member points at it, two audience heads look up; 'out':
+// ONE hand-circling ink ring strokes on round the lock (found) and the beams retract; 'how': it pulses, the teams lean in
+// (torso + head); 'bad': ONE focal event: S02's dashed hooded hand redraws over the lock and turns it, the bolt slides
+// all the way back and the plan's door swings AJAR (a dark gap), Bit (posing as part of the drawing) gets an ink '!' and
+// hops out onto the lock box; an audience head turns to its neighbour; 'it': Pip jolts awake, the leaf flicks off; 'was.':
+// the messenger raises the envelope to his right shoulder, Bit leaps onto his collar and he breaks into a run out right,
+// the camera trucking with him (0.30 s, MULTIPLANE: steps 1.0, banner / facade 0.67, wing 0.4, audience 1.12: the cut on
+// action into S06); Pip leaps off the rail to follow.
 //
 // Camera: scene05/camera.ts (each set layer gets its own camera matrix in `wrap`). The sun is SCREEN space in its notch
 // (930, 725) r110 (depth 0.05: it barely moves on the truck). Notes: docs/scenes/S05.md.
@@ -21,24 +25,26 @@
 import React, {useId} from 'react';
 import {World, useScene, useTime, skies, palette} from '../lib';
 import {Sun} from '../lib/Sun';
+import {Look} from '../lib/exit';
+import {captionFontStack, useCaptionFont} from '../lib/font';
 import {mat, XG} from '../lib/xf';
 import {BlueprintWall, BLUEPRINT_WALL, LayerWrap} from './shared/sets';
 import {Calendar, DiagramHand, LabelTag, yearPages} from './shared/props';
 import {beats, S05_START, S05_END} from './scene05/beats';
 import {camAt, camMat, layerCam, LAYER_F} from './scene05/camera';
-import {Beams, BigZ, BitOnLock, MessengerDash, PipHop, PipOnRail, Teams} from './scene05/cast';
-import {FoundRing, handTurn, KNOB, LOCK_C, LockTurn, SheetColour, StepsOverlay} from './scene05/plan';
+import {Beams, BigZ, BitLeap, BitOnLock, LeafFall, LeafOnEar, MessengerDash, PipHop, PipOnRail, Teams} from './scene05/cast';
+import {DoorSwing, FoundRing, handTurn, KNOB, LOCK_C, LockTurn, PlazaGround, SHEET_IN, SheetLock, SheetPanels, SheetTint, StepsOverlay} from './scene05/plan';
+import {Audience, Pigeons} from './scene05/audience';
 
 // ---------------------------------------------------------------- labels (final_script section 6)
 
-/** L6's first line starts after the slip's paper clip (at 24 % of the slip's width): two en spaces push the centred
+/** L6's first line starts after the slip's paper clip (at 24 % of the slip's width): three en spaces push the centred
  *  line right so the clip sits in its margin, clear of the 'f' of 'found'. */
 const L5 = ['in the code since', 'at least 2012'];
-const L6 = ['   found with AI help ·', 'reported privately in August'];
+const L6 = ['   found with AI help ·', 'reported privately in August'];
 const ZOOM = 1.13;
 /** L5 continues S04's tag: where S04's dive leaves it on the cut (screen ~(426-749, 1004-1106) at zoom 1.9 around
- *  lock4), in S05 world at the 1.08 landing; hung from the lock's bottom-right corner. 36 world = 39-41 px on screen.
- *  (Fix round 1: measured against S04's last frame, 1.5 right and 4 lower: text within 1 px.) */
+ *  lock4), in S05 world at the 1.08 landing; hung from the lock's bottom-right corner. 36 world = 39-41 px on screen. */
 const L5_BOX: [number, number, number, number] = [435.5, 1002, 735.5, 1110];
 /** L6 on the banner's clean top margin (storyboard (205-650, 688-760), 24 px taller so two 38 px lines fit). */
 const L6_BOX: [number, number, number, number] = [205, 688, 650, 784];
@@ -53,11 +59,7 @@ const swayAngle = (t: number, at: number, amp = 1.1, period = 0.9, settle = 0.9)
   return amp * Math.exp((-dt * 4.6) / settle / 1.6) * Math.sin((2 * Math.PI * dt) / period);
 };
 
-// the sheet's inner rect (inside the teal frame): the diagram hand is DRAWN ON the plan, so it is clipped to it
-const [SX, SY, SW, SH] = BLUEPRINT_WALL.sheet;
-const SHEET_IN: [number, number, number, number] = [SX + 12, SY + 12, SW - 24, SH - 24];
-
-/** Clip to the sheet's inner rect (world). */
+/** Clip to the sheet's inner rect (world): the diagram hand is DRAWN ON the plan. */
 const OnSheet: React.FC<{children: React.ReactNode}> = ({children}) => {
   const id = 'sh5' + useId().replace(/[^a-zA-Z0-9]/g, '');
   return (
@@ -72,14 +74,26 @@ const OnSheet: React.FC<{children: React.ReactNode}> = ({children}) => {
   );
 };
 
+/** 'AUG' lettered on the calendar's summer page (pausers: L6's 'reported privately in August'), ink on peach, 21 world
+ *  = 24 px on screen; it is on the page once the tear has cleared it. */
+const AugMark: React.FC<{at: number}> = ({at}) => {
+  const t = useTime();
+  useCaptionFont();
+  if (t < at) return null;
+  return (
+    <text x={CAL[0] + 7} y={CAL[1] + CAL[3] * 0.2 + 21} fontFamily={captionFontStack} fontSize={21} fill={palette.ink}>
+      AUG
+    </text>
+  );
+};
+
 // ---------------------------------------------------------------- the scene
 
-/** 'bad' (rule 5: the big read lands ON the word): the hand draws on from bad-0.10 in 0.15 s (its teal sleeve fills at
- *  ~bad-0.02), the '!' pops and Bit hops out ON the word, the hand turns the knob from bad+0.12. */
+/** 'bad' (rule 5: the big read lands ON the word): the hand draws on from bad-0.10 in 0.15 s, the '!' is up by the word
+ *  and Bit hops out ON it, the hand turns the knob from bad+0.10 (the bolt slides all the way back), the door swings
+ *  ajar from bad+0.22. */
 const HAND_AT = (b: {bad: number}) => b.bad - 0.1;
-const TURN_AT = (b: {bad: number}) => b.bad + 0.12;
-/** The pinch point and the forearm angle: -15 deg, so the teal sleeve enters the sheet's right edge below the L6 slip
- *  (its upper edge at screen y ~ 793 on the sheet's edge) and passes ~70 px under the slip's right end. */
+/** The pinch point and the forearm angle: -15 deg, so the teal sleeve enters the sheet's right edge below the L6 slip. */
 const PINCH: [number, number] = [KNOB[0] + 3, KNOB[1] - 2];
 const HAND_ANGLE = -15;
 
@@ -87,32 +101,42 @@ const Scene05: React.FC = () => {
   const t = useTime();
   const scene = useScene();
   const start = scene?.start ?? S05_START;
-  const end = (scene?.end ?? S05_END) - start;
-  const b = beats(start);
-  const cam = camAt(t, end);
+  const b = beats(start, scene?.end ?? S05_END);
+  const cam = camAt(t, b.end);
 
-  // the banner sways once on its rod on 'before' (a small damped pendulum about the rod's centre)
-  const sway = swayAngle(t, b.zzz);
+  // the landing hits the banner: it sways once on its rod from the cut (a small damped pendulum about the rod's centre)
+  const sway = swayAngle(t, b.sway);
   const swayM = mat.about(mat.rotate(sway), BLUEPRINT_WALL.lock.x, BLUEPRINT_WALL.rodY);
 
-  // the sun: SCREEN space in its notch (930, 725) r110, a slow 6 px/s idle drift (never perfectly still, ENGINE 9);
-  // depth 0.05 on the exit truck
+  // the sun: SCREEN space in its notch (930, 725) r110, a 10 px/s idle drift right (ENGINE 6), depth 0.05 on the truck
   const sunX = 930 - (cam.x - 540) * cam.zoom * 0.05;
-  const sun = <Sun cx={sunX} cy={725} r={110} drift={[6, 0]} />;
+  const sun = <Sun cx={sunX} cy={725} r={110} drift={[10, 0]} />;
 
-  const calendar = <Calendar x={CAL[0]} y={CAL[1]} w={CAL[2]} h={CAL[3]} pages={[...yearPages(1), {kind: 'summer'}]} tearAt={[b.calendar]} tearDur={0.12} seed="s5cal" />;
+  const calendar = (
+    <>
+      <Calendar x={CAL[0]} y={CAL[1]} w={CAL[2]} h={CAL[3]} pages={[...yearPages(1), {kind: 'summer'}]} tearAt={[b.calendar]} tearDur={0.12} seed="s5cal" />
+      <AugMark at={b.calendar + 0.12} />
+    </>
+  );
 
-  const turn = handTurn(t, TURN_AT(b));
+  const turn = handTurn(t, b.turn);
 
   const inner = (name: string, node: React.ReactNode): React.ReactNode => {
     if (name === 'banner')
       return (
         <XG m={swayM}>
           {node}
-          <SheetColour />
+          {/* the paper tone, the scan beams' light, the cream accents, then the set's ink again on top */}
+          <SheetTint />
+          <Beams b={b} />
+          <SheetPanels />
+          <Look fills="none">{node}</Look>
+          {/* 'bad': the right leaf swings ajar behind the callout */}
+          <DoorSwing at={b.door} />
+          <SheetLock />
           {/* L5 rides across the match-cut as the lock's annotation tag; pops off on 'using' */}
           <LabelTag kind="tag" box={L5_BOX} hang={[LOCK_C[0] + 24, LOCK_C[1] + 36]} text={L5} fontSize={36} outAt={b.l5Out} seed="s5L5" />
-          <LockTurn drawAt={HAND_AT(b)} turnAt={TURN_AT(b)} undrawAt={b.envelope} />
+          <LockTurn drawAt={HAND_AT(b)} turnAt={b.turn} undrawAt={b.envelope} />
           <FoundRing x={LOCK_C[0]} y={LOCK_C[1]} r={92} at={b.ring} pulseAt={b.how} width={4.8} />
           <OnSheet>
             <XG m={mat.about(mat.rotate(turn), PINCH[0], PINCH[1])}>
@@ -120,10 +144,11 @@ const Scene05: React.FC = () => {
             </XG>
           </OnSheet>
           {/* Bit over the hand (he is the one being caught), his '!' balloon over everything on the sheet */}
-          <BitOnLock alertAt={b.bad} backAt={b.bitBack} />
+          <BitOnLock alertAt={b.bad} balloonAt={b.balloon} leapAt={b.bitLeap} />
           {/* L6: the clipped slip on the banner's clean top margin (leads its beat: in full by 'AI'+0.40) */}
           <LabelTag kind="slip" box={L6_BOX} text={L6} fontSize={38 / ZOOM} at={b.l6 - 0.08} seed="s5L6" />
           <PipOnRail b={b} />
+          <LeafOnEar b={b} />
           <BigZ at={b.zzz} />
         </XG>
       );
@@ -132,10 +157,13 @@ const Scene05: React.FC = () => {
         <>
           {node}
           <StepsOverlay />
-          <Beams b={b} />
+          <PlazaGround />
           <Teams b={b} />
           <MessengerDash b={b} />
+          <Pigeons b={b} />
+          <LeafFall b={b} />
           <PipHop b={b} />
+          <BitLeap b={b} leapAt={b.bitLeap} />
         </>
       );
     return node;
@@ -150,7 +178,7 @@ const Scene05: React.FC = () => {
 
   return (
     <World sky={[{t: 0, tod: 'day', color: skies.day}]}>
-      <BlueprintWall sun={sun} calendar={calendar} wrap={wrap} seed="bpw" />
+      <BlueprintWall sun={sun} calendar={calendar} foreground={<Audience b={b} />} wrap={wrap} seed="bpw" />
     </World>
   );
 };

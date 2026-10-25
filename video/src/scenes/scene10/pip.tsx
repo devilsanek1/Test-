@@ -43,10 +43,10 @@ const CROUCH = 0.05;
 const ARC = 0.66;
 export const LEAP_DUR = CROUCH + ARC;
 const OUT_DUR = 0.3;
-/** The take-off (fix round 2): a small upward kick, then constant gravity g = 2 (dy - VY0 ARC) / ARC^2 (~4,600 px/s^2,
- *  motion spec #25); x keeps S09's roof velocity (decaying over TAU_V) and eases onto the perch, so his velocity is
- *  continuous through the hand-off and he never steps back left. */
-const VY0 = -250;
+/** The take-off (fix round 2): a small upward kick, then constant gravity g = 2 (dy - VY0 ARC) / ARC^2 (~5,000 px/s^2,
+ *  motion spec #25). x keeps S09's roof velocity through the crouch (decaying over TAU_V: he never steps back left), and
+ *  the push-off gives him a constant leftward speed (ballistic: x linear in the air), so he leaves the edge at once. */
+const VY0 = -350;
 const TAU_V = 0.12;
 
 /** Where his trunk tip is in the mirrored trunk-up pose (world): the 'hey' spark radiates from here at the plaque. */
@@ -84,7 +84,7 @@ export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
     const [x0, y0] = T.leapFrom;
     const vx0 = T.leapV ?? 0;
     const k = Math.max(0, (tau - CROUCH) / ARC);
-    const x = x0 + vx0 * tau * Math.exp(-tau / TAU_V) + (px - x0) * k * k * (3 - 2 * k);
+    const x = x0 + vx0 * tau * Math.exp(-tau / TAU_V) + (px - x0) * k;
     if (tau < CROUCH) {
       return <Elephant x={x} y={y0} scale={s0} pose="stand-side" flip amount={0.15} squash={0.24} rotate={4} t={t} seed={PIP.seed} />;
     }

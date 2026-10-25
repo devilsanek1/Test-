@@ -1,8 +1,9 @@
 // S11 near-plane and depth helpers (fix round 1):
-//   NearLamp     the plaza's lamp post, cropped by the LEFT frame edge (SCREEN space: a foreground layer the 4 % push /
-//                3 % lean barely moves): tealDark post from below the frame to a cream lantern at screen y ~900 (under the
-//                caption band), a short crossbar (the bar S12's pigeons land on). Its lantern pops off (cream -> sand) with
-//                the switch-off spreading along govA's side. Pip's in-hop passes BEHIND it (he is on govB's sill).
+//   NearLamp     the plaza's lamp post at the LEFT frame edge (SCREEN space: a foreground layer the 4 % push / 3 % lean
+//                barely moves): a slim tealDark post from below the frame to a WHOLE cream lantern head at screen x ~3-77,
+//                y 832-962 (under the caption band; fix round 2: the head is fully in frame and the post stands 29 px in
+//                from the edge, so it reads as a lamp, not a frame border), a short crossbar (the bar S12's pigeons land
+//                on). Its lantern pops off (cream -> sand) with the switch-off ripple. Pip's in-hop passes BEHIND it.
 //   StepTreads   ink for the plaza's far steps in the gap between govB and govD (world): the set leaves them as flat
 //                cream / sand stripes in colour (its step lines are paper-only), which at zoom 1.7 read as blinds. Three
 //                broken tread lines + a kerb line in the set's hand turn them back into steps.
@@ -18,7 +19,7 @@ import {blob, line, polyPath, rectPath} from '../../lib/sketch';
 
 // ---------------------------------------------------------------- NearLamp (screen px)
 
-const LAMP = {x: 12, w: 30, lantern: [878, 962] as [number, number], lw: 58, roofTop: 832, barY: 1012, barX1: 104};
+const LAMP = {x: 40, w: 22, lantern: [878, 962] as [number, number], lw: 58, roofTop: 832, barY: 1012, barX1: 122};
 
 export const NearLamp: React.FC<{offAt?: number; seed?: string}> = ({offAt, seed = 's11/lamp'}) => {
   const t = useTime();
@@ -34,6 +35,8 @@ export const NearLamp: React.FC<{offAt?: number; seed?: string}> = ({offAt, seed
   const bold = stroke.inkBold;
   const ink =
     line(x1, 1990, x1 - 1, ly1 + 16, {seed: `${seed}/r`, over: 0}) +
+    line(x0, 1990, x0 + 1, ly1 + 16, {seed: `${seed}/l`, over: 0}) +
+    line(x - w * 0.75 - 1, ly1 + 1, x - w * 0.75, ly1 + 16, {seed: `${seed}/c4`, over: 0}) +
     line(x - w * 0.75 - 2, ly1, x + w * 0.75 + 3, ly1 + 1, {seed: `${seed}/c1`, over: [2, 2]}) +
     line(x - w * 0.75, ly1 + 16, x + w * 0.75 + 2, ly1 + 16, {seed: `${seed}/c2`, over: [2, 2]}) +
     line(x + w * 0.75 + 1, ly1, x + w * 0.75, ly1 + 16, {seed: `${seed}/c3`, over: 0}) +
@@ -44,7 +47,9 @@ export const NearLamp: React.FC<{offAt?: number; seed?: string}> = ({offAt, seed
     line(x, LAMP.roofTop, x + lw / 2 + 10, ly0, {seed: `${seed}/rf2`, over: [0, 2]}) +
     line(x - lw / 2 - 10, ly0 + 1, x + lw / 2 + 10, ly0, {seed: `${seed}/rf3`, over: [2, 2]});
   const glass =
-    line(x + lw / 2, ly0, x + lw / 2 - 1, ly1, {seed: `${seed}/g1`, over: [1, 1]}) + line(x, ly0 + 2, x + 1, ly1 - 2, {seed: `${seed}/g2`, over: 0});
+    line(x + lw / 2, ly0, x + lw / 2 - 1, ly1, {seed: `${seed}/g1`, over: [1, 1]}) +
+    line(x - lw / 2, ly0, x - lw / 2 + 1, ly1, {seed: `${seed}/g3`, over: [1, 1]}) +
+    line(x, ly0 + 2, x + 1, ly1 - 2, {seed: `${seed}/g2`, over: 0});
   return (
     <>
       <Fill d={post + bar} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/post`} />

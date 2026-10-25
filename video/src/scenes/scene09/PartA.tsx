@@ -191,7 +191,7 @@ export function pipA(t: number): PipState {
 }
 
 /** Where a rider (Bit) sits on Pip at state `st` and `scale`, in Pip's parent coordinates: on top of his left ear in the
- *  sitting / trunk-up poses (his left ear), on his back in the side poses (Pip-local units, through the Elephant's own transform:
+ *  sitting / trunk-up poses, on his back in the side poses (Pip-local units, through the Elephant's own transform:
  *  translate, rotate, scale(flip x scale), squash). */
 export function pipRidePoint(st: PipState, scale: number): [number, number] {
   const side = st.pose === 'stand-side' || st.pose === 'walk-side';
