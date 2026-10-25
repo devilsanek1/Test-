@@ -37,9 +37,15 @@ const ABS = {
   stamp: 8.83, //               w31-0.13 'PHP': the stamp SLAMS: ink ring 0.06 s, the print pops 2.6x at 8.89 and drops (in-quad)
   //                            to 1.0x in 0.10 s: CONTACT at 8.99 ('PHP'+0.03), a 2-frame impact; Pip jolts + bounces
   contact: 8.99, //             the print's contact frame (stamp + 0.16): Pip's jolt + bounce, the plan's 2 px jolt
-  L3: 9.26, //                  w31+0.30 'PHP': label L3 pops on the title-block card
-  popUp: 9.46, //               w31+0.50 'PHP': the city springs out of the plan (press first, then L1 R1 L2 R2 L3 R3 L4 R4 L5)
-  allUp: 9.81, //               w31+0.85: every side building has started (0.035 s apart)
+  popUp: 9.02, //               contact+0.03 'PHP' (hook pass: was w31+0.50 = 9.46, half a second after the word on ~1.07 s
+  //                            of bare plan): the street is BUILT ON 'PHP': the stamp's impact (contact frame + the 2 px
+  //                            plan jolt) triggers it, the press house's first frame is the jolt's second frame (film
+  //                            f271, 9.033, already ~25 % up), then L1 R1 L2 R2 L3 R3 L4 R4 L5 0.035 s apart
+  allUp: 9.34, //               popUp+0.32: every side building has started (L5); all settled by ~9.60
+  L3: 9.55, //                  w31+0.59 'PHP' (hook pass: was w31+0.30 = 9.26, under the build): label L3 pops on the
+  //                            title-block card AFTER the rows (L5 settling), its own beat in the ellipsis
+  wire: 9.93, //                end(PHP)+0.115: the bird wire draws from L3's cornice to the sign pole (unchanged by the hook
+  //                            pass: it was popAt.L5 + 0.15 off the old build)
   pipSettle: 9.915, //          end(PHP)+0.10: Pip settles on the stamp; the roof vent puffs two sheets
   birdHop: 10.07, //            w32-0.065 'the': a bird on the new wire hops and turns round (polish round 1: life in the
   //                            calm after the pop-up; the frame otherwise holds for the bait)

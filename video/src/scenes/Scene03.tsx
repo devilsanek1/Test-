@@ -4,8 +4,8 @@
 // Blueprint Street (shared BlueprintStreet, wide): a HARD CUT onto the bare plan (ten flat sand footprints with inked
 // edges and door swings: the figure; the sheet framed in S02's teal band, a sparse grid on the plain running to the
 // horizon: the ground; the sun already in its wide slot); the near grid draws on far -> near (lead into 'It's'), Pip drops in and lands ('in'), the solid tealDark elephant stamp slams under him ('PHP')
-// and he settles on its rump, L3 pops on the title-block card, and in the ellipsis the whole street springs out of the
-// plan in one gesture (press house, then L1 R1 L2 R2 L3 R3 L4 R4 L5). The bait ('the language everyone loves') plays on
+// and he settles on its rump; the stamp's impact triggers the build (hook pass): the whole street springs out of the
+// plan in one gesture ON 'PHP' (press house, then L1 R1 L2 R2 L3 R3 L4 R4 L5), and L3 pops on the title-block card after it. The bait ('the language everyone loves') plays on
 // a calm frame: one screen lights, the street fills ('everyone'), Pip puffs up proudly ('loves'), the pen-nib sign
 // swings with Bit on it. The count (polish round 1: ONE street encoding, the screens): ten spokes on the sun ('about');
 // 'seven': the press plaque pings, then the six side PHP screens (L1 R1 L2 R2 L4 R3) light near -> far with an elephant
@@ -201,7 +201,8 @@ const Scene03: React.FC = () => {
       // no PHP lock on the 3 non-PHP doors), plus the per-building overlays (screens = the count, pages, awnings, window
       // boxes), the tree, the bird wire and the sun (behind the rows until its take-off squash, then in front)
       const rows = <SideRows popAt={T.popAt} />;
-      const allUp = T.popAt.L5 + 0.15;
+      // the bird wire draws at its own beat (end(PHP)+0.115), not off the build: the hook pass moved the build to 'PHP'
+      const allUp = b.wire;
       const sunFront = t >= b.sunHop - 0.1;
       return (
         <>

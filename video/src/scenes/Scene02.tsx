@@ -14,7 +14,7 @@ import {World, Sun, XG, Ink, Fill, useTime, useScene, palette, prog, lerp, clamp
 import {ElephantTimeline, hop} from '../lib/mascot';
 import {BlueprintWall, BLUEPRINT_WALL, LayerWrap} from './shared/sets';
 import {LabelTag, DiagramHand, KeyCross, dashPath, pointAlong} from './shared/props';
-import {camAt, camMat, LAND} from './scene02/camera';
+import {camAt, camMat, LAND, pushShiftX} from './scene02/camera';
 import {B, LAST_FRAME_ABS, S02_END, S02_START, W, local} from './scene02/beats';
 import {DiagramLock, THUMB} from './scene02/DiagramLock';
 import {TakenSite} from './scene02/TakenSite';
@@ -24,6 +24,8 @@ import {S02Steps} from './scene02/Steps';
 import type {Pt} from '../lib/sketch';
 
 const DUR = S02_END - S02_START;
+/** Share of the takeover push's sideways move the screen-space sun follows (parallax; camera.ts pushShiftX). */
+const SUN_PARALLAX = 0.45;
 const L = BLUEPRINT_WALL.lock;
 const LOCK_SIZE = L.h; // 75: 60 x 75 world, 69 x 86 px on screen at the 1.15 landing (the S01 match)
 const C: Pt = [L.x, L.y];
@@ -60,9 +62,11 @@ const CONNECTOR: Pt[] = [
   [CON_X, C[1] + 14],
   [CON_X, ICON[1] + 12.5],
 ];
-// L2: lower left, 14 world under the loupe's bottom (1100) and 12 above the door-width dimension line (1214); its left
-// edge 20 world (~27 px) inside the sheet's inner frame (212), never tangent to it
-const L2_BOX: [number, number, number, number] = [232, 1114, 596, 1202];
+// L2: lower left, 10 world under the loupe's bottom (1100) and 20 above the door-width dimension line (1214); its left
+// edge 20 world (~27 px) inside the sheet's inner frame (212), never tangent to it. Hook pass 2: L2 now pops at 7.45 on
+// the tighter late creep (x1.40-1.44), so the card is 4 world shorter and 4 higher (was 1114-1202): its bottom edge stays
+// above the bottom UI zone (screen 1520) to the last frame (~1517 px at x1.44)
+const L2_BOX: [number, number, number, number] = [232, 1110, 596, 1194];
 // its leader: a curved ink line from the card's right edge to a dot on the icon's left wall (~80 px on screen), drawn
 // over a white paper halo that breaks the door-elevation lines it crosses (the drafting convention, no '+' crossings)
 const LEADER = `M${L2_BOX[2] + 2} 1170C624 1172 642 1154 ${ICON[0] + 14} 1146`;
@@ -123,7 +127,7 @@ const lockNode = (ink: number, knobOnly = false) => (
     turnAt={B.turn}
     knobOnly={knobOnly}
     plate={PLATE}
-    bit={{size: 24, peekAt: B.bitPeek, cowerAt: B.could, hideAt: B.bitHide, popAt: B.bitPop}}
+    bit={{size: 24, peekAt: B.bitPeek, hitAt: B.bitHit, cowerAt: B.could, hideAt: B.bitHide, popAt: B.bitPop}}
   />
 );
 
@@ -443,7 +447,9 @@ const Scene02: React.FC = () => {
       {/* the sun peeks over the cornice (screen space, behind the facade), left of Pip: (668, 700) r110, top 590 (under
           the 560 sky ceiling), only its cap above the cornice; it drifts 6 px/s and reaches S03's slot (690, 700) r110
           exactly on the hard cut (fix round 2: was 18 px short, a near-miss jitter across the cut) */}
-      <Sun cx={668} cy={700} r={110} drift={[6, 0]} />
+      {/* hook pass 2: during the takeover push (6.30-7.24 film) the sun follows 45 % of the facade's sideways move behind
+          it (a far layer's parallax), so Pip, carried left by the push, stays clear of the disc; 0 outside the push */}
+      <Sun cx={668 + SUN_PARALLAX * pushShiftX(t, dur, 668 + 6 * t, 700)} cy={700} r={110} drift={[6, 0]} />
       <XG m={camMat(cam)}>
         {/* the PHP master blueprint, pre-rolled 0.72 s (polish; was 0.3: the match frame was a near-blank sheet). The
             set draws its door ink panels-first, one stroke per frame (26 strokes from drawAt + 0.2): at the cut the four

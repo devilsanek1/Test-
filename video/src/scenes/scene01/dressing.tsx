@@ -2,7 +2,10 @@
 // time; S12 (the loop seam) must draw the same pieces at their t = 0 state:
 //   SunRipple     the press ripple: a 5 px CREAM band with 1.5 px ink edges (fix round 5, review: the 2-3 px cream line
 //                 was ~1.3:1 on the mint sky, invisible on a phone): r155 -> r195, thinning out over 0.2 s, same curve as
-//                 SunPress 'release'.
+//                 SunPress 'release'. Hook pass 2: generalised (r1, dur, out(quad), thin-to, no hold) for the SHUTDOWN
+//                 RINGS (hook.tsx); its defaults are the frame-0 ripple, unchanged (S12 draws it).
+//   pressK        (hook pass 2) the later power PRESSES: 0 -> 1 -> 0 around each press bottom (S01Glyph `pressAt`, the
+//                 disc dip in plaza.tsx).
 //   PressTicks    (fix round 5) three short ink 'press' ticks off the rim in the clear sky above the gap (r168-196 at
 //                 114 / 90 / 66 deg), full on frame 0, retracting outward and gone by 0.1 s: the button caught at the
 //                 bottom of its press. S12's last reversed step draws them (and the ripple) at their t = 0 state.
@@ -32,12 +35,34 @@ import {LanternOff} from './shims';
 
 /** The SunPress 'release' ripple (pass `ripple={false}` to SunPress): a cream band with ink edges, 5 px of cream between
  *  two 1.5 px ink lines at its emission radius (fix round 5): light leaving the button, readable on the mint sky. Frame
- *  0 (u = 0) = the ring at r, full width; it runs out to r + 40 and thins to nothing in 0.2 s. */
-export const SunRipple: React.FC<{cx: number; cy: number; r: number; at: number; width?: number; edge?: number}> = ({cx, cy, r, at, width = 5, edge = 1.5}) => {
+ *  0 (u = 0) = the ring at r, full width; it runs out to r + 40 and thins to nothing in 0.2 s.
+ *  Hook pass 2, generalised for the shutdown rings: `profile="outQuad"` runs r -> r1 over `dur` on out(quad) and thins
+ *  linearly to `thinTo` of its width (the ink edges to 1.5 x that, capped at 1), then POPS OFF after its last frame (no
+ *  fade); `hold={false}` draws nothing before `at`. The defaults are the frame-0 ripple exactly. */
+export const SunRipple: React.FC<{
+  cx: number;
+  cy: number;
+  r: number;
+  at: number;
+  width?: number;
+  edge?: number;
+  r1?: number;
+  dur?: number;
+  profile?: 'release' | 'outQuad';
+  thinTo?: number;
+  hold?: boolean;
+}> = ({cx, cy, r, at, width = 5, edge = 1.5, r1, dur = 0.2, profile = 'release', thinTo = 0, hold = true}) => {
   const t = useTime();
   const ks = useInkScale();
-  const u = t < at ? 0 : prog(t, at, 0.2);
-  const [, rg, rw] = releaseState(u, 0.12);
+  if (!hold && t < at) return null;
+  const u = t < at ? 0 : prog(t, at, dur);
+  let rg: number;
+  let rw: number;
+  if (profile === 'release') [, rg, rw] = releaseState(u, 0.12);
+  else {
+    rg = ((r1 ?? r + 40) - r) * E.outQuad(u);
+    rw = 1 - (1 - thinTo) * u;
+  }
   if (u >= 1 || rw <= 0.02) return null;
   const w = width * rw;
   const e = edge * Math.min(1, rw * 1.5) * ks;
@@ -47,6 +72,19 @@ export const SunRipple: React.FC<{cx: number; cy: number; r: number; at: number;
       <circle cx={cx} cy={cy} r={r + rg} fill="none" stroke={palette.cream} strokeWidth={w + 0.01} />
     </>
   );
+};
+
+/** Hook pass 2, the later power presses: 0 -> 1 -> 0 around each press bottom `at` (down 0.03 s in(quad), the click ON
+ *  `at`, back up 0.05 s out(cubic): 0.08 s in all). 0 outside every press, so frame 0 is untouched. */
+export const PRESS = {down: 0.03, up: 0.05, glyph: 0.1, disc: 0.03} as const;
+export const pressK = (t: number, ats: readonly number[] | undefined): number => {
+  let k = 0;
+  for (const a of ats ?? []) {
+    const u = t - a;
+    if (u >= -PRESS.down && u < 0) k = Math.max(k, E.inQuad((u + PRESS.down) / PRESS.down));
+    else if (u >= 0 && u < PRESS.up) k = Math.max(k, 1 - E.outCubic(u / PRESS.up));
+  }
+  return k;
 };
 
 /** The press ticks (fix round 5, review: the 0.88 squash is hidden behind govB's dome and govC's tower, so frame 0 read as
@@ -75,12 +113,16 @@ export const PressTicks: React.FC<{cx: number; cy: number; at: number; width?: n
 /** The power glyph with the 'just' glint on the glyph itself (fix round 5): from `glintAt` a scale pop 1 -> 1.12 (0.045 s,
  *  out(cubic)) -> 1 (by +0.12, inOut(sine)) about the glyph's centre, and three cream sparks (6 px, round caps) around
  *  the top of the bar on the orange disc, growing outward (0.05 s) then retracting toward their tips (gone by +0.22).
- *  Sun-local units (origin = the disc centre), `r` = the Sun's render-prop radius. */
-export const S01Glyph: React.FC<{r: number; glintAt: number; seed: string}> = ({r, glintAt, seed}) => {
+ *  Sun-local units (origin = the disc centre), `r` = the Sun's render-prop radius. Hook pass 2: `pressAt` = the later
+ *  power presses (pressK), the glyph squashing to 0.9 on each. */
+export const S01Glyph: React.FC<{r: number; glintAt: number; seed: string; pressAt?: readonly number[]}> = ({r, glintAt, seed, pressAt}) => {
   const t = useTime();
   const ks = useInkScale();
   const u = t - glintAt;
-  const pop = u < 0 ? 1 : u < 0.045 ? 1 + 0.12 * E.outCubic(u / 0.045) : u < 0.12 ? 1.12 - 0.12 * E.inOutSine((u - 0.045) / 0.075) : 1;
+  // hook pass 2: each later press squashes the glyph to 0.9 on screen (the disc itself dips PRESS.disc, plaza.tsx)
+  const pk = pressK(t, pressAt);
+  const press = pk === 0 ? 1 : (1 - PRESS.glyph * pk) / (1 - PRESS.disc * pk);
+  const pop = (u < 0 ? 1 : u < 0.045 ? 1 + 0.12 * E.outCubic(u / 0.045) : u < 0.12 ? 1.12 - 0.12 * E.inOutSine((u - 0.045) / 0.075) : 1) * press;
   const ring = (r * 56) / 150;
   const sparks: React.ReactNode[] = [];
   const su = u - 0.015;

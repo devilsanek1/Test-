@@ -38,6 +38,10 @@ export type DiagramBit = {
   size?: number;
   /** He slides out of the socket into the gap (0.2 s, outBack). */
   peekAt?: number;
+  /** Hook pass 2 ('bug': Bit IS the bug): from peekAt he pops x1 -> x1.35 (out(cubic)), peaking ON hitAt with an
+   *  antenna FLICK (his head and antennae snap up 16 deg about his feet, the antenna tips reach the thumb-turn), then
+   *  settles to x1.15 (a damped bounce, ~0.15 s) and stays that size. */
+  hitAt?: number;
   /** Antennae down / cower (squash about his feet) and a look up at the hand. */
   cowerAt?: number;
   /** He ducks back into the socket (0.14 s). */
@@ -236,6 +240,21 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
     const mouth = sl[0];
     const ax = mouth + L * 0.62 - out * L * 0.62;
     const cowering = bit.cowerAt !== undefined && t >= bit.cowerAt;
+    // the 'bug' hit: scale pop (x1.35 ON hitAt, settling to x1.15) and the antenna flick (a head-up snap about his feet,
+    // peaking ON hitAt, sprung back with one small overshoot); Bit faces left, so + deg lifts his head
+    let pop = 1;
+    let flick = 0;
+    if (bit.hitAt !== undefined && bit.peekAt !== undefined && t >= bit.peekAt) {
+      if (t < bit.hitAt) {
+        const q = prog(t, bit.peekAt, bit.hitAt - bit.peekAt, E.outCubic);
+        pop = 1 + 0.35 * q;
+        flick = 16 * prog(t, bit.hitAt - 0.05, 0.05, E.outCubic);
+      } else {
+        const u = t - bit.hitAt;
+        pop = 1.15 + 0.2 * Math.exp(-u / 0.05) * Math.cos((2 * Math.PI * u) / 0.2);
+        flick = 16 * Math.exp(-u / 0.045) * Math.cos((2 * Math.PI * u) / 0.16);
+      }
+    }
     bitNode = (
       <g key="bit">
         <defs>
@@ -244,7 +263,7 @@ export const DiagramLock: React.FC<DiagramLockProps> = ({x, y, size, ink = 3.4, 
           </clipPath>
         </defs>
         <g clipPath={`url(#${uid}b)`}>
-          <XG m={mat.about(mat.scale(1 + (1 - cower) * 0.4, squashY * cower), ax, 9)}>
+          <XG m={mat.compose(mat.about(mat.scale(1 + (1 - cower) * 0.4, squashY * cower), ax, 9), mat.about(mat.compose(mat.scale(pop), mat.rotate(flick)), ax, 9))}>
             {/* a cream rim round his silhouette separates the ink beetle from the dark socket and the lock's ink */}
             <path d={bitPath(ax, 9, L, true)} fill="none" stroke={palette.cream} strokeWidth={W * 0.75} strokeLinejoin="round" />
             <Bit x={ax} y={9} size={L} flip look={cowering ? 'up' : 'auto'} seed={`${seed}/bit`} />

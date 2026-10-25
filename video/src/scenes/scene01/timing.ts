@@ -30,6 +30,18 @@ export const B = {
   crtB: -0.05, // govB's CRT collapse: at t = 0 its screen IS the bright horizontal line
   // Pip flinches at the click of the press (frame 0 is untouched: the jolt's anticipation starts after it)
   pipFlinch: 0.12,
+  // Hook pass 2: the power-button sun PRESSES four more times (glyph 1 -> 0.9 -> 1, the bottom of each press = `at`, the
+  // click on the sound lane) and each press emits a SHUTDOWN RING from the rim (screen px, out(quad), thinning to 40 %,
+  // popping off on its last frame). Emit times are solved so each ring crosses its target ON its word (camera.ts screen
+  // positions at the hit): ring 1 on 'Governments' sweeps the crowd as heads turn (0.34); ring 2's band reaches govA's
+  // screen (its near edge) ON 'all' (crtA 0.63); ring 3's band crosses govC's screen centre ON 'over' (crtC 0.885);
+  // ring 4, the big one, leaves on 'Europe' and sweeps out across the plaza while the far skyline steps dark.
+  ring: [
+    {at: 0.19, r1: 680, dur: 0.3, w: 6}, // crosses the far row / sB / fC heads (r ~540-560) at 0.34
+    {at: 0.537, r1: 780, dur: 0.3, w: 6}, // r 483 = govA's screen, near edge, at 0.63
+    {at: 0.873, r1: 720, dur: 0.3, w: 6}, // r 204 = govC's screen centre at 0.885
+    {at: 1.155, r1: 1250, dur: 0.45, w: 8}, // the far skyline at once, then out across the plaza; r ~1130 at 1.455
+  ],
   // 'Governments' w0+0.15
   heads: 0.34,
   // 'all' w1-0.10: govA's screen collapses; a walker slows
@@ -75,6 +87,12 @@ export const B = {
   pigeonBack: 3.535,
   // 'on' w13-0.10: the lettered 'back soon' tags swing on (pendulum -16 -> 0, 0.35 s, 0.05 s stagger)
   tags: [3.695, 3.745, 3.795],
+  // Hook pass 2 'on PURPOSE': govB's big 'back soon' tag (on the shutter slats) swings on from tags[0] and SLAPS flat
+  // against the shutter ON 'PURPOSE' (camera: +4 % punch landing here + an 8 px jolt)
+  purposeSlap: 3.955,
+  // the dive rushes govB's slats up through the (empty) caption band in its last frames: the big tag pops off (one
+  // shrunken frame) on f138 so nothing new draws above screen y 590 (its top would cross it on f139)
+  slatTagOut: 4.6,
   // 'PURPOSE' w14: govB's dome lantern pops off; heads turn back to the plaza; the three padlocks glint; Pip glances back
   domeLanternOff: 3.955,
   headsBack: 3.955,

@@ -33,8 +33,10 @@ const ABS = {
   pipLand: 4.865, //                        w15+0.15 'because': Pip lands on the rod with a squash
   coverOpen: 4.855, //                      w16-0.10 'of': the lock cover swings open (out(cubic), diagram dashes)
   boltTest: 5.005, //                       w17-0.10 'this': the bolt shoots out, SLAMS to a stop short of the socket
-  bug: 5.205, //                            w18-0.10 'bug': peach gap + bold bracket + ring draw on
-  bitPeek: 5.235, //                        w18-0.07 'bug': Bit peeks out of the socket, antennae up
+  bug: 5.205, //                            w18-0.10 'bug': peach gap + bold bracket + ring draw on; the camera PUNCH
+  //                                        starts (camera.ts: +6 % in 0.10 s, lands ON 'bug' 5.305 with a jolt)
+  bitPeek: 5.235, //                        w18-0.07 'bug': Bit peeks out of the socket, antennae up, popping x1.35
+  bitHit: 5.305, //                         w18 'bug': ... ON the word (scale peak + antenna flick), settles to x1.15
   site: 5.695, //                           w19 'where': site icon draws on, connector runs lock -> icon
   L1: 5.775, //                             w19+0.08 'where': label L1 (static title-block tag)
   handIn: 5.775, //                         w20-0.10 'hackers' (polish: was w20-0.05 in 0.3 s out(cubic), a 3-frame pop):
@@ -43,9 +45,10 @@ const ABS = {
   could: 6.18, //                           w21-0.10 'could': Bit's antennae flatten; connector dashes march one step
   turn: 6.34, //                            w22-0.08 'take': the thumb-turn turns 90 deg (0.2 s out(cubic)), bolt retracts
   take: 6.42, //                            w22 'take': (lock_click SFX; the bolt is visibly moving, home ~6.5)
-  L2: 6.70, //                              w23+0.065 'over' (polish; storyboard w22+0.15 = 6.57, fix round 2 6.85): label
-  //                                        L2 + its curved leader just after the flag lands (6.585), so the padlock pop on
-  //                                        'site' (6.82) reads as the leader's target. Sound lane: pop_mid 'L2 tag' -> 6.70
+  L2: 7.45, //                              w27-0.135 'a' (hook pass 2; was 6.70 on 'over', polish; storyboard w22+0.15):
+  //                                        label L2 pops after the takeover push has pulled back (7.24), so the push never
+  //                                        crops it; its leader draws at +0.12 (7.57) and its dot lands ON 'password'
+  //                                        (7.67). Sound lane: pop_mid 'L2 tag' -> 7.45
   arrow: 6.475, //                          w23-0.16 'over': the arrow runs along the connector, lands on the word
   bitHide: 6.575, //                        w23-0.06 'over': Bit ducks into the socket (out(quad))
   taken: 6.535, //                          w23-0.10 'over': the icon's window floods dark + hatching (starts on the word)

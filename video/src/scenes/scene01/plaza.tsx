@@ -18,7 +18,8 @@ import {B} from './timing';
 import {CitizenPlan, leanAt, OnlookerPhoneArm, OnlookerShade, PigeonPlan, PipLeap, PipPlan, PipS01, PlazaCitizen, Pigeon} from './cast';
 import {s01WindowSlot} from './screens';
 import {DOME_GLASS, LanternOff, S01_PADLOCK_SIZE, S01Shutter} from './shims';
-import {DoorLanterns, LockRing, PressTicks, S01Branch, S01Glyph, SunRipple, TreeTicks} from './dressing';
+import {DoorLanterns, LockRing, PRESS, pressK, PressTicks, S01Branch, S01Glyph, SunRipple, TreeTicks} from './dressing';
+import {ShutdownRings, SlatTag} from './hook';
 
 const SUN = PLAZA.sun; // (720, 900) r155
 const VP = PLAZA.vp as Pt;
@@ -54,6 +55,12 @@ const S01_GOV_SET: Partial<Record<GovId, GovEvents>> = (() => {
   };
   return {...S01_GOV, govA: strip(S01_GOV.govA), govB: strip(S01_GOV.govB), govC: strip(S01_GOV.govC)};
 })();
+
+/** What S01Shutter draws in S01 (hook pass 2): govB WITHOUT the kit tag under the rail: S01 hangs its big tag on the
+ *  slats instead (hook.tsx SlatTag). S01_GOV itself keeps the old tag for S12 (its S11 note hangs on those slats). */
+const S01_GOV_DRAW: Partial<Record<GovId, GovEvents>> = {...S01_GOV, govB: {...S01_GOV.govB, tagAt: undefined}};
+/** The later power presses (one per shutdown ring, timing.ts B.ring): the click = the bottom of each press. */
+export const S01_PRESSES = B.ring.map((r) => r.at);
 
 /** The windows with the ink-dark dead screen (local stand-in, see screens.tsx). S12: pass the same slot. */
 export const S01_WINDOWS = s01WindowSlot(S01_GOV, true);
@@ -191,8 +198,9 @@ export const PlazaShutdown: React.FC = () => {
     buildings: (
       <>
         {(['govC', 'govA', 'govB'] as const).map((id) => (
-          <S01Shutter key={id} id={id} ev={S01_GOV[id] as GovEvents} />
+          <S01Shutter key={id} id={id} ev={S01_GOV_DRAW[id] as GovEvents} />
         ))}
+        <SlatTag at={B.tags[0]} slap={B.purposeSlap} outAt={B.slatTagOut} />
         <LanternOff r={DOME_GLASS} at={B.domeLanternOff} seed="s01/domeOff" />
         <DoorLanterns offAt={[B.lampOff, B.lampOff + 0.06]} />
         <Bit x={S01_BIT[0]} y={S01_BIT[1]} size={PLAZA.bitSize} seed="plaza/bit" state="idle" />
@@ -201,6 +209,8 @@ export const PlazaShutdown: React.FC = () => {
     ),
     light: (
       <>
+        {/* hook pass 2: the shutdown rings, over the facades and the ground, under the crowd and the near layer */}
+        <ShutdownRings layer="light" />
         {CITIZEN_ORDER.map((i) => (
           <PlazaCitizen key={i} p={S01_CITIZENS[i]} vp={VP} horizon={HZ} />
         ))}
@@ -233,12 +243,16 @@ export const PlazaShutdown: React.FC = () => {
   );
   // frame 0 = the bottom of the SunPress (0.88) with the ripple at its emission radius; it releases over 0.2 s while
   // the ripple runs out to r + 40 (S12 ends on mode="reverse": the same state)
+  const discPress = pressK(t, S01_PRESSES);
   const sun = (
     <>
       <SunPress mode="release" at={B.rippleAt} cx={SUN.x} cy={SUN.y} r={SUN.r} width={MID} ripple={false}>
-        <Sun cx={SUN.x} cy={SUN.y} r={SUN.r} drift={[0, 0]}>
-          {(r: number) => <S01Glyph r={r} glintAt={B.glintPop} seed="s01/pwr" />}
-        </Sun>
+        {/* hook pass 2: the disc dips PRESS.disc on each later press (identity outside them: frame 0 untouched) */}
+        <XG m={discPress === 0 ? mat.I : mat.about(mat.scale(1 - PRESS.disc * discPress), SUN.x, SUN.y)}>
+          <Sun cx={SUN.x} cy={SUN.y} r={SUN.r} drift={[0, 0]}>
+            {(r: number) => <S01Glyph r={r} glintAt={B.glintPop} seed="s01/pwr" pressAt={S01_PRESSES} />}
+          </Sun>
+        </XG>
       </SunPress>
       {/* the ripple: a cream band with ink edges (the kit's ink ring read as an outline around the sun), and the three
           press ticks in the clear sky above the gap (frame 0 only: gone by 0.1 s) */}
