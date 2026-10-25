@@ -3,14 +3,15 @@
 // glass panes kept mintPale under the golden relight, the far-roof, wall and ground details and the clock's speed
 // wedge. The fill-first pen reveal is scene07/reveal.tsx.
 
-import React from 'react';
-import {canvas, ease as E, Fill, Ink, lerp, mat, Mat, MOTION, osc, palette, prog, springAt, springs, Tod, useInkScale, useTime, useXf, world, XG, clamp, Pt, hline, poly, polyPath, line} from '../../lib';
+import React, {useId} from 'react';
+import {canvas, ease as E, Fill, Ink, lerp, mat, Mat, MOTION, osc, palette, prog, springAt, springs, Tod, useInkScale, useTime, useXf, world, XG, clamp, Pt, hline, poly, polyPath, line, blob, circle} from '../../lib';
 import {Elephant, hop} from '../../lib/mascot';
 import {rand, rng} from '../../lib/rng';
 import {Bird} from '../../lib/kit';
-import {Bit, DEPTH_INK, LeakSheet, MarkRing, misregScreen} from '../shared/props';
+import {Bit, DEPTH_INK, LeakSheet, MarkRing, misregScreen, pendulum} from '../shared/props';
+import {measureCaption, useCaptionFont} from '../../lib/font';
 import type {PaneRect} from '../shared/props';
-import {glintAt, HALF, SI, wireAt, WIRES} from '../shared/sets';
+import {glintAt, GroundMarks, HALF, SI, wireAt, WIRES} from '../shared/sets';
 import type {Beats} from './beats';
 
 // ---------------------------------------------------------------- camera (storyboard flat projection)
@@ -178,13 +179,18 @@ const LiteSheet: React.FC<{x: number; y: number; w: number; h: number; rot: numb
   );
 };
 
+/** Pop spring pre-roll of a board clone (s): springs.pop is at ~19 % after 0.035 s. */
+const CLONE_PRE = 0.035;
+
 export const BoardClones: React.FC<{spots: CloneSpot[]; seed: string}> = ({spots, seed}) => {
   const t = useTime();
   return (
     <>
       {spots.map((sp, i) => {
         if (t < sp.at || (sp.liftAt !== undefined && t >= sp.liftAt)) return null;
-        const k = springAt(t, sp.at, springs.pop);
+        // A1 fix round 1 (motion spec: a pop starts at >= 20 %): the spring starts CLONE_PRE before the clone is first drawn
+        // (L7's approach), so its first frame on either grid is a >= 19 % sheet on its beat, not a 2-12 % speck
+        const k = springAt(t, sp.at - CLONE_PRE, springs.pop);
         return (
           <XG key={i} m={mat.about(mat.scale(k), sp.x, sp.y)}>
             {sp.s >= 0.85 ? (
@@ -226,8 +232,10 @@ export const Pigeon: React.FC<{wire: 0 | 1 | 2; x: number; at?: number; hopAt?: 
  *  screen y ~780 (above the like / comment rail, y 900-1500), over the workshop's upper floor, not through the rail. */
 export const PIP = {x: 705, y: 928, s: 1.2, entry: [-40, 1150] as Pt, inAir: 0.5, inH: 60, exit: [1085, 760] as Pt, offLead: 0.02, offAir: 0.32, offH: 30};
 /** The flyer is flicked off this long before the word 'was' (frame 1 already moves ~30 %: out(cubic)). Fix round 2:
- *  0.08 -> 0.14 so the head shake after it gets a full 0.2 s before the hop-off crouch. */
-export const PEEL_LEAD = 0.14;
+ *  0.08 -> 0.14 so the head shake after it got a full 0.2 s before the hop-off crouch; A1 fix round 1: 0.14 -> 0.09
+ *  (ENGINE rule 5's small-element lead): the face clears on ~film frame 23.500, the shake straddles 'was' (23.545) with
+ *  the phone copy and the pigeon, and it carries on into the hop-off crouch (overlapping action) instead of being cut. */
+export const PEEL_LEAD = 0.09;
 /** The head shake after the peel: one 5 Hz swing pair (each half-swing 3 frames), look +-1 decaying to 0.5, with a head
  *  roll of SHAKE.roll deg on the same curve (the sit-front `look` alone moved the face a few px: invisible at 7 Hz). */
 const SHAKE = {lead: 0.005, dur: 0.2, hz: 5, roll: 6};
@@ -242,6 +250,10 @@ export const PipS07: React.FC<{B: Beats}> = ({B}) => {
   const inAir = PIP.inAir;
   const offT0 = B.tilt - PIP.offLead; // hop-off take-off as the tilt starts (crouch from offT0 - 0.08)
   const entry = (tt: number) => hop({t: tt, t0: land - inAir, dur: inAir, from: {x: PIP.entry[0], y: PIP.entry[1]}, to: {x: PIP.x, y: PIP.y}, height: PIP.inH});
+  // the shake after the peel: look swings right / left at 5 Hz (3 frames a half-swing), decaying, with a head roll; it
+  // carries on through the hop-off crouch (A1 fix round 1)
+  const sh = t - (B.was - PEEL_LEAD + SHAKE.lead);
+  const shake = sh > 0 && sh < SHAKE.dur ? Math.sin(sh * Math.PI * 2 * SHAKE.hz) * (1 - (0.5 * sh) / SHAKE.dur) : 0;
   // 1) leap in from off-frame left after the sheet
   if (t < land) {
     const h = entry(t);
@@ -253,7 +265,7 @@ export const PipS07: React.FC<{B: Beats}> = ({B}) => {
     const h = hop({t, t0: offT0, dur: PIP.offAir, from: {x: PIP.x, y: PIP.y}, to: {x: PIP.exit[0], y: PIP.exit[1]}, height: PIP.offH});
     if (t >= offT0 + PIP.offAir) return null; // past the frame edge
     if (h.airborne || t >= offT0) return <Elephant x={h.x} y={h.y} scale={PIP.s} pose="stand-side" amount={h.spread} squash={h.squash} rotate={h.rotate} t={t} seed={7} expression="meh" />;
-    return <Elephant x={h.x} y={h.y} scale={PIP.s} pose="sit-front" squash={h.squash} t={t} seed={7} expression="meh" />;
+    return <Elephant x={h.x} y={h.y} scale={PIP.s} pose="sit-front" look={shake} rotate={shake * SHAKE.roll} squash={h.squash} t={t} seed={7} expression="meh" />;
   }
   // 2) on the board top: sit-back watching the notice; on the 'out' rustle (the copy leaves pane 2, B.out) he turns to
   //    sit-front, so the copy lands on his FACE 0.1 s later (fix round 2: he turned on the slap, the copy hit the back of
@@ -264,9 +276,6 @@ export const PipS07: React.FC<{B: Beats}> = ({B}) => {
   // a small turn squash on the flip (one 0.1 s dip), then the slap's squash
   const turn = t >= B.out && t < B.out + 0.1 ? 0.06 * Math.sin(((t - B.out) / 0.1) * Math.PI) : 0;
   const sq = landSq + sw(t - B.slap) * 1.4 + turn;
-  // the shake after the peel: look swings right / left at 5 Hz (3 frames a half-swing), decaying, with a head roll
-  const sh = t - (B.was - PEEL_LEAD + SHAKE.lead);
-  const shake = sh > 0 && sh < SHAKE.dur ? Math.sin(sh * Math.PI * 2 * SHAKE.hz) * (1 - (0.5 * sh) / SHAKE.dur) : 0;
   const look = front ? shake : -0.55;
   const expr = front ? (t < B.was - PEEL_LEAD ? 'wide' : 'meh') : undefined;
   return <Elephant x={PIP.x} y={PIP.y} scale={PIP.s} pose={front ? 'sit-front' : 'sit-back'} look={look} rotate={front ? shake * SHAKE.roll : 0} expression={expr} squash={sq} t={t} seed={7} />;
@@ -314,6 +323,46 @@ export const Flyer: React.FC<{B: Beats; from: Pt}> = ({B, from}) => {
   return (
     <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(s * sx, s * sy))}>
       <LeakSheet x={0} y={0} w={64} h={82} pin={false} depth="mid" seed="s7flyer" />
+    </XG>
+  );
+};
+
+// ---------------------------------------------------------------- J4's focal cue on 'fix' (A1 fix round 1)
+// With the sound off, 'the fix is NOT ready' rested on the small 'still fixing...' card at the right; the eye was on the
+// big clock ('time passes'). On 'fix' + J4_CUE the card pops 1.15x and settles, and an ink underline is scribbled under
+// 'still': clock and sign read as one idea.
+
+/** The cue's lead after 'fix' (the clock pops on 'fix' itself, the sign answers it). */
+export const J4_CUE = 0.15;
+
+/** The sign's pop-and-settle scale at t (1 outside the cue): up to 1.15 in 0.06 s (out(cubic)), then a damped settle
+ *  (one small undershoot), back to 1 by ~0.4 s. */
+export function j4Pop(t: number, at: number): number {
+  const dt = t - at;
+  if (dt <= 0 || dt > 0.6) return 1;
+  if (dt < 0.06) return 1 + 0.15 * E.outCubic(dt / 0.06);
+  const u = dt - 0.06;
+  return 1 + 0.15 * Math.exp(-u * 9) * Math.cos(u * Math.PI * 2 * 2.2);
+}
+
+/** A quick ink underline under the first word ('still') of a FixSign hung at (x, y) with lettering fs (props FixSign
+ *  layout: card top y + 0.5 fs, row-1 baseline 1.05 fs below it, the line centred on x), drawn on in 0.13 s as one pen
+ *  stroke (out and a shorter stroke back under it), turning with the card's own tilt and swing (FixSign: rot -2 +
+ *  pendulum(swingAt, 12 deg, 0.5 s, 0.9)) about the hang point. */
+export const StillUnderline: React.FC<{x: number; y: number; fs: number; at: number; swingAt?: number; text?: string; word?: string; seed: string}> = ({x, y, fs, at, swingAt, text = 'still fixing...', word = 'still', seed}) => {
+  useCaptionFont();
+  const t = useTime();
+  if (t < at) return null;
+  const lw = measureCaption(text, fs);
+  const ww = measureCaption(word, fs);
+  const x0 = x - lw / 2 - fs * 0.06;
+  const x1 = x - lw / 2 + ww + fs * 0.1;
+  const by = y + fs * 0.5 + fs * 1.05 + fs * 0.2;
+  const d = `M${x0.toFixed(1)} ${(by + 0.6).toFixed(1)}Q${((x0 + x1) / 2).toFixed(1)} ${(by - 2.2).toFixed(1)} ${x1.toFixed(1)} ${(by - 0.8).toFixed(1)}L${(x0 + fs * 0.35).toFixed(1)} ${(by + fs * 0.2).toFixed(1)}Q${((x0 + x1) / 2).toFixed(1)} ${(by + fs * 0.14).toFixed(1)} ${(x1 - fs * 0.25).toFixed(1)} ${(by + fs * 0.16).toFixed(1)}`;
+  const ang = -2 + pendulum(t, swingAt, 12, 0.5, 0.9);
+  return (
+    <XG m={mat.about(mat.rotate(ang), x, y)}>
+      <Ink d={d} at={at} dur={0.13} width={2.5} taper={false} seed={seed} />
     </XG>
   );
 };
@@ -407,8 +456,9 @@ export const PaneGlass: React.FC<{r: PaneRect; corner: 'tl' | 'tr'; seed: string
 };
 
 // ---------------------------------------------------------------- far-roof details (the town the wires run out to)
-// Drawn into the set's 'roofs' layer (behind the wall): chimney stacks in the roofs' own haze tone, TV aerials and a
-// little far pole with two sagging lines on to the left edge, all hairline (far depth).
+// Drawn into the set's 'roofs' layer (behind the wall): chimney stacks in the roofs' own haze tone and a line of three far
+// poles (diminishing to the left) with two sagging lines on to the left edge, all hairline (far depth). A1 fix round 1:
+// no TV aerials.
 
 export const FarRoofDetails: React.FC<{seed?: string}> = ({seed = 's7roofs'}) => {
   const chim: [number, number, number, number][] = [
@@ -422,36 +472,56 @@ export const FarRoofDetails: React.FC<{seed?: string}> = ({seed = 's7roofs'}) =>
   for (const [x, y, w, h] of chim) stacks += `M${x} ${y}V${y - h}H${x + w}V${y}Z`;
   let caps = '';
   for (const [x, y, w, h] of chim) caps += `M${x - 3} ${y - h}H${x + w + 3}V${y - h - 4}H${x - 3}Z`;
-  // TV aerials (fix round 3: a mast with two equal bars read as the glyph '‡' at phone size): a mast leaning a hair, a
-  // long boom near the top TILTED 8-15 deg, a shorter bar and a stub below it (three unequal elements), and a lead
-  // sagging from the mast down to the roof beside its foot. Three of them, all left of the sun (none crosses the clock).
-  const aer = (x: number, y: number, h: number, tilt: number, dir: 1 | -1, k: string) => {
-    const lean = dir * h * 0.04;
-    const top: Pt = [x + lean, y - h];
-    const at = (f: number): Pt => [x + lean * f, y - h * f];
-    const bar = (f: number, l0: number, l1: number, deg: number, kk: string) => {
-      const [cx, cy] = at(f);
-      const a = (deg * Math.PI) / 180;
-      return line(cx - Math.cos(a) * l0, cy - Math.sin(a) * l0, cx + Math.cos(a) * l1, cy + Math.sin(a) * l1, {over: 0, seed: `${seed}/${kk}${k}`});
-    };
-    const mid = at(0.55);
-    const foot: Pt = [x + dir * 15, y];
-    // the lead hangs: it drops steeply off the mast and lies along the roof to its clip (control point under the chord)
-    const lead = `M${mid[0].toFixed(1)} ${mid[1].toFixed(1)}Q${(x + dir * 3).toFixed(1)} ${(y - 1).toFixed(1)} ${foot[0].toFixed(1)} ${foot[1].toFixed(1)}`;
-    return line(x, y, top[0], top[1], {over: 0, seed: `${seed}/a${k}`}) + bar(0.92, 8, 13, dir * tilt, 'b') + bar(0.74, 5, 8, 0, 'c') + bar(0.6, 2, 4, 0, 'd') + lead;
-  };
-  const aerials = aer(66, 772, 30, 12, 1, '0') + aer(176, 790, 24, 9, -1, '1') + aer(338, 784, 27, 14, 1, '2');
-  // the far pole (x 262 on the 808 roof) and its two lines sagging on to the left edge (under the town wires)
-  const P = {x: 262, base: 808, top: 774};
-  const pole = line(P.x, P.base, P.x, P.top, {over: 0, seed: `${seed}/p`}) + line(P.x - 10, P.top + 4, P.x + 10, P.top + 4, {over: 0, seed: `${seed}/pb`});
-  const lines = `M${P.x - 8} ${P.top + 4}Q${(P.x - 8) / 2 - 80} ${P.top + 18} -200 ${P.top + 2}` + `M${P.x + 8} ${P.top + 4}Q${(P.x + 8) / 2 - 70} ${P.top + 24} -200 ${P.top + 10}`;
+  // A1 fix round 1: NO TV aerials (three small masts with cross bars read as '天' / '‡' glyphs at phone size, and a yagi
+  // on a chimney sat right on the town's wire 2): the far-city step (FarCity) and the receding far poles carry the skyline
+  // the far poles: the one at x 262 on the 808 roof and two smaller ones further off (x 205, 18: h 34 -> 23 -> 16), their
+  // two lines running from pole to pole and on out of the left edge: a line of poles receding into the city
+  const poles = [
+    {x: 262, base: 808, h: 34, bar: 10},
+    {x: 205, base: 808, h: 23, bar: 7},
+    {x: 18, base: 790, h: 16, bar: 5},
+  ];
+  let pole = '';
+  poles.forEach((p, i) => {
+    const top = p.base - p.h;
+    pole += line(p.x, p.base, p.x, top, {over: 0, seed: `${seed}/p${i}`}) + line(p.x - p.bar, top + 4 * (p.h / 34), p.x + p.bar, top + 4 * (p.h / 34), {over: 0, seed: `${seed}/pb${i}`});
+  });
+  // each line sags between its tie points (the crossbar ends, inset 2)
+  const ties = (side: -1 | 1): Pt[] => [...poles.map((p): Pt => [p.x + side * (p.bar - 2), p.base - p.h + 4 * (p.h / 34)]), [-200, side < 0 ? 776 : 783]];
+  const sagLine = (pts: Pt[], sag: number) =>
+    pts
+      .slice(1)
+      .map((b, i) => {
+        const a = pts[i];
+        return `${i ? '' : `M${a[0].toFixed(1)} ${a[1].toFixed(1)}`}Q${((a[0] + b[0]) / 2).toFixed(1)} ${(Math.max(a[1], b[1]) + sag * (Math.abs(a[0] - b[0]) / 120)).toFixed(1)} ${b[0].toFixed(1)} ${b[1].toFixed(1)}`;
+      })
+      .join('');
+  const lines = sagLine(ties(-1), 7) + sagLine(ties(1), 9);
   return (
     <>
       <Fill d={stacks + caps} color={HALF.sand} offset={false} seed={`${seed}/st`} />
-      <Ink d={aerials + pole} width={SI.hair} taper={false} seed={`${seed}/ai`} />
+      <Ink d={pole} width={SI.hair} taper={false} seed={`${seed}/ai`} />
       <Ink d={lines} width={SI.hair * 0.8} taper={false} order="all" seed={`${seed}/pl`} />
     </>
   );
+};
+
+/** A1 fix round 1 (the colossal 'whole city' the wires run out to did not read: a thin band of a few bumps): one
+ *  FILL-ONLY far-city step behind the far roofs on the left, a haze tone between the golden sky and the roofs, no ink
+ *  (style bible: far layers flatter, closer to the sky): a stepped skyline 20-40 px above the roofline (a dome, a
+ *  tower, flat blocks) that steps down and thins toward the left edge. World px, drawn first in the set's 'roofs' layer
+ *  (x <= 452: clear of the sun's disc and the clock; screen y > 600 at every camera pose: under the caption band). */
+export const FAR_CITY_HAZE = '#98C0AE';
+export const FarCity: React.FC<{seed?: string}> = ({seed = 's7city'}) => {
+  const top: Pt[] = [
+    [452, 812], [452, 766], [430, 766], [430, 748], [418, 748], [418, 762], [392, 762], [392, 756],
+    [356, 756], [356, 768], [318, 768], [318, 752], [304, 752], [304, 744], [296, 744], [296, 752], [282, 752], [282, 764],
+    [248, 764], [248, 772], [214, 772], [214, 760], [186, 760], [186, 770], [158, 770], [158, 776], [120, 776], [120, 768],
+    [96, 768], [96, 778], [62, 778], [62, 774], [34, 774], [34, 782], [-20, 782], [-20, 786], [-160, 786], [-160, 812],
+  ];
+  // a small dome on the tower block at x 392-356 (the city's one round silhouette, far and flat)
+  const dome = `M362 756A12 11 0 0 1 386 756Z`;
+  return <Fill d={polyPath(top) + dome} color={FAR_CITY_HAZE} offset={false} mode="snap" seed={seed} />;
 };
 
 // ---------------------------------------------------------------- quiet wall details (the left wall field)
@@ -535,15 +605,34 @@ export const GroundDetails: React.FC<{seed?: string}> = ({seed = 's7ground'}) =>
     [-C.w / 2, C.h / 2],
   ];
   const leaf = `M424 1636Q432 1622 447 1625Q442 1640 424 1636Z`;
-  const ticks =
-    line(350, 1574, 366, 1572, {over: 0, seed: `${seed}/t0`}) +
-    line(468, 1590, 480, 1586, {over: 0, seed: `${seed}/t1`}) +
-    line(702, 1569, 721, 1570, {over: 0, seed: `${seed}/t2`}) +
-    line(762, 1624, 774, 1620, {over: 0, seed: `${seed}/t3`}) +
-    line(452, 1657, 466, 1655, {over: 0, seed: `${seed}/t4`}) + // fix round 3: off the set's ground ray at x ~521 (it read as a '⊢')
-    line(652, 1660, 662, 1655, {over: 0, seed: `${seed}/t5`}) +
-    line(806, 1590, 820, 1592, {over: 0, seed: `${seed}/t6`}) +
-    line(392, 1612, 400, 1607, {over: 0, seed: `${seed}/t7`});
+  // A1 fix round 1: the set's long ground rays and its cross read as a registration '+' under the board (S07 drops them,
+  // `withoutGroundMarks`); the paving gets reference 2's ground ticks instead: short PAIRED dashes and small grass commas,
+  // 8-20 px, densest along the kerb and thinning toward the frame bottom (the bottom UI zone), clear of the dropped copy
+  // and the leaf
+  const dash = (x: number, y: number, l: number, k: string) => {
+    const r = rng(`${seed}/d${k}`);
+    const a = r.range(-4, 4);
+    const g = r.range(5, 8);
+    const l2 = l * r.range(0.45, 0.7);
+    const dy = Math.tan((a * Math.PI) / 180);
+    return line(x, y, x + l, y + l * dy, {over: 0, seed: `${seed}/da${k}`}) + line(x + l + g, y + (l + g) * dy + r.range(-1, 1), x + l + g + l2, y + (l + g + l2) * dy, {over: 0, seed: `${seed}/db${k}`});
+  };
+  const comma = (x: number, y: number, h: number, k: string) => {
+    const r = rng(`${seed}/g${k}`);
+    const lean = r.range(-0.35, 0.35) * h;
+    const h2 = h * r.range(0.55, 0.75);
+    return `M${x.toFixed(1)} ${y.toFixed(1)}q${(lean * 0.2).toFixed(1)} ${(-h * 0.55).toFixed(1)} ${lean.toFixed(1)} ${(-h).toFixed(1)}` + `M${(x + 4).toFixed(1)} ${(y + 0.5).toFixed(1)}q${(2 + lean * 0.3).toFixed(1)} ${(-h2 * 0.5).toFixed(1)} ${(4 + lean * 0.6).toFixed(1)} ${(-h2).toFixed(1)}`;
+  };
+  const DASHES: [number, number, number][] = [
+    [262, 1561, 14], [384, 1566, 12], [512, 1559, 16], [640, 1563, 12], [748, 1568, 14], [858, 1560, 12],
+    [318, 1596, 12], [478, 1604, 10], [700, 1598, 13],
+    [404, 1668, 11], [628, 1676, 12], [520, 1742, 10],
+  ];
+  const COMMAS: [number, number, number][] = [
+    [226, 1578, 11], [452, 1580, 9], [586, 1572, 10], [812, 1584, 11],
+    [366, 1632, 9], [668, 1640, 10], [492, 1702, 8], [742, 1712, 9],
+  ];
+  const ticks = DASHES.map(([x, y, l], i) => dash(x, y, l, `${i}`)).join('') + COMMAS.map(([x, y, h], i) => comma(x, y, h, `${i}`)).join('');
   return (
     <>
       <Fill d={shadow + legs} color={palette.sand} seed={`${seed}/sh`} />
@@ -560,6 +649,14 @@ export const GroundDetails: React.FC<{seed?: string}> = ({seed = 's7ground'}) =>
     </>
   );
 };
+
+/** The set's ground layer without its GroundMarks (the long perspective rays and the cross that read as a registration
+ *  mark under the board, A1 fix round 1): the paving fill and the kerb stay exactly as the kit draws them. */
+export function withoutGroundMarks(node: React.ReactNode): React.ReactNode {
+  if (!React.isValidElement(node)) return node;
+  const kids = React.Children.toArray((node.props as {children?: React.ReactNode}).children);
+  return <>{kids.filter((c) => !(React.isValidElement(c) && c.type === GroundMarks))}</>;
+}
 
 // ---------------------------------------------------------------- the clock's speed wedge
 // While the minute hand of the shared HoursClock turns faster than ~25 deg / frame, a flat peach wedge trails it (a
@@ -623,22 +720,53 @@ export const CLOCK_SKY_CLIP = (() => {
 const TAN_UC = palette.tan.toUpperCase();
 export const litWall = (c: string) => (c.toUpperCase() === TAN_UC ? palette.sand : c);
 
+/** A set layer drawn as it is, then once more relit (clay -> sand, `litWall`) over it, limited to the half-plane past
+ *  `at` (world x for edge 'x': x >= at; world y for edge 'y': y >= at). A1 fix round 1 (the 1 px light seam down the
+ *  workshop corner during the push): a rect clip-path is applied by Chrome PER DRAW, so on the pixel column its edge
+ *  half covers, every draw of the relit copy got a partial coverage and the facade's sand fill under the door bled
+ *  through the door's teal ('conflation'). The relit copy is now cut by a MASK, applied once to the composited copy (the
+ *  edge pixel is a blend of two identical teals), and the edge is snapped to an even canvas px through the current
+ *  world -> screen transform (a whole device px at 1x and at the 0.5x previews), crispEdges. */
+export const LitCopy: React.FC<{edge: 'x' | 'y'; at: number; children?: React.ReactNode}> = ({edge, at, children}) => {
+  const m = useXf();
+  const id = 's7lit' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  // screen = k * world + o on the clip's axis (the flat camera: no rotation or skew)
+  const snap = (v: number, k: number, o: number) => (Math.abs(k) < 1e-6 ? v : (Math.round((k * v + o) / 2) * 2 - o) / k);
+  const r = edge === 'x' ? {x: snap(at, m[0], m[4]), y: -6000, width: 12000, height: 12000} : {x: -6000, y: snap(at, m[3], m[5]), width: 12000, height: 12000};
+  return (
+    <>
+      {children}
+      <defs>
+        <mask id={id} maskUnits="userSpaceOnUse" x={-6000} y={-6000} width={12000} height={12000}>
+          <rect x={r.x.toFixed(4)} y={r.y.toFixed(4)} width={r.width} height={r.height} fill="#fff" shapeRendering="crispEdges" />
+        </mask>
+      </defs>
+      <g mask={`url(#${id})`}>
+        <Tod map={litWall}>{children}</Tod>
+      </g>
+    </>
+  );
+};
+
 /** The one shade plane left on the public wall (fix round 3): a flat clay band, no outline, down the wall LEFT of the
  *  board (light from the right, style bible 6 'shading'): the board stands off the wall, its recess / shadow side. */
 export const BoardShade: React.FC<{seed?: string}> = ({seed = 's7bshade'}) => (
   <Fill d={polyPath([[121, 922], [140, 922], [140, 1500], [124, 1500]])} color={palette.tan} offset={false} seed={seed} />
 );
 
-/** The board's centre latch is two INK-coloured fills (kit Noticeboard handles): the fills-only pass of the pen reveal
- *  showed them from the cut, floating on the panes like a pause icon (fix round 3). In that pass they are covered with
- *  the glass they sit on (PaneGlass' day mintPale + the kit's 12 % tint, relit); the pen inks them with the stile. */
+/** The board's centre latch is two INK-coloured fills (kit Noticeboard handles): two parallel thick bars either side of
+ *  the centre stile, which read as a pause glyph near the centre of a vertical video. Fix round 3 covered them in the
+ *  reveal's fills pass only; A1 fix round 1 covers them for the whole scene (with the glass they sit on: PaneGlass' day
+ *  mintPale + the kit's 12 % tint, relit) and the board gets one round knob on the stile instead (`LatchKnob`). The left
+ *  cover stops 1.5 px short of the stile so the stile's own ink line is never clipped (a 1 px sliver of bar there just
+ *  thickens the line). */
 export const LatchCover: React.FC<{board: readonly [number, number, number, number]}> = ({board}) => {
   const [x, y, w, h] = board;
   const fb = 13;
   const gw = (w - fb * 2 - 7) / 2;
   const rects: [number, number, number, number][] = [
-    [x + fb + gw - 11, y + h / 2 - 24, 11, 48],
-    [x + fb + gw + 7, y + h / 2 - 24, 11, 48],
+    [x + fb + gw - 12, y + h / 2 - 25, 10.5, 50],
+    [x + fb + gw + 8.5, y + h / 2 - 25, 11.5, 50],
   ];
   return (
     <>
@@ -650,6 +778,22 @@ export const LatchCover: React.FC<{board: readonly [number, number, number, numb
           <Fill rect={r} color={palette.mintPale} opacity={0.12} offset={false} mode="snap" seed={`s7latcht${i}`} />
         </React.Fragment>
       ))}
+    </>
+  );
+};
+
+/** The board's latch (A1 fix round 1): ONE small round knob on the centre stile (r 7, ink 2.2, sand fill), in place of
+ *  the kit's two bars (LatchCover). Drawn in the set's reveal: its fill shows with the fills, the pen inks it with the
+ *  stile. */
+export const LatchKnob: React.FC<{board: readonly [number, number, number, number]}> = ({board}) => {
+  const [x, y, w, h] = board;
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  return (
+    <>
+      <Fill d={blob(cx, cy, 7, 7, {seed: 's7knob', wobble: 0.02})} color={palette.sand} offset={false} seed="s7knobF" />
+      <Ink d={circle(cx, cy, 7, {seed: 's7knob', wobble: 0.02, overlap: 12})} width={2.2} taper={false} seed="s7knobI" />
+      <circle cx={cx - 2} cy={cy - 2.2} r={1.6} fill={palette.cream} />
     </>
   );
 };

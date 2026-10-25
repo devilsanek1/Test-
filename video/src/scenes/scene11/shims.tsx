@@ -1,10 +1,11 @@
 // S11 local pieces around shared kit pieces. No opacity anywhere: rotations, scales, pops.
 //   NoteBreeze  the J6 sticky note flutters on its adhesive top edge in a breeze (a damped swing about its top) and jolts
 //               under the pen as the strike starts. Applied OUTSIDE the shared StickyNote so the prop stays untouched.
-//   NoteFlight  the note's drop from behind govB's cornice (clipped there), its back out, flipping to the lettered
-//               face on the slap (the shared StickyNote's flutter shows the lettering in flight and pops in mid-air).
-//   NoteBack    the note's back for the flight: a squarer sheet, sand glue band, the lettering showing through mirrored
-//               in flat sand, a curled corner (fix round 3: the plain cream back read as an empty placeholder card).
+//   NoteFlight  the note's drop: lifted off the top of govB's cornice ledge by the breeze, over the lip and fluttering
+//               down in front of the facade, its back out, flipping to the lettered face on the slap (the shared
+//               StickyNote's flutter shows the lettering in flight and pops in mid-air).
+//   NoteBack    the note's back for the flight: a squarer sheet, sand glue band, the writing showing through as two
+//               wavy sand lines (no glyphs), a curled corner (fix round 3: the plain cream back read as an empty card).
 //   NoteStrike  the J6 strike-through: ONE marker stroke (~4 px) along the x-height centre (StickyNote's own is ~3 px
 //               and has no width option), the letters stay readable above and below it.
 //   StepRipple  the SunPress ripple as a flat peach band expanding in 3 discrete steps (12 / 8 / 4 px): the house glow
@@ -27,7 +28,7 @@ import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {blob, Pt, speedLines} from '../../lib/sketch';
 import {mat, useXf, XG} from '../../lib/xf';
-import {captionFontStack, measureCaption, useCaptionFont} from '../../lib/font';
+import {measureCaption, useCaptionFont} from '../../lib/font';
 import {matScale} from '../shared/props/common';
 import {layoutText} from '../shared/props/Labels';
 import {bitPath, slamCurve} from '../shared/props';
@@ -56,69 +57,83 @@ export const NoteBreeze: React.FC<{
 
 // ---------------------------------------------------------------- NoteFlight
 
-/** The J6 note's drop onto the shutter. It slips out from behind govB's cornice (clipped above `clipY`, world: hidden
- *  while it is behind the cornice, so it never pops into the open sky) as a sheet tipped back (scaleY 0.45),
- *  opens toward the shutter as it falls (scaleY -> 1, one flutter dip), sways on the breeze and settles its spin; it shows its BLANK
- *  BACK the whole way (no lettering in flight: the words are the punchline on 'tech') and paper-flips to the lettered
- *  face over the last `flipDur` (scaleX 1 -> 0 -> 1), arriving at `arriveAt` where the slapping note takes over.
- *  Motion: y falls with a light gravity (0.85 q + 0.15 q^2), x is pushed by the breeze and eases out (1 - (1 - q)^2) with
- *  1.5 sways and a decaying spin: no linear tween, the fall stays <= ~20 px / frame at this zoom (the 0.15 s flip's
- *  edges are faster: a paper flip). Nothing before `arriveAt - dur` or after `arriveAt`. */
+/** The J6 note's drop onto the shutter. A1 fix round 2 (review: clipped at the cornice's lower edge it slid out from
+ *  under the cornice band, like paper fed out of the shutter box, and the clip's release at mid-fall popped the whole
+ *  sheet in front of the cornice for 4 frames): NO clip. The breeze lifts it off the TOP of the cornice ledge: over
+ *  `liftDur` it tips up on its bottom edge at `lip` (world: the ledge's front lip; scaleY 0.08 -> 0.5, tilting 9 deg with
+ *  the gust; the first frame is already a thin sheet on the ledge, nothing hidden), then it goes over the lip and
+ *  flutters down IN FRONT of the facade to its rest centre (x, y), opening toward the shutter (scaleY -> 1, one flutter
+ *  dip), with 1.5 sways and a decaying spin. It shows its BACK the whole way (no lettering in flight: the words are the
+ *  punchline on 'tech') and paper-flips to the lettered face over the last `flipDur` (scaleX 1 -> 0 -> 1), arriving at
+ *  `arriveAt` where the slapping note takes over. Fall: y with a light gravity (0.7 q + 0.3 q^2: ~20 px / frame mean,
+ *  ~27 at the slap at this zoom), x pushed by the breeze, easing out. Nothing before `arriveAt - dur` or after
+ *  `arriveAt`. */
 export const NoteFlight: React.FC<{
   /** Rest centre (world). */
   x: number;
   y: number;
-  /** Start centre (world, behind the cornice). */
-  from: Pt;
+  /** The sheet's height (world): the lift pivots on its bottom edge. */
+  h: number;
+  /** The ledge's front lip (world) the sheet's bottom edge sits on as it lifts. */
+  lip: Pt;
   arriveAt: number;
   dur: number;
-  /** Hidden above this world y (the cornice's lower edge). */
-  clipY: number;
+  liftDur?: number;
   flipDur?: number;
-  /** The note's blank back and its lettered face, both drawn at the rest centre (x, y). */
+  /** The note's back and its lettered face, both drawn at the rest centre (x, y). */
   back: React.ReactNode;
   face: React.ReactNode;
-  id?: string;
-}> = ({x, y, from, arriveAt, dur, clipY, flipDur = 0.15, back, face, id = 's11-noteclip'}) => {
+}> = ({x, y, h, lip, arriveAt, dur, liftDur = 0.1, flipDur = 0.15, back, face}) => {
   const t = useTime();
-  if (t < arriveAt - dur || t >= arriveAt) return null;
-  const q = (t - (arriveAt - dur)) / dur;
-  const fx = 1 - (1 - q) * (1 - q);
-  // fix round 1: a flatter fall (0.85 q + 0.15 q^2: the end speed is only 1.15 x the mean, <= ~20 px / frame at 1.69 over
-  // the 0.42 s drop) and TWO sways on the breeze (x and spin), so it reads as a sheet fluttering down, not a dropped card
-  const fy = 0.85 * q + 0.15 * q * q;
-  const px = from[0] + (x - from[0]) * fx + 7 * Math.sin(q * Math.PI * 3) * (1 - q);
-  const py = from[1] + (y - from[1]) * fy;
-  const a = 7 * (1 - q) * Math.cos(q * Math.PI * 2.5);
-  // tipped back as it slips out (scaleY 0.45), opening toward the shutter as it falls, with one flutter dip
-  const sy = Math.min(1, 0.45 + 0.55 * E.outCubic(Math.min(1, q / 0.75)) - 0.12 * Math.sin(Math.min(1, q / 0.75) * Math.PI));
-  // the paper flip: back folds edge-on, the lettered face unfolds
-  const qf = 1 - flipDur / dur;
-  const f = q < qf ? 0 : (q - qf) / (1 - qf);
-  const cx = Math.cos(Math.PI * f);
-  const sx = Math.max(0.03, Math.abs(cx));
-  const side = cx >= 0 ? back : face;
-  const g = <XG m={mat.compose(mat.translate(px, py), mat.rotate(a), mat.scale(sx, sy), mat.translate(-x, -y))}>{side}</XG>;
-  if (q > 0.5) return g;
-  return (
-    <>
-      <defs>
-        <clipPath id={id}>
-          <rect x={-1e4} y={clipY} width={2e4} height={2e4} />
-        </clipPath>
-      </defs>
-      <g clipPath={`url(#${id})`}>{g}</g>
-    </>
-  );
+  const t0 = arriveAt - dur;
+  if (t < t0 || t >= arriveAt) return null;
+  const S0 = 0.5; // scaleY as it goes over the lip (tipped back)
+  const A0 = 9; // its tilt then (deg; the breeze blows it left)
+  const rad = (deg: number) => (deg * Math.PI) / 180;
+  // the bottom-centre pivot: centre = lip - R(a) (0, h sy / 2)
+  const overLip = (sy: number, a: number): Pt => [lip[0] + Math.sin(rad(a)) * (h * sy) / 2, lip[1] - Math.cos(rad(a)) * (h * sy) / 2];
+  const d = t - t0;
+  let px: number;
+  let py: number;
+  let a: number;
+  let sy: number;
+  let sx = 1;
+  let side = back;
+  if (d < liftDur) {
+    const u = E.outCubic(d / liftDur);
+    sy = 0.08 + (S0 - 0.08) * u;
+    a = A0 * u;
+    [px, py] = overLip(sy, a);
+  } else {
+    const fall = dur - liftDur;
+    const q = (d - liftDur) / fall;
+    const [x0, y0] = overLip(S0, A0);
+    const fx = 1 - (1 - q) * (1 - q);
+    const fy = 0.7 * q + 0.3 * q * q;
+    px = x0 + (x - x0) * fx + 7 * Math.sin(q * Math.PI * 3) * (1 - q);
+    py = y0 + (y - y0) * fy;
+    a = A0 * (1 - q) * Math.cos(q * Math.PI * 2.5);
+    // opening toward the shutter as it falls, with one flutter dip
+    const o = Math.min(1, q / 0.75);
+    sy = Math.min(1, S0 + (1 - S0) * E.outCubic(o) - 0.12 * Math.sin(o * Math.PI));
+    // the paper flip: the back folds edge-on, the lettered face unfolds
+    const qf = 1 - flipDur / fall;
+    const f = q < qf ? 0 : (q - qf) / (1 - qf);
+    const cx = Math.cos(Math.PI * f);
+    sx = Math.max(0.03, Math.abs(cx));
+    side = cx >= 0 ? back : face;
+  }
+  return <XG m={mat.compose(mat.translate(px, py), mat.rotate(a), mat.scale(sx, sy), mat.translate(-x, -y))}>{side}</XG>;
 };
 
 // ---------------------------------------------------------------- NoteBack
 
 /** The J6 note's BACK, shown while it falls (fix round 3: the plain cream card read as an empty placeholder): a squarer
- *  sheet (`w` x `h` world, ~210 x 200 px on screen), the sand adhesive band across its top ~20 % (the glue is on the
- *  back), the face's lettering showing through MIRRORED as flat sand glyphs (no opacity: a flat colour one step off the
- *  paper), one curled corner (bottom-left: the face's bottom-right, seen from behind) and the ink outline. Drawn about
- *  its rest centre (x, y) with the note's tilt, like the StickyNote it flips to. */
+ *  sheet (`w` x `h` world), the sand adhesive band across its top ~20 % (the glue is on the back), the face's writing
+ *  showing through as two thin wavy sand lines as long as the face's lines (A1 fix round 2: the mirrored glyphs read
+ *  'ffo ti nruT' ~0.3 s before 'tech' and gave the punchline away; the wavy lines say 'written on the other side'
+ *  without letters), one curled corner (bottom-left: the face's bottom-right, seen from behind) and the ink outline.
+ *  Drawn about its rest centre (x, y) with the note's tilt, like the StickyNote it flips to. */
 export const NoteBack: React.FC<{x: number; y: number; w: number; h: number; rot: number; lines: string[]; fontSize: number; inkPx: number; seed?: string}> = ({x, y, w, h, rot, lines, fontSize, inkPx, seed = 's11/noteback'}) => {
   useCaptionFont();
   const k = Math.max(1e-4, matScale(useXf()));
@@ -131,20 +146,28 @@ export const NoteBack: React.FC<{x: number; y: number; w: number; h: number; rot
   const body = `M${x0} ${y0}L${x1} ${y0}L${x1} ${y1}L${x0 + c} ${y1}L${x0} ${y1 - c}Z`;
   const flap = `M${x0 + c} ${y1}L${x0} ${y1 - c}L${x0 + c * 0.92} ${y1 - c * 0.92}Z`;
   const band = `M${x0} ${y0}L${x1} ${y0}L${x1} ${y0 + h * 0.2}L${x0} ${y0 + h * 0.2}Z`;
-  // the show-through: the face's two lines, mirrored, centred under the band
+  // the show-through: the face's two lines as wavy strokes (no glyphs), centred under the band
   const pitch = fontSize * 1.08;
   const top = y0 + h * 0.2 + (h * 0.8 - pitch * (lines.length - 1)) / 2 + fontSize * 0.3;
   return (
     <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot))}>
       <Fill d={body} color={palette.cream} offset={false} mode="none" seed={`${seed}/p`} />
       <Fill d={band} color={palette.sand} offset={false} mode="none" seed={`${seed}/band`} />
-      <g transform="scale(-1 1)">
-        {lines.map((ln, i) => (
-          <text key={i} x={0} y={top + i * pitch} fontFamily={captionFontStack} fontSize={fontSize} fill={palette.sand} textAnchor="middle">
-            {ln}
-          </text>
-        ))}
-      </g>
+      {lines.map((ln, i) => {
+        const lw = (measureCaption(ln, 100) / 100) * fontSize * 0.92;
+        const ly = top + i * pitch - fontSize * 0.3;
+        const n = Math.max(3, Math.round(lw / (fontSize * 0.42)));
+        const step = lw / n;
+        let dd = `M${(lw / 2).toFixed(1)} ${ly.toFixed(1)}`;
+        // right to left (mirrored writing), small irregular waves
+        for (let j = 0; j < n; j++) {
+          const xa = lw / 2 - (j + 0.5) * step;
+          const xb = lw / 2 - (j + 1) * step;
+          const amp = fontSize * (j % 3 === 1 ? 0.2 : 0.13) * (j % 2 ? -1 : 1);
+          dd += `Q${xa.toFixed(1)} ${(ly + amp).toFixed(1)} ${xb.toFixed(1)} ${ly.toFixed(1)}`;
+        }
+        return <path key={i} d={dd} fill="none" stroke={palette.sand} strokeWidth={fontSize * 0.17} strokeLinecap="round" strokeLinejoin="round" />;
+      })}
       <Ink d={body} width={iw} taper={false} vary={0} open={0.06} seed={`${seed}/o`} />
       <Fill d={flap} color={palette.sand} offset={false} mode="none" seed={`${seed}/fl`} />
       <Ink d={flap} width={iw * 0.8} taper={false} vary={0} seed={`${seed}/fli`} />

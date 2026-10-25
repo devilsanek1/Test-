@@ -1,6 +1,6 @@
 // S11 near-plane and depth helpers (fix round 1):
 //   NearLamp     the plaza's lamp post near the LEFT frame edge (SCREEN space: a foreground layer the 4 % push / 3 % lean
-//                barely moves): a slim tealDark post from below the frame to a WHOLE cream lantern head at screen x ~73-151,
+//                barely moves): a slim tealDark post from below the frame to a WHOLE cream lantern head at screen x ~103-181,
 //                y 832-962 (under the caption band; fix round 3: moved in from x 3-77, clear of the film edge's bare left
 //                strip), a short crossbar (the bar S12's pigeons land on). Its lantern goes dark (cream -> tealDark) with
 //                the switch-off ripple. Pip's in-hop passes BEHIND it.
@@ -20,10 +20,12 @@ import {arc, blob, line, polyPath, rectPath} from '../../lib/sketch';
 
 // ---------------------------------------------------------------- NearLamp (screen px)
 
-// fix round 3: the whole lamp stands at x >= 73 (post 101-123, roof 73-151, crossbar to 194). The film's paint edge
-// (FILM_EDGES paint-subtle, no S11 hints yet) leaves a bare strip at x < 54 on the left: at x 3-77 the lantern and post
-// were cut lengthways into line art and colour (EDGES.md: a lamp is never half colour, half line art)
-const LAMP = {x: 112, w: 22, lantern: [878, 962] as [number, number], lw: 58, roofTop: 832, barY: 1012, barX1: 194};
+// fix round 3: the whole lamp stands at x >= 73. The film's paint edge (FILM_EDGES paint-subtle, no S11 hints yet)
+// leaves a bare strip at x < 54 on the left: at x 3-77 the lantern and post were cut lengthways into line art and colour
+// (EDGES.md: a lamp is never half colour, half line art). A1 fix round 2 (review: the post's left edge at x ~100 ran
+// exactly along govA's window right frame, a near-plane / mid-plane tangent fused into one double line): +30 px, post
+// 131-153, glass 113-171, roof 103-181, crossbar to 224: it overlaps govA's first column face, clearly in front
+const LAMP = {x: 142, w: 22, lantern: [878, 962] as [number, number], lw: 58, roofTop: 832, barY: 1012, barX1: 224};
 
 export const NearLamp: React.FC<{offAt?: number; seed?: string}> = ({offAt, seed = 's11/lamp'}) => {
   const t = useTime();

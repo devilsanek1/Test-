@@ -24,9 +24,9 @@ export const T = {
   pushAt: w(89, -0.25), // 'Cloudflare' - 0.25
   pushEnd: w(106), // 'minutes'
   pullAt: w(108, -0.15), // 'millions' - 0.15 (the burst)
-  // fix round 2: 1.1 s (storyboard 0.9): the pull-back now also drops the depth-0 plane 60 px (the board out of the
-  // flood band); 0.9 s ran 20 px / frame, 1.1 s keeps the peak under the 18 px strobe limit
-  pullEnd: w(108, 0.95),
+  // A1 fix round 1: 1.0 s (storyboard 0.9; fix round 2's 1.1 s landed 6 frames late, inside the sunset): the pull-back
+  // drops the depth-0 plane 30 px (the board out of the flood band) and lands right after the second dusk snap
+  pullEnd: w(108, 0.85),
   // beats
   hackers: w(81, 0.1), // the city opens row by row
   were: w(83, -0.1), // copies reach the city, flutter down
@@ -64,8 +64,9 @@ export const T = {
   comma: we(106, 0.05), // clock off, sun sinks back, rings on, a gate
   millions: w(108, -0.15), // burst + pull-back
   stamp2: w(108, -0.08), // L11 (storyboard anchor)
-  stamp2At: w(108, -0.2),
-  stamp2Land: w(108), // lands on 'millions'
+  // A1 fix round 1: lands 2 frames AFTER 'millions' (the caption highlight first, then the stamp)
+  stamp2At: w(108, -0.13),
+  stamp2Land: w(108, 0.07),
   wave2: w(108, 0.35),
   millionsWord: w(108),
   within: w(109), // stepped dusk starts (sky snaps on the word)

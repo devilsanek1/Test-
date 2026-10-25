@@ -69,7 +69,7 @@ export function s07Strokes(jx: number): PenStroke[] {
     {d: P([[172, 958], [205, 1000]]), w: 44, f: 6, dur: 0.1},
     {d: P([[680, 958], [712, 1000]]), w: 44, f: 6, dur: 0.1},
     {d: P([[548, 1015], [496, 1115]]), w: 52, f: 6, dur: 0.1},
-    {d: circle(850, 1080, 22), w: 58, f: 6, dur: 0.14},
+    {d: circle(826, 1080, 22), w: 58, f: 6, dur: 0.14}, // A1 fix round 1: the round sign 24 px left (WS_LAYOUT)
     {d: rows(30, 128, [930, 1000, 1070, 1140, 1210, 1280, 1350, 1420, 1480]), w: 74, f: 6, dur: 0.2},
     // the door hatched, the second window, the corner's far ticks
     {d: rows(790, 934, [1150, 1222, 1294, 1366, 1438, 1480]), w: 80, f: 7, dur: 0.18},

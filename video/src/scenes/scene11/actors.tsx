@@ -329,7 +329,7 @@ export type GovBWindowProps = {
   r: [number, number, number, number];
   /** Progress steps (fraction): the page's ONE fat bar + its flip-tile % readout (fix round 3: the address pill shows
    *  the lettered 'updating...' instead of a second bar). An UP step JUMPS past its value (+5 %: 8 -> ~14 %, then sags
-   *  back to the value over 0.35 s), flashes the fill cream for 2 frames and scale-pops the % tile 1.2x; a down step
+   *  back to the value over 0.35 s), flashes the fill + trough outline sage for 2 frames and scale-pops the % tile 1.2x; a down step
    *  snaps (A1 polish: the fill sliver and the trough's outline flash peach for 2 frames and the bar row jolts -/+6 px;
    *  the trough is never filled: a full peach bar read as 100 % / done). */
   steps: ProgressStep[];
@@ -345,8 +345,8 @@ export type GovBWindowProps = {
   /** Screen-local x where the content bars start (default: the page margin). S11 starts them under the notice's left
    *  edge, so once the notice is taped up they are all under it (no bar ends poking out between Pip's ear and it). */
   barsX0?: number;
-  /** The fill's leading edge (its last ~8 px) flickers on / off every 2 frames for 0.27 s without moving; the % tile
-   *  stays drawn and ticks once (1 frame). */
+  /** The fill flickers without moving: the whole sliver blinks peach for 3 frames, then its leading edge (its last
+   *  ~8 px) flickers on / off every 2 frames to 0.27 s; the % tile stays drawn and ticks once (1 frame). */
   flickerAt?: number;
   /** Loading-ring radius (world; the chrome's own is ~10). */
   ringR?: number;
@@ -415,9 +415,14 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
     else if (d < 0.45) v += 0.05 * Math.cos(((d - 0.1) / 0.35) * (Math.PI / 2)) ** 2;
     if (d < 2 / 30) flash = true;
   }
-  // 'FBI': ONLY the fill's leading edge flickers (its last 5 world = ~8 px drop out every other 2 frames) without the
-  // fill moving; the % tile stays drawn (fix round 3: a tile blinking out read as a render glitch) and ticks once
-  const flickOff = flickerAt !== undefined && t >= flickerAt && t < flickerAt + 0.27 && Math.floor((t - flickerAt) * 15) % 2 === 0;
+  // 'FBI': the fill flickers without moving. A1 fix round 2 (review: an ~8 px edge flicker every 2 frames read as nothing
+  // at phone size on the scene's most stressed word): the whole 8 % sliver AND the trough's outline blink PEACH for 3
+  // frames ON the word (the 'yet' regression's language, without its shake / jolt / tile flip), then its leading edge
+  // (last 5 world = ~8 px) drops out every
+  // other 2 frames to 0.27 s; the % tile stays drawn (fix round 3: a tile blinking out read as a render glitch), ticks once
+  const flickD = flickerAt !== undefined ? t - flickerAt : -1;
+  const flickPeach = flickD >= 0 && flickD < 3 / 30;
+  const flickOff = !flickPeach && flickD >= 0 && flickD < 0.27 && Math.floor(flickD * 15) % 2 === 1;
   const tick = flickerAt !== undefined && t >= flickerAt && t < flickerAt + 1 / 30 ? -7 : 0;
   // ---- the % tile: a paper flip (old digits fold shut, new ones unfold) at each change of the shown number
   const shown = (tt: number) => Math.round(stepAt(steps, tt) * 100);
@@ -465,10 +470,12 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
       {bars}
       <SiteHeader seed={seed} />
       <XG m={jolt ? mat.translate(jolt, 0) : mat.I}>
-      {/* the fat bar: white trough, teal fill (cream for two frames on an up-step; on 'yet' the sliver + outline peach) */}
+      {/* the fat bar: white trough, teal fill (A1 fix round 2: SAGE + a sage trough outline for two frames on an up-step,
+          so the +5 % surge on "can't" is drawn in a colour that reads on the white trough (cream vanished there: the bar
+          seemed to blink empty); peach for 3 frames on 'FBI'; on 'yet' the sliver + outline peach) */}
       <Fill d={roundRect(bx, by, bw, bh, 5)} color={palette.white} offset={false} mode="none" seed={`${seed}/trough`} />
-      {fillShown > 0.3 ? <Fill d={rectPath(bx + 2.5, by + 2.5, fillShown, bh - 5)} color={regress ? palette.peach : flash ? palette.cream : palette.teal} offset={false} mode="none" seed={`${seed}/fill`} /> : null}
-      {regress ? <path d={roundRect(bx - 1.2, by - 1.2, bw + 2.4, bh + 2.4, 6)} fill="none" stroke={palette.peach} strokeWidth={iw * 1.6} strokeLinejoin="round" /> : null}
+      {fillShown > 0.3 ? <Fill d={rectPath(bx + 2.5, by + 2.5, fillShown, bh - 5)} color={regress || flickPeach ? palette.peach : flash ? palette.sage : palette.teal} offset={false} mode="none" seed={`${seed}/fill`} /> : null}
+      {regress || flash || flickPeach ? <path d={roundRect(bx - 1.2, by - 1.2, bw + 2.4, bh + 2.4, 6)} fill="none" stroke={flash ? palette.sage : palette.peach} strokeWidth={iw * 1.6} strokeLinejoin="round" /> : null}
       <Ink d={roundRect(bx, by, bw, bh, 5, {closed: false, seed: `${seed}/troughi`})} width={iw * 0.85} taper={false} vary={0} seed={`${seed}/troughi`} />
       {/* the % flip tile, right of the bar */}
       <XG m={tileM}>

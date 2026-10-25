@@ -89,6 +89,9 @@ export const MinuteWedge: React.FC<{r: number; at?: number; dur?: number; fracti
   );
 };
 
+/** The stamp print's default padding (em). */
+const STAMP_PAD0 = {x: 0.3, top: 0.2, bot: 0.14};
+
 /** A rough-edged rect (local 0..w x 0..h): seeded nicks along every edge (an inked rubber-stamp print). */
 function roughRect(w: number, h: number, seed: string): string {
   const pts: Pt[] = [];
@@ -112,24 +115,28 @@ function roughRect(w: number, h: number, seed: string): string {
  *  (inCubic: it accelerates into the board) and LANDS at `land`; 2 frames of squash on the landing. `origin` (fix round
  *  3b) = where along the print's width (0 left .. 1 right) the slam scales about: < 0.5 keeps the oversized print off
  *  whatever stands left of the slot (Pip). */
-export const InkStamp: React.FC<{box: [number, number, number, number]; text: LabelText; fontSize: number; at: number; land: number; s0: number; rot?: number; paper?: string; border?: string; origin?: number; seed: string}> = ({
-  box,
-  text,
-  fontSize,
-  at,
-  land,
-  s0,
-  rot = -4,
-  paper = palette.peach,
-  border = palette.sun,
-  origin = 0.5,
-  seed,
-}) => {
+export const InkStamp: React.FC<{
+  box: [number, number, number, number];
+  text: LabelText;
+  fontSize: number;
+  at: number;
+  land: number;
+  s0: number;
+  rot?: number;
+  paper?: string;
+  border?: string;
+  origin?: number;
+  /** A1 fix round 1: the print's padding (em; default x 0.3, top 0.2, bot 0.14). */
+  pad?: {x: number; top: number; bot: number};
+  /** A1 fix round 1: a one-frame ink RING flash around the print as it lands (the slam's weight, motion spec #15). */
+  ring?: boolean;
+  seed: string;
+}> = ({box, text, fontSize, at, land, s0, rot = -4, paper = palette.peach, border = palette.sun, origin = 0.5, pad = STAMP_PAD0, ring, seed}) => {
   useCaptionFont();
   const t = useTime();
   const look = useLook();
   if (t < at) return null;
-  const L = layoutText(labelLines(text), fontSize, {x: 0.3, top: 0.2, bot: 0.14});
+  const L = layoutText(labelLines(text), fontSize, pad);
   const {w, h} = L;
   const cx = (box[0] + box[2]) / 2;
   const cy = (box[1] + box[3]) / 2;
@@ -155,13 +162,14 @@ export const InkStamp: React.FC<{box: [number, number, number, number]; text: La
       <Ink d={b1} width={2.8} color={border} taper={false} seed={`${seed}/b1`} />
       <Ink d={b2} width={1.4} color={border} taper={false} seed={`${seed}/b2`} />
       <InkTextBlock L={L} align="center" color={palette.ink} k={k} seed={seed} />
+      {ring && t >= land && t < land + 0.034 ? <path d={rect(-12, -10, w + 24, h + 20, {seed: `${seed}/ring`, over: 3})} fill="none" stroke={palette.ink} strokeWidth={3.2} strokeLinejoin="round" /> : null}
     </XG>
   );
 };
 
 /** The print's size (world px, before rotation) for a stamp text at a font size (InkStamp's own layout). */
-export const stampPrintSize = (text: LabelText, fontSize: number) => {
-  const L = layoutText(labelLines(text), fontSize, {x: 0.3, top: 0.2, bot: 0.14});
+export const stampPrintSize = (text: LabelText, fontSize: number, pad = STAMP_PAD0) => {
+  const L = layoutText(labelLines(text), fontSize, pad);
   return {w: L.w, h: L.h};
 };
 

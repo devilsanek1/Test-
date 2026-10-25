@@ -221,6 +221,9 @@ export type GhostSpec = {
   depth?: 'far' | 'hair';
   /** Mirrored (a back view mirrored is still a back view): the phone arm on the side toward the partner. */
   mirror?: boolean;
+  /** A1 fix round (a pair read as two white blocks): one member per pair gets sand trousers or a sand bag. */
+  trousers?: string;
+  bag?: string;
 };
 
 /** The passers-by's camera: horizon at the street's VP, lens 1.7 x a person (the shot is taken from the stoop's top
@@ -251,36 +254,43 @@ function figPaths(H: number, ph: number, hair: PasserHair, acc: PasserAcc[]) {
   // ---- legs (fix round 2: they read as straight tubes): tapered trousers (hem ~70 % of the hip width) in two segments,
   // thigh and shin; on the stride the lifted leg's heel comes up (a shorter shin from behind) and its shin breaks
   // inward at the knee by up to 5 deg, so every step shows a knee
-  const lift = [Math.max(0, Math.sin(ph)) * 0.045, Math.max(0, Math.sin(ph + Math.PI)) * 0.045];
+  // A1 fix round (they read as stiff white suits: tube legs, no knee at this size): the trousers taper harder (hem
+  // ~50 % of the hip width) and the lifted leg's knee breaks up to 11 deg with its heel up 0.06 H
+  const LIFT = 0.06;
+  const lift = [Math.max(0, Math.sin(ph)) * LIFT, Math.max(0, Math.sin(ph + Math.PI)) * LIFT];
   let legs = '';
   let shoes = '';
   [-1, 1].forEach((s, i) => {
     const bot = -0.035 - lift[i];
-    const th = ((s * 5 * lift[i]) / 0.045) * (Math.PI / 180); // the knee break (rad), the foot tucks toward the centre
-    const kx = s * 0.068;
+    const th = ((s * 11 * lift[i]) / LIFT) * (Math.PI / 180); // the knee break (rad), the foot tucks toward the centre
+    const kx = s * 0.066;
     const ky = -0.27;
     const rot = (x: number, y: number): [number, number] => {
       const dx = x - kx;
       const dy = y - ky;
       return [kx + dx * Math.cos(th) - dy * Math.sin(th), ky + dx * Math.sin(th) + dy * Math.cos(th)];
     };
-    const aO = rot(s * 0.106, bot);
-    const aI = rot(s * 0.028, bot);
+    const aO = rot(s * 0.094, bot);
+    const aI = rot(s * 0.036, bot);
     legs +=
-      `M${P(s * 0.012, -0.415)}L${P(s * 0.008, -0.5)}L${P(s * 0.124, -0.5)}` +
-      `C${P(s * 0.126, -0.42)} ${P(s * 0.114, -0.33)} ${P(s * 0.111, ky)}` +
-      `L${P(aO[0], aO[1])}L${P(aI[0], aI[1])}L${P(s * 0.025, ky)}` +
-      `C${P(s * 0.022, -0.33)} ${P(s * 0.016, -0.38)} ${P(s * 0.012, -0.415)}Z`;
-    const [cx, cyy] = rot(s * 0.067, bot);
+      `M${P(s * 0.012, -0.415)}L${P(s * 0.008, -0.5)}L${P(s * 0.128, -0.5)}` +
+      `C${P(s * 0.128, -0.42)} ${P(s * 0.112, -0.33)} ${P(s * 0.104, ky)}` +
+      `L${P(aO[0], aO[1])}L${P(aI[0], aI[1])}L${P(s * 0.03, ky)}` +
+      `C${P(s * 0.024, -0.33)} ${P(s * 0.016, -0.38)} ${P(s * 0.012, -0.415)}Z`;
+    // the knee: a short crease on the lifted leg's outer edge
+    if (lift[i] > LIFT * 0.45) legs += `M${P(s * 0.104, ky + 0.012)}L${P(s * 0.084, ky - 0.006)}`;
+    const [cx, cyy] = rot(s * 0.065, bot);
     const sh = 0.026 + lift[i] * 0.25; // a raised heel shows a little more sole
     shoes += `M${P(cx - 0.042, cyy)}Q${P(cx, cyy - 0.02)} ${P(cx + 0.042, cyy)}L${P(cx + 0.04, cyy + sh)}Q${P(cx, cyy + sh + 0.01)} ${P(cx - 0.04, cyy + sh)}Z`;
   });
   // ---- the jacket: a soft bell (fix round 2: the hem was a flat box edge). Round sloped shoulders (radius ~0.1 H), the
   // sides in a little at the waist and out to the hem, ROUNDED hem corners and a hem that dips at the middle
+  // A1 fix round: the shoulders slope in one round curve from the collar (no square top corner), the sides come in a
+  // little at the waist and FLARE to the hem (no vertical box sides), the hem dips at the middle
   const half = (s: number) =>
-    `C${P(s * 0.085, -0.848)} ${P(s * 0.145, -0.83)} ${P(s * 0.153, -0.772)}C${P(s * 0.16, -0.71)} ${P(s * 0.142, -0.62)} ${P(s * 0.142, -0.56)}C${P(s * 0.142, -0.52)} ${P(s * 0.152, -0.49)} ${P(s * 0.15, -0.476)}Q${P(s * 0.148, -0.458)} ${P(s * 0.124, -0.455)}`;
-  const halfR = `Q${P(0.148, -0.458)} ${P(0.15, -0.476)}C${P(0.152, -0.49)} ${P(0.142, -0.52)} ${P(0.142, -0.56)}C${P(0.142, -0.62)} ${P(0.16, -0.71)} ${P(0.153, -0.772)}C${P(0.145, -0.83)} ${P(0.085, -0.848)} ${P(0.03, -0.846)}Z`;
-  const torso = `M${P(-0.03, -0.846)}${half(-1)}Q${P(0, -0.432)} ${P(0.124, -0.455)}${halfR}`;
+    `C${P(s * 0.075, -0.85)} ${P(s * 0.128, -0.832)} ${P(s * 0.146, -0.77)}C${P(s * 0.156, -0.715)} ${P(s * 0.134, -0.655)} ${P(s * 0.136, -0.6)}C${P(s * 0.138, -0.545)} ${P(s * 0.16, -0.5)} ${P(s * 0.166, -0.474)}Q${P(s * 0.166, -0.456)} ${P(s * 0.138, -0.455)}`;
+  const halfR = `Q${P(0.166, -0.456)} ${P(0.166, -0.474)}C${P(0.16, -0.5)} ${P(0.138, -0.545)} ${P(0.136, -0.6)}C${P(0.134, -0.655)} ${P(0.156, -0.715)} ${P(0.146, -0.77)}C${P(0.128, -0.832)} ${P(0.075, -0.85)} ${P(0.03, -0.846)}Z`;
+  const torso = `M${P(-0.03, -0.846)}${half(-1)}Q${P(0, -0.428)} ${P(0.138, -0.455)}${halfR}`;
   // the neck (two short lines from under the hair into the collar) and the collar band at the nape (convex up, like
   // the kit's CollarBand: a back collar, never a V or a centre seam)
   const neck = `M${P(-0.026, -0.83)}L${P(-0.025, HC + 0.05)}M${P(0.026, -0.83)}L${P(0.025, HC + 0.05)}`;
@@ -405,7 +415,7 @@ function figPaths(H: number, ph: number, hair: PasserHair, acc: PasserAcc[]) {
 /** One passer-by: a complete back-view line-art figure (white paper fills, ink outlines; closed trouser legs and
  *  sleeves, an identity detail), reference 1's readers (f_9.0) given legs. (x, y) = feet, H = height (world px). The
  *  upper body rolls +-1.5 deg with the gait. */
-export const Passer: React.FC<{x: number; y: number; H: number; t: number; hz: number; hair: PasserHair; acc: PasserAcc[]; ink: number; seed: string}> = ({x, y, H, t, hz, hair, acc, ink, seed}) => {
+export const Passer: React.FC<{x: number; y: number; H: number; t: number; hz: number; hair: PasserHair; acc: PasserAcc[]; ink: number; seed: string; trousers?: string; bag?: string}> = ({x, y, H, t, hz, hair, acc, ink, seed, trousers = palette.white, bag = palette.white}) => {
   const ph = t * hz * Math.PI + rand(seed, 'ph') * 6.28;
   const bob = -Math.abs(Math.sin(ph)) * 0.012 * H;
   const sway = Math.sin(ph) * 0.006 * H;
@@ -428,13 +438,13 @@ export const Passer: React.FC<{x: number; y: number; H: number; t: number; hz: n
       <XG m={mat.translate(-UP, UP * 0.75)}>
         <Fill d={g.legs + g.torso + g.head + (long ? g.hairFill : '')} color={palette.sand} offset={false} mode="none" seed={`${seed}/up`} />
       </XG>
-      {layer(g.legs, 'lg')}
+      {layer(g.legs, 'lg', trousers)}
       <Fill d={g.shoes} color={palette.ink} offset={false} mode="none" seed={`${seed}/sh`} />
       <XG m={mat.about(mat.rotate(roll), 0, -0.47 * H)}>
         {layer(g.torso, 'to')}
         <Ink d={g.neck} width={ink * 0.8} taper={false} seed={`${seed}/nk`} />
         {long ? null : layer(g.collar, 'co', W, ink * 0.8)}
-        {layer(g.accFill ? g.accInk : '', 'ac')}
+        {layer(g.accFill ? g.accInk : '', 'ac', bag)}
         <Fill d={g.arms} color={W} offset={false} mode="none" seed={`${seed}/arf`} />
         <Ink d={g.armsInk} width={ink} taper={false} seed={`${seed}/ari`} />
         {layer(g.hands, 'hn', palette.sand, ink * 0.8)}
@@ -466,7 +476,7 @@ export const Ghosts: React.FC<{list: GhostSpec[]}> = ({list}) => {
         const sc = last ? 0.82 : 0.2 + 0.8 * springAt(t, g.in, springs.pop);
         return (
           <XG key={g.seed} m={mat.about(mat.scale(g.mirror ? -sc : sc, sc), fx, fy)}>
-            <Passer x={fx} y={fy} H={H} t={t} hz={g.hz ?? 1.9} hair={g.hair} acc={g.acc ?? []} ink={g.depth === 'hair' ? SI.hair : SI.far} seed={g.seed} />
+            <Passer x={fx} y={fy} H={H} t={t} hz={g.hz ?? 1.9} hair={g.hair} acc={g.acc ?? []} ink={g.depth === 'hair' ? SI.hair : SI.far} seed={g.seed} trousers={g.trousers} bag={g.bag} />
           </XG>
         );
       })}
@@ -486,11 +496,11 @@ const roadEdgeX = (y: number) => 520 + ((1370 - y) / (1370 - VP[1])) * (VP[0] - 
 export function ghostList(b: Beats, tears: number[]): GhostSpec[] {
   const out: GhostSpec[] = [
     // 'was': a pair, walking away up the street (one at the hero house's corner, one a step ahead and farther)
-    {x: roadEdgeX(1338) - 4, y: 1338, in: b.ghosts1 - 0.1, out: tears[1], seed: 'g4a', pace: 0.06, hz: 1.9, hair: 'short', acc: ['backpack']},
-    {x: roadEdgeX(1290) - 4, y: 1290, in: b.ghosts1 - 0.06, out: tears[2], seed: 'g4b', pace: 0.06, hz: 2.1, hair: 'long', acc: ['strap']},
+    {x: roadEdgeX(1338) - 4, y: 1338, in: b.ghosts1 - 0.1, out: tears[1], seed: 'g4a', pace: 0.06, hz: 1.9, hair: 'short', acc: ['backpack'], bag: palette.sand},
+    {x: roadEdgeX(1290) - 4, y: 1290, in: b.ghosts1 - 0.06, out: tears[2], seed: 'g4b', pace: 0.06, hz: 2.1, hair: 'long', acc: ['strap'], trousers: palette.sand},
     // 'like': a second pair strides past (faster legs, faster into depth)
     {x: roadEdgeX(1336) - 4, y: 1336, in: b.ghosts2 - 0.1, out: tears[8], seed: 'g4c', pace: 0.12, hz: 2.8, hair: 'headphones', acc: []},
-    {x: roadEdgeX(1290) - 4, y: 1290, in: b.ghosts2 - 0.05, out: tears[9], seed: 'g4d', pace: 0.12, hz: 2.9, hair: 'bun', acc: ['phone'], mirror: true},
+    {x: roadEdgeX(1290) - 4, y: 1290, in: b.ghosts2 - 0.05, out: tears[9], seed: 'g4d', pace: 0.12, hz: 2.9, hair: 'bun', acc: ['phone'], mirror: true, trousers: palette.sand},
   ];
   // the time-lapse flickers: up the road (hair ink), one at a time, only while at most one pair member is on screen;
   // fix round 2 (framecheck: they stood in the right rail, x ~945-985): a little nearer (y 1264-1274) and on the row's

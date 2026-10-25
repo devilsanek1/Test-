@@ -113,15 +113,16 @@ export const SheetLock: React.FC<{from?: DiscSpot; moveAt?: number; moveDur?: nu
 export const CalloutGlow: React.FC<{at: number; stepAt: number}> = ({at, stepAt}) => {
   const t = useTime();
   if (t < at || t >= stepAt) return null;
+  // it springs OUT from the disc's edge (a scale from 0 would spend its first 3 frames hidden under the disc)
   const k = springAt(t, at, springs.pop);
   if (k <= 0.01) return null;
-  const r0 = DISC_R * 1.35;
-  const r1 = DISC_R * 1.5;
+  const r0 = DISC_R + DISC_R * 0.35 * k;
+  const r1 = DISC_R + DISC_R * 0.5 * k;
   return (
-    <XG m={mat.about(mat.scale(k), L.x, L.y)}>
+    <>
       <Fill d={blob(L.x, L.y, r1, r1 * 0.96, {seed: 's5cg/o'})} color={palette.bg} offset={false} mode="none" seed="s5cgO" />
       <Fill d={blob(L.x, L.y, r0, r0 * 0.95, {seed: 's5cg/i'})} color={palette.white} offset={false} mode="none" seed="s5cgI" />
-    </XG>
+    </>
   );
 };
 

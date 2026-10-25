@@ -37,8 +37,10 @@ export const SCENE = {start: 45.618, end: 52.163};
 /** Absolute beat times (storyboard S11 beats; leads per ENGINE rule 5 already applied by the storyboard). */
 export const ABS = {
   cut: 45.618,
-  pipLand: W.even - 0.01, // Pip touches down on the sill's left end ON 'Even' (his hop is still past the left edge / behind the
-  // near lamp post at f0: only his trunk tip shows on the cut)
+  pipLand: W.even + 0.02, // Pip touches down on the sill's left end ON 'Even' (his hop is still past the left edge at f0)
+  // A1 fix round 2 (review: in Main f1369-f1370 his head and body crossed the film edge's bare left paper strip, x < 54):
+  // the hop starts 0.03 s later from 30 px further left (x -300), so Main f1369 shows nothing of him and f1370 only the
+  // trunk; the touch-down is 0.02 s into 'Even' (0.6 frame)
   ringHiccup1: W.the, // the loading ring hiccups; a pigeon on the cornice shuffles
   barFlicker: W.fbi, // the bar's fill edge flickers without moving
   earFlick: W.fbi + 0.25, // Pip's ear flicks toward the window
@@ -79,7 +81,10 @@ export const ABS = {
   pigeonLand: W.which, // the lean-in starts; a pigeon lands on the shutter box
   tagTwirl: W.is - 0.12, // the tag twirls once in a breeze (its first narrowing lands on 'is')
   antennae: W.basically, // the snail pokes one antenna out, then the other (span 0.4)
-  noteDrop: W.is + 0.06, // the note slips out from behind govB's cornice (blank back, swaying down on the breeze over 0.42 s)
+  // A1 fix round 2 (review: it slid out from under the cornice band like paper fed out of the shutter box, then popped in
+  // front of the cornice mid-fall): the tag's breeze lifts it off the TOP of the cornice ledge (0.1 s, tipping up on its
+  // bottom edge at the lip, the cornice pigeon stepping off it), then it flutters down in front of the facade (0.42 s)
+  noteDrop: W.is - 0.04,
   noteSlap: W.tech - 0.05, // ... flips to its lettered face and slaps flat onto the closed shutter (J6)
   noteCurl: W.supports, // the note's corner curls once; Bit looks up at it
   preen: W.supports + 0.25, // a pigeon on the cornice preens; the tag stills
@@ -93,9 +98,10 @@ export const ABS = {
   strike: W.everything, // 'and on again' gets one ink strike-through (0.15 s) ON the word; the corner flutters after
   pipOut: W.everythingEnd + 0.05, // Pip hops off the sill toward the lens; the snail peeks out
   tagSway: SCENE.end - 0.1, // the tag sways
-  pigeonFly: 52.02, // the box pigeon crouches and takes off up-left (whole bird, flapping) with the tag sway: clear of the box by
-  // the cut, 2+ frames AFTER Pip's hop-off (51.945), so the two departures do not share a frame (A1 fix round 1: was 51.99,
-  // 2.2 frames before the resolved 52.063; now 1.3 frames)
+  // the box pigeon crouches (2 frames) and LAUNCHES on 52.037 (resolved 52.063: startled by Pip's leap, 2.8 frames after
+  // his takeoff) with the tag sway, steeply up: Pip's leap heads for its perch, so it is ~35 px above it on f194 and
+  // clear of his head from f195 (A1 fix round 2: crouch was 52.02, launch 52.087, up-left into his rising head)
+  pigeonFly: 51.97,
 } as const;
 
 export type Beats = {-readonly [K in keyof typeof ABS]: number};

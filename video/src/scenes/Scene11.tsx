@@ -84,25 +84,28 @@ const SNAIL_AT: Pt = [641, SILL_Y]; // the sill's right end: its eye stalks stay
 // = x 440-615 (screen ~408-699 at 1.66: 16 px of air to Pip's ear at ~392, 11 px to the jamb at ~710)
 const NOTICE = {x: 527, y: 1076, fs: 21.7, sx: 0.93};
 const NOTICE_LINES = ['FBI · NSA', 'UK NCSC · CERT-EU'];
-// J6 on the closed shutter: A1 fix round 1 (review: at ~250 x 190 px with 42 px lettering the whole joke was ~2.4 % of
-// the frame and competed with the white tag and the padlock): 1.18x, 172 x 136 world (~294 x 233 px at 1.71), 29 world
-// lettering (~50 px), anchored HIGHER: its top overlaps the shutter box (y 935-948, the box is 952-970) so the bottom
-// stays above the padlock / tag row (bottom-left corner ~(455, 1083): ~16 px above Bit on the shackle; over the tag's
-// left end ~1078 < its nail 1094); right corner ~626 just over the jamb (622). S12 (cast.tsx S11_NOTE) must use these
-// numbers.
-const NOTE = {x: 536, y: 1009, w: 172, h: 136};
+// J6 on the closed shutter. A1 fix round 2 (review: the 1.18x note, 294 x 233 px, covered ~80 % of the closed shutter and
+// rode over the shutter box, so 'switched off' was left to two strips of slats + the padlock): 144 x 100 world (~246 x
+// 171 px at 1.71), 25 world lettering (~43 px), tilt -2, centre (538, 1031): it sits INSIDE the curtain (window rect
+// x 414-622, y 970-1116) with slats on every side: its highest corner (top-right, y ~978) ~11 px under the shutter box's
+// bold lower line (970), its lowest (bottom-left, (468, ~1083)) ~11 px above Bit's antennae on the shackle, its bottom
+// edge ~21 px above the tag's nail (566, 1094), its right edge ~18 px inside the right jamb (622), ~92 px of slats on
+// its left. (The -4 tilt could not fit 100 world of paper between the box line and Bit: its corners drop 5 world more.)
+// S12 (cast.tsx S11_NOTE) must use these numbers: {x 538, y 1031, w 144, h 100, rot -2, fs 25}.
+const NOTE = {x: 538, y: 1031, w: 144, h: 100};
 const NOTE_LINES = ['Turn it off', 'and on again'];
-const NOTE_FS = 29;
-const NOTE_ROT = -4;
-// its BACK while it falls (fix round 3): squarer, 143 x 136 world (A1 fix round 1: 1.15x with the face), the show-through
-// at 22 world
-const NOTE_BACK = {w: 143, h: 136, fs: 22};
-// the drop: from behind govB's cornice (its lower edge at world y 926 hides it), just left of the cornice pigeon
-const NOTE_FROM: Pt = [566, 884]; // hidden at the start (the tipped sheet's bottom ~ the cornice's lower edge 926)
-const CORNICE_B = 926;
+const NOTE_FS = 25;
+const NOTE_ROT = -2;
+// its BACK while it falls (fix round 3): squarer, 120 x 100 world (A1 fix round 2: scaled with the face), the writing
+// showing through as two illegible sand lines (no mirrored glyphs: they gave the punchline away before 'tech')
+const NOTE_BACK = {w: 120, h: 100, fs: 19};
+// the drop (A1 fix round 2: no clip, no slide out from behind the cornice): the breeze that twirled the tag lifts the
+// sheet off the TOP of govB's cornice ledge (world y 904, the cornice pigeon's feet) under the cornice pigeon's step:
+// it tips up on its bottom edge at the ledge's lip, goes over and flutters down IN FRONT of the facade onto the shutter
+const NOTE_LIP: Pt = [578, 904];
 const CORNICE_PIGEON: Pt = [640, 904];
-// A1 fix round 1: 42 world left (was 454), on the box's left end: the bigger note's top-left corner (~446, 948) keeps
-// ~20 px of air to the pigeon, which now sits right above Pip
+// A1 fix round 1: 42 world left (was 454), on the box's left end, right above Pip. A1 fix round 2 (review: its take-off
+// up-left ran into Pip's rising leap, perched on his ear on f195-f196): it leaves STEEPLY up (flyTo [-160, -420])
 const BOX_PIGEON: Pt = [412, 952];
 const PIGEON_S = 0.8;
 
@@ -119,6 +122,8 @@ const GOVB_WIN = PLAZA.gov.govB.window; // [414, 970, 208, 146]: the shutter's c
 // ~85 px on f193 and are still rising at the cut (~130 px up); the growth is capped (~1.3x at the cut) so the hop, not
 // the scale, carries the motion
 const SHRUG_DUR = 0.5;
+// the in-hop's take-off x (SCREEN px, past the left edge; A1 fix round 2: was -270, see beats.ts pipLand)
+const PIP_IN_X0 = -300;
 // the near onlookers (SCREEN px, head centre + diameter): bottom left, inside the film edge's colour (x >= 54, y <= 1895)
 // A1 fix round 1 (review: the long-haired head read as an arched door / tombstone with no neck or shoulders, both froze
 // for 6.5 s, and onlooker 2's crown touched govB's elephant plaque): both raised ~42 px so collars and shoulders show
@@ -243,8 +248,10 @@ const Scene11: React.FC = () => {
   const pipKeys: (PoseKey & {rot: number; up?: number})[] = [
     {t: -10, pose: 'sit-back', look: 0, rot: 0},
     {t: b.earFlick, pose: 'sit-back', look: 0.6, rot: 1},
-    {t: b.lookNotice, pose: 'sit-back', look: 0.75, rot: 0}, // no lean: his ear keeps clear air to the notice's tape
-    {t: b.snailCrawl + 0.06, pose: 'sit-back', look: 0.95, rot: 0, up: 0.06}, // the page tries again: he perks up at the bar
+    // A1 fix round 2 (review: look 0.6 -> 0.75 on a back view was invisible): on 'if' he leans BACK (away from the
+    // notice's tape) and stretches up, looking up at the notice; on 'update' he perks up further toward the bar
+    {t: b.lookNotice, pose: 'sit-back', look: 0.75, rot: -4, up: 0.06},
+    {t: b.snailCrawl + 0.06, pose: 'sit-back', look: 0.95, rot: 2, up: 0.1}, // the page tries again: he perks up at the bar
     // A1 polish (review: 1-7 deg leans of the back view do not read at phone size): a SILHOUETTE change. On end(yet) he
     // gets up on the sill in profile facing the sun (stand-side, facing right), nose and trunk tipped up toward it, and
     // holds it through the press (braced, eyes wide); the shutter's slam drops him back to sit-back (startle)
@@ -284,12 +291,12 @@ const Scene11: React.FC = () => {
   // the lamp post, touching down ON 'Even'
   // fix round 3: a LOWER arc (feet ~1430-1500, body under govA's window sill at y >= ~1300 on f1-f2: he reads against
   // govA's column base and the lamp post, never on govA's window glass)
-  const inHop = hop({t, t0: b.pipLand - 0.34, dur: 0.34, from: {x: -270, y: 1500}, to: {x: pipAnchor[0], y: pipAnchor[1]}, height: 32});
+  const inHop = hop({t, t0: b.pipLand - 0.34, dur: 0.34, from: {x: PIP_IN_X0, y: 1500}, to: {x: pipAnchor[0], y: pipAnchor[1]}, height: 32});
   if (t < b.pipLand) {
     // A1 polish: 3 ink speed lines trail him on the fast frames (f1-f5, ~55 px / frame), S12's fall-smear language
     let smear: React.ReactNode = null;
     if (inHop.airborne && t >= 1 / 30 - 1e-4 && inHop.k < 0.88) {
-      const h0 = hop({t: t - 0.005, t0: b.pipLand - 0.34, dur: 0.34, from: {x: -270, y: 1500}, to: {x: pipAnchor[0], y: pipAnchor[1]}, height: 32});
+      const h0 = hop({t: t - 0.005, t0: b.pipLand - 0.34, dur: 0.34, from: {x: PIP_IN_X0, y: 1500}, to: {x: pipAnchor[0], y: pipAnchor[1]}, height: 32});
       smear = <PipHopSmear x={inHop.x} y={inHop.y} vx={(inHop.x - h0.x) / 0.005} vy={(inHop.y - h0.y) / 0.005} scale={pipScale} />;
     }
     pip =
@@ -430,10 +437,10 @@ const Scene11: React.FC = () => {
         {nearPlane}
         {/* on the closed shutter: the sticky note (J6), then S01's lettered 'back soon' tag on its nail and S01's padlock
             on the rail (drawn by the scene: they rock / twirl and they sit over the bold near-plane strokes) */}
-        <NoteFlight x={NOTE.x} y={NOTE.y} from={NOTE_FROM} arriveAt={slapAt} dur={slapAt - b.noteDrop} flipDur={0.15} clipY={CORNICE_B} back={<NoteBack x={NOTE.x} y={NOTE.y} w={NOTE_BACK.w} h={NOTE_BACK.h} rot={NOTE_ROT} lines={NOTE_LINES} fontSize={NOTE_BACK.fs} inkPx={3.4} />} face={noteEl(false)} />
+        <NoteFlight x={NOTE.x} y={NOTE.y} h={NOTE.h} lip={NOTE_LIP} arriveAt={slapAt} dur={slapAt - b.noteDrop} liftDur={0.1} flipDur={0.15} back={<NoteBack x={NOTE.x} y={NOTE.y} w={NOTE_BACK.w} h={NOTE_BACK.h} rot={NOTE_ROT} lines={NOTE_LINES} fontSize={NOTE_BACK.fs} inkPx={3.4} />} face={noteEl(false)} />
         <NoteBreeze x={NOTE.x} y={NOTE.y} h={NOTE.h} flutterAt={[b.noteCurl - 0.02, b.strike + 0.25]} joltAt={b.strike}>
           {noteEl(true)}
-          {t >= slapAt ? <NoteStrike x={NOTE.x} y={NOTE.y} w={NOTE.w} h={NOTE.h} lines={NOTE_LINES} fontSize={NOTE_FS} strike="and on again" rot={NOTE_ROT} at={b.strike} widthPx={6.5} overPx={9} seed="s11/J6/strike" /> : null}
+          {t >= slapAt ? <NoteStrike x={NOTE.x} y={NOTE.y} w={NOTE.w} h={NOTE.h} lines={NOTE_LINES} fontSize={NOTE_FS} strike="and on again" rot={NOTE_ROT} at={b.strike} widthPx={5.5} overPx={8} seed="s11/J6/strike" /> : null}
         </NoteBreeze>
         {/* A1 polish: on the twirl's edge-on frames (narrower than 35 %) the same tag with no lettering (the paper edge) */}
         <TagTwirl x={TAG.x} y={TAG.y} twirlAt={[b.tagTwirl]} edge={<BackSoonTag x={TAG.x} y={TAG.y} lettered text=" " font={backSoonFont(tagW)} size={tagW} at={b.tag} tapAt={[b.tagTwirl + 0.45, b.tagSway]} inkPx={3.4} seed="plaza/govB/tag" />}>
@@ -447,10 +454,12 @@ const Scene11: React.FC = () => {
         {/* the sill: the snail (running gag), Bit; the pigeons on the cornice and on the shutter box */}
         <SillSnail x={SNAIL_AT[0]} y={SNAIL_AT[1]} size={28} shellAt={b.snailShell} crawlAt={b.snailCrawl} hideAt={b.snailHide} antennaeAt={b.antennae} peekAt={b.pipOut} speed={5} seed="s11/snail" />
         {bit}
-        <Pigeon x={CORNICE_PIGEON[0]} y={CORNICE_PIGEON[1]} s={PIGEON_S} shuffle={[{at: b.ringHiccup1, dx: -9}, {at: b.cornShuffle, dx: 6}, {at: b.barBack + 0.17, dx: 4}, {at: b.antennae + 0.08, dx: -3}]} hopAt={[b.cornShuffle, b.press + 0.05, b.glint + 0.17]} preenAt={b.preen} seed="s11/pg1" />
-        {/* the box pigeon: crouch, then off up-left (the whole bird, flapping, 20 -> 28 px / frame) with the tag sway,
-            after Pip's hop-off: clear of the box by the cut, mid-flight on the last frame */}
-        <Pigeon x={BOX_PIGEON[0]} y={BOX_PIGEON[1]} s={PIGEON_S} land={{at: b.pigeonLand, from: [175, 875], dur: 0.45}} shuffle={[{at: b.noteSlap + 0.18, dx: 5}]} hopAt={[b.glint - 0.03]} hopH={20} flyAt={b.pigeonFly} flyTo={[-300, -200]} flySpeed={[20, 28]} seed="s11/pg2" />
+        {/* the cornice pigeon; A1 fix round 2: it steps off the note's corner (a right shuffle) as the breeze lifts the
+            sheet off the ledge under it */}
+        <Pigeon x={CORNICE_PIGEON[0]} y={CORNICE_PIGEON[1]} s={PIGEON_S} shuffle={[{at: b.ringHiccup1, dx: -9}, {at: b.cornShuffle, dx: 6}, {at: b.barBack + 0.17, dx: 4}, {at: b.noteDrop - 0.03, dx: 7}, {at: b.antennae + 0.08, dx: -3}]} hopAt={[b.cornShuffle, b.press + 0.05, b.glint + 0.17]} preenAt={b.preen} seed="s11/pg1" />
+        {/* the box pigeon: crouch, then off STEEPLY up (the whole bird, flapping, 24 -> 32 px / frame) as Pip leaps at it
+            (A1 fix round 2: was up-left at 20 -> 28, into his rising head): clear of his apex, mid-flight on the last frame */}
+        <Pigeon x={BOX_PIGEON[0]} y={BOX_PIGEON[1]} s={PIGEON_S} land={{at: b.pigeonLand, from: [175, 875], dur: 0.45}} shuffle={[{at: b.noteSlap + 0.18, dx: 5}]} hopAt={[b.glint - 0.03]} hopH={20} flyAt={b.pigeonFly} flyTo={[-160, -420]} flySpeed={[24, 32]} seed="s11/pg2" />
       </XG>
       {/* the near layer (screen space): Pip, the plaza lamp post near the left edge (Pip hops in behind it), then two
           quiet back-view onlookers at the BOTTOM LEFT, at the base of govA's columns (under the platform UI: depth +

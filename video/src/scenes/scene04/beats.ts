@@ -41,9 +41,9 @@ const ABS = {
   //                        curls up asleep on the step (sleep pose, z's float)
   ghosts2: 15.375, //       w52 'like': a second pair of ghosts strides past; Bit yawns and blinks (he does not move)
   l5: 15.39, //             w53-0.10 'fourteen': label L5 swings in as a tag hanging from lock4 (pendulum -16 -> 0)
-  cobweb: 15.59, //         w53+0.10 'fourteen': a cobweb draws over the lock box corner (0.3 s); Bit does not move
-  //                        (fix round 3: drawn from cobweb+0.15, once L5's pendulum has mostly settled: highlight ->
-  //                        label -> web)
+  cobweb: 15.59, //         w53+0.10 'fourteen': a small hair cobweb draws on the lock box's OUTER top-left corner (0.24
+  //                        s, ON the anchor; A1 fix round: fix round 3's +0.15 delay put it 4.5 frames late); Bit does
+  //                        not move
   leaf: 15.61, //           w53+0.12 'fourteen' = tear 7 + 0.035 (storyboard w53+0.20; fix round 2: one frame after the
   //                        ivy turns tan on tear 7, and it goes bare on tear 9 while the leaf falls; lands 0.3 s before
   //                        the dive, seen at rest): the last tan leaf drifts down onto sleeping Pip's crown

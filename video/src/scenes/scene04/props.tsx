@@ -1,8 +1,10 @@
-// S04 local props: the season ivy on door #4's frame (THE season cue: it creeps up one node per step and recolours every
-// two tears: green, peach, tan, bare), the YEAR calendar (a bigger body than the kit's, a year page of twelve month
-// blocks) and its torn pages (each flips up over the binding, then flies off: several in the air at once: the
-// time-lapse), the neighbours' windows, the stoop's step tones, the ground marks, and the clip helpers the scene uses
-// for the fill-only cornice top, the dive's one-unit flatten and the near tree's shift.
+// S04 local props: the season ivy on door #4's frame (THE season cue: it creeps up one node per step and steps a season
+// every two tears: tan, bare, green, tan, bare; fills only, a bare step is a leaf drop, green regrows from the root), the
+// YEAR calendar (a bigger body than the kit's, a year page of twelve month blocks) and its torn pages (each flips up
+// over the binding, then flies off and shrinks to nothing: several in the air at once: the time-lapse), the neighbours'
+// windows, the hero browser and its site layouts (redesigned every other tear), the 'fourteen' hair cobweb, the stoop's
+// step tones, the ground marks, and the clip helpers the scene uses for the fill-only cornice top, the dive's row-by-row
+// caption-band treatment (BandInk), the wire's snap and the near tree's shift.
 
 import React, {useId} from 'react';
 import {palette} from '../../lib/theme';
@@ -63,7 +65,16 @@ const IVY_TONES: Record<Season, [string, string] | null> = {green: [palette.sage
  *  that node's ink) so the overlaps stay clean. */
 export const SeasonIvy: React.FC<{steps: {t: number; n: number}[]; seasons: {t: number; s: Season}[]; seed?: string}> = ({steps, seasons, seed = 's4ivy'}) => {
   const t = useTime();
-  const season = seasonAt(seasons, t);
+  // the season now, when it started, and the one before (A1 fix round: the whole mass swapped every ~4 frames, a
+  // strobe of a big shape; now green <-> tan steps the leaf FILLS only (outlines unchanged), a 'bare' step is a LEAF
+  // DROP (the leaves let go in two waves two frames apart while four of them flutter down for 0.2 s) and the green after
+  // a bare step REGROWS from the root up (each leaf pops 20 % -> 100 %))
+  const kIdx = seasons.reduce((acc, key, j) => (t >= key.t ? j : acc), 0);
+  const season = seasons[kIdx].s;
+  const ts = seasons[kIdx].t;
+  const prevSeason = kIdx > 0 ? seasons[kIdx - 1].s : season;
+  const bare = season === 'bare';
+  const regrow = !bare && prevSeason === 'bare' && kIdx > 0;
   const born: number[] = [];
   steps.forEach((st, i) => {
     const prev = i ? steps[i - 1].n : 0;
@@ -73,7 +84,8 @@ export const SeasonIvy: React.FC<{steps: {t: number; n: number}[]; seasons: {t: 
   if (n < 2) return null;
   const pts = IVY_NODES.slice(0, n);
   const vine = smoothVine(pts);
-  const tones = IVY_TONES[season];
+  // a bare step: the leaves still on the vine keep the season before's tones until their wave lets go
+  const tones = IVY_TONES[bare ? prevSeason : season];
   let twigs = '';
   // settled leaves are drawn NODE BY NODE (that node's two fills, then its ink), from the root up: a nearer / newer
   // leaf's fill covers the outline of the one under it (fix round 1: one batched ink pass let back outlines show through)
@@ -83,7 +95,9 @@ export const SeasonIvy: React.FC<{steps: {t: number; n: number}[]; seasons: {t: 
     if (i === 0) return;
     const prev = pts[i - 1];
     const dir = (Math.atan2(p[1] - prev[1], p[0] - prev[0]) * 180) / Math.PI;
-    const q = Math.min(1, (t - born[i]) / 0.12);
+    // regrowth after a bare step: from the root up over IVY_REGROW s
+    const start = regrow ? Math.max(born[i], ts + (IVY_REGROW * i) / IVY_NODES.length) : born[i];
+    const q = Math.min(1, (t - start) / 0.12);
     const k = 0.2 + 0.8 * E.outCubic(q);
     let fa = '';
     let fb = '';
@@ -92,13 +106,13 @@ export const SeasonIvy: React.FC<{steps: {t: number; n: number}[]; seasons: {t: 
       const j = `${i}${side}`;
       const a = dir + side * (62 + rand(seed, `a${j}`) * 26);
       const sz = 15 + rand(seed, `s${j}`) * 6 + (i < 4 ? 3 : 0);
-      if (!tones) {
-        if ((i + (side > 0 ? 1 : 0)) % 2 === 0) {
-          const rr = (a * Math.PI) / 180;
-          twigs += `M${p[0].toFixed(1)} ${p[1].toFixed(1)}l${(Math.cos(rr) * 7).toFixed(1)} ${(Math.sin(rr) * 7).toFixed(1)}`;
-        }
-        continue;
+      if (bare && (i + (side > 0 ? 1 : 0)) % 2 === 0) {
+        const rr = (a * Math.PI) / 180;
+        twigs += `M${p[0].toFixed(1)} ${p[1].toFixed(1)}l${(Math.cos(rr) * 7).toFixed(1)} ${(Math.sin(rr) * 7).toFixed(1)}`;
       }
+      if (!tones || t < start) continue;
+      // a bare step: the falling four are IvyDrops'; the rest let go in two waves (odd leaves two frames later)
+      if (bare && (isDrop(i, side) || t >= ts + ((i + (side > 0 ? 1 : 0)) % 2 ? 2 * FRAME : 0))) continue;
       const L = leafD(p, a, sz);
       const useA = (i + (side > 0 ? 0 : 1)) % 2 === 0;
       if (q < 1) {
@@ -128,8 +142,62 @@ export const SeasonIvy: React.FC<{steps: {t: number; n: number}[]; seasons: {t: 
       <Ink d={vine + twigs} width={2.2} taper={false} seed={`${seed}/vine`} />
       {settled}
       {popping}
+      <IvyDrops seasons={seasons} n={n} seed={seed} />
     </>
   );
+};
+
+/** How long the green regrowth after a bare step takes to climb the whole vine (s). */
+const IVY_REGROW = 0.1;
+/** The four leaves that flutter down on each bare step (node, side): spread up the frame and onto the lintel. */
+const IVY_DROPS: [number, number][] = [
+  [3, 1],
+  [6, -1],
+  [10, 1],
+  [13, -1],
+];
+const isDrop = (i: number, side: number) => IVY_DROPS.some(([di, ds]) => di === i && ds === side);
+/** A leaf drop's flight (s). */
+const DROP_LIFE = 0.2;
+
+/** On every bare step four leaves (the season before's tones, their outlines unchanged) let go and flutter down for
+ *  0.2 s: falling faster as they go, a sideways sway and a spin, shrinking to nothing over their last two frames (no
+ *  fade, no one-frame vanish). The story's last tan leaf (Leaf, onto Pip) is the last of this series. */
+const IvyDrops: React.FC<{seasons: {t: number; s: Season}[]; n: number; seed: string}> = ({seasons, n, seed}) => {
+  const t = useTime();
+  const out: React.ReactNode[] = [];
+  seasons.forEach((key, kj) => {
+    if (key.s !== 'bare' || kj === 0) return;
+    const d = t - key.t;
+    if (d < 0 || d >= DROP_LIFE) return;
+    const tones = IVY_TONES[seasons[kj - 1].s];
+    if (!tones) return;
+    const u = d / DROP_LIFE;
+    const shrink = Math.min(1, (DROP_LIFE - d) / (2 * FRAME));
+    IVY_DROPS.forEach(([i, side], m) => {
+      if (i >= n || i < 1) return;
+      const p = IVY_NODES[i];
+      const prev = IVY_NODES[i - 1];
+      const j = `${i}${side}`;
+      const dir = (Math.atan2(p[1] - prev[1], p[0] - prev[0]) * 180) / Math.PI;
+      const a = dir + side * (62 + rand(seed, `a${j}`) * 26);
+      const sz = 15 + rand(seed, `s${j}`) * 6 + (i < 4 ? 3 : 0);
+      const L = leafD(p, a, sz);
+      const r = (a * Math.PI) / 180;
+      const mid: Pt = [p[0] + Math.cos(r) * sz * 0.5, p[1] + Math.sin(r) * sz * 0.5];
+      const dx = side * 9 * u + 5 * Math.sin(u * Math.PI * 2 + m);
+      const dy = 16 * u + 38 * u * u;
+      const rot = side * 50 * u + 18 * Math.sin(u * Math.PI * 3 + m);
+      const flip = 0.55 + 0.45 * Math.abs(Math.cos(u * Math.PI * 2.2 + m));
+      out.push(
+        <XG key={`${kj}/${j}`} m={mat.compose(mat.translate(mid[0] + dx, mid[1] + dy), mat.rotate(rot), mat.scale(shrink, shrink * flip), mat.translate(-mid[0], -mid[1]))}>
+          <Fill d={L.d} color={(i + (side > 0 ? 0 : 1)) % 2 === 0 ? tones[0] : tones[1]} offset={false} mode="none" seed={`${seed}/dr${j}`} />
+          <Ink d={L.d + L.vein} width={1.3} taper={false} seed={`${seed}/dri${j}`} />
+        </XG>,
+      );
+    });
+  });
+  return <>{out}</>;
 };
 
 /** A smooth vine through the nodes (quadratic midpoints). */
@@ -378,7 +446,8 @@ export const YearFlyers: React.FC<{tears: number[]; until: number; life?: number
     const cx = CAL[0] + w / 2 + 4 + lerp(0, 26 + r('x') * 48, E.outCubic(q));
     const cy = bind - 34 - lerp(0, 46 + r('y') * 40, E.outQuad(q)) + 16 * q * q;
     const rot = (r('r') - 0.4) * 36 * q + 7 * Math.sin(q * 9 + r('p') * 6);
-    const sc = 0.72 - 0.42 * E.outQuad(q);
+    // A1 fix round: it shrinks to nothing over its last two frames (it used to be removed at 0.30 in one frame)
+    const sc = (0.72 - 0.42 * E.outQuad(q)) * Math.min(1, (end - t) / (2 * FRAME));
     const fl = 0.55 + 0.4 * Math.abs(Math.sin(q * 7 + 0.4 + r('f') * 2));
     out.push(
       <XG key={i} m={mat.compose(mat.translate(cx, cy), mat.rotate(rot), mat.scale(sc, sc * fl), mat.translate(-w / 2, -h / 2))}>
@@ -540,7 +609,7 @@ const PAVE_JOINTS = (() => {
 /** The sand kerb shadows (the sun is up right: they fall a little left): under the stoop's bottom step and the planter. */
 const KERB_SHADOWS =
   polyPath([[148, STOOP.pavementY + 1], [436, STOOP.pavementY + 1], [428, STOOP.pavementY + 8], [140, STOOP.pavementY + 8]]) +
-  polyPath([[452, STOOP.furniture[0].y - 1], [512, STOOP.furniture[0].y - 1], [506, STOOP.furniture[0].y + 6], [444, STOOP.furniture[0].y + 6]]);
+  polyPath([[494, STOOP.furniture[0].y - 1], [554, STOOP.furniture[0].y - 1], [548, STOOP.furniture[0].y + 6], [486, STOOP.furniture[0].y + 6]]);
 /** Two fallen tan leaves on the pavement (the season cue's callback): (x, y, rot, size). */
 const FALLEN: [number, number, number, number][] = [
   [292, 1482, -28, 9],
@@ -605,25 +674,87 @@ export const SplitInk: React.FC<{y: number; x0?: number; node: React.ReactNode}>
   </>
 );
 
-// ---------------------------------------------------------------- soft ink (the dive)
+// ---------------------------------------------------------------- the dive's caption band, row by row
 
-/** `node` with its ink SOFTENED to tan above world y `y` (from x0 rightward), unchanged below: two clipped copies, one
- *  switch for a whole layer. Fix round 3 (the dive's flatten dropped every ink line above world 990 in one frame and the
- *  browser / windows changed content: a repaint, not motion): every line, mullion, curtain edge, browser hairline and
- *  window frame stays exactly where it is, only its colour steps from ink to tan (a CSS rule on the copy: SVG presentation
- *  attributes lose to any style rule), so silhouettes and content are identical and the caption band only ever sees tan
- *  lines (tan behind ink lettering is ~6:1). */
-export const SoftInk: React.FC<{y: number; x0?: number; node: React.ReactNode; color?: string}> = ({y, x0, node, color = palette.tan}) => {
-  const cls = 's4soft' + useId().replace(/[^a-zA-Z0-9]/g, '');
+/** A world box (x0, y0, x1, y1). */
+export type Box = [number, number, number, number];
+
+/** The dive's caption-band state of a layer: everything above world `tanY` has its ink softened to tan, everything
+ *  above `flatY` is fill-only (no line at all); the box (the hero browser) is its own unit, in or out of each region by
+ *  `bTan` / `bFlat`, whatever the rows around it do. null = nothing. */
+export type BandState = {tanY: number | null; flatY: number | null; bTan: boolean; bFlat: boolean};
+export const BAND_OFF: BandState = {tanY: null, flatY: null, bTan: false, bFlat: false};
+
+/** The region above world y (all x) with box B added (`inB`) or cut out (!inB) where they overlap (even-odd: B is either
+ *  disjoint from the half-plane or inside it), grown by g (the overlap of a copy drawn over another); null = empty. */
+export function bandRegion(y: number | null, B: Box, inB: boolean, g = 0): string | null {
+  const [x0, y0, x1, y1] = B;
+  const w = x1 - x0;
+  if (y === null) return inB ? rectPath(x0 - g, y0 - g, w + 2 * g, y1 - y0 + 2 * g) : null;
+  const Y = y + g;
+  const base = above(Y);
+  if (inB) return Y >= y1 + g ? base : base + rectPath(x0 - g, Math.max(Y, y0 - g), w + 2 * g, y1 + g - Math.max(Y, y0 - g));
+  if (Y <= y0 + g) return base;
+  return base + rectPath(x0 + g, y0 + g, w - 2 * g, Math.min(Y, y1 - g) - (y0 + g));
+}
+
+/** `node` treated for the caption band ROW BY ROW (A1 fix round; replaces fix round 3's SoftInk, which switched the
+ *  whole set above world 990 to tan in one frame early in the dive: two drawing styles on one facade, the split running
+ *  across the house mid-frame). Up to three clipped copies: inked (outside the tan region), its ink softened to tan (a
+ *  CSS rule on the copy: SVG presentation attributes lose to any style rule; silhouettes and content unchanged), and
+ *  fill-only (<Look ink={false}>) deep inside the band. The scene computes the regions from the camera, so each row
+ *  switches as it reaches the band and everything below keeps its ink. */
+export const BandInk: React.FC<{s: BandState; B: Box; node: React.ReactNode; color?: string}> = ({s, B, node, color = palette.tan}) => {
+  const cls = 's4band' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const tan0 = bandRegion(s.tanY, B, s.bTan);
+  if (!tan0) return <>{node}</>;
+  const tanG = bandRegion(s.tanY, B, s.bTan, 1.5) as string;
+  const flat0 = bandRegion(s.flatY, B, s.bFlat);
+  const flatG = bandRegion(s.flatY, B, s.bFlat, 1.5);
+  const tanCopy = <g className={cls}>{node}</g>;
   return (
     <>
       <style>{`.${cls} path[stroke="${palette.ink}" i]{stroke:${color}}`}</style>
-      <ClipG d={above(y + 1.5, x0)}>
-        <g className={cls}>{node}</g>
-      </ClipG>
-      <ClipG d={except(above(y, x0))}>{node}</ClipG>
+      <ClipG d={except(tan0)}>{node}</ClipG>
+      <ClipG d={tanG}>{flat0 ? <ClipG d={except(flat0)}>{tanCopy}</ClipG> : tanCopy}</ClipG>
+      {flatG ? (
+        <ClipG d={flatG}>
+          <Look ink={false}>{node}</Look>
+        </ClipG>
+      ) : null}
     </>
   );
+};
+
+// ---------------------------------------------------------------- the 'fourteen' cobweb
+
+/** A small hair-weight cobweb on the OUTSIDE of a box corner (A1 fix round: the props Cobweb at r 28 / 2.2 fanned INTO
+ *  lock4's box from its top-left corner and covered ~80 % of the face: a black scribble over the keyhole on the match
+ *  cut). The hub sits on the corner, four radials fan OUT over the door leaf behind the box (from along the box's top
+ *  edge, extended, round to along its left edge, extended) and two arcs sag between them toward the hub, so the web
+ *  spans the gap between the box and the door and the box face stays clear. `corner` picks the box corner; world units.
+ *  The radials draw first, then the arcs (one Ink, at -> at + dur). */
+export const HairWeb: React.FC<{x: number; y: number; r: number; corner?: 'tl' | 'tr'; at: number; dur?: number; width?: number; seed?: string}> = ({x, y, r, corner = 'tl', at, dur = 0.24, width = 1.2, seed = 's4web'}) => {
+  // outward: up and away from the box (tl: up-left)
+  const sx = corner === 'tl' ? -1 : 1;
+  const P = (a: number, rr: number): Pt => [x + sx * Math.cos((a * Math.PI) / 180) * rr, y - Math.sin((a * Math.PI) / 180) * rr];
+  const spokes = [4, 32, 60, 86];
+  const lens = [1, 0.9, 0.96, 1];
+  const fmt = (p: Pt) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+  let d = '';
+  spokes.forEach((a, i) => {
+    d += `M${fmt([x, y])}L${fmt(P(a, r * lens[i]))}`;
+  });
+  // two arcs, each a chain of sagging spans between neighbouring radials (the midpoint pulled toward the hub)
+  for (const k of [0.5, 0.88]) {
+    const pts = spokes.map((a, i) => P(a, r * k * Math.min(1, lens[i] + 0.04)));
+    d += `M${fmt(pts[0])}`;
+    for (let i = 1; i < pts.length; i++) {
+      const am = (spokes[i - 1] + spokes[i]) / 2;
+      d += `Q${fmt(P(am, r * k * 0.62))} ${fmt(pts[i])}`;
+    }
+  }
+  return <Ink d={d} at={at} dur={dur} pace="free" width={width} taper={false} seed={seed} />;
 };
 
 // ---------------------------------------------------------------- the hero browser window (whole scene)
@@ -636,36 +767,117 @@ export const SoftInk: React.FC<{y: number; x0?: number; node: React.ReactNode; c
  *    ink lettering is ~2.4:1, teal ~3.6:1), its dots cream / sage / SAND (no peach inside the caption band but the
  *    highlight), the cream address pill, the bar line and the frame redrawn on top.
  *  The screen's ink hairlines stay the set's. */
-export const HeroBrowser: React.FC<{seed?: string}> = ({seed = 'stoop/hbw'}) => {
+export const HeroBrowser: React.FC<{layout?: number; chrome?: number; flat?: boolean; seed?: string}> = ({layout = 0, chrome = 0, flat = false, seed = 'stoop/hbw'}) => {
   const [x, y, w, h] = STOOP.browser;
   const F = usePropFrame({ink: SI.mid, seed, defDepth: 'mid'});
   const W = F.W;
   const bar = Math.min(30, h * 0.27);
   const sh = h - bar;
-  const pad = Math.max(5, w * 0.07);
-  const hh = sh * 0.24;
   const dr = bar * 0.25;
   const sp = bar * 0.63;
   const d0 = bar * 0.47;
   const px = d0 + 2 * sp + dr + bar * 0.38;
-  const pw = Math.max(bar, w - px - bar * 0.35);
+  const pw0 = Math.max(bar, w - px - bar * 0.35);
   const ph = bar * 0.6;
   const py = (bar - ph) / 2;
+  // chrome 1 (one redesign of the browser itself, mid time-lapse): a shorter pill and a sage menu tab right of it
+  const pw = chrome ? pw0 * 0.74 : pw0;
+  const tab = chrome ? roundRect(px + pw + bar * 0.22, py + 1, ph - 2, ph - 2, 3) : '';
   const dots = [palette.cream, palette.sage, palette.sand];
   return (
     <PropRoot x={x} y={y}>
-      <Fill rect={[pad, bar + pad, w - pad * 2, hh]} color={palette.sand} offset={false} mode="none" seed={`${seed}/hdr`} />
+      {/* the page (screen-local under the bar): a cream sheet over the set's page, then the layout of the year */}
+      <XG m={mat.translate(0, bar)}>
+        <Fill rect={[0, 0, w, sh]} color={palette.cream} offset={false} mode="none" seed={`${seed}/pg`} />
+        <SitePage layout={layout} w={w} h={sh} seed={`${seed}/L${layout}`} />
+      </XG>
       <Fill rect={[0, 0, w, bar]} color={palette.teal} offset={F.off} mode="none" seed={`${seed}/bar`} />
-      {dots.map((c, i) => (
-        <React.Fragment key={i}>
-          <Fill d={roundRect(d0 + i * sp - dr, bar / 2 - dr, dr * 2, dr * 2, dr)} color={c} offset={false} mode="none" seed={`${seed}/d${i}`} />
-          <Ink d={circle(d0 + i * sp, bar / 2, dr, {seed: `${seed}/di${i}`, overlap: 8})} width={W * 0.5} taper={false} seed={`${seed}/di${i}`} />
-        </React.Fragment>
-      ))}
-      <Fill d={roundRect(px, py, pw, ph, ph / 2)} color={palette.cream} offset={false} mode="none" seed={`${seed}/pill`} />
-      <Ink d={roundRect(px, py, pw, ph, ph / 2, {closed: false, seed: `${seed}/pi`})} width={W * 0.55} seed={`${seed}/pi`} />
+      {/* the dive (once the window reaches the caption band): one flat teal bar, no dots and no pill */}
+      {flat
+        ? null
+        : dots.map((c, i) => (
+            <React.Fragment key={i}>
+              <Fill d={roundRect(d0 + i * sp - dr, bar / 2 - dr, dr * 2, dr * 2, dr)} color={c} offset={false} mode="none" seed={`${seed}/d${i}`} />
+              <Ink d={circle(d0 + i * sp, bar / 2, dr, {seed: `${seed}/di${i}`, overlap: 8})} width={W * 0.5} taper={false} seed={`${seed}/di${i}`} />
+            </React.Fragment>
+          ))}
+      {flat ? null : (
+        <>
+          <Fill d={roundRect(px, py, pw, ph, ph / 2)} color={palette.cream} offset={false} mode="none" seed={`${seed}/pill`} />
+          <Ink d={roundRect(px, py, pw, ph, ph / 2, {closed: false, seed: `${seed}/pi`})} width={W * 0.55} seed={`${seed}/pi`} />
+          {tab ? <Fill d={tab} color={palette.sage} offset={false} mode="none" seed={`${seed}/tab`} /> : null}
+          {tab ? <Ink d={tab} width={W * 0.5} taper={false} seed={`${seed}/tabi`} /> : null}
+        </>
+      )}
       <Ink d={hline(0, w, bar, {seed: `${seed}/bl`, over: [2, 6]})} width={W * 0.8} seed={`${seed}/bl`} />
       <Ink d={rect(0, 0, w, h, {seed: `${seed}/fr`, over: 6})} width={W} seed={`${seed}/fr`} />
     </PropRoot>
   );
 };
+
+/** The hero site's page layouts (A1 fix round: the website ages with the years while the lock never changes; a pauser
+ *  joke). Fill-only (no ink: calm under the captions in the dive), never peach. Page-local, w x h (220 x 110 world):
+ *  0 the 2012 page (a sand header block, three text bars); 1 a blog (a thin sand band, a mintPale image left, text
+ *  bars right and under it); 2 a big sand hero block with a sage button and two centred text bars; 3 three cards
+ *  (sage / mintPale / sand) under a sage band, two short text bars under each; 4 = layout 1 mirrored (image right).
+ *  Text bars are tan, 3.2 world tall (~5 px on screen). */
+const SitePage: React.FC<{layout: number; w: number; h: number; seed: string}> = ({layout, w, h, seed}) => {
+  const pad = Math.max(5, w * 0.07);
+  const bars: [number, number, number][] = [];
+  const blocks: {r: [number, number, number, number]; c: string}[] = [];
+  const TB = 3.2;
+  if (layout === 0) {
+    const hh = h * 0.24;
+    blocks.push({r: [pad, pad, w - pad * 2, hh], c: palette.sand});
+    const gy = (h - pad * 2 - hh) / 4;
+    [0.86, 0.7, 0.5].forEach((f, i) => bars.push([pad, pad + hh + gy * (i + 1) - TB / 2, (w - pad * 2) * f]));
+  } else if (layout === 1 || layout === 4) {
+    const m = layout === 4;
+    blocks.push({r: [0, 0, w, 11], c: palette.sand});
+    const iw = (w - pad * 2) * 0.42;
+    const ix = m ? w - pad - iw : pad;
+    blocks.push({r: [ix, 20, iw, 58], c: palette.mintPale});
+    const tx = m ? pad : pad + iw + 9;
+    const tw = w - pad * 2 - iw - 9;
+    [0.95, 0.8, 0.9, 0.55].forEach((f, i) => bars.push([tx, 24 + i * 13, tw * f]));
+    [0.92, 0.6].forEach((f, i) => bars.push([pad, 88 + i * 10, (w - pad * 2) * f]));
+  } else if (layout === 2) {
+    blocks.push({r: [pad * 0.6, pad * 0.6, w - pad * 1.2, 58], c: palette.sand});
+    blocks.push({r: [w / 2 - 26, 72, 52, 11], c: palette.sage});
+    [0.62, 0.44].forEach((f, i) => {
+      const bw = (w - pad * 2) * f;
+      bars.push([(w - bw) / 2, 90 + i * 9, bw]);
+    });
+  } else {
+    blocks.push({r: [0, 0, w, 9], c: palette.sage});
+    const gap = 9;
+    const cw = (w - pad * 2 - gap * 2) / 3;
+    [palette.sage, palette.mintPale, palette.sand].forEach((c, i) => {
+      const cx = pad + i * (cw + gap);
+      blocks.push({r: [cx, 20, cw, 44], c});
+      bars.push([cx, 74, cw * 0.92]);
+      bars.push([cx, 84, cw * (0.5 + 0.15 * i)]);
+    });
+  }
+  return (
+    <>
+      {blocks.map((b, i) => (
+        <Fill key={i} rect={b.r} color={b.c} offset={false} mode="none" seed={`${seed}/b${i}`} />
+      ))}
+      {bars.length ? <Fill d={bars.map(([bx, by, bw]) => roundRect(bx, by, bw, TB, TB / 2)).join('')} color={palette.tan} offset={false} mode="none" seed={`${seed}/t`} /> : null}
+    </>
+  );
+};
+
+/** The hero site's layout through the time-lapse: redesigned on every other tear (tears 0, 2, ... 12: seven redesigns,
+ *  the windows change on the same tears; the ivy's seasons step on the odd ones), never repeating the one before; the
+ *  browser chrome itself changes once (tear 6). Returns {layout, chrome}. */
+export const SITE_LAYOUTS = [1, 2, 3, 4, 3, 1, 2];
+export function siteAt(tears: number[], t: number): {layout: number; chrome: number} {
+  let layout = 0;
+  SITE_LAYOUTS.forEach((l, k) => {
+    const at = tears[k * 2];
+    if (at !== undefined && t >= at) layout = l;
+  });
+  return {layout, chrome: tears[6] !== undefined && t >= tears[6] ? 1 : 0};
+}

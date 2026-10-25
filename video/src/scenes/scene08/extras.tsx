@@ -67,11 +67,11 @@ export const LightDoors: React.FC<{row: 2 | 3}> = ({row}) => {
 
 /** S07 world -> S08 world at the cut (S07 camera (480, 760) zoom 1.06, S08 camera (540, 1260) zoom 1.3). */
 const K = 1.06 / 1.3;
-/** A1 fix round 1: the right-hand spans END at a second rooftop pole just right of the board (x 905; screen ~1013 on the
- *  cut frame, near the right edge, where S07's own pole stood just off frame), so the city right of the board, the
- *  flood there and the dome are wire-free once the board has risen (they used to run on to the right edge through the
- *  payoff). */
-export const POLE2 = {x: 905, base: 1444, top: 1146};
+/** A1 fix round 1: the right-hand spans END at a second rooftop pole right of the board (x 950: screen ~1073 on the cut
+ *  frame, at the right edge, where S07's own pole stood just off frame; screen 950 at rest, in the right rail), so the
+ *  city right of the board, the flood there and the dome are nearly wire-free once the board has risen (they ran on to
+ *  the right edge through the payoff), and the tally's overflow gates on the board's frame stay clear of the pole. */
+export const POLE2 = {x: 950, base: 1443, top: 1140};
 const SPANS = (() => {
   let d = '';
   const ties: number[] = [];

@@ -13,13 +13,14 @@
 // Wiper: scene07/lens.ts. No shims. Isolated preview entry: scene07/entry.tsx. Notes: docs/scenes/S07.md.
 
 import React, {useId} from 'react';
-import {World, Sun, sunPoseAt, Tod, XG, mat, palette, useTime, useGlobalTime, ease as E, Pt} from '../lib';
+import {World, Sun, sunPoseAt, XG, mat, palette, useTime, useGlobalTime, ease as E, Pt} from '../lib';
 import type {SunHop, SunMove} from '../lib';
-import {NoticeboardCorner, NOTICE_CORNER} from './shared/sets';
-import type {LayerWrap} from './shared/sets';
+import {NoticeboardCorner, NOTICE_CORNER, WORKSHOP_CORNER} from './shared/sets';
+import type {LayerWrap, WorkshopLayout} from './shared/sets';
+import {measureCaption, useCaptionFont} from '../lib/font';
 import {EdgeOnlooker, FixSign, HoursClock, LabelTag, LeakSheet} from './shared/props';
 import {useBeats} from './scene07/beats';
-import {BoardClones, BoardShade, camAt, camMat, CLOCK_SKY_CLIP, ClockFace, CLONE, CloneSpot, cruiseFor, DownSleeve, FarRoofDetails, Flyer, GroundDetails, LatchCover, litWall, PaneGlass, PhoneCopy, PhoneScreen, Pigeon, PinDot, PipS07, PUSHED, RiseFromLow, SpinWedge, WallDetails, WireCopy, WireCopySpec} from './scene07/parts';
+import {BoardClones, BoardShade, camAt, camMat, CLOCK_SKY_CLIP, ClockFace, CLONE, CloneSpot, cruiseFor, DownSleeve, FarCity, FarRoofDetails, Flyer, GroundDetails, J4_CUE, j4Pop, LatchCover, LatchKnob, LitCopy, PaneGlass, PhoneCopy, PhoneScreen, Pigeon, PinDot, PipS07, PUSHED, RiseFromLow, SpinWedge, StillUnderline, WallDetails, WireCopy, WireCopySpec, withoutGroundMarks} from './scene07/parts';
 import {PenReveal, RevealPass, s07Strokes, wire0InkedAt} from './scene07/reveal';
 // S06's leak page (the lens wipe's ONE trajectory, pageAt): S07 draws its own copy of the lens sheet with it, so the S07
 // composition and the film (where S06's Wiper draws the same page above both scenes) can never show two sheets.
@@ -49,8 +50,10 @@ const R0_DX = -55;
 /** Reader 3 (brown coat): the set's 'long' hair read as a featureless tan dome on a flat slab from behind; a dark bun +
  *  a collar band give it a back of the head and a shoulder line like the left readers. */
 const READER3 = {hair: 'bun' as const, hairColor: palette.ink, acc: ['collar' as const]};
-/** The left readers wait low in the frame from the cut (heads at y ~1740 / 1765) and rise the rest of the way on 'out'. */
-const LOW = [1740 - S7_READERS[0].head[1], 1765 - S7_READERS[1].head[1]];
+/** The left readers wait low in the frame from the cut and rise the rest of the way on 'out'. A1 fix round 1: they wait
+ *  70 px higher (heads at y ~1670 / 1695, was 1740 / 1765), so their hood, bun and scarf frame the bottom-left from the
+ *  cut instead of two head tops under a bare pavement. */
+const LOW = [1670 - S7_READERS[0].head[1], 1695 - S7_READERS[1].head[1]];
 /** On 'fix' the sun lifts so the clock's hub clears the far roofline (sun top at screen ~610, under the 570 caption
  *  floor). */
 const CLOCK_LIFT = 100;
@@ -114,12 +117,18 @@ const L7_PRE = 0.037;
  *  66 px (780-846, the kit's shade band, behind the door and the shop window) stay clay. At 846 the step lands at screen
  *  x ~928 after the push, left of the right-rail UI (x > 950), not as an extra edge inside it. */
 const WS_SHADE_X1 = 846;
+/** The workshop corner preset with its round elephant sign 24 px left (A1 fix round 1, right-rail density: its swing on
+ *  'fix' half sat under the like / comment column at screen 950-975; now its rim ends at screen ~949 after the push). */
+const WS_LAYOUT: WorkshopLayout = {...WORKSHOP_CORNER, sign: {...WORKSHOP_CORNER.sign, x: WORKSHOP_CORNER.sign.x - 24}};
 
 const Scene07: React.FC = () => {
   const t = useTime();
   const B = useBeats();
   const cam = camAt(t, B);
   const M = camMat(cam);
+  useCaptionFont();
+  /** Half the width of J4's lettering: its pop scales about the end of the lettering (A1 fix round 1). */
+  const j4TextHalf = measureCaption('still fixing...', J4.fs) / 2;
 
   // ---- the hours clock on the sun (pops on 'fix' (word - 0.04), pops off as the tilt starts). One minute-hand turn in
   //      0.42 s (<= 45 deg a frame at the inOut(sine) peak, a peach speed wedge trailing the hand while it is fast) and
@@ -266,47 +275,38 @@ const Scene07: React.FC = () => {
   const wrap: LayerWrap = (name, _z, node) =>
     name === 'roofs' ? (
       <>
+        {/* A1 fix round 1: a fill-only far-city step behind the roofs on the left (the city the wires run out to) */}
+        <FarCity />
         {node}
         <FarRoofDetails />
       </>
     ) : name === 'wall' ? (
       <>
         {/* the layer as drawn, then the relit copy over it below the cornice (over, not beside it: two clipped halves
-            leave an anti-aliased seam) */}
-        <defs>
-          <clipPath id="s7wallLit" clipPathUnits="userSpaceOnUse">
-            <rect x={-400} y={880} width={1800} height={1400} />
-          </clipPath>
-        </defs>
-        {node}
-        <g clipPath="url(#s7wallLit)">
-          <Tod map={litWall}>{node}</Tod>
-        </g>
+            leave an anti-aliased seam); a mask with its edge on whole device px, not a clip-path (LitCopy: A1 fix round 1) */}
+        <LitCopy edge="y" at={880}>
+          {node}
+        </LitCopy>
         <BoardShade />
         <WallDetails />
       </>
     ) : name === 'corner' ? (
-      <>
-        <defs>
-          <clipPath id="s7wsLit" clipPathUnits="userSpaceOnUse">
-            <rect x={WS_SHADE_X1} y={-400} width={1000} height={2800} />
-          </clipPath>
-        </defs>
+      <LitCopy edge="x" at={WS_SHADE_X1}>
         {node}
-        <g clipPath="url(#s7wsLit)">
-          <Tod map={litWall}>{node}</Tod>
-        </g>
-      </>
+      </LitCopy>
     ) : name === 'ground' ? (
       <>
-        {node}
+        {/* A1 fix round 1: the kit's long ground rays + cross (a registration '+' under the board) dropped; reference 2
+            ground ticks in GroundDetails */}
+        {withoutGroundMarks(node)}
         <GroundDetails />
       </>
     ) : (
       node
     );
 
-  const set = (pass: RevealPass) => (
+  // (the fills / all pass is told apart by the reveal itself: Look ink=false; the latch cover is drawn in both since A1)
+  const set = (_pass: RevealPass) => (
     <>
       <NoticeboardCorner
         sun={sun}
@@ -315,17 +315,25 @@ const Scene07: React.FC = () => {
           pane1: (r) => <PaneGlass r={r} corner="tl" seed="s7pane1" />,
           pane2: (r) => <PaneGlass r={r} corner="tr" seed="s7pane2" />,
         }}
-        workshop={{signSwingAt: B.fix}}
+        workshop={{signSwingAt: B.fix, layout: WS_LAYOUT}}
         readers={false}
         pigeons={false}
         wrap={wrap}
         seed="nc"
       />
-      {/* fills pass only: hide the latch's ink-coloured bars until the pen inks the stile (fix round 3) */}
-      {pass === 'fills' ? <LatchCover board={NOTICE_CORNER.board.frame} /> : null}
+      {/* the kit latch's two ink-coloured bars read as a pause glyph: covered for the whole scene, one round knob on the
+          stile instead (A1 fix round 1; its ink is drawn on by the pen with the stile) */}
+      <LatchCover board={NOTICE_CORNER.board.frame} />
+      <LatchKnob board={NOTICE_CORNER.board.frame} />
       {/* J4: the makers' blind is still down: 'still fixing...' (props FixSign: the one sign of J3 / J4 / J5). Hung from a
           nail on the blind's top-left, drawn after the set so the window frame and the round sign's bracket stay behind it */}
-      <FixSign x={J4.x} y={J4.y} fs={J4.fs} swingAt={[B.fix]} seed="s7J4" />
+      {/* A1 fix round 1: on 'fix' + 0.15 the sign is the focal cue (sound off: the fix is NOT ready): a 1.15x pop and
+          settle about the end of its lettering (it never grows into the right rail) and an ink underline scribbled under
+          'still' (0.13 s), riding the card's own swing */}
+      <XG m={mat.about(mat.scale(j4Pop(t, B.fix + J4_CUE)), J4.x + j4TextHalf, J4.y + J4.fs * 1.775)}>
+        <FixSign x={J4.x} y={J4.y} fs={J4.fs} swingAt={[B.fix]} seed="s7J4" />
+        <StillUnderline x={J4.x} y={J4.y} fs={J4.fs} at={B.fix + J4_CUE + 0.04} swingAt={B.fix} seed="s7J4u" />
+      </XG>
     </>
   );
   // pigeons on the wires (outside the reveal): each pops (wobbly spring) one frame after the pen has inked its wire under
@@ -346,7 +354,9 @@ const Scene07: React.FC = () => {
   // four phones go up. arms 'near': the phone arm is the only arm drawn (no hand left floating at the hip).
   // Fix round 3: three phones (reader 3 is an edge sliver, no phone); the hanging near arm ends at the sleeve cuff, no hand
   // (DownSleeve: the kit's seam + cuff; the kit draws its arms={false} reader with no hanging arm at all).
-  const RAISE: (number | undefined)[] = [B.the, B.the + 0.15, B.the + 0.05, undefined];
+  // A1 fix round 1: reader 1's raise moved from 'the' + 0.15 to + 0.035, so the three phones pop on three consecutive film
+  // frames (23.067 / 23.1 / 23.133) and the 'fix' window (the clock pop from 23.167) belongs to the clock alone
+  const RAISE: (number | undefined)[] = [B.the, B.the + 0.035, B.the + 0.05, undefined];
   const reader = (i: number) => {
     const r = S7_READERS[i];
     const head: Pt = i < 2 ? [r.head[0] + (i === 0 ? R0_DX : 0), r.head[1]] : RIGHT_HEADS[i - 2];

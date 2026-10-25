@@ -244,10 +244,10 @@ export const GlintSweep: React.FC<{at: number; dur?: number; interior: string; x
 
 /** Ink impact ticks off a landed stamp's SHORT ENDS only (fix round 2: the top ticks struck through L9a's last line and
  *  L10): three short strokes fanning out from each end of the print (its real rotated extent), on for `dur`. */
-export const StampHit: React.FC<{box: [number, number, number, number]; text: string; fontSize: number; rot: number; at: number; dur?: number}> = ({box, text, fontSize, rot, at, dur = 0.3}) => {
+export const StampHit: React.FC<{box: [number, number, number, number]; text: string; fontSize: number; rot: number; at: number; dur?: number; pad?: {x: number; top: number; bot: number}}> = ({box, text, fontSize, rot, at, dur = 0.3, pad}) => {
   const t = useTime();
   if (t < at || t >= at + dur) return null;
-  const {w} = stampPrintSize(text, fontSize);
+  const {w} = stampPrintSize(text, fontSize, pad);
   const cx = (box[0] + box[2]) / 2;
   const cy = (box[1] + box[3]) / 2;
   const q = E.outCubic(Math.min(1, (t - at) / 0.12));
