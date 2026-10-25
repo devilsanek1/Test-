@@ -1,0 +1,15 @@
+# Project: short-form explainer videos (TikTok / Reels / Shorts)
+
+The video project lives in `video/` (Remotion). Before starting or continuing any video:
+1. Read `video/docs/OWNER_PLAYBOOK.md`: every piece of the owner's feedback, as rules. It is the memory across videos.
+2. Follow `video/docs/PIPELINE_V2.md`: gates G0-G8, with a playable low-res video with voice at every gate.
+
+**Whenever the owner gives feedback, add it to `video/docs/OWNER_PLAYBOOK.md` in the same turn** (as a rule, with the date,
+the video and the reason) and commit it. Post-publish numbers go in its "Performance log".
+
+Top rules (details in the playbook):
+- Show playable video at every stage, never only stills. Lock the story (sketch animatic) before building; polish last.
+- The first 2-5 s matter most: state the payoff in words on frame 0. Target 30-45 s.
+- Everyday spoken language, no AI-sounding phrasing; scripts come with detailed emotional cues.
+- Captions pop in place (no clipped roll-ins). No paper edge at the top of the frame.
+- Don't waste tokens: no AI reviews before the polish gate, short agent prompts, small checkpointed tasks.

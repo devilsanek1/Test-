@@ -24,6 +24,8 @@ whole context, and every rendered frame an agent looks at stays in that context.
 
 ## The loop: gates G0-G8
 
+Start every video by reading `docs/OWNER_PLAYBOOK.md` (the owner's rules), and add any new feedback to it at every gate.
+
 Breadth-first: the whole film passes each gate together. At every gate from G1 on, the owner gets **one MP4 that plays
 on the phone, with voice and captions**, plus at most 5 lines of notes. Nothing is built for a later gate before this
 one is approved.
