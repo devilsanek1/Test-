@@ -36,7 +36,10 @@ export const T = {
   useIt: w(87, -0.1), // ~40 specks along far streets
   settle: CRANE, // glow rings, Pip lands, last copy slides with Bit
   rattleA: we(88, 0.2), // end(it) + 0.2: two near rattlers again
-  cloudflare: w(89, -0.25), // dome arc draws from both feet
+  cloudflare: w(89, -0.25), // the push starts (the dome's own key is `dome`)
+  // fix round 3: the dome arc draws from both feet over 0.36 s and CLOSES on 'Cloudflare' (ENGINE rule 5: a big build
+  // completes on its word); the glass pops on the word
+  dome: w(89, -0.36),
   board: w(89, -0.15), // the board rises with L8
   bitHop: w(89, 0.3),
   says: w(90), // watchtower rises

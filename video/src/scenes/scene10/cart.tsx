@@ -1,41 +1,43 @@
-// S10 the makers' cart on the stoop line (y 1306, just behind the stoops' fronts; behind the stoops, the A-frame sign, the
-// hanging plaques and the bollard). Fix round 2 staging, so the hand-out and the SKIP are seen whole:
-//  - on 'old' + 0.15 the maker + cart pop up beside the A-frame's right edge and step out (<= 14 px / frame, out-quad),
-//    (0.28 s, still 4 frames before the first arm moves), then PARK with the maker in the clear wall between siteL's plaque and siteM's plaque (x 455: nothing in front of him
-//    but the A-frame's thin back edge), the cart under siteM's plaque;
-//  - each toss is thrown from a RAISED arm (FigureArm, the tag in the hand, released a head above him, clear of every
-//    plaque): the LEFT arm flicks a short lob back-left onto siteL's plaque (tick on 'officially'), then the RIGHT arm
-//    lobs the second tag high OVER siteM's old plaque (apex >= 74 px above its top, dashed trail) onto siteR's (tick on
-//    'supported');
-//  - he stays parked through Pip's 'hey!' (the spark has clear wall to the plaque: the cart's front ends at x 612) and
-//    rolls out right on 'anymore' (sine ramp to 500 px/s: <= 18 px / frame on screen).
-// S09's 'still fixing... / fixed!' card (the shared FixSign, the SAME object as S06 / S07 / S09) hangs flat on a short post
-// on the cart's camera-facing side over the wheel, fs 21 ('fixed!' 24.7 px on screen), between siteM's plaque bottom
-// (1224) and the stoops (1300). The satchel of tags hangs at the maker's right hip.
+// S10 the makers' cart on the OPEN PAVEMENT (fix round 2b: cart line y 1395, in front of the stoops, behind the A-frame
+// sign and Pip's bollard), so the S09 continuity object reads whole: bed, wheel, handle, the 'fixed!' card on its post and
+// a full-height maker (154 px, 1.08 x the old 143) pushing it, against the empty cream pavement.
+//  - ENTRANCE: the cart and the maker walk out from BEHIND the A-frame (no pop): they start hidden behind the board's
+//    face, roll right at a constant 14.3 px / frame (15 px on screen) and brake out-quad into the PARK spot (cart centre
+//    579 = screen 461-639 for the maker + cart, between the A-frame's back leg and Pip's bollard) just as the first arm
+//    rises;
+//  - each toss is thrown from a RAISED arm (FigureArm, the tag in the hand, released above his head): the LEFT arm flicks
+//    a short lob back-left onto siteL's plaque (tick on 'officially'), then the RIGHT arm, raised straight up, lobs the
+//    second tag high OVER siteM's old plaque (a steep launch, clear of its corner, apex ~75 px above its top, dashed trail)
+//    onto siteR's (tick on 'supported'); the lob runs at an even ~33 px / frame along its path;
+//  - he stays parked through Pip's 'hey!' and rolls out right on 'anymore' (sine ramp to 500 px/s: <= 18 px / frame).
+// S09's 'still fixing... / fixed!' card (the shared FixSign, the SAME object as S06 / S07 / S09) is pinned flat on a short
+// post in the bed, under siteM's plaque with clear wall above it (Pip's spark sits there). The satchel of tags rides on
+// the bed's back end.
 
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {useTime, prog, ease as E} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import type {Pt} from '../../lib/sketch';
-import {FIG_H, FigureArm, FixSign, MakersCart, PopUp, SI, SupportTag} from './kit';
+import {FIG_H, FigureArm, FixSign, Maker, MakersCart, SI, SupportTag} from './kit';
 import {mat, XG} from '../../lib/xf';
 import {Satchel} from './shims';
 import {tagBodyOffset, TAG_W} from './plaques';
 
-/** Cart line (feet y), bed length, the park spot (cart centre), the step-out, the roll-out. */
-export const CART = {y: 1306, size: 100, parkX: 562, stepIn: 64, stepDur: 0.28, vMax: 500, acc: 0.5};
+/** Cart line (wheel ground y), bed length, the park spot (cart centre), the walk-out from behind the A-frame (start x,
+ *  cruise speed, braking time), the roll-out. */
+export const CART = {y: 1395, size: 100, parkX: 579, x0: 330, v: 428, brake: 0.25, vMax: 500, acc: 0.5};
 const CS = CART.size / 140; // MakersCart local -> world
-/** The maker walks this far behind the cart centre (MakersCart: 150 local units). */
-export const MAKER_DX = -150 * CS;
-/** The maker's figure frame (props Maker: h = 200 local x CS; hip = feet - 62 x figure scale). */
-const MAKER_H = 200 * CS;
+/** The maker stands this far behind the cart centre (his hands on the grip, in front of his back-view body). */
+export const MAKER_DX = -99;
+/** The maker's height (world) and figure frame (hip = feet - 62 x figure scale). */
+export const MAKER_H = 154;
 const SF = MAKER_H / FIG_H;
 const HIP_Y = CART.y - 62 * SF;
 
 export type CartTimes = {
-  /** The maker + cart pop up / step out beside the A-frame. */
-  inAt: number;
+  /** The cart is parked here (the walk-out brakes into it). */
+  parkAt: number;
   /** Releases (the left arm, then the right) and landings. */
   toss1: number;
   land1: number;
@@ -47,19 +49,30 @@ export type CartTimes = {
   end: number;
 };
 
-/** Cart centre x at scene time t: the step-out, parked, then the roll-out (sine ramp to vMax over `acc` s). */
+/** When the walk-out starts (hidden behind the A-frame at CART.x0) for a cart parked at `parkAt`. */
+export const cartGoAt = (parkAt: number) => parkAt - CART.brake - (CART.parkX - (CART.v * CART.brake) / 2 - CART.x0) / CART.v;
+
+/** Cart centre x at scene time t: the walk-out (cruise, then an out-quad brake), parked, then the roll-out (sine ramp to
+ *  vMax over `acc` s). */
 export function cartX(t: number, T: CartTimes): number {
-  const {parkX, stepIn, stepDur, vMax, acc} = CART;
-  if (t < T.rollAt) return parkX - stepIn + stepIn * E.outQuad(prog(t, T.inAt, stepDur));
+  const {parkX, v, brake, vMax, acc} = CART;
+  if (t < T.rollAt) {
+    const tc = T.parkAt - brake;
+    const xc = parkX - (v * brake) / 2;
+    if (t < tc) return xc - v * (tc - t);
+    const u = Math.min(1, (t - tc) / brake);
+    return parkX - ((v * brake) / 2) * (1 - u) * (1 - u);
+  }
   const d = t - T.rollAt;
   if (d < acc) return parkX + (vMax / 2) * (d - (acc / Math.PI) * Math.sin((Math.PI * d) / acc));
   return parkX + (vMax * acc) / 2 + vMax * (d - acc);
 }
 
-/** The arm for each toss: side -1 = his left (screen left), +1 = right. Person-local shoulder / hand points. */
+/** The arm for each toss: side -1 = his left (screen left), +1 = right. Person-local shoulder / hand points. The right
+ *  arm goes straight UP (the hand over his head) for the high lob, so the tag leaves well left of siteM's plaque. */
 const SHOULDER = (side: number): Pt => [side * 32, -76];
 const HAND_DOWN = (side: number): Pt => [side * 38, -8];
-const HAND_UP = (side: number): Pt => [side * 58, -152];
+const HAND_UP = (side: number): Pt => (side < 0 ? [-58, -152] : [12, -162]);
 const RAISE = 0.1;
 const HOLD = 0.07;
 const LOWER = 0.12;
@@ -76,7 +89,7 @@ const toWorld = (xm: number, p: Pt): Pt => [xm + p[0] * SF, HIP_Y + p[1] * SF];
 
 /** Where a tag leaves the hand (body centre, world) for a toss from `side`: the raised hand + the tag held above it. */
 export const throwHand = (T: CartTimes, side: number): Pt => {
-  const h = toWorld(cartX(T.toss1, T) + MAKER_DX, HAND_UP(side));
+  const h = toWorld(cartX(side < 0 ? T.toss1 : T.toss2, T) + MAKER_DX, HAND_UP(side));
   return [h[0], h[1] - 16];
 };
 
@@ -87,6 +100,41 @@ function tossPos(t: number, t0: number, t1: number, a: Pt, b: Pt, h: number): {p
   const base = a[1] + (b[1] - a[1]) * u;
   return {p: [x, base - 4 * h * u * (1 - u)], u};
 }
+
+/** The high lob as a cubic Bezier (steep launch from the raised hand, apex over siteM's plaque, a falling approach onto
+ *  siteR's), walked at an even speed (arc-length table): `at(s)` for s = 0..1 of the path length. */
+function lobPath(a: Pt, b: Pt): (s: number) => Pt {
+  const c1: Pt = [a[0] + 8, a[1] - LOB.rise];
+  const c2: Pt = [b[0] - 50, b[1] - LOB.fall];
+  const bz = (u: number): Pt => {
+    const v = 1 - u;
+    const k0 = v * v * v;
+    const k1 = 3 * u * v * v;
+    const k2 = 3 * u * u * v;
+    const k3 = u * u * u;
+    return [k0 * a[0] + k1 * c1[0] + k2 * c2[0] + k3 * b[0], k0 * a[1] + k1 * c1[1] + k2 * c2[1] + k3 * b[1]];
+  };
+  const N = 48;
+  const us: number[] = [0];
+  const ls: number[] = [0];
+  let prev = bz(0);
+  for (let i = 1; i <= N; i++) {
+    const p = bz(i / N);
+    ls.push(ls[i - 1] + Math.hypot(p[0] - prev[0], p[1] - prev[1]));
+    us.push(i / N);
+    prev = p;
+  }
+  const L = ls[N];
+  return (s: number) => {
+    const target = Math.min(1, Math.max(0, s)) * L;
+    let i = 1;
+    while (i < N && ls[i] < target) i++;
+    const f = (target - ls[i - 1]) / Math.max(1e-6, ls[i] - ls[i - 1]);
+    return bz(us[i - 1] + (us[i] - us[i - 1]) * f);
+  };
+}
+/** The high lob's Bezier handles: up from the hand, down into siteR's plaque (apex ~1030, siteM's plaque top 1104). */
+export const LOB = {rise: 205, fall: 190};
 
 export type CartProps = {
   T: CartTimes;
@@ -127,39 +175,46 @@ const ThrowArms: React.FC<{T: CartTimes; xm: number}> = ({T, xm}) => {
   return <>{out}</>;
 };
 
-/** The cart, its maker, his throwing arms, the satchel and the sign card. Drawn in the set's cart slot (behind the
- *  plaques and the A-frame). */
+/** The cart, its maker, his throwing arms, the satchel and the sign card. Scene10 draws it in the 'sign' layer, after
+ *  the stoops and the hanging plaques and before the A-frame (it walks out from behind the board). */
 export const Cart: React.FC<{T: CartTimes}> = ({T}) => {
   const t = useTime();
-  const t0 = T.inAt;
+  const t0 = cartGoAt(T.parkAt);
   if (t < t0) return null;
   const x = cartX(t, T);
   const xm = x + MAKER_DX;
   if (xm - 40 > 1240) return null;
-  const x0 = CART.parkX - CART.stepIn;
+  const x0 = CART.x0;
   const tEnd = T.end + 0.4;
   const x1 = cartX(tEnd, T);
-  // one cart, two rolls (the wheel angle and the maker's walk follow the distance from x0): the step-out, then (parked:
-  // no walk) the roll-out, whose ease starts at the park spot's fraction so the wheel never snaps
+  // one cart, two rolls (the wheel angle follows the distance from x0): the walk-out, then (parked) the roll-out, whose
+  // ease starts at the park spot's fraction so the wheel never snaps; the sign jolts as each roll starts
   const roll =
     t < T.rollAt
-      ? {at: t0, to: [CART.parkX, CART.y] as Pt, dur: CART.stepDur, ease: E.outQuad}
+      ? {at: t0, to: [CART.parkX, CART.y] as Pt, dur: T.parkAt - t0, ease: (q: number) => (cartX(t0 + q * (T.parkAt - t0), T) - x0) / (CART.parkX - x0)}
       : {at: T.rollAt, to: [x1, CART.y] as Pt, dur: tEnd - T.rollAt, ease: (q: number) => (cartX(T.rollAt + q * (tEnd - T.rollAt), T) - x0) / (x1 - x0)};
-  const sign = <FixSign x={0} y={0} fs={21} w={120} string={false} rot={-2} strikeAt={-10} fixedAt={-10} ink={2.2} seed="s10/csign" />;
+  const moving = t < T.parkAt - 0.04 || t >= T.rollAt + 0.06;
+  const sign = <FixSign x={0} y={0} fs={21} w={114} string={false} rot={-2} strikeAt={-10} fixedAt={-10} ink={2.2} seed="s10/csign" />;
   return (
-    <PopUp at={t0} x={x} y={CART.y} over={0.06}>
-      <MakersCart x={x0} y={CART.y} size={CART.size} crates={1} roll={roll} pusher sign={sign} signPost={22} signX={-2 / CS} seed="s10/cart" />
-      <Satchel x={xm + 17} y={HIP_Y + 8} w={22} pullAt={[T.toss1 - RAISE, T.toss2 - RAISE]} pullDur={0.06} seed="s10/satchel" />
+    <>
+      <Maker x={xm} y={CART.y} h={MAKER_H} walk={moving ? {at: t < T.rollAt ? t0 : T.rollAt, hz: 2.3} : undefined} seed="s10/cart/maker" />
+      <MakersCart x={x0} y={CART.y} size={CART.size} crates={0} roll={roll} sign={sign} signPost={CART_SIGN.post} signX={CART_SIGN.x} seed="s10/cart" />
+      <Satchel x={x - 34 * CS * 1.4} y={CART.y - 60 * CS} w={24} pullAt={[T.toss1 - RAISE, T.toss2 - RAISE]} pullDur={0.06} seed="s10/satchel" />
       <ThrowArms T={T} xm={xm} />
-    </PopUp>
+    </>
   );
 };
+
+/** The card's post (world px above the bed top) and its spot along the bed (cart-local units): the card (pinned flat,
+ *  w 114, fs 21) spans x 512-626, y 1285-1339 with the cart parked: under siteM's plaque (bottom 1224) with 60 px of clear
+ *  wall above it, left of Pip's spark, its foot on the bed. */
+export const CART_SIGN = {post: 62, x: -17};
 
 /** The two flying tags (+ the dashed trail of the lob over siteM). Drawn above the plaques and the sign. */
 export const Tosses: React.FC<CartProps> = ({T, land1, land2, tagSize}) => {
   const t = useTime();
   const out: React.ReactNode[] = [];
-  const fly = (key: string, t0: number, t1: number, a0: Pt, b: Pt, h: number, spin: number, trail: boolean) => {
+  const fly = (key: string, t0: number, t1: number, at: (u: number) => Pt, spin: number, trail: boolean) => {
     if (t < t0) return;
     // the dashed trail: from the hand to the tag; after the landing it retracts from its tail in 0.16 s (no fade)
     if (trail && t < t1 + 0.16) {
@@ -169,15 +224,15 @@ export const Tosses: React.FC<CartProps> = ({T, land1, land2, tagSize}) => {
         let d = '';
         const n = 30;
         for (let i = 0; i <= n; i++) {
-          const u = uTail + ((uHead - uTail) * i) / n;
-          const q = tossPos(t0 + u * (t1 - t0), t0, t1, a0, b, h).p;
+          const q = at(uTail + ((uHead - uTail) * i) / n);
           d += `${i ? 'L' : 'M'}${q[0].toFixed(1)} ${q[1].toFixed(1)}`;
         }
         out.push(<Ink key={`${key}tr`} d={d} width={2.8} dash="2 11" color={palette.ink} taper={false} seed={`s10/${key}tr`} />);
       }
     }
     if (t >= t1) return;
-    const {p, u} = tossPos(t, t0, t1, a0, b, h);
+    const u = Math.min(1, Math.max(0, (t - t0) / (t1 - t0)));
+    const p = at(u);
     // the tag spins about its body centre on the way (its check is drawn only when it lands)
     out.push(
       <XG key={key} m={mat.about(mat.rotate(-spin * 360 * u), p[0], p[1])}>
@@ -186,10 +241,12 @@ export const Tosses: React.FC<CartProps> = ({T, land1, land2, tagSize}) => {
     );
   };
   // the left arm's short lob back-left onto siteL's plaque; the right arm's high lob OVER siteM's old plaque onto siteR's
-  fly('toss1', T.toss1, T.land1, throwHand(T, -1), land1, 30, -0.6, false);
-  fly('toss2', T.toss2, T.land2, throwHand(T, 1), land2, TOSS2_H, 1.25, true);
+  const a1 = throwHand(T, -1);
+  fly('toss1', T.toss1, T.land1, (u) => tossPos(T.toss1 + u * (T.land1 - T.toss1), T.toss1, T.land1, a1, land1, TOSS1_H).p, -0.6, false);
+  const lob = lobPath(throwHand(T, 1), land2);
+  fly('toss2', T.toss2, T.land2, lob, 1.25, true);
   return <>{out}</>;
 };
 
-/** The lob's apex above the hand-to-plaque line: its top passes >= 74 px above siteM's plaque top (1104). */
-export const TOSS2_H = 106;
+/** The short lob's height above the hand-to-plaque line (fix round 2b: 30 -> 40, flight 0.23 s). */
+export const TOSS1_H = 40;

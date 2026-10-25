@@ -6,7 +6,7 @@
 // and sag, the maker + cart step out from behind the A-frame and hand out support tags, SKIPPING the old site (the lob
 // arcs over it), Pip goes 'hey!' at it, and siteM's update stalls at 10 % on 'anymore'. Depth on the cart line: walker <
 // cart < stoops < hanging plaques < A-frame < flying tags < Pip. Camera: hold through the wipe, one 5 % sine push
-// (anchored so the A-frame lands on screen 104-440 x 1256-1466), locked from 'of'. Docs: docs/scenes/S10.md.
+// (anchored so the A-frame's paper lands on screen 91-413 x 1262-1472), locked from 'of'. Docs: docs/scenes/S10.md.
 
 import React from 'react';
 import {World, ScreenSpace, Sun, TimeShift, ease as E, useScene, useTime, useTransition} from '../lib';
@@ -49,7 +49,7 @@ const Scene10: React.FC = () => {
   const hangL = plaqueFacePoint(plaqueRest('L'), TAG_HANG.L);
   const hangR = plaqueFacePoint(plaqueRest('R'), TAG_HANG.R);
   const body = (h: Pt): Pt => [h[0], h[1] + tagBodyOffset(TAG_W)];
-  const cartT: CartTimes = {inAt: b.cartIn, toss1: b.toss1, land1: b.tick1, toss2: b.toss2, land2: b.tick2, rollAt: b.rollOut, end};
+  const cartT: CartTimes = {parkAt: b.cartPark, toss1: b.toss1, land1: b.tick1, toss2: b.toss2, land2: b.tick2, rollAt: b.rollOut, end};
 
   // standalone preview only (no Film transition running): S09's own tram Wiper (Pip on its roof) as the wipe shows it
   const standIn = tr === null && t < WIPE.dur / 2;
@@ -61,9 +61,10 @@ const Scene10: React.FC = () => {
   // (backward difference inside S09's roof window)
   const hand = tramPipAt(start + b.pipHop);
   const handV = (hand.x - tramPipAt(start + b.pipHop - 1 / 30).x) * 30;
-  // the A-frame (fix round 2): 6 px lower and 20 px narrower on its right than the set's slot box, so a >= 20 px band of
-  // wall separates it from siteL's (raised) plaque and the parked maker stands clear of its back edge
-  const signBox = (box: [number, number, number, number]): [number, number, number, number] => [box[0], box[1] + 6, box[2] - 20, box[3] + 6];
+  // the A-frame: 6 px lower than the set's slot box (a >= 20 px band of wall under siteL's raised plaque) and, fix round
+  // 2b, 12 px further left and 24 px narrower (L13 still at full size), so its back leg clears the maker parked on the
+  // open pavement by >= 7 px
+  const signBox = (box: [number, number, number, number]): [number, number, number, number] => [box[0] - 12, box[1] + 6, box[2] - 36, box[3] + 6];
   // the street-gap wedge and its walker pop up with siteR (not floating in the empty street from the cut)
   const sitePops: [number, number, number] = [b.siteL, b.siteL + 0.1, b.siteL + 0.2];
   const wedgeAt = sitePops[2];
@@ -80,7 +81,6 @@ const Scene10: React.FC = () => {
         }
         people={false}
         furniture="bike"
-        cart={<Cart T={cartT} />}
         noticeSign={(slot) => {
           const box = signBox(slot);
           return (
@@ -108,16 +108,16 @@ const Scene10: React.FC = () => {
           if (name === 'sign')
             return (
               <>
-                {/* the stoops' fronts and the hanging plaques are nearer than the cart line: the cart's wheels and the
-                    maker's feet pass behind the stoops, his head and shoulders behind the plaques (which project toward
-                    the camera from their brackets); the A-frame stands below the plaques */}
+                {/* fix round 2b: the cart line is the OPEN PAVEMENT (y 1395): nearer than the stoops and the hanging
+                    plaques, farther than the A-frame (it walks out from behind the board) and Pip's bollard */}
                 <Stoops popAt={sitePops} />
                 <Plaques
                   plaqueAt={[b.plaques, b.plaques + 0.06, b.plaques + 0.12]}
-                  old={{flipOldAt: b.flipM, cobwebAt: b.cobweb, dustAt: b.dust, caneAt: b.cane, droopAt: b.droop, wobbleAt: b.wobble, nudgeAt: [b.skipNudge], bit: {at: b.bitIn, size: 20, bursts: [0, b.cane, b.not, b.update].map((x) => x - (b.bitIn + 0.4))}}}
+                  old={{flipOldAt: b.flipM, cobwebAt: b.cobweb, dustAt: b.dust, caneAt: b.cane, droopAt: b.droop, wobbleAt: b.wobble, nudgeAt: [b.skipNudge, b.hey + 0.04], bit: {at: b.bitIn, size: 20, bursts: [0, b.cane, b.not, b.update].map((x) => x - (b.bitIn + 0.4))}}}
                   tagL={{at: b.tick1, tickAt: b.tick1 + 0.03}}
                   tagR={{at: b.tick2, tickAt: b.tick2 + 0.03, ringAt: b.tick2 + 0.03}}
                 />
+                <Cart T={cartT} />
                 {node}
                 <Tosses T={cartT} land1={body(hangL)} land2={body(hangR)} tagSize={TAG_W} />
               </>
@@ -126,7 +126,7 @@ const Scene10: React.FC = () => {
             return (
               <>
                 {node}
-                <Pip T={{leap: b.pipHop, leapFrom: [hand.x, hand.y], leapScale: hand.scale, leapV: handV, perk: b.pipPerk, lookPlaque: b.walker, lookFar: b.flip2 + 0.04, lookWeb: b.cobweb + 0.1, lookCart: b.cartIn + 0.345, lookLob: b.toss2 + 0.12, hey: b.hey, sparkEnd: b.hey + 0.46, heyEnd: b.heyEnd, out: b.pipOut}} />
+                <Pip T={{leap: b.pipHop, leapFrom: [hand.x, hand.y], leapScale: hand.scale, leapV: handV, perk: b.pipPerk, lookPlaque: b.walker, lookFar: b.flip2 + 0.04, lookWeb: b.cobweb + 0.1, lookCart: b.lookCart, lookLob: b.toss2 + 0.12, hey: b.hey, sparkEnd: b.hey + 0.46, heyEnd: b.heyEnd, out: b.pipOut}} />
               </>
             );
           if (name === 'foreground')

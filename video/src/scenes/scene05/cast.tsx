@@ -42,7 +42,7 @@ type Member = {
   back?: boolean;
   tablet?: 'left' | 'right';
   pose?: 'point' | 'clipboard' | 'hips';
-  /** Fix round 3: a peach hair tie at the nape (long hair: the ponytail read). */
+  /** Fix round 3: a ponytail with a hair tie of this colour (was long hair: tan on a tan coat read as a bald capsule). */
   tie?: string;
 };
 
@@ -57,7 +57,7 @@ export const TEAM_A: Member[] = [
 ];
 export const TEAM_B: Member[] = [
   {x: 644, rise: 1, h: 116 * K, seed: 's5b3', body: palette.tan, hair: 'cap', back: true},
-  {x: 586, rise: 0, h: 128 * K, seed: 's5b1', body: palette.sand, hair: 'long', hairColor: palette.brown, tie: palette.peach, tablet: 'left'},
+  {x: 586, rise: 0, h: 128 * K, seed: 's5b1', body: palette.sand, hair: 'short', hairColor: palette.brown, tie: palette.peach, tablet: 'left'},
   {x: 702, rise: 2, h: 136 * K, seed: 's5b2', body: palette.sage, hair: 'short', hairColor: palette.brown, acc: ['strap'], pose: 'hips'},
 ];
 const TABLET = 42;
@@ -117,7 +117,7 @@ const TeamMember: React.FC<{m: Member; riseAt: number; raiseAt?: number; poseAt:
   return (
     <PopRise at={riseAt} x={m.x} y={fy}>
       <HipLean x={m.x} hipY={hipY} deg={a}>
-        <Investigator x={m.x} y={fy} h={m.h} raiseAt={raiseAt} arm={m.tablet} tabletSize={TABLET} tabletLift="head" landscape pose={pose} body={m.body} hair={m.hair} hairColor={m.hairColor} hairTie={m.tie} acc={m.acc} bob={1.2} seed={m.seed} />
+        <Investigator x={m.x} y={fy} h={m.h} raiseAt={raiseAt} arm={m.tablet} tabletSize={TABLET} tabletLift="head" landscape pose={pose} body={m.body} hair={m.hair} hairColor={m.hairColor} ponytail={m.tie} acc={m.acc} bob={1.2} seed={m.seed} />
       </HipLean>
     </PopRise>
   );
@@ -249,8 +249,9 @@ const LeafShape: React.FC<{x: number; y: number; rot: number; fy: number}> = ({x
   </XG>
 );
 const CROWN: Pt = [PIP_RAIL[0] + SLEEP_CROWN[0] * PIP_SCALE, PIP_RAIL[1] + SLEEP_CROWN[1] * PIP_SCALE - 2];
-/** Where the flicked leaf lands: the second tread, right of the rail's end of the stamp. */
-const LEAF_LAND: Pt = [668, 1352];
+/** Where the flicked leaf lands: the second tread, LEFT of Pip (fix round 3: it flies off his crown away from his body,
+ *  not across his face), in the clear stretch between the two teams' raised tablets. */
+const LEAF_LAND: Pt = [470, 1356];
 const LEAF_FALL = 0.25;
 
 /** The leaf on Pip's crown (banner layer, riding the sway and his roll-over) until he jolts awake on 'it'. */

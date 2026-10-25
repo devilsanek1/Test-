@@ -43,16 +43,21 @@ const CROUCH = 0.05;
 const ARC = 0.66;
 export const LEAP_DUR = CROUCH + ARC;
 const OUT_DUR = 0.3;
-/** The take-off (fix round 2): a small upward kick, then constant gravity g = 2 (dy - VY0 ARC) / ARC^2 (~5,000 px/s^2,
- *  motion spec #25). x keeps S09's roof velocity through the crouch (decaying over TAU_V: he never steps back left), and
- *  the push-off gives him a constant leftward speed (ballistic: x linear in the air), so he leaves the edge at once. */
-const VY0 = -350;
-const TAU_V = 0.12;
+/** The take-off (fix round 2b): a DOWNWARD push off the roof (+700 px/s, no upward kick, so he never hangs in the sky
+ *  at the frame edge after the tram has gone), then constant gravity g = 2 (dy - VY0 ARC) / ARC^2 (~1,770 px/s^2): he
+ *  lands at ~62 px / frame (was 75-93 with the kick and g ~4,950), consecutive silhouettes overlapping. x keeps S09's
+ *  roof velocity through the crouch (decaying over TAU_V: he never steps back left), and the push-off gives him a
+ *  constant leftward speed (ballistic: x linear in the air), so he leaves the edge at once. */
+const VY0 = 700;
+const TAU_V = 0.08;
 
 /** Where his trunk tip is in the mirrored trunk-up pose (world): the 'hey' spark radiates from here at the plaque. */
 const HEY_TIP: Pt = [662, 1306];
-/** Spark directions (deg): about 20 deg more vertical than fix round 1, toward siteM's plaque through clear wall. */
-const HEY_ANGLES = [-132, -110, -88];
+/** Spark directions (deg), toward siteM's plaque (its centre is at -113 deg from the tip), and the stroke span along
+ *  them (fix round 2b: 40-72 px from the tip, was 24-52: the spark sits ~30 px higher, on the clear wall between the
+ *  plaque's bottom (1224) and the cart's card (top 1285), clear of both). */
+const HEY_ANGLES = [-134, -112, -90];
+const HEY_R: [number, number] = [40, 72];
 
 /** The 'hey' spark: three short ink emanata from the trunk tip toward siteM's plaque (up-left), drawn on in a stagger and
  *  retracted from their inner ends before Pip settles (no fade). */
@@ -64,12 +69,12 @@ const HeySpark: React.FC<{at: number; end: number}> = ({at, end}) => {
     const a = (deg * Math.PI) / 180;
     const grow = E.outCubic(prog(t, at + i * 0.03, 0.08));
     const shrink = E.inCubic(prog(t, end - 0.12 + i * 0.02, 0.08));
-    const r0 = 24 + (52 - 24) * shrink;
-    const r1 = 24 + (52 - 24) * grow;
+    const r0 = HEY_R[0] + (HEY_R[1] - HEY_R[0]) * shrink;
+    const r1 = HEY_R[0] + (HEY_R[1] - HEY_R[0]) * grow;
     if (r1 - r0 < 1) return;
     d += `M${(HEY_TIP[0] + Math.cos(a) * r0).toFixed(1)} ${(HEY_TIP[1] + Math.sin(a) * r0).toFixed(1)}L${(HEY_TIP[0] + Math.cos(a) * r1).toFixed(1)} ${(HEY_TIP[1] + Math.sin(a) * r1).toFixed(1)}`;
   });
-  return d ? <Ink d={d} width={4.2} taper={false} vary={0} seed="s10/hey" /> : null;
+  return d ? <Ink d={d} width={4} taper={false} vary={0} seed="s10/hey" /> : null;
 };
 
 export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
@@ -115,8 +120,9 @@ export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
     ...(T.lookWeb !== undefined ? [{t: T.lookWeb, pose: 'sit-back' as const, look: -0.9}] : []),
     ...(T.lookCart !== undefined ? [{t: T.lookCart, pose: 'sit-back' as const, look: -1}] : []),
     ...(T.lookLob !== undefined ? [{t: T.lookLob, pose: 'sit-back' as const, look: 0.45}] : []),
-    // GAG: mirrored so the raised trunk points up-left AT siteM's plaque; look +0.6 before the mirror = toward it
-    {t: T.hey, pose: 'trunk-up', expression: 'wide', look: 0.6},
+    // GAG: mirrored so the raised trunk points up-left AT siteM's plaque; look +1 before the mirror = head, eyes and
+    // cheeks shifted toward it (fix round 2b: was 0.6, the pupils read as centred on the camera)
+    {t: T.hey, pose: 'trunk-up', expression: 'wide', look: 1},
     // straight from the 'hey' into the hop's own pose (side-on, facing right): its crouch frames come right before the
     // take-off, so the exit has exactly ONE pose pop (fix round 2: no 3-frame back-view flicker)
     {t: T.heyEnd, pose: 'stand-side', look: 0.3},
@@ -124,8 +130,8 @@ export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
   const heyOn = t >= T.hey && t < T.heyEnd;
   return (
     <>
-      {/* during the 'hey' he leans toward the plaque (about his feet) */}
-      <ElephantTimeline x={px} y={py} scale={PIP.scale} t={t} seed={PIP.seed} keys={keys} flip={heyOn} rotate={heyOn ? -10 : 0} squash={land + crouch.squash} idle={0.25} />
+      {/* during the 'hey' he leans toward the plaque (about his feet, 13 deg: the head tilts up-left at it) */}
+      <ElephantTimeline x={px} y={py} scale={PIP.scale} t={t} seed={PIP.seed} keys={keys} flip={heyOn} rotate={heyOn ? -13 : 0} squash={land + crouch.squash} idle={0.25} />
       <HeySpark at={T.hey + 0.04} end={T.sparkEnd ?? T.heyEnd} />
     </>
   );

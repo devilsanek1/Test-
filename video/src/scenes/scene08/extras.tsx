@@ -16,8 +16,8 @@ import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {ellipse, line, rect, rectPath} from '../../lib/sketch';
 import {BrowserChrome, EdgeOnlooker} from '../shared/props';
-import {Glass, SI, WIRES, wireAt} from '../shared/sets';
-import {DOORS3, R2} from './layout';
+import {SI, WIRES, wireAt} from '../shared/sets';
+import {DOME8, DOORS3, R2} from './layout';
 import {doorPaths} from './crowd';
 
 // ---------------------------------------------------------------- light doors (rows 2 and 3)
@@ -94,13 +94,14 @@ const TOWERS = [
   {x: 386, y: 1000, w: 30, h: 80},
 ];
 
-/** Five browser-chrome towers inside the dome (drawn under <Glass>: one glass step lighter than the rows outside),
- *  popping with the glass after the arc closes. Clip them to the dome interior in the scene. */
+/** Five browser-chrome towers inside the dome, popping with the glass after the arc closes. Clip them to the dome
+ *  interior in the scene. Fix round 3: drawn WITHOUT the glass step (one value darker than before: teal / sage on the
+ *  pale glass), so the protected district reads as one distinct block inside, the crowd as another outside. */
 export const DistrictTowers: React.FC<{at: number}> = ({at}) => {
   const t = useTime();
   if (t < at) return null;
   return (
-    <Glass>
+    <>
       {TOWERS.map((q, i) => {
         const k = springAt(t, at + i * 0.04, springs.pop);
         if (k <= 0.01) return null;
@@ -113,7 +114,30 @@ export const DistrictTowers: React.FC<{at: number}> = ({at}) => {
           </g>
         );
       })}
-    </Glass>
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- the dome's foot (plinth)
+
+const PLINTH = (() => {
+  const x0 = DOME8.cx - DOME8.rx - 8;
+  const x1 = DOME8.cx + DOME8.rx + 8;
+  const y0 = DOME8.by - 5;
+  const y1 = DOME8.by + 7;
+  return {fill: rectPath(x0, y0, x1 - x0, y1 - y0), ink: line(x0, y0, x1, y0, {seed: 's8/pl0', over: [4, 4]}) + line(x0 + 2, y1, x1 - 2, y1, {seed: 's8/pl1', over: [2, 2]})};
+})();
+
+/** Fix round 3: a cream plinth along the dome's foot (y by-5 .. by+7) between the glass and the crowd pressed against it:
+ *  the district is an island on its base, the crowd stands in front of it. Pops with the glass (`at`). */
+export const DomePlinth: React.FC<{at: number}> = ({at}) => {
+  const t = useTime();
+  if (t < at) return null;
+  return (
+    <>
+      <Fill d={PLINTH.fill} color={palette.cream} offset={false} mode="snap" seed="s8/plf" />
+      <Ink d={PLINTH.ink} width={SI.far} taper={false} seed="s8/pli" />
+    </>
   );
 };
 
@@ -155,11 +179,14 @@ export const DeckClutter: React.FC = () => (
 export const NEIGHBOUR_F = 1.2;
 
 /** Two back-view neighbours watching the city from our deck, cropped by the bottom edge (EdgeOnlooker: the coat always
- *  runs off the frame); the right one raises a phone on `phoneAt`. Heads at rest y ~1590-1660 (inside the bottom UI
- *  band, below the coping). */
-export const Neighbours: React.FC<{phoneAt: number}> = ({phoneAt}) => (
+ *  runs off the frame). Fix round 3: MIRRORED to continue S07's readers across the match cut (the bun / tan-hair reader
+ *  on the LEFT, the teal-cap reader on the RIGHT), the left one moved in so its head clears the bottom-left paint corner. */
+export const Neighbours: React.FC<{reactAt: number}> = ({reactAt}) => (
   <>
-    <EdgeOnlooker x={172} y={1692} head={164} hair="cap" body={palette.brown} acc={['collar']} rim="right" arms="near" depth="mid" bob={1.2} seed="s8/nbL" />
-    <EdgeOnlooker x={770} y={1676} head={170} hair="long" body={palette.teal} acc={['hood']} rim="left" arms="near" depth="mid" bob={1.2} raisePhoneAt={phoneAt} phoneSide="right" seed="s8/nbR" />
+    <EdgeOnlooker x={NB.L.x} y={NB.L.y} head={NB.L.head} hair="bun" hairColor={palette.tan} body={palette.brown} acc={['collar']} rim="right" arms="near" depth="mid" bob={0} seed="s8/nbL" />
+    <EdgeOnlooker x={NB.R.x} y={NB.R.y} head={NB.R.head} hair="cap" body={palette.teal} rim="left" arms="near" depth="mid" bob={0} seed="s8/nbR" />
   </>
 );
+
+/** Head centres / diameters (world, the neighbours' own layer). */
+export const NB = {L: {x: 250, y: 1684, head: 164}, R: {x: 950, y: 1690, head: 170}};

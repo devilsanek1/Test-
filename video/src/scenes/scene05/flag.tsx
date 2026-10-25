@@ -1,9 +1,11 @@
 // S05 flagpole on the wing's roof (fix round 3): the low angle needs something up in the top third (ref 2 always has
 // string lights / a cloud / palms there): a slim pole rising from the wing's roof (world y 840) to screen y ~200 at the
-// frame's right (screen x ~1022 -> 1012 at the top: it leans in a touch like the pilasters), a white ball finial and a
-// small teal flag (cream stripe) streaming LEFT into the sky right of the caption column (x 945) and above its band (y
-// 280). The flag waves on a travelling wave and SNAPS (a quick gust: amplitude + rate up, 0.25 s) on 'researchers' and
-// 'using'; it goes slack during 'bad' (the ONE focal event). Wing layer (parallax 0.4). World px, scene seconds.
+// frame's right (screen x ~1003 -> 993 at the top: it leans in a touch like the pilasters; it crosses the sun decisively,
+// never at a tangent, and deeper as the sun drifts right), a white ball finial and a
+// small teal flag (cream stripe) streaming LEFT into the sky ABOVE the caption band (screen y ~205-262 < 280). The flag
+// waves on a travelling wave and SNAPS (a quick gust: amplitude up, 0.25 s) on 'researchers' and 'using'; it goes slack
+// during 'bad' (the ONE focal event). Wing layer (parallax 0.4), drawn behind the wing (its base under the roof line).
+// World px, scene seconds.
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {clamp, useTime} from '../../lib/time';
@@ -13,8 +15,8 @@ import type {Pt} from '../../lib/sketch';
 import {SI} from '../shared/sets';
 
 /** Pole base (on the wing roof) and top, world (wing layer: at rest screen = (w - 540) 1.13 + 540, (w - 940) 1.13 + 960). */
-const BASE: Pt = [977, 842];
-const TOP: Pt = [968, 268];
+const BASE: Pt = [950, 842];
+const TOP: Pt = [941, 268];
 const FLAG = {w: 84, h: 50};
 
 /** One unbroken stroke (a sketchy line() breaks into dashes over this length). */

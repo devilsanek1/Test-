@@ -14,7 +14,7 @@ import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {PERSON_LEGS, PERSON_SHOES, PERSON_HAIR} from '../../lib/kit';
 import {mat, XG} from '../../lib/xf';
-import {polyPath, Pt} from '../../lib/sketch';
+import {blob, polyPath, Pt} from '../../lib/sketch';
 import {BLUEPRINT_WALL} from '../shared/sets';
 import {FigureArm, Messenger} from '../shared/props';
 import {camAt, Cam} from './camera';
@@ -160,6 +160,8 @@ export const MessengerRun: React.FC<{b: Beats; Pop: React.FC<{at: number; x: num
   if (!st.running) {
     return (
       <Pop at={b.teamB + 0.24} x={MESSENGER.x} y={FEET}>
+        {/* fix round 3: the flat sand contact sliver under his soles (as the teams'): he stands ON the landing */}
+        <Fill d={blob(st.x, FEET + 1.5 * S, G.w * 0.52 * S, 4.2 * S, {seed: 's5msg/cs'})} color={palette.sand} offset={false} mode="none" seed="s5msg/csf" />
         <Messenger x={st.x} y={FEET} h={MESSENGER.h} pullAt={b.pull} bob={1.2} seed={MESSENGER.seed} />
       </Pop>
     );

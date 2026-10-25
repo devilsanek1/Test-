@@ -13,7 +13,7 @@ import {InkScale} from '../../lib/inkComp';
 import {GovEvents, GovernmentPlaza, GovId, PLAZA} from '../shared/sets';
 import {PowerGlyph, RewindGlyph, SunPress} from '../shared/props';
 import {B as S01B} from '../scene01/timing';
-import {NearObserver, Onlookers, S01_CITIZENS, S01_GOV, S01_PIP_SEED, S01_WINDOWS} from '../scene01/plaza';
+import {NearObserver, Onlookers, S01_GOV, S01_PIP_SEED, S01_WINDOWS} from '../scene01/plaza';
 import {Pigeon, PipS01, PlazaCitizen} from '../scene01/cast';
 import {DOME_GLASS, LanternOff, S01Shutter} from '../scene01/shims';
 import {DoorLanterns, PressTicks, S01Branch, S01Glyph, SunRipple, TreeTicks} from '../scene01/dressing';
@@ -131,6 +131,3 @@ export const PlazaRewind: React.FC = () => {
     </TimeProvider>
   );
 };
-
-/** For readers: S01's citizen list (S12 re-acts the same people). */
-export const S12_CITIZENS = S01_CITIZENS;

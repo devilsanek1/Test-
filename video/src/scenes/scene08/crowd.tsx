@@ -172,20 +172,37 @@ export const Rattler: React.FC<RattlerSpec> = ({x, y, h, dh: dhIn, at, rattles, 
 
 // ---------------------------------------------------------------- the pile (COUNTED: at the dome's foot and flank)
 
-export type PileFig = {x: number; y: number; h: number; at: number; taps: number[]; hood: boolean; fill: 0 | 1; arm?: -1 | 1; flash?: number};
+export type PileFig = {x: number; y: number; h: number; at: number; taps: number[]; hood: boolean; fill: 0 | 1; arm?: -1 | 1; flash?: number; reachTo?: [number, number]};
 
-/** Pile slots, in fill order: `front` = ranks of busts along the dome's FOOT (x from x0 to x1, back ranks higher and
- *  smaller), `flank` = a short heap climbing the outside of the LEFT flank (only where the flank is at x >= 120 + 0.3 h). */
-export function pileSlots(o: {seed: string; front: {x0: number; x1: number; y: number; h: [number, number]; ranks: number}; flank: {y0: number; y1: number; n: number; h: [number, number]}}): {x: number; y: number; h: number; rank: number; flank: boolean}[] {
+/** An arm from the shoulder (side s) to a fist at `to` (the flank climbers' hands ON the glass); `k` < 1 pulls it back
+ *  (a tap). The elbow bows outward. */
+function armTo(x: number, y: number, h: number, s: number, to: [number, number], k = 1): {d: string; fist: [number, number]} {
+  const sx = x + s * 0.22 * h;
+  const sy = y - 0.46 * h;
+  const fx = sx + (to[0] - sx) * k;
+  const fy = sy + (to[1] - sy) * k;
+  const ex = (sx + fx) / 2 - s * 0.06 * h;
+  const ey = (sy + fy) / 2 + 0.04 * h;
+  return {d: `M${f1(sx)} ${f1(sy)}L${f1(ex)} ${f1(ey)}L${f1(fx)} ${f1(fy)}`, fist: [fx, fy]};
+}
+
+/** Pile slots, in fill order (fix round 3: the pile stands IN FRONT of the dome's near foot, never inside the arc):
+ *  `front` = ranks of busts along the foot, rank 0 (the back rank) with its base at `y` just in front of the foot line
+ *  (its heads overlap only the bottom ~10 px of the glass, its raised fists ~15-25 px), every further rank stepping DOWN
+ *  and forward (y + r * 0.42 h) and a touch bigger; `flank` = a heap climbing the OUTSIDE of the left flank, each
+ *  climber's whole body left of the arc at its feet (x <= flankX(y) - 0.34 h), hands on the glass, and right of the
+ *  paint edge (x - 0.33 h >= minX). */
+export function pileSlots(o: {seed: string; front: {x0: number; x1: number; y: number; h: [number, number]; ranks: number}; flank: {y0: number; y1: number; n: number; h: [number, number]; minX: number}}): {x: number; y: number; h: number; rank: number; flank: boolean}[] {
   const out: {x: number; y: number; h: number; rank: number; flank: boolean}[] = [];
   const F = o.front;
   for (let r = 0; r < F.ranks; r++) {
-    const hm = lerp(F.h[0], F.h[1], 0.5) * (1 - r * 0.1);
+    const grow = 1 + r * 0.05;
+    const hm = lerp(F.h[0], F.h[1], 0.5) * grow;
     let x = F.x0 + (r % 2 ? hm * 0.36 : 0) + rand(o.seed, `s${r}`) * 4;
     let i = 0;
     while (x < F.x1) {
-      const h = lerp(F.h[0], F.h[1], rand(o.seed, `h${r}/${i}`)) * (1 - r * 0.1);
-      out.push({x, y: F.y - r * hm * 0.42 + (rand(o.seed, `y${r}/${i}`) - 0.5) * 2, h, rank: r, flank: false});
+      const h = lerp(F.h[0], F.h[1], rand(o.seed, `h${r}/${i}`)) * grow;
+      out.push({x, y: F.y + r * hm * 0.42 + (rand(o.seed, `y${r}/${i}`) - 0.5) * 2.5, h, rank: r, flank: false});
       x += h * 0.66 + 2.5 + rand(o.seed, `p${r}/${i}`) * 2;
       i++;
     }
@@ -194,8 +211,8 @@ export function pileSlots(o: {seed: string; front: {x0: number; x1: number; y: n
     const u = k / Math.max(1, o.flank.n - 1);
     const y = lerp(o.flank.y0, o.flank.y1, u);
     const h = lerp(o.flank.h[0], o.flank.h[1], rand(o.seed, `fh${k}`));
-    const x = flankX(y - h * 0.6, -1) - h * 0.3 - 1;
-    if (x - h * 0.33 >= 118) out.push({x, y, h, rank: F.ranks + k, flank: true});
+    const x = flankX(y, -1) - h * 0.34 - 1 + (rand(o.seed, `fx${k}`) - 0.5) * 2;
+    if (x - h * 0.33 >= o.flank.minX) out.push({x, y, h, rank: F.ranks + k, flank: true});
   }
   return out;
 }
@@ -217,7 +234,7 @@ export const Pile: React.FC<{figs: PileFig[]}> = ({figs}) => {
     if (t < f.at) continue;
     const k = t < f.at + 0.067 ? 1.25 : 1;
     const h = f.h * k;
-    const flashing = f.flash !== undefined && t >= f.flash && t < f.flash + 0.067;
+    const flashing = f.flash !== undefined && t >= f.flash && t < f.flash + 0.1;
     const b = bust(f.x, f.y, h, f.hood, f.x < DOME8.cx ? 1 : -1);
     if (flashing) lit += b;
     else if (f.fill) body1 += b;
@@ -226,7 +243,7 @@ export const Pile: React.FC<{figs: PileFig[]}> = ({figs}) => {
     if (f.arm) {
       const tap = latest(f.taps, t);
       const tapping = tap !== undefined && t < tap + 0.2;
-      const a = armUp(f.x, f.y, h, f.arm, tapping ? 0.6 : 1);
+      const a = f.reachTo ? armTo(f.x, f.y, h, f.arm, f.reachTo, tapping ? 0.8 : 1) : armUp(f.x, f.y, h, f.arm, tapping ? 0.6 : 1);
       arms += a.d;
       if (tapping) {
         const q = t - tap! < 0.1 ? 0 : 1;
@@ -256,7 +273,53 @@ export const Pile: React.FC<{figs: PileFig[]}> = ({figs}) => {
 
 // ---------------------------------------------------------------- the flood ('millions': OUTSIDE the dome)
 
-export type CrowdFig = {x: number; y: number; h: number; at: number; rank: number; fill: 0 | 1; hood: boolean; arm?: -1 | 1};
+export type CrowdFig = {x: number; y: number; h: number; at: number; rank: number; fill: 0 | 1; hood: boolean; arm?: -1 | 1; vx?: number};
+
+/** Fix round 3: CLUMPS along a street instead of evenly spaced ranks (the old bands read as bleacher rows). Clumps of
+ *  `clump` figures (3-6) shoulder to shoulder (size jitter +-20 %, y jitter `jy` per clump + 1.5 px per figure), 0-12 px
+ *  gaps between clumps, every `arms`-th figure (seeded) with a raised arm; `vx` = a slow drift along the street TOWARD
+ *  x `toward` (the crowd flows to the dome; 0 = still). Pop order: `order` (ltr | out-from x | in-to x). */
+export function clumpBand(
+  seed: string,
+  x0: number,
+  x1: number,
+  y: number,
+  h: number,
+  at: number,
+  span: number,
+  o: {clump?: [number, number]; gap?: [number, number]; jy?: number; order?: 'ltr' | 'rand' | {from: number} | {to: number}; skip?: (x: number, y: number, h: number) => boolean; rank?: number; arms?: number; hoods?: number; toward?: number; vx?: number; sizeJ?: number} = {},
+): CrowdFig[] {
+  const out: CrowdFig[] = [];
+  const [c0, c1] = o.clump ?? [3, 6];
+  const [g0, g1] = o.gap ?? [0, 12];
+  const jy = o.jy ?? 6;
+  const sj = o.sizeJ ?? 0.2;
+  let x = x0 + rand(seed, 'x0') * h;
+  let c = 0;
+  let i = 0;
+  while (x < x1) {
+    const n = c0 + Math.floor(rand(seed, `n${c}`) * (c1 - c0 + 1));
+    const cy = y + (rand(seed, `cy${c}`) - 0.5) * 2 * jy;
+    let last = h;
+    for (let j = 0; j < n && x < x1; j++, i++) {
+      const hh = h * (1 - sj + 2 * sj * rand(seed, `h${i}`));
+      const fy = cy + (rand(seed, `y${i}`) - 0.5) * 3;
+      if (!(o.skip && o.skip(x, fy, hh))) {
+        const ord = o.order ?? 'rand';
+        const u =
+          ord === 'ltr' ? (x - x0) / (x1 - x0) : ord === 'rand' ? rand(seed, `a${i}`) : 'from' in ord ? Math.min(1, Math.abs(x - ord.from) / 700) : 1 - Math.min(1, Math.abs(x - ord.to) / 700);
+        const arm = o.arms && rand(seed, `ar${i}`) < 1 / o.arms ? ((rand(seed, `as${i}`) < 0.5 ? -1 : 1) as -1 | 1) : undefined;
+        const vx = o.toward !== undefined && o.vx ? Math.sign(o.toward - x) * o.vx * (0.7 + 0.6 * rand(seed, `v${c}`)) : undefined;
+        out.push({x, y: fy, h: hh, at: at + u * span, rank: o.rank ?? 0, fill: (i % 2) as 0 | 1, hood: rand(seed, `hd${i}`) < (o.hoods ?? 0.7), arm, vx});
+      }
+      last = hh;
+      x += hh * 0.62 + 0.5 + rand(seed, `p${i}`) * 1.5;
+    }
+    x += g0 + rand(seed, `g${c}`) * (g1 - g0) + last * 0.1;
+    c++;
+  }
+  return out;
+}
 
 /** A band of busts: `ranks` rows (back rank higher and smaller), shoulder to shoulder with a 2-4 px gap over x0..x1,
  *  base at yBase (+- jy); pop times = at + (the figure's share of span) in `order` (rand | ltr | out-from x). Fill
@@ -323,16 +386,19 @@ export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string
     if (t < f.at) return;
     const k = t < f.at + 0.067 ? 1.25 : 1;
     const h = f.h * k;
-    const bob = step >= 0 && rand(seed, `f${i}`) < 0.35 && (step + i) % 2 === 0 ? -Math.max(1, h * 0.06) : 0;
+    // drifting figures WALK (a 1-step bob every 0.2 s, phase per figure); after `flickerAt` a third of the rest bob too
+    const walk = f.vx ? (Math.floor((t - f.at) / 0.2 + rand(seed, `w${i}`) * 2) % 2 ? -Math.max(0.6, h * 0.05) : 0) : 0;
+    const bob = walk || (step >= 0 && rand(seed, `f${i}`) < 0.35 && (step + i) % 2 === 0 ? -Math.max(1, h * 0.06) : 0);
     const y = f.y + bob;
-    const d = bust(f.x, y, h, f.hood, rand(seed, `l${i}`) < 0.5 ? -1 : 1);
+    const fx = f.vx ? f.x + f.vx * (t - f.at) : f.x;
+    const d = bust(fx, y, h, f.hood, f.vx ? (Math.sign(f.vx) as 1 | -1) : rand(seed, `l${i}`) < 0.5 ? -1 : 1);
     if (f.fill) b1[f.rank] = (b1[f.rank] ?? '') + d;
     else b0[f.rank] = (b0[f.rank] ?? '') + d;
-    rims[f.rank] = (rims[f.rank] ?? '') + bustRim(f.x, y, h, f.x < SUN_X ? 1 : -1, Math.max(1.2, h * 0.08), f.hood);
+    rims[f.rank] = (rims[f.rank] ?? '') + bustRim(fx, y, h, fx < SUN_X ? 1 : -1, Math.max(1.1, h * 0.09), f.hood);
     if (f.arm) {
       const pump = Math.floor((t - f.at) / 0.2 + rand(seed, `ap${i}`) * 2) % 2;
-      arms[f.rank] = (arms[f.rank] ?? '') + armUp(f.x, y, h, f.arm, pump ? 0.75 : 1).d;
-      aw[f.rank] = Math.max(1.6, h * 0.12);
+      arms[f.rank] = (arms[f.rank] ?? '') + armUp(fx, y, h, f.arm, pump ? 0.75 : 1).d;
+      aw[f.rank] = Math.max(1.2, h * 0.12);
     }
   });
   const out: React.ReactNode[] = [];

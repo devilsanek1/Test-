@@ -19,7 +19,7 @@
 // inside the glass. Shared props: CounterBoard, TelephoneWires (WIRES.S08, pole at x 540), Attempter, LeakSheet, Bit,
 // SunGlowSteps, InkTextBlock. Local stand-ins (scene08/shims.tsx): MinuteWedge + ease, InkStamp (stampPaper).
 import React, {useId} from 'react';
-import {World, Sun, palette} from '../lib';
+import {World, Sun, palette, skies} from '../lib';
 import {ease as E, lerp, prog, useTime as useTimeLocal} from '../lib/time';
 import {camAt, Layer} from '../lib/cine/camera';
 import type {CamKey} from '../lib/cine/camera';
@@ -32,12 +32,12 @@ import type {SkyKey} from '../lib/World';
 import {CounterBoard, counterBoardZones, SunGlowSteps} from './shared/props';
 import {DomeCity, DOME, TelephoneWires, WIRES} from './shared/sets';
 import {DUR, GATES_AT, T} from './scene08/times';
-import {BOARD, copingY, depthOf, DOME8, DOORS3, PIP, PUSH_X, R2} from './scene08/layout';
+import {BOARD, copingY, depthOf, DOME8, DOORS3, flankX, PIP, PUSH_X, R2} from './scene08/layout';
 import {BitRide, CopySpec, GlintSweep, PaperSpecks, Pigeons, Pip, StampHit, WindowWink, WireCopy} from './scene08/cast';
-import {crowdBand, CrowdFig, Flood, NearCrowd, NearFig, outsideDome, Pile, PileFig, pileSlots, Rattler, RattlerSpec} from './scene08/crowd';
-import {beamEnd, Searchlight8, Watchtower8} from './scene08/tower';
+import {clumpBand, CrowdFig, Flood, NearCrowd, NearFig, outsideDome, Pile, PileFig, pileSlots, Rattler, RattlerSpec} from './scene08/crowd';
+import {BeamSpot, beamHit, Searchlight8, Watchtower8} from './scene08/tower';
 import {BoardNote, InkStamp, MinuteWedge} from './scene08/shims';
-import {DeckClutter, DistrictTowers, LightDoors, Neighbours, NEIGHBOUR_F, WireSpans} from './scene08/extras';
+import {DeckClutter, DistrictTowers, DomePlinth, LightDoors, Neighbours, NEIGHBOUR_F, WireSpans} from './scene08/extras';
 
 // ---------------------------------------------------------------- camera (depth-0 plane = our parapet)
 
@@ -115,8 +115,9 @@ const Rings: React.FC<{at: number; outAt: number; goneAt: number}> = ({at, outAt
 
 const SunInSky: React.FC = () => (
   <>
-    {/* off before the hop's anticipation (take-off - 0.1 s) */}
-    <Rings at={T.settle} outAt={T.hopOff - 0.27} goneAt={T.hopOff - 0.1} />
+    {/* fix round 3: the rings pop off in 3 frames straight into the hop's anticipation (one action ending on
+        'forty-five'; they used to shrink 0.3 s early, in the gap between 'attempts' and 'in') */}
+    <Rings at={T.settle} outAt={T.hopOff - 0.2} goneAt={T.hopOff - 0.1} />
     {/* fix round 2: no second ring pair after the clock (it held only 0.24 s and blinked over the payoff): the sun stays
         ringless from the clock through the sunset */}
     <Sun cx={640} cy={1021} r={110} drift={[0, 0]} moves={SUN_MOVES} hops={SUN_HOPS} breathe={0.01}>
@@ -153,7 +154,7 @@ const RATTLERS3: RattlerSpec[] = [
   // 'ALREADY': three pop (the two nearest at 86-92 px), a fourth on the second beat; on 'attempts' A gives up and hops
   // to the edge door, and D takes A's door (a chain of two hops)
   {...R3(0, 86), at: T.already, rattles: [T.already + 0.04, T.rattleA, T.itWas + 0.06, T.thousands + 0.1, T.millions, T.wave2 + 0.2], hop: {at: T.attempts, to: door3(4).x, toY: door3(4).y}, seed: 'r3a'},
-  {...R3(2, 92), at: T.already + 0.05, rattles: [T.already + 0.09, T.itWas, T.thousands + 0.15, T.attempts + 0.42, T.comma, T.millions + 0.05], seed: 'r3b'},
+  {...R3(2, 92), at: T.already + 0.05, rattles: [T.already + 0.09, T.says + 0.05, T.itWas, T.thousands + 0.15, T.attempts + 0.42, T.comma, T.millions + 0.05], seed: 'r3b'},
   {...R3(3, 62), at: T.already + 0.1, rattles: [T.already + 0.14, T.trying + 0.2], seed: 'r3c'},
   {...R3(1, 90), at: T.already2, rattles: [T.already2 + 0.04, T.rattleA + 0.05, T.they + 0.2, T.hacking, T.comma + 0.05, T.wave2], hop: {at: T.attempts + 0.12, to: door3(0).x, toY: door3(0).y}, seed: 'r3d'},
 ];
@@ -171,28 +172,25 @@ const RATTLERS2: RattlerSpec[] = R2.map((q, i) => ({
 
 // ---------------------------------------------------------------- the COUNTED pile at the dome's foot (x >= 120)
 
-/** Distance from point p to the beam's centre ray at angle deg (lamp -> its end at the glass / foot). */
-const beamDist = (px: number, py: number, deg: number) => {
-  const o: [number, number] = [330, 941];
-  const e = beamEnd(deg);
-  const vx = e[0] - o[0];
-  const vy = e[1] - o[1];
-  const u = Math.max(0, Math.min(1, ((px - o[0]) * vx + (py - o[1]) * vy) / (vx * vx + vy * vy)));
-  return Math.hypot(px - (o[0] + vx * u), py - (o[1] + vy * u));
-};
+/** Where the beam lands on 'hacking' (on the crowd in front of the foot): the caught group is around this x. */
+const CATCH_X = beamHit(CATCH_DEG).p[0];
 
 const PILE: PileFig[] = (() => {
-  // ranks along the foot (x 132-360, back ranks higher and smaller) + a short climb up the outside of the left flank
-  const slots = pileSlots({seed: 's8/pile', front: {x0: 132, x1: 360, y: 1074, h: [24, 30], ranks: 4}, flank: {y0: 1012, y1: 905, n: 7, h: [20, 25]}});
+  // fix round 3: ranks IN FRONT of the near foot (rank 0's base just below the foot line, every further rank stepping
+  // down and forward), so only heads, raised fists and ripples overlap the bottom of the glass; on 'millions' a heap
+  // climbs the OUTSIDE of the left flank, hands on the glass
+  const slots = pileSlots({seed: 's8/pile', front: {x0: 112, x1: 404, y: 1099, h: [24, 30], ranks: 4}, flank: {y0: 1086, y1: 905, n: 10, h: [20, 25], minX: 96}});
   const early = slots.filter((s) => !s.flank && s.rank < 3).sort((a, b) => a.rank - b.rank || a.x - b.x);
   const late = slots.filter((s) => s.flank || s.rank >= 3);
   const out: PileFig[] = [];
   const n = early.length;
   early.forEach((s, i) => {
-    // 6 on 'they', +10 on 'tens', the rest on 'thousands' (a ripple left to right)
+    // 6 on 'they', +10 on 'tens', the rest on 'thousands' (a ripple left to right); the back rank (against the glass)
+    // fills first
     const at = i < 6 ? T.they + i * 0.03 : i < 16 ? T.tens + (i - 6) * 0.02 : T.thousands + ((i - 16) / Math.max(1, n - 17)) * 0.25;
-    const hit = beamDist(s.x, s.y - s.h * 0.5, CATCH_DEG) < 16 && s.x < 260;
-    const arm = rand('s8/pa', `${i}`) < 0.36 ? ((rand('s8/pas', `${i}`) < 0.5 ? -1 : 1) as -1 | 1) : undefined;
+    const hit = s.rank <= 1 && Math.abs(s.x - CATCH_X) < 30;
+    const armP = s.rank === 0 ? 0.5 : s.rank === 1 ? 0.22 : 0;
+    const arm = rand('s8/pa', `${i}`) < armP ? ((rand('s8/pas', `${i}`) < 0.5 ? -1 : 1) as -1 | 1) : undefined;
     out.push({
       x: s.x,
       y: s.y,
@@ -206,8 +204,19 @@ const PILE: PileFig[] = (() => {
     });
   });
   late.forEach((s, i) => {
-    const at = T.millions + (i % 3) * 0.033;
-    out.push({x: s.x, y: s.y, h: s.h, at, hood: rand('s8/ph', `l${i}`) < 0.65, fill: (i % 2) as 0 | 1, arm: s.flank ? 1 : i % 3 === 0 ? -1 : undefined, taps: [at + 0.03, T.wave2 + (i % 4) * 0.05, T.within + (i % 3) * 0.1]});
+    const at = s.flank ? T.millions + (s.rank - 4) * 0.033 : T.millions + (i % 3) * 0.033;
+    const reach = 0.95 * s.h;
+    out.push({
+      x: s.x,
+      y: s.y,
+      h: s.h,
+      at,
+      hood: rand('s8/ph', `l${i}`) < 0.65,
+      fill: (i % 2) as 0 | 1,
+      arm: s.flank ? 1 : i % 4 === 0 ? -1 : undefined,
+      reachTo: s.flank ? [flankX(s.y - reach, -1) + 1.5, s.y - reach] : undefined,
+      taps: [at + 0.03, T.wave2 + (i % 4) * 0.05, T.within + (i % 3) * 0.1],
+    });
   });
   // back to front: higher figures first
   return out.sort((a, b) => a.y - b.y);
@@ -216,20 +225,38 @@ const PILE: PileFig[] = (() => {
 // ---------------------------------------------------------------- the flood ('millions'): crowds OUTSIDE the dome
 
 const FLOOD = (() => {
-  // 'use it': four small clusters of heads in the far streets (right of the dome, 16-19 px: head dots 6-8 px)
+  // fix round 3: STIPPLE in the far streets (the old 15-38 px ranks in straight, evenly spaced lines read as bleacher
+  // seating, people as big as far houses). Far = 4-8 px hooded specks in clumps of 3-6 (size +-20 %, y +-3..6, gaps
+  // 0-12 px) at the FOOT of each far row: row 0's street (y ~1050, behind row 1) and row 1's street (y ~1117, behind
+  // row 2): they show in the gaps between the nearer roofs. Mid = 10-16 px figures in clumps along row 2's street
+  // (y ~1300, above the row-3 sheds). Everything drifts / walks TOWARD the dome. Figures over 40 px only on row 3 and
+  // our roof.
+  // 'use it': four clumps of 5-8 px specks in the far streets right of the dome
+  // (x ranges = the street gaps between row 2's roofs at rest, measured on the 1.75 s frame: row 1's foot shows there)
   const useIt = [
-    [462, 530],
-    [606, 676],
-    [770, 846],
-    [944, 1030],
-  ].flatMap(([a, b], k) => crowdBand(`s8/u${k}`, a, b, 1106, 16, 19, 2, T.useIt + k * 0.06, 0.1, {rank0: 4, arms: k % 2, skip: outsideDome}));
-  // 'millions': ONE burst (2 frames, rippling out from the dome) over the far streets and the mid rooftops, then a second
-  // wave over the far skyline left to right; fewer, bigger ranks (far 16-21 px, mid 30-38 px)
-  const farBurst = crowdBand('s8/bf', -40, 1120, 1098, 17, 21, 2, T.millions, 0.067, {order: {from: DOME8.cx}, rank0: 2, arms: 3, skip: outsideDome});
-  const farWave = crowdBand('s8/wf', -40, 1120, 1032, 15, 18, 2, T.wave2, 0.25, {order: 'ltr', rank0: 0, arms: 2, skip: outsideDome});
-  const midBurst = crowdBand('s8/bm', -40, 1120, 1224, 30, 38, 2, T.millions, 0.067, {order: {from: DOME8.cx}, rank0: 1, arms: 2});
-  const midWave = crowdBand('s8/wm', -40, 1120, 1184, 26, 32, 1, T.wave2 + 0.06, 0.2, {order: 'ltr', rank0: 0, arms: 2});
-  return {far: [...farWave, ...farBurst, ...useIt] as CrowdFig[], mid: [...midWave, ...midBurst] as CrowdFig[]};
+    [517, 581],
+    [656, 707],
+    [758, 817],
+    [859, 911],
+  ].flatMap(([a, b], k) => clumpBand(`s8/u${k}`, a, b, 1113, 6.5, T.useIt + k * 0.06, 0.1, {clump: [3, 5], gap: [3, 8], jy: 2, skip: outsideDome, toward: DOME8.cx, vx: 3}));
+  // 'millions': ONE burst (2 frames, rippling out from the dome) over row 1's street and row 2's street, then a second
+  // wave over row 0's street (the far skyline) left to right and more clumps on row 2's street
+  const far1 = [
+    ...clumpBand('s8/bf1', -40, 1120, 1112, 5.6, T.millions, 0.067, {order: {from: DOME8.cx}, jy: 3, gap: [0, 8], skip: outsideDome, toward: DOME8.cx, vx: 3}),
+    ...clumpBand('s8/bf1b', -30, 1120, 1121, 6.6, T.millions + 0.033, 0.067, {order: {from: DOME8.cx}, jy: 3, gap: [0, 10], arms: 9, skip: outsideDome, toward: DOME8.cx, vx: 4}),
+  ];
+  const far0 = [
+    ...clumpBand('s8/wf0', -40, 1120, 1047, 4.4, T.wave2, 0.25, {order: 'ltr', jy: 2, gap: [0, 8], skip: outsideDome, toward: DOME8.cx, vx: 2}),
+    ...clumpBand('s8/wf0b', -30, 1120, 1053, 5, T.wave2 + 0.04, 0.25, {order: 'ltr', jy: 2, gap: [0, 10], skip: outsideDome, toward: DOME8.cx, vx: 2.5}),
+  ];
+  // row 2's street: a PACKED street of 10-16 px figures in three staggered clump lines (heads at different heights:
+  // a crowd, not a rank), flowing toward the dome
+  const mid = [
+    ...clumpBand('s8/bm0', -40, 1120, 1293, 11, T.millions, 0.067, {order: {from: DOME8.cx}, clump: [3, 6], gap: [0, 10], jy: 3, arms: 7, toward: DOME8.cx, vx: 8}),
+    ...clumpBand('s8/bm1', -30, 1120, 1302, 13, T.millions + 0.033, 0.067, {order: {from: DOME8.cx}, clump: [3, 6], gap: [0, 12], jy: 3, arms: 6, toward: DOME8.cx, vx: 9}),
+    ...clumpBand('s8/bm2', -20, 1120, 1311, 15, T.wave2 + 0.06, 0.2, {order: 'ltr', clump: [2, 5], gap: [6, 30], jy: 3, arms: 5, toward: DOME8.cx, vx: 10}),
+  ];
+  return {row0: far0 as CrowdFig[], row1: [...far1, ...useIt] as CrowdFig[], mid: mid as CrowdFig[]};
 })();
 
 // 'millions': big busts crowd our coping (the flood's foreground; their lower part hidden by the coping)
@@ -345,6 +372,14 @@ const DuskBand: React.FC<{glass?: boolean}> = ({glass}) => {
  *  warm accents. A flat colour override of the set's fills (CSS on the layer group: no filter, no fade). */
 const HAZE: Record<string, [string, string]> = {row0: ['#84A895', '#90B3A1'], row1: ['#7A9B8A', '#86A796']};
 const LIT = [palette.peach, '#F5CCAF', palette.sun].map((c) => `:not([fill="${c}"]):not([fill="${c.toLowerCase()}"])`).join('');
+/** Row 1's street: a ground strip under row 1's foot (y 1119-1165, row 2's back-fill colour), so the vista framing
+ *  (camera y 900: row 2 drops ~14 px more than row 1) shows a street there instead of a sky-coloured slit; the far
+ *  crowd stands on it. Relights with row 1 on 'day'. */
+const StreetStrip: React.FC = () => {
+  const t = useTimeLocal();
+  return <path d="M-300 1119H1400V1165H-300Z" fill={t >= T.day ? HAZE.row1[0] : palette.sand} />;
+};
+
 const DuskRelight: React.FC<{name: string; children?: React.ReactNode}> = ({name, children}) => {
   const t = useTimeLocal();
   if (t < T.day || !HAZE[name]) return <>{children}</>;
@@ -357,6 +392,30 @@ const DuskRelight: React.FC<{name: string; children?: React.ReactNode}> = ({name
     </g>
   );
 };
+
+/** Fix round 3: the glass is ONE VALUE DARKER (it was a pale wash the same value as the light far rows, so the dome
+ *  read as 'filled' and the cream searchlight vanished on it): the glass sky #CCE4D2 -> the day sky's #ACD1BF, the
+ *  glass peach band half-peach -> peach, and the city's glass copies half-sand -> #ACD1BF (a cool mint tint): inside the
+ *  dome (mint + the teal district) and outside (the warm sand city) are two distinct values, and the cream cone reads
+ *  on every part of the glass. A flat colour override of the set's glass copies (CSS on the layer group; no filter, no
+ *  fade); off from 'day' (the dusk relight owns the glass then). */
+const GLASS_TINT: [string, string][] = [
+  ['#CCE4D2', skies.golden],
+  ['#F5CCAF', palette.peach],
+  ['#E6CEB6', skies.golden],
+];
+const GLASS_CSS = GLASS_TINT.map(([a, b]) => `.s8gt g[clip-path] path[fill="${a}"],.s8gt g[clip-path] path[fill="${a.toLowerCase()}"]{fill:${b}}`).join('');
+const GlassTint: React.FC<{on: boolean; children?: React.ReactNode}> = ({on, children}) => {
+  const t = useTimeLocal();
+  if (!on || t >= T.day) return <>{children}</>;
+  return (
+    <g className="s8gt">
+      <style>{GLASS_CSS}</style>
+      {children}
+    </g>
+  );
+};
+const GLASSY = new Set(['domeGlass', 'row0', 'row1']);
 
 /** Fix round 2: the near half of the dusk relight lands EARLY, on the sky's third snap (`within` + 0.3): row 2, row 3
  *  and the neighbours flip to dusk there; the deck, the parapet and the board flip with the sky's `tod` key on 'day'.
@@ -372,6 +431,7 @@ const DuskStep: React.FC<{on: boolean; children?: React.ReactNode}> = ({on, chil
 /** Overlays injected into the DomeCity v3 layers (by its layer names). */
 const EXTRAS: Record<string, React.ReactNode> = {
   sky: <DuskBand />,
+  row0: <Flood figs={FLOOD.row0} flickerAt={T.duskIdle} seed="s8/f0" />,
   domeGlass: (
     <>
       <defs>
@@ -385,10 +445,13 @@ const EXTRAS: Record<string, React.ReactNode> = {
   row1: (
     <>
       <WindowWink x={760} y={1040} cols={4} rows={3} at={T.once + 0.05} size={5} />
+      {/* fix round 3: a second wink on 'that' (an onset in the thin 'says / that / once' stretch) */}
+      <WindowWink x={560} y={1078} cols={3} rows={2} at={T.that + 0.02} size={6} />
       <g clipPath="url(#s8domeclip)">
         <DistrictTowers at={T.cloudflare + 0.42} />
       </g>
-      <Flood figs={FLOOD.far} flickerAt={T.duskIdle} seed="s8/ff" />
+      <StreetStrip />
+      <Flood figs={FLOOD.row1} flickerAt={T.duskIdle} seed="s8/ff" />
     </>
   ),
   dome: (
@@ -398,7 +461,6 @@ const EXTRAS: Record<string, React.ReactNode> = {
       <g clipPath="url(#s8domeclip)">
         <Searchlight8 at={T.that} angle={sweepAngle} duskAt={T.day} />
       </g>
-      <Pile figs={PILE} />
     </>
   ),
   row2: (
@@ -468,15 +530,26 @@ const wrap = (name: string, _nearness: number, node: React.ReactNode) =>
     <>
       <Layer depth={depthOf(name)}>
         <DuskStep on={EARLY.has(name)}>
-          <DuskRelight name={name}>{node}</DuskRelight>
+          <GlassTint on={GLASSY.has(name)}>
+            <DuskRelight name={name}>{node}</DuskRelight>
+          </GlassTint>
           {EXTRAS[name]}
         </DuskStep>
       </Layer>
+      {name === 'row2' ? (
+        // fix round 3: the counted pile + the dome's plinth, at the DOME's depth but drawn after row 2, so the crowd
+        // pressed against the foot is never hidden by row 2's roofs during the push
+        <Layer depth={depthOf('dome')}>
+          <DomePlinth at={T.dome + 0.36} />
+          <BeamSpot at={T.that} angle={sweepAngle} />
+          <Pile figs={PILE} />
+        </Layer>
+      ) : null}
       {name === 'fg' ? (
         // the rooftop neighbours: nearer than our parapet (they drop away faster during the crane)
         <Layer depth={1 - NEIGHBOUR_F}>
           <DuskStep on>
-            <Neighbours phoneAt={T.millions + 0.32} />
+            <Neighbours reactAt={T.millions + 0.32} />
           </DuskStep>
         </Layer>
       ) : null}
@@ -491,8 +564,8 @@ const Scene08: React.FC = () => (
         wrap={wrap}
         sun={<SunInSky />}
         dotsAt={0.12}
-        domeAt={T.cloudflare}
-        domeDur={0.38}
+        domeAt={T.dome}
+        domeDur={0.36}
         towerAt={1e6}
         footprintAt={false}
         duskAt={T.within}

@@ -17,7 +17,7 @@ import {palette} from '../../lib/theme';
 import {ease as E, prog, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {blob, line, polyPath, rect, rectPath, Pt} from '../../lib/sketch';
+import {blob, circle, line, polyPath, rect, rectPath, Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import {Cobweb, OLD_QUARTER, PopUp, SI, SupportTag} from './kit';
 import {plateFace} from './plate';
@@ -27,12 +27,20 @@ type Roof = 'flat' | 'gable' | 'step' | 'chimney';
 type Plate = {x: number; y: number; old: boolean};
 type B = {x: number; w: number; top: number; roof: Roof; color: string; plate?: Plate};
 
+/** The old far plates' crooked drop onto their one screw + the sag on 'so' (deg). */
+const DROP_DEG = 9;
+const SAG_DEG = 3;
 /** Far plate size (world px; 46 px on screen at the 1.05 push). */
 export const FAR_PLATE = 44;
+/** Pop stagger back to front (fix round 2b: 0.04 -> 0.03, with the row leading 'like' by 0.30 s, so all nine pops start
+ *  0.571-0.811 local and settle by ~1.01: after the gap wedge, before the sun's spoke and its cream half on 'HALF'). */
+const STAGGER = 0.03;
 
-// Order = draw order (back to front) = pop order (0.04 s stagger). Roof peaks stay >= 640 (screen >= 603: rule 10).
+// Order = draw order (back to front) = pop order (STAGGER). Roof peaks stay >= 640 (screen >= 603: rule 10).
 const DEF: B[] = [
-  {x: 338, w: 60, top: 646, roof: 'flat', color: palette.sage, plate: {x: 369, y: 680, old: true}},
+  // b0: P0 centred on the wall right of siteL's mansard (its slope is at x <= 353 down to the mansard base 690 + 6 px
+  // of ink overshoot): the plate spans 359-403, clear of it even after its crooked drop (fix round 2b: was x 369)
+  {x: 338, w: 66, top: 646, roof: 'flat', color: palette.sage, plate: {x: 381, y: 674, old: true}},
   {x: 398, w: 52, top: 792, roof: 'flat', color: palette.sand},
   {x: 450, w: 54, top: 776, roof: 'gable', color: palette.tan},
   {x: 504, w: 50, top: 790, roof: 'step', color: palette.cream},
@@ -99,7 +107,7 @@ const G = (() => {
 })();
 
 export type SecondRowProps = {
-  /** Pop-up start (0.04 s stagger, back to front). */
+  /** Pop-up start (STAGGER, back to front). */
   popAt: number;
   /** EVERY plate paper-flips (0.05 s apart): the old ones land dark + crooked with a dust puff. */
   flipAt: number;
@@ -135,21 +143,35 @@ const FarPlate: React.FC<{p: Plate; flipAt: number; sagAt: number; shudderAt?: n
   const q = prog(t, flipAt, 0.2, E.inOutSine);
   const old = p.old && q >= 0.5;
   const sx = q > 0 && q < 1 ? Math.max(0.03, Math.abs(Math.cos(Math.PI * q))) : 1;
-  // the crooked drop starts at the swap (flipAt + 0.1), outBack; the sag on 'so'
-  let rot = old ? 16 * prog(t, flipAt + 0.1, 0.24, E.outBack(2.2)) + 5 * prog(t, sagAt, 0.22, E.outBack(1.8)) : 0;
+  // the crooked drop starts at the swap (flipAt + 0.1), outBack; the sag on 'so'. Fix round 2b: 9 + 3 deg (was 16 + 5:
+  // at 25-30 deg the dark plates read as diamonds / stickers in mid-air, not plates on a wall)
+  let rot = old ? DROP_DEG * prog(t, flipAt + 0.1, 0.24, E.outBack(2.2)) + SAG_DEG * prog(t, sagAt, 0.22, E.outBack(1.8)) : 0;
   let hop = 0;
   if (shudderAt !== undefined && t >= shudderAt && t < shudderAt + 0.2) {
     const d = t - shudderAt;
-    rot += 9 * Math.exp(-d * 14) * Math.sin(d * 2 * Math.PI * 9);
+    rot += 6 * Math.exp(-d * 14) * Math.sin(d * 2 * Math.PI * 9);
     hop = -4 * Math.sin(Math.PI * Math.min(1, d / 0.12));
   }
   const pivot: Pt = [p.x - 38 * s, p.y - 38 * s];
+  // the old plate hangs on its ONE remaining screw (a fat ink screw head at the pivot, on the wall) and the empty hole
+  // of the second screw stays on the wall where the plate's top-right corner was (an ink ring): a plate that dropped
+  const dropped = old && t >= flipAt + 0.1;
+  const hole: Pt = [p.x + 38 * s, p.y - 38 * s];
   return (
-    <XG m={mat.compose(mat.translate(0, hop), mat.about(mat.rotate(rot), pivot[0], pivot[1]))}>
-      <XG m={mat.compose(mat.translate(p.x, p.y), mat.scale(s * sx, s))}>{plateFace({old, W: SI.far / s, seed, offset: [3, 2.2]})}</XG>
+    <>
+      {dropped ? <Ink d={circle(hole[0], hole[1], 2.3, {seed: `${seed}/hole`})} width={1.5} taper={false} vary={0} seed={`${seed}/hole`} /> : null}
+      <XG m={mat.compose(mat.translate(0, hop), mat.about(mat.rotate(rot), pivot[0], pivot[1]))}>
+      <XG m={mat.compose(mat.translate(p.x, p.y), mat.scale(s * sx, s))}>{plateFace({old, W: SI.far / s, seed, offset: [3, 2.2], screws: !old})}</XG>
       {old && t >= sagAt ? <Cobweb x={p.x + P / 2 - 1} y={p.y - P * 0.3} r={P * 0.4} corner="tr" at={sagAt + 0.04} dur={0.2} width={1.4} color={palette.cream} seed={`${seed}/w`} /> : null}
       {tagAt !== undefined && t >= tagAt ? <SupportTag x={p.x + 6} y={p.y - P / 2 + 3} size={30} at={tagAt} checkAt={tagAt + 0.05} seed={`${seed}/tag`} /> : null}
-    </XG>
+      </XG>
+      {old ? (
+        <>
+          <Fill d={circle(pivot[0], pivot[1] + hop, 3.1, {seed: `${seed}/scr`})} color={palette.ink} offset={false} mode="none" seed={`${seed}/scr`} />
+          <Ink d={`M${(pivot[0] - 1.8).toFixed(1)} ${(pivot[1] + hop - 1.2).toFixed(1)}L${(pivot[0] + 1.8).toFixed(1)} ${(pivot[1] + hop + 1.2).toFixed(1)}`} width={0.9} color={palette.cream} taper={false} vary={0} seed={`${seed}/slot`} />
+        </>
+      ) : null}
+    </>
   );
 };
 
@@ -164,7 +186,7 @@ export const SecondRow: React.FC<SecondRowProps> = ({popAt, flipAt, dropAt, wind
   return (
     <>
       {SECOND.map((b) => {
-        const pa = popAt + 0.04 * b.i;
+        const pa = popAt + STAGGER * b.i;
         const r = G.roofs[b.i];
         const fa = flips.get(b.i);
         const wa = wave.get(b.i);
@@ -181,7 +203,7 @@ export const SecondRow: React.FC<SecondRowProps> = ({popAt, flipAt, dropAt, wind
         );
       })}
       {/* window dots, batched (half density); they arrive with the last pop-ups */}
-      {t >= popAt + 0.3 ? (
+      {t >= popAt + STAGGER * 8 + 0.18 ? (
         <>
           <Fill d={G.winDark} color={palette.tealDark} offset={false} mode="snap" seed="s10s/win" />
           <Fill d={G.winLight} color={palette.mintPale} offset={false} mode="snap" seed="s10s/winl" />
@@ -190,7 +212,7 @@ export const SecondRow: React.FC<SecondRowProps> = ({popAt, flipAt, dropAt, wind
       {winLit ? <Fill rect={[SECOND[6].x + SECOND[6].w * 0.24, SECOND[6].top + 16 + 40 * 4, 7, 11]} color={palette.peach} offset={false} mode="snap" seed="s10s/lit" /> : null}
       {/* gap doors: the OLD gabled house's door already carries a host's own sage tag on its handle (a pauser detail) */}
       {G.doors.map((d, k) =>
-        t >= popAt + 0.04 * (7 + k) + 0.1 ? (
+        t >= popAt + STAGGER * (7 + k) + 0.1 ? (
           <React.Fragment key={k}>
             <Fill d={rectPath(d.x, d.y, d.w, d.h)} color={palette.teal} offset={false} mode="snap" seed={`s10s/d${k}`} />
             <Ink d={rect(d.x, d.y, d.w, d.h, {seed: `s10s/di${k}`, over: 1, edges: 'tlr'})} width={SI.hair} taper={false} seed={`s10s/di${k}`} />
@@ -198,7 +220,7 @@ export const SecondRow: React.FC<SecondRowProps> = ({popAt, flipAt, dropAt, wind
           </React.Fragment>
         ) : null,
       )}
-      {t >= popAt + 0.04 * 7 + 0.1
+      {t >= popAt + STAGGER * 7 + 0.1
         ? (() => {
             const d = G.doors[0];
             const hx = d.x + d.w - 4;

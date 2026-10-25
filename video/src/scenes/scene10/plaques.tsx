@@ -29,8 +29,11 @@ export const tagBodyOffset = (w: number) => w * (0.16 + 0.41);
 /** The cobweb tuft radius (face units) and where Bit's strand ties into its outer ring; Bit's spot on the top edge. */
 const TUFT_R = 32;
 const TUFT_TIE: Pt = [-50 + Math.cos((45 * Math.PI) / 180) * TUFT_R * 0.38, -50 + Math.sin((45 * Math.PI) / 180) * TUFT_R * 0.38];
-/** Bit's spot on the plate's left edge (face y): just below the tuft, above siteM's door. */
-const BIT_EDGE_Y = -33;
+/** Bit's spot (face units): fix round 2b, he DANGLES head-down from the tuft's strand 3 px off the plate's left edge
+ *  (x -53), his shell on siteM's cream wall with a clear gap from the ochre plate, his head clear of the door's dark
+ *  cornice line (y -41 keeps the head >= 4 px above it). */
+const BIT_EDGE_Y = -41;
+const BIT_EDGE_X = -53;
 
 export type HangPlaqueProps = {
   /** Face centre (world) + size (face side, world px) + the wall point of the bracket. */
@@ -106,11 +109,12 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
   // He lunges down against the strand in short bursts.
   if (p.bit && t >= p.bit.at) {
     const bs = p.bit.size / s;
-    const stuck: Pt = [-50.5, BIT_EDGE_Y];
+    const stuck: Pt = [BIT_EDGE_X, BIT_EDGE_Y];
     const path: Pt[] = [
       [-19, -66],
       [-21.5, -51],
       [-50.5, -51],
+      [-50.5, BIT_EDGE_Y],
       stuck,
     ];
     const crawlAt = p.bit.at + 0.1;
@@ -127,17 +131,33 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
         if (d >= bt && d < bt + 0.32) burst = Math.max(burst, Math.sin(((d - bt) / 0.32) * Math.PI));
         if (d >= bt) last = bt;
       }
-      // a lunge down (away from the web) that the strand yanks back, the body rocking on its feet
+      // a lunge down (away from the web) that the strand yanks back, a sideways WIGGLE (+-3 px world, 8 Hz) and the
+      // body rocking: a visible struggle at phone size
       const lunge = 3.4 * burst * (0.5 + 0.5 * Math.sin(d * 2 * Math.PI * 6));
-      const rock = -9 * burst * Math.sin(d * 2 * Math.PI * 7);
+      const wig = (3 / s) * burst * Math.sin(d * 2 * Math.PI * 8);
+      const rock = -12 * burst * Math.sin(d * 2 * Math.PI * 7);
       // between the bursts he is stuck STILL (his clock frozen at the end of the last burst): crisp beats, no idle fidget
       const still = burst <= 0 && last >= 0 ? arrive + last + 0.32 : undefined;
+      const bx = stuck[0] + Math.min(0, wig);
       const by = stuck[1] + lunge;
-      // facing down (flip + rot -90: his feet on the edge, toward +x)
-      const bitNode = <Bit x={stuck[0]} y={by} size={bs} flip state={burst > 0.2 ? 'scuttle' : 'idle'} rot={-90 + rock} look="forward" blink={false} seed={`${seed}/bit`} />;
-      // the one strand: from his back leg (up, at his rear) into the tuft's outer ring (taut in a lunge)
-      const leg: Pt = [stuck[0] - 1.5, by - bs * 0.34];
+      // facing down (flip + rot -90: his underside toward the plate, +x); the shell's dome on the cream wall
+      const bitNode = <Bit x={bx} y={by} size={bs} flip state={burst > 0.2 ? 'scuttle' : 'idle'} rot={-90 + rock} look="forward" blink={false} seed={`${seed}/bit`} />;
+      // SPLAYED legs (fix round 2b): four thin legs fanned out from his underside into the gap, flailing in a burst,
+      // so the round shell + antennae + legs read as a beetle, not a speck
+      const k = bs / 20;
+      let legsD = '';
+      [[-5, -38], [-1.5, -12], [2, 14], [5.5, 40]].forEach(([along, ang], i) => {
+        const a = ((ang + (burst > 0 ? 18 * Math.sin(d * 2 * Math.PI * 9 + i * 1.7) : 0)) * Math.PI) / 180;
+        const r0: Pt = [bx + 0.4 * k, by + along * k];
+        const len = 6.5 * k;
+        const mid: Pt = [r0[0] + Math.cos(a) * len * 0.55, r0[1] + Math.sin(a) * len * 0.55];
+        const tip: Pt = [mid[0] + Math.cos(a + (ang < 0 ? -0.5 : 0.5)) * len * 0.55, mid[1] + Math.sin(a + (ang < 0 ? -0.5 : 0.5)) * len * 0.55];
+        legsD += `M${r0[0].toFixed(2)} ${r0[1].toFixed(2)}L${mid[0].toFixed(2)} ${mid[1].toFixed(2)}L${tip[0].toFixed(2)} ${tip[1].toFixed(2)}`;
+      });
+      // the one strand: from his back end (up, at his rear) into the tuft's outer ring (taut in a lunge)
+      const leg: Pt = [bx - 1.5, by - bs * 0.42];
       face.push(<Ink key="strand" d={`M${leg[0].toFixed(1)} ${leg[1].toFixed(1)}L${TUFT_TIE[0].toFixed(1)} ${TUFT_TIE[1].toFixed(1)}`} width={1.5 / s} color={palette.cream} taper={false} vary={0} seed={`${seed}/strand`} />);
+      face.push(<Ink key="bitlegs" d={legsD} width={1.3 / s} taper={false} vary={0} seed={`${seed}/bitlegs`} />);
       face.push(still !== undefined ? <TimeShift key="bit" by={t - still}>{bitNode}</TimeShift> : <React.Fragment key="bit">{bitNode}</React.Fragment>);
     }
   }

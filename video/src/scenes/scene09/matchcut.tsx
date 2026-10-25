@@ -59,9 +59,19 @@ export const WIRE_HOLE = (() => {
   }
   return `M${top.join('L')}L${bot.join('L')}Z`;
 })();
-/** The A2 ghost (the whole Stoop Street view) leaves in ONE pop during the pull-back's cruise (zoom ~4.2, ~72 px/frame),
- *  revealing the hill. */
-export const A2_BAND_UNTIL = B.hidden + 0.43;
+/** Fix round 2b, the 'to install' BUILD (was ONE full-frame pop in the cruise at 2.862, ~72 px/frame: a jump cut): the A2
+ *  ghost (the whole Stoop Street view) comes apart outward from door #4 in four steps while the camera is still in its
+ *  ramp (< ~50 px/frame at the corners), each step revealing the hill behind it:
+ *    props (f79) the lamp post, the walkers (+ bike) and the puddle pop off;
+ *    right (f81) everything right of the hero house above the street line (side street, right row, towers) -> houses #5, #6;
+ *    left  (f82) everything left of it (the neighbour) -> houses #3, #2;
+ *    all   (f83) the hero facade + the street go: house #4 (A2's door, browser and plaque kept by DoorMatch, the quarter-size
+ *          doorstep by A2Ground) on the terrace street, re-toned to A2's pavement so the ground value holds.
+ *  Each newly revealed row-0 plaque blinks as its house appears (hill.tsx NearLodRow0). */
+export const GHOST = {props: B.to - 0.1, right: B.to - 0.052, left: B.to - 0.007, all: B.to + 0.032};
+export const A2_BAND_UNTIL = GHOST.all;
+/** The ghost's clip boundaries in A2 world: the hero house's sides and the B-world street line (row 0's base 1500). */
+export const GHOST_CUT = {left: STOOP.hero.x, right: STOOP.hero.x + STOOP.hero.w, street: (1500 - 1182) / 0.25};
 /** The door overlay hands back to house #4's own (now fixed, sage) door. */
 export const DOOR_MATCH_UNTIL = B.single;
 

@@ -11,7 +11,7 @@ import {mat, XG} from '../../lib/xf';
 import {captionFontStack, useCaptionFont} from '../../lib/font';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {crown, line, polyPath, Pt, rectPath, roundRect} from '../../lib/sketch';
+import {crown, line, polyPath, Pt, rect, rectPath, roundRect} from '../../lib/sketch';
 import {BrowserChrome, OLD_QUARTER, PopUp, SI, SiteFacade} from './kit';
 import {HangPlaque, HangPlaqueProps} from './plaques';
 
@@ -151,6 +151,57 @@ const StallRing: React.FC<{x: number; y: number; r: number; at: number}> = ({x, 
   );
 };
 
+/** siteL's and siteR's pages (fix round 2b: the three windows were one stamped page): siteL a blog page (an image tile
+ *  with a sun-over-hill doodle left, a sage title bar + two lines right, one more line under both); siteR a shop page (a
+ *  centred peach banner, a row of three framed product tiles, a sage button). siteM keeps the plain default page until
+ *  its update takes over on 'anymore'. Screen-local coords (BrowserChrome `content`), static. */
+const PageL: React.FC<{w: number; h: number}> = ({w, h}) => {
+  const pad = 9;
+  const tw = w * 0.38;
+  const th = h - pad * 2 - 16;
+  const x1 = pad + tw + 9;
+  const hill = `M${pad} ${pad + th}Q${pad + tw * 0.35} ${pad + th * 0.45} ${pad + tw * 0.7} ${pad + th * 0.7}T${pad + tw} ${pad + th * 0.6}V${pad + th}Z`;
+  return (
+    <>
+      <Fill d={rectPath(pad, pad, tw, th)} color={palette.mintPale} offset={false} mode="none" seed="s10pg/L/img" />
+      <Fill d={hill} color={palette.sage} offset={false} mode="none" seed="s10pg/L/hill" />
+      <Fill d={`M${pad + tw * 0.68 + 6} ${pad + th * 0.3}a6 6 0 1 0 0.01 0Z`} color={palette.sun} offset={false} mode="none" seed="s10pg/L/sun" />
+      <Fill d={rectPath(x1, pad, w - x1 - pad, 13)} color={palette.sage} offset={false} mode="none" seed="s10pg/L/title" />
+      <Ink
+        d={rect(pad, pad, tw, th, {seed: 's10pg/L/imgI', over: 1}) + line(x1, pad + 27, w - pad - 6, pad + 27, {seed: 's10pg/L/l1', over: 0, breaks: false}) + line(x1, pad + 39, w - pad - 22, pad + 39, {seed: 's10pg/L/l2', over: 0, breaks: false}) + line(pad, h - pad - 3, w * 0.62, h - pad - 3, {seed: 's10pg/L/l3', over: 0, breaks: false})}
+        width={SI.hair}
+        taper={false}
+        seed="s10pg/L/ink"
+      />
+    </>
+  );
+};
+const PageR: React.FC<{w: number; h: number}> = ({w, h}) => {
+  const pad = 8;
+  const bw = w * 0.62;
+  const ty = pad + 22;
+  const n = 3;
+  const gap = 7;
+  const tw = (w - pad * 2 - gap * (n - 1)) / n;
+  const tH = Math.min(tw * 0.9, h - ty - 26);
+  let tiles = '';
+  let tileFill = '';
+  for (let i = 0; i < n; i++) {
+    const x = pad + i * (tw + gap);
+    tiles += rect(x, ty, tw, tH, {seed: `s10pg/R/t${i}`, over: 1});
+    tileFill += rectPath(x + tw * 0.28, ty + tH * 0.3, tw * 0.44, tH * 0.44);
+  }
+  const btnY = ty + tH + 6;
+  return (
+    <>
+      <Fill d={rectPath((w - bw) / 2, pad, bw, 13)} color={palette.peach} offset={false} mode="none" seed="s10pg/R/ban" />
+      <Fill d={tileFill} color={palette.tan} offset={false} mode="none" seed="s10pg/R/prod" />
+      <Fill d={roundRect(w - pad - 40, btnY, 40, 12, 5)} color={palette.sage} offset={false} mode="none" seed="s10pg/R/btn" />
+      <Ink d={tiles + line(pad, btnY + 6, pad + 46, btnY + 6, {seed: 's10pg/R/l1', over: 0, breaks: false})} width={SI.hair} taper={false} seed="s10pg/R/ink" />
+    </>
+  );
+};
+
 export type SitesProps = {
   popAt: [number, number, number];
   /** siteM's browser starts its stalled update. */
@@ -188,8 +239,11 @@ export const Sites: React.FC<SitesProps> = ({popAt, updateAt, wobbleAt}) => {
   const node = (id: SiteId, i: number) => {
     const c = S[id];
     const browserSlot =
-      id === 'M'
-        ? (r: [number, number, number, number]) => {
+      id !== 'M'
+        ? (r: [number, number, number, number]) => (
+            <BrowserChrome x={r[0]} y={r[1]} w={r[2]} h={r[3]} ink={SI.mid} content={id === 'L' ? ({w, h}) => <PageL w={w} h={h} /> : ({w, h}) => <PageR w={w} h={h} />} seed={`oq/site${id}/bw`} />
+          )
+        : (r: [number, number, number, number]) => {
             const rs = ringSpot(r);
             return (
               <>
@@ -198,12 +252,11 @@ export const Sites: React.FC<SitesProps> = ({popAt, updateAt, wobbleAt}) => {
                 <StallRing x={rs.x} y={rs.y} r={rs.r} at={updateAt} />
               </>
             );
-          }
-        : undefined;
+          };
     return (
       <PopUp key={id} at={popAt[i]} x={c.x + c.w / 2} y={OLD_QUARTER.base + 24}>
         <Roof id={id} />
-        <SiteFacade x={c.x} y={OLD_QUARTER.base} w={c.w} storeys={c.storeys} storeyH={(OLD_QUARTER.base - c.top) / c.storeys} fill={c.fill} roof="cornice" browser={c.browser} door={c.door} plaque={false} lock="closed" cols={c.w > 300 ? 3 : 2} seed={`oq/site${id}`} slots={browserSlot ? {browser: browserSlot} : undefined} />
+        <SiteFacade x={c.x} y={OLD_QUARTER.base} w={c.w} storeys={c.storeys} storeyH={(OLD_QUARTER.base - c.top) / c.storeys} fill={c.fill} roof="cornice" browser={c.browser} door={c.door} plaque={false} lock="closed" cols={c.w > 300 ? 3 : 2} seed={`oq/site${id}`} slots={{browser: browserSlot}} />
         {id === 'R' ? (
           <>
             <Fill d={G.balcRail} color={palette.sage} seed="oq/brail" />

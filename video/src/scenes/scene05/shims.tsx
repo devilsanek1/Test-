@@ -122,8 +122,9 @@ export type InvestigatorProps = Frame & {
   /** Fix round 3: white sneakers over the kit's shoe blocks and a flat sand contact sliver under the soles (the figure
    *  stands ON the tread). Default true. */
   shoes?: boolean;
-  /** Fix round 3: a hair tie (this colour) across a long-hair head at the nape (the ponytail read). */
-  hairTie?: string;
+  /** Fix round 3: a PONYTAIL hanging from the back of the head down the coat (hair colour, ink outline) with a hair tie
+   *  of this colour at its root (ref 2 f_33): the hair separates from the coat. Use with a 'short' head. */
+  ponytail?: string;
 };
 
 /** World centre of an investigator's raised tablet (for beams). */
@@ -184,11 +185,19 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
   // the lanyard: its strap seen from behind, a shallow U round the nape from shoulder-neck to shoulder-neck (~2 px)
   const ny = -g.h;
   const lan = `M${(-g.hr * 0.95).toFixed(1)} ${(ny + g.hr * 0.12).toFixed(1)}Q0 ${(ny + g.hr * 0.62).toFixed(1)} ${(g.hr * 0.95).toFixed(1)} ${(ny + g.hr * 0.12).toFixed(1)}`;
-  const lanOn = p.lanyard ?? p.hair !== 'long';
+  const lanOn = p.lanyard ?? (p.hair !== 'long' && !p.ponytail);
   const shoesOn = p.shoes ?? true;
-  // the hair tie: a short peach band across the long hair at the nape (ponytail), ink outlined
-  const tieY = g.hy + g.hr * 0.95;
-  const tie = p.hairTie && p.hair === 'long' ? roundRect(-g.hr * 0.3, tieY - g.hr * 0.11, g.hr * 0.6, g.hr * 0.22, g.hr * 0.08) : '';
+  // the ponytail: a tapered tail from the back of the head down over the collar, its tie at the root
+  const pt = p.ponytail
+    ? (() => {
+        const r = g.hr;
+        const y0 = g.hy + r * 0.45;
+        const y1 = g.hy + r * 2.75;
+        const tail = `M${-r * 0.3} ${y0}C${-r * 0.42} ${y0 + r * 0.9} ${-r * 0.3} ${y1 - r * 0.6} ${r * 0.06} ${y1}C${r * 0.22} ${y1 - r * 0.7} ${r * 0.4} ${y0 + r * 0.9} ${r * 0.3} ${y0}Z`;
+        const tie = roundRect(-r * 0.33, y0 + r * 0.02, r * 0.66, r * 0.24, r * 0.1);
+        return {tail, tie, strand: `M${-r * 0.02} ${y0 + r * 0.45}C${-r * 0.08} ${y0 + r * 1.1} ${0} ${y1 - r * 0.7} ${r * 0.05} ${y1 - r * 0.35}`};
+      })()
+    : null;
   // the second arm's pose: drawn BEFORE the body when it is mostly behind it (hands on the hips, a hand at the brow:
   // only the elbow shows past the coat, the back-view read), after it when it is out in front (point, clipboard)
   const before: React.ReactNode[] = [];
@@ -232,10 +241,12 @@ export const Investigator: React.FC<InvestigatorProps> = (p) => {
       {before}
       <Person seed={seed} legs torsoH={TORSO} legH={LEG} body={coat} hair={p.hair} hairColor={p.hairColor} acc={p.acc ?? []} ink={W} walk={p.walk} />
       {shoesOn ? <Sneakers w={g.w} W={W} seed={seed} /> : null}
-      {tie ? (
+      {pt ? (
         <>
-          <Fill d={tie} color={p.hairTie ?? palette.peach} offset={false} mode="none" seed={`${seed}/tieF`} />
-          <Ink d={tie} width={W * 0.6} taper={false} vary={0} seed={`${seed}/tieI`} />
+          <Fill d={pt.tail} color={p.hairColor ?? palette.brown} offset={false} mode="none" seed={`${seed}/ptF`} />
+          <Ink d={pt.tail + pt.strand} width={W * 0.8} taper={false} seed={`${seed}/ptI`} />
+          <Fill d={pt.tie} color={p.ponytail ?? palette.peach} offset={false} mode="none" seed={`${seed}/tieF`} />
+          <Ink d={pt.tie} width={W * 0.6} taper={false} vary={0} seed={`${seed}/tieI`} />
         </>
       ) : null}
       {lanOn ? <Ink d={lan} width={W * 0.62} taper={false} seed={`${seed}/lan`} /> : null}

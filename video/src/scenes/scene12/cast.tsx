@@ -4,30 +4,30 @@
 // time. S01's components are reused as they are (scene01/cast.tsx, plaza.tsx, shims.tsx): the plaza at the end of S12
 // IS S01's code at t = 0.
 import React from 'react';
-import {clamp, ease as E, lerp, useTime} from '../../lib/time';
-import {TimeProvider} from '../../lib/time';
+import {clamp, ease as E, lerp, TimeProvider, useTime} from '../../lib/time';
 import {Elephant, popSwitch} from '../../lib/mascot';
 import {GovEvents, PLAZA} from '../shared/sets';
 import {Bit, EdgeOnlooker, StickyNote} from '../shared/props';
 import {palette} from '../../lib/theme';
 import {CitizenPlan, OnlookerPhoneArm, PigeonPlan} from '../scene01/cast';
 import {NearPlan, ONL_DX, ONLOOKERS, S01_BIT, S01_CITIZENS, S01_GOV, S01_NEAR, S01_PIGEONS, S01_PIP, S01_PIP_SEED} from '../scene01/plaza';
-import {B, DUR, pClock, R0, stepIndex} from './timing';
+import {B, pClock, R0, stepIndex} from './timing';
 
 const pc = pClock;
 
 // ---------------------------------------------------------------- citizens
 
 /** P phase (cut -> 'before'): the shutdown's audience as S12 opens on it: phones up, heads turned to govB; on
- *  'governments' the phones come down (fA, sB, then the left onlooker), fD points at govB on 'those' and lowers it, and
+ *  'governments' the phones come down (fA, then the left onlooker), sB points at govB on 'those' and lowers it, and
  *  every head swaps back to the back view before the rewind (= S01's settled state, so the R phase picks up seamlessly). */
 const P_OVERRIDES: Record<string, Partial<CitizenPlan>> = {
   's01/fA': {phone: {up: -1, down: pc(B.phonesDown[0]), side: 1}, turn: [{t: -1, d: 1}, {t: pc(B.headsBack[0]), d: 0}], lean: [{t: -1, a: 3}, {t: pc(B.headsBack[0]), a: 0}]},
   's01/fC': {turn: [{t: -1, d: -1}, {t: pc(B.headsBack[1]), d: 0}], lean: [{t: -1, a: -6}, {t: pc(B.headsBack[1]), a: 0}]},
-  // fD (right of govB, x 905): points UP-LEFT at govB's shuttered window on 'those', lowers it before 'did'
-  's01/fD': {turn: [{t: -1, d: -1}, {t: pc(B.pointDown + 0.04), d: 0}], point: {at: pc(B.point), side: -1, hand: [-150, -132], downAt: pc(B.pointDown)}, lean: [{t: -1, a: -4}, {t: pc(B.point), a: -6}, {t: pc(B.pointDown), a: 0}]},
-  's01/sA': {turn: [{t: -1, d: 1}, {t: pc(B.headsBack[2]), d: 0}]},
-  's01/sB': {phone: {up: -1, down: pc(B.phonesDown[1]), side: -1}, turn: [{t: -1, d: -1}, {t: pc(B.headsBack[3]), d: 0}], lean: [{t: -1, a: -4}, {t: pc(B.headsBack[3]), a: 0}]},
+  's01/fD': {turn: [{t: -1, d: -1}, {t: pc(B.headsBack[2]), d: 0}], lean: [{t: -1, a: -4}, {t: pc(B.headsBack[2]), a: 0}]},
+  's01/sA': {turn: [{t: -1, d: 1}, {t: pc(B.headsBack[3]), d: 0}]},
+  // sB (second row, x 640, under govB's right edge; brown coat, so the sleeve reads on the cream steps): points UP-LEFT
+  // at govB's shuttered window on 'those', lowers it before 'did'
+  's01/sB': {turn: [{t: -1, d: -1}, {t: pc(B.pointDown + 0.04), d: 0}], point: {at: pc(B.point), side: -1, hand: [-80, -175], downAt: pc(B.pointDown)}, lean: [{t: -1, a: -4}, {t: pc(B.point), a: -6}, {t: pc(B.pointDown), a: 0}]},
 };
 export const P_CITIZENS: CitizenPlan[] = S01_CITIZENS.map((c) => ({...c, ...(P_OVERRIDES[c.seed] ?? {})}));
 /** R phase: S01's own plans (played backwards by the clock). */
@@ -192,5 +192,3 @@ export const S11Note: React.FC<{t: number}> = ({t}) => {
     </TimeProvider>
   );
 };
-
-export const S12_DUR = DUR;

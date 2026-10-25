@@ -1,9 +1,10 @@
-// S08 watchtower + searchlight (fix round 1). The dome district moved left of the board, so the set's v3 tower (fixed at
-// x 600-650, on the board's top edge) is switched off (towerAt far in the future, no searchAt) and the scene draws its
-// own tower INSIDE the glass by the right flank, in the set's silhouette style (tealDark lattice + cabin, dark window,
-// no guard), and a flat light cone: one solid 1.6 px ink edge on the upper side, none below, stopping at the dome's far
-// (left) side instead of the frame edge; a warm (peach) light at a FIXED translucency (no fades: it has to read on the
-// light glass), one step quieter on 'day' so it never becomes the brightest shape of the dusk.
+// S08 watchtower + searchlight (fix round 1; fix round 3: it has to READ with the sound off: 'Cloudflare sees it').
+// The dome district moved left of the board, so the set's v3 tower (fixed at x 600-650, on the board's top edge) is
+// switched off (towerAt far in the future, no searchAt) and the scene draws its own tower INSIDE the glass by the right
+// flank: an INK-DARK silhouette (lattice + cabin) against the peach band with a one-sided peach rim (sun side), no guard.
+// The light: a wide flat CREAM cone (half 15 deg) at a FIXED ~0.7 translucency (static light shaft: no fades), both edges
+// inked (upper solid, lower dashed), switching on in 2 frames with a 3-frame lamp flash, a flat cream lit spot where it
+// lands (on the glass, or on the crowd at the dome's foot: BeamSpot); one step quieter on 'day'.
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {ease as E, prog, useTime} from '../../lib/time';
@@ -47,7 +48,29 @@ const TOWER = (() => {
   return {lattice, cabin, window, lamp};
 })();
 
-/** The watchtower: rises at `at` (scaleY 0 -> 1.04 -> 1 about its base, 0.3 + 0.15 s). */
+/** The cabin's sun-side (right) rim: a peach strip down the cabin's right edge + along the roof's right slope. */
+const CABIN_RIM = (() => {
+  const T = TOWER8;
+  const [cx, cy, cw, ch] = T.cabin;
+  const r = 3.2;
+  return (
+    poly([
+      [cx + cw - r, cy + 2],
+      [cx + cw, cy + 2],
+      [cx + cw, cy + ch - 3],
+      [cx + cw - r, cy + ch - 3],
+    ]) +
+    poly([
+      [cx + cw / 2 + 2, T.top + 2],
+      [cx + cw + 5, cy + 1],
+      [cx + cw + 1, cy + 1 + r * 0.6],
+      [cx + cw / 2 + 1, T.top + 2 + r],
+    ])
+  );
+})();
+
+/** The watchtower: rises at `at` (scaleY 0 -> 1.04 -> 1 about its base, 0.3 + 0.15 s). Fix round 3: an INK-DARK
+ *  silhouette on the peach band (was tealDark on pale glass: its rise on 'says' was lost) with a peach rim. */
 export const Watchtower8: React.FC<{at: number}> = ({at}) => {
   const t = useTime();
   if (t < at) return null;
@@ -56,10 +79,11 @@ export const Watchtower8: React.FC<{at: number}> = ({at}) => {
   const T = TOWER8;
   return (
     <XG m={tk !== 1 ? mat.about(mat.scale(1, tk), (T.x0 + T.x1) / 2, T.base) : mat.I}>
-      <Ink d={TOWER.lattice} width={3.2} color={palette.tealDark} taper={false} vary={0} seed="s8/tw" />
-      <Fill d={TOWER.cabin} color={palette.tealDark} offset={false} seed="s8/twc" />
+      <Ink d={TOWER.lattice} width={3.4} color={palette.ink} taper={false} vary={0} seed="s8/tw" />
+      <Fill d={TOWER.cabin} color={palette.ink} offset={false} seed="s8/twc" />
+      <Fill d={CABIN_RIM} color={palette.peach} offset={false} seed="s8/twr" />
       <Fill d={TOWER.window} color={DEEP_WINDOW} offset={false} seed="s8/tww" />
-      <Fill d={TOWER.lamp} color={palette.tealDark} offset={false} seed="s8/twl" />
+      <Fill d={TOWER.lamp} color={palette.ink} offset={false} seed="s8/twl" />
     </XG>
   );
 };
@@ -90,14 +114,24 @@ export const beamEnd = (deg: number): Pt => {
   return [o[0] - Math.cos(r) * s, o[1] + Math.sin(r) * s];
 };
 
-/** The searchlight cone (pointing LEFT across the dome; angle = degrees BELOW the horizontal). */
-export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; duskAt?: number; half?: number}> = ({at, angle, duskAt, half = 8}) => {
+/** Where the beam's centre line ends at time t: on the glass, or (pointing down past the foot) on the crowd in front
+ *  of it (`foot` = true). */
+export const beamHit = (deg: number): {p: Pt; foot: boolean} => {
+  const e = beamEnd(deg);
+  return {p: e, foot: e[1] >= DOME8.by - 0.5};
+};
+
+/** The searchlight cone (pointing LEFT across the dome; angle = degrees BELOW the horizontal). Fix round 3: half 15 deg,
+ *  flat cream at a fixed 0.7 (0.5 after `duskAt`), both edges inked (upper solid, lower dashed), full length in 2
+ *  frames (0.07 s) with a 3-frame lamp flash, a flat cream lit spot where the centre line meets the glass. Clip it to
+ *  the dome interior in the scene. */
+export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; duskAt?: number; half?: number}> = ({at, angle, duskAt, half = 15}) => {
   const t = useTime();
   const look = useLook();
   if (t < at || look.fills !== 'color') return null;
   const o = TOWER8.light;
   const a = angle(t);
-  const grow = E.outCubic(prog(t, at, 0.35));
+  const grow = E.outCubic(prog(t, at, 0.07));
   const end = (deg: number): Pt => {
     const r = (deg * Math.PI) / 180;
     const s = rayToGlass(o, deg) * grow;
@@ -106,11 +140,31 @@ export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; d
   const up = end(a - half);
   const mid = end(a);
   const lo = end(a + half);
+  const q1 = end(a - half * 0.5);
+  const q2 = end(a + half * 0.5);
   const dusk = duskAt !== undefined && t >= duskAt;
+  const flash = t < at + 0.1;
+  const hit = beamHit(a);
+  const tan = (a * Math.PI) / 180;
   return (
     <>
-      <path d={poly([o, up, mid, lo])} fill={palette.peach} opacity={dusk ? 0.45 : 0.6} />
-      <path d={`M${o[0]} ${o[1]}L${up[0].toFixed(1)} ${up[1].toFixed(1)}`} fill="none" stroke={palette.ink} strokeWidth={SI.hair} strokeLinecap="round" />
+      <path d={poly([o, up, q1, mid, q2, lo])} fill={palette.cream} opacity={dusk ? 0.5 : 0.7} />
+      {grow >= 0.999 && !hit.foot ? <ellipse cx={mid[0]} cy={mid[1]} rx={13} ry={7} transform={`rotate(${((-tan * 180) / Math.PI + 90).toFixed(1)} ${mid[0].toFixed(1)} ${mid[1].toFixed(1)})`} fill={palette.cream} /> : null}
+      <path d={`M${o[0]} ${o[1]}L${up[0].toFixed(1)} ${up[1].toFixed(1)}`} fill="none" stroke={palette.ink} strokeWidth={2} strokeLinecap="round" />
+      <path d={`M${o[0]} ${o[1]}L${lo[0].toFixed(1)} ${lo[1].toFixed(1)}`} fill="none" stroke={palette.ink} strokeWidth={1.6} strokeLinecap="round" strokeDasharray="9 7" />
+      {flash ? <circle cx={o[0] - 3} cy={o[1]} r={11} fill={palette.cream} stroke={palette.ink} strokeWidth={1.6} /> : <circle cx={o[0] - 3} cy={o[1]} r={3.6} fill={palette.cream} />}
     </>
   );
+};
+
+/** The lit spot on the crowd in front of the dome's foot while the beam points down past the foot line: a flat cream
+ *  pool (drawn under the pile's figures). */
+export const BeamSpot: React.FC<{at: number; angle: (t: number) => number; until?: number}> = ({at, angle, until}) => {
+  const t = useTime();
+  const look = useLook();
+  if (t < at + 0.07 || (until !== undefined && t >= until) || look.fills !== 'color') return null;
+  const hit = beamHit(angle(t));
+  if (!hit.foot) return null;
+  // on the foot where the beam meets it (over the plinth and the glass's bottom), the caught heads in front of it
+  return <ellipse cx={hit.p[0]} cy={DOME8.by - 3} rx={32} ry={10} fill={palette.cream} />;
 };

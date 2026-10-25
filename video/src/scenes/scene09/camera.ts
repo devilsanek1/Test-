@@ -2,9 +2,11 @@
 //   A1  Stoop Street wide  (560, 1020) zoom 1.00 -> 1.03 (in-out sine, cut -> cut(out)): a 3 % breath on the dusk street,
 //       the VP STOOP.vp (720, 1060) sits at screen (700, 1000) = where S08's sun set (stays within 5 px).
 //   A2  door #4 close      (330, 900) zoom 1.5, HELD STILL (hard cut on 'somebody' -> the hidden cut).
-//   B   TerraceHill        log-anchored pull-back (540, 1407, 6) -> (540, 960, 1), MOTION.camera.reveal from rest,
-//       anchored on house #4's lock (world (540, 1464.5)) released from screen (540, 1305) to its rest spot; lands on
-//       'single' and HOLDS still to the tram wipe.
+//   B   TerraceHill        log-anchored pull-back (540, 1407, 6) -> (540, 890, 1), MOTION.camera.reveal from rest,
+//       anchored on house #4's lock (world (540, 1464.5)) released from screen (540, 1305) to its rest spot (540, 1534.5);
+//       lands on 'single' and HOLDS still to the tram wipe. Fix round 2b: the rest camera sits 70 px HIGHER than the set's
+//       canvas rest (cam y 890, screen = world + 70): row 0's base at screen 1570, the sun's crest top at 640 (>= 600 under
+//       the captions), the near street band below for the standers, their shadows and the near balustrade.
 // screen = (world - cam) * zoom + (540, 960).
 
 import {MOTION, ease as E, clamp, mat, Mat} from '../../lib';
@@ -16,7 +18,9 @@ const C: [number, number] = [540, 960];
 export const A1 = {x: 560, y: 1020, z0: 1, z1: 1.03};
 export const A2 = {x: 330, y: 900, zoom: 1.5};
 /** Part B: the lock anchor (world) and its screen path. */
-export const BPULL = {anchor: [540, 1464.5] as [number, number], from: 1305, to: 1464.5, zoom0: 6};
+export const BPULL = {anchor: [540, 1464.5] as [number, number], from: 1305, to: 1534.5, zoom0: 6};
+/** Part B's rest: screen = world + (0, REST_DY). */
+export const REST_DY = BPULL.to - BPULL.anchor[1];
 
 export function camAt(t: number): Cam {
   if (t < B.cutA2) {

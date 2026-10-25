@@ -1,8 +1,9 @@
-// scene07/parts.tsx — S07 local helpers: the flat camera, the fill-first ink reveal, the wire copies (Bit rides one),
-// the board clones (with a level of detail), the pigeons, Pip with his flyer gag, the reader's phone copy, the glass
-// panes kept mintPale under the golden relight, the far-roof details and the clock's speed wedge.
+// scene07/parts.tsx — S07 local helpers: the flat camera, the wire copies (Bit rides one), the board clones (with a
+// level of detail), the pigeons, Pip with his flyer gag, the reader's phone copy and the other phones' dark screens, the
+// glass panes kept mintPale under the golden relight, the far-roof, wall and ground details and the clock's speed
+// wedge. The fill-first pen reveal is scene07/reveal.tsx.
 
-import React, {useId} from 'react';
+import React from 'react';
 import {ease as E, Fill, Ink, lerp, mat, Mat, osc, palette, prog, springAt, springs, Tod, useTime, XG, clamp, Pt, hline, poly, polyPath, line} from '../../lib';
 import {Elephant, hop} from '../../lib/mascot';
 import {rand} from '../../lib/rng';
@@ -353,22 +354,35 @@ export const PhoneCopy: React.FC<{x: number; y: number; at: number; rot?: number
 };
 
 /** A raised phone's screen taken out of the white-paper family (fix round 2: four white phones + the notice + 8 clones +
- *  4 wire copies + 2 cards made the board a white mosaic): a teal-dark screen inset in the kit phone's white face (22 x
- *  38 local, scaled with the reader) with a tiny peach copy glyph, lit 0.17 s after the raise pop (once the kit's
- *  overshoot has settled: the screen wakes). (x, y) = the kit phone face centre (world, measured at rest), dy = the
- *  reader's own idle bob (EdgeOnlooker: osc(t, 0.5, rand(seed, 'b') x 6) x 1.5). */
-export const PhoneScreen: React.FC<{x: number; y: number; s: number; at: number; seed: string}> = ({x, y, s, at, seed}) => {
+ *  4 wire copies + 2 cards made the board a white mosaic): a teal-dark screen inset in the kit phone's white face (a thin
+ *  white rim stays, clear of the grip's finger tips) with a tiny peach copy glyph, lit 0.17 s after the raise pop (once
+ *  the kit's overshoot has settled: the screen wakes, with the 20 % -> 100 % spring). (x, y, w, h) = the kit phone's
+ *  white face (world), measured on a render at tRef; dy = the reader's own idle bob (EdgeOnlooker: osc(t, 0.5,
+ *  rand(seed, 'b') x 6) x 1.5) relative to tRef. */
+export const PhoneScreen: React.FC<{x: number; y: number; w: number; h: number; at: number; tRef: number; seed: string}> = ({x, y, w, h, at, tRef, seed}) => {
   const t = useTime();
   if (t < at) return null;
-  const dy = osc(t, 0.5, rand(seed, 'b') * 6) * 1.5;
+  const bob = (tt: number) => osc(tt, 0.5, rand(seed, 'b') * 6) * 1.5;
   const k = 0.2 + 0.8 * springAt(t, at, springs.pop);
-  const w = 16.6 * s;
-  const h = 30 * s;
+  const sw = w * 0.64;
+  const sh = h * 0.82;
+  const gw = sw * 0.46;
+  const gh = sh * 0.36;
+  const f = gw * 0.28;
+  const glyph = polyPath([
+    [-gw / 2, -gh / 2],
+    [gw / 2 - f, -gh / 2],
+    [gw / 2, -gh / 2 + f],
+    [gw / 2, gh / 2],
+    [-gw / 2, gh / 2],
+  ]);
   return (
-    <XG m={mat.compose(mat.translate(x, y + dy), mat.scale(k))}>
-      <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={2.4 * s} fill={palette.tealDark} />
-      <rect x={-w * 0.22} y={-h * 0.2} width={w * 0.44} height={h * 0.42} fill={palette.peach} />
-      <path d={`M${(-w * 0.14).toFixed(2)} ${(-h * 0.08).toFixed(2)}h${(w * 0.24).toFixed(2)}`} stroke={palette.tealDark} strokeWidth={Math.max(1, s * 1.1)} strokeLinecap="round" />
+    <XG m={mat.compose(mat.translate(x, y + bob(t) - bob(tRef)), mat.scale(k))}>
+      <rect x={-sw / 2} y={-sh / 2} width={sw} height={sh} rx={sw * 0.16} fill={palette.tealDark} />
+      <XG m={mat.translate(0, -sh * 0.06)}>
+        <path d={glyph} fill={palette.peach} />
+        <path d={`M${(-gw * 0.3).toFixed(2)} ${(-gh * 0.18).toFixed(2)}h${(gw * 0.42).toFixed(2)}`} stroke={palette.tealDark} strokeWidth={Math.max(1.2, gh * 0.09)} strokeLinecap="round" />
+      </XG>
     </XG>
   );
 };

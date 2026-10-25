@@ -82,6 +82,14 @@ const cutWorldX = (sx: number) => PUSHED.x + (sx - 540) / PUSHED.z;
  *  (fix round 1: reader 1's phone + its ring piled up on the notice's lock sketch and ringed Bit doodle). World, measured
  *  on the render at t 1.6 (raised and settled from 1.42). */
 const PHONE: Pt = [728, 1156];
+/** The other three raised phones' white faces (world; measured on the full-res render at t 1.6, settled after the pop):
+ *  they get a teal-dark screen (PhoneScreen) so only reader 2's phone (the leak + its ring) stays in the white family. */
+const SCREENS = [
+  {i: 0, x: 187.1, y: 1184.0, w: 36.8, h: 67.9},
+  {i: 1, x: 297.0, y: 1234.4, w: 39.6, h: 70.8},
+  {i: 3, x: 839.4, y: 1142.5, w: 35.8, h: 64.2},
+];
+const SCREEN_TREF = 1.6;
 /** J4 'still fixing...' (props FixSign, fs 25 = 26.5 px lettering on screen): hung from a nail on the blind's top-left so
  *  the card hangs over the shop window's top-left corner, above the round elephant sign. Fix round 2: 24 world px left
  *  and fs 26 -> 25 so the ellipsis ends left of screen x 945 after the push (it sat under the TikTok / Reels like rail
@@ -337,6 +345,9 @@ const Scene07: React.FC = () => {
             reader 2's cap instead of across it */}
         {[3, 2].map((i) => reader(i))}
         <PhoneCopy x={PHONE[0]} y={PHONE[1]} at={B.was - 0.1} ringAt={B.was - 0.06} rot={-3} ringR={39} />
+        {SCREENS.map((p) => (
+          <PhoneScreen key={p.i} x={p.x} y={p.y} w={p.w} h={p.h} at={RAISE[p.i] + 0.17} tRef={SCREEN_TREF} seed={`nc/rd${p.i}`} />
+        ))}
 
         {/* the lens wipe: the printed sheet at the lens shrinks into the notice, on top of everything until it lands: S06's
             page itself (screen space), exactly what S06's Wiper draws above both scenes in the film */}
