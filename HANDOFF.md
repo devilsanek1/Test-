@@ -104,7 +104,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
 ## 3. The queue (in order) at handoff
 
 1. **RUNNING again since 2026-10-25 20:20 UTC** (the owner: "continue with video 2"). **The v2 G0 workflow** `context/workflows/v2-g0-angles-wf_b7b190a7-4fe.js` (now with the hook-sound and palette lines); output `video/docs/v2/G0_ANGLES.md`. Present the top 3; the owner picks.
-2. **PAUSED by the owner at 2026-10-25 19:52 UTC (nothing produced). When the owner says go, relaunch `context/workflows/look-cozy-and-scale-wf_ee30e562-0c7.js` to research the "cozy + scale" look** (owner, 2026-10-25 17:32). Output `video/docs/look/COZY_AND_SCALE.md` plus `video/docs/look/research/*.md`. It must also follow the palette direction in `video/docs/look/PALETTE.md` (owner, after the pause).
+2. **RUNNING in the v3 session since 2026-10-26 00:10 UTC (owner engaged again via the Arcane idea and said "continue"; don't duplicate): `context/workflows/look-cozy-scale-arcane-wf_e8c65891-2ba.js` (palette rule merged in, covers v2 and v3). It replaces the paused `look-cozy-and-scale-wf_ee30e562-0c7.js`. Research the "cozy + scale" look** (owner, 2026-10-25 17:32). Output `video/docs/look/COZY_AND_SCALE.md` plus `video/docs/look/research/*.md`. It must also follow the palette direction in `video/docs/look/PALETTE.md` (owner, after the pause).
    - **Owner idea, 2026-10-25 23:30 UTC (v3 session):** reverse-engineer Arcane's camera moves and cinematic shots into
      references. When relaunched, add an Arcane lane that lists 8-12 specific moments for the owner to screen-record
      (we can't download the show), then measure each clip frame by frame (OpenCV feature tracking: pan/tilt/zoom/roll
