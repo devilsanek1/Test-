@@ -13,4 +13,6 @@ Top rules (details in the playbook):
 - The first 2-5 s matter most: state the payoff in words on frame 0. Target 30-45 s.
 - Everyday spoken language, no AI-sounding phrasing; scripts come with detailed emotional cues.
 - Captions pop in place (no clipped roll-ins). No paper edge at the top of the frame.
-- Don't waste tokens: no AI reviews before the polish gate, short agent prompts, small checkpointed tasks.
+- Never trade quality for savings: brainstorms, competing ideas with judges and design explorations at the early gates are
+  worth their tokens. Cut only waste: rework, reviews of things that will still change, polish before the story lock,
+  and lost work (small checkpointed tasks).

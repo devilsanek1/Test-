@@ -44,6 +44,21 @@ one is approved.
 
 Target: playable cuts at about hours 1, 3, 8 and 14 (video 1: hour 18.7).
 
+## Creative exploration is not waste (owner rule)
+
+Quality and output value come first. Spend generously where ideas are decided, because that is cheap compared to
+building, and it decides the outcome:
+- **G0 angle and hook:** 4-6 independent writers with different lenses (retention editor, storyteller, sceptical
+  expert, comedian, viewer), each proposing angles and hook lines. A judge panel of 3 scores them, and one synthesis
+  agent merges the winner with the best grafts. The owner picks from the top 3.
+- **G1 script:** 2-3 competing drafts plus an AI-wording critic before the radio cut.
+- **G3 animatic:** 2-3 visual concepts for the hook and the peaks (the whole film in one concept, the alternatives
+  for the key moments). The owner picks at the gate.
+- **G4 look:** 2-4 style-frame directions when the topic needs a new look.
+
+These are divergent stages: many agents, short outputs, judged together. The rules below target the convergent
+stages (building, fixing, polishing), where the measured waste happened.
+
 ## Anti-waste rules (each one fixes a measured waste)
 
 1. **No AI critics before G6** (reviews were 28 % of spend, mostly on scenes that changed afterwards). Before G6 the

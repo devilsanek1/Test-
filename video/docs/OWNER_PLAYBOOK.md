@@ -56,6 +56,10 @@ Format: **rule** — why / evidence (video, date).
 - **Lock the story with a clean sketch/animatic before big commitments; push all polish late.** — v1, 2026-10-25.
 - **Progress updates about every 30 min while working, covering all threads and including visuals, even unfinished ones.** With the new
   pipeline, the gate video is the update and between gates a one-line status. — v1.
+- **Never trade quality or output value for savings. Creative work gets the budget it needs:** multi-agent
+  brainstorms, competing ideas with judges, design and style explorations, and hook variants are excellent use of tokens.
+  "Waste" means rework, reviews of things that will still change, polish before the story is locked, and lost work.
+  — owner, 2026-10-25.
 - **No wasted tokens or time:** no reviews or polish on things that will change, short prompts, lean docs; cut what
   doesn't help (see the measured waste in `docs/PIPELINE_V2.md`). — v1, 2026-10-25.
 - **Once the owner says "final", don't redo it.** Log ideas for the next video instead. — v1, 2026-10-25.
