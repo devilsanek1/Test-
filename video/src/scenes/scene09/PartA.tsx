@@ -190,13 +190,14 @@ export function pipA(t: number): PipState {
   return {x: PA.pip.x, y: PA.pip.y, pose, squash, rotate: 0, look, expression, prop};
 }
 
-/** Where a rider (Bit) sits on Pip at state `st` and `scale`, in Pip's parent coordinates: on top of his head in the
- *  sitting / trunk-up poses, on his back in the side poses (Pip-local units, through the Elephant's own transform:
+/** Where a rider (Bit) sits on Pip at state `st` and `scale`, in Pip's parent coordinates: on top of his left ear in the
+ *  sitting / trunk-up poses (his left ear), on his back in the side poses (Pip-local units, through the Elephant's own transform:
  *  translate, rotate, scale(flip x scale), squash). */
 export function pipRidePoint(st: PipState, scale: number): [number, number] {
   const side = st.pose === 'stand-side' || st.pose === 'walk-side';
-  const lx0 = side ? -12 : -2;
-  const ly0 = side ? -62 : -88;
+  // sitting / trunk-up: on top of his left ear (the head top is under the raised trunk's curl); side poses: his back
+  const lx0 = side ? -12 : -34;
+  const ly0 = side ? -62 : -84;
   const lx = lx0 * (st.flip ? -1 : 1) * scale * (1 + st.squash * 0.55);
   const ly = ly0 * scale * (1 - st.squash);
   const a = (st.rotate * Math.PI) / 180;

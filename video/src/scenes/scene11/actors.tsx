@@ -321,13 +321,14 @@ export const HiccupRing: React.FC<{x: number; y: number; r: number; hiccups: num
 
 export type GovBWindowProps = {
   r: [number, number, number, number];
-  /** Progress steps (fraction): the address pill AND the page's fat bar + its flip-tile % readout. An UP step springs
-   *  past its value (+2.5 %) and flashes the fill cream for 2 frames; a down step snaps. */
+  /** Progress steps (fraction): the address pill AND the page's fat bar + its flip-tile % readout. An UP step JUMPS
+   *  past its value (+5 %: 8 -> ~14 %, then sags back to the value over 0.35 s), flashes the fill cream for 2 frames and
+   *  scale-pops the % tile 1.3x; a down step snaps. */
   steps: ProgressStep[];
   /** Ring hiccups. */
   hiccups: number[];
-  /** The page tries again: the fill snaps to 0 for one frame and regrows to its value over 0.25 s while 'updating...'
-   *  re-letters (no blank frames); the content bars are gone (reloading); the ring spins 2x for 0.3 s. */
+  /** The page tries again: 'updating...' re-letters (no blank frames), the content bars are gone (reloading), the ring
+   *  spins 2x for 0.3 s. The fill and the % tile HOLD (fix round 2: the only regression in the scene is 'yet'). */
   reloadAt?: number[];
   /** The page shakes 'no' (0.24 s, 5 world px decaying: the bar row shakes with it). */
   shakeAt?: number;
@@ -375,7 +376,7 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
   useCaptionFont();
   const t = useTime();
   const k = Math.max(1e-4, matScale(useXf()));
-  // the latest reload that has started: the fill snaps to 0 and regrows, the lettering re-letters (no blank frames)
+  // the latest reload that has started: the lettering re-letters (no blank frames); the fill and the % hold
   let ra: number | undefined;
   for (const r of reloadAt) if (t >= r) ra = r;
   const dx = shakeAt !== undefined && t >= shakeAt && t < shakeAt + 0.24 ? Math.sin(prog(t, shakeAt, 0.24) * Math.PI * 3) * 5 * (1 - prog(t, shakeAt, 0.24)) : 0;
@@ -391,16 +392,23 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
     const d = t - st.t;
     if (d >= 0 && d < 2 / 30 && steps[i].v < steps[i - 1].v) regress = true;
     if (d < 0 || steps[i].v <= steps[i - 1].v) continue;
-    if (d < 0.1) v += 0.025 * Math.sin((d / 0.1) * (Math.PI / 2));
-    else if (d < 0.35) v += 0.025 * Math.cos(((d - 0.1) / 0.25) * (Math.PI / 2)) ** 2;
+    // the jump: 8 -> ~14 % in 0.1 s, then it sags back to the step's value (a stall you can see at phone size)
+    if (d < 0.1) v += 0.05 * Math.sin((d / 0.1) * (Math.PI / 2));
+    else if (d < 0.45) v += 0.05 * Math.cos(((d - 0.1) / 0.35) * (Math.PI / 2)) ** 2;
     if (d < 2 / 30) flash = true;
   }
-  if (ra !== undefined) v *= prog(t, ra + 1 / 30, 0.25, E.outCubic);
   const flickOff = flickerAt !== undefined && t >= flickerAt && t < flickerAt + 0.27 && Math.floor((t - flickerAt) * 15) % 2 === 0;
   // ---- the % tile: a paper flip (old digits fold shut, new ones unfold) at each change of the shown number
   const shown = (tt: number) => Math.round(stepAt(steps, tt) * 100);
   let pct = shown(t);
   let flipY = 1;
+  // an UP step scale-pops the tile 1.3x about its centre (with the flip): the 8 -> 9 % reads on a phone
+  let tilePop = 1;
+  for (let i = 1; i < steps.length; i++) {
+    const d = t - steps[i].t;
+    if (d < 0 || d >= 0.45 || steps[i].v <= steps[i - 1].v) continue;
+    tilePop = 1 + 0.3 * (d < 0.06 ? Math.sin((d / 0.06) * (Math.PI / 2)) : Math.exp(-(d - 0.06) * 9) * Math.cos((d - 0.06) * Math.PI * 2 * 1.6));
+  }
   for (let i = 1; i < steps.length; i++) {
     const d = t - steps[i].t;
     if (d < 0 || d >= 0.16 || shown(steps[i].t) === shown(steps[i].t - 1e-3)) continue;
@@ -409,8 +417,6 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
       flipY = 1 - d / 0.08;
     } else flipY = (d - 0.08) / 0.08;
   }
-  // the reload: the tile reads the regrowing fill, counting 0 % -> back up (a new digit most frames)
-  if (ra !== undefined && t < ra + 1 / 30 + 0.25) pct = Math.round(v * 100);
   const iw = inkW;
   // the % tile sits at the LEFT end (over the fill it reports; away from the spinning ring), 'updating...' after it
   const tileW = 34;
@@ -445,7 +451,7 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
       </text>
       {/* the % flip tile */}
       {!flickOff ? (
-        <XG m={flipY !== 1 ? mat.about(mat.scale(1, Math.max(0.04, flipY)), tileX + tileW / 2, tileY + tileH / 2) : mat.I}>
+        <XG m={flipY !== 1 || tilePop !== 1 ? mat.about(mat.scale(tilePop, tilePop * Math.max(0.04, flipY)), tileX + tileW / 2, tileY + tileH / 2) : mat.I}>
           <Fill d={roundRect(tileX, tileY, tileW, tileH, 3)} color={palette.white} offset={[1.6 / k, 1.2 / k]} mode="none" seed={`${seed}/tile`} />
           <Ink d={roundRect(tileX, tileY, tileW, tileH, 3, {closed: false, seed: `${seed}/tilei`})} width={iw * 0.7} taper={false} vary={0} seed={`${seed}/tilei`} />
           <text x={tileX + tileW / 2} y={PAGE.ty} fontFamily={captionFontStack} fontSize={PAGE.fs} fill={palette.ink} textAnchor="middle">
@@ -501,7 +507,8 @@ export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reload
         {null}
       </BrowserChrome>
       <HiccupRing x={x + w - rr * 1.3 - 1.5} y={y + g.ringY} r={rr} hiccups={hiccups} fastAt={reloadAt} inkW={inkW * 0.5} />
-      {alertAt !== undefined ? <AlertBadge x={x + w - rr * 1.3 - 1.5} y={y + g.ringY} r={rr * 0.98} at={alertAt} inkW={inkW * 0.6} seed={`${seed}/alert`} /> : null}
+      {/* fix round 2: the badge 1.3x (it reads at phone size on 'yet') */}
+      {alertAt !== undefined ? <AlertBadge x={x + w - rr * 1.3 - 1.5} y={y + g.ringY} r={rr * 1.27} at={alertAt} inkW={inkW * 0.7} seed={`${seed}/alert`} /> : null}
       {children}
     </>
   );
