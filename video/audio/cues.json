@@ -10,6 +10,16 @@
   "src_t": 0.0
  },
  {
+  "t": 0.02,
+  "sfx": "power_off_thunk",
+  "gain_db": -21.0,
+  "pan": 0.0,
+  "provisional": false,
+  "scene": "S01",
+  "why": "hook pass: low power-down thunk under the frame-0 click (the camera punch-in)",
+  "src_t": 0.02
+ },
+ {
   "t": 0.63,
   "sfx": "power_off_thunk",
   "gain_db": -24.0,
@@ -40,24 +50,24 @@
   "src_t": 1.155
  },
  {
-  "t": 1.235,
+  "t": 1.215,
   "sfx": "typing_tick",
   "gain_db": -25.5,
   "pan": -0.25,
-  "provisional": true,
+  "provisional": false,
   "scene": "S01",
   "why": "-24 dB, far silhouettes step dark (3 offsets)",
-  "src_t": 1.155
+  "src_t": 1.215
  },
  {
-  "t": 1.315,
+  "t": 1.275,
   "sfx": "typing_tick",
   "gain_db": -27.0,
   "pan": 0.25,
-  "provisional": true,
+  "provisional": false,
   "scene": "S01",
   "why": "-24 dB, far silhouettes step dark (3 offsets)",
-  "src_t": 1.155
+  "src_t": 1.275
  },
  {
   "t": 1.565,
@@ -72,29 +82,29 @@
  {
   "t": 1.71,
   "sfx": "pop_low",
-  "gain_db": -18.0,
+  "gain_db": -14.0,
   "pan": 0.0,
-  "provisional": true,
+  "provisional": false,
   "scene": "S01",
-  "why": "govB shutter",
+  "why": "govB shutter | hook pass: louder, lands with the camera jolt",
   "src_t": 1.71
  },
  {
   "t": 1.98,
   "sfx": "pop_low",
-  "gain_db": -18.0,
+  "gain_db": -14.0,
   "pan": 0.0,
-  "provisional": true,
+  "provisional": false,
   "scene": "S01",
-  "why": "-18 dB, govA shutter",
+  "why": "-18 dB, govA shutter | hook pass: louder, lands with the camera jolt",
   "src_t": 1.98
  },
  {
   "t": 2.35,
   "sfx": "pop_low",
-  "gain_db": -20.0,
+  "gain_db": -17.0,
   "pan": 0.0,
-  "provisional": true,
+  "provisional": false,
   "scene": "S01",
   "why": "-20 dB, govC half shutter",
   "src_t": 2.35
@@ -120,24 +130,24 @@
   "src_t": 3.385
  },
  {
-  "t": 3.465,
+  "t": 3.445,
   "sfx": "lock_click",
   "gain_db": -17.5,
   "pan": -0.25,
-  "provisional": true,
+  "provisional": false,
   "scene": "S01",
   "why": "-16 dB, padlocks x3",
-  "src_t": 3.385
+  "src_t": 3.445
  },
  {
-  "t": 3.545,
+  "t": 3.505,
   "sfx": "lock_click",
   "gain_db": -19.0,
   "pan": 0.25,
-  "provisional": true,
+  "provisional": false,
   "scene": "S01",
   "why": "-16 dB, padlocks x3",
-  "src_t": 3.385
+  "src_t": 3.505
  },
  {
   "t": 3.695,
@@ -152,9 +162,9 @@
  {
   "t": 4.385,
   "sfx": "whoosh_soft",
-  "gain_db": -22.0,
+  "gain_db": -18.0,
   "pan": 0.0,
-  "provisional": true,
+  "provisional": false,
   "scene": "S01",
   "why": "the dive",
   "src_t": 4.385
@@ -290,24 +300,24 @@
   "src_t": 8.393
  },
  {
-  "t": 8.605,
+  "t": 8.45,
   "sfx": "pencil_scratch_medium",
   "gain_db": -20.0,
   "pan": 0.0,
-  "provisional": true,
+  "provisional": false,
   "scene": "S03",
   "why": "-20 dB, grid",
-  "src_t": 8.605
+  "src_t": 8.45
  },
  {
-  "t": 8.83,
+  "t": 8.99,
   "sfx": "pop_low",
   "gain_db": -18.0,
   "pan": 0.0,
-  "provisional": true,
+  "provisional": false,
   "scene": "S03",
   "why": "stamp slam",
-  "src_t": 8.83
+  "src_t": 8.99
  },
  {
   "t": 9.26,
@@ -330,14 +340,14 @@
   "src_t": 9.46
  },
  {
-  "t": 11.105,
+  "t": 11.04,
   "sfx": "pop_mid",
   "gain_db": -24.0,
   "pan": 0.0,
-  "provisional": true,
+  "provisional": false,
   "scene": "S03",
   "why": "-24 dB, Pip puffs up",
-  "src_t": 11.105
+  "src_t": 11.04
  },
  {
   "t": 11.605,
@@ -352,82 +362,82 @@
  {
   "t": 11.955,
   "sfx": "pop_high",
-  "gain_db": -18.0,
-  "pan": 0.0,
-  "provisional": true,
+  "gain_db": -18,
+  "pan": 0,
+  "provisional": false,
   "scene": "S03",
   "why": "-18 dB counting ticks x7, 0.08 s apart",
   "src_t": 11.955
  },
  {
-  "t": 12.035,
+  "t": 12.015,
   "sfx": "pop_high",
   "gain_db": -19.5,
-  "pan": -0.25,
-  "provisional": true,
+  "pan": 0.25,
+  "provisional": false,
   "scene": "S03",
   "why": "-18 dB counting ticks x7, 0.08 s apart",
-  "src_t": 11.955
+  "src_t": 12.015
  },
  {
-  "t": 12.115,
+  "t": 12.075,
   "sfx": "pop_high",
-  "gain_db": -21.0,
-  "pan": 0.25,
-  "provisional": true,
+  "gain_db": -21,
+  "pan": -0.25,
+  "provisional": false,
   "scene": "S03",
   "why": "-18 dB counting ticks x7, 0.08 s apart",
-  "src_t": 11.955
+  "src_t": 12.075
+ },
+ {
+  "t": 12.135,
+  "sfx": "pop_high",
+  "gain_db": -22.5,
+  "pan": 0.25,
+  "provisional": false,
+  "scene": "S03",
+  "why": "-18 dB counting ticks x7, 0.08 s apart",
+  "src_t": 12.135
  },
  {
   "t": 12.195,
   "sfx": "pop_high",
-  "gain_db": -22.5,
-  "pan": 0.0,
-  "provisional": true,
-  "scene": "S03",
-  "why": "-18 dB counting ticks x7, 0.08 s apart",
-  "src_t": 11.955
- },
- {
-  "t": 12.275,
-  "sfx": "pop_high",
-  "gain_db": -24.0,
+  "gain_db": -24,
   "pan": -0.25,
-  "provisional": true,
+  "provisional": false,
   "scene": "S03",
   "why": "-18 dB counting ticks x7, 0.08 s apart",
-  "src_t": 11.955
+  "src_t": 12.195
  },
  {
-  "t": 12.355,
+  "t": 12.255,
   "sfx": "pop_high",
   "gain_db": -25.5,
-  "pan": 0.25,
-  "provisional": true,
+  "pan": 0.35,
+  "provisional": false,
   "scene": "S03",
   "why": "-18 dB counting ticks x7, 0.08 s apart",
-  "src_t": 11.955
+  "src_t": 12.255
  },
  {
-  "t": 12.435,
+  "t": 12.255,
   "sfx": "pop_high",
-  "gain_db": -27.0,
-  "pan": 0.0,
-  "provisional": true,
+  "gain_db": -25.5,
+  "pan": -0.35,
+  "provisional": false,
   "scene": "S03",
   "why": "-18 dB counting ticks x7, 0.08 s apart",
-  "src_t": 11.955
+  "src_t": 12.255
  },
  {
-  "t": 12.505,
+  "t": 12.3,
   "sfx": "card_flip",
   "gain_db": -24.0,
   "pan": 0.0,
-  "provisional": true,
+  "provisional": false,
   "scene": "S03",
   "why": "-24 dB, the card flips",
-  "src_t": 12.505
+  "src_t": 12.3
  },
  {
   "t": 12.55,
@@ -448,16 +458,6 @@
   "scene": "S03",
   "why": "sun glide-hop",
   "src_t": 13.945
- },
- {
-  "t": 14.17,
-  "sfx": "whoosh_soft",
-  "gain_db": -22.0,
-  "pan": 0.0,
-  "provisional": false,
-  "scene": "S04",
-  "why": "-22 dB, the sun crosses the cut",
-  "src_t": 14.17
  },
  {
   "t": 14.395,
@@ -1618,14 +1618,14 @@
   "src_t": 54.725
  },
  {
-  "t": 55.01,
+  "t": 55.063,
   "sfx": "typing_tick",
   "gain_db": -26.0,
   "pan": 0.0,
-  "provisional": true,
+  "provisional": false,
   "scene": "S12",
   "why": "-26 dB, REVERSED, the last step (wraps into the frame-0 click)",
-  "src_t": 55.01,
+  "src_t": 55.063,
   "reverse": true
  }
 ]
