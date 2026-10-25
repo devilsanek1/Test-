@@ -1,11 +1,12 @@
 // S09 Part A (Stoop Street, StoopStreet set world = canvas px at S03's rest): A1 the dusk -> dawn wide, A2 the door #4
 // close. Everything here is in the StoopStreet world; Scene09 applies the camera.
 //
-// Staging (world): the crate of new locks (props LockCrate, size 85) on step 2's LEFT end (232, 1226); Pip leaps in from
-// off-frame left onto the facade ledge beside it (125, 1230), scale 1.1; the old lock on door #4 (330, 1130) with Bit
-// sitting on it; the makers' cart parked right of the stoop (760, 1432) with the shared FixSign in its sign slot; a
-// back-view onlooker cropped by the bottom-left edge (A1 only); at the hard cut the keeper rises on step 1's right end
-// (420, 1300) and reaches left to the lock. The lock axis (x 313-347) stays clear for the drop and the pop-on.
+// Staging (world): the crate of new locks (polish A1: the scene's crate.tsx, 118 px, sage with cream slats) on step 2's
+// LEFT end (251, 1226); Pip starts where S08's last frame leaves him (world (412, 1540), scale 0.75) and hops onto the
+// facade ledge beside the crate (125, 1230), scale 1.1; the old lock on door #4 (330, 1130) with Bit sitting on it; the
+// makers' cart parked right of the stoop (760, 1432) with the shared FixSign in its sign slot; two back-view onlookers
+// cropped by the bottom edge; at the hard cut the keeper (kit Keeper + keeper.tsx overlay) stands on step 1's right end
+// (398, 1300) and reaches left to the lock. The lock axis (x 313-347) stays clear for the drop and the pop-on.
 // The A2 actors (old lock, Bit, crate, keeper, Pip, the flying new lock) are <A2Actors/>: Part B renders the SAME
 // component through the hidden-cut map (camera.ts a2ToBMat), so the hidden cut holds them in place.
 //
@@ -13,7 +14,7 @@
 // no wipe edge crosses the captions); the set's night dressing pops off on the second step (nightUntil) and the ground
 // relights in two more flat steps behind the sky (GROUND_A / GROUND_B), never in one big flash. The sun rises in front of
 // the far towers with ONE near tower re-drawn in front of it from the first frame of the rise (its depth never changes);
-// the near tree, the far towers' dawn rims (kit v3b `dawnRims={[0, 1, 4]}`: the hero's own rim only) and the walker are kept
+// the near tree, the far towers' dawn rims (kit v3b `dawnRims={[1, 4]}`; the hero's own thin rim is the scene's) and the walker are kept
 // off the sun's column.
 
 import React, {useId} from 'react';

@@ -8,9 +8,9 @@
 //   - the BOW: every row from 1 up rises toward the frame's sides, house by house (-A_k ((x - 540) / 540)^2, A 18 -> 42 px,
 //     the haze bands 46-54): the rows curve round the hill like an amphitheatre town; where the bow opens the gap wider the
 //     wall face simply grows. Row 0 (the street front) is straight.
-//   - three zig-zag STAIR flights (x ~170 / ~612 / ~910, rows 1-6): a stepped cream flight with a stringer and a hand
-//     rail, climbing from a row's walkway across the terrace gap onto the next coping (the landing), alternating
-//     direction; round teal SHRUBS on five landings.
+//   - three zig-zag STAIR flights (x ~170 / ~612 / ~910, polish A1: rows 1-3 only, 0.42 of a house wide, in a lighter
+//     slot): a stepped cream flight with a stringer and a hand rail, climbing from a row's walkway across the terrace gap
+//     onto the next coping (the landing), alternating direction; round teal SHRUBS on the landings.
 //   - the RIDGE: the three haze bands (the set's playbook ladder), bowed, a water tower and two trees in silhouette in
 //     front of the sun (peach rims on their sun side).
 //   - rows 4-7 at a calm far LOD (three flat tones, roof slab, door); rows 1-3 with the set's per-house detail; row 0 at
