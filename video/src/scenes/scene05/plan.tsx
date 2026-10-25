@@ -280,7 +280,12 @@ const STEP_G = (() => {
     line(x1 - 6, yF - 9, X1, yF - 8, {seed: 's5chF', over: [0, 0]});
   const tick = (x: number, y: number, n: number) => Array.from({length: n}, (_, i) => `M${x + i * 7} ${y + i * 1.5}l-7 9`).join('');
   const hatch = tick(884, 1346, 3) + tick(966, 1392, 2) + tick(912, 1404, 2);
-  return {base: rectPath(X0, y0 - 2, X1 - X0, STEPS.plinth - y0 + 2), treads, cheek, coping, foot, cheekInk, hatch};
+  // A1 polish: a small civic plaque on the block's face (an ochre plate, two screw dots, two cream 'lettering' lines:
+  // illegible on purpose, the block sits in the right rail at screen x > 950)
+  const plaque = roundRect(918, 1336, 44, 26, 3);
+  const plaqueLines = 'M926 1345.5H954M929 1353H950';
+  const screws = 'M921.5 1340.2a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0ZM955.3 1340.2a1.6 1.6 0 1 0 3.2 0a1.6 1.6 0 1 0 -3.2 0Z';
+  return {base: rectPath(X0, y0 - 2, X1 - X0, STEPS.plinth - y0 + 2), treads, cheek, coping, foot, cheekInk, hatch, plaque, plaqueLines, screws};
 })();
 
 /** The nosing lines with the gaps open at t (segments between the cuts; each line keeps its own seed). */
@@ -321,9 +326,53 @@ export const StepsOverlay: React.FC<{gaps?: StepGap[]}> = ({gaps = []}) => {
       <Ink d={stepInk(t, gaps)} width={SI.mid} seed="s5stI" />
       <Ink d={STEP_G.cheekInk} width={SI.mid} seed="s5chI" />
       <Ink d={STEP_G.hatch} width={SI.hair} taper={false} seed="s5chH" />
+      <Fill d={STEP_G.plaque} color={palette.brown} offset={[1.5, 1]} seed="s5plq" />
+      <Ink d={STEP_G.plaque} width={SI.far} taper={false} seed="s5plqI" />
+      <Ink d={STEP_G.plaqueLines} width={2} color={palette.cream} taper={false} vary={0} seed="s5plqL" />
+      <Fill d={STEP_G.screws} color={palette.ink} offset={false} mode="none" seed="s5plqS" />
     </>
   );
 };
+
+// ---------------------------------------------------------------- the wing's small details (A1 polish)
+
+/** Pause-worthy detail on the wing's flat wall (wing layer, parallax 0.4; drawn over the set's wing): a drainpipe down
+ *  its left corner (a hopper head under the roof coping, three bracket ticks, a shoe kicking out at the foot), a potted
+ *  plant on the upper window's sill and an AC unit hung under the lower window's sill. No lettering (right rail). */
+const WING_D = (() => {
+  const px = 862;
+  const pw = 9;
+  const top = 868;
+  const foot = 1300;
+  const pipe = rectPath(px, top, pw, foot - top) + `M${px} ${foot}Q${px} ${foot + 12} ${px + 16} ${foot + 12}L${px + 16} ${foot + 3}Q${px + pw} ${foot + 3} ${px + pw} ${foot}Z`;
+  const hopper = `M${px - 6} 856L${px + pw + 6} 856L${px + pw + 1} ${top + 2}L${px - 1} ${top + 2}Z`;
+  const pipeInk =
+    line(px, top + 2, px, foot, {seed: 's5dpL', over: [0, 0]}) +
+    line(px + pw, top + 2, px + pw, foot - 2, {seed: 's5dpR', over: [0, 0]}) +
+    `M${px} ${foot}Q${px} ${foot + 12} ${px + 16} ${foot + 12}M${px + pw} ${foot - 2}Q${px + pw} ${foot + 3} ${px + 16} ${foot + 3}` +
+    hopper +
+    [960, 1080, 1200].map((y) => `M${px - 3} ${y}H${px + pw + 3}`).join('');
+  // the plant: an ochre pot on the sill of the window at (900, 920) (sill line y 1010), three sage leaf blobs
+  const pot = `M906 994L930 994L927 1011L909 1011Z`;
+  const leaves = blob(913, 985, 9, 7, {seed: 's5pl1'}) + blob(925, 983, 8, 8, {seed: 's5pl2'}) + blob(919, 976, 7, 8, {seed: 's5pl3'});
+  // the AC unit under the window at (900, 1100) (sill line y 1190): a cream box, its grille, two bracket ticks
+  const ac = roundRect(910, 1197, 42, 26, 2.5);
+  const acInk = 'M916 1204H946M916 1210H946M916 1216H946' + 'M914 1223L918 1230M948 1223L944 1230';
+  return {pipe, hopper, pipeInk, pot, leaves, ac, acInk};
+})();
+
+export const WingDetails: React.FC = () => (
+  <>
+    <Fill d={WING_D.pipe + WING_D.hopper} color={palette.teal} offset={false} mode="none" seed="s5dp" />
+    <Ink d={WING_D.pipeInk} width={SI.far} taper={false} seed="s5dpI" />
+    <Fill d={WING_D.leaves} color={palette.sage} offset={false} mode="none" seed="s5plF" />
+    <Fill d={WING_D.pot} color={palette.brown} offset={false} mode="none" seed="s5potF" />
+    <Ink d={WING_D.leaves + WING_D.pot} width={SI.far} taper={false} seed="s5plI" />
+    <Fill d={WING_D.ac} color={palette.cream} offset={[1, 1]} seed="s5acF" />
+    <Ink d={WING_D.ac} width={SI.far} taper={false} seed="s5acI" />
+    <Ink d={WING_D.acInk} width={SI.hair} taper={false} vary={0} seed="s5acG" />
+  </>
+);
 
 /** The forecourt in front of the steps (fix round 2): ONE flat mintPale field (the set's broken paving hairlines read as
  *  scratches: covered) and one flat sand shade wedge cast by the facade, a diagonal from the steps' left end down

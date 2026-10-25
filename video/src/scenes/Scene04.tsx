@@ -34,9 +34,9 @@ import {Cobweb, LabelTag, Lock, pendulum} from './shared/props';
 import {SI} from './shared/sets';
 import {beats, S04_START, S04_END, tearTimes} from './scene04/beats';
 import {camAt, camMat, diveK, DIVE} from './scene04/camera';
-import {above, ClipG, except, FlatChrome, GroundS04, ivyNode, SeasonIvy, seasonKeys, SplitInk, StepTones, WindowLife, YearCalendar, YearFlyers} from './scene04/props';
+import {above, ClipG, except, GroundS04, HeroBrowser, ivyNode, SeasonIvy, seasonKeys, SoftInk, SplitInk, StepTones, WindowLife, YearCalendar, YearFlyers} from './scene04/props';
 import {bitHopAt, BitS04, BugSpot, ghostList, Ghosts, HOP_DUR, Leaf, LockGlint, PipS04, spotAt, spotOff} from './scene04/cast';
-import {DivePigeons, WireWhip} from './scene04/dive';
+import {DivePigeons, DiveTicks, WireWhip} from './scene04/dive';
 
 // ---------------------------------------------------------------- labels (final_script section 6)
 
@@ -50,13 +50,15 @@ const L5_HANG: [number, number] = [LK.x + 3, LK.y + LK.h / 2 - 3];
  *  world under the lock (a ~27 px string), its eyelet 12 world right of the screw; at the cut (world under the end
  *  camera: it lands on S05's annotation tag, paper screen ~(425-752, 1000-1120), ~38 px lettering). Lerped through the
  *  dive. */
-const L5_REST = {box: [240, 1155, 454, 1229] as [number, number, number, number], fs: 26.5};
+const L5_REST = {box: [240, 1153, 454, 1225] as [number, number, number, number], fs: 26.5};
 const L5_CUT = {box: [300, 1152, 472, 1215] as [number, number, number, number], fs: 20};
 /** lock4's box top-left corner (the cobweb's corner), its top-right corner (the glint) and its mount (the rattle's
  *  pivot: the top screw). */
 const LOCK_TL: [number, number] = [LK.x - (LK.h * 0.8) / 2, LK.y - LK.h / 2];
 const LOCK_TR: [number, number] = [LK.x + (LK.h * 0.8) / 2, LK.y - LK.h / 2];
 const LOCK_PIVOT: [number, number] = [LK.x, LK.y - LK.h / 2 + 4];
+/** lock4's centre (the dive's speed ticks converge on it). */
+const LOCK_MID: [number, number] = [LK.x, LK.y];
 /** The sun: its slot in this shot (it sinks 7 px into it after the touch-down), and S05's notch (where the dive slides
  *  it: S05's first frame has it at (930, 725)). */
 const SUN_SLOT: [number, number] = [930, 690];
@@ -81,6 +83,19 @@ const TREE_BOX = rectPath(560, 930, 190, 470);
  *  everything of the sun below this roofline is behind the row anyway. */
 const SUN_SKY = `M-4000 -4000H4000V${STOOP.vp[1]}H${STOOP.vp[0]}L520 660H-4000Z`;
 const TREE_DX = 70;
+/** Fix round 3: the dive's ink softening (SoftInk: ink -> tan above world 990, content unchanged) switches 0.10 s into
+ *  the dive (film F490 / S04 f65), when the camera already runs ~71 px / frame and one frame before the upper window
+ *  row's top (world 706) enters the caption band (screen 551 on F490, the cornice's lower line 572 on F489). It was the
+ *  dive's first frame (0.6 px / frame, nothing moving yet): it read as a glitch on 'years'. */
+const SOFT_LAG = 0.1;
+/** Fix round 3: the sun's z-swap (in front of the set mid-hop, the S03 match object; in the sky slot from the landing)
+ *  is a 3-frame SWEEP instead of a one-frame swap (47 % of the disc vanished on F432): from `this - lead` both copies
+ *  draw, the front one clipped to the right of an edge that sweeps across the disc (screen x 826 = the hero house's right edge -> 1048, the roofline's
+ *  occlusion spreading along it) over `dur`, so the disc reads as sliding in behind the roof. */
+const SUN_SWEEP = {lead: 0.045, dur: 0.1, x: [826, 1048] as [number, number]};
+/** L5's entry pendulum (fix round 3: -16 -> -12 deg, with the paper 2 world higher and 4 shorter: its swing no longer
+ *  dips past the 1480 label box). */
+const L5_SWING = -12;
 
 /** The lock box rattles about its top screw: +-5 deg for 0.15 s when Bit kicks off on 'bug', +-3 deg for 0.12 s when he
  *  lands back on it. */
@@ -99,8 +114,9 @@ const Scene04: React.FC = () => {
   const seasons = seasonKeys(tears);
   const cam = camAt(t, end);
   const M = camMat(cam);
-  const diveAt = end - DIVE;
+  const diveAt = end - DIVE; // = b.dive, w54 'years'
   const diving = t >= diveAt;
+  const soft = t >= diveAt + SOFT_LAG;
 
   // ---- the sun, SCREEN space the whole scene (a sky object at infinity does not move in a dolly): S03's glide-hop
   // continued (take-off at end(it), mid-air at (810, 680) on the cut, lands on 'This' in its slot and sinks 7 px into
@@ -115,12 +131,17 @@ const Scene04: React.FC = () => {
     {at: diveAt, dur: DIVE, x: SUN_S05[0], y: SUN_S05[1], ease: E.inOutSine},
   ];
   const sunHops = [{t: b.sunTakeOff, to: SUN_SLOT, h: 15, air: b.this - b.sunTakeOff}];
-  const sunFront = t < b.this;
+  const sweep0 = b.this - SUN_SWEEP.lead;
+  const sunFront = t < sweep0 + SUN_SWEEP.dur;
+  const sunBack = t >= sweep0;
   const sun = (
     <XG m={mat.inv(M)}>
       <Sun cx={690} cy={700} r={110} drift={[0, 0]} hops={sunHops} moves={sunMoves} />
     </XG>
   );
+  // during the sweep the front copy keeps only what is right of the sweeping edge (world x through the camera)
+  const sweepX = lerp(SUN_SWEEP.x[0], SUN_SWEEP.x[1], Math.max(0, Math.min(1, (t - sweep0) / SUN_SWEEP.dur)));
+  const sunFrontNode = sunFront ? sunBack ? <ClipG d={rectPath((sweepX - 540) / cam.zoom + cam.x, -4000, 9000, 9000)}>{sun}</ClipG> : sun : null;
 
   // ---- the year calendar: 15 pages, 14 tears (the page swaps at the tear; the torn page flips up and flies off)
   const calendar = <YearCalendar tears={tears} />;
@@ -138,24 +159,28 @@ const Scene04: React.FC = () => {
   const heroSlot = (
     <>
       <StepTones />
-      <FlatChrome on={diving} />
-      <WindowLife tears={tears} flatAbove={diving ? FLAT_Y : undefined} />
+      {/* the hero browser: sand header block, teal bar, sand third dot, for the whole scene (never switched) */}
+      <HeroBrowser />
+      <WindowLife tears={tears} />
       <SeasonIvy steps={ivySteps} seasons={seasons} />
       {/* 'bug': a peach spot with an ink ring and glint ticks behind the lock box and Bit */}
       <BugSpot at={spotAt(b)} off={spotOff(b)} word={b.bug} />
       {/* the dive (fix round 2: it read as a tilt-down with sound off): the same spot RE-POPS behind lock4 on the dive's
           first frame, 10 % bigger, and holds to the cut, so the eye locks onto the target */}
       <BugSpot at={diveAt} off={end + 1} word={-10} k={1.1} />
+      {/* fix round 3: seven hair speed ticks converge on lock4 through the dive's fastest four frames */}
+      <DiveTicks at={diveAt + 0.1} cam={cam} target={LOCK_MID} />
       {/* lock4 (the set's own hero lock, drawn here so it can rattle about its top screw when Bit kicks off on 'bug') */}
       <XG m={mat.about(mat.rotate(rattle(t, hopAt, hopAt + HOP_DUR)), LOCK_PIVOT[0], LOCK_PIVOT[1])}>
         <Lock x={LK.x} y={LK.y} size={LK.h} seed="stoop/lock4" ink={SI.far} glintAt={b.bug} />
       </XG>
-      {/* 'fourteen': a cobweb draws over the lock box's top-left corner (rule-5 lead: it lands with the highlight) */}
-      <Cobweb x={LOCK_TL[0] + 1} y={LOCK_TL[1] + 1} r={20} corner="tl" at={b.cobweb - 0.1} dur={0.24} width={1.6} seed="s4web" />
+      {/* 'fourteen': a cobweb draws over the lock box's top-left corner (fix round 3: r 28 world, inkThin 2.2, ~45 px on
+          screen; drawn from cobweb + 0.15, once L5's pendulum has mostly settled: highlight -> label -> web) */}
+      <Cobweb x={LOCK_TL[0] + 1} y={LOCK_TL[1] + 1} r={28} corner="tl" at={b.cobweb + 0.15} dur={0.24} width={2.2} seed="s4web" />
       <YearFlyers tears={tears} until={diveAt} />
       <BitS04 b={b} />
       <LockGlint at={b.bug} p={[LOCK_TR[0] + 2, LOCK_TR[1] + 4]} />
-      <LabelTag kind="tag" box={l5Box} hang={L5_HANG} text={L5} fontSize={l5Fs} at={b.l5} seed="s4L5" />
+      <LabelTag kind="tag" box={l5Box} hang={L5_HANG} text={L5} fontSize={l5Fs} at={b.l5} swing={false} rot={pendulum(t, b.l5, L5_SWING, 0.5, 0.8)} seed="s4L5" />
       {/* L5's string: a visible ink thread from the lock's bottom screw over the paper's top edge into the eyelet */}
       {t >= b.l5 ? <L5String box={l5Box} fs={l5Fs} at={b.l5} /> : null}
       <PipS04 b={b} cam={cam} />
@@ -167,16 +192,16 @@ const Scene04: React.FC = () => {
   const wrap: LayerWrap = (name, _n, node) => {
     // the ground: its fills, its kerb lines, kerb-stone joints, a drain grate, a few specks
     if (name === 'ground') return <GroundS04 node={node} />;
-    if (name === 'rows') return diving ? <SplitInk y={FLAT_Y} node={node} /> : node;
-    if (name === 'hero')
-      return diving ? (
-        <SplitInk y={FLAT_Y} node={node} />
-      ) : (
+    if (name === 'rows') return soft ? <SoftInk y={FLAT_Y} node={node} /> : node;
+    if (name === 'hero') {
+      const rimmed = (
         <>
           <Fill rect={[STOOP.hero.x - 6, STOOP.hero.y - 6, STOOP.hero.w + 12, 7]} color={palette.cream} offset={false} mode="none" seed="s4/rim" />
           <ClipG d={except(above(RIM_CLIP))}>{node}</ClipG>
         </>
       );
+      return soft ? <SoftInk y={FLAT_Y} node={rimmed} /> : rimmed;
+    }
     // every passer-by walks on the road beyond the planter: all of them behind it (pot and bush as one unit)
     if (name === 'people')
       return (
@@ -193,7 +218,7 @@ const Scene04: React.FC = () => {
             <ClipG d={TREE_BOX}>{node}</ClipG>
           </XG>
           {/* the pigeons (the set's own, pixel-identical) take off and the wire snaps on the dive's first frame */}
-          <DivePigeons diveAt={diveAt} />
+          <DivePigeons diveAt={diveAt} cam={cam} />
           <WireWhip diveAt={diveAt} />
         </>
       );
@@ -208,14 +233,14 @@ const Scene04: React.FC = () => {
           foreground={false}
           furniture={[STOOP.furniture[0]]}
           pigeons={false}
-          sun={sunFront ? null : <ClipG d={SUN_SKY}>{sun}</ClipG>}
+          sun={sunBack ? <ClipG d={SUN_SKY}>{sun}</ClipG> : null}
           calendar={calendar}
           heroLock={false}
           heroSlot={heroSlot}
           wrap={wrap}
           seed="stoop"
         />
-        {sunFront ? sun : null}
+        {sunFrontNode}
       </XG>
     </World>
   );
@@ -226,7 +251,7 @@ const Scene04: React.FC = () => {
 const L5String: React.FC<{box: [number, number, number, number]; fs: number; at: number}> = ({box, fs, at}) => {
   const t = useTime();
   const k = springAt(t, at, springs.pop);
-  const ang = (pendulum(t, at, -16, 0.5, 0.8) * Math.PI) / 180;
+  const ang = (pendulum(t, at, L5_SWING, 0.5, 0.8) * Math.PI) / 180;
   const er = Math.max(2.5, Math.min(7, fs * 0.13));
   const ey = Math.max(er + 3, fs * 0.36);
   const dx = (box[0] + box[2]) / 2 - L5_HANG[0];

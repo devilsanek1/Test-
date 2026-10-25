@@ -1,12 +1,13 @@
-// S04 dive extras (fix round 2): what happens to the wire and its pigeons when the upper set goes flat on the dive's
-// first frame, so the change is motivated instead of a one-frame vanish:
+// S04 dive extras: what happens to the wire and its pigeons when the dive starts (so nothing just vanishes), and the
+// dive's speed ticks:
 //  - the two pigeons are drawn here (StoopStreet pigeons={false}): before the dive the set's own Bird, same positions,
-//    seeds and colours (pixel-identical); on the dive's first frame they TAKE OFF: two flap frames (wings up, then down)
-//    darting LEFT and a little up, then they are out of the shot. Their path stays under the caption band (screen y > 570)
-//    so nothing crosses the glyphs;
+//    seeds and colours (pixel-identical); on w54 'years' (the dive's first frame) they TAKE OFF and fly out past the
+//    LEFT edge in four frames on a screen path under the caption band (fix round 3: they vanished mid-frame);
 //  - the telephone wire SNAPS at the lamp end on the same frame and whips right, out of frame, in two frames (the lamp
-//    keeps its stub: the near layer left of world x 90 stays inked).
-// Both are world space (they ride the dive) and drawn after the near layer's flat copy (always inked).
+//    keeps its stub: the near layer left of world x 90 stays inked);
+//  - fix round 3 (with sound off the dive read as a crane-down): seven short hair SPEED TICKS converge on lock4 for four
+//    frames through the dive's fastest stretch, around the re-popped peach spot.
+// All world space (they ride the dive), placed through the camera where they follow a screen path.
 
 import React from 'react';
 import {palette} from '../../lib/theme';
@@ -92,4 +93,28 @@ export const WireWhip: React.FC<{diveAt: number}> = ({diveAt}) => {
   const curl = `M${fx - 16} ${fy - 8}Q${fx - 13} ${fy + 4} ${fx} ${fy}`;
   const d1 = `${curl}C${c1[0]} ${c1[1]} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${WB[0]} ${WB[1]}`;
   return <Ink d={d1} width={SI.far} taper={false} seed="s4/whip" />;
+};
+
+/** Seven short hair speed ticks around lock4 converging on it (screen space through the camera), for `frames` frames
+ *  from `at`: each a radial stroke ~40 px long that steps ~28 px inward per frame; none below the lock (the L5 tag
+ *  hangs there) and all far under the caption band. */
+const TICK_ANGLES = [-162, -126, -92, -58, -22, 14, 196];
+export const DiveTicks: React.FC<{at: number; cam: Cam; target: Pt; frames?: number}> = ({at, cam, target, frames = 4}) => {
+  const t = useTime();
+  const d = t - at;
+  if (d < 0 || d >= frames * FRAME) return null;
+  const k = Math.floor(d / FRAME);
+  const c = toScreen(cam, target);
+  let path = '';
+  TICK_ANGLES.forEach((a, i) => {
+    const r = (a * Math.PI) / 180;
+    const ux = Math.cos(r);
+    const uy = Math.sin(r);
+    const r1 = 205 - 28 * k + (i % 3) * 14;
+    const r0 = r1 - 36 - (i % 2) * 10;
+    const p0 = toWorld(cam, [c[0] + ux * r1, c[1] + uy * r1]);
+    const p1 = toWorld(cam, [c[0] + ux * r0, c[1] + uy * r0]);
+    path += `M${p0[0].toFixed(1)} ${p0[1].toFixed(1)}L${p1[0].toFixed(1)} ${p1[1].toFixed(1)}`;
+  });
+  return <Ink d={path} width={2.2 / cam.zoom} taper={false} seed="s4/ticks" />;
 };

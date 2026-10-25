@@ -42,11 +42,13 @@ const ABS = {
   ghosts2: 15.375, //       w52 'like': a second pair of ghosts strides past; Bit yawns and blinks (he does not move)
   l5: 15.39, //             w53-0.10 'fourteen': label L5 swings in as a tag hanging from lock4 (pendulum -16 -> 0)
   cobweb: 15.59, //         w53+0.10 'fourteen': a cobweb draws over the lock box corner (0.3 s); Bit does not move
+  //                        (fix round 3: drawn from cobweb+0.15, once L5's pendulum has mostly settled: highlight ->
+  //                        label -> web)
   leaf: 15.61, //           w53+0.12 'fourteen' = tear 7 + 0.035 (storyboard w53+0.20; fix round 2: one frame after the
   //                        ivy turns tan on tear 7, and it goes bare on tear 9 while the leaf falls; lands 0.3 s before
   //                        the dive, seen at rest): the last tan leaf drifts down onto sleeping Pip's crown
-  dive: 16.26, //           cut(years)-0.33 'years': the camera dives into lock4 (in(quad), fixed 0.33 s); the leaf
-  //                        lands on sleeping Pip's ear
+  dive: 16.225, //          w54 'years' (fix round 3: was cut(years)-0.33 = 16.26, one frame after the word): the camera
+  //                        dives into lock4 (0.365 s ending on the cut); the pigeons take off; the leaf has landed
   end: S04_END, //          cut(years): match-cut into S05 on the lock (65 x 80 px at screen (483, 960))
 } as const;
 

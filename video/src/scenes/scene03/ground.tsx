@@ -15,7 +15,7 @@
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {springAt, springs, useTime} from '../../lib/time';
-import {mat, XG} from '../../lib/xf';
+import {mat, Mat, XG} from '../../lib/xf';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {arrow, circle, line, polyPath, rect, Pt} from '../../lib/sketch';
@@ -145,10 +145,12 @@ const G = (() => {
  *  kerb dimension or frame-band line enters it) and the title block's frame is ONE hairline rect at that knock-out's
  *  edge (was two rects at 8 / 16 px round the set's box), so the white card with its tan offset sits in a clean field. */
 const KO = 14;
-const KNOCK = (() => {
+/** The knock-out clip: the whole plane minus the card's box (+ KO), the box scaled by `m` (the card's pop). */
+const knockPath = (m: Mat = mat.I): string => {
   const [x0, y0, x1, y1] = CARD_BOX;
-  return `M-3000 -3000H4000V6000H-3000Z M${x0 - KO} ${y0 - KO}V${y1 + KO}H${x1 + KO}V${y0 - KO}Z`;
-})();
+  const pt = (x: number, y: number) => `${(m[0] * x + m[2] * y + m[4]).toFixed(2)} ${(m[1] * x + m[3] * y + m[5]).toFixed(2)}`;
+  return `M-3000 -3000H4000V6000H-3000Z M${pt(x0 - KO, y0 - KO)}L${pt(x0 - KO, y1 + KO)}L${pt(x1 + KO, y1 + KO)}L${pt(x1 + KO, y0 - KO)}Z`;
+};
 const TB_FRAME = (() => {
   const [x0, y0, x1, y1] = CARD_BOX;
   return rect(x0 - KO, y0 - KO, x1 - x0 + 2 * KO, y1 - y0 + 2 * KO, {seed: 'bp/tbf2', over: 'small'});
@@ -232,7 +234,7 @@ export const CardKnock: React.FC<{at?: number; children: React.ReactNode}> = ({a
     <>
       <defs>
         <clipPath id={id} clipPathUnits="userSpaceOnUse">
-          <path d={KNOCK} clipRule="evenodd" transform={`matrix(${m.join(" ")})`} />
+          <path d={knockPath(m)} clipRule="evenodd" />
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>{children}</g>

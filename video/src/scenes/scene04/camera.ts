@@ -8,15 +8,17 @@
 //                                it starts ON w54 'years' (16.225, one frame before the storyboard's cut - 0.33) so the
 //                                first frame is not a jump from rest, and
 //                                - log zoom on a cubic Hermite p(u) = (3 - m) u^2 + (m - 2) u^3, p'(0) = 0, end slope
-//                                  m = 0.8 (was in(quad), m = 2: 1.23 /s into the cut against S05's ~0.54 /s first
-//                                  frame pair, a 2.1x brake on the cut). Now the last S04 frame pair runs ~0.59 /s and
-//                                  the zoom is front-loaded (half the log zoom by u ~0.45);
+//                                  m = 1.5 (was in(quad), m = 2: 1.23 /s into the cut, a 2.1x brake against S05's old
+//                                  landing). The handoff rate is ~0.8 /s on both sides: S04's last frame pair ~0.83 /s
+//                                  (0.84 /s at the cut), S05's first pair ~0.79 /s (its A1 landing: K_LAND 1.055,
+//                                  LAND_K 8);
 //                                - lock4's SCREEN position travels (540, 1330) -> (483, 960) on a TRAPEZOID velocity
-//                                  profile over the first 85 % of the dive (accelerate over its first 35 %, constant,
-//                                  decelerate over the last 35 %; was an in-out sine over 85 %), so the frame pair after
-//                                  the travel is a pure zoom about the lock.
-//                                Simulated corner speeds (the camspeed measure, px / frame, film F486-F497):
-//                                0 1 22 49 74 88 91 91 77 56 35 23 | S05 18 11 7: 1.25x across the cut (was 38 | 18).
+//                                  profile over the first 85 % of the dive (accelerate over its first 30 %, constant,
+//                                  decelerate over the last 30 %; was an in-out sine over 85 %), so the last frame pair
+//                                  is a pure zoom about the lock.
+//                                Simulated corner speeds (the camspeed measure, px / frame, film F486 -> F497):
+//                                0 1 21 47 71 78 81 83 79 60 40 32 | S05 ~29: 1.1x across the cut (was 38 | 18, 2.1x);
+//                                peak 83 (was 92), first steps 1 -> 21 -> 47 (was 0.6 -> 22 -> 51).
 // The creep ends at zero velocity and the dive starts from zero velocity: velocity-continuous, no step.
 
 import {ease as E, lerp, prog} from '../../lib/time';
@@ -43,9 +45,9 @@ export const toWorld = (c: Cam, p: Pt): Pt => [(p[0] - 540) / c.zoom + c.x, (p[1
 /** The share of the dive over which lock4's screen position travels (the rest is a pure zoom about the lock). */
 export const TRAVEL = 0.85;
 /** The travel's trapezoid: accelerate over [0, ACC], constant to 1 - ACC, decelerate (normalised travel time). */
-const ACC = 0.35;
-/** The zoom's end slope (p'(1)): log-zoom rate at the cut = m x ln(1.9 / 1.55) / DIVE = 0.45 /s. */
-const ZOOM_END_SLOPE = 0.8;
+const ACC = 0.3;
+/** The zoom's end slope (p'(1)): log-zoom rate at the cut = m x ln(1.9 / 1.55) / DIVE = 0.84 /s. */
+const ZOOM_END_SLOPE = 1.5;
 
 /** Normalised trapezoid-velocity position 0..1 (zero velocity at both ends, constant in the middle). */
 export function trapezoid(x: number, acc = ACC): number {

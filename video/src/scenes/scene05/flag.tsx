@@ -1,8 +1,6 @@
-// S05 flagpole on the wing's roof (fix round 3): the low angle needs something up in the top third (ref 2 always has
-// string lights / a cloud / palms there): a slim pole rising from the wing's roof (world y 840) to screen y ~200 at the
-// frame's right (screen x ~1003 -> 993 at the top: it leans in a touch like the pilasters; it crosses the sun decisively,
-// never at a tangent, and deeper as the sun drifts right), a white ball finial and a
-// small teal flag (cream stripe) streaming LEFT into the sky ABOVE the caption band (screen y ~205-262 < 280). The flag
+// S05 flagpole on the wing's roof (fix round 3; A1 polish: shortened and moved right of the sun): a slim pole rising
+// from the wing's roof (world y 840) at the frame's right (screen x ~1051) to screen y ~598, a white ball finial and a
+// small teal flag (cream stripe) streaming LEFT in front of the sun's upper-right rim, under the caption band. The flag
 // waves on a travelling wave and SNAPS (a quick gust: amplitude up, 0.25 s) on 'researchers' and 'using'; it goes slack
 // during 'bad' (the ONE focal event). Wing layer (parallax 0.4), drawn behind the wing (its base under the roof line).
 // World px, scene seconds.
@@ -14,10 +12,15 @@ import {Fill} from '../../lib/Fill';
 import type {Pt} from '../../lib/sketch';
 import {SI} from '../shared/sets';
 
-/** Pole base (on the wing roof) and top, world (wing layer: at rest screen = (w - 540) 1.13 + 540, (w - 940) 1.13 + 960). */
-const BASE: Pt = [950, 842];
-const TOP: Pt = [941, 268];
-const FLAG = {w: 84, h: 50};
+/** Pole base (on the wing roof) and top, world (wing layer: at rest screen = (w - 540) 1.13 + 540, (w - 940) 1.13 + 960).
+ *  A1 polish (the pole ran down through the sun's right third: a disc on a stick; the flag fluttered beside the caption
+ *  block): a SHORT pole at the wing's right, screen x ~1060 at the lock, clear of the disc (the sun now drifts LEFT, away
+ *  from it, Scene05; on the landing it clips the disc's right rim only on Main's first S05 frame), its top at screen
+ *  ~598, so the flag flies at screen y ~605-660, streaming left to the sun's upper-right rim (ref 2's palms by the sun);
+ *  the sky above the caption stays calm. It only crosses the disc on the exit truck (parallax 0.4 vs the sun's 0.05). */
+const BASE: Pt = [1000, 842];
+const TOP: Pt = [998.5, 620];
+const FLAG = {w: 88, h: 46};
 
 /** One unbroken stroke (a sketchy line() breaks into dashes over this length). */
 const POLE_INK = `M${BASE[0]} ${BASE[1]}L${TOP[0]} ${TOP[1]}`;

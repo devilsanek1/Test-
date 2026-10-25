@@ -681,17 +681,19 @@ export const PressScreen: React.FC<{lightAt: number; pulseAt?: number[]; pageAt?
   if (t < lightAt) return <Fill d={d} color={palette.sage} offset={false} mode="none" seed="s03/scrP" />;
   if (t < lightAt + GLOW || pulse) return <Fill d={d} color={palette.peach} offset={false} mode="none" seed="s03/scrPp" />;
   if (pageAt === undefined || t < pageAt) return null;
-  const pad = Math.max(5, s.w * 0.07);
-  const hh = s.h * 0.24;
+  // a thin header so the elephant can fill the page's height (~50 px tall on screen, as big as the side pages' glyphs
+  // relative to their pages: the press screen is 3x wider)
+  const pad = 6;
+  const hh = s.h * 0.14;
   const cy = s.y + pad + hh + (s.h - pad - hh) / 2 + 1;
   const cx = s.x + s.w / 2;
   const k = Math.max(0.001, springAt(t, pageAt, springs.pop));
   return (
     <>
       <Fill rect={[s.x + 1.5, s.y + 1, s.w - 3, s.h - 2.5]} color={palette.cream} offset={false} mode="none" seed="s03/scrPg" />
-      <Fill rect={[s.x + pad, s.y + pad, s.w - pad * 2, hh]} color={palette.peach} offset={false} mode="none" seed="s03/scrPh" />
+      <Fill rect={[s.x + pad + 4, s.y + pad, s.w - pad * 2 - 8, hh]} color={palette.peach} offset={false} mode="none" seed="s03/scrPh" />
       <XG m={mat.about(mat.scale(k), cx, cy)}>
-        <ElephantEmblem x={cx} y={cy} size={(s.h - pad - hh) * 0.98} mode="solid" color={palette.ink} seed="s03/scrPel" />
+        <ElephantEmblem x={cx} y={cy} size={72} mode="solid" color={palette.ink} seed="s03/scrPel" />
       </XG>
     </>
   );

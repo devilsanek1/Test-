@@ -157,7 +157,7 @@ const Scene03: React.FC = () => {
           <PressScreen lightAt={b.pressScreen} pulseAt={[T.countAt.P, b.websites]} pageAt={T.countAt.P + 0.067} />
           <Sticker x={648} y={1040} w={124} question={false} seed="s03/sticker" />
           <QuestionScribble x={727} y={1013} />
-          <TickRing x={PRESS_SCREEN.x + PRESS_SCREEN.w / 2} y={PRESS_SCREEN.y + PRESS_SCREEN.h / 2} r={PRESS_SCREEN.w * 0.42} at={T.countAt.P} />
+          <TickRing x={PRESS_SCREEN.x + PRESS_SCREEN.w / 2} y={PRESS_SCREEN.y + PRESS_SCREEN.h / 2} r={PRESS_SCREEN.w * 0.36} at={T.countAt.P} />
           <RoofSign swingAt={b.swing} />
           <BitOnSign swingAt={b.swing} twitchAt={b.doorway} />
         </PopUp>

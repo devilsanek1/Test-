@@ -372,7 +372,8 @@ export const YearFlyers: React.FC<{tears: number[]; until: number; life?: number
       out.push(<LiftPose key={i} i={i} seed={seed} />);
       return;
     }
-    const q = (t - ta - FRAME) / (life - FRAME);
+    // (the last tears' flights are compressed so they finish their fly-off by `until`, not cut mid-air)
+    const q = (t - ta - FRAME) / (end - ta - FRAME);
     // off the pad, front out: from just above the header, up and a little right, shrinking away, fluttering
     const cx = CAL[0] + w / 2 + 4 + lerp(0, 26 + r('x') * 48, E.outCubic(q));
     const cy = bind - 34 - lerp(0, 46 + r('y') * 40, E.outQuad(q)) + 16 * q * q;

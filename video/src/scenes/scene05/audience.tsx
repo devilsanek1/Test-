@@ -26,18 +26,23 @@ type Head = {x: number; y: number; head: number; hair: Hair; hairColor?: string;
  *  (`bun`: the kit's 'short' head, whose three strands follow the skull, plus a registered bun and a peach hair tie): the
  *  kit's bun drew its parting across the strands (an X) and its ring 10-15 px off its fill. */
 export const HEADS: Head[] = [
-  // back row: heads 128-134 (~147 px), centres ~1556 (screen ~1656, tops ~1582)
-  {x: 150, y: 1560, head: 130, hair: 'short', bun: true, hairColor: palette.brown, body: palette.sand, acc: ['scarf'], rim: 'right', seed: 's5au/b1'},
-  {x: 392, y: 1552, head: 128, hair: 'curly', hairColor: palette.tan, body: palette.sage, acc: ['collar'], rim: 'right', react: 'look', seed: 's5au/b2'},
-  {x: 690, y: 1558, head: 132, hair: 'beanie', hairColor: palette.brown, body: palette.sand, acc: ['collar'], rim: 'left', seed: 's5au/b3'},
-  {x: 935, y: 1548, head: 134, hair: 'short', hairColor: palette.brown, body: palette.tan, acc: ['collar'], rim: 'left', seed: 's5au/b4'},
-  {x: 1170, y: 1556, head: 130, hair: 'curly', hairColor: palette.ink, body: palette.sage, acc: ['collar'], rim: 'left', seed: 's5au/b5'},
-  // front row: heads 182-196 (~210 px), centres ~1660 (screen ~1774), the outer two cropped by the frame edges
-  {x: 60, y: 1652, head: 192, hair: 'short', hairColor: palette.brown, body: palette.teal, acc: ['hood'], rim: 'right', seed: 's5au/f1'},
-  {x: 280, y: 1672, head: 182, hair: 'short', bun: true, hairColor: palette.tan, body: palette.sage, acc: ['collar'], rim: 'right', react: 'turn', seed: 's5au/f2'},
-  {x: 808, y: 1664, head: 186, hair: 'cap', body: palette.tan, rim: 'left', react: 'look', seed: 's5au/f3'},
-  {x: 1012, y: 1646, head: 196, hair: 'long', hairColor: palette.brown, body: palette.teal, acc: ['collar'], rim: 'left', seed: 's5au/f4'},
-  {x: 1290, y: 1660, head: 188, hair: 'short', hairColor: palette.tan, body: palette.sand, acc: ['hood'], rim: 'left', seed: 's5au/f5'},
+  // A1 polish (review: the 10 heads were the largest, highest-contrast mass and sat at the teams' feet, so the audience
+  // read as seated children): both rows DROP 45 world (~51 px) and calm down: ONE dark head (f4, the long brown hair at
+  // the right edge), every other hair one step lighter (tan), the beanie sage (seed b3d: the kit's hat pick), f1's coat
+  // sage (and b4's: a tan head on a tan coat makes the kit swap the hair to ink). The teams and tablets are the contrast
+  // peak above y 1480.
+  // back row: heads 128-134 (~147 px), centres ~1601 (screen ~1707, tops ~1633)
+  {x: 150, y: 1605, head: 130, hair: 'short', bun: true, hairColor: palette.tan, body: palette.sand, acc: ['scarf'], rim: 'right', seed: 's5au/b1'},
+  {x: 392, y: 1597, head: 128, hair: 'curly', hairColor: palette.tan, body: palette.sage, acc: ['collar'], rim: 'right', react: 'look', seed: 's5au/b2'},
+  {x: 690, y: 1603, head: 132, hair: 'beanie', hairColor: palette.tan, body: palette.sand, acc: ['collar'], rim: 'left', seed: 's5au/b3d'},
+  {x: 935, y: 1593, head: 134, hair: 'short', hairColor: palette.tan, body: palette.sage, acc: ['collar'], rim: 'left', seed: 's5au/b4'},
+  {x: 1170, y: 1601, head: 130, hair: 'curly', hairColor: palette.brown, body: palette.sage, acc: ['collar'], rim: 'left', seed: 's5au/b5'},
+  // front row: heads 182-196 (~210 px), centres ~1705 (screen ~1825), the outer two cropped by the frame edges
+  {x: 60, y: 1697, head: 192, hair: 'short', hairColor: palette.tan, body: palette.sage, acc: ['hood'], rim: 'right', seed: 's5au/f1'},
+  {x: 280, y: 1717, head: 182, hair: 'short', bun: true, hairColor: palette.tan, body: palette.sage, acc: ['collar'], rim: 'right', react: 'turn', seed: 's5au/f2'},
+  {x: 808, y: 1709, head: 186, hair: 'cap', body: palette.tan, rim: 'left', react: 'look', seed: 's5au/f3'},
+  {x: 1012, y: 1691, head: 196, hair: 'long', hairColor: palette.brown, body: palette.teal, acc: ['collar'], rim: 'left', seed: 's5au/f4'},
+  {x: 1290, y: 1705, head: 188, hair: 'short', hairColor: palette.tan, body: palette.sand, acc: ['hood'], rim: 'left', seed: 's5au/f5'},
 ];
 
 /** EdgeOnlooker's idle bob (props Figures.tsx: osc(t, 0.5, rand(seed, 'b') x 6) x bob): the bun rides it. */

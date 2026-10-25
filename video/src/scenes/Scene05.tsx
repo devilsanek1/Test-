@@ -38,7 +38,7 @@ import {Calendar, DiagramHand, LabelTag, yearPages} from './shared/props';
 import {beats, S05_START, S05_END} from './scene05/beats';
 import {camAt, camMat, layerCam, LAYER_F} from './scene05/camera';
 import {Beams, BigZ, BitLeap, BitOnLock, LeafFall, LeafOnCrown, MessengerDash, PipHop, PipOnRail, stepGaps, Teams} from './scene05/cast';
-import {CalloutKeyhole, CorniceSoffit, DoorSwing, FoundRing, handTurn, KNOB, LOCK_C, LockTurn, PlazaGround, SHEET_IN, SheetLock, SheetPanels, SheetTint, StepsOverlay} from './scene05/plan';
+import {CalloutKeyhole, CorniceSoffit, DoorSwing, FoundRing, handTurn, KNOB, LOCK_C, LockTurn, PlazaGround, SHEET_IN, SheetLock, SheetPanels, SheetTint, StepsOverlay, WingDetails} from './scene05/plan';
 import {Audience, Pigeons} from './scene05/audience';
 import {Flagpole} from './scene05/flag';
 
@@ -172,9 +172,10 @@ const Scene05: React.FC = () => {
   const sway = swayAngle(t, b.sway);
   const swayM = mat.about(mat.rotate(sway), BLUEPRINT_WALL.lock.x, BLUEPRINT_WALL.rodY);
 
-  // the sun: SCREEN space in its notch (930, 725) r110, a 10 px/s idle drift right (ENGINE 6), depth 0.05 on the truck
+  // the sun: SCREEN space in its notch (930, 725) r110, a 10 px/s idle drift (ENGINE 6), depth 0.05 on the truck. A1
+  // polish: it drifts LEFT (sinking behind the facade corner), away from the flagpole now standing right of it
   const sunX = 930 - (cam.x - 540) * cam.zoom * 0.05;
-  const sun = <Sun cx={sunX} cy={725} r={110} drift={[10, 0]} />;
+  const sun = <Sun cx={sunX} cy={725} r={110} drift={[-10, 0]} />;
 
   const calendar = (
     <>
@@ -197,7 +198,7 @@ const Scene05: React.FC = () => {
           <Look fills="none">{node}</Look>
           {/* 'bad': the right leaf swings ajar behind the callout */}
           <DoorSwing at={b.door} />
-          <SheetLock />
+          <SheetLock whiteAt={b.bitIn} />
           <CalloutKeyhole />
           {/* L5 rides across the match-cut as the lock's annotation tag; pops off on 'using' */}
           <LabelTag kind="tag" box={L5_BOX} hang={[LOCK_C[0] + 24, LOCK_C[1] + 36]} text={L5} fontSize={36} outAt={b.l5Out} seed="s5L5" />
@@ -206,7 +207,7 @@ const Scene05: React.FC = () => {
           <OnSheet>
             <XG m={mat.about(mat.rotate(turn), PINCH[0], PINCH[1])}>
               <ArmBreak drawAt={HAND_AT(b)} undrawAt={b.envelope} dur={0.15}>
-                <DiagramHand x={PINCH[0]} y={PINCH[1]} angle={HAND_ANGLE} scale={HAND_SCALE} drawAt={HAND_AT(b)} drawDur={0.15} undrawAt={b.envelope} ink={3.0} handFill={palette.white} seed="s5hand" />
+                <DiagramHand x={PINCH[0]} y={PINCH[1]} angle={HAND_ANGLE} scale={HAND_SCALE} drawAt={HAND_AT(b)} drawDur={0.15} undrawAt={b.envelope} ink={3.0} handFill={palette.cream} seed="s5hand" />
                 <HoodCue drawAt={HAND_AT(b)} undrawAt={b.envelope} dur={0.15} />
               </ArmBreak>
             </XG>
@@ -247,6 +248,7 @@ const Scene05: React.FC = () => {
         <>
           <Flagpole snaps={[b.teamA, b.calendar]} slack={[b.balloon, b.door + 0.2]} />
           {node}
+          <WingDetails />
         </>
       );
     return node;

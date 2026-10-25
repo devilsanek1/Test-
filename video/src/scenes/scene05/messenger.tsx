@@ -8,8 +8,8 @@
 // World px (steps layer, parallax 1.0), scene seconds.
 import React, {useId} from 'react';
 import {palette} from '../../lib/theme';
-import {clamp, ease as E, lerp, prog, useTime} from '../../lib/time';
-import {rng} from '../../lib/rng';
+import {clamp, ease as E, lerp, osc, prog, useTime} from '../../lib/time';
+import {rand, rng} from '../../lib/rng';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {PERSON_LEGS, PERSON_SHOES, PERSON_HAIR} from '../../lib/kit';
@@ -17,6 +17,7 @@ import {mat, XG} from '../../lib/xf';
 import {blob, polyPath, Pt} from '../../lib/sketch';
 import {BLUEPRINT_WALL} from '../shared/sets';
 import {FigureArm, Messenger} from '../shared/props';
+import {MessengerDetail} from '../scene06/msgDetail';
 import {camAt, Cam} from './camera';
 import type {Beats} from './beats';
 import {FIG_H, LEG, personGeo, TORSO} from './shims';
@@ -156,6 +157,20 @@ export function collarAt(t: number, b: Beats): Pt {
   return [st.hip[0] + dx * Math.cos(a) - dy * Math.sin(a), st.hip[1] + dx * Math.sin(a) + dy * Math.cos(a)];
 }
 
+/** A1 polish (S05 -> S06 continuity: S06's messenger carries a cross-body satchel, coat seams, cream soles and a peach
+ *  rim): S06's own hero overlay (scene06/msgDetail, exported for S05, same seed) drawn in his person frame, so he is the
+ *  SAME figure on both sides of the cut on action. `arm` = the props Messenger's raised envelope arm (rim on its top);
+ *  `bag` = the satchel's swing per run pose. Running, the overlay is clipped below the coat (S05's legs are its own run
+ *  legs: no kit soles). */
+const RUN_BAG = [3.5, 0, -3.5, 0];
+const msgArm = (t: number, b: Beats) => {
+  const q = prog(t, b.pull, 0.3, E.outBack(1.3));
+  if (q <= 0.6) return undefined;
+  const sh: Pt = [G.w * 0.34, -G.h * 0.8];
+  const hand: Pt = [lerp(G.w * 0.48, G.w * 0.7, q), lerp(-G.h * 0.2, -G.h * 0.92, q)];
+  return {sh, hand};
+};
+
 /** Pops up with team B (PopRise from cast.tsx), stands, raises the envelope; runs from 'was.'. */
 export const MessengerRun: React.FC<{b: Beats; Pop: React.FC<{at: number; x: number; y: number; children?: React.ReactNode}>}> = ({b, Pop}) => {
   const t = useTime();
@@ -167,6 +182,9 @@ export const MessengerRun: React.FC<{b: Beats; Pop: React.FC<{at: number; x: num
         {/* fix round 3: the flat sand contact sliver under his soles (as the teams'): he stands ON the landing */}
         <Fill d={blob(st.x, FEET + 1.5 * S, G.w * 0.52 * S, 4.2 * S, {seed: 's5msg/cs'})} color={palette.sand} offset={false} mode="none" seed="s5msg/csf" />
         <Messenger x={st.x} y={FEET} h={MESSENGER.h} pullAt={b.pull} bob={1.2} seed={MESSENGER.seed} />
+        <XG m={mat.compose(mat.translate(st.x, FEET - LEG * S + osc(t, 0.6, rand(MESSENGER.seed, 'bob') * 6) * 1.2), mat.scale(S))}>
+          <MessengerDetail seed={MESSENGER.seed} k={S * camAt(t, b.end).zoom} arm={msgArm(t, b)} />
+        </XG>
       </Pop>
     );
   }
@@ -190,6 +208,16 @@ export const MessengerRun: React.FC<{b: Beats; Pop: React.FC<{at: number; x: num
         </defs>
         <g clipPath={`url(#${id})`}>
           <Messenger x={st.x} y={FEET + st.drop * S} h={MESSENGER.h} pullAt={b.pull} seed={MESSENGER.seed} />
+        </g>
+        <defs>
+          <clipPath id={`${id}d`} clipPathUnits="userSpaceOnUse">
+            <rect x={st.x - 400} y={st.hip[1] - 800} width={800} height={800 + 14} />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${id}d)`}>
+          <XG m={local}>
+            <MessengerDetail seed={MESSENGER.seed} k={S * camAt(t, b.end).zoom} arm={msgArm(t, b)} bag={{rot: RUN_BAG[st.idx], dy: 0}} />
+          </XG>
         </g>
       </XG>
       <SpeedLines t={t} at={b.truck + 0.02} x={st.x} />

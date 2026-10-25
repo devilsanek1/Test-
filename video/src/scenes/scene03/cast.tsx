@@ -301,7 +301,11 @@ const SmallWalker: React.FC<{w: Walker; bobAt: number}> = ({w, bobAt}) => {
   if (k <= 0.001) return null;
   const p = walkerPos(w, t);
   const bob = t >= bobAt && t < bobAt + 0.24 ? 5 * Math.sin(Math.PI * ((t - bobAt) / 0.24)) * (p.h / 100) : 0;
-  const lean = w.lookUpAt !== undefined && t >= w.lookUpAt ? -5 * E.outBack(1.6)(clamp((t - w.lookUpAt) / 0.25)) : 0;
+  // the look-up (A1, finding: a 5 deg lean changed < 2,000 px2 a frame and did not register as an event, leaving the
+  // bait's longest gap at 0.73 s): he leans back 9 deg (out-back, 0.2 s) and lifts the street-side hand to his brow,
+  // shading his eyes to look up at the press house; held ~1.75 s, then the hand drops (0.15 s)
+  const lookK = w.lookUpAt !== undefined && t >= w.lookUpAt ? E.outBack(1.6)(clamp((t - w.lookUpAt) / 0.2)) * (1 - E.inOutSine(prog(t, w.lookUpAt + 1.75, 0.15))) : 0;
+  const lean = -9 * lookK;
   const fy = p.y - bob;
   // the waving arm (coat sleeve + sand hand), from the shoulder on the street side
   let arm: React.ReactNode = null;
@@ -330,10 +334,35 @@ const SmallWalker: React.FC<{w: Walker; bobAt: number}> = ({w, bobAt}) => {
       </>
     );
   }
+  // the brow hand: upper arm out and up to the elbow, forearm back in to the brow, a sleeve-coloured mitten at the
+  // forehead (drawn over the figure: the arm is raised in front of the head's side)
+  let brow: React.ReactNode = null;
+  if (lookK > 0.02) {
+    const side = p.x < VP[0] ? 1 : -1;
+    const q = Math.min(1, lookK);
+    const sh: Pt = [p.x + side * p.h * 0.13, fy - p.h * 0.66];
+    const rest: Pt = [p.x + side * p.h * 0.16, fy - p.h * 0.36];
+    const el: Pt = [lerp(rest[0], p.x + side * p.h * 0.29, q), lerp(rest[1], fy - p.h * 0.76, q)];
+    const hd: Pt = [lerp(rest[0], p.x + side * p.h * 0.1, q), lerp(rest[1] + p.h * 0.1, fy - p.h * 0.9, q)];
+    const wd = Math.max(2.4, p.h * 0.06);
+    const d = `M${sh[0].toFixed(1)} ${sh[1].toFixed(1)}L${el[0].toFixed(1)} ${el[1].toFixed(1)}L${hd[0].toFixed(1)} ${hd[1].toFixed(1)}`;
+    const ang = (Math.atan2(hd[1] - el[1], hd[0] - el[0]) * 180) / Math.PI;
+    brow = (
+      <>
+        <Ink d={d} width={wd + 3.2} color={palette.ink} taper={false} cap="round" seed={`s03/brow${w.id}o`} />
+        <Ink d={d} width={wd} color={w.body ?? palette.teal} taper={false} cap="round" seed={`s03/brow${w.id}i`} />
+        <XG m={mat.compose(mat.translate(hd[0], hd[1]), mat.rotate(ang + 90))}>
+          <Fill d={mitten(wd, side)} color={w.body ?? palette.teal} offset={false} mode="none" seed={`s03/browH${w.id}`} />
+          <Ink d={mitten(wd, side)} width={1.5} taper={false} seed={`s03/browHI${w.id}`} />
+        </XG>
+      </>
+    );
+  }
   return (
     <XG m={mat.compose(mat.about(mat.scale(1, k), p.x, p.y), mat.about(mat.rotate(lean), p.x, fy))}>
       {arm}
       <Citizen x={p.x} y={fy} h={p.h} body={w.body} hair={w.hair} acc={w.acc} walk={p.walking ? {hz: 1.8} : undefined} bob={p.walking ? 0 : 1.0} seed={`s03/w${w.id}`} />
+      {brow}
     </XG>
   );
 };
