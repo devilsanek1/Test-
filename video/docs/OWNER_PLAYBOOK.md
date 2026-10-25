@@ -47,11 +47,13 @@ Format: **rule** — why / evidence (video, date).
   - Expand with new colours or palettes when a story needs it.
   - Board: `docs/look/palette_family.png`; data: `docs/look/palettes.json`; rules: `docs/look/PALETTE.md`.
   — owner, 2026-10-25.
-- **Texture and lines: VERY subtle, as in `docs/look/texture_refs/autumn_walk_detail.png`.**
-  - Texture: a fine, tone-on-tone halftone dot texture on the colour fills, barely visible.
-  - Lines: thin dark lines only in key places (creases, a leash, a mouth, an ear), not outlines around every shape;
-    shapes are separated by colour.
-  - Test it in production (G4 style frames, checked after Reels-like compression). — owner, 2026-10-25.
+- **Texture and lines: VERY subtle, and only where it makes sense.**
+  - Thin dark tapered lines go only in key places (creases, a leash, a mouth, an ear), not as outlines around every shape.
+  - The halftone texture (`docs/look/texture_refs/`) is applied **tactically, to a few elements where it adds
+    something** (e.g. the hero's clothes in a close-up, one key prop, a cozy interior surface), never everywhere.
+  - It is an **optional last step of production**, after polish and before the final render. The film must work flat
+    without it, and the owner decides per video whether to use it.
+  — owner, 2026-10-25 (after the texture test).
 - **Profile identity: the mascot Pip (the purple PHP elephant) in the film's style;** the avatar in use is the
   power-button sun one (`video/deliverables/profile/pip_power_button.png`). — 2026-10-25.
 

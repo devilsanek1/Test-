@@ -59,7 +59,7 @@ every palette against the DNA below.
   - **one hero** (C >= 30): saturated, on the subject or the story's object, 5-15 % of the frame;
   - **one dark anchor** (L* <= 40): tinted, instead of black, about 5 %;
   - **at most one hot pop** (C >= 50): 1-3 %, only on "look here" (the frame-0 hook detail, a notification, a reveal).
-- **Texture and lines:** see "Texture and lines" below. They are very subtle: a tone-on-tone halftone and lines only in key places.
+- **Texture and lines:** see "Texture and lines" below. Lines go only in key places. The halftone is optional, a last-step polish used tactically on a few elements, never everywhere.
 
 **The family (v1):**
 
@@ -130,4 +130,10 @@ and locked to the shape, so it moves with the camera.
   - `motion_master.mp4` and `motion_reels_sim.mp4`: a 5 s camera push from 1.0 to 1.22, with the texture locked to
     the shapes, re-encoded at 3.5 Mbps.
 - **Result:** the halftone survives Reels-like compression, at rest and mid-push, and no moiré was visible in the stills.
-- **Waiting on the owner:** pick B or C (or in between), confirm key lines vs outlines, and check for shimmer on the phone.
+- **The owner's decision, 2026-10-25:** "it needs to be very subtle and only tactically in some places where it makes
+  sense, not everywhere; super tactically, perhaps as the very last step in production, otherwise optional."
+  - **Strength:** at most variant B (6 %), lighter if in doubt.
+  - **Where:** only on a few chosen elements per shot, e.g. the hero's clothing in a close-up, one key prop or a cozy
+    interior surface. Never the background, never every shape, never small or fast-moving things.
+  - **When:** an optional texture pass, as the last step after G6 polish and before the G8 render. The film must be
+    finished and good flat. Key-place lines stay part of the normal drawing.

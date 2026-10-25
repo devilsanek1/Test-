@@ -38,7 +38,7 @@ one is approved.
 | **G3 Sketch animatic** | the whole film as line sketches timed to the voice, rough camera, **every transition labelled**, 2 hook-visual variants | **story in pictures**: shot per line, cuts, transitions, peaks | scene list, cut points, shot content, transition types | first cut 2 h; rounds 30 min |
 | G4 Look (parallel to G3) | 1-3 finished stills plus a 3-5 s motion test | palette, line, mascot, edges | visual language | house style: 15-min check |
 | G5 Blocking cut | real sets and props at draft quality, final camera, key poses, **no edges/paper/texture** | staging, readability at phone size, transitions that play | compositions, camera, timing | 4 h |
-| G6 Polish cut | easing, secondary motion, edges, paper; **AI critics start here** | feel only (no restaging) | the picture | 6 h, 1 round + bug fixes |
+| G6 Polish cut | easing, secondary motion, edges, paper; **AI critics start here**; last, an *optional* tactical texture pass on a few elements (playbook) | feel only (no restaging) | the picture | 6 h, 1 round + bug fixes |
 | G7 Sound | SFX from the final beats, music, -14 LUFS mix | mix | audio | 1 h |
 | G8 Final | full-res render, QA, cover, posting kit | blockers only | everything | 1.5 h |
 
