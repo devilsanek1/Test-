@@ -82,6 +82,7 @@ def main():
             'words': words,
             'lines': segs,
             'sfx': spec.get('sfx', []),
+            'hideCaptions': bool(hook.get('hideCaptions')),
         }
         (OUT / f'{a.prefix}{n}.json').write_text(json.dumps(data, indent=1))
         print(f'{a.prefix}{n}: {data["durationSec"]:.1f} s, {len(words)} words')

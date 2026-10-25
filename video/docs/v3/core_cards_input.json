@@ -1,0 +1,7 @@
+{"voice":"af_heart","speed":1.05,"lead":0.15,"tail":1.1,
+ "hooks":[
+  {"label":"v3 G0.5 core line · A (recommended)","vo":"Don't use AI? It's still raising laptop prices.","tts":"Don't use AI? ... It's still raising laptop prices.","frame0":"DON'T USE AI? IT'S STILL RAISING LAPTOP PRICES","frame0Hold":true,"hideCaptions":true,"image":"a giant AI data centre scooping up memory chips; a small laptop beside it, its price tag climbing"},
+  {"label":"v3 G0.5 core line · B (your line, made true)","vo":"AI is making your next laptop pricier.","frame0":"AI IS MAKING YOUR NEXT LAPTOP PRICIER","frame0Hold":true,"hideCaptions":true,"image":"a laptop in a cozy desk nook; its price tag grows as a huge data centre glows outside the window"},
+  {"label":"v3 G0.5 core line · C","vo":"You're losing a bidding war to AI, for the memory chips your next laptop needs.","frame0":"YOU'RE LOSING A BIDDING WAR TO AI","frame0Hold":true,"hideCaptions":true,"image":"an auction hall: a giant data-centre hand with a paddle against a tiny laptop hand; memory chips on the block"}
+ ],
+ "sfx":[{"src":"v3/phone_like_pop.wav","t":0.03,"gain":0.5}]}

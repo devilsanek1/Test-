@@ -1,0 +1,114 @@
+{
+ "label": "v3 G0.5 core line \u00b7 C",
+ "audio": "v3/core_3.wav",
+ "durationSec": 5.864,
+ "frame0": "YOU'RE LOSING A BIDDING WAR TO AI",
+ "frame0Until": 5.864,
+ "words": [
+  {
+   "w": "You're",
+   "s": 0.15,
+   "e": 0.533,
+   "line": 0
+  },
+  {
+   "w": "losing",
+   "s": 0.533,
+   "e": 0.916,
+   "line": 0
+  },
+  {
+   "w": "a",
+   "s": 0.916,
+   "e": 1.043,
+   "line": 0
+  },
+  {
+   "w": "bidding",
+   "s": 1.043,
+   "e": 1.477,
+   "line": 0
+  },
+  {
+   "w": "war",
+   "s": 1.477,
+   "e": 1.707,
+   "line": 0
+  },
+  {
+   "w": "to",
+   "s": 1.707,
+   "e": 1.885,
+   "line": 0
+  },
+  {
+   "w": "AI",
+   "s": 1.885,
+   "e": 2.064,
+   "line": 0
+  },
+  {
+   "w": "for",
+   "s": 2.064,
+   "e": 2.294,
+   "line": 0
+  },
+  {
+   "w": "the",
+   "s": 2.294,
+   "e": 2.523,
+   "line": 0
+  },
+  {
+   "w": "memory",
+   "s": 2.523,
+   "e": 2.906,
+   "line": 0
+  },
+  {
+   "w": "chips",
+   "s": 2.906,
+   "e": 3.238,
+   "line": 0
+  },
+  {
+   "w": "your",
+   "s": 3.238,
+   "e": 3.518,
+   "line": 0
+  },
+  {
+   "w": "next",
+   "s": 3.518,
+   "e": 3.799,
+   "line": 0
+  },
+  {
+   "w": "laptop",
+   "s": 3.799,
+   "e": 4.182,
+   "line": 0
+  },
+  {
+   "w": "needs",
+   "s": 4.182,
+   "e": 4.514,
+   "line": 0
+  }
+ ],
+ "lines": [
+  {
+   "s": 0.15,
+   "e": 4.514,
+   "image": "an auction hall: a giant data-centre hand with a paddle against a tiny laptop hand; memory chips on the block"
+  }
+ ],
+ "sfx": [
+  {
+   "src": "v3/phone_like_pop.wav",
+   "t": 0.03,
+   "gain": 0.5
+  }
+ ],
+ "hideCaptions": true
+}

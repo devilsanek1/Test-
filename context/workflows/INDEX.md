@@ -41,3 +41,5 @@
 | 2026-10-25 15:32 | `pipeline-retro-wf_a4892463-c35.js` | 1 | 3 | `context/agent_reports/2026-10-25_1532_pipeline-retro-wf_a4892463-c35.md` |
 | 2026-10-25 17:34 | `v2-g0-angles-wf_b7b190a7-4fe.js` | 0 | 13 | `context/agent_reports/2026-10-25_1734_v2-g0-angles-wf_b7b190a7-4fe.md` |
 | 2026-10-25 20:30 | `v3-g0-topics-wf_b78a4844-2b3.js` | 10 | 0 | `context/agent_reports/2026-10-25_2030_v3-g0-topics-wf_b78a4844-2b3.md` |
+| 2026-10-25 | `v3-g1-script-wf_8fae0ebe-4dd.js` | 5 | stopped | facts + 3 drafts kept; stopped for G0.5 |
+| 2026-10-25 | `v3-g05-core-line-wf_82260111-549.js` | 35 | 0 | `context/agent_reports/2026-10-25_v3-g05-core-line-wf_82260111-549.md` |

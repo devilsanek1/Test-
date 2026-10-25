@@ -1,0 +1,66 @@
+{
+ "label": "v3 G0.5 core line \u00b7 B (your line, made true)",
+ "audio": "v3/core_2.wav",
+ "durationSec": 3.842,
+ "frame0": "AI IS MAKING YOUR NEXT LAPTOP PRICIER",
+ "frame0Until": 3.842,
+ "words": [
+  {
+   "w": "AI",
+   "s": 0.15,
+   "e": 0.348,
+   "line": 0
+  },
+  {
+   "w": "is",
+   "s": 0.348,
+   "e": 0.545,
+   "line": 0
+  },
+  {
+   "w": "making",
+   "s": 0.545,
+   "e": 0.968,
+   "line": 0
+  },
+  {
+   "w": "your",
+   "s": 0.968,
+   "e": 1.279,
+   "line": 0
+  },
+  {
+   "w": "next",
+   "s": 1.279,
+   "e": 1.589,
+   "line": 0
+  },
+  {
+   "w": "laptop",
+   "s": 1.589,
+   "e": 2.012,
+   "line": 0
+  },
+  {
+   "w": "pricier",
+   "s": 2.012,
+   "e": 2.492,
+   "line": 0
+  }
+ ],
+ "lines": [
+  {
+   "s": 0.15,
+   "e": 2.492,
+   "image": "a laptop in a cozy desk nook; its price tag grows as a huge data centre glows outside the window"
+  }
+ ],
+ "sfx": [
+  {
+   "src": "v3/phone_like_pop.wav",
+   "t": 0.03,
+   "gain": 0.5
+  }
+ ],
+ "hideCaptions": true
+}

@@ -16,6 +16,7 @@ export type RadioData = {
   words: Word[];
   lines: {s: number; e: number; image: string}[];
   sfx: {src: string; t: number; gain?: number}[];
+  hideCaptions?: boolean;
 };
 
 const INK = '#2a2420';
@@ -71,13 +72,13 @@ export const RadioCut: React.FC<{data: RadioData}> = ({data}) => {
       ))}
 
       {showF0 && (
-        <div style={{position: 'absolute', top: 330, left: 70, right: 70, textAlign: 'center', fontSize: 104,
+        <div style={{position: 'absolute', top: data.hideCaptions ? 700 : 330, left: 70, right: 70, textAlign: 'center', fontSize: 104,
           lineHeight: 1.08, fontWeight: 700, opacity: f0}}>
           {data.frame0}
         </div>
       )}
 
-      {page && (
+      {page && !data.hideCaptions && (
         <div style={{position: 'absolute', top: 1000, left: 60, right: 60, textAlign: 'center', fontSize: 118,
           lineHeight: 1.1, opacity: pp.opacity, transform: `scale(${pp.scale})`}}>
           {page.map((w, i) => (
