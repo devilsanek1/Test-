@@ -29,8 +29,12 @@ export const PUSH_X = 560;
  *  round 1: narrower and 30 px further right (rx 200 -> 172, cx 280 -> 310: feet (138, 1080) / (482, 1080), apex
  *  (310, 868)): the COUNTED attempters heap up OUTSIDE its left flank (x ~20-150, a mound against the glass, bodies on
  *  the city / the peach band, hands on the glass), never inside the arc's silhouette; the climbers on 'millions' carry
- *  the heap on up the shoulder. */
-export const DOME8: DomeArc = {cx: 310, by: 1080, rx: 172, ry: 212};
+ *  the heap on up the shoulder. A1 fix round 2 (the reviewers: 'a small greenhouse / snow globe on nearby roofs'): a
+ *  COLOSSAL far dome: its foot sits BEHIND row 2 (by 1132: row 2's back-fill from 1120 and its roofs at 1089-1126 hide
+ *  the foot by 10-40 px, no plinth on top of the roofs), the apex up at y 814 (ry 318: the arc stands up out of the
+ *  peach band into the sky), feet 115 / 525 (rx 205; the right flank still runs behind the board), and inside it a
+ *  dense far district at row-0/1 scale (extras.tsx District). */
+export const DOME8: DomeArc = {cx: 320, by: 1132, rx: 205, ry: 318};
 
 /** Pip on the coping LEFT of the board (fix round 1: at x 915 he sat on the board's corner and in the right rail). */
 export const PIP: Pt = [390, copingY(390)];

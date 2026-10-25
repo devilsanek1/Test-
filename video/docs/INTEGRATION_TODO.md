@@ -115,7 +115,8 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
   S11 (r2 reviews), S12 (r1 reviews), S04's final fix (partly done). Kept: S09 / S10 first polish (7.5 / 8 +fix).
   05:35: tree OK (tsc clean); relaunched A1 as 3 workflows (lower concurrency, fewer agents to lose):
   wf_c49e57be-ed9 (S11 -> S12), wf_757a8d7d-ce1 (S03, S05, S04), wf_f6eafcb1-f45 (S08, S07, S09, S10); 2 rounds each.
-  Half-res preview of the whole film rendering to out/preview_0540.mp4.
+  Half-res preview of the whole film rendering to out/preview_0540.mp4 (killed by its 50 min timeout under load).
+- 08:20: out/preview_v1.mp4 (40 %, 432x768, 55.38 s, AAC, peak -1.3 dB) delivered to the user as a WIP snapshot.
 
 ## Sound re-lock notes (phase D)
 
