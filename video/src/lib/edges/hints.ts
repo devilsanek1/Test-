@@ -21,7 +21,7 @@ import type {EdgeHints} from './shared';
  *  colour for all of S01 and S12) is the only hints-level fix. bl / br are dense but their figures are kept, so they
  *  cannot go bare. */
 const S01_HINTS: EdgeHints = {
-  ink: {tl: 0, tr: 0.45, br: 1, bl: 0.62, left: 1, right: 0.13, bottom: 0.69},
+  ink: {tl: 0, tr: 0.1, br: 1, bl: 0.62, left: 1, right: 0.13, bottom: 0.69}, // tr 0.1: no bare top corner (no white at the top)
   keep: [
     [0, 1380, 260, 1920], // the onlooker at the left frame edge (phone raised from 1.5 s; S12 too)
     [360, 1380, 760, 1920], // the near observer (grows in S01's dive)

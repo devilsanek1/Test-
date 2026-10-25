@@ -112,12 +112,14 @@ const ANCHORS: [number, Params][] = [
   [
     0.6,
     {
-      top: [14, 26],
+      // the user's note on the posted reel: a white strip at the very top reads as a screen recording under the
+      // phone's status bar, so the subtle preset paints colour past the top edge (no top paper); sides / bottom stay
+      top: [-40, -40],
       topStep: 0,
-      left0: [18, 30],
+      left0: [-40, -40], // no paper beside the caption band either: the top third is full-bleed colour
       left: [46, 62],
       leftLow: [46, 62],
-      right0: [14, 24],
+      right0: [-40, -40],
       rightLow: [14, 24],
       bottom: [18, 34],
       bottomSteps: 0,
