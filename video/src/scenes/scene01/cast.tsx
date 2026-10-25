@@ -329,7 +329,7 @@ export type PigeonPlan = {
   /** A small sideways hop on the bar. */
   shuffleAt?: number;
   shuffleDx?: number;
-  /** Scatters: flies to perch + flyTo over 1.1 s. */
+  /** Scatters: flies to perch + flyTo over 0.9 s (out(quad) burst). */
   flyAt?: number;
   flyTo?: Pt;
   /** Comes back: flies in from perch + backFrom along an arc, lands at backAt + 0.34 s. */
@@ -422,7 +422,8 @@ export const Pigeon: React.FC<{p: PigeonPlan; s?: number}> = ({p, s = 0.8}) => {
   }
   const back = p.backAt !== undefined && t >= p.backAt;
   if (p.flyAt !== undefined && t >= p.flyAt && !back) {
-    const q = prog(t, p.flyAt, 1.1, E.inQuad);
+    // fix round 4: a startled BURST (fast take-off, out(quad)) up and left: off the left edge in ~0.3 s
+    const q = prog(t, p.flyAt, 0.9, E.outQuad);
     if (q >= 1) return null;
     const to = p.flyTo ?? [200, -360];
     const [x, y] = arcPt(perch, [perch[0] + to[0], perch[1] + to[1]], q, 40);

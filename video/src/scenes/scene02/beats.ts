@@ -37,29 +37,35 @@ const ABS = {
   bitPeek: 5.235, //                        w18-0.07 'bug': Bit peeks out of the socket, antennae up
   site: 5.695, //                           w19 'where': site icon draws on, connector runs lock -> icon
   L1: 5.775, //                             w19+0.08 'where': label L1 (static title-block tag)
-  handIn: 5.825, //                         w20-0.05 'hackers': the dashed hand slides in (0.3 s, out(cubic))
+  handIn: 5.775, //                         w20-0.10 'hackers' (polish: was w20-0.05 in 0.3 s out(cubic), a 3-frame pop):
+  //                                        the dashed hand slides in from the sheet's edge, 0.40 s out(quad), ~70 -> 0 px
+  //                                        per frame, settled at 6.175, before 'could'
   could: 6.18, //                           w21-0.10 'could': Bit's antennae flatten; connector dashes march one step
   turn: 6.34, //                            w22-0.08 'take': the thumb-turn turns 90 deg (0.2 s out(cubic)), bolt retracts
   take: 6.42, //                            w22 'take': (lock_click SFX; the bolt is visibly moving, home ~6.5)
-  L2: 6.85, //                              w25-0.05 'site' (fix round 2; storyboard w22+0.15): label L2 + its curved
-  //                                        leader, AFTER the 'over' payoff (flag + ring settled), not inside it
+  L2: 6.70, //                              w23+0.065 'over' (polish; storyboard w22+0.15 = 6.57, fix round 2 6.85): label
+  //                                        L2 + its curved leader just after the flag lands (6.585), so the padlock pop on
+  //                                        'site' (6.82) reads as the leader's target. Sound lane: pop_mid 'L2 tag' -> 6.70
   arrow: 6.475, //                          w23-0.16 'over': the arrow runs along the connector, lands on the word
   bitHide: 6.575, //                        w23-0.06 'over': Bit ducks into the socket (out(quad))
   taken: 6.535, //                          w23-0.10 'over': the icon's window floods dark + hatching (starts on the word)
-  flag: 6.615, //                           w23-0.02 'over': the big flag pops on the roof, the icon squash-pops
+  flag: 6.585, //                           w23-0.05 'over': the big flag pops on the roof (0.1 s outBack from 0.3: full
+  //                                        size on the word), the icon squash-pops
   ring: 6.605, //                           w23-0.03 'over': an ink ring pops round the icon and runs out
   siteWord: 6.82, //                        w25-0.08 'site': the icon jolts, its padlock pops open
   release: 7.05, //                         (between 'site' and 'without'): the hand lets go of the turned knob, hovers
-  erase: 7.175, //                          w26-0.10 'without': an eraser rubs a patch of paper clean beside the loupe
-  without: 7.275, //                        w26 'without': key glyph draws in the patch, then an ink cross
+  erase: 7.03, //                           w26-0.245 'without': an eraser rubs a patch of paper clean beside the loupe
+  keyDraw: 7.10, //                         w26-0.175 'without': the key glyph draws in the patch (0.1 s), led in
+  without: 7.275, //                        w26 'without': the ink cross strikes the key ON the word (ENGINE rule 5)
   pipLean: 7.67, //                         w28 'password': Pip leans and looks down at the crossed key (0.1 s)
   pipCover: 7.77, //                        w28+0.10 'password': GAG: Pip ears-cover (x1.3, big worry marks, shiver)
   flutter: 8.03, //                         end(password)-0.15: the flag flutters; the cross ink settles
   handOut: 8.03, //                         end(password)-0.15 (fix round 2; storyboard cut-0.12): the hand pulls back out
   //                                        past the sheet edge, in(cubic) 0.34 s: visible over ~9 frames, gone by 8.36
-  pipEars: 8.04, //                         end(password)-0.14: Pip lifts his ears (stand-side, wide) and crouches
-  pipHop: 8.10, //                          end(password)-0.08 (fix round 2; storyboard cut-0.04): takeoff; on S02's last
-  //                                        frame he is in the air one S03 frame from S03's pickup (Scene02 PIP_OUT)
+  pipEars: 8.20, //                         end(password)+0.02 (polish: the ears-cover gag now holds 0.43 s): Pip lifts his
+  //                                        ears (stand-side, wide) and crouches 0.04 s
+  pipHop: 8.24, //                          end(password)+0.06 (storyboard cut-0.04 = 8.353): takeoff; on S02's last frame
+  //                                        he is ON S03's ballistic drop, at its position and velocity (Scene02 PIP_OUT)
   bitPop: 8.273, //                         cut(password)-0.12: Bit pops back up in the socket
 } as const;
 

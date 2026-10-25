@@ -19,7 +19,10 @@ sketch / bracket variants. `mode: 'heads'` = cap wearers (Keeper, Caretaker, cap
 size and at phone-thumbnail scale (x 0.3), colour and paper. `mode: 'figures'` (kitv3b) = every back-view preset at film
 size: the S06 Messenger (260, seed `s5msg`), a curly Messenger, Investigator, Maker, Keeper with arms raised; citizens
 whose seeded kit hair is sand / clay next to untouched ones; six EdgeOnlookers at the S07 size raising phones (raises at
-0.5 s: render 0.6-0.8 for the swing, 2.0 for the pose).
+0.5 s: render 0.6-0.8 for the swing, 2.0 for the pose). `mode: 'figfix'` (kitv3b fix round) = collar bands cut around
+LONG hair (Investigator 'inv3', S05's 's5b1', a long-haired Messenger, EdgeOnlooker 'collar' + 'long') and around the hero
+nape (90 px), S03's near walkers ('s03/nearR' on tan: tealDark band; on sand: tan band), a 60 px 'collar' head, S02's three
+onlookers at 2x (seed 's2on/a': seeded clay 'short' at 53 px -> ink-brown), a 12-citizen crowd (hair variety); render 2.0.
 
 ```bash
 scripts/still.sh SharedKitSheet 2.5 out.png                                         # every prop, mid-animation
@@ -53,6 +56,10 @@ scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 -
 - **No fades**: things pop (7 % spring), draw on, wipe, slide, swing, squash. Static translucency only for the scan beam.
 - **Misregistration in SCREEN space**: one offset per object, 2.4-4 px, 2/3 right-down; divided by the accumulated screen scale
   (camera zoom x parents x prop scale, read from `useXf()`), so a zoom-6 hidden match keeps the same print offset on screen.
+- **Camera ink compensation** (opt-in, docs/ENGINE.md 4b): raw `strokeWidth`: multiply by `useInkScale()` (lib/inkComp.tsx)
+  so camera ink compensation reaches it (lines drawn with core `<Ink>` get it already; 1 outside an `<InkScale>`, so
+  nothing changes by default). **Open request (kitv3b core review)**: BrowserChrome, Lock and SunMorphs (on screen in
+  S01's opted-in dive) still draw raw widths; then Figures, Labels, Glyphs, Bit, Diagram, Elephant, FixSign, Shutter, Tablet.
 - **LOD by on-screen size** (the same `useXf()` scale as `screenSize`/`toScreen` in `lib/cine/state.tsx`): each prop drops
   detail below its thresholds (listed per prop) and becomes a flat dot / bar far away.
 - **Render states**: `<Look fills="paper">` turns every fill white (frame 0 / loop line art; Bit, the sun and its overlays stay
@@ -300,7 +307,7 @@ out(exp)), `walk={{at, hz, to, dur}}`, `bob`, `flip`, `depth` (default by size: 
 
 | preset | look | extra props |
 |---|---|---|
-| `EdgeOnlooker` | tier A: head centre + `head` diameter; a long coat that ALWAYS runs off the frame bottom (its length is derived every frame from the camera transform: frame bottom + 40 px, never less than world.h + bleed; `frameBottom` overrides), so no hem and no legs can show; hanging arms (sleeve seam, cuff, sand hand at a natural arm length), a fixed-length white rim strip, ink 4.8 | `raisePhoneAt` / `lowerPhoneAt` (0.3 s outBack, shoulder jolt; kitv3b: a JOINTED arm driven by joint angles: the upper arm swings up while the elbow folds the forearm up ahead of it (bend 30 deg in the raised pose, +30 deg mid-swing), elbow out, tapered sleeve, cuff line, inner-elbow crease; the palm cups the phone's lower edge behind it, thumb + two finger tips wrap its sides in front; a coat tension FOLD draws from the raised arm's armpit toward the spine with the raise; hanging and raised hand points are the old ones, so every phone rests where it did), `phoneSide` (default: the side facing the frame centre), `arms` ('both' / 'near' / false), `hair` ('cap' = our `BackHead` over a straight collar band, head raised so the neck shows; never the kit cap or kit head), `hairColor` (default: the kit's seeded pick, a sand pick becomes ochre / ink-brown; clay stays: the hero head's strands + nape read as hair), `acc` ('hood' drawn here, under the head; not with 'cap'; 'backpack' dropped; kitv3b: 'collar' = a straight `CollarBand`, never the kit V, and under a cap it is dropped, BackHead draws the band), `body`, `rim` |
+| `EdgeOnlooker` | tier A: head centre + `head` diameter; a long coat that ALWAYS runs off the frame bottom (its length is derived every frame from the camera transform: frame bottom + 40 px, never less than world.h + bleed; `frameBottom` overrides), so no hem and no legs can show; hanging arms (sleeve seam, cuff, sand hand at a natural arm length), a fixed-length white rim strip, ink 4.8 | `raisePhoneAt` / `lowerPhoneAt` (0.3 s outBack, shoulder jolt; kitv3b: a JOINTED arm driven by joint angles: the upper arm swings up while the elbow folds the forearm up ahead of it (bend 30 deg in the raised pose, +30 deg mid-swing), elbow out, tapered sleeve, cuff line, inner-elbow crease; the palm cups the phone's lower edge behind it, thumb + two finger tips wrap its sides in front; a coat tension FOLD draws from the raised arm's armpit toward the spine with the raise; hanging and raised hand points are the old ones, so every phone rests where it did), `phoneSide` (default: the side facing the frame centre), `arms` ('both' / 'near' / false), `hair` ('cap' = our `BackHead` over a straight collar band, head raised so the neck shows; never the kit cap or kit head), `hairColor` (default: the kit's seeded pick, a sand pick becomes ochre / ink-brown; a clay pick on a 'short' / 'bun' head becomes ochre or ink-brown (seeded coin) BELOW the kit's hero-head size: clay stays only when `head` >= the kit's per-person hero threshold + 3 px (about 60-66 px; Person.tsx headT, hero head >= 80 % in), where the hero strands + notched nape read as hair. At S02's 50-54 px heads a clay disc had neither and read as a bald head; a swapped DARK disc also gets the exact disc under the kit's misregistered one, so no light crescent), `acc` ('hood' drawn here, under the head; not with 'cap'; 'backpack' dropped; kitv3b: 'collar' = a straight `CollarBand`, never the kit V (S03 's03/nearR' changed from the V to the band), cut around the head, hero nape and long hair, never the hair colour; under a cap it is dropped, BackHead draws the band), `body`, `rim` |
 | `Citizen` | 40-55 px kit Person with legs (also used larger as near walkers) | `silhouette` (flat sage cut-out; white tombstone in paper), `color`, `hairColor` (kitv3b; default: the seeded pick, sand / clay plain discs become ochre / ink-brown) |
 | `Investigator` | 110-140 px, ink shield badge on the back, straight collar band | `raiseAt` / `lowerAt` (arm swings up with a SparkleTablet), `arm`, `hairColor` (as Citizen), `collar` ('band' default since kitv3b / 'v' = the old kit chevron / false) |
 | `Messenger` | teal coat, ink-brown hair disc, straight tealDark collar band | `pullAt` (envelope out of the coat to shoulder height), `holdEnvelope`; `messengerHand(x, y, h)` (unchanged); kitv3b: `hair` (kit style passthrough, default 'short'), `hairColor` (default `palette.ink`: a FULL hair-colour disc; was the seeded clay pick, read as a skin disc in S06), `collar` ('band' default / 'v' = old / false) |
@@ -316,16 +323,24 @@ The presets mirror the kit Person's seeded torso width / head radius / shoulder 
 order changes, update them (kitv3b: also `kitPicks` = hair style weights, hair colour + its coat-clash swap, walk phase).
 
 Hair and collars (kitv3b, S06 review: the Messenger's seeded clay 'short' head read as a bald / skin disc from behind).
-`skinSafeHair(colour, coat?, style?)` (exported): sand -> ochre (ink-brown on an ochre coat), clay too on plain-disc styles
-('short', 'bun'); long / curly shapes keep any colour. The legged presets (Messenger, Investigator, Maker, Citizen) never
+`skinSafeHair(colour, coat?, style?, seed?)` (exported): sand -> ochre (ink-brown on an ochre coat), clay too on plain-disc
+styles ('short', 'bun'); long / curly shapes keep any colour. Fix round (crowd variety: 62 % of preset short / bun heads
+had gone ochre): with `seed`, clay goes to ochre OR ink-brown by a seeded coin (`rand(seed, 'hairfix') < 0.5` = ink-brown;
+always ink-brown on an ochre coat); sand stays -> ochre. Every preset passes its seed (Citizen, Investigator, Maker,
+EdgeOnlooker); without `seed` the old clay -> ochre mapping holds. The legged presets (Messenger, Investigator, Maker, Citizen) never
 pass `hairColor` to the kit Person (that skips a seeded draw and re-seeds the trousers, shoes and WALK PHASE: S05 -> S06
 trouser continuity, S06's planted stride): `HairOver` redraws the kit's own head disc (+ bun + part line, curly crown,
 long hair) with the kit's seeds over it, so the misregistered fill and the open outline land exactly on the kit's; it
 rides the kit's walk bob, relights at the kit's anchor and un-builds in its ExitSync group. Dark hair (ink, tealDark)
 also gets the exact disc under the misregistered one, so the outline never floats as a separate arc. It draws only
-when the colour changes (Messenger: always). EdgeOnlooker passes `hairColor` to the kit only for a sand pick (the
-re-seed only moves its scarf colour). The collar band (`CollarBand`, one palette step darker than the coat) goes over the
-kit torso and UNDER the redrawn head (Messenger, Investigator), or over the kit head's lower edge (EdgeOnlooker 'collar').
+when the colour changes (Messenger: always). EdgeOnlooker passes `hairColor` to the kit only for a swapped pick (the
+re-seed only moves its hat / scarf colour). The collar band (`CollarBand`, one palette step darker than the coat) is drawn
+after the kit Person (Messenger, Investigator, EdgeOnlooker 'collar') but CUT around the kit's head with a luminance mask
+(fix round): the kit head disc + ink circle, the 'long' hair shape, the 'curly' crown and the hero nape notch (scaled like
+the kit's), each filled and stroked at the ink width, so the band goes behind the hair: it never paints across long hair
+like a strap (Investigator 'long', e.g. S05's 's5b1') and never hides a hero head's notched nape (S03 'nearR'). Its
+colour is never the hair colour: when `darker(coat)` equals the hair (tan coat + ochre hair) or the coat, it falls back
+to tealDark (ink-brown when the hair / coat is tealDark). Cap wearers (`BackHead`) draw it under the head as before.
 
 `FigureArm` (exported; every preset's raised arm: Investigator, Messenger, Keeper, Caretaker, EdgeOnlooker's phone arm).
 Props `{sh, hand, w = 19, coat, W, seed, hand2 = true, bend?, side?, elbow?}` in person-local units, unchanged call shape

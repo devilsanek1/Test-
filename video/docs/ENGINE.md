@@ -217,22 +217,48 @@ misregistration offsets, sizes). `<ScreenSpace>` resets it to 1 (no camera zooms
 | camera | opt in | factor |
 |---|---|---|
 | your own transform (S01's `layerMat`, any scene camera.ts) | `<XG m={layerMat(t, name)}><InkScale value={inkCompFactor(zoomNow, 0.6, zoomAtMoveStart)}>...</InkScale></XG>` (or `<InkScale zoom={zoomNow} from={zoomAtMoveStart}>`) | what you pass; use `from` = the zoom where the compensated move starts, so it is exactly 1 there (no width step) |
-| `<ShotCam keys>` / `<CineCamera keys>` | **in the dive keys, set `inkComp: 0.6`** on the key that ENDS the segment (like `ease`): `[{t: 4.385, zoom: 1.04}, {t: 4.715, zoom: 3.19, inkComp: 0.6}]` | per `<Layer>`: (layer scale now / layer scale at the segment start)^-k (dolly parallax included), 1 at the segment start, HELD after it; flagged segments multiply (a flagged dive in and a flagged pull-back out cancel); handheld / `add` not compensated |
-| `<World push>` / `<ShotCam push>` | `push={{to: 2.5, dur: 1, inkComp: 0.6}}` | pushZoom^-k |
+| `<ShotCam keys>` / `<CineCamera keys>` | **in the dive keys, set `inkComp: 0.6`** on the key that ENDS the segment (like `ease`): `[{t: 4.385, zoom: 1.04}, {t: 4.715, zoom: 3.19, inkComp: 0.6}]` | per `<Layer>`: (layer scale now / layer scale at the segment start)^-k (dolly parallax included), 1 at the segment start, HELD after it (**if the camera comes back, flag the return key too**, or the lines stay thinner than nominal at rest); flagged segments multiply (a flagged dive in and a flagged pull-back out cancel); handheld / `add` not compensated |
+| `<World push>` | `push={{to: 2.5, dur: 1, inkComp: 0.6}}` | pushZoom^-k (one zoom, the same for everything in the World) |
+| `<ShotCam push>` | `push={{to: 2.5, dur: 1, inkComp: 0.6}}` | a DOLLY (it becomes two flagged keys), so per `<Layer>`: (layer scale now / layer scale at the push start)^-k: far layers grow less and get less (measured, a 4 px line at `to` 2.5: depth 0 10 -> 6 px, depth 0.5 5.75 -> 4.76 px) |
 | Film `camera-continuous` / `push-through` | `transitionIn: {type: 'push-through', zoom: 7, inkComp: 0.6}` | zoom^-k on both legs (`StageCam.ink`; a flat World applies it, `<CineCamera stage>` / ShotCam folds it into its Layers) |
+
+**The factor is HELD after a flagged segment.** If the camera comes back, flag the return key too, or the lines stay
+thinner than nominal at rest (measured: keys 1 -> 3x flagged, hold, -> 1x UNflagged: a 4 px line renders 2.0 px with
+the camera back at zoom 1; with the return key flagged too it is 4.0 px again). A `<World push>` / transition factor
+and your own `inkCompFactor(zoomNow, k, from)` follow the zoom live instead (back to 1 when the zoom is back at `from`).
+`useScreenWidth(depth)(px)` (CINE.md) is no longer screen-constant inside a flagged camera when fed to `<Ink>` (Ink
+multiplies by the layer factor): divide it by `useInkScale()` there.
+
+**Coverage gaps (raw strokes).** Only the pieces listed above read the factor. A raw `<path strokeWidth>` in shared code
+stays uncompensated even inside an opted-in InkScale: props SunMorphs (12 uses), Figures (9), BrowserChrome (5), Labels
+(5), Lock (4), Glyphs (3), Bit / Diagram / Elephant props / FixSign / Shutter (2 each), Tablet (1); sets
+GovernmentPlaza's chevron (~l. 914), DomeCity (1); core `FigureWiper` (screen space, never zoomed: fine) and the
+lib/cine pieces (city, street, props, monument, sky, tower, wall, wipers, lens, light, windows, figures). The owning lanes wire them
+by multiplying the width by `useInkScale()` (requests in SHARED_PROPS.md 1 / SHARED_SETS.md 1); for S01 the dive shows
+BrowserChrome (the `windowSlot` windows inside `{node}`), Lock and SunMorphs, so those three come first.
 
 Verified (temporary lab entries, removed): CineCamera keys 1 -> 3x: a 4 px line 12 px -> 6 px, held after the
 segment; World push 2.5x: 10 -> 6 px; push-through x7 at u 0.9: 20 -> 8 px; S01 with the opt-in (below): the set's
 door frame / lintel at the cut 9-11 px -> 5-6 px (mid lines 6-7 -> 3-4 px), S02 opens at 2-5 px. Default off: S01,
 S08 (ShotCam), S10 (World push + ScreenSpace) render pixel-identical to before.
 
-**S01 opts in with one line** (it uses its OWN camera, scene01/camera.ts `layerMat`, applied per GovernmentPlaza layer
-through the set's `wrap`, not the engine's keys; its camera.ts already exports `inkComp(t, layer)` = the factor
-relative to the dive start, ramped sun layer included): in plaza.tsx `wrap`,
-`<XG m={layerMat(t, name)}><InkScale value={inkComp(t, name)}>{node}</InkScale>{extra[name] ?? null}</XG>`.
-Wrap only `{node}` (the set) while the scene keeps its own manual `ink` / `inkK` / `lineWeight` multipliers on its
-extras; wrapping the extras too requires removing those multipliers (else they are compensated twice). Both render
-the same (diffed).
+**S01 opts in in its set `wrap`** (it uses its OWN camera, scene01/camera.ts `layerMat`, applied per GovernmentPlaza
+layer through the set's `wrap`, not the engine's keys; its camera.ts exports `inkComp(t, layer)` = the factor relative
+to the dive start, ramped sun layer included). **The clean opt-in (recommended) wraps the set AND the extras**:
+
+```tsx
+const wrap = (name, _n, node) => (
+  <XG m={layerMat(t, name)}><InkScale value={inkComp(t, name)}>{node}{extra[name] ?? null}</InkScale></XG>
+);
+```
+
+and drops every manual dive multiplier from the extras (`ink` / `inkK` / `lineWeight` x inkComp(t), `/ zoomAt(t)`):
+an extra that reads the context (Ink-based kit people, `<Elephant>`, cast.tsx's `useInkScale()` readers) would else be
+compensated twice. With the full form, extras without a manual multiplier (Bit, LanternOff, TreeTicks, Pigeon,
+Onlookers, S01Branch) are compensated too, as far as they draw with `<Ink>` (their raw strokeWidths: see coverage gaps).
+The minimal step, `<XG ...><InkScale value={inkComp(t, name)}>{node}</InkScale>{extra[name] ?? null}</XG>`, wraps the
+set only and leaves those extras at the raw dive weight; it is a stopgap, not the target. (The S01 lane's plaza.tsx is
+already on the full form; cast.tsx reads `useInkScale()`.)
 
 ## 5. Transitions (`transitionIn` of the INCOMING scene; c = its `start`)
 

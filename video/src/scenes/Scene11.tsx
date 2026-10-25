@@ -84,6 +84,13 @@ const PIGEON_S = 0.8;
 // govA / govC / govD keep their normal lit chrome (the same params the set's own WindowRig uses at detail 'close')
 const MID_CLOSE = 3.4 * 0.7;
 
+// govB's bands (GovernmentPlaza G.B): dome base 792, cornice bottom 926, x 396-640
+const G_B = {x0: 396, x1: 640, domeBase: 792, cornB: 926};
+
+// Pip's exit hop toward the lens (feet anchor, SCREEN px from his sill point; tau = s after b.pipOut): x = x0 + vx tau,
+// y = y0 + vy tau + g tau^2, scale = PIP_S' (1 + grow tau), rotate = rot0 + rotV tau (deg), pose sit-front (happy)
+const PIP_EXIT = {vx: 60, vy: -600, g: 2600, grow: 2.4, rot0: -4, rotV: 30};
+
 const Scene11: React.FC = () => {
   useCaptionFont();
   const t = useTime();
@@ -91,6 +98,8 @@ const Scene11: React.FC = () => {
   const start = scene.id === 'S11' ? scene.start : SCENE.start;
   const b = useMemo(() => localBeats(start), [start]);
   const keys = useMemo(() => camKeys({lookNotice: b.lookNotice, offCut: ABS.offCut - start, leanEnd: b.pipOut}), [b, start]);
+  // lights out, one frame per band from 'off' (each time lands just before its frame: f104 / f105 / f106 / f107)
+  const LO = {lantern: b.lightsOut, dome: b.lightsOut + 1 / 30, drum: b.lightsOut + 2 / 30, facade: b.lightsOut + 3 / 30};
   const cam = camAt(keys, t);
   const M = camMat(cam);
   const Minv = mat.inv(M);
@@ -255,7 +264,7 @@ const Scene11: React.FC = () => {
   // ---- the near plane in BOLD (style bible: weight by depth, front 4.5-5 px): govB's sill top (with its horn under Pip
   // and one doubled re-stroke) and the shutter box's lower edge; the horn steps darker with govB's lights
   const kz = cam.z;
-  const govBOff = t >= b.lightsOut + 1 / 30;
+  const govBOff = t >= LO.facade;
   const nearPlane = (
     <>
       <Fill d={rectPath(SILL.horn, SILL_Y, SILL.x0 + 2 - SILL.horn, SILL.depth)} color={govBOff ? palette.tan : palette.sand} offset={false} mode="none" seed="s11/horn" />
@@ -267,31 +276,49 @@ const Scene11: React.FC = () => {
   );
   const tagW = backSoonW(TAG.bottom - TAG.y);
 
+  // the plaza; `govBOffAt` = when govB's body steps darker (the lantern has its own switch at 'off')
+  const plaza = (govBOffAt: number) => (
+    <GovernmentPlaza
+      state="built"
+      detail="close"
+      sun={sun}
+      bit={false}
+      citizensAt={false}
+      onlookers={false}
+      gov={{
+        // govB: padlock + tag are drawn by the scene (below)
+        govB: {shutterAt: b.shutter, lanternOffAt: LO.lantern, offAt: govBOffAt},
+        // the switch-off spreads across the plaza: govA's screen goes dark and its shutter slams, but govA keeps its
+        // lit tone (fix round 1: the left third of the frame stays pale behind the joke); govC half shut
+        govA: {shutterAt: b.govAShutter},
+        govC: {shutterAt: b.govCShutter, shutterStop: 0.5},
+      }}
+      windowSlot={windowSlot}
+      civicOffAt={[0, 1, 2, 3, 4, 5].map((i) => b.civicOff + i * 0.1)}
+      civicLanternsOffAt={b.civicLanterns}
+      seed="plaza"
+    />
+  );
+  // lights out on 'off' as a 1-frame cascade TOP TO BOTTOM (storyboard): lantern, dome, drum + cornice, facade. The set's
+  // govB LightsOut is one switch, so for the two in-between frames the scene draws the set a second time, already dark,
+  // clipped to the top bands (identical everywhere else: same seeds, same time). Local stand-in until the sets lane
+  // gives LightsOut per-band times.
+  const cascadeY = t >= LO.dome && t < LO.facade ? (t >= LO.drum ? G_B.cornB : G_B.domeBase) : undefined;
+
   return (
     <World sky={[{t: 0, tod: 'day'}]}>
       <XG m={M}>
-        <GovernmentPlaza
-          state="built"
-          detail="close"
-          sun={sun}
-          bit={false}
-          citizensAt={false}
-          onlookers={false}
-          gov={{
-            // govB: the lantern goes out a frame before the building (top to bottom); padlock + tag are drawn below
-            govB: {shutterAt: b.shutter, lanternOffAt: b.lightsOut, offAt: b.lightsOut + 1 / 30},
-            // the switch-off spreads across the plaza (S12 opens on govA shuttered + darker, govC half shut)
-            govA: {shutterAt: b.govAShutter, offAt: b.govAOff},
-            govC: {shutterAt: b.govCShutter, shutterStop: 0.5},
-          }}
-          windowSlot={windowSlot}
-          civicOffAt={[0, 1, 2, 3, 4, 5].map((i) => b.civicOff + i * 0.1)}
-          civicLanternsOffAt={b.civicLanterns}
-          seed="plaza"
-        />
+        {plaza(LO.facade)}
+        {cascadeY !== undefined ? (
+          <BandClip y={cascadeY} x0={G_B.x0 - 30} x1={G_B.x1 + 30} id="s11-lo-cascade">
+            {plaza(LO.lantern)}
+          </BandClip>
+        ) : null}
         {/* govC's clock face sat as a half-cropped white disc at the right edge beside the sun: S11 paints the turret plain
             (its tan, inside its ink edges), so the strip keeps one simple vertical edge shape */}
         <Fill d={rectPath(838, 641, 64, 58)} color={palette.tan} offset={false} mode="none" seed="s11/clockpatch" />
+        {/* the far steps in the gap get ink treads + a kerb (flat stripes read as blinds at this zoom) */}
+        <StepTreads x0={G_B.x1 + 6} x1={788} kz={kz} />
         {nearPlane}
         {/* on the closed shutter: the sticky note (J6), then S01's lettered 'back soon' tag on its nail and S01's padlock
             on the rail (drawn by the scene: they rock / twirl and they sit over the bold near-plane strokes) */}
@@ -316,7 +343,12 @@ const Scene11: React.FC = () => {
             after Pip's hop-off: clear of the box by the cut, mid-flight on the last frame */}
         <Pigeon x={BOX_PIGEON[0]} y={BOX_PIGEON[1]} s={PIGEON_S} land={{at: b.pigeonLand, from: [175, 875], dur: 0.45}} shuffle={[{at: b.noteSlap + 0.18, dx: 5}]} hopAt={[b.glint - 0.03]} hopH={20} flyAt={b.pigeonFly} flyTo={[-300, -200]} flySpeed={[20, 28]} seed="s11/pg2" />
       </XG>
+      {/* the near layer (screen space): back-view onlookers at the bottom right (under the platform UI: depth + scale,
+          and S12's 'phones up'), Pip, then the plaza lamp post cropped by the left edge (Pip hops in behind it) */}
+      <EdgeOnlooker x={846} y={1842} head={104} hair="bun" body={palette.sage} acc={['collar']} raisePhoneAt={b.phonesUp1} phoneSide="left" rim="right" seed="s11/onl1" />
+      <EdgeOnlooker x={1034} y={1786} head={110} hair="short" body={palette.teal} acc={['hood']} raisePhoneAt={b.phonesUp2} phoneSide="left" rim="left" seed="s11/onl2" />
       {pip}
+      <NearLamp offAt={b.lampOff} />
     </World>
   );
 };

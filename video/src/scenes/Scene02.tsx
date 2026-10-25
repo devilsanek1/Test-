@@ -47,11 +47,15 @@ const KNOB: Pt = [C[0] + THUMB[0] * (LOCK_SIZE / 100) * LOUPE.m, C[1] + THUMB[1]
 // the site icon sits 30 px higher than the storyboard box (640-760 x 1090-1210) so it clears the sheet's elephant stamp
 const ICON: [number, number, number, number] = [640, 1060, 120, 120];
 const ICON_C: Pt = [ICON[0] + ICON[2] / 2, ICON[1] + ICON[3] * 0.55];
-// dashed connector: out of the loupe's right edge at the bolt axis, along, then down onto the icon's roof
+// dashed connector: out of the loupe's right edge at the bolt axis, along, then down onto the icon's LEFT roof slope
+// (polish: it came down x = ICON[0] + 60, exactly on the flag pole, so the pole merged into it and the flag read as a
+// pennant hanging on the connector). It now lands 18 world left of the apex (the roof at icon x 42 is y ~16.8), the
+// arrowhead touches the slope beside the flag, and the pole stands alone on the apex
+const CON_X = ICON[0] + 42;
 const CONNECTOR: Pt[] = [
   [C[0] + Math.sqrt(LOUPE.r1 ** 2 - 14 ** 2) + 3, C[1] + 14],
-  [ICON[0] + 60, C[1] + 14],
-  [ICON[0] + 60, ICON[1] - 2],
+  [CON_X, C[1] + 14],
+  [CON_X, ICON[1] + 12.5],
 ];
 // L2: lower left, 14 world under the loupe's bottom (1100) and 12 above the door-width dimension line (1214); its left
 // edge 20 world (~27 px) inside the sheet's inner frame (212), never tangent to it
@@ -77,14 +81,23 @@ const ERASE = `M256 798L352 804L258 826L354 832L260 854L350 858`;
 // the connector: heavier than the grid (3.6 world, ~4.8 px), long dashes, on a solid paper-white halo that breaks the
 // grid and plan lines it crosses (the same convention as L2's leader), so 'this lock guards that site' reads unmistakably
 const CON = {w: 3.6, dash: 14, gap: 8, halo: 10};
-// Pip sits 14 world right of the set's perch (700, 680) on the same rod (fix round 2): the sun now drifts into S03's
-// slot (690, 700), and at the perch his ears-cover ear was tangent to its right edge; this leaves a clear ~20 px gap
-const PIP_PERCH: Pt = [BLUEPRINT_WALL.perch[0] + 14, BLUEPRINT_WALL.perch[1]];
+// Pip sits 50 world right of the set's perch (700, 680) on the same rod (polish; fix round 2 had +14): the sun drifts
+// into S03's slot (690, 700) and at +14 his ear came within ~10-17 px of its right edge (the two most saturated shapes
+// read as stuck together); +50 keeps his ear and the ears-cover worry ticks >= 60 px clear of the disc all scene
+const PIP_PERCH: Pt = [BLUEPRINT_WALL.perch[0] + 50, BLUEPRINT_WALL.perch[1]];
+// the hop IN keeps fix round 2's curve (S01's handoff.ts mirrors it: S01 flies Pip in screen space and delivers EXACTLY
+// this curve's state on S02's first film frame f142), landing at the old perch + 14; from f142 a smoothstep blend (zero
+// slope at f142, so position AND velocity there are unchanged) carries the landing out to the new perch
+const PIP_IN_TO: Pt = [BLUEPRINT_WALL.perch[0] + 14, BLUEPRINT_WALL.perch[1]];
+const T_F142 = +(Math.ceil(S02_START * 30) / 30 - S02_START).toFixed(4); // S02-local time of the first S02 film frame
 const PIP_SCALE = 1.2 / 1.3; // 1.2 on screen at the 1.30 landing (~115 px)
-// the diagram hand. Exit (fix round 2): 300 world (the fingertips clear the sheet's right edge at ~280 incl. the let-go)
-// in 0.34 s in(cubic) from end(password)-0.15: on screen 0.5, 3, 8, 15, 24, 36, 50, 66, 84 px per frame, a pull-away
-// visible over ~9 frames, gone before the last S02 frame (was 380 in 0.18 s in-out: a 2-frame vanish)
-const HAND = {angle: -40, turn: 18, scale: 1.2, from: 430, exitTravel: 300, exitDur: 0.34, ink: 3.2, dash: [6, 5] as [number, number]};
+// the diagram hand (polish). Angle -26 (was -40): the whole sleeve now leaves the plan through the sheet's RIGHT edge
+// (its top edge crosses it at world y ~719, ~36 px below the inner top edge; at -40 the sleeve swallowed the sheet's
+// top-right corner, by Pip's tail). Slide-in: 300 world (the fingertips are hidden behind the sheet edge until ~288)
+// in 0.40 s out(quad) from handIn: on screen ~62, 57, 52, 47, 42, 36 ... 5 px per frame, settled before 'could'.
+// Exit: 260 world (hidden at ~259 incl. the let-go, turned) in 0.32 s in(quad) from end(password)-0.15: ~4, 11, 19,
+// 26 ... 64 px per frame, gone at 8.35 (before the last S02 frame).
+const HAND = {angle: -26, turn: 16, scale: 1.2, from: 300, inDur: 0.4, exitTravel: 260, exitDur: 0.32, ink: 3.2, dash: [6, 5] as [number, number]};
 const PINCH: Pt = [KNOB[0], KNOB[1] - 3];
 // solid ink contact strokes on the index and thumb tips (DiagramHand local units: fingertips at the origin)
 const TIPS = 'M4.5 -10.6C0.4 -9.6 -1.6 -6 1.6 -2.8' + 'M6.2 9.2C1.6 8.2 -1.2 4.8 2.6 1.8';
@@ -204,63 +217,45 @@ const OnSheet: React.FC<{children: React.ReactNode}> = ({children}) => {
   );
 };
 
-/** The hoodie drawstring's swing (deg, + = trailing toward the fingertips): a damped pendulum kicked by each move of the
- *  hand (slide-in stop, turn, let-go), an idle sway, and a trailing lean as the hand accelerates away on the exit. */
-const cordSwing = (t: number) => {
-  const kicks: [number, number][] = [
-    [B.handIn + 0.22, 18],
-    [B.turn + 0.05, -12],
-    [B.release, 9],
-  ];
-  let a = 2.5 * Math.sin((t - B.handIn) * Math.PI * 2 * 0.7);
-  for (const [t0, amp] of kicks) if (t > t0) a += amp * Math.exp(-(t - t0) * 3.2) * Math.sin((t - t0) * Math.PI * 2 * 1.9);
-  return a + 24 * prog(t, B.handOut, HAND.exitDur, E.inQuad);
-};
+// the hood cue (polish; the stray drawstring is gone), in DiagramHand's local units (fingertips at the origin, the
+// forearm along +x, x1.2): the Attempter's HOOD POINT (props Figures: a pointed hood, tealDark, ink) as a small dashed
+// peak standing on the cuff seam, so the teal hoodie sleeve reads as the attackers' hoodie (S08's hooded figures)
+const HOOD = 'M113 -33.5Q112 -46 125 -58Q139 -47 141 -35.2';
+const HOOD_FILL = HOOD + 'L118 -34Z';
 
-// the hood cue (fix round 2), in DiagramHand's local units (fingertips at the origin, the forearm along +x, x1.2): the
-// sleeve is the kit's teal hoodie fill (DiagramHand `sleeve`, the attempters' hoodie: teal sleeve, tealDark ribbed
-// cuff) and a hoodie drawstring with an ink aglet hangs from the cuff's lower edge, swinging with the hand
-const CORD_AT: Pt = [111, 33];
-const CORD_L = 34;
-
-/** The dashed hooded hand. The shared DiagramHand does the slide-in, the dashes and the fills (dashed outline, white
- *  paper hand, the teal hoodie sleeve, the flat tealDark ribbed cuff); this rig adds: the turn on the thumb-turn (out(cubic), with the
- *  knob), the GRAB (12 px further onto the knob and back as the slide ends), the let-go (backs off 26 px) and the hover
- *  (a slow bob), the exit (300 px along the arm in 0.34 s in(cubic), from end(password)-0.15: past the sheet's edge
- *  before the last frame), solid ink contact strokes on the index and thumb tips, and the hoodie drawstring. */
+/** The dashed hooded hand. The shared DiagramHand draws the dashes and the fills (dashed outline, white paper hand, the
+ *  teal hoodie sleeve, the flat tealDark ribbed cuff) at rest; this rig moves it: the slide-in (300 world along the
+ *  arm, 0.40 s out(quad), clipped by the sheet edge it enters from), the settle squeeze, the GRAB (12 px further onto
+ *  the knob and back as the slide ends), the turn on the thumb-turn (out(cubic), with the knob), the let-go (backs off
+ *  26 px) and the hover (a slow bob), the exit (260 world along the arm in 0.32 s in(quad), from end(password)-0.15:
+ *  past the sheet's edge before the last frame); plus solid ink contact strokes on the index and thumb tips and the
+ *  dashed hood point on the cuff. */
 const HandRig: React.FC = () => {
   const t = useTime();
   if (t < B.handIn) return null;
   const rot = HAND.turn * prog(t, B.turn, 0.2, E.outCubic);
   const a = ((HAND.angle + rot) * Math.PI) / 180;
-  const grab = -12 * Math.sin(Math.PI * prog(t, B.handIn + 0.27, 0.24));
+  const slide = HAND.from * (1 - E.outQuad(prog(t, B.handIn, HAND.inDur)));
+  const settled = B.handIn + HAND.inDur;
+  const grab = -12 * Math.sin(Math.PI * prog(t, settled - 0.04, 0.2));
   const letGo = 26 * prog(t, B.release, 0.2, E.outCubic);
   const hover = t > B.release + 0.2 ? 7 * Math.sin(((t - B.release - 0.2) / 0.95) * Math.PI * 2) : 0;
-  const exit = HAND.exitTravel * prog(t, B.handOut, HAND.exitDur, E.inCubic);
+  const exit = HAND.exitTravel * prog(t, B.handOut, HAND.exitDur, E.inQuad);
   if (exit >= HAND.exitTravel - 0.5) return null;
-  const d = grab + letGo + hover + exit;
+  const d = slide + grab + letGo + hover + exit;
   const lift = t > B.release ? -4 * Math.sin(((t - B.release) / 0.95) * Math.PI * 2) : 0;
-  // DiagramHand's own frame (its slide-in and the settle squeeze), for the contact strokes and the hood cue
-  const a0 = (HAND.angle * Math.PI) / 180;
-  const slide = HAND.from * (1 - prog(t, B.handIn, 0.3, E.outCubic));
-  const sq = Math.max(0, Math.sin(clamp((t - B.handIn - 0.3 - 0.12) / 0.14) * Math.PI)) * 0.05;
-  const handLocal = mat.compose(mat.translate(PINCH[0] + Math.cos(a0) * slide, PINCH[1] + Math.sin(a0) * slide), mat.rotate(HAND.angle), mat.scale(HAND.scale * (1 - sq), HAND.scale * (1 + sq * 0.5)));
-  // the drawstring hangs world-down (90 deg in the world = 90 - arm angle in the hand's frame), plus its swing
-  const g = ((90 - (HAND.angle + rot) + cordSwing(t)) * Math.PI) / 180;
-  const u: Pt = [Math.cos(g), Math.sin(g)];
-  const n: Pt = [-u[1], u[0]];
-  const end: Pt = [CORD_AT[0] + u[0] * CORD_L, CORD_AT[1] + u[1] * CORD_L];
-  const mid: Pt = [CORD_AT[0] + u[0] * CORD_L * 0.5 + n[0] * 2.4, CORD_AT[1] + u[1] * CORD_L * 0.5 + n[1] * 2.4];
-  const cord = `M${CORD_AT[0]} ${CORD_AT[1]}Q${mid[0].toFixed(2)} ${mid[1].toFixed(2)} ${end[0].toFixed(2)} ${end[1].toFixed(2)}`;
-  const aglet = `M${(end[0] + u[0] * 1.5).toFixed(2)} ${(end[1] + u[1] * 1.5).toFixed(2)}L${(end[0] + u[0] * 8.5).toFixed(2)} ${(end[1] + u[1] * 8.5).toFixed(2)}`;
+  // the settle squeeze along the arm (as DiagramHand's own entry does), about the pinch
+  const sq = Math.max(0, Math.sin(clamp((t - settled - 0.02) / 0.14) * Math.PI)) * 0.05;
+  const squeeze = mat.about(mat.compose(mat.rotate(HAND.angle), mat.scale(1 - sq, 1 + sq * 0.5), mat.rotate(-HAND.angle)), PINCH[0], PINCH[1]);
+  const handLocal = mat.compose(mat.translate(PINCH[0], PINCH[1]), mat.rotate(HAND.angle), mat.scale(HAND.scale));
   const iw = 1 / HAND.scale;
   return (
-    <XG m={mat.compose(mat.translate(Math.cos(a) * d, Math.sin(a) * d + lift), mat.about(mat.rotate(rot), PINCH[0], PINCH[1]))}>
-      <DiagramHand x={PINCH[0]} y={PINCH[1]} angle={HAND.angle} scale={HAND.scale} enterAt={B.handIn} from={HAND.from} ink={HAND.ink} dash={HAND.dash} handFill={palette.white} sleeve={palette.teal} seed="s2hand" />
+    <XG m={mat.compose(mat.translate(Math.cos(a) * d, Math.sin(a) * d + lift), mat.about(mat.rotate(rot), PINCH[0], PINCH[1]), squeeze)}>
+      <DiagramHand x={PINCH[0]} y={PINCH[1]} angle={HAND.angle} scale={HAND.scale} ink={HAND.ink} dash={HAND.dash} handFill={palette.white} sleeve={palette.teal} seed="s2hand" />
       <XG m={handLocal}>
+        <Fill d={HOOD_FILL} color={palette.tealDark} offset={[1.2, 0.8]} mode="none" seed="s2hoodF" />
+        <Ink d={HOOD} width={HAND.ink * 0.8 * iw} dash={`${(5 * iw).toFixed(2)} ${(3.6 * iw).toFixed(2)}`} taper={false} vary={0} seed="s2hood" />
         <Ink d={TIPS} width={3.6 * iw} taper={false} vary={0} seed="s2tips" />
-        <Ink d={cord} width={2.3 * iw} taper={false} vary={0} seed="s2cord" />
-        <path d={aglet} stroke={palette.ink} strokeWidth={5.4 * iw} strokeLinecap="round" fill="none" />
       </XG>
     </XG>
   );
@@ -301,12 +296,11 @@ const Leader: React.FC = () => {
 // read-only here): at S03's t0 Pip is at world (830, 905) = screen (830, 915) under S03's rest camera, already FALLING
 // down-left (vx -1133, vy0 +400 px/s, g ~5,400), scale 1.2, stand-side spread 0.85, flipped, nose up ~6 deg, stretch
 // -0.2; S03's first frame (8.400) shows him at ~(822, 918). S02's last film frame (8.3667) is one S03 frame before:
-// S03's own ballistic extrapolation puts him at (860, 906) moving (-1133, +257) px/s. A curve from the rod to exactly
-// that would swing 43 px RIGHT before turning left (net x ~0), so S02 lands at (848, 906) moving (-680, +257) px/s:
-// position within one S03 frame, the same phase (falling, down-left), the horizontal speed picks up across the cut.
-// The hop is a Hermite curve in world px from the rod (a small hop up) to that point and velocity: on screen 12, 8, 19,
-// 27, 30, 29, 26, 25 px per frame. Retune S03_PICKUP if S03 moves its pickup again.
-const S03_PICKUP = {screen: [848, 906] as Pt, v: [-680, 257] as Pt, scale: 1.2, rotate: 6, amount: 0.85, squash: -0.2};
+// S03's own ballistic extrapolation puts him at (860, 906) moving (-1133, +257) px/s. Polish: S02 now lands EXACTLY on
+// that (position and velocity: no speed step across the cut). The perch moved right (screen x ~910), so the short
+// Hermite (takeoff end(password)+0.06, D 0.127 s) runs monotonically left: no back-swing. The ears-cover gag holds
+// 0.43 s (7.77 -> 8.20), the ears pop up, a 0.04 s crouch, takeoff. Retune S03_PICKUP if S03 moves its pickup again.
+const S03_PICKUP = {screen: [860, 906] as Pt, v: [-1133, 257] as Pt, scale: 1.2, rotate: 6, amount: 0.85, squash: -0.2};
 const T_LAST = +(LAST_FRAME_ABS - S02_START).toFixed(4);
 const CAM_LAST = camAt(T_LAST, DUR);
 const PIP_OUT = {
@@ -343,9 +337,10 @@ const Pip: React.FC = () => {
   // hop in across the frame's right edge ON the cut (S01 lost him off its right edge at ~(1060, 920)): a short, low arc
   // from just off the right edge (world (975, 860), screen ~(1120, 835) at 1.15) so it reads as a hop (~50 px per frame),
   // landing on the rod on 'because'+0.15; at the first S02 frame he is ~43 % along, mid-air
-  const hIn = hop({t, t0: B.pipLand - 0.23, dur: 0.23, from: {x: 975, y: 860}, to: {x: PIP_PERCH[0], y: PIP_PERCH[1]}, height: 22});
+  const hIn = hop({t, t0: B.pipLand - 0.23, dur: 0.23, from: {x: 975, y: 860}, to: {x: PIP_IN_TO[0], y: PIP_IN_TO[1]}, height: 22});
   const out = t >= B.pipEars;
-  let x = hIn.x;
+  const blend = E.inOutCubic(prog(t, T_F142, B.pipLand - T_F142));
+  let x = hIn.x + (PIP_PERCH[0] - PIP_IN_TO[0]) * blend;
   let y = hIn.y;
   let squash = hIn.squash;
   let rotate = hIn.rotate;
@@ -405,9 +400,11 @@ const Pip: React.FC = () => {
           {t: B.pipLand, pose: 'sit-back', look: -0.55},
           {t: B.handIn + 0.05, pose: 'sit-back', look: 0.55},
           {t: B.take + 0.05, pose: 'sit-back', look: -0.45},
-          {t: B.siteWord + 0.1, pose: 'sit-back', look: 0.2},
-          {t: B.without + 0.06, pose: 'sit-back', look: -0.9},
-          {t: B.pipLean, pose: 'sit-back', look: -1},
+          // 'site' (polish): he turns round to face us and looks down at the taken-over icon below him (in back view his
+          // glances never read); on 'without' his eyes go to the crossed key at the far left; then the ears-cover gag
+          {t: B.siteWord + 0.02, pose: 'sit-front', look: -0.25, expression: 'worried'},
+          {t: B.without + 0.04, pose: 'sit-front', look: -0.95, expression: 'worried'},
+          {t: B.pipLean, pose: 'sit-front', look: -1, expression: 'worried'},
           {t: B.pipCover, pose: 'ears-cover'},
           {t: B.pipEars, pose: 'stand-side', expression: 'wide'},
         ]}
@@ -440,16 +437,16 @@ const Scene02: React.FC = () => {
         <SiteJolt>
           <TakenSite x={ICON[0]} y={ICON[1]} w={ICON[2]} h={ICON[3]} at={B.site - 0.04} takenAt={B.taken} flagAt={B.flag} unlockAt={B.siteWord} flutterAt={B.flutter} ink={3.8} seed="s2site" />
         </SiteJolt>
-        {/* 'without': an eraser rubs a patch of paper clean beside the loupe (0.1 s, three rubs), the key draws in it,
-            then an ink cross strikes it */}
+        {/* 'without' (polish: led in, the cross lands ON the word): an eraser rubs a patch of paper clean beside the
+            loupe (0.1 s, three rubs), the key draws in it (0.1 s), the ink cross strikes it on 'without' */}
         {t >= B.erase ? (
           <OnSheet>
             <Ink d={ERASE} at={B.erase} dur={0.1} pace="free" width={40} color={palette.white} taper={false} vary={0} seed="s2erase" />
           </OnSheet>
         ) : null}
-        <KeyCross x={KEY[0]} y={KEY[1]} size={118} at={B.without} crossAt={B.without + 0.17} settleAt={B.flutter} ink={5.2} seed="s2key" />
+        <KeyCross x={KEY[0]} y={KEY[1]} size={118} at={B.keyDraw} crossAt={B.without} settleAt={B.flutter} ink={5.2} seed="s2key" />
         <LabelTag kind="card" x={215 + 196} y={724} text="PHP2Shell · two linked flaws" fontSize={40 / 1.3} inkPx={2.2} at={B.L1} seed="s2L1" />
-        <LabelTag kind="card" box={L2_BOX} text={['no password', 'control of the site and its data']} fontSize={40 / 1.32} inkPx={2.2} at={B.L2} seed="s2L2" />
+        <LabelTag kind="card" box={L2_BOX} text={['no password ·', 'control of the site and its data']} fontSize={40 / 1.32} inkPx={2.2} at={B.L2} seed="s2L2" />
         <Leader />
         <OnSheet>
           <HandRig />

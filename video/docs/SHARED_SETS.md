@@ -69,6 +69,10 @@ row); `DemoSun` is pinned (`drift={[0, 0]}`) so a preview frame shows the sun SL
   reference push-in). Exceptions: `detail="close"` thins govB (S11 close-up); TerraceHill uses a SCREEN-space ladder
   (row 0 3.4, row 1 2.2, rows 2-3 1.6, then none) with a world-unit floor for its zoom-6 match (row 0 0.85): on-screen
   width = max(world x zoom, screen), so there is no pop across the pull-back (`terraceInk(k, zoom)`).
+- **Camera ink compensation** (opt-in, docs/ENGINE.md 4b): raw `strokeWidth`: multiply by `useInkScale()`
+  (lib/inkComp.tsx) so camera ink compensation reaches it (core `<Ink>` / `<Drawn>` lines get it already; 1 by default).
+  **Open request (kitv3b core review)**: GovernmentPlaza's chevron mark and DomeCity's raw stroke; S01 wraps the plaza
+  in an `<InkScale>`, so props placed through `propSlots` / `windowSlot` (BrowserChrome, Lock) need the props lane's fix.
 - **Haze ladder** (style_bible_ref2 8): far layers are fill-only and step toward the sky, day `#84B09C` -> `#98C0AE` ->
   sky; on golden skies `HALF.sand` (#E6CEB6). No per-house rects under ~6 px at rest: distant rows collapse into stepped
   skyline bands with a few >= 3 px window dots (TerraceHill, the plaza's far city).
@@ -99,8 +103,10 @@ row); `DemoSun` is pinned (`drift={[0, 0]}`) so a preview frame shows the sun SL
   `house4Lock`), so scenes drive screws / cover / bolt / cobweb / drop / pop-on through the set.
   Props kitv3b (no set file changed): every set figure follows the props fixes automatically: `OnlookerSlot` `acc:
   ['collar']` now draws a straight collar band (no V; under `hair: 'cap'` the BackHead band only), seeded sand hair on
-  onlookers / citizens / makers becomes ochre or ink-brown (clay too on the citizens' and makers' plain-disc heads), and
-  raised phones use the jointed arm with a hand on the phone. `CitizenSlot` / `OnlookerSlot` do not forward the new
+  onlookers / citizens / makers becomes ochre or ink-brown (clay too on the citizens' and makers' plain-disc heads, and on
+  onlookers' plain-disc heads below the kit's hero-head size, ~60-66 px; fix round: clay goes to ochre OR ink-brown by a
+  seeded coin, so set crowds keep their hair variety), the collar band is cut around the head / long hair / hero nape and
+  is never the hair colour (tealDark fallback), and raised phones use the jointed arm with a hand on the phone. `CitizenSlot` / `OnlookerSlot` do not forward the new
   `hairColor` prop yet (sets lane: add it to the slot types if a set needs to pin a colour).
 
 ## 2. Building blocks

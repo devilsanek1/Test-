@@ -3,13 +3,13 @@
 //   - takenAt: the window goes DARK (a flat tealDark fill wipes across it) under the ink hatching (both 0.22 s, starting
 //     ON takenAt, out(cubic)), so the browser window visibly dies at phone size;
 //   - flagAt (default takenAt + 0.08): a BIG ink flag pops on the roof apex (pole 40 u, pennant 28 u; the shared one is
-//     30 / 20 and pops at takenAt + 0.2);
+//     30 / 20 and pops at takenAt + 0.2), a 0.1 s outBack scale from 0.3 (readable on its second frame);
 //   - unlockAt / flutterAt as the shared prop.
 // Same geometry, props and seeds as the shared SiteIcon, so swapping back is a one-line change once it has these props.
 
 import React, {useId} from 'react';
 import {palette} from '../../lib/theme';
-import {ease as E, osc, prog, springAt, springs, useTime} from '../../lib/time';
+import {ease as E, lerp, osc, prog, springAt, springs, useTime} from '../../lib/time';
 import {Seed} from '../../lib/rng';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
@@ -17,6 +17,8 @@ import {ExitFade} from '../../lib/exit';
 import {circle, line, polyPath, Pt, rect} from '../../lib/sketch';
 import {mat, useXf, XG} from '../../lib/xf';
 import {matScale, misregScreen} from '../shared/props/common';
+
+const FLAG_POP = E.outBack(1.7);
 
 export type TakenSiteProps = {
   x: number;
@@ -87,7 +89,9 @@ export const TakenSite: React.FC<TakenSiteProps> = ({x, y, w = 120, h = 120, at,
   const front = win[0] - win[3] + (win[2] + win[3] * 2) * hatchP;
   const darkClip = `M${(win[0] - win[3] - 2).toFixed(1)} ${(win[1] + win[3]).toFixed(1)}L${front.toFixed(1)} ${(win[1] + win[3]).toFixed(1)}L${(front + win[3]).toFixed(1)} ${win[1].toFixed(1)}L${(win[0] - 2).toFixed(1)} ${win[1].toFixed(1)}Z`;
   const fAt = flagAt ?? (takenAt === undefined ? undefined : takenAt + 0.08);
-  const flagK = fAt === undefined ? 0 : springAt(t, fAt, springs.pop);
+  // the flag pops FAST and readable (polish: springs.pop started at ~0.19 scale and took ~2.4 frames to read): a 0.1 s
+  // outBack scale from 0.3, so it is full size on the frame after its start
+  const flagK = fAt === undefined || t < fAt ? 0 : lerp(0.3, 1, FLAG_POP(prog(t, fAt, 0.1)));
   const flap = flutterAt === undefined || t < flutterAt ? 0 : Math.exp(-(t - flutterAt) * 5) * osc(t - flutterAt, 4.2);
   const pole: Pt = [X(60), Y(3)];
   const pl: Pt = [win[0] + win[2] - 10 * u, win[1] + win[3] - 10 * u];

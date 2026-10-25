@@ -90,7 +90,7 @@ Model: parallax factor `f = 1 - depth`; on screen `C + T + R(rot) * s_f * (p - C
 | `rot` | roll, degrees |
 | `anchor`, `anchorDepth`, `anchorTo` | keep world point `anchor` (in the layer of `anchorDepth`) at screen `anchorTo` (default: its rest position). Two consecutive keys with the same anchor keep it pinned through the move. **Anchor a push on the FAR city / the VP** (`anchorDepth` 0.8+) so the world grows and the foreground slides out |
 | `ease` | ease of a segment whose ends are both at rest. Default `CAM.ease` (inOutCubic); `CAM.slow` (inOutSine), `CAM.reveal` (trapezoid: sine ramp 25 %, cruise, soft landing 35 %; peak 1.43x the average speed), `CAM.settle` (outCubic: first segment only) |
-| `inkComp` | OPT-IN ink compensation for the segment arriving at this key (like `ease`; 0.6 = house): every `<Layer>` draws the engine's strokes at width x (layer scale now / at the segment start)^-inkComp, held after the segment (ENGINE.md 4b). Default off |
+| `inkComp` | OPT-IN ink compensation for the segment arriving at this key (like `ease`; 0.6 = house): every `<Layer>` draws the engine's strokes at width x (layer scale now / at the segment start)^-inkComp, held after the segment (ENGINE.md 4b). **If the camera comes back, flag the return key too, or the lines stay thinner than nominal at rest** (1 -> 3x flagged, back to 1x unflagged: a 4 px line stays 2 px). `<ShotCam push={{inkComp}}>` is a dolly: far layers get less. Default off |
 
 **Crane vs tilt.** A `y` crane with the horizon in frame moves the depth-0 ground (and its vanishing lines) while the
 depth-1 sky and sun stay put: the horizon slides against the sun. Crane only with the horizon off-frame (shot B), or use
@@ -114,7 +114,9 @@ Hooks / math: `useCam()`, `layerScale(cam, depth)`, `layerMat`, `project(cam, de
 (layer -> screen matrix over time: precompute what a moving camera will show, e.g. `WallOfWindows keepDark.path`),
 **`camSpeed(keys, {t0, t1, depths, handheld})`** (the fastest on-screen motion of a 7 x 11 screen grid, per layer depth, in
 px / frame, plus when / where, the average and `maxDv`: the largest frame-to-frame speed change, the continuity check),
-**`camSpeedAt(keys, t)`** (speed of one frame: use it at seams), `useScreenWidth(depth)(px)`. `<CineCamera stage>` folds the core
+**`camSpeedAt(keys, t)`** (speed of one frame: use it at seams), `useScreenWidth(depth)(px)` (inside a flagged `inkComp` camera,
+divide it by `useInkScale()` before handing it to `<Ink>`, which multiplies by the layer factor; a raw `strokeWidth`
+takes it as is). `<CineCamera stage>` folds the core
 transition camera in. `<CineFrame bg overlay>` is a minimal full-bleed svg root; `<Shot from to>` runs children on a
 local clock.
 

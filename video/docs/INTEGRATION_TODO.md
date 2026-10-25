@@ -53,6 +53,18 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
 - S01 in lane (if its fix rounds don't get to it): padlocks 52-60 px, 3.4 px ink, cream/ochre body, overlapping the
   shutter's bottom rail.
 
+## Continuity routing from kit v3b (check in the integration continuity pass)
+
+- S05 -> S06 messenger: S05's shim Messenger (scene05/shims.tsx ~229) must draw the ink-brown hair + straight collar
+  band (or use props `<Messenger>`), its local `Arm` (~39) -> `FigureArm`, `BentArm` (~63) -> one `FigureArm` with
+  `elbow`. Otherwise the messenger changes look across the S05/S06 cut.
+- S06: local `Arm` (scene06/parts.tsx:143) -> `FigureArm` (same props), so the arm doesn't snap straight at f26-27.
+- S01: scene01/timing.ts comment "domeB is silhouette 2, domeF 3" is stale (PLAZA_CIVIC order is now domeF, templeM,
+  spireB, spireM, domeB, templeF; lanterns can no longer go dark before their dome).
+- S11: still draws its own padlock and tag (PadlockRock / TagTwirl); fine if it matches S01/S12. S03: still StampS03.
+- Raw strokeWidth in shared props/sets ignore inkComp (S01 dive end: lock + window frame too heavy): workflow
+  inkscale-raw-strokes (wf_1036d3ea-5c5) running.
+
 ## Run log
 
 - 00:05: a usage limit stopped ~37 agents mid-task across the 4 scene workflows and kit v3b; their last fix rounds were
