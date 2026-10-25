@@ -26,16 +26,16 @@ whole context, and every rendered frame an agent looks at stays in that context.
 
 Start every video by reading `docs/OWNER_PLAYBOOK.md` (the owner's rules), and add any new feedback to it at every gate.
 
-Breadth-first: the whole film passes each gate together. At every gate from G1 on, the owner gets **one MP4 that plays
-on the phone, with voice and captions**, plus at most 5 lines of notes. Nothing is built for a later gate before this
+Breadth-first: the whole film passes each gate together. At every gate from G2 on, the owner gets **one MP4 that plays
+on the phone, with voice and captions** (G1 is the script text: the owner records the voice), plus at most 5 lines of notes. Nothing is built for a later gate before this
 one is approved.
 
 | Gate | Owner plays / sees | Owner approves | Frozen after | Budget |
 |---|---|---|---|---|
 | G0 Angle | 1 screen of text | topic, audience, takeaway, length | topic, length band | 15 min, orchestrator only |
 | **G0.5 Core line** (owner, 2026-10-25) | the top 3 candidate lines on one screen, plus a short playable clip of each as its frame-0 card with voice and the phone sound | **the one sentence** the whole video exists to land, the one that gets the biggest emotional reaction (v3 example: "AI is making your PC more expensive") | the core line: it becomes the frame-0 text, the hook's seed, the cover and title text and the payoff's callback, and every script line must serve it | 1 h, after the facts are locked |
-| G1 Radio cut | TTS voice over plain paper with big captions, plus **3 hook-line variants** | every word, hook line | meaning and order of lines | 1 h, then 15 min per round |
-| G2 Voice lock | the radio cut with the final take | voice, pace | the clock (word timings) | 30 min |
+| G1 Script | **the ElevenLabs-ready script** (a short emotional cue per line, v1 format), plus **3 hook-line variants**; no voice from us (owner rule, 2026-10-25) | every word, hook line | meaning and order of lines | 1 h, then 15 min per round |
+| G2 Voice lock | the owner records the take in ElevenLabs; we return the radio cut (`RadioCut`: big pop captions, frame-0 text, picture notes, the first-second sound) on that take | voice, pace | the clock (word timings) | 30 min |
 | **G3 Sketch animatic** | the whole film as line sketches timed to the voice, rough camera, **every transition labelled**, 2 hook-visual variants | **story in pictures**: shot per line, cuts, transitions, peaks | scene list, cut points, shot content, transition types | first cut 2 h; rounds 30 min |
 | G4 Look (parallel to G3) | 1-3 finished stills plus a 3-5 s motion test | palette, line, mascot, edges | visual language | house style: 15-min check |
 | G5 Blocking cut | real sets and props at draft quality, final camera, key poses, **no edges/paper/texture** | staging, readability at phone size, transitions that play | compositions, camera, timing | 4 h |

@@ -22,6 +22,11 @@ Format: **rule** — why / evidence (video, date).
   talking. — v1, 2026-10-24.
 - **When delivering a script, include emotional / delivery cues that are as detailed and concrete as possible.** — v1.
 - **Always give the owner the updated script text along with any new voice take.** — v1.
+- **The owner records the voice in ElevenLabs; we never add a voice (no stand-in TTS) to a deliverable.** The script
+  stage delivers an ElevenLabs-ready script in the v1 format: one short human cue in brackets per line (tone, "like
+  you...", what to lean on, e.g. [deadpan, like you're stating the obvious, tiny pause after "PHP"]), then the line;
+  CAPS for emphasis, … for beats, numbers spelled out; no ms, wpm or technical notes. Template: `docs/v3/script/script_elevenlabs.md`.
+  — owner, v3 G1, 2026-10-25.
 - **Voice: the treated ElevenLabs WAV is the quality bar.** An untreated or cheaper TTS sounded "cheap". — v1.
 
 ## Music and sound
