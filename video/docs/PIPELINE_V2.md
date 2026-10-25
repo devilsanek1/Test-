@@ -83,5 +83,10 @@ Target: playable cuts at about hours 1, 3, 8 and 14 (video 1: hour 18.7).
 5. **Scripted gate check**: duration, A/V sync, caption safe area, cut list vs word anchors. It replaces review agents for
    mechanical checks. *(~1 h)*
 
+Defaults learned from video 1's posted reel: captions use `skyCaption.motion = 'pop'`, or a line rise that stays
+inside the caption window. The 'scroll' slot reveal clipped letters mid-rise on a plain sky and looked like a glitch on
+the phone. Paper edges never at the top or beside the caption band, because that looks like a screen recording under
+the status bar. The G4 look check includes a phone screen recording of a 5 s clip.
+
 Drop or slim: per-scene QA charts in every check-in, beat-sync against the old storyboard, critic panels before G6, edge
 labs before G4.
