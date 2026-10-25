@@ -38,11 +38,12 @@ import {BitS04, ghostList, Ghosts, Leaf, PipS04, pipEarWorld} from './scene04/ca
 const L5 = ['in the code since', 'at least 2012'];
 const LK = STOOP.lock4;
 /** lock4's bottom screw (the string's top). */
-const L5_HANG: [number, number] = [LK.x + 4, LK.y + LK.h / 2 - 3];
-/** L5's paper at rest (world, ~36 px lettering at the 1.5 zoom): its top ~30 world (45 px of string) under the lock,
- *  its eyelet as close under the screw as sleeping Pip allows; at the cut (world under the end camera: it lands on
+const L5_HANG: [number, number] = [LK.x + 3, LK.y + LK.h / 2 - 3];
+/** L5's paper at rest (world, ~36 px lettering at the 1.5 zoom): its top ~21 world under the lock (a ~45 px string),
+ *  its eyelet 12 world right of the screw (the closest sleeping Pip allows: his head hides only the paper's blank
+ *  bottom-left corner, never the lettering); at the cut (world under the end camera: it lands on
  *  S05's annotation tag, paper screen ~(425-752, 1000-1120), ~38 px lettering). Lerped through the dive. */
-const L5_REST = {box: [300, 1180, 494, 1252] as [number, number, number, number], fs: 24};
+const L5_REST = {box: [248, 1172, 442, 1244] as [number, number, number, number], fs: 24};
 const L5_CUT = {box: [300, 1152, 472, 1215] as [number, number, number, number], fs: 20};
 /** When (after the dive starts) the caption band goes calm: the camera is already moving as the hero cornice crosses
  *  caption line 2 (frame 65). */
@@ -121,9 +122,9 @@ const Scene04: React.FC = () => {
       <Cobweb x={LOCK_TL[0] + 1} y={LOCK_TL[1] + 1} r={20} corner="tl" at={b.cobweb - 0.1} dur={0.24} width={1.6} seed="s4web" />
       <YearFlyers tears={tears} />
       <BitS04 b={b} />
-      {/* L5's string: a visible ink thread from the lock's bottom screw down to the eyelet */}
-      {t >= b.l5 ? <L5String box={l5Box} fs={l5Fs} at={b.l5} /> : null}
       <LabelTag kind="tag" box={l5Box} hang={L5_HANG} text={L5} fontSize={l5Fs} at={b.l5} seed="s4L5" />
+      {/* L5's string: a visible ink thread from the lock's bottom screw over the paper's top edge into the eyelet */}
+      {t >= b.l5 ? <L5String box={l5Box} fs={l5Fs} at={b.l5} /> : null}
       <PipS04 b={b} cam={cam} />
       {/* the dive's caption band: each hero object pops whole to its flat no-ink version once it is in the band */}
       <DiveFlat cam={cam} from={diveAt + CALM_AFTER} />

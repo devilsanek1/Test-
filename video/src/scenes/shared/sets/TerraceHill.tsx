@@ -33,7 +33,7 @@
 
 import React, {useId} from 'react';
 import {palette, misreg, skies} from '../../../lib/theme';
-import {useTime} from '../../../lib/time';
+import {springAt, springs, useTime} from '../../../lib/time';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {line, polyPath, rect as sketchRect, Pt} from '../../../lib/sketch';
@@ -140,9 +140,11 @@ export const TERRACE = {
    *  dotted path; 48 px standing, `crouch` 0.86 when he kneels = 41 px (the storyboard holds the kneel at rest). */
   keeper: {from: [581, 1500] as Pt, to: [662, 1500] as Pt, h: 48, crouch: 0.86, pathY: 1513},
   /** The check-box tag over every door (house-local units at row scale u = w / 90): the props-lane CheckBoxTag design (a
-   *  cream tag hanging from (47.5, 64) on a short loop, an EMPTY ink check box), `size` 19 wide; batched per row. Door
-   *  #4's is the only TICKED one (props CheckBoxTag). */
-  checkBox: {hang: [47.5, 64] as [number, number], size: 19},
+   *  cream card hanging from (47.5, 64) on a tealDark loop, an EMPTY ink check box), `size` 19 = the base unit; drawn at
+   *  `k` x size (kit v3b: 1.4 -> 26.6 px on row 0, 13.6 on row 3 at rest) and never under `minScreen[k]` ON-SCREEN px
+   *  (rows 0-3: 22 / 17 / 13 / 10) whatever the zoom; batched per row. Door #4's is the only TICKED one (props
+   *  CheckBoxTag, same size). */
+  checkBox: {hang: [47.5, 64] as [number, number], size: 19, k: 1.4, minScreen: [22, 17, 13, 10] as readonly number[]},
 } as const;
 
 /** Mode 'flat' anchors: the horizon the haze bands sit on, the VP the house columns / avenues converge to, the sun
@@ -198,13 +200,13 @@ const INK_ROWS = 6;
 
 // ---------------------------------------------------------------- per-row batched geometry
 
-type RowChunk = {facades: string[]; shade: string; screens: string; bars: string; barDots: string; doors: string; plaques: string; locks: string; bits: string; ink: string; detail: string; stairs: string; stairInk: string; tags: string; tagBoxes: string; tagInk: string};
+type RowChunk = {facades: string[]; shade: string; screens: string; bars: string; barDots: string; doors: string; plaques: string; locks: string; bits: string; ink: string; detail: string; stairs: string; stairInk: string; tagHangs: number[]};
 
 const COLORS = [palette.cream, palette.sand, palette.tan, palette.mintPale];
 const f2 = (n: number) => n.toFixed(2);
 
 function rowChunks(mode: Mode, R: TerraceRow, half: [number, number], ext: [number, number], seed: string): {core: RowChunk; left: RowChunk; right: RowChunk} {
-  const mk = () => ({pb: COLORS.map(() => new PathBuf(2)), shade: new PathBuf(2), screens: new PathBuf(2), bars: new PathBuf(2), barDots: new PathBuf(2), doors: new PathBuf(2), plaques: new PathBuf(2), locks: new PathBuf(2), bits: new PathBuf(2), ink: '', detail: '', stairs: new PathBuf(2), stairInk: '', tags: new PathBuf(2), tagBoxes: new PathBuf(2), tagInk: ''});
+  const mk = () => ({pb: COLORS.map(() => new PathBuf(2)), shade: new PathBuf(2), screens: new PathBuf(2), bars: new PathBuf(2), barDots: new PathBuf(2), doors: new PathBuf(2), plaques: new PathBuf(2), locks: new PathBuf(2), bits: new PathBuf(2), ink: '', detail: '', stairs: new PathBuf(2), stairInk: '', tagHangs: [] as number[]});
   const parts = {core: mk(), left: mk(), right: mk()};
   const u = R.w / 90;
   const k = R.k;
@@ -251,21 +253,9 @@ function rowChunks(mode: Mode, R: TerraceRow, half: [number, number], ext: [numb
       if (k <= 1) for (let d = 0; d < 3; d++) P.barDots.circle(x + (22.5 + d * 6) * u, R.top + 34.75 * u, 2.2 * u);
     } else P.screens.rect(x + 17.5 * u, R.top + 30 * u, 55 * u, 35 * u);
     P.doors.rect(x + 32.5 * u, R.top + 97.5 * u, 30 * u, 50 * u);
-    // v3 check-box tag over the door: the props CheckBoxTag shape (a slanted cream tag on a loop, an empty box at 0.58),
-    // >= 4 px; ink (outline, box, loop) on rows 0-1, a sand box beyond
-    {
-      const CB = TERRACE.checkBox;
-      const sz = Math.max(CB.size * u, 4);
-      const hx = x + CB.hang[0] * u;
-      const hy = R.top + CB.hang[1] * u;
-      const q: Pt[] = [[hx - sz * 0.46, hy + sz * 0.22], [hx + sz * 0.5, hy + sz * 0.12], [hx + sz * 0.47, hy + sz * 0.98], [hx - sz * 0.5, hy + sz * 1.02]];
-      P.tags.poly(q);
-      const b = sz * 0.25;
-      const by = hy + sz * 0.58;
-      if (k <= 1) {
-        P.tagInk += `M${f2(hx)} ${f2(hy)}L${f2(hx - sz * 0.02)} ${f2(hy + sz * 0.18)}` + `M${q.map((p) => `${f2(p[0])} ${f2(p[1])}`).join('L')}Z` + `M${f2(hx - b)} ${f2(by - b)}h${f2(2 * b)}v${f2(2 * b)}h${f2(-2 * b)}Z`;
-      } else if (2 * b >= 2) P.tagBoxes.rect(hx - b, by - b, 2 * b, 2 * b);
-    }
+    // v3 check-box tag over the door: its hang point (the tags are built per frame by RowTags: their size has an
+    // on-screen floor and each row springs in)
+    P.tagHangs.push(x + TERRACE.checkBox.hang[0] * u, R.top + TERRACE.checkBox.hang[1] * u);
     // dots never under 3 px at rest (no sub-pixel noise)
     const pq = Math.max(8 * u, 3);
     P.plaques.rect(x + 18 * u - pq / 2, R.top + 110 * u - pq / 2, pq, pq);
@@ -293,7 +283,7 @@ function rowChunks(mode: Mode, R: TerraceRow, half: [number, number], ext: [numb
       }
     }
   }
-  const fin = (p: ReturnType<typeof mk>): RowChunk => ({facades: p.pb.map((b) => b.d), shade: p.shade.d, screens: p.screens.d, bars: p.bars.d, barDots: p.barDots.d, doors: p.doors.d, plaques: p.plaques.d, locks: p.locks.d, bits: p.bits.d, ink: p.ink, detail: p.detail, stairs: p.stairs.d, stairInk: p.stairInk, tags: p.tags.d, tagBoxes: p.tagBoxes.d, tagInk: p.tagInk});
+  const fin = (p: ReturnType<typeof mk>): RowChunk => ({facades: p.pb.map((b) => b.d), shade: p.shade.d, screens: p.screens.d, bars: p.bars.d, barDots: p.barDots.d, doors: p.doors.d, plaques: p.plaques.d, locks: p.locks.d, bits: p.bits.d, ink: p.ink, detail: p.detail, stairs: p.stairs.d, stairInk: p.stairInk, tagHangs: p.tagHangs});
   return {core: fin(parts.core), left: fin(parts.left), right: fin(parts.right)};
 }
 
@@ -377,7 +367,7 @@ function bandsFor(mode: Mode, hazeFrom: number, seed: string): Band[] {
 
 const revealXf = (reveal: number, y: number, node: React.ReactNode) => (reveal >= 1 ? node : reveal <= 0 ? null : <XG m={mat.about(mat.scale(1, reveal), 540, y)}>{node}</XG>);
 
-const RowNode: React.FC<{mode: Mode; k: number; zoom: number; reveal: number; extended: boolean; plaques: boolean; bits: boolean; tags?: boolean; seed: string}> = ({mode, k, zoom, reveal, extended, plaques, bits, tags, seed}) => {
+const RowNode: React.FC<{mode: Mode; k: number; zoom: number; reveal: number; extended: boolean; plaques: boolean; bits: boolean; tagsAt?: number; seed: string}> = ({mode, k, zoom, reveal, extended, plaques, bits, tagsAt, seed}) => {
   const R = rowsOf(mode)[k];
   const C = chunksFor(mode, k, seed);
   const depth = Math.min(1, k / (HAZE_FROM[mode] + 3));
@@ -408,14 +398,69 @@ const RowNode: React.FC<{mode: Mode; k: number; zoom: number; reveal: number; ex
           {iw > 0 && c.ink ? <Ink d={c.ink} width={iw} taper={false} vary={0.05} seed={`${seed}/i${k}/${i}`} /> : null}
           {dw > 0 && c.detail ? <Ink d={c.detail} width={dw} taper={false} vary={0.05} seed={`${seed}/di${k}/${i}`} /> : null}
           {c.stairInk && iw > 0 ? <Ink d={c.stairInk} width={iw * 0.8} taper={false} vary={0} seed={`${seed}/si${k}/${i}`} /> : null}
-          {tags && c.tags ? <Fill d={c.tags} color={palette.cream} offset={false} mode="snap" seed={`${seed}/tg${k}/${i}`} /> : null}
-          {tags && c.tagBoxes ? <Fill d={c.tagBoxes} color={palette.sand} offset={false} mode="snap" seed={`${seed}/tgb${k}/${i}`} /> : null}
-          {tags && c.tagInk && iw > 0 ? <Ink d={c.tagInk} width={Math.max(dw, iw * 0.5)} taper={false} vary={0} seed={`${seed}/tgi${k}/${i}`} /> : null}
         </React.Fragment>
       ))}
+      {tagsAt !== undefined ? <RowTags k={k} u={R.w / 90} zoom={zoom} at={tagsAt} hangs={sets.map((c) => c.tagHangs)} seed={`${seed}/tg${k}`} /> : null}
     </>
   );
   return revealXf(reveal, R.base, inner);
+};
+
+/** On-screen tag width (px) of row k at rest scale: max(k x size x u x zoom, the row's floor). World width back. */
+function tagSize(k: number, u: number, zoom: number): number {
+  const CB = TERRACE.checkBox;
+  return Math.max(CB.k * CB.size * u, (CB.minScreen[k] ?? 0) / zoom, 4);
+}
+
+/** One row's EMPTY check-box tags (kit v3b), batched: cream cards (the props CheckBoxTag outline: a slightly skewed card
+ *  hanging from its loop), on rows 0-3 an ink card outline (1.6 px on screen), a ~2 px ink check box (1.6 from row 2)
+ *  and a tealDark loop; rows 4+ a cream card + a sand box (no ink: the haze ladder). The whole row springs in about each
+ *  tag's hang point with the 7 % pop spring (springs.pop: 0 -> 1.07 -> 1), no fades. */
+const RowTags: React.FC<{k: number; u: number; zoom: number; at: number; hangs: number[][]; seed: string}> = ({k, u, zoom, at, hangs, seed}) => {
+  const t = useTime();
+  if (t < at) return null;
+  const pop = at < 0 ? 1 : springAt(t, at, springs.pop);
+  if (pop <= 0.02) return null;
+  const s = tagSize(k, u, zoom) * pop;
+  const inked = k <= 3;
+  let body = '';
+  let outline = '';
+  let boxes = '';
+  let loops = '';
+  for (const hs of hangs) {
+    for (let i = 0; i < hs.length; i += 2) {
+      const hx = hs[i];
+      const hy = hs[i + 1];
+      const q: Pt[] = [[hx - s * 0.46, hy + s * 0.22], [hx + s * 0.5, hy + s * 0.12], [hx + s * 0.47, hy + s * 0.98], [hx - s * 0.5, hy + s * 1.02]];
+      const qd = `M${q.map((p) => `${f2(p[0])} ${f2(p[1])}`).join('L')}Z`;
+      body += qd;
+      const b = s * 0.25;
+      const by = hy + s * 0.58;
+      const box = `M${f2(hx - b)} ${f2(by - b)}h${f2(2 * b)}v${f2(2 * b)}h${f2(-2 * b)}Z`;
+      if (inked) {
+        outline += qd;
+        boxes += box;
+        // the loop: the hanging string as a caret from the nail down to the card's top edge (its top edge runs from
+        // y + 0.22 s at the left to y + 0.12 s at the right)
+        loops += `M${f2(hx - s * 0.2)} ${f2(hy + s * 0.18)}L${f2(hx)} ${f2(hy - s * 0.06)}L${f2(hx + s * 0.2)} ${f2(hy + s * 0.14)}`;
+      } else if (2 * b * zoom >= 2) boxes += box;
+    }
+  }
+  const sc = (px: number) => px / zoom;
+  return (
+    <>
+      <Fill d={body} color={palette.cream} offset={false} mode="snap" seed={`${seed}/b`} />
+      {inked ? (
+        <>
+          <Ink d={loops} width={sc(1.6)} color={palette.tealDark} taper={false} vary={0} seed={`${seed}/lp`} />
+          <Ink d={outline} width={sc(1.6)} taper={false} vary={0} seed={`${seed}/o`} />
+          <Ink d={boxes} width={sc(k <= 1 ? 2 : 1.6)} taper={false} vary={0} seed={`${seed}/x`} />
+        </>
+      ) : boxes ? (
+        <Fill d={boxes} color={palette.sand} offset={false} mode="snap" seed={`${seed}/x`} />
+      ) : null}
+    </>
+  );
 };
 
 const BandNode: React.FC<{band: Band; reveal: number; extended: boolean; plaques: boolean; seed: string}> = ({band, reveal, extended, plaques, seed}) => {
@@ -505,8 +550,8 @@ export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFl
     const reveal = revealOf(rows[k].top);
     if (reveal <= 0) continue;
     const bits = bitWaveAt !== undefined && t >= bitWaveAt + k * waveStep;
-    const tags = checkBoxWaveAt !== undefined && (checkBoxWaveAt < 0 || t >= checkBoxWaveAt + k * checkBoxStep);
-    nodes.push(<RowNode key={k} mode={mode} k={k} zoom={zoom} reveal={reveal} extended={extendedAt(k)} plaques={plaquesAt(k)} bits={bits} tags={tags} seed={sd} />);
+    const tagsAt = checkBoxWaveAt === undefined ? undefined : checkBoxWaveAt < 0 ? -1 : checkBoxWaveAt + k * checkBoxStep;
+    nodes.push(<RowNode key={k} mode={mode} k={k} zoom={zoom} reveal={reveal} extended={extendedAt(k)} plaques={plaquesAt(k)} bits={bits} tagsAt={tagsAt} seed={sd} />);
   }
   // house #4 in full detail (the hidden-match object, THE fixed door)
   const H4 = TERRACE.house4;
@@ -537,7 +582,7 @@ export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFl
       <PlaqueSlot x={H4.facade[0] + 18} y={H4.facade[1] + 110} size={8} width={Math.max(0.4, 1 / zoom)} seed={`${sd}/h4p`} />
       <Lock x={H4.lock.x} y={H4.lock.y} size={H4.lock.h} state="fixed" ink={Math.max(0.6, 1.2 / zoom)} seed={`${sd}/h4lock`} {...house4Lock} />
       {flagAt !== undefined ? <CheckFlagSlot x={F.x} y={F.y} size={F.size} raiseAt={flagAt < 0 ? undefined : flagAt} at={flagAt < 0 ? undefined : flagAt} width={Math.max(1.6, 2.2 / zoom)} seed={`${sd}/flag`} /> : null}
-      {checkBoxWaveAt !== undefined && (checkBoxWaveAt < 0 || t >= checkBoxWaveAt) ? <House4Tag ink={Math.max(0.6, 2.2 / zoom)} seed={sd} /> : null}
+      {checkBoxWaveAt !== undefined && (checkBoxWaveAt < 0 || t >= checkBoxWaveAt) ? <House4Tag at={checkBoxWaveAt < 0 ? undefined : checkBoxWaveAt} zoom={zoom} ink={Math.max(0.6, 2.2 / zoom)} seed={sd} /> : null}
       <House4Bit spec={bit} seed={sd} />
     </>
   );
@@ -578,10 +623,10 @@ export const TerraceHill: React.FC<TerraceHillProps> = ({mode = 'hill', revealFl
   );
 };
 
-/** Door #4's check-box tag: the only TICKED one (props CheckBoxTag, same design as the batched ones). */
-const House4Tag: React.FC<{ink: number; seed: string}> = ({ink, seed}) => {
+/** Door #4's check-box tag: the only TICKED one (props CheckBoxTag), the row-0 size, springing in with row 0. */
+const House4Tag: React.FC<{at?: number; zoom: number; ink: number; seed: string}> = ({at, zoom, ink, seed}) => {
   const CB = TERRACE.checkBox;
-  return <CheckBoxTagSlot x={TERRACE.house4.facade[0] + CB.hang[0]} y={TERRACE.house4.facade[1] + CB.hang[1]} size={CB.size} ticked ink={ink} seed={`${seed}/h4tag`} />;
+  return <CheckBoxTagSlot x={TERRACE.house4.facade[0] + CB.hang[0]} y={TERRACE.house4.facade[1] + CB.hang[1]} size={tagSize(0, 1, zoom)} ticked at={at} ink={ink} seed={`${seed}/h4tag`} />;
 };
 
 /** Bit on house #4's door jamb (v3 hidden-cut match object). */

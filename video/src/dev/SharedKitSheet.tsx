@@ -200,8 +200,9 @@ export type SharedKitSheetProps = {
    *  phone size. 'v3' = the storyboard-v3 pieces (labels, rewind, counter board, diagram, tags, notes) in big cells.
    *  'v3fix' = the v3 review round: FixSign (J3 -> J5) + the MakersCart sign slot, LockCrate lid + tags, the lettered
    *  BackSoonTag width ladder, the CounterBoard footer zone, LabelTag minFont (paper growth).
+   *  'figures' = every back-view figure preset at film size: hair discs, collar bands, jointed arms, phone raises.
    *  All loop on a 5 s clock. */
-  mode?: 'sheet' | 'context' | 'lock' | 'heads' | 'v3' | 'v3fix';
+  mode?: 'sheet' | 'context' | 'lock' | 'heads' | 'v3' | 'v3fix' | 'figures';
   /** false = skip the set thumbnails (props-only cost check). */
   thumbs?: boolean;
 };
@@ -291,6 +292,36 @@ const HeadsMode: React.FC = () => {
       <EdgeOnlooker x={420} y={1520} head={100} hair="cap" body={palette.teal} seed="ho3" />
       <EdgeOnlooker x={700} y={1500} head={104} seed="ho4" />
       <Ghost x={930} y={1700} h={260} seed="hg1" />
+    </TimeProvider>
+  );
+};
+
+/** Every back-view figure preset at film size (kitv3b review): hair discs (no sand / skin-coloured heads), straight
+ *  collar bands (no V), the jointed arm (elbow bend that follows the raise, taper, cuff, hand) and the EdgeOnlooker
+ *  phone raise at the S07 size (head 82: palm + thumb + fingers on the phone, the coat fold). Raises at 0.5 s. Row 2:
+ *  citizens whose seeded kit hair is sand / clay (fixed) next to untouched picks. */
+const FiguresMode: React.FC = () => {
+  const t = useTime() % 5;
+  return (
+    <TimeProvider global={t} offset={0}>
+      <rect width={1080} height={1920} fill={skies.day} />
+      <rect x={0} y={0} width={1080} height={720} fill={palette.sand} />
+      <Messenger x={110} y={700} h={260} holdEnvelope seed="s5msg" />
+      <Messenger x={300} y={700} h={260} pullAt={0.5} hair="curly" hairColor={palette.brown} seed="msg" />
+      <Investigator x={520} y={700} h={260} raiseAt={0.5} hair="short" seed="inv1" />
+      <Maker x={730} y={700} h={260} walk={{hz: 1.8}} seed="fm6" />
+      <Keeper x={940} y={700} h={300} reachAt={0.5} holding={<NewLockIcon size={42} grip="bottom" seed="fgkh" />} seed="fgk" />
+      <rect x={0} y={720} width={1080} height={400} fill={palette.mintPale} />
+      {['fc13', 'fc45', 'fc51', 'fc59', 'fc11', 'fc6', 'fc1', 'fc49', 'fc10'].map((sd, i) => (
+        <Citizen key={sd} x={70 + i * 118} y={1060} h={i % 2 ? 150 : 130} walk={i === 2 ? {hz: 1.8} : undefined} seed={sd} />
+      ))}
+      <rect x={0} y={1120} width={1080} height={800} fill={palette.cream} />
+      <EdgeOnlooker x={80} y={1520} head={82} hair="short" body={palette.teal} acc={['hood']} raisePhoneAt={0.5} arms="near" rim="left" seed="nc/rd0" />
+      <EdgeOnlooker x={190} y={1570} head={82} hair="bun" body={palette.sand} acc={['scarf']} raisePhoneAt={0.55} arms="near" rim="left" seed="nc/rd1" />
+      <EdgeOnlooker x={400} y={1560} head={100} hair="short" body={palette.sage} acc={['collar']} raisePhoneAt={0.6} rim="left" seed="oq/aud3" />
+      <EdgeOnlooker x={640} y={1560} head={100} seed="ho4" raisePhoneAt={0.65} phoneSide="left" />
+      <EdgeOnlooker x={900} y={1540} head={82} hair="cap" body={palette.sage} acc={['collar']} raisePhoneAt={0.7} arms="near" rim="right" seed="nc/rd2" />
+      <EdgeOnlooker x={1010} y={1500} head={82} hair="long" body={palette.brown} raisePhoneAt={0.75} arms="near" rim="right" seed="nc/rd3" />
     </TimeProvider>
   );
 };
@@ -580,12 +611,12 @@ export const SharedKitSheet: React.FC<SharedKitSheetProps> = ({look, unbuildAt, 
       </AbsoluteFill>
     );
   }
-  if (mode === 'context' || mode === 'lock' || mode === 'heads') {
+  if (mode === 'context' || mode === 'lock' || mode === 'heads' || mode === 'figures') {
     return (
       <AbsoluteFill style={{background: skies.day}}>
         <svg width={1080} height={1920} viewBox="0 0 1080 1920">
           <Modes look={look} unbuildAt={unbuildAt}>
-            {mode === 'lock' ? <LockMode /> : mode === 'heads' ? <HeadsMode /> : <ContextMode />}
+            {mode === 'lock' ? <LockMode /> : mode === 'heads' ? <HeadsMode /> : mode === 'figures' ? <FiguresMode /> : <ContextMode />}
           </Modes>
         </svg>
       </AbsoluteFill>

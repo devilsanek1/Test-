@@ -270,8 +270,12 @@ export type BlueprintStreetProps = {
   plaqueAt?: Partial<Record<BlueprintId, number>>;
   /** The blueprint grid draws on near -> far from here (omit = drawn). */
   gridAt?: number;
-  /** The elephant stamp slams (ring 0.13 s, then 2.6x -> 1.0x). Omit = printed; false = none. */
+  /** The elephant stamp slams (ring 0.13 s, then 2.6x -> 1.0x). Omit = printed; false = none. Kit v3b: the props
+   *  ElephantStamp 'solid' rubber-stamp print (tealDark over the whole ellipse, 3 px misregistered, cream border ring,
+   *  the elephant reversed out in cream). */
   stampAt?: number | false;
+  /** Mirror the stamp's elephant (faces left: its trunk / ear clear of Pip perched on its right end). Default false. */
+  stampFlip?: boolean;
   ventAt?: number;
   signSwingAt?: number;
   /** Browser screens blink (2 frames white) at these times (every building). */
@@ -297,7 +301,7 @@ export type BlueprintStreetProps = {
   seed?: string;
 };
 
-export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pressAt, plaqueAt = {}, gridAt, stampAt, ventAt, signSwingAt, blinkAt, lock = {}, people, titleBlock, sign, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bp'}) => {
+export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pressAt, plaqueAt = {}, gridAt, stampAt, stampFlip, ventAt, signSwingAt, blinkAt, lock = {}, people, titleBlock, sign, sun, wrap = noWrap, x = 0, y = 0, scale = 1, outAt, outDur, seed = 'bp'}) => {
   const t = useTime();
   const P = BLUEPRINT.press;
   const [wx, wy, ww, wh] = BLUEPRINT.window;
@@ -324,7 +328,7 @@ export const BlueprintStreet: React.FC<BlueprintStreetProps> = ({popAt = {}, pre
       <Ink d={G.dimL + G.dimR} width={SI.far} at={gridAt !== undefined ? gridAt + 0.3 : undefined} taper={false} seed={`${seed}/dim`} />
       <Ink d={G.tb} width={SI.far} at={gridAt !== undefined ? gridAt + 0.35 : undefined} taper={false} seed={`${seed}/tb`} />
       {titleBlock ? <Ink d={TB_FRAME} width={SI.hair} at={gridAt !== undefined ? gridAt + 0.35 : undefined} taper={false} seed={`${seed}/tb3`} /> : null}
-      {stampAt !== false ? <ElephantStampSlot x={BLUEPRINT.stamp.x} y={BLUEPRINT.stamp.y} rx={BLUEPRINT.stamp.rx} ry={BLUEPRINT.stamp.ry} ring={14} at={stampAt} seed={`${seed}/stamp`} /> : null}
+      {stampAt !== false ? <ElephantStampSlot x={BLUEPRINT.stamp.x} y={BLUEPRINT.stamp.y} rx={BLUEPRINT.stamp.rx} ry={BLUEPRINT.stamp.ry} ring={14} at={stampAt} flip={stampFlip} seed={`${seed}/stamp`} /> : null}
     </>
   );
 

@@ -1,8 +1,10 @@
-// scene02/PlanGrid.tsx — the PLAN's ink grid on the master blueprint (fix round 1): a broken-stroke hairline grid, 40
-// world px pitch, on the sheet below its clean top margin. It is what makes the sheet read as THE plan, and it shares
-// its visual language with S03's street floor (an ink-gridded plan) across the hard cut. It draws OUTWARD from the
-// lock with the rest of the sheet: the segments are binned by distance from the lock into rings, one Ink per ring,
-// each ring a little later. The loupe, the labels, the site icon and the eraser patch are all drawn on top of it.
+// scene02/PlanGrid.tsx — the PLAN's grid on the master blueprint: a broken-stroke hairline grid on the sheet below its
+// clean top margin. Fix round 2: it is a pale BLUEPRINT TINT (`color`, default GRID_TINT), not ink, at 52 world px
+// pitch and 0.85 width, so it sits far below the plan drawing in weight and colour (the artist leaves paper empty; an
+// ink grid read as wire mesh and buried the door elevation and the dashed connector). `thin` drops whole segments
+// (never by opacity) toward the lock, so the paper round the loupe stays clean. It draws OUTWARD from the lock with the
+// rest of the sheet: the segments are binned by distance from the lock into rings, one Ink per ring, each ring a
+// little later. The loupe, the labels, the site icon and the eraser patch are all drawn on top of it.
 
 import React from 'react';
 import {Ink} from '../../lib/Ink';
@@ -22,8 +24,15 @@ export type PlanGridProps = {
   ring?: number;
   perRing?: number;
   width?: number;
+  /** Stroke colour (default GRID_TINT, the pale blueprint tint). */
+  color?: string;
+  /** [r0, r1] world px from `from`: no segment inside r0, all kept past r1, a linear keep-chance between (seeded). */
+  thin?: [number, number];
   seed?: string;
 };
+
+/** The blueprint tint: a pale mint between the page sky and the paper (reads as printed grid, never as ink). */
+export const GRID_TINT = '#BFD8CC';
 
 export type Hole = {c: [number, number, number]} | {r: [number, number, number, number]};
 const inHole = (p: Pt, holes: Hole[]) =>
@@ -31,12 +40,13 @@ const inHole = (p: Pt, holes: Hole[]) =>
 
 const CACHE = new Map<string, string[]>();
 
-function rings(area: [number, number, number, number], from: Pt, pitch: number, ring: number, holes: Hole[], seed: string): string[] {
-  const key = `${area.join(',')}|${from.join(',')}|${pitch}|${ring}|${JSON.stringify(holes)}|${seed}`;
+function rings(area: [number, number, number, number], from: Pt, pitch: number, ring: number, holes: Hole[], thin: [number, number] | undefined, seed: string): string[] {
+  const key = `${area.join(',')}|${from.join(',')}|${pitch}|${ring}|${JSON.stringify(holes)}|${thin?.join(',')}|${seed}`;
   const hit = CACHE.get(key);
   if (hit) return hit;
   const [x0, y0, x1, y1] = area;
   const r = rng(`${seed}/grid`);
+  const keep = rng(`${seed}/thin`);
   const out: string[] = [];
   const add = (a: Pt, b: Pt, i: number) => {
     // cut the segment where it crosses a keep-out (2 px steps), keep the runs longer than 14 px
@@ -57,7 +67,12 @@ function rings(area: [number, number, number, number], from: Pt, pitch: number, 
   const put = (a: Pt, b: Pt, i: string) => {
     const mx = (a[0] + b[0]) / 2 - from[0];
     const my = (a[1] + b[1]) / 2 - from[1];
-    const k = Math.floor(Math.hypot(mx, my) / ring);
+    const dist = Math.hypot(mx, my);
+    if (thin) {
+      const u = keep.range(0, 1);
+      if (dist < thin[0] || u > (dist - thin[0]) / (thin[1] - thin[0])) return;
+    }
+    const k = Math.floor(dist / ring);
     while (out.length <= k) out.push('');
     out[k] += line(a[0], a[1], b[0], b[1], {seed: `${seed}/g${i}`, over: 0});
   };
@@ -79,11 +94,11 @@ function rings(area: [number, number, number, number], from: Pt, pitch: number, 
   return out;
 }
 
-export const PlanGrid: React.FC<PlanGridProps> = ({area, from, at, pitch = 40, holes = [], ring = 60, perRing = 0.05, width = 1.15, seed = 's2grid'}) => {
-  const rs = rings(area, from, pitch, ring, holes, seed);
+export const PlanGrid: React.FC<PlanGridProps> = ({area, from, at, pitch = 52, holes = [], ring = 60, perRing = 0.05, width = 0.85, color = GRID_TINT, thin, seed = 's2grid'}) => {
+  const rs = rings(area, from, pitch, ring, holes, thin, seed);
   return (
     <>
-      {rs.map((d, i) => (d ? <Ink key={i} d={d} at={at + i * perRing} order="all" width={width} taper={false} vary={0} seed={`${seed}/r${i}`} /> : null))}
+      {rs.map((d, i) => (d ? <Ink key={i} d={d} at={at + i * perRing} order="all" width={width} color={color} taper={false} vary={0} seed={`${seed}/r${i}`} /> : null))}
     </>
   );
 };

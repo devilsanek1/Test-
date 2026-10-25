@@ -34,14 +34,14 @@ export type PipTimes = {
 };
 
 /** The crouch on the roof (2 frames), then the drop to the bollard. */
-const CROUCH = 0.067;
-const ARC = 0.62;
+const CROUCH = 0.05;
+const ARC = 0.66;
 export const LEAP_DUR = CROUCH + ARC;
 const OUT_DUR = 0.3;
 /** The fall: y ~ k^FALL (a soft gravity: <= ~60 px / frame on the last frames, no kick up into the caption band). */
 const FALL = 1.4;
-/** Rightward drift kept from the tram ride at take-off (x += DRIFT k (1-k)^2): the arc turns back left, no snap. */
-const DRIFT = 420;
+/** Take-off ease (x += DRIFT k (1-k)^2): the arc starts almost still after the crouch drift and turns left, no snap. */
+const DRIFT = 330;
 
 /** Where his trunk tip is in the mirrored trunk-up pose (world): the 'hey' spark radiates from here at the plaque. */
 const HEY_TIP: Pt = [662, 1306];

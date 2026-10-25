@@ -63,3 +63,9 @@ export const toScreen = (t: number, p: [number, number], layer: string | number 
   return [m[0] * p[0] + m[2] * p[1] + m[4], m[1] * p[0] + m[3] * p[1] + m[5]];
 };
 export const zoomAt = (t: number, layer: string | number = 1) => layerMat(t, layer)[0];
+
+/** Ink compensation in the dive (fix round 3): the camera scales every stroke 3.07x, S02 opens at ~3-4 px. Strokes the
+ *  scene draws itself (govA / govB / govC shutters, padlocks, tags, the lock ring) are drawn at width x this factor
+ *  = (zoom / zoom at the dive start)^-0.6: 1.0 up to 4.385 (no step), 0.51 at the cut, so a 3.4 px line lands at
+ *  ~5.5 px instead of ~10.9 px. */
+export const inkComp = (t: number, layer: string | number = 'buildings') => (t <= CAM.dive.t0 ? 1 : Math.pow(zoomAt(t, layer) / zoomAt(CAM.dive.t0, layer), -0.6));

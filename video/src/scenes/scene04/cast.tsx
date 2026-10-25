@@ -34,8 +34,9 @@ export const PIP_WORLD_SCALE = PIP_SCREEN / K_REST.zoom;
  *  (410.0, 1438.4) today). Imported, so the hand-off cannot drift when S03 moves him. */
 export const PIP_CUT_SCREEN: Pt = s03Screen(S03_CAM, S03_PIP_AT);
 export const PIP_FROM: Pt = toWorld(K_REST, PIP_CUT_SCREEN);
-/** His spot on step 2's tread: left of the L5 tag's paper. */
-export const PIP_AT: Pt = [232, STOOP.step2[1]];
+/** His spot on step 2's tread, at its left end (his tail at the step's edge): the L5 tag hangs right of him, almost
+ *  straight under lock4, its blank bottom-left corner behind his head. */
+export const PIP_AT: Pt = [218, STOOP.step2[1]];
 /** The sleeping ear (sleep pose, local px at scale 1, feet = (0, 0)), measured on the pose. */
 export const SLEEP_EAR: Pt = [14, -25];
 
@@ -133,7 +134,7 @@ const AttentionRing: React.FC<{at: number; c: Pt}> = ({at, c}) => {
   if (t < at || t >= at + 0.24) return null;
   const k = 1 + 0.25 * E.outCubic(clamp((t - at) / 0.24));
   const r = 15 * k;
-  const ring = `M${c[0] + r} ${c[1]}A${r} ${r} 0 1 0 ${c[0] + r - 0.01} ${c[1] - 0.6}`;
+  const ring = `M${(c[0] + r).toFixed(1)} ${c[1]}A${r} ${r} 0 1 0 ${(c[0] - r).toFixed(1)} ${c[1]}A${r} ${r} 0 1 0 ${(c[0] + r).toFixed(1)} ${c[1]}`;
   let ticks = '';
   for (const a of [-140, -90, -40]) {
     const q = (a * Math.PI) / 180;
@@ -193,19 +194,20 @@ function figPaths(H: number, ph: number, hair: PasserHair, acc: PasserAcc[]) {
     const sh = 0.026 + lift[i] * 0.25; // a raised heel shows a little more sole
     shoes += `M${P(cx - 0.042, bot)}Q${P(cx, bot - 0.022)} ${P(cx + 0.042, bot)}L${P(cx + 0.04, bot + sh)}Q${P(cx, bot + sh + 0.01)} ${P(cx - 0.04, bot + sh)}Z`;
   });
-  // the jacket (rounded shoulders, slight taper to the hem)
-  const torso = `M${P(-0.132, -0.47)}C${P(-0.138, -0.6)} ${P(-0.162, -0.72)} ${P(-0.158, -0.77)}C${P(-0.152, -0.822)} ${P(-0.1, -0.842)} ${P(-0.045, -0.846)}L${P(0.045, -0.846)}C${P(0.1, -0.842)} ${P(0.152, -0.822)} ${P(0.158, -0.77)}C${P(0.162, -0.72)} ${P(0.138, -0.6)} ${P(0.132, -0.47)}Z`;
-  const seam = `M${P(0, -0.84)}L${P(0.002, -0.74)}M${P(-0.12, -0.53)}L${P(-0.05, -0.53)}`;
-  // arms: closed sleeves from the shoulders, swinging in antiphase with the legs
+  // the jacket: sloped shoulders from the neck, a slight waist, a soft curved hem
+  const torso = `M${P(-0.13, -0.47)}C${P(-0.128, -0.53)} ${P(-0.12, -0.6)} ${P(-0.128, -0.66)}C${P(-0.138, -0.72)} ${P(-0.152, -0.745)} ${P(-0.148, -0.772)}C${P(-0.14, -0.812)} ${P(-0.08, -0.832)} ${P(-0.034, -0.842)}L${P(0.034, -0.842)}C${P(0.08, -0.832)} ${P(0.14, -0.812)} ${P(0.148, -0.772)}C${P(0.152, -0.745)} ${P(0.138, -0.72)} ${P(0.128, -0.66)}C${P(0.12, -0.6)} ${P(0.128, -0.53)} ${P(0.13, -0.47)}Q${P(0, -0.452)} ${P(-0.13, -0.47)}Z`;
+  const seam = `M${P(0, -0.835)}L${P(0.002, -0.75)}M${P(-0.118, -0.535)}Q${P(-0.08, -0.528)} ${P(-0.05, -0.532)}`;
+  // arms: closed sleeves from the shoulders, hanging a little outward (a sliver of air at the hands), swinging in
+  // antiphase with the legs
   const arm = (s: number, swing: number) => {
-    // local sleeve: u across, v down from the shoulder, rotated so the hand hangs a little outward (+ the swing)
-    const a = ((-s * 5 + swing) * Math.PI) / 180;
+    // local sleeve: u across, v down from the shoulder, rotated so the hand hangs outward (+ the swing)
+    const a = ((-s * 7 + swing) * Math.PI) / 180;
     const c = Math.cos(a);
     const sn = Math.sin(a);
-    const sx0 = s * 0.138;
-    const sy0 = -0.8;
+    const sx0 = s * 0.13;
+    const sy0 = -0.79;
     const Q = (u: number, v: number) => P(sx0 + u * c - v * sn, sy0 + u * sn + v * c);
-    return `M${Q(-0.03, 0)}L${Q(-0.026, 0.27)}Q${Q(0, 0.305)} ${Q(0.026, 0.27)}L${Q(0.03, 0)}Z`;
+    return `M${Q(-0.028, 0)}C${Q(-0.03, 0.1)} ${Q(-0.024, 0.2)} ${Q(-0.022, 0.29)}Q${Q(0, 0.315)} ${Q(0.022, 0.29)}C${Q(0.024, 0.2)} ${Q(0.03, 0.1)} ${Q(0.028, 0)}Z`;
   };
   const sw = Math.sin(ph) * 5;
   const phone = acc.includes('phone');
@@ -220,8 +222,8 @@ function figPaths(H: number, ph: number, hair: PasserHair, acc: PasserAcc[]) {
     phoneD = `M${P(0.072, -0.97)}L${P(0.112, -0.965)}L${P(0.104, -0.875)}L${P(0.066, -0.88)}Z`;
   } else arms += arm(1, -sw);
   // head (the back of it) + hair
-  const hr = 0.07;
-  const hc = -0.915;
+  const hr = 0.062;
+  const hc = -0.925;
   const head = `M${P(-hr, hc)}C${P(-hr, hc - 0.11)} ${P(hr, hc - 0.11)} ${P(hr, hc)}C${P(hr, hc + 0.07)} ${P(0.03, hc + 0.085)} ${P(0, hc + 0.085)}C${P(-0.03, hc + 0.085)} ${P(-hr, hc + 0.07)} ${P(-hr, hc)}Z`;
   let hairFill = '';
   let hairInk = '';
@@ -231,7 +233,7 @@ function figPaths(H: number, ph: number, hair: PasserHair, acc: PasserAcc[]) {
     hairInk = hairFill + `M${P(-0.04, hc - 0.05)}Q${P(-0.01, hc - 0.02)} ${P(-0.02, hc + 0.05)}M${P(0.04, hc - 0.05)}Q${P(0.012, hc - 0.02)} ${P(0.022, hc + 0.05)}`;
   } else if (hair === 'long') {
     hairFill = `M${P(-0.074, hc - 0.01)}C${P(-0.08, hc + 0.06)} ${P(-0.082, hc + 0.12)} ${P(-0.07, hc + 0.15)}L${P(0.07, hc + 0.15)}C${P(0.082, hc + 0.12)} ${P(0.08, hc + 0.06)} ${P(0.074, hc - 0.01)}Z`;
-    hairInk = hairFill + `M${P(-0.02, hc - 0.06)}Q${P(-0.03, hc + 0.05)} ${P(-0.035, hc + 0.14)}M${P(0.025, hc - 0.06)}Q${P(0.03, hc + 0.05)} ${P(0.03, hc + 0.14)}`;
+    hairInk = hairFill + `M${P(-0.028, hc + 0.04)}Q${P(-0.034, hc + 0.09)} ${P(-0.036, hc + 0.14)}M${P(0.026, hc + 0.05)}Q${P(0.03, hc + 0.1)} ${P(0.03, hc + 0.14)}`;
   } else if (hair === 'cap') {
     hairInk = `M${P(-hr, hc - 0.012)}Q${P(0, hc + 0.012)} ${P(hr, hc - 0.012)}M${P(-0.022, hc - 0.002)}Q${P(0, hc - 0.03)} ${P(0.022, hc - 0.002)}`;
     darkFill = `M${P(-0.012, hc - 0.1)}a${fmt(0.012 * H)} ${fmt(0.01 * H)} 0 1 1 ${fmt(0.024 * H)} 0a${fmt(0.012 * H)} ${fmt(0.01 * H)} 0 1 1 ${fmt(-0.024 * H)} 0Z`;

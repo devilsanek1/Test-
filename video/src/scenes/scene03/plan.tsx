@@ -2,9 +2,11 @@
 // right depth): the far plain + horizon skyline that the bare plan runs to before the city springs up, the ten inked
 // FOOTPRINTS (cream lots, solid ink, door swings, lot marks), S02's teal frame band on the plan sheet + the dog-ear
 // fold, the side rows re-coloured (S03 replaces the set's 'sides' layer with the same rows: mint / peach facades,
-// no tiny plaques, no PHP lock on the three non-PHP doors), the per-building COUNT BADGES (30-44 px plaques over the
-// doors), awnings, the browser-screen states (unlit sage glass until their beat, a 2-frame peach glow pop, then a lit
-// page: peach header + text rows, an ink elephant on the seven PHP sites), the count pings and the roof-vent puffs.
+// no tiny plaques, no PHP lock on the three non-PHP doors), the per-building COUNT SIGNS (fix round 2: blade signs on
+// iron brackets projecting into the street, facing the viewer, 58-69 px on screen, the plate pops and swings on its
+// beat with an orange ping ring), awnings, flower boxes, the browser-screen states (unlit sage glass; the seven PHP
+// screens light on 'websites' with a big ink elephant on their page; the three non-PHP screens stay DARK to the cut),
+// the count pings, the bird wire, S03's roof vent (moved off the sun's edge) and its puffs.
 //
 // The side-building geometry is the set's own layout, rebuilt here with the SAME inputs (quadRowLayout is pure and
 // memoised): LX / RX / lTop / lBase / rTop / rBase and the sheet edge (yF, lB, rB, inset) are copied from
@@ -12,15 +14,15 @@
 
 import React from 'react';
 import {palette} from '../../lib/theme';
-import {ease as E, prog, useTime} from '../../lib/time';
+import {ease as E, prog, springAt, springs, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {crown, crownTicks, line, polyPath, rect, Pt} from '../../lib/sketch';
+import {crown, crownTicks, line, polyPath, rect, roundRect, Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import {rng} from '../../lib/rng';
 import {Quad} from '../../lib/persp';
 import {BLUEPRINT, PerspRow, PopUp, quadRowLayout, RowHouse, SI, SideId, BlueprintId} from '../shared/sets';
-import {chromeScreen, ElephantEmblem, ElephantPlaque} from '../shared/props';
+import {chromeScreen, ElephantEmblem} from '../shared/props';
 
 // ---------------------------------------------------------------- the set's side-building layout (copied inputs)
 
@@ -51,7 +53,10 @@ const rightQuads: Quad[] = RX.slice(0, -1).map((x0, i) => {
 });
 const LEFT_IDS: (SideId | null)[] = [null, 'L1', 'L2', 'L3', 'L4', 'L5'];
 const RIGHT_IDS: (SideId | null)[] = [null, 'R1', 'R2', 'R3', 'R4'];
-const isBlank = (id: SideId | null) => id !== null && BLUEPRINT.blank.includes(id);
+/** S03's three non-PHP sites (fix round 2: R1, entirely under the right UI rail, swapped with the set's R4, so all seven
+ *  PHP count signs sit left of x 950 on screen). */
+export const S03_BLANK: SideId[] = ['L3', 'L5', 'R1'];
+const isBlank = (id: SideId | null) => id !== null && S03_BLANK.includes(id);
 /** Fix round 1 palette: the set's rows were ~70 % one brown family. Same rows, re-coloured: L2 / R2 mintPale, L4 peach,
  *  L3 tan (was mint, next to L2), R3 cream; the bleed slivers and L1 / L5 / R1 / R4 keep the set's colours. The tiny
  *  side plaques are dropped (`plaque: false`): the count badges over the doors carry the count instead. */
@@ -133,14 +138,14 @@ const RAYS = (() => {
 const HLINE = line(-120, HORIZON, 1200, HORIZON, {seed: 's03/hz', over: 0});
 
 /** The plain from the horizon down to the street (sand, like the set's street), a low hazy far city on it, and the
- *  plan's horizon + construction rays (drawn on with the grid). */
-export const FarPlain: React.FC<{gridAt?: number}> = ({gridAt}) => (
+ *  plan's horizon + construction rays (inked from the cut: fix round 2, the hard-cut frame reads as a drawn plan). */
+export const FarPlain: React.FC = () => (
   <>
     <Fill d={FAR.far} color={SKY_FAR} offset={false} mode="none" seed="s03/farA" />
     <Fill d={FAR.near} color={SKY_NEAR} offset={false} mode="none" seed="s03/farB" />
     <Fill rect={[-260, HORIZON, 1600, 1200 - HORIZON + 10]} color={palette.sand} offset={false} mode="none" seed="s03/plain" />
     <Ink d={HLINE} width={1.6} taper={false} seed="s03/hzi" />
-    <Ink d={RAYS} at={gridAt} dur={0.25} order="all" width={1.3} taper={false} seed="s03/rays" />
+    <Ink d={RAYS} width={1.3} taper={false} seed="s03/rays" />
   </>
 );
 
@@ -353,59 +358,104 @@ const seg = (q: Q4, u0: number, u1: number, v: number) => {
   return `M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b[0].toFixed(1)} ${b[1].toFixed(1)}`;
 };
 
-/** A lit page in a side screen (the press-house page recipe scaled to the window): a peach header across the top
- *  third, hairline text rows; the PHP sites carry a small solid ink elephant (the count is about websites). */
+/** A lit page in a side screen: a peach header across the top, then (the PHP sites: the count is about websites) a BIG
+ *  solid ink elephant filling the page width (fix round 2: >= 32 px on screen; it was ~15 px and a lit PHP page read
+ *  like any other lit page), or hairline text rows. */
 const Page: React.FC<{q: Q4; php: boolean; seed: string}> = ({q, php, seed}) => {
   const w = Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1]);
   const h = Math.hypot(q[3][0] - q[0][0], q[3][1] - q[0][1]);
-  const rows = php ? seg(q, 0.12, 0.5, 0.5) + seg(q, 0.12, 0.42, 0.66) + seg(q, 0.12, 0.88, 0.84) : seg(q, 0.12, 0.84, 0.5) + seg(q, 0.12, 0.66, 0.66) + seg(q, 0.12, 0.8, 0.84);
-  const c = bil(q, 0.73, 0.6);
-  const es = Math.min(w * 0.42, h * 0.5);
+  const c = bil(q, 0.5, 0.64);
+  const es = Math.min(w * 0.92, h * 0.62);
+  if (!php) {
+    const rows = seg(q, 0.12, 0.84, 0.5) + seg(q, 0.12, 0.66, 0.66) + seg(q, 0.12, 0.8, 0.84);
+    return (
+      <>
+        <Fill d={sub(q, 0.1, 0.1, 0.9, 0.32)} color={palette.peach} offset={false} mode="none" seed={`${seed}/hd`} />
+        <Ink d={rows} width={w > 45 ? 1.4 : 1.1} taper={false} seed={`${seed}/tx`} />
+      </>
+    );
+  }
   return (
     <>
-      <Fill d={sub(q, 0.1, 0.1, 0.9, 0.32)} color={palette.peach} offset={false} mode="none" seed={`${seed}/hd`} />
-      <Ink d={rows} width={w > 45 ? 1.4 : 1.1} taper={false} seed={`${seed}/tx`} />
-      {php ? <ElephantEmblem x={c[0]} y={c[1]} size={es} mode="solid" color={palette.ink} seed={`${seed}/el`} /> : null}
+      <Fill d={sub(q, 0.08, 0.08, 0.92, 0.26)} color={palette.peach} offset={false} mode="none" seed={`${seed}/hd`} />
+      <ElephantEmblem x={c[0]} y={c[1]} size={es} mode="solid" color={palette.ink} seed={`${seed}/el`} />
     </>
   );
 };
 
-/** One screen overlay: unlit sage glass before `lightAt`, peach for two frames at it (the glow pop), then the set's lit
- *  screen with S03's page on it. */
-const ScreenState: React.FC<{d: string; lightAt: number; php: boolean; seed: string}> = ({d, lightAt, php, seed}) => {
+/** One screen overlay: unlit sage glass before `lightAt` (always, when `lightAt` is undefined: the three non-PHP
+ *  sites stay dark to the cut), peach for two frames at it (the glow pop), then S03's page. */
+const ScreenState: React.FC<{d: string; lightAt?: number; php: boolean; seed: string}> = ({d, lightAt, php, seed}) => {
   const t = useTime();
-  if (t < lightAt) return <Fill d={d} color={palette.sage} offset={false} mode="none" seed={seed} />;
+  if (lightAt === undefined || t < lightAt) return <Fill d={d} color={palette.sage} offset={false} mode="none" seed={seed} />;
   if (t < lightAt + GLOW) return <Fill d={d} color={palette.peach} offset={false} mode="none" seed={`${seed}/p`} />;
   return <Page q={quadOf(d)} php={php} seed={`${seed}/pg`} />;
 };
 
-// ---------------------------------------------------------------- count badges (a plaque over every door)
+// ---------------------------------------------------------------- flower boxes (static detail, ride the pop-ups)
 
-/** Badge size (world px) by the facade's on-screen height: 30-44 px on screen (>= 30 px at the far end). */
-const badgeSize = (h: RowHouse) => Math.max(30, Math.min(42, h.h * 0.046));
+/** A point on a side facade at local (u along the facade near -> far as seen, v down from the roofline), bilinear on
+ *  the facade quad (close enough to the homography at this size). */
+function facadeAt(h: RowHouse, u: number, v: number): Pt {
+  const q = quadOf(h.g.facade);
+  return bil(q, u, v);
+}
 
-/** Per side house: its screen state + page, an awning (L2 / R2), the count badge that springs on at `badgeAt` (a sand
- *  elephant plaque on the 7 PHP sites, a blank cream plate of the same size on the 3 others) with an ink ping ring. */
-export const SideOverlays: React.FC<{popAt: Record<SideId, number>; lightAt: Record<SideId, number>; badgeAt: Partial<Record<SideId, number>>; awnings?: SideId[]}> = ({popAt, lightAt, badgeAt, awnings = ['L2', 'R2']}) => (
+/** Window-box planters under top-storey windows (local column c: 0.14 / 0.6; storey s 0 = top): a tan box on the wall
+ *  under the sill and sage leaf blobs spilling over it with two peach flowers. */
+function flowerBox(h: RowHouse, c: number, s: number, seed: string, right: boolean) {
+  const sill = 0.045 + s * 0.2375 + 0.2375 * 0.22 + 0.2375 * 0.5;
+  const u0 = right ? 1 - (c + 0.26) : c - 0.03;
+  const u1 = right ? 1 - (c - 0.03) : c + 0.27;
+  const a = facadeAt(h, u0, sill + 0.004);
+  const b = facadeAt(h, u1, sill + 0.004);
+  const bh = h.h * 0.022;
+  const box = polyPath([a, b, [b[0], b[1] + bh], [a[0], a[1] + bh]]);
+  const r = rng(seed);
+  let leaves = '';
+  let flowers = '';
+  const n = 4;
+  for (let i = 0; i < n; i++) {
+    const k = (i + 0.5) / n;
+    const x = a[0] + (b[0] - a[0]) * k + r.range(-1.5, 1.5);
+    const y = a[1] + (b[1] - a[1]) * k - bh * r.range(0.25, 0.6);
+    const rr = Math.abs(b[0] - a[0]) * r.range(0.16, 0.22);
+    leaves += `M${(x - rr).toFixed(1)} ${y.toFixed(1)}a${rr.toFixed(1)} ${(rr * 0.85).toFixed(1)} 0 1 0 ${(2 * rr).toFixed(1)} 0a${rr.toFixed(1)} ${(rr * 0.85).toFixed(1)} 0 1 0 ${(-2 * rr).toFixed(1)} 0Z`;
+    if (i === 1 || i === 3) flowers += `M${(x - 2.6).toFixed(1)} ${(y - rr * 0.4).toFixed(1)}a2.6 2.6 0 1 0 5.2 0a2.6 2.6 0 1 0 -5.2 0Z`;
+  }
+  return {box, leaves, flowers};
+}
+
+const FLOWERS = (() => {
+  const pick = (id: SideId) => SIDE_HOUSES.find((e) => e.id === id)!.h;
+  const out = [flowerBox(pick('L2'), 0.14, 0, 's03/fbA', false), flowerBox(pick('L2'), 0.6, 0, 's03/fbB', false), flowerBox(pick('R3'), 0.6, 0, 's03/fbC', true)];
+  return {
+    L2: {box: out[0].box + out[1].box, leaves: out[0].leaves + out[1].leaves, flowers: out[0].flowers + out[1].flowers},
+    R3: out[2],
+  } as Partial<Record<SideId, {box: string; leaves: string; flowers: string}>>;
+})();
+
+/** Per side house: its screen state + page, an awning (L2 / R2), window boxes (L2, R3). */
+export const SideOverlays: React.FC<{popAt: Record<SideId, number>; lightAt: Partial<Record<SideId, number>>; awnings?: SideId[]}> = ({popAt, lightAt, awnings = ['L2', 'R2']}) => (
   <>
     {SIDE_HOUSES.map(({id, h}) => {
       const php = !isBlank(id);
-      const size = badgeSize(h);
-      const [bx, by] = h.overDoor;
-      const at = badgeAt[id];
+      const fb = FLOWERS[id];
       return (
         <PopUp key={id} at={popAt[id]} x={h.base[0]} y={h.base[1]}>
-          <ScreenState d={h.g.screen} lightAt={lightAt[id]} php={php} seed={`s03/scr${id}`} />
+          <ScreenState d={h.g.screen} lightAt={php ? lightAt[id] : undefined} php={php} seed={`s03/scr${id}`} />
           {awnings.includes(id) && h.g.awning ? (
             <>
               <Fill d={h.g.awning} color={palette.peach} seed={`s03/aw${id}`} />
               <Ink d={h.g.awning} width={1.6} taper={false} seed={`s03/awi${id}`} />
             </>
           ) : null}
-          {at !== undefined ? (
+          {fb ? (
             <>
-              <ElephantPlaque x={bx} y={by - size * 0.15} size={size} variant={php ? 'plate' : 'blank'} tickOnAt={at} ink={2} seed={`s03/badge${id}`} />
-              {php ? <CountPing x={bx} y={by - size * 0.15} r={size * 0.72} at={at} /> : null}
+              <Fill d={fb.box} color={palette.tan} offset={false} mode="none" seed={`s03/fbx${id}`} />
+              <Fill d={fb.leaves} color={palette.sage} offset={false} mode="none" seed={`s03/fbl${id}`} />
+              <Fill d={fb.flowers} color={palette.peach} offset={false} mode="none" seed={`s03/fbf${id}`} />
+              <Ink d={fb.box + fb.leaves} width={1.3} taper={false} seed={`s03/fbi${id}`} />
             </>
           ) : null}
         </PopUp>
@@ -413,6 +463,87 @@ export const SideOverlays: React.FC<{popAt: Record<SideId, number>; lightAt: Rec
     })}
   </>
 );
+
+// ---------------------------------------------------------------- count signs (blade signs into the street)
+
+/** Plate size (world px; x 1.04 on screen at the lock) per side building: 58-66 (60-69 px on screen). */
+const SIGN_SIZE: Record<SideId, number> = {L1: 66, L2: 64, L3: 60, L4: 58, L5: 56, R1: 66, R2: 64, R3: 61, R4: 58};
+
+type SignGeo = {id: SideId; dir: 1 | -1; wall: Pt; size: number; centre: Pt; hook: Pt; bracket: string; chains: string; base: Pt};
+
+/** Blade-sign geometry: an iron arm out of the facade just past the door's far jamb (0.16 of the facade height above
+ *  the door), a diagonal brace and an end scroll; the plate hangs under the arm on two short chains. The plate faces the
+ *  viewer (a sign perpendicular to a side facade is parallel to the picture plane in one-point perspective), so it
+ *  reads undistorted, and it sits INWARD of its facade: every PHP sign is inside x 90-950 on screen. */
+export const SIGNS: SignGeo[] = SIDE_HOUSES.map(({id, h}) => {
+  const left = id[0] === 'L';
+  const dir: 1 | -1 = left ? 1 : -1;
+  const jamb = left ? h.door[1] : h.door[0];
+  const size = SIGN_SIZE[id];
+  const wall: Pt = [jamb[0] + dir * 4, jamb[1] - 0.16 * h.h];
+  const armL = size + 22;
+  const centre: Pt = [wall[0] + dir * (12 + size / 2), wall[1] + 9 + size / 2];
+  const hook: Pt = [centre[0], wall[1]];
+  const end = wall[0] + dir * armL;
+  const bracket =
+    line(wall[0], wall[1], end, wall[1], {seed: `s03/sg${id}a`, over: [0, 3], breaks: false}) +
+    line(wall[0], wall[1] + size * 0.42, wall[0] + dir * size * 0.42, wall[1], {seed: `s03/sg${id}b`, over: 0, breaks: false}) +
+    `M${end.toFixed(1)} ${wall[1].toFixed(1)}q${dir * 7} 0 ${dir * 7} -7q0 -5 ${-dir * 4.5} -4.5`;
+  const cx = size * 0.36;
+  const chains = `M${(centre[0] - cx).toFixed(1)} ${wall[1].toFixed(1)}L${(centre[0] - cx).toFixed(1)} ${(centre[1] - size / 2).toFixed(1)}M${(centre[0] + cx).toFixed(1)} ${wall[1].toFixed(1)}L${(centre[0] + cx).toFixed(1)} ${(centre[1] - size / 2).toFixed(1)}`;
+  return {id, dir, wall, size, centre, hook, bracket, chains, base: h.base};
+});
+
+/** A count-sign plate: a sand plate (cream for the blanks) with a SOLID ink elephant (PHP) filling 78 % of it, a 2.2 px
+ *  ink outline and screw dots. Solid, not the plaque prop's line-art emblem: at phone size (the plate is ~23 px on a
+ *  390 px screen) only a silhouette reads. Pops with the 7 % spring. */
+const SignPlate: React.FC<{x: number; y: number; size: number; php: boolean; at: number; seed: string}> = ({x, y, size, php, at, seed}) => {
+  const t = useTime();
+  if (t < at) return null;
+  const k = springAt(t, at, springs.pop);
+  const h = size / 2;
+  const sc = size * 0.37;
+  const screws = (php ? [[-sc, -sc], [sc, -sc], [-sc, sc], [sc, sc]] : [[-sc, 0], [sc, 0]]).map(([a, b]) => `M${x + a - 2.2} ${y + b}a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0 -4.4 0Z`).join('');
+  return (
+    <XG m={mat.about(mat.scale(Math.max(0.001, k)), x, y)}>
+      <Fill d={roundRect(x - h, y - h, size, size, size * 0.06)} color={php ? palette.sand : palette.cream} seed={`${seed}/p`} />
+      <Ink d={rect(x - h, y - h, size, size, {seed: `${seed}/i`, over: 'small'})} width={2.2} taper={false} seed={`${seed}/i`} />
+      {php ? <ElephantEmblem x={x - size * 0.02} y={y + size * 0.06} size={size * 0.74} mode="solid" color={palette.ink} seed={`${seed}/e`} /> : null}
+      <Fill d={screws} color={palette.ink} offset={false} mode="none" seed={`${seed}/s`} />
+    </XG>
+  );
+};
+
+/** The count signs: brackets stand with their buildings (they pop up with them, empty); each plate pops on its beat
+ *  (7 % spring), swings (pendulum, -12 deg decaying) and the PHP ones fire an ORANGE 3.4 px ping ring (r 0.75 x the
+ *  plate -> 1.8 x). Drawn far -> near on each side so a nearer sign covers a farther one. */
+export const CountSigns: React.FC<{popAt: Record<SideId, number>; signAt: Partial<Record<SideId, number>>}> = ({popAt, signAt}) => {
+  const t = useTime();
+  const order = SIGNS.slice().sort((p, q) => p.base[1] - q.base[1]);
+  return (
+    <>
+      {order.map((g) => {
+        const at = signAt[g.id];
+        const php = !isBlank(g.id);
+        const on = at !== undefined && t >= at;
+        const sw = on ? -g.dir * 12 * Math.exp(-4.5 * (t - (at as number))) * Math.cos((t - (at as number)) * 11) : 0;
+        return (
+          <PopUp key={g.id} at={popAt[g.id]} x={g.base[0]} y={g.base[1]}>
+            <Fill d={`M${g.wall[0] - 3} ${g.wall[1] - 7}h6v${g.size * 0.5}h-6Z`} color={palette.tealDark} offset={false} mode="none" seed={`s03/sgw${g.id}`} />
+            <Ink d={g.bracket} width={2.6} taper={false} seed={`s03/sgb${g.id}`} />
+            {on ? (
+              <XG m={mat.about(mat.rotate(sw), g.hook[0], g.hook[1])}>
+                <Ink d={g.chains} width={1.3} taper={false} seed={`s03/sgc${g.id}`} />
+                <SignPlate x={g.centre[0]} y={g.centre[1]} size={g.size} php={php} at={at as number} seed={`s03/sign${g.id}`} />
+              </XG>
+            ) : null}
+            {on && php ? <CountPing x={g.centre[0]} y={g.centre[1]} r={g.size * 0.75} at={at as number} color={palette.sun} /> : null}
+          </PopUp>
+        );
+      })}
+    </>
+  );
+};
 
 /** The press house's screen (BrowserChrome screen rect under its bar): unlit, peach pop, the set's page; re-pulses
  *  (peach, 2 frames) at `pulseAt`. */
@@ -429,24 +560,72 @@ export const PressScreen: React.FC<{lightAt: number; pulseAt?: number}> = ({ligh
 
 // ---------------------------------------------------------------- count pings
 
-/** An ink ring that pops at r and expands to 1.8 r while thinning to nothing (0.32 s): a count "tick". */
-export const CountPing: React.FC<{x: number; y: number; r: number; at: number; width?: number}> = ({x, y, r, at, width = 3.4}) => {
+/** A ring that pops at r and expands to 1.8 r while thinning to nothing (0.32 s): a count "tick" (ink, or orange). */
+export const CountPing: React.FC<{x: number; y: number; r: number; at: number; width?: number; color?: string}> = ({x, y, r, at, width = 3.4, color = palette.ink}) => {
   const t = useTime();
   if (t < at) return null;
   const p = prog(t, at, 0.32, E.outCubic);
   if (p >= 1) return null;
-  return <circle cx={x} cy={y} r={r * (1 + 0.8 * p)} fill="none" stroke={palette.ink} strokeWidth={width * (1 - p * 0.85) + 0.01} />;
+  return <circle cx={x} cy={y} r={r * (1 + 0.8 * p)} fill="none" stroke={color} strokeWidth={width * (1 - p * 0.85) + 0.01} />;
 };
 
-// ---------------------------------------------------------------- roof vent puffs (several)
+// ---------------------------------------------------------------- S03's roof vent (moved off the sun's edge)
 
-/** Paper sheets puffed out of the press-house roof vent at each time (n sheets, 0.12 s apart): they tumble UP-LEFT
- *  (dx -100..-140, rise 110-140), away from the sun's disc (its left edge is at screen x 580), ending at screen x
- *  <= ~540. Render this BEHIND the sun (in the set's 'sun' layer, before the sun): the vent sits at the disc's
- *  lower-left edge, so a sheet never crosses the 7/10 pie. */
+/** Fix round 2: the set's vent (BLUEPRINT.vent (652, 816), right roof slope) poked its cap into the sun disc's lower-left
+ *  edge (a tangent: the sun seemed to rest on the chimney, right where the 7/10 pie is drawn). S03 hides it (VENT_HIDE
+ *  clips it out of the set's press layer, VentPatch redraws the roof band and its ink line there, from the set's own
+ *  path) and puts the same vent on the LEFT slope next to the apex, clear of the disc by > 40 px. */
+const PR = BLUEPRINT.press;
+const roofTopR = (x: number) => PR.apex[1] + ((x - PR.apex[0]) * (PR.eaves + 6 - PR.apex[1])) / (PR.x1 + 16 - PR.apex[0]);
+const roofBotR = (x: number) => PR.apex[1] + 12 + ((x - PR.apex[0]) * (PR.eaves + 16 - PR.apex[1] - 12)) / (PR.x1 + 16 - PR.apex[0]);
+const roofTopL = (x: number) => PR.apex[1] + ((PR.apex[0] - x) * (PR.eaves + 6 - PR.apex[1])) / (PR.apex[0] - (PR.x0 - 16));
+const VW: [number, number] = [624, 684];
+/** The hidden window of the set's press layer (sky above the right slope, the roof band and an 8 px strip of the gable
+ *  under it, where the old vent's ink overshoots; x 624-684). Scale it with the press house's pop-up (it is applied
+ *  outside the set's PopUp). */
+export const VENT_HIDE = polyPath([[VW[0], 700], [VW[1], 700], [VW[1], roofBotR(VW[1]) + 8], [VW[0], roofBotR(VW[0]) + 8]]);
+/** The set's right roof-slope ink stroke (BlueprintStreet G.pressInk 'g2': same call, same seed). */
+const G2 = line(PR.apex[0], PR.apex[1], PR.x1 + 24, PR.eaves + 12, {seed: 'bps/g2', over: [2, 6]});
+/** S03's vent: on the left slope, 30 px from the apex. */
+export const VENT: Pt = [530, Math.round(roofTopL(530) + 1)];
+
+/** The roof band + its ink line redrawn inside VENT_HIDE (render inside the press house's PopUp, after the set's node). */
+export const VentPatch: React.FC = () => {
+  const band = polyPath([[VW[0] - 1, roofTopR(VW[0] - 1)], [VW[1] + 1, roofTopR(VW[1] + 1)], [VW[1] + 1, roofBotR(VW[1] + 1)], [VW[0] - 1, roofBotR(VW[0] - 1)]]);
+  const gable = polyPath([[VW[0] - 1, roofBotR(VW[0] - 1) - 2], [VW[1] + 1, roofBotR(VW[1] + 1) - 2], [VW[1] + 1, roofBotR(VW[1] + 1) + 9], [VW[0] - 1, roofBotR(VW[0] - 1) + 9]]);
+  return (
+    <>
+      <Fill d={gable} color={palette.sand} offset={false} mode="none" seed="s03/vpg" />
+      <Fill d={band} color={palette.teal} offset={false} mode="none" seed="s03/vpb" />
+      <g clipPath="url(#s03ventWin)">
+        <Ink d={G2} width={SI.mid} seed="s03/vpi" />
+      </g>
+      <defs>
+        <clipPath id="s03ventWin" clipPathUnits="userSpaceOnUse">
+          <path d={VENT_HIDE} />
+        </clipPath>
+      </defs>
+    </>
+  );
+};
+
+/** S03's vent box (the set's recipe: tealDark box + cap, ink on top / left / right). */
+export const VentS03: React.FC = () => {
+  const [x, y] = VENT;
+  const d = `M${x - 12} ${y - 22}h24v26h-24Z` + `M${x - 17} ${y - 28}h34v7h-34Z`;
+  return (
+    <>
+      <Fill d={d} color={palette.tealDark} seed="s03/vent" />
+      <Ink d={rect(x - 12, y - 22, 24, 26, {seed: 's03/vI', over: 'small', edges: 'tlr'}) + rect(x - 17, y - 28, 34, 7, {seed: 's03/vcI', over: 'small'})} width={SI.mid} seed="s03/ventI" />
+    </>
+  );
+};
+
+/** Paper sheets puffed out of S03's roof vent at each time (n sheets, 0.12 s apart): they tumble UP-LEFT (dx -95..-130,
+ *  rise 110-140), over the sky left of the press house, above the pen-nib sign's arm; never near the sun's disc. */
 export const VentPuffs: React.FC<{times: number[]; n?: number; seed?: string}> = ({times, n = 2, seed = 's03/vent'}) => {
   const t = useTime();
-  const V = BLUEPRINT.vent;
+  const V = VENT;
   const out: React.ReactNode[] = [];
   times.forEach((at, j) => {
     const r = rng(`${seed}/${j}`);
@@ -455,10 +634,10 @@ export const VentPuffs: React.FC<{times: number[]; n?: number; seed?: string}> =
       if (t < t0) continue;
       const p = prog(t, t0, 0.9, E.outCubic);
       if (p >= 1) continue;
-      const dx = -(i % 2 ? r.range(125, 140) : r.range(100, 115));
-      const rise = i % 2 ? r.range(105, 120) : r.range(130, 145);
-      const x = V.x + dx * p + Math.sin(p * 6 + i + j) * 6;
-      const y = V.y - 30 - rise * p;
+      const dx = -(i % 2 ? r.range(115, 130) : r.range(95, 108));
+      const rise = i % 2 ? r.range(110, 122) : r.range(128, 140);
+      const x = V[0] + dx * p + Math.sin(p * 6 + i + j) * 6;
+      const y = V[1] - 30 - rise * p;
       const rot = -50 * p + Math.sin(p * 9 + i) * 18;
       out.push(
         <XG key={`${j}/${i}`} m={mat.about(mat.rotate(rot), x, y)}>
@@ -469,6 +648,40 @@ export const VentPuffs: React.FC<{times: number[]; n?: number; seed?: string}> =
     }
   });
   return <>{out}</>;
+};
+
+// ---------------------------------------------------------------- the bird wire (static pauser detail)
+
+/** A wire from L3's cornice to the pen-nib sign's pole top (sagging over the sky left of the sun, screen y ~700-725),
+ *  two small birds on it; the second one turns round at `turnAt`. */
+const WIRE = {a: [190, 690] as Pt, b: [438, 706] as Pt, sag: 16};
+const wireAt = (u: number): Pt => {
+  const {a, b, sag} = WIRE;
+  return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u + 4 * sag * u * (1 - u)];
+};
+const bird = (x: number, y: number, dir: number) => {
+  // body: a plump teardrop sitting on the wire, head forward, a tail flick back
+  const s = dir;
+  return (
+    `M${x - 6 * s} ${y - 1}Q${x - 7 * s} ${y - 9} ${x + 1 * s} ${y - 9}Q${x + 4 * s} ${y - 13} ${x + 7 * s} ${y - 11}` +
+    `Q${x + 9 * s} ${y - 9} ${x + 6 * s} ${y - 7}Q${x + 7 * s} ${y - 2} ${x + 1 * s} ${y}Q${x - 4 * s} ${y + 1} ${x - 6 * s} ${y - 1}Z` +
+    `M${x - 5 * s} ${y - 3}L${x - 12 * s} ${y + 1}L${x - 11 * s} ${y - 3}Z`
+  );
+};
+export const BirdWire: React.FC<{drawAt?: number; turnAt?: number}> = ({drawAt, turnAt}) => {
+  const t = useTime();
+  const {a, b, sag} = WIRE;
+  const mid: Pt = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + 2 * sag];
+  const wire = `M${a[0]} ${a[1]}Q${mid[0]} ${mid[1]} ${b[0]} ${b[1]}`;
+  const p1 = wireAt(0.52);
+  const p2 = wireAt(0.6);
+  const turned = turnAt !== undefined && t >= turnAt;
+  return (
+    <>
+      <Ink d={wire} at={drawAt} width={1.4} taper={false} seed="s03/wire" />
+      {drawAt === undefined || t >= drawAt + 0.12 ? <Fill d={bird(p1[0], p1[1], 1) + bird(p2[0], p2[1], turned ? 1 : -1)} color={palette.ink} offset={false} mode="none" seed="s03/birds" /> : null}
+    </>
+  );
 };
 
 export type {BlueprintId};
@@ -502,5 +715,21 @@ export const RoofSign: React.FC<{swingAt?: number; seed?: string}> = ({swingAt, 
         <circle cx={S.x} cy={S.y - 3} r={3} fill={palette.cream} />
       </XG>
     </>
+  );
+};
+
+// ---------------------------------------------------------------- sign joke J2: the scribbled '?'
+
+/** The pauser's '?' beside the 'I [heart] PHP' sticker (fix round 2: the sticker's own '?' is a ~7 px hairline curl on a
+ *  phone and the doubt was lost): a separate hand-scribble in 2.2 px ink (on screen), 30 px tall, tilted +10 deg, just
+ *  outside the sticker's right edge, between the press house's right windows. Static: it rides the house's pop-up. */
+export const QuestionScribble: React.FC<{x: number; y: number; h?: number; width?: number; seed?: string}> = ({x, y, h = 30, width = 2.1, seed = 's03/q'}) => {
+  const s = h / 30;
+  const hook = `M${-7.5} ${-8}C${-8.5} ${-15.5} ${-2} ${-17.5} ${2.5} ${-16.5}C${8.5} ${-15} ${9.5} ${-8} ${4.5} ${-4.5}C${0.8} ${-2} ${-0.6} ${0} ${-0.2} ${5.2}`;
+  return (
+    <XG m={mat.compose(mat.translate(x, y), mat.rotate(10), mat.scale(s))}>
+      <Ink d={hook} width={width / s} taper={false} seed={`${seed}/h`} />
+      <Fill d={`M${-2.3} ${11.5}a2.4 2.4 0 1 0 4.8 0a2.4 2.4 0 1 0 -4.8 0Z`} color={palette.ink} offset={false} mode="none" seed={`${seed}/d`} />
+    </XG>
   );
 };

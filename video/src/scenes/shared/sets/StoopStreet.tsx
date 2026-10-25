@@ -101,8 +101,10 @@ export const STOOP = {
     {side: 'right' as const, i: 3},
     {side: 'right' as const, i: 1},
   ],
-  /** Dawn rim strips (peach) on the facades' sun side (the sun rises at the VP): the hero house's right edge and the far
-   *  towers' VP-facing edges, all below world y 650 (screen >= 600 at the S09 camera). [x, y, w, h]. */
+  /** Dawn rim strips (peach) on the facades' sun side (the sun rises at the VP): [0] = the hero house's right edge (hero
+   *  layer), [1..4] = the far towers' VP-facing edges (STOOP.towers[0..3]; drawn in the FAR layer with the towers,
+   *  clipped to their silhouettes, so a sun in the `sun` slot passes behind them and a scene sun drawn over the far layer
+   *  covers them), all below world y 650 (screen >= 600 at the S09 camera). [x, y, w, h]. */
   dawnRims: [
     [512, 660, 8, 570],
     [640, 812, 6, 160],
@@ -191,7 +193,22 @@ const G = (() => {
     for (let yy = top + 34; yy < VP[1] - 8; yy += 15) for (let xx = tx + 6; xx < tx + tw - 6; xx += 11) if ((xx * 7 + yy * 3) % 5 < 2) towerDots += rectPath(xx, yy, 4, 6);
     for (let yy = top + 36; yy < VP[1] - 20; yy += 22) for (let xx = tx + 7; xx < tx + tw - 7; xx += 12) if ((xx * 5 + yy * 7) % 9 < 2) towerDayDots += rectPath(xx, yy, 3.5, 4.5);
   });
-  return {wins, winInk, glass, heroInk, plinthInk, bricks, road, pavR, kerbInk, ground, lampFill, lampInk, lantern, wireD, treeCrown, treeTicks, trunk, trunkInk, bare, towers, towersFar, towerDots, towerDayDots};
+  // dawn rims of the far towers (STOOP.dawnRims[1..4] <-> STOOP.towers[0..3]) clipped to each tower's silhouette (body
+  // + set-back top storey): no peach where a rim rect sticks out into the sky beside the top storey
+  const isect = (a: number[], b: number[]) => {
+    const x0 = Math.max(a[0], b[0]);
+    const y0 = Math.max(a[1], b[1]);
+    const x1 = Math.min(a[0] + a[2], b[0] + b[2]);
+    const y1 = Math.min(a[1] + a[3], b[1] + b[3]);
+    return x1 > x0 && y1 > y0 ? rectPath(x0, y0, x1 - x0, y1 - y0) : '';
+  };
+  const towerRims = STOOP.towers.map(([tx, tw, top], i) => {
+    const rim = STOOP.dawnRims[i + 1];
+    if (!rim) return '';
+    const setback = tw * 0.22;
+    return isect(rim, [tx, top + 22, tw, VP[1] + 4 - top - 22]) + isect(rim, [tx + setback, top, tw - setback * 2, 24]);
+  });
+  return {wins, winInk, glass, heroInk, plinthInk, bricks, road, pavR, kerbInk, ground, lampFill, lampInk, lantern, wireD, treeCrown, treeTicks, trunk, trunkInk, bare, towers, towersFar, towerDots, towerDayDots, towerRims};
 })();
 
 /** The day haze ladder for the far towers (style_bible_ref2 8): nearer #84B09C, farther #98C0AE. */
@@ -364,6 +381,9 @@ export type StoopStreetProps = {
    *  (default: with tod 'dawn' / nightUntil). Inside a World whose sky key turns 'dawn' (S09: {tod: 'dawn', wipe: 'up'})
    *  each piece also pops when the wipe edge reaches it, and the dusk features pop off the same way. */
   dawnAt?: number;
+  /** Which dawn rims draw (indices into STOOP.dawnRims: 0 = the hero house, 1-4 = the far towers): true = all
+   *  (default), false = none, e.g. [0] = the hero's only. The tower rims sit in the far layer with the towers. */
+  dawnRims?: boolean | number[];
   /** tod="dusk" (S09's cut, under a World dusk key): the lamp glows ON and a few windows lit (STOOP.duskLit), no stars,
    *  no night ground; they pop off at nightUntil / as the dawn wipe passes them. The lit windows pop off one by one at
    *  these times (STOOP.duskLit order). */
@@ -418,6 +438,7 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
   tod = 'day',
   nightUntil,
   dawnAt,
+  dawnRims = true,
   duskOffAt,
   glowFlickerAt,
   crate,
@@ -450,6 +471,7 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
   const night = tod === 'night' && (nightUntil === undefined || t < nightUntil);
   const dusk = tod === 'dusk' && (nightUntil === undefined || t < nightUntil);
   const dawnBand = tod === 'dawn' || (dawnAt !== undefined && t >= dawnAt) || ((tod === 'night' || tod === 'dusk') && nightUntil !== undefined && t >= nightUntil);
+  const rimOn = (i: number) => (Array.isArray(dawnRims) ? dawnRims.includes(i) : dawnRims);
   const sz = typeof season === 'string' ? season : season.reduce<Season>((acc, k) => (t >= k.t ? k.s : acc), season[0]?.s ?? 'green');
   const crownColor = SEASON[sz];
   const VP = STOOP.vp;
@@ -472,6 +494,15 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
       <Fill d={G.towersFar} color={night ? palette.tealDark : TOWER_HAZE[1]} offset={false} mode="snap" at={fa} seed={`${seed}/towersF`} />
       <Fill d={G.towers} color={night ? palette.tealDark : TOWER_HAZE[0]} offset={false} mode="snap" at={fa} seed={`${seed}/towers`} />
       {night ? <Fill d={G.towerDots} color={palette.peach} offset={false} mode="snap" seed={`${seed}/tdots`} /> : <Fill d={G.towerDayDots} color={HALF.daySky} offset={false} mode="snap" at={fa} seed={`${seed}/tddots`} />}
+      {/* kit v3b: the towers' dawn rims live HERE, with the towers (after the sun slot, clipped to their silhouettes),
+          not in the hero layer where they stood as stray peach bars across a rising sun */}
+      {G.towerRims.map((d, i) =>
+        d && rimOn(i + 1) ? (
+          <DawnOnly key={`trim${i}`} on={dawnBand} p={[STOOP.dawnRims[i + 1][0], STOOP.dawnRims[i + 1][1] + STOOP.dawnRims[i + 1][3] / 2]}>
+            <Fill d={d} color={palette.peach} offset={false} mode="snap" seed={`${seed}/rim${i + 1}`} />
+          </DawnOnly>
+        ) : null,
+      )}
       <NightGround on={night}>
         <Fill rect={[600, VP[1] - 2, 330, 8]} color={palette.mintPale} offset={false} at={fa} mode="snap" seed={`${seed}/hz`} />
       </NightGround>
@@ -547,12 +578,12 @@ export const StoopStreet: React.FC<StoopStreetProps> = ({
       {ivy > 0 ? <Ivy k={ivy} seed={seed} /> : null}
       {heroLock === false ? null : <Lock x={STOOP.lock4.x} y={STOOP.lock4.y} size={STOOP.lock4.h} seed={`${seed}/lock4`} ink={SI.far} {...heroLock} />}
       <Stoop {...stoop} drawAt={stoop?.drawAt ?? drawAt} seed={`${seed}/stoop`} />
-      {/* v3 dawn rims: peach strips on the sun side (the sun rises at the VP) */}
-      {STOOP.dawnRims.map((r, i) => (
-        <DawnOnly key={`rim${i}`} on={dawnBand} p={[r[0] + r[2] / 2, r[1] + r[3] / 2]}>
-          <Fill rect={r} color={palette.peach} offset={false} mode="snap" seed={`${seed}/rim${i}`} />
+      {/* v3 dawn rim on the hero house's sun side (the towers' rims are drawn with the towers in the far layer) */}
+      {rimOn(0) ? (
+        <DawnOnly on={dawnBand} p={[STOOP.dawnRims[0][0] + STOOP.dawnRims[0][2] / 2, STOOP.dawnRims[0][1] + STOOP.dawnRims[0][3] / 2]}>
+          <Fill rect={STOOP.dawnRims[0]} color={palette.peach} offset={false} mode="snap" seed={`${seed}/rim0`} />
         </DawnOnly>
-      ))}
+      ) : null}
       {crate}
       {heroSlot}
     </>

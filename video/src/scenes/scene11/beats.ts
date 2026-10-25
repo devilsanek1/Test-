@@ -37,7 +37,7 @@ export const SCENE = {start: 45.618, end: 52.163};
 /** Absolute beat times (storyboard S11 beats; leads per ENGINE rule 5 already applied by the storyboard). */
 export const ABS = {
   cut: 45.618,
-  pipLand: W.even + 0.05, // Pip lands on the sill's left end (his hop enters past the left edge: f0 shows only a sliver)
+  pipLand: W.even - 0.01, // Pip touches down on the sill's left end ON 'Even' (his hop enters past the left edge at f0)
   ringHiccup1: W.the, // the loading ring hiccups; a pigeon on the cornice shuffles
   barFlicker: W.fbi, // the bar's fill edge flickers without moving
   earFlick: W.fbi + 0.25, // Pip's ear flicks toward the window
@@ -46,6 +46,7 @@ export const ABS = {
   snailShell: W.you, // the snail's shell appears at the sill's right edge
   barStep: W.cant, // bar 8 % -> 9 %, stalls
   snailCrawl: W.update, // the snail crawls onto the sill (slow)
+  cornShuffle: W.update + 0.25, // the cornice pigeon's second shuffle: splits the 'update' -> 'yet' gap
   barBack: W.yet, // bar twitches back 9 % -> 8 %; the ring hiccups
   glanceSun: W.yetEnd + 0.05, // Pip glances from the bar up to the sun
   glyph: W.just - 0.1, // the power glyph inks onto the sun
@@ -55,7 +56,7 @@ export const ABS = {
   offCut: 49.515, // cut(off): the comma pause after 'off,' (gap anchor): the lean into the joke starts here
   padlock: W.off + 0.14, // padlock pops + the lettered 'back soon' tag swings in
   // the switch-off spreads, AFTER the padlock beat (the padlock + tag are the only focal event on 'off'):
-  govAScreen: W.which + 0.04, // govA's screen CRT-collapses on 'which' (S12 opens with it dark) ...
+  govAScreen: W.is + 0.02, // govA's screen CRT-collapses on 'is', with its shutter (S12 opens with it dark) ...
   govAShutter: W.is + 0.06, // ... its shutter slams on 'is' ...
   govAOff: W.is + 0.2, // ... and govA steps one palette step darker
   govCScreen: W.basically, // govC's screen collapses at the right edge on 'basically' ...
@@ -75,7 +76,8 @@ export const ABS = {
   bitTap: W.toEnd - 0.05, // Bit taps the padlock's shackle
   strike: W.everything + 0.01, // 'and on again' gets one ink strike-through (0.15 s) ON the word; the corner flutters after
   pipOut: W.everythingEnd + 0.05, // Pip hops off the sill toward the lens; the snail peeks out
-  tagSway: SCENE.end - 0.1, // the tag sways; the pigeon flaps off the shutter box
+  tagSway: SCENE.end - 0.1, // the tag sways
+  pigeonFly: SCENE.end - 0.3, // the box pigeon crouches and takes off up-left (whole bird, flapping): clear of the box by the cut
 } as const;
 
 export type Beats = {-readonly [K in keyof typeof ABS]: number};

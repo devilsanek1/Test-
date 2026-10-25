@@ -16,7 +16,10 @@ thumbnails too). The sun cells show each morph on two skies (pie: day + golden; 
 `mode: 'context'` also has the S10 keeper (h 300) and the S13 caretaker (h 225) at film size. `mode: 'lock'` = the P1 bolt
 test at the S02 close-up size (200 px) and at 100 px on a teal door, without the bracket, + fixed / blueprint / paper /
 sketch / bracket variants. `mode: 'heads'` = cap wearers (Keeper, Caretaker, capped EdgeOnlookers) and the Ghost at film
-size and at phone-thumbnail scale (x 0.3), colour and paper.
+size and at phone-thumbnail scale (x 0.3), colour and paper. `mode: 'figures'` (kitv3b) = every back-view preset at film
+size: the S06 Messenger (260, seed `s5msg`), a curly Messenger, Investigator, Maker, Keeper with arms raised; citizens
+whose seeded kit hair is sand / clay next to untouched ones; six EdgeOnlookers at the S07 size raising phones (raises at
+0.5 s: render 0.6-0.8 for the swing, 2.0 for the pose).
 
 ```bash
 scripts/still.sh SharedKitSheet 2.5 out.png                                         # every prop, mid-animation
@@ -26,6 +29,7 @@ node scripts/render-frames.mjs SharedKitSheet /tmp/o 2.3 --props='{"unbuildAt":2
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 2.5 --props='{"thumbs":false}'  # props only (cost check)
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 0.9,1.3,1.5,1.9 --props='{"mode":"lock"}'  # stub, stop, ghost, Bit
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 0.5 --props='{"mode":"heads"}'  # add "look":"paper" for line art
+node scripts/render-frames.mjs SharedKitSheet /tmp/o 0.6,0.7,2 --props='{"mode":"figures"}'  # hair discs, collars, arms
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 2.5 --props='{"mode":"v3"}'     # the storyboard-v3 pieces (section 9b)
 node scripts/render-frames.mjs SharedKitSheet /tmp/o 1.0,2.5 --props='{"mode":"v3fix"}'  # v3 review: FixSign + cart slot,
                                                    # LockCrate lid / tags, BackSoonTag ladder, board footer, LabelTag minFont
@@ -127,6 +131,7 @@ scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 -
 <ElephantPlaque x={wallX} y={wallY} size={90} variant="round" side="right" swingAt={27.5} />    // anchor = bracket wall point
 <ElephantPlaque ... size={120} variant="hanging" flipOldAt={62.4} cobwebAt={63} dustAt={63.1} caneAt={63.3} />
 <ElephantStamp x={330} y={1400} rx={160} ry={60} slamAt={7.9} />   <ElephantStamp x y r={40} at />
+<ElephantStamp ... print="solid" | "line" flip color />            // kit v3b: 'solid' (default) rubber-stamp print
 <PlaqueSpecks spots={[{x, y, size, at, old}]} />                    // S10's wave: dots blink on, batched
 ```
 
@@ -138,6 +143,13 @@ scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 -
 - Events: `tickOnAt` (count pop), `pulseAt` (112 % + two ink ring pulses, 0.2 s), `swingAt` (round / hanging: pendulum),
   `flipOldAt` (paper flip 0.2 s, swaps at the edge-on), `cobwebAt`, `dustAt`, `caneAt`, `wobbleAt`, `blinkAt` (cream flash +
   125 %). Stamp: `slamAt` = ink ring 0.13 s, then the print 2.6 x -> 1.0 x in 0.27 s (motion spec #15).
+- **Stamp print (kit v3b, DEFAULT CHANGED)**: `print="solid"` (default) = a rubber-stamp print: ONE flat fill (`color`,
+  default tealDark) over the whole stamp silhouette, misregistered 3 px against its ink edge, a cream border ring inset
+  (0.8 x `ring` in, 0.32 x `ring` wide) and the elephant reversed out in cream (line art carved in the print colour; a
+  plain cream silhouette under ~24 px on screen). It reads at ~130 px on a cream ground (S03 'It's in PHP': the old
+  print was hairline ink with a cream fill on the cream street). `flip` mirrors the elephant (faces left: S03 keeps its
+  trunk clear of Pip on the print's right end). `print="line"` = the v1-v3 badge (sand ring, cream line-art elephant,
+  default colour sand): the BlueprintWall corner stamp (S02 / S05) passes it, so that badge is unchanged.
 - `signCentre(x, y, size, side)` = the face centre of a hanging sign.
 
 ## 4. P3 Bit, the ink beetle
@@ -288,11 +300,11 @@ out(exp)), `walk={{at, hz, to, dur}}`, `bob`, `flip`, `depth` (default by size: 
 
 | preset | look | extra props |
 |---|---|---|
-| `EdgeOnlooker` | tier A: head centre + `head` diameter; a long coat that ALWAYS runs off the frame bottom (its length is derived every frame from the camera transform: frame bottom + 40 px, never less than world.h + bleed; `frameBottom` overrides), so no hem and no legs can show; hanging arms (sleeve seam, cuff, sand hand at a natural arm length), a fixed-length white rim strip, ink 4.8 | `raisePhoneAt` / `lowerPhoneAt` (the arm swings up about the shoulder, 0.3 s outBack, phone in hand, shoulder jolt), `phoneSide` (default: the side facing the frame centre), `arms` ('both' / 'near' / false), `hair` ('cap' = our `BackHead` over a straight collar band, head raised so the neck shows; never the kit cap or kit head), `acc` ('hood' drawn here, under the head; not with 'cap'; 'backpack' dropped), `body`, `rim` |
-| `Citizen` | 40-55 px kit Person with legs | `silhouette` (flat sage cut-out; white tombstone in paper), `color` |
-| `Investigator` | 110-140 px, ink shield badge on the back | `raiseAt` / `lowerAt` (arm swings up with a SparkleTablet), `arm` |
-| `Messenger` | teal coat | `pullAt` (envelope out of the coat to shoulder height), `holdEnvelope`; `messengerHand(x, y, h)` |
-| `Maker` | teal + cream apron (Y straps meeting mid-back, bow, apron edges; crossed X straps read as "crossed out"); no caps | `bust` (waist-up at a bench), `work` (nodding hz) |
+| `EdgeOnlooker` | tier A: head centre + `head` diameter; a long coat that ALWAYS runs off the frame bottom (its length is derived every frame from the camera transform: frame bottom + 40 px, never less than world.h + bleed; `frameBottom` overrides), so no hem and no legs can show; hanging arms (sleeve seam, cuff, sand hand at a natural arm length), a fixed-length white rim strip, ink 4.8 | `raisePhoneAt` / `lowerPhoneAt` (0.3 s outBack, shoulder jolt; kitv3b: a JOINTED arm driven by joint angles: the upper arm swings up while the elbow folds the forearm up ahead of it (bend 30 deg in the raised pose, +30 deg mid-swing), elbow out, tapered sleeve, cuff line, inner-elbow crease; the palm cups the phone's lower edge behind it, thumb + two finger tips wrap its sides in front; a coat tension FOLD draws from the raised arm's armpit toward the spine with the raise; hanging and raised hand points are the old ones, so every phone rests where it did), `phoneSide` (default: the side facing the frame centre), `arms` ('both' / 'near' / false), `hair` ('cap' = our `BackHead` over a straight collar band, head raised so the neck shows; never the kit cap or kit head), `hairColor` (default: the kit's seeded pick, a sand pick becomes ochre / ink-brown; clay stays: the hero head's strands + nape read as hair), `acc` ('hood' drawn here, under the head; not with 'cap'; 'backpack' dropped; kitv3b: 'collar' = a straight `CollarBand`, never the kit V, and under a cap it is dropped, BackHead draws the band), `body`, `rim` |
+| `Citizen` | 40-55 px kit Person with legs (also used larger as near walkers) | `silhouette` (flat sage cut-out; white tombstone in paper), `color`, `hairColor` (kitv3b; default: the seeded pick, sand / clay plain discs become ochre / ink-brown) |
+| `Investigator` | 110-140 px, ink shield badge on the back, straight collar band | `raiseAt` / `lowerAt` (arm swings up with a SparkleTablet), `arm`, `hairColor` (as Citizen), `collar` ('band' default since kitv3b / 'v' = the old kit chevron / false) |
+| `Messenger` | teal coat, ink-brown hair disc, straight tealDark collar band | `pullAt` (envelope out of the coat to shoulder height), `holdEnvelope`; `messengerHand(x, y, h)` (unchanged); kitv3b: `hair` (kit style passthrough, default 'short'), `hairColor` (default `palette.ink`: a FULL hair-colour disc; was the seeded clay pick, read as a skin disc in S06), `collar` ('band' default / 'v' = old / false) |
+| `Maker` | teal + cream apron (Y straps meeting mid-back, bow, apron edges; crossed X straps read as "crossed out"); no caps | `bust` (waist-up at a bench), `work` (nodding hz), `hairColor` (as Citizen) |
 | `Keeper` | sand coat with a tan collar band, teal cap, ochre hair, teal trousers, ochre tool belt (hammer, pouch); NOT a maker | `reachAt` + `holding` (e.g. `<NewLockIcon/>`), `installAt`, `climb={{at, steps, run, rise}}`, `cap` (colour or false), `hair`; < 30 px = sand speck |
 | `Caretaker` | teal coat with a tealDark collar band, sage cap, ochre hair, key ring r22 with sand keys | `raiseKeysAt`, `jingleAt`, `glintAt`, `cap`, `hair` |
 | `Attempter` | hooded, tealDark, ink hood point | `mode` `tap` (`tapAt[]`, ripple arcs at `tapPoint`) / `rattle` (`rattleAt`, handle + marks) / `stand` |
@@ -301,7 +313,29 @@ out(exp)), `walk={{at, hz, to, dur}}`, `bob`, `flip`, `depth` (default by size: 
 
 The presets mirror the kit Person's seeded torso width / head radius / shoulder rounding and coat pick (`personGeo`,
 `personCoat` in `Figures.tsx`) to keep hand-placed arms, caps and belts on the body; if `kit/Person.tsx`'s `makeSpec` draw
-order changes, update them.
+order changes, update them (kitv3b: also `kitPicks` = hair style weights, hair colour + its coat-clash swap, walk phase).
+
+Hair and collars (kitv3b, S06 review: the Messenger's seeded clay 'short' head read as a bald / skin disc from behind).
+`skinSafeHair(colour, coat?, style?)` (exported): sand -> ochre (ink-brown on an ochre coat), clay too on plain-disc styles
+('short', 'bun'); long / curly shapes keep any colour. The legged presets (Messenger, Investigator, Maker, Citizen) never
+pass `hairColor` to the kit Person (that skips a seeded draw and re-seeds the trousers, shoes and WALK PHASE: S05 -> S06
+trouser continuity, S06's planted stride): `HairOver` redraws the kit's own head disc (+ bun + part line, curly crown,
+long hair) with the kit's seeds over it, so the misregistered fill and the open outline land exactly on the kit's; it
+rides the kit's walk bob, relights at the kit's anchor and un-builds in its ExitSync group. Dark hair (ink, tealDark)
+also gets the exact disc under the misregistered one, so the outline never floats as a separate arc. It draws only
+when the colour changes (Messenger: always). EdgeOnlooker passes `hairColor` to the kit only for a sand pick (the
+re-seed only moves its scarf colour). The collar band (`CollarBand`, one palette step darker than the coat) goes over the
+kit torso and UNDER the redrawn head (Messenger, Investigator), or over the kit head's lower edge (EdgeOnlooker 'collar').
+
+`FigureArm` (exported; every preset's raised arm: Investigator, Messenger, Keeper, Caretaker, EdgeOnlooker's phone arm).
+Props `{sh, hand, w = 19, coat, W, seed, hand2 = true, bend?, side?, elbow?}` in person-local units, unchanged call shape
+from the old private `Arm`. Upper arm + forearm are straight and meet at an ELBOW pushed off the shoulder-hand chord by
+`bend` (default follows the raise: 0 hanging, easing to 30 deg once the hand is level with the shoulder or above), out /
+down on the shoulder's side (`side`), the outer corner rounded and the inner one tight with a short crease; the sleeve
+tapers 1 -> 0.9 -> 0.74 toward the wrist, a cuff line crosses it at 80 % of the forearm, and an inked sand hand sits
+behind the cuff (`hand2={false}`: none). `elbow` = an explicit elbow point (joint-angle rigs). The hand point is still
+the sleeve end, so held things (tablet, keys, envelope, `holding`) are where they were. Scenes that mirror a preset's arm
+to hand it over (S06's messenger after the door beat) should draw `FigureArm` with the same props.
 
 Back-view heads for cap wearers (reviews 4 + 5: at phone size a cap over a full hair-colour disc, a zig-zag nape and a V
 chevron collar read as a bearded face looking at the camera). `Keeper`, `Caretaker` (via `BackBody`) and capped

@@ -107,7 +107,7 @@ const UpdatePage: React.FC<{w: number; h: number; at: number; wobbleAt?: number}
   const tw = w - pad * 2;
   const th = 32;
   const ty = h - th - 14;
-  const fs = 24;
+  const fs = 28;
   const k = popT >= 0 ? 1 + 0.18 * Math.max(0, 1 - (t - popT) / 0.12) : 1;
   return (
     <XG m={mat.translate(dx, 0)}>

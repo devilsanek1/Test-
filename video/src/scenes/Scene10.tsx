@@ -2,10 +2,11 @@
 // VO: "Plus something like half of PHP sites run versions so old they're not officially supported anymore."
 // The Old Quarter at day from door height: S09's tram wipes the hillside away, the three sites pop up on 'something',
 // the far row on 'like', the sun becomes a 1/2 pie on 'HALF', the elephant plaques swing out on 'PHP' (L13 on the
-// A-frame), siteM's plaque turns old (flip, cobweb with Bit caught in it, cane, droop), five far plates flip old, the
-// makers' cart hands out stamped support tags and SKIPS the old site (the lob arcs over it), Pip goes 'hey!', and
-// siteM's update stalls on 'anymore'. Camera: hold through the wipe, one 5 % sine push (anchored so the A-frame lands
-// on screen 104-440 x 1256-1466), locked from 'of'. Docs: docs/scenes/S10.md.
+// sandwich board), siteM's plaque turns old (flip, cobweb with Bit caught in it, cane, droop), three far plates flip old
+// and sag, the maker + cart step out from behind the A-frame and hand out support tags, SKIPPING the old site (the lob
+// arcs over it), Pip goes 'hey!' at it, and siteM's update stalls at 10 % on 'anymore'. Depth on the cart line: walker <
+// cart < stoops < hanging plaques < A-frame < flying tags < Pip. Camera: hold through the wipe, one 5 % sine push
+// (anchored so the A-frame lands on screen 104-440 x 1256-1466), locked from 'of'. Docs: docs/scenes/S10.md.
 
 import React from 'react';
 import {World, ScreenSpace, Sun, TimeShift, ease as E, useScene, useTime, useTransition} from '../lib';

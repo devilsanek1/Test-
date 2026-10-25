@@ -6,19 +6,18 @@
 //   the ring on govB's lock; the dive into the lock box (fixed 0.33 s) onto S02's blueprint lock.
 import React from 'react';
 import {palette} from '../../lib/theme';
-import {clamp, ease as E, prog, useTime} from '../../lib/time';
-import {Ink} from '../../lib/Ink';
+import {useTime} from '../../lib/time';
 import {Sun} from '../../lib/Sun';
-import {Fill} from '../../lib/Fill';
-import {Pt, rectPath} from '../../lib/sketch';
-import {mat, XG} from '../../lib/xf';
+import {Pt} from '../../lib/sketch';
+import {XG} from '../../lib/xf';
 import {GovEvents, GovernmentPlaza, GovId, PLAZA} from '../shared/sets';
 import {Bit, EdgeOnlooker, MarkRing, PowerGlyph, SunPress} from '../shared/props';
-import {layerMat, zoomAt} from './camera';
+import {inkComp, layerMat} from './camera';
 import {B} from './timing';
 import {CitizenPlan, OnlookerPhoneArm, PigeonPlan, PipPlan, PipS01, PlazaCitizen, Pigeon} from './cast';
 import {s01WindowSlot} from './screens';
-import {DOME_GLASS, GovCShutter, LAMP_GLASS, LanternOff, S01FarCivic} from './shims';
+import {DOME_GLASS, LanternOff, S01_PADLOCK_SIZE, S01Shutter} from './shims';
+import {DoorLanterns, S01Branch, SunRipple, TreeTicks} from './dressing';
 
 const SUN = PLAZA.sun; // (720, 900) r155
 const VP = PLAZA.vp as Pt;
@@ -30,20 +29,25 @@ const MID = 3.4;
 const SLAM_DUR = 0.16;
 /** The power-off wave and the closures. govB: frame 0 holds its screen as the bright line (state 'frame0') and
  *  screenOffAt 0 releases it; govD stays lit ('a bunch of', not all). The slams LAND on 'shut' / 'down' / 'bunch'
- *  (offAt = landing). Padlocks (1.3x, 36 px) / lettered tags are shifted apart on the rails (the kit's default slots
- *  overlap once the tag is lettered); the padlocks glint on 'PURPOSE'. */
+ *  (offAt = landing). Lettered tags are shifted apart on the rails (the kit's default slots overlap once the tag is
+ *  lettered). Fix round 3: the padlocks are the scene's BIG CREAM S01Padlock (52-58 px, body centre 20 px above the
+ *  bottom rail's bottom edge, so it covers the rail and the last slats: `padlockProps` mirrors x / y / size for kit
+ *  readers), they glint on 'PURPOSE'. */
 export const S01_GOV: Partial<Record<GovId, GovEvents>> = {
-  govA: {screenOffAt: B.crtA, shutterAt: B.slamA, offAt: B.slamA + SLAM_DUR, padlockAt: B.padlocks[1], padlockProps: {x: 152, size: 36}, glintAt: B.padlockGlint[1], tagAt: B.tags[1], tagProps: {lettered: true, size: 74, x: 226}},
-  govB: {screenOffAt: 0, shutterAt: B.slamB, offAt: B.slamB + SLAM_DUR, padlockAt: B.padlocks[0], padlockProps: {x: 462, size: 36}, glintAt: B.padlockGlint[0], tagAt: B.tags[0], tagProps: {lettered: true, size: 138, x: 566, y: 1104}, lanternOffAt: B.domeLanternOff},
-  govC: {screenOffAt: B.crtC, shutterAt: B.slamC, shutterStop: 0.5, padlockAt: B.padlocks[2], padlockProps: {x: 838, size: 36}, glintAt: B.padlockGlint[2], tagAt: B.tags[2], tagProps: {lettered: true, size: 62, x: 900}},
+  govA: {screenOffAt: B.crtA, shutterAt: B.slamA, offAt: B.slamA + SLAM_DUR, padlockAt: B.padlocks[1], padlockProps: {x: 152, y: 994, size: S01_PADLOCK_SIZE.govA}, glintAt: B.padlockGlint[1], tagAt: B.tags[1], tagProps: {lettered: true, size: 74, x: 226}},
+  govB: {screenOffAt: 0, shutterAt: B.slamB, offAt: B.slamB + SLAM_DUR, padlockAt: B.padlocks[0], padlockProps: {x: 462, y: 1096, size: S01_PADLOCK_SIZE.govB}, glintAt: B.padlockGlint[0], tagAt: B.tags[0], tagProps: {lettered: true, size: 138, x: 566, y: 1104}, lanternOffAt: B.domeLanternOff},
+  govC: {screenOffAt: B.crtC, shutterAt: B.slamC, shutterStop: 0.5, padlockAt: B.padlocks[2], padlockProps: {x: 838, y: 767, size: S01_PADLOCK_SIZE.govC}, glintAt: B.padlockGlint[2], tagAt: B.tags[2], tagProps: {lettered: true, size: 62, x: 900}},
 };
 
-/** What the SET draws: S01_GOV minus govC's shutter / padlock / tag / glint, which `GovCShutter` (shims.tsx) draws with
- *  the props RollerShutter's partial-drop jolt (the kit's ShutterRig drops h x stop with a full-closure bounce). govC
- *  keeps shutterStop, so the set still draws its rolled-up shutter box. Drop this once the kit passes stopAt. */
+/** What the SET draws: S01_GOV minus every shutter / padlock / tag / glint, which `S01Shutter` (shims.tsx) draws on top
+ *  (the cream padlock, the lock-click jolt, govC's partial-drop jolt, the dive ink compensation). The set still draws
+ *  each rolled-up shutter box (redrawn identically), the screens, the lights-out step and govB's dome lantern. */
 const S01_GOV_SET: Partial<Record<GovId, GovEvents>> = (() => {
-  const {shutterAt: _s, padlockAt: _p, tagAt: _t, glintAt: _g, ...rest} = S01_GOV.govC as GovEvents;
-  return {...S01_GOV, govC: rest};
+  const strip = (e?: GovEvents): GovEvents => {
+    const {shutterAt: _s, padlockAt: _p, tagAt: _t, glintAt: _g, ...rest} = e ?? {};
+    return rest;
+  };
+  return {...S01_GOV, govA: strip(S01_GOV.govA), govB: strip(S01_GOV.govB), govC: strip(S01_GOV.govC)};
 })();
 
 /** The windows with the ink-dark dead screen (local stand-in, see screens.tsx). S12: pass the same slot. */
@@ -100,7 +104,7 @@ export const S01_PIGEONS: PigeonPlan[] = [
 // ---------------------------------------------------------------- Pip (frame 0: sit-back, look 0, seed 11, idle clock t = 0)
 
 export const S01_PIP_SEED = 11;
-export const S01_PIP: PipPlan = {x: PLAZA.pip[0], y: PLAZA.pip[1], flinchAt: B.pipFlinch, lookAt: B.heads, look: -0.55, hopAt: B.pipHop, landAt: B.pipLand, backAt: B.pipBack, exitAt: B.dive + 0.045, exitTo: [1010, 1270], lookBackAt: B.headsBack + 0.05};
+export const S01_PIP: PipPlan = {x: PLAZA.pip[0], y: PLAZA.pip[1], flinchAt: B.pipFlinch, lookAt: B.heads, look: -0.55, hopAt: B.pipHop, landAt: B.pipLand, backAt: B.pipBack, exitAt: B.dive + 0.045, exitTo: [1100, 900], lookBackAt: B.headsBack + 0.05};
 
 // ---------------------------------------------------------------- Bit: seated ON govA's cornice ledge line
 
@@ -118,7 +122,7 @@ const Onlookers: React.FC = () => {
     <>
       {PLAZA.onlookers.map((o, i) => {
         const head = 60 * o.s * 1.05;
-        const body = [palette.teal, palette.sand, palette.sage][i];
+        const body = [palette.tan, palette.sand, palette.sage][i];
         const raised = i === 0 && t >= ONL_PHONE.up;
         return (
           <React.Fragment key={i}>
@@ -141,88 +145,46 @@ const Onlookers: React.FC = () => {
   );
 };
 
-// ---------------------------------------------------------------- 'PURPOSE': the padlocks glint
-
-/** Two glint ticks pop off a padlock's upper-left corner, cream on the dark shutter slats it hangs from (the kit's glint
- *  is a 1-px cream tick: invisible on a phone; the facade right of the body is taken by the tags). Pop 30 % -> 100 % in
- *  0.05 s, gone after 0.25 s. */
-const PadlockSpark: React.FC<{x: number; y: number; at: number; seed: string}> = ({x, y, at, seed}) => {
-  const t = useTime();
-  if (t < at || t >= at + 0.25) return null;
-  const k = 0.3 + 0.7 * E.outBack(1.8)(clamp((t - at) / 0.05));
-  return (
-    <XG m={mat.about(mat.scale(k), x - 14, y - 10)}>
-      <Ink d={`M${x - 16} ${y - 13}L${x - 28} ${y - 26}M${x - 19} ${y - 4}L${x - 35} ${y - 6}`} width={4.2} color={palette.cream} taper={false} seed={seed} />
-    </XG>
-  );
-};
-const SPARKS: [number, number, number][] = [
-  [462, PLAZA.gov.govB.padlock[1], B.padlockGlint[0]],
-  [152, PLAZA.gov.govA.padlock[1], B.padlockGlint[1]],
-  [838, PLAZA.gov.govC.padlock[1] - 0.5 * PLAZA.gov.govC.window[3], B.padlockGlint[2]],
-];
-
-// ---------------------------------------------------------------- the dive: govB's shutter thins out
-
-/** During the 0.33 s dive the camera scales the ink 3.07x (the shutter's 1.5 px ribs reached ~5 px, review: heavy
- *  parallel bars at the cut, scribble under the caption): from the dive start the curtain is re-covered flat and its
- *  ribs redrawn at width x (zoom / zoom0)^-0.6 (1.0 at the dive start: no step), and they thin out to nothing over
- *  4.585-4.645, so the last 3 frames (f139-f141, the caption over the shutter) show a flat tealDark curtain under the
- *  rail and box. Same rib path and seed as props RollerShutter. */
-const GovBDiveShutter: React.FC = () => {
-  const t = useTime();
-  if (t < B.dive || t >= B.cut) return null;
-  const [x, y, w, h] = PLAZA.gov.govB.window;
-  const z = zoomAt(t, 'buildings') / zoomAt(B.dive, 'buildings');
-  const rw = SHUTTER_RIB * Math.pow(z, -0.6) * (1 - prog(t, 4.585, 0.06));
-  let ribs = '';
-  for (let yy = y + h - 24; yy > y + 2; yy -= 14) ribs += `M${x + 3} ${yy.toFixed(1)}H${x + w - 3}`;
-  return (
-    <>
-      <Fill d={rectPath(x + 2.2, y + 2, w - 4.4, h - 14)} color={palette.tealDark} offset={false} mode="none" seed="s01/bdive" />
-      {rw > 0.05 ? <Ink d={ribs} width={rw} taper={false} vary={0} seed="plaza/govB/sh/rb" /> : null}
-    </>
-  );
-};
-/** props RollerShutter's rib width at the set's mid ink (iw x 0.45). */
-const SHUTTER_RIB = MID * 0.45;
-
 // ---------------------------------------------------------------- the shot
 
 export const PlazaShutdown: React.FC = () => {
   const t = useTime();
+  // the dive's ink compensation for everything the scene draws (the set's own strokes still scale: core / sets lane)
+  const ink = inkComp(t, 'buildings');
+  const inkNear = inkComp(t, 'near');
   const extra: Record<string, React.ReactNode> = {
-    far: <S01FarCivic offAt={B.civicOff[0]} lanternsOffAt={B.civicLanterns[0]} />,
     buildings: (
       <>
-        <GovCShutter ev={S01_GOV.govC as GovEvents} />
-        <LanternOff r={DOME_GLASS} at={B.domeLanternOff} seed="s01/domeOff" />
-        <GovBDiveShutter />
-        <Bit x={S01_BIT[0]} y={S01_BIT[1]} size={PLAZA.bitSize} seed="plaza/bit" state="idle" />
-        {SPARKS.map(([x, y, at], i) => (
-          <PadlockSpark key={i} x={x} y={y} at={at} seed={`s01/spark${i}`} />
+        {(['govC', 'govA', 'govB'] as const).map((id) => (
+          <S01Shutter key={id} id={id} ev={S01_GOV[id] as GovEvents} ink={ink} />
         ))}
-        <MarkRing x={PLAZA.gov.govB.lock[0]} y={PLAZA.gov.govB.lock[1]} r={24} at={B.lockRing} dur={0.12} width={2.4} seed="s01/ring" />
+        <LanternOff r={DOME_GLASS} at={B.domeLanternOff} seed="s01/domeOff" />
+        <DoorLanterns offAt={[B.lampOff, B.lampOff + 0.06]} ink={ink} />
+        <Bit x={S01_BIT[0]} y={S01_BIT[1]} size={PLAZA.bitSize} seed="plaza/bit" state="idle" />
+        {/* fix round 3: the ring's ink is compensated in the dive like the shutters (2.4 -> ~1.3 world at the cut =
+            ~4 px on screen, S02's detail circle is ~4 px) */}
+        <MarkRing x={PLAZA.gov.govB.lock[0]} y={PLAZA.gov.govB.lock[1]} r={24} at={B.lockRing} dur={0.12} width={2.4 * ink} seed="s01/ring" />
       </>
     ),
     light: (
       <>
         {CITIZEN_ORDER.map((i) => (
-          <PlazaCitizen key={i} p={S01_CITIZENS[i]} vp={VP} horizon={HZ} />
+          <PlazaCitizen key={i} p={S01_CITIZENS[i]} vp={VP} horizon={HZ} inkK={ink} />
         ))}
       </>
     ),
     near: (
       <>
-        <LanternOff r={LAMP_GLASS} at={B.lampOff} seed="s01/lampOff" />
+        <TreeTicks />
         {S01_PIGEONS.map((p) => (
           <Pigeon key={p.seed} p={p} />
         ))}
-        <PipS01 p={S01_PIP} seed={S01_PIP_SEED} />
+        <PipS01 p={S01_PIP} seed={S01_PIP_SEED} inkK={inkNear} />
         {S01_NEAR.map((c) => (
-          <PlazaCitizen key={c.seed} p={c} vp={VP} horizon={HZ} />
+          <PlazaCitizen key={c.seed} p={c} vp={VP} horizon={HZ} inkK={inkNear} />
         ))}
         <Onlookers />
+        <S01Branch />
       </>
     ),
   };
@@ -235,11 +197,15 @@ export const PlazaShutdown: React.FC = () => {
   // frame 0 = the bottom of the SunPress (0.88) with the ripple at its emission radius; it releases over 0.2 s while
   // the ripple runs out to r + 40 (S12 ends on mode="reverse": the same state)
   const sun = (
-    <SunPress mode="release" at={B.rippleAt} cx={SUN.x} cy={SUN.y} r={SUN.r} width={MID}>
-      <Sun cx={SUN.x} cy={SUN.y} r={SUN.r} drift={[0, 0]}>
-        {(r: number) => <PowerGlyph r={r} glintAt={B.glint} seed="s01/pwr" />}
-      </Sun>
-    </SunPress>
+    <>
+      <SunPress mode="release" at={B.rippleAt} cx={SUN.x} cy={SUN.y} r={SUN.r} width={MID} ripple={false}>
+        <Sun cx={SUN.x} cy={SUN.y} r={SUN.r} drift={[0, 0]}>
+          {(r: number) => <PowerGlyph r={r} glintAt={B.glint} seed="s01/pwr" />}
+        </Sun>
+      </SunPress>
+      {/* fix round 3: the ripple in the glyph's cream (the kit's ink ring read as an outline around the sun) */}
+      <SunRipple cx={SUN.x} cy={SUN.y} r={SUN.r} at={B.rippleAt} />
+    </>
   );
   return (
     <GovernmentPlaza

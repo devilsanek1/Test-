@@ -6,8 +6,9 @@
 //   govB Domed Capitol (x 396..640, lantern tip 600, tall drum; the hero: window 414,970,208,146, lock box (543,1318) 22x27)
 //   govC Clock Tower (x 800..1000, behind govD; white clock face r26 at (870,670) that stays white when dark)
 //   govD Modern Ministry (x 790..1240, roof 880, base 1470, cut by the right edge): the nearest, biggest mass
-// + the far city in the gap (two fill-only haze tiers on the horizon), the plaza (one flat field with a few broken
-// paving lines + specks), the flat cream sun path with sage shadow wedges, a lamp post at the left edge with a crossbar
+// + the far city in the gap (kit v3b: fill-only civic silhouettes in 3 depth tiers on a horizon line at y 1166, the
+// plaza's far steps below it), the plaza (one flat mintPale field with a few broken paving lines + specks, ONE sage
+// shade wedge from govA's side; ground="sage" = the old two wedges), the flat cream sun path, a lamp post at the left edge with a crossbar
 // and 3 pigeons, a foreground tree in a tree pit, Pip's bollard (812,1426), 4 abstract pennants, 6 readable 55-75 px
 // citizens on the VP axis + 4 far ones, an onlooker cropped by the left edge INSIDE the visible band and 2 heads in the
 // bottom corners. World coordinates = S01 camera rest. docs/SHARED_SETS.md section 8 lists the anchors this moved.
@@ -45,17 +46,20 @@ import {FacadeDoor} from './SiteFacade';
 export type GovId = 'govA' | 'govB' | 'govC' | 'govD';
 type R4 = [number, number, number, number];
 
-/** Far civic skyline in the sun gap (storyboard v3 `farCivic`): six fill-only silhouettes (domes, pediments, clock
- *  spires) in the two day haze tiers, each >= 40 px wide where the gap shows it (x 640-790), listed LEFT TO RIGHT (the
- *  order `civicOffAt` steps them dark; `civicOnAt` relights them right to left). tier 0 = the far tier (#98C0AE), 1 = the
- *  nearer tier (#84B09C); `top` = the silhouette's highest point (all under the power glyph's lower edge, y 957). */
+/** Far civic skyline in the sun gap (storyboard v3 `farCivic`, kit v3b layout): six fill-only silhouettes (domes,
+ *  pediments, clock spires) in THREE depth tiers that shrink with distance, standing on the far city's horizon line
+ *  (`PLAZA.civicBase`, world y 1166) at the top of the plaza's far steps. Listed LEFT TO RIGHT (the order `civicOffAt`
+ *  steps them dark; `civicOnAt` relights them right to left). `depth` 0 = back (smallest, lightest), 1 = mid, 2 = near
+ *  (biggest); each owns the stretch `band` [x0, x1] of its depth's low roofline band (`PLAZA.civicBands[depth]`), so a
+ *  whole tier steps dark with its two silhouettes. `tier` = the v3 colour family (0 far, 1 nearer), kept for old readers.
+ *  `top` = the silhouette's highest point (all under the power glyph's lower edge, y 957). */
 export const PLAZA_CIVIC = [
-  {id: 'templeF', kind: 'temple', tier: 1, x0: 640, x1: 698, top: 1086, cx: 669},
-  {id: 'domeB', kind: 'dome', tier: 0, x0: 652, x1: 700, top: 960, cx: 676, lantern: true},
-  {id: 'domeF', kind: 'dome', tier: 1, x0: 694, x1: 750, top: 1052, cx: 722, lantern: true},
-  {id: 'templeB', kind: 'temple', tier: 0, x0: 698, x1: 756, top: 978, cx: 727},
-  {id: 'spireF', kind: 'spire', tier: 1, x0: 746, x1: 790, top: 1050, cx: 768},
-  {id: 'spireB', kind: 'spire', tier: 0, x0: 748, x1: 790, top: 952, cx: 769},
+  {id: 'templeM', kind: 'temple', tier: 1, depth: 1, x0: 624, x1: 672, top: 1030, cx: 648, band: [590, 692]},
+  {id: 'domeF', kind: 'dome', tier: 1, depth: 2, x0: 640, x1: 704, top: 1036, cx: 672, lantern: true, band: [590, 716]},
+  {id: 'spireB', kind: 'spire', tier: 0, depth: 0, x0: 680, x1: 700, top: 966, cx: 690, band: [590, 720]},
+  {id: 'spireM', kind: 'spire', tier: 1, depth: 1, x0: 700, x1: 730, top: 996, cx: 715, band: [692, 840]},
+  {id: 'domeB', kind: 'dome', tier: 0, depth: 0, x0: 728, x1: 762, top: 982, cx: 745, lantern: true, band: [720, 840]},
+  {id: 'templeF', kind: 'temple', tier: 1, depth: 2, x0: 728, x1: 788, top: 1060, cx: 758, band: [716, 840]},
 ] as const;
 
 /** PEAK-1 layout (review 5): the architecture is ~1.35x taller than storyboard v1 (bases y 1400-1470 instead of
@@ -122,6 +126,11 @@ export const PLAZA = {
   layers: {far: 0.1, sun: 0.12, buildings: 0.55, govD: 0.62, ground: 0.7, light: 0.7, near: 1.0},
   /** Storyboard v3: the far civic silhouettes (left to right), see PLAZA_CIVIC. */
   civic: PLAZA_CIVIC,
+  /** Kit v3b: the far city ends on this horizon line (the top of the plaza's far steps); below it, in the gap, the far
+   *  steps (3 flights shrinking with distance, cream / half-sand) run down to the plaza horizon (1384). */
+  civicBase: 1166,
+  /** Top of each depth's low roofline band (back, mid, near): each tier shows a ~35 px strip over the one in front. */
+  civicBands: [1058, 1092, 1126] as readonly number[],
   /** Storyboard v3 frame 0 (= S12's last frame): the sun at the bottom of its SunPress (0.88) in its rest slot. */
   frame0: {sun: {x: 720, y: 900, r: 155}, press: 0.88},
 } as const;
@@ -175,6 +184,9 @@ export type GovEvents = {
  *  gov.govB.screenOffAt to release it), every other screen lit, no shutters: frame 0 = S12's last frame. */
 export type PlazaState = 'lineArt' | 'built' | 'off' | 'frame0';
 
+/** The plaza floor: 'light' (kit v3b default) or the review-5 'sage' wedges. */
+export type PlazaGround = 'light' | 'sage';
+
 export type GovernmentPlazaProps = {
   state?: PlazaState;
   /** 'built': the colour cascade from the sun gap (paper until the wave reaches each fill). Omit = in colour. */
@@ -203,6 +215,10 @@ export type GovernmentPlazaProps = {
   lanternOffAt?: number;
   /** Lamp lantern relights (S12 rewind). */
   lanternOnAt?: number;
+  /** The plaza floor (kit v3b): 'light' (default) = the mintPale plaza with ONE sage shade wedge from govA's side
+   *  (~27 % of the visible plaza) and the cream sun path, so the teal / dark figures stand on a LIGHT ground; 'sage' =
+   *  the review-5 look (two sage wedges from govB's and govD's sides, ~60 % of the plaza). */
+  ground?: PlazaGround;
   /** Storyboard v3 far civic skyline in the sun gap (PLAZA_CIVIC: domes, pediments, clock spires as whole fill-only
    *  silhouettes) instead of the generic block city with window dots and cranes. Default true. */
   farCivic?: boolean;
@@ -290,7 +306,9 @@ const G = (() => {
       line(cx - 32, A.friezeB + 1, cx + 32, A.friezeB + 1, {seed: `${s}/cc${cx}`, over: [2, 2]}) +
       line(cx - 26, A.colTop, cx + 26, A.colTop, {seed: `${s}/cd${cx}`, over: [1, 1]}) +
       line(cx - 28, A.colBot, cx + 28, A.colBot, {seed: `${s}/cb${cx}`, over: [1, 1]});
-    for (const fx of [-11, 0, 11]) flutes += line(cx + fx, A.colTop + 12, cx + fx, A.colBot - 12, {seed: `${s}/fl${cx}/${fx}`, over: 0});
+    // ONE flute per column (right of centre, clear of the shade strip), a long pen stroke with its natural breaks:
+    // 3 parallel flutes + the 2 column edges + the shade edge read as a barcode in S01's 3x dive
+    flutes += line(cx + 7, A.colTop + 34, cx + 7, A.colBot - 46, {seed: `${s}/fl${cx}`, over: 0});
   }
   // the 3-step crepidoma, each step wider than the one above
   const steps = [0, 1, 2].map((i) => [A.x0 - 20 - i * 14, A.styl + i * 19, A.x1 - A.x0 + 40 + i * 28, 19] as R4);
@@ -386,7 +404,6 @@ const G = (() => {
   const gx0 = 600;
   const gx1 = 820;
   farA += rectPath(gx0, 1050, gx1 - gx0, HZ + 4 - 1050);
-  const civicBand = rectPath(gx0, 1110, gx1 - gx0, HZ + 4 - 1110);
   for (let x = gx0; x < gx1; ) {
     const w = fr.range(18, 34);
     const top = fr.range(968, 1050);
@@ -428,6 +445,10 @@ const G = (() => {
   const wedgeB = polyPath([[300, A.base + 2], [B.x1, B.base + 50], [pL0[0], pL0[1]], [exL(2060), 2060], [-200, 2060], [-200, 1760]]);
   const wedgeD = polyPath([[pR0[0], pR0[1]], [D.x0, pR0[1]], [D.x0, D.base], [1300, D.base], [1300, 2060], [exR(2060), 2060]]);
   const pathFar = polyPath([pL1, pR1, [exR(2060), 2060], [exL(2060), 2060]]);
+  // kit v3b (default ground 'light'): ONE diagonal shade plane from govA's side (style bible: one shade plane) on the
+  // light plaza: from the kerb under govA / govB's steps (x <= 440) down-left to x ~150 at the frame bottom, ~27 % of
+  // the visible plaza (the 'sage' ground keeps the two old wedges, ~60 %)
+  const wedgeA = polyPath([[-200, A.base - 2], [440, A.base - 2], [60, 2060], [-200, 2060]]);
   // benches
   const bench = (x: number, y: number, w: number) => ({fill: rectPath(x, y, w, 8), ink: line(x - 3, y, x + w + 3, y, {seed: `bn${x}`, over: [2, 2]}) + line(x + 6, y + 8, x + 4, y + 28, {seed: `bl${x}`, over: 0}) + line(x + w - 6, y + 8, x + w - 4, y + 28, {seed: `br${x}`, over: 0})});
   const benches = [bench(330, 1470, 76), bench(940, 1486, 64)];
@@ -445,65 +466,146 @@ const G = (() => {
   const trunk = rectPath(1046, 1390, 24, 168);
   const trunkInk = line(1046, 1556, 1046, 1404, {seed: `${s}/t1`, over: 0}) + line(1070, 1556, 1069, 1408, {seed: `${s}/t2`, over: 0}) + ellipse(1058, 1558, 60, 14, {seed: `${s}/pit`, overlap: -40});
   const pit = `M998 1558a60 14 0 1 0 120 0a60 14 0 1 0 -120 0Z`;
-  return {civicBand, pathFar, farEdges, A, colsA, CW, ped, tymp, aInk, colInk, colFill, colShade, flutes, steps, stepInk, B, bSteps, domeFill, domeInk, ribs, domeRim, lantern, lanternInk, bInk, drumThin, C, cInk, D, gridInk, cells, cellsDark, dInk, pilotis, farA, farB, farDots, cranes, ground, kerbs, pathPoly, pathEdges, wedgeB, wedgeD, benches, lampInk, lampFill, lanternRect, crownD, treeTicks, trunk, trunkInk, pit};
+  return {wedgeA, pathFar, farEdges, A, colsA, CW, ped, tymp, aInk, colInk, colFill, colShade, flutes, steps, stepInk, B, bSteps, domeFill, domeInk, ribs, domeRim, lantern, lanternInk, bInk, drumThin, C, cInk, D, gridInk, cells, cellsDark, dInk, pilotis, farA, farB, farDots, cranes, ground, kerbs, pathPoly, pathEdges, wedgeB, wedgeD, benches, lampInk, lampFill, lanternRect, crownD, treeTicks, trunk, trunkInk, pit};
 })();
 
-// ---------------------------------------------------------------- far civic skyline (v3)
+// ---------------------------------------------------------------- far civic skyline (v3, kit v3b layout)
 
-/** Haze steps of the civic tiers: [lit, dark] per tier. The far tier sits one haze step lighter than the old far city
- *  (#A2C8B6, against the sun disc) so the two tiers read as separate shapes (1.33:1), and each switch-off is one step
- *  (1.27-1.32:1): far #A2C8B6 -> #88B3A0, nearer #84B09C -> sage. */
+/** Haze steps of the civic depths: [lit, dark] per depth (back, mid, near). Lit = the day haze ladder (back #A2C8B6 ->
+ *  near #84B09C, stepping toward the sky with distance); the switch-off is a CLEAR two-value step (1.7-2.1:1: back
+ *  #A2C8B6 -> #6E9A88, near #84B09C -> #4E786A) so 'Europe' reads on a phone, the depths still ~1.2:1 apart when dark.
+ *  The lit windows / clock faces / lanterns (cream) turn tealDark on the same step. */
 const CIVIC_FILL: [string, string][] = [
-  ['#A2C8B6', '#88B3A0'],
-  ['#84B09C', palette.sage],
+  ['#A2C8B6', '#6E9A88'],
+  ['#93BCAA', '#5E897A'],
+  ['#84B09C', '#4E786A'],
 ];
 
 const CIV = (() => {
-  const base = PLAZA.horizon + 4;
+  const CB = PLAZA.civicBase;
+  // every silhouette runs 30 px under the horizon line (the far steps, drawn after, cover it: no seam under parallax)
+  const base = CB + 30;
   const f = (n: number) => n.toFixed(1);
+  const R = (x: number, y: number, w: number, h: number) => rectPath(x, y, w, h);
   return PLAZA_CIVIC.map((c) => {
-    const {x0, x1, top, cx} = c;
-    let d = '';
+    const {x0, x1, top, cx, depth} = c;
+    const near = depth === 2;
+    const back = depth === 0;
+    const bandTop = PLAZA.civicBands[depth];
+    const r = rng(`gp/civ/${c.id}`);
+    // the low roofline band this silhouette owns (+ one raised roof block so it never reads as a flat slab)
+    const [bx0, bx1] = c.band;
+    let d = R(bx0, bandTop, bx1 - bx0 + 0.5, base - bandTop);
+    const bw = r.range(16, 26);
+    const bxs = r.range(bx0 + 6, bx1 - bw - 6);
+    d += R(bxs, bandTop - r.range(7, 12), bw, 14);
     let lantern = '';
-    let face = '';
+    let dots = '';
+    const dot = (x: number, y: number, w: number, h: number) => (dots += R(x, y, w, h));
     if (c.kind === 'dome') {
-      // drum with a cornice lip, a half-ellipse dome, a lantern with a pointed cap up to `top`
+      // drum with a cornice lip, a half-ellipse dome, a lantern (glazed: the lit window that pops off) with a pointed cap
+      const lanW = near ? 14 : 9;
+      const lanH = near ? 18 : 13;
       const rx = (x1 - x0) / 2 - 3;
-      const ry = 30;
-      const lanH = 18;
-      const domeTop = top + lanH + 6;
+      const ry = near ? 26 : 20;
+      const domeTop = top + 6 + lanH;
       const drumTop = domeTop + ry;
-      d =
+      d +=
         `M${f(x0)} ${base}L${f(x0)} ${f(drumTop + 5)}L${f(x0 - 3)} ${f(drumTop + 5)}L${f(x0 - 3)} ${f(drumTop)}` +
         `L${f(cx - rx)} ${f(drumTop)}A${f(rx)} ${ry} 0 0 1 ${f(cx + rx)} ${f(drumTop)}` +
         `L${f(x1 + 3)} ${f(drumTop)}L${f(x1 + 3)} ${f(drumTop + 5)}L${f(x1)} ${f(drumTop + 5)}L${f(x1)} ${base}Z` +
-        `M${f(cx - 5)} ${f(domeTop + 3)}L${f(cx - 5)} ${f(top + 6)}L${f(cx)} ${f(top)}L${f(cx + 5)} ${f(top + 6)}L${f(cx + 5)} ${f(domeTop + 3)}Z`;
-      lantern = rectPath(cx - 2.5, top + 8, 5, 9);
+        `M${f(cx - lanW / 2)} ${f(domeTop + 3)}L${f(cx - lanW / 2)} ${f(top + 6)}L${f(cx)} ${f(top)}L${f(cx + lanW / 2)} ${f(top + 6)}L${f(cx + lanW / 2)} ${f(domeTop + 3)}Z`;
+      lantern = R(cx - lanW / 2 + 2, top + 8, lanW - 4, lanH - 4);
+      // drum windows
+      const n = near ? 3 : 2;
+      const ww = near ? 5 : 3;
+      const wh = near ? 8 : 5;
+      for (let i = 0; i < n; i++) dot(cx - ((n - 1) / 2 - i) * (near ? 14 : 10) - ww / 2, drumTop + (near ? 11 : 9), ww, wh);
     } else if (c.kind === 'temple') {
-      // a pediment over a cornice lip on a plain block (the colonnade reads as a stepped silhouette)
-      const corn = top + 22;
-      d =
+      // a pediment over a cornice lip on a colonnade block; the column gaps are the lit window slits
+      const pedH = near ? 18 : 14;
+      const corn = top + pedH;
+      d +=
         `M${f(x0)} ${base}L${f(x0)} ${f(corn + 6)}L${f(x0 - 4)} ${f(corn + 6)}L${f(x0 - 4)} ${f(corn)}L${f(cx)} ${f(top)}` +
-        `L${f(x1 + 4)} ${f(corn)}L${f(x1 + 4)} ${f(corn + 6)}L${f(x1)} ${f(corn + 6)}L${f(x1)} ${base}Z` +
-        // a stylobate step at the colonnade's foot, 40 px under the cornice
-        `M${f(x0 - 3)} ${f(corn + 46)}h${f(x1 - x0 + 6)}v6h${f(-(x1 - x0 + 6))}Z`;
+        `L${f(x1 + 4)} ${f(corn)}L${f(x1 + 4)} ${f(corn + 6)}L${f(x1)} ${f(corn + 6)}L${f(x1)} ${base}Z`;
+      const n = near ? 4 : 3;
+      const sw = near ? 5 : 4;
+      const sh = near ? 20 : 14;
+      const pitch = (x1 - x0 - 12) / (n - 1);
+      for (let i = 0; i < n; i++) dot(x0 + 6 + i * pitch - sw / 2, corn + 12, sw, sh);
     } else {
-      // clock spire: tower, belfry lip, a tall pointed spire up to `top`; a round clock face one step lighter
-      const bel = top + 34;
-      d =
-        `M${f(x0 + 4)} ${base}L${f(x0 + 4)} ${f(bel + 6)}L${f(x0)} ${f(bel + 6)}L${f(x0)} ${f(bel)}L${f(cx)} ${f(top)}` +
-        `L${f(x1)} ${f(bel)}L${f(x1)} ${f(bel + 6)}L${f(x1 - 4)} ${f(bel + 6)}L${f(x1 - 4)} ${base}Z`;
-      const fy = bel + 26;
-      face = `M${f(cx - 8)} ${f(fy)}a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z`;
+      // clock spire: tower, belfry lip, a tall pointed spire up to `top`; a round clock face (lit) under the belfry
+      const spH = back ? 30 : 34;
+      const bel = top + spH;
+      d +=
+        `M${f(x0 + 3)} ${base}L${f(x0 + 3)} ${f(bel + 6)}L${f(x0)} ${f(bel + 6)}L${f(x0)} ${f(bel)}L${f(cx)} ${f(top)}` +
+        `L${f(x1)} ${f(bel)}L${f(x1)} ${f(bel + 6)}L${f(x1 - 3)} ${f(bel + 6)}L${f(x1 - 3)} ${base}Z`;
+      const fr = back ? 4.5 : 7;
+      const fy = bel + 8 + fr;
+      dots += `M${f(cx - fr)} ${f(fy)}a${fr} ${fr} 0 1 0 ${f(2 * fr)} 0a${fr} ${fr} 0 1 0 ${f(-2 * fr)} 0Z`;
+      dot(cx - (back ? 1.5 : 2.5), fy + fr + 8, back ? 3 : 5, back ? 6 : 9);
     }
-    return {...c, d, lantern, face};
+    // band windows: a few lit dots along the band's visible strip (>= 3 px; bigger nearer)
+    const dw = near ? 5 : back ? 3 : 4;
+    const dh = near ? 6 : back ? 4 : 5;
+    for (let x = bx0 + r.range(6, 14); x < bx1 - 8; x += r.range(16, 26)) if (r.chance(0.42)) dot(x, bandTop + (near ? 10 : 8), dw, dh);
+    return {...c, d, lantern, dots};
   });
 })();
 
-/** Paint order: the far tier first, then the nearer tier (indices into CIV, which is left to right). */
-const CIV_DRAW = CIV.map((c, i) => [c.tier, i] as const)
+/** Paint order: back -> mid -> near (indices into CIV, which is left to right). */
+const CIV_DRAW = CIV.map((c, i) => [c.depth, i] as const)
   .sort((a, b) => a[0] - b[0] || a[1] - b[1])
   .map((q) => q[1]);
+
+/** The plaza's far steps under the far city's horizon line (kit v3b): a cream coping (the horizon line) and three
+ *  flights that shrink with distance (8 / 12 / 20 px steps, cream nosings over half-sand risers: a quiet light field
+ *  under the dark skyline, not a striped one) separated by cream landings, from y 1166 down to the plaza horizon; the
+ *  last riser runs on under the plaza (hidden by it). */
+const FAR_STEPS = (() => {
+  const CB = PLAZA.civicBase;
+  const x0 = 590;
+  const w = 250;
+  let cream = rectPath(x0, CB, w, 5);
+  let half = '';
+  let sand = '';
+  let lines = `M${x0} ${CB}H${x0 + w}`;
+  let y = CB + 5;
+  const flights: [number, number, 'half' | 'sand', number][] = [
+    [4, 8, 'half', 6],
+    [4, 12, 'half', 8],
+    [6, 20, 'half', 0],
+  ];
+  flights.forEach(([n, h, riser, landing]) => {
+    for (let i = 0; i < n; i++) {
+      const nose = Math.max(3, Math.round(h * 0.34));
+      cream += rectPath(x0, y, w, nose);
+      if (riser === 'sand') sand += rectPath(x0, y + nose, w, h - nose + 0.5);
+      else half += rectPath(x0, y + nose, w, h - nose + 0.5);
+      lines += `M${x0} ${(y + nose).toFixed(1)}H${x0 + w}`;
+      y += h;
+    }
+    if (landing) {
+      cream += rectPath(x0, y, w, landing);
+      lines += `M${x0} ${y.toFixed(1)}H${x0 + w}`;
+      y += landing;
+    }
+  });
+  // the last riser runs on under the plaza field (the ground layer covers it; no sky seam under multiplane parallax)
+  sand += rectPath(x0, y, w, 1480 - y);
+  return {cream, half, sand, lines};
+})();
+
+const FarSteps: React.FC<{seed: string}> = ({seed}) => (
+  <>
+    <Fill d={FAR_STEPS.sand} color={palette.sand} offset={false} mode="none" seed={`${seed}/fstS`} />
+    <Fill d={FAR_STEPS.half} color={HALF.sand} offset={false} mode="none" seed={`${seed}/fstH`} />
+    <Fill d={FAR_STEPS.cream} color={palette.cream} offset={false} mode="none" seed={`${seed}/fstC`} />
+    <OnlyWhilePaper p={[715, 1260]}>
+      <Ink d={FAR_STEPS.lines} width={HAIR} taper={false} seed={`${seed}/fstE`} />
+    </OnlyWhilePaper>
+  </>
+);
 
 /** Per-silhouette event times (left-to-right order). */
 function civicTimes(v: number | number[] | undefined, dir: 'lr' | 'rl'): (number | undefined)[] {
@@ -524,8 +626,7 @@ const FarCivic: React.FC<{off: boolean; offAt?: number | number[]; onAt?: number
       {CIV_DRAW.map((i) => {
         const c = CIV[i];
         const dark = latestState(t, [offs[i]], [ons[i]], off);
-        const [lit, drk] = CIVIC_FILL[c.tier];
-        const col = dark ? drk : lit;
+        const [lit, drk] = CIVIC_FILL[c.depth];
         let lanternOn = false;
         if ('lantern' in c && c.lantern) {
           // with civicLanternsOffAt a lantern stays lit through its dome's step until then (S01: the domes step on
@@ -535,13 +636,13 @@ const FarCivic: React.FC<{off: boolean; offAt?: number | number[]; onAt?: number
         }
         return (
           <React.Fragment key={c.id}>
-            <Fill d={c.d} color={col} offset={false} mode="none" seed={`${seed}/civ${i}`} />
-            {c.face ? <Fill d={c.face} color={dark ? lit : HALF.daySky} offset={false} mode="none" seed={`${seed}/civf${i}`} /> : null}
-            {lanternOn ? <Fill d={c.lantern} color={palette.cream} offset={false} mode="none" seed={`${seed}/civl${i}`} /> : null}
+            <Fill d={c.d} color={dark ? drk : lit} offset={false} mode="none" seed={`${seed}/civ${i}`} />
+            <Fill d={c.dots} color={dark ? palette.tealDark : palette.cream} offset={false} mode="none" seed={`${seed}/civd${i}`} />
+            {c.lantern ? <Fill d={c.lantern} color={lanternOn ? palette.cream : palette.tealDark} offset={false} mode="none" seed={`${seed}/civl${i}`} /> : null}
           </React.Fragment>
         );
       })}
-      <OnlyWhilePaper p={[710, 1150]}>
+      <OnlyWhilePaper p={[710, 1100]}>
         <Ink d={CIV.map((c) => c.d).join('')} width={HAIR} taper={false} seed={`${seed}/civE`} />
       </OnlyWhilePaper>
     </>
@@ -641,7 +742,10 @@ const crtContent = (u: number, seed: string) => ({w, h}: {w: number; h: number})
 
 // ---------------------------------------------------------------- shared window hardware (chrome + shutter + lock + tag)
 
-type WinCtx = {id: GovId; ev: GovEvents; off: boolean; chrome: boolean; seed: string; windowSlot?: GovernmentPlazaProps['windowSlot']; k?: number; fps?: number};
+type WinCtx = {id: GovId; ev: GovEvents; off: boolean; chrome: boolean; seed: string; windowSlot?: GovernmentPlazaProps['windowSlot']; k?: number; fps?: number;
+  /** 'window' = the screen + shutter, 'hardware' = the tag + padlock hanging on its rail (drawn LAST, after the
+   *  building's sill / ink, so no stroke of the facade cuts through them), 'all' = both (default). */
+  part?: 'all' | 'window' | 'hardware'};
 
 /** The reversed slam's forward window (the drop without its bounce), replayed backwards by `liftAt`. */
 const SLAM_DROP = 0.16;
@@ -686,7 +790,7 @@ const PadlockRig: React.FC<{x: number; y: number; at?: number; glintAt?: number;
   return <XG m={mat.about(mat.scale(0.55), extra?.x ?? x, extra?.y ?? y)}>{pl}</XG>;
 };
 
-const WindowRig: React.FC<WinCtx> = ({id, ev, off, chrome, seed, windowSlot, k = 1, fps = 12}) => {
+const WindowRig: React.FC<WinCtx> = ({id, ev, off, chrome, seed, windowSlot, k = 1, fps = 12, part = 'all'}) => {
   const t = useTime();
   const g = PLAZA.gov[id];
   const [x, y, w, h] = g.window;
@@ -699,16 +803,17 @@ const WindowRig: React.FC<WinCtx> = ({id, ev, off, chrome, seed, windowSlot, k =
   const v1On = ev.screenOnAt !== undefined && !crtOnIsReverse(ev) ? ev.screenOnAt : undefined;
   const chromeOff = off ? -1e6 : crt ? (u >= 0.999 ? -1e6 : undefined) : ev.offAt;
   const content = crt && u > 0.001 && u < 0.999 ? crtContent(u, `${seed}/${id}/crt`) : undefined;
-  const showTag = off || ev.tagAt !== undefined;
-  const showLock = off || ev.padlockAt !== undefined;
+  const showTag = (off || ev.tagAt !== undefined) && part !== 'window';
+  const showLock = (off || ev.padlockAt !== undefined) && part !== 'window';
+  const showWin = part !== 'hardware';
   return (
     <>
-      {windowSlot ? (
+      {!showWin ? null : windowSlot ? (
         windowSlot(id, g.window)
       ) : (
         <ChromeSlot x={x} y={y} w={w} h={h} chrome={chrome} chromeAt={off ? undefined : ev.chromeAt} screenOnAt={off ? undefined : v1On} offAt={chromeOff} content={content} width={MID * k} seed={`${seed}/${id}/bw`} />
       )}
-      <ShutterRig x={x} y={y} w={w} h={h * stop} ev={ev} off={off} fps={fps} width={MID * k} seed={`${seed}/${id}/sh`} />
+      {showWin ? <ShutterRig x={x} y={y} w={w} h={h * stop} ev={ev} off={off} fps={fps} width={MID * k} seed={`${seed}/${id}/sh`} /> : null}
       {showTag ? <TagRig x={g.tag[0]} y={g.tag[1] + dy} at={off ? undefined : ev.tagAt} tapAt={ev.tagTapAt} outAt={off ? undefined : ev.tagOutAt} fps={fps} extra={ev.tagProps} seed={`${seed}/${id}/tag`} /> : null}
       {showLock ? <PadlockRig x={g.padlock[0]} y={g.padlock[1] + dy} at={off ? undefined : ev.padlockAt} glintAt={ev.glintAt} outAt={off ? undefined : ev.padlockOutAt} fps={fps} extra={ev.padlockProps} seed={`${seed}/${id}/pl`} /> : null}
     </>
@@ -859,9 +964,11 @@ const GovB: React.FC<BProps> = ({ev, off, chrome, detail, seed, windowSlot, k, f
       <Ink d={G.ribs} width={THIN * k} taper={false} color={palette.teal} seed={`${seed}/bribs`} />
       <Ink d={G.bInk} width={MID * k} seed={`${seed}/bink`} />
       <Ink d={G.drumThin + (close ? stoneCourses(B.x0 + 16, B.x1 - 16, B.cornB + 20, B.base - 30, `${seed}/bsc`) + brickHints(B.x0 + 22, 1150, 200, 200, `${seed}/bbh`, 4, 20) : '')} width={HAIR * k} taper={false} seed={`${seed}/bthin`} />
-      <WindowRig k={k} fps={fps} id="govB" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} />
+      <WindowRig k={k} fps={fps} id="govB" ev={ev} off={off} chrome={chrome} seed={seed} windowSlot={windowSlot} part="window" />
       {/* window sill (Pip / snail perch in S11) */}
       <Ink d={line(win[0] - 10, sill, win[0] + win[2] + 10, sill, {seed: `${seed}/bsill`, over: [6, 6]}) + line(win[0] - 6, sill + 9, win[0] + win[2] + 6, sill + 9, {seed: `${seed}/bsill2`, over: [2, 2]})} width={MID * k} taper={false} />
+      {/* the tag + padlock hang over the sill: drawn after it (the sill strokes used to cut through them) */}
+      <WindowRig k={k} fps={fps} id="govB" ev={ev} off={off} chrome={chrome} seed={seed} part="hardware" />
     </>
   );
 };
@@ -936,9 +1043,10 @@ const GovD: React.FC<BProps> = ({ev, off, chrome, seed, windowSlot, k, fps}) => 
 const FarCity: React.FC<{seed: string; civic?: React.ReactNode}> = ({seed, civic}) =>
   civic ? (
     <>
-      {/* v3: the civic silhouettes ARE the far city in the gap (the back band keeps the sun's lower edge off the horizon) */}
-      <Fill d={G.civicBand} color={CIVIC_FILL[0][0]} offset={false} seed={`${seed}/farA`} />
+      {/* v3: the civic silhouettes ARE the far city in the gap; kit v3b: it ends on a horizon line (y 1166) at the top
+          of the plaza's far steps instead of running down to the plaza as one teal slab */}
       {civic}
+      <FarSteps seed={seed} />
     </>
   ) : (
   <>
@@ -959,13 +1067,19 @@ const Ground: React.FC<{seed: string}> = ({seed}) => (
   </>
 );
 
-const LightLayer: React.FC<{seed: string}> = ({seed}) => (
+const LightLayer: React.FC<{seed: string; ground: PlazaGround}> = ({seed, ground}) => (
   <>
-    <Fill d={G.wedgeB} color={palette.sage} offset={false} mode="snap" seed={`${seed}/wedgeB`} />
-    <Fill d={G.wedgeD} color={palette.sage} offset={false} mode="snap" seed={`${seed}/wedgeD`} />
+    {ground === 'sage' ? (
+      <>
+        <Fill d={G.wedgeB} color={palette.sage} offset={false} mode="snap" seed={`${seed}/wedgeB`} />
+        <Fill d={G.wedgeD} color={palette.sage} offset={false} mode="snap" seed={`${seed}/wedgeD`} />
+        <Fill d={G.pathFar} color={palette.mintPale} offset={false} mode="snap" seed={`${seed}/pathFar`} />
+      </>
+    ) : (
+      <Fill d={G.wedgeA} color={palette.sage} offset={false} mode="snap" seed={`${seed}/wedgeA`} />
+    )}
     {/* the flat sun path: cream at a FIXED partial opacity (never animated) with dashed ink edges; light only exists in
         the coloured state, so the line-art frame shows just its edges */}
-    <Fill d={G.pathFar} color={palette.mintPale} offset={false} mode="snap" seed={`${seed}/pathFar`} />
     <GroundMarks marks={G.ground} width={THIN} seed={`${seed}/gm`} />
     <SunPath seed={seed} />
     {G.benches.map((b, i) => (
@@ -1089,6 +1203,7 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
   pigeonsFlyAt,
   phonesDownAt,
   farCivic = true,
+  ground = 'light',
   civicOffAt,
   civicOnAt,
   civicLanternsOffAt,
@@ -1155,7 +1270,7 @@ export const GovernmentPlaza: React.FC<GovernmentPlazaProps> = ({
         'light',
         L.light,
         <>
-          <LightLayer seed={seed} />
+          <LightLayer seed={seed} ground={ground} />
           {citizensAt !== false ? <Citizens at={lineArt || off ? undefined : citizensAt} phonesAt={lineArt ? undefined : phonesAt} phonesDownAt={lineArt ? undefined : phonesDownAt} seed={seed} /> : null}
         </>,
       )}

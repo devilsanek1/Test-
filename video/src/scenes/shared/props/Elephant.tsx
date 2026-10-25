@@ -340,7 +340,14 @@ export type ElephantStampProps = {
   r?: number;
   /** Ring width (world px). Default 14 (ellipse) / 0.17 r (round). */
   ring?: number;
+  /** Print colour. Default tealDark for the 'solid' print, sand for the 'line' print. */
   color?: string;
+  /** 'solid' (kit v3b default): a rubber-stamp print, ONE flat fill over the whole stamp silhouette, misregistered 3 px
+   *  against its ink edge, a cream border ring inset and the elephant reversed out in cream (it reads at ~130 px on a
+   *  cream ground). 'line': the v1-v3 print (a sand ring around a cream line-art elephant: a badge on a white sheet). */
+  print?: 'solid' | 'line';
+  /** Mirror the elephant (faces left), e.g. to keep its trunk clear of a perched mascot. */
+  flip?: boolean;
   /** Drawn at `at` (no slam), or SLAM: the ink ring strokes on (0.13 s), then the print slams 2.6 x -> 1.0 x (0.27 s). */
   at?: number;
   slamAt?: number;
@@ -348,7 +355,66 @@ export type ElephantStampProps = {
   seed?: Seed;
 };
 
-const ElephantStampBase: React.FC<ElephantStampProps> = ({x, y, rx: rxIn, ry: ryIn, r, ring, color = palette.sand, at, slamAt, depth, seed = 'stamp'}) => {
+const ElephantStampBase: React.FC<ElephantStampProps> = (p) => (p.print ?? 'solid') === 'solid' ? <ElephantStampSolid {...p} /> : <ElephantStampLine {...p} />;
+
+/** The slam / print timing shared by both prints: null before the stamp exists. */
+function stampPhase(t: number, at: number | undefined, slamAt: number | undefined) {
+  const start = slamAt ?? at;
+  if (start !== undefined && t < start) return null;
+  const printAt = slamAt !== undefined ? slamAt + 0.13 : at;
+  const showPrint = printAt === undefined || t >= printAt;
+  const k = slamAt !== undefined && showPrint ? lerp(2.6, 1, E.inOutCubic(prog(t, printAt!, 0.27))) : 1;
+  return {showPrint, k};
+}
+
+/** Kit v3b rubber-stamp print: a flat SOLID fill (tealDark) over the full silhouette, misregistered 3 px against the ink
+ *  edge, a cream border ring inset (0.8 x ring in, 0.32 x ring wide), the elephant reversed out in cream (its lines
+ *  carved in the print colour; a plain cream silhouette when it is under ~24 px on screen). Same slam as the line print. */
+const ElephantStampSolid: React.FC<ElephantStampProps> = ({x, y, rx: rxIn, ry: ryIn, r, ring, color = palette.tealDark, at, slamAt, depth, flip = false, seed = 'stamp'}) => {
+  const t = useTime();
+  const m = useXf();
+  const rx = rxIn ?? r ?? 40;
+  const ry = ryIn ?? r ?? 40;
+  const rw = ring ?? (r !== undefined ? r * 0.17 : 14);
+  const iw = Math.max(DEPTH_INK[depth ?? 'far'], 2.4);
+  const ph = stampPhase(t, at, slamAt);
+  if (!ph) return null;
+  const sq = ry / rx;
+  // the border ring's vertical inset follows the squash (a perspective ellipse keeps a readable band top and bottom)
+  const ky = Math.min(1, sq * 1.4);
+  const ell = (a: number, b: number) => `M${x - a} ${y}a${a} ${b} 0 1 0 ${a * 2} 0a${a} ${b} 0 1 0 ${-a * 2} 0Z`;
+  const i0 = rw * 0.8;
+  const i1 = i0 + Math.max(1.5, rw * 0.32);
+  const border = ell(rx - i0, ry - i0 * ky) + ell(rx - i1, ry - i1 * ky);
+  const mr = misregScreen(seed);
+  const ml = Math.hypot(mr[0], mr[1]) || 1;
+  const off: [number, number] = [(mr[0] / ml) * 3, (mr[1] / ml) * 3];
+  const emb = rx * 1.42;
+  const embScreen = emb * sq * 1.18 * matScale(m);
+  const small = embScreen < 24;
+  const edge = <Ink d={ellipse(x, y, rx + 2, ry + 2, {seed: `${seed}/ri`, overlap: 18})} width={iw} taper={false} seed={`${seed}/ri2`} />;
+  return (
+    <>
+      {slamAt !== undefined ? <Ink d={ellipse(x, y, rx + 2, ry + 2, {seed: `${seed}/ri`, overlap: 18})} at={slamAt} dur={0.13} width={iw} taper={false} seed={`${seed}/ri`} /> : null}
+      {ph.showPrint ? (
+        <XG m={mat.about(mat.scale(ph.k), x, y)}>
+          <Fill d={ell(rx, ry)} color={color} offset={off} mode="none" seed={`${seed}/print`} />
+          <Fill d={border} rule="evenodd" color={palette.cream} offset={off} mode="none" seed={`${seed}/border`} />
+          <XG m={mat.compose(mat.translate(x + off[0], y + off[1] + ry * 0.06), mat.scale(flip ? -1 : 1, sq * 1.18), mat.translate(-x, -y))}>
+            {small ? (
+              <ElephantEmblem x={x} y={y} size={emb} mode="solid" color={palette.cream} seed={`${seed}/e`} />
+            ) : (
+              <ElephantEmblem x={x} y={y} size={emb} mode="line" bg={palette.cream} color={color} ink={Math.max(2, rx * 0.031)} seed={`${seed}/e`} />
+            )}
+          </XG>
+          {slamAt === undefined ? edge : null}
+        </XG>
+      ) : null}
+    </>
+  );
+};
+
+const ElephantStampLine: React.FC<ElephantStampProps> = ({x, y, rx: rxIn, ry: ryIn, r, ring, color = palette.sand, at, slamAt, depth, seed = 'stamp'}) => {
   const t = useTime();
   const rx = rxIn ?? r ?? 40;
   const ry = ryIn ?? r ?? 40;

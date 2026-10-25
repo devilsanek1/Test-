@@ -35,36 +35,46 @@ export type PigeonProps = {
   hopAt?: number[];
   /** Hop height (world, default 14). */
   hopH?: number;
-  /** Flies off (kit Bird flight). */
+  /** Flies off: a 2-frame crouch (turned toward the flight), then a launch along `flyTo` (direction only), the WHOLE
+   *  bird (body + head) with flapping wing strokes, nose up; speed `flySpeed` screen px / frame at launch -> 0.45 s
+   *  later (it accelerates: no ease-in, no pop-out). */
   flyAt?: number;
   flyTo?: Pt;
+  flySpeed?: [number, number];
   color?: string;
   seed?: string;
 };
 
-const wings = (t: number, ph: number) => {
-  const flap = osc(t, 7, ph) * 9;
+const wings = (t: number, ph: number, hz = 7) => {
+  const flap = osc(t, hz, ph) * 9;
   return `M-16 ${(-6 - flap).toFixed(1)}Q-8 -2 0 0Q8 -2 16 ${(-6 - flap).toFixed(1)}`;
 };
 
+/** Flight wings: two cream wing blades with ink edges over the body, beating 8 Hz from tips-down (-) to tips-up (+),
+ *  big enough to read as flapping at phone size (the landing glide's single stroke reads as a stray line in flight). */
+const FlightWings: React.FC<{t: number; ph: number; s: number; k: number; color: string; seed: string}> = ({t, ph, s, k, color, seed}) => {
+  const f = osc(t, 8, ph); // -1 .. 1
+  const tipY = -12 - f * 15;
+  const near = `M-1 -13Q-9 ${(tipY - 2).toFixed(1)} -22 ${tipY.toFixed(1)}Q-12 ${(tipY * 0.4 - 6).toFixed(1)} -3 -9Z`;
+  const far = `M3 -13Q11 ${(tipY - 2).toFixed(1)} 21 ${(tipY + 2).toFixed(1)}Q13 ${(tipY * 0.4 - 6).toFixed(1)} 5 -9Z`;
+  const w = 2.4 / (k * s);
+  return (
+    <XG m={mat.scale(s)}>
+      <Fill d={far} color={palette.tan} offset={false} mode="none" seed={`${seed}/fwf`} />
+      <Ink d={far} width={w * 0.8} taper={false} vary={0} seed={`${seed}/fwfi`} />
+      <Fill d={near} color={color} offset={false} mode="none" seed={`${seed}/fwn`} />
+      <Ink d={near} width={w * 0.9} taper={false} vary={0} seed={`${seed}/fwni`} />
+    </XG>
+  );
+};
+
 /** A small ink pigeon (the reference's birds: a cream body with a tan wing, an ink DOT eye, a tan beak; no white, no
- *  orange, no cartoon eye). The kit Bird's body plan and flight (wing strokes only), drawn at the parent's ink. */
-const InkBird: React.FC<{s: number; seed: string; flyAt?: number; flyTo: Pt; color?: string}> = ({s, seed, flyAt, flyTo, color = palette.cream}) => {
+ *  orange, no cartoon eye), drawn at the parent's ink. Static body: the Pigeon moves it (landing glide, hops, flight). */
+const InkBird: React.FC<{s: number; seed: string; color?: string}> = ({s, seed, color = palette.cream}) => {
   const t = useTime();
   const k = Math.max(1e-4, matScale(useXf()));
   const iw = 2.4 / k;
   const ph = rand(seed, 'ph') * 6.28;
-  const fly = flyAt !== undefined ? prog(t, flyAt, 1.6, E.inQuad) : 0;
-  if (fly >= 1) return null;
-  if (fly > 0) {
-    const fx = flyTo[0] * fly;
-    const fy = flyTo[1] * fly - Math.sin(fly * Math.PI) * 40;
-    return (
-      <XG m={mat.compose(mat.translate(fx, fy - 12 * s), mat.scale(s * (1 - fly * 0.4)))}>
-        <path d={wings(t, ph)} fill="none" stroke={palette.ink} strokeWidth={iw / (s * (1 - fly * 0.4))} strokeLinecap="round" strokeLinejoin="round" />
-      </XG>
-    );
-  }
   // idle: an occasional head turn
   const look = Math.sin(t * 1.3 + ph) > 0.75 ? -10 : 0;
   const w = iw / s;
@@ -83,7 +93,7 @@ const InkBird: React.FC<{s: number; seed: string; flyAt?: number; flyTo: Pt; col
   );
 };
 
-export const Pigeon: React.FC<PigeonProps> = ({x, y, s = 0.7, flip = false, land, shuffle = [], preenAt, hopAt = [], hopH = 14, flyAt, flyTo = [-260, -320], color = palette.cream, seed = 'pg'}) => {
+export const Pigeon: React.FC<PigeonProps> = ({x, y, s = 0.7, flip = false, land, shuffle = [], preenAt, hopAt = [], hopH = 14, flyAt, flyTo = [-260, -320], flySpeed = [16, 24], color = palette.cream, seed = 'pg'}) => {
   const t = useTime();
   const k = Math.max(1e-4, matScale(useXf()));
   const ph = rand(seed, 'ph') * 6.28;
@@ -101,7 +111,7 @@ export const Pigeon: React.FC<PigeonProps> = ({x, y, s = 0.7, flip = false, land
       const dir = land.from[0] > x ? -1 : 1;
       return (
         <XG m={mat.compose(mat.translate(px, py), mat.scale(dir, 1), mat.rotate(-10 * Math.sin(Math.PI * u)))}>
-          <InkBird s={s} seed={seed} flyTo={flyTo} color={color} />
+          <InkBird s={s} seed={seed} color={color} />
           <XG m={mat.compose(mat.translate(-2 * s, -16 * s), mat.scale(s * 0.9))}>
             <path d={wings(t, ph)} fill="none" stroke={palette.ink} strokeWidth={2.6 / (k * s)} strokeLinecap="round" strokeLinejoin="round" />
           </XG>
@@ -120,6 +130,34 @@ export const Pigeon: React.FC<PigeonProps> = ({x, y, s = 0.7, flip = false, land
     dy -= Math.sin(Math.PI * q) * 5;
     if (t >= sh.at + 0.02) face = sh.dx < 0;
   }
+  // ---- flying off: crouch (2 frames, turned toward the flight), then launch, the whole bird flapping, nose up
+  if (flyAt !== undefined && t >= flyAt) {
+    const d = t - flyAt;
+    const CROUCH = 2 / 30;
+    const len = Math.hypot(flyTo[0], flyTo[1]) || 1;
+    const left = flyTo[0] < 0;
+    let ox = 0;
+    let oy = 0;
+    let sqY = 1;
+    let tilt = 0;
+    if (d < CROUCH) sqY = 1 - 0.2 * Math.sin(((d / CROUCH) * Math.PI) / 2);
+    else {
+      const u = d - CROUCH;
+      const v0 = (flySpeed[0] * 30) / k;
+      const acc = ((flySpeed[1] - flySpeed[0]) * 30) / k / 0.45;
+      const dist = v0 * u + 0.5 * acc * u * u;
+      ox = (flyTo[0] / len) * dist;
+      oy = (flyTo[1] / len) * dist;
+      sqY = 1 + 0.14 * Math.exp(-u * 14); // stretch off the launch
+      tilt = -16;
+    }
+    return (
+      <XG m={mat.compose(mat.translate(x + dx + ox, y + dy + oy), mat.scale(left ? -1 : 1, 1), mat.rotate(tilt), mat.scale(1, sqY))}>
+        <InkBird s={s} seed={seed} color={color} />
+        {d >= CROUCH ? <FlightWings t={t} ph={ph} s={s} k={k} color={color} seed={seed} /> : null}
+      </XG>
+    );
+  }
   let flap = false;
   for (const h of hopAt) if (t >= h && t < h + 0.3) {
     dy -= Math.sin(prog(t, h, 0.3) * Math.PI) * hopH;
@@ -135,8 +173,8 @@ export const Pigeon: React.FC<PigeonProps> = ({x, y, s = 0.7, flip = false, land
   if (preenAt !== undefined && t >= preenAt && t < preenAt + 0.5) rot = 22 * Math.abs(Math.sin(prog(t, preenAt, 0.5) * Math.PI * 2));
   return (
     <XG m={mat.compose(mat.translate(x + dx, y + dy), mat.scale(face ? -1 : 1, sq), mat.rotate(rot))}>
-      <InkBird s={s} seed={seed} flyAt={flyAt} flyTo={face ? [-flyTo[0], flyTo[1]] : flyTo} color={color} />
-      {flap && (flyAt === undefined || t < flyAt) ? (
+      <InkBird s={s} seed={seed} color={color} />
+      {flap ? (
         <XG m={mat.compose(mat.translate(-2 * s, -16 * s), mat.scale(s * 0.9))}>
           <path d={wings(t, ph)} fill="none" stroke={palette.ink} strokeWidth={2.6 / (k * s)} strokeLinecap="round" strokeLinejoin="round" />
         </XG>
@@ -253,9 +291,11 @@ export const SillSnail: React.FC<SillSnailProps> = ({x, y, size = 24, flip = tru
 
 /** The props LoadingRing's look (peach band, ink rims, an ink arc spinning at 1.2 rev/s), but the spinner HICCUPS:
  *  at each time it stalls for 0.1 s, kicks back 50 deg and carries on, with a tiny pulse. */
-export const HiccupRing: React.FC<{x: number; y: number; r: number; hiccups: number[]; inkW: number; spin?: number}> = ({x, y, r, hiccups, inkW, spin = 1.2}) => {
+export const HiccupRing: React.FC<{x: number; y: number; r: number; hiccups: number[]; inkW: number; spin?: number; fastAt?: number[]}> = ({x, y, r, hiccups, inkW, spin = 1.2, fastAt = []}) => {
   const t = useTime();
   let ang = t * spin * 360;
+  // the page tries again: the ring spins at 2x for 0.3 s
+  for (const f of fastAt) ang += Math.max(0, Math.min(t - f, 0.3)) * spin * 360;
   let pk = 1;
   for (const h of hiccups) {
     if (t < h) continue;
@@ -286,7 +326,8 @@ export type GovBWindowProps = {
   steps: ProgressStep[];
   /** Ring hiccups. */
   hiccups: number[];
-  /** The page tries to reload: the readout row and the bar blank for 2 frames, the lettering pops back, the fill regrows. */
+  /** The page tries again: the fill snaps to 0 for one frame and regrows to its value over 0.25 s while 'updating...'
+   *  re-letters (no blank frames); the content bars are gone (reloading); the ring spins 2x for 0.3 s. */
   reloadAt?: number[];
   /** The page shakes 'no' (0.24 s, 5 world px decaying: the bar row shakes with it). */
   shakeAt?: number;
@@ -331,10 +372,9 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
   useCaptionFont();
   const t = useTime();
   const k = Math.max(1e-4, matScale(useXf()));
-  // the latest reload that has started: the readout blanks for two frames and rebuilds
+  // the latest reload that has started: the fill snaps to 0 and regrows, the lettering re-letters (no blank frames)
   let ra: number | undefined;
   for (const r of reloadAt) if (t >= r) ra = r;
-  const blank = ra !== undefined && t < ra + 2 / 30;
   const dx = shakeAt !== undefined && t >= shakeAt && t < shakeAt + 0.24 ? Math.sin(prog(t, shakeAt, 0.24) * Math.PI * 3) * 5 * (1 - prog(t, shakeAt, 0.24)) : 0;
   const bx = w - PAGE.bw - 10; // a wider left margin: Pip's ear sits by the window's lower-left corner
   // ---- the value: steps, an up-step's spring past its value, the reload regrow
@@ -348,7 +388,7 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
     else if (d < 0.35) v += 0.025 * Math.cos(((d - 0.1) / 0.25) * (Math.PI / 2)) ** 2;
     if (d < 2 / 30) flash = true;
   }
-  if (ra !== undefined && t >= ra + 2 / 30) v *= 0.15 + 0.85 * prog(t, ra + 2 / 30, 0.15, E.outCubic);
+  if (ra !== undefined) v *= prog(t, ra + 1 / 30, 0.25, E.outCubic);
   const flickOff = flickerAt !== undefined && t >= flickerAt && t < flickerAt + 0.27 && Math.floor((t - flickerAt) * 15) % 2 === 0;
   // ---- the % tile: a paper flip (old digits fold shut, new ones unfold) at each change of the shown number
   const shown = (tt: number) => Math.round(stepAt(steps, tt) * 100);
@@ -362,6 +402,8 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
       flipY = 1 - d / 0.08;
     } else flipY = (d - 0.08) / 0.08;
   }
+  // the reload: the tile reads the regrowing fill, counting 0 % -> back up (a new digit most frames)
+  if (ra !== undefined && t < ra + 1 / 30 + 0.25) pct = Math.round(v * 100);
   const iw = inkW;
   // the % tile sits at the LEFT end (over the fill it reports; away from the spinning ring), 'updating...' after it
   const tileW = 34;
@@ -370,7 +412,9 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
   const tileY = PAGE.ty - 19;
   const txtX = bx;
   const dots = '.'.repeat(1 + (Math.floor(t / 0.3) % 3));
-  const txtK = ra !== undefined && t >= ra + 2 / 30 ? 0.25 + 0.75 * prog(t, ra + 2 / 30, 0.12, E.outCubic) : 1;
+  // re-lettering after a reload: 'u', 'up', 'upd', ... over 0.25 s
+  const word = 'updating' + dots;
+  const nTxt = ra !== undefined && t < ra + 0.25 ? 1 + Math.floor(prog(t, ra, 0.25) * (word.length - 1)) : word.length;
   // content bars (the page still loading): each draws on L -> R at its time; a reload hides them again
   const bars: React.ReactNode[] = [];
   [0.84, 0.62, 0.74].forEach((f, i) => {
@@ -386,15 +430,12 @@ const Page: React.FC<{w: number; h: number; steps: ProgressStep[]; reloadAt: num
       </XG>,
     );
   });
-  if (blank) return <>{bars}</>;
   return (
     <XG m={mat.translate(dx, 0)}>
       {/* 'updating...' */}
-      <XG m={txtK !== 1 ? mat.about(mat.scale(txtK), txtX, PAGE.ty - 7) : mat.I}>
-        <text x={txtX} y={PAGE.ty} fontFamily={captionFontStack} fontSize={PAGE.fs} fill={palette.ink}>
-          {'updating' + dots}
-        </text>
-      </XG>
+      <text x={txtX} y={PAGE.ty} fontFamily={captionFontStack} fontSize={PAGE.fs} fill={palette.ink}>
+        {word.slice(0, nTxt)}
+      </text>
       {/* the % flip tile */}
       {!flickOff ? (
         <XG m={flipY !== 1 ? mat.about(mat.scale(1, Math.max(0.04, flipY)), tileX + tileW / 2, tileY + tileH / 2) : mat.I}>
@@ -433,7 +474,7 @@ export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reload
       >
         {null}
       </BrowserChrome>
-      <HiccupRing x={x + w - rr * 1.3 - 1.5} y={y + g.ringY} r={rr} hiccups={hiccups} inkW={inkW * 0.5} />
+      <HiccupRing x={x + w - rr * 1.3 - 1.5} y={y + g.ringY} r={rr} hiccups={hiccups} fastAt={reloadAt} inkW={inkW * 0.5} />
       {children}
     </>
   );
@@ -444,7 +485,7 @@ export const GovBWindow: React.FC<GovBWindowProps> = ({r, steps, hiccups, reload
 /** The set's CRT overlay (GovernmentPlaza crtContent), for windows S11 draws itself through `windowSlot`: tealDark glass
  *  with the bright band (u < line: the lit screen squashing to a line), the line (shrinking to a dot), the dot. Opaque
  *  stepped glow (cream halo, white core): no fades. */
-export const crtContent = (u: number, seed: string) => ({w, h}: {w: number; h: number}) => {
+export const crtContent = (u: number, seed: string, coreColor: string = palette.white, haloColor: string = palette.cream) => ({w, h}: {w: number; h: number}) => {
   const cx = w / 2;
   const cy = h / 2;
   const lh = Math.max(4, h * 0.065);
@@ -471,8 +512,8 @@ export const crtContent = (u: number, seed: string) => ({w, h}: {w: number; h: n
   return (
     <>
       <Fill d={rectPath(-1, -1, w + 5, h + 5)} color={palette.tealDark} offset={false} mode="none" seed={`${seed}/crtg`} />
-      {halo ? <Fill d={halo} color={palette.cream} offset={false} mode="none" seed={`${seed}/crth`} /> : null}
-      {core ? <Fill d={core} color={palette.white} offset={false} mode="none" seed={`${seed}/crtc`} /> : null}
+      {halo ? <Fill d={halo} color={haloColor} offset={false} mode="none" seed={`${seed}/crth`} /> : null}
+      {core ? <Fill d={core} color={coreColor} offset={false} mode="none" seed={`${seed}/crtc`} /> : null}
     </>
   );
 };
@@ -485,10 +526,12 @@ export const crtContent = (u: number, seed: string) => ({w, h}: {w: number; h: n
 export const PlainPane: React.FC<{r: [number, number, number, number]; inkW: number; crt?: number; seed: string}> = ({r, inkW, crt = 0, seed}) => {
   const [x, y, w, h] = r;
   const dark = crt >= 0.999;
+  // at the frame edge: the first visible frame is an already-squashed band, cream core / peach halo (no white block)
+  const cu = Math.max(crt, CRT.line * 0.85);
   return (
     <>
       <Fill d={rectPath(x, y, w, h)} color={dark ? palette.tealDark : palette.cream} offset={false} mode="none" seed={`${seed}/pane`} />
-      {crt > 0.001 && !dark ? <XG m={mat.translate(x, y)}>{crtContent(crt, `${seed}/crt`)({w, h})}</XG> : null}
+      {crt > 0.001 && !dark ? <XG m={mat.translate(x, y)}>{crtContent(cu, `${seed}/crt`, palette.cream, palette.peach)({w, h})}</XG> : null}
       <Ink d={rectPath(x, y, w, h)} width={inkW} taper={false} vary={0} seed={`${seed}/frame`} />
     </>
   );

@@ -196,7 +196,7 @@ const turnAt = (t: number, keys?: {t: number; d: 1 | 0 | -1}[]): {d: 1 | -1; k: 
 
 /** One back-view plaza citizen (kit Person with legs) with the S01 acting: walk away and stop, lean, swap to a 3/4 head
  *  toward govB, phone up / down (lit screen), point up. (x, y) = feet. */
-export const PlazaCitizen: React.FC<{p: CitizenPlan; vp: Pt; horizon: number}> = ({p, vp, horizon}) => {
+export const PlazaCitizen: React.FC<{p: CitizenPlan; vp: Pt; horizon: number; inkK?: number}> = ({p, vp, horizon, inkK = 1}) => {
   const t = useTime();
   if (p.silhouette) return <Citizen x={p.x} y={p.y} h={p.h} silhouette seed={p.seed} />;
   // walking away along the ray to the VP: feet move toward it, the figure shrinks with perspective
@@ -215,7 +215,8 @@ export const PlazaCitizen: React.FC<{p: CitizenPlan; vp: Pt; horizon: number}> =
   const s = h / FIG_H;
   const bob = p.bob ? osc(t, 0.55) * p.bob : 0; // phase 0: frame 0 = standing
   const lean = leanAt(t, p.lean);
-  const W = (p.ink ?? inkFor(p.h)) / s;
+  // inkK: the dive's ink compensation (camera.ts inkComp; 1 outside the dive)
+  const W = ((p.ink ?? inkFor(p.h)) * inkK) / s;
   const g = headGeo(p.seed);
   const coat = p.body ?? coatOf(p.seed, p.hair !== undefined);
   const parts: React.ReactNode[] = [];
@@ -423,19 +424,39 @@ export type PipPlan = {
   lookBackAt?: number;
 };
 
+/** Startle ticks (fix round 3, review: the 'own' hop read as a calm step at phone size): three short ink ticks
+ *  radiating from above Pip's head, popping in 0.3 -> 1 in 0.06 s, gone on landing. (x, y) = the burst centre. */
+const StartleTicks: React.FC<{x: number; y: number; at: number; until: number}> = ({x, y, at, until}) => {
+  const t = useTime();
+  if (t < at || t >= until) return null;
+  const k = 0.3 + 0.7 * E.outBack(1.6)(clamp((t - at) / 0.06));
+  let d = '';
+  for (const a of [-165, -125, -85]) {
+    const c = Math.cos((a * Math.PI) / 180);
+    const s = Math.sin((a * Math.PI) / 180);
+    const r0 = 12 * k;
+    const r1 = 12 * k + 17 * k;
+    d += `M${(x + c * r0).toFixed(1)} ${(y + s * r0).toFixed(1)}L${(x + c * r1).toFixed(1)} ${(y + s * r1).toFixed(1)}`;
+  }
+  return <Ink d={d} width={3.6} taper={false} seed="s01/pip/startle" />;
+};
+/** The burst centre relative to Pip's feet in the flipped stand-side pose (above the head, facing left). */
+const PIP_HEAD: Pt = [-40, -92];
+
 const EXIT_CROUCH = 0.075; // 2 frames at 30 fps (f131, f132 before the 4.43 take-off)
 const EXIT_AIR = 0.34;
 
 /** Pip on his bollard, scale 1.0 (the hop gag must read in the vista). No look to camera. */
-export const PipS01: React.FC<{p: PipPlan; seed?: number}> = ({p, seed = 11}) => {
+export const PipS01: React.FC<{p: PipPlan; seed?: number; inkK?: number}> = ({p, seed = 11, inkK = 1}) => {
   const t = useTime();
+  const lw = inkK; // the dive's ink compensation (Elephant lineWeight; 1 outside the dive)
   // the dive exit: a 2-frame crouch in the side pose on the bollard (squash +0.12: the anticipation), then the leap
   // toward the lens (up-right): a -0.08 stretch at take-off, growing 1.0 -> 1.3 along the arc, so he crosses the cut
   // toward S02's rod
   if (t >= p.exitAt - EXIT_CROUCH) {
     if (t < p.exitAt) {
       const k = (t - (p.exitAt - EXIT_CROUCH)) / EXIT_CROUCH;
-      return <Elephant x={p.x} y={p.y} scale={1} t={t} seed={seed} pose="stand-side" amount={0} squash={0.12 * Math.sin((Math.PI / 2) * Math.min(1, k * 1.6))} look={0.2} />;
+      return <Elephant x={p.x} y={p.y} scale={1} t={t} seed={seed} pose="stand-side" amount={0} squash={0.12 * Math.sin((Math.PI / 2) * Math.min(1, k * 1.6))} look={0.2} lineWeight={lw} />;
     }
     const k = clamp((t - p.exitAt) / EXIT_AIR);
     const top = Math.min(p.y, p.exitTo[1]) - 110;
@@ -444,7 +465,7 @@ export const PipS01: React.FC<{p: PipPlan; seed?: number}> = ({p, seed = 11}) =>
     const y = (1 - k) * (1 - k) * p.y + 2 * (1 - k) * k * cy + k * k * p.exitTo[1];
     const squash = -0.08 * (1 - E.outCubic(clamp(k / 0.5)));
     const grow = 1 + 0.3 * E.inOutSine(k);
-    return <Elephant x={x} y={y} scale={grow} t={t} seed={seed} pose="stand-side" amount={Math.sqrt(Math.sin(Math.PI * Math.min(1, k * 0.9 + 0.1)))} squash={squash} rotate={-10 * Math.cos(Math.PI * k)} look={0.2} />;
+    return <Elephant x={x} y={y} scale={grow} t={t} seed={seed} pose="stand-side" amount={Math.sqrt(Math.sin(Math.PI * Math.min(1, k * 0.9 + 0.1)))} squash={squash} rotate={-10 * Math.cos(Math.PI * k)} look={0.2} lineWeight={lw} />;
   }
   // the startle hop (fix round 2: no look to camera): an instant pop into the PROFILE facing govB (stand-side, flipped
   // to face left), eyes wide, a quick vertical hop with the legs spread and the ears + tail up (the leap `amount`),
@@ -458,13 +479,19 @@ export const PipS01: React.FC<{p: PipPlan; seed?: number}> = ({p, seed = 11}) =>
       const k = (t - p.hopAt) / air;
       y = p.y - 34 * 4 * k * (1 - k);
       squash -= 0.16 * Math.sin(Math.PI * k);
-      amount = 0.45 + 0.55 * Math.sin(Math.PI * Math.min(1, k * 1.4));
+      // fix round 3: the leap spread (ears + tail up, legs fore / aft) peaks at 1 ON the apex
+      amount = 0.45 + 0.55 * Math.pow(Math.sin(Math.PI * k), 0.6);
     } else {
       const d = t - p.landAt;
       squash += 0.22 * Math.exp(-d * 11) * Math.cos(d * Math.PI * 2 * 3.2);
       amount = 0.2 + 0.25 * Math.exp(-d * 8);
     }
-    return <Elephant x={p.x} y={y} scale={1} t={t} seed={seed} pose="stand-side" flip expression="wide" amount={amount} look={0.9} squash={squash} />;
+    return (
+      <>
+        <Elephant x={p.x} y={y} scale={1} t={t} seed={seed} pose="stand-side" flip expression="wide" amount={amount} look={0.9} squash={squash} />
+        <StartleTicks x={p.x + PIP_HEAD[0]} y={y + PIP_HEAD[1]} at={p.hopAt + 0.03} until={p.landAt} />
+      </>
+    );
   }
   let look = 0;
   let squash = p.flinchAt !== undefined ? popSwitch(t, p.flinchAt) * 1.25 : 0;

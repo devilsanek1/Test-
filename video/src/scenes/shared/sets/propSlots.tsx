@@ -200,8 +200,9 @@ export const NoticeboardPlaceholder: React.FC<{x: number; y: number; w: number; 
 
 // ---------------------------------------------------------------- P2 ElephantStamp, P14 Calendar
 
-/** -> props ElephantStamp: perspective ellipse print (S02) or round corner stamp (S05). `at` = the slam. */
-export const ElephantStampSlot: React.FC<{x: number; y: number; rx: number; ry: number; ring?: number; at?: number; seed?: Seed}> = ({x, y, rx, ry, ring = 14, at, seed = 'stamp'}) => <ElephantStamp x={x} y={y} rx={rx} ry={ry} ring={ring} slamAt={at} seed={seed} />;
+/** -> props ElephantStamp: perspective ellipse print (S03 BlueprintStreet: the solid rubber-stamp print, kit v3b) or
+ *  round corner stamp (BlueprintWall S02 / S05: keeps the 'line' badge). `at` = the slam. */
+export const ElephantStampSlot: React.FC<{x: number; y: number; rx: number; ry: number; ring?: number; at?: number; print?: 'solid' | 'line'; flip?: boolean; seed?: Seed}> = ({x, y, rx, ry, ring = 14, at, print, flip, seed = 'stamp'}) => <ElephantStamp x={x} y={y} rx={rx} ry={ry} ring={ring} slamAt={at} print={print} flip={flip} seed={seed} />;
 
 /** -> props Calendar (P14): tear-off calendar 70 x 80 (x, y = top-left). Default pages: four season pages. */
 export const CalendarSlot: React.FC<{x: number; y: number; w?: number; h?: number; at?: number; pages?: CalPage[]; tearAt?: number[]; seed?: Seed}> = ({x, y, w = 70, h = 80, at, pages, tearAt, seed = 'cal'}) => (

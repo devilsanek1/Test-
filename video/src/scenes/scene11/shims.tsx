@@ -1,27 +1,27 @@
-// S11 local pieces around / instead of shared kit pieces. No opacity anywhere: rotations, scales, pops.
+// S11 local pieces around shared kit pieces. No opacity anywhere: rotations, scales, pops.
 //   NoteBreeze  the J6 sticky note flutters on its adhesive top edge in a breeze (a damped swing about its top) and jolts
 //               under the pen as the strike starts. Applied OUTSIDE the shared StickyNote so the prop stays untouched.
 //   NoteFlight  the note's drop from behind govB's cornice (clipped there), blank back out, flipping to the lettered
 //               face on the slap (the shared StickyNote's flutter shows the lettering in flight and pops in mid-air).
-//   NoteStrike  a heavier J6 strike-through (StickyNote's own is ~3 px, the same weight as the lettering).
+//   NoteStrike  the J6 strike-through: ONE marker stroke (~4 px) along the x-height centre (StickyNote's own is ~3 px
+//               and has no width option), the letters stay readable above and below it.
 //   StepRipple  the SunPress ripple with a stepped width (PressRipple thins to sub-pixel grey: reads as a fade).
-//   S11Padlock  STAND-IN for the set's govB padlock rig (GovernmentPlaza draws govB's sill ink AFTER its WindowRig, so the
-//               two sill lines strike through the padlock and the tag: sets-lane z-order fix pending). Same anchor
-//               (PLAZA.gov.govB.padlock), the props ShutterPadlock look, but an OCHRE body with a 3 px misregistered
-//               fill (the sand body vanished into the darkened facade) at ~1.2x size, a rock + a cream sparkle glint.
-//   S11Tag      STAND-IN for the set's lettered 'back soon' tag rig: the props BackSoonTag lettered look in CREAM (label
-//               style), hung from a nail on the shutter face a little above the rail so it clears the bottom UI zone.
-// Swap back to the set's rigs (gov.govB.padlockAt / tagAt / tagProps) once the sill is drawn under them.
+//   PadlockRock the S01 padlock (the shared ShutterPadlock, S01's size / seed) rocking on its shackle (+-6 deg): Bit's
+//               weight / tap. ShutterPadlock has no rock of its own.
+//   TagTwirl    the S01 lettered 'back soon' tag (the shared BackSoonTag, one line, white) twirling in the breeze as a
+//               NARROWING (to 15 % width and back, then a smaller one): never past edge-on, so the lettering never
+//               leaves a blank card (BackSoonTag's own twirlAt shows its blank back for ~4 frames).
+//   backSoonW   the width of a one-line lettered BackSoonTag whose total drop (string + tag) is a given height.
 
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {ease as E, prog, springAt, springs, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {blob, circle, line, poly, roundRect, Pt} from '../../lib/sketch';
+import {blob, Pt} from '../../lib/sketch';
 import {mat, useXf, XG} from '../../lib/xf';
 import {captionFontStack, measureCaption, useCaptionFont} from '../../lib/font';
-import {matScale, pendulum} from '../shared/props/common';
+import {matScale} from '../shared/props/common';
 import {layoutText} from '../shared/props/Labels';
 
 // ---------------------------------------------------------------- NoteBreeze
@@ -103,10 +103,10 @@ export const NoteFlight: React.FC<{
 
 // ---------------------------------------------------------------- NoteStrike
 
-/** The J6 strike-through drawn by the scene (StickyNote's own strike is 1.3 x its outline = ~3 px: it melts into the
- *  lettering at phone size). A marker scratch-out at `widthPx` (screen px, ~2 x the lettering stroke): one stroke left
- *  -> right overshooting both ends by ~10 px on a slight upward slope, then a quick return pass under it, both inside
- *  `dur`. The geometry mirrors StickyNote's text layout (layoutText with its paper padding) so it lands on `strike`. */
+/** The J6 strike-through drawn by the scene: ONE marker stroke at `widthPx` (screen px, ~4: inkBold-ish) along the
+ *  x-height centre of `strike`, flat along the note's text line (the note's own rotation), overshooting each end by
+ *  `overPx` (~7 px), drawn left -> right inside `dur`. No return pass: the letters stay readable above and below it.
+ *  The geometry mirrors StickyNote's text layout (layoutText with its paper padding) so it lands on `strike`. */
 export const NoteStrike: React.FC<{
   x: number;
   y: number;
@@ -119,8 +119,9 @@ export const NoteStrike: React.FC<{
   at: number;
   dur?: number;
   widthPx?: number;
+  overPx?: number;
   seed?: string;
-}> = ({x, y, w, h, lines, fontSize, strike, rot, at, dur = 0.15, widthPx = 5.5, seed = 's11/strike'}) => {
+}> = ({x, y, w, h, lines, fontSize, strike, rot, at, dur = 0.15, widthPx = 4, overPx = 7, seed = 's11/strike'}) => {
   useCaptionFont();
   const t = useTime();
   const k = Math.max(1e-4, matScale(useXf()));
@@ -133,13 +134,13 @@ export const NoteStrike: React.FC<{
   const pre = (measureCaption(ln.slice(0, i0), 100) / 100) * L.fs;
   const sub = (measureCaption(strike, 100) / 100) * L.fs;
   const x0 = -w / 2 + (w - L.widths[li]) / 2 + pre;
-  const ly = -h / 2 + L.base0 + li * (L.pitch ?? 1.08) * L.fs - L.fs * 0.3;
-  const ov = 10 / k; // ~10 px past each end
-  const go = `M${(x0 - ov).toFixed(1)} ${(ly + 2.6).toFixed(1)}L${(x0 + sub + ov).toFixed(1)} ${(ly - 2.6).toFixed(1)}`;
-  const back = `M${(x0 + sub + ov * 0.4).toFixed(1)} ${(ly + 1.2).toFixed(1)}L${(x0 + ov * 0.6).toFixed(1)} ${(ly + 4.4).toFixed(1)}`;
+  // the x-height centre: ~0.24 em above the baseline
+  const ly = -h / 2 + L.base0 + li * (L.pitch ?? 1.08) * L.fs - L.fs * 0.24;
+  const ov = overPx / k;
+  const go = `M${(x0 - ov).toFixed(1)} ${(ly + 0.5).toFixed(1)}L${(x0 + sub + ov).toFixed(1)} ${(ly - 0.5).toFixed(1)}`;
   return (
     <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot))}>
-      <Ink d={go + back} at={at} dur={dur} pace="free" order="seq" width={widthPx / k} vary={0.04} taper={false} seed={seed} />
+      <Ink d={go} at={at} dur={dur} pace="free" width={widthPx / k} vary={0.04} taper={false} seed={seed} />
     </XG>
   );
 };
@@ -176,139 +177,49 @@ export const Sparkle: React.FC<{x: number; y: number; r: number; at: number[]; d
   );
 };
 
-// ---------------------------------------------------------------- S11Padlock
+// ---------------------------------------------------------------- PadlockRock
 
-export type S11PadlockProps = {
-  /** Body centre (world): PLAZA.gov.govB.padlock. */
-  x: number;
-  y: number;
-  /** Total height (shackle + body), world. ShutterPadlock's default is 28. */
-  size?: number;
-  /** Pops on (springs.pop); the shackle snaps shut at lockAt (default at + 0.1). */
-  at: number;
-  lockAt?: number;
-  /** Rocks on its shackle (+-6 deg, decaying, 0.35 s): Bit shifting his weight / tapping. */
-  rockAt?: number[];
-  /** Body colour (default ochre: brass against the darkened facade). */
-  color?: string;
-  /** Ink (screen px). */
-  inkPx?: number;
-  seed?: string;
-};
-
-/** Shackle-top offset (world, for size s) above the body centre: where Bit sits. */
+/** Shackle-top offset (world, for a ShutterPadlock of total height `size`) above the body centre: where Bit sits. */
 export const padlockShackleTop = (size: number) => (-9 - 6.5 - 1) * (size / 28);
 
-export const S11Padlock: React.FC<S11PadlockProps> = ({x, y, size = 28, at, lockAt, rockAt = [], color = palette.ochre, inkPx = 2.6, seed = 's11/pl'}) => {
+/** Rocks its child (the shared ShutterPadlock at body centre x, y) about the shackle top, where it hangs from the rail:
+ *  +-6 deg, 1.5 swings, decaying over 0.5 s at each `rockAt`. */
+export const PadlockRock: React.FC<{x: number; y: number; size: number; rockAt: number[]; children?: React.ReactNode}> = ({x, y, size, rockAt, children}) => {
   const t = useTime();
-  const k = Math.max(1e-4, matScale(useXf()));
-  if (t < at) return null;
-  const s = size / 28;
-  const iw = inkPx / (k * s);
-  const pop = springAt(t, at, springs.pop);
-  const la = lockAt ?? at + 0.1;
-  const sh = -4 * (1 - springAt(t, la, springs.snappy));
-  // rock about the shackle top (it hangs from the rail there)
   let rot = 0;
   for (const r of rockAt) if (t >= r && t < r + 0.5) rot += 6 * Math.sin(prog(t, r, 0.5) * Math.PI * 3) * Math.exp(-(t - r) * 6);
-  const top = padlockShackleTop(size) / s;
-  // misregistered fill: 3 px right / 2 px down on screen, constant whatever the zoom
-  const off: Pt = [3 / (k * s), 2 / (k * s)];
-  return (
-    <XG m={mat.compose(mat.translate(x, y), mat.scale(s * pop), mat.about(mat.rotate(rot), 0, top))}>
-      <XG m={mat.translate(0, sh)}>
-        <Ink d="M-6.5 -1V-9A6.5 6.5 0 0 1 6.5 -9V-1" width={iw * 1.35} taper={false} seed={`${seed}/sh`} />
-      </XG>
-      <Fill d={roundRect(-12, -3, 24, 18, 3.5)} color={color} offset={off} mode="none" seed={`${seed}/b`} />
-      <Ink d={roundRect(-12, -3, 24, 18, 3.5, {closed: false, seed: `${seed}/bi`})} width={iw} seed={`${seed}/bi`} />
-      {/* keyhole: a cream plate with the ink hole, so it reads on the ochre */}
-      <Fill d={blob(0, 6, 5.2, 6.2, {seed: `${seed}/kp`})} color={palette.cream} offset={false} mode="none" seed={`${seed}/kp`} />
-      <Fill d={blob(0, 4.6, 1.9, 1.9, {seed: `${seed}/k`}) + 'M-0.9 5.5L-1.4 9.6H1.4L0.9 5.5Z'} color={palette.ink} offset={false} mode="none" seed={`${seed}/k`} />
-      <Ink d="M-9 10L-7.2 1.5" width={iw * 0.8} color={palette.cream} taper={false} seed={`${seed}/g0`} />
-    </XG>
-  );
+  if (rot === 0) return <>{children}</>;
+  return <XG m={mat.about(mat.rotate(rot), x, y + padlockShackleTop(size))}>{children}</XG>;
 };
 
-// ---------------------------------------------------------------- S11Tag
+// ---------------------------------------------------------------- TagTwirl
 
-export type S11TagProps = {
-  /** Hang point (world): the nail. The tag hangs below it. */
-  x: number;
-  y: number;
-  /** Tag width (world). */
-  size: number;
-  text: [string, string];
-  /** Appears and swings -16 -> 0 deg over 0.5 s. */
-  at: number;
-  tapAt?: number[];
-  /** Twirls once about its string (0.45 s: scaleX through edge-on, the blank back shows). */
-  twirlAt?: number[];
-  inkPx?: number;
-  color?: string;
-  seed?: string;
-};
-
-/** The lettered 'back soon' tag (props BackSoonTag lettered geometry) in cream, on a nail. */
-export const S11Tag: React.FC<S11TagProps> = ({x, y, size: W, text, at, tapAt = [], twirlAt = [], inkPx = 2.2, color = palette.cream, seed = 's11/tag'}) => {
-  useCaptionFont();
+/** The 'back soon' tag twirling in a breeze WITHOUT ever turning its blank back to us: a narrowing about its hang point
+ *  (x) to 15 % width and back over 0.25 s, then a smaller one (to 55 %) over 0.2 s. The first narrowest point is at
+ *  `at + 0.125`. The lettering stays on (narrowed): no blank card. */
+export const TagTwirl: React.FC<{x: number; y: number; twirlAt: number[]; children?: React.ReactNode}> = ({x, y, twirlAt, children}) => {
   const t = useTime();
-  const k = Math.max(1e-4, matScale(useXf()));
-  if (t < at) return null;
-  let a = pendulum(t, at, -16, 0.5, 0.8);
-  for (const tp of tapAt) a += pendulum(t, tp, 14, 0.5, 0.9);
-  let tw = 1;
-  for (const tr of twirlAt) if (t >= tr && t < tr + 0.45) tw = Math.cos(prog(t, tr, 0.45, E.inOutSine) * Math.PI * 2);
-  const twx = Math.abs(tw) < 0.06 ? 0.06 : tw;
-  const pop = Math.min(1, 0.3 + springAt(t, at, springs.pop) * 0.7);
-  const iw = inkPx / k;
-  const m2 = Math.max(measureCaption(text[0], 100), measureCaption(text[1], 100)) / 100;
-  const fs = Math.min((W * 0.8) / m2, W * 0.34);
-  const n = Math.min(W * 0.14, fs * 0.6);
-  const str = Math.max(5, fs * 0.3);
-  const H = n + fs * 0.42 + fs * 2.0 + fs * 0.28;
-  const body: Pt[] = [
-    [-W / 2, str + n],
-    [-W / 2 + n, str],
-    [W / 2 - n, str],
-    [W / 2, str + n],
-    [W / 2, str + H],
-    [-W / 2, str + H],
-  ];
-  const bodyD = `M${body.map((q) => `${q[0].toFixed(1)} ${q[1].toFixed(1)}`).join('L')}Z`;
-  const ey = str + n * 0.62;
-  const er = Math.max(1.8, fs * 0.1);
-  const ty = str + n + fs * 0.32 + fs * 0.72;
-  const off: Pt = [-3 / k, 2 / k];
-  return (
-    <>
-      {/* the nail head on the shutter */}
-      <path d={blob(x, y - 0.5, 1.8, 1.8, {seed: `${seed}/nail`})} fill={palette.ink} />
-      <XG m={mat.compose(mat.translate(x, y), mat.rotate(a), mat.scale(pop))}>
-        <Ink d={line(0, 0, 0, ey - er, {over: [0, 0], seed: `${seed}/str`})} width={iw * 0.6} taper={false} seed={`${seed}/str`} />
-        <XG m={mat.scale(twx, 1)}>
-          <Fill d={bodyD} color={color} offset={off} mode="none" seed={`${seed}/f`} />
-          <Ink d={poly(body, {closed: true, over: 2, seed: `${seed}/o`})} width={iw} taper={false} seed={`${seed}/o`} />
-          <Ink d={circle(0, ey, er, {seed: `${seed}/h`})} width={iw * 0.6} taper={false} seed={`${seed}/h`} />
-          {tw > 0.3 ? (
-            <>
-              <text x={0} y={ty} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink} textAnchor="middle">
-                {text[0]}
-              </text>
-              <text x={0} y={ty + fs * 0.98} fontFamily={captionFontStack} fontSize={fs} fill={palette.ink} textAnchor="middle">
-                {text[1]}
-              </text>
-            </>
-          ) : null}
-        </XG>
-      </XG>
-    </>
-  );
+  let sx = 1;
+  for (const a of twirlAt) {
+    const d = t - a;
+    if (d >= 0 && d < 0.25) sx = 1 - 0.85 * Math.sin((d / 0.25) * Math.PI);
+    else if (d >= 0.25 && d < 0.45) sx = 1 - 0.45 * Math.sin(((d - 0.25) / 0.2) * Math.PI);
+  }
+  if (sx === 1) return <>{children}</>;
+  return <XG m={mat.about(mat.scale(sx, 1), x, y)}>{children}</XG>;
 };
 
-/** Height (world) of an S11Tag of width W hanging from its nail, string included (for the UI-zone check). */
-export function s11TagDrop(W: number, text: [string, string]): number {
-  const m2 = Math.max(measureCaption(text[0], 100), measureCaption(text[1], 100)) / 100;
-  const fs = Math.min((W * 0.8) / m2, W * 0.34);
-  const n = Math.min(W * 0.14, fs * 0.6);
-  return Math.max(5, fs * 0.3) + n + fs * 2.7;
+// ---------------------------------------------------------------- backSoonW
+
+/** Width (world) of a ONE-line lettered BackSoonTag ('back soon') whose whole drop (string + tag) is `drop` (world),
+ *  from the props layout (fs = 0.84 W / m, notch min(0.14 W, 0.6 fs), string max(6, 0.36 fs), body notch + 1.72 fs). */
+export function backSoonW(drop: number, text = 'back soon'): number {
+  const m1 = measureCaption(text, 100) / 100;
+  const dropOf = (W: number) => {
+    const fs = Math.min((W * 0.84) / m1, W * 0.34);
+    return Math.max(6, fs * 0.36) + Math.min(W * 0.14, fs * 0.6) + fs * 1.72;
+  };
+  let W = 100;
+  for (let i = 0; i < 6; i++) W *= drop / dropOf(W);
+  return W;
 }

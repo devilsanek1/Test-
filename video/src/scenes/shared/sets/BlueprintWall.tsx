@@ -177,7 +177,7 @@ export const BlueprintWall: React.FC<BlueprintWallProps> = ({drawAt, lock = {}, 
       <Ink d={G.dims} width={SI.hair} at={d(0.45)} taper={false} seed={`${seed}/dims`} />
       <Ink d={G.title} width={SI.hair} at={d(0.6)} taper={false} seed={`${seed}/title`} />
       <Ink d={G.sheetEdge} width={SI.far} at={d(0.7)} taper={false} seed={`${seed}/edge`} />
-      <ElephantStampSlot x={BLUEPRINT_WALL.stamp.x} y={BLUEPRINT_WALL.stamp.y} rx={BLUEPRINT_WALL.stamp.r} ry={BLUEPRINT_WALL.stamp.r} ring={7} at={stampAt} seed={`${seed}/stamp`} />
+      <ElephantStampSlot x={BLUEPRINT_WALL.stamp.x} y={BLUEPRINT_WALL.stamp.y} rx={BLUEPRINT_WALL.stamp.r} ry={BLUEPRINT_WALL.stamp.r} ring={7} at={stampAt} print="line" seed={`${seed}/stamp`} />
       {/* the paper's glint sits low on the right: the top margin stays clean (v3) */}
       <Ink d={glintAt(bx + bw - 60, by + 470, 40, `${seed}/gl`)} width={SI.hair} taper={false} />
       {bottomRail ? (

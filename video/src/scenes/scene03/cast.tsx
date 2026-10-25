@@ -20,11 +20,15 @@ import type {Pt} from '../../lib/sketch';
 // ---------------------------------------------------------------- Pip
 
 const PIP_SCALE = 1.2;
-/** Where Pip is on the hard cut: S02 hops him off its rod perch toward the lens at cut(password)-0.04; this being a
- *  hard cut, S03 picks him up already lower and closer (world (700, 1000) = screen (700, 1010) at the rest camera),
- *  still rising a little (vy0) and dropping onto the plan: dx 280, dy 405 in 0.362 s, g ~7,000 px/s2, landing at
- *  ~80 px/frame (motion_spec #25: g 3,000-8,000, <= ~93 px/frame). */
-const PIP_FROM: Pt = [700, 1000];
+/** Where Pip is on the hard cut: S02 hops him off its rod perch (screen ~(843, 689)) toward the lens at
+ *  cut(password)-0.04. Fix round 2: S03 picks him up HIGH, against the far haze above the horizon (world (830, 905) =
+ *  screen (830, 915) at the rest camera, clear of the sun's disc; was (700, 1010), on the horizon line, where he read as
+ *  a small elephant standing far away), already falling (vy0 +400 px/s: S02's down-left take-off continued) and dropping
+ *  onto the stamp's rump: dx -410, dy 500 in 0.362 s, g ~5,300 px/s2, landing at ~78 px/frame (motion_spec #25: g
+ *  3,000-8,000, <= ~93 px/frame).
+ *  His shadow grows on the plan under the landing point while he falls (PipShadow). */
+const PIP_FROM: Pt = [830, 905];
+const PIP_VY0 = 400;
 /** Fix round 1: Pip sits on the stamp's RUMP (its right end), not its centre (BLUEPRINT.pip (350, 1420) hid ~80 % of
  *  the print): the reversed-out elephant faces left, so its trunk, ear and legs stay clear (and his ear clears the title
  *  card). Screen at the 1.04 lock: (410.0, 1438.4), where he crouches on the cut (S04 continues from there). */
@@ -52,10 +56,22 @@ const landSq = (t: number, at: number, amp = 0.24) => {
   return amp * Math.exp(-d * 11) * Math.cos(d * Math.PI * 2 * 3.2);
 };
 
+/** Pip's shadow on the plan under his landing point: a flat tan ellipse that GROWS as he falls (so the drop reads as a
+ *  drop toward the plan, not a slide along the horizon); he lands on it; the stamp's print covers it. Ground layer. */
+export const PipShadow: React.FC<{b: Beats}> = ({b}) => {
+  const t = useTime();
+  if (t >= b.contact) return null;
+  const u = E.inQuad(clamp((t - b.cut) / (b.pipLand - b.cut)));
+  const rx = lerp(14, 50, u);
+  const ry = lerp(5, 15, u);
+  const [x, y] = [PIP_AT[0] - 2, PIP_AT[1] + 3];
+  return <Fill d={`M${x - rx} ${y}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0Z`} color={palette.tan} offset={false} mode="none" seed="s03/pipsh" />;
+};
+
 export const PipS03: React.FC<{b: Beats}> = ({b}) => {
   const t = useTime();
   const t0 = b.cut; // picks S02's hop-off up at the hard cut (S02 takes off at cut(password)-0.04)
-  const printLand = b.stamp + 0.4; // the stamp's print lands (ring 0.13 + slam 0.27)
+  const printLand = b.contact; // the stamp's print CONTACT (ring 0.06 + drop 0.10): the jolt and the bounce start here
   const b1 = {at: printLand, T: 0.4, h: 64};
   const b2 = {at: printLand + 0.4, T: 0.25, h: 16};
   const settle = b2.at + b2.T;
@@ -66,7 +82,7 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
   let rotate = 0;
   if (t < b.pipLand) {
     // the drop from S02's rod: falling down-left onto the bare plan, nose dipping
-    [x, y] = drop(t, t0, b.pipLand - t0, PIP_FROM, PIP_AT, -150);
+    [x, y] = drop(t, t0, b.pipLand - t0, PIP_FROM, PIP_AT, PIP_VY0);
     const u = clamp((t - t0) / (b.pipLand - t0));
     squash = -0.16 * (1 - u) - 0.04;
     rotate = lerp(-6, 14, u);
@@ -74,17 +90,21 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
     y -= bounce(t, b1.at, b1.T, b1.h) + bounce(t, b2.at, b2.T, b2.h);
     if (t >= b1.at && t < b1.at + b1.T) squash = -0.12 * Math.sin(Math.PI * clamp((t - b1.at) / b1.T));
     squash += landSq(t, b.pipLand, 0.26) + landSq(t, b2.at, 0.18) + landSq(t, settle, 0.12);
-    // the slam's impact jolt just before the bounce
-    if (t >= printLand - 0.06 && t < printLand) squash += 0.14 * Math.sin(Math.PI * ((t - (printLand - 0.06)) / 0.06));
-    // 'loves': the proud puff (chest out: a stretch pulse -0.06 -> 0 over 0.3 s, on top of the pose pop)
-    if (t >= b.loves && t < b.loves + 0.3) squash += -0.06 * (1 - E.outCubic((t - b.loves) / 0.3));
+    // the slam's impact jolt AT contact (two frames squashed), as the bounce launches him
+    if (t >= printLand && t < printLand + 0.07) squash += 0.16 * Math.sin(Math.PI * ((t - printLand) / 0.07));
+    // 'loves': the proud puff: chest out (a 1.10 -> 1.0 stretch over 0.3 s on top of the pose pop) and chin up (a
+    // -7 deg lean back, out-back in, held to proudOff, then back)
+    if (t >= b.loves && t < b.loves + 0.3) squash += -0.1 * (1 - E.outCubic((t - b.loves) / 0.3));
+    if (t >= b.loves) rotate = -7 * E.outBack(1.6)(prog(t, b.loves, 0.16)) * (1 - E.inOutSine(prog(t, b.proudOff, 0.14)));
     // the hop-off crouch (S04 owns the leap: take-off after the cut)
     if (t >= b.pipHop) squash += 0.2 * Math.sin((Math.min(1, (t - b.pipHop) / 0.14) * Math.PI) / 2);
   }
   const keys: PoseKey[] = [
     {t: -10, pose: 'stand-side', amount: 0.85},
     {t: b.pipLand, pose: 'sit-back', look: 0.25},
-    {t: b.loves, pose: 'sit-front', expression: 'happy', look: 0},
+    // 'loves': pride, straight-faced: the trunk curls UP (a toot: trunk-up with its two tiny puff marks), happy
+    {t: b.loves, pose: 'trunk-up', expression: 'happy', look: 0},
+    {t: b.proudOff, pose: 'sit-front', expression: 'happy', look: 0},
     {t: b.run, pose: 'sit-front', expression: 'happy', look: 0.7},
     {t: b.pipHop, pose: 'stand-side', amount: 0},
   ];
@@ -216,22 +236,26 @@ export const StreetLife: React.FC<{b: Beats}> = ({b}) => {
 };
 
 /** The two near walkers: big back-view figures cropped by the frame edges, sliding in on 'everyone' (0.3 s, out cubic),
- *  turning toward the press house at w42+0.30 (a small lean toward the centre) and bobbing on 'run'. */
+ *  turning toward the press house at w42+0.30 (a small lean toward the centre) and bobbing on 'run'.
+ *  Fix round 2 (they read as flat slabs): both carry their arms again (the near arm: sleeve seam, cuff, sand hand), the
+ *  left one a HOOD over short hair and a diagonal bag STRAP, the right one her bun over a coat COLLAR; each has the 3 px
+ *  white rim strip on its sun side (the sun is between them: the left figure's right edge, the right figure's left
+ *  edge); and both sit 40 px lower so the corners hold head + shoulders + upper arm. */
 export const NearWalkers: React.FC<{b: Beats}> = ({b}) => {
   const t = useTime();
   const slide = (side: number, delay: number) => (1 - E.outCubic(prog(t, b.everyone + delay, 0.3))) * 260 * side;
   if (t < b.everyone) return null;
   const turn = (side: number) => -side * 3.2 * E.outBack(1.4)(prog(t, b.heads, 0.3));
   const bobY = (delay: number) => (t >= b.run + delay && t < b.run + delay + 0.26 ? -7 * Math.sin(Math.PI * ((t - b.run - delay) / 0.26)) : 0);
-  const L: Pt = [64, 1492];
-  const R: Pt = [1036, 1432];
+  const L: Pt = [64, 1532];
+  const R: Pt = [1036, 1472];
   return (
     <>
-      <XG m={mat.compose(mat.translate(slide(-1, 0) , bobY(0)), mat.about(mat.rotate(turn(-1)), L[0], L[1] + 400))}>
-        <EdgeOnlooker x={L[0]} y={L[1]} head={104} hair="short" body={palette.teal} rim="right" arms={false} seed="s03/nearL" />
+      <XG m={mat.compose(mat.translate(slide(-1, 0), bobY(0)), mat.about(mat.rotate(turn(-1)), L[0], L[1] + 400))}>
+        <EdgeOnlooker x={L[0]} y={L[1]} head={104} hair="short" acc={['hood', 'strap']} body={palette.teal} rim="right" arms="near" seed="s03/nearL" />
       </XG>
       <XG m={mat.compose(mat.translate(slide(1, 0.04), bobY(0.04)), mat.about(mat.rotate(turn(1)), R[0], R[1] + 400))}>
-        <EdgeOnlooker x={R[0]} y={R[1]} head={112} hair="bun" body={palette.tan} rim="left" arms={false} seed="s03/nearR" />
+        <EdgeOnlooker x={R[0]} y={R[1]} head={112} hair="bun" acc={['collar']} body={palette.tan} rim="left" arms="near" seed="s03/nearR" />
       </XG>
     </>
   );

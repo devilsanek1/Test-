@@ -1,101 +1,24 @@
-// S01 local stand-ins for GovernmentPlaza changes requested from the sets lane (fix round 2, docs/scenes/S01.md). Each
-// one draws ON TOP of the set's own piece through the set's `wrap` layers (same world coords, same paths), so it can be
-// dropped the moment the kit does the same thing:
-//   S01FarCivic       the far civic skyline with a TWO-value dark step (far #A2C8B6 -> #6E9A88, nearer #84B09C ->
-//                     #4E786A) and tealDark clock faces / lanterns once off (kit CIVIC_FILL steps only ~1.3:1: 'Europe'
-//                     did not read on a phone). Same PLAZA_CIVIC geometry and left-to-right timing as the set.
-//   LanternOff        a switched-off lantern = ink-dark glass + a one-frame squash pop (the kit steps cream -> sand,
-//                     ~1.15:1): the lamp lantern on 'their', govB's dome lantern on 'PURPOSE'.
-//   GovCShutter       govC's HALF shutter with the props RollerShutter's partial-drop jolt (`stopAt`: the kit's
-//                     ShutterRig passes h x stop and no stopAt, so the half shutter bounced like a short full one), with
-//                     its padlock and lettered tag (same props, seeds and rail offsets as the set's rigs).
+// S01 local stand-ins (docs/scenes/S01.md). Each one draws through the set's `wrap` layers in the set's own world
+// coords, so it can be dropped the moment the kit does the same thing:
+//   LanternOff   a switched-off lantern = ink-dark glass + a one-frame squash pop (the kit steps cream -> sand,
+//                ~1.15:1): govB's dome lantern on 'PURPOSE', govA's door lanterns on 'their'.
+//   S01Shutter   govA / govB / govC's shutter hardware drawn by the scene (fix round 3; was GovCShutter for govC only):
+//                props RollerShutter (govC with the partial-drop jolt `stopAt`: the kit's ShutterRig drops h x stop
+//                with a full-closure bounce), the lettered tag, and the scene's BIG CREAM padlock (`S01Padlock`, the
+//                kit's ShutterPadlock is a sand body with no colour prop: tan on tan, ~12 px on a phone). Each lock
+//                click jolts the curtain 3 px (one frame). Ink is compensated in the dive (camera.ts `inkComp`).
+// Fix round 3: S01FarCivic is gone (the kit's v3b far city ends on a horizon line over the plaza's far steps, three
+// depth tiers, lit window dots that step off with the fill), and so is the lamp's LanternOff (cropped by the frame
+// edge it read as a glitch; the set's cream -> sand step stays, the 'their' light event moved to govA's door).
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {clamp, ease as E, useTime} from '../../lib/time';
 import {Fill} from '../../lib/Fill';
-import {rectPath} from '../../lib/sketch';
+import {Ink} from '../../lib/Ink';
+import {rectPath, roundRect} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
-import {GovEvents, HALF, PLAZA, PLAZA_CIVIC, SI} from '../shared/sets';
-import {BackSoonTag, RollerShutter, ShutterPadlock} from '../shared/props';
-
-// ---------------------------------------------------------------- far civic skyline, two-value dark step
-
-/** [lit, dark] per tier (tier 0 = far, 1 = nearer). Lit = the kit's; dark = two haze values down (1.7:1 / 2.1:1), the
- *  two tiers still 1.6:1 apart when both are dark. */
-export const S01_CIVIC_FILL: [string, string][] = [
-  ['#A2C8B6', '#6E9A88'],
-  ['#84B09C', '#4E786A'],
-];
-
-/** The set's FarCivic paths (GovernmentPlaza CIV, mirrored 1:1 from PLAZA_CIVIC). */
-const CIV = (() => {
-  const base = PLAZA.horizon + 4;
-  const f = (n: number) => n.toFixed(1);
-  return PLAZA_CIVIC.map((c) => {
-    const {x0, x1, top, cx} = c;
-    let d = '';
-    let lantern = '';
-    let face = '';
-    if (c.kind === 'dome') {
-      const rx = (x1 - x0) / 2 - 3;
-      const ry = 30;
-      const lanH = 18;
-      const domeTop = top + lanH + 6;
-      const drumTop = domeTop + ry;
-      d =
-        `M${f(x0)} ${base}L${f(x0)} ${f(drumTop + 5)}L${f(x0 - 3)} ${f(drumTop + 5)}L${f(x0 - 3)} ${f(drumTop)}` +
-        `L${f(cx - rx)} ${f(drumTop)}A${f(rx)} ${ry} 0 0 1 ${f(cx + rx)} ${f(drumTop)}` +
-        `L${f(x1 + 3)} ${f(drumTop)}L${f(x1 + 3)} ${f(drumTop + 5)}L${f(x1)} ${f(drumTop + 5)}L${f(x1)} ${base}Z` +
-        `M${f(cx - 5)} ${f(domeTop + 3)}L${f(cx - 5)} ${f(top + 6)}L${f(cx)} ${f(top)}L${f(cx + 5)} ${f(top + 6)}L${f(cx + 5)} ${f(domeTop + 3)}Z`;
-      lantern = rectPath(cx - 2.5, top + 8, 5, 9);
-    } else if (c.kind === 'temple') {
-      const corn = top + 22;
-      d =
-        `M${f(x0)} ${base}L${f(x0)} ${f(corn + 6)}L${f(x0 - 4)} ${f(corn + 6)}L${f(x0 - 4)} ${f(corn)}L${f(cx)} ${f(top)}` +
-        `L${f(x1 + 4)} ${f(corn)}L${f(x1 + 4)} ${f(corn + 6)}L${f(x1)} ${f(corn + 6)}L${f(x1)} ${base}Z` +
-        `M${f(x0 - 3)} ${f(corn + 46)}h${f(x1 - x0 + 6)}v6h${f(-(x1 - x0 + 6))}Z`;
-    } else {
-      const bel = top + 34;
-      d =
-        `M${f(x0 + 4)} ${base}L${f(x0 + 4)} ${f(bel + 6)}L${f(x0)} ${f(bel + 6)}L${f(x0)} ${f(bel)}L${f(cx)} ${f(top)}` +
-        `L${f(x1)} ${f(bel)}L${f(x1)} ${f(bel + 6)}L${f(x1 - 4)} ${f(bel + 6)}L${f(x1 - 4)} ${base}Z`;
-      const fy = bel + 26;
-      face = `M${f(cx - 8)} ${f(fy)}a8 8 0 1 0 16 0a8 8 0 1 0 -16 0Z`;
-    }
-    return {...c, d, lantern, face};
-  });
-})();
-const CIV_DRAW = CIV.map((c, i) => [c.tier, i] as const)
-  .sort((a, b) => a[0] - b[0] || a[1] - b[1])
-  .map((q) => q[1]);
-const LANTERN_IDX = CIV.map((c, i) => CIV.slice(0, i).filter((q) => 'lantern' in q && q.lantern).length);
-
-/** Drawn in the set's 'far' layer AFTER its FarCivic (same paths): nothing until the first step (frame 0 = the set's
- *  own lit skyline, pixel-identical for S12's seam), then all six in the set's paint order with S01's dark values.
- *  `offAt` steps them left to right 0.06 s apart (= GovernmentPlaza civicOffAt); a lantern goes off at
- *  lanternsOffAt + its index x 0.06 (= civicLanternsOffAt) and shows tealDark glass. */
-export const S01FarCivic: React.FC<{offAt: number; lanternsOffAt: number; seed?: string}> = ({offAt, lanternsOffAt, seed = 'plaza'}) => {
-  const t = useTime();
-  if (t < offAt) return null;
-  return (
-    <>
-      {CIV_DRAW.map((i) => {
-        const c = CIV[i];
-        const dark = t >= offAt + i * 0.06;
-        const [lit, drk] = S01_CIVIC_FILL[c.tier];
-        const lantern = 'lantern' in c && c.lantern ? c.lantern : '';
-        const lOff = lantern ? t >= lanternsOffAt + LANTERN_IDX[i] * 0.06 : false;
-        return (
-          <React.Fragment key={c.id}>
-            <Fill d={c.d} color={dark ? drk : lit} offset={false} mode="none" seed={`${seed}/s01civ${i}`} />
-            {c.face ? <Fill d={c.face} color={dark ? palette.tealDark : HALF.daySky} offset={false} mode="none" seed={`${seed}/s01civf${i}`} /> : null}
-            {lantern ? <Fill d={lantern} color={lOff ? palette.tealDark : palette.cream} offset={false} mode="none" seed={`${seed}/s01civl${i}`} /> : null}
-          </React.Fragment>
-        );
-      })}
-    </>
-  );
-};
+import {GovEvents, PLAZA, SI} from '../shared/sets';
+import {BackSoonTag, DEPTH_INK, RollerShutter} from '../shared/props';
 
 // ---------------------------------------------------------------- a lantern switching off
 
@@ -118,28 +41,88 @@ export const LanternOff: React.FC<{r: [number, number, number, number]; at: numb
     </XG>
   );
 };
-/** The lamp's glass (set: lanternRect [34, 1048, 32, 38] inside its ink rect [32, 1046, 36, 42]), inset 2 px. */
-export const LAMP_GLASS: [number, number, number, number] = [PLAZA.lamp.x - 14, PLAZA.lamp.lantern[1] - 16, 28, 34];
 /** govB's dome lantern glass (set: rect [508, 612, 20, 40] under the cap to (518, 600)), inset 3 px. */
 export const DOME_GLASS: [number, number, number, number] = [511, 615, 14, 34];
 
-// ---------------------------------------------------------------- govC: the half shutter with the partial-drop jolt
+// ---------------------------------------------------------------- the big cream padlock
 
-/** The set's WindowRig hardware for govC with a real partial drop: RollerShutter over the FULL window with `stopAt`
- *  (gravity fall 0.16 x sqrt(stop) s, then the 1-frame jolt +5 / -2 px), the padlock and the lettered tag hanging from
- *  the half rail (y + (stop - 1) x h, like the set). Same props / seeds as GovernmentPlaza's ShutterSlot / PadlockSlot
- *  / BackSoonSlot. Pass the set govC WITHOUT shutterAt / padlockAt / tagAt (keep shutterStop: the set then draws only
- *  the rolled-up box, which this redraws identically on top). */
-export const GovCShutter: React.FC<{ev: GovEvents; seed?: string}> = ({ev, seed = 'plaza'}) => {
-  const g = PLAZA.gov.govC;
+/** A padlock that reads at phone size (fix round 3, review: the kit's 36 px sand lock hung on the clay wall under the
+ *  rail = tan on tan, ~12 px specks): `size` = total height (shackle + body), a CREAM body with 3.4 px ink and an ink
+ *  keyhole, hung over the shutter's bottom rail and last slats (tealDark behind: the strongest contrast in the facade).
+ *  (x, y) = the body's centre. Pops 0.3 -> 1.3 -> 1 (0.13 s); the shackle snaps down 5 units at `lockAt`; on each
+ *  `glintAt` two cream rays pop off the body's upper-left corner onto the dark slats (0.25 s). `ink` = stroke factor
+ *  (the dive compensation). */
+export const S01Padlock: React.FC<{x: number; y: number; size: number; at?: number; lockAt?: number; glintAt?: number; ink?: number; seed: string}> = ({x, y, size, at, lockAt, glintAt, ink = 1, seed}) => {
+  const t = useTime();
+  if (at !== undefined && t < at) return null;
+  // local frame: body 40 x 30 centred on (0, 0), shackle 26 wide rising 20 above the body: total 50 units
+  const s = size / 50;
+  let pop = 1;
+  if (at !== undefined) {
+    const u = t - at;
+    pop = u < 0.05 ? 0.3 + 1.0 * E.outCubic(u / 0.05) : u < 0.13 ? 1.3 - 0.3 * E.inOutSine((u - 0.05) / 0.08) : 1;
+  }
+  const la = lockAt ?? (at !== undefined ? at + 0.05 : undefined);
+  const sh = la !== undefined && t < la ? -5 : 0;
+  const W = (SI.mid * ink) / s;
+  const glint = glintAt !== undefined && t >= glintAt && t < glintAt + 0.25;
+  const gk = glint ? 0.3 + 0.7 * E.outBack(1.8)(clamp((t - (glintAt as number)) / 0.05)) : 0;
+  return (
+    <XG m={mat.compose(mat.translate(x, y), mat.scale(s * pop))}>
+      <XG m={mat.translate(0, sh)}>
+        <Ink d="M-10 -14V-24A10 10 0 0 1 10 -24V-14" width={W * 1.25} taper={false} seed={`${seed}/sh`} />
+      </XG>
+      <Fill d={roundRect(-20, -15, 40, 30, 5)} color={palette.cream} offset={false} mode="none" seed={`${seed}/b`} />
+      <Ink d={roundRect(-20, -15, 40, 30, 5, {seed: `${seed}/bi`})} width={W} taper={false} seed={`${seed}/bi`} />
+      <Fill d="M-3.4 -3a3.4 3.4 0 1 0 6.8 0a3.4 3.4 0 1 0 -6.8 0ZM-1.8 -1L-2.6 8H2.6L1.8 -1Z" color={palette.ink} offset={false} mode="none" seed={`${seed}/k`} />
+      {glint ? (
+        <XG m={mat.about(mat.scale(gk), -20, -15)}>
+          <Ink d="M-24 -19L-36 -31M-26 -9L-42 -11" width={W * 1.15} color={palette.cream} taper={false} seed={`${seed}/gl`} />
+        </XG>
+      ) : null}
+    </XG>
+  );
+};
+
+// ---------------------------------------------------------------- the shutter hardware, drawn by the scene
+
+/** Padlock size (total height) per building: govB (the dive target) 58, govA / govC 52. */
+export const S01_PADLOCK_SIZE: Record<'govA' | 'govB' | 'govC', number> = {govA: 52, govB: 58, govC: 52};
+/** The lock click (shackle snap + curtain jolt) after each padlock's pop starts. */
+export const LOCK_CLICK = 0.05;
+
+/** One-frame curtain jolt (px, down) at a lock click: +3, then +1, then rest. */
+const jolt = (t: number, at?: number) => {
+  if (at === undefined || t < at) return 0;
+  const f = (t - at) * 30;
+  return f < 1 ? 3 : f < 2 ? 1 : 0;
+};
+
+/** The set's WindowRig hardware for one building, drawn by the scene on top of the set (which then gets the building's
+ *  events WITHOUT shutterAt / padlockAt / tagAt / glintAt and still draws the rolled-up shutter box, redrawn identically
+ *  here): props RollerShutter over the FULL window with `stopAt` (govC: gravity fall 0.16 x sqrt(stop) s, then the
+ *  1-frame jolt +5 / -2 px), the lettered tag hanging from the rail (same props / seeds as the set's BackSoonSlot), and
+ *  `S01Padlock` over the rail. The padlock's click jolts the curtain 3 px (the rail, tag and lock ride it). `ink` =
+ *  stroke factor (the dive compensation). */
+export const S01Shutter: React.FC<{id: 'govA' | 'govB' | 'govC'; ev: GovEvents; ink?: number; seed?: string}> = ({id, ev, ink = 1, seed = 'plaza'}) => {
+  const t = useTime();
+  const g = PLAZA.gov[id];
   const [x, y, w, h] = g.window;
   const stop = clamp(ev.shutterStop ?? ev.stopAt ?? 1, 0.05, 1);
-  const dy = (stop - 1) * h;
+  const click = ev.padlockAt !== undefined ? ev.padlockAt + LOCK_CLICK : undefined;
+  const j = jolt(t, click);
+  const dy = (stop - 1) * h + j;
+  const rail = y + stop * h + j; // the bottom rail's bottom edge once the curtain is down
+  const px = ev.padlockProps?.x ?? g.padlock[0];
   return (
     <>
-      <RollerShutter x={x} y={y} w={w} h={h} box={18} slamAt={ev.shutterAt} stopAt={stop} width={SI.mid} seed={`${seed}/govC/sh`} />
-      {ev.tagAt !== undefined ? <BackSoonTag x={g.tag[0]} y={g.tag[1] + dy} at={ev.tagAt} tapAt={ev.tagTapAt} seed={`${seed}/govC/tag`} {...ev.tagProps} /> : null}
-      {ev.padlockAt !== undefined ? <ShutterPadlock x={g.padlock[0]} y={g.padlock[1] + dy} size={28} at={ev.padlockAt} glintAt={ev.glintAt} seed={`${seed}/govC/pl`} {...ev.padlockProps} /> : null}
+      {stop < 1 ? (
+        <RollerShutter x={x} y={y} w={w} h={h + j / stop} box={18} slamAt={ev.shutterAt} stopAt={stop} width={SI.mid * ink} seed={`${seed}/${id}/sh`} />
+      ) : (
+        <RollerShutter x={x} y={y} w={w} h={h + j} box={18} slamAt={ev.shutterAt} width={SI.mid * ink} seed={`${seed}/${id}/sh`} />
+      )}
+      {ev.tagAt !== undefined ? <BackSoonTag at={ev.tagAt} tapAt={ev.tagTapAt} width={DEPTH_INK.far * ink} seed={`${seed}/${id}/tag`} {...ev.tagProps} x={ev.tagProps?.x ?? g.tag[0]} y={ev.tagProps?.y !== undefined ? ev.tagProps.y + j : g.tag[1] + dy} /> : null}
+      {ev.padlockAt !== undefined ? <S01Padlock x={px} y={rail - 20} size={S01_PADLOCK_SIZE[id]} at={ev.padlockAt} lockAt={click} glintAt={ev.glintAt} ink={ink} seed={`s01/${id}/pl`} /> : null}
     </>
   );
 };
