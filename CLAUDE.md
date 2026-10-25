@@ -11,7 +11,7 @@ the video and the reason) and commit it. Post-publish numbers go in its "Perform
 the playbook if its Maintenance trigger fires (7+ days since "Last compacted" with new entries, or over 150 lines).
 
 Top rules (details in the playbook):
-- Show playable video at every stage, never only stills. Lock the story (sketch animatic) before building; polish last.
+- From the sketch animatic (G3) on, show one playable video per gate, never only stills; before that, text/audio only (no MP4s). Lock the story (sketch animatic) before building; polish last.
 - Every video gets ONE core line (its own step, G0.5: brainstorm, critique, owner picks) before the script is written.
 - The first 2-5 s matter most: state the payoff in words on frame 0. Target 30-45 s.
 - Everyday spoken language, no AI-sounding phrasing; scripts come with detailed emotional cues.

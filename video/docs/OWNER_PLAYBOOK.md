@@ -99,8 +99,10 @@ Format: **rule** — why / evidence (video, date).
 - **Captions are burned in;** platform auto-captions stay off. — v1.
 
 ## Process and communication
-- **Show a PLAYABLE video (with voice) at every stage, never only stills.** The owner saw only pictures until the
-  final and could not steer. Use the gate loop in `docs/PIPELINE_V2.md`. — v1, 2026-10-25.
+- **Playable video starts at the sketch animatic (G3); from then on every gate is a video, never only stills.** The owner
+  saw only pictures until v1's final and could not steer. Before G3 (topic, core line, script, voice) deliver text and
+  audio only, with no MP4s, and never several versions of one video unless asked. — v1 2026-10-25; narrowed by the owner
+  on v3 ("why are there multiple versions and why is it needed at all at this point?"), 2026-10-25.
 - **Lock the story with a clean sketch/animatic before big commitments; push all polish late.** — v1, 2026-10-25.
 - **Progress updates about every 30 min while working, covering all threads and including visuals, even unfinished ones.** With the new
   pipeline, the gate video is the update and between gates a one-line status. — v1.
