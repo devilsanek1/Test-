@@ -89,6 +89,11 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
   4 `scene-polish` workflows (scripts/scene-polish.js): fresh review of the current state, fix rounds carry the kit
   notes, S12 built after S01. Workflow resume does NOT replay concurrent scene runs (call order changes), so after
   any future interruption relaunch scene-polish for the unfinished scenes instead of resuming.
+- ~05:00: second usage limit (reset 05:30). Lost: the A1 rounds of S03/S05 (fix r1 partly done), S07/S08 (nothing),
+  S11 (r2 reviews), S12 (r1 reviews), S04's final fix (partly done). Kept: S09 / S10 first polish (7.5 / 8 +fix).
+  05:35: tree OK (tsc clean); relaunched A1 as 3 workflows (lower concurrency, fewer agents to lose):
+  wf_c49e57be-ed9 (S11 -> S12), wf_757a8d7d-ce1 (S03, S05, S04), wf_f6eafcb1-f45 (S08, S07, S09, S10); 2 rounds each.
+  Half-res preview of the whole film rendering to out/preview_0540.mp4.
 
 ## Other
 
