@@ -1,7 +1,0 @@
-0 0 /home/user/Test-/video/review/checkins/0443/S10/f00000.png
-1 30 /home/user/Test-/video/review/checkins/0443/S10/f00030.png
-1.99 60 /home/user/Test-/video/review/checkins/0443/S10/f00060.png
-2.99 90 /home/user/Test-/video/review/checkins/0443/S10/f00090.png
-3.99 120 /home/user/Test-/video/review/checkins/0443/S10/f00120.png
-4.98 149 /home/user/Test-/video/review/checkins/0443/S10/f00149.png
-[render-frames] S10 (src/entry-film.ts): bundle 5.3s, 6 frames in 1.7s (291 ms/frame incl. page setup, concurrency 2, scale 0.5)

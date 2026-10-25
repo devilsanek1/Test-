@@ -1,7 +1,0 @@
-0 0 /home/user/Test-/video/review/checkins/0702/S03/f00000.png
-0.96 29 /home/user/Test-/video/review/checkins/0702/S03/f00029.png
-1.93 58 /home/user/Test-/video/review/checkins/0702/S03/f00058.png
-2.89 87 /home/user/Test-/video/review/checkins/0702/S03/f00087.png
-3.85 116 /home/user/Test-/video/review/checkins/0702/S03/f00116.png
-4.82 145 /home/user/Test-/video/review/checkins/0702/S03/f00145.png
-[render-frames] S03 (src/entry-film.ts): bundle 3.6s, 6 frames in 1.8s (298 ms/frame incl. page setup, concurrency 2, scale 0.5)

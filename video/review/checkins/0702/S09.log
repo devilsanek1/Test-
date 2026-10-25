@@ -1,7 +1,0 @@
-0 0 /home/user/Test-/video/review/checkins/0702/S09/f00000.png
-0.86 26 /home/user/Test-/video/review/checkins/0702/S09/f00026.png
-1.72 52 /home/user/Test-/video/review/checkins/0702/S09/f00052.png
-2.58 77 /home/user/Test-/video/review/checkins/0702/S09/f00077.png
-3.43 103 /home/user/Test-/video/review/checkins/0702/S09/f00103.png
-4.29 129 /home/user/Test-/video/review/checkins/0702/S09/f00129.png
-[render-frames] S09 (src/entry-film.ts): bundle 3.9s, 6 frames in 1.7s (290 ms/frame incl. page setup, concurrency 2, scale 0.5)

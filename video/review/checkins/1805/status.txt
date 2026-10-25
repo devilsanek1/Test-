@@ -1,4 +1,0 @@
-ok   S07
-ok   CineDemo
-ok   KitDemo
-ok   SharedKitSheet

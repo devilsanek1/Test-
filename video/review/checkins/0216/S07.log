@@ -1,7 +1,0 @@
-0 0 /home/user/Test-/video/review/checkins/0216/S07/f00000.png
-0.35 11 /home/user/Test-/video/review/checkins/0216/S07/f00011.png
-0.7 21 /home/user/Test-/video/review/checkins/0216/S07/f00021.png
-1.05 32 /home/user/Test-/video/review/checkins/0216/S07/f00032.png
-1.41 42 /home/user/Test-/video/review/checkins/0216/S07/f00042.png
-1.76 53 /home/user/Test-/video/review/checkins/0216/S07/f00053.png
-[render-frames] S07 (src/entry-film.ts): bundle 5.6s, 6 frames in 1.8s (306 ms/frame incl. page setup, concurrency 2, scale 0.5)
