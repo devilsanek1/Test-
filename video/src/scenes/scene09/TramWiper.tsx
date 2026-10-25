@@ -7,7 +7,7 @@
 // covers x +-670 top to bottom (Film's 'half').
 
 import React from 'react';
-import {Fill, Ink, palette, useTime, line, rect, rectPath, roundRect, WiperComponent, WiperProps} from '../../lib';
+import {Fill, Ink, palette, useTime, line, rect, rectPath, roundRect, captionFontStack, WiperComponent, WiperProps} from '../../lib';
 import {Elephant} from '../../lib/mascot';
 import {B, S09_END, WIPE_DUR} from './beats';
 import {wipeEdgeX} from '../../lib/cine/wipers';
@@ -69,19 +69,53 @@ const TramBody: React.FC<{x: number; dir: 'left' | 'right'}> = ({x, dir}) => {
   const lampX = L / 2 - 70;
   const lampY = stripeY + 150;
   const sx = dir === 'right' ? 1 : -1;
+  // fix round 2 detail (the tram fills the frame for ~0.3 s): a roof rail on short posts + a folded pantograph (its
+  // head stays under the caption floor), panel seams with overshoot on the lower body, misregistered window fills, a
+  // destination board in the caption hand (a pauser joke for S10's Old Quarter), wheels + bogie under the skirt line,
+  // rivet ticks, and a one-sided peach rim along the roof from the dawn sun behind it.
+  const rail = rectPath(-L / 2 + 60, y0 - 12, L - nose - 120, 5);
+  let posts = '';
+  for (let px = -L / 2 + 90; px < L / 2 - nose - 70; px += 150) posts += `M${px} ${y0 - 8}V${y0}`;
+  const pc = -L / 2 + 470; // pantograph base centre
+  const panto = `M${pc - 60} ${y0 - 4}L${pc - 8} ${y0 - 22}L${pc + 46} ${y0 - 6}M${pc - 8} ${y0 - 22}L${pc + 30} ${y0 - 26}M${pc - 4} ${y0 - 26}H${pc + 70}`;
+  let seams = '';
+  for (let i = 0; i < 5; i++) {
+    const qx = -L / 2 + 150 + i * 250 + (i >= 2 ? 40 : 0);
+    seams += line(qx, stripeY + 40, qx, skirtY - 6, {seed: `s9tram/sm${i}`, over: [4, 10]});
+  }
+  seams += line(-L / 2, stripeY + 330, L / 2 - 20, stripeY + 330, {seed: 's9tram/smh', over: [0, 12]});
+  let rivets = '';
+  for (let rx = -L / 2 + 40; rx < L / 2 - 40; rx += 46) rivets += `M${rx} ${skirtY + 22}v6`;
+  const wheelY = skirtY + 190;
+  const wheels = [-L / 2 + 230, -L / 2 + 420, L / 2 - 420, L / 2 - 230];
+  const wheelD = wheels.map((wx) => `M${wx - 72} ${wheelY}a72 72 0 1 0 144 0a72 72 0 1 0 -144 0Z`).join('');
+  const hubD = wheels.map((wx) => `M${wx - 16} ${wheelY}a16 16 0 1 0 32 0a16 16 0 1 0 -32 0Z`).join('');
+  const board = {x: L / 2 - 372, y: y0 + 30, w: 300, h: 48};
   return (
     <g transform={`translate(${x.toFixed(1)} 0) scale(${sx} 1)`}>
       <Fill d={body} color={palette.teal} offset={[5, 4]} mode="snap" seed="s9tram/body" />
       <Fill d={rectPath(-L / 2, y0, L - nose * 0.6, 34)} color={palette.tealDark} offset={false} mode="snap" seed="s9tram/roof" />
+      <Fill d={rail} color={palette.tealDark} offset={false} mode="snap" seed="s9tram/rail" />
+      <Fill d={rectPath(-L / 2 + 20, y0 - 1, L - nose - 40, 6)} color={palette.peach} offset={false} mode="snap" seed="s9tram/rim" />
       <Fill d={door} color={palette.tealDark} offset={false} mode="snap" seed="s9tram/door" />
-      <Fill d={wins.join('') + ws + doorGlass} color={palette.mintPale} offset={false} mode="snap" seed="s9tram/win" />
-      <Fill d={rectPath(-L / 2, stripeY, L, 34)} color={palette.sand} offset={false} mode="snap" seed="s9tram/stripe" />
+      <Fill d={wins.join('') + ws + doorGlass} color={palette.mintPale} offset={[6, 4]} mode="snap" seed="s9tram/win" />
+      <Fill d={rectPath(-L / 2, stripeY, L, 34)} color={palette.sand} offset={[4, 3]} mode="snap" seed="s9tram/stripe" />
       <Fill d={rectPath(-L / 2, skirtY, L, 600)} color={palette.tealDark} offset={false} mode="snap" seed="s9tram/skirt" />
+      <Fill d={wheelD} color={palette.ink} offset={false} mode="snap" seed="s9tram/wheels" />
+      <Fill d={hubD} color={palette.sand} offset={false} mode="snap" seed="s9tram/hubs" />
       <Fill d={roundRect(lampX - 34, lampY, 68, 44, 18)} color={palette.peach} offset={false} mode="snap" seed="s9tram/lamp" />
-      <Fill d={roundRect(L / 2 - 210, y0 + 38, 150, 34, 6)} color={palette.cream} offset={false} mode="snap" seed="s9tram/sign" />
+      <Fill d={roundRect(board.x, board.y, board.w, board.h, 6)} color={palette.cream} offset={[3, 2]} mode="snap" seed="s9tram/sign" />
+      <g transform={`translate(${board.x + board.w / 2} ${board.y + board.h * 0.74}) scale(${sx} 1)`}>
+        <text x={0} y={0} textAnchor="middle" fontFamily={captionFontStack} fontSize={34} fill={palette.ink}>
+          Old Quarter · v5.6
+        </text>
+      </g>
+      <Ink d={posts + panto} width={W * 0.62} taper={false} seed="s9tram/panto" />
+      <Ink d={seams + rivets} width={W * 0.5} taper={false} seed="s9tram/seams" />
+      <Ink d={wheels.map((wx) => `M${wx - 72} ${wheelY}a72 72 0 1 0 144 0a72 72 0 1 0 -144 0Z`).join('') + line(wheels[0], wheelY, wheels[1], wheelY, {seed: 's9tram/b1', over: [10, 10]}) + line(wheels[2], wheelY, wheels[3], wheelY, {seed: 's9tram/b2', over: [10, 10]})} width={W * 0.6} color={palette.sand} taper={false} seed="s9tram/wi" />
       <Ink d={body} width={W} taper={false} seed="s9tram/bodyI" />
       <Ink d={mull + ws + line(-L / 2, stripeY, L / 2, stripeY, {seed: 's9tram/s1', over: [0, 0]}) + line(-L / 2, stripeY + 34, L / 2, stripeY + 34, {seed: 's9tram/s2', over: [0, 0]}) + line(-L / 2, skirtY, L / 2, skirtY, {seed: 's9tram/s3', over: [0, 0]}) + rect(dx, winTop - 18, 136, 1100, {seed: 's9tram/d', over: 4, edges: 'tlr'}) + `M${dx + 68} ${winTop - 10}V${winTop + 1060}`} width={W * 0.72} taper={false} seed="s9tram/det" />
-      <Ink d={roundRect(lampX - 34, lampY, 68, 44, 18) + rect(L / 2 - 210, y0 + 38, 150, 34, {seed: 's9tram/sg', over: 3})} width={W * 0.6} taper={false} seed="s9tram/li" />
+      <Ink d={roundRect(lampX - 34, lampY, 68, 44, 18) + rect(board.x, board.y, board.w, board.h, {seed: 's9tram/sg', over: 4})} width={W * 0.6} taper={false} seed="s9tram/li" />
       {/* window glints: two short diagonal strokes per window (cream on mintPale reads as glass) */}
       <Ink d={wins.map((_, i) => {
         const wx = x0 + i * (ww + gap) + (i >= 2 ? 120 : 0);

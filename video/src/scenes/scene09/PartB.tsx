@@ -7,15 +7,18 @@
 // the hill; as the tram comes in he leaps up onto its roof (the Wiper carries him into S10).
 
 import React from 'react';
-import {Fill, Ink, Sun, Bird, palette, useTime, ease as E, prog, lerp, clamp, mat, XG, rand, line, polyPath} from '../../lib';
+import {Fill, Ink, Sun, Bird, palette, useTime, ease as E, prog, lerp, clamp, mat, XG, rand, line, polyPath, sunPoseAt} from '../../lib';
 import {Elephant, hop, popSwitch} from '../../lib/mascot';
+import type {PoseName} from '../../lib/mascot';
 import {TerraceHill, TERRACE, terraceDoor, LayerWrap} from '../shared/sets';
 import {Bit, Snail} from '../shared/props';
 import {B} from './beats';
 import {a2ToB, a2ToBMat, camAt, toScreen} from './camera';
-import {A2Actors, PA, pipA, PipFigure} from './PartA';
+import {A2Actors, PA, pipA, pipRidePoint} from './PartA';
 import {A2Ground, DoorMatch} from './matchcut';
 import {Glint} from './shims';
+import {A2Ghost} from './ghost';
+import {EXTEND_AT, FixedPool, House4Tag, NearLodRow0, TerraceDress} from './terrace';
 
 // ---------------------------------------------------------------- small B-world beats
 
@@ -92,10 +95,6 @@ const RidgeRims: React.FC = () => {
   return <Fill d={d} color={palette.peach} offset={false} mode="snap" seed="s9ridgeRims" />;
 };
 
-/** The cream light path from the fixed door ends on the near pavement (y ~1700, a rounded pool end) instead of
- *  running out of the frame bottom like a beam. */
-const PATH_END = polyPath([[488, 1692], [530, 1716], [572, 1692], [618, 2084], [442, 2084]]);
-
 // ---------------------------------------------------------------- the near layer (SCREEN space, in the plaza)
 
 /** A sand stone post with a tealDark cap slab on a short kerb that runs off the right edge (screen px). Pip sits on the
@@ -152,39 +151,32 @@ const NearLayer: React.FC<{children?: React.ReactNode}> = ({children}) => {
         <Fill rect={G.cap} color={palette.tealDark} seed="s9post/c" />
         <Ink d={G.ink} width={NW} taper={false} seed="s9post/i" />
         <Snail x={NEAR.snail.x} y={CAP + 1} size={NEAR.snail.size} popAt={B.tags - 0.3} crawl={{at: crawlAt, speed: 7}} flip depth="mid" seed="s9snail" />
-        {t >= B.tags - 0.26 ? <Bit x={snailX + 1} y={CAP + 1 - 16.8} size={14} state="ride" flip hopAt={B.tags - 0.26} hopH={0.6} seed="s9bitB" /> : null}
+        {t >= SNAIL_HOP + SNAIL_HOP_DUR ? <Bit x={snailX + 1} y={CAP + 1 - 16.8} size={BIT_SNAIL} state="ride" flip hopAt={SNAIL_HOP + SNAIL_HOP_DUR - 0.3} hopH={0} seed="s9bit" /> : null}
       </XG>
       {children}
     </>
   );
 };
 
-// ---------------------------------------------------------------- Pip in Part B (screen space)
+// ---------------------------------------------------------------- Pip + Bit in Part B (screen space)
 
-const PipB: React.FC = () => {
-  const t = useTime();
+/** Pip in Part B's screen space from his 'install' hop on (before it he is an A2 actor drawn through the map, so the
+ *  hidden cut holds him to the pixel): the hop off the mapped ledge onto the post (his line weight and size ease from
+ *  the map's to the screen's), sitting on the post, the boarding leap. `lw` = Elephant lineWeight. */
+type PipShot = {x: number; y: number; scale: number; pose: PoseName; squash: number; rotate: number; amount?: number; look?: number; lw: number};
+
+function pipShot(t: number): PipShot | null {
   const t0 = B.install;
+  if (t < t0) return null;
   const air = 0.42;
-  const mapped = (tt: number) => {
-    const st = pipA(tt);
-    const c = camAt(tt);
-    const [sx, sy] = toScreen(c, a2ToB([st.x, st.y]));
-    return {st, x: sx, y: sy, scale: PA.pip.scale * 0.25 * c.zoom};
-  };
-  if (t < t0) {
-    const m = mapped(t);
-    const crouch = t >= t0 - 0.14 ? 0.18 * Math.sin(((t - (t0 - 0.14)) / 0.14) * (Math.PI / 2)) : 0;
-    return <PipFigure st={{...m.st, x: m.x, y: m.y, squash: m.st.squash + crouch}} scale={m.scale} t={t} />;
-  }
   const to = {x: NEAR.pip.x, y: CAP + 1};
   // the boarding: crouch, then a big leap straight up past the tram's roof line (screen y 600) before its nose reaches
   // him; he lands on the roof at boardLand, where the Wiper takes over
   if (t >= B.board - 0.14) {
     if (t >= B.boardLand) return null;
     if (t < B.board) {
-      // the crouch (anticipation) on the post
       const a = (t - (B.board - 0.14)) / 0.14;
-      return <Elephant x={to.x} y={to.y} scale={NEAR.pip.scale} pose="sit-back" look={-0.4} squash={0.22 * Math.sin((a * Math.PI) / 2)} t={t} seed={9} />;
+      return {x: to.x, y: to.y, scale: NEAR.pip.scale, pose: 'sit-back', look: -0.4, squash: 0.22 * Math.sin((a * Math.PI) / 2), rotate: 0, lw: 1};
     }
     // straight up, decelerating to 14 px above the roof line, then down onto it (feet never above y 586: his head stays
     // under the caption box)
@@ -192,21 +184,53 @@ const PipB: React.FC = () => {
     const up = 0.78;
     const y = k < up ? lerp(to.y, 586, 1 - Math.pow(1 - k / up, 2)) : lerp(586, 602, Math.pow((k - up) / (1 - up), 2));
     const squash = k < 0.3 ? -0.22 * (1 - k / 0.3) - 0.04 : -0.04;
-    return <Elephant x={to.x} y={y} scale={NEAR.pip.scale} pose="stand-side" amount={Math.sqrt(Math.sin(Math.PI * Math.min(1, k)))} squash={squash} look={-0.4} t={t} seed={9} />;
+    return {x: to.x, y, scale: NEAR.pip.scale, pose: 'stand-side', amount: Math.sqrt(Math.sin(Math.PI * Math.min(1, k))), squash, look: -0.4, rotate: 0, lw: 1};
   }
-  const m0 = mapped(t0);
-  const h = hop({t, t0, dur: air, from: {x: m0.x, y: m0.y}, to, height: 46});
+  const st0 = pipA(t0);
+  const c0 = camAt(t0);
+  const [x0, y0] = toScreen(c0, a2ToB([st0.x, st0.y]));
+  const s0 = PA.pip.scale * 0.25 * c0.zoom;
+  const h = hop({t, t0, dur: air, from: {x: x0, y: y0}, to, height: 46});
   const k = clamp((t - t0) / air);
-  const scale = lerp(m0.scale, NEAR.pip.scale, E.inOutSine(k));
-  if (h.k < 1) {
-    return <Elephant x={h.x} y={h.y} scale={scale} pose="stand-side" amount={h.spread} squash={h.squash} rotate={h.rotate} t={t} seed={9} />;
-  }
+  const e = E.inOutSine(k);
+  if (h.k < 1) return {x: h.x, y: h.y, scale: lerp(s0, NEAR.pip.scale, e), pose: 'stand-side', amount: h.spread, squash: h.squash, rotate: h.rotate, lw: lerp(0.25 * c0.zoom, 1, e)};
   // on the post, watching the hill; the sigh (a quick sit-back squash pulse before the boarding crouch)
   const sigh = t >= B.sigh ? 0.08 * Math.sin(Math.min(1, (t - B.sigh) / 0.16) * Math.PI) : 0;
   // he looks up the hill at the flag on 'single', then along the rows of empty tags on 'server'
   const look = t < B.single + 0.1 ? -0.25 : t < B.server + 0.18 ? -0.7 : 0.45;
   const turn = popSwitch(t, B.single + 0.1) * 0.6 + popSwitch(t, B.server + 0.18) * 0.6;
-  return <Elephant x={to.x} y={to.y} scale={NEAR.pip.scale} pose="sit-back" look={look} squash={h.squash + sigh + turn} t={t} seed={9} />;
+  // Bit hops off his head onto the snail: a little push-off squash
+  const push = t >= SNAIL_HOP && t < SNAIL_HOP + 0.1 ? 0.06 * Math.sin(((t - SNAIL_HOP) / 0.1) * Math.PI) : 0;
+  return {x: to.x, y: to.y, scale: NEAR.pip.scale, pose: 'sit-back', look, squash: h.squash + sigh + turn + push, rotate: 0, lw: 1};
+}
+
+const PipB: React.FC = () => {
+  const t = useTime();
+  const p = pipShot(t);
+  if (!p) return null;
+  return <Elephant x={p.x} y={p.y} scale={p.scale} pose={p.pose} amount={p.amount} squash={p.squash} rotate={p.rotate} look={p.look} lineWeight={p.lw} t={t} seed={9} />;
+};
+
+/** Bit hops off Pip's head onto the snail's shell (the snail has popped onto the cap at tags-0.30). */
+const SNAIL_HOP = B.tags - 0.26;
+const SNAIL_HOP_DUR = 0.24;
+const BIT_SNAIL = 14;
+const snailShell = (t: number): [number, number] => [NEAR.snail.x - Math.max(0, t - B.snail) * 7 + 1, CAP + 1 - 16.8];
+
+/** Bit riding Pip in screen space (from Pip's 'install' hop: BitOnPip in PartA carried him until then), then the hop
+ *  down onto the snail; NearLayer draws him riding the snail from the landing. One Bit at any time. */
+const BitRide: React.FC = () => {
+  const t = useTime();
+  if (t < B.install || t >= SNAIL_HOP + SNAIL_HOP_DUR) return null;
+  const p = pipShot(t);
+  if (!p) return null;
+  const head = pipRidePoint({x: p.x, y: p.y, pose: p.pose, squash: p.squash, rotate: p.rotate}, p.scale);
+  const s0 = PA.bitSize * 0.25 * camAt(B.install).zoom;
+  const size = lerp(s0, BIT_SNAIL, E.inOutSine(clamp((t - B.install) / 0.42)));
+  if (t < SNAIL_HOP) return <Bit x={head[0]} y={head[1]} size={size} state="ride" rot={p.rotate} seed="s9bit" />;
+  const q = (t - SNAIL_HOP) / SNAIL_HOP_DUR;
+  const [sx, sy] = snailShell(t);
+  return <Bit x={lerp(head[0], sx, q)} y={lerp(head[1], sy, q) - Math.sin(Math.PI * q) * 34} size={BIT_SNAIL} state="hop" flip rot={-20 + 30 * q} seed="s9bit" />;
 };
 
 // ---------------------------------------------------------------- Part B
@@ -214,34 +238,43 @@ const PipB: React.FC = () => {
 export const PartBWorld: React.FC = () => {
   const t = useTime();
   const sunCrest = B.server;
+  // the take-off's anticipation squash is anchored at the disc's bottom (behind the ridge), so it would pull the visible
+  // cap below the tram's roof (y 600) for the 2 frames before the cut: held at its crest top through the anticipation
+  const sunMoves = [
+    {at: sunCrest - 0.34, dur: 0.34, y: TERRACE.sun.y, ease: E.outCubic},
+    {at: B.end, dur: 0.56, r: 110, ease: E.inOutSine},
+  ];
+  const sunHops = [{t: B.end, to: [500, 690] as [number, number], air: 0.56, h: 60}];
+  const pose = sunPoseAt(t, {cx: TERRACE.sun.x, cy: 910, r: TERRACE.sun.r, moves: sunMoves, hops: sunHops});
+  const hold = t >= B.end - 0.1 && t < B.end ? 2 * pose.r * (1 - pose.sq.sy) : 0;
   const sun =
     t >= sunCrest - 0.5 ? (
-      <Sun
-        cx={TERRACE.sun.x}
-        cy={910}
-        r={TERRACE.sun.r}
-        drift={[0, 0]}
-        moves={[
-          {at: sunCrest - 0.34, dur: 0.34, y: TERRACE.sun.y, ease: E.outCubic},
-          {at: B.end, dur: 0.56, r: 110, ease: E.inOutSine},
-        ]}
-        hops={[{t: B.end, to: [500, 690], air: 0.56, h: 60}]}
-      />
+      <XG m={mat.translate(0, -hold)}>
+        <Sun cx={TERRACE.sun.x} cy={910} r={TERRACE.sun.r} drift={[0, 0]} moves={sunMoves} hops={sunHops} />
+      </XG>
     ) : null;
   const F = TERRACE.flag;
   const d3 = terraceDoor(0, -1);
-  const fixed = t >= B.single;
   const wrap: LayerWrap = (name, _n, node) => {
-    if (name === 'street') return fixed ? (
+    if (name === 'street') return (
       <>
         {node}
-        <Fill d={PATH_END} color={palette.mintPale} offset={false} mode="snap" seed="s9pathEnd" />
+        <FixedPool />
       </>
-    ) : node;
+    );
+    if (name === 'hill') return (
+      <>
+        {node}
+        <NearLodRow0 />
+        <TerraceDress />
+      </>
+    );
     if (name === 'house4')
       return (
         <>
           {node}
+          <House4Tag />
+          <A2Ghost />
           <DoorMatch />
           <XG m={a2ToBMat}>
             <A2Ground />
@@ -254,13 +287,11 @@ export const PartBWorld: React.FC = () => {
     <>
       <TerraceHill
         revealFloor={TERRACE.revealFloor}
-        plaqueWaveAt={B.to}
+        plaqueWaveAt={B.to - 0.1}
         waveStep={0.09}
-        extendAt={B.every}
+        extendAt={EXTEND_AT}
         flagAt={B.single - 0.1}
         fixedAt={B.single}
-        checkBoxWaveAt={B.tags}
-        checkBoxStep={0.075}
         house4Lock={{checkAt: B.check}}
         people={{riseAt: 3.55}}
         sun={sun}
@@ -270,7 +301,7 @@ export const PartBWorld: React.FC = () => {
       <RidgeRims />
       <KeeperPath />
       <XG m={a2ToBMat}>
-        <A2Actors pip={false} />
+        <A2Actors partB />
       </XG>
       <Glint x={d3.plaque[0]} y={d3.plaque[1]} r={7} at={B.path} dur={0.3} ink={0.9} />
       <RingPulse x={F.x + F.size / 2} y={F.y - F.pole + F.size * 0.34} r={46} at={B.single + 0.02} />
@@ -286,5 +317,6 @@ export const PartBWorld: React.FC = () => {
 export const PartBScreen: React.FC = () => (
   <NearLayer>
     <PipB />
+    <BitRide />
   </NearLayer>
 );

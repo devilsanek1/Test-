@@ -13,6 +13,7 @@ import {Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {ExitFade, useLook} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 import {roundRect, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {Depth, DEPTH_INK, misregScreen, withOut} from './common';
@@ -94,6 +95,7 @@ export type ScanBeamProps = {
 export const ScanBeam: React.FC<ScanBeamProps> = ({from, to, w0 = 14, w1 = 150, at, sweep, convergeAt, outAt, color = palette.mintPale, opacity = 0.5, depth = 'far'}) => {
   const t = useTime();
   const look = useLook();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   if (at !== undefined && t < at) return null;
   const grow = at !== undefined ? E.outCubic(prog(t, at, 0.25)) : 1;
   const shrink = outAt !== undefined ? 1 - E.inCubic(prog(t, outAt, 0.2)) : 1;
@@ -117,7 +119,7 @@ export const ScanBeam: React.FC<ScanBeamProps> = ({from, to, w0 = 14, w1 = 150, 
   return (
     <ExitFade>
       {look.fills === 'color' ? <path d={poly} fill={color} opacity={opacity} /> : null}
-      <path d={edges} fill="none" stroke={palette.ink} strokeWidth={DEPTH_INK[depth]} strokeDasharray="9 8" strokeLinecap="round" />
+      <path d={edges} fill="none" stroke={palette.ink} strokeWidth={DEPTH_INK[depth] * ks} strokeDasharray="9 8" strokeLinecap="round" />
     </ExitFade>
   );
 };

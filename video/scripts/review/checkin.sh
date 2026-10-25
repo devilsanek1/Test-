@@ -43,5 +43,8 @@ if [ -n "$strips" ]; then
   # the committed copy: an 8-bit JPEG (the 16-bit PNG and the per-comp frames are gitignored)
   convert "$OUT/overview.png" -depth 8 -quality 86 "$OUT/overview.jpg"
 fi
+# keep disk low (agents render a lot in parallel): drop the per-comp frame folders and the 16-bit PNGs
+find "$OUT" -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +
+rm -f "$OUT"/overview.png "$OUT"/strip_*.png
 cat "$OUT/status.txt"
 echo "$OUT"

@@ -58,8 +58,16 @@ scripts/strip.sh SharedKitSheet 0.45 1.6 o.png --crop=216x196+216+84 --scale=1 -
   (camera zoom x parents x prop scale, read from `useXf()`), so a zoom-6 hidden match keeps the same print offset on screen.
 - **Camera ink compensation** (opt-in, docs/ENGINE.md 4b): raw `strokeWidth`: multiply by `useInkScale()` (lib/inkComp.tsx)
   so camera ink compensation reaches it (lines drawn with core `<Ink>` get it already; 1 outside an `<InkScale>`, so
-  nothing changes by default). **Open request (kitv3b core review)**: BrowserChrome, Lock and SunMorphs (on screen in
-  S01's opted-in dive) still draw raw widths; then Figures, Labels, Glyphs, Bit, Diagram, Elephant, FixSign, Shutter, Tablet.
+  nothing changes by default). **Done (kitv3b core review request)**: every raw `strokeWidth` in `props/**` reads the
+  factor (`const ks = useInkScale()` at the component's top level, `strokeWidth={w * ks}`): Lock (ghost outline, glint,
+  `LockSpecks`), BrowserChrome's `LoadingRing` / `TargetRing` (ink circles, spinner, ripple), SunMorphs (PowerGlyph glints,
+  RewindGlyph, SunPress / PressRipple ripples, SunPie rims, HoursClock, MinuteWedge), Shutter (peephole ink ring), Figures
+  (Citizen paper outline, CollarBand mask holes, Attempter), Labels (`InkTextBlock` bars + strike, `CheckBoxTags`,
+  StickyNote slap marks), Glyphs (MarkRing ping, QuestionMark ink rim), Bit (eye / shell highlight lines), Diagram
+  (SiteIcon), Elephant (plaque pulse rings, `PlaqueSpecks`), FixSign, Tablet (ScanBeam). Deliberately NOT compensated
+  (body geometry drawn as a stroke, not ink): the ring's coloured band, the peephole's cream rim, the QuestionMark's cream
+  body, the Attempter's arm. Factor 1 = pixel-identical (S01/S02/S05/S07/S08/S10/S11/S12 frames checked). The props
+  S01's dive shows (Lock, BrowserChrome frame, RollerShutter) were already compensated: their linework is `<Ink>`.
 - **LOD by on-screen size** (the same `useXf()` scale as `screenSize`/`toScreen` in `lib/cine/state.tsx`): each prop drops
   detail below its thresholds (listed per prop) and becomes a flat dot / bar far away.
 - **Render states**: `<Look fills="paper">` turns every fill white (frame 0 / loop line art; Bit, the sun and its overlays stay

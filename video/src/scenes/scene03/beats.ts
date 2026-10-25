@@ -41,6 +41,8 @@ const ABS = {
   popUp: 9.46, //               w31+0.50 'PHP': the city springs out of the plan (press first, then L1 R1 L2 R2 L3 R3 L4 R4 L5)
   allUp: 9.81, //               w31+0.85: every side building has started (0.035 s apart)
   pipSettle: 9.915, //          end(PHP)+0.10: Pip settles on the stamp; the roof vent puffs two sheets
+  birdHop: 10.07, //            w32-0.065 'the': a bird on the new wire hops and turns round (polish round 1: life in the
+  //                            calm after the pop-up; the frame otherwise holds for the bait)
   pressScreen: 10.135, //       w32 'the': the press house's browser window lights
   doorway: 10.305, //           w33+0.10 'language': a far walker steps out of a doorway; Bit's antennae twitch
   everyone: 10.54, //           w34-0.10 'everyone': six tiny walkers pop up (0.05 s); the two near walkers slide in
@@ -49,16 +51,19 @@ const ABS = {
   looksUp: 11.355, //           w35+0.25: a far walker stops and looks up at the press house
   swing: 11.605, //             end(loves): the pen-nib sign swings, Bit riding it; the vent puffs
   spokes: 11.695, //            w37-0.10 'about': ten spokes draw across the sun (0.15 s)
-  count: 11.955, //             w38 'seven': the 7 PHP count signs pop, near -> far: P (re-pulse), L1, R2, L2, R3, L4, R4,
-  //                            0.08 s apart (fix round 2: R1, under the right UI rail, swapped with R4: R1 is a blank)
+  count: 11.955, //             w38 'seven': the count, near -> far, 0.08 s apart: P (plaque ping + screen re-pulse), then
+  //                            the PHP screens L2, R2, L3, R3, L4, R4 light (elephant page + orange ping) (polish round 1:
+  //                            the screens are the street's count; L1 / R1 at the frame edges are non-PHP with L5)
   flip: 12.505, //              w39+0.10 'out': the title-block card paper-flips to L4 (0.2 s)
-  ten: 12.55, //                w41-0.10 'ten': three blank plates L3, L5, R1 (0.05 s apart) + 3 cream sun slices
-  websites: 12.905, //          w42 'websites': the seven PHP screens light up in a wave (0.02 s)
+  ten: 12.55, //                w41-0.10 'ten': blank cream pages on L1, R1, L5 (0.05 s apart) + 3 cream sun slices
+  websites: 12.905, //          w42 'websites': the seven PHP pages re-pulse in a wave (0.02 s)
   heads: 13.205, //             w42+0.30: the near walkers turn their heads; a far walker waves
   run: 13.485, //               w43 'run': walkers bob; Pip glances down the street (look 0.7) (no vent puff here: fix
   //                            round 1, it flew through the pie and the take-off)
-  solid: 13.78, //              w45-0.075 'it.': the pie pops back to solid in ONE frame (slices + spokes gone together):
-  //                            f161 (13.760) full pie, f162 (13.793) solid, one frame before 'it.'
+  solid: 13.81, //              w45-0.045 'it.': the pie pops back to solid in ONE frame (slices + spokes gone together):
+  //                            f162 (13.793) full pie, f163 (13.826) solid: 0.03 s before 'it.' (13.855, f164; ENGINE rule 5
+  //                            +-0.05) and one frame before the take-off squash (sunHop - 0.1 = 13.845) (polish round 1:
+  //                            was 13.78, 0.062 s early)
   sunHop: 13.945, //            end(it): the sun's low glide-hop (take-off; mid-air at (810,680) on the cut, lands on 'This')
   pipHop: 14.05, //             cut(it)-0.12: Pip hops off the stamp toward the stoop (crosses the cut)
 } as const;

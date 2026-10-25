@@ -1,258 +1,380 @@
-// S08 attempters (fix round 1): every hooded figure in the scene, built to READ at phone size.
-//   - Rattler: the shared Attempter at a door + a one-step-lighter (sage) door behind it, a 2-3 px peach rim strip on
-//     the sun side and 2.2 px x 8-10 px rattle marks (the near doors: NOT counted).
-//   - RimPile: the COUNTED attempters, ink-dark 18-24 px with a cream rim, pressed against the OUTSIDE of the dome's
-//     flank in a pile that grows in visible steps with the tally (6 / +10 / +20 / +more), raising a hand to the glass
-//     and tapping it (2-3 short ink tap ticks; no ripple arcs); the searchlight catches a group (cream flash).
-//   - Flood: the 'millions' crowd: ink-dark hooded tombstones (8-18 px) with a cream rim on the sun side, packed in
-//     ranks over the roofs and streets of every row OUTSIDE the dome, batched one body path + one rim path per rank.
-// Everything is time-driven (scene seconds), pops (1.25x for 2 frames), no fades.
+// S08 attempters (fix round 2): every hooded figure in the scene, redrawn to READ as people at phone size.
+//   - bust(): a back-view HEAD-AND-SHOULDERS silhouette (round head, a small hood peak on most, a shoulder hump, a
+//     2-4 px gap to the next figure), the reference artist's back-view crowd (ref f_5.5 / ref2 f_33), never a spike.
+//   - Rattler: an INK-DARK hooded person (head, shoulders, coat, legs, one arm on the handle) on a LIGHT door (cream /
+//     peach), a cream rim on the sun side; each rattle = 4 shakes, every shake pops a set of 3 ink marks for 3 frames,
+//     alternating sides (right of the handle / left of the figure), and jolts the body (no every-other-frame blink).
+//   - Pile: the COUNTED attempters at the dome's foot and up its left flank (x >= 120), ink-dark / tealDark busts with
+//     a cream rim, some with a raised arm whose fist is ON the glass: every tap pops two short cream ripple arcs there.
+//   - Flood: the 'millions' crowd: ranks of busts (16-20 px on the far skyline, 30-40 px on the mid rooftops), ink-dark
+//     and tealDark alternating per figure, a cream rim on the sun side, one or two raised arms per rank; batched per rank.
+//   - NearCrowd: 90-120 px busts crowding our coping on 'millions' (the flood's foreground).
+// Everything is time-driven (scene seconds), pops (1.25x for 2 frames or the 7 % spring), no fades.
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {ease as E, lerp, prog, springAt, springs, useTime} from '../../lib/time';
 import {rand} from '../../lib/rng';
 import {useLook} from '../../lib/exit';
-import {Attempter} from '../shared/props';
-import {flankX, inDome} from './layout';
+import {DOME8, flankX, inDome} from './layout';
 
 const SUN_X = 700;
+const f1 = (v: number) => v.toFixed(1);
 const latest = (ts: number[], t: number): number | undefined => {
   let r: number | undefined;
   for (const x of ts) if (x <= t) r = x;
   return r;
 };
 
-/** A hooded figure seen from behind (feet centre x, y; height h): rounded shoulders 0.62 h wide + a pointed hood
- *  0.34 h wide, so a packed crowd reads as a mass of HEADS (reference 1) rather than a hedge of tombstones. */
-function person(x: number, y: number, h: number): string {
-  const sw = 0.31 * h;
-  const hw = 0.17 * h;
-  const f = (v: number) => v.toFixed(1);
-  return (
-    `M${f(x - sw)} ${f(y)}V${f(y - 0.36 * h)}Q${f(x - sw)} ${f(y - 0.54 * h)} ${f(x - 0.1 * h)} ${f(y - 0.55 * h)}H${f(x + 0.1 * h)}Q${f(x + sw)} ${f(y - 0.54 * h)} ${f(x + sw)} ${f(y - 0.36 * h)}V${f(y)}Z` +
-    `M${f(x - hw)} ${f(y - 0.48 * h)}C${f(x - hw * 1.3)} ${f(y - 0.84 * h)} ${f(x - 0.07 * h)} ${f(y - 0.93 * h)} ${f(x)} ${f(y - h)}C${f(x + 0.07 * h)} ${f(y - 0.93 * h)} ${f(x + hw * 1.3)} ${f(y - 0.84 * h)} ${f(x + hw)} ${f(y - 0.48 * h)}Z`
-  );
+// ---------------------------------------------------------------- the bust (head + shoulders, back view)
+
+/** A back-view head-and-shoulders silhouette, base centre (x, y), height h (base to head top): shoulders 0.66 h wide
+ *  rising in a hump to the neck, a round head (r 0.2 h) and, with `hood`, a small hood peak leaning to one side. */
+export function bust(x: number, y: number, h: number, hood: boolean, lean = 1): string {
+  const sw = 0.33 * h;
+  const r = 0.2 * h;
+  const hy = y - h + r + (hood ? 0.05 * h : 0);
+  const sh = y - 0.5 * h; // shoulder top
+  const k = 0.5523 * r;
+  let d =
+    `M${f1(x - sw)} ${f1(y)}V${f1(sh + 0.16 * h)}C${f1(x - sw)} ${f1(sh + 0.02 * h)} ${f1(x - 0.24 * h)} ${f1(sh - 0.02 * h)} ${f1(x - 0.12 * h)} ${f1(sh - 0.03 * h)}` +
+    `H${f1(x + 0.12 * h)}C${f1(x + 0.24 * h)} ${f1(sh - 0.02 * h)} ${f1(x + sw)} ${f1(sh + 0.02 * h)} ${f1(x + sw)} ${f1(sh + 0.16 * h)}V${f1(y)}Z`;
+  // the head (a circle as 4 cubics)
+  d += `M${f1(x - r)} ${f1(hy)}C${f1(x - r)} ${f1(hy - k)} ${f1(x - k)} ${f1(hy - r)} ${f1(x)} ${f1(hy - r)}C${f1(x + k)} ${f1(hy - r)} ${f1(x + r)} ${f1(hy - k)} ${f1(x + r)} ${f1(hy)}C${f1(x + r)} ${f1(hy + k)} ${f1(x + k)} ${f1(hy + r * 1.25)} ${f1(x)} ${f1(hy + r * 1.25)}C${f1(x - k)} ${f1(hy + r * 1.25)} ${f1(x - r)} ${f1(hy + k)} ${f1(x - r)} ${f1(hy)}Z`;
+  if (hood) {
+    // the hood: a slightly bigger cowl over the head with a small peak (lean = which side the tip falls)
+    const R = r * 1.12;
+    d += `M${f1(x - R)} ${f1(hy + r * 0.5)}C${f1(x - R * 1.02)} ${f1(hy - r * 0.7)} ${f1(x - r * 0.5)} ${f1(hy - r * 1.15)} ${f1(x + lean * r * 0.25)} ${f1(hy - r * 1.42)}C${f1(x + r * 0.55)} ${f1(hy - r * 1.05)} ${f1(x + R * 1.02)} ${f1(hy - r * 0.6)} ${f1(x + R)} ${f1(hy + r * 0.5)}Z`;
+  }
+  return d;
 }
-/** Its rim strips (rw wide) on side s (+1 right, -1 left): the hood edge and the outer shoulder. */
-function personRim(x: number, y: number, h: number, s: number, rw: number): string {
-  const sw = 0.31 * h;
-  const hw = 0.17 * h;
-  const f = (v: number) => v.toFixed(1);
-  return (
-    `M${f(x + s * hw)} ${f(y - 0.5 * h)}C${f(x + s * hw * 1.3)} ${f(y - 0.84 * h)} ${f(x + s * 0.07 * h)} ${f(y - 0.93 * h)} ${f(x)} ${f(y - h)}C${f(x + s * 0.03 * h)} ${f(y - 0.9 * h)} ${f(x + s * (hw * 1.3 - rw))} ${f(y - 0.82 * h)} ${f(x + s * (hw - rw))} ${f(y - 0.5 * h)}Z` +
-    `M${f(x + s * sw)} ${f(y - 0.12 * h)}V${f(y - 0.36 * h)}Q${f(x + s * sw)} ${f(y - 0.54 * h)} ${f(x + s * 0.12 * h)} ${f(y - 0.55 * h)}V${f(y - 0.55 * h + rw)}Q${f(x + s * (sw - rw))} ${f(y - 0.52 * h)} ${f(x + s * (sw - rw))} ${f(y - 0.36 * h)}V${f(y - 0.12 * h)}Z`
-  );
+
+/** The bust's rim strip (rw wide) on side s (+1 right, -1 left): around the head / hood and down the outer shoulder. */
+export function bustRim(x: number, y: number, h: number, s: number, rw: number, hood: boolean): string {
+  const sw = 0.33 * h;
+  const r = 0.2 * h * (hood ? 1.12 : 1);
+  const hy = y - h + 0.2 * h + (hood ? 0.05 * h : 0);
+  const sh = y - 0.5 * h;
+  const top = hood ? hy - 0.2 * h * 1.3 : hy - r;
+  // head: an outer arc from the top to the side, back along an inner arc (a crescent)
+  const a = `M${f1(x + s * r * 0.15)} ${f1(top + rw * 0.2)}C${f1(x + s * r * 0.75)} ${f1(top + r * 0.1)} ${f1(x + s * r * 1.02)} ${f1(hy - r * 0.35)} ${f1(x + s * r)} ${f1(hy + r * 0.25)}` + `L${f1(x + s * (r - rw))} ${f1(hy + r * 0.2)}C${f1(x + s * (r - rw) * 0.98)} ${f1(hy - r * 0.3)} ${f1(x + s * r * 0.6)} ${f1(top + r * 0.1 + rw)} ${f1(x + s * r * 0.1)} ${f1(top + rw * 1.1)}Z`;
+  const b = `M${f1(x + s * sw)} ${f1(y - 0.04 * h)}V${f1(sh + 0.16 * h)}C${f1(x + s * sw)} ${f1(sh + 0.03 * h)} ${f1(x + s * 0.25 * h)} ${f1(sh - 0.015 * h)} ${f1(x + s * 0.15 * h)} ${f1(sh - 0.025 * h)}` + `L${f1(x + s * 0.15 * h)} ${f1(sh - 0.025 * h + rw)}C${f1(x + s * 0.24 * h)} ${f1(sh + rw * 0.6)} ${f1(x + s * (sw - rw))} ${f1(sh + 0.05 * h)} ${f1(x + s * (sw - rw))} ${f1(sh + 0.16 * h)}V${f1(y - 0.04 * h)}Z`;
+  return a + b;
+}
+
+/** A raised arm from the shoulder on side s up past the head (a thick stroke path) + where the fist is. */
+export function armUp(x: number, y: number, h: number, s: number, reach = 1): {d: string; fist: [number, number]} {
+  const sx = x + s * 0.22 * h;
+  const sy = y - 0.46 * h;
+  const ex = x + s * 0.36 * h;
+  const ey = y - 0.82 * h;
+  const fx = x + s * (0.3 + 0.08 * reach) * h;
+  const fy = y - (1.08 + 0.1 * reach) * h;
+  return {d: `M${f1(sx)} ${f1(sy)}L${f1(ex)} ${f1(ey)}L${f1(fx)} ${f1(fy)}`, fist: [fx, fy]};
 }
 
 // ---------------------------------------------------------------- rattlers (the near doors: NOT counted)
 
-export type RattlerSpec = {x: number; y: number; h: number; at: number; rattles: number[]; hop?: {at: number; to: number}; flip?: boolean; seed: string; /** 'stand' = a crowd figure pushing in behind the door rattlers (no door, no handle) */ mode?: 'rattle' | 'stand'};
+export type RattlerSpec = {
+  /** Door centre x and sill y; the figure stands left of the door centre (0.16 h). */
+  x: number;
+  y: number;
+  /** Figure height. */
+  h: number;
+  /** Door height (default 1.1 h). */
+  dh?: number;
+  at: number;
+  rattles: number[];
+  /** Gives up and hops to the door at x `to` (its sill y follows `toY`). */
+  hop?: {at: number; to: number; toY?: number};
+  seed: string;
+};
 
-/** A hooded attempter at a door rattling its handle; `hop` = gives up and hops to the next door (its door highlight
- *  goes with it). Accents for readability: sage door behind, peach rim strip, big rattle marks. */
-export const Rattler: React.FC<RattlerSpec> = ({x, y, h, at, rattles, hop, flip, seed, mode = 'rattle'}) => {
+/** One light door (the figure's door): cream fill (peach for every third seed), ink sides + top, a dark handle. */
+export function doorPaths(x: number, y: number, dh: number): {fill: string; ink: string; handle: [number, number]} {
+  const w = dh * 0.46;
+  const fill = `M${f1(x - w / 2)} ${f1(y)}V${f1(y - dh)}H${f1(x + w / 2)}V${f1(y)}Z`;
+  const ink = `M${f1(x - w / 2)} ${f1(y + 1)}V${f1(y - dh)}H${f1(x + w / 2)}V${f1(y + 1)}`;
+  return {fill, ink, handle: [x + w * 0.28, y - dh * 0.5]};
+}
+
+/** The hooded rattler's body (feet centre x, y; height h) as one path: hood + head, shoulders, coat, two legs. */
+function rattlerBody(x: number, y: number, h: number): string {
+  const b = bust(x, y - 0.3 * h, 0.7 * h, true, -1);
+  // every sub-path CLOCKWISE (nonzero fill: an opposite winding would punch a hole where the coat overlaps the bust)
+  const coat = `M${f1(x - 0.25 * h)} ${f1(y - 0.28 * h)}L${f1(x - 0.23 * h)} ${f1(y - 0.62 * h)}H${f1(x + 0.23 * h)}L${f1(x + 0.25 * h)} ${f1(y - 0.28 * h)}Z`;
+  const legs = `M${f1(x - 0.17 * h)} ${f1(y - 0.3 * h)}H${f1(x - 0.03 * h)}V${f1(y)}H${f1(x - 0.17 * h)}Z` + `M${f1(x + 0.03 * h)} ${f1(y - 0.3 * h)}H${f1(x + 0.17 * h)}V${f1(y)}H${f1(x + 0.03 * h)}Z`;
+  return b + coat + legs;
+}
+
+/** A hooded attempter at a door rattling its handle (ink-dark on its LIGHT door: the doors are drawn by the scene,
+ *  extras.tsx LightDoors), a cream rim on the sun side; `hop` = gives up and hops to the next door. */
+export const Rattler: React.FC<RattlerSpec> = ({x, y, h, dh: dhIn, at, rattles, hop}) => {
   const t = useTime();
   const look = useLook();
   if (t < at) return null;
-  let px = x;
-  let py = y;
-  let rattleAt = latest(rattles, t);
+  const dh = dhIn ?? h * 1.1;
+  let dx = x;
+  let dy = y;
+  let lift = 0;
   let air = false;
+  let rattleAt = latest(rattles, t);
   if (hop && t >= hop.at) {
     const q = prog(t, hop.at, 0.34);
-    px = lerp(x, hop.to, E.inOutSine(q));
-    py = y - Math.sin(q * Math.PI) * h * 0.38;
+    dx = lerp(x, hop.to, E.inOutSine(q));
+    dy = lerp(y, hop.toY ?? y, q);
+    lift = Math.sin(q * Math.PI) * h * 0.38;
     if (q < 1) {
       rattleAt = undefined;
       air = true;
     }
   }
-  const rattleDur = 0.5;
-  const rattling = rattleAt !== undefined && t >= rattleAt && t < rattleAt + rattleDur;
-  // the Attempter's own geometry (shared Figures.tsx), to lay the accents on it
+  // 4 shakes 0.133 s apart; each pops its marks for 3 frames (0.1 s), alternating sides, and jolts the body
+  let shake = -1;
+  if (rattleAt !== undefined && t < rattleAt + 0.53) shake = Math.floor((t - rattleAt) / 0.1333);
+  const marksOn = shake >= 0 && t - rattleAt! - shake * 0.1333 < 0.1;
+  const jig = shake >= 0 ? (shake % 2 ? -1 : 1) * h * 0.025 : 0;
   const pop = springAt(t, at, springs.pop);
-  const jig = rattling ? Math.sin(t * 60) * h * 0.03 : 0;
-  const tw = h * 0.36;
-  const th = h * 0.5;
-  const top = py - h * 0.38 - th;
-  const hr = h * 0.12;
-  const hcx = px + jig;
-  const hcy = top - hr * 0.7;
-  const iw = h >= 36 ? Math.max(1.6, h * 0.035) : 0;
-  const rw = h >= 50 ? 3 : 2;
-  const s = px < SUN_X ? 1 : -1;
-  const ins = iw / 2 + rw / 2;
-  const ex = hcx + s * (tw / 2 - ins);
-  const rim =
-    `M${ex.toFixed(1)} ${(top + th * 0.95).toFixed(1)}V${(top + tw * 0.4).toFixed(1)}Q${ex.toFixed(1)} ${(top + ins).toFixed(1)} ${(hcx + s * 2).toFixed(1)} ${(top + ins).toFixed(1)}` +
-    `M${(hcx + s * (hr * 1.05 - ins)).toFixed(1)} ${(hcy + hr * 0.3).toFixed(1)}Q${(hcx + s * (hr * 1.12 - ins)).toFixed(1)} ${(hcy - hr * 0.7).toFixed(1)} ${(hcx + s * 0.6).toFixed(1)} ${(hcy - hr * 1.55).toFixed(1)}`;
-  // door highlight: the door this figure stands at (door centre = figure x + 0.16 h), one step lighter
-  const dh = h * 1.18;
-  const dw = dh * 0.42;
-  const dcx = px + h * 0.16;
-  const hx = hcx + tw * 0.66;
-  const hy = top + th * 0.45;
-  const stand = mode === 'stand';
-  const marks = !stand && rattling && Math.floor(t * 15) % 2 === 0 ? `M${hx + 4} ${hy - 5}l8 -4M${hx + 5} ${hy}l10 0M${hx + 4} ${hy + 5}l8 4` : '';
-  const sc = pop < 1 ? `translate(${px} ${py}) scale(${pop.toFixed(3)}) translate(${-px} ${-py})` : undefined;
+  const fx = dx - h * 0.16 + jig; // the figure's feet centre
+  const fy = dy - lift;
+  const body = rattlerBody(fx, fy, h);
+  const s = fx < SUN_X ? 1 : -1;
+  const rw = Math.max(1.6, h * 0.035);
+  const rim = bustRim(fx, fy - 0.3 * h, 0.7 * h, s, rw, true) + `M${f1(fx + s * 0.235 * h)} ${f1(fy - 0.6 * h)}L${f1(fx + s * 0.25 * h)} ${f1(fy - 0.3 * h)}L${f1(fx + s * (0.25 * h - rw))} ${f1(fy - 0.3 * h)}L${f1(fx + s * (0.235 * h - rw))} ${f1(fy - 0.6 * h)}Z`;
+  const door = doorPaths(dx, dy, dh);
+  const [hx, hy] = door.handle;
+  // the arm: shoulder -> the handle (a limb: a thick body-coloured stroke)
+  const arm = air ? `M${f1(fx + 0.2 * h)} ${f1(fy - 0.58 * h)}L${f1(fx + 0.34 * h)} ${f1(fy - 0.78 * h)}` : `M${f1(fx + 0.18 * h)} ${f1(fy - 0.58 * h)}Q${f1(hx - 0.02 * h)} ${f1(hy - 0.1 * h)} ${f1(hx + jig * 0.5)} ${f1(hy)}`;
+  const mw = Math.max(2.2, h * 0.034);
+  const L = h * 0.13;
+  let marks = '';
+  if (marksOn && !air) {
+    if (shake % 2 === 0) {
+      // right of the handle: three strokes fanning out
+      marks = `M${f1(hx + L * 0.45)} ${f1(hy - L * 0.6)}l${f1(L * 0.9)} ${f1(-L * 0.45)}M${f1(hx + L * 0.55)} ${f1(hy)}l${f1(L)} 0M${f1(hx + L * 0.45)} ${f1(hy + L * 0.6)}l${f1(L * 0.9)} ${f1(L * 0.45)}`;
+    } else {
+      // left of the figure at shoulder height
+      const lx = fx - 0.3 * h;
+      const ly = fy - 0.62 * h;
+      marks = `M${f1(lx)} ${f1(ly - L * 0.6)}l${f1(-L * 0.9)} ${f1(-L * 0.45)}M${f1(lx - L * 0.1)} ${f1(ly)}l${f1(-L)} 0M${f1(lx)} ${f1(ly + L * 0.6)}l${f1(-L * 0.9)} ${f1(L * 0.45)}`;
+    }
+  }
+  const sc = pop < 1 ? `translate(${f1(dx)} ${f1(dy)}) scale(${pop.toFixed(3)}) translate(${f1(-dx)} ${f1(-dy)})` : undefined;
+  const color = look.fills === 'color';
   return (
-    <>
-      {!air && !stand && look.fills === 'color' ? <path d={`M${(dcx - dw / 2 + 1.5).toFixed(1)} ${(py - 0.5).toFixed(1)}V${(py - dh + 1.5).toFixed(1)}H${(dcx + dw / 2 - 1.5).toFixed(1)}V${(py - 0.5).toFixed(1)}Z`} fill={palette.sage} transform={sc} /> : null}
-      <Attempter x={px} y={py} h={h} mode={stand ? 'stand' : 'rattle'} riseAt={at} rattleAt={stand ? undefined : rattleAt} rattleDur={rattleDur} flip={flip} seed={seed} />
-      {look.fills === 'color' ? (
-        <g transform={sc}>
-          <path d={rim} fill="none" stroke={palette.peach} strokeWidth={rw} strokeLinecap="round" />
-          {stand ? null : <path d={`M${hcx + tw * 0.36} ${top + th * 0.2}L${hcx + tw * 0.62} ${top + th * 0.25}`} stroke={palette.tealDark} strokeWidth={h * 0.09} strokeLinecap="round" fill="none" />}
-          {marks ? <path d={marks} stroke={palette.ink} strokeWidth={2.2} strokeLinecap="round" fill="none" /> : null}
-        </g>
-      ) : null}
-    </>
+    <g transform={sc}>
+      <path d={body} fill={color ? palette.ink : palette.white} stroke={color ? undefined : palette.ink} strokeWidth={1.2} />
+      <path d={arm} fill="none" stroke={palette.ink} strokeWidth={h * 0.085} strokeLinecap="round" strokeLinejoin="round" />
+      {color ? <path d={rim} fill={palette.cream} /> : null}
+      {marks ? <path d={marks} fill="none" stroke={palette.ink} strokeWidth={mw} strokeLinecap="round" /> : null}
+    </g>
   );
 };
 
-// ---------------------------------------------------------------- the rim pile (COUNTED: pressed against the glass)
+// ---------------------------------------------------------------- the pile (COUNTED: at the dome's foot and flank)
 
-export type PileFig = {x: number; y: number; h: number; side: -1 | 1; at: number; taps: number[]; flash?: number};
+export type PileFig = {x: number; y: number; h: number; at: number; taps: number[]; hood: boolean; fill: 0 | 1; arm?: -1 | 1; flash?: number};
 
-/** Slots of a pile against the dome's flank (side -1 = left, +1 = right), in fill order (it grows up and out).
- *  levels: feet y = foot - L * 13; ranks per level shrink with height (a heap); the ground level spreads `ground`
- *  figures away from the glass. */
-export function pileSlots(side: -1 | 1, o: {foot?: number; levels: number; ground: number; ranks: (L: number) => number; seed: string}): {x: number; y: number; h: number; order: number}[] {
-  const foot = o.foot ?? 1086;
-  const out: {x: number; y: number; h: number; order: number}[] = [];
-  for (let L = 0; L < o.levels; L++) {
-    const nk = L === 0 ? o.ground : o.ranks(L);
-    for (let k = 0; k < nk; k++) {
-      const h = lerp(18, 24, rand(o.seed, `h${L}/${k}`));
-      const y = foot - L * 13 + (rand(o.seed, `y${L}/${k}`) - 0.5) * 3;
-      const touch = flankX(y - h * 0.78, side);
-      const x = touch + side * (h * 0.25 + 3 + k * 10.5 + (rand(o.seed, `x${L}/${k}`) - 0.5) * 3);
-      out.push({x, y, h, order: L * 1.0 + k * 0.85 + rand(o.seed, `o${L}/${k}`) * 0.3});
+/** Pile slots, in fill order: `front` = ranks of busts along the dome's FOOT (x from x0 to x1, back ranks higher and
+ *  smaller), `flank` = a short heap climbing the outside of the LEFT flank (only where the flank is at x >= 120 + 0.3 h). */
+export function pileSlots(o: {seed: string; front: {x0: number; x1: number; y: number; h: [number, number]; ranks: number}; flank: {y0: number; y1: number; n: number; h: [number, number]}}): {x: number; y: number; h: number; rank: number; flank: boolean}[] {
+  const out: {x: number; y: number; h: number; rank: number; flank: boolean}[] = [];
+  const F = o.front;
+  for (let r = 0; r < F.ranks; r++) {
+    const hm = lerp(F.h[0], F.h[1], 0.5) * (1 - r * 0.1);
+    let x = F.x0 + (r % 2 ? hm * 0.36 : 0) + rand(o.seed, `s${r}`) * 4;
+    let i = 0;
+    while (x < F.x1) {
+      const h = lerp(F.h[0], F.h[1], rand(o.seed, `h${r}/${i}`)) * (1 - r * 0.1);
+      out.push({x, y: F.y - r * hm * 0.42 + (rand(o.seed, `y${r}/${i}`) - 0.5) * 2, h, rank: r, flank: false});
+      x += h * 0.66 + 2.5 + rand(o.seed, `p${r}/${i}`) * 2;
+      i++;
     }
   }
-  return out.sort((a, b) => a.order - b.order);
+  for (let k = 0; k < o.flank.n; k++) {
+    const u = k / Math.max(1, o.flank.n - 1);
+    const y = lerp(o.flank.y0, o.flank.y1, u);
+    const h = lerp(o.flank.h[0], o.flank.h[1], rand(o.seed, `fh${k}`));
+    const x = flankX(y - h * 0.6, -1) - h * 0.3 - 1;
+    if (x - h * 0.33 >= 118) out.push({x, y, h, rank: F.ranks + k, flank: true});
+  }
+  return out;
 }
 
-/** The counted pile: ink-dark hooded figures (cream rim on the glass side) with a hand on the glass; taps = 2-3 short
- *  ink ticks at the hand for 0.3 s; flash = the searchlight catches it (cream body for 2 frames). Drawn back to front
- *  (higher figures first, then the outer ranks) as a handful of batched paths. */
-export const RimPile: React.FC<{figs: PileFig[]}> = ({figs}) => {
+/** The counted pile: batched ink / tealDark busts with a cream rim (sun side), raised arms whose fists are ON the glass;
+ *  a tap pops two short cream ripple arcs at the fist (2 steps, 0.2 s) and nudges the arm; flash = the searchlight
+ *  catches the figure (cream body + ink outline for 2 frames). */
+export const Pile: React.FC<{figs: PileFig[]}> = ({figs}) => {
   const t = useTime();
   const look = useLook();
   if (look.fills !== 'color') return null;
-  let body = '';
+  let body0 = '';
+  let body1 = '';
   let lit = '';
   let rim = '';
   let arms = '';
-  let ticks = '';
+  let ripples = '';
   for (const f of figs) {
     if (t < f.at) continue;
     const k = t < f.at + 0.067 ? 1.25 : 1;
     const h = f.h * k;
-    const {x, y, side} = f;
     const flashing = f.flash !== undefined && t >= f.flash && t < f.flash + 0.067;
-    const b = person(x, y, h);
+    const b = bust(f.x, f.y, h, f.hood, f.x < DOME8.cx ? 1 : -1);
     if (flashing) lit += b;
-    else body += b;
-    rim += personRim(x, y, h, x < SUN_X ? 1 : -1, Math.max(1.8, h * 0.09));
-    // the hand on the glass
-    const sx = x - side * h * 0.22;
-    const sy = y - h * 0.5;
-    const hx = flankX(y - h * 0.95, side) + side * 1.5;
-    const hy = y - h * 0.95;
-    arms += `M${sx.toFixed(1)} ${sy.toFixed(1)}L${hx.toFixed(1)} ${hy.toFixed(1)}`;
-    const tap = latest(f.taps, t);
-    if (tap !== undefined && t < tap + 0.3 && Math.floor((t - tap) * 15) % 2 === 0) {
-      // 3 short ticks fanning out from the touch point, on the glass side
-      for (const a of [-50, 0, 50]) {
-        const r = ((a + (side > 0 ? 180 : 0)) * Math.PI) / 180;
-        const c = Math.cos(r);
-        const sn = Math.sin(r);
-        ticks += `M${(hx + c * 3).toFixed(1)} ${(hy + sn * 3).toFixed(1)}l${(c * 5).toFixed(1)} ${(sn * 5).toFixed(1)}`;
+    else if (f.fill) body1 += b;
+    else body0 += b;
+    rim += bustRim(f.x, f.y, h, f.x < SUN_X ? 1 : -1, Math.max(1.6, h * 0.08), f.hood);
+    if (f.arm) {
+      const tap = latest(f.taps, t);
+      const tapping = tap !== undefined && t < tap + 0.2;
+      const a = armUp(f.x, f.y, h, f.arm, tapping ? 0.6 : 1);
+      arms += a.d;
+      if (tapping) {
+        const q = t - tap! < 0.1 ? 0 : 1;
+        const [px, py] = a.fist;
+        for (const rr of [h * (0.2 + 0.1 * q), h * (0.36 + 0.12 * q)]) {
+          // a ripple ON the glass: a short arc over the fist (its open side down), the outer one wider
+          const a0 = (-150 * Math.PI) / 180;
+          const a1 = (-30 * Math.PI) / 180;
+          ripples += `M${f1(px + Math.cos(a0) * rr)} ${f1(py + Math.sin(a0) * rr)}A${f1(rr)} ${f1(rr)} 0 0 1 ${f1(px + Math.cos(a1) * rr)} ${f1(py + Math.sin(a1) * rr)}`;
+        }
       }
     }
   }
-  if (!body && !lit) return null;
+  if (!body0 && !body1 && !lit) return null;
+  const aw = figs.length ? Math.max(2, figs[0].h * 0.12) : 2;
   return (
     <>
-      {arms ? <path d={arms} stroke={palette.ink} strokeWidth={2.4} strokeLinecap="round" fill="none" /> : null}
-      {body ? <path d={body} fill={palette.ink} /> : null}
-      {lit ? <path d={lit} fill={palette.cream} stroke={palette.ink} strokeWidth={1} /> : null}
+      {arms ? <path d={arms} stroke={palette.ink} strokeWidth={aw} strokeLinecap="round" strokeLinejoin="round" fill="none" /> : null}
+      {body0 ? <path d={body0} fill={palette.ink} /> : null}
+      {body1 ? <path d={body1} fill={palette.tealDark} /> : null}
+      {lit ? <path d={lit} fill={palette.cream} stroke={palette.ink} strokeWidth={1.2} /> : null}
       {rim ? <path d={rim} fill={palette.cream} /> : null}
-      {ticks ? <path d={ticks} stroke={palette.ink} strokeWidth={1.6} strokeLinecap="round" fill="none" /> : null}
+      {ripples ? <path d={ripples} stroke={palette.cream} strokeWidth={2.4} strokeLinecap="round" fill="none" /> : null}
     </>
   );
 };
 
 // ---------------------------------------------------------------- the flood ('millions': OUTSIDE the dome)
 
-export type CrowdFig = {x: number; y: number; h: number; at: number; rank: number};
+export type CrowdFig = {x: number; y: number; h: number; at: number; rank: number; fill: 0 | 1; hood: boolean; arm?: -1 | 1};
 
-/** A packed band of hooded figures: `ranks` rows (back rank higher and smaller), shoulder to shoulder (pitch 0.42 h
- *  with jitter) over x0..x1 with feet at yFeet (+- jy); pop times = at + (the figure's share of span) in `order`
- *  (rand | ltr | out-from (x)). `skip` drops figures (inside the dome, behind the board ...). */
+/** A band of busts: `ranks` rows (back rank higher and smaller), shoulder to shoulder with a 2-4 px gap over x0..x1,
+ *  base at yBase (+- jy); pop times = at + (the figure's share of span) in `order` (rand | ltr | out-from x). Fill
+ *  alternates ink / tealDark per figure; `arms` raised arms per rank. `skip` drops figures (inside the dome, behind the
+ *  board ...). */
 export function crowdBand(
   seed: string,
   x0: number,
   x1: number,
-  yFeet: number,
+  yBase: number,
   h0: number,
   h1: number,
   ranks: number,
   at: number,
   span: number,
-  o: {jy?: number; gap?: number; order?: 'rand' | 'ltr' | {from: number}; skip?: (x: number, y: number, h: number) => boolean; rank0?: number} = {},
+  o: {jy?: number; gap?: number; order?: 'rand' | 'ltr' | {from: number}; skip?: (x: number, y: number, h: number) => boolean; rank0?: number; arms?: number; hoods?: number} = {},
 ): CrowdFig[] {
   const out: CrowdFig[] = [];
   for (let r = ranks - 1; r >= 0; r--) {
-    const hm = lerp(h0, h1, 0.5) * (1 - r * 0.08);
-    let x = x0 + rand(seed, `s${r}`) * hm * 0.4;
+    const hm = lerp(h0, h1, 0.5) * (1 - r * 0.1);
+    let x = x0 + rand(seed, `s${r}`) * hm * 0.4 + (r % 2 ? hm * 0.33 : 0);
     let i = 0;
+    const row: CrowdFig[] = [];
     while (x < x1) {
-      const h = lerp(h0, h1, rand(seed, `h${r}/${i}`)) * (1 - r * 0.07);
-      const y = yFeet - r * hm * 0.38 + (rand(seed, `y${r}/${i}`) - 0.5) * 2 * (o.jy ?? 1.5);
-      // seeded gaps: the crowd breaks into clumps (the back ranks thin out in places)
-      const gapHere = (o.gap !== undefined && rand(seed, `g${r}/${Math.floor(i / 6)}`) < o.gap) || (r > 0 && rand(seed, `G${r}/${Math.floor(i / 5)}`) < 0.18 * r);
+      const h = lerp(h0, h1, rand(seed, `h${r}/${i}`)) * (1 - r * 0.1);
+      const y = yBase - r * hm * 0.45 + (rand(seed, `y${r}/${i}`) - 0.5) * 2 * (o.jy ?? 1.5);
+      const gapHere = o.gap !== undefined && rand(seed, `g${r}/${Math.floor(i / 5)}`) < o.gap;
       if (!gapHere && !(o.skip && o.skip(x, y, h))) {
         const ord = o.order ?? 'rand';
         const u = ord === 'ltr' ? (x - x0) / (x1 - x0) : ord === 'rand' ? rand(seed, `a${r}/${i}`) : Math.min(1, Math.abs(x - ord.from) / 700);
-        out.push({x, y, h, at: at + u * span, rank: (o.rank0 ?? 0) + (ranks - 1 - r)});
+        row.push({x, y, h, at: at + u * span, rank: (o.rank0 ?? 0) + (ranks - 1 - r), fill: (i % 2) as 0 | 1, hood: rand(seed, `hd${r}/${i}`) < (o.hoods ?? 0.6)});
       }
-      x += h * (0.42 + rand(seed, `p${r}/${i}`) * 0.16);
+      x += h * 0.66 + 2 + rand(seed, `p${r}/${i}`) * 2;
       i++;
     }
+    // one or two raised arms per rank (seeded picks, spread out)
+    const na = Math.min(row.length, o.arms ?? 2);
+    for (let a = 0; a < na; a++) {
+      const j = Math.floor(((a + 0.3 + rand(seed, `ar${r}/${a}`) * 0.4) / na) * row.length);
+      if (row[j]) row[j].arm = rand(seed, `as${r}/${a}`) < 0.5 ? -1 : 1;
+    }
+    out.push(...row);
   }
   return out;
 }
 
 /** Skip helper: outside-the-dome only (a figure's head inside the glass is dropped). */
-export const outsideDome = (x: number, y: number, h: number) => inDome(x, y - h * 0.5) || inDome(x - h * 0.3, y - h) || inDome(x + h * 0.3, y - h);
+export const outsideDome = (x: number, y: number, h: number) => inDome(x, y - h * 0.4) || inDome(x - h * 0.33, y - h * 0.5) || inDome(x + h * 0.33, y - h * 0.5) || inDome(x, y - h);
 
-/** The flood: per rank one ink-dark body path + one cream rim path (sun side), back ranks first. Pops 1.25x for 2
- *  frames; after `flickerAt` a seeded third of the crowd bobs 1-2 px in 0.1 s steps (it seethes). */
-export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string; color?: string}> = ({figs, flickerAt, seed, color = palette.ink}) => {
+/** The flood: per rank the ink bodies, the tealDark bodies, the raised arms and the cream rims (sun side), back ranks
+ *  first. Pops 1.25x for 2 frames; after `flickerAt` a seeded third of the crowd bobs 1-2 px in 0.1 s steps (it
+ *  seethes), the raised arms pump. */
+export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string}> = ({figs, flickerAt, seed}) => {
   const t = useTime();
   const look = useLook();
   if (look.fills !== 'color') return null;
   const step = flickerAt !== undefined && t >= flickerAt ? Math.floor((t - flickerAt) / 0.1) : -1;
-  const bodies: string[] = [];
-  const bodies2: string[] = [];
+  const b0: string[] = [];
+  const b1: string[] = [];
   const rims: string[] = [];
+  const arms: string[] = [];
+  const aw: number[] = [];
   figs.forEach((f, i) => {
     if (t < f.at) return;
     const k = t < f.at + 0.067 ? 1.25 : 1;
     const h = f.h * k;
-    const bob = step >= 0 && rand(seed, `f${i}`) < 0.35 && (step + i) % 2 === 0 ? -Math.max(1, h * 0.12) : 0;
+    const bob = step >= 0 && rand(seed, `f${i}`) < 0.35 && (step + i) % 2 === 0 ? -Math.max(1, h * 0.06) : 0;
     const y = f.y + bob;
-    if (rand(seed, `c${i}`) < 0.3) bodies2[f.rank] = (bodies2[f.rank] ?? '') + person(f.x, y, h);
-    else bodies[f.rank] = (bodies[f.rank] ?? '') + person(f.x, y, h);
-    rims[f.rank] = (rims[f.rank] ?? '') + personRim(f.x, y, h, f.x < SUN_X ? 1 : -1, Math.max(1, h * 0.1));
+    const d = bust(f.x, y, h, f.hood, rand(seed, `l${i}`) < 0.5 ? -1 : 1);
+    if (f.fill) b1[f.rank] = (b1[f.rank] ?? '') + d;
+    else b0[f.rank] = (b0[f.rank] ?? '') + d;
+    rims[f.rank] = (rims[f.rank] ?? '') + bustRim(f.x, y, h, f.x < SUN_X ? 1 : -1, Math.max(1.2, h * 0.08), f.hood);
+    if (f.arm) {
+      const pump = Math.floor((t - f.at) / 0.2 + rand(seed, `ap${i}`) * 2) % 2;
+      arms[f.rank] = (arms[f.rank] ?? '') + armUp(f.x, y, h, f.arm, pump ? 0.75 : 1).d;
+      aw[f.rank] = Math.max(1.6, h * 0.12);
+    }
   });
   const out: React.ReactNode[] = [];
-  for (let r = 0; r < Math.max(bodies.length, bodies2.length); r++) {
-    if (bodies[r]) out.push(<path key={`b${r}`} d={bodies[r]} fill={color} />);
-    if (bodies2[r]) out.push(<path key={`c${r}`} d={bodies2[r]} fill={palette.tealDark} />);
+  const n = Math.max(b0.length, b1.length);
+  for (let r = 0; r < n; r++) {
+    if (arms[r]) out.push(<path key={`a${r}`} d={arms[r]} stroke={palette.ink} strokeWidth={aw[r]} strokeLinecap="round" strokeLinejoin="round" fill="none" />);
+    if (b0[r]) out.push(<path key={`b${r}`} d={b0[r]} fill={palette.ink} />);
+    if (b1[r]) out.push(<path key={`c${r}`} d={b1[r]} fill={palette.tealDark} />);
     if (rims[r]) out.push(<path key={`r${r}`} d={rims[r]} fill={palette.cream} />);
   }
   return out.length ? <>{out}</> : null;
+};
+
+// ---------------------------------------------------------------- the near crowd ('millions': our coping's foreground)
+
+export type NearFig = {x: number; y: number; h: number; at: number; fill: 0 | 1; hood: boolean; arm?: -1 | 1; seed: string};
+
+/** Big busts (90-120 px) pushing in behind our coping (their lower half hidden by it): spring pop, ink outline 2.4,
+ *  a cream rim on the sun side, a raised fist that pumps; they sway 1-2 px. */
+export const NearCrowd: React.FC<{figs: NearFig[]}> = ({figs}) => {
+  const t = useTime();
+  const look = useLook();
+  const color = look.fills === 'color';
+  return (
+    <>
+      {figs.map((f) => {
+        if (t < f.at) return null;
+        const k = springAt(t, f.at, springs.pop);
+        const sway = Math.sin(t * 2.1 + rand(f.seed, 'ph') * 6) * 1.5;
+        const x = f.x + sway;
+        const h = f.h;
+        const s = x < SUN_X ? 1 : -1;
+        const d = bust(x, f.y, h, f.hood, s);
+        const arm = f.arm ? armUp(x, f.y, h, f.arm, Math.floor((t - f.at) / 0.22) % 2 ? 0.7 : 1) : undefined;
+        return (
+          <g key={f.seed} transform={k < 1 ? `translate(${f1(x)} ${f1(f.y)}) scale(${k.toFixed(3)}) translate(${f1(-x)} ${f1(-f.y)})` : undefined}>
+            {arm ? <path d={arm.d} stroke={palette.ink} strokeWidth={h * 0.11} strokeLinecap="round" strokeLinejoin="round" fill="none" /> : null}
+            <path d={d} fill={color ? (f.fill ? palette.tealDark : palette.ink) : palette.white} stroke={palette.ink} strokeWidth={2.4} strokeLinejoin="round" />
+            {color ? <path d={bustRim(x, f.y, h, s, Math.max(2.4, h * 0.05), f.hood)} fill={palette.cream} /> : null}
+          </g>
+        );
+      })}
+    </>
+  );
 };

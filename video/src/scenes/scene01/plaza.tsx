@@ -15,7 +15,7 @@ import {GovEvents, GovernmentPlaza, GovId, PLAZA} from '../shared/sets';
 import {Bit, EdgeOnlooker, PowerGlyph, SunPress} from '../shared/props';
 import {inkComp, layerMat, toScreen, zoomAt} from './camera';
 import {B} from './timing';
-import {CitizenPlan, leanAt, OnlookerPhoneArm, PigeonPlan, PipLeap, PipPlan, PipS01, PlazaCitizen, Pigeon} from './cast';
+import {CitizenPlan, leanAt, OnlookerPhoneArm, OnlookerShade, PigeonPlan, PipLeap, PipPlan, PipS01, PlazaCitizen, Pigeon} from './cast';
 import {s01WindowSlot} from './screens';
 import {DOME_GLASS, LanternOff, S01_PADLOCK_SIZE, S01Shutter} from './shims';
 import {DoorLanterns, LockRing, S01Branch, SunRipple, TreeTicks} from './dressing';
@@ -131,8 +131,8 @@ export const S01_BIT: [number, number] = [PLAZA.bit[0], PLAZA.bit[1] + 6];
  *  his body left the frame ahead of the raised arm: a 'cane' hook for 5 frames). Onlooker [1] (the bottom-left bun
  *  head) is dropped (review: five framing elements in the bottom band; the left onlooker is the one side crop). */
 const ONL_PHONE = {up: B.phonesUp + 0.06, down: B.onlookerPhoneDown, hand: [202, 1471] as [number, number]};
-const ONLOOKERS = [0, 2];
-const Onlookers: React.FC = () => {
+export const ONLOOKERS = [0, 2];
+export const Onlookers: React.FC = () => {
   const t = useTime();
   return (
     <>
@@ -164,12 +164,13 @@ const Onlookers: React.FC = () => {
 
 /** The near observer (S01_NEAR): kit EdgeOnlooker leaning about a point below the frame, plus a tealDark shade wedge
  *  down the right side of the back (one light step, ref2 1.7). */
-const NearObserver: React.FC<{p: NearPlan}> = ({p}) => {
+export const NearObserver: React.FC<{p: NearPlan}> = ({p}) => {
   const t = useTime();
   const lean = leanAt(t, p.lean);
   return (
     <XG m={mat.about(mat.rotate(lean), p.x, 2080)}>
       <EdgeOnlooker x={p.x} y={p.y} head={p.head} hair={p.hair} hairColor={p.hairColor} body={p.body} acc={p.acc} rim={p.rim} arms="both" bob={p.bob} seed={p.seed} />
+      <OnlookerShade x={p.x} y={p.y} head={p.head} seed={p.seed} bob={p.bob} />
     </XG>
   );
 };

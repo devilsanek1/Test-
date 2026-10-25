@@ -23,6 +23,7 @@ import {rng, rand, Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {Look, ExitFade, ExitSync, useLook} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 import {MOTION} from '../../../lib/spec';
 import {Acc, Hair, Person, PERSON_BODIES, PERSON_HAIR} from '../../../lib/kit';
 import {tinyFigure} from '../../../lib/cine/figures';
@@ -639,6 +640,7 @@ export type CitizenProps = FigBase & {
 export const Citizen: React.FC<CitizenProps> = (p) => {
   const t = useTime();
   const look = useLook();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   const s = p.h / FIG_H;
   if (p.silhouette || p.h < 26) {
     const {x, y} = walkPos(t, p);
@@ -649,7 +651,7 @@ export const Citizen: React.FC<CitizenProps> = (p) => {
     return (
       <RiseClip at={p.riseAt} dist={p.h * 1.05} clipY={y + 1}>
         <ExitFade x={x} y={y}>
-          <path d={a.d} fill={look.fills === 'paper' ? palette.white : look.fills === 'none' ? 'none' : p.color ?? palette.sage} stroke={look.fills === 'paper' ? palette.ink : undefined} strokeWidth={look.fills === 'paper' ? 1 : undefined} transform={outK < 1 ? `translate(${x} ${y}) scale(1 ${outK}) translate(${-x} ${-y})` : undefined} />
+          <path d={a.d} fill={look.fills === 'paper' ? palette.white : look.fills === 'none' ? 'none' : p.color ?? palette.sage} stroke={look.fills === 'paper' ? palette.ink : undefined} strokeWidth={look.fills === 'paper' ? 1 * ks : undefined} transform={outK < 1 ? `translate(${x} ${y}) scale(1 ${outK}) translate(${-x} ${-y})` : undefined} />
         </ExitFade>
       </RiseClip>
     );
@@ -933,6 +935,7 @@ const bandColor = (coat: string, hair?: string) => {
  *  and hid the notched nape). */
 const CollarBand: React.FC<{top: number; hr: number; coat: string; W: number; seed: string; at?: number; hair?: string; holes?: string[]}> = ({top, hr, coat, W, seed, at, hair, holes}) => {
   const id = 'cb' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const ks = useInkScale(); // the holes are stroked at the (compensated) <Ink> width of the head lines
   const f = (v: number) => v.toFixed(2);
   const hw = hr * 1.05;
   const y0 = top - hr * 0.04;
@@ -955,7 +958,7 @@ const CollarBand: React.FC<{top: number; hr: number; coat: string; W: number; se
         <mask id={id} maskUnits="userSpaceOnUse" x={-m} y={y0 - sag - hr - W * 2} width={m * 2} height={y1 - y0 + hr * 2 + sag * 2 + W * 4}>
           <rect x={-m} y={y0 - sag - hr - W * 2} width={m * 2} height={y1 - y0 + hr * 2 + sag * 2 + W * 4} fill="#fff" />
           {holes.map((h, i) => (
-            <path key={i} d={h} fill="#000" stroke="#000" strokeWidth={W} strokeLinejoin="round" />
+            <path key={i} d={h} fill="#000" stroke="#000" strokeWidth={W * ks} strokeLinejoin="round" />
           ))}
         </mask>
       </defs>
@@ -1163,6 +1166,7 @@ export type AttempterProps = FigBase & {
 export const Attempter: React.FC<AttempterProps> = (p) => {
   const t = useTime();
   const look = useLook();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   const paint = look.fills === 'paper' ? palette.white : look.fills === 'none' ? 'none' : palette.tealDark;
   const seed = p.seed ?? 'att';
   const {x, y} = walkPos(t, p);
@@ -1190,22 +1194,23 @@ export const Attempter: React.FC<AttempterProps> = (p) => {
     const tp = p.tapPoint ?? [hcx + tw * 0.7, top - hr * 1.4];
     for (let i = 0; i < 2; i++) {
       const rr = h * (0.12 + 0.12 * i + 0.25 * q);
-      marks.push(<path key={i} d={arc(tp[0], tp[1], rr, rr, -60, 60, {seed: `${seed}/rp${i}`}) + arc(tp[0], tp[1], rr, rr, 120, 240, {seed: `${seed}/rq${i}`})} fill="none" stroke={palette.ink} strokeWidth={Math.max(1, DEPTH_INK.hair * (1 - q))} strokeLinecap="round" />);
+      marks.push(<path key={i} d={arc(tp[0], tp[1], rr, rr, -60, 60, {seed: `${seed}/rp${i}`}) + arc(tp[0], tp[1], rr, rr, 120, 240, {seed: `${seed}/rq${i}`})} fill="none" stroke={palette.ink} strokeWidth={Math.max(1, DEPTH_INK.hair * (1 - q)) * ks} strokeLinecap="round" />);
     }
   }
   if (p.mode === 'rattle') {
     const hx = hcx + tw * 0.66;
     const hy = top + th * 0.45;
-    marks.push(<path key="h" d={`M${hx} ${hy - h * 0.06}v${h * 0.12}`} stroke={palette.ink} strokeWidth={Math.max(1.6, h * 0.035)} strokeLinecap="round" />);
-    if (rattling && Math.floor(t * 15) % 2 === 0) marks.push(<path key="rm" d={`M${hx + h * 0.08} ${hy - h * 0.1}l${h * 0.05} ${-h * 0.03}M${hx + h * 0.09} ${hy}l${h * 0.06} 0M${hx + h * 0.08} ${hy + h * 0.1}l${h * 0.05} ${h * 0.03}`} stroke={palette.ink} strokeWidth={DEPTH_INK.far} strokeLinecap="round" />);
+    marks.push(<path key="h" d={`M${hx} ${hy - h * 0.06}v${h * 0.12}`} stroke={palette.ink} strokeWidth={Math.max(1.6, h * 0.035) * ks} strokeLinecap="round" />);
+    if (rattling && Math.floor(t * 15) % 2 === 0) marks.push(<path key="rm" d={`M${hx + h * 0.08} ${hy - h * 0.1}l${h * 0.05} ${-h * 0.03}M${hx + h * 0.09} ${hy}l${h * 0.06} 0M${hx + h * 0.08} ${hy + h * 0.1}l${h * 0.05} ${h * 0.03}`} stroke={palette.ink} strokeWidth={DEPTH_INK.far * ks} strokeLinecap="round" />);
   }
   return (
     <ExitFade x={x} y={y}>
       <g transform={pop < 1 ? `translate(${x} ${y}) scale(${pop.toFixed(3)}) translate(${-x} ${-y})` : undefined}>
-        <path d={legs + body + hood} fill={paint} stroke={look.fills === 'paper' && h < 36 ? palette.ink : undefined} strokeWidth={1} />
+        <path d={legs + body + hood} fill={paint} stroke={look.fills === 'paper' && h < 36 ? palette.ink : undefined} strokeWidth={1 * ks} />
+        {/* the arm is a limb drawn as a thick stroke (body geometry, like the filled torso): not ink-compensated */}
         {arm ? <path d={arm} stroke={paint === 'none' ? palette.ink : paint} strokeWidth={h * 0.09} strokeLinecap="round" fill="none" /> : null}
-        {h >= 36 && look.ink ? <path d={body + hood} fill="none" stroke={palette.ink} strokeWidth={iw} strokeLinejoin="round" /> : null}
-        <path d={`M${hcx} ${hcy - hr * 1.75}l${-hr * 0.15} ${hr * 0.6}`} stroke={palette.ink} strokeWidth={Math.max(1, iw * 0.9)} strokeLinecap="round" />
+        {h >= 36 && look.ink ? <path d={body + hood} fill="none" stroke={palette.ink} strokeWidth={iw * ks} strokeLinejoin="round" /> : null}
+        <path d={`M${hcx} ${hcy - hr * 1.75}l${-hr * 0.15} ${hr * 0.6}`} stroke={palette.ink} strokeWidth={Math.max(1, iw * 0.9) * ks} strokeLinecap="round" />
         {marks}
       </g>
     </ExitFade>

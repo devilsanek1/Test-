@@ -24,7 +24,9 @@ export const T = {
   pushAt: w(89, -0.25), // 'Cloudflare' - 0.25
   pushEnd: w(106), // 'minutes'
   pullAt: w(108, -0.15), // 'millions' - 0.15 (the burst)
-  pullEnd: w(108, 0.75),
+  // fix round 2: 1.1 s (storyboard 0.9): the pull-back now also drops the depth-0 plane 60 px (the board out of the
+  // flood band); 0.9 s ran 20 px / frame, 1.1 s keeps the peak under the 18 px strobe limit
+  pullEnd: w(108, 0.95),
   // beats
   hackers: w(81, 0.1), // the city opens row by row
   were: w(83, -0.1), // copies reach the city, flutter down

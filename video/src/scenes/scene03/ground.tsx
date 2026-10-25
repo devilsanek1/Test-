@@ -140,22 +140,25 @@ const FURNITURE = (() => {
 })();
 
 /** S03's plan (replaces the set's 'ground' node): street, sheet, edges, margin, far + mid grid, kerb dimensions, the
- *  title-block frame and the furniture from the cut; the near grid rows draw on from `gridAt` (far -> near). */
-export const GroundS03: React.FC<{gridAt: number; seed?: string}> = ({gridAt, seed = 'bp'}) => {
+ *  title-block frame and the furniture from the cut; the near grid rows draw on from `gridAt` (far -> near).
+ *  Polish round 1: the sand street exists only from `streetAt` (the pop-up: the pavement springs up with the city);
+ *  before it the bare plan is all paper (FarPlain's cream + grid show round the sheet, to the horizon). The grid weights
+ *  thin with depth from 2.2 (near) through 1.9 (mid) to inkHair 1.6 (far), continuing into the far plain's 1.6. */
+export const GroundS03: React.FC<{gridAt: number; streetAt?: number; seed?: string}> = ({gridAt, streetAt, seed = 'bp'}) => {
   useCaptionFont();
   const t = useTime();
   const F = FURNITURE;
   const nearOn = t >= gridAt;
   return (
     <>
-      <Fill rect={[-160, 1180, 1400, 900]} color={palette.sand} offset={false} mode="snap" seed={`${seed}/street`} />
+      {streetAt === undefined || t >= streetAt ? <Fill rect={[-160, 1180, 1400, 900]} color={palette.sand} offset={false} mode="snap" seed={`${seed}/street`} /> : null}
       <Fill d={G.sheet} color={palette.cream} offset={false} mode="snap" seed={`${seed}/sheet`} />
       <Fill d={G.dogEar} color={palette.white} offset={false} mode="snap" seed={`${seed}/ear`} />
       <Ink d={G.edgeInk} width={SI.far} taper={false} seed={`${seed}/edge`} />
       <Ink d={G.margin} width={SI.hair * 0.8} taper={false} seed={`${seed}/margin`} />
-      <Ink d={G.gridFar} width={SI.hair * 0.6} taper={false} seed={`${seed}/gF`} />
-      <Ink d={G.gridMid} width={SI.hair * 0.9} taper={false} seed={`${seed}/gM`} />
-      {nearOn ? <Ink d={G.gridNear} width={SI.hair * 1.25} at={gridAt} dur={0.3} order="all" taper={false} seed={`${seed}/gN`} /> : null}
+      <Ink d={G.gridFar} width={SI.hair} taper={false} seed={`${seed}/gF`} />
+      <Ink d={G.gridMid} width={1.9} taper={false} seed={`${seed}/gM`} />
+      {nearOn ? <Ink d={G.gridNear} width={SI.far} at={gridAt} dur={0.3} order="all" taper={false} seed={`${seed}/gN`} /> : null}
       <Ink d={G.dims} width={SI.far} taper={false} seed={`${seed}/dim`} />
       <Ink d={TB_FRAME} width={SI.hair} taper={false} seed={`${seed}/tb3`} />
       {/* plan furniture */}

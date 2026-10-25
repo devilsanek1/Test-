@@ -20,6 +20,7 @@ import {Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {ExitFade, useLook} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 import {circle, hline, line, rect, rectPath, roundRect} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {bt, Depth, DEPTH_INK, lodOf, PropBase, PropRoot, usePropFrame, withOut} from './common';
@@ -221,6 +222,7 @@ export type RingProps = {
 export const LoadingRing: React.FC<RingProps> = ({x, y, r = 10, at, spin, pulseAt, popAt, outAt, width, depth, seed = 'ring', color: colorIn = palette.peach}) => {
   const t = useTime();
   const look = useLook();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   const color = look.fills === 'paper' ? palette.white : colorIn;
   const start = popAt ?? at;
   if (start !== undefined && t < start) return null;
@@ -248,12 +250,13 @@ export const LoadingRing: React.FC<RingProps> = ({x, y, r = 10, at, spin, pulseA
   return (
     <ExitFade x={x} y={y}>
       <g transform={`translate(${x} ${y}) scale(${k.toFixed(4)})`}>
+        {/* the coloured band is the ring's BODY (the ink circles sit at r +- band / 2): geometry, not compensated */}
         <circle r={r} fill="none" stroke={color} strokeWidth={band} />
-        <circle r={r + band / 2} fill="none" stroke={palette.ink} strokeWidth={iw} />
-        {r > 6 ? <circle r={Math.max(0.5, r - band / 2)} fill="none" stroke={palette.ink} strokeWidth={iw * 0.7} /> : null}
-        {sp ? <path d={`M${(Math.cos(a0) * r).toFixed(2)} ${(Math.sin(a0) * r).toFixed(2)}A${r} ${r} 0 0 1 ${(Math.cos(a1) * r).toFixed(2)} ${(Math.sin(a1) * r).toFixed(2)}`} fill="none" stroke={palette.ink} strokeWidth={band * 0.55} strokeLinecap="round" /> : null}
+        <circle r={r + band / 2} fill="none" stroke={palette.ink} strokeWidth={iw * ks} />
+        {r > 6 ? <circle r={Math.max(0.5, r - band / 2)} fill="none" stroke={palette.ink} strokeWidth={iw * 0.7 * ks} /> : null}
+        {sp ? <path d={`M${(Math.cos(a0) * r).toFixed(2)} ${(Math.sin(a0) * r).toFixed(2)}A${r} ${r} 0 0 1 ${(Math.cos(a1) * r).toFixed(2)} ${(Math.sin(a1) * r).toFixed(2)}`} fill="none" stroke={palette.ink} strokeWidth={band * 0.55 * ks} strokeLinecap="round" /> : null}
       </g>
-      {ripple > 0 ? <circle cx={x} cy={y} r={(r + band) * (1 + ripple * 0.9)} fill="none" stroke={palette.ink} strokeWidth={iw * (1 - ripple)} /> : null}
+      {ripple > 0 ? <circle cx={x} cy={y} r={(r + band) * (1 + ripple * 0.9)} fill="none" stroke={palette.ink} strokeWidth={iw * (1 - ripple) * ks} /> : null}
     </ExitFade>
   );
 };

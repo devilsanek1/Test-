@@ -7,6 +7,8 @@
 // 'back soon' tag of S01 arrive (now explained), and a cream sticky note on the closed shutter makes the tech-support
 // joke (J6: 'Turn it off ~~and on again~~'). Pip watches from the sill's left end and shrugs on 'answer'; the snail is
 // the running gag; Bit hops onto the padlock's shackle (rewatch spot: he guards the lock that keeps the bug out).
+// Near plane (fix round 1): the plaza lamp post cropped by the left edge (Pip hops in behind it) and two back-view
+// onlookers with phones at the bottom right (under the UI); govA keeps its lit tone (only govB steps darker).
 //
 // Hard cut in and out (no transition camera). Camera: a 4 % push from rest, locked, a 3 % lean into the joke, hold.
 // Local helpers: ./scene11/* (beats, camera, actors: pigeons, snail, govB's window with its fat 'updating... 8%' bar, the
@@ -15,7 +17,8 @@
 // StickyNote, StepRipple (the press ring, stepped width), a Sparkle, PadlockRock / TagTwirl (motion around S01's own
 // padlock and lettered tag); entry = an isolated preview entry). Shared kit: GovernmentPlaza (far civic skyline,
 // shutters, lights out), LabelTag (L14 notice), StickyNote (J6), ShutterPadlock + BackSoonTag (S01's govB padlock and
-// one-line white 'back soon' tag, S01's seeds), PowerGlyph, SunPress, Bit.
+// one-line white 'back soon' tag, S01's seeds), PowerGlyph, SunPress, Bit, EdgeOnlooker. scene11/near: NearLamp,
+// StepTreads (ink on the far steps), BandClip (the top-to-bottom lights-out cascade).
 
 import React, {useMemo} from 'react';
 import {World, Sun, useTime, useScene, mat, XG} from '../lib';

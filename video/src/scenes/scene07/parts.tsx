@@ -5,6 +5,7 @@
 import React, {useId} from 'react';
 import {ease as E, Fill, Ink, lerp, Look, mat, Mat, palette, prog, springAt, springs, Tod, useTime, XG, clamp, Pt, hline, poly, polyPath, line} from '../../lib';
 import {Elephant, hop} from '../../lib/mascot';
+import {rand} from '../../lib/rng';
 import {Bird} from '../../lib/kit';
 import {Bit, DEPTH_INK, LeakSheet, MarkRing, misregScreen} from '../shared/props';
 import type {PaneRect} from '../shared/props';
@@ -14,12 +15,13 @@ import type {Beats} from './beats';
 // ---------------------------------------------------------------- camera (storyboard flat projection)
 // screen = (world - (x, y)) * z + (540, 960). Keys (S07 camera[] in docs/storyboard_v3_resolved.json):
 //   cut -> cut+0.21 hold (540,960,1.0) | -> 'fix' push-in to (480,950,1.06) inOut(sine) | hold | the last 0.40 s a
-//   TILT-UP to (480,760,1.06) in(sine): every layer (the sun too) moves down 201 px, exiting at ~790 px/s into S08.
+//   TILT-UP to (480,764,1.06) in(sine): every layer except the sun moves down 197 px, exiting at ~775 px/s into S08.
 
 export type Cam = {x: number; y: number; z: number};
 export const REST: Cam = {x: 540, y: 960, z: 1};
 export const PUSHED: Cam = {x: 480, y: 950, z: 1.06};
-export const TILT_TO_Y = 760;
+/** 760 + 4 / 1.06: S07's end state = S08's first frame (the wires landed ~4 px low, fix round 1). */
+export const TILT_TO_Y = 764;
 
 export function camAt(t: number, B: Beats): Cam {
   const p0 = B.cut + 0.21;
@@ -45,10 +47,13 @@ export function tiltPx(t: number, B: Beats): number {
 }
 
 // ---------------------------------------------------------------- fill-first reveal (motion spec T-MATCH 4-5)
-// The new scene arrives as flat fills only, then its linework draws on top -> bottom. Rendered as two passes (fills,
-// then the ink clipped to everything above a falling edge) only while the reveal runs; one pass before / after it.
+// The new scene arrives as flat fills only, then its linework draws on top -> bottom. Rendered as two passes while the
+// reveal runs: the fills-only pass for the part not yet revealed, and above it the WHOLE render (fills and ink in their
+// true z-order) clipped to everything above a falling edge, so the ink of an object at the back never shows through the
+// fill of one in front of it (fix round 1: the blind's slats struck through J4 and the round sign). One pass before /
+// after the reveal.
 
-export type RevealPass = 'all' | 'fills' | 'ink';
+export type RevealPass = 'all' | 'fills';
 
 export const InkReveal: React.FC<{at: number; dur: number; y0: number; y1: number; render: (pass: RevealPass) => React.ReactNode}> = ({at, dur, y0, y1, render}) => {
   const t = useTime();
@@ -65,9 +70,7 @@ export const InkReveal: React.FC<{at: number; dur: number; y0: number; y1: numbe
           <rect x={-3000} y={-4000} width={7000} height={edge + 4000} />
         </clipPath>
       </defs>
-      <g clipPath={`url(#${id})`}>
-        <Look fills="none">{render('ink')}</Look>
-      </g>
+      <g clipPath={`url(#${id})`}>{render('all')}</g>
     </>
   );
 };
@@ -93,6 +96,10 @@ export type WireCopySpec = {
   rampDur?: number;
   bit?: boolean;
   bitHopAt?: number;
+  /** Over the ramp the copy's lean blends (smoothstep) into S08's lean for the same copy (scene08/cast.tsx copyLean:
+   *  5 + 1.5 sin(t8 x 5.3 + rand(seed, 'p') x 6), t8 = t - t0): equal angle and angular speed on the cut (fix round 1:
+   *  a 3 deg lean mismatch shifted a sheet ~2.5 px on the cut frame). */
+  leanTo?: {seed: string; t0: number};
   seed: string;
 };
 
@@ -142,7 +149,13 @@ export function wireCopyAt(t: number, c: WireCopySpec): {pt: Pt; rot: number; s:
   const x = c.x - copySlid(c, t);
   const pt = wireAt(spec, c.wire, x);
   // peg jolt, then a trailing lean against the travel + a slow sway
-  const swing = 14 * Math.exp(-dt * 4.2) * Math.sin(dt * 15) + 5 * (1 - Math.exp(-dt * 6)) + 1.5 * Math.sin(dt * 5.3 + c.x);
+  let swing = 14 * Math.exp(-dt * 4.2) * Math.sin(dt * 15) + 5 * (1 - Math.exp(-dt * 6)) + 1.5 * Math.sin(dt * 5.3 + c.x);
+  if (c.leanTo && c.rampAt !== undefined && c.rampDur) {
+    const u = clamp((t - c.rampAt) / c.rampDur);
+    const w = u * u * (3 - 2 * u);
+    const lean8 = 5 + 1.5 * Math.sin((t - c.leanTo.t0) * 5.3 + rand(c.leanTo.seed, 'p') * 6);
+    swing = lerp(swing, lean8, w);
+  }
   return {pt, rot: swing, s: COPY.s, pegged: true};
 }
 
@@ -233,8 +246,11 @@ export const Pigeon: React.FC<{wire: 0 | 1 | 2; x: number; hopAt?: number[]; fly
 
 // ---------------------------------------------------------------- Pip (scale 1.2 on the board top) + the flyer gag
 
-/** exit: down behind the right-hand readers' coats (fully hidden by the cut: no sliver of ear on the last frames). */
-export const PIP = {x: 705, y: 928, s: 1.2, entry: [-150, 1190] as Pt, exit: [1000, 1600] as Pt};
+/** entry: a flatter, longer leap in from off-frame left (hidden under the lens sheet for its first frames; <= ~60 px a
+ *  frame on screen at the landing). exit (fix round 1): an arc UP and out of the right frame edge over the workshop's
+ *  window box (feet never below the board top y 928, so it never crosses J4 or the round sign; Pip is fully past the
+ *  frame edge, world x 989 + his 62 px tail, by local ~1.98; every step <= ~60 px a frame incl. the tilt). */
+export const PIP = {x: 705, y: 928, s: 1.2, entry: [-40, 1150] as Pt, inAir: 0.5, inH: 60, exit: [1085, 905] as Pt, offLead: 0.02, offAir: 0.32, offH: 36};
 /** The flyer is flicked off this long before the word 'was' (frame 1 already moves ~30 %: out(cubic)). */
 export const PEEL_LEAD = 0.08;
 const PEEL_DUR = 0.25;
@@ -245,23 +261,24 @@ const FACE: Pt = [0, -67];
 export const PipS07: React.FC<{B: Beats}> = ({B}) => {
   const t = useTime();
   const land = B.pinPip;
-  const inAir = 0.46;
-  const offT0 = B.tilt + 0.03; // hop-off take-off on the tilt (crouch from B.tilt - 0.05)
-  const offAir = 0.27;
+  const inAir = PIP.inAir;
+  const offT0 = B.tilt - PIP.offLead; // hop-off take-off as the tilt starts (crouch from offT0 - 0.08)
+  const entry = (tt: number) => hop({t: tt, t0: land - inAir, dur: inAir, from: {x: PIP.entry[0], y: PIP.entry[1]}, to: {x: PIP.x, y: PIP.y}, height: PIP.inH});
   // 1) leap in from off-frame left after the sheet
   if (t < land) {
-    const h = hop({t, t0: land - inAir, dur: inAir, from: {x: PIP.entry[0], y: PIP.entry[1]}, to: {x: PIP.x, y: PIP.y}, height: 150});
+    const h = entry(t);
     if (!h.airborne && h.k === 0 && t < land - inAir) return null;
     return <Elephant x={h.x} y={h.y} scale={PIP.s} pose="stand-side" amount={h.spread} squash={h.squash} rotate={h.rotate} t={t} seed={7} expression="wide" />;
   }
-  // 3) hop off the board, down behind the right-hand readers
+  // 3) hop off the board: up-right over the window box and out of the right frame edge
   if (t >= offT0 - 0.08) {
-    const h = hop({t, t0: offT0, dur: offAir, from: {x: PIP.x, y: PIP.y}, to: {x: PIP.exit[0], y: PIP.exit[1]}, height: 34});
+    const h = hop({t, t0: offT0, dur: PIP.offAir, from: {x: PIP.x, y: PIP.y}, to: {x: PIP.exit[0], y: PIP.exit[1]}, height: PIP.offH});
+    if (t >= offT0 + PIP.offAir) return null; // past the frame edge
     if (h.airborne || t >= offT0) return <Elephant x={h.x} y={h.y} scale={PIP.s} pose="stand-side" amount={h.spread} squash={h.squash} rotate={h.rotate} t={t} seed={7} expression="meh" />;
     return <Elephant x={h.x} y={h.y} scale={PIP.s} pose="sit-front" squash={h.squash} t={t} seed={7} expression="meh" />;
   }
   // 2) on the board top: sit-back watching the notice; the slap flips him to sit-front behind the flyer; head shake
-  const landSq = hop({t, t0: land - inAir, dur: inAir, from: {x: PIP.entry[0], y: PIP.entry[1]}, to: {x: PIP.x, y: PIP.y}, height: 150}).squash;
+  const landSq = entry(t).squash;
   const front = t >= B.slap;
   const sw = (dt: number) => (dt > -0.1 && dt < 0.45 ? (dt < 0 ? 0.14 * prog(dt, -0.1, 0.1) : 0.14 * Math.exp(-dt * 9) * Math.cos(dt * Math.PI * 2 * 3.4)) : 0);
   const sq = landSq + sw(t - B.slap) * 1.4;
@@ -334,7 +351,7 @@ export const PinDot: React.FC<{x: number; y: number; at: number}> = ({x, y, at})
 
 /** The leak on a reader's phone screen (pops, fills the screen: ~30 x 38 world) and an ink ring pops around the phone
  *  (a spring + the ring's stroke-on, never a fade). (x, y) = the phone screen centre, world. */
-export const PhoneCopy: React.FC<{x: number; y: number; at: number; rot?: number; ringAt?: number}> = ({x, y, at, rot = 0, ringAt}) => {
+export const PhoneCopy: React.FC<{x: number; y: number; at: number; rot?: number; ringAt?: number; ringR?: number}> = ({x, y, at, rot = 0, ringAt, ringR = 46}) => {
   const t = useTime();
   if (t < at) return null;
   const k = springAt(t, at, springs.pop);
@@ -347,7 +364,7 @@ export const PhoneCopy: React.FC<{x: number; y: number; at: number; rot?: number
       </XG>
       {kr > 0 ? (
         <XG m={mat.about(mat.scale(kr), x, y)}>
-          <MarkRing x={x} y={y} r={46} at={ra} dur={0.14} depth="mid" seed="s7phoneRing" />
+          <MarkRing x={x} y={y} r={ringR} at={ra} dur={0.14} depth="mid" seed="s7phoneRing" />
         </XG>
       ) : null}
     </>
@@ -400,6 +417,58 @@ export const FarRoofDetails: React.FC<{seed?: string}> = ({seed = 's7roofs'}) =>
       <Fill d={stacks + caps} color={HALF.sand} offset={false} seed={`${seed}/st`} />
       <Ink d={aerials + pole} width={SI.hair} taper={false} seed={`${seed}/ai`} />
       <Ink d={lines} width={SI.hair * 0.8} taper={false} order="all" seed={`${seed}/pl`} />
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- quiet wall details (the left wall field)
+// Fix round 1: the left wall (screen x 0-170 after the push) was a bare flat field. A drainpipe down the wall's left end
+// (hopper head under the cornice, three brackets, a shoe at the paving) and the torn corner of an old poster, both
+// static, at the mid ink weight, in the wall's own family (tan / cream / sand): architecture, not events. Drawn into the
+// set's 'wall' layer (behind the board and the readers).
+
+export const WallDetails: React.FC<{seed?: string}> = ({seed = 's7wall'}) => {
+  const P = {x: 6, w: 14, top: 884, bot: 1548};
+  const pipe = `M${P.x} ${P.top + 26}V${P.bot - 14}Q${P.x} ${P.bot} ${P.x + 12} ${P.bot}H${P.x + P.w + 14}V${P.bot - P.w}H${P.x + P.w}V${P.top + 26}Z`;
+  const head = polyPath([
+    [P.x - 9, P.top],
+    [P.x + P.w + 9, P.top],
+    [P.x + P.w + 3, P.top + 26],
+    [P.x - 3, P.top + 26],
+  ]);
+  const brackets = [1000, 1200, 1400].map((y, i) => line(P.x - 4, y, P.x + P.w + 4, y + 0.5, {over: 0, seed: `${seed}/b${i}`})).join('');
+  // the torn poster corner: an old notice's top-left, its lower-right edge torn off (a zig-zag), one faded band + rules
+  const Q = {x: 34, y: 1112, w: 74, h: 58};
+  const torn: Pt[] = [
+    [Q.x, Q.y],
+    [Q.x + Q.w, Q.y + 2],
+    [Q.x + Q.w - 6, Q.y + 14],
+    [Q.x + Q.w - 16, Q.y + 19],
+    [Q.x + Q.w - 22, Q.y + 33],
+    [Q.x + Q.w - 36, Q.y + 38],
+    [Q.x + 30, Q.y + 50],
+    [Q.x + 14, Q.y + 52],
+    [Q.x + 6, Q.y + Q.h],
+    [Q.x - 1, Q.y + Q.h - 2],
+  ];
+  const band = polyPath([
+    [Q.x + 4, Q.y + 8],
+    [Q.x + Q.w - 6, Q.y + 9],
+    [Q.x + Q.w - 9, Q.y + 15],
+    [Q.x + 4, Q.y + 15],
+  ]);
+  const rules = line(Q.x + 7, Q.y + 25, Q.x + 44, Q.y + 25.5, {over: 0, seed: `${seed}/r1`}) + line(Q.x + 7, Q.y + 34, Q.x + 30, Q.y + 34.5, {over: 0, seed: `${seed}/r2`});
+  return (
+    <>
+      <Fill d={pipe + head} color={palette.tan} seed={`${seed}/pf`} />
+      <Ink d={pipe + head + brackets} width={SI.mid} taper={false} seed={`${seed}/pi`} />
+      <XG m={mat.about(mat.rotate(-4), Q.x, Q.y)}>
+        <Fill d={polyPath(torn)} color={palette.cream} seed={`${seed}/qf`} />
+        <Fill d={band} color={palette.sand} offset={false} seed={`${seed}/qb`} />
+        <Ink d={poly(torn, {closed: true, seed: `${seed}/qo`, over: 1})} width={SI.mid * 0.8} taper={false} seed={`${seed}/qo`} />
+        <Ink d={rules} width={SI.far * 0.8} taper={false} seed={`${seed}/qr`} />
+        <circle cx={Q.x + 5} cy={Q.y + 5} r={2.6} fill={palette.ink} />
+      </XG>
     </>
   );
 };

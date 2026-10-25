@@ -1,7 +1,7 @@
 // S10 local pieces that have no shared-kit counterpart:
 //   (SupportTag: swapped to the shared props one, src/scenes/shared/props/Labels.tsx)
 //   (CartSign: swapped to the shared props FixSign, src/scenes/shared/props/FixSign.tsx, fix round 1)
-//   Satchel     (the cart's satchel of support tags; no shared piece requested, scene-owned)
+//   Satchel     (the maker's hip satchel of support tags; no shared piece requested, scene-owned)
 // Everything is Ink / Fill (relights, un-builds, paper Look), seconds-based, no opacity.
 
 import React from 'react';
@@ -15,8 +15,8 @@ import {mat, XG} from '../../lib/xf';
 // ---------------------------------------------------------------- Satchel (the cart's bag of support tags)
 
 /** A sand satchel with a flap and two sage tag tops peeking out. (x, y) = bottom centre; w = width. `pullAt` times:
- *  each pulls one tag up out of the bag (0.12 s rise), then it is gone (the scene flies it). */
-export const Satchel: React.FC<{x: number; y: number; w?: number; pullAt?: number[]; ink?: number; seed?: string}> = ({x, y, w = 34, pullAt = [], ink = 2.2, seed = 'satchel'}) => {
+ *  each pulls one tag up out of the bag (`pullDur` rise), then it is gone (the scene's raised hand has it). */
+export const Satchel: React.FC<{x: number; y: number; w?: number; pullAt?: number[]; pullDur?: number; ink?: number; seed?: string}> = ({x, y, w = 34, pullAt = [], pullDur = 0.1, ink = 2.2, seed = 'satchel'}) => {
   const t = useTime();
   const h = w * 0.72;
   const x0 = x - w / 2;
@@ -33,8 +33,8 @@ export const Satchel: React.FC<{x: number; y: number; w?: number; pullAt?: numbe
   });
   // a pulled tag rises out (0.12 s) and is gone 2 frames before the scene flicks the flying tag up from above the bag
   pullAt.forEach((pa, i) => {
-    if (t < pa || t >= pa + 0.1) return;
-    const q = E.outCubic(prog(t, pa, 0.1));
+    if (t < pa || t >= pa + pullDur) return;
+    const q = E.outCubic(prog(t, pa, pullDur));
     const ty = y0 - h * 0.3 - q * h * 0.9;
     tags.push(
       <g key={`pl${i}`}>

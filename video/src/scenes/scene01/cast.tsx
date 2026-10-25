@@ -2,13 +2,13 @@
 // is a pure function of scene time (no state between frames), so S12's rewind can replay it backwards through a
 // TimeProvider.
 import React from 'react';
-import {palette, skies} from '../../lib/theme';
+import {canvas, palette, skies, world} from '../../lib/theme';
 import {clamp, ease as E, lerp, osc, prog, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {arc, blob, circle, polyPath, rectPath, roundRect, Pt} from '../../lib/sketch';
 import {rand, rng} from '../../lib/rng';
-import {mat, XG} from '../../lib/xf';
+import {mat, useXf, XG} from '../../lib/xf';
 import {Person, Bird, PERSON_BODIES} from '../../lib/kit';
 import {inkW} from '../../lib/kit/common';
 import {useInkScale} from '../../lib/inkComp';
@@ -582,3 +582,66 @@ export const PipLeap: React.FC<{p: PipPlan; from: Pt; fromScale: number; v0?: Pt
   }
   return <Elephant x={x} y={y} scale={scale} t={t} seed={S02_PIP.seed} pose="stand-side" flip={left} amount={amount} squash={squash} rotate={rotate} look={left ? 0 : 0.2} />;
 };
+
+// ---------------------------------------------------------------- the near observer's shade (on a props EdgeOnlooker)
+
+/** A tealDark shade over the RIGHT sleeve of a props EdgeOnlooker (light from the left, where its rim strip is; fix
+ *  round 4, ref2 1.7: one shade step on the foreground figure). Mirrors EdgeOnlooker's figure frame for the seed (kit
+ *  torso width / head radius / rounding, the coat length derived from the frame bottom, the breathing bob) and fills
+ *  the band between the sleeve seam and the coat outline, from below the hood to the cuff, inset by the ink so both
+ *  strokes stay on top. Render it right after the EdgeOnlooker, in the same transform. */
+export const OnlookerShade: React.FC<{x: number; y: number; head: number; seed: string; bob: number; color?: string}> = ({x, y, head, seed, bob, color = palette.tealDark}) => {
+  const t = useTime();
+  const m = useXf();
+  const r = rng(`person/${seed}`);
+  const w = r.range(86, 100);
+  const hr = w * r.range(0.23, 0.26);
+  const round = r.range(0.36, 0.45);
+  const s = head / (hr * 2);
+  const iv = mat.inv(m);
+  const Y = canvas.height + 40;
+  const yb = Math.max(world.h + world.bleed, iv[3] * Y + iv[5], iv[1] * canvas.width + iv[3] * Y + iv[5]);
+  const need = (yb + 30 - y) / s - hr * 0.86;
+  const h = Math.min(8000, Math.max(220, Math.ceil(need / 64) * 64));
+  const hy = -h - hr * 0.86;
+  const hipY = y - hy * s + (bob ? osc(t, 0.5, rand(seed, 'b') * 6) * bob : 0);
+  const hw = w / 2;
+  const bx = hw * 1.07;
+  const R = Math.min(w * round, h * 0.8);
+  const xAt = (yy: number) => (yy < -h + R ? hw - R + Math.sqrt(Math.max(0, R * R - (yy - (-h + R)) ** 2)) : hw + ((bx - hw) * (yy - (-h + R))) / (h - R));
+  const d = w * 0.18;
+  const yTop = -h + R - Math.sqrt(Math.max(0, R * R - (R - d) * (R - d))) + w * 0.03;
+  const yCuff = -h + w * 1.05;
+  const xc = xAt(yCuff);
+  const ink = DEPTH_INK_FRONT / s;
+  const ins = ink * 0.62;
+  const y0 = yTop + w * 0.2; // below the hood's shoulder
+  const y1 = yCuff - ink * 0.6;
+  // the seam: quadratic (hw - d, yTop) -> ctrl (hw - d + 0.012 w, mid) -> (xc - d, yCuff); sample its x at y
+  const seamX = (yy: number) => {
+    const u = clamp((yy - yTop) / (yCuff - yTop));
+    const x0 = hw - d;
+    const cx = hw - d + w * 0.012;
+    const x1 = xc - d;
+    return (1 - u) * (1 - u) * x0 + 2 * (1 - u) * u * cx + u * u * x1;
+  };
+  const N = 8;
+  const outer: string[] = [];
+  const inner: string[] = [];
+  // the top edge runs diagonally down from the outline to the seam (a soft shoulder, not a flat cut)
+  const y0i = y0 + w * 0.3;
+  for (let i = 0; i <= N; i++) {
+    const yy = lerp(y0, y1, i / N);
+    const yi = lerp(y0i, y1, i / N);
+    outer.push(`${(xAt(yy) - ins).toFixed(2)} ${yy.toFixed(2)}`);
+    inner.unshift(`${(seamX(yi) + ins).toFixed(2)} ${yi.toFixed(2)}`);
+  }
+  const dPath = `M${outer.join('L')}L${inner.join('L')}Z`;
+  return (
+    <XG m={mat.compose(mat.translate(x, hipY), mat.scale(s))}>
+      <Fill d={dPath} color={color} offset={false} mode="none" seed={`${seed}/shade`} />
+    </XG>
+  );
+};
+/** props DEPTH_INK.front (EdgeOnlooker's default depth), screen px. */
+const DEPTH_INK_FRONT = 4.8;

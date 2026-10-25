@@ -21,18 +21,19 @@ export const BOARD = {x0: 440, x1: 880, y0: 1046, y1: 1436};
 /** The baseline push target (camera x): 530 keeps the whole board left of x 950 at 1.15. */
 export const PUSH_X = 530;
 
-/** The district dome, slid LEFT of the board (fix round 1: the shared DOME.district 180-600 ran behind the board, its
- *  right foot and the watchtower ended exactly on the board's top edge). Feet (75, 1080) / (415, 1080), apex (245, 835):
- *  ~1/5 of the visible city, its whole arc in the clear. */
-export const DOME8: DomeArc = {cx: 245, by: 1080, rx: 170, ry: 245};
+/** The district dome, slid LEFT of the board. Fix round 2 (polish): narrowed to rx 150 and moved right (feet (120, 1080)
+ *  / (420, 1080), apex (270, 835)) so the counted pile at its foot and flank stands at screen x >= 120: in the assembled
+ *  film the paint edge eats the left ~85 px (fix round 1's pile at x 0-85 was mostly paper there). Still ~1/5 of the
+ *  visible city and clear of the board (>= 16 px at the 1.15 push). */
+export const DOME8: DomeArc = {cx: 270, by: 1080, rx: 150, ry: 245};
 
 /** Pip on the coping LEFT of the board (fix round 1: at x 915 he sat on the board's corner and in the right rail). */
 export const PIP: Pt = [390, copingY(390)];
 
-/** The watchtower, now standing INSIDE the glass by the dome's right flank (it would otherwise stand in the board):
- *  lattice from row 1 (y 1100) up to a 40 x 38 cabin (322-362 x 922-960, roof apex 908); the searchlight lamp on the
- *  cabin's left side points across the dome at its far (left) flank. */
-export const TOWER8 = {x0: 324, x1: 360, base: 1100, cabin: [322, 922, 40, 38] as [number, number, number, number], top: 908, light: [318, 941] as Pt};
+/** The watchtower, standing INSIDE the glass by the dome's right flank (it would otherwise stand in the board):
+ *  lattice from row 1 (y 1100) up to a 40 x 38 cabin (334-374 x 922-960, roof apex 908); the searchlight lamp on the
+ *  cabin's left side points across the dome at its far (left) flank and down at the pile. */
+export const TOWER8 = {x0: 336, x1: 372, base: 1100, cabin: [334, 922, 40, 38] as [number, number, number, number], top: 908, light: [330, 941] as Pt};
 
 /** The dome arc's y at x (top of the glass), or the foot line outside it. */
 export const domeY = (x: number) => {
@@ -51,13 +52,16 @@ export const inDome = (x: number, y: number) => {
   return y < a.by && u * u + v * v < 1;
 };
 
-/** Row-3 doors: the set's five (DOME.rattlers.row3) + three the scene adds (x 30 at the left edge, 240 and 330: the
- *  doors two rattlers hop to on 'attempts'; 330 replaces 413, which Pip now sits in front of). Feet points + the
- *  attempter height there. */
-export const R3 = DOME.rattlers.row3;
-export const EXTRA_DOORS3 = [
-  {x: 30, y: 1443, h: 60},
-  {x: 240, y: 1440.5, h: 60},
-  {x: 330, y: 1439.5, h: 60},
-];
+/** Row-3 doors (fix round 2: the scene draws its own LIGHT doors, the set's teal ones are off): three big near doors
+ *  x 125 / 220 / 315 (96-98 px: the nearest rattlers are 86-92 px, so 'a hooded person at a door' reads at phone
+ *  size), a small one at 455 (behind the board once it rises) and one at the left edge (x 40: the hop target on
+ *  'attempts'). Door centre x, sill y (just above our coping), door height. */
+export const DOORS3 = [
+  {x: 125, h: 96},
+  {x: 220, h: 98},
+  {x: 315, h: 96},
+  {x: 455, h: 74},
+  {x: 40, h: 96},
+].map((d) => ({...d, y: copingY(d.x) - 9}));
+/** Row-2 doors: the set's slots (street level y 1300 in front of low row-3 sheds), drawn light by the scene. */
 export const R2 = DOME.rattlers.row2;

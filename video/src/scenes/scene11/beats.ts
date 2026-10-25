@@ -56,17 +56,20 @@ export const ABS = {
   shutter: W.it, // govB's shutter rolls down clean (0.16 s + 6 px bounce), covering the bar and the notice
   lightsOut: W.off, // govB one palette step darker
   offCut: 49.515, // cut(off): the comma pause after 'off,' (gap anchor): the lean into the joke starts here
-  padlock: W.off + 0.04, // the padlock pops (ShutterPadlock's grow: full at ~49.21, ON the lock_click at 49.205) ...
-  tag: W.off + 0.08, // ... and the lettered 'back soon' tag swings in on its nail
-  // the switch-off spreads, AFTER the padlock beat (the padlock + tag are the only focal event on 'off'):
-  govAScreen: W.is + 0.02, // govA's screen CRT-collapses on 'is', with its shutter (S12 opens with it dark) ...
-  govAShutter: W.is + 0.06, // ... its shutter slams on 'is' ...
-  lampOff: W.is + 0.2, // ... and the near plaza lamp's lantern pops off (cream -> sand) at the left edge. govA does NOT step
+  padlock: W.off + 0.02, // the padlock pops (ShutterPadlock's grow: first frame ~49.13, full ~49.20, ON the lock_click at 49.205) ...
+  tag: W.off + 0.1, // ... and the lettered 'back soon' tag swings in on its nail right after it
+  // the switch-off spreads as ONE outward ripple from govB in the comma pause after 'off,' (fix round 2: before the note
+  // appears, so 'is' .. 'everything' carries only the note's own events): govA's screen + shutter (left neighbour), govC's
+  // screen + half shutter (right neighbour), the far civic silhouettes (0.04 s steps, all six dark by ~49.72), then the
+  // civic lanterns and the near lamp's lantern
+  govAScreen: W.offEnd + 0.05, // govA's screen CRT-collapses (S12 opens with it dark) ...
+  govAShutter: W.offEnd + 0.08, // ... its shutter slams ...
+  govCScreen: W.offEnd + 0.12, // ... govC's screen collapses at the right edge ...
+  govCShutter: W.offEnd + 0.18, // ... and its shutter drops half way (S12: govC half shut)
+  civicOff: W.offEnd + 0.12, // the far civic silhouettes step dark, left to right, 0.04 s apart (6 steps: 49.52 .. 49.72)
+  civicLanterns: W.offEnd + 0.32, // their lanterns pop off right after the last step (domeF 49.72, domeB 49.78)
+  lampOff: W.offEnd + 0.32, // the near plaza lamp's lantern pops off (cream -> sand) at the left edge. govA does NOT step
   // darker (fix round 1: after 'off' the frame keeps its pale left third; govB's one step is the story beat)
-  govCScreen: W.basically, // govC's screen collapses at the right edge on 'basically' ...
-  govCShutter: W.basically + 0.14, // ... and its shutter drops half way (S12: govC half shut)
-  civicOff: W.supports + 0.03, // the far civic silhouettes step dark left to right (0.1 s apart) from "support's" ...
-  civicLanterns: W.answer + 0.15, // ... and their lanterns pop off after them ('answer' -> 'to')
   bitHop: W.offEnd + 0.05, // Bit hops onto the padlock's shackle; the snail pulls into its shell
   pigeonLand: W.which, // the lean-in starts; a pigeon lands on the shutter box
   tagTwirl: W.is - 0.12, // the tag twirls once in a breeze (its first narrowing lands on 'is')
@@ -75,16 +78,15 @@ export const ABS = {
   noteSlap: W.tech - 0.05, // ... flips to its lettered face and slaps flat onto the closed shutter (J6)
   noteCurl: W.supports, // the note's corner curls once; Bit looks up at it
   preen: W.supports + 0.25, // a pigeon on the cornice preens; the tag stills
-  shrug: W.answer, // GAG: Pip turns toward the sun and does a tiny shrug (0.5 s)
+  shrug: W.answer, // GAG: Pip turns toward the sun and does a tiny shrug (0.5 s), then settles facing us (no back view)
   glint: W.to, // the padlock glints; the pigeon on the shutter box hops
   bitTap: W.toEnd - 0.05, // Bit taps the padlock's shackle
-  strike: W.everything + 0.01, // 'and on again' gets one ink strike-through (0.15 s) ON the word; the corner flutters after
+  strike: W.everything + 0.05, // 'and on again' gets one ink strike-through (0.15 s) on the word (storyboard 51.755: 3 frames
+  // after Bit's tap); the corner flutters after
   pipOut: W.everythingEnd + 0.05, // Pip hops off the sill toward the lens; the snail peeks out
   tagSway: SCENE.end - 0.1, // the tag sways
   pigeonFly: 51.99, // the box pigeon crouches and takes off up-left (whole bird, flapping) with the tag sway: clear of the box by
   // the cut, AFTER Pip's hop-off (51.945), so the two departures do not share a frame
-  phonesUp1: W.offEnd - 0.05, // the bottom-right onlookers' phones go up (under the UI: decoration, sets up S12's 'phones up')
-  phonesUp2: W.which + 0.12,
 } as const;
 
 export type Beats = {-readonly [K in keyof typeof ABS]: number};

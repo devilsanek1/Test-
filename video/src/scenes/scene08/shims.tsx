@@ -70,15 +70,20 @@ export const MinuteWedge: React.FC<{r: number; at?: number; dur?: number; fracti
     <ExitFade x={cx} y={cy}>
       <g transform={`translate(${cx} ${cy}) scale(${outK.toFixed(4)})`}>
         {face && fk > 0.01 ? <circle r={R * fk} fill="none" stroke={palette.ink} strokeWidth={w * 0.55} /> : null}
-        {q > 0.003 ? (
-          <>
+        {q > 0.003 && fk > 0.01 ? (
+          <g transform={fk < 0.999 ? `scale(${fk.toFixed(4)})` : undefined}>
             <path d={sector(-90, Math.max(-89.9, end), R)} fill={sweepColor} />
-            <path d={`M0 0L${sx.toFixed(2)} ${sy.toFixed(2)}` + rimArc(-90, Math.max(-89.9, end), R)} fill="none" stroke={palette.ink} strokeWidth={w * 0.7} strokeLinecap="round" strokeLinejoin="round" />
-          </>
+            <path d={`M0 0L${sx.toFixed(2)} ${sy.toFixed(2)}` + rimArc(-90, Math.max(-89.9, end), R)} fill="none" stroke={palette.ink} strokeWidth={(w * 0.7) / Math.max(0.3, fk)} strokeLinecap="round" strokeLinejoin="round" />
+          </g>
         ) : null}
         {ticks ? <path d={ticks} stroke={palette.ink} strokeWidth={w * 0.8} strokeLinecap="round" fill="none" /> : null}
-        <path d={`M0 0L${hx.toFixed(2)} ${hy.toFixed(2)}`} stroke={palette.ink} strokeWidth={w} strokeLinecap="round" />
-        <circle r={w * 1.3} fill={palette.ink} />
+        {/* fix round 2: the hand and hub pop WITH the face ring (fk): no lone hand on the bare sun for 2 frames */}
+        {fk > 0.01 ? (
+          <>
+            <path d={`M0 0L${(hx * fk).toFixed(2)} ${(hy * fk).toFixed(2)}`} stroke={palette.ink} strokeWidth={w} strokeLinecap="round" />
+            <circle r={w * 1.3 * Math.min(1, fk)} fill={palette.ink} />
+          </>
+        ) : null}
       </g>
     </ExitFade>
   );
@@ -148,6 +153,12 @@ export const InkStamp: React.FC<{box: [number, number, number, number]; text: La
       <InkTextBlock L={L} align="center" color={palette.ink} k={k} seed={seed} />
     </XG>
   );
+};
+
+/** The print's size (world px, before rotation) for a stamp text at a font size (InkStamp's own layout). */
+export const stampPrintSize = (text: LabelText, fontSize: number) => {
+  const L = layoutText(labelLines(text), fontSize, {x: 0.3, top: 0.2, bot: 0.14});
+  return {w: L.w, h: L.h};
 };
 
 /** A painted note block in a zone (world rect), popping (7 % spring) about its left middle at `at`. Used for L9a so it

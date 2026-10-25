@@ -19,6 +19,8 @@ export type PipTimes = {
   leapFrom: [number, number];
   /** His scale on the tram roof (S09's 0.75): he grows to 1.2 over the leap (he comes toward us). */
   leapScale?: number;
+  /** His screen velocity on the roof at the hand-off (px/s, S09's tramPipAt backward difference): the leap keeps it. */
+  leapV?: number;
   perk: number;
   lookPlaque: number;
   /** Optional: glances up at the far row's plates flipping, then back down at the web. */
@@ -28,6 +30,9 @@ export type PipTimes = {
   lookCart?: number;
   lookLob?: number;
   hey: number;
+  /** The 'hey' spark retracts by here (default heyEnd): before the cart rolls behind him. */
+  sparkEnd?: number;
+  /** He turns side-on (facing right, the hop's pose) = the crouch of the hop out: set to out - 0.12. */
   heyEnd: number;
   /** Take-off toward the right edge. */
   out: number;
@@ -38,13 +43,16 @@ const CROUCH = 0.05;
 const ARC = 0.66;
 export const LEAP_DUR = CROUCH + ARC;
 const OUT_DUR = 0.3;
-/** The fall: y ~ k^FALL (a soft gravity: <= ~60 px / frame on the last frames, no kick up into the caption band). */
-const FALL = 1.4;
-/** Take-off ease (x += DRIFT k (1-k)^2): the arc starts almost still after the crouch drift and turns left, no snap. */
-const DRIFT = 330;
+/** The take-off (fix round 2): a small upward kick, then constant gravity g = 2 (dy - VY0 ARC) / ARC^2 (~4,600 px/s^2,
+ *  motion spec #25); x keeps S09's roof velocity (decaying over TAU_V) and eases onto the perch, so his velocity is
+ *  continuous through the hand-off and he never steps back left. */
+const VY0 = -250;
+const TAU_V = 0.12;
 
 /** Where his trunk tip is in the mirrored trunk-up pose (world): the 'hey' spark radiates from here at the plaque. */
 const HEY_TIP: Pt = [662, 1306];
+/** Spark directions (deg): about 20 deg more vertical than fix round 1, toward siteM's plaque through clear wall. */
+const HEY_ANGLES = [-132, -110, -88];
 
 /** The 'hey' spark: three short ink emanata from the trunk tip toward siteM's plaque (up-left), drawn on in a stagger and
  *  retracted from their inner ends before Pip settles (no fade). */
@@ -52,7 +60,7 @@ const HeySpark: React.FC<{at: number; end: number}> = ({at, end}) => {
   const t = useTime();
   if (t < at || t >= end) return null;
   let d = '';
-  [-152, -126, -100].forEach((deg, i) => {
+  HEY_ANGLES.forEach((deg, i) => {
     const a = (deg * Math.PI) / 180;
     const grow = E.outCubic(prog(t, at + i * 0.03, 0.08));
     const shrink = E.inCubic(prog(t, end - 0.12 + i * 0.02, 0.08));
@@ -69,18 +77,20 @@ export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
   const [px, py] = PIP.perch;
   if (t < T.leap) return null;
   const s0 = T.leapScale ?? PIP.scale;
-  // 1a) the crouch on the tram roof (2 frames): squashed, still drifting right with the tram a little
-  if (t < T.leap + CROUCH) {
-    const q = (t - T.leap) / CROUCH;
-    return <Elephant x={T.leapFrom[0] + 8 * q} y={T.leapFrom[1]} scale={s0} pose="stand-side" flip amount={0.15} squash={0.24} rotate={4} t={t} seed={PIP.seed} />;
-  }
-  // 1b) the drop to the bollard: launch stretch, a little rightward drift before the arc turns, a soft gravity fall
-  const t1 = T.leap + CROUCH;
-  if (t < t1 + ARC) {
-    const k = (t - t1) / ARC;
-    const x0 = T.leapFrom[0] + 8;
-    const x = x0 + (px - x0) * k + DRIFT * k * (1 - k) * (1 - k);
-    const y = T.leapFrom[1] + (py - T.leapFrom[1]) * Math.pow(k, FALL);
+  // 1) the take-off from the tram's tail roof: x continues S09's roof velocity (decaying) and eases onto the perch; the
+  //    first two frames are the crouch (on the roof, squashed), then a small kick up and a constant-gravity fall
+  const tau = t - T.leap;
+  if (tau < CROUCH + ARC) {
+    const [x0, y0] = T.leapFrom;
+    const vx0 = T.leapV ?? 0;
+    const k = Math.max(0, (tau - CROUCH) / ARC);
+    const x = x0 + vx0 * tau * Math.exp(-tau / TAU_V) + (px - x0) * k * k * (3 - 2 * k);
+    if (tau < CROUCH) {
+      return <Elephant x={x} y={y0} scale={s0} pose="stand-side" flip amount={0.15} squash={0.24} rotate={4} t={t} seed={PIP.seed} />;
+    }
+    const u = tau - CROUCH;
+    const g = (2 * (py - y0 - VY0 * ARC)) / (ARC * ARC);
+    const y = y0 + VY0 * u + 0.5 * g * u * u;
     const sc = s0 + (PIP.scale - s0) * E.inOutSine(k);
     const stretch = k < 0.25 ? -0.2 * (1 - k / 0.25) - 0.04 : -0.04 - 0.08 * Math.max(0, (k - 0.7) / 0.3);
     const spread = Math.sqrt(Math.sin(Math.PI * Math.min(1, k * 1.15)));
@@ -93,6 +103,7 @@ export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
   }
   // 2) perched: the landing squash, then pose / look keys (each switch pops), the crouch before the hop out. Idle life
   //    is kept low so each look / pose pop reads as its own beat (not one long fidget)
+  const t1 = T.leap + CROUCH;
   const dl = t - (t1 + ARC);
   const land = dl < 0.32 ? 0.24 * Math.exp(-dl * 11) * Math.cos(dl * Math.PI * 2 * 3.2) : 0;
   const crouch = hop({t, t0: T.out, dur: OUT_DUR, from: {x: px, y: py}, to: {x: PIP.exitTo[0], y: PIP.exitTo[1]}, height: 64});
@@ -106,14 +117,16 @@ export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
     ...(T.lookLob !== undefined ? [{t: T.lookLob, pose: 'sit-back' as const, look: 0.1}] : []),
     // GAG: mirrored so the raised trunk points up-left AT siteM's plaque; look +0.6 before the mirror = toward it
     {t: T.hey, pose: 'trunk-up', expression: 'wide', look: 0.6},
-    {t: T.heyEnd, pose: 'sit-back', look: 0.55},
+    // straight from the 'hey' into the hop's own pose (side-on, facing right): its crouch frames come right before the
+    // take-off, so the exit has exactly ONE pose pop (fix round 2: no 3-frame back-view flicker)
+    {t: T.heyEnd, pose: 'stand-side', look: 0.3},
   ];
   const heyOn = t >= T.hey && t < T.heyEnd;
   return (
     <>
       {/* during the 'hey' he leans toward the plaque (about his feet) */}
       <ElephantTimeline x={px} y={py} scale={PIP.scale} t={t} seed={PIP.seed} keys={keys} flip={heyOn} rotate={heyOn ? -10 : 0} squash={land + crouch.squash} idle={0.25} />
-      <HeySpark at={T.hey + 0.04} end={T.heyEnd} />
+      <HeySpark at={T.hey + 0.04} end={T.sparkEnd ?? T.heyEnd} />
     </>
   );
 };

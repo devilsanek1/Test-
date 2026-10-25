@@ -12,6 +12,7 @@ import {ElephantTimeline, hop as pipHop} from '../../lib/mascot';
 import type {PoseKey} from '../../lib/mascot';
 import {Bit, LeakSheet} from '../shared/props';
 import {WIRES, wireAt} from '../shared/sets';
+import {stampPrintSize} from './shims';
 
 const latest = (ts: number[], t: number): number | undefined => {
   let r: number | undefined;
@@ -95,8 +96,9 @@ export const WireCopy: React.FC<CopySpec & {children?: React.ReactNode}> = (c) =
 
 // ---------------------------------------------------------------- pigeons on the chimney
 
-/** S07's two pigeons on wire 0 (its Pigeon x 384 white / x 330 sand flipped, Bird s 0.8 at zoom 1.06), carried over
- *  the cut at the same screen spot and size: S07 x -> S08 x = 540 + 1.06 / 1.3 (x - 480). */
+/** S07's two pigeons on wire 0 (Scene07: Pigeon x 384 white / x 330 sand flipped, Bird s 0.8 at zoom 1.06), carried
+ *  over the cut at the same screen spot and size: S07 x -> S08 x = 540 + 1.06 / 1.3 (x - 480). (Fix round 2 checked on
+ *  the cut: the S07 polish moved its pigeons to these x, so both birds land on the same screen spot.) */
 const WIRE_PIGEONS = [
   {x7: 384, seed: 's7pg0', color: palette.white, flip: false},
   {x7: 330, seed: 's7pg1', color: palette.sand, flip: true},
@@ -220,15 +222,27 @@ export const GlintSweep: React.FC<{at: number; dur?: number; interior: string; x
   );
 };
 
-/** Ink impact ticks around a landed stamp (4-6 short strokes), on for `dur`. */
-export const StampHit: React.FC<{box: [number, number, number, number]; at: number; dur?: number}> = ({box, at, dur = 0.3}) => {
+/** Ink impact ticks off a landed stamp's SHORT ENDS only (fix round 2: the top ticks struck through L9a's last line and
+ *  L10): three short strokes fanning out from each end of the print (its real rotated extent), on for `dur`. */
+export const StampHit: React.FC<{box: [number, number, number, number]; text: string; fontSize: number; rot: number; at: number; dur?: number}> = ({box, text, fontSize, rot, at, dur = 0.3}) => {
   const t = useTime();
   if (t < at || t >= at + dur) return null;
-  const [x0, y0, x1, y1] = box;
-  const q = E.outCubic((t - at) / 0.12);
-  const g = 6 + 8 * Math.min(1, q);
-  const d =
-    `M${x0 - g} ${y0 + 6}l-12 -8M${x0 - g} ${y1 - 4}l-12 7M${x1 + g} ${y0 + 6}l12 -8M${x1 + g} ${y1 - 4}l12 7` +
-    `M${(x0 + x1) / 2 - 40} ${y0 - g}l-4 -11M${(x0 + x1) / 2 + 40} ${y0 - g}l4 -11`;
+  const {w} = stampPrintSize(text, fontSize);
+  const cx = (box[0] + box[2]) / 2;
+  const cy = (box[1] + box[3]) / 2;
+  const q = E.outCubic(Math.min(1, (t - at) / 0.12));
+  const g = 8 + 8 * q;
+  const r = (rot * Math.PI) / 180;
+  const ux = Math.cos(r);
+  const uy = Math.sin(r);
+  let d = '';
+  for (const s of [-1, 1]) {
+    const ex = cx + s * ux * (w / 2 + g);
+    const ey = cy + s * uy * (w / 2 + g);
+    for (const a of [-32, 0, 32]) {
+      const th = r + ((s < 0 ? 180 : 0) + a) * (Math.PI / 180);
+      d += `M${(ex + Math.cos(th) * 2).toFixed(1)} ${(ey + Math.sin(th) * 2).toFixed(1)}l${(Math.cos(th) * 12).toFixed(1)} ${(Math.sin(th) * 12).toFixed(1)}`;
+    }
+  }
   return <path d={d} stroke={palette.ink} strokeWidth={2.6} strokeLinecap="round" fill="none" />;
 };

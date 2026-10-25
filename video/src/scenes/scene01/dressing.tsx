@@ -6,6 +6,10 @@
 //                 lantern is cropped by the frame edge and eaten by the paint edge in the film).
 //   S01Branch     a leafy plane-tree branch entering the TOP-RIGHT corner (x > 975, y < 250: outside the caption band
 //                 and the sky ceiling), swaying: the hook frame's top-edge framing (every ref2 frame has one).
+//   TreeTicks     (fix round 4) paints out the set tree's two level 'smile' ticks and draws three rim ticks instead.
+//   LockRing      (fix round 4) the ring on govB's lock: a pop at r 30 / 3.4 px, easing to r 23.2 in the dive (= S02's
+//                 74 px callout ring at the cut).
+// Strokes are compensated in the dive by the enclosing <InkScale> (plaza.tsx wrap), not here.
 import React from 'react';
 import {palette} from '../../lib/theme';
 import {clamp, ease as E, lerp, osc, prog, useTime} from '../../lib/time';

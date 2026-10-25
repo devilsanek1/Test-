@@ -19,6 +19,7 @@ import {Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {ExitFade, UnBuild} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 import {MOTION} from '../../../lib/spec';
 import {captionFontStack, measureCaption, useCaptionFont} from '../../../lib/font';
 import {blob, circle, hline, line, poly, Pt, rect, rectPath, roundRect} from '../../../lib/sketch';
@@ -97,6 +98,7 @@ export function shutterDrop(t: number, o: {slamAt?: number; liftAt?: number; sta
 
 export const RollerShutter: React.FC<RollerShutterProps> = ({x, y, w, h, box = 18, at, slamAt, liftAt, state = 'up', stopAt, liftMode, step, rib = 14, peephole, depth, width, seed = 'shut', outAt}) => {
   const t = useTime();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   if (at !== undefined && t < at) return null;
   if (outAt !== undefined && t >= outAt + 0.2) return null;
   const iw = width ?? DEPTH_INK[depth ?? 'mid'];
@@ -129,8 +131,9 @@ export const RollerShutter: React.FC<RollerShutterProps> = ({x, y, w, h, box = 1
     if (ph) {
       out.push(
         <ExitFade key="ph" x={ph.cx} y={ph.cy}>
+          {/* the cream rim fills the gap between the hole and the ink ring (geometry, not compensated) */}
           <circle cx={ph.cx} cy={ph.cy} r={ph.r + 1.6} fill="none" stroke={palette.cream} strokeWidth={4} />
-          <circle cx={ph.cx} cy={ph.cy} r={ph.r + 4} fill="none" stroke={palette.ink} strokeWidth={iw * 0.6} />
+          <circle cx={ph.cx} cy={ph.cy} r={ph.r + 4} fill="none" stroke={palette.ink} strokeWidth={iw * 0.6 * ks} />
         </ExitFade>,
       );
     }

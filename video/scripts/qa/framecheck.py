@@ -266,6 +266,8 @@ def main(argv=None):
         clip_end = args.t0 + src.n / fps
         for pg in json.load(open(cap_path)):
             a0, a1 = float(pg['s']) + 0.3, float(pg['e']) - 0.1        # after the scroll settles, before the next page
+            if pg.get('out') is not None:                               # the page leaves on its own (empty band, ENGINE.md)
+                a1 = min(a1, float(pg['out']) - 0.1)
             if a1 > a0 and a1 > args.t0 and a0 < clip_end:
                 expect[max(0, int(math.ceil((a0 - args.t0) * fps))):max(0, int((a1 - args.t0) * fps))] = True
 

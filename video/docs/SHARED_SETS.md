@@ -71,8 +71,9 @@ row); `DemoSun` is pinned (`drift={[0, 0]}`) so a preview frame shows the sun SL
   width = max(world x zoom, screen), so there is no pop across the pull-back (`terraceInk(k, zoom)`).
 - **Camera ink compensation** (opt-in, docs/ENGINE.md 4b): raw `strokeWidth`: multiply by `useInkScale()`
   (lib/inkComp.tsx) so camera ink compensation reaches it (core `<Ink>` / `<Drawn>` lines get it already; 1 by default).
-  **Open request (kitv3b core review)**: GovernmentPlaza's chevron mark and DomeCity's raw stroke; S01 wraps the plaza
-  in an `<InkScale>`, so props placed through `propSlots` / `windowSlot` (BrowserChrome, Lock) need the props lane's fix.
+  **Done (kitv3b core review request)**: GovernmentPlaza's pennant chevron mark and DomeCity's searchlight beam edges
+  read `useInkScale()`; the props placed through `propSlots` / `windowSlot` (BrowserChrome, Lock, shutters) honour it too
+  (SHARED_PROPS.md), so everything inside S01's plaza `<InkScale>` is compensated. No raw `strokeWidth` is left in `sets/**`.
 - **Haze ladder** (style_bible_ref2 8): far layers are fill-only and step toward the sky, day `#84B09C` -> `#98C0AE` ->
   sky; on golden skies `HALF.sand` (#E6CEB6). No per-house rects under ~6 px at rest: distant rows collapse into stepped
   skyline bands with a few >= 3 px window dots (TerraceHill, the plaza's far city).

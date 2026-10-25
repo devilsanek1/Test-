@@ -9,9 +9,10 @@
 // like S02's lock, which holds still at (560,1150) from its first frame (gate 1: no translation stop across the cut);
 // the end camera is unchanged. Light multiplane parallax (storyboard: far x0.3 / buildings x0.7 / near x1.0) = the same
 // move raised to f = ratio / 0.7 per layer: far + sun 0.43, buildings / ground / light 1, near 1.43. During the dive the
-// SUN's exponent ramps to 1.5 on the dive's inOut(sine) curve (zero slope at its start: no velocity step), so the sun
-// leaves the frame with the dive (storyboard: 'It leaves the frame with the dive'): its disc is fully above the frame on
-// the last frame (f141: bottom edge y -168), instead of a big disc at the right shrinking to S02's r110 across the cut.
+// SUN's exponent ramps to 1.15 on the dive's inOut(sine) curve (zero slope at its start: no velocity step) and the disc
+// is lifted up out of the frame in screen space (-400 x diveS^2), so the sun leaves the frame with the dive (storyboard:
+// 'It leaves the frame with the dive') while it zooms less than the facades (fix round 4; was a 1.5 ramp: inverted
+// parallax), instead of a big disc at the right shrinking to S02's r110 across the cut.
 // The far layer keeps 0.43 (ramping it too made the far civic silhouettes loom up in the gap: inverted parallax).
 import {clamp, ease as E} from '../../lib/time';
 import {mat, Mat} from '../../lib/xf';
@@ -31,7 +32,11 @@ const PUSH_S = CAM.push.S;
 /** Parallax exponents per set layer (GovernmentPlaza wrap names) during the push / hold. */
 export const PARALLAX: Record<string, number> = {sun: 0.43, far: 0.43, buildings: 1, govD: 1, ground: 1, light: 1, near: 1.43};
 /** Layers whose exponent ramps during the dive (so the sun leaves the frame), and the exponent they reach at the cut. */
-const DIVE_RAMP: Record<string, number> = {sun: 1.5};
+const DIVE_RAMP: Record<string, number> = {sun: 1.15};
+/** Fix round 4 (review: ramped to 1.5 the farthest layer zoomed past the facades, inverted parallax for ~5 frames): the
+ *  sun's exponent ramps only to 1.15 (it still zooms LESS than the buildings) and the disc is carried up out of the
+ *  frame in screen space instead: y - 400 x diveS^2 (zero slope at the dive start: no velocity step). */
+const DIVE_LIFT: Record<string, number> = {sun: -400};
 
 export const pushQ = (t: number) => E.inOutSine(clamp((t - CAM.push.t0) / (CAM.push.t1 - CAM.push.t0)));
 const diveU = (t: number) => clamp((t - CAM.dive.t0) / (CAM.dive.t1 - CAM.dive.t0));
@@ -54,7 +59,8 @@ export function layerMat(t: number, layer: string | number = 1): Mat {
   const tx = (P1[0] - P0[0]) * s;
   const ty = (P1[1] - P0[1]) * s;
   // zoom about the lock's hold screen point, then carry that point along its path (scaled by the layer's exponent)
-  return mat.mul(mat.translate(tx, ty), mat.mul(mat.about(mat.scale(dz), P0[0], P0[1]), push));
+  const lift = typeof layer === 'string' && DIVE_LIFT[layer] !== undefined ? DIVE_LIFT[layer] * diveS(t) * diveS(t) : 0;
+  return mat.mul(mat.translate(tx, ty + lift), mat.mul(mat.about(mat.scale(dz), P0[0], P0[1]), push));
 }
 
 /** Screen position of a world point on a layer. */
@@ -64,8 +70,8 @@ export const toScreen = (t: number, p: [number, number], layer: string | number 
 };
 export const zoomAt = (t: number, layer: string | number = 1) => layerMat(t, layer)[0];
 
-/** Ink compensation in the dive (fix round 3): the camera scales every stroke 3.07x, S02 opens at ~3-4 px. Strokes the
- *  scene draws itself (govA / govB / govC shutters, padlocks, tags, the lock ring) are drawn at width x this factor
- *  = (zoom / zoom at the dive start)^-0.6: 1.0 up to 4.385 (no step), 0.51 at the cut, so a 3.4 px line lands at
- *  ~5.5 px instead of ~10.9 px. */
+/** Ink compensation in the dive: the camera scales every stroke 3.07x, S02 opens at ~3-4 px. Per layer, the factor
+ *  (zoom / zoom at the dive start)^-0.6 (ENGINE.md 4b, house k 0.6): 1.0 up to 4.385 (no step), ~0.51 at the cut, so a
+ *  3.4 px line lands at ~5.5 px instead of ~10.9 px. Fix round 4: fed to an <InkScale> around EVERY layer of the set
+ *  AND the scene's extras (plaza.tsx wrap), so govA's columns, govB's door, pediment and lock box are compensated too. */
 export const inkComp = (t: number, layer: string | number = 'buildings') => (t <= CAM.dive.t0 ? 1 : Math.pow(zoomAt(t, layer) / zoomAt(CAM.dive.t0, layer), -0.6));

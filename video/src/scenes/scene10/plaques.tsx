@@ -9,9 +9,10 @@ import {palette} from '../../lib/theme';
 import {ease as E, prog, TimeShift, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {blob, line, polyPath, Pt, rect, roundRect} from '../../lib/sketch';
+import {blob, line, Pt, roundRect} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
-import {Bit, Cobweb, ElephantEmblem, pendulum, popK, SupportTag} from './kit';
+import {Bit, Cobweb, pendulum, popK, SupportTag} from './kit';
+import {plateFace} from './plate';
 
 /** Bracket root for a hanging sign whose face centre is (x, y) (= sets/propSlots bracketFor). */
 export function bracketFor(x: number, y: number, size: number, wallX: number): {x: number; y: number; side: 'left' | 'right'; arm: number} {
@@ -25,7 +26,11 @@ export const TAG_W = 42;
 /** Hang point -> the tag body's centre (props SupportTag geometry). */
 export const tagBodyOffset = (w: number) => w * (0.16 + 0.41);
 
-const CHIPPED: Pt[] = [[-50, -50], [26, -50], [33, -42], [38, -44], [44, -36], [50, -30], [50, 50], [-50, 50]];
+/** The cobweb tuft radius (face units) and where Bit's strand ties into its outer ring; Bit's spot on the top edge. */
+const TUFT_R = 32;
+const TUFT_TIE: Pt = [-50 + Math.cos((70 * Math.PI) / 180) * TUFT_R * 0.66, -50 + Math.sin((70 * Math.PI) / 180) * TUFT_R * 0.66];
+/** Bit's spot on the plate's left edge (face y): just below the tuft, above siteM's door. */
+const BIT_EDGE_Y = -22;
 
 export type HangPlaqueProps = {
   /** Face centre (world) + size (face side, world px) + the wall point of the bracket. */
@@ -44,8 +49,11 @@ export type HangPlaqueProps = {
   droopAt?: number;
   /** The emblem wobbles on its cane (decaying, 0.8 s). */
   wobbleAt?: number;
-  /** A support tag lands at this face-local hang point (100-unit face coords) at `at`, its check at `tickAt`. */
-  tag?: {at: number; tickAt: number; hang: Pt; size?: number};
+  /** A support tag lands at this face-local hang point (100-unit face coords) at `at`, its check at `tickAt`; `ringAt`
+   *  = one stepped ink ring pulse around it (two rings, 0.08 s apart, thinning as they grow: no fade). */
+  tag?: {at: number; tickAt: number; hang: Pt; size?: number; ringAt?: number};
+  /** Small nudges of the whole plate (pendulum 4 deg, 0.3 s): the 'skip' as a tag sails over it. */
+  nudgeAt?: number[];
   /** Bit: pops on the hook at `at`, crawls down the chain onto the face and into the web corner (arrives at + 0.4). */
   bit?: {at: number; size: number; /** struggle bursts, s after he is caught */ bursts?: number[]};
   seed?: string;
@@ -71,13 +79,14 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
   const k = popK(t, at, 0.08, 0.2);
   // the swing out (motion spec #14), settled (0.72 s) well before the next beat on the plate so each beat reads on its own
   // + a small nudge when the cane pops on 'old' (the whole 120 px plate answers the beat, not just a thin cane line)
-  const sw = (pendulum(t, at, -16, 0.5, 0.45) + (p.caneAt !== undefined ? pendulum(t, p.caneAt, 5, 0.3, 0.25) : 0)) * dir;
+  let sw = pendulum(t, at, -16, 0.5, 0.45) + (p.caneAt !== undefined ? pendulum(t, p.caneAt, 5, 0.3, 0.25) : 0);
+  for (const n of p.nudgeAt ?? []) sw += pendulum(t, n, 4, 0.3, 0.25);
+  sw *= dir;
 
   // ---- face state
   const flipQ = p.flipOldAt !== undefined ? prog(t, p.flipOldAt, 0.2, E.inOutSine) : 0;
   const old = p.age === 'old' || flipQ >= 0.5;
   const flipSx = p.flipOldAt !== undefined && flipQ > 0 && flipQ < 1 ? Math.max(0.02, Math.abs(Math.cos(Math.PI * flipQ))) : 1;
-  const plateCol = old ? palette.tan : palette.sand;
   let lean = 0;
   if (old) lean = 12 * (p.caneAt === undefined ? 1 : prog(t, p.caneAt + 0.12, 0.2, E.outBack(1.4)));
   if (old && p.droopAt !== undefined) lean += 6 * prog(t, p.droopAt, 0.28, E.outBack(1.8));
@@ -87,36 +96,28 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
     wob = 5 * Math.exp(-d * 4.2) * Math.sin(d * 26);
   }
 
-  const plate = old ? polyPath(CHIPPED) : roundRect(-50, -50, 100, 100, 6);
-  const plateInk = old ? polyPath(CHIPPED) : rect(-50, -50, 100, 100, {seed: `${seed}/pi`, over: 5});
-  const screws = (old ? [[-38, -38], [38, 38], [-38, 38], [30, -32]] : [[-38, -38], [38, 38], [-38, 38], [38, -38]]).map(([a, c]) => blob(a, c, 3.6, 3.6, {seed: `${seed}/s${a}${c}`})).join('');
-  const face: React.ReactNode[] = [];
-  face.push(<Fill key="plate" d={plate} color={plateCol} offset={[2.4, 1.8]} seed={`${seed}/plate`} />);
-  face.push(<Fill key="bevel" d={polyPath([[-50, -44], [-43, -44], [-43, 43], [44, 43], [44, 50], [-50, 50]])} color={old ? palette.brown : palette.tan} mode="snap" offset={false} seed={`${seed}/bev`} />);
-  face.push(<Ink key="plateI" d={plateInk} width={W} seed={`${seed}/pi`} />);
-  face.push(<Fill key="screws" d={screws} color={palette.ink} mode="snap" offset={false} seed={`${seed}/scr`} />);
-  face.push(
-    <XG key="emb" m={mat.about(mat.rotate(wob * 0.5), 37.7, 29.2)}>
-      <ElephantEmblem size={74} y={4} bg={plateCol} style={old ? 'old' : 'modern'} seed={`${seed}/e`} ink={W * 0.8} cane={old} caneAt={p.caneAt} lean={lean + wob} />
-    </XG>,
-  );
-  // Bit (under the web: caught IN it)
+  const face: React.ReactNode[] = plateFace({old, W, seed, emblem: old ? 74 : 62, lean, cane: old, caneAt: p.caneAt, wob});
+  // the cobweb: a cream corner TUFT on the dark old plate (under Bit's strand, which ties into its outer ring)
+  if (old && (p.cobwebAt !== undefined || p.age === 'old')) face.push(<Cobweb key="web" x={-50} y={-50} r={TUFT_R} corner="tl" at={p.cobwebAt} width={1.9 / s} color={palette.cream} seed={`${seed}/web`} />);
+  // Bit (fix round 2: at the web's EDGE, not in its centre): he drops onto the left chain, crawls down it, along the
+  // plate's top edge into the corner tuft and over the corner onto the plate's LEFT edge, where ONE cream strand from the
+  // tuft holds his back leg: side-on, head down (trying to get away), his feet on the edge and his body against siteM's
+  // cream wall above the door, so his beetle silhouette (split shell, two antennae, eye) has clear ground around it.
+  // He lunges down against the strand in short bursts.
   if (p.bit && t >= p.bit.at) {
     const bs = p.bit.size / s;
-    // down the left chain onto the plate's top edge, then onto the web's 30-degree strand, away from its hub (the corner):
-    // caught there at an angle along the strand, head out, so the beetle silhouette (split shell, eye dot) reads
-    const strand: Pt = [-50 + Math.cos(Math.PI / 6) * 32, -50 + Math.sin(Math.PI / 6) * 32];
+    const stuck: Pt = [-50.5, BIT_EDGE_Y];
     const path: Pt[] = [
-      [-18, -66],
-      [-21.5, -50],
-      strand,
+      [-19, -66],
+      [-21.5, -51],
+      [-50.5, -51],
+      stuck,
     ];
     const crawlAt = p.bit.at + 0.1;
-    const arrive = crawlAt + 0.3;
+    const arrive = crawlAt + 0.32;
     if (t < arrive) {
-      face.push(<Bit key="bit" x={path[0][0]} y={path[0][1]} size={bs} state="scuttle" crawl={{at: crawlAt, path, speed: 118}} at={p.bit.at} seed={`${seed}/bit`} />);
+      face.push(<Bit key="bit" x={path[0][0]} y={path[0][1]} size={bs} state="scuttle" crawl={{at: crawlAt, path, speed: 205}} at={p.bit.at} seed={`${seed}/bit`} />);
     } else {
-      // caught: legs flail, the body jerks in short bursts
       const d = t - arrive;
       // struggle bursts: right after he is caught, on 'old', on 'not' and on 'anymore' (a beat each)
       const bursts = p.bit.bursts ?? [0, 0.7, 1.4, 2.3];
@@ -126,16 +127,20 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
         if (d >= bt && d < bt + 0.32) burst = Math.max(burst, Math.sin(((d - bt) / 0.32) * Math.PI));
         if (d >= bt) last = bt;
       }
-      const jerk = 14 * burst * Math.sin(d * 2 * Math.PI * 7);
-      // along the strand (30 deg, facing out of the web), kicking (scuttle legs) in the bursts
-      const ang = 30;
+      // a lunge down (away from the web) that the strand yanks back, the body rocking on its feet
+      const lunge = 3.4 * burst * (0.5 + 0.5 * Math.sin(d * 2 * Math.PI * 6));
+      const rock = -9 * burst * Math.sin(d * 2 * Math.PI * 7);
       // between the bursts he is stuck STILL (his clock frozen at the end of the last burst): crisp beats, no idle fidget
       const still = burst <= 0 && last >= 0 ? arrive + last + 0.32 : undefined;
-      const bitNode = <Bit x={path[2][0]} y={path[2][1]} size={bs} state={burst > 0.2 ? 'scuttle' : 'idle'} rot={ang + jerk} look="up" blink={false} seed={`${seed}/bit`} />;
+      const by = stuck[1] + lunge;
+      // facing down (flip + rot -90: his feet on the edge, toward +x)
+      const bitNode = <Bit x={stuck[0]} y={by} size={bs} flip state={burst > 0.2 ? 'scuttle' : 'idle'} rot={-90 + rock} look="forward" blink={false} seed={`${seed}/bit`} />;
+      // the one strand: from his back leg (up, at his rear) into the tuft's outer ring (taut in a lunge)
+      const leg: Pt = [stuck[0] - 1.5, by - bs * 0.34];
+      face.push(<Ink key="strand" d={`M${leg[0].toFixed(1)} ${leg[1].toFixed(1)}L${TUFT_TIE[0].toFixed(1)} ${TUFT_TIE[1].toFixed(1)}`} width={1.5 / s} color={palette.cream} taper={false} vary={0} seed={`${seed}/strand`} />);
       face.push(still !== undefined ? <TimeShift key="bit" by={t - still}>{bitNode}</TimeShift> : <React.Fragment key="bit">{bitNode}</React.Fragment>);
     }
   }
-  if (old && (p.cobwebAt !== undefined || p.age === 'old')) face.push(<Cobweb key="web" x={-50} y={-50} r={46} corner="tl" at={p.cobwebAt} width={1.7 / s} seed={`${seed}/web`} />);
   // the flip shakes a puff of dust off the plate (specks fly out and shrink away: no fade)
   if (p.flipOldAt !== undefined && t >= p.flipOldAt + 0.12 && t < p.flipOldAt + 0.5) {
     const q = E.outCubic(prog(t, p.flipOldAt + 0.12, 0.28));
@@ -166,9 +171,27 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
     line(0, armL * 0.55, dir * armL * 0.5, 0, {over: [0, 0], seed: `${seed}/brace`}) +
     `M${dir * armL} 0q${dir * 8} 0 ${dir * 8} -8q0 -6 ${-dir * 5} -5`;
   const chain = 16;
-  const tag = p.tag && t >= p.tag.at ? (
-    <SupportTag x={hookX + p.tag.hang[0]} y={chain + 50 + p.tag.hang[1]} size={(p.tag.size ?? TAG_W) / s} at={p.tag.at} checkAt={p.tag.tickAt} seed={`${seed}/tag`} />
-  ) : null;
+  let tag: React.ReactNode = null;
+  if (p.tag && t >= p.tag.at) {
+    const tw = (p.tag.size ?? TAG_W) / s;
+    const hx = hookX + p.tag.hang[0];
+    const hy = chain + 50 + p.tag.hang[1];
+    const rings: React.ReactNode[] = [];
+    if (p.tag.ringAt !== undefined) {
+      for (let i = 0; i < 2; i++) {
+        const q = (t - p.tag.ringAt - i * 0.08) / 0.2;
+        // stepped: the ring jumps in 3 sizes (12 Hz), its stroke thinning to nothing
+        const qs = Math.floor(q * 3) / 3;
+        if (q >= 0 && q < 1) rings.push(<circle key={`rg${i}`} cx={hx} cy={hy + tagBodyOffset(tw)} r={tw * (0.62 + 0.5 * qs)} fill="none" stroke={palette.ink} strokeWidth={(3.2 / s) * (1 - qs)} />);
+      }
+    }
+    tag = (
+      <>
+        {rings}
+        <SupportTag x={hx} y={hy} size={tw} at={p.tag.at} checkAt={p.tag.tickAt} seed={`${seed}/tag`} />
+      </>
+    );
+  }
   return (
     <XG m={mat.compose(mat.translate(b.x, b.y), mat.scale(s))}>
       <Ink d={bracket} width={brW} seed={`${seed}/br`} />

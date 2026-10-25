@@ -15,6 +15,7 @@ import {Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {ExitFade} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 import {arc, blob, check, circle, line, rectPath, roundRect, smooth, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {bt, Depth, DEPTH_INK, misregScreen, pendulum, withOut} from './common';
@@ -43,12 +44,13 @@ const CheckMarkBase: React.FC<G & {size?: number; dur?: number}> = ({x, y, size 
 /** Ink ring that strokes on in ~0.17 s; `pingAt` sends out an expanding ring (r -> 1.7 r, 0.3 s) that thins to nothing. */
 const MarkRingBase: React.FC<G & {r?: number; dur?: number; pingAt?: number}> = ({x, y, r = 55, at, dur = 0.17, seed = 'ring', width, depth, color = palette.ink, pingAt}) => {
   const t = useTime();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   const w = wOf({width, depth}, 'front');
   const ping = pingAt !== undefined ? prog(t, pingAt, 0.3, E.outCubic) : 0;
   return (
     <>
       <Ink d={circle(x, y, r, {seed, overlap: 22})} at={at} dur={dur} width={w} color={color} taper={false} seed={seed} />
-      {ping > 0 && ping < 1 ? <circle cx={x} cy={y} r={r * (1 + 0.7 * ping)} fill="none" stroke={color} strokeWidth={w * (1 - ping)} /> : null}
+      {ping > 0 && ping < 1 ? <circle cx={x} cy={y} r={r * (1 + 0.7 * ping)} fill="none" stroke={color} strokeWidth={w * (1 - ping) * ks} /> : null}
     </>
   );
 };
@@ -186,6 +188,7 @@ const qPath = (x: number, y: number, s: number) =>
 
 /** "?" with a cream body and an ink outline (pops). (x, y) = centre, size = height. */
 const QuestionMarkBase: React.FC<G & {size?: number}> = ({x, y, size = 70, at, seed = 'q', width, depth}) => {
+  const ks = useInkScale();
   const w = wOf({width, depth}, 'mid');
   const body = size * 0.16;
   const d = qPath(x, y, size);
@@ -193,9 +196,9 @@ const QuestionMarkBase: React.FC<G & {size?: number}> = ({x, y, size = 70, at, s
   return (
     <PopAt at={at} x={x} y={y + size * 0.4}>
       <ExitFade x={x} y={y}>
-      <path d={d} fill="none" stroke={palette.ink} strokeWidth={body + w * 2} strokeLinecap="round" />
+      <path d={d} fill="none" stroke={palette.ink} strokeWidth={body + w * 2 * ks} strokeLinecap="round" />
       <path d={d} fill="none" stroke={palette.cream} strokeWidth={body} strokeLinecap="round" />
-      <circle cx={x} cy={dy} r={body * 0.62 + w} fill={palette.ink} />
+      <circle cx={x} cy={dy} r={body * 0.62 + w * ks} fill={palette.ink} />
       <circle cx={x} cy={dy} r={body * 0.62} fill={palette.cream} />
       </ExitFade>
     </PopAt>

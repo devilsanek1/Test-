@@ -17,7 +17,7 @@
 // off the sun's column.
 
 import React from 'react';
-import {Fill, Ink, Sun, Bird, Tod, palette, useTime, ease as E, prog, lerp, clamp, mat, XG, rectPath, line, springAt, springs, wirePoint} from '../../lib';
+import {Fill, Ink, Sun, Bird, Tod, palette, useTime, ease as E, prog, lerp, clamp, mat, XG, rectPath, line, springAt, springs, wirePoint, smooth, arc} from '../../lib';
 import {Elephant, hop, popSwitch, PoseName, Expression} from '../../lib/mascot';
 import {StoopStreet, STOOP, paneFill, windowInk, SI, HALF, Foreground, EdgeFigure, LayerWrap} from '../shared/sets';
 import type {WalkerAnchor} from '../shared/sets';
@@ -29,13 +29,15 @@ import {ClipOut, WIRE_HOLE} from './matchcut';
 
 export const PA = {
   pip: {x: 125, y: 1230, scale: 1.1},
-  /** Off-frame left (A1 screen x = world - 20): Pip leaps in from here onto the ledge, in the air on 'But'. */
-  pipStart: {x: -64, y: 1434},
+  /** On the pavement at the left edge, in frame from the cut (A1 screen (42, 1312), half behind the edge onlooker's
+   *  head, the lamp post in front): he crouches from frame 0 and leaps up onto the ledge, in the air on 'But'. */
+  pipStart: {x: 62, y: 1372},
   crate: {x: 232, y: 1226, size: 85},
   lock: {x: STOOP.lock4.x, y: STOOP.lock4.y, size: STOOP.lock4.h},
   dropDist: 76,
-  /** Bit sits on the old lock (lock-local units: 42 px lock = 100 units), size 12 world (18 px on screen in A2). */
-  bitSize: 12,
+  /** Bit sits on the old lock (lock-local units: 42 px lock = 100 units), body length 16 world: 16 px in A1, 24 px in A2
+   *  (his eye gets its pupil from 24 px). */
+  bitSize: 16,
   bitFrame: [349, 1080] as [number, number],
   keeper: {x: 420, y: 1300, h: 186},
   /** Keeper walks (Part B) to door #5: A2 coords of B-world (652, 1507). */
@@ -57,9 +59,9 @@ export const TOSS = {at: B.still - 0.1, land: B.lockOn};
 
 /** The set's night dressing (stars, lamp glows, lit windows, night ground) pops off on the dawn's second sky step. */
 export const NIGHT_UNTIL = B.dawn + 0.12;
-/** The ground relights behind the sky in two more flat steps (A: haze, B: half-step), day from GROUND_DAY. */
+/** The ground relights behind the sky in two flat steps (A: haze, B: half a step under day) and STOPS there: the lower
+ *  frame keeps its tone (no bleached mintPale band) until S10's tram brings the day relight. */
 const GROUND_B_AT = B.dawn + 0.24;
-const GROUND_DAY = B.dawn + 0.36;
 
 // ---------------------------------------------------------------- the old lock + Bit, the flying new lock
 
@@ -76,15 +78,19 @@ const OldLock: React.FC = () => {
       seed="stoop/lock4"
       dropAt={DROP_AT}
       dropDist={PA.dropDist}
-      rider={riding ? <Bit x={-6} y={-50} size={PA.bitSize / s} state="ride" look="down" seed="s9bit" /> : undefined}
+      rider={riding ? <Bit x={-6} y={-50} size={PA.bitSize / s} state="ride" look="down" hopAt={B.even - 0.06} hopH={0.7} seed="s9bit" /> : undefined}
     />
   );
 };
 
+/** Bit leaves door #4's jamb (Part B, after the hidden cut) with a leap onto Pip's head: PartB's BitRide carries him
+ *  from here (screen space) to the snail, so there is only ever ONE Bit. */
+export const BIT_LEAP = B.to - 0.14;
+
 /** Bit after the landing: hops off the fallen lock and scuttles up door #4's right frame (the hidden-cut match). */
 const BitRun: React.FC = () => {
   const t = useTime();
-  if (t < LAND_T + 0.04) return null;
+  if (t < LAND_T + 0.04 || t >= BIT_LEAP) return null;
   const top = PA.lock.y + PA.dropDist - PA.lock.size / 2; // fallen lock top
   const path: [number, number][] = [
     [PA.lock.x - 2, top],
@@ -92,6 +98,23 @@ const BitRun: React.FC = () => {
     [PA.bitFrame[0], PA.bitFrame[1]],
   ];
   return <Bit crawl={{at: LAND_T + 0.06, path, speed: 430}} state="scuttle" size={PA.bitSize} seed="s9bit" look="forward" />;
+};
+
+/** Bit's leap (Part B, after the hidden cut, drawn through the map like every A2 actor): off door #4's jamb in one
+ *  big arc onto Pip's head, where he rides; from Pip's 'install' hop on PartB's BitRide carries him (screen space). */
+export const BIT_LEAP_DUR = 0.24;
+const BitOnPip: React.FC = () => {
+  const t = useTime();
+  if (t < BIT_LEAP || t >= B.install) return null;
+  const head = pipRidePoint(pipA(t), PA.pip.scale);
+  const q = (t - BIT_LEAP) / BIT_LEAP_DUR;
+  if (q < 1) {
+    const [x0, y0] = PA.bitFrame;
+    const x = lerp(x0, head[0], q);
+    const y = lerp(y0, head[1], q) - Math.sin(Math.PI * q) * 90;
+    return <Bit x={x} y={y} size={PA.bitSize} state="hop" flip rot={-50 * (1 - q) + 30 * q} look="forward" seed="s9bit" />;
+  }
+  return <Bit x={head[0]} y={head[1]} size={PA.bitSize} state="ride" hopAt={BIT_LEAP + BIT_LEAP_DUR - 0.3} hopH={0} seed="s9bit" />;
 };
 
 /** The new lock in the air: flung from Pip's trunk on an arc, landing ON the door as the pop-on. */
@@ -121,7 +144,7 @@ const LandedLock: React.FC = () => {
 
 // ---------------------------------------------------------------- Pip (Part A world)
 
-type PipState = {x: number; y: number; pose: PoseName; squash: number; rotate: number; amount?: number; look?: number; expression?: Expression; prop?: React.ReactNode; walkRate?: number; flip?: boolean};
+export type PipState = {x: number; y: number; pose: PoseName; squash: number; rotate: number; amount?: number; look?: number; expression?: Expression; prop?: React.ReactNode; walkRate?: number; flip?: boolean};
 
 /** Pip in Part A world coordinates at scene time t (also used, mapped, at the start of Part B). */
 export function pipA(t: number): PipState {
@@ -162,7 +185,22 @@ export function pipA(t: number): PipState {
     expression = 'happy';
   }
   squash += popSwitch(t, B.lift) + popSwitch(t, TOSS.at);
+  // Part B: the crouch before his 'install' hop off the map (PartB PipB takes him over at B.install)
+  if (t >= B.install - 0.14) squash += 0.18 * Math.sin(Math.min(1, (t - (B.install - 0.14)) / 0.14) * (Math.PI / 2));
   return {x: PA.pip.x, y: PA.pip.y, pose, squash, rotate: 0, look, expression, prop};
+}
+
+/** Where a rider (Bit) sits on Pip at state `st` and `scale`, in Pip's parent coordinates: on top of his head in the
+ *  sitting / trunk-up poses, on his back in the side poses (Pip-local units, through the Elephant's own transform:
+ *  translate, rotate, scale(flip x scale), squash). */
+export function pipRidePoint(st: PipState, scale: number): [number, number] {
+  const side = st.pose === 'stand-side' || st.pose === 'walk-side';
+  const lx0 = side ? -12 : -2;
+  const ly0 = side ? -62 : -88;
+  const lx = lx0 * (st.flip ? -1 : 1) * scale * (1 + st.squash * 0.55);
+  const ly = ly0 * scale * (1 - st.squash);
+  const a = (st.rotate * Math.PI) / 180;
+  return [st.x + lx * Math.cos(a) - ly * Math.sin(a), st.y + lx * Math.sin(a) + ly * Math.cos(a)];
 }
 
 export const PipFigure: React.FC<{st: PipState; scale: number; t: number}> = ({st, scale, t}) => (
@@ -209,16 +247,24 @@ const KeeperA: React.FC = () => {
   );
 };
 
-export const A2Actors: React.FC<{pip?: boolean}> = ({pip = true}) => {
+/** Part A draws them in StoopStreet's hero slot; Part B (`partB`) draws the SAME component through the hidden-cut map:
+ *  there Pip leaves the map on 'install' (PartB PipB carries him on in screen space), and the quarter-size crate, the
+ *  fallen old lock and the new lock pop off in door #4's 'single' pop (only the flag, the glow arch and the ticked tag
+ *  mark the fixed door at rest; the set's own fixed lock is under them). */
+export const A2Actors: React.FC<{partB?: boolean}> = ({partB = false}) => {
   const t = useTime();
   const st = pipA(t);
+  const props = !partB || t < B.single;
+  const pip = !partB || t < B.install;
   return (
     <>
-      <LockCrate x={PA.crate.x} y={PA.crate.y} size={PA.crate.size} lid lidAt={B.fix - 0.08} tagsAt={B.out - 0.06} ink={SI.far} seed="s9crate" />
-      <OldLock />
+      {props ? <LockCrate x={PA.crate.x} y={PA.crate.y} size={PA.crate.size} lid lidAt={B.fix - 0.08} tagsAt={B.out - 0.14} ink={SI.far} seed="s9crate" /> : null}
+      {props ? <OldLock /> : null}
+      {props ? <LandedLock /> : null}
       <BitRun />
       {t >= B.cutA2 ? <KeeperA /> : null}
       {pip ? <PipFigure st={st} scale={PA.pip.scale} t={t} /> : null}
+      <BitOnPip />
       <FlyingLock />
     </>
   );
@@ -266,13 +312,18 @@ const DuskDawn: React.FC = () => {
 
 // ---------------------------------------------------------------- the cart (A1 only: the maker has left before A2)
 
+const CART_GO = B.out - 0.05;
+const CART_DUR = 0.45;
+
 const CartA: React.FC = () => {
   const t = useTime();
   if (t >= B.cutA2) return null;
   const c = PA.cart;
-  // rolls off toward the VP: one-point perspective = a scale about the VP
-  const q = E.inOutSine(clamp((t - B.out) / 1.1));
-  const k = 1 - 0.22 * q;
+  // rolls off toward the VP on 'out' (makers ship, they don't install): one-point perspective = a scale about the VP,
+  // out-cubic over 0.45 s from out-0.05, so ~90 % of the trip happens before the hard cut (the 'fixed!' card has been
+  // complete since 1.37 and rides along, shrinking)
+  const q = E.outCubic(clamp((t - CART_GO) / CART_DUR));
+  const k = 1 - 0.32 * q;
   return (
     <XG m={mat.about(mat.scale(k, k), STOOP.vp[0], STOOP.vp[1])}>
       <MakersCart
@@ -282,7 +333,7 @@ const CartA: React.FC = () => {
         crates={2}
         pusher
         seed="s9cart"
-        roll={{at: B.out, to: [c.x + 1, c.y], dur: 1.1}}
+        roll={{at: CART_GO, to: [c.x + 26, c.y], dur: CART_DUR, ease: E.outCubic}}
         signPost={PA.sign.post}
         sign={<FixSign x={0} y={0} w={PA.sign.w} fs={PA.sign.fs} strikeAt={B.fix} fixedAt={B.out - 0.1} ink={SI.far} seed="s9sign" />}
       />
@@ -341,8 +392,9 @@ const NEAR_TOWER = (() => {
   return {fill, night, day};
 })();
 
-/** The rise: from just under the horizon at the VP to world y 915 in 0.40 s (out-cubic, ~75 % of the disc clear of the
- *  row rooflines by 1.0 s), then a slow glide to y 885 (screen ~(700, 820)) up to the hard cut. Gone in A2. */
+/** The rise: from just under the horizon at the VP to world y 880 in 0.40 s (out-cubic), then a slow glide to y 822
+ *  (screen ~(700, 756), top ~641: under the caption floor) up to the hard cut, so the disc's bottom clears the two
+ *  rooflines' V (~y 870 at x 588-812) and it reads as a round disc rising, not a wedge. Gone in A2. */
 const SunLayer: React.FC = () => {
   const t = useTime();
   if (t < B.dawn || t >= B.cutA2) return null;
@@ -356,8 +408,8 @@ const SunLayer: React.FC = () => {
         horizon={STOOP.vp[1]}
         drift={[0, 0]}
         moves={[
-          {at: B.dawn, dur: 0.4, y: 915, ease: E.outCubic},
-          {at: B.dawn + 0.4, dur: B.cutA2 - B.dawn - 0.45, y: 885, ease: E.inOutSine},
+          {at: B.dawn, dur: 0.4, y: 880, ease: E.outCubic},
+          {at: B.dawn + 0.4, dur: B.cutA2 - B.dawn - 0.45, y: 822, ease: E.inOutSine},
         ]}
       />
       <Fill d={NEAR_TOWER.fill} color={night ? palette.tealDark : '#84B09C'} offset={false} mode="snap" seed="stoop/towers" />
@@ -413,7 +465,7 @@ const GROUND_A = mapOf({[palette.mintPale]: '#98C0AE', [palette.sky]: '#98C0AE',
 const GROUND_B = mapOf({[palette.mintPale]: HALF.daySky, [palette.sky]: HALF.daySky, [palette.cream]: HALF.sand});
 
 const groundStep = (t: number, node: React.ReactNode): React.ReactNode => {
-  if (t < NIGHT_UNTIL || t >= GROUND_DAY) return node;
+  if (t < NIGHT_UNTIL) return node;
   return <Tod map={t < GROUND_B_AT ? GROUND_A : GROUND_B}>{node}</Tod>;
 };
 
@@ -426,12 +478,53 @@ const A1_FOREGROUND = (
   </>
 );
 
-/** The walker kept off the sun's column: a small figure on the right pavement walking up toward the VP. */
-const WALKER: WalkerAnchor = {x: 842, y: 1192, h: 104, go: 'vp', pace: 0.04, body: palette.teal, hair: 'short'};
+/** The walker kept off the sun's column: a small figure on the right pavement walking up toward the VP, and two
+ *  back-view pedestrians on the near pavement below the stoop (A1 screen y ~1330-1480, the action-safe band; left of the
+ *  cart's maker), walking up the street toward the dawn. They stop just before the hidden cut (the A2 frame keeps their
+ *  heads at its bottom edge, and the Part B ghost freezes on exactly that frame). */
+const WALKERS: WalkerAnchor[] = [
+  {x: 842, y: 1192, h: 104, go: 'vp', pace: 0.04, body: palette.teal, hair: 'short'},
+  {x: 300, y: 1544, h: 140, go: 'vp', pace: 0.05, body: palette.brown, hair: 'bun'},
+  {x: 452, y: 1528, h: 128, go: 'vp', pace: 0.05, body: palette.sage, hair: 'short', acc: ['backpack']},
+];
+export const GHOST_AT = B.hidden - 1 / 30;
+
+/** A puddle on the near pavement under the sunrise column: a sage pool with a broken ink lip; from the dawn's second
+ *  step it holds the sun's stepped reflection (a peach ellipse, a cream core 0.12 s later). Night: tealDark. */
+const PUDDLE = {cx: 704, cy: 1506, rx: 96, ry: 15};
+const PUDDLE_D = (() => {
+  const {cx, cy, rx, ry} = PUDDLE;
+  const pts: [number, number][] = [];
+  for (let i = 0; i < 18; i++) {
+    const a = (i / 18) * Math.PI * 2;
+    const w = 1 + 0.08 * Math.sin(a * 3 + 1.1) + 0.05 * Math.cos(a * 5);
+    pts.push([cx + Math.cos(a) * rx * w, cy + Math.sin(a) * ry * w]);
+  }
+  return {
+    body: smooth(pts, {closed: true}) + 'Z',
+    lip: arc(cx, cy, rx * 1.03, ry * 1.12, 22, 108, {seed: 's9pud/a'}) + arc(cx, cy, rx * 1.03, ry * 1.12, 124, 168, {seed: 's9pud/b'}),
+  };
+})();
+const Puddle: React.FC = () => {
+  const t = useTime();
+  const night = t < NIGHT_UNTIL;
+  const sunny = !night && t < B.cutA2;
+  const rx = PUDDLE.cx + 14;
+  return (
+    <>
+      <Fill d={PUDDLE_D.body} color={night ? palette.tealDark : palette.sage} offset={[3, 2]} mode="snap" seed="s9pud/f" />
+      {sunny ? <Fill d={`M${rx - 40} ${PUDDLE.cy}a40 7 0 1 0 80 0a40 7 0 1 0 -80 0Z`} color={palette.peach} offset={false} mode="snap" seed="s9pud/r1" /> : null}
+      {sunny && t >= NIGHT_UNTIL + 0.12 ? <Fill d={`M${rx - 17} ${PUDDLE.cy}a17 3.4 0 1 0 34 0a17 3.4 0 1 0 -34 0Z`} color={palette.cream} offset={false} mode="snap" seed="s9pud/r2" /> : null}
+      <Ink d={PUDDLE_D.lip} width={SI.mid * 0.8} taper={false} seed="s9pud/i" />
+    </>
+  );
+};
 
 // ---------------------------------------------------------------- Part A
 
-export const PartA: React.FC = () => {
+/** `ghost` = the Part B hidden-cut ghost (ghost.tsx): the set alone (no actors, no lock, no dusk dressing), drawn under a
+ *  frozen time through the hidden-cut map. */
+export const PartA: React.FC<{ghost?: boolean}> = ({ghost = false}) => {
   const t = useTime();
   const a2 = t >= B.cutA2;
   const wrap: LayerWrap = (name, _n, node) => {
@@ -447,7 +540,12 @@ export const PartA: React.FC = () => {
         {node}
       </>
     );
-    if (name === 'ground') return groundStep(t, node);
+    if (name === 'ground') return (
+      <>
+        {groundStep(t, node)}
+        <Puddle />
+      </>
+    );
     if (name === 'near') return <ClipOut holes={a2 ? [TREE_HOLE, WIRE_HOLE] : [TREE_HOLE]}>{groundStep(t, node)}</ClipOut>;
     return node;
   };
@@ -464,17 +562,22 @@ export const PartA: React.FC = () => {
         pigeons={false}
         foreground={a2 ? false : A1_FOREGROUND}
         furniture={[{kind: 'bike', x: 930, y: 1462, s: 0.95}]}
-        people={{walkers: [WALKER], walk: 0}}
+        people={{walkers: WALKERS, walk: 0, stop: GHOST_AT}}
         heroSlot={
-          <>
-            <DuskDawn />
-            <LandedLock />
-            <A2Actors />
-          </>
+          ghost ? null : (
+            <>
+              <DuskDawn />
+              <A2Actors />
+            </>
+          )
         }
       />
-      <Pigeons />
-      <CartA />
+      {ghost ? null : (
+        <>
+          <Pigeons />
+          <CartA />
+        </>
+      )}
     </>
   );
 };

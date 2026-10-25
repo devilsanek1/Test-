@@ -29,6 +29,7 @@ import {ease as E, prog, useTime} from '../../../lib/time';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {useLook} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 import {line, polyPath, rect, rectPath, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {rng, Seed} from '../../../lib/rng';
@@ -469,6 +470,7 @@ const RowNode: React.FC<{ri: number; inkW: number; dotsAt?: number; duskAt?: num
 const Searchlight: React.FC<{at?: number; angle?: number | ((t: number) => number); seed: string; v3?: boolean; clamp?: [number, number]}> = ({at, angle, seed, v3, clamp}) => {
   const t = useTime();
   const look = useLook();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   if (at === undefined || t < at || look.fills !== 'color') return null;
   const S = DOME.searchV3;
   const [ox, oy] = v3 ? DOME.towerV3.light : DOME.tower.light;
@@ -490,7 +492,7 @@ const Searchlight: React.FC<{at?: number; angle?: number | ((t: number) => numbe
   return (
     <>
       <path d={polyPath([[ox, oy], p0, p1])} fill={palette.cream} opacity={0.55} />
-      <path d={`M${ox} ${oy}L${p0[0].toFixed(1)} ${p0[1].toFixed(1)}M${ox} ${oy}L${p1[0].toFixed(1)} ${p1[1].toFixed(1)}`} fill="none" stroke={palette.ink} strokeWidth={SI.far} strokeDasharray="12 10" strokeLinecap="round" data-seed={seed} />
+      <path d={`M${ox} ${oy}L${p0[0].toFixed(1)} ${p0[1].toFixed(1)}M${ox} ${oy}L${p1[0].toFixed(1)} ${p1[1].toFixed(1)}`} fill="none" stroke={palette.ink} strokeWidth={SI.far * ks} strokeDasharray="12 10" strokeLinecap="round" data-seed={seed} />
     </>
   );
 };

@@ -12,10 +12,10 @@ import React from 'react';
 import {World, ScreenSpace, Sun, TimeShift, ease as E, useScene, useTime, useTransition} from '../lib';
 import {wipeEdgeX} from '../lib/cine/wipers';
 import scenesJson from '../data/scenes.json';
-import {LabelTag, OLD_QUARTER, OldQuarter, PopUp, SunPie} from './scene10/kit';
+import {LabelTag, OldQuarter, PopUp, SunPie} from './scene10/kit';
 import {localBeats, SCENE, W} from './scene10/beats';
 import {SecondRow} from './scene10/secondRow';
-import {PLAQUE_SIZE, Plaques, Sites, Stoops, TAG_HANG} from './scene10/sites';
+import {Plaques, plaqueRest, Sites, Stoops, TAG_HANG} from './scene10/sites';
 import {plaqueFacePoint, TAG_W, tagBodyOffset} from './scene10/plaques';
 import {Cart, CartTimes, Tosses} from './scene10/cart';
 import {Pip} from './scene10/pip';
@@ -30,6 +30,11 @@ const WIPE = {dur: 0.5, half: TramWiper.half ?? S09_TRAM.L / 2 + 8};
 const wipeP = (t: number) => (t + WIPE.dur / 2) / WIPE.dur;
 const tramX = (t: number) => wipeEdgeX(wipeP(t), 'right', WIPE.half);
 
+/** The sun's hand-off hop height (fix round 2: 60 -> 14, so the disc top stays near the caption floor). S09's own hop
+ *  (h 60) is only on screen until the wipe edge passes the disc, ~0.06 s after the cut, while both hops are still in
+ *  their 0.1 s anticipation squash: the two sides of the wipe still match. */
+const SUN_HOP_H = 14;
+
 const L13 = ['Rough estimate from', 'W3Techs data · only sites', 'that show their version ·', 'some hosts patch old', 'versions themselves'];
 
 const Scene10: React.FC = () => {
@@ -39,13 +44,11 @@ const Scene10: React.FC = () => {
   const start = scene.id === 'none' ? SCENE.start : scene.start;
   const b = localBeats(start);
   const end = (scene.id === 'none' ? SCENE.end : scene.end) - start;
-  const sg = OLD_QUARTER.sites;
-
   // the support tags land on siteL's / siteR's plaques (body centre = hang point + string + half the tag)
-  const hangL = plaqueFacePoint({x: sg.L.sign.x, y: sg.L.sign.y, size: PLAQUE_SIZE.L}, TAG_HANG.L);
-  const hangR = plaqueFacePoint({x: sg.R.sign.x, y: sg.R.sign.y, size: PLAQUE_SIZE.R}, TAG_HANG.R);
+  const hangL = plaqueFacePoint(plaqueRest('L'), TAG_HANG.L);
+  const hangR = plaqueFacePoint(plaqueRest('R'), TAG_HANG.R);
   const body = (h: Pt): Pt => [h[0], h[1] + tagBodyOffset(TAG_W)];
-  const cartT: CartTimes = {inAt: b.cartIn, pull1: b.pullTag1, toss1: b.toss1, land1: b.tick1, pull2: b.pullTag2, toss2: b.toss2, land2: b.tick2, end};
+  const cartT: CartTimes = {inAt: b.cartIn, toss1: b.toss1, land1: b.tick1, toss2: b.toss2, land2: b.tick2, rollAt: b.rollOut, end};
 
   // standalone preview only (no Film transition running): S09's own tram Wiper (Pip on its roof) as the wipe shows it
   const standIn = tr === null && t < WIPE.dur / 2;
@@ -53,8 +56,13 @@ const Scene10: React.FC = () => {
   // the S09 sun's hop (PartB: takes off ON the cut from (700, 720) r150, lands at (500, 690) r110 after 0.56 s, h 60):
   // the same sun on both sides of the wipe; then it idles with a slow drift
   const sunAir = b.sunLand - b.cut;
-  // Pip leaves S09's tram roof exactly where S09's Wiper last drew him (its tramPipAt, film time)
+  // Pip leaves S09's tram roof exactly where S09's Wiper last drew him (its tramPipAt, film time), with its velocity
+  // (backward difference inside S09's roof window)
   const hand = tramPipAt(start + b.pipHop);
+  const handV = (hand.x - tramPipAt(start + b.pipHop - 1 / 30).x) * 30;
+  // the A-frame (fix round 2): 6 px lower and 20 px narrower on its right than the set's slot box, so a >= 20 px band of
+  // wall separates it from siteL's (raised) plaque and the parked maker stands clear of its back edge
+  const signBox = (box: [number, number, number, number]): [number, number, number, number] => [box[0], box[1] + 6, box[2] - 20, box[3] + 6];
   // the street-gap wedge and its walker pop up with siteR (not floating in the empty street from the cut)
   const sitePops: [number, number, number] = [b.siteL, b.siteL + 0.1, b.siteL + 0.2];
   const wedgeAt = sitePops[2];
@@ -64,7 +72,7 @@ const Scene10: React.FC = () => {
       <OldQuarter
         sun={
           <ScreenSpace>
-            <Sun cx={700} cy={720} r={150} drift={[5, 0]} hops={[{t: b.cut, to: [500, 690], h: 60, air: sunAir}]} moves={[{at: b.cut, dur: sunAir, r: 110, ease: E.inOutSine}]}>
+            <Sun cx={700} cy={720} r={150} drift={[5, 0]} hops={[{t: b.cut, to: [500, 690], h: SUN_HOP_H, air: sunAir}]} moves={[{at: b.cut, dur: sunAir, r: 110, ease: E.inOutSine}]}>
               {(r) => <SunPie r={r} n={2} cream={1} spokesAt={b.pieSpoke} slicesAt={b.pieCream} solidAt={b.pieSolid} width={2.6} seed="s10/pie" />}
             </Sun>
           </ScreenSpace>
@@ -72,11 +80,14 @@ const Scene10: React.FC = () => {
         people={false}
         furniture="bike"
         cart={<Cart T={cartT} />}
-        noticeSign={(box) => (
-          <SandwichBoard box={box} ground={box[3] + 30} at={b.label}>
-            <LabelTag kind="sign" box={box} fontSize={30 / 1.05} legH={30} frame={false} text={L13} seed="s10/L13" />
-          </SandwichBoard>
-        )}
+        noticeSign={(slot) => {
+          const box = signBox(slot);
+          return (
+            <SandwichBoard box={box} ground={box[3] + 30} at={b.label}>
+              <LabelTag kind="sign" box={box} fontSize={30 / 1.05} legH={30} frame={false} text={L13} seed="s10/L13" />
+            </SandwichBoard>
+          );
+        }}
         wrap={(name, _n, node) => {
           // the empty street has a horizon from the cut: pavement to the eye line + a thin fill-only skyline
           if (name === 'far') return <FarStreet />;
@@ -85,12 +96,12 @@ const Scene10: React.FC = () => {
           if (name === 'sites')
             return (
               <>
-                <Sites popAt={sitePops} updateAt={b.update} wobbleAt={b.wobble} />
-                {/* the gap walker is FARTHER than the cart line (feet 1262 -> 1238 vs 1336): drawn before the set's cart
-                    slot; he pops up with the gap wedge (siteR) and keeps walking up the gap until the cart steps out */}
+                {/* the gap walker is FARTHER than the near row: drawn before it, so siteR's wall covers his exit (he
+                    walks off up the gap and right, gone by 'old'); he pops up with the gap wedge (siteR) */}
                 <PopUp at={wedgeAt} x={GAP_WALKER.x} y={GAP_WALKER.y}>
-                  <GapWalker walkAt={b.walker} stopAt={b.cartIn} />
+                  <GapWalker walkAt={b.walker} outAt={b.walkerOut} />
                 </PopUp>
+                <Sites popAt={sitePops} updateAt={b.update} wobbleAt={b.wobble} />
               </>
             );
           if (name === 'sign')
@@ -102,9 +113,9 @@ const Scene10: React.FC = () => {
                 <Stoops popAt={sitePops} />
                 <Plaques
                   plaqueAt={[b.plaques, b.plaques + 0.06, b.plaques + 0.12]}
-                  old={{flipOldAt: b.flipM, cobwebAt: b.cobweb, dustAt: b.dust, caneAt: b.cane, droopAt: b.droop, wobbleAt: b.wobble, bit: {at: b.bitIn, size: 20, bursts: [0, b.cane, b.not, b.update].map((x) => x - (b.bitIn + 0.4))}}}
+                  old={{flipOldAt: b.flipM, cobwebAt: b.cobweb, dustAt: b.dust, caneAt: b.cane, droopAt: b.droop, wobbleAt: b.wobble, nudgeAt: [b.skipNudge], bit: {at: b.bitIn, size: 20, bursts: [0, b.cane, b.not, b.update].map((x) => x - (b.bitIn + 0.4))}}}
                   tagL={{at: b.tick1, tickAt: b.tick1 + 0.03}}
-                  tagR={{at: b.tick2, tickAt: b.tick2 + 0.03}}
+                  tagR={{at: b.tick2, tickAt: b.tick2 + 0.03, ringAt: b.tick2 + 0.03}}
                 />
                 {node}
                 <Tosses T={cartT} land1={body(hangL)} land2={body(hangR)} tagSize={TAG_W} />
@@ -114,7 +125,7 @@ const Scene10: React.FC = () => {
             return (
               <>
                 {node}
-                <Pip T={{leap: b.pipHop, leapFrom: [hand.x, hand.y], leapScale: hand.scale, perk: b.pipPerk, lookPlaque: b.walker, lookFar: b.flip2 + 0.04, lookWeb: b.cobweb + 0.1, lookCart: b.cartIn + 0.05, hey: b.hey, heyEnd: b.heyEnd, out: b.pipOut}} />
+                <Pip T={{leap: b.pipHop, leapFrom: [hand.x, hand.y], leapScale: hand.scale, leapV: handV, perk: b.pipPerk, lookPlaque: b.walker, lookFar: b.flip2 + 0.04, lookWeb: b.cobweb + 0.1, lookCart: b.cartIn + 0.05, hey: b.hey, sparkEnd: b.hey + 0.46, heyEnd: b.heyEnd, out: b.pipOut}} />
               </>
             );
           if (name === 'foreground')

@@ -22,6 +22,7 @@ import {Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {ExitFade, useLook} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 import {arc, crown, line, smooth, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {DEPTH_INK, pendulum, withOut} from './common';
@@ -61,6 +62,7 @@ export type PowerGlyphProps = {
 
 export const PowerGlyph: React.FC<PowerGlyphProps> = ({r = 150, ring: ringIn, width: wIn, x = 0, y = 0, color = palette.cream, at, inkOnAt, glintAt, colorAt, toColor, fly, outAt, seed = 'pwr'}) => {
   const t = useTime();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   if (at !== undefined && t < at) return null;
   const ring0 = ringIn ?? (r * 56) / 150;
   const w0 = wIn ?? (ring0 * 10) / 56;
@@ -95,7 +97,7 @@ export const PowerGlyph: React.FC<PowerGlyphProps> = ({r = 150, ring: ringIn, wi
           key={g}
           d={`M${ax} ${ay}l${(Math.cos(-40 * D2R) * len).toFixed(2)} ${(Math.sin(-40 * D2R) * len).toFixed(2)}M${bx} ${by}l${(Math.cos(-62 * D2R) * len * 0.8).toFixed(2)} ${(Math.sin(-62 * D2R) * len * 0.8).toFixed(2)}`}
           stroke={palette.ink}
-          strokeWidth={Math.max(2, w * 0.45)}
+          strokeWidth={Math.max(2, w * 0.45) * ks}
           strokeLinecap="round"
           fill="none"
         />,
@@ -137,6 +139,7 @@ export type RewindGlyphProps = {
  *  outAt={F} /> + <PowerGlyph at={F + 0.06} />. */
 export const RewindGlyph: React.FC<RewindGlyphProps> = ({r = 150, ring: ringIn, width: wIn, x = 0, y = 0, color = palette.cream, at, outAt, nudgeAt, seed = 'rew'}) => {
   const t = useTime();
+  const ks = useInkScale();
   if (at !== undefined && t < at) return null;
   const R = ringIn ?? (r * 56) / 150;
   const w = wIn ?? (R * 10) / 56;
@@ -157,7 +160,7 @@ export const RewindGlyph: React.FC<RewindGlyphProps> = ({r = 150, ring: ringIn, 
   return (
     <XG m={mat.compose(mat.translate(x + nx, y), mat.scale(k))}>
       <ExitFade x={0} y={0}>
-        <path d={d} fill={color} stroke={color} strokeWidth={w * 0.8} strokeLinejoin="round" />
+        <path d={d} fill={color} stroke={color} strokeWidth={w * 0.8 * ks} strokeLinejoin="round" />
       </ExitFade>
     </XG>
   );
@@ -211,6 +214,7 @@ export function releaseState(u: number, amount = 0.12, grow = 40): [number, numb
 /** Wrap a <Sun> (or <BigSun>) to press it like a power button. */
 export const SunPress: React.FC<SunPressProps> = ({at, cx, cy, r, amount, mode = 'press', ripple, dur = 0.2, step = 12, width = DEPTH_INK.mid, children}) => {
   const t = useTime();
+  const ks = useInkScale();
   const amt = amount ?? (mode === 'land' ? 0.1 : 0.12);
   if (mode === 'release' || mode === 'reverse') {
     const a0 = Array.isArray(at) ? at[0] : at;
@@ -224,7 +228,7 @@ export const SunPress: React.FC<SunPressProps> = ({at, cx, cy, r, amount, mode =
     return (
       <>
         <XG m={sc === 1 ? mat.I : mat.about(mat.scale(sc), cx, cy)}>{children}</XG>
-        {showRipple ? <circle cx={cx} cy={cy} r={r + rg} fill="none" stroke={palette.ink} strokeWidth={width * rw + 0.01} /> : null}
+        {showRipple ? <circle cx={cx} cy={cy} r={r + rg} fill="none" stroke={palette.ink} strokeWidth={(width * rw + 0.01) * ks} /> : null}
       </>
     );
   }
@@ -242,9 +246,10 @@ export const SunPress: React.FC<SunPressProps> = ({at, cx, cy, r, amount, mode =
 /** An ink ring that expands r -> r + grow and thins to nothing (0.2 s). */
 export const PressRipple: React.FC<{cx: number; cy: number; r: number; at: number; grow?: number; dur?: number; width?: number; color?: string}> = ({cx, cy, r, at, grow = 40, dur = 0.2, width = DEPTH_INK.mid, color = palette.ink}) => {
   const t = useTime();
+  const ks = useInkScale();
   if (t < at || t >= at + dur) return null;
   const q = E.outCubic((t - at) / dur);
-  return <circle cx={cx} cy={cy} r={r + grow * q} fill="none" stroke={color} strokeWidth={width * (1 - q) + 0.01} />;
+  return <circle cx={cx} cy={cy} r={r + grow * q} fill="none" stroke={color} strokeWidth={(width * (1 - q) + 0.01) * ks} />;
 };
 
 // ---------------------------------------------------------------- SunPie
@@ -289,6 +294,7 @@ const sector = (a0: number, a1: number, rr: number) => {
 export const SunPie: React.FC<SunPieProps> = ({r, n, cream = 0, spokesAt, slicesAt, sliceStagger = 0, pulseAt, solidAt, spokesOutAt: spokesOutIn, width = DEPTH_INK.far, sliceColor = palette.cream, seed = 'pie'}) => {
   const spokesOutAt = spokesOutIn ?? (solidAt !== undefined ? solidAt + 0.1 : undefined);
   const t = useTime();
+  const ks = useInkScale();
   const idx = Array.isArray(cream) ? cream : Array.from({length: cream}, (_, i) => n - cream + i);
   const step = 360 / n;
   const out: React.ReactNode[] = [];
@@ -306,7 +312,7 @@ export const SunPie: React.FC<SunPieProps> = ({r, n, cream = 0, spokesAt, slices
     out.push(
       <XG key={`s${i}`} m={mat.about(mat.scale(k), mid[0] * 0.2, mid[1] * 0.2)}>
         <Fill d={sector(a0 + 0.6, a0 + step - 0.6, r * 0.985)} color={sliceColor} offset={false} mode="none" seed={`${seed}/s${i}`} lookExempt />
-        <path d={rimArc(a0 + 0.6, a0 + step - 0.6, r * 0.985 - width / 2)} fill="none" stroke={palette.ink} strokeWidth={width} strokeLinecap="round" />
+        <path d={rimArc(a0 + 0.6, a0 + step - 0.6, r * 0.985 - (width * ks) / 2)} fill="none" stroke={palette.ink} strokeWidth={width * ks} strokeLinecap="round" />
       </XG>,
     );
   });
@@ -341,6 +347,7 @@ export type HoursClockProps = {
 /** Cream ring (0.82 r) + a long minute hand spinning `turns` over spinDur + a short hour hand stepping on. No numerals. */
 export const HoursClock: React.FC<HoursClockProps> = ({r, at, spinAt, spinDur = 1.1, turns = 3.5, hourSteps = 4, outAt, color = palette.cream, seed = 'clock'}) => {
   const t = useTime();
+  const ks = useInkScale();
   if (at !== undefined && t < at) return null;
   const pop = at !== undefined ? springAt(t, at, springs.pop) : 1;
   const outK = outAt !== undefined ? 1 - E.inBack(1.4)(prog(t, outAt, 0.16)) : 1;
@@ -367,11 +374,11 @@ export const HoursClock: React.FC<HoursClockProps> = ({r, at, spinAt, spinDur = 
   return (
     <ExitFade x={0} y={0}>
       <g transform={`scale(${k.toFixed(4)})`}>
-        <circle r={R} fill="none" stroke={color} strokeWidth={sw} />
-        <path d={ticks} stroke={color} strokeWidth={sw * 0.6} strokeLinecap="round" />
-        <path d={hand(hA, R * 0.48)} stroke={color} strokeWidth={sw * 1.15} strokeLinecap="round" />
-        <path d={hand(mA, R * 0.78)} stroke={color} strokeWidth={sw * 0.8} strokeLinecap="round" />
-        <circle r={sw * 0.95} fill={color} />
+        <circle r={R} fill="none" stroke={color} strokeWidth={sw * ks} />
+        <path d={ticks} stroke={color} strokeWidth={sw * 0.6 * ks} strokeLinecap="round" />
+        <path d={hand(hA, R * 0.48)} stroke={color} strokeWidth={sw * 1.15 * ks} strokeLinecap="round" />
+        <path d={hand(mA, R * 0.78)} stroke={color} strokeWidth={sw * 0.8 * ks} strokeLinecap="round" />
+        <circle r={sw * 0.95 * ks} fill={color} />
       </g>
     </ExitFade>
   );
@@ -397,6 +404,7 @@ export type MinuteWedgeProps = {
  *  ease-out) with an ink rim arc following it, and ticks. The disc silhouette stays whole (thin orange ring outside). */
 export const MinuteWedge: React.FC<MinuteWedgeProps> = ({r, at, dur = 0.61, fraction = 0.75, outAt, width, sweepColor = palette.peach, seed = 'wedge'}) => {
   const t = useTime();
+  const ks = useInkScale();
   if (at !== undefined && t < at) return null;
   const q = at !== undefined ? prog(t, at, dur, E.outCubic) : 1;
   const done = at === undefined || t >= at + dur;
@@ -423,12 +431,12 @@ export const MinuteWedge: React.FC<MinuteWedgeProps> = ({r, at, dur = 0.61, frac
         {q > 0.003 ? (
           <>
             <path d={sector(-90, Math.max(-89.9, end), R)} fill={sweepColor} />
-            <path d={`M0 0L${sx.toFixed(2)} ${sy.toFixed(2)}` + rimArc(-90, Math.max(-89.9, end), R)} fill="none" stroke={palette.ink} strokeWidth={w * 0.7} strokeLinecap="round" strokeLinejoin="round" />
+            <path d={`M0 0L${sx.toFixed(2)} ${sy.toFixed(2)}` + rimArc(-90, Math.max(-89.9, end), R)} fill="none" stroke={palette.ink} strokeWidth={w * 0.7 * ks} strokeLinecap="round" strokeLinejoin="round" />
           </>
         ) : null}
-        {ticks ? <path d={ticks} stroke={palette.ink} strokeWidth={w * 0.8} strokeLinecap="round" fill="none" /> : null}
-        <path d={`M0 0L${hx.toFixed(2)} ${hy.toFixed(2)}`} stroke={palette.ink} strokeWidth={w} strokeLinecap="round" />
-        <circle r={w * 1.3} fill={palette.ink} />
+        {ticks ? <path d={ticks} stroke={palette.ink} strokeWidth={w * 0.8 * ks} strokeLinecap="round" fill="none" /> : null}
+        <path d={`M0 0L${hx.toFixed(2)} ${hy.toFixed(2)}`} stroke={palette.ink} strokeWidth={w * ks} strokeLinecap="round" />
+        <circle r={w * 1.3 * ks} fill={palette.ink} />
       </g>
     </ExitFade>
   );

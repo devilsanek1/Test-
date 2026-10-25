@@ -26,6 +26,7 @@ import {mat, useXf, XG} from '../../../lib/xf';
 import {bt, Depth, DEPTH_INK, lodOf, matScale, misregScreen, pendulum, PropBase, PropRoot, usePropFrame, withOut} from './common';
 import {Cobweb} from './Glyphs';
 import {ExitFade} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 
 // ---------------------------------------------------------------- emblem geometry (100 x 80 box, centred, faces right)
 
@@ -219,6 +220,7 @@ export type ElephantPlaqueProps = PropBase & {
 
 export const ElephantPlaque: React.FC<ElephantPlaqueProps> = (p) => {
   const t = useTime();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   const {x = 0, y = 0, size = 50, variant = 'plate', at, outAt, outDur, seed = 'plq', side = 'right'} = p;
   const s = size / 100; // local design: plate 100 x 100 centred
   const F = usePropFrame({scale: s, depth: p.depth, ink: p.ink, at, dur: p.dur, baseDur: 0.5, seed, defDepth: size >= 80 ? 'mid' : 'far'});
@@ -243,7 +245,7 @@ export const ElephantPlaque: React.FC<ElephantPlaqueProps> = (p) => {
       k *= 1 + 0.12 * Math.sin(Math.PI * Math.min(1, q));
       for (let i = 0; i < 2; i++) {
         const qq = (t - pa - i * 0.08) / 0.22;
-        if (qq > 0 && qq < 1) rings.push(<rect key={`r${pa}${i}`} x={-50 - 14 - 26 * qq} y={-50 - 14 - 26 * qq} width={128 + 52 * qq} height={128 + 52 * qq} rx={10} fill="none" stroke={palette.ink} strokeWidth={W * (1 - qq)} />);
+        if (qq > 0 && qq < 1) rings.push(<rect key={`r${pa}${i}`} x={-50 - 14 - 26 * qq} y={-50 - 14 - 26 * qq} width={128 + 52 * qq} height={128 + 52 * qq} rx={10} fill="none" stroke={palette.ink} strokeWidth={W * (1 - qq) * ks} />);
       }
     }
   }
@@ -458,6 +460,7 @@ export const ElephantStamp = withOut(ElephantStampBase, 'ElephantStamp');
  *  for dots >= rimFrom world px). Each dot BLINKS on at its `at` (cream flash + 125 % for 3 frames). */
 export const PlaqueSpecks: React.FC<{spots: {x: number; y: number; size: number; at?: number; old?: boolean}[]; ink?: number; rimFrom?: number}> = ({spots, ink = 0.6, rimFrom = 3.5}) => {
   const t = useTime();
+  const ks = useInkScale();
   let sand = '';
   let tan = '';
   let flash = '';
@@ -477,7 +480,7 @@ export const PlaqueSpecks: React.FC<{spots: {x: number; y: number; size: number;
       {sand ? <path d={sand} fill={palette.sand} /> : null}
       {tan ? <path d={tan} fill={palette.tan} /> : null}
       {flash ? <path d={flash} fill={palette.cream} /> : null}
-      {rim && ink > 0 ? <path d={rim} fill="none" stroke={palette.ink} strokeWidth={ink} /> : null}
+      {rim && ink > 0 ? <path d={rim} fill="none" stroke={palette.ink} strokeWidth={ink * ks} /> : null}
     </ExitFade>
   );
 };

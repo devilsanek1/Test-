@@ -33,32 +33,33 @@ export const ABS = {
   siteL: W.something - 0.1, // siteL pops up (scaleY 0 -> 1.06 -> 1), siteM +0.10, siteR +0.20 (with the gap wedge + walker)
   sunLand: W.something, // the sun lands over siteM ON the word
   second: W.like, // the nine second-row buildings pop up behind (0.04 s stagger); the caretaker tag is already there
-  pieSpoke: W.half - 0.06, // the sun draws its one ink spoke
-  pieCream: W.half, // HALF its disc pops cream (1/2 pie) on the word
+  pieSpoke: W.half - 0.14, // the sun draws its one ink spoke
+  pieCream: W.half - 0.08, // HALF its disc pops cream (1/2 pie): half grown ON the word, complete by +0.07 (rule 5)
   pipPerk: W.half + 0.2, // Pip's ears perk at the half-cream sun
   plaques: W.php - 0.1, // the hanging plaque signs swing out on every site (L, M, R 0.06 s apart)
   label: W.php + 0.15, // L13 rises on the A-frame sign
   pieSolid: W.sites - 0.3, // the pie settles (cream shrinks, spoke retracts); a second-row window lights
   walker: W.sites, // the walker heads up the street gap; Pip looks up at siteM's plaque
+  walkerOut: W.old, // ... and has turned off behind siteR's wall (the gap is clear before the cart steps out)
   flipM: W.run - 0.05, // siteM's plaque paper-flips to the OLD version
   bitIn: W.run + 0.22, // Bit drops onto the old plaque's chain and crawls to its corner
   flip2: W.versions, // five second-row plaques flip old (alternating, 0.04 s apart) + dust puffs
   cobweb: W.so - 0.1, // a cobweb draws across the old plaque's corner (rule-5 lead: it reads ON 'so'): Bit is caught in it
   dust: W.so + 0.02, // dust specks pop under the old plaque
   cane: W.old, // the old emblem leans on a tiny cane
-  cartIn: W.old + 0.15, // the maker + cart step out from behind the A-frame's right edge (sign 'fixed!' under the deck)
+  cartIn: W.old + 0.15, // the maker + cart pop up beside the A-frame's right edge, step out and park (sign 'fixed!')
   droop: W.theyre, // the old emblem's ear droops (it sags further on its cane); a dust speck drifts down
   not: W.not, // Bit struggles in the web; the maker reaches into the satchel
-  pullTag1: W.not - 0.15, // the maker pulls a tag from the satchel (gone 2 frames before the flick)
-  toss1: W.not + 0.02, // ... and flicks it at siteL's plaque
+  toss1: W.not + 0.02, // his LEFT arm (raised from the satchel 0.13 s before) lobs a tag back-left at siteL's plaque
   tick1: W.officially, // it lands on siteL's plaque: tick
-  pullTag2: W.officially - 0.14, // the second tag comes out of the satchel
-  toss2: W.officially + 0.03, // the toss that arcs OVER siteM's old plaque (0.36 s flight, over siteM ~0.2 s in)
-  tick2: W.supported + 0.01, // lands on siteR's plaque: tick
+  toss2: W.officially - 0.03, // his RIGHT arm lobs the second tag high OVER siteM's old plaque (0.405 s flight)
+  skipNudge: W.officially + 0.1, // siteM's old plaque nudges as the tag sails over it (the skip, as an event)
+  tick2: W.supported + 0.01, // lands on siteR's plaque: tick + one stepped ink ring pulse
   wave: W.supported + 0.06, // tiny tags pop onto the CURRENT second-row plaques, skipping the old ones
   hey: W.supported + 0.1, // GAG: Pip trunk-up 'hey!' at siteM's plaque (it was skipped)
-  heyEnd: W.anymore + 0.2, // Pip settles back to sit-back
-  update: W.anymore, // siteM's browser starts an update: the bar stalls at ~10 %, ring spinning; the cart rolls out right
+  heyEnd: W.anymoreEnd - 0.21, // = pipOut - 0.12: Pip turns side-on (facing right) into the crouch of his hop out
+  update: W.anymore, // siteM's browser starts an update: the bar stalls at ~10 %, ring spinning
+  rollOut: W.anymore + 0.05, // the cart rolls out right (sine ramp, <= 18 px / frame)
   wobble: W.anymoreEnd - 0.1, // the old emblem's cane wobbles; the ring keeps spinning
   pipOut: W.anymoreEnd - 0.09, // Pip hops out past the right edge (0.30 s: gone one frame before the cut, into S11)
 } as const;

@@ -31,6 +31,7 @@ import {clamp, ease as E, osc, prog, TimeProvider, TimeShift, useTime} from '../
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {Look, useLook} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 import {arc, blob, circle, crown, crownTicks, ellipse, line, polyPath, rect, rectPath, smooth, vline, Pt} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {mat, XG} from '../../../lib/xf';
@@ -880,6 +881,7 @@ const PENNANT_STYLE: {base: string; mark: string; kind: 'dot' | 'chevron' | 'str
 
 const Pennant: React.FC<{i: number; root: Pt; at?: number; up: boolean; waveAt?: number; seed: string}> = ({i, root, at, up, waveAt, seed}) => {
   const t = useTime();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   if (!up && (at === undefined || t < at)) return null;
   const st = PENNANT_STYLE[i];
   const L = 58; // pole length
@@ -911,7 +913,7 @@ const Pennant: React.FC<{i: number; root: Pt; at?: number; up: boolean; waveAt?:
   const cy = fh * 0.5 + wave * 4;
   if (k > 0.5) {
     if (st.kind === 'dot') mark = <path d={blob(cx, cy, 6, 6, {seed: `${seed}/pd${i}`}) + blob(cx + dir * 15, cy - 6, 3.2, 3.2, {seed: `${seed}/pd2${i}`})} fill={st.mark} />;
-    if (st.kind === 'chevron') mark = <path d={`M${cx - dir * 14} ${cy - 9}L${cx + dir * 4} ${cy}L${cx - dir * 14} ${cy + 9}`} fill="none" stroke={st.mark} strokeWidth={5} strokeLinejoin="round" />;
+    if (st.kind === 'chevron') mark = <path d={`M${cx - dir * 14} ${cy - 9}L${cx + dir * 4} ${cy}L${cx - dir * 14} ${cy + 9}`} fill="none" stroke={st.mark} strokeWidth={5 * ks} strokeLinejoin="round" />;
     if (st.kind === 'stripe') mark = <path d={rectPath(Math.min(cx - dir * 22, cx + dir * 22), cy - 5, 44 * k, 10)} fill={st.mark} />;
     if (st.kind === 'star') {
       const pts: Pt[] = [];

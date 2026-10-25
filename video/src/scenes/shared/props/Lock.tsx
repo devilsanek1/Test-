@@ -27,6 +27,7 @@ import {Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {ExitFade, useLook} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 import {check, circle, line, rect, rectPath, roundRect, Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {bt, landSquash, lodOf, PropBase, PropRoot, usePropFrame} from './common';
@@ -129,6 +130,7 @@ export const Lock: React.FC<LockProps> = (p) => {
   const {x = 0, y = 0, size, state = 'closed', at, outAt, outDur, rot = 0, flip, seed = 'lock'} = p;
   const t = useTime();
   const look = useLook();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   const paperLook = look.fills === 'paper';
   const clipId = 'lk' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const scale = size !== undefined ? size / LOCK.h : p.scale ?? 1;
@@ -203,8 +205,8 @@ export const Lock: React.FC<LockProps> = (p) => {
   if (state === 'ghost') {
     out.push(
       <ExitFade key="ghost" x={0} y={0}>
-        <path d={boxD} fill="none" stroke={palette.ink} strokeWidth={W * 0.8} strokeDasharray={`${8} ${7}`} strokeLinecap="round" />
-        <circle cx={LOCK.keyhole[0]} cy={LOCK.keyhole[1]} r={7} fill="none" stroke={palette.ink} strokeWidth={W * 0.6} strokeDasharray="3 4" />
+        <path d={boxD} fill="none" stroke={palette.ink} strokeWidth={W * 0.8 * ks} strokeDasharray={`${8} ${7}`} strokeLinecap="round" />
+        <circle cx={LOCK.keyhole[0]} cy={LOCK.keyhole[1]} r={7} fill="none" stroke={palette.ink} strokeWidth={W * 0.6 * ks} strokeDasharray="3 4" />
       </ExitFade>,
     );
     return (
@@ -386,7 +388,7 @@ export const Lock: React.FC<LockProps> = (p) => {
     out.push(
       <ExitFade key="glint">
         <g transform={`translate(-22 -30) scale(${s.toFixed(3)})`}>
-          <path d="M-6 8L8 -10M2 12L12 0" stroke={palette.white} strokeWidth={W * 0.9} strokeLinecap="round" fill="none" />
+          <path d="M-6 8L8 -10M2 12L12 0" stroke={palette.white} strokeWidth={W * 0.9 * ks} strokeLinecap="round" fill="none" />
         </g>
       </ExitFade>,
     );
@@ -544,6 +546,7 @@ export type LockSpot = {x: number; y: number; size: number; at?: number; fixed?:
  *  ones. Ink width in world px (S10: authored in world units). */
 export const LockSpecks: React.FC<{spots: LockSpot[]; ink?: number; inkFrom?: number; outAt?: number}> = ({spots, ink = 0.6, inkFrom = 6, outAt}) => {
   const t = useTime();
+  const ks = useInkScale();
   if (outAt !== undefined && t >= outAt) return null;
   let sand = '';
   let sage = '';
@@ -562,7 +565,7 @@ export const LockSpecks: React.FC<{spots: LockSpot[]; ink?: number; inkFrom?: nu
     <ExitFade>
       {sand ? <path d={sand} fill={palette.sand} /> : null}
       {sage ? <path d={sage} fill={palette.sage} /> : null}
-      {line_ && ink > 0 ? <path d={line_} fill="none" stroke={palette.ink} strokeWidth={ink} strokeLinejoin="round" /> : null}
+      {line_ && ink > 0 ? <path d={line_} fill="none" stroke={palette.ink} strokeWidth={ink * ks} strokeLinejoin="round" /> : null}
     </ExitFade>
   );
 };

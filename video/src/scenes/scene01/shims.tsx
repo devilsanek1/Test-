@@ -6,7 +6,8 @@
 //                props RollerShutter (govC with the partial-drop jolt `stopAt`: the kit's ShutterRig drops h x stop
 //                with a full-closure bounce), the lettered tag, and the scene's BIG CREAM padlock (`S01Padlock`, the
 //                kit's ShutterPadlock is a sand body with no colour prop: tan on tan, ~12 px on a phone). Each lock
-//                click jolts the curtain 3 px (one frame). Ink is compensated in the dive (camera.ts `inkComp`).
+//                click jolts the curtain 3 px (one frame). Fix round 4: TagString runs the lettered tag's string down
+//                through its eyelet. Ink is compensated in the dive by the enclosing <InkScale> (plaza.tsx wrap).
 // Fix round 3: S01FarCivic is gone (the kit's v3b far city ends on a horizon line over the plaza's far steps, three
 // depth tiers, lit window dots that step off with the fill), and so is the lamp's LanternOff (cropped by the frame
 // edge it read as a glitch; the set's cream -> sand step stays, the 'their' light event moved to govA's door).
@@ -53,7 +54,7 @@ export const DOME_GLASS: [number, number, number, number] = [511, 615, 14, 34];
  *  keyhole, hung over the shutter's bottom rail and last slats (tealDark behind: the strongest contrast in the facade).
  *  (x, y) = the body's centre. Pops 0.3 -> 1.3 -> 1 (0.13 s); the shackle snaps down 5 units at `lockAt`; on each
  *  `glintAt` two cream rays pop off the body's upper-left corner onto the dark slats (0.25 s). `ink` = stroke factor
- *  (the dive compensation). */
+ *  (an extra stroke factor; the dive compensation itself comes from the enclosing <InkScale>). */
 export const S01Padlock: React.FC<{x: number; y: number; size: number; at?: number; lockAt?: number; glintAt?: number; ink?: number; seed: string}> = ({x, y, size, at, lockAt, glintAt, ink = 1, seed}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
@@ -126,8 +127,8 @@ const jolt = (t: number, at?: number) => {
  *  events WITHOUT shutterAt / padlockAt / tagAt / glintAt and still draws the rolled-up shutter box, redrawn identically
  *  here): props RollerShutter over the FULL window with `stopAt` (govC: gravity fall 0.16 x sqrt(stop) s, then the
  *  1-frame jolt +5 / -2 px), the lettered tag hanging from the rail (same props / seeds as the set's BackSoonSlot), and
- *  `S01Padlock` over the rail. The padlock's click jolts the curtain 3 px (the rail, tag and lock ride it). `ink` =
- *  stroke factor (the dive compensation). */
+ *  `S01Padlock` over the rail. The padlock's click jolts the curtain 3 px (the rail, tag and lock ride it). Strokes
+ *  are compensated in the dive by the enclosing <InkScale>. */
 export const S01Shutter: React.FC<{id: 'govA' | 'govB' | 'govC'; ev: GovEvents; seed?: string}> = ({id, ev, seed = 'plaza'}) => {
   const t = useTime();
   const g = PLAZA.gov[id];

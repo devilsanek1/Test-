@@ -56,8 +56,25 @@ const GND = (() => {
     kerb: line(-160, OQ.kerb, 1240, OQ.kerb + 2, {seed: `${s}/k`, over: 0}) + line(-160, OQ.kerb + 20, 1240, OQ.kerb + 23, {seed: `${s}/k2`, over: 0}),
     walk: groundMarks({vp: [690, 1150], top: OQ.base + 30, bottom: OQ.kerb - 6, x0: -700, x1: 2000, rays: 4, cross: 1, specks: 8, reach: 0.9, seed: `${s}/gw`}),
     street: groundMarks({vp: [690, 1150], top: OQ.kerb + 40, bottom: 1920, x0: -200, x1: 1300, rays: 0, cross: 1, specks: 14, seed: `${s}/gs`}),
+    ...railsAndSetts(),
   };
 })();
+
+/** Fix round 2: the empty street after the tram is not a bare stage: a row of kerb setts along the kerb's street side and
+ *  the tram's RAIL PAIR across the street (the tram just passed), a tan groove strip under an ink rail head each. */
+function railsAndSetts() {
+  const y0 = OQ.kerb + 26;
+  let setts = '';
+  let settInk = '';
+  for (let i = 0, x = -150; x < 1240; i++) {
+    const w = 40 + ((i * 7) % 3) * 6;
+    setts += roundRect(x, y0, w - 6, 18, 4);
+    settInk += line(x, y0 + 19, x + w - 6, y0 + 19, {seed: `s10/sb${i}`, over: 0, breaks: false}) + (i % 2 ? line(x + w - 6, y0 + 2, x + w - 6, y0 + 18, {seed: `s10/sv${i}`, over: 0, breaks: false}) : '');
+    x += w;
+  }
+  const rails = [1590, 1640].map((ry) => ({groove: rectPath(-160, ry, 1400, 8), head: line(-160, ry, 1240, ry + 1, {seed: `s10/rail${ry}`, over: 0})}));
+  return {setts, settInk, railGroove: rails.map((r) => r.groove).join(''), railHead: rails.map((r) => r.head).join('')};
+}
 
 /** The set's ground layer, the street-gap wedge popping up from the base line at `wedgeAt` (with siteR). */
 export const StreetGround: React.FC<{wedgeAt: number}> = ({wedgeAt}) => (
@@ -70,6 +87,10 @@ export const StreetGround: React.FC<{wedgeAt: number}> = ({wedgeAt}) => (
     <Ink d={GND.kerb} width={SI.front} seed="oq/kerb" />
     <GroundMarks marks={GND.walk} width={SI.far} seed="oq/gw" />
     <GroundMarks marks={GND.street} width={SI.far} seed="oq/gs" />
+    <Fill d={GND.setts} color={palette.cream} offset={false} mode="snap" seed="s10/setts" />
+    <Ink d={GND.settInk} width={SI.hair} taper={false} seed="s10/settI" />
+    <Fill d={GND.railGroove} color={palette.tan} offset={false} mode="snap" seed="s10/railG" />
+    <Ink d={GND.railHead} width={SI.mid} seed="s10/railH" />
   </>
 );
 

@@ -12,7 +12,7 @@
 import React, {useId} from 'react';
 import {World, Sun, XG, Ink, Fill, useTime, useScene, palette, prog, lerp, clamp, ease as E, mat, circle} from '../lib';
 import {ElephantTimeline, hop} from '../lib/mascot';
-import {BlueprintWall, BLUEPRINT_WALL} from './shared/sets';
+import {BlueprintWall, BLUEPRINT_WALL, LayerWrap} from './shared/sets';
 import {LabelTag, DiagramHand, KeyCross, dashPath, pointAlong} from './shared/props';
 import {camAt, camMat, LAND} from './scene02/camera';
 import {B, LAST_FRAME_ABS, S02_END, S02_START, W, local} from './scene02/beats';
@@ -20,6 +20,7 @@ import {DiagramLock, THUMB} from './scene02/DiagramLock';
 import {TakenSite} from './scene02/TakenSite';
 import {PlanGrid, GRID_TINT} from './scene02/PlanGrid';
 import {Onlookers} from './scene02/Onlookers';
+import {S02Steps} from './scene02/Steps';
 import type {Pt} from '../lib/sketch';
 
 const DUR = S02_END - S02_START;
@@ -81,10 +82,10 @@ const ERASE = `M256 798L352 804L258 826L354 832L260 854L350 858`;
 // the connector: heavier than the grid (3.6 world, ~4.8 px), long dashes, on a solid paper-white halo that breaks the
 // grid and plan lines it crosses (the same convention as L2's leader), so 'this lock guards that site' reads unmistakably
 const CON = {w: 3.6, dash: 14, gap: 8, halo: 10};
-// Pip sits 50 world right of the set's perch (700, 680) on the same rod (polish; fix round 2 had +14): the sun drifts
-// into S03's slot (690, 700) and at +14 his ear came within ~10-17 px of its right edge (the two most saturated shapes
-// read as stuck together); +50 keeps his ear and the ears-cover worry ticks >= 60 px clear of the disc all scene
-const PIP_PERCH: Pt = [BLUEPRINT_WALL.perch[0] + 50, BLUEPRINT_WALL.perch[1]];
+// Pip sits 58 world right of the set's perch (700, 680), near the rod's right end (polish; fix round 2 had +14): the
+// sun drifts into S03's slot (690, 700) and at +14 his ear came within ~10-17 px of its right edge (the two most
+// saturated shapes read as stuck together); +58 keeps his silhouette ~60 px clear of the disc all scene (measured)
+const PIP_PERCH: Pt = [BLUEPRINT_WALL.perch[0] + 58, BLUEPRINT_WALL.perch[1]];
 // the hop IN keeps fix round 2's curve (S01's handoff.ts mirrors it: S01 flies Pip in screen space and delivers EXACTLY
 // this curve's state on S02's first film frame f142), landing at the old perch + 14; from f142 a smoothstep blend (zero
 // slope at f142, so position AND velocity there are unchanged) carries the landing out to the new perch
@@ -102,6 +103,12 @@ const PINCH: Pt = [KNOB[0], KNOB[1] - 3];
 // solid ink contact strokes on the index and thumb tips (DiagramHand local units: fingertips at the origin)
 const TIPS = 'M4.5 -10.6C0.4 -9.6 -1.6 -6 1.6 -2.8' + 'M6.2 9.2C1.6 8.2 -1.2 4.8 2.6 1.8';
 
+// the match object keeps S01's colour across the cut (polish): S01's lock box is a SAND plate, so the closed plate
+// is sand on the first 3 frames and pops to paper white as the loupe swells (before the cover swings at 0.14)
+const PLATE = {color: palette.sand, until: 0.1};
+// BlueprintWall's layers as the set draws them, except its steps: S02's lighter 4-nosing version (scene02/Steps.tsx)
+const wallWrap: LayerWrap = (name, _near, node) => (name === 'steps' ? <S02Steps /> : node);
+
 const lockNode = (ink: number, knobOnly = false) => (
   <DiagramLock
     x={C[0]}
@@ -113,6 +120,7 @@ const lockNode = (ink: number, knobOnly = false) => (
     gapMarkAt={B.bug}
     turnAt={B.turn}
     knobOnly={knobOnly}
+    plate={PLATE}
     bit={{size: 24, peekAt: B.bitPeek, cowerAt: B.could, hideAt: B.bitHide, popAt: B.bitPop}}
   />
 );
@@ -325,11 +333,17 @@ const pipOutAt = (t: number): {p: Pt; s: number} => {
 // pops x1.3 (the front ears-cover rig is ~30 % smaller than sit-back), shivers, and big worry marks flick out round
 // his head (the pose's own marks are ~5 px)
 const COVER_SCALE = 1.3;
-// worry marks (Pip-local units, x his scale; anchor = feet): three short strokes fanned out on each side of the head
-const WORRY: [Pt, Pt][] = [
-  [[-50, -92], [-62, -104]],
-  [[-56, -74], [-71, -77]],
-  [[-52, -56], [-65, -50]],
+// worry marks (Pip-local units, x his scale; anchor = feet): three short strokes fanned out on his right (away from
+// the sun), two set HIGH on his left (polish: the old mid-left tick landed on the sun's edge; these sit where the
+// disc narrows toward its top, >= 60 px clear of it)
+const WORRY_R: [Pt, Pt][] = [
+  [[50, -92], [62, -104]],
+  [[56, -74], [71, -77]],
+  [[52, -56], [65, -50]],
+];
+const WORRY_L: [Pt, Pt][] = [
+  [[-42, -104], [-50, -118]],
+  [[-46, -86], [-55, -97]],
 ];
 
 const Pip: React.FC = () => {
@@ -364,7 +378,7 @@ const Pip: React.FC = () => {
     }
   } else if (t >= B.pipLean) {
     // the gag: lean toward the key (0.1 s), then ears-cover x1.3 with a shiver
-    rotate = -9 * E.outCubic(prog(t, B.pipLean, 0.1)) * (1 - prog(t, B.pipCover, 0.08));
+    rotate = -5 * E.outCubic(prog(t, B.pipLean, 0.1)) * (1 - prog(t, B.pipCover, 0.08));
     const k = E.outBack(1.8)(prog(t, B.pipCover - 0.02, 0.14));
     scale = PIP_SCALE * lerp(1, COVER_SCALE, k);
     if (t >= B.pipCover) x += 1.6 * Math.sin((t - B.pipCover) * Math.PI * 2 * 11);
@@ -375,10 +389,10 @@ const Pip: React.FC = () => {
     const sc = PIP_SCALE * COVER_SCALE;
     const wob = Math.sin((t - B.pipCover) * Math.PI * 2 * 3.1) * 2.2;
     let d = '';
-    for (const sd of [-1, 1]) {
-      for (const [i, [a, b]] of WORRY.entries()) {
+    for (const set of [WORRY_L, WORRY_R]) {
+      for (const [i, [a, b]] of set.entries()) {
         const w = (i % 2 ? -1 : 1) * wob;
-        d += `M${(x + sd * a[0] * sc).toFixed(1)} ${(y + (a[1] + w) * sc).toFixed(1)}L${(x + sd * b[0] * sc).toFixed(1)} ${(y + (b[1] + w) * sc).toFixed(1)}`;
+        d += `M${(x + a[0] * sc).toFixed(1)} ${(y + (a[1] + w) * sc).toFixed(1)}L${(x + b[0] * sc).toFixed(1)} ${(y + (b[1] + w) * sc).toFixed(1)}`;
       }
     }
     worry = <Ink d={d} at={B.pipCover + 0.06} dur={0.08} order="all" width={2.6} taper={false} vary={0} seed="s2worry" />;
@@ -426,10 +440,14 @@ const Scene02: React.FC = () => {
           exactly on the hard cut (fix round 2: was 18 px short, a near-miss jitter across the cut) */}
       <Sun cx={668} cy={700} r={110} drift={[6, 0]} />
       <XG m={camMat(cam)}>
-        {/* the PHP master blueprint, pre-rolled 0.3 s: its outer linework is already drawing outward at the cut (the
-            swelling loupe covers plan lines that are there = a magnifier); its own Lock is hidden (the loupe draws it) */}
-        <BlueprintWall drawAt={-0.3} lock={{at: 1e6}} foreground={false} />
-        <PlanGrid area={GRID_AREA} from={C} at={-0.06} holes={GRID_HOLES} color={GRID_TINT} pitch={52} width={0.85} thin={[150, 300]} />
+        {/* the PHP master blueprint, pre-rolled 0.72 s (polish; was 0.3: the match frame was a near-blank sheet). The
+            set draws its door ink panels-first, one stroke per frame (26 strokes from drawAt + 0.2): at the cut the four
+            door panels round the loupe are drawn, and the door outline (0.0-0.3), the dimensions (-0.27-0.25), the title
+            block (-0.12-0.1) and the sheet edge (-0.02-0.25) are still drawing OUTWARD; its own Lock is hidden (the loupe
+            draws it); its steps are S02's lighter ones */}
+        <BlueprintWall drawAt={-0.72} lock={{at: 1e6}} foreground={false} wrap={wallWrap} />
+        {/* the plan grid pre-rolled 0.25 s: the rings out to ~300 world are drawn at the cut, the outer ones keep growing */}
+        <PlanGrid area={GRID_AREA} from={C} at={-0.25} holes={GRID_HOLES} color={GRID_TINT} pitch={52} width={0.85} thin={[150, 300]} />
         {/* the lock detail (match object: already there at the cut), then the detail loupe */}
         <Loupe />
         <Connector />

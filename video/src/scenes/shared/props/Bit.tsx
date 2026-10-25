@@ -22,6 +22,7 @@ import {rand, Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {ExitFade} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 import {PathBuf} from '../../../lib/cine/util';
 import type {Pt} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
@@ -85,6 +86,7 @@ const BLINK = 0.07; // two frames at 30 fps
 export const Bit: React.FC<BitProps> = (p) => {
   const t = useTime();
   const m = useXf();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   const {size = 16, state = 'idle', seed = 'bit', at, outAt, outDur} = p;
   let {x = 0, y = 0} = p;
   let rot = p.rot ?? 0;
@@ -202,7 +204,7 @@ export const Bit: React.FC<BitProps> = (p) => {
     }
     let eye: React.ReactNode;
     if (closed) {
-      eye = <path d={`M${EYE[0] - er} ${EYE[1]}Q${EYE[0]} ${EYE[1] + er * 0.7} ${EYE[0] + er} ${EYE[1]}`} stroke={palette.cream} strokeWidth={Math.max(0.45, er * 0.42)} fill="none" strokeLinecap="round" />;
+      eye = <path d={`M${EYE[0] - er} ${EYE[1]}Q${EYE[0]} ${EYE[1] + er * 0.7} ${EYE[0] + er} ${EYE[1]}`} stroke={palette.cream} strokeWidth={Math.max(0.45, er * 0.42) * ks} fill="none" strokeLinecap="round" />;
     } else {
       let g: Pt = LOOKS.forward;
       const lk = p.look ?? 'auto';
@@ -228,7 +230,7 @@ export const Bit: React.FC<BitProps> = (p) => {
     parts.push(
       <ExitFade key="eye" x={EYE[0]} y={EYE[1]}>
         {eye}
-        {lod === 2 ? <path d="M-6.5 -7.2Q-4 -10 0 -10.2" stroke={palette.cream} strokeWidth={Math.min(1.6, Math.max(0.9, 1.1 / kpx))} fill="none" strokeLinecap="round" /> : null}
+        {lod === 2 ? <path d="M-6.5 -7.2Q-4 -10 0 -10.2" stroke={palette.cream} strokeWidth={Math.min(1.6, Math.max(0.9, 1.1 / kpx)) * ks} fill="none" strokeLinecap="round" /> : null}
       </ExitFade>,
     );
   }

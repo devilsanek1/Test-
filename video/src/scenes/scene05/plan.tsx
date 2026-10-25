@@ -1,13 +1,18 @@
-// S05 overlays ON the shared BlueprintWall (drawn inside its layers through Scene05's `wrap`): the colour accents on the
-// white sheet (fix round 1: the lock is the one coloured spot, S02's mint section), the 'found' ring, the thumb-turn and
-// bolt the dashed hand turns, and the flight of steps re-drawn as treads / risers. World px, scene seconds.
-import React from 'react';
+// S05 overlays ON the shared BlueprintWall (drawn inside its layers through Scene05's `wrap`): the paper tone and the
+// colour accents of the plan (fix round 2: a flat mintPale paper under the plan's ink, the callout a white spot round
+// the lock), the 'found' ring, the thumb-turn and bolt the dashed hand turns, the door's right leaf swinging ajar on
+// 'bad', the flight of steps re-drawn as treads / risers and the plaza in front of them. World px, scene seconds.
+//
+// Banner layer order (Scene05.tsx): set banner -> SheetTint (mintPale field) -> scan beams (opaque white) -> SheetPanels
+// (cream) -> the set's ink again (`<Look fills="none">`) -> DoorSwing -> SheetLock (white callout, lock box, section,
+// lock ink) -> labels, hand, Bit, Pip. Every pixel is a palette colour (no translucency stacking).
+import React, {useId} from 'react';
 import {palette} from '../../lib/theme';
 import {clamp, ease as E, lerp, prog, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {Look} from '../../lib/exit';
-import {blob, line, rect, rectPath, roundRect, smooth, Pt} from '../../lib/sketch';
+import {blob, line, polyPath, rect, rectPath, roundRect, smooth, Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
 import {BLUEPRINT_WALL, SI} from '../shared/sets';
 import {Lock, LOCK, lockPoint} from '../shared/props';
@@ -19,42 +24,51 @@ export const lp = (x: number, y: number): Pt => lockPoint(L.x, L.y, L.h, [x, y])
 /** The thumb-turn the dashed hand pinches: on the box's top edge. World. */
 export const KNOB: Pt = lp(4, -43);
 
-// ---------------------------------------------------------------- colour on the sheet
+// ---------------------------------------------------------------- the paper and its colour
 
-// the set's own geometry (BlueprintWall.tsx G, seed 'bpw'): the same seeded sketch paths, so the re-ink sits exactly on
-// the set's ink (a misregistered fill goes UNDER its outline, as everywhere in the film)
+// the set's geometry (BlueprintWall.tsx G): door elevation 330..646 x 796..1190, its opening (door2) 352..624 x
+// 818..1168 with the centre mullion at x 488 (the lock straddles it), panels 98 wide
 const DT = BLUEPRINT_WALL.topMargin[3] + 6; // 796: the door elevation's head
-const [BX, BY, , BH] = BLUEPRINT_WALL.sheet;
+const [BX, BY, BW, BH] = BLUEPRINT_WALL.sheet;
 const PANEL_UL: [number, number, number, number] = [370, DT + 36, 98, 894 - DT - 36];
 const PANEL_LR: [number, number, number, number] = [508, 1040, 98, 110];
+const PANEL_UR: [number, number, number, number] = [508, DT + 36, 98, 894 - DT - 36];
 const TITLE: [number, number, number, number] = [BX + 26, BY + BH - 96, 176, 70];
-const REINK_DOOR = rect(...PANEL_UL, {seed: 'bpw/pn1', over: 'small'}) + rect(...PANEL_LR, {seed: 'bpw/pn4', over: 'small'});
-const REINK_HAIR =
-  rect(...TITLE, {seed: 'bpw/tb', over: 'small'}) +
-  line(BX + 26, BY + BH - 70, BX + 202, BY + BH - 70, {seed: 'bpw/tb1', over: 0}) +
-  line(BX + 40, BY + BH - 84, BX + 140, BY + BH - 84, {seed: 'bpw/tb2', over: 0}) +
-  line(BX + 40, BY + BH - 52, BX + 120, BY + BH - 52, {seed: 'bpw/tb3', over: 0}) +
-  line(BX + 40, BY + BH - 38, BX + 150, BY + BH - 38, {seed: 'bpw/tb4', over: 0}) +
-  line(L.x + 44, L.y - 30, L.x + 120, L.y - 70, {seed: 'bpw/lead', over: 0});
-/** The callout disc (inside the set's r64 callout ring) and the lock box / section in lock-local units. */
-const DISC = blob(L.x, L.y, 58, 57, {seed: 's5disc'});
-const BOX_D = roundRect(LOCK.box[0], LOCK.box[1], LOCK.box[2], LOCK.box[3], 9);
-const SECTION_D = rectPath(LOCK.cover[0], LOCK.cover[1], LOCK.cover[2], LOCK.cover[3]);
-/** The section colour inside the lock box: one step stronger than the disc so the lock is the strongest spot. */
-export const SECTION = palette.bg;
-const LOCK_M = mat.compose(mat.translate(L.x, L.y), mat.scale(L.h / LOCK.h));
+/** The sheet's inner field (inside the 12 px teal frame). */
+export const SHEET_IN: [number, number, number, number] = [BX + 12, BY + 12, BW - 24, BH - 24];
+/** The paper tone (fix round 2: was the set's #FFF, the brightest area in the frame). */
+export const PAPER = palette.mintPale;
+const ST = BLUEPRINT_WALL.stamp;
 
-/** Flat accents on the white plan (all misregistered fills under re-inked outlines): cream on two door panels and the
- *  title block, and THE coloured spot: a mintPale callout disc round the lock, the lock box white with S02's mintPale
- *  section, the lock's ink redrawn on top. */
-export const SheetColour: React.FC = () => (
+/** The paper tone over the sheet's field, with a hole for the corner stamp (its white disc + ring stay the set's). The
+ *  set's ink is re-stroked over it (Scene05: `<Look fills="none">`). */
+export const SheetTint: React.FC = () => {
+  const r = ST.r + 5;
+  const hole = `M${ST.x - r} ${ST.y}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0Z`;
+  return <Fill d={rectPath(...SHEET_IN) + hole} rule="evenodd" color={PAPER} offset={false} mode="none" seed="s5paper" />;
+};
+
+/** Cream on two door panels and the title block (misregistered, under the re-stroked ink). */
+export const SheetPanels: React.FC = () => (
   <>
     <Fill rect={PANEL_UL} color={palette.cream} seed="s5pnUL" />
     <Fill rect={PANEL_LR} color={palette.cream} seed="s5pnLR" />
     <Fill rect={TITLE} color={palette.cream} seed="s5title" />
-    <Ink d={REINK_DOOR} width={SI.far} taper={false} seed="s5reD" />
-    <Ink d={REINK_HAIR} width={SI.hair} taper={false} seed="s5reH" />
-    <Fill d={DISC} color={palette.mintPale} seed="s5disc" />
+  </>
+);
+
+/** The callout: a WHITE disc inside the set's r64 callout ring (the brightest spot on the plan), the lock box white
+ *  with S02's section one step stronger, the lock's ink redrawn on top. */
+const DISC = blob(L.x, L.y, 58, 57, {seed: 's5disc'});
+const BOX_D = roundRect(LOCK.box[0], LOCK.box[1], LOCK.box[2], LOCK.box[3], 9);
+const SECTION_D = rectPath(LOCK.cover[0], LOCK.cover[1], LOCK.cover[2], LOCK.cover[3]);
+/** The section colour inside the lock box. */
+export const SECTION = palette.bg;
+const LOCK_M = mat.compose(mat.translate(L.x, L.y), mat.scale(L.h / LOCK.h));
+
+export const SheetLock: React.FC = () => (
+  <>
+    <Fill d={DISC} color={palette.white} seed="s5disc" />
     <XG m={LOCK_M}>
       <Fill d={BOX_D} color={palette.white} offset={false} seed="s5box" />
       <Fill d={SECTION_D} color={SECTION} seed="s5sect" />
@@ -65,6 +79,53 @@ export const SheetColour: React.FC = () => (
     </Look>
   </>
 );
+
+// ---------------------------------------------------------------- the door swings ajar ('bad')
+
+/** The opening's right half (the right leaf, hinged on the right jamb x 624) and the swing. */
+const LEAF = {x0: 488, x1: 624, y0: 818, y1: 1168};
+const SWING = {narrow: 0.76, grow: 9, dur: 0.2};
+/** Swing amount at t: 0 (shut) .. 1 (ajar), a 0.2 s out-back (the leaf knocks open a touch past and settles). */
+export const swingAt = (t: number, at: number) => (t < at ? 0 : E.outBack(1.6)(prog(t, at, SWING.dur)));
+
+/** The leaf's map at swing q: x narrows toward the hinge, the free edge grows taller (it comes toward us). */
+function leafMap(q: number) {
+  const k = 1 - (1 - SWING.narrow) * q;
+  const d = SWING.grow * q;
+  const yc = (LEAF.y0 + LEAF.y1) / 2;
+  const hy = (LEAF.y1 - LEAF.y0) / 2;
+  return (x: number, y: number): Pt => {
+    const u = (LEAF.x1 - x) / (LEAF.x1 - LEAF.x0);
+    return [LEAF.x1 - (LEAF.x1 - x) * k, y + ((y - yc) / hy) * d * u];
+  };
+}
+const quad = (m: (x: number, y: number) => Pt, r: [number, number, number, number]): Pt[] => [m(r[0], r[1]), m(r[0] + r[2], r[1]), m(r[0] + r[2], r[1] + r[3]), m(r[0], r[1] + r[3])];
+const quadInk = (P: Pt[], seed: string) => P.map((p, i) => line(p[0], p[1], P[(i + 1) % 4][0], P[(i + 1) % 4][1], {seed: `${seed}${i}`, over: 3})).join('');
+
+/** 'bad', after the bolt clears: the plan's right door leaf swings ajar (narrowed, its free edge taller) and the
+ *  opening behind it shows as ONE flat tealDark gap (~33 world = 37 px on screen) from the mullion to the free edge,
+ *  above and below the callout. It stays open. */
+export const DoorSwing: React.FC<{at: number}> = ({at}) => {
+  const t = useTime();
+  const q = swingAt(t, at);
+  if (q <= 0) return null;
+  const m = leafMap(q);
+  const leaf: [number, number, number, number] = [LEAF.x0, LEAF.y0, LEAF.x1 - LEAF.x0, LEAF.y1 - LEAF.y0];
+  const P = quad(m, leaf);
+  const ur = quad(m, PANEL_UR);
+  const lr = quad(m, PANEL_LR);
+  return (
+    <>
+      {/* the dark opening (inside the frame lines: the lintel, sill and right jamb stay the set's) */}
+      <Fill d={rectPath(LEAF.x0 + 1.6, LEAF.y0 + 1.6, LEAF.x1 - LEAF.x0 - 3.6, LEAF.y1 - LEAF.y0 - 3.2)} color={palette.tealDark} offset={false} mode="none" seed="s5gap" />
+      {/* the leaf, swung toward us */}
+      <Fill d={polyPath(P)} color={PAPER} offset={false} mode="none" seed="s5leafF" />
+      <Fill d={polyPath(lr)} color={palette.cream} offset={false} mode="none" seed="s5leafP" />
+      <Ink d={quadInk(P, 's5lf')} width={SI.far} taper={false} seed="s5leafI" />
+      <Ink d={quadInk(ur, 's5ur') + quadInk(lr, 's5lr')} width={SI.far} taper={false} seed="s5leafJ" />
+    </>
+  );
+};
 
 // ---------------------------------------------------------------- the 'found' ring
 
@@ -87,7 +148,7 @@ function ringPath(x: number, y: number, r: number): string {
   return smooth(pts);
 }
 
-/** The 'found' mark: strokes on in 0.17 s at `at` (ON 'out'), one quick 0.15 s scale pulse at `pulseAt` ('how'). */
+/** The 'found' mark: strokes on in 0.17 s at `at` ('out'-0.06), one quick 0.15 s scale pulse at `pulseAt` ('how'). */
 export const FoundRing: React.FC<{x: number; y: number; r: number; at: number; pulseAt: number; width?: number; color?: string}> = ({x, y, r, at, pulseAt, width = 4.8, color = palette.ink}) => {
   const t = useTime();
   if (t < at) return null;
@@ -101,30 +162,57 @@ export const FoundRing: React.FC<{x: number; y: number; r: number; at: number; p
 
 // ---------------------------------------------------------------- the thumb-turn and the bolt
 
-/** The thumb-turn the dashed hand redraws and turns (90 deg, `dur`), and the short bolt retracting with it: the lock
- *  opens with no key (S02's 'take over', recalled on 'bad'). Drawn over the lock. */
-export const LockTurn: React.FC<{drawAt: number; turnAt: number; undrawAt: number; dur?: number}> = ({drawAt, turnAt, undrawAt, dur = 0.28}) => {
+/** The bolt's travel (lock units): from the flaw's short stop (9, a 9-unit gap from the socket) all the way back THROUGH
+ *  the guide (-27): 36 units = 27 world = 31 px on screen; the cavity from the guide to the socket is left empty (39
+ *  units) and the bar's tail shows left of the guide. */
+const BOLT = {from: LOCK.tip.short, to: -27, len: 30};
+
+/** The thumb-turn the dashed hand redraws and turns (90 deg, `dur`), and the bolt sliding all the way back with it:
+ *  the lock opens with no key (S02's 'take over', recalled on 'bad'). Drawn over the lock. */
+export const LockTurn: React.FC<{drawAt: number; turnAt: number; undrawAt: number; dur?: number}> = ({drawAt, turnAt, undrawAt, dur = 0.22}) => {
   const t = useTime();
+  const id = 'lt5' + useId().replace(/[^a-zA-Z0-9]/g, '');
   if (t < drawAt) return null;
   const q = E.inOutSine(prog(t, turnAt, dur));
   const k = L.h / 100; // world px per lock unit
   const W = 2.2;
-  // the bolt: a section-coloured patch over the short bar (x -21..9.5), then the bar at its new tip (9 -> -15)
-  const tip = lerp(9, -15, q);
-  const hb = -21;
-  const br = 6.5;
+  const [hx, , hw] = LOCK.housing;
+  const hb = hx + hw; // -21: the guide's right edge
+  const tip = lerp(BOLT.from, BOLT.to, q);
+  const tail = tip - BOLT.len;
+  const br = LOCK.boltR;
   const P = (x: number, y: number) => lp(x, y).map((v) => v.toFixed(1)).join(' ');
+  // cover the set's short bar (right of the guide)
   const patch = `M${P(hb + 0.6, -br - 1.4)}L${P(10.6, -br - 1.4)}L${P(10.6, br + 1.4)}L${P(hb + 0.6, br + 1.4)}Z`;
-  const bar = `M${P(hb, -br)}L${P(tip - 2, -br)}L${P(tip, -br + 2)}L${P(tip, br - 2)}L${P(tip - 2, br)}L${P(hb, br)}`;
+  // the bar right of the guide (bevelled tip) while the tip is out
+  const bev = 2;
+  const barR = tip > hb + 0.5 ? `M${P(hb, -br)}L${P(tip - bev, -br)}L${P(tip, -br + bev)}L${P(tip, br - bev)}L${P(tip - bev, br)}L${P(hb, br)}` : '';
+  // its tail left of the guide (x < -28), clipped at the box's inner edge (-38)
+  const tx0 = Math.max(tail, -38);
+  const barL = tail < hx - 0.5 ? `M${P(hx, -br)}L${P(tx0, -br)}L${P(tx0, br)}L${P(hx, br)}` : '';
   const knobR = 7 * k;
   const knobOn = t < undrawAt + 0.12;
   const rot = 90 * q;
+  const [x0, y0] = lp(-40, -br - 2);
+  const [x1, y1] = lp(-21, br + 2);
   return (
     <>
       {q > 0 ? (
         <>
           <path d={patch} fill={SECTION} />
-          <Ink d={bar} width={W} taper={false} vary={0} seed="s5bolt" />
+          {barL ? (
+            <>
+              <defs>
+                <clipPath id={id} clipPathUnits="userSpaceOnUse">
+                  <rect x={x0} y={y0} width={x1 - x0} height={y1 - y0} />
+                </clipPath>
+              </defs>
+              <g clipPath={`url(#${id})`}>
+                <path d={barL + 'Z'} fill={palette.white} />
+              </g>
+            </>
+          ) : null}
+          <Ink d={barR + barL} width={W} taper={false} vary={0} seed="s5bolt" />
         </>
       ) : null}
       {knobOn ? (
@@ -137,17 +225,17 @@ export const LockTurn: React.FC<{drawAt: number; turnAt: number; undrawAt: numbe
   );
 };
 
-/** The hand's turn (deg) about its pinch point: 12 deg over 0.28 s in-out sine (the sleeve end stays < ~14 px/frame). */
-export const handTurn = (t: number, at: number, deg = 12, dur = 0.28) => deg * E.inOutSine(prog(t, at, dur));
+/** The hand's turn (deg) about its pinch point: 12 deg over 0.22 s in-out sine (the sleeve end stays < ~16 px/frame). */
+export const handTurn = (t: number, at: number, deg = 12, dur = 0.22) => deg * E.inOutSine(prog(t, at, dur));
 
-// ---------------------------------------------------------------- the steps
+// ---------------------------------------------------------------- the steps and the plaza
 
 /** The flight re-drawn over the set's stripes (fix round 1): four steps (cream tread band + sand riser, ONE ink nosing
  *  line each, running off both frame sides) and the deep bottom tread / landing the front row stands on (feet 1470),
  *  its sand plinth riser above the forecourt. The back row stands on the landing's back edge (feet 1446). */
 export const STEPS = {y0: 1320, pitch: 30, n: 4, tread: 9, landing: [1440, 1474] as [number, number], plinth: 1488};
 const X0 = -170;
-const X1 = 1260;
+const X1 = 1300;
 const STEP_G = (() => {
   let treads = rectPath(X0, STEPS.landing[0], X1 - X0, STEPS.landing[1] - STEPS.landing[0]);
   let ink = '';
@@ -165,5 +253,16 @@ export const StepsOverlay: React.FC = () => (
     <Fill d={STEP_G.base} color={palette.sand} offset={false} seed="s5stB" />
     <Fill d={STEP_G.treads} color={palette.cream} seed="s5stT" />
     <Ink d={STEP_G.ink} width={SI.mid} seed="s5stI" />
+  </>
+);
+
+/** The forecourt in front of the steps (fix round 2): ONE flat mintPale field (the set's broken paving hairlines read as
+ *  scratches: covered) and one flat sand shade wedge cast by the facade, a diagonal from the steps' left end down
+ *  across the audience's aisle. No ink. */
+const PLAZA = {top: STEPS.plinth, wedge: [[-300, STEPS.plinth], [720, STEPS.plinth], [130, 1830], [-300, 1830]] as Pt[]};
+export const PlazaGround: React.FC = () => (
+  <>
+    <Fill d={rectPath(-400, PLAZA.top, 1900, 520)} color={palette.mintPale} offset={false} mode="none" seed="s5plaza" />
+    <Fill d={polyPath(PLAZA.wedge)} color={palette.sand} offset={false} mode="none" seed="s5wedge" />
   </>
 );

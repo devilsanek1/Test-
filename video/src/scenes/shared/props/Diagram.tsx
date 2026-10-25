@@ -26,6 +26,7 @@ import {Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {ExitFade} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 import {circle, line, polyPath, Pt, rect} from '../../../lib/sketch';
 import {mat, useXf, XG} from '../../../lib/xf';
 import {matScale, misregScreen} from './common';
@@ -298,6 +299,7 @@ export const SiteIcon: React.FC<SiteIconProps> = ({x, y, w = 120, h = 120, at, t
   const t = useTime();
   const uid = 'si' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const off = useMisreg(seed);
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   if (at !== undefined && t < at) return null;
   const u = w / 120;
   const X = (v: number) => x + v * u;
@@ -355,7 +357,7 @@ export const SiteIcon: React.FC<SiteIconProps> = ({x, y, w = 120, h = 120, at, t
             </clipPath>
           </defs>
           <g clipPath={`url(#${uid}w)`}>
-            <path d={hatch} stroke={palette.ink} strokeWidth={ink * 0.62} strokeLinecap="round" fill="none" />
+            <path d={hatch} stroke={palette.ink} strokeWidth={ink * 0.62 * ks} strokeLinecap="round" fill="none" />
           </g>
         </ExitFade>
       ) : null}
@@ -371,7 +373,7 @@ export const SiteIcon: React.FC<SiteIconProps> = ({x, y, w = 120, h = 120, at, t
       {flagK > 0.01 ? (
         <ExitFade x={pole[0]} y={pole[1]}>
           <XG m={mat.about(mat.scale(flagK), pole[0], pole[1])}>
-            <path d={`M${pole[0]} ${pole[1]}V${pole[1] - 30 * u}`} stroke={palette.ink} strokeWidth={ink * 0.7} strokeLinecap="round" fill="none" />
+            <path d={`M${pole[0]} ${pole[1]}V${pole[1] - 30 * u}`} stroke={palette.ink} strokeWidth={ink * 0.7 * ks} strokeLinecap="round" fill="none" />
             <XG m={mat.about(mat.scale(1 - Math.abs(flap) * 0.25, 1), pole[0], pole[1])}>
               <path d={`M${pole[0]} ${pole[1] - 30 * u}L${pole[0] + 20 * u} ${pole[1] - (25 + 3 * flap) * u}L${pole[0]} ${pole[1] - 19 * u}Z`} fill={palette.ink} />
             </XG>

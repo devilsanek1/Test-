@@ -32,6 +32,7 @@ import {rand, Seed} from '../../../lib/rng';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
 import {ExitFade, UnBuild, useLook} from '../../../lib/exit';
+import {useInkScale} from '../../../lib/inkComp';
 import {captionFontStack, measureCaption, useCaptionFont} from '../../../lib/font';
 import {circle, line, poly, Pt, rect, rectPath, roundRect} from '../../../lib/sketch';
 import {mat, Mat, XG} from '../../../lib/xf';
@@ -97,6 +98,7 @@ export function layoutText(lines: string[], fs: number, pad: {x: number; top: nu
  *  placeholders below 7 px on screen; hidden in the fills-only Look; shrinks with the un-build. */
 export const InkTextBlock: React.FC<{L: TextLayout; align: 'center' | 'left'; color: string; k: number; seed: Seed; strike?: {line: number; from: number; to: number; p: number; width: number}}> = ({L, align, color, k, seed, strike}) => {
   const look = useLook();
+  const ks = useInkScale(); // camera ink compensation for the raw strokes below (lib/inkComp.tsx): 1 outside an <InkScale>
   if (!look.ink) return null;
   const onScreen = L.fs * k;
   if (onScreen < 7) {
@@ -107,6 +109,7 @@ export const InkTextBlock: React.FC<{L: TextLayout; align: 'center' | 'left'; co
       const y = L.base0 + i * (L.pitch ?? PITCH) * L.fs - L.fs * 0.25;
       d += `M${x0.toFixed(1)} ${y.toFixed(1)}h${lw.toFixed(1)}`;
     });
+    // text stand-in: NOT ink-compensated, so it matches the <text> it swaps to at 7 px (text never is)
     return <path d={d} stroke={color} strokeWidth={Math.max(0.6, L.fs * 0.14)} strokeLinecap="round" fill="none" />;
   }
   const x = align === 'center' ? L.w / 2 : L.padX;
@@ -121,7 +124,7 @@ export const InkTextBlock: React.FC<{L: TextLayout; align: 'center' | 'left'; co
         <path
           d={`M${strike.from.toFixed(1)} ${(L.base0 + strike.line * (L.pitch ?? PITCH) * L.fs - L.fs * 0.27).toFixed(1)}L${lerp(strike.from, strike.to, strike.p).toFixed(1)} ${(L.base0 + strike.line * (L.pitch ?? PITCH) * L.fs - L.fs * 0.3 + strike.p * L.fs * 0.03).toFixed(1)}`}
           stroke={color}
-          strokeWidth={strike.width}
+          strokeWidth={strike.width * ks}
           strokeLinecap="round"
           fill="none"
         />
@@ -591,6 +594,7 @@ export type CheckBoxSpot = {x: number; y: number; size: number; at?: number; tic
 export const CheckBoxTags: React.FC<{spots: CheckBoxSpot[]; ink?: number; inkFrom?: number; boxFrom?: number; outAt?: number; color?: string}> = ({spots, ink = 0.8, inkFrom = 8, boxFrom = 12, outAt, color = palette.cream}) => {
   const t = useTime();
   const look = useLook();
+  const ks = useInkScale();
   if (outAt !== undefined && t >= outAt) return null;
   const bodyCol = look.fills === 'paper' ? palette.white : look.fills === 'none' ? undefined : color;
   const inkOn = look.ink;
@@ -611,8 +615,8 @@ export const CheckBoxTags: React.FC<{spots: CheckBoxSpot[]; ink?: number; inkFro
   return (
     <ExitFade>
       {body && bodyCol ? <path d={body} fill={bodyCol} /> : null}
-      {line_ && ink > 0 && inkOn ? <path d={line_} fill="none" stroke={palette.ink} strokeWidth={ink} strokeLinejoin="round" strokeLinecap="round" /> : null}
-      {tick && inkOn ? <path d={tick} fill="none" stroke={palette.ink} strokeWidth={Math.max(ink * 1.6, 0.6)} strokeLinejoin="round" strokeLinecap="round" /> : null}
+      {line_ && ink > 0 && inkOn ? <path d={line_} fill="none" stroke={palette.ink} strokeWidth={ink * ks} strokeLinejoin="round" strokeLinecap="round" /> : null}
+      {tick && inkOn ? <path d={tick} fill="none" stroke={palette.ink} strokeWidth={Math.max(ink * 1.6, 0.6) * ks} strokeLinejoin="round" strokeLinecap="round" /> : null}
     </ExitFade>
   );
 };
@@ -716,6 +720,7 @@ export type StickyNoteProps = {
 export const StickyNote: React.FC<StickyNoteProps> = (p) => {
   useCaptionFont();
   const t = useTime();
+  const ks = useInkScale();
   const seed = p.seed ?? 'note';
   const F = usePropFrame({ink: p.ink ?? 2.4, seed, defDepth: 'mid'});
   const flutter = p.flutter === false ? undefined : (p.flutter ?? (p.slapAt !== undefined ? {from: [p.x - 220, p.y - 160] as Pt} : undefined));
@@ -802,7 +807,7 @@ export const StickyNote: React.FC<StickyNoteProps> = (p) => {
     const q = prog(t, p.slapAt, 0.16);
     const Ln = 9 * Math.sin(Math.PI * q) + 2;
     const tk = (px: number, py: number, dx: number, dy: number) => `M${(px + dx * 4).toFixed(1)} ${(py + dy * 4).toFixed(1)}l${(dx * Ln).toFixed(1)} ${(dy * Ln).toFixed(1)}`;
-    slapMarks = <path d={tk(x0 - 3, y0 - 3, -0.7, -0.7) + tk(x1 + 3, y0 - 3, 0.7, -0.7) + tk(x1 + 4, 0, 1, 0) + tk(x0 - 4, y1 * 0.4, -1, 0.15)} stroke={palette.ink} strokeWidth={iw * 0.8} strokeLinecap="round" fill="none" />;
+    slapMarks = <path d={tk(x0 - 3, y0 - 3, -0.7, -0.7) + tk(x1 + 3, y0 - 3, 0.7, -0.7) + tk(x1 + 4, 0, 1, 0) + tk(x0 - 4, y1 * 0.4, -1, 0.15)} stroke={palette.ink} strokeWidth={iw * 0.8 * ks} strokeLinecap="round" fill="none" />;
   }
   const off = F.off;
   return (

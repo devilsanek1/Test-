@@ -42,8 +42,11 @@ const G = (() => {
     dormerInk += line(dx - 28, dy + 2, dx, dy - 18, {seed: `${s}/dr${dx}a`, over: [3, 1]}) + line(dx, dy - 18, dx + 28, dy + 2, {seed: `${s}/dr${dx}b`, over: [1, 3]}) + line(dx - 20, dy + 2, dx - 20, dy + 44, {seed: `${s}/dr${dx}c`, over: 0}) + line(dx + 20, dy + 2, dx + 20, dy + 44, {seed: `${s}/dr${dx}d`, over: 0}) + line(dx - 12, dy + 10, dx + 12, dy + 10, {seed: `${s}/dr${dx}e`, over: 0});
   }
   const mansardInk = line(M.x0 - 6, M.base + 2, M.x0 + M.inset, M.top, {seed: `${s}/ml`, over: [2, 4]}) + line(M.x1 - M.inset, M.top, M.x1 + 6, M.base + 2, {seed: `${s}/mr`, over: [4, 2]}) + line(M.x0 + M.inset - 10, M.top, M.x1 - M.inset + 10, M.top, {seed: `${s}/mt`, over: [6, 6]}) + line(M.x0 + 14, M.base - 34, M.x1 - 14, M.base - 34, {seed: `${s}/mm`, over: 0});
-  const A = RF.antenna;
-  const antenna = line(A.x, A.base, A.x, A.top, {seed: `${s}/an`, over: 0}) + line(A.x - 34, A.top + 14, A.x + 30, A.top + 14, {seed: `${s}/an1`, over: [2, 2]}) + line(A.x - 26, A.top + 34, A.x + 24, A.top + 34, {seed: `${s}/an2`, over: [2, 2]}) + line(A.x - 18, A.top + 52, A.x + 16, A.top + 52, {seed: `${s}/an3`, over: [2, 2]}) + line(A.x, A.top + 60, A.x + 42, A.base, {seed: `${s}/an4`, over: 0});
+  // siteM's rooftop detail (fix round 2): the set's TV antenna (x 616) crossed the far row's plates right of the sun; a
+  // short chimney pot at the roof's LEFT end instead (clear of the sun's disc and of every far plate by >= 20 px)
+  const CH = {x: 376, base: 820, h: 22, w: 16};
+  const chimney = rectPath(CH.x - CH.w / 2, CH.base - CH.h, CH.w, CH.h) + rectPath(CH.x - CH.w / 2 - 3, CH.base - CH.h - 5, CH.w + 6, 6);
+  const chimneyInk = line(CH.x - CH.w / 2, CH.base, CH.x - CH.w / 2, CH.base - CH.h, {seed: `${s}/ch1`, over: 0}) + line(CH.x + CH.w / 2, CH.base - CH.h, CH.x + CH.w / 2, CH.base, {seed: `${s}/ch2`, over: 0}) + line(CH.x - CH.w / 2 - 5, CH.base - CH.h - 5, CH.x + CH.w / 2 + 5, CH.base - CH.h - 5, {seed: `${s}/ch3`, over: 0});
   const T = RF.tank;
   const tank = rectPath(T.x - T.w / 2, T.y, T.w, T.h) + polyPath([[T.x - T.w / 2 - 4, T.y], [T.x, T.y - 16], [T.x + T.w / 2 + 4, T.y]]);
   const tankInk = line(T.x - T.w / 2 - 6, T.y + 1, T.x, T.y - 16, {seed: `${s}/tk1`, over: [2, 0]}) + line(T.x, T.y - 16, T.x + T.w / 2 + 6, T.y + 1, {seed: `${s}/tk2`, over: [0, 2]}) + line(T.x - T.w / 2, T.y, T.x - T.w / 2, T.y + T.h, {seed: `${s}/tk3`, over: 0}) + line(T.x + T.w / 2, T.y, T.x + T.w / 2, T.y + T.h, {seed: `${s}/tk4`, over: 0}) + line(T.x - T.w / 2 - 2, T.y + T.h, T.x + T.w / 2 + 2, T.y + T.h, {seed: `${s}/tk5`, over: [2, 2]}) + line(T.x - T.w / 2 + 6, T.y + T.h, T.x - T.w / 2 + 2, T.legs, {seed: `${s}/tk6`, over: 0}) + line(T.x + T.w / 2 - 6, T.y + T.h, T.x + T.w / 2 - 2, T.legs, {seed: `${s}/tk7`, over: 0}) + line(T.x - T.w / 2 + 4, T.y + T.h + 22, T.x + T.w / 2 - 4, T.legs - 6, {seed: `${s}/tk8`, over: 0}) + line(T.x - 12, T.y + 10, T.x - 12, T.y + T.h - 6, {seed: `${s}/tk9`, over: 0});
@@ -60,7 +63,7 @@ const G = (() => {
     balcInk += line(bx0 - 22, by, bx1 + 10, by, {seed: `${s}/bs${by}`, over: [6, 10]}) + line(bx0 - 18, by + 9, bx1 + 6, by + 9, {seed: `${s}/bs2${by}`, over: [4, 8]}) + line(bx0 - 8, by - 34, bx1, by - 34, {seed: `${s}/br${by}`, over: [3, 6]});
     for (let x = bx0 + 14; x < bx1; x += 26) balcInk += line(x, by - 32, x, by - 2, {seed: `${s}/bv${by}/${x}`, over: 0});
   }
-  return {stoops, stoopInk, mansard, dormers, dormerGlass, dormerInk, mansardInk, antenna, tank, tankInk, plants, balcSlab, balcRail, balcInk};
+  return {stoops, stoopInk, mansard, dormers, dormerGlass, dormerInk, mansardInk, chimney, chimneyInk, tank, tankInk, plants, balcSlab, balcRail, balcInk};
 })();
 
 const Roof: React.FC<{id: SiteId}> = ({id}) =>
@@ -72,7 +75,10 @@ const Roof: React.FC<{id: SiteId}> = ({id}) =>
       <Ink d={G.mansardInk + G.dormerInk} width={SI.mid} seed="oq/mansi" />
     </>
   ) : id === 'M' ? (
-    <Ink d={G.antenna} width={SI.far} taper={false} seed="oq/ant" />
+    <>
+      <Fill d={G.chimney} color={palette.tan} seed="oq/chim" />
+      <Ink d={G.chimneyInk} width={SI.far} taper={false} seed="oq/chimI" />
+    </>
   ) : (
     <>
       <Fill d={G.tank} color={palette.tan} seed="oq/tank" />
@@ -157,6 +163,12 @@ export type SitesProps = {
  *  from... siteL's top-right, siteR's top-left, so the tag hangs over the plate's edge, clear of the A-frame sign. */
 export const TAG_HANG: Record<'L' | 'R', Pt> = {L: [44, -40], R: [-44, -40]};
 export const PLAQUE_SIZE: Record<SiteId, number> = {L: 112, M: 120, R: 112};
+/** Fix round 2: the three plaques hang 26 px higher than the set's anchors (y 1190 -> 1164): a >= 20 px band of wall
+ *  between siteL's plaque and the A-frame's top bar, and room under the plaques (bottoms 1220-1224) for the cart's sign
+ *  card above the stoops (1300). */
+export const PLAQUE_DY = -26;
+/** A plaque's face centre (world, at rest). */
+export const plaqueRest = (id: SiteId) => ({x: S[id].sign.x, y: S[id].sign.y + PLAQUE_DY, size: PLAQUE_SIZE[id]});
 
 /** siteM's title-bar ring spot (world): where the chrome reserves its ring (BrowserChrome pill geometry). */
 function ringSpot(r: [number, number, number, number]): {x: number; y: number; r: number} {
@@ -228,16 +240,16 @@ export type PlaquesProps = {
   /** Plaques swing out (L, M, R). */
   plaqueAt: [number, number, number];
   /** siteM's plaque events (HangPlaque). */
-  old: Pick<HangPlaqueProps, 'flipOldAt' | 'cobwebAt' | 'dustAt' | 'caneAt' | 'droopAt' | 'wobbleAt' | 'bit'>;
+  old: Pick<HangPlaqueProps, 'flipOldAt' | 'cobwebAt' | 'dustAt' | 'caneAt' | 'droopAt' | 'wobbleAt' | 'bit' | 'nudgeAt'>;
   /** Support tags landing on siteL's / siteR's plaques. */
-  tagL?: {at: number; tickAt: number};
-  tagR?: {at: number; tickAt: number};
+  tagL?: {at: number; tickAt: number; ringAt?: number};
+  tagR?: {at: number; tickAt: number; ringAt?: number};
 };
 
 /** The three hanging plaques. They project toward the camera from their brackets, so they are drawn ABOVE the cart line
  *  (the maker and the cart pass behind them): Scene10 renders them in the set's 'sign' layer. */
 export const Plaques: React.FC<PlaquesProps> = ({plaqueAt, old, tagL, tagR}) => {
-  const sg = (id: SiteId) => S[id].sign;
+  const sg = (id: SiteId) => ({...S[id].sign, y: S[id].sign.y + PLAQUE_DY});
   return (
     <>
       <HangPlaque x={sg('L').x} y={sg('L').y} size={PLAQUE_SIZE.L} wallX={sg('L').wallX} at={plaqueAt[0]} tag={tagL ? {...tagL, hang: TAG_HANG.L} : undefined} seed="s10/plqL" />
