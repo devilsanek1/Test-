@@ -44,3 +44,4 @@
 | 2026-10-25 | `v3-g1-script-wf_8fae0ebe-4dd.js` | 5 | stopped | facts + 3 drafts kept; stopped for G0.5 |
 | 2026-10-25 | `v3-g05-core-line-wf_82260111-549.js` | 35 | 0 | `context/agent_reports/2026-10-25_v3-g05-core-line-wf_82260111-549.md` |
 | 2026-10-25 | `v3-g1-script-wf_8fae0ebe-4dd.js` (resumed, core line B) | 9 | 0 | `context/agent_reports/2026-10-25_v3-g1-script-wf_8fae0ebe-4dd.md` |
+| 2026-10-26 | `v3-line2-fix-wf_1f03c055-f2d.js` | 9 | 0 | `context/agent_reports/2026-10-26_v3-line2-fix-wf_1f03c055-f2d.md` |
