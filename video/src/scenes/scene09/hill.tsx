@@ -66,8 +66,11 @@ const ROWS = HROWS;
 
 // ---------------------------------------------------------------- the bow
 
-/** The rise at the frame's sides per row (px at rest): row 0 (the street front) straight, then 18 -> 42, bands 46-54. */
-export const BOW = (k: number) => (k <= 0 ? 0 : 14 + 4 * Math.min(k, 10));
+/** The rise at the frame's sides per row (px at rest). A1 FR2 (reviewer: the bow on every row read as a stadium bowl, not
+ *  a hillside climbing to a ridge): only the near terraces 1-3 curve up a little toward the frame sides (16 / 11 / 6),
+ *  rows 4-7 are level, and the haze bands + ridge are gently CONVEX (negative: the crest is highest behind the sun and
+ *  falls 10-18 px toward the sides). Row 0 (the street front) straight. */
+export const BOW = (k: number) => (k <= 0 ? 0 : k <= 3 ? [16, 11, 6][k - 1] : k < HAZE ? 0 : -(10 + 4 * Math.min(k - HAZE, 2)));
 /** Row k's vertical offset at world x (negative = up). */
 export const bowAt = (k: number, x: number) => {
   const u = Math.max(-1.3, Math.min(1.3, (x - 540) / 540));
@@ -95,7 +98,18 @@ const stairJ = (k: number, tx: number) => Math.round((tx - ROWS[k].x0 - ROWS[k].
 
 // ---------------------------------------------------------------- per-house cells
 
-export type Cell = {j: number; x: number; cx: number; ci: number; stair: boolean; d: number; core: boolean};
+export type Cell = {j: number; x: number; cx: number; ci: number; stair: boolean; d: number; core: boolean; jy: number; brk: number};
+
+/** A1 FR2 (reviewer: rows 4-7 read as a procedural texture): rows 3-6 get a +-3.5 px roof-height jitter per house and a
+ *  hand-drawn BREAK every 6-8 houses (1 chimney, 2 aerial, 3 tree; 0 none). */
+const JITTER_ROWS = [3, 6];
+const breakOf = (k: number, j: number) => {
+  if (k < JITTER_ROWS[0] || k > JITTER_ROWS[1]) return 0;
+  const period = 6 + Math.floor(rand(SEED, `brkP${k}`) * 3);
+  const phase = Math.floor(rand(SEED, `brkO${k}`) * period);
+  if (((j - phase) % period + period) % period !== 0) return 0;
+  return 1 + Math.floor(rand(SEED, `brk${k}/${j}`) * 3);
+};
 
 function cellsOf(k: number): Cell[] {
   const R = ROWS[k];
@@ -109,7 +123,8 @@ function cellsOf(k: number): Cell[] {
     const setStair = k >= 1 && k <= STAIR_ROWS && Math.abs(cx - setStairX(k)) < R.w * 0.5;
     const mine = k >= 1 && k <= STAIR_ROWS && MY_STAIRS.some((tx) => stairJ(k, tx) === j);
     const ci = k === 1 && j === 0 ? 2 : Math.floor(rand(SEED, `hill/${k}/${j}`) * COLORS.length);
-    out.push({j, x, cx, ci, stair: setStair || mine, d: bowAt(k, cx), core: Math.abs(cx - 540) <= halfW(k)});
+    const jy = k >= JITTER_ROWS[0] && k <= JITTER_ROWS[1] ? (rand(SEED, `jy${k}/${j}`) - 0.5) * 7 : 0;
+    out.push({j, x, cx, ci, stair: setStair || mine, d: bowAt(k, cx), core: Math.abs(cx - 540) <= halfW(k), jy, brk: setStair || mine ? 0 : breakOf(k, j)});
   }
   return out;
 }
@@ -141,22 +156,29 @@ type RowGeo = {
   flightInk: string;
   shrubs: string;
   shrubInk: string;
+  /** A1 FR2: the frontal flight's risers (one haze step under cream; the treads are the flight fill) + its cheek lines. */
+  risers: string;
+  /** A1 FR2: roof breaks: chimney stacks, aerial masts, tree crowns (+ trunks). */
+  chim: string;
+  aer: string;
+  crowns: string;
 };
 
 function rowGeo(k: number, pick: (c: Cell) => boolean): RowGeo {
   const R = ROWS[k];
   const u = R.s;
-  const g: RowGeo = {wall: '', slotWall: '', joints: '', fac: ['', '', '', ''], roofs: '', shade: '', screens: '', bars: '', barDots: '', doors: '', plaques: '', locks: '', ink: '', detail: '', sliver: '', coping: '', lip: '', rail: '', flight: '', flightInk: '', shrubs: '', shrubInk: ''};
+  const g: RowGeo = {wall: '', slotWall: '', joints: '', fac: ['', '', '', ''], roofs: '', shade: '', screens: '', bars: '', barDots: '', doors: '', plaques: '', locks: '', ink: '', detail: '', sliver: '', coping: '', lip: '', rail: '', flight: '', flightInk: '', shrubs: '', shrubInk: '', risers: '', chim: '', aer: '', crowns: ''};
   const cells = CELLS[k].filter(pick);
   if (!cells.length) return g;
-  const P = {wall: new PathBuf(2), slotWall: new PathBuf(2), fac: [0, 1, 2, 3].map(() => new PathBuf(2)), roofs: new PathBuf(2), shade: new PathBuf(2), screens: new PathBuf(2), bars: new PathBuf(2), barDots: new PathBuf(2), doors: new PathBuf(2), plaques: new PathBuf(2), locks: new PathBuf(2), flight: new PathBuf(2), sliver: new PathBuf(2), coping: new PathBuf(2), shrubs: new PathBuf(2)};
+  const P = {wall: new PathBuf(2), slotWall: new PathBuf(2), fac: [0, 1, 2, 3].map(() => new PathBuf(2)), roofs: new PathBuf(2), shade: new PathBuf(2), screens: new PathBuf(2), bars: new PathBuf(2), barDots: new PathBuf(2), doors: new PathBuf(2), plaques: new PathBuf(2), locks: new PathBuf(2), flight: new PathBuf(2), sliver: new PathBuf(2), coping: new PathBuf(2), shrubs: new PathBuf(2), risers: new PathBuf(2), chim: new PathBuf(2), aer: new PathBuf(2), crowns: new PathBuf(2)};
   const near = k <= 3;
   const inked = k <= 3;
   for (const c of cells) {
     const top = R.top + c.d;
     const base = R.base + c.d;
     // the lower row's roof sliver on top of every house (row 0's too: the set draws house #4's facade from its top down)
-    if (!c.stair) P.sliver.rect(c.x - 0.2, top - SLIVER * u, R.w + 0.4, SLIVER * u + 0.6);
+    const rt = top + c.jy; // the jittered roofline (rows 3-6); doors / windows keep the row's top
+    if (!c.stair) P.sliver.rect(c.x - 0.2, rt - SLIVER * u, R.w + 0.4, SLIVER * u + 0.6);
     if (k === 0) continue; // row 0's houses: NearLodRow0 (and the set's house #4)
     const hs = `${SEED}/s9h/${k}/${c.j}`;
     const r = rng(`${hs}/i`);
@@ -180,41 +202,35 @@ function rowGeo(k: number, pick: (c: Cell) => boolean): RowGeo {
     if (c.stair) {
       // the stair column: wall face top to bottom + a zig-zag flight from this row's walkway up to the next coping
       P.slotWall.rect(c.x - 0.2, top - 2 * u, R.w + 0.4, R.h + 2 * u);
-      const dir = (k % 2 ? -1 : 1) * (c.cx < 400 ? 1 : c.cx > 700 ? -1 : 1);
-      // polish A1: ~40 % narrower than before (0.70 -> 0.42 of the house width)
-      const xa = c.cx - dir * R.w * 0.22;
-      const xb = c.cx + dir * R.w * 0.2;
+      // A1 FR2 (reviewer: the zig-zag flights read as cracks / ropes at phone size): a FRONTAL flight climbing straight up
+      // the hill from this row's walkway to the next row's coping, 0.6 of a house wide, tapering a little with distance:
+      // flat cream treads over risers one haze step darker (horizontal stripes: unmistakably steps), one cheek line
+      // (stringer) down each side. dir only places the landing shrub.
+      const dir = c.cx < 540 ? 1 : -1;
       const yA = base - 1.5 * u;
       const yB = top - (3 + GAP) * u * 0.8 - 1.5 * u; // the upper row's coping (its walkway)
-      const n = 9;
-      const run = (xb - xa) / n;
-      const rise = (yA - yB) / n;
-      const T = 12 * u;
-      const pts: [number, number][] = [[xa, yA]];
-      let prof = `M${f2(xa)} ${f2(yA)}`;
+      const wA = R.w * 0.62;
+      const wB = R.w * 0.5;
+      const n = 8;
+      const stepH = (yA - yB) / n;
+      const xb = c.cx + dir * wB * 0.5;
+      P.flight.poly([
+        [c.cx - wA / 2, yA],
+        [c.cx - wB / 2, yB],
+        [c.cx + wB / 2, yB],
+        [c.cx + wA / 2, yA],
+      ]);
       for (let i = 0; i < n; i++) {
-        const x0 = xa + i * run;
-        const y1 = yA - (i + 1) * rise;
-        pts.push([x0, y1], [x0 + run, y1]);
-        prof += `V${f2(y1)}H${f2(x0 + run)}`;
+        const y0 = yA - i * stepH;
+        const q = (i + 0.5) / n;
+        const hw = (wA + (wB - wA) * q) / 2;
+        // the riser: the lower ~62 % of each step
+        P.risers.rect(c.cx - hw, y0 - stepH * 0.62, hw * 2, stepH * 0.62);
       }
-      pts.push([xb, yB + T], [xa + dir * 4 * u, yA]);
-      P.flight.poly(pts);
-      if (inked) {
-        // the stringer under the flight, the hand rail above it (3 posts), the step profile
-        const hr = 10 * u;
-        let d = prof + `M${f2(xb)} ${f2(yB + T)}L${f2(xa + dir * 4 * u)} ${f2(yA)}`;
-        d += `M${f2(xa)} ${f2(yA - hr)}L${f2(xb)} ${f2(yB - hr)}`;
-        for (const q of [0.1, 0.5, 0.9]) {
-          const px = xa + (xb - xa) * q;
-          const py = yA + (yB - yA) * q;
-          d += `M${f2(px)} ${f2(py - hr)}V${f2(py - rise * 0.5)}`;
-        }
-        g.flightInk += d;
-      }
+      if (inked) g.flightInk += `M${f2(c.cx - wA / 2)} ${f2(yA)}L${f2(c.cx - wB / 2)} ${f2(yB)}M${f2(c.cx + wA / 2)} ${f2(yA)}L${f2(c.cx + wB / 2)} ${f2(yB)}`;
       // a round shrub on the upper landing (rows 1-4), beside the flight's top
       if (k <= 4) {
-        const sx = xb + dir * R.w * 0.24;
+        const sx = xb + dir * R.w * 0.16;
         const sy = yB + 1;
         const r1 = 9.5 * u;
         P.shrubs.circle(sx, sy - r1 * 0.8, r1).circle(sx + dir * r1 * 0.95, sy - r1 * 0.55, r1 * 0.72);
@@ -225,8 +241,8 @@ function rowGeo(k: number, pick: (c: Cell) => boolean): RowGeo {
     // the house
     const ci = c.ci;
     if (near) {
-      P.fac[ci].rect(c.x, top, R.w + 0.3, R.h);
-      if (COLORS[ci] !== palette.tan) P.shade.rect(c.x, top, R.w * 0.18, R.h);
+      P.fac[ci].rect(c.x, rt, R.w + 0.3, R.h - c.jy);
+      if (COLORS[ci] !== palette.tan) P.shade.rect(c.x, rt, R.w * 0.18, R.h - c.jy);
       P.screens.rect(c.x + 17.5 * u, top + 39.5 * u, 55 * u, 25.5 * u);
       P.bars.rect(c.x + 17.5 * u, top + 30 * u, 55 * u, 9.5 * u);
       if (k <= 1) for (let dd = 0; dd < 3; dd++) P.barDots.circle(c.x + (22.5 + dd * 6) * u, top + 34.75 * u, 2.2 * u);
@@ -239,18 +255,37 @@ function rowGeo(k: number, pick: (c: Cell) => boolean): RowGeo {
     } else {
       // far LOD: three flat tones (the set's per-house colour pick), a roof slab, the door
       const tone = COLORS[ci] === palette.tan ? 2 : COLORS[ci] === palette.sand ? 1 : 0;
-      P.fac[tone].rect(c.x, top, R.w + 0.4, R.h);
-      P.roofs.rect(c.x, top, R.w * (0.55 + 0.3 * rand(SEED, `rf${k}/${c.j}`)), 6 * u);
+      P.fac[tone].rect(c.x, rt, R.w + 0.4, R.h - c.jy);
+      P.roofs.rect(c.x, rt, R.w * (0.55 + 0.3 * rand(SEED, `rf${k}/${c.j}`)), 6 * u);
       P.doors.rect(c.x + 34 * u, top + 97.5 * u, 26 * u, 50 * u);
+    }
+    if (c.brk === 1) {
+      // a chimney stack (+ its cap) on the roof
+      const cx0 = c.x + R.w * (0.2 + 0.45 * rand(hs, 'chx'));
+      const cw = Math.max(2.4, R.w * 0.13);
+      const ch = Math.max(4, R.h * 0.13);
+      P.chim.rect(cx0, rt - ch, cw, ch + 1).rect(cx0 - cw * 0.18, rt - ch - Math.max(1.2, cw * 0.25), cw * 1.36, Math.max(1.2, cw * 0.25));
+    } else if (c.brk === 2) {
+      // an aerial: a mast and two cross bars
+      const ax = c.x + R.w * (0.3 + 0.4 * rand(hs, 'ax'));
+      const ah = Math.max(7, R.h * 0.3);
+      const lw = Math.max(1.3, 1.6 * u);
+      P.aer.rect(ax - lw / 2, rt - ah, lw, ah).rect(ax - R.w * 0.18, rt - ah * 0.82, R.w * 0.36, lw).rect(ax - R.w * 0.11, rt - ah * 0.55, R.w * 0.22, lw);
+    } else if (c.brk === 3) {
+      // a round tree in front of the house's corner, its crown over the roofline
+      const tx = c.x + (rand(hs, 'tx') < 0.5 ? R.w * 0.08 : R.w * 0.92);
+      const cr = Math.max(4, R.w * 0.26);
+      P.crowns.circle(tx, rt - cr * 0.25, cr).circle(tx + cr * 0.7, rt + cr * 0.2, cr * 0.72);
+      P.chim.rect(tx - Math.max(1, cr * 0.12), rt + cr * 0.5, Math.max(2, cr * 0.24), R.h * 0.5);
     }
     if (inked) {
       const ov = (a: number, b: number) => [r.range(a, b) * u, r.range(a, b) * u] as [number, number];
       if (r.chance(0.3)) {
         const cut = c.x + R.w * r.range(0.35, 0.7);
-        g.ink += line(c.x, top, cut - 4 * u, top, {seed: `${hs}/r1`, over: ov(2, 7), breaks: false}) + line(cut + 3 * u, top, c.x + R.w, top, {seed: `${hs}/r2`, over: ov(1, 8), breaks: false});
-      } else g.ink += line(c.x, top, c.x + R.w, top, {seed: `${hs}/r`, over: ov(2, 9), breaks: false});
+        g.ink += line(c.x, rt, cut - 4 * u, rt, {seed: `${hs}/r1`, over: ov(2, 7), breaks: false}) + line(cut + 3 * u, rt, c.x + R.w, rt, {seed: `${hs}/r2`, over: ov(1, 8), breaks: false});
+      } else g.ink += line(c.x, rt, c.x + R.w, rt, {seed: `${hs}/r`, over: ov(2, 9), breaks: false});
       if (k <= 1 && r.chance(0.75)) g.ink += line(c.x + 3 * u, top + 9 * u, c.x + R.w - 3 * u, top + 9 * u, {seed: `${hs}/c`, over: ov(0, 4), breaks: false});
-      if (r.chance(0.84)) g.ink += line(c.x, base, c.x, top, {seed: `${hs}/w`, over: [0, r.range(1, 5) * u], breaks: false});
+      if (r.chance(0.84)) g.ink += line(c.x, base, c.x, rt, {seed: `${hs}/w`, over: [0, r.range(1, 5) * u], breaks: false});
       if (k <= 2) {
         g.detail += sketchRect(c.x + 17.5 * u, top + 30 * u, 55 * u, 35 * u, {seed: `${hs}/wi`, edges: r.chance(0.5) ? 'tlb' : 'tlr', over: 5 * u});
         g.detail += sketchRect(c.x + 32.5 * u, top + 97.5 * u, 30 * u, 50 * u, {seed: `${hs}/di`, edges: 'tlr', over: 4 * u});
@@ -279,6 +314,10 @@ function rowGeo(k: number, pick: (c: Cell) => boolean): RowGeo {
   g.sliver = P.sliver.d;
   g.coping = P.coping.d;
   g.shrubs = P.shrubs.d;
+  g.risers = P.risers.d;
+  g.chim = P.chim.d;
+  g.aer = P.aer.d;
+  g.crowns = P.crowns.d;
   return g;
 }
 /** Fix round 3 (no one-frame 1080 x 430 block): the near rows' houses pop in RINGS from the centre outward, one frame
@@ -386,7 +425,7 @@ const RIDGE_FILL = '#84B09C';
 const visTop = (t: number, wy: number, k: number) => {
   const c = camAt(t);
   const xe = Math.min(1.3 * 540, 540 / c.zoom);
-  return (wy + bowAt(k, 540 + xe) - c.y) * c.zoom + 960;
+  return (wy + Math.min(0, bowAt(k, 540 + xe)) - c.y) * c.zoom + 960;
 };
 const revealOf = (t: number, wy: number, k: number) => clamp((visTop(t, wy, k) - TERRACE.revealFloor) / 14 + 1);
 /** The terraces extend at the frame's side edges: row k at EXTEND_AT + k * 0.03, so the last (row 7 + the bands)
@@ -407,11 +446,15 @@ const TAG_PX = [44, 32, 24, 18, 14, 11, 9, 8];
 const tagSize = (k: number, zoom: number) => Math.max(TAG_PX[k] ?? 8, (TERRACE.checkBox.minScreen[k] ?? 0) / zoom);
 /** Screen ink of the inked rows' tags: [card outline, box]. */
 const TAG_INK: [number, number][] = [
-  [3.4, 3.0],
-  [3.4, 3.0],
-  [2.4, 2.2],
-  [1.8, 1.6],
+  [2.6, 2.4],
+  [2.2, 2.0],
+  [2.0, 1.8],
+  [1.6, 1.4],
 ];
+/** A1 FR2 (reviewer: ~250 pure-white tags with 3.4 px outlines made a high-contrast noise field competing with the flag
+ *  and the sun): the EMPTY tags are cream cards (HALF.cream on the uninked far rows) with thinner ink; door #4's ticked
+ *  tag stays the one pure-white card (1.3x, a sage box behind its tick): flag > ticked tag > field. */
+const TAG_FILL = (k: number) => (k <= 3 ? palette.cream : HALF.cream);
 const rot = (hx: number, hy: number, a: number) => {
   const c = Math.cos(a);
   const sn = Math.sin(a);
@@ -459,11 +502,11 @@ const RowTags: React.FC<{k: number; zoom: number; extended: boolean}> = ({k, zoo
   const sc = (px: number) => px / zoom;
   return (
     <>
-      <Fill d={body} color={palette.white} offset={false} mode="snap" seed={`s9tg${k}/b`} />
+      <Fill d={body} color={TAG_FILL(k)} offset={false} mode="snap" seed={`s9tg${k}/b`} />
       {inked ? null : <Fill d={box} color={tint(palette.sand, k)} offset={false} mode="snap" seed={`s9tg${k}/x`} />}
       {inked ? (
         <>
-          <Ink d={loop} width={sc(k <= 1 ? 2.2 : 1.6)} color={palette.tealDark} taper={false} vary={0} seed={`s9tg${k}/lp`} />
+          <Ink d={loop} width={sc(k <= 1 ? 1.8 : 1.4)} color={palette.tealDark} taper={false} vary={0} seed={`s9tg${k}/lp`} />
           <Ink d={body} width={sc(TAG_INK[k][0])} taper={false} vary={0} seed={`s9tg${k}/o`} />
           <Ink d={box} width={sc(TAG_INK[k][1])} taper={false} vary={0} seed={`s9tg${k}/xi`} />
         </>
@@ -480,19 +523,21 @@ export const House4Tag: React.FC = () => {
   if (t < at) return null;
   const zoom = camAt(t).zoom;
   const pop = springAt(t, at, springs.pop);
-  const s = tagSize(0, zoom) * pop;
+  // A1 FR2: 1.3x the row's tag, pure white (the field is cream), a sage box (the new lock's sage) behind the tick
+  const s = tagSize(0, zoom) * 1.3 * pop;
   const H = TERRACE.house4.facade;
-  const [hx, hy] = [H[0] + TERRACE.checkBox.hang[0], H[1] + TERRACE.checkBox.hang[1]];
+  const [hx, hy] = [H[0] + TERRACE.checkBox.hang[0], H[1] + TERRACE.checkBox.hang[1] - 4];
   const b = s * 0.25;
   const by = hy + s * 0.58;
   const tick = `M${f2(hx - b * 0.85)} ${f2(by - b * 0.05)}L${f2(hx - b * 0.2)} ${f2(by + b * 0.7)}L${f2(hx + b * 1.25)} ${f2(by - b * 1.25)}`;
   return (
     <>
       <Fill d={tagQuad(hx, hy, s)} color={palette.white} offset={false} mode="snap" seed="s9h4tag/b" />
+      <Fill d={tagBox(hx, hy, s)} color={palette.sage} offset={false} mode="snap" seed="s9h4tag/x" />
       <Ink d={tagLoop(hx, hy, s)} width={2.2 / zoom} color={palette.tealDark} taper={false} vary={0} seed="s9h4tag/lp" />
       <Ink d={tagQuad(hx, hy, s)} width={3.4 / zoom} taper={false} vary={0} seed="s9h4tag/o" />
       <Ink d={tagBox(hx, hy, s)} width={3 / zoom} taper={false} vary={0} seed="s9h4tag/xi" />
-      <Ink d={tick} at={B.single - 0.12} dur={0.12} width={5 / zoom} taper={false} seed="s9h4tag/tick" />
+      <Ink d={tick} at={B.single - 0.12} dur={0.12} width={6 / zoom} taper={false} seed="s9h4tag/tick" />
     </>
   );
 };
@@ -501,7 +546,7 @@ export const House4Tag: React.FC = () => {
 
 /** One chunk of a row (a ring of its core houses, or its frame-edge houses) with the reveal of its houses (`rv`) and of
  *  its terrace strip (`strip`). */
-type RowPart = {g: RowGeo; rv: number; strip: number};
+type RowPart = {g: RowGeo; rv: number; strip: number; stair: boolean};
 
 /** One row: the terrace strip's back (retaining wall face + joints) as soon as the strip is revealed; each chunk's houses
  *  with their stair slots (wall face + the flight's tread / stringer fill + the landing shrubs: fix round 3, the slot is
@@ -561,8 +606,12 @@ const RowNode: React.FC<{k: number; zoom: number; parts: RowPart[]}> = ({k, zoom
                 {iw > 0 && g.ink ? <Ink d={g.ink} width={iw} taper={false} vary={0.05} seed={`s9h/i${k}/${i}`} /> : null}
                 {dw > 0 && g.detail ? <Ink d={g.detail} width={dw} taper={false} vary={0.05} seed={`s9h/di${k}/${i}`} /> : null}
                 {g.sliver ? <Fill d={g.sliver} color={sliver} offset={false} mode="snap" seed={`s9h/sv${k}/${i}`} /> : null}
-                {g.flight ? <Fill d={g.flight} color={tint(palette.cream, k)} offset={false} mode="snap" seed={`s9h/fl${k}/${i}`} /> : null}
-                {g.shrubs ? <Fill d={g.shrubs} color={k <= 2 ? palette.teal : tint(palette.sage, k)} offset={false} mode="snap" seed={`s9h/sb${k}/${i}`} /> : null}
+                {g.chim ? <Fill d={g.chim} color={tint(mix(palette.tan, palette.tealDark, 0.35), k)} offset={false} mode="snap" seed={`s9h/ch${k}/${i}`} /> : null}
+                {g.aer ? <Fill d={g.aer} color={tint(mix(palette.tealDark, palette.ink, 0.3), k)} offset={false} mode="snap" seed={`s9h/ae${k}/${i}`} /> : null}
+                {g.crowns ? <Fill d={g.crowns} color={tint(k <= 4 ? palette.sage : palette.teal, k)} offset={false} mode="snap" seed={`s9h/cr${k}/${i}`} /> : null}
+                {p.stair && g.flight ? <Fill d={g.flight} color={tint(palette.cream, k)} offset={false} mode="snap" seed={`s9h/fl${k}/${i}`} /> : null}
+                {p.stair && g.risers ? <Fill d={g.risers} color={tint(mix(palette.cream, palette.tan, 0.42), k)} offset={false} mode="snap" seed={`s9h/rs${k}/${i}`} /> : null}
+                {p.stair && g.shrubs ? <Fill d={g.shrubs} color={k <= 2 ? palette.teal : tint(palette.sage, k)} offset={false} mode="snap" seed={`s9h/sb${k}/${i}`} /> : null}
               </>,
             )}
           </React.Fragment>
@@ -586,10 +635,10 @@ const RowNode: React.FC<{k: number; zoom: number; parts: RowPart[]}> = ({k, zoom
       })}
       {parts.map((p, i) => {
         const g = p.g;
-        if (p.rv < 1 || iw <= 0 || (!g.flightInk && !g.shrubInk)) return null;
+        if (p.rv < 1 || !p.stair || iw <= 0 || (!g.flightInk && !g.shrubInk)) return null;
         return (
           <React.Fragment key={`fi${i}`}>
-            {g.flightInk ? <Ink d={g.flightInk} at={DRAW_AT + 0.02 + k * 0.05} order="all" width={Math.max(iw * 0.8, 1.3 / zoom)} taper={false} vary={0} seed={`s9h/fi${k}/${i}`} /> : null}
+            {g.flightInk ? <Ink d={g.flightInk} at={DRAW_AT + 0.02 + k * 0.05} order="all" width={Math.max(2.2 / zoom, Math.min(iw, 2.2 / zoom))} taper={false} vary={0} seed={`s9h/fi${k}/${i}`} /> : null}
             {g.shrubInk ? <Ink d={g.shrubInk} width={iw * 0.8} taper={false} vary={0} seed={`s9h/sbi${k}/${i}`} /> : null}
           </React.Fragment>
         );
@@ -652,9 +701,13 @@ export const Hill: React.FC = () => {
   // a strip never floats over the row below's still-empty slots: it waits for that row's last ring
   const strip = ROWS.slice(0, HAZE).map((R, k) => (k === 0 ? 1 : rings[k - 1][NRING - 1] < 1 ? 0 : revealOf(t, R.base - RAIL * R.s, k)));
   const ext = ROWS.slice(0, HAZE).map((_, k) => extendedAt(t, k));
+  // A1 FR2 (reviewer: a row-2 house popped alone with its flight already up = a staircase to nowhere): a row's flights +
+  // landing shrubs pop one frame AFTER the row above completes (its last ring), so a flight always lands on a coping
+  const above = (k: number) => (k + 1 >= HAZE ? 1 : revealOf(t - 1 / 30 - (NRING - 1) / 30, ROWS[k + 1].top - (3 + GAP) * ROWS[k + 1].s, k + 1));
+  const stairOn = ROWS.slice(0, HAZE).map((_, k) => above(k) >= 1);
   const partsOf = (k: number): RowPart[] => {
-    const ps: RowPart[] = GEO[k].rings.map((g, i) => ({g, rv: rings[k][i], strip: strip[k]}));
-    if (ext[k] || k === 0) ps.push({g: GEO[k].edge, rv: rings[k][0], strip: strip[k]});
+    const ps: RowPart[] = GEO[k].rings.map((g, i) => ({g, rv: rings[k][i], strip: strip[k], stair: stairOn[k]}));
+    if (ext[k] || k === 0) ps.push({g: GEO[k].edge, rv: rings[k][0], strip: strip[k], stair: stairOn[k]});
     return ps;
   };
   for (let k = HAZE - 1; k >= 1; k--) {
