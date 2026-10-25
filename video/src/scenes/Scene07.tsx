@@ -110,6 +110,10 @@ const POP_SKIP = 0.3 * (1 - 1.3 / 2.3) + 0.001;
 /** L7's pop starts this long before the card is first drawn: the kit's 7 % pop spring (LabelTag 'card') is at 20 % after
  *  0.037 s, so the first frame shows a 20-50 % card (motion spec fill pop) instead of a 0-17 % speck. */
 const L7_PRE = 0.037;
+/** The workshop's one shade plane (fix round 3): its facade is relit clay -> sand right of this world x, so the left
+ *  66 px (780-846, the kit's shade band, behind the door and the shop window) stay clay. At 846 the step lands at screen
+ *  x ~928 after the push, left of the right-rail UI (x > 950), not as an extra edge inside it. */
+const WS_SHADE_X1 = 846;
 
 const Scene07: React.FC = () => {
   const t = useTime();
@@ -257,8 +261,8 @@ const Scene07: React.FC = () => {
   // far roof details go into the set's roofs layer (behind the wall); quiet details on the left wall field.
   // Fix round 3 (palette value: the lower 55 % read as a brown mass): the lit walls go up one step, clay -> sand (a <Tod
   // map> on the layer), keeping clay only for the shade planes: the public wall's cornice band stays as drawn (the map runs
-  // below y 880 only), the board's recess band (BoardShade) is added left of the board, and the workshop keeps its kit
-  // shade plane (its left 20 %, x 780-868, drawn unmapped) as its one flat shade polygon.
+  // below y 880 only), the board's recess band (BoardShade) is added left of the board, and the workshop keeps its left
+  // 66 px (x 780-846, inside the kit's 20 % shade band, drawn unmapped) as its one flat shade polygon.
   const wrap: LayerWrap = (name, _z, node) =>
     name === 'roofs' ? (
       <>
@@ -267,15 +271,14 @@ const Scene07: React.FC = () => {
       </>
     ) : name === 'wall' ? (
       <>
+        {/* the layer as drawn, then the relit copy over it below the cornice (over, not beside it: two clipped halves
+            leave an anti-aliased seam) */}
         <defs>
-          <clipPath id="s7wallCorn" clipPathUnits="userSpaceOnUse">
-            <rect x={-400} y={-400} width={1800} height={1280} />
-          </clipPath>
           <clipPath id="s7wallLit" clipPathUnits="userSpaceOnUse">
             <rect x={-400} y={880} width={1800} height={1400} />
           </clipPath>
         </defs>
-        <g clipPath="url(#s7wallCorn)">{node}</g>
+        {node}
         <g clipPath="url(#s7wallLit)">
           <Tod map={litWall}>{node}</Tod>
         </g>
@@ -285,14 +288,11 @@ const Scene07: React.FC = () => {
     ) : name === 'corner' ? (
       <>
         <defs>
-          <clipPath id="s7wsShade" clipPathUnits="userSpaceOnUse">
-            <rect x={-400} y={-400} width={1268} height={2800} />
-          </clipPath>
           <clipPath id="s7wsLit" clipPathUnits="userSpaceOnUse">
-            <rect x={868} y={-400} width={1000} height={2800} />
+            <rect x={WS_SHADE_X1} y={-400} width={1000} height={2800} />
           </clipPath>
         </defs>
-        <g clipPath="url(#s7wsShade)">{node}</g>
+        {node}
         <g clipPath="url(#s7wsLit)">
           <Tod map={litWall}>{node}</Tod>
         </g>

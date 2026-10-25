@@ -18,8 +18,8 @@ import {Pigeon, PipS01, PlazaCitizen} from '../scene01/cast';
 import {DOME_GLASS, LanternOff, S01Shutter} from '../scene01/shims';
 import {DoorLanterns, PressTicks, S01Branch, S01Glyph, SunRipple, TreeTicks} from '../scene01/dressing';
 import {layerMat} from './camera';
-import {B, DOME_LANTERN_R, inRewind, s01Clock} from './timing';
-import {BitHome, CITIZEN_ORDER, DidSparkles, OnlookersP, P_CITIZENS, P_GOV, P_PIGEONS, PipP, P_NEAR, R_CITIZENS, R_GOV, R_NEAR, R_PIGEONS, R_PIP, S11Note} from './cast';
+import {B, DOME_LANTERN_R, inRewind, pipClockR, s01Clock} from './timing';
+import {BitHome, CITIZEN_ORDER, DidSparkles, OnlookersP, P_CITIZENS, P_GOV, P_PIGEONS, PipP, P_NEAR, R_CITIZENS, R_GOV, R_NEAR, R_PIGEONS, R_PIP, S11Note, SB_SEED, SbPoint} from './cast';
 
 const SUN = PLAZA.sun; // (720, 900) r155
 const VP = PLAZA.vp as [number, number];
@@ -44,14 +44,16 @@ const REW = {k: 0.9, x: -20, y: -28} as const;
 
 /** The sun's glyph: S01's own (S01Glyph, S01 clock) until 'before'; then on S12's clock the power glyph shrinks out, the
  *  bold cream REWIND glyph pops in (nudging left on 'there' / 'was' / 'even') and pops back to the power glyph on
- *  'fix.'; once that pop has settled the glyph is S01's own again (at W = 0: S01's frame-0 glyph, to the pixel). */
+ *  'fix.'; once that pop has settled the glyph is S01's own again (at W = 0: S01's frame-0 glyph, to the pixel).
+ *  Fix round 2: each swap is SEQUENCED, never two glyphs in one frame: the outgoing glyph is drawn only before the
+ *  incoming one's first frame (`rewindShow` / `powerShow`), and the incoming one enters mid-pop (timing.ts B). */
 const Glyph: React.FC<{r: number; t: number}> = ({r, t}) => {
   if (t < B.powerOut || t >= B.powerHandBack) return <S01Glyph r={r} glintAt={S01B.glintPop} seed="s01/pwr" />;
   return (
     <TimeProvider global={t} offset={0}>
-      {t < B.powerOut + 0.13 ? <PowerGlyph r={r} outAt={B.powerOut} seed="s01/pwr" /> : null}
-      <RewindGlyph r={r * REW.k} x={REW.x} y={REW.y} at={B.rewindIn} outAt={B.rewindOut} nudgeAt={[...B.rewindNudge]} seed="s12/rew" />
-      <PowerGlyph r={r} at={B.powerIn} seed="s01/pwr" />
+      {t < B.rewindShow ? <PowerGlyph r={r} outAt={B.powerOut} seed="s01/pwr" /> : null}
+      {t >= B.rewindShow && t < B.powerShow ? <RewindGlyph r={r * REW.k} x={REW.x} y={REW.y} at={B.rewindIn} outAt={B.rewindOut} nudgeAt={[...B.rewindNudge]} seed="s12/rew" /> : null}
+      {t >= B.powerShow ? <PowerGlyph r={r} at={B.powerIn} seed="s01/pwr" /> : null}
     </TimeProvider>
   );
 };
@@ -78,9 +80,16 @@ export const PlazaRewind: React.FC = () => {
     ),
     light: (
       <>
-        {CITIZEN_ORDER.map((i) => (
-          <PlazaCitizen key={i} p={citizens[i]} vp={VP} horizon={HZ} />
-        ))}
+        {CITIZEN_ORDER.map((i) => {
+          const sb = !rew && citizens[i].seed === SB_SEED;
+          return (
+            <React.Fragment key={i}>
+              {sb ? <SbPoint p={citizens[i]} rim /> : null}
+              <PlazaCitizen p={citizens[i]} vp={VP} horizon={HZ} />
+              {sb ? <SbPoint p={citizens[i]} /> : null}
+            </React.Fragment>
+          );
+        })}
       </>
     ),
     near: (
@@ -89,7 +98,13 @@ export const PlazaRewind: React.FC = () => {
         {pigeons.map((p) => (
           <Pigeon key={p.seed} p={p} />
         ))}
-        {rew ? <PipS01 p={R_PIP} seed={S01_PIP_SEED} /> : <PipP t={t} />}
+        {rew ? (
+          <TimeProvider global={pipClockR(t)} offset={0}>
+            <PipS01 p={R_PIP} seed={S01_PIP_SEED} />
+          </TimeProvider>
+        ) : (
+          <PipP t={t} />
+        )}
         {(rew ? R_NEAR : P_NEAR).map((c) => (
           <NearObserver key={c.seed} p={c} />
         ))}

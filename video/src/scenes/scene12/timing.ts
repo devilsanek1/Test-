@@ -9,8 +9,9 @@
 //     lower, a point, Pip lands and nods, padlocks glint) are extra events placed in that clock.
 //   R phase ('before' -> END): W runs BACKWARDS through S01 (4.45 -> 0) as a TAPE: one S01 time per 12-fps step (every
 //     pose held 2-3 frames), each step a readable pose of a reversed S01 beat, placed on its S12 word (R_STEPS). It
-//     reaches 0 = S01's frame 0 (the bottom of the press, govB's screen the bright line) at 2.963 and holds it: the
-//     last frame IS frame 0 (0 px). The camera, Bit's walk home, S11's note and the glyph swaps run on own clocks.
+//     reaches 0 = S01's frame 0 (the bottom of the press, govB's screen the bright line) at 2.880 (first drawn f87) and
+//     holds it: the last frame IS frame 0 (0 px). The camera, Bit's walk home, S11's note, the glyph swaps and Pip's
+//     reversed hop (pipClockR) run on their own clocks.
 import {B as S01} from '../scene01/timing';
 
 /** S12's start on the film timeline (src/data/scenes.json). */
@@ -79,15 +80,21 @@ export const B = {
   // cream sparkle pops on each padlock, ON the word
   tagDid: W.did - 0.03,
   sparkle: W.did - 0.02,
-  // 'before' w172-0.05: THE REWIND. The power glyph shrinks out, the bold cream REWIND glyph pops in; S01 starts
-  // playing backwards (the R phase below)
-  powerOut: L(53.71) - 0.06,
-  rewindIn: L(53.71),
+  // 'before' w172: THE REWIND glyph swap. Fix round 2 (review: 1-frame double-glyph smudge at f48, the REWIND glyph
+  // only full on f49, 0.036 s after the word): the two glyphs NEVER share a frame. The power glyph shrinks out (0.12 s
+  // in-cubic: 0.99 / 0.87 / 0.51 on f42-f44) and is gone by f45; the REWIND glyph is first drawn on f45 (`rewindShow`)
+  // already mid-pop (its spring origin `rewindIn` is 2 frames earlier: 0.51 / 0.79 / 0.97 / 1.05 on f45-f48), so it is
+  // full by f47 (53.73) and at its overshoot peak ON 'before' (f48, 53.76). The tape (R0) still starts at 53.71.
+  rewindShow: W.before - 0.1,
+  rewindIn: W.before - 0.1 - 0.066,
+  powerOut: W.before - 0.1 - 0.125,
   rewindNudge: [W.there - 0.02, W.was - 0.02, W.even - 0.02],
-  // 'fix.' w177: the rewind glyph pops back to the bold power glyph
-  // (fix round 1: the same lead as the 'before' swap, so the power glyph is full size by ~W.fix + 0.03)
-  rewindOut: W.fix - 0.11,
-  powerIn: W.fix - 0.05,
+  // 'fix.' w177: the rewind glyph pops back to the bold power glyph, the same sequenced swap: the rewind glyph shrinks
+  // out (0.99 / 0.86 / 0.48 on f71-f73), the power glyph is first drawn on f74 mid-pop (0.52 / 0.80 / 0.97 / 1.05 on
+  // f74-f77): full by f76, overshoot peak ON 'fix.' (f77, 54.73)
+  powerShow: W.fix - 0.1,
+  powerIn: W.fix - 0.1 - 0.066,
+  rewindOut: W.fix - 0.1 - 0.125,
   // after the power glyph's pop has settled, the scene hands the glyph back to S01's own (S01Glyph in the S01 clock)
   // so the last frame is S01's frame 0 to the pixel
   powerHandBack: W.fix + 0.42,
@@ -97,8 +104,8 @@ export const B = {
 
 // ---------------------------------------------------------------- the S01 clock W(t)
 
-/** The rewind starts on 'before' (w172-0.05). */
-export const R0 = B.rewindIn;
+/** The rewind starts on 'before' (w172-0.05 = 53.71, the storyboard time; independent of the glyph's own clock). */
+export const R0 = L(53.71);
 /** The tape's step rate: every reversed pose is held 2-3 frames at 30 fps. */
 export const REWIND_FPS = 12;
 /** P phase: S01's settled tail (every S01 event, the onlooker's phone and Pip's look-back included, is done by 4.45 s;
@@ -109,17 +116,21 @@ export const P_W0 = 4.45;
  *  pose of an S01 beat in reverse and lands on its S12 word (storyboard S12 beats; ENGINE rule 5: a step leads its word
  *  by <= 0.02). Expressed through S01's own beat table (scene01/timing.ts), so a retimed S01 keeps the rewind in step.
  *  Fix round 1: 18 steps (was 19: the lamp no longer has a step of its own, govB's dome lantern relights WITH Pip's
- *  reversed hop on 'there', the lamp with govC's half shutter), so every pose after 'was' sits on its word and frame 0
- *  arrives at 2.963 (film 55.13; 7 frames held to the seam).
+ *  reversed hop on 'there', the lamp with govC's half shutter), so every pose after 'was' sits on its word.
+ *  Fix round 2: 17 steps (old steps 14 'heads swap back' + 15 'Pip's look undone' merged into one W 0.30 step: the
+ *  heads, the walker, the pigeons and Pip's look all reverse on it), so the step one before the press lands on f84
+ *  (54.96, was 55.04) and frame 0 on f87 (film 55.063, +1.6 frames from the storyboard's 55.01, was +3.6), held 9 frames.
+ *  Pip's reversed startle hop runs on its own 3-pose tape from 'there' (PIP_R_STEPS below), so steps 4-5 only carry
+ *  the rest of the plaza.
  *    k  local  film   word      W     the pose
  *    0  1.547  53.71  'before'  4.45  the plaza as S01 left it (the rewind glyph pops in)
  *    1  1.630  53.79            3.80  the tags swing back UP (govA's shrinking, govB's swinging)
  *    2  1.713  53.88            3.72  govB's tag a small swinging pop, govA's gone
  *    3  1.797  53.96            3.42  the padlocks pop off (govB's in its overshoot, govA's small, govC's gone)
- *    4  1.880  54.04  'there'   2.96  Pip's startle hop backwards: mid-air at the apex (+ startle ticks); fA's phone up
- *                                     again; govB's dome lantern relit (DOME_LANTERN_R 2.97)
- *    5  1.963  54.13            2.32  Pip back on the bollard; the lamp + govA's door lanterns relit; govC's shutter
- *                                     half way up (its 0.113 s fall)
+ *    4  1.880  54.04  'there'   2.96  fA's phone up again; govB's dome lantern relit (DOME_LANTERN_R 2.97); Pip's own
+ *                                     tape starts (PIP_R_STEPS: low, apex, lift-off, f57-f63)
+ *    5  1.963  54.13            2.32  the lamp + govA's door lanterns relit; govC's shutter half way up (its 0.113 s
+ *                                     fall)
  *    6  2.047  54.21  'was'     1.93  govC's shutter up; govA's half way (0.7 of its 0.16 s ease-in slam)
  *    7  2.130  54.29            1.66  govA's up (govA one step lighter); govB's half way
  *    8  2.213  54.38  'even'    1.36  govB's up; the far civic silhouettes relight right to left (two lit)
@@ -128,12 +139,13 @@ export const P_W0 = 4.45;
  *   11  2.463  54.63            0.82  govC's screen lit; the pigeons fly backwards off the crossbar
  *   12  2.547  54.71  'fix.'    0.70  govA's screen comes back as the bright line
  *   13  2.630  54.79            0.55  govA's screen lit
- *   14  2.713  54.88            0.40  heads swap back, the walker walks backwards
- *   15  2.797  54.96            0.24  Pip's look at govB undone; govB's screen still dark
- *   16  2.880  55.04  END-0.32  0.02  ONE STEP BEFORE THE PRESS: govB's dot grows back to the line, the sun squashes
+ *   14  2.713  54.88            0.30  heads swap back, the walker walks backwards, the pigeons fly out backwards,
+ *                                     Pip's look at govB undone; govB's screen still dark
+ *   15  2.797  54.96  END-0.40  0.02  ONE STEP BEFORE THE PRESS: govB's dot grows back to the line, the sun squashes
  *                                     DOWN (release scale ~0.93, half way to 0.88), the ripple contracts
- *   17  2.963  55.13            0     frame 0: the bottom of the press (0.88), ripple + press ticks at their emission
- *                                     radius; held to the seam (only Bit and the caption roll move)
+ *   16  2.880  55.04            0     frame 0 (first drawn f87, 55.063): the bottom of the press (0.88), ripple + press
+ *                                     ticks at their emission radius; held 9 frames to the seam (only Bit and the
+ *                                     caption roll move)
  */
 export const R_STEPS: number[] = [
   P_W0,
@@ -150,8 +162,7 @@ export const R_STEPS: number[] = [
   S01.crtC - 0.065,
   S01.crtA + 0.07,
   S01.crtA - 0.08,
-  S01.heads + 0.06,
-  0.24,
+  S01.heads - 0.04,
   0.02,
   0,
 ];
@@ -159,6 +170,13 @@ export const R_STEPS: number[] = [
  *  reversed hop (step 4, W 2.96), one step before the lamp (storyboard: "govB's dome lantern, then the lamp"). Frame 0
  *  is unaffected (lit either way). */
 export const DOME_LANTERN_R = (S01.pipHop + S01.pipLand) / 2 + 0.01;
+
+/** Pip's reversed startle hop on his OWN tape (fix round 2, review: on the shared tape the hop was one 2-frame apex
+ *  pose, unreadable as a hop): from 'there' - 0.02, three S01 poses at 12 fps (2-3 frames each, f57-f63 in the air):
+ *  low before the landing (8 px up, startle ticks full), the apex (34 px), just after the lift-off (22 px); then the
+ *  shared tape again (sit-back, the hop undone). */
+export const PIP_R0 = W.there - 0.02;
+export const PIP_R_STEPS: number[] = [S01.pipLand - 0.01, (S01.pipHop + S01.pipLand) / 2, S01.pipHop + 0.03];
 
 /** The tape step index at S12-local t (0 on 'before'). */
 export const stepIndex = (t: number) => Math.floor((t - R0) * REWIND_FPS + 1e-6);
@@ -174,3 +192,9 @@ export function s01Clock(t: number): number {
 
 /** S12-local t -> the P-phase S01 clock (for placing S12's own beats in it). */
 export const pClock = (t: number) => P_W0 + t;
+
+/** Pip's S01 clock in the R phase: the shared tape, except his own 3 hop poses from PIP_R0. */
+export function pipClockR(t: number): number {
+  const k = Math.floor((t - PIP_R0) * REWIND_FPS + 1e-6);
+  return k >= 0 && k < PIP_R_STEPS.length ? PIP_R_STEPS[k] : s01Clock(t);
+}

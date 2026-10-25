@@ -436,7 +436,8 @@ export const FarRoofDetails: React.FC<{seed?: string}> = ({seed = 's7roofs'}) =>
     };
     const mid = at(0.55);
     const foot: Pt = [x + dir * 15, y];
-    const lead = `M${mid[0].toFixed(1)} ${mid[1].toFixed(1)}Q${(x + dir * 12).toFixed(1)} ${(mid[1] + h * 0.42).toFixed(1)} ${foot[0].toFixed(1)} ${foot[1].toFixed(1)}`;
+    // the lead hangs: it drops steeply off the mast and lies along the roof to its clip (control point under the chord)
+    const lead = `M${mid[0].toFixed(1)} ${mid[1].toFixed(1)}Q${(x + dir * 3).toFixed(1)} ${(y - 1).toFixed(1)} ${foot[0].toFixed(1)} ${foot[1].toFixed(1)}`;
     return line(x, y, top[0], top[1], {over: 0, seed: `${seed}/a${k}`}) + bar(0.92, 8, 13, dir * tilt, 'b') + bar(0.74, 5, 8, 0, 'c') + bar(0.6, 2, 4, 0, 'd') + lead;
   };
   const aerials = aer(66, 772, 30, 12, 1, '0') + aer(176, 790, 24, 9, -1, '1') + aer(338, 784, 27, 14, 1, '2');

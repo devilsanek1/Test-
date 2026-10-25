@@ -30,14 +30,27 @@ export const LENS_OUT = {
   rest: {x: 295, y: 1140, s: 1, rot: -2} as const,
   /** Log-scale ease exponent: q = 1 - (1 - u)^pow. */
   pow: 1.4,
+  /** Inside the FIRST film frame interval (t0 -> t0 + 1/30) the pull-back eases IN from rest (q ~ u^inPow, meeting the
+   *  out curve's value on the film frame t0 + 1/30): the hold before it is nearly static, and every film frame keeps
+   *  exactly the 1 - (1 - u)^pow steps. Only in-between times change (S07's own composition samples film time t0 + 0.5 f
+   *  on its first frame: there the sheet's solid heading bar sat right behind S06's caption text; now it is still above
+   *  it, and on the film frame 22.000 it is already below it). */
+  inPow: 3.5,
 };
+
+/** The out phase's log-scale progress at u (0..1 over t0..t1). */
+function outQ(u: number, o: typeof LENS_OUT): number {
+  const q = (v: number) => 1 - Math.pow(1 - v, o.pow);
+  const u1 = 1 / 30 / (o.t1 - o.t0);
+  return u >= u1 ? q(u) : q(u1) * Math.pow(Math.max(0, u) / u1, o.inPow);
+}
 
 /** Where the lens sheet is at film time T during the out phase (screen px), from the hold state `from` at LENS_OUT.t0;
  *  null from t1 on. */
 export function lensOutAt(T: number, from: LensState, o = LENS_OUT): LensState | null {
   if (T >= o.t1) return null;
   const u = Math.max(0, Math.min(1, (T - o.t0) / (o.t1 - o.t0)));
-  const q = 1 - Math.pow(1 - u, o.pow);
+  const q = outQ(u, o);
   const s = from.s * Math.pow(o.rest.s / from.s, q);
   // the fixed point of the pull-back: c(s) = F + s (R - F) passes through the hold centre at from.s and R at 1
   const R: Pt = [o.rest.x, o.rest.y];

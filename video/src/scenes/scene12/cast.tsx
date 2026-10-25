@@ -4,15 +4,18 @@
 // time. S01's components are reused as they are (scene01/cast.tsx, plaza.tsx, shims.tsx): the plaza at the end of S12
 // IS S01's code at t = 0.
 import React from 'react';
-import {clamp, ease as E, lerp, prog, TimeProvider, useTime} from '../../lib/time';
+import {clamp, ease as E, lerp, osc, prog, TimeProvider, useTime} from '../../lib/time';
+import {rng} from '../../lib/rng';
 import {Elephant, popSwitch} from '../../lib/mascot';
 import {GovEvents, PLAZA} from '../shared/sets';
-import {Bit, bitPath, EdgeOnlooker, StickyNote} from '../shared/props';
+import {Bit, bitPath, EdgeOnlooker, FigureArm, StickyNote} from '../shared/props';
 import {matScale} from '../shared/props/common';
+import {Ink} from '../../lib/Ink';
+import {speedLines} from '../../lib/sketch';
 import {mat, useXf, XG} from '../../lib/xf';
 import {palette} from '../../lib/theme';
 import {S01_PADLOCK_SIZE} from '../scene01/shims';
-import {CitizenPlan, OnlookerPhoneArm, PigeonPlan} from '../scene01/cast';
+import {CitizenPlan, leanAt, OnlookerPhoneArm, PigeonPlan} from '../scene01/cast';
 import {NearPlan, ONL_DX, ONLOOKERS, S01_BIT, S01_CITIZENS, S01_GOV, S01_NEAR, S01_PIGEONS, S01_PIP, S01_PIP_SEED} from '../scene01/plaza';
 import {B, pClock, R0, stepIndex} from './timing';
 
@@ -28,10 +31,69 @@ const P_OVERRIDES: Record<string, Partial<CitizenPlan>> = {
   's01/fC': {turn: [{t: -1, d: -1}, {t: pc(B.headsBack[1]), d: 0}], lean: [{t: -1, a: -6}, {t: pc(B.headsBack[1]), a: 0}]},
   's01/fD': {turn: [{t: -1, d: -1}, {t: pc(B.headsBack[2]), d: 0}], lean: [{t: -1, a: -4}, {t: pc(B.headsBack[2]), a: 0}]},
   's01/sA': {turn: [{t: -1, d: 1}, {t: pc(B.headsBack[3]), d: 0}]},
-  // sB (second row, x 640, under govB's right edge; brown coat, so the sleeve reads on the cream steps): points UP-LEFT
-  // at govB's shuttered window on 'those', lowers it before 'did'. Fix round 1: a LONG straight arm (~78 px on screen,
-  // was ~45) raised steeply, so the hand clears the far-row heads behind him and the line runs on to govB's padlock
-  's01/sB': {turn: [{t: -1, d: -1}, {t: pc(B.pointDown + 0.04), d: 0}], point: {at: pc(B.point), side: -1, hand: [-90, -240], downAt: pc(B.pointDown)}, lean: [{t: -1, a: -4}, {t: pc(B.point), a: -6}, {t: pc(B.pointDown), a: 0}]},
+  // sB (second row, x 640, under govB's right edge; brown coat): points UP at govB's shuttered window on 'those',
+  // lowers it before 'did'. The arm is S12's own (SbPoint below: kit FigureArm + a cream rim), not S01's `point`.
+  // Fix round 2: he straightens as he points (lean -4 -> -2, was -6), so the near-vertical arm clears the backpack
+  // figure behind him
+  's01/sB': {turn: [{t: -1, d: -1}, {t: pc(B.pointDown + 0.04), d: 0}], lean: [{t: -1, a: -4}, {t: pc(B.point), a: -2}, {t: pc(B.pointDown), a: 0}]},
+};
+export const SB_SEED = 's01/sB';
+
+/** sB's point (fix round 2, review: the brown sleeve on govB's tan wall was a small brown tick, and its raised arm
+ *  crossed the backpack figure behind him). The kit FigureArm (tapered sleeve, small elbow bend, cuff, inked sand hand)
+ *  raised ~12 deg off vertical with the lean (was ~25 deg), ~58 px on screen (a ~72 px near-vertical arm read as a
+ *  pole), so it rises past the neighbour's head and backpack and points at govB's shutter, with a 1.8 px CREAM RIM
+ *  (BitRim / onlooker rim language) drawn behind sB (`rim`): sleeve and hand separate from the wall, the steps and the
+ *  neighbour's backpack edge it grazes at the shoulder. Mirrors PlazaCitizen's figure frame (scene01/
+ *  cast.tsx: TORSO 95, LEG 62, FIG_H 199, the person rng's torso width, ink by height, the point raise / lower eases).
+ *  Reads the S01 clock (P phase). */
+const SB_POINT = {at: pc(B.point), downAt: pc(B.pointDown), hand: [-60, -218] as [number, number], w: 21, bend: 12} as const;
+const FIG = {TORSO: 95, LEG: 62, H: 199} as const;
+export const SbPoint: React.FC<{p: CitizenPlan; rim?: boolean}> = ({p, rim}) => {
+  const t = useTime();
+  if (t < SB_POINT.at) return null;
+  const up = E.outBack(1.5)(clamp((t - SB_POINT.at) / 0.22));
+  const dn = E.inOutCubic(clamp((t - SB_POINT.downAt) / 0.2));
+  const q = up * (1 - dn);
+  if (q <= 0.01) return null;
+  const s = p.h / FIG.H;
+  const gw = rng(`person/${p.seed}`).range(86, 100);
+  const sh: [number, number] = [-gw * 0.36, -FIG.TORSO * 0.8];
+  const down: [number, number] = [-gw * 0.5, -FIG.TORSO * 0.1];
+  const hand: [number, number] = [lerp(down[0], SB_POINT.hand[0], q), lerp(down[1], SB_POINT.hand[1], q)];
+  // the elbow as FigureArm places it (bend about the chord, outward = -x), passed explicitly so rim and arm agree
+  const dx = hand[0] - sh[0];
+  const dy = hand[1] - sh[1];
+  const d = Math.hypot(dx, dy) || 1e-6;
+  const ux = dx / d;
+  const uy = dy / d;
+  const bend = SB_POINT.bend * Math.sin((Math.PI / 2) * clamp(q));
+  const off = (d / 2) * Math.tan((bend * Math.PI) / 360);
+  const el: [number, number] = [sh[0] + dx * 0.5 + uy * off, sh[1] + dy * 0.5 - ux * off];
+  const bob = p.bob ? osc(t, 0.55) * p.bob : 0;
+  const m = mat.compose(mat.translate(p.x, p.y + bob), mat.rotate(leanAt(t, p.lean)), mat.translate(0, -FIG.LEG * s), mat.scale(s));
+  const W = (p.h >= 120 ? 3.4 : p.h >= 70 ? 2.2 : 1.6) / s;
+  return (
+    <XG m={m}>
+      {rim ? <SbRim sh={sh} el={el} hand={hand} w={SB_POINT.w} /> : <FigureArm sh={sh} hand={hand} elbow={el} w={SB_POINT.w} coat={p.body ?? palette.brown} W={W * 0.85} seed={`${p.seed}/pt12`} />}
+    </XG>
+  );
+};
+/** The cream rim behind sB's point arm: the sleeve (shoulder -> elbow -> wrist) and the hand blob, `px` screen px out. */
+const SbRim: React.FC<{sh: [number, number]; el: [number, number]; hand: [number, number]; w: number; px?: number}> = ({sh, el, hand, w, px = 1.8}) => {
+  const k = Math.max(1e-4, matScale(useXf()));
+  const r = px / k;
+  const fx = hand[0] - el[0];
+  const fy = hand[1] - el[1];
+  const fL = Math.hypot(fx, fy) || 1;
+  const hc: [number, number] = [hand[0] + (fx / fL) * w * 0.28, hand[1] + (fy / fL) * w * 0.28];
+  const hr = w * 0.44 + r;
+  return (
+    <>
+      <path d={`M${sh[0]} ${sh[1]}L${el[0]} ${el[1]}L${hand[0]} ${hand[1]}`} fill="none" stroke={palette.cream} strokeWidth={w + 2 * r} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={`M${hc[0] - hr} ${hc[1]}a${hr} ${hr} 0 1 0 ${2 * hr} 0a${hr} ${hr} 0 1 0 ${-2 * hr} 0Z`} fill={palette.cream} />
+    </>
+  );
 };
 export const P_CITIZENS: CitizenPlan[] = S01_CITIZENS.map((c) => ({...c, ...(P_OVERRIDES[c.seed] ?? {})}));
 /** R phase: S01's own plans (played backwards by the clock). */
@@ -161,6 +223,21 @@ export const OnlookersP: React.FC = () => (
 export const R_PIP = {...S01_PIP, exitAt: 1e9};
 
 const PIP_FALL = {h: 92, dx: 150} as const;
+/** Fix round 2 (review: 19-29 px / frame on flat ink with no smear, and a 323 px jump from S11's last Pip): 3 short ink
+ *  speed lines trail UP-LEFT behind Pip on every falling frame after the cut (f1-f8, the S03 FR3 smear language), their
+ *  length growing with his speed (~28 -> ~40 px), anchored just behind his back along -velocity; they also lead the eye
+ *  back toward S11's exit point. (x, y) = his feet, (vx, vy) = world px / s. */
+const PipFallSmear: React.FC<{x: number; y: number; vx: number; vy: number; t: number}> = ({x, y, vx, vy, t}) => {
+  if (t < 1 / 30 - 1e-4) return null;
+  const sp = Math.hypot(vx, vy) || 1;
+  const ux = -vx / sp;
+  const uy = -vy / sp; // trailing direction (up-left)
+  const cx = x + ux * 46;
+  const cy = y - 46 + uy * 46; // behind the body centre (stand-side Pip ~92 px tall)
+  const len = clamp((sp / 30) * 1.6, 24, 44);
+  const ang = (Math.atan2(uy, ux) * 180) / Math.PI;
+  return <Ink d={speedLines(cx, cy, {n: 3, len, gap: 15, angle: ang, seed: 's12/pipSpd'})} width={2.4} taper={false} seed="s12/pipSpdI" />;
+};
 /** Pip in the P phase. S11 sends him leaping up-right toward the lens (stand-side, profile facing RIGHT, still rising at
  *  the cut: docs/scenes/S11.md 'Pip hand-off'). The wide picks the leap up just past its apex (B.pipApex < 0: the
  *  first frame is already falling) ~150 px up-left of his bollard (fix round 1: was 40, a near-still hang 425 px from
@@ -183,7 +260,12 @@ export const PipP: React.FC<{t: number}> = ({t}) => {
     const k = clamp(t / land);
     const amount = lerp(0.9, 0.35, E.inQuad(k));
     const rotate = lerp(-10, 8, k);
-    return <Elephant x={x} y={y} scale={1} t={w} seed={S01_PIP_SEED} pose="stand-side" expression="happy" amount={amount} look={0.2} squash={-0.08} rotate={rotate} />;
+    return (
+      <>
+        <PipFallSmear x={x} y={y} vx={PIP_FALL.dx / T} vy={g * dt} t={t} />
+        <Elephant x={x} y={y} scale={1} t={w} seed={S01_PIP_SEED} pose="stand-side" expression="happy" amount={amount} look={0.2} squash={-0.08} rotate={rotate} />
+      </>
+    );
   }
   if (t < sitAt) {
     const d = t - land;
