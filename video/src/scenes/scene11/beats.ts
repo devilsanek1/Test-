@@ -46,10 +46,13 @@ export const ABS = {
   // tape strips pop on the word
   lookNotice: W.if, // Pip looks up at the notice
   snailShell: W.you - 0.08, // the snail's shell is up ON 'you' (its pop lands 2-3 frames after `at`); the bar step owns "can't"
-  barStep: W.cant, // bar 8 % -> 9 %, stalls
+  // A1 polish (review: the % tile's 0.16 s paper flip made the new digit readable ~4 frames after the word): the bar
+  // steps 0.08 s EARLY, so the jump + flash lead the word by 2 frames and the flip unfolds the new digit ON the word
+  barStep: W.cant - 0.08, // bar 8 % -> 9 %, stalls
   snailCrawl: W.update, // the snail crawls onto the sill (slow)
   cornShuffle: W.update + 0.25, // the cornice pigeon's second shuffle: splits the 'update' -> 'yet' gap
-  barBack: W.yet, // bar twitches back 9 % -> 8 %; the ring hiccups
+  barBack: W.yet - 0.08, // bar twitches back 9 % -> 8 % (the 8 unfolds ON 'yet'); the ring hiccups; the page shakes 'no'
+  alert: W.yet - 0.04, // the loader's '!' badge springs onto the ring (its 0.08 s pop lands on the word)
   glanceSun: W.yetEnd + 0.05, // Pip glances from the bar up to the sun
   glyph: W.just - 0.1, // the power glyph inks onto the sun
   press: W.turn, // the sun is PRESSED (SunPress 0.88 + ripple)
@@ -82,9 +85,10 @@ export const ABS = {
   preen: W.supports + 0.25, // a pigeon on the cornice preens; the tag stills
   shrug: W.answer, // GAG: Pip turns toward the sun and does a tiny shrug (0.5 s), then settles facing us (no back view)
   glint: W.to, // the padlock glints; the pigeon on the shutter box hops
-  bitTap: W.toEnd - 0.05, // Bit taps the padlock's shackle
-  strike: W.everything + 0.05, // 'and on again' gets one ink strike-through (0.15 s) on the word (storyboard 51.755: 3 frames
-  // after Bit's tap); the corner flutters after
+  // A1 polish (review: the strike started 0.05 s after the word and Pip's crouch overlapped it): the strike runs ON
+  // 'everything' (51.705-51.855), Bit's tap (a 0.12 s peck) is done just before it, Pip's crouch starts when it ends
+  bitTap: W.everything - 0.14, // Bit taps the padlock's shackle (the peck ends 51.685, the strike starts 51.705)
+  strike: W.everything, // 'and on again' gets one ink strike-through (0.15 s) ON the word; the corner flutters after
   pipOut: W.everythingEnd + 0.05, // Pip hops off the sill toward the lens; the snail peeks out
   tagSway: SCENE.end - 0.1, // the tag sways
   pigeonFly: 51.99, // the box pigeon crouches and takes off up-left (whole bird, flapping) with the tag sway: clear of the box by
