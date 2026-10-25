@@ -44,6 +44,8 @@ export type PlateFaceProps = {
   offset?: [number, number] | false;
   /** Screw dots (default true). */
   screws?: boolean;
+  /** A1 FR2: override the old plate's fill (the far flips' 1-frame dark landing pop). */
+  oldFill?: string;
 };
 
 /** The plate face nodes (draw inside the plate's transform). */
@@ -51,7 +53,7 @@ export function plateFace(p: PlateFaceProps): React.ReactNode[] {
   const {old, W, seed} = p;
   const out: React.ReactNode[] = [];
   if (old) {
-    out.push(<Fill key="plate" d={polyPath(OLD_OUTLINE)} color={PLATE.oldFill} offset={p.offset ?? [2.4, 1.8]} seed={`${seed}/plate`} />);
+    out.push(<Fill key="plate" d={polyPath(OLD_OUTLINE)} color={p.oldFill ?? PLATE.oldFill} offset={p.offset ?? [2.4, 1.8]} seed={`${seed}/plate`} />);
     out.push(<Fill key="flap" d={polyPath(FLAP)} color={PLATE.oldBack} offset={false} mode="snap" seed={`${seed}/flap`} />);
     out.push(<Ink key="plateI" d={polyPath(OLD_OUTLINE) + polyPath(FLAP)} width={W} seed={`${seed}/pi`} />);
     out.push(<Ink key="crack" d={CRACK} width={W * 0.75} taper={false} seed={`${seed}/cr`} />);
@@ -69,7 +71,7 @@ export function plateFace(p: PlateFaceProps): React.ReactNode[] {
   const wob = p.wob ?? 0;
   out.push(
     <XG key="emb" m={mat.about(mat.rotate(wob * 0.5), 37.7 * (es / 100), 29.2 * (es / 100))}>
-      <ElephantEmblem size={es} y={old ? 4 : 3} bg={old ? PLATE.oldFill : PLATE.newFill} color={old ? PLATE.oldLine : palette.ink} style={old ? 'old' : 'modern'} seed={`${seed}/e`} ink={W * 0.8} cane={old && p.cane} caneAt={p.caneAt} lean={(p.lean ?? 0) + wob} />
+      <ElephantEmblem size={es} y={old ? 4 : 3} bg={old ? (p.oldFill ?? PLATE.oldFill) : PLATE.newFill} color={old ? PLATE.oldLine : palette.ink} style={old ? 'old' : 'modern'} seed={`${seed}/e`} ink={W * 0.8} cane={old && p.cane} caneAt={p.caneAt} lean={(p.lean ?? 0) + wob} />
     </XG>,
   );
   return out;

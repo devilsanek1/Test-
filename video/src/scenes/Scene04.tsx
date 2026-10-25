@@ -25,6 +25,8 @@
 import React from 'react';
 import {World, useScene, useTime, skies} from '../lib';
 import {Sun} from '../lib/Sun';
+import type {SunHop} from '../lib/Sun';
+import {GLIDE, sunGlideOffset} from './scene03/sunglide';
 import {ease as E, lerp, prog, springAt, springs} from '../lib/time';
 import {mat, XG} from '../lib/xf';
 import {Ink} from '../lib/Ink';
@@ -148,18 +150,16 @@ function bandState(cam: Cam, on: boolean, cap = Infinity): BandState {
  *  roofline. The bend is a cubic Hermite offset added to the hop (zero at the cut with zero slope, so position and
  *  velocity match S03; its end slope `land` cancels most of the hop's sideways speed at the touch-down: the disc lands
  *  moving ~4 px / frame, not 18). Screen px. */
-const SUN_LAND = {touch: [990, 668] as [number, number], land: [-413, 39] as [number, number], slide: 0.26, delay: 1 / 30};
-/** The sun's screen offset from S03's hop path at scene time t (the hop lands at SUN_SLOT on 'This'). */
-function sunOffset(t: number, touchAt: number): [number, number] {
+const SUN_LAND = {touch: GLIDE.touch, slide: 0.26, delay: 1 / 30};
+/** The sun's screen offset from S03's hop path at scene time t (the hop lands at SUN_SLOT on 'This'; `abs` = film
+ *  time). Cut S03|S04 pass: until the touch-down the centre runs on the glide path S03 and S04 share
+ *  (scene03/sunglide.ts: S03's slot -> (810, 680) on the cut -> SUN_LAND.touch on 'This', touching down at ~4 px / frame
+ *  as before), one speed bell through the cut; it replaces S04's own Hermite bend, which was zero-slope at the cut and so
+ *  kicked the disc from ~18 to ~34 px / frame in the first three frames of the shot. */
+function sunOffset(t: number, abs: number, touchAt: number, hops: SunHop[]): [number, number] {
   const dx = SUN_LAND.touch[0] - SUN_SLOT[0];
   const dy = SUN_LAND.touch[1] - SUN_SLOT[1];
-  if (t <= 0) return [0, 0];
-  if (t <= touchAt) {
-    const u = t / touchAt;
-    const h01 = 3 * u * u - 2 * u * u * u;
-    const h11 = u * u * u - u * u;
-    return [dx * h01 + touchAt * SUN_LAND.land[0] * h11, dy * h01 + touchAt * SUN_LAND.land[1] * h11];
-  }
+  if (t <= touchAt) return sunGlideOffset(abs, t, hops);
   const e = prog(t, touchAt + SUN_LAND.delay, SUN_LAND.slide, E.inOutSine);
   return [dx * (1 - e), dy * (1 - e) + SUN_SINK * e];
 }
@@ -202,9 +202,9 @@ const Scene04: React.FC = () => {
   // object stays whole on the cut), behind them from the touch-down frame, where nothing overlaps the disc. Both copies
   // sit in FRONT of the far towers (drawn after the far layer) and BEHIND the wire and the near layer (the front copy is
   // drawn at the start of the near layer), so neither the towers nor the wire ever change sides of the disc.
-  const sunHops = [{t: b.sunTakeOff, to: SUN_SLOT, h: 15, air: b.this - b.sunTakeOff}];
+  const sunHops: SunHop[] = [{t: b.sunTakeOff, to: SUN_SLOT, h: 15, air: b.this - b.sunTakeOff}];
   const sunFront = t < b.this;
-  const [sox, soy] = sunOffset(t, b.this);
+  const [sox, soy] = sunOffset(t, t + start, b.this, sunHops);
   const sun = (
     <XG m={mat.inv(M)}>
       <XG m={mat.translate(sox, soy)}>

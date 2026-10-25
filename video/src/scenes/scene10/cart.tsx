@@ -124,8 +124,8 @@ function tossPos(t: number, t0: number, t1: number, a: Pt, b: Pt, h: number): {p
 /** The high lob as a cubic Bezier (steep launch from the raised hand, apex over siteM's plaque, a falling approach onto
  *  siteR's), walked at an even speed (arc-length table): `at(s)` for s = 0..1 of the path length. */
 function lobPath(a: Pt, b: Pt): (s: number) => Pt {
-  const c1: Pt = [a[0] - 45, a[1] - LOB.rise];
-  const c2: Pt = [b[0] - 51, b[1] - LOB.fall];
+  const c1: Pt = [a[0] + LOB.d1, a[1] - LOB.rise];
+  const c2: Pt = [b[0] + LOB.d2, b[1] - LOB.fall];
   const bz = (u: number): Pt => {
     const v = 1 - u;
     const k0 = v * v * v;
@@ -153,11 +153,16 @@ function lobPath(a: Pt, b: Pt): (s: number) => Pt {
     return bz(us[i - 1] + (us[i] - us[i - 1]) * f);
   };
 }
-/** The high lob's Bezier handles (A1 FR1, with the 1.2x plaques, the tags beside the plates and the cart line at 1435):
- *  up from the hand over his head (x 439) leaning left, over siteM's plaque, down beside siteR's. Measured on the path
- *  (tag centre to obstacle box): 38 px clear of Bit, 66 px of the plate face, 61 px of the bracket, apex 928; 760 px
- *  long = 48 px / frame over the 0.53 s flight (the dashed trail carries it). */
-export const LOB = {rise: 430, fall: 220};
+/** The high lob's Bezier handles: up from the hand over his head (x 433) leaning left, over siteM's plaque, down beside
+ *  siteR's (c1 = hand + (d1, -rise), c2 = landing + (d2, -fall)). */
+/** A1 FR2 (the skip gets its own beat): the lob leaves 0.15 s later (supported - 0.49, 0.43 s flight, was 0.53) on a
+ *  flatter, shorter Bezier (apex 968, was 928; 711 px, was 765): 12 / 28 / 39 px box-to-box clear of Bit / the bracket /
+ *  the plate face (tag box incl. its knockout rim), 55 px / frame world (58 on screen) with the dashed trail; it crosses
+ *  siteM's plate (x 590) at 51 % of its length = toss2 + 0.22 (beats.ts skipNudge). The path can't be shorter: it has to
+ *  climb past Bit 70 px right of the raised hand. */
+export const LOB = {rise: 420, fall: 120, d1: -60, d2: -150};
+/** Where the lob crosses x 590 (siteM's plate), as a fraction of the flight. */
+export const LOB_SKIP_FRAC = 0.513;
 
 export type CartProps = {
   T: CartTimes;
@@ -264,7 +269,9 @@ function makerGait(t: number, T: CartTimes, xm: number): string | undefined {
 
 /** The FixSign pinned flat on the cart's side: lettering size, card width, its x offset from the cart centre, and the card
  *  bottom (world y, 3 px into the bed plank). */
-export const CART_SIGN = {fs: 19, w: 102, dx: 2, bottom: CART.y - 60 * CS + 3};
+/** A1 FR2 (one FixSign across the film): the card keeps S09's J5 proportions exactly (w = 274 / 44 fs, ink 2.2 = S09's
+ *  SI.far, one line 'still fixing...' struck + 'fixed!'): fs 18 / w 112 (was 19 / 102, a narrower card than S09's). */
+export const CART_SIGN = {fs: 18, w: (18 * 274) / 44, dx: 2, bottom: CART.y - 60 * CS + 3};
 
 /** The cart, its maker, his throwing arms, the satchel and the sign card. Scene10 draws it in the 'sign' layer, after
  *  the stoops and the hanging plaques and before the A-frame (it walks out from behind the board). */

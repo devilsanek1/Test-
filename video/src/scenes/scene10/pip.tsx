@@ -6,10 +6,17 @@
 import React from 'react';
 import {Elephant, ElephantTimeline, hop, popSwitch} from '../../lib/mascot';
 import type {PoseKey} from '../../lib/mascot';
-import {useTime, prog, ease as E} from '../../lib/time';
+import {useTime, prog, ease as E, springAt, springs} from '../../lib/time';
+import {palette} from '../../lib/theme';
 import {Ink} from '../../lib/Ink';
-import {speedLines} from '../../lib/sketch';
+import {Fill} from '../../lib/Fill';
+import {mat, XG} from '../../lib/xf';
+import {circle, speedLines} from '../../lib/sketch';
 import type {Pt} from '../../lib/sketch';
+
+/** The trunk tip in the 'hey!' pose (world; measured on the render, see HEY_TIP). */
+const HEY_TIP_X = 651;
+const HEY_TIP_Y = 1312;
 
 export const PIP = {scale: 1.2, seed: 10, perch: [700, 1450] as [number, number], exitTo: [1185, 1360] as [number, number]};
 
@@ -27,8 +34,10 @@ export type PipTimes = {
   /** Optional: glances up at the far row's plates flipping, then back down at the web. */
   lookFar?: number;
   lookWeb?: number;
-  /** Optional: turns to the cart stepping out from behind the A-frame on the left. */
+  /** Optional: turns to the cart stepping out from behind the A-frame on the left (side-on, facing left) and HOLDS that
+   *  silhouette until the 'hey!' (A1 FR2: the pop back to the back view on the lob, 0.23 s later, read as a flicker). */
   lookCart?: number;
+  /** Optional: the lob sails over siteM's plate: he tips back (+6 deg, looking up after it) inside the side-on pose. */
   lookLob?: number;
   hey: number;
   /** The 'hey' spark retracts by here (default heyEnd): before the cart rolls behind him. */
@@ -106,14 +115,25 @@ function perkStretch(t: number, at: number): number {
   return -0.1 * Math.exp(-e * 10) * Math.cos(e * Math.PI * 2 * 3);
 }
 
-/** Where his trunk tip is in the mirrored 'hold' pose leaning 13 deg (world, measured on the render): the 'hey' spark
- *  radiates from here at the plaque. */
-const HEY_TIP: Pt = [638, 1338];
-/** A1 FR1: the spark is aimed ALONG the line from his trunk tip to siteM's old plate (its centre (590, 1144) is at
- *  -103 deg from the tip), three strokes fanned +-22 deg, 18 px long (r 16 -> 34 from the tip), 3.4 px ink: on the cream
- *  wall right of siteM's door. */
-const HEY_ANGLES = [-125, -103, -81];
-const HEY_R: [number, number] = [16, 34];
+/** Where his trunk tip is in the mirrored 'trunk-up' pose leaning HEY_LEAN (world, measured on the render): the 'hey'
+ *  spark radiates from here at the plaque. */
+const HEY_TIP: Pt = [HEY_TIP_X, HEY_TIP_Y];
+/** A1 FR2: the spark is aimed ALONG the line from his trunk tip to siteM's old plate (centre (590, 1144)), three strokes
+ *  fanned +-24 deg, 32 px long (r 18 -> 50 from the tip), 5 px ink (A1 FR1's 18 px / 3.4 px vanished at phone size). */
+const HEY_DIR = (Math.atan2(1144 - HEY_TIP_Y, 590 - HEY_TIP_X) * 180) / Math.PI;
+const HEY_ANGLES = [HEY_DIR - 24, HEY_DIR, HEY_DIR + 24];
+const HEY_R: [number, number] = [14, 46];
+/** The 'hey!' lean (deg, - = the top leans left toward the plate). */
+const HEY_LEAN = -10;
+/** The 'hey!' STAMP (A1 FR2): squash 0.90 for one frame on the beat, stretch 1.08, settle, over 0.12 s (it replaces the
+ *  pose-switch pop): an alarm, not a happy look-up. */
+function heyStamp(t: number, at: number): number {
+  const d = t - at;
+  if (d < 0 || d >= 0.12) return 0;
+  if (d < 1 / 30) return 0.1;
+  if (d < 2.2 / 30) return -0.08;
+  return -0.08 * (1 - E.outCubic((d - 2.2 / 30) / (0.12 - 2.2 / 30)));
+}
 
 /** The 'hey' spark: three short ink emanata from the trunk tip toward siteM's plaque (up-left), drawn on in a stagger and
  *  retracted from their inner ends before Pip settles (no fade). */
@@ -130,7 +150,27 @@ const HeySpark: React.FC<{at: number; end: number}> = ({at, end}) => {
     if (r1 - r0 < 1) return;
     d += `M${(HEY_TIP[0] + Math.cos(a) * r0).toFixed(1)} ${(HEY_TIP[1] + Math.sin(a) * r0).toFixed(1)}L${(HEY_TIP[0] + Math.cos(a) * r1).toFixed(1)} ${(HEY_TIP[1] + Math.sin(a) * r1).toFixed(1)}`;
   });
-  return d ? <Ink d={d} width={3.4} taper={false} vary={0} seed="s10/hey" /> : null;
+  return d ? <Ink d={d} width={5} taper={false} vary={0} seed="s10/hey" /> : null;
+};
+
+/** A1 FR2: a small peach '!' bubble between his trunk and the skipped plate (screen ~(598, 1240), on siteM's cream wall
+ *  right of the door), its tail toward him: pops with the stamp (spring), holds, shrinks out with the spark (no fade). */
+const BUBBLE = {x: 595, y: 1247, r: 21};
+const HeyBubble: React.FC<{at: number; end: number}> = ({at, end}) => {
+  const t = useTime();
+  if (t < at || t >= end) return null;
+  const k = Math.min(springAt(t, at, springs.pop), 1 - E.inCubic(prog(t, end - 0.1, 0.1)));
+  if (k <= 0.02) return null;
+  const {x, y, r} = BUBBLE;
+  const tail = `M${x + r * 0.45} ${y + r * 0.78}L${x + r * 1.35} ${y + r * 1.5}L${x + r * 0.85} ${y + r * 0.4}Z`;
+  return (
+    <XG m={mat.about(mat.scale(k), x + r * 1.2, y + r * 1.4)}>
+      <Fill d={tail + circle(x, y, r, {seed: 's10/heyb'})} color={palette.peach} offset={false} mode="none" seed="s10/heyb" />
+      <Ink d={circle(x, y, r, {seed: 's10/heybi'}) + `M${x + r * 0.5} ${y + r * 0.86}L${x + r * 1.35} ${y + r * 1.5}L${x + r * 0.88} ${y + r * 0.48}`} width={3.4} taper={false} seed="s10/heybi" />
+      <Ink d={`M${x + 0.5} ${y - 11}L${x} ${y + 3}`} width={4.6} taper={false} vary={0} seed="s10/heyx" />
+      <Fill d={circle(x, y + 10, 2.9, {seed: 's10/heyd'})} color={palette.ink} offset={false} mode="none" seed="s10/heyd" />
+    </XG>
+  );
 };
 
 export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
@@ -201,35 +241,37 @@ export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
     ...(T.lookFar !== undefined ? [{t: T.lookFar, pose: 'sit-back' as const, look: -0.15}] : []),
     ...(T.lookWeb !== undefined ? [{t: T.lookWeb, pose: 'sit-back' as const, look: -0.9}] : []),
     ...(T.lookCart !== undefined ? [{t: T.lookCart, pose: 'stand-side' as const, look: 0.2, amount: 0.15}] : []),
-    ...(T.lookLob !== undefined ? [{t: T.lookLob, pose: 'sit-back' as const, look: 0.45}] : []),
-    // GAG: mirrored 'hold' (no prop): the trunk curls up-left AT siteM's plaque, the head turned toward it (look 1
-    // before the mirror), wide eyes
-    {t: T.hey, pose: 'hold', expression: 'wide', look: 1},
+    // GAG (A1 FR2): mirrored 'trunk-up' (mouth open, trumpet marks, ears spread), wide eyes: the trunk raised and curled
+    // up-left AT siteM's plaque (A1 FR1's mirrored 'hold' kept the closed smile + blush and read as a happy look-up)
+    {t: T.hey, pose: 'trunk-up', expression: 'wide', look: 1},
     // straight from the 'hey' into the hop's own pose (side-on, facing right): its crouch frames come right before the
     // take-off, so the exit has exactly ONE pose pop (fix round 2: no 3-frame back-view flicker)
     {t: T.heyEnd, pose: 'stand-side', look: 0.3},
   ];
   const heyOn = t >= T.hey && t < T.heyEnd;
-  const cartOn = T.lookCart !== undefined && t >= T.lookCart && t < (T.lookLob ?? T.hey);
+  const cartOn = T.lookCart !== undefined && t >= T.lookCart && t < T.hey;
   const rot = rotAt(t, [
     [T.perk, -6],
     [T.lookPlaque, -10],
     ...(T.lookFar !== undefined ? ([[T.lookFar, -4]] as [number, number][]) : []),
     ...(T.lookWeb !== undefined ? ([[T.lookWeb, -8]] as [number, number][]) : []),
     ...(T.lookCart !== undefined ? ([[T.lookCart, -3]] as [number, number][]) : []),
-    ...(T.lookLob !== undefined ? ([[T.lookLob, 4]] as [number, number][]) : []),
-    [T.hey, -13],
+    ...(T.lookLob !== undefined ? ([[T.lookLob, 6]] as [number, number][]) : []),
+    [T.hey, HEY_LEAN],
     [T.heyEnd, 0],
   ]);
   // the perk replaces its pose-pop dip with the stretch pop
   const perk = perkStretch(t, T.perk) - popSwitch(t, T.perk);
+  // the 'hey!' stamp replaces its pose-switch pop
+  const stamp = heyStamp(t, T.hey) - popSwitch(t, T.hey);
   // the leap's speed lines retract over the 2 frames after touch-down
   const vLand = leapV(CROUCH + ARC - 1e-3, T);
   return (
     <>
       {dl >= 0 && dl < 2 / 30 ? <PipSmear x={px} y={py} vx={vLand[0]} vy={vLand[1]} sc={PIP.scale} k={1 - dl / (2 / 30)} seed="s10/pipLeapSpd" /> : null}
-      <ElephantTimeline x={px} y={py} scale={PIP.scale} t={t} seed={PIP.seed} keys={keys} flip={heyOn || cartOn} rotate={rot} squash={land + crouch.squash + perk} idle={0.25} />
+      <ElephantTimeline x={px} y={py} scale={PIP.scale} t={t} seed={PIP.seed} keys={keys} flip={heyOn || cartOn} rotate={rot} squash={land + crouch.squash + perk + stamp} idle={0.25} />
       <HeySpark at={T.hey + 0.04} end={T.sparkEnd ?? T.heyEnd} />
+      <HeyBubble at={T.hey + 0.06} end={(T.sparkEnd ?? T.heyEnd) + 0.08} />
     </>
   );
 };

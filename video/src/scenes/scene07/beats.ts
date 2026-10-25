@@ -24,7 +24,7 @@ export const SCENE = {start: 21.985, end: 24.095};
 /** Absolute beat times (storyboard S07 beats; leads per ENGINE rule 5 already applied by the storyboard). */
 export const ABS = {
   cut: 21.985, // lens wipe centre (foreground-wipe window cut -0.21 .. +0.21)
-  pinPip: W.word - 0.05, // 22.105: the pin dot pops on the notice; Pip lands on the board top
+  pinPip: W.word - 0.05, // 22.105: the notice's pin (its dot pops one frame before S07_PIN); Pip lands 0.03 s later (PIP.landLag, 22.135)
   label: W.word + 0.1, // 22.255: L7 tag pops on the board's bottom rail, on the storyboard's w73+0.10 (fix round 3: back from
   // +0.23; the pen now inks the board frame and legs by ~0.25 local, reveal.tsx; the card pops from 20 %, Scene07 L7)
   got: W.got, // 22.505: the address-bar rail lights; two clones pop

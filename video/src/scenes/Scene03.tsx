@@ -30,6 +30,7 @@ import {CardKnock, GroundS03} from './scene03/ground';
 import {TitleCard} from './scene03/card';
 import {StampS03} from './scene03/stamp';
 import {BitOnSign, FarCrowd, NearWalkers, PipS03, PipShadow, StreetLife} from './scene03/cast';
+import {sunGlideOffset} from './scene03/sunglide';
 
 // ---------------------------------------------------------------- labels (final_script section 6)
 
@@ -55,7 +56,6 @@ const BLANK: SideId[] = S03_BLANK; // L3, R4, L5: the screens go dark on 'ten' (
 /** The sun's rest slot relative to S02's / S04's (690, 700) (A1 fix round 1), and S02's drift speed on the cut (px/s). */
 const SUN_SLOT_OFF: [number, number] = [22, -10];
 const SUN_DRIFT_IN = 6;
-const smoothstep = (u: number) => u * u * (3 - 2 * u);
 
 function tables(b: Beats) {
   const pressAt = b.popUp;
@@ -116,11 +116,11 @@ const Scene03: React.FC = () => {
   // near-misses that flatten depth): the sun SETTLES into a slot 22 px right and 10 px up, SUN_SLOT_OFF from S02's
   // (690, 700). It arrives on the cut at (690, 700) still drifting right at S02's 6 px/s and eases into the slot by the
   // camera's lock ('everyone', a cubic Hermite: velocity-continuous at both ends, peak ~16 px/s); with R4 one storey
-  // lower the disc clears the press roof by ~38 px and R3's roof corner by ~36. The hop is S04's own curve (from (690,
-  // 700), the same `hops`) plus the slot offset blended out by the cut (smoothstep over the hop's first half: zero
-  // velocity change at take-off and at the cut), so the sun is mid-air at (810, 680) on the cut, exactly where S04
-  // picks it up, with S04's velocity.
+  // lower the disc clears the press roof by ~38 px and R3's roof corner by ~36. From the take-off (end(it)) its centre
+  // runs on the glide path S03 and S04 share (scene03/sunglide.ts, cut S03|S04 pass), mid-air at (810, 680) on the
+  // cut; the Sun's own hop key still gives the anticipation squash and the stretch.
   const settle = local(W.everyone, start);
+  const sunHops = [{t: b.sunHop, to: [930, 690] as [number, number], h: 15, air: sunHopAir}];
   const sunOff = (() => {
     if (t < settle) {
       // Hermite from 0 (velocity S02's drift, (6, 0) px/s) to SUN_SLOT_OFF (velocity 0) over [0, settle]
@@ -129,12 +129,15 @@ const Scene03: React.FC = () => {
       const h01 = -2 * u * u * u + 3 * u * u;
       return [SUN_DRIFT_IN * settle * h10 + SUN_SLOT_OFF[0] * h01, SUN_SLOT_OFF[1] * h01];
     }
-    const s = 1 - smoothstep(clamp((t - b.sunHop) / (sunHopAir / 2)));
-    return [SUN_SLOT_OFF[0] * s, SUN_SLOT_OFF[1] * s];
-  })();
+    if (t < b.sunHop) return SUN_SLOT_OFF;
+    // cut S03|S04 (phase B): from the take-off the centre runs on the ONE glide path both scenes share
+    // (scene03/sunglide.ts: from the slot through (810, 680) on the cut to S04's touch-down), so its speed is one bell
+    // through the cut (was: a dip to 12.5 px / frame here, then a kick to 34 in S04's first frames)
+    return sunGlideOffset(t + start, t, sunHops);
+  })() as [number, number];
   const sun = (
     <XG m={mat.compose(mat.inv(M), mat.translate(sunOff[0], sunOff[1]))}>
-      <Sun cx={690} cy={700} r={110} drift={[0, 0]} hops={[{t: b.sunHop, to: [930, 690], h: 15, air: sunHopAir}]}>
+      <Sun cx={690} cy={700} r={110} drift={[0, 0]} hops={sunHops}>
         {pie}
       </Sun>
     </XG>

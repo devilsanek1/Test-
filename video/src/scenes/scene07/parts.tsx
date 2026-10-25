@@ -8,7 +8,8 @@ import {canvas, ease as E, Fill, Ink, lerp, mat, Mat, MOTION, osc, palette, prog
 import {Elephant, hop} from '../../lib/mascot';
 import {rand, rng} from '../../lib/rng';
 import {Bird} from '../../lib/kit';
-import {Bit, DEPTH_INK, LeakSheet, MarkRing, misregScreen, pendulum} from '../shared/props';
+import {Bit, DEPTH_INK, Lock, MarkRing, misregScreen, pendulum} from '../shared/props';
+import type {Depth} from '../shared/props';
 import {measureCaption, useCaptionFont} from '../../lib/font';
 import type {PaneRect} from '../shared/props';
 import {glintAt, GroundMarks, HALF, SI, wireAt, WIRES} from '../shared/sets';
@@ -73,6 +74,11 @@ export type WireCopySpec = {
    *  5 + 1.5 sin(t8 x 5.3 + rand(seed, 'p') x 6), t8 = t - t0): equal angle and angular speed on the cut (fix round 1:
    *  a 3 deg lean mismatch shifted a sheet ~2.5 px on the cut frame). */
   leanTo?: {seed: string; t0: number};
+  /** A1 fix round 2: the ringed Bit doodle draws on at doodleAt (its ring 0.1 s later) so the copy matches S08's LeakSheet
+   *  copies on the cut; undefined = no doodle. `lockAt`: the lock sketch draws on in flight (a copy peeled off a small
+   *  clone, which has no sketch); undefined = drawn. */
+  doodleAt?: number;
+  lockAt?: number;
   seed: string;
 };
 
@@ -142,15 +148,67 @@ export const WireCopy: React.FC<{c: WireCopySpec}> = ({c}) => {
   const sq = pegged ? 1 - 0.12 * Math.exp(-(t - c.pegAt) * 22) : 1;
   return (
     <XG m={mat.compose(mat.translate(pt[0], pt[1]), mat.rotate(rot), mat.scale(1, sq))}>
-      <LeakSheet x={0} y={hang} w={COPY.w} h={COPY.h} scale={s} peg={pegged} pin={false} depth="far" seed={c.seed} />
+      <CopySheet x={0} y={hang} w={COPY.w} h={COPY.h} scale={s} peg={pegged} pin={false} depth="far" doodle={c.doodleAt === undefined ? false : {bitAt: c.doodleAt, ringAt: c.doodleAt + 0.1}} lockAt={c.lockAt} seed={c.seed} />
       {c.bit ? <Bit x={9} y={-0.5} size={18} state="ride" flip look="forward" hopAt={c.bitHopAt} seed={`${c.seed}/bit`} /> : null}
     </XG>
   );
 };
 
+// ---------------------------------------------------------------- the copies' sheet (A1 fix round 2)
+// The rewatch game is 'two Bits in one shot: the drawing and the real one'. Every clone and copy carried the kit
+// LeakSheet's ringed Bit doodle (~15 drawn Bits on screen at 'the fix was ready', a field of identical circles; the live
+// Bit, 19 px on wire copy 2, got lost among them). Only the ORIGINAL pinned notice keeps the ringed doodle now; clones,
+// the flyer and the phone copy are the heading bar, the rules and the lock sketch. The four wire copies get the doodle
+// back during the tilt (drawn on, 1.75-2.05 s, while the frame moves ~26 px a frame), so they hand S08 the same
+// LeakSheet copies on the cut.
+
+/** The kit LeakSheet's drawing (same geometry, seeds and misregistration) with the Bit doodle optional: `doodle` false =
+ *  none; {bitAt, ringAt} = the doodle and its ring drawn on at those times (undefined = drawn). `lockAt` draws the lock
+ *  sketch on (undefined = drawn). */
+export const CopySheet: React.FC<{x: number; y: number; w?: number; h?: number; rot?: number; scale?: number; peg?: boolean; pin?: boolean; depth?: Depth; doodle?: false | {bitAt?: number; ringAt?: number}; lockAt?: number; seed: string}> = ({x, y, w = 210, h = 270, rot = 0, scale = 1, peg = false, pin = true, depth = 'far', doodle = false, lockAt, seed}) => {
+  const t = useTime();
+  const s = scale;
+  const iw = DEPTH_INK[depth] / s;
+  const f = Math.min(w, h) * 0.15;
+  const pts: Pt[] = [
+    [-w / 2, -h / 2],
+    [w / 2 - f, -h / 2],
+    [w / 2, -h / 2 + f],
+    [w / 2, h / 2],
+    [-w / 2, h / 2],
+  ];
+  const off = misregScreen(seed);
+  const small = w * s < 70;
+  const dd = doodle === false ? null : doodle;
+  const bitOn = !!dd && (dd.bitAt === undefined || t >= dd.bitAt);
+  const ringOn = !!dd && (dd.ringAt === undefined || t >= dd.ringAt);
+  return (
+    <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(s))}>
+      <Fill d={polyPath(pts)} color={palette.white} offset={[off[0] / s, off[1] / s]} seed={`${seed}/f`} />
+      <Fill d={polyPath([[w / 2 - f, -h / 2], [w / 2 - f, -h / 2 + f], [w / 2, -h / 2 + f]])} color={palette.sand} offset={false} seed={`${seed}/ear`} />
+      <Ink d={poly(pts, {closed: true, seed: `${seed}/o`, over: 2.5})} width={iw} seed={`${seed}/o`} />
+      <Ink d={`M${w / 2 - f} ${-h / 2}L${w / 2 - f + 1} ${-h / 2 + f}L${w / 2} ${-h / 2 + f}`} width={iw * 0.8} seed={`${seed}/eo`} />
+      <Ink d={hline(-w * 0.36, -w * 0.02, -h * 0.33, {over: 0, seed: `${seed}/hd`})} width={iw * 1.8} seed={`${seed}/hd`} />
+      {!small ? <Ink d={hline(-w * 0.36, w * 0.22, -h * 0.26, {over: 0, seed: `${seed}/l1`}) + hline(-w * 0.36, w * 0.1, -h * 0.205, {over: 0, seed: `${seed}/l2`})} width={iw * 0.7} seed={`${seed}/tl`} /> : null}
+      <Lock x={-w * 0.12} y={h * 0.12} size={h * 0.4} state="sketch" at={lockAt} ink={iw * 0.9} seed={`${seed}/lk`} />
+      {bitOn && dd ? <Bit x={w * 0.25} y={h * 0.27} size={w * 0.2} state="doodle" at={dd.bitAt} seed={`${seed}/bit`} /> : null}
+      {ringOn && dd ? <MarkRing x={w * 0.25} y={h * 0.22} r={w * 0.17} at={dd.ringAt} width={iw * 1.2} seed={`${seed}/ring`} /> : null}
+      {pin && !peg ? <Fill d={blob(0, -h / 2 + h * 0.06, Math.max(2.5, 5 / s / 2) * 1.2, Math.max(2.5, 5 / s / 2) * 1.2, {seed: `${seed}/pin`})} color={palette.ink} mode="snap" offset={false} seed={`${seed}/pin`} /> : null}
+      {peg
+        ? [-0.3, 0.3].map((px, i) => (
+            <g key={i}>
+              <Fill d={polyPath([[w * px - 4, -h / 2 - 10], [w * px + 4, -h / 2 - 10], [w * px + 3, -h / 2 + 14], [w * px - 3, -h / 2 + 14]])} color={palette.brown} offset={false} seed={`${seed}/pg${i}`} />
+              <Ink d={`M${w * px - 4} ${-h / 2 - 10}L${w * px - 3} ${-h / 2 + 14}M${w * px + 4} ${-h / 2 - 10}L${w * px + 3} ${-h / 2 + 14}`} width={iw * 0.8} seed={`${seed}/pgi${i}`} order="all" />
+            </g>
+          ))
+        : null}
+    </XG>
+  );
+};
+
 // ---------------------------------------------------------------- board clones (level of detail)
-// Below s 0.85 a clone is the paper, its heading bar, two rules and the ringed Bit doodle: no lock sketch (at phone size
-// the sketch is grey hairline noise). A clone with `liftAt` hides on that frame: its wire copy flies on from its place.
+// Below s 0.85 a clone is the paper, its heading bar and two rules: no lock sketch (at phone size the sketch is grey
+// hairline noise). A1 fix round 2: no clone carries the ringed Bit doodle (only the pinned notice does, see CopySheet). A clone with `liftAt` hides on that frame: its wire copy flies on from its place.
 
 export type CloneSpot = {x: number; y: number; at: number; rot: number; s: number; liftAt?: number};
 
@@ -173,8 +231,6 @@ const LiteSheet: React.FC<{x: number; y: number; w: number; h: number; rot: numb
       <Ink d={`M${w / 2 - f} ${-h / 2}L${w / 2 - f + 1} ${-h / 2 + f}L${w / 2} ${-h / 2 + f}`} width={iw * 0.8} seed={`${seed}/eo`} />
       <Ink d={hline(-w * 0.36, w * 0.04, -h * 0.3, {over: 0, seed: `${seed}/hd`})} width={iw * 2.1} seed={`${seed}/hd`} />
       <Ink d={hline(-w * 0.36, w * 0.22, -h * 0.17, {over: 0, seed: `${seed}/l1`}) + hline(-w * 0.36, w * 0.06, -h * 0.07, {over: 0, seed: `${seed}/l2`})} width={iw * 0.9} seed={`${seed}/tl`} />
-      <Bit x={w * 0.12} y={h * 0.27} size={w * 0.26} state="doodle" seed={`${seed}/bit`} />
-      <MarkRing x={w * 0.12} y={h * 0.21} r={w * 0.21} width={iw * 1.3} seed={`${seed}/ring`} />
     </XG>
   );
 };
@@ -194,7 +250,7 @@ export const BoardClones: React.FC<{spots: CloneSpot[]; seed: string}> = ({spots
         return (
           <XG key={i} m={mat.about(mat.scale(k), sp.x, sp.y)}>
             {sp.s >= 0.85 ? (
-              <LeakSheet x={sp.x} y={sp.y} w={CLONE.w} h={CLONE.h} rot={sp.rot} scale={sp.s} seed={`${seed}/${i}`} />
+              <CopySheet x={sp.x} y={sp.y} w={CLONE.w} h={CLONE.h} rot={sp.rot} scale={sp.s} seed={`${seed}/${i}`} />
             ) : (
               <LiteSheet x={sp.x} y={sp.y} w={CLONE.w} h={CLONE.h} rot={sp.rot} s={sp.s} seed={`${seed}/${i}`} />
             )}
@@ -329,7 +385,7 @@ export const Flyer: React.FC<{B: Beats; from: Pt}> = ({B, from}) => {
   }
   return (
     <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(s * sx, s * sy))}>
-      <LeakSheet x={0} y={0} w={64} h={82} pin={false} depth="mid" seed="s7flyer" />
+      <CopySheet x={0} y={0} w={64} h={82} pin={false} depth="mid" seed="s7flyer" />
     </XG>
   );
 };
@@ -374,6 +430,35 @@ export const StillUnderline: React.FC<{x: number; y: number; fs: number; at: num
   );
 };
 
+// ---------------------------------------------------------------- L7's pin and corner (A1 fix round 2)
+// The kit LabelTag card puts its pin at its pivot, 0.22 em under the top edge: on L7 it sat right above the 'le' of
+// 'leaked' and read as a diacritic. L7 stays the shared LabelTag (tilted -1.8 deg); this overlay rides the card's own
+// transform (rotation + pop + swing about that pivot: the kit maths): a paper-cream patch over the kit pin, the pin moved
+// ONTO the top edge near its left (r 6, a cream glint) and one overshooting corner (the top edge and the right edge run
+// on past the top-right corner, the hand-made finish of the FixSign card). The kit's ~3 px misregistered fill stays.
+
+export const L7Pin: React.FC<{box: [number, number, number, number]; fs: number; rot: number; at: number; seed: string}> = ({box, fs, rot, at, seed}) => {
+  const t = useTime();
+  if (t < at) return null;
+  const [x0, y0, x1, y1] = box;
+  const cx = (x0 + x1) / 2;
+  const pv: Pt = [cx, y0 + fs * 0.22]; // the kit card's pivot = its pin
+  const ang = rot + pendulum(t, at, -16, 0.5, 0.8);
+  const k = springAt(t, at, springs.pop);
+  if (k <= 0.001) return null;
+  const pr = Math.max(2.4, Math.min(6, fs * 0.12));
+  const np: Pt = [x0 + (x1 - x0) * 0.2, y0 + 0.5];
+  const corner = line(x1 - 12, y0 + 0.2, x1 + 8, y0 - 1.1, {over: 0, seed: `${seed}/c1`}) + line(x1 + 0.1, y0 + 8, x1 + 0.5, y0 - 2.5, {over: 0, seed: `${seed}/c2`});
+  return (
+    <XG m={mat.compose(mat.translate(pv[0], pv[1]), mat.rotate(ang), mat.scale(k), mat.translate(-pv[0], -pv[1]))}>
+      <Fill d={circle(pv[0], pv[1], pr + 1.6, {seed: `${seed}/patch`, wobble: 0})} color={palette.cream} offset={false} mode="none" seed={`${seed}/patch`} />
+      <Ink d={corner} width={2.2} taper={false} seed={`${seed}/corner`} />
+      <Fill d={blob(np[0], np[1], 6, 6, {seed: `${seed}/pin`, wobble: 0.02})} color={palette.ink} offset={false} mode="none" seed={`${seed}/pin`} />
+      <circle cx={np[0] - 2} cy={np[1] - 2.1} r={1.7} fill={palette.cream} />
+    </XG>
+  );
+};
+
 // ---------------------------------------------------------------- the pin dot and the phone copy
 
 /** The notice's pin: grows 20 % -> 100 % (motion spec fill pop) with the 7 % spring, so it reads on its first frames. */
@@ -400,7 +485,7 @@ export const PhoneCopy: React.FC<{x: number; y: number; at: number; rot?: number
   return (
     <>
       <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot), mat.scale(k))}>
-        <LeakSheet x={0} y={0} w={30} h={38} pin={false} depth="hair" seed="s7phone" />
+        <CopySheet x={0} y={0} w={30} h={38} pin={false} depth="hair" seed="s7phone" />
       </XG>
       {kr > 0 ? (
         <XG m={mat.about(mat.scale(kr), x, y)}>
@@ -836,15 +921,11 @@ export const LatchKnob: React.FC<{board: readonly [number, number, number, numbe
   );
 };
 
-/** A back-view reader's HANGING near arm without a hand (fix round 3: the kit's puffy sand hand under the cuff read as a
- *  mitten; style bible: no drawn hands on back-view figures): the kit EdgeOnlooker's own sleeve seam + cuff line, same
- *  geometry and seeds (mirrors Figures.tsx personGeo / torsoSides / the arms block: the torso length follows the frame
- *  bottom read from the transform, the rise, the idle bob), for a reader drawn with arms={false}. Draw it right after
- *  that EdgeOnlooker, with the same props, while its phone arm is down. */
-export const DownSleeve: React.FC<{x: number; y: number; head: number; seed: string; cap?: boolean; riseAt?: number; bob?: number}> = ({x, y, head, seed, cap, riseAt, bob = 1.5}) => {
-  const t = useTime();
-  const m = useXf();
-  if (riseAt !== undefined && t < riseAt) return null;
+type ReaderGeoIn = {x: number; y: number; head: number; seed: string; cap?: boolean; riseAt?: number; bob?: number};
+
+/** The kit EdgeOnlooker's own frame for a reader (mirrors Figures.tsx personGeo / torsoSides: the torso length follows the
+ *  frame bottom read from the transform, the rise, the idle bob): person-local units, hip line at 0, torso top at -h. */
+function readerGeo(t: number, m: Mat, {x, y, head, seed, cap, riseAt, bob = 1.5}: ReaderGeoIn) {
   const geo = (torsoH: number) => {
     const r = rng(`person/${seed}`);
     const w = r.range(86, 100);
@@ -868,9 +949,20 @@ export const DownSleeve: React.FC<{x: number; y: number; head: number; seed: str
   const sx = m[0] * x + m[2] * y + m[4];
   const sd: 1 | -1 = sx < canvas.width / 2 ? 1 : -1;
   const hw = g.w / 2;
-  const bx = hw * 1.07;
   const R = Math.min(g.w * g.round, g.h * 0.8);
-  const xAt = (yy: number) => hw + ((bx - hw) * (yy - (-g.h + R))) / (g.h - R);
+  return {g, s, rise, hipY, W, sd, hw, R, torsoH};
+}
+
+/** A back-view reader's HANGING near arm without a hand (fix round 3: the kit's puffy sand hand under the cuff read as a
+ *  mitten; style bible: no drawn hands on back-view figures): the kit EdgeOnlooker's own sleeve seam + cuff line, same
+ *  geometry and seeds, for a reader drawn with arms={false}. Draw it right after that EdgeOnlooker, with the same props,
+ *  while its phone arm is down. */
+export const DownSleeve: React.FC<ReaderGeoIn> = (p) => {
+  const t = useTime();
+  const m = useXf();
+  if (p.riseAt !== undefined && t < p.riseAt) return null;
+  const {g, s, rise, hipY, W, sd, hw, R} = readerGeo(t, m, p);
+  const xAt = (yy: number) => hw + ((hw * 1.07 - hw) * (yy - (-g.h + R))) / (g.h - R);
   const d = g.w * 0.18;
   const yTop = -g.h + R - Math.sqrt(Math.max(0, R * R - (R - d) * (R - d))) + g.w * 0.03;
   const yCuff = -g.h + g.w * 1.05;
@@ -879,8 +971,41 @@ export const DownSleeve: React.FC<{x: number; y: number; head: number; seed: str
   const cuff = `M${(sd * (xc - 0.5)).toFixed(2)} ${yCuff.toFixed(2)}L${(sd * (xc - d)).toFixed(2)} ${(yCuff + 0.6).toFixed(2)}`;
   return (
     <XG m={mat.translate(0, rise)}>
-      <XG m={mat.compose(mat.translate(x, hipY), mat.scale(s))}>
-        <Ink d={seam + cuff} width={W * 0.85} taper={false} seed={`${seed}/seam${sd}`} />
+      <XG m={mat.compose(mat.translate(p.x, hipY), mat.scale(s))}>
+        <Ink d={seam + cuff} width={W * 0.85} taper={false} seed={`${p.seed}/seam${sd}`} />
+      </XG>
+    </XG>
+  );
+};
+
+/** A1 fix round 2 (the risen readers read as flat coat slabs next to reference 2's back views): one or two small kit
+ *  details per reader, ~2.2 px ink on screen, fills untouched, static (no extra events), on the kit EdgeOnlooker's own
+ *  frame (readerGeo): 'hood' = the hood's hem seam inside its lower rim (reader 0, teal hood); 'collar' = a centre-back
+ *  crease under the collar band and a shoulder seam each side (reader 2, cap + collar). Reader 1's bag strap is the kit
+ *  Person's own 'strap' accessory. */
+export const CoatDetail: React.FC<ReaderGeoIn & {kind: 'hood' | 'collar'}> = ({kind, ...p}) => {
+  const t = useTime();
+  const m = useXf();
+  if (p.riseAt !== undefined && t < p.riseAt) return null;
+  const {g, s, rise, hipY, W, hw, R} = readerGeo(t, m, p);
+  const f = (v: number) => v.toFixed(2);
+  const hr = g.hr;
+  const top = -g.h;
+  let d = '';
+  if (kind === 'hood') {
+    // the hood (EdgeOnlooker: lower rim through (-1.32 hr, top + 0.25 hr) -> (0, top + 1.32 hr)): a hem seam ~0.2 hr inside
+    d = `M${f(-hr * 1.12)} ${f(top + hr * 0.42)}Q${f(-hr * 0.74)} ${f(top + hr * 1.1)} 0 ${f(top + hr * 1.12)}Q${f(hr * 0.74)} ${f(top + hr * 1.1)} ${f(hr * 1.12)} ${f(top + hr * 0.42)}`;
+  } else {
+    // collar band (CollarBand: x +-1.05 hr, y top - 0.04 hr .. top + 0.34 hr): a short crease down the centre back and a
+    // shoulder seam from each end of the band out over the shoulder
+    d = `M${f(hr * 0.06)} ${f(top + hr * 0.42)}Q${f(-hr * 0.04)} ${f(top + hr * 0.75)} ${f(hr * 0.02)} ${f(top + hr * 1.05)}`;
+    const x1 = hw - g.w * 0.07;
+    for (const sd of [-1, 1]) d += `M${f(sd * hr * 1.08)} ${f(top + hr * 0.22)}Q${f(sd * (hr * 1.08 + x1) * 0.5)} ${f(top + hr * 0.2)} ${f(sd * x1)} ${f(top + R * 0.62)}`;
+  }
+  return (
+    <XG m={mat.translate(0, rise)}>
+      <XG m={mat.compose(mat.translate(p.x, hipY), mat.scale(s))}>
+        <Ink d={d} width={W * 0.46} taper={false} seed={`${p.seed}/detail`} />
       </XG>
     </XG>
   );

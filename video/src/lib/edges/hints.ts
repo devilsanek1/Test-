@@ -14,9 +14,12 @@ import type {EdgeHints} from './shared';
 
 /** S01 (Government Plaza) and S12 (its rewind): Film puts S01's painting (seed + these hints) on S12 too, since S12
  *  ends ON S01's frame 0 (the loop seam), so the keep rects are the union over both shots. Ink: the min over S01 0-4.4 s
- *  and all of S12. tr 0.45: the hanging leaves (0.63-0.73 measured) make the top-right the bare corner; held under 0.5
- *  so its block outline is ruled in, because S01's dive (4.45-4.6 s) swings flat sky through it. bl / br are dense but
- *  their figures are kept, so they cannot go bare. */
+ *  and all of S12. tr 0.45: the hanging leaves (0.63-0.73 measured) make the top-right the bare corner (a ~90 x 80 px
+ *  notch, x ~970-1060, y ~18-95, under the top UI). Held under 0.5 for the ruled pair, but that pair runs along the thin
+ *  top / right margins (y ~12, x ~1069), not around the notch: in S01's dive (f134-137, f141) flat sky swings through
+ *  and the notch reads as a blank white rectangle for ~5 frames. Accepted: tr 0.1 (no bare corner, the leaves go into
+ *  colour for all of S01 and S12) is the only hints-level fix. bl / br are dense but their figures are kept, so they
+ *  cannot go bare. */
 const S01_HINTS: EdgeHints = {
   ink: {tl: 0, tr: 0.45, br: 1, bl: 0.62, left: 1, right: 0.13, bottom: 0.69},
   keep: [
@@ -59,14 +62,15 @@ export const EDGE_HINTS: Record<string, EdgeHints> = {
   // ---- the film (Film: <FilmEdges scene={id}>, paint-subtle, seed 'film/<id>'). Measured with scan_hints.py on 6-7
   // clean full-res frames per scene (first / last 0.2 s and the camera extremes) + Pip's bbox every 0.1 s; keep rects
   // are the union over the scene's motion. paint-subtle leaves ONE corner bare (the densest corner that fits around the
-  // keep rects); ink < 0.3 never goes bare, < 0.12 not even as the fallback. Checked on Main renders (docs/EDGES.md 0.1).
+  // keep rects); ink < 0.3 never goes bare, < 0.12 not even as the fallback. Checked on Main renders (docs/EDGES.md 5.1).
   // S07-S10: not yet (their scenes were still being polished).
   S01: S01_HINTS,
   S02: {
     // bare corner: bottom-left (the board's leg and the ground lines run into it)
     ink: {tl: 0, tr: 0, br: 0.9, bl: 1, left: 0.74, right: 1, bottom: 1},
+    // no rect for Pip: he lands from S01 at x 939-1049 (f142) and stays left of that, clear of the 18-24 px right paper
+    // (from x ~1060 at his height); a rect within 110 px of the side runs off it, and his only cut the paper at y 600-900
     keep: [
-      [830, 620, 1075, 905], // Pip landing from S01 at the right edge, then on the board's corner
       [270, 1640, 790, 1920], // the three audience heads
       [20, 860, 130, 1020], // the site plaque at the left frame edge
     ],
@@ -107,10 +111,12 @@ export const EDGE_HINTS: Record<string, EdgeHints> = {
   },
   S11: {
     // bare corner: bottom-right (govC's steps). bl 0.25 by hand: the lamp's foot and the onlookers fill it, so it
-    // must not go bare (the lamp at x 95-180 needs no keep rect otherwise: it sits clear of the paper)
+    // must not go bare (the lamp at x 95-180 needs no keep rect otherwise: it sits clear of the paper). No rect for
+    // Pip's in-hop: he is in the 54 px left paper only for f1370-1372 (45.67-45.73 s), where his body stays in colour
+    // (an actor fill) and only the peach inner ear goes paper; a rect ran a 200 px colour tongue down the left side
+    // (paper / tongue / paper at y ~1250-1490) for the whole 6.5 s shot
     ink: {tl: 0, tr: 0, br: 0.84, bl: 0.25, left: 1, right: 1, bottom: 1},
     keep: [
-      [0, 1280, 135, 1470], // Pip hopping in at the left frame edge
       [229, 1159, 441, 1539], // Pip at govB's window
       [150, 1700, 500, 1920], // the two onlookers
     ],

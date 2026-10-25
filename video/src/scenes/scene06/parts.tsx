@@ -18,6 +18,8 @@ import {MAKERS_LANE, walkerAt} from '../shared/sets';
 import type {WalkerAnchor} from '../shared/sets';
 import {MessengerDetail} from './msgDetail';
 import type {Beats} from './beats';
+import {camAt} from './camera';
+import {speedLines as smearLines} from '../../lib/sketch';
 
 // ---------------------------------------------------------------- the messenger (props Messenger, 260 px)
 
@@ -533,11 +535,18 @@ export const MakerHeads: React.FC<{screen: {x: number; y: number; w: number; h: 
 
 // ---------------------------------------------------------------- Pip
 
-/** Pip (scale 1.2) on the reference plane, behind the messenger in depth (feet 1480). Fix round 2 (cut on action): he
- *  is off frame LEFT on S06's first frame, BEHIND the messenger (S05 has him trailing), and leaps in after him: one long
- *  low leap from (-480, 1350) that lands at (172, 1480) at cut + 0.30, clear of the messenger's legs (his left leg is
- *  at ~273 then: never occluded), then tiptoes. PIP_H = his standing height (px) for the shadow rule. */
-export const PIP = {scale: 1.2, y: 1480, hopFrom: [-480, 1350] as Pt, land: [172, 1480] as Pt, landAt: 0.3, hopDur: 0.39} as const;
+/** Pip (scale 1.2) on the reference plane, behind the messenger in depth (feet 1480). PIP_H = his standing height (px)
+ *  for the shadow rule.
+ *  Cut S05|S06 (phase B wave 1): his leap CARRIES ACROSS the cut on action. S05 (scene05/cast.tsx PipHop) leaves him at
+ *  the top of his arc, level, half out of frame RIGHT (S05's last frame: feet screen ~(1091, 1118), ~40 px/frame right);
+ *  S06 picks him up on its FIRST frame at the same height, half IN at the left edge above-left of the messenger's head
+ *  (feet screen ~(-8, 1120)), still moving right (~29 px/frame against the trucking camera, ~50 px/frame against the
+ *  lane), hangs a frame and drops in BEHIND the messenger: he lands behind-left of him at `land` at cut + `landAt`,
+ *  clear of the messenger's head, envelope, back, satchel and legs on every frame (>= ~35 px). `entry` = his state at
+ *  the cut (screen px, px/frame); x is a cubic Hermite in world px from that speed to the tiptoe speed, y a parabola
+ *  down from the apex. Was (fix round 2): one low leap from world (-480, 1350) landing at cut + 0.30: off frame left on
+ *  Main f594-f598 (5 frames without Pip after S05 had him leaving right), then entering below the messenger's head. */
+export const PIP = {scale: 1.2, y: 1480, land: [172, 1480] as Pt, landAt: 0.4, entry: {sx: -35, sy: 1118, vx: 32}, k0: 0.77} as const;
 export const PIP_H = 110;
 
 type PipState = {x: number; y: number; pose: PoseName; flip: boolean; squash: number; rotate: number; amount?: number; expression?: Expression; walkRate?: number; look?: number; shh?: boolean};
@@ -550,7 +559,6 @@ export const SHH_HOLD = 0.52;
  *  sheet (he turns to it); leaps after it. */
 export function pipAt(t: number, B: Beats): PipState {
   const landT = B.cut + PIP.landAt;
-  const hopDur = PIP.hopDur;
   const rate = 1.0;
   const v = walkSpeed(rate) * PIP.scale;
   const shhEnd = B.shh + SHH_HOLD;
@@ -558,14 +566,12 @@ export function pipAt(t: number, B: Beats): PipState {
   // x along the tiptoe (it pauses during the shh)
   const walked = (until: number) => Math.max(0, Math.min(until, B.shh) - landT) + Math.max(0, until - shhEnd);
   const xAt = (tt: number) => PIP.land[0] + v * walked(tt);
-  const hop1 = (tt: number) => hop({t: tt, t0: landT - hopDur, dur: hopDur, from: {x: PIP.hopFrom[0], y: PIP.hopFrom[1]}, to: {x: PIP.land[0], y: PIP.land[1]}, height: 70});
-  if (t < landT) {
-    const h = hop1(t);
-    return {x: h.x, y: h.y, pose: 'stand-side', flip: false, squash: h.squash, rotate: h.rotate, amount: h.spread};
-  }
+  if (t < landT) return pipEntry(t, B, v);
   if (t < B.shh) {
-    const h = hop1(t);
-    return {x: xAt(t), y: PIP.y, pose: 'walk-side', flip: false, squash: h.squash + popSwitch(t, B.shh), rotate: 0, walkRate: rate};
+    // the landing squash (props hop's: 0.24 e^-11d cos(2 pi 3.2 d) over 0.32 s)
+    const d = t - landT;
+    const land = d < 0.32 ? 0.24 * Math.exp(-d * 11) * Math.cos(d * Math.PI * 2 * 3.2) : 0;
+    return {x: xAt(t), y: PIP.y, pose: 'walk-side', flip: false, squash: land + popSwitch(t, B.shh), rotate: 0, walkRate: rate};
   }
   if (t < shhEnd) return {x: xAt(t), y: PIP.y, pose: 'stand-side', flip: false, squash: popSwitch(t, B.shh) + popSwitch(t, shhEnd), rotate: 0, expression: 'closed', look: 0.3, shh: true};
   if (t < B.sheet) return {x: xAt(t), y: PIP.y, pose: 'walk-side', flip: false, squash: popSwitch(t, shhEnd) + popSwitch(t, B.sheet), rotate: 0, walkRate: rate};
@@ -573,6 +579,25 @@ export function pipAt(t: number, B: Beats): PipState {
   if (t < leapT - 0.14) return {x: x0, y: PIP.y, pose: 'stand-side', flip: true, squash: popSwitch(t, B.sheet), rotate: 0, expression: 'wide', amount: 0.25};
   const h = hop({t, t0: leapT, dur: 0.42, from: {x: x0, y: PIP.y}, to: {x: x0 - 260, y: 1150}, height: 150});
   return {x: h.x, y: h.y, pose: 'stand-side', flip: true, squash: h.squash, rotate: h.rotate, amount: Math.max(0.25, h.spread), expression: 'wide'};
+}
+
+/** Pip's leap in across the cut (cut S05|S06, see PIP): world state on the near plane (f = 1) for B.cut <= t < landT.
+ *  The leap pose carries S05's (stand-side, 'wide', spread / stretch on the hop's own curves continued from S05's k at
+ *  its cut, PIP.k0, to the landing), the nose turns from level at the apex to 10 deg down at the landing. */
+function pipEntry(t: number, B: Beats, vWalk: number): PipState {
+  const L = PIP.landAt;
+  const c0 = camAt(B.cut, B);
+  const camV = (camAt(B.cut + 1e-3, B).x - c0.x) / 1e-3;
+  const x0 = (PIP.entry.sx - 540) / c0.z + c0.x;
+  const v0 = (PIP.entry.vx * 30) / c0.z + camV;
+  const y0 = (PIP.entry.sy - 960) / c0.z + c0.y;
+  const tau = clamp(t - B.cut, 0, L);
+  const s = tau / L;
+  const x = (2 * s ** 3 - 3 * s ** 2 + 1) * x0 + (s ** 3 - 2 * s ** 2 + s) * L * v0 + (-2 * s ** 3 + 3 * s ** 2) * PIP.land[0] + (s ** 3 - s ** 2) * L * vWalk;
+  const y = y0 + (PIP.land[1] - y0) * s * s;
+  const kk = PIP.k0 + (1 - PIP.k0) * s;
+  const sn = Math.sin(Math.PI * kk);
+  return {x, y, pose: 'stand-side', flip: false, squash: -0.22 * (1 - sn) * 0.6 - 0.04, rotate: 10 * s, amount: Math.sqrt(Math.max(0, sn)), expression: 'wide'};
 }
 
 /** The side rig's head + trunk frame when standing (lib/mascot/poses sideRig, not walking): head centre H, tilt, the
@@ -614,6 +639,7 @@ export const PipS06: React.FC<{B: Beats}> = ({B}) => {
   const inkScale = useInkScale();
   const p = pipAt(t, B);
   const el = <Elephant x={p.x} y={p.y} scale={PIP.scale} pose={p.pose} flip={p.flip} t={t} seed={6} squash={p.squash} rotate={p.rotate} amount={p.amount} expression={p.expression} walkRate={p.walkRate ?? 1} look={p.look ?? 0} />;
+  if (t < B.cut + PIP.landAt) return <><PipSmearS06 t={t} B={B} />{el}</>;
   if (!p.shh) return el;
   // ---- the shh: clip the rig's hanging trunk below the cut line, draw the J-curl in its place
   const sc = PIP.scale;
@@ -662,6 +688,36 @@ export const PipS06: React.FC<{B: Beats}> = ({B}) => {
       </g>
     </>
   );
+};
+
+/** Cut S05|S06: the speed lines S05 trails behind a fast Pip (scene05/cast.tsx PipSmear: the film's smear language,
+ *  copied, never imported across scenes) carry across the cut on his leap in: 3 short ink lines behind his body centre
+ *  along -(screen velocity), length with the speed, drawn only above 22 screen px / frame. World px (near plane). */
+const PipSmearS06: React.FC<{t: number; B: Beats}> = ({t, B}) => {
+  // the velocity over the last frame (from the cut on S06's first frame: S05 drew the smear on its last one)
+  const t0 = Math.max(B.cut, t - 1 / 30);
+  const dt = t - t0;
+  if (dt < 1e-3) return null;
+  const toS = (tt: number) => {
+    const c = camAt(tt, B);
+    const q = pipAt(tt, B);
+    return [(q.x - c.x) * c.z, (q.y - c.y) * c.z] as const;
+  };
+  const a = toS(t0);
+  const b = toS(t);
+  const z = camAt(t, B).z;
+  // world px per frame
+  const vx = (b[0] - a[0]) / z / (dt * 30);
+  const vy = (b[1] - a[1]) / z / (dt * 30);
+  const sp = Math.hypot(vx, vy);
+  if (sp * z < 22) return null;
+  const p = pipAt(t, B);
+  const sc = PIP.scale;
+  const ux = -vx / sp;
+  const uy = -vy / sp;
+  const len = Math.max(20, Math.min(50, sp * z * 0.8)) / z;
+  const ang = (Math.atan2(uy, ux) * 180) / Math.PI;
+  return <Ink d={smearLines(p.x + ux * 50 * sc, p.y - 46 * sc + uy * 50 * sc, {n: 3, len, gap: 15 * sc, angle: ang, seed: 's6pipSpd/l'})} width={2.6 / z} taper={false} seed="s6pipSpd/i" />;
 };
 
 /** 'shh' lettered beside Pip in CaptionHand (64 px world = ~44 px x-height-to-ascender on screen), a short ink tail

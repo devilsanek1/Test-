@@ -98,20 +98,20 @@ const Scene10: React.FC = () => {
           </ScreenSpace>
         }
         people={false}
-        furniture="bike"
+        furniture={false}
         noticeSign={(slot) => {
           const box = signBox(slot);
           return (
             <SandwichBoard box={box} ground={box[3] + 30} at={b.label}>
-              <LabelTag kind="sign" box={box} fontSize={28 / 1.05} minFont={28 / 1.05} legH={30} frame={false} ink={0} text={L13} seed="s10/L13" />
+              <LabelTag kind="sign" box={box} fontSize={30 / 1.05} minFont={30 / 1.05} legH={30} frame={false} ink={0} text={L13} seed="s10/L13" />
             </SandwichBoard>
           );
         }}
         wrap={(name, _n, node) => {
           // the empty street has a horizon from the cut: pavement to the eye line + a thin fill-only skyline
-          if (name === 'far') return <FarStreet skylineAt={b.siteL} />;
+          if (name === 'far') return <FarStreet skylineAt={sitePops} />;
           if (name === 'ground') return <StreetGround wedgeAt={wedgeAt} />;
-          if (name === 'second') return <SecondRow popAt={b.second} flipAt={b.flip2} dropAt={b.dust + 0.1} windowAt={W.of - start} tagsAt={b.wave} />;
+          if (name === 'second') return <SecondRow popAt={b.second} flipAt={b.flip2} dropAt={b.dust + 0.1} windowAt={W.of - 0.05 - start} tagsAt={b.wave} />;
           if (name === 'sites')
             return (
               <>
@@ -133,7 +133,7 @@ const Scene10: React.FC = () => {
                 <Stoops popAt={sitePops} />
                 <Plaques
                   plaqueAt={[b.plaques, b.plaques + 0.06, b.plaques + 0.12]}
-                  old={{flipOldAt: b.flipM, cobwebAt: b.cobweb, dustAt: b.dust, caneAt: b.cane, droopAt: b.droop, wobbleAt: b.wobble, nudgeAt: [b.skipNudge, b.hey + 0.04], bit: {at: b.bitIn, size: 22, bursts: [0, ...[b.cane, b.not, b.update].map((x) => x - (b.bitIn + 0.42))]}}}
+                  old={{flipOldAt: b.flipM, cobwebAt: b.cobweb, dustAt: b.dust, caneAt: b.cane, droopAt: b.droop, wobbleAt: b.wobble, nudgeAt: [b.skipNudge, b.hey + 0.04], emptyHook: [50, -31], bit: {at: b.bitIn, size: 22, bursts: [0, ...[b.cane, b.not, b.update].map((x) => x - (b.bitIn + 0.42))]}}}
                   tagL={{at: b.tick1, tickAt: b.tick1 + 0.03, ringAt: b.tick1 + 0.03}}
                   tagR={{at: b.tick2, tickAt: b.tick2 + 0.03, ringAt: b.tick2 + 0.03}}
                 />
@@ -147,7 +147,7 @@ const Scene10: React.FC = () => {
               <>
                 {node}
                 <TreeLeafPatch />
-                <Pip T={{leap: b.pipHop, leapFrom: [hand.x, hand.y], leapScale: hand.scale, leapV: handV, perk: b.pipPerk, lookPlaque: b.walker, lookFar: b.flip2 + 0.04, lookWeb: b.cobweb + 0.1, lookCart: b.lookCart, lookLob: b.toss2 + 0.12, hey: b.hey, sparkEnd: b.hey + 0.46, heyEnd: b.heyEnd, out: b.pipOut}} />
+                <Pip T={{leap: b.pipHop, leapFrom: [hand.x, hand.y], leapScale: hand.scale, leapV: handV, perk: b.pipPerk, lookPlaque: b.walker, lookFar: b.flip2 + 0.04, lookWeb: b.cobweb + 0.1, lookCart: b.lookCart, lookLob: b.skipNudge, hey: b.hey, sparkEnd: b.hey + 0.46, heyEnd: b.heyEnd, out: b.pipOut}} />
               </>
             );
           if (name === 'foreground')

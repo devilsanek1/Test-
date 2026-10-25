@@ -65,7 +65,9 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
 
 ## Cross-lane findings scene agents can't fix (polish pass)
 
-- OPEN (edges, phase A2 for S07-S10, 08:40): EDGE_HINTS for S07 must keep the bottom-left foreground readers
+- DONE (edges, phase A2, 09:15): EDGE_HINTS for S01-S06, S11, S12 (wf_c90c1d9d-76b; docs/EDGES.md 5.1). Bare corners:
+  S01/S12 top-right, S02 bottom-left, S06 + S11 bottom-right; none in S03-S05. Loop seam still 0 px below y 600.
+- OPEN (edges, phase A2b for S07-S10, 08:40): EDGE_HINTS for S07 must keep the bottom-left foreground readers
   inked (paint-subtle leaves the left ~50 px strip and the bottom-left corner as bare paper and bleaches them, film
   22.07-24.10). S09 needs a keep rect over the tram cue at the left edge (film 39.00-39.38: PartB.tsx TramCue's
   headlamp half-disc centred at x=-2 is covered by the white paper edge, so the leap has no visible cause). S08: the
@@ -77,9 +79,13 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
   51.895, cut 52.163), so S12 opens on an empty band and 'And some of those' rolls in on 'And' (52.43).
 - PARTLY TAKEN (S01, 07:55): S12's request to make S01's dead glass + lantern teal was NOT taken (black = off reads
   instantly in the hook; see docs/scenes/S01.md). Pigeons brown -> cream taken. Loop seam still 0 px.
-- OPEN (captions, minor): (1) on page rolls the outgoing line and its highlight box should clip at one mask edge
-  below the descender bottom (S12 f48-f50 'governments did it' sliced mid-glyph); (2) 1-2 stray i-dots / apostrophes
-  of an outgoing line for 1 frame at the band top (Main 52.40, 55.30, 45.58). SkyCaptions clip polish for phase C.
+- DONE (core, 09:25): caption slivers at the band top. SkyCaptions drops an outgoing page (pushed, `out`, or the loop
+  tail) once its lowest baseline is within 0.15 em of the band top, so no descenders / highlight-box strips linger on
+  the scroll's slow tail (checked Main f131, f424, f1367, f1561: band empty; pages now leave full -> half -> gone).
+  Still worth a look in phase C: the S12 f48-f50 'governments did it' mid-glyph slice on a roll.
+- DONE (data, 09:20, from the phase B cut owners): page 6 ('about seven out of ten / websites run on it.') `out`
+  14.04 ('it.' ends 13.945), so S04 opens on an empty band and 'This bug was in there' rolls in at f431; page 25 `out`
+  52.06 -> 51.965 (no descender slivers on S12 f0). overrides.json and captions.json both updated.
 - DONE (data, 06:05): S10's last caption page ('they're not officially / supported anymore.') no longer hangs over
   S11's government window after the hard cut: page 22 `out` 45.48 ('anymore.' ends 45.385, cut 45.618), so the band is
   empty on S11 f0 until 'Even' rolls in at 45.85 (S11 A1 art + motion reviews).
@@ -131,6 +137,12 @@ S08 art 6; S09 art 6, motion 6.5; S04 art 6; S03 art 6.5; S05 art 6.5; S06 art 6
   (owner fixes both sides -> independent verifier -> one fix round + re-verify). Cross-lane requests (captions, edge
   hints, shared props) come back in the result and are applied by the orchestrator. Still to run: wave 1 S07|S08 and
   S09|S10 (after A1 / the S08 redesign), wave 2 (S02|S03, S04|S05, S06|S07, S08|S09, S10|S11, S12|S01).
+- 09:25: cut results so far: S01|S02 PASS 8.5 (S01 DIVE_INK_K 0.85, S02 loupe ink0 2.4: stroke weight now matches
+  across the dive), S03|S04 owner done (shared sun glide path scene03/sunglide.ts, Pip take-off at the cut), S11|S12
+  owner done (onlooker 2 restyled so she isn't read as S12's near observer; set diff 0 px). S08 dedicated pass
+  launched: wf_e36892f5-1e2 (scene-polish, rounds 3, PEAK-2 notes).
+- Sound (phase D): S03|S04 owner notes two `whoosh_soft` cues 0.225 s apart for the one sun hop (13.945 and 14.17):
+  keep 13.945, drop or soften 14.17.
 
 ## Sound re-lock notes (phase D)
 

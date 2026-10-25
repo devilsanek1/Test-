@@ -26,8 +26,11 @@ const FAR = (() => {
   // gables, chimney pots, a dome, a clock tower, a water tower and a thin spire, fill-only (far: no ink), with a few
   // pale window ticks so it reads as a city beyond, not a placeholder band
   const E0 = OQ.eye;
-  let d = '';
-  let win = '';
+  // A1 FR2: three segments, one behind each near site (L: x < 352, M: < 690, R: the rest), each popping WITH its site
+  // (the whole skyline popped with siteL and showed through siteM's / siteR's empty wireframes: 'glass buildings')
+  const seg = (cx: number) => (cx < 352 ? 0 : cx < 690 ? 1 : 2);
+  const d = ['', '', ''];
+  const win = ['', '', ''];
   const kinds = ['gable', 'flat', 'chim', 'step', 'flat', 'gable', 'dome', 'chim', 'flat', 'step', 'gable', 'chim', 'flat', 'gable', 'step', 'flat', 'chim', 'gable', 'dome', 'flat', 'step', 'chim'];
   const hs = [34, 52, 26, 44, 60, 30, 48, 38, 24, 56, 40, 30, 46, 28, 54, 36, 42, 26, 50, 34, 44, 30];
   let x = -170;
@@ -37,26 +40,27 @@ const FAR = (() => {
     const h = hs[i % hs.length];
     const top = E0 - h;
     const k = kinds[i % kinds.length];
-    d += rectPath(x, top, w + 1, h + 1);
-    if (k === 'gable') d += polyPath([[x, top + 1], [x + w / 2, top - 16], [x + w + 1, top + 1]]);
-    else if (k === 'step') d += rectPath(x + w * 0.2, top - 8, w * 0.6, 9) + rectPath(x + w * 0.36, top - 15, w * 0.28, 8);
-    else if (k === 'chim') d += rectPath(x + w * 0.66, top - 13, 7, 14) + rectPath(x + w * 0.2, top - 9, 6, 10);
-    else if (k === 'dome') d += `M${x + w * 0.18} ${top + 1}a${w * 0.32} ${w * 0.3} 0 0 1 ${w * 0.64} 0Z` + rectPath(x + w / 2 - 1.5, top - w * 0.3 - 9, 3, 10);
-    else d += rectPath(x - 2, top - 4, 9, 5) + rectPath(x + w - 7, top - 4, 9, 5);
+    const g = seg(x + w / 2);
+    d[g] += rectPath(x, top, w + 1, h + 1);
+    if (k === 'gable') d[g] += polyPath([[x, top + 1], [x + w / 2, top - 16], [x + w + 1, top + 1]]);
+    else if (k === 'step') d[g] += rectPath(x + w * 0.2, top - 8, w * 0.6, 9) + rectPath(x + w * 0.36, top - 15, w * 0.28, 8);
+    else if (k === 'chim') d[g] += rectPath(x + w * 0.66, top - 13, 7, 14) + rectPath(x + w * 0.2, top - 9, 6, 10);
+    else if (k === 'dome') d[g] += `M${x + w * 0.18} ${top + 1}a${w * 0.32} ${w * 0.3} 0 0 1 ${w * 0.64} 0Z` + rectPath(x + w / 2 - 1.5, top - w * 0.3 - 9, 3, 10);
+    else d[g] += rectPath(x - 2, top - 4, 9, 5) + rectPath(x + w - 7, top - 4, 9, 5);
     // window ticks: one or two short rows on the taller blocks
     if (h >= 34) {
       for (let r = 0; r < (h >= 48 ? 2 : 1); r++) {
-        for (let c = 0; c < Math.floor((w - 10) / 13); c++) if ((c + r + i) % 3 !== 0) win += rectPath(x + 7 + c * 13, top + 9 + r * 14, 4, 6);
+        for (let c = 0; c < Math.floor((w - 10) / 13); c++) if ((c + r + i) % 3 !== 0) win[g] += rectPath(x + 7 + c * 13, top + 9 + r * 14, 4, 6);
       }
     }
     x += w;
     i++;
   }
   // a water tower on legs, a clock tower and a thin spire (the city beyond)
-  d += rectPath(214, E0 - 96, 30, 22) + polyPath([[210, E0 - 96], [229, E0 - 110], [248, E0 - 96]]) + rectPath(218, E0 - 74, 3, 30) + rectPath(237, E0 - 74, 3, 30);
-  d += rectPath(866, E0 - 112, 10, 80) + polyPath([[864, E0 - 112], [871, E0 - 130], [878, E0 - 112]]);
-  d += rectPath(560, E0 - 104, 22, 104) + polyPath([[557, E0 - 104], [571, E0 - 124], [585, E0 - 104]]);
-  win += `M${571 + 6} ${E0 - 88}a6 6 0 1 0 0.01 0Z`;
+  d[0] += rectPath(214, E0 - 96, 30, 22) + polyPath([[210, E0 - 96], [229, E0 - 110], [248, E0 - 96]]) + rectPath(218, E0 - 74, 3, 30) + rectPath(237, E0 - 74, 3, 30);
+  d[2] += rectPath(866, E0 - 112, 10, 80) + polyPath([[864, E0 - 112], [871, E0 - 130], [878, E0 - 112]]);
+  d[1] += rectPath(560, E0 - 104, 22, 104) + polyPath([[557, E0 - 104], [571, E0 - 124], [585, E0 - 104]]);
+  win[1] += `M${571 + 6} ${E0 - 88}a6 6 0 1 0 0.01 0Z`;
   return {d, win};
 })();
 
@@ -68,18 +72,20 @@ const FARGROUND = {
   rails: line(-160, 1238, 1240, 1239, {seed: 's10/fr1', over: 0, breaks: false}) + line(-160, 1256, 1240, 1257, {seed: 's10/fr2', over: 0, breaks: false}),
 };
 
-/** `skylineAt` (fix round 3): the fill-only skyline pops up from the eye line WITH siteL (scaleY 0 -> 1.06 -> 1), so the
- *  frames after the tram show only the near row's ink construction lines over bare ground (reference 1's clean
- *  line-art-on-paper state), not line art over an already-filled skyline (a double exposure). */
-export const FarStreet: React.FC<{skylineAt?: number}> = ({skylineAt}) => (
+/** `skylineAt` (fix round 3): the fill-only skyline pops up from the eye line WITH the near sites (scaleY 0 -> 1.06 -> 1;
+ *  A1 FR2: one segment per site, [L, M, R]), so the frames after the tram show only the near row's ink construction lines
+ *  over bare ground (reference 1's clean line-art-on-paper state), never a filled skyline behind an empty outline. */
+export const FarStreet: React.FC<{skylineAt?: [number, number, number]}> = ({skylineAt}) => (
   <>
     <Fill rect={[-160, OQ.eye, 1400, OQ.base - OQ.eye + 2]} color={palette.mintPale} offset={false} seed="s10/farground" />
     <Fill d={FARGROUND.kerb} color={palette.sand} offset={false} mode="snap" seed="s10/farkerb" />
     <Ink d={FARGROUND.kerbInk + FARGROUND.rails} width={SI.hair} taper={false} seed="s10/farI" />
-    <PopUp at={skylineAt} x={540} y={OQ.eye}>
-      <Fill d={FAR.d} color={palette.sage} offset={false} mode="snap" seed="s10/skyline" />
-      <Fill d={FAR.win} color={palette.mintPale} offset={false} mode="snap" seed="s10/skywin" />
-    </PopUp>
+    {FAR.d.map((d, g) => (
+      <PopUp key={g} at={skylineAt?.[g]} x={[190, 520, 870][g]} y={OQ.eye}>
+        <Fill d={d} color={palette.sage} offset={false} mode="snap" seed={`s10/skyline${g ? g : ''}`} />
+        <Fill d={FAR.win[g]} color={palette.mintPale} offset={false} mode="snap" seed={`s10/skywin${g ? g : ''}`} />
+      </PopUp>
+    ))}
   </>
 );
 
@@ -207,7 +213,9 @@ export const GapReturns: React.FC<{atM: number; atR: number}> = ({atM, atR}) => 
  *  maker parked on the open pavement. */
 /** A1 FR1: L13 drops to 28 px on screen (was 30) and the board shrinks around it (22 px lower top, 24 px narrower on the
  *  right): it was the brightest, biggest rectangle in the frame, above the plaques it annotates. */
-export const signBox = (box: [number, number, number, number]): [number, number, number, number] => [box[0] - 12, box[1] + 28, box[2] - 60, box[3] + 6];
+/** A1 FR2: L13 back at 30 px on screen (28 could not be read at phone size): the paper widens 22 px to the LEFT (the
+ *  right edge stays put, clear of the parked maker), so the five lines fit at full size. */
+export const signBox = (box: [number, number, number, number]): [number, number, number, number] => [box[0] - 34, box[1] + 28, box[2] - 60, box[3] + 6];
 const AF = {fw: 13, tp: 12};
 /** The A-frame's hinge cap: its right end x and its top y (world), for the slot box `box` (signBox applied). */
 export const aFrameCap = (box: [number, number, number, number]) => ({right: box[2] + AF.fw - AF.tp + 6, top: box[1] - AF.fw - 12});
@@ -245,13 +253,15 @@ export const SandwichBoard: React.FC<{box: [number, number, number, number]; gro
   return (
     <XG m={mat.about(mat.scale(k), cx, ground)}>
       {/* the back board's edge first (behind the front board) */}
-      <Fill d={polyPath(back)} color={palette.tealDark} offset={off} seed="s10/ab/back" />
+      <Fill d={polyPath(back)} color={palette.brown} offset={off} seed="s10/ab/back" />
       <Ink d={line(back[0][0], back[0][1], back[3][0], back[3][1], {over: [0, 1], seed: 's10/ab/b1'}) + line(back[1][0], back[1][1], back[2][0], back[2][1], {over: [0, 1], seed: 's10/ab/b2'})} width={SI.mid} taper={false} seed="s10/ab/bi" />
       <Ink d={`M${fx(chainY).toFixed(1)} ${chainY}Q${((fx(chainY) + bx(chainY + 6)) / 2).toFixed(1)} ${chainY + 9} ${bx(chainY + 6).toFixed(1)} ${chainY + 6}`} width={1.8} taper={false} seed="s10/ab/chain" />
       {/* legs + front frame */}
-      <Fill d={polyPath(legL) + polyPath(legR)} color={palette.teal} offset={off} seed="s10/ab/legs" />
-      <Fill d={polyPath(outer)} color={palette.teal} offset={off} seed="s10/ab/frame" />
-      <Fill d={rectPath(x0 - 10, ground - 5, 14, 5) + rectPath(x1 - 4, ground - 5, 14, 5)} color={palette.tealDark} offset={false} mode="none" seed="s10/ab/feet" />
+      {/* A1 FR2: a LIGHT board (tan frame, sand legs; was teal / tealDark, the heaviest shape in the lower half, pulling
+          the eye off the plaques); its back edge, cap and feet one step darker (brown) */}
+      <Fill d={polyPath(legL) + polyPath(legR)} color={palette.sand} offset={off} seed="s10/ab/legs" />
+      <Fill d={polyPath(outer)} color={palette.tan} offset={off} seed="s10/ab/frame" />
+      <Fill d={rectPath(x0 - 10, ground - 5, 14, 5) + rectPath(x1 - 4, ground - 5, 14, 5)} color={palette.brown} offset={false} mode="none" seed="s10/ab/feet" />
       {/* fix round 3: the frame outline at ink (3.4), the legs keep the front weight (4.8): the board sits back */}
       <Ink
         d={
@@ -275,7 +285,7 @@ export const SandwichBoard: React.FC<{box: [number, number, number, number]; gro
         seed="s10/ab/li"
       />
       {/* the hinge cap across the top, two hinge knuckles */}
-      <Fill d={cap} color={palette.tealDark} offset={off} seed="s10/ab/cap" />
+      <Fill d={cap} color={palette.brown} offset={off} seed="s10/ab/cap" />
       <Ink d={roundRect(cx - (x1 - x0) / 2 - fw + tp - 6, top - 12, x1 - x0 + 2 * fw - 2 * tp + 12, 14, 6, {seed: 's10/ab/capi', closed: false}) + `M${cx - 70} ${top - 5}h18M${cx + 52} ${top - 5}h18`} width={SI.mid} taper={false} seed="s10/ab/capi" />
       {/* the paper, hand-inked (fix round 3): the cream fill (the LabelTag, outline-less) misregistered 3 px right and
           2 px down from its own ink outline, the outline left OPEN at the top-right corner, two short edge overshoots */}

@@ -7,7 +7,7 @@
 // clock (the fix is not ready: one fast minute turn, three hour ticks; clipped to the sky, so it sinks behind the far
 // roofs with the disc) that no copy ever covers, the workshop's blind stays down ('still fixing...', J4: the
 // shared FixSign, the same sign as S06's J3 and S09's J5), then a fixed 0.40 s tilt-up follows the copies into S08 (wires
-// at screen 896 / 928 / 960, the sun arriving at (640, 1021) with S08's slide speed, the copies at S08's first-frame pegs
+// at screen 896 / 928 / 960, the sun arriving at (640, 1021) riding the wall, the copies at S08's first-frame pegs
 // and on-screen speeds). Label L7 on the board's bottom rail.
 // Beat table: scene07/beats.ts. Parts: scene07/parts.tsx. Pen reveal: scene07/reveal.tsx. Lens out phase for S06's
 // Wiper: scene07/lens.ts. No shims. Isolated preview entry: scene07/entry.tsx. Notes: docs/scenes/S07.md.
@@ -18,9 +18,10 @@ import type {SunHop, SunMove} from '../lib';
 import {NoticeboardCorner, NOTICE_CORNER, WORKSHOP_CORNER} from './shared/sets';
 import type {LayerWrap, WorkshopLayout} from './shared/sets';
 import {measureCaption, useCaptionFont} from '../lib/font';
-import {EdgeOnlooker, FixSign, HoursClock, LabelTag, LeakSheet} from './shared/props';
+import {EdgeOnlooker, FixSign, HoursClock, LabelTag, labelBox, LeakSheet} from './shared/props';
+import type {LabelTagProps} from './shared/props';
 import {useBeats} from './scene07/beats';
-import {BoardClones, BoardShade, camAt, camMat, CLOCK_SKY_CLIP, ClockFace, CLONE, CloneSpot, cruiseFor, DownSleeve, FarCity, FarRoofDetails, Flyer, GroundDetails, J4_CUE, j4Pop, LatchCover, LatchKnob, LitCopy, PaneGlass, PhoneCopy, PhoneScreen, Pigeon, PinDot, PipS07, PUSHED, RiseFromLow, SpinWedge, StillUnderline, WallDetails, WireCopy, WireCopySpec, withoutGroundMarks} from './scene07/parts';
+import {BoardClones, BoardShade, camAt, camMat, CLOCK_SKY_CLIP, ClockFace, CLONE, CloneSpot, CoatDetail, cruiseFor, DownSleeve, FarCity, FarRoofDetails, Flyer, GroundDetails, J4_CUE, j4Pop, L7Pin, LatchCover, LatchKnob, LitCopy, PaneGlass, PhoneCopy, PhoneScreen, Pigeon, PinDot, PipS07, PUSHED, RiseFromLow, SpinWedge, StillUnderline, WallDetails, WireCopy, WireCopySpec, withoutGroundMarks} from './scene07/parts';
 import {PenReveal, RevealPass, s07Strokes, wire0InkedAt} from './scene07/reveal';
 // S06's leak page (the lens wipe's ONE trajectory, pageAt): S07 draws its own copy of the lens sheet with it, so the S07
 // composition and the film (where S06's Wiper draws the same page above both scenes) can never show two sheets.
@@ -41,8 +42,10 @@ const RIGHT_HEADS: Pt[] = [
   [835, 1255],
   // fix round 3: reader 3 is a shoulder-and-bun SLIVER at the right frame edge (head centre at screen ~1085 after the push,
   // no phone): his raised phone covered the round elephant sign as it swung on 'fix' and his head sat under the right-rail
-  // UI (x > 950) for no read; reader 2 carries the right side
-  [994, 1262],
+  // UI (x > 950) for no read; reader 2 carries the right side. A1 fix round 2: he is STATIC and LOW, like the left pair
+  // waiting at the cut (head y 1690): a bun-and-shoulder in the bottom-right corner that frames the opening opposite the
+  // hood and the bun, under the right rail (y > 1500), and slides out of frame with the push (no rise inside the rail)
+  [1000, 1690],
 ];
 /** Fix round 3: reader 0 (teal hood) 55 px left, so his raised phone arm rises from his own shoulder (hand at screen x
  *  ~170) instead of out of the top of reader 1's bun; his phone stays left of the notice's Bit ring. */
@@ -112,6 +115,10 @@ const POP_SKIP = 0.3 * (1 - 1.3 / 2.3) + 0.001;
 /** L7's pop starts this long before the card is first drawn: the kit's 7 % pop spring (LabelTag 'card') is at 20 % after
  *  0.037 s, so the first frame shows a 20-50 % card (motion spec fill pop) instead of a 0-17 % speck. */
 const L7_PRE = 0.037;
+/** L7 (shared LabelTag card) on the board's bottom rail. A1 fix round 2: tilted -1.8 deg (it read as a level UI tooltip
+ *  next to the hand-made FixSign), its pin moved onto the top edge and one overshooting corner (L7Pin overlay). */
+const L7: LabelTagProps = {kind: 'card', box: [300, 1338, 640, 1436], text: ['word leaked Oct 20', 'fix out Oct 21'], fontSize: 36, swing: true, rot: -1.8, seed: 's7L7'};
+const L7_BOX = labelBox(L7);
 /** The workshop's one shade plane (fix round 3): its facade is relit clay -> sand right of this world x, so the left
  *  66 px (780-846, the kit's shade band, behind the door and the shop window) stay clay. At 846 the step lands at screen
  *  x ~928 after the push, left of the right-rail UI (x > 950), not as an extra edge inside it. */
@@ -252,6 +259,11 @@ const Scene07: React.FC = () => {
     rampAt: B.tilt,
     rampDur: RAMP,
     leanTo: {seed: s8.seed, t0: B.end},
+    // A1 fix round 2: no drawn Bit on a copy until the tilt (only the pinned notice carries the doodle while the clock
+    // runs); the doodle and its ring draw on during the tilt so the copies reach S08's LeakSheet copies on the cut
+    doodleAt: B.tilt + 0.04 + (pegAt - B.before) * 0.8,
+    // a copy peeled off a small (sketch-less) clone draws its lock sketch on in flight
+    lockAt: src.s < 0.85 ? src.liftAt! + 0.05 : undefined,
     seed,
     ...extra,
   });
@@ -357,7 +369,8 @@ const Scene07: React.FC = () => {
   const reader = (i: number) => {
     const r = S7_READERS[i];
     const head: Pt = i < 2 ? [r.head[0] + (i === 0 ? R0_DX : 0), r.head[1]] : RIGHT_HEADS[i - 2];
-    const look = i === 3 ? READER3 : {hair: r.hair, hairColor: undefined, acc: r.acc};
+    // A1 fix round 2: reader 1 carries a bag strap across her back (the kit Person's 'strap')
+    const look = i === 3 ? READER3 : {hair: r.hair, hairColor: undefined, acc: i === 1 ? [...r.acc, 'strap' as const] : r.acc};
     // A1 fix round 2: reader 3 (the brown edge sliver, at screen x > 950) is present and STATIC from the cut: his rise
     // landed under the like / comment column, where it read as nothing; reader 2's rise carries 'the' at the right
     const riseAt = i === 2 ? B.the - 0.06 : undefined;
@@ -380,6 +393,9 @@ const Scene07: React.FC = () => {
           seed={`nc/rd${i}`}
         />
         {up ? null : <DownSleeve x={head[0]} y={head[1]} head={82} cap={look.hair === 'cap'} riseAt={riseAt} seed={`nc/rd${i}`} />}
+        {/* A1 fix round 2: one small kit detail each (static): reader 0's hood hem seam, reader 2's collar crease and
+            shoulder seams */}
+        {i === 0 || i === 2 ? <CoatDetail kind={i === 0 ? 'hood' : 'collar'} x={head[0]} y={head[1]} head={82} cap={look.hair === 'cap'} riseAt={riseAt} seed={`nc/rd${i}`} /> : null}
       </React.Fragment>
     );
   };
@@ -406,7 +422,12 @@ const Scene07: React.FC = () => {
 
         {/* L7 on the board's bottom rail (fix round 3: on the storyboard's w73+0.10; it pops from ~20 %: the kit's spring is
             started L7_PRE early and the card is drawn from B.label, so its first frame already reads) */}
-        {t >= B.label ? <LabelTag kind="card" box={[300, 1338, 640, 1436]} text={['word leaked Oct 20', 'fix out Oct 21']} fontSize={36} swing at={B.label - L7_PRE} seed="s7L7" /> : null}
+        {t >= B.label ? (
+          <>
+            <LabelTag {...L7} at={B.label - L7_PRE} />
+            <L7Pin box={L7_BOX} fs={36} rot={-1.8} at={B.label - L7_PRE} seed="s7L7p" />
+          </>
+        ) : null}
 
         {/* Pip on the board top + the flyer gag */}
         <PipS07 B={B} />

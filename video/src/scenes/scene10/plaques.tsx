@@ -24,8 +24,10 @@ export function bracketFor(x: number, y: number, size: number, wallX: number): {
 /** Support tag width (world px; props SupportTag: body w x 0.82 w under a 0.16 w loop). Fix round 3: 58 (was 42) for the
  *  near plaques and the two lobs, so 'tick / no tick / tick' reads at thumbnail size (the far wave keeps 30). */
 export const TAG_W = 58;
-/** The flat peach backing disc behind a landed tag: radius (x tag width), pop, hold, shrink (s). */
-export const TAG_DISC = {r: 0.74, pop: 0.12, hold: 0.3, out: 0.1};
+/** The flat peach backing disc behind a landed tag: radius (x tag width), pop, hold, settle (s) and the size it KEEPS
+ *  (A1 FR2: it stays for the rest of the scene, settling to 0.86, so 'tagged' still reads at phone size after the tick;
+ *  it used to shrink away after 0.3 s). */
+export const TAG_DISC = {r: 0.74, pop: 0.12, hold: 0.3, out: 0.14, keep: 0.86};
 /** Hang point -> the tag body's centre (props SupportTag geometry). */
 export const tagBodyOffset = (w: number) => w * (0.16 + 0.41);
 
@@ -63,6 +65,9 @@ export type HangPlaqueProps = {
   tag?: {at: number; tickAt: number; hang: Pt; size?: number; ringAt?: number; /** A1 FR1: the corner screw its twine is tied to (face units) */ screw?: Pt};
   /** Small nudges of the whole plate (pendulum 4 deg, 0.3 s): the 'skip' as a tag sails over it. */
   nudgeAt?: number[];
+  /** A1 FR2: an EMPTY twine with an empty eyelet hangs from the plate's outer top corner where a tag would be (face
+   *  units: the tie point); it swings on every nudge (the first one hardest): 'no tag' as a readable absence. */
+  emptyHook?: Pt;
   /** Bit: pops on the hook at `at`, crawls down the chain onto the face and into the web corner (arrives at + 0.4). */
   bit?: {at: number; size: number; /** struggle bursts, s after he is caught */ bursts?: number[]};
   seed?: string;
@@ -232,12 +237,12 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
       }
     }
     // the flat peach backing disc (fix round 3): pops with a 7 % overshoot on the landing, holds 0.3 s behind the tick,
-    // then shrinks away (no fade)
+    // then settles to 0.86 and stays (A1 FR2)
     const da = p.tag.at;
     let dk = 0;
     if (t < da + TAG_DISC.pop) dk = popK(t, da, 0.07, TAG_DISC.pop);
     else if (t < da + TAG_DISC.pop + TAG_DISC.hold) dk = 1;
-    else dk = 1 - E.inCubic(prog(t, da + TAG_DISC.pop + TAG_DISC.hold, TAG_DISC.out));
+    else dk = 1 - (1 - TAG_DISC.keep) * E.inOutSine(prog(t, da + TAG_DISC.pop + TAG_DISC.hold, TAG_DISC.out));
     const disc = dk > 0.01 ? <circle cx={hx} cy={hy + tagBodyOffset(tw)} r={tw * TAG_DISC.r * dk} fill={palette.peach} /> : null;
     // A1 FR1: the twine from the plate's outer corner screw to the tag's eyelet (a slight sag), so the tag hangs BESIDE
     // the plate, not over its emblem
@@ -257,6 +262,24 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
       </>
     );
   }
+  // A1 FR2: the empty twine (where siteM's tag would hang): tied at the plate's outer top corner, 34 units long, an empty
+  // ink eyelet at its end; it swings 18 deg on the skip nudge (and 9 on the later ones)
+  let emptyHook: React.ReactNode = null;
+  if (p.emptyHook && flipQ >= 0.5) {
+    const tx = hookX + p.emptyHook[0];
+    const ty = chain + 50 + p.emptyHook[1];
+    let a = 0;
+    (p.nudgeAt ?? []).forEach((n, i) => (a += pendulum(t, n, i ? 9 : 18, 0.45, 0.7)));
+    const L = 34;
+    const eye: Pt = [tx + 6, ty + L];
+    emptyHook = (
+      <XG m={mat.about(mat.rotate(a * dir), tx, ty)}>
+        <Ink d={`M${tx.toFixed(1)} ${ty.toFixed(1)}Q${(tx + 9).toFixed(1)} ${(ty + L * 0.55).toFixed(1)} ${eye[0].toFixed(1)} ${(eye[1] - 4.5).toFixed(1)}`} width={1.9 / s} color={palette.brown} taper={false} vary={0} seed={`${seed}/etw`} />
+        <Ink d={`M${eye[0] + 4.5} ${eye[1]}a4.5 4.5 0 1 0 -9 0a4.5 4.5 0 1 0 9 0`} width={2.2 / s} taper={false} vary={0} seed={`${seed}/eye`} />
+        <Fill d={blob(tx, ty, 4.2, 4.2, {seed: `${seed}/eknot`})} color={palette.ink} mode="none" offset={false} seed={`${seed}/eknot`} />
+      </XG>
+    );
+  }
   return (
     <XG m={mat.compose(mat.translate(b.x, b.y), mat.scale(s))}>
       <Ink d={bracket} width={brW} seed={`${seed}/br`} />
@@ -264,6 +287,7 @@ export const HangPlaque: React.FC<HangPlaqueProps> = (p) => {
       <XG m={mat.compose(mat.about(mat.rotate(sw), hookX, 0), mat.about(mat.scale(k), hookX, 0))}>
         <Ink d={`M${hookX - 18} 0L${hookX - 22} ${chain}M${hookX + 18} 0L${hookX + 22} ${chain}`} width={W * 0.7} seed={`${seed}/ch`} order="all" />
         <XG m={mat.compose(mat.translate(hookX, chain + 50), mat.scale(flipSx, 1))}>{face}</XG>
+        {emptyHook}
         {tag}
       </XG>
     </XG>

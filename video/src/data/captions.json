@@ -5,7 +5,7 @@
   {"s":6.42,"e":8.605,"lines":[{"text":"take over a site","s":6.42},{"text":"without a password.","s":7.275}],"highlights":[{"text":"without a password.","s":7.275}]},
   {"s":8.605,"e":10.135,"lines":[{"text":"It's in PHP,","s":8.605}],"highlights":[{"text":"PHP,","s":8.96}]},
   {"s":10.135,"e":11.795,"lines":[{"text":"the language","s":10.135},{"text":"everyone loves, and","s":10.64}],"highlights":[]},
-  {"s":11.795,"e":14.395,"lines":[{"text":"about seven out of ten","s":11.795},{"text":"websites run on it.","s":12.905}],"highlights":[{"text":"seven out of ten","s":11.955}]},
+  {"s":11.795,"e":14.395,"lines":[{"text":"about seven out of ten","s":11.795},{"text":"websites run on it.","s":12.905}],"highlights":[{"text":"seven out of ten","s":11.955}],"out":14.04},
   {"s":14.395,"e":16.61,"lines":[{"text":"This bug was in there","s":14.395},{"text":"for like fourteen years","s":15.195}],"highlights":[{"text":"fourteen years","s":15.49}]},
   {"s":16.61,"e":18.705,"lines":[{"text":"before researchers","s":16.61},{"text":"using AI figured out","s":17.435}],"highlights":[{"text":"AI","s":17.705}]},
   {"s":18.705,"e":19.98,"lines":[{"text":"how bad it was.","s":18.705}],"highlights":[{"text":"bad","s":18.87}]},
@@ -24,7 +24,7 @@
   {"s":43.605,"e":45.85,"lines":[{"text":"they're not officially","s":43.605},{"text":"supported anymore.","s":44.39}],"highlights":[{"text":"not officially","s":43.855}],"out":45.48},
   {"s":45.85,"e":48.365,"lines":[{"text":"Even the FBI said if","s":45.85},{"text":"you can't update yet,","s":47.235}],"highlights":[{"text":"FBI","s":46.195}]},
   {"s":48.365,"e":50.235,"lines":[{"text":"just turn it off,","s":48.365},{"text":"which is basically","s":49.63}],"highlights":[{"text":"turn it off,","s":48.69}]},
-  {"s":50.235,"e":52.43,"lines":[{"text":"tech support's answer","s":50.235},{"text":"to everything.","s":51.345}],"highlights":[],"out":52.06},
+  {"s":50.235,"e":52.43,"lines":[{"text":"tech support's answer","s":50.235},{"text":"to everything.","s":51.345}],"highlights":[],"out":51.965},
   {"s":52.43,"e":53.76,"lines":[{"text":"And some of those","s":52.43},{"text":"governments did it","s":53.015}],"highlights":[{"text":"did it","s":53.51}]},
   {"s":53.76,"e":55.36,"lines":[{"text":"before there was","s":53.76},{"text":"even a fix.","s":54.395}],"highlights":[{"text":"before","s":53.76}]}
 ]

@@ -1,0 +1,7 @@
+0 0 /home/user/Test-/video/review/checkins/0908/S11/f00000.png
+1.09 33 /home/user/Test-/video/review/checkins/0908/S11/f00033.png
+2.18 65 /home/user/Test-/video/review/checkins/0908/S11/f00065.png
+3.27 98 /home/user/Test-/video/review/checkins/0908/S11/f00098.png
+4.36 131 /home/user/Test-/video/review/checkins/0908/S11/f00131.png
+5.45 164 /home/user/Test-/video/review/checkins/0908/S11/f00164.png
+[render-frames] S11 (src/entry-film.ts): bundle 3.7s, 6 frames in 1.7s (286 ms/frame incl. page setup, concurrency 2, scale 0.5)

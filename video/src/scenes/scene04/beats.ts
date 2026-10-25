@@ -26,7 +26,8 @@ const ABS = {
   sunTakeOff: 13.945, //    end(it) (S03): the sun's low glide-hop starts (mid-air at (810, 680) on the cut)
   pipCrouch: 14.05, //      cut(it)-0.12 (S03): Pip crouches to hop toward the stoop (crosses the cut)
   cut: S04_START, //        cut(it): MATCH on the sun (mid-glide); door #4 at medium-close; the slow creep begins
-  pipTakeOff: 14.19, //     S03 hand-off: Pip's take-off, right after the cut
+  pipTakeOff: 14.17, //     S03 hand-off (cut S03|S04 pass; was 14.19, airborne on S04's first frame): the PUSH starts
+  //                        on the cut (S03's crouch released over 0.08 s, feet planted: cast.tsx PUSH), lift-off 14.25
   this: 14.395, //          w46 'This': the sun touches down in its slot (930, 690); Pip lands on step 2's tread
   yawn: 14.76, //           w48-0.025 'was' (fix round: was w46+0.12 = 14.515, inside 'bug'): Pip yawns once Bit has
   //                        had the 'bug' window to himself (he stands, settled, from 'This' until here)

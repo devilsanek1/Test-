@@ -470,8 +470,12 @@ const Scene11: React.FC = () => {
       <NearLamp offAt={b.lampOff} />
       <EdgeOnlooker x={ONL[0].x} y={ONL[0].y} head={ONL[0].head} hair="long" hairColor={palette.brown} body={palette.sage} acc={['collar']} rim="right" seed="s11/onl1" />
       <OnlookerHairMarks x={ONL[0].x} y={ONL[0].y} head={ONL[0].head} hair={palette.brown} />
+      {/* Cut S11|S12 (phase B): onlooker 2 was a clay-haired head in a TEAL HOOD on a teal coat, the look of S12's near
+          observer (S01's: brown hair, teal hood, teal coat), whose head opens the wide 130 px right / 180 px up and
+          bigger: across the close -> wide cut the same person seemed to jump and grow. Now a dark BUN and a scarf (no
+          hood): a different person at a glance; the teal coat stays (the bottom keeps its colour mass across the cut) */}
       <OnlookerTurn x={ONL[1].x} y={ONL[1].y} turnAt={b.shutter + 0.03} backAt={b.noteSlap}>
-        <EdgeOnlooker x={ONL[1].x} y={ONL[1].y} head={ONL[1].head} hair="short" hairColor={palette.tan} body={palette.teal} acc={['hood']} rim="right" seed="s11/onl2" />
+        <EdgeOnlooker x={ONL[1].x} y={ONL[1].y} head={ONL[1].head} hair="bun" hairColor={palette.ink} body={palette.teal} acc={['scarf']} rim="right" seed="s11/onl2" />
       </OnlookerTurn>
     </World>
   );

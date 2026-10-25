@@ -29,8 +29,10 @@ const LOCK_SIZE = L.h; // 75: 60 x 75 world, 69 x 86 px on screen at the 1.15 la
 const C: Pt = [L.x, L.y];
 // the detail loupe: the blueprint's callout circle (r 64) swells to r 140 and magnifies the lock x2.8 about its centre
 // (lock 168 x 210 world = 225 x 281 px at zoom 1.34; its rounded box reaches r ~127, inside the ring). ink1 keeps the
-// magnified box pen at ~5 px on screen (1.36 x 2.8 x 1.34).
-const LOUPE = {r0: 64, r1: 140, m: 2.8, dur: 0.56, ink0: 3.4, ink1: 1.36};
+// magnified box pen at ~5 px on screen (1.36 x 2.8 x 1.34). Cut S01|S02 (phase B): ink0 3.4 -> 2.4, so the closed
+// plate's pen on the match frames carries S01's lock box weight (f141 ~2.0 px; it was ~3.6 px on f142, a heavier box
+// than the one the dive left on screen); it still grows to the same ~5 px as the loupe swells (ink0^(1-k) ink1^k x m).
+const LOUPE = {r0: 64, r1: 140, m: 2.8, dur: 0.56, ink0: 2.4, ink1: 1.36};
 const LN_M = Math.log(LOUPE.m);
 /** The camera landing's log-zoom since the cut (camera.ts: out(quad) over LAND). */
 const zLand = (t: number) => Math.log(camAt(Math.min(Math.max(t, 0), LAND), DUR).zoom / camAt(0, DUR).zoom);

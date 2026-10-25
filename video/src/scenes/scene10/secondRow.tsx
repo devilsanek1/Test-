@@ -1,16 +1,16 @@
 // S10 second row (replaces the OldQuarter 'second' layer through the set's `wrap`; stand-in for the sets request
 // "second-row plaques with an `old` mask and one old door with a pre-existing caretaker tag; support-tag slots on the
-// plaques"). Fix round 2 re-lay: nine real buildings behind the near row, the far plates enlarged to 44 px and kept clear
+// plaques"). A1 FR2 re-lay: ten buildings behind the near row, SIX far plates at 40 px (42 on screen), ink 2.0, kept clear
 // of every other detail (no antenna rods, no dark boards over the sun, windows at half density):
-//  - LEFT of the sun: one tall building (b0) with an OLD plate;
+//  - LEFT of the sun: one tall building (b0) with a current plate (P0);
 //  - UNDER the sun: four low, plate-less rooftops (tops 772-792), fills and one roofline stroke each, so the 1/2 pie reads;
-//  - RIGHT of the sun: two tall ones (A current, B old);
-//  - IN the street gap: a cream gabled house (C old) behind a lower tan one (D current).
-// On 'versions' EVERY far plate paper-flips (a version check, 0.05 s apart): the old ones land dark (ochre, chipped,
-// bent corner, crack) AND drop crooked onto their one screw in the same move, with a dust puff; the current ones land
-// cream. On 'so' + 0.12 the old ones grow a cream cobweb tuft and sag a little more. On 'supported' the wave of 30 px
-// support tags pops onto the CURRENT plates (A, then D), and each OLD plate it passes shudders (the skip, seen): A tag,
-// B shudder, C shudder, D tag, 0.08 s apart. With the near row: 4 old of 8 plates.
+//  - RIGHT of the sun: two tall ones (A old on a cream wall, B current);
+//  - IN the street gap: three houses stepping down toward us (C old, D current, E old), plates zig-zagging.
+// On 'versions' EVERY far plate paper-flips (a version check, 0.04 s apart, reading order): the old ones land with a
+// 1-frame dark pop, then ochre (chipped, bent corner, crack) AND drop crooked onto their one screw in the same move, with
+// a 1.5x dust puff; the current ones land cream. On 'so' + 0.12 the old ones sag a little more. On 'supported' the wave
+// of 24 px support tags pops onto the CURRENT plates and each OLD plate it passes shudders (the skip, seen), 0.06 s
+// apart. With the near row: 4 old of 9 plates (about half at thumbnail size).
 
 import React from 'react';
 import {palette} from '../../lib/theme';
@@ -34,36 +34,44 @@ const SAG_DEG = 3;
 /** Far plate size (world px; 46 px on screen at the 1.05 push). */
 /** A1 FR1: 33 (was 44: each far plate was ~5 far windows wide, a sticker on the skyline; a near plaque is ~2.4 near
  *  windows wide). */
-export const FAR_PLATE = 33;
+/** A1 FR2: 40 (42 on screen; was 33: at thumbnail size the far plates were specks and 'half' rested on the sun pie). */
+export const FAR_PLATE = 40;
 /** Far plate ink (world px): the far layer's thin weight. */
 const FAR_INK = 2;
 /** Pop stagger back to front (fix round 2b: 0.04 -> 0.03, with the row leading 'like' by 0.30 s, so all nine pops start
  *  0.571-0.811 local and settle by ~1.01: after the gap wedge, before the sun's spoke and its cream half on 'HALF'). */
-const STAGGER = 0.03;
+/** A1 FR2: 0.025 with the row at 'like' - 0.22 (ten pops, the last settles ~40.71, its own beat after the sun lands). */
+const STAGGER = 0.025;
 
 // Order = draw order (back to front) = pop order (STAGGER). Roof peaks stay >= 640 (screen >= 603: rule 10).
 const DEF: B[] = [
-  // b0: P0 centred on the wall right of siteL's mansard (its slope is at x <= 353 down to the mansard base 690 + 6 px
-  // of ink overshoot): the plate spans 359-403, clear of it even after its crooked drop (fix round 2b: was x 369)
-  // A1 FR1: b0's 45 px sliver beside the mansard (next to the sun) is left EMPTY: P0 is dropped (C carries the third old
-  // plate of the row: siteM, B, C)
-  {x: 338, w: 66, top: 646, roof: 'flat', color: palette.sage},
+  // A1 FR2 (far cascade you can see): SIX far plates at 40 px (42 on screen), ink 2.0, alternating current / OLD in
+  // reading order (P0, A, B, C, D, E): with the near row 4 old of 9 at thumbnail size. Every plate sits fully inside
+  // ONE visible facade (the gap's visible width is 654-726 below y 921, between the near sites' return faces), the old
+  // ones on LIGHT walls (cream / mintPale / sand) so the ochre plate is the darkest thing on its wall.
+  // b0: P0 (current) in the sliver right of siteL's edge (345) and left of the sun (b0 covers the sun's left rim)
+  {x: 338, w: 66, top: 646, roof: 'flat', color: palette.sage, plate: {x: 375, y: 726, old: false}},
   {x: 398, w: 52, top: 792, roof: 'flat', color: palette.sand},
   {x: 450, w: 54, top: 776, roof: 'gable', color: palette.tan},
   {x: 504, w: 50, top: 790, roof: 'step', color: palette.cream},
   {x: 554, w: 48, top: 774, roof: 'chimney', color: palette.sage},
-  // A1 FR1: every far plate sits fully inside ONE visible facade, below its roofline, >= 12 px from its edges
-  {x: 602, w: 80, top: 662, roof: 'step', color: palette.tan, plate: {x: 646, y: 712, old: false}},
-  {x: 682, w: 62, top: 648, roof: 'flat', color: palette.sage, plate: {x: 711, y: 708, old: true}},
-  // the street gap (x 640-740): a cream gabled house behind a lower tan one (nearer, so drawn later)
-  {x: 640, w: 100, top: 776, roof: 'gable', color: palette.cream, plate: {x: 690, y: 820, old: true, hang: 'tr'}},
-  {x: 640, w: 100, top: 868, roof: 'flat', color: palette.tan, plate: {x: 690, y: 914, old: false}},
+  // A (OLD, cream wall beside the sun) and B (current, tan)
+  {x: 602, w: 80, top: 662, roof: 'step', color: palette.cream, plate: {x: 646, y: 706, old: true}},
+  {x: 682, w: 62, top: 648, roof: 'flat', color: palette.tan, plate: {x: 712, y: 694, old: false}},
+  // the street gap (x 640-740): three houses stepping down toward us (each nearer one drawn later), plates zig-zag
+  {x: 640, w: 100, top: 800, roof: 'gable', color: palette.mintPale, plate: {x: 673, y: 838, old: true, hang: 'tr'}},
+  {x: 640, w: 100, top: 892, roof: 'flat', color: palette.tan, plate: {x: 700, y: 932, old: false}},
+  {x: 640, w: 100, top: 980, roof: 'chimney', color: palette.sand, plate: {x: 681, y: 1022, old: true}},
 ];
 
 export const SECOND = DEF.map((d, i) => ({...d, i, cx: d.x + d.w / 2}));
 const PLATED = SECOND.filter((b) => b.plate);
 
 const GABLE = 22;
+/** Far flip spacing (storyboard: 0.04 s apart). */
+const FLIP_STEP = 0.04;
+/** The windows that light on 'of' (window-dot origins, world; each on a visible wall: b0, A, E). */
+const LIT: Pt[] = [[338 + 66 * 0.24, 662], [602 + 80 * 0.24, 758], [640 + 100 * 0.66, 1076]];
 
 /** Roof shapes (fills in the wall colour + one roofline stroke) and the half-density window dots, batched once. */
 const G = (() => {
@@ -106,10 +114,10 @@ const G = (() => {
     }
     (b.color === palette.sage ? winLight : winDark).push(wd);
   }
-  // the gap houses' doors on the eye line (the gabled house's door shows left of the nearer one's)
+  // the nearest gap house's (E, OLD) doors on the eye line, inside the visible 654-726 between the return faces
   const doors = [
-    {i: 8, x: 652, y: EYE - 34, w: 15, h: 34},
-    {i: 8, x: 712, y: EYE - 34, w: 15, h: 34},
+    {i: 9, x: 664, y: EYE - 34, w: 15, h: 34},
+    {i: 9, x: 700, y: EYE - 34, w: 15, h: 34},
   ];
   return {roofs, winDark: winDark.join(''), winLight: winLight.join(''), doors};
 })();
@@ -127,15 +135,15 @@ export type SecondRowProps = {
   tagsAt: number;
 };
 
-/** A dust puff: five specks fly out and shrink away (0.26 s, no fade). */
-const Puff: React.FC<{x: number; y: number; at: number; r?: number; seed: string}> = ({x, y, at, r = 26, seed}) => {
+/** A dust puff: five specks fly out and shrink away (0.26 s, no fade). A1 FR2: r 39 / specks 5.4 on the far flips (1.5x). */
+const Puff: React.FC<{x: number; y: number; at: number; r?: number; speck?: number; seed: string}> = ({x, y, at, r = 26, speck = 3.6, seed}) => {
   const t = useTime();
   if (t < at || t >= at + 0.26) return null;
   const q = E.outCubic(prog(t, at, 0.18));
   const shrink = 1 - prog(t, at + 0.14, 0.12);
   let d = '';
   [[-1, -0.6], [1, -0.8], [-0.9, 0.7], [0.8, 0.9], [0.1, -1.1]].forEach(([dx, dy], i) => {
-    const rr = 3.6 * shrink;
+    const rr = speck * shrink;
     if (rr > 0.3) d += blob(x + dx * (r * 0.55 + q * r), y + dy * (r * 0.45 + q * r * 0.8), rr, rr, {seed: `${seed}/${i}`});
   });
   return d ? <Fill d={d} color={palette.sand} mode="none" offset={false} seed={`${seed}/puff`} /> : null;
@@ -163,6 +171,9 @@ const FarPlate: React.FC<{p: Plate; flipAt: number; sagAt: number; shudderAt?: n
     hop = -4 * Math.sin(Math.PI * Math.min(1, d / 0.12));
   }
   const pivot: Pt = [p.x - dir * 38 * s, p.y - 38 * s];
+  // A1 FR2: an old plate LANDS with a 1-frame dark pop (ink-brown face, 1.12x) as its flip completes: the thunk of 'old'
+  const thunk = p.old && t >= flipAt + 0.2 && t < flipAt + 0.2 + 1 / 30;
+  const pk = thunk ? 1.12 : 1;
   // the old plate hangs on its ONE remaining screw (a fat ink screw head at the pivot, on the wall) and the empty hole
   // of the second screw stays on the wall where the plate's top-right corner was (an ink ring): a plate that dropped
   const dropped = old && t >= flipAt + 0.1;
@@ -171,7 +182,7 @@ const FarPlate: React.FC<{p: Plate; flipAt: number; sagAt: number; shudderAt?: n
     <>
       {dropped ? <Ink d={circle(hole[0], hole[1], 2.3, {seed: `${seed}/hole`})} width={1.5} taper={false} vary={0} seed={`${seed}/hole`} /> : null}
       <XG m={mat.compose(mat.translate(0, hop), mat.about(mat.rotate(rot), pivot[0], pivot[1]))}>
-      <XG m={mat.compose(mat.translate(p.x, p.y), mat.scale(s * sx, s))}>{plateFace({old, W: FAR_INK / s, seed, offset: [3, 2.2], screws: !old})}</XG>
+      <XG m={mat.compose(mat.translate(p.x, p.y), mat.scale(s * sx * pk, s * pk))}>{plateFace({old, W: FAR_INK / s, seed, offset: [3, 2.2], screws: !old, oldFill: thunk ? palette.ink : undefined})}</XG>
       {/* A1 FR1: no cobweb tufts on the far plates (dark + crooked is enough); the wave's tags are 24 px */}
       {tagAt !== undefined && t >= tagAt ? <SupportTag x={p.x + 5} y={p.y - P / 2 + 2} size={24} at={tagAt} checkAt={tagAt + 0.05} seed={`${seed}/tag`} /> : null}
       </XG>
@@ -188,11 +199,12 @@ const FarPlate: React.FC<{p: Plate; flipAt: number; sagAt: number; shudderAt?: n
 export const SecondRow: React.FC<SecondRowProps> = ({popAt, flipAt, dropAt, windowAt, tagsAt}) => {
   const t = useTime();
   const flips = new Map<number, number>();
-  PLATED.forEach((b, k) => flips.set(b.i, flipAt + 0.05 * k));
-  // the wave runs over the plates right of the sun and down the gap (A, B, C, D): tags on the current, shudders on the old
+  // A1 FR2: 0.04 s apart (storyboard), reading order P0, A, B, C, D, E
+  PLATED.forEach((b, k) => flips.set(b.i, flipAt + FLIP_STEP * k));
+  // the wave runs over every far plate in reading order: tags on the current, shudders on the old (the skip, seen)
   const wave = new Map<number, number>();
-  PLATED.filter((b) => b.i >= 5).forEach((b, k) => wave.set(b.i, tagsAt + 0.08 * k));
-  const winLit = t >= windowAt;
+  PLATED.forEach((b, k) => wave.set(b.i, tagsAt + 0.06 * k));
+  const last = SECOND.length - 1;
   return (
     <>
       {SECOND.map((b) => {
@@ -213,16 +225,18 @@ export const SecondRow: React.FC<SecondRowProps> = ({popAt, flipAt, dropAt, wind
         );
       })}
       {/* window dots, batched (half density); they arrive with the last pop-ups */}
-      {t >= popAt + STAGGER * 8 + 0.18 ? (
+      {t >= popAt + STAGGER * last + 0.18 ? (
         <>
           <Fill d={G.winDark} color={palette.tealDark} offset={false} mode="snap" seed="s10s/win" />
           <Fill d={G.winLight} color={palette.mintPale} offset={false} mode="snap" seed="s10s/winl" />
         </>
       ) : null}
-      {winLit ? <Fill rect={[SECOND[6].x + SECOND[6].w * 0.24, SECOND[6].top + 16 + 40 * 4, 7, 11]} color={palette.peach} offset={false} mode="snap" seed="s10s/lit" /> : null}
+      {/* A1 FR2: on 'of' three far windows light in a 0.04 s cascade (b0, A, E: all on visible wall; the single window
+          lit before sat behind the gap house and nothing marked the word) */}
+      {LIT.map(([x, y], k) => (t >= windowAt + 0.04 * k ? <Fill key={`lit${k}`} rect={[x - 1, y - 1, 9, 13]} color={palette.peach} offset={false} mode="snap" seed={`s10s/lit${k}`} /> : null))}
       {/* gap doors: the OLD gabled house's door already carries a host's own sage tag on its handle (a pauser detail) */}
       {G.doors.map((d, k) =>
-        t >= popAt + STAGGER * (7 + k) + 0.1 ? (
+        t >= popAt + STAGGER * d.i + 0.1 ? (
           <React.Fragment key={k}>
             <Fill d={rectPath(d.x, d.y, d.w, d.h)} color={palette.teal} offset={false} mode="snap" seed={`s10s/d${k}`} />
             <Ink d={rect(d.x, d.y, d.w, d.h, {seed: `s10s/di${k}`, over: 1, edges: 'tlr'})} width={SI.hair} taper={false} seed={`s10s/di${k}`} />
@@ -230,7 +244,7 @@ export const SecondRow: React.FC<SecondRowProps> = ({popAt, flipAt, dropAt, wind
           </React.Fragment>
         ) : null,
       )}
-      {t >= popAt + STAGGER * 7 + 0.1
+      {t >= popAt + STAGGER * G.doors[0].i + 0.1
         ? (() => {
             const d = G.doors[0];
             const hx = d.x + d.w - 4;
@@ -244,7 +258,7 @@ export const SecondRow: React.FC<SecondRowProps> = ({popAt, flipAt, dropAt, wind
             );
           })()
         : null}
-      {PLATED.map((b) => (b.plate!.old ? <Puff key={`pf${b.i}`} x={b.plate!.x} y={b.plate!.y} at={flips.get(b.i)! + 0.1} seed={`s10s/pf${b.i}`} /> : null))}
+      {PLATED.map((b) => (b.plate!.old ? <Puff key={`pf${b.i}`} x={b.plate!.x} y={b.plate!.y} at={flips.get(b.i)! + 0.1} r={39} speck={5.4} seed={`s10s/pf${b.i}`} /> : null))}
     </>
   );
 };

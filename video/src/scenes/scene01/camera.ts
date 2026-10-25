@@ -70,8 +70,14 @@ export const toScreen = (t: number, p: [number, number], layer: string | number 
 };
 export const zoomAt = (t: number, layer: string | number = 1) => layerMat(t, layer)[0];
 
-/** Ink compensation in the dive: the camera scales every stroke 3.07x, S02 opens at ~3-4 px. Per layer, the factor
- *  (zoom / zoom at the dive start)^-0.6 (ENGINE.md 4b, house k 0.6): 1.0 up to 4.385 (no step), ~0.51 at the cut, so a
- *  3.4 px line lands at ~5.5 px instead of ~10.9 px. Fix round 4: fed to an <InkScale> around EVERY layer of the set
- *  AND the scene's extras (plaza.tsx wrap), so govA's columns, govB's door, pediment and lock box are compensated too. */
-export const inkComp = (t: number, layer: string | number = 'buildings') => (t <= CAM.dive.t0 ? 1 : Math.pow(zoomAt(t, layer) / zoomAt(CAM.dive.t0, layer), -0.6));
+/** Ink compensation in the dive: the camera scales every stroke 3.07x, S02 opens at ~2-4 px. Per layer, the factor
+ *  (zoom / zoom at the dive start)^-DIVE_INK_K (ENGINE.md 4b): 1.0 up to 4.385 (no step). Fix round 4: fed to an
+ *  <InkScale> around EVERY layer of the set AND the scene's extras (plaza.tsx wrap), so govA's columns, govB's door,
+ *  pediment and lock box are compensated too.
+ *  Cut S01|S02 (phase B): k 0.6 -> 0.85. With the house 0.6 the dive kept 3.07^0.4 = 1.57x of its line growth and the
+ *  last S01 frame (f141, full res, near-axis strokes) measured p50 3.5 / p75 4.9 / p90 5.7 px against S02's first frame
+ *  (f142) 2.4 / 3.5 / 3.9 px, the door frame and shutter box 5.5-5.9 px against S02's 4 px loupe ring and cornice, the
+ *  lock ring 4.9 px against S02's 3.9 px callout ring. At 0.85 the dive keeps 3.07^0.15 = 1.18x (a 3.4 px line lands at
+ *  ~4 px), so the weight carries through the matchcut (measured after: docs/scenes/S01.md 'Cut S01|S02'). */
+export const DIVE_INK_K = 0.85;
+export const inkComp = (t: number, layer: string | number = 'buildings') => (t <= CAM.dive.t0 ? 1 : Math.pow(zoomAt(t, layer) / zoomAt(CAM.dive.t0, layer), -DIVE_INK_K));

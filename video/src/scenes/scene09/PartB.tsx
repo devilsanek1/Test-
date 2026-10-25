@@ -17,12 +17,13 @@ import {TerraceHill, TERRACE, terraceDoor, LayerWrap, HALF, People} from '../sha
 import type {WalkerAnchor} from '../shared/sets';
 import {Bit, Snail} from '../shared/props';
 import {B} from './beats';
-import {a2ToB, a2ToBMat, camAt, toScreen} from './camera';
+import {a2ToB, a2ToBMat, camAt, toScreen, REST_DY} from './camera';
 import {A2Actors, PA, pipA, pipRidePoint} from './PartA';
 import {A2Ground, DoorMatch, GHOST} from './matchcut';
 import {Glint} from './shims';
 import {A2Ghost} from './ghost';
 import {bowAt, FixedPool, Hill, House4Tag, HROWS, SUN_CREST} from './hill';
+import {LAND, PipFlight, TAKEOFF, TRAM, edgeAt, fT} from './board';
 
 // ---------------------------------------------------------------- small B-world beats
 
@@ -277,23 +278,16 @@ const NearLayer: React.FC<{children?: React.ReactNode}> = ({children}) => {
  *  the map's to the screen's), sitting on the pier, the boarding leap. `lw` = Elephant lineWeight. */
 type PipShot = {x: number; y: number; scale: number; pose: PoseName; squash: number; rotate: number; amount?: number; look?: number; lw: number};
 
-/** The boarding (fix round 3: a true ballistic leap, no upward slam into the roof). Polish A1: (1) the tram's CUE comes
- *  first (reviewer: he rocketed into empty sky for 6 frames before the nose entered): at board - 0.50 a peach headlamp
- *  glow pops at the left edge at the tram's lamp height and a pantograph spark flashes twice at the top-left corner; his
- *  ears perk and he turns his head to it (0.03 s later); (2) the take-off is 2 frames earlier (board - 0.37, the same
- *  ballistic landing at boardLand), so the launch is ~110 px / frame instead of ~130, and the first 2 airborne frames
- *  carry a stretch smear (a body-colour streak from the pier to him + 3 ink speed lines), so consecutive positions
- *  overlap. The vertical speed still falls linearly to ZERO at the apex = the tram's roof line (feet 602) at boardLand,
- *  where the Wiper takes him over (its landing squash). The sigh moves to 'server' (the vista lands, he sighs). */
+/** The boarding. A1 FR2 (reviewer major: the leap began 9 frames before any tram was on screen, so with the sound off
+ *  'Pip flies away'): he holds on the pier through the sigh ON 'server' (the vista lands); THEN the tram's cue (a peach
+ *  headlamp pool sliding in along the street from the left + a pantograph spark at the top-left, both clear of the
+ *  paper edge), his ears perk and he turns hard left to it; the crouch; the take-off only once the nose is in frame
+ *  (board.tsx TAKEOFF = local 5.00), a 0.26 s ballistic flight to the roof line (feet 602) landing at LAND = 5.26 inside
+ *  the wipe. The flight itself is board.tsx PipFlight (the Wiper draws the same over the tram). */
 const SIGH_AT = B.server + 0.02;
-export const CUE_AT = B.board - 0.5;
+export const CUE_AT = SIGH_AT + 0.28;
 const PERK_AT = CUE_AT + 0.03;
-const TAKEOFF = B.board - 0.37;
-const CROUCH_AT = TAKEOFF - 0.09;
-const ROOF_Y = 602;
-const APEX_Y = ROOF_Y;
-const SPEED_LINES = 0.1;
-const SMEAR_DUR = 2 / 30 + 0.001;
+const CROUCH_AT = TAKEOFF - 0.14;
 
 function pipShot(t: number): PipShot | null {
   const t0 = B.install;
@@ -301,17 +295,9 @@ function pipShot(t: number): PipShot | null {
   const air = 0.42;
   const to = {x: NEAR.pip.x, y: CAP + 1};
   if (t >= CROUCH_AT) {
-    if (t >= B.boardLand) return null;
-    if (t < TAKEOFF) {
-      const a = (t - CROUCH_AT) / (TAKEOFF - CROUCH_AT);
-      return {x: to.x, y: to.y, scale: NEAR.pip.scale, pose: 'sit-back', look: -0.9, squash: 0.26 * Math.sin((a * Math.PI) / 2), rotate: 0, lw: 1};
-    }
-    // up: ballistic, decelerating linearly to rest at the apex (the roof line) at boardLand
-    const k = clamp((t - TAKEOFF) / (B.boardLand - TAKEOFF));
-    const y = APEX_Y + (to.y - APEX_Y) * (1 - k) * (1 - k);
-    // stretched on the fast take-off frames (sy ~1.3), relaxing toward the apex (ears + legs gathered for the roof)
-    const squash = k < 0.45 ? -0.3 * (1 - k / 0.45) - 0.05 : -0.05;
-    return {x: to.x, y, scale: NEAR.pip.scale, pose: 'stand-side', amount: Math.sqrt(Math.min(1, k * 1.6)), squash, look: -0.4, rotate: 0, lw: 1};
+    if (t >= TAKEOFF) return null;
+    const a = (t - CROUCH_AT) / (TAKEOFF - CROUCH_AT);
+    return {x: to.x, y: to.y, scale: NEAR.pip.scale, pose: 'sit-back', look: -0.9, squash: 0.26 * Math.sin((a * Math.PI) / 2), rotate: 0, lw: 1};
   }
   const st0 = pipA(t0);
   const c0 = camAt(t0);
@@ -341,71 +327,56 @@ function perk(t: number, at: number): number {
   return -0.1 * Math.exp(-e * 10) * Math.cos(e * Math.PI * 2 * 3);
 }
 
-/** Pip's body colour (lib/mascot colors: the lavender body) for the take-off smear. */
-const PIP_BODY = '#8D90CC';
-
 const PipB: React.FC = () => {
   const t = useTime();
+  if (t >= TAKEOFF) return t < LAND ? <PipFlight t={t} /> : null;
   const p = pipShot(t);
   if (!p) return null;
-  // the take-off: a body-colour streak from the pier to him on the first 2 airborne frames, and three ink speed lines
-  // trailing under him for 3 frames
-  let smear: React.ReactNode = null;
-  if (t >= TAKEOFF && t < TAKEOFF + SMEAR_DUR) {
-    // a teardrop of his body colour from his belly down toward where he was (it tapers to a point: a smear, not a limb)
-    const top = p.y - 34;
-    const bot = Math.min(CAP + 1, p.y + 80);
-    const w = 24;
-    const d = `M${p.x - w} ${top}Q${p.x} ${top - 12} ${p.x + w} ${top}Q${p.x + w * 0.5} ${(top + bot) / 2} ${p.x} ${bot}Q${p.x - w * 0.5} ${(top + bot) / 2} ${p.x - w} ${top}Z`;
-    smear = <Fill d={d} color={PIP_BODY} offset={false} mode="snap" seed="s9pip/smear" />;
-  }
-  let lines = '';
-  if (t >= TAKEOFF && t < TAKEOFF + SPEED_LINES) {
-    lines = speedLines(p.x, p.y + 60, {n: 3, len: 90, gap: 20, angle: 90, seed: 's9pip/sl'});
-  }
+  return <Elephant x={p.x} y={p.y} scale={p.scale} pose={p.pose} amount={p.amount} squash={p.squash} rotate={p.rotate} look={p.look} lineWeight={p.lw} t={t} seed={9} />;
+};
+
+/** The tram's cue, A1 FR2 (reviewers: the headlamp half-disc painted on the far row-1/2 facades read as a peach smear on
+ *  the hill, and the paper edge covered it): NEAR light only. (1) The headlamp's light POOL on the pale street band (the
+ *  'street' wrap, under the standers and their shadows): a 2-step flat fan (HALF.peach, a peach core near the lamp)
+ *  that pops in at the left edge and slides right, reaching further as the tram nears, then runs ahead of the nose once
+ *  it is in frame. (2) A pantograph spark (cream 4-point star, ink) flashing three times at the top-left, inboard of the
+ *  paper edge (x 112), just under the caption floor. */
+const POOL = {y: 1712, h0: 26, h1: 92, reach0: 170, reach1: 470};
+export const TramLight: React.FC = () => {
+  const t = useTime();
+  if (t < CUE_AT || t >= LAND + 0.2) return null;
+  const pop = springAt(t, CUE_AT, springs.pop);
+  // the lamp's screen x: the tram's nose (off-frame left until the wipe starts)
+  const src = Math.max(-60, edgeAt(fT(t)) + TRAM.L / 2 - 30);
+  const reach = (POOL.reach0 + (POOL.reach1 - POOL.reach0) * E.inOutSine(clamp((t - CUE_AT) / (TAKEOFF - CUE_AT)))) * pop;
+  const fan = (len: number, h0: number, h1: number) => {
+    const x1 = src + len;
+    const y = POOL.y - REST_DY;
+    return `M${src} ${y - h0}L${x1} ${y - h1 * 0.8}Q${x1 + h1 * 0.9} ${y} ${x1} ${y + h1 * 0.8}L${src} ${y + h0}Z`;
+  };
   return (
     <>
-      {smear}
-      {lines ? <Ink d={lines} width={3.4} taper={false} seed="s9pip/sli" /> : null}
-      <Elephant x={p.x} y={p.y} scale={p.scale} pose={p.pose} amount={p.amount} squash={p.squash} rotate={p.rotate} look={p.look} lineWeight={p.lw} t={t} seed={9} />
+      <Fill d={fan(reach, POOL.h0, POOL.h1)} color={HALF.peach} offset={false} mode="snap" seed="s9cue/pool" />
+      <Fill d={fan(reach * 0.5, POOL.h0 * 0.7, POOL.h1 * 0.5)} color={palette.peach} offset={false} mode="snap" seed="s9cue/core" />
     </>
   );
 };
 
-/** The tram's cue (polish A1), screen space: its headlamp glow pops at the left edge at the lamp's height (TramWiper's
- *  lamp: screen y ~1286) as a 2-step flat half-disc with a low flat beam, swelling once as the nose nears; a pantograph
- *  spark (a cream 4-point star with ink) flashes twice at the top-left corner just under the caption floor. Gone when
- *  the nose itself enters (board - 0.12: the wipe's first frame). */
-const LAMP_Y = 1286;
 const TramCue: React.FC = () => {
   const t = useTime();
-  if (t < CUE_AT || t >= B.end - 0.25) return null;
-  const grow = 1 + 0.35 * clamp((t - CUE_AT) / (B.end - 0.25 - CUE_AT));
-  const pop = springAt(t, CUE_AT, springs.pop);
-  const r1 = 58 * grow * pop;
-  const r2 = 30 * grow * pop;
-  const disc = (r: number) => `M-2 ${LAMP_Y - r}A${r} ${r} 0 0 1 -2 ${LAMP_Y + r}Z`;
-  const beam = `M0 ${LAMP_Y - 18 * grow}L${160 * grow * pop} ${LAMP_Y - 6}L${160 * grow * pop} ${LAMP_Y + 10}L0 ${LAMP_Y + 18 * grow}Z`;
-  const sparks = [CUE_AT + 0.06, CUE_AT + 0.22];
-  let spark: React.ReactNode = null;
+  if (t < CUE_AT || t >= TAKEOFF) return null;
+  const sparks = [CUE_AT + 0.04, CUE_AT + 0.2, TAKEOFF - 0.08];
   for (const sa of sparks) {
     if (t >= sa && t < sa + 0.1) {
-      const k = t < sa + 0.034 ? 1.25 : 1;
-      const r = 16 * k;
+      const k = t < sa + 0.034 ? 1.3 : 1;
+      const r = 20 * k;
       const q = r * 0.3;
-      const [x, y] = [18, 596];
+      const [x, y] = [112, 604];
       const d = `M${x} ${y - r}L${x + q} ${y - q}L${x + r} ${y}L${x + q} ${y + q}L${x} ${y + r}L${x - q} ${y + q}L${x - r} ${y}L${x - q} ${y - q}Z`;
-      spark = <path d={d} fill={palette.cream} stroke={palette.ink} strokeWidth={2.2} strokeLinejoin="round" />;
+      return <path d={d} fill={palette.cream} stroke={palette.ink} strokeWidth={2.6} strokeLinejoin="round" />;
     }
   }
-  return (
-    <>
-      <Fill d={beam} color={HALF.peach} offset={false} mode="snap" seed="s9cue/beam" />
-      <Fill d={disc(r1)} color={HALF.peach} offset={false} mode="snap" seed="s9cue/r1" />
-      <Fill d={disc(r2)} color={palette.cream} offset={false} mode="snap" seed="s9cue/r2" />
-      {spark}
-    </>
-  );
+  return null;
 };
 
 /** Bit hops off Pip's head onto the snail's shell (the snail has popped onto the cap at tags-0.30). */
@@ -498,6 +469,7 @@ export const PartBWorld: React.FC = () => {
         <Tod map={STREET_TONE}>
           {node}
           <FixedPool />
+          <TramLight />
         </Tod>
       );
     // the scene's hillside replaces the set's rows (hill.tsx)

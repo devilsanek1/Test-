@@ -253,27 +253,42 @@ corner can score high while the corner itself is flat pavement). Then checked on
 
 | scene | bare corner | ink set by hand (and why) | keep rects |
 |---|---|---|---|
-| S01 (+ S12) | top-right: the hanging leaves, the stem in the white, its block outline ruled in | `tr` 0.45 (leaves measure 0.63-0.73; under 0.5 so the outline is ruled: S01's dive swings flat sky through the corner for 4.45-4.6 s) | left onlooker (phone raised), near observer (grows in the dive), cap onlooker, the lamp at the left edge (S01: head at x 10-75), Pip on the bollard, Pip's leap out at the right edge (4.45-4.7 s) |
-| S02 | bottom-left: the board's leg and the ground lines | - | Pip (landing from S01 at the right edge, then on the board's corner), the three audience heads, the site plaque at the left edge |
-| S03 | none: flat sky at the top, the near walkers fill both bottom corners, the bottom is the flat plan (0.13: no bite) | - | both near walkers, Pip (arrival, disc) |
-| S04 | none | `br` / `bl` 0.1: the scan's 0.48 / 0.16 come from the house and the lamp post; the corner triangles hold flat pavement, and nothing in the dive (a bare corner read as a blank trapezoid) | Pip (steps -> window; interior) |
-| S05 | none: the foreground audience fills the whole bottom | - | the audience (the world runs off the bottom in colour), the team at the left edge, the messenger running in at the right, Pip at the board and on the exit, the AUG calendar at the left edge |
-| S06 | bottom-right: the shrub and the bench as line art | `bl` 0.2: under the kept cart there is only flat pavement. Measured without the white page of the last 0.15 s (paper on a white page does not show) | the messenger entering at the left edge + the cart + Pip on it (one rect) |
-| S11 | bottom-right: govC's steps | `bl` 0.25: the lamp's foot and the onlookers fill it, so it must not go bare | Pip hopping in at the left edge, Pip at govB's window, the two onlookers |
+| S01 (+ S12) | top-right: the hanging leaves, the stem in the white. The notch is ~90 x 80 px (x ~970-1060, y ~18-95, under the top UI) | `tr` 0.45 (leaves measure 0.63-0.73). Under 0.5 so a ruled pair is drawn, but it runs along the thin top and right margins (y ~12 from x 812, x ~1069 from y 0-166), not around the notch. In S01's dive (f134-137, f141 = 4.47-4.57 s, 4.70 s) flat sky swings through and the notch reads as a blank white rectangle for ~5 frames. Accepted: `tr` 0.1 would remove the bare corner (the leaves go into colour for all of S01 and S12). S12's notch holds the leaves throughout | left onlooker (phone raised), near observer (grows in the dive), cap onlooker, the lamp at the left edge (S01: head at x 10-75), Pip on the bollard, Pip's leap out at the right edge (4.45-4.7 s) |
+| S02 | bottom-left: the board's leg and the ground lines | - | the three audience heads, the site plaque at the left edge. No rect for Pip: his max x is 1049 (f142, landing from S01), the right paper starts at x ~1060 at his height, so the rect only cut a step into the right side (y 600-900). Without it the right side is one 18-24 px strip |
+| S03 | none: flat sky at the top, the near walkers fill both bottom corners, the bottom is the flat plan (0.13: no bite) | - | both near walkers, Pip (arrival, disc). In the opener (8.4 to ~10 s) the left 54 px strip ends in a straight cut at y 1320 (the walker's rect, before the walkers appear): accepted |
+| S04 | none | `br` / `bl` 0.1: the scan's 0.48 / 0.16 come from the house and the lamp post; the corner triangles hold flat pavement, and nothing in the dive (a bare corner read as a blank trapezoid) | Pip (steps -> window; interior). The 57 px left strip runs 3-10 px from the lamp post's outline (x 60-104), so the post reads as the paint's edge |
+| S05 | none: the foreground audience fills the whole bottom | - | the audience (the world runs off the bottom in colour), the team at the left edge, the messenger running in at the right, Pip at the board and on the exit, the AUG calendar at the left edge. The calendar's rect makes a 200 px tab (y 680-880) above the 51 px left strip; it stays: the calendar pans to x 38-98 at 19.67 s and ~0-70 at 19.73 s (without the rect it is half or all line art in f590-593; merged as `[0,690,90,1350]` the left side below y 680 loses all its paper) |
+| S06 | bottom-right: the shrub and the bench as line art | `bl` 0.2: under the kept cart there is only flat pavement. Measured without the white page of the last 0.15 s (paper on a white page does not show) | the messenger entering at the left edge + the cart + Pip on it (one rect: the cart sits at x 0-160 all shot). The bare corner is empty only in f594 (the cut frame); the shrub is in by f596. The S06 -> S07 painting switch (21.985 s) falls on S06's white page |
+| S11 | bottom-right: govC's steps | `bl` 0.25: the lamp's foot and the onlookers fill it, so it must not go bare | Pip at govB's window, the two onlookers. No rect for Pip's in-hop: he is in the left paper only in f1370-1372 (45.67-45.73 s; x >= 89 from f1373). The rect `[0,1280,135,1470]` ran a 200 px colour tongue down the left side for the whole 6.5 s shot (paper / tongue / paper at y ~1250-1490). Without it the left side is one 54 px strip from y 800 to the bottom; the cost is Pip's peach inner ear going paper-white in f1371 (his body and outline stay) |
 | S12 | wears S01's painting (Film, for the loop seam), so S01's entry is the union over both shots; `EDGE_HINTS.S12` is the same object | | |
 
 Lessons:
 - **A keep rect within 110 px of a frame side runs off that side** (colour to the edge). A rect for a lamp post at the
   left edge takes the whole left paper below it away: S11's lamp sits at x 95-180, clear of the 46-62 px paper, so it
   gets no rect; `bl` is held down instead, so no corner can cut it.
+- **A rect is for the whole shot, so weigh it against the frames it protects.** A figure that touches the side for a
+  few frames costs a tongue or a step for every frame of the shot. Check the figure's bbox against the paper depth
+  first: S02's Pip rect protected nothing (max x 1049, paper from x ~1060) and S11's in-hop rect protected 3 frames
+  for a 6.5 s tongue, so both were dropped. Pip's body and shade are actor fills, so in the paper he keeps his colour
+  and only his peach inner ears and cheeks go paper (section 7). A prop in scene colours that sits on the edge for
+  much of the shot still needs its rect (S05's calendar, S06's cart).
 - **Steering by `ink`:** below 0.3 a corner never goes bare when another dense corner fits; below 0.12 it is not even
   the fallback. Write the reason next to every hand-set value.
-- **Keep blocks meet the thin margins in a step** (the 10-24 px rail band, the bottom strip): 3.6 jogs per edge for
-  the film's entries at subtle (section 7). The film's geometry check (`check-paint.ts` with these entries and seeds
-  `film/<id>`, 3 presets x 10 seeds): 0 failures (caption block, keep rects, rail, holes, hairlines).
+- **Keep blocks meet the thin margins in a step** (the 10-24 px rail band, the bottom strip): 124 jogs over the film's
+  8 entries x 10 seeds at subtle, 1.55 per painting (144 / 1.8 before S02 and S11 lost their Pip rects; the earlier
+  "3.6 per edge" divided by the lab check's 40) (section 7). The film's geometry check (`check-paint.ts` with these
+  entries and seeds `film/<id>`, 3 presets x 10 seeds = 240 edges): 0 failures (caption block, keep rects, rail, holes,
+  hairlines). Corner roles at subtle: S01 / S12 top-right bare, S02 bottom-left, S06 and S11 bottom-right, the rest
+  none.
 - **The loop seam** is unchanged: Main 55.3333 s vs 0 s differ only in the caption band (0 px below y 600).
 - What is still half colour, half line art: S03's tree crown at the left edge (y 1010-1250, cut by the 46-62 px
-  paper, f_5.5's half-filled crown read), a 10-20 px teal sliver at the left of S06's shrub in its bare corner.
+  paper, f_5.5's half-filled crown read), a 10-20 px teal sliver at the left of S06's shrub in its bare corner, Pip's
+  inner ear in S11's f1371 (in-hop, the left paper).
+- **Checked (review of 5.1):** Main with edges at 51 frames (5-9 per scene) against the same frames clean, Pip tracked
+  on 476 clean frames (every 2nd): no pop within a scene (every frame matches its own scene's painting; S12's match
+  S01's exactly), Pip never on paper, no bare corner under a caption, every keep rect inside the colour. That ran on the
+  entries before S02 / S11 lost their Pip rects; since then Pip is on paper only in the 3 S11 in-hop frames above
+  (S02's Pip stays left of x 1049, clear of the new right strip; re-rendered and checked on Main).
 
 ## 6. Render cost
 

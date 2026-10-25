@@ -33,20 +33,22 @@ export const ABS = {
   pipHop: W.plus + 0.1, // Pip leaps off the tram's tail onto the bollard
   siteL: W.something - 0.1, // siteL pops up (scaleY 0 -> 1.06 -> 1), siteM +0.10, siteR +0.20 (with the gap wedge + walker)
   sunLand: W.something, // the sun lands over siteM ON the word
-  second: W.like - 0.3, // the nine second-row buildings pop up behind (0.03 s stagger), settled by ~1.01 local: after the gap
-  //   wedge, before the sun's spoke and HALF its disc (fix round 2b: was ON 'like' and landed on 'HALF'); the caretaker tag is there
+  second: W.like - 0.22, // A1 FR2: the ten second-row buildings pop up behind (0.025 s stagger, was -0.30 / 0.03: it started
+  //   ON 'something' with the sun's landing; fix round 2b: ON 'like' it landed on 'HALF'): the last settles ~40.71,
+  //   after the gap wedge, as the sun's spoke draws; the caretaker tag is on the nearest gap house's door
   pieSpoke: W.half - 0.14, // the sun draws its one ink spoke
   pieCream: W.half - 0.08, // HALF its disc pops cream (1/2 pie): half grown ON the word, complete by +0.07 (rule 5)
   pipPerk: W.half + 0.2, // Pip's ears perk at the half-cream sun
   plaques: W.php - 0.1, // the hanging plaque signs swing out on every site (L, M, R 0.06 s apart)
   label: W.php + 0.15, // L13 rises on the A-frame sign
-  pieSolid: W.sites - 0.3, // the pie settles (cream shrinks, spoke retracts); a second-row window lights
+  pieSolid: W.sites - 0.3, // the pie settles (cream shrinks, spoke retracts)
   walker: W.sites, // the walker heads up the street gap; Pip looks up at siteM's plaque
   walkerOut: W.old, // ... and has turned off behind siteR's wall (the gap is clear before the cart steps out)
   flipM: W.run - 0.15, // siteM's plaque paper-flips to the OLD version (fix round 3: the 0.2 s flip swaps its face at
   //   -0.05 and settles at +0.05: complete ON 'run', rule 5; was -0.05, settling 0.135 s after the word)
   bitIn: W.run + 0.12, // Bit drops onto the old plaque's chain and crawls to its corner (= flipM + 0.27, as before)
-  flip2: W.versions - 0.1, // five second-row plaques flip old (alternating, 0.04 s apart) + dust puffs (fix round 3: -0.10,
+  flip2: W.versions - 0.18, // A1 FR2: all SIX far plates flip (0.04 s apart), the three old ones land dark with a 1-frame pop
+  //   and a 1.5x dust puff: faces swap 42.415-42.615, all landed by local 3.0 (was -0.10 with four plates, 0.05 apart;
   //   the wave's faces swap from -0.05 and land inside 'versions')
   cobweb: W.so - 0.1, // a cobweb draws across the old plaque's corner (rule-5 lead: it reads ON 'so'): Bit is caught in it
   dust: W.so + 0.02, // dust specks pop under the old plaque
@@ -56,23 +58,28 @@ export const ABS = {
   //   park spot on the open pavement 0.11 s before his first arm rises: the park and the throw are separate beats
   droop: W.theyre, // the old emblem's ear droops (it sags further on its cane); a dust speck drifts down
   not: W.not, // Bit struggles in the web; the maker reaches into the satchel
-  lookCart: W.theyre + 0.1, // Pip turns to the parked cart
+  lookCart: W.theyre + 0.1, // Pip turns to the parked cart (A1 FR2: and HOLDS that side-on silhouette to the 'hey!')
   // A1 FR1 (rule 5: check marks land ON the word): every hand-out beat moved earlier by the tick's delta, so the flight
   // durations (0.23 s / 0.5 s) are unchanged and the check (tickAt = landing + 0.03, 0.17 s draw) completes on the word
   toss1: W.not - 0.1, // his LEFT arm (raised 0.1 s before) lobs a tag back-left at siteL's plaque (0.23 s flight)
   tick1: W.officially - 0.04, // it lands beside siteL's plaque: tick (was ON the word: the check showed +0.075 s late)
-  toss2: W.supported - 0.59, // his RIGHT arm (raised up over his head) lobs the second tag high OVER siteM's old plaque
+  toss2: W.supported - 0.49, // his RIGHT arm (raised up over his head) lobs the second tag high OVER siteM's old plaque
+  //   A1 FR2: 0.10 s later (was -0.59: the skip landed on tick 1), tag 1 is 63 % into its flight; 0.43 s flight on a
+  //   shorter Bezier (cart.tsx LOB), so the order reads tick 44.015 | skip 44.12 | tick 44.36
   //   (A1 FR1: 0.53 s, was 0.5: the tag now lands BESIDE siteR's plate, 100 px further right, ~48 px / frame + the trail;
   //   released 0.045 s after the left toss, so the two tags are never in his hands together for more than a frame)
-  skipNudge: W.officially + 0.02, // siteM's old plaque nudges as the tag sails over it (the lob crosses x 590 at 48 %)
+  skipNudge: W.supported - 0.49 + 0.43 * 0.513, // siteM's old plaque nudges (and its empty twine swings) as the tag
+  //   sails over it: the lob crosses x 590 at 51.3 % of its flight (cart.tsx LOB_SKIP_FRAC) = 44.12
   tick2: W.supported - 0.06, // lands beside siteR's plaque: tick + one stepped ink ring pulse (was +0.01: +0.11 s late)
   wave: W.supported + 0.06, // tiny tags pop onto the CURRENT second-row plaques, skipping the old ones
   hey: W.supported + 0.1, // GAG: Pip trunk-up 'hey!' at siteM's plaque (it was skipped)
   heyEnd: W.anymoreEnd - 0.21, // = pipOut - 0.12: Pip turns side-on (facing right) into the crouch of his hop out
   update: W.anymore, // siteM's browser starts an update: the bar stalls at ~10 %, ring spinning
-  rollOut: W.supported + 0.33, // the cart rolls out right (sine ramp, <= 18 px / frame). A1 FR1: once the lob's trail has
-  //   retracted and the arm is down (was 'anymore' + 0.05: by the cut it had moved only ~130 px and sat mid-frame); it
-  //   is ~x 890 at the cut, leaving on 'anymore'
+  rollOut: W.anymore - 0.12, // A1 FR2: the cart stays PARKED (whole, its FixSign readable) through Pip's 'hey!' and
+  //   rolls out on 'anymore' (sine ramp, <= 18 px / frame): its nose reaches Pip's bollard only as he crouches to hop out
+  //   (5.54), the maker passes where Pip sat after he has gone; ~x 800 at the cut (no bike there any more). Was
+  //   supported + 0.33 (44.72): the cart's nose and FixSign slid behind Pip during the gag (and 'anymore' + 0.05 before
+  //   that only moved ~130 px by the cut): now ~270 px, at full roll speed through the last 8 frames
   wobble: W.anymoreEnd - 0.1, // the old emblem's cane wobbles; the ring keeps spinning
   pipOut: W.anymoreEnd - 0.09, // Pip hops out past the right edge (0.30 s: gone one frame before the cut, into S11)
 } as const;

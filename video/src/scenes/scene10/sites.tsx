@@ -12,7 +12,7 @@ import {captionFontStack, useCaptionFont} from '../../lib/font';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {crown, line, polyPath, Pt, rect, rectPath, roundRect} from '../../lib/sketch';
-import {BrowserChrome, OLD_QUARTER, PopUp, popK, SI, SiteFacade, siteFacadeLayout} from './kit';
+import {brickHints, BrowserChrome, FacadeDoor, OLD_QUARTER, PopUp, popK, SI, SiteFacade, siteFacadeLayout, windowInk} from './kit';
 import {HangPlaque, HangPlaqueProps} from './plaques';
 
 type SiteId = 'L' | 'M' | 'R';
@@ -239,6 +239,32 @@ function ringSpot(r: [number, number, number, number]): {x: number; y: number; r
   return {x: x + px + pw + bar * 0.25 + ringR, y: y + bar / 2, r: ringR * 1.4};
 }
 
+/** A1 FR2 (calmer walls, ref f_9.0): siteL's and siteR's window ink (SiteFacade lod 'full' = mullioned window grids +
+ *  brick ticks on every storey) is redrawn here with full detail only on the lower half (storeys 1-3, around the
+ *  plaques): the upper three storeys keep plain window frames + sills (no mullions) and no brick ticks. The facades
+ *  render at lod 'simple' (fills, outline, cornice) with the door slot at full detail, so only this overlay changes. */
+const CALM = (() => {
+  const out: Partial<Record<SiteId, {thin: string}>> = {};
+  for (const id of ['L', 'R'] as const) {
+    const c = S[id];
+    const seed = `oq/site${id}`;
+    const B = OLD_QUARTER.base;
+    const H = B - c.top;
+    const sh = H / c.storeys;
+    const lay = siteFacadeLayout({x: c.x, y: B, w: c.w, storeys: c.storeys, storeyH: sh, browser: c.browser, door: c.door, plaque: false, cols: c.w > 300 ? 3 : 2});
+    const half = B - sh * Math.ceil(c.storeys / 2);
+    let thin = '';
+    lay.windows.forEach((q, i) => {
+      const low = q[1] >= half - 2;
+      thin += windowInk(q[0], q[1], q[2], q[3], `${seed}/w${i}`, {mullion: low && q[2] > 22, sill: true});
+    });
+    const nb = Math.max(2, Math.round((c.w * H) / 40000));
+    thin += brickHints(c.x + c.w * 0.05, half + 10, c.w * 0.9, B - half - 20, seed, Math.ceil(nb / 2), Math.min(24, c.w * 0.08));
+    out[id] = {thin};
+  }
+  return out;
+})();
+
 export const Sites: React.FC<SitesProps> = ({popAt, updateAt, wobbleAt}) => {
   const t = useTime();
   const node = (id: SiteId, i: number) => {
@@ -261,7 +287,24 @@ export const Sites: React.FC<SitesProps> = ({popAt, updateAt, wobbleAt}) => {
     return (
       <PopUp key={id} at={popAt[i]} x={c.x + c.w / 2} y={OLD_QUARTER.base + 24}>
         <Roof id={id} />
-        <SiteFacade x={c.x} y={OLD_QUARTER.base} w={c.w} storeys={c.storeys} storeyH={(OLD_QUARTER.base - c.top) / c.storeys} fill={c.fill} roof="cornice" browser={c.browser} door={c.door} plaque={false} lock="closed" cols={c.w > 300 ? 3 : 2} seed={`oq/site${id}`} slots={{browser: browserSlot}} />
+        <SiteFacade
+          x={c.x}
+          y={OLD_QUARTER.base}
+          w={c.w}
+          storeys={c.storeys}
+          storeyH={(OLD_QUARTER.base - c.top) / c.storeys}
+          fill={c.fill}
+          roof="cornice"
+          browser={c.browser}
+          door={c.door}
+          plaque={false}
+          lock="closed"
+          cols={c.w > 300 ? 3 : 2}
+          lod={CALM[id] ? 'simple' : undefined}
+          seed={`oq/site${id}`}
+          slots={CALM[id] ? {browser: browserSlot, door: (r) => <FacadeDoor r={r} lod="full" seed={`oq/site${id}/door`} width={SI.mid} />} : {browser: browserSlot}}
+        />
+        {CALM[id] ? <Ink d={CALM[id]!.thin} width={SI.mid * 0.66} taper={false} seed={`oq/site${id}/thin`} /> : null}
         {id === 'R' ? (
           <>
             <Fill d={G.balcRail} color={palette.sage} seed="oq/brail" />
@@ -283,13 +326,16 @@ export const Sites: React.FC<SitesProps> = ({popAt, updateAt, wobbleAt}) => {
 
 
 /** The near row as LINE ART first (fix round 2b): under the tram wipe, from 'Plus', the three facades draw on as thin
- *  construction lines (edges overshooting the top, cornice and base lines, storey ticks, door, browser window and
- *  roof outlines, each site 0.06 s after the last, as the wipe uncovers it); on 'something' the filled sites pop up
+ *  construction lines, each site 0.06 s after the last as the wipe uncovers it; on 'something' the filled sites pop up
  *  INTO their outlines (scaleY from the base) and cover them; only the overshoots stay, like the reference's pen
- *  construction. Drawn behind the Sites, in the 'sites' layer. */
+ *  construction. Drawn behind the Sites, in the 'sites' layer.
+ *  A1 FR2: drawn as a PEN would, in order (all the window boxes' corner ticks at once read as noise scattered over bare
+ *  ground): (1) the two verticals, (2) cornice + base line, (3) the storey ticks and window boxes ONE AFTER ANOTHER, top
+ *  storey first (one pass per storey, 0.035 s apart), (4) door, browser window, roof outline. */
+type Sketch = {frame: string; rule: string; boxes: string[]; detail: string};
 const SKETCH = (() => {
   const s = 's10sk';
-  const out: Record<SiteId, string> = {L: '', M: '', R: ''};
+  const out = {} as Record<SiteId, Sketch>;
   const B = OLD_QUARTER.base;
   for (const id of IDS) {
     const c = S[id];
@@ -297,37 +343,56 @@ const SKETCH = (() => {
     const x1 = c.x + c.w;
     const top = c.top;
     const sh = (B - top) / c.storeys;
-    let d = line(x0, B + 6, x0, top - 9, {seed: `${s}/${id}l`, over: 0, breaks: false}) + line(x1, B + 6, x1, top - 9, {seed: `${s}/${id}r`, over: 0, breaks: false});
-    d += line(x0 - 11, top, x1 + 11, top, {seed: `${s}/${id}t`, over: 0, breaks: false}) + line(x0 - 14, B, x1 + 14, B, {seed: `${s}/${id}b`, over: 0, breaks: false});
-    for (let k = 1; k < c.storeys; k++) {
-      const y = B - k * sh;
-      d += `M${x0 + 2} ${y.toFixed(1)}h14M${x1 - 2} ${y.toFixed(1)}h-14`;
-    }
-    // the window grid as open pen boxes (the same layout SiteFacade fills, so the pop lands on them)
+    const frame = line(x0, top - 9, x0, B + 6, {seed: `${s}/${id}l`, over: 0, breaks: false}) + line(x1, top - 9, x1, B + 6, {seed: `${s}/${id}r`, over: 0, breaks: false});
+    const rule = line(x0 - 11, top, x1 + 11, top, {seed: `${s}/${id}t`, over: 0, breaks: false}) + line(x0 - 14, B, x1 + 14, B, {seed: `${s}/${id}b`, over: 0, breaks: false});
+    // the window grid as open pen boxes (the same layout SiteFacade fills, so the pop lands on them), storey by storey
+    // from the top, each storey's ticks first
     const lay = siteFacadeLayout({x: c.x, y: B, w: c.w, storeys: c.storeys, storeyH: sh, browser: c.browser, door: c.door, plaque: false, cols: c.w > 300 ? 3 : 2});
-    lay.windows.forEach((r, k) => {
-      d += rect(r[0], r[1], r[2], r[3], {seed: `${s}/${id}win${k}`, over: 1.5, edges: k % 2 ? 'tlb' : 'tlr'});
-    });
+    const wins = lay.windows.map((r, k) => ({r, k})).sort((a, b) => a.r[1] - b.r[1] || a.r[0] - b.r[0]);
+    const boxes: string[] = [];
+    let lastY = -1;
+    for (const {r, k} of wins) {
+      if (Math.abs(r[1] - lastY) > 4) {
+        // a new storey (its own pen pass): its two edge ticks first
+        boxes.push('');
+        const k2 = Math.ceil((B - r[1] - r[3]) / sh);
+        const y = B - k2 * sh;
+        if (k2 > 0 && k2 < c.storeys) boxes[boxes.length - 1] += `M${x0 + 2} ${y.toFixed(1)}h14M${x1 - 2} ${y.toFixed(1)}h-14`;
+        lastY = r[1];
+      }
+      boxes[boxes.length - 1] += rect(r[0], r[1], r[2], r[3], {seed: `${s}/${id}win${k}`, over: 1.5, edges: k % 2 ? 'tlb' : 'tlr'});
+    }
     const [dx, dy, dw, dh] = c.door;
-    d += rect(dx, dy, dw, dh, {seed: `${s}/${id}d`, over: 1, edges: 'tlr'});
+    let detail = rect(dx, dy, dw, dh, {seed: `${s}/${id}d`, over: 1, edges: 'tlr'});
     if (c.browser) {
       const [bx, by, bw, bh] = c.browser;
-      d += rect(bx, by, bw, bh, {seed: `${s}/${id}w`, over: 2});
+      detail += rect(bx, by, bw, bh, {seed: `${s}/${id}w`, over: 2});
     }
-    out[id] = d;
+    out[id] = {frame, rule, boxes, detail};
   }
   const M = OLD_QUARTER.roofs.mansard;
-  out.L += line(M.x0 - 4, M.base + 3, M.x0 + M.inset, M.top, {seed: `${s}/ml`, over: [0, 4], breaks: false}) + line(M.x0 + M.inset - 6, M.top, M.x1 - M.inset + 6, M.top, {seed: `${s}/mt`, over: 0, breaks: false}) + line(M.x1 - M.inset, M.top, M.x1 + 4, M.base + 3, {seed: `${s}/mr`, over: [4, 0], breaks: false});
-  out.M += rect(368, 798, 16, 22, {seed: `${s}/ch`, over: 2, edges: 'tlr'});
+  out.L.detail += line(M.x0 - 4, M.base + 3, M.x0 + M.inset, M.top, {seed: `${s}/ml`, over: [0, 4], breaks: false}) + line(M.x0 + M.inset - 6, M.top, M.x1 - M.inset + 6, M.top, {seed: `${s}/mt`, over: 0, breaks: false}) + line(M.x1 - M.inset, M.top, M.x1 + 4, M.base + 3, {seed: `${s}/mr`, over: [4, 0], breaks: false});
+  out.M.detail += rect(368, 798, 16, 22, {seed: `${s}/ch`, over: 2, edges: 'tlr'});
   const T = OLD_QUARTER.roofs.tank;
-  out.R += rect(T.x - T.w / 2, T.y, T.w, T.h, {seed: `${s}/tk`, over: 2}) + `M${T.x - T.w / 2 + 6} ${T.y + T.h}L${T.x - T.w / 2 + 2} ${T.legs}M${T.x + T.w / 2 - 6} ${T.y + T.h}L${T.x + T.w / 2 - 2} ${T.legs}`;
+  out.R.detail += rect(T.x - T.w / 2, T.y, T.w, T.h, {seed: `${s}/tk`, over: 2}) + `M${T.x - T.w / 2 + 6} ${T.y + T.h}L${T.x - T.w / 2 + 2} ${T.legs}M${T.x + T.w / 2 - 6} ${T.y + T.h}L${T.x + T.w / 2 - 2} ${T.legs}`;
   return out;
 })();
 
-export const SiteSketch: React.FC<{at: [number, number, number]; dur?: number}> = ({at, dur = 0.26}) => (
+/** Stroke-group starts after the site's `at` (s): verticals, cornice + base, the boxes (one storey per pass, top down,
+ *  `storey` s apart), the details. */
+const SK_T = {frame: 0, rule: 0.07, boxes: 0.12, storey: 0.035, detail: 0.2};
+
+export const SiteSketch: React.FC<{at: [number, number, number]}> = ({at}) => (
   <>
     {IDS.map((id, i) => (
-      <Ink key={id} d={SKETCH[id]} at={at[i]} dur={dur} order="all" width={2.6} taper={false} seed={`s10sk/${id}`} />
+      <React.Fragment key={id}>
+        <Ink d={SKETCH[id].frame} at={at[i] + SK_T.frame} order="all" dur={0.16} width={2.6} taper={false} seed={`s10sk/${id}f`} />
+        <Ink d={SKETCH[id].rule} at={at[i] + SK_T.rule} order="all" dur={0.16} width={2.6} taper={false} seed={`s10sk/${id}r`} />
+        {SKETCH[id].boxes.map((d, k) => (
+          <Ink key={k} d={d} at={at[i] + SK_T.boxes + k * SK_T.storey} order="all" dur={0.12} width={2.6} taper={false} seed={`s10sk/${id}b${k}`} />
+        ))}
+        <Ink d={SKETCH[id].detail} at={at[i] + SK_T.detail} order="all" dur={0.2} width={2.6} taper={false} seed={`s10sk/${id}d`} />
+      </React.Fragment>
     ))}
   </>
 );
@@ -349,7 +414,7 @@ export type PlaquesProps = {
   /** Plaques swing out (L, M, R). */
   plaqueAt: [number, number, number];
   /** siteM's plaque events (HangPlaque). */
-  old: Pick<HangPlaqueProps, 'flipOldAt' | 'cobwebAt' | 'dustAt' | 'caneAt' | 'droopAt' | 'wobbleAt' | 'bit' | 'nudgeAt'>;
+  old: Pick<HangPlaqueProps, 'flipOldAt' | 'cobwebAt' | 'dustAt' | 'caneAt' | 'droopAt' | 'wobbleAt' | 'bit' | 'nudgeAt' | 'emptyHook'>;
   /** Support tags landing on siteL's / siteR's plaques. */
   tagL?: {at: number; tickAt: number; ringAt?: number};
   tagR?: {at: number; tickAt: number; ringAt?: number};

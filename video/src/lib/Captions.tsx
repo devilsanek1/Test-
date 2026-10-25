@@ -469,13 +469,19 @@ export const SkyCaptions: React.FC<SkyCaptionsProps> = ({beats, tone = 'dark', s
   // the hook frame: the first page's line 1 shows settled before anything starts; later lines/boxes keep their times
   const iu = settledAll || (hookAtStart && k === 0) ? Math.max(instantUntil, cur.start) : instantUntil;
   const regs = (regions ? regions(T) : null) ?? (split ? splitRegions(split.x(T), split.left, split.right) : null);
+  // an outgoing page is gone once its lowest baseline is within 0.15 em of the band top: past that only descenders and
+  // the bottom strip of a highlight box would show, lingering for a few frames on the scroll curve's slow tail
+  const above = (pg: SkyPage, dy: number) => Math.max(...pg.lines.map((l) => l.baseline)) + dy <= skyCaption.clipTop + 0.15 * pg.size;
+  const prevDy = -SKY_D * Math.max(q, prevOutQ);
+  const curDy = SKY_D * (1 - q) + (tail ? SKY_D * (1 - tail.q) : 0) - SKY_D * outQ;
+  if (outQ > 0 && above(cur, curDy)) return null;
   const stack = (t: CaptionTone, sfx: string) => (
     <>
-      {prev && !prevGone && !instant && u < 1 ? <SkyPageG key={`p${k - 1}`} page={prev} T={T} dy={-SKY_D * Math.max(q, prevOutQ)} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}a`} pop={pop} /> : null}
-      {tail?.prev && tail.q < 1 ? (
+      {prev && !prevGone && !instant && u < 1 && !above(prev, prevDy) ? <SkyPageG key={`p${k - 1}`} page={prev} T={T} dy={prevDy} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}a`} pop={pop} /> : null}
+      {tail?.prev && tail.q < 1 && !above(tail.prev, -SKY_D * tail.q) ? (
         <SkyPageG key="ptail" page={tail.prev} T={loopEnd! + T} dy={-SKY_D * tail.q} instantUntil={instantUntil} col={toneCols(t, mask)} uid={`${uid}${sfx}t`} pop={pop} />
       ) : null}
-      <SkyPageG key={`p${k}`} page={cur} T={settledAll ? Math.max(T, cur.start) : T} dy={SKY_D * (1 - q) + (tail ? SKY_D * (1 - tail.q) : 0) - SKY_D * outQ} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}b`} pop={pop} />
+      <SkyPageG key={`p${k}`} page={cur} T={settledAll ? Math.max(T, cur.start) : T} dy={curDy} instantUntil={iu} col={toneCols(t, mask)} uid={`${uid}${sfx}b`} pop={pop} />
     </>
   );
   const body =

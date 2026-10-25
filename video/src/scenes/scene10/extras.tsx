@@ -4,7 +4,8 @@
 //    the centre, which at n = 2 showed a small cream 'D' inside the disc for 2 frames (read as a half-moon / an eye);
 //    the spokes still come from the kit SunPie (cream={[]}).
 //  - TreeLeafPatch: the OldQuarter tree's leaf ticks (G.treeTicks: two stacked arcs over a lower arc) read as a
-//    closed-eyes smiley at the right edge: one sage leaf-cluster patch over them + three asymmetric leaf arcs, swaying
+//    closed-eyes smiley at the right edge: one sage leaf-cluster patch over them + two scallops on the crown's left
+//    contour (A1 FR2; three interior arcs still read as a face), swaying
 //    with the tree (same sway as the set: osc(t, 0.3, 2.1) x 0.5 deg about the trunk foot). Sets-lane request stands:
 //    remove this when G.treeTicks is broken up in the set.
 // Everything Ink / Fill, seconds-based, no opacity.
@@ -62,8 +63,9 @@ export const HalfSweep: React.FC<{r: number; at: number; solidAt?: number; dur?:
 const LEAF = {
   patch: blob(1004, 1122, 50, 38, {seed: 's10/leafp'}),
   arcs:
-    // three leaf arcs on one DIAGONAL (no two at the same height: no 'eyes', no 'mouth'), each a different angle and length
-    'M953 1090q8 9 20 5' + 'M984 1112q3 11 14 15' + 'M1018 1138q10 4 18 -4',
+    // A1 FR2: two SCALLOPS hugging the crown's outer (left) contour, at different heights and lengths, bulging outward
+    // like the bumps they echo (the three interior arcs still read as a closed-eyes smiley at the right edge)
+    'M946 1012q-15 17 -3 37' + 'M957 1094q-12 12 -4 26',
 };
 
 /** Covers the set tree's smiley ticks (draw after the set's 'near' node). */

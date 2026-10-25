@@ -375,6 +375,18 @@ export const PipOnRail: React.FC<{b: Beats}> = ({b}) => {
   return ro.rot !== 0 ? <XG m={mat.about(mat.rotate(ro.rot), PIP_RAIL[0], PIP_RAIL[1])}>{el}</XG> : el;
 };
 
+/** Cut S05|S06 (phase B): the leap's HEIGHT climbs to its apex ON the cut (world y PIP_APEX_Y at b.end): rise =
+ *  1 - (1 - u)^3 over take-off -> cut, so he still springs off the rail as fast as the old hop (over the stamp: feet
+ *  ~1160 world, 30 above its ring, as he passes it) and then levels out: the last 4 frames hang at the top of the arc as
+ *  he leaves frame right (S05's last frame: feet screen ~(1091, 1118), ~40 px/frame right, ~0 vertical), so S06 picks
+ *  him up on its FIRST frame at the same height, half in at its left edge above the messenger's head, and drops him in
+ *  behind the messenger (scene06/parts.tsx pipEntry). Was: the hop's own arc (apex at f588, then falling 45 px/frame
+ *  through the cut at screen y ~1262), which S06 could only pick up 5 frames later below the messenger's head. x keeps
+ *  the hop's k^1.3 lag; the nose levels out with the climb (-10 deg at take-off -> 0 at the apex). */
+export const PIP_APEX_Y = 1080;
+const pipLeapU = (t: number, t0: number, apexT: number) => clamp((t - t0) / (apexT - t0));
+const pipLeapY = (t: number, t0: number, apexT: number) => PIP_RAIL[1] - (PIP_RAIL[1] - PIP_APEX_Y) * (1 - Math.pow(1 - pipLeapU(t, t0, apexT), 3));
+
 /** Pip in the air (steps plane, f = 1): the hop starts from the rail point as the banner layer showed it at take-off
  *  (its parallax offset folded in, so there is no jump when he changes plane). */
 export const PipHop: React.FC<{b: Beats}> = ({b}) => {
@@ -387,21 +399,22 @@ export const PipHop: React.FC<{b: Beats}> = ({b}) => {
     const h = hop({t: tt, t0: H.t0, dur: H.dur, from: {x: fromX, y: PIP_RAIL[1]}, to: H.to, height: H.height});
     // the leap goes UP first (x lags: k^1.3), so he rises over the elephant stamp before he crosses it
     const k = clamp((tt - H.t0) / H.dur);
-    return {h, x: h.airborne ? lerp(fromX, H.to.x, Math.pow(k, PIP_XLAG)) : h.x};
+    const air = h.airborne && tt >= H.t0;
+    return {h, x: air ? lerp(fromX, H.to.x, Math.pow(k, PIP_XLAG)) : h.x, y: air ? pipLeapY(tt, H.t0, b.end) : h.y, rot: air ? -10 * Math.pow(1 - pipLeapU(tt, H.t0, b.end), 2) : h.rotate};
   };
-  const {h, x} = at(t);
+  const {h, x, y, rot} = at(t);
   // his on-screen velocity (steps plane, the trucking camera included), back in world units for the smear
   const dt = 1 / 30;
   const prev = at(t - dt);
   const cA = layerCam(camAt(t - dt, b.end), LAYER_F.steps);
   const cB = layerCam(camAt(t, b.end), LAYER_F.steps);
-  const sA = toScreen(cA, [prev.x, prev.h.y]);
-  const sB = toScreen(cB, [x, h.y]);
+  const sA = toScreen(cA, [prev.x, prev.y]);
+  const sB = toScreen(cB, [x, y]);
   const v: Pt = [(sB[0] - sA[0]) / dt / cB.zoom, (sB[1] - sA[1]) / dt / cB.zoom];
   return (
     <>
-      {h.airborne && t - H.t0 > dt ? <PipSmear x={x} y={h.y} vx={v[0]} vy={v[1]} sc={PIP_SCALE} zoom={cB.zoom} /> : null}
-      <ElephantTimeline x={x} y={h.y} scale={PIP_SCALE} t={t} seed={5} keys={pipKeys(b, H.t0)} squash={h.squash} rotate={h.rotate} amount={h.airborne ? h.spread : undefined} />
+      {h.airborne && t - H.t0 > dt ? <PipSmear x={x} y={y} vx={v[0]} vy={v[1]} sc={PIP_SCALE} zoom={cB.zoom} /> : null}
+      <ElephantTimeline x={x} y={y} scale={PIP_SCALE} t={t} seed={5} keys={pipKeys(b, H.t0)} squash={h.squash} rotate={rot} amount={h.airborne ? h.spread : undefined} />
     </>
   );
 };

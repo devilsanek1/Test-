@@ -20,8 +20,9 @@ import type {Expression, PoseName} from '../../lib/mascot';
 import {Bit, bitPath, hopY, landSquash} from '../shared/props';
 import {eyeLevel} from '../../lib/persp';
 import {SI, STOOP} from '../shared/sets';
-import {PIP_AT as S03_PIP_AT, PIP_CUT_FLIP} from '../scene03/cast';
+import {PIP_AT as S03_PIP_AT, PIP_CUT_FLIP, pipCrouchAt} from '../scene03/cast';
 import {CAM_LOCK as S03_CAM, toScreen as s03Screen} from '../scene03/camera';
+import {S04_START} from './beats';
 import type {Beats} from './beats';
 import {camMat, Cam, K_REST, toScreen, toWorld} from './camera';
 
@@ -47,28 +48,57 @@ export const SLEEP_CROWN: Pt = [-24, -45];
 
 type PipState = {x: number; y: number; squash: number; rotate: number; pose: PoseName; expression?: Expression; amount?: number; look?: number; flip?: boolean};
 
+/** The take-off (cut S03|S04 pass; finding: S04's first frame was already airborne, so Pip's centroid stepped +13 px
+ *  RIGHT against his leftward hop and -30 px up in one frame (72 -> 135 px tall): hop() pitched him nose-up +10 deg about
+ *  the feet (the body swung BACK from S03's -3 deg forward lean) and its stretch and leg spread started at full value).
+ *  Now the take-off is a PUSH that starts on the cut: feet planted, S03's crouch (`pipCrouchAt`: squash 0.28, lean -3 deg
+ *  on the cut) extends into the leap's lift-off stretch over PUSH s (ease-in: it starts from the crouch's turn-round),
+ *  then the hop's arc from lift-off onto step 2 on 'This'. The pitch keeps S03's forward lean and dips nose-down into
+ *  the landing (LEAN0 -> PITCH_LAND, ease-in: never a nose-up swing back), the legs spread with sin(pi k) (not its
+ *  square root, which flung them open on the first airborne frame) and the landing pitch settles over LAND_SETTLE s
+ *  instead of snapping upright in one frame. Measured (Main, full res, centroid): see docs/scenes/S04.md, Cut S03|S04. */
+const PUSH = 0.08;
+/** S03's crouch lean on the cut (scene03/cast.tsx CROUCH_LEAN, screen deg about the feet; negative = toward screen-left,
+ *  his facing and his travel). */
+const LEAN0 = -3;
+const PITCH_LAND = -10;
+const LAND_SETTLE = 0.1;
+/** The settle-hop's apex (world px above S03's spot; was 18 with 0.205 s of air: with the push the air is 0.145 s, and
+ *  18 landed him at ~36 px / frame, the landing frame's centroid dropping 42 px). */
+const HOP_H = 12;
+/** hop()'s squash at k = 0 (its lift-off stretch): the push ends on it. */
+const STRETCH_LIFT = -0.26;
+
 function pipState(t: number, b: Beats): PipState {
-  const crouchFrom = b.pipCrouch; // S03 pops him to stand-side and crouches from cut(it)-0.12
-  const air = b.this - b.pipTakeOff;
   // fix round 2 (blocker: he flipped to face right on the cut and hopped backwards): S03 leaves him facing LEFT
   // (PIP_CUT_FLIP, the contract) and his settle-hop travels left, so he faces left from the cut through the stand, the
-  // yawn and the drowsy nod into his (flipped) sleep: one facing for the whole scene. hop() already leans him along
-  // his travel (screen space); the drowsy nod is mirrored with him.
+  // yawn and the drowsy nod into his (flipped) sleep: one facing for the whole scene; the drowsy nod is mirrored with him.
   const flip = PIP_CUT_FLIP;
   const fr = (r: number) => (flip ? -r : r);
+  // absolute film time (beats are local: b.cut = S04_START - start)
+  const abs = t + S04_START - b.cut;
   if (t < b.pipTakeOff) {
-    // S03's crouch, continued exactly (same curve as S03's PipS03), plus the stand-side pop's settle
-    const sq = 0.2 * Math.sin((Math.min(1, (t - crouchFrom) / 0.14) * Math.PI) / 2) + popSwitch(t, crouchFrom);
-    return {x: PIP_FROM[0], y: PIP_FROM[1], squash: sq, rotate: 0, pose: 'stand-side', amount: 0, flip};
+    // S03's crouch, continued exactly (pipCrouchAt is S03's own TOTAL squash and lean; no pose pop on top)
+    const c = pipCrouchAt(abs);
+    return {x: PIP_FROM[0], y: PIP_FROM[1], squash: c.squash, rotate: c.lean, pose: 'stand-side', amount: 0, flip};
   }
-  // from S03's spot (already over step 2) a small settle-hop onto the tread
-  const h = hop({t, t0: b.pipTakeOff, dur: air, from: {x: PIP_FROM[0], y: PIP_FROM[1]}, to: {x: PIP_AT[0], y: PIP_AT[1]}, height: 18});
-  const base = {x: h.x, y: h.y, rotate: h.rotate, flip};
+  const lift = b.pipTakeOff + PUSH;
+  if (t < lift) {
+    // the push: feet planted, the crouch extends into the lift-off stretch
+    const u = clamp((t - b.pipTakeOff) / PUSH);
+    const c0 = pipCrouchAt(abs - (t - b.pipTakeOff)).squash;
+    return {x: PIP_FROM[0], y: PIP_FROM[1], squash: lerp(c0, STRETCH_LIFT, 0.5 * u + 0.5 * u * u), rotate: LEAN0, pose: 'stand-side', amount: 0, flip};
+  }
+  // from S03's spot (already over step 2) a small settle-hop onto the tread, landing on 'This'
+  const h = hop({t, t0: lift, dur: b.this - lift, from: {x: PIP_FROM[0], y: PIP_FROM[1]}, to: {x: PIP_AT[0], y: PIP_AT[1]}, height: HOP_H});
+  const pitch = h.airborne ? LEAN0 + (PITCH_LAND - LEAN0) * h.k * h.k : PITCH_LAND * (1 - E.outQuad(clamp((t - b.this) / LAND_SETTLE)));
+  const spread = h.airborne ? Math.sin(Math.PI * h.k) : 0;
+  const base = {x: h.x, y: h.y, rotate: pitch, flip};
   // fix round: the yawn waits until 'was' (it fired on 'bug' beside the lock: 150 px of the brightest colour stole the
   // beat from Bit). Until then he stands settled on the step (landing squash, then the pose's idle breathing).
   const yawnAt = b.yawn;
   const drowsyAt = b.drowsy;
-  if (t < yawnAt) return {...base, squash: h.squash + popSwitch(t, yawnAt), pose: 'stand-side', amount: h.spread};
+  if (t < yawnAt) return {...base, squash: h.squash + popSwitch(t, yawnAt), pose: 'stand-side', amount: spread};
   if (t < drowsyAt) {
     // the yawn: trunk up, eyes shut, a long stretch (mouth open)
     const u = clamp((t - yawnAt) / (drowsyAt - yawnAt));
