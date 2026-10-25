@@ -18,14 +18,14 @@
 // Notes: docs/scenes/S03.md.
 
 import React from 'react';
-import {World, useScene, useTime, skies} from '../lib';
+import {World, useScene, useTime, skies, clamp} from '../lib';
 import {Sun} from '../lib/Sun';
 import {mat, XG} from '../lib/xf';
 import {BlueprintStreet, BLUEPRINT, PopUp, popUpK, SideId, BlueprintId, LayerWrap} from './shared/sets';
 import {Sticker, SunPie} from './shared/props';
 import {beats, Beats, local, S03_START, W} from './scene03/beats';
 import {camAt, camMat} from './scene03/camera';
-import {AtticVent, BirdWire, EdgeTree, FarPlain, Footprints, PressElevation, PRESS_SCREEN, PressScreen, QuestionScribble, RoofSign, S03_BLANK, SheetFrame, SideElevations, SideOverlays, SideRows, TickFlash, TickRing, VENT_HIDE, VentPatch, VentPuffs, VentS03} from './scene03/plan';
+import {AtticVent, BirdWire, EdgeTree, FarPlain, Footprints, PressElevation, PRESS_SCREEN, PressScreen, QuestionScribble, RoofSign, S03_BLANK, SheetFrame, SideElevations, SideOverlays, SideRows, RoofClutter, TickRing, VENT_HIDE, VentPatch, VentPuffs, VentS03} from './scene03/plan';
 import {CardKnock, GroundS03} from './scene03/ground';
 import {TitleCard} from './scene03/card';
 import {StampS03} from './scene03/stamp';
@@ -44,20 +44,30 @@ const SIDE_ORDER: SideId[] = ['L1', 'R1', 'L2', 'R2', 'L3', 'R3', 'L4', 'R4', 'L
  *  so the wave travels outward from the press house, where the eye already is (was the storyboard's near -> far P, L1,
  *  R1, L2, R2, L4, R3). The three non-PHP sites are the storyboard's mid-depth L3, R4, L5 (plan.tsx S03_BLANK). */
 const COUNT: BlueprintId[] = ['P', 'R3', 'L4', 'R2', 'L2', 'R1', 'L1'];
+/** Each site's slot in the wave. A1 fix round 1 (finding: the wave's last two ticks, R1 under the right UI rail and L1 at
+ *  the left frame edge, finished the count where a phone hides it): the wave ends on R2 / L2 (fully on screen) and R1 +
+ *  L1 fire TOGETHER as one final pair, one gap after L2: six beats, seven screens. */
+const COUNT_SLOT = [0, 1, 2, 3, 4, 5, 5];
 /** Gap between count ticks (A1: 0.08 -> 0.06 s, so the wave is done by 12.255, before the card's flip at 12.30). */
 const COUNT_GAP = 0.06;
 const BLANK: SideId[] = S03_BLANK; // L3, R4, L5: the screens go dark on 'ten' (near -> far)
+
+/** The sun's rest slot relative to S02's / S04's (690, 700) (A1 fix round 1), and S02's drift speed on the cut (px/s). */
+const SUN_SLOT_OFF: [number, number] = [22, -10];
+const SUN_DRIFT_IN = 6;
+const smoothstep = (u: number) => u * u * (3 - 2 * u);
 
 function tables(b: Beats) {
   const pressAt = b.popUp;
   const popAt = {} as Record<SideId, number>;
   // the nine side buildings: near -> far, alternating sides, 0.035 s apart, the first right after the press house
   SIDE_ORDER.forEach((id, i) => (popAt[id] = +(b.popUp + 0.04 + i * 0.035).toFixed(4)));
-  // the count (polish round 1: the screens ARE the street's count): 'seven', 0.08 s apart: P (its plaque pings, its lit
-  // screen re-pulses), then the six side PHP screens light with the elephant page + an orange ping; 'ten': the three
-  // non-PHP screens blink and go dark (0.05 s apart); 'websites': the seven PHP pages re-pulse in a wave (0.02 s)
+  // the count (polish round 1: the screens ARE the street's count): 'seven', centre-out, 0.06 s apart: P (its screen
+  // glows and switches to the elephant page), then the six side PHP screens light with the elephant page + an orange
+  // ping (R1 + L1 together, the final pair); 'ten': the three non-PHP screens blink and go dark (0.05 s apart);
+  // 'websites': the seven PHP pages re-pulse in a wave (0.02 s)
   const countAt = {} as Record<BlueprintId, number>;
-  COUNT.forEach((id, i) => (countAt[id] = +(b.count + i * COUNT_GAP).toFixed(4)));
+  COUNT.forEach((id, i) => (countAt[id] = +(b.count + COUNT_SLOT[i] * COUNT_GAP).toFixed(4)));
   const onAt: Partial<Record<SideId, number>> = {};
   const pulseAt: Partial<Record<SideId, number>> = {};
   COUNT.forEach((id, i) => {
@@ -102,8 +112,28 @@ const Scene03: React.FC = () => {
         <SunPie r={r} n={10} cream={0} spokesAt={b.spokes} seed="s03/pie" />
       </>
     ) : null;
+  // A1 fix round 1 (finding: the disc at rest nearly touched the press-house roof and R4's roof corner, ~18-20 px each:
+  // near-misses that flatten depth): the sun SETTLES into a slot 22 px right and 10 px up, SUN_SLOT_OFF from S02's
+  // (690, 700). It arrives on the cut at (690, 700) still drifting right at S02's 6 px/s and eases into the slot by the
+  // camera's lock ('everyone', a cubic Hermite: velocity-continuous at both ends, peak ~16 px/s); with R4 one storey
+  // lower the disc clears the press roof by ~38 px and R3's roof corner by ~36. The hop is S04's own curve (from (690,
+  // 700), the same `hops`) plus the slot offset blended out by the cut (smoothstep over the hop's first half: zero
+  // velocity change at take-off and at the cut), so the sun is mid-air at (810, 680) on the cut, exactly where S04
+  // picks it up, with S04's velocity.
+  const settle = local(W.everyone, start);
+  const sunOff = (() => {
+    if (t < settle) {
+      // Hermite from 0 (velocity S02's drift, (6, 0) px/s) to SUN_SLOT_OFF (velocity 0) over [0, settle]
+      const u = clamp(t / settle);
+      const h10 = u * u * u - 2 * u * u + u;
+      const h01 = -2 * u * u * u + 3 * u * u;
+      return [SUN_DRIFT_IN * settle * h10 + SUN_SLOT_OFF[0] * h01, SUN_SLOT_OFF[1] * h01];
+    }
+    const s = 1 - smoothstep(clamp((t - b.sunHop) / (sunHopAir / 2)));
+    return [SUN_SLOT_OFF[0] * s, SUN_SLOT_OFF[1] * s];
+  })();
   const sun = (
-    <XG m={mat.inv(M)}>
+    <XG m={mat.compose(mat.inv(M), mat.translate(sunOff[0], sunOff[1]))}>
       <Sun cx={690} cy={700} r={110} drift={[0, 0]} hops={[{t: b.sunHop, to: [930, 690], h: 15, air: sunHopAir}]}>
         {pie}
       </Sun>
@@ -151,9 +181,8 @@ const Scene03: React.FC = () => {
           <VentPatch />
           <AtticVent />
           <VentS03 />
-          {/* A1: the press house's count tick is its SCREEN (the same cream flash + inked ring as the side screens, and
-              its page switches to the elephant page): no plaque ping */}
-          <TickFlash x={PRESS_SCREEN.x + PRESS_SCREEN.w / 2} y={PRESS_SCREEN.y + PRESS_SCREEN.h / 2} rx={PRESS_SCREEN.w * 0.66} ry={PRESS_SCREEN.h * 0.95} at={T.countAt.P} />
+          {/* A1: the press house's count tick is its SCREEN (a stepped glow inside its browser window + the inked ring,
+              as on the side screens, and its page switches to the elephant page): no plaque ping */}
           <PressScreen lightAt={b.pressScreen} pulseAt={[T.countAt.P, b.websites]} pageAt={T.countAt.P + 0.067} />
           <Sticker x={648} y={1040} w={124} question={false} seed="s03/sticker" />
           <QuestionScribble x={727} y={1013} />
@@ -174,6 +203,8 @@ const Scene03: React.FC = () => {
       return (
         <>
           {sunFront ? null : sun}
+          {/* A1 fix round 1: L2's water tank and R3's aerial, behind their facades (the cornice hides their bases) */}
+          <RoofClutter popAt={T.popAt} />
           {/* fix round 3: the first two bays of each row as hairline construction elevations from the cut */}
           <SideElevations popAt={T.popAt} />
           {/* the bleed slivers (beyond the frame edges) stand from frame 0: keep their ink overshoot out of the frame

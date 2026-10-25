@@ -22,6 +22,7 @@ import {mat, XG} from '../../lib/xf';
 import {rng} from '../../lib/rng';
 import {Quad} from '../../lib/persp';
 import {BLUEPRINT, PerspRow, PopUp, quadRowLayout, RowHouse, SI, SideId, BlueprintId} from '../shared/sets';
+import type {PerspRowLayout} from '../shared/sets';
 import {chromeScreen, ElephantEmblem} from '../shared/props';
 import {Bird} from '../../lib/kit';
 
@@ -66,14 +67,35 @@ const isBlank = (id: SideId | null) => id !== null && S03_BLANK.includes(id);
  *  side plaques are dropped (`plaque: false`): the screens carry the count instead. */
 const LEFT_COLORS = [palette.sand, palette.cream, palette.mintPale, palette.tan, palette.peach, palette.cream];
 const RIGHT_COLORS = [palette.cream, palette.tan, palette.mintPale, palette.cream, palette.sand];
-const LEFT = quadRowLayout({quads: leftQuads, side: 'left', storeys: 4, colors: LEFT_COLORS, plaque: () => false, seed: 'bpL', plaqueK: 0.16});
-const RIGHT = quadRowLayout({quads: rightQuads, side: 'right', storeys: 4, colors: RIGHT_COLORS, plaque: () => false, seed: 'bpR', plaqueK: 0.16});
+/** A1 fix round 1 (finding: next to reference 1's street the rows read mechanical: the rooflines stepped down at one
+ *  constant rate and every screen sat in the same band): L4 and R4 are ONE STOREY LOWER (3 storeys, the roofline dropped
+ *  by one 4-storey storey along both vertical edges, so the storeys keep their height and the doors their size): the
+ *  farther L5 / R3 stand above them (two notches in the silhouettes), and their screens (the browser is always the
+ *  second storey from the top) sit one storey lower than their neighbours'. Raising a house instead would push its
+ *  roof into the caption band (screen y < 570). R4's lower roof also opens the air at the sun's lower right (its roof
+ *  corner came within ~19 px of the disc). */
+const LOWERED = {L: 4, R: 4};
+const STOREY = 0.95 / 4; // one storey, as a fraction of a 4-storey facade's height (houseGeo: sh = H * 0.95 / storeys)
+const lowerQuad = (q: Quad): Quad => {
+  const dn = (top: Pt, bot: Pt): Pt => [top[0], top[1] + (bot[1] - top[1]) * STOREY];
+  return [dn(q[0], q[3]), dn(q[1], q[2]), q[2], q[3]];
+};
+const rowWith = (quads: Quad[], side: 'left' | 'right', colors: string[], seed: string, low: number): PerspRowLayout => {
+  const base = quadRowLayout({quads, side, storeys: 4, colors, plaque: () => false, seed, plaqueK: 0.16});
+  const one = quadRowLayout({quads: [lowerQuad(quads[low])], side, storeys: 3, colors: [colors[low % colors.length]], plaque: () => false, seed: `${seed}${low}`, plaqueK: 0.16});
+  // the lowered house keeps its index in the row (pop-up, lock, fill seeds); its geometry was built as house 0 of its own
+  // one-house layout (GEO_I below: the seeds its ink strokes were made with)
+  return {spec: base.spec, houses: base.houses.map((h, i) => (i === low ? {...one.houses[0], i} : h))};
+};
+const LEFT = rowWith(leftQuads, 'left', LEFT_COLORS, 'bpL', LOWERED.L);
+const RIGHT = rowWith(rightQuads, 'right', RIGHT_COLORS, 'bpR', LOWERED.R);
 
-/** Every side house with its id (near -> far per side). */
-export const SIDE_HOUSES: {id: SideId; h: RowHouse}[] = [
-  ...LEFT.houses.map((h, i) => ({id: LEFT_IDS[i], h})),
-  ...RIGHT.houses.map((h, i) => ({id: RIGHT_IDS[i], h})),
-].filter((e): e is {id: SideId; h: RowHouse} => e.id !== null);
+/** Every side house with its id (near -> far per side) and `gi`, the house index its geometry's ink seeds were made
+ *  with (0 for the two lowered houses). */
+export const SIDE_HOUSES: {id: SideId; h: RowHouse; gi: number}[] = [
+  ...LEFT.houses.map((h, i) => ({id: LEFT_IDS[i], h, gi: i === LOWERED.L ? 0 : i})),
+  ...RIGHT.houses.map((h, i) => ({id: RIGHT_IDS[i], h, gi: i === LOWERED.R ? 0 : i})),
+].filter((e): e is {id: SideId; h: RowHouse; gi: number} => e.id !== null);
 
 /** The set's two side rows (same layout, seeds, pop-ups and ink as BlueprintStreet's 'sides' layer), re-coloured; the
  *  three non-PHP doors carry no PHP lock. Replaces the set's 'sides' node. */
@@ -422,8 +444,14 @@ const CE: React.FC<{d: string; at: number; dur: number; w?: number; seed: string
   <Ink d={d} at={at} dur={dur} order="seq" pace="free" width={w} taper={false} seed={seed} />
 );
 
+/** A1 fix round 1 (finding: on the cut frame only a few short verticals had started, the upper half of the frame held
+ *  just the sun and Pip): the whole schedule starts 0.20 s earlier (CE_LEAD), same per-stroke durations, so the cut
+ *  frame already shows the press walls drawn, the roof slopes ~70 % and the L1 / R1 street-side verticals, and the
+ *  strokes keep drawing through f6. */
+const CE_LEAD = -0.2;
+
 /** The press house's construction elevation (render in the press layer, before the set's node): walls bottom -> top
- *  from -0.10, the roof slopes (eaves -> apex) and the eaves line from 0.10, door + window from 0.18; dropped once the
+ *  from -0.30, the roof slopes (eaves -> apex) and the eaves line from -0.10, door + window from -0.02; dropped once the
  *  house is fully up (pressAt + 0.22). */
 export const PressElevation: React.FC<{pressAt: number}> = ({pressAt}) => {
   const t = useTime();
@@ -431,16 +459,16 @@ export const PressElevation: React.FC<{pressAt: number}> = ({pressAt}) => {
   const E0 = ELEV.press;
   return (
     <>
-      {E0.walls.map((d, i) => <CE key={`w${i}`} d={d} at={-0.1 + i * 0.03} dur={0.22} seed={`s03/ce/pW${i}`} />)}
-      {E0.roof.map((d, i) => <CE key={`r${i}`} d={d} at={0.1 + i * 0.03} dur={0.14} seed={`s03/ce/pR${i}`} />)}
-      {E0.openings.map((d, i) => <CE key={`o${i}`} d={d} at={0.18 + i * 0.04} dur={0.16} w={1.2} seed={`s03/ce/pO${i}`} />)}
+      {E0.walls.map((d, i) => <CE key={`w${i}`} d={d} at={CE_LEAD - 0.1 + i * 0.03} dur={0.22} seed={`s03/ce/pW${i}`} />)}
+      {E0.roof.map((d, i) => <CE key={`r${i}`} d={d} at={CE_LEAD + 0.1 + i * 0.03} dur={0.14} seed={`s03/ce/pR${i}`} />)}
+      {E0.openings.map((d, i) => <CE key={`o${i}`} d={d} at={CE_LEAD + 0.18 + i * 0.04} dur={0.16} w={1.2} seed={`s03/ce/pO${i}`} />)}
     </>
   );
 };
 
 /** The first two bays of each side row (render in the sides layer, before the rows): the walls draw up from the
- *  footprints (L1 / R1 from -0.06, L2 / R2 0.04 s later), then the rooflines (from the frame edge toward the VP) and two
- *  storey lines; each bay is dropped once its building is up (popAt + 0.22). */
+ *  footprints (L1 / R1 from -0.26, L2 / R2 0.04 s later), then the rooflines (from the frame edge toward the VP, from
+ *  -0.04) and two storey lines (from 0.04); each bay is dropped once its building is up (popAt + 0.22). */
 export const SideElevations: React.FC<{popAt: Record<SideId, number>}> = ({popAt}) => {
   const t = useTime();
   const ids: ('L1' | 'R1' | 'L2' | 'R2')[] = ['L1', 'R1', 'L2', 'R2'];
@@ -449,12 +477,12 @@ export const SideElevations: React.FC<{popAt: Record<SideId, number>}> = ({popAt
       {ids.map((id, i) => {
         if (t >= popAt[id] + 0.22) return null;
         const B = ELEV[id];
-        const d0 = i < 2 ? -0.06 : -0.02;
+        const d0 = CE_LEAD + (i < 2 ? -0.06 : -0.02);
         return (
           <React.Fragment key={id}>
             <CE d={B.wall} at={d0} dur={0.24} seed={`s03/ce/${id}W`} />
-            <CE d={B.roof} at={0.16 + i * 0.02} dur={0.14} seed={`s03/ce/${id}R`} />
-            <CE d={B.storeys} at={0.24 + i * 0.02} dur={0.18} w={1.2} seed={`s03/ce/${id}S`} />
+            <CE d={B.roof} at={CE_LEAD + 0.16 + i * 0.02} dur={0.14} seed={`s03/ce/${id}R`} />
+            <CE d={B.storeys} at={CE_LEAD + 0.24 + i * 0.02} dur={0.18} w={1.2} seed={`s03/ce/${id}S`} />
           </React.Fragment>
         );
       })}
@@ -515,7 +543,7 @@ const seg = (q: Q4, u0: number, u1: number, v: number) => {
  *  2b: R2's screen (x 926-980 on screen) is half under the right UI rail (x > 950): its elephant shrinks to 0.8 and
  *  shifts toward the street (u 0.4), its tick ring is centred at u 0.25 (~13 px further left), so the tick's centroid
  *  moves off the rail. `hd`: the page's peach header band [v0, v1] (default [0.08, 0.26]). */
-const PAGE_AT: Partial<Record<SideId, {u: number; k: number; pingU: number; v?: number; pingV?: number; hd?: [number, number]}>> = {
+const PAGE_AT: Partial<Record<SideId, {u: number; k: number; pingU: number; v?: number; pingV?: number; hd?: [number, number]; pingMaxX?: number}>> = {
   R2: {u: 0.4, k: 0.8, pingU: 0.25},
   // A1 (finding: R1's page and tick sat in the right UI rail, x > 950 / y 900-1500, so with the platform UI on top the
   // street counted 6 + the press house): R1's whole screen is at x 1012-1076 (no bay of R1 lies left of x 950), but its
@@ -523,7 +551,10 @@ const PAGE_AT: Partial<Record<SideId, {u: number; k: number; pingU: number; v?: 
   // elephant at v 0.34 (its back above y 900), and its tick is centred on the screen's top street-side corner (screen
   // ~(1012, 880)): the cream flash and the inked ring burst up and left over R2's facade and the sky gap, a visible echo
   // left of x 950 and above the rail
-  R1: {u: 0.3, k: 0.78, pingU: 0.0, v: 0.34, pingV: 0.08, hd: [0.05, 0.13]},
+  // A1 fix round 1: its ring's centre is also clamped to world x <= 991 (screen ~993 at the lock: R1's street-side edge,
+  // above the rail's top), so the ring bursts up-left over R2's roof and the sky gap. (The finding's x <= 940 would put
+  // it on R2's lit screen, where R2's own ring fired 0.12 s earlier: it read as R2 pinging twice.)
+  R1: {u: 0.3, k: 0.78, pingU: 0.0, v: 0.34, pingV: 0.08, hd: [0.05, 0.13], pingMaxX: 991},
   // L1 (cut by the left frame edge, x -7..57 on screen; the film's paint edge eats the outer ~30 px): its elephant and
   // tick sit at the street side of its screen (u 0.72)
   L1: {u: 0.72, k: 0.85, pingU: 0.72},
@@ -626,23 +657,102 @@ function screenCentre(h: RowHouse, u = 0.5, v = 0.5): {c: Pt; w: number; h: numb
   return {c: bil(q, u, v), w: Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1]), h: Math.hypot(q[3][0] - q[0][0], q[3][1] - q[0][1])};
 }
 
-/** Per side house: its screen state + page (+ the count's tick on the PHP screens: a 2-frame cream flash BEHIND the
- *  screen and an inked orange ring in front), an awning (L2 / R2), window boxes (L2, R3). `onAt`: the PHP screens light
- *  on 'seven' (the count: polish round 1, the screens ARE the street's count, no blade signs), the three non-PHP
- *  screens go dark on 'ten'; `pulseAt`: the PHP pages re-pulse on 'websites'. */
+/** A1 fix round 1 (finding: each count tick's 2-frame glow was a cream disc / block 1.5-2x its screen, spilling over
+ *  the neighbouring pilasters and facades: seven glows in a row left peach smudges that read as render errors): the
+ *  glow is the SCREEN, lit peach (ScreenState), plus ONE stepped flat halo hugging it: the screen quad grown 3.5 px
+ *  (peach) and 7 px (cream) on its left, right and bottom (the browser bar above is left alone), two flat quads, no blur,
+ *  for the same 2 frames; the browser frame's own ink (houseGeo's 'rb' strokes, same seeds) is re-inked over it, clipped
+ *  to the halo, so the glow sits UNDER the facade's frame lines. Also on the 'websites' re-pulse. */
+const HALO = [7, 3.5];
+const browserInk = (h: RowHouse, gi: number): string => {
+  const bq = h.browser;
+  return (
+    line(bq[0][0], bq[0][1], bq[1][0], bq[1][1], {over: 'small', seed: `rb1${gi}`}) +
+    line(bq[0][0], bq[0][1], bq[3][0], bq[3][1], {over: 'small', seed: `rb2${gi}`}) +
+    line(bq[1][0], bq[1][1], bq[2][0], bq[2][1], {over: 'small', seed: `rb3${gi}`}) +
+    line(bq[3][0], bq[3][1], bq[2][0], bq[2][1], {over: 'small', seed: `rb4${gi}`})
+  );
+};
+const haloQuad = (q: Q4, d: number): string => {
+  const w = Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1]);
+  const hh = Math.hypot(q[3][0] - q[0][0], q[3][1] - q[0][1]);
+  return sub(q, -d / w, 0, 1 + d / w, 1 + d / hh);
+};
+const ScreenHalo: React.FC<{h: RowHouse; gi: number; at: (number | undefined)[]; id: string; children?: React.ReactNode}> = ({h, gi, at, id, children}) => {
+  const t = useTime();
+  const on = at.some((a) => a !== undefined && t >= a && t < a + GLOW);
+  if (!on) return <>{children}</>;
+  const q = quadOf(h.g.screen);
+  const outer = haloQuad(q, HALO[0]);
+  const iw = h.tier === 'full' ? SI.mid : SI.far;
+  return (
+    <>
+      <Fill d={outer} color={palette.cream} offset={false} mode="none" seed={`s03/halo${id}o`} />
+      <Fill d={haloQuad(q, HALO[1])} color={palette.peach} offset={false} mode="none" seed={`s03/halo${id}i`} />
+      {children}
+      <g clipPath={`url(#s03halo${id})`}>
+        <Ink d={browserInk(h, gi)} width={iw} taper={false} seed={`s03/haloI${id}`} />
+      </g>
+      <defs>
+        <clipPath id={`s03halo${id}`} clipPathUnits="userSpaceOnUse">
+          <path d={haloQuad(q, HALO[0] + 3)} />
+        </clipPath>
+      </defs>
+    </>
+  );
+};
+
+/** A1 fix round 1 (rows read mechanical next to reference 1): a BALCONY on L2's third storey, under its far window,
+ *  below the screen band: a tan slab projecting toward the street, a railing (top rail + bars), a peach towel over the
+ *  rail and a potted plant at its far end. Static, rides L2's pop-up. */
+const BALCONY = (() => {
+  const h = SIDE_HOUSES.find((e) => e.id === 'L2')!.h;
+  const f: Pt = [8, 2]; // the slab's projection toward the street (left row: +x)
+  const A = facadeAt(h, 0.5, 0.703);
+  const B = facadeAt(h, 0.93, 0.703);
+  const A2: Pt = [A[0] + f[0], A[1] + f[1]];
+  const B2: Pt = [B[0] + f[0], B[1] + f[1]];
+  const th = 5;
+  const rh = 30;
+  const slab = polyPath([A, B, B2, A2]) + polyPath([A2, B2, [B2[0], B2[1] + th], [A2[0], A2[1] + th]]);
+  const at = (u: number): Pt => [A2[0] + (B2[0] - A2[0]) * u, A2[1] + (B2[1] - A2[1]) * u];
+  let rail = `M${A2[0].toFixed(1)} ${(A2[1] - rh).toFixed(1)}L${B2[0].toFixed(1)} ${(B2[1] - rh).toFixed(1)}`;
+  for (const u of [0, 0.2, 0.4, 0.6, 0.8, 1]) {
+    const p = at(u);
+    rail += `M${p[0].toFixed(1)} ${p[1].toFixed(1)}L${p[0].toFixed(1)} ${(p[1] - rh).toFixed(1)}`;
+  }
+  // the side rails back to the wall
+  rail += `M${A[0].toFixed(1)} ${(A[1] - rh + 2).toFixed(1)}L${A2[0].toFixed(1)} ${(A2[1] - rh).toFixed(1)}`;
+  // a towel over the rail (peach), hanging on the street side
+  const tw = at(0.18);
+  const towel = polyPath([[tw[0] - 1, tw[1] - rh - 1], [tw[0] + 11, tw[1] - rh - 0.6], [tw[0] + 11.5, tw[1] - rh + 17], [tw[0] - 0.5, tw[1] - rh + 16]]);
+  // the potted plant at the far end (pot on the slab, leaves above the rail)
+  const pp = at(0.84);
+  const pot = polyPath([[pp[0] - 6, pp[1] - 12], [pp[0] + 6, pp[1] - 12], [pp[0] + 4.5, pp[1]], [pp[0] - 4.5, pp[1]]]);
+  const leaf = (cx: number, cy: number, r: number) => `M${(cx - r).toFixed(1)} ${cy.toFixed(1)}a${r} ${(r * 0.8).toFixed(1)} 0 1 0 ${2 * r} 0a${r} ${(r * 0.8).toFixed(1)} 0 1 0 ${-2 * r} 0Z`;
+  const leaves = leaf(pp[0] - 5, pp[1] - 22, 7) + leaf(pp[0] + 5, pp[1] - 25, 7.5) + leaf(pp[0], pp[1] - 33, 7);
+  return {slab, rail, towel, pot, leaves};
+})();
+
+/** Per side house: its screen state + page (+ the count's tick on the PHP screens: the screen's stepped halo for two
+ *  frames and an inked orange ring in front), an awning (L2 / R2), window boxes (L2, R3), L2's balcony. `onAt`: the PHP
+ *  screens light on 'seven' (the count: polish round 1, the screens ARE the street's count, no blade signs), the three
+ *  non-PHP screens go dark on 'ten'; `pulseAt`: the PHP pages re-pulse on 'websites'. */
 export const SideOverlays: React.FC<{popAt: Record<SideId, number>; onAt: Partial<Record<SideId, number>>; pulseAt: Partial<Record<SideId, number>>; awnings?: SideId[]}> = ({popAt, onAt, pulseAt, awnings = ['L2', 'R2']}) => (
   <>
-    {SIDE_HOUSES.map(({id, h}) => {
+    {SIDE_HOUSES.map(({id, h, gi}) => {
       const php = !isBlank(id);
       const fb = FLOWERS[id];
       const pa = PAGE_AT[id];
       const sc = screenCentre(h, pa?.pingU, pa?.pingV);
+      const ping: Pt = [Math.min(sc.c[0], pa?.pingMaxX ?? Infinity), sc.c[1]];
       const on = onAt[id];
       const tick = php && on !== undefined;
       return (
         <PopUp key={id} at={popAt[id]} x={h.base[0]} y={h.base[1]}>
-          {tick ? <TickFlash x={sc.c[0]} y={sc.c[1]} rx={sc.w * 1.05} ry={sc.h * 0.62} at={on} /> : null}
-          <ScreenState d={h.g.screen} onAt={on} pulseAt={php ? pulseAt[id] : undefined} php={php} page={pa} seed={`s03/scr${id}`} />
+          <ScreenHalo h={h} gi={gi} at={php ? [on, pulseAt[id]] : []} id={id}>
+            <ScreenState d={h.g.screen} onAt={on} pulseAt={php ? pulseAt[id] : undefined} php={php} page={pa} seed={`s03/scr${id}`} />
+          </ScreenHalo>
           {awnings.includes(id) && h.g.awning ? (
             <>
               <Fill d={h.g.awning} color={palette.peach} seed={`s03/aw${id}`} />
@@ -657,12 +767,65 @@ export const SideOverlays: React.FC<{popAt: Record<SideId, number>; onAt: Partia
               <Ink d={fb.box + fb.leaves} width={1.3} taper={false} seed={`s03/fbi${id}`} />
             </>
           ) : null}
-          {tick ? <TickRing x={sc.c[0]} y={sc.c[1]} r={sc.w * 0.8} at={on} /> : null}
+          {id === 'L2' ? (
+            <>
+              <Fill d={BALCONY.slab} color={palette.tan} offset={false} mode="none" seed="s03/balS" />
+              <Fill d={BALCONY.towel} color={palette.peach} offset={false} mode="none" seed="s03/balT" />
+              <Fill d={BALCONY.pot} color={palette.brown} offset={false} mode="none" seed="s03/balP" />
+              <Fill d={BALCONY.leaves} color={palette.sage} offset={[1.5, 1]} mode="none" seed="s03/balL" />
+              <Ink d={BALCONY.slab + BALCONY.towel + BALCONY.pot} width={1.4} taper={false} seed="s03/balI" />
+              <Ink d={BALCONY.rail} width={1.6} taper={false} seed="s03/balR" />
+              <Ink d={BALCONY.leaves} width={1.3} taper={false} open={0.1} seed="s03/balLi" />
+            </>
+          ) : null}
+          {tick ? <TickRing x={ping[0]} y={ping[1]} r={sc.w * 0.8} at={on} /> : null}
         </PopUp>
       );
     })}
   </>
 );
+
+/** A1 fix round 1: one roof object per side, standing BEHIND its facade (render in the sides layer before the rows, so
+ *  the cornice hides the base) and rising with its house's pop-up: a wooden WATER TANK on L2 (legs, a tan barrel with two
+ *  hoops, a tealDark cone cap) and a TV AERIAL on R3 (a mast, three crossbars, a stay wire). Both tops stay below screen
+ *  y ~605 (the caption band ends at 570) and left of x 950 (the UI rail). */
+const ROOF = (() => {
+  // the tank: on L2's roof near its far end (roofline y 660-666 there)
+  const tx = 149;
+  const tb = 668; // hidden behind the cornice
+  const legs = `M${tx - 13} ${tb}L${tx - 12} ${tb - 18}M${tx + 13} ${tb}L${tx + 12} ${tb - 18}M${tx - 12} ${tb - 6}L${tx + 12} ${tb - 14}`;
+  const barrel = `M${tx - 17} ${tb - 18}L${tx - 16} ${tb - 47}L${tx + 16} ${tb - 47}L${tx + 17} ${tb - 18}Q${tx} ${tb - 15} ${tx - 17} ${tb - 18}Z`;
+  const hoops = `M${tx - 16.6} ${tb - 27}Q${tx} ${tb - 24} ${tx + 16.6} ${tb - 27}M${tx - 16.2} ${tb - 38}Q${tx} ${tb - 35} ${tx + 16.2} ${tb - 38}`;
+  const cap = `M${tx - 20} ${tb - 46}L${tx} ${tb - 60}L${tx + 20} ${tb - 46}Z`;
+  // the aerial: on R3's roof near its street-side end (roofline y ~706 there)
+  const ax = 884;
+  const ab = 712;
+  const mast = `M${ax} ${ab}L${ax + 0.5} ${ab - 70}`;
+  const bars = `M${ax - 19} ${ab - 62}L${ax + 18} ${ab - 63}M${ax - 15} ${ab - 50}L${ax + 14} ${ab - 51}M${ax - 10} ${ab - 38}L${ax + 10} ${ab - 38.5}`;
+  const stay = `M${ax + 0.3} ${ab - 34}L${ax + 22} ${ab - 4}`;
+  return {tank: {legs, barrel, hoops, cap, base: [tx, tb] as Pt}, aerial: {mast, bars, stay, base: [ax, ab] as Pt}};
+})();
+export const RoofClutter: React.FC<{popAt: Record<SideId, number>}> = ({popAt}) => {
+  const L2 = SIDE_HOUSES.find((e) => e.id === 'L2')!.h;
+  const R3 = SIDE_HOUSES.find((e) => e.id === 'R3')!.h;
+  const {tank, aerial} = ROOF;
+  return (
+    <>
+      <PopUp at={popAt.L2} x={L2.base[0]} y={L2.base[1]}>
+        <Ink d={tank.legs} width={2.2} taper={false} seed="s03/tankL" />
+        <Fill d={tank.barrel} color={palette.tan} seed="s03/tankB" />
+        <Fill d={tank.cap} color={palette.tealDark} seed="s03/tankC" />
+        <Ink d={tank.barrel + tank.cap} width={SI.far} taper={false} seed="s03/tankI" />
+        <Ink d={tank.hoops} width={1.4} taper={false} seed="s03/tankH" />
+      </PopUp>
+      <PopUp at={popAt.R3} x={R3.base[0]} y={R3.base[1]}>
+        <Ink d={aerial.mast} width={2.4} taper={false} seed="s03/aerM" />
+        <Ink d={aerial.bars} width={2.0} taper={false} seed="s03/aerB" />
+        <Ink d={aerial.stay} width={1.2} taper={false} seed="s03/aerS" />
+      </PopUp>
+    </>
+  );
+};
 
 /** The press house's screen (BrowserChrome screen rect under its bar): unlit, peach pop, the set's page; re-pulses
  *  (peach, 2 frames) at each `pulseAt` (its count tick on 'seven', 'websites'). A1 (finding: the press house, counted
@@ -679,7 +842,15 @@ export const PressScreen: React.FC<{lightAt: number; pulseAt?: number[]; pageAt?
   const d = `M${s.x} ${s.y}H${s.x + s.w}V${s.y + s.h}H${s.x}Z`;
   const pulse = pulseAt.some((p) => t >= p && t < p + GLOW);
   if (t < lightAt) return <Fill d={d} color={palette.sage} offset={false} mode="none" seed="s03/scrP" />;
-  if (t < lightAt + GLOW || pulse) return <Fill d={d} color={palette.peach} offset={false} mode="none" seed="s03/scrPp" />;
+  // the glow (first light, the count tick, 'websites'): A1 fix round 1, kept INSIDE the browser window (the sticker
+  // below stays clean): two flat steps, the screen cream with a peach panel inset 7 px (was an ellipse 1.3 x the screen)
+  if (t < lightAt + GLOW || pulse)
+    return (
+      <>
+        <Fill d={d} color={palette.cream} offset={false} mode="none" seed="s03/scrPc" />
+        <Fill rect={[s.x + 7, s.y + 5, s.w - 14, s.h - 12]} color={palette.peach} offset={false} mode="none" seed="s03/scrPp" />
+      </>
+    );
   if (pageAt === undefined || t < pageAt) return null;
   // a thin header so the elephant can fill the page's height (~50 px tall on screen, as big as the side pages' glyphs
   // relative to their pages: the press screen is 3x wider)
@@ -700,14 +871,6 @@ export const PressScreen: React.FC<{lightAt: number; pulseAt?: number[]; pageAt?
 };
 
 // ---------------------------------------------------------------- count ticks
-
-/** A count tick's flash (A1, finding: a thin 3.4 px orange ring on peach / tan facades all but vanished at phone
- *  size): a cream disc (ellipse rx x ry) behind the screen for two frames. */
-export const TickFlash: React.FC<{x: number; y: number; rx: number; ry: number; at: number}> = ({x, y, rx, ry, at}) => {
-  const t = useTime();
-  if (t < at || t >= at + GLOW) return null;
-  return <ellipse cx={x} cy={y} rx={rx} ry={ry} fill={palette.cream} />;
-};
 
 /** A count tick's ring (A1): an ORANGE 4.8 px ring with a 2 px ink outline each side, popping at r and expanding to
  *  1.8 r while thinning (0.26 s): reads on peach, tan, mint and sky alike. */

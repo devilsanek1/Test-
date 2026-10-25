@@ -13,7 +13,7 @@ import {ElephantTimeline, PoseKey, popSwitch, poseAt} from '../../lib/mascot';
 import {BLUEPRINT, popUpK} from '../shared/sets';
 import {Bit, Citizen, EdgeOnlooker} from '../shared/props';
 import type {Acc, Hair} from '../../lib/kit';
-import {beats, S03_START, type Beats} from './beats';
+import {beats, S03_END, S03_START, type Beats} from './beats';
 import {CAM_REST} from './camera';
 import {ROOF_SIGN, signAngle} from './plan';
 import type {Pt} from '../../lib/sketch';
@@ -80,6 +80,10 @@ const FALL_TILT = 20;
 
 /** Max total squash (incl. the pose pops) so Pip's head keeps its silhouette (sy >= 0.75). */
 const SQUASH_CAP = 0.25;
+/** The hop-off crouch (A1 fix round 1): total squash from the stand-side pop to the cut (ease-in), and its lean toward
+ *  screen-left (deg, the way S04's hop takes him), about his feet. */
+const CROUCH = [0.14, 0.28];
+const CROUCH_LEAN = -3;
 
 /** Pip's arc at scene-local time `tl` (valid from S02's last frame, tl = PIP_HANDOFF.t - S03_START ~ -0.026, where it
  *  returns PIP_HANDOFF.screen, to the landing), in SCREEN px under S03's rest camera (540, 950, 1.0) = S02's framing
@@ -147,6 +151,8 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
   let squash = 0;
   let rotate = 0;
   let smear: React.ReactNode = null;
+  let crouchLean = 0;
+  let ghost: React.ReactNode = null;
   if (t < b.pipLand) {
     // the drop: S02's live hop-out continued from its last frame (PIP_HANDOFF: one arc, g 2,400, the sideways speed easing up from S02's),
     // falling down-left onto the bare plan. Fix round 3 (finding: the last frames moved ~75 px/frame on flat ink, a
@@ -173,6 +179,13 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
       const ang = (Math.atan2(uy, ux) * 180) / Math.PI;
       smear = <Ink d={speedLines(sx, sy, {n: 3, len: 40, gap: 15, angle: ang, seed: 's03/pipSpd'})} width={2.2} taper={false} seed="s03/pipSpdI" />;
     }
+    // A1 fix round 1 (finding: the last frames before contact step ~76 px a frame and read as a jump on a phone): on the
+    // last 2 frames an INK-ONLY smear copy of his silhouette (no fill, thinner line) trails half a frame behind him on
+    // the arc, so the eye gets an in-between
+    if (t >= b.pipLand - 0.07) {
+      const g = arcAt(t - 1 / 60).p;
+      ghost = <ElephantTimeline x={g[0]} y={g[1]} scale={PIP_SCALE} t={t} seed={3} keys={keys} squash={squash} rotate={screenRot} flip fill={0} lineWeight={0.7} />;
+    }
   } else {
     // the impact: his fall tilt (screen FALL_TILT) comes back upright over 2 frames under the landing squash
     rotate = FALL_TILT * (1 - E.outQuad(prog(t, b.pipLand, 0.067)));
@@ -193,13 +206,21 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
     // 'run': the glance down the street: a +5 deg lean toward the VP (out-back, 0.25 s), eased back in the 0.1 s before
     // the hop-off pop
     if (t >= b.run) rotate += 5 * E.outBack(1.6)(prog(t, b.run, 0.25)) * (1 - E.inOutSine(prog(t, b.pipHop - 0.1, 0.1)));
-    // the hop-off crouch (S04 owns the leap: take-off after the cut)
-    if (t >= b.pipHop) squash += 0.2 * Math.sin((Math.min(1, (t - b.pipHop) / 0.14) * Math.PI) / 2);
+    // the hop-off crouch (S04 owns the leap: take-off after the cut). A1 fix round 1 (finding: from the pose pop to the
+    // cut his centroid and bbox were identical for 4 frames: the 0.2 sin crouch grew exactly as fast as the stand-side
+    // pop's settle wobble shrank, a dead hold, then S04's first frame is already airborne): the pop is cancelled here
+    // and the crouch is driven directly as a TOTAL squash, 0.14 (the pop's peak) -> 0.28 on an ease-in into the cut (feet fixed), so the
+    // body keeps sinking (~2, 3, 5 px/frame of centroid) and S04's stretched take-off reads as its release
+    if (t >= b.pipHop) {
+      const cut = b.cut + (S03_END - S03_START);
+      squash = CROUCH[0] + (CROUCH[1] - CROUCH[0]) * E.inQuad(clamp((t - b.pipHop) / (cut - b.pipHop))) - popSwitch(t, b.pipHop);
+      crouchLean = CROUCH_LEAN * E.inOutSine(clamp((t - b.pipHop) / (cut - b.pipHop)));
+    }
   }
   // fix round 2b (finding: on the landing frames the sit-back pop (0.14) + the landing squash (0.26) flattened his head
   // into his body, ~55 % head height): the TOTAL squash, the timeline's pose pops included, is capped at 0.25, so he
   // stays on model on the impact frame
-  {
+  if (t < b.pipHop) {
     const {cur, prev, next} = poseAt(keys, t);
     const pops = (prev ? popSwitch(t, cur.t) : 0) + (next ? popSwitch(t, next.t) : 0);
     squash = Math.min(squash, SQUASH_CAP - pops);
@@ -210,7 +231,10 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
   return (
     <>
       {smear}
-      <ElephantTimeline x={x} y={y} scale={PIP_SCALE} t={t} seed={3} keys={keys} squash={squash} rotate={flip ? -rotate : rotate} flip={flip} />
+      {ghost}
+      <XG m={mat.about(mat.rotate(crouchLean), x, y)}>
+        <ElephantTimeline x={x} y={y} scale={PIP_SCALE} t={t} seed={3} keys={keys} squash={squash} rotate={flip ? -rotate : rotate} flip={flip} />
+      </XG>
     </>
   );
 };

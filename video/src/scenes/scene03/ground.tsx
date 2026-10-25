@@ -252,6 +252,17 @@ const NEAR_DUR = 0.09;
  *  Polish round 1: the sand street exists only from `streetAt` (the pop-up: the pavement springs up with the city);
  *  before it the bare plan is all paper (FarPlain's cream + grid show round the sheet, to the horizon). The grid weights
  *  thin with depth from 2.2 (near) through 1.9 (mid) to inkHair 1.6 (far), continuing into the far plain's 1.6. */
+/** A1 fix round 1 (fresh look: for the 3-6 frames before the side rows rose, the street was a full-width sand slab with
+ *  a hard horizontal edge across the lots at y 1180): the street is the WEDGE between the two building lines (the side
+ *  rows' base lines, lBase / rBase, from the press house's corners (360 / 760, 1180) out past the frame bottom), so it
+ *  grows down from the press house as the street itself; outside it the facades stand once they are up. */
+const STREET_WEDGE = (() => {
+  const yB = 2080;
+  const xl = 360 - ((yB - 1180) * 360) / 380;
+  const xr = 760 + ((yB - 1180) * 320) / 380;
+  return `M360 1180L760 1180L${xr.toFixed(1)} ${yB}L${xl.toFixed(1)} ${yB}Z`;
+})();
+
 export const GroundS03: React.FC<{gridAt: number; streetAt?: number; knockAt?: number; seed?: string}> = ({gridAt, streetAt, knockAt, seed = 'bp'}) => {
   useCaptionFont();
   const t = useTime();
@@ -264,7 +275,7 @@ export const GroundS03: React.FC<{gridAt: number; streetAt?: number; knockAt?: n
     <>
       {streetK > 0.001 ? (
         <XG m={streetK === 1 ? mat.I : mat.about(mat.scale(1, streetK), 0, 1180)}>
-          <Fill rect={[-160, 1180, 1400, 900]} color={palette.sand} offset={false} mode="snap" seed={`${seed}/street`} />
+          <Fill d={STREET_WEDGE} color={palette.sand} offset={false} mode="snap" seed={`${seed}/street`} />
         </XG>
       ) : null}
       <Fill d={G.sheet} color={palette.cream} offset={false} mode="snap" seed={`${seed}/sheet`} />
