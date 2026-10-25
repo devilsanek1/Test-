@@ -43,10 +43,11 @@ const ABS = {
   //                        big ink sparkle pops above it (+0.02) on its stepped glow disc (+0.08): up as 'AI' is heard
   twinkle: 17.77, //        w58+0.065 'AI' (fix round 4): team A's sparkle twinkles once on the highlight (B 0.07 s later)
   beams: 17.955, //         w58+0.25: two scan beams shoot out and sweep the banner from opposite sides
-  l6: 18.24, //             w59+0.045 'figured' (A1 polish: was 18.30, on screen 1.47 s < the 1.5 s label floor; fix round 4:
-  //                        was w58+0.40-0.08 = 18.025, before the beams found anything): L6 pops as a slip clipped to the
-  //                        banner's top edge just after the beams' converge midpoint (18.225), before the ring (18.475):
-  //                        the label follows the scan; 1.53 s on screen
+  l6: 18.175, //            w59-0.02 'figured' (A1 fix round: was 18.24, legible only from 18.32, 1.45 s to the cut, under the
+  //                        1.5 s label floor; A1 polish: 18.30; fix round 4: was w58+0.40-0.08 = 18.025, before the beams
+  //                        found anything): L6 pops as a slip clipped to the banner's top edge as the beams converge
+  //                        (narrowing 50 % at 18.225), before the ring (18.475): the label follows the scan; its 2-frame
+  //                        spring lands on f48-f49, clear of the f46 'look' pose swaps; ~1.6 s on screen
   converge: 18.115, //      w59-0.08 'figured': both beams converge on the lock detail (narrow by ~figured+0.1)
   look: 18.115, //          w59-0.08 'figured' (fix round 4: rule 5 lead, was ON the word): two audience heads tilt up
   //                        and team A's back-row member points at the lock (1-frame pose swaps)

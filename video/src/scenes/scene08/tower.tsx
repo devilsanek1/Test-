@@ -26,22 +26,23 @@ const TOWER = (() => {
   const legL: [Pt, Pt] = [[T.x0 - 6, T.base], [cx + 5, cy + ch]];
   const legR: [Pt, Pt] = [[T.x1 + 6, T.base], [cx + cw - 5, cy + ch]];
   const at = (leg: [Pt, Pt], u: number): Pt => [leg[0][0] + (leg[1][0] - leg[0][0]) * u, leg[0][1] + (leg[1][1] - leg[0][1]) * u];
+  // A1 fix round 1: TWO legs and TWO X-braces (the 4-level lattice read as an oil derrick / pylon at phone size): a
+  // lookout on stilts
   let lattice = `M${legL[0][0]} ${legL[0][1]}L${legL[1][0]} ${legL[1][1]}M${legR[0][0]} ${legR[0][1]}L${legR[1][0]} ${legR[1][1]}`;
-  const us = [0, 0.24, 0.48, 0.72, 0.9];
+  const us = [0.04, 0.47, 0.9];
   for (let i = 0; i < us.length - 1; i++) {
     const a0 = at(legL, us[i]);
     const b0 = at(legR, us[i]);
     const b1 = at(legR, us[i + 1]);
     const a1 = at(legL, us[i + 1]);
-    lattice += `M${a0[0].toFixed(1)} ${a0[1].toFixed(1)}L${b0[0].toFixed(1)} ${b0[1].toFixed(1)}`;
-    lattice += i % 2 ? `M${a0[0].toFixed(1)} ${a0[1].toFixed(1)}L${b1[0].toFixed(1)} ${b1[1].toFixed(1)}` : `M${b0[0].toFixed(1)} ${b0[1].toFixed(1)}L${a1[0].toFixed(1)} ${a1[1].toFixed(1)}`;
+    lattice += `M${a0[0].toFixed(1)} ${a0[1].toFixed(1)}L${b1[0].toFixed(1)} ${b1[1].toFixed(1)}M${b0[0].toFixed(1)} ${b0[1].toFixed(1)}L${a1[0].toFixed(1)} ${a1[1].toFixed(1)}`;
   }
   const cabin =
     `M${cx} ${cy}h${cw}v${ch}h${-cw}Z` +
     poly([
-      [cx - 5, cy + 1],
+      [cx - 9, cy + 3],
       [cx + cw / 2, T.top],
-      [cx + cw + 5, cy + 1],
+      [cx + cw + 9, cy + 3],
     ]) +
     `M${cx - 4} ${cy + ch - 3}h${cw + 8}v5h${-cw - 8}Z`;
   const window = `M${cx + 5} ${cy + 7}h${cw - 10}v${(ch * 0.42).toFixed(1)}h${-(cw - 10)}Z`;
@@ -63,8 +64,8 @@ const CABIN_RIM = (() => {
     ]) +
     poly([
       [cx + cw / 2 + 2, T.top + 2],
-      [cx + cw + 5, cy + 1],
-      [cx + cw + 1, cy + 1 + r * 0.6],
+      [cx + cw + 9, cy + 3],
+      [cx + cw + 5, cy + 3 + r * 0.6],
       [cx + cw / 2 + 1, T.top + 2 + r],
     ])
   );
@@ -151,21 +152,34 @@ export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; h
       <path d={fan(core)} fill={palette.cream} opacity={0.85} />
       {grow >= 0.999 && !hit.foot ? <ellipse cx={mid[0]} cy={mid[1]} rx={14} ry={7} transform={`rotate(${((-tan * 180) / Math.PI + 90).toFixed(1)} ${mid[0].toFixed(1)} ${mid[1].toFixed(1)})`} fill={palette.cream} /> : null}
       <path d={`M${o[0]} ${o[1]}L${up[0].toFixed(1)} ${up[1].toFixed(1)}M${o[0]} ${o[1]}L${lo[0].toFixed(1)} ${lo[1].toFixed(1)}`} fill="none" stroke={palette.ink} strokeWidth={1.6} strokeLinecap="round" />
-      {flash ? <circle cx={o[0] - 3} cy={o[1]} r={11} fill={palette.cream} stroke={palette.ink} strokeWidth={1.6} /> : <circle cx={o[0] - 3} cy={o[1]} r={3.6} fill={palette.cream} />}
+      {flash ? <circle cx={o[0] - 3} cy={o[1]} r={11} fill={palette.cream} stroke={palette.ink} strokeWidth={1.6} /> : <circle cx={o[0] - 3} cy={o[1]} r={6.5} fill={palette.cream} stroke={palette.ink} strokeWidth={1.8} />}
     </>
   );
 };
 
-/** The lit POOL on the crowd in front of the dome's foot while the beam points down past the foot line: a flat cream
- *  ellipse (drawn under the pile's figures; fix round 3b: 2x the core's width, popping 1.25x for 2 frames at `popAt`,
- *  the beam landing on 'hacking'). */
-export const BeamSpot: React.FC<{at: number; angle: (t: number) => number; until?: number; popAt?: number}> = ({at, angle, until, popAt}) => {
+/** The lit POOL on the attempters OUTSIDE the glass (A1 fix round 1: the counted heap presses on the dome's left
+ *  flank): while the beam's centre line meets the left flank low down (y >= `minY`), a flat cream pool sits just
+ *  OUTSIDE the glass at that point (drawn under the heap's figures, over the city behind them), elongated along the
+ *  flank, popping 1.25x for 2 frames at `popAt` (the beam landing on 'hacking'). The beam's own lit spot on the glass
+ *  (Searchlight8) sits right inside, so light runs from the lamp through the glass onto the people outside. Pointing
+ *  down past the foot line, it falls on the foot. */
+export const BeamSpot: React.FC<{at: number; angle: (t: number) => number; until?: number; popAt?: number; minY?: number}> = ({at, angle, until, popAt, minY = 960}) => {
   const t = useTime();
   const look = useLook();
   if (t < at + 0.07 || (until !== undefined && t >= until) || look.fills !== 'color') return null;
   const hit = beamHit(angle(t));
-  if (!hit.foot) return null;
   const k = popAt !== undefined && t >= popAt && t < popAt + 0.067 ? 1.25 : 1;
-  // on the foot where the beam meets it (over the plinth and the glass's bottom), the caught heads in front of it
-  return <ellipse cx={hit.p[0]} cy={DOME8.by - 2} rx={46 * k} ry={13 * k} fill={palette.cream} />;
+  if (hit.foot) return <ellipse cx={hit.p[0]} cy={DOME8.by - 2} rx={46 * k} ry={13 * k} fill={palette.cream} />;
+  const [hx, hy] = hit.p;
+  if (hy < minY || hx > DOME8.cx) return null;
+  // the flank's outward normal at the hit (left side of the ellipse)
+  const nx = (hx - DOME8.cx) / (DOME8.rx * DOME8.rx);
+  const ny = (hy - DOME8.by) / (DOME8.ry * DOME8.ry);
+  const nl = Math.hypot(nx, ny) || 1;
+  const ux = nx / nl;
+  const uy = ny / nl;
+  const deg = (Math.atan2(uy, ux) * 180) / Math.PI;
+  const cx = hx + ux * 22;
+  const cy = hy + uy * 22;
+  return <ellipse cx={cx} cy={cy} rx={30 * k} ry={44 * k} transform={`rotate(${deg.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)})`} fill={palette.cream} />;
 };

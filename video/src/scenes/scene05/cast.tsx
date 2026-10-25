@@ -10,7 +10,7 @@ import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {ElephantTimeline, hop} from '../../lib/mascot';
 import {BLUEPRINT_WALL} from '../shared/sets';
-import {AlertMark, Bit, DEPTH_INK, LOCK} from '../shared/props';
+import {AlertMark, Bit, bitPath, DEPTH_INK, LOCK} from '../shared/props';
 import type {Acc, Hair} from '../../lib/kit';
 import type {Pt} from '../../lib/sketch';
 import type {Beats} from './beats';
@@ -292,10 +292,16 @@ export const Beams: React.FC<{b: Beats}> = ({b}) => {
 export const PIP_RAIL: Pt = [BLUEPRINT_WALL.perchBottom[0] - 10, BLUEPRINT_WALL.perchBottom[1]];
 /** 1.2 on screen at the 1.13 lock. */
 export const PIP_SCALE = 1.2 / 1.13;
-/** Pip's leap off the rail after the messenger (fix round 2: a HIGH arc, apex ~world 1100 = screen ~1140, so he clears
- *  the elephant stamp by > 60 px instead of crossing it): take-off 0.04 s into the truck, mid-air (past the apex) on
- *  the cut, travelling right faster than the truck. */
-export const pipHop = (b: Beats) => ({t0: b.truck + 0.04, dur: 0.45, to: {x: 1180, y: 1440}, height: 196});
+/** Pip's leap off the rail after the messenger (fix round 2: a HIGH arc, so he rises over the elephant stamp instead of
+ *  crossing it). A1 fix round (review: on the cut he hung mid-frame at screen ~(720, 1100), still 360 px from the edge,
+ *  and S06 only picks him up at its left edge 0.19 s later: the thread viewers follow vanished mid-frame): take-off
+ *  0.03 s BEFORE the truck (the wake face still holds 0.20 s), a longer leap (to x 1420) with less x lag (k^1.3): a
+ *  steady ~46 px/frame dash across the frame, so on the cut he is half out of frame RIGHT (centre screen ~(1050, 1180)),
+ *  falling fast, and S06 brings him in at its left edge (screen y ~1300-1340, S06 19.97). He rises over the stamp
+ *  (feet at world ~1190 as he passes its centre). */
+export const pipHop = (b: Beats) => ({t0: b.truck - 0.03, dur: 0.45, to: {x: 1420, y: 1440}, height: 196});
+/** The leap's x lag (x eases k^PIP_XLAG: up first, then out). */
+const PIP_XLAG = 1.3;
 
 /** A1 polish: the 'stand-side' key moved from take-off - 0.14 to take-off, so the wake gag face (trunk-up, wide) holds
  *  f79-f88 (0.30 s) and no Pip pose pop lands on the messenger's envelope / run pops (f82 / f83); the anticipation stays
@@ -337,9 +343,9 @@ export const PipHop: React.FC<{b: Beats}> = ({b}) => {
   const c0 = camAt(H.t0, b.end);
   const fromX = PIP_RAIL[0] + (1 - LAYER_F.banner) * (c0.x - 540);
   const h = hop({t, t0: H.t0, dur: H.dur, from: {x: fromX, y: PIP_RAIL[1]}, to: H.to, height: H.height});
-  // the leap goes UP first (x lags: k^1.6), so he rises clear of the elephant stamp before he crosses it
+  // the leap goes UP first (x lags: k^1.3), so he rises over the elephant stamp before he crosses it
   const k = clamp((t - H.t0) / H.dur);
-  const x = h.airborne ? lerp(fromX, H.to.x, Math.pow(k, 1.6)) : h.x;
+  const x = h.airborne ? lerp(fromX, H.to.x, Math.pow(k, PIP_XLAG)) : h.x;
   return <ElephantTimeline x={x} y={h.y} scale={PIP_SCALE} t={t} seed={5} keys={pipKeys(b, H.t0)} squash={h.squash} rotate={h.rotate} amount={h.airborne ? h.spread : undefined} />;
 };
 
@@ -459,6 +465,13 @@ export const BitOnLock: React.FC<{inAt: number; alertAt: number; balloonAt: numb
   );
 };
 
+/** A1 fix round (review: solid-ink Bit vanished on the messenger's dark hair and collar band, the rewatch payoff and the
+ *  hand-off to S06's stowaway lost): a CREAM keyline round his shell + head silhouette while he leaps and rides (the
+ *  sparkles' keyline treatment), ~2.5 px outside his outline on screen. */
+const BitKey: React.FC<{x: number; y: number; size: number}> = ({x, y, size}) => (
+  <path d={bitPath(x, y, size)} fill={palette.cream} stroke={palette.cream} strokeWidth={5} strokeLinejoin="round" />
+);
+
 /** Bit's leap (steps layer): from the lock box edge (where the banner layer shows it) along a high arc onto the
  *  messenger's right collar (tracking it as he starts to run), a 0.05 s sit, then he ducks INTO the collar (clipped at
  *  the collar line) by ~19.63: S06's stowaway, peeking out of the same collar on 'gave'. */
@@ -477,7 +490,12 @@ export const BitLeap: React.FC<{b: Beats; leapAt: number}> = ({b, leapAt}) => {
     const u = E.inOutSine(tl / LEAP.dur);
     const x = lerp(from[0], to[0], u);
     const y = lerp(from[1], to[1], u) - LEAP.height * 4 * u * (1 - u);
-    return <Bit x={x} y={y} size={lerp(21, 20, u)} state="hop" look="forward" seed="s5bit" />;
+    return (
+      <>
+        <BitKey x={x} y={y} size={lerp(21, 20, u)} />
+        <Bit x={x} y={y} size={lerp(21, 20, u)} state="hop" look="forward" seed="s5bit" />
+      </>
+    );
   }
   const k = clamp((tl - duck0) / LEAP.duck);
   return (
@@ -488,6 +506,7 @@ export const BitLeap: React.FC<{b: Beats; leapAt: number}> = ({b, leapAt}) => {
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>
+        <BitKey x={to[0]} y={to[1] + k * 20 * 0.9} size={20} />
         <Bit x={to[0]} y={to[1] + k * 20 * 0.9} size={20} state="ride" look={k > 0 ? 'down' : 'forward'} seed="s5bit" />
       </g>
     </>

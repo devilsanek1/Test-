@@ -24,20 +24,22 @@ export const BOARD = {x0: 440, x1: 880, y0: 1046, y1: 1436};
  *  the tally gates / the L10 stamp <= 890 at the 1.15 push (clear of the platform's right rail, x > 950). */
 export const PUSH_X = 560;
 
-/** The district dome, LEFT of the board. Fix round 3b: a broad SHIELD profile (rx 200 / ry 212: feet (80, 1080) /
- *  (480, 1080), apex (280, 868), ~1.9:1) instead of the 1.2:1 bell jar: its right flank runs BEHIND the board's left edge
- *  (the board at depth 0 occludes it), so the dome reads bigger than the frame allows. The counted pile stands in
- *  front of its foot at x 112-404 (the paint edge eats the left ~85 px in the film); the climbers stand ON its left
- *  shoulder. */
-export const DOME8: DomeArc = {cx: 280, by: 1080, rx: 200, ry: 212};
+/** The district dome, LEFT of the board. Fix round 3b: a broad SHIELD profile (~1.9:1) whose right flank runs BEHIND
+ *  the board's left edge (the board at depth 0 occludes it), so the dome reads bigger than the frame allows. A1 fix
+ *  round 1: narrower and 30 px further right (rx 200 -> 172, cx 280 -> 310: feet (138, 1080) / (482, 1080), apex
+ *  (310, 868)): the COUNTED attempters heap up OUTSIDE its left flank (x ~20-150, a mound against the glass, bodies on
+ *  the city / the peach band, hands on the glass), never inside the arc's silhouette; the climbers on 'millions' carry
+ *  the heap on up the shoulder. */
+export const DOME8: DomeArc = {cx: 310, by: 1080, rx: 172, ry: 212};
 
 /** Pip on the coping LEFT of the board (fix round 1: at x 915 he sat on the board's corner and in the right rail). */
 export const PIP: Pt = [390, copingY(390)];
 
-/** The watchtower, standing INSIDE the glass right of the dome's centre (fix round 3b: x 302-338; the dome's right
- *  flank is behind the board): lattice from row 1 (y 1100) up to a 40 x 38 cabin (300-340 x 922-960, roof apex 908);
- *  the searchlight lamp on the cabin's left side points across the dome at its far (left) flank and down at the pile. */
-export const TOWER8 = {x0: 302, x1: 338, base: 1100, cabin: [300, 922, 40, 38] as [number, number, number, number], top: 908, light: [296, 941] as Pt};
+/** The watchtower, standing INSIDE the glass just right of the dome's apex (A1 fix round 1: x 330-366 with the dome at
+ *  cx 310; the dome's right flank is behind the board): two legs with two X-braces from row 1 (y 1100) up to a 40 x 38
+ *  cabin (326-366 x 922-960) under a pitched roof with overhang (apex 906); the lamp on the cabin's left side points
+ *  across the dome at its far (left) flank and down at the heap outside it. */
+export const TOWER8 = {x0: DOME8.cx + 20, x1: DOME8.cx + 56, base: 1100, cabin: [DOME8.cx + 16, 922, 40, 38] as [number, number, number, number], top: 906, light: [DOME8.cx + 12, 941] as Pt};
 
 /** The dome arc's y at x (top of the glass), or the foot line outside it. */
 export const domeY = (x: number) => {

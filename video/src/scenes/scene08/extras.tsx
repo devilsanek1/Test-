@@ -2,8 +2,9 @@
 //   - LightDoors: the rattler doors drawn LIGHT (cream / peach, ink sides + top, a dark handle) on rows 2-3, so every
 //     ink-dark rattler sits on a light door (the set's teal doors are off: `doors={false}`); row 3 has three big near
 //     doors for the 86-92 px rattlers.
-//   - WireSpans: the three wires continue PAST the rooftop pole to the right frame edge along S07's own curves (mapped
-//     through the cut), so the whole wire set matches on the cut; the pole is a junction (the board covers the middle).
+//   - WireSpans: the three wires continue PAST the rooftop pole along S07's own curves (mapped through the cut) to a
+//     second pole just right of the board (A1 fix round 1: no wires through the city right of the board or the dome
+//     once the board is up); the first pole is a junction (the board covers the middle).
 //   - DistrictTowers: 5 browser-chrome towers inside the glass (no glass step), the protected sites; they pop on the
 //     glass frame, their browser windows a beat later (fix round 3b).
 //   - DeckClutter: our roof deck between the two neighbours (hatch, vent pipes, drain, tar seams).
@@ -17,7 +18,7 @@ import {ease as E, lerp, osc, prog, useTime} from '../../lib/time';
 import {mat, XG} from '../../lib/xf';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
-import {blob, ellipse, line, rect, rectPath} from '../../lib/sketch';
+import {blob, ellipse, line, polyPath, rect, rectPath} from '../../lib/sketch';
 import {BrowserChrome, DEPTH_INK, EdgeOnlooker, FigureArm} from '../shared/props';
 import {SI, WIRES, wireAt} from '../shared/sets';
 import {DOME8, DOORS3, R2} from './layout';
@@ -66,35 +67,64 @@ export const LightDoors: React.FC<{row: 2 | 3}> = ({row}) => {
 
 /** S07 world -> S08 world at the cut (S07 camera (480, 760) zoom 1.06, S08 camera (540, 1260) zoom 1.3). */
 const K = 1.06 / 1.3;
+/** A1 fix round 1: the right-hand spans END at a second rooftop pole just right of the board (x 905; screen ~1013 on the
+ *  cut frame, near the right edge, where S07's own pole stood just off frame), so the city right of the board, the
+ *  flood there and the dome are wire-free once the board has risen (they used to run on to the right edge through the
+ *  payoff). */
+export const POLE2 = {x: 905, base: 1444, top: 1146};
 const SPANS = (() => {
   let d = '';
+  const ties: number[] = [];
   for (let i = 0; i < 3; i++) {
-    // S07's wire i continues right of x7 = 480 (our pole) past its own pole at x7 1000 (off frame at the cut)
+    // S07's wire i continues right of x7 = 480 (our pole) along its own curve, mapped through the cut, to POLE2
     const pts: [number, number][] = [];
-    for (let k = 0; k <= 24; k++) {
-      const x8 = 540 + (k / 24) * 820;
+    for (let k = 0; k <= 16; k++) {
+      const x8 = 540 + (k / 16) * (POLE2.x - 540);
       const x7 = 480 + (x8 - 540) / K;
       const y7 = wireAt(WIRES.S07, i, x7)[1];
       // anchored on our pole's tie-off height (S07 and S08 differ by < 1 px there)
       const y8 = WIRES.S08.ys[i] + K * (y7 - wireAt(WIRES.S07, i, 480)[1]);
       pts.push([x8, y8]);
     }
+    ties.push(pts[pts.length - 1][1]);
     d += pts.map((p, k) => `${k ? 'L' : 'M'}${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join('');
   }
-  return d;
+  return {d, ties};
 })();
 
-/** The wires' right-hand spans from the pole to the right edge (draw with the wires, before the board). */
-export const WireSpans: React.FC = () => <Ink d={SPANS} width={SI.far} taper={false} order="all" seed="s8/spans" />;
+/** The wires' right-hand spans from the pole at x 540 to POLE2 (draw with the wires, before the board), and POLE2 itself:
+ *  the kit pole's look (an ochre post with a cap, an insulator pin where each wire ties off). */
+export const WireSpans: React.FC = () => {
+  const P = POLE2;
+  const post = polyPath([
+    [P.x - 8, P.base],
+    [P.x - 6, P.top],
+    [P.x + 6, P.top],
+    [P.x + 8, P.base],
+  ]);
+  const ink =
+    line(P.x - 8, P.base, P.x - 6, P.top, {seed: 's8/q1', over: [0, 3]}) +
+    line(P.x + 8, P.base, P.x + 6, P.top, {seed: 's8/q2', over: [0, 3]}) +
+    line(P.x - 11, P.top, P.x + 11, P.top, {seed: 's8/qc', over: [2, 2]}) +
+    SPANS.ties.map((yy, i) => `M${(P.x - 6).toFixed(1)} ${yy.toFixed(1)}l${(i % 2 ? 14 : -10).toFixed(1)} 0`).join('');
+  return (
+    <>
+      <Fill d={post} color={palette.brown} seed="s8/q2post" />
+      <Ink d={ink} width={SI.front * 0.8} taper={false} seed="s8/q2i" />
+      <Ink d={SPANS.d} width={SI.far} taper={false} order="all" seed="s8/spans" />
+    </>
+  );
+};
 
 // ---------------------------------------------------------------- the protected district (inside the glass)
 
+/** A1 fix round 1: re-spaced for the narrower dome (cx 310, rx 172), clear of the watchtower's legs (x 324-372). */
 const TOWERS = [
-  {x: 104, y: 1004, w: 36, h: 76},
-  {x: 144, y: 958, w: 60, h: 122},
-  {x: 208, y: 922, w: 64, h: 158},
-  {x: 350, y: 972, w: 58, h: 108},
-  {x: 412, y: 1000, w: 40, h: 80},
+  {x: 158, y: 1004, w: 32, h: 76},
+  {x: 192, y: 958, w: 54, h: 122},
+  {x: 250, y: 922, w: 58, h: 158},
+  {x: 377, y: 972, w: 50, h: 108},
+  {x: 432, y: 1000, w: 34, h: 80},
 ];
 
 /** Five browser-chrome towers inside the (fix round 3b: broad shield) dome. Clip them to the dome interior in the
@@ -246,8 +276,9 @@ const HandsToHead: React.FC<{at: number; coat: string}> = ({at, coat}) => {
 
 /** The near pair's look. Fix round 3b: clearly DIFFERENT people from S07's side readers (the bun / tan-hair reader and
  *  the teal-cap reader at ~75 px heads: the same identity at 2.3x across the match cut read as a pop on the people), so
- *  the cut reads as a new place: dark curly hair over a sage coat (left), an ochre beanie over a tan coat (right). */
-const NB_LOOK = {L: {hair: 'curly' as const, hairColor: palette.ink, body: palette.sage}, R: {hair: 'beanie' as const, hairColor: palette.brown, body: palette.tan}};
+ *  the cut reads as a new place: dark curly hair over a sage coat (left), an ochre-banded beanie over an OCHRE coat (right;
+ *  A1 fix round 1: one value darker than the tan deck, it was the deck's own tan and separated only by its outline). */
+const NB_LOOK = {L: {hair: 'curly' as const, hairColor: palette.ink, body: palette.sage}, R: {hair: 'beanie' as const, hairColor: palette.brown, body: palette.brown}};
 
 /** Two back-view neighbours watching the city from our deck, cropped by the bottom edge (EdgeOnlooker: the coat always
  *  runs off the frame). Front ink (4.8, the heaviest in the frame), ear fills, a cream rim on the sun side; the left one

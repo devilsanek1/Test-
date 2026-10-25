@@ -1,14 +1,14 @@
 // S05 camera (storyboard v3, ONE owner per move: this scene's own keys; Film adds no camera on a 'matchcut').
 // screen = (world - cam) x zoom + (540, 960)
-//   cut(years) -> +0.30      push-in zoom 1.055 -> 1.13 (A1: was 1.07 / 1.08), 1 - 2^(-8u) (A1: was 2^(-6u); fix round 4:
-//                            was out(expo), exponent 10): the S04 dive lands still moving IN (log-zoom ~0.77 /s at the cut vs the
-//                            dive's ~1.23 /s; Main's first S05 frame shows the lock at S04's last-frame size, ~65 px)
-//                            and settles. y has its OWN zero-velocity ease (fix round
-//                            3): 960 -> 940 in-out(sine) over 0.05 -> 0.65 s, so the lock (world y 960) holds its screen
-//                            spot through the match (S04's dive brings lock4 to rest: an out(expo) y started at ~13
-//                            px/frame and bounced it DOWN on the cut); peak ~1.2 px/frame. The 20 world px rise (fix
-//                            round 2) puts the cornice ink at screen >= 585, under the caption band (ENGINE 10)
-//   +0.30 -> cut(was)-0.30   hold (540, 940, 1.13): locked while the teams, tablets, beams and the ring build
+//   cut(years) -> +0.40      push-in zoom 1.033 -> 1.13, 1 - 2^(-6.67u) normalised (A1 fix round: was 1.055 over 0.30 s on
+//                            2^(-8u); A1: 1.07; fix round 4: out(expo)): the S04 dive lands still moving IN (log-zoom
+//                            ~0.77 /s on Main's first S05 pair vs S04's last ~0.83 /s) and decelerates over ~10 frames
+//                            (x 0.68 per frame); the lock on Main's first S05 frame is S04's last-frame size (~60 px).
+//                            y has its OWN zero-velocity ease (fix round 3): 960 -> 940 in-out(sine) over 0.05 -> 0.65
+//                            s, so the lock (world y 960) holds its screen spot through the match; peak ~1.2 px/frame.
+//                            The 20 world px rise (fix round 2) puts the cornice ink at screen >= 585, under the caption
+//                            band (ENGINE 10)
+//   +0.40 -> cut(was)-0.30   hold (540, 940, 1.13): locked while the teams, tablets, beams and the ring build
 //   cut(was)-0.30 -> cut     truck-right (540 -> 690, 940, 1.13), in(sine): follows the messenger out of frame right; a
 //                            FIXED 0.30 s ending on the cut, exiting at pi/2 x 150 / 0.30 x 1.13 = ~888 screen px/s
 // Zoom is interpolated in log space. Every segment meets the next at zero velocity except the cut-on-action exit.
@@ -25,20 +25,25 @@ import type {Pt} from '../../lib/sketch';
 export type Cam = {x: number; y: number; zoom: number};
 
 /** Fix round 4: 1.08 -> 1.07 (Main's first S05 frame is t = 0.01, already into the landing: the lock grew ~9 % across
- *  the cut against S04's last drawn frame). A1 polish: 1.07 -> 1.055 with the steeper LAND_K 8, so the landing keeps
- *  more of the dive's log-zoom rate on Main's first S05 frame (~0.79 /s, a 1.37 x drop from S04's last pair instead of
- *  2.0 x) while the lock on that frame stays ~64.4 px wide (S04: 65). */
-export const K_LAND: Cam = {x: 540, y: 960, zoom: 1.055};
+ *  the cut against S04's last drawn frame). A1 polish: 1.07 -> 1.055 with the steeper LAND_K 8. A1 fix round (review:
+ *  the rate then halved every frame, 0.79 -> 0.43 -> 0.23 /s, a soft brake on the cut, not one long decelerating
+ *  push): 1.055 -> 1.033 over a 0.40 s landing at the gentler K 6.67 (per-frame decay 0.68 instead of 0.54: 0.77, 0.53,
+ *  0.36, 0.25 /s ...). Main's first S05 pair still runs at ~0.77 /s against S04's last pair ~0.83 /s (S04's Hermite dive
+ *  ends at 0.84 /s, scene04/camera.ts), and the lock on Main's first S05 frame is ~60.6 px wide (S04's last: 59 px plus
+ *  one frame of its zoom = 60.7). */
+export const K_LAND: Cam = {x: 540, y: 960, zoom: 1.033};
 export const K_LOCK: Cam = {x: 540, y: 940, zoom: 1.13};
 export const K_EXIT: Cam = {x: 690, y: 940, zoom: 1.13};
-export const LAND = 0.3;
+/** A1 fix round: 0.30 -> 0.40 s with K 5 -> 6.67 (the same per-frame decay), so the landing's residual rate when it
+ *  locks is ~0.01 /s (0.4 px/frame at the frame corners) instead of a ~1.2 px/frame step. */
+export const LAND = 0.4;
 export const TRUCK = 0.3;
 /** The y rise: in-out(sine) from RISE[0] over RISE[1] s (zero velocity at both ends). */
 export const RISE: [number, number] = [0.05, 0.6];
 /** Fix round 4: the landing's ease, 1 - 2^(-K u) normalised (was out(expo), exponent 10: a 1.3-frame time constant, the
  *  log-zoom rate halved every frame after the cut and read as a soft stop). A1 polish: K 6 -> 8 with K_LAND 1.055 (one
  *  decelerating push across the matchcut, ~1.4 x rate drop at the cut). */
-const LAND_K = 8;
+const LAND_K = 6.67;
 const landEase = (u: number) => (u >= 1 ? 1 : (1 - Math.pow(2, -LAND_K * u)) / (1 - Math.pow(2, -LAND_K)));
 
 /** Camera at scene time t; `end` = the scene length (the cut on action). */

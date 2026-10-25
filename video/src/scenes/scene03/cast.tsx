@@ -22,44 +22,44 @@ import type {Pt} from '../../lib/sketch';
 
 const PIP_SCALE = 1.2;
 /** A1 polish (blocker: S02 still steers its hop-out to the FR2 pickup, so S03's FR3 arc, which started higher on a
- *  different parabola, made Pip jump ~(-172, -74) px against his fall on the cut): S03 now picks Pip up EXACTLY where
+ *  different parabola, made Pip jump ~(-172, -74) px against his fall on the cut): S03 picks Pip up EXACTLY where
  *  S02's live hop-out leaves him. On S02's last film frame (8.3667, scene02 LAST_FRAME_ABS) S02's Hermite ends at its
  *  `S03_PICKUP.screen` (860, 906) (his FEET, screen px; S03's rest framing = S02's at the cut). From there S03 runs ONE
- *  ballistic arc (gravity PIP_G, the sideways speed easing up from S02's) onto the stamp's rump on 'in'. S02's last vertical step is ~+32 px/frame
- *  (its Hermite brakes into the pickup: +45, +56, +32), so the arc's first step is chosen to CONTINUE that step (~+30,
- *  then rising every frame to ~+59 at contact) rather than S02's instantaneous end tangent (+257 px/s = +9 px/frame,
- *  which braked to +12-16 on S03's first frames, the earlier finding). Horizontally -31 (S02's last step) easing up to
- *  -48 px per frame at contact. If S02 moves its pickup, update PIP_HANDOFF here (or S02 imports it). */
+ *  arc of constant acceleration onto the stamp's rump on 'in'. If S02 moves its pickup, update PIP_HANDOFF here (or S02
+ *  imports it). */
 export const PIP_HANDOFF = {
   /** absolute time of S02's last film frame (30 fps): frame 251 */
   t: Math.floor(S03_START * 30 - 1e-6) / 30,
   /** Pip's FEET on that frame, SCREEN px (scene02 S03_PICKUP.screen) */
   screen: [860, 906] as Pt,
 };
-/** The arc's gravity (screen px/s2 at S03's rest zoom 1.0): ~physical for a 115 px elephant; chosen so the first S03
- *  step continues S02's last one (~30 px/frame) and the landing still falls on 'in'. */
-export const PIP_G = 2400;
+/** Fix round 1 (S03 A1; findings: a one-frame slow-down inside the free fall at the cut, and the last frames before
+ *  contact stepping ~76 px a frame): S02's 0.127 s Hermite peaks at ~+56 px/frame mid-hop and brakes to +32 on its last
+ *  frame; the old arc (g 2,400) then started at that braked +30 and accelerated to ~76 px/frame at contact. The pickup
+ *  -> landing is 687 px in 0.387 s (59 px/frame on average), so no arc can stay under ~59; the most even one is used:
+ *  the hand-off velocity is (-1000, +1250) px/s (~-33, +42 px/frame), so S03 resumes S02's mid-hop speed at once, and
+ *  the arc runs at ~+42 -> +46 px/frame down (g ~330 px/s2) and -35 -> -45 sideways (peak step ~64 px/frame, was 76).
+ *  Measured with S02 as it is (film f249-f251 | f252...): dy +44, +56, +32 | +42, +42, +43 ... (the one slow frame is
+ *  S02's own brake); with S02's Hermite ending on this velocity (Requests in docs/scenes/S03.md): +34, +53, +50 | +42,
+ *  +42 ... */
+const PIP_V_HANDOFF: Pt = [-1000, 1250];
 /** Fix round 1: Pip sits on the stamp's RUMP (its right end), not its centre (BLUEPRINT.pip (350, 1420) hid ~80 % of
  *  the print): the reversed-out elephant faces left, so its trunk, ear and legs stay clear. Fix round 3: the stamp and
  *  Pip moved 22 px left (STAMP in stamp.tsx) so the title card clears his rump and the print's tip by >= 30 px. Screen
  *  at the 1.04 lock: (387.1, 1438.4), where he crouches on the cut (S04 imports this and continues from there). */
 export const PIP_AT: Pt = [398, 1405];
-/** S02's last horizontal step (its Hermite's feet, -9, -19, -31 px over film f248-f251): the arc starts at this
- *  sideways speed and eases up to ~-48 px/frame at contact (a constant -40 jumped the centroid step from S02's -24 to
- *  S03's -41 on the cut). */
-const PIP_VX_HANDOFF = -930;
 /** The arc, from S02's last frame (world = screen - (0, 10) under S03's rest camera): position p0 at scene-local tL,
- *  velocity v0, constant acceleration acc (x: the sideways ease-up, y: gravity), landing on the stamp's rump at
- *  b.pipLand ('in'). */
+ *  velocity v0 (PIP_V_HANDOFF), constant acceleration acc solved so he lands on the stamp's rump at b.pipLand ('in'). */
 const ARC = (() => {
   const b = beats();
   const p0: Pt = [PIP_HANDOFF.screen[0] - 540 + CAM_REST.x, PIP_HANDOFF.screen[1] - 960 + CAM_REST.y];
   const tL = PIP_HANDOFF.t - S03_START; // S02's last frame, scene-local (~ -0.026)
   const T = b.pipLand - tL;
-  const ax = (2 * (PIP_AT[0] - p0[0] - PIP_VX_HANDOFF * T)) / (T * T);
-  const vyL = (PIP_AT[1] - p0[1] - 0.5 * PIP_G * T * T) / T;
-  return {p0, tL, T, v0: [PIP_VX_HANDOFF, vyL] as Pt, acc: [ax, PIP_G] as Pt};
+  const acc: Pt = [(2 * (PIP_AT[0] - p0[0] - PIP_V_HANDOFF[0] * T)) / (T * T), (2 * (PIP_AT[1] - p0[1] - PIP_V_HANDOFF[1] * T)) / (T * T)];
+  return {p0, tL, T, v0: PIP_V_HANDOFF, acc};
 })();
+/** The arc's vertical acceleration (screen px/s2 at S03's rest zoom 1.0), derived (~330). */
+export const PIP_G = ARC.acc[1];
 /** Pip on the arc at scene-local `tl` (world feet + velocity, world px/s); clamped to [tL, landing]. */
 function arcAt(tl: number): {p: Pt; v: Pt} {
   const tau = Math.min(Math.max(tl - ARC.tL, 0), ARC.T);
@@ -84,11 +84,22 @@ const SQUASH_CAP = 0.25;
  *  screen-left (deg, the way S04's hop takes him), about his feet. */
 const CROUCH = [0.14, 0.28];
 const CROUCH_LEAN = -3;
+/** The crouch's span on the take (absolute s): cut(it) - 0.12 (S03's pipHop beat, 1 ms early like every beat) to the cut. */
+const CROUCH_SPAN: [number, number] = [14.05 - 1e-3, S03_END];
+/** Pip's hop-off crouch at ABSOLUTE film time `abs`: his TOTAL squash (the stand-side pose pop included, so a caller that
+ *  pops the pose itself must not add its own popSwitch) and his lean (screen deg, about the feet; negative = toward
+ *  screen-left). From cut(it)-0.12 it deepens 0.14 -> 0.28 on an ease-in into the cut and HOLDS there after it.
+ *  S04: use this for any frame before its take-off, so the crouch continues across the cut instead of popping back to
+ *  its old 0.2 sin curve. */
+export function pipCrouchAt(abs: number): {squash: number; lean: number} {
+  const u = clamp((abs - CROUCH_SPAN[0]) / (CROUCH_SPAN[1] - CROUCH_SPAN[0]));
+  return {squash: CROUCH[0] + (CROUCH[1] - CROUCH[0]) * E.inQuad(u), lean: CROUCH_LEAN * E.inOutSine(u)};
+}
 
 /** Pip's arc at scene-local time `tl` (valid from S02's last frame, tl = PIP_HANDOFF.t - S03_START ~ -0.026, where it
  *  returns PIP_HANDOFF.screen, to the landing), in SCREEN px under S03's rest camera (540, 950, 1.0) = S02's framing
  *  of the same screen, and his velocity (screen px/s). A Phase-B cut agent can give S02's Hermite this end velocity
- *  (`pipDropState(PIP_HANDOFF.t - S03_START).v`, ~(-930, +850)) so its last frames stop braking. */
+ *  (`pipDropState(PIP_HANDOFF.t - S03_START).v`, (-1000, +1250)) so its last frames stop braking. */
 export function pipDropState(tl: number): {screen: Pt; v: Pt} {
   const {p, v} = arcAt(tl);
   return {screen: [p[0] - CAM_REST.x + 540, p[1] - CAM_REST.y + 960], v: [v[0] * CAM_REST.zoom, v[1] * CAM_REST.zoom]};
@@ -154,7 +165,7 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
   let crouchLean = 0;
   let ghost: React.ReactNode = null;
   if (t < b.pipLand) {
-    // the drop: S02's live hop-out continued from its last frame (PIP_HANDOFF: one arc, g 2,400, the sideways speed easing up from S02's),
+    // the drop: S02's live hop-out continued from its last frame (PIP_HANDOFF: one arc, hand-off velocity PIP_V_HANDOFF),
     // falling down-left onto the bare plan. Fix round 3 (finding: the last frames moved ~75 px/frame on flat ink, a
     // jump-cut): the body STRETCHES along the velocity as he speeds up (-0.2 at the cut, S02's hand-off, -> -0.28 at
     // contact; the pose key's anticipation squash is cancelled here, it would fight the stretch) and its axis turns into
@@ -212,9 +223,10 @@ export const PipS03: React.FC<{b: Beats}> = ({b}) => {
     // and the crouch is driven directly as a TOTAL squash, 0.14 (the pop's peak) -> 0.28 on an ease-in into the cut (feet fixed), so the
     // body keeps sinking (~2, 3, 5 px/frame of centroid) and S04's stretched take-off reads as its release
     if (t >= b.pipHop) {
-      const cut = b.cut + (S03_END - S03_START);
-      squash = CROUCH[0] + (CROUCH[1] - CROUCH[0]) * E.inQuad(clamp((t - b.pipHop) / (cut - b.pipHop))) - popSwitch(t, b.pipHop);
-      crouchLean = CROUCH_LEAN * E.inOutSine(clamp((t - b.pipHop) / (cut - b.pipHop)));
+      // scene-local -> absolute (beats() puts every beat 1 ms early: b.cut = S03_START - start - 0.001)
+      const c = pipCrouchAt(t + S03_START - b.cut - 1e-3);
+      squash = c.squash - popSwitch(t, b.pipHop);
+      crouchLean = c.lean;
     }
   }
   // fix round 2b (finding: on the landing frames the sit-back pop (0.14) + the landing squash (0.26) flattened his head

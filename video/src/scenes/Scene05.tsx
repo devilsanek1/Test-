@@ -36,9 +36,9 @@ import {mat, XG} from '../lib/xf';
 import {BlueprintWall, BLUEPRINT_WALL, LayerWrap} from './shared/sets';
 import {Calendar, DiagramHand, LabelTag, yearPages} from './shared/props';
 import {beats, S05_START, S05_END} from './scene05/beats';
-import {camAt, camMat, layerCam, LAYER_F} from './scene05/camera';
+import {camAt, camMat, layerCam, LAYER_F, toWorld} from './scene05/camera';
 import {Beams, BigZ, BitLeap, BitOnLock, LeafFall, LeafOnCrown, MessengerDash, PipHop, PipOnRail, stepGaps, Teams} from './scene05/cast';
-import {CalloutKeyhole, CorniceSoffit, DoorSwing, FoundRing, handTurn, KNOB, LOCK_C, LockTurn, PlazaGround, SHEET_IN, SheetLock, SheetPanels, SheetTint, StepsOverlay, WingDetails} from './scene05/plan';
+import {CalloutGlow, CalloutKeyhole, CorniceSoffit, DiscSpot, DoorSwing, FoundRing, handTurn, KNOB, LOCK_C, LockTurn, PlazaGround, SHEET_IN, SheetLock, SheetPanels, SheetTint, StepsOverlay, WingDetails} from './scene05/plan';
 import {Audience, Pigeons} from './scene05/audience';
 import {Flagpole} from './scene05/flag';
 
@@ -59,6 +59,20 @@ const L6_BOX: [number, number, number, number] = [205, 679, 650, 805];
 /** The calendar, 1.2 x and nudged in from the frame edge (its summer page centre at screen ~105), right edge just short
  *  of the banner's frame (x 200). */
 const CAL: [number, number, number, number] = [114, 748, 84, 108];
+
+/** The sun (A1 fix round, review: its bottom kissed the wing's roofline for the whole shot, the rod's ring end sat on its
+ *  left limb and the flagpole rode its right edge): SCREEN space, set lower and left in the notch so the wing roof crops
+ *  ~45-70 px of its bottom (ref 2 sets the sun on / behind the skyline) and the facade's corner pilaster hides its left
+ *  limb; its idle drift (10 px/s, ENGINE 6) rises slowly up and right out of the notch. Checked per frame (scratch
+ *  suncheck): through the hold the disc keeps >= 31 px from the flagpole, >= 22 px from the rod's ring end, >= 23 px from
+ *  the flag, >= 26 px past the pilaster edge, its top at screen >= 672 (under the caption band); the pole and the
+ *  pilaster only cross its limbs on the exit truck (moving, 2-3 frames). */
+const SUN = {x: 885, y: 790, r: 110, drift: [9.66, -2.59] as [number, number]};
+/** S04's peach lock spot on S04's last drawn frame (Main f497, measured): screen centre (482.5, 926.5), r 58.5, carried
+ *  one more frame of S04's pure zoom about the lock (log rate 0.84 /s): (482.5, 925.6) r 60. */
+const S04_SPOT: [number, number, number] = [482.5, 925.6, 60];
+/** The callout glow holds 2 frames past the found flash (the white disc + glow read as one big flash), then steps off. */
+const GLOW_HOLD = 0.1;
 
 /** The banner's one sway on its rod: from rest, a damped sine (deg). */
 const swayAngle = (t: number, at: number, amp = 1.1, period = 0.9, settle = 0.9) => {
@@ -172,10 +186,9 @@ const Scene05: React.FC = () => {
   const sway = swayAngle(t, b.sway);
   const swayM = mat.about(mat.rotate(sway), BLUEPRINT_WALL.lock.x, BLUEPRINT_WALL.rodY);
 
-  // the sun: SCREEN space in its notch (930, 725) r110, a 10 px/s idle drift (ENGINE 6), depth 0.05 on the truck. A1
-  // polish: it drifts LEFT (sinking behind the facade corner), away from the flagpole now standing right of it
-  const sunX = 930 - (cam.x - 540) * cam.zoom * 0.05;
-  const sun = <Sun cx={sunX} cy={725} r={110} drift={[-10, 0]} />;
+  // the sun: SCREEN space in its notch, depth 0.05 on the truck (SUN below)
+  const sunX = SUN.x - (cam.x - 540) * cam.zoom * 0.05;
+  const sun = <Sun cx={sunX} cy={SUN.y} r={SUN.r} drift={SUN.drift} />;
 
   const calendar = (
     <>
@@ -186,6 +199,12 @@ const Scene05: React.FC = () => {
 
   const turn = handTurn(t, b.turn);
 
+  // the peach lock spot as S04's last frame leaves it, in world through the landing camera on Main's first S05 frame
+  const t0 = Math.ceil(start * 30 - 1e-6) / 30 - start;
+  const c0 = camAt(t0, b.end);
+  const [dx, dy] = toWorld(c0, [S04_SPOT[0], S04_SPOT[1]]);
+  const discFrom: DiscSpot = {x: dx, y: dy, r: S04_SPOT[2] / c0.zoom};
+
   const inner = (name: string, node: React.ReactNode): React.ReactNode => {
     if (name === 'banner')
       return (
@@ -194,11 +213,13 @@ const Scene05: React.FC = () => {
           {/* the paper tone, the scan beams' light, the cream accents, then the set's ink again on top */}
           <SheetTint />
           <SheetPanels />
+          {/* 'figured': a stepped glow pools behind the callout as the beams converge; off 2 frames after the found flash */}
+          <CalloutGlow at={b.converge} stepAt={b.ring + GLOW_HOLD} />
           <Beams b={b} />
           <Look fills="none">{node}</Look>
           {/* 'bad': the right leaf swings ajar behind the callout */}
           <DoorSwing at={b.door} />
-          <SheetLock whiteAt={b.bitIn} />
+          <SheetLock from={discFrom} moveAt={b.bitIn} moveDur={0.2} whiteAt={b.ring + 0.02} />
           <CalloutKeyhole />
           {/* L5 rides across the match-cut as the lock's annotation tag; pops off on 'using' */}
           <LabelTag kind="tag" box={L5_BOX} hang={[LOCK_C[0] + 24, LOCK_C[1] + 36]} text={L5} fontSize={36} outAt={b.l5Out} seed="s5L5" />

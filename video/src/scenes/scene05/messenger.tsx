@@ -146,10 +146,12 @@ export function messengerState(t: number, b: Beats): MsgState {
   return {x, running, hip: [x, FEET - LEG * S + drop * S], lean: leanAt(t, b), drop, idx};
 }
 
-/** The right collar point (world): where Bit lands and ducks in (S06's stowaway spot). */
+/** The right collar point (world): where Bit lands and ducks in (S06's stowaway spot). A1 fix round: a touch lower and
+ *  further out on the right shoulder (0.30 w -> 0.33 w, 6.5 -> 11 units under the torso top), so he sits on the teal coat
+ *  at the collar's end instead of on the ink-brown hair (and he carries a cream keyline, cast.tsx BitKey). */
 export function collarAt(t: number, b: Beats): Pt {
   const st = messengerState(t, b);
-  const p: Pt = [st.hip[0] + G.w * 0.3 * S, st.hip[1] - (TORSO - 6.5) * S];
+  const p: Pt = [st.hip[0] + G.w * 0.33 * S, st.hip[1] - (TORSO - 11) * S];
   if (!st.lean) return p;
   const a = (st.lean * Math.PI) / 180;
   const dx = p[0] - st.hip[0];

@@ -8,7 +8,7 @@
 // lock ink) -> labels, hand, Bit, Pip. Every pixel is a palette colour (no translucency stacking).
 import React, {useId} from 'react';
 import {palette} from '../../lib/theme';
-import {clamp, ease as E, lerp, prog, useTime} from '../../lib/time';
+import {clamp, ease as E, lerp, prog, springAt, springs, useTime} from '../../lib/time';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {Look} from '../../lib/exit';
@@ -66,15 +66,29 @@ const SECTION_D = rectPath(LOCK.cover[0], LOCK.cover[1], LOCK.cover[2], LOCK.cov
 export const SECTION = palette.bg;
 const LOCK_M = mat.compose(mat.translate(L.x, L.y), mat.scale(L.h / LOCK.h));
 
-/** A1 polish: the callout disc OPENS in S04's peach (its lock spot, same place and radius on the matchcut: the same lock,
- *  now drawn on the plan) and steps to white with a 1-frame fill pop (x 1.06) on Bit's hop into the socket. */
-export const SheetLock: React.FC<{whiteAt?: number}> = ({whiteAt = 0}) => {
+/** The callout disc's spot at the matchcut: S04's peach lock spot as S04's last frame leaves it (world, from Scene05:
+ *  screen (482.5, 925.6) r60 through the landing camera), i.e. ~31 world ABOVE the lock, a touch smaller. */
+export type DiscSpot = {x: number; y: number; r: number};
+/** The disc's radius in the callout (DISC: blob r58). */
+const DISC_R = 58;
+
+/** A1 fix round: the callout disc is S04's PEACH lock spot carried across the matchcut, a designed colour beat instead of
+ *  a 1-frame swap. On the cut it sits exactly where S04 leaves it (`from`, f0-f2); on 'before' it slides down INTO the
+ *  callout with Bit's hop into the socket (same 0.2 s in-out sine: the hot spot follows the bug), stays peach through
+ *  the build (the bug's hot spot, rhyming with the caption highlight) and turns WHITE on 'out' (`whiteAt`, with the
+ *  found ring): the 'found' flash (a 1-frame x 1.08 pop, merging with the callout glow). */
+export const SheetLock: React.FC<{from?: DiscSpot; moveAt?: number; moveDur?: number; whiteAt?: number}> = ({from, moveAt = 0, moveDur = 0.2, whiteAt = 0}) => {
   const t = useTime();
   const white = t >= whiteAt;
-  const pop = white && t < whiteAt + 1 / 30 ? 1.06 : 1;
+  const pop = white && t < whiteAt + 1 / 30 ? 1.08 : 1;
+  const u = from ? E.inOutSine(prog(t, moveAt, moveDur)) : 1;
+  const cx = from ? lerp(from.x, L.x, u) : L.x;
+  const cy = from ? lerp(from.y, L.y, u) : L.y;
+  const k = (from ? lerp(from.r, DISC_R, u) : DISC_R) / DISC_R;
+  const discM = mat.compose(mat.translate(cx, cy), mat.scale(k * pop), mat.translate(-L.x, -L.y));
   return (
   <>
-    <XG m={pop !== 1 ? mat.about(mat.scale(pop), L.x, L.y) : mat.I}>
+    <XG m={discM}>
       <Fill d={DISC} color={white ? palette.white : palette.peach} seed="s5disc" />
     </XG>
     <XG m={LOCK_M}>
@@ -89,11 +103,36 @@ export const SheetLock: React.FC<{whiteAt?: number}> = ({whiteAt = 0}) => {
   );
 };
 
+/** A1 fix round ('figured' had no hit at the target: white beams on mintPale paper are ~1.05:1): a stepped flat GLOW
+ *  pops behind the callout as the beams converge, drawn UNDER the beams and the plan's re-stroked ink (light pooling on
+ *  the paper: the beams run into it, the door lines cross it). The review's tablet recipe (white over mintPale) is
+ *  invisible on the mintPale paper, so the pool is white r 1.35 x the callout disc inside a flat palette.bg EDGE RING
+ *  (r 1.35 -> 1.5 x: the beams' own edge-strip colour, no blur, no opacity): it reads as a lit disc at phone size. On
+ *  'out' the disc turns white inside it (one big white flash, the found ring stroking on round it); `stepAt` steps it
+ *  off (one frame), leaving the white callout. */
+export const CalloutGlow: React.FC<{at: number; stepAt: number}> = ({at, stepAt}) => {
+  const t = useTime();
+  if (t < at || t >= stepAt) return null;
+  const k = springAt(t, at, springs.pop);
+  if (k <= 0.01) return null;
+  const r0 = DISC_R * 1.35;
+  const r1 = DISC_R * 1.5;
+  return (
+    <XG m={mat.about(mat.scale(k), L.x, L.y)}>
+      <Fill d={blob(L.x, L.y, r1, r1 * 0.96, {seed: 's5cg/o'})} color={palette.bg} offset={false} mode="none" seed="s5cgO" />
+      <Fill d={blob(L.x, L.y, r0, r0 * 0.95, {seed: 's5cg/i'})} color={palette.white} offset={false} mode="none" seed="s5cgI" />
+    </XG>
+  );
+};
+
 // ---------------------------------------------------------------- the door swings ajar ('bad')
 
-/** The opening's right half (the right leaf, hinged on the right jamb x 624) and the swing. */
+/** The opening's right half (the right leaf, hinged on the right jamb x 624) and the swing. A1 fix round (the dark gap
+ *  plus the ring read as a crosshair at thumbnail size): the leaf foreshortens much more (0.76 -> 0.64 wide) and its
+ *  free edge grows taller (+9 -> +20 world: it comes toward us), and a cream DOOR-THICKNESS strip (12 world) runs along
+ *  the free edge on the gap side, so 'opened' reads from the leaf itself. */
 const LEAF = {x0: 488, x1: 624, y0: 818, y1: 1168};
-const SWING = {narrow: 0.76, grow: 9, dur: 0.2};
+const SWING = {narrow: 0.64, grow: 20, dur: 0.2, thick: 12};
 /** Swing amount at t: 0 (shut) .. 1 (ajar), a 0.2 s out-back (the leaf knocks open a touch past and settles). */
 export const swingAt = (t: number, at: number) => (t < at ? 0 : E.outBack(1.6)(prog(t, at, SWING.dur)));
 
@@ -123,14 +162,20 @@ export const DoorSwing: React.FC<{at: number}> = ({at}) => {
   const P = quad(m, leaf);
   const ur = quad(m, PANEL_UR);
   const lr = quad(m, PANEL_LR);
+  // the door's THICKNESS: a cream strip along the free edge on the gap side (its far edge a touch shorter: it recedes)
+  const th = SWING.thick * q;
+  const T: Pt[] = [P[0], P[3], [P[3][0] - th, P[3][1] - th * 0.3], [P[0][0] - th, P[0][1] + th * 0.3]];
+  const thInk = line(T[2][0], T[2][1], T[3][0], T[3][1], {seed: 's5thI', over: 2}) + line(T[3][0], T[3][1], P[0][0], P[0][1], {seed: 's5thT', over: 1}) + line(T[2][0], T[2][1], P[3][0], P[3][1], {seed: 's5thB', over: 1});
   return (
     <>
       {/* the dark opening (inside the frame lines: the lintel, sill and right jamb stay the set's) */}
       <Fill d={rectPath(LEAF.x0 + 1.6, LEAF.y0 + 1.6, LEAF.x1 - LEAF.x0 - 3.6, LEAF.y1 - LEAF.y0 - 3.2)} color={palette.tealDark} offset={false} mode="none" seed="s5gap" />
-      {/* the leaf, swung toward us */}
+      {/* the leaf, swung toward us, and its thickness */}
       <Fill d={polyPath(P)} color={PAPER} offset={false} mode="none" seed="s5leafF" />
       <Fill d={polyPath(lr)} color={palette.cream} offset={false} mode="none" seed="s5leafP" />
+      {th > 0.5 ? <Fill d={polyPath(T)} color={palette.cream} offset={false} mode="none" seed="s5thF" /> : null}
       <Ink d={quadInk(P, 's5lf')} width={SI.far} taper={false} seed="s5leafI" />
+      {th > 0.5 ? <Ink d={thInk} width={SI.far} taper={false} seed="s5thK" /> : null}
       <Ink d={quadInk(ur, 's5ur') + quadInk(lr, 's5lr')} width={SI.far} taper={false} seed="s5leafJ" />
     </>
   );
