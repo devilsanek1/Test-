@@ -59,7 +59,7 @@ every palette against the DNA below.
   - **one hero** (C >= 30): saturated, on the subject or the story's object, 5-15 % of the frame;
   - **one dark anchor** (L* <= 40): tinted, instead of black, about 5 %;
   - **at most one hot pop** (C >= 50): 1-3 %, only on "look here" (the frame-0 hook detail, a notification, a reveal).
-- **Texture:** a very light stipple grain on fills (it must survive Reels compression). Thin interior lines.
+- **Texture and lines:** see "Texture and lines" below. They are very subtle: a tone-on-tone halftone and lines only in key places.
 
 **The family (v1):**
 
@@ -84,3 +84,39 @@ every palette against the DNA below.
   - make a new palette by copying the closest one, changing the background tint and the hero / anchor / pop, running
     the DNA check, and adding it to `palettes.json` with its mood and use cases.
 - The palettes evolve: polish the existing ones with each video's lessons (owner feedback goes in the playbook).
+
+## Texture and lines (owner, 2026-10-25)
+
+> "I only really like these very subtle texture pieces and the black outlines, VERY subtle but in key places. Perhaps
+> this is something we can test out in the production."
+
+The reference is `texture_refs/autumn_walk_detail.png`, a crop of `palette_refs/4.webp`. Zoomed in, it shows:
+
+- **Texture: a regular halftone dot grid, not random noise.**
+  - The grid is rotated about 45°, with a pitch of about 0.6 % of the image width (about 6-7 px at 1080).
+  - It is **tone-on-tone**: the dots are the fill's own hue, about 6-10 % darker in L* on mid and dark fills, and
+    slightly lighter on very light fills. A few paper-white flecks sit on top.
+  - It reads as material, not as grain.
+- **Lines:**
+  - **Interior and key places only:** a crease on trousers, a leash, a collar, a mouth, the ear's edge.
+  - **No outline around silhouettes;** shapes are separated by colour alone.
+  - **The stroke:** dark warm ink, about 2-4 px at 1080 wide, **tapered at both ends** (a brush, not a pen). Our
+    `brush()` in `src/lib/mascot/ink.ts` already tapers (`tipIn` / `tipOut`).
+
+**What our kit has:**
+- an optional paper-grain overlay (`public/textures/grain.png`, `Card` `grain`; off by default);
+- tapered brush lines (the mascot ink).
+
+**What it lacks:** a halftone fill. Add it as an SVG `<pattern>` (dots in the fill's darker tone), applied per shape
+and locked to the shape, so it moves with the camera.
+
+**The production test (G4 style frames, then one 5 s motion test):**
+1. Render a style frame three ways: no texture; the halftone at 6 % and at 10 % tone difference; the same with key
+   lines only and with full outlines.
+2. Encode the motion test like Reels does (about 3.5 Mbps H.264) and view it on a phone.
+3. Check for:
+   - shimmer or moiré when the camera pushes, since the dots scale with the object (fix it by snapping the pattern
+     scale, or by fading the texture out during fast moves);
+   - the texture vanishing after compression (then raise the contrast slightly or the pitch to about 8 px);
+   - lines staying crisp at phone size.
+4. The owner picks.
