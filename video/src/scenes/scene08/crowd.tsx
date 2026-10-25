@@ -273,10 +273,10 @@ function armTo(x: number, y: number, h: number, s: number, to: [number, number],
 /** Pile slots, in fill order (fix round 3: the pile stands IN FRONT of the dome's near foot, never inside the arc):
  *  `front` = ranks of busts along the foot, rank 0 (the back rank) with its base at `y` just in front of the foot line
  *  (its heads overlap only the bottom ~10 px of the glass, its raised fists ~15-25 px), every further rank stepping DOWN
- *  and forward (y + r * 0.42 h) and a touch bigger; `flank` = a heap climbing the OUTSIDE of the left flank, each
- *  climber's whole body left of the arc at its feet (x <= flankX(y) - 0.34 h), hands on the glass, and right of the
- *  paint edge (x - 0.33 h >= minX). */
-export function pileSlots(o: {seed: string; front: {x0: number; x1: number; y: number; h: [number, number]; ranks: number}; flank: {y0: number; y1: number; n: number; h: [number, number]; minX: number}}): {x: number; y: number; h: number; rank: number; flank: boolean}[] {
+ *  and forward (y + r * 0.42 h) and a touch bigger; `flank` (fix round 3b, the broad shield dome) = climbers standing
+ *  ON the glass up the dome's left shoulder (feet on the arc at x0..x1, the body above it: outside the dome), right of
+ *  the paint edge (x - 0.33 h >= minX). */
+export function pileSlots(o: {seed: string; front: {x0: number; x1: number; y: number; h: [number, number]; ranks: number}; flank: {x0: number; x1: number; n: number; h: [number, number]; minX: number}}): {x: number; y: number; h: number; rank: number; flank: boolean}[] {
   const out: {x: number; y: number; h: number; rank: number; flank: boolean}[] = [];
   const F = o.front;
   for (let r = 0; r < F.ranks; r++) {
@@ -293,17 +293,17 @@ export function pileSlots(o: {seed: string; front: {x0: number; x1: number; y: n
   }
   for (let k = 0; k < o.flank.n; k++) {
     const u = k / Math.max(1, o.flank.n - 1);
-    const y = lerp(o.flank.y0, o.flank.y1, u);
     const h = lerp(o.flank.h[0], o.flank.h[1], rand(o.seed, `fh${k}`));
-    const x = flankX(y, -1) - h * 0.34 - 1 + (rand(o.seed, `fx${k}`) - 0.5) * 2;
+    const x = lerp(o.flank.x0, o.flank.x1, u) + (rand(o.seed, `fx${k}`) - 0.5) * 6;
+    const y = domeY(x) + 2;
     if (x - h * 0.33 >= o.flank.minX) out.push({x, y, h, rank: F.ranks + k, flank: true});
   }
   return out;
 }
 
 /** The counted pile: batched ink / tealDark busts with a cream rim (sun side), raised arms whose fists are ON the glass;
- *  a tap pops two short cream ripple arcs at the fist (2 steps, 0.2 s) and nudges the arm; flash = the searchlight
- *  catches the figure (cream body + ink outline for 2 frames). */
+ *  a tap pops 3 radiating ink impact ticks at the fist (2 steps, 5 frames) and nudges the arm; flash = the searchlight
+ *  catches the figure (cream body + ink outline for 3 frames). */
 export const Pile: React.FC<{figs: PileFig[]}> = ({figs}) => {
   const t = useTime();
   const look = useLook();
@@ -326,17 +326,20 @@ export const Pile: React.FC<{figs: PileFig[]}> = ({figs}) => {
     rim += bustRim(f.x, f.y, h, f.x < SUN_X ? 1 : -1, Math.max(1.6, h * 0.08), f.hood);
     if (f.arm) {
       const tap = latest(f.taps, t);
-      const tapping = tap !== undefined && t < tap + 0.2;
+      const tapping = tap !== undefined && t < tap + 0.167;
       const a = f.reachTo ? armTo(f.x, f.y, h, f.arm, f.reachTo, tapping ? 0.8 : 1) : armUp(f.x, f.y, h, f.arm, tapping ? 0.6 : 1);
       arms += a.d;
       if (tapping) {
+        // fix round 3b: the reference's impact language, ON the glass at the fist: 3 short radiating ink ticks that pop
+        // out a step on the 3rd frame (5 frames in all; the cream arcs over the fist read as Wi-Fi glyphs)
         const q = t - tap! < 0.1 ? 0 : 1;
         const [px, py] = a.fist;
-        for (const rr of [h * (0.2 + 0.1 * q), h * (0.36 + 0.12 * q)]) {
-          // a ripple ON the glass: a short arc over the fist (its open side down), the outer one wider
-          const a0 = (-150 * Math.PI) / 180;
-          const a1 = (-30 * Math.PI) / 180;
-          ripples += `M${f1(px + Math.cos(a0) * rr)} ${f1(py + Math.sin(a0) * rr)}A${f1(rr)} ${f1(rr)} 0 0 1 ${f1(px + Math.cos(a1) * rr)} ${f1(py + Math.sin(a1) * rr)}`;
+        const r0 = h * (0.17 + 0.05 * q);
+        const r1 = r0 + h * 0.15;
+        const base = f.reachTo ? Math.atan2(f.reachTo[1] - (f.y - 0.46 * h), f.reachTo[0] - f.x) : -Math.PI / 2;
+        for (const da of [-0.75, 0, 0.75]) {
+          const th = base + da;
+          ripples += `M${f1(px + Math.cos(th) * r0)} ${f1(py + Math.sin(th) * r0)}L${f1(px + Math.cos(th) * r1)} ${f1(py + Math.sin(th) * r1)}`;
         }
       }
     }
@@ -350,7 +353,7 @@ export const Pile: React.FC<{figs: PileFig[]}> = ({figs}) => {
       {body1 ? <path d={body1} fill={palette.tealDark} /> : null}
       {lit ? <path d={lit} fill={palette.cream} stroke={palette.ink} strokeWidth={1.2} /> : null}
       {rim ? <path d={rim} fill={palette.cream} /> : null}
-      {ripples ? <path d={ripples} stroke={palette.cream} strokeWidth={2.4} strokeLinecap="round" fill="none" /> : null}
+      {ripples ? <path d={ripples} stroke={palette.ink} strokeWidth={2.4} strokeLinecap="round" fill="none" /> : null}
     </>
   );
 };
