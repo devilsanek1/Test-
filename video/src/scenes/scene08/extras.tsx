@@ -126,15 +126,18 @@ export const WireSpans: React.FC = () => {
  *  fills (back tier lighter: the haze ladder under the glass) with 3 px window dots, and ONE browser-chrome landmark
  *  (42 px wide) left of the lookout. Deterministic (seeded). The old plinth is gone: the foot is behind row 2. */
 type Block = {x: number; w: number; top: number; base: number; fill: string; dot: string; tier: 0 | 1};
-const LANDMARK = {x: DOME8.cx - 92, w: 42, top: 958, base: 1124};
+// A1 fix round 3 (the reviewers: the district measured L 131 = row 2's value, its blocks 2-3x the far rows outside, so the
+// dome read as a mid-distance greenhouse): blocks 20-55 px (row-0/1 scale), the far rows' haze colours one glass step
+// greener (interior >= L 160), low-contrast window dots, a 28 px landmark topping out at 1065.
+const LANDMARK = {x: DOME8.cx - 92, w: 28, top: 1065, base: 1124};
 const DISTRICT: Block[] = (() => {
   const out: Block[] = [];
   const x0 = DOME8.cx - DOME8.rx + 18;
   const x1 = DOME8.cx + DOME8.rx - 14;
   // the district's skyline: highest a little left of the centre (the lookout stands right of it)
   const prof = (x: number) => Math.exp(-(((x - (DOME8.cx - 40)) / (DOME8.rx * 0.55)) ** 2));
-  const BACK = ['#88B3A0', '#7CA995', '#94BDAA'];
-  const FRONT = [palette.sage, '#5F8C80', palette.teal];
+  const BACK = ['#C2CCB6', '#B8C6B0', '#CAD2BE'];
+  const FRONT = ['#AEBBA4', '#A6B6A0', '#B6C0A8'];
   for (const tier of [0, 1] as const) {
     const r = rng(`s8/district${tier}`);
     let x = x0 - r.range(0, 10);
@@ -143,14 +146,14 @@ const DISTRICT: Block[] = (() => {
       const w = r.range(15, tier ? 35 : 27);
       const cx = x + w / 2;
       const base = tier ? 1124 : 1062;
-      const hMin = tier ? 34 : 30;
-      const hMax = tier ? 118 : 150;
+      const hMin = 20;
+      const hMax = tier ? 45 : 55;
       const top = base - (hMin + (hMax - hMin) * prof(cx) * r.range(0.55, 1));
       const skipLm = tier === 1 && x + w > LANDMARK.x - 2 && x < LANDMARK.x + LANDMARK.w + 2;
       if (!skipLm) {
         const pal = tier ? FRONT : BACK;
         const k = (i + r.int(0, 1)) % pal.length;
-        out.push({x, w, top, base, fill: pal[k], dot: tier ? (k === 2 ? palette.sage : '#ACD1BF') : '#ACD1BF', tier});
+        out.push({x, w, top, base, fill: pal[k], dot: tier ? '#C4CCB8' : '#D2D8C6', tier});
       }
       x += w + r.range(-3, 2);
       i++;
@@ -182,24 +185,27 @@ export const DISTRICT_N = DISTRICT.length + 1;
 /** The far district inside the dome (clip it to the dome interior in the scene). The blocks POP on the glass frame
  *  (`at`: 1.08x for 2 frames about the foot line, no growing from zero), their window dots at `chromeAt` (a later onset)
  *  with the landmark's browser window. */
-export const District: React.FC<{at: number; chromeAt?: number}> = ({at, chromeAt = at}) => {
+/** A1 fix round 3: on 'day' the district relights with the far rows (one dusk haze step lighter than row 1's glass copy). */
+const DISTRICT_DUSK: Record<string, string> = {'#C2CCB6': '#A6C2B2', '#B8C6B0': '#A0BEAE', '#CAD2BE': '#AAC6B6', '#AEBBA4': '#98B6A6', '#A6B6A0': '#94B2A2', '#B6C0A8': '#9CBAAA', '#C4CCB8': '#A8C4B4', '#D2D8C6': '#B0CABB', '#9EB09E': '#8AA898'};
+export const District: React.FC<{at: number; chromeAt?: number; duskAt?: number}> = ({at, chromeAt = at, duskAt = 1e6}) => {
   const t = useTime();
   if (t < at) return null;
+  const dk = (c: string) => (t >= duskAt ? DISTRICT_DUSK[c] ?? c : c);
   const k = t < at + 0.067 ? 1.08 : 1;
   const L = LANDMARK;
   return (
     <g transform={k !== 1 ? `translate(0 ${L.base}) scale(1 ${k}) translate(0 ${-L.base})` : undefined}>
       {DISTRICT_GEO.fills.map(([c, d]) => (
-        <path key={c} d={d} fill={c} />
+        <path key={c} d={d} fill={dk(c)} />
       ))}
       {t >= chromeAt
         ? DISTRICT_GEO.dots.map(([c, d]) => (
-            <path key={c} d={d} fill={c} />
+            <path key={c} d={d} fill={dk(c)} />
           ))
         : null}
-      <Fill d={DISTRICT_GEO.lm} color={palette.teal} offset={false} mode="snap" seed="s8/lm" />
-      {t >= chromeAt ? <BrowserChrome x={L.x + 3} y={L.top + 6} w={L.w - 6} h={26} depth="hair" seed="s8/lmc" /> : null}
-      <Ink d={DISTRICT_GEO.lmInk} width={1.4} taper={false} seed="s8/lmi" />
+      <Fill d={DISTRICT_GEO.lm} color={dk('#9EB09E')} offset={false} mode="snap" seed="s8/lm" />
+      {t >= chromeAt ? <BrowserChrome x={L.x + 3} y={L.top + 4} w={L.w - 6} h={15} depth="hair" seed="s8/lmc" /> : null}
+      <Ink d={DISTRICT_GEO.lmInk} width={1} taper={false} seed="s8/lmi" />
     </g>
   );
 };

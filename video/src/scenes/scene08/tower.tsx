@@ -23,8 +23,10 @@ const DEEP_WINDOW = '#2F4A49';
 const TOWER = (() => {
   const T = TOWER8;
   const [cx, cy, cw, ch] = T.cabin;
-  const legL: [Pt, Pt] = [[T.x0 - 6, T.base], [cx + 5, cy + ch]];
-  const legR: [Pt, Pt] = [[T.x1 + 6, T.base], [cx + cw - 5, cy + ch]];
+  // A1 fix round 3: every detail scales with the cabin (designed at 40 px wide)
+  const k = cw / 40;
+  const legL: [Pt, Pt] = [[T.x0 - 6 * k, T.base], [cx + 5 * k, cy + ch]];
+  const legR: [Pt, Pt] = [[T.x1 + 6 * k, T.base], [cx + cw - 5 * k, cy + ch]];
   const at = (leg: [Pt, Pt], u: number): Pt => [leg[0][0] + (leg[1][0] - leg[0][0]) * u, leg[0][1] + (leg[1][1] - leg[0][1]) * u];
   // A1 fix round 1: TWO legs and TWO X-braces (the 4-level lattice read as an oil derrick / pylon at phone size): a
   // lookout on stilts
@@ -40,13 +42,13 @@ const TOWER = (() => {
   const cabin =
     `M${cx} ${cy}h${cw}v${ch}h${-cw}Z` +
     poly([
-      [cx - 9, cy + 3],
+      [cx - 9 * k, cy + 3 * k],
       [cx + cw / 2, T.top],
-      [cx + cw + 9, cy + 3],
+      [cx + cw + 9 * k, cy + 3 * k],
     ]) +
-    `M${cx - 4} ${cy + ch - 3}h${cw + 8}v5h${-cw - 8}Z`;
-  const window = `M${cx + 5} ${cy + 7}h${cw - 10}v${(ch * 0.42).toFixed(1)}h${-(cw - 10)}Z`;
-  const lamp = `M${T.light[0] - 6} ${T.light[1] - 6}h10v12h-10Z`;
+    `M${cx - 4 * k} ${cy + ch - 3 * k}h${cw + 8 * k}v${5 * k}h${-cw - 8 * k}Z`;
+  const window = `M${cx + 5 * k} ${cy + 7 * k}h${cw - 10 * k}v${(ch * 0.42).toFixed(1)}h${-(cw - 10 * k)}Z`;
+  const lamp = `M${T.light[0] - 6 * k} ${T.light[1] - 6 * k}h${10 * k}v${12 * k}h${-10 * k}Z`;
   return {lattice, cabin, window, lamp};
 })();
 
@@ -54,7 +56,8 @@ const TOWER = (() => {
 const CABIN_RIM = (() => {
   const T = TOWER8;
   const [cx, cy, cw, ch] = T.cabin;
-  const r = 3.2;
+  const k = cw / 40;
+  const r = 3.2 * k;
   return (
     poly([
       [cx + cw - r, cy + 2],
@@ -63,10 +66,10 @@ const CABIN_RIM = (() => {
       [cx + cw - r, cy + ch - 3],
     ]) +
     poly([
-      [cx + cw / 2 + 2, T.top + 2],
-      [cx + cw + 9, cy + 3],
-      [cx + cw + 5, cy + 3 + r * 0.6],
-      [cx + cw / 2 + 1, T.top + 2 + r],
+      [cx + cw / 2 + 2 * k, T.top + 2 * k],
+      [cx + cw + 9 * k, cy + 3 * k],
+      [cx + cw + 5 * k, cy + 3 * k + r * 0.6],
+      [cx + cw / 2 + k, T.top + 2 * k + r],
     ])
   );
 })();
@@ -81,8 +84,9 @@ export const Watchtower8: React.FC<{at: number}> = ({at}) => {
   const T = TOWER8;
   return (
     <XG m={tk !== 1 ? mat.about(mat.scale(1, tk), (T.x0 + T.x1) / 2, T.base) : mat.I}>
-      <Ink d={TOWER.lattice} width={3.4} color={palette.ink} taper={false} vary={0} seed="s8/tw" />
-      <Fill d={TOWER.cabin} color={palette.ink} offset={false} seed="s8/twc" />
+      {/* A1 fix round 3: far-plane scale, hair ink, a tealDark cabin (no ink-dark mass under the glass) */}
+      <Ink d={TOWER.lattice} width={1.3} color={palette.ink} taper={false} vary={0} seed="s8/tw" />
+      <Fill d={TOWER.cabin} color={palette.tealDark} offset={false} seed="s8/twc" />
       <Fill d={CABIN_RIM} color={palette.peach} offset={false} seed="s8/twr" />
       <Fill d={TOWER.window} color={DEEP_WINDOW} offset={false} seed="s8/tww" />
       <Fill d={TOWER.lamp} color={palette.ink} offset={false} seed="s8/twl" />
@@ -157,7 +161,7 @@ export const Searchlight8: React.FC<{at: number; angle: (t: number) => number; h
       <path d={fan(core)} fill={palette.cream} opacity={0.85} />
       {grow >= 0.999 && !hit.foot ? <ellipse cx={mid[0]} cy={mid[1]} rx={14} ry={7} transform={`rotate(${((-tan * 180) / Math.PI + 90).toFixed(1)} ${mid[0].toFixed(1)} ${mid[1].toFixed(1)})`} fill={palette.cream} /> : null}
       <path d={`M${o[0]} ${o[1]}L${up[0].toFixed(1)} ${up[1].toFixed(1)}M${o[0]} ${o[1]}L${lo[0].toFixed(1)} ${lo[1].toFixed(1)}`} fill="none" stroke={palette.ink} strokeWidth={1.6} strokeLinecap="round" />
-      {flash ? <circle cx={o[0] - 3} cy={o[1]} r={11} fill={palette.cream} stroke={palette.ink} strokeWidth={1.6} /> : <circle cx={o[0] - 3} cy={o[1]} r={6.5} fill={palette.cream} stroke={palette.ink} strokeWidth={1.8} />}
+      {flash ? <circle cx={o[0] - 1.5} cy={o[1]} r={6.5} fill={palette.cream} stroke={palette.ink} strokeWidth={1.2} /> : <circle cx={o[0] - 1.5} cy={o[1]} r={3.6} fill={palette.cream} stroke={palette.ink} strokeWidth={1.1} />}
     </>
   );
 };

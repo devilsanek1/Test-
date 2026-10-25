@@ -41,7 +41,8 @@ export const ABS = {
   pipPerk: W.half + 0.2, // Pip's ears perk at the half-cream sun
   plaques: W.php - 0.1, // the hanging plaque signs swing out on every site (L, M, R 0.06 s apart)
   label: W.php + 0.15, // L13 rises on the A-frame sign
-  pieSolid: W.sites - 0.3, // the pie settles (cream shrinks, spoke retracts)
+  pieSolid: W.so + 0.1, // the pie settles (cream shrinks, spoke retracts). Wrap FR1: was sites - 0.3 (41.605): the 1/2
+  //   pie is now still up when the far plates land old (~42.67), so 'half' and 'old' are on screen together
   walker: W.sites, // the walker heads up the street gap; Pip looks up at siteM's plaque
   walkerOut: W.old, // ... and has turned off behind siteR's wall (the gap is clear before the cart steps out)
   flipM: W.run - 0.15, // siteM's plaque paper-flips to the OLD version (fix round 3: the 0.2 s flip swaps its face at

@@ -43,7 +43,9 @@ export const PIP: Pt = [390, copingY(390)];
  *  cx 310; the dome's right flank is behind the board): two legs with two X-braces from row 1 (y 1100) up to a 40 x 38
  *  cabin (326-366 x 922-960) under a pitched roof with overhang (apex 906); the lamp on the cabin's left side points
  *  across the dome at its far (left) flank and down at the heap outside it. */
-export const TOWER8 = {x0: DOME8.cx + 20, x1: DOME8.cx + 56, base: 1124, cabin: [DOME8.cx + 16, 922, 40, 38] as [number, number, number, number], top: 906, light: [DOME8.cx + 12, 941] as Pt};
+// A1 fix round 3 (the reviewers: a 200 px ink tower = 63 % of the dome made it '1.5 water towers tall'): ~30 % of the
+// dome's height (roof apex 1030), an 18 x 16 cabin at hair weight: the tower is far-plane scale, the dome colossal.
+export const TOWER8 = {x0: DOME8.cx + 30, x1: DOME8.cx + 46, base: 1124, cabin: [DOME8.cx + 29, 1037, 18, 16] as [number, number, number, number], top: 1030, light: [DOME8.cx + 27, 1045] as Pt};
 
 /** The dome arc's y at x (top of the glass), or the foot line outside it. */
 export const domeY = (x: number) => {

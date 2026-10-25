@@ -106,6 +106,31 @@ export const SheetLock: React.FC<{from?: DiscSpot; moveAt?: number; moveDur?: nu
   );
 };
 
+/** Wrap-up, cut S04|S05 (S04 request 3): S04's 'fourteen' hair cobweb (scene04/props.tsx HairWeb, copied: hub on the box's
+ *  top-left corner, four radials at 4-86 deg fanning UP-LEFT over the door, two arcs sagging toward the hub) carried
+ *  across the matchcut onto the blueprint box's top-left corner at S04's last-frame size (r ~28 px, ink ~2.2 px on
+ *  screen). Drawn whole from the cut, gone (one frame) at `until`, with Pip's landing on the rail. */
+export const LockWeb: React.FC<{until: number}> = ({until}) => {
+  const t = useTime();
+  if (t >= until) return null;
+  const [x, y] = lp(-40.7, -50.7);
+  const r = 27;
+  const P = (a: number, rr: number): Pt => [x - Math.cos((a * Math.PI) / 180) * rr, y - Math.sin((a * Math.PI) / 180) * rr];
+  const spokes = [4, 32, 60, 86];
+  const lens = [1, 0.9, 0.96, 1];
+  const fmt = (p: Pt) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+  let d = '';
+  spokes.forEach((a, i) => {
+    d += `M${fmt([x, y])}L${fmt(P(a, r * lens[i]))}`;
+  });
+  for (const k of [0.5, 0.88]) {
+    const pts = spokes.map((a, i) => P(a, r * k * Math.min(1, lens[i] + 0.04)));
+    d += `M${fmt(pts[0])}`;
+    for (let i = 1; i < pts.length; i++) d += `Q${fmt(P((spokes[i - 1] + spokes[i]) / 2, r * k * 0.62))} ${fmt(pts[i])}`;
+  }
+  return <Ink d={d} width={2.15} taper={false} seed="s5web" />;
+};
+
 /** A1 fix round ('figured' had no hit at the target: white beams on mintPale paper are ~1.05:1): a stepped flat GLOW
  *  pops behind the callout as the beams converge, drawn UNDER the beams and the plan's re-stroked ink (light pooling on
  *  the paper: the beams run into it, the door lines cross it). The review's tablet recipe (white over mintPale) is

@@ -37,8 +37,8 @@ import {BlueprintWall, BLUEPRINT_WALL, LayerWrap} from './shared/sets';
 import {Calendar, DiagramHand, LabelTag, yearPages} from './shared/props';
 import {beats, S05_START, S05_END} from './scene05/beats';
 import {camAt, camMat, layerCam, LAYER_F, toWorld} from './scene05/camera';
-import {Beams, BigZ, BitLeap, BitOnLock, LeafFall, LeafOnCrown, MessengerDash, PipHop, PipOnRail, stepGaps, Teams} from './scene05/cast';
-import {CalloutGlow, CalloutKeyhole, CorniceSoffit, DiscSpot, DoorSwing, FoundRing, handTurn, KNOB, LOCK_C, LockTurn, PlazaGround, SHEET_IN, SheetLock, SheetPanels, SheetTint, StepsOverlay, WingDetails} from './scene05/plan';
+import {Beams, BigZ, BitLeap, BitOnLock, LeafFall, LeafOnCrown, MessengerDash, PipFrom, PipHop, PipOnRail, S04_PIP, stepGaps, Teams} from './scene05/cast';
+import {CalloutGlow, CalloutKeyhole, CorniceSoffit, DiscSpot, DoorSwing, FoundRing, handTurn, KNOB, LOCK_C, LockTurn, LockWeb, PlazaGround, SHEET_IN, SheetLock, SheetPanels, SheetTint, StepsOverlay, WingDetails} from './scene05/plan';
 import {Audience, Pigeons} from './scene05/audience';
 import {Flagpole} from './scene05/flag';
 
@@ -224,6 +224,9 @@ const Scene05: React.FC = () => {
   const c0 = camAt(t0, b.end);
   const [dx, dy] = toWorld(c0, [S04_SPOT[0], S04_SPOT[1]]);
   const discFrom: DiscSpot = {x: dx, y: dy, r: S04_SPOT[2] / c0.zoom};
+  // wrap-up, cut S04|S05: sleeping Pip where S04's last frame leaves him (the same mapping); he tumbles onto the rail
+  const [px, py] = toWorld(c0, [S04_PIP[0], S04_PIP[1]]);
+  const pipFrom: PipFrom = {x: px, y: py, sc: S04_PIP[2], t0};
 
   const inner = (name: string, node: React.ReactNode): React.ReactNode => {
     if (name === 'banner')
@@ -240,6 +243,8 @@ const Scene05: React.FC = () => {
           {/* 'bad': the right leaf swings ajar behind the callout */}
           <DoorSwing at={b.door} />
           <SheetLock from={discFrom} moveAt={b.bitIn} moveDur={0.2} whiteAt={b.ring + 0.02} whiteFor={GLOW_HOLD - 0.02} />
+          {/* S04's hair cobweb on the box's top-left corner, carried across the matchcut; off with Pip's landing */}
+          <LockWeb until={t0 + 0.3} />
           <CalloutKeyhole />
           {/* L5 rides across the match-cut as the lock's annotation tag; pops off on 'using' */}
           <LabelTag kind="tag" box={L5_BOX} hang={[LOCK_C[0] + 24, LOCK_C[1] + 36]} text={L5} fontSize={36} outAt={b.l5Out} seed="s5L5" />
@@ -258,9 +263,9 @@ const Scene05: React.FC = () => {
           {/* L6: the clipped slip on the banner's clean top edge (final polish: back on the storyboard's w58+0.40, one
               frame early so the slip's spring is legible by ~18.19, as the beams converge on the lock) */}
           <LabelTag kind="slip" box={L6_BOX} text={L6} fontSize={38 / ZOOM} at={b.l6} seed="s5L6" />
-          <PipOnRail b={b} />
-          <LeafOnCrown b={b} />
-          <BigZ at={b.zzz} />
+          <PipOnRail b={b} from={pipFrom} />
+          <LeafOnCrown b={b} from={pipFrom} />
+          <BigZ at={b.zzz} end={b.end} from={pipFrom} />
         </XG>
       );
     if (name === 'steps')

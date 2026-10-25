@@ -360,19 +360,43 @@ const rollOver = (t: number) => {
   return {rot: 14 * (1 - E.outCubic(u)), sq: 0.12 * (1 - E.outCubic(u))};
 };
 
+/** Wrap-up, cut S04|S05 (review: Pip jumped (+345, +166) px on the cut while the lock, Bit and L5 held): S04's last
+ *  frame (Main f497) leaves him asleep FACING LEFT, feet at screen (274.3, 1146.3), screen scale 1.30 (scene04 PIP_AT
+ *  (218, 1230) through its dive camera; its scale clamp); one more frame of S04's zoom about lock4 (0.84 /s) puts the
+ *  feet at (268.4, 1151.6). Scene05 maps it to world through the landing camera on Main's first S05 frame (`PipFrom`). */
+export const S04_PIP: [number, number, number] = [268.4, 1151.6, 1.3];
+/** World feet, ON-SCREEN scale, and the scene time of Main's first S05 frame. */
+export type PipFrom = {x: number; y: number; sc: number; t0: number};
+/** The tumble: the landing's hit rolls him off S04's spot, still asleep and facing left: he DROPS first (y out-quad: his
+ *  crown clears L5's lower-left corner), then rolls right onto his perch (x in-out sine), his screen scale easing
+ *  1.30 -> the perch's, tilting 0 -> 14 deg into the roll-over, which then settles as before (0.18 s). */
+const TUMBLE = 0.3;
+export const pipRailPose = (t: number, end: number, from?: PipFrom) => {
+  const k = from ? clamp((t - from.t0) / TUMBLE) : 1;
+  if (from && k < 1) {
+    const xp = E.inOutSine(k);
+    const s = lerp(from.sc / camAt(t, end).zoom, PIP_SCALE, xp);
+    return {x: lerp(from.x, PIP_RAIL[0], xp), y: lerp(from.y, PIP_RAIL[1], E.outQuad(k)), s, rot: 14 * xp, sq: -0.06 * Math.sin(Math.PI * k)};
+  }
+  const ro = rollOver(from ? t - from.t0 - TUMBLE : t);
+  return {x: PIP_RAIL[0], y: PIP_RAIL[1], s: PIP_SCALE, rot: ro.rot, sq: ro.sq};
+};
+
 /** Pip ON THE RAIL (banner layer, riding its sway and its parallax): asleep FACING LEFT (flipped, exactly as S04 leaves
  *  him, S04's tan leaf still on his crown), jolts awake on 'it' turning right toward the messenger (trunk-up, wide: the
  *  pose pop carries the turn), crouches; gone at take-off (<PipHop> takes over in the steps plane). */
-export const PipOnRail: React.FC<{b: Beats}> = ({b}) => {
+export const PipOnRail: React.FC<{b: Beats; from?: PipFrom}> = ({b, from}) => {
   const t = useTime();
   const H = pipHop(b);
   if (t >= H.t0) return null;
   const h = hop({t, t0: H.t0, dur: H.dur, from: {x: PIP_RAIL[0], y: PIP_RAIL[1]}, to: H.to, height: H.height});
   const crouch = t >= H.t0 - PIP_CROUCH;
   const jolt = t >= b.pipWake ? -10 * Math.sin(Math.PI * clamp((t - b.pipWake) / 0.16)) : 0;
-  const ro = rollOver(t);
-  const el = <ElephantTimeline x={h.x} y={h.y + jolt} scale={PIP_SCALE} t={t} seed={5} keys={pipKeys(b, H.t0)} squash={(crouch ? h.squash : 0) + ro.sq} rotate={0} flip={t < b.pipWake} />;
-  return ro.rot !== 0 ? <XG m={mat.about(mat.rotate(ro.rot), PIP_RAIL[0], PIP_RAIL[1])}>{el}</XG> : el;
+  const p = pipRailPose(t, b.end, from);
+  const x = p.x + h.x - PIP_RAIL[0];
+  const y = p.y + h.y - PIP_RAIL[1];
+  const el = <ElephantTimeline x={x} y={y + jolt} scale={p.s} t={t} seed={5} keys={pipKeys(b, H.t0)} squash={(crouch ? h.squash : 0) + p.sq} rotate={0} flip={t < b.pipWake} />;
+  return p.rot !== 0 ? <XG m={mat.about(mat.rotate(p.rot), x, y)}>{el}</XG> : el;
 };
 
 /** Cut S05|S06 (phase B): the leap's HEIGHT climbs to its apex ON the cut (world y PIP_APEX_Y at b.end): rise =
@@ -459,13 +483,17 @@ const LEAF_LAND: Pt = [470, 1356];
 const LEAF_FALL = 0.25;
 
 /** The leaf on Pip's crown (banner layer, riding the sway and his roll-over) until he jolts awake on 'it'. */
-export const LeafOnCrown: React.FC<{b: Beats}> = ({b}) => {
+export const LeafOnCrown: React.FC<{b: Beats; from?: PipFrom}> = ({b, from}) => {
   const t = useTime();
   if (t >= b.pipWake) return null;
-  const ro = rollOver(t);
+  // it rides his crown through the cut's tumble (feet, scale and roll from pipRailPose); CROWN once he is on the rail
+  const p = pipRailPose(t, b.end, from);
+  const k = p.s / PIP_SCALE;
+  const cx = p.x + SLEEP_CROWN[0] * p.s;
+  const cy = p.y + SLEEP_CROWN[1] * p.s - 2;
   return (
-    <XG m={ro.rot !== 0 ? mat.about(mat.rotate(ro.rot), PIP_RAIL[0], PIP_RAIL[1]) : mat.I}>
-      <LeafShape x={CROWN[0]} y={CROWN[1]} rot={LEAF_REST.rot} fy={LEAF_REST.flip} />
+    <XG m={mat.compose(p.rot !== 0 ? mat.about(mat.rotate(p.rot), p.x, p.y) : mat.I, k !== 1 ? mat.about(mat.scale(k), cx, cy) : mat.I)}>
+      <LeafShape x={cx} y={cy} rot={LEAF_REST.rot} fy={LEAF_REST.flip} />
     </XG>
   );
 };
@@ -488,14 +516,17 @@ export const LeafFall: React.FC<{b: Beats}> = ({b}) => {
  *  grows, and pops off (one shrunken frame) before it reaches the door elevation's foot line (world 1190). */
 const Z_SIZE = 18;
 const Z_DUR = 0.6;
-export const BigZ: React.FC<{at: number}> = ({at}) => {
+export const BigZ: React.FC<{at: number; end: number; from?: PipFrom}> = ({at, end, from}) => {
   const t = useTime();
   if (t < at || t >= at + Z_DUR + 1 / 30) return null;
+  // wrap-up: on 'before' he is still tumbling onto the rail (pipRailPose): the z rides beside his head until he lands
+  const f = pipRailPose(t, end, from);
+  const p: Pt = [f.x, f.y];
   const q = prog(t, at, Z_DUR, E.outQuad);
   const off = t >= at + Z_DUR ? 0.72 : 1;
   const s = Z_SIZE * lerp(0.55, 1, E.outBack(1.4)(prog(t, at, 0.22))) * off;
-  const x = PIP_RAIL[0] - 44 - 28 * q + 2.5 * osc(t, 3, 0.3);
-  const y = PIP_RAIL[1] - 58 - 30 * q;
+  const x = p[0] - 44 - 28 * q + 2.5 * osc(t, 3, 0.3);
+  const y = p[1] - 58 - 30 * q;
   // the mascot's z polyline (poses.ts sleep), flipped: [s - a, b]
   const P = (a: number, c: number) => `${(x + (s - a) - s / 2).toFixed(1)} ${(y + c - s / 2).toFixed(1)}`;
   const z = `M${P(0, 0)}L${P(s, -0.2)}L${P(0.2, s)}L${P(s * 1.05, s)}`;

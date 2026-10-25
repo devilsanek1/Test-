@@ -81,9 +81,40 @@ export function cartX(t: number, T: CartTimes): number {
     return parkX - ((v * brake) / 2) * (1 - u) * (1 - u);
   }
   const d = t - T.rollAt;
+  if (d < ROLL.D) {
+    // Wrap FR1: the slow start (held, then a 1-cos push to ROLL.vp, then a linear ease onto the old curve's speed at D)
+    const {d0, r, vp, vD, L} = ROLL;
+    if (d < d0) return parkX;
+    const u = d - d0;
+    if (u < r) return parkX + (vp / 2) * (u - (r / Math.PI) * Math.sin((Math.PI * u) / r));
+    const w = u - r;
+    return parkX + (vp * r) / 2 + vp * w + ((vD - vp) * w * w) / (2 * L);
+  }
+  return rollOld(d);
+}
+
+/** The roll-out as it was (sine ramp to vMax over `acc` s), d = s after rollAt, as cart centre x. */
+function rollOld(d: number): number {
+  const {parkX, vMax, acc} = CART;
   if (d < acc) return parkX + (vMax / 2) * (d - (acc / Math.PI) * Math.sin((Math.PI * d) / acc));
   return parkX + (vMax * acc) / 2 + vMax * (d - acc);
 }
+
+/** Wrap FR1 (the FixSign slid in behind Pip's left ear in the last frames of the 'hey!'): the roll-out's START is
+ *  reshaped, not its start time or its end. The cart holds still until d0, pushes off over r s (1-cos) to vp (510 px/s =
+ *  17.9 px / frame on screen, under the 18 px strobe line) and eases linearly onto the old curve's speed, meeting the old
+ *  curve (position and speed) at D = 0.453 s = film 45.318: from there on (+0.01 s for cartSpeed) every frame, the last
+ *  0.3 s (the cut frames) included, is unchanged. With the parked card only ~12 px left of his ear, this is about the
+ *  latest the cart can start under the strobe line: the card now meets the ear ~45.14 (was ~45.07). */
+const ROLL = (() => {
+  const D = 0.453;
+  const r = 0.1;
+  const vp = 510;
+  const X = rollOld(D) - CART.parkX;
+  const vD = (CART.vMax / 2) * (1 - Math.cos((Math.PI * D) / CART.acc));
+  const L = (X - (vp * r) / 2) / ((vp + vD) / 2);
+  return {D, r, vp, vD, L, d0: D - r - L};
+})();
 
 /** The arm for each toss: side -1 = his left (screen left), +1 = right. Person-local shoulder / hand points. The right
  *  arm goes straight UP (the hand over his head) for the high lob, so the tag leaves well left of siteM's plaque. */
@@ -292,7 +323,9 @@ export const Cart: React.FC<{T: CartTimes}> = ({T}) => {
     t < T.rollAt
       ? {at: t0, to: [CART.parkX, CART.y] as Pt, dur: T.parkAt - t0, ease: (q: number) => (cartX(t0 + q * (T.parkAt - t0), T) - x0) / (CART.parkX - x0)}
       : {at: T.rollAt, to: [x1, CART.y] as Pt, dur: tEnd - T.rollAt, ease: (q: number) => (cartX(T.rollAt + q * (tEnd - T.rollAt), T) - x0) / (x1 - x0)};
-  const moving = t < T.parkAt - 0.04 || t >= T.rollAt + 0.06;
+  // Wrap FR1: he starts stepping when the cart starts moving (rollAt + ROLL.d0; the walk phase still counts from rollAt,
+  // so every later frame is unchanged)
+  const moving = t < T.parkAt - 0.04 || t >= T.rollAt + Math.max(0.06, ROLL.d0);
   // while he walks behind the A-frame, his bun would glide along the board's top as a dark knob: clip him to the right
   // of the board's hinge cap above its top (the board itself hides the rest)
   const hide = xm - 30 < CAP.right;

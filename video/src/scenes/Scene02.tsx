@@ -310,7 +310,10 @@ const Leader: React.FC = () => {
 // that (position and velocity: no speed step across the cut). The perch moved right (screen x ~910), so the short
 // Hermite (takeoff end(password)+0.06, D 0.127 s) runs monotonically left: no back-swing. The ears-cover gag holds
 // 0.43 s (7.77 -> 8.20), the ears pop up, a 0.04 s crouch, takeoff. Retune S03_PICKUP if S03 moves its pickup again.
-const S03_PICKUP = {screen: [860, 906] as Pt, v: [-1133, 257] as Pt, scale: 1.2, rotate: 6, amount: 0.85, squash: -0.2};
+// Wrap-up cut S02|S03: S03 now drops at (-1000, +1250) px/s (scene03/cast pipDropState); this end velocity is tuned on
+// the FRAMES instead (the pose's rotate lerp shifts the body ~+7 px x on the last frame): body-centroid steps f249-f251 |
+// f252 = 55, 55, 55 | 55 px/frame, heading 103, 120 | 130 deg (was 58, 42 | 55 with the old (-1133, 257)).
+const S03_PICKUP = {screen: [860, 906] as Pt, v: [-1300, 1000] as Pt, scale: 1.2, rotate: 6, amount: 0.85, squash: -0.2};
 const T_LAST = +(LAST_FRAME_ABS - S02_START).toFixed(4);
 const CAM_LAST = camAt(T_LAST, DUR);
 const PIP_OUT = {

@@ -19,6 +19,7 @@ import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {blob, circle, line, polyPath, rect, rectPath, Pt} from '../../lib/sketch';
 import {mat, XG} from '../../lib/xf';
+import {mix} from '../../lib/cine/util';
 import {OLD_QUARTER, PopUp, SI, SupportTag} from './kit';
 import {plateFace} from './plate';
 
@@ -70,6 +71,10 @@ const PLATED = SECOND.filter((b) => b.plate);
 const GABLE = 22;
 /** Far flip spacing (storyboard: 0.04 s apart). */
 const FLIP_STEP = 0.04;
+/** Wrap FR1: when an OLD far plate lands (its 1-frame dark pop) the whole building ages on the same frame: its facade
+ *  takes a 35 % wash of the old-plate brown and its window dots turn into dark ink ticks, so old / current reads by
+ *  building MASS at thumbnail size (alternating light and dark far houses), not only by the 40 px plates. */
+const AGE_WASH = 0.7;
 /** The windows that light on 'of' (window-dot origins, world; each on a visible wall: b0, A, E). */
 const LIT: Pt[] = [[338 + 66 * 0.24, 662], [602 + 80 * 0.24, 758], [640 + 100 * 0.66, 1076]];
 
@@ -101,25 +106,33 @@ const G = (() => {
     if (b.i !== 0) ink += line(x, b.roof === 'gable' ? top + 1 : b.roof === 'step' ? top - 6 : top, x, Math.min(EYE, b.i >= 7 ? EYE : 820), {seed: `s10s/l${b.i}`, over: 0, breaks: false});
     return {fill, ink, dark};
   });
-  // window dots at HALF density (rows every 40 px, one column on narrow walls), skipping the plate's storey (+-8 px)
-  const winDark: string[] = [];
-  const winLight: string[] = [];
+  // window dots at HALF density (rows every 40 px, one column on narrow walls), skipping the plate's storey (+-8 px).
+  // Wrap FR1: per building, drawn inside its PopUp (the batched layer sat on top of the nearer gap houses); an old
+  // building also gets its aged windows: slanted dark ink ticks on the same spots
+  const win: string[] = [];
+  const ticks: string[] = [];
   for (const b of SECOND) {
     let wd = '';
+    let tk = '';
     const ww = 7;
     const cols = b.w >= 58 ? [0.24, 0.66] : [0.42];
     for (let yy = b.top + 16; yy < EYE - 50; yy += 40) {
       if (b.plate && yy + 11 > b.plate.y - FAR_PLATE / 2 - 8 && yy < b.plate.y + FAR_PLATE / 2 + 8) continue;
-      for (const c of cols) wd += rectPath(b.x + b.w * c, yy, ww, 11);
+      for (const c of cols) {
+        const wx = b.x + b.w * c;
+        wd += rectPath(wx, yy, ww, 11);
+        tk += polyPath([[wx + 1.5, yy - 1], [wx + ww + 0.5, yy + 0.5], [wx + ww - 1, yy + 12], [wx - 0.5, yy + 10.5]]);
+      }
     }
-    (b.color === palette.sage ? winLight : winDark).push(wd);
+    win.push(wd);
+    ticks.push(tk);
   }
   // the nearest gap house's (E, OLD) doors on the eye line, inside the visible 654-726 between the return faces
   const doors = [
     {i: 9, x: 664, y: EYE - 34, w: 15, h: 34},
     {i: 9, x: 700, y: EYE - 34, w: 15, h: 34},
   ];
-  return {roofs, winDark: winDark.join(''), winLight: winLight.join(''), doors};
+  return {roofs, win, ticks, doors};
 })();
 
 export type SecondRowProps = {
@@ -205,6 +218,7 @@ export const SecondRow: React.FC<SecondRowProps> = ({popAt, flipAt, dropAt, wind
   const wave = new Map<number, number>();
   PLATED.forEach((b, k) => wave.set(b.i, tagsAt + 0.06 * k));
   const last = SECOND.length - 1;
+  const winOn = t >= popAt + STAGGER * last + 0.18;
   return (
     <>
       {SECOND.map((b) => {
@@ -212,25 +226,29 @@ export const SecondRow: React.FC<SecondRowProps> = ({popAt, flipAt, dropAt, wind
         const r = G.roofs[b.i];
         const fa = flips.get(b.i);
         const wa = wave.get(b.i);
+        // Wrap FR1: an old building ages on its plate's landing frame (the 1-frame dark pop)
+        const aged = !!b.plate?.old && fa !== undefined && t >= fa + 0.2;
+        const color = aged ? mix(b.color, palette.brown, AGE_WASH) : b.color;
         return (
           <PopUp key={b.i} at={pa} x={b.cx} y={EYE}>
-            {r.fill ? <Fill d={r.fill} color={b.color} offset={false} seed={`s10s/rf${b.i}`} /> : null}
-            <Fill rect={[b.x, b.top, b.w + 2, EYE - b.top]} color={b.color} seed={`s10s/b${b.i}`} />
+            {r.fill ? <Fill d={r.fill} color={color} offset={false} seed={`s10s/rf${b.i}`} /> : null}
+            <Fill rect={[b.x, b.top, b.w + 2, EYE - b.top]} color={color} seed={`s10s/b${b.i}`} />
             {r.dark ? <Fill d={r.dark} color={palette.tan} offset={false} mode="snap" seed={`s10s/rd${b.i}`} /> : null}
             <Ink d={r.ink} width={SI.far} taper={false} seed={`s10s/i${b.i}`} />
+            {/* window dots (half density); they arrive with the last pop-ups */}
+            {winOn ? (
+              aged ? (
+                <Fill d={G.ticks[b.i]} color={palette.ink} offset={false} mode="snap" seed={`s10s/tk${b.i}`} />
+              ) : (
+                <Fill d={G.win[b.i]} color={b.color === palette.sage ? palette.mintPale : palette.tealDark} offset={false} mode="snap" seed={`s10s/win${b.i}`} />
+              )
+            ) : null}
             {b.plate && fa !== undefined ? (
               <FarPlate p={b.plate} flipAt={fa} sagAt={dropAt + 0.05 * PLATED.indexOf(b)} shudderAt={b.plate.old ? wa : undefined} tagAt={b.plate.old ? undefined : wa} seed={`s10s/p${b.i}`} />
             ) : null}
           </PopUp>
         );
       })}
-      {/* window dots, batched (half density); they arrive with the last pop-ups */}
-      {t >= popAt + STAGGER * last + 0.18 ? (
-        <>
-          <Fill d={G.winDark} color={palette.tealDark} offset={false} mode="snap" seed="s10s/win" />
-          <Fill d={G.winLight} color={palette.mintPale} offset={false} mode="snap" seed="s10s/winl" />
-        </>
-      ) : null}
       {/* A1 FR2: on 'of' three far windows light in a 0.04 s cascade (b0, A, E: all on visible wall; the single window
           lit before sat behind the gap house and nothing marked the word) */}
       {LIT.map(([x, y], k) => (t >= windowAt + 0.04 * k ? <Fill key={`lit${k}`} rect={[x - 1, y - 1, 9, 13]} color={palette.peach} offset={false} mode="snap" seed={`s10s/lit${k}`} /> : null))}

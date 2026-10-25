@@ -291,7 +291,7 @@ export const Rattler: React.FC<RattlerSpec> = ({x, y, h, dh: dhIn, at, rattles, 
  *  shoulder climbers); `reach` = a free arm reaching up toward the dome (climbing the backs in front). A1 fix round 2:
  *  `fill` = the hoodie colour (0 teal, 1 tealDark, 2 ochre, 3 sand), `dark` = an ink-dark hood (about 1 in 4);
  *  `recoil` = the searchlight catches it: it pops 1.2x for 2 frames with 3 impact ticks at its hand. */
-export type PileFig = {x: number; y: number; h: number; at: number; taps: number[]; hood: boolean; fill: 0 | 1 | 2 | 3; dark?: boolean; rot: number; reachTo?: [number, number]; reach?: boolean; flash?: number; lite?: boolean};
+export type PileFig = {x: number; y: number; h: number; at: number; taps: number[]; hood: boolean; fill: number; dark?: boolean; rot: number; reachTo?: [number, number]; reach?: boolean; flash?: number; lite?: boolean};
 
 /** An arm from the (rotated) shoulder on side s to a fist at `to`; `k` < 1 pulls it back (a tap). The elbow bows down. */
 function armTo(x: number, y: number, h: number, s: number, to: [number, number], k = 1, rot = 0): {d: string; fist: [number, number]} {
@@ -318,7 +318,7 @@ export type HeapSlot = {x: number; y: number; h: number; wall: boolean; rot: num
  *  (shoulder and hood). Every figure turns 3/4 toward the flank (leaning 8-12 deg right); the ones touching the wall are
  *  `wall` (hands on the glass). `d` = the distance from the foot corner (the heap GROWS from the corner outward and
  *  upward: the scene pops the slots in `d` order). Sorted back (high) to front (low) for drawing. */
-export function heapSlots(o: {seed: string; base: number; top: number; left: number; h: [number, number]; dy: number; gap: number; minX: number}): HeapSlot[] {
+export function heapSlots(o: {seed: string; base: number; top: number; left: number; h: [number, number]; dy: number; gap: number; minX: number; jx?: number; jy?: number; rot?: [number, number]}): HeapSlot[] {
   const out: HeapSlot[] = [];
   const hm = (o.h[0] + o.h[1]) / 2;
   const wx = flankX(o.top, -1);
@@ -330,14 +330,17 @@ export function heapSlots(o: {seed: string; base: number; top: number; left: num
     let i = 0;
     while (x < DOME8.cx) {
       const h = lerp(o.h[0], o.h[1], rand(o.seed, `h${j}/${i}`)) * (1 - 0.1 * (j / rows));
-      const y = o.base - j * o.dy + (rand(o.seed, `y${j}/${i}`) - 0.5) * 3;
+      // A1 fix round 3: +-jy / +-jx jitter per slot (the regular tiers read as a choir)
+      const y = o.base - j * o.dy + (rand(o.seed, `y${j}/${i}`) - 0.5) * 2 * (o.jy ?? 1.5);
       // outside the glass: the shoulder corner and the hood's sun side clear of the flank (leaning right ~10 deg)
       const xm = Math.min(flankX(y - 0.5 * h, -1) - 0.42 * h - 1, flankX(y - 1.1 * h, -1) - 0.42 * h - 1);
       if (x > xm) break;
-      if (y - 1.05 * h >= surf(x) - 6) {
-        const wall = x > xm - 0.5 * h;
-        const rot = 8 + rand(o.seed, `r${j}/${i}`) * 4;
-        out.push({x, y, h, wall, rot, d: Math.hypot((corner - x) * 0.85, o.base - y)});
+      const xj = Math.max(o.minX, Math.min(xm, x + (rand(o.seed, `jx${j}/${i}`) - 0.5) * 2 * (o.jx ?? 0)));
+      if (y - 1.05 * h >= surf(xj) - 6) {
+        const wall = xj > xm - 0.5 * h;
+        const [r0, r1] = o.rot ?? [8, 12];
+        const rot = r0 + rand(o.seed, `r${j}/${i}`) * (r1 - r0);
+        out.push({x: xj, y, h, wall, rot, d: Math.hypot((corner - xj) * 0.85, o.base - y)});
       }
       // A1 fix round 2: a 2-3 px gap between neighbours (coat width 0.66 h)
       x += 0.66 * h + o.gap + rand(o.seed, `p${j}/${i}`) * 1.2;
@@ -363,8 +366,8 @@ export function climberSlots(o: {seed: string; x0: number; x1: number; n: number
   return out;
 }
 
-/** The heap's hoodie colours (A1 fix round 2: coat colours, not ink: teal, tealDark, ochre, sand). */
-const PILE_COATS = [palette.teal, palette.tealDark, palette.brown, palette.sand];
+/** The heap's hoodie colours (A1 fix round 3: teal, ochre, cream, clay, sage, tealDark: coat colours with variety). */
+export const PILE_COATS = [palette.teal, palette.brown, palette.cream, palette.tan, palette.sage, palette.tealDark];
 
 /** A 3/4-turned hooded bust (back view turned toward the flank on the right): `bustParts` plus the sand cheek sliver in
  *  the hood's right opening and the hood shifted 0.04 h toward the glass. */
@@ -407,7 +410,7 @@ export const Pile: React.FC<{figs: PileFig[]}> = ({figs}) => {
     const aw = Math.max(2.6, f.h * 0.12);
     const tap = latest(f.taps, t);
     const tapping = tap !== undefined && t < tap + 0.167;
-    const coat = PILE_COATS[f.fill];
+    const coat = PILE_COATS[f.fill % PILE_COATS.length];
     let arm = '';
     let hand: [number, number] | undefined;
     const tickAt = (p: [number, number], from: [number, number], q: number) => {
@@ -486,7 +489,7 @@ export function clumpBand(
   h: number,
   at: number,
   span: number,
-  o: {clump?: [number, number]; gap?: [number, number]; jy?: number; order?: 'ltr' | 'rand' | {from: number} | {to: number}; skip?: (x: number, y: number, h: number) => boolean; rank?: number; arms?: number; hoods?: number; toward?: number; vx?: number; sizeJ?: number} = {},
+  o: {clump?: [number, number]; gap?: [number, number]; jy?: number; fj?: number; xj?: number; order?: 'ltr' | 'rand' | {from: number} | {to: number}; skip?: (x: number, y: number, h: number) => boolean; rank?: number; arms?: number; hoods?: number; toward?: number; vx?: number; sizeJ?: number} = {},
 ): CrowdFig[] {
   const out: CrowdFig[] = [];
   const [c0, c1] = o.clump ?? [3, 6];
@@ -502,14 +505,15 @@ export function clumpBand(
     let last = h;
     for (let j = 0; j < n && x < x1; j++, i++) {
       const hh = h * (1 - sj + 2 * sj * rand(seed, `h${i}`));
-      const fy = cy + (rand(seed, `y${i}`) - 0.5) * 3;
-      if (!(o.skip && o.skip(x, fy, hh))) {
+      const fy = cy + (rand(seed, `y${i}`) - 0.5) * 2 * (o.fj ?? 1.5);
+      const fx = x + (rand(seed, `xj${i}`) - 0.5) * 2 * (o.xj ?? 0) * hh;
+      if (!(o.skip && o.skip(fx, fy, hh))) {
         const ord = o.order ?? 'rand';
         const u =
           ord === 'ltr' ? (x - x0) / (x1 - x0) : ord === 'rand' ? rand(seed, `a${i}`) : 'from' in ord ? Math.min(1, Math.abs(x - ord.from) / 700) : 1 - Math.min(1, Math.abs(x - ord.to) / 700);
         const arm = o.arms && rand(seed, `ar${i}`) < 1 / o.arms ? ((rand(seed, `as${i}`) < 0.5 ? -1 : 1) as -1 | 1) : undefined;
         const vx = o.toward !== undefined && o.vx ? Math.sign(o.toward - x) * o.vx * (0.7 + 0.6 * rand(seed, `v${c}`)) : undefined;
-        out.push({x, y: fy, h: hh, at: at + u * span, rank: o.rank ?? 0, fill: (i % 2) as 0 | 1, hood: rand(seed, `hd${i}`) < (o.hoods ?? 0.9), arm, vx});
+        out.push({x: fx, y: fy, h: hh, at: at + u * span, rank: o.rank ?? 0, fill: (i % 2) as 0 | 1, hood: rand(seed, `hd${i}`) < (o.hoods ?? 0.9), arm, vx});
       }
       last = hh;
       x += hh * 0.62 * (0.7 + 0.6 * rand(seed, `p${i}`)) + 0.5;
@@ -536,7 +540,7 @@ export function roofBand(
   x1: number,
   h: [number, number],
   at: number[],
-  o: {ranks?: number; rankFrom?: number; clump?: [number, number]; empty?: number; arms?: number; skip?: (x: number, y: number, h: number) => boolean; span?: number; order?: 'ltr' | {from: number}; rank0?: number; dy?: number} = {},
+  o: {ranks?: number; rankFrom?: number; clump?: [number, number]; empty?: number; arms?: number; skip?: (x: number, y: number, h: number) => boolean; span?: number; order?: 'ltr' | {from: number}; rank0?: number; dy?: number; cgap?: number; jy?: number; xj?: number} = {},
 ): CrowdFig[] {
   const out: CrowdFig[] = [];
   const ranks = o.ranks ?? 2;
@@ -552,18 +556,21 @@ export function roofBand(
       while (x < b.x + b.w - 1 && x < x1) {
         const k = `${Math.round(b.x)}/${r}/${i}`;
         const hh = lerp(h[0], h[1], rand(seed, `h${k}`)) * (1 - 0.08 * r);
-        const y = b.top + (o.dy ?? 0.5) - r * 0.3 * hm * (0.7 + 0.6 * rand(seed, `ry${k}`)) + (rand(seed, `y${k}`) - 0.5) * (r ? 0.24 * hm : 1.2);
-        if (x >= x0 && !(o.skip && o.skip(x, y, hh))) {
+        // A1 fix round 3: `jy` = an extra per-figure step BACK from the roof edge (up only: they stay on the roof), `xj` =
+        // per-figure x jitter (fraction of h): no straight ranks along the roof edge
+        const y = b.top + (o.dy ?? 0.5) - r * 0.3 * hm * (0.7 + 0.6 * rand(seed, `ry${k}`)) + (rand(seed, `y${k}`) - 0.5) * (r ? 0.24 * hm : 1.2) - rand(seed, `jy${k}`) * (o.jy ?? 0);
+        const fx = Math.max(b.x + 1, Math.min(b.x + b.w - 1, x + (rand(seed, `xj${k}`) - 0.5) * 2 * (o.xj ?? 0) * hh));
+        if (x >= x0 && !(o.skip && o.skip(fx, y, hh))) {
           const ord = o.order;
           const u = !ord ? 0 : ord === 'ltr' ? (x - x0) / (x1 - x0) : Math.min(1, Math.abs(x - ord.from) / 700);
           const arm = o.arms && rand(seed, `ar${k}`) < 1 / o.arms ? ((rand(seed, `as${k}`) < 0.5 ? -1 : 1) as -1 | 1) : undefined;
-          out.push({x, y, h: hh, at: (at[r] ?? at[at.length - 1]) + u * (o.span ?? 0), rank: (o.rank0 ?? 0) + (ranks - 1 - r), fill: ((i + r) % 2) as 0 | 1, hood: rand(seed, `hd${k}`) < 0.9, arm});
+          out.push({x: fx, y, h: hh, at: (at[r] ?? at[at.length - 1]) + u * (o.span ?? 0), rank: (o.rank0 ?? 0) + (ranks - 1 - r), fill: ((i + r) % 2) as 0 | 1, hood: rand(seed, `hd${k}`) < 0.9, arm});
         }
         // A1 fix round 2: the spacing jitters +-30 % (even ranks read as stubble at phone size)
         x += hh * 0.62 * (0.7 + 0.6 * rand(seed, `p${k}`)) + 0.4;
         i++;
         if (--n <= 0) {
-          x += 1 + rand(seed, `g${k}`) * 4;
+          x += (1 + rand(seed, `g${k}`) * 4) * (o.cgap ?? 1);
           n = c0 + Math.floor(rand(seed, `n${k}`) * (c1 - c0 + 1));
         }
       }
@@ -576,10 +583,27 @@ export function roofBand(
  *  reads as varied heads, not as dark bristle) and their coats (teal, tealDark, ochre, sand). */
 const FLOOD_HOODS = [palette.ink, palette.tealDark, palette.brown, palette.tan];
 const FLOOD_COATS = [palette.teal, palette.tealDark, palette.brown, palette.sand];
+/** A1 fix round 3: row 2 (mid distance) has no ink hoods: the darkest values and the ink stay with the near crowd. */
+const MID_HOODS = [palette.teal, palette.tealDark, palette.brown, palette.tan];
 /** The far tiers: row 0 = fill-only clay / sand round-topped blobs (one value step darker than the row, close to the
  *  sky value: no ink, no hood point); row 1 = fill-only tealDark / ochre quads (the lite bust in ONE colour). */
-const FAR0 = [palette.tan, palette.tan, palette.tan, palette.sand];
-const FAR1 = [palette.tealDark, palette.brown];
+/** A1 fix round 3 (the reviewers: row 1's dark teal / olive tufts read as pine stubble): the coat colours mixed ~60-70 %
+ *  toward the row's haze (row 0 HALF.sand, row 1 sand), round dot heads, no pointed hoods. */
+const FAR0 = [palette.tan, palette.tan, '#C9AE8E', '#BBB5A4', palette.sand];
+const FAR1 = ['#9D9D8E', '#B5946E', '#A8AB97', '#C3A58B', '#A39C8C'];
+
+/** Row 1's figure: round-shouldered body + a round dot head (base centre x, y; height h). */
+function dotFig(x: number, y: number, h: number): {body: string; head: string} {
+  const w = Math.max(3, 0.6 * h);
+  const bh = 0.58 * h;
+  const rr = w * 0.32;
+  const hr = Math.max(1.4, 0.2 * h);
+  const hy = y - bh - hr * 0.75;
+  return {
+    body: `M${f1(x - w / 2)} ${f1(y)}V${f1(y - bh + rr)}Q${f1(x - w / 2)} ${f1(y - bh)} ${f1(x - w / 2 + rr)} ${f1(y - bh)}H${f1(x + w / 2 - rr)}Q${f1(x + w / 2)} ${f1(y - bh)} ${f1(x + w / 2)} ${f1(y - bh + rr)}V${f1(y)}Z`,
+    head: `M${f1(x - hr)} ${f1(hy)}a${f1(hr)} ${f1(hr)} 0 1 0 ${f1(2 * hr)} 0a${f1(hr)} ${f1(hr)} 0 1 0 ${f1(-2 * hr)} 0Z`,
+  };
+}
 
 /** Row 0's figure: a round-topped capsule (base centre x, y; height h). */
 function blobFig(x: number, y: number, h: number): string {
@@ -629,8 +653,10 @@ export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string
     }
     const lean = f.vx ? (Math.sign(f.vx) as 1 | -1) : rand(seed, `l${i}`) < 0.5 ? -1 : 1;
     if (tier === 1) {
-      const b = bustParts(fx, y, h * 0.85, f.hood, lean, true);
-      add(fills, r, FAR1[Math.floor(u * FAR1.length)], b.coat + b.head);
+      const b = dotFig(fx, y, h * 0.85);
+      const ci = Math.floor(u * FAR1.length);
+      add(fills, r, FAR1[ci], b.body);
+      add(hoods, r, FAR1[(ci + 1 + Math.floor(rand(seed, `hc${i}`) * 3)) % FAR1.length], b.head);
       return;
     }
     const lite = tier === 2 && f.h < 12;
@@ -639,7 +665,7 @@ export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string
     let hi = Math.floor(rand(seed, `hc${i}`) * 4);
     if (hi === ci && ci !== 0) hi = (hi + 1) % 4; // a hood one value off its coat (an ink hood on any coat)
     add(fills, r, FLOOD_COATS[ci], b.coat);
-    add(hoods, r, FLOOD_HOODS[hi], b.head);
+    add(hoods, r, (tier === 2 ? MID_HOODS : FLOOD_HOODS)[hi], b.head);
     outline[r] = (outline[r] ?? '') + b.coat + b.head;
     if (tier === 3 || f.h >= 15) {
       const s = fx < SUN_X ? 1 : -1;
@@ -656,7 +682,7 @@ export const Flood: React.FC<{figs: CrowdFig[]; flickerAt?: number; seed: string
   });
   const out: React.ReactNode[] = [];
   const n = Math.max(fills.length, hoods.length);
-  const ow = tier === 3 ? 1.8 : 1.4;
+  const ow = tier === 3 ? 1.8 : 1.0;
   for (let r = 0; r < n; r++) {
     if (arms[r]) out.push(<path key={`a${r}`} d={arms[r]} stroke={palette.ink} strokeWidth={aw[r]} strokeLinecap="round" strokeLinejoin="round" fill="none" />);
     if (outline[r]) out.push(<path key={`o${r}`} d={outline[r]} stroke={palette.ink} strokeWidth={ow * 2} strokeLinejoin="round" fill="none" />);

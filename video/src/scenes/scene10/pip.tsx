@@ -11,7 +11,9 @@ import {palette} from '../../lib/theme';
 import {Ink} from '../../lib/Ink';
 import {Fill} from '../../lib/Fill';
 import {mat, XG} from '../../lib/xf';
-import {circle, speedLines} from '../../lib/sketch';
+import {polyPath, speedLines} from '../../lib/sketch';
+import {captionFontStack} from '../../lib/font';
+import type {Mat} from '../../lib/xf';
 import type {Pt} from '../../lib/sketch';
 
 /** The trunk tip in the 'hey!' pose (world; measured on the render, see HEY_TIP). */
@@ -118,10 +120,11 @@ function perkStretch(t: number, at: number): number {
 /** Where his trunk tip is in the mirrored 'trunk-up' pose leaning HEY_LEAN (world, measured on the render): the 'hey'
  *  spark radiates from here at the plaque. */
 const HEY_TIP: Pt = [HEY_TIP_X, HEY_TIP_Y];
-/** A1 FR2: the spark is aimed ALONG the line from his trunk tip to siteM's old plate (centre (590, 1144)), three strokes
- *  fanned +-24 deg, 32 px long (r 18 -> 50 from the tip), 5 px ink (A1 FR1's 18 px / 3.4 px vanished at phone size). */
-const HEY_DIR = (Math.atan2(1144 - HEY_TIP_Y, 590 - HEY_TIP_X) * 180) / Math.PI;
-const HEY_ANGLES = [HEY_DIR - 24, HEY_DIR, HEY_DIR + 24];
+/** A1 FR2: three strokes fanned +-24 deg, 32 px long (r 14 -> 46 from the tip), 5 px ink. Wrap FR1: aimed at the EMPTY
+ *  twine hook on siteM's old plate (world ~(670, 1135), measured on the render; was the plate centre (590, 1144)): the
+ *  tag that should hang there went over it; fanned +-20 deg so the left stroke clears the shout bubble. */
+const HEY_DIR = (Math.atan2(1135 - HEY_TIP_Y, 670 - HEY_TIP_X) * 180) / Math.PI;
+const HEY_ANGLES = [HEY_DIR - 20, HEY_DIR, HEY_DIR + 20];
 const HEY_R: [number, number] = [14, 46];
 /** The 'hey!' lean (deg, - = the top leans left toward the plate). */
 const HEY_LEAN = -10;
@@ -153,24 +156,92 @@ const HeySpark: React.FC<{at: number; end: number}> = ({at, end}) => {
   return d ? <Ink d={d} width={5} taper={false} vary={0} seed="s10/hey" /> : null;
 };
 
-/** A1 FR2: a small peach '!' bubble between his trunk and the skipped plate (screen ~(598, 1240), on siteM's cream wall
- *  right of the door), its tail toward him: pops with the stamp (spring), holds, shrinks out with the spark (no fade). */
-const BUBBLE = {x: 595, y: 1247, r: 21};
-const HeyBubble: React.FC<{at: number; end: number}> = ({at, end}) => {
+/** Wrap FR1: a SPIKY shout bubble lettered 'hey!' (caption hand, ~30 px tall on screen) up-left of his head, its tail
+ *  aimed at his mouth (the tip on his left ear's top edge): it pops on the stamp (spring about the tail tip), holds,
+ *  and shrinks out into the tail tip by `end` (no fade). Replaces A1 FR2's round peach '!' on siteM's wall (it read as
+ *  the door / plaque exclaiming). World px. */
+const SHOUT = {x: 568, y: 1263, rx: 47, ry: 37, spike: 10, n: 14, fs: 38};
+const SHOUT_MOUTH: Pt = [686, 1388];
+const SHOUT_TIP: Pt = [628, 1321];
+const SHOUT_PTS: Pt[] = (() => {
+  const {x, y, rx, ry, spike, n} = SHOUT;
+  const pts: Pt[] = [];
+  for (let i = 0; i < 2 * n; i++) {
+    const a = (i / (2 * n)) * Math.PI * 2 - Math.PI / 2 + 0.11;
+    const out = i % 2 === 0;
+    // hand-drawn unevenness: spike lengths vary (deterministic)
+    const k = out ? 1 + (spike / rx) * (0.75 + 0.5 * Math.abs(Math.sin(i * 2.7))) : 1;
+    pts.push([x + Math.cos(a) * rx * k, y + Math.sin(a) * ry * (out ? 1 + (spike / ry) * (0.75 + 0.5 * Math.abs(Math.sin(i * 2.7))) : 1)]);
+  }
+  return pts;
+})();
+/** The tail: a wedge from the bubble's edge toward his mouth, its base 22 px wide. */
+const SHOUT_TAIL: Pt[] = (() => {
+  const {x, y, rx, ry} = SHOUT;
+  const dx = SHOUT_MOUTH[0] - x;
+  const dy = SHOUT_MOUTH[1] - y;
+  const a = Math.atan2(dy / ry, dx / rx);
+  const nx = -Math.sin(Math.atan2(dy, dx));
+  const ny = Math.cos(Math.atan2(dy, dx));
+  const bx = x + Math.cos(a) * rx * 0.8;
+  const by = y + Math.sin(a) * ry * 0.8;
+  return [[bx + nx * 11, by + ny * 11], SHOUT_TIP, [bx - nx * 11, by - ny * 11]];
+})();
+const ShoutBubble: React.FC<{at: number; end: number}> = ({at, end}) => {
   const t = useTime();
   if (t < at || t >= end) return null;
   const k = Math.min(springAt(t, at, springs.pop), 1 - E.inCubic(prog(t, end - 0.1, 0.1)));
   if (k <= 0.02) return null;
-  const {x, y, r} = BUBBLE;
-  const tail = `M${x + r * 0.45} ${y + r * 0.78}L${x + r * 1.35} ${y + r * 1.5}L${x + r * 0.85} ${y + r * 0.4}Z`;
+  const body = polyPath(SHOUT_PTS);
+  const tail = polyPath(SHOUT_TAIL);
+  const [a, b, c] = SHOUT_TAIL;
   return (
-    <XG m={mat.about(mat.scale(k), x + r * 1.2, y + r * 1.4)}>
-      <Fill d={tail + circle(x, y, r, {seed: 's10/heyb'})} color={palette.peach} offset={false} mode="none" seed="s10/heyb" />
-      <Ink d={circle(x, y, r, {seed: 's10/heybi'}) + `M${x + r * 0.5} ${y + r * 0.86}L${x + r * 1.35} ${y + r * 1.5}L${x + r * 0.88} ${y + r * 0.48}`} width={3.4} taper={false} seed="s10/heybi" />
-      <Ink d={`M${x + 0.5} ${y - 11}L${x} ${y + 3}`} width={4.6} taper={false} vary={0} seed="s10/heyx" />
-      <Fill d={circle(x, y + 10, 2.9, {seed: 's10/heyd'})} color={palette.ink} offset={false} mode="none" seed="s10/heyd" />
+    <XG m={mat.about(mat.scale(k), SHOUT_TIP[0], SHOUT_TIP[1])}>
+      <Fill d={tail + body} color={palette.peach} offset={false} mode="none" seed="s10/shout" />
+      <Ink d={`${body}M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b[0]} ${b[1]}L${c[0].toFixed(1)} ${c[1].toFixed(1)}`} width={3.4} taper={false} seed="s10/shouti" />
+      <Fill d={polyPath([a, b, c])} color={palette.peach} offset={false} mode="none" seed="s10/shoutt" />
+      <text x={SHOUT.x - 1} y={SHOUT.y + SHOUT.fs * 0.3} textAnchor="middle" fontFamily={captionFontStack} fontSize={SHOUT.fs} fill={palette.ink} transform={`rotate(-6 ${SHOUT.x} ${SHOUT.y})`}>
+        hey!
+      </text>
     </XG>
   );
+};
+
+/** Wrap FR1: two short ink impact ticks either side of his feet on the bollard top: the stamp's squash frame is a STOMP
+ *  (3 frames: full, then retracting from the inner ends). */
+const StompTicks: React.FC<{at: number; x: number; y: number}> = ({at, x, y}) => {
+  const t = useTime();
+  const d = t - at;
+  if (d < 0 || d >= 0.1) return null;
+  const k = d < 1 / 30 ? 0 : E.inCubic(Math.min(1, (d - 1 / 30) / (0.1 - 1 / 30)));
+  let p = '';
+  for (const s of [-1, 1]) {
+    const x0 = x + s * 46;
+    const y0 = y - 4;
+    const x1 = x + s * 66;
+    const y1 = y - 16;
+    p += `M${(x0 + (x1 - x0) * k).toFixed(1)} ${(y0 + (y1 - y0) * k).toFixed(1)}L${x1} ${y1}`;
+    p += `M${(x0 + s * 2 + (x1 - x0 + s * 6) * k * 0.9).toFixed(1)} ${(y0 + 9 + (y1 - y0 + 8) * k * 0.9).toFixed(1)}L${x1 + s * 8} ${y1 + 16}`;
+  }
+  return <Ink d={p} width={3.6} taper={false} vary={0} seed="s10/stomp" />;
+};
+
+/** Wrap FR1: a CROSS face for the 'hey!': two 5 px ink brow slashes over his eyes, inner ends low (toward the trunk),
+ *  drawn through Pip's own transform (Elephant: translate, rotate, scale(flip x scale), squash), so they ride the stamp.
+ *  Points are the trunk-up front rig's head frame (poses.ts frontRig: head at (1.6 look, -69), tilt -7 + 2 look). */
+const HeyBrows: React.FC<{m: Mat; look: number}> = ({m, look}) => {
+  const H: Pt = [look * 1.6, -69];
+  const tilt = ((-7 + look * 2) * Math.PI) / 180;
+  const hp = (p: Pt): Pt => [p[0] * Math.cos(tilt) - p[1] * Math.sin(tilt) + H[0], p[0] * Math.sin(tilt) + p[1] * Math.cos(tilt) + H[1]];
+  const ap = (p: Pt): Pt => [m[0] * p[0] + m[2] * p[1] + m[4], m[1] * p[0] + m[3] * p[1] + m[5]];
+  let d = '';
+  for (const s of [-1, 1]) {
+    const ex = s * 9.6 + look * 2.2;
+    const a = ap(hp([ex - s * 3.6, -7.4]));
+    const b = ap(hp([ex + s * 4.6, -12.6]));
+    d += `M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${b[0].toFixed(1)} ${b[1].toFixed(1)}`;
+  }
+  return <Ink d={d} width={5} taper={false} vary={0} seed="s10/brows" />;
 };
 
 export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
@@ -243,7 +314,9 @@ export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
     ...(T.lookCart !== undefined ? [{t: T.lookCart, pose: 'stand-side' as const, look: 0.2, amount: 0.15}] : []),
     // GAG (A1 FR2): mirrored 'trunk-up' (mouth open, trumpet marks, ears spread), wide eyes: the trunk raised and curled
     // up-left AT siteM's plaque (A1 FR1's mirrored 'hold' kept the closed smile + blush and read as a happy look-up)
-    {t: T.hey, pose: 'trunk-up', expression: 'wide', look: 1},
+    // Wrap FR1: 'worried' (its rig brows are inner-LOW = cross, and the eyes lose the 'wide' size + shine), with the
+    // local 5 px brow slashes (HeyBrows) on top: indignant, not cheering
+    {t: T.hey, pose: 'trunk-up', expression: 'worried', look: 1},
     // straight from the 'hey' into the hop's own pose (side-on, facing right): its crouch frames come right before the
     // take-off, so the exit has exactly ONE pose pop (fix round 2: no 3-frame back-view flicker)
     {t: T.heyEnd, pose: 'stand-side', look: 0.3},
@@ -264,14 +337,20 @@ export const Pip: React.FC<{T: PipTimes}> = ({T}) => {
   const perk = perkStretch(t, T.perk) - popSwitch(t, T.perk);
   // the 'hey!' stamp replaces its pose-switch pop
   const stamp = heyStamp(t, T.hey) - popSwitch(t, T.hey);
+  // Wrap FR1: Pip's own matrix in the 'hey!' (Elephant: translate rotate scale(fx scale, scale) scale(squash)), with the
+  // squash ElephantTimeline adds (its pops into the 'hey' key and toward the next one), for the brows
+  const sqAll = land + crouch.squash + perk + stamp + popSwitch(t, T.hey) + popSwitch(t, T.heyEnd);
+  const heyM = mat.compose(mat.translate(px, py), mat.rotate(rot), mat.scale(-PIP.scale * (1 + sqAll * 0.55), PIP.scale * (1 - sqAll)));
   // the leap's speed lines retract over the 2 frames after touch-down
   const vLand = leapV(CROUCH + ARC - 1e-3, T);
   return (
     <>
       {dl >= 0 && dl < 2 / 30 ? <PipSmear x={px} y={py} vx={vLand[0]} vy={vLand[1]} sc={PIP.scale} k={1 - dl / (2 / 30)} seed="s10/pipLeapSpd" /> : null}
       <ElephantTimeline x={px} y={py} scale={PIP.scale} t={t} seed={PIP.seed} keys={keys} flip={heyOn || cartOn} rotate={rot} squash={land + crouch.squash + perk + stamp} idle={0.25} />
+      {heyOn ? <HeyBrows m={heyM} look={1} /> : null}
+      <StompTicks at={T.hey} x={px} y={py} />
       <HeySpark at={T.hey + 0.04} end={T.sparkEnd ?? T.heyEnd} />
-      <HeyBubble at={T.hey + 0.06} end={(T.sparkEnd ?? T.heyEnd) + 0.08} />
+      <ShoutBubble at={T.hey} end={T.heyEnd} />
     </>
   );
 };

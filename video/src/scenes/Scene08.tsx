@@ -34,15 +34,16 @@ import {ShotCam} from '../lib/ShotCam';
 import {Tod} from '../lib/tod';
 import {Ink} from '../lib/Ink';
 import {line} from '../lib/sketch';
+import {Fill} from '../lib/Fill';
 import {rand} from '../lib/rng';
 import type {SkyKey} from '../lib/World';
 import {CounterBoard, counterBoardZones, SunGlowSteps} from './shared/props';
 import {DomeCity, DOME, TelephoneWires, WIRES} from './shared/sets';
 import {DUR, GATES_AT, T} from './scene08/times';
 import {TallyGates, tallySlots} from './scene08/tally';
-import {BOARD, copingY, depthOf, DOME8, domeY, DOORS3, flankX, PIP, PUSH_X, R2, TOWER8} from './scene08/layout';
+import {BOARD, copingY, depthOf, DOME8, DOORS3, flankX, PIP, PUSH_X, R2, TOWER8} from './scene08/layout';
 import {BitRide, CopySpec, GlintSweep, PaperSpecks, Pigeons, Pip, StampHit, WindowWink, WireCopy} from './scene08/cast';
-import {climberSlots, clumpBand, CrowdFig, Flood, GlassPulse, heapSlots, NearCrowd, NearFig, outsideDome, Pile, PileFig, Rattler, RattlerSpec, roofBand} from './scene08/crowd';
+import {clumpBand, CrowdFig, Flood, GlassPulse, heapSlots, NearCrowd, NearFig, outsideDome, Pile, PileFig, Rattler, RattlerSpec, roofBand} from './scene08/crowd';
 import {BeamSpot, Searchlight8, Watchtower8} from './scene08/tower';
 import {BoardNote, InkStamp, MinuteWedge} from './scene08/shims';
 import {DeckClutter, District, LightDoors, Neighbours, NEIGHBOUR_F, WireSpans} from './scene08/extras';
@@ -284,12 +285,16 @@ const RATTLERS2: RattlerSpec[] = R2.map((q, i) => ({
  *  A1 fix round 2: the heap stands at the dome's depth BEHIND row 2 (drawn in the dome layer): its feet (base 1124) are
  *  hidden by row 2's roofs / back-fill, so it rises from behind the rooftops instead of floating on the peach band;
  *  3/4-turned hoodies in coat colours (an ink hood on 1 in 4), 2-3 px apart, 3 px rims, sand hands on the glass. */
-const HEAP_BASE = 1124;
+// A1 fix round 3: the base 12 px lower (row 2's roofline cuts it), every figure at screen x >= 60 (world 72: clear of
+// the left paper edge through the push), slots jittered +-6 / +-5 px, leaning 5-10 deg into the glass; the
+// 'millions' shoulder climbers are gone (a human ruler up the dome's outline): the heap stays at the dome's foot.
+const HEAP_BASE = 1136;
 const PILE: PileFig[] = (() => {
-  const slots = heapSlots({seed: 's8/heap', base: HEAP_BASE, top: 930, left: -130, h: [25, 32], dy: 15, gap: 2.2, minX: -36});
+  const slots = heapSlots({seed: 's8/heap', base: HEAP_BASE, top: 930, left: -130, h: [25, 32], dy: 15, gap: 2.2, minX: 72, jx: 6, jy: 5, rot: [5, 10]}).filter((q) => q.y - q.h > 952);
   const byD = [...slots].sort((a, b) => a.d - b.d);
   const order = new Map(byD.map((q, i) => [q, i]));
-  const WAVES = [6, 16, 40, 46];
+  const N = slots.length;
+  const WAVES = [0.12, 0.32, 0.72, 0.86].map((u) => Math.round(u * N));
   const n2 = WAVES[2] - WAVES[1];
   const out: PileFig[] = slots.map((q, idx) => {
     const i = order.get(q)!;
@@ -307,21 +312,13 @@ const PILE: PileFig[] = (() => {
       rot: q.rot,
       at,
       hood: true,
-      fill: Math.floor(rand('s8/pc', `${idx}`) * 4) as 0 | 1 | 2 | 3,
-      dark: rand('s8/pd', `${idx}`) < 0.25,
+      fill: Math.floor(rand('s8/pc', `${idx}`) * 6),
+      dark: rand('s8/pd', `${idx}`) < 0.15,
       reachTo,
       reach: !q.wall && rand('s8/pr', `${idx}`) < 0.3,
       taps: [at + 0.02, ...(stage < 2 ? [T.thousands + (i % 4) * 0.05] : []), T.in + (i % 5) * 0.04, T.stamp1Ring + ((i * 3) % 7) * 0.03, T.millions + (i % 5) * 0.05, T.within + (i % 4) * 0.08],
       flash: hit ? T.hacking : undefined,
     };
-  });
-  // 'millions': climbers carry the heap on up over the shoulder (feet ON the arc, hands on the glass up-slope), all up by
-  // 'millions' + 1 frame
-  const climb = climberSlots({seed: 's8/climb', x0: flankX(930, -1) + 14, x1: DOME8.cx - 70, n: 11, h: [22, 28]});
-  climb.forEach((q, i) => {
-    const at = T.millions + (i % 2) * 0.033;
-    const rx = q.x + 0.5 * q.h;
-    out.push({x: q.x, y: q.y, h: q.h, rot: q.rot, at, hood: true, fill: (i % 4) as 0 | 1 | 2 | 3, dark: i % 4 === 1, reachTo: [rx, domeY(rx) + 1.5], taps: [at + 0.03, T.wave2 + (i % 4) * 0.05, T.within + (i % 3) * 0.1]});
   });
   // back to front: higher figures first
   return out.sort((a, b) => a.y - b.y);
@@ -353,12 +350,118 @@ const behindBoard2 = (x: number, y: number) => x > 450 && x < 870 && y > 1092;
 const behindBoard3 = (x: number) => x > 400 && x < 905;
 const inDomeSkip = (x: number, y: number, h: number) => outsideDome(x, y, h) || (x > DOME8.cx - DOME8.rx - 4 && x < DOME8.cx + DOME8.rx + 4 && y > DOME8.by - 30 && y < DOME8.by + 8);
 
+/** A1 fix round 3 (the reviewers: with sound off 'tens of thousands' was not in the picture): every counted word also
+ *  adds people in the open LEFT THIRD (on screen through the push): a share of the row-2 rooftop crowd left of the board
+ *  pops early, in clumps, with the glass ring ('they' 2 / 'tens' 5 / 'thousands' 13 / 'hacking' 4 / 'attempts' 2 /
+ *  comma 2), and queues grow beside the three near door rattlers (1 / 3 / 7 / 2 / 1 / 1). 'millions' floods the rest. */
+const COUNT_STEPS: [number, number, number][] = [
+  // [time, row-2 roof figures, near queue figures]
+  [T.they + 0.04, 2, 1],
+  [T.tens + 0.04, 5, 3],
+  [T.thousands + 0.06, 13, 7],
+  [T.hacking + 0.02, 4, 2],
+  [GATES_AT[7], 2, 1],
+  [GATES_AT[8], 2, 1],
+];
+/** Assigns the count steps' onsets to `figs` in order (a 2-frame ripple per clump); the rest keep their own. */
+function countOnsets<F extends {at: number}>(figs: F[], k: 1 | 2): F[] {
+  let n = 0;
+  const out = figs.map((f) => ({...f}));
+  for (const step of COUNT_STEPS) {
+    for (let j = 0; j < step[k] && n < out.length; j++, n++) out[n].at = step[0] + Math.min(j, 6) * 0.017;
+  }
+  return out;
+}
+
+/** Near queues beside the three left door rattlers (row 3, near layer): hooded busts in coat colours lined up between
+ *  the doors (x 60-300 world, clear of Pip), a front rank at 1426 and a smaller back rank at 1414. */
+const QUEUE: CrowdFig[] = (() => {
+  const spots: [number, number, number][] = [
+    // x, base y, h (in the order they join the count)
+    [168, 1426, 50],
+    [262, 1426, 52],
+    [80, 1426, 48],
+    [192, 1414, 44],
+    [148, 1414, 42],
+    [286, 1414, 44],
+    [102, 1414, 44],
+    [244, 1416, 42],
+    [60, 1416, 42],
+    [176, 1404, 38],
+    [270, 1404, 38],
+    [126, 1404, 38],
+    [86, 1404, 36],
+    [154, 1396, 34],
+    [232, 1398, 34],
+  ];
+  return countOnsets(
+    spots.map(([x, y, h], i) => ({x: x + (rand('s8/q', `x${i}`) - 0.5) * 6, y, h, at: 1e6, rank: y > 1420 ? 2 : y > 1408 ? 1 : 0, fill: (i % 2) as 0 | 1, hood: true})),
+    2,
+  );
+})();
+
+/** A1 fix round 3: the 'millions' sea POURS at the dome: four tongues of figures down ALLEYS cut between row-2
+ *  buildings (from row 1's street at 1124 to row 2's street at 1300, widening toward us), sizes 9 -> 17 px with depth,
+ *  every figure walking / leaning toward the dome's centre, popping back to front over 0.2 s (the pour). */
+const ALLEYS = [
+  {x: 186, w0: 16, w1: 44},
+  {x: 298, w0: 16, w1: 44},
+  {x: 986, w0: 16, w1: 44},
+  {x: 1052, w0: 16, w1: 44},
+];
+const ALLEY_Y: [number, number] = [1122, 1300];
+const alleyHalf = (a: (typeof ALLEYS)[number], y: number) => lerp(a.w0, a.w1, (y - ALLEY_Y[0]) / (ALLEY_Y[1] - ALLEY_Y[0])) / 2;
+const ALLEY_GEO = (() => {
+  let fill = '';
+  let ink = '';
+  for (const a of ALLEYS) {
+    const [y0, y1] = ALLEY_Y;
+    const l0 = a.x - a.w0 / 2;
+    const r0 = a.x + a.w0 / 2;
+    const l1 = a.x - a.w1 / 2;
+    const r1 = a.x + a.w1 / 2;
+    fill += `M${l0} ${y0}L${r0} ${y0}L${r1} ${y1}L${l1} ${y1}Z`;
+    ink += line(l0, y0 - 4, l1, y1, {seed: `s8/al${a.x}`, over: [0, 0]}) + line(r0, y0 - 4, r1, y1, {seed: `s8/ar${a.x}`, over: [0, 0]});
+  }
+  return {fill, ink};
+})();
+const TONGUES: CrowdFig[] = (() => {
+  const out: CrowdFig[] = [];
+  for (const a of ALLEYS) {
+    const toward = Math.sign(DOME8.cx - a.x) || 1;
+    for (let y = ALLEY_Y[0] + 9, j = 0; y <= ALLEY_Y[1] + 2; j++) {
+      const v = (y - ALLEY_Y[0]) / (ALLEY_Y[1] - ALLEY_Y[0]);
+      const h = lerp(9, 17, v);
+      const half = alleyHalf(a, y);
+      const n = Math.max(1, Math.round((2 * half) / (0.6 * h)));
+      for (let i = 0; i < n; i++) {
+        const k = `${a.x}/${j}/${i}`;
+        const x = a.x - half + ((i + 0.5) / n) * 2 * half + (rand('s8/tg', `x${k}`) - 0.5) * 0.3 * h;
+        out.push({x, y: y + (rand('s8/tg', `y${k}`) - 0.5) * 3, h: h * (0.85 + 0.3 * rand('s8/tg', `h${k}`)), at: WAVE.row2 + (1 - v) * 0.2, rank: j, fill: ((i + j) % 2) as 0 | 1, hood: true, vx: toward * (3 + 3 * rand('s8/tg', `v${k}`))});
+      }
+      y += 0.55 * h;
+    }
+  }
+  return out;
+})();
+const Alleys: React.FC<{at: number}> = ({at}) => {
+  const t = useTimeLocal();
+  if (t < at) return null;
+  return (
+    <>
+      <Fill d={ALLEY_GEO.fill} color={palette.sand} offset={false} mode="snap" seed="s8/alley" />
+      <Ink d={ALLEY_GEO.ink} width={1.4} taper={false} seed="s8/alleyi" />
+    </>
+  );
+};
+
 const FLOOD = (() => {
   // fix round 3b (the reviewers: 'make the flood a MASS, not a texture line'): every building of rows 0-2 gets a PACKED
-  // rooftop crowd (roofs.ts replays the set's own rows) in clumps with 1-5 px gaps and ~5 % empty roofs: rows 0-1 at
-  // 7-12 px, row 2 at 13-19 px, 3 ranks on the burst + a 4th on wave 2 (the far skyline: silhouettes on the peach band
-  // and against the sun); plus street clumps at the foot of rows 0 / 1 / 2 (seen in the gaps between the nearer
-  // roofs) that walk toward the dome; a mid tier of 20-30 px raised-arm busts on the row-3 roofs either side of the board.
+  // rooftop crowd (roofs.ts replays the set's own rows); plus street crowds at the foot of rows 0 / 1 / 2 (seen in the
+  // gaps between the nearer roofs) that walk toward the dome; a mid tier of 20-30 px busts on the row-3 roofs either
+  // side of the board. A1 fix round 3, the HAZE LADDER: rows 0 / 1 are continuous value stipple (no empty roofs, no
+  // clump gaps; round dot heads in hazed coat colours), row 1's street is a 4-rank sheet; rows 2 / 3 and the streets in
+  // jittered ranks (no bleacher lines); the ink and the darkest values stay with the near crowd.
   // 'use it' (fix round 3b: the 4-8 px specks read as grass): four clumps of 11-15 px figures (two ranks) on row-2
   // ROOFTOPS right of the dome, visible at rest, popping 0.08 s apart; they stay and become part of the flood
   const useIt = [
@@ -367,42 +470,63 @@ const FLOOD = (() => {
     [902, 966],
     [998, 1060],
   ].flatMap(([x0, x1], k) => roofBand(`s8/u${k}`, 2, x0, x1, [11, 15], [T.useIt + k * 0.08, T.useIt + k * 0.08], {ranks: 2, clump: [5, 7], empty: 0, arms: 20, rank0: 3}));
-  const row2 = [
-    ...roofBand('s8/r2', 2, -40, 1120, [13, 19], [WAVE.row2, WAVE.row2, WAVE.row2], {ranks: 3, rank0: 1, arms: 20, empty: 0.05, skip: behindBoard2}),
-    ...roofBand('s8/r2w', 2, -40, 1120, [13, 19], [0, 0, 0, T.wave2], {ranks: 4, rankFrom: 3, rank0: 0, empty: 0.05, skip: behindBoard2, span: 0.2, order: 'ltr'}),
+  const r2main = [
+    ...roofBand('s8/r2', 2, -40, 1120, [13, 19], [WAVE.row2, WAVE.row2, WAVE.row2], {ranks: 3, rank0: 1, arms: 20, empty: 0.05, skip: (x, y) => behindBoard2(x, y) || (x > 94 && x < 211), jy: 4, xj: 0.12}),
+    // the two roofs at x 94-211 (the seeded 5 % left them empty: they sit in the counted left third)
+    ...roofBand('s8/r2c', 2, 94, 211, [13, 19], [WAVE.row2, WAVE.row2, WAVE.row2], {ranks: 3, rank0: 1, arms: 20, empty: 0, jy: 4, xj: 0.12}),
   ];
+  // the counted share: the front two ranks on the roofs left of the board, building by building (a seeded order)
+  const isCount = (f: CrowdFig) => f.x > 64 && f.x < 425 && f.rank >= 2;
+  // runs of 3-4 neighbours (front rank first), the runs in a seeded order: each word's figures pop as clumps spread
+  // over several roofs, not one roof filling up
+  const cand = r2main.filter(isCount).sort((a, b) => b.rank - a.rank || a.x - b.x);
+  const runs: CrowdFig[][] = [];
+  for (const f of cand) {
+    const r = runs[runs.length - 1];
+    if (r && r.length < 4 && r[0].rank === f.rank && f.x - r[r.length - 1].x < 16) r.push(f);
+    else runs.push([f]);
+  }
+  const counted = countOnsets(runs.sort((a, b) => rand('s8/cb', `${a[0].rank}/${Math.round(a[0].x)}`) - rand('s8/cb', `${b[0].rank}/${Math.round(b[0].x)}`)).flat(), 1);
+  const row2 = [
+    ...r2main.filter((f) => !isCount(f)),
+    ...counted,
+    ...roofBand('s8/r2w', 2, -40, 1120, [13, 19], [0, 0, 0, T.wave2], {ranks: 4, rankFrom: 3, rank0: 0, empty: 0.05, skip: behindBoard2, span: 0.2, order: 'ltr', jy: 4, xj: 0.12}),
+  ];
+  const far = {empty: 0, cgap: 0};
   const row1 = [
-    ...roofBand('s8/r1', 1, -40, 1120, [9, 12], [WAVE.row1, WAVE.row1, WAVE.row1], {ranks: 3, rank0: 1, arms: 24, empty: 0.05, skip: inDomeSkip}),
-    ...roofBand('s8/r1w', 1, -40, 1120, [9, 12], [0, 0, 0, T.wave2 + 0.03], {ranks: 4, rankFrom: 3, rank0: 0, empty: 0.05, skip: inDomeSkip, span: 0.22, order: 'ltr'}),
+    ...roofBand('s8/r1', 1, -40, 1120, [9, 12], [WAVE.row1, WAVE.row1, WAVE.row1], {ranks: 3, rank0: 1, arms: 24, skip: inDomeSkip, ...far}),
+    ...roofBand('s8/r1w', 1, -40, 1120, [9, 12], [0, 0, 0, T.wave2 + 0.03], {ranks: 4, rankFrom: 3, rank0: 0, skip: inDomeSkip, span: 0.22, order: 'ltr', ...far}),
   ];
   const row0 = [
-    ...roofBand('s8/r0', 0, -40, 1120, [7, 9], [WAVE.row0, WAVE.row0, WAVE.row0], {ranks: 3, rank0: 1, arms: 30, empty: 0.05, skip: inDomeSkip}),
-    ...roofBand('s8/r0w', 0, -40, 1120, [7, 9], [0, 0, 0, T.wave2 + 0.06], {ranks: 4, rankFrom: 3, rank0: 0, empty: 0.05, skip: inDomeSkip, span: 0.24, order: 'ltr'}),
+    ...roofBand('s8/r0', 0, -40, 1120, [7, 9], [WAVE.row0, WAVE.row0, WAVE.row0], {ranks: 3, rank0: 1, arms: 30, skip: inDomeSkip, ...far}),
+    ...roofBand('s8/r0w', 0, -40, 1120, [7, 9], [0, 0, 0, T.wave2 + 0.06], {ranks: 4, rankFrom: 3, rank0: 0, skip: inDomeSkip, span: 0.24, order: 'ltr', ...far}),
   ];
-  // the streets: clumps at the foot of row 0 (behind row 1), row 1 (on the StreetStrip, behind row 2) and row 2 (above
-  // the low row-3 sheds), walking toward the dome
+  // the streets: row 0's foot (behind row 1), row 1's street as a continuous 4-rank stipple sheet (behind row 2), row
+  // 2's street (above the low row-3 sheds) in jittered ranks, all walking toward the dome
   const st0 = [
-    ...clumpBand('s8/s0a', -40, 1120, 1048, 7, WAVE.row0, 0, {clump: [4, 8], gap: [0, 6], jy: 2, skip: inDomeSkip, toward: DOME8.cx, vx: 3}),
-    ...clumpBand('s8/s0b', -30, 1120, 1053, 8, T.wave2 + 0.06, 0.24, {order: 'ltr', clump: [4, 8], gap: [0, 8], jy: 2, skip: inDomeSkip, toward: DOME8.cx, vx: 3}),
+    ...clumpBand('s8/s0a', -40, 1120, 1048, 7, WAVE.row0, 0, {clump: [6, 10], gap: [0, 1], jy: 2, skip: inDomeSkip, toward: DOME8.cx, vx: 3}),
+    ...clumpBand('s8/s0b', -30, 1120, 1053, 8, T.wave2 + 0.06, 0.24, {order: 'ltr', clump: [6, 10], gap: [0, 1], jy: 2, skip: inDomeSkip, toward: DOME8.cx, vx: 3}),
   ];
   const st1 = [
-    ...clumpBand('s8/s1a', -40, 1120, 1114, 9, WAVE.row1, 0, {clump: [4, 8], gap: [0, 6], jy: 3, arms: 24, skip: inDomeSkip, toward: DOME8.cx, vx: 4}),
-    ...clumpBand('s8/s1b', -30, 1120, 1124, 10, T.wave2 + 0.03, 0.22, {order: 'ltr', clump: [4, 8], gap: [0, 8], jy: 3, skip: inDomeSkip, toward: DOME8.cx, vx: 4}),
+    ...clumpBand('s8/s1c', -40, 1120, 1104, 8, WAVE.row1, 0, {clump: [6, 10], gap: [0, 1], jy: 2, fj: 2.5, xj: 0.15, skip: inDomeSkip, toward: DOME8.cx, vx: 3}),
+    ...clumpBand('s8/s1a', -40, 1120, 1112, 9, WAVE.row1, 0, {clump: [6, 10], gap: [0, 1], jy: 2, fj: 2.5, xj: 0.15, skip: inDomeSkip, toward: DOME8.cx, vx: 4}),
+    ...clumpBand('s8/s1d', -40, 1120, 1120, 9, WAVE.row1, 0, {clump: [6, 10], gap: [0, 1], jy: 2, fj: 2.5, xj: 0.15, skip: inDomeSkip, toward: DOME8.cx, vx: 4}),
+    ...clumpBand('s8/s1b', -30, 1120, 1128, 10, T.wave2 + 0.03, 0.22, {order: 'ltr', clump: [6, 10], gap: [0, 1], jy: 2, fj: 2.5, xj: 0.15, skip: inDomeSkip, toward: DOME8.cx, vx: 4}),
   ];
   const st2 = [
-    ...clumpBand('s8/bm0', -40, 1120, 1294, 13, WAVE.row2, 0, {clump: [3, 7], gap: [0, 8], jy: 3, arms: 20, toward: DOME8.cx, vx: 8}),
-    ...clumpBand('s8/bm1', -30, 1120, 1304, 15, WAVE.row2, 0, {clump: [3, 7], gap: [0, 10], jy: 3, arms: 20, toward: DOME8.cx, vx: 9}),
-    ...clumpBand('s8/bm2', -20, 1120, 1313, 17, T.wave2, 0.2, {order: 'ltr', clump: [2, 5], gap: [6, 24], jy: 3, arms: 20, toward: DOME8.cx, vx: 10}),
+    ...clumpBand('s8/bm0', -40, 1120, 1292, 13, WAVE.row2, 0, {clump: [3, 7], gap: [0, 8], jy: 8, fj: 3, xj: 0.2, arms: 20, toward: DOME8.cx, vx: 8}),
+    ...clumpBand('s8/bm1', -30, 1120, 1304, 15, WAVE.row2, 0, {clump: [3, 7], gap: [0, 10], jy: 8, fj: 3, xj: 0.2, arms: 20, toward: DOME8.cx, vx: 9}),
+    ...clumpBand('s8/bm2', -20, 1120, 1314, 17, T.wave2, 0.2, {order: 'ltr', clump: [2, 5], gap: [6, 24], jy: 8, fj: 3, xj: 0.2, arms: 20, toward: DOME8.cx, vx: 10}),
   ];
   // the mid tier: 20-30 px hooded busts on the row-3 rooftops either side of the board (between the 60-90 px rattlers
-  // and the far crowd). A1 fix round 1: every crowd is HOODED (0.9) and at most one in ~20 reaches toward the dome (the
-  // raised arms read as a cheering concert crowd)
+  // and the far crowd), hooded, at most one in ~20 reaching toward the dome
   const mid = [
-    ...roofBand('s8/r3', 3, -40, 1120, [20, 30], [WAVE.mid, WAVE.mid], {ranks: 2, rank0: 1, clump: [3, 6], empty: 0.05, arms: 20, skip: (x) => behindBoard3(x), dy: 1}),
+    ...roofBand('s8/r3', 3, -40, 1120, [20, 30], [WAVE.mid, WAVE.mid, WAVE.mid], {ranks: 3, rank0: 1, clump: [3, 6], empty: 0.05, arms: 20, skip: (x) => behindBoard3(x), dy: 1, jy: 6, xj: 0.15}),
     // wave 2: 'more rattlers crowd row 3': a street crowd of 38-50 px busts at the row-3 doors where no rattler stands
-    // (left of the first door, right of the board)
-    ...clumpBand('s8/s3', 890, 1120, 1438, 44, T.wave2, 0.12, {order: 'ltr', clump: [3, 5], gap: [0, 6], jy: 3, arms: 20, rank: 0}),
-    ...clumpBand('s8/s3l', -40, 70, 1440, 44, T.wave2 + 0.05, 0.08, {order: 'ltr', clump: [2, 3], gap: [0, 4], jy: 3, arms: 20, rank: 0}),
+    // (left of the first door, right of the board), in two jittered ranks
+    ...clumpBand('s8/s3k', 900, 1120, 1424, 38, T.wave2, 0.12, {order: 'ltr', clump: [3, 5], gap: [0, 4], jy: 6, fj: 4, xj: 0.2, arms: 20, rank: 0}),
+    ...clumpBand('s8/s3', 890, 1120, 1438, 44, T.wave2, 0.12, {order: 'ltr', clump: [3, 5], gap: [0, 6], jy: 6, fj: 4, xj: 0.2, arms: 20, rank: 1}),
+    ...clumpBand('s8/s3l', -40, 70, 1440, 44, T.wave2 + 0.05, 0.08, {order: 'ltr', clump: [2, 3], gap: [0, 4], jy: 6, fj: 4, xj: 0.2, arms: 20, rank: 1}),
   ];
   return {
     row0: row0 as CrowdFig[],
@@ -756,7 +880,7 @@ const EXTRAS: Record<string, React.ReactNode> = {
       <WindowWink x={560} y={1078} cols={3} rows={2} at={T.that + 0.02} size={6} />
       <g clipPath="url(#s8domeclip)">
         {/* A1 fix round 2: a dense far district (row-0/1 scale) pops WITH the glass, its window dots + landmark later */}
-        <District at={T.dome + 0.36} chromeAt={T.cloudflare + 0.42} />
+        <District at={T.dome + 0.36} chromeAt={T.cloudflare + 0.42} duskAt={T.day} />
       </g>
       <StreetStrip />
       <DuskWindows row="row1" />
@@ -786,6 +910,8 @@ const EXTRAS: Record<string, React.ReactNode> = {
     <>
       <PaperSpecks spots={PAPER} />
       <DuskWindows row="row2" />
+      <Alleys at={WAVE.row2} />
+      <Flood figs={TONGUES} flickerAt={T.duskIdle} seed="s8/ft" tier={2} />
       <Flood figs={FLOOD.row2} flickerAt={T.duskIdle} seed="s8/f2" tier={2} />
       <LightDoors row={2} />
       {RATTLERS2.map((r) => (
@@ -798,6 +924,7 @@ const EXTRAS: Record<string, React.ReactNode> = {
     <>
       <LightDoors row={3} />
       <Flood figs={FLOOD.mid} flickerAt={T.duskIdle} seed="s8/f3" tier={3} />
+      <Flood figs={QUEUE} flickerAt={T.duskIdle} seed="s8/fq" tier={3} />
       {RATTLERS3.map((r) => (
         <Rattler key={r.seed} {...r} />
       ))}
