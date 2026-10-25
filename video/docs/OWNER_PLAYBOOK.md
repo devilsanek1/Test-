@@ -38,6 +38,9 @@ Format: **rule** — why / evidence (video, date).
 - **The first 2 s and first 5 s get the most polish; the first 10 s get the next most.** Quirks late in the video are acceptable. — v1, 2026-10-25.
 - **State the payoff in words from frame 0** (a bold claim on the first frame, starting mid-action). A calm, pretty
   opening frame lost about 80 % of viewers by 3 s. — v1 Instagram insights after 45 min (155 views, 70 viewers, avg 21 s / 55 s), 2026-10-25.
+- **The hook is a concrete, surprising claim with stakes (names / numbers / a curiosity gap), stronger than a plain
+  news headline** ("Engineers are leaving Google!" was the owner's starting point, asked to be made more powerful);
+  **every hook fact is verified against the primary source before the hook is locked.** — v2 topic, 2026-10-25.
 - **Target 30-45 s and end close to the payoff.** Viewers who passed the hook stayed until about 40 s, then left once
   the story felt resolved. — same insights.
 - **Every frame should be at least 8/10, with no dead frames, and cuts locked to the beat** (the owner's creator-reel tips). — v1.
