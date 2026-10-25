@@ -27,6 +27,10 @@ Format: **rule** — why / evidence (video, date).
   you...", what to lean on, e.g. [deadpan, like you're stating the obvious, tiny pause after "PHP"]), then the line;
   CAPS for emphasis, … for beats, numbers spelled out; no ms, wpm or technical notes. Template: `docs/v3/script/script_elevenlabs.md`.
   — owner, v3 G1, 2026-10-25.
+- **ElevenLabs paste files are paste-safe:** only tags and spoken words (no titles, notes, labels or alternates: v4 read
+  them aloud); tags describe delivery only and NEVER quote script words (v4 spoke the quoted phrases); put a short tag
+  right where the delivery changes, mid-line if needed (a tag carries on until the next one), and show emphasis with CAPS
+  in the line. Alternate hooks go in their own paste file. — owner's first v3 take, 2026-10-25.
 - **Voice: the treated ElevenLabs WAV is the quality bar.** An untreated or cheaper TTS sounded "cheap". — v1.
 
 ## Music and sound
