@@ -53,12 +53,14 @@ Format: **rule** — why / evidence (video, date).
 
 ## Visual style
 - **Hand-drawn ink, flat colour, like reference video 1.** — (v1, 2026-10-24).
-- **Every frame is FULL and ALIVE, at the density of reference video 1 (France) and v1 (PHP):** dressed sets (buildings
-  with windows, signs, notices, plants, bikes, shelves), people (back view) near and far, layered depth, a recurring
-  living character (the reference's sun and cat, our mascot), and constant motion (>= 5 medium visual events per second,
-  no gap over 1 s, an idle layer always on). Big flat empty fields and an object alone on a blank wall are failures,
-  even in a draft. Density belongs to the set build (G5), not to polish. — ("the scenes are way too empty ... those
-  feel a lot more alive", v3 G5, 2026-10-26).
+- **Every scene must FEEL ALIVE: that is the key, not an object count.** Aliveness comes from a dense, detailed world
+  (a city full of buildings and windows, a room full of real things), people near and far, layered depth, a recurring
+  living character, and ambient life that never stops (clouds drifting, birds, snow, steam, lights switching, small
+  movements). Even Arcane's rooftop shot feels alive from the city's density and detail, the clouds and the birds. The
+  references set the bar (reference 1 France, v1 PHP); numbers from `scripts/qa/density.py` are a warning signal, never
+  a quota. Big flat empty fields and an object alone on a blank wall are failures, even in a draft; density belongs to
+  the set build (G5), not to polish. — ("way too empty ... those feel a lot more alive", then "less prescriptive on
+  the amount of objects, but feeling alive is absolutely the key", v3 G5, 2026-10-26).
 - **Scale moments, occasionally: make the viewer feel small**, using Arcane's camera work and staging, never its footage.
   Keep it nuanced (it's still TikTok). The owner liked v1's scale scenes. — (v1, 2026-10-24/25).
 - **Arcane references: ENVIRONMENT ONLY, few and high-confidence** (buildings, cityscapes, interiors as spaces, wides;
