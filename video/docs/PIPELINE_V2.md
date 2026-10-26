@@ -38,8 +38,8 @@ one is approved.
 | G2 Voice lock | the owner records the take in ElevenLabs; we clean it (cut anything misread) and take word timings; no video (owner, 2026-10-25) | voice, pace | the clock (word timings) | 30 min |
 | **G3 Sketch animatic** | ONE video: the whole film as line sketches timed to the voice, rough camera, **every transition labelled** (visual concepts are explored and judged internally; owner rule: one version) — tool: `SketchReel` (`src/v3/SketchReel.tsx`, data in `public/v3/animatic.json`) | **story in pictures**: shot per line, cuts, transitions, peaks | scene list, cut points, shot content, transition types | first cut 2 h; rounds 30 min |
 | G4 Look (parallel to G3) | 1-3 finished stills plus a 3-5 s motion test | palette, line, mascot, edges | visual language | house style: 15-min check |
-| G5 Blocking cut | real sets and props at draft quality, final camera, key poses, **no edges/paper/texture** | staging, readability at phone size, transitions that play | compositions, camera, timing | 4 h |
-| G6 Polish cut | easing, secondary motion, edges, paper; **AI critics start here**; last, an *optional* tactical texture pass on a few elements (playbook) | feel only (no restaging) | the picture | 6 h, 1 round + bug fixes |
+| G5 Blocking cut | real sets and props at draft line quality but **reference density** (dressed sets, people, a living character, the idle layer on: `OWNER_PLAYBOOK` Visual style; v3 G5 was "way too empty"), final camera, key poses, **no edges/paper/texture** | staging, readability at phone size, transitions that play | compositions, camera, timing | 4 h |
+| G6 Polish cut | life (>= 5 medium events/s, no gap > 1 s, measured), easing, secondary motion, edges, paper, full-res 60 fps; **AI critics start here**; last, an *optional* tactical texture pass on a few elements (playbook) | feel only (no restaging) | the picture | 6 h, 1 round + bug fixes |
 | G7 Sound | SFX from the final beats, music, -14 LUFS mix | mix | audio | 1 h |
 | G8 Final | full-res render, QA, cover, posting kit | blockers only | everything | 1.5 h |
 

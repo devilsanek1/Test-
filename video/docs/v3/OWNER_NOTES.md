@@ -53,3 +53,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-26, G5: the S5 pull-back proposal for S9 + S9b (`deliverables/v3/v3_proposal_pullback.mp4`, `docs/v3/proposal_pullback.md`):
   "pretty good, yeah, continue, swap". -> S9 + S9b become one S5 pull-back crane panel S9 (19.40-22.68) in the locked
   board and in G5.
+
+## Production (G5 on)
+- 2026-10-26, G5 cut (with the S9 pull-back): "getting there, but the scenes are way too empty; compare with the first
+  reference about France and our PHP video, those feel a lot more alive ... if those are the final versions it's not
+  good enough; the quality and smoothness is not there; let me know if this is an intermediate step". -> rules: Visual
+  style (full and alive), Process (say the stage); PIPELINE G5/G6 updated; a density + life pass for v3.
