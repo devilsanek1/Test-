@@ -36,7 +36,7 @@ one is approved.
 | **G0.5 Core line** (owner, 2026-10-25) | the top 3 candidate lines on one screen | **the one sentence** the whole video exists to land, the one that gets the biggest emotional reaction (v3 example: "AI is making your PC more expensive") | the core line: it becomes the frame-0 text, the hook's seed, the cover and title text and the payoff's callback, and every script line must serve it | 1 h, after the facts are locked |
 | G1 Script | **the ElevenLabs-ready script** (a short emotional cue per line, v1 format), plus **3 hook-line variants**; no voice from us (owner rule, 2026-10-25) | every word, hook line | meaning and order of lines | 1 h, then 15 min per round |
 | G2 Voice lock | the owner records the take in ElevenLabs; we clean it (cut anything misread) and take word timings; no video (owner, 2026-10-25) | voice, pace | the clock (word timings) | 30 min |
-| **G3 Sketch animatic** | the whole film as line sketches timed to the voice, rough camera, **every transition labelled**, 2 hook-visual variants | **story in pictures**: shot per line, cuts, transitions, peaks | scene list, cut points, shot content, transition types | first cut 2 h; rounds 30 min |
+| **G3 Sketch animatic** | ONE video: the whole film as line sketches timed to the voice, rough camera, **every transition labelled** (visual concepts are explored and judged internally; owner rule: one version) — tool: `SketchReel` (`src/v3/SketchReel.tsx`, data in `public/v3/animatic.json`) | **story in pictures**: shot per line, cuts, transitions, peaks | scene list, cut points, shot content, transition types | first cut 2 h; rounds 30 min |
 | G4 Look (parallel to G3) | 1-3 finished stills plus a 3-5 s motion test | palette, line, mascot, edges | visual language | house style: 15-min check |
 | G5 Blocking cut | real sets and props at draft quality, final camera, key poses, **no edges/paper/texture** | staging, readability at phone size, transitions that play | compositions, camera, timing | 4 h |
 | G6 Polish cut | easing, secondary motion, edges, paper; **AI critics start here**; last, an *optional* tactical texture pass on a few elements (playbook) | feel only (no restaging) | the picture | 6 h, 1 round + bug fixes |
@@ -63,8 +63,7 @@ building, and it decides the outcome:
   draft the winning spine; (3) a cold-read panel retells each draft (a list-like retelling fails) plus a flow critic
   (every line follows from the previous) and a fact check; (4) one merged script. Never structure a script as a list of
   facts to prove.
-- **G3 animatic:** 2-3 visual concepts for the hook and the peaks (the whole film in one concept, the alternatives
-  for the key moments). The owner picks at the gate.
+- **G3 animatic:** 2-3 visual concepts for the whole film, judged internally; the owner sees one animatic (one-version rule).
 - **G4 look:** 2-4 style-frame directions when the topic needs a new look.
 
 These are divergent stages: many agents, short outputs, judged together. The rules below target the convergent

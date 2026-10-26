@@ -1,9 +1,10 @@
 // Video 3 gate cuts, isolated from the v1 film and from other videos' work: RadioH1..H3 (G1 radio cut, one per hook
 // variant) read public/v3/radio_h<N>.json; Core1..3 (G0.5 core-line cards) read public/v3/core_<N>.json; TakeH1..3 (G2 radio cut on the owner's take) read
-// public/v3/take_h<N>.json (scripts/v3/build_take.py). Render: npx remotion render src/entry-v3.tsx RadioH1 out/v3_radio_h1.mp4
+// public/v3/take_h<N>.json (scripts/v3/build_take.py); Animatic (G3 sketch animatic) reads public/v3/animatic.json. Render: npx remotion render src/entry-v3.tsx RadioH1 out/v3_radio_h1.mp4
 import React from 'react';
 import {Composition, registerRoot, staticFile} from 'remotion';
 import {RadioCut, type RadioData} from './v3/RadioCut';
+import {SketchReel, type Animatic} from './v3/SketchReel';
 
 const FPS = 30;
 const V3Root: React.FC = () => (
@@ -24,6 +25,19 @@ const V3Root: React.FC = () => (
         },
       }),
     )}
+    <Composition
+      id="Animatic"
+      component={SketchReel as unknown as React.FC<Record<string, unknown>>}
+      fps={FPS}
+      width={1080}
+      height={1920}
+      durationInFrames={30}
+      defaultProps={{data: null as unknown as Animatic}}
+      calculateMetadata={async () => {
+        const data: Animatic = await (await fetch(staticFile('v3/animatic.json'))).json();
+        return {durationInFrames: Math.ceil(data.durationSec * FPS), props: {data}};
+      }}
+    />
   </>
 );
 
