@@ -124,6 +124,8 @@ deliverables/vN/vN_g5_blocking.mp4 --scale=0.5`).
   lowered and scaled under it (one line, inside the band); they move back up on the first page change after `until`.
   From the loop roll (the last page rolls back to page 1 at `captionAt`, default end - 0.22 s) the words return, so
   the last frame lands on frame 0.
+- (v2) Pages before `until` AND the page starting ON `until` stay lowered: make them one line. Credits = FilmN's own overlay keyed by the panel on screen (scenes.json `credit`), one ink-on-cream tab at y ~185-288 (under the top UI, above the band), hidden while the frame-0 words show (seam = frame 0).
+- (v2) A frame-0 credit needs a custom `Frame0Text` layout (words 70 on 340 / 424, credit 34 on 472, captions 556 at 0.68); gate_check reads Film.tsx's default F0, so re-check custom numbers. `FilmNBare` = `<Film showCaptions={false}>`, no frame0 / label / overlay: sound-off cold reads.
 
 ## 6. 60 fps notes
 
