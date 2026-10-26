@@ -110,10 +110,17 @@ Format: **rule** — why / evidence (video, date).
 - **Every frame at least 8/10, no dead frames, cuts locked to the beat.** — (v1).
 
 ## Storyboard (G3)
+- **G3 is the most important gate: an ANIMATED SKETCHBOOK of the final film.** With script and voice locked, the
+  animatic is the closest signal to the final story in as little time as possible: the story, transitions, animations
+  and camera moves already very close to their final version; detail deliberately loose placeholders (nothing
+  perfectly sharp, but the backbone of the future film clearly visible, like an urban sketcher's page — ref
+  `docs/look/ref_animated_sketchbook.png`). Spec: `docs/G3_ANIMATIC.md`. — ("frankly the most important stage ...
+  more like an animated sketchbook", 2026-10-26).
 - **Boards optimise for SIGNAL, not quality: the director gets the most information about the final film in the least
   drawing and the least review time.** Thumbnail-level drawings; the intent made explicit (framing, the one action,
-  the shot type, cozy/scale, the camera move as a red mark, all in a big readable note); animate only where timing is
-  the question; no polish, no extra detail, lean review loops. — (v3 G3, 2026-10-26).
+  the shot type, cozy/scale, all in a big readable note); the film's real moves and transitions PLAYED, not only
+  marked (their shape and timing, never their polish); no extra detail, lean review loops. — (v3 G3, 2026-10-26;
+  motion widened from "animate only where timing is the question" by the animated-sketchbook rule, 2026-10-26).
 - **Every shot reads instantly with the sound off: literal beats clever.** Show recognisable things: a laptop that looks
   like a laptop, a data center like a building of servers, a plain labelled chart. No metaphors that need explaining.
   Test every animatic with a sound-off cold read before the owner sees it. — (v3 G3, 2026-10-26).
