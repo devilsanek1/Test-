@@ -63,6 +63,10 @@ Format: **rule** — why / evidence (video, date).
   the amount of objects, but feeling alive is absolutely the key", v3 G5, 2026-10-26).
 - **Scale moments, occasionally: make the viewer feel small**, using Arcane's camera work and staging, never its footage.
   Keep it nuanced (it's still TikTok). The owner liked v1's scale scenes. — (v1, 2026-10-24/25).
+  **When a scale shot comes, the scale must feel GREAT**, like Arcane's rooftop end frame: a world that keeps going
+  (hundreds of buildings shrinking into haze), a landmark that is huge yet far, tiny anchors (figures, birds, airships),
+  the drop below the camera, a big sky with huge clouds, many depth layers. Recipe: `docs/look/CINEMATIC_GUIDE.md`
+  ("Scale cues"). — ("another point in the Arcane shot is how great the scale feels", v3, 2026-10-26).
 - **Arcane references: ENVIRONMENT ONLY, few and high-confidence** (buildings, cityscapes, interiors as spaces, wides;
   no faces or people). Build on our own videos incrementally (angles, composition, light, camera), never reinvent.
   Guide with sketches: `docs/look/CINEMATIC_GUIDE.md`. — ("targeted with high confidence", 2026-10-26).
