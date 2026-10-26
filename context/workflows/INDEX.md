@@ -53,3 +53,6 @@
 | 2026-10-26 | `v3-opening-banger-wf_2a987913-4bb.js` | 5 | 0 | `context/agent_reports/2026-10-26_v3-opening-banger.md` |
 | 2026-10-26 | `v3-g3-board-wf_6de1c788-3cb.js` | 6 | 0 | `context/agent_reports/2026-10-26_v3-g3-board.md` |
 | 2026-10-26 | `v3-g3-board-cine-wf_cc1733e4-531.js` | 10 | 0 | `context/agent_reports/2026-10-26_v3-g3-board-cine.md` |
+| 2026-10-26 | `v3-g5-blocking-wf_8387753a-5af.js` | 9 | 0 | `context/agent_reports/2026-10-26_v3-g5-blocking.md` |
+| 2026-10-26 | `arcane-pullback-distill-wf_74d92f5c-c1b.js` | 9 | 0 | `context/agent_reports/2026-10-26_arcane-pullback-distill.md` |
+| 2026-10-26 | `v3-g5-s9-pullback-wf_045dcc0d-92e.js` | 4 | 0 | (running) |
