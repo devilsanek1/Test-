@@ -44,6 +44,9 @@ Format: **rule** — why / evidence (video, date).
 - **Scale moments, occasionally: keep making the viewer feel small,** inspired by Arcane's camera work and staging (not
   its footage); nuanced, since it is still TikTok content. The owner liked v1's scale scenes ("we did it great").
   — v1 2026-10-24, reconfirmed 2026-10-25.
+- **Camera and shot grammar come from the Arcane-measured guidebook `docs/look/CINEMATIC_GUIDE.md`** (owner: "lock in the
+  Arcane part ... a guidebook with references and rules we use across all videos"; sketches as visual references so the
+  owner can check what we index on). — owner, 2026-10-26.
 - **Second visual twist: coziness, through a sense of enclosure** (framed, street-like spaces whose walls hold the
   subject, as in the owner's reference `docs/look/ref_sense_of_enclosure.jpg`). Rules: `docs/look/COZY_AND_SCALE.md`.
   — owner, 2026-10-25.

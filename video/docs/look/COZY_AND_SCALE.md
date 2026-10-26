@@ -75,6 +75,9 @@ owner's reference measures 1:1 on screen with 27 % sky and a tower closing the v
 - **Sound:** room tone + weather behind glass (low-passed rain, or wind for snow) 18-24 dB under the voice, ducked; soft close
   foley (mug down, page, lamp click); the breach opens the filter, then near-silence. Mix per playbook (-14 LUFS).
 
+> **Measured update (2026-10-26):** the camera and shot numbers below are superseded where they differ by
+> `CINEMATIC_GUIDE.md` (165 measured Arcane shots; its section 7 lists exactly what changed).
+
 ## 4. Scale shot grammar (Arcane-inspired; framing [UNCERTAIN] until we measure the scenes in section 8)
 **Shared rules.** *Haze:* 4-6 flat planes, a value step darker per plane toward the viewer, steps growing (Arcane still A7:
 12 / 25 / 32 / 36 on a 0-255 scale, ~5 / 10 / 13 / 14 L* [AR §3, our measure]); far planes fill-only, then key-place ink
