@@ -98,6 +98,11 @@ Format: **rule** — why / evidence (video, date).
   abstract dark block growing in a window). Test every animatic with a sound-off cold read before the owner sees it.
   — owner, v3 G3 ("what does the AI mountain signify?", "is that a screen or a window?", "don't get this part"), 2026-10-26.
 
+- **The animatic (G3) is drawn like a professional storyboard: simple, monochrome, clarity first.** No colour at the
+  sketch stage; it must look like an actual drawing that makes the intent obvious, fast to iterate, in the way animation
+  studios board a film (style spec: `docs/look/STORYBOARD_STYLE.md`). Colour belongs to G4/G5. — owner, v3 G3,
+  2026-10-26 ("the sketch is making it confusing ... very simple, avoid colours for now ... like an actual drawing").
+
 ## Taste signals (the owner's picks; weight them when ranking options)
 - **Topics: the everyday wallet consequence** ("AI is outbidding you for the memory in your laptop" over the higher-scored
   Meta $25B story). — v3 G0, 2026-10-25.
