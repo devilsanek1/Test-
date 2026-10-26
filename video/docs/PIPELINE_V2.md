@@ -112,6 +112,7 @@ in `context/workflows/` (the v3 ones are the current best versions):
 | G1 script | `v3-g1-story-*.js` | story spines first, judges, 3 writers, cold-read retell panel, flow critic, merge, fact-check |
 | any line | `v3-line2-fix-*.js` | replacement lines tested in context by viewer personas + a standards/flow judge |
 | G1/G2 voice | `docs/ELEVENLABS.md`; `video/scripts/voice/` | paste-file rules + `check_paste.py`; `check_take.py` (transcribe + diff), `clean_take.py`, `transcribe.py` |
+| G2 voice (API) | `video/scripts/voice/generate_take.py` | per-line generation with the owner's voice, ASR check (Parakeet + Whisper), auto-regenerate, stitch; needs `ELEVENLABS_API_KEY` |
 | G2 sound | `video/audio/tools/make_phone_sfx.py` | our own positive phone sounds (like pop, ding, swoosh, cart add) |
 | G3 animatic | `video/src/v3/SketchReel.tsx` + `v3-g3-animatic-*.js` | 3 visual concepts, judges, storyboard artist writes the animatic JSON; SketchReel draws it with voice and pop captions |
 | G3 board style | `docs/look/STORYBOARD_STYLE.md`; SketchReel `style: "board"`; `scripts/v3/board_lint.py`; `v3-g3-board-*.js` | monochrome studio boards (4 tones, line weight by role, icons, gesture figures, one idea per panel); lint before render; sound-off cold read; one fix round |

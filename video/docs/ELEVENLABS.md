@@ -51,3 +51,17 @@ Before sending: `python3 scripts/voice/check_paste.py docs/vN/script/script_elev
 
 The full paste block in one code block, nothing else in it; one line before it ("paste everything inside the box"),
 the length after it. If only one line changed, still send everything.
+
+## 4. Automated takes via the API (owner chose this, 2026-10-26)
+
+`video/scripts/voice/generate_take.py PASTE.md OUT_DIR --voice VOICE_ID` generates the take with the owner's voice:
+1. Each paste line is generated on its own, with the neighbouring lines as context.
+2. Each line is checked by speech recognition. Parakeet runs first, and Whisper gives a second opinion so a misheard
+   "BBC" doesn't fail a good line.
+3. A line that doesn't match the script exactly, or runs too fast or too slow, is regenerated with a new seed (up to
+   `--tries`).
+4. The clean lines are stitched with natural pauses into `take.wav`, with `take_words.json` and `report.json`.
+
+The owner hears only a take whose report says ALL LINES CLEAN. Tested offline on 2026-10-26: the pipeline ran end to
+end and caught v2 take 1's swallowed "Google". Needs the `ELEVENLABS_API_KEY` secret and the voice id
+(`docs/voice/VOICE.md`). `--dry-run` parses only; `--list-models` and `--list-voices` show what the key can use.
