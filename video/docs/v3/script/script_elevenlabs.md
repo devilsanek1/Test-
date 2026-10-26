@@ -1,8 +1,8 @@
-[plain, a touch amazed, like sharing news with a friend]
-AI is making your NEXT laptop pricier.
+[bright and casual, a real question]
+Buying a laptop soon? [plain, a touch amazed] AI's making it pricier.
 
-[leaning in, dry, letting you in on something]
-You're up against AI data centers for memory chips… [flat, a tiny wince] and losing.
+[leaning in, matter-of-fact, letting you in on something]
+AI data centers get FIRST DIBS… on the memory chips your laptop needs.
 
 [straight and level, a flicker of disbelief]
 In the US, computers are up almost TEN percent in a year… after twenty years of getting CHEAPER, [tossed off, tiny smile] give or take a pandemic.

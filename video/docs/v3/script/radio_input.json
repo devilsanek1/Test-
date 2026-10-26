@@ -1,17 +1,73 @@
-{"voice":"af_heart","speed":1.05,"lead":0.5,"tail":0.8,
- "hooks":[
-  {"label":"v3 G1 radio cut · H1 · stand-in voice","vo":"AI is making your next laptop pricier.","tts":"AI is making your next laptop pricier.","frame0":"AI IS MAKING YOUR NEXT LAPTOP PRICIER","image":"FRAME 0, cozy desk nook at night: the thumb taps Add to cart under a new laptop on the phone and its price tag ticks up; the old laptop on the desk; an AI DATA CENTER tower pressed against the frosty window, scooping memory chips","pause":0.2},
-  {"label":"v3 G1 radio cut · H2 · stand-in voice","vo":"Buying a laptop soon? AI's making it pricier.","tts":"Buying a laptop soon? ... AI's making it pricier.","frame0":"AI IS MAKING YOUR NEXT LAPTOP PRICIER","image":"FRAME 0, cozy desk nook at night: the thumb taps Add to cart under a new laptop on the phone and its price tag ticks up; the old laptop on the desk; an AI DATA CENTER tower pressed against the frosty window, scooping memory chips","pause":0.2},
-  {"label":"v3 G1 radio cut · H3 · stand-in voice","vo":"Be nice to your laptop. AI's making the next one pricier.","tts":"Be nice to your laptop. ... AI's making the next one pricier.","frame0":"AI IS MAKING YOUR NEXT LAPTOP PRICIER","image":"FRAME 0, cozy desk nook at night: the thumb taps Add to cart under a new laptop on the phone and its price tag ticks up; the old laptop on the desk; an AI DATA CENTER tower pressed against the frosty window, scooping memory chips","pause":0.2}
+{
+ "voice": "af_heart",
+ "speed": 1.05,
+ "lead": 0.5,
+ "tail": 0.8,
+ "hooks": [
+  {
+   "label": "v3 \u00b7 hook H2",
+   "vo": "Buying a laptop soon? AI's making it pricier.",
+   "tts": "Buying a laptop soon? ... AI's making it pricier.",
+   "frame0": "AI IS MAKING YOUR NEXT LAPTOP PRICIER",
+   "image": "FRAME 0, cozy desk nook at night: the thumb taps Add to cart under a new laptop on the phone and its price tag ticks up; the old laptop on the desk; an AI DATA CENTER tower pressed against the frosty window, scooping memory chips",
+   "pause": 0.2
+  }
  ],
- "body":[
-  {"vo":"You're up against AI data centers for memory chips, and losing.","tts":"You're up against AI data centers for memory chips ... and losing.","image":"conveyor outside, close and low: the viewer's hand and the data center's giant scoop reach for one glowing chip; the scoop is served first, the hand still gets its chip, but the chip's tag ticks up","pause":0.25},
-  {"vo":"In the US, computers are up almost 10% in a year, after 20 years of getting cheaper, give or take a pandemic.","tts":"In the US, computers are up almost ten percent in a year, after twenty years of getting cheaper ... give or take a pandemic.","image":"price line drawn on the fogged window hooks up, brass tag +9.7% (US, BLS); pull back along the long slide from 2005 to 2025, one small 2021 bump wearing a face mask","pause":0.2},
-  {"vo":"Mostly because memory chips cost about 5x last year's price.","tts":"Mostly because memory chips cost about five times last year's price.","image":"inside the new laptop: the memory + storage pie slice swells from ~15% to almost 40%; one memory chip lifts out alone and its tag flips x2, x3, x4, about 5x","pause":0.2},
-  {"vo":"AI data centers need mountains of them, and they pay more.","tts":"AI data centers need mountains of them ... and they pay more.","image":"SCALE MOMENT: pull back over the snowy town to the AI data center rising into haze; a mountain of chips slides into its loading door; one rack beside ~1,300 tiny laptops","pause":0.3},
-  {"vo":"It's less of a shortage, more of an auction, and you're bidding against a building.","tts":"It's less of a shortage, more of an auction ... and you're bidding against a building.","image":"a SHORTAGE shelf swings open onto a warm auction hall, LOT 1: MEMORY CHIPS; the polite giant data center raises a billboard paddle, the tiny viewer holds up their phone","pause":0.35},
-  {"vo":"The bids are still climbing, so the cheap laptops drop out first.","tts":"The bids are still climbing, so the cheap laptops drop out first.","image":"COZY ENCLOSURE, back in the nook: a price updated card pops on the phone; the cheapest laptop listings grey out one by one, no longer available","pause":0.15},
-  {"vo":"Experts give it a year or two.","tts":"Experts give it a year or two.","image":"a paper wall calendar flips 2026, 2027, 2028 by the frosty window; the data center glows outside","pause":0.3},
-  {"vo":"That's how a data center ends up on your next laptop's price tag.","tts":"That's how a data center ends up on your next laptop's price tag.","image":"close on the phone: the price tag turns over and shows a tiny ink data center on its back; the thumb drifts back over Add to cart, hard cut to frame 0","pause":0.5}
+ "body": [
+  {
+   "vo": "AI data centers get first dibs on the memory chips your laptop needs.",
+   "tts": "AI data centers get first dibs ... on the memory chips your laptop needs.",
+   "image": "conveyor outside, close and low: the viewer's hand and the data center's giant scoop reach for one glowing chip; the scoop is served first, the hand still gets its chip, but the chip's tag ticks up",
+   "pause": 0.25
+  },
+  {
+   "vo": "In the US, computers are up almost 10% in a year, after 20 years of getting cheaper, give or take a pandemic.",
+   "tts": "In the US, computers are up almost ten percent in a year, after twenty years of getting cheaper ... give or take a pandemic.",
+   "image": "price line drawn on the fogged window hooks up, brass tag +9.7% (US, BLS); pull back along the long slide from 2005 to 2025, one small 2021 bump wearing a face mask",
+   "pause": 0.2
+  },
+  {
+   "vo": "Mostly because memory chips cost about 5x last year's price.",
+   "tts": "Mostly because memory chips cost about five times last year's price.",
+   "image": "inside the new laptop: the memory + storage pie slice swells from ~15% to almost 40%; one memory chip lifts out alone and its tag flips x2, x3, x4, about 5x",
+   "pause": 0.2
+  },
+  {
+   "vo": "AI data centers need mountains of them, and they pay more.",
+   "tts": "AI data centers need mountains of them ... and they pay more.",
+   "image": "SCALE MOMENT: pull back over the snowy town to the AI data center rising into haze; a mountain of chips slides into its loading door; one rack beside ~1,300 tiny laptops",
+   "pause": 0.3
+  },
+  {
+   "vo": "It's less of a shortage, more of an auction, and you're bidding against a building.",
+   "tts": "It's less of a shortage, more of an auction ... and you're bidding against a building.",
+   "image": "a SHORTAGE shelf swings open onto a warm auction hall, LOT 1: MEMORY CHIPS; the polite giant data center raises a billboard paddle, the tiny viewer holds up their phone",
+   "pause": 0.35
+  },
+  {
+   "vo": "The bids are still climbing, so the cheap laptops drop out first.",
+   "tts": "The bids are still climbing, so the cheap laptops drop out first.",
+   "image": "COZY ENCLOSURE, back in the nook: a price updated card pops on the phone; the cheapest laptop listings grey out one by one, no longer available",
+   "pause": 0.15
+  },
+  {
+   "vo": "Experts give it a year or two.",
+   "tts": "Experts give it a year or two.",
+   "image": "a paper wall calendar flips 2026, 2027, 2028 by the frosty window; the data center glows outside",
+   "pause": 0.3
+  },
+  {
+   "vo": "That's how a data center ends up on your next laptop's price tag.",
+   "tts": "That's how a data center ends up on your next laptop's price tag.",
+   "image": "close on the phone: the price tag turns over and shows a tiny ink data center on its back; the thumb drifts back over Add to cart, hard cut to frame 0",
+   "pause": 0.5
+  }
  ],
- "sfx":[{"src":"v3/phone_cart_add.wav","t":0.07,"gain":0.5}]}
+ "sfx": [
+  {
+   "src": "v3/phone_cart_add.wav",
+   "t": 0.07,
+   "gain": 0.5
+  }
+ ]
+}
