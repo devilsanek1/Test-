@@ -33,6 +33,10 @@ Format: **rule** — why / evidence (video, date).
   `docs/ELEVENLABS.md` (only tags and spoken words; one short positive tag per line, no mid-line tags (v2 take 1 looped); tags give a tone, never quote words or name an action; always the
   FULL paste text in one block). — (v1 "cheap" TTS; v3 takes, 2026-10-25/26).
 
+- **One full paste must narrate cleanly: a voice failure is our process bug, not the owner's problem.** Repeats, loops
+  and derails have happened "a few times", so the paste format, the settings and the take check are being
+  root-caused and hardened (`docs/voice/`). — (owner, v2 take 1, 2026-10-26).
+
 ## Music and sound
 - **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — (v1).
 - **Mix to -14 LUFS / -1 dBTP, voice always on top**; SFX land on visual hits. — (v1).
