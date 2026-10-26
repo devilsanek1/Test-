@@ -48,3 +48,5 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   that I really like ... suspense, sense of scale, fantastic environment and composition, the actual camera movement";
   "distill this scene into our arcane library reference and then find the best scene to replicate in our video".
   -> rule: Visual style (the favourite: pull-back crane reveal); distillation + pick running.
+- 2026-10-26: "the speed of transition should not be the reference point ... since it's a short reel we would speed it up"
+  -> rule: Motion (a reference move gives the shape, never the speed).

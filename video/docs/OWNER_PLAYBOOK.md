@@ -119,6 +119,10 @@ Format: **rule** — why / evidence (video, date).
 - **Palettes: the warm, everyday one for a money / everyday-life story.** — (v3 G4).
 
 ## Motion
+- **A reference move gives the SHAPE, never the speed.** Copy its path, framing, reveal order and easing shape, then
+  retime it to the reel: speed up (usually) or slow down where it feels right. Speed limits exist only to keep motion
+  readable and strobe-free (60 fps allows faster moves). — ("the speed of transition should not be the reference point
+  ... in a short reel we would speed it up", v3, 2026-10-26).
 - **Render at 60 fps from G5 to the final** ("smoother and more crispy"). Animate by time; drawn motion may stay stepped
   (12-24 drawings/s) while the camera glides; G3 may stay at 30. — (v3, 2026-10-26).
 
