@@ -57,11 +57,11 @@ V3, V7); 5-7 close-ups or inserts (V8-V10); <= 1 ECU, <= 1 overhead (V11), <= 1 
 
 | V1 Establisher | V2 Refuge portal | V3 Silhouette before the light | V4 Tiny observer | V5 Worm's-eye colossus | V6 Vista back view |
 |---|---|---|---|---|---|
-| ![V1](cine_sketches/V1.png) | ![V2](cine_sketches/V2.png) | ![V3](cine_sketches/V3.png) | ![V4](cine_sketches/V4.png) | ![V5](cine_sketches/V5.png) | ![V6](cine_sketches/V6.png) |
+| ![V1](cine_sketches_full_v1/V1.png) | ![V2](cine_sketches_full_v1/V2.png) | ![V3](cine_sketches_full_v1/V3.png) | ![V4](cine_sketches_full_v1/V4.png) | ![V5](cine_sketches_full_v1/V5.png) | ![V6](cine_sketches_full_v1/V6.png) |
 
 | V7 Low power | V8 Feeling close-up | V9 Symbol insert | V10 Lone light | V11 Institution high | V12 Impact |
 |---|---|---|---|---|---|
-| ![V7](cine_sketches/V7.png) | ![V8](cine_sketches/V8.png) | ![V9](cine_sketches/V9.png) | ![V10](cine_sketches/V10.png) | ![V11](cine_sketches/V11.png) | ![V12](cine_sketches/V12.png) |
+| ![V7](cine_sketches_full_v1/V7.png) | ![V8](cine_sketches_full_v1/V8.png) | ![V9](cine_sketches_full_v1/V9.png) | ![V10](cine_sketches_full_v1/V10.png) | ![V11](cine_sketches_full_v1/V11.png) | ![V12](cine_sketches_full_v1/V12.png) |
 
 ## 3. Camera presets
 **In SketchReel (G3).** `camera.from` / `to` = `{x, y, z}`: the world point at the screen centre, and the scale; rest
