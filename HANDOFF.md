@@ -93,6 +93,10 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
   `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
+- **v3 status (2026-10-26 ~22:00 UTC): G5 blocking cut DELIVERED** (`deliverables/v3/v3_g5_blocking.mp4`, 60 fps, 540x960,
+  gate check PASS; sheet `review/v3_g5/sheet.jpg`), waiting for the owner's notes. S9 + S9b were merged into one S5
+  pull-back crane panel (owner: "swap"; library entry S5 in `docs/look/CINEMATIC_GUIDE.md`, from Arcane compilation shot #55).
+  Next: owner notes on G5, then G6 polish.
 - **v3 status (2026-10-26 ~19:30 UTC): G3 LOCKED** (board with cinematography, commit 14bfa55; owner: "okay fine, go ahead").
   **G5 blocking RUNNING** as `context/workflows/v3-g5-blocking-wf_8387753a-5af.js`: engine (entry `src/entry-v3-film.tsx`,
   composition Film3 at 60 fps, panels in `src/v3/film/scenes/` that start as board placeholders) + Autumn Ember kit
