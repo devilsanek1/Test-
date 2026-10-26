@@ -53,8 +53,20 @@ Format: **rule** — why / evidence (video, date).
 
 ## Visual style
 - **Hand-drawn ink, flat colour, like reference video 1.** — (v1, 2026-10-24).
+- **Every scene must FEEL ALIVE: that is the key, not an object count.** Aliveness comes from a dense, detailed world
+  (a city full of buildings and windows, a room full of real things), people near and far, layered depth, a recurring
+  living character, and ambient life that never stops (clouds drifting, birds, snow, steam, lights switching, small
+  movements). Even Arcane's rooftop shot feels alive from the city's density and detail, the clouds and the birds. The
+  references set the bar (reference 1 France, v1 PHP); numbers from `scripts/qa/density.py` are a warning signal, never
+  a quota. Big flat empty fields and an object alone on a blank wall are failures, even in a draft; density belongs to
+  the set build (G5), not to polish. — ("way too empty ... those feel a lot more alive", then "less prescriptive on
+  the amount of objects, but feeling alive is absolutely the key", v3 G5, 2026-10-26).
 - **Scale moments, occasionally: make the viewer feel small**, using Arcane's camera work and staging, never its footage.
   Keep it nuanced (it's still TikTok). The owner liked v1's scale scenes. — (v1, 2026-10-24/25).
+  **When a scale shot comes, the scale must feel GREAT**, like Arcane's rooftop end frame: a world that keeps going
+  (hundreds of buildings shrinking into haze), a landmark that is huge yet far, tiny anchors (figures, birds, airships),
+  the drop below the camera, a big sky with huge clouds, many depth layers. Recipe: `docs/look/CINEMATIC_GUIDE.md`
+  ("Scale cues"). — ("another point in the Arcane shot is how great the scale feels", v3, 2026-10-26).
 - **Arcane references: ENVIRONMENT ONLY, few and high-confidence** (buildings, cityscapes, interiors as spaces, wides;
   no faces or people). Build on our own videos incrementally (angles, composition, light, camera), never reinvent.
   Guide with sketches: `docs/look/CINEMATIC_GUIDE.md`. — ("targeted with high confidence", 2026-10-26).
@@ -140,6 +152,13 @@ Format: **rule** — why / evidence (video, date).
   G3 (topic, core line, script, voice): text and audio only, no MP4s, never several versions unless asked. — (v1, 2026-10-25; "why are there multiple versions", v3).
 - **Lock the story with a clean sketch/animatic before big commitments; push all polish late.** — (v1, 2026-10-25).
 - **Progress: the gate deliverable is the update; between gates, a short status covering all threads.** — (v1).
+- **Every cut sent to the owner says what stage it is and what the next stages add** (e.g. "blocking: staging only;
+  next: density, life, polish, full-res"), so a draft is never mistaken for the final. — ("let me know if this is just
+  an initial intermediate step", v3 G5, 2026-10-26).
+- **NO LIMIT ON TOKENS for creative output.** Ideas, scripts, design explorations, set building, density, life, animation
+  and polish get as many agents, rounds and tokens as the quality needs, including workflows larger than the default size
+  guideline. Savings never decide a creative choice; only true waste is cut (rework, lost work, reviewing what will
+  still change). — (owner, 2026-10-26).
 - **Never trade quality for savings:** brainstorms, judged competing ideas and design explorations are worth their
   tokens; waste = rework, reviews of things that will change, early polish, lost work. — (2026-10-25).
 - **Locked means dropped:** rejected options go to the video's `archive/`, the gate doc keeps only the locked choice,
