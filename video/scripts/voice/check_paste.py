@@ -2,6 +2,7 @@
 
 Catches what went wrong on v3: notes/labels that v4 reads aloud, quoted script words inside tags (v4 speaks them),
 action words in tags ("correcting yourself" made v4 repeat the previous line), digits and symbols in the spoken text.
+And on v2 take 1: mid-line tags (the line derailed / the ending looped 3x) and negations or long tags in cues.
 Prints the spoken text, word count and estimated length. Exit code 1 if anything must be fixed.
 Usage: python3 scripts/voice/check_paste.py docs/vN/script/script_elevenlabs.md
 """
@@ -29,6 +30,12 @@ def main():
                 errors.append(f'{n}: a tag names an action, v4 may act it out (name a tone instead): [{tag}]')
             if re.search(r'\d', tag):
                 errors.append(f'{n}: digits in a tag: [{tag}]')
+            if re.search(r'\b(no|not|never|without|don\'t)\b', tag, re.I):
+                warnings.append(f'{n}: a negation in a tag (say what you want, not what to avoid): [{tag}]')
+            if len(tag.split()) > 9:
+                warnings.append(f'{n}: long tag ({len(tag.split())} words; keep it 3-8): [{tag}]')
+        if TAG.search(line) and not re.fullmatch(r'\s*\[[^\]]*\]\s*', line) and (TAG.sub('', line.split('[', 1)[0]).strip() or line.count('[') > 1):
+            warnings.append(f'{n}: a mid-line tag; split the line in two, each with its own tag (v2 take 1 looped): {line[:60]}')
         speech = TAG.sub(' ', line).strip()
         if not speech:
             prev_tag = True

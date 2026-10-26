@@ -14,8 +14,17 @@ paste file that produces the script word for word, and a check of every take. Le
   - never name an action ("correcting yourself" made v4 say the previous line again; no correcting, repeating, quoting,
     reading, listing, saying);
   - no digits.
-- **Put a short extra tag mid-line where the delivery changes** (a tag carries on until the next one):
-  `Laptops get better for the same money… [deadpan, a half-smile you can hear] usually right after you buy one.`
+- **Avoid mid-line tags: one short tag per line** (`check_paste.py` warns). Where the delivery changes inside a sentence, split it into two lines,
+  each with its own tag. On v2 take 1, both places with a mid-line tag broke:
+  - line 5 derailed and v4 restarted from the top;
+  - the closing lines looped three times.
+  (v3 used mid-line tags without trouble, but the risk isn't worth it.)
+- **Tags are 3-8 words and positive, with no negations** (`check_paste.py` warns). "no gasp", "no doom", "no mic drop" and "no irony, no edge" were
+  all in v2 take 1's broken stretch. Say what you want, not what to avoid.
+- **A key name right after "And" can lose its first sound:** v2 take 1 said "And 'oogle can't veto". Put CAPS on the name
+  when it carries the contrast ("And GOOGLE can't veto"). Check every name in the take transcript.
+- **The first words may be said twice** ("She quit. She quit Google.": v3 take 4 and v2 take 1). `check_take.py` flags
+  it and `clean_take.py` cuts it; no paste fix is known yet.
 - **Keep the opening block under ONE tag, with no mid-line tag in it,** and never follow it with a line that only makes
   sense by referring back (v3: "Buying a laptop soon? [tag] AI's making it pricier." + "Well, AI DATA CENTERS are." made v4
   say "AI's making it pricier" twice, in two takes in a row).
