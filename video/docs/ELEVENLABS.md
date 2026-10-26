@@ -65,3 +65,14 @@ the length after it. If only one line changed, still send everything.
 The owner hears only a take whose report says ALL LINES CLEAN. Tested offline on 2026-10-26: the pipeline ran end to
 end and caught v2 take 1's swallowed "Google". Needs the `ELEVENLABS_API_KEY` secret and the voice id
 (`docs/voice/VOICE.md`). `--dry-run` parses only; `--list-models` and `--list-voices` show what the key can use.
+
+## 5. Take log (model, paste format, outcome)
+
+| Date | Video, take | Paste | Outcome |
+|---|---|---|---|
+| 2026-10-26 | v2 take 1 | 10 long tags (8-20 words), 2 mid-line tags, negations, 1,345 characters | 88 s instead of 43: opening repeat, derail and restart, closing lines looped 3 times, "And 'oogle". Rescued by cutting. |
+| 2026-10-26 | v2 take 2 | **5 short tags (1-3 words) inline before their words, tags carry forward, no mid-line tags, no brand after "And", 714 characters** | **Clean on the first generation:** 38.96 s, every word matches (Parakeet + Whisper), no repeats. |
+
+What changed between them is now the default format: short tags on the same line as their words, 4-6 per script,
+only where the delivery shifts, and the whole paste at about 800 characters or less. The root-cause proposal
+(`docs/voice/PROPOSAL.md`) will refine this.
