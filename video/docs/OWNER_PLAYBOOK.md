@@ -82,6 +82,12 @@ Format: **rule** — why / evidence (video, date).
 - **Drawn like a professional storyboard: simple, monochrome, clarity first.** No colour at the sketch stage; colour
   belongs to G4/G5. Spec: `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
 
+- **The board carries the cinematography too: clear AND cinematic.** Framing, camera angle, scale (the rise-over reveal,
+  the scale cut to a tiny figure) and coziness (the enclosed home base, the window) are decided in the board, in
+  monochrome; clarity comes from composition, never from flattening every panel to an icon on blank paper. Every
+  panel names its shot type (CINEMATIC_GUIDE / COZY_AND_SCALE) and still passes the sound-off read. — owner, v3 G3,
+  2026-10-26 ("where is the scale / coziness / learnings from Arcane?").
+
 ## Taste signals (the owner's picks; weight them when ranking options)
 - **Topics: the everyday wallet consequence** (laptop memory prices over the higher-scored Meta $25B story). — (v3 G0, 2026-10-25).
 - **Lines: plain, direct and personal over clever** ("AI is making your next laptop pricier"; hook as a question,

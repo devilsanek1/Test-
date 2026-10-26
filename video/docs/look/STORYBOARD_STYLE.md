@@ -116,6 +116,16 @@ mark; text at least 48 px; fills from the palette only; nothing crossing y 290-6
 in x 380-700 and 270-460 px wide (a tall subject such as a standing figure is measured by its height, 300-650 px); the camera's zoom
 changing by at most 2x within a shot. Implemented: `scripts/v3/board_lint.py` (props and defaults: the header of `src/v3/SketchReel.tsx`).
 
+## 7. Cinematography belongs in the board (owner, 2026-10-26)
+Clarity and cinematics are not a trade-off. Each panel names its shot type and framing, drawn in monochrome:
+- **Home base = cozy enclosure** (`COZY_AND_SCALE.md` §2-3): walls/shelf as dark masses cut by 2 frame edges, ONE opening
+  (the window, 15-30 % of the frame) in light grey; the lamp pool as a light-grey shape. The subject stays the darkest.
+- **Scale** (`CINEMATIC_GUIDE.md`): the one big move (S1 rise-over reveal) drawn with its planes; a scale CUT from a close
+  panel to a tiny figure (0.04-0.08 H) under something huge; a low or worm's-eye angle for the colossus. Mark the move
+  with the red `frame` / arrow notation.
+- **Angle and size vary on purpose:** close for the personal beat, wide for the system, the home base to return to.
+- The sound-off read still rules: if a cinematic choice makes a panel unreadable, simplify the drawing, not the framing.
+
 ## Sources
 [1] https://www.moma.org/audio/playlist/192/2574 · [2] https://2719hyperion.com/2009/05/conversation-with-joe-ranft.html · [3] https://www.creativebloq.com/advice/storyboard-tips
 [4] https://community.wacom.com/en-us/how-to-storyboarding-with-klaus-scherwinski/ · [5] https://proko.com/course-lesson/how-to-draw-with-line-weight/notes
