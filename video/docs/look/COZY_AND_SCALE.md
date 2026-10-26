@@ -9,7 +9,8 @@ prices) and v2 (DeepMind resignations). Evidence: `research/` enclosure [EN], co
 1. **Cozy = held, not shut:** walls on 2-3 sides, ONE opening the subject faces, the threat visible but outside it
    (prospect-refuge; safety + abundance + softness, Project Horseshoe [CO §1, VERIFIED]). Shut rooms read as a trap [EN §9].
 2. **Scale = a colossus too big to take in whole** (top >= 45° up, cut by the frame; Maertens [EN §4, REPORTED]) against a
-   tiny, readable person on our side, ratio >= 10:1. Our Arcane reading: contrast across a cut, not long wides [AR §4, UNCERTAIN].
+   tiny, readable person on our side, ratio >= 10:1, **or a world that keeps going** in a long wide, its landmark only 1.1-1.4x
+   the figures yet huge and far (#55 measured: `CINEMATIC_GUIDE.md` "Scale cues"; "contrast across a cut" was half true).
 3. **Cozy holds the viewer; scale, only occasionally (playbook), makes them feel the stakes.** Cozy >= 50 % of the runtime
    outside full-frame chart inserts (frame 0's world, the ending; an insert is a neutral breath, neither cozy nor scale:
    v3 G3 is 38 % of all 41 s, 55 % of the non-chart time); 1-2 scale moments, never 3 (v2: 1), 1.5-4 s each, <= 20 % of
@@ -78,11 +79,17 @@ owner's reference measures 1:1 on screen with 27 % sky and a tower closing the v
   foley (mug down, page, lamp click); the breach opens the filter, then near-silence. Mix per playbook (-14 LUFS).
 
 > **Measured update (2026-10-26):** the camera and shot numbers below are superseded where they differ by
-> `CINEMATIC_GUIDE.md` (165 measured Arcane shots; its section 7 lists exactly what changed).
+> `CINEMATIC_GUIDE.md` (165 measured Arcane shots; `research/CINEMATIC_GUIDE_full_v1.md` §7 lists exactly what changed).
 
 ## 4. Scale shot grammar (Arcane-inspired; framing [UNCERTAIN] until we measure the scenes in section 8)
-**Shared rules.** *Haze:* 4-6 flat planes, a value step darker per plane toward the viewer, steps growing (Arcane still A7:
-12 / 25 / 32 / 36 on a 0-255 scale, ~5 / 10 / 13 / 14 L* [AR §3, our measure]); far planes fill-only, then key-place ink
+**Scale must feel GREAT (owner, 2026-10-26).** A scale wide (any K wide, the S1/S5 landings) is judged by whether it feels
+vast and alive, never by an object count: run the 11 cues and the checklist in `CINEMATIC_GUIDE.md` "Scale cues: why a wide
+feels vast" (a world that keeps going past every edge, a size gradient, a huge-yet-far landmark, tiny anchors, the drop, a
+big sky with huge slow clouds, life in the hold). Where the planes, haze or life numbers below differ, that section wins.
+
+**Shared rules.** *Haze:* 4-6 flat planes (5-7 on a city vista), a value step darker per plane toward the viewer (one still,
+A7: 12 / 25 / 32 / 36 on a 0-255 scale, ~5 / 10 / 13 / 14 L* [AR §3, our measure]; on a vista the mix toward the sky doubles
+per plane going AWAY, 0 / 12 / 22 / 40 / 65 %, #55 measured: Scale cues 5); far planes fill-only, then key-place ink
 1.5-2 -> 2-3 -> 3-4 px, tapered, no outlines (PALETTE). Dusk ladder: sky `#D9DEE5` (L* 88) -> `#BAC3CE` (78) -> `#8A9AA8` (63)
 -> `#545F6D` (40) -> anchor `#1F2433` (14) on the observer; L* <= 40 is anchor-dark, so those two stay ~5 % of a held frame
 and big foregrounds are `#8A9AA8` with a `#545F6D` lip (PALETTE). *Parallax* f = 1 - depth: sky 0, far 0.1, city 0.3, near
@@ -99,7 +106,7 @@ while it drifts (Fortiche treated the virtual camera as a physical one [REPORTED
 | K3 | **Rise-over (crane)** | the world opens past the wall | crane `y` 400-700 px in 2.5-3.5 s (the ledge moves 1.3x: 700 px needs >= 2.9 s), `CAM.reveal`; a roof / ledge (depth -0.3, `#8A9AA8`, `#545F6D` lip) fills the bottom 30-45 % and slides out the bottom; horizon hidden behind rows; the colossus (depth 0.85) drifts down only 0.15x the crane and "rises" against the falling ledge, so start it cut by the top with that margin | EXISTS: `y` keys, `Ledge` / `Balustrade` (`cine/props.tsx`), `Monument quietY`, CineDemo B |
 | K4 | **Pull-back, intimate -> vast** | our world becomes a dot | dolly from push ~0.8 to 0 anchored on the subject; far x0.95 / mid x0.75 / fore x0.67 (ref-2 shot 16); dolly not zoom, so the room shrinks 5x and a depth-0.85 colossus 1.14x; land at 0.04-0.08 H, hold 0.6-1.0 s. Budget: 5x takes 5.6 s centred (9 s anchored low) at peak 15, so skip ~2x of it in a hidden cut on a dark wiper (S09's door match-cut) or settle for 2.3x in 3 s; never a bare allow-list (S09 hit 80 px/frame) | EXISTS: `push` / `anchor`, CineDemo C, `WindowCloseup` LOD hand-off (`cine/props.tsx`); `revealPlan()` TO BUILD |
 | K5 | **Slow push to the vista** | resolve, looking out | `push` 3-8 % in 2-4 s, `CAM.slow`, anchored on the far VP (`anchorDepth` >= 0.85); back-view figure 0.25-0.35 H cut by the bottom (7 of 12 Arcane stills face a vista) | EXISTS: `ShotCam push` (`src/lib/ShotCam.tsx`) |
-| K6 | **Locked tiny-figure wide** | stillness, being watched | still camera, `handheld` 1-1.5 px; observer 0.04-0.08 H, fill-only, on the axis; colossus cut by the frame >= 10:1; life from 1-3 small things (one window on, smoke, a bird); 2-3.5 s | EXISTS: `LitWindows` (`cine/windows.tsx`), `WallOfWindows` (`cine/wall.tsx`), `TinyCrowd` (`cine/figures.tsx`), `Birds` (`cine/sky.tsx`) |
+| K6 | **Locked tiny-figure wide** | stillness, being watched | still camera, `handheld` 1-1.5 px; observer 0.04-0.08 H, fill-only, on the axis; colossus cut by the frame >= 10:1; life on 3 speed tiers, never 1 s still, none inside the city mass (Scale cues 11: birds, a pennant, one window on, white steam); 2-3.5 s | EXISTS: `LitWindows` (`cine/windows.tsx`), `WallOfWindows` (`cine/wall.tsx`), `TinyCrowd` (`cine/figures.tsx`), `Birds` (`cine/sky.tsx`) |
 | K7 | **Worm's-eye on the colossus** | power over you | camera 0.3 m, horizon 0.58-0.64 H (the observer's feet above y 1250); colossus >= 0.7 H cut by the top, flat above y 556; one tiny mover 0.01-0.02 H at 10-20 px/s, clouds 8-15 px/s on depth 1; optional 2-4 % tilt | EXISTS: `Tower vpy`, `Monument` (`cine/monument.tsx`), `LensFigure` (`cine/lens.tsx`); data center TO BUILD |
 | K8 | **Shaft / one lit window** | one person, one light, in a vast structure | shaft core 0.10-0.14 W on the axis, one halo 1.8x a step darker, widening 1.3-1.6x down into a pool 2x the core with the observer in it, top below y 600; or one warm window (the pop) in a cold grid (Hopper) | EXISTS: `LightShaft`, `Glow` (`cine/light.tsx`), `WallOfWindows` events |
 | K9 | **Frame push-through** (Cullen here -> there) | leaving the refuge for the stakes | a window / doorway at depth -0.5 [EN §7] holds the opening at 15-25 %; push 0 -> 0.85 anchored on the far subject (depth 0.85) in 1.2-2 s, `CAM.ease`; the opening's edges stay <= 15 px/frame until the mullion wipe, which hides the over-cap pass (allow-list only that window); carry speed into the next shot | TO BUILD: `Portal`, `roomBox` holes; wiper EXISTS (`WipePass`, `cine/props.tsx`) |
@@ -111,7 +118,8 @@ while it drifts (Fortiche treated the virtual camera as a physical one [REPORTED
 - **Stack the depth vertically:** captions on a flat field at L* >= 70 (7:1 with the ink; `#8A9AA8` is 5.9:1) in y 290-600,
   the read in y 600-1250, a foreground mass cut by the bottom; <= 2 points of interest per scale shot, x 380-700 [VE §3].
 - **Observer** 60-150 px (floor 40), fill-only below 80 px, the stage's only high-contrast mark. **Horizon** in eye-height
-  scale shots 0.52-0.59 H (top edge >= 45° up, feet above y 1250); a 0.3 m camera allows 0.64 H [VE §1].
+  scale shots 0.52-0.59 H (top edge >= 45° up, feet above y 1250); a 0.3 m camera allows 0.64 H [VE §1]; a city vista from
+  a roof (S1/S5 landings) 0.43-0.46 H, feet 2-3 figure heights below it (`CINEMATIC_GUIDE.md` Scale cues 6).
 - **Time and captions:** payoff words on frame 0, never a silent scale opener; nothing scale before 3 s unless the move IS the
   claim; captions pop in place in screen space (never on a camera layer or clipped by a wiper), a change at least every 1.5 s,
   also through moves; still peak frames 1.5-3 s; target 30-45 s (playbook).

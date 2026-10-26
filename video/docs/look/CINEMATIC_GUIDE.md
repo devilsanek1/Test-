@@ -39,7 +39,7 @@ scale move belongs to the reveal later in the film (S1 or S5).
 - **Idea:** stand behind the rooftop wall, then rise over it: the wall drops out the bottom and the whole city settles in.
 - **Frame:** eye level at rooftop height. Start: the wall and people's backs fill the bottom 25 % (top edge y ~1440),
   horizon at 0.37 H. Land: the wall is gone, horizon at 0.40 H (y ~770), city in the lower 60 %, flat sky in the top 40 %.
-- **Planes (5, the only 5-plane type), travel down during the rise:** wall + backs ~520 px (they leave the frame), near
+- **Planes (5), travel down during the rise:** wall + backs ~520 px (they leave the frame), near
   towers ~400 px (cut by both side edges, tops kept out of the caption band), mid city ~220 px, horizon ~60 px, sky 0.
 - **Move:** 4-4.5 s, scale 1.00 -> 1.04, ease-out (fast start, lands in the last third), then hold 1 s. Draw the city
   layers ~500 px taller than the start frame shows, so nothing runs out at the bottom.
@@ -47,6 +47,8 @@ scale move belongs to the reveal later in the film (S1 or S5).
 - **Upgrades v1 @25** (rooftop wall, backs, skyline and sun, held static) into one reveal that ends on the whole city.
   Put it on a scale line ("tens of thousands", "every single server").
 - **Ref:** #94 @238.0: a balcony railing drops away, and the skyline rises and lands with towers cut by the side edges.
+- **The landing must feel vast:** run "Scale cues" (after S5); with no figures, the near towers and a 2x ladder of birds
+  are the anchors (#94's airships: 0.14 / 0.06 / 0.03 / 0.015 W, the smaller ones lower).
 
 ### S2 Sun behind the roofline (light). Confidence: high (avg 7.9; one reviewer 5, since v1 already has the big sun)
 - **Idea:** our orange disc becomes the subject, and everything in front of it is one flat silhouette.
@@ -108,7 +110,7 @@ scale move belongs to the reveal later in the film (S1 or S5).
   pot) wipes across the figures and hides the hand-off (they come out as backs; swap the drawing behind it): give it its
   own window of >= 8 / 10 / 12 f at 60 fps (up to ~90 px/f), or drop it at 2 s. p 0.5-0.55 a light burst (cloud bank,
   pale far) as the dormer slides on to become the left frame. p 0.77 the spire rises over the right roofline; it lands
-  by p 0.96 as the camera slows. Birds (not airships) are the life beat in the hold.
+  by p 0.96 as the camera slows. Birds (not airships) lead the life in the hold (Scale cues 11).
 - **Start (u = 0):** sky y 0-840; horizon 0.44 H, seen only through a slot at x 240-600, y 780-900 (low skyline, one
   spire to y 720). Dormer x 600-1080 (finial y 640) down to the bottom edge; boiler x 0-240; parapet top y 1280. Two
   backs, 3/4, heads turned right (no faces), centre x 470, heads ~180 px from y 1060, cut at the hips; the lead room
@@ -121,12 +123,12 @@ scale move belongs to the reveal later in the film (S1 or S5).
   a deck below with tile lines converging on them. 6 planes. Their look runs ~65 deg up-right (no 9:16 crop holds
   Arcane's 45).
 - **Light:** one sun high beyond the city (3/4 backlight): tops lit, camera-facing walls and the backs in shade, shadows
-  toward us. Each farther plane is a fixed flat mix toward the sky (0 / ~20 / ~55 %), its shade leaning to the dusk blue
-  (warm near, dusty-cool far, never grey-blue), with fewer value steps (near 5, mid 4, far 3) and less ink (full,
-  hairline, none). Eye path: lit deck -> warmest lit facades up the canyon -> pale hill base -> the landmark, the
-  darkest far shape, against the palest cloud (a low flat bank on the horizon, the landmark in its gap). Over the move:
-  bright slot in a dark frame -> darkest at the dormer -> light burst BEFORE the landmark lands -> settle. Flat mist
-  cuts: ask the owner first.
+  toward us. Each farther plane is a fixed flat mix toward the sky (0 / 12 / 22 / 40 / 65 %, measured: Scale cues 5),
+  its shade leaning to the dusk blue (warm near, dusty-cool far, never grey-blue), with fewer value steps (5 / 5 / 4 /
+  3 / 2) and less ink (full, full, hairline, none, none). Eye path: lit deck -> warmest lit facades up the canyon ->
+  pale hill base -> the landmark, the darkest far shape, against the palest cloud (a low flat bank on the horizon, the
+  landmark in its gap). Over the move: bright slot in a dark frame -> darkest at the dormer -> light burst BEFORE the
+  landmark lands -> settle. Flat mist cuts: ask the owner first.
 - **Retime: the shape, never the speed** (owner: "speed up or slow down where it feels appropriate; in a short reel we
   would usually speed it up"). Source 11.5 s; ours at 60 fps: 2.0 s = 90 f move + 30 f hold, pivot 3.5x, far peak 25
   px/f; **3.3 s (default)** = 156 + 42 f, 5x, 14 px/f (creep/accel/cruise/decel/settle 10/59/25/51/11 f); 5.0 s = 240 +
@@ -135,7 +137,54 @@ scale move belongs to the reveal later in the film (S1 or S5).
   finds the tiny figures, then the landmark. At 3.3 s the spire rises at ~1.7 s and lands by ~2.2 s: the payoff word.
 - **Upgrades v1 @25** (rooftop wall, backs, skyline, static) when the reveal must travel from the small world to the
   whole system; S1 when the city only needs to land. **Ref:** #55 @109.46 (11.46 s; S1E1 "Welcome to the Playground",
-  ~2:30).
+  ~2:30). **The end frame must feel vast and alive:** run "Scale cues" (next section) on it.
+
+## Scale cues: why a wide feels vast (owner, 2026-10-26: "how GREAT the SCALE feels"; every video)
+Measured on #55's end (@120.5 s; with #94 @242.8, #24 @33.6; the sky also on #60/#61/#108). Ruler F = figure height = 200
+px, horizon y ~890, feet y ~1490 (the S5 end). Scale is felt, not counted: Arcane's counts are a warning signal, never a
+quota. Breathers (S3, S4) take theirs from the sky (9-10).
+1. **The world keeps going:** nothing ENDS inside the frame. Every band runs past both side edges, behind near side masses
+   (x 0-30 % and 78-100 % W) that cut the far rows; something is cut by all 4 edges; the horizon exits at least one side;
+   a tiny second landmark on it (~28 px, one step toward the sky) proves the city runs on to the coast.
+2. **The size gradient:** 5-7 planes, each 2.2-3x smaller than the one in front (never two neighbours within 2x). Building
+   widths near : mid : far = 17 : 3 : 1 (near 120-520 px, mid 21-35, far 7-17 x 6-8 tall); windows shrink with them (near
+   7-11 px on a 21-30 px period, near-mid 4-6 on 12, mid 2-3 px dots on 5, far none).
+3. **Most of the city is in the thinnest band:** the far field (0-11 % of the horizon-to-feet span) plus the hill town
+   hold ~60 % of Arcane's ~400 roofs: 5-7 rows every 9-10 px, each hiding half the row behind, no sky gaps, a chimney tick
+   per 3-4 roofs. Generate the rows from seeded motifs (+-15 % width, 3-4 roof colours), never a few hand-placed blocks.
+4. **Detail rises toward the horizon:** shapes per building fall (near 30-60, mid 5-8, far 2), so marks per 100 px tile
+   stay level or rise 1.0-1.5x and PEAK just under the horizon (Arcane edge density 23-25 % there, 8-11 % near). Motifs
+   repeat in runs of 4-6 at a fixed period. Calm zones only: the landmark (0.4x the city), the deck (0.65x), the sky.
+5. **Atmospheric steps, flat (never a haze gradient):** each plane is one fixed mix toward the sky that about doubles per
+   plane: near 0 / near-mid 12 / mid 22 / far 40 / infinity strip 65 %, shade leaning 0-50 % to the dusk blue. Autumn
+   Ember darkest swatches `#3A1F16` L15 | `#533D38` 28 | `#695653` 38 | `#8C7D7C` 54 | `#BAACA8` 71; values 5/5/4/3/2; ink
+   full, full, hairline, none, none; warm near, the sky's hue farthest.
+6. **The drop below the camera:** a low crane, not a drone: feet 2-3 F below the horizon (Arcane 2.0-2.4; the S5 end's 3.0
+   is the limit; past 3.5 reads as a map), every city roof under it. Ridges halve per plane (infinity 0-12 px under it,
+   far 15-40, mid 60-100, near-mid 140-220), then the rail jumps to 480-560: that gap IS the drop. Never draw a street
+   floor or a far base; one dark canyon slot (50-90 px) falls from a VP on the horizon over the figures.
+7. **The landmark, huge yet far:** the only far shape over the horizon, rising 1.1-1.4 F above it (cluster 1.5-2.4 F wide,
+   top y >= 620) on a hill the town climbs in 5-6 rows. Huge: its units are 2x the mid windows though 2 bands farther
+   (lancets 6 x 11 px, one rose or clock 22-28 px). Far: the narrowest value range (0.58x the near), the least detail, ink
+   in its shade colour, behind the hill town and the sea strip, birds crossing in front.
+8. **Tiny anchors, lines up:** two backs at 1.0 F, heads on a lighter mid wall; the near anchor 30-35 % of the frame in
+   the darkest swatches, cut by 2 edges. Lines lead UP to the landmark: the canyon VP over their heads, the far skyline
+   stepping up 40-60 px before the hill, one diagonal (a skylight ridge) at its base; the rail is the one level line.
+9. **A big sky with huge clouds:** sky 30-40 % on a scale end (65-85 % on breathers), clouds 45-55 % of it outside y
+   317-556. One hero mass >= 1.0 W (cut by a side), >= 2.5x the landmark's width and BEHIND it (farther, still bigger): on
+   S1/S5 a bank on the horizon (150-280 px tall), the landmark in its gap. Flat base, lobed top (lobes 180-450 px), 3 flat
+   fills: crown `#FAF1EA` 15-25 %, body `#ECD8CB` 30-40 %, belly `#CFC5C4` on the base; new, so show the owner at G4.
+10. **Huge means slow:** hero cloud 0-6 px/s, thin bars 5-15 px/s, all one way and <= 1/10 of the birds (a fast cloud
+    reads small). Light constant through the hold: no flicker, no moving shadow patches.
+11. **Life in the hold (the owner's "alive"):** the city's static density IS its life; nothing moves inside it. Motion
+    goes in the sky and by the figures: 3-4 kinds of mover on 3 speed tiers, something always moving (> 1 s without is a
+    dead frame), <= 2 % of the frame, never competing with the figures and the landmark. Fast: a flock of 3-6 V's, 24-44
+    px (far ones paler), 5-6 wingspans/s, flap 3-4 Hz, one gliding, entering at 70-80 % of the move and crossing toward
+    the landmark in 1.5-2.5 s, outside y 317-556. Periodic: a pennant on the near frame, 1-3 Hz. Mid-move: 1-3 white steam
+    wisps; cloth 1-3 px. `Birds` (`cine/sky.tsx`): size 24-44, flap 3-4, dur = path / (5.5 x size).
+**Checklist:** nothing ends inside the frame | 5-7 planes 2.2-3x apart | far band packed, detail peaking under the horizon
+| darks climb to the sky | (feet - horizon) / F = 2-3, then the drop | one huge-yet-calm landmark over the horizon | a
+hero cloud behind it | 3 tiers of life, never 1 s still. Then, at phone size: does the world keep going, and is it alive?
 
 ## Rules (all types)
 1. **One change per shot.** Each type changes ONE thing in a v1 shot (the move, the light or the composition). The
@@ -145,8 +194,8 @@ scale move belongs to the reveal later in the film (S1 or S5).
 3. **One big move per video (S1 or S5, never both).** Every other wide is locked or breathes: a 1.5-2 % pull-out (or a
    push of 1 % at most) over 2-3 s, ease-out. No roll, no compound moves, no cut mid-move.
 4. **Depth and light in flat steps.** Use 3-4 planes (5 in S1, 6 in S5), each farther plane one value step paler and
-   mintier (as in #75 @185.3). The sun is the only light: one lit side and one shade side per building; silhouettes are
-   in our darkest teal. No bloom, haze, glow or gradients.
+   nearer the sky's hue (as in #75 @185.3; scale wides: Scale cues 5). The sun is the only light: one lit side and one
+   shade side per building; silhouettes are in the palette's anchor. No bloom, haze, glow or gradients.
 5. **Dose.** Per video: S1 or S5 once, S2 and S4 at most once each, never two of these back to back. These are the scale
    and breather beats; the cozy, enclosed streets stay the majority (`COZY_AND_SCALE.md`).
 
