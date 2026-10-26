@@ -56,3 +56,4 @@
 | 2026-10-26 | `v3-g5-blocking-wf_8387753a-5af.js` | 9 | 0 | `context/agent_reports/2026-10-26_v3-g5-blocking.md` |
 | 2026-10-26 | `arcane-pullback-distill-wf_74d92f5c-c1b.js` | 9 | 0 | `context/agent_reports/2026-10-26_arcane-pullback-distill.md` |
 | 2026-10-26 | `v3-g5-s9-pullback-wf_045dcc0d-92e.js` | 4 | 0 | `context/agent_reports/2026-10-26_v3-g5-s9-pullback.md` |
+| 2026-10-26 | `v2-g5-blocking-wf_46cfb5eb-fa2.js` | 10 | 0 | (running: engine + kit, 5 lanes, assembler, sound-off cold reader, finisher) |
