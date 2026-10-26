@@ -144,3 +144,29 @@ It checks: fps 60 (the MP4 and the composition), duration = the voice (+-1 frame
 scene start has a detected hard cut within 1 frame (caption band and label strip masked), and every caption page (and
 the frame-0 words) inside the caption band and the caption clip, within the safe width. FAIL exits 1; WARN lines (long
 lines, cut-like events inside a shot) are for a human look.
+
+## 8. Lessons from v3 (the assembler's round)
+
+Six panel lanes, an engine lane and a kit lane built v3's G5 in parallel; one assembler folded their requests in,
+rendered the film and fixed what only shows across panels.
+
+- **What kept the lanes consistent:** one kit with a written consistency contract (THE laptop, tag, phone, data center,
+  You, stick: never redrawn by hand), the palette module rewriting the house tokens (no lane could drift a colour),
+  shared-set files for repeated frames (`O1_set` for O1 + S15, `S10_set` for S10 + S14, `S4_wall` / `S4_chart` for
+  S4 / S6 / S11), and panels exporting their own `captionTone` (no shared-file edits). At phone size every object
+  matched across panels on the first assembly.
+- **What did not:** kit defects surfaced only when a lane used a prop at its real panel size (the thought cloud's
+  geometry, a hero-coloured clock hand, the struck old price and the tag back's sign too small to read, a fixed lid
+  height that filled S8's frame with dark screen, dashed keys reading as bars at 1400 px, the factory's door side
+  and steam, the van decal size). Each lane worked around it locally (a private bubble, a mirrored + clipped factory,
+  a laptop drawn over the decal), so the assembler had to fold eight requests back into the kit and undo the
+  workarounds.
+- **The loop seam had three owners and no viewer:** the engine's un-build collapses the last panel's sky slab last,
+  O1's bare-line underlay waits beneath it, and S16's wall is the same colour, so the slab hid O1's lines until the
+  final two frames (four near-empty frames, then a wipe). Fix: the last panel drops its sky slab while it un-builds
+  (`useExit() > 0` -> `sky="transparent"`, S16) so the first panel's lines draw on in place.
+- **Set up first next time:** (1) the kit sheet shows every prop at EVERY size the board uses it (the extremes too:
+  the 1400 px laptop, the 460 px tag's back, the 190 px tags) at 0.25 scale, and the kit lane fixes what does not
+  read before any lane starts; (2) the last panel's lane owns the seam and checks a strip of the last 0.3 s plus
+  frames 0-6; (3) a hero % / dark % meter per panel on the lane sheets (the S8 dark budget was a measured number
+  nobody had); (4) lanes commit only and the assembler pushes once (every lane push was rejected as non-fast-forward).
