@@ -10,7 +10,13 @@ import {arrow, ellipse, hatch, poly, rect} from '../lib/sketch';
 
 type Fill = 'warm' | 'cold' | 'dark' | 'paper' | 'pop';
 /** f = depth factor for parallax (1 = moves with the camera, 0 = fixed far plane, > 1 = foreground); the authored end frame is exact for every f. */
-type Depth = {f?: number};
+type Depth = {
+  f?: number;
+  /** stroke draw-on: [start, duration] in s after the shot start (the opening "scene is drawn" build) */
+  draw?: [number, number];
+  /** the fill floods in at this many s after the shot start (0.12 s fade); before it, lines only */
+  fillIn?: number;
+};
 export type El = Depth & (
   | {t: 'rect'; x: number; y: number; w: number; h: number; fill?: Fill; label?: string; in?: number}
   | {t: 'ellipse'; cx: number; cy: number; rx: number; ry: number; fill?: Fill; label?: string; in?: number}
@@ -78,6 +84,20 @@ function camForDepth(shot: Shot, c: Cam, f: number): Cam {
 
 const camTf = (c: Cam) => `translate(${W / 2} ${H / 2}) rotate(${c.r ?? 0}) scale(${c.z}) translate(${-c.x} ${-c.y})`;
 
+/** A pencil path; with `u` < 1 its strokes (subpaths) draw on one after another, so multi-stroke shapes build up. */
+const Pen: React.FC<{d: string; u: number; style: React.SVGProps<SVGPathElement>}> = ({d, u, style}) => {
+  if (u >= 1) return <path d={d} {...style} />;
+  const subs = d.split(/(?=M)/).filter((x) => x.trim());
+  return (
+    <>
+      {subs.map((sp, k) => {
+        const v = Math.max(0, Math.min(1, u * subs.length - k));
+        return v <= 0 ? null : <path key={k} d={sp} {...style} pathLength={1} strokeDasharray={1} strokeDashoffset={1 - v} />;
+      })}
+    </>
+  );
+};
+
 const Element: React.FC<{el: El; t: number; shot: Shot; i: number}> = ({el, t, shot, i}) => {
   const appear = el.in === undefined ? 1 : interpolate(t - shot.s, [el.in, el.in + 0.1], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   if (appear <= 0) return null;
@@ -90,6 +110,9 @@ const Element: React.FC<{el: El; t: number; shot: Shot; i: number}> = ({el, t, s
     dy += m.dy * u;
   }
   const seed = `${shot.id}-${i}`;
+  const local = t - shot.s;
+  const drawU = el.draw ? interpolate(local, [el.draw[0], el.draw[0] + Math.max(0.01, el.draw[1])], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}) : 1;
+  const fillO = el.fillIn === undefined ? 1 : interpolate(local, [el.fillIn, el.fillIn + 0.12], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
   const stroke = {stroke: LEAD, strokeWidth: 4, fill: 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const};
   const label = (x: number, y: number, s?: string) =>
     s ? <text x={x} y={y} fontSize={34} fill={MUTED} textAnchor="middle" fontFamily={captionFontStack}>{s}</text> : null;
@@ -98,8 +121,8 @@ const Element: React.FC<{el: El; t: number; shot: Shot; i: number}> = ({el, t, s
     case 'rect':
       body = (
         <>
-          {el.fill && <rect x={el.x} y={el.y} width={el.w} height={el.h} fill={FILLS[el.fill]} />}
-          <path d={rect(el.x, el.y, el.w, el.h, {seed})} {...stroke} />
+          {el.fill && <rect x={el.x} y={el.y} width={el.w} height={el.h} fill={FILLS[el.fill]} opacity={fillO} />}
+          <Pen d={rect(el.x, el.y, el.w, el.h, {seed})} u={drawU} style={stroke} />
           {label(el.x + el.w / 2, el.y + el.h / 2 + 12, el.label)}
         </>
       );
@@ -107,8 +130,8 @@ const Element: React.FC<{el: El; t: number; shot: Shot; i: number}> = ({el, t, s
     case 'ellipse':
       body = (
         <>
-          {el.fill && <ellipse cx={el.cx} cy={el.cy} rx={el.rx} ry={el.ry} fill={FILLS[el.fill]} />}
-          <path d={ellipse(el.cx, el.cy, el.rx, el.ry, {seed})} {...stroke} />
+          {el.fill && <ellipse cx={el.cx} cy={el.cy} rx={el.rx} ry={el.ry} fill={FILLS[el.fill]} opacity={fillO} />}
+          <Pen d={ellipse(el.cx, el.cy, el.rx, el.ry, {seed})} u={drawU} style={stroke} />
           {label(el.cx, el.cy + 12, el.label)}
         </>
       );
@@ -117,24 +140,24 @@ const Element: React.FC<{el: El; t: number; shot: Shot; i: number}> = ({el, t, s
       const pts = el.pts;
       body = (
         <>
-          {el.fill && el.closed && <polygon points={pts.map((p) => p.join(',')).join(' ')} fill={FILLS[el.fill]} />}
-          <path d={poly(pts, {seed, closed: el.closed})} {...stroke} />
+          {el.fill && el.closed && <polygon points={pts.map((p) => p.join(',')).join(' ')} fill={FILLS[el.fill]} opacity={fillO} />}
+          <Pen d={poly(pts, {seed, closed: el.closed})} u={drawU} style={stroke} />
         </>
       );
       break;
     }
     case 'arrow':
-      body = <path d={arrow(el.x1, el.y1, el.x2, el.y2, {seed})} {...stroke} />;
+      body = <Pen d={arrow(el.x1, el.y1, el.x2, el.y2, {seed})} u={drawU} style={stroke} />;
       break;
     case 'hatch':
-      body = <path d={hatch(el.x, el.y, el.w, el.h, {seed})} {...stroke} strokeWidth={2} />;
+      body = <Pen d={hatch(el.x, el.y, el.w, el.h, {seed})} u={drawU} style={{...stroke, strokeWidth: 2}} />;
       break;
     case 'figure': {
       const r = el.h * 0.12;
       body = (
         <>
-          <path d={ellipse(el.x, el.y - el.h + r, r, r, {seed})} {...stroke} />
-          <path d={poly([[el.x - el.h * 0.16, el.y], [el.x - el.h * 0.12, el.y - el.h * 0.72], [el.x + el.h * 0.12, el.y - el.h * 0.72], [el.x + el.h * 0.16, el.y]], {seed: seed + 'b'})} {...stroke} />
+          <Pen d={ellipse(el.x, el.y - el.h + r, r, r, {seed})} u={drawU} style={stroke} />
+          <Pen d={poly([[el.x - el.h * 0.16, el.y], [el.x - el.h * 0.12, el.y - el.h * 0.72], [el.x + el.h * 0.12, el.y - el.h * 0.72], [el.x + el.h * 0.16, el.y]], {seed: seed + 'b'})} u={drawU} style={stroke} />
         </>
       );
       break;
