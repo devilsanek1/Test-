@@ -95,6 +95,10 @@ Format: **rule** — why / evidence (video, date).
 ## Taste signals (the owner's picks; weight them when ranking options)
 - **Topics: the everyday wallet consequence** ("AI is outbidding you for the memory in your laptop" over the higher-scored
   Meta $25B story). — v3 G0, 2026-10-25.
+- **Warm, never sickly.** Low-saturation beige + muddy tan + olive-brown lines + a grey window read "sick" even when the
+  hue is warm. Warmth = peach/apricot creams (not yellow-beige), terracotta not tan, warm red-brown lines and wood (not
+  olive), a golden lamp pool, warm shadows, and the cold outside as a saturated dusk blue (never grey). v3's Autumn
+  Ochre became "Autumn Ember". — owner, v3 G4, 2026-10-26 ("we need to have a warm feeling, not sick").
 - **Palettes: the warm, everyday one for a money story** (v3: Autumn Ochre, C, over the research's Sage Study and the
   continuity Mint & Clay 1.1). — v3 G4, 2026-10-26.
 - **Lines: plain, direct and personal over clever** (core line "AI is making your next laptop pricier" over the panel's

@@ -140,6 +140,39 @@
         "pop": "#FFC23D",
         "ink": "#1E2A2E"
       }
+    },
+    {
+      "name": "9 Autumn Ember",
+      "mood": "Autumn Ochre made warm, not sickly (owner, v3): peach cream page, terracotta-apricot ground, warm red-brown wood and lines, golden lamp light, burnt-orange hero, blue pop; the night outside a saturated dusk blue. Money, everyday life, cozy interiors at night.",
+      "colors": {
+        "bg": "#F6E3D4",
+        "ground": "#DA9670",
+        "disc": "#F7C98B",
+        "hl": "#F4A988",
+        "line": "#9A4A2E",
+        "skin": "#D9926B",
+        "hero": "#D9542F",
+        "anchor": "#3A1F16",
+        "pop": "#2F8EEB",
+        "ink": "#2B1B0A"
+      },
+      "support": {
+        "night_window": {
+          "colors": [
+            "#5B6A94",
+            "#46527C",
+            "#323A5E"
+          ],
+          "role": "the cold outside seen from the warm room: saturated dusk blue, never grey"
+        },
+        "lamp": {
+          "colors": [
+            "#F7C98B",
+            "#FBE6C2"
+          ],
+          "role": "the lamp pool and its core"
+        }
+      }
     }
   ]
 }
