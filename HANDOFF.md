@@ -93,6 +93,13 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
   `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
+- **v3 status (2026-10-26 evening):** script + voice (take 4, `assets/v3/take4_clean.wav`) and palette (Autumn Ember,
+  `docs/v3/LOOK.md`) locked. G3 animatic: monochrome board style (`public/v3/animatic.json`, render
+  `deliverables/v3/v3_g3_animatic_board.mp4`, panel table `docs/v3/storyboard_g3.md`); the owner can follow the story and
+  asked to (1) put the cinematography back (cozy home base, scale reveal, Arcane learnings) and (2) replace the opening's
+  "data center consumes the houses" with a literal view; running as `context/workflows/v3-g3-board-cine-*.js`. Rules
+  learned today: playbook "Storyboard (G3)", `docs/look/STORYBOARD_STYLE.md` (sections 0 and 7), `docs/look/CINEMATIC_GUIDE.md`
+  (environment shot types + "The opening"), 60 fps production, `docs/ELEVENLABS.md`. Older status below.
 - **v3 status (2026-10-26 ~11:30 UTC):** script LOCKED (story-first rewrite, `docs/v3/script/script_g1.md`); the owner is
   regenerating the ElevenLabs take from `docs/v3/script/script_elevenlabs.md` (check it with `scripts/voice/check_take.py`);
   working voice `assets/v3/take2_clean.wav` -> `public/v3/voice.wav` + `voice_words.json`; G3 animatic workflow
