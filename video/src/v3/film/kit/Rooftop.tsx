@@ -174,17 +174,25 @@ export const MidTown: React.FC<MidTownProps> = ({x0, x1, rows, street: st, lamps
     const y = st.yB - u * (st.yB - st.yT);
     const [l, rr] = streetAt(st, y);
     const k = width(y) / wB; // perspective scale
-    const postH = 52 * k + 6;
-    const headR = Math.max(2.6, 7.5 * k);
+    // tall enough to stand clear of the street-front roofs, so each reads as a STREET LAMP (v3 cold read: short dark posts
+    // vanished against the house fronts and the bare pools read as "a dotted path")
+    const postH = 80 * k + 8;
+    const headR = Math.max(3.4, 10 * k);
+    const postW = Math.max(2, 4.4 * k);
     // posts stand on the snow banks just outside the curbs; the arm reaches over the road; a small warm pool under it
     for (const [side, cx] of [[-1, l - 7 * k], [1, rr + 7 * k]] as const) {
-      const poolRx = Math.max(4, width(y) * 0.2);
-      const hx = cx - side * 12 * k;
+      const poolRx = Math.max(3, width(y) * 0.13);
+      const hx = cx - side * 16 * k;
+      const hy = y - postH + 4 * k;
       lampEls.push(
         <React.Fragment key={`${i}${side}`}>
-          <Fill d={ellipse(hx - side * poolRx * 0.2, y + 3 * k, poolRx, Math.max(2, poolRx * 0.32), {seed: `${seed}/pool${i}${side}`})} color={EMBER.houseLit} at={fillAt(at, 0.1)} offset={false} />
-          <Ink d={vline(cx, y, y - postH, {over: [0, 0], seed: `${seed}/post${i}${side}`}) + line(cx, y - postH, hx, y - postH + 2 * k, {over: [0, 0], seed: `${seed}/arm${i}${side}`})} at={b(at, 0.1)} width={Math.max(1.6, 3.4 * k)} color={EMBER.anchor} taper={false} />
-          <Fill d={blob(hx, y - postH + 4 * k, headR, headR * 0.8, {seed: `${seed}/lamp${i}${side}`})} color={EMBER.houseLit} at={fillAt(at, 0.12)} offset={false} />
+          <Fill d={ellipse(hx - side * poolRx * 0.2, y + 3 * k, poolRx, Math.max(1.6, poolRx * 0.28), {seed: `${seed}/pool${i}${side}`})} color={EMBER.houseLit} at={fillAt(at, 0.1)} offset={false} />
+          {/* a snow-lit edge on the post (a flat light line beside the dark one), so it reads against the house fronts */}
+          <Ink d={vline(cx - side * postW * 0.75, y, y - postH + 2 * k, {over: [0, 0], seed: `${seed}/postL${i}${side}`})} at={b(at, 0.1)} width={Math.max(1.2, postW * 0.6)} color={EMBER.snow} taper={false} />
+          <Ink d={vline(cx, y, y - postH, {over: [0, 0], seed: `${seed}/post${i}${side}`}) + line(cx, y - postH, hx, y - postH + 2 * k, {over: [0, 0], seed: `${seed}/arm${i}${side}`})} at={b(at, 0.1)} width={postW} color={EMBER.anchor} taper={false} />
+          {/* the lamp: a warm halo disc around a bright core (flat steps, no gradient) */}
+          <Fill d={blob(hx, hy, headR * 1.9, headR * 1.6, {seed: `${seed}/halo${i}${side}`})} color={EMBER.houseLit} at={fillAt(at, 0.12)} offset={false} />
+          <Fill d={blob(hx, hy, headR, headR * 0.8, {seed: `${seed}/lamp${i}${side}`})} color={EMBER.core} at={fillAt(at, 0.12)} offset={false} />
         </React.Fragment>,
       );
     }

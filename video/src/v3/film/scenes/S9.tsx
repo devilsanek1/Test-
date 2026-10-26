@@ -113,7 +113,7 @@ const STREAMS: StickFlightOpts[] = (() => {
     const long = kind === 0;
     const to: Pt = [r.range(HALL.x - 120, HALL.x + 120), HALL_ROOF + 16];
     const dur = long ? r.range(1.2, 1.4) : kind === 2 ? r.range(0.8, 0.95) : r.range(0.6, 0.75);
-    out.push({from: [sx, peakAt(sx) + 10], to, t0, t1: t0 + dur, arc: long ? r.range(170, 220) : r.range(150, 190), w0: 50, w1: 40, rot0: r.range(-25, 25), rot1: r.range(-40, 40), end: 'shrink'});
+    out.push({from: [sx, peakAt(sx) + 10], to, t0, t1: t0 + dur, arc: long ? r.range(170, 220) : r.range(150, 190), w0: 60, w1: 50, rot0: r.range(-25, 25), rot1: r.range(-40, 40), end: 'shrink'});
   }
   return out;
 })();
@@ -124,9 +124,10 @@ const FarPlane: React.FC = () => (
     <Fill rect={[-2000, BAND_TOP, 4000, 400]} color={EMBER.skyLow} offset={false} />
     {/* the mountain of memory sticks: gold sticks with black chips (the kit Pile, ~62 px sticks), past the right edge */}
     <Pile x={840} y={HALL.y} w={840} h={372} stickW={62} ink={2.2} seed="s9/pile" />
-    {/* the streams (behind the hall: each stick sinks behind its parapet, into the roof) */}
+    {/* the streams (behind the hall: each stick sinks behind its parapet, into the roof). No trail ticks and ~the held
+        stick's size: with two dark ticks behind them the small sticks read as birds or drones (v3 cold read). */}
     {STREAMS.map((o, i) => (
-      <StickFlight key={i} {...o} seed={`s9/st${i}`} ink={2} />
+      <StickFlight key={i} {...o} seed={`s9/st${i}`} ink={2} trail={false} />
     ))}
     {/* the AI data center: the dark body, its sign lit (ink letters on cold light) */}
     <DataCenter x={HALL.x} y={HALL.y} w={HALL.w} h={HALL.h} variant="dark" signLitAt={0} signH={52} ink={2.6} seed="s9/dc" />

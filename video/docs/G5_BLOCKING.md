@@ -170,3 +170,10 @@ rendered the film and fixed what only shows across panels.
   read before any lane starts; (2) the last panel's lane owns the seam and checks a strip of the last 0.3 s plus
   frames 0-6; (3) a hero % / dark % meter per panel on the lane sheets (the S8 dark budget was a measured number
   nobody had); (4) lanes commit only and the assembler pushes once (every lane push was rejected as non-fast-forward).
+- **Re-staging one panel after the assembly** (v3 S9 + S9b -> one S5 pull-back): keep the panel's outer contract fixed
+  (its start and end, the cut words, the sound-cue times), so only one scenes.json row, its scene file and new kit
+  pieces change; a docs lane updates the board, camera plan and storyboard in parallel, and one finisher re-renders the
+  film, gate-checks it and rebuilds the whole-film sheet with new sample times (the move's start, reveal and hold).
+- **Cold-read the new panel at phone size before the full render:** the builder's own checks passed, but a sound-off
+  reader still took S9's streams for birds or drones (dark trail ticks), the lit street for "a dotted path" (posts lost
+  against the house fronts) and the pile for hay (pale stick backs); fixing those in the kit first cost one render, not two.

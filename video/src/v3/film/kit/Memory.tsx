@@ -236,7 +236,8 @@ function pileLayout(x: number, y: number, w: number, h: number, stickW: number, 
         x: x - half + u * half * 2 + r.jitter(step * 0.35),
         y: y - dy + r.jitter(rowStep * 0.35),
         w: sw * r.range(0.86, 1),
-        rot: r.chance(0.18) ? r.range(55, 80) * (r.chance(0.5) ? 1 : -1) : r.jitter(38),
+        // mostly near level (steep, pale-edged sticks at random angles read as fries or hay at phone size)
+        rot: r.chance(0.07) ? r.range(50, 70) * (r.chance(0.5) ? 1 : -1) : r.jitter(30),
         shade: r.chance(0.3),
         back: r.chance(0.3),
         row: ri,
@@ -274,7 +275,8 @@ const RawStick: React.FC<{s: PileStick; scale: number}> = ({s, scale}) => {
     <g transform={`translate(${s.x.toFixed(1)} ${s.y.toFixed(1)}) rotate(${s.rot.toFixed(1)})`}>
       <rect x={x0} y={y0} width={w} height={h} fill={s.shade ? EMBER.boardDeep : EMBER.board} />
       <rect x={x0 + w * 0.05} y={y0 + h * 0.76} width={w * 0.9} height={h * 0.24} fill={EMBER.pin} />
-      {s.back ? <rect x={x0 + w * 0.3} y={y0 + h * 0.22} width={w * 0.32} height={h * 0.36} fill={EMBER.card} /> : <path d={chips} fill={EMBER.chip} />}
+      {/* every pile stick shows its black chips (the stick's signature; v3 cold read: pale label backs read as hay) */}
+      <path d={chips} fill={EMBER.chip} />
       <rect x={x0} y={y0} width={w} height={h} fill="none" stroke={EMBER.ink} strokeWidth={1.7} strokeLinejoin="round" />
     </g>
   );
