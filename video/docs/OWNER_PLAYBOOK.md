@@ -117,6 +117,10 @@ Format: **rule** — why / evidence (video, date).
   line 2 "AI data centers get first dibs..."). A plain line needs the frame-0 image, the first-second sound and the 2nd
   line to bring the jolt. — v3 G0.5-G1, 2026-10-25/26.
 
+- **Core lines: one real person in her own (attributed) words over a plural headline** ("She quit Google, and says her
+  contract bans criticizing it, for life" over "Google AI engineers are quitting..." and "ashamed to work at Google").
+  — v2 G0.5, 2026-10-26.
+
 ## Motion
 - **Render at 60 fps: every video, from the blocking cut (G5) to the final.** The owner compared the same 6 s tower move
   at 30 and 60 on the phone: "60 is definitely better, smoother and more crispy". Animate by time (seconds), never by
