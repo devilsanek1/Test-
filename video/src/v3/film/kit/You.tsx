@@ -58,7 +58,7 @@ export const YouFront: React.FC<YouFrontProps> = ({x, y: y0, head: H = 250, face
   const cy = y + H * 0.52;
   const shY = y + H * 1.14;
   const waist = y + H * 4.4;
-  const hw = H * 1.12; // half shoulder width
+  const hw = H * 0.96; // half shoulder width
   const [hl, hr] = hands ?? [[x - H * 0.62, y + H * 2.75], [x + H * 0.62, y + H * 2.75]];
   // torso: rounded shoulders, slight taper, runs past the waist (the lane's counter cuts it)
   const torso = smooth(
@@ -66,10 +66,10 @@ export const YouFront: React.FC<YouFrontProps> = ({x, y: y0, head: H = 250, face
       [cx - H * 0.2, shY - H * 0.06],
       [cx - hw * 0.72, shY + H * 0.02],
       [cx - hw, shY + H * 0.3],
-      [cx - hw * 1.02, shY + H * 1.4],
-      [cx - hw * 0.94, waist],
-      [cx + hw * 0.94, waist],
-      [cx + hw * 1.02, shY + H * 1.4],
+      [cx - hw * 0.96, shY + H * 1.4],
+      [cx - hw * 0.9, waist],
+      [cx + hw * 0.9, waist],
+      [cx + hw * 0.96, shY + H * 1.4],
       [cx + hw, shY + H * 0.3],
       [cx + hw * 0.72, shY + H * 0.02],
       [cx + H * 0.2, shY - H * 0.06],
@@ -79,9 +79,9 @@ export const YouFront: React.FC<YouFrontProps> = ({x, y: y0, head: H = 250, face
   // arms: upper arm down the side, forearm in to the hand
   const arm = (side: -1 | 1, hand: Pt) => {
     const sh: Pt = [cx + side * hw * 0.86, shY + H * 0.28];
-    const el: Pt = [cx + side * hw * 1.08, shY + H * 1.45];
+    const el: Pt = [cx + side * hw * 1.04, shY + H * 1.42];
     const wr: Pt = [hand[0] - side * H * 0.02, hand[1]];
-    const thick = H * 0.21;
+    const thick = H * 0.165;
     // a sleeve as a fat stroke outline: offset the polyline both ways
     const pts = [sh, el, wr];
     const left: Pt[] = [];
