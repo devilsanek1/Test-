@@ -19,8 +19,7 @@ read; G5 sets the rest.
 | **S6** | 11.48-16.60 | This past year, US computer prices turned up: +9.7 %. | **INSERT**, the exact S4 frame | Same chart, same camera as S4; only the hook up and "+9.7%" are new. | None | HOLD | The matched frame makes the turn the only difference. Frozen. |
 | **S7** | 16.60-18.28 | Your laptop runs on the memory stick inside it. | **CLOSE** (object), at your desk in the home base | Slightly high (the icon kit's 3/4 view). The laptop (w ~420) centred on a light desk mass cut by both side edges; the see-inside bubble pops upper right on "your" (17.24), above y 840. | COZY: the lamp pool, a paper ellipse on the desk under the laptop, 540-760 px wide (wider than the laptop, so it reads as light, not a mat). No window: it is saved for O1, S13 and S15. | HOLD | The pool frames the laptop and says "yours, at home". Add 2 elements (desk, pool) to the frozen drawing. |
 | **S8** | 18.28-19.40 | It runs on a stick of memory chips. | **EXTREME CLOSE**, cut-in on S7's axis | Same angle as S7. The keyboard is cut by both side edges low in the stage; the stick rises out (0.4 s) and holds at 460 px wide, centred, with its pins and chips exaggerated. | SCALE ladder, small end: ONE stick fills the frame, so S9's many sticks and S9b's mountain read as "more". The pool continues, cut by the edges. | HOLD (the stick's rise is an element move) | Redraw at close size; never zoom the camera, because the line weights would scale with it. |
-| **S9** | 19.40-21.32 | AI data centers run on memory chips too, lots of them. | **SCALE: S1 RISE-OVER REVEAL**, the film's ONE big move; it lands in an S3-style one-landmark frame | Eye level at roof height. START: our roof ledge (mid-grey mass with an ink lip, cut by both side edges) fills from y ~860 down and hides the lower half of the data center; only its roof, top rows and 56 px AI DATA CENTER sign show (top at y ~648). LAND (on "centers", ~20.8): the ledge is a thin foreground lip cut by the bottom (top y ~1380); the data center whole and centred (~447 px wide, roof y ~760, base y ~1210) on a low town band; plain sky above. | SCALE by comparison: the building ~4-5x a house in the town band. 4 planes: ledge, landmark, town band, sky. | **RISE**, 19.40-21.32, ease-out (visibly landed by ~20.8, drifting into the cut on "By"). Two layers, because the board has no parallax: the camera rises (y 1080 to 960, z 1.00 to 1.04; the world sinks ~120 px, so the roof never enters the caption band) while the ledge drops 384 px on its own move with a sine ease-out over the whole 1.92 s (520 px on screen with the camera; the camera lands at 20.8 with the `unveil` ease; peak 14.8 px per 30 fps frame on screen). Sticks (170 px) arc in from the side edges only from 19.75 (the roof is 48 px under the caption band at the start), into the roof. Animated, so no red mark. | Both end frames pass as panels: the start says "an AI data center behind our roof", the landing "memory sticks pouring into it". This replaces board v2's 140 px rise, which read as a nudge. |
-| **S9b** | 21.32-22.68 | ... by the mountain: their memory dwarfs everything. | **SCALE CUT to a LOW ANGLE** (worm's-eye, K7), with a tiny figure | Ground-level camera, horizon low at y ~1200. The pile of memory sticks is the subject: a tall mound (w up to 460, h ~560) from the horizon up to y ~620, just under the caption band. The data center at its foot is half its S9 size (w ~220, mid role). Plain paper ground with one ground line. | SCALE: tiny you at the pile's foot, bottom left: board v2's 86 px mid figure (0.045 H, 5 px outline; 0.03 H would be a 15 px speck on the cold read), holding your one stick drawn 2x. Pile to you ~6.5:1 (the caption band caps the pile at ~580 px); the half-size data center at its foot carries the rest. | HOLD (the cut is the move) | The cut changes the angle (eye level to ground level) and the size (the building halves), so it steps up from S9 instead of repeating it: S9 and S9b are ONE scale moment of 3.28 s. The low angle goes on the pile (the quantity), never on the company's building (no villain). Drops the light ground block one reader called meaningless. |
+| **S9** | 19.40-22.68 | Your one stick vs their mountain of memory ("And so do AI data centers. By the mountain."). | **SCALE: S5 PULL-BACK CRANE**, the film's ONE big move (`CINEMATIC_GUIDE.md` S5, the owner's favourite Arcane shot); it lands on tiny you inside the move, so no scale cut | Spec `docs/v3/proposal_pullback.md`, exact boxes `scripts/v3/build_proposal_pullback.py`. START (19.40): your back in MCU, 3/4, head turned right (hair and the ear side, no face), cut at the hips, raising your one stick (S8's drawing, matched on the object) against the brick stack; the only view out is the slot in your eyeline. END (held from 21.98): plain sky over the caption band; the dark hall on the far band with its sign as 48 px roof letters and the sticks pouring in from the roofs; the mountain of ~65 px sticks runs past the right edge, summit (840, 626) under the band; mid roofs with chimney pots (not notches, which read as battlements); tiny you (180 px, x ~420-560, feet y ~1490) back to us at OUR ROOF's parapet, stick up; the deck lines and the lit street lead to the hall. | SCALE by depth: you shrink 5x while the hall and the mountain land, so the ladder (one stick, many, the mountain) plays inside one move; the roofs streaming sticks are O1's cause at city scale. 6 planes (sky, far, mid roofs, clutter, deck + you, the pot); 25 elements. | **PULL-BACK CRANE**, 19.40-21.98 (155 f at 60 fps), then a 42 f hold to the cut on "They" (22.68). One continuous dolly back + crane up + arc on ONE ease, cubic-bezier(0.55, 0.03, 0.50, 1.0), roll 0: Arcane #55's shape at 3.5x its speed (the shape, never the speed). Element moves on one p, parallax shift = 1 - D/Z: far x1.11 to 1 sliding 1 W from 1080 px right (horizon held), mid x2 to 1 from 920 right / 300 up, clutter box to box (~x0.3), deck x5 to 1 pinned on (480, 1430); the pot crosses on its own at 90 px/f. Far peak 14.5 px/f at 20.75; frame 1 at 3 % of peak; under 5 % from 21.88 (the landing hold). Beats: sticks rise in the slot and streak behind the stack (to 20.05); the darkest beat (to 20.60); the pot's wipe window hides the hand-over to tiny you (20.67-20.83); its trailing edge uncovers the hall, the sign and the sticks; the summit swings in at 21.10, is at x 967 on "By", lands on "mountain" (21.72, the thoom). Animated, so no red mark. | Both ends pass as panels: the start says "you, your one stick, something out there", the hold "tiny you and your one stick vs their mountain". The fastest cuts (S7 1.68 s, S8 1.12 s) lead into it at 47 % of the film, a reveal about every 0.5 s. At the board's 30 fps the far plane peaks at 29 px/frame, over the 15 px budget; G5 renders at 60 fps. Sheet thumbnails: 19.5 s and 22.4 s. Fallback if a cold read fails: D3, S5 inside S9 only with S9b's cut kept. |
 | **S10** | 22.68-25.24 | They pay more, so they get first dibs. | **WIDE** (the system), side-on profile | Eye level, flat, no perspective; ground line at y ~1150. The queue runs left to right into the whole chip factory on the right: the laptop van (left, small), the data center first in line (centre, the subject), sticks flying from the factory into it. | SCALE by comparison only: the data center ~2.5x the van (the bigger buyer). No low angle on it. | HOLD | Side-on is the clearest queue: who is first is plain left-right order. Frozen. |
 | **S11** | 25.24-29.40 | What's left costs 5 times last year's price. | **INSERT**, bar chart straight-on | Level; L axes; a light short bar left, a dark bar five times as tall right; "5x" above. | None | HOLD | Frozen. Straight-on keeps the 5x honest. |
 | **S12** | 29.40-31.32 | Laptop makers pass it on. | **CLOSE** (object) | Slightly high, the same angle as S7. The dark laptop centred; its price tag centred under it: $999 struck on "makers", $1,099 pops on "on" (ding). | None | HOLD | Swap the price card for O1's tag icon, so one object carries the stake in O1, S12, S15 and S16. |
@@ -40,8 +39,7 @@ read; G5 sets the rest.
 | S6 | S6 · INSERT, same frame as S4 · HOLD · CUT | This year the line turns UP: +9.7% |
 | S7 | S7 · CLOSE at your desk, lamp pool · HOLD · CUT | Your laptop runs on the memory stick inside |
 | S8 | S8 · EXTREME CLOSE, cut-in · HOLD · CUT | ONE stick of memory chips |
-| S9 | S9 · SCALE: RISE-OVER (the one big move) · CUT | Over our roof: the AI data center, sticks pour in |
-| S9b | S9b · SCALE CUT: LOW ANGLE, tiny you · HOLD · CUT | Their mountain of memory vs your one stick |
+| S9 | S9 · SCALE: S5 PULL-BACK CRANE (the one big move) · CUT | Your one stick vs their mountain of memory |
 | S10 | S10 · WIDE, side-on · HOLD · CUT | Data center first in line; the laptop van waits |
 | S11 | S11 · INSERT bars · HOLD · CUT | What's left costs 5x last year |
 | S12 | S12 · CLOSE · HOLD · CUT | Laptop makers pass it on: $999 to $1,099 |
@@ -52,23 +50,27 @@ read; G5 sets the rest.
 | LOOP | LOOP · DISSOLVE 0.12 s to frame 0 · O1 start | Back to the start |
 
 ## Film-level checks
-- **Moves:** two, both animated, both timing questions: O1's 5 % pull-out (the opening rule) and S9's rise-over (the one
-  big move). Every other panel holds and cuts on its locked word; G5's 1.5-2 % breathes are polish, not boarded.
+- **Moves:** two, both animated, both timing questions: O1's 5 % pull-out (the opening rule) and the one big move, S9's
+  S5 pull-back crane (since the owner's swap, 2026-10-26; it was an S1 rise-over). Every other panel holds and cuts on
+  its locked word; G5's 1.5-2 % breathes are polish, not boarded.
 - **Red marks:** one, O1's focus circle on the sign at 4.04. No camera marks, because both moves are animated (§4: the move
-  is its own notation). On a still contact sheet, show S9 as two thumbnails (start and landing) instead of a mark.
+  is its own notation). On a still contact sheet, show S9 as two thumbnails
+  (start 19.5 s and the landing hold 22.4 s) instead of a mark.
 - **Home base:** O1 (POV, the open), S7-S8 (at your desk in the lamp pool), S13 (objective, the waiting beat), S15 (POV, the
   callback), S16 (close, the lamp pool), LOOP. That is 15.5 s, 38 % of the film and 55 % of the non-chart time (rule: cozy
   at least 50 %). The nook is breached once, on O1's "pricier", and never again.
-- **Scale:** one moment, S9 + S9b, 3.28 s = 8 % (rule: 1.5-4 s, at most 20 %). One scale cut to a tiny figure (S9 to S9b),
-  set up by the close-to-wide cut S8 to S9: one stick, then many, then a mountain. Comparison scale (the data center ~4x the
-  houses) sits in the window in O1 and S15.
+- **Scale:** one moment, S9, 3.28 s = 8 % (rule: 1.5-4 s, at most 20 %); the dose is unchanged by the merge. The ladder
+  (one stick, then many, then the mountain) now plays inside the one move: S8's one stick, matched on the object at S9's
+  start, then the pull-back lands on tiny you (180 px) against the mountain, with no separate scale cut
+  (`STORYBOARD_STYLE.md` §7). Comparison scale (the data center ~4x the houses) sits in the window in O1 and S15.
 - **Size and angle change at every cut** except the deliberate matches, which keep the exact frame so the change is the only
   difference: S4 = S6 (chart), S10 = S14 (queue), O1's end = S15 (callback). The run: POV close-medium, insert, medium,
-  insert, close, extreme close, wide eye level (rise), wide low angle, wide side-on, insert, close, medium-wide, wide, POV,
-  close-up.
-- **Respect:** no low angle on the data center alone (no villain); S9b's low angle sits on the pile of chips.
-- **Caption band:** plain in every frame, also through the moves (O1's window top at 613 or lower; S9's roof at 648 or
-  lower at its start; S9b's pile top at ~620).
+  insert, close, extreme close, MCU back craning up to a high wide (one move), wide side-on, insert, close, medium-wide,
+  wide, POV, close-up.
+- **Respect:** no low angle on the data center (no villain); S9 looks out from OUR ROOF, and the quantity (the mountain
+  of sticks) is what dwarfs you.
+- **Caption band:** plain in every frame, also through the moves (O1's window top at 613 or lower; S9's summit lands at
+  y 626, under the band, with plain sky above).
 - **Not used:** CINEMATIC_GUIDE S2 (no time-passing beat), the S4 low-horizon breather (no exterior pause earns it; the
   chart inserts give the breaths), K10 (no institution looking down).
 
@@ -99,3 +101,11 @@ is one mid room tone over the whole frame in O1, S7, S8, S13, S15 and S16 (the w
 a hall cut by both side edges (not 447 px centred) with OUR ROOF's lip and vent; S9b is a worm's-eye with the horizon at
 y 1500 and the pile past both edges at 10:1 (not 6.5:1); S10 = S14 is a queue in depth from slightly above (not side-on);
 S16 is a cut-in on S15's phone; the notes strip is two big lines (shot type / COZY / SCALE / move, then the idea).
+
+## The S5 merge (owner, 2026-10-26: "pretty good, continue, swap"; supersedes the S9 / S9b notes above) S9 + S9b became
+ONE panel S9, 19.40-22.68, staged as `CINEMATIC_GUIDE.md` S5 (the pull-back crane, the owner's favourite Arcane shot):
+the rows above carry it. Spec `docs/v3/proposal_pullback.md`; exact boxes `scripts/v3/build_proposal_pullback.py`; board
+render `deliverables/v3/v3_proposal_pullback.mp4`; merged into `public/v3/animatic.json` (lint 0 / 0). The replaced S9
+and S9b rows (plan and notes strip) are kept verbatim in `docs/v3/archive/g3/s9_s9b_board_cine_rows.md`. Only the cut on
+"By" goes; every other cut and word stays. S9 adds two sfx: our swell (19.95, peaking with the burst) and the thoom on
+"mountain" (21.72).
