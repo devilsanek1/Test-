@@ -68,6 +68,14 @@ Format: **rule** — why / evidence (video, date).
   absolute core of the message and gets the biggest emotional reaction (v3: something like "AI is making your PC more
   expensive"). Brainstorm, critique and the owner's pick, like the topic. It drives frame 0, the hook, the cover and the
   payoff, and every line must serve it. — owner, v3, 2026-10-25.
+- **The first 3 seconds, the whole first scene, must be an absolute banger: the viewer feels "something is about to
+  happen".** From the owner's reference (an explainer in our style, 2026-10-26): (1) frame 0 is the scene being MADE:
+  bare ink lines, colour floods in within ~0.3 s; (2) the voice starts on the first frames (~0.05 s); (3) the hook's
+  claim is made physical and escalates: the expectation is shown, then reality overtakes it (empty markers for "France
+  expected 200,000", then a crowd pours in and overflows on "half a million came", at ~2 s); (4) something new appears
+  every few frames, never a static frame in the first 3 s; (5) one continuous shot through the opening (7.7 s, a slow
+  ~5 % pull-out that gathers speed), no cut; (6) the film loops back to the bare-line frame 0. Details:
+  `docs/look/CINEMATIC_GUIDE.md`, "The opening". — owner, v3, 2026-10-26.
 - **The first 2 s and first 5 s get the most polish; the first 10 s get the next most.** Quirks late in the video are acceptable. — v1, 2026-10-25.
 - **State the payoff in words from frame 0** (a bold claim on the first frame, starting mid-action). A calm, pretty
   opening frame lost about 80 % of viewers by 3 s. — v1 Instagram insights after 45 min (155 views, 70 viewers, avg 21 s / 55 s), 2026-10-25.

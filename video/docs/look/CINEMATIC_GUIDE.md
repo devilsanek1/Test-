@@ -9,6 +9,24 @@ upgrade of a v1 shot (a better move, light or composition), and nothing else cha
 Notation: frame 1080 x 1920, H = 1920 px, captions at y 317-556. `#94 @238.0` = Arcane shot 94 at 238.0 s into the source
 video; `v1 @25` = 25 s into the v1 film. The sketch animatic (G3) names the S#; blocking (G5) sets the exact numbers.
 
+## The opening: the first 3 seconds (owner rule, 2026-10-26; the most important shot of every video)
+From the owner's reference (an explainer reel in our hand-drawn style, 1080x1350, a one-point-perspective street;
+measured, not stored):
+- **0.00-0.35 s, the scene is made:** frame 0 is bare ink lines only; flat colour floods in shape by shape within
+  ~0.3 s. Motion and "making" from the first frame.
+- **The voice starts at ~0.05 s.** No silent lead, no title card.
+- **0.3-2.2 s, the expectation:** the hook's claim is staged as what SHOULD happen (neat empty markers filling the
+  street for "France expected 200,000 marchers"), building up row by row.
+- **~2.2 s, reality overtakes it:** on the payoff number ("Half a million came") the scene escalates and overflows
+  (a crowd pours in past the markers, signs pop up). The keyword is highlighted in the caption at the same moment.
+- **Never still:** a new element every 3-6 frames through the first 3 s; the camera keeps moving (a slow ~5 % pull-out
+  that gathers speed, ease-in, over the whole 7.7 s shot).
+- **One continuous shot for the opening, no cut** until the hook's idea has landed.
+- **The loop:** the last frame returns to the bare-line frame 0, so the rewatch starts seamlessly.
+**For our videos:** stage the hook as "the expected thing, then the surprising reality overtaking it", inside one
+opening shot that builds from bare lines; keep our frame-0 claim text and the first-second phone sound. SketchReel
+supports it: `draw` (stroke draw-on) and `fillIn` (colour flood) per element.
+
 ## Shot types
 
 ### S1 Rise-over reveal (move). Confidence: highest, the only shot that passed all 3 reviewers (min 7, avg 7.7)
