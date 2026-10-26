@@ -7,7 +7,8 @@
 // paper + 4 tones, line weight by role, gesture figures, red notation marks, notes in a strip under the stage, no
 // parallax) and 'sketch' (the original warm pencil look, kept so old data renders as before).
 // Board API: role 'subject' | 'mid' | 'far' on any element (default: 'subject' for fill 'pop', 'far' for f < 0.5, else
-// 'mid'); sw = stroke width override; figure pose / facing / face; text strike; {t: 'mark'}; camera.word.
+// 'mid'); sw = stroke width override; figure pose / facing / face; text strike; {t: 'mark'}; camera.word; shot.credit and
+// frame0Credit = the small-print slot (sources, a name caption), drawn under the caption, never in the picture.
 // Lint before every render: python3 scripts/v3/board_lint.py public/v3/animatic.json
 
 import React from 'react';
@@ -78,6 +79,9 @@ export type Shot = {
   camera: {from: Cam; to: Cam; ease?: Ease; start?: number; end?: number; word?: string};
   els: El[];
   moves?: {el: number; dx: number; dy: number; at: number; dur: number}[];
+  /** the small-print slot (added for v2): a source credit or a name caption, 36 px mid grey under the caption, never
+   *  in the picture (e.g. "Source: BBC News, 21 Oct 2026") */
+  credit?: string;
 };
 export type Animatic = {
   /** default 'board' */
@@ -87,6 +91,8 @@ export type Animatic = {
   durationSec: number;
   frame0: string;
   frame0Until: number;
+  /** a small line under the frame-0 text, shown with it (added for v2, e.g. its source) */
+  frame0Credit?: string;
   words: {w: string; s: number; e: number}[];
   sfx: {src: string; t: number; gain?: number}[];
   shots: Shot[];
@@ -582,8 +588,15 @@ export const SketchReel: React.FC<{data: Animatic}> = ({data}) => {
       ) : null}
       {t < data.frame0Until && (
         <div style={{position: 'absolute', top: CAPTION_TOP - 160, left: 60, right: 60, textAlign: 'center', fontSize: 86, fontWeight: 700,
-          lineHeight: 1.05, color: ink}}>{data.frame0}</div>
+          lineHeight: 1.05, color: ink}}>
+          {data.frame0}
+          {data.frame0Credit ? <div style={{fontSize: 36, fontWeight: 400, lineHeight: 1.2, marginTop: 4, color: board ? BOARD.mid : MUTED}}>{data.frame0Credit}</div> : null}
+        </div>
       )}
+      {shot.credit && !(t < data.frame0Until && data.frame0Credit) ? (
+        <div style={{position: 'absolute', top: CAPTION_TOP + 236, left: 60, right: 60, textAlign: 'center', fontSize: 36, lineHeight: 1.2,
+          color: board ? BOARD.mid : MUTED}}>{shot.credit}</div>
+      ) : null}
       {page && (
         <div style={{position: 'absolute', top: CAPTION_TOP + 80, left: 60, right: 60, textAlign: 'center', fontSize: 100, lineHeight: 1.1,
           color: ink, opacity: pop.opacity, transform: `scale(${pop.scale})`, textShadow: board ? undefined : `0 0 18px ${PAPER}, 0 0 8px ${PAPER}`}}>
