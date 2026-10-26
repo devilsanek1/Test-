@@ -36,6 +36,8 @@ Format: **rule** — why / evidence (video, date).
   them aloud); tags describe delivery only and NEVER quote script words (v4 spoke the quoted phrases); put a short tag
   right where the delivery changes, mid-line if needed (a tag carries on until the next one), and show emphasis with CAPS
   in the line. Alternate hooks go in their own paste file. — owner's first v3 take, 2026-10-25.
+- **Always give the owner the FULL paste text in one copy-paste block, never just the changed line,** whenever any line
+  or cue changes. — owner, v3, 2026-10-26 ("just giving me a line to change is clunky").
 - **ElevenLabs cues name a tone or emotion, never an action:** "correcting yourself" made v4 say the previous line again
   before the correction. No "correcting", "repeating", "quoting", "reading", "listing" in tags. — owner's v3 take 3, 2026-10-26.
 - **Voice: the treated ElevenLabs WAV is the quality bar.** An untreated or cheaper TTS sounded "cheap". — v1.
