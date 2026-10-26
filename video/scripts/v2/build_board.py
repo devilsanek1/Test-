@@ -339,8 +339,19 @@ def nook(s=1.0, dx=0.0, dy=0.0):
                 continue
         else:
             e = below_band(e)
+        if n in ('curtain', 'shade', 'floor') and off_frame(e):
+            continue
         out.append(e)
     return out
+
+
+def off_frame(e):
+    """True when a line / shape / icon lies wholly outside the stage (x 0-1080, y 0-1680)"""
+    if e['t'] == 'line':
+        xs, ys = [x for x, _ in e['pts']], [y for _, y in e['pts']]
+    else:
+        xs, ys = [e['x'], e['x'] + e['w']], [e['y'], e['y'] + e.get('h', 0)]
+    return min(xs) >= 1080 or max(xs) <= 0 or min(ys) >= 1680
 
 
 # P2: WIDE, eye level. "One odd contract": she stands in her nook holding her contract, and it runs down to the floor
@@ -360,7 +371,6 @@ p13_els = nook(S13, *D13)
 p13_els += [
     xform(fig(**SEATED, role='mid', hair='long'), S13, *D13),
     xform(icon('mic', 540, 1180, 75), S13, *D13),
-    xform(shape([(560, 1600), (680, 1600), (740, 1700), (500, 1700)], 'paper'), S13, *D13),         # her contract, on the floor
     icon('speech', 270, 640, 400, 264, role='subject', text='FACTS', pts=[[0.53, 1.75]], **{'in': 1.12}),   # 'talking'
 ]
 
@@ -413,7 +423,7 @@ p6_els = [
     ell(260, 1540, 300, 60, 'paper', role='far', sw=0),                               # the lamp pool on the desk
     icon('mic', 200, 1250, 120),
     fig(640, 1960, 1100, facing='l', face='worried', hair='long'),                    # head (596, 1130)
-    icon('speech', 120, 650, 400, 264, pts=[[1.02, 1.75]], **{'in': 0.16}),          # on 'told'
+    icon('speech', 120, 650, 400, 264, pts=[[0.95, 1.72]], **{'in': 0.16}),          # on 'told'
 ]
 
 # ===================================================================== P7: in April, a deal (cold insert, the stamp)
