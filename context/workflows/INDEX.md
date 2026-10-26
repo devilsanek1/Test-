@@ -47,3 +47,4 @@
 | 2026-10-26 | `v3-line2-fix-wf_1f03c055-f2d.js` | 9 | 0 | `context/agent_reports/2026-10-26_v3-line2-fix-wf_1f03c055-f2d.md` |
 | 2026-10-26 | `look-cozy-scale-arcane-wf_e8c65891-2ba.js` | 7 | 0 | `context/agent_reports/2026-10-26_look-cozy-scale-arcane-wf_e8c65891-2ba.md` |
 | 2026-10-26 | `v3-g1-story-wf_0c14abc0-179.js` | 16 | 0 | `context/agent_reports/2026-10-26_v3-g1-story-wf_0c14abc0-179.md` |
+| 2026-10-26 | `v3-g3-animatic-wf_af0b4e08-537.js` | 6 | 0 | `context/agent_reports/2026-10-26_v3-g3-animatic-wf_af0b4e08-537.md` |
