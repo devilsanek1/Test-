@@ -75,6 +75,8 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'light'}];   // optional: ov
   the bottom-left (y > 1850). Key action inside x 90-990, y 600-1480.
 - **Board notation is not film**: the red pencil marks and the notes strip never appear. A red focus circle becomes a
   production emphasis that fits the look (light, the hero colour, a pop), never a drawn circle.
+- **Density and life**: every panel is dressed and alive at G5 (a world around the subject, people, the living character,
+  the idle layer always on): `docs/look/LIFE_AND_DENSITY.md`; check with `scripts/qa/density.py` before the owner sees a cut.
 - **Look**: the video's LOOK.md, its approved style frame and palette roles (one hero colour, one dark anchor, at most
   one pop), `docs/look/COZY_AND_SCALE.md`, `docs/look/CINEMATIC_GUIDE.md`.
 
