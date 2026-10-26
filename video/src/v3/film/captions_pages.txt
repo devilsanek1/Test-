@@ -1,0 +1,67 @@
+# Video 3 caption paging (G5). One page per paragraph (blank line between pages), one caption line per text line,
+# [brackets] = a highlight box (one phrase per bracket; a phrase never spans two lines). Every word of the voice must
+# appear once, in order. Times come from public/v3/voice_words.json (word starts), never from here:
+#   python3 -I scripts/film_captions.py --words public/v3/voice_words.json --pages src/v3/film/captions_pages.txt --out src/v3/film/captions.json
+# Rules: pages of 1-2 lines, at most ~20 characters per line, split on phrase and sentence boundaries (owner playbook:
+# pop captions). The frame-0 core line ("AI is making your next laptop pricier.") is NOT a page: Film3 draws it.
+
+Buying a laptop soon?
+
+AI's making it [pricier.]
+
+Well,
+[AI data centers] are.
+
+Which is backwards.
+
+Laptops get better
+for the same money.
+
+Usually right after
+you buy one.
+
+But this past year,
+in the US,
+
+computers went up
+almost 10%.
+
+Mostly because
+your laptop runs on
+
+[memory chips.]
+
+And so do
+[AI data centers.]
+
+By the mountain.
+
+They pay more,
+
+so they get
+[first dibs.]
+
+Which means
+what's left costs
+
+about [five times]
+last year's price.
+
+And laptop makers
+[pass that on.]
+
+Normally you'd wait
+for the better one.
+
+But chip makers say
+
+next year's
+even tighter.
+
+So that's how
+an AI data center
+
+ends up on your
+
+[next laptop's]
+[price tag.]

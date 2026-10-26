@@ -51,13 +51,24 @@
 //     rest at the seam, and frame 0 (= "end + 1 frame") continues that roll and settles it ~0.15 s later
 //     (SkyCaptions `loopAt` / `loopEnd`).
 // Scenes keep rendering (holding their end state) through any overlap after their own end.
+//
+// OPTIONAL PROPS (G5 film shells, docs/G5_BLOCKING.md; every one off by default, so v1 / v2 render exactly as before):
+//   audioSrc        public path of the soundtrack (default: audioFile(), mix.wav / vo.mp3).
+//   sfx             [{src, t, gain?}] timeline sound cues (public paths, VO s), played like SketchReel's; a preview
+//                   (`offset`) plays the cues from its offset on.
+//   captionMotion   'pop' | 'scroll': SkyCaptions motion override (owner playbook: captions pop in place).
+//   frame0          the core line in words from frame 0 (Frame0Text): drawn in the caption band until `until` (and from
+//                   the loop roll to the seam, so the loop lands on frame 0), with the spoken captions moved down and
+//                   scaled under it; the captions move back on the first page change after `until` (pop captions).
+//   draftLabel      a burned-in "<label> · <scene id> · <m:ss.ss>" (small, mid grey, bottom-left), so the owner can
+//                   name a shot in feedback (pre-final cuts only).
 
 import React from 'react';
-import {Audio, AbsoluteFill, getStaticFiles, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
-import {CaptionTone, palette, stroke, world} from './theme';
+import {Audio, AbsoluteFill, getStaticFiles, Sequence, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
+import {CaptionTone, captionTones, palette, skyCaption, skyHighlightBox, stroke, world} from './theme';
 import {clamp, ease as E, lerp, osc, prog, TimeProvider} from './time';
 import {ExitProvider, NoExit} from './exit';
-import {capcheckMode, CaptionBeat, SkyCaptions, ToneRegion, toneOn} from './Captions';
+import {CAPCHECK_COLORS, capcheckMode, CaptionBeat, SkyCaptions, ToneRegion, toneOn} from './Captions';
 import {exitFillProgress} from './exit';
 import {SceneInfo, SceneTransitionIn, StageCam, StageContexts, STAGE_REST, TransitionInfo, zoomAbout} from './stage';
 import {Ink} from './Ink';
@@ -68,7 +79,7 @@ import type {Pt} from './sketch';
 import {MOTION} from './spec';
 import {World} from './World';
 import {Sun} from './Sun';
-import {captionFontStack} from './font';
+import {captionFontStack, measureCaption, useCaptionFont} from './font';
 import {FigureWiper} from './FigureWiper';
 import {FilmEdges} from './edges';
 import {CINE_WIPE_HALF, CINE_WIPERS, wipeEdgeX} from './cine/wipers';
@@ -466,6 +477,83 @@ const MissingScene: React.FC<{id: string}> = ({id}) => (
 
 type Layer = {key: string; node: React.ReactNode; z: number};
 
+// ---------------------------------------------------------------- G5 shell extras (all optional)
+
+/** A timeline sound cue: public path, VO seconds, gain (default 0.6, as SketchReel). */
+export type FilmSfx = {src: string; t: number; gain?: number};
+
+/** The core line in words on frame 0 (owner playbook: state the payoff in words on frame 0). Screen px. */
+export type Frame0Text = {
+  /** The core line, one entry per line (1-2 lines), e.g. ['AI is making your', 'next laptop pricier.']. */
+  lines: string[];
+  /** One phrase of the LAST line that gets the caption highlight box (e.g. 'pricier.'). */
+  highlight?: string;
+  /** Timeline s: the words pop out here (the captions move back up on the next page change). */
+  until: number;
+  /** Font px (default 72: it sits over the spoken captions inside the band). */
+  size?: number;
+  /** Baselines, screen y (default [342, 432]: the band's top half). */
+  baselines?: number[];
+  /** While the words show, the spoken captions' one-line baseline moves from skyCaption.oneLine (448) to this y and
+   *  the captions scale by `captionScale` about it (default 545 and 0.84: one line under the words, inside the band). */
+  captionBaseline?: number;
+  captionScale?: number;
+};
+
+const F0 = {size: 72, baselines: [342, 432], captionBaseline: 545, captionScale: 0.84} as const;
+
+/** The frame-0 words (caption font, the caption tone's colours, the highlight box in the house geometry). */
+const Frame0Words: React.FC<{f0: Frame0Text; tone: CaptionTone}> = ({f0, tone}) => {
+  const ok = useCaptionFont();
+  const mode = capcheckMode();
+  if (mode === 'bg') return null;
+  const mask = mode === 'mask';
+  // read at render time: a film's palette module may restyle captionTones before the first frame
+  const col = mask ? {text: CAPCHECK_COLORS[tone], highlight: CAPCHECK_COLORS.box, highlightText: CAPCHECK_COLORS.box} : captionTones[tone];
+  const size0 = f0.size ?? F0.size;
+  const widest = Math.max(1, ...f0.lines.map((l) => measureCaption(l, size0)));
+  const size = widest > skyCaption.maxWidth ? Math.floor((size0 * skyCaption.maxWidth) / widest) : size0;
+  const bl = f0.baselines ?? F0.baselines;
+  const cx = skyCaption.cx;
+  const last = f0.lines.length - 1;
+  let box: {x: number; y: number; w: number; h: number} | null = null;
+  if (f0.highlight && last >= 0) {
+    const ln = f0.lines[last];
+    const idx = ln.indexOf(f0.highlight);
+    if (idx >= 0) {
+      const lw = measureCaption(ln, size);
+      const x0 = cx - lw / 2 + measureCaption(ln.slice(0, idx), size);
+      const pad = skyHighlightBox.padEm * size;
+      box = {x: x0 - pad, y: bl[last] - skyHighlightBox.topEm * size, w: measureCaption(f0.highlight, size) + 2 * pad, h: (skyHighlightBox.topEm + skyHighlightBox.bottomEm) * size};
+    }
+  }
+  return (
+    <svg width={world.w} height={world.h} viewBox={`0 0 ${world.w} ${world.h}`} style={{position: 'absolute', left: 0, top: 0, visibility: ok ? undefined : 'hidden'}}>
+      {mask ? <rect x={0} y={skyCaption.clipTop} width={world.w} height={skyCaption.clipBottom - skyCaption.clipTop} fill="#000000" /> : null}
+      {box ? <rect x={box.x} y={box.y} width={box.w} height={box.h} rx={skyHighlightBox.radiusEm * size} fill={col.highlight} /> : null}
+      {f0.lines.map((l, i) => (
+        <text key={i} x={cx} y={bl[i] ?? bl[bl.length - 1]} textAnchor="middle" fontFamily={captionFontStack} fontSize={size} fill={col.text}>
+          {l}
+        </text>
+      ))}
+    </svg>
+  );
+};
+
+/** "m:ss.ss" */
+const timecode = (T: number) => `${Math.floor(Math.max(0, T) / 60)}:${(Math.max(0, T) % 60).toFixed(2).padStart(5, '0')}`;
+
+/** The draft label (pre-final cuts): small, mid grey, bottom-left, clear of the caption band and the right rail; a
+ *  crisp light halo (an SVG stroke under the fill, no blur) keeps it readable on mid-grey and dark sets. */
+const DraftLabel: React.FC<{text: string}> = ({text}) =>
+  capcheckMode() ? null : (
+    <svg width={world.w} height={world.h} viewBox={`0 0 ${world.w} ${world.h}`} style={{position: 'absolute', left: 0, top: 0}}>
+      <text x={34} y={world.h - 34} fontSize={30} fill="#8C8C8C" stroke="#F2F2F2" strokeWidth={5} strokeLinejoin="round" paintOrder="stroke" fontFamily="'DejaVu Sans Mono', 'Liberation Mono', monospace">
+        {text}
+      </text>
+    </svg>
+  );
+
 // ---------------------------------------------------------------- Film
 
 export type FilmProps = {
@@ -485,9 +573,19 @@ export type FilmProps = {
   /** Wrap the scene stack in the house edge treatment (edges/config FILM_EDGES; captions stay above it). Default: on for
    *  the full film, off for single-scene previews (`only`), so scene builders work under 'clean'. */
   edges?: boolean;
+  /** Soundtrack (public path). Default: audioFile() (mix.wav, else vo.mp3). */
+  audioSrc?: string;
+  /** Timeline sound cues (played with the soundtrack; off with `audio={false}`). */
+  sfx?: FilmSfx[];
+  /** SkyCaptions motion override ('pop' = the owner's pop captions). Default: the theme's skyCaption.motion. */
+  captionMotion?: 'scroll' | 'pop';
+  /** The core line in words on frame 0 (see Frame0Text). */
+  frame0?: Frame0Text;
+  /** Burned-in draft label prefix, e.g. 'G5' -> "G5 · S9 · 0:19.83". Off by default (final renders). */
+  draftLabel?: string;
 };
 
-export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers = {}, captions, offset = 0, only, audio = true, showCaptions = true, edges = !only}) => {
+export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers = {}, captions, offset = 0, only, audio = true, showCaptions = true, edges = !only, audioSrc, sfx, captionMotion, frame0, draftLabel}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const T = frame / fps + offset;
@@ -685,13 +783,51 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
     </>
   );
 
+  // frame-0 words: shown before `until` and again from the loop roll to the seam (frame 0 continues it); the spoken
+  // captions sit lowered under them until the first page change after `until` (and from the loop roll on)
+  let f0Words = false;
+  let f0Lowered = false;
+  if (frame0 && showCaptions) {
+    const lead = MOTION.captionScroll.lead;
+    const nextPage = captions.slice().sort((a, b) => a.s - b.s).find((b) => b.s - lead >= frame0.until - 1e-6);
+    const lowerUntil = nextPage ? nextPage.s - lead : Infinity;
+    const looping = loopAt !== undefined && T >= loopAt;
+    f0Words = T < frame0.until || looping;
+    f0Lowered = T < lowerUntil || looping;
+  }
+  const caps = showCaptions ? (
+    <SkyCaptions beats={captions} tone={tone} regions={regions} loopAt={loopAt} loopEnd={seam} range={range} hookAtStart={!only} motion={captionMotion} />
+  ) : null;
+  const f0k = frame0?.captionScale ?? F0.captionScale;
+  const f0dy = (frame0?.captionBaseline ?? F0.captionBaseline) - skyCaption.oneLine;
+  // the label names the scene on screen (the one whose cut T has passed)
+  const labelId = only ?? scenes.reduce<FilmScene | undefined>((acc, s) => (T >= s.start - 1e-6 ? s : acc), scenes[0])?.id ?? '';
+  const sfxFrom = only && range ? range[0] : offset;
+  const sfxTo = only && range ? range[1] : Infinity;
+
   return (
     <TimeProvider global={T} offset={0}>
       <AbsoluteFill style={{background: palette.sky, overflow: 'hidden'}}>
         {edges ? <FilmEdges scene={edgeId}>{stack}</FilmEdges> : stack}
-        {showCaptions ? <SkyCaptions beats={captions} tone={tone} regions={regions} loopAt={loopAt} loopEnd={seam} range={range} hookAtStart={!only} /> : null}
+        {caps && frame0 ? (
+          // one stable wrapper (no remount when the captions move back up); v1 / v2 (no frame0) keep the bare SkyCaptions
+          <AbsoluteFill style={f0Lowered ? {transform: `translate(0px, ${f0dy}px) scale(${f0k})`, transformOrigin: `${skyCaption.cx}px ${skyCaption.oneLine}px`} : undefined}>{caps}</AbsoluteFill>
+        ) : (
+          caps
+        )}
+        {frame0 && f0Words ? <Frame0Words f0={frame0} tone={tone(T)} /> : null}
+        {draftLabel ? <DraftLabel text={`${draftLabel} · ${labelId} · ${timecode(T)}`} /> : null}
       </AbsoluteFill>
-      {audio ? <Audio src={staticFile(audioFile())} trimBefore={offset > 0 ? Math.round(offset * fps) : undefined} /> : null}
+      {audio ? <Audio src={staticFile(audioSrc ?? audioFile())} trimBefore={offset > 0 ? Math.round(offset * fps) : undefined} /> : null}
+      {audio && sfx
+        ? sfx
+            .filter((c) => c.t >= sfxFrom - 1e-6 && c.t < sfxTo)
+            .map((c, i) => (
+              <Sequence key={`sfx${i}`} from={Math.round((c.t - offset) * fps)} layout="none">
+                <Audio src={staticFile(c.src)} volume={c.gain ?? 0.6} />
+              </Sequence>
+            ))
+        : null}
     </TimeProvider>
   );
 };
