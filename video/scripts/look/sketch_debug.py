@@ -1,8 +1,9 @@
 """Side-by-side check sheets for the cinematic guidebook: each shot type's 9:16 sketch (our drawing) next to the reference
 frames it was translated from, so the owner can see what we index on. The reference frames come from copyrighted
 footage: sheets go to the scratchpad and to the owner in chat only, never into the repo.
-Usage: python3 scripts/look/sketch_debug.py SKETCHES_JSON SKETCH_PNG_DIR REFERENCE_VIDEO OUTDIR [--per 3]
-(sketch PNGs named <id>.png, e.g. V1.png; each sketch's "refs" field holds "@<seconds>" timestamps)
+Usage: python3 scripts/look/sketch_debug.py SKETCHES_JSON SKETCH_PNG_DIR REFERENCE_VIDEO OUTDIR [--per 3] [--ours VIDEO]
+(sketch PNGs named <id>.png, e.g. V1.png; each sketch's "refs" field holds "@<seconds>" timestamps; with --ours, the
+optional "ours" field ("v1 @ <seconds>") adds the frame of our own film the shot type builds on)
 """
 import argparse
 import json
@@ -30,9 +31,11 @@ def main():
     ap.add_argument('video')
     ap.add_argument('out')
     ap.add_argument('--per', type=int, default=3)
+    ap.add_argument('--ours', help='our own film, for the "ours" frame')
     a = ap.parse_args()
     data = json.loads(Path(a.sketches).read_text())['sketches']
     cap = cv2.VideoCapture(a.video)
+    ours = cv2.VideoCapture(a.ours) if a.ours else None
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     rows = []
@@ -54,7 +57,18 @@ def main():
             cv2.putText(right, f'Arcane ref @ {t:.1f} s', (8, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
             y += h + 50
         cv2.putText(right, sk['name'], (8, H - 20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (40, 40, 160), 2, cv2.LINE_AA)
-        rows.append(np.hstack([sketch, np.full((H, 20, 3), 255, np.uint8), right]))
+        parts = [sketch, np.full((H, 20, 3), 255, np.uint8), right]
+        t_ours = [float(x) for x in re.findall(r'@\s*([\d.]+)', sk.get('ours', ''))]
+        if ours is not None and t_ours:
+            ours.set(cv2.CAP_PROP_POS_MSEC, t_ours[0] * 1000)
+            ok, f = ours.read()
+            if ok:
+                f = cv2.resize(f, (int(f.shape[1] * (H - 40) / f.shape[0]), H - 40))
+                col = np.full((H, f.shape[1], 3), 255, np.uint8)
+                col[40:] = f
+                cv2.putText(col, f'ours (v1) @ {t_ours[0]:.1f} s', (8, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
+                parts += [np.full((H, 20, 3), 255, np.uint8), col]
+        rows.append(np.hstack(parts))
     for i in range(0, len(rows), a.per):
         chunk = rows[i:i + a.per]
         w = max(r.shape[1] for r in chunk)
