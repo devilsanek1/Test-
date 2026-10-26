@@ -39,3 +39,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   opening concepts (the mechanism: data centers buy the memory chips). -> rule: Storyboard (no unsupported metaphors).
 - 2026-10-26: "focus less on quality; the most signal for the director in the least time/drawing". -> rule: Storyboard
   (signal per drawing).
+- 2026-10-26, G3 LOCKED: board with cinematography (literal opening: each memory stick that leaves for the AI data
+  center ticks the laptop's price up one step; window-nook home base; S9 rise-over reveal; S9b worm's-eye scale cut),
+  `deliverables/v3/v3_g3_animatic_board.mp4`, commit 14bfa55: "okay fine, go ahead". No objection to counting the cozy
+  share outside chart inserts (55 % of non-chart time; COZY_AND_SCALE §1.3). Next: G5 blocking in Autumn Ember, 60 fps.
