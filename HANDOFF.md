@@ -135,6 +135,16 @@ The owner is connecting ElevenLabs so we can generate takes ourselves. Guided st
 
 Never print the key, and never commit it or put it in a file.
 
+**2c update (2026-10-26 ~19:30 UTC):** the API path WORKS.
+- The owner's voice id is `gHYdn45bUiDI9umVTpCo` ("Test 3", cloned; in `video/docs/voice/VOICE.md`).
+- `generate_take.py` produced `video/assets/v2/api_take1/take.wav`: clean on the whole-script first try, 40.09 s,
+  check_take MATCH.
+- The key can read voices and do TTS but not list models; the model `eleven_v4` is given explicitly.
+- The owner pasted the key in chat. It was used only inline in this session's commands, never written to a file. The
+  owner was asked to rotate it and store the new one as the environment secret `ELEVENLABS_API_KEY`;
+  `export_context.py` now redacts keys.
+- A new session needs the secret set to use the API.
+
 ## 3. The queue (in order) at handoff
 
 1. **v2: core line LOCKED 2026-10-26 (A: "She quit Google, and says her contract bans criticizing it, for life.", `video/docs/v2/CORE_LINE.md`; options in `docs/v2/archive/`). G1 script DONE 2026-10-26 ~17:00 UTC** (`docs/v2/script/script_g1.md`, 113 words, ~43 s; paste file `script_elevenlabs.md`, paste-safe; hook variants H1-H3 in script_g1.md). **Take 2 (2026-10-26 17:55) is CLEAN**: `video/assets/v2/take2_clean.wav` (38.96 s, matches the script; the lean paste format worked first time), word timings `take2_clean_words.json`. Take 1 and its cleaned version stay in `assets/v2/`. **Voice LOCKED by the owner (G2, 2026-10-26 ~18:20 UTC):** `public/v2/voice.wav` (take 2 + 0.12 s lead), `public/v2/voice_words.json`. **G3 animatic RUNNING** (entry `src/entry-v2.tsx` Animatic → `public/v2/animatic.json`, shared SketchReel board style). Started 14:40 UTC (the owner: "let's start working on the second video"). Video 2 follows the v3 process: the topic is picked; the old G0 "angles" step is folded into the core line.
