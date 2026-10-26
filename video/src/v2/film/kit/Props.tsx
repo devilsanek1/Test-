@@ -18,6 +18,7 @@ import {mat, Mat, XG} from '../../../lib/xf';
 import {useCaptionFont} from '../../../lib/font';
 import {CC} from '../palette';
 import {add, applyM, At, b, Fill, fillAt, Ink, Letter, Placed, Pt, W} from './util';
+import {Live} from './Ambient';
 
 // ---------------------------------------------------------------- the badge
 
@@ -256,6 +257,8 @@ export const Laptop: React.FC<LaptopProps> = ({x, y, w = 460, lidH = 0.42, scree
   const nr = sc.h * 0.06;
   // a soft pulse round the network (one node lights at a time; a stepped walk, no fades)
   const lit = Math.floor((t + 0.3) * 3) % 6;
+  // the hub beats every 1.1 s (it swells and lights for a moment: filled, so it reads at phone size)
+  const hubK = 1 + 0.22 * Math.max(0, Math.sin(Math.min(1, (t % 1.1) / 0.3) * Math.PI));
   let links = '';
   RING.forEach((p, i) => {
     const q = RING[(i + 1) % 6];
@@ -284,21 +287,35 @@ export const Laptop: React.FC<LaptopProps> = ({x, y, w = 460, lidH = 0.42, scree
           <Fill rect={[sc.x, sc.y, sc.w, sc.h]} color={CC.screen} offset={false} at={fillAt(at, 0.06)} />
           {screen === 'ai' ? (
             <>
+              {/* a pulse ring from the hub every 1.1 s and a packet running out along a spoke (the network works) */}
+              <Live at={b(at, 0.2)} c={hubC}>
+                <circle cx={hubC[0]} cy={hubC[1]} r={hr * (1 + 1.5 * ((t % 1.1) / 1.1))} fill="none" stroke={CC.ring} strokeWidth={Math.max(2, w * 0.007)} />
+              </Live>
               <Ink d={links} width={Math.max(2, w * 0.006)} color={CC.screenInk} at={b(at, 0.12)} />
               {RING.map((p, i) => {
                 const c = P(p[0], p[1]);
                 return (
                   <React.Fragment key={i}>
-                    <Fill d={blob(c[0], c[1], nr, nr, {seed: `${seed}/n${i}`})} color={i === lit ? CC.ring : CC.paper} offset={false} at={fillAt(at, 0.14)} />
+                    <Fill d={blob(c[0], c[1], nr * (i === lit ? 1.5 : 1), nr * (i === lit ? 1.5 : 1), {seed: `${seed}/n${i}`})} color={i === lit ? CC.ring : CC.paper} offset={false} at={fillAt(at, 0.14)} />
                     <Ink d={ellipse(c[0], c[1], nr, nr, {seed: `${seed}/nI${i}`})} width={W.far} at={b(at, 0.14)} />
                   </React.Fragment>
                 );
               })}
-              <Fill d={blob(hubC[0], hubC[1], hr, hr, {seed: `${seed}/hub`})} color={CC.paper} offset={false} at={fillAt(at, 0.16)} />
+              <Fill d={blob(hubC[0], hubC[1], hr * hubK, hr * hubK, {seed: `${seed}/hub`})} color={(t % 1.1) < 0.25 ? CC.ring : CC.paper} offset={false} at={fillAt(at, 0.16)} />
               <Ink d={ellipse(hubC[0], hubC[1], hr, hr, {seed: `${seed}/hubI`})} width={W.mid} at={b(at, 0.16)} />
               <Letter x={hubC[0]} y={hubC[1] + hr * 0.42} size={hr * 1.15} anchor="middle" at={b(at, 0.2)}>
                 {hub}
               </Letter>
+              {(() => {
+                const sp = RING[Math.floor(t / 0.7) % 6];
+                const q = P(sp[0], sp[1]);
+                const u = (t % 0.7) / 0.7;
+                return (
+                  <Live at={b(at, 0.2)} c={hubC}>
+                    <circle cx={hubC[0] + (q[0] - hubC[0]) * u} cy={hubC[1] + (q[1] - hubC[1]) * u} r={nr * 0.55} fill={CC.mugBand} />
+                  </Live>
+                );
+              })()}
             </>
           ) : null}
           <Ink d={glint(sc.x + sc.w * 0.86, sc.y + sc.h * 0.22, sc.w * 0.08, {seed: `${seed}/gl`})} width={W.far} color={CC.white} at={b(at, 0.2)} />

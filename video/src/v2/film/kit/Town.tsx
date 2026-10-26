@@ -4,7 +4,8 @@
 //   a crescent moon, stars (two twinkle), drifting clouds; the far skyline in haze (towers, a dome, a crane, a few lit
 //   specks); two rows of roofs (townMid, townNear: pitched and flat, chimneys, many small windows); the facades across the
 //   street (facade plum, cornices, a grid of windows, lit shop fronts on the ground floor, a street lamp) with a
-//   pavement where tiny walkers pass; neighbours crossing two lit windows; a few windows switching on and off; a flock.
+//   pavement where tiny walkers and two cars pass; neighbours crossing two lit windows; a few windows switching on and
+//   off; a flock, a single bird and a near bird past the glass.
 // Usage: <DuskTown x y w h /> with the GLASS rect in canvas px (it clips itself). `horizon` = the canvas y of the far
 // skyline's base (default y + 0.55 h); `k` = the content scale (1 = the nook wide P2; the same seed + the room's
 // matrix gives the same town at 1.2x / 1.4x). Life rates: `life` (1 = draft G5 density).
@@ -15,7 +16,7 @@ import {rand, rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {CC} from '../palette';
 import {At, Pt} from './util';
-import {Clouds, Flock, Live, loopT, onOff, stepT} from './Ambient';
+import {Bird, Clouds, Flock, Live, loopT, onOff, stepT} from './Ambient';
 
 export type DuskTownProps = {
   /** The glass rect (canvas px). */
@@ -156,6 +157,20 @@ export const DuskTown: React.FC<DuskTownProps> = ({x, y, w, h, horizon, k = 1, m
         return {x: wx, step: Math.floor(wt * 6 + i) % 2, i};
       })
     : [];
+  // two cars along the street (opposite ways, headlights and tail lights), a near bird past the glass every ~6.5 s
+  const cars = street
+    ? [0, 1].map((i) => {
+        const per = 3.6 + i * 1.5;
+        const dur = 2.2 + i * 0.4;
+        const p = loopT(t, per, rand(seed, `car${i}`) * per) / dur;
+        const dir = i === 0 ? 1 : -1;
+        const cx = dir === 1 ? x - 80 * k + (w + 160 * k) * p : x + w + 80 * k - (w + 160 * k) * p;
+        return {i, cx, dir, on: p <= 1};
+      })
+    : [];
+  const nb = loopT(t, 6.5, rand(seed, 'nearbird') * 6.5) / 1.6;
+  const nbx = x + w + 40 * k - (w + 80 * k) * nb;
+  const nby = y + Math.max(40 * k, (H - y) * 0.45) + Math.sin(nb * 6) * 14 * k;
   return (
     <Live at={at} c={[x + w / 2, y + h / 2]}>
       <defs>
@@ -235,6 +250,18 @@ export const DuskTown: React.FC<DuskTownProps> = ({x, y, w, h, horizon, k = 1, m
           </g>
         ))}
         {street ? <rect x={x - 2} y={T.pave} width={w + 4} height={h} fill={CC.roofs} /> : null}
+        {cars.map((q) =>
+          q.on ? (
+            <g key={`car${q.i}`}>
+              <path d={roundRect(q.cx - 34 * k, T.pave - 14 * k, 68 * k, 14 * k, 5 * k)} fill={CC.neighbour} />
+              <path d={roundRect(q.cx - 18 * k, T.pave - 25 * k, 34 * k, 13 * k, 6 * k)} fill={CC.neighbour} />
+              <rect x={q.cx - 14 * k} y={T.pave - 22 * k} width={26 * k} height={7 * k} fill={CC.winDark} />
+              <rect x={q.cx + q.dir * 30 * k - 4 * k} y={T.pave - 11 * k} width={8 * k} height={5 * k} fill={CC.moon} />
+              <rect x={q.cx - q.dir * 31 * k - 3 * k} y={T.pave - 11 * k} width={6 * k} height={4 * k} fill={CC.catEar} />
+            </g>
+          ) : null,
+        )}
+        {nb <= 1 ? <Bird x={nbx} y={nby} s={16 * k} flap={Math.floor(t * 7) % 2} color={CC.anchor} /> : null}
         {walkers.map((q) => (
           <g key={`w${q.i}`}>
             <circle cx={q.x} cy={T.pave - 25 * k} r={4.5 * k} fill={CC.roofs} />

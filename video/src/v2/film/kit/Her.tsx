@@ -544,13 +544,20 @@ export type HerBackProps = HerBase & {
 export const HerBack: React.FC<HerBackProps> = ({x, y, h, facing = 'r', hand, at, seed = 'herBack', ink: inkP, life = true}) => {
   const t = useTime();
   const swh = life ? hairSway(t, seed) * 1.4 : 0;
-  const fgb = life ? fidget(t, seed, 0.008 * h) : ([0, 0] as Pt);
+  const fgb0 = life ? fidget(t, seed, 0.008 * h) : ([0, 0] as Pt);
+  // typing: the hand taps in bursts (0.6 s every 1.4 s, stepped at 8 drawings / s); the head dips to the screen and back
+  const tt8 = Math.floor(t * 8) / 8;
+  const burst = life && ((tt8 % 1.4) + 1.4) % 1.4 < 0.6;
+  const tap = burst ? (Math.floor(t * 8) % 2) * 0.007 * h : 0;
+  const fgb: Pt = [fgb0[0], fgb0[1] + tap];
+  const dip = life ? Math.max(0, Math.sin(((t % 3.3) / 3.3) * Math.PI * 2)) * 0.008 * h : 0;
   const s = facing === 'r' ? 1 : -1;
   const r = 0.09 * h;
   const ink = inkP ?? inkForHead(r);
   const bob = Math.sin(t * 1.6) * 0.0015 * h;
   const P = (u: number, v: number): Pt => [x + s * u * h, y - v * h + bob];
-  const H = P(0.04, 0.755);
+  const H0 = P(0.04, 0.755);
+  const H: Pt = [H0[0], H0[1] + dip];
   const S = P(0.02, 0.62);
   const bottom = y + 0.4 * h;
   // the back: broad shoulders, straight down past the frame (and the left edge)

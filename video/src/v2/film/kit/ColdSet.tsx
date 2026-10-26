@@ -9,9 +9,9 @@
 //   <InsertPage x y w h lift>    a warm white page on the cold set: flat drop shadow, paper, outline, a lifting corner
 //   INSERT_PAGES                 the board's page boxes (P9 = P11: Google's page at the deal page's size and place)
 
-import React from 'react';
-import {blob, ellipse, hline, line, poly, polyPath, rect, roundRect, textLines} from '../../../lib/sketch';
-import {rng} from '../../../lib/rng';
+import React, {useId} from 'react';
+import {blob, ellipse, hline, line, poly, polyPath, rect, roundRect, smooth, textLines} from '../../../lib/sketch';
+import {rand, rng} from '../../../lib/rng';
 import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {InkScale} from '../../../lib/inkComp';
@@ -50,13 +50,18 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, at
   const M = zoom === 1 ? mat.I : mat.about(mat.scale(zoom), COLD_CENTRE[0], COLD_CENTRE[1]);
   // the window's light: two panes falling across the desk from the upper right, drifting slowly
   const drift = Math.sin(t * 0.12) * 18;
-  // (the light starts under the caption band, y 610, so captions sit on the flat desk: white 4.8:1)
+  // (the light starts under the caption band, y 610, so captions sit on the flat desk: white 4.6:1)
   const top = 610;
   const pane = (x0: number): Pt[] => [[x0 + drift, top], [x0 + 300 + drift, top], [x0 - 120 + drift, 2300], [x0 - 420 + drift, 2300]];
   const paneA = pane(900);
   const paneB = pane(1240);
-  // a cloud's shadow sliding through the light every 7 s
-  const cp = loopT(t, 7, 2) / 7;
+  // a cloud's shadow sliding through the light every 4.2 s; someone passing the window every 5.6 s (a head-and-
+  // shoulders shadow crossing the light panes: people near, never seen)
+  const cp = loopT(t, 4.2, 2) / 4.2;
+  const pp = loopT(t, 3.2, 0.7) / 1.8;
+  const pasDir = Math.floor((t + 0.7) / 3.2) % 2 === 0 ? 1 : -1;
+  const pasX = pasDir === 1 ? 1300 - pp * 1300 : pp * 1300;
+  const clipId = ('coldpanes' + useId()).replace(/[^a-zA-Z0-9-]/g, '');
   const cloudX = -300 + cp * 2000;
   const cloud: Pt[] = [[cloudX, top], [cloudX + 220, top], [cloudX + 100, 2300], [cloudX - 120, 2300]];
   // the pen rolls a little (a nudge every 3.4 s)
@@ -67,16 +72,32 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, at
   const ink = (w: number) => w;
   const docs: React.ReactNode[] = [];
   // other documents: a page lower-left, a folder stack lower-right, a closed folder top-right
-  const docPage = (x: number, y: number, w: number, h: number, rot: number, k: string, fillC = CC.paper) => (
-    <XG key={k} m={mat.about(mat.rotate(rot), x + w / 2, y + h / 2)}>
-      <Fill rect={[x + 10, y + 12, w, h]} color={C.shade} offset={false} at={fillAt(at)} />
-      <Fill rect={[x, y, w, h]} color={fillC} at={fillAt(at)} seed={`${seed}/${k}`} />
-      <Ink d={rect(x, y, w, h, {seed: `${seed}/${k}I`, over: 'small'})} width={ink(W.mid)} color={C.ink} at={at} />
-      {fillC === CC.paper ? <Ink d={textLines(x + w * 0.1, y + h * 0.14, w * 0.78, {n: Math.max(3, Math.floor(h / 46)), gap: 30, seed: `${seed}/${k}t`, heading: true})} width={W.far} color={C.ink} at={b(at, 0.06)} /> : null}
-    </XG>
-  );
+  const docPage = (x: number, y: number, w: number, h: number, rot: number, k: string, per = 0) => {
+    // the top-right corner lifts in the draft every `per` s (0 = never)
+    const u = per ? loopT(t, per, rand(seed, k) * per) / per : 1;
+    const lk = per && u < 0.3 ? Math.sin((u / 0.3) * Math.PI) : 0;
+    const c = 30 + 22 * lk;
+    const fold: Pt[] = [[x + w - c, y], [x + w, y + c], [x + w - c * 0.92 - 8 * lk, y + c * 0.92 + 8 * lk]];
+    return (
+      <XG key={k} m={mat.about(mat.rotate(rot), x + w / 2, y + h / 2)}>
+        <Fill rect={[x + 10, y + 12, w, h]} color={C.shade} offset={false} at={fillAt(at)} />
+        <Fill rect={[x, y, w, h]} color={CC.paper} at={fillAt(at)} seed={`${seed}/${k}`} />
+        <Ink d={rect(x, y, w, h, {seed: `${seed}/${k}I`, over: 'small'})} width={ink(W.mid)} color={C.ink} at={at} />
+        <Ink d={textLines(x + w * 0.1, y + h * 0.14, w * 0.7, {n: Math.max(3, Math.floor(h / 46)), gap: 30, seed: `${seed}/${k}t`, heading: true})} width={W.far} color={C.ink} at={b(at, 0.06)} />
+        {per ? (
+          <>
+            <Fill d={polyPath([[x + w - c, y - 1], [x + w + 1, y - 1], [x + w + 1, y + c]])} color={C.table} offset={false} at={fillAt(at)} />
+            <Fill d={polyPath(fold)} color={CC.paperEdge} offset={false} at={fillAt(at)} />
+            <Ink d={poly(fold, {closed: true, seed: `${seed}/${k}f`, over: [0, 0]})} width={W.far} color={C.ink} at={at} />
+          </>
+        ) : null}
+      </XG>
+    );
+  };
   docs.push(docPage(-90, 1350, 340, 440, 7, 'docA'));
-  docs.push(docPage(-60, 1300, 330, 420, -4, 'docB'));
+  docs.push(docPage(-60, 1300, 330, 420, -4, 'docB', 3.1));
+  docs.push(docPage(420, 1740, 250, 300, -3, 'docC', 3.9));
+  docs.push(docPage(380, 60, 230, 200, 5, 'docD', 5.2));
   const folder = (x: number, y: number, w: number, h: number, rot: number, col: string, k: string) => (
     <XG key={k} m={mat.about(mat.rotate(rot), x + w / 2, y + h / 2)}>
       <Fill rect={[x + 10, y + 12, w, h]} color={C.shade} offset={false} at={fillAt(at)} />
@@ -109,12 +130,24 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, at
       <InkScale zoom={zoom}>
         {/* the desk top, edge to edge (+ bleed for the 0.85 pull-back) */}
         <Fill rect={[-600, -600, 2300, 3200]} color={C.table} offset={false} mode="snap" at={at} />
-        <Ink d={[260, 520, 1500, 1760].map((y, i) => hline(-200, 1300, y, {seed: `${seed}/seam${i}`, over: [0, 0]})).join('')} width={W.hair} color={C.seam} at={at} />
-        {/* the window's light, with a cloud shadow drifting through it */}
-        <Live at={at} c={[700, 300]}>
+        {/* the desk's grain (hairlines; none in the caption band) */}
+        <Ink d={grain(seed)} width={W.hair} color={C.seam} at={at} />
+        {/* the window's light, with a cloud's shadow and a passer-by's shadow drifting through it */}
+        <defs>
+          <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+            <path d={polyPath(paneA) + polyPath(paneB)} />
+          </clipPath>
+        </defs>
+        <Live at={at} c={[900, 900]}>
           <path d={polyPath(paneA)} fill={C.light} />
           <path d={polyPath(paneB)} fill={C.light} />
           <path d={polyPath(cloud)} fill={C.table} />
+          {pp <= 1 ? (
+            <g clipPath={`url(#${clipId})`}>
+              <circle cx={pasX} cy={860} r={70} fill={C.table} />
+              <path d={roundRect(pasX - 150, 930, 300, 900, 120)} fill={C.table} />
+            </g>
+          ) : null}
         </Live>
         {/* the desk lamp from above (top-left) and its cool pool */}
         <Fill d={blob(250, 900, 330, 300, {seed: `${seed}/pool`, wobble: 0.02})} color={C.pool} offset={false} at={fillAt(at)} />
@@ -144,6 +177,19 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, at
         <Fill d={blob(410, 1630, 26, 26, {seed: `${seed}/stampK`})} color={CC.chairShade} offset={false} at={fillAt(at, 0.02)} />
         <Ink d={ellipse(410, 1630, 46, 46, {seed: `${seed}/stampI`})} width={W.mid} color={C.ink} at={at} />
         {clips}
+        {/* the desk phone (right margin): body, handset, keys, a coiled cord, a line light that blinks */}
+        <DeskPhone x={975} y={760} C={C} t={t} at={at} seed={`${seed}/phone`} />
+        {/* a cup of cold coffee on its saucer, a spoon (right margin, lower) */}
+        <Fill d={blob(968, 1212, 92, 88, {seed: `${seed}/saucer`})} color={CC.paper} at={fillAt(at)} offset={false} />
+        <Fill d={blob(962, 1206, 58, 56, {seed: `${seed}/cup`})} color={CC.paper} at={fillAt(at, 0.02)} offset={false} />
+        <Fill d={blob(962, 1206, 44, 42, {seed: `${seed}/coffee`})} color={CC.under} offset={false} at={fillAt(at, 0.03)} />
+        <Ink d={ellipse(968, 1212, 92, 88, {seed: `${seed}/saucerI`}) + ellipse(962, 1206, 58, 56, {seed: `${seed}/cupI`}) + roundRect(1012, 1196, 34, 20, 9, {seed: `${seed}/hdl`, closed: false}) + line(890, 1270, 860, 1330, {over: [0, 0], seed: `${seed}/spoon`})} width={W.mid} color={C.ink} at={at} />
+        {/* reading glasses (left margin) */}
+        <XG m={mat.about(mat.rotate(-18), 130, 1110)}>
+          <Fill d={blob(90, 1110, 36, 30, {seed: `${seed}/g1`})} color={C.glass} offset={false} at={fillAt(at)} />
+          <Fill d={blob(176, 1110, 36, 30, {seed: `${seed}/g2`})} color={C.glass} offset={false} at={fillAt(at)} />
+          <Ink d={ellipse(90, 1110, 36, 30, {seed: `${seed}/g1I`}) + ellipse(176, 1110, 36, 30, {seed: `${seed}/g2I`}) + smooth([[126, 1104], [133, 1096], [140, 1104]]) + line(54, 1104, 20, 1200, {over: [0, 0], seed: `${seed}/t1`}) + line(212, 1104, 232, 1204, {over: [0, 0], seed: `${seed}/t2`})} width={W.mid} color={C.ink} at={at} />
+        </XG>
         {/* the fountain pen beside the page (it rolls a little) */}
         <XG m={mat.compose(mat.translate(842 + roll, 940), mat.rotate(68))}>
           <Fill d={roundRect(-150, -13, 300, 26, 13)} color={C.pen} at={fillAt(at)} offset={false} />
@@ -167,6 +213,46 @@ export const ColdSet: React.FC<ColdSetProps> = ({zoom = 1, variant, life = 1, at
 };
 
 const vline2 = (x: number, y0: number, y1: number, seed: string) => line(x, y0, x, y1, {over: [0, 0], seed});
+
+/** The desk's grain: wavy hairlines across the top, none in the caption band (y 280-620). */
+const grain = (seed: string): string => {
+  const r = rng(`grain/${seed}`);
+  let d = '';
+  const ys = [40, 130, 210, 660, 740, 830, 930, 1040, 1150, 1260, 1370, 1470, 1580, 1690, 1800, 1890];
+  ys.forEach((y0, i) => {
+    const pts: Pt[] = [];
+    const amp = r.range(4, 12);
+    const ph = r.range(0, 6.28);
+    const x0 = r.range(-200, 300);
+    const x1 = r.range(780, 1300);
+    for (let x = x0; x <= x1; x += 90) pts.push([x, y0 + Math.sin(x / 160 + ph) * amp]);
+    d += smooth(pts);
+    if (r.chance(0.4)) d += smooth([[x0 + 200, y0 + 18], [x0 + 260, y0 + 10], [x0 + 330, y0 + 20]]) + (i % 3 === 0 ? smooth([[x1 - 260, y0 - 16], [x1 - 200, y0 - 26], [x1 - 140, y0 - 14]]) : '');
+  });
+  return d;
+};
+
+/** An official desk phone seen from above (centre x, y): body, handset, keys, a coiled cord, a blinking line light. */
+const DeskPhone: React.FC<{x: number; y: number; C: ColdRoles; t: number; at?: At; seed: string}> = ({x, y, C, t, at, seed}) => {
+  const body: Pt[] = [[x - 96, y - 82], [x + 96, y - 82], [x + 112, y + 96], [x - 112, y + 96]];
+  const keys: string[] = [];
+  for (let j = 0; j < 4; j++) for (let i = 0; i < 3; i++) keys.push(roundRect(x - 50 + i * 36, y + 4 + j * 22, 26, 16, 4));
+  const cord: Pt[] = [];
+  for (let i = 0; i <= 14; i++) cord.push([x - 112 - i * 8 + Math.sin(i * 1.9) * 9, y + 40 + i * 14 + Math.cos(i * 1.9) * 9]);
+  const lit = Math.floor(t * 1.6) % 2 === 0;
+  return (
+    <>
+      <Ink d={smooth(cord)} width={5} color={C.lamp} taper={false} at={at} />
+      <Fill d={polyPath(body)} color={C.lamp} at={fillAt(at)} seed={`${seed}/b`} />
+      <Fill d={roundRect(x - 112, y - 120, 224, 64, 30)} color={C.blotter} at={fillAt(at, 0.02)} seed={`${seed}/h`} />
+      <Fill d={keys.join('')} color={C.metal} offset={false} at={fillAt(at, 0.04)} />
+      <Ink d={poly(body, {closed: true, seed: `${seed}/bI`, over: 'small'}) + roundRect(x - 112, y - 120, 224, 64, 30, {seed: `${seed}/hI`})} width={W.mid} color={C.ink} at={at} />
+      <Live at={at} c={[x + 70, y + 30]}>
+        <circle cx={x + 76} cy={y + 30} r={9} fill={lit ? CC.recLight : C.blotter} />
+      </Live>
+    </>
+  );
+};
 
 export type InsertPageProps = {
   x: number;

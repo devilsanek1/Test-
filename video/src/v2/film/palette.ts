@@ -219,7 +219,7 @@ export type DuskRole = keyof typeof DUSK;
  *  never the hero cobalt). PICKED 'dusk' (kit/README.md "The cold set"): a mid-violet official desk (DUSK.facade, the
  *  Pentagon's own facade colour) under a cool desk lamp, the window's light falling across its lower half: it reads
  *  cold and official against her apricot home, yet belongs to this film (P7 -> P8 -> P9 stay in one Dusk family), the
- *  warm white pages read hard on it, white captions hold 4.8:1 over it, and its dark share is ~7 % (the anchor budget).
+ *  warm white pages read hard on it, white captions hold 4.6:1 over it, and its dark share is ~7 % (the anchor budget).
  *  'night' (rejected, kept for the comparison sheet): the same desk in DUSK.post: colder still, but ~49 % of the frame
  *  dark (L* < 30), the heaviest frame in the film for 12 s, and it breaks from both approved style frames' lightness. */
 export const COLD_SETS = {

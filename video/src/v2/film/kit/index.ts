@@ -15,7 +15,7 @@ export type {CloudsProps, FlockProps, SteamProps, DustMotesProps, WallClockProps
 export {DuskTown} from './Town';
 export type {DuskTownProps} from './Town';
 // her home: the nook (P2 / P4 / P13 layouts, P5 close, P6 angle) and its pieces
-export {NookRoom, NookDeskClose, NookAngle, NOOK, NOOK_LAYOUTS, nookMat, nookPt, nookWorld, PotPlant, FramedPicture, Corkboard, CoatOnHook, TableLamp, NookMug, NookMug as Mug, BookPile, PaperStack, FloorPlant} from './Nook';
+export {NookRoom, NookDeskClose, NookAngle, NOOK, NOOK_LAYOUTS, nookMat, nookPt, nookWorld, HighShelf, PotPlant, FramedPicture, Corkboard, CoatOnHook, TableLamp, NookMug, NookMug as Mug, BookPile, PaperStack, FloorPlant} from './Nook';
 export type {NookLayoutName, NookRoomProps} from './Nook';
 // her desk (O1 / P12 / LOOP): the approved style frame, alive
 export {DESK, O1_WAVE, o1Wave, o1Cam, DeskBack, DeskFront, Books, Bookcase, BookStack, TopShelf, DeskWindow, DeskFloor, DeskTop, Basket, Pen, DeskMug, LampHead, leafPath} from './Desk';

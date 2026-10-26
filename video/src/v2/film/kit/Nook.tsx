@@ -328,6 +328,53 @@ export const PaperStack: React.FC<{x: number; y: number; w: number; at?: At; see
 
 // ---------------------------------------------------------------- the big pieces of the nook (nook-world px)
 
+/** A long high wall shelf full of things (books, a pile, a framed photo, a box, a trailing plant, a jar), from x0 to x1
+ *  with its top at y (keep y <= 260 so everything stays above the caption band). The nook's, P5's and P6's top edge. */
+export const HighShelf: React.FC<{x0: number; x1: number; y: number; at?: At; seed?: string}> = ({x0, x1, y, at, seed = 'hs'}) => {
+  const items: React.ReactNode[] = [];
+  const r = rng(`hshelf/${seed}`);
+  let x = x0 + 20;
+  let k = 0;
+  while (x < x1 - 60) {
+    const kind = k % 6;
+    if (kind === 0 || kind === 4) {
+      const w = r.range(110, 190);
+      items.push(<Books key={k} x0={x} x1={Math.min(x1 - 20, x + w)} base={y} hMin={64} hMax={92} seed={`${seed}/b${k}`} at={at} />);
+      x += w + 18;
+    } else if (kind === 1) {
+      items.push(<BookPile key={k} x={x} y={y} w={92} n={3} seed={`${seed}/p${k}`} at={at} />);
+      x += 112;
+    } else if (kind === 2) {
+      items.push(<FramedPicture key={k} x={x} y={y - 92} w={76} h={92} kind={r.chance(0.5) ? 'sea' : 'portrait'} seed={`${seed}/f${k}`} at={at} />);
+      x += 96;
+    } else if (kind === 3) {
+      items.push(<PotPlant key={k} x={x} y={y - 34} w={50} h={34} kind="trailing" seed={`${seed}/t${k}`} at={at} />);
+      x += 72;
+    } else {
+      items.push(
+        <React.Fragment key={k}>
+          <Fill rect={[x, y - 62, 92, 62]} color={CC.box} at={fillAt(at)} seed={`${seed}/x${k}`} />
+          <Ink d={rect(x, y - 62, 92, 62, {seed: `${seed}/xI${k}`, over: 'small'}) + hline(x + 10, x + 82, y - 42, {over: [0, 0], seed: `${seed}/xL${k}`})} width={W.far} at={at} />
+          <Fill d={roundRect(x + 104, y - 52, 38, 52, 8)} color={CC.candle} at={fillAt(at)} seed={`${seed}/j${k}`} />
+          <Ink d={roundRect(x + 104, y - 52, 38, 52, 8, {seed: `${seed}/jI${k}`})} width={W.far} at={at} />
+        </React.Fragment>,
+      );
+      x += 160;
+    }
+    k++;
+  }
+  return (
+    <>
+      {items}
+      <Fill rect={[x0, y, x1 - x0, 14]} color={CC.shelf} offset={false} at={fillAt(at)} />
+      <Ink d={rect(x0, y, x1 - x0, 14, {seed: `${seed}/I`, over: [0, 3], edges: 'tbr'})} width={W.mid} at={at} />
+      {[x0 + 140, x1 - 60].map((bx, i) => (
+        <Ink key={i} d={poly([[bx, y + 14], [bx + 26, y + 14], [bx, y + 44]], {closed: true, seed: `${seed}/br${i}`, over: [0, 0]})} width={W.far} at={at} />
+      ))}
+    </>
+  );
+};
+
 const Soffit: React.FC<{at?: At}> = ({at}) => {
   const {x1, y} = NOOK.soffit;
   const sh = NOOK.highShelf;
@@ -337,20 +384,7 @@ const Soffit: React.FC<{at?: At}> = ({at}) => {
       <Fill rect={[-200, y, x1 + 200, 10]} color={CC.wallDeep} offset={false} at={fillAt(at)} />
       <Ink d={hline(-60, x1, y, {seed: 'sof1', over: [0, 8]}) + vline(x1, -60, y, {seed: 'sof2', over: [0, 4]})} width={W.mid} at={at} />
       {/* a long high shelf under the soffit, full of things (above the caption band: y < 290) */}
-      <Books x0={-40} x1={150} base={sh.y} hMin={70} hMax={92} seed="hs1" at={at} />
-      <BookPile x={170} y={sh.y} w={96} n={3} seed="hs2" at={at} />
-      <FramedPicture x={290} y={sh.y - 92} w={78} h={92} kind="sea" seed="hs3" at={at} />
-      <Fill rect={[392, sh.y - 64, 96, 64]} color={CC.box} at={fillAt(at)} seed="hs4" />
-      <Ink d={rect(392, sh.y - 64, 96, 64, {seed: 'hs4I', over: 'small'}) + hline(402, 478, sh.y - 44, {over: [0, 0], seed: 'hs4L'})} width={W.far} at={at} />
-      <Books x0={506} x1={606} base={sh.y} hMin={64} hMax={88} seed="hs5" at={at} />
-      <PotPlant x={622} y={sh.y - 34} w={50} h={34} kind="trailing" seed="hsplant" at={at} />
-      <Fill d={roundRect(694, sh.y - 54, 40, 54, 8)} color={CC.candle} at={fillAt(at)} seed="hsjar" />
-      <Ink d={roundRect(694, sh.y - 54, 40, 54, 8, {seed: 'hsjarI'})} width={W.far} at={at} />
-      <Fill rect={[-60, sh.y, sh.x1 + 60, 14]} color={CC.shelf} offset={false} at={fillAt(at)} />
-      <Ink d={rect(-60, sh.y, sh.x1 + 60, 14, {seed: 'hsI', over: [0, 3], edges: 'tbr'})} width={W.mid} at={at} />
-      {[120, sh.x1 - 60].map((bx, i) => (
-        <Ink key={i} d={poly([[bx, sh.y + 14], [bx + 26, sh.y + 14], [bx, sh.y + 44]], {closed: true, seed: `hsb${i}`, over: [0, 0]})} width={W.far} at={at} />
-      ))}
+      <HighShelf x0={-60} x1={sh.x1} y={sh.y} seed="hs" at={at} />
     </>
   );
 };
@@ -643,6 +677,12 @@ export const NookDeskClose: React.FC<{town?: Partial<DuskTownProps>; slab?: bool
     <Fill rect={[672, 946, 520, 14]} color={CC.wallShade} offset={false} at={fillAt(at)} />
     <Ink d={hline(672, 1190, 932, {over: [4, 0], seed: 'p5s1'}) + hline(672, 1190, 960, {over: [0, 0], seed: 'p5s2'})} width={W.mid} at={at} />
     <PotPlant x={1000} y={892} w={50} h={40} kind="succulent" seed="p5sill" at={at} />
+    {/* the top edge: the home's high shelf (above the caption band), a trailing plant hanging right */}
+    <HighShelf x0={-40} x1={660} y={250} seed="p5hs" at={at} />
+    <Sway x={880} y={-20} amp={1.6} hz={0.17} seed="p5hang">
+      <Ink d={line(880, -20, 864, 200, {over: [0, 0], seed: 'p5h1'}) + line(880, -20, 896, 200, {over: [0, 0], seed: 'p5h2'})} width={W.hair} at={at} />
+      <PotPlant x={854} y={200} w={54} h={36} kind="trailing" seed="p5hangpot" at={at} />
+    </Sway>
     {/* the wall left and centre: corkboard (behind her head), a print over the laptop, a cable */}
     <Corkboard x={34} y={640} w={300} h={230} seed="p5cork" at={at} />
     <FramedPicture x={432} y={622} w={150} h={116} kind="shapes" seed="p5pic" at={at} />
@@ -658,6 +698,18 @@ export const NookDeskClose: React.FC<{town?: Partial<DuskTownProps>; slab?: bool
     <Ink d={poly([[600, 1240], [860, 1226], [880, 1330], [612, 1346]], {closed: true, seed: 'p5paperI', over: 'small'}) + textLines(630, 1262, 200, {n: 3, gap: 22, seed: 'p5pl', heading: false})} width={W.far} at={at} />
     <NookMug x={790} top={1040} w={74} seed="p5mug" at={at} />
     <Ink d={line(250, 1300, 420, 1340, {over: [0, 0], seed: 'p5pen'})} width={14} color={CC.anchor} taper={false} at={at} />
+    {/* more on the desk: grain, an open notebook, sticky notes, her phone face down, books, the laptop's cable */}
+    <Ink d={[1060, 1130, 1210, 1290, 1380, 1480, 1640, 1760, 1880].map((y, i) => smooth([[-40 + i * 30, y], [300, y + 6 * Math.sin(i)], [700, y - 4], [1120, y + 5]])).join('')} width={W.hair} color={CC.deskShade} at={at} />
+    <Fill d={polyPath([[330, 1430], [470, 1424], [478, 1600], [334, 1606]])} color={CC.paper} at={fillAt(at)} seed="p5nb1" />
+    <Fill d={polyPath([[470, 1424], [612, 1430], [606, 1606], [478, 1600]])} color={CC.paper} at={fillAt(at)} seed="p5nb2" />
+    <Ink d={poly([[330, 1430], [470, 1424], [478, 1600], [334, 1606]], {closed: true, seed: 'p5nbI1', over: 'small'}) + poly([[470, 1424], [612, 1430], [606, 1606], [478, 1600]], {closed: true, seed: 'p5nbI2', over: 'small'}) + textLines(350, 1458, 110, {n: 5, gap: 26, seed: 'p5nbt1', heading: false}) + textLines(492, 1458, 100, {n: 4, gap: 26, seed: 'p5nbt2', heading: false})} width={W.far} at={at} />
+    <Fill d={polyPath([[652, 1444], [740, 1436], [746, 1518], [658, 1526]])} color={CC.note3} at={fillAt(at)} seed="p5st1" />
+    <Fill d={polyPath([[700, 1500], [784, 1506], [778, 1586], [694, 1580]])} color={CC.note2} at={fillAt(at)} seed="p5st2" />
+    <Ink d={poly([[652, 1444], [740, 1436], [746, 1518], [658, 1526]], {closed: true, seed: 'p5stI1', over: [0, 0]}) + poly([[700, 1500], [784, 1506], [778, 1586], [694, 1580]], {closed: true, seed: 'p5stI2', over: [0, 0]}) + textLines(668, 1470, 60, {n: 2, gap: 20, seed: 'p5stt', heading: false})} width={W.far} at={at} />
+    <Fill d={roundRect(800, 1600, 100, 180, 18)} color={CC.anchor} at={fillAt(at)} seed="p5phone" />
+    <Ink d={roundRect(800, 1600, 100, 180, 18, {seed: 'p5phoneI'})} width={W.mid} at={at} />
+    <BookPile x={930} y={1760} w={170} n={3} seed="p5books" at={at} />
+    <Ink d={smooth([[762, 1000], [840, 1020], [880, 1090], [1000, 1110], [1120, 1100]])} width={5} color={CC.cable} taper={false} at={b(at, 0.06)} />
     {children}
   </>
 );
@@ -698,6 +750,13 @@ export const NookAngle: React.FC<{town?: Partial<DuskTownProps>; slab?: boolean;
     ))}
     <Fill rect={[118, 636, 22, 904]} color={CC.shelf} offset={false} at={fillAt(at)} />
     <Ink d={[640, 826, 1016, 1206, 1396].map((y, i) => hline(-60, 118, y, {seed: `p6bl${i}`, over: [0, 0]}) + hline(-60, 118, y + 16, {seed: `p6bm${i}`, over: [0, 0]})).join('') + vline(118, 636, 1540, {over: [0, 0], seed: 'p6u1'}) + vline(140, 636, 1540, {over: [0, 0], seed: 'p6u2'})} width={W.mid} at={at} />
+    {/* the top edge: the home's high shelf, a print over the window (cut right), a trailing plant hanging */}
+    <HighShelf x0={-40} x1={520} y={250} seed="p6hs" at={at} />
+    <FramedPicture x={720} y={96} w={260} h={170} kind="hills" seed="p6toppic" at={at} />
+    <Sway x={620} y={-20} amp={1.6} hz={0.17} seed="p6hang">
+      <Ink d={line(620, -20, 604, 196, {over: [0, 0], seed: 'p6h1'}) + line(620, -20, 636, 196, {over: [0, 0], seed: 'p6h2'})} width={W.hair} at={at} />
+      <PotPlant x={594} y={196} w={54} h={36} kind="trailing" seed="p6hangpot" at={at} />
+    </Sway>
     {/* the wall between: prints and the clock, under the bubble's place */}
     <FramedPicture x={190} y={968} w={128} h={160} kind="hills" seed="p6pic1" at={at} />
     <FramedPicture x={346} y={1002} w={110} h={90} kind="portrait" seed="p6pic2" at={at} />
@@ -709,6 +768,12 @@ export const NookAngle: React.FC<{town?: Partial<DuskTownProps>; slab?: boolean;
     <Fill d={blob(256, 1536, 190, 36, {seed: 'p6pool2', wobble: 0.02})} color={CC.core} offset={false} at={fillAt(at)} />
     <Ink d={hline(-60, 640, 1450, {seed: 'p6dk', over: [0, 8]})} width={W.mid} at={at} />
     <NookMug x={36} top={1420} w={70} seed="p6mug" at={at} />
+    <BookPile x={-20} y={1700} w={210} n={3} seed="p6deskbooks" at={at} />
+    <PotPlant x={170} y={1452} w={64} h={52} kind="succulent" seed="p6deskplant" at={at} />
+    <Fill d={polyPath([[60, 1760], [300, 1744], [316, 1900], [70, 1916]])} color={CC.paper} at={fillAt(at)} seed="p6note" />
+    <Fill d={polyPath([[300, 1744], [520, 1736], [530, 1890], [316, 1900]])} color={CC.paper} at={fillAt(at)} seed="p6note2" />
+    <Ink d={poly([[60, 1760], [300, 1744], [316, 1900], [70, 1916]], {closed: true, seed: 'p6noteI', over: 'small'}) + poly([[300, 1744], [520, 1736], [530, 1890], [316, 1900]], {closed: true, seed: 'p6note2I', over: 'small'}) + textLines(86, 1784, 190, {n: 4, gap: 26, seed: 'p6nl1', heading: false}) + textLines(330, 1772, 170, {n: 4, gap: 26, seed: 'p6nl2', heading: false})} width={W.far} at={at} />
+    <Ink d={line(240, 1700, 420, 1676, {over: [0, 0], seed: 'p6pen'})} width={12} color={CC.anchor} taper={false} at={at} />
     <Fill d={polyPath([[300, 1560], [520, 1550], [530, 1640], [306, 1652]])} color={CC.paper} at={fillAt(at)} seed="p6paper" />
     <Ink d={poly([[300, 1560], [520, 1550], [530, 1640], [306, 1652]], {closed: true, seed: 'p6paperI', over: 'small'}) + textLines(322, 1578, 170, {n: 3, gap: 20, seed: 'p6pl', heading: false})} width={W.far} at={at} />
     {children}

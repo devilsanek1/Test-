@@ -9,7 +9,7 @@
 //   <InterviewRoom>       everything behind the staffers (wall, glass wall + town, softbox, panels, shelves, ceiling)
 //   <InterviewTableTop>   the dressing on the table (recorder, glasses, cable, pen): after <InterviewTable/>
 
-import React from 'react';
+import React, {useId} from 'react';
 import {blob, ellipse, hline, line, poly, polyPath, rect, roundRect, smooth, vline} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
@@ -22,8 +22,14 @@ import {PotPlant} from './Nook';
 export const INTERVIEW = {tableTop: 1362, tableFront: 1532, tableBottom: 1732, glass: [-20, 640, 330, 722] as [number, number, number, number], mic: {x: 185, y: 1352, w: 150}};
 
 export const InterviewRoom: React.FC<{at?: At; seed?: string}> = ({at, seed = 'iroom'}) => {
+  const t = useTime();
   const r = rng(`iroom/${seed}`);
   const [gx, gy, gw, gh] = INTERVIEW.glass;
+  const clipId = ('iglass' + useId()).replace(/[^a-zA-Z0-9-]/g, '');
+  // a colleague walks past outside the glass every 4.4 s (a silhouette crossing in 2 s, stepped like a drawn walk)
+  const wp = loopT(Math.floor(t * 12) / 12, 4.4, 1.2) / 2;
+  const wx = gx - 80 + (gw + 160) * wp;
+  const step = Math.floor(t * 6) % 2;
   // archive shelving (right, cut by the edge): boards and boxes
   const shelfX = 960;
   const boards = [700, 880, 1060, 1240];
@@ -60,6 +66,20 @@ export const InterviewRoom: React.FC<{at?: At; seed?: string}> = ({at, seed = 'i
       {/* the glass wall onto the city (left): the town with walkers, the mullion grid */}
       <Fill rect={[gx - 14, gy - 14, gw + 28, gh + 14]} color={CC.shelfMetal} offset={false} at={fillAt(at)} />
       <DuskTown x={gx} y={gy} w={gw} h={gh} horizon={gy + gh * 0.4} k={0.85} moon={[gx + gw * 0.7, gy + 70]} stars={5} clouds={2} seed={`${seed}/town`} at={at} />
+      <defs>
+        <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+          <rect x={gx} y={gy} width={gw} height={gh} />
+        </clipPath>
+      </defs>
+      {wp <= 1 ? (
+        <Live at={at} c={[gx + gw / 2, gy + gh * 0.7]}>
+          <g clipPath={`url(#${clipId})`}>
+            <circle cx={wx} cy={gy + gh - 300} r={26} fill={CC.neighbour} />
+            <path d={roundRect(wx - 34, gy + gh - 268, 68, 160, 26)} fill={CC.neighbour} />
+            <path d={`M${wx - 14} ${gy + gh - 116}L${wx - (step ? 30 : 6)} ${gy + gh}M${wx + 14} ${gy + gh - 116}L${wx + (step ? 30 : 6)} ${gy + gh}`} stroke={CC.neighbour} strokeWidth={22} strokeLinecap="round" />
+          </g>
+        </Live>
+      ) : null}
       <Ink d={vline(gx + gw * 0.5, gy, gy + gh, {over: [0, 0], seed: `${seed}/gm1`}) + hline(gx, gx + gw, gy + gh * 0.55, {over: [0, 0], seed: `${seed}/gm2`})} width={10} color={CC.shelfMetal} taper={false} at={at} />
       <Ink d={rect(gx, gy, gw, gh, {seed: `${seed}/gI`, over: 'small'})} width={W.mid} at={at} />
       {/* the softbox on its stand (between the glass and the staffers) */}
