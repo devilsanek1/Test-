@@ -114,9 +114,25 @@ Everything that agent knew is in this repo. This file is the map; the details li
   model-files-v1.0, `pip install kokoro-onnx`).
 - Both push to `video-production`: pull before pushing, and keep each video's files in its own `docs/vN/` folder.
 
+## 2c. ElevenLabs automation (owner, 2026-10-26)
+
+The owner is connecting ElevenLabs so we can generate takes ourselves. Guided steps:
+1. A restricted API key: Text to Speech + Voices read, with a credit limit.
+2. Stored as the environment secret **`ELEVENLABS_API_KEY`** (cloud environment → Edit → Network secrets). A new session
+   picks it up.
+3. The voice ID: the owner sends it in chat. Store it in `video/docs/voice/VOICE.md` (not a secret).
+
+`api.elevenlabs.io` is reachable from the container. The plan and settings come from the root-cause workflow
+(`context/workflows/elevenlabs-clean-takes-*.js` → `video/docs/voice/PROPOSAL.md`):
+- generate per line or paragraph with the owner's voice and the newest model;
+- check each part with `scripts/voice/check_take.py` and auto-regenerate any mismatch;
+- stitch the parts and deliver one clean take.
+
+Never print the key, and never commit it or put it in a file.
+
 ## 3. The queue (in order) at handoff
 
-1. **v2: core line LOCKED 2026-10-26 (A: "She quit Google, and says her contract bans criticizing it, for life.", `video/docs/v2/CORE_LINE.md`; options in `docs/v2/archive/`). G1 script DONE 2026-10-26 ~17:00 UTC** (`docs/v2/script/script_g1.md`, 113 words, ~43 s; paste file `script_elevenlabs.md`, paste-safe; hook variants H1-H3 in script_g1.md). **WAITING for the owner's ElevenLabs take** → save to `video/assets/v2/`, run `scripts/voice/check_take.py`, clean, word timings, then G3 (monochrome storyboard animatic, SketchReel). Started 14:40 UTC (the owner: "let's start working on the second video"). Video 2 follows the v3 process: the topic is picked; the old G0 "angles" step is folded into the core line.
+1. **v2: core line LOCKED 2026-10-26 (A: "She quit Google, and says her contract bans criticizing it, for life.", `video/docs/v2/CORE_LINE.md`; options in `docs/v2/archive/`). G1 script DONE 2026-10-26 ~17:00 UTC** (`docs/v2/script/script_g1.md`, 113 words, ~43 s; paste file `script_elevenlabs.md`, paste-safe; hook variants H1-H3 in script_g1.md). **Take 2 (2026-10-26 17:55) is CLEAN**: `video/assets/v2/take2_clean.wav` (38.96 s, matches the script; the lean paste format worked first time), word timings `take2_clean_words.json`. Take 1 and its cleaned version stay in `assets/v2/`. **Voice LOCKED by the owner (G2, 2026-10-26 ~18:20 UTC):** `public/v2/voice.wav` (take 2 + 0.12 s lead), `public/v2/voice_words.json`. **G3 animatic RUNNING** (entry `src/entry-v2.tsx` Animatic → `public/v2/animatic.json`, shared SketchReel board style). Started 14:40 UTC (the owner: "let's start working on the second video"). Video 2 follows the v3 process: the topic is picked; the old G0 "angles" step is folded into the core line.
    - Workflow: `context/workflows/v2-g0-facts-and-core-line-wf_fad013d0-cfd.js`.
    - Steps: research (industry, guardrails; timeline already done) → `video/docs/v2/research/factlock.md` → G0.5 core line (6 lever writers, 4 judges, 4 viewer personas, 2 sceptics per finalist) → `video/docs/v2/CORE_LINE.md` (top 3) → truth check.
    - Next: the owner picks the core line; archive the rest (locked-means-dropped); then G1, the story-first script (template `v3-g1-story-*.js`).

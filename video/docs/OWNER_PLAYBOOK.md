@@ -30,8 +30,17 @@ Format: **rule** — why / evidence (video, date).
 - **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24).
 - **Scripts come with detailed emotional / delivery cues; the owner always gets the full script text with any take.** — (v1).
 - **The owner records the voice in ElevenLabs; we never add a voice to a deliverable.** Paste file and take checks:
-  `docs/ELEVENLABS.md` (only tags and spoken words; tags give a tone, never quote words or name an action; always the
+  `docs/ELEVENLABS.md` (only tags and spoken words; one short positive tag per line, no mid-line tags (v2 take 1 looped); tags give a tone, never quote words or name an action; always the
   FULL paste text in one block). — (v1 "cheap" TTS; v3 takes, 2026-10-25/26).
+
+- **One full paste must narrate cleanly: a voice failure is our process bug, not the owner's problem.** It is fixed in
+  the process (`docs/ELEVENLABS.md`; study in `docs/voice/`):
+  - paste format v2: few short tags, only at the start of a paragraph; that format was clean first time;
+  - `check_paste.py` blocks every pattern that ever broke a take, and only its `--handoff` text reaches the owner;
+  - three takes per paste (free regenerations), with a stated length limit;
+  - `check_take.py` on every take;
+  - the API generator, once the key is in.
+  — (owner, v2 take 1, 2026-10-26).
 
 ## Music and sound
 - **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — (v1).
