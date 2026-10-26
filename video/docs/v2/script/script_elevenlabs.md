@@ -7,7 +7,7 @@ She quit Google. And she says her CONTRACT bans her from criticizing it… for l
 So why is SHE talking?
 
 [warm and steady, fair, like someone you respect, easy pace]
-She worked on Google's AI, and told the BBC she disagreed with where its military work was heading.
+She worked on Google's AI, and told the BBC she objected to where its military work was heading.
 
 [plain and a little slower, every word clean, like fine print that surprised you, no gasp] In April, that meant a deal letting the Pentagon use its AI for any lawful government purpose… [level and dry, nothing extra, no doom] and Google can't veto how it's used.
 
