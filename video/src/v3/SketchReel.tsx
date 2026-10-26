@@ -16,6 +16,8 @@ type Depth = {
   draw?: [number, number];
   /** the fill floods in at this many s after the shot start (0.12 s fade); before it, lines only */
   fillIn?: number;
+  /** the element pops out at this many s after the shot start (0.07 s), e.g. a highlight that leaves with its text */
+  out?: number;
 };
 export type El = Depth & (
   | {t: 'rect'; x: number; y: number; w: number; h: number; fill?: Fill; label?: string; in?: number}
@@ -99,7 +101,8 @@ const Pen: React.FC<{d: string; u: number; style: React.SVGProps<SVGPathElement>
 };
 
 const Element: React.FC<{el: El; t: number; shot: Shot; i: number}> = ({el, t, shot, i}) => {
-  const appear = el.in === undefined ? 1 : interpolate(t - shot.s, [el.in, el.in + 0.1], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const gone = el.out === undefined ? 1 : interpolate(t - shot.s, [el.out, el.out + 0.07], [1, 0], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
+  const appear = gone * (el.in === undefined ? 1 : interpolate(t - shot.s, [el.in, el.in + 0.1], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'}));
   if (appear <= 0) return null;
   let dx = 0;
   let dy = 0;
