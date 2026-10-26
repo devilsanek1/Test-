@@ -1533,7 +1533,8 @@
     "establishing"
    ],
    "recipe_2d": "Our ONE big move: the source's 11.5 s compresses to 3.5 s plus a 1.2 s hold (141 f). Layers with crane parallax: L0 sky gradient and 3 cumulus, 0.08x. L1 far upper city: spires, towers, mountains, ending the sight line top-right, 0.2x. L2 mid rooftops, chimneys, one smoke puff, 0.45x. L3 near rooftop deck with the two characters, 1.0x. L4 foreground chimney/ledge cut by the bottom-left corner, 1.35x. Start: camera scale 2.3 on the two profile heads (x 260-520, y 900-1250, heads ~30% H, eyes looking right). Move: scale 2.3->1.0 (-57%). Camera x +520 px: pan right, content slides left at parallax rates. Camera rises 380 px: L3 and L4 slide down 380 / 510 px, L1 only 76 px, so the city rises out from behind the roofs. Roll 0->-3\u00b0. Easing cubic-bezier(0.4,0,0.45,1), peak speed at ~42%. End: sisters ~170 px tall (9%) at (420, 1450), backs to us. City fills y 600-1300. Sky at least 36% ('exposed' dose), with captions on the flat sky at y 317-556. Hold 1.2 s, then cut to an agency beat (a face) within ~5 s.",
-   "measured": "pull-out + pan right + tilt up / crane up + roll -15\u00b0"
+   "measured": "pull-out + pan right + tilt up / crane up + roll -15\u00b0",
+   "owner_favourite": "The owner's favourite shot (2026-10-26): \"It has pretty much everything: suspense, sense of scale, fantastic environment and composition, and the animation, the actual camera movement.\" Now shot type S5 in CINEMATIC_GUIDE.md (sketches E5a/E5b); take its shape (path, framing, reveal order, easing), never its speed: retime to 2-5 s, hold >= 0.5 s. Re-measured per frame: one move with no cut (measure_camera.py's split at 114.8 s is a chimney-pot wipe), roll ~0 (the -15 deg is crane keystone), a dolly not a zoom (deck 0.17x, mid 0.4x, far 0.9x), end figures ~0.26 H tall (not 9 %)."
   },
   {
    "shot": 56,
