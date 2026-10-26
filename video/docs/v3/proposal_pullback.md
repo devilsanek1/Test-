@@ -1,4 +1,4 @@
-# v3 proposal: S9 + S9b as one S5 pull-back crane (NOT locked; the owner decides)
+# v3 proposal: S9 + S9b as one S5 pull-back crane (APPROVED by the owner 2026-10-26: "pretty good, continue, swap")
 
 **Play:** `deliverables/v3/v3_proposal_pullback.mp4` (17.40-24.68, 540p 30 fps, voice), from composition `AnimaticProposal`
 (`src/entry-v3.tsx`). It reads `public/v3/proposal_pullback.json`: the locked board with only S9 + S9b replaced, built by

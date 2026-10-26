@@ -50,3 +50,6 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   -> rule: Visual style (the favourite: pull-back crane reveal); distillation + pick running.
 - 2026-10-26: "the speed of transition should not be the reference point ... since it's a short reel we would speed it up"
   -> rule: Motion (a reference move gives the shape, never the speed).
+- 2026-10-26, G5: the S5 pull-back proposal for S9 + S9b (`deliverables/v3/v3_proposal_pullback.mp4`, `docs/v3/proposal_pullback.md`):
+  "pretty good, yeah, continue, swap". -> S9 + S9b become one S5 pull-back crane panel S9 (19.40-22.68) in the locked
+  board and in G5.
