@@ -1,6 +1,7 @@
 # Voice: the ElevenLabs handoff (every video)
 
-The owner records the voice in ElevenLabs (v4 so far); we never add a voice of our own to a deliverable. Our job is a
+**Default since 2026-10-26: we generate the take through the API with the owner's voice (`docs/voice/API_QUICKSTART.md`,
+section 4 below).** Without the key, the owner records it in ElevenLabs. Never a voice other than the owner's. Our job is a
 paste file that produces the script word for word, and a check of every take. Learned on v1 and v3; owner rules in
 `OWNER_PLAYBOOK.md` (Script and voice).
 

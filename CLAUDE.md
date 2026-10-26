@@ -19,8 +19,10 @@ Top rules (details in the playbook):
 - The first 3 s must be a banger: frame 0 is the scene being drawn (lines, then colour), voice from frame 1, the hook made
   physical (the expected thing, then reality overtaking it), never a still frame; state the payoff in words on frame 0. Target 30-45 s.
 - A script is one coherent story (spine first; every line follows from the last), never a list of facts. Everyday spoken
-  language, no AI-sounding phrasing; detailed emotional cues. The owner records the voice: follow `video/docs/ELEVENLABS.md`
-  and always hand over the full paste text.
+  language, no AI-sounding phrasing; detailed emotional cues. The narration is generated with the owner's ElevenLabs voice through the API
+  (owner, 2026-10-26): follow `video/docs/voice/API_QUICKSTART.md` (paste format v2, `check_paste.py` OK, `generate_take.py`
+  `all_clean`, `check_take.py` MATCH; send take.wav, lock it into `public/vN/`, log it in `ELEVENLABS.md` section 5). Only
+  without the key does the owner paste it (then always hand over the full paste text).
 - Every lesson goes into the generic process (playbook, pipeline gate, studio toolkit) and is committed, so the next
   video doesn't repeat it.
 - Captions pop in place (no clipped roll-ins). No paper edge at the top of the frame. Production renders at 60 fps.

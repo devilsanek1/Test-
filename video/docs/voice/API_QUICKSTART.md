@@ -1,5 +1,9 @@
 # ElevenLabs API quickstart (any Claude session on this repo)
 
+**The owner's standing instruction for every future video (2026-10-26):** read `HANDOFF.md`, then follow this page;
+send take.wav as an attachment, lock it into `public/vN/`, log it in `docs/ELEVENLABS.md` section 5, and commit and push to
+`video-production` after each step (pull first: another session pushes to the same branch).
+
 Goal: generate a video's narration with the owner's voice through the ElevenLabs API, checked word for word, so the
 owner never pastes anything. Proven on 2026-10-26: video 2's API take was clean on the first whole-script try (40.1 s).
 

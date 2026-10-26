@@ -29,9 +29,12 @@ Format: **rule** — why / evidence (video, date).
   — ("just a collection of sentences", v3 G1, 2026-10-26).
 - **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24).
 - **Scripts come with detailed emotional / delivery cues; the owner always gets the full script text with any take.** — (v1).
-- **The owner records the voice in ElevenLabs; we never add a voice to a deliverable.** Paste file and take checks:
-  `docs/ELEVENLABS.md` (only tags and spoken words; one short positive tag per line, no mid-line tags (v2 take 1 looped); tags give a tone, never quote words or name an action; always the
-  FULL paste text in one block). — (v1 "cheap" TTS; v3 takes, 2026-10-25/26).
+- **We generate the narration with the owner's ElevenLabs voice through the API, for every video** (voice id and model in
+  `docs/voice/VOICE.md`, procedure `docs/voice/API_QUICKSTART.md`): paste format v2 with `check_paste.py` OK;
+  `generate_take.py` (whole script first, auto-checked, auto-regenerated) with `report.json` `all_clean`; `check_take.py`
+  MATCH; send take.wav as an attachment; lock it into `public/vN/`; log it in `ELEVENLABS.md` section 5; commit and push after
+  each step (pull first). The key is the secret `ELEVENLABS_API_KEY`: never print, file, prompt or commit it. Never a voice
+  other than the owner's. — (owner's standing instruction, 2026-10-26).
 
 - **One full paste must narrate cleanly: a voice failure is our process bug, not the owner's problem.** It is fixed in
   the process (`docs/ELEVENLABS.md`; study in `docs/voice/`):
@@ -165,7 +168,7 @@ Format: **rule** — why / evidence (video, date).
   — 2026-10-26.
 
 ## Retired rules
-(none yet)
+- ~~The owner records the voice in ElevenLabs (we hand over the paste text)~~ → generated through the API with the owner's voice (2026-10-26).
 
 ## Maintenance (keep this file short)
 Compact when, at the start of a session, **it has been 7+ days since "Last compacted" and entries were added since**,
