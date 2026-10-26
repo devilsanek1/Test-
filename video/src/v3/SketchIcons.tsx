@@ -27,14 +27,14 @@ export type IconName =
   | 'factory' | 'truck' | 'calendar' | 'house' | 'cart' | 'crane' | 'pile'
   // added for v2 (2026-10-26)
   | 'page' | 'stamp' | 'badge' | 'mic' | 'lamp' | 'mug' | 'pentagon' | 'lot' | 'speech' | 'bookshelf' | 'window'
-  | 'box' | 'stonewall' | 'nodes' | 'marker';
+  | 'box' | 'stonewall' | 'nodes' | 'marker' | 'cars';
 
 /** natural height / width of each icon (h defaults to w * this) */
 export const ICON_ASPECT: Record<IconName, number> = {
   laptop: 0.7, phone: 2, ram: 0.3, chip: 1, datacenter: 0.7, server: 1.7, pricetag: 0.6, chart: 0.78,
   factory: 0.72, truck: 0.58, calendar: 1, house: 0.92, cart: 0.82, crane: 1, pile: 0.58,
   page: 1.3, stamp: 0.38, badge: 1.7, mic: 1.7, lamp: 1.1, mug: 1.1, pentagon: 0.62, lot: 0.5, speech: 0.66,
-  bookshelf: 2.4, window: 1.15, box: 0.8, stonewall: 0.3, nodes: 0.6, marker: 1,
+  bookshelf: 2.4, window: 1.15, box: 0.8, stonewall: 0.3, nodes: 0.6, marker: 1, cars: 0.035,
 };
 export const ICON_NAMES = Object.keys(ICON_ASPECT) as IconName[];
 
@@ -519,8 +519,9 @@ const ICONS: Record<IconName, (b: Ico, o: Opts) => void> = {
     // A sheet lying on a surface, seen from slightly above (its top edge a little narrower). text = its rows, one per
     // line, "v|kind|content": v = the row's centre (0..1 down the sheet); kind '#NN' bold header centred (NN px),
     // '^NN' words centred, '>NN' words from the left margin, '~' a handwriting squiggle (content = its width 0..1),
-    // '-' a plain rule, '@' a signed rule (rule + signature), 'm' the side margin for the rows after it (default 0.08).
-    // No text: a short heading rule, 6 squiggles, a signature.
+    // '-' a plain rule, '@' a signed rule (rule + signature), 'm' the side margin for the rows after it (default 0.08),
+    // '=' a highlighter band behind the row (content "frac|px": its width 0..1 of the text area, its height in px; it
+    // sits under the words, so they stay readable). No text: a short heading rule, 6 squiggles, a signature.
     const paper = o.body(C.white);
     const k = 0.035;
     const shape: Pt[] = [[k, 0], [1 - k, 0], [1, 1], [0, 1]];
@@ -558,6 +559,10 @@ const ICONS: Record<IconName, (b: Ico, o: Opts) => void> = {
       else if (kind[0] === '>') b.say(L, v, content, Number.isFinite(size) ? size : b.fit(content, (R - L) * b.w, 0.06 * b.h), LEAD, {anchor: 'start'});
       else if (kind[0] === '~') squiggle(L, L + (R - L) * frac, v);
       else if (kind[0] === '-') b.ln(L, v, L + (R - L) * frac, v, 2.5);
+      else if (kind[0] === '=') {
+        const hh = (parseFloat(rest[1]) || 0.06 * b.h) / b.h;
+        b.fBx(L - 0.01, v - hh / 2, (R - L) * frac + 0.02, hh, C.smoke);
+      }
       else if (kind[0] === '@') {
         b.ln(L, v, L + (R - L) * frac, v, 2.5);
         signature(L, v);
@@ -776,6 +781,23 @@ const ICONS: Record<IconName, (b: Ico, o: Opts) => void> = {
     b.fCi(0.5, 0.5, 0.16, node);
     b.ci(0.5, 0.5, 0.16);
     if (o.text) b.say(0.5, 0.5, o.text, b.fit(o.text, 0.24 * b.w, 0.3 * b.h));
+  },
+
+  cars(b, o) {
+    // a row of identical parked cars seen from high up (the scale ruler under a colossal building, ISOTYPE-style): each
+    // a body with its glass cabin on top; text = how many (default: as many as fit at about 1.75 x the height each)
+    const body = o.body(C.silver);
+    const n = Math.max(1, parseInt(o.text ?? '', 10) || Math.round(b.w / (1.75 * b.h)));
+    const slot = 1 / n;
+    for (let i = 0; i < n; i++) {
+      const u0 = i * slot + 0.12 * slot;
+      const cw = 0.76 * slot;
+      const cabin: Pt[] = [[u0 + 0.2 * cw, 0.02], [u0 + 0.8 * cw, 0.02], [u0 + 0.9 * cw, 0.42], [u0 + 0.1 * cw, 0.42]];
+      b.fBx(u0, 0.4, cw, 0.58, body);
+      b.fPl(cabin, C.steel);
+      b.bx(u0, 0.4, cw, 0.58, 3);
+      b.pl(cabin, true, 3);
+    }
   },
 
   marker(b, o) {

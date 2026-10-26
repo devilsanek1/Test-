@@ -7,7 +7,7 @@
 // paper + 4 tones, line weight by role, gesture figures, red notation marks, notes in a strip under the stage, no
 // parallax) and 'sketch' (the original warm pencil look, kept so old data renders as before).
 // Board API: role 'subject' | 'mid' | 'far' on any element (default: 'subject' for fill 'pop', 'far' for f < 0.5, else
-// 'mid'); sw = stroke width override; figure pose / facing / face; text strike; {t: 'mark'}; camera.word; moves[].ease;
+// 'mid'); sw = stroke width override; figure pose / facing / face / hair; text strike; {t: 'mark'}; camera.word; moves[].ease;
 // shot.credit and frame0Credit = the small-print slot (sources, a name caption), drawn under the caption, never in the picture.
 // Lint before every render: python3 scripts/v3/board_lint.py public/v3/animatic.json
 
@@ -27,6 +27,9 @@ export type Style = 'board' | 'sketch';
 export type Pose = 'stand' | 'walk' | 'point' | 'reach' | 'hold' | 'shrug' | 'slump' | 'lookup' | 'sit';
 /** a face only when the emotion is the beat */
 export type Face = 'none' | 'happy' | 'sad' | 'shock' | 'worried';
+/** a generic hair cue (board; added for v2: "is this her?"), never a likeness: 'long' = a cap over the back of the head
+ *  and hair down to the shoulders, 'bun' = the cap and a bun; in the torso's tone (dark on the subject, mid elsewhere) */
+export type Hair = 'none' | 'long' | 'bun';
 /** f = depth factor for parallax (1 = moves with the camera, 0 = fixed far plane, > 1 = foreground); the authored end frame is exact for every f.
  *  Board mode has no parallax: f only sets the default role (far if f < 0.5). */
 type Depth = {
@@ -52,7 +55,7 @@ export type El = Depth & (
   /** x = between the feet, y = the ground, h = standing height (head top at y - h; sit: seat at y - 0.29 h). Board: a
    *  gesture figure (head r 0.09 h, bean torso, limb lines, mitten hands); fill = the torso tone (default: dark on the
    *  subject, light on mid, mid on far); facing default 'r'; face default 'none' (lookup shows the eyes) */
-  | {t: 'figure'; x: number; y: number; h: number; pose?: Pose; facing?: 'l' | 'r'; face?: Face; fill?: Fill; in?: number}
+  | {t: 'figure'; x: number; y: number; h: number; pose?: Pose; facing?: 'l' | 'r'; face?: Face; hair?: Hair; fill?: Fill; in?: number}
   /** size default 64 in board (48 in sketch); strike = struck through (true, or the s after the shot start it is drawn) */
   | {t: 'text'; x: number; y: number; text: string; size?: number; strike?: boolean | number; in?: number}
   /** a recognisable pencil object fitted into the box (src/v3/SketchIcons.tsx): x, y = top-left, h defaults to the
@@ -252,13 +255,31 @@ function figureLayers(el: Extract<El, {t: 'figure'}>, role: Role, seed: string):
   const [backLeg, frontLeg] = pose.legs;
   const r = 0.09 * h;
   const H = P(pose.H);
+  // hair: u forward (toward facing), v down, in head radii; the back part goes behind the head, the cap over it
+  const hair = role === 'far' ? 'none' : el.hair ?? 'none';
+  const hairC = role === 'subject' ? BOARD.dark : BOARD.mid;
+  const HP = (u: number, v: number): Pt => [H[0] + s * u * r, H[1] + v * r];
+  const behind: Layer[] = [];
+  const cap: Layer[] = [];
+  if (hair !== 'none') {
+    const back = hair === 'long'
+      ? smooth([HP(-0.1, -0.95), HP(-0.9, -0.55), HP(-1.12, 0.35), HP(-1.0, 1.35), HP(-0.45, 1.55), HP(0.05, 0.8)], {closed: true})
+      : oval(...HP(-0.82, -0.78), 0.4 * r, 0.4 * r);
+    behind.push({fill: hairC, fillD: back, d: back, w: rl.w, c: rl.c});
+    const arc: Pt[] = [];
+    for (let a = -50; a >= -230; a -= 15) arc.push(HP(1.05 * Math.cos((a * Math.PI) / 180), 1.05 * Math.sin((a * Math.PI) / 180)));
+    const capD = smooth([...arc, HP(-0.15, -0.12)], {closed: true});
+    cap.push({fill: hairC, fillD: capD, d: capD, w: rl.w, c: rl.c});
+  }
   const layers: Layer[] = [
     {d: leg(-1, backLeg), w: rl.w, c: rl.c},
     {d: leg(1, frontLeg), w: rl.w, c: rl.c},
     {d: limb(sh(-1), backArm), w: rl.w, c: rl.c},
     hand(backArm),
+    ...behind,
     {fill: tone, fillD: torso, d: torso, w: rl.w, c: rl.c},
     {fill: skin, fillD: oval(H[0], H[1], r, r), d: ellipse(H[0], H[1], r, r, {seed: `${seed}/head`, ...boardLoop(r, true)}), w: rl.w, c: rl.c},
+    ...cap,
   ];
   // the face: dot eyes, one brow line per eye, one mouth line (only when the emotion is the beat)
   const face = el.face ?? 'none';
