@@ -1,8 +1,5 @@
-[bright and casual, quick, a real question to a friend]
-Buying a laptop soon? [plain and level, a touch amazed, like sharing news about their own stuff] AI's making it pricier.
-
-[quick and throwaway, a little wry]
-Well, AI DATA CENTERS are.
+[bright and casual, quick, a real question to a friend, then plain and a little wry]
+Buying a laptop soon? AI's making it pricier. Well, AI DATA CENTERS are.
 
 [dry and a little fond, easy pace, like stating something everyone has noticed]
 Which is backwards. Laptops get better for the same money… [deadpan, a half-smile you can hear, don't sell it] usually right after you buy one.

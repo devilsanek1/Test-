@@ -16,6 +16,9 @@ paste file that produces the script word for word, and a check of every take. Le
   - no digits.
 - **Put a short extra tag mid-line where the delivery changes** (a tag carries on until the next one):
   `Laptops get better for the same money… [deadpan, a half-smile you can hear] usually right after you buy one.`
+- **Keep the opening block under ONE tag, with no mid-line tag in it,** and never follow it with a line that only makes
+  sense by referring back (v3: "Buying a laptop soon? [tag] AI's making it pricier." + "Well, AI DATA CENTERS are." made v4
+  say "AI's making it pricier" twice, in two takes in a row).
 - **Emphasis = CAPS on the word in the line; a beat = …**
 - **Numbers and symbols spelled out** (ten percent, five times, twenty twenty-seven); write "U.S." (v4 can read "US" as "us").
 - **Alternate hooks go in their own paste file.**
