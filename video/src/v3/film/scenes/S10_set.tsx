@@ -17,20 +17,19 @@
 import React from 'react';
 import {World, ShotCam, Fill, Ink, hline, line, polyPath, ease, prog, useTime, mat, XG} from '../../../lib';
 import {Layer, type CamKey} from '../../../lib/cine/camera';
-import {EMBER, FILM_TOD, ChipFactory, chipFactoryGeo, ChipMaker, DataCenter, Laptop, Snowfall, SpeechBubble, Calendar, StickFlight, TownBand, Van, WaitingDots, type Pt} from '../kit';
+import {EMBER, FILM_TOD, ChipFactory, chipFactoryGeo, ChipMaker, DataCenter, Snowfall, SpeechBubble, Calendar, StickFlight, TownBand, Van, WaitingDots, type Pt} from '../kit';
 
 // ---- the set (canvas px at camera rest; the board's coordinates translated to the kit props)
 export const HORIZON = 800;
 const BAND_Y = 700; // the one flat lighter sky step (skyLow) toward the horizon
 
-/** The chip factory: base centre, width. Drawn MIRRORED so its big door sits at the right end, where the board's
- *  road arrives (the kit door is at the left end). */
+/** The chip factory: base centre, width. Its big door at the right end (kit `doorSide="r"`), where the board's road
+ *  arrives. */
 export const FAB = {x: 784, y: 856, w: 280};
 const fabG = chipFactoryGeo(FAB.x, FAB.y, FAB.w);
 /** The door in the mirrored drawing (canvas px). */
 export const DOOR = {x0: 2 * FAB.x - (fabG.door.x + fabG.door.w), x1: 2 * FAB.x - fabG.door.x, y0: fabG.door.y, y1: FAB.y};
-/** The chimney's top (the kit puffs above it are clipped: they would rise into the caption band). */
-const CHIMNEY_TOP = fabG.top - FAB.w * 0.17 - FAB.w * 0.32;
+// the chimney's top sits at y ~590, just under the caption band: no steam (kit `steam={false}`)
 
 /** The road: the board's polygon (far end at the door, edges at the board's slopes), run on to the frame bottom. */
 const ROAD_FAR: [Pt, Pt] = [
@@ -109,8 +108,6 @@ export const QueueSet: React.FC<{dur: number; s14?: QueueS14; id: string}> = ({d
   const dc2Off = -(DC2.x + DC2.w / 2 + 40) * (1 - slide); // fully off the left edge before it starts
   const dc1Lit = !s14 || t < s14.litSwapAt;
   const vanTop = VAN.y - VAN.w * 0.5;
-  const boxW = VAN.w * 0.68;
-  const clipId = `${id}-fabsteam`;
   const makerX = 792;
   const makerH = 92;
   const makerHead: Pt = [makerX - 14, FAB.y - makerH + 12];
@@ -126,17 +123,8 @@ export const QueueSet: React.FC<{dur: number; s14?: QueueS14; id: string}> = ({d
           {/* the road to the factory door */}
           <Fill d={ROAD_D} color={EMBER.road} offset={false} seed="q/road" />
           <Ink d={line(ROAD_FAR[0][0], FAB.y, -60, Y_LEFT_EXIT, {seed: 'q/rl', over: [0, 0]}) + line(ROAD_FAR[1][0], FAB.y, roadR(1990), 1990, {seed: 'q/rr', over: [0, 0]})} width={2.2} />
-          {/* the chip factory, mirrored (door at the right end, on the road); its chimney steam clipped */}
-          <defs>
-            <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
-              <rect x={-400} y={CHIMNEY_TOP - 4} width={1900} height={2400} />
-            </clipPath>
-          </defs>
-          <g clipPath={`url(#${clipId})`}>
-            <XG m={mat.about(mat.scale(-1, 1), FAB.x, FAB.y)}>
-              <ChipFactory x={FAB.x} y={FAB.y} w={FAB.w} seed="q/fab" />
-            </XG>
-          </g>
+          {/* the chip factory, its door at the right end (on the road); no steam (the caption band is right above) */}
+          <ChipFactory x={FAB.x} y={FAB.y} w={FAB.w} doorSide="r" steam={false} seed="q/fab" />
           {/* S14: the chip maker speaks from the door (facing the road, arm out) */}
           {s14 ? <ChipMaker x={makerX} y={FAB.y} h={makerH} facing="l" at={s14.makerAt} seed="q/maker" /> : null}
           {/* the first data center, first at the door (its sign lit while it is the subject) */}
@@ -160,9 +148,8 @@ export const QueueSet: React.FC<{dur: number; s14?: QueueS14; id: string}> = ({d
           ) : null}
           {/* the laptop van, waiting (shoved back in S14) */}
           <XG m={mat.translate(vdx, vdy)}>
-            <Van x={VAN.x} y={VAN.y} w={VAN.w} seed="q/van" />
-            {/* THE laptop on its box at the board's size (covers the kit's smaller decal) */}
-            <Laptop x={VAN.x - VAN.w / 2 + boxW * 0.5} y={vanTop + 104} w={140} variant="old" seed="q/vanlap" ink={2.8} />
+            {/* THE laptop on its box at the board's size (kit decalW) */}
+            <Van x={VAN.x} y={VAN.y} w={VAN.w} decalW={140} seed="q/van" />
           </XG>
           {/* falling snow under the caption band */}
           <Snowfall x={-20} y={612} w={1120} h={1000} n={22} seed="q/snow" />

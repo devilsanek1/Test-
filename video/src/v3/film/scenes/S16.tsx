@@ -10,7 +10,7 @@ import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
 import {Fill} from '../../../lib/Fill';
 import {Ink} from '../../../lib/Ink';
-import {ExitShrink} from '../../../lib/exit';
+import {ExitShrink, useExit} from '../../../lib/exit';
 import {blob, hline, line} from '../../../lib/sketch';
 import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
@@ -38,13 +38,17 @@ const Desk: React.FC = () => (
 
 const S16: React.FC = () => {
   const t = useTime();
+  // the loop seam (assembler fix): during the un-build O1's bare-line underlay waits beneath. S16's wall is the same
+  // peach cream, so its sky slab is dropped while it un-builds: O1's lines draw on in place as S16's pieces leave,
+  // instead of the slab hiding them and wiping them in over the last two frames (a near-empty page before).
+  const unbuilding = useExit() > 0;
   const z = 1 + 0.015 * prog(t, 0, DUR, ease.inOutSine);
   const g = laptopGeo(LAP.x, LAP.y, LAP.w);
   // the string ties on at the lid's top-right corner
   const corner: Pt = [g.lid[1][0] - 6, g.lid[1][1] + 10];
   const tagC: Pt = [TAG.x + TAG.w * 0.55, TAG.y + TAG.w * 0.25];
   return (
-    <World sky={EMBER.wall}>
+    <World sky={unbuilding ? 'transparent' : EMBER.wall}>
       <XG m={mat.about(mat.scale(z), tagC[0], tagC[1])}>
         <Desk />
         <Lamp pose={{base: [-170, 1250], elbow: [-60, 650], head: [92, 790], rot: 32, scale: 1.25}} seed="s16/lamp" />

@@ -18,8 +18,14 @@ export type ChipFactoryProps = {
   x: number;
   y: number;
   w?: number;
-  /** The big door faces left (toward the road) at the left end of the facade. */
+  /** The big door is lit (warm). */
   doorLit?: boolean;
+  /** Which end of the facade the big door sits at (default 'l'; 'r' mirrors the whole factory about x, so the door
+   *  meets a road arriving from the right and the chimney moves to the left end). */
+  doorSide?: 'l' | 'r';
+  /** Chimney steam: the puffs' max rise above the chimney top (px; default 0.3 w), or false = no steam (e.g. when the
+   *  chimney top sits just under the caption band). */
+  steam?: number | false;
   at?: At;
   seed?: string;
   ink?: number;
@@ -32,7 +38,16 @@ export function chipFactoryGeo(x: number, y: number, w = 300) {
   return {h, x0, x1: x + w / 2, top: y - h, door, doorC: [door.x + door.w / 2, y] as Pt};
 }
 
-export const ChipFactory: React.FC<ChipFactoryProps> = ({x, y, w = 300, doorLit = true, at, seed = 'fab', ink = 3.4}) => {
+export const ChipFactory: React.FC<ChipFactoryProps> = ({doorSide = 'l', ...p}) =>
+  doorSide === 'r' ? (
+    <XG m={mat.about(mat.scale(-1, 1), p.x, p.y)}>
+      <ChipFactoryL {...p} />
+    </XG>
+  ) : (
+    <ChipFactoryL {...p} />
+  );
+
+const ChipFactoryL: React.FC<Omit<ChipFactoryProps, 'doorSide'>> = ({x, y, w = 300, doorLit = true, steam, at, seed = 'fab', ink = 3.4}) => {
   const t = useTime();
   const g = chipFactoryGeo(x, y, w);
   const teeth = 3;
@@ -46,9 +61,10 @@ export const ChipFactory: React.FC<ChipFactoryProps> = ({x, y, w = 300, doorLit 
   const glass = Array.from({length: teeth}, (_, i) => polyPath([[g.x0 + i * tw + 3, g.top - th + 6], [g.x0 + i * tw + 3, g.top - 2], [g.x0 + i * tw + tw * 0.18, g.top - 2]]));
   const ch = {x: g.x1 - w * 0.17, w: w * 0.09, top: g.top - th - w * 0.32};
   // chimney steam: three flat snow-coloured puffs rising and growing on a loop
-  const puffs = [0, 1, 2].map((i) => {
+  const rise = steam === false ? 0 : steam ?? w * 0.3;
+  const puffs = steam === false ? [] : [0, 1, 2].map((i) => {
     const ph = ((t * 0.45 + i / 3) % 1 + 1) % 1;
-    return {cx: ch.x + ch.w / 2 + ph * w * 0.08, cy: ch.top - 10 - ph * w * 0.3, r: w * (0.035 + ph * 0.05)};
+    return {cx: ch.x + ch.w / 2 + ph * w * 0.08, cy: ch.top - 10 - ph * rise, r: w * (0.035 + ph * 0.05)};
   });
   // the chip sign on the facade: a dark square with pins
   const cs = w * 0.17;
@@ -134,13 +150,15 @@ export type VanProps = {
   flip?: boolean;
   /** Headlights on (warm). */
   lights?: boolean;
+  /** The laptop decal's width (px; default 0.42 of the box, ~108 at w 380). */
+  decalW?: number;
   /** Wheels roll (degrees per px of travel are the lane's; here a static spoke). */
   at?: At;
   seed?: string;
   ink?: number;
 };
 
-export const Van: React.FC<VanProps> = ({x, y, w = 380, flip, lights = true, at, seed = 'van', ink = 3.4}) => {
+export const Van: React.FC<VanProps> = ({x, y, w = 380, flip, lights = true, decalW, at, seed = 'van', ink = 3.4}) => {
   const h = w * 0.5;
   const x0 = x - w / 2;
   const wheelR = w * 0.085;
@@ -166,7 +184,7 @@ export const Van: React.FC<VanProps> = ({x, y, w = 380, flip, lights = true, at,
       {lights ? <Fill d={blob(x0 + w * 0.975, top + h * 0.66, w * 0.022, w * 0.03, {seed: `${seed}/hl`})} color={EMBER.houseLit} at={fillAt(at, 0.08)} offset={false} /> : null}
       <Ink d={poly(body, {seed: `${seed}/bI`, over: [2, 6]}) + vline(x0 + boxW, top, y - wheelR, {seed: `${seed}/cab`, over: [0, 0]}) + poly(cabWin, {closed: true, seed: `${seed}/wI`, over: [0, 2]})} at={at} width={ink} />
       {/* the decal: THE laptop on its side of the box */}
-      <Laptop x={x0 + boxW * 0.5} y={top + h * 0.56} w={boxW * 0.42} variant="old" at={b(at, 0.12)} seed={`${seed}/decal`} ink={2.6} />
+      <Laptop x={x0 + boxW * 0.5} y={top + h * (decalW ? 0.547 : 0.56)} w={decalW ?? boxW * 0.42} variant="old" at={b(at, 0.12)} seed={`${seed}/decal`} ink={decalW ? 2.8 : 2.6} />
       {wheels.map((wx, i) => (
         <React.Fragment key={i}>
           <Fill d={blob(wx, y - wheelR, wheelR, wheelR, {seed: `${seed}/w${i}`})} color={EMBER.anchor} at={fillAt(at, 0.05)} />
@@ -242,11 +260,16 @@ export const ThoughtBubble: React.FC<BubbleProps> = ({cx, cy, rx, ry, to, at, se
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const s = at === undefined ? 1 : 0.2 + 0.8 * prog(t, at, 0.16, ease.outBack(1.3));
-  const cloud = crown(cx, cy + ry * 0.92, rx, ry * 1.84, {seed: `${seed}/c`, bumps: 9, round: 0.75});
-  const d1: Pt = [cx + (to[0] - cx) * 0.55, cy + ry * 0.9 + (to[1] - cy - ry * 0.9) * 0.45];
-  const d2: Pt = [cx + (to[0] - cx) * 0.82, cy + ry * 0.9 + (to[1] - cy - ry * 0.9) * 0.8];
-  const r1 = Math.max(10, rx * 0.11);
-  const r2 = Math.max(7, rx * 0.07);
+  // crown takes the ellipse's centre and radii: the cloud is centred on (cx, cy); the two dots step from the rim
+  // point facing the head down to it (S13's fix)
+  const cloud = crown(cx, cy, rx, ry, {seed: `${seed}/c`, bumps: 9, round: 0.75});
+  const th = Math.atan2((to[1] - cy) / ry, (to[0] - cx) / rx);
+  const rim: Pt = [cx + Math.cos(th) * rx, cy + Math.sin(th) * ry];
+  const along = (k: number): Pt => [rim[0] + (to[0] - rim[0]) * k, rim[1] + (to[1] - rim[1]) * k];
+  const d1 = along(0.38);
+  const d2 = along(0.76);
+  const r1 = Math.max(10, rx * 0.105);
+  const r2 = Math.max(7, rx * 0.066);
   return (
     <XG m={mat.about(mat.scale(s), to[0], to[1])}>
       <Fill d={blob(d2[0], d2[1], r2, r2, {seed: `${seed}/d2`})} color={EMBER.card} offset={false} />
@@ -284,7 +307,7 @@ export const WallClock: React.FC<{cx: number; cy: number; r?: number; at?: At; s
       <Show at={fillAt(at, 0.04)}>
         <path d={ticks} stroke={EMBER.ink} strokeWidth={Math.max(1.6, r * 0.04)} strokeLinecap="round" />
         <path d={handD(hourDeg, r * 0.45) + handD(minDeg, r * 0.68)} stroke={EMBER.ink} strokeWidth={Math.max(2.4, r * 0.075)} strokeLinecap="round" />
-        <path d={handD(sec * 6, r * 0.74)} stroke={EMBER.hero} strokeWidth={Math.max(1.4, r * 0.035)} strokeLinecap="round" />
+        <path d={handD(sec * 6, r * 0.74)} stroke={EMBER.beam} strokeWidth={Math.max(1.4, r * 0.035)} strokeLinecap="round" />
         <circle cx={cx} cy={cy} r={Math.max(2.5, r * 0.07)} fill={EMBER.ink} />
       </Show>
     </>

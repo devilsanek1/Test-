@@ -40,6 +40,9 @@ theme check, which must say "0 problems").
   leaving home for the cold building; never green (olive reads sickly next to peach).
 - The data center's "gone dark" (the board's dark fill) is `dcDark`; **the board's red focus circle becomes
   `signLitAt`**: the sign panel lights up cold white with ink letters (light, not a mark).
+- **The sign stays lit after O1**: O1 lights it at 4.04 and every later panel that shows the named building draws it
+  lit from the cut (`signLitAt={0}`: S9, S9b, S10, S15 via O1's set; in S14 the lit sign passes to the second
+  building). Only S13's far silhouette has no sign, and the tag's back (S16) carries the short sign "AI".
 
 ## Exports
 
@@ -53,10 +56,10 @@ theme check, which must say "0 problems").
 | `TownBand` | `y` (ground), `houses` [{x, w, h?, lit?, chimney?}] or `n x0 x1 houseW`, `far` (no ink), `ground` | houses >= 50 px wide. |
 | `DataCenter` | `x y` (base centre) `w h`, `variant` 'normal' \| 'dark' \| 'far' \| 'hall' \| 'mini', `sign` (text, '' blank, null none), `signAt`, `darkAt`, `signLitAt`, `units` (3), `blink` | ONE building everywhere. Board sizes: 436 window, 371 far, 1290 hall (cut by both edges), 330 S10, 240 S9b. Sign reads from w ~300. `dataCenterGeo()` gives the sign/roof rects. |
 | `RoofLedge` | `y` (top of the lip), `x0 x1 h`, `ventX` | warm brick, snow lip, one vent; front ink. |
-| `Laptop` | `x y` (hinge centre) `w`, `variant` 'old' \| 'new', `taped`, `label` ("BETTER") + `labelAt`, `screen`, `rot`, `lidOnly`, `children` (on screen) | lid 0.64 w tall, deck 0.24 w. Reads from 150 px; S8 at 1400 keeps the house line. `laptopGeo()` gives screen/keys centres. |
+| `Laptop` | `x y` (hinge centre) `w`, `lidH` (0.64), `variant` 'old' \| 'new', `taped`, `label` ("BETTER") + `labelAt`, `screen`, `rot`, `lidOnly`, `children` (on screen) | lid `lidH` w tall (S8's close-up from above: 0.36), deck 0.24 w. Reads from 150 px; at w >= 800 the keys are separate caps (dashed rows below). S8 at 1400 keeps the house line. `laptopGeo(x, y, w, lidH)` gives screen/keys centres. |
 | `Phone` | `x y` (top-left) `w` (400) `h` (2.2 w) `rot` (-3), `title`, `badge` + `badgeAt`, `price` + `priceStrikeAt`, `newPrice` + `newPriceAt`, `priceY` (372), `buttonY` (400), `buttonText`, `pressAt`, `photoLaptop`, `children` (phone-local px) | `phoneSlots(w)` = local rects (photo, listing laptop, price, button, cart, badge); `phonePoint(phone, lx, ly)` = canvas point (aim sticks / the tag string). |
 | `Hand` | `phone` (same geometry), `thumbTo` (local), `pressAt` | fingers, thumb on the button, palm + rust sleeve past the bottom; follows the phone when it lowers. |
-| `PriceTag` | `x y` (box top-left) `w` (h = 0.5 w), `value` or `ticker` [{t, v}], `old` + `oldAt` + `strikeAt`, `stringFrom`, `rot`, `sway`, `turnAt` (back = mini data center), `tone` 'hero' \| 'pop' | 360 in O1 (subject), 190 on S5's laptops, 460 in S16. Each ticker step pops the price and jolts the tag. `tagHoleAt()` = where a string ties on. |
+| `PriceTag` | `x y` (box top-left) `w` (h = 0.5 w), `value` or `ticker` [{t, v}], `old` + `oldAt` + `strikeAt`, `oldSize` (0.16 w), `oldTone` 'white' \| 'cream', `stringFrom`, `rot`, `sway`, `turnAt` (back = mini data center), `backSign` ("AI"), `tone` 'hero' \| 'pop' | 360 in O1 (subject), 190 on S5's laptops, 460 in S16. Each ticker step pops the price and jolts the tag. `tagHoleAt()` = where a string ties on. |
 | `MemoryStick` | `x y` (centre) `w`, `rot`, `chips` (4 at every size), `board`, `flat` | h = 0.31 w. Reads from ~60 px; 130 flying, 700 in S8. |
 | `StickFlight` / `flightPose()` | `from to t0 t1`, `arc`, `w0 w1`, `rot0 rot1`, `end` 'vanish' \| 'shrink' \| 'land', `ease`, `trail` | one stick on an arc, shrinking into its target; `flightPose(t, opts)` is pure (aim the tag ticks at it). |
 | `Pile` | `x y` (base centre / ground) `w h`, `stickW` (<= 130), `at` + `dur` (pops row by row, bottom up) | a big pile gets MORE sticks, never bigger ones (S9b 1480 x 880 = ~410 sticks, raw SVG). |
@@ -64,12 +67,12 @@ theme check, which must say "0 problems").
 | `YouSeated` | `x` (hip) `y` (seat top) `head` (92), `floorY` | S13, 3/4 back facing right; the chair back sits in front of the lower back. |
 | `YouTiny` | `x y` (feet) `h` (86), `stick`, `stickW` (46) | S9b; reads from 60 px. |
 | `ChartCard`, `LineChart`, `BarChart` | card `x y w h`; line: plot `x y w h`, `title`, `years`, `data`, `drawAt drawDur`, `hook hookAt hookDur`, `label labelAt labelPos`; bars: `bars` [{label, v, color, at, stick}], `value valueAt` | straight-on, level; words 56-64 px; the line is hero, 9 px, drawn on with the voice. S6 = S4 + `hook` + `label` (same props otherwise). |
-| `ChipFactory` / `chipFactoryGeo()` | `x y` (base centre) `w` (300), `doorLit` | warm brick, sawtooth roof with snow, chimney steam, chip sign, lit door (the queue's goal: `geo.doorC`). |
+| `ChipFactory` / `chipFactoryGeo()` | `x y` (base centre) `w` (300), `doorLit`, `doorSide` 'l' \| 'r' (mirrors the factory), `steam` (max rise px, default 0.3 w; false = none) | warm brick, sawtooth roof with snow, chimney steam, chip sign, lit door (the queue's goal: `geo.doorC`, door-left geometry; mirror it for 'r'). |
 | `ChipMaker` | `x y` (feet) `h` (112), `facing`, `point` | S14's speaker: a clean-room suit. |
-| `Van` | `x y` (centre, wheels' ground) `w` (380), `flip`, `lights` | cream box van, THE laptop as its decal, faces right. |
+| `Van` | `x y` (centre, wheels' ground) `w` (380), `flip`, `lights`, `decalW` (0.42 of the box) | cream box van, THE laptop as its decal, faces right. |
 | `WaitingDots` | `x y r gap n color` | bob one after another. |
-| `SpeechBubble`, `ThoughtBubble` | `cx cy rx ry`, `to` (the head), `children` | pop in from the tail. |
-| `WallClock` | `cx cy r` (46), `startMin` | the second hand ticks each second. |
+| `SpeechBubble`, `ThoughtBubble` | `cx cy rx ry` (the cloud's centre and radii), `to` (the head), `children` | pop in from the tail; the thought dots step from the rim to the head. |
+| `WallClock` | `cx cy r` (46), `startMin` | the second hand (wood red-brown, never the hero) ticks each second. |
 | `Calendar` | `x y w` (170), `from to`, `flipAt` | the page flips up over the binding (no fade). |
 | helpers | `b`, `fillAt`, `Show`, `Pop`, `Txt` (caption hand, `fit`), `Rot`, `Scale`, `quadPt`, `W` (depth ink) | |
 

@@ -6,9 +6,9 @@
 // hinge, over the bottom bezel and the top key rows: it comes up through the third key row (clipped there, so it reads
 // as coming out of the laptop) with a small overshoot, and lands before "chips." (18.76). The lamp pool continues on
 // the desk under the deck, cut by the edges ("the pool's edge below").
-// The kit lid is 0.64 w tall, so at this size the lid fills the top of the frame (the board's notation icon had a
-// short lid with a wall strip above it): the caption band is the flat dark screen, the caption ("memory chips.",
-// all highlighted) sits on its own box there.
+// The lid is foreshortened (kit `lidH` 0.36: seen from above at this size), so the board's wall strip shows above it
+// and the caption band is flat wall again (ink captions); the dark screen drops from ~35 % of the frame to ~16 %
+// (assembler fix: the dark-anchor budget; the kit's 0.64 lid filled the top of the frame).
 // Camera: HOLD (the rise is an element move), breathing in 1.5 % (ease in-out) on the stick.
 import React, {useId} from 'react';
 import {World} from '../../../lib/World';
@@ -25,7 +25,7 @@ const RISE_AT = 0;
 const RISE_DUR = 0.4;
 
 /** YOUR laptop at close size: hinge centre and lid width (S7's laptop x 3.3 on its axis). */
-const LAP = {x: 540, y: 1080, w: 1400};
+const LAP = {x: 540, y: 1080, w: 1400, lidH: 0.36};
 /** The stick (board: w 700, centred, landing on the hinge over the bezel and the keys). */
 const STICK_W = 700;
 const STICK_H = STICK_W * STICK_RATIO;
@@ -38,7 +38,7 @@ const S8: React.FC = () => {
   const t = useTime();
   const clipId = 's8slot' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const z = 1 + 0.015 * prog(t, 0, DUR, ease.inOutSine);
-  const g = laptopGeo(LAP.x, LAP.y, LAP.w);
+  const g = laptopGeo(LAP.x, LAP.y, LAP.w, LAP.lidH);
   // the slot line: the third key row across the deck (it tilts with the deck's 3/4 view)
   const sL = quadPt(g.deck, -0.4, SLOT_V);
   const sR = quadPt(g.deck, 1.4, SLOT_V);
@@ -58,7 +58,7 @@ const S8: React.FC = () => {
         <Fill rect={[-60, 700, 1200, 1400]} color={EMBER.desk} offset={false} />
         <Fill d={blob(POOL.cx, POOL.cy, POOL.rx, POOL.ry, {seed: 's8/pool1', wobble: 0.015})} color={EMBER.ring} offset={false} />
         <Fill d={blob(POOL.cx - 20, POOL.cy + 6, POOL.rx * 0.6, POOL.ry * 0.6, {seed: 's8/pool2', wobble: 0.02})} color={EMBER.core} offset={false} />
-        <Laptop x={LAP.x} y={LAP.y} w={LAP.w} variant="old" ink={4.8} seed="s8/lap" />
+        <Laptop x={LAP.x} y={LAP.y} w={LAP.w} lidH={LAP.lidH} variant="old" ink={4.8} seed="s8/lap" />
         <defs>
           <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
             <path d={polyPath(clip)} />
@@ -73,5 +73,5 @@ const S8: React.FC = () => {
 };
 export default S8;
 
-/** The caption band is the laptop's dark screen: white text (the page is all highlight box anyway). */
-export const captionTone: ToneKey[] = [{t: 0, tone: 'light'}];
+/** The caption band is the wall strip above the lid: ink captions. */
+export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];

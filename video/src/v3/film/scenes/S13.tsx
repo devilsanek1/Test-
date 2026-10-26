@@ -6,14 +6,13 @@
 // left (its second hand ticks: the waiting); the thought bubble on the wall above your head holds the NEW laptop
 // labelled BETTER. Everything is there from the cut. Camera: HOLD (the stillness is the waiting), breathing in 1.5 %
 // (ease in-out) toward you and the bubble. Caption band (y 290-600) = flat wall: the clock's top sits at y ~610.
-// The bubble is S13_bubble.tsx (the kit ThoughtBubble's look with its cloud centred; see that file).
+// The bubble is the kit ThoughtBubble (its cloud centred on (cx, cy) since the assembler's kit fix; S13_bubble.tsx retired).
 import React from 'react';
 import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
 import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {EMBER, Laptop, Nook, WallClock, YouSeated, type Pt} from '../kit';
-import {S13Bubble} from './S13_bubble';
+import {EMBER, Laptop, Nook, ThoughtBubble, WallClock, YouSeated, type Pt} from '../kit';
 
 const DUR = 33.4 - 31.32;
 /** You: hip x, seat top y, head height (head centre = (x + 0.2 H, y - 3.3 H)). */
@@ -35,9 +34,9 @@ const S13: React.FC = () => {
         <Nook variant="objective" seed="s13/nook" />
         <WallClock cx={CLOCK.cx} cy={CLOCK.cy} r={CLOCK.r} startMin={50} seed="s13/clock" />
         <YouSeated x={YOU.x} y={YOU.y} head={YOU.head} floorY={FLOOR_Y} seed="s13/you" />
-        <S13Bubble cx={BUBBLE.cx} cy={BUBBLE.cy} rx={BUBBLE.rx} ry={BUBBLE.ry} to={HEAD_TOP} seed="s13/think">
+        <ThoughtBubble cx={BUBBLE.cx} cy={BUBBLE.cy} rx={BUBBLE.rx} ry={BUBBLE.ry} to={HEAD_TOP} seed="s13/think">
           <Laptop x={THINK.x} y={THINK.y} w={THINK.w} variant="new" label="BETTER" seed="s13/lap" ink={2.6} />
-        </S13Bubble>
+        </ThoughtBubble>
       </XG>
     </World>
   );
