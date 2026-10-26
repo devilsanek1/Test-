@@ -148,7 +148,7 @@ Format: **rule** — why / evidence (video, date).
   readable and strobe-free (60 fps allows faster moves). — ("the speed of transition should not be the reference point
   ... in a short reel we would speed it up", v3, 2026-10-26).
 - **Render at 60 fps from G5 to the final** ("smoother and more crispy"). Animate by time; drawn motion may stay stepped
-  (12-24 drawings/s) while the camera glides; G3 may stay at 30. — (v3, 2026-10-26).
+  (12-24 drawings/s) while the camera glides; the G3 reel also renders at 60 (`G3_ANIMATIC.md`, 2026-10-26). — (v3, 2026-10-26).
 
 ## Captions
 - **Captions pop in place (or rise without clipping);** a slot or scroll reveal that cuts letters looked like a glitch. — (v1 reel, 2026-10-25).
