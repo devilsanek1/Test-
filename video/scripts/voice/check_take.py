@@ -48,7 +48,8 @@ def whisper_window(take, a, b):
     if y.ndim > 1:
         y = y.mean(1)
     seg = y[max(0, int(a * sr)):int(b * sr)]
-    return second_opinion(seg, sr, str(Path(DEFAULT_MODEL_DIR).parent / 'fw'))
+    import os
+    return second_opinion(seg, sr, os.environ.get('WHISPER_DIR', str(Path(DEFAULT_MODEL_DIR).parent / 'fw')))
 
 
 def main():
