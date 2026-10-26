@@ -114,6 +114,22 @@ Everything that agent knew is in this repo. This file is the map; the details li
   model-files-v1.0, `pip install kokoro-onnx`).
 - Both push to `video-production`: pull before pushing, and keep each video's files in its own `docs/vN/` folder.
 
+## 2c. ElevenLabs automation (owner, 2026-10-26)
+
+The owner is connecting ElevenLabs so we can generate takes ourselves. Guided steps:
+1. A restricted API key: Text to Speech + Voices read, with a credit limit.
+2. Stored as the environment secret **`ELEVENLABS_API_KEY`** (cloud environment → Edit → Network secrets). A new session
+   picks it up.
+3. The voice ID: the owner sends it in chat. Store it in `video/docs/voice/VOICE.md` (not a secret).
+
+`api.elevenlabs.io` is reachable from the container. The plan and settings come from the root-cause workflow
+(`context/workflows/elevenlabs-clean-takes-*.js` → `video/docs/voice/PROPOSAL.md`):
+- generate per line or paragraph with the owner's voice and the newest model;
+- check each part with `scripts/voice/check_take.py` and auto-regenerate any mismatch;
+- stitch the parts and deliver one clean take.
+
+Never print the key, and never commit it or put it in a file.
+
 ## 3. The queue (in order) at handoff
 
 1. **v2: core line LOCKED 2026-10-26 (A: "She quit Google, and says her contract bans criticizing it, for life.", `video/docs/v2/CORE_LINE.md`; options in `docs/v2/archive/`). G1 script DONE 2026-10-26 ~17:00 UTC** (`docs/v2/script/script_g1.md`, 113 words, ~43 s; paste file `script_elevenlabs.md`, paste-safe; hook variants H1-H3 in script_g1.md). **Take 1 received 2026-10-26** (`video/assets/v2/take1_raw.wav`, 87.9 s: opening repeat, line-5 derail + restart, closing lines looped 3x). Cleaned to `take1_clean.wav` (44.6 s, matches the script except "And Google" said as "And 'oogle" at ~28.6 s) + `take1_clean_words.json`. Paste file fixed (one short tag per line, no mid-line tags, no negations, GOOGLE in caps); the take-1 paste is in `docs/v2/archive/`. **Waiting for the owner:** keep take 1 clean, or regenerate with the fixed paste. Then G3 (monochrome storyboard animatic, SketchReel). Started 14:40 UTC (the owner: "let's start working on the second video"). Video 2 follows the v3 process: the topic is picked; the old G0 "angles" step is folded into the core line.
