@@ -1,6 +1,6 @@
 # Video 3 look (G4, LOCKED 2026-10-26)
 
-- **Palette: Autumn Ember** (owner picked C, Autumn Ochre, then: "we need a warm feeling, not sick"): `palettes.json`
+- **Palette: Autumn Ember, APPROVED by the owner ("much better") 2026-10-26** (owner picked C, Autumn Ochre, then: "we need a warm feeling, not sick"): `palettes.json`
   "9 Autumn Ember" (peach cream, terracotta-apricot, warm red-brown, golden lamp; the night window a saturated dusk blue). One hero (burnt orange: the laptops),
   one dark anchor, one pop (the blue "Add to cart" / price-tag accent).
 - **Style frame:** `review/look/v3_g4/nook_C_warm.png` (composition `StyleNook`, palette "Autumn Ember", `src/v3/StyleNook.tsx`); the sickly first try is `archive/g4/nook_C.png`.
