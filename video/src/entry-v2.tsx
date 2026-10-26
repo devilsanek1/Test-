@@ -4,11 +4,15 @@
 // StyleDesk (G4 look check, src/v2/StyleDesk.tsx): frame 0 / O1 as a style frame; props {palette: 'A' | 'B' | 'C', caption}.
 // StylePentagon (G4 look check, src/v2/StylePentagon.tsx): P8 (the scale moment); props {palette: '6 Dusk' | '3 Cream & Cobalt',
 // caption}; landing frame 140: npx remotion still src/entry-v2.tsx StylePentagon out.png --frame=140 --props='{"palette":"6 Dusk"}'
+// StyleDeskOpen (G4 opening motion test, src/v2/StyleDeskOpen.tsx): O1's first 4 s built from bare lines, with voice +
+// chime; props {palette (default '3 Cream & Cobalt'), caption, audio}:
+// npx remotion render src/entry-v2.tsx StyleDeskOpen review/look/v2_g4/opening_test.mp4 --crf 18
 import React from 'react';
 import {Composition, registerRoot, staticFile} from 'remotion';
 import {SketchReel, type Animatic} from './v3/SketchReel';
 import {StyleDesk} from './v2/StyleDesk';
 import {StylePentagon} from './v2/StylePentagon';
+import {StyleDeskOpen} from './v2/StyleDeskOpen';
 
 const FPS = 30;
 const V2Root: React.FC = () => (
@@ -46,6 +50,16 @@ const V2Root: React.FC = () => (
       height={1920}
       durationInFrames={149}
       defaultProps={{palette: '6 Dusk', caption: true}}
+    />
+    {/* G4 opening motion test: O1's first 4 s (bare lines -> colour, signature, badge, highlighter, the page runs on) */}
+    <Composition
+      id="StyleDeskOpen"
+      component={StyleDeskOpen as unknown as React.FC<Record<string, unknown>>}
+      fps={60}
+      width={1080}
+      height={1920}
+      durationInFrames={240}
+      defaultProps={{palette: '3 Cream & Cobalt', caption: true, audio: true}}
     />
   </>
 );
