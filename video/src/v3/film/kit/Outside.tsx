@@ -1,0 +1,290 @@
+// kit/Outside.tsx: the cold outside at blue hour, first snow (kit/README.md "Time of day"): the dusk-blue sky, falling
+// snow, the town band (snow-capped houses with warm lit windows), THE AI data center (one model, five variants) and our
+// roof ledge (warm brick: our side is warm, theirs is cold).
+
+import React from 'react';
+import {Ink} from '../../../lib/Ink';
+import {Fill} from '../../../lib/Fill';
+import {blob, circle, hline, line, poly, polyPath, rect as rectInk, vline} from '../../../lib/sketch';
+import {rng} from '../../../lib/rng';
+import {useTime} from '../../../lib/time';
+import {EMBER} from '../palette';
+import {At, b, fillAt, Pt, Show, Txt} from './util';
+
+// ---------------------------------------------------------------- sky + snow
+
+/** The flat dusk-blue sky over a rect (default: the whole frame plus bleed), with an optional lighter band (one flat
+ *  step, no gradient) from `bandY` down to the horizon. */
+export const NightSky: React.FC<{x?: number; y?: number; w?: number; h?: number; bandY?: number; horizon?: number; at?: At}> = ({x = -200, y = -200, w = 1480, h = 2320, bandY, horizon, at}) => (
+  <>
+    <Fill rect={[x, y, w, h]} color={EMBER.sky} at={at} mode="snap" offset={false} />
+    {bandY !== undefined && horizon !== undefined && horizon > bandY ? <Fill rect={[x, bandY, w, horizon - bandY]} color={EMBER.skyLow} at={at} mode="snap" offset={false} /> : null}
+  </>
+);
+
+/** Steady falling snow inside a rect: seeded flakes that drift down and wrap (deterministic in t). */
+export const Snowfall: React.FC<{x: number; y: number; w: number; h: number; n?: number; size?: number; speed?: number; seed?: string; at?: At}> = ({x, y, w, h, n = 26, size = 1, speed = 1, seed = 'snow', at}) => {
+  const t = useTime();
+  if (at !== undefined && t < at) return null;
+  const r = rng(`flakes/${seed}`);
+  const out: React.ReactNode[] = [];
+  for (let i = 0; i < n; i++) {
+    const x0 = r.range(x + 6, x + w - 6);
+    const y0 = r.range(y, y + h);
+    const sp = r.range(26, 44) * speed;
+    const rad = r.range(2.6, 4.6) * size;
+    const fy = y + ((((y0 - y + sp * t) % h) + h) % h);
+    const fx = x0 + Math.sin(t * 0.9 + i) * 4;
+    out.push(<circle key={i} cx={fx} cy={fy} r={rad} fill={EMBER.snow} />);
+  }
+  return <>{out}</>;
+};
+
+// ---------------------------------------------------------------- the town band
+
+export type HouseSpec = {x: number; w: number; h?: number; lit?: boolean; chimney?: boolean};
+
+/** Snow-capped pitched-roof houses standing on the ground line `y` (two by default, as on the board's horizon).
+ *  `far`: fill only (behind a window or far in a wide); otherwise thin ink. */
+export const TownBand: React.FC<{y: number; houses?: HouseSpec[]; x0?: number; x1?: number; n?: number; houseW?: number; far?: boolean; at?: At; seed?: string; ground?: string | false; groundH?: number}> = ({
+  y,
+  houses,
+  x0 = 180,
+  x1 = 900,
+  n = 2,
+  houseW = 70,
+  far = true,
+  at,
+  seed = 'town',
+  ground = false,
+  groundH = 400,
+}) => {
+  const r = rng(`town/${seed}`);
+  const list: HouseSpec[] =
+    houses ??
+    Array.from({length: n}, (_, i) => {
+      const u = n === 1 ? 0.5 : i / (n - 1);
+      const w = houseW * r.range(0.86, 1.14);
+      return {x: x0 + u * (x1 - x0 - w), w, lit: r.chance(0.7), chimney: r.chance(0.5)};
+    });
+  return (
+    <>
+      {ground ? <Fill rect={[-200, y, 1480, groundH]} color={ground} at={at} mode="snap" offset={false} /> : null}
+      {list.map((hs, i) => (
+        <House key={i} {...hs} y={y} far={far} at={b(at, i * 0.04)} seed={`${seed}/${i}`} />
+      ))}
+    </>
+  );
+};
+
+const House: React.FC<HouseSpec & {y: number; far: boolean; at?: At; seed: string}> = ({x, w, h, lit = true, chimney, y, far, at, seed}) => {
+  const bodyH = h ?? w * 0.62;
+  const eave = y - bodyH;
+  const peak = eave - w * 0.42;
+  const pk = x + w / 2;
+  const body: Pt[] = [[x, y + 2], [x, eave], [x - w * 0.08, eave + 3], [pk, peak], [x + w * 1.08, eave + 3], [x + w, eave], [x + w, y + 2]];
+  const cap: Pt[] = [[x - w * 0.11, eave + 4], [pk, peak - w * 0.07], [x + w * 1.11, eave + 4], [x + w * 1.03, eave + w * 0.09], [pk, peak + w * 0.06], [x - w * 0.03, eave + w * 0.09]];
+  const ch: Pt[] = [[x + w * 0.66, peak + w * 0.12], [x + w * 0.66, peak - w * 0.04], [x + w * 0.8, peak - w * 0.04], [x + w * 0.8, peak + w * 0.26]];
+  const win = {x: x + w * 0.38, y: eave + bodyH * 0.28, w: w * 0.22, h: bodyH * 0.34};
+  return (
+    <>
+      {chimney ? <Fill d={polyPath(ch)} color={EMBER.roofs} at={fillAt(at)} offset={false} /> : null}
+      <Fill d={polyPath(body)} color={EMBER.roofs} at={fillAt(at)} offset={false} seed={`${seed}/b`} />
+      <Fill d={polyPath(cap)} color={EMBER.snow} at={fillAt(at, 0.03)} offset={false} seed={`${seed}/c`} />
+      {lit ? <Fill rect={[win.x, win.y, win.w, win.h]} color={EMBER.houseLit} at={fillAt(at, 0.06)} offset={false} /> : null}
+      {far ? null : <Ink d={poly(body.slice(1, 6), {seed: `${seed}/i`, over: [1, 3]}) + vline(x, eave, y, {over: [0, 0], seed: `${seed}/l`}) + vline(x + w, eave, y, {over: [0, 0], seed: `${seed}/r`})} at={at} width={2.2} />}
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- THE AI data center
+
+export type DataCenterVariant = 'normal' | 'dark' | 'far' | 'hall' | 'mini';
+
+export type DataCenterProps = {
+  /** Base centre (canvas px): the building stands on y. */
+  x: number;
+  y: number;
+  /** Width (px). Board sizes: 436 in the window (O1, S15), 370 far (S13), 1290 hall (S9), 330 (S10), 240 (S9b). */
+  w: number;
+  /** Height (default by variant: 0.7 w; hall 0.4 w; mini 0.62 w). */
+  h?: number;
+  /** 'normal' | 'dark' (gone dark: the subject; O1 after 4.04, S15) | 'far' (fill-only silhouette, S13) |
+   *  'hall' (wide hall, cut by both side edges, S9) | 'mini' (the drawing on the tag's back, S16). */
+  variant?: DataCenterVariant;
+  /** Sign text (default "AI DATA CENTER"; '' = a blank sign panel, the opening's frame 0; null = no sign). */
+  sign?: string | null;
+  /** The sign's letters pop in at this time (O1: 0.25). */
+  signAt?: At;
+  /** From this time on the building is the 'dark' variant (a 1-frame switch, O1: 4.04). */
+  darkAt?: number;
+  /** The emphasis that replaces the board's red circle: from this time the sign panel is LIT (cold light, ink letters). */
+  signLitAt?: number;
+  /** Roof units (default 3). */
+  units?: number;
+  /** Server lights blink (a few at a time). Default true. */
+  blink?: boolean;
+  at?: At;
+  seed?: string;
+  /** Screen ink weight (default 3.4; far = none). */
+  ink?: number;
+};
+
+export function dataCenterGeo(x: number, y: number, w: number, h?: number, variant: DataCenterVariant = 'normal') {
+  const H = h ?? (variant === 'hall' ? w * 0.4 : variant === 'mini' ? w * 0.62 : w * 0.7);
+  const top = y - H;
+  const signH = variant === 'hall' ? H * 0.17 : H * 0.2;
+  const sign = {x: x - w * 0.43, y: top + H * 0.1, w: w * 0.86, h: signH};
+  return {H, top, sign, x0: x - w / 2, x1: x + w / 2};
+}
+
+export const DataCenter: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4}) => {
+  const t = useTime();
+  const variant: DataCenterVariant = darkAt !== undefined && t >= darkAt ? 'dark' : v0;
+  const g = dataCenterGeo(x, y, w, h, v0);
+  const far = variant === 'far';
+  const mini = variant === 'mini';
+  const dark = variant === 'dark';
+  const body = dark ? EMBER.dcDark : EMBER.dc;
+  const side = dark ? '#1C2036' : EMBER.dcSide;
+  const lit = signLitAt !== undefined && t >= signLitAt;
+  const iw = mini ? Math.min(ink, 2.2) : ink;
+  // side face (the left, in shade) and the roof parapet
+  const sideW = w * 0.06;
+  const parH = Math.max(4, g.H * 0.05);
+  // roof units: boxes with a fan disc, spread along the roof
+  const r = rng(`dcu/${seed}`);
+  const unitW = Math.min(w * 0.13, g.H * 0.22);
+  const unitH = unitW * 0.62;
+  const unitsX = Array.from({length: units}, (_, i) => x - w * 0.34 + ((i + 0.5) / units) * w * 0.68 + r.jitter(w * 0.03) - unitW / 2);
+  // server rows: dark strips with small light ticks (rows between the sign and the base)
+  const rowsTop = g.sign.y + g.sign.h + g.H * 0.08;
+  const nRows = mini ? 2 : variant === 'hall' ? 3 : 4;
+  const rowGap = (y - g.H * 0.08 - rowsTop) / nRows;
+  const rowH = Math.max(3, rowGap * 0.42);
+  const tickW = Math.max(3, w * (variant === 'hall' ? 0.012 : 0.02));
+  const step = tickW * 2;
+  const lr = rng(`dcl/${seed}`);
+  const ticks: React.ReactNode[] = [];
+  const strips: React.ReactNode[] = [];
+  for (let i = 0; i < nRows; i++) {
+    const ry = rowsTop + i * rowGap;
+    strips.push(<rect key={`s${i}`} x={g.x0 + sideW + w * 0.04} y={ry} width={w - sideW - w * 0.08} height={rowH} fill={side} />);
+    if (far && !mini) continue;
+    for (let tx = g.x0 + sideW + w * 0.06, j = 0; tx + tickW < g.x1 - w * 0.05; tx += step, j++) {
+      if (lr.chance(0.12)) continue;
+      const ph = lr.range(0, 100);
+      const rate = lr.range(0.6, 1.6);
+      const off = blink && Math.sin(t * rate * 2.3 + ph) > 0.93;
+      if (off) continue;
+      ticks.push(<rect key={`t${i}_${j}`} x={tx} y={ry + rowH * 0.3} width={tickW} height={Math.max(2.5, rowH * 0.4)} fill={EMBER.led} />);
+    }
+  }
+  const outline: Pt[] = [[g.x0, y], [g.x0, g.top], [g.x1, g.top], [g.x1, y]];
+  const signText = sign === null ? null : sign;
+  const signSize = Math.min(g.sign.h * 0.78, w * 0.13);
+  return (
+    <>
+      {/* roof units (behind the parapet line) */}
+      {unitsX.map((ux, i) => (
+        <React.Fragment key={i}>
+          <Fill rect={[ux, g.top - unitH, unitW, unitH + 2]} color={side} at={fillAt(at, 0.05)} offset={far ? false : undefined} seed={`${seed}/u${i}`} />
+          <Fill rect={[ux - 2, g.top - unitH - 3, unitW + 4, 5]} color={EMBER.snow} at={fillAt(at, 0.08)} offset={false} />
+          {far ? null : (
+            <>
+              <Fill d={blob(ux + unitW / 2, g.top - unitH * 0.5, unitW * 0.26, unitH * 0.3, {seed: `${seed}/fan${i}`})} color={body} at={fillAt(at, 0.08)} offset={false} />
+              <Ink d={rectInk(ux, g.top - unitH, unitW, unitH, {seed: `${seed}/uI${i}`, over: [0, 2], edges: 'tlr'}) + circle(ux + unitW / 2, g.top - unitH * 0.5, unitW * 0.26, {seed: `${seed}/fI${i}`})} at={b(at, 0.1 + i * 0.03)} width={Math.max(1.6, iw * 0.65)} />
+            </>
+          )}
+        </React.Fragment>
+      ))}
+      {/* body, shade side, parapet with its snow line */}
+      <Fill d={polyPath(outline)} color={body} at={fillAt(at)} offset={far ? false : undefined} seed={`${seed}/body`} />
+      <Fill rect={[g.x0, g.top, sideW, g.H]} color={side} at={fillAt(at, 0.02)} offset={false} />
+      <Fill rect={[g.x0, g.top, w, parH]} color={side} at={fillAt(at, 0.02)} offset={false} />
+      <Fill rect={[g.x0 - 2, g.top - 4, w + 4, 5]} color={EMBER.snow} at={fillAt(at, 0.06)} offset={false} />
+      <Show at={fillAt(at, 0.06)}>
+        {strips}
+        {ticks}
+      </Show>
+      {/* the sign: a panel on the facade; letters in cold light (or ink on a lit panel) */}
+      {signText !== null ? (
+        <>
+          <Fill rect={[g.sign.x, g.sign.y, g.sign.w, g.sign.h]} color={lit ? EMBER.led : side} at={fillAt(at, 0.04)} offset={false} seed={`${seed}/sign`} />
+          {signText ? (
+            <Show at={signAt ?? fillAt(at, 0.06)}>
+              <Txt x={x + sideW / 2} y={g.sign.y + g.sign.h * 0.74} size={signSize} fill={lit ? EMBER.ink : EMBER.led} fit={g.sign.w * 0.92}>
+                {signText}
+              </Txt>
+            </Show>
+          ) : null}
+          {far ? null : <Ink d={rectInk(g.sign.x, g.sign.y, g.sign.w, g.sign.h, {seed: `${seed}/sI`, over: [0, 3]})} at={b(at, 0.08)} width={lit ? iw : Math.max(1.6, iw * 0.6)} />}
+        </>
+      ) : null}
+      {/* ink: outline, parapet line, side edge (none on the far silhouette) */}
+      {far ? null : (
+        <Ink
+          d={poly(outline, {seed: `${seed}/o`, over: [2, 6]}) + hline(g.x0, g.x1, g.top + parH, {seed: `${seed}/p`, over: [0, 0]}) + vline(g.x0 + sideW, g.top + parH, y, {seed: `${seed}/sd`, over: [0, 0]})}
+          at={at}
+          width={iw}
+        />
+      )}
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- our roof ledge (S9 foreground)
+
+export type RoofLedgeProps = {
+  /** Top of the coping lip (canvas px). The mass runs down past the frame bottom. */
+  y: number;
+  x0?: number;
+  x1?: number;
+  /** Mass height below the lip (default 1400: always past the bottom). */
+  h?: number;
+  /** The vent's centre x (null = none). */
+  ventX?: number | null;
+  at?: At;
+  seed?: string;
+  ink?: number;
+};
+
+/** Our building's roof parapet: warm brick (our side is warm), a light snow coping lip, one vent with a snow cap; cut
+ *  by both side edges. Front ink (4.8). */
+export const RoofLedge: React.FC<RoofLedgeProps> = ({y, x0 = -60, x1 = 1140, h = 1400, ventX = 220, at, seed = 'ledge', ink = 4.8}) => {
+  const lipH = 36;
+  const r = rng(`ledge/${seed}`);
+  // a few brick ticks on the parapet face (short marks, not a pattern)
+  let bricks = '';
+  for (let i = 0; i < 9; i++) {
+    const bx = r.range(x0 + 60, x1 - 60);
+    const by = y + lipH + r.range(30, 220);
+    bricks += line(bx, by, bx + r.range(26, 44), by, {over: [0, 0], seed: `${seed}/bk${i}`});
+    if (r.chance(0.5)) bricks += line(bx + 14, by, bx + 14, by + 18, {over: [0, 0], seed: `${seed}/bv${i}`});
+  }
+  const vent = ventX === null ? null : (() => {
+    const vx = ventX;
+    const vw = 64;
+    const vh = 70;
+    const vy = y - vh;
+    const cap: Pt[] = [[vx - vw * 0.75, vy], [vx + vw * 0.75, vy], [vx + vw * 0.55, vy - 22], [vx - vw * 0.55, vy - 22]];
+    return (
+      <>
+        <Fill rect={[vx - vw / 2, vy, vw, vh + 4]} color={EMBER.brickShade} at={fillAt(at, 0.04)} seed={`${seed}/v`} />
+        <Fill d={polyPath(cap)} color={EMBER.anchor} at={fillAt(at, 0.06)} seed={`${seed}/vc`} />
+        <Fill d={blob(vx, vy - 24, vw * 0.5, 9, {seed: `${seed}/vs`})} color={EMBER.snow} at={fillAt(at, 0.08)} offset={false} />
+        <Ink d={vline(vx - vw / 2, vy, y, {over: [0, 0], seed: `${seed}/v1`}) + vline(vx + vw / 2, vy, y, {over: [0, 0], seed: `${seed}/v2`}) + poly(cap, {closed: true, seed: `${seed}/vcI`, over: [1, 4]})} at={b(at, 0.04)} width={ink * 0.8} />
+      </>
+    );
+  })();
+  return (
+    <>
+      {vent}
+      <Fill rect={[x0, y + lipH, x1 - x0, h]} color={EMBER.brick} at={fillAt(at)} seed={`${seed}/mass`} />
+      <Fill rect={[x0, y, x1 - x0, lipH]} color={EMBER.snow} at={fillAt(at, 0.03)} seed={`${seed}/lip`} />
+      <Fill rect={[x0, y + lipH, x1 - x0, 14]} color={EMBER.brickShade} at={fillAt(at, 0.05)} offset={false} />
+      <Ink d={hline(x0, x1, y, {seed: `${seed}/t`, over: 'structural'}) + hline(x0, x1, y + lipH, {seed: `${seed}/b`, over: 'medium'})} at={at} width={ink} />
+      <Ink d={bricks} at={b(at, 0.12)} width={2.2} />
+    </>
+  );
+};
