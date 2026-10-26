@@ -6,6 +6,8 @@ REPORTED item (no relief before 2027-28) is on screen only, with soft wording. F
 chip, the 5x chip, the rack footnote, the Micron quote, and line 8's chart no longer forecasts computer prices). Before
 G8: tick the BLS series for line 4's +9.7%.
 
+**LOCKED by the owner 2026-10-26 ("The text is good"). Working voice: `assets/v3/take2_clean.wav`.**
+
 Rewritten from scratch on 2026-10-26, after the owner's note: "the story doesn't coherently flow... just a collection of
 sentences... start from scratch." It replaces `archive/script_v1/`. Not committed.
 
