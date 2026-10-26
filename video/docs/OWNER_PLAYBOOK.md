@@ -149,6 +149,10 @@ Format: **rule** — why / evidence (video, date).
 - **Every cut sent to the owner says what stage it is and what the next stages add** (e.g. "blocking: staging only;
   next: density, life, polish, full-res"), so a draft is never mistaken for the final. — ("let me know if this is just
   an initial intermediate step", v3 G5, 2026-10-26).
+- **NO LIMIT ON TOKENS for creative output.** Ideas, scripts, design explorations, set building, density, life, animation
+  and polish get as many agents, rounds and tokens as the quality needs, including workflows larger than the default size
+  guideline. Savings never decide a creative choice; only true waste is cut (rework, lost work, reviewing what will
+  still change). — (owner, 2026-10-26).
 - **Never trade quality for savings:** brainstorms, judged competing ideas and design explorations are worth their
   tokens; waste = rework, reviews of things that will change, early polish, lost work. — (2026-10-25).
 - **Locked means dropped:** rejected options go to the video's `archive/`, the gate doc keeps only the locked choice,

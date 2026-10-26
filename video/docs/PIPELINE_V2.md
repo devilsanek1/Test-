@@ -47,6 +47,10 @@ Target: playable cuts at about hours 1, 3, 8 and 14 (video 1: hour 18.7).
 
 ## Creative exploration is not waste (owner rule)
 
+**NO LIMIT ON TOKENS for creative output (owner, 2026-10-26).** Every creative stage (ideas, script, design, sets, density,
+life, animation, polish) gets as many agents, rounds and tokens as the quality needs, including workflows larger than the
+default size guideline. The anti-waste rules below only cut true waste (rework, lost work, reviews of things that will change).
+
 Quality and output value come first. Spend generously where ideas are decided, because that is cheap compared to
 building, and it decides the outcome:
 - **G0 angle and hook:** 4-6 independent writers with different lenses (retention editor, storyteller, sceptical
