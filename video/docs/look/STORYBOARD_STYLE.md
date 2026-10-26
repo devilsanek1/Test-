@@ -50,7 +50,8 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   cut on the voice. Exactly one subject; 12-25 elements, and over 30 the panel gets split.
 - **Staging:** the subject sits on the centre axis (x 380-700) of the read zone (y 600-1250). It spans 35-60 % of the 760 px stage
   (at least 270 px) with 80 px of clear paper around it, and keeps its screen spot across a cut unless the cut is about movement.
-  Before goes on the left, after on the right; more goes up or taller; time runs left to right.
+  Before goes on the left, after on the right; more goes up or taller; time runs left to right. A scale panel inverts the
+  size rule: its subject is too big to take in (§7, shot `scale: true`).
 - **Silhouette and depth:** filled solid black at 270 x 480, the subject and its action can still be named; nothing touches its key edge,
   hands stay off faces and bodies, objects overlap clearly or keep 30 px apart. At most 3 planes: subject (9 px, a dark mass, or paper-white
   against light), middle (5 px, light fill), far (3 px mid-grey lines or a flat light shape, no detail). Overlap does the rest; no perspective grids.
@@ -70,8 +71,12 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 - **Space:** at least 40 % of the stage is plain paper. Nothing important sits within 120 px of a side edge or under the UI rail (x > 780,
   y > 840). The **caption band** (y 290-600) is plain paper or one flat light sky, and no lines cross it. The captions keep today's
   in-place pop (100 px ink), and the frame-0 payoff line sits above them.
-- **Notes strip:** the director's note and the slug (shot, transition, camera word, timecode) go in one strip at y 1680-1900: paper with a
-  2 px light rule, 30-32 px mid grey, at most 2 lines. Nothing is drawn under the text; below the stage the ground is light or plain paper.
+- **Notes strip (big words, v3 G3 fix round):** one strip at y 1680-1920, paper with a 2 px light rule, written for the director
+  reading a 25 % contact sheet. Line 1, 48 px ink, bold, at most 2 lines: shot id, shot type, COZY / SCALE and the camera move
+  ("S9 · SCALE 2/3: RISE over OUR ROOF (the big move)"). Line 2, 38 px ink, at most 2 lines: the one idea in plain words, then
+  the transition. Data: `note: "line 1\nline 2"`; SketchReel appends the move word when line 1 does not name it. No label,
+  no timecode, no mid-grey text: 31 px grey slug-first notes were unreadable on the sheet. If the picture needs a word to be
+  read (a grey slab that is OUR ROOF), line 2 says it. Nothing is drawn under the text.
 
 ## 4. Camera and motion notation
 - **By default a panel is a held drawing, cut on the voice.** Motion is used only where the motion is the meaning (the Iron Giant reels
@@ -92,14 +97,18 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 - **Thumbnails first:** for each beat, write the sentence, render 3 variants (a different subject size or angle) as 270 x 480 board stills
   on one contact sheet, pick one by the checklist, then finish that panel's JSON. Thumbnails are the first draft (Lefler [19], VERIFIED),
   "thinking" drawings (Matt Jones, Pixar [20], REPORTED). The whole reel as a 25 % contact sheet is the pacing check, before any MP4.
+  Sheet samples: one frame per panel at its middle, never inside a caption's 2-frame pop (at least 0.07 s after a word starts,
+  or the caption reads as fading text), the animated big move as its start AND landing frames, and every change that is the
+  panel's idea already on screen at the sampled frame (put it on the earliest word that names it; hold it >= 1 s).
 - **Re-board only the panel that fails:** each note (from the owner or a cold read) maps to a shot id plus a checklist number. Change that shot's JSON
   only, re-render its stills, then the 540p 30 fps reel. Panels that passed stay frozen. A fix is usually a swap from the kit (an icon,
   a pose, a size). Nothing is polished at G3: no parallax, texture, colour or extra draw-on.
 - **Sound-off checklist, per panel, at 270 x 480:** (1) one sentence, one subject; (2) filled black, subject and action still named;
   (3) squinting or at 25 %, the eye lands on the subject within ~1 s (heaviest line, darkest against lightest); (4) 3 weights, 4 tones, no hue
-  but at most one red mark; (5) subject centred, 35-60 % of the stage, 80 px clear, caption band empty, nothing key at an edge; (6) every object
+  but at most one red mark; (5) subject centred, 35-60 % of the stage (a scale panel: >= 60 % of the frame or cut by both sides), 80 px clear, caption band empty, nothing key at an edge; (6) every object
   named by its shape (no words in boxes), lines that add nothing deleted; (7) at most 1 label (56+ px) and 1 number, no text repeating the
-  caption, no sources in frame; (8) a cold reader, sound off, says the sentence from (1).
+  caption, no sources in frame; (8) a cold reader, sound off, says the sentence from (1); (9) the notes strip's line 1 names the
+  shot type, COZY / SCALE and the move, line 2 the idea, both readable on the sheet.
 
 ## 6. Implementation notes for SketchReel (`Animatic.style: 'board' | 'sketch'`, default `board` at G3)
 | Today | Board mode |
@@ -111,26 +120,92 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 | `label` (34 px MUTED), `text` (48 px) | ink, 56-72 px; lint flags a second label or text under 48 px |
 | icon palette `C` (screen blue, lit yellow…) | `boardTone(hex)` snaps each colour's brightness to the nearest of the 4 tones; outlines follow `role`, details 3 px |
 | `figure` (head + trapezoid) · `f` parallax | a gesture figure from `pose` · `f` doesn't move anything; it sets the default `role` (`far` if f < 0.5) |
-| `shot.note` + top-left label · caption glow | the notes strip at y 1680-1900 · glow removed (the band is empty) |
+| `shot.note` + top-left label · caption glow | the notes strip at y 1680-1920 (§3: line 1 / line 2) · glow removed (the band is empty) |
 | `sketch.ts` overshoot and breaks | `over: 'small'` (`'none'` on the subject), `breaks: false`, `jitter` at most 0.8 |
 New props: `role?: 'subject'|'mid'|'far'` on every element, icons and figures included; `sw?: number`, a rare stroke override (`w` is already a width);
+shot `scale?: true` for a scale panel (the lint then wants its subject BIG: >= 60 % of the frame or cut by both side edges);
 figure `pose?: 'stand'|'walk'|'point'|'reach'|'hold'|'shrug'|'slump'|'lookup'|'sit'`, `facing?: 'l'|'r'`,
 `face?: 'none'|'happy'|'sad'|'shock'|'worried'`; text `strike?: boolean`; a new element `{t: 'mark', kind: 'circle'|'arrow'|'underline'|'frame',
 …, word?}` on the red annotation layer (5 px; `frame` = a dashed end-frame box with corner arrows), with `in` and `out` like any other element.
 **`board-lint` runs before every render.** Per shot it checks: at most 25 elements (warn at 30 to split); one subject group; at most 1 label and 1
 mark; text at least 48 px; fills from the palette only; nothing crossing y 290-600 except a `far` flat fill; the subject's box centred
-in x 380-700 and 270-460 px wide (a tall subject such as a standing figure is measured by its height, 300-650 px); the camera's zoom
-changing by at most 2x within a shot. Implemented: `scripts/v3/board_lint.py` (props and defaults: the header of `src/v3/SketchReel.tsx`).
+in x 380-700 and 270-460 px wide (a tall subject such as a standing figure is measured by its height, 300-650 px; a `scale` panel's
+subject at least 648 px or cut by both side edges); a bare year ("2005") counts as an axis word, not the number; the camera's zoom
+changing by at most 2x within a shot. Boxes are measured on screen (clipped to the frame and the stage above the notes strip); a subject cut by a frame edge
+(a waist-up figure) is measured by its visible width. Element moves take `ease` (default `inout`; `outSine` for a
+rise-over's ledge). Implemented: `scripts/v3/board_lint.py` (props and defaults: the header of `src/v3/SketchReel.tsx`);
+a worked board with every pattern (home base as 1-element window, icon ticker, element reuse, two-layer rise-over):
+`scripts/v3/build_board_cine.py`.
 
 ## 7. Cinematography belongs in the board (owner, 2026-10-26)
 Clarity and cinematics are not a trade-off. Each panel names its shot type and framing, drawn in monochrome:
 - **Home base = cozy enclosure** (`COZY_AND_SCALE.md` §2-3): walls/shelf as dark masses cut by 2 frame edges, ONE opening
   (the window, 15-30 % of the frame) in light grey; the lamp pool as a light-grey shape. The subject stays the darkest.
+  Reads as a window, not a screen (v3 G3): landscape glass, a sill, the lamp shade over one lower corner, the view in it
+  (horizon, landmark) and ONE mullion in clear glass, never across the landmark or its sign (a cross over the subject
+  brought back "screen or blinds?"); the landmark's body in paper so it separates from the light glass. The pool sits
+  on a darker surface (the desk as part of the mid refuge mass) as a paper ellipse; on plain paper it reads as a stain.
+- **The home base is ONE room tone (v3 G3 fix round):** a single far flat mid rect over the whole frame (wall, shelf and desk),
+  so the light glass is the lightest thing around it; a light window on blank paper is darker than its surround and reads as
+  a picture or a screen. Every home-base panel (the POV, the objective return, the close-ups at the desk, the callback)
+  starts from the same room tone and the same lamp shade or pool, so the place visibly returns; a light desk on paper read
+  as another place. In an objective return, reuse the opening's window and its outline of the landmark (scaled), never a
+  new drawing: a tall slab with a cross read as a glass door, a box with notches as a castle. A cut-in keeps the object
+  it cuts into (S15's phone, 1.275x on its axis), not a look-alike.
 - **Scale** (`CINEMATIC_GUIDE.md`): the one big move (S1 rise-over reveal) drawn with its planes; a scale CUT from a close
-  panel to a tiny figure (0.04-0.08 H) under something huge; a low or worm's-eye angle for the colossus. Mark the move
-  with the red `frame` / arrow notation.
-- **Angle and size vary on purpose:** close for the personal beat, wide for the system, the home base to return to.
+  panel to a tiny figure (0.04-0.08 H, so at least ~80 px: a 3 % figure is a 15 px speck on the cold-read thumbnail;
+  fix the plan, not the floor) under something huge; a low or worm's-eye angle for the colossus. Mark a move with the
+  red `frame` / arrow notation only when it is not animated (§4); an animated move is its own notation.
+- **Scale panels are BIG, never a centred object on paper (fix round):** shot `scale: true`. The reveal lands with the
+  colossus cut by BOTH side edges (a wide hall, its sign readable), with a ruler at its foot (a row of houses, drawn paper
+  with far lines so they show on a light body). The rise-over's near plane must read as OUR ROOF: a parapet lip (a light
+  coping strip) and one vent in the roof's tone, and "OUR ROOF" in the notes; a flat grey slab read as ground, a hill or a
+  sinking building. The worm's-eye: horizon low (~0.78 H), the colossus or pile past both side edges up to the caption band,
+  >= 10:1 over the figure; the tiny figure stands on plain ground IN FRONT (against a busy colossus it vanishes). The ladder's
+  small end: the one object breaks out of its container (over the bezel and the keys) and is the biggest whole thing in the
+  frame (>= 60 % W); inside a screen rectangle it reads as a picture on the display.
+- **Angle and size vary on purpose:** close for the personal beat, wide for the system, the home base to return to. Never
+  three wides in a row that share a centred landmark on a ground line: change the angle (eye-level reveal, worm's-eye,
+  slightly high) as well as the size.
+- **A queue reads in depth:** look up the line from slightly above, the road as one light band from the waiting one (near,
+  big, its cargo readable) to the source's door (far), the first in line at the door getting the goods, and one waiting cue
+  (three dots over the cab). Side-on, the same objects read as "three buildings side by side". The reprise of a matched
+  frame changes only what the voice says (who cuts in, who is pushed back) and moves the subject role to the newcomer.
+- **Literal reads, small things (fix round cold read):** the mildest face that carries the beat (a shock face read as
+  "something bad happened"); "better" drawn as bigger plus the voice's own word as the label; an object keeps its tone
+  across panels unless the change is the idea (a laptop turned dark read as "a different, infected laptop"); a speech
+  bubble's speaker is a figure and the tail ends at its head (a tail toward buildings has no speaker); the stake's number
+  is on frame 0 and in the loop frame (an empty tag read as "price unknown").
 - The sound-off read still rules: if a cinematic choice makes a panel unreadable, simplify the drawing, not the framing.
+
+**Camera plan first (v3 G3, 2026-10-26; example `docs/v3/camera_plan_g3.md`).** Before re-boarding, the cinematographer
+writes one row per panel: time, idea, shot type, framing, cozy/scale element, move, readability note, plus the notes-strip
+lines. Then check the whole film:
+- **Moves:** animate at most two, both timing questions: the opening's 5 % pull-out and the one big reveal. Every other
+  panel holds and cuts on its word (G5 adds the 1.5-2 % breathes).
+- **Home base:** it opens the film, returns on the quiet beat (the waiting / thinking line) and hosts the callback; close-ups
+  at the viewer's desk keep it with just a lamp-pool ellipse (0.5-0.7 W, wider than the object on it, so it reads as
+  light, not a mat). Cozy is at least 50 % of the runtime outside full-frame chart inserts (`COZY_AND_SCALE.md` §1.3:
+  an insert is a neutral breath); the nook is breached once.
+- **Scale:** one moment (1.5-4 s) built as a ladder: a close-up of the one thing, the reveal of many, then ONE cut to a
+  tiny figure (change the angle as well as the size, so the second wide steps up instead of repeating).
+- **Size or angle changes at every cut,** except a deliberate match (the same chart again, the same place later, the
+  callback to the opening's end frame), which keeps the exact frame so the change is the only difference.
+- **Rise-over in board mode = two layers:** the camera rises a little (the world sinks ~120 px, so nothing enters the
+  caption band; ease `unveil`, landing on the key word) while the near ledge drops on its own move with ease `outSine`
+  over the WHOLE panel. Budget the speed on screen: camera + own move at most 15 px per 30 fps frame (a sine ease-out
+  peaks at pi/2 x the average speed; a quad or cubic ease-out landing early peaks at 2-3x and strobes). v3 S9: 120 px
+  of camera + 384 px own move = 520 px on screen in 1.92 s, peak 14.8. Start with the ledge hiding about half the
+  landmark, its sign showing; things flying in enter from the side edges when the landmark's top sits near the band.
+  This is the only parallax a board gets.
+- **Close-ups are redrawn at size, never zoomed** (line weights scale with the camera). **Charts are straight-on, level
+  inserts** (an angle bends the number). **A match is built, not redrawn:** the builder makes the reprise from the first
+  panel's element list plus the changes (a redrawn S6 dropped S4's axis word; a redrawn S14 moved S10's ground line).
+- **The low angle goes on the quantity, never on the thing under critique** (no villain): the pile of chips gets the
+  worm's-eye; the company's building stays at eye level.
+- **The opening shows the real mechanism, never a growth or consumption metaphor:** each unit of cause is one visible
+  tick of the viewer's stake (one memory stick leaves, the price ticks up one step); the cause sits outside the
+  home-base window, the effect in the hand, and both change on the payoff word (`CINEMATIC_GUIDE.md`, "The opening").
 
 ## Sources
 [1] https://www.moma.org/audio/playlist/192/2574 · [2] https://2719hyperion.com/2009/05/conversation-with-joe-ranft.html · [3] https://www.creativebloq.com/advice/storyboard-tips

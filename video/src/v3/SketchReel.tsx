@@ -7,7 +7,7 @@
 // paper + 4 tones, line weight by role, gesture figures, red notation marks, notes in a strip under the stage, no
 // parallax) and 'sketch' (the original warm pencil look, kept so old data renders as before).
 // Board API: role 'subject' | 'mid' | 'far' on any element (default: 'subject' for fill 'pop', 'far' for f < 0.5, else
-// 'mid'); sw = stroke width override; figure pose / facing / face; text strike; {t: 'mark'}; camera.word.
+// 'mid'); sw = stroke width override; figure pose / facing / face; text strike; {t: 'mark'}; camera.word; moves[].ease.
 // Lint before every render: python3 scripts/v3/board_lint.py public/v3/animatic.json
 
 import React from 'react';
@@ -66,18 +66,24 @@ export type El = Depth & (
   | {t: 'mark'; kind: 'arrow'; x1: number; y1: number; x2: number; y2: number; word?: string; in?: number});
 /** r = roll in degrees (CINEMATIC_GUIDE: <= 2 deg drift, <= 6 deg in action). */
 type Cam = {x: number; y: number; z: number; r?: number};
-type Ease = 'inout' | 'out' | 'in' | 'linear' | 'unveil' | 'inQuad';
+/** outSine = sine ease-out: fastest at the start, peak speed only pi/2 x the average (a rise-over's near ledge, STORYBOARD_STYLE §7) */
+type Ease = 'inout' | 'out' | 'in' | 'linear' | 'unveil' | 'inQuad' | 'outSine';
 export type Shot = {
   id: string;
   s: number;
   e: number;
+  /** board: "line 1\nline 2" for the notes strip (line 1 = shot type, COZY / SCALE, the move; line 2 = the one idea) */
   note: string;
+  /** board: a scale panel (the colossus cut by the frame, or the extreme close of the scale ladder): board-lint checks
+   *  that its subject is BIG (at least 60 % of the frame width, or cut by both side edges) instead of 270-460 px */
+  scale?: boolean;
   /** dur = transition length in s (dissolve default 0.2; T10 slow dissolve 0.5-0.8); dip = through dark, flash = through white. */
   transition: {type: 'cut' | 'dissolve' | 'push-through' | 'match-cut' | 'wipe' | 'dip' | 'flash'; label?: string; dur?: number};
   /** word = the slug's camera word (default from the move: PUSH IN, PULL OUT, RISE, TILT DOWN, PAN L/R, HOLD) */
   camera: {from: Cam; to: Cam; ease?: Ease; start?: number; end?: number; word?: string};
   els: El[];
-  moves?: {el: number; dx: number; dy: number; at: number; dur: number}[];
+  /** element moves (dx, dy in world px, from at for dur s after the shot start; several on one element add up); ease default 'inout' */
+  moves?: {el: number; dx: number; dy: number; at: number; dur: number; ease?: Ease}[];
 };
 export type Animatic = {
   /** default 'board' */
@@ -110,7 +116,7 @@ const trapezoid = (a: number, d: number) => {
 };
 const EASE: Record<Ease, (x: number) => number> = {
   inout: Easing.inOut(Easing.sin), out: Easing.out(Easing.cubic), in: Easing.in(Easing.cubic), linear: (x: number) => x,
-  unveil: trapezoid(0.1, 0.6), inQuad: Easing.in(Easing.quad),
+  unveil: trapezoid(0.1, 0.6), inQuad: Easing.in(Easing.quad), outSine: Easing.out(Easing.sin),
 };
 
 function camAt(shot: Shot, t: number): Cam {
@@ -355,7 +361,7 @@ const Element: React.FC<{el: El; t: number; shot: Shot; i: number; board: boolea
   let dy = 0;
   for (const m of shot.moves ?? []) {
     if (m.el !== i) continue;
-    const u = interpolate(t - shot.s, [m.at, m.at + m.dur], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE.inout});
+    const u = interpolate(t - shot.s, [m.at, m.at + m.dur], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE[m.ease ?? 'inout']});
     dx += m.dx * u;
     dy += m.dy * u;
   }
@@ -494,6 +500,13 @@ export const ShotView: React.FC<{shot: Shot; t: number; mode?: Style}> = ({shot,
   );
 };
 
+/** board notes strip, line 1: "S9 · <shot type, COZY / SCALE> · <move>" (the move word added unless the note names it) */
+function notesLine1(shot: Shot): string {
+  const head = (shot.note ?? '').split('\n')[0];
+  const mv = camWord(shot.camera);
+  return [shot.id, head, head.toUpperCase().includes(mv) ? '' : mv].filter(Boolean).join(' · ');
+}
+
 /** the slug's camera word: camera.word, or read from the move (zoom first, then the on-screen travel) */
 export function camWord(cam: Shot['camera']): string {
   if (cam.word) return cam.word;
@@ -592,11 +605,17 @@ export const SketchReel: React.FC<{data: Animatic}> = ({data}) => {
       )}
 
       {board ? (
-        // the notes strip (y 1680-1900): slug + director's note, off the picture, at most 2 lines
+        // the notes strip (y 1680-1920, STORYBOARD_STYLE §3): big words the director reads on a 25 % sheet. Line 1 (48 px ink):
+        // shot id, shot type, COZY / SCALE, the camera move; line 2 (38 px ink): the one idea and the transition. The note's
+        // first line (before '\n') is line 1; the move word is appended when line 1 does not name it. No label, no timecode.
         <div style={{position: 'absolute', top: NOTES_TOP, left: 0, right: 0, bottom: 0, background: BOARD.paper, borderTop: `2px solid ${BOARD.light}`}}>
-          <div style={{margin: '22px 70px 0', fontSize: 31, lineHeight: 1.3, color: BOARD.mid, display: '-webkit-box', WebkitLineClamp: 2,
+          <div style={{margin: '14px 52px 0', fontSize: 48, lineHeight: 1.1, fontWeight: 700, color: BOARD.ink, display: '-webkit-box', WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>
-            {shot.id} · {trText} · {camWord(shot.camera)} · {tc} · {data.label}{shot.note ? ` | ${shot.note}` : ''}
+            {notesLine1(shot)}
+          </div>
+          <div style={{margin: '6px 52px 0', fontSize: 38, lineHeight: 1.15, color: BOARD.ink, display: '-webkit-box', WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical', overflow: 'hidden'}}>
+            {[shot.note.split('\n')[1], trText].filter(Boolean).join(' · ')}
           </div>
         </div>
       ) : (

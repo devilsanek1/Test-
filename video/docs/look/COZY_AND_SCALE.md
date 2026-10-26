@@ -11,7 +11,9 @@ prices) and v2 (DeepMind resignations). Evidence: `research/` enclosure [EN], co
 2. **Scale = a colossus too big to take in whole** (top >= 45° up, cut by the frame; Maertens [EN §4, REPORTED]) against a
    tiny, readable person on our side, ratio >= 10:1. Our Arcane reading: contrast across a cut, not long wides [AR §4, UNCERTAIN].
 3. **Cozy holds the viewer; scale, only occasionally (playbook), makes them feel the stakes.** Cozy >= 50 % of the runtime
-   (frame 0's world, the ending); 1-2 scale moments, never 3 (v2: 1), 1.5-4 s each, <= 20 % of the runtime (VE: 25 %).
+   outside full-frame chart inserts (frame 0's world, the ending; an insert is a neutral breath, neither cozy nor scale:
+   v3 G3 is 38 % of all 41 s, 55 % of the non-chart time); 1-2 scale moments, never 3 (v2: 1), 1.5-4 s each, <= 20 % of
+   the runtime (VE: 25 %).
 4. **ONE big move per video** (2.5-4 s + 0.8-1.5 s hold), <= 1 mid-size move, other shots push 3-8 %. Never two scale wides
    in a row; within ~5 s of each small-making beat, a beat of agency (a face, a voice, what is being done or can be done)
    [VE §7: our proposal, built on awe (Piff 2015) and threat-needs-efficacy (EPPM), both VERIFIED].

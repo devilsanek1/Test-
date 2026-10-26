@@ -475,8 +475,11 @@ const ICONS: Record<IconName, (b: Ico, o: Opts) => void> = {
     // a heap of the same memory sticks as 'ram' (board, four black chips, gold teeth), biggest at the bottom
     const board = o.body(C.green);
     const r = rng(`${b.seed}/pile`);
-    const sw = 0.28 * b.w;
-    const sh = 0.085 * b.w;
+    // sticks stay ram-sized (at most 130 px wide): a pile wider than ~460 px gets MORE sticks, not bigger ones, so a
+    // worm's-eye mountain that runs past both frame edges still reads as countless sticks (v3 G3 S9b)
+    const unit = Math.min(b.w, 130 / 0.28);
+    const sw = 0.28 * unit;
+    const sh = 0.085 * unit;
     const stick = (cx: number, cy: number, deg: number) => {
       const a = (deg * Math.PI) / 180;
       const T = (lx: number, ly: number): Pt => [cx + lx * Math.cos(a) - ly * Math.sin(a), cy + lx * Math.sin(a) + ly * Math.cos(a)];
@@ -488,14 +491,14 @@ const ICONS: Record<IconName, (b: Ico, o: Opts) => void> = {
       for (let k = 0; k < 4; k++) b.paint(quad(sw * (-0.43 + k * 0.225), -sh * 0.36, sw * (-0.43 + k * 0.225 + 0.17), sh * 0.1), C.darker);
       b.ink(poly(outline, {seed: b.sd(), closed: true, over: b.ov(sh), ...b.pen}), 3.5);
     };
-    // a taller box makes a taller mountain: rows stack 0.09 w apart, each narrower than the one below
-    const nRows = Math.max(2, Math.round((b.h / b.w - 0.2) / 0.09) + 1);
+    // a taller box makes a taller mountain: rows stack 0.09 unit apart, each narrower than the one below
+    const nRows = Math.max(2, Math.round((b.h - 0.2 * unit) / (0.09 * unit)) + 1);
     for (let i = 0; i < nRows; i++) {
       const span = 0.94 - (i * 0.76) / (nRows - 1);
-      const n = Math.max(1, Math.round(span / 0.188));
+      const n = Math.max(1, Math.round((span * b.w) / (0.188 * unit)));
       for (let k = 0; k < n; k++) {
-        const u = 0.5 - span / 2 + ((k + 0.5) * span) / n + r.jitter(0.02);
-        const cy = b.h - 0.06 * b.w - i * 0.09 * b.w + r.jitter(0.01 * b.w);
+        const u = 0.5 - span / 2 + ((k + 0.5) * span) / n + r.jitter((0.02 * unit) / b.w);
+        const cy = b.h - 0.06 * unit - i * 0.09 * unit + r.jitter(0.01 * unit);
         const deg = i === 0 ? r.range(-8, 8) : r.range(8, 28) * r.sign();
         stick(b.X(u), b.y + cy, deg);
       }

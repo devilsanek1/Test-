@@ -1,6 +1,6 @@
 {
  "style": "board",
- "label": "v3 G3 board",
+ "label": "v3 G3 cine",
  "audio": "v3/voice.wav",
  "durationSec": 41.15,
  "frame0": "AI IS MAKING YOUR NEXT LAPTOP PRICIER",
@@ -575,7 +575,7 @@
   },
   {
    "src": "v3/phone_notify_ding.wav",
-   "t": 30.84,
+   "t": 30.28,
    "gain": 0.4
   },
   {
@@ -649,391 +649,713 @@
    "id": "O1",
    "s": 0,
    "e": 5.8,
-   "note": "Your tap; the town's AI data center outgrows it on 'pricier'; the phone drops away on 'data'",
+   "note": "HOME BASE, COZY nook \u00b7 POV \u00b7 PULL OUT 5%\nEach memory stick that flies to the AI data center = your laptop's price up one step",
    "transition": {
     "type": "cut",
-    "label": "frame 0; the loop lands here"
+    "label": "frame 0"
    },
    "camera": {
     "from": {
      "x": 540,
      "y": 960,
-     "z": 1.04
+     "z": 1.05
     },
     "to": {
      "x": 540,
-     "y": 830,
+     "y": 960,
      "z": 1.0
     },
     "ease": "inQuad"
    },
    "els": [
     {
+     "t": "rect",
+     "x": -20,
+     "y": -20,
+     "w": 1120,
+     "h": 1720,
+     "role": "far",
+     "fill": "mid",
+     "fillIn": 0.04
+    },
+    {
      "t": "line",
      "pts": [
       [
-       120,
-       1040
+       180,
+       630
       ],
       [
-       960,
-       1040
+       830,
+       630
+      ],
+      [
+       830,
+       1060
+      ],
+      [
+       830,
+       630
+      ],
+      [
+       900,
+       630
+      ],
+      [
+       900,
+       1060
+      ],
+      [
+       925,
+       1060
+      ],
+      [
+       925,
+       1086
+      ],
+      [
+       155,
+       1086
+      ],
+      [
+       155,
+       1060
+      ],
+      [
+       180,
+       1060
+      ],
+      [
+       900,
+       1060
+      ],
+      [
+       180,
+       1060
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "light",
+     "draw": [
+      -0.3,
+      0.5
+     ],
+     "fillIn": 0.08
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       180,
+       950
+      ],
+      [
+       205,
+       950
+      ],
+      [
+       205,
+       905
+      ],
+      [
+       240,
+       874
+      ],
+      [
+       275,
+       905
+      ],
+      [
+       275,
+       950
+      ],
+      [
+       762,
+       950
+      ],
+      [
+       762,
+       910
+      ],
+      [
+       792,
+       882
+      ],
+      [
+       822,
+       910
+      ],
+      [
+       822,
+       950
+      ],
+      [
+       900,
+       950
       ]
      ],
      "role": "far",
      "draw": [
-      -0.25,
+      -0.21,
       0.3
      ]
     },
     {
      "t": "icon",
-     "name": "house",
-     "x": 130,
-     "y": 939,
-     "w": 110,
-     "role": "far",
-     "in": 0.55
-    },
-    {
-     "t": "icon",
-     "name": "house",
-     "x": 280,
-     "y": 939,
-     "w": 110,
-     "role": "far",
-     "in": 0.8,
-     "out": 2.6
-    },
-    {
-     "t": "icon",
-     "name": "house",
-     "x": 690,
-     "y": 939,
-     "w": 110,
-     "role": "far",
-     "in": 1.05,
-     "out": 2.6
-    },
-    {
-     "t": "icon",
-     "name": "house",
-     "x": 840,
-     "y": 939,
-     "w": 110,
-     "role": "far",
-     "in": 1.3
-    },
-    {
-     "t": "icon",
      "name": "datacenter",
-     "x": 405.0,
-     "y": 851,
-     "w": 270,
-     "role": "subject",
-     "h": 189,
-     "text": "AI DATA CENTER",
-     "out": 1.94,
+     "x": 322,
+     "y": 645,
+     "w": 436,
+     "role": "mid",
+     "h": 305,
+     "fill": "paper",
+     "text": " ",
      "draw": [
-      -0.3,
-      0.4
+      -0.25,
+      0.45
      ],
-     "fillIn": 0.18
+     "fillIn": 0.14,
+     "out": 4.14
     },
     {
      "t": "icon",
      "name": "datacenter",
-     "x": 385.0,
-     "y": 800,
-     "w": 310,
-     "role": "subject",
-     "h": 240,
-     "text": "AI DATA CENTER",
-     "in": 1.88,
-     "out": 2.18
-    },
-    {
-     "t": "icon",
-     "name": "datacenter",
-     "x": 365.0,
-     "y": 750,
-     "w": 350,
-     "role": "subject",
-     "h": 290,
-     "text": "AI DATA CENTER",
-     "in": 2.12,
-     "out": 2.36
-    },
-    {
-     "t": "icon",
-     "name": "datacenter",
-     "x": 347.5,
-     "y": 700,
-     "w": 385,
-     "role": "subject",
-     "h": 340,
-     "text": "AI DATA CENTER",
-     "in": 2.3,
-     "out": 2.48
-    },
-    {
-     "t": "icon",
-     "name": "datacenter",
-     "x": 332.5,
-     "y": 660,
-     "w": 415,
-     "role": "subject",
-     "h": 380,
-     "text": "AI DATA CENTER",
-     "in": 2.42,
-     "out": 2.66
-    },
-    {
-     "t": "icon",
-     "name": "datacenter",
-     "x": 322.0,
-     "y": 620,
+     "x": 322,
+     "y": 645,
      "w": 436,
      "role": "subject",
-     "h": 420,
+     "h": 305,
+     "fill": "dark",
      "text": " ",
-     "in": 2.6
+     "in": 4.04
     },
     {
      "t": "text",
      "x": 540,
-     "y": 790,
+     "y": 773,
      "text": "AI DATA CENTER",
      "size": 56,
      "role": "mid",
-     "in": 2.6
+     "in": 0.25
     },
     {
-     "t": "icon",
-     "name": "phone",
-     "x": 380,
-     "y": 1070,
-     "w": 320,
-     "role": "mid",
-     "draw": [
-      -0.3,
-      0.35
-     ],
-     "fillIn": 0.09
-    },
-    {
-     "t": "rect",
-     "x": 414,
-     "y": 1112,
-     "w": 252,
-     "h": 560,
+     "t": "ellipse",
+     "cx": 200,
+     "cy": 1200,
+     "rx": 160,
+     "ry": 55,
+     "role": "far",
      "fill": "paper",
+     "sw": 0,
+     "fillIn": 0.2
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       150,
+       1000
+      ],
+      [
+       250,
+       1000
+      ],
+      [
+       280,
+       1086
+      ],
+      [
+       120,
+       1086
+      ]
+     ],
      "role": "mid",
+     "closed": true,
+     "fill": "paper",
      "draw": [
-      99,
-      0.01
+      -0.15,
+      0.25
      ],
      "fillIn": 0.1
     },
     {
      "t": "icon",
-     "name": "laptop",
-     "x": 440,
-     "y": 1145,
-     "w": 200,
+     "name": "phone",
+     "x": 340,
+     "y": 980,
+     "w": 400,
      "role": "mid",
      "draw": [
       -0.24,
-      0.3
+      0.35
      ],
-     "fillIn": 0.13
-    },
-    {
-     "t": "text",
-     "x": 540,
-     "y": 1365,
-     "text": "$999",
-     "size": 72,
-     "role": "mid",
-     "in": 0.2,
-     "strike": 2.6
-    },
-    {
-     "t": "text",
-     "x": 540,
-     "y": 1450,
-     "text": "$1,099",
-     "size": 72,
-     "role": "mid",
-     "in": 2.62
-    },
-    {
-     "t": "arrow",
-     "x1": 632,
-     "y1": 1305,
-     "x2": 632,
-     "y2": 1372,
-     "role": "mid",
-     "in": 1.08,
-     "draw": [
-      1.08,
-      0.25
-     ],
-     "out": 1.64
-    },
-    {
-     "t": "arrow",
-     "x1": 632,
-     "y1": 1372,
-     "x2": 632,
-     "y2": 1305,
-     "role": "mid",
-     "in": 1.64,
-     "out": 2.6
+     "fillIn": 0.06
     },
     {
      "t": "rect",
-     "x": 430,
-     "y": 1488,
-     "w": 220,
-     "h": 90,
-     "fill": "light",
+     "x": 382,
+     "y": 1052,
+     "w": 316,
+     "h": 700,
+     "role": "mid",
+     "fill": "paper",
+     "draw": [
+      99,
+      0.01
+     ],
+     "fillIn": -0.2
+    },
+    {
+     "t": "icon",
+     "name": "laptop",
+     "x": 455,
+     "y": 1062,
+     "w": 170,
      "role": "mid",
      "draw": [
-      -0.25,
+      -0.18,
       0.3
      ],
-     "fillIn": 0.05
+     "fillIn": 0.12
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 1236,
+     "text": "$999",
+     "size": 56,
+     "role": "mid",
+     "in": 1.88,
+     "strike": 1.88
+    },
+    {
+     "t": "icon",
+     "name": "pricetag",
+     "x": 360,
+     "y": 1262,
+     "w": 360,
+     "role": "subject",
+     "text": " $999 ",
+     "fillIn": 0.16,
+     "out": 1.98
+    },
+    {
+     "t": "icon",
+     "name": "pricetag",
+     "x": 360,
+     "y": 1262,
+     "w": 360,
+     "role": "subject",
+     "text": "$1,019",
+     "in": 1.88,
+     "out": 2.28
+    },
+    {
+     "t": "icon",
+     "name": "pricetag",
+     "x": 360,
+     "y": 1262,
+     "w": 360,
+     "role": "subject",
+     "text": "$1,039",
+     "in": 2.18,
+     "out": 2.5
+    },
+    {
+     "t": "icon",
+     "name": "pricetag",
+     "x": 360,
+     "y": 1262,
+     "w": 360,
+     "role": "subject",
+     "text": "$1,059",
+     "in": 2.4,
+     "out": 2.7
+    },
+    {
+     "t": "icon",
+     "name": "pricetag",
+     "x": 360,
+     "y": 1262,
+     "w": 360,
+     "role": "subject",
+     "text": "$1,079",
+     "in": 2.6,
+     "out": 2.82
+    },
+    {
+     "t": "icon",
+     "name": "pricetag",
+     "x": 360,
+     "y": 1262,
+     "w": 360,
+     "role": "subject",
+     "text": "$1,099",
+     "in": 2.72,
+     "out": 4.04
+    },
+    {
+     "t": "icon",
+     "name": "pricetag",
+     "x": 360,
+     "y": 1402,
+     "w": 360,
+     "role": "mid",
+     "text": "$1,099",
+     "in": 3.96
     },
     {
      "t": "icon",
      "name": "cart",
-     "x": 502,
-     "y": 1502,
-     "w": 76,
+     "x": 507,
+     "y": 1500,
+     "w": 66,
      "role": "mid",
      "draw": [
-      -0.2,
+      -0.15,
       0.25
      ],
      "fillIn": 0.07
     },
     {
      "t": "line",
-     "closed": true,
-     "fill": "light",
-     "role": "mid",
-     "draw": [
-      -0.4,
-      0.3
-     ],
-     "fillIn": 0.03,
      "pts": [
       [
+       564,
+       1508
+      ],
+      [
+       588,
+       1490
+      ],
+      [
+       618,
+       1496
+      ],
+      [
+       640,
+       1522
+      ],
+      [
+       780,
+       1676
+      ],
+      [
+       690,
+       1696
+      ],
+      [
        574,
-       1532
+       1554
       ],
       [
-       598,
-       1514
-      ],
-      [
-       628,
-       1520
-      ],
-      [
-       650,
-       1546
-      ],
-      [
-       790,
-       1700
-      ],
-      [
-       700,
-       1720
-      ],
-      [
-       584,
-       1578
-      ],
-      [
-       568,
-       1552
+       558,
+       1528
       ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "light",
+     "draw": [
+      -0.27,
+      0.3
+     ],
+     "fillIn": 0.03
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": 425,
+     "y": 1080,
+     "w": 130,
+     "role": "mid",
+     "in": 1.88
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": 425,
+     "y": 1080,
+     "w": 130,
+     "role": "mid",
+     "in": 2.18
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": 425,
+     "y": 1080,
+     "w": 130,
+     "role": "mid",
+     "in": 2.4
+    },
+    {
+     "t": "mark",
+     "kind": "circle",
+     "x": 357,
+     "y": 729,
+     "w": 366,
+     "h": 49,
+     "in": 4.04,
+     "draw": [
+      4.04,
+      0.3
      ]
     }
    ],
    "moves": [
     {
-     "el": 21,
+     "el": 20,
      "dx": -4,
      "dy": 8,
      "at": 0.0,
      "dur": 0.06
     },
     {
-     "el": 21,
+     "el": 20,
      "dx": 4,
      "dy": -8,
      "at": 0.14,
      "dur": 0.12
     },
     {
-     "el": 12,
-     "dx": 0,
-     "dy": 920,
-     "at": 4.46,
-     "dur": 0.3
-    },
-    {
-     "el": 13,
-     "dx": 0,
-     "dy": 920,
-     "at": 4.46,
-     "dur": 0.3
-    },
-    {
-     "el": 14,
-     "dx": 0,
-     "dy": 920,
-     "at": 4.46,
-     "dur": 0.3
-    },
-    {
-     "el": 15,
-     "dx": 0,
-     "dy": 920,
-     "at": 4.46,
-     "dur": 0.3
-    },
-    {
-     "el": 16,
-     "dx": 0,
-     "dy": 920,
-     "at": 4.46,
-     "dur": 0.3
-    },
-    {
-     "el": 19,
-     "dx": 0,
-     "dy": 920,
-     "at": 4.46,
-     "dur": 0.3
-    },
-    {
-     "el": 20,
-     "dx": 0,
-     "dy": 920,
-     "at": 4.46,
-     "dur": 0.3
+     "el": 21,
+     "dx": -240,
+     "dy": -100,
+     "at": 1.88,
+     "dur": 0.2
     },
     {
      "el": 21,
      "dx": 0,
-     "dy": 920,
-     "at": 4.46,
-     "dur": 0.3
+     "dy": -310,
+     "at": 1.98,
+     "dur": 0.28
+    },
+    {
+     "el": 21,
+     "dx": 145,
+     "dy": -5,
+     "at": 2.2,
+     "dur": 0.16
+    },
+    {
+     "el": 21,
+     "dx": -2000,
+     "dy": 0,
+     "at": 2.3707,
+     "dur": 0.008
+    },
+    {
+     "el": 21,
+     "dx": 2095,
+     "dy": 415,
+     "at": 2.5707,
+     "dur": 0.008
+    },
+    {
+     "el": 21,
+     "dx": -240,
+     "dy": -100,
+     "at": 2.6,
+     "dur": 0.2
+    },
+    {
+     "el": 21,
+     "dx": 0,
+     "dy": -310,
+     "at": 2.7,
+     "dur": 0.28
+    },
+    {
+     "el": 21,
+     "dx": 145,
+     "dy": -5,
+     "at": 2.92,
+     "dur": 0.16
+    },
+    {
+     "el": 21,
+     "dx": -2000,
+     "dy": 0,
+     "at": 3.0873,
+     "dur": 0.008
+    },
+    {
+     "el": 22,
+     "dx": -240,
+     "dy": -100,
+     "at": 2.18,
+     "dur": 0.2
+    },
+    {
+     "el": 22,
+     "dx": 0,
+     "dy": -310,
+     "at": 2.28,
+     "dur": 0.28
+    },
+    {
+     "el": 22,
+     "dx": 145,
+     "dy": -5,
+     "at": 2.5,
+     "dur": 0.16
+    },
+    {
+     "el": 22,
+     "dx": -2000,
+     "dy": 0,
+     "at": 2.6707,
+     "dur": 0.008
+    },
+    {
+     "el": 22,
+     "dx": 2095,
+     "dy": 415,
+     "at": 2.6873,
+     "dur": 0.008
+    },
+    {
+     "el": 22,
+     "dx": -240,
+     "dy": -100,
+     "at": 2.72,
+     "dur": 0.2
+    },
+    {
+     "el": 22,
+     "dx": 0,
+     "dy": -310,
+     "at": 2.82,
+     "dur": 0.28
+    },
+    {
+     "el": 22,
+     "dx": 145,
+     "dy": -5,
+     "at": 3.04,
+     "dur": 0.16
+    },
+    {
+     "el": 22,
+     "dx": -2000,
+     "dy": 0,
+     "at": 3.204,
+     "dur": 0.008
+    },
+    {
+     "el": 23,
+     "dx": -240,
+     "dy": -100,
+     "at": 2.4,
+     "dur": 0.2
+    },
+    {
+     "el": 23,
+     "dx": 0,
+     "dy": -310,
+     "at": 2.5,
+     "dur": 0.28
+    },
+    {
+     "el": 23,
+     "dx": 145,
+     "dy": -5,
+     "at": 2.72,
+     "dur": 0.16
+    },
+    {
+     "el": 23,
+     "dx": -2000,
+     "dy": 0,
+     "at": 2.8873,
+     "dur": 0.008
+    },
+    {
+     "el": 8,
+     "dx": 0,
+     "dy": 140,
+     "at": 3.64,
+     "dur": 0.36
+    },
+    {
+     "el": 9,
+     "dx": 0,
+     "dy": 140,
+     "at": 3.64,
+     "dur": 0.36
+    },
+    {
+     "el": 10,
+     "dx": 0,
+     "dy": 140,
+     "at": 3.64,
+     "dur": 0.36
+    },
+    {
+     "el": 11,
+     "dx": 0,
+     "dy": 140,
+     "at": 3.64,
+     "dur": 0.36
+    },
+    {
+     "el": 19,
+     "dx": 0,
+     "dy": 140,
+     "at": 3.64,
+     "dur": 0.36
+    },
+    {
+     "el": 20,
+     "dx": 0,
+     "dy": 140,
+     "at": 3.64,
+     "dur": 0.36
+    },
+    {
+     "el": 12,
+     "dx": 0,
+     "dy": 140,
+     "at": 3.64,
+     "dur": 0.36
+    },
+    {
+     "el": 13,
+     "dx": 0,
+     "dy": 140,
+     "at": 3.64,
+     "dur": 0.36
+    },
+    {
+     "el": 14,
+     "dx": 0,
+     "dy": 140,
+     "at": 3.64,
+     "dur": 0.36
+    },
+    {
+     "el": 15,
+     "dx": 0,
+     "dy": 140,
+     "at": 3.64,
+     "dur": 0.36
+    },
+    {
+     "el": 16,
+     "dx": 0,
+     "dy": 140,
+     "at": 3.64,
+     "dur": 0.36
+    },
+    {
+     "el": 17,
+     "dx": 0,
+     "dy": 140,
+     "at": 3.64,
+     "dur": 0.36
     }
    ]
   },
@@ -1041,7 +1363,7 @@
    "id": "S4",
    "s": 5.8,
    "e": 9.48,
-   "note": "Plain chart: 20 years of better for the same money",
+   "note": "INSERT chart, straight-on\n20 years: the same money bought more computer",
    "transition": {
     "type": "cut",
     "label": "on 'Which'"
@@ -1141,7 +1463,7 @@
    "id": "S5",
    "s": 9.48,
    "e": 11.48,
-   "note": "The joke: right after you buy, a newer one, same price",
+   "note": "MEDIUM, waist-up (the face)\nRight after you buy one, a BETTER one comes out for the same $999",
    "transition": {
     "type": "cut",
     "label": "on 'Usually'"
@@ -1163,35 +1485,21 @@
      "t": "line",
      "pts": [
       [
-       150,
-       1440
+       470,
+       910
       ],
       [
-       930,
-       1440
-      ]
-     ],
-     "role": "far"
-    },
-    {
-     "t": "line",
-     "pts": [
-      [
-       530,
-       830
-      ],
-      [
-       790,
-       830
+       860,
+       910
       ]
      ],
      "role": "mid"
     },
     {
      "t": "figure",
-     "x": 340,
-     "y": 1440,
-     "h": 640,
+     "x": 330,
+     "y": 1952,
+     "h": 1200,
      "pose": "hold",
      "facing": "r",
      "role": "subject",
@@ -1200,28 +1508,37 @@
     },
     {
      "t": "figure",
-     "x": 340,
-     "y": 1440,
-     "h": 640,
+     "x": 330,
+     "y": 1952,
+     "h": 1200,
      "pose": "hold",
      "facing": "r",
      "role": "subject",
-     "face": "shock",
+     "face": "worried",
      "in": 0.72
+    },
+    {
+     "t": "rect",
+     "x": -20,
+     "y": 1395,
+     "w": 1120,
+     "h": 400,
+     "role": "mid",
+     "fill": "light"
     },
     {
      "t": "icon",
      "name": "laptop",
-     "x": 360,
-     "y": 950,
-     "w": 210,
-     "role": "subject"
+     "x": 426,
+     "y": 1032,
+     "w": 300,
+     "role": "mid"
     },
     {
      "t": "icon",
      "name": "pricetag",
-     "x": 420,
-     "y": 1124,
+     "x": 470,
+     "y": 1250,
      "w": 190,
      "role": "mid",
      "text": "$999"
@@ -1229,17 +1546,17 @@
     {
      "t": "icon",
      "name": "laptop",
-     "x": 545,
-     "y": 669,
-     "w": 230,
+     "x": 490,
+     "y": 672,
+     "w": 340,
      "role": "mid",
      "in": 0.72
     },
     {
      "t": "icon",
      "name": "pricetag",
-     "x": 590,
-     "y": 852,
+     "x": 690,
+     "y": 900,
      "w": 190,
      "role": "mid",
      "text": "$999",
@@ -1248,9 +1565,9 @@
     {
      "t": "text",
      "x": 660,
-     "y": 652,
-     "text": "NEW",
-     "size": 64,
+     "y": 662,
+     "text": "BETTER",
+     "size": 56,
      "role": "mid",
      "in": 0.72
     }
@@ -1260,7 +1577,7 @@
    "id": "S6",
    "s": 11.48,
    "e": 16.6,
-   "note": "This past year the line hooks UP: +9.7% (US)",
+   "note": "INSERT, the exact S4 frame\nThis year the line turns UP: +9.7%",
    "transition": {
     "type": "cut",
     "label": "back on 'But'"
@@ -1302,6 +1619,14 @@
      "y": 655,
      "text": "US computer prices",
      "size": 60,
+     "role": "mid"
+    },
+    {
+     "t": "text",
+     "x": 300,
+     "y": 1248,
+     "text": "2005",
+     "size": 56,
      "role": "mid"
     },
     {
@@ -1379,7 +1704,7 @@
    "id": "S7",
    "s": 16.6,
    "e": 18.28,
-   "note": "Your laptop: a see-inside bubble shows the memory stick in it",
+   "note": "CLOSE at your desk, COZY lamp\nYour laptop runs on the memory stick inside it",
    "transition": {
     "type": "cut",
     "label": "on 'Mostly'"
@@ -1398,33 +1723,76 @@
    },
    "els": [
     {
+     "t": "rect",
+     "x": -20,
+     "y": -20,
+     "w": 1120,
+     "h": 1720,
+     "role": "far",
+     "fill": "mid"
+    },
+    {
      "t": "line",
      "pts": [
       [
-       170,
-       1150
+       -20,
+       1000
       ],
       [
-       910,
-       1150
+       1100,
+       1000
       ]
      ],
      "role": "mid"
     },
     {
+     "t": "line",
+     "pts": [
+      [
+       -60,
+       790
+      ],
+      [
+       110,
+       790
+      ],
+      [
+       160,
+       930
+      ],
+      [
+       -110,
+       930
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "paper"
+    },
+    {
+     "t": "ellipse",
+     "cx": 540,
+     "cy": 1150,
+     "rx": 320,
+     "ry": 110,
+     "role": "far",
+     "fill": "paper",
+     "sw": 0
+    },
+    {
      "t": "icon",
      "name": "laptop",
-     "x": 255,
-     "y": 884,
-     "w": 380,
+     "x": 330,
+     "y": 860,
+     "w": 420,
      "role": "subject"
     },
     {
      "t": "line",
      "pts": [
       [
-       618,
-       1112
+       650,
+       1100
       ],
       [
        676,
@@ -1440,8 +1808,8 @@
      "cy": 728,
      "rx": 112,
      "ry": 112,
-     "fill": "paper",
      "role": "mid",
+     "fill": "paper",
      "in": 0.64
     },
     {
@@ -1459,7 +1827,7 @@
    "id": "S8",
    "s": 18.28,
    "e": 19.4,
-   "note": "It runs on a stick of memory chips (it rises out)",
+   "note": "EXTREME CLOSE cut-in, SCALE 1/3\nONE stick of memory chips, the biggest thing in frame",
    "transition": {
     "type": "cut",
     "label": "cut-in on 'memory'"
@@ -1478,41 +1846,60 @@
    },
    "els": [
     {
-     "t": "line",
-     "pts": [
-      [
-       170,
-       1376
-      ],
-      [
-       910,
-       1376
-      ]
-     ],
-     "role": "mid"
+     "t": "rect",
+     "x": -20,
+     "y": -20,
+     "w": 1120,
+     "h": 1720,
+     "role": "far",
+     "fill": "mid"
+    },
+    {
+     "t": "ellipse",
+     "cx": 540,
+     "cy": 1630,
+     "rx": 420,
+     "ry": 70,
+     "role": "far",
+     "fill": "paper",
+     "sw": 0
     },
     {
      "t": "icon",
      "name": "laptop",
-     "x": 330,
-     "y": 1082,
-     "w": 420,
+     "x": -160,
+     "y": 610,
+     "w": 1400,
      "role": "mid"
+    },
+    {
+     "t": "rect",
+     "x": 71,
+     "y": 664,
+     "w": 938,
+     "h": 480,
+     "role": "mid",
+     "fill": "paper",
+     "draw": [
+      99,
+      0.01
+     ]
     },
     {
      "t": "icon",
      "name": "ram",
-     "x": 320,
-     "y": 1300,
-     "w": 440,
+     "x": 190,
+     "y": 1490,
+     "w": 700,
      "role": "subject"
     }
    ],
+   "scale": true,
    "moves": [
     {
-     "el": 2,
+     "el": 4,
      "dx": 0,
-     "dy": -478,
+     "dy": -380,
      "at": 0.0,
      "dur": 0.4
     }
@@ -1522,7 +1909,7 @@
    "id": "S9",
    "s": 19.4,
    "e": 21.32,
-   "note": "Rise over our ledge: memory sticks pour into the AI data center",
+   "note": "SCALE 2/3: RISE over OUR ROOF (the big move)\nGrey slab = OUR ROOF dropping away; the AI data center is too big for the frame; sticks pour in",
    "transition": {
     "type": "cut",
     "label": "on 'And'"
@@ -1530,197 +1917,543 @@
    "camera": {
     "from": {
      "x": 540,
-     "y": 1100,
-     "z": 0.98
+     "y": 1080,
+     "z": 1.0
     },
     "to": {
      "x": 540,
      "y": 960,
-     "z": 1.0
+     "z": 1.04
     },
-    "ease": "out",
+    "ease": "unveil",
     "start": 19.4,
-    "end": 20.3,
+    "end": 20.8,
     "word": "RISE"
    },
    "els": [
     {
-     "t": "rect",
-     "x": -100,
-     "y": 1700,
-     "w": 1280,
-     "h": 400,
-     "fill": "light",
-     "role": "far"
+     "t": "icon",
+     "name": "ram",
+     "x": -190,
+     "y": 705,
+     "w": 150,
+     "role": "mid",
+     "in": 0.55,
+     "out": 1.15
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": 1100,
+     "y": 705,
+     "w": 150,
+     "role": "mid",
+     "in": 0.68,
+     "out": 1.28
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": -190,
+     "y": 705,
+     "w": 150,
+     "role": "mid",
+     "in": 0.81,
+     "out": 1.41
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": 1100,
+     "y": 705,
+     "w": 150,
+     "role": "mid",
+     "in": 0.94,
+     "out": 1.54
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": -190,
+     "y": 705,
+     "w": 150,
+     "role": "mid",
+     "in": 1.07,
+     "out": 1.67
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": 1100,
+     "y": 705,
+     "w": 150,
+     "role": "mid",
+     "in": 1.2,
+     "out": 1.8
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": -190,
+     "y": 705,
+     "w": 150,
+     "role": "mid",
+     "in": 1.33,
+     "out": 1.93
+    },
+    {
+     "t": "icon",
+     "name": "datacenter",
+     "x": -80,
+     "y": 740,
+     "w": 1240,
+     "role": "subject",
+     "h": 500,
+     "text": "AI DATA CENTER"
     },
     {
      "t": "line",
      "pts": [
       [
-       120,
-       1250
+       -40,
+       1340
+      ],
+      [
+       -40,
+       1310
+      ],
+      [
+       -40,
+       1272
+      ],
+      [
+       0,
+       1238
+      ],
+      [
+       40,
+       1272
+      ],
+      [
+       40,
+       1310
+      ],
+      [
+       60,
+       1310
+      ],
+      [
+       60,
+       1272
+      ],
+      [
+       100,
+       1238
+      ],
+      [
+       140,
+       1272
+      ],
+      [
+       140,
+       1310
+      ],
+      [
+       160,
+       1310
+      ],
+      [
+       160,
+       1272
+      ],
+      [
+       200,
+       1238
+      ],
+      [
+       240,
+       1272
+      ],
+      [
+       240,
+       1310
+      ],
+      [
+       260,
+       1310
+      ],
+      [
+       260,
+       1272
+      ],
+      [
+       300,
+       1238
+      ],
+      [
+       340,
+       1272
+      ],
+      [
+       340,
+       1310
+      ],
+      [
+       360,
+       1310
+      ],
+      [
+       360,
+       1272
+      ],
+      [
+       400,
+       1238
+      ],
+      [
+       440,
+       1272
+      ],
+      [
+       440,
+       1310
+      ],
+      [
+       460,
+       1310
+      ],
+      [
+       460,
+       1272
+      ],
+      [
+       500,
+       1238
+      ],
+      [
+       540,
+       1272
+      ],
+      [
+       540,
+       1310
+      ],
+      [
+       560,
+       1310
+      ],
+      [
+       560,
+       1272
+      ],
+      [
+       600,
+       1238
+      ],
+      [
+       640,
+       1272
+      ],
+      [
+       640,
+       1310
+      ],
+      [
+       660,
+       1310
+      ],
+      [
+       660,
+       1272
+      ],
+      [
+       700,
+       1238
+      ],
+      [
+       740,
+       1272
+      ],
+      [
+       740,
+       1310
+      ],
+      [
+       760,
+       1310
+      ],
+      [
+       760,
+       1272
+      ],
+      [
+       800,
+       1238
+      ],
+      [
+       840,
+       1272
+      ],
+      [
+       840,
+       1310
+      ],
+      [
+       860,
+       1310
+      ],
+      [
+       860,
+       1272
+      ],
+      [
+       900,
+       1238
+      ],
+      [
+       940,
+       1272
+      ],
+      [
+       940,
+       1310
       ],
       [
        960,
-       1250
+       1310
+      ],
+      [
+       960,
+       1272
+      ],
+      [
+       1000,
+       1238
+      ],
+      [
+       1040,
+       1272
+      ],
+      [
+       1040,
+       1310
+      ],
+      [
+       1060,
+       1310
+      ],
+      [
+       1060,
+       1272
+      ],
+      [
+       1100,
+       1238
+      ],
+      [
+       1140,
+       1272
+      ],
+      [
+       1140,
+       1310
+      ],
+      [
+       1120,
+       1310
+      ],
+      [
+       1120,
+       1340
       ]
      ],
-     "role": "far"
+     "role": "far",
+     "closed": true,
+     "fill": "paper",
+     "sw": 3
     },
     {
-     "t": "icon",
-     "name": "house",
-     "x": 150,
-     "y": 1176,
-     "w": 80,
-     "role": "far"
-    },
-    {
-     "t": "icon",
-     "name": "house",
-     "x": 850,
-     "y": 1176,
-     "w": 80,
-     "role": "far"
-    },
-    {
-     "t": "icon",
-     "name": "ram",
-     "x": 370,
-     "y": 740,
-     "w": 170,
+     "t": "rect",
+     "x": -40,
+     "y": 1040,
+     "w": 1160,
+     "h": 1400,
      "role": "mid",
-     "in": 0.35,
-     "out": 0.95
+     "fill": "mid"
     },
     {
-     "t": "icon",
-     "name": "ram",
-     "x": 560,
-     "y": 740,
-     "w": 170,
+     "t": "rect",
+     "x": -40,
+     "y": 1000,
+     "w": 1160,
+     "h": 40,
      "role": "mid",
-     "in": 0.5,
-     "out": 1.1
+     "fill": "light"
     },
     {
-     "t": "icon",
-     "name": "ram",
-     "x": 420,
-     "y": 740,
-     "w": 170,
+     "t": "line",
+     "pts": [
+      [
+       190,
+       1000
+      ],
+      [
+       190,
+       938
+      ],
+      [
+       176,
+       938
+      ],
+      [
+       176,
+       916
+      ],
+      [
+       264,
+       916
+      ],
+      [
+       264,
+       938
+      ],
+      [
+       250,
+       938
+      ],
+      [
+       250,
+       1000
+      ]
+     ],
      "role": "mid",
-     "in": 0.65,
-     "out": 1.25
-    },
-    {
-     "t": "icon",
-     "name": "ram",
-     "x": 585,
-     "y": 740,
-     "w": 170,
-     "role": "mid",
-     "in": 0.8,
-     "out": 1.4
-    },
-    {
-     "t": "icon",
-     "name": "ram",
-     "x": 360,
-     "y": 740,
-     "w": 170,
-     "role": "mid",
-     "in": 0.95,
-     "out": 1.55
-    },
-    {
-     "t": "icon",
-     "name": "ram",
-     "x": 520,
-     "y": 740,
-     "w": 170,
-     "role": "mid",
-     "in": 1.1,
-     "out": 1.7
-    },
-    {
-     "t": "icon",
-     "name": "ram",
-     "x": 440,
-     "y": 740,
-     "w": 170,
-     "role": "mid",
-     "in": 1.25,
-     "out": 1.85
-    },
-    {
-     "t": "icon",
-     "name": "datacenter",
-     "x": 320,
-     "y": 910,
-     "w": 440,
-     "role": "subject",
-     "h": 340,
-     "text": " "
-    },
-    {
-     "t": "text",
-     "x": 540,
-     "y": 1049,
-     "text": "AI DATA CENTER",
-     "size": 56,
-     "role": "mid"
+     "closed": true,
+     "fill": "mid"
     }
    ],
+   "scale": true,
    "moves": [
+    {
+     "el": 0,
+     "dx": 560,
+     "dy": 0,
+     "at": 0.55,
+     "dur": 0.55
+    },
+    {
+     "el": 0,
+     "dx": 0,
+     "dy": 100,
+     "at": 0.85,
+     "dur": 0.25
+    },
+    {
+     "el": 1,
+     "dx": -560,
+     "dy": 0,
+     "at": 0.68,
+     "dur": 0.55
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 100,
+     "at": 0.98,
+     "dur": 0.25
+    },
+    {
+     "el": 2,
+     "dx": 560,
+     "dy": 0,
+     "at": 0.81,
+     "dur": 0.55
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 100,
+     "at": 1.11,
+     "dur": 0.25
+    },
+    {
+     "el": 3,
+     "dx": -560,
+     "dy": 0,
+     "at": 0.94,
+     "dur": 0.55
+    },
+    {
+     "el": 3,
+     "dx": 0,
+     "dy": 100,
+     "at": 1.24,
+     "dur": 0.25
+    },
+    {
+     "el": 4,
+     "dx": 560,
+     "dy": 0,
+     "at": 1.07,
+     "dur": 0.55
+    },
     {
      "el": 4,
      "dx": 0,
-     "dy": 220,
-     "at": 0.35,
-     "dur": 0.6
+     "dy": 100,
+     "at": 1.37,
+     "dur": 0.25
+    },
+    {
+     "el": 5,
+     "dx": -560,
+     "dy": 0,
+     "at": 1.2,
+     "dur": 0.55
     },
     {
      "el": 5,
      "dx": 0,
-     "dy": 220,
-     "at": 0.5,
-     "dur": 0.6
+     "dy": 100,
+     "at": 1.5,
+     "dur": 0.25
+    },
+    {
+     "el": 6,
+     "dx": 560,
+     "dy": 0,
+     "at": 1.33,
+     "dur": 0.55
     },
     {
      "el": 6,
      "dx": 0,
-     "dy": 220,
-     "at": 0.65,
-     "dur": 0.6
-    },
-    {
-     "el": 7,
-     "dx": 0,
-     "dy": 220,
-     "at": 0.8,
-     "dur": 0.6
-    },
-    {
-     "el": 8,
-     "dx": 0,
-     "dy": 220,
-     "at": 0.95,
-     "dur": 0.6
+     "dy": 100,
+     "at": 1.63,
+     "dur": 0.25
     },
     {
      "el": 9,
      "dx": 0,
-     "dy": 220,
-     "at": 1.1,
-     "dur": 0.6
+     "dy": 373,
+     "at": 0.0,
+     "dur": 1.92,
+     "ease": "outSine"
     },
     {
      "el": 10,
      "dx": 0,
-     "dy": 220,
-     "at": 1.25,
-     "dur": 0.6
+     "dy": 373,
+     "at": 0.0,
+     "dur": 1.92,
+     "ease": "outSine"
+    },
+    {
+     "el": 11,
+     "dx": 0,
+     "dy": 373,
+     "at": 0.0,
+     "dur": 1.92,
+     "ease": "outSine"
     }
    ]
   },
@@ -1728,7 +2461,7 @@
    "id": "S9b",
    "s": 21.32,
    "e": 22.68,
-   "note": "... by the mountain: its stockpile dwarfs it; tiny you, one stick",
+   "note": "SCALE 3/3: CUT to WORM'S-EYE, tiny you\nTheir mountain of memory towers 10:1 over you and your one stick",
    "transition": {
     "type": "cut",
     "label": "wide on 'By'"
@@ -1747,67 +2480,42 @@
    },
    "els": [
     {
-     "t": "rect",
-     "x": -100,
-     "y": 1260,
-     "w": 1280,
-     "h": 480,
-     "fill": "light",
-     "role": "far"
-    },
-    {
      "t": "line",
      "pts": [
       [
-       120,
-       1260
+       -20,
+       1500
       ],
       [
-       960,
-       1260
+       1100,
+       1500
       ]
      ],
      "role": "far"
     },
     {
      "t": "icon",
-     "name": "house",
-     "x": 140,
-     "y": 1209,
-     "w": 55,
-     "role": "far"
-    },
-    {
-     "t": "icon",
-     "name": "house",
-     "x": 880,
-     "y": 1209,
-     "w": 55,
-     "role": "far"
-    },
-    {
-     "t": "icon",
      "name": "pile",
-     "x": 310,
-     "y": 700,
-     "w": 460,
+     "x": -200,
+     "y": 620,
+     "w": 1480,
      "role": "subject",
-     "h": 560,
+     "h": 880,
      "fill": "light"
     },
     {
      "t": "icon",
      "name": "datacenter",
-     "x": 425,
-     "y": 1099,
-     "w": 230,
+     "x": 600,
+     "y": 1332,
+     "w": 240,
      "role": "mid",
-     "text": "AI DATA CENTER"
+     "h": 168
     },
     {
      "t": "figure",
-     "x": 200,
-     "y": 1260,
+     "x": 250,
+     "y": 1590,
      "h": 86,
      "pose": "hold",
      "role": "mid"
@@ -1815,18 +2523,19 @@
     {
      "t": "icon",
      "name": "ram",
-     "x": 210,
-     "y": 1200,
-     "w": 26,
+     "x": 256,
+     "y": 1530,
+     "w": 30,
      "role": "mid"
     }
-   ]
+   ],
+   "scale": true
   },
   {
    "id": "S10",
    "s": 22.68,
    "e": 25.24,
-   "note": "First dibs: the chip factory loads the AI data center first; the laptop van waits behind",
+   "note": "MEDIUM-WIDE, slightly high: the QUEUE\nThey pay more: the data center is first at the chip factory door; the laptop van waits behind",
    "transition": {
     "type": "cut",
     "label": "on 'They'"
@@ -1848,30 +2557,44 @@
      "t": "line",
      "pts": [
       [
-       120,
-       1200
+       805,
+       842
       ],
       [
-       960,
-       1200
+       925,
+       842
+      ],
+      [
+       407,
+       1640
+      ],
+      [
+       -20,
+       1640
+      ],
+      [
+       -20,
+       1410
       ]
      ],
-     "role": "far"
+     "role": "far",
+     "closed": true,
+     "fill": "light"
     },
     {
      "t": "icon",
      "name": "factory",
-     "x": 700,
-     "y": 1042,
-     "w": 220,
+     "x": 634,
+     "y": 626,
+     "w": 300,
      "role": "mid"
     },
     {
      "t": "icon",
      "name": "ram",
-     "x": 690,
-     "y": 1070,
-     "w": 110,
+     "x": 820,
+     "y": 780,
+     "w": 90,
      "role": "mid",
      "in": 0.1,
      "out": 0.9
@@ -1879,9 +2602,9 @@
     {
      "t": "icon",
      "name": "ram",
-     "x": 690,
-     "y": 1070,
-     "w": 110,
+     "x": 820,
+     "y": 780,
+     "w": 90,
      "role": "mid",
      "in": 0.45,
      "out": 1.25
@@ -1889,9 +2612,9 @@
     {
      "t": "icon",
      "name": "ram",
-     "x": 690,
-     "y": 1070,
-     "w": 110,
+     "x": 820,
+     "y": 780,
+     "w": 90,
      "role": "mid",
      "in": 0.8,
      "out": 1.6
@@ -1899,9 +2622,9 @@
     {
      "t": "icon",
      "name": "ram",
-     "x": 690,
-     "y": 1070,
-     "w": 110,
+     "x": 820,
+     "y": 780,
+     "w": 90,
      "role": "mid",
      "in": 1.15,
      "out": 1.95
@@ -1909,9 +2632,9 @@
     {
      "t": "icon",
      "name": "ram",
-     "x": 690,
-     "y": 1070,
-     "w": 110,
+     "x": 820,
+     "y": 780,
+     "w": 90,
      "role": "mid",
      "in": 1.5,
      "out": 2.3
@@ -1919,9 +2642,9 @@
     {
      "t": "icon",
      "name": "ram",
-     "x": 690,
-     "y": 1070,
-     "w": 110,
+     "x": 820,
+     "y": 780,
+     "w": 90,
      "role": "mid",
      "in": 1.85,
      "out": 2.65
@@ -1929,120 +2652,148 @@
     {
      "t": "icon",
      "name": "datacenter",
-     "x": 335,
-     "y": 950,
-     "w": 340,
+     "x": 435,
+     "y": 860,
+     "w": 330,
      "role": "subject",
-     "h": 250,
+     "h": 231,
+     "fill": "dark",
      "text": " "
+    },
+    {
+     "t": "text",
+     "x": 600,
+     "y": 960,
+     "text": "AI DATA CENTER",
+     "size": 48,
+     "role": "mid"
     },
     {
      "t": "icon",
      "name": "truck",
-     "x": 120,
-     "y": 1084,
-     "w": 200,
+     "x": 70,
+     "y": 1200,
+     "w": 380,
      "role": "mid"
     },
     {
      "t": "icon",
      "name": "laptop",
-     "x": 133,
-     "y": 1092,
-     "w": 104,
+     "x": 100,
+     "y": 1222,
+     "w": 190,
      "role": "mid"
     },
     {
-     "t": "text",
-     "x": 505,
-     "y": 1055,
-     "text": "AI DATA CENTER",
-     "size": 48,
-     "role": "mid"
+     "t": "ellipse",
+     "cx": 372,
+     "cy": 1166,
+     "rx": 11,
+     "ry": 11,
+     "role": "mid",
+     "fill": "dark"
+    },
+    {
+     "t": "ellipse",
+     "cx": 408,
+     "cy": 1150,
+     "rx": 11,
+     "ry": 11,
+     "role": "mid",
+     "fill": "dark"
+    },
+    {
+     "t": "ellipse",
+     "cx": 444,
+     "cy": 1134,
+     "rx": 11,
+     "ry": 11,
+     "role": "mid",
+     "fill": "dark"
     }
    ],
    "moves": [
     {
      "el": 2,
-     "dx": -90,
-     "dy": -170,
+     "dx": -110,
+     "dy": -70,
      "at": 0.1,
      "dur": 0.4
     },
     {
      "el": 2,
-     "dx": -90,
-     "dy": 120,
+     "dx": -110,
+     "dy": 110,
      "at": 0.5,
      "dur": 0.4
     },
     {
      "el": 3,
-     "dx": -90,
-     "dy": -170,
+     "dx": -110,
+     "dy": -70,
      "at": 0.45,
      "dur": 0.4
     },
     {
      "el": 3,
-     "dx": -90,
-     "dy": 120,
+     "dx": -110,
+     "dy": 110,
      "at": 0.85,
      "dur": 0.4
     },
     {
      "el": 4,
-     "dx": -90,
-     "dy": -170,
+     "dx": -110,
+     "dy": -70,
      "at": 0.8,
      "dur": 0.4
     },
     {
      "el": 4,
-     "dx": -90,
-     "dy": 120,
+     "dx": -110,
+     "dy": 110,
      "at": 1.2,
      "dur": 0.4
     },
     {
      "el": 5,
-     "dx": -90,
-     "dy": -170,
+     "dx": -110,
+     "dy": -70,
      "at": 1.15,
      "dur": 0.4
     },
     {
      "el": 5,
-     "dx": -90,
-     "dy": 120,
+     "dx": -110,
+     "dy": 110,
      "at": 1.55,
      "dur": 0.4
     },
     {
      "el": 6,
-     "dx": -90,
-     "dy": -170,
+     "dx": -110,
+     "dy": -70,
      "at": 1.5,
      "dur": 0.4
     },
     {
      "el": 6,
-     "dx": -90,
-     "dy": 120,
+     "dx": -110,
+     "dy": 110,
      "at": 1.9,
      "dur": 0.4
     },
     {
      "el": 7,
-     "dx": -90,
-     "dy": -170,
+     "dx": -110,
+     "dy": -70,
      "at": 1.85,
      "dur": 0.4
     },
     {
      "el": 7,
-     "dx": -90,
-     "dy": 120,
+     "dx": -110,
+     "dy": 110,
      "at": 2.25,
      "dur": 0.4
     }
@@ -2052,7 +2803,7 @@
    "id": "S11",
    "s": 25.24,
    "e": 29.4,
-   "note": "What's left costs 5x: a memory stick's price, last year vs now",
+   "note": "INSERT bars, straight-on\nWhat's left costs 5x last year",
    "transition": {
     "type": "cut",
     "label": "on 'Which'"
@@ -2147,7 +2898,7 @@
    "id": "S12",
    "s": 29.4,
    "e": 31.32,
-   "note": "The laptop maker passes it on: $999 to $1,099 (ding)",
+   "note": "CLOSE on the tag\nLaptop makers pass it on: $999 struck, $1,099 on 'pass'",
    "transition": {
     "type": "cut",
     "label": "on 'laptop'"
@@ -2185,8 +2936,7 @@
      "x": 340,
      "y": 882,
      "w": 400,
-     "role": "subject",
-     "fill": "dark"
+     "role": "mid"
     },
     {
      "t": "icon",
@@ -2198,18 +2948,17 @@
      "out": 0.55
     },
     {
-     "t": "rect",
-     "x": 330,
-     "y": 1196,
-     "w": 420,
-     "h": 130,
-     "fill": "paper",
-     "role": "mid"
+     "t": "icon",
+     "name": "pricetag",
+     "x": 350,
+     "y": 1180,
+     "w": 380,
+     "role": "subject"
     },
     {
      "t": "text",
-     "x": 440,
-     "y": 1286,
+     "x": 586,
+     "y": 1270,
      "text": "$999",
      "size": 64,
      "role": "mid",
@@ -2217,12 +2966,12 @@
     },
     {
      "t": "text",
-     "x": 640,
-     "y": 1286,
+     "x": 586,
+     "y": 1352,
      "text": "$1,099",
      "size": 64,
      "role": "mid",
-     "in": 1.44
+     "in": 0.88
     }
    ],
    "moves": [
@@ -2239,7 +2988,7 @@
    "id": "S13",
    "s": 31.32,
    "e": 33.4,
-   "note": "The old move: sit and wait for the newer one",
+   "note": "HOME BASE returns, COZY \u00b7 MEDIUM-WIDE\nNormally you'd sit and wait for the better one; the data center stays outside",
    "transition": {
     "type": "cut",
     "label": "on 'Normally'"
@@ -2258,28 +3007,196 @@
    },
    "els": [
     {
-     "t": "line",
-     "pts": [
-      [
-       150,
-       1400
-      ],
-      [
-       930,
-       1400
-      ]
-     ],
-     "role": "far"
+     "t": "rect",
+     "x": -20,
+     "y": -20,
+     "w": 1120,
+     "h": 1720,
+     "role": "far",
+     "fill": "mid"
     },
     {
      "t": "line",
      "pts": [
       [
-       388,
+       470.0,
+       640.0
+      ],
+      [
+       1022.5,
+       640.0
+      ],
+      [
+       1022.5,
+       1005.5
+      ],
+      [
+       1022.5,
+       640.0
+      ],
+      [
+       1082.0,
+       640.0
+      ],
+      [
+       1082.0,
+       1005.5
+      ],
+      [
+       1103.25,
+       1005.5
+      ],
+      [
+       1103.25,
+       1027.6
+      ],
+      [
+       448.75,
+       1027.6
+      ],
+      [
+       448.75,
+       1005.5
+      ],
+      [
+       470.0,
+       1005.5
+      ],
+      [
+       1082.0,
+       1005.5
+      ],
+      [
+       470.0,
+       1005.5
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "light"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       470.0,
+       912.0
+      ],
+      [
+       491.25,
+       912.0
+      ],
+      [
+       491.25,
+       873.75
+      ],
+      [
+       521.0,
+       847.4
+      ],
+      [
+       550.75,
+       873.75
+      ],
+      [
+       550.75,
+       912.0
+      ],
+      [
+       964.7,
+       912.0
+      ],
+      [
+       964.7,
+       878.0
+      ],
+      [
+       990.2,
+       854.2
+      ],
+      [
+       1015.7,
+       878.0
+      ],
+      [
+       1015.7,
+       912.0
+      ],
+      [
+       1082.0,
+       912.0
+      ]
+     ],
+     "role": "far"
+    },
+    {
+     "t": "icon",
+     "name": "datacenter",
+     "x": 590.7,
+     "y": 652.75,
+     "w": 370.6,
+     "role": "far",
+     "h": 259.25,
+     "fill": "paper",
+     "text": "AI DATA CENTER"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       480,
        1060
       ],
       [
-       388,
+       1100,
+       1060
+      ]
+     ],
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       545,
+       975
+      ],
+      [
+       640,
+       975
+      ],
+      [
+       670,
+       1060
+      ],
+      [
+       515,
+       1060
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "paper"
+    },
+    {
+     "t": "ellipse",
+     "cx": 650,
+     "cy": 1086,
+     "rx": 130,
+     "ry": 22,
+     "role": "far",
+     "fill": "paper",
+     "sw": 0
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       -20,
+       1400
+      ],
+      [
+       1100,
        1400
       ]
      ],
@@ -2289,15 +3206,29 @@
      "t": "line",
      "pts": [
       [
-       388,
+       348,
+       1060
+      ],
+      [
+       348,
+       1400
+      ]
+     ],
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       348,
        1272
       ],
       [
-       510,
+       470,
        1272
       ],
       [
-       510,
+       470,
        1400
       ]
      ],
@@ -2305,7 +3236,7 @@
     },
     {
      "t": "figure",
-     "x": 450,
+     "x": 410,
      "y": 1400,
      "h": 460,
      "pose": "sit",
@@ -2314,70 +3245,70 @@
     },
     {
      "t": "ellipse",
-     "cx": 506,
-     "cy": 1004,
-     "rx": 11,
-     "ry": 11,
-     "fill": "paper",
-     "role": "mid"
+     "cx": 425,
+     "cy": 985,
+     "rx": 9,
+     "ry": 9,
+     "role": "mid",
+     "fill": "paper"
     },
     {
      "t": "ellipse",
-     "cx": 538,
-     "cy": 974,
-     "rx": 16,
-     "ry": 16,
-     "fill": "paper",
-     "role": "mid"
+     "cx": 412,
+     "cy": 952,
+     "rx": 12,
+     "ry": 12,
+     "role": "mid",
+     "fill": "paper"
     },
     {
      "t": "ellipse",
-     "cx": 630,
-     "cy": 830,
-     "rx": 180,
-     "ry": 128,
-     "fill": "paper",
-     "role": "mid"
+     "cx": 330,
+     "cy": 790,
+     "rx": 150,
+     "ry": 115,
+     "role": "mid",
+     "fill": "paper"
     },
     {
      "t": "text",
-     "x": 630,
-     "y": 776,
-     "text": "NEW",
+     "x": 330,
+     "y": 742,
+     "text": "BETTER",
      "size": 56,
      "role": "mid"
     },
     {
      "t": "icon",
      "name": "laptop",
-     "x": 545,
-     "y": 790,
+     "x": 245,
+     "y": 755,
      "w": 170,
      "role": "mid"
     },
     {
      "t": "ellipse",
-     "cx": 236,
-     "cy": 820,
-     "rx": 70,
-     "ry": 70,
-     "fill": "paper",
-     "role": "mid"
+     "cx": 140,
+     "cy": 650,
+     "rx": 46,
+     "ry": 46,
+     "role": "mid",
+     "fill": "paper"
     },
     {
      "t": "line",
      "pts": [
       [
-       236,
-       772
+       140,
+       618
       ],
       [
-       236,
-       820
+       140,
+       650
       ],
       [
-       272,
-       838
+       165,
+       663
       ]
      ],
      "role": "mid"
@@ -2388,7 +3319,7 @@
    "id": "S14",
    "s": 33.4,
    "e": 36.36,
-   "note": "Chip makers say 2027 is tighter: one more data center cuts in ahead of the laptop van",
+   "note": "MEDIUM-WIDE, the exact S10 frame\nChip makers: 2027 is worse. A 2nd data center cuts in; the laptop van is pushed back",
    "transition": {
     "type": "cut",
     "label": "on 'But'"
@@ -2410,123 +3341,369 @@
      "t": "line",
      "pts": [
       [
-       120,
-       1220
+       805,
+       842
       ],
       [
-       960,
-       1220
+       925,
+       842
+      ],
+      [
+       407,
+       1640
+      ],
+      [
+       -20,
+       1640
+      ],
+      [
+       -20,
+       1410
       ]
      ],
-     "role": "far"
+     "role": "far",
+     "closed": true,
+     "fill": "light"
     },
     {
      "t": "icon",
      "name": "factory",
-     "x": 720,
-     "y": 1062,
-     "w": 220,
+     "x": 634,
+     "y": 626,
+     "w": 300,
      "role": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": 820,
+     "y": 780,
+     "w": 90,
+     "role": "mid",
+     "in": 0.1,
+     "out": 0.9
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": 820,
+     "y": 780,
+     "w": 90,
+     "role": "mid",
+     "in": 0.45,
+     "out": 1.25
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": 820,
+     "y": 780,
+     "w": 90,
+     "role": "mid",
+     "in": 0.8,
+     "out": 1.6
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": 820,
+     "y": 780,
+     "w": 90,
+     "role": "mid",
+     "in": 1.15,
+     "out": 1.95
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": 820,
+     "y": 780,
+     "w": 90,
+     "role": "mid",
+     "in": 1.5,
+     "out": 2.3
+    },
+    {
+     "t": "icon",
+     "name": "ram",
+     "x": 820,
+     "y": 780,
+     "w": 90,
+     "role": "mid",
+     "in": 1.85,
+     "out": 2.65
+    },
+    {
+     "t": "icon",
+     "name": "datacenter",
+     "x": 435,
+     "y": 860,
+     "w": 330,
+     "role": "subject",
+     "h": 231,
+     "fill": "dark",
+     "text": " ",
+     "out": 1.36
+    },
+    {
+     "t": "text",
+     "x": 600,
+     "y": 960,
+     "text": "AI DATA CENTER",
+     "size": 48,
+     "role": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "truck",
+     "x": 70,
+     "y": 1200,
+     "w": 380,
+     "role": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "laptop",
+     "x": 100,
+     "y": 1222,
+     "w": 190,
+     "role": "mid"
+    },
+    {
+     "t": "ellipse",
+     "cx": 372,
+     "cy": 1166,
+     "rx": 11,
+     "ry": 11,
+     "role": "mid",
+     "fill": "dark"
+    },
+    {
+     "t": "ellipse",
+     "cx": 408,
+     "cy": 1150,
+     "rx": 11,
+     "ry": 11,
+     "role": "mid",
+     "fill": "dark"
+    },
+    {
+     "t": "ellipse",
+     "cx": 444,
+     "cy": 1134,
+     "rx": 11,
+     "ry": 11,
+     "role": "mid",
+     "fill": "dark"
     },
     {
      "t": "line",
      "pts": [
       [
-       668,
-       920
+       560,
+       772
       ],
       [
-       716,
-       900
+       600,
+       800
       ],
       [
-       800,
-       1050
+       770,
+       752
       ]
      ],
      "role": "mid",
      "closed": true,
-     "fill": "paper"
+     "fill": "paper",
+     "in": 0.16
     },
     {
      "t": "ellipse",
-     "cx": 560,
-     "cy": 790,
-     "rx": 190,
-     "ry": 168,
+     "cx": 450,
+     "cy": 720,
+     "rx": 170,
+     "ry": 112,
+     "role": "mid",
      "fill": "paper",
-     "role": "mid"
+     "in": 0.16
     },
     {
      "t": "icon",
      "name": "calendar",
-     "x": 440,
-     "y": 676,
-     "w": 240,
+     "x": 365,
+     "y": 632,
+     "w": 170,
      "role": "mid",
      "text": "2026",
      "fill": "dark",
-     "out": 1.2
+     "out": 1.2,
+     "in": 0.16
     },
     {
      "t": "icon",
      "name": "calendar",
-     "x": 440,
-     "y": 676,
-     "w": 240,
+     "x": 365,
+     "y": 632,
+     "w": 170,
      "role": "mid",
      "text": "2027",
      "fill": "dark",
      "in": 1.2
     },
     {
-     "t": "icon",
-     "name": "datacenter",
-     "x": 520,
-     "y": 1094,
-     "w": 180,
-     "role": "subject"
-    },
-    {
-     "t": "icon",
-     "name": "truck",
-     "x": 320,
-     "y": 1121,
-     "w": 170,
-     "role": "mid"
-    },
-    {
-     "t": "icon",
-     "name": "laptop",
-     "x": 334,
-     "y": 1130,
-     "w": 80,
-     "role": "mid"
+     "t": "figure",
+     "x": 790,
+     "y": 842,
+     "h": 112,
+     "pose": "point",
+     "facing": "l",
+     "role": "mid",
+     "in": 0.16
     },
     {
      "t": "icon",
      "name": "datacenter",
-     "x": 310,
-     "y": 1094,
-     "w": 180,
+     "x": 435,
+     "y": 860,
+     "w": 330,
+     "role": "mid",
+     "h": 231,
+     "fill": "dark",
+     "text": " ",
+     "in": 1.36
+    },
+    {
+     "t": "icon",
+     "name": "datacenter",
+     "x": 308,
+     "y": 1020,
+     "w": 300,
      "role": "subject",
+     "h": 210,
+     "fill": "dark",
+     "text": "AI DATA CENTER",
      "in": 1.36
     }
    ],
    "moves": [
     {
-     "el": 7,
-     "dx": -200,
-     "dy": 0,
-     "at": 1.2,
-     "dur": 0.2
+     "el": 2,
+     "dx": -110,
+     "dy": -70,
+     "at": 0.1,
+     "dur": 0.4
     },
     {
-     "el": 8,
-     "dx": -200,
-     "dy": 0,
+     "el": 2,
+     "dx": -110,
+     "dy": 110,
+     "at": 0.5,
+     "dur": 0.4
+    },
+    {
+     "el": 3,
+     "dx": -110,
+     "dy": -70,
+     "at": 0.45,
+     "dur": 0.4
+    },
+    {
+     "el": 3,
+     "dx": -110,
+     "dy": 110,
+     "at": 0.85,
+     "dur": 0.4
+    },
+    {
+     "el": 4,
+     "dx": -110,
+     "dy": -70,
+     "at": 0.8,
+     "dur": 0.4
+    },
+    {
+     "el": 4,
+     "dx": -110,
+     "dy": 110,
      "at": 1.2,
-     "dur": 0.2
+     "dur": 0.4
+    },
+    {
+     "el": 5,
+     "dx": -110,
+     "dy": -70,
+     "at": 1.15,
+     "dur": 0.4
+    },
+    {
+     "el": 5,
+     "dx": -110,
+     "dy": 110,
+     "at": 1.55,
+     "dur": 0.4
+    },
+    {
+     "el": 6,
+     "dx": -110,
+     "dy": -70,
+     "at": 1.5,
+     "dur": 0.4
+    },
+    {
+     "el": 6,
+     "dx": -110,
+     "dy": 110,
+     "at": 1.9,
+     "dur": 0.4
+    },
+    {
+     "el": 7,
+     "dx": -110,
+     "dy": -70,
+     "at": 1.85,
+     "dur": 0.4
+    },
+    {
+     "el": 7,
+     "dx": -110,
+     "dy": 110,
+     "at": 2.25,
+     "dur": 0.4
+    },
+    {
+     "el": 10,
+     "dx": -190,
+     "dy": 170,
+     "at": 1.2,
+     "dur": 0.3
+    },
+    {
+     "el": 11,
+     "dx": -190,
+     "dy": 170,
+     "at": 1.2,
+     "dur": 0.3
+    },
+    {
+     "el": 12,
+     "dx": -190,
+     "dy": 170,
+     "at": 1.2,
+     "dur": 0.3
+    },
+    {
+     "el": 13,
+     "dx": -190,
+     "dy": 170,
+     "at": 1.2,
+     "dur": 0.3
+    },
+    {
+     "el": 14,
+     "dx": -190,
+     "dy": 170,
+     "at": 1.2,
+     "dur": 0.3
     }
    ]
   },
@@ -2534,7 +3711,7 @@
    "id": "S15",
    "s": 36.36,
    "e": 38.84,
-   "note": "Callback: the opening's end frame",
+   "note": "HOME BASE callback = O1's end, COZY\nThat's how the AI data center ends up on your price",
    "transition": {
     "type": "cut",
     "label": "on 'So'"
@@ -2553,61 +3730,197 @@
    },
    "els": [
     {
+     "t": "rect",
+     "x": -20,
+     "y": -20,
+     "w": 1120,
+     "h": 1720,
+     "role": "far",
+     "fill": "mid"
+    },
+    {
      "t": "line",
      "pts": [
       [
-       120,
-       1040
+       180,
+       630
       ],
       [
-       960,
-       1040
+       830,
+       630
+      ],
+      [
+       830,
+       1060
+      ],
+      [
+       830,
+       630
+      ],
+      [
+       900,
+       630
+      ],
+      [
+       900,
+       1060
+      ],
+      [
+       925,
+       1060
+      ],
+      [
+       925,
+       1086
+      ],
+      [
+       155,
+       1086
+      ],
+      [
+       155,
+       1060
+      ],
+      [
+       180,
+       1060
+      ],
+      [
+       900,
+       1060
+      ],
+      [
+       180,
+       1060
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "light"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       180,
+       950
+      ],
+      [
+       205,
+       950
+      ],
+      [
+       205,
+       905
+      ],
+      [
+       240,
+       874
+      ],
+      [
+       275,
+       905
+      ],
+      [
+       275,
+       950
+      ],
+      [
+       762,
+       950
+      ],
+      [
+       762,
+       910
+      ],
+      [
+       792,
+       882
+      ],
+      [
+       822,
+       910
+      ],
+      [
+       822,
+       950
+      ],
+      [
+       900,
+       950
       ]
      ],
      "role": "far"
     },
     {
      "t": "icon",
-     "name": "house",
-     "x": 130,
-     "y": 939,
-     "w": 110,
-     "role": "far"
-    },
-    {
-     "t": "icon",
-     "name": "house",
-     "x": 840,
-     "y": 939,
-     "w": 110,
-     "role": "far"
-    },
-    {
-     "t": "icon",
      "name": "datacenter",
-     "x": 322.0,
-     "y": 620,
+     "x": 322,
+     "y": 645,
      "w": 436,
      "role": "subject",
-     "h": 420,
-     "text": "AI DATA CENTER"
+     "h": 305,
+     "fill": "dark",
+     "text": " "
+    },
+    {
+     "t": "text",
+     "x": 540,
+     "y": 773,
+     "text": "AI DATA CENTER",
+     "size": 56,
+     "role": "mid"
+    },
+    {
+     "t": "ellipse",
+     "cx": 200,
+     "cy": 1200,
+     "rx": 160,
+     "ry": 55,
+     "role": "far",
+     "fill": "paper",
+     "sw": 0
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       150,
+       1000
+      ],
+      [
+       250,
+       1000
+      ],
+      [
+       280,
+       1086
+      ],
+      [
+       120,
+       1086
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "paper"
     },
     {
      "t": "icon",
      "name": "phone",
-     "x": 380,
-     "y": 1210,
-     "w": 320,
+     "x": 340,
+     "y": 1120,
+     "w": 400,
      "role": "mid"
     },
     {
      "t": "rect",
-     "x": 414,
-     "y": 1252,
-     "w": 252,
-     "h": 560,
-     "fill": "paper",
+     "x": 382,
+     "y": 1192,
+     "w": 316,
+     "h": 700,
      "role": "mid",
+     "fill": "paper",
      "draw": [
       99,
       0.01
@@ -2616,44 +3929,76 @@
     {
      "t": "icon",
      "name": "laptop",
-     "x": 440,
-     "y": 1285,
-     "w": 200,
+     "x": 455,
+     "y": 1202,
+     "w": 170,
      "role": "mid"
     },
     {
      "t": "text",
      "x": 540,
-     "y": 1505,
+     "y": 1376,
      "text": "$999",
-     "size": 72,
+     "size": 56,
      "role": "mid",
      "strike": true
     },
     {
-     "t": "text",
-     "x": 540,
-     "y": 1590,
-     "text": "$1,099",
-     "size": 72,
-     "role": "mid"
-    },
-    {
-     "t": "rect",
-     "x": 430,
-     "y": 1628,
-     "w": 220,
-     "h": 90,
-     "fill": "light",
-     "role": "mid"
+     "t": "icon",
+     "name": "pricetag",
+     "x": 360,
+     "y": 1402,
+     "w": 360,
+     "role": "mid",
+     "text": "$1,099"
     },
     {
      "t": "icon",
      "name": "cart",
-     "x": 502,
-     "y": 1642,
-     "w": 76,
+     "x": 507,
+     "y": 1640,
+     "w": 66,
      "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       564,
+       1648
+      ],
+      [
+       588,
+       1630
+      ],
+      [
+       618,
+       1636
+      ],
+      [
+       640,
+       1662
+      ],
+      [
+       780,
+       1816
+      ],
+      [
+       690,
+       1836
+      ],
+      [
+       574,
+       1694
+      ],
+      [
+       558,
+       1668
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "light"
     }
    ]
   },
@@ -2661,7 +4006,7 @@
    "id": "S16",
    "s": 38.84,
    "e": 40.85,
-   "note": "The tag turns over: an AI data center on its back (like-pop)",
+   "note": "CLOSE-UP cut-in on S15's tag, COZY\nThe tag turns over: an AI data center on its back",
    "transition": {
     "type": "cut",
     "label": "cut-in on 'next'"
@@ -2680,19 +4025,58 @@
    },
    "els": [
     {
+     "t": "rect",
+     "x": -20,
+     "y": -20,
+     "w": 1120,
+     "h": 1720,
+     "role": "far",
+     "fill": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "phone",
+     "x": 285.0,
+     "y": 652.75,
+     "w": 510.0,
+     "role": "mid"
+    },
+    {
+     "t": "rect",
+     "x": 338.55,
+     "y": 744.55,
+     "w": 402.9,
+     "h": 892.5,
+     "role": "mid",
+     "fill": "paper",
+     "draw": [
+      99,
+      0.01
+     ]
+    },
+    {
      "t": "icon",
      "name": "laptop",
-     "x": 170,
-     "y": 650,
-     "w": 260,
+     "x": 431.62,
+     "y": 757.3,
+     "w": 216.75,
      "role": "mid"
+    },
+    {
+     "t": "text",
+     "x": 540.0,
+     "y": 979.15,
+     "text": "$999",
+     "size": 71.4,
+     "role": "mid",
+     "strike": true
     },
     {
      "t": "icon",
      "name": "pricetag",
-     "x": 340,
-     "y": 860,
-     "w": 420,
+     "x": 310.5,
+     "y": 1012.3,
+     "w": 459.0,
      "role": "subject",
      "text": "$1,099",
      "out": 0.86
@@ -2700,21 +4084,30 @@
     {
      "t": "icon",
      "name": "pricetag",
-     "x": 340,
-     "y": 860,
-     "w": 420,
+     "x": 310.5,
+     "y": 1012.3,
+     "w": 459.0,
      "role": "subject",
+     "text": " ",
      "in": 0.86
     },
     {
      "t": "icon",
      "name": "datacenter",
-     "x": 498,
-     "y": 908,
-     "w": 220,
+     "x": 430,
+     "y": 1060,
+     "w": 230,
      "role": "subject",
      "text": "AI",
      "in": 0.86
+    },
+    {
+     "t": "icon",
+     "name": "cart",
+     "x": 497.92,
+     "y": 1315.75,
+     "w": 84.15,
+     "role": "mid"
     }
    ]
   },
@@ -2722,7 +4115,7 @@
    "id": "LOOP",
    "s": 40.85,
    "e": 41.15,
-   "note": "Back to frame 0: its bare lines, already most of the way drawn",
+   "note": "DISSOLVE back to frame 0 (the loop)\nThe opening's bare lines redraw, so the rewatch starts seamlessly",
    "transition": {
     "type": "dissolve",
     "label": "to frame 0",
@@ -2732,12 +4125,12 @@
     "from": {
      "x": 540,
      "y": 960,
-     "z": 1.04
+     "z": 1.05
     },
     "to": {
      "x": 540,
      "y": 960,
-     "z": 1.04
+     "z": 1.05
     }
    },
    "els": [
@@ -2745,17 +4138,122 @@
      "t": "line",
      "pts": [
       [
-       120,
-       1040
+       180,
+       630
       ],
       [
-       960,
-       1040
+       830,
+       630
+      ],
+      [
+       830,
+       1060
+      ],
+      [
+       830,
+       630
+      ],
+      [
+       900,
+       630
+      ],
+      [
+       900,
+       1060
+      ],
+      [
+       925,
+       1060
+      ],
+      [
+       925,
+       1086
+      ],
+      [
+       155,
+       1086
+      ],
+      [
+       155,
+       1060
+      ],
+      [
+       180,
+       1060
+      ],
+      [
+       900,
+       1060
+      ],
+      [
+       180,
+       1060
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "light",
+     "draw": [
+      -0.42,
+      1.2
+     ],
+     "fillIn": 99
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       180,
+       950
+      ],
+      [
+       205,
+       950
+      ],
+      [
+       205,
+       905
+      ],
+      [
+       240,
+       874
+      ],
+      [
+       275,
+       905
+      ],
+      [
+       275,
+       950
+      ],
+      [
+       762,
+       950
+      ],
+      [
+       762,
+       910
+      ],
+      [
+       792,
+       882
+      ],
+      [
+       822,
+       910
+      ],
+      [
+       822,
+       950
+      ],
+      [
+       900,
+       950
       ]
      ],
      "role": "far",
      "draw": [
-      -0.7,
+      -0.54,
       1.2
      ],
      "fillIn": 99
@@ -2763,14 +4261,44 @@
     {
      "t": "icon",
      "name": "datacenter",
-     "x": 405.0,
-     "y": 851,
-     "w": 270,
-     "role": "subject",
-     "h": 189,
-     "text": "AI DATA CENTER",
+     "x": 322,
+     "y": 645,
+     "w": 436,
+     "role": "mid",
+     "h": 305,
+     "fill": "paper",
+     "text": " ",
      "draw": [
-      -0.6,
+      -0.37,
+      1.2
+     ],
+     "fillIn": 99
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       150,
+       1000
+      ],
+      [
+       250,
+       1000
+      ],
+      [
+       280,
+       1086
+      ],
+      [
+       120,
+       1086
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "paper",
+     "draw": [
+      -0.42,
       1.2
      ],
      "fillIn": 99
@@ -2778,100 +4306,110 @@
     {
      "t": "icon",
      "name": "phone",
-     "x": 380,
-     "y": 1070,
-     "w": 320,
+     "x": 340,
+     "y": 980,
+     "w": 400,
      "role": "mid",
      "draw": [
-      -0.729,
-      1.2
-     ],
-     "fillIn": 99
-    },
-    {
-     "t": "icon",
-     "name": "laptop",
-     "x": 440,
-     "y": 1145,
-     "w": 200,
-     "role": "mid",
-     "draw": [
-      -0.66,
+      -0.52,
       1.2
      ],
      "fillIn": 99
     },
     {
      "t": "rect",
-     "x": 430,
-     "y": 1488,
-     "w": 220,
-     "h": 90,
-     "fill": "light",
+     "x": 382,
+     "y": 1052,
+     "w": 316,
+     "h": 700,
+     "role": "mid",
+     "fill": "paper",
+     "draw": [
+      99,
+      0.01
+     ],
+     "fillIn": -0.2
+    },
+    {
+     "t": "icon",
+     "name": "laptop",
+     "x": 455,
+     "y": 1062,
+     "w": 170,
      "role": "mid",
      "draw": [
-      -0.7,
+      -0.42,
       1.2
      ],
      "fillIn": 99
     },
     {
      "t": "icon",
+     "name": "pricetag",
+     "x": 360,
+     "y": 1262,
+     "w": 360,
+     "role": "subject",
+     "text": " $999 ",
+     "fillIn": 99
+    },
+    {
+     "t": "icon",
      "name": "cart",
-     "x": 502,
-     "y": 1502,
-     "w": 76,
+     "x": 507,
+     "y": 1500,
+     "w": 66,
      "role": "mid",
      "draw": [
-      -0.66,
+      -0.42,
       1.2
      ],
      "fillIn": 99
     },
     {
      "t": "line",
-     "closed": true,
-     "fill": "light",
-     "role": "mid",
-     "draw": [
-      -0.9,
-      1.2
-     ],
-     "fillIn": 99,
      "pts": [
       [
+       564,
+       1508
+      ],
+      [
+       588,
+       1490
+      ],
+      [
+       618,
+       1496
+      ],
+      [
+       640,
+       1522
+      ],
+      [
+       780,
+       1676
+      ],
+      [
+       690,
+       1696
+      ],
+      [
        574,
-       1532
+       1554
       ],
       [
-       598,
-       1514
-      ],
-      [
-       628,
-       1520
-      ],
-      [
-       650,
-       1546
-      ],
-      [
-       790,
-       1700
-      ],
-      [
-       700,
-       1720
-      ],
-      [
-       584,
-       1578
-      ],
-      [
-       568,
-       1552
+       558,
+       1528
       ]
-     ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "light",
+     "draw": [
+      -0.78,
+      1.2
+     ],
+     "fillIn": 99
     }
    ]
   }
