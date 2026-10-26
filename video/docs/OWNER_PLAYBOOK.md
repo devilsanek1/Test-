@@ -79,6 +79,8 @@ Format: **rule** — why / evidence (video, date).
 - **Every shot reads instantly with the sound off: literal beats clever.** Show recognisable things: a laptop that looks
   like a laptop, a data center like a building of servers, a plain labelled chart. No metaphors that need explaining.
   Test every animatic with a sound-off cold read before the owner sees it. — ("what does the AI mountain signify?", v3 G3, 2026-10-26).
+  Also no physical metaphors the facts don't support: a data center "growing and consuming the houses" made no sense to the
+  owner; show the real mechanism (it buys up the memory chips) instead. — owner, v3 G3, 2026-10-26.
 - **Drawn like a professional storyboard: simple, monochrome, clarity first.** No colour at the sketch stage; colour
   belongs to G4/G5. Spec: `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
 
