@@ -116,6 +116,7 @@ in `context/workflows/` (the v3 ones are the current best versions):
 | G3 animatic | `video/src/v3/SketchReel.tsx` + `v3-g3-animatic-*.js` | 3 visual concepts, judges, storyboard artist writes the animatic JSON; SketchReel draws it with voice and pop captions |
 | G3-G5 camera | `docs/look/CINEMATIC_GUIDE.md` (+ `research/arcane_shots.json`, sketches in `docs/look/cine_sketches/`) | Arcane-measured shot vocabulary V1-V12, camera presets, 9:16 composition, light, transitions, sequence templates; storyboard and blocking pick from it |
 | references | `arcane-cinematic-guide-*.js`, `scripts/look/shot_sheets.py` | dissect any reference video: measure, contact sheets, per-shot analysis agents, guidebook |
+| opening (every video) | `v3-opening-banger-*.js`; SketchReel `draw` / `fillIn` | 3 concepts for the one continuous opening shot (drawn live, expectation then reality, never still), judge, build; loop to the bare-line frame 0 |
 | G4 look | `docs/look/COZY_AND_SCALE.md`, `docs/look/PALETTE.md`, `look-cozy-scale-arcane-*.js` | look rules; research template |
 | references | `video/scripts/look/measure_camera.py` | cuts + per-shot camera curves, easing, parallax from a reference video (keep copyrighted clips out of git) |
 
