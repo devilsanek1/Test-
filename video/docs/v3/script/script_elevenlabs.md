@@ -1,7 +1,7 @@
 [bright and casual, quick, a real question to a friend]
 Buying a laptop soon? [plain and level, a touch amazed, like sharing news about their own stuff] AI's making it pricier.
 
-[quick and throwaway, correcting yourself to be precise, not a big reveal]
+[quick and throwaway, a little wry]
 Well, AI DATA CENTERS are.
 
 [dry and a little fond, easy pace, like stating something everyone has noticed]
