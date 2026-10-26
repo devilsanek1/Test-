@@ -93,6 +93,13 @@ stages (building, fixing, polishing), where the measured waste happened.
     (no prompt reads it), trim the gate doc to the locked choice, and point later prompts only at locked docs and
     the fact files. Unused topics go to `docs/IDEAS_BANK.md`. Superseded drafts are archived at the next gate.
 
+## Frame rate (owner, 2026-10-26)
+
+All production renders (G5 blocking, G6 polish, G8 final) are **60 fps** (composition `fps: 60`; the final encode keeps
+`-r 60`). Everything animates in seconds (`useTime`, `frame / fps`), so a scene renders at any rate. Camera speed limits
+are per second (v1's ~15 px/frame at 30 = ~450 px/s). Drawn character motion can stay stepped (hold each drawing for
+`round(60 / drawingsPerSecond)` frames). The G3 animatic may render at 30. Test file: `video/deliverables/tests/`.
+
 ## Studio toolkit (reuse per video; copy a workflow template and swap the topic, paths and locked lines)
 
 Every lesson lands here, in the playbook or in a gate, in the same turn (owner, 2026-10-26). Workflow templates live

@@ -88,10 +88,11 @@ Format: **rule** — why / evidence (video, date).
   line to bring the jolt. — v3 G0.5-G1, 2026-10-25/26.
 
 ## Motion
-- **Motion must feel very smooth (owner asks about a higher frame rate).** Proposal, PENDING the owner's call after a
-  phone test: render camera moves and parallax at 60 fps, keep drawn character motion stepped like Arcane (on 2s at
-  24, i.e. every 2nd-3rd frame), so moves glide without the "video game" look; test a 5 s scale move at 30 vs 60 on the
-  owner's phone at G4 (Instagram accepts 23-60 fps; YouTube Shorts plays 60). — owner, v3, 2026-10-26.
+- **Render at 60 fps: every video, from the blocking cut (G5) to the final.** The owner compared the same 6 s tower move
+  at 30 and 60 on the phone: "60 is definitely better, smoother and more crispy". Animate by time (seconds), never by
+  frame counts; drawn character motion may still be stepped like Arcane (held drawings, about 12-24 per second) while
+  the camera and parallax glide at 60. Sketch animatics (G3) may stay at 30 for speed. — owner, v3, 2026-10-26
+  (test: `video/deliverables/tests/fps_test_30_then_60.mp4`).
 
 ## Captions
 - **Captions pop in place (or rise without clipping); no slot or scroll reveal that cuts letters mid-motion.** On a

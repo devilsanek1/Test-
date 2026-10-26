@@ -19,7 +19,7 @@ Top rules (details in the playbook):
   and always hand over the full paste text.
 - Every lesson goes into the generic process (playbook, pipeline gate, studio toolkit) and is committed, so the next
   video doesn't repeat it.
-- Captions pop in place (no clipped roll-ins). No paper edge at the top of the frame.
+- Captions pop in place (no clipped roll-ins). No paper edge at the top of the frame. Production renders at 60 fps.
 - Never trade quality for savings: brainstorms, competing ideas with judges and design explorations at the early gates are
   worth their tokens. Cut only waste: rework, reviews of things that will still change, polish before the story lock,
   and lost work (small checkpointed tasks).
