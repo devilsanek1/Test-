@@ -109,7 +109,15 @@ Everything that agent knew is in this repo. This file is the map; the details li
 
 ## 3. The queue (in order) at handoff
 
-1. **RUNNING again since 2026-10-25 20:20 UTC** (the owner: "continue with video 2"). **The v2 G0 workflow** `context/workflows/v2-g0-angles-wf_b7b190a7-4fe.js` (now with the hook-sound and palette lines); output `video/docs/v2/G0_ANGLES.md`. Present the top 3; the owner picks.
+1. **PAUSED by the owner (2026-10-26).** The v2 G0 workflow `context/workflows/v2-g0-angles-wf_b7b190a7-4fe.js`, run on 2026-10-25 20:20 UTC, got only **research:timeline** done: `video/docs/v2/research/timeline.md`, 149 lines, VERIFIED/REPORTED tags. Its key findings:
+   - Google signed the classified "any lawful purpose" deal about a day after 600+ staff asked it not to.
+   - Anthropic refused the same terms.
+   - Earlier leavers: Mayrhofer and Turner.
+   - No count of leavers exists anywhere.
+   - Liguori had been on a sick-out since April.
+   - No source puts Google's AI in Maven targeting.
+
+   The other 12 agents hit the weekly usage limit. When the owner says go, re-run the script. It rewrites timeline.md, unless you remove that lane from `RESEARCH` and point `files` at the existing file. Output: `video/docs/v2/G0_ANGLES.md`. Then present the top 3; the owner picks.
 2. **DONE 2026-10-26 (v3 session): `video/docs/look/COZY_AND_SCALE.md` + `video/docs/look/research/`. Waiting for the owner's Arcane screen recording to measure (section 8). Was: RUNNING since 2026-10-26 00:10 UTC (owner engaged again via the Arcane idea and said "continue"; don't duplicate): `context/workflows/look-cozy-scale-arcane-wf_e8c65891-2ba.js` (palette rule merged in, covers v2 and v3). It replaces the paused `look-cozy-and-scale-wf_ee30e562-0c7.js`. Research the "cozy + scale" look** (owner, 2026-10-25 17:32). Output `video/docs/look/COZY_AND_SCALE.md` plus `video/docs/look/research/*.md`. It must also follow the palette direction in `video/docs/look/PALETTE.md` (owner, after the pause).
    - **Owner idea, 2026-10-25 23:30 UTC (v3 session):** reverse-engineer Arcane's camera moves and cinematic shots into
      references. When relaunched, add an Arcane lane that lists 8-12 specific moments for the owner to screen-record
