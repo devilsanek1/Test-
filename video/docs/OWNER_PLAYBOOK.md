@@ -92,6 +92,12 @@ Format: **rule** — why / evidence (video, date).
   the story felt resolved. — same insights.
 - **Every frame should be at least 8/10, with no dead frames, and cuts locked to the beat** (the owner's creator-reel tips). — v1.
 
+- **Every shot reads instantly with the sound off: literal beats clever.** Show recognisable things (a laptop that
+  looks like a laptop, a data center that looks like a building of servers, a plain labelled chart); no visual
+  metaphors that need explaining (a price line drawn on window fog, a chip held up to match a building's size, an
+  abstract dark block growing in a window). Test every animatic with a sound-off cold read before the owner sees it.
+  — owner, v3 G3 ("what does the AI mountain signify?", "is that a screen or a window?", "don't get this part"), 2026-10-26.
+
 ## Taste signals (the owner's picks; weight them when ranking options)
 - **Topics: the everyday wallet consequence** ("AI is outbidding you for the memory in your laptop" over the higher-scored
   Meta $25B story). — v3 G0, 2026-10-25.
