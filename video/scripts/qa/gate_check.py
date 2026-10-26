@@ -5,7 +5,7 @@ before G6, instead of review agents). Generic: any entry / composition + its MP4
   python3 -I scripts/qa/gate_check.py --mp4 out/v3_g5.mp4 --scenes src/v3/film/scenes.json \
       --captions src/v3/film/captions.json --voice public/v3/voice.wav \
       [--entry src/entry-v3-film.tsx --comp Film3] [--fps 60] [--only S9] \
-      [--frame0 "AI is making your|next laptop pricier." --frame0-until 3.37] [--json report.json]
+      [--frame0 "AI is making your|next laptop pricier." --frame0-until 3.37] [--density] [--json report.json]
 
 Checks (FAIL = exit 1; WARN never fails):
   fps        the video stream is --fps (default 60); with --entry/--comp also the composition's own fps and length
@@ -23,7 +23,12 @@ Checks (FAIL = exit 1; WARN never fails):
              (x 90-950: the right rail), 1-2 lines per page, ~20 characters per line (WARN), pages in time order.
              --frame0: the frame-0 words (Film `frame0`, lines split by '|') and the spoken pages lowered under them,
              with Film.tsx's F0 layout.
-Works on any render scale (quarter-scale smoke renders included): cut detection runs on a 90 x 160 grey copy.
+  density    (--density, optional) scripts/qa/density.py on the MP4 with the scenes: medium events per second, the
+             longest gap, near-static frames, flat share, objects and fine detail per shot vs targets measured on
+             reference 1 and v1 (docs/look/research/density_numbers.md). WARN per shot under target; FAIL only when
+             a film AVERAGE is far under target (an empty film, not one quiet shot). Adds ~30 s.
+Works on any render scale (quarter-scale smoke renders included): cut detection runs on a 90 x 160 grey copy
+(density wants a half-scale render or better: its fullness pass reads edges at 540 px wide).
 """
 from __future__ import annotations
 
@@ -261,6 +266,30 @@ def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
         report("PASS", "captions", f"{len(caps)} pages inside the band {band[0]:.0f}-{band[1]:.0f} and the clip {clip[0]:.0f}-{clip[1]:.0f}, x {x_lo}-{x_hi}" + (f"; frame-0 words + {len([b for b in caps if b['s'] - lead < lower_until])} lowered pages" if f0_lines else ""))
 
 
+# ---------------------------------------------------------------- density (scripts/qa/density.py)
+
+def check_density(a, mp4: Path, scenes: list[dict]) -> None:
+    sys.dont_write_bytecode = True
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import density as D  # noqa: PLC0415
+    band = tuple(float(x) for x in a.band.split(","))
+    sc = [{"id": a.only, "start": 0.0, "end": 1e9}] if a.only else scenes
+    res = D.analyze(str(mp4), sc, band=band, quiet=True)
+    f = res["film"]
+    summ = (f"{f['evps']:.1f} medium events/s, longest gap {f['gap']:.2f} s, static {f['static']:.0%}, flat {f['flat']:.0%}, "
+            f"{f['obj']:.0f} objects/Mpx, fine detail {f['detail']:.0%}")
+    if f["far"]:
+        report("FAIL", "density", f"film far under target ({', '.join(f['far'])}): {summ}")
+    elif res["verdict"] == "PASS":
+        report("PASS", "density", f"{summ} (density_numbers.md targets)")
+    else:
+        report("WARN", "density", summ)
+    for r in res["shots"]:
+        bad = [f"{k} {D.TARGETS[k]['fmt'].format(r[k])} ({v})" for k, v in r["verdicts"].items() if v not in ("PASS", "-")]
+        if bad:
+            report("WARN", "density", f"{r['id']}: " + ", ".join(bad))
+
+
 # ---------------------------------------------------------------- main
 
 def main() -> int:
@@ -279,6 +308,7 @@ def main() -> int:
     ap.add_argument("--frame0", help="frame-0 words, lines split by '|'")
     ap.add_argument("--frame0-until", type=float, default=0.0)
     ap.add_argument("--cut-min", type=float, default=2.0, help="minimum mean grey difference of a cut (0-255)")
+    ap.add_argument("--density", action="store_true", help="also run the density meter (scripts/qa/density.py)")
     ap.add_argument("--json", help="write the results here")
     a = ap.parse_args()
     a.safe_x = tuple(int(x) for x in a.safe_x.split(","))
@@ -372,6 +402,10 @@ def main() -> int:
 
     # ---- captions
     check_captions(caps, a, voice_s, fps)
+
+    # ---- density (optional)
+    if a.density:
+        check_density(a, mp4, scenes)
     return finish(a)
 
 

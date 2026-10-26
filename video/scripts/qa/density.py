@@ -11,25 +11,26 @@ object count"). Targets and their reasons: docs/look/research/density_numbers.md
 
 Everything is measured on a 1080-wide CANVAS whatever the input size (540x960 drafts, 1080x1350 reference 1) and in
 SECONDS whatever the frame rate: the motion pass resamples the video to --rate (30) fps, so a 60 fps render and a
-30 fps reference are measured on the same clock.
+30 fps reference are measured on the same clock (keep 30: the targets live on it; event sizes and holds are seconds-based).
 
 MOTION (motion_spec section 9 method), quarter canvas resolution (270 px wide), --rate fps:
   change mask   a pixel changed when max over RGB |frame - previous| > --tau (24 of 255; codec noise stays under).
   medium event  a space-time change blob: each frame, changed pixels within 8 canvas px form a blob; a blob continues
-                the chain whose footprint of the last 0.067 s it overlaps (within 4 canvas px), else it starts a new
-                chain; chains never merge (a new pop beside an ongoing motion is its own event). A chain of >= 500
-                voxels at 30 fps (16.7 quarter-res px^2 * s: ~ a 40x40 px object moving for 5 frames) is a MEDIUM
-                EVENT, counted at its onset. Hard cuts (a scene start, or > 35 % of pixels changing at once) are not
-                events and break every chain.
+                the chain whose footprint of the last 0.067 s holds >= 30 % of it (within 4 canvas px), else it starts
+                a new chain; chains never merge (a new pop beside or inside an ongoing motion is its own event, a
+                bobbing placard stays one). A chain of >= 500 voxels at 30 fps (16.7 quarter-res px^2 * s: ~ a
+                40x40 px object moving for 5 frames) is a MEDIUM EVENT, counted at its onset. Hard cuts (> 35 % of pixels changing at a scene start) are not events;
+                a whole-frame change elsewhere (> 50 %: a camera move) is covered time, never a gap. Both break chains.
   ev/s          medium events per second.            gap   longest stretch without a new medium event (shot edges
                 count; transition windows of the scene list count as one long event).
   static        share of frames with < 0.1 % of the measured pixels changing; run = longest such run (s).
 FULLNESS, half canvas resolution (540 px wide), one frame every --sample s (default 0.25):
   flat          share of 48x48 canvas-px tiles that are FLAT: (almost) no edges (< 0.5 % edge px) and one colour
                 (max-channel std < 6). Big empty walls, skies and floors.
-  obj           distinct small objects per canvas megapixel: connected Canny edge components (after a 3x3 close)
-                with >= 24 edge px at half res.
+  obj           distinct small objects per canvas megapixel: connected Canny edge components (8-connected) with
+                >= 16 edge px at half res (a window, a head, a sign, a bottle; a big outline counts once).
   detail        share of tiles with FINE DETAIL (>= 10 % edge px: windows, hatching, faces, signage, clutter).
+  objn          (summary line) the same objects as a raw count per frame.
 Regions: the caption band (--band, default 290-600) and the --ignore strips (default 1820-1920: draft label, bottom
 UI) are left out of every number. 4:5 input (reference 1, card on mint) gets the preset `ref1`: motion inside the card
 above its caption strip, fullness inside the art panel.
@@ -54,16 +55,21 @@ cv2.setNumThreads(1)  # the machine is shared
 
 CANVAS_W = 1080
 # ---------------------------------------------------------------- targets (docs/look/research/density_numbers.md)
-# kind: 'min' (value must be >= target) or 'max' (value must be <= target); far = the FAR threshold.
+# kind: 'min' (value must be >= target) or 'max' (value must be <= target); far = the FAR threshold;
+# shot = (target, far) for one shot when it differs from the film's.
 TARGETS = {
-    'evps':   dict(kind='min', target=5.0, far=2.5, fmt='{:.1f}', why='motion_spec 9 + playbook (>= 5 medium events/s); ref 1 and v1 both measure >= 5'),
-    'gap':    dict(kind='max', target=1.0, far=2.0, fmt='{:.2f}', why='playbook: no gap over 1 s (ref 1 longest in-shot gap ~1 s)'),
+    'evps':   dict(kind='min', target=5.0, far=2.5, shot=(3.5, 1.75), fmt='{:.1f}',
+                  why='film: playbook / motion_spec 9 (>= 5/s; ref 1 6.6, v1 7.7); one shot: >= 3.5 (ref 1 shots 3.8-9.1, v1 5.4-14.7)'),
+    'gap':    dict(kind='max', target=1.0, far=2.0, fmt='{:.2f}', why='playbook: no gap over 1 s; ref 1 longest 1.00 s'),
     'static': dict(kind='max', target=0.05, far=0.25, fmt='{:.0%}', why='motion_spec 9: <= 5 % near-static frames'),
     'run':    dict(kind='max', target=0.4, far=1.0, fmt='{:.2f}', why='motion_spec 9: no near-static run over 0.4 s'),
-    'flat':   dict(kind='max', target=0.35, far=0.55, fmt='{:.0%}', why='ref 1 / v1 film means ~0.2-0.3 incl. sky'),
-    'obj':    dict(kind='min', target=110.0, far=55.0, fmt='{:.0f}', why='~0.75 x the emptier reference'),
-    'detail': dict(kind='min', target=0.12, far=0.06, fmt='{:.0%}', why='~0.75 x the emptier reference'),
+    'flat':   dict(kind='max', target=0.40, far=0.55, fmt='{:.0%}', why='v1 32 % (incl. the sky over the band) + margin; ref 1 20 %'),
+    'obj':    dict(kind='min', target=105.0, far=70.0, fmt='{:.0f}', why='0.75 x v1 (140/Mpx); far = 0.5 x v1; ref 1 195'),
+    'detail': dict(kind='min', target=0.34, far=0.22, fmt='{:.0%}', why='0.75 x v1 (45 %); far = 0.5 x v1; ref 1 58 %'),
 }
+# medium event tracker (canvas px / seconds), calibrated on reference 1 (6.6 events/s, longest in-shot gap 1.00 s;
+# motion_spec 9 measured 5.9/s and 0.97 s) - see density_numbers.md
+EVENT = dict(merge=8, link=4, cont=0.3)
 MOTION_KEYS = ('evps', 'gap', 'static', 'run')
 FULL_KEYS = ('flat', 'obj', 'detail')
 
@@ -187,16 +193,17 @@ def motion_pass(path: str, info: dict, a) -> dict:
     width = CANVAS_W // 4
     hold = max(1, int(round(a.hold * a.rate)))
     min_vox = a.event_vox * a.rate / 30.0          # 500 voxels at 30 fps; seconds-based
-    ch = Chains(merge=max(0, int(round(8 / 4))), link=max(0, int(round(4 / 4))), hold=hold)
-    starts = [s['start'] for s in a.scene_list[1:]]
+    ch = Chains(merge=EVENT['merge'] // 4, link=EVENT['link'] // 4, hold=hold, cont=EVENT['cont'])
     cut_frames = set()
-    for s in starts:
-        k = int(math.ceil(s * a.rate - 1e-6))
+    for s in a.scene_list[1:]:
+        k = int(math.ceil(s['start'] * a.rate - 1e-6))
         cut_frames.update((k, k + 1))
     prev = None
     mask_r = None
+    npx = 1
     frac = []
-    cuts = []
+    skip = set()        # cut frames and whole-frame changes: no events, not static
+    busy = []           # whole-frame change (camera move, untracked cut): covered time, never a gap
     for i, (t, im) in enumerate(frames(path, info, width, a.rate, a.crop)):
         if prev is None:
             mask_r = region_mask(im.shape[0], im.shape[1], width / CANVAS_W, a.crop, a.band, a.ignore)
@@ -209,15 +216,16 @@ def motion_pass(path: str, info: dict, a) -> dict:
         m = (d > a.tau) & mask_r
         f = float(m.sum()) / npx
         frac.append(f)
-        if f > 0.35 and (i in cut_frames or f > 0.5 or not a.scene_list):
-            cuts.append(i)
+        if (f > 0.35 and i in cut_frames) or f > 0.5:
+            skip.add(i)
             ch.reset()
+            if i not in cut_frames:
+                busy.append(((i - 1) / a.rate, i / a.rate))
             continue
         ch.add(i, m)
-    n = len(frac)
     onsets = sorted(o for o, v in zip(ch.onset, ch.vox) if v >= min_vox)
-    return {'n': n, 'rate': a.rate, 'frac': np.array(frac), 'onsets': np.array(onsets, float) / a.rate,
-            'cuts': [c / a.rate for c in cuts], 'cut_idx': set(cuts)}
+    return {'n': len(frac), 'rate': a.rate, 'frac': np.array(frac), 'onsets': np.array(onsets, float) / a.rate,
+            'skip': skip, 'busy': busy}
 
 
 def runs_longest(flags: np.ndarray) -> int:
@@ -230,17 +238,18 @@ def runs_longest(flags: np.ndarray) -> int:
 
 def motion_stats(mo: dict, s: float, e: float, trans: list) -> dict:
     r = mo['rate']
+    trans = list(trans) + [w for w in mo['busy'] if s <= w[0] < e]
     on = mo['onsets'][(mo['onsets'] >= s) & (mo['onsets'] < e)]
     dur = max(1e-6, e - s)
     marks = np.r_[s, on, e]
     gap = 0.0
     for g0, g1 in zip(marks[:-1], marks[1:]):
         free = g1 - g0
-        for t0, t1 in trans:            # a transition is one long event: its time is never a gap
+        for t0, t1 in trans:            # a transition / camera move is one long event: its time is never a gap
             free -= max(0.0, min(g1, t1) - max(g0, t0))
         gap = max(gap, free)
     i0, i1 = int(math.ceil(s * r)), min(mo['n'], int(math.ceil(e * r)))
-    idx = [i for i in range(max(1, i0 + 1), i1) if i not in mo['cut_idx']]
+    idx = [i for i in range(max(1, i0 + 1), i1) if i not in mo['skip']]
     fr = mo['frac'][idx] if idx else np.array([])
     static = fr < 0.001
     return {'evps': len(on) / dur, 'events': int(len(on)), 'gap': float(gap),
@@ -263,10 +272,8 @@ def fullness_frame(im: np.ndarray, mask: np.ndarray, tile: int, canvas_per_px: f
     flat = ((E < 0.005) & (S < 6.0) & M).sum() / nt
     detail = ((E >= 0.10) & M).sum() / nt
     em = (e & mask).astype(np.uint8)
-    closed = cv2.morphologyEx(em, cv2.MORPH_CLOSE, np.ones((3, 3), np.uint8)) | em
-    n, lab, st, _ = cv2.connectedComponentsWithStats(closed, connectivity=8)
-    cnt = np.bincount(lab[em > 0].ravel(), minlength=n)
-    objs = int((cnt[1:] >= 24).sum())
+    n, _, st, _ = cv2.connectedComponentsWithStats(em, connectivity=8)
+    objs = int((st[1:, cv2.CC_STAT_AREA] >= 16).sum())
     area_mpx = mask.sum() * canvas_per_px ** 2 / 1e6
     return {'flat': float(flat), 'detail': float(detail), 'obj': objs / max(1e-6, area_mpx), 'objn': objs}
 
@@ -293,13 +300,14 @@ def full_stats(fu: list[dict], s: float, e: float) -> dict:
 
 # ---------------------------------------------------------------- verdicts and printing
 
-def verdict(key: str, v: float) -> str:
+def verdict(key: str, v: float, film: bool = False) -> str:
     if v is None or (isinstance(v, float) and math.isnan(v)):
         return '-'
     T = TARGETS[key]
+    tgt, far = (T['target'], T['far']) if film or 'shot' not in T else T['shot']
     if T['kind'] == 'min':
-        return 'PASS' if v >= T['target'] else 'FAR' if v < T['far'] else 'WARN'
-    return 'PASS' if v <= T['target'] else 'FAR' if v > T['far'] else 'WARN'
+        return 'PASS' if v >= tgt else 'FAR' if v < far else 'WARN'
+    return 'PASS' if v <= tgt else 'FAR' if v > far else 'WARN'
 
 
 def worst(vs: list[str]) -> str:
@@ -309,18 +317,19 @@ def worst(vs: list[str]) -> str:
     return '-'
 
 
-def cell(key: str, v: float) -> str:
+def cell(key: str, v: float, film: bool = False) -> str:
     if v is None or (isinstance(v, float) and math.isnan(v)):
         return '-'
     s = TARGETS[key]['fmt'].format(v)
-    vd = verdict(key, v)
+    vd = verdict(key, v, film)
     return s + ('' if vd == 'PASS' else '!' if vd == 'WARN' else '!!')
 
 
-def load_scenes(path: str | None, dur: float) -> list[dict]:
+def load_scenes(path, dur: float) -> list[dict]:
+    """path: a scene list JSON file, or the list itself, or None (the whole video is one shot)."""
     if not path:
         return [{'id': 'film', 'start': 0.0, 'end': dur, 'trans': []}]
-    d = json.loads(Path(path).read_text())
+    d = json.loads(Path(path).read_text()) if isinstance(path, (str, Path)) else path
     if isinstance(d, dict):
         d = d.get('scenes', [])
     out = []
@@ -369,9 +378,12 @@ def analyze(mp4: str, scenes: str | None = None, preset: str = 'auto', rate: flo
         film[k] = sum(v * w for v, w in vals) / max(1e-6, sum(w for _, w in vals))
     film['flat_worst'] = max((r['flat_worst'] for r in shots), default=0.0)
     film['med_gap'] = float(np.median(np.diff(mo['onsets']))) if len(mo['onsets']) > 1 else math.nan
-    film['verdicts'] = {k: verdict(k, film[k]) for k in MOTION_KEYS + FULL_KEYS}
-    # a film is FAR only when its averages are far off; one empty shot makes it WARN
-    film['verdict'] = worst(list(film['verdicts'].values()) + ['WARN' if any(r['verdict'] != 'PASS' for r in shots) else 'PASS'])
+    film['verdicts'] = {k: verdict(k, film[k], True) for k in MOTION_KEYS + FULL_KEYS}
+    # the film is FAR only when an AVERAGE is far off (ev/s, static, flat, obj, detail); gap / run are worst-shot
+    # numbers and one empty shot makes the film WARN, not FAR
+    vs = [('WARN' if v == 'FAR' and k in ('gap', 'run') else v) for k, v in film['verdicts'].items()]
+    film['verdict'] = worst(vs + ['WARN' if any(r['verdict'] != 'PASS' for r in shots) else 'PASS'])
+    film['far'] = [k for k, v in film['verdicts'].items() if v == 'FAR' and k not in ('gap', 'run')]
     res = {'mp4': mp4, 'preset': preset, 'info': info, 'shots': shots, 'film': film, 'verdict': film['verdict'],
            'regions': {'crop': a.crop, 'fcrop': a.fcrop, 'band': a.band, 'ignore': a.ignore}}
     if not quiet:
@@ -390,9 +402,10 @@ def print_table(res: dict) -> None:
         if r['id'] == 'FILM':
             print('-' * len(hdr))
         t = f"{r['s']:5.2f}-{r['e']:5.2f}"
-        print(f"{r['id']:8} {t:>11} {cell('evps', r['evps']):>6} {cell('gap', r['gap']):>6} {cell('static', r['static']):>7} "
-              f"{cell('run', r['run']):>6} {cell('flat', r['flat']):>6} {cell('obj', r['obj']):>8} {cell('detail', r['detail']):>7}  {r['verdict']}")
-    tg = '  '.join(f"{k} {'>=' if T['kind'] == 'min' else '<='}{T['fmt'].format(T['target'])}" for k, T in TARGETS.items())
+        c = (lambda k: cell(k, r[k], r['id'] == 'FILM'))
+        print(f"{r['id']:8} {t:>11} {c('evps'):>6} {c('gap'):>6} {c('static'):>7} {c('run'):>6} {c('flat'):>6} {c('obj'):>8} {c('detail'):>7}  {r['verdict']}")
+    tg = '  '.join(f"{k} {'>=' if T['kind'] == 'min' else '<='}{T['fmt'].format(T['target'])}"
+                   + (f" (shot {T['fmt'].format(T['shot'][0])})" if 'shot' in T else '') for k, T in TARGETS.items())
     print(f"targets: {tg}   (! = WARN, !! = FAR)")
     f = res['film']
     print(f"density: {res['verdict']}  {f['events']} medium events ({f['evps']:.1f}/s, median gap {f['med_gap']:.2f} s), "
