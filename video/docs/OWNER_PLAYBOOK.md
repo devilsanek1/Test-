@@ -87,6 +87,12 @@ Format: **rule** — why / evidence (video, date).
   line 2 "AI data centers get first dibs..."). A plain line needs the frame-0 image, the first-second sound and the 2nd
   line to bring the jolt. — v3 G0.5-G1, 2026-10-25/26.
 
+## Motion
+- **Motion must feel very smooth (owner asks about a higher frame rate).** Proposal, PENDING the owner's call after a
+  phone test: render camera moves and parallax at 60 fps, keep drawn character motion stepped like Arcane (on 2s at
+  24, i.e. every 2nd-3rd frame), so moves glide without the "video game" look; test a 5 s scale move at 30 vs 60 on the
+  owner's phone at G4 (Instagram accepts 23-60 fps; YouTube Shorts plays 60). — owner, v3, 2026-10-26.
+
 ## Captions
 - **Captions pop in place (or rise without clipping); no slot or scroll reveal that cuts letters mid-motion.** On a
   plain sky it looks like a glitch. — v1 posted reel, 2026-10-25.
