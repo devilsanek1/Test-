@@ -7,6 +7,7 @@ import React from 'react';
 import {AbsoluteFill, Audio, Easing, Sequence, interpolate, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {captionFontStack, useCaptionFont} from '../lib/font';
 import {arrow, ellipse, hatch, poly, rect} from '../lib/sketch';
+import {SketchIcon, type IconName} from './SketchIcons';
 
 type Fill = 'warm' | 'cold' | 'dark' | 'paper' | 'pop';
 /** f = depth factor for parallax (1 = moves with the camera, 0 = fixed far plane, > 1 = foreground); the authored end frame is exact for every f. */
@@ -26,7 +27,12 @@ export type El = Depth & (
   | {t: 'arrow'; x1: number; y1: number; x2: number; y2: number; in?: number}
   | {t: 'hatch'; x: number; y: number; w: number; h: number; in?: number}
   | {t: 'figure'; x: number; y: number; h: number; in?: number}
-  | {t: 'text'; x: number; y: number; text: string; size?: number; in?: number});
+  | {t: 'text'; x: number; y: number; text: string; size?: number; in?: number}
+  /** a recognisable pencil object fitted into the box (src/v3/SketchIcons.tsx): x, y = top-left, h defaults to the
+   *  icon's natural aspect; fill = body colour (FILLS key, #hex, or 'none'; omitted = the icon's own); text = its own
+   *  words (sign, price, chart title, year, chip marking); pts = chart line [[x 0..1, value 0..1], ...]; label = muted caption below */
+  | {t: 'icon'; name: IconName; x: number; y: number; w: number; h?: number; fill?: Fill | 'none' | `#${string}`; label?: string;
+      text?: string; pts?: [number, number][]; in?: number});
 /** r = roll in degrees (CINEMATIC_GUIDE: <= 2 deg drift, <= 6 deg in action). */
 type Cam = {x: number; y: number; z: number; r?: number};
 type Ease = 'inout' | 'out' | 'in' | 'linear' | 'unveil' | 'inQuad';
@@ -168,6 +174,12 @@ const Element: React.FC<{el: El; t: number; shot: Shot; i: number}> = ({el, t, s
     case 'text':
       body = <text x={el.x} y={el.y} fontSize={el.size ?? 48} fill={LEAD} textAnchor="middle" fontFamily={captionFontStack}>{el.text}</text>;
       break;
+    case 'icon': {
+      const fill = el.fill === undefined ? undefined : el.fill === 'none' ? null : el.fill in FILLS ? FILLS[el.fill as Fill] : el.fill;
+      body = <SketchIcon name={el.name} x={el.x} y={el.y} w={el.w} h={el.h} fill={fill} text={el.text} label={el.label} pts={el.pts}
+        seed={seed} drawU={drawU} fillO={fillO} t={local} />;
+      break;
+    }
   }
   return <g opacity={appear} transform={`translate(${dx} ${dy})`}>{body}</g>;
 };
