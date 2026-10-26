@@ -8,7 +8,7 @@ replace it).
 
 Format: **rule** — why / evidence (video, date).
 
-**Last compacted: 2026-10-26 (second pass: 181 lines down to under 150) · size budget: <= 150 lines** (see Maintenance at the end).
+**Last compacted: 2026-10-26 (second pass) · size budget: <= 150 lines** (see Maintenance at the end).
 
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
@@ -24,13 +24,9 @@ Format: **rule** — why / evidence (video, date).
   — ("just a collection of sentences", v3 G1, 2026-10-26).
 - **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24).
 - **Scripts come with detailed emotional / delivery cues; the owner always gets the full script text with any take.** — (v1).
-- **The owner records the voice in ElevenLabs; we never add a voice (no stand-in TTS) to a deliverable.**
-  - The treated take is the quality bar (a cheaper TTS sounded "cheap", v1).
-  - Paste file and take checks: `docs/ELEVENLABS.md`.
-  - From the v3 takes: only tags and spoken words (v4 read notes aloud); tags describe a tone, never quote script words
-    and never name an action ("correcting yourself" repeated a line); always hand over the FULL paste text in one block
-    (one changed line on its own was "clunky").
-  — (v3, 2026-10-25/26).
+- **The owner records the voice in ElevenLabs; we never add a voice to a deliverable.** Paste file and take checks:
+  `docs/ELEVENLABS.md` (only tags and spoken words; tags give a tone, never quote words or name an action; always the
+  FULL paste text in one block). — (v1 "cheap" TTS; v3 takes, 2026-10-25/26).
 
 ## Music and sound
 - **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — (v1).
@@ -49,22 +45,12 @@ Format: **rule** — why / evidence (video, date).
   `docs/look/ref_sense_of_enclosure.jpg`). Rules: `docs/look/COZY_AND_SCALE.md`. — (2026-10-25).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). — (v1 posted reel, 2026-10-25).
-- **Palette: a family of house palettes as tools, not a cage.**
-  - A soft, warm, "no screaming colours" base, and one sister palette per video.
-  - Within a video: one hero, one dark anchor, at most one pop. Expand when a story needs it.
-  - Rules and data: `docs/look/PALETTE.md`, `palettes.json`.
-  — (2026-10-25).
-- **Warm, never sickly.**
-  - Low-saturation beige, muddy tan, olive-brown lines and grey read "sick".
-  - Warmth = peach/apricot creams, terracotta, warm red-brown lines and wood, a golden lamp pool, warm shadows. The cold
-    outside is a saturated dusk blue, never grey.
-  - Autumn Ochre became "Autumn Ember".
-  — ("warm feeling, not sick", v3 G4, 2026-10-26).
-- **Texture and lines: VERY subtle, only where they add something.**
-  - Thin tapered lines in key places; no outlines everywhere.
-  - Halftone texture tactically on a few elements, as an optional last step after polish. The film must work flat, and
-    the owner decides per video.
-  — (texture test, 2026-10-25).
+- **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
+  palette per video; within it one hero, one dark anchor, at most one pop. Rules: `docs/look/PALETTE.md`. — (2026-10-25).
+- **Warm, never sickly.** Beige, muddy tan, olive-brown lines and grey read "sick"; warmth = peach creams, terracotta,
+  red-brown lines, a golden lamp pool, warm shadows, a saturated dusk-blue outside. — ("not sick", v3 G4, 2026-10-26).
+- **Texture and lines: VERY subtle.** Thin tapered lines only in key places; halftone tactically on a few elements as
+  an optional last step (the film must work flat; the owner decides per video). — (texture test, 2026-10-25).
 - **Profile identity: mascot Pip (the purple PHP elephant) in the film's style;** avatar
   `video/deliverables/profile/pip_power_button.png`. — (2026-10-25).
 
@@ -81,11 +67,8 @@ Format: **rule** — why / evidence (video, date).
   Details: `CINEMATIC_GUIDE.md`, "The opening". — (owner's reference, v3, 2026-10-26).
 - **State the payoff in words on frame 0; polish the first 2 s and 5 s most, then the first 10 s.** A calm, pretty
   opening lost ~80 % of viewers by 3 s; late quirks are acceptable. — (v1 IG insights, 2026-10-25).
-- **The hook is a concrete, surprising, TRUE claim with stakes** (names, numbers, a curiosity gap), stronger than a
-  plain headline.
-  - Every hook fact is verified against the primary source before it's locked.
-  - When a news item is small, research the bigger story around it and lead with its most powerful true framing.
-  — (v2, 2026-10-25).
+- **The hook is a concrete, surprising, TRUE claim with stakes**, verified against the primary source before it's
+  locked; for a small news item, research the bigger story and lead with its strongest true framing. — (v2, 2026-10-25).
 - **Personal framings must feel natural, not over the top.** "You're up against AI data centers… and losing" was too
   much. Never cast the viewer as a loser in a contest they don't feel; test "you" claims with a viewer panel.
   — (v3 G2, 2026-10-25).
@@ -109,12 +92,8 @@ Format: **rule** — why / evidence (video, date).
 - **Palettes: the warm, everyday one for a money story** (Autumn Ochre over Sage Study and Mint & Clay 1.1). — (v3 G4, 2026-10-26).
 
 ## Motion
-- **Render at 60 fps from the blocking cut (G5) to the final** ("smoother and more crispy" on the phone).
-  - Animate by time, never by frame counts.
-  - Drawn character motion may stay stepped (12-24 drawings/s) while camera and parallax glide.
-  - G3 animatics may stay at 30 fps.
-  - Test: `video/deliverables/tests/fps_test_30_then_60.mp4`.
-  — (v3, 2026-10-26).
+- **Render at 60 fps from G5 to the final** ("smoother and more crispy"). Animate by time; drawn motion may stay stepped
+  (12-24 drawings/s) while the camera glides; G3 may stay at 30. — (v3, 2026-10-26).
 
 ## Captions
 - **Captions pop in place (or rise without clipping);** a slot or scroll reveal that cuts letters looked like a glitch. — (v1 reel, 2026-10-25).
@@ -125,16 +104,10 @@ Format: **rule** — why / evidence (video, date).
   G3 (topic, core line, script, voice): text and audio only, no MP4s, never several versions unless asked. — (v1, 2026-10-25; "why are there multiple versions", v3).
 - **Lock the story with a clean sketch/animatic before big commitments; push all polish late.** — (v1, 2026-10-25).
 - **Progress: the gate deliverable is the update; between gates, a short status covering all threads.** — (v1).
-- **Never trade quality or output value for savings.**
-  - Brainstorms, competing ideas with judges, design explorations and hook variants are excellent use of tokens.
-  - Waste = rework, reviews of things that will change, polish before the story lock, and lost work.
-  — (2026-10-25).
-- **Locked means dropped.**
-  - Move rejected options (topics, core lines, hooks, drafts, scores, panels) to the video's `archive/` and trim the
-    gate doc to the locked choice.
-  - Never put rejected options into later prompts.
-  - Unused topics go to `docs/IDEAS_BANK.md`.
-  — (v3, 2026-10-25).
+- **Never trade quality for savings:** brainstorms, judged competing ideas and design explorations are worth their
+  tokens; waste = rework, reviews of things that will change, early polish, lost work. — (2026-10-25).
+- **Locked means dropped:** rejected options go to the video's `archive/`, the gate doc keeps only the locked choice,
+  later prompts never see them; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
 - **No wasted tokens or time:** short prompts, lean docs, nothing reviewed or polished that will still change. — (v1).
 - **Every lesson goes into the generic process, committed:** this playbook, a gate in `PIPELINE_V2.md`, or the studio
   toolkit, so the next video doesn't repeat it. — ("we gradually get better as a production studio", v3, 2026-10-26).
@@ -149,11 +122,8 @@ Format: **rule** — why / evidence (video, date).
 - **No paid boost until 3-5 posts exist;** then boost the best organic performer for profile visits. — (2026-10-25).
 
 ## Performance log (one line per video and check)
-- v1 "PHP bug / governments switched off their sites", IG after 45 min:
-  - 155 views, 70 viewers, average watch 21 s of 55 s;
-  - like rate 3.9 %; 0 saves, shares, comments or follows;
-  - ~80 % gone by 3 s, flat at ~20 % until ~40 s, then a drop.
-  — 2026-10-25.
+- v1 "PHP bug", IG after 45 min: 155 views, 70 viewers, avg 21 s of 55 s, likes 3.9 %, 0 saves/shares/comments/follows;
+  ~80 % gone by 3 s, flat ~20 % until ~40 s. — 2026-10-25.
 
 ## Retired rules
 (none yet)
