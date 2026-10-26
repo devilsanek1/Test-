@@ -77,6 +77,10 @@ Format: **rule** — why / evidence (video, date).
   `docs/look/CINEMATIC_GUIDE.md`. — (v3, 2026-10-26).
 - **Second visual twist: coziness through a sense of enclosure**: framed, street-like spaces that hold the subject (ref
   `docs/look/ref_sense_of_enclosure.jpg`). Rules: `docs/look/COZY_AND_SCALE.md`. — (2026-10-25).
+  **Coziness is a recurring topic we keep evolving, one reference at a time** (enclosure H:W ratios first; then the
+  owner's 2026-10-26 reference: a painterly street seen from above, everyday traffic flowing calmly under flowering trees):
+  each new reference is measured (composition, movement, texture, camera, details) and folded into `COZY_AND_SCALE.md`.
+  — ("really figure out what about the scene brings out this feeling; this is a recurring topic we need to evolve", 2026-10-26).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). — (v1 posted reel, 2026-10-25).
 - **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
