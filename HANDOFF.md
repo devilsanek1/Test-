@@ -109,7 +109,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
 
 ## 3. The queue (in order) at handoff
 
-1. **v2, RUNNING since 2026-10-26 14:40 UTC** (the owner: "let's start working on the second video"). Video 2 follows the v3 process: the topic is picked; the old G0 "angles" step is folded into the core line.
+1. **v2, G0.5 done 2026-10-26 15:50 UTC: WAITING FOR THE OWNER'S CORE-LINE PICK** (A recommended; see `video/docs/v2/CORE_LINE.md`). Started 14:40 UTC (the owner: "let's start working on the second video"). Video 2 follows the v3 process: the topic is picked; the old G0 "angles" step is folded into the core line.
    - Workflow: `context/workflows/v2-g0-facts-and-core-line-wf_fad013d0-cfd.js`.
    - Steps: research (industry, guardrails; timeline already done) → `video/docs/v2/research/factlock.md` → G0.5 core line (6 lever writers, 4 judges, 4 viewer personas, 2 sceptics per finalist) → `video/docs/v2/CORE_LINE.md` (top 3) → truth check.
    - Next: the owner picks the core line; archive the rest (locked-means-dropped); then G1, the story-first script (template `v3-g1-story-*.js`).
