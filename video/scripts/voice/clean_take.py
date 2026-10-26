@@ -1,6 +1,6 @@
 """Cut unwanted bits out of an ElevenLabs take: keep the given [start, end] ranges (seconds, from the word timings), snap
 each cut to the quietest 20 ms window near it, and join with 15 ms crossfades.
-Usage: python3 scripts/v3/clean_take.py IN.wav OUT.wav '[[0,3.2],[6.08,10.24]]' [gap_s]
+Usage: python3 scripts/voice/clean_take.py IN.wav OUT.wav '[[0,3.2],[6.08,10.24]]' [gap_s]
 """
 import json
 import sys

@@ -1,5 +1,5 @@
 """G2 radio cut on the owner's ElevenLabs take: assets/v3/<take>_h<N>.wav + its Parakeet word timings
-(<take>_h<N>_words.json, from context/scratchpad_tools/transcribe_parakeet.py) -> public/v3/take_h<N>.wav + .json for
+(<take>_h<N>_words.json, from scripts/voice/transcribe.py) -> public/v3/take_h<N>.wav + .json for
 RadioCut (compositions TakeH1..3). Caption words are the script's (docs/v3/script/radio_input.json, digits kept), timed by
 aligning them to the transcript; words the transcript spells differently ("5x" / "five times") are interpolated.
 Usage: python3 scripts/v3/build_take.py take1 [--lead 0.35]

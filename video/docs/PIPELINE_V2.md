@@ -93,6 +93,23 @@ stages (building, fixing, polishing), where the measured waste happened.
     (no prompt reads it), trim the gate doc to the locked choice, and point later prompts only at locked docs and
     the fact files. Unused topics go to `docs/IDEAS_BANK.md`. Superseded drafts are archived at the next gate.
 
+## Studio toolkit (reuse per video; copy a workflow template and swap the topic, paths and locked lines)
+
+Every lesson lands here, in the playbook or in a gate, in the same turn (owner, 2026-10-26). Workflow templates live
+in `context/workflows/` (the v3 ones are the current best versions):
+
+| Gate | Tool / template | What it does |
+|---|---|---|
+| G0 topic | `v3-g0-topics-*.js`; `docs/IDEAS_BANK.md` | 5 beat scouts (last 72 h), 3 judges, synthesis, fact-check: top 3 topics |
+| G0.5 core line | `v3-g05-core-line-*.js` | 6 emotional-lever writers, 4 judges, viewer personas + sceptics on finalists, top 3 |
+| G1 script | `v3-g1-story-*.js` | story spines first, judges, 3 writers, cold-read retell panel, flow critic, merge, fact-check |
+| any line | `v3-line2-fix-*.js` | replacement lines tested in context by viewer personas + a standards/flow judge |
+| G1/G2 voice | `docs/ELEVENLABS.md`; `video/scripts/voice/` | paste-file rules + `check_paste.py`; `check_take.py` (transcribe + diff), `clean_take.py`, `transcribe.py` |
+| G2 sound | `video/audio/tools/make_phone_sfx.py` | our own positive phone sounds (like pop, ding, swoosh, cart add) |
+| G3 animatic | `video/src/v3/SketchReel.tsx` + `v3-g3-animatic-*.js` | 3 visual concepts, judges, storyboard artist writes the animatic JSON; SketchReel draws it with voice and pop captions |
+| G4 look | `docs/look/COZY_AND_SCALE.md`, `docs/look/PALETTE.md`, `look-cozy-scale-arcane-*.js` | look rules; research template |
+| references | `video/scripts/look/measure_camera.py` | cuts + per-shot camera curves, easing, parallax from a reference video (keep copyrighted clips out of git) |
+
 ## Agent prompt rules
 
 - Context: the gate's brief plus the scene's own data. **Point to sections, never "read all docs fully".**

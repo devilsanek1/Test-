@@ -14,7 +14,11 @@ Top rules (details in the playbook):
 - From the sketch animatic (G3) on, show one playable video per gate, never only stills; before that, text/audio only (no MP4s). Lock the story (sketch animatic) before building; polish last.
 - Every video gets ONE core line (its own step, G0.5: brainstorm, critique, owner picks) before the script is written.
 - The first 2-5 s matter most: state the payoff in words on frame 0. Target 30-45 s.
-- Everyday spoken language, no AI-sounding phrasing; scripts come with detailed emotional cues.
+- A script is one coherent story (spine first; every line follows from the last), never a list of facts. Everyday spoken
+  language, no AI-sounding phrasing; detailed emotional cues. The owner records the voice: follow `video/docs/ELEVENLABS.md`
+  and always hand over the full paste text.
+- Every lesson goes into the generic process (playbook, pipeline gate, studio toolkit) and is committed, so the next
+  video doesn't repeat it.
 - Captions pop in place (no clipped roll-ins). No paper edge at the top of the frame.
 - Never trade quality for savings: brainstorms, competing ideas with judges and design explorations at the early gates are
   worth their tokens. Cut only waste: rework, reviews of things that will still change, polish before the story lock,

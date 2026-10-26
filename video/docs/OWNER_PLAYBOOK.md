@@ -8,14 +8,12 @@ replace it).
 
 Format: **rule** — why / evidence (video, date).
 
-**Last compacted: 2026-10-25 · size budget: <= 150 lines** (see Maintenance at the end).
+**Last compacted: 2026-10-26 · size budget: <= 150 lines** (see Maintenance at the end).
 
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — the target from day one (v1, 2026-10-24).
 - **Growth matters: maximise engagement with subtle, defensible hooks** (bait that is true, e.g. "the language everyone
   loves"). Never misleading. — v1 script round, 2026-10-24.
-- **Topic picks lean to the everyday wallet consequence:** for v3 the owner chose "AI is outbidding you for the memory in
-  your laptop" (prices) over the recommended, higher-scored Meta $25B story. Weight "what it costs me" when ranking topics. — v3 G0, 2026-10-25.
 
 ## Script and voice
 - **A script is a coherent STORY, not a collection of true sentences about the topic.** One throughline question,
@@ -23,24 +21,16 @@ Format: **rule** — why / evidence (video, date).
   "so" or "because", never "and also"), building to a turn and a payoff. Build the story spine first, then write the
   lines; a list of facts to prove is input, never the structure. Test: someone who hears it once can retell it as a
   story. — owner, v3 G1 ("it's just a collection of sentences ... start from scratch"), 2026-10-26.
-- **Everyday spoken language. Check every sentence for AI-sounding wording**; it must sound approachable, like a person
-  talking. — v1, 2026-10-24.
-- **When delivering a script, include emotional / delivery cues that are as detailed and concrete as possible.** — v1.
-- **Always give the owner the updated script text along with any new voice take.** — v1.
-- **The owner records the voice in ElevenLabs; we never add a voice (no stand-in TTS) to a deliverable.** The script
-  stage delivers an ElevenLabs-ready script in the v1 format: one short human cue in brackets per line (tone, "like
-  you...", what to lean on, e.g. [deadpan, like you're stating the obvious, tiny pause after "PHP"]), then the line;
-  CAPS for emphasis, … for beats, numbers spelled out; no ms, wpm or technical notes. Template: `docs/v3/script/script_elevenlabs.md`.
-  — owner, v3 G1, 2026-10-25.
-- **ElevenLabs paste files are paste-safe:** only tags and spoken words (no titles, notes, labels or alternates: v4 read
-  them aloud); tags describe delivery only and NEVER quote script words (v4 spoke the quoted phrases); put a short tag
-  right where the delivery changes, mid-line if needed (a tag carries on until the next one), and show emphasis with CAPS
-  in the line. Alternate hooks go in their own paste file. — owner's first v3 take, 2026-10-25.
-- **Always give the owner the FULL paste text in one copy-paste block, never just the changed line,** whenever any line
-  or cue changes. — owner, v3, 2026-10-26 ("just giving me a line to change is clunky").
-- **ElevenLabs cues name a tone or emotion, never an action:** "correcting yourself" made v4 say the previous line again
-  before the correction. No "correcting", "repeating", "quoting", "reading", "listing" in tags. — owner's v3 take 3, 2026-10-26.
-- **Voice: the treated ElevenLabs WAV is the quality bar.** An untreated or cheaper TTS sounded "cheap". — v1.
+- **Everyday spoken language. Check every sentence for AI-sounding wording**; it must sound like a person talking. — v1, 2026-10-24.
+- **Scripts come with detailed emotional / delivery cues, and the owner always gets the full script text with any
+  take.** — v1, 2026-10-24.
+- **The owner records the voice in ElevenLabs; we never add a voice (no stand-in TTS) to a deliverable.** The treated
+  ElevenLabs take is the quality bar (a cheaper TTS sounded "cheap", v1). The paste file and take checks follow
+  `docs/ELEVENLABS.md`; the rules behind it, all from the owner's v3 takes (2026-10-25/26):
+  - only tags and spoken words (v4 read our notes and alternate-hook labels aloud);
+  - tags describe a tone, never quote script words (v4 spoke them) and never name an action ("correcting yourself"
+    made it repeat the previous line);
+  - always hand over the FULL paste text in one block, never just the changed line ("clunky").
 
 ## Music and sound
 - **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — v1.
@@ -59,21 +49,12 @@ Format: **rule** — why / evidence (video, date).
   — owner, 2026-10-25.
 - **Edges: hand-drawn paper edges ('paint-subtle') are liked, BUT never at the top of the frame or beside the caption
   band.** A white strip at the top looked like a screen recording under the phone's status bar. — v1, posted reel, 2026-10-25.
-- **Palette: a family of house palettes as tools, not a cage.**
-  - Keep our soft, warm, "no screaming colours" v1 palette (the owner likes it) and evolve it incrementally.
-  - Keep several similar-ish palettes that share the house DNA, each slightly different and unique, and pick one per
-    video or use case.
-  - Within a video be tactical: one hero, one dark anchor, at most one pop, never all the colours at once.
-  - Expand with new colours or palettes when a story needs it.
-  - Board: `docs/look/palette_family.png`; data: `docs/look/palettes.json`; rules: `docs/look/PALETTE.md`.
-  — owner, 2026-10-25.
-- **Texture and lines: VERY subtle, and only where it makes sense.**
-  - Thin dark tapered lines go only in key places (creases, a leash, a mouth, an ear), not as outlines around every shape.
-  - The halftone texture (`docs/look/texture_refs/`) is applied **tactically, to a few elements where it adds
-    something** (e.g. the hero's clothes in a close-up, one key prop, a cozy interior surface), never everywhere.
-  - It is an **optional last step of production**, after polish and before the final render. The film must work flat
-    without it, and the owner decides per video whether to use it.
-  — owner, 2026-10-25 (after the texture test).
+- **Palette: a family of house palettes as tools, not a cage.** Keep the soft, warm, "no screaming colours" v1 base and
+  evolve it; pick one sister palette per video; within a video one hero, one dark anchor, at most one pop; expand when a
+  story needs it. Rules and data: `docs/look/PALETTE.md`, `palettes.json`, `palette_family.png`. — owner, 2026-10-25.
+- **Texture and lines: VERY subtle, only where they add something.** Thin dark tapered lines only in key places (not
+  outlines everywhere); the halftone texture tactically on a few elements; an optional last step after polish (the film
+  must work flat; the owner decides per video). — owner, 2026-10-25 (after the texture test).
 - **Profile identity: the mascot Pip (the purple PHP elephant) in the film's style;** the avatar in use is the
   power-button sun one (`video/deliverables/profile/pip_power_button.png`). — 2026-10-25.
 
@@ -82,9 +63,6 @@ Format: **rule** — why / evidence (video, date).
   absolute core of the message and gets the biggest emotional reaction (v3: something like "AI is making your PC more
   expensive"). Brainstorm, critique and the owner's pick, like the topic. It drives frame 0, the hook, the cover and the
   payoff, and every line must serve it. — owner, v3, 2026-10-25.
-- **Core-line picks lean plain, direct and personal over clever:** for v3 the owner chose "AI is making your next laptop
-  pricier" (their own line, made true) over the panel's recommended "Don't use AI? It's still raising laptop prices". So
-  the frame-0 image, the first-second sound and the 2nd line must bring the jolt that a plain line lacks. — v3 G0.5, 2026-10-25.
 - **The first 2 s and first 5 s get the most polish; the first 10 s get the next most.** Quirks late in the video are acceptable. — v1, 2026-10-25.
 - **State the payoff in words from frame 0** (a bold claim on the first frame, starting mid-action). A calm, pretty
   opening frame lost about 80 % of viewers by 3 s. — v1 Instagram insights after 45 min (155 views, 70 viewers, avg 21 s / 55 s), 2026-10-25.
@@ -97,11 +75,17 @@ Format: **rule** — why / evidence (video, date).
 - **Personal framings must feel natural, not over the top:** "You're up against AI data centers… and losing" was too much
   for the owner ("how would people react hearing this?"). Don't cast the viewer as a loser or a competitor in a contest they
   don't feel; test any "you" claim with a viewer panel for eye-rolls before it's locked. — owner, v3 G2, 2026-10-25.
-- **v3 hook pick: H2, the question ("Buying a laptop soon? AI's making it pricier.")** over the verbatim core line. — owner, v3 G2, 2026-10-25.
-- **v3 line 2 pick: "AI data centers get first dibs on the memory chips your laptop needs."** The panel's top option (no loser, no fight). — owner, v3 G2, 2026-10-26.
 - **Target 30-45 s and end close to the payoff.** Viewers who passed the hook stayed until about 40 s, then left once
   the story felt resolved. — same insights.
 - **Every frame should be at least 8/10, with no dead frames, and cuts locked to the beat** (the owner's creator-reel tips). — v1.
+
+## Taste signals (the owner's picks; weight them when ranking options)
+- **Topics: the everyday wallet consequence** ("AI is outbidding you for the memory in your laptop" over the higher-scored
+  Meta $25B story). — v3 G0, 2026-10-25.
+- **Lines: plain, direct and personal over clever** (core line "AI is making your next laptop pricier" over the panel's
+  "Don't use AI? It's still raising laptop prices"; hook as a question, "Buying a laptop soon? AI's making it pricier.";
+  line 2 "AI data centers get first dibs..."). A plain line needs the frame-0 image, the first-second sound and the 2nd
+  line to bring the jolt. — v3 G0.5-G1, 2026-10-25/26.
 
 ## Captions
 - **Captions pop in place (or rise without clipping); no slot or scroll reveal that cuts letters mid-motion.** On a
@@ -114,8 +98,7 @@ Format: **rule** — why / evidence (video, date).
   audio only, with no MP4s, and never several versions of one video unless asked. — v1 2026-10-25; narrowed by the owner
   on v3 ("why are there multiple versions and why is it needed at all at this point?"), 2026-10-25.
 - **Lock the story with a clean sketch/animatic before big commitments; push all polish late.** — v1, 2026-10-25.
-- **Progress updates about every 30 min while working, covering all threads and including visuals, even unfinished ones.** With the new
-  pipeline, the gate video is the update and between gates a one-line status. — v1.
+- **Progress: the gate deliverable is the update; between gates, a short status covering all threads.** — v1, 2026-10-25.
 - **Never trade quality or output value for savings. Creative work gets the budget it needs:** multi-agent
   brainstorms, competing ideas with judges, design and style explorations, and hook variants are excellent use of tokens.
   "Waste" means rework, reviews of things that will still change, polish before the story is locked, and lost work.
@@ -126,6 +109,9 @@ Format: **rule** — why / evidence (video, date).
   — owner, v3, 2026-10-25.
 - **No wasted tokens or time:** no reviews or polish on things that will change, short prompts, lean docs; cut what
   doesn't help (see the measured waste in `docs/PIPELINE_V2.md`). — v1, 2026-10-25.
+- **Every lesson goes into the generic process, committed, so the next video doesn't repeat the mistake:** the rule
+  here, the gate in `docs/PIPELINE_V2.md`, the tool or template in the studio toolkit (`PIPELINE_V2.md`, "Studio
+  toolkit"). — owner, v3, 2026-10-26 ("we gradually get better as a production studio").
 - **Once the owner says "final", don't redo it.** Log ideas for the next video instead. — v1, 2026-10-25.
 - **Deliver videos as a download as well;** in-app previews may play muted. — v1, 2026-10-25.
 

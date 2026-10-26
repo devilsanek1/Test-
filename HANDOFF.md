@@ -93,6 +93,12 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
   `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
+- **v3 status (2026-10-26 ~11:30 UTC):** script LOCKED (story-first rewrite, `docs/v3/script/script_g1.md`); the owner is
+  regenerating the ElevenLabs take from `docs/v3/script/script_elevenlabs.md` (check it with `scripts/voice/check_take.py`);
+  working voice `assets/v3/take2_clean.wav` -> `public/v3/voice.wav` + `voice_words.json`; G3 animatic workflow
+  `context/workflows/v3-g3-animatic-*.js` writes `public/v3/animatic.json` (render: `npx remotion render src/entry-v3.tsx Animatic`).
+  Look bible done (`docs/look/COZY_AND_SCALE.md`); waiting for the owner's Arcane screen recording (measure with
+  `scripts/look/measure_camera.py`, keep the clip out of git). Earlier status, now superseded:
 - **v3 status (2026-10-25 23:00 UTC):** topic locked (`docs/v3/G0_TOPICS.md`), core line locked at the new G0.5 step
   ("AI is making your next laptop pricier", `docs/v3/CORE_LINE.md`), G1 script `docs/v3/script/script_g1.md`, radio cuts
   `video/deliverables/v3/v3_g1_radio_h{1,2,3}.mp4` sent, waiting for the owner's hook pick and word notes. Rejected
@@ -197,7 +203,7 @@ Everything that agent knew is in this repo. This file is the map; the details li
     and the `swangle` GL renderer. Point it at the container's headless Chromium if the path differs.
   - Python 3.13 with numpy, scipy, librosa, soundfile, pyloudnorm, pedalboard, soxr, pretty_midi, mido,
     opencv-python-headless, pillow and matplotlib. Word timings used sherpa-onnx with the NVIDIA Parakeet model;
-    `context/scratchpad_tools/transcribe_parakeet.py` shows how.
+    `video/scripts/voice/transcribe.py` shows how (setup in its header; `check_take.py` wraps it).
   - ffmpeg 6, ImageMagick, and the Inter fonts (the project also ships fonts in `video/public/fonts`).
 - **Commands (from `video/`):**
   - Final render: `npx remotion render src/entry-film.ts Main out/X.mp4 --crf 14`. Then convert to TV range:
