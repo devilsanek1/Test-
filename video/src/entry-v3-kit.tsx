@@ -5,9 +5,13 @@ import './v3/film/palette';
 import React from 'react';
 import {Composition, registerRoot} from 'remotion';
 import {KitSheet3, SHEET} from './v3/film/kit/KitSheet3';
+import {KitSheetLife, LIFE_SHEET} from './v3/film/kit/KitSheetLife';
 
 const KitRoot: React.FC = () => (
-  <Composition id="KitSheet3" component={KitSheet3} fps={60} width={SHEET.w} height={SHEET.h} durationInFrames={120} />
+  <>
+    <Composition id="KitSheet3" component={KitSheet3} fps={60} width={SHEET.w} height={SHEET.h} durationInFrames={240} />
+    <Composition id="KitSheetLife" component={KitSheetLife} fps={60} width={LIFE_SHEET.w} height={LIFE_SHEET.h} durationInFrames={240} />
+  </>
 );
 
 registerRoot(KitRoot);

@@ -28,9 +28,9 @@ export const BAND: [number, number] = [290, 600];
 export type SnowLayer = 'far' | 'mid' | 'near';
 
 const LAYER = {
-  far: {r: [1.4, 2.4], v: [16, 26], n: 0.00016, wob: 2, color: EMBER.snow},
-  mid: {r: [2.6, 4.2], v: [30, 46], n: 0.00008, wob: 4, color: EMBER.snow},
-  near: {r: [5, 8], v: [70, 110], n: 0.000016, wob: 7, color: EMBER.snow},
+  far: {r: [1.0, 1.6], v: [16, 26], n: 0.00016, wob: 2, color: EMBER.snow},
+  mid: {r: [1.7, 2.6], v: [30, 46], n: 0.00008, wob: 4, color: EMBER.snow},
+  near: {r: [3.6, 5], v: [70, 110], n: 0.000016, wob: 7, color: EMBER.snow},
 } as const;
 
 export type SnowLayersProps = {
@@ -188,7 +188,7 @@ export const PuffTrain: React.FC<PuffTrainProps> = ({x, y, color = EMBER.skyLow,
   if (at !== undefined && t < at) return null;
   const ps = puffs(t - (at ?? 0), o, y);
   let d = '';
-  for (const p of ps) d += blob(x + p.x, y + p.y, p.r, p.r * 0.86, {seed: `${o.seed ?? 'pf'}/${Math.round(p.k * 7)}`});
+  for (const p of ps) d += blob(x + p.x, y + p.y, p.r * 1.25, p.r * 0.8, {seed: `${o.seed ?? 'pf'}/${Math.round(p.k * 7)}`});
   if (!d) return null;
   return (
     <>
@@ -199,13 +199,13 @@ export const PuffTrain: React.FC<PuffTrainProps> = ({x, y, color = EMBER.skyLow,
 };
 
 /** Chimney smoke against the dusk sky: a lighter flat step, drifting right. */
-export const Smoke: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={5} life={2.8} rise={110} drift={46} r0={5} r1={18} wobble={4} {...p} color={p.color ?? EMBER.skyLow} />;
+export const Smoke: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={7} life={2.8} rise={110} drift={52} r0={4} r1={13} wobble={3} {...p} color={p.color ?? EMBER.skyLow} />;
 
 /** Steam (a mug, a vent, a coffee cup, a manhole): small white puffs rising straight. */
 export const Steam: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={4} life={1.8} rise={70} drift={4} r0={3} r1={9} wobble={5} {...p} color={p.color ?? EMBER.snow} />;
 
 /** The data center's cooling plume (one per roof unit): big slow puffs, never above `ceil` (default 600: the band). */
-export const CoolingPlume: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={5} life={3.2} rise={160} drift={30} r0={10} r1={30} wobble={6} ceil={600} {...p} color={p.color ?? EMBER.frost} />;
+export const CoolingPlume: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={8} life={3.4} rise={150} drift={34} r0={9} r1={24} wobble={5} ceil={600} {...p} color={p.color ?? EMBER.skyLow} />;
 
 /** Exhaust from a vehicle's pipe: a puff every ~0.6 s drifting back (dir -1 = left). */
 export const Exhaust: React.FC<{x: number; y: number; dir?: number; size?: number; seed?: string; color?: string}> = ({x, y, dir = -1, size = 1, seed = 'ex', color = EMBER.frost}) => (

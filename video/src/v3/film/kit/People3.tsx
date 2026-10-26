@@ -241,30 +241,32 @@ export const WinterPerson: React.FC<WinterPersonProps> = (props) => {
     );
   }
   if (wear.includes('point') && pointAt !== undefined && t >= pointAt) {
+    // the arm (lengths from the torso WIDTH: long torsos cut by the frame keep a normal arm)
     const k = Math.min(1, (t - pointAt) / 0.12);
-    const sx = hw * 0.75;
-    const sy = -g.h * 0.82;
-    const ex = sx + g.w * (0.2 + 0.25 * k);
-    const ey = sy - g.h * (0.4 + 0.5 * k);
+    const sx = hw * 0.7;
+    const sy = -g.h + g.w * 0.28;
+    const ex = sx + g.w * (0.25 + 0.2 * k);
+    const ey = sy - g.w * (0.55 + 0.6 * k);
     over.push(
       <g key="pt">
-        <path d={`M${sx} ${sy}L${ex} ${ey}`} stroke={EMBER.ink} strokeWidth={g.w * 0.17 + W * 2} strokeLinecap="round" />
-        <path d={`M${sx} ${sy}L${ex} ${ey}`} stroke={pick.coat} strokeWidth={g.w * 0.17} strokeLinecap="round" />
-        <path d={blob(ex + 3, ey - 4, g.w * 0.07, g.w * 0.09, {seed: fx('ph')})} fill={EMBER.skin} />
+        <path d={`M${sx} ${sy}L${ex} ${ey}`} stroke={EMBER.ink} strokeWidth={g.w * 0.19 + W * 2} strokeLinecap="round" />
+        <path d={`M${sx} ${sy}L${ex} ${ey}`} stroke={pick.coat} strokeWidth={g.w * 0.19} strokeLinecap="round" />
+        <path d={blob(ex + g.w * 0.02, ey - g.w * 0.05, g.w * 0.075, g.w * 0.095, {seed: fx('ph')})} fill={EMBER.skin} />
+        <path d={`M${ex + g.w * 0.02} ${ey - g.w * 0.1}l${g.w * 0.04} ${-g.w * 0.12}`} stroke={EMBER.skin} strokeWidth={g.w * 0.05} strokeLinecap="round" />
       </g>,
     );
   }
   if (wear.includes('wave') && waveAt !== undefined && t >= waveAt) {
     const a = -25 + 22 * Math.sin((t - waveAt) * Math.PI * 2 * 1.8);
-    const sx = -hw * 0.75;
-    const sy = -g.h * 0.82;
-    const len = g.h * 0.85;
+    const sx = -hw * 0.7;
+    const sy = -g.h + g.w * 0.28;
+    const len = g.w * 1.05;
     const ex = sx - Math.sin((a * Math.PI) / 180) * len * 0.4 - g.w * 0.15;
     const ey = sy - Math.cos((a * Math.PI) / 180) * len;
     over.push(
       <g key="wv">
-        <path d={`M${sx} ${sy}L${ex} ${ey}`} stroke={EMBER.ink} strokeWidth={g.w * 0.17 + W * 2} strokeLinecap="round" />
-        <path d={`M${sx} ${sy}L${ex} ${ey}`} stroke={pick.coat} strokeWidth={g.w * 0.17} strokeLinecap="round" />
+        <path d={`M${sx} ${sy}L${ex} ${ey}`} stroke={EMBER.ink} strokeWidth={g.w * 0.19 + W * 2} strokeLinecap="round" />
+        <path d={`M${sx} ${sy}L${ex} ${ey}`} stroke={pick.coat} strokeWidth={g.w * 0.19} strokeLinecap="round" />
         <path d={blob(ex, ey - 4, g.w * 0.075, g.w * 0.095, {seed: fx('wh')})} fill={EMBER.skin} />
       </g>,
     );
@@ -312,8 +314,8 @@ export const WinterPerson: React.FC<WinterPersonProps> = (props) => {
     over.push(
       <g key="sn">
         <path d={blob(hr * 0.1, capTop, hr * 0.62, hr * 0.2, {seed: fx('sh')})} fill={EMBER.snow} />
-        <path d={blob(-hw * 0.6, -g.h + g.h * 0.035, g.w * 0.17, g.h * 0.03 + 1.5, {seed: fx('s1')})} fill={EMBER.snow} />
-        <path d={blob(hw * 0.62, -g.h + g.h * 0.04, g.w * 0.15, g.h * 0.03 + 1.5, {seed: fx('s2')})} fill={EMBER.snow} />
+        <path d={blob(-g.w * 0.27, -g.h + g.w * 0.025, g.w * 0.13, g.w * 0.035, {seed: fx('s1')})} fill={EMBER.snow} />
+        <path d={blob(g.w * 0.29, -g.h + g.w * 0.03, g.w * 0.11, g.w * 0.03, {seed: fx('s2')})} fill={EMBER.snow} />
       </g>,
     );
   }
