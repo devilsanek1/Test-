@@ -56,7 +56,9 @@ Format: **rule** — why / evidence (video, date).
 - **Every scene must FEEL ALIVE: that is the key, not an object count.** Aliveness comes from a dense, detailed world
   (a city full of buildings and windows, a room full of real things), people near and far, layered depth, a recurring
   living character, and ambient life that never stops (clouds drifting, birds, snow, steam, lights switching, small
-  movements). Even Arcane's rooftop shot feels alive from the city's density and detail, the clouds and the birds. The
+  movements). Even Arcane's rooftop shot feels alive from the city's density and detail, the clouds and the birds; and the owner's
+  riverside reference (a few cyclists, people sitting by the water) "doesn't feel empty at all": a dense, detailed world
+  makes a frame full even when little moves. The
   references set the bar (reference 1 France, v1 PHP); numbers from `scripts/qa/density.py` are a warning signal, never
   a quota. Big flat empty fields and an object alone on a blank wall are failures, even in a draft; density belongs to
   the set build (G5), not to polish. — ("way too empty ... those feel a lot more alive", then "less prescriptive on
