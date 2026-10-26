@@ -16,8 +16,11 @@ export type LaptopProps = {
   /** Centre of the hinge line (canvas px). */
   x: number;
   y: number;
-  /** Lid width (px). The lid is 0.64 w tall; the deck reaches 0.24 w toward the viewer. */
+  /** Lid width (px). The lid is `lidH` w tall (default 0.64); the deck reaches 0.24 w toward the viewer. */
   w: number;
+  /** Lid height as a fraction of w (default 0.64). A close-up seen from above foreshortens it (S8: 0.36, so the
+   *  board's wall strip shows above the lid and the dark screen stays near its budget). */
+  lidH?: number;
   variant?: 'old' | 'new';
   /** Screen colour override (default: anchor for 'old', the lit peach for 'new'). */
   screen?: string;
@@ -38,8 +41,8 @@ export type LaptopProps = {
 };
 
 /** Key points of a laptop (for lanes aiming at it: the screen centre, the keyboard centre, the lid corners). */
-export function laptopGeo(x: number, y: number, w: number) {
-  const H = w * 0.64;
+export function laptopGeo(x: number, y: number, w: number, lidH = 0.64) {
+  const H = w * lidH;
   const D = w * 0.24;
   const f = w * 0.07;
   // 3/4 from slightly right and above: the right side recedes (shorter, higher), the deck flares toward us
@@ -56,8 +59,8 @@ export function laptopGeo(x: number, y: number, w: number) {
   return {H, D, lid, scr, deck, edge, screenC: quadPt(scr, 0.5, 0.5), keysC: quadPt(deck, 0.5, 0.42)};
 }
 
-export const Laptop: React.FC<LaptopProps> = ({x, y, w, variant = 'old', screen, taped, label, labelAt, rot = 0, at, seed = 'laptop', ink = 3.4, lidOnly, children}) => {
-  const g = laptopGeo(x, y, w);
+export const Laptop: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = 'old', screen, taped, label, labelAt, rot = 0, at, seed = 'laptop', ink = 3.4, lidOnly, children}) => {
+  const g = laptopGeo(x, y, w, lidH);
   const isNew = variant === 'new';
   const scr = screen ?? (isNew ? EMBER.newScreen : EMBER.anchor);
   const small = w < 220;
@@ -70,6 +73,25 @@ export const Laptop: React.FC<LaptopProps> = ({x, y, w, variant = 'old', screen,
     return `M${a[0].toFixed(1)} ${a[1].toFixed(1)}L${c[0].toFixed(1)} ${c[1].toFixed(1)}`;
   });
   const kw = Math.max(3, w * 0.027);
+  // at close-up size (w >= 800) the dashed rows read as solid bars: draw separate key caps instead (12 per row, the
+  // orange deck showing between them), on the same three rows (S8's stick comes up through the third)
+  const caps =
+    w >= 800
+      ? [0.18, 0.36, 0.54]
+          .flatMap((v, i) => {
+            const u0 = 0.09 - i * 0.012;
+            const u1 = 0.91 + i * 0.012;
+            const n = 12;
+            const step = (u1 - u0) / n;
+            const hv = 0.055;
+            return Array.from({length: n}, (_, j) => {
+              const a = u0 + j * step + step * 0.12;
+              const c = a + step * 0.76;
+              return polyPath([quadPt(g.deck, a, v - hv), quadPt(g.deck, c, v - hv), quadPt(g.deck, c, v + hv), quadPt(g.deck, a, v + hv)]);
+            });
+          })
+          .join('')
+      : '';
   const tp = [quadPt(g.deck, 0.38, 0.7), quadPt(g.deck, 0.62, 0.7), quadPt(g.deck, 0.63, 0.92), quadPt(g.deck, 0.37, 0.92)] as Pt[];
   const glintAt = quadPt(g.scr, 0.2, 0.78);
   const tape = (() => {
@@ -96,7 +118,11 @@ export const Laptop: React.FC<LaptopProps> = ({x, y, w, variant = 'old', screen,
           <Fill d={polyPath(g.edge)} color={EMBER.heroDeep} at={fillAt(at, 0.06)} seed={`${seed}/edge`} />
           <Fill d={polyPath(g.deck)} color={EMBER.hero} at={fillAt(at, 0.04)} seed={`${seed}/deck`} />
           <Ink d={poly(g.deck, {closed: true, seed: `${seed}/deckI`, over}) + poly([g.edge[1], g.edge[2], g.edge[3], g.edge[0]], {seed: `${seed}/edgeI`, over: [0, 2]})} at={b(at, 0.04)} width={ink} />
-          <Ink d={rows.join('')} at={b(at, 0.14)} width={kw} color={EMBER.anchor} dash={`${(w * 0.05).toFixed(1)} ${(w * 0.018).toFixed(1)}`} taper={false} />
+          {caps ? (
+            <Fill d={caps} color={EMBER.anchor} at={fillAt(at, 0.14)} offset={false} seed={`${seed}/caps`} />
+          ) : (
+            <Ink d={rows.join('')} at={b(at, 0.14)} width={kw} color={EMBER.anchor} dash={`${(w * 0.05).toFixed(1)} ${(w * 0.018).toFixed(1)}`} taper={false} />
+          )}
           <Ink d={poly(tp, {closed: true, seed: `${seed}/tp`, over: [0, 1]})} at={b(at, 0.18)} width={Math.max(1.4, ink * 0.5)} />
           {taped ? (
             <>

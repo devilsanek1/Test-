@@ -133,7 +133,8 @@ export type DataCenterProps = {
 export function dataCenterGeo(x: number, y: number, w: number, h?: number, variant: DataCenterVariant = 'normal') {
   const H = h ?? (variant === 'hall' ? w * 0.4 : variant === 'mini' ? w * 0.62 : w * 0.7);
   const top = y - H;
-  const signH = variant === 'hall' ? H * 0.17 : H * 0.2;
+  // the mini (the tag's back) carries a short sign ("AI") on a taller panel so it reads at phone size
+  const signH = variant === 'hall' ? H * 0.17 : variant === 'mini' ? H * 0.28 : H * 0.2;
   const sign = {x: x - w * 0.43, y: top + H * 0.1, w: w * 0.86, h: signH};
   return {H, top, sign, x0: x - w / 2, x1: x + w / 2};
 }
@@ -182,7 +183,7 @@ export const DataCenter: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 =
   }
   const outline: Pt[] = [[g.x0, y], [g.x0, g.top], [g.x1, g.top], [g.x1, y]];
   const signText = sign === null ? null : sign;
-  const signSize = Math.min(g.sign.h * 0.78, w * 0.13);
+  const signSize = Math.min(g.sign.h * 0.78, w * (mini ? 0.2 : 0.13));
   return (
     <>
       {/* roof units (behind the parapet line) */}
