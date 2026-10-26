@@ -6,9 +6,11 @@
 //   "3 Cream & Cobalt"  video 2's main palette, the same shot without the sister shift (for comparison)
 // Shot (docs/v2/storyboard_g3.md P8; CINEMATIC_GUIDE S1; COZY_AND_SCALE 4 K3): the camera has risen over a low stone
 // wall (its coping a dark mass across the bottom); the Pentagon at dusk, too big for the frame (cut by both side
-// edges), seen across a distance from a shallow raised angle (a true ground-level view hides the five sides); rows of
-// identical parked cars at its foot are the ruler; haze planes lighter with distance; the caption band (y 317-556) is
-// flat sky. Fairness (CORE_LINE 2): a plain building, no flags, figures, vehicles other than parked cars, weapons, text
+// edges), seen across a distance from a low raised angle (~15 deg; a true ground-level view hides the five sides); four
+// rows of identical parked cars and hairline lamp posts at its foot are the ruler; haze planes lighter with distance; a
+// flat dusk sky in steps (caption sky, lilac band, peach glow, the low sun with one halo ring as in v1 @31); the caption
+// band (y 317-556) is flat sky. The wall: a mid-dark face (L* 38-39) under a lighter coping, only its lip and joints
+// anchor-dark (PALETTE: L* <= 40 stays a small share of a held frame). Fairness (CORE_LINE 2): a plain building, no flags, figures, vehicles other than parked cars, weapons, text
 // or "Google"; no glow, rim or hero colour on it. Hero (cobalt / indigo) is hers only, so it is absent here; no pop.
 // The move: the rise lands at 2.08 s (on "AI"), then holds; the wall drops on its own outSine over the panel (2.48 s).
 // Render the landing: npx remotion still src/entry-v2.tsx StylePentagon out.png --frame=140 --props='{"palette":"6 Dusk"}'
@@ -33,8 +35,11 @@ export type PentPal = {
   hl: string; // caption highlight box
   // sky (the page)
   sky: string;
+  dusk: string; // the band between the caption sky and the glow (flat step, below y 556)
   glow: string; // the warm horizon band (v1's peach band behind the skyline)
+  halo: string; // one flat ring round the sun (v1 @31; CINEMATIC rule 4: 1-2 rings, no bloom)
   sun: string; // the low sun (the palette's disc)
+  post: string; // lamp posts in the lot (a second ruler), hairline
   // haze planes, far -> near
   far: string; // far city, fill only
   woods: string; // the woods behind the building, fill only
@@ -75,10 +80,13 @@ const DUSK: PentPal = {
   ink: '#1C1A26',
   hl: '#F3B27E',
   sky: '#A9B5EC',
+  dusk: '#C7B9EA',
   glow: '#F7CDB3',
+  halo: '#F6C29E',
   sun: '#F3B27E',
+  post: '#3A3570',
   far: '#B4AEDF',
-  woods: '#8784C6',
+  woods: '#9893D3',
   roof: '#BEBDE8',
   well: '#7C78BA',
   facade: '#716DB0',
@@ -96,12 +104,12 @@ const DUSK: PentPal = {
   wheel: '#1F1C33',
   road: '#B3B0E1',
   roadLine: '#F3D2B8',
-  verge: '#6F6BAE',
-  bush: '#5A5699',
-  coping: '#6A5F98',
-  lip: '#2E2750',
-  wall: '#463D73',
-  joint: '#2A2349',
+  verge: '#716AAE',
+  bush: '#5E5498',
+  coping: '#7E6BA6',
+  lip: '#2F2346',
+  wall: '#5E4F8C',
+  joint: '#2C2045',
 };
 
 /** 3 Cream & Cobalt, kept warm (playbook): the cream page as the sky, a peach band and the peach disc low on it,
@@ -112,8 +120,11 @@ const COBALT: PentPal = {
   ink: '#2B1B0A',
   hl: '#F6B892',
   sky: '#F3E6D6',
-  glow: '#F9D9C1',
+  dusk: '#F7DFCB',
+  glow: '#F9D2B6',
+  halo: '#F8C7A5',
   sun: '#F6B892',
+  post: '#6A4A3A',
   far: '#EBC4AA',
   woods: '#D9997D',
   roof: '#F5DFCC',
@@ -135,10 +146,10 @@ const COBALT: PentPal = {
   roadLine: '#D9A889',
   verge: '#CB8C70',
   bush: '#B4705A',
-  coping: '#6F6283',
-  lip: '#24233A',
-  wall: '#45405F',
-  joint: '#2B2A44',
+  coping: '#94708A',
+  lip: '#2B2A44',
+  wall: '#714F6A',
+  joint: '#3A2C40',
 };
 
 export const PENTAGON_PALETTES: Record<string, PentPal> = {[DUSK.name]: DUSK, [COBALT.name]: COBALT};
@@ -152,8 +163,9 @@ export function pentPalette(name?: string): PentPal {
 
 // ---------------------------------------------------------------- the camera: one perspective for building + lot
 // Plan in metres: X right, Z away from us (the front facade at Z = 0), Y up. Real plan (281 m sides, a 5-acre court);
-// the height is raised 23.5 -> 32 m so the facade carries five window rows. The numbers solve for the landing frame:
-// front corners at x 40 / 1040 (the side vertices fall outside the frame), roof front edge y 1040, apex y 640.
+// the height is raised 23.5 -> 44 m (the board's tall front wall; it lowers the angle to ~15 deg, the roof depth falls
+// from 400 to 290 px while the five rings and the court still read). The numbers solve for the landing frame:
+// front corners at x 40 / 1040 (the side vertices fall outside the frame), roof front edge y 1000, apex y 710.
 
 const D36 = Math.PI / 5;
 const EDGE = 281;
@@ -166,11 +178,11 @@ const WELLS: [number, number][] = [
   [118, 124],
   [94, 100],
 ]; // light wells (inradius ranges), outside in
-const HB = 32;
+const HB = 44;
 const DC = 900; // camera -> front face
 const HALF = 500;
-const ROOF_FRONT_Y = 1040;
-const APEX_Y = 640;
+const ROOF_FRONT_Y = 1000;
+const APEX_Y = 710;
 const F = (HALF * DC) / (EDGE / 2);
 const A_ = ((ROOF_FRONT_Y - APEX_Y) * DC * (DC + R_OUT + RI_OUT)) / (R_OUT + RI_OUT); // (camera height - HB) * F
 const HY = ROOF_FRONT_Y - A_ / DC;
@@ -199,13 +211,18 @@ type PP = {P: PentPal};
 
 // ---------------------------------------------------------------- sky: flat page, the warm band, the low sun
 
-const GLOW_TOP = 618;
-const SUN = {cx: 930, cy: 668, r: 60};
+const DUSK_TOP = 586; // below the caption band (556) even at the cut (the far layer starts 14 px higher)
+const GLOW_TOP = 640;
+const SUN = {cx: 905, cy: 690, r: 62};
+const HALO = 98; // ring top y 592
 
+const disc = (r: number) => roundRect(SUN.cx - r, SUN.cy - r, r * 2, r * 2, r);
 const SkyBand: React.FC<PP> = ({P}) => (
   <>
+    <Fill rect={[-300, DUSK_TOP, 1680, 600]} color={P.dusk} offset={false} />
     <Fill rect={[-300, GLOW_TOP, 1680, 520]} color={P.glow} offset={false} />
-    <Fill d={roundRect(SUN.cx - SUN.r, SUN.cy - SUN.r, SUN.r * 2, SUN.r * 2, SUN.r)} color={P.sun} offset={false} />
+    <Fill d={disc(HALO)} color={P.halo} offset={false} />
+    <Fill d={disc(SUN.r)} color={P.sun} offset={false} />
   </>
 );
 
@@ -215,8 +232,8 @@ const Birds: React.FC<{P: PentPal; t: number}> = ({P, t}) => {
     const f = 0.55 + 0.45 * Math.sin(t * 7 + ph); // wing beat
     return `M${x - s} ${y - s * 0.5 * f}Q${x - s * 0.45} ${y - s * 0.75 * f} ${x} ${y}Q${x + s * 0.45} ${y - s * 0.75 * f} ${x + s} ${y - s * 0.5 * f}`;
   };
-  const dx = -10 * t;
-  return <Ink d={b(756 + dx, 622, 11, 0) + b(790 + dx * 1.2, 640, 8, 1.7)} width={W_THIN} color={P.ink} taper={false} />;
+  const dx = -12 * t;
+  return <Ink d={b(712 + dx, 618, 15, 0) + b(758 + dx * 1.2, 640, 11, 1.7)} width={W_THIN} color={P.ink} taper={false} />;
 };
 
 // ---------------------------------------------------------------- far planes (fill only, no ink: haze)
@@ -228,10 +245,10 @@ const FarCity: React.FC<PP> = ({P}) => {
     const w = r.range(26, 74);
     const h = r.chance(0.12) ? r.range(52, 66) : r.range(14, 44);
     d += polyPath([
-      [x, 760],
-      [x, 702 - h],
-      [x + w, 702 - h],
-      [x + w, 760],
+      [x, 800],
+      [x, 724 - h],
+      [x + w, 724 - h],
+      [x + w, 800],
     ]);
     x += w + (r.chance(0.3) ? r.range(4, 18) : -r.range(0, 8));
   }
@@ -243,7 +260,7 @@ const Woods: React.FC<PP> = ({P}) => {
   const crowns: string[] = [];
   for (let x = -60; x < 1140; ) {
     const rx = r.range(34, 62);
-    crowns.push(crown(x + rx, 716 + r.range(-6, 8), rx, r.range(20, 30), {seed: `wd${Math.round(x)}`, bumps: 6, round: 0.7}));
+    crowns.push(crown(x + rx, 742 + r.range(-6, 8), rx, r.range(20, 30), {seed: `wd${Math.round(x)}`, bumps: 6, round: 0.7}));
     x += rx * r.range(1.3, 1.7);
   }
   return (
@@ -251,7 +268,7 @@ const Woods: React.FC<PP> = ({P}) => {
       {crowns.map((c, i) => (
         <Fill key={i} d={c} color={P.woods} offset={false} />
       ))}
-      <Fill rect={[-300, 720, 1680, 500]} color={P.woods} offset={false} />
+      <Fill rect={[-300, 746, 1680, 500]} color={P.woods} offset={false} />
     </>
   );
 };
@@ -314,13 +331,15 @@ const Pentagon: React.FC<PP> = ({P}) => {
   }
   // creases where the rings meet at the corners
   const creases = court.map((c, k) => line(...proj(c[0], c[1], HB), ...proj(outer[k][0], outer[k][1], HB), {over: [0, 0], seed: `cr${k}`, breaks: false})).join('');
-  const roofInk = [0, 1, 2, 3, 4].map((k) => line(...roof[k], ...roof[(k + 1) % 5], {over: 'small', seed: `ro${k}`})).join('');
+  const roofInk = [1, 2, 3, 4].map((k) => line(...roof[k], ...roof[(k + 1) % 5], {over: 'small', seed: `ro${k}`})).join('');
   const faceInk =
+    line(...base[4], ...base[0], {over: [0, 0], seed: 'b0'}) +
+    line(...base[1], ...base[2], {over: [0, 0], seed: 'b2'});
+  const frontInk =
+    line(...roof[0], ...roof[1], {over: 'small', seed: 'rf'}) +
     vline(roof[0][0], roof[0][1], base[0][1], {over: [0, 2], seed: 'c0'}) +
     vline(roof[1][0], roof[1][1], base[1][1], {over: [0, 2], seed: 'c1'}) +
-    line(...base[4], ...base[0], {over: [0, 0], seed: 'b0'}) +
-    line(...base[0], ...base[1], {over: 'small', seed: 'b1'}) +
-    line(...base[1], ...base[2], {over: [0, 0], seed: 'b2'});
+    line(...base[0], ...base[1], {over: 'small', seed: 'b1'});
   const holeInk = [0, 1, 2, 3, 4].map((k) => line(...hole[k], ...hole[(k + 1) % 5], {over: [0, 0], seed: `ho${k}`, breaks: false})).join('');
   return (
     <>
@@ -358,6 +377,7 @@ const Pentagon: React.FC<PP> = ({P}) => {
       </g>
       <Ink d={holeInk} width={W_HAIR} color={P.ink} />
       <Ink d={roofInk + faceInk} width={W_THIN} color={P.ink} />
+      <Ink d={frontInk} width={W_MID} color={P.ink} />
     </>
   );
 };
@@ -365,9 +385,10 @@ const Pentagon: React.FC<PP> = ({P}) => {
 // ---------------------------------------------------------------- the lot: rows of identical parked cars (the ruler)
 
 const CAR_M = 8.2; // car length in plan metres (4.7 m drawn 1.75x so it reads; the building is 1.36x too)
-const ROWS = [-24, -80, -136];
-const LOT_END = -170;
-const ROAD: [number, number] = [-172, -194];
+const ROWS = [-22, -70, -118, -166];
+const MEDIANS = [-46, -94, -142];
+const LOT_END = -192;
+const ROAD: [number, number] = [-196, -220];
 
 /** One car, side view, facing right, length L, wheels on (x, y). Returns [body, glass, wheels] paths. */
 function carPaths(x: number, y: number, L: number): [string, string, string] {
@@ -387,9 +408,27 @@ const LotGround: React.FC<PP> = ({P}) => {
 
 const Lot: React.FC<PP> = ({P}) => {
   const top = groundY(0);
-  const lines = [-52, -108, -164].map((Z, i) => {
+  const lines = MEDIANS.map((Z, i) => {
     const y = groundY(Z);
     return <Fill key={i} rect={[-60, y - 0.25 * kAt(Z), 1200, Math.max(2, 0.5 * kAt(Z))]} color={P.lotLine} offset={false} />;
+  });
+  // lamp posts on the medians (a second ruler, ~10 m): hairline poles with a small head, sparse and staggered
+  const pr = rng('p8/posts');
+  const posts = MEDIANS.map((Z, i) => {
+    const k = kAt(Z);
+    const y = groundY(Z);
+    let pole = '';
+    let head = '';
+    for (let x = 90 + (i % 2) * 150 + pr.range(-30, 30); x < 1060; x += pr.range(270, 330)) {
+      pole += vline(x, y - 10 * k, y, {over: [0, 0], seed: `pp${i}-${Math.round(x)}`, breaks: false});
+      head += line(x - 1.4 * k, y - 10 * k, x + 1.4 * k, y - 10 * k, {over: [0, 0], seed: `ph${i}-${Math.round(x)}`, breaks: false});
+    }
+    return (
+      <React.Fragment key={`p${i}`}>
+        <Ink d={pole} width={W_HAIR} color={P.post} taper={false} />
+        <Ink d={head} width={W_THIN} color={P.post} taper={false} />
+      </React.Fragment>
+    );
   });
   const rows = ROWS.map((Z, ri) => {
     const r = rng(`p8/row${ri}`);
@@ -418,7 +457,8 @@ const Lot: React.FC<PP> = ({P}) => {
     <>
       <Fill rect={[-300, top, 1680, groundY(-7) - top]} color={P.walk} offset={false} />
       {lines}
-      {rows}
+      {/* far to near: each median's posts stand between the row behind it and the row in front */}
+      {rows.flatMap((row, i) => (i < posts.length ? [row, posts[i]] : [row]))}
     </>
   );
 };
@@ -460,7 +500,7 @@ const Hedge: React.FC<PP> = ({P}) => {
 
 // ---------------------------------------------------------------- the wall (foreground, the dark mass we rose over)
 
-const WALL_Y = 1664; // the coping's top edge at the landing
+const WALL_Y = 1640; // the coping's top edge at the landing
 
 const Wall: React.FC<PP> = ({P}) => {
   const top = WALL_Y;
@@ -470,7 +510,8 @@ const Wall: React.FC<PP> = ({P}) => {
   // coping joints (slabs ~250 px) and stone courses on the face, staggered
   let joints = '';
   for (let x = r.range(60, 180); x < 1080; x += r.range(230, 290)) joints += line(x, top + 3, x + 6, lipY - 2, {over: [0, 0], seed: `cj${Math.round(x)}`});
-  const courses = [faceY + 70, faceY + 140, faceY + 210];
+  // courses all the way down: at the cut the wall stands 700 px higher and fills the frame from y ~940
+  const courses = Array.from({length: 14}, (_, i) => faceY + 70 * (i + 1));
   courses.forEach((y, i) => (joints += hline(-40, 1120, y, {seed: `wc${i}`, over: [0, 0]})));
   [faceY, ...courses].forEach((y0, i) => {
     for (let x = (i % 2) * 90 + r.range(40, 110); x < 1080; x += r.range(150, 210)) joints += vline(x, y0 + 4, y0 + 66, {over: [0, 0], seed: `wv${i}-${Math.round(x)}`});

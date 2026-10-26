@@ -10,20 +10,22 @@
 // Shot: docs/v2/storyboard_g3.md O1 (HOME BASE desk, COZY, INSERT high 3/4, PULL OUT 1.05 -> 1.00 ease-in over 6.12 s):
 // the contract in a golden lamp pool, signed, the clause "no criticizing / Google" highlighted, her sleeve holding the
 // highlighter, her GOOGLE badge (hand-lettered) dropped in a cardboard box with its lanyard spilling over the rim, a
-// steaming mug, a pen; a bookcase cut by the top on the left and a dusk window cut by the right edge (only the gutters
-// rise through y 317-556); the lamp head cut by the right edge. Frame-0 words in screen space on the flat wall.
+// steaming mug, a pen; a bookcase cut by the top on the left with a short wall shelf + trailing plant (the top-edge
+// object, above the words), a dusk window cut by the right edge (only the gutters rise through y 317-556); the lamp
+// head cut by the right edge; a wastebasket in the knee space. Frame-0 words in screen space on the flat wall.
+// Finals (frame 0, full scale): review/look/v2_g4/desk_A.png / desk_B.png / desk_C.png.
 // Fairness: generic figure (sleeve + hand only), no logo, no military imagery.
 // Render: npx remotion still src/entry-v2.tsx StyleDesk out.png --props='{"palette":"A"}'
 
-import React, {useId} from 'react';
+import React, {createContext, useContext, useId} from 'react';
 import {AbsoluteFill} from 'remotion';
-import {Ink} from '../lib/Ink';
-import {Fill} from '../lib/Fill';
+import {Ink as KitInk, InkProps, parseInk} from '../lib/Ink';
+import {bbox, Fill as KitFill, FillProps} from '../lib/Fill';
 import {skyCaption, skyHighlightBox, stroke} from '../lib/theme';
-import {blob, circle, crown, ellipse, glint, hline, line, poly, polyPath, Pt, rect, roundRect, smooth, textLines, vline} from '../lib/sketch';
+import {blob, circle, crown, ellipse, glint, hline, line, poly, polyPath, Pt, rect, rectPath, roundRect, smooth, textLines, vline} from '../lib/sketch';
 import {rng} from '../lib/rng';
-import {useTime} from '../lib/time';
-import {mat, Mat, XG} from '../lib/xf';
+import {prog, useTime} from '../lib/time';
+import {mat, Mat, useXf, XG} from '../lib/xf';
 import {captionFontStack, measureCaption, useCaptionFont} from '../lib/font';
 
 // ---------------------------------------------------------------- palettes (roles -> hex, from docs/look/palettes.json)
@@ -187,8 +189,8 @@ const SAGE: DeskPal = {
   desk: '#D49A72',
   deskFront: '#B87C58',
   deskShade: '#C38960',
-  floor: '#C49470',
-  under: '#9A6A4E',
+  floor: '#CC9068',
+  under: '#A66A4C',
   ring: '#F2D49B',
   core: '#F0E2BF',
   paper: '#FBF8EE',
@@ -197,7 +199,7 @@ const SAGE: DeskPal = {
   boxSide: '#CC9C66',
   boxIn: '#A06E46',
   pot: '#C98A64',
-  leaf: '#22332C',
+  leaf: '#4E7A5C',
   frame: '#B87C58',
   badge: '#FBF8EE',
   badgeBand: '#F2D49B',
@@ -232,15 +234,59 @@ export function deskPalette(name?: string): DeskPal {
   return COBALT;
 }
 
+// ---------------------------------------------------------------- the opening build (StyleDeskOpen.tsx)
+// Without a provider every piece renders as the finished style frame (StyleDesk). Inside <DeskBuild.Provider> the
+// scene is MADE: each ink drawing draws on when the ink wave reaches its centre, each fill is plain paper until the
+// colour wave reaches its centre, then flips whole in one frame (the engine's opening cascade, ENGINE.md <Look>), and
+// the hand lettering writes on left to right. Centres are world points (the camera removed via `uncam`).
+
+export type DeskBuildV = {
+  /** Draw-on start (s) of an ink drawing centred at world point c. */
+  inkAt: (c: Pt) => number;
+  /** Time (s) the colour reaches world point c (paper before). */
+  colourAt: (c: Pt) => number;
+  /** The bare-line state's paper colour. */
+  paper: string;
+  /** Inverse of the camera matrix (screen -> world). */
+  uncam: Mat;
+  /** The signature's own draw-on (pace free). */
+  sig?: {at: number; dur: number};
+};
+export const DeskBuild = createContext<DeskBuildV | null>(null);
+
+const worldCentre = (b: DeskBuildV, m: Mat, d: string): Pt => {
+  const bb = bbox(d);
+  return apply(mat.mul(b.uncam, m), bb.x + bb.w / 2, bb.y + bb.h / 2);
+};
+
+/** Kit Fill; paper until the colour wave reaches it (inside a DeskBuild). */
+const Fill: React.FC<FillProps> = (p) => {
+  const b = useContext(DeskBuild);
+  const m = useXf();
+  const t = useTime();
+  if (!b) return <KitFill {...p} />;
+  const d = p.d ?? (p.rect ? rectPath(p.rect[0], p.rect[1], p.rect[2], p.rect[3]) : '');
+  return <KitFill {...p} color={t < b.colourAt(worldCentre(b, m, d)) ? b.paper : p.color} />;
+};
+
+/** Kit Ink; draws on when the ink wave reaches it (inside a DeskBuild; big groups draw all strokes at once). */
+const Ink: React.FC<InkProps> = (p) => {
+  const b = useContext(DeskBuild);
+  const m = useXf();
+  if (!b || p.at !== undefined) return <KitInk {...p} />;
+  const n = parseInk(p.d).subs.length;
+  return <KitInk {...p} at={b.inkAt(worldCentre(b, m, p.d))} order={n > 5 ? 'all' : p.order} />;
+};
+
 // ---------------------------------------------------------------- layout (canvas px at camera rest)
 
 const DESK_BACK = 668; // the desk's back edge (the wall line)
-const DESK_FRONT = 1300; // the desk's front edge
-const APRON = 76; // front face height
-const DESK_R: [number, number] = [996, 1036]; // the desk's right end, back -> front (it widens toward us)
-const LEG = {x: 1000, w: 30, foot: 1700};
+export const DESK_FRONT = 1384; // the desk's front edge
+export const APRON = 76; // front face height
+const DESK_R: [number, number] = [996, 1044]; // the desk's right end, back -> front (it widens toward us)
+const LEG = {x: 1006, w: 30, foot: 1768};
 const FLOOR_Y = 1080; // the wall-floor line past the desk's right end
-const PAGE = {x: 334, y: 704, w: 420, h: 500, rot: -2.5};
+export const PAGE = {x: 334, y: 704, w: 420, h: 500, rot: -2.5};
 const POOL = {cx: 575, cy: 965, rx: 380, ry: 255};
 const REVEAL_X = 932; // the window's wall opening (only the right gutter rises through the caption band)
 const FRAME_X = 950;
@@ -258,14 +304,37 @@ const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 const apply = (m: Mat, x: number, y: number): Pt => [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]];
 const add = (a: Pt, b: Pt, k = 1): Pt => [a[0] + b[0] * k, a[1] + b[1] * k];
 const dirDeg = (deg: number): Pt => [Math.cos((deg * Math.PI) / 180), Math.sin((deg * Math.PI) / 180)];
-const PAGE_M: Mat = mat.compose(mat.translate(PAGE.x + PAGE.w / 2, PAGE.y + PAGE.h / 2), mat.rotate(PAGE.rot), mat.translate(-PAGE.w / 2, -PAGE.h / 2));
+export const PAGE_M: Mat = mat.compose(mat.translate(PAGE.x + PAGE.w / 2, PAGE.y + PAGE.h / 2), mat.rotate(PAGE.rot), mat.translate(-PAGE.w / 2, -PAGE.h / 2));
 
 /** Hand-lettered text (the caption hand font), SVG text in the current coordinates. */
-const Letter: React.FC<{x: number; y: number; size: number; fill: string; anchor?: 'start' | 'middle'; children: React.ReactNode}> = ({x, y, size, fill, anchor = 'start', children}) => (
-  <text x={x} y={y} fontFamily={captionFontStack} fontSize={size} fill={fill} textAnchor={anchor}>
-    {children}
-  </text>
-);
+/** A pointed leaf: from its stem (x, y) toward `deg`, length `len`. */
+const leafPath = (x: number, y: number, len: number, deg: number): string => {
+  const u = dirDeg(deg);
+  const n: Pt = [-u[1], u[0]];
+  const w = len * 0.42;
+  const tip = add([x, y], u, len);
+  const c1 = add(add([x, y], u, len * 0.5), n, w);
+  const c2 = add(add([x, y], u, len * 0.5), n, -w);
+  return `M${x} ${y}Q${c1[0]} ${c1[1]} ${tip[0]} ${tip[1]}Q${c2[0]} ${c2[1]} ${x} ${y}Z`;
+};
+
+const Letter: React.FC<{x: number; y: number; size: number; fill: string; anchor?: 'start' | 'middle'; children: React.ReactNode}> = ({x, y, size, fill, anchor = 'start', children}) => {
+  const b = useContext(DeskBuild);
+  const m = useXf();
+  const t = useTime();
+  let style: React.CSSProperties | undefined;
+  if (b) {
+    // inside a DeskBuild the words write on, left to right, when the ink wave reaches them
+    const p = prog(t, b.inkAt(apply(mat.mul(b.uncam, m), x + size, y - size * 0.35)), 0.2);
+    if (p <= 0) return null;
+    if (p < 1) style = {clipPath: `inset(-30% ${((1 - p) * 100).toFixed(1)}% -30% -5%)`};
+  }
+  return (
+    <text x={x} y={y} fontFamily={captionFontStack} fontSize={size} fill={fill} textAnchor={anchor} style={style}>
+      {children}
+    </text>
+  );
+};
 
 // ---------------------------------------------------------------- the bookcase (left, cut by the top; the gutter only)
 
@@ -303,7 +372,7 @@ const Books: React.FC<{P: DeskPal; x0: number; x1: number; base: number; hMin: n
 
 const BC = {x0: -40, up: 76, upW: 20, boards: [-10, 226, 588]};
 
-const Bookcase: React.FC<PP> = ({P}) => {
+export const Bookcase: React.FC<PP> = ({P}) => {
   const ux = BC.up;
   let boards = '';
   BC.boards.forEach((y, i) => {
@@ -325,7 +394,7 @@ const Bookcase: React.FC<PP> = ({P}) => {
 };
 
 /** Three books lying flat at the desk's back-left (abundance at the edges). */
-const BookStack: React.FC<PP> = ({P}) => {
+export const BookStack: React.FC<PP> = ({P}) => {
   const bk: [number, number, number, string][] = [
     [-40, 684, 150, P.books[1]],
     [-40, 660, 128, P.books[4]],
@@ -342,6 +411,72 @@ const BookStack: React.FC<PP> = ({P}) => {
           </React.Fragment>
         );
       })}
+    </>
+  );
+};
+
+/** The top-edge object (COZY 2): a short wall shelf off the bookcase, its books cut by the top at frame 0, a pot whose
+ *  trailing plant hangs over the board (a sign of care). Stays above y 250, left of the words. */
+export const TopShelf: React.FC<PP> = ({P}) => {
+  const x0 = BC.up + BC.upW;
+  const x1 = 404;
+  const y = 176;
+  const pot: Pt[] = [
+    [292, 132],
+    [340, 132],
+    [334, y],
+    [298, y],
+  ];
+  const vines: Pt[][] = [
+    [
+      [304, 170],
+      [294, 196],
+      [298, 222],
+      [288, 246],
+    ],
+    [
+      [326, 172],
+      [340, 198],
+      [336, 220],
+      [352, 238],
+    ],
+  ];
+  // [stem x, stem y, direction deg]
+  const leaves: [number, number, number][] = [
+    [296, 190, 160],
+    [298, 212, 20],
+    [292, 236, 165],
+    [292, 248, 70],
+    [338, 192, 15],
+    [337, 214, 165],
+    [346, 232, 25],
+    [352, 240, 95],
+  ];
+  const brackets = [x0 + 34, x1 - 46].map((bx) => [
+    [bx, y + 16],
+    [bx + 30, y + 16],
+    [bx, y + 50],
+  ] as Pt[]);
+  return (
+    <>
+      <Books P={P} x0={x0 + 8} x1={252} base={y} hMin={162} hMax={198} seed="top2" />
+      {brackets.map((b, i) => (
+        <React.Fragment key={i}>
+          <Fill d={polyPath(b)} color={P.shelf} seed={`brk${i}`} />
+          <Ink d={poly(b, {closed: true, seed: `brkI${i}`, over: [0, 0]})} width={W_THIN} />
+        </React.Fragment>
+      ))}
+      <Fill d={polyPath(pot)} color={P.pot} seed="tpot" />
+      <Ink d={poly(pot, {closed: true, seed: 'tpotI', over: 'small'})} width={W_THIN} />
+      <Fill d={crown(316, 118, 34, 30, {seed: 'tleaf', bumps: 7, round: 0.7})} color={P.leaf} seed="tleafF" />
+      <Ink d={crown(316, 118, 34, 30, {seed: 'tleaf', bumps: 7, round: 0.7})} width={W_THIN} open={0.3} />
+      <Fill rect={[x0, y, x1 - x0, 16]} color={P.shelf} seed="tboard" />
+      <Ink d={rect(x0, y, x1 - x0, 16, {seed: 'tboardI', over: [0, 2], edges: 'tbr'})} width={W_MID} />
+      <Ink d={vines.map((v) => smooth(v)).join('')} width={W_THIN} />
+      {leaves.map(([lx, ly, deg], i) => (
+        <Fill key={i} d={leafPath(lx, ly, 24, deg)} color={P.leaf} offset={false} />
+      ))}
+      <Ink d={leaves.map(([lx, ly, deg]) => leafPath(lx, ly, 24, deg)).join('')} width={W_HAIR} open={0.35} />
     </>
   );
 };
@@ -379,8 +514,10 @@ const Outside: React.FC<{P: DeskPal; t: number}> = ({P, t}) => {
   );
 };
 
-const WindowView: React.FC<{P: DeskPal; t: number}> = ({P, t}) => {
+export const WindowView: React.FC<{P: DeskPal; t: number}> = ({P, t}) => {
   const id = 'v2glass' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const b = useContext(DeskBuild);
+  const paper = b !== null && t < b.colourAt([GLASS_X + 100, 330]);
   return (
     <>
       {/* the reveal (wall depth), the frame band, the glass */}
@@ -391,9 +528,7 @@ const WindowView: React.FC<{P: DeskPal; t: number}> = ({P, t}) => {
           <rect x={GLASS_X} y={-60} width={240} height={SILL_Y + 60} />
         </clipPath>
       </defs>
-      <g clipPath={`url(#${id})`}>
-        <Outside P={P} t={t} />
-      </g>
+      <g clipPath={`url(#${id})`}>{paper ? <rect x={GLASS_X - 10} y={-60} width={240} height={SILL_Y + 80} fill={b.paper} /> : <Outside P={P} t={t} />}</g>
       <Fill rect={[GLASS_X, TRANSOM_Y, 200, 14]} color={P.trim} offset={false} />
       <Ink d={vline(REVEAL_X, -40, SILL_Y, {over: [0, 0], seed: 'rv'}) + vline(GLASS_X, -40, SILL_Y, {over: [0, 0], seed: 'gl'}) + rect(GLASS_X, TRANSOM_Y, 200, 14, {seed: 'tr', over: [0, 0], edges: 'tb'})} width={W_MID} />
       <Ink d={glint(1000, 560 - 150, 40, {seed: 'wglint'})} width={W_THIN} color={P.star} />
@@ -406,7 +541,7 @@ const WindowView: React.FC<{P: DeskPal; t: number}> = ({P, t}) => {
 
 // ---------------------------------------------------------------- the room below: wall strip, floor, desk
 
-const Floor: React.FC<PP> = ({P}) => (
+export const Floor: React.FC<PP> = ({P}) => (
   <>
     {/* past the desk's right end: the wall, a baseboard, the floor behind */}
     <Fill rect={[DESK_R[0] - 20, FLOOR_Y - 18, 200, 18]} color={P.wallShade} offset={false} />
@@ -416,11 +551,11 @@ const Floor: React.FC<PP> = ({P}) => (
     <Fill rect={[-60, DESK_FRONT + APRON, LEG.x + 60, LEG.foot - DESK_FRONT - APRON]} color={P.under} offset={false} />
     <Fill d={polyPath([[-60, LEG.foot - 4], [1140, LEG.foot + 14], [1140, 2000], [-60, 2000]])} color={P.floor} offset={false} />
     <Ink d={line(-60, LEG.foot - 4, LEG.x, LEG.foot + 11, {seed: 'fl0', over: [0, 0]})} width={W_THIN} />
-    <Ink d={line(120, 1790, 1140, 1806, {seed: 'fl1', over: [0, 0]}) + line(-60, 1872, 1140, 1892, {seed: 'fl2', over: [0, 0]})} width={W_HAIR} />
+    <Ink d={line(120, 1838, 1140, 1856, {seed: 'fl1', over: [0, 0]}) + line(-60, 1912, 1140, 1934, {seed: 'fl2', over: [0, 0]})} width={W_HAIR} />
   </>
 );
 
-const Desk: React.FC<PP> = ({P}) => {
+export const Desk: React.FC<PP> = ({P}) => {
   const top: Pt[] = [
     [-60, DESK_BACK],
     [DESK_R[0], DESK_BACK],
@@ -442,16 +577,52 @@ const Desk: React.FC<PP> = ({P}) => {
       <Fill d={blob(POOL.cx, POOL.cy, POOL.rx, POOL.ry, {seed: 'pool1', wobble: 0.02})} color={P.ring} offset={false} />
       <Fill d={blob(POOL.cx - 8, POOL.cy - 4, POOL.rx * 0.64, POOL.ry * 0.64, {seed: 'pool2', wobble: 0.025})} color={P.core} offset={false} />
       {/* wood grain, a few hairlines outside the pool */}
-      <Ink d={line(40, 1236, 236, 1240, {seed: 'gr1', over: [0, 0]}) + line(760, 712, 960, 716, {seed: 'gr2', over: [0, 0]}) + line(880, 1250, 1010, 1253, {seed: 'gr3', over: [0, 0]})} width={W_HAIR} />
+      <Ink d={line(40, 1236, 236, 1240, {seed: 'gr1', over: [0, 0]}) + line(760, 712, 960, 716, {seed: 'gr2', over: [0, 0]}) + line(860, 1300, 1020, 1303, {seed: 'gr3', over: [0, 0]}) + line(600, 1346, 780, 1349, {seed: 'gr4', over: [0, 0]})} width={W_HAIR} />
+    </>
+  );
+};
+
+/** A wastebasket in the knee space (abundance at the edges; the dark under-desk is no dead block). */
+export const Basket: React.FC<PP> = ({P}) => {
+  const top = 1590;
+  const bot = 1738;
+  const body: Pt[] = [
+    [758, top],
+    [882, top],
+    [868, bot],
+    [772, bot],
+  ];
+  return (
+    <>
+      <Fill d={polyPath(body)} color={P.boxSide} seed="bsk" />
+      <Fill d={blob(820, top, 62, 13, {seed: 'bskO'})} color={P.boxIn} offset={false} />
+      {[
+        [800, top - 8, 22],
+        [840, top - 4, 17],
+      ].map(([bx, by, br], i) => (
+        <React.Fragment key={i}>
+          <Fill d={crown(bx, by, br, br * 0.85, {seed: `ball${i}`, bumps: 8, round: 0.55})} color={P.paperEdge} offset={false} />
+          <Ink d={crown(bx, by, br, br * 0.85, {seed: `ball${i}`, bumps: 8, round: 0.55}) + poly([[bx - br * 0.5, by - br * 0.2], [bx - br * 0.1, by + br * 0.15], [bx + br * 0.35, by - br * 0.3]], {seed: `crease${i}`, over: [0, 0]})} width={W_HAIR} />
+        </React.Fragment>
+      ))}
+      <Ink d={line(758, top, 772, bot, {seed: 'bsk1', over: [0, 0]}) + line(882, top, 868, bot, {seed: 'bsk2', over: [0, 0]}) + hline(772, 868, bot, {seed: 'bsk3', over: [0, 0]}) + ellipse(820, top, 62, 13, {seed: 'bskR'})} width={W_THIN} />
+      <Ink d={line(790, top + 30, 798, bot - 12, {seed: 'bw1', over: [0, 0]}) + line(820, top + 30, 820, bot - 12, {seed: 'bw2', over: [0, 0]}) + line(850, top + 30, 842, bot - 12, {seed: 'bw3', over: [0, 0]})} width={W_HAIR} />
     </>
   );
 };
 
 // ---------------------------------------------------------------- the cardboard box: she quit (badge + lanyard inside)
 
-const BOX = {fl: 36, fr: 280, bl: 56, br: 296, back: 800, rim: 930, bot: 1008};
+export const BOX = {fl: 36, fr: 280, bl: 56, br: 296, back: 800, rim: 930, bot: 1008};
 
-const Box: React.FC<{P: DeskPal; ok: boolean}> = ({P, ok}) => {
+/** The badge at rest in the box (world <- badge local). */
+export const BADGE_REST: Mat = mat.compose(mat.translate(170, 872), mat.rotate(-11));
+/** A badge in motion: its transform, and how far its lanyard has draped (0 = bunched behind it, 1 = over the rim). */
+export type BadgeState = {m: Mat; drape: number};
+
+/** The box. `badge`: omit = at rest, null = not there yet, else the badge in flight. `jolt` 0..1 squashes the box
+ *  (the badge landing), `tip` (deg) knocks the photo frame. */
+export const Box: React.FC<{P: DeskPal; ok: boolean; badge?: BadgeState | null; jolt?: number; tip?: number}> = ({P, ok, badge, jolt = 0, tip = 0}) => {
   const {fl, fr, bl, br, back, rim, bot} = BOX;
   const opening: Pt[] = [
     [fl, rim],
@@ -484,10 +655,9 @@ const Box: React.FC<{P: DeskPal; ok: boolean}> = ({P, ok}) => {
     [fr + 44, rim + 4],
   ];
   // the badge (its clip toward the back), lying on the folder
-  const bm = mat.compose(mat.translate(170, 872), mat.rotate(-11));
-  const clip = apply(bm, 0, -54);
-  const lanyard = smooth(
-    [
+  const bm = badge ? badge.m : BADGE_REST;
+  const clip = apply(BADGE_REST, 0, -54);
+  const restPts: Pt[] = [
       clip,
       [112, 822],
       [74, 856],
@@ -501,12 +671,20 @@ const Box: React.FC<{P: DeskPal; ok: boolean}> = ({P, ok}) => {
       [220, 896],
       [204, 858],
       add(clip, [12, 2]),
-    ],
-    {closed: true},
-  );
-  const frameM = mat.compose(mat.translate(252, 788), mat.rotate(7));
+  ];
+  // in flight: the rest shape in the badge's own frame, bunched toward its clip, carried by the badge
+  const inv = mat.inv(BADGE_REST);
+  const lanPts = badge
+    ? restPts.map((q0): Pt => {
+        const q = apply(inv, q0[0], q0[1]);
+        const k = 0.5 + 0.5 * badge.drape;
+        return apply(bm, q[0] * k, -54 + (q[1] + 54) * k);
+      })
+    : restPts;
+  const lanyard = smooth(lanPts, {closed: true});
+  const frameM = mat.compose(mat.translate(252, 788), mat.rotate(7 + tip));
   return (
-    <>
+    <XG m={jolt ? mat.about(mat.scale(1 + 0.015 * jolt, 1 - 0.04 * jolt), (fl + br) / 2, bot) : mat.I}>
       {/* contact shadow on the desk (warm, flat) */}
       <Fill d={polyPath([[fl - 30, bot - 6], [fr, bot - 6], [fr + 6, bot + 10], [fl - 40, bot + 12]])} color={P.deskShade} offset={false} />
       <Fill d={polyPath(flapBack)} color={P.box} seed="flb" />
@@ -535,6 +713,8 @@ const Box: React.FC<{P: DeskPal; ok: boolean}> = ({P, ok}) => {
       <Ink d={poly(flapL, {closed: true, seed: 'flLI', over: 'small'}) + poly(flapR, {closed: true, seed: 'flRI', over: 'small'})} width={W_MID} />
       <Ink d={rect(fl, rim, fr - fl, bot - rim, {seed: 'bxFI', over: 'small'}) + poly([[fr, bot], [br, back + (bot - rim)], [br, back]], {seed: 'bxRI', over: 'small'}) + line(bl, back, br, back, {seed: 'bxBI', over: 'small'})} width={W_MID} />
       <Ink d={hline(fl + 70, fr - 70, rim + 40, {seed: 'bxtape', over: [0, 0]}) + hline(fl + 70, fr - 70, rim + 50, {seed: 'bxtape2', over: [0, 0]})} width={W_HAIR} />
+      {badge === null ? null : (
+        <>
       {/* her lanyard (hero), spilling over the front rim; ribbon = ink under a narrower hero stroke */}
       <Ink d={lanyard} width={19} color={P.ink} taper={false} />
       <Ink d={lanyard} width={12.5} color={P.hero} taper={false} />
@@ -549,27 +729,29 @@ const Box: React.FC<{P: DeskPal; ok: boolean}> = ({P, ok}) => {
         <Fill d={`M-68 44Q-66 24 -51 22Q-36 24 -34 44Z`} color={P.badgeBand} offset={false} />
         <Ink d={rect(-72, -12, 42, 56, {seed: 'photoI', over: [0, 1]})} width={W_THIN} />
         {ok ? (
-          <Letter x={-22} y={18} size={37} fill={P.ink}>
+          <Letter x={-24} y={17} size={33} fill={P.ink}>
             GOOGLE
           </Letter>
         ) : null}
         <Ink d={textLines(-22, 32, 92, {n: 2, gap: 10, seed: 'bdgt', heading: false})} width={W_HAIR} />
       </XG>
-    </>
+        </>
+      )}
+    </XG>
   );
 };
 
 // ---------------------------------------------------------------- the contract (subject): signed, the clause highlighted
 
-type Clause = {size: number; rows: {txt: string; base: number; w: number}[]};
+export type Clause = {size: number; rows: {txt: string; base: number; w: number}[]};
 
-function clauseLayout(ok: boolean): Clause {
+export function clauseLayout(ok: boolean): Clause {
   const size = 50;
   const est = (s: string) => (ok ? measureCaption(s, size) : s.length * size * 0.42);
   return {size, rows: [{txt: 'no criticizing', base: 252, w: est('no criticizing')}, {txt: 'Google', base: 310, w: est('Google')}]};
 }
 
-const CL_X = 34;
+export const CL_X = 34;
 const bandPts = (x0: number, x1: number, by: number, s: number, seed: string): Pt[] => {
   const r = rng(seed);
   const t = by - s * 0.58;
@@ -583,28 +765,36 @@ const bandPts = (x0: number, x1: number, by: number, s: number, seed: string): P
 };
 
 /** The highlighter tip in world coords: the end of the band under "Google". */
-function tipPoint(cl: Clause): Pt {
+export function tipPoint(cl: Clause): Pt {
   const g = cl.rows[1];
   return apply(PAGE_M, CL_X + g.w + 10, g.base - cl.size * 0.22);
 }
 
-const Contract: React.FC<{P: DeskPal; ok: boolean; cl: Clause}> = ({P, ok, cl}) => {
+/** The contract. `bands`: how far the highlighter has run along each clause row (0..1, default done). `runOn`: how
+ *  far (px) the page has run on past its bottom edge (the opening: 2030, 2040, ... over the desk's front edge). */
+export const Contract: React.FC<{P: DeskPal; ok: boolean; cl: Clause; bands?: [number, number]; runOn?: number}> = ({P, ok, cl, bands = [1, 1], runOn = 0}) => {
   const {w, h} = PAGE;
-  const sig = smooth([
-    [214, 438],
-    [226, 410],
-    [236, 438],
-    [244, 418],
-    [258, 430],
-    [270, 404],
-    [278, 436],
-    [292, 420],
-    [310, 432],
-    [324, 414],
-    [336, 430],
-    [352, 424],
-    [380, 428],
-  ]);
+  const b = useContext(DeskBuild);
+  const SX = 18; // the signature block, shifted clear of her fingers
+  const sig = smooth(
+    (
+      [
+        [214, 438],
+        [226, 410],
+        [236, 438],
+        [244, 418],
+        [258, 430],
+        [270, 404],
+        [278, 436],
+        [292, 420],
+        [310, 432],
+        [324, 414],
+        [336, 430],
+        [352, 424],
+        [380, 428],
+      ] as Pt[]
+    ).map(([x, y]): Pt => [x + SX, y]),
+  );
   return (
     <XG m={PAGE_M}>
       <Fill rect={[5, 7, w, h]} color={P.paperEdge} offset={false} />
@@ -617,9 +807,9 @@ const Contract: React.FC<{P: DeskPal; ok: boolean; cl: Clause}> = ({P, ok, cl}) 
       ) : null}
       <Ink d={textLines(CL_X, 110, 352, {n: 4, gap: 26, seed: 'ct1', heading: false})} width={W_THIN} />
       {/* the highlighter band (the pop) under the clause's words, then the words */}
-      {cl.rows.map((r, i) => (
-        <Fill key={i} d={polyPath(bandPts(CL_X - 6, CL_X + r.w + 10, r.base, cl.size, `band${i}`))} color={P.pop} offset={false} />
-      ))}
+      {cl.rows.map((r, i) =>
+        bands[i] > 0 ? <Fill key={i} d={polyPath(bandPts(CL_X - 6, CL_X - 6 + Math.max(14, (r.w + 16) * bands[i]), r.base, cl.size, `band${i}`))} color={P.pop} offset={false} /> : null,
+      )}
       {ok
         ? cl.rows.map((r, i) => (
             <Letter key={i} x={CL_X} y={r.base} size={cl.size} fill={P.ink}>
@@ -630,15 +820,76 @@ const Contract: React.FC<{P: DeskPal; ok: boolean; cl: Clause}> = ({P, ok, cl}) 
       <Ink d={textLines(CL_X, 352, 352, {n: 2, gap: 26, seed: 'ct2', heading: false})} width={W_THIN} />
       {/* signed */}
       <Ink d={textLines(CL_X, 446, 118, {n: 1, seed: 'ctd', heading: false})} width={W_THIN} />
-      <Ink d={line(196, 432, 206, 444, {over: [0, 0], seed: 'x1'}) + line(206, 432, 196, 444, {over: [0, 0], seed: 'x2'})} width={W_THIN} />
-      <Ink d={hline(214, 392, 450, {seed: 'sigl', over: [0, 4]})} width={W_THIN} />
-      <Ink d={sig} width={W_MID} />
+      <Ink d={line(196 + SX, 432, 206 + SX, 444, {over: [0, 0], seed: 'x1'}) + line(206 + SX, 432, 196 + SX, 444, {over: [0, 0], seed: 'x2'})} width={W_THIN} />
+      <Ink d={hline(214 + SX, 392 + SX / 2, 450, {seed: 'sigl', over: [0, 4]})} width={W_THIN} />
+      {b?.sig ? <Ink d={sig} width={W_MID} at={b.sig.at} dur={b.sig.dur} pace="free" /> : <Ink d={sig} width={W_MID} />}
+      {runOn > 0 ? <RunOn P={P} L={runOn} /> : null}
     </XG>
   );
 };
 
+/** Mix two #RRGGBB colours (k = share of b). */
+const mixHex = (a: string, b: string, k: number): string => {
+  const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16));
+  const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
+  return '#' + pa.map((v, i) => Math.round(v + (pb[i] - v) * k).toString(16).padStart(2, '0')).join('');
+};
+
+const RUN_YEARS = [2030, 2040, 2050, 2060, 2070, 2080, 2090];
+const RUN_STEP = 234; // px of page per decade
+/** The page running on past its bottom edge (page-local coords, inside PAGE_M): the same paper, the clause's lines
+ *  going on, a year every RUN_STEP px, a rolled leading edge; past the desk's front edge it hangs (shaded, a crease). */
+const RunOn: React.FC<{P: DeskPal; L: number}> = ({P, L}) => {
+  const {w, h} = PAGE;
+  const y1 = h + L;
+  // the desk's front edge (world y DESK_FRONT) in page-local coords: y = (Y - b x - f) / d
+  const M = PAGE_M;
+  const edgeY = (x: number) => (DESK_FRONT - M[1] * x - M[5]) / M[3];
+  const e0 = edgeY(0);
+  const ew = edgeY(w);
+  const over = y1 > Math.min(e0, ew);
+  const shade = mixHex(P.paper, P.paperEdge, 0.55);
+  const r = rng('v2runon');
+  const rows: string[] = [];
+  const years: {y: number; label: number}[] = [];
+  for (let k = 0; k < RUN_YEARS.length; k++) {
+    const yy = h + 74 + k * RUN_STEP;
+    if (yy < y1 - 26) years.push({y: yy, label: RUN_YEARS[k]});
+  }
+  for (let i = 0, y = h + 30; y < y1 - 20; i++, y += 26) {
+    const lw = r.range(250, 352);
+    if (years.some((yr) => Math.abs(yr.y - 14 - y) < 24)) continue;
+    rows.push(hline(CL_X, CL_X + lw, y, {seed: `ro${i}`, over: [0, 0]}));
+  }
+  return (
+    <>
+      <Fill rect={[5, h, w, L]} color={P.paperEdge} offset={false} />
+      <Fill rect={[0, h - 1, w, L + 1]} color={P.paper} offset={false} />
+      {over ? <Fill d={polyPath([[0, e0], [w, ew], [w, y1], [0, y1]])} color={shade} offset={false} /> : null}
+      <Ink d={rows.join('')} width={W_THIN} />
+      {years.map((yr, i) => (
+        <React.Fragment key={i}>
+          <Ink d={hline(CL_X, 218, yr.y - 14, {seed: `ry${i}`, over: [0, 0]})} width={W_THIN} />
+          <Letter x={232} y={yr.y} size={42} fill={P.ink}>
+            {String(yr.label)}
+          </Letter>
+        </React.Fragment>
+      ))}
+      <Ink d={line(0, h, 0, y1, {seed: 'roL', over: [0, 0]}) + line(w, h, w, y1, {seed: 'roR', over: [0, 0]})} width={W_MID} taper={false} />
+      {over ? <Ink d={line(0, e0, w, ew, {seed: 'roE', over: [0, 0]})} width={W_THIN} taper={false} /> : null}
+      {/* the rolled leading edge */}
+      <XG m={mat.translate(0, y1)}>
+        <Fill d={roundRect(-8, -15, w + 16, 30, 14)} color={P.paper} offset={false} />
+        <Fill d={roundRect(-8, 1, w + 16, 14, 7)} color={P.paperEdge} offset={false} />
+        <Ink d={roundRect(-8, -15, w + 16, 30, 14, {seed: 'roll'})} width={W_MID} taper={false} />
+        <Ink d={ellipse(8, 0, 5, 9, {seed: 'rollA'}) + ellipse(w - 8, 0, 5, 9, {seed: 'rollB'})} width={W_HAIR} />
+      </XG>
+    </>
+  );
+};
+
 /** The signing pen, lying across the page's bottom-right corner. */
-const Pen: React.FC<PP> = ({P}) => {
+export const Pen: React.FC<PP> = ({P}) => {
   const a: Pt = [706, 1182];
   const b: Pt = [874, 1238];
   const ang = (Math.atan2(b[1] - a[1], b[0] - a[0]) * 180) / Math.PI;
@@ -659,7 +910,7 @@ const Pen: React.FC<PP> = ({P}) => {
 
 // ---------------------------------------------------------------- the mug (a sign of care; steam = a small slow loop)
 
-const Mug: React.FC<{P: DeskPal; t: number}> = ({P, t}) => {
+export const Mug: React.FC<{P: DeskPal; t: number}> = ({P, t}) => {
   const x0 = 800;
   const x1 = 898;
   const top = 950;
@@ -688,7 +939,7 @@ const Mug: React.FC<{P: DeskPal; t: number}> = ({P, t}) => {
 
 // ---------------------------------------------------------------- the lamp head (cut by the right edge)
 
-const Lamp: React.FC<PP> = ({P}) => {
+export const Lamp: React.FC<PP> = ({P}) => {
   const B: Pt = [1094, 648]; // the shade's back (off frame at frame 0)
   const M: Pt = [930, 806]; // the mouth centre
   const len = Math.hypot(M[0] - B[0], M[1] - B[1]);
@@ -712,14 +963,17 @@ const Lamp: React.FC<PP> = ({P}) => {
 
 // ---------------------------------------------------------------- her sleeve + hand with the highlighter (no face)
 
-const Arm: React.FC<{P: DeskPal; tip: Pt}> = ({P, tip}) => {
-  const UA = 141; // the highlighter axis: from the tip toward her hand (down-left)
+export const Arm: React.FC<{P: DeskPal; tip: Pt; reach?: number}> = ({P, tip, reach = 820}) => {
+  const UA = 112; // the highlighter axis: from the tip toward her hand (down, a little left: the fist stays under the words)
   const u = dirDeg(UA);
-  const v = dirDeg(126); // the forearm runs a little steeper than the marker
+  const v = dirDeg(121); // the forearm comes in from the bottom-left corner
   const pv: Pt = [-v[1], v[0]];
   const W = add(tip, u, 188); // the cuff
-  const C1 = add(W, v, 820);
-  const sleeve: Pt[] = [add(W, pv, 62), add(C1, pv, 108), add(C1, pv, -108), add(W, pv, -62)];
+  const C1 = add(W, v, reach);
+  const mid = add(W, v, 400);
+  const sideA: Pt[] = [add(W, pv, 62), add(mid, pv, 96), add(C1, pv, 112)];
+  const sideB: Pt[] = [add(W, pv, -62), add(mid, pv, -90), add(C1, pv, -104)];
+  const sleeve = smooth([...sideA, ...[...sideB].reverse()], {closed: true, tension: 0.35});
   const cuff2 = add(W, v, 34);
   const fold = (k: number, s: number, l: number) => {
     const c = add(add(W, v, k), pv, s);
@@ -727,20 +981,19 @@ const Arm: React.FC<{P: DeskPal; tip: Pt}> = ({P, tip}) => {
   };
   return (
     <>
-      <Fill d={polyPath(sleeve)} color={P.hero} seed="sleeve" />
-      <Ink d={line(...sleeve[0], ...sleeve[1], {seed: 'sl1', over: [0, 0]}) + line(...sleeve[3], ...sleeve[2], {seed: 'sl2', over: [0, 0]})} width={W_FRONT} />
+      <Fill d={sleeve} color={P.hero} seed="sleeve" />
+      <Ink d={smooth(sideA) + smooth(sideB)} width={W_FRONT} />
       <Ink d={line(...add(W, pv, 62), ...add(W, pv, -62), {seed: 'cuf1', over: [3, 3]}) + line(...add(cuff2, pv, 64), ...add(cuff2, pv, -64), {seed: 'cuf2', over: [0, 0]})} width={W_MID} />
       <Ink d={fold(150, 30, 70) + fold(250, -20, 90) + fold(330, 46, 60)} width={W_THIN} />
       <XG m={mat.compose(mat.translate(tip[0], tip[1]), mat.rotate(UA))}>
         {/* wrist into the cuff */}
         <Fill d={roundRect(150, -34, 56, 66, 26)} color={P.skin} seed="wrist" />
         <Ink d={line(156, -34, 200, -36, {seed: 'wr1', over: [0, 0]}) + line(156, 32, 200, 30, {seed: 'wr2', over: [0, 0]})} width={W_MID} />
-        {/* the highlighter: pop chisel tip + end cap, anchor body */}
+        {/* the highlighter: pop chisel tip, anchor body; its back end stays inside the fist (the wrist reads) */}
         <Fill d={polyPath([[0, -5], [18, -12], [18, 12], [0, 5]])} color={P.pop} offset={false} />
-        <Fill d={roundRect(18, -15, 196, 30, 8)} color={P.anchor} seed="hlb" />
-        <Fill d={roundRect(204, -15, 18, 30, 7)} color={P.pop} offset={false} />
+        <Fill d={roundRect(18, -15, 152, 30, 8)} color={P.anchor} seed="hlb" />
         <Fill rect={[30, -15, 8, 30]} color={P.badge} offset={false} />
-        <Ink d={roundRect(18, -15, 204, 30, 8, {seed: 'hlbI'}) + poly([[18, -12], [0, -5], [0, 5], [18, 12]], {seed: 'hlT', over: [0, 0]})} width={W_MID} />
+        <Ink d={roundRect(18, -15, 152, 30, 8, {seed: 'hlbI'}) + poly([[18, -12], [0, -5], [0, 5], [18, 12]], {seed: 'hlT', over: [0, 0]})} width={W_MID} />
         {/* the fist, the curled fingers toward us, the thumb along the marker */}
         <Fill d={roundRect(84, -46, 94, 90, 32)} color={P.skin} seed="fist" />
         <Ink d={roundRect(84, -46, 94, 90, 32, {seed: 'fistI'})} width={W_FRONT} />
@@ -761,7 +1014,7 @@ const Arm: React.FC<{P: DeskPal; tip: Pt}> = ({P, tip}) => {
 
 // ---------------------------------------------------------------- frame-0 words (screen space, on the flat wall)
 
-const Claim: React.FC<{P: DeskPal; ok: boolean}> = ({P, ok}) => {
+export const Claim: React.FC<{P: DeskPal; ok: boolean}> = ({P, ok}) => {
   if (!ok) return null;
   const lines = ['NO CRITICIZING', 'GOOGLE. FOR LIFE.'];
   const hl = 'FOR LIFE.';
@@ -817,8 +1070,10 @@ export const StyleDesk: React.FC<StyleDeskProps> = ({palette: name = 'A', captio
         <XG m={cam}>
           <rect x={-200} y={-200} width={1480} height={2320} fill={P.wall} />
           <Bookcase P={P} />
+          <TopShelf P={P} />
           <WindowView P={P} t={t} />
           <Floor P={P} />
+          <Basket P={P} />
           <Desk P={P} />
           <BookStack P={P} />
           <Box P={P} ok={ok} />
