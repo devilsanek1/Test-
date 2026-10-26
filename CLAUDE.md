@@ -8,7 +8,7 @@ The video project lives in `video/` (Remotion). Before starting or continuing an
 
 **Whenever the owner gives feedback, add it to `video/docs/OWNER_PLAYBOOK.md` in the same turn** (as a rule, with the date,
 the video and the reason) and commit it. Post-publish numbers go in its "Performance log". At session start, compact
-the playbook if its Maintenance trigger fires (7+ days since "Last compacted" with new entries, or over 150 lines).
+the playbook if its Maintenance trigger fires (7+ days since "Last compacted" with new entries, or over 200 lines; budget raised by the owner, 2026-10-26).
 
 Top rules (details in the playbook):
 - From the sketch animatic (G3) on, show one playable video per gate, never only stills; before that, text/audio only (no MP4s). Lock the story (sketch animatic) before building; polish last.
