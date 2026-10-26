@@ -92,9 +92,26 @@ Format: **rule** — why / evidence (video, date).
   the story felt resolved. — same insights.
 - **Every frame should be at least 8/10, with no dead frames, and cuts locked to the beat** (the owner's creator-reel tips). — v1.
 
+- **Every shot reads instantly with the sound off: literal beats clever.** Show recognisable things (a laptop that
+  looks like a laptop, a data center that looks like a building of servers, a plain labelled chart); no visual
+  metaphors that need explaining (a price line drawn on window fog, a chip held up to match a building's size, an
+  abstract dark block growing in a window). Test every animatic with a sound-off cold read before the owner sees it.
+  — owner, v3 G3 ("what does the AI mountain signify?", "is that a screen or a window?", "don't get this part"), 2026-10-26.
+
+- **The animatic (G3) is drawn like a professional storyboard: simple, monochrome, clarity first.** No colour at the
+  sketch stage; it must look like an actual drawing that makes the intent obvious, fast to iterate, in the way animation
+  studios board a film (style spec: `docs/look/STORYBOARD_STYLE.md`). Colour belongs to G4/G5. — owner, v3 G3,
+  2026-10-26 ("the sketch is making it confusing ... very simple, avoid colours for now ... like an actual drawing").
+
 ## Taste signals (the owner's picks; weight them when ranking options)
 - **Topics: the everyday wallet consequence** ("AI is outbidding you for the memory in your laptop" over the higher-scored
   Meta $25B story). — v3 G0, 2026-10-25.
+- **Warm, never sickly.** Low-saturation beige + muddy tan + olive-brown lines + a grey window read "sick" even when the
+  hue is warm. Warmth = peach/apricot creams (not yellow-beige), terracotta not tan, warm red-brown lines and wood (not
+  olive), a golden lamp pool, warm shadows, and the cold outside as a saturated dusk blue (never grey). v3's Autumn
+  Ochre became "Autumn Ember". — owner, v3 G4, 2026-10-26 ("we need to have a warm feeling, not sick").
+- **Palettes: the warm, everyday one for a money story** (v3: Autumn Ochre, C, over the research's Sage Study and the
+  continuity Mint & Clay 1.1). — v3 G4, 2026-10-26.
 - **Lines: plain, direct and personal over clever** (core line "AI is making your next laptop pricier" over the panel's
   "Don't use AI? It's still raising laptop prices"; hook as a question, "Buying a laptop soon? AI's making it pricier.";
   line 2 "AI data centers get first dibs..."). A plain line needs the frame-0 image, the first-second sound and the 2nd

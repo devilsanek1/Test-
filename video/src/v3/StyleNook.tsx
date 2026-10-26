@@ -204,12 +204,55 @@ const OCHRE: NookPal = {
   hl: '#F6B892',
 };
 
-export const NOOK_PALETTES: Record<string, NookPal> = {[MINT.name]: MINT, [SAGE.name]: SAGE, [OCHRE.name]: OCHRE};
+/** C-warm "Autumn Ember" (owner, 2026-10-26: "we need a warm feeling, not sick"): Autumn Ochre without the sickly cast.
+ *  The yellow-beige page goes peach cream, the muddy tan desk goes terracotta-apricot, the olive line/wood goes warm
+ *  red-brown, the lamp pool goes golden, and the grey night window becomes a saturated dusk blue with warm lit houses. */
+const EMBER: NookPal = {
+  ...OCHRE,
+  name: 'Autumn Ember',
+  wall: '#F6E3D4',
+  reveal: '#EBC2A4',
+  slope: '#EBC2A4',
+  beam: '#9A4A2E',
+  shelf: '#E6B293',
+  books: ['#F2B263', '#F4A988', '#EBC2A4', '#9A4A2E', '#D9805A', '#F6E3D4', '#C98A64'],
+  desk: '#DA9670',
+  ring: '#F7C98B',
+  core: '#FBE6C2',
+  trim: '#9A4A2E',
+  sillTop: '#F6E3D4',
+  sillFront: '#EBC2A4',
+  pot: '#D9805A',
+  leaf: '#3F5A3C',
+  mug: '#F6E3D4',
+  mugBand: '#D9542F',
+  tape: '#F6E3D4',
+  skin: '#D9926B',
+  nail: '#F4A988',
+  sleeve: '#A8492F',
+  paper: '#F6E3D4',
+  panel: '#F6E3D4',
+  newScreen: '#F4A988',
+  sky: '#5B6A94',
+  dc: '#46527C',
+  dcSide: '#323A5E',
+  led: '#D6E4FF',
+  roofs: '#323A5E',
+  snow: '#E6EBF7',
+  frost: '#CBD5EC',
+  houseLit: '#F7B65E',
+  hero: '#D9542F',
+  anchor: '#3A1F16',
+  hl: '#F4A988',
+};
+
+export const NOOK_PALETTES: Record<string, NookPal> = {[MINT.name]: MINT, [SAGE.name]: SAGE, [OCHRE.name]: OCHRE, [EMBER.name]: EMBER};
 
 /** Palette by name ("Mint & Clay 1.1", "2 Mint & Clay 1.1", or the candidate letter "A" / "B" / "C"). */
 export function nookPalette(name?: string): NookPal {
   const n = (name ?? '').trim().replace(/^\d+\s+/, '').toLowerCase();
   if (n === 'b' || n.startsWith('sage')) return SAGE;
+  if (n === 'c2' || n.includes('ember')) return EMBER;
   if (n === 'c' || n.startsWith('autumn') || n.startsWith('ochre')) return OCHRE;
   return MINT;
 }

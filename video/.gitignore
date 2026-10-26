@@ -9,3 +9,4 @@ review/checkins/*/*/
 review/checkins/*/strip_*.png
 review/checkins/*/overview.png
 review/checkins/*/sharedkit.png
+*.whl

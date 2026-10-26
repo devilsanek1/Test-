@@ -50,3 +50,4 @@
 | 2026-10-26 | `v3-g3-animatic-wf_af0b4e08-537.js` | 6 | 0 | `context/agent_reports/2026-10-26_v3-g3-animatic-wf_af0b4e08-537.md` |
 | 2026-10-26 | `arcane-cinematic-guide-wf_e0e3d122-fd4.js` | 19 | 0 | `context/agent_reports/2026-10-26_arcane-cinematic-guide.md` |
 | 2026-10-26 | `arcane-env-guide-wf_4543b886-a49.js` | 5 | 0 | `context/agent_reports/2026-10-26_arcane-env-guide.md` |
+| 2026-10-26 | `v3-opening-banger-wf_2a987913-4bb.js` | 5 | 0 | `context/agent_reports/2026-10-26_v3-opening-banger.md` |
