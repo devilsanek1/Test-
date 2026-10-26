@@ -4,6 +4,12 @@ Owner, v3 G3: "the sketch is making it confusing ... very simple, avoid colours 
 `board` mode and the brief for storyboard agents (evidence: `research/storyboard_{feature,series,craft}.md`). **VERIFIED** = primary page or
 sources agree; **REPORTED** = one secondary source or search summary; numbers without a source are our own choices for a 1080 x 1920 phone frame.
 
+## 0. The principle (owner, 2026-10-26): signal per drawing
+A board exists to give the director (the owner) the most signal about the final film in the least drawing and review
+time. Draw at thumbnail level, make the intent explicit (one action, the framing, the shot type, cozy/scale, the camera
+move as a red mark, all stated in the notes strip in big words), animate only where timing is the question, and stop
+the moment the panel says what it must. Quality is not the goal at G3.
+
 ## 1. Why
 The v3 animatic (frames at 1, 3.4, 7, 18 and 22 s) gives the eye nothing to follow. Five fills are used as decoration (warm walls, blue
 sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 228 elements. Things are drawn as labelled boxes

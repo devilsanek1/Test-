@@ -76,6 +76,10 @@ Format: **rule** — why / evidence (video, date).
 - **Every frame at least 8/10, no dead frames, cuts locked to the beat.** — (v1).
 
 ## Storyboard (G3)
+- **Boards optimise for SIGNAL, not quality: the director gets the most information about the final film in the least
+  drawing and the least review time.** Thumbnail-level drawings; the intent made explicit (framing, the one action,
+  the shot type, cozy/scale, the camera move as a red mark, all in a big readable note); animate only where timing is
+  the question; no polish, no extra detail, lean review loops. — owner, v3 G3, 2026-10-26.
 - **Every shot reads instantly with the sound off: literal beats clever.** Show recognisable things: a laptop that looks
   like a laptop, a data center like a building of servers, a plain labelled chart. No metaphors that need explaining.
   Test every animatic with a sound-off cold read before the owner sees it. — ("what does the AI mountain signify?", v3 G3, 2026-10-26).
