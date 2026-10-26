@@ -260,7 +260,7 @@ function figureLayers(el: Extract<El, {t: 'figure'}>, role: Role, seed: string):
   const hairC = role === 'subject' ? BOARD.dark : BOARD.mid;
   const HP = (u: number, v: number): Pt => [H[0] + s * u * r, H[1] + v * r];
   const behind: Layer[] = [];
-  const cap: Layer[] = [];
+  const hairCap: Layer[] = [];
   if (hair !== 'none') {
     const back = hair === 'long'
       ? smooth([HP(-0.1, -0.95), HP(-0.9, -0.55), HP(-1.12, 0.35), HP(-1.0, 1.35), HP(-0.45, 1.55), HP(0.05, 0.8)], {closed: true})
@@ -269,7 +269,7 @@ function figureLayers(el: Extract<El, {t: 'figure'}>, role: Role, seed: string):
     const arc: Pt[] = [];
     for (let a = -50; a >= -230; a -= 15) arc.push(HP(1.05 * Math.cos((a * Math.PI) / 180), 1.05 * Math.sin((a * Math.PI) / 180)));
     const capD = smooth([...arc, HP(-0.15, -0.12)], {closed: true});
-    cap.push({fill: hairC, fillD: capD, d: capD, w: rl.w, c: rl.c});
+    hairCap.push({fill: hairC, fillD: capD, d: capD, w: rl.w, c: rl.c});
   }
   const layers: Layer[] = [
     {d: leg(-1, backLeg), w: rl.w, c: rl.c},
@@ -279,7 +279,7 @@ function figureLayers(el: Extract<El, {t: 'figure'}>, role: Role, seed: string):
     ...behind,
     {fill: tone, fillD: torso, d: torso, w: rl.w, c: rl.c},
     {fill: skin, fillD: oval(H[0], H[1], r, r), d: ellipse(H[0], H[1], r, r, {seed: `${seed}/head`, ...boardLoop(r, true)}), w: rl.w, c: rl.c},
-    ...cap,
+    ...hairCap,
   ];
   // the face: dot eyes, one brow line per eye, one mouth line (only when the emotion is the beat)
   const face = el.face ?? 'none';
