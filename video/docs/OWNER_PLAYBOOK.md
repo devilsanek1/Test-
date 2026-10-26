@@ -8,164 +8,152 @@ replace it).
 
 Format: **rule** — why / evidence (video, date).
 
-**Last compacted: 2026-10-26 · size budget: <= 150 lines** (see Maintenance at the end).
+**Last compacted: 2026-10-26 (second pass: 181 lines down to under 150) · size budget: <= 150 lines** (see Maintenance at the end).
 
 ## Audience and goal
-- **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — the target from day one (v1, 2026-10-24).
-- **Growth matters: maximise engagement with subtle, defensible hooks** (bait that is true, e.g. "the language everyone
-  loves"). Never misleading. — v1 script round, 2026-10-24.
+- **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
+- **Growth matters: maximise engagement with subtle, defensible hooks**: bait that is true, e.g. "the language everyone
+  loves". Never misleading. — (v1, 2026-10-24).
 
 ## Script and voice
-- **A script is a coherent STORY, not a collection of true sentences about the topic.** One throughline question,
-  a situation the viewer is in, and every line following from the one before (you could join each pair with "but",
-  "so" or "because", never "and also"), building to a turn and a payoff. Build the story spine first, then write the
-  lines; a list of facts to prove is input, never the structure. Test: someone who hears it once can retell it as a
-  story. — owner, v3 G1 ("it's just a collection of sentences ... start from scratch"), 2026-10-26.
-- **Everyday spoken language. Check every sentence for AI-sounding wording**; it must sound like a person talking. — v1, 2026-10-24.
-- **Scripts come with detailed emotional / delivery cues, and the owner always gets the full script text with any
-  take.** — v1, 2026-10-24.
-- **The owner records the voice in ElevenLabs; we never add a voice (no stand-in TTS) to a deliverable.** The treated
-  ElevenLabs take is the quality bar (a cheaper TTS sounded "cheap", v1). The paste file and take checks follow
-  `docs/ELEVENLABS.md`; the rules behind it, all from the owner's v3 takes (2026-10-25/26):
-  - only tags and spoken words (v4 read our notes and alternate-hook labels aloud);
-  - tags describe a tone, never quote script words (v4 spoke them) and never name an action ("correcting yourself"
-    made it repeat the previous line);
-  - always hand over the FULL paste text in one block, never just the changed line ("clunky").
+- **A script is a coherent STORY, not a collection of true sentences about the topic.**
+  - One throughline question, a situation the viewer is in, and every line following from the one before (joinable by
+    "but", "so" or "because", never "and also"), building to a turn and a payoff.
+  - Spine first, then lines. A list of facts to prove is input, never the structure.
+  - Test: someone who hears it once can retell it as a story.
+  — ("just a collection of sentences", v3 G1, 2026-10-26).
+- **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24).
+- **Scripts come with detailed emotional / delivery cues; the owner always gets the full script text with any take.** — (v1).
+- **The owner records the voice in ElevenLabs; we never add a voice (no stand-in TTS) to a deliverable.**
+  - The treated take is the quality bar (a cheaper TTS sounded "cheap", v1).
+  - Paste file and take checks: `docs/ELEVENLABS.md`.
+  - From the v3 takes: only tags and spoken words (v4 read notes aloud); tags describe a tone, never quote script words
+    and never name an action ("correcting yourself" repeated a line); always hand over the FULL paste text in one block
+    (one changed line on its own was "clunky").
+  — (v3, 2026-10-25/26).
 
 ## Music and sound
-- **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — v1.
-- **Mix to -14 LUFS / -1 dBTP, with the voice always on top**; SFX land on visual hits (slams, punches). — v1.
-- **More sound effects, especially ones people link with something good on their phone** (a like / heart pop, a
-  notification ding, a message-sent swoosh), **with one in the first second.** The owner likes our SFX. We make our own
-  sounds that evoke these; never Apple's or Instagram's actual sounds. — owner, 2026-10-25.
+- **Music: cinematic but subtle, especially at the start.** The voice and the hook carry the opening. — (v1).
+- **Mix to -14 LUFS / -1 dBTP, voice always on top**; SFX land on visual hits. — (v1).
+- **More sound effects, especially ones people link with something good on their phone** (like pop, notification ding,
+  message-sent swoosh), **with one in the first second.** Our own sounds that evoke them, never Apple's or Instagram's. — (2026-10-25).
 
 ## Visual style
-- **Style: hand-drawn ink, flat colour, like reference video 1.** — v1, 2026-10-24.
-- **Scale moments, occasionally: keep making the viewer feel small,** inspired by Arcane's camera work and staging (not
-  its footage); nuanced, since it is still TikTok content. The owner liked v1's scale scenes ("we did it great").
-  — v1 2026-10-24, reconfirmed 2026-10-25.
-- **Arcane references: ENVIRONMENT ONLY, few and high-confidence.** Buildings, cityscapes, interiors as spaces, wide
-  and bigger shots; no close-ups, faces or people as references. Keep it simple: a handful of references that fit our
-  flat ink style naturally. Our videos are already good: build on them incrementally (better angles, composition,
-  lighting, camera moves), never reinvent. Guide: `docs/look/CINEMATIC_GUIDE.md` (with sketches so the owner can check
-  what we index on). — owner, 2026-10-26 ("rework ... targeted with high confidence").
-- **Second visual twist: coziness, through a sense of enclosure** (framed, street-like spaces whose walls hold the
-  subject, as in the owner's reference `docs/look/ref_sense_of_enclosure.jpg`). Rules: `docs/look/COZY_AND_SCALE.md`.
-  — owner, 2026-10-25.
-- **Edges: hand-drawn paper edges ('paint-subtle') are liked, BUT never at the top of the frame or beside the caption
-  band.** A white strip at the top looked like a screen recording under the phone's status bar. — v1, posted reel, 2026-10-25.
-- **Palette: a family of house palettes as tools, not a cage.** Keep the soft, warm, "no screaming colours" v1 base and
-  evolve it; pick one sister palette per video; within a video one hero, one dark anchor, at most one pop; expand when a
-  story needs it. Rules and data: `docs/look/PALETTE.md`, `palettes.json`, `palette_family.png`. — owner, 2026-10-25.
-- **Texture and lines: VERY subtle, only where they add something.** Thin dark tapered lines only in key places (not
-  outlines everywhere); the halftone texture tactically on a few elements; an optional last step after polish (the film
-  must work flat; the owner decides per video). — owner, 2026-10-25 (after the texture test).
-- **Profile identity: the mascot Pip (the purple PHP elephant) in the film's style;** the avatar in use is the
-  power-button sun one (`video/deliverables/profile/pip_power_button.png`). — 2026-10-25.
+- **Hand-drawn ink, flat colour, like reference video 1.** — (v1, 2026-10-24).
+- **Scale moments, occasionally: make the viewer feel small**, using Arcane's camera work and staging, never its footage.
+  Keep it nuanced (it's still TikTok). The owner liked v1's scale scenes. — (v1, 2026-10-24/25).
+- **Arcane references: ENVIRONMENT ONLY, few and high-confidence** (buildings, cityscapes, interiors as spaces, wides;
+  no faces or people). Build on our own videos incrementally (angles, composition, light, camera), never reinvent.
+  Guide with sketches: `docs/look/CINEMATIC_GUIDE.md`. — ("targeted with high confidence", 2026-10-26).
+- **Second visual twist: coziness through a sense of enclosure**: framed, street-like spaces that hold the subject (ref
+  `docs/look/ref_sense_of_enclosure.jpg`). Rules: `docs/look/COZY_AND_SCALE.md`. — (2026-10-25).
+- **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
+  as a screen recording under the status bar). — (v1 posted reel, 2026-10-25).
+- **Palette: a family of house palettes as tools, not a cage.**
+  - A soft, warm, "no screaming colours" base, and one sister palette per video.
+  - Within a video: one hero, one dark anchor, at most one pop. Expand when a story needs it.
+  - Rules and data: `docs/look/PALETTE.md`, `palettes.json`.
+  — (2026-10-25).
+- **Warm, never sickly.**
+  - Low-saturation beige, muddy tan, olive-brown lines and grey read "sick".
+  - Warmth = peach/apricot creams, terracotta, warm red-brown lines and wood, a golden lamp pool, warm shadows. The cold
+    outside is a saturated dusk blue, never grey.
+  - Autumn Ochre became "Autumn Ember".
+  — ("warm feeling, not sick", v3 G4, 2026-10-26).
+- **Texture and lines: VERY subtle, only where they add something.**
+  - Thin tapered lines in key places; no outlines everywhere.
+  - Halftone texture tactically on a few elements, as an optional last step after polish. The film must work flat, and
+    the owner decides per video.
+  — (texture test, 2026-10-25).
+- **Profile identity: mascot Pip (the purple PHP elephant) in the film's style;** avatar
+  `video/deliverables/profile/pip_power_button.png`. — (2026-10-25).
 
 ## Hook and pacing
-- **Every video has ONE core line, picked in its own step (G0.5) before the script:** the single sentence that is the
-  absolute core of the message and gets the biggest emotional reaction (v3: something like "AI is making your PC more
-  expensive"). Brainstorm, critique and the owner's pick, like the topic. It drives frame 0, the hook, the cover and the
-  payoff, and every line must serve it. — owner, v3, 2026-10-25.
-- **The first 3 seconds, the whole first scene, must be an absolute banger: the viewer feels "something is about to
-  happen".** From the owner's reference (an explainer in our style, 2026-10-26): (1) frame 0 is the scene being MADE:
-  bare ink lines, colour floods in within ~0.3 s; (2) the voice starts on the first frames (~0.05 s); (3) the hook's
-  claim is made physical and escalates: the expectation is shown, then reality overtakes it (empty markers for "France
-  expected 200,000", then a crowd pours in and overflows on "half a million came", at ~2 s); (4) something new appears
-  every few frames, never a static frame in the first 3 s; (5) one continuous shot through the opening (7.7 s, a slow
-  ~5 % pull-out that gathers speed), no cut; (6) the film loops back to the bare-line frame 0. Details:
-  `docs/look/CINEMATIC_GUIDE.md`, "The opening". — owner, v3, 2026-10-26.
-- **The first 2 s and first 5 s get the most polish; the first 10 s get the next most.** Quirks late in the video are acceptable. — v1, 2026-10-25.
-- **State the payoff in words from frame 0** (a bold claim on the first frame, starting mid-action). A calm, pretty
-  opening frame lost about 80 % of viewers by 3 s. — v1 Instagram insights after 45 min (155 views, 70 viewers, avg 21 s / 55 s), 2026-10-25.
-- **The hook is a concrete, surprising claim with stakes (names / numbers / a curiosity gap), stronger than a plain
-  news headline** ("Engineers are leaving Google!" was the owner's starting point, asked to be made more powerful);
-  **every hook fact is verified against the primary source before the hook is locked.** — v2 topic, 2026-10-25.
-- **When a news item is small, research the bigger story around it** (history, the pattern across companies, what's
-  at stake) and lead with the most powerful TRUE framing (v2: "engineers resigning and afraid to speak", not just "people
-  leaving Google"). — owner, 2026-10-25.
-- **Personal framings must feel natural, not over the top:** "You're up against AI data centers… and losing" was too much
-  for the owner ("how would people react hearing this?"). Don't cast the viewer as a loser or a competitor in a contest they
-  don't feel; test any "you" claim with a viewer panel for eye-rolls before it's locked. — owner, v3 G2, 2026-10-25.
-- **Target 30-45 s and end close to the payoff.** Viewers who passed the hook stayed until about 40 s, then left once
-  the story felt resolved. — same insights.
-- **Every frame should be at least 8/10, with no dead frames, and cuts locked to the beat** (the owner's creator-reel tips). — v1.
+- **Every video has ONE core line, picked in its own step (G0.5) before the script:** the single sentence at the core
+  of the message with the biggest emotional reaction. It drives frame 0, the hook, the cover and the payoff; every line
+  serves it. — (v3, 2026-10-25).
+- **The first 3 s / first scene must be a banger ("something is about to happen"):**
+  - frame 0 is the scene being made: bare ink lines, then colour floods in within ~0.3 s;
+  - voice from the first frames;
+  - the hook's claim made physical and escalating: the expected thing shown, then reality overtaking it at ~2 s;
+  - something new every few frames, never still, in one continuous opening shot;
+  - the film loops back to the bare-line frame 0.
+  Details: `CINEMATIC_GUIDE.md`, "The opening". — (owner's reference, v3, 2026-10-26).
+- **State the payoff in words on frame 0; polish the first 2 s and 5 s most, then the first 10 s.** A calm, pretty
+  opening lost ~80 % of viewers by 3 s; late quirks are acceptable. — (v1 IG insights, 2026-10-25).
+- **The hook is a concrete, surprising, TRUE claim with stakes** (names, numbers, a curiosity gap), stronger than a
+  plain headline.
+  - Every hook fact is verified against the primary source before it's locked.
+  - When a news item is small, research the bigger story around it and lead with its most powerful true framing.
+  — (v2, 2026-10-25).
+- **Personal framings must feel natural, not over the top.** "You're up against AI data centers… and losing" was too
+  much. Never cast the viewer as a loser in a contest they don't feel; test "you" claims with a viewer panel.
+  — (v3 G2, 2026-10-25).
+- **Target 30-45 s and end close to the payoff** (viewers left once the story felt resolved, ~40 s). — (v1 insights).
+- **Every frame at least 8/10, no dead frames, cuts locked to the beat.** — (v1).
 
-- **Every shot reads instantly with the sound off: literal beats clever.** Show recognisable things (a laptop that
-  looks like a laptop, a data center that looks like a building of servers, a plain labelled chart); no visual
-  metaphors that need explaining (a price line drawn on window fog, a chip held up to match a building's size, an
-  abstract dark block growing in a window). Test every animatic with a sound-off cold read before the owner sees it.
-  — owner, v3 G3 ("what does the AI mountain signify?", "is that a screen or a window?", "don't get this part"), 2026-10-26.
-
-- **The animatic (G3) is drawn like a professional storyboard: simple, monochrome, clarity first.** No colour at the
-  sketch stage; it must look like an actual drawing that makes the intent obvious, fast to iterate, in the way animation
-  studios board a film (style spec: `docs/look/STORYBOARD_STYLE.md`). Colour belongs to G4/G5. — owner, v3 G3,
-  2026-10-26 ("the sketch is making it confusing ... very simple, avoid colours for now ... like an actual drawing").
+## Storyboard (G3)
+- **Every shot reads instantly with the sound off: literal beats clever.** Show recognisable things: a laptop that looks
+  like a laptop, a data center like a building of servers, a plain labelled chart. No metaphors that need explaining.
+  Test every animatic with a sound-off cold read before the owner sees it. — ("what does the AI mountain signify?", v3 G3, 2026-10-26).
+- **Drawn like a professional storyboard: simple, monochrome, clarity first.** No colour at the sketch stage; colour
+  belongs to G4/G5. Spec: `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
 
 ## Taste signals (the owner's picks; weight them when ranking options)
-- **Topics: the everyday wallet consequence** ("AI is outbidding you for the memory in your laptop" over the higher-scored
-  Meta $25B story). — v3 G0, 2026-10-25.
-- **Warm, never sickly.** Low-saturation beige + muddy tan + olive-brown lines + a grey window read "sick" even when the
-  hue is warm. Warmth = peach/apricot creams (not yellow-beige), terracotta not tan, warm red-brown lines and wood (not
-  olive), a golden lamp pool, warm shadows, and the cold outside as a saturated dusk blue (never grey). v3's Autumn
-  Ochre became "Autumn Ember". — owner, v3 G4, 2026-10-26 ("we need to have a warm feeling, not sick").
-- **Palettes: the warm, everyday one for a money story** (v3: Autumn Ochre, C, over the research's Sage Study and the
-  continuity Mint & Clay 1.1). — v3 G4, 2026-10-26.
-- **Lines: plain, direct and personal over clever** (core line "AI is making your next laptop pricier" over the panel's
-  "Don't use AI? It's still raising laptop prices"; hook as a question, "Buying a laptop soon? AI's making it pricier.";
-  line 2 "AI data centers get first dibs..."). A plain line needs the frame-0 image, the first-second sound and the 2nd
-  line to bring the jolt. — v3 G0.5-G1, 2026-10-25/26.
-
+- **Topics: the everyday wallet consequence** (laptop memory prices over the higher-scored Meta $25B story). — (v3 G0, 2026-10-25).
+- **Lines: plain, direct and personal over clever** ("AI is making your next laptop pricier"; hook as a question,
+  "Buying a laptop soon? AI's making it pricier."). A plain line needs the frame-0 image, the first-second sound and the
+  second line to bring the jolt. — (v3 G0.5-G1, 2026-10-25/26).
 - **Core lines: one real person in her own (attributed) words over a plural headline** ("She quit Google, and says her
-  contract bans criticizing it, for life" over "Google AI engineers are quitting..." and "ashamed to work at Google").
-  — v2 G0.5, 2026-10-26.
+  contract bans criticizing it, for life" over "Google AI engineers are quitting..."). — (v2 G0.5, 2026-10-26).
+- **Palettes: the warm, everyday one for a money story** (Autumn Ochre over Sage Study and Mint & Clay 1.1). — (v3 G4, 2026-10-26).
 
 ## Motion
-- **Render at 60 fps: every video, from the blocking cut (G5) to the final.** The owner compared the same 6 s tower move
-  at 30 and 60 on the phone: "60 is definitely better, smoother and more crispy". Animate by time (seconds), never by
-  frame counts; drawn character motion may still be stepped like Arcane (held drawings, about 12-24 per second) while
-  the camera and parallax glide at 60. Sketch animatics (G3) may stay at 30 for speed. — owner, v3, 2026-10-26
-  (test: `video/deliverables/tests/fps_test_30_then_60.mp4`).
+- **Render at 60 fps from the blocking cut (G5) to the final** ("smoother and more crispy" on the phone).
+  - Animate by time, never by frame counts.
+  - Drawn character motion may stay stepped (12-24 drawings/s) while camera and parallax glide.
+  - G3 animatics may stay at 30 fps.
+  - Test: `video/deliverables/tests/fps_test_30_then_60.mp4`.
+  — (v3, 2026-10-26).
 
 ## Captions
-- **Captions pop in place (or rise without clipping); no slot or scroll reveal that cuts letters mid-motion.** On a
-  plain sky it looks like a glitch. — v1 posted reel, 2026-10-25.
-- **Captions are burned in;** platform auto-captions stay off. — v1.
+- **Captions pop in place (or rise without clipping);** a slot or scroll reveal that cuts letters looked like a glitch. — (v1 reel, 2026-10-25).
+- **Captions are burned in;** platform auto-captions stay off. — (v1).
 
 ## Process and communication
-- **Playable video starts at the sketch animatic (G3); from then on every gate is a video, never only stills.** The owner
-  saw only pictures until v1's final and could not steer. Before G3 (topic, core line, script, voice) deliver text and
-  audio only, with no MP4s, and never several versions of one video unless asked. — v1 2026-10-25; narrowed by the owner
-  on v3 ("why are there multiple versions and why is it needed at all at this point?"), 2026-10-25.
-- **Lock the story with a clean sketch/animatic before big commitments; push all polish late.** — v1, 2026-10-25.
-- **Progress: the gate deliverable is the update; between gates, a short status covering all threads.** — v1, 2026-10-25.
-- **Never trade quality or output value for savings. Creative work gets the budget it needs:** multi-agent
-  brainstorms, competing ideas with judges, design and style explorations, and hook variants are excellent use of tokens.
-  "Waste" means rework, reviews of things that will still change, polish before the story is locked, and lost work.
-  — owner, 2026-10-25.
-- **Once a step is locked, only the locked choice goes forward:** move the rejected options (other topics, core lines,
-  hooks, drafts, scores, panels) to the video's `archive/` folder, trim the gate doc to the locked choice, and never put
-  rejected options into later prompts or re-discuss them. Unused topics go to `docs/IDEAS_BANK.md` for future videos.
-  — owner, v3, 2026-10-25.
-- **No wasted tokens or time:** no reviews or polish on things that will change, short prompts, lean docs; cut what
-  doesn't help (see the measured waste in `docs/PIPELINE_V2.md`). — v1, 2026-10-25.
-- **Every lesson goes into the generic process, committed, so the next video doesn't repeat the mistake:** the rule
-  here, the gate in `docs/PIPELINE_V2.md`, the tool or template in the studio toolkit (`PIPELINE_V2.md`, "Studio
-  toolkit"). — owner, v3, 2026-10-26 ("we gradually get better as a production studio").
-- **Once the owner says "final", don't redo it.** Log ideas for the next video instead. — v1, 2026-10-25.
-- **Deliver videos as a download as well;** in-app previews may play muted. — v1, 2026-10-25.
+- **Playable video starts at the sketch animatic (G3); from then on every gate is a video, never only stills.** Before
+  G3 (topic, core line, script, voice): text and audio only, no MP4s, never several versions unless asked. — (v1, 2026-10-25; "why are there multiple versions", v3).
+- **Lock the story with a clean sketch/animatic before big commitments; push all polish late.** — (v1, 2026-10-25).
+- **Progress: the gate deliverable is the update; between gates, a short status covering all threads.** — (v1).
+- **Never trade quality or output value for savings.**
+  - Brainstorms, competing ideas with judges, design explorations and hook variants are excellent use of tokens.
+  - Waste = rework, reviews of things that will change, polish before the story lock, and lost work.
+  — (2026-10-25).
+- **Locked means dropped.**
+  - Move rejected options (topics, core lines, hooks, drafts, scores, panels) to the video's `archive/` and trim the
+    gate doc to the locked choice.
+  - Never put rejected options into later prompts.
+  - Unused topics go to `docs/IDEAS_BANK.md`.
+  — (v3, 2026-10-25).
+- **No wasted tokens or time:** short prompts, lean docs, nothing reviewed or polished that will still change. — (v1).
+- **Every lesson goes into the generic process, committed:** this playbook, a gate in `PIPELINE_V2.md`, or the studio
+  toolkit, so the next video doesn't repeat it. — ("we gradually get better as a production studio", v3, 2026-10-26).
+- **Once the owner says "final", don't redo it;** log ideas for the next video. — (v1, 2026-10-25).
+- **Deliver videos as a download as well;** in-app previews may play muted. — (v1, 2026-10-25).
 
 ## Platforms and posting
-- **Accounts: Instagram `what.the.fuss.is.about`** (Creator account, Education); TikTok and YouTube Shorts under the same
-  name, handle and avatar. Posting texts per video: `docs/POSTING_KIT.md`. — 2026-10-25.
-- **AI label ON** (AI narration voice) on every platform. — 2026-10-25.
-- **Upload at the highest quality and natively on each platform** (checklist in `docs/POSTING_KIT.md`; owner asked, 2026-10-25).
-- **No paid boost until 3-5 posts exist;** then boost the best organic performer for profile visits. — 2026-10-25.
+- **Accounts: Instagram `what.the.fuss.is.about`** (Creator, Education); TikTok and YouTube Shorts under the same name,
+  handle and avatar. Posting texts per video: `docs/POSTING_KIT.md`. — (2026-10-25).
+- **AI label ON** (AI narration voice) on every platform. — (2026-10-25).
+- **Upload at the highest quality and natively on each platform** (checklist in `docs/POSTING_KIT.md`). — (2026-10-25).
+- **No paid boost until 3-5 posts exist;** then boost the best organic performer for profile visits. — (2026-10-25).
 
 ## Performance log (one line per video and check)
-- v1 "PHP bug / governments switched off their sites" — IG after 45 min: 155 views, 70 viewers, avg watch 21 s of
-  55 s, like rate 3.9 %, 0 saves / shares / comments / follows; ~80 % gone by 3 s, flat ~20 % until ~40 s, then a drop. — 2026-10-25.
+- v1 "PHP bug / governments switched off their sites", IG after 45 min:
+  - 155 views, 70 viewers, average watch 21 s of 55 s;
+  - like rate 3.9 %; 0 saves, shares, comments or follows;
+  - ~80 % gone by 3 s, flat at ~20 % until ~40 s, then a drop.
+  — 2026-10-25.
 
 ## Retired rules
 (none yet)
@@ -178,4 +166,3 @@ or **the file is over 150 lines**. The orchestrator does it in one pass, with no
 3. Performance log: keep the last ~5 raw lines; fold older ones into a "Trends" paragraph (what the numbers keep saying).
 4. Retired: keep the 10 most recent, one line each; drop older ones (git history keeps them).
 5. Update "Last compacted", then commit "Compact owner playbook".
-
