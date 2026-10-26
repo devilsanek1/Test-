@@ -267,8 +267,8 @@ function figureLayers(el: Extract<El, {t: 'figure'}>, role: Role, seed: string):
       : oval(...HP(-0.82, -0.78), 0.4 * r, 0.4 * r);
     behind.push({fill: hairC, fillD: back, d: back, w: rl.w, c: rl.c});
     const arc: Pt[] = [];
-    for (let a = -50; a >= -230; a -= 15) arc.push(HP(1.05 * Math.cos((a * Math.PI) / 180), 1.05 * Math.sin((a * Math.PI) / 180)));
-    const capD = smooth([...arc, HP(-0.15, -0.12)], {closed: true});
+    for (let a = -70; a >= -215; a -= 15) arc.push(HP(1.05 * Math.cos((a * Math.PI) / 180), 1.05 * Math.sin((a * Math.PI) / 180)));
+    const capD = smooth([...arc, HP(-0.3, -0.3)], {closed: true});   // the top and back of the head; the face side stays open
     hairCap.push({fill: hairC, fillD: capD, d: capD, w: rl.w, c: rl.c});
   }
   const layers: Layer[] = [

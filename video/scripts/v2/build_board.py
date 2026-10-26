@@ -257,7 +257,7 @@ def opening():
     for n in ('arm', 'badge', 'box', 'boxfront'):
         p.move(n, -560, 0, 1.48, 0.34)
     for n in ('arm', 'marker'):
-        p.move(n, 930, 17, 1.90, 0.26)
+        p.move(n, 930, 17, 1.84, 0.30)
         p.move(n, 297, 0, 2.60, 0.32)
         p.move(n, -1300, 0, 3.02, 0.30)
     # the line keeps going: the page steps out past its own edge (3.00-3.50), then pours over the desk edge, faster
@@ -358,9 +358,9 @@ def off_frame(e):
 # and on out of the frame (board v1: "just a person at a desk ... nothing odd"). Long hair: "is this her?".
 p2_els = nook()
 p2_els += [
-    fig(560, 1640, 600, pose='hold', facing='r', hair='long'),                                    # hands ~(674-692, 1250)
-    icon('page', 652, 1225, 104, 415, role='subject', text=squiggles(0.06, 0.94, 9, 0.8)),        # held up, hanging down
-    shape([(647, 1640), (761, 1640), (840, 1720), (590, 1720)], 'paper', role='subject'),         # ... and on along the floor
+    fig(540, 1600, 640, pose='hold', facing='r', hair='long'),                                    # hands ~(662-681, 1190)
+    icon('page', 640, 1170, 120, 440, role='subject', text=squiggles(0.05, 0.95, 10, 0.8)),       # held up, hanging down
+    icon('page', 610, 1606, 260, 160, role='subject', text=squiggles(0.15, 0.55, 3, 0.8)),        # ... and on along the floor
 ]
 
 # P13: the nook at 1.2x, held. Her own words: her bubble (the subject, 400 px) pops on "talking" with FACTS in it, her
@@ -450,8 +450,8 @@ p8.add('ground', rect(-200, HORIZON, 1480, 1300, 'light', role='far'))
 p8.add('trees', rect(-200, HORIZON, 1480, 20, 'mid', role='far'))
 p8.add('pentagon', icon('pentagon', -210, 722, 1500, 760, role='subject', fill='paper'))   # top vertex 737, facades to 1400
 p8.add('road', rect(-200, 1408, 1480, 26, 'paper', role='far', sw=0))
-for k, (y, h) in enumerate([(1444, 36), (1500, 40), (1560, 44)]):
-    p8.add(f'cars{k}', icon('cars', -110 - 30 * k, y, 1300 + 60 * k, h))
+for k, (y, h) in enumerate([(1450, 40), (1566, 48)]):                               # two rows, an aisle between
+    p8.add(f'cars{k}', icon('cars', -110 - 40 * k, y, 1300 + 80 * k, h))
 joints = [(-40, 1160)]
 for k, x in enumerate(range(80, 1100, 160)):
     joints += [(x, 1160), (x, 1060 if k % 2 else 1270), (x, 1160)]
