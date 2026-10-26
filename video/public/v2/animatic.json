@@ -1,10 +1,11 @@
 {
  "style": "board",
- "label": "v2 G3 board (placeholder)",
+ "label": "v2 G3 board",
  "audio": "v2/voice.wav",
- "durationSec": 39.48,
+ "durationSec": 39.5,
  "frame0": "SHE SAYS: NO CRITICIZING GOOGLE. FOR LIFE.",
- "frame0Until": 2.6,
+ "frame0Until": 4.84,
+ "frame0Credit": "Source: BBC News, 21 Oct 2026",
  "words": [
   {
    "w": "She",
@@ -367,7 +368,7 @@
    "e": 24.04
   },
   {
-   "w": "any",
+   "w": "\"any",
    "s": 24.04,
    "e": 24.28
   },
@@ -382,7 +383,7 @@
    "e": 25.16
   },
   {
-   "w": "purpose.",
+   "w": "purpose\".",
    "s": 25.16,
    "e": 25.96
   },
@@ -392,8 +393,13 @@
    "e": 26.36
   },
   {
-   "w": "can'tveto",
+   "w": "can't",
    "s": 26.36,
+   "e": 26.7
+  },
+  {
+   "w": "veto",
+   "s": 26.7,
    "e": 27.08
   },
   {
@@ -467,7 +473,7 @@
    "e": 31.88
   },
   {
-   "w": "of",
+   "w": "\"of",
    "s": 31.88,
    "e": 32.2
   },
@@ -477,7 +483,7 @@
    "e": 32.52
   },
   {
-   "w": "kind.",
+   "w": "kind\".",
    "s": 32.52,
    "e": 33.08
   },
@@ -532,7 +538,7 @@
    "e": 36.44
   },
   {
-   "w": "talking",
+   "w": "\"talking",
    "s": 36.44,
    "e": 36.92
   },
@@ -557,40 +563,2796 @@
    "e": 38.12
   },
   {
-   "w": "criticizing.",
+   "w": "criticising\".",
    "s": 38.12,
    "e": 39.08
   }
  ],
- "sfx": [],
+ "sfx": [
+  {
+   "src": "v2/v2_signed_chime.wav",
+   "t": 0.08,
+   "gain": 0.55
+  },
+  {
+   "src": "v2/v2_badge_clack.wav",
+   "t": 0.92,
+   "gain": 0.5
+  },
+  {
+   "src": "v2/v2_marker_squeak.wav",
+   "t": 2.6,
+   "gain": 0.4
+  },
+  {
+   "src": "v2/v2_paper_unroll.wav",
+   "t": 3.48,
+   "gain": 0.4
+  },
+  {
+   "src": "v2/v2_room_tone_2s.wav",
+   "t": 6.12,
+   "gain": 0.2
+  },
+  {
+   "src": "v2/v2_pencil_line.wav",
+   "t": 12.2,
+   "gain": 0.35
+  },
+  {
+   "src": "v2/v2_room_tone_7s.wav",
+   "t": 13.24,
+   "gain": 0.2
+  },
+  {
+   "src": "v2/v2_like_pop.wav",
+   "t": 14.28,
+   "gain": 0.4
+  },
+  {
+   "src": "v2/v2_like_pop.wav",
+   "t": 16.76,
+   "gain": 0.3
+  },
+  {
+   "src": "v2/v2_cold_air.wav",
+   "t": 20.52,
+   "gain": 0.25
+  },
+  {
+   "src": "v2/v2_stamp_april.wav",
+   "t": 20.76,
+   "gain": 0.55
+  },
+  {
+   "src": "v2/v2_rise_swell.wav",
+   "t": 21.32,
+   "gain": 0.35
+  },
+  {
+   "src": "v2/v2_stamp_noveto.wav",
+   "t": 26.7,
+   "gain": 0.6
+  },
+  {
+   "src": "v2/v2_paper_tap.wav",
+   "t": 28.2,
+   "gain": 0.4
+  },
+  {
+   "src": "v2/v2_pencil_line.wav",
+   "t": 30.04,
+   "gain": 0.3
+  },
+  {
+   "src": "v2/v2_pencil_line.wav",
+   "t": 30.76,
+   "gain": 0.3
+  },
+  {
+   "src": "v2/v2_room_tone_6s.wav",
+   "t": 33.08,
+   "gain": 0.2
+  },
+  {
+   "src": "v2/v2_paper_unroll_short.wav",
+   "t": 33.72,
+   "gain": 0.35
+  },
+  {
+   "src": "v2/v2_like_pop.wav",
+   "t": 36.44,
+   "gain": 0.4
+  },
+  {
+   "src": "v2/v2_paper_tap.wav",
+   "t": 37.16,
+   "gain": 0.35
+  }
+ ],
  "shots": [
   {
-   "id": "P0",
+   "id": "O1",
    "s": 0,
-   "e": 39.48,
-   "note": "placeholder",
+   "e": 6.12,
+   "note": "COZY desk insert, high 3/4. Signed (chime), badge in the box, then her line runs off the page and pours off the desk",
    "transition": {
-    "type": "cut"
+    "type": "cut",
+    "label": "frame 0; the loop lands here"
    },
    "camera": {
     "from": {
      "x": 540,
      "y": 960,
-     "z": 1
+     "z": 1.06
     },
     "to": {
      "x": 540,
      "y": 960,
-     "z": 1
+     "z": 1.0
+    },
+    "ease": "inQuad"
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": -40,
+     "y": 1390,
+     "w": 1160,
+     "h": 80,
+     "role": "mid",
+     "fill": "mid",
+     "draw": [
+      -0.35,
+      0.5
+     ],
+     "fillIn": 0.08
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 340,
+     "y": 680,
+     "w": 400,
+     "role": "mid",
+     "h": 710,
+     "sw": 9,
+     "text": "0.03|~|0.74\n0.09|~|0.8\n0.15|~|0.8\n0.21|~|0.74\n0.27|~|0.8\n0.32|~|0.8\n0.38|~|0.74\n0.44|~|0.8\n0.5|~|0.8\n0.56|~|0.74\n0.62|~|0.8\n0.68|~|0.8\n0.73|~|0.74\n0.79|~|0.8\n0.85|~|0.8\n0.91|~|0.74\n0.97|~|0.8",
+     "in": 4.84
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       712,
+       680
+      ],
+      [
+       712,
+       1390
+      ]
+     ],
+     "role": "mid",
+     "sw": 22,
+     "in": 4.84
+    },
+    {
+     "t": "rect",
+     "x": -40,
+     "y": 640,
+     "w": 1160,
+     "h": 750,
+     "role": "mid",
+     "fill": "light",
+     "draw": [
+      -0.4,
+      0.55
+     ],
+     "fillIn": 0.05
+    },
+    {
+     "t": "icon",
+     "name": "bookshelf",
+     "x": -100,
+     "y": 630,
+     "w": 220,
+     "role": "mid",
+     "h": 560,
+     "draw": [
+      -0.4,
+      0.6
+     ],
+     "fillIn": 0.2
+    },
+    {
+     "t": "ellipse",
+     "cx": 540,
+     "cy": 950,
+     "rx": 400,
+     "ry": 290,
+     "role": "mid",
+     "fill": "paper",
+     "draw": [
+      99,
+      0.01
+     ],
+     "fillIn": 0.12
+    },
+    {
+     "t": "icon",
+     "name": "box",
+     "x": 140,
+     "y": 700,
+     "w": 170,
+     "role": "mid",
+     "draw": [
+      -0.35,
+      0.5
+     ],
+     "fillIn": 0.18
+    },
+    {
+     "t": "icon",
+     "name": "mug",
+     "x": 800,
+     "y": 690,
+     "w": 90,
+     "role": "mid",
+     "draw": [
+      -0.3,
+      0.45
+     ],
+     "fillIn": 0.25
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 344,
+     "y": 950,
+     "w": 392,
+     "role": "mid",
+     "h": 220,
+     "sw": 9,
+     "text": "0.1|~|0.74\n0.27|~|0.8\n0.44|~|0.8\n0.61|~|0.74\n0.78|~|0.8\n0.95|~|0.8",
+     "in": 3.48
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       712,
+       950
+      ],
+      [
+       712,
+       1170
+      ]
+     ],
+     "role": "mid",
+     "sw": 22,
+     "in": 3.48
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 340,
+     "y": 700,
+     "w": 400,
+     "role": "subject",
+     "h": 470,
+     "text": "0.09|#56|JOB CONTRACT\n0.22|~|0.78\n0.3|~|0.84\n0.38|~|0.84\n0.46|~|0.78\n0.54|~|0.84\n0.645|~|0.86\n0.86|-|0.5",
+     "draw": [
+      -0.45,
+      0.6
+     ],
+     "fillIn": 0.03
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       382,
+       1096
+      ],
+      [
+       396,
+       1072
+      ],
+      [
+       410,
+       1094
+      ],
+      [
+       404,
+       1102
+      ],
+      [
+       428,
+       1080
+      ],
+      [
+       446,
+       1098
+      ],
+      [
+       466,
+       1076
+      ],
+      [
+       478,
+       1096
+      ],
+      [
+       506,
+       1086
+      ],
+      [
+       540,
+       1090
+      ]
+     ],
+     "role": "mid",
+     "sw": 5,
+     "draw": [
+      -0.05,
+      0.3
+     ]
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       377,
+       1003
+      ],
+      [
+       703,
+       1003
+      ]
+     ],
+     "role": "subject",
+     "sw": 24,
+     "draw": [
+      2.6,
+      0.88
+     ]
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       703,
+       1003
+      ],
+      [
+       712,
+       1016
+      ],
+      [
+       712,
+       1170
+      ]
+     ],
+     "role": "subject",
+     "sw": 22,
+     "draw": [
+      3.48,
+      0.25
+     ]
+    },
+    {
+     "t": "icon",
+     "name": "badge",
+     "x": -380,
+     "y": 626,
+     "w": 100,
+     "role": "mid",
+     "text": "GOOGLE"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       -820,
+       616
+      ],
+      [
+       -348,
+       618
+      ],
+      [
+       -348,
+       666
+      ],
+      [
+       -820,
+       688
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "mid"
+    },
+    {
+     "t": "ellipse",
+     "cx": -330,
+     "cy": 636,
+     "rx": 26,
+     "ry": 26,
+     "role": "mid",
+     "fill": "paper"
+    },
+    {
+     "t": "icon",
+     "name": "marker",
+     "x": 377,
+     "y": 853,
+     "w": 150,
+     "role": "mid",
+     "h": 150,
+     "in": 2.2,
+     "out": 4.1
+    }
+   ],
+   "moves": [
+    {
+     "el": 14,
+     "dx": 560,
+     "dy": 0,
+     "at": 0.4,
+     "dur": 0.4
+    },
+    {
+     "el": 14,
+     "dx": 0,
+     "dy": 24,
+     "at": 0.84,
+     "dur": 0.08
+    },
+    {
+     "el": 15,
+     "dx": 560,
+     "dy": 0,
+     "at": 0.4,
+     "dur": 0.4
+    },
+    {
+     "el": 15,
+     "dx": 0,
+     "dy": 24,
+     "at": 0.84,
+     "dur": 0.08
+    },
+    {
+     "el": 16,
+     "dx": 560,
+     "dy": 0,
+     "at": 0.4,
+     "dur": 0.4
+    },
+    {
+     "el": 16,
+     "dx": 0,
+     "dy": 24,
+     "at": 0.84,
+     "dur": 0.08
+    },
+    {
+     "el": 15,
+     "dx": -620,
+     "dy": 0,
+     "at": 1.0,
+     "dur": 0.4
+    },
+    {
+     "el": 16,
+     "dx": -620,
+     "dy": 0,
+     "at": 1.0,
+     "dur": 0.4
+    },
+    {
+     "el": 14,
+     "dx": 0,
+     "dy": 6,
+     "at": 1.5,
+     "dur": 0.2
+    },
+    {
+     "el": 17,
+     "dx": 54.33,
+     "dy": 0,
+     "at": 2.6,
+     "dur": 0.15
+    },
+    {
+     "el": 17,
+     "dx": 54.33,
+     "dy": 0,
+     "at": 2.75,
+     "dur": 0.15
+    },
+    {
+     "el": 17,
+     "dx": 54.33,
+     "dy": 0,
+     "at": 2.89,
+     "dur": 0.15
+    },
+    {
+     "el": 17,
+     "dx": 54.33,
+     "dy": 0,
+     "at": 3.04,
+     "dur": 0.15
+    },
+    {
+     "el": 17,
+     "dx": 54.33,
+     "dy": 0,
+     "at": 3.19,
+     "dur": 0.15
+    },
+    {
+     "el": 17,
+     "dx": 54.33,
+     "dy": 0,
+     "at": 3.33,
+     "dur": 0.15
+    },
+    {
+     "el": 17,
+     "dx": 9,
+     "dy": 167,
+     "at": 3.48,
+     "dur": 0.25
+    },
+    {
+     "el": 17,
+     "dx": 300,
+     "dy": -150,
+     "at": 3.8,
+     "dur": 0.3
+    },
+    {
+     "el": 8,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 3.48,
+     "dur": 0.06
+    },
+    {
+     "el": 8,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 3.63,
+     "dur": 0.06
+    },
+    {
+     "el": 8,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 3.78,
+     "dur": 0.06
+    },
+    {
+     "el": 8,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 3.93,
+     "dur": 0.06
+    },
+    {
+     "el": 8,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 4.08,
+     "dur": 0.06
+    },
+    {
+     "el": 8,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 4.23,
+     "dur": 0.06
+    },
+    {
+     "el": 8,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 4.38,
+     "dur": 0.06
+    },
+    {
+     "el": 8,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 4.53,
+     "dur": 0.06
+    },
+    {
+     "el": 8,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 4.68,
+     "dur": 0.06
+    },
+    {
+     "el": 9,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 3.48,
+     "dur": 0.06
+    },
+    {
+     "el": 9,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 3.63,
+     "dur": 0.06
+    },
+    {
+     "el": 9,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 3.78,
+     "dur": 0.06
+    },
+    {
+     "el": 9,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 3.93,
+     "dur": 0.06
+    },
+    {
+     "el": 9,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 4.08,
+     "dur": 0.06
+    },
+    {
+     "el": 9,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 4.23,
+     "dur": 0.06
+    },
+    {
+     "el": 9,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 4.38,
+     "dur": 0.06
+    },
+    {
+     "el": 9,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 4.53,
+     "dur": 0.06
+    },
+    {
+     "el": 9,
+     "dx": 0,
+     "dy": 24.44,
+     "at": 4.68,
+     "dur": 0.06
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 19.72,
+     "at": 4.84,
+     "dur": 0.16
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 39.44,
+     "at": 5.0,
+     "dur": 0.16
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 59.17,
+     "at": 5.16,
+     "dur": 0.16
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 78.89,
+     "at": 5.32,
+     "dur": 0.16
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 98.61,
+     "at": 5.48,
+     "dur": 0.16
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 118.33,
+     "at": 5.64,
+     "dur": 0.16
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 138.06,
+     "at": 5.8,
+     "dur": 0.16
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 157.78,
+     "at": 5.96,
+     "dur": 0.16
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 19.72,
+     "at": 4.84,
+     "dur": 0.16
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 39.44,
+     "at": 5.0,
+     "dur": 0.16
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 59.17,
+     "at": 5.16,
+     "dur": 0.16
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 78.89,
+     "at": 5.32,
+     "dur": 0.16
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 98.61,
+     "at": 5.48,
+     "dur": 0.16
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 118.33,
+     "at": 5.64,
+     "dur": 0.16
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 138.06,
+     "at": 5.8,
+     "dur": 0.16
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 157.78,
+     "at": 5.96,
+     "dur": 0.16
+    }
+   ]
+  },
+  {
+   "id": "P2",
+   "s": 6.12,
+   "e": 8.36,
+   "note": "COZY nook, wide, eye level: the home base. One odd contract: hers, its tail heaped on the floor",
+   "transition": {
+    "type": "cut",
+    "label": "on 'You'd'"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
     }
    },
    "els": [
     {
-     "t": "text",
+     "t": "icon",
+     "name": "bookshelf",
+     "x": -80,
+     "y": 640,
+     "w": 300,
+     "role": "mid",
+     "h": 1060
+    },
+    {
+     "t": "icon",
+     "name": "window",
+     "x": 560,
+     "y": 650,
+     "w": 400,
+     "role": "mid",
+     "h": 470
+    },
+    {
+     "t": "rect",
+     "x": 380,
+     "y": 1280,
+     "w": 740,
+     "h": 70,
+     "role": "mid",
+     "fill": "light"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       420,
+       1350
+      ],
+      [
+       420,
+       1600
+      ]
+     ],
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       1040,
+       1350
+      ],
+      [
+       1040,
+       1600
+      ]
+     ],
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       -40,
+       1600
+      ],
+      [
+       1120,
+       1600
+      ]
+     ],
+     "role": "far"
+    },
+    {
+     "t": "icon",
+     "name": "lamp",
+     "x": 800,
+     "y": 1071,
+     "w": 190,
+     "role": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "mug",
+     "x": 720,
+     "y": 1214,
+     "w": 60,
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       322,
+       1150
+      ],
+      [
+       322,
+       1600
+      ]
+     ],
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       322,
+       1402
+      ],
+      [
+       452,
+       1402
+      ],
+      [
+       452,
+       1600
+      ]
+     ],
+     "role": "mid"
+    },
+    {
+     "t": "figure",
+     "x": 400,
+     "y": 1600,
+     "h": 600,
+     "pose": "sit",
+     "facing": "r",
+     "role": "subject"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       470,
+       1284
+      ],
+      [
+       700,
+       1284
+      ],
+      [
+       708,
+       1298
+      ],
+      [
+       462,
+       1298
+      ]
+     ],
+     "role": "subject",
+     "closed": true,
+     "fill": "paper"
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 586,
+     "y": 1298,
+     "w": 110,
+     "role": "subject",
+     "h": 216,
+     "text": ""
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       680,
+       1298
+      ],
+      [
+       680,
+       1514
+      ]
+     ],
+     "role": "subject",
+     "sw": 20
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       560,
+       1600
+      ],
+      [
+       730,
+       1600
+      ],
+      [
+       720,
+       1578
+      ],
+      [
+       550,
+       1578
+      ]
+     ],
+     "role": "subject",
+     "closed": true,
+     "fill": "paper"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       580,
+       1578
+      ],
+      [
+       750,
+       1578
+      ],
+      [
+       740,
+       1556
+      ],
+      [
+       570,
+       1556
+      ]
+     ],
+     "role": "subject",
+     "closed": true,
+     "fill": "paper"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       556,
+       1556
+      ],
+      [
+       726,
+       1556
+      ],
+      [
+       716,
+       1534
+      ],
+      [
+       546,
+       1534
+      ]
+     ],
+     "role": "subject",
+     "closed": true,
+     "fill": "paper"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       584,
+       1534
+      ],
+      [
+       754,
+       1534
+      ],
+      [
+       744,
+       1512
+      ],
+      [
+       574,
+       1512
+      ]
+     ],
+     "role": "subject",
+     "closed": true,
+     "fill": "paper"
+    }
+   ]
+  },
+  {
+   "id": "P3",
+   "s": 8.36,
+   "e": 13.24,
+   "note": "PLAIN interview look: backlit, faceless staff; NAME WITHHELD; an ordinary underline on their contract",
+   "transition": {
+    "type": "cut",
+    "label": "on 'But'"
+   },
+   "camera": {
+    "from": {
      "x": 540,
      "y": 960,
-     "text": "v2 animatic placeholder",
-     "size": 60
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    }
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 140,
+     "y": 650,
+     "w": 800,
+     "h": 600,
+     "role": "mid",
+     "fill": "light"
+    },
+    {
+     "t": "figure",
+     "x": 760,
+     "y": 1520,
+     "h": 520,
+     "pose": "sit",
+     "facing": "l",
+     "role": "mid",
+     "fill": "mid"
+    },
+    {
+     "t": "ellipse",
+     "cx": 739.2,
+     "cy": 1127.4,
+     "rx": 46.8,
+     "ry": 46.8,
+     "role": "mid",
+     "fill": "mid"
+    },
+    {
+     "t": "figure",
+     "x": 430,
+     "y": 1560,
+     "h": 600,
+     "pose": "sit",
+     "facing": "r",
+     "role": "subject"
+    },
+    {
+     "t": "ellipse",
+     "cx": 454.0,
+     "cy": 1107.0,
+     "rx": 54.0,
+     "ry": 54.0,
+     "role": "subject",
+     "fill": "dark"
+    },
+    {
+     "t": "icon",
+     "name": "badge",
+     "x": 452,
+     "y": 1150,
+     "w": 66,
+     "role": "mid"
+    },
+    {
+     "t": "rect",
+     "x": 40,
+     "y": 1280,
+     "w": 1000,
+     "h": 260,
+     "role": "mid",
+     "fill": "light"
+    },
+    {
+     "t": "rect",
+     "x": 40,
+     "y": 1540,
+     "w": 1000,
+     "h": 90,
+     "role": "mid",
+     "fill": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 330,
+     "y": 1320,
+     "w": 360,
+     "role": "mid",
+     "h": 190,
+     "text": "0.14|#40|CONTRACT\n0.36|~|0.79\n0.52|~|0.85\n0.68|~|0.85\n0.88|-|0.5"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       362,
+       1462
+      ],
+      [
+       600,
+       1462
+      ]
+     ],
+     "role": "mid",
+     "sw": 5,
+     "draw": [
+      3.84,
+      0.3
+     ],
+     "in": 3.84
+    },
+    {
+     "t": "text",
+     "x": 454.0,
+     "y": 1023.0,
+     "text": "NAME WITHHELD",
+     "size": 52,
+     "role": "mid"
+    }
+   ],
+   "credit": "Source: BBC News, 21 Oct 2026"
+  },
+  {
+   "id": "P4",
+   "s": 13.24,
+   "e": 15.0,
+   "note": "COZY nook medium: so why is SHE talking? Her mic; her bubble pops on \"talking\"",
+   "transition": {
+    "type": "cut",
+    "label": "on 'So'"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    }
+   },
+   "els": [
+    {
+     "t": "icon",
+     "name": "bookshelf",
+     "x": -80,
+     "y": 640,
+     "w": 260,
+     "role": "mid",
+     "h": 1060
+    },
+    {
+     "t": "icon",
+     "name": "window",
+     "x": 600,
+     "y": 650,
+     "w": 400,
+     "role": "mid",
+     "h": 460
+    },
+    {
+     "t": "rect",
+     "x": 330,
+     "y": 1330,
+     "w": 790,
+     "h": 80,
+     "role": "mid",
+     "fill": "light"
+    },
+    {
+     "t": "icon",
+     "name": "lamp",
+     "x": 820,
+     "y": 1121,
+     "w": 190,
+     "role": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "mug",
+     "x": 730,
+     "y": 1268,
+     "w": 56,
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       280,
+       1180
+      ],
+      [
+       280,
+       1700
+      ]
+     ],
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       280,
+       1429
+      ],
+      [
+       400,
+       1429
+      ]
+     ],
+     "role": "mid"
+    },
+    {
+     "t": "figure",
+     "x": 340,
+     "y": 1640,
+     "h": 640,
+     "pose": "sit",
+     "facing": "r",
+     "role": "subject"
+    },
+    {
+     "t": "icon",
+     "name": "mic",
+     "x": 480,
+     "y": 1160,
+     "w": 100,
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       560,
+       1334
+      ],
+      [
+       740,
+       1334
+      ],
+      [
+       748,
+       1348
+      ],
+      [
+       552,
+       1348
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "paper"
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 670,
+     "y": 1348,
+     "w": 66,
+     "role": "mid",
+     "h": 342,
+     "sw": 5,
+     "text": ""
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       720,
+       1348
+      ],
+      [
+       720,
+       1690
+      ]
+     ],
+     "role": "mid",
+     "sw": 12
+    },
+    {
+     "t": "icon",
+     "name": "speech",
+     "x": 430,
+     "y": 660,
+     "w": 400,
+     "role": "mid",
+     "h": 264,
+     "pts": [
+      [
+       0.0,
+       1.7
+      ]
+     ],
+     "in": 0.72
+    }
+   ]
+  },
+  {
+   "id": "P5",
+   "s": 15.0,
+   "e": 16.6,
+   "note": "COZY cut-in over her shoulder: she worked on Google's AI",
+   "transition": {
+    "type": "cut",
+    "label": "cut-in on 'She'"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    }
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": -40,
+     "y": 980,
+     "w": 1160,
+     "h": 760,
+     "role": "mid",
+     "fill": "light"
+    },
+    {
+     "t": "icon",
+     "name": "lamp",
+     "x": 800,
+     "y": 771,
+     "w": 180,
+     "role": "mid"
+    },
+    {
+     "t": "ellipse",
+     "cx": 560,
+     "cy": 1190,
+     "rx": 420,
+     "ry": 170,
+     "role": "mid",
+     "fill": "paper",
+     "draw": [
+      99,
+      0.01
+     ]
+    },
+    {
+     "t": "icon",
+     "name": "laptop",
+     "x": 300,
+     "y": 760,
+     "w": 460,
+     "role": "subject"
+    },
+    {
+     "t": "icon",
+     "name": "nodes",
+     "x": 392,
+     "y": 786,
+     "w": 276,
+     "role": "mid",
+     "h": 160
+    },
+    {
+     "t": "text",
+     "x": 530,
+     "y": 888,
+     "text": "AI",
+     "size": 64,
+     "role": "mid"
+    },
+    {
+     "t": "figure",
+     "x": 110,
+     "y": 1600,
+     "h": 1100,
+     "pose": "sit",
+     "facing": "r",
+     "role": "mid",
+     "fill": "mid"
+    }
+   ],
+   "credit": "Sofia Liguori \u00b7 research engineer, Google DeepMind"
+  },
+  {
+   "id": "P6",
+   "s": 16.6,
+   "e": 20.52,
+   "note": "COZY, closer: she told the BBC she objected (worried, speaking)",
+   "transition": {
+    "type": "cut",
+    "label": "on 'and'"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    }
+   },
+   "els": [
+    {
+     "t": "icon",
+     "name": "bookshelf",
+     "x": -120,
+     "y": 640,
+     "w": 230,
+     "role": "mid",
+     "h": 1100
+    },
+    {
+     "t": "icon",
+     "name": "window",
+     "x": 640,
+     "y": 650,
+     "w": 380,
+     "role": "mid",
+     "h": 470
+    },
+    {
+     "t": "rect",
+     "x": 360,
+     "y": 1340,
+     "w": 760,
+     "h": 90,
+     "role": "mid",
+     "fill": "light"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       252,
+       1100
+      ],
+      [
+       252,
+       1700
+      ]
+     ],
+     "role": "mid"
+    },
+    {
+     "t": "figure",
+     "x": 330,
+     "y": 1700,
+     "h": 760,
+     "pose": "sit",
+     "facing": "r",
+     "role": "subject",
+     "face": "worried"
+    },
+    {
+     "t": "icon",
+     "name": "mic",
+     "x": 500,
+     "y": 1153,
+     "w": 110,
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       600,
+       1344
+      ],
+      [
+       780,
+       1344
+      ],
+      [
+       788,
+       1358
+      ],
+      [
+       592,
+       1358
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "paper"
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 710,
+     "y": 1358,
+     "w": 66,
+     "role": "mid",
+     "h": 332,
+     "sw": 5,
+     "text": ""
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       760,
+       1358
+      ],
+      [
+       760,
+       1690
+      ]
+     ],
+     "role": "mid",
+     "sw": 12
+    },
+    {
+     "t": "icon",
+     "name": "speech",
+     "x": 440,
+     "y": 650,
+     "w": 420,
+     "role": "mid",
+     "h": 270,
+     "pts": [
+      [
+       0.0,
+       1.59
+      ]
+     ],
+     "in": 0.16
+    }
+   ],
+   "credit": "Source: BBC News, 21 Oct 2026"
+  },
+  {
+   "id": "P7",
+   "s": 20.52,
+   "e": 21.32,
+   "note": "PLAIN cold insert: a deal, stamped APRIL 2026 on \"April\". Out of her room (never through her window)",
+   "transition": {
+    "type": "cut",
+    "label": "hard cut on 'In'"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    }
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": -40,
+     "y": 600,
+     "w": 1160,
+     "h": 1120,
+     "role": "far",
+     "fill": "light"
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 320,
+     "y": 640,
+     "w": 440,
+     "role": "subject",
+     "h": 600,
+     "text": "0.08|>60|DEAL\n0.2|~|0.8\n0.28|~|0.86\n0.36|~|0.86\n0.44|~|0.8\n0.52|~|0.86\n0.6|~|0.86\n0.8|@|0.42\n0.91|@|0.42"
+    },
+    {
+     "t": "icon",
+     "name": "stamp",
+     "x": 520,
+     "y": 650,
+     "w": 240,
+     "role": "subject",
+     "h": 91,
+     "text": "APRIL 2026",
+     "in": 0.24
+    }
+   ],
+   "moves": [
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 18,
+     "at": 0.24,
+     "dur": 0.06
+    }
+   ],
+   "credit": "Source: Japan Times, 28 Apr 2026"
+  },
+  {
+   "id": "P8",
+   "s": 21.32,
+   "e": 23.8,
+   "note": "SCALE, the one big move (S1 rise-over): over a low wall onto the Pentagon; car lots for scale. No figures",
+   "transition": {
+    "type": "cut",
+    "label": "on 'that'"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 1560,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "ease": "inout",
+    "start": 21.32,
+    "end": 22.85
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": -40,
+     "y": 1610,
+     "w": 1160,
+     "h": 1300,
+     "role": "far",
+     "fill": "light"
+    },
+    {
+     "t": "rect",
+     "x": -40,
+     "y": 1610,
+     "w": 1160,
+     "h": 26,
+     "role": "far",
+     "fill": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       -40,
+       1860
+      ],
+      [
+       330,
+       1870
+      ]
+     ],
+     "role": "far"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       750,
+       1870
+      ],
+      [
+       1120,
+       1850
+      ]
+     ],
+     "role": "far"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       540,
+       2000
+      ],
+      [
+       540,
+       2200
+      ]
+     ],
+     "role": "far"
+    },
+    {
+     "t": "icon",
+     "name": "lot",
+     "x": 40,
+     "y": 1910,
+     "w": 270,
+     "role": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "lot",
+     "x": 770,
+     "y": 1910,
+     "w": 270,
+     "role": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "lot",
+     "x": 380,
+     "y": 2100,
+     "w": 320,
+     "role": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "pentagon",
+     "x": 310,
+     "y": 1710,
+     "w": 460,
+     "role": "subject"
+    },
+    {
+     "t": "icon",
+     "name": "stonewall",
+     "x": -60,
+     "y": 1700,
+     "w": 1200,
+     "role": "mid",
+     "h": 700
+    }
+   ],
+   "moves": [
+    {
+     "el": 0,
+     "dx": 0,
+     "dy": -850,
+     "at": 0,
+     "dur": 1.53
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": -850,
+     "at": 0,
+     "dur": 1.53
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": -850,
+     "at": 0,
+     "dur": 1.53
+    },
+    {
+     "el": 3,
+     "dx": 0,
+     "dy": -850,
+     "at": 0,
+     "dur": 1.53
+    },
+    {
+     "el": 4,
+     "dx": 0,
+     "dy": -850,
+     "at": 0,
+     "dur": 1.53
+    },
+    {
+     "el": 5,
+     "dx": 0,
+     "dy": -850,
+     "at": 0,
+     "dur": 1.53
+    },
+    {
+     "el": 6,
+     "dx": 0,
+     "dy": -850,
+     "at": 0,
+     "dur": 1.53
+    },
+    {
+     "el": 7,
+     "dx": 0,
+     "dy": -850,
+     "at": 0,
+     "dur": 1.53
+    },
+    {
+     "el": 8,
+     "dx": 0,
+     "dy": -850,
+     "at": 0,
+     "dur": 1.53
+    }
+   ]
+  },
+  {
+   "id": "P9",
+   "s": 23.8,
+   "e": 25.96,
+   "note": "PLAIN insert (scale cut back in): the deal's words, with its oversight clause in full",
+   "transition": {
+    "type": "cut",
+    "label": "scale cut on 'for'"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    }
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": -40,
+     "y": 600,
+     "w": 1160,
+     "h": 1120,
+     "role": "far",
+     "fill": "light"
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 320,
+     "y": 640,
+     "w": 440,
+     "role": "subject",
+     "h": 615,
+     "text": "0|m|0.05\n0.15|>50|for any lawful\n0.24|>50|government purpose\n0.34|>48|should not be used\n0.42|>48|for domestic mass\n0.51|>48|surveillance or\n0.59|>48|autonomous weapons\n0.68|>48|(including target\n0.76|>48|selection) without\n0.85|>48|appropriate human\n0.93|>48|oversight and control"
+    },
+    {
+     "t": "icon",
+     "name": "stamp",
+     "x": 616,
+     "y": 610,
+     "w": 150,
+     "role": "mid",
+     "h": 56,
+     "text": "APRIL 2026"
+    }
+   ],
+   "credit": "Source: BBC News, 21 Oct 2026"
+  },
+  {
+   "id": "P10",
+   "s": 25.96,
+   "e": 28.2,
+   "note": "PLAIN insert, same frame: NO VETO stamped on \"veto\"; the clause stays readable",
+   "transition": {
+    "type": "cut",
+    "label": "on 'Google'"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    }
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": -40,
+     "y": 600,
+     "w": 1160,
+     "h": 1120,
+     "role": "far",
+     "fill": "light"
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 320,
+     "y": 640,
+     "w": 440,
+     "role": "subject",
+     "h": 615,
+     "text": "0|m|0.05\n0.15|>50|for any lawful\n0.24|>50|government purpose\n0.34|>48|should not be used\n0.42|>48|for domestic mass\n0.51|>48|surveillance or\n0.59|>48|autonomous weapons\n0.68|>48|(including target\n0.76|>48|selection) without\n0.85|>48|appropriate human\n0.93|>48|oversight and control"
+    },
+    {
+     "t": "icon",
+     "name": "stamp",
+     "x": 616,
+     "y": 610,
+     "w": 150,
+     "role": "mid",
+     "h": 56,
+     "text": "APRIL 2026"
+    },
+    {
+     "t": "icon",
+     "name": "stamp",
+     "x": 330,
+     "y": 605,
+     "w": 280,
+     "role": "subject",
+     "h": 80,
+     "text": "NO VETO",
+     "in": 0.74
+    }
+   ],
+   "moves": [
+    {
+     "el": 3,
+     "dx": 0,
+     "dy": 5,
+     "at": 0.74,
+     "dur": 0.05
+    }
+   ],
+   "credit": "Sources: BBC News, 21 Oct 2026 \u00b7 Japan Times, 28 Apr 2026"
+  },
+  {
+   "id": "P11",
+   "s": 28.2,
+   "e": 33.08,
+   "note": "PLAIN neutral: Google's own page, same size as hers; underlines read along",
+   "transition": {
+    "type": "cut",
+    "label": "on 'But'"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    }
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": 334,
+     "y": 654,
+     "w": 440,
+     "h": 615,
+     "role": "far",
+     "fill": "light"
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 320,
+     "y": 640,
+     "w": 440,
+     "role": "subject",
+     "h": 615,
+     "text": "0|m|0.06\n0.1|#60|GOOGLE SAYS\n0.28|>52|it follows its\n0.37|>52|AI principles\n0.53|>52|bans retaliation\n0.62|>52|\"of any kind\"\n0.78|~|0.74\n0.85|~|0.8\n0.92|~|0.8"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       360,
+       902
+      ],
+      [
+       640,
+       902
+      ]
+     ],
+     "role": "mid",
+     "sw": 5,
+     "draw": [
+      1.84,
+      0.3
+     ],
+     "in": 1.84
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       360,
+       1000
+      ],
+      [
+       700,
+       1000
+      ]
+     ],
+     "role": "mid",
+     "sw": 5,
+     "draw": [
+      2.56,
+      0.4
+     ],
+     "in": 2.56
+    }
+   ],
+   "credit": "Statement to the BBC, 21 Oct 2026"
+  },
+  {
+   "id": "P12",
+   "s": 33.08,
+   "e": 35.32,
+   "note": "COZY desk insert, O1's end frame: she says she still can't; her line runs again",
+   "transition": {
+    "type": "cut",
+    "label": "on 'She'"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    }
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": -40,
+     "y": 1390,
+     "w": 1160,
+     "h": 80,
+     "role": "mid",
+     "fill": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 340,
+     "y": 1220,
+     "w": 400,
+     "role": "mid",
+     "h": 880,
+     "sw": 9,
+     "text": "0.03|~|0.74\n0.07|~|0.8\n0.12|~|0.8\n0.16|~|0.74\n0.21|~|0.8\n0.25|~|0.8\n0.3|~|0.74\n0.34|~|0.8\n0.39|~|0.8\n0.43|~|0.74\n0.48|~|0.8\n0.52|~|0.8\n0.57|~|0.74\n0.61|~|0.8\n0.66|~|0.8\n0.7|~|0.74\n0.75|~|0.8\n0.79|~|0.8\n0.84|~|0.74\n0.88|~|0.8\n0.93|~|0.8\n0.97|~|0.74"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       712,
+       1220
+      ],
+      [
+       712,
+       2100
+      ]
+     ],
+     "role": "mid",
+     "sw": 22
+    },
+    {
+     "t": "rect",
+     "x": -40,
+     "y": 640,
+     "w": 1160,
+     "h": 750,
+     "role": "mid",
+     "fill": "light"
+    },
+    {
+     "t": "icon",
+     "name": "bookshelf",
+     "x": -100,
+     "y": 630,
+     "w": 220,
+     "role": "mid",
+     "h": 560
+    },
+    {
+     "t": "ellipse",
+     "cx": 540,
+     "cy": 950,
+     "rx": 400,
+     "ry": 290,
+     "role": "mid",
+     "fill": "paper",
+     "draw": [
+      99,
+      0.01
+     ]
+    },
+    {
+     "t": "icon",
+     "name": "box",
+     "x": 140,
+     "y": 700,
+     "w": 170,
+     "role": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "mug",
+     "x": 800,
+     "y": 690,
+     "w": 90,
+     "role": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 344,
+     "y": 1170,
+     "w": 392,
+     "role": "mid",
+     "h": 220,
+     "sw": 9,
+     "text": "0.1|~|0.74\n0.27|~|0.8\n0.44|~|0.8\n0.61|~|0.74\n0.78|~|0.8\n0.95|~|0.8"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       712,
+       1170
+      ],
+      [
+       712,
+       1390
+      ]
+     ],
+     "role": "mid",
+     "sw": 22
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 340,
+     "y": 700,
+     "w": 400,
+     "role": "subject",
+     "h": 470,
+     "text": "0.09|#56|JOB CONTRACT\n0.22|~|0.78\n0.3|~|0.84\n0.38|~|0.84\n0.46|~|0.78\n0.54|~|0.84\n0.645|~|0.86\n0.86|-|0.5"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       382,
+       1096
+      ],
+      [
+       396,
+       1072
+      ],
+      [
+       410,
+       1094
+      ],
+      [
+       404,
+       1102
+      ],
+      [
+       428,
+       1080
+      ],
+      [
+       446,
+       1098
+      ],
+      [
+       466,
+       1076
+      ],
+      [
+       478,
+       1096
+      ],
+      [
+       506,
+       1086
+      ],
+      [
+       540,
+       1090
+      ]
+     ],
+     "role": "mid",
+     "sw": 5
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       377,
+       1003
+      ],
+      [
+       703,
+       1003
+      ]
+     ],
+     "role": "subject",
+     "sw": 24
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       703,
+       1003
+      ],
+      [
+       712,
+       1016
+      ],
+      [
+       712,
+       1170
+      ]
+     ],
+     "role": "subject",
+     "sw": 22
+    },
+    {
+     "t": "icon",
+     "name": "badge",
+     "x": 180,
+     "y": 656,
+     "w": 100,
+     "role": "mid",
+     "text": "GOOGLE"
+    }
+   ],
+   "moves": [
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 11.33,
+     "at": 0.64,
+     "dur": 0.12
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 22.67,
+     "at": 0.76,
+     "dur": 0.12
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 34.0,
+     "at": 0.88,
+     "dur": 0.12
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 45.33,
+     "at": 1.0,
+     "dur": 0.12
+    },
+    {
+     "el": 1,
+     "dx": 0,
+     "dy": 56.67,
+     "at": 1.12,
+     "dur": 0.12
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 11.33,
+     "at": 0.64,
+     "dur": 0.12
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 22.67,
+     "at": 0.76,
+     "dur": 0.12
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 34.0,
+     "at": 0.88,
+     "dur": 0.12
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 45.33,
+     "at": 1.0,
+     "dur": 0.12
+    },
+    {
+     "el": 2,
+     "dx": 0,
+     "dy": 56.67,
+     "at": 1.12,
+     "dur": 0.12
+    }
+   ],
+   "credit": "Source: BBC News, 21 Oct 2026"
+  },
+  {
+   "id": "P13",
+   "s": 35.32,
+   "e": 39.08,
+   "note": "COZY nook medium, slow push: her own words; on \"FACTS\" her bubble holds the sourced deal page",
+   "transition": {
+    "type": "cut",
+    "label": "on 'But'"
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.0
+    },
+    "to": {
+     "x": 540,
+     "y": 980,
+     "z": 1.04
+    },
+    "ease": "out",
+    "start": 35.32,
+    "end": 38.6
+   },
+   "els": [
+    {
+     "t": "icon",
+     "name": "bookshelf",
+     "x": -80,
+     "y": 640,
+     "w": 260,
+     "role": "mid",
+     "h": 1060
+    },
+    {
+     "t": "icon",
+     "name": "window",
+     "x": 600,
+     "y": 650,
+     "w": 400,
+     "role": "mid",
+     "h": 460
+    },
+    {
+     "t": "rect",
+     "x": 330,
+     "y": 1330,
+     "w": 790,
+     "h": 80,
+     "role": "mid",
+     "fill": "light"
+    },
+    {
+     "t": "icon",
+     "name": "lamp",
+     "x": 820,
+     "y": 1121,
+     "w": 190,
+     "role": "mid"
+    },
+    {
+     "t": "icon",
+     "name": "mug",
+     "x": 730,
+     "y": 1268,
+     "w": 56,
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       280,
+       1180
+      ],
+      [
+       280,
+       1700
+      ]
+     ],
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       280,
+       1429
+      ],
+      [
+       400,
+       1429
+      ]
+     ],
+     "role": "mid"
+    },
+    {
+     "t": "figure",
+     "x": 340,
+     "y": 1640,
+     "h": 640,
+     "pose": "sit",
+     "facing": "r",
+     "role": "subject"
+    },
+    {
+     "t": "icon",
+     "name": "mic",
+     "x": 480,
+     "y": 1160,
+     "w": 100,
+     "role": "mid"
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       560,
+       1334
+      ],
+      [
+       740,
+       1334
+      ],
+      [
+       748,
+       1348
+      ],
+      [
+       552,
+       1348
+      ]
+     ],
+     "role": "mid",
+     "closed": true,
+     "fill": "paper"
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 670,
+     "y": 1348,
+     "w": 66,
+     "role": "mid",
+     "h": 342,
+     "sw": 5,
+     "text": ""
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       720,
+       1348
+      ],
+      [
+       720,
+       1690
+      ]
+     ],
+     "role": "mid",
+     "sw": 12
+    },
+    {
+     "t": "icon",
+     "name": "speech",
+     "x": 430,
+     "y": 660,
+     "w": 400,
+     "role": "mid",
+     "h": 264,
+     "pts": [
+      [
+       0.0,
+       1.7
+      ]
+     ],
+     "out": 1.78,
+     "in": 1.12
+    },
+    {
+     "t": "icon",
+     "name": "speech",
+     "x": 430,
+     "y": 660,
+     "w": 400,
+     "role": "mid",
+     "h": 264,
+     "pts": [
+      [
+       0.0,
+       1.7
+      ]
+     ],
+     "text": " ",
+     "in": 1.78
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 560,
+     "y": 690,
+     "w": 140,
+     "role": "mid",
+     "h": 180,
+     "text": "0.14|>30|DEAL\n0.32|~|0.74\n0.42|~|0.8\n0.52|~|0.8\n0.62|~|0.74\n0.84|@|0.45",
+     "in": 1.78
+    },
+    {
+     "t": "icon",
+     "name": "stamp",
+     "x": 600,
+     "y": 760,
+     "w": 120,
+     "role": "mid",
+     "in": 1.78
+    }
+   ],
+   "credit": "Source: BBC News, 21 Oct 2026"
+  },
+  {
+   "id": "LOOP",
+   "s": 39.08,
+   "e": 39.5,
+   "note": "Back to frame 0's bare lines",
+   "transition": {
+    "type": "dissolve",
+    "label": "to frame 0",
+    "dur": 0.12
+   },
+   "camera": {
+    "from": {
+     "x": 540,
+     "y": 960,
+     "z": 1.06
+    },
+    "to": {
+     "x": 540,
+     "y": 960,
+     "z": 1.06
+    }
+   },
+   "els": [
+    {
+     "t": "rect",
+     "x": -40,
+     "y": 1390,
+     "w": 1160,
+     "h": 80,
+     "role": "mid",
+     "fill": "mid",
+     "draw": [
+      0.07,
+      0.5
+     ],
+     "fillIn": 99
+    },
+    {
+     "t": "rect",
+     "x": -40,
+     "y": 640,
+     "w": 1160,
+     "h": 750,
+     "role": "mid",
+     "fill": "light",
+     "draw": [
+      0.02,
+      0.55
+     ],
+     "fillIn": 99
+    },
+    {
+     "t": "icon",
+     "name": "bookshelf",
+     "x": -100,
+     "y": 630,
+     "w": 220,
+     "role": "mid",
+     "h": 560,
+     "draw": [
+      0.02,
+      0.6
+     ],
+     "fillIn": 99
+    },
+    {
+     "t": "icon",
+     "name": "box",
+     "x": 140,
+     "y": 700,
+     "w": 170,
+     "role": "mid",
+     "draw": [
+      0.07,
+      0.5
+     ],
+     "fillIn": 99
+    },
+    {
+     "t": "icon",
+     "name": "mug",
+     "x": 800,
+     "y": 690,
+     "w": 90,
+     "role": "mid",
+     "draw": [
+      0.12,
+      0.45
+     ],
+     "fillIn": 99
+    },
+    {
+     "t": "icon",
+     "name": "page",
+     "x": 340,
+     "y": 700,
+     "w": 400,
+     "role": "subject",
+     "h": 470,
+     "text": "0.09|#56|JOB CONTRACT\n0.22|~|0.78\n0.3|~|0.84\n0.38|~|0.84\n0.46|~|0.78\n0.54|~|0.84\n0.645|~|0.86\n0.86|-|0.5",
+     "draw": [
+      -0.03,
+      0.6
+     ],
+     "fillIn": 99
+    },
+    {
+     "t": "line",
+     "pts": [
+      [
+       382,
+       1096
+      ],
+      [
+       396,
+       1072
+      ],
+      [
+       410,
+       1094
+      ],
+      [
+       404,
+       1102
+      ],
+      [
+       428,
+       1080
+      ],
+      [
+       446,
+       1098
+      ],
+      [
+       466,
+       1076
+      ],
+      [
+       478,
+       1096
+      ],
+      [
+       506,
+       1086
+      ],
+      [
+       540,
+       1090
+      ]
+     ],
+     "role": "mid",
+     "sw": 5,
+     "draw": [
+      0.37,
+      0.3
+     ],
+     "fillIn": 99
     }
    ]
   }

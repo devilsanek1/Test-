@@ -90,6 +90,7 @@ it rejected the broken take 1 (84 s), accepted a clean whole take, and caught th
 |---|---|---|---|
 | 2026-10-26 | v2 take 1 | 10 long tags (8-20 words), 2 mid-line tags, negations, 1,345 characters | 88 s instead of 43: opening repeat, derail and restart, closing lines looped 3 times, "And 'oogle". Rescued by cutting. |
 | 2026-10-26 | v2 take 2 | **5 short tags (1-3 words) inline before their words, tags carry forward, no mid-line tags, no brand after "And", 714 characters** | **Clean on the first generation:** 38.96 s, every word matches (Parakeet + Whisper), no repeats. |
+| 2026-10-26 | v2 API take 1 (`generate_take.py`, whole script, eleven_v4, stability 0.5, voice "Test 3") | the take-2 paste (format v2) | **Clean on the first try:** 40.09 s, MATCH (Parakeet + Whisper), 44.1 kHz WAV. |
 
 What changed between them is now the default format: short tags on the same line as their words, 4-6 per script,
 only where the delivery shifts, and the whole paste at about 800 characters or less. The root-cause proposal

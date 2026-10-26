@@ -24,12 +24,17 @@ import {BOARD, type Role, boardTone, roleLine} from './board';
 
 export type IconName =
   | 'laptop' | 'phone' | 'ram' | 'chip' | 'datacenter' | 'server' | 'pricetag' | 'chart'
-  | 'factory' | 'truck' | 'calendar' | 'house' | 'cart' | 'crane' | 'pile';
+  | 'factory' | 'truck' | 'calendar' | 'house' | 'cart' | 'crane' | 'pile'
+  // added for v2 (2026-10-26)
+  | 'page' | 'stamp' | 'badge' | 'mic' | 'lamp' | 'mug' | 'pentagon' | 'lot' | 'speech' | 'bookshelf' | 'window'
+  | 'box' | 'stonewall' | 'nodes' | 'marker' | 'cars';
 
 /** natural height / width of each icon (h defaults to w * this) */
 export const ICON_ASPECT: Record<IconName, number> = {
   laptop: 0.7, phone: 2, ram: 0.3, chip: 1, datacenter: 0.7, server: 1.7, pricetag: 0.6, chart: 0.78,
   factory: 0.72, truck: 0.58, calendar: 1, house: 0.92, cart: 0.82, crane: 1, pile: 0.58,
+  page: 1.3, stamp: 0.38, badge: 1.7, mic: 1.7, lamp: 1.1, mug: 1.1, pentagon: 0.62, lot: 0.5, speech: 0.66,
+  bookshelf: 2.4, window: 1.15, box: 0.8, stonewall: 0.3, nodes: 0.6, marker: 1, cars: 0.035,
 };
 export const ICON_NAMES = Object.keys(ICON_ASPECT) as IconName[];
 
@@ -505,6 +510,313 @@ const ICONS: Record<IconName, (b: Ico, o: Opts) => void> = {
     }
     b.part();
     b.ln(-0.03, 1, 1.03, 1, 3);
+  },
+
+  // ---------------------------------------------------------------- added for v2 (2026-10-26): documents, desk
+  // props, the nook (shelf, window, lamp, mug, box), the Pentagon from a high 3/4 angle with its car-lot ruler.
+
+  page(b, o) {
+    // A sheet lying on a surface, seen from slightly above (its top edge a little narrower). text = its rows, one per
+    // line, "v|kind|content": v = the row's centre (0..1 down the sheet); kind '#NN' bold header centred (NN px),
+    // '^NN' words centred, '>NN' words from the left margin, '~' a handwriting squiggle (content = its width 0..1),
+    // '-' a plain rule, '@' a signed rule (rule + signature), 'm' the side margin for the rows after it (default 0.08),
+    // '=' a highlighter band behind the row (content "frac|px": its width 0..1 of the text area, its height in px; it
+    // sits under the words, so they stay readable). No text: a short heading rule, 6 squiggles, a signature.
+    const paper = o.body(C.white);
+    const k = 0.035;
+    const shape: Pt[] = [[k, 0], [1 - k, 0], [1, 1], [0, 1]];
+    b.fPl(shape, paper);
+    b.pl(shape);
+    const r = rng(`${b.seed}/page`);
+    const amp = Math.min(7, 0.014 * b.w);
+    const squiggle = (u0: number, u1: number, v: number) => {
+      const n = Math.max(4, Math.round(((u1 - u0) * b.w) / 24));
+      const pts: Pt[] = [];
+      for (let i = 0; i <= n; i++) pts.push([b.X(u0 + ((u1 - u0) * i) / n), b.Y(v) + (i % 2 ? -1 : 1) * r.range(0.3, 1) * amp]);
+      b.ink(smooth(pts), 2.5);
+    };
+    const signature = (u0: number, v: number) => {
+      const s = 0.05 * b.w;
+      const x0 = b.X(u0 + 0.02);
+      const y0 = b.Y(v) - 0.25 * s;
+      const pts: Pt[] = [[0, 0], [0.5, -1.2], [0.9, -0.2], [0.7, 0.3], [1.3, -0.9], [1.8, 0.1], [2.3, -1], [2.6, 0], [3.4, -0.6], [4.4, -0.3]];
+      b.ink(smooth(pts.map(([x, y]): Pt => [x0 + x * s, y0 + y * s])), 3);
+    };
+    const rows = o.text ?? '0.1|-|0.4\n0.24|~|0.85\n0.34|~|0.9\n0.44|~|0.8\n0.54|~|0.9\n0.64|~|0.85\n0.86|@|0.45';
+    let margin = 0.08;
+    for (const row of rows.split('\n')) {
+      const [vs, kind = '', ...rest] = row.split('|');
+      const v = parseFloat(vs);
+      if (kind === 'm') margin = Math.max(0.02, Math.min(0.3, parseFloat(rest[0]) || 0.08)); // '0|m|0.05': the side margin from here on
+      if (!Number.isFinite(v) || !kind || kind === 'm') continue;
+      const content = rest.join('|');
+      const inset = k * (1 - v);
+      const L = margin + inset;
+      const R = 1 - margin - inset;
+      const size = parseFloat(kind.slice(1));
+      const frac = Math.max(0.05, Math.min(1, parseFloat(content) || 0.85));
+      if (kind[0] === '#' || kind[0] === '^') b.say(0.5, v, content, Number.isFinite(size) ? size : b.fit(content, (R - L) * b.w, 0.09 * b.h));
+      else if (kind[0] === '>') b.say(L, v, content, Number.isFinite(size) ? size : b.fit(content, (R - L) * b.w, 0.06 * b.h), LEAD, {anchor: 'start'});
+      else if (kind[0] === '~') squiggle(L, L + (R - L) * frac, v);
+      else if (kind[0] === '-') b.ln(L, v, L + (R - L) * frac, v, 2.5);
+      else if (kind[0] === '=') {
+        const hh = (parseFloat(rest[1]) || 0.06 * b.h) / b.h;
+        b.fBx(L - 0.01, v - hh / 2, (R - L) * frac + 0.02, hh, C.smoke);
+      }
+      else if (kind[0] === '@') {
+        b.ln(L, v, L + (R - L) * frac, v, 2.5);
+        signature(L, v);
+      }
+    }
+  },
+
+  stamp(b, o) {
+    // a rubber-stamp impression, slightly tilted: a double rounded border and its words (text) in stamp ink (body)
+    const ink = o.body(C.dark) ?? LEAD;
+    b.rotate = -6;
+    b.fRr(0.01, 0.03, 0.98, 0.94, 0.06, C.white, 0.9);
+    b.rr(0.01, 0.03, 0.98, 0.94, 0.06, 4, ink);
+    b.rr(0.05, 0.14, 0.9, 0.72, 0.04, 3, ink);
+    if (o.text) b.say(0.5, 0.5, o.text, b.fit(o.text, 0.8 * b.w, 0.52 * b.h), ink);
+  },
+
+  badge(b, o) {
+    // a work ID badge on its lanyard: the strap loop, a clip, the card with a photo square and a name (text)
+    const card = o.body(C.white);
+    b.ink(smooth(([[0.5, 0.4], [0.22, 0.24], [0.16, 0.07], [0.32, 0.0], [0.68, 0.0], [0.84, 0.07], [0.78, 0.24], [0.5, 0.4]] as Pt[]).map(b.P)), 4);
+    b.fBx(0.43, 0.37, 0.14, 0.08, C.steel);
+    b.bx(0.43, 0.37, 0.14, 0.08, 3);
+    b.part();
+    b.fRr(0.08, 0.44, 0.84, 0.54, 0.07, card);
+    b.rr(0.08, 0.44, 0.84, 0.54, 0.07);
+    b.fBx(0.17, 0.51, 0.28, 0.25, C.steel);
+    b.bx(0.17, 0.51, 0.28, 0.25, 3);
+    b.ln(0.53, 0.57, 0.83, 0.57, 2.5);
+    b.ln(0.53, 0.66, 0.75, 0.66, 2.5);
+    if (o.text) b.say(0.5, 0.87, o.text, b.fit(o.text, 0.74 * b.w, 0.13 * b.h));
+    else b.ln(0.17, 0.87, 0.83, 0.87, 2.5);
+  },
+
+  mic(b, o) {
+    // a desk microphone: a round-ended capsule with grille lines (body) on a short stand with a flat base
+    const body = o.body(C.dark);
+    b.fRr(0.14, 0.9, 0.72, 0.09, 0.045, C.steel);
+    b.rr(0.14, 0.9, 0.72, 0.09, 0.045);
+    b.ln(0.5, 0.9, 0.5, 0.46);
+    b.part();
+    b.fRr(0.27, 0.02, 0.46, 0.46, 0.23, body);
+    b.rr(0.27, 0.02, 0.46, 0.46, 0.23);
+    for (const v of [0.15, 0.23, 0.31]) b.ln(0.33, v, 0.67, v, 2.5, C.silver);
+  },
+
+  lamp(b, o) {
+    // a desk lamp: round base, a two-part arm, a cone shade opening down to the right (body = the shade)
+    const shade = o.body(C.cream);
+    b.fRr(0.06, 0.9, 0.44, 0.09, 0.045, C.steel);
+    b.rr(0.06, 0.9, 0.44, 0.09, 0.045);
+    b.pl([[0.28, 0.9], [0.18, 0.5], [0.56, 0.14]], false);
+    b.part();
+    const cone: Pt[] = [[0.48, 0.08], [0.7, 0.0], [0.98, 0.42], [0.6, 0.54]];
+    b.fPl(cone, shade);
+    b.pl(cone);
+  },
+
+  mug(b, o) {
+    // a mug of something hot (a sign of care): two steam curls, the handle, the body
+    const body = o.body(C.cream);
+    for (const u of [0.28, 0.5]) b.ink(smooth(([[u, 0.32], [u - 0.06, 0.22], [u + 0.02, 0.12], [u - 0.04, 0.02]] as Pt[]).map(b.P)), 2.5);
+    b.part();
+    b.ink(smooth(([[0.7, 0.5], [0.94, 0.52], [0.94, 0.78], [0.7, 0.84]] as Pt[]).map(b.P)), 4);
+    b.fRr(0.08, 0.38, 0.64, 0.6, 0.08, body);
+    b.rr(0.08, 0.38, 0.64, 0.6, 0.08);
+    b.ln(0.08, 0.46, 0.72, 0.46, 2.5);
+  },
+
+  pentagon(b, o) {
+    // the Pentagon from a high 3/4 angle: the near facades under the outer edge, five rings of roof (body) round the
+    // courtyard, and the corner corridors that make the shape unmistakable
+    const roof = o.body(C.silver);
+    const cx = b.X(0.5);
+    const cy = b.Y(0.43);
+    const R = 0.49 * b.w;
+    const sq = Math.min(0.62, (0.82 * b.h) / (2 * R));
+    const fh = 0.13 * b.h;
+    const ang = [-90, -18, 54, 126, 198].map((a) => (a * Math.PI) / 180);
+    const ring = (f: number): Pt[] => ang.map((a): Pt => [cx + Math.cos(a) * R * f, cy + Math.sin(a) * R * f * sq]);
+    const outer = ring(1);
+    const shut = (pts: Pt[], w: number) => b.ink(poly(pts, {seed: b.sd(), closed: true, over: b.ov(40), ...b.pen}), w);
+    for (const i of [1, 2, 3]) {
+      const p = outer[i];
+      const q = outer[(i + 1) % 5];
+      const face: Pt[] = [p, q, [q[0], q[1] + fh], [p[0], p[1] + fh]];
+      b.paint(polyPath(face), C.steel);
+      shut(face, 4);
+    }
+    b.part();
+    b.paint(polyPath(outer), roof);
+    shut(outer, 4);
+    for (const f of [0.82, 0.64]) shut(ring(f), 2.5);
+    const court = ring(0.44);
+    for (let i = 0; i < 5; i++) b.ink(line(court[i][0], court[i][1], outer[i][0], outer[i][1], {seed: b.sd(), over: b.ov(40), ...b.pen}), 2.5);
+    b.paint(polyPath(court), C.white);
+    shut(court, 3);
+    b.fBx(0.46, 0.41, 0.08, 0.05, C.steel);
+  },
+
+  lot(b, o) {
+    // a parking lot seen from high up: two rows of tiny parked cars, the ruler for a colossal building
+    const tar = o.body(C.smoke);
+    b.fBx(0, 0, 1, 1, tar);
+    const r = rng(`${b.seed}/lot`);
+    const cw = 0.042;
+    for (const v of [0.12, 0.56]) {
+      for (let u = 0.04; u + cw < 0.97; u += cw + 0.024) if (!r.chance(0.22)) b.fRr(u, v, cw, 0.28, 0.014, C.steel);
+    }
+  },
+
+  speech(b, o) {
+    // a speech bubble; pts[0] = the tail's tip in box units (default: below the bottom-left); text: none = three
+    // speech lines, ' ' = empty, anything else = those words
+    const fill = o.body(C.white);
+    const tip: Pt = o.pts?.[0] ?? [0.14, 1.04];
+    const cu = 0.5;
+    const cv = 0.44;
+    const ru = 0.49;
+    const rv = 0.42;
+    const a0 = Math.atan2((tip[1] - cv) / rv, (tip[0] - cu) / ru);
+    const pts: Pt[] = [tip];
+    const N = 34;
+    for (let i = 0; i <= N; i++) {
+      const a = a0 + 0.24 + ((2 * Math.PI - 0.48) * i) / N;
+      pts.push([cu + ru * Math.cos(a), cv + rv * Math.sin(a)]);
+    }
+    b.fPl(pts, fill);
+    b.pl(pts);
+    if (o.text === undefined) {
+      for (const [v, w] of [[0.3, 0.56], [0.44, 0.66], [0.58, 0.4]]) b.ln(0.5 - w / 2, v, 0.5 + w / 2, v);
+    } else if (o.text.trim()) b.say(0.5, 0.44, o.text, b.fit(o.text, 0.7 * b.w, 0.3 * b.h));
+  },
+
+  bookshelf(b, o) {
+    // a bookcase: the frame (body), three shelves, books of uneven heights with a few gaps
+    const wood = o.body(C.cream);
+    b.fBx(0, 0, 1, 1, wood);
+    const r = rng(`${b.seed}/books`);
+    for (const base of [0.245, 0.495, 0.745, 0.985]) {
+      let u = 0.06;
+      while (u < 0.9) {
+        const bw = r.range(0.08, 0.14);
+        const bh = r.range(0.13, 0.2);
+        if (u + bw > 0.94) break;
+        b.fBx(u, base - bh, bw, bh, r.chance(0.5) ? C.smoke : C.steel);
+        b.bx(u, base - bh, bw, bh, 2.5);
+        u += bw + 0.012 + (r.chance(0.18) ? 0.1 : 0);
+      }
+    }
+    b.part();
+    b.bx(0, 0, 1, 1);
+    for (const v of [0.25, 0.5, 0.75]) b.ln(0, v, 1, v);
+  },
+
+  window(b, o) {
+    // the room's one opening: the pane (body), two flat far roofs at its foot (text ' ' = none), a cross mullion, the sill
+    const pane = o.body(C.glass);
+    b.fBx(0, 0, 1, 0.93, pane);
+    if (o.text !== ' ') {
+      b.fPl([[0, 0.93], [0, 0.73], [0.2, 0.73], [0.2, 0.66], [0.38, 0.66], [0.38, 0.93]], C.steel);
+      b.fPl([[0.6, 0.93], [0.6, 0.77], [0.82, 0.77], [0.82, 0.71], [1, 0.71], [1, 0.93]], C.steel);
+    }
+    b.bx(0, 0, 1, 0.93);
+    b.ln(0.5, 0, 0.5, 0.93);
+    b.ln(0, 0.46, 1, 0.46);
+    b.fBx(-0.05, 0.93, 1.1, 0.07, C.cream);
+    b.bx(-0.05, 0.93, 1.1, 0.07, 3);
+  },
+
+  box(b, o) {
+    // an open cardboard box from slightly above: two flaps out, the shadowed inside, the front (body) with its tape
+    const card = o.body(C.cream);
+    const flapL: Pt[] = [[0.04, 0.34], [0.16, 0.18], [-0.04, 0.02], [-0.12, 0.22]];
+    const flapR: Pt[] = [[0.96, 0.34], [0.84, 0.18], [1.04, 0.04], [1.12, 0.24]];
+    b.fPl(flapL, card);
+    b.pl(flapL);
+    b.fPl(flapR, card);
+    b.pl(flapR);
+    b.part();
+    const inside: Pt[] = [[0.04, 0.34], [0.96, 0.34], [0.84, 0.18], [0.16, 0.18]];
+    b.fPl(inside, C.steel);
+    b.pl(inside);
+    b.fBx(0.04, 0.34, 0.92, 0.64, card);
+    b.bx(0.04, 0.34, 0.92, 0.64);
+    b.ln(0.5, 0.34, 0.5, 0.56, 2.5);
+  },
+
+  stonewall(b, o) {
+    // a low stone wall (the rise-over ledge): a coping band on top, staggered block joints (body = the stone)
+    const stone = o.body(C.concrete);
+    b.fBx(0, 0.1, 1, 0.9, stone);
+    b.fBx(-0.01, 0, 1.02, 0.1, C.smoke);
+    for (let k = 0; k < 4; k++) {
+      const v = 0.1 + k * 0.225;
+      if (k) b.ln(0, v, 1, v, 2.5);
+      for (let u = k % 2 ? 0.05 : 0.12; u < 0.98; u += 0.14) b.ln(u, v, u, v + 0.225, 2.5);
+    }
+    b.bx(-0.01, 0, 1.02, 0.1);
+  },
+
+  nodes(b, o) {
+    // an AI network doodle: a hub (text = its word, e.g. "AI") linked to six nodes in a ring
+    const node = o.body(C.white);
+    const ringPts: Pt[] = [[0.12, 0.26], [0.5, 0.09], [0.88, 0.26], [0.88, 0.74], [0.5, 0.91], [0.12, 0.74]];
+    ringPts.forEach((p, i) => {
+      const q = ringPts[(i + 1) % 6];
+      b.ln(0.5, 0.5, p[0], p[1], 3);
+      b.ln(p[0], p[1], q[0], q[1], 2.5);
+    });
+    b.part();
+    for (const p of ringPts) {
+      b.fCi(p[0], p[1], 0.05, node);
+      b.ci(p[0], p[1], 0.05, 3);
+    }
+    b.fCi(0.5, 0.5, 0.16, node);
+    b.ci(0.5, 0.5, 0.16);
+    if (o.text) b.say(0.5, 0.5, o.text, b.fit(o.text, 0.24 * b.w, 0.3 * b.h));
+  },
+
+  cars(b, o) {
+    // a row of identical parked cars seen from high up (the scale ruler under a colossal building, ISOTYPE-style): each
+    // a body with its glass cabin on top; text = how many (default: as many as fit at about 1.75 x the height each)
+    const body = o.body(C.silver);
+    const n = Math.max(1, parseInt(o.text ?? '', 10) || Math.round(b.w / (1.75 * b.h)));
+    const slot = 1 / n;
+    for (let i = 0; i < n; i++) {
+      const u0 = i * slot + 0.12 * slot;
+      const cw = 0.76 * slot;
+      const cabin: Pt[] = [[u0 + 0.2 * cw, 0.02], [u0 + 0.8 * cw, 0.02], [u0 + 0.9 * cw, 0.42], [u0 + 0.1 * cw, 0.42]];
+      b.fBx(u0, 0.4, cw, 0.58, body);
+      b.fPl(cabin, C.steel);
+      b.bx(u0, 0.4, cw, 0.58, 3);
+      b.pl(cabin, true, 3);
+    }
+  },
+
+  marker(b, o) {
+    // a highlighter lying diagonally, its chisel tip at the box's bottom-left corner (body = the barrel)
+    const barrel = o.body(C.dark);
+    const T = b.P([0, 1]);
+    const E = b.P([1, 0]);
+    const L = Math.hypot(E[0] - T[0], E[1] - T[1]);
+    const ux = (E[0] - T[0]) / L;
+    const uy = (E[1] - T[1]) / L;
+    const at = (s: number, k: number): Pt => [T[0] + (ux * s - uy * k) * L, T[1] + (uy * s + ux * k) * L];
+    const hw = 0.08;
+    const tip = [at(0, -0.015), at(0, 0.015), at(0.13, hw * 0.7), at(0.13, -hw * 0.7)];
+    const body = [at(0.13, -hw), at(0.13, hw), at(0.78, hw), at(0.78, -hw)];
+    const cap = [at(0.78, -hw * 0.95), at(0.78, hw * 0.95), at(1, hw * 0.85), at(1, -hw * 0.85)];
+    b.paint(polyPath(tip), C.steel);
+    b.paint(polyPath(body), barrel);
+    b.paint(polyPath(cap), C.steel);
+    for (const q of [tip, body, cap]) b.ink(poly(q, {seed: b.sd(), closed: true, over: b.ov(2 * hw * L), ...b.pen}), 4);
   },
 };
 
