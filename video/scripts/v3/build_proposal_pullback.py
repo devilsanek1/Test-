@@ -1,5 +1,7 @@
 """build_proposal_pullback.py: the S5 pull-back proposal for v3 (docs/v3/proposal_pullback.md).
 
+MERGED 2026-10-26 (owner: "swap"): public/v3/animatic.json now carries this S9; the proposal JSON is archived in
+docs/v3/archive/g3/. Kept as the record of how the panel was built; do not re-run on the merged board.
 Copies the locked board (public/v3/animatic.json) to public/v3/proposal_pullback.json and replaces S9 + S9b
 (19.40-22.68) with ONE panel: the S5 pull-back crane (CINEMATIC_GUIDE S5, the owner's favourite, Arcane #55's shape at
 3.5x its speed). Every other panel, word and cue stays identical, so the proposal plays in context (composition
