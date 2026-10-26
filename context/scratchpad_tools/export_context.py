@@ -22,8 +22,8 @@ flags = []
 def clean(s):
     s = s.replace(EMAIL, '[owner email]')
     for m in SECRET_RE.finditer(s):
-        flags.append(m.group(0)[:60])
-    return s
+        flags.append(m.group(0)[:6] + '...')
+    return SECRET_RE.sub('[REDACTED SECRET]', s)  # API keys pasted into chat never reach the repo
 
 
 def md5(p):
