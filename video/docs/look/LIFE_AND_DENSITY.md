@@ -5,7 +5,45 @@ every frame feels ALIVE at the level of reference 1 (France, `assets/ref/referen
 `deliverables/v1/php2shell_final.mp4`): a dense, specific world, people near and far, layered depth, a recurring living
 character and ambient life that never stops. Feeling alive is the goal; the numbers are a warning signal, never a quota.
 A big flat empty field, or an object alone on a blank wall, is a failure even in a draft. Sources: style bible §5-8,
-motion_spec §5, 6, 9, `look/research/density_numbers.md`. Worked example: `docs/v3/density_plan_g5b.md`.
+motion_spec §5, 6, 9, `look/research/density_numbers.md`. Worked example: `docs/v3/density_plan_g5b.md`. For cozy holds
+the bar is the owner's cozy references (a street seen from a balcony, a riverside: `COZY_AND_SCALE.md` 3b), the fullest and
+the calmest we have measured: fullness first, motion second (§0).
+
+## 0. Fullness first, motion second (owner's riverside reference, 2026-10-26: "it doesn't feel empty at all")
+- **The world's density and detail make a frame full even when little moves; motion only has to prove the place is
+  alive.** The riverside (C3 in `COZY_AND_SCALE.md` 3b) moves the least of all our references (~1 medium event/s, ~1.4 %
+  of the pixels per 0.1 s: density.py says FAR) yet is the fullest (flat 9-10 %, detail 61-62 %, ~250 objects/Mpx); the
+  balcony street (C2) is the same (2.0 ev/s; flat 14 %, detail 47 %). v3 G5 moved more than both (2.6 ev/s; its busiest
+  shot 17.9 % of the pixels) and read "way too empty" (flat 61 %, detail 16 %, 63 objects/Mpx). Emptiness is a fullness
+  problem, not an event-count problem.
+- **Judge the paused frame first.** If a still looks empty, more motion will not fix it (v3 S9). Fix in this order: the
+  world (things, layers, thin lines), then people (still ones count), then the idle motion. Never put motion on a void to
+  liven it up (31 % of v3 G5's moving pixels sat on void): fill the void.
+- **What makes a still full** (C2 / C3 against v3 G5, for a flat-colour frame; warnings, never quotas):
+  - **No hole bigger than the caption band:** outside the caption band and the one quiet field, no empty patch over ~200 px
+    across (largest empty disc: C3 393 px, the sky; v3 G5 910 px). The quiet field is ONE band touching the top or bottom
+    edge (sky, water, floor), and it is still patterned.
+  - **Many small things, no fields:** per frame >= 45 medium things (50-160 px: windows, signs, people, plants, bikes) and
+    >= 125 small ones (20-50 px: panes, pots, heads, rails, leaves), ~2x in a cozy hold (C3 ~115 / ~510, v3 G5 ~17 / ~50);
+    each size step down holds ~3x more; the biggest single flat region <= 15-20 % of the frame except the quiet field (C3
+    8-15 %, v3 G5 23-45 %). A field MADE of objects, never objects ON a field.
+  - **Stacked, not spread:** a new surface every <= 60-90 px down any column (C3 42, v3 G5 143), depth by overlap; 5+ of 8
+    horizontal bands (240 px each) hold drawn detail (C3 7, v3 G5 0-3).
+  - **Local colour variety:** >= 2.5 colours per 96 px patch on average, >= 45 % of patches with 3+ (C3 4.25 / 85 %, v3 G5
+    1.77 / 22 %); repeats vary in colour (each house, awning, shirt).
+  - **Thin lines are the cheapest fullness:** 3-4 % of the frame in ~3 px lines (wires, poles, antennas, rails, mullions;
+    never outlines); drawn back onto a flattened C3 they cut its flat share from 18 to 15 %.
+  - **People, even still:** 5-8 in a wide, about half at rest; a still person counts as life (v3 G5: nobody in 9 of 14 shots).
+  - **Texture last:** worth the last 5-15 points of flat share, never the fix; the frame must read full with it off.
+- **Two alive profiles, one per shot** (name it in the camera plan):
+
+| profile | for | fullness (density.py) | motion |
+|---|---|---|---|
+| DENSE-CALM | cozy holds (`COZY_AND_SCALE.md` 3b) | flat <= 25 %, detail >= 35 %, obj >= 120 (C3 flattened to 24 flat colours: 18 % / 37 % / 124), plus the still checks above | 1-5 moving figures in every frame (aim 2-4), ~1 % of the pixels changing per frame, steady (CV <= 0.3) or one slow swell per 6-7 s, in one band; ev/s >= 1 (§9's cozy check) |
+| BUSY | explainer beats and the opening (a scale hold has its own: `CINEMATIC_GUIDE.md` Scale cues 11) | §1 (flat <= 40 %, obj >= 105, detail >= 34 %) | §1 and §6 (>= 5 ev/s per film, no gap over 1 s) |
+
+  v3 G5 was neither: a third of the cozy fullness and half the busy motion. Film averages of ev/s and gap count BUSY shots
+  only: cozy shots fill >= 50 % of a film's non-chart time (`COZY_AND_SCALE.md` §1.3) and would drag the average down.
 
 ## 1. The bar (measured on the references; warning signals)
 
@@ -18,6 +56,9 @@ motion_spec §5, 6, 9, `look/research/density_numbers.md`. Worked example: `docs
 | objects / canvas Mpx | 192 | 141 | >= 105 | < 70 |
 | fine-detail tiles | 58 % | 45 % | >= 34 % | < 22 % |
 
+These are the BUSY profile's targets (§0). Cozy holds (DENSE-CALM) are judged by §0's row and §9's cozy check: the riverside
+measures 1.0-1.2 ev/s and a 2.4 s gap (FAR) with a moving figure in every frame.
+
 What one frame holds (count it on a still at phone size):
 
 | shot | quiet field | distinct props besides the subject | depth planes | people |
@@ -25,10 +66,13 @@ What one frame holds (count it on a still at phone size):
 | wide / exterior | sky gap or ground, 15-35 % | 12+ | 3-4 | 10 to 300+ (far crowds count) |
 | medium / interior | the wall or sky behind the captions | 8+ | 2-3 | 2+ (a silhouette in a window counts) |
 | close / insert | the subject's own backing | 5+, cut by the frame edges | 2 | a row of 3-6 backs, or the character |
+| cozy wide (balcony, riverside) | ONE band at a frame edge: sky 10-18 %, or a bounded floor up to 50-60 % (`COZY_AND_SCALE.md` 3b.1) | 12+, plus lived-in infrastructure (wires, poles, antennas, railings) | 5-7 | 5-8, about half at rest |
 
 ## 2. Composition: where the density goes
 - **One quiet field, the rest loaded.** In thirds (y 0-640, 640-1280, 1280-1920) the quiet field (in 9:16 usually the
-  wall or sky behind the caption band) takes at most one; every other third holds 3+ distinct props at 3 depths.
+  wall or sky behind the caption band) takes at most one; every other third holds 3+ distinct props at 3 depths. Finer:
+  5+ of 8 bands of 240 px hold drawn detail, and calm sits only at a frame edge, round the subject or behind the captions,
+  never as a slab mid-frame (§0; `COZY_AND_SCALE.md` 3b.3: busy edges and far side, calm centre or floor).
 - **Hierarchy keeps the read.** The subject keeps the strongest value contrast, the hero colour and a calm ring (30-60 px
   of one value) round its silhouette; dressing sits one value step off its ground, ink by depth (front 4.8, mid 3.4,
   far 2.2, far planes fill only). The sound-off cold read must still pass at phone size.
@@ -64,6 +108,10 @@ What one frame holds (count it on a still at phone size):
   people: 12-40 px silhouettes in lit windows, moving.
 - **They do things:** walk, carry, point, raise a phone, shovel, lean in, bob 2-3 px; on the voice's key word heads turn
   or a phone goes up, 0.1-0.3 s after the cause.
+- **Rest counts; cozy life passes through.** In a wide about half the people are at rest (sitting on an edge, leaning,
+  chatting, waiting) next to the moving ones. In a cozy hold the movers cross sideways at real-world speeds (walk 0.7-1.1
+  body heights/s, bike 1-3), 1-5 at once, and nothing comes at the viewer (`COZY_AND_SCALE.md` 3b.4). Seated figures that
+  face the viewer across water stay featureless, in side or 3/4 view (3b.2 RIVERSIDE).
 
 ## 5. The recurring living character
 - **One, in every shot** (reference 1: the cat and the sun; v1: Pip and the sun). Default: the channel's mascot **Pip**
@@ -78,6 +126,10 @@ What one frame holds (count it on a still at phone size):
   a scale wide (where it becomes a scale anchor). Never in the caption band or the right rail, never over the subject.
 
 ## 6. The idle layer and secondary motion (never a still frame)
+- **Profile first (§0).** BUSY shots run the full idle layer and cadence below. DENSE-CALM (cozy) holds run on a steady lane
+  (1-5 movers, never zero: `COZY_AND_SCALE.md` 3b.4) and a locked or floating camera (3b.5); the other loops are optional
+  there and stay below the movers in contrast and speed (neither cozy reference sways, shimmers or drifts a cloud). The
+  cadence rule (>= 5/s, gap <= 1 s) is BUSY only; "never a still frame" holds for both.
 - **Always on, in every shot, from frame 0:** weather (snow, rain, leaves) and smoke or steam; clouds drifting at least
   10 px/s; lights (bulbs twinkling, a window switching somewhere every 0.6-1.5 s); people walking, breathing, bobbing;
   the character's idle; plus ONE small loop per shot (a swinging sign or tag, a fan, a clock hand, a forklift).
@@ -104,8 +156,11 @@ What one frame holds (count it on a still at phone size):
   no ink, roof tops, heads or props.
 - **Platform UI zones** (top y < 180, bottom y > 1520, right rail x > 950 / y 900-1500): dressing yes (backs, kerbs,
   edges of things), key information no.
-- **The quiet field** (15-35 %) and **the subject's ring**. **One breath beat per film** (at most 2.5 s, usually after
+- **The quiet field** (15-35 %; a bounded floor seen from a balcony up to 50-60 %, `COZY_AND_SCALE.md` 3b.1) and **the
+  subject's ring**. **One breath beat per film** (at most 2.5 s, usually after
   the heaviest line): fewer events (>= 2.5/s), still no gap over 1 s, the idle layer on, never a frozen frame.
+- **Cozy holds** (DENSE-CALM, §0): little motion is fine, emptiness never: the fullness bar rises, the motion bar becomes
+  §9's cozy check.
 
 ## 9. How to check (before the owner sees a cut)
 ```bash
@@ -117,12 +172,24 @@ python3 -I scripts/qa/gate_check.py ... --density     # WARN per shot; FAIL when
   the sound-off cold read (density must never bury the subject).
 - The owner's cut renders at full size (1080 x 1920): at 0.5 scale the fine dressing lines blur (v3 G5's 540 x 960
   render added to "the quality and smoothness is not there").
+- **Meter caveat: one long walk counts as one event.** density.py counts a medium event at a chain's onset, so a calm lane
+  with three long crossings scores ~1 ev/s and a 2.4 s "gap" (FAR) with a mover on screen in every frame (C3). Its static
+  share also misreads drawn cadence (C3: 24 % from 25 drawn frames/s, with no frame lacking a mover), and a push-in slower
+  than a few px/s at the edge never crosses its change threshold (v3 G5's 1.4 % push: static runs up to 0.8 s, truly
+  frozen). **Cozy holds are checked by:** (1) moving figures per frame: >= 1 in every frame (aim 2-4, at most 5);
+  (2) frames without motion (no moving figure once a float is removed): 0 (C3 0 %, v3 G5 7 %); (3) steadiness of change:
+  the changed-pixel share per frame (~1 %) with CV <= 0.3 over the hold (C3 0.14), or one slow swell; plus §0's fullness
+  row. Read ev/s and gap there as information only. Until density.py has a cozy mode (TO BUILD, `COZY_AND_SCALE.md` §7.6:
+  with void, small / medium things, colours per tile, layers, and film averages over BUSY shots only), measure by hand:
+  stabilise a float first (translation-only alignment on the static set), take the change mask at density.py's settings
+  (tau 24, 30 fps), count connected blobs >= ~1000 canvas px² per frame as moving figures, and report the share of frames
+  with none and the CV.
 
 ## 10. When each part is built
 | gate | what |
 |---|---|
 | G3 board | signal only; the camera plan gets a "world" note per panel (the place, who watches, the character's spot), so density is designed in, never bolted on |
-| G4 look | the style frame is dressed at final density and judged beside reference 1 and v1 |
+| G4 look | the style frame is dressed at final density and judged beside reference 1 and v1 (a cozy frame also against §0's DENSE-CALM row and `COZY_AND_SCALE.md` 3b.8) |
 | kit (before the G5 lanes) | the dressing inventory for the video's settings, the people variants and the character's colourway; every piece on the kit sheet at each size a panel uses, checked at 0.25 scale |
-| G5 blocking | sets at full density, people placed, the character in every shot with key poses, the idle layer on (weather, lights, people idle, the character's idle, one loop per shot); density.py before the owner sees it |
-| G6 polish | motion life refined: secondary motion, reactions on the voice's words, the cadence measured (>= 5/s, gap <= 1 s), the character's hops across cuts and the loop; then edges and texture |
+| G5 blocking | sets at full density, people placed, the character in every shot with key poses, the idle layer on (weather, lights, people idle, the character's idle, one loop per shot); each set judged paused first (§0); density.py before the owner sees it, cozy holds by §9's cozy check with a locked or floating camera |
+| G6 polish | motion life refined: secondary motion, reactions on the voice's words, the cadence measured (BUSY shots: >= 5/s, gap <= 1 s; cozy holds: §9's cozy check), the character's hops across cuts and the loop; then edges and texture |

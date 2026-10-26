@@ -3,7 +3,9 @@
 The owner's two visual twists (playbook, 2026-10-25) for G3 (sketch animatic), G4 (look) and G5 (blocking), for v3 (laptop
 prices) and v2 (DeepMind resignations). Evidence: `research/` enclosure [EN], coziness [CO], arcane [AR], vertical [VE], audit
 [AU]. Colour obeys `PALETTE.md`. Tags VERIFIED / REPORTED / UNCERTAIN; untagged numbers are proposals, to test at G4. 1080 x
-1920, 30 fps, captions 98 px at y 387 / 510 (block y 317-556, x 95-945). Arcane in words only: never traced, recorded or copied.
+1920 (G3 at 30 fps, production at 60), captions 98 px at y 387 / 510 (block y 317-556, x 95-945). Arcane in words only: never
+traced, recorded or copied. **Coziness evolves one measured reference at a time** (playbook): the owner's cozy references
+C1-C3 and what each taught are logged in words at the end of section 3b; section 3b (Coziness v2) wins where 2-3 differ.
 
 ## 1. Principles
 1. **Cozy = held, not shut:** walls on 2-3 sides, ONE opening the subject faces, the threat visible but outside it
@@ -15,8 +17,9 @@ prices) and v2 (DeepMind resignations). Evidence: `research/` enclosure [EN], co
    outside full-frame chart inserts (frame 0's world, the ending; an insert is a neutral breath, neither cozy nor scale:
    v3 G3 is 38 % of all 41 s, 55 % of the non-chart time); 1-2 scale moments, never 3 (v2: 1), 1.5-4 s each, <= 20 % of
    the runtime (VE: 25 %).
-4. **ONE big move per video** (2.5-4 s + 0.8-1.5 s hold), <= 1 mid-size move, other shots push 3-8 %. Never two scale wides
-   in a row; within ~5 s of each small-making beat, a beat of agency (a face, a voice, what is being done or can be done)
+4. **ONE big move per video** (2.5-4 s + 0.8-1.5 s hold), <= 1 mid-size move, other story moves push 3-8 %; cozy holds are
+   locked or float, never an invisible push (3b.5). Never two scale wides in a row; within ~5 s of each small-making beat, a
+   beat of agency (a face, a voice, what is being done or can be done)
    [VE §7: our proposal, built on awe (Piff 2015) and threat-needs-efficacy (EPPM), both VERIFIED].
 5. **Coziness belongs to the people affected, never to the threat.** Break it once, at the turn; never twice (the "cosy
    catastrophe" trap [CO §8, VERIFIED term]). Scale shown as fact must be true or signposted as a metaphor (SPJ [VE §7]).
@@ -30,13 +33,16 @@ prices) and v2 (DeepMind resignations). Evidence: `research/` enclosure [EN], co
 | exposed | >= 1:4, plaza | sky >= 36 % | no near boundary, long sight line | scale reveals |
 
 1:1 encloses strongly and enclosure fades past 1:3 (UK Manual for Streets range 1:1-1:3; CNU) [REPORTED, several agree]; the
-owner's reference measures 1:1 on screen with 27 % sky and a tower closing the vista [EN §1, VERIFIED].
-- **Refuge:** the near surround (shelf, wall, soffit, curtain, hedge) covers 35-55 % of the frame on >= 2 edges, as line art
-  or mids so the page still fills >= 50 % (PALETTE), plus a top-edge object in y 0-290 (lamp, branches, beam) [EN §9], never
-  a flat full-width band or paper edge (playbook); >= 2 elements cut by a frame edge in every shot (style bible 1.6).
-- **Prospect:** ONE opening, 15-30 % of the frame (cozy interiors 20-25 %), its read in y 600-1250, >= 10 L* off the surround:
-  lighter by day; at night the lit room is the light side, the window the cool darker inset (Dusk `#BAC3CE` L* 78 on the Sage
-  page, L* 94). <= 1 long sight line, ended by one object (tower, bend, data center) (Cullen, Sitte [EN §6-7, REPORTED]).
+owner's reference measures 1:1 on screen with 27 % sky and a tower closing the vista [EN §1, VERIFIED]. H:W is the eye-level
+case of an angle-independent measure, enclosing mass : open field on screen, with two more doses (BALCONY, RIVERSIDE): 3b.1-3b.2.
+- **Refuge:** the near surround (shelf, wall, soffit, curtain, hedge) covers 35-55 % of the frame on >= 2 edges, in soft
+  mids so light soft fills still cover >= 50 % (PALETTE, read as in 3b.6), plus a top-edge object in y 0-290 (lamp, branches,
+  beam; in a high angle a whole lid, 3b.2) [EN §9], never a flat full-width band or paper edge (playbook); >= 2 elements cut
+  by a frame edge in every shot (style bible 1.6).
+- **Prospect:** ONE opening, 15-30 % of the frame (cozy interiors 20-25 %) when it is a VOID (sky, a view out; a bounded
+  FLOOR seen in front may be larger: 3b.1), its read in y 600-1250, >= 10 L* off the surround: lighter by day; at night the
+  lit room is the light side, the window the cool darker inset (Dusk `#BAC3CE` L* 78 on the Sage page, L* 94). <= 1 long
+  sight line, ended by one object (tower, bend, data center) (Cullen, Sitte [EN §6-7, REPORTED]).
 - **Walls:** >= 75 % of each side continuous (trees count), no side gaps below the roofline: sky "across" leaks enclosure
   worse than sky ahead (Ewing & Handy [EN §5, REPORTED]). In a 3/4 view the opposite side is the taller, unbroken one.
 - **Asymmetry for captions:** one side tall and cut by the top edge, a FLAT field (no ink, windows dark) across y 317-556;
@@ -67,16 +73,206 @@ owner's reference measures 1:1 on screen with 27 % sky and a tower closing the v
 - **Temperature, not darkness:** cold only in the window (Dusk `#BAC3CE` / `#8A9AA8`, frost `#D9DEE5`), glass <= 20 % of the
   frame; spines, mullions, hair in the anchor `#22332C` (~5 %); page L* >= 75 at night too. Hero (5-15 %) on the story's object,
   one hue all video, across the Sage -> Dusk shift too; ONE pop (amber `#F2A541` or coral `#FF7A4D`), 1-3 %, look-here only.
-- **Density:** abundance at the edges, an empty centre: 6-12 props in 15-25 % of the frame (shelf, sill, desk edge), each
-  >= 60 px, as line drawings; >= 1 sign of care (steaming mug, blanket, plant) [CO §4]. Seen from outside, light 1-3 windows
-  (a few lit windows read as human scale [EN §5]), never most (Kinkade [CO §5]); only ours in the pop.
+- **Density:** abundance at the edges and the far side, a calm (never empty) centre: props cluster on the shelf, sill and
+  desk edge, which hold 3-6x the linework of the centre (3b.3), each >= 60 px, in many soft flat fills (line drawings only far
+  back); the paused frame must read full (`LIFE_AND_DENSITY.md` §0); >= 1 sign of care (steaming mug, blanket, plant)
+  [CO §4]. Seen from outside, light 1-3 windows (a few lit windows read as human scale [EN §5]), never most (Kinkade
+  [CO §5]); only ours in the pop.
 - **Shape:** inside rounded (lamp, mug, cushions, window corners), outside rectilinear and hard (curves are preferred: Bar &
   Neta [CO §4, VERIFIED effect]). The threat is never cute, rounded or warm, and stays visible in the cozy frame. On the
   heaviest line, strip the comfort: stop the loops, drop the bed, no cute props near real harm.
-- **Motion:** small slow loops inside (steam, breath, a page), steady weather outside; push 3-5 % `CAM.slow`, `handheld` <= 1
-  px; no flicker inside until the breach; one 0.5-1.0 s still hold after the heaviest line ("ma" [CO §6, VERIFIED concept]).
+- **Motion:** small slow loops inside (steam, breath, a page), steady weather outside, life passing through outside (3b.4);
+  the camera locked or a slow 2D float (3b.5), never a zoom in a hold (the old "push 3-5 %, handheld <= 1 px" is retired for
+  holds: too slow to see, so it read as a frozen frame); no flicker inside until the breach; one 0.5-1.0 s hold after the
+  heaviest line ("ma" [CO §6, VERIFIED concept]), still with the camera's float or one mover, never a frozen frame.
 - **Sound:** room tone + weather behind glass (low-passed rain, or wind for snow) 18-24 dB under the voice, ducked; soft close
   foley (mug down, page, lamp click); the breach opens the filter, then near-silence. Mix per playbook (-14 LUFS).
+
+## 3b. Coziness v2: two measured references (2026-10-26)
+A recipe for a FEELING: safe, held, unhurried, among people. Numbers are guides measured on the owner's references (C2 the
+street from a balcony, C3 the riverside: "References" below), never a quota; judge at phone size, paused first, then playing,
+sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are proposals to test at G4. Wins over 2-3.
+
+### 3b.1 Enclosure at any angle: enclosing mass : open field
+- **E = enclosing mass : open field, in screen area.** Mass = what holds the place: walls, facades, a bank or kerb face,
+  canopies, hedges, shelves, near frames, a lid overhead. Open field = the rest, in two kinds: **VOID** (sky, a horizon, any
+  view to infinity) and **FLOOR** (ground, water, a table top seen in front of or below the viewer).
+- **Cozy band: E 1:1.5-2.5:1 (mass 40-70 % of the frame), with the void inside its dose.** C1 the lane ~1:1.5 (walls ~40 % vs
+  sky 27 % + cobbles ~33 %), C2 1:1.4 (masses 41 % vs floor 59 %), C3 ~1.8:1 (facades and the stone bank ~64 % vs sky 16 %,
+  path 3 % and water 17 %). Exposed: E under ~1:2 or void >= 36 % (v3 G5 S10: a 0.04 H row of houses on a 0.6 H snow field,
+  ~1:5). Shut: E over ~3:1 with the opening under ~10 % and no floor to look out over (a canyon, a closed room): a trap
+  (principle 1). A nook sits at the top of the band (window 20-25 % + desk top), a balcony at the bottom.
+- **H:W is the eye-level special case:** along a street at eye level, H:W sets both E and the void (`research/enclosure.md`
+  §3 gives the sky share per H:W). Build with H:W at eye level; check E + void at any angle (high, level-across, interior).
+- **VOID leaks enclosure; FLOOR is the prospect.** Void: 15-30 % at eye level (§2), 10-18 % as a jagged sky over a backdrop
+  (C3), 0 % from above (C2). A floor may fill 50-60 % (C2 54-59 %) when it is bounded on 3 sides (masses, or the world running
+  past the side edges), its far end hidden (dives under a mass, or a facing wall closes it), lighter than the masses (C2 +15-18
+  L*) and it carries the life. A floor whose far end shows (a road to the horizon, open sea) counts as void.
+- **Closed where it matters:** >= 40 % of the frame's perimeter is mass (C2 49 %, C3 ~40 %); the open part faces the viewer
+  (bottom, lower sides) or is the sky; the far end is closed (a wall, a bend, a mouth under leaves): no vanishing point at all
+  is the coziest vista.
+- **The viewer is the refuge** when no protagonist is in frame: up behind leaves (BALCONY) or safe across a moat (RIVERSIDE),
+  unseen; the life is the prospect, small and unthreatening; nobody addresses us.
+
+### 3b.2 Doses (one per cozy shot; §2's NOOK and LANE stay)
+| dose | vantage | E / void | bands (screen y) | camera | life |
+|---|---|---|---|---|---|
+| NOOK | interior, eye level | refuge 35-55 % on >= 2 edges; window 15-30 % | §2 | locked or float | the subject, small loops |
+| LANE | eye level along a street | H:W 1:1-1:1.5; sky 15-30 % | §2 | locked or float | walkers on the walks, 1-5 |
+| BALCONY | high, 35-55° down | 1:1-1:1.5; void 0 | lid 0-600, life 600-1250, floor 1250-1920 | locked | along the curve, 1-5 |
+| RIVERSIDE | level, across water | ~1.5-2:1; sky 10-18 % | sky + far row to 560, facades to 1115, lane to 1230, bank, water 1420+ | 2D float | one lane, 2-4, both ways |
+
+**BALCONY [C2]: a high angle from a window over a street, square or courtyard.**
+- From a 3rd-5th floor window or balcony, 35-55° down; no sky, no horizon; figures grow 1.4-2.5x from the far kerb to the
+  near floor.
+- **LID (y 0-600):** >= 90 % mass (canopy, facades, awnings) cut by the top edge, so it does the holding a paper edge would
+  (never an edge at the top). One corner mass cut by two edges (12-18 % of the frame, 45-60 % across, 35-45 % down), 1-2
+  smaller side masses at staggered heights (4-10 % each, <= 35 % in): a C-shaped cradle. One near repoussoir (a bush, a
+  rail, a pot) overlaps the floor on one side: we look out from among leaves. 3-6 sagging wires stitch the sides, in y 0-300
+  and 560-640, never across the caption lines. Behind the caption block the lid is ONE calm plane (a facade in one light
+  fill with unlined windows, or the canopy in one flat leaf tone); its busy detail sits above y 290, below y 556 and in the
+  gutters (x < 95, x > 945).
+- **C-curve:** one leading curve (kerb, bank, shelf edge) enters one side at y 450-650 and leaves the other at y 860-1060,
+  concave to the viewer; its far end dives under a mass through a mouth <= 8 % of that edge (<= 150 px), the only far exit.
+  The traffic follows it.
+- **LIFE (y 600-1250, the stage):** the far kerb with shopfronts, people, vehicles and the story object; with the lid it holds
+  most of the detail.
+- **FLOOR (y 1250-1920, under the platform UI):** >= 90 % one calm field in <= 2 tones, <= 6 guide marks echoing the curve,
+  15-18 L* lighter than the masses; a passing near vehicle may cross it (dressing), key reads never.
+- **People and vehicles:** 5-8 people 70-190 px (3.5-10 % H) in the life band, about half standing or sitting still;
+  vehicles rounded and toy-like, the largest <= 2/3 W and <= 10 % of the frame (the one "event"); movers enter and leave only
+  through the open sides or the mouth, never across the lid.
+
+**RIVERSIDE [C3]: eye level across water (a canal, a river, a pond, a square seen across a fountain).**
+- Level, long lens: the eye line on the far path's standing heads; verticals vertical; every plane shows a little of its top
+  (roofs, stair treads); depth by overlap and stacking upward, no vanishing lines.
+- **BACKDROP (the facade wall):** full width, 5-7 overlapping planes, 7-10 buildings across (a new one every 0.10-0.15 W), no
+  base visible, each farther row higher and ~10-15 L* lighter; a jagged skyline (amplitude >= 0.12 H, never one straight
+  roofline) with sky 10-18 %, the lightest and flattest field (L* ~90). The light, low-detail back row and the sky notches are
+  the caption field (y 317-556); the busy facade belt sits in y 560-1000.
+- **Value sandwich:** the darkest mass (a hedge, trees, a bush, L* 20-38) right behind the seam, so light figures pop; the
+  path where people sit is the most neutral ground (C <= 15); the bank and the water below are light again.
+- **The moat:** the lane (seam) at y 1115-1230, above the UI; a stone bank under it (y 1230-1420, dabs, part of the mass), then
+  the water (y 1420-1920, ~26 %): calm, patterned, still. We watch from across it, safe and unseen.
+- **Sides and stitches:** every band runs off both side edges (>= 5 cut elements per side); asymmetric wings (a soft dark
+  tree mass ~0.3 W on one side, a hard building column on the other); the top edge sky and wires only, the bottom edge water
+  only; >= 3 stitches cross the bands (a tall tree, poles, a stair from the seam into the wall, sagging wires).
+- **Life in ONE lane:** 5-8 people on the seam, about half sitting still on its edge (a cluster of 3 at 1.2-1.5 body heights
+  apart + a loner), backs to the wall, facing the water in side or 3/4 view, featureless at this size (a head in the hair
+  colour: LIFE_AND_DENSITY §4's no-faces rule holds); 1-4 movers cross parallel to the bands, both ways; one far, slow,
+  small mover higher up (a stair, an upper walk, ~60 px). Seated ~85 px (0.045 H), standing ~140 px (0.074 H); wall :
+  standing figure 6-9:1 (>= 10:1 is scale); a storey ~1 standing figure (compressed depth).
+
+### 3b.3 The detail gradient: busy edges and far side, calm centre or floor
+- The far side (lid, far kerb, facade belt) and the frame edges hold 3-6x the linework of the calm field: C2's top 35 % holds
+  56 % of all linework (lid cells 3-6x the floor's); C3's facade belt has 66 % detail tiles while sky and water stay low in
+  contrast (local colour std 10-22 vs 39-46 in the busy belts).
+- Calm sits only where the eye can rest: one band touching the top or bottom edge (sky, water, floor), the subject's ring,
+  the caption plane. Never a slab mid-frame (C3's middle 60 %: 2-3 % flat tiles).
+- Calm is never empty: patterned (<= 6 lane marks, ripple dashes, two long soft tones), and no hole bigger than the caption
+  band anywhere else (`LIFE_AND_DENSITY.md` §0).
+- Rhythm in tiny things: kerb stripes, rails, wires, windows, blossoms, each 1-6 % W; the frame's strongest contrast goes to
+  one tiny rhythmic element (C2's kerb stripes, 3 % W period), never to a big shape.
+- Lived-in infrastructure is the cheapest fullness: thin lines on 3-4 % of the frame (~3 px: 5-9 sagging wires, poles with
+  crossarms, antennas, railings, mullions); per exterior frame >= 3 rooftop items, >= 2 street items (pole, lamp, meter box),
+  balconies or railings on every other facade, 1-2 signs, a reflection in one glass face [C3].
+
+### 3b.4 Life in a cozy beat: it passes through
+- **Sideways, along the place:** movers cross parallel to the picture plane or along the C-curve; they enter from an edge or
+  the mouth already at cruising speed, keep it, and leave by an edge or behind a mass; no stops, starts or easing on screen.
+  Nothing comes AT the viewer (no mover grows toward the lens or heads for the frame centre); from a high angle a mover may
+  pass below us out of the bottom edge (C2's car).
+- **Real-world speeds, in body heights per second** (lengths for vehicles), the same at every depth, so far figures are slower
+  in pixels (C3's far walker 1.1 bh/s like the near one): walk 0.7-1.1 bh/s (C3 0.95; C2 0.64 in high-angle foreshortening),
+  strolling bike 1.0-1.5, bike 2.5-3, town car or rickshaw 1.2-1.8 lengths/s, bus ~0.4 lengths/s. Screen ceiling ~30-37 %
+  W/s (~400 px/s); each crossing takes 2.5-7 s, none under ~2 s.
+- **1-5 movers at once, never zero** (C2 mean 3.2, min 1, max 5; C3 2-5, no frame without one): a small far mover is the
+  heartbeat; the next enters 0.3-0.5 s before the last leaves; arrivals 0.4-1.3 s apart; a crossing or an occlusion every 2-3 s.
+- **Steady change:** ~1 % of the pixels change per frame (C3 0.85 %, CV 0.14) and movers cover 1-15 % of the frame (median
+  ~3 %), either constant (C3) or one slow swell per 6-7 s (C2: one tiny mover, then a peak of 4-5 with the one big vehicle,
+  then release). No bursts: bursts belong to the hero beats.
+- **Rest next to motion:** about half the people are at rest (sitting on an edge, leaning, chatting, waiting at a kerb)
+  right beside the moving ones; stillness among motion reads as leisure. They hold still (at most a 1-2 px breath).
+- **Motion lives in one band:** the lane, kerb or road (C3 ~10 % of the frame; C2 the road, 27 % of pixels ever move); the
+  lid, the caption plane, the backdrop and the water have no motion of their own; a near lane plus one far slow figure give
+  depth without parallax.
+- **Ambient stays under the movers:** neither reference sways, shimmers or boils. Allowed: one very slow light shift (C2: sun
+  warming a canopy over ~2 s), a window lighting somewhere, steady slow weather; always lower in contrast and speed than the
+  movers, never in the caption plane.
+- **Cut or loop when the lane is nearly empty** (a mover leaving by an edge), so the jump reads soft; a loop brings every mover
+  off-screen or back to its start state.
+
+### 3b.5 The camera for cozy holds: locked, or a slow 2D float; never a zoom
+- **Locked** (C2: <= 0.1 px over 7.8 s) when the life crosses a floor: the still observer at a window.
+- **2D float** (C3) when the life is one lane: translation only, 8-15 px/s at 1080 (0.7-1.4 % W/s), peak <= 25 px/s, in
+  straight legs with a steady heading, turning (eased) every 0.6-1.5 s; 15-25 px of travel per 4 s; the whole set moves as one
+  card (no parallax needed, no rotation, no zoom); >= 40 px of overscan on each side; sub-pixel transforms (at 10 px/s a
+  rounded one steps 1 px every 6 frames at 60 fps). Captions, the paper edge and the UI stay fixed in screen space: they are
+  the fixed mat the picture slides under. `CINEMATIC_GUIDE.md` rule 3's "breathes" means this float on a cozy wide.
+- **Never a zoom in a cozy hold.** v3 G5's centred 1.4 % push-in (10 of 14 shots) moved ~2 px/s at the frame edge, under the
+  change threshold: it read as frozen (static runs up to 0.8 s), and a push leans in at the viewer. The float is ~5x faster,
+  the same speed everywhere, visible but calm. A zoom stays a story move: visible (>= 3 % in <= 2 s), on a line (K5, K9, the
+  one big move, the frame-0 push on the hook word). No handheld jitter in a cozy hold (C2 0.07 px): the float is the breath.
+
+### 3b.6 Colour and light (the references' structure at PALETTE's levels)
+- **One calm field:** the largest field is one hue in <= 2 tones (dL* <= 6) laid as long soft shapes along the perspective
+  (C2's road: 56 % of the frame in two tones dL* 6), lighter than the masses around it; at our levels: L* >= 75, C <= 20 for a
+  floor or sky, C 20-35 for a cool chromatic field (water, a dusk sky). The references' saturation (C* median 33) is louder
+  than our DNA: we copy the structure, never the level.
+- **A warm accent where the eye rests, as the field's near-complement** (135-175° apart): C2 17-25 % warm on the lid and edges
+  against a cool road; C3 a warm facade block between a cool sky and a cool river. Our warm palettes keep the structure: a
+  warm made world held by one cool chromatic field (sky, water, the dusk window, C 20-35, never grey); >= 10 % of the opposite
+  temperature in every frame (v3 G5 had 0 % cool at 17.4 s); a yellow-green bridge (~15 %, toward yellow, never blue-green).
+- **Saturation as confetti, not fields:** 20-50 small patches each < 1 % of the frame (awnings, balcony panels, signs,
+  clothes, a reflection) in 8+ hue families (v3 G5: 2-4), at C 25-45 in hues other than the hero's and the pop's, each far
+  smaller than the hero, so the hero and the one pop (C >= 50) stay the loudest (colour jobs, PALETTE).
+  PALETTE's "background 50-80 %" is met by many light soft fills together (each facade, the sky, the floor its own tint),
+  never by one empty slab: the biggest single flat region <= 20 % of the frame except the one calm field (C3 15 %, v3 G5 23-45 %).
+- **Good-weather light, one sun:** lit tones lean yellow-gold; lit : shade on buildings ~3:1 (C3); shadows short (<= 3-4 % W
+  past the object, C2) and soft in value and edge: flat, or a 2-step band with a lighter 15-25 px penumbra (C2's soft edge,
+  25 px at 1080), never a blur or a gradient.
+- **Shadows are colour, never grey:** dL* -25 to -40, chroma x0.6-0.7, hue turned away from yellow: 10-15° toward blue on a
+  cool surface (C2), toward plum on warm walls (C3: orange to plum), a deep red-brown under eaves (L* ~29); cast shadows on
+  the ground take the darker tone of the cool field. On a warm palette: red-brown and plum, never grey or olive.
+- **Tinted extremes, both rare:** whites carry the scene's tint (C 7-15: a cream on a warm set, pale cyan on water); pure
+  white only as glints (<= 5 % of one object); darks warm and rare (L* < 25 on <= 6 % of the frame) in the palette's anchor
+  (red-brown, aubergine). The references' olive darks and lines are NOT copied (playbook: "Warm, never sickly").
+- **Value framing by content:** the perimeter 5-8 L* darker than the centre through the masses (C2), or the light-dark-light
+  sandwich (C3); never a vignette gradient, never a dark band in front of a cozy backdrop.
+
+### 3b.7 Texture and edges (VERY subtle, playbook)
+- **Texture goes inverse to area.** Large fields stay flat in fill (C2's road: high-pass 1.5-2 L*); their "paint" is a few
+  long tone-on-tone drawn shapes (dL 3-8): lane marks; ripple dashes on water 15-55 px long, 6-8 px thick, ~10-15 per
+  100 x 100 px (C3); a few dry vertical streaks on the biggest wall; stone dabs 25-80 px a value step darker. Small organic
+  things carry the tactile texture at 3-4x the field's (foliage hatching; blossom daubs 23-45 px with a slightly darker rim,
+  no outline; a rug; wood); the optional halftone (<= 6 %, PALETTE) goes only there. Nothing on people, props or captions.
+- **Locked to the world, never boiling** (both references: no boil, no crawl you can see).
+- **Must read full with texture OFF:** C3 flattened to 24 flat colours still reads full and cozy (flat 18 %, detail 37 %);
+  texture is worth the last ~5-15 points of flat share, never the fix for an empty set.
+- **Lines:** no outlines; thin warm-dark lines (~2.5-3 px at 1080) only in key places (poles, wires, tyres, rails,
+  mullions), 1-4 % of the pixels; light lines too (railings, lane marks).
+- **Paper edges:** both references edge all four sides; we never put one at the top or beside the caption band. If used:
+  the bottom and the sides from y >= 640 (fading in), inset 12-40 px, ragged (peak-to-peak 20-45 px), a dry-brush zone of
+  10-40 px, the surround a dark warm tint (anchor family, L* 15-35), never grey, white paper or a photo. At the top, the lid
+  or a wall cut by the top edge does the holding job.
+
+### 3b.8 Check a cozy shot (phone size, sound off)
+1. Paused: is it full? No hole bigger than the caption band, many small things, one calm field at an edge (LIFE §0).
+2. E in 1:1.5-2.5:1 with the void in its dose; a floor bounded, its far end hidden; >= 40 % of the perimeter closed, open toward us.
+3. Detail gradient: busy far side and edges, calm floor or centre; the captions on one calm plane.
+4. Playing: >= 1 moving figure in every frame (aim 2-4), steady change, half the people at rest, nothing coming at us, the
+   camera locked or floating (the cozy check in `LIFE_AND_DENSITY.md` §9).
+5. Colour: one calm field, warm world and cool frame, confetti not fields, short coloured shadows, tinted whites, rare warm darks.
+
+### References (words only, never frames or clips in the repo; add the next one here with what it taught)
+- **C1** (2026-10-25): the owner's sense-of-enclosure photo, an eye-level cobbled lane with a tall wall cut by the top on one
+  side, a hedge on the other and a tower closing the vista. Taught: H:W 1:1, sky 27 %, one opening, a closed vista (§2, [EN §1]).
+- **C2** (2026-10-26): a painterly street seen from a 4th-5th floor balcony, everyday traffic (a bus, a rickshaw, a car, a
+  walker, a cyclist) flowing calmly under flowering trees, locked camera, a ~6.6 s loop. Taught: BALCONY, mass : open field,
+  the void / floor split, the detail gradient, life passing through, the colour structure, texture inverse to area.
+- **C3** (2026-10-26): a painterly riverside at eye level across the water, dense layered facades, people sitting on the
+  embankment, a few cyclists and walkers in one lane, a slow 2D float; "it doesn't feel empty at all". Taught: RIVERSIDE,
+  fullness first (the meter rates it FAR on motion yet it is full), rest next to motion, the float replacing the push-in.
 
 > **Measured update (2026-10-26):** the camera and shot numbers below are superseded where they differ by
 > `CINEMATIC_GUIDE.md` (165 measured Arcane shots; `research/CINEMATIC_GUIDE_full_v1.md` §7 lists exactly what changed).
@@ -163,7 +359,10 @@ Hyperion, Louisiana, ~4x Central Park by 2030; Abilene ~1 Central Park late 2026
 4. **G4:** DataCenter colossus (M): louvred faces, LED rows on `LitWindows`, chillers, vapour, `quietAbove`, door, chip mountain.
 5. **G5:** interior props (L: Bookshelf with batched spines and a flat top, Desk, DeskLamp, FrostyWindow, Mug + steam,
    Calendar, Phone + PriceTag, old Laptop, in core `Ink` / `Fill`); Snow (S); capcheck UI mask (S); HangingLamp (S).
-6. **Later:** street kit (M: `quietY`, `closer`, ivy, `Flank`) before any lane shot; cine inkComp (M, before any K4 over cine
+6. **G5 (cozy v2, before the next cozy hold):** a float mode in the shot camera (`ShotCam` / `CineCamera`: translation legs,
+   eased turns, sub-pixel, overscan) (S); `density.py` cozy mode (movers per frame, zero-mover frames, change CV, void, small
+   things; `LIFE_AND_DENSITY.md` §9) (S); BALCONY and RIVERSIDE set templates (lid, C-curve and mouth; backdrop, bank, water) (M).
+7. **Later:** street kit (M: `quietY`, `closer`, ivy, `Flank`) before any lane shot; cine inkComp (M, before any K4 over cine
    pieces, e.g. v2's office-block pull-back); tilt keystone (M, cut first).
 
 ## 8. Arcane scenes for the owner to measure [AR §7]
