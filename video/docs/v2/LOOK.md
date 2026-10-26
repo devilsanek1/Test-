@@ -18,5 +18,9 @@
     "box carried out" beat is not in the test;
   - the badge clack, marker squeak and paper unroll sounds exist (`public/v2/`) but aren't in the test's mix;
   - check the credit "Her account to BBC News, 21 Oct 2026" before release.
+- **Aliveness (owner rule, 2026-10-26):** every set dense and living from G5 on (the bar: reference 1 and v1); her cat is
+  the recurring living character, in her home only (desk and nook panels), never on the deal or Google pages, P3 or P8 (warm/cold
+  contrast, equal pages); P8 gets the great-scale cues (a world that keeps going into haze, huge clouds, birds, moving cars; no
+  figures or aircraft).
 - **Rules:** `docs/look/CINEMATIC_GUIDE.md`, `COZY_AND_SCALE.md`, 60 fps production renders, texture off until the
   optional last step.

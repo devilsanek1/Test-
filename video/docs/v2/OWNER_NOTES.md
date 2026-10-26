@@ -32,6 +32,13 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-26, G4: "lets go with A": palette 3 Cream & Cobalt (desk_A); then "lets do dusk": the Pentagon scale beat in the
   6 Dusk sister palette. -> `docs/v2/LOOK.md`; rule: Taste signals (palettes).
 
+## Production (G5 on)
+- 2026-10-26, G5 (while the v2 blocking build ran): "we've updated the repo with a few more ground rules" (every scene must feel
+  alive; great scale; every cut names its stage; no token limit for creative work) -> the v2 G5 workflow was stopped before its
+  lanes (the engine's finished shell kept) and re-briefed: dense, living sets with ambient life always on, HER CAT as the recurring
+  living character in her home only (our call for this cut; the owner may veto it), P8 with the great-scale cues, a kit critic and a
+  per-lane aliveness critic + fix round. -> rules: Visual style (feel alive; great scale), Process (say the stage; no token limit).
+
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
   the caption and the pinned comment as text plus a URL people can copy; links in captions aren't clickable; a
