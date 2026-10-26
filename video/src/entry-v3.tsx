@@ -5,6 +5,7 @@ import React from 'react';
 import {Composition, registerRoot, staticFile} from 'remotion';
 import {RadioCut, type RadioData} from './v3/RadioCut';
 import {SketchReel, type Animatic} from './v3/SketchReel';
+import {ShotSketch, type SketchData} from './v3/ShotSketch';
 
 const FPS = 30;
 const V3Root: React.FC = () => (
@@ -36,6 +37,19 @@ const V3Root: React.FC = () => (
       calculateMetadata={async () => {
         const data: Animatic = await (await fetch(staticFile('v3/animatic.json'))).json();
         return {durationInFrames: Math.ceil(data.durationSec * FPS), props: {data}};
+      }}
+    />
+    <Composition
+      id="ShotSketch"
+      component={ShotSketch as unknown as React.FC<Record<string, unknown>>}
+      fps={FPS}
+      width={1080}
+      height={1920}
+      durationInFrames={1}
+      defaultProps={{data: null as unknown as SketchData}}
+      calculateMetadata={async () => {
+        const data: SketchData = await (await fetch(staticFile('look/cine_sketches.json'))).json();
+        return {durationInFrames: data.sketches.length, props: {data}};
       }}
     />
   </>

@@ -124,7 +124,7 @@ const Element: React.FC<{el: El; t: number; shot: Shot; i: number}> = ({el, t, s
   return <g opacity={appear} transform={`translate(${dx} ${dy})`}>{body}</g>;
 };
 
-const ShotView: React.FC<{shot: Shot; t: number}> = ({shot, t}) => {
+export const ShotView: React.FC<{shot: Shot; t: number}> = ({shot, t}) => {
   const c = camAt(shot, t);
   const tf = `translate(${W / 2} ${H / 2}) scale(${c.z}) translate(${-c.x} ${-c.y})`;
   return (
