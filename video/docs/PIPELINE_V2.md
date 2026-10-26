@@ -121,6 +121,7 @@ in `context/workflows/` (the v3 ones are the current best versions):
 | references | `arcane-cinematic-guide-*.js`, `scripts/look/shot_sheets.py` | dissect any reference video: measure, contact sheets, per-shot analysis agents, guidebook |
 | opening (every video) | `v3-opening-banger-*.js`; SketchReel `draw` / `fillIn` | 3 concepts for the one continuous opening shot (drawn live, expectation then reality, never still), judge, build; loop to the bare-line frame 0 |
 | G4 look | `docs/look/COZY_AND_SCALE.md`, `docs/look/PALETTE.md`, `look-cozy-scale-arcane-*.js` | look rules; research template |
+| G5 blocking | `docs/G5_BLOCKING.md`; `src/entry-v3-film.tsx` (template); `scripts/qa/gate_check.py` | the film shell plays end to end from minute one: `scripts/g5_scaffold.py` turns the locked board into scenes.json + one placeholder file per panel (the board panel inside `<Film>`), lanes replace panel files; pop captions from `scripts/film_captions.py`; frame-0 words, voice, sound cues, draft label; the scripted gate check (fps 60, duration, audio, cuts vs scene starts, captions in the band) |
 | references | `video/scripts/look/measure_camera.py` | cuts + per-shot camera curves, easing, parallax from a reference video (keep copyrighted clips out of git) |
 
 ## Agent prompt rules
