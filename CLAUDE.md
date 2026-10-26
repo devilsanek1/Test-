@@ -6,8 +6,9 @@ The video project lives in `video/` (Remotion). Before starting or continuing an
 1. Read `video/docs/OWNER_PLAYBOOK.md`: every piece of the owner's feedback, as rules. It is the memory across videos.
 2. Follow `video/docs/PIPELINE_V2.md`: gates G0-G8, with a playable low-res video with voice at every gate.
 
-**Whenever the owner gives feedback, add it to `video/docs/OWNER_PLAYBOOK.md` in the same turn** (as a rule, with the date,
-the video and the reason) and commit it. Post-publish numbers go in its "Performance log". At session start, compact
+**Whenever the owner gives feedback, capture it in the same turn and commit it, split by scope:** approach-level lessons go to
+`video/docs/OWNER_PLAYBOOK.md` as general rules; notes on one concrete video (picks, lines, takes, shots) go to
+`video/docs/vN/OWNER_NOTES.md`; a concrete note that teaches something general goes to both. Post-publish numbers go in its "Performance log". At session start, compact
 the playbook if its Maintenance trigger fires (7+ days since "Last compacted" with new entries, or over 200 lines; budget raised by the owner, 2026-10-26).
 
 Top rules (details in the playbook):

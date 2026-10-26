@@ -1,9 +1,14 @@
 # Owner playbook: everything the owner has told us, as rules
 
-This is the memory of the owner's feedback across videos. Read it before starting any video, and before every gate
-of `docs/PIPELINE_V2.md`. **Add every new piece of owner feedback here in the same turn it is given** (as a rule,
-with the date, the video and the reason), commit it, and move a rule to "Retired" instead of deleting it if the
-owner reverses it. The owner's master creative brief is `docs/CREATIVE_BRIEF.md` (the source; this file does not
+This is the memory of the owner's feedback across videos: **approach-level rules only** (how we design and produce any
+video). Read it before starting any video, and before every gate of `docs/PIPELINE_V2.md`.
+
+**Capturing feedback (owner, 2026-10-26): split every note in the same turn.**
+- A note about THIS video (a pick, a line, a take, a shot) goes to `docs/vN/OWNER_NOTES.md` (date, gate, what the owner
+  said, what we did).
+- A lesson about our approach goes HERE as a general rule, worded for any video, with a short evidence tag (vN, date).
+- A concrete note that teaches something general goes to both: the instance in the video's notes, the rule here.
+Commit in the same turn; move a rule to "Retired" instead of deleting it if the owner reverses it. The owner's master creative brief is `docs/CREATIVE_BRIEF.md` (the source; this file does not
 replace it).
 
 Format: **rule** — why / evidence (video, date).
@@ -69,8 +74,8 @@ Format: **rule** — why / evidence (video, date).
   opening lost ~80 % of viewers by 3 s; late quirks are acceptable. — (v1 IG insights, 2026-10-25).
 - **The hook is a concrete, surprising, TRUE claim with stakes**, verified against the primary source before it's
   locked; for a small news item, research the bigger story and lead with its strongest true framing. — (v2, 2026-10-25).
-- **Personal framings must feel natural, not over the top.** "You're up against AI data centers… and losing" was too
-  much. Never cast the viewer as a loser in a contest they don't feel; test "you" claims with a viewer panel.
+- **Personal framings must feel natural, not over the top.** Never cast the viewer as a loser in a contest they don't
+  feel; test "you" claims with a viewer panel.
   — (v3 G2, 2026-10-25).
 - **Target 30-45 s and end close to the payoff** (viewers left once the story felt resolved, ~40 s). — (v1 insights).
 - **Every frame at least 8/10, no dead frames, cuts locked to the beat.** — (v1).
@@ -79,29 +84,25 @@ Format: **rule** — why / evidence (video, date).
 - **Boards optimise for SIGNAL, not quality: the director gets the most information about the final film in the least
   drawing and the least review time.** Thumbnail-level drawings; the intent made explicit (framing, the one action,
   the shot type, cozy/scale, the camera move as a red mark, all in a big readable note); animate only where timing is
-  the question; no polish, no extra detail, lean review loops. — owner, v3 G3, 2026-10-26.
+  the question; no polish, no extra detail, lean review loops. — (v3 G3, 2026-10-26).
 - **Every shot reads instantly with the sound off: literal beats clever.** Show recognisable things: a laptop that looks
   like a laptop, a data center like a building of servers, a plain labelled chart. No metaphors that need explaining.
-  Test every animatic with a sound-off cold read before the owner sees it. — ("what does the AI mountain signify?", v3 G3, 2026-10-26).
-  Also no physical metaphors the facts don't support: a data center "growing and consuming the houses" made no sense to the
-  owner; show the real mechanism (it buys up the memory chips) instead. — owner, v3 G3, 2026-10-26.
+  Test every animatic with a sound-off cold read before the owner sees it. — (v3 G3, 2026-10-26).
+- **No physical metaphors the facts don't support;** show the real mechanism instead. — (v3 G3, 2026-10-26).
 - **Drawn like a professional storyboard: simple, monochrome, clarity first.** No colour at the sketch stage; colour
   belongs to G4/G5. Spec: `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
 
 - **The board carries the cinematography too: clear AND cinematic.** Framing, camera angle, scale (the rise-over reveal,
   the scale cut to a tiny figure) and coziness (the enclosed home base, the window) are decided in the board, in
   monochrome; clarity comes from composition, never from flattening every panel to an icon on blank paper. Every
-  panel names its shot type (CINEMATIC_GUIDE / COZY_AND_SCALE) and still passes the sound-off read. — owner, v3 G3,
-  2026-10-26 ("where is the scale / coziness / learnings from Arcane?").
+  panel names its shot type (CINEMATIC_GUIDE / COZY_AND_SCALE) and still passes the sound-off read. — (v3 G3, 2026-10-26).
 
-## Taste signals (the owner's picks; weight them when ranking options)
-- **Topics: the everyday wallet consequence** (laptop memory prices over the higher-scored Meta $25B story). — (v3 G0, 2026-10-25).
-- **Lines: plain, direct and personal over clever** ("AI is making your next laptop pricier"; hook as a question,
-  "Buying a laptop soon? AI's making it pricier."). A plain line needs the frame-0 image, the first-second sound and the
-  second line to bring the jolt. — (v3 G0.5-G1, 2026-10-25/26).
-- **Core lines: one real person in her own (attributed) words over a plural headline** ("She quit Google, and says her
-  contract bans criticizing it, for life" over "Google AI engineers are quitting..."). — (v2 G0.5, 2026-10-26).
-- **Palettes: the warm, everyday one for a money story** (Autumn Ochre over Sage Study and Mint & Clay 1.1). — (v3 G4, 2026-10-26).
+## Taste signals (general preferences from the owner's picks; the picks themselves are in each video's OWNER_NOTES.md)
+- **Topics: the everyday wallet consequence** wins over a bigger but more distant story. — (v3 G0).
+- **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
+  frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
+- **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
+- **Palettes: the warm, everyday one for a money / everyday-life story.** — (v3 G4).
 
 ## Motion
 - **Render at 60 fps from G5 to the final** ("smoother and more crispy"). Animate by time; drawn motion may stay stepped
