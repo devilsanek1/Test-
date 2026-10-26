@@ -155,14 +155,16 @@ export function crossing(t: number, t0: number, t1: number, from: [number, numbe
 }
 
 /** Back-and-forth between a and b: travel `dur` s each way, `hold` s at each end (a forklift, a pacing worker).
- *  Returns x, the direction of travel (+1 toward b) and whether it is holding. */
+ *  Returns x, the direction of travel (+1 toward b), whether it is holding, at which end, and the progress through the
+ *  hold (0..1). */
 export function shuttle(t: number, a: number, b: number, dur: number, hold = 0.6, phase = 0) {
   const T = 2 * (dur + hold);
   const v = frac(t / T + phase) * T;
-  if (v < dur) return {x: a + (b - a) * smooth01(v / dur), dir: Math.sign(b - a) || 1, holding: false, end: 0};
-  if (v < dur + hold) return {x: b, dir: Math.sign(b - a) || 1, holding: true, end: 1};
-  if (v < 2 * dur + hold) return {x: b + (a - b) * smooth01((v - dur - hold) / dur), dir: -(Math.sign(b - a) || 1), holding: false, end: 1};
-  return {x: a, dir: -(Math.sign(b - a) || 1), holding: true, end: 0};
+  const hk = (u: number) => (hold > 0 ? u / hold : 1);
+  if (v < dur) return {x: a + (b - a) * smooth01(v / dur), dir: Math.sign(b - a) || 1, holding: false, end: 0, holdK: 0};
+  if (v < dur + hold) return {x: b, dir: Math.sign(b - a) || 1, holding: true, end: 1, holdK: hk(v - dur)};
+  if (v < 2 * dur + hold) return {x: b + (a - b) * smooth01((v - dur - hold) / dur), dir: -(Math.sign(b - a) || 1), holding: false, end: 1, holdK: 0};
+  return {x: a, dir: -(Math.sign(b - a) || 1), holding: true, end: 0, holdK: hk(v - 2 * dur - hold)};
 }
 
 // ---------------------------------------------------------------- puff trains (smoke, steam, plumes)
