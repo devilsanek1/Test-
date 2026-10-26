@@ -23,6 +23,9 @@ moves with camera.to; both end frames must pass as panels):
     scale ladder) inverts the size rule: its subject must be BIG, at least 648 px (60 % of the frame) or cut by both
     side edges, at both camera ends (ERROR), because a scale subject at medium size reads as "a building on paper"
   - the camera zoom changing at most 2x within a shot (ERROR; over 1.6x WARN: a push-in is at most 1.6x)
+Moves with a scale (s, pivot o, lin) are applied in list order, as SketchReel does. A subject group is measured at the
+panel's end frames it is on screen in (its in / out window): the start subject of an S5 pull-back that hands over behind a
+wipe is checked at the start, the landing's subject at the end (a group on screen at neither end: at its first frame).
 Exit code 1 if there is any ERROR.
 
 Figure boxes come from the POSES table in src/v3/SketchReel.tsx and icon sizes from ICON_ASPECT in
@@ -137,12 +140,71 @@ def box(el, board):
     return None
 
 
-def moved(b, el_index, shot, at_end):
-    if b is None or not at_end:
+def _bezier(x1, y1, x2, y2):
+    def f(x):
+        lo, hi = 0.0, 1.0
+        for _ in range(40):  # solve bx(s) = x by bisection (bx is monotonic for 0 <= x1, x2 <= 1)
+            m = (lo + hi) / 2
+            bx = 3 * (1 - m) ** 2 * m * x1 + 3 * (1 - m) * m * m * x2 + m ** 3
+            lo, hi = (m, hi) if bx < x else (lo, m)
+        m = (lo + hi) / 2
+        return 3 * (1 - m) ** 2 * m * y1 + 3 * (1 - m) * m * m * y2 + m ** 3
+    return f
+
+
+def _trapezoid(a, d):
+    v = 1 / (1 - a / 2 - d / 2)
+    return lambda u: v * u * u / (2 * a) if u < a else v * (u - a / 2) if u <= 1 - d else 1 - v * (1 - u) ** 2 / (2 * d)
+
+
+EASES = {
+    'inout': lambda x: -(math.cos(math.pi * x) - 1) / 2, 'out': lambda x: 1 - (1 - x) ** 3, 'in': lambda x: x ** 3,
+    'linear': lambda x: x, 'unveil': _trapezoid(0.1, 0.6), 'inQuad': lambda x: x * x, 'outSine': lambda x: math.sin(x * math.pi / 2),
+}
+
+
+def ease_fn(e):
+    return _bezier(*e) if isinstance(e, list) else EASES.get(e or 'inout', EASES['inout'])
+
+
+def progress(m, t):
+    """a move's eased progress at t s after the shot start; t 'end' = every move done (the authored end frame)"""
+    if t == 'end':
+        return 1.0
+    x = (t - m['at']) / max(1e-6, m['dur'])
+    return ease_fn(m.get('ease'))(min(1.0, max(0.0, x)))
+
+
+def moved(b, el_index, shot, at):
+    """the box after the element's moves at time at: False / 0 = the shot start, True / 'end' = after every move"""
+    if b is None:
         return b
-    dx = sum(m['dx'] for m in shot.get('moves', []) if m['el'] == el_index)
-    dy = sum(m['dy'] for m in shot.get('moves', []) if m['el'] == el_index)
-    return b[0] + dx, b[1] + dy, b[2] + dx, b[3] + dy
+    t = 'end' if at is True else 0.0 if at is False else at
+    x0, y0, x1, y1 = b
+    for m in shot.get('moves', []) or []:
+        if m['el'] != el_index:
+            continue
+        u = progress(m, t)
+        s = m.get('s', 1)
+        if s != 1:
+            S = 1 + (s - 1) * u if m.get('lin') else s ** u
+            ox, oy = m.get('o', [0, 0])
+            x0, x1 = ox + S * (x0 - ox), ox + S * (x1 - ox)
+            y0, y1 = oy + S * (y0 - oy), oy + S * (y1 - oy)
+        x0, x1 = x0 + m['dx'] * u, x1 + m['dx'] * u
+        y0, y1 = y0 + m['dy'] * u, y1 + m['dy'] * u
+    return x0, y0, x1, y1
+
+
+def cam_at(cam, t, shot):
+    """the camera at t s after the shot start (t 'end' = camera.to)"""
+    if t == 'end':
+        return cam['to']
+    s0 = cam.get('start', shot['s']) - shot['s']
+    s1 = max(s0 + 0.01, cam.get('end', shot['e']) - shot['s'])
+    u = ease_fn(cam.get('ease'))(min(1.0, max(0.0, (t - s0) / (s1 - s0))))
+    a, b = cam['from'], cam['to']
+    return {k: a[k] + (b[k] - a[k]) * u for k in ('x', 'y', 'z')}
 
 
 def to_screen(b, cam):
@@ -259,10 +321,14 @@ def lint_shot(shot, board):
                  if spans[a][0] < spans[b][1] and spans[b][0] < spans[a][1]]
         if clash:
             err(f'{len(groups)} subject groups on screen together ({", ".join(str(sorted(g)) for g in groups)}): one subject per panel')
-        for g in groups:
+        for g, (g_in, g_out) in zip(groups, spans):
             chart = any(els[i].get('t') == 'icon' and els[i].get('name') == 'chart' for i in g)
             lo, hi = CHART_W if chart else SUBJECT_W
-            for c, at_end, which in ends:
+            # the end frames this group is on screen in (a group on screen at neither end: its first frame)
+            g_ends = [(c, at, which) for c, at, which in ends if (g_in <= 0 if which == 'start' else g_out >= dur)]
+            if not g_ends:
+                g_ends = [(cam_at(cam, g_in, shot), g_in, f'{g_in:.2f} s')]
+            for c, at_end, which in g_ends:
                 raw = union([to_screen(moved(box(els[i], board), i, shot, at_end), c) for i in g])
                 sb = (max(0, raw[0]), max(0, raw[1]), min(W, raw[2]), min(STAGE_BOTTOM, raw[3]))
                 cut = sb != raw

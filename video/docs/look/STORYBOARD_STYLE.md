@@ -189,6 +189,7 @@ lines. Then check the whole film:
   an insert is a neutral breath); the nook is breached once.
 - **Scale:** one moment (1.5-4 s) built as a ladder: a close-up of the one thing, the reveal of many, then ONE cut to a
   tiny figure (change the angle as well as the size, so the second wide steps up instead of repeating).
+- **An S5 pull-back lands on the tiny figure inside the move** instead of a separate scale cut (v3, 2026-10-26).
 - **Size or angle changes at every cut,** except a deliberate match (the same chart again, the same place later, the
   callback to the opening's end frame), which keeps the exact frame so the change is the only difference.
 - **Rise-over in board mode = two layers:** the camera rises a little (the world sinks ~120 px, so nothing enters the

@@ -70,8 +70,9 @@ export type El = Depth & (
   | {t: 'mark'; kind: 'arrow'; x1: number; y1: number; x2: number; y2: number; word?: string; in?: number});
 /** r = roll in degrees (CINEMATIC_GUIDE: <= 2 deg drift, <= 6 deg in action). */
 type Cam = {x: number; y: number; z: number; r?: number};
-/** outSine = sine ease-out: fastest at the start, peak speed only pi/2 x the average (a rise-over's near ledge, STORYBOARD_STYLE §7) */
-type Ease = 'inout' | 'out' | 'in' | 'linear' | 'unveil' | 'inQuad' | 'outSine';
+/** outSine = sine ease-out: fastest at the start, peak speed only pi/2 x the average (a rise-over's near ledge, STORYBOARD_STYLE §7);
+ *  [x1, y1, x2, y2] = a CSS cubic-bezier (e.g. the S5 pull-back crane's [0.55, 0.03, 0.5, 1.0], CINEMATIC_GUIDE) */
+type Ease = 'inout' | 'out' | 'in' | 'linear' | 'unveil' | 'inQuad' | 'outSine' | [number, number, number, number];
 export type Shot = {
   id: string;
   s: number;
@@ -86,8 +87,12 @@ export type Shot = {
   /** word = the slug's camera word (default from the move: PUSH IN, PULL OUT, RISE, TILT DOWN, PAN L/R, HOLD) */
   camera: {from: Cam; to: Cam; ease?: Ease; start?: number; end?: number; word?: string};
   els: El[];
-  /** element moves (dx, dy in world px, from at for dur s after the shot start; several on one element add up); ease default 'inout' */
-  moves?: {el: number; dx: number; dy: number; at: number; dur: number; ease?: Ease}[];
+  /** element moves (dx, dy in world px, from at for dur s after the shot start; several on one element add up); ease default 'inout'.
+   *  s = the scale the move reaches (about the pivot o, in the coordinates the element's earlier moves leave; geometric in u, or
+   *  linear with lin: true, which moves every point on a straight line from the start box to the end box): a plane of an
+   *  S5 pull-back moving on one ease (STORYBOARD_STYLE §7). A scaled element keeps its role's line weight on screen
+   *  (non-scaling strokes). A move with at + dur <= 0 is already done at the shot start (a constant pre-scale). */
+  moves?: {el: number; dx: number; dy: number; at: number; dur: number; ease?: Ease; s?: number; o?: [number, number]; lin?: boolean}[];
   /** the small-print slot (added for v2): a source credit or a name caption, 36 px mid grey under the caption, never
    *  in the picture (e.g. "Source: BBC News, 21 Oct 2026") */
   credit?: string;
@@ -123,14 +128,15 @@ const trapezoid = (a: number, d: number) => {
   const v = 1 / (1 - a / 2 - d / 2);
   return (u: number) => (u < a ? (v * u * u) / (2 * a) : u <= 1 - d ? v * (u - a / 2) : 1 - (v * (1 - u) * (1 - u)) / (2 * d));
 };
-const EASE: Record<Ease, (x: number) => number> = {
+const EASE: Record<Exclude<Ease, number[]>, (x: number) => number> = {
   inout: Easing.inOut(Easing.sin), out: Easing.out(Easing.cubic), in: Easing.in(Easing.cubic), linear: (x: number) => x,
   unveil: trapezoid(0.1, 0.6), inQuad: Easing.in(Easing.quad), outSine: Easing.out(Easing.sin),
 };
+const easeOf = (e: Ease = 'inout') => (Array.isArray(e) ? Easing.bezier(e[0], e[1], e[2], e[3]) : EASE[e]);
 
 function camAt(shot: Shot, t: number): Cam {
   const {from, to, ease = 'inout', start = shot.s, end = shot.e} = shot.camera;
-  const u = interpolate(t, [start, Math.max(start + 0.01, end)], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE[ease]});
+  const u = interpolate(t, [start, Math.max(start + 0.01, end)], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: easeOf(ease)});
   return {x: from.x + (to.x - from.x) * u, y: from.y + (to.y - from.y) * u, z: from.z + (to.z - from.z) * u,
     r: (from.r ?? 0) + ((to.r ?? 0) - (from.r ?? 0)) * u};
 }
@@ -386,11 +392,23 @@ const Element: React.FC<{el: El; t: number; shot: Shot; i: number; board: boolea
   if (appear <= 0) return null;
   let dx = 0;
   let dy = 0;
+  // scale moves compose in list order (SVG applies the list right to left); translation-only moves just add up
+  const tfs: string[] = [];
+  let scaled = false;
   for (const m of shot.moves ?? []) {
     if (m.el !== i) continue;
-    const u = interpolate(t - shot.s, [m.at, m.at + m.dur], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE[m.ease ?? 'inout']});
-    dx += m.dx * u;
-    dy += m.dy * u;
+    const u = interpolate(t - shot.s, [m.at, m.at + m.dur], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: easeOf(m.ease)});
+    if (m.s !== undefined && m.s !== 1) {
+      const S = m.lin ? 1 + (m.s - 1) * u : Math.pow(m.s, u);
+      const [ox, oy] = m.o ?? [0, 0];
+      tfs.unshift(`translate(${ox + m.dx * u} ${oy + m.dy * u}) scale(${S}) translate(${-ox} ${-oy})`);
+      scaled = true;
+    } else if (scaled) {
+      tfs.unshift(`translate(${m.dx * u} ${m.dy * u})`);
+    } else {
+      dx += m.dx * u;
+      dy += m.dy * u;
+    }
   }
   const seed = `${shot.id}-${i}`;
   const local = t - shot.s;
@@ -503,6 +521,9 @@ const Element: React.FC<{el: El; t: number; shot: Shot; i: number; board: boolea
       body = <MarkView el={el} seed={seed} u={drawU} />;
       break;
   }
+  if (scaled) {
+    return <g opacity={appear} className="nss" transform={[...tfs, `translate(${dx} ${dy})`].join(' ')}>{body}</g>;
+  }
   return <g opacity={appear} transform={`translate(${dx} ${dy})`}>{body}</g>;
 };
 
@@ -515,6 +536,7 @@ export const ShotView: React.FC<{shot: Shot; t: number; mode?: Style}> = ({shot,
   return (
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{position: 'absolute', inset: 0}}>
       <rect width={W} height={H} fill={board ? BOARD.paper : PAPER} />
+      {shot.moves?.some((m) => m.s !== undefined && m.s !== 1) ? <style>{'.nss *{vector-effect:non-scaling-stroke}'}</style> : null}
       {order.map((i) => {
         const el = shot.els[i];
         return (

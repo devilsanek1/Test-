@@ -25,8 +25,12 @@ export type PriceTagProps = {
   value?: string;
   /** Steps: the latest step with t <= now shows; each change pops the price and jolts the tag. */
   ticker?: TickerStep[];
-  /** A struck old price above the main one (small, light), struck from `strikeAt` (omit = struck already). */
+  /** A struck old price above the main one, struck from `strikeAt` (omit = struck already). */
   old?: string;
+  /** The old price's size as a fraction of w (default 0.16: it reads at phone size; the first kit's 0.13 did not). */
+  oldSize?: number;
+  /** The old price's colour: 'white' (default, the price's own white) | 'cream' (the lamp core, a softer step). */
+  oldTone?: 'white' | 'cream';
   oldAt?: At;
   strikeAt?: At;
   /** The string's far end (canvas px): the tag hangs from it. Omit = no string. */
@@ -37,6 +41,8 @@ export type PriceTagProps = {
   sway?: number;
   /** Turn the tag over from this time (0.36 s): the back shows a small data center. */
   turnAt?: number;
+  /** The sign on the back's mini data center (default "AI": the full "AI DATA CENTER" is ~6 px at phone size). */
+  backSign?: string;
   /** 'hero' (burnt orange, default) | 'pop' (the style frame's blue tag). */
   tone?: 'hero' | 'pop';
   at?: At;
@@ -73,7 +79,7 @@ function tickerNow(t: number, value?: string, ticker?: TickerStep[]): {v: string
   return {v, since};
 }
 
-export const PriceTag: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, oldAt, strikeAt, stringFrom, rot = 0, sway = 0, turnAt, tone = 'hero', at, seed = 'tag', ink = 3.4}) => {
+export const PriceTag: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, oldSize: oldK = 0.16, oldTone = 'white', oldAt, strikeAt, stringFrom, rot = 0, sway = 0, turnAt, backSign = 'AI', tone = 'hero', at, seed = 'tag', ink = 3.4}) => {
   const t = useTime();
   const h = w * 0.5;
   const shape = tagShape(w);
@@ -101,9 +107,10 @@ export const PriceTag: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, 
   const priceY = old ? h * 0.86 : h * 0.68;
   const textX = w * 0.6;
   const fit = w * 0.66;
-  const oldSize = w * 0.13;
-  const oldY = h * 0.36;
-  const strikeD = old ? line(textX - w * 0.17, oldY - oldSize * 0.32, textX + w * 0.17, oldY - oldSize * 0.36, {over: [2, 4], seed: `${seed}/strike`}) : '';
+  const oldSize = w * oldK;
+  const oldY = h * 0.36 + (oldSize - w * 0.13) * 0.3;
+  const strikeHalf = Math.min(w * 0.24, w * 0.17 * (oldK / 0.13));
+  const strikeD = old ? line(textX - strikeHalf, oldY - oldSize * 0.32, textX + strikeHalf, oldY - oldSize * 0.36, {over: [2, 4], seed: `${seed}/strike`}) : '';
   // the string: from its anchor to the hole, with a little sag
   let stringD = '';
   if (stringFrom) {
@@ -124,18 +131,18 @@ export const PriceTag: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, 
         <Ink d={circle(hx, hy, w * 0.045, {seed: `${seed}/ringI`})} at={b(at, 0.06)} width={Math.max(1.6, ink * 0.6)} />
         {back ? (
           <Show at={fillAt(at)}>
-            <DataCenter x={w * 0.6} y={h * 0.8} w={w * 0.52} variant="mini" seed={`${seed}/back`} ink={Math.max(1.6, ink * 0.6)} />
+            <DataCenter x={w * 0.6} y={h * 0.8} w={w * 0.52} variant="mini" sign={backSign} seed={`${seed}/back`} ink={Math.max(1.6, ink * 0.6)} />
           </Show>
         ) : (
           <>
             {old ? (
               <Show at={oldAt ?? fillAt(at)}>
-                <Txt x={textX} y={oldY} size={oldSize} fill={EMBER.core} fit={fit * 0.7}>
+                <Txt x={textX} y={oldY} size={oldSize} fill={oldTone === 'white' ? EMBER.white : EMBER.core} fit={fit * 0.76}>
                   {old}
                 </Txt>
               </Show>
             ) : null}
-            {old ? <Ink d={strikeD} at={strikeAt ?? oldAt ?? b(at, 0.2)} width={Math.max(2.6, w * 0.011)} color={EMBER.ink} /> : null}
+            {old ? <Ink d={strikeD} at={strikeAt ?? oldAt ?? b(at, 0.2)} width={Math.max(2.6, w * 0.013)} color={EMBER.ink} /> : null}
             <Show at={fillAt(at)}>
               <XG m={mat.about(mat.scale(clamp(popS, 1, 1.3)), textX, priceY - priceSize * 0.3)}>
                 <Txt x={textX} y={priceY} size={priceSize} fill={EMBER.white} fit={fit}>

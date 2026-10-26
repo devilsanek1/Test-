@@ -5,7 +5,7 @@
 import React from 'react';
 import {Ink} from '../../../lib/Ink';
 import {Fill} from '../../../lib/Fill';
-import {line, poly, polyPath, rect as rectInk} from '../../../lib/sketch';
+import {line, poly, polyPath} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {useTime, prog, ease, clamp} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
@@ -206,7 +206,7 @@ export type PileProps = {
   ink?: number;
 };
 
-type PileStick = {x: number; y: number; w: number; rot: number; shade: boolean; row: number};
+type PileStick = {x: number; y: number; w: number; rot: number; shade: boolean; back: boolean; row: number};
 
 const pileCache = new Map<string, {sticks: PileStick[]; rows: number; outline: string; mound: string}>();
 
@@ -237,7 +237,8 @@ function pileLayout(x: number, y: number, w: number, h: number, stickW: number, 
         y: y - dy + r.jitter(rowStep * 0.35),
         w: sw * r.range(0.86, 1),
         rot: r.chance(0.18) ? r.range(55, 80) * (r.chance(0.5) ? 1 : -1) : r.jitter(38),
-        shade: r.chance(0.35),
+        shade: r.chance(0.3),
+        back: r.chance(0.3),
         row: ri,
       });
     }
@@ -273,7 +274,7 @@ const RawStick: React.FC<{s: PileStick; scale: number}> = ({s, scale}) => {
     <g transform={`translate(${s.x.toFixed(1)} ${s.y.toFixed(1)}) rotate(${s.rot.toFixed(1)})`}>
       <rect x={x0} y={y0} width={w} height={h} fill={s.shade ? EMBER.boardDeep : EMBER.board} />
       <rect x={x0 + w * 0.05} y={y0 + h * 0.76} width={w * 0.9} height={h * 0.24} fill={EMBER.pin} />
-      <path d={chips} fill={EMBER.chip} />
+      {s.back ? <rect x={x0 + w * 0.3} y={y0 + h * 0.22} width={w * 0.32} height={h * 0.36} fill={EMBER.card} /> : <path d={chips} fill={EMBER.chip} />}
       <rect x={x0} y={y0} width={w} height={h} fill="none" stroke={EMBER.ink} strokeWidth={1.7} strokeLinejoin="round" />
     </g>
   );
@@ -286,7 +287,7 @@ export const Pile: React.FC<PileProps> = ({x, y, w, h, stickW = 130, at, dur = 0
   const shown = (row: number) => (at === undefined ? 1 : prog(t, at + (row / Math.max(1, L.rows - 1)) * dur, 0.12, ease.outCubic));
   return (
     <>
-      <Fill d={L.mound} color={EMBER.chip} at={at} seed={`${seed}/mound`} offset={false} />
+      <Fill d={L.mound} color={EMBER.boardDeep} at={at} seed={`${seed}/mound`} offset={false} />
       {L.sticks.map((s, i) => {
         const k = shown(s.row);
         return k <= 0 ? null : <RawStick key={i} s={s} scale={0.2 + 0.8 * k} />;

@@ -1,28 +1,30 @@
-# Video 3, G3 storyboard (board v3, cine, fix round 1): "The laptop deal that flipped"
+# Video 3, G3 storyboard (board v3, cine, fix round 1, S5 merge): "The laptop deal that flipped"
 
 Data: `public/v3/animatic.json` (`"style": "board"`, label `v3 G3 cine`, drawn by `src/v3/SketchReel.tsx`, composition
 `Animatic` in `src/entry-v3.tsx`), built by `scripts/v3/build_board_cine.py` from the camera plan
-(`docs/v3/camera_plan_g3.md`, with the supervisor's changes). Board v3 puts the cinematography back into the clear
-board v2 (the owner: "where is the scale / coziness / learnings from Arcane?") and replaces the opening (the owner: "why
-is the AI data center growing and consuming the buildings?") with the real mechanism. Fix round 1 answers one sound-off
-cold read and the cinematography review (below). House style: `docs/look/STORYBOARD_STYLE.md` (§0 signal per drawing,
-§3 notes strip, §7 cinematography). The lint (`python3 scripts/v3/board_lint.py public/v3/animatic.json`) reports 0 errors
+(`docs/v3/camera_plan_g3.md`, with the supervisor's changes). Board v3 puts the cinematography back into the clear board
+v2 (the owner: "where is the scale / coziness / learnings from Arcane?") and replaces the opening (the owner: "why is
+the AI data center growing and consuming the buildings?") with the real mechanism. Fix round 1 answers one sound-off
+cold read and the cinematography review (below). House style: `docs/look/STORYBOARD_STYLE.md` (§0 signal per drawing, §3
+notes strip, §7 cinematography). The lint (`python3 scripts/v3/board_lint.py public/v3/animatic.json`) reports 0 errors
 and 0 warnings. Voice: the owner's take 4 (`public/v3/voice.wav`, 0.12 s lead, 41.15 s). Words, audio and every cut (on
-the same word) are unchanged; one sfx moved (the ding, with S12's new price, 30.84 to 30.28). The MP4
-`deliverables/v3/v3_g3_animatic_board.mp4` predates fix round 1: re-render it before showing the owner.
+the same word) are unchanged except S9: the owner swapped S9 + S9b for ONE S5 pull-back crane panel (2026-10-26, "pretty
+good, continue, swap"; `docs/v3/proposal_pullback.md`), so the cut on "By" goes. One sfx moved (the ding, with S12's new
+price, 30.84 to 30.28); S9 adds two (below). The MP4 `deliverables/v3/v3_g3_animatic_board.mp4` (540 x 960) is
+re-rendered from the merged board; the replaced S9 / S9b rows are in `docs/v3/archive/g3/s9_s9b_board_cine_rows.md`.
 
 **The story in pictures.** In your dim nook, the one bright window shows an AI data center over the houses; you're about
 to buy a $999 laptop on your phone. Memory sticks lift off the listing's laptop, fly out past the lamp, up the window
 and into the data center's roof, and every stick that leaves pushes your tag up one step, faster and faster, to $1,099
 on "pricier". You lower the phone; the data center turns dark and gets circled. A plain chart shows the old deal; right
 after you buy one, a BETTER one comes out for the same $999 (aw, man); this year the line turns up. Your laptop on your
-lamp-lit desk runs on one memory stick, and that stick rises out of it, bigger than the laptop. We rise over OUR ROOF to
-an AI data center too wide for the frame, swallowing sticks, then cut to the ground: their mountain of memory runs past
-both edges and towers over tiny you with your one stick. Up the road at the chip factory the data center is first at the
-door while the laptop van waits behind; a stick costs 5x; the laptop makers pass it on, $999 to $1,099. Back in your
-nook you wait for the better one, the data center quiet outside your window, but the chip maker says 2027, a second
-data center cuts in and the van is pushed back. The opening's last picture returns; on the phone, the tag turns over to
-show a data center on its back.
+lamp-lit desk runs on one memory stick, and that stick rises out of it, bigger than the laptop. From behind, you raise
+your one stick on a dark rooftop; the camera pulls back and cranes up until you are tiny at OUR ROOF's parapet, sticks
+pour from the roofs into an AI data center, and their mountain of memory lands past the right edge, over your one stick.
+Up the road at the chip factory the data center is first at the door while the laptop van waits behind; a stick costs
+5x; the laptop makers pass it on, $999 to $1,099. Back in your nook you wait for the better one, the data center quiet
+outside your window, but the chip maker says 2027, a second data center cuts in and the van is pushed back. The
+opening's last picture returns; on the phone, the tag turns over to show a data center on its back.
 
 | Panel | Time (s) | The one idea | Shot type | What we see | Camera |
 |---|---|---|---|---|---|
@@ -32,8 +34,7 @@ show a data center on its back.
 | S6 | 11.48-16.60 | This past year, US computer prices turned up: +9.7 %. | INSERT, the exact S4 frame | Built from S4's elements (title, axes, "2005", the line, now 5 px) plus the hook rising from "US" to "went" and "+9.7%" on "almost 10%". | HOLD |
 | S7 | 16.60-18.28 | Your laptop runs on the memory stick inside it. | CLOSE at your desk (home base) | O1's room tone with the desk's back edge, O1's lamp shade cut by the left edge, the laptop (420 px) in a 640 px paper lamp pool on the mid desk; on "your" (17.24) a see-inside bubble pops upper right with the stick. | HOLD |
 | S8 | 18.28-19.40 | It runs on a stick of memory chips. | EXTREME CLOSE, cut-in on S7's axis; SCALE ladder 1/3 (`scale`) | Redrawn at size in the room tone: the laptop's keyboard cut by both side edges, its screen plain; the stick (700 px, 65 % of the frame) rises out of the keys (0.4 s) and lands on the hinge, over the bezel and the keys (inside the screen it read as a picture on the display); the pool's edge below. | HOLD |
-| S9 | 19.40-21.32 | AI data centers run on memory chips too, lots of them. | SCALE 2/3: S1 rise-over reveal (the one big move), `scale` | Start: OUR ROOF (a mid parapet with a light coping lip and one vent, cut by both sides; "OUR ROOF" in the notes) fills from screen y 880 and hides half of the data center, a wide hall cut by both side edges; its roof units and its sign (AI DATA CENTER, on the building) show. The roof drops out while seven sticks (150 px) fly in from the side edges just over the roof units from 19.95 and dive into it. Land (20.8): the hall cut by both side edges (1290 px on screen), a row of small paper houses at its foot (~1:7), plain sky above, our roof's lip at the bottom. | RISE: camera y 1080 to 960, zoom 1.00 to 1.04, `unveil` ease, landing at 20.8; the roof's own 373 px drop runs `outSine` over the whole panel (peak 14.6 px per 30 fps frame on screen) |
-| S9b | 21.32-22.68 | ... by the mountain. | SCALE 3/3: CUT to a WORM'S-EYE, tiny figure, `scale` | Ground-level camera, the horizon low at y 1500: the mountain of memory sticks (1480 x 880, ram-sized sticks) runs past both side edges up to just under the caption band; their data center small at its foot; tiny you (86 px, 10:1) on the paper ground in front, holding your one stick. | HOLD |
+| S9 | 19.40-22.68 | Your one stick vs their mountain of memory ("And so do AI data centers. By the mountain."). | SCALE: S5 PULL-BACK CRANE (the one big move), `scale`: MCU on your back to a high wide in ONE move that lands on tiny you (no scale cut) | **Start (19.40):** your back in MCU, head turned right (hair and the ear side, no face), cut at the hips, raising your one stick (S8's drawing, matched on the object) against the brick stack; the only view out is the slot. **Move:** sticks rise in the slot and streak behind the stack (to 20.05); the darkest beat (to 20.60); the chimney pot crosses on its own (90 px/f) and hides the hand-over to tiny you (20.67-20.83); its trailing edge uncovers the hall, its sign (48 px roof letters) and the sticks pouring in from the roofs (O1's cause at city scale); the summit swings in at 21.10, is at x 967 on "By" and lands on "mountain" (21.72, the thoom). **End (held 21.98-22.68):** tiny you (180 px) at OUR ROOF's parapet, back to us, stick up; the deck lines and the lit street lead to the dark hall; the mountain of ~65 px sticks runs past the right edge, its summit (840, 626) under the caption band. 25 elements. | PULL-BACK CRANE (`CINEMATIC_GUIDE.md` S5: dolly back + crane up + arc, roll 0), 19.40-21.98 = 155 f at 60 fps on cubic-bezier(0.55, 0.03, 0.50, 1.0), then a 42 f hold to the cut on "They"; element moves on one p, parallax shift = 1 - D/Z: far x1.11 to 1 sliding 1 W from 1080 px right (horizon held), mid x2 to 1 from 920 right / 300 up, clutter box to box (~x0.3), deck x5 to 1 pinned on (480, 1430); you shrink 5x; far peak 14.5 px/f at 20.75, frame 1 at 3 % of peak, under 5 % from 21.88. Arcane #55's shape, our speed (3.5x). |
 | S10 | 22.68-25.24 | They pay more, so they get first dibs. | MEDIUM-WIDE, slightly high, looking up the queue | The road (one light band) runs from the laptop van (near, bottom left, 380 px, a laptop on its side, three waiting dots over the cab) up to the chip factory's door (far, upper right); the data center (dark, the subject, labelled) is first at the door, and sticks fly from the door into its roof. | HOLD |
 | S11 | 25.24-29.40 | What's left costs 5 times last year's price. | INSERT, bars straight-on | Frozen: a light "last year" bar and a dark bar five times as tall, "5x". | HOLD |
 | S12 | 29.40-31.32 | Laptop makers pass it on. | CLOSE on the tag, S7's angle | The 5x stick slides into the laptop (light, as in S7); under it O1's price tag is the subject: $999 struck on "makers", $1,099 on "pass" (30.28, with the ding), so the change holds 1 s and is on the middle frame. | HOLD |
@@ -43,22 +44,25 @@ show a data center on its back.
 | S16 | 38.84-40.85 | ... on your next laptop's price tag. | CLOSE-UP, cut-in on S15's tag (1.275x on its axis) | S15's phone in the room tone: the listing laptop, the struck $999, the $1,099 tag (460 px, centred), the cart; the tag turns over at 39.70 (like-pop 39.88) to show a data center on its back. | HOLD |
 | LOOP | 40.85-41.15 | Back to frame 0. | DISSOLVE 0.12 s | O1's frame-0 lines, drawing on slowly so every stroke ends at exactly its frame-0 progress: window, horizon, building with a blank sign, lamp, phone, listing, cart and thumb; the tag complete with its $999. | O1's start camera (zoom 1.05) |
 
-**Film-level checks (as built, fix round 1):** two animated moves (O1's pull-out, S9's rise); one red mark (O1's circle
-at 4.04); home base O1, S7, S8, S13, S15, S16, LOOP = 15.5 s, 38 % of the film and 55 % of the time outside chart
-inserts, now all in ONE room tone with the lamp, so the place visibly returns; one scale moment S8 > S9 > S9b (a ladder:
-one stick bigger than the laptop, a hall too wide for the frame, a mountain past both edges at 10:1 over you), the three
-`scale` panels lint-checked as BIG; the wides change angle (eye-level reveal, worm's-eye, slightly high queue); size or
-angle changes at every cut except the deliberate matches S4 = S6, S10 = S14, O1's end = S15, each now built from one
-element list plus the changes.
+**Film-level checks (as built, fix round 1 + the S5 merge):** two animated moves (O1's pull-out, and the one big move,
+S9's S5 pull-back crane); one red mark (O1's circle at 4.04); home base O1, S7, S8, S13, S15, S16, LOOP = 15.5 s, 38 %
+of the film and 55 % of the time outside chart inserts, now all in ONE room tone with the lamp, so the place visibly
+returns; one scale moment, S9, and the scale dose stays 3.28 s: the ladder (one stick, many, the mountain) now plays
+inside one move, from S8's one stick bigger than the laptop (matched on the object at S9's start) to the sticks pouring
+from the roofs and the mountain past the right edge over tiny you (180 px, 5x smaller than at the start), with no
+separate scale cut; the two `scale` panels (S8, S9) lint-checked as BIG; the wides change angle (S9 cranes up from your
+back to a high wide, S10 is the slightly high queue); size or angle changes at every cut except the deliberate matches
+S4 = S6, S10 = S14, O1's end = S15, each now built from one element list plus the changes. Lint: 0 errors, 0 warnings.
 
-**Sound:** unchanged except the ding (the cart pop at 0.0, led ticks, crane clunks at 1.88, 2.12, 2.30, 2.42, floor slams
-and stamp at 2.60-2.75, the thoom at 4.76; the ding moved 30.84 to 30.28 with S12's new price on "pass"; the like-pop
-at 39.88). The sticks launch at 1.88, 2.18, 2.40, 2.60 and
-2.72, so two clunks are 60 and 20 ms off their stick, and the thoom lands 0.7 s after the turn at 4.04: the camera
-plan's sound map (rising tiks on the sticks, the thoom on 4.04) is for the sound pass.
+**Sound:** unchanged except the ding (the cart pop at 0.0, led ticks, crane clunks at 1.88, 2.12, 2.30, 2.42, floor
+slams and stamp at 2.60-2.75, the thoom at 4.76; the ding moved 30.84 to 30.28 with S12's new price on "pass"; the
+like-pop at 39.88). S9 adds our own swell (`v3_pullback_swell.wav`, 19.95, peaking with the burst) and `v3_thoom.wav` on
+"mountain" (21.72). The sticks launch at 1.88, 2.18, 2.40, 2.60 and 2.72, so two clunks are 60 and 20 ms off their
+stick, and the thoom lands 0.7 s after the turn at 4.04: the camera plan's sound map (rising tiks on the sticks, the
+thoom on 4.04) is for the sound pass.
 
-**Fix round 1: what changed, and the note it answers** (cold read = one sound-off viewer on the 25 % sheet; review =
-the cinematography reviewer)
+**Fix round 1: what changed, and the note it answers** (cold read = one sound-off viewer on the 25 % sheet; review = the
+cinematography reviewer; the S9 and S9b bullets are history: the S5 merge replaced both panels)
 - **Notes strip (review 10-11):** line 1 in 48 px ink bold = shot type, COZY / SCALE and the move; line 2 in 38 px ink = the
   idea and the transition; no label or timecode (`SketchReel.tsx` strip; notes as "line 1\nline 2").
 - **O1, S15, S13 (review 1, 3):** the room is one mid tone over the whole frame, so the light window is the opening, not a
@@ -106,6 +110,6 @@ the cinematography reviewer)
 - The caption pager still splits into 1-3 word fragments (`MAX_CHARS = 16` in `SketchReel.tsx`); the owner's call.
 
 Cold-read sheet (25 %, one frame per panel at its middle, kept off caption pops; the opening at 0.3, 2.0, 3.0 and 4.9 s;
-S9 at its start 19.5 s and its landing 21.2 s): `coldread/sheet_board_cine.jpg`, indexed by
-`coldread/index_board_cine.json` in the session scratchpad (board v2's sheet: `coldread/sheet_board.jpg`). Board v2 and
-v1 are in git history (`90e8d69` and earlier).
+S9 at its start 19.5 s and its landing 21.2 s; after the S5 merge, S9 at 19.5 s and its landing hold 22.4 s):
+`coldread/sheet_board_cine.jpg`, indexed by `coldread/index_board_cine.json` in the session scratchpad (board v2's
+sheet: `coldread/sheet_board.jpg`). Board v2 and v1 are in git history (`90e8d69` and earlier).
