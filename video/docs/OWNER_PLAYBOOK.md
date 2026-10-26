@@ -124,6 +124,14 @@ Format: **rule** — why / evidence (video, date).
 ## Performance log (one line per video and check)
 - v1 "PHP bug", IG after 45 min: 155 views, 70 viewers, avg 21 s of 55 s, likes 3.9 %, 0 saves/shares/comments/follows;
   ~80 % gone by 3 s, flat ~20 % until ~40 s. — 2026-10-25.
+- v1 after ~24 h (IG):
+  - ~2.1K views, 86 % from the Reels tab and 11 % from Explore (non-followers);
+  - skip rate 32.2 %; likes 2.5 %, shares 0.7 %, saves 0.4 %, reposts 0;
+  - retention ~76 % at 2 s, ~58 % at 5 s, ~43 % at 10 s, ~33 % at 15 s, ~25 % at 35 s, ~19 % at the end.
+
+  Reading: the leak is the first 15 s (-42 points by 5 s, another -25 by 15 s); after that it is nearly flat. Saves and
+  shares are low, so give people a reason to send it. Screenshots: `context/uploads/inline/2026-10-26_v1_insights_24h_*`.
+  — 2026-10-26.
 
 ## Retired rules
 (none yet)
