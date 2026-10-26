@@ -18,6 +18,11 @@ Format: **rule** — why / evidence (video, date).
   your laptop" (prices) over the recommended, higher-scored Meta $25B story. Weight "what it costs me" when ranking topics. — v3 G0, 2026-10-25.
 
 ## Script and voice
+- **A script is a coherent STORY, not a collection of true sentences about the topic.** One throughline question,
+  a situation the viewer is in, and every line following from the one before (you could join each pair with "but",
+  "so" or "because", never "and also"), building to a turn and a payoff. Build the story spine first, then write the
+  lines; a list of facts to prove is input, never the structure. Test: someone who hears it once can retell it as a
+  story. — owner, v3 G1 ("it's just a collection of sentences ... start from scratch"), 2026-10-26.
 - **Everyday spoken language. Check every sentence for AI-sounding wording**; it must sound approachable, like a person
   talking. — v1, 2026-10-24.
 - **When delivering a script, include emotional / delivery cues that are as detailed and concrete as possible.** — v1.

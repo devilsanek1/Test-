@@ -58,7 +58,11 @@ building, and it decides the outcome:
   reaction, truth, read-at-a-glance clarity and whether the video can pay it off; a viewer-persona panel gives gut
   rankings; sceptics try to refute the finalists as misleading. Pick: the owner picks from the top 3. Workflow:
   `context/workflows/v3-g05-core-line*.js`.
-- **G1 script:** 2-3 competing drafts **built around the locked core line**, plus an AI-wording critic before the radio cut.
+- **G1 script = story first (owner, 2026-10-26):** (1) 3-4 competing **story spines** (the throughline question, the
+  viewer's situation, beats joined by but/so, the turn, the payoff that lands the core line), judged; (2) 2-3 writers
+  draft the winning spine; (3) a cold-read panel retells each draft (a list-like retelling fails) plus a flow critic
+  (every line follows from the previous) and a fact check; (4) one merged script. Never structure a script as a list of
+  facts to prove.
 - **G3 animatic:** 2-3 visual concepts for the hook and the peaks (the whole film in one concept, the alternatives
   for the key moments). The owner picks at the gate.
 - **G4 look:** 2-4 style-frame directions when the topic needs a new look.
