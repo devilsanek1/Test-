@@ -55,6 +55,11 @@ Format: **rule** — why / evidence (video, date).
 - **Arcane references: ENVIRONMENT ONLY, few and high-confidence** (buildings, cityscapes, interiors as spaces, wides;
   no faces or people). Build on our own videos incrementally (angles, composition, light, camera), never reinvent.
   Guide with sketches: `docs/look/CINEMATIC_GUIDE.md`. — ("targeted with high confidence", 2026-10-26).
+- **The owner's favourite Arcane shot: the pull-back crane reveal** (S1E1, the sisters on a rooftop, "It's nice getting
+  above it all, huh?": from the characters' small world, the camera pulls back and rises until they are tiny figures with
+  their backs to us, overlooking a vast sunlit city). "It has pretty much everything": suspense, sense of scale,
+  environment, composition and the camera movement. Use it as the model for a film's big reveal; distilled in
+  `docs/look/CINEMATIC_GUIDE.md`. — (v3, 2026-10-26).
 - **Second visual twist: coziness through a sense of enclosure**: framed, street-like spaces that hold the subject (ref
   `docs/look/ref_sense_of_enclosure.jpg`). Rules: `docs/look/COZY_AND_SCALE.md`. — (2026-10-25).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
@@ -114,6 +119,10 @@ Format: **rule** — why / evidence (video, date).
 - **Palettes: the warm, everyday one for a money / everyday-life story.** — (v3 G4).
 
 ## Motion
+- **A reference move gives the SHAPE, never the speed.** Copy its path, framing, reveal order and easing shape, then
+  retime it to the reel: speed up (usually) or slow down where it feels right. Speed limits exist only to keep motion
+  readable and strobe-free (60 fps allows faster moves). — ("the speed of transition should not be the reference point
+  ... in a short reel we would speed it up", v3, 2026-10-26).
 - **Render at 60 fps from G5 to the final** ("smoother and more crispy"). Animate by time; drawn motion may stay stepped
   (12-24 drawings/s) while the camera glides; G3 may stay at 30. — (v3, 2026-10-26).
 

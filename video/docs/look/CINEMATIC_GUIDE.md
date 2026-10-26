@@ -26,6 +26,12 @@ measured, not stored):
 **For our videos:** stage the hook as "the expected thing, then the surprising reality overtaking it", inside one
 opening shot that builds from bare lines; keep our frame-0 claim text and the first-second phone sound. SketchReel
 supports it: `draw` (stroke draw-on) and `fillIn` (colour flood) per element.
+**Show the real mechanism (v3 G3, 2026-10-26):** reality overtakes the expectation through the true cause, coupled
+one-to-one to the viewer's stake: each unit of cause is one visible tick of the effect (one memory stick flies to the AI
+data center, the laptop's price ticks up one step). The cause sits outside the home-base window, the effect in the
+viewer's hand, and both change on the payoff word. Never a growth or consumption metaphor (v3's data center swallowing
+the houses: "why is it growing and consuming the buildings?"). Keep the opening's camera to the 5 % pull-out; the big
+scale move belongs to the reveal later in the film.
 
 ## Shot types
 

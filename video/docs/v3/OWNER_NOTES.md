@@ -39,3 +39,14 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   opening concepts (the mechanism: data centers buy the memory chips). -> rule: Storyboard (no unsupported metaphors).
 - 2026-10-26: "focus less on quality; the most signal for the director in the least time/drawing". -> rule: Storyboard
   (signal per drawing).
+- 2026-10-26, G3 LOCKED: board with cinematography (literal opening: each memory stick that leaves for the AI data
+  center ticks the laptop's price up one step; window-nook home base; S9 rise-over reveal; S9b worm's-eye scale cut),
+  `deliverables/v3/v3_g3_animatic_board.mp4`, commit 14bfa55: "okay fine, go ahead". No objection to counting the cozy
+  share outside chart inserts (55 % of non-chart time; COZY_AND_SCALE §1.3). Next: G5 blocking in Autumn Ember, 60 fps.
+- 2026-10-26, during G5: sent an Arcane screen recording (Netflix, came out black: DRM; identified from the subtitle and
+  timecode as S1E1 ~2:30, the rooftop pull-back = compilation shot #55): "the arcane shot of environment and camera work
+  that I really like ... suspense, sense of scale, fantastic environment and composition, the actual camera movement";
+  "distill this scene into our arcane library reference and then find the best scene to replicate in our video".
+  -> rule: Visual style (the favourite: pull-back crane reveal); distillation + pick running.
+- 2026-10-26: "the speed of transition should not be the reference point ... since it's a short reel we would speed it up"
+  -> rule: Motion (a reference move gives the shape, never the speed).

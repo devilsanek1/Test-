@@ -8,14 +8,20 @@ moves with camera.to; both end frames must pass as panels):
   - elements: at most 25 (WARN), over 30 = split the panel (ERROR)
   - exactly one subject group: the elements with role 'subject' (or fill 'pop'), touching within 40 px; two groups on
     screen at the same time, or none, is an ERROR
-  - at most 1 label (a `label` prop or a text without digits) and 1 mark (ERROR); more than 1 unstruck number (WARN)
+  - at most 1 label (a `label` prop or a text without digits) and 1 mark (ERROR); more than 1 unstruck number (WARN;
+    a bare year such as "2005" is a chart's axis word, not the panel's number)
   - text at least 48 px (ERROR)
   - fills from the board palette only: paper / light / mid / dark / pop (a #hex or unknown name is an ERROR; the sketch
     names warm / cold WARN: use light)
   - nothing crossing the caption band (y 290-600) except a far flat fill (a role-far rect / ellipse / closed line / hatch
     with a fill and no sw) (ERROR)
   - the subject's box centred in x 380-700 (ERROR) and 270-460 px wide (ERROR; a chart subject may span 456-760; a tall
-    subject, taller than 1.3x its width like a standing figure, is measured by its height instead: 300-650 px, WARN)
+    subject, taller than 1.3x its width like a standing figure, is measured by its height instead: 300-650 px, WARN).
+    The box is the part on screen: clipped to the frame and the stage above the notes strip (y < 1680); a subject cut
+    by a frame edge (a medium or close shot, e.g. a waist-up figure) is measured by its visible width.
+    A scale panel (shot `"scale": true`: the colossus cut by the frame, the worm's-eye pile, the extreme close of the
+    scale ladder) inverts the size rule: its subject must be BIG, at least 648 px (60 % of the frame) or cut by both
+    side edges, at both camera ends (ERROR), because a scale subject at medium size reads as "a building on paper"
   - the camera zoom changing at most 2x within a shot (ERROR; over 1.6x WARN: a push-in is at most 1.6x)
 Exit code 1 if there is any ERROR.
 
@@ -31,8 +37,11 @@ import sys
 
 W, H = 1080, 1920
 BAND = (290, 600)
+STAGE_BOTTOM = 1680  # the notes strip starts here: the visible stage is y 0-1680
 STAGE_X = (380, 700)
 SUBJECT_W = (270, 460)
+SCALE_MIN_W = 0.6 * W  # a scale panel's subject: at least 60 % of the frame wide, or cut by both side edges
+YEAR = re.compile(r'(19|20)\d\d')  # an axis word ("2005"), not the panel's number
 CHART_W = (456, 760)
 TALL_H = (300, 650)
 TOUCH = 40
@@ -189,7 +198,8 @@ def lint_shot(shot, board):
     labels += [i for i, e in enumerate(els) if e.get('t') == 'text' and not re.search(r'\d', e.get('text', ''))]
     if len(labels) > 1:
         err(f'{len(labels)} labels (els {sorted(labels)}): at most 1, 56-72 px, only when the picture cannot say it')
-    numbers = [i for i, e in enumerate(els) if e.get('t') == 'text' and re.search(r'\d', e.get('text', '')) and not e.get('strike')]
+    numbers = [i for i, e in enumerate(els) if e.get('t') == 'text' and re.search(r'\d', e.get('text', '')) and not e.get('strike')
+               and not YEAR.fullmatch(e.get('text', '').strip())]
     if len(numbers) > 1:
         warn(f'{len(numbers)} numbers (els {numbers}): one per panel (a change = the old one struck through + the new one)')
     marks = [i for i, e in enumerate(els) if e.get('t') == 'mark']
@@ -253,13 +263,19 @@ def lint_shot(shot, board):
             chart = any(els[i].get('t') == 'icon' and els[i].get('name') == 'chart' for i in g)
             lo, hi = CHART_W if chart else SUBJECT_W
             for c, at_end, which in ends:
-                sb = union([to_screen(moved(box(els[i], board), i, shot, at_end), c) for i in g])
+                raw = union([to_screen(moved(box(els[i], board), i, shot, at_end), c) for i in g])
+                sb = (max(0, raw[0]), max(0, raw[1]), min(W, raw[2]), min(STAGE_BOTTOM, raw[3]))
+                cut = sb != raw
                 cx = (sb[0] + sb[2]) / 2
                 w = sb[2] - sb[0]
                 h = sb[3] - sb[1]
                 if not STAGE_X[0] <= cx <= STAGE_X[1]:
                     err(f'subject {sorted(g)} centred at x {cx:.0f} at the {which} (centre axis x {STAGE_X[0]}-{STAGE_X[1]})')
-                if h > 1.3 * w and not chart:
+                if shot.get('scale'):
+                    if w < SCALE_MIN_W and not (raw[0] < 0 and raw[2] > W):
+                        err(f'scale subject {sorted(g)} is {w:.0f} px wide at the {which}: a scale panel needs it >= {SCALE_MIN_W:.0f} px '
+                            f'or cut by both side edges (too big to take in)')
+                elif h > 1.3 * w and not chart and not cut:
                     if not TALL_H[0] <= h <= TALL_H[1]:
                         warn(f'tall subject {sorted(g)} is {h:.0f} px high at the {which} ({TALL_H[0]}-{TALL_H[1]})')
                 elif not lo <= w <= hi:
