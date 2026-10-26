@@ -172,7 +172,7 @@ export const ContractPage: React.FC<ContractPageProps> = (p) => {
             {title}
           </Letter>
         ) : null}
-        <Ink d={textLines(CL_X, 110, 352, {n: 4, gap: 26, seed: `${seed}/l1`, heading: false})} width={simple ? W.mid : W.far} at={b(at, 0.1)} />
+        <Ink d={textLines(CL_X, 110, 352, {n: simple ? 2 : 4, gap: simple ? 46 : 26, seed: `${seed}/l1`, heading: false})} width={W.far} at={b(at, 0.1)} />
         {/* the highlighter band (the pop) under the clause's words, then the words */}
         {clause
           ? CLAUSE.rows.map((r, i) =>
@@ -195,7 +195,7 @@ export const ContractPage: React.FC<ContractPageProps> = (p) => {
             ))
           : null}
         {clause && simple ? <Ink d={hline(CL_X + 4, CL_X + widths[0] - 10, 238, {seed: `${seed}/cw1`, over: [0, 0]}) + hline(CL_X + 4, CL_X + widths[1] - 6, 296, {seed: `${seed}/cw2`, over: [0, 0]})} width={W.mid} at={b(at, 0.14)} /> : null}
-        <Ink d={textLines(CL_X, 352, 352, {n: 2, gap: 26, seed: `${seed}/l2`, heading: false})} width={simple ? W.mid : W.far} at={b(at, 0.14)} />
+        <Ink d={textLines(CL_X, 352, 352, {n: simple ? 1 : 2, gap: 26, seed: `${seed}/l2`, heading: false})} width={W.far} at={b(at, 0.14)} />
         {/* signed */}
         <Ink d={textLines(CL_X, 446, 118, {n: 1, seed: `${seed}/ld`, heading: false})} width={W.far} at={b(at, 0.16)} />
         {!simple ? <Ink d={line(196 + SX, 432, 206 + SX, 444, {over: [0, 0], seed: `${seed}/x1`}) + line(206 + SX, 432, 196 + SX, 444, {over: [0, 0], seed: `${seed}/x2`})} width={W.far} at={b(at, 0.16)} /> : null}
@@ -223,9 +223,11 @@ const RunOnLocal: React.FC<{M: Mat; L: number; edgeY?: number; seed: string; sim
     const yy = h + 74 + k * RUN_STEP;
     if (yy < y1 - 26) years.push({y: yy, label: RUN_YEARS[k]});
   }
-  for (let i = 0, y = h + 30; y < y1 - 20; i++, y += 26) {
-    const lw = r.range(250, 352);
-    if (years.some((yr) => Math.abs(yr.y - 14 - y) < 24)) continue;
+  // small pages (simple face) get half the rows: at w 120 a row every 26 local px is a 7 px barcode on the phone
+  const gap = simple ? 58 : 26;
+  for (let i = 0, y = h + 30; y < y1 - 20; i++, y += gap) {
+    const lw = r.range(simple ? 200 : 250, simple ? 330 : 352);
+    if (years.some((yr) => Math.abs(yr.y - 14 - y) < (simple ? 60 : 24))) continue;
     rows.push(hline(CL_X, CL_X + lw, y, {seed: `${seed}/ro${i}`, over: [0, 0]}));
   }
   return (
@@ -233,11 +235,11 @@ const RunOnLocal: React.FC<{M: Mat; L: number; edgeY?: number; seed: string; sim
       <Fill rect={[5, h, w, L]} color={CC.paperEdge} offset={false} />
       <Fill rect={[0, h - 1, w, L + 1]} color={CC.paper} offset={false} />
       {over ? <Fill d={polyPath([[0, Math.max(h, e0)], [w, Math.max(h, ew)], [w, y1], [0, y1]])} color={PAPER_HANG} offset={false} /> : null}
-      <Ink d={rows.join('')} width={simple ? W.mid : W.far} />
+      <Ink d={rows.join('')} width={W.far} />
       {years.map((yr, i) => (
         <React.Fragment key={i}>
-          <Ink d={hline(CL_X, 218, yr.y - 14, {seed: `${seed}/ry${i}`, over: [0, 0]})} width={W.far} />
-          <Letter x={232} y={yr.y} size={simple ? 64 : 42}>
+          {simple ? null : <Ink d={hline(CL_X, 218, yr.y - 14, {seed: `${seed}/ry${i}`, over: [0, 0]})} width={W.far} />}
+          <Letter x={simple ? w / 2 : 232} y={simple ? yr.y + 20 : yr.y} size={simple ? 112 : 42} anchor={simple ? 'middle' : 'start'}>
             {String(yr.label)}
           </Letter>
         </React.Fragment>

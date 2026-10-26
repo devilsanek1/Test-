@@ -12,10 +12,12 @@
 //
 // TIME OF DAY (one for the whole film): EVENING. Inside, her warm lamp-lit home (the desk of O1/P12 and the nook of
 // P2/P4/P5/P6/P13 are the same home: cream wall, apricot desk, red-brown wood, golden lamp pool). Outside her window,
-// the saturated dusk blue of the approved style frame (#4D5C99, never grey), a crescent moon, a few stars, far roofs
-// with a few lit windows. Every house time-of-day name maps to that one moment (no relight steps). The cold inserts
-// (P7, P9, P10, P11) sit on ONE flat ground, `CC.cold` (kit/README.md "The cold inserts"); P3's interview backdrop is
-// a plain neutral-warm `CC.studio`; P8 is the sister palette DUSK.
+// the saturated dusk blue of the approved style frame (#4D5C99, never grey) over a DENSE town in flat value steps (a
+// peach-lilac last light at the horizon, a far skyline in haze, rows of roofs, the facades across the street, many
+// windows, a few switching on and off), a crescent moon, a few stars, drifting clouds, birds. Every house time-of-day
+// name maps to that one moment (no relight steps). The cold pages (P7, P9, P10, P11) lie on THE COLD SET (kit/ColdSet.tsx,
+// `CC.cold*`: one official mid-violet desk, the same for the deal page and Google's page); P3's interview room is a cool
+// periwinkle studio (`CC.studio*`: not her home, not the cold set); P8 is the sister palette DUSK.
 
 import {captionTones, glow, palette, skies, todBulbHalo, todSky, todSteps, todTone, type as typeTok, TodName} from '../../lib/theme';
 
@@ -95,13 +97,70 @@ export const CC = {
   skin2: '#D9A07C', // staffer B's skin (a second warm skin)
   lanyardA: '#2B2A44', // non-hero lanyards
   lanyardB: '#9A5236',
-  // ---- the interview set (P3: plain, not home) and the cold inserts (P7, P9, P10, P11)
-  studio: '#E3CDB9', // P3's plain neutral-warm backdrop
-  table: '#C9A386', // P3's interview table top
-  tableFront: '#B08A6C',
-  cold: '#A9B5EC', // THE cold-insert ground (= DUSK.sky: the deal's world; kit/README.md "The cold inserts")
-  coldShade: '#8F9BD8', // a page's flat drop shadow on it
+  // ---- P3's interview table (kit/Interview.tsx; the room's roles are `studio*` below)
+  table: '#E1DDF3', // a pale lilac laminate top
+  tableFront: '#B7B2DE',
+  // ---- the cold set (P7, P9, P10, P11): THE picked COLD_SETS variant (kit/ColdSet.tsx; kit/README.md "The cold set")
+  cold: '#716DB0', // the official desk top (= COLD_SETS.dusk.table, the pick)
+  coldShade: '#55509A', // a page's flat drop shadow on it
   stamp: '#2B2A44', // APRIL 2026 / NO VETO stamps (anchor ink, never the pop)
+  // ---- her home, more of it (G5 density: kit/Nook.tsx)
+  wallDeep: '#E2C3A6', // the wall in shadow (under the desk, behind the bookcase's books)
+  caseBack: '#D9A27E', // the bookcase's back panel (one step under the shelf wood)
+  rug: '#C8714E', // the rug (terracotta) ...
+  rugBand: '#F6B892', // ... its peach bands ...
+  rugEdge: '#9A5236', // ... and its border
+  radiator: '#EBD9C6',
+  cork: '#D49A66', // the corkboard
+  note: '#FFF8EE', // notes pinned on it
+  note2: '#F7CF9C',
+  note3: '#F6B892',
+  pin: '#C8714E',
+  coat: '#B07A8C', // her coat on its hook (dusty mauve: soft, recedes; not the hero)
+  coatShade: '#96657A',
+  scarf: '#E9B47A',
+  leafDark: '#467A5A', // a plant's back leaves (one step under `leaf`)
+  leafLight: '#7FA884',
+  blind: '#F2D3AE', // the roller blind (honey cream)
+  candle: '#FBE6C6',
+  flame: '#F7CF9C',
+  cable: '#2B2A44',
+  pictures: ['#F6B892', '#E9B47A', '#C8714E', '#5E8C6A', '#9C8CC4', '#F7CF9C'] as string[], // framed prints (no hero blues)
+  wallGlow: '#F7DDB8', // the lamp's warm light on the wall (one flat step over the wall)
+  // ---- her cat (kit/Cat.tsx): a warm dark tabby; never the hero, never the pop; reads on cream, apricot and dusk blue
+  catBody: '#7A4A38',
+  catStripe: '#4A2C22',
+  catLight: '#F6E3CC', // chest, muzzle, paws, tail tip underside
+  catEar: '#E9A08A', // inner ears, nose
+  catEye: '#E9C46A',
+  // ---- the town outside her window (kit/Town.tsx), back to front in flat value steps (no ink: a far plane)
+  skyLow: '#5B69A6', // one flat step lighter toward the horizon
+  glowHi: '#9A88BC', // the last light: lilac ...
+  glow: '#E6A48E', // ... then peach at the horizon
+  cloudLit: '#7E86C0', // a cloud's lit underside
+  skyline: '#8A82BC', // the far skyline in haze
+  skylineLit: '#D9B2C2',
+  townMid: '#56609B', // rows of roofs
+  townMidSide: '#48518C',
+  townNear: '#3D4A85', // the near roofs (= the style frame's `far`)
+  facade: '#5D5287', // the facades across the street (plum dusk brick)
+  facadeSide: '#4A4275',
+  cornice: '#7A6DA3',
+  winDark: '#2F3462', // an unlit window
+  litWarm: '#F6B892', // a second, peachier lit window
+  neighbour: '#3A3360', // a figure seen in a lit window
+  // ---- P3: the interview room (kit/Interview.tsx): a cool periwinkle studio, dense but not cozy
+  studio: '#C6C9EA',
+  studioPanel: '#B3B8E2',
+  studioDeep: '#9EA4D6',
+  studioFloor: '#8F96CC',
+  shelfMetal: '#6F76B4',
+  archive: '#E3B07B', // archive boxes (cardboard: the one warm accent of the room)
+  archiveSide: '#CC9260',
+  softbox: '#FFF8EE',
+  stand: '#2B2A44',
+  glass: '#DCE0F5', // a water glass
+  recLight: '#F7C98B', // the recorder's small blinking light (never the pop)
   // ---- the colour jobs
   hero: '#3F7FE0', // cobalt: HER ONLY (sweater, sleeve, her badge lanyard). Never Google, the deal or the Pentagon.
   heroDeep: '#2F66BF',
@@ -155,8 +214,68 @@ export const DUSK = {
 
 export type DuskRole = keyof typeof DUSK;
 
+/** THE COLD SET candidates (kit/ColdSet.tsx): one official desk, straight-on from above, edge to edge, for the deal page
+ *  AND Google's page (fairness: the same ground, tone and dressing). Both in DUSK's family (blue-violet, never grey,
+ *  never the hero cobalt). PICKED 'dusk' (kit/README.md "The cold set"): a mid-violet official desk (DUSK.facade, the
+ *  Pentagon's own facade colour) under a cool desk lamp, the window's light falling across its lower half: it reads
+ *  cold and official against her apricot home, yet belongs to this film (P7 -> P8 -> P9 stay in one Dusk family), the
+ *  warm white pages read hard on it, white captions hold 4.8:1 over it, and its dark share is ~7 % (the anchor budget).
+ *  'night' (rejected, kept for the comparison sheet): the same desk in DUSK.post: colder still, but ~49 % of the frame
+ *  dark (L* < 30), the heaviest frame in the film for 12 s, and it breaks from both approved style frames' lightness. */
+export const COLD_SETS = {
+  night: {
+    table: '#3A3570', // DUSK.post
+    seam: '#2E2A5E',
+    light: '#4B4690', // the window's light falling across the desk (one flat step up)
+    pool: '#5D599F', // the desk lamp's cool pool, outer ring (DUSK.sideShade)
+    poolCore: '#716DB0', // its core (DUSK.facade)
+    shade: '#26234A', // flat drop shadows
+    blotter: '#2B2A44',
+    blotterEdge: '#55509A',
+    folder: '#7C78BA', // DUSK.well
+    folder2: '#9D9AD3', // DUSK.lot
+    folderTab: '#B4AEDF', // DUSK.far
+    lamp: '#1F1C33', // the desk lamp (DUSK.wheel)
+    lampMouth: '#C9C7EC',
+    pen: '#1F1C33',
+    penBand: '#B4AEDF',
+    glass: '#B3B9EC', // DUSK.carGlass
+    water: '#8F9BD8',
+    metal: '#C3C1EC', // clips, the lamp's arm highlight
+    stampPad: '#1F1C33',
+    ink: '#1C1A26', // DUSK.ink: the cold set's outlines
+  },
+  dusk: {
+    table: '#716DB0',
+    seam: '#625EA3',
+    light: '#8C88C8',
+    pool: '#A9B5EC',
+    poolCore: '#C9C7EC',
+    shade: '#55509A',
+    blotter: '#38357A',
+    blotterEdge: '#7C78BA',
+    folder: '#B4AEDF',
+    folder2: '#BEBDE8',
+    folderTab: '#55509A',
+    lamp: '#38357A',
+    lampMouth: '#E6E5F7',
+    pen: '#1F1C33',
+    penBand: '#B4AEDF',
+    glass: '#DCE0F5',
+    water: '#A9B5EC',
+    metal: '#E6E5F7',
+    stampPad: '#1F1C33',
+    ink: '#1C1A26',
+  },
+};
+export type ColdSetName = keyof typeof COLD_SETS;
+export type ColdRoles = (typeof COLD_SETS)['night'];
+/** The picked cold set (kit/README.md). */
+export const COLD_PICK: ColdSetName = 'dusk';
+export const COLD: ColdRoles = COLD_SETS[COLD_PICK];
+
 /** The film's one time of day (kit/README.md). Use this name for every <World sky> key: `{t: 0, tod: FILM_TOD}`
- *  (the dusk blue). Interiors and inserts pass a colour instead: `<World sky={CC.wall}>` / `CC.cold` / `CC.studio`. */
+ *  (the dusk blue). Interiors and inserts pass a colour instead: `<World sky={CC.wall}>` / `COLD.table` / `CC.studio`. */
 export const FILM_TOD: TodName = 'night';
 export const PALETTE_NAME = CC.name;
 
@@ -235,6 +354,7 @@ export function ccProblems(captured: [string, string, string][] = []): string[] 
     if (v.toUpperCase() === CC.hero.toUpperCase()) out.push(`palette.${k} is the hero cobalt (hers only)`);
     if (v.toUpperCase() === CC.pop.toUpperCase()) out.push(`palette.${k} is the pop orange (the clause only)`);
   }
+  eq('CC.cold', CC.cold, COLD.table);
   for (const [label, got, want] of captured) eq(label, got, want);
   return out;
 }

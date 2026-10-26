@@ -7,8 +7,8 @@
 //   <Laptop>       her laptop (P5): anchor lid, the screen with an abstract "AI" network (no logos)
 //   <Bubble>       her speech bubble: pops from its tail; speech lines (P4, P6) or her own word (P13: FACTS)
 //   <Stamp>        APRIL 2026 / NO VETO: anchor ink, slams in (never the pop colour)
-//   <InsertPage>, <ColdGround>, INSERT_PAGES   the cold inserts (P7, P9, P10, P11): warm white pages on ONE flat ground
-//   <Mug>          the steaming mug (nook sizes)
+//   (the cold set's InsertPage / ColdGround / INSERT_PAGES live in kit/ColdSet.tsx)
+//   (the steaming mug at nook sizes is kit/Nook.tsx NookMug; the desk insert's is Desk.tsx DeskMug)
 // Geometry in canvas px; `at` = build / pop time (omit = there); `seed`.
 
 import React from 'react';
@@ -401,61 +401,5 @@ export const Stamp: React.FC<StampProps> = ({x, y, w, text, rot = -6, at}) => {
         {text}
       </Letter>
     </XG>
-  );
-};
-
-// ---------------------------------------------------------------- the cold inserts (P7, P9, P10, P11)
-
-/** The board's page boxes: P9 and P11 share one box (Google's page at the deal page's size, position, ground, tone). */
-export const INSERT_PAGES = {
-  P7: {x: 320, y: 640, w: 440, h: 600},
-  P9: {x: 310, y: 640, w: 460, h: 620},
-  P10: {x: 344.5, y: 686.5, w: 391, h: 527},
-  P11: {x: 310, y: 640, w: 460, h: 620},
-} as const;
-
-/** THE cold ground (kit/README.md): one flat CC.cold slab over the whole frame (+ bleed). */
-export const ColdGround: React.FC<{at?: At; color?: string}> = ({at, color = CC.cold}) => (
-  <Fill rect={[-200, -200, 1480, 2320]} color={color} at={at} mode="snap" offset={false} />
-);
-
-export type InsertPageProps = {x: number; y: number; w: number; h: number; at?: At; seed?: string; children?: React.ReactNode};
-
-/** A warm white page with ink on the cold ground: a flat drop shadow (one step darker than the ground), the paper, the
- *  outline. Children draw on it in canvas px (use <Letter> for its words). */
-export const InsertPage: React.FC<InsertPageProps> = ({x, y, w, h, at, seed = 'ipage', children}) => (
-  <>
-    <Fill rect={[x + 12, y + 14, w, h]} color={CC.coldShade} offset={false} at={fillAt(at)} />
-    <Fill rect={[x, y, w, h]} color={CC.paper} offset={false} at={fillAt(at)} />
-    <Ink d={rect(x, y, w, h, {seed: `${seed}/I`, over: 'small'})} width={W.mid} at={at} />
-    {children}
-  </>
-);
-
-// ---------------------------------------------------------------- the mug (nook sizes; O1's desk mug is DeskMug)
-
-export const Mug: React.FC<{x: number; top: number; w?: number; steam?: boolean; at?: At; seed?: string}> = ({x, top, w = 50, steam = true, at, seed = 'mug'}) => {
-  const t = useTime();
-  const x1 = x + w;
-  const hgt = w * 1.06;
-  const bot = top + hgt;
-  const r = w * 0.18;
-  const body = `M${x} ${top}L${x} ${bot - r}Q${x} ${bot} ${x + r} ${bot}L${x1 - r} ${bot}Q${x1} ${bot} ${x1} ${bot - r}L${x1} ${top}Z`;
-  const st = (sx: number, ph: number) => {
-    const pts: Pt[] = [];
-    for (let i = 0; i <= 4; i++) pts.push([sx + Math.sin(i * 1.3 + ph + t * 1.6) * w * 0.07, top - w * 0.16 - i * w * 0.18]);
-    return smooth(pts);
-  };
-  const ink = w >= 80 ? W.mid : W.far + 0.4;
-  return (
-    <>
-      <Ink d={`M${x1 - 1} ${top + w * 0.2}C${x1 + w * 0.42} ${top + w * 0.18} ${x1 + w * 0.42} ${top + w * 0.78} ${x1 - 1} ${top + w * 0.74}`} width={Math.max(4, w * 0.14)} color={CC.ink} taper={false} at={at} />
-      <Ink d={`M${x1 - 1} ${top + w * 0.2}C${x1 + w * 0.42} ${top + w * 0.18} ${x1 + w * 0.42} ${top + w * 0.78} ${x1 - 1} ${top + w * 0.74}`} width={Math.max(2, w * 0.08)} color={CC.mug} taper={false} at={at} />
-      <Fill d={body} color={CC.mug} seed={`${seed}/b`} at={fillAt(at)} />
-      <Fill rect={[x, top + hgt * 0.38, w, hgt * 0.17]} color={CC.mugBand} offset={false} at={fillAt(at, 0.02)} />
-      <Ink d={body} width={ink} at={at} />
-      <Fill d={blob(x + w / 2, top, w / 2, Math.max(4, w * 0.12), {seed: `${seed}/rim`})} color={CC.anchor} offset={false} at={fillAt(at, 0.03)} />
-      {steam ? <Ink d={st(x + w * 0.35, 0) + st(x + w * 0.66, 2.1)} width={W.far} at={b(at, 0.1)} /> : null}
-    </>
   );
 };

@@ -3,7 +3,7 @@
 //   <Staffer variant 'A'>  the one who spoke (the subject; NAME WITHHELD goes over him: the lane's lettering):
 //                          short dark-brown hair, a wine crew-neck sweater, anchor lanyard
 //   <Staffer variant 'B'>  bald with side tufts, round glasses, a camel jacket over a cream shirt, wood-brown lanyard
-//   <InterviewBackdrop>    the plain neutral-warm backdrop (CC.studio: not her home, not the cold pages)
+//   (the room behind them is kit/Interview.tsx InterviewRoom: a cool periwinkle studio, dense but not cozy)
 //   <InterviewTable>       the table top (a deep surface) + its front face; draw it OVER the staffers' bodies and
 //                          UNDER their arms: <Staffer part="body"/> <InterviewTable/> <Staffer part="arms"/>
 //   <TablePage>            a page lying on the table (P3: CONTRACT; their contracts, no clause, no pop)
@@ -16,7 +16,8 @@ import {useTime} from '../../../lib/time';
 import {CC} from '../palette';
 import {At, b, Fill, fillAt, Ink, inkForHead, Letter, Pt, quadPt, W} from './util';
 import {Badge} from './Props';
-import {elbow, Facing, HerFace, HerHeadParts, HeadSpec, Talking, tube} from './Her';
+import {elbow, Facing, fidget, HerFace, HerHeadParts, HeadSpec, Talking, tube} from './Her';
+import {rand} from '../../../lib/rng';
 
 const {Head} = HerHeadParts;
 
@@ -44,20 +45,27 @@ export type StafferProps = {
   badge?: boolean;
   /** Override hand positions (canvas px). */
   hands?: [Pt, Pt];
+  /** Idle life (default true): breath, blink, a glance, a hand fidget, a swallow. */
+  life?: boolean;
   at?: At;
   seed?: string;
   ink?: number;
 };
 
-export const Staffer: React.FC<StafferProps> = ({x, y, h, facing = 'l', variant = 'A', face = 'worried', talking, part = 'all', badge = true, hands, at, seed, ink: inkP}) => {
+export const Staffer: React.FC<StafferProps> = ({x, y, h, facing = 'l', variant = 'A', face = 'worried', talking, part = 'all', badge = true, hands, at, seed, ink: inkP, life = true}) => {
   const t = useTime();
   const V = STAFF[variant];
   const sd = seed ?? `staff${variant}`;
   const s = facing === 'r' ? 1 : -1;
   const r = 0.09 * h;
   const ink = inkP ?? inkForHead(r);
-  const turn = 0.3;
-  const bob = Math.sin(t * 1.5 + (variant === 'A' ? 0 : 1.7)) * 0.0016 * h;
+  // idle life: breath, a glance (the head turns toward the camera for a beat every ~3.4 s), a fidget, a swallow
+  const gper = 3.1 + rand(sd, 'gp') * 0.9;
+  const gu = (((Math.floor(t * 12) / 12 + rand(sd, 'go') * gper) % gper) + gper) % gper;
+  const turn = life ? (gu < 0.9 ? 0.3 - 0.22 * Math.sin((gu / 0.9) * Math.PI) : 0.3) : 0.3;
+  const swallow = life && gu > 1.6 && gu < 1.8 ? 0.006 * h : 0;
+  const bob = (life ? Math.sin(t * 1.5 + (variant === 'A' ? 0 : 1.7)) * 0.0016 * h : 0) - swallow * 0.3;
+  const fg = life ? fidget(t, sd, 0.008 * h) : ([0, 0] as Pt);
   const P = (u: number, v: number): Pt => [x + s * u * h, y - v * h + bob];
   const H = P(0.04, 0.755);
   const S = P(0.02, 0.62);
@@ -90,7 +98,9 @@ export const Staffer: React.FC<StafferProps> = ({x, y, h, facing = 'l', variant 
       ? smooth([[cx - 0.5 * r, S[1] - 0.15 * r], [cx - 0.95 * r, S[1] + 0.7 * r], [cx - 0.12 * r, S[1] + 2.2 * r]]) + smooth([[cx + 0.5 * r, S[1] - 0.15 * r], [cx + 0.95 * r, S[1] + 0.7 * r], [cx + 0.12 * r, S[1] + 2.2 * r]])
       : '';
   // arms: shoulders -> elbows -> hands on the table (toward the mic)
-  const handsP: [Pt, Pt] = hands ?? [P(0.15, 0.462), P(0.21, 0.475)];
+  // default: the forearms on the table, the hands clasped in front of the body (a worried interview pose)
+  const handsP0: [Pt, Pt] = hands ?? [P(0.0, 0.4), P(-0.05, 0.392)];
+  const handsP: [Pt, Pt] = [[handsP0[0][0] + fg[0], handsP0[0][1] + fg[1]], handsP0[1]];
   const shB: Pt = [S[0] - s * 0.105 * h, S[1] + 0.035 * h];
   const shF: Pt = [S[0] + s * 0.095 * h, S[1] + 0.035 * h];
   const E0 = elbow(shB, handsP[0], 0.16 * h, 0.16 * h, -s);
@@ -134,15 +144,13 @@ export const Staffer: React.FC<StafferProps> = ({x, y, h, facing = 'l', variant 
 
 // ---------------------------------------------------------------- the set
 
-/** P3's plain neutral-warm backdrop (screen-filling, + bleed). */
-export const InterviewBackdrop: React.FC<{at?: At}> = ({at}) => <Fill rect={[-200, -200, 1480, 2320]} color={CC.studio} at={at} mode="snap" offset={false} />;
 
 /** The interview table: top surface from `top` to `front`, front face to `bottom` (canvas px; the board's 1362 / 1532 / 1732). */
 export const InterviewTable: React.FC<{top?: number; front?: number; bottom?: number; x0?: number; x1?: number; at?: At; seed?: string}> = ({top = 1362, front = 1532, bottom = 1732, x0 = -60, x1 = 1140, at, seed = 'itable'}) => (
   <>
     <Fill rect={[x0, top, x1 - x0, front - top]} color={CC.table} at={fillAt(at)} mode="snap" offset={false} />
     <Fill rect={[x0, front, x1 - x0, bottom - front]} color={CC.tableFront} at={fillAt(at)} mode="snap" offset={false} />
-    <Fill rect={[x0, bottom, x1 - x0, 2000 - bottom]} color={CC.studio} at={fillAt(at)} mode="snap" offset={false} />
+    <Fill rect={[x0, bottom, x1 - x0, 2000 - bottom]} color={CC.studioFloor} at={fillAt(at)} mode="snap" offset={false} />
     <Ink d={hline(x0, x1, top, {seed: `${seed}/t`, over: [0, 0]}) + hline(x0, x1, front, {seed: `${seed}/f`, over: [0, 0]}) + hline(x0, x1, bottom, {seed: `${seed}/b`, over: [0, 0]})} width={W.mid} at={at} />
     <Ink d={hline(x0, x1, front + 16, {seed: `${seed}/e`, over: [0, 0]})} width={W.hair} at={b(at, 0.05)} />
   </>

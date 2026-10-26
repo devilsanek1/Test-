@@ -17,6 +17,8 @@ import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {CC} from '../palette';
 import {add, BuildWave, BuildWaveCtx, BuildWaveV, dirDeg, Fill, Ink, Pt, radialWave, useWaveColour, W} from './util';
+import {DustMotes, Steam, Sway} from './Ambient';
+import {DuskTown} from './Town';
 
 // ---------------------------------------------------------------- layout (the style frame's canvas px)
 
@@ -71,7 +73,7 @@ function bookRow(x0: number, x1: number, hMin: number, hMax: number, seed: strin
 }
 
 /** A row of books standing on a board (base y), x0..x1; ink thin (style frame). Shared with the nook's bookcase. */
-export const Books: React.FC<{x0: number; x1: number; base: number; hMin: number; hMax: number; seed: string; ink?: number}> = ({x0, x1, base, hMin, hMax, seed, ink = W.far}) => {
+export const Books: React.FC<{x0: number; x1: number; base: number; hMin: number; hMax: number; seed: string; ink?: number; at?: number}> = ({x0, x1, base, hMin, hMax, seed, ink = W.far, at}) => {
   const row = bookRow(x0, x1, hMin, hMax, seed);
   let d = '';
   const fills = row.map((bk, i) => {
@@ -79,12 +81,12 @@ export const Books: React.FC<{x0: number; x1: number; base: number; hMin: number
     d += rect(bk.x, y, bk.w, bk.h, {seed: `${seed}/r${i}`, over: 'small', edges: 'tlr'});
     d += hline(bk.x + 2, bk.x + bk.w - 2, y + bk.h * bk.band, {seed: `${seed}/b${i}`, over: [1, 1]});
     if (bk.band2) d += hline(bk.x + 2, bk.x + bk.w - 2, y + bk.h * (1 - bk.band * 0.7), {seed: `${seed}/c${i}`, over: [1, 1]});
-    return <Fill key={i} rect={[bk.x, y, bk.w, bk.h]} color={bk.c} seed={`${seed}/${i}`} />;
+    return <Fill key={i} rect={[bk.x, y, bk.w, bk.h]} color={bk.c} seed={`${seed}/${i}`} at={at === undefined ? undefined : at + 0.18} />;
   });
   return (
     <>
       {fills}
-      <Ink d={d} width={ink} />
+      <Ink d={d} width={ink} at={at} />
     </>
   );
 };
@@ -172,38 +174,23 @@ export const TopShelf: React.FC = () => {
       <Ink d={crown(316, 118, 34, 30, {seed: 'tleaf', bumps: 7, round: 0.7})} width={W.far} open={0.3} />
       <Fill rect={[x0, y, x1 - x0, 16]} color={CC.shelf} seed="tboard" />
       <Ink d={rect(x0, y, x1 - x0, 16, {seed: 'tboardI', over: [0, 2], edges: 'tbr'})} width={W.mid} />
-      <Ink d={vines.map((v) => smooth(v)).join('')} width={W.far} />
-      {leaves.map(([lx, ly, deg], i) => (
-        <Fill key={i} d={leafPath(lx, ly, 24, deg)} color={CC.leaf} offset={false} />
-      ))}
-      <Ink d={leaves.map(([lx, ly, deg]) => leafPath(lx, ly, 24, deg)).join('')} width={W.hair} open={0.35} />
+      <Sway x={316} y={172} amp={2.2} hz={0.2} seed="topvines">
+        <Ink d={vines.map((v) => smooth(v)).join('')} width={W.far} />
+        {leaves.map(([lx, ly, deg], i) => (
+          <Fill key={i} d={leafPath(lx, ly, 24, deg)} color={CC.leaf} offset={false} />
+        ))}
+        <Ink d={leaves.map(([lx, ly, deg]) => leafPath(lx, ly, 24, deg)).join('')} width={W.hair} open={0.35} />
+      </Sway>
     </>
   );
 };
 
 // ---------------------------------------------------------------- the window strip (right, cut by the top and right)
 
-const DeskOutside: React.FC<{t: number}> = ({t}) => {
+/** The living town in the window strip (kit/Town: the same evening as the nook's window), cut by the right edge. */
+const DeskOutside: React.FC = () => {
   const {glassX, sillY} = DESK.window;
-  const fr = rng('v2stars');
-  const stars: Pt[] = [[996, 86], [1052, 318], [992, 410], [1062, 486], [1010, 230]];
-  const drift = (t * 6) % 260;
-  return (
-    <>
-      <rect x={glassX - 10} y={-60} width={240} height={sillY + 80} fill={CC.sky} />
-      <rect x={glassX - 120 + drift} y={196} width={150} height={12} rx={6} fill={CC.cloud} />
-      <rect x={glassX - 40 + drift * 0.8} y={214} width={90} height={10} rx={5} fill={CC.cloud} />
-      <circle cx={1034} cy={146} r={30} fill={CC.moon} />
-      <circle cx={1048} cy={136} r={26} fill={CC.sky} />
-      {stars.map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r={fr.range(2.8, 4.4)} fill={CC.star} />
-      ))}
-      <path d={polyPath([[glassX - 10, 572], [990, 556], [1004, 566], [1004, 540], [1036, 518], [1068, 540], [1140, 540], [1140, 660], [glassX - 10, 660]])} fill={CC.far} />
-      <path d={polyPath([[glassX - 10, 604], [1000, 604], [1040, 576], [1080, 604], [1140, 604], [1140, 660], [glassX - 10, 660]])} fill={CC.roofs} />
-      <rect x={1004} y={560} width={14} height={30} fill={CC.roofs} />
-      <rect x={1032} y={612} width={15} height={18} fill={CC.lit} />
-    </>
-  );
+  return <DuskTown x={glassX} y={-60} w={240} h={sillY + 60} horizon={520} k={0.9} moon={[1034, 146]} stars={6} clouds={2} cloudSpeed={9} seed="desktown" />;
 };
 
 export const DeskWindow: React.FC = () => {
@@ -220,7 +207,7 @@ export const DeskWindow: React.FC = () => {
           <rect x={glassX} y={-60} width={240} height={sillY + 60} />
         </clipPath>
       </defs>
-      <g clipPath={`url(#${id})`}>{lit === CC.sky ? <DeskOutside t={t} /> : lit ? <rect x={glassX - 10} y={-60} width={240} height={sillY + 80} fill={lit} /> : null}</g>
+      <g clipPath={`url(#${id})`}>{lit === CC.sky ? <DeskOutside /> : lit ? <rect x={glassX - 10} y={-60} width={240} height={sillY + 80} fill={lit} /> : null}</g>
       <Fill rect={[glassX, transomY, 200, 14]} color={CC.trim} offset={false} />
       <Ink d={vline(revealX, -40, sillY, {over: [0, 0], seed: 'rv'}) + vline(glassX, -40, sillY, {over: [0, 0], seed: 'gl'}) + rect(glassX, transomY, 200, 14, {seed: 'tr', over: [0, 0], edges: 'tb'})} width={W.mid} />
       <Ink d={glint(1000, 410, 40, {seed: 'wglint'})} width={W.far} color={CC.star} />
@@ -316,17 +303,11 @@ export const Pen: React.FC = () => {
 };
 
 export const DeskMug: React.FC = () => {
-  const t = useTime();
   const x0 = 800;
   const x1 = 898;
   const top = 950;
   const bot = 1054;
   const body = `M${x0} ${top}L${x0} ${bot - 18}Q${x0} ${bot} ${x0 + 18} ${bot}L${x1 - 18} ${bot}Q${x1} ${bot} ${x1} ${bot - 18}L${x1} ${top}Z`;
-  const steam = (sx: number, ph: number) => {
-    const pts: Pt[] = [];
-    for (let i = 0; i <= 5; i++) pts.push([sx + Math.sin(i * 1.3 + ph + t * 1.6) * 8, top - 18 - i * 20]);
-    return smooth(pts);
-  };
   return (
     <>
       <Fill d={smooth([[x0 + 10, bot - 6], [x0 - 40, bot + 18], [x0 - 70, bot + 40], [x0 - 30, bot + 46], [x1 - 10, bot + 6]], {closed: true})} color={CC.deskShade} offset={false} />
@@ -337,7 +318,7 @@ export const DeskMug: React.FC = () => {
       <Ink d={line(x0, top, x0, bot - 14, {over: [0, 0], seed: 'mg1'}) + line(x1, top, x1, bot - 14, {over: [0, 0], seed: 'mg2'}) + `M${x0} ${bot - 18}Q${x0} ${bot} ${x0 + 18} ${bot}L${x1 - 18} ${bot}Q${x1} ${bot} ${x1} ${bot - 18}`} width={W.mid} />
       <Fill d={blob((x0 + x1) / 2, top, (x1 - x0) / 2, 13, {seed: 'rim'})} color={CC.anchor} offset={false} />
       <Ink d={ellipse((x0 + x1) / 2, top, (x1 - x0) / 2, 13, {seed: 'rimI'})} width={W.mid} />
-      <Ink d={steam(834, 0) + steam(866, 2.1)} width={W.far} />
+      <Steam x={850} y={top - 8} h={120} amp={9} n={2} seed="deskmug" />
     </>
   );
 };
@@ -384,6 +365,7 @@ export const DeskBack: React.FC<{at?: number; lampOn?: boolean}> = ({at, lampOn 
 /** The pen, the mug, the lamp head (in front of the page). */
 export const DeskFront: React.FC<{at?: number}> = ({at}) => (
   <AtWave at={at}>
+    <DustMotes cx={DESK.pool.cx + 40} cy={DESK.pool.cy - 60} rx={DESK.pool.rx * 0.9} ry={DESK.pool.ry * 0.8} n={11} r={3.2} seed="deskmotes" />
     <Pen />
     <DeskMug />
     <LampHead />

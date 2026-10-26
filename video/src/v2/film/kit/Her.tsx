@@ -84,6 +84,19 @@ const MOUTH_STEPS = [2, 1, 2, 0, 1, 2, 1, 0, 2, 1];
 const mouthStep = (t: number, talking?: Talking) => (talkingAt(t, talking) ? MOUTH_STEPS[Math.floor(t * 10) % MOUTH_STEPS.length] : 0);
 /** A blink every ~3.3 s (0.1 s), phase by seed. */
 const blinking = (t: number, seed: string) => (t + rand(seed, 'blink') * 3.3) % 3.3 < 0.1;
+/** Idle life (kit/README.md "Keep a panel alive"): the hair's slow sway (head radii) and a hand fidget (px offset,
+ *  stepped at 12 drawings / s: every ~2.9 s the hands shift a little and settle). */
+export const hairSway = (t: number, seed: string) => 0.05 * Math.sin(t * 1.1 + rand(seed, 'hs') * 6.28);
+export const fidget = (t: number, seed: string, amp: number): Pt => {
+  const per = 2.6 + rand(seed, 'fp') * 0.8;
+  const tt = Math.floor(t * 12) / 12;
+  const u = (((tt + rand(seed, 'fo') * per) % per) + per) % per;
+  const k = u < 0.7 ? Math.sin((u / 0.7) * Math.PI) : 0;
+  const a = rand(seed, `fa${Math.floor((tt + rand(seed, 'fo') * per) / per)}`) * 6.28;
+  return [Math.cos(a) * amp * k, Math.sin(a) * amp * k * 0.6];
+};
+/** Talking: the head nods a hair on the stresses (stepped). */
+const talkNod = (t: number, talking: Talking | undefined, r: number) => (talkingAt(t, talking) ? Math.sin(Math.floor(t * 8) * 1.7) * r * 0.035 : 0);
 
 // ---------------------------------------------------------------- the head (face, hair cap, hair mass)
 
@@ -97,6 +110,8 @@ type HeadSpec = {
   ink: number;
   at: At;
   seed: string;
+  /** Idle life: the hair mass's lower half sways by this much (head radii). */
+  sway?: number;
   /** Cast variants (staffers): 'long' (HER) | 'short' | 'bald'; hair colour, skin, round glasses. */
   hairStyle?: 'long' | 'short' | 'bald';
   hairColor?: string;
@@ -122,7 +137,8 @@ const ptsAt = (h: HeadSpec, pts: Pt[]): Pt[] => pts.map(([u, v]) => [h.c[0] + h.
 const HairMass: React.FC<{h: HeadSpec}> = ({h}) => {
   const k = h.turn;
   // the front mass's 11 points vs the side mass's 11: blend
-  const pts = ptsAt(h, blendPts(MASS_FRONT, MASS_SIDE, k));
+  const sw = h.sway ?? 0;
+  const pts = ptsAt(h, blendPts(MASS_FRONT, MASS_SIDE, k).map(([u, v]): Pt => [u + (v > 0.8 ? sw * Math.min(1, (v - 0.8) / 1.6) : 0), v]));
   const d = smooth(pts, {closed: true, tension: 0.42});
   return (
     <>
@@ -287,19 +303,23 @@ export type HerStandingProps = HerBase & {
   grip?: boolean;
   /** Her lanyard + badge on the chest (she quit: default off). */
   lanyard?: boolean;
-  /** The held prop (her contract): drawn over her arms and under her fingers. */
+  /** The held prop (her contract): drawn over her arms and under her fingers; it moves with her hands' fidget. */
   children?: React.ReactNode;
+  /** Idle life (default true): breath, blink, hair sway, a hand fidget (the held prop moves with it). */
+  life?: boolean;
 };
 
-export const HerStanding: React.FC<HerStandingProps> = ({x, y, h, facing = 'r', face = 'calm', talking, turn = 0.3, hands, grip, lanyard = false, at, seed = 'herStand', ink: inkP, children}) => {
+export const HerStanding: React.FC<HerStandingProps> = ({x, y, h, facing = 'r', face = 'calm', talking, turn = 0.3, hands, grip, lanyard = false, at, seed = 'herStand', ink: inkP, children, life = true}) => {
   const t = useTime();
   const s = facing === 'r' ? 1 : -1;
   const r = 0.09 * h;
   const ink = inkP ?? inkForHead(r);
-  const bob = Math.sin(t * 1.8) * 0.002 * h;
+  const bob = life ? Math.sin(t * 1.8) * 0.002 * h : 0;
   const P = (u: number, v: number): Pt => [x + s * u * h, y - v * h + bob];
-  const H = P(0.01, 0.905);
-  const head: HeadSpec = {c: H, r, s, turn, face, talking, ink, at, seed};
+  const H0 = P(0.01, 0.905);
+  const H: Pt = [H0[0], H0[1] + talkNod(t, talking, r)];
+  const head: HeadSpec = {c: H, r, s, turn, face, talking, ink, at, seed, sway: life ? hairSway(t, seed) : 0};
+  const fg = life ? fidget(t, seed, 0.006 * h) : ([0, 0] as Pt);
   const shY = y - 0.77 * h + bob;
   const cx = x + s * 0.0 * h;
   const sw = 0.105 * h; // shoulder half-width
@@ -332,7 +352,8 @@ export const HerStanding: React.FC<HerStandingProps> = ({x, y, h, facing = 'r', 
     return roundRect(f[0] - 0.035 * h + s * 0.015 * h, f[1] - 0.04 * h, 0.085 * h, 0.04 * h, 0.018 * h);
   };
   // arms: shoulders -> elbows (two-bone reach) -> hands
-  const handsP: [Pt, Pt] = hands ?? [P(0.19, 0.64), P(0.22, 0.67)];
+  const handsP0: [Pt, Pt] = hands ?? [P(0.19, 0.64), P(0.22, 0.67)];
+  const handsP: [Pt, Pt] = [add(handsP0[0], fg), add(handsP0[1], fg)];
   const shL: Pt = [cx - s * sw * 0.86 + off, shY + 0.025 * h];
   const shR: Pt = [cx + s * sw * 0.86 + off, shY + 0.025 * h];
   const l1 = 0.17 * h;
@@ -365,7 +386,7 @@ export const HerStanding: React.FC<HerStandingProps> = ({x, y, h, facing = 'r', 
       <HairLocks h={head} />
       <Sleeve A={shL} E={E0} Z={handsP[0]} w={aw} ink={ink} at={at} seed={`${seed}/a0`} />
       <Sleeve A={shR} E={E1} Z={handsP[1]} w={aw} ink={ink} at={at} seed={`${seed}/a1`} />
-      {children}
+      {children ? <XG m={mat.translate(fg[0], fg[1])}>{children}</XG> : null}
       <HandShape p={handsP[0]} r={0.034 * h} dir={dirOf(E0, handsP[0])} ink={ink} at={at} seed={`${seed}/h0`} grip={grip ?? !!hands} />
       <HandShape p={handsP[1]} r={0.034 * h} dir={dirOf(E1, handsP[1])} ink={ink} at={at} seed={`${seed}/h1`} grip={grip ?? !!hands} />
     </>
@@ -386,20 +407,24 @@ export type HerSeatedProps = HerBase & {
   lanyard?: boolean;
   /** Draw the legs (default true; P6 cuts them with the frame anyway). */
   legs?: boolean;
+  /** Idle life (default true): breath, blink, hair sway, a hand fidget, a nod while talking. */
+  life?: boolean;
 };
 
-export const HerSeated: React.FC<HerSeatedProps> = ({x, y, h, facing = 'r', view = 'side', face = 'calm', talking, turn: turnP, hands, lanyard = false, legs = true, at, seed = 'herSeat', ink: inkP}) => {
+export const HerSeated: React.FC<HerSeatedProps> = ({x, y, h, facing = 'r', view = 'side', face = 'calm', talking, turn: turnP, hands, lanyard = false, legs = true, at, seed = 'herSeat', ink: inkP, life = true}) => {
   const t = useTime();
   const s = facing === 'r' ? 1 : -1;
   const r = 0.09 * h;
   const ink = inkP ?? inkForHead(r);
   const front = view === 'front34';
   const turn = turnP ?? (front ? 0.32 : 0.72);
-  const bob = Math.sin(t * 1.6) * 0.0018 * h;
+  const bob = life ? Math.sin(t * 1.6) * 0.0018 * h : 0;
   const P = (u: number, v: number): Pt => [x + s * u * h, y - v * h];
   const Pb = (u: number, v: number): Pt => [x + s * u * h, y - v * h + bob];
-  const H = Pb(0.04, 0.755);
-  const head: HeadSpec = {c: H, r, s, turn, face, talking, ink, at, seed};
+  const H0 = Pb(0.04, 0.755);
+  const H: Pt = [H0[0], H0[1] + (life ? talkNod(t, talking, r) : 0)];
+  const head: HeadSpec = {c: H, r, s, turn, face, talking, ink, at, seed, sway: life ? hairSway(t, seed) : 0};
+  const fg = life ? fidget(t, seed, 0.005 * h) : ([0, 0] as Pt);
   const S = Pb(0.02, 0.62);
   const Hp = P(-0.02, 0.33);
   // torso: side = a bean along the line of action (chest forward); front34 = a wider bean, turned
@@ -446,7 +471,8 @@ export const HerSeated: React.FC<HerSeatedProps> = ({x, y, h, facing = 'r', view
   };
   const shoeD = (f: Pt) => roundRect(Math.min(f[0] - 0.03 * h, f[0] + s * 0.09 * h), f[1] - 0.012 * h, 0.12 * h, 0.042 * h, 0.02 * h);
   // arms: shoulder -> elbow -> hand on the desk
-  const handsP: [Pt, Pt] = hands ?? (front ? [P(0.15, 0.455), P(0.2, 0.47)] : [P(0.17, 0.46), P(0.22, 0.48)]);
+  const handsP0: [Pt, Pt] = hands ?? (front ? [P(0.07, 0.44), P(0.13, 0.425)] : [P(0.17, 0.46), P(0.22, 0.48)]);
+  const handsP: [Pt, Pt] = [handsP0[0], add(handsP0[1], fg)];
   const shBack: Pt = front ? [S[0] - s * 0.09 * h, S[1] + 0.03 * h] : [S[0] - s * 0.01 * h, S[1] + 0.025 * h];
   const shFront: Pt = front ? [S[0] + s * 0.085 * h, S[1] + 0.03 * h] : [S[0] + s * 0.035 * h, S[1] + 0.03 * h];
   const l1 = 0.16 * h;
@@ -511,10 +537,14 @@ export const herMouth = (p: {x: number; y: number; h: number; facing?: Facing; v
 export type HerBackProps = HerBase & {
   /** The hand on the laptop (canvas px). Default: the board's sit-pose hand. */
   hand?: Pt;
+  /** Idle life (default true): breath, the hair's sway, the hand's fidget (typing). */
+  life?: boolean;
 };
 
-export const HerBack: React.FC<HerBackProps> = ({x, y, h, facing = 'r', hand, at, seed = 'herBack', ink: inkP}) => {
+export const HerBack: React.FC<HerBackProps> = ({x, y, h, facing = 'r', hand, at, seed = 'herBack', ink: inkP, life = true}) => {
   const t = useTime();
+  const swh = life ? hairSway(t, seed) * 1.4 : 0;
+  const fgb = life ? fidget(t, seed, 0.008 * h) : ([0, 0] as Pt);
   const s = facing === 'r' ? 1 : -1;
   const r = 0.09 * h;
   const ink = inkP ?? inkForHead(r);
@@ -540,7 +570,7 @@ export const HerBack: React.FC<HerBackProps> = ({x, y, h, facing = 'r', hand, at
     {closed: true, tension: 0.35},
   );
   // the arm toward the laptop: upper arm down the side, the forearm reaching forward (up the frame) to the hand
-  const Z: Pt = hand ?? P(0.21, 0.47);
+  const Z: Pt = add(hand ?? P(0.21, 0.47), fgb);
   const A: Pt = [S[0] + s * 0.105 * h, S[1] + 0.035 * h];
   const E: Pt = [A[0] + s * 0.06 * h, A[1] + 0.2 * h];
   const aw = 0.075 * h;
@@ -563,7 +593,7 @@ export const HerBack: React.FC<HerBackProps> = ({x, y, h, facing = 'r', hand, at
         [0.7, -0.05],
         [0.86, -0.6],
       ] as Pt[]
-    ).map(([u, v]): Pt => [H[0] + s * u * r, H[1] + v * r]),
+    ).map(([u, v]): Pt => [H[0] + s * (u + (v > 1 ? swh * Math.min(1, (v - 1) / 2) : 0)) * r, H[1] + v * r]),
     {closed: true, tension: 0.42},
   );
   const strands = [0.1, -0.35, -0.75].map((u, i) => smooth(([[u + 0.1, -0.7], [u - 0.05, 0.6], [u - 0.02, 2.0], [u + 0.08, 3.0 - i * 0.2]] as Pt[]).map(([uu, v]): Pt => [H[0] + s * uu * r, H[1] + v * r]))).join('');
