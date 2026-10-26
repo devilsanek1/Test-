@@ -60,6 +60,15 @@ export type LineOpts = {
 
 const OVER_RANGES: Record<Exclude<OverPreset, 'none'>, [number, number]> = {small: [3, 8], medium: [6, 15], structural: [30, 62]};
 
+/** Board-mode pen (docs/look/STORYBOARD_STYLE.md §2, §6): one clean round-capped stroke per edge, a small overshoot
+ *  (none on the subject), no breaks in long lines, low jitter and drift. Spread it into line / rect / poly / arrow opts. */
+export const boardPen = (subject = false): LineOpts => ({over: subject ? 'none' : 'small', breaks: false, jitter: 0.5, drift: 0.2});
+/** Board-mode loop for ellipse() / circle(): low wobble, the ends meet (subject) or overlap by at most ~6 px. */
+export const boardLoop = (radius: number, subject = false): CircleOpts => ({
+  wobble: 0.012,
+  overlap: subject ? 0 : Math.min(12, (6 / Math.max(1, radius)) * (180 / Math.PI)),
+});
+
 function overs(r: Rng, over: LineOpts['over'], len: number): [number, number] {
   if (Array.isArray(over)) return over;
   if (typeof over === 'number') return [over * r.range(0.5, 1.4), over * r.range(0.5, 1.4)];
@@ -175,7 +184,7 @@ function _poly(points: Pt[], o: PolyOpts = {}): string {
   }
   const out: string[] = [];
   for (let i = 0; i < pts.length - 1; i++) {
-    out.push(line(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], {over: o.over, bow: o.bow, jitter: o.jitter, seed: `${seed}/${i}`}));
+    out.push(line(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], {over: o.over, bow: o.bow, jitter: o.jitter, drift: o.drift, breaks: o.breaks, seed: `${seed}/${i}`}));
   }
   return out.join('');
 }
@@ -408,13 +417,14 @@ function _hatch(x: number, y: number, w: number, h: number, o: {seed?: Seed; ang
 }
 export const hatch = memo('hatch', _hatch);
 
-/** Arrow from (x1,y1) to (x2,y2): bowed shaft + two head strokes. */
-function _arrow(x1: number, y1: number, x2: number, y2: number, o: {seed?: Seed; head?: number; bow?: number; spread?: number} = {}): string {
+/** Arrow from (x1,y1) to (x2,y2): bowed shaft + two head strokes. breaks / jitter / drift go to the shaft (see LineOpts). */
+function _arrow(x1: number, y1: number, x2: number, y2: number,
+  o: {seed?: Seed; head?: number; bow?: number; spread?: number} & Pick<LineOpts, 'breaks' | 'jitter' | 'drift'> = {}): string {
   const seed = o.seed ?? autoSeed(x1, y1, x2, y2);
   const r = rng(seed);
   const head = o.head ?? 18;
   const spread = (o.spread ?? 30) * D2R;
-  const shaft = line(x1, y1, x2, y2, {seed: `${seed}/s`, over: [r.range(0, 4), 0], bow: o.bow});
+  const shaft = line(x1, y1, x2, y2, {seed: `${seed}/s`, over: [r.range(0, 4), 0], bow: o.bow, breaks: o.breaks, jitter: o.jitter, drift: o.drift});
   const a = Math.atan2(y2 - y1, x2 - x1) + Math.PI;
   const h1 = `M${P(x2 + Math.cos(a - spread) * head, y2 + Math.sin(a - spread) * head)}L${P(x2, y2)}`;
   const h2 = `L${P(x2 + Math.cos(a + spread) * head * r.range(0.85, 1.1), y2 + Math.sin(a + spread) * head * r.range(0.85, 1.1))}`;

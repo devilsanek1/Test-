@@ -1,44 +1,97 @@
-# Video 3, G3 storyboard v3: "One Room, One Window" (opening O1)
+# Video 3, G3 storyboard (board v2): "The laptop deal that flipped"
 
-Data: `public/v3/animatic.json` (drawn by `src/v3/SketchReel.tsx`, composition `Animatic` in `src/entry-v3.tsx`), built by
-targeted edits to v1 (`archive/g3_v1/`). Voice: the owner's take 4 (`public/v3/voice.wav`, words in `voice_words.json`,
-41.38 s). Every cut lands on the same word as in v1.
+Data: `public/v3/animatic.json` (`"style": "board"`, drawn by `src/v3/SketchReel.tsx`, composition `Animatic` in
+`src/entry-v3.tsx`). Re-boarded 2026-10-26 in the house style (`docs/look/STORYBOARD_STYLE.md`): monochrome, one idea and
+one subject per panel, icons instead of labelled boxes, held drawings cut on the voice, notes in the strip. Board v2
+(same day) re-boards only the 8 panels that the sound-off cold read of board v1 flagged: O1's end, S5, S7, S9, S10, S11,
+S14 and LOOP. The other panels are frozen. The board lint (`python3 scripts/v3/board_lint.py public/v3/animatic.json`)
+reports 0 errors and 0 warnings. Voice: the owner's take 4 (`public/v3/voice.wav`, word timings in `voice_words.json`,
+0.12 s lead, 41.15 s in total). Words, audio, sfx and shot timings are unchanged.
 
-**Concept.** We watch everything from one lamp-lit desk nook at night, and its single frosty window is our screen onto
-the world, where a finger draws the price line on the fogged glass. At the turn we push through the window once, rise over
-our own roof ledge to see the data center fill the horizon with its chip mountain, and come home to the same paper price tag.
+**The story in pictures.** You tap Add to cart, and the town's AI data center outgrows everything on "pricier". Then
+the phone drops away and the data center stands alone. A plain chart shows the old deal and this year's turn. A
+see-inside bubble shows the memory stick in your laptop, and memory sticks pour into the data center, then pile up into a
+mountain. At the chip factory the data center is first in line and the laptop maker's van waits behind it. A stick
+costs 5x what it did last year, and your price goes up. Waiting doesn't help: the chip makers say "2027", and one more
+data center cuts in ahead of the van. Last, the price tag turns over and there's a data center on its back.
 
-**What changed vs v1:** all 16 shots retimed to take 4 (no gaps, 0-41.38 s); S9 rebuilt as CINEMATIC_GUIDE **S1 rise-over
-reveal** with true parallax; S10 upgraded to **S3 big sky, one landmark**. Every other shot keeps v1's drawing and move.
+| Panel | Time (s) | The one idea | What we see | Camera |
+|---|---|---|---|---|
+| O1 | 0-5.80 | AI data centers are making your next laptop pricier: the expected town first, then the data center outgrows it. | **Frame 0:** bare lines still drawing: your phone with a laptop listing, the Add-to-cart button (with a cart icon) under your thumb mid-press (cart pop at 0.0), and a house-sized AI DATA CENTER on the horizon (its strokes about 75 % drawn). Grey tones flood in 0.03-0.41. **Expected:** $999 on the screen (0.2); four little houses pop in around the data center (0.55-1.30); a pencil down-arrow appears by the price on "soon?". **Reality:** on "AI's" the arrow flips up; the data center grows on each crane clunk (1.88, 2.12, 2.30, 2.42); on "pricier" (2.60) it slams up, swallows the two houses beside it and shows a big AI DATA CENTER sign, while $999 is struck and $1,099 appears. **"Well, AI data centers are":** on "data" (4.46-4.76) the phone drops out of the bottom of the frame and lands on the thoom, so the data center stands alone, centred, while the caption says "centers are." | PULL OUT with a slight tilt up: zoom 1.04 to 1.00 and y 960 to 830 over the whole shot, ease-in quad (gathers speed; frame 0 is unchanged) |
+| S4 | 5.80-9.48 | For 20 years, the same money bought more computer. | A plain chart titled "US computer prices": an L of axes, "2005", and one 9 px line drawn downhill with the voice (5.90-8.20), with a small 2021 bump. | HOLD |
+| S5 | 9.48-11.48 | Right after you buy one, a newer one comes out at the same price. | You (a bigger gesture figure, head about 1.2x board v1) hold your new laptop, happy, with a large $999 tag. On "after" (10.20) a laptop marked NEW pops onto the shop shelf with the same large $999 tag, and your face turns to shock. The tags are 190 px wide (about 60 px numbers) and 30 px clear of the laptops. | HOLD |
+| S6 | 11.48-16.60 | This past year, US computer prices turned up: +9.7%. | The same chart. The old line drops to 5 px; the hook rises from "US" to "went" (12.92-14.12) as the 9 px subject line, and +9.7% pops on "almost 10%" (14.84). | HOLD |
+| S7 | 16.60-18.28 | Your laptop runs on the memory stick inside it. | One open laptop on a desk line. On "your" (17.24) a see-inside bubble pops up from inside its base, showing the memory stick. | HOLD |
+| S8 | 18.28-19.40 | It runs on a stick of memory chips. | Cut-in on "memory": the memory stick rises out of the laptop (0.4 s) and holds above it. | HOLD |
+| S9 | 19.40-21.32 | AI data centers run on memory chips too, lots of them. | We rise a little over our own roof ledge, which drops out under the notes strip, to a big AI data center (440 px, 56 px AI DATA CENTER sign) on plain paper. From 19.75, seven large memory sticks (170 px) rain down into its roof one after another, 0.15 s apart, so 3-4 are in the air at any moment. | RISE: y 1100 to 960, zoom 0.98 to 1.00, ease-out 19.40-20.30 |
+| S9b | 21.32-22.68 | ... by the mountain. | Cut wide on "By": a mountain of memory sticks towers behind the data center, and tiny you, on the left, holds your one stick. | HOLD |
+| S10 | 22.68-25.24 | They pay more, so they get first dibs. | A queue at the chip factory (right, fully in frame). First in line is the AI data center itself (340 px, with its sign), and memory sticks fly out of the factory into it, one every 0.35 s. Behind it waits the laptop maker's van, with a large laptop on its side. There is no truck or shrugging driver. | HOLD |
+| S11 | 25.24-29.40 | What's left costs 5 times last year's price. | A two-bar chart (an L of axes). Left: a short light bar with a memory stick on it, labelled "last year". On "costs" (26.36) a dark bar five times as tall pops in on the right with the same stick on top, and on "five" (27.08) a big "5x" pops above it. | HOLD |
+| S12 | 29.40-31.32 | Laptop makers pass it on. | The stick slides into a dark laptop. On the price card, $999 is struck on "makers" and $1,099 pops on "on" (ding). | HOLD |
+| S13 | 31.32-33.40 | Normally you'd just wait for the newer one. | You sit in a chair under a wall clock, with a thought bubble of a NEW laptop. | HOLD |
+| S14 | 33.40-36.36 | Chip makers say next year is even tighter: the line ahead of laptops gets longer. | The S10 queue again: the chip factory on the right, an AI data center first in line, the laptop van right behind it. A speech bubble from the factory holds a big calendar that flips from 2026 to 2027 on "next" (34.60). The van backs off (34.60-34.80) and a second data center cuts in ahead of it (34.76). | HOLD |
+| S15 | 36.36-38.84 | That's how an AI data center ends up on your price. | Callback to O1's "pricier" frame: the big data center over the town, and the lowered phone showing $999 struck and $1,099. | HOLD |
+| S16 | 38.84-40.85 | ... on your next laptop's price tag. | Cut-in: the $1,099 tag hangs from the laptop. It turns over at 39.70 (like-pop at 39.88) to show an AI data center drawn on its back. | HOLD |
+| LOOP | 40.85-41.15 | Back to frame 0. | O1's frame-0 bare lines, already about 50-75 % drawn when the 0.12 s dissolve lands and drawing on slowly, so this tail reads as the opening scene (phone, listing, cart, data center on the horizon). Each stroke ends at exactly its frame-0 progress, so the rewatch carries on without a seam (the pencil speeds up at the wrap). | O1's start framing (zoom 1.04), 0.12 s dissolve |
 
-| Shot | Time (s) | What we see | Camera | Transition in | Guide type | Changed vs v1 |
-|---|---|---|---|---|---|---|
-| O1 | 0-5.8 | **THE OPENING, one continuous shot (replaces S1-S3).** FRAME 0 = the nook (nook_C_warm layout) in bare ink, last strokes (mullions, roofs, lamp arm, shelf spines) still drawing; thumb mid-press on "Add to cart", cart pop 0.0. Colour floods out from the thumb 0.03-0.29 (button, phone, hand, desk, mug, tag, lamp "switches on", old laptop, window, sky, town, toy data center, shelf, wall last). EXPECTED (0.1-1.6): a house-sized toy data center with a lit "AI" sign among five snowy houses; "$$" tag with a pencil down-arrow (0.6); its one LED blinks out of step (0.9, 1.22); house windows light (1.08-1.48). REALITY: "AI's" (1.64) the arrow flips up and a crane draws on; floors clunk on faster and faster (1.88, 2.12, 2.30, 2.42), each a pencil tick on the tag; a 3-frame hold (lights dip); "pricier" (2.60): the base swallows two houses and floors slam on every ~1.5 frames, "$$" struck, "$$$" stamped, PRICIER highlighted; it stacks out through the top of the window (3.05). "Well," holds the dark slab (flicker 3.9); "AI" (4.04) rows light bottom-up; "data" (4.44) a second block fills the left panes; "centers" (4.76) brass plate AI DATA CENTER, its cold light falls across the desk in four pane-shaped patches toward us, the old laptop's screen mirrors the rows, the lamp pool shrinks (never flickers); 4.9 the phone lowers 140 px; "are." last tick; steam fogs the lower panes. Snow every 0.1 s: never a still frame. | one shot, pull-out z 1.05 to 1.00 (ease-in quad, gathers speed), fixed point ~ the window top so the caption band stays clean; planes: outside f 0.6, room 1, phone/hand/tag 1.15 | none (frame 0; the loop lands here) | the opening (CINEMATIC_GUIDE) | new: winner "The window can't hold it" + judge grafts |
-| S4 | 5.8-9.48 | Closer on the fogged pane: on "backwards" a finger touches 2005 and draws the downhill line to 2025 (US computer prices, same computing power). | truck right with the finger (from 7.31) | cut-in on "Which" (the viewer has looked up at the fogging pane) | - | retimed |
-| S5 | 9.48-11.48 | Cut-in on the line: a doodle you buys one, a shinier one pops in for the same $. | 1.6x cut-in, locked | cut-in on "Usually" | - | retimed |
-| S6 | 11.48-16.6 | Back out: the line runs to 2026 and on "up" hooks UP, wiping a clear patch on the data center; the +9.7 % BLS tag is taped on. | tilt-up riding the hook (14.75-15.47) | hard cut on "But" | - | retimed |
-| S7 | 16.6-18.28 | The old laptop open in the lamp pool; a fingertip lands on one memory chip. | 8 % push into the open back | hard cut on "Mostly" | - | retimed |
-| S8 | 18.28-20.36 | At the glass: the chip held up looks the size of the data center in the wiped patch; then we push through the patch. | still, then push 1 to 4.2x (19.33-20.59, ease in) | hard cut on "memory" | - | retimed |
-| S9 | 20.36-23.64 | THE SCALE MOMENT. Start: behind our dark, snow-lipped roof ledge, our snowy terrace and a band of the data center above it. We rise: the ledge drops out the bottom, the terrace and two lit houses sink, and the data center stands across the whole horizon (wider than the frame, tops at y >= 604), LED rows and an AI DATA CENTER sign over its loading door. On "mountain" the chip mountain rises from behind the far roofs; a tiny back-view you on the terrace; footnote "1 AI rack holds the memory of 1,300+ laptops"; from "They" one chip rides the conveyor into the door. | **S1 rise-over:** camera y 1360 to 960 (rise 400 px), push 1.00 to 1.04 (z 0.9615 to 1), ease-out 20.59-22.91 (lands on "They"), hold 0.96 s. Planes: ledge f 1.3 (travels 520 px), terrace + you + side roofs f 1 (400), houses f 0.65 / 0.5 (260 / 200), data center + mountain f 0.15 (60), sky + footnote f 0 (fixed). | mullion wipe on "data" (Sage to Dusk) | S1 | rebuilt: true 5-plane parallax replaces layer-move faking; data center is now a horizon-wide wall below the caption band (v1: a face too tall for the frame, behind the captions); terrace now snowy with our lamp's light patch |
-| S10 | 23.64-25.24 | The chip factory stands alone on the left third (to y 650) and carries the card "3 companies: almost 90% of RAM chip sales (TrendForce, Q2 2026)"; the dock is a low band (ground at 0.73 H): two data-center trucks with "$$$$" bids load first, the laptop maker's "$" van idles; two flat clouds drift. | **S3:** pull-out 1.016 to 1.00, ease-out, clouds f 0.4 drift 4-5 px/s | hard cut on "so" (down to eye level) | S3 | recomposed: dock dropped from 0.57 H to 0.73 H (v1 left the lower half empty), the sign moved from floating sky onto the factory; move is the S3 pull-out instead of a 2 % truck |
-| S11 | 25.24-29.4 | Same dock, closer: the last truck leaves, the driver lifts the one crate left, the van drives off; on "five" the "~5x" tag swings onto the gate. Box: RAM chips ~5x a year earlier (Gartner, Q2 2026). | 5 % push, landing on "five" (27.31) | hard cut on "Which" | - | retimed |
-| S12 | 29.4-31.32 | Home, close: the van's lights pass in the fogged window; on "on" the tag is struck again and "$$$$" pops (ding). | locked, 3 % push | hard cut on "laptop" | - | retimed |
-| S13 | 31.32-33.4 | Over the shoulder again (S3 plate, chart on the glass): phone face down, mug up; a fingertip dots an empty "?" laptop just past the line. | push 4 % | hard cut on "Normally" | - | retimed |
-| S14 | 33.4-36.36 | Front-on to the window wall: on "next year's" the calendar flips 2026 to 2027; the outline stays empty. Micron box; analysts line on "tighter". | 2 % push on "tighter" (35.79-36.59) | hard cut on "But" | - | retimed |
-| S15 | 36.36-38.84 | Back to the frame-0 composition with the chart on the glass: the phone comes up, its tag on one diagonal with the data center; one more LED row lights. | push 3 % toward the tag, landing on "your" (38.91) | hard cut on "So" | - | retimed |
-| S16 | 38.84-40.85 | Close on the tag: on "laptop's" it turns over; on "price" its back lands: a tiny inked AI data center with its chip mountain (like-pop). Hold to 40.85, then LOOP. | locked, 0.5 % drift | hard cut on "next" | - | retimed; ends at 40.85 for LOOP |
-| LOOP | 40.85-41.15 | O1's frame 0 as bare lines (same elements, no fills): the colour drains, and the strokes that are still drawing on frame 0 start drawing here, so the rewatch continues seamlessly. | O1's start framing, locked | 0.2 s dissolve (colour drains to bare lines) | the opening: loop | new |
+**Sound:** unchanged. The cart pop at 0.0 (the tap), O1's led ticks, crane clunks (1.88-2.42), floor slams and stamp
+(2.60-2.75) and the thoom on "centers" (4.76, the phone has just dropped away); the ding at 30.84 ("on": $1,099); the
+like-pop at 39.88 (the tag's back). Frame-0 title until 3.37 s.
 
-**Sound:** cart pop 0.0 s (the tap on frame 0), ding 30.84 s ("on", the tag ticks up at home), like-pop 39.88 s ("price", the
-tag lands on its back). Frame-0 title until 3.37 s ("Well," at 3.64 s). O1 cues for the sound pass (no files yet): crane clunks rising in pitch (1.88-2.42), a 3-frame hush, paper stamp + low soft thump on "pricier" (2.60), quiet rising ticks on the LED rows (4.04-4.64), a low soft "thoom" on "centers" (4.76).
+**Board v2: what the sound-off cold read of board v1 flagged, and what changed** (8 of 19 frames; each fix is in the
+flagged panel only):
+- O1 at 4.9 s, "centers are." was the same picture as 3.0 s. Now the phone drops away on "data" and the camera tilts up
+  a little, so the AI data center stands alone and centred under "centers are."
+- S5, the joke: the $999 tags were too small to compare and the face was a dot. The tags are now about 1.3x bigger and
+  the figure about 1.15x, and nothing overlaps. The "detour" note (what does the joke have to do with AI?) is about the
+  locked script, so it was not changed.
+- S7, "your laptop runs" showed a plain laptop. A see-inside bubble now shows the stick inside it.
+- S9, the conveyor sticks read as buses or a train, and the light ground read as a glitch. Now large sticks rain down
+  into the roof of a bigger data center with a 56 px sign, on plain paper.
+- S10, nobody could tell whose truck it was, who the shrugging man was, or what the cut-off factory was. Now the queue
+  is the data center itself at a whole factory, with sticks flying into it and the laptop van waiting behind it.
+- S11, "5x what?". Now a two-bar chart compares "last year" with a bar five times as tall.
+- S14, "next year's WHAT?". Now the factory says "2027" in a speech bubble, and one more data center cuts in ahead of
+  the laptop van, so the picture shows "worse for laptops".
+- LOOP at 41.0 s looked broken (scraps of lines). It now shows the opening scene's lines mostly drawn. To allow that,
+  O1's frame 0 draws a little further ahead: the data center at 75 % (was 50 %), the listing's laptop and the cart
+  at 80 % (were 50 % and 40 %).
+- Not changed, because it isn't a panel: every cold reader said the captions are 1-3 word fragments ("centers are.",
+  "so they get", "say next year's"). That is the caption pager (`MAX_CHARS = 16` in `SketchReel.tsx`). Splitting on
+  phrases or allowing about 24 characters would fix it, and that is the owner's call.
 
-Animatic notes (O1): `pop` stands in for the frame's pop blue (button, badge, "$$$" stamp), `warm` for the salmon highlight behind PRICIER / DATA CENTERS; SketchReel gained `out` (an element pops out, e.g. the highlight leaves with the claim). S15 still uses the old S1 layout: rebuild it on O1's layout when S15 is next touched.
+**Board v1 (vs the sketch animatic, where all 18 frames were flagged):**
+- The window is gone. The data center is the icon with roof units, server rows and a 56 px AI DATA CENTER sign. It
+  grows over a town of little houses, never as a dark block in a window, and it never fills the frame like blinds.
+- The price line is a plain chart on paper (title, L axes, one line, one year). There is no window fog, finger or wedge.
+- The chip held to the glass is replaced by two beats: your laptop's one stick (S7-S8), then sticks pouring into a data
+  center, then the mountain of them with tiny you holding one stick (S9-S9b).
+- Micron and the boxes of small source text are gone (S14). The tag's back is a large drawing (S16). The LOOP dissolve
+  is 0.12 s, so it no longer reads as a double exposure.
+
+**Structure changes vs the sketch animatic:**
+- S9 is split at "By" into S9 (the rise) and S9b (the mountain), so each has one idea.
+- The S9/S10 cut moves from "so" to "They", so "They pay more, so they get first dibs" is one panel.
+- The S8/S9 cut moves from "data" to "And", so the data center is on screen as "AI" is heard.
+- There are two camera moves (O1 and S9); every other panel is a held drawing.
 
 **Notes for the owner / G4-G5:**
-- The S1 move runs 2.3 s, not the guide's 4-4.5 s: "data centers. By the mountain. They pay more," gives 3.28 s between
-  the cut words. Ease-out lands 93 % of the travel by "mountain", so the mountain rises on a settled frame. G5 sets the
-  exact numbers (60 fps).
-- Video 3 stays at night (the lamp-lit nook is the story), where the guide's S1 has daylight and a sun; the light in S9
-  is the lit windows and the warm patch from our own window.
-- No S2 or S4: the only exterior shots are the breach (S9-S11), S4 can't follow the S1 shot (dose rule), and the nook
-  shots don't call for them.
+- S6's hook is schematic. On this scale a true +9.7% would rise about 10 px; it is drawn about 130 px so that it reads.
+  G5 sets the honest shape (for example a "since 2024" inset).
+- $999 to $1,099 is an illustrative listing price (+10%, in step with the US +9.7%). It is not a fact, so it gets no
+  source.
+- S11's bars are the verified 5x (Gartner: RAM chips about 5x a year earlier, Q2 2026); "last year" is the only word.
+- S14's growing queue pictures "tighter" (the chip makers' 2027 forecast, FL 6.1). It shows no price and no "will".
+- S5 shows two $999 tags (the joke needs the same price twice), a knowing exception to "one number per panel". The
+  lint counts only text elements, so it stays clean.
+- The lamp-lit nook and its window are not in the board, because the window caused the "screen or window?" confusion.
+  G4 can frame the same staging through a window again if the owner wants the coziness back.
+- S9b (frozen, understood by all 3 readers) still has its light ground block, which one reader found meaningless. Fix it
+  together with S9 if the next cold read flags it.
+- S12's strike lands on "makers" and S16's flip lands 0.18 s before the like-pop, so the panel middles (the cold-read
+  frames) show the change.
+
+Cold-read sheet (25 %, one frame per panel; the opening at 0.3, 2.0, 3.0 and 4.9 s; S9 at 20.43 s so its caption has
+finished popping): `coldread/sheet_board.jpg`, indexed by `coldread/index_board.json` in the session scratchpad (board
+v1's sheet: `coldread/sheet_board_v1.jpg`). Built by `rb/reboard.py` (the v2 panels) and `rb/render_sheet.py` (stills
+from the pre-built bundle, then tiled).

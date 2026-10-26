@@ -6,9 +6,10 @@
 import React from 'react';
 import {AbsoluteFill, useCurrentFrame} from 'remotion';
 import {captionFontStack, useCaptionFont} from '../lib/font';
-import {ShotView, type Shot} from './SketchReel';
+import {ShotView, type Shot, type Style} from './SketchReel';
 
-export type SketchData = {sketches: {name: string; rule: string; shot: Shot}[]};
+/** style: the SketchReel look for these sketches (default 'sketch', the guidebook's original pencil look) */
+export type SketchData = {style?: Style; sketches: {name: string; rule: string; shot: Shot}[]};
 
 export const ShotSketch: React.FC<{data: SketchData}> = ({data}) => {
   useCaptionFont();
@@ -16,7 +17,7 @@ export const ShotSketch: React.FC<{data: SketchData}> = ({data}) => {
   const sk = data.sketches[Math.min(f, data.sketches.length - 1)];
   return (
     <AbsoluteFill style={{background: '#f3ebdd', fontFamily: captionFontStack}}>
-      <ShotView shot={sk.shot} t={sk.shot.e} />
+      <ShotView shot={sk.shot} t={sk.shot.e} mode={data.style ?? 'sketch'} />
       <div style={{position: 'absolute', top: 70, left: 60, right: 60, textAlign: 'center', fontSize: 84, fontWeight: 700, color: '#4a443e'}}>{sk.name}</div>
       <div style={{position: 'absolute', bottom: 90, left: 70, right: 70, textAlign: 'center', fontSize: 42, lineHeight: 1.25, color: '#4a443e',
         background: 'rgba(243,235,221,0.9)', padding: '18px 10px'}}>{sk.rule}</div>

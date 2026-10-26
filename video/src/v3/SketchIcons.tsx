@@ -10,11 +10,17 @@
 // text = the icon's own words (datacenter sign, pricetag price, chart title, calendar year, chip marking);
 // pts = chart only: the line's points [[x 0..1, value 0..1 (0 = the x axis, 1 = the top)], ...].
 // Readable from 270 px wide (a third of the frame); details scale with w.
+//
+// Board mode (SketchReel `style: "board"`, docs/look/STORYBOARD_STYLE.md §6): pass `board: {role, sw?}`. Every colour
+// snaps to the 4 board tones by brightness (boardTone; dark only on the subject, far icons wash out to light), outlines (the 4+ px strokes) take the
+// role's weight and colour (subject 9 px ink, mid 5 px ink, far 3 px mid grey; sw overrides), details are 3 px, lights
+// don't blink, a chart drops its grid and area wash (an L of axes at 5 px, one line), the label is 60 px ink.
 
 import React, {useMemo} from 'react';
 import {captionFontStack} from '../lib/font';
 import {rng} from '../lib/rng';
-import {Pt, arc, arrow, crown, ellipse, glint, line, poly, polyPath, rect, rectPath, roundRect, smooth} from '../lib/sketch';
+import {type LineOpts, Pt, arc, arrow, boardLoop, boardPen, crown, ellipse, glint, line, poly, polyPath, rect, rectPath, roundRect, smooth} from '../lib/sketch';
+import {BOARD, type Role, boardTone, roleLine} from './board';
 
 export type IconName =
   | 'laptop' | 'phone' | 'ram' | 'chip' | 'datacenter' | 'server' | 'pricetag' | 'chart'
@@ -37,7 +43,8 @@ const C = {
   ledG: '#7fe0a0', ledB: '#8fd3f0', ledA: '#f5b945', grid: '#bfb3a3',
 };
 
-type Stroke = {d: string; w: number; c?: string; subs: string[]};
+/** k (board mode): 'o' outline (takes the role's weight), 'd' detail (3 px), 'm' a fixed 5 px line (chart axes) */
+type Stroke = {d: string; w: number; c?: string; subs: string[]; k: 'o' | 'd' | 'm'};
 type Paint = {d: string; c: string; o?: number; blink?: number};
 type Words = {x: number; y: number; s: string; size: number; c: string; anchor: 'start' | 'middle'; onFill?: boolean};
 type Part = {fills: Paint[]; strokes: Stroke[]; texts: Words[]};
@@ -63,9 +70,13 @@ class Ico {
   private cur: Part = {fills: [], strokes: [], texts: []};
   private n = 0;
   readonly over: number;
-  constructor(readonly x: number, readonly y: number, readonly w: number, readonly h: number, readonly seed: string) {
+  /** board-mode pen options spread into every stroke ({} in sketch mode, so sketch strokes are unchanged) */
+  readonly pen: LineOpts;
+  constructor(readonly x: number, readonly y: number, readonly w: number, readonly h: number, readonly seed: string,
+    readonly board?: {role: Role; sw?: number}) {
     this.parts.push(this.cur);
     this.over = 3 * Math.max(0.5, Math.min(3, w / 270));
+    this.pen = board ? {breaks: false, jitter: boardPen().jitter, drift: boardPen().drift} : {};
   }
   part() {
     this.cur = {fills: [], strokes: [], texts: []};
@@ -75,27 +86,32 @@ class Ico {
   Y = (v: number) => this.y + v * this.h;
   P = (p: Pt): Pt => [this.X(p[0]), this.Y(p[1])];
   sd = () => `${this.seed}/${this.n++}`;
-  /** overshoot for a stroke whose shortest segment is len px: small details stay crisp */
-  ov = (len: number) => Math.min(this.over, 0.07 * len);
+  /** overshoot for a stroke whose shortest segment is len px: small details stay crisp (board: at most 6 px, none on the subject) */
+  ov = (len: number): LineOpts['over'] => {
+    if (!this.board) return Math.min(this.over, 0.07 * len);
+    const v = this.board.role === 'subject' ? 0 : Math.min(6, 0.05 * len);
+    return [v, v * 0.8];
+  };
   // ---- strokes
-  ink(d: string, w = 4, c?: string) {
-    if (d) this.cur.strokes.push({d, w, c, subs: d.split(/(?=M)/).filter((s) => s.trim())});
+  ink(d: string, w = 4, c?: string, k?: Stroke['k']) {
+    if (d) this.cur.strokes.push({d, w, c, subs: d.split(/(?=M)/).filter((s) => s.trim()), k: k ?? (w >= 4 ? 'o' : 'd')});
   }
   ln(u1: number, v1: number, u2: number, v2: number, w = 4, c?: string) {
-    this.ink(line(this.X(u1), this.Y(v1), this.X(u2), this.Y(v2), {seed: this.sd(), over: this.ov(Math.hypot((u2 - u1) * this.w, (v2 - v1) * this.h))}), w, c);
+    this.ink(line(this.X(u1), this.Y(v1), this.X(u2), this.Y(v2), {seed: this.sd(), over: this.ov(Math.hypot((u2 - u1) * this.w, (v2 - v1) * this.h)), ...this.pen}), w, c);
   }
   bx(u: number, v: number, uw: number, vh: number, w = 4, c?: string) {
-    this.ink(rect(this.X(u), this.Y(v), uw * this.w, vh * this.h, {seed: this.sd(), over: this.ov(Math.min(Math.abs(uw * this.w), Math.abs(vh * this.h)))}), w, c);
+    this.ink(rect(this.X(u), this.Y(v), uw * this.w, vh * this.h, {seed: this.sd(), over: this.ov(Math.min(Math.abs(uw * this.w), Math.abs(vh * this.h))), ...this.pen}), w, c);
   }
   pl(pts: Pt[], closed = true, w = 4, c?: string) {
-    this.ink(poly(pts.map(this.P), {seed: this.sd(), closed, over: this.ov(shortest(pts.map(this.P), closed))}), w, c);
+    this.ink(poly(pts.map(this.P), {seed: this.sd(), closed, over: this.ov(shortest(pts.map(this.P), closed)), ...this.pen}), w, c);
   }
   /** one continuous stroke through the points */
   run(pts: Pt[], w = 4, c?: string) {
-    this.ink(poly(pts.map(this.P), {seed: this.sd(), joined: true}), w, c);
+    this.ink(poly(pts.map(this.P), {seed: this.sd(), joined: true, jitter: this.pen.jitter}), w, c);
   }
   ci(u: number, v: number, r: number, w = 4, c?: string) {
-    this.ink(ellipse(this.X(u), this.Y(v), r * this.w, r * this.w, {seed: this.sd()}), w, c);
+    const loop = this.board ? boardLoop(r * this.w, this.board.role === 'subject') : {};
+    this.ink(ellipse(this.X(u), this.Y(v), r * this.w, r * this.w, {seed: this.sd(), ...loop}), w, c);
   }
   rr(u: number, v: number, uw: number, vh: number, rad: number, w = 4, c?: string) {
     this.ink(roundRect(this.X(u), this.Y(v), uw * this.w, vh * this.h, rad * this.w, {seed: this.sd(), closed: false}), w, c);
@@ -126,7 +142,7 @@ class Ico {
   }
 }
 
-type Opts = {body: (def: string) => string | null; text?: string; pts?: Pt[]};
+type Opts = {body: (def: string | null) => string | null; text?: string; pts?: Pt[]; board: boolean};
 
 const ICONS: Record<IconName, (b: Ico, o: Opts) => void> = {
   laptop(b, o) {
@@ -277,16 +293,21 @@ const ICONS: Record<IconName, (b: Ico, o: Opts) => void> = {
   },
 
   chart(b, o) {
-    const area = o.body(C.red);
+    // board: no default area wash (one line on an L of axes); an explicit fill still paints the area
+    const area = o.body(o.board ? null : C.red);
     const top = o.text ? 0.22 : 0.06;
     const L = 0.12;
     const R = 0.95;
     const B = 0.88;
     if (o.text) b.say(0.04, 0.08, o.text, b.fit(o.text, 0.92 * b.w, 0.13 * b.h), LEAD, {anchor: 'start'});
-    for (const f of [0.33, 0.66]) b.ln(L, B - f * (B - top), R, B - f * (B - top), 2, C.grid);
-    const head = 0.035 * b.w;
-    b.ink(arrow(b.X(L), b.Y(B), b.X(L), b.Y(top - 0.02), {seed: b.sd(), head}));
-    b.ink(arrow(b.X(L), b.Y(B), b.X(R + 0.03), b.Y(B), {seed: b.sd(), head}));
+    if (o.board) {
+      b.ink(poly([b.P([L, top - 0.02]), b.P([L, B]), b.P([R + 0.03, B])], {seed: b.sd(), over: b.ov(0.3 * b.w), ...b.pen}), 4, undefined, 'm');
+    } else {
+      for (const f of [0.33, 0.66]) b.ln(L, B - f * (B - top), R, B - f * (B - top), 2, C.grid);
+      const head = 0.035 * b.w;
+      b.ink(arrow(b.X(L), b.Y(B), b.X(L), b.Y(top - 0.02), {seed: b.sd(), head}));
+      b.ink(arrow(b.X(L), b.Y(B), b.X(R + 0.03), b.Y(B), {seed: b.sd(), head}));
+    }
     const raw: Pt[] = o.pts?.length
       ? o.pts
       : [[0, 0.58], [0.12, 0.5], [0.22, 0.53], [0.34, 0.42], [0.46, 0.4], [0.58, 0.31], [0.7, 0.27], [0.8, 0.36], [0.9, 0.62], [1, 0.97]];
@@ -465,7 +486,7 @@ const ICONS: Record<IconName, (b: Ico, o: Opts) => void> = {
       b.paint(polyPath(outline), board);
       for (let k = 0; k < 10; k++) b.paint(quad(sw * (-0.46 + k * 0.093), sh * 0.2, sw * (-0.46 + k * 0.093 + 0.06), sh * 0.47), C.gold);
       for (let k = 0; k < 4; k++) b.paint(quad(sw * (-0.43 + k * 0.225), -sh * 0.36, sw * (-0.43 + k * 0.225 + 0.17), sh * 0.1), C.darker);
-      b.ink(poly(outline, {seed: b.sd(), closed: true, over: b.ov(sh)}), 3.5);
+      b.ink(poly(outline, {seed: b.sd(), closed: true, over: b.ov(sh), ...b.pen}), 3.5);
     };
     // a taller box makes a taller mountain: rows stack 0.09 w apart, each narrower than the one below
     const nRows = Math.max(2, Math.round((b.h / b.w - 0.2) / 0.09) + 1);
@@ -502,30 +523,48 @@ export type IconProps = {
   fillO: number;
   /** seconds since the shot start (blinking server lights) */
   t: number;
+  /** board mode (STORYBOARD_STYLE §6): tones, role line weights, no blinking; omitted = the sketch look */
+  board?: {role: Role; sw?: number};
 };
 
-export const SketchIcon: React.FC<IconProps> = ({name, x, y, w, h, fill, text, label, pts, seed, drawU, fillO, t}) => {
+export const SketchIcon: React.FC<IconProps> = ({name, x, y, w, h, fill, text, label, pts, seed, drawU, fillO, t, board}) => {
   const hh = h ?? w * (ICON_ASPECT[name] ?? 1);
   const ptsKey = pts ? JSON.stringify(pts) : '';
+  const role = board?.role;
+  const sw = board?.sw;
   const built = useMemo(() => {
-    const b = new Ico(x, y, w, hh, seed);
-    const body = (def: string) => (fill === null ? null : fill ?? def);
-    (ICONS[name] ?? ICONS.chip)(b, {body, text, pts});
+    const b = new Ico(x, y, w, hh, seed, role ? {role, sw} : undefined);
+    const body = (def: string | null) => (fill === null ? null : fill ?? def);
+    (ICONS[name] ?? ICONS.chip)(b, {body, text, pts, board: !!role});
     const total = b.parts.reduce((n, p) => n + p.strokes.reduce((m, s) => m + s.subs.length, 0), 0);
     return {parts: b.parts, rotate: b.rotate, total};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, x, y, w, hh, fill, text, ptsKey, seed]);
+  }, [name, x, y, w, hh, fill, text, ptsKey, seed, role, sw]);
+  const line = role ? roleLine(role, sw) : null;
+  const tone = (c: string, o?: number) => (role ? boardTone(c, role, o) : c);
+  const strokeOf = (s: Stroke) => {
+    if (!role || !line) return {c: s.c ?? LEAD, w: s.w};
+    const c = s.c === undefined || s.c === LEAD ? line.c : tone(s.c);
+    return {c, w: s.k === 'o' ? line.w : s.k === 'm' ? (role === 'far' ? 3 : 5) : 3};
+  };
+  const textC = (c: string) => (!role ? c : c === LEAD ? (role === 'far' ? BOARD.mid : BOARD.ink) : boardTone(c));
 
   const textO = Math.max(0, Math.min(1, (drawU - 0.85) / 0.15));
   let k = 0;
   const out: React.ReactNode[] = [];
   built.parts.forEach((p, pi) => {
     p.fills.forEach((f, fi) => {
+      if (fillO <= 0) return;
+      if (role) {
+        out.push(<path key={`f${pi}-${fi}`} d={f.d} fill={tone(f.c, f.o)} opacity={fillO} />);
+        return;
+      }
       const blink = f.blink === undefined ? 1 : Math.floor(t * 2.6 + f.blink * 11) % 4 === 0 ? 0.25 : 1;
-      if (fillO > 0) out.push(<path key={`f${pi}-${fi}`} d={f.d} fill={f.c} opacity={fillO * (f.o ?? 1) * blink} />);
+      out.push(<path key={`f${pi}-${fi}`} d={f.d} fill={f.c} opacity={fillO * (f.o ?? 1) * blink} />);
     });
     p.strokes.forEach((s, si) => {
-      const style = {stroke: s.c ?? LEAD, strokeWidth: s.w, fill: 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const};
+      const sc = strokeOf(s);
+      const style = {stroke: sc.c, strokeWidth: sc.w, fill: 'none', strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const};
       if (drawU >= 1) {
         out.push(<path key={`s${pi}-${si}`} d={s.d} {...style} />);
         return;
@@ -540,15 +579,17 @@ export const SketchIcon: React.FC<IconProps> = ({name, x, y, w, h, fill, text, l
       if (textO <= 0) return;
       const common = {x: tx.x, y: tx.y, fontSize: tx.size, fontWeight: 700, textAnchor: tx.anchor, fontFamily: captionFontStack};
       if (tx.onFill) {
-        if (fillO < 1) out.push(<text key={`tl${pi}-${ti}`} {...common} fill={LEAD} opacity={textO * (1 - fillO)}>{tx.s}</text>);
-        if (fillO > 0) out.push(<text key={`t${pi}-${ti}`} {...common} fill={tx.c} opacity={textO * fillO}>{tx.s}</text>);
-      } else out.push(<text key={`t${pi}-${ti}`} {...common} fill={tx.c} opacity={textO}>{tx.s}</text>);
+        if (fillO < 1) out.push(<text key={`tl${pi}-${ti}`} {...common} fill={textC(LEAD)} opacity={textO * (1 - fillO)}>{tx.s}</text>);
+        if (fillO > 0) out.push(<text key={`t${pi}-${ti}`} {...common} fill={textC(tx.c)} opacity={textO * fillO}>{tx.s}</text>);
+      } else out.push(<text key={`t${pi}-${ti}`} {...common} fill={textC(tx.c)} opacity={textO}>{tx.s}</text>);
     });
   });
   return (
     <>
       <g transform={built.rotate ? `rotate(${built.rotate} ${x + w / 2} ${y + hh / 2})` : undefined}>{out}</g>
-      {label ? (
+      {label && role ? (
+        <text x={x + w / 2} y={y + hh + 64} fontSize={60} fill={BOARD.ink} textAnchor="middle" fontFamily={captionFontStack}>{label}</text>
+      ) : label ? (
         <text x={x + w / 2} y={y + hh + 46} fontSize={34} fill={MUTED} textAnchor="middle" fontFamily={captionFontStack}>{label}</text>
       ) : null}
     </>

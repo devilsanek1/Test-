@@ -107,13 +107,14 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 | `figure` (head + trapezoid) · `f` parallax | a gesture figure from `pose` · `f` doesn't move anything; it sets the default `role` (`far` if f < 0.5) |
 | `shot.note` + top-left label · caption glow | the notes strip at y 1680-1900 · glow removed (the band is empty) |
 | `sketch.ts` overshoot and breaks | `over: 'small'` (`'none'` on the subject), `breaks: false`, `jitter` at most 0.8 |
-New props: `role?: 'subject'|'mid'|'far'` on every element, icons and figures included; `w?: number`, a rare stroke override;
+New props: `role?: 'subject'|'mid'|'far'` on every element, icons and figures included; `sw?: number`, a rare stroke override (`w` is already a width);
 figure `pose?: 'stand'|'walk'|'point'|'reach'|'hold'|'shrug'|'slump'|'lookup'|'sit'`, `facing?: 'l'|'r'`,
 `face?: 'none'|'happy'|'sad'|'shock'|'worried'`; text `strike?: boolean`; a new element `{t: 'mark', kind: 'circle'|'arrow'|'underline'|'frame',
 …, word?}` on the red annotation layer (5 px; `frame` = a dashed end-frame box with corner arrows), with `in` and `out` like any other element.
 **`board-lint` runs before every render.** Per shot it checks: at most 25 elements (warn at 30 to split); one subject group; at most 1 label and 1
 mark; text at least 48 px; fills from the palette only; nothing crossing y 290-600 except a `far` flat fill; the subject's box centred
-in x 380-700 and 270-460 px wide; the camera's zoom changing by at most 2x within a shot.
+in x 380-700 and 270-460 px wide (a tall subject such as a standing figure is measured by its height, 300-650 px); the camera's zoom
+changing by at most 2x within a shot. Implemented: `scripts/v3/board_lint.py` (props and defaults: the header of `src/v3/SketchReel.tsx`).
 
 ## Sources
 [1] https://www.moma.org/audio/playlist/192/2574 · [2] https://2719hyperion.com/2009/05/conversation-with-joe-ranft.html · [3] https://www.creativebloq.com/advice/storyboard-tips
