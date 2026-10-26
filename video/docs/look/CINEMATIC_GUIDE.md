@@ -52,6 +52,17 @@ Figure sizes are fractions of frame height, kept from Arcane's frame to ours (§
 **Mix for 30-45 s (14-18 shots):** 2-4 wides (1-2 scale: V4-V6); 5-7 wide-to-medium on our person with the object (V2,
 V3, V7); 5-7 close-ups or inserts (V8-V10); <= 1 ECU, <= 1 overhead (V11), <= 1 impact (V12); never two scale wides in a row.
 
+**Sketches (our 9:16 translation of each type; source data `public/look/cine_sketches.json`, render with the
+`ShotSketch` composition):**
+
+| V1 Establisher | V2 Refuge portal | V3 Silhouette before the light | V4 Tiny observer | V5 Worm's-eye colossus | V6 Vista back view |
+|---|---|---|---|---|---|
+| ![V1](cine_sketches/V1.png) | ![V2](cine_sketches/V2.png) | ![V3](cine_sketches/V3.png) | ![V4](cine_sketches/V4.png) | ![V5](cine_sketches/V5.png) | ![V6](cine_sketches/V6.png) |
+
+| V7 Low power | V8 Feeling close-up | V9 Symbol insert | V10 Lone light | V11 Institution high | V12 Impact |
+|---|---|---|---|---|---|
+| ![V7](cine_sketches/V7.png) | ![V8](cine_sketches/V8.png) | ![V9](cine_sketches/V9.png) | ![V10](cine_sketches/V10.png) | ![V11](cine_sketches/V11.png) | ![V12](cine_sketches/V12.png) |
+
 ## 3. Camera presets
 **In SketchReel (G3).** `camera.from` / `to` = `{x, y, z}`: the world point at the screen centre, and the scale; rest
 `{540, 960, 1}`. The end frame is the authored one (a pull starts zoomed in, lands at z 1). `s`, `e` = shot times; d = e - s.
