@@ -844,20 +844,25 @@ export const Speaker: React.FC<{x: number; y: number; w?: number; h?: number; se
   </>
 );
 
-/** Wood-grain strokes on the desk (4-8 long thin arcs, one flat step under the desk colour). */
+/** Wood-grain strokes on the desk: 4-8 short organic pairs (a wavy stroke and a shorter companion), the odd knot, one
+ *  flat step under the desk colour; never a long straight line (that reads as a table edge). */
 export const DeskGrain: React.FC<{x: number; y: number; w: number; h: number; n?: number; seed?: string; at?: At; color?: string}> = ({x, y, w, h, n = 6, seed = 'grain', at, color = GRAIN}) => {
   const r = rng(`grain/${seed}`);
   let d = '';
   for (let i = 0; i < n; i++) {
     const gy = y + r.range(0.05, 0.95) * h;
-    const gx = x + r.range(-0.1, 0.5) * w;
-    const len = w * r.range(0.25, 0.55);
-    const bow = r.range(-10, 10);
-    d += `M${gx.toFixed(1)} ${gy.toFixed(1)}Q${(gx + len / 2).toFixed(1)} ${(gy + bow).toFixed(1)} ${(gx + len).toFixed(1)} ${(gy + r.range(-4, 4)).toFixed(1)}`;
-    if (r.chance(0.35)) {
-      const kx = gx + len * r.range(0.3, 0.7);
-      d += ellipse(kx, gy + bow * 0.5, r.range(10, 18), r.range(4, 7), {seed: `${seed}/k${i}`});
-    }
+    const gx = x + r.range(0, 0.85) * w;
+    const len = Math.min(w * 0.3, r.range(110, 240));
+    const amp = r.range(3, 7);
+    const pts: Pt[] = [];
+    for (let k = 0; k <= 4; k++) pts.push([gx + (len * k) / 4, gy + Math.sin(k * 1.4 + i) * amp]);
+    d += smooth(pts);
+    // the companion stroke: shorter, offset 7-10 px
+    const off = r.range(7, 10);
+    const c0 = 1;
+    const c1 = r.chance(0.5) ? 3 : 4;
+    d += smooth(pts.slice(c0, c1 + 1).map(([px, py]) => [px, py + off] as Pt));
+    if (r.chance(0.3)) d += ellipse(gx + len * 0.55, gy + off * 0.5, r.range(9, 14), r.range(3.5, 5.5), {seed: `${seed}/k${i}`});
   }
   return <Ink d={d} at={at} width={W.hair} color={color} />;
 };

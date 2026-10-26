@@ -54,8 +54,9 @@ export function personGeo(seed: string | number, o: {torsoH?: number; legs?: boo
   const w = r.range(86, 100);
   const h = o.torsoH ?? (o.legs ? w * r.range(0.95, 1.08) : w * r.range(1.02, 1.16));
   const hr = w * r.range(0.23, 0.26);
+  const round = r.range(0.36, 0.45);
   const hy = -h - hr * 0.86;
-  return {w, h, hr, hy, headTop: hy - hr, legH: h * 0.62};
+  return {w, h, hr, hy, round, headTop: hy - hr, legH: h * 0.62};
 }
 
 // ---------------------------------------------------------------- WinterPerson
@@ -309,13 +310,23 @@ export const WinterPerson: React.FC<WinterPersonProps> = (props) => {
     );
   }
   if (wear.includes('snow')) {
-    // snow on the hat / head top and along both shoulders (it never grows into a beard)
+    // snow on the hat / head top, and on both shoulders CLIPPED to the coat's own silhouette (so it lies on the
+    // shoulder line and never floats past it; it never grows into a beard either)
     const capTop = rest.hair === 'beanie' ? hy - hr * 1.0 : hy - hr * 0.92;
+    const coat = torso(0, 0, g.w, g.h, g.round, 0.07);
+    const sid = `${clipId}s`;
     over.push(
       <g key="sn">
+        <defs>
+          <clipPath id={sid}>
+            <path d={coat} />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${sid})`}>
+          <path d={blob(-g.w * 0.3, -g.h + g.w * 0.02, g.w * 0.2, g.w * 0.07, {seed: fx('s1')})} fill={EMBER.snow} />
+          <path d={blob(g.w * 0.32, -g.h + g.w * 0.03, g.w * 0.18, g.w * 0.065, {seed: fx('s2')})} fill={EMBER.snow} />
+        </g>
         <path d={blob(hr * 0.1, capTop, hr * 0.62, hr * 0.2, {seed: fx('sh')})} fill={EMBER.snow} />
-        <path d={blob(-g.w * 0.27, -g.h + g.w * 0.025, g.w * 0.13, g.w * 0.035, {seed: fx('s1')})} fill={EMBER.snow} />
-        <path d={blob(g.w * 0.29, -g.h + g.w * 0.03, g.w * 0.11, g.w * 0.03, {seed: fx('s2')})} fill={EMBER.snow} />
       </g>,
     );
   }

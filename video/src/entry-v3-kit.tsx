@@ -5,12 +5,14 @@ import './v3/film/palette';
 import React from 'react';
 import {Composition, registerRoot} from 'remotion';
 import {KitSheet3, SHEET} from './v3/film/kit/KitSheet3';
-import {KitSheetLife, LIFE_SHEET} from './v3/film/kit/KitSheetLife';
+import {KitLifeFrame, KitSheetLife, LIFE_SHEET} from './v3/film/kit/KitSheetLife';
 
 const KitRoot: React.FC = () => (
   <>
     <Composition id="KitSheet3" component={KitSheet3} fps={60} width={SHEET.w} height={SHEET.h} durationInFrames={240} />
     <Composition id="KitSheetLife" component={KitSheetLife} fps={60} width={LIFE_SHEET.w} height={LIFE_SHEET.h} durationInFrames={240} />
+    <Composition id="KitLifeO1" component={KitLifeFrame} defaultProps={{which: 'o1' as const}} fps={60} width={1080} height={1920} durationInFrames={360} />
+    <Composition id="KitLifeS4" component={KitLifeFrame} defaultProps={{which: 's4' as const}} fps={60} width={1080} height={1920} durationInFrames={360} />
   </>
 );
 

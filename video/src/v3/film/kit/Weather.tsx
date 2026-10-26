@@ -7,8 +7,8 @@
 //   <SnowLayers x={180} y={630} w={720} h={430} layers={['far', 'mid', 'near']} seed="o1" />
 //   <SnowSill x0={180} x1={900} y={1060} />            <Frost x={180} y={630} w={720} h={430} corners={['bl', 'br']} />
 //   <Smoke x={520} y={990} />  <Steam x={..} y={..} />  <CoolingPlume x={..} y={..} ceil={600} />  <Exhaust .. />
-//   <NearRoofs x0={180} x1={900} y={1062} seed="o1" force={[{i: 2, t: 4.6, on: false}]} />
-//   <SkyClouds x0={-100} x1={1180} y0={60} y1={280} n={4} />   <CloudBank y={1010} h={70} />
+//   <NearFronts x0={180} x1={900} y={1062} seed="o1" force={[{i: 2, t: 4.6, on: false}]} />
+//   <SkyClouds x0={-100} x1={1180} y0={60} y1={280} n={4} />   <LowClouds y={1010} h={70} />
 //   <BirdV at={20} from={[80, 760]} to={[520, 690]} dur={2.2} />  <Icicles x0={0} x1={1080} y={262} n={6} drip />
 
 import React, {useMemo} from 'react';
@@ -177,18 +177,21 @@ export type PuffTrainProps = PuffOpts & {
   x: number;
   y: number;
   color?: string;
+  /** Puff shape: width / height of each puff (smoke trails 1.8, steam 1.1). */
+  stretch?: number;
   /** Hair ink round each puff (default none: smoke is fill-only). */
   ink?: number;
   at?: At;
 };
 
 /** A flat puff train: each puff grows, rises, drifts and shrinks to nothing (no fade), 2-3 s loop. */
-export const PuffTrain: React.FC<PuffTrainProps> = ({x, y, color = EMBER.skyLow, ink = 0, at, ...o}) => {
+export const PuffTrain: React.FC<PuffTrainProps> = ({x, y, color = EMBER.skyLow, ink = 0, at, stretch = 1.5, ...o}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const ps = puffs(t - (at ?? 0), o, y);
   let d = '';
-  for (const p of ps) d += blob(x + p.x, y + p.y, p.r * 1.25, p.r * 0.8, {seed: `${o.seed ?? 'pf'}/${Math.round(p.k * 7)}`});
+  const sx = Math.sqrt(stretch);
+  for (const p of ps) d += blob(x + p.x, y + p.y, p.r * sx, p.r / sx, {seed: `${o.seed ?? 'pf'}/${Math.round(p.k * 7)}`});
   if (!d) return null;
   return (
     <>
@@ -199,10 +202,10 @@ export const PuffTrain: React.FC<PuffTrainProps> = ({x, y, color = EMBER.skyLow,
 };
 
 /** Chimney smoke against the dusk sky: a lighter flat step, drifting right. */
-export const Smoke: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={7} life={2.8} rise={110} drift={52} r0={4} r1={13} wobble={3} {...p} color={p.color ?? EMBER.skyLow} />;
+export const Smoke: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={8} life={3} rise={90} drift={70} r0={3} r1={11} wobble={2} stretch={2.2} {...p} color={p.color ?? EMBER.skyLow} />;
 
 /** Steam (a mug, a vent, a coffee cup, a manhole): small white puffs rising straight. */
-export const Steam: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={4} life={1.8} rise={70} drift={4} r0={3} r1={9} wobble={5} {...p} color={p.color ?? EMBER.snow} />;
+export const Steam: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={4} life={1.8} rise={70} drift={4} r0={3} r1={9} wobble={5} stretch={1.1} {...p} color={p.color ?? EMBER.snow} />;
 
 /** The data center's cooling plume (one per roof unit): big slow puffs, never above `ceil` (default 600: the band). */
 export const CoolingPlume: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={8} life={3.4} rise={150} drift={34} r0={9} r1={24} wobble={5} ceil={600} {...p} color={p.color ?? EMBER.skyLow} />;
@@ -214,7 +217,7 @@ export const Exhaust: React.FC<{x: number; y: number; dir?: number; size?: numbe
 
 // ---------------------------------------------------------------- near house fronts (through a window)
 
-export type NearRoofsProps = {
+export type NearFrontsProps = {
   /** Extent and the ground line (the fronts stand on y; behind a window this is the glass's lower edge region). */
   x0: number;
   x1: number;
@@ -237,7 +240,7 @@ export type NearRoofsProps = {
 
 /** 2-4 house fronts face-on behind the window: varied gables and flat tops in the cold roofs blue, snowy roofs, 6-10
  *  warm lit windows on one switching schedule (2 with silhouettes), chimneys with smoke drifting right. Fill only. */
-export const NearRoofs: React.FC<NearRoofsProps> = ({x0, x1, y, h = [70, 110], n = 3, seed = 'near', far = true, smoke = true, sil = {1: 'cross', 4: 'read'}, force, gap, at}) => {
+export const NearFronts: React.FC<NearFrontsProps> = ({x0, x1, y, h = [70, 110], n = 3, seed = 'near', far = true, smoke = true, sil = {1: 'cross', 4: 'read'}, force, gap, at}) => {
   const t = useTime();
   const plan = useMemo(() => {
     const r = rng(`nearR/${seed}`);
@@ -326,7 +329,7 @@ export const SkyClouds: React.FC<SkyCloudsProps> = ({x0 = -200, x1 = 1280, y0 = 
 };
 
 /** A pale low snow-cloud bank on the horizon (S9: the dark hall and the mountain stand against the palest shape). */
-export const CloudBank: React.FC<{y: number; h?: number; x0?: number; x1?: number; color?: string; seed?: string; drift?: number}> = ({y, h = 70, x0 = -200, x1 = 1280, color = EMBER.skyLow, seed = 'bank', drift = 3}) => {
+export const LowClouds: React.FC<{y: number; h?: number; x0?: number; x1?: number; color?: string; seed?: string; drift?: number}> = ({y, h = 70, x0 = -200, x1 = 1280, color = EMBER.skyLow, seed = 'bank', drift = 3}) => {
   const t = useTime();
   const r = rng(`bank/${seed}`);
   const pts: Pt[] = [];
