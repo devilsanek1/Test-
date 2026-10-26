@@ -37,6 +37,32 @@ above its caption strip, fullness inside the art panel.
 
 Verdict per metric: PASS (at target), WARN (under target), FAR (far under target: gate_check --density fails on FAR
 at film level). Exit code: 0 (warnings never fail), 2 on bad input.
+
+COZY HOLDS (--cozy, opt-in: one more pass and a second table; the table above, its verdict, the exit code and
+gate_check are unchanged). Why: the cozy references are rated FAR on ev/s and gap yet never feel empty (one long walk
+is one event); a calm hold is judged on movers present, never-empty frames and steady change instead. Half canvas res
+(540 px wide), on the --rate clock, inside --crop, band and ignore strips left out:
+  camera        removed FIRST: one global 2D shift per frame (phase correlation of the largest measured row block
+                against an anchor frame, re-anchored when the match weakens). The track restarts at every scene start
+                and at a JUMP: > 15 % of the pixels changing in one frame after the shift (a loop seam, a zoom crane, a
+                flash) or a one-frame camera step > 4 canvas px and > 4x the recent steps (a player restart).
+  float         the camera's own speed: mean |velocity| of that shift over 0.27 s windows, canvas px/s at 1080.
+                Locked camera reads 0-1 (noise ~0.3); a visible but calm float 8-15; an invisible 1.4 % push-in 1-4.
+  chg           share of measured pixels changed over the last --cozy-span s (default 0.2) after the shift: a pixel
+                changed when it lies > --tau outside the range of the old frame's 3x3 neighbourhood (+-2 canvas px
+                absorbs sub-pixel shifts, a slow zoom and line wobble). A span, not one frame: screen recordings with
+                duplicate frames read the same as clean renders.
+  movers        moving blobs per frame (a proxy for moving figures): that change mask opened 3x3 (thin line boil
+                drops out), changed px within 16 canvas px form one blob, and a blob with >= 400 canvas px^2 changed
+                and a mean thickness (area / longest side) >= 6 canvas px is a mover. Still people do not count.
+  empty         share of frames with no mover.
+  cv            steadiness of change: std / mean of chg over the shot's frames (low = steady: no bursts, no lulls).
+  jumps         track restarts inside the shot (a draw-on, a seam, a crane: those frames are not a hold).
+  FILM row: movers and empty over all measured frames; cv and float are the median shot.
+  Cozy markers (! / !!) are a warning signal from two cozy references (docs/look/research/density_numbers.md): movers
+  >= 2 (!! < 1), empty <= 5 % (!! > 20 %), cv <= 0.75 (!! > 1.2); float has no target (river floats ~10 px/s, the
+  street is locked at 0: both cozy). The cozy column is informational and never changes the verdict or exit code.
+  python3 -I scripts/qa/density.py out/v3_g5.mp4 --scenes src/v3/film/scenes.json --cozy [--cozy-span 0.2] [--json d.json]
 """
 from __future__ import annotations
 
@@ -72,6 +98,16 @@ TARGETS = {
 EVENT = dict(merge=8, link=4, cont=0.3)
 MOTION_KEYS = ('evps', 'gap', 'static', 'run')
 FULL_KEYS = ('flat', 'obj', 'detail')
+# cozy holds (--cozy): markers only, never the verdict; measured on the river reference (movers 2.9, empty 0 %,
+# cv 0.14, float 10 px/s) and the street reference (0-7.9 s: movers 3.2, empty 0 %, cv 0.73, float 0.2 = locked)
+COZY_TARGETS = {
+    'movers': dict(kind='min', target=2.0, far=1.0, fmt='{:.1f}', why='cozy refs 2.9 (river) / 3.2 (street), never below 1'),
+    'empty':  dict(kind='max', target=0.05, far=0.20, fmt='{:.0%}', why='cozy refs: 0 % frames without a mover'),
+    'cv':     dict(kind='max', target=0.75, far=1.2, fmt='{:.2f}', why='river 0.14 (steady lane), street 0.73 (builds to a peak)'),
+}
+COZY_KEYS = tuple(COZY_TARGETS)
+# mover blob (canvas px): merge radius, min changed area (px^2), min mean thickness; jump thresholds; float window (s)
+COZY = dict(merge=16, area=400.0, thick=6.0, jump_frac=0.15, jump_step=4.0, jump_ratio=4.0, win=0.27, open=3)
 
 PRESETS = {
     # 9:16 house film: caption band in the sky, draft label / bottom UI strip ignored
@@ -298,12 +334,152 @@ def full_stats(fu: list[dict], s: float, e: float) -> dict:
         'flat_worst': float(max(r['flat'] for r in rows))}
 
 
+# ---------------------------------------------------------------- cozy holds (--cozy)
+
+def _maxc(im: np.ndarray) -> np.ndarray:
+    """Max over the colour channels (cv2: much faster than numpy's reduce on a 3-channel frame)."""
+    c = cv2.split(im)
+    return cv2.max(cv2.max(c[0], c[1]), c[2])
+
+
+def _shift(im: np.ndarray, d) -> np.ndarray:
+    """Translate an image by d = (dx, dy) px (content at x moves to x + d)."""
+    m = np.float32([[1, 0, d[0]], [0, 1, d[1]]])
+    return cv2.warpAffine(im, m, (im.shape[1], im.shape[0]), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+
+
+def _row_block(mask: np.ndarray) -> tuple[int, int]:
+    """The largest run of fully measured rows (the camera is tracked there, away from the caption band)."""
+    best, cur = (0, mask.shape[0]), None
+    best_n = 0
+    for y, v in enumerate(list(mask.all(axis=1)) + [False]):
+        if v and cur is None:
+            cur = y
+        elif not v and cur is not None:
+            if y - cur > best_n:
+                best, best_n = (cur, y), y - cur
+            cur = None
+    return best
+
+
+def cozy_pass(path: str, info: dict, a) -> dict:
+    """Per frame: camera track (canvas px), segment id, changed share over the span, movers (-1 = not measured)."""
+    width = CANVAS_W // 2
+    sc = width / CANVAS_W                          # analysis px per canvas px
+    k = max(1, int(round(a.cozy_span * a.rate)))
+    cut_frames = {int(math.ceil(s['start'] * a.rate - 1e-6)) for s in a.scene_list[1:]}
+    k3 = np.ones((3, 3), np.uint8)
+    kop = np.ones((COZY['open'], COZY['open']), np.uint8)
+    mr = max(1, int(round(COZY['merge'] * sc)))
+    kmg = cv2.getStructuringElement(cv2.MORPH_RECT, (2 * mr + 1, 2 * mr + 1))
+    min_area, min_thick = COZY['area'] * sc * sc, COZY['thick'] * sc
+    crit_resp = 0.15
+    traj, seg, chg, mov, jumps = [], [], [], [], []
+    buf: list[tuple] = []                          # (frame, track px, segment) of the last k + 1 frames
+    steps: list[float] = []
+    mask = R = win = anchor = prev = prev_g = None
+    off = np.zeros(2)
+    sid = 0
+    npx = 1
+    for i, (t, im) in enumerate(frames(path, info, width, a.rate, a.crop)):
+        if mask is None:
+            mask = region_mask(im.shape[0], im.shape[1], sc, a.crop, a.band, a.ignore)
+            npx = max(1, int(mask.sum()))
+            y0, y1 = _row_block(mask)
+            m = 12 if (y1 - y0) > 64 and im.shape[1] > 64 else 0
+            R = (slice(y0 + m, y1 - m), slice(m, im.shape[1] - m))
+        g = cv2.cvtColor(im, cv2.COLOR_RGB2GRAY).astype(np.float32)[R]
+        if win is None:
+            win = cv2.createHanningWindow((g.shape[1], g.shape[0]), cv2.CV_32F)
+        jump = i in cut_frames
+        if anchor is None:
+            anchor, p = g, np.zeros(2)
+        else:
+            (dx, dy), r = cv2.phaseCorrelate(anchor, g, win)
+            if r < crit_resp or abs(dx) > 0.1 * g.shape[1] or abs(dy) > 0.1 * g.shape[0]:
+                anchor, off = prev_g, traj[-1] * sc      # re-anchor on the last frame (a long or fast move)
+                (dx, dy), r = cv2.phaseCorrelate(anchor, g, win)
+            p = off + (dx, dy)
+            if not jump:
+                d = p - traj[-1] * sc
+                f1 = float(cv2.countNonZero(((_maxc(cv2.absdiff(im, _shift(prev, d))) > a.tau) & mask).astype(np.uint8))) / npx
+                step = float(np.hypot(*d)) / sc
+                med = float(np.median(steps[-15:])) if len(steps) >= 3 else 0.0
+                steps.append(step)
+                if f1 > COZY['jump_frac'] or (step > COZY['jump_step'] and step > COZY['jump_ratio'] * med + 1.0):
+                    jump = True
+                    jumps.append(i)
+        if jump:                                   # restart the track: new anchor, new segment
+            sid += 1
+            anchor, off, p, buf, steps = g, np.zeros(2), np.zeros(2), [], []
+        traj.append(np.asarray(p, float) / sc)
+        seg.append(sid)
+        prev, prev_g = im, g
+        buf.append((im, np.asarray(p, float), sid))
+        if len(buf) > k + 1:
+            buf.pop(0)
+        if len(buf) < k + 1 or buf[0][2] != sid:
+            chg.append(math.nan)
+            mov.append(-1)
+            continue
+        old, po, _ = buf[0]
+        d = p - po
+        w = _shift(old, d)
+        hi, lo = cv2.dilate(w, k3), cv2.erode(w, k3)
+        dd = _maxc(cv2.max(cv2.subtract(im, hi), cv2.subtract(lo, im)))
+        vm = mask.copy()
+        bx, by = int(math.ceil(abs(d[0]))) + 2, int(math.ceil(abs(d[1]))) + 2
+        vm[:by], vm[-by:], vm[:, :bx], vm[:, -bx:] = False, False, False, False
+        C = ((dd > a.tau) & vm).astype(np.uint8)
+        chg.append(float(cv2.countNonZero(C)) / max(1, int(vm.sum())))
+        C = cv2.morphologyEx(C, cv2.MORPH_OPEN, kop)
+        n, lab = cv2.connectedComponents(cv2.dilate(C, kmg), connectivity=8)
+        ys, xs = np.nonzero(C)
+        if not len(ys):
+            mov.append(0)
+            continue
+        ll = lab[ys, xs]
+        area = np.bincount(ll, minlength=n).astype(float)
+        x0, x1 = np.full(n, 1e9), np.full(n, -1e9)
+        z0, z1 = np.full(n, 1e9), np.full(n, -1e9)
+        np.minimum.at(x0, ll, xs)
+        np.maximum.at(x1, ll, xs)
+        np.minimum.at(z0, ll, ys)
+        np.maximum.at(z1, ll, ys)
+        ext = np.maximum(np.maximum(x1 - x0, z1 - z0) + 1, 1)
+        ok = (area >= min_area) & (area / ext >= min_thick)
+        mov.append(int(ok[1:].sum()))
+    return {'n': len(traj), 'rate': a.rate, 'span': a.cozy_span, 'traj': np.array(traj).reshape(-1, 2),
+            'seg': np.array(seg, int), 'chg': np.array(chg, float), 'mov': np.array(mov, int), 'jumps': jumps}
+
+
+def cozy_stats(cz: dict, s: float, e: float, trans: list) -> dict:
+    r, n = cz['rate'], cz['n']
+    idx = [i for i in range(int(math.ceil(s * r)), min(n, int(math.ceil(e * r))))
+           if cz['mov'][i] >= 0 and not any(t0 <= i / r < t1 for t0, t1 in trans)]
+    mv, ch = cz['mov'][idx], cz['chg'][idx]
+    h = max(1, int(round(COZY['win'] * r / 2)))
+    sp = [float(np.hypot(*(cz['traj'][i + h] - cz['traj'][i - h]))) / (2 * h / r)
+          for i in range(max(h, int(math.ceil(s * r)) + h), min(n - h, int(math.ceil(e * r)) - h))
+          if cz['seg'][i - h] == cz['seg'][i + h]]
+    nan = math.nan
+    return {'frames': len(idx),
+            'movers': float(mv.mean()) if len(mv) else nan,
+            'movers_min': int(mv.min()) if len(mv) else -1, 'movers_max': int(mv.max()) if len(mv) else -1,
+            'movers_p10': float(np.percentile(mv, 10)) if len(mv) else nan,
+            'empty': float((mv == 0).mean()) if len(mv) else nan,
+            'chg': float(ch.mean()) if len(ch) else nan,
+            'cv': float(ch.std() / ch.mean()) if len(ch) > 1 and ch.mean() > 0 else nan,
+            'float': float(np.mean(sp)) if sp else nan, 'float_peak': float(np.percentile(sp, 95)) if sp else nan,
+            'jumps': int(sum(1 for j in cz['jumps'] if s <= j / r < e))}
+
+
 # ---------------------------------------------------------------- verdicts and printing
 
-def verdict(key: str, v: float, film: bool = False) -> str:
+def verdict(key: str, v: float, film: bool = False, table: dict = TARGETS) -> str:
     if v is None or (isinstance(v, float) and math.isnan(v)):
         return '-'
-    T = TARGETS[key]
+    T = table[key]
     tgt, far = (T['target'], T['far']) if film or 'shot' not in T else T['shot']
     if T['kind'] == 'min':
         return 'PASS' if v >= tgt else 'FAR' if v < far else 'WARN'
@@ -317,11 +493,11 @@ def worst(vs: list[str]) -> str:
     return '-'
 
 
-def cell(key: str, v: float, film: bool = False) -> str:
+def cell(key: str, v: float, film: bool = False, table: dict = TARGETS) -> str:
     if v is None or (isinstance(v, float) and math.isnan(v)):
         return '-'
-    s = TARGETS[key]['fmt'].format(v)
-    vd = verdict(key, v, film)
+    s = table[key]['fmt'].format(v)
+    vd = verdict(key, v, film, table)
     return s + ('' if vd == 'PASS' else '!' if vd == 'WARN' else '!!')
 
 
@@ -343,14 +519,15 @@ def load_scenes(path, dur: float) -> list[dict]:
 
 def analyze(mp4: str, scenes: str | None = None, preset: str = 'auto', rate: float = 30.0, sample: float = 0.25,
             tau: float = 24.0, band=None, ignore=None, crop=None, fcrop=None, only: str | None = None,
-            quiet: bool = False) -> dict:
-    """Measure one video. Returns {'preset', 'shots': [...], 'film': {...}, 'verdict'}; prints the table unless quiet."""
+            quiet: bool = False, cozy: bool = False, cozy_span: float = 0.2) -> dict:
+    """Measure one video. Returns {'preset', 'shots': [...], 'film': {...}, 'verdict'}; prints the table unless quiet.
+    cozy=True adds r['cozy'] to every shot and the film (cozy-hold metrics, see the module doc); nothing else changes."""
     info = probe(mp4)
     if preset == 'auto':
         ar = info['h'] / info['w']
         preset = 'film' if abs(ar - 16 / 9) < 0.02 else 'ref1' if abs(ar - 1.25) < 0.02 else 'whole'
     P = dict(PRESETS[preset])
-    a = argparse.Namespace(rate=rate, sample=sample, tau=tau, hold=2 / 30, event_vox=500.0,
+    a = argparse.Namespace(rate=rate, sample=sample, tau=tau, hold=2 / 30, event_vox=500.0, cozy_span=cozy_span,
                            crop=crop if crop is not None else P['crop'], fcrop=fcrop if fcrop is not None else (P['fcrop'] or crop or P['crop']),
                            band=band if band is not None else P['band'], ignore=ignore if ignore is not None else P['ignore'])
     if a.band in ((), (0, 0)):
@@ -358,6 +535,7 @@ def analyze(mp4: str, scenes: str | None = None, preset: str = 'auto', rate: flo
     a.scene_list = load_scenes(scenes, info['dur'])
     mo = motion_pass(mp4, info, a)
     fu = fullness_pass(mp4, info, a)
+    cz = cozy_pass(mp4, info, a) if cozy else None
     shots = []
     for sc in a.scene_list:
         if only and sc['id'] != only:
@@ -367,6 +545,11 @@ def analyze(mp4: str, scenes: str | None = None, preset: str = 'auto', rate: flo
         r.update(full_stats(fu, sc['start'], sc['end']))
         r['verdicts'] = {k: verdict(k, r[k]) for k in MOTION_KEYS + FULL_KEYS}
         r['verdict'] = worst(list(r['verdicts'].values()))
+        if cz is not None:
+            c = cozy_stats(cz, sc['start'], sc['end'], sc['trans'])
+            c['verdicts'] = {k: verdict(k, c[k], table=COZY_TARGETS) for k in COZY_KEYS}
+            c['verdict'] = worst(list(c['verdicts'].values()))
+            r['cozy'] = c
         shots.append(r)
     # film summary: time-weighted means; gap / run = the worst shot; ev/s = all events / all time
     tot = sum(r['e'] - r['s'] for r in shots) or 1.0
@@ -384,11 +567,50 @@ def analyze(mp4: str, scenes: str | None = None, preset: str = 'auto', rate: flo
     vs = [('WARN' if v == 'FAR' and k in ('gap', 'run') else v) for k, v in film['verdicts'].items()]
     film['verdict'] = worst(vs + ['WARN' if any(r['verdict'] != 'PASS' for r in shots) else 'PASS'])
     film['far'] = [k for k, v in film['verdicts'].items() if v == 'FAR' and k not in ('gap', 'run')]
+    if cz is not None:
+        film['cozy'] = cozy_film(shots)
     res = {'mp4': mp4, 'preset': preset, 'info': info, 'shots': shots, 'film': film, 'verdict': film['verdict'],
            'regions': {'crop': a.crop, 'fcrop': a.fcrop, 'band': a.band, 'ignore': a.ignore}}
     if not quiet:
         print_table(res)
+        if cz is not None:
+            print_cozy(res, cozy_span)
     return res
+
+
+def cozy_film(shots: list[dict]) -> dict:
+    """Film row of the cozy table: movers / empty over all measured frames; cv and float = the median shot."""
+    cs = [r['cozy'] for r in shots if r['cozy']['frames']]
+    nf = sum(c['frames'] for c in cs) or 1
+    med = (lambda k: float(np.median([c[k] for c in cs if not math.isnan(c[k])])) if any(not math.isnan(c[k]) for c in cs) else math.nan)
+    f = {'frames': sum(c['frames'] for c in cs),
+         'movers': sum(c['movers'] * c['frames'] for c in cs) / nf if cs else math.nan,
+         'movers_min': min((c['movers_min'] for c in cs), default=-1), 'movers_max': max((c['movers_max'] for c in cs), default=-1),
+         'empty': sum(c['empty'] * c['frames'] for c in cs) / nf if cs else math.nan,
+         'chg': sum(c['chg'] * c['frames'] for c in cs) / nf if cs else math.nan,
+         'cv': med('cv'), 'float': med('float'), 'float_peak': med('float_peak'), 'jumps': sum(c['jumps'] for c in cs)}
+    f['verdicts'] = {k: verdict(k, f[k], True, COZY_TARGETS) for k in COZY_KEYS}
+    f['verdict'] = worst(list(f['verdicts'].values()))
+    return f
+
+
+def print_cozy(res: dict, span: float) -> None:
+    print(f"cozy holds: camera shift removed first, change over {span:.2f} s (informational: never changes the verdict)")
+    hdr = f"{'shot':8} {'time':>11} {'movers':>7} {'min-max':>8} {'empty':>6} {'cv':>6} {'chg':>6} {'float px/s':>11} {'jumps':>6}  cozy"
+    print(hdr)
+    print('-' * len(hdr))
+    for r in res['shots'] + [res['film']]:
+        if r['id'] == 'FILM':
+            print('-' * len(hdr))
+        c = r['cozy']
+        t = f"{r['s']:5.2f}-{r['e']:5.2f}"
+        q = (lambda k: cell(k, c[k], r['id'] == 'FILM', COZY_TARGETS))
+        mm = f"{c['movers_min']}-{c['movers_max']}" if c['movers_min'] >= 0 else '-'
+        fl = '-' if math.isnan(c['float']) else f"{c['float']:.1f}" + (f" ({c['float_peak']:.0f})" if not math.isnan(c['float_peak']) else '')
+        ch = '-' if math.isnan(c['chg']) else f"{c['chg']:.1%}"
+        print(f"{r['id']:8} {t:>11} {q('movers'):>7} {mm:>8} {q('empty'):>6} {q('cv'):>6} {ch:>6} {fl:>11} {c['jumps']:>6}  {c['verdict']}")
+    tg = '  '.join(f"{k} {'>=' if T['kind'] == 'min' else '<='}{T['fmt'].format(T['target'])}" for k, T in COZY_TARGETS.items())
+    print(f"cozy marks: {tg}   (! / !!; float = mean (p95) camera px/s at 1080: river ref ~10, street ref 0 = locked)")
 
 
 def print_table(res: dict) -> None:
@@ -426,6 +648,8 @@ def main() -> int:
     ap.add_argument('--sample', type=float, default=0.25, help='fullness: one frame every this many seconds')
     ap.add_argument('--tau', type=float, default=24.0, help='change threshold (8-bit, max over RGB)')
     ap.add_argument('--json', help='write the results here')
+    ap.add_argument('--cozy', action='store_true', help='also measure the cozy-hold metrics (camera float, movers, empty frames, cv)')
+    ap.add_argument('--cozy-span', type=float, default=0.2, help='cozy: change is measured over this many seconds (default 0.2)')
     a = ap.parse_args()
     tup = (lambda s: tuple(float(x) for x in s.split(',')))
     band = None if a.band is None else (() if a.band == 'none' else tup(a.band))
@@ -434,7 +658,7 @@ def main() -> int:
         print(f'density: no such file {a.mp4}', file=sys.stderr)
         return 2
     res = analyze(a.mp4, a.scenes, a.preset, a.rate, a.sample, a.tau, band, ignore,
-                  tup(a.crop) if a.crop else None, tup(a.fcrop) if a.fcrop else None, a.only)
+                  tup(a.crop) if a.crop else None, tup(a.fcrop) if a.fcrop else None, a.only, cozy=a.cozy, cozy_span=a.cozy_span)
     if a.json:
         Path(a.json).write_text(json.dumps(res, indent=1, default=lambda o: sorted(o) if isinstance(o, set) else str(o)))
     return 0

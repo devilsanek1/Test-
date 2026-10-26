@@ -58,3 +58,12 @@ two-thirds flat with a tenth of the references' detail and almost no new motion:
 
 Caveats: events are a proxy (+-20 %); keep `--rate 30` (the targets live on a 30 fps clock: at 60 the same v3 cut
 reads 45 % static). Fullness reads edges at 540 px wide: measure half-scale renders or better.
+
+## Cozy holds (`--cozy`, added 2026-10-26)
+
+Camera shift removed first; movers = moving blobs per frame; empty = frames with no mover; cv = std / mean of changed pixels per
+frame; float = camera px/s at 1080 (method in the script header). **River ref** (cozy3, crop 61,61,1019,2004): movers 2.9 (1-5),
+empty 0 %, cv 0.14, float 10.1 px/s · **street ref** (cozy2, 0-7.9 s, crop 92,92,988,1748): movers 3.2 (1-7), empty 0 %, cv 0.73
+(builds to a bus-and-car peak), float 0.2 (locked) · **v3 G5**: movers 1.0, empty 56 % (11 of 14 shots >= 37 %, S13 100 %), cv
+1.13 (median shot; 7 shots > 1.2), float 2.3 px/s (the invisible 1.4 % push-in; S9 crane 54). Both cozy refs PASS, v3 is FAR
+everywhere except S10. Reading: the calm refs always show 2-4 figures in motion; v3's holds show none for half their frames.
