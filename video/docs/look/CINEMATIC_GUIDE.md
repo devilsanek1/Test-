@@ -94,7 +94,7 @@ parallax; `y` / `x` = crane / truck; `<Layer depth={1 - f}>`. Check every move w
 | P9 | **High widen** | pull 2-6.5 %, centred; never a push | 2.7-4 | `linear` / linear or `CAM.slow` | `{from:{x:540,y:960,z:1.04},to:{x:540,y:960,z:1},ease:'linear'}` | V11 |
 | P10 | **Shake / lurch** | impact: 2 frames of 6-15 px, decaying in <= 0.25 s; lurch: roll <= 6° + tilt <= 0.07 H (130 px) in 0.5 s (more only under a smear) | contact frames | label only / `add` | none (SketchReel has no roll; write it in the label) | contact frames, one per beat |
 
-**SketchReel gaps (proposals, each under half a day):** the eases `unveil` (`trapezoid(0.1, 0.6)`) and `inQuad`; a per-element
+**SketchReel gaps, CLOSED 2026-10-26:** per-element `f` (true parallax; the end frame is exact for every f), eases `unveil` and `inQuad`, transitions `dip` and `flash`, `transition.dur`, camera roll `r`. Were: the eases `unveil` (`trapezoid(0.1, 0.6)`) and `inQuad`; a per-element
 `f` (real parallax at G3); the transitions `dip` and `flash`; a dissolve length (T10 needs 0.5-0.8 s; it is fixed at 0.2 s).
 
 ## 4. Composition and depth in 9:16

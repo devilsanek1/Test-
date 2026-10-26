@@ -9,22 +9,27 @@ import {captionFontStack, useCaptionFont} from '../lib/font';
 import {arrow, ellipse, hatch, poly, rect} from '../lib/sketch';
 
 type Fill = 'warm' | 'cold' | 'dark' | 'paper' | 'pop';
-export type El =
+/** f = depth factor for parallax (1 = moves with the camera, 0 = fixed far plane, > 1 = foreground); the authored end frame is exact for every f. */
+type Depth = {f?: number};
+export type El = Depth & (
   | {t: 'rect'; x: number; y: number; w: number; h: number; fill?: Fill; label?: string; in?: number}
   | {t: 'ellipse'; cx: number; cy: number; rx: number; ry: number; fill?: Fill; label?: string; in?: number}
   | {t: 'line'; pts: [number, number][]; closed?: boolean; fill?: Fill; in?: number}
   | {t: 'arrow'; x1: number; y1: number; x2: number; y2: number; in?: number}
   | {t: 'hatch'; x: number; y: number; w: number; h: number; in?: number}
   | {t: 'figure'; x: number; y: number; h: number; in?: number}
-  | {t: 'text'; x: number; y: number; text: string; size?: number; in?: number};
-type Cam = {x: number; y: number; z: number};
+  | {t: 'text'; x: number; y: number; text: string; size?: number; in?: number});
+/** r = roll in degrees (CINEMATIC_GUIDE: <= 2 deg drift, <= 6 deg in action). */
+type Cam = {x: number; y: number; z: number; r?: number};
+type Ease = 'inout' | 'out' | 'in' | 'linear' | 'unveil' | 'inQuad';
 export type Shot = {
   id: string;
   s: number;
   e: number;
   note: string;
-  transition: {type: 'cut' | 'dissolve' | 'push-through' | 'match-cut' | 'wipe'; label?: string};
-  camera: {from: Cam; to: Cam; ease?: 'inout' | 'out' | 'in' | 'linear'; start?: number; end?: number};
+  /** dur = transition length in s (dissolve default 0.2; T10 slow dissolve 0.5-0.8); dip = through dark, flash = through white. */
+  transition: {type: 'cut' | 'dissolve' | 'push-through' | 'match-cut' | 'wipe' | 'dip' | 'flash'; label?: string; dur?: number};
+  camera: {from: Cam; to: Cam; ease?: Ease; start?: number; end?: number};
   els: El[];
   moves?: {el: number; dx: number; dy: number; at: number; dur: number}[];
 };
@@ -48,13 +53,30 @@ const FILLS: Record<Fill, string> = {warm: '#f2d49b', cold: '#bac3ce', dark: '#5
 const CAPTION_TOP = 300;
 const MAX_CHARS = 16;
 
-const EASE = {inout: Easing.inOut(Easing.sin), out: Easing.out(Easing.cubic), in: Easing.in(Easing.cubic), linear: (x: number) => x};
+// unveil = trapezoid(0.1, 0.6): accelerate over the first 10 %, cruise, decelerate over the last 60 % (Arcane's reveals)
+const trapezoid = (a: number, d: number) => {
+  const v = 1 / (1 - a / 2 - d / 2);
+  return (u: number) => (u < a ? (v * u * u) / (2 * a) : u <= 1 - d ? v * (u - a / 2) : 1 - (v * (1 - u) * (1 - u)) / (2 * d));
+};
+const EASE: Record<Ease, (x: number) => number> = {
+  inout: Easing.inOut(Easing.sin), out: Easing.out(Easing.cubic), in: Easing.in(Easing.cubic), linear: (x: number) => x,
+  unveil: trapezoid(0.1, 0.6), inQuad: Easing.in(Easing.quad),
+};
 
 function camAt(shot: Shot, t: number): Cam {
   const {from, to, ease = 'inout', start = shot.s, end = shot.e} = shot.camera;
   const u = interpolate(t, [start, Math.max(start + 0.01, end)], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: EASE[ease]});
-  return {x: from.x + (to.x - from.x) * u, y: from.y + (to.y - from.y) * u, z: from.z + (to.z - from.z) * u};
+  return {x: from.x + (to.x - from.x) * u, y: from.y + (to.y - from.y) * u, z: from.z + (to.z - from.z) * u,
+    r: (from.r ?? 0) + ((to.r ?? 0) - (from.r ?? 0)) * u};
 }
+
+/** camera for a plane at depth factor f: the same end frame, f times the move */
+function camForDepth(shot: Shot, c: Cam, f: number): Cam {
+  const e = shot.camera.to;
+  return {x: e.x + (c.x - e.x) * f, y: e.y + (c.y - e.y) * f, z: e.z * Math.pow(c.z / e.z, f), r: c.r};
+}
+
+const camTf = (c: Cam) => `translate(${W / 2} ${H / 2}) rotate(${c.r ?? 0}) scale(${c.z}) translate(${-c.x} ${-c.y})`;
 
 const Element: React.FC<{el: El; t: number; shot: Shot; i: number}> = ({el, t, shot, i}) => {
   const appear = el.in === undefined ? 1 : interpolate(t - shot.s, [el.in, el.in + 0.1], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp'});
@@ -126,11 +148,14 @@ const Element: React.FC<{el: El; t: number; shot: Shot; i: number}> = ({el, t, s
 
 export const ShotView: React.FC<{shot: Shot; t: number}> = ({shot, t}) => {
   const c = camAt(shot, t);
-  const tf = `translate(${W / 2} ${H / 2}) scale(${c.z}) translate(${-c.x} ${-c.y})`;
   return (
     <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{position: 'absolute', inset: 0}}>
       <rect width={W} height={H} fill={PAPER} />
-      <g transform={tf}>{shot.els.map((el, i) => <Element key={i} el={el} t={t} shot={shot} i={i} />)}</g>
+      {shot.els.map((el, i) => (
+        <g key={i} transform={camTf(el.f === undefined || el.f === 1 ? c : camForDepth(shot, c, el.f))}>
+          <Element el={el} t={t} shot={shot} i={i} />
+        </g>
+      ))}
     </svg>
   );
 };
@@ -162,7 +187,7 @@ export const SketchReel: React.FC<{data: Animatic}> = ({data}) => {
   const prev = shots[k - 1];
   const since = t - shot.s;
   const tr = shot.transition.type;
-  const dur = tr === 'dissolve' ? 0.2 : tr === 'push-through' ? 0.3 : tr === 'wipe' ? 0.25 : 0;
+  const dur = shot.transition.dur ?? (tr === 'dissolve' ? 0.2 : tr === 'push-through' ? 0.3 : tr === 'wipe' ? 0.25 : tr === 'dip' ? 0.3 : tr === 'flash' ? 0.12 : 0);
   const inTr = prev && dur > 0 && since < dur;
   const u = inTr ? since / dur : 1;
 
@@ -187,7 +212,7 @@ export const SketchReel: React.FC<{data: Animatic}> = ({data}) => {
       {inTr && tr === 'push-through' ? (
         <div style={{position: 'absolute', inset: 0, transform: `scale(${1 + 0.4 * u})`, opacity: 1 - u}}><ShotView shot={prev} t={t} /></div>
       ) : null}
-      <div style={{position: 'absolute', inset: 0, opacity: inTr && tr !== 'wipe' ? u : 1,
+      <div style={{position: 'absolute', inset: 0, opacity: inTr && tr !== 'wipe' && tr !== 'dip' && tr !== 'flash' ? u : 1,
         clipPath: inTr && tr === 'wipe' ? `inset(0 ${100 - u * 100}% 0 0)` : undefined}}>
         <ShotView shot={shot} t={t} />
       </div>
@@ -197,6 +222,12 @@ export const SketchReel: React.FC<{data: Animatic}> = ({data}) => {
         </div>
       ) : null}
 
+      {inTr && (tr === 'dip' || tr === 'flash') && u < 0.5 ? (
+        <div style={{position: 'absolute', inset: 0}}><ShotView shot={prev} t={t} /></div>
+      ) : null}
+      {inTr && (tr === 'dip' || tr === 'flash') ? (
+        <div style={{position: 'absolute', inset: 0, background: tr === 'dip' ? '#2a2420' : '#ffffff', opacity: 1 - Math.abs(2 * u - 1)}} />
+      ) : null}
       {t < data.frame0Until && (
         <div style={{position: 'absolute', top: CAPTION_TOP - 160, left: 60, right: 60, textAlign: 'center', fontSize: 86, fontWeight: 700,
           lineHeight: 1.05, color: LEAD}}>{data.frame0}</div>
