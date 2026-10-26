@@ -42,7 +42,9 @@ export const Snowfall: React.FC<{x: number; y: number; w: number; h: number; n?:
 
 // ---------------------------------------------------------------- the town band
 
-export type HouseSpec = {x: number; w: number; h?: number; lit?: boolean; chimney?: boolean};
+/** One house: left x, width, body height (default 0.62 w), a lit window, a chimney, and its own ground line `y`
+ *  (default: the band's; a hill town steps up house by house). */
+export type HouseSpec = {x: number; w: number; h?: number; lit?: boolean; chimney?: boolean; y?: number};
 
 /** Snow-capped pitched-roof houses standing on the ground line `y` (two by default, as on the board's horizon).
  *  `far`: fill only (behind a window or far in a wide); otherwise thin ink. */
@@ -71,7 +73,7 @@ export const TownBand: React.FC<{y: number; houses?: HouseSpec[]; x0?: number; x
     <>
       {ground ? <Fill rect={[-200, y, 1480, groundH]} color={ground} at={at} mode="snap" offset={false} /> : null}
       {list.map((hs, i) => (
-        <House key={i} {...hs} y={y} far={far} at={b(at, i * 0.04)} seed={`${seed}/${i}`} />
+        <House key={i} {...hs} y={hs.y ?? y} far={far} at={b(at, i * 0.04)} seed={`${seed}/${i}`} />
       ))}
     </>
   );
@@ -105,7 +107,7 @@ export type DataCenterProps = {
   /** Base centre (canvas px): the building stands on y. */
   x: number;
   y: number;
-  /** Width (px). Board sizes: 436 in the window (O1, S15), 370 far (S13), 1290 hall (S9), 330 (S10), 240 (S9b). */
+  /** Width (px). Board sizes: 436 in the window (O1, S15), 370 far (S13), 1290 hall, 330 (S10), 340 dark (S9 end). */
   w: number;
   /** Height (default by variant: 0.7 w; hall 0.4 w; mini 0.62 w). */
   h?: number;
@@ -128,21 +130,24 @@ export type DataCenterProps = {
   seed?: string;
   /** Screen ink weight (default 3.4; far = none). */
   ink?: number;
+  /** Sign panel height (px; default by variant). A small building far in a wide (S9's 340 px hall at the end of the
+   *  pull-back) takes a taller panel so its letters stay ~40 px. */
+  signH?: number;
 };
 
-export function dataCenterGeo(x: number, y: number, w: number, h?: number, variant: DataCenterVariant = 'normal') {
+export function dataCenterGeo(x: number, y: number, w: number, h?: number, variant: DataCenterVariant = 'normal', signH?: number) {
   const H = h ?? (variant === 'hall' ? w * 0.4 : variant === 'mini' ? w * 0.62 : w * 0.7);
   const top = y - H;
   // the mini (the tag's back) carries a short sign ("AI") on a taller panel so it reads at phone size
-  const signH = variant === 'hall' ? H * 0.17 : variant === 'mini' ? H * 0.28 : H * 0.2;
-  const sign = {x: x - w * 0.43, y: top + H * 0.1, w: w * 0.86, h: signH};
+  const sH = signH ?? (variant === 'hall' ? H * 0.17 : variant === 'mini' ? H * 0.28 : H * 0.2);
+  const sign = {x: x - w * 0.43, y: top + H * 0.1, w: w * 0.86, h: sH};
   return {H, top, sign, x0: x - w / 2, x1: x + w / 2};
 }
 
-export const DataCenter: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4}) => {
+export const DataCenter: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH}) => {
   const t = useTime();
   const variant: DataCenterVariant = darkAt !== undefined && t >= darkAt ? 'dark' : v0;
-  const g = dataCenterGeo(x, y, w, h, v0);
+  const g = dataCenterGeo(x, y, w, h, v0, signH);
   const far = variant === 'far';
   const mini = variant === 'mini';
   const dark = variant === 'dark';
@@ -183,7 +188,7 @@ export const DataCenter: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 =
   }
   const outline: Pt[] = [[g.x0, y], [g.x0, g.top], [g.x1, g.top], [g.x1, y]];
   const signText = sign === null ? null : sign;
-  const signSize = Math.min(g.sign.h * 0.78, w * (mini ? 0.2 : 0.13));
+  const signSize = Math.min(g.sign.h * 0.78, w * (mini ? 0.2 : signH !== undefined ? 0.16 : 0.13));
   return (
     <>
       {/* roof units (behind the parapet line) */}
@@ -234,17 +239,23 @@ export const DataCenter: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 =
   );
 };
 
-// ---------------------------------------------------------------- our roof ledge (S9 foreground)
+// ---------------------------------------------------------------- our roof: the ledge (parapet) and a vent
 
 export type RoofLedgeProps = {
   /** Top of the coping lip (canvas px). The mass runs down past the frame bottom. */
   y: number;
   x0?: number;
   x1?: number;
-  /** Mass height below the lip (default 1400: always past the bottom). */
+  /** Mass height below the lip (default 1400: always past the bottom). S9's parapet seen from behind: its face. */
   h?: number;
   /** The vent's centre x (null = none). */
   ventX?: number | null;
+  /** Snow coping lip height (default 36). */
+  lipH?: number;
+  /** Brick ticks on the face (default 9). */
+  bricks?: number;
+  /** Fills exactly on the linework (no misregistration): for a ledge drawn small and shown big (a pull-back plane). */
+  exact?: boolean;
   at?: At;
   seed?: string;
   ink?: number;
@@ -252,40 +263,56 @@ export type RoofLedgeProps = {
 
 /** Our building's roof parapet: warm brick (our side is warm), a light snow coping lip, one vent with a snow cap; cut
  *  by both side edges. Front ink (4.8). */
-export const RoofLedge: React.FC<RoofLedgeProps> = ({y, x0 = -60, x1 = 1140, h = 1400, ventX = 220, at, seed = 'ledge', ink = 4.8}) => {
-  const lipH = 36;
+export const RoofLedge: React.FC<RoofLedgeProps> = ({y, x0 = -60, x1 = 1140, h = 1400, ventX = 220, lipH = 36, bricks: nBricks = 9, exact, at, seed = 'ledge', ink = 4.8}) => {
   const r = rng(`ledge/${seed}`);
-  // a few brick ticks on the parapet face (short marks, not a pattern)
+  const off = exact ? false : undefined;
+  // a few brick ticks on the parapet face (short marks, not a pattern), kept inside the face
   let bricks = '';
-  for (let i = 0; i < 9; i++) {
+  for (let i = 0; i < nBricks; i++) {
     const bx = r.range(x0 + 60, x1 - 60);
-    const by = y + lipH + r.range(30, 220);
+    const by = y + lipH + r.range(Math.min(30, h * 0.3), Math.min(220, h * 0.6));
     bricks += line(bx, by, bx + r.range(26, 44), by, {over: [0, 0], seed: `${seed}/bk${i}`});
-    if (r.chance(0.5)) bricks += line(bx + 14, by, bx + 14, by + 18, {over: [0, 0], seed: `${seed}/bv${i}`});
+    if (r.chance(0.5)) bricks += line(bx + 14, by, bx + 14, by + Math.min(18, h * 0.3), {over: [0, 0], seed: `${seed}/bv${i}`});
   }
-  const vent = ventX === null ? null : (() => {
-    const vx = ventX;
-    const vw = 64;
-    const vh = 70;
-    const vy = y - vh;
-    const cap: Pt[] = [[vx - vw * 0.75, vy], [vx + vw * 0.75, vy], [vx + vw * 0.55, vy - 22], [vx - vw * 0.55, vy - 22]];
-    return (
-      <>
-        <Fill rect={[vx - vw / 2, vy, vw, vh + 4]} color={EMBER.brickShade} at={fillAt(at, 0.04)} seed={`${seed}/v`} />
-        <Fill d={polyPath(cap)} color={EMBER.anchor} at={fillAt(at, 0.06)} seed={`${seed}/vc`} />
-        <Fill d={blob(vx, vy - 24, vw * 0.5, 9, {seed: `${seed}/vs`})} color={EMBER.snow} at={fillAt(at, 0.08)} offset={false} />
-        <Ink d={vline(vx - vw / 2, vy, y, {over: [0, 0], seed: `${seed}/v1`}) + vline(vx + vw / 2, vy, y, {over: [0, 0], seed: `${seed}/v2`}) + poly(cap, {closed: true, seed: `${seed}/vcI`, over: [1, 4]})} at={b(at, 0.04)} width={ink * 0.8} />
-      </>
-    );
-  })();
   return (
     <>
-      {vent}
-      <Fill rect={[x0, y + lipH, x1 - x0, h]} color={EMBER.brick} at={fillAt(at)} seed={`${seed}/mass`} />
-      <Fill rect={[x0, y, x1 - x0, lipH]} color={EMBER.snow} at={fillAt(at, 0.03)} seed={`${seed}/lip`} />
-      <Fill rect={[x0, y + lipH, x1 - x0, 14]} color={EMBER.brickShade} at={fillAt(at, 0.05)} offset={false} />
+      {ventX === null ? null : <RoofVent x={ventX} y={y} at={at} seed={seed} ink={ink * 0.8} exact={exact} />}
+      <Fill rect={[x0, y + lipH, x1 - x0, h]} color={EMBER.brick} at={fillAt(at)} offset={off} seed={`${seed}/mass`} />
+      <Fill rect={[x0, y, x1 - x0, lipH]} color={EMBER.snow} at={fillAt(at, 0.03)} offset={off} seed={`${seed}/lip`} />
+      <Fill rect={[x0, y + lipH, x1 - x0, Math.min(14, h * 0.25)]} color={EMBER.brickShade} at={fillAt(at, 0.05)} offset={false} />
       <Ink d={hline(x0, x1, y, {seed: `${seed}/t`, over: 'structural'}) + hline(x0, x1, y + lipH, {seed: `${seed}/b`, over: 'medium'})} at={at} width={ink} />
       <Ink d={bricks} at={b(at, 0.12)} width={2.2} />
+    </>
+  );
+};
+
+export type RoofVentProps = {
+  /** Body centre x and the roof line it stands on (canvas px). */
+  x: number;
+  y: number;
+  /** Body width (64) and height (70); the cap is 1.5 w wide and `capH` (0.34 w) tall. */
+  w?: number;
+  h?: number;
+  capH?: number;
+  /** Fills exactly on the linework (see RoofLedge). */
+  exact?: boolean;
+  at?: At;
+  seed?: string;
+  /** Screen ink weight (3.8 on the ledge). */
+  ink?: number;
+};
+
+/** OUR roof's vent: a warm brick-shade body under a dark cowl with a snow cap (RoofLedge's vent; S9's near clutter). */
+export const RoofVent: React.FC<RoofVentProps> = ({x: vx, y, w: vw = 64, h: vh = 70, capH = vw * 0.344, exact, at, seed = 'ledge', ink = 3.84}) => {
+  const vy = y - vh;
+  const off = exact ? false : undefined;
+  const cap: Pt[] = [[vx - vw * 0.75, vy], [vx + vw * 0.75, vy], [vx + vw * 0.55, vy - capH], [vx - vw * 0.55, vy - capH]];
+  return (
+    <>
+      <Fill rect={[vx - vw / 2, vy, vw, vh + 4]} color={EMBER.brickShade} at={fillAt(at, 0.04)} offset={off} seed={`${seed}/v`} />
+      <Fill d={polyPath(cap)} color={EMBER.anchor} at={fillAt(at, 0.06)} offset={off} seed={`${seed}/vc`} />
+      <Fill d={blob(vx, vy - capH - 2 * (capH / 22), vw * 0.5, capH * 0.41, {seed: `${seed}/vs`})} color={EMBER.snow} at={fillAt(at, 0.08)} offset={false} />
+      <Ink d={vline(vx - vw / 2, vy, y, {over: [0, 0], seed: `${seed}/v1`}) + vline(vx + vw / 2, vy, y, {over: [0, 0], seed: `${seed}/v2`}) + poly(cap, {closed: true, seed: `${seed}/vcI`, over: [1, 4]})} at={b(at, 0.04)} width={ink} />
     </>
   );
 };

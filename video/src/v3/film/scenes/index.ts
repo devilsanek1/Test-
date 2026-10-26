@@ -12,7 +12,6 @@ import * as S6 from './S6';
 import * as S7 from './S7';
 import * as S8 from './S8';
 import * as S9 from './S9';
-import * as S9b from './S9b';
 import * as S10 from './S10';
 import * as S11 from './S11';
 import * as S12 from './S12';
@@ -22,7 +21,7 @@ import * as S15 from './S15';
 import * as S16 from './S16';
 
 type PanelModule = {default: React.FC; Wiper?: React.FC<WiperProps>; captionTone?: ToneKey[]};
-const PANELS: Record<string, PanelModule> = {"O1": O1, "S4": S4, "S5": S5, "S6": S6, "S7": S7, "S8": S8, "S9": S9, "S9b": S9b, "S10": S10, "S11": S11, "S12": S12, "S13": S13, "S14": S14, "S15": S15, "S16": S16};
+const PANELS: Record<string, PanelModule> = {"O1": O1, "S4": S4, "S5": S5, "S6": S6, "S7": S7, "S8": S8, "S9": S9, "S10": S10, "S11": S11, "S12": S12, "S13": S13, "S14": S14, "S15": S15, "S16": S16};
 
 export const sceneComponents: Record<string, React.FC> = {};
 export const sceneWipers: Record<string, React.FC<WiperProps>> = {};

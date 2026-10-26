@@ -1,6 +1,6 @@
 // kit/Memory.tsx: the memory stick (a board with near-black chips and light gold pins), its flight helper, and the
-// pile (a mountain of sticks, S9b). One stick model at every size: O1's 130 px sticks, S7's bubble, S8's 700 px
-// close-up, S11's bar caps, S9's 150 px divers and S9b's mountain are the same object.
+// pile (a mountain of sticks, S9). One stick model at every size: O1's 130 px sticks, S7's bubble, S8's 700 px
+// close-up, S11's bar caps, S9's 50 px streams and its mountain are the same object.
 
 import React from 'react';
 import {Ink} from '../../../lib/Ink';
@@ -193,7 +193,7 @@ export type PileProps = {
   /** Centre x and the ground line y (the pile's base). */
   x: number;
   y: number;
-  /** Base width and height (px). Wider than the frame is fine (S9b: 1480 x 880). */
+  /** Base width and height (px). Wider than the frame is fine (S9: 840 x 372, past the right edge). */
   w: number;
   h: number;
   /** Largest stick (px, front row). Capped at 130 so a big pile gets MORE sticks, not bigger ones. */

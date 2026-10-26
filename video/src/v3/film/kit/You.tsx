@@ -1,9 +1,11 @@
 // kit/You.tsx: THE protagonist ("you"), one model for every lane: short dark hair with a fringe, the rust sweater with
-// darker rib cuffs and collar (the POV hand's sleeve is the same sweater), dusk-blue jeans, warm skin. Three poses:
+// darker rib cuffs and collar (the POV hand's sleeve is the same sweater), dusk-blue jeans, warm skin. Four poses:
 //   <YouFront>   waist-up, facing us, the one face beat (S5): a simple house-style face, 'happy' | 'worried' | 'neutral',
 //                hands in front of the chest holding whatever the lane passes as children (laptop + tag).
 //   <YouSeated>  seated 3/4 back view facing right, toward the window (S13), on a wooden chair; no face.
-//   <YouTiny>    tiny standing back view (~86 px) holding up ONE memory stick (S9b).
+//   <YouBack>    standing back view, waist-up, 3/4 with the head turned right (no face), one hand raised holding
+//                the prop the lane passes as children (S9's opening: your one memory stick).
+//   <YouTiny>    tiny standing back view (86-200 px) holding up ONE memory stick (S9's landing).
 
 import React from 'react';
 import {Ink} from '../../../lib/Ink';
@@ -307,7 +309,123 @@ export const YouSeated: React.FC<YouSeatedProps> = ({x, y, head: H = 92, floorY,
   );
 };
 
-// ---------------------------------------------------------------- tiny, standing back view (S9b)
+// ---------------------------------------------------------------- standing back view, waist-up (S9 start)
+
+export type YouBackProps = {
+  /** Head centre x and head top y (canvas px). */
+  x: number;
+  y: number;
+  /** Head height (px). S9's opening: 184 (cut at the hips by the frame bottom). */
+  head?: number;
+  /** The raised hand (canvas px): the right forearm stands up from the elbow to it. Default: beside the head, at ear
+   *  height. */
+  hand?: Pt;
+  at?: At;
+  seed?: string;
+  ink?: number;
+  /** The held prop (the one memory stick), drawn over the arm and under the fingers. */
+  children?: React.ReactNode;
+};
+
+/** You from behind, 3/4, head turned right (the back of the head, the right ear and a sliver of cheek: no face), the
+ *  left arm down, the right arm raised holding something up beside the head. The torso runs ~6 heads down (the frame
+ *  cuts it at the hips). Same cast as YouSeated: dark hair, rust sweater with rib collar and cuff, warm skin. */
+export const YouBack: React.FC<YouBackProps> = ({x, y: y0, head: H = 184, hand, at, seed = 'youB', ink = 4.8, children}) => {
+  const t = useTime();
+  const y = y0 + Math.sin(t * 1.7) * 1.2; // breathing
+  const inner = Math.max(2.2, ink * 0.65);
+  const hcx = x;
+  const hcy = y + H * 0.5;
+  const shY = hcy + H * 0.62; // the shoulder line
+  const bottom = y + H * 6.5;
+  const [hx, hy] = hand ?? [hcx + H * 1.5, hcy + H * 0.3];
+  // head: 3/4 back, turned right; the hair covers all but the right ear and a sliver of cheek
+  const headD = blob(hcx, hcy, H * 0.44, H * 0.5, {seed: `${seed}/head`, wobble: 0.012});
+  const hairD = smooth(
+    [
+      [hcx - H * 0.45, hcy + H * 0.12],
+      [hcx - H * 0.44, hcy - H * 0.26],
+      [hcx - H * 0.14, hcy - H * 0.53],
+      [hcx + H * 0.22, hcy - H * 0.49],
+      [hcx + H * 0.42, hcy - H * 0.22],
+      [hcx + H * 0.31, hcy + H * 0.02],
+      [hcx + H * 0.24, hcy + H * 0.34],
+      [hcx + H * 0.02, hcy + H * 0.47],
+      [hcx - H * 0.3, hcy + H * 0.4],
+    ],
+    {closed: true},
+  );
+  const ear = blob(hcx + H * 0.37, hcy + H * 0.08, H * 0.075, H * 0.12, {seed: `${seed}/ear`});
+  const neck = polyPath([[hcx - H * 0.19, hcy + H * 0.32], [hcx + H * 0.15, hcy + H * 0.32], [hcx + H * 0.19, shY + H * 0.08], [hcx - H * 0.23, shY + H * 0.08]]);
+  const collar = smooth([[hcx - H * 0.36, shY - H * 0.01], [hcx, shY + H * 0.05], [hcx + H * 0.32, shY - H * 0.03], [hcx + H * 0.3, shY + H * 0.12], [hcx, shY + H * 0.18], [hcx - H * 0.34, shY + H * 0.12]], {closed: true});
+  // torso: rounded shoulders (the right one, further from us, a little narrower), straight down past the frame
+  const torso = smooth(
+    [
+      [hcx - H * 0.3, shY - H * 0.02],
+      [hcx - H * 0.74, shY + H * 0.06],
+      [hcx - H * 1.0, shY + H * 0.36],
+      [hcx - H * 1.06, shY + H * 1.5],
+      [hcx - H * 1.04, bottom],
+      [hcx + H * 0.94, bottom],
+      [hcx + H * 0.96, shY + H * 1.5],
+      [hcx + H * 0.9, shY + H * 0.36],
+      [hcx + H * 0.66, shY + H * 0.04],
+      [hcx + H * 0.3, shY - H * 0.03],
+    ],
+    {closed: true},
+  );
+  // left arm hanging along the side (behind the torso's edge), cut by the frame
+  const armL = smooth([[hcx - H * 0.86, shY + H * 0.16], [hcx - H * 1.12, shY + H * 0.42], [hcx - H * 1.24, shY + H * 1.4], [hcx - H * 1.26, bottom], [hcx - H * 0.9, bottom], [hcx - H * 0.92, shY + H * 0.8]], {closed: true});
+  // right arm raised: the upper arm out and down to the elbow, the forearm up to the hand (a sleeve of width aw)
+  const aw = H * 0.36;
+  const S: Pt = [hcx + H * 0.72, shY + H * 0.2];
+  const E: Pt = [hx + H * 0.06, shY + H * 0.86];
+  const Wr: Pt = [hx, hy + H * 0.22];
+  const armR = smooth(
+    [
+      [S[0] - aw * 0.3, S[1] - aw * 0.45],
+      [S[0] + aw * 0.5, S[1] - aw * 0.25],
+      [E[0] - aw * 0.55, E[1] - aw * 0.75],
+      [Wr[0] - aw * 0.42, Wr[1]],
+      [Wr[0] + aw * 0.42, Wr[1]],
+      [E[0] + aw * 0.55, E[1] - aw * 0.2],
+      [E[0] + aw * 0.2, E[1] + aw * 0.45],
+      [E[0] - aw * 0.5, E[1] + aw * 0.35],
+      [S[0] - aw * 0.1, S[1] + aw * 0.95],
+    ],
+    {closed: true},
+  );
+  const cuff = polyPath([[Wr[0] - aw * 0.44, Wr[1] - aw * 0.02], [Wr[0] + aw * 0.44, Wr[1] - aw * 0.02], [Wr[0] + aw * 0.42, Wr[1] - aw * 0.36], [Wr[0] - aw * 0.42, Wr[1] - aw * 0.36]]);
+  // the hand: palm behind the prop's lower edge, fingers curled over it, the thumb up its back
+  const palm = blob(hx, hy + H * 0.02, H * 0.15, H * 0.16, {seed: `${seed}/palm`});
+  const fingers = smooth([[hx - H * 0.15, hy - H * 0.06], [hx - H * 0.05, hy - H * 0.13], [hx + H * 0.09, hy - H * 0.13], [hx + H * 0.16, hy - H * 0.05], [hx + H * 0.12, hy + H * 0.04], [hx - H * 0.12, hy + H * 0.04]], {closed: true});
+  return (
+    <>
+      <Fill d={armL} color={YOU.sweater} at={fillAt(at, 0.02)} seed={`${seed}/armL`} />
+      <Ink d={armL} at={b(at, 0.02)} width={inner} open={0.2} />
+      <Fill d={torso} color={YOU.sweater} at={fillAt(at)} seed={`${seed}/torso`} />
+      <Ink d={torso} at={at} width={ink} open={0.06} />
+      <Ink d={line(hcx - H * 0.04, shY + H * 0.3, hcx - H * 0.08, shY + H * 2.6, {over: [0, 0], seed: `${seed}/seam`}) + line(hcx - H * 0.62, shY + H * 0.6, hcx - H * 0.3, shY + H * 0.86, {over: [0, 0], seed: `${seed}/blade`})} at={b(at, 0.1)} width={1.8} color={YOU.rib} />
+      <Fill d={neck} color={YOU.skin} at={fillAt(at, 0.03)} offset={false} />
+      <Fill d={collar} color={YOU.rib} at={fillAt(at, 0.04)} offset={false} />
+      <Fill d={headD} color={YOU.skin} at={fillAt(at, 0.05)} seed={`${seed}/headF`} />
+      <Fill d={ear} color={YOU.skin} at={fillAt(at, 0.06)} />
+      <Fill d={hairD} color={YOU.hair} at={fillAt(at, 0.07)} seed={`${seed}/hair`} />
+      <Ink d={headD} at={b(at, 0.05)} width={ink} open={0.12} />
+      <Ink d={ellipse(hcx + H * 0.37, hcy + H * 0.08, H * 0.075, H * 0.12, {seed: `${seed}/earI`})} at={b(at, 0.08)} width={inner} />
+      <Ink d={hairD} at={b(at, 0.07)} width={inner} open={0.25} />
+      <Fill d={armR} color={YOU.sweater} at={fillAt(at, 0.05)} seed={`${seed}/armR`} />
+      <Fill d={cuff} color={YOU.rib} at={fillAt(at, 0.06)} offset={false} />
+      <Ink d={armR} at={b(at, 0.05)} width={inner} open={0.1} />
+      <Fill d={palm} color={YOU.skin} at={fillAt(at, 0.07)} />
+      {children}
+      <Fill d={fingers} color={YOU.skin} at={fillAt(at, 0.08)} />
+      <Ink d={fingers} at={b(at, 0.08)} width={inner} open={0.3} />
+    </>
+  );
+};
+
+// ---------------------------------------------------------------- tiny, standing back view (S9's landing)
 
 export type YouTinyProps = {
   /** Feet centre (canvas px). */

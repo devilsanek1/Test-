@@ -13,12 +13,13 @@ import {TOD} from '../../../lib/cine/atmosphere';
 import {EMBER, emberProblems} from '../palette';
 import {Txt} from './util';
 import {Nook, NookOutside} from './Nook';
-import {DataCenter, NightSky, RoofLedge, Snowfall, TownBand} from './Outside';
+import {DataCenter, NightSky, RoofLedge, RoofVent, Snowfall, TownBand} from './Outside';
+import {BrickStack, ChimneyPot, MidTown, RoofDeck} from './Rooftop';
 import {Laptop} from './Laptop';
 import {Phone, Hand, phonePoint, phoneSlots} from './Phone';
 import {PriceTag} from './PriceTag';
 import {MemoryStick, Pile, StickFlight} from './Memory';
-import {YouFront, YouSeated, YouTiny} from './You';
+import {YouBack, YouFront, YouSeated, YouTiny} from './You';
 import {BarChart, ChartCard, LineChart, PRICE_HOOK} from './Charts';
 import {Calendar, ChipFactory, ChipMaker, SpeechBubble, ThoughtBubble, Van, WaitingDots, WallClock} from './Props';
 
@@ -73,25 +74,35 @@ const S13Frame: React.FC = () => (
   </>
 );
 
-const S9Frame: React.FC = () => (
+// S9's S5 pull-back at its two ends, every piece at its board size (scenes/S9.tsx moves them on the plane maps)
+const S9StartFrame: React.FC = () => (
   <>
-    <NightSky bandY={1080} horizon={1210} />
-    <Snowfall x={0} y={600} w={1080} h={700} n={30} seed="k/s9" />
-    <Fill2 />
-    <DataCenter x={540} y={1214} w={1290} variant="hall" seed="k/hall" />
-    <TownBand y={1214} n={6} x0={-20} x1={1100} houseW={110} far={false} seed="k/s9t" />
-    <RoofLedge y={1380} ventX={210} />
+    <NightSky bandY={790} horizon={900} />
+    <TownBand y={880} n={12} x0={160} x1={700} houseW={38} seed="k/s9far" />
+    <rect x={-200} y={880} width={1480} height={400} fill={EMBER.dc} />
+    <BrickStack x={600} y={640} w={1055} h={1500} pots={[0.8, 0.93]} potW={107} seed="k/s9stack" ink={4.4} />
+    <RoofLedge y={1270} x0={-60} x1={1140} h={170} lipH={80} ventX={null} bricks={4} seed="k/s9ledge" ink={4.4} />
+    <rect x={-200} y={1520} width={1480} height={500} fill={EMBER.desk} />
+    <RoofVent x={-10} y={2000} w={333} h={1100} seed="k/s9vent" ink={4.9} />
+    <YouBack x={470} y={1058} head={184} hand={[748, 1214]} seed="k/s9youB">
+      <MemoryStick x={748} y={1172} w={330} rot={-6} seed="k/s9stick" />
+    </YouBack>
   </>
 );
-const Fill2: React.FC = () => <rect x={-200} y={1210} width={1480} height={800} fill={EMBER.snow} />;
 
-const S9bFrame: React.FC = () => (
+const S9EndFrame: React.FC = () => (
   <>
-    <NightSky bandY={1380} horizon={1500} />
-    <rect x={-200} y={1500} width={1480} height={600} fill={EMBER.snow} />
-    <Pile x={540} y={1500} w={1480} h={880} seed="k/pile" />
-    <DataCenter x={720} y={1500} w={240} variant="normal" sign={null} seed="k/dcS9b" />
-    <YouTiny x={250} y={1590} h={86} />
+    <NightSky bandY={790} horizon={1100} />
+    <Pile x={840} y={1030} w={840} h={372} stickW={62} ink={2.2} seed="k/pile" />
+    <DataCenter x={450} y={1030} w={340} h={180} variant="dark" signLitAt={0} signH={52} ink={2.6} seed="k/dcS9" />
+    <rect x={-200} y={1030} width={1480} height={600} fill={EMBER.frost} />
+    <MidTown x0={-320} x1={1160} rows={[{y: 1150, w: 62}, {y: 1252, w: 86}, {y: 1362, w: 112}]} street={{yB: 1440, yT: 1104, xBL: 402, xBR: 578, xTL: 452, xTR: 470}} seed="k/s9mid" />
+    <BrickStack x={-76} y={980} w={326} h={480} pots={[0.8, 0.93]} potW={33} seed="k/s9stackE" />
+    <RoofDeck y={1446} x0={-60} x1={1140} h={520} vp={[470, 1010]} planks={9} seed="k/s9deck" />
+    <RoofLedge y={1398} x0={-60} x1={1140} h={34} lipH={16} ventX={null} ink={3.4} seed="k/s9ledgeE" />
+    <YouTiny x={490} y={1490} h={184} stickW={56} ink={2.6} seed="k/s9youT" />
+    <RoofVent x={75} y={1964} w={100} h={330} seed="k/s9ventE" />
+    <ChimneyPot x={760} y={1560} w={300} seed="k/s9pot" />
   </>
 );
 
@@ -115,15 +126,15 @@ export const KitSheet3: React.FC = () => {
           <S13Frame />
         </Frame>
         <Frame x={0} y={960} s={0.5} id="f3">
-          <S9Frame />
+          <S9StartFrame />
         </Frame>
         <Frame x={540} y={960} s={0.5} id="f4">
-          <S9bFrame />
+          <S9EndFrame />
         </Frame>
         <Label x={12} y={34}>Nook pov + Phone + Hand + PriceTag + StickFlight (O1)</Label>
         <Label x={552} y={34}>Nook objective + YouSeated + clock + bubble (S13)</Label>
-        <Label x={12} y={994} light>DataCenter hall + TownBand + RoofLedge (S9 landing)</Label>
-        <Label x={552} y={994} light>Pile + small DataCenter + YouTiny (S9b)</Label>
+        <Label x={12} y={994} light>S9 start: YouBack + stick 330 + BrickStack + RoofLedge + RoofVent</Label>
+        <Label x={552} y={994} light>S9 end: Pile + DataCenter + MidTown + RoofDeck + YouTiny + pot</Label>
 
         {/* ---- screen 2: props at full size */}
         <g>
