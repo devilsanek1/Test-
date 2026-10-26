@@ -2,11 +2,11 @@
 
   python3 scripts/v2/build_board.py && python3 scripts/v3/board_lint.py public/v2/animatic.json
 
-Concept: "the line that never ends" (contract lens), with the judges' grafts: a high 3/4 desk (the page visibly pours
-over the desk edge), the eye-level nook as the home base, backlit anonymous staff with NAME WITHHELD, a hard cut out of
-her room (never through her window) to the one S1 rise-over onto the Pentagon, the full oversight clause held through
-the veto beat, Google's page on its own neutral panel, and her own voice (a speech bubble) for the turn.
-Panels and reasons: docs/v2/storyboard_g3.md. World coords = each shot's end frame (camera.to).
+Board v2 (2026-10-26): the fix round after board v1's sound-off cold read, cinematography check and standards check.
+Concept "the line that never ends" (contract lens). Panels, reasons and the camera plan: docs/v2/storyboard_g3.md.
+House style: docs/look/STORYBOARD_STYLE.md (§0 signal per drawing, §3 notes strip, §7 cinematography); the reusable
+patterns come from scripts/v3/build_board_cine.py (room tone, one-shape window, matched frames, two-layer rise-over).
+World coords = each shot's end frame (camera.to); 1080 x 1920, caption band y 290-600, notes strip from y 1680.
 
 Words come from public/v2/voice_words.json with two caption fixes: the merged token "can'tveto" is split (can't
 26.36-26.70, veto 26.70-27.08), and the quoted spans get quote marks (her quote in BBC spelling, "criticising")."""
@@ -21,35 +21,30 @@ DST = os.path.join(ROOT, 'public', 'v2', 'animatic.json')
 NODRAW = [99, 0.01]   # fill-only shape: its stroke never draws
 NEVER = 99            # a fillIn that never arrives (bare lines)
 DUR = 39.5            # voice 39.08 s + 0.42 s of room tone for the loop
+LOOP_LEN = round(DUR - 39.08, 2)
 BBC = 'Source: BBC News, 21 Oct 2026'
+HER = 'Her account to BBC News, 21 Oct 2026'          # her clause is REPORTED (FL 5.2): no outlet has seen the contract
+TI = 'Source: The Information via Japan Times, 28 Apr 2026'
 
 
 def r2(x):
     return round(x, 2)
 
 
-def cam(x=540, y=960, z=1.0, x2=None, y2=None, z2=None, **kw):
-    c = {'from': {'x': x, 'y': y, 'z': z}, 'to': {'x': x if x2 is None else x2, 'y': y if y2 is None else y2, 'z': z if z2 is None else z2}}
-    c.update(kw)
-    return c
-
-
-def shot(id_, s, e, note, tr_label, els, camera=None, moves=None, tr='cut', dur=None, credit=None):
-    t = {'type': tr, 'label': tr_label}
-    if dur:
-        t['dur'] = dur
-    out = {'id': id_, 's': s, 'e': e, 'note': note, 'transition': t, 'camera': camera or cam(), 'els': els}
-    if moves:
-        out['moves'] = moves
-    if credit:
-        out['credit'] = credit
-    return out
+def hold():
+    return {'from': {'x': 540, 'y': 960, 'z': 1}, 'to': {'x': 540, 'y': 960, 'z': 1}}
 
 
 def icon(name, x, y, w, h=None, role='mid', **kw):
-    e = {'t': 'icon', 'name': name, 'x': x, 'y': y, 'w': w, 'role': role}
+    e = {'t': 'icon', 'name': name, 'x': r2(x), 'y': r2(y), 'w': r2(w), 'role': role}
     if h is not None:
-        e['h'] = h
+        e['h'] = r2(h)
+    e.update(kw)
+    return e
+
+
+def text(x, y, s, size=64, role='mid', **kw):
+    e = {'t': 'text', 'x': x, 'y': y, 'text': s, 'size': size, 'role': role}
     e.update(kw)
     return e
 
@@ -62,12 +57,6 @@ def rect(x, y, w, h, fill=None, role='mid', **kw):
     return e
 
 
-def line(pts, role='mid', **kw):
-    e = {'t': 'line', 'pts': pts, 'role': role}
-    e.update(kw)
-    return e
-
-
 def ell(cx, cy, rx, ry, fill=None, role='mid', **kw):
     e = {'t': 'ellipse', 'cx': cx, 'cy': cy, 'rx': rx, 'ry': ry, 'role': role}
     if fill:
@@ -76,220 +65,369 @@ def ell(cx, cy, rx, ry, fill=None, role='mid', **kw):
     return e
 
 
-def fig(x, y, h, pose='sit', facing='r', role='subject', **kw):
-    e = {'t': 'figure', 'x': x, 'y': y, 'h': h, 'pose': pose, 'facing': facing, 'role': role}
+def line(pts, role='mid', **kw):
+    e = {'t': 'line', 'pts': [[r2(x), r2(y)] for x, y in pts], 'role': role}
     e.update(kw)
     return e
 
 
-def head_of(x, y, h, facing='r'):
-    """the centre and radius of a seated figure's head (POSES.sit.H in SketchReel.tsx)"""
-    s = -1 if facing == 'l' else 1
-    return x + s * 0.04 * h, y - 0.755 * h, 0.09 * h
+def shape(pts, fill, role='mid', **kw):
+    return line(pts, role, closed=True, fill=fill, **kw)
+
+
+def fig(x, y, h, pose='sit', facing='r', role='subject', **kw):
+    e = {'t': 'figure', 'x': r2(x), 'y': r2(y), 'h': r2(h), 'pose': pose, 'facing': facing, 'role': role}
+    e.update(kw)
+    return e
+
+
+def room(**kw):
+    """the home-base room: one far flat mid tone over the whole frame (wall, shelf, desk); lighter things sit on it"""
+    return rect(-20, -20, 1120, 1720, 'mid', role='far', **kw)
+
+
+def window_shape(l, t, r, b, mullion, sill_b, lip, **kw):
+    """landscape glass + frame + ONE vertical mullion + sill as one closed light shape (the bar and the glass's bottom
+    edge are zero-area spikes in the outline): the room's one opening, the lightest thing in the nook"""
+    pts = [(l, t), (mullion, t), (mullion, b), (mullion, t), (r, t), (r, b), (r + lip, b), (r + lip, sill_b),
+           (l - lip, sill_b), (l - lip, b), (l, b), (r, b), (l, b)]
+    return shape(pts, 'light', **kw)
+
+
+def xform(el, s, dx, dy):
+    """the element scaled by s about the origin, then moved by (dx, dy): a drawing redrawn at another size (line
+    weights stay the role's, unlike a camera zoom)"""
+    e = copy.deepcopy(el)
+    if e['t'] == 'line':
+        e['pts'] = [[r2(x * s + dx), r2(y * s + dy)] for x, y in e['pts']]
+    elif e['t'] == 'ellipse':
+        e.update(cx=r2(e['cx'] * s + dx), cy=r2(e['cy'] * s + dy), rx=r2(e['rx'] * s), ry=r2(e['ry'] * s))
+    else:
+        e.update(x=r2(e['x'] * s + dx), y=r2(e['y'] * s + dy))
+        for k in ('w', 'h', 'size'):
+            if k in e:
+                e[k] = r2(e[k] * s)
+    return e
+
+
+def below_band(el, top=605):
+    """clip an element's top to the read zone (a window or shelf cut by the caption band's edge in a closer size)"""
+    e = copy.deepcopy(el)
+    if e['t'] == 'line':
+        e['pts'] = [[x, max(top, y)] for x, y in e['pts']]
+    elif e['t'] == 'icon' and e['y'] < top:
+        h = e.get('h', e['w'] * 2.4)
+        e['h'], e['y'] = r2(h - (top - e['y'])), top
+    return e
+
+
+def drawn(p0, dur):
+    """draw-on that is p0 (0..1) done at the shot start and finishes after dur s (frame 0: the scene being drawn)"""
+    return [r2(-p0 * dur), dur]
+
+
+class Panel:
+    def __init__(self):
+        self.els, self.moves, self.ix = [], [], {}
+
+    def add(self, name, el):
+        self.ix[name] = len(self.els)
+        self.els.append(el)
+        return el
+
+    def move(self, name, dx, dy, at, dur, ease=None):
+        m = {'el': self.ix[name], 'dx': r2(dx), 'dy': r2(dy), 'at': r2(at), 'dur': r2(dur)}
+        if ease:
+            m['ease'] = ease
+        self.moves.append(m)
+
+
+def settled(el, dx=0, dy=0):
+    """the element as it stands at the end of its shot (moved by dx, dy), held, no timing: for a callback frame"""
+    e = copy.deepcopy(el)
+    if e['t'] == 'line':
+        e['pts'] = [[x + dx, y + dy] for x, y in e['pts']]
+    elif e['t'] == 'ellipse':
+        e['cx'] += dx
+        e['cy'] += dy
+    else:
+        e['x'] = r2(e['x'] + dx)
+        e['y'] = r2(e['y'] + dy)
+    for k in ('in', 'out', 'fillIn'):
+        e.pop(k, None)
+    if e.get('draw') != NODRAW:
+        e.pop('draw', None)
+    return e
 
 
 def squiggles(v0, v1, n, width=0.84):
     return '\n'.join(f'{r2(v0 + (v1 - v0) * i / max(1, n - 1))}|~|{width if i % 3 else width - 0.06}' for i in range(n))
 
 
-def steps(el, total, t0, n, gap, dur=0.06, accel=False):
-    """el moves down by `total` in n short steps from t0 (paper stepping out); accel = growing steps (pouring)"""
-    w = [1 + (k if accel else 0) for k in range(n)]
-    return [{'el': el, 'dx': 0, 'dy': r2(total * wk / sum(w)), 'at': r2(t0 + k * gap), 'dur': dur if not accel else r2(gap)} for k, wk in enumerate(w)]
+def steps(total, t0, n, gap, first=4):
+    """(dy, at, dur) for a pour in n growing steps (weights first .. first+n-1), each one gap long: faster and faster"""
+    w = [first + k for k in range(n)]
+    return [(r2(total * wk / sum(w)), r2(t0 + k * gap), r2(gap)) for k, wk in enumerate(w)]
 
 
-# ===================================================================== her desk (O1, P12, LOOP): high 3/4 insert
-PAGE = dict(x=340, y=700, w=400, h=470)                  # her job contract
-CLAUSE_Y = 1003                                          # v 0.645
-TXT_L, TXT_R = 377, 703
-HL_X = 712                                               # the running line's x (the page's right margin)
-DESK_EDGE = 1390
-PAGE_TEXT = '\n'.join(['0.09|#56|JOB CONTRACT', squiggles(0.22, 0.54, 5), '0.645|~|0.86', '0.86|-|0.5'])
-SIGNATURE = [[382, 1096], [396, 1072], [410, 1094], [404, 1102], [428, 1080], [446, 1098], [466, 1076], [478, 1096], [506, 1086], [540, 1090]]
-FLAT = dict(x=344, w=392, h=220)                          # the tail on the desk (1170 -> the desk edge)
-HANG_H = 710                                              # the tail over the desk edge
+# ===================================================================== HOME BASE 1: her desk, high 3/4 (O1, P12, LOOP)
+# One room tone (wall, shelf, desk), so the paper pool and her paper contract are the light; the desk reads in 3/4 by
+# its back edge, its front face and its right end with one leg and the floor line beyond it (board v1's full-width
+# light band read top-down). Two edge-cut masses: the shelf (left) and the lamp head (right, below the band).
+O1_CAM = {'from': {'x': 540, 'y': 960, 'z': 1.05}, 'to': {'x': 540, 'y': 960, 'z': 1.0}, 'ease': 'inQuad'}
+DESK_BACK, DESK_EDGE, FRONT_B = 650, 1310, 1390
+PAGE = dict(x=340, y=700, w=400, h=480)                # her job contract (bottom 1180)
+PAGE_B = PAGE['y'] + PAGE['h']
+ROW1, ROW2 = 0.59, 0.68                                # "no criticizing" / "Google": the clause, in words
+TXT_L = 378                                            # the rows' left edge (margin 0.08 + the sheet's 3/4 inset)
+SIGNATURE = [[382, 1076], [396, 1052], [410, 1074], [404, 1082], [428, 1060], [446, 1078], [466, 1056], [478, 1076],
+             [506, 1066], [540, 1070]]
+FLAT_H = 130                                           # the run-on on the desk: page bottom -> desk edge
+HANG_H = 650                                           # the run-on over the desk edge (hidden behind the desk top first)
+YEARS = [2040, 2050, 2060, 2070, 2080]
 
 
-def desk_base(frame0=True):
-    """the desk, shelf corner, lamp pool, box and mug (frame-0 draw-on and tone flood when frame0)"""
-    d = (lambda a, b: {'draw': [a, b]}) if frame0 else (lambda a, b: {})
-    f = (lambda t: {'fillIn': t}) if frame0 else (lambda t: {})
-    # frame 0 is already 55-75 % drawn, so the LOOP tail (0.42 s earlier in the same draw-on) reads as the scene
-    front = rect(-40, DESK_EDGE, 1160, 80, 'mid', **d(-0.35, 0.5), **f(0.08))
-    top = rect(-40, 640, 1160, DESK_EDGE - 640, 'light', **d(-0.4, 0.55), **f(0.05))
-    shelf = icon('bookshelf', -100, 630, 220, 560, **d(-0.4, 0.6), **f(0.2))
-    pool = ell(540, 950, 400, 290, 'paper', draw=NODRAW, **f(0.12))
-    box = icon('box', 140, 700, 170, **d(-0.35, 0.5), **f(0.18))
-    mug = icon('mug', 800, 690, 90, **d(-0.3, 0.45), **f(0.25))
-    return front, top, shelf, pool, box, mug
+def page_rows(bands=()):
+    """her contract: header, 4 lines of squiggles, the clause in words (her account, under SHE SAYS), the signature
+    rule; bands = highlighter bands behind the clause rows [(v, frac)]"""
+    rows = ['0.09|#52|JOB CONTRACT', squiggles(0.21, 0.45, 4)]
+    rows += [f'{v}|=|{frac}|50' for v, frac in bands]
+    rows += [f'{ROW1}|>46|no criticizing', f'{ROW2}|>46|Google', '0.88|-|0.5']
+    return '\n'.join(rows)
 
 
-def page_el(frame0=True):
-    e = icon('page', role='subject', text=PAGE_TEXT, **PAGE)
-    if frame0:
-        e.update(draw=[-0.45, 0.6], fillIn=0.03)
-    return e
+def runon_rows(h, years, pad=0):
+    """the run-on: a year at the left of every other row (2040, 2050, ... downwards), squiggles after it and between;
+    pad = plain squiggle rows above the first year (px)"""
+    rows, vs = ['0|m|0.08'], []
+    step = (h - pad) / len(years)
+    for k, y in enumerate(years):
+        v = (pad + step * (k + 0.5)) / h
+        vs.append(v)
+        rows.append(f'{r2(v)}|>48|{y}')
+    rows.append('0|m|0.36')
+    rows += [f'{r2(v)}|~|0.85' for v in vs]
+    rows.append('0|m|0.08')
+    rows += [f'{r2(v - step / 2 / h)}|~|0.8' for v in vs if v - step / 2 / h > 0.03]
+    rows += [f'{r2(v / h)}|~|0.8' for v in range(40, pad, 60)]
+    return '\n'.join(rows)
 
 
-def hang_text(h):
-    return squiggles(0.03, 0.97, max(4, int(h / 40)), 0.8)
+def arm_pts(hx, hy):
+    """her sleeve from the left edge to a mitten at (hx, hy)"""
+    return [(hx - 1300, hy - 40), (hx - 40, hy - 26), (hx - 10, hy - 30), (hx + 22, hy - 14), (hx + 26, hy + 12),
+            (hx + 6, hy + 30), (hx - 40, hy + 28), (hx - 1300, hy + 56)]
 
 
-# ===================================================================== O1: the opening (0-6.12, one continuous shot)
 def opening():
-    els, moves = [], []
-
-    def add(e):
-        els.append(e)
-        return len(els) - 1
-    front, top, shelf, pool, box, mug = desk_base()
-    add(front)
-    hang = add(icon('page', 340, DESK_EDGE - HANG_H, 400, HANG_H, sw=9, text=hang_text(HANG_H), **{'in': 4.84}))
-    hang_hl = add(line([[HL_X, DESK_EDGE - HANG_H], [HL_X, DESK_EDGE]], sw=22, **{'in': 4.84}))
-    for e in (top, shelf, pool, box, mug):
-        add(e)
-    flat = add(icon('page', FLAT['x'], 1170 - FLAT['h'], FLAT['w'], FLAT['h'], sw=9, text=squiggles(0.1, 0.95, 6, 0.8), **{'in': 3.48}))
-    flat_hl = add(line([[HL_X, 1170 - FLAT['h']], [HL_X, 1170]], sw=22, **{'in': 3.48}))
-    add(page_el())
-    add(line(SIGNATURE, sw=5, draw=[-0.05, 0.30]))
-    add(line([[TXT_L, CLAUSE_Y], [TXT_R, CLAUSE_Y]], role='subject', sw=24, draw=[2.60, 0.88]))
-    add(line([[TXT_R, CLAUSE_Y], [HL_X, CLAUSE_Y + 13], [HL_X, 1170]], role='subject', sw=22, draw=[3.48, 0.25]))
-    # 'She quit Google.': her sleeve brings her work badge in from the left and drops it into the box (clack 0.92)
-    badge = add(icon('badge', 180 - 560, 626, 100, text='GOOGLE'))
-    sleeve = add(line([[-820, 616], [-348, 618], [-348, 666], [-820, 688]], closed=True, fill='mid'))
-    hand = add(ell(-330, 636, 26, 26, 'paper'))
-    for i in (badge, sleeve, hand):
-        moves.append({'el': i, 'dx': 560, 'dy': 0, 'at': 0.40, 'dur': 0.40})
-        moves.append({'el': i, 'dx': 0, 'dy': 24, 'at': 0.84, 'dur': 0.08})
-    for i in (sleeve, hand):
-        moves.append({'el': i, 'dx': -620, 'dy': 0, 'at': 1.00, 'dur': 0.40})
-    moves.append({'el': badge, 'dx': 0, 'dy': 6, 'at': 1.50, 'dur': 0.2})      # the lanyard settles
-    # 'her CONTRACT': a marker touches the clause line (2.20), sweeps it, wraps down the margin, then lifts off while
-    # the line keeps running by itself
-    mk = add(icon('marker', TXT_L, CLAUSE_Y - 150, 150, 150, **{'in': 2.20, 'out': 4.10}))
-    for k in range(6):
-        moves.append({'el': mk, 'dx': r2((TXT_R - TXT_L) / 6), 'dy': 0, 'at': r2(2.60 + k * 0.88 / 6), 'dur': r2(0.88 / 6)})
-    moves.append({'el': mk, 'dx': HL_X - TXT_R, 'dy': 1170 - CLAUSE_Y, 'at': 3.48, 'dur': 0.25})
-    moves.append({'el': mk, 'dx': 300, 'dy': -150, 'at': 3.80, 'dur': 0.30})
-    # the page outgrows its own edge in short steps (3.48-4.84), then pours over the desk edge, faster and faster
-    for i in (flat, flat_hl):
-        moves += steps(i, FLAT['h'], 3.48, 9, 0.15)
-    for i in (hang, hang_hl):
-        moves += steps(i, HANG_H, 4.84, 8, 0.16, accel=True)
-    camera = cam(540, 960, 1.06, z2=1.0, ease='inQuad')
-    return els, moves, camera
-
-
-o1_els, o1_moves, o1_cam = opening()
-
-
-# ===================================================================== the nook (P2 wide, P4/P13 medium, P6 closer)
-def nook_contract(x0, y_top, hang_to, role='mid', w=180, tail_w=66, lines=False):
-    """her contract on the desk with its tail over the desk's front and down (the running line); a narrow tail is a
-    plain strip (squiggles on a narrow strip read as a ladder)"""
-    tx = x0 + w - tail_w - 4
-    return [
-        line([[x0, y_top], [x0 + w, y_top], [x0 + w + 8, y_top + 14], [x0 - 8, y_top + 14]], role=role, closed=True, fill='paper'),
-        icon('page', r2(tx), y_top + 14, tail_w, hang_to - y_top - 14, role=role, sw=5 if role == 'mid' else None,
-             text=hang_text(hang_to - y_top) if lines else ''),
-        line([[r2(tx + tail_w - 16), y_top + 14], [r2(tx + tail_w - 16), hang_to]], role=role, sw=20 if tail_w > 90 else 12),
-    ]
+    p = Panel()
+    p.add('room', room(fillIn=0.04))
+    p.add('front', line([(-40, DESK_EDGE), (1015, DESK_EDGE), (1015, FRONT_B), (-40, FRONT_B)], draw=drawn(0.85, 0.7)))
+    # the run-on over the edge: hidden behind the opaque desk top until it pours down over the front face and the floor
+    p.add('hang', icon('page', PAGE['x'], DESK_EDGE - HANG_H, PAGE['w'], HANG_H, sw=9, text=runon_rows(HANG_H, YEARS),
+                       **{'in': 3.5}))
+    p.add('top', shape([(-40, DESK_BACK), (975, DESK_BACK), (1015, DESK_EDGE), (-40, DESK_EDGE)], 'mid',
+                       draw=drawn(0.85, 0.8), fillIn=0.04))
+    p.add('leg', line([(995, FRONT_B), (995, 1700)], draw=drawn(0.8, 0.5)))
+    p.add('floor', line([(1001, 1080), (1100, 1080)], draw=drawn(0.8, 0.4)))      # the floor meets the wall, past the desk
+    p.add('shelf', icon('bookshelf', -150, 625, 280, 430, fill='mid', draw=drawn(0.85, 0.8), fillIn=0.2))
+    p.add('pool', ell(560, 975, 370, 270, 'paper', role='far', sw=0, draw=NODRAW, fillIn=0.12))   # 740 wide on the desk
+    p.add('flat', icon('page', PAGE['x'], PAGE_B - FLAT_H, PAGE['w'], FLAT_H, sw=9,
+                       text='0|m|0.08\n0.5|>48|2030\n0|m|0.36\n0.5|~|0.85', **{'in': 2.95}))
+    p.add('page', icon('page', role='subject', text=page_rows(), draw=drawn(0.85, 0.8), fillIn=0.03, **PAGE))
+    # "her CONTRACT": the clause gets highlighted (a light band UNDER the words: board v1's dark bar read as crossed out)
+    for k, (t, bands) in enumerate([(2.74, [(ROW1, 0.5)]), (2.86, [(ROW1, 0.95)]), (2.96, [(ROW1, 0.95), (ROW2, 0.45)])]):
+        p.add(f'hl{k}', icon('page', role='subject', text=page_rows(bands), **{'in': t}, **PAGE))
+    p.add('sign', line(SIGNATURE, sw=5, draw=[-0.05, 0.30]))                       # signed on frame 0 (the chime)
+    p.add('box', icon('box', 70, 770, 250, fill='light', draw=drawn(0.85, 0.7), fillIn=0.18))
+    p.add('badge', icon('badge', -420, 640, 170, text='GOOGLE'))
+    p.add('boxfront', rect(80, 838, 230, 128, 'light', draw=drawn(0.85, 0.5), fillIn=0.18))   # the badge drops behind it
+    p.add('mug', icon('mug', 770, 990, 90, draw=drawn(0.85, 0.6), fillIn=0.25))
+    p.add('shade', shape([(1060, 625), (1110, 690), (985, 860), (885, 760)], 'paper', draw=drawn(0.85, 0.5), fillIn=0.1))
+    p.add('marker', icon('marker', TXT_L - 930, 1000 - 17 - 150, 150, 150))
+    p.add('arm', shape(arm_pts(-335, 640), 'light'))
+    # "She quit Google.": her sleeve brings the badge to the centre, then drops it into the box (clack 0.92), comes back
+    # and carries the box out; "her CONTRACT": it brings a highlighter to the clause and sweeps it (2.60-2.92)
+    for n in ('arm', 'badge'):
+        p.move(n, 875, 0, 0.36, 0.22)
+        p.move(n, -355, 20, 0.70, 0.12)
+        p.move(n, 0, 27, 0.84, 0.08)
+    p.move('arm', -745, 0, 0.98, 0.20)
+    p.move('arm', 650, 213, 1.24, 0.18)
+    for n in ('arm', 'badge', 'box', 'boxfront'):
+        p.move(n, -560, 0, 1.48, 0.34)
+    for n in ('arm', 'marker'):
+        p.move(n, 930, 17, 1.84, 0.30)
+        p.move(n, 297, 0, 2.60, 0.32)
+        p.move(n, -1300, 0, 3.02, 0.30)
+    # the line keeps going: the page steps out past its own edge (3.00-3.50), then pours over the desk edge, faster
+    # and faster, the years running down (3.55-6.05)
+    for k in range(5):
+        p.move('flat', 0, FLAT_H / 5, 3.0 + 0.11 * k, 0.07)
+    for dy, at, dur in steps(HANG_H, 3.55, 9, 0.278):
+        p.move('hang', 0, dy, at, dur)
+    return p
 
 
-def clean(e):
-    return {k: v for k, v in e.items() if v is not None}
+o1 = opening()
+O1 = {n: o1.els[i] for n, i in o1.ix.items()}
+
+# P12: the callback = O1's end frame (her contract, highlighted, its run-on down the desk), held; on "can't" it pours
+# on by 200 px (a longer run-on whose top 200 px start hidden behind the desk top). The box and her sleeve are gone.
+MORE = 200
+p12 = Panel()
+for n in ('room', 'front'):
+    p12.add(n, settled(O1[n]))
+p12.add('hang', icon('page', PAGE['x'], DESK_EDGE - MORE, PAGE['w'], HANG_H + MORE, sw=9,
+                     text=runon_rows(HANG_H + MORE, YEARS, pad=MORE)))
+for n in ('top', 'leg', 'floor', 'shelf', 'pool'):
+    p12.add(n, settled(O1[n]))
+p12.add('flat', settled(O1['flat'], dy=FLAT_H))
+p12.add('page', settled(O1['hl2']))
+for n in ('sign', 'mug', 'shade'):
+    p12.add(n, settled(O1[n]))
+for dy, at, dur in steps(MORE, 0.64, 4, 0.12, first=2):
+    p12.move('hang', 0, dy, at, dur)
+
+# LOOP: O1's frame-0 lines, drawing on slowly so each stroke ends at exactly its frame-0 progress (seamless rewatch);
+# frame 0 is ~85 % drawn, so the 0.42 s tail shows the desk scene 50-85 % sketched (board v1's tail read as "erased")
+loop_els = []
+for n, e in O1.items():
+    if 'draw' not in e or e['draw'] == NODRAW or e.get('in') is not None:
+        continue
+    c = copy.deepcopy(e)
+    p0 = max(0.0, min(1.0, -c['draw'][0] / c['draw'][1]))
+    c['draw'] = [r2(LOOP_LEN - p0 * 1.2), 1.2]
+    c['fillIn'] = NEVER
+    c.pop('out', None)
+    loop_els.append(c)
+loop_cam = {'from': dict(O1_CAM['from']), 'to': dict(O1_CAM['from'])}
+
+# ===================================================================== HOME BASE 2: her nook (P2 wide, P13, P4)
+# One room tone; the ONE opening = landscape glass (660 x 470 = 15 % of the frame) with a sill, one mullion and far
+# roofs; the shelf cut by the left edge and the curtain by the right; a soffit edge over the caption band; the lamp
+# shade and its paper pool on the desk; her the only dark mass. P13 and P4 are the same nook REDRAWN at 1.2x and 1.4x
+# (line weights stay), so the home base returns at three sizes.
+WL, WT, WR, WB = 290, 620, 950, 1090
+NOOK = {
+    'soffit': shape([(-20, -20), (760, -20), (760, 230), (-20, 230)], 'mid'),
+    'shelf': icon('bookshelf', -150, 640, 330, 900, fill='mid'),
+    'curtain': shape([(1000, 600), (1100, 600), (1100, 1540), (1030, 1540), (1010, 1300), (990, 1000)], 'mid'),
+    'window': window_shape(WL, WT, WR, WB, 740, WB + 26, 25),
+    'view': line([(WL, 1010), (330, 1010), (330, 976), (360, 950), (390, 976), (390, 1010), (560, 1010), (560, 984),
+                  (600, 960), (640, 984), (640, 1010), (820, 1010), (820, 978), (850, 978), (850, 1010), (WR, 1010)],
+                 role='far'),
+    'desk': line([(250, 1310), (1100, 1310), (1100, 1345), (250, 1345), (250, 1310)]),
+    'shade': shape([(800, 1222), (890, 1222), (920, 1310), (770, 1310)], 'paper'),
+    'pool': ell(845, 1332, 160, 24, 'paper', role='far', sw=0),
+    'mug': icon('mug', 680, 1255, 50),
+    'floor': line([(-20, 1540), (1100, 1540)]),
+    'chair': line([(330, 1270), (330, 1600), (330, 1430), (450, 1430), (450, 1600)]),
+}
+NOOK_ORDER = ['soffit', 'shelf', 'curtain', 'window', 'view', 'desk', 'shade', 'pool', 'mug', 'floor', 'chair']
+SEATED = dict(x=420, y=1600, h=600)                    # her at the desk (head centre (444, 1147), hands on the desk)
 
 
-p2_els = [clean(e) for e in [
-    icon('bookshelf', -80, 640, 300, 1060),                                          # shelf cut by the left edge
-    icon('window', 560, 650, 400, 470),                                              # the one opening
-    rect(380, 1280, 740, 70, 'light'),                                               # desk
-    line([[420, 1350], [420, 1600]]), line([[1040, 1350], [1040, 1600]]),
-    line([[-40, 1600], [1120, 1600]], role='far'),                                   # floor
-    icon('lamp', 800, 1071, 190),
-    icon('mug', 720, 1214, 60),
-    line([[322, 1150], [322, 1600]]), line([[322, 1402], [452, 1402], [452, 1600]]),  # chair
-    fig(400, 1600, 600),                                                             # her, 3/4 back, facing the window
-    *nook_contract(470, 1284, 1514, role='subject', w=230, tail_w=110),
-    *[line([[x0, 1600 - 22 * k], [x0 + 170, 1600 - 22 * k], [x0 + 160, 1578 - 22 * k], [x0 - 10, 1578 - 22 * k]], role='subject',
-           closed=True, fill='paper') for k, x0 in enumerate((560, 580, 556, 584))],  # the tail folded up on the floor
-]]
+def nook(s=1.0, dx=0.0, dy=0.0):
+    """the nook redrawn at size s (x' = s x + dx); anything that would reach into the caption band is cut at its edge,
+    anything that leaves the frame is dropped"""
+    out = [room()]
+    for n in NOOK_ORDER:
+        e = xform(NOOK[n], s, dx, dy) if s != 1 or dx or dy else copy.deepcopy(NOOK[n])
+        if n == 'soffit':
+            if max(y for _, y in e['pts']) > 290:
+                continue
+        else:
+            e = below_band(e)
+        if n in ('curtain', 'shade', 'floor') and off_frame(e):
+            continue
+        out.append(e)
+    return out
 
 
-def nook_medium(bubble_in=None, bubble=None, extra=()):
-    els = [
-        icon('bookshelf', -80, 640, 260, 1060),
-        icon('window', 600, 650, 400, 460),
-        rect(330, 1330, 790, 80, 'light'),                                           # desk
-        icon('lamp', 820, 1121, 190),
-        icon('mug', 730, 1268, 56),
-        line([[280, 1180], [280, 1700]]), line([[280, 1429], [400, 1429]]),          # chair
-        fig(340, 1640, 640),                                                         # her (head at y ~1157)
-        icon('mic', 480, 1160, 100),                                                 # the interview mic
-        *nook_contract(560, 1334, 1690),
-    ]
-    if bubble:
-        b = dict(bubble)
-        if bubble_in is not None:
-            b['in'] = bubble_in
-        els.append(b)
-    els += list(extra)
-    return [clean(e) for e in els]
+def off_frame(e):
+    """True when a line / shape / icon lies wholly outside the stage (x 0-1080, y 0-1680)"""
+    if e['t'] == 'line':
+        xs, ys = [x for x, _ in e['pts']], [y for _, y in e['pts']]
+    else:
+        xs, ys = [e['x'], e['x'] + e['w']], [e['y'], e['y'] + e.get('h', 0)]
+    return min(xs) >= 1080 or max(xs) <= 0 or min(ys) >= 1680
 
 
-BUBBLE4 = icon('speech', 430, 660, 400, 264, pts=[[0.0, 1.7]])
-p4_els = nook_medium(0.72, BUBBLE4)                                                 # pops on 'SHE' (13.96)
+# P2: WIDE, eye level. "One odd contract": she stands in her nook holding her contract, and it runs down to the floor
+# and on out of the frame (board v1: "just a person at a desk ... nothing odd"). Long hair: "is this her?".
+p2_els = nook()
+p2_els += [
+    fig(540, 1600, 640, pose='hold', facing='r', hair='long'),                                    # hands ~(662-681, 1190)
+    icon('page', 640, 1170, 120, 440, role='subject', text=squiggles(0.05, 0.95, 10, 0.8)),       # held up, hanging down
+    icon('page', 610, 1606, 260, 160, role='subject', text=squiggles(0.15, 0.55, 3, 0.8)),        # ... and on along the floor
+]
 
-# P13: the same set-up; her bubble pops on 'talking', and on 'FACTS' its words become the stamped deal page
-p13_els = nook_medium(1.12, dict(BUBBLE4, out=1.78), extra=[                      # (1.78: fully swapped on 'FACTS', 37.16)
-    icon('speech', 430, 660, 400, 264, pts=[[0.0, 1.7]], text=' ', **{'in': 1.78}),
-    icon('page', 560, 690, 140, 180, text='0.14|>30|DEAL\n' + squiggles(0.32, 0.62, 4, 0.8) + '\n0.84|@|0.45', **{'in': 1.78}),
-    icon('stamp', 600, 760, 120, **{'in': 1.78}),
-])
-p13_cam = cam(540, 960, 1.0, x2=540, y2=980, z2=1.04, ease='out', start=35.32, end=38.60)
+# P13: the nook at 1.2x, held. Her own words: her bubble (the subject, 400 px) pops on "talking" with FACTS in it, her
+# word, hand-lettered. No document in it (board v1's deal page in her mouth suggested she leaked it).
+S13 = 1.2
+D13 = (500 - (SEATED['x'] + 24) * S13, 1185 - 1147 * S13)
+p13_els = nook(S13, *D13)
+p13_els += [
+    xform(fig(**SEATED, role='mid', hair='long'), S13, *D13),
+    xform(icon('mic', 540, 1180, 75), S13, *D13),
+    icon('speech', 270, 640, 400, 264, role='subject', text='FACTS', pts=[[0.53, 1.75]], **{'in': 1.12}),   # 'talking'
+]
 
-# ===================================================================== P3: staff told the BBC (backlit, anonymous)
-hx, hy, hr = head_of(430, 1560, 600)
-sx, sy, sr = head_of(760, 1520, 520, 'l')
+# P4: the nook at 1.4x (MEDIUM), held: she sits at her mic, the dark mass; her bubble pops on "SHE" (13.96)
+S4 = 1.4
+D4 = (520 - (SEATED['x'] + 24) * S4, 1150 - 1147 * S4)
+p4_els = nook(S4, *D4)
+p4_els += [
+    xform(fig(**SEATED, hair='long'), S4, *D4),
+    xform(icon('mic', 540, 1180, 75), S4, *D4),
+    icon('speech', 250, 650, 400, 264, pts=[[0.6, 1.62]], **{'in': 0.72}),
+]
+
+# ===================================================================== P3: staff told the BBC they're scared
+# MEDIUM 2-shot, the interview look: two staffers (badges, no hair: not her) behind a table, worried faces (the fear IS
+# the beat; board v1's faceless backlit silhouettes didn't read as scared), NAME WITHHELD over the one who spoke, a
+# plain mic, their contract on the table with an ordinary underline on "contracts" (12.20).
 p3_els = [
-    rect(140, 650, 800, 600, 'light'),                                               # the bright window behind them
-    fig(760, 1520, 520, facing='l', role='mid', fill='mid'),                         # a second staffer, half hidden
-    ell(r2(sx), r2(sy), r2(sr), r2(sr), 'mid'),                                       # ... faceless
-    fig(430, 1560, 600),                                                             # the staffer who spoke (silhouette)
-    ell(r2(hx), r2(hy), r2(hr), r2(hr), 'dark', role='subject'),                     # backlit: no face
-    icon('badge', 452, 1150, 66),                                                    # a staff badge on a lanyard
-    rect(40, 1280, 1000, 260, 'light'),                                              # table top
-    rect(40, 1540, 1000, 90, 'mid'),                                                 # table front
-    icon('page', 330, 1320, 360, 190, text='0.14|#40|CONTRACT\n' + squiggles(0.36, 0.68, 3, 0.85) + '\n0.88|-|0.5'),
-    line([[362, 1462], [600, 1462]], sw=5, draw=[3.84, 0.3], **{'in': 3.84}),       # 'contracts': an ordinary underline
-    {'t': 'text', 'x': r2(hx), 'y': r2(hy - hr - 30), 'text': 'NAME WITHHELD', 'size': 52, 'role': 'mid'},
+    fig(905, 1780, 820, facing='l', role='mid', face='worried'),                      # a second staffer, half cut
+    fig(640, 1780, 900, facing='l', face='worried'),                                  # the staffer who spoke (head r 81)
+    icon('badge', 572, 1236, 62),                                                     # a staff badge on the lanyard
+    rect(-40, 1362, 1160, 170, 'light'),                                              # the table
+    rect(-40, 1532, 1160, 200, 'mid'),
+    icon('page', 300, 1380, 320, 140, text='0.24|#40|CONTRACT\n' + squiggles(0.55, 0.85, 3, 0.85)),
+    line([[330, 1432], [590, 1432]], sw=5, draw=[3.84, 0.3], **{'in': 3.84}),       # 'contracts': an ordinary underline
+    icon('mic', 110, 1100, 150),                                                      # the interview mic (plain)
+    text(604, 990, 'NAME WITHHELD', 56),
 ]
 
-# ===================================================================== P5: over her shoulder, Google's AI
+# ===================================================================== P5: over her shoulder, Google's AI (home base)
 p5_els = [
-    rect(-40, 980, 1160, 760, 'light'),                                              # desk top
-    icon('lamp', 800, 771, 180),
-    ell(560, 1190, 420, 170, 'paper', draw=NODRAW),                                  # lamp pool
+    room(),
+    line([(-20, 980), (1100, 980)]),                                                  # the desk's back edge
+    ell(560, 1190, 400, 170, 'paper', role='far', sw=0),                              # the lamp pool on the mid desk
+    icon('lamp', 820, 771, 180, fill='paper'),
     icon('laptop', 300, 760, 460, role='subject'),
-    icon('nodes', 392, 786, 276, 160),                                               # the AI on her screen
-    {'t': 'text', 'x': 530, 'y': 888, 'text': 'AI', 'size': 64, 'role': 'mid'},
-    fig(110, 1600, 1100, role='mid', fill='mid'),                                    # her shoulder and head, close
+    icon('nodes', 392, 786, 276, 160),                                                # the AI on her screen
+    text(530, 888, 'AI', 64),
+    fig(110, 1600, 1100, role='mid', hair='long'),                                    # her shoulder and head, close
 ]
 
-# ===================================================================== P6: closer, she told the BBC she objected
-p6_els = [clean(e) for e in [
-    icon('bookshelf', -120, 640, 230, 1100),
-    icon('window', 640, 650, 380, 470),
-    rect(360, 1340, 760, 90, 'light'),
-    line([[252, 1100], [252, 1700]]),
-    fig(330, 1700, 760, face='worried'),
-    icon('mic', 500, 1153, 110),
-    *nook_contract(600, 1344, 1690),
-    icon('speech', 440, 650, 420, 270, pts=[[0.0, 1.59]], **{'in': 0.16}),           # 'told'
-]]
+# ===================================================================== P6: MEDIUM CLOSE, a new angle (3/4 front)
+# She faces the mic (left), the window behind her (right): the worried face is the beat (head r 99, board v1's was 68).
+p6_els = [
+    room(),
+    icon('bookshelf', -150, 640, 290, 900, fill='mid'),
+    window_shape(560, 640, 1080, 1130, 900, 1156, 25),
+    line([(560, 1050), (700, 1050), (700, 1012), (735, 985), (770, 1012), (770, 1050), (1080, 1050)], role='far'),
+    line([(-20, 1450), (620, 1450)]),                                                 # the desk's edge, in front of her
+    ell(260, 1540, 300, 60, 'paper', role='far', sw=0),                               # the lamp pool on the desk
+    icon('mic', 200, 1250, 120),
+    fig(640, 1960, 1100, facing='l', face='worried', hair='long'),                    # head (596, 1130)
+    icon('speech', 120, 650, 400, 264, pts=[[0.95, 1.72]], **{'in': 0.16}),          # on 'told'
+]
 
 # ===================================================================== P7: in April, a deal (cold insert, the stamp)
-SURFACE = rect(-40, 600, 1160, 1120, 'light', role='far')
+SURFACE = rect(-200, 600, 1480, 1300, 'light', role='far')                           # the cold desk: no lamp, no room
 DEAL_TEXT = '\n'.join(['0.08|>60|DEAL', squiggles(0.2, 0.6, 6, 0.86), '0.8|@|0.42', '0.91|@|0.42'])
 p7_els = [
     SURFACE,
@@ -298,122 +436,126 @@ p7_els = [
 ]
 p7_moves = [{'el': 2, 'dx': 0, 'dy': 18, 'at': 0.24, 'dur': 0.06}]
 
-# ===================================================================== P8: the rise over a low wall onto the Pentagon
-LIFT = 850   # the landscape rises 850 px against the 600 px crane: the wall drops out, the Pentagon comes up over it
-p8_land = [
-    rect(-40, 760, 1160, 1300, 'light', role='far'),                                 # the ground to the horizon
-    rect(-40, 760, 1160, 26, 'mid', role='far'),                                     # far tree line
-    line([[-40, 1010], [330, 1020]], role='far'), line([[750, 1020], [1120, 1000]], role='far'),
-    line([[540, 1150], [540, 1350]], role='far'),
-    icon('lot', 40, 1060, 270),
-    icon('lot', 770, 1060, 270),
-    icon('lot', 380, 1250, 320),
-    icon('pentagon', 310, 860, 460, role='subject'),
-]
-for e in p8_land:
-    if e['t'] == 'line':
-        e['pts'] = [[x, y + LIFT] for x, y in e['pts']]
-    else:
-        e['y'] = e['y'] + LIFT
-p8_els = p8_land + [icon('stonewall', -60, 1700, 1200, 700)]
-p8_moves = [{'el': i, 'dx': 0, 'dy': -LIFT, 'at': 0, 'dur': 1.53} for i in range(len(p8_land))]
-p8_cam = cam(540, 1560, 1.0, y2=960, ease='inout', start=21.32, end=22.85)
+# ===================================================================== P8: SCALE, the rise-over (the one big move)
+# Two layers (STORYBOARD_STYLE §7): the camera rises a little (the world sinks 120 px, ease unveil, landing on "AI",
+# 23.40) while the low wall drops on its own move (outSine over the whole panel); on screen <= ~15 px per 30 fps frame.
+# The cut lands on a wide: the wall hides about half of a Pentagon that is already cut by both side edges; it lands
+# with the whole five-ring building wider than the frame and rows of small identical cars (47 px, under 1/8 of P7's
+# page) at its foot as the ruler. No figures, aircraft, weapons or "Google" lettering.
+P8_CAM = {'from': {'x': 540, 'y': 1080, 'z': 1.0}, 'to': {'x': 540, 'y': 960, 'z': 1.04}, 'ease': 'unveil',
+          'start': 21.32, 'end': 23.40, 'word': 'RISE'}
+HORIZON, WALL_Y, WALL_DROP = 712, 1020, 640
+p8 = Panel()
+p8.add('ground', rect(-200, HORIZON, 1480, 1300, 'light', role='far'))
+p8.add('trees', rect(-200, HORIZON, 1480, 20, 'mid', role='far'))
+p8.add('pentagon', icon('pentagon', -210, 722, 1500, 760, role='subject', fill='paper'))   # top vertex 737, facades to 1400
+p8.add('road', rect(-200, 1408, 1480, 26, 'paper', role='far', sw=0))
+for k, (y, h) in enumerate([(1450, 40), (1566, 48)]):                               # two rows, an aisle between
+    p8.add(f'cars{k}', icon('cars', -110 - 40 * k, y, 1300 + 80 * k, h))
+joints = [(-40, 1160)]
+for k, x in enumerate(range(80, 1100, 160)):
+    joints += [(x, 1160), (x, 1060 if k % 2 else 1270), (x, 1160)]
+joints += [(1120, 1160)]
+p8.add('wall', rect(-40, WALL_Y + 40, 1160, 1400, 'mid'))                            # the low stone wall we rise over ...
+p8.add('lip', rect(-40, WALL_Y, 1160, 40, 'light'))                                  # ... its coping ...
+p8.add('joints', line(joints))                                                       # ... and its stone courses
+for n in ('wall', 'lip', 'joints'):
+    p8.move(n, 0, WALL_DROP, 0.0, 2.48, ease='outSine')
 
-# ===================================================================== P9 / P10: the clause, held; then NO VETO
-PHRASE = ['for any lawful', 'government purpose']
-CLAUSE = ['should not be used', 'for domestic mass', 'surveillance or', 'autonomous weapons', '(including target',
-          'selection) without', 'appropriate human', 'oversight and control']
-DP = dict(x=320, y=640, w=440, h=615)
+# ===================================================================== P9 / P10: the deal's words; then NO VETO
+# Two separate quoted blocks with a rule between them (board v1 ran them together into a sentence the deal does not
+# contain): "any lawful government purpose" (58 px, the line the voice reads) and the oversight clause IN FULL (34 px).
+DP = dict(x=310, y=640, w=460, h=620)
+BLOCK1 = ['"any lawful', 'government', 'purpose"']
+CLAUSE = ['"should not be used', 'for domestic mass', 'surveillance or', 'autonomous weapons', '(including target',
+          'selection) without', 'appropriate human', 'oversight and control"']
 
 
-def deal_text():
-    """the phrase (50 px) and the full clause (48 px) under it, on narrower side margins"""
-    rows, y = ['0|m|0.05'], 90
-    for s_ in PHRASE:
-        rows.append(f'{r2(y / DP["h"])}|>50|{s_}')
-        y += 56
-    y += 6
-    for s_ in CLAUSE:
-        rows.append(f'{r2(y / DP["h"])}|>48|{s_}')
-        y += 52
+def deal_rows(s=1.0):
+    h = DP['h']
+    rows = ['0|m|0.06', f'{r2(46 / h)}|#{round(40 * s)}|DEAL']
+    rows += [f'{r2((140 + 62 * k) / h)}|>{round(58 * s)}|{w}' for k, w in enumerate(BLOCK1)]
+    rows.append(f'{r2(312 / h)}|-|1')
+    rows += [f'{r2((350 + 35 * k) / h)}|>{round(34 * s)}|{w}' for k, w in enumerate(CLAUSE)]
     return '\n'.join(rows)
 
 
-p9_els = [
-    SURFACE,
-    icon('page', role='subject', text=deal_text(), **DP),
-    icon('stamp', 616, 610, 150, 56, text='APRIL 2026'),
-]
-p10_els = p9_els + [icon('stamp', 330, 605, 280, 80, role='subject', text='NO VETO', **{'in': 0.74})]
-p10_moves = [{'el': 3, 'dx': 0, 'dy': 5, 'at': 0.74, 'dur': 0.05}]
+p9_els = [SURFACE, icon('page', role='subject', text=deal_rows(), **DP)]
+# P10: the same page redrawn at 0.85 (a pulled-back cut: the size changes at the cut, the clause stays whole) with a
+# big NO VETO stamp (the subject, 330 px) landing on "veto" across the page's top edge, beside "any lawful government
+# purpose" and clear of the clause block (never near "autonomous weapons (including target selection)").
+S10 = 0.85
+p10_page = icon('page', 540 - DP['w'] / 2 * S10, 950 - DP['h'] / 2 * S10, DP['w'] * S10, DP['h'] * S10, text=deal_rows(S10))
+p10_els = [SURFACE, p10_page, icon('stamp', 378, 626, 330, 125, role='subject', text='NO VETO', **{'in': 0.74})]
+p10_moves = [{'el': 2, 'dx': 0, 'dy': 5, 'at': 0.74, 'dur': 0.05}]
 
 # ===================================================================== P11: Google's side, its own panel
-GP = dict(x=320, y=640, w=440, h=615)
-G_TEXT = '\n'.join(['0|m|0.06', '0.1|#60|GOOGLE SAYS', '0.28|>52|it follows its', '0.37|>52|AI principles', '0.53|>52|bans retaliation',
-                    '0.62|>52|"of any kind"', squiggles(0.78, 0.92, 3, 0.8)])
+# Equal weight: the deal page's size, position, ground and tone (board v1 put it on plain paper); hand-lettered
+# GOOGLE SAYS, never the logo; quote marks only on the exact words; "staff can safely raise concerns" (FL 6.2,
+# unquoted paraphrase) answers P3's fear. Pencil underlines read along on "principles" (30.04) and "bans" (30.76).
+G_ROWS = [(52, '#44|GOOGLE SAYS'), (150, '>46|it follows its'), (208, '>46|AI principles'), (306, '>46|staff can safely'),
+          (364, '>46|raise concerns'), (462, '>46|bans retaliation'), (520, '>46|"of any kind"')]
+G_TEXT = '\n'.join(['0|m|0.07'] + [f'{r2(v / DP["h"])}|{s}' for v, s in G_ROWS])
 p11_els = [
-    rect(334, 654, 440, 615, 'light', role='far'),                                   # its shadow on a plain ground
-    icon('page', role='subject', text=G_TEXT, **GP),
-    line([[360, 902], [640, 902]], sw=5, draw=[1.84, 0.3], **{'in': 1.84}),          # 'principles'
-    line([[360, 1000], [700, 1000]], sw=5, draw=[2.56, 0.4], **{'in': 2.56}),         # 'bans'
+    SURFACE,
+    icon('page', role='subject', text=G_TEXT, **DP),
+    line([[345, 874], [640, 874]], sw=5, draw=[1.84, 0.3], **{'in': 1.84}),          # 'principles'
+    line([[345, 1128], [700, 1128]], sw=5, draw=[2.56, 0.4], **{'in': 2.56}),         # 'bans'
 ]
 
-# ===================================================================== P12: back on her contract, the line runs again
-front, top, shelf, pool, box, mug = desk_base(frame0=False)
-MORE = 170
-p12_els = [front,
-           icon('page', 340, DESK_EDGE - MORE, 400, HANG_H + MORE, sw=9, text=hang_text(HANG_H + MORE)),
-           line([[HL_X, DESK_EDGE - MORE], [HL_X, DESK_EDGE + HANG_H]], sw=22),
-           top, shelf, pool, box, mug,
-           icon('page', FLAT['x'], 1170, FLAT['w'], FLAT['h'], sw=9, text=squiggles(0.1, 0.95, 6, 0.8)),
-           line([[HL_X, 1170], [HL_X, DESK_EDGE]], sw=22),
-           page_el(frame0=False),
-           line(SIGNATURE, sw=5),
-           line([[TXT_L, CLAUSE_Y], [TXT_R, CLAUSE_Y]], role='subject', sw=24),
-           line([[TXT_R, CLAUSE_Y], [HL_X, CLAUSE_Y + 13], [HL_X, 1170]], role='subject', sw=22),
-           icon('badge', 180, 656, 100, text='GOOGLE')]
-p12_moves = []
-for i in (1, 2):
-    p12_moves += steps(i, MORE, 0.64, 5, 0.12, accel=True)
-
-# ===================================================================== LOOP: back to frame 0's bare lines
-LOOP_LEN = r2(DUR - 39.08)
-loop_els = []
-for e in o1_els:
-    if 'draw' in e and e['draw'] != NODRAW and e.get('in') is None and e['draw'][0] < 0.5:
-        c = copy.deepcopy(e)
-        c['draw'] = [r2(c['draw'][0] + LOOP_LEN), c['draw'][1]]
-        c['fillIn'] = NEVER
-        c.pop('out', None)
-        loop_els.append(c)
-loop_cam = cam(540, 960, 1.06)
-
 # ===================================================================== the reel
+# notes strip: line 1 = shot type, COZY / SCALE and the move (SketchReel adds the id and the move word if missing),
+# line 2 = the one idea (SketchReel adds the transition)
+NOTES = {
+    'O1': ("HOME BASE desk, COZY · INSERT high 3/4 · PULL OUT 5%",
+           "She quit: badge in the box. Her contract's line runs past its end, year after year, off the desk"),
+    'P2': ("HOME BASE nook, COZY · WIDE, eye level", "One odd contract: hers runs down to the floor"),
+    'P3': ("MEDIUM 2-shot, interview look", "Other staff, worried, told the BBC they're scared: their contracts"),
+    'P4': ("HOME BASE nook, COZY · MEDIUM (1.4x)", "So why is SHE talking? Her bubble pops"),
+    'P5': ("CLOSE over her shoulder, COZY", "She worked on Google's AI"),
+    'P6': ("MEDIUM CLOSE, new angle 3/4 front, COZY", "Worried, she tells the BBC she objected"),
+    'P7': ("INSERT, cold: out of her room", "April: a deal, stamped"),
+    'P8': ("SCALE: RISE over a low wall (the big move)",
+           "Grey band = a low wall we rise over; the Pentagon too big for the frame; car rows = the ruler"),
+    'P9': ("INSERT close, straight-on (scale cut back in)", "The deal's words: 'any lawful government purpose' + the clause in full"),
+    'P10': ("INSERT pulled back (0.85x), same page", "NO VETO stamped by the purpose line"),
+    'P11': ("INSERT, the deal page's size and ground", "Google's side, equal weight: principles, safe channels, no retaliation"),
+    'P12': ("HOME BASE callback = O1's end, COZY", "She says she still can't: her line runs on"),
+    'P13': ("HOME BASE nook, COZY · MEDIUM-WIDE (1.2x)", "Her own words: talking about FACTS"),
+    'LOOP': ("DISSOLVE back to frame 0 (the loop)", "The opening's bare lines redraw"),
+}
+
+
+def shot(id_, s, e, tr_label, els, camera=None, moves=None, tr='cut', dur=None, credit=None, scale=False):
+    t = {'type': tr, 'label': tr_label}
+    if dur:
+        t['dur'] = dur
+    out = {'id': id_, 's': s, 'e': e, 'note': '\n'.join(NOTES[id_]), 'transition': t, 'camera': camera or hold(), 'els': els}
+    if moves:
+        out['moves'] = moves
+    if credit:
+        out['credit'] = credit
+    if scale:
+        out['scale'] = True
+    return out
+
+
 shots = [
-    shot('O1', 0, 6.12, "COZY desk insert, high 3/4. Signed (chime), badge in the box, then her line runs off the page and pours off the desk",
-         'frame 0; the loop lands here', o1_els, o1_cam, o1_moves),
-    shot('P2', 6.12, 8.36, "COZY nook, wide, eye level: the home base. One odd contract: hers, its tail heaped on the floor", "on 'You'd'", p2_els),
-    shot('P3', 8.36, 13.24, 'PLAIN interview look: backlit, faceless staff; NAME WITHHELD; an ordinary underline on their contract',
-         "on 'But'", p3_els, credit=BBC),
-    shot('P4', 13.24, 15.0, 'COZY nook medium: so why is SHE talking? Her mic; her bubble pops on "talking"', "on 'So'", p4_els),
-    shot('P5', 15.0, 16.6, 'COZY cut-in over her shoulder: she worked on Google\'s AI', "cut-in on 'She'", p5_els,
-         credit='Sofia Liguori · research engineer, Google DeepMind'),
-    shot('P6', 16.6, 20.52, 'COZY, closer: she told the BBC she objected (worried, speaking)', "on 'and'", p6_els, credit=BBC),
-    shot('P7', 20.52, 21.32, 'PLAIN cold insert: a deal, stamped APRIL 2026 on "April". Out of her room (never through her window)',
-         "hard cut on 'In'", p7_els, moves=p7_moves, credit='Source: Japan Times, 28 Apr 2026'),
-    shot('P8', 21.32, 23.8, 'SCALE, the one big move (S1 rise-over): over a low wall onto the Pentagon; car lots for scale. No figures',
-         "on 'that'", p8_els, p8_cam, p8_moves),
-    shot('P9', 23.8, 25.96, "PLAIN insert (scale cut back in): the deal's words, with its oversight clause in full", "scale cut on 'for'",
-         p9_els, credit=BBC),
-    shot('P10', 25.96, 28.2, 'PLAIN insert, same frame: NO VETO stamped on "veto"; the clause stays readable', "on 'Google'", p10_els,
-         moves=p10_moves, credit='Sources: BBC News, 21 Oct 2026 · Japan Times, 28 Apr 2026'),
-    shot('P11', 28.2, 33.08, "PLAIN neutral: Google's own page, same size as hers; underlines read along", "on 'But'", p11_els,
-         credit='Statement to the BBC, 21 Oct 2026'),
-    shot('P12', 33.08, 35.32, "COZY desk insert, O1's end frame: she says she still can't; her line runs again", "on 'She'", p12_els,
-         moves=p12_moves, credit=BBC),
-    shot('P13', 35.32, 39.08, 'COZY nook medium, slow push: her own words; on "FACTS" her bubble holds the sourced deal page',
-         "on 'But'", p13_els, p13_cam, credit=BBC),
-    shot('LOOP', 39.08, DUR, "Back to frame 0's bare lines", 'to frame 0', loop_els, loop_cam, tr='dissolve', dur=0.12),
+    shot('O1', 0, 6.12, 'frame 0; the loop lands here', o1.els, O1_CAM, o1.moves),
+    shot('P2', 6.12, 8.36, "on 'You'd'", p2_els, credit=HER),
+    shot('P3', 8.36, 13.24, "on 'But'", p3_els, credit=BBC),
+    shot('P4', 13.24, 15.0, "on 'So'", p4_els),
+    shot('P5', 15.0, 16.6, "cut-in on 'She'", p5_els, credit='Sofia Liguori · former research engineer, Google DeepMind'),
+    shot('P6', 16.6, 20.52, "on 'and'", p6_els, credit=BBC),
+    shot('P7', 20.52, 21.32, "hard cut on 'In'", p7_els, moves=p7_moves, credit=TI),
+    shot('P8', 21.32, 23.8, "on 'that'", p8.els, P8_CAM, p8.moves, scale=True),
+    shot('P9', 23.8, 25.96, "scale cut on 'for'", p9_els, credit=BBC),
+    shot('P10', 25.96, 28.2, "on 'Google'", p10_els, moves=p10_moves,
+         credit='Sources: BBC News, 21 Oct 2026 · The Information via Japan Times, 28 Apr 2026'),
+    shot('P11', 28.2, 33.08, "on 'But'", p11_els, credit='Statement to the BBC, 21 Oct 2026'),
+    shot('P12', 33.08, 35.32, "on 'She'", p12.els, moves=p12.moves, credit=HER),
+    shot('P13', 35.32, 39.08, "on 'But'", p13_els, credit=BBC),
+    shot('LOOP', 39.08, DUR, 'to frame 0', loop_els, loop_cam, tr='dissolve', dur=0.12),
 ]
 
 # ===================================================================== words (captions) and sound
@@ -439,12 +581,12 @@ def sfx(name, t, gain):
 SFX = [
     sfx('signed_chime', 0.08, 0.55),       # the first-second positive phone sound: her signature lands (E6 -> A6)
     sfx('badge_clack', 0.92, 0.5),         # 'Google.': the badge drops into the box
-    sfx('marker_squeak', 2.60, 0.4),       # 'CONTRACT': the marker starts its line
-    sfx('paper_unroll', 3.48, 0.4),        # the page steps out past its edge; ends dead at 4.84 ('for life': near silence)
+    sfx('marker_squeak', 2.60, 0.4),       # 'CONTRACT': the highlighter sweeps the clause
+    sfx('paper_unroll', 3.00, 0.4),        # the page runs past its edge; ends dead at 4.36 ('for life': near silence)
     sfx('room_tone_2s', 6.12, 0.2),
     sfx('pencil_line', 12.20, 0.35),       # 'contracts': an ordinary underline
     sfx('room_tone_7s', 13.24, 0.2),
-    sfx('like_pop', 14.28, 0.4),           # 'talking': HER bubble pops
+    sfx('like_pop', 13.96, 0.4),           # 'SHE': her bubble pops
     sfx('like_pop', 16.76, 0.3),           # 'told'
     sfx('cold_air', 20.52, 0.25),          # out of her room
     sfx('stamp_april', 20.76, 0.55),       # 'April'
@@ -454,13 +596,12 @@ SFX = [
     sfx('pencil_line', 30.04, 0.3),        # 'principles'
     sfx('pencil_line', 30.76, 0.3),        # 'bans'
     sfx('room_tone_6s', 33.08, 0.2),       # home again
-    sfx('paper_unroll_short', 33.72, 0.35),  # "can't": her line runs again
-    sfx('like_pop', 36.44, 0.4),           # 'talking'
-    sfx('paper_tap', 37.16, 0.35),         # 'FACTS': the sourced page in her bubble
+    sfx('paper_unroll_short', 33.72, 0.35),  # "can't": her line runs on
+    sfx('like_pop', 36.44, 0.4),           # 'talking': her FACTS bubble
 ]
 
 out = {'style': 'board', 'label': 'v2 G3 board', 'audio': 'v2/voice.wav', 'durationSec': DUR,
-       'frame0': 'SHE SAYS: NO CRITICIZING GOOGLE. FOR LIFE.', 'frame0Until': 4.84, 'frame0Credit': BBC,
+       'frame0': 'SHE SAYS: NO CRITICIZING GOOGLE. FOR LIFE.', 'frame0Until': 6.12, 'frame0Credit': HER,
        'words': words, 'sfx': SFX, 'shots': shots}
 
 # checks: the shots tile the film, every cut lands on a word start, every sfx file exists

@@ -1,5 +1,7 @@
 """Sound-off cold-read sheet for a board animatic: one frame per panel at its middle, plus the opening at fixed times,
 each labelled only with a number (the notes strip is cropped off so the director's notes don't give the answer).
+STORYBOARD_STYLE §3 sampling: a sample never lands inside a caption page's 2-frame pop (it moves to 0.08 s after the
+page starts), and a scale panel with an animated camera (shot "scale": true) gives its start AND landing frames.
 
   python3 scripts/v2/coldread_sheet.py [public/v2/animatic.json] [out_dir]
 
@@ -28,7 +30,34 @@ if abs(near['t'] - mid0) < 0.2:  # the opening already has a frame at O1's middl
 else:
     frames.append({'t': mid0, 'panel': o1['id'], 'what': 'panel middle'})
 for s in d['shots'][1:]:
-    frames.append({'t': round((s['s'] + s['e']) / 2, 2), 'panel': s['id'], 'what': 'panel middle'})
+    cam = s.get('camera', {})
+    if s.get('scale') and cam.get('from') != cam.get('to'):
+        land = min(s['e'] - 0.05, cam.get('end', s['e']) + 0.1)
+        frames.append({'t': round(s['s'] + 0.1, 2), 'panel': s['id'], 'what': 'big move: start frame'})
+        frames.append({'t': round(land, 2), 'panel': s['id'], 'what': 'big move: landing frame'})
+    else:
+        frames.append({'t': round((s['s'] + s['e']) / 2, 2), 'panel': s['id'], 'what': 'panel middle'})
+
+
+def page_starts(words, max_chars=16):
+    """caption page start times, paged like SketchReel's pages() (16 chars, a new page after a sentence end)"""
+    out, cur = [], []
+    for w in words:
+        n = sum(len(x['w']) + 1 for x in cur) + len(w['w'])
+        if cur and (n > max_chars or cur[-1]['w'][-1:] in '.?!'):
+            out.append(cur[0]['s'])
+            cur = []
+        cur.append(w)
+    if cur:
+        out.append(cur[0]['s'])
+    return out[1:]  # the first page shows from frame 0 without a pop
+
+
+POPS = page_starts(d['words'])
+for f in frames:
+    hit = [p for p in POPS if f['t'] - 0.07 < p <= f['t']]
+    if hit:
+        f['t'] = round(max(hit) + 0.08, 2)
 frames.sort(key=lambda f: f['t'])
 
 os.makedirs(OUT, exist_ok=True)

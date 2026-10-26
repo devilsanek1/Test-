@@ -785,17 +785,21 @@ const ICONS: Record<IconName, (b: Ico, o: Opts) => void> = {
 
   cars(b, o) {
     // a row of identical parked cars seen from high up (the scale ruler under a colossal building, ISOTYPE-style): each
-    // a body with its glass cabin on top; text = how many (default: as many as fit at about 1.75 x the height each)
+    // a rounded body, a glass cabin on top and two wheels, with gaps between them and a few empty bays (a tight grid of
+    // boxes read as a keyboard); text = how many bays (default: as many as fit at about 2.6 x the height each)
     const body = o.body(C.silver);
-    const n = Math.max(1, parseInt(o.text ?? '', 10) || Math.round(b.w / (1.75 * b.h)));
+    const n = Math.max(1, parseInt(o.text ?? '', 10) || Math.round(b.w / (2.6 * b.h)));
     const slot = 1 / n;
+    const r = rng(`${b.seed}/cars`);
     for (let i = 0; i < n; i++) {
-      const u0 = i * slot + 0.12 * slot;
-      const cw = 0.76 * slot;
-      const cabin: Pt[] = [[u0 + 0.2 * cw, 0.02], [u0 + 0.8 * cw, 0.02], [u0 + 0.9 * cw, 0.42], [u0 + 0.1 * cw, 0.42]];
-      b.fBx(u0, 0.4, cw, 0.58, body);
+      if (i % 7 === 3 || r.chance(0.1)) continue;
+      const u0 = i * slot + 0.2 * slot;
+      const cw = 0.6 * slot;
+      const cabin: Pt[] = [[u0 + 0.2 * cw, 0.04], [u0 + 0.8 * cw, 0.04], [u0 + 0.94 * cw, 0.44], [u0 + 0.06 * cw, 0.44]];
+      for (const wu of [0.08, 0.7]) b.fBx(u0 + wu * cw, 0.8, 0.22 * cw, 0.2, C.dark);
+      b.fRr(u0, 0.36, cw, 0.5, 0.22 * cw, body);
       b.fPl(cabin, C.steel);
-      b.bx(u0, 0.4, cw, 0.58, 3);
+      b.rr(u0, 0.36, cw, 0.5, 0.22 * cw, 3);
       b.pl(cabin, true, 3);
     }
   },
