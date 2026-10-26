@@ -120,6 +120,8 @@ Format: **rule** — why / evidence (video, date).
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
 - **Palettes: the warm, everyday one for a money / everyday-life story.** — (v3 G4).
+- **Palettes: the clean "news" one (Cream & Cobalt) for a serious story,** with a cold sister palette (Dusk) only for
+  the one scale beat. — (v2 G4).
 
 ## Motion
 - **A reference move gives the SHAPE, never the speed.** Copy its path, framing, reveal order and easing shape, then
