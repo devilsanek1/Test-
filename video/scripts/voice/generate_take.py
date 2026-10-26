@@ -71,30 +71,47 @@ def words(s):
 
 def same(heard, expected):
     """Exact match of the spoken words, ignoring spacing artifacts of the recogniser (e.g. "can'tveto")."""
-    return ''.join(heard) == ''.join(expected)
+    squash = lambda ws: re.sub(r'(.)\1+', r'\1', ''.join(ws))  # sounds merged at a word boundary ("Google staff" ~ "Google's staff")
+    return squash(heard) == squash(expected)
 
 
-def tts(text, voice, model, prev_text, next_text, seed, a):
-    body = {'text': text, 'model_id': model, 'seed': seed,
-            'voice_settings': {'stability': a.stability, 'similarity_boost': a.similarity, 'style': a.style,
-                               'use_speaker_boost': True, 'speed': a.speed}}
+_FMT = {'fmt': 'pcm_44100'}
+
+
+def tts(text, voice, model, prev_text, next_text, seed, a, prev_ids=None):
+    """One request -> (audio float32, sr, request_id). v4 takes stability + similarity only (no style/speed);
+    request stitching via previous_request_ids (accepted units, <= 3) + next_text; WAV (pcm_44100, Pro plan) first,
+    MP3 if the plan refuses it; context fields dropped if a model rejects them."""
+    vs = {'stability': a.stability, 'similarity_boost': a.similarity}
+    if not model.startswith('eleven_v4'):
+        vs.update({'style': a.style, 'use_speaker_boost': True, 'speed': a.speed})
+    body = {'text': text, 'model_id': model, 'seed': seed, 'voice_settings': vs}
     if a.context:
-        if prev_text:
+        if prev_ids:
+            body['previous_request_ids'] = prev_ids[-3:]
+        elif prev_text:
             body['previous_text'] = prev_text
         if next_text:
             body['next_text'] = next_text
-    url = f'{API}/text-to-speech/{voice}?output_format=mp3_44100_128'
-    for attempt in range(2):
+    for attempt in range(4):
+        url = f'{API}/text-to-speech/{voice}?output_format={_FMT["fmt"]}'
         r = requests.post(url, headers={'xi-api-key': key(), 'Content-Type': 'application/json'}, json=body, timeout=180)
-        if r.status_code == 400 and attempt == 0 and ('previous_text' in body or 'next_text' in body):
-            body.pop('previous_text', None)  # some models reject context fields: retry without them
-            body.pop('next_text', None)
+        if r.status_code >= 400 and _FMT['fmt'].startswith('pcm') and ('format' in r.text.lower() or r.status_code == 403):
+            _FMT['fmt'] = 'mp3_44100_128'
+            continue
+        if r.status_code == 400 and any(k in body for k in ('previous_request_ids', 'previous_text', 'next_text')):
+            for k in ('previous_request_ids', 'previous_text', 'next_text'):
+                body.pop(k, None)
             continue
         if r.status_code >= 400:
             raise RuntimeError(f'ElevenLabs {r.status_code}: {r.text[:300]}')
+        rid = r.headers.get('request-id') or r.headers.get('x-request-id')
+        if _FMT['fmt'].startswith('pcm'):
+            y = np.frombuffer(r.content, dtype=np.int16).astype(np.float32) / 32768.0
+            return y, 44100, rid
         pcm = subprocess.run(['ffmpeg', '-v', 'error', '-i', 'pipe:0', '-ac', '1', '-ar', '48000', '-f', 'f32le', 'pipe:1'],
                              input=r.content, check=True, capture_output=True).stdout
-        return np.frombuffer(pcm, dtype=np.float32).copy(), 48000
+        return np.frombuffer(pcm, dtype=np.float32).copy(), 48000, rid
     raise RuntimeError('ElevenLabs request failed')
 
 
@@ -152,7 +169,7 @@ def main():
     p.add_argument('paste', nargs='?')
     p.add_argument('out', nargs='?')
     p.add_argument('--voice', default=os.environ.get('ELEVENLABS_VOICE_ID'))
-    p.add_argument('--model', default=os.environ.get('ELEVENLABS_MODEL', 'eleven_v3'))
+    p.add_argument('--model', default=os.environ.get('ELEVENLABS_MODEL', 'eleven_v4'))
     p.add_argument('--tries', type=int, default=4)
     p.add_argument('--stability', type=float, default=0.5)
     p.add_argument('--similarity', type=float, default=0.75)
@@ -165,6 +182,8 @@ def main():
     p.add_argument('--lead', type=float, default=0.12, help='silence before the first word (s)')
     p.add_argument('--model-dir', default=os.environ.get('PARAKEET_DIR', DEFAULT_MODEL_DIR))
     p.add_argument('--whisper-dir', default=os.environ.get('WHISPER_DIR', os.path.join(os.path.dirname(DEFAULT_MODEL_DIR), 'fw')))
+    p.add_argument('--mode', choices=['auto', 'whole', 'units'], default='auto', help='auto: the whole script first (up to --whole-tries), then per paragraph')
+    p.add_argument('--whole-tries', type=int, default=3)
     p.add_argument('--dry-run', action='store_true')
     p.add_argument('--list-models', action='store_true')
     p.add_argument('--list-voices', action='store_true')
@@ -188,9 +207,36 @@ def main():
         return
     if not a.voice:
         sys.exit('No voice id: pass --voice or set ELEVENLABS_VOICE_ID (see docs/voice/VOICE.md).')
+    sys.path.insert(0, HERE)
+    from check_paste import lint
+    errs, _, st = lint(a.paste)
+    if errs:
+        sys.exit('The paste fails check_paste.py; fix it first:\n' + '\n'.join(errs))
     os.makedirs(a.out, exist_ok=True)
+    script_words = [w for u in units for w in words(u['text'])]
 
-    report, parts = [], []
+    # 1. the whole script in one generation (keeps v4's whole-scene arc); first clean take wins
+    if a.mode in ('auto', 'whole'):
+        for k in range(a.whole_tries):
+            y, sr, _ = tts(st['raw'], a.voice, a.model, '', '', 500 + k, a)
+            y = trim(y, sr)
+            dur = len(y) / sr
+            heard = words(transcribe(y, sr, a.model_dir).get('text', ''))
+            ok = same(heard, script_words) and dur <= 1.3 * len(script_words) / 2.8
+            print(f'whole try {k + 1}: {"OK " if ok else "BAD"} {dur:.2f}s, {len(heard)} words (script {len(script_words)})')
+            if ok:
+                take = np.concatenate([np.zeros(int(a.lead * sr), dtype=np.float32), fade(y, sr), np.zeros(int(0.3 * sr), dtype=np.float32)])
+                sf.write(f'{a.out}/take.wav', take, sr, subtype='PCM_16')
+                subprocess.run([sys.executable, f'{HERE}/transcribe.py', f'{a.out}/take.wav', a.model_dir, f'{a.out}/take_words.json'], check=True, capture_output=True)
+                json.dump({'model': a.model, 'voice': a.voice, 'mode': 'whole', 'try': k + 1, 'duration': round(len(take) / sr, 2), 'all_clean': True},
+                          open(f'{a.out}/report.json', 'w'), indent=1)
+                print(f'\ntake: {a.out}/take.wav, {len(take) / sr:.2f} s; ALL CLEAN (whole script, try {k + 1}). Check it with check_take.py too.')
+                return
+        if a.mode == 'whole':
+            sys.exit('No clean whole-script take; run with --mode units.')
+
+    # 2. per paragraph, chained with request stitching, each checked and regenerated until it matches
+    report, parts, accepted_ids = [], [], []
     for i, u in enumerate(units):
         expected = words(u['text'])
         prev_text = ' '.join(x['text'] for x in units[max(0, i - 2):i])
@@ -198,7 +244,7 @@ def main():
         send = u['text'] if (a.no_tags or not u['tag']) else f'[{u["tag"]}] {u["text"]}'
         best = None
         for k in range(a.tries):
-            y, sr = tts(send, a.voice, a.model, prev_text, next_text, 1000 + 97 * i + k, a)
+            y, sr, rid = tts(send, a.voice, a.model, prev_text, next_text, 1000 + 97 * i + k, a, accepted_ids)
             y = trim(y, sr)
             sf.write(f'{a.out}/line_{i + 1:02d}_try{k + 1}.wav', y, sr)
             heard = words(transcribe(y, sr, a.model_dir).get('text', ''))
@@ -212,13 +258,16 @@ def main():
                     heard, ratio, judge = words(alt), 1.0, 'whisper'
             ok = same(heard, expected) and 1.5 <= wps <= 4.2
             cand = {'line': i + 1, 'try': k + 1, 'judge': judge, 'match': same(heard, expected), 'ratio': round(ratio, 3),
-                    'dur': round(dur, 2), 'wps': round(wps, 2), 'heard': ' '.join(heard), 'y': y, 'sr': sr}
+                    'dur': round(dur, 2), 'wps': round(wps, 2), 'heard': ' '.join(heard), 'y': y, 'sr': sr, 'rid': rid,
+                    'listen': judge == 'whisper'}
             print(f'line {i + 1:2d} try {k + 1}: {"OK " if ok else "BAD"} ratio {ratio:.3f} {dur:.2f}s {wps:.1f} w/s  "{" ".join(heard)[:70]}"')
             if best is None or (ok, ratio) > (best['ok'], best['ratio']):
                 best = dict(cand, ok=ok)
             if ok:
                 break
         parts.append(best)
+        if best.get('rid'):
+            accepted_ids.append(best['rid'])
         report.append({k2: v for k2, v in best.items() if k2 not in ('y', 'sr')})
 
     sr_out = 48000
@@ -237,9 +286,11 @@ def main():
     sf.write(f'{a.out}/take.wav', take, sr_out, subtype='PCM_16')
     subprocess.run([sys.executable, f'{HERE}/transcribe.py', f'{a.out}/take.wav', a.model_dir, f'{a.out}/take_words.json'], check=True, capture_output=True)
     bad = [r['line'] for r in report if not r['ok']]
+    listen = [r['line'] for r in report if r.get('listen')]
     json.dump({'model': a.model, 'voice': a.voice, 'settings': {k: getattr(a, k) for k in ('stability', 'similarity', 'style', 'speed', 'context', 'no_tags', 'gap', 'gap_comma')},
                'lines': report, 'duration': round(len(take) / sr_out, 2), 'all_clean': not bad}, open(f'{a.out}/report.json', 'w'), indent=1)
-    print(f'\ntake: {a.out}/take.wav, {len(take) / sr_out:.2f} s; ' + ('ALL LINES CLEAN' if not bad else f'lines still not matching: {bad} (listen, or raise --tries)'))
+    print(f'\ntake: {a.out}/take.wav, {len(take) / sr_out:.2f} s; ' + ('ALL LINES CLEAN' if not bad else f'lines still not matching: {bad} (listen, or raise --tries)')
+          + (f'; passed only on Whisper, listen once: {listen}' if listen else ''))
 
 
 if __name__ == '__main__':
