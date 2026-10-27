@@ -124,7 +124,7 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
 | NOOK | interior, eye level | refuge 35-55 % on >= 2 edges; window 15-30 % | §2 | locked or float | the subject, small loops |
 | LANE | eye level along a street | H:W 1:1-1:1.5 (mass >= 35 %); sky 15-30 % | §2 | locked or float | walkers on the walks |
 | BALCONY | high, 35-55° down | mass 40-50 %; void 0 | lid 0-600 (flat facade x 95-945, y 290-600), life 600-1250, floor 1250-1920 | locked | along the curve |
-| RIVERSIDE | level, across water | mass ~60-70 %; sky ~8-15 % | sky + skyline 0-290, flat far row 290-600, facade belt 600-1115, lane to 1230, bank, water 1420+ | 2D float | one lane, both ways |
+| RIVERSIDE | level, across water | mass ~60-70 %; sky ~8-15 % | sky + skyline 0-290, flat far row 290-600, facade belt 600-1000, dark belt to 1115, lane to 1230, bank to 1420, water 1420+ | 2D float | one lane, both ways |
 
 **BALCONY [C2]: a high angle from a window over a street, square or courtyard.**
 - From a 3rd-5th floor window or balcony, 35-55° down; no sky, no horizon; figures grow 1.4-2.5x from the far kerb to the
@@ -157,7 +157,7 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   (amplitude >= 0.12 H, never one straight roofline), kept with its sky in y 0-290 and the gutters: sky ~8-15 %, the
   lightest, calmest field (L* ~90), never an empty slab (LIFE §3: the notches, wires and antennas, an occasional bird or a
   slow cloud). Across x 95-945, y 290-600 the back row is ONE flat facade fill (L* >= 75, no windows, ink or roof edges):
-  the caption plane. The busy facade belt sits in y 600-1000.
+  the caption plane. The busy facade belt sits in y 600-1000, the value sandwich's dark belt in y 1000-1115.
 - **Value sandwich:** the darkest mass (a hedge, trees, a bush, L* 20-38) right behind the seam, so light figures pop; the
   path where people sit is the most neutral ground (C <= 15); the bank and the water below are light again.
 - **The moat:** the lane (seam) at y 1115-1230, above the UI; a stone bank under it (y 1230-1420, dabs, part of the mass), then
@@ -244,7 +244,7 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   clothes, a reflection), across many hue families (what C3 held: References), at C <= min(40, the hero's C - 10) in hues
   other than the hero's and the pop's, so the hero (C >= 30) and the one pop (C >= 50) stay the loudest (colour jobs,
   PALETTE). PALETTE's "background 50-80 %" is met by many light soft fills together (each facade, the sky, the floor its own
-  tint), never by one empty slab (LIFE §0: the biggest flat region <= 20 % apart from the calm field).
+  tint), never by one empty slab (LIFE §0's biggest-field check).
 - **Good-weather light, one sun:** lit tones lean yellow-gold; lit : shade on buildings ~3:1 (C3); shadows short (<= 3-4 % W
   past the object, C2) and soft in value and edge: flat, or a 2-step band with a lighter 15-25 px penumbra (C2's soft edge,
   25 px at 1080), never a blur or a gradient.
@@ -267,15 +267,15 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
 - **Must read full with texture OFF:** C3 flattened to 24 flat colours still reads full and cozy (flat 18 %, detail 37 %);
   texture is worth the last ~5-15 points of flat share, never the fix for an empty set.
 - **Lines:** no outlines; thin warm-dark lines (~2.5-3 px at 1080) only in key places (poles, wires, tyres, rails,
-  mullions), 1-4 % of the pixels; light lines too (railings, lane marks).
+  mullions; C2 ~1.6 % of the pixels, C3 3.8 %: examples, never a quota); light lines too (railings, lane marks).
 - **Paper edges:** both references edge all four sides; we never put one at the top or beside the caption band. If used:
   the bottom and the sides from y >= 640 (fading in), inset 12-40 px, ragged (peak-to-peak 20-45 px), a dry-brush zone of
   10-40 px, the surround a dark warm tint (anchor family, L* 15-35), never grey, white paper or a photo. At the top, the lid
   or a wall cut by the top edge does the holding job.
 
 ### 3b.8 Check a cozy shot (phone size, sound off)
-1. Paused, at phone size beside the cozy reference: full by LIFE §0's DENSE-CALM row (flat <= 30 %, detail >= 33 %,
-   obj >= 120), no hole bigger than the caption band, the biggest field <= 20 % apart from the one calm field at an edge.
+1. Paused, at phone size beside the cozy reference: full by `LIFE_AND_DENSITY.md` §0 (its DENSE-CALM row and its checks:
+   no hole bigger than the caption band, no big field apart from the one calm field at an edge); the numbers live there.
 2. Mass 35-70 % of the frame with the void in its dose; a floor bounded, its far end hidden; >= 40 % of the perimeter closed, open toward us.
 3. Detail gradient: busy far side and edges, calm floor or centre; the captions on one flat plane (a light facade fill or
    the sky, never the canopy), with no wires, windows or roof edges in y 290-600 inside x 95-945.

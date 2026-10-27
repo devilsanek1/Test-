@@ -19,29 +19,34 @@ the calmest we have measured: fullness first, motion second (§0).
 - **Judge the paused frame first.** If a still looks empty, more motion will not fix it (v3 S9). Fix in this order: the
   world (things, layers, thin lines), then people (still ones count), then the idle motion. Never put motion on a void to
   liven it up (31 % of v3 G5's moving pixels sat on void): fill the void.
-- **What makes a still full** (C2 / C3 against v3 G5, for a flat-colour frame; warnings, never quotas). The owner wants
-  "less prescriptive on the amount of objects": how many things the references hold is an example for the eye
-  (`COZY_AND_SCALE.md` References), never a count to hit; only what can be measured is a check here.
+- **What makes a still full** (C2 / C3 against v3 G5, for a flat-colour frame). The owner wants "less prescriptive on the
+  amount of objects", so only these checks are rules, and each lives here once (`COZY_AND_SCALE.md` 3b.8 points here):
+  - **The meter's fullness:** the profile's row below (DENSE-CALM or BUSY), from density.py's default table.
   - **No hole bigger than the caption band:** outside the caption band and the one quiet field, no empty patch over ~200 px
     across (largest empty disc: C3 393 px, the sky; v3 G5 910 px). The quiet field is ONE band touching the top or bottom
     edge (sky, water, floor), and it is still patterned.
   - **A field MADE of things, never things ON a field:** the biggest single flat region <= 20 % of the frame apart from the
-    quiet field (C3 8-15 %, v3 G5 23-45 %); many small things, each size step down holding more (C3 ~3x).
-  - **Stacked, not spread:** a new surface every <= 60-90 px down any column (C3 42, v3 G5 143), depth by overlap; 5+ of 8
-    horizontal bands (240 px each) hold drawn detail (C3 7, v3 G5 0-3).
-  - **Local colour variety:** >= 2.5 colours per 96 px patch on average, >= 45 % of patches with 3+ (C3 4.25 / 85 %, v3 G5
-    1.77 / 22 %); repeats vary in colour (each house, awning, shirt).
-  - **Thin lines are the cheapest fullness:** 3-4 % of the frame in ~3 px lines (wires, poles, antennas, rails, mullions;
-    never outlines, never in the caption band: §8); drawn back onto a flattened C3 they cut its flat share from 18 to 15 %.
-  - **People, even still:** about half at rest; a still person counts as life (v3 G5: nobody in 9 of 14 shots); a shot with
-    nobody in it needs the character or a silhouette in a window.
-  - **Texture last:** worth the last 5-15 points of flat share, never the fix; the frame must read full with it off.
-  - Void, stacking and colours per patch are not in density.py yet (TO BUILD, `COZY_AND_SCALE.md` §7.6): judge them by eye.
+    quiet field (C3 8-15 %, v3 G5 23-45 %).
+  - **The paused frame at phone size beside the reference** (a cozy hold beside C3 or C2, a BUSY shot beside reference 1
+    and v1) reads as full as it does. The hole and field checks are not in density.py yet (void, TO BUILD:
+    `COZY_AND_SCALE.md` §7.6): the paused-frame look decides them.
+- **What fills a frame** (how the references get there; examples for the eye, never targets; their counts per frame are in
+  the `COZY_AND_SCALE.md` References log):
+  - many small things, each size step down holding more (C3 ~3x per step);
+  - stacked, not spread: depth by overlap, a new surface every few dozen px down a column (C3 42 px, v1 90, v3 G5 143),
+    drawn detail in most 240 px bands (C3 7 of 8, v3 G5 0-3);
+  - local colour variety: several colours in every small patch (per 96 px: C3 4.25, v1 2.41, v3 G5 1.77), and repeats
+    vary in colour (each house, awning, shirt);
+  - thin lines, the cheapest fullness: wires, poles, antennas, rails, mullions (never outlines, never in the caption band:
+    §8; line style in `COZY_AND_SCALE.md` 3b.7); drawn back onto a flattened C3 they cut its flat share from 18 to 15 %;
+  - people, even still: about half at rest; a still person counts as life (v3 G5: nobody in 9 of 14 shots); a shot with
+    nobody in it needs the character or a silhouette in a window;
+  - texture last: worth the last 5-15 points of flat share, never the fix; the frame must read full with it off.
 - **Two alive profiles, one per shot** (name it in the camera plan):
 
 | profile | for | fullness (density.py) | motion |
 |---|---|---|---|
-| DENSE-CALM | cozy holds (`COZY_AND_SCALE.md` 3b) | flat <= 30 %, detail >= 33 %, obj >= 120, set so both cozy refs pass made flat like for like (C3 at 24 flat colours 18 % / 37 % / 124; C2 flattened: flat 29 %, detail 33 %): flat and obj rise above BUSY, detail holds. Plus no hole bigger than the caption band and the biggest field <= 20 % apart from the quiet field; judge the paused frame at phone size beside the cozy reference (the clip stays out of the repo) | `density.py --cozy` (§9): movers >= 2 (!! < 1), empty <= 5 % (!! > 20 %), cv <= 0.3 for a steady lane or <= 0.75 for one slow swell per 6-7 s (!! > 1.2), the camera locked (float ~0) or floating 8-15 px/s; the motion in one band; one quiet ambient element on (§6) |
+| DENSE-CALM | cozy holds (`COZY_AND_SCALE.md` 3b) | flat <= 30 %, detail >= 33 %, obj >= 120, set so both cozy refs pass made flat like for like (C3 at 24 flat colours 18 % / 37 % / 124; C2 flattened: flat 29 %, detail 33 %): flat and obj rise above BUSY, detail holds. Plus the hole, field and paused-frame checks above (the reference clip stays out of the repo) | `density.py --cozy` (§9): movers >= 2 (!! < 1), empty <= 5 % (!! > 20 %), cv <= 0.3 for a steady lane or <= 0.75 for one slow swell per 6-7 s (!! > 1.2), the camera locked (float ~0) or floating 8-15 px/s; the motion in one band; one quiet ambient element on (§6) |
 | BUSY | explainer beats and the opening (a scale hold has its own: `CINEMATIC_GUIDE.md` Scale cues 11) | §1 (flat <= 40 %, obj >= 105, detail >= 34 %) | §1 and §6 (>= 5 ev/s per film, no gap over 1 s) |
 
   v3 G5 was neither: a third of the cozy fullness and half the busy motion (`--cozy`: movers 1.0, empty 56 %, cv 1.13,
@@ -76,7 +81,7 @@ What one frame holds (count it on a still at phone size):
 ## 2. Composition: where the density goes
 - **One quiet field, the rest loaded.** In thirds (y 0-640, 640-1280, 1280-1920) the quiet field (in 9:16 usually the
   wall or sky behind the caption band) takes at most one; every other third holds 3+ distinct props at 3 depths. Finer:
-  5+ of 8 bands of 240 px hold drawn detail, and calm sits only at a frame edge, round the subject or behind the captions,
+  drawn detail in most 240 px bands (§0), and calm sits only at a frame edge, round the subject or behind the captions,
   never as a slab mid-frame (§0; `COZY_AND_SCALE.md` 3b.3: busy edges and far side, calm centre or floor).
 - **Hierarchy keeps the read.** The subject keeps the strongest value contrast, the hero colour and a calm ring (30-60 px
   of one value) round its silhouette; dressing sits one value step off its ground, ink by depth (front 4.8, mid 3.4,
