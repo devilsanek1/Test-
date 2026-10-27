@@ -118,11 +118,17 @@ export function benchBack(B: Batch, o: {x0: number; x1: number; yRail: number; y
   const under = part === 'all' || part === 'under';
   const over = part === 'all' || part === 'over';
   if (under) {
-    // the shadow under / behind the bench (toward us) and the floor seen through it
-    if (o.shadow !== false) B.fill(DT.deep, polyD([[x0 + endW, yFeet - 0.42 * k], [x1 - endW, yFeet - 0.42 * k], [x1 + 0.12 * k, yFeet + 0.1 * k], [x0 - 0.04 * k, yFeet + 0.14 * k]]));
-    // the seat surface (seen from above-behind, beyond the back edge) and its slats
-    B.poly(DT.woodShade, [[x0 + endW * 0.6, seatFrontY], [x1 - endW * 0.6, seatFrontY], [x1 - endW * 0.6, seatY], [x0 + endW * 0.6, seatY]]);
-    B.ink(lineD([[x0 + endW, (seatFrontY + seatY) / 2], [x1 - endW, (seatFrontY + seatY) / 2]]), Math.max(0.6, ink * 0.3), DT.woodShade);
+    // the dark gap under the seat (the floor in the bench's own shade, between the legs) + a contact shadow strip
+    if (o.shadow !== false) {
+      // the floor under the seat in the bench's own shade, the darkest right under the seat's edge, a stretcher bar
+      B.fill(DT.deep, polyD([[x0 + endW * 0.5, seatY], [x1 - endW * 0.5, seatY], [x1 - endW * 0.2, yFeet + 0.015 * k], [x0 + endW * 0.2, yFeet + 0.015 * k]]));
+      B.fill(DT.under, polyD([[x0 + endW * 0.5, seatY], [x1 - endW * 0.5, seatY], [x1 - endW * 0.5, seatY + 0.09 * k], [x0 + endW * 0.5, seatY + 0.13 * k]]));
+      B.fill(DT.deep, polyD([[x0 - 0.03 * k, yFeet], [x1 + 0.06 * k, yFeet], [x1 - 0.02 * k, yFeet + 0.06 * k], [x0 - 0.1 * k, yFeet + 0.07 * k]]));
+      B.rect(DT.iron, x0 + endW * 0.5, yFeet - 0.17 * k, x1 - x0 - endW, Math.max(1, 0.025 * k));
+    }
+    // the seat's top (seen from above-behind, beyond its back edge: lit) and a slat line
+    B.poly(DT.woodLit, [[x0 + endW * 0.6, seatFrontY], [x1 - endW * 0.6, seatFrontY], [x1 - endW * 0.6, seatY], [x0 + endW * 0.6, seatY]]);
+    B.ink(lineD([[x0 + endW, (seatFrontY + seatY) / 2], [x1 - endW, (seatFrontY + seatY) / 2]]), Math.max(0.6, ink * 0.3), DT.wood);
     // the top rail's part UNDER the figures (Pip's perch): from the split to the right end
     if (split < x1) {
       B.rect(DT.wood, split, yRail, x1 - endW * 0.5 - split, railH);
@@ -193,10 +199,7 @@ export function parkBench(X0: number, X1: number, d: number, extra?: (B: Batch, 
   const a = dpt(X0, d);
   const b = dpt(X1, d);
   const yRail = dpt(X0, d, 0.92)[1];
-  // a cast shadow toward us (flat, deep)
-  B.fill(DT.deep, polyD([[a[0] + 0.05 * k, a[1] - 0.05 * k], [b[0] - 0.05 * k, b[1] - 0.05 * k], [b[0] - 0.2 * k, b[1] + 0.35 * k], [a[0] - 0.1 * k, a[1] + 0.32 * k]]));
-  B.layer();
-  benchBack(B, {x0: a[0], x1: b[0], yRail, yFeet: a[1], d, ink: k > 75 ? 2.6 : 2.2, part: 'all', shadow: false});
+  benchBack(B, {x0: a[0], x1: b[0], yRail, yFeet: a[1], d, ink: k > 75 ? 2.6 : 2.2, part: 'all'});
   if (extra) {
     B.layer();
     extra(B, a, b, k);
@@ -255,85 +258,91 @@ export function fountain(X: number, d: number): Prop {
   return {y, b: B, key: `fountain${X}`};
 }
 
-/** A raised tulip bed: a stone kerb (0.4 m), soil, rows of tulips (leaves + flat heads in several colours), from
- *  (X0..X1) x (dNear..dFar). Optional clipped box hedge along its back. */
-export function tulipBed(X0: number, X1: number, dNear: number, dFar: number, seed: string, hedge = false): Prop {
+/** A tulip bed at ground level: a low stone edging, soil, broad leaves and tulips planted in colour DRIFTS (a few
+ *  strays), heights varying, inside a low iron HOOP fence (ink-only hoops: thin lines); (X0..X1) x (dNear..dFar). */
+export function tulipBed(X0: number, X1: number, dNear: number, dFar: number, seed: string): Prop {
   const B = new Batch();
-  const kz = 0.4;
+  const kz = 0.08;
+  const kw = 0.12;
   const pt = (X: number, d: number, z = 0) => dpt(X, d, z);
-  // the kerb's outer faces (toward us = in shade) and its top (lit)
-  const fl0 = pt(X0, dNear);
-  const fl1 = pt(X1, dNear);
-  const ft0 = pt(X0, dNear, kz);
-  const ft1 = pt(X1, dNear, kz);
   const bt0 = pt(X0, dFar, kz);
   const bt1 = pt(X1, dFar, kz);
-  B.fill(DT.deep, polyD([[fl0[0], fl0[1]], [fl1[0], fl1[1]], [fl1[0] - 0.1 * pxmD(dNear), fl1[1] + 0.3 * pxmD(dNear)], [fl0[0] - 0.2 * pxmD(dNear), fl0[1] + 0.3 * pxmD(dNear)]]));
-  B.layer();
-  B.poly(DT.stoneMid, [fl0, fl1, ft1, ft0]);
-  // the side faces (left side seen when the bed is right of the VP and vice versa)
-  const side = (X: number) => {
-    const a = pt(X, dNear);
-    const b = pt(X, dFar);
-    const c = pt(X, dFar, kz);
-    const e = pt(X, dNear, kz);
-    return [a, b, c, e] as Pt[];
-  };
-  if (X0 > 0) B.poly(DT.stoneShade, side(X0));
-  if (X1 < 0) B.poly(DT.stone, side(X1));
-  // the top: kerb band + soil
-  const kw = 0.16;
-  B.poly(DT.stone, [ft0, ft1, bt1, bt0]);
+  const ft0 = pt(X0, dNear, kz);
+  const ft1 = pt(X1, dNear, kz);
+  const bb0 = pt(X0, dFar);
+  // the edging and the soil
+  B.poly(DT.stoneMid, [ft0, ft1, bt1, bt0]);
   B.poly(DT.soil, [pt(X0 + kw, dNear - kw, kz), pt(X1 - kw, dNear - kw, kz), pt(X1 - kw, dFar + kw, kz), pt(X0 + kw, dFar + kw, kz)]);
-  B.rect(DT.stoneLit, Math.min(ft0[0], bt0[0]), ft0[1] - 1.2, Math.max(ft1[0], bt1[0]) - Math.min(ft0[0], bt0[0]), 2.2);
+  B.rect(DT.stone, bt0[0], bt0[1] - 1.2, bt1[0] - bt0[0], 2.2);
   B.layer();
   const r = rng(`s5deck/tul/${seed}`);
-  // hedge along the back (a clipped box hedge: sage in two values, no grey)
-  if (hedge) {
-    const hb0 = pt(X0 + kw, dFar + kw + 0.3, kz);
-    const hb1 = pt(X1 - kw, dFar + kw + 0.3, kz);
-    const hh = 0.5 * pxmD(dFar);
-    B.poly(DT.leafShade, [hb0, hb1, [hb1[0], hb1[1] - hh], [hb0[0], hb0[1] - hh]]);
-    B.rect(DT.hedge, hb0[0], hb0[1] - hh - 2, hb1[0] - hb0[0], 0.22 * hh + 2);
-    let tufts = '';
-    for (let x = hb0[0] + 6; x < hb1[0] - 6; x += r.range(10, 18)) tufts += crownD(x, hb0[1] - hh + r.range(4, hh - 4), r.range(5, 10), r.range(3, 6), `s5deck/ht${seed}${Math.round(x)}`, 5, 0.3);
-    B.fill(DT.leafDeep, tufts);
-    B.layer();
-  }
-  // tulips: rows across the bed, back to front (each: two leaves, a stem, a cup head)
-  const leaves: string[] = [];
+  // the hoop fence along the far edge and both sides (behind the tulips), as ink hoops
+  const hoops = (Xa: number, da: number, Xb: number, db: number) => {
+    let h = '';
+    const n = Math.max(2, Math.round(Math.hypot(Xb - Xa, db - da) / 0.42));
+    for (let i = 0; i < n; i++) {
+      const u0 = i / n;
+      const u1 = (i + 1) / n;
+      const A = pt(Xa + (Xb - Xa) * u0, da + (db - da) * u0);
+      const Bp = pt(Xa + (Xb - Xa) * u1, da + (db - da) * u1);
+      const k = pxmD(da + (db - da) * (u0 + u1) / 2);
+      h += `M${A[0].toFixed(1)} ${A[1].toFixed(1)}Q${((A[0] + Bp[0]) / 2).toFixed(1)} ${((A[1] + Bp[1]) / 2 - 0.62 * k).toFixed(1)} ${Bp[0].toFixed(1)} ${Bp[1].toFixed(1)}`;
+    }
+    return h;
+  };
+  const kInk = pxmD(dNear) > 75 ? 1.8 : 1.5;
+  B.ink(hoops(X0 - 0.06, dFar + 0.06, X1 + 0.06, dFar + 0.06), kInk, DT.iron);
+  // colour drifts along the bed
+  const drifts: {X: number; d: number; col: string}[] = [];
+  for (let i = 0; i < Math.max(3, Math.round((X1 - X0) / 0.5)); i++) drifts.push({X: r.range(X0, X1), d: r.range(dNear, dFar), col: DT.tulips[(i * 3 + r.int(0, 2)) % DT.tulips.length]});
+  const colAt = (X: number, d: number) => {
+    let best = drifts[0];
+    let bd = 1e9;
+    for (const q of drifts) {
+      const dd = (q.X - X) ** 2 + ((q.d - d) * 1.6) ** 2;
+      if (dd < bd) {
+        bd = dd;
+        best = q;
+      }
+    }
+    return r.chance(0.08) ? r.pick(DT.tulips) : best.col;
+  };
+  const leafA: string[] = [];
+  const leafB: string[] = [];
   const stems: string[] = [];
   const heads = new Map<string, string>();
   const headsLit = new Map<string, string>();
-  const rows = Math.max(3, Math.round((dFar - dNear - 2 * kw) / 0.22));
-  for (let ri = 0; ri < rows; ri++) {
-    const d = dFar + kw - ((ri + 0.5) * (dFar - dNear - 2 * kw)) / rows;
+  const plants: {x: number; y: number; k: number; hgt: number; col: string}[] = [];
+  for (let d = dFar + kw - 0.06; d > dNear - kw + 0.05; d -= r.range(0.1, 0.16)) {
     const k = pxmD(d);
-    const colBase = r.int(0, DT.tulips.length - 1);
-    for (let X = X0 + kw + r.range(0.04, 0.14); X < X1 - kw - 0.05; X += r.range(0.15, 0.22)) {
-      const [x, y] = pt(X + r.jitter(0.03), d + r.jitter(0.04), kz);
-      const hgt = r.range(0.32, 0.46) * k;
-      leaves.push(polyD([[x - 0.05 * k, y], [x - 0.09 * k, y - hgt * 0.42], [x - 0.01 * k, y - hgt * 0.2]]));
-      leaves.push(polyD([[x + 0.04 * k, y], [x + 0.1 * k, y - hgt * 0.5], [x + 0.01 * k, y - hgt * 0.22]]));
-      stems.push(lineD([[x, y], [x + r.jitter(0.01 * k), y - hgt]]));
-      // rows of one colour with a few strays (a planted bed)
-      const col = r.chance(0.82) ? DT.tulips[colBase] : r.pick(DT.tulips);
-      const hw = 0.045 * k;
-      const hd = `M${x - hw} ${y - hgt}Q${x - hw} ${y - hgt - hw * 2.2} ${x - hw * 0.3} ${y - hgt - hw * 2.4}L${x} ${y - hgt - hw * 1.7}L${x + hw * 0.3} ${y - hgt - hw * 2.4}Q${x + hw} ${y - hgt - hw * 2.2} ${x + hw} ${y - hgt}Q${x} ${y - hgt + hw * 0.8} ${x - hw} ${y - hgt}Z`;
-      heads.set(col, (heads.get(col) ?? '') + hd);
-      if (k > 60) headsLit.set(col, (headsLit.get(col) ?? '') + ellD(x + hw * 0.35, y - hgt - hw * 1.2, hw * 0.3, hw * 0.65));
+    for (let X = X0 + kw + r.range(0, 0.12); X < X1 - kw - 0.03; X += r.range(0.11, 0.2)) {
+      const [x, y] = pt(X + r.jitter(0.04), d, kz);
+      plants.push({x, y, k, hgt: r.range(0.3, 0.5) * k, col: colAt(X, d)});
     }
   }
-  B.fill(DT.leaf, leaves.join(''));
+  for (const p of plants) {
+    const {x, y, k, hgt} = p;
+    const lean = r.jitter(0.04) * k;
+    (r.chance(0.5) ? leafA : leafB).push(polyD([[x - 0.05 * k, y], [x - 0.12 * k + lean, y - hgt * 0.45], [x - 0.01 * k, y - hgt * 0.18]]));
+    (r.chance(0.5) ? leafA : leafB).push(polyD([[x + 0.04 * k, y], [x + 0.11 * k + lean, y - hgt * 0.52], [x + 0.01 * k, y - hgt * 0.22]]));
+    stems.push(lineD([[x, y - hgt * 0.15], [x + lean * 0.5, y - hgt]]));
+    const hw = 0.048 * k;
+    const hx = x + lean * 0.5;
+    const hy = y - hgt;
+    const hd = `M${hx - hw} ${hy}Q${hx - hw} ${hy - hw * 2.2} ${hx - hw * 0.3} ${hy - hw * 2.4}L${hx} ${hy - hw * 1.7}L${hx + hw * 0.3} ${hy - hw * 2.4}Q${hx + hw} ${hy - hw * 2.2} ${hx + hw} ${hy}Q${hx} ${hy + hw * 0.8} ${hx - hw} ${hy}Z`;
+    heads.set(p.col, (heads.get(p.col) ?? '') + hd);
+    if (k > 60) headsLit.set(p.col, (headsLit.get(p.col) ?? '') + ellD(hx + hw * 0.38, hy - hw * 1.25, hw * 0.28, hw * 0.62));
+  }
+  B.fill(DT.leafShade, leafB.join(''));
+  B.fill(DT.leaf, leafA.join(''));
   B.ink(stems.join(''), Math.max(0.8, pxmD(dNear) * 0.012), DT.leafShade);
   B.layer();
   heads.forEach((d, col) => B.fill(col, d));
   headsLit.forEach((d, col) => B.fill(mix(col, CM.paper, 0.45), d));
   B.layer();
-  const kInk = pxmD(dNear) > 75 ? 2.6 : 2.2;
-  B.ink(lineD([fl0, ft0, ft1, fl1]), kInk, DT.ink, 0.2);
-  B.ink(lineD([ft0, bt0]) + lineD([ft1, bt1]), kInk * 0.7, DT.ink, 0.3);
-  return {y: fl0[1], b: B, key: `bed${seed}`};
+  // the side hoops (in front of the side tulips)
+  B.ink(hoops(X0 - 0.06, dFar + 0.06, X0 - 0.06, dNear - 0.3) + hoops(X1 + 0.06, dFar + 0.06, X1 + 0.06, dNear - 0.3), kInk, DT.iron);
+  return {y: bb0[1], b: B, key: `bed${seed}`};
 }
 
 /** A square stone planter with a small blossoming crabapple (the crown stays under the crane: low). */
@@ -350,10 +359,10 @@ export function crabPlanter(X: number, d: number, seed: string): Prop {
   const dt = dpt(X + w / 2, d + w, hz);
   B.fill(DT.deep, polyD([a, b, [b[0] - 0.2 * k, b[1] + 0.4 * k], [a[0] - 0.3 * k, a[1] + 0.4 * k]]));
   B.layer();
-  B.poly(DT.stone, [a, b, bt, at]);
-  B.poly(DT.stoneMid, [a, [a[0] + (b[0] - a[0]) * 0.3, a[1]], [at[0] + (bt[0] - at[0]) * 0.3, at[1]], at]);
-  B.poly(X > 0 ? DT.stoneShade : DT.stone, X > 0 ? [a, dpt(X - w / 2, d + w), ct, at] : [b, dpt(X + w / 2, d + w), dt, bt]);
-  B.poly(DT.stoneLit, [at, bt, dt, ct]);
+  B.poly(DT.stoneShade, [a, b, bt, at]);
+  B.poly(DT.stoneDeep, [a, [a[0] + (b[0] - a[0]) * 0.3, a[1]], [at[0] + (bt[0] - at[0]) * 0.3, at[1]], at]);
+  B.poly(X > 0 ? DT.stoneDeep : DT.stoneMid, X > 0 ? [a, dpt(X - w / 2, d + w), ct, at] : [b, dpt(X + w / 2, d + w), dt, bt]);
+  B.poly(DT.stone, [at, bt, dt, ct]);
   B.poly(DT.soil, [dpt(X - w / 2 + 0.1, d + 0.1, hz), dpt(X + w / 2 - 0.1, d + 0.1, hz), dpt(X + w / 2 - 0.1, d + w - 0.1, hz), dpt(X - w / 2 + 0.1, d + w - 0.1, hz)]);
   // trunk + crown (2.0-3.4 m up)
   const [tx, ty] = dpt(X, d + w / 2, hz);

@@ -129,9 +129,7 @@ export const TerraceTree5: React.FC<{burstAt?: number}> = ({burstAt}) => {
     const T = TREE5.trunk;
     const bark = CM.anchor;
     const barkLit = mix(CM.anchor, CM.brickDeep, 0.5);
-    // the shade on the floor round its foot (deep, flat) and the roots spreading over it, cut by both edges
-    B.fill(DT.deep, polyD([[-80, 1800], [150, 1780], [330, 1850], [420, 1990], [-80, 1990]]));
-    B.layer();
+    // the roots spreading over the floor, cut by both edges (the floor's own shade is the deck's: no light there)
     // roots: flared buttresses into the ground
     B.poly(bark, [[T.x - 150, 1990], [T.x - 120, 1902], [T.x - 52, 1866], [T.x - 40, 1990]]);
     B.poly(bark, [[T.x + 40, 1990], [T.x + 58, 1868], [T.x + 120, 1898], [T.x + 230, 1960], [T.x + 250, 1990]]);
@@ -201,22 +199,32 @@ export const TerraceTree5: React.FC<{burstAt?: number}> = ({burstAt}) => {
 
 // ---------------------------------------------------------------- lampposts (one family) + baskets
 
-/** The basket's flowers (pink, white, mustard, plum) on sage; `nod` = the soft sway (px at h 560). */
+/** A hanging basket at (cx, cy) (the rim's centre; k = scale vs the 560 px reference): a wicker bowl, a lobed
+ *  mound of leaves in two sage values and trailing chains of small leaves (ivy-leaved geraniums) hanging below it. */
 function basketShapes(B: Batch, cx: number, cy: number, k: number, seed: string) {
   const r = rng(`s5deck/basket/${seed}`);
-  // the wicker bowl
-  B.fill(mix(CM.line, CM.brickDeep, 0.3), `M${cx - 66 * k} ${cy}Q${cx} ${cy + 64 * k} ${cx + 66 * k} ${cy}Z`);
-  B.ink(`M${cx - 54 * k} ${cy + 16 * k}Q${cx} ${cy + 44 * k} ${cx + 54 * k} ${cy + 16 * k}`, Math.max(1, 1.6 * k), mix(CM.line, CM.anchor, 0.4));
-  // the mound of leaves, and trailing strands down to ~cy + 80
-  B.fill(DT.leafShade, crownD(cx, cy - 22 * k, 116 * k, 54 * k, `s5deck/bk/${seed}0`, 10, 0.05));
-  B.fill(DT.leaf, crownD(cx + 12 * k, cy - 34 * k, 86 * k, 38 * k, `s5deck/bk/${seed}1`, 9, 0.1));
-  let strands = '';
-  for (let i = 0; i < 9; i++) {
-    const sx = cx + r.range(-100, 100) * k;
-    const len = r.range(40, 96) * k;
-    strands += smoothClosed([[sx - 7 * k, cy - 6 * k], [sx + 7 * k, cy - 6 * k], [sx + 3 * k + r.jitter(5 * k), cy + len], [sx - 3 * k, cy + len * 0.9]]);
+  B.fill(mix(CM.line, CM.brickDeep, 0.3), `M${cx - 64 * k} ${cy - 4 * k}Q${cx} ${cy + 62 * k} ${cx + 64 * k} ${cy - 4 * k}Z`);
+  B.ink(`M${cx - 52 * k} ${cy + 14 * k}Q${cx} ${cy + 42 * k} ${cx + 52 * k} ${cy + 14 * k}`, Math.max(1, 1.6 * k), mix(CM.line, CM.anchor, 0.4));
+  B.fill(DT.leafShade, crownD(cx, cy - 18 * k, 112 * k, 50 * k, `s5deck/bk/${seed}0`, 11, 0.12));
+  B.fill(DT.leaf, crownD(cx + 14 * k, cy - 32 * k, 84 * k, 34 * k, `s5deck/bk/${seed}1`, 9, 0.15));
+  // trailing chains
+  let ca = '';
+  let cb = '';
+  for (let i = 0; i < 11; i++) {
+    let x = cx + r.range(-104, 104) * k;
+    let y = cy - r.range(0, 14) * k;
+    const n = r.int(3, 7);
+    for (let j = 0; j < n; j++) {
+      const lw = r.range(8, 12) * k;
+      const e = crownD(x, y, lw, lw * 0.72, `s5deck/bk/${seed}c${i}/${j}`, 5, 0.1);
+      if ((i + j) % 2) ca += e;
+      else cb += e;
+      x += r.jitter(6) * k;
+      y += r.range(9, 14) * k;
+    }
   }
-  B.fill(DT.leafShade, strands);
+  B.fill(DT.leafShade, cb);
+  B.fill(DT.leafWarm, ca);
 }
 
 /** A terrace lamppost, BASE at (0, 0), `h` px to the finial (the reference drawing is 560 tall). Unlit lantern. */
@@ -271,10 +279,11 @@ export const LampPost5: React.FC<{h: number; baskets?: 0 | 1 | 2; ink?: number; 
     const cols = [CM.blossom, CM.paper, CM.coatMustard, CM.blossom, CM.coatPlum, mix(CM.blossom, CM.brick, 0.35)];
     const out: {x: number; y: number; rr: number; col: string}[] = [];
     for (const s of baskets === 2 ? [-1, 1] : [1]) {
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 36; i++) {
         const a = r.range(0, Math.PI * 2);
         const dd = Math.sqrt(r.next());
-        out.push({x: s * 118 * k + Math.cos(a) * 104 * k * dd, y: -392 * k + Math.sin(a) * 40 * k * dd + (r.chance(0.3) ? r.range(20, 70) * k : 0), rr: r.range(8, 13) * k, col: r.pick(cols)});
+        const trail = r.chance(0.35);
+        out.push({x: s * 118 * k + Math.cos(a) * 100 * k * dd, y: (trail ? -370 * k + r.range(10, 66) * k : -398 * k + Math.sin(a) * 36 * k * dd), rr: r.range(8, 12.5) * k, col: r.pick(cols)});
       }
     }
     return out;
