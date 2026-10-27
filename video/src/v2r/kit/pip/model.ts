@@ -65,6 +65,16 @@ export type PoseParams = {
   tuftLean: number;
   /** Eyes open 1 .. closed 0 (blink). */
   eyes: number;
+  /** THE WATCHER CHEAT 0..1 (the art director's "watch34"; 1 = the default). While the body is within ~40 deg of
+   *  facing away (a perched watcher), the body settles to a 3/4 back turned toward the side it looks, and the head
+   *  turns its FACE to that side: 3/4 front above 72 px (the trunk curl, one eye and the blush show), a clean profile
+   *  at <= 60 px (the elephant still reads at 44 px). The side: the look / target (< 0 screen left), else the way the
+   *  body is turned (FACING back / backRight -> right, backLeft -> left, straight away -> left, west). 0 = the plain
+   *  rig (a back view whose head turns away from us). */
+  watch: number;
+  /** 0..1: turn to the camera. The body swings round to a 3/4 front through the side the head is on, the head faces
+   *  us, a target stops pulling the head (S1's ears-cover is played from the FRONT: earsCover sets 1). */
+  toCam: number;
 };
 
 export const NEUTRAL: PoseParams = {
@@ -95,6 +105,8 @@ export const NEUTRAL: PoseParams = {
   flutter: 0,
   tuftLean: 0,
   eyes: 1,
+  watch: 1,
+  toCam: 0,
 };
 
 export const PARAM_KEYS = Object.keys(NEUTRAL) as (keyof PoseParams)[];
@@ -111,6 +123,89 @@ export function blendParams(a: PoseParams, b: PoseParams, k: number): PoseParams
     } else out[key] = lerp(a[key], b[key], k);
   }
   return out;
+}
+
+// ---------------------------------------------------------------- the watcher (how a perched Pip is seen)
+
+/** Tunables of the watcher cheat (`watch`) and the turn to camera (`toCam`). Degrees. */
+export const WATCH = {
+  /** The watcher's body: degrees from straight away, turned toward the side it looks (45 = a true 3/4 back)... */
+  body: 40,
+  /** ...and at <= 60 px, further round toward the profile (the elephant silhouette carries the 44 px S5 end). */
+  bodySmall: 62,
+  /** The watcher's head: degrees PAST the profile toward us from 72 px up (a 3/4 front: the trunk curl, one eye, the
+   *  blush); none at <= 60 px (a clean profile). */
+  past: 34,
+  /** |look| >= this turns the face fully to that side. */
+  sideLook: 0.3,
+  /** The back sector: the cheat is full while the body is >= `full` deg from facing us, gone at <= `none`. */
+  full: 140,
+  none: 112,
+  /** toCam = 1: the body ends this far off facing us (on the side the head came round), the head this far. */
+  camBody: 26,
+  camHead: 5,
+  /** How far the ears follow a turned head (the plain rig lags them at 0.5 so a head turned away keeps a leaf on each
+   *  side; the watcher's face-on head carries them further, so the near leaf sits behind its eye, not over it). */
+  earLag: 0.75,
+};
+
+/** Wrap degrees to [-180, 180). */
+export const wrap180 = (a: number) => ((((a + 180) % 360) + 360) % 360) - 180;
+
+/** The plain rig's head yaw (absolute degrees) for a body yaw and a screen-relative look: squared to the camera axis
+ *  within 30 deg of front / back, turned up to +-95 deg by look, the look fading out side-on (no flip). */
+export function plainHeadYaw(yawDeg: number, look: number): number {
+  const cT = Math.cos(yawDeg * D2R);
+  const yawD = ((yawDeg % 360) + 360) % 360;
+  const dBack = 180 - yawD;
+  const dFront = yawD <= 180 ? -yawD : 360 - yawD;
+  const fade = (dd: number) => dd * clamp((45 - Math.abs(dd)) / 15);
+  const squareTo = Math.abs(dBack) < Math.abs(dFront) ? fade(dBack) : fade(dFront);
+  return yawDeg + look * 95 * clamp(cT * 1.6, -1, 1) + squareTo;
+}
+
+export type WatchYaw = {
+  /** The effective body and head yaw (degrees; 0 = toward us, 90 = facing screen right, 180 = away, 270 = left). */
+  body: number;
+  head: number;
+  /** -1 (its face toward screen left) .. +1 (right): the side the watcher shows its face on. */
+  side: number;
+  /** 0..1: how much of the watcher cheat is on (watch x the back sector). */
+  k: number;
+};
+
+/** Where the body and the head point, after the watcher cheat and the turn to camera. Pure; continuous in every
+ *  parameter (the side passes through the back of the head, never a pop). `px` = the drawn size (seat to head top). */
+export function watchYaw(p: PoseParams, px = 96): WatchYaw {
+  const Hp = plainHeadYaw(p.yaw, p.look);
+  const phiB = wrap180(p.yaw); // 0 = facing us, +-180 = away, + = turned toward screen right
+  const k = clamp(p.watch) * smooth((Math.abs(phiB) - WATCH.none) / (WATCH.full - WATCH.none));
+  // the side: the look first; with no look, the way the body is turned; straight away with no look: west (left)
+  const s0 = clamp(p.look / WATCH.sideLook, -1, 1);
+  const sb = Math.sign(phiB) * clamp((180 - Math.abs(phiB)) / 20);
+  const side = clamp(s0 + (1 - Math.abs(s0)) * (sb - (1 - Math.abs(sb))), -1, 1);
+  const sg = side > 0 ? 1 : -1;
+  // size: a clean profile at <= 60 px, the 3/4 front from 72 px
+  const big = smooth((px - 60) / 12);
+  const past = WATCH.past * big;
+  const bodyOff = lerp(WATCH.bodySmall, WATCH.body, big);
+  // side 0 = the back of the head (180); side +-1 = (90 - past) deg off facing us on that side
+  const phiHw = sg * (180 - Math.abs(side) * (90 + past));
+  const phiBw = sg * (180 - Math.abs(side) * bodyOff);
+  let body = p.yaw + wrap180(phiBw - p.yaw) * k;
+  let head = Hp + wrap180(phiHw - Hp) * k;
+  // the turn to camera: round through the side the head is on (linear in [-180, 180): never across the back)
+  const tc = clamp(p.toCam);
+  if (tc > 0) {
+    let fb = wrap180(body);
+    let fh = wrap180(head);
+    if (Math.abs(fb) > 170) fb = sg * Math.abs(fb);
+    if (Math.abs(fh) > 170) fh = sg * Math.abs(fh);
+    const eb = smooth(tc);
+    body = lerp(fb, sg * WATCH.camBody, eb);
+    head = lerp(fh, sg * WATCH.camHead, tc);
+  }
+  return {body, head, side, k};
 }
 
 // ---------------------------------------------------------------- output
@@ -171,10 +266,15 @@ const ELEV = 9 * D2R;
 export type BuildOpts = {
   /** Level of detail: 0 = tiny (<= 55 px: no ribs, no toes, 2 tuft hairs), 1 = full. */
   lod: 0 | 1;
+  /** The drawn size (px, seat to head top): the watcher's head is a 3/4 front above 72 px, a profile at <= 60. */
+  px?: number;
+  /** Design studies only: force the body / head yaw (degrees), bypassing watchYaw. */
+  yaws?: {body: number; head: number};
 };
 
 export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
-  const th = p.yaw * D2R;
+  const wy = o.yaws ? {...o.yaws, side: 0, k: 0} : watchYaw(p, o.px ?? 96);
+  const th = wy.body * D2R;
   const cT = Math.cos(th);
   const sT = Math.sin(th);
   const cE = Math.cos(ELEV);
@@ -208,25 +308,20 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
 
   // ---- head rig: head-local -> body-local (roll, pitch, yaw relative to the body) -> view
   const headDrop = p.headDrop + bodyTopShift * 0.9;
-  // seen from behind a head turn is nearly invisible, so it is played big: the head leans and tilts toward the side
-  // it looks at, and the trunk lifts out past the cheek (backness 0 facing us .. 1 facing away)
-  const backness = clamp(-Math.cos(p.yaw * D2R) * 1.3);
-  const turnedAway = backness > 0.4 && Math.abs(p.look) > 0.38 && Math.max(p.earSwingA, p.earSwingB) < 95;
-  const H0: V3 = [HEAD.x - p.look * 3.5 * backness * Math.sign(-Math.cos(p.yaw * D2R) || 1), HEAD.y + headDrop, HEAD.z];
-  const sgn = cT < -0.05 ? -1 : 1;
-  // a near-front / near-back body: the head squares up to the camera axis at look 0 (so look +-1 turns it the same
-  // amount either way); a profile keeps its head in line with the body
-  const yawD = ((p.yaw % 360) + 360) % 360;
-  // (continuous: full within 30 deg of front / back, fading out by 45 deg, so a turning body never snaps its head)
-  const dBack = 180 - yawD;
-  const dFront = yawD <= 180 ? -yawD : 360 - yawD;
-  const fade = (dd: number) => dd * clamp((45 - Math.abs(dd)) / 15);
-  const squareTo = Math.abs(dBack) < Math.abs(dFront) ? fade(dBack) : fade(dFront);
-  // look is screen-relative and full-strength within 50 deg of front / back; side-on it fades to nothing (no flip)
-  const psi = p.look * 95 * D2R * clamp(cT * 1.6, -1, 1) + squareTo * D2R;
-  void sgn;
+  // The head's yaw comes from watchYaw: the plain rig squares the head to the camera axis near front / back and turns
+  // it +-95 deg by the screen-relative look (fading out side-on); the watcher cheat turns the face round to us on the
+  // side it looks; toCam turns it to face us. Seen from BEHIND a head turn is nearly invisible, so the plain rig plays
+  // it big (the head leans and tilts toward its look side, the trunk lifts out past the cheek): those tricks follow
+  // the head's own backness under the cheat (none for a 3/4 front head), and fade with toCam.
+  const bodyBack = clamp(-cT * 1.3);
+  const headBack = clamp(-Math.cos(wy.head * D2R) * 1.3);
+  const backness = lerp(bodyBack, headBack, wy.k);
+  const lk = p.look * (1 - clamp(p.toCam));
+  const turnedAway = backness > 0.4 && Math.abs(lk) > 0.38 && Math.max(p.earSwingA, p.earSwingB) < 95;
+  const H0: V3 = [HEAD.x - lk * 3.5 * backness * Math.sign(-cT || 1), HEAD.y + headDrop, HEAD.z];
+  const psi = wrap180(wy.head - wy.body) * D2R;
   const phi = p.lookUp * 38 * D2R;
-  const rho = (p.headTilt + p.look * 8 * backness) * D2R;
+  const rho = (p.headTilt + lk * 8 * backness) * D2R;
   const makeRot = (yawR: number, pitchR: number, rollR: number) => {
     const cP = Math.cos(pitchR);
     const sP = Math.sin(pitchR);
@@ -250,7 +345,7 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
   const headVec = (q: V3): V3 => viewDir(headRot(q));
   // the ears turn only part of the way with the head (a cartoonist's lag: seen from behind, a turned head keeps one
   // leaf on each side instead of swinging one ear into the middle of the back of the head)
-  const earRot = makeRot(psi * 0.5, phi * 0.6, rho);
+  const earRot = makeRot(psi * lerp(0.5, WATCH.earLag, wy.k), phi * 0.6, rho);
   const earPt = (q: V3): V3 => view(v3.add(earRot(q), H0));
   const earVec = (q: V3): V3 => viewDir(earRot(q));
   const hc = view(H0);
@@ -347,7 +442,7 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
     // over the shoulder: seen from behind with the head turned, the ear on the look side tucks behind the head and
     // the trunk shows in front of it
     const rootX = earPt(att)[0];
-    const lookSide = turnedAway && Math.sign(rootX - hc[0]) === Math.sign(p.look);
+    const lookSide = turnedAway && Math.sign(rootX - hc[0]) === Math.sign(lk);
     const layer = lookSide ? 0.35 + rootDepth * 0.0005 : front ? 0.6 + rootDepth * 0.001 : -2 + rootDepth * 0.001;
     const fillRole: FillRole = 'body';
     // the ear darkens to the shade colour as it turns round the back of the head (a colour mix, continuous: no pop
@@ -411,13 +506,13 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
 
   // ---- trunk: down a little, then one curl forward and up
   {
-    const raise = (p.trunkRaise + 80 * Math.abs(p.look) * backness) * D2R;
+    const raise = (p.trunkRaise + 80 * Math.abs(lk) * backness) * D2R;
     const g: V3 = [0, Math.cos(raise), Math.sin(raise)];
     const f0: V3 = [0, -Math.sin(raise), Math.cos(raise)];
     const T0: V3 = [0, 6, 25.3];
     // turned away from us the trunk is all we see of the face: a longer, looser hook reads at 86 px (a tight curl
     // closes into a ball)
-    const away = backness * smooth((Math.abs(p.look) - 0.15) / 0.3); // 0..1, continuous
+    const away = backness * smooth((Math.abs(lk) - 0.15) / 0.3); // 0..1, continuous
     const curl = clamp(p.trunkCurl * (1 - 0.28 * away), 0, 1.4);
     const len = clamp(p.trunkLen * (1 + 0.25 * away), 0.5, 2);
     const Ls = (10 + 4 * (1 - Math.min(1, curl))) * len;
@@ -448,15 +543,23 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
       return {C, R, depthSum};
     };
     // the curl leans to one side; turned away from us it leans OUT toward the look side, so it clears the cheek
-    let tr = trace(38 + p.trunkSide);
+    let chi = 38 + p.trunkSide;
     if (away > 0.001) {
       // which way is "out" for this look (fixed by the geometry), then lean the curl there continuously
-      const alt = trace(-38 - p.trunkSide);
-      const out = (c: V2[]) => (c[c.length - 1][0] - hc[0]) * Math.sign(p.look) + (c[Math.round(c.length * 0.6)][0] - hc[0]) * Math.sign(p.look);
-      const outSign = out(alt.C) > out(tr.C) ? -1 : 1;
-      if (outSign < 0) tr = trace(lerp(38 + p.trunkSide, -38 - p.trunkSide, smooth(Math.abs(p.look) / 0.4) * clamp(backness * 2)));
+      const out = (c: V2[]) => (c[c.length - 1][0] - hc[0]) * Math.sign(lk) + (c[Math.round(c.length * 0.6)][0] - hc[0]) * Math.sign(lk);
+      const outSign = out(trace(-38 - p.trunkSide).C) > out(trace(chi).C) ? -1 : 1;
+      if (outSign < 0) chi = lerp(38 + p.trunkSide, -38 - p.trunkSide, smooth(Math.abs(lk) / 0.4) * clamp(backness * 2));
     }
-    const {C, R, depthSum} = tr;
+    // a face turned to us (the watcher, the turn to camera): the curl leans into the picture plane, so it reads in the
+    // silhouette instead of pointing at the lens (its plane faces yaw head + chi: chi pulls it toward the profile);
+    // full on a 3/4 head, nothing face-on or from behind (no flip anywhere)
+    const faceK = Math.max(wy.k, clamp(p.toCam));
+    if (faceK > 0.001) {
+      const phiH = wrap180(wy.head);
+      const ideal = phiH >= 0 ? 38 * clamp((90 - phiH) / 15, -1, 1) : 38 * clamp((-90 - phiH) / 15, -1, 1);
+      chi = lerp(chi, ideal + p.trunkSide, faceK * smooth((Math.abs(Math.sin(phiH * D2R)) - 0.15) / 0.35));
+    }
+    const {C, R, depthSum} = trace(chi);
     const front = depthSum / (steps + 1) > -HEAD.rz * 0.3;
     parts.push({id: 'trunk', group: 'trunk', shape: tubeShape(C, R), layer: front ? 0.7 : turnedAway ? 0.38 : -2.5, fill: 'body', union: true, lines: front || turnedAway});
     // two little trunk creases (only side-on: seen end-on they read as a mouth)
@@ -477,10 +580,12 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
 
   // ---- eyes and cheeks (face side only)
   if (faceVisible) {
+    // a face turned round to us shows ONE eye: the far one stays hidden until it is clear of the contour
+    const eyeMin = lerp(3, 8, Math.max(wy.k, clamp(p.toCam)));
     for (const s of [1, -1]) {
       const e = headPt([s * 12.5, -3, 23.6]);
       const rd = e[2] - hc[2];
-      if (rd > 3) {
+      if (rd > eyeMin) {
         const fs = clamp(rd / HEAD.rz, 0.35, 1);
         const open = clamp(p.eyes, 0.08, 1);
         parts.push({id: `eye${s}`, group: 'head', shape: ellipseShape(e[0], e[1], 2.5 * fs, 3.3 * open, rho, 14), layer: 0.45, fill: 'eye', union: false, lines: false});

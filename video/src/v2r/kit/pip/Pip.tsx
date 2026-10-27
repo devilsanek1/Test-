@@ -136,17 +136,19 @@ export type PipDrawingProps = {
   inkPx?: number;
   seed?: Seed;
   drawInk?: boolean;
+  /** Design studies only: force the body / head yaw (degrees). */
+  yaws?: {body: number; head: number};
 };
 
 const OPAQUE = new Set(['body', 'shade', 'scarf']);
 
-export const PipDrawing: React.FC<PipDrawingProps> = ({x, y, size, params, squash = 0, rotate = 0, draw = 1, exit = 0, paint = 'colour', inkPx, seed = 'pip', drawInk = true}) => {
+export const PipDrawing: React.FC<PipDrawingProps> = ({x, y, size, params, squash = 0, rotate = 0, draw = 1, exit = 0, paint = 'colour', inkPx, seed = 'pip', drawInk = true, yaws}) => {
   if (draw <= 0 || exit >= 1) return null;
-  const out = drawPip({x, y, size, params, squash, rotate, draw, exit, paint, inkPx: inkPx ?? defaultInk(size), seed: String(seed), drawInk});
+  const out = drawPip({x, y, size, params, squash, rotate, draw, exit, paint, inkPx: inkPx ?? defaultInk(size), seed: String(seed), drawInk, yaws});
   return <g>{out}</g>;
 };
 
-type DrawArgs = Required<Omit<PipDrawingProps, 'seed'>> & {seed: string};
+type DrawArgs = Required<Omit<PipDrawingProps, 'seed' | 'yaws'>> & {seed: string; yaws?: {body: number; head: number}};
 
 function hashSeed(s: string): number {
   let h = 2166136261;
@@ -157,7 +159,7 @@ function hashSeed(s: string): number {
 function drawPip(a: DrawArgs): React.ReactNode[] {
   const {x, y, size, params, draw, exit, paint, inkPx, seed, drawInk} = a;
   const lod: 0 | 1 = size < 58 ? 0 : 1;
-  const g: PipGeom = buildPip(params, {lod});
+  const g: PipGeom = buildPip(params, {lod, px: size, yaws: a.yaws});
   const s = size / MODEL_H;
   const sq = clamp(a.squash, -0.5, 0.6);
   const sx = 1 + sq * 0.55;
