@@ -178,7 +178,7 @@ CUES = [
     # V2S2 The wall (6.10-12.98)
     (at_frame(407), "window_outline", 17, "'one': her dark window's A outline pops on (one frame), in the gap before 'one'"),
     (lead(8.44), "board_clack:2", 13, "the newsstand A-board slides out: TOLD THE BBC (the ONE board sound) ('But')"),
-    (lead(8.96), "light_clicks", 19, "'staff': the five windows round hers turn a cooler white"),
+    (lead(8.96), "light_clicks", 19, "'staff': the five windows round hers turn a cooler white in one step (five clicks in 40 ms)"),
     (lead(9.48), "notebook_flap", 19, "'BBC': the reporter's notebook opens"),
     (10.26, "blinds_five", 16, "'scared': five blinds drop to half one by one (10.26-10.60)"),
     (lead(12.20), "blind_thump", 15, "'contracts': the blind beside hers comes fully down"),

@@ -152,8 +152,8 @@
  {
   "src": "v2r/sfx/light_clicks.wav",
   "t": 8.9333,
-  "gain": 0.2081,
-  "note": "'staff': the five windows round hers turn a cooler white",
+  "gain": 0.1545,
+  "note": "'staff': the five windows round hers turn a cooler white in one step (five clicks in 40 ms)",
   "under_db": 19,
   "set_by": "sheet"
  },
@@ -272,7 +272,7 @@
  {
   "src": "v2r/sfx/wipe_air.wav",
   "t": 21.95,
-  "gain": 0.1127,
+  "gain": 0.1055,
   "note": "the lamppost wipes the backs at the crane's peak speed (22.02-22.19), its air pass centred 22.10",
   "under_db": 17,
   "set_by": "sheet"
@@ -296,7 +296,7 @@
  {
   "src": "v2r/sfx/tree_wipe.wav",
   "t": 23.62,
-  "gain": 0.1104,
+  "gain": 0.092,
   "note": "JOIN S5>S6, the D wipe: one blossom tree crosses the lens right to left 23.62-23.98, its rush peaking on the midpoint 23.80",
   "under_db": 18,
   "set_by": "sheet"
