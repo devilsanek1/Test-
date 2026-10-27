@@ -147,7 +147,14 @@ export type DataCenterProps = {
    *  one row at a time from `at` over `dur` s (each row's bands a quick left-to-right sweep, 2 frames apart), in
    *  `color` (default ledColor): the subject's own motion on its beat ("AI data centers"). */
   rowsOn?: {at: number; dur: number; color?: string};
+  /** OPT-IN (v3 rework): centre the sign plate on the lit FRONT face (shifted right by half the shaded side face), so
+   *  the letters (always centred on that face) sit in the middle of their plate; default: the plate centred on the
+   *  whole building and the letters a few px right of its middle. */
+  signOnFace?: boolean;
 };
+
+/** How far `signOnFace` moves the sign plate right (px): half the shaded side face (w x 0.06 / 2). */
+export const signFaceShift = (w: number) => w * 0.03;
 
 export function dataCenterGeo(x: number, y: number, w: number, h?: number, variant: DataCenterVariant = 'normal', signH?: number) {
   const H = h ?? (variant === 'hall' ? w * 0.4 : variant === 'mini' ? w * 0.62 : w * 0.7);
@@ -158,10 +165,11 @@ export function dataCenterGeo(x: number, y: number, w: number, h?: number, varia
   return {H, top, sign, x0: x - w / 2, x1: x + w / 2};
 }
 
-const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH, ledColor = EMBER.led, ledStyle = 'ticks', rowsOn}) => {
+const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH, ledColor = EMBER.led, ledStyle = 'ticks', rowsOn, signOnFace}) => {
   const t = useTime();
   const variant: DataCenterVariant = darkAt !== undefined && t >= darkAt ? 'dark' : v0;
-  const g = dataCenterGeo(x, y, w, h, v0, signH);
+  const g0 = dataCenterGeo(x, y, w, h, v0, signH);
+  const g = signOnFace ? {...g0, sign: {...g0.sign, x: g0.sign.x + signFaceShift(w)}} : g0;
   const far = variant === 'far';
   const mini = variant === 'mini';
   const dark = variant === 'dark';
