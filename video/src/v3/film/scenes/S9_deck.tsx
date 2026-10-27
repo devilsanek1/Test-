@@ -11,7 +11,7 @@ import {Fill} from '../../../lib/Fill';
 import {blob, hline, line, smooth} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
-import {EMBER, YouTiny, PipTiny, FoldingChair, SideTable, Pennant, StringLights3, Footprints, Shovel, Plant, W} from '../kit';
+import {EMBER, YouTiny, PipTiny, FoldingChair, SideTable, Pennant, StringLights3, Footprints, Shovel, Plant, LaundryLine, W} from '../kit';
 import {T9} from './S9_tones';
 
 type Pt = [number, number];
@@ -30,7 +30,6 @@ const WIN = {x: 902, y: 1292, w: 72, h: 92};
 /** The deck floor in shade: planks converging on you, snow drifts (~30 %), a trail of footprints, the door's light pool. */
 const DeckFloor: React.FC = () => {
   const {y, x0, x1, h, vp} = DECK;
-  const r = rng('s9/deck2');
   let planks = '';
   const n = 15;
   for (let i = 0; i < n; i++) {
@@ -41,31 +40,39 @@ const DeckFloor: React.FC = () => {
   }
   // drifts: along the parapet's foot, banked into the left corner (stack, vent) and against the hut
   const footDrift = smooth([[x0, y - 2], [x1, y - 2], [x1, y + 12], [760, y + 20], [600, y + 12], [420, y + 22], [200, y + 14], [x0, y + 18]], {closed: true});
-  const leftDrift = smooth([[-120, 1440], [250, 1446], [320, 1500], [300, 1580], [230, 1660], [330, 1760], [300, 1880], [180, 1980], [-120, 1980]], {closed: true});
+  const leftDrift = smooth([[-120, 1446], [262, 1452], [286, 1490], [236, 1536], [150, 1560], [196, 1640], [120, 1760], [168, 1880], [90, 1980], [-120, 1980]], {closed: true});
   const hutDrift = smooth([[770, 1450], [820, 1460], [840, 1560], [800, 1640], [760, 1600], [740, 1520]], {closed: true});
-  const patches: string[] = [];
-  for (let i = 0; i < 6; i++) patches.push(blob(r.range(360, 760), r.range(1560, 1900), r.range(20, 46), r.range(5, 9), {seed: `s9/dp${i}`}));
   // the door's light: two flat steps spilling onto the deck toward the lower left
   const poolOut = polyD([[DOOR.x0 + 4, 1730], [DOOR.x1, 1760], [920, 1960], [540, 1960], [600, 1830]]);
   const poolIn = polyD([[DOOR.x0 + 10, 1780], [DOOR.x1 - 6, 1800], [900, 1960], [680, 1960], [720, 1870]]);
-  // footprints from the bottom edge to you
+  // footprints from the bottom edge to you, on a trodden strip of snow (the eye's path up the deck)
   const steps: Pt[] = [];
+  const pathX = (u: number) => 548 - 54 * u + Math.sin(u * 5) * 6;
   for (let i = 0; i < 18; i++) {
     const u = i / 17;
-    steps.push([548 - 54 * u + Math.sin(u * 5) * 6, 1960 - 450 * u]);
+    steps.push([pathX(u), 1960 - 450 * u]);
   }
+  const trailL: Pt[] = [];
+  const trailR: Pt[] = [];
+  for (let i = 0; i <= 12; i++) {
+    const u = i / 12;
+    const hw = 34 - 20 * u;
+    trailL.push([pathX(u) - hw + Math.sin(u * 13) * 3, 1980 - 470 * u]);
+    trailR.push([pathX(u) + hw + Math.sin(u * 11 + 1) * 3, 1980 - 470 * u]);
+  }
+  const trail = smooth([...trailL, ...trailR.reverse()], {closed: true});
   return (
     <>
       <Fill rect={[x0, y, x1 - x0, h]} color={T9.deck} offset={false} seed="s9/floor" />
       <Ink d={planks} width={1.6} color={T9.deckDeep} />
-      <path d={patches.join('')} fill={T9.deckSnow} />
       <path d={leftDrift} fill={T9.deckSnow} />
       <path d={hutDrift} fill={T9.deckSnow} />
       <path d={poolOut} fill={EMBER.desk} />
       <path d={poolIn} fill={EMBER.ring} />
       <path d={footDrift} fill={T9.deckSnow} />
       <Ink d={hline(x0, x1, y + 13, {over: [0, 0], seed: 's9/fdI'})} width={1.4} color={EMBER.dc} />
-      <Footprints points={steps} size={15} shrink={0.55} color={T9.deckDeep} seed="s9/fp" />
+      <path d={trail} fill={T9.deckSnow} />
+      <Footprints points={steps} size={15} shrink={0.55} color={T9.footprint} seed="s9/fp" />
     </>
   );
 };
@@ -126,7 +133,7 @@ const StairHut: React.FC = () => {
       <Pennant x={1004} y={top - 6} h={112} w={44} seed="s9/pen" />
       <Ink d={`M992 ${top - 60}h24M995 ${top - 82}h18`} width={2.2} color={EMBER.anchor} />
       {/* bulbs along the eave */}
-      <StringLights3 points={[[x0 - 10, eave + 10], [900, eave + 12], [1000, eave + 12], [1100, eave + 12]]} sag={12} n={7} r={5} halo={[EMBER.skyLow, EMBER.ring]} sway={1} every={0.5} seed="s9/hutBulbs" ink={1.6} />
+      <StringLights3 points={[[x0 - 10, eave + 10], [900, eave + 12], [1000, eave + 12], [1100, eave + 12]]} sag={12} n={7} r={5} halo={false} sway={1} every={0.5} seed="s9/hutBulbs" ink={1.6} />
     </>
   );
 };
@@ -137,11 +144,16 @@ export const DeckPlane: React.FC<DeckPlaneProps> = ({tiny, thoom}) => (
   <>
     <Parapet />
     {/* fairy lights on the lip (20 bulbs), clear of you: x 0-380 and 600-790 (outside the start's view, x 384-600) */}
-    <StringLights3 points={[[-30, 1402], [70, 1404], [170, 1403], [270, 1404], [372, 1402]]} sag={7} n={11} r={4.4} halo={[EMBER.skyLow, EMBER.ring]} sway={0.6} every={0.5} seed="s9/lip1" ink={1.5} />
-    <StringLights3 points={[[606, 1402], [700, 1404], [796, 1402]]} sag={7} n={7} r={4.4} halo={[EMBER.skyLow, EMBER.ring]} sway={0.6} every={0.5} seed="s9/lip2" ink={1.5} />
+    <StringLights3 points={[[-30, 1402], [70, 1404], [170, 1403], [270, 1404], [372, 1402]]} sag={7} n={11} r={4.4} halo={false} sway={0.6} every={0.5} seed="s9/lip1" ink={1.5} />
+    <StringLights3 points={[[606, 1402], [700, 1404], [796, 1402]]} sag={7} n={7} r={4.4} halo={false} sway={0.6} every={0.5} seed="s9/lip2" ink={1.5} />
     <DeckFloor />
     <VentClutter />
+    <DeckThings />
     <StairHut />
+    {/* a laundry line from a post on the deck to the hut's wall: three pieces swaying (colour without the hero) */}
+    <Ink d={`M598 1716V1532M590 1534h16`} width={4} color={EMBER.anchor} />
+    <path d={blob(598, 1530, 9, 3, {seed: 's9/postsn'})} fill={T9.deckSnowLit} />
+    <LaundryLine a={[600, 1540]} b={[812, 1508]} sag={20} n={4} size={46} seed="s9/laundry" ink={2.6} />
     {/* the chair and the small table with the steaming mug, by the hut's door */}
     <FoldingChair x={640} y={1772} w={112} seed="s9/chair" ink={3} />
     <SideTable x={758} y={1758} w={92} mug seed="s9/table" ink={3} />
@@ -151,6 +163,25 @@ export const DeckPlane: React.FC<DeckPlaneProps> = ({tiny, thoom}) => (
         <YouTiny x={YOU_FEET[0]} y={YOU_FEET[1]} h={184} stickW={56} ink={2.6} seed="s9/youT" />
       </>
     ) : null}
+  </>
+);
+
+/** A small snowman by the parapet (left of Pip, clear of you) and a snowy crate of firewood at the stack's foot. */
+const DeckThings: React.FC = () => (
+  <>
+    {/* the crate */}
+    <Fill rect={[150, 1488, 96, 62]} color={EMBER.beam} offset={false} seed="s9/crate" />
+    <Ink d={`M150 1508h96M150 1528h96M150 1488h96v62h-96Z`} width={2.6} color={EMBER.anchor} />
+    <path d={[0, 1, 2, 3, 4].map((i) => blob(164 + i * 17, 1484, 8, 6, {seed: `s9/log${i}`})).join('')} fill={EMBER.desk} />
+    <path d={blob(198, 1478, 52, 7, {seed: 's9/crsn'})} fill={T9.deckSnowLit} />
+    {/* a small snowman by the parapet (left of Pip, clear of you): a scarf, a stick arm, a coal smile */}
+    <path d={blob(326, 1462, 30, 26, {seed: 's9/sm1'}) + blob(326, 1418, 21, 19, {seed: 's9/sm2'}) + blob(326, 1384, 14, 13, {seed: 's9/sm3'})} fill={T9.deckSnow} />
+    <path d={blob(320, 1452, 20, 12, {seed: 's9/sm1l'}) + blob(321, 1412, 13, 9, {seed: 's9/sm2l'}) + blob(322, 1381, 8, 6, {seed: 's9/sm3l'})} fill={T9.deckSnowLit} />
+    <Ink d={`${blob(326, 1462, 30, 26, {seed: 's9/sm1'})}${blob(326, 1418, 21, 19, {seed: 's9/sm2'})}${blob(326, 1384, 14, 13, {seed: 's9/sm3'})}`} width={2.4} />
+    <Fill d={polyD([[307, 1398], [346, 1398], [348, 1406], [306, 1407]]) + polyD([[336, 1402], [345, 1404], [352, 1428], [342, 1430]])} color={EMBER.hl} offset={false} seed="s9/scarf" />
+    <Ink d={`M305 1420L278 1398M286 1404l-6 -10M347 1418L372 1404`} width={2.6} color={EMBER.beam} />
+    <path d={blob(306, 1356, 15, 4, {seed: 's9/hat0'})} fill={EMBER.anchor} />
+    <path d={polyD([[313, 1357], [337, 1355], [336, 1338], [315, 1340]])} fill={EMBER.anchor} />
   </>
 );
 

@@ -251,12 +251,12 @@ export const RoofRowsView: React.FC<{rows: RoofRowSpec[]; paths: RoofPaths; inkC
   </>
 );
 
-// The far field: six rows every ~9.6 px (972-1035), roofs 9 -> 16 wide, the back rows a step paler (haze).
-const FF_ROWS: RoofRowSpec[] = Array.from({length: 6}, (_, i) => {
-  const haze = ((5 - i) / 5) * 0.32;
+// The far field: seven rows every ~9.6 px (972-1040), roofs 9 -> 16.5 wide, the back rows a step paler (haze).
+const FF_ROWS: RoofRowSpec[] = Array.from({length: 7}, (_, i) => {
+  const haze = ((6 - i) / 6) * 0.32;
   return {
     y: 980 + i * 9.6,
-    w: 9 + i * 1.4,
+    w: 9 + i * 1.25,
     dark: planeTone(T9.farDark, haze),
     light: planeTone(T9.farLight, haze * 0.6),
     dot: T9.farDot,
@@ -390,12 +390,10 @@ export const HallB: React.FC = () => {
   );
 };
 
-/** The cooling plume off hall B (~30 px/s, never above y 680: never over the sign or the summit). */
-export const HallBPlume: React.FC = () => (
-  <>
-    <CoolingPlume x={858} y={HALLB.top - 12} seed="s9/plumeB" rise={190} life={6} drift={40} r0={7} r1={20} n={9} ceil={690} color={mix(EMBER.skyLow, EMBER.frost, 0.35)} />
-    <CoolingPlume x={704} y={HALLB.top - 12} seed="s9/plumeB2" rise={120} life={5} drift={30} r0={5} r1={14} n={7} ceil={760} color={mix(EMBER.skyLow, EMBER.frost, 0.35)} />
-  </>
+/** The cooling plume off the hall's first fan (~20 px/s, y >= 684): it rises against the pale bank, left of the
+ *  mountain (over the gold it read as holes), never over the sign or the summit. */
+export const HallPlume: React.FC = () => (
+  <CoolingPlume x={322} y={HALL_ROOF - 16} seed="s9/plume" rise={104} life={5.5} drift={40} r0={5} r1={13} n={6} ceil={684} color={EMBER.frost} />
 );
 
 /** The hall's roof: a run of 7 fan units (18 px fans on 44) between which the streams dive. */

@@ -45,12 +45,15 @@ export const T9 = {
   nmDark: '#3B4469',
   nmLight: '#D9DFEF',
   nmWin: '#ECB266',
-  litWall: '#D9DFEF',
+  litWall: '#C2CBE3',
+  road: '#8E99C0',
+  pool: '#C9A784',
   // our roof (warm, in shade)
   deck: EMBER.brickShade,
   deckDeep: '#5E2C1C',
   deckSnow: '#B4BEDC',
   deckSnowLit: '#CBD5EC',
+  footprint: '#8790B4',
   parapet: EMBER.beam,
   stackShade: '#6A3220',
 } as const;

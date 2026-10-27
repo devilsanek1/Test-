@@ -23,8 +23,8 @@ const TERRACE = {x0: -60, x1: 434, ridge: 1252, eave: 1318, base: 1520};
 const MANSARD = {x0: 518, x1: 836, top: 1250, slope: 1262, cornice: 1320, base: 1520};
 const FLAT = {x0: 830, x1: 1160, top: 1236};
 export const NEAR_STACKS = [
-  {x: 360, y: 1206, w: 18},
-  {x: 400, y: 1196, w: 22},
+  {x: 354, y: 1214, w: 30},
+  {x: 396, y: 1206, w: 34},
 ];
 const DORMERS = [262, 290, 318, 346, 374].map((x) => ({x, y: 1278, w: 17, h: 15}));
 const MANSARD_WINS = Array.from({length: 11}, (_, i) => ({x: MANSARD.x0 + 14 + i * 26, y: 1274, w: 10, h: 14}));
@@ -42,7 +42,10 @@ const SLOT = (() => {
     const [l, r] = canyonAt(y);
     return l + (r - l) * 0.46;
   };
-  const wall: Pt[] = [[wallX(yB), yB], [wallX(yT), yT], [rT + 4, yT], [canyonAt(yB)[1] + 6, yB]];
+  // lit only behind your head (y >= 1290): above it the wall is dark with warm windows (no light column up the street)
+  const yL = 1290;
+  const wall: Pt[] = [[wallX(yB), yB], [wallX(yL), yL], [canyonAt(yL)[1] + 4, yL], [canyonAt(yB)[1] + 6, yB]];
+  const wallDark: Pt[] = [[wallX(yL), yL], [wallX(yT), yT], [rT + 4, yT], [canyonAt(yL)[1] + 4, yL]];
   let ticks = '';
   let lit = '';
   const r = rng('s9/slotwin');
@@ -53,7 +56,7 @@ const SLOT = (() => {
     const x0 = wallX(y) + 3;
     const x1 = canyonAt(y)[1] + 2;
     for (let x = x0; x + tw < x1; x += tw * 1.9) {
-      if (r.chance(0.3)) lit += rectD(x, y - th, tw, th);
+      if (y < yL ? r.chance(0.7) : r.chance(0.3)) lit += rectD(x, y - th, tw, th);
       else ticks += rectD(x, y - th, tw, th);
     }
     y -= th * 2.1;
@@ -64,7 +67,7 @@ const SLOT = (() => {
     const x = canyonAt(y)[0] + 2;
     leftLit += rectD(x, y - 10 * k - 4, 4 + 4 * k, 8 + 8 * k);
   }
-  return {slot: polyD(slot), wall: polyD(wall), ticks, lit, leftLit};
+  return {slot: polyD(slot), wall: polyD(wall), wallDark: polyD(wallDark), ticks, lit, leftLit};
 })();
 
 const TERRACE_D = (() => {
@@ -154,6 +157,7 @@ export const NearRoofs: React.FC = () => {
       {/* ---- the canyon slot (the drop): dark, its right wall lit behind your head */}
       <path d={SLOT.slot} fill={EMBER.dcDark} />
       <path d={SLOT.wall} fill={T9.litWall} />
+      <path d={SLOT.wallDark} fill={EMBER.dc} />
       <path d={SLOT.ticks} fill={EMBER.dc} />
       <path d={SLOT.lit} fill={EMBER.houseLit} />
       <path d={SLOT.leftLit} fill={EMBER.houseLit} />
@@ -177,8 +181,8 @@ export const NearRoofs: React.FC = () => {
       ))}
       {NEAR_STACKS.map((s, i) => (
         <React.Fragment key={i}>
-          <BrickStack x={s.x} y={s.y} w={s.w} h={TERRACE.ridge - s.y + 30} pots={[0.5]} potW={s.w * 0.5} color={EMBER.roofs} shade={EMBER.dcSide} bricks={0} exact seed={`s9/nst${i}`} ink={2.6} />
-          <Smoke x={s.x + s.w / 2} y={s.y - s.w * 0.75} seed={`s9/nsm${i}`} rise={70} drift={56} r0={3} r1={10} />
+          <BrickStack x={s.x} y={s.y} w={s.w} h={TERRACE.ridge - s.y + 30} pots={[0.3, 0.7]} potW={s.w * 0.24} color={EMBER.dc} shade={EMBER.dcSide} bricks={0} exact seed={`s9/nst${i}`} ink={2.6} />
+          <Smoke x={s.x + s.w * 0.7} y={s.y - s.w * 0.45} seed={`s9/nsm${i}`} rise={70} drift={56} r0={3} r1={10} />
         </React.Fragment>
       ))}
       <RoofNeighbour x={302} y={1314} h={40} kind="shovel" seed="s9/shov" coat={EMBER.hl} />

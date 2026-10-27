@@ -2,8 +2,8 @@
 // (docs/v3/s9_scale_plan.md section 1): the MID BAND (plane S9_FAR2: 3-4 rows of 22-34 px roofs with snow tops, the
 // roofline climbing toward the mountain, hairline ink) and the NEAR-MID BAND (plane S9_MID: 2-3 rows of 50-80 px houses
 // in five types, chimneys smoking) cut by THE DROP: the street as a canyon from below our parapet to the hall (vanishing
-// point (470, 980)): no floor near us, a dark slot with its right wall lit, string lights across it, then the floor as a
-// lit ribbon narrowing 26 -> 3 px with five lamps, posed walkers (about half standing; a sledge, a dog) and one car's
+// point (470, 980)): the floor narrowing ~54 -> 3 px between the house rows (the near slot with its lit wall is the
+// near plane's: S9_near.tsx), string lights across it with five lamps, posed walkers (about half standing; a sledge, a dog) and one car's
 // lights heading for the data center's gate. End-frame coordinates (screen at rest).
 //
 // The town mass holds still in the hold (s9_scale_plan section 2: nothing moves inside it but the listed tiers): the
@@ -35,7 +35,7 @@ const climb = (x: number) => -40 * smooth01((x - 560) / 440);
 const MB_ROWS: RoofRowSpec[] = [0, 1, 2, 3].map((i) => {
   const haze = ((3 - i) / 3) * 0.18;
   return {
-    y: 1062 + i * 15.6,
+    y: 1056 + i * 16.8,
     w: 22 + i * 4,
     dark: planeTone(T9.midDark, haze),
     light: planeTone(T9.midLight, haze * 0.5),
@@ -126,49 +126,31 @@ const NearMidHouses: React.FC = () => {
   );
 };
 
-// the street: slot, lit wall, ribbon, lamps
+// the street: the floor all the way from under the near roofs to the hall's gate (a road receding, never a dark spire)
 const RIBBON = {y0: 990, y1: 1124, w0: 3, w1: 26};
-const ribbonW = (y: number) => RIBBON.w0 + ((RIBBON.w1 - RIBBON.w0) * (y - RIBBON.y0)) / (RIBBON.y1 - RIBBON.y0);
+const FLOOR_Y1 = 1262;
+/** The floor's width at y (the canyon's, a little inside it): 26 px at 1124, ~54 at 1262, ~2 at 990. */
+const ribbonW = (y: number) => (0.94 * (canyonAt(y)[1] - canyonAt(y)[0]));
 const STREET = (() => {
-  // the dark slot between the rows (no floor near us), from under the near roofs up to where the floor shows
-  const slot: Pt[] = [];
-  for (let y = 1270; y >= RIBBON.y1 - 4; y -= 10) slot.push([canyonAt(y)[0], y]);
-  for (let y = RIBBON.y1 - 4; y <= 1270; y += 10) slot.push([canyonAt(y)[1], y]);
-  // its right wall, lit by the street (a light face with storeys of window ticks, smaller up the street)
-  const wallL = (y: number) => {
-    const [l, rr] = canyonAt(y);
-    return l + (rr - l) * 0.52;
-  };
-  const wall: Pt[] = [];
-  for (let y = 1270; y >= RIBBON.y1; y -= 10) wall.push([wallL(y), y]);
-  for (let y = RIBBON.y1; y <= 1270; y += 10) wall.push([canyonAt(y)[1], y]);
-  let ticks = '';
-  for (let y = 1262; y > RIBBON.y1 + 6; ) {
-    const k = (y - RIBBON.y1) / (1270 - RIBBON.y1);
-    const th = 3 + 3 * k;
-    const tw = 2.2 + 2.6 * k;
-    const x0 = wallL(y) + 2;
-    const x1 = canyonAt(y)[1] - 2;
-    for (let x = x0; x + tw < x1; x += tw * 2.1) ticks += rectD(x, y - th, tw, th);
-    y -= th * 2.4;
-  }
-  // the ribbon: the lit floor from y 1124 (26 px) to 990 (3 px), with dark curb edges
   const rib: Pt[] = [];
-  const kerbs: string[] = [];
-  for (let y = RIBBON.y1; y >= RIBBON.y0; y -= 6) rib.push([VP[0] - ribbonW(y) / 2, y]);
-  for (let y = RIBBON.y0; y <= RIBBON.y1; y += 6) rib.push([VP[0] + ribbonW(y) / 2, y]);
-  kerbs.push(`M${f1(VP[0] - RIBBON.w1 / 2 - 1)} ${RIBBON.y1}L${f1(VP[0] - RIBBON.w0 / 2 - 0.5)} ${RIBBON.y0}M${f1(VP[0] + RIBBON.w1 / 2 + 1)} ${RIBBON.y1}L${f1(VP[0] + RIBBON.w0 / 2 + 0.5)} ${RIBBON.y0}`);
-  // shopfront glows along both sides (warm dots, smaller up the street)
+  for (let y = FLOOR_Y1; y >= RIBBON.y0; y -= 6) rib.push([VP[0] - ribbonW(y) / 2, y]);
+  for (let y = RIBBON.y0; y <= FLOOR_Y1; y += 6) rib.push([VP[0] + ribbonW(y) / 2, y]);
+  const kerbs = `M${f1(VP[0] - ribbonW(FLOOR_Y1) / 2 - 1)} ${FLOOR_Y1}L${f1(VP[0] - 1)} ${RIBBON.y0}M${f1(VP[0] + ribbonW(FLOOR_Y1) / 2 + 1)} ${FLOOR_Y1}L${f1(VP[0] + 1)} ${RIBBON.y0}`;
+  // two tyre tracks one step darker, converging with the kerbs
+  const tracks = `M${f1(VP[0] - ribbonW(FLOOR_Y1) * 0.16)} ${FLOOR_Y1}L${VP[0]} ${RIBBON.y0 + 6}M${f1(VP[0] + ribbonW(FLOOR_Y1) * 0.16)} ${FLOOR_Y1}L${VP[0]} ${RIBBON.y0 + 6}`;
+  // shopfront glows along both sides (warm, smaller up the street)
   const r = rng('s9/fronts');
   let fronts = '';
-  for (let y = RIBBON.y1 - 4; y > RIBBON.y0 + 8; y -= r.range(5, 9)) {
-    const s = 1.2 + 2.6 * ((y - RIBBON.y0) / (RIBBON.y1 - RIBBON.y0));
-    if (r.chance(0.7)) fronts += rectD(VP[0] - ribbonW(y) / 2 - s - 1.5, y - s, s, s * 1.3);
-    if (r.chance(0.7)) fronts += rectD(VP[0] + ribbonW(y) / 2 + 1.5, y - s, s, s * 1.3);
+  for (let y = FLOOR_Y1 - 4; y > RIBBON.y0 + 8; y -= r.range(5, 9) * (0.6 + (y - RIBBON.y0) / 200)) {
+    const s = 1.2 + 2.6 * Math.min(1.8, (y - RIBBON.y0) / (RIBBON.y1 - RIBBON.y0));
+    if (r.chance(0.65)) fronts += rectD(VP[0] - ribbonW(y) / 2 - s - 1.5, y - s, s, s * 1.3);
+    if (r.chance(0.65)) fronts += rectD(VP[0] + ribbonW(y) / 2 + 1.5, y - s, s, s * 1.3);
   }
-  return {slot: polyD(slot), wall: polyD(wall), ticks, rib: polyD(rib), kerbs: kerbs.join(''), fronts};
+  return {rib: polyD(rib), kerbs, tracks, fronts};
 })();
 const LAMPS: {y: number; side: -1 | 1}[] = [
+  {y: 1232, side: -1},
+  {y: 1176, side: 1},
   {y: 1114, side: -1},
   {y: 1088, side: 1},
   {y: 1062, side: -1},
@@ -180,14 +162,14 @@ const StreetLamps: React.FC = () => (
   <>
     {LAMPS.map((L, i) => {
       const k = (L.y - RIBBON.y0) / (RIBBON.y1 - RIBBON.y0);
-      const halo = 5 + 7 * k; // radius: diameter 24 -> 10
+      const halo = 2.6 + 3.6 * Math.min(1.25, k); // radius: diameter 14 -> 5 (wider read as a column of gold blobs)
       const x = VP[0] + L.side * (ribbonW(L.y) / 2 + 1.5 + k * 2);
-      const postH = 10 + 12 * k;
+      const postH = 7 + 10 * Math.min(1.6, k);
       const hx = x - L.side * (2 + 3 * k);
       const hy = L.y - postH;
       return (
         <React.Fragment key={i}>
-          <ellipse cx={x - L.side * 3 * k} cy={L.y + 1} rx={4 + 6 * k} ry={1.4 + 2 * k} fill={EMBER.houseLit} />
+          <ellipse cx={VP[0] + L.side * ribbonW(L.y) * 0.18} cy={L.y + 1} rx={ribbonW(L.y) * 0.3} ry={1.2 + 1.6 * k} fill={T9.pool} />
           <circle cx={hx} cy={hy} r={halo} fill={EMBER.houseLit} />
           <circle cx={hx} cy={hy} r={halo * 0.45} fill={EMBER.core} />
           <path d={`M${f1(x)} ${f1(L.y)}V${f1(hy)}L${f1(hx)} ${f1(hy)}`} fill="none" stroke={EMBER.anchor} strokeWidth={1 + k * 0.8} />
@@ -200,6 +182,9 @@ const StreetLamps: React.FC = () => (
 // tiny posed walkers on the lit floor (8-14 px; about half standing), and one car heading for the gate
 type W9 = {y: number; dx: number; kind: 'walker' | 'dog' | 'sledge' | 'umbrella' | 'pair'; v: number; dir: 1 | -1};
 const WALKERS: W9[] = [
+  {y: 1228, dx: 8, kind: 'dog', v: 0, dir: -1},
+  {y: 1196, dx: -7, kind: 'walker', v: 6, dir: -1},
+  {y: 1156, dx: 6, kind: 'pair', v: 0, dir: 1},
   {y: 1118, dx: -5, kind: 'walker', v: 5, dir: -1},
   {y: 1108, dx: 7, kind: 'pair', v: 0, dir: 1},
   {y: 1094, dx: -6, kind: 'dog', v: 0, dir: 1},
@@ -221,8 +206,8 @@ const StreetLife: React.FC = () => {
         // moving ones walk along the street (up = away); standing ones hold one pose
         const y = w.y - w.v * t;
         const k = (y - RIBBON.y0) / (RIBBON.y1 - RIBBON.y0);
-        const h = 8 + 6 * k;
-        const x = VP[0] + w.dx * (ribbonW(y) / RIBBON.w1) * 1.6;
+        const h = 8 + 6 * Math.min(1.6, k);
+        const x = VP[0] + w.dx * (ribbonW(y) / RIBBON.w1) * 0.9;
         return <Tiny key={i} x={x} y={y} h={h} t={w.v ? t + i : i * 0.37} coat={coat} hair={hair} kind={w.kind} dir={w.dir} />;
       })}
     </>
@@ -251,17 +236,14 @@ export const NearMid: React.FC = () => (
   <>
     {/* the ground between the rows: snow in the blue-hour shade */}
     <path d={rectD(-400, 1150, 1900, 700)} fill={EMBER.dc} />
-    {/* the floor far down the street: the lit ribbon (over the far rows: it is the gap between them) */}
-    <path d={STREET.rib} fill={EMBER.road} />
+    {/* the street's floor down to the hall's gate (over the far rows: it is the gap between them) */}
+    <path d={STREET.rib} fill={T9.road} />
+    <path d={STREET.tracks} fill="none" stroke={EMBER.skyLow} strokeWidth={1.6} />
     <path d={STREET.kerbs} fill="none" stroke={EMBER.dcSide} strokeWidth={1.4} />
     <path d={STREET.fronts} fill={T9.nmWin} />
     <StreetLamps />
     <StreetCar />
     <StreetLife />
-    {/* the slot near us: no floor, its right wall lit */}
-    <path d={STREET.slot} fill={EMBER.dcDark} />
-    <path d={STREET.wall} fill={T9.litWall} />
-    <path d={STREET.ticks} fill={EMBER.dc} />
     <NearMidHouses />
     {NEAR_MID.filter((h) => h.smoke).map((h, i) => {
       const [sx, sy] = chimneyTop(h);

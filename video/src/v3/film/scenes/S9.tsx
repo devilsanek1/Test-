@@ -57,7 +57,7 @@ import {
   type StickFlightOpts,
   type Pt,
 } from '../kit';
-import {CornerCloud, CloudBank, FarGround, HillTown, FarField, InfinityLine, Pylons, HallB, HallBPlume, HallFans, Hall, ThoomPuffs, FAR_HOUSES, HALL, HALL_ROOF, farRoofTop} from './S9_far';
+import {CornerCloud, CloudBank, FarGround, HillTown, FarField, InfinityLine, Pylons, HallB, HallPlume, HallFans, Hall, ThoomPuffs, FAR_HOUSES, HALL, HALL_ROOF, farRoofTop} from './S9_far';
 import {PeakPile} from './S9_peak';
 import {MidBand, NearMid} from './S9_town';
 import {NearRoofs, NEAR_PUFFS} from './S9_near';
@@ -120,7 +120,7 @@ const FarPlane: React.FC = () => (
     <PeakPile />
     <Pylons />
     <HallB />
-    <HallBPlume />
+    <HallPlume />
     {/* the streams (behind the hall: each stick sinks behind its parapet, between the fans). No trail ticks and ~the
         held stick's size: with two dark ticks behind them the small sticks read as birds or drones (v3 cold read). */}
     {STREAMS.map((o, i) => (
