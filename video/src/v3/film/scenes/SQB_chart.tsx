@@ -162,13 +162,14 @@ export function doodlePose(year: number, w: number): {x: number; y: number; rot:
   return {x: foot[0] + Math.sin(a) * d, y: foot[1] - Math.cos(a) * d, rot, foot};
 }
 
-/** The price on a doodle's screen (upright in the laptop's frame). */
+/** The price on a doodle's screen (upright in the laptop's frame), a little right of centre and up: the kit's screen
+ *  glint lies in the screen's lower-left corner. */
 const ScreenPrice: React.FC<{x: number; y: number; w: number; dark: boolean}> = ({x, y, w, dark}) => {
   const g = laptopGeo(x, y, w);
   const [cx, cy] = g.screenC;
-  const size = Math.round(w * 0.3);
+  const size = Math.round(w * 0.27);
   return (
-    <Txt x={cx} y={cy + size * 0.34} size={size} fill={dark ? EMBER.core : EMBER.ink} fit={w * 0.7}>
+    <Txt x={cx + w * 0.08} y={cy + size * 0.24} size={size} fill={dark ? EMBER.core : EMBER.ink} fit={w * 0.6}>
       $999
     </Txt>
   );
