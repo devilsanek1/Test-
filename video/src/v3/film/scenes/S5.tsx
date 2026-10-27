@@ -23,7 +23,7 @@ import {blob, hline, poly, polyPath, vline} from '../../../lib/sketch';
 import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER, Laptop, laptopGeo, Pip3, Pop, PriceTag, quadPt, Show, YouFront, type Pt} from '../kit';
-import {S5Ceiling, S5Customer, S5ShelfExtras, S5Wall, S5Window, type ShopBeats} from './S5_shop';
+import {S5Ceiling, S5Customer, S5Panel, S5ShelfExtras, S5Wall, S5Window, type ShopBeats} from './S5_shop';
 import {S5Assistant, S5Counter, S5CounterTop} from './S5_counter';
 
 const DUR = 11.48 - 9.48;
@@ -43,7 +43,7 @@ const FEED_DUR = 0.6;
 /** The world's beats round the pop. */
 const BEATS: ShopBeats = {popAt: NEW_AT, customerTurn: NEW_AT + 0.22, slides: [0.06, 1.34]};
 /** Pip's perch on the counter top (feet), left of your laptop and under your arm. */
-const PIP_AT: Pt = [272, 1440];
+const PIP_AT: Pt = [322, 1440];
 
 /** The display shelf (plank top y; cut by the right edge). */
 const SHELF = {x0: 470, x1: 1140, y: 958, h: 20};
@@ -89,9 +89,10 @@ const S5: React.FC = () => {
   return (
     <World sky={EMBER.wall}>
       <XG m={mat.about(mat.scale(z), 520, 960)}>
-        <S5Ceiling />
+        <S5Ceiling tvSlides={[0.5, 1.56]} />
         <S5Window />
         <S5Customer turnAt={BEATS.customerTurn} />
+        <S5Panel />
         {/* the display light behind the shelf: snaps on with the new laptop */}
         <Show at={NEW_AT}>
           <Fill d={blob(NEW.x, 800, 240, 188, {seed: 's5/spot1', wobble: 0.02})} color={EMBER.core} offset={false} />

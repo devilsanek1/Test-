@@ -74,8 +74,54 @@ const jolt = (t: number, at: number) => -Math.abs(rings(t, [at], 4, 5, 8));
 
 // ---------------------------------------------------------------- the ceiling (above the caption band)
 
+const TV_BG = [EMBER.dc, EMBER.ring, EMBER.dcSide];
+
+/** The demo screen on the wall under the bulkhead (top left): an ad that changes on `slides` (a stepped slide-in from
+ *  the right, no fade): a laptop with sparkles, a box with lines, a laptop with a gold star. */
+const DemoScreen: React.FC<{slides: number[]}> = ({slides}) => {
+  const t = useTime();
+  const tv = {x: 178, y: 150, w: 176, h: 108};
+  const k = slides.filter((s) => t >= s).length;
+  const since = k ? t - slides[k - 1] : 9;
+  const slideX = since < 0.16 ? (1 - ease01(since, 0, 0.16)) * tv.w : 0;
+  const bg = TV_BG[k % 3];
+  const prevBg = TV_BG[(k + 2) % 3];
+  const fg = k % 3 === 1 ? EMBER.beam : EMBER.core;
+  const sw = tv.w - 16;
+  const sh = tv.h - 16;
+  return (
+    <>
+      <path d={`M${tv.x + 50} ${BULK_Y}V${tv.y}M${tv.x + tv.w - 50} ${BULK_Y}V${tv.y}`} stroke={EMBER.anchor} strokeWidth={5} />
+      <Fill rect={[tv.x, tv.y, tv.w, tv.h]} color={EMBER.anchor} seed="s5sh/tv" />
+      <svg x={tv.x + 8} y={tv.y + 8} width={sw} height={sh} overflow="hidden">
+        <rect x={0} y={0} width={sw} height={sh} fill={prevBg} />
+        <g transform={`translate(${slideX.toFixed(1)} 0)`}>
+          <rect x={0} y={0} width={sw} height={sh} fill={bg} />
+          {k % 3 === 1 ? (
+            <>
+              <rect x={20} y={20} width={50} height={52} fill="none" stroke={fg} strokeWidth={4} />
+              <path d={textLines(84, 30, 60, {seed: `s5sh/tvl${k}`, n: 3, gap: 16})} stroke={fg} strokeWidth={5} strokeLinecap="round" fill="none" />
+            </>
+          ) : (
+            <>
+              <path d={`M50 22h60v38h-60ZM40 64h80l-7 9h-66Z`} fill="none" stroke={fg} strokeWidth={4} strokeLinejoin="round" />
+              {k % 3 === 0 ? (
+                <path d={`M128 22v14M121 29h14M30 40v10M25 45h10`} stroke={EMBER.houseLit} strokeWidth={3} strokeLinecap="round" />
+              ) : (
+                <path d={`M132 18l4 9l9 1l-7 6l2 9l-8 -5l-8 5l2 -9l-7 -6l9 -1Z`} fill={EMBER.board} />
+              )}
+            </>
+          )}
+        </g>
+      </svg>
+      <Ink d={rectInk(tv.x, tv.y, tv.w, tv.h, {seed: 's5sh/tvI', over: [0, 2]})} width={W.mid} />
+      <path d={glint(tv.x + tv.w - 34, tv.y + 18, 20, {seed: 's5sh/tvg'})} fill="none" stroke={EMBER.white} strokeWidth={2} strokeLinecap="round" />
+    </>
+  );
+};
+
 /** Plaster ceiling with flat downlights, the bulkhead (a vent, the dome camera), the clock and the framed ad. */
-export const S5Ceiling: React.FC = () => {
+export const S5Ceiling: React.FC<{tvSlides?: number[]}> = ({tvSlides = []}) => {
   const t = useTime();
   const camOn = Math.floor(t / 0.7) % 2 === 0;
   const signA = sway(t, 0.9, 3.4, 0.6);
@@ -119,8 +165,9 @@ export const S5Ceiling: React.FC = () => {
       </XG>
       {/* warm bulbs in shallow swags under the bulkhead (lowest bulb ~y 150) */}
       <StringLights3 points={[[-30, BULK_Y + 8], [250, BULK_Y + 12], [520, BULK_Y + 10], [790, BULK_Y + 12], [1110, BULK_Y + 8]]} sag={26} n={24} r={7} sway={1} seed="s5sh/bulbs" />
-      {/* the wall clock (left) and the framed ad on the near wall (right) */}
-      <WallClock cx={108} cy={226} r={42} startMin={17} seed="s5sh/clock" ink={W.mid} />
+      {/* the wall clock and the demo screen (left), the framed ad on the near wall (right) */}
+      <WallClock cx={92} cy={226} r={42} startMin={17} seed="s5sh/clock" ink={W.mid} />
+      <DemoScreen slides={tvSlides} />
       <Fill rect={[948, 162, 128, 108]} color={EMBER.beam} seed="s5sh/adF" />
       <Fill rect={[958, 172, 108, 88]} color={EMBER.sky} offset={false} />
       <path d={`M982 188h58v34h-58ZM974 226h74l-6 7h-62Z`} fill="none" stroke={EMBER.snow} strokeWidth={2.6} strokeLinejoin="round" />
@@ -449,6 +496,26 @@ const HookBar: React.FC<{popAt: number}> = ({popAt}) => {
       {[1002, 1062].map((hx, i) => (
         <Pack key={hx} x={hx} y={1004} kind={i ? 'cable' : 'buds'} color={i ? EMBER.skyLow : EMBER.card} seed={`s5sh/hb${i}`} a={sway(t, 1.8, 2.9, i * 2) + rings(t, [popAt + 0.04], 4, 2.6, 3.5)} />
       ))}
+    </>
+  );
+};
+
+/** The near wall is a slatwall display panel one step darker than the back wall (from just under the caption band,
+ *  starting beside your head's ring): its grooves make the empty slot read as an empty display space, and the
+ *  display light lands on it (the light is drawn over the panel). */
+export const PANEL = {x: 478, y: 616};
+const GROOVE = '#DDAF8F';
+export const S5Panel: React.FC = () => {
+  const grooves = useMemo(() => {
+    let d = '';
+    for (let y = PANEL.y + 30; y < 1400; y += 30) d += `M${PANEL.x + 4} ${y}H1140`;
+    return d;
+  }, []);
+  return (
+    <>
+      <Fill rect={[PANEL.x, PANEL.y, 700, 800]} color={EMBER.reveal} offset={false} />
+      <path d={grooves} stroke={GROOVE} strokeWidth={2.6} />
+      <Ink d={line(PANEL.x, PANEL.y, 1140, PANEL.y, {seed: 's5sh/panT', over: [0, 0]}) + line(PANEL.x, PANEL.y, PANEL.x, 1400, {seed: 's5sh/panL', over: [0, 0]})} width={W.far} />
     </>
   );
 };

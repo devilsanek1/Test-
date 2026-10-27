@@ -20,6 +20,7 @@ import {
   EMBER,
   LaptopBox,
   PenCup,
+  Plant,
   ReceiptPrinter,
   UsbJar,
   W,
@@ -200,7 +201,8 @@ export const S5CounterTop: React.FC<{feedAt: number; feedDur: number}> = ({feedA
     <path d={`M580 1450h24`} stroke={EMBER.dc} strokeWidth={2} />
     <CounterBell x={694} y={1446} w={62} seed="s5ct/bell" ink={W.mid} />
     <CardReader x={772} y={1436} w={76} seed="s5ct/reader" ink={W.mid} />
-    <UsbJar x={1012} y={1440} w={70} seed="s5ct/usb" ink={W.mid} />
+    <Plant x={1066} y={1436} kind="snake" size={124} seed="s5ct/snake" ink={W.mid} />
+    <UsbJar x={996} y={1446} w={70} seed="s5ct/usb" ink={W.mid} />
     <ReceiptPrinter x={884} y={1476} w={124} feedAt={feedAt} feedDur={feedDur} len={260} seed="s5ct/printer" ink={W.mid} />
   </>
 );
@@ -208,11 +210,11 @@ export const S5CounterTop: React.FC<{feedAt: number; feedDur: number}> = ({feedA
 // ---------------------------------------------------------------- the assistant (foreground, behind the counter)
 
 const STAFF_SEED = 's5ct/staff';
-const STAFF_S = 5.0;
+const STAFF_S = 4.4;
 const STAFF_TORSO = 175;
-/** The assistant's head top (canvas px) and hip x (the head is half cut by the left edge). */
-const STAFF_TOP = 1236;
-const STAFF_X = 4;
+/** The assistant's head top (canvas px) and hip x: the whole head in frame, the shoulders cut by the left edge. */
+const STAFF_TOP = 1262;
+const STAFF_X = 92;
 
 /** A big back view cut by the left edge and the bottom: the shop's dusk-blue polo with a yoke seam and collar, the S4
  *  shopkeeper's red-brown hair in a bun, a lanyard cord round the neck; breathing, a look-around after the pop. */
@@ -235,16 +237,22 @@ export const S5Assistant: React.FC<{turnAt: number}> = ({turnAt}) => {
     moves,
     breathe: 2.2,
     ink: W.front,
-    rim: 'right',
+    hero: true,
+    rim: false,
   };
   // the lanyard: a cord round the back of the neck, in the figure's own space (it breathes and turns with it)
   const m = winterPersonMat(props, t);
   const neckY = -g.h - g.hr * 0.1;
+  // the shop's mark printed on the upper back (S4's COMPUTERS fascia: a laptop and the name)
+  const ly = -g.h + g.w * 0.36;
+  const k = 1 / STAFF_S;
   return (
     <>
       <WinterPerson {...props} />
       <XG m={m}>
-        <path d={`M${-g.hr * 0.95} ${neckY + g.hr * 0.25}Q0 ${neckY + g.hr * 0.95} ${g.hr * 0.95} ${neckY + g.hr * 0.25}`} fill="none" stroke={EMBER.hl} strokeWidth={5 / STAFF_S} strokeLinecap="round" />
+        <path d={`M${-g.hr * 0.95} ${neckY + g.hr * 0.25}Q0 ${neckY + g.hr * 0.95} ${g.hr * 0.95} ${neckY + g.hr * 0.25}`} fill="none" stroke={EMBER.hl} strokeWidth={5 * k} strokeLinecap="round" />
+        <path d={`M-10 ${ly - 8}h20v12h-20ZM-14 ${ly + 6}h28l-3 3.4h-22Z`} fill="none" stroke={EMBER.core} strokeWidth={3.4 * k} strokeLinejoin="round" />
+        <path d={`M-17 ${ly + 17}h34`} stroke={EMBER.skyLow} strokeWidth={4.4 * k} strokeLinecap="round" />
       </XG>
     </>
   );
