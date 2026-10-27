@@ -30,8 +30,8 @@ one grey shadow value). The reel is staged in one world space (the home place an
 `CRAFT.md` §a), so pushes and cranes are camera moves, not cuts. Colour and the final line stay absent, and only the
 board's PEN is thrown away: the film is drawn with the clean pen (`CRAFT.md` §c), never the sketch pen.
 
-G3 **IS NOT**: colour, final line, texture, easing micro-tuning, overshoot/settle/secondary motion, faces beyond the
-acting beat, real detail anywhere (windows, signage, crowds are marks, never drawings — identity-critical elements
+G3 **IS NOT**: colour, final line, texture, easing micro-tuning, overshoot/settle/secondary motion, faces (people have
+none at any gate, playbook: the pose acts; the mascot's face is part of its drawing), real detail anywhere (windows, signage, crowds are marks, never drawings — identity-critical elements
 excepted, §3). Loose in precision, dense in
 suggestion: the backbone (big shapes, framing, timing, counts) is exact; the skin is scribble (`animatic_sketchlook.md` §0).
 
@@ -56,9 +56,9 @@ edit, never silently inside a build (`animatic_mograph.md`).
 | Key actions / animations | near-final shape+timing | every move the film will have exists here: 2-4 stepped key poses on beat words, smears for fast transits; stillness is a claim | motion check at 1x; "no G5 move without a G3 placeholder" |
 | Aliveness / density | placeholder (plan FROZEN) | every surface that is dense in the final carries a grey mass at final position, size and tier; `life:` list placed; 2-3 ambient loops per set panel; density planned per sequence against the home set's density key (§3) | emptiness lint; density-promise check; owner question |
 | Scale + cozy moments | near-final composition | home-base room tone, the one big move, the scale ladder, haze-band/shrinking-rows as grey dress | STORYBOARD_STYLE §7 checks |
-| Hook / frame 0 | near-final | frame 0 = the scene being drawn: the subject's lines draw on (B's mid-grey lines with them), then the tones land (C as pale flat tone), payoff in words, voice from frame 1, expectation-then-reality played through the subject's own build | first-3s watch; playbook Hook rules; `DIRECTION.md` rule 9 |
+| Hook / frame 0 | near-final | frame 0 = the scene being drawn: the subject's lines draw on (B's mid-grey lines with them), then the tones land (C as pale flat tone), payoff in words, voice from the first frames (the first word at ~0.12 s), expectation-then-reality played through the subject's own build | first-3s watch; playbook Hook rules; `DIRECTION.md` rule 9 |
 | Captions / timing | final | locked VO, pop captions, word-anchored cuts; reel at full runtime, 60 fps | gate check; full-reel watch |
-| Colour, texture, final line, easing feel, faces | ABSENT | — | deferred to G4/G5/G6 by design; the hand-off says so |
+| Colour, texture, final line, easing feel | ABSENT | — | deferred to G4/G5/G6 by design; the hand-off says so |
 
 ## 3. Placeholder vocabulary: loose never means empty
 
@@ -115,11 +115,12 @@ G5 adds no new motion — only colour, line, easing polish, secondary motion (`a
   frames (snap()/pops exempt). Both end frames pass the STORYBOARD_STYLE §5 checklist as stills.
 - **Drawn actions are a pose test, not tweens**: 2-4 held key poses per shot, popping on their words (held 0.3-1.5 s),
   stepped — never an eased body slide. A fast transit is ONE smear drawing (silhouette stretched along the path) held
-  2-3 frames between the keys. Faces and hands drop in motion poses; an emotion face appears only on the held acting
-  beat; mitten hands always. No volume lint (precision the owner waived): the cold read checks that the subject stays
+  2-3 frames between the keys. People carry no faces (playbook: like reference 1's, the pose acts); mitten hands
+  always, dropped in motion poses. No volume lint (precision the owner waived): the cold read checks that the subject stays
   the same size and on its ground line across a shot's poses unless the change is the idea.
-- **Ambient life**: every set panel carries 2-3 looping micro-moves (`loop: true`), placed and scaled from a **shared
-  kit of 3-5 presets** (cloud drift, steam, window-light switch, bird tick) — never authored fresh per panel (building
+- **Ambient life**: every set panel carries 2-3 ambient micro-moves (`loop: true`: weather, a cloud, steam, a window
+  lighting, a bird; at most one of them a periodic prop such as a swinging sign, `LIFE_AND_DENSITY.md` §6), placed and
+  scaled from a **shared kit of 3-5 presets** (cloud drift, steam, window-light switch, bird tick) — never authored fresh per panel (building
   the kit is the `loop: true` item in §7). Zero ambient elements on a set panel is a lint FAIL (§2 freezes 2-3 as contract).
   They are supporting life at their tier and at FINAL size and speed (B near the story, C for weather and far life:
   `CRAFT.md` §b), so the mover budget (§2) shows on the board; they take turns (~0.6 entries/s), and none enters in the
@@ -128,7 +129,8 @@ G5 adds no new motion — only colour, line, easing polish, secondary motion (`a
   carried by placeholders + ambient loops, which ARE the contract).
 - **Unanimated, on purpose**: overshoot, settle, secondary action, a figure's breath, true morph tweens, easing feel
   beyond in/out — all G5/G6. Blocking is the kill test: a shot that only reads with polish gets redrawn, never polished.
-- **Drawing budget** for a 40 s / ~15-shot reel: ~60-120 distinct drawings (2-4 poses x shots, + smears),
+- **Drawing budget** for a 40 s reel of ~10-12 shots (shots average >= 3.5 s: `CRAFT.md` §a): ~40-90 distinct
+  drawings (2-4 poses x shots, + smears),
   spent unevenly — 2-3 poses on held dialogue shots, 6-12 drawings on the 1-3 shots whose meaning IS motion.
 
 **Transition grammar: carry something, don't cut** (`docs/look/CRAFT.md` §a; owner, v3 G5b, 2026-10-27: "no clean
@@ -153,7 +155,7 @@ only as a declared exception for time passing (0.2-0.4 s, up to 1-2 s), named in
 | wipe (object-wipe) | the wiping element already exists in panel A, with its travel direction |
 | dissolve / dip / flash (a declared exception, never a carrier) | the relationship named ("time passes"); duration per the rule above |
 
-## 5. Build order and time budget (first full animatic ~3 h, ASSUMING §7 tier-1 tooling is built; rounds 30 min)
+## 5. Build order and time budget (first full animatic ~3 h, ASSUMING §7 tier-1 tooling is built: not yet on 2026-10-27; rounds 30 min)
 
 With script + voice locked (word timings = the clock), the through-line card approved with the script and the W1 world
 bible written (`PIPELINE_V2.md`); per-step budgets sum to the ~3 h (was 2; the hour goes to tiers, carriers and the
@@ -169,7 +171,7 @@ light marks):
 3. **Thumbnails** (~30 min): 3 variants per beat at 270x480 on one contact sheet, picked by checklist (two-pass:
    scribble for energy, volume pass only on survivors — discard at pass 1), plus one drawn midpoint frame per join.
 4. **Board JSON** (~45 min wall clock: one agent per 3-5 panels, ~4 lanes in parallel, once the camera plan is locked;
-   tiers and rig drawn in; the dress/density pass runs in a parallel lane, the G4 look clip in its own).
+   tiers and rig drawn in; the dress/density pass runs in a parallel lane).
 5. **Motion pass** (~30 min): camera keys, pose pops, smears, kit loops at their tier, size and speed, every transition
    played with its carrier.
 6. **Lint** (~10 min, `board_lint.py`) — boxes, bands, counts, PLUS the tier-1 checks (§7): five-values per move, speed
@@ -185,7 +187,7 @@ light marks):
    anti-waste rule 1); no further internal loops.
 8. **Owner** (~5 min): ONE 540p **60 fps** MP4 of the whole reel (always end-to-end; the reel is the living master —
    every approved change lands in the board JSON first), plus the home set's density-key still. The G4 look clip
-   (parallel lane) is its own gate video, approved before the G5 lanes.
+   follows the lock as its own gate video (`PIPELINE_V2.md` G4), approved before the G5 lanes.
 
 **Over budget?** Cut pose counts toward 2 per shot and ambient loops toward the kit minimum first; never cut a §2
 contract column (cuts, framing, moves, transitions and carriers, the thread, tiers, the rig, density placeholders).
@@ -219,7 +221,9 @@ contract column (cuts, framing, moves, transitions and carriers, the thread, tie
 **Already exists**: 7 transition types played; element moves + eases; one camera segment; 9 poses; draw-on/fillIn; notes
 strip; red marks; box/band/count/zoom lint; contact sheets; g5 scaffold; **`{t:'scribble'}` masses (built 2026-10-27,
 owner-approved texture)**. Scribble masses, flat mid-grey rects + figure rows cover the first reel's placeholders (§3). **Tier 1 is a ONE-TIME checkpointed tooling lane, landed before the next video's G3
-and outside the gate budget; the §5 ~3 h first cut assumes only tier 1 exists. Tier 2 is built lazily, the first time a
+and outside the gate budget (not built yet on 2026-10-27: SketchReel, `board_lint.py` and `g5_scaffold.py` have no
+dress, loop, life, carrier, tier, rig or thread handling; who and when: `PIPELINE_V2.md` "Craft tooling lane"); the §5
+~3 h first cut assumes only tier 1 exists. Tier 2 is built lazily, the first time a
 reel needs it — never ahead of a reel.** Nobody builds tooling before drawing panels the existing kit can draw.
 
 | Tier 1 — required before the next G3 (all fix the v3 failure directly) | Where | Effort |
@@ -243,7 +247,7 @@ reel needs it — never ahead of a reel.** Nobody builds tooling before drawing 
 |---|---|---|
 | `crowd-row` / `facade-row` / `window-ticks` / `foliage-blob` when a reel's density key demands them (`scribble-mass`: BUILT 2026-10-27, owner yes) | SketchReel | M |
 | `camera.keys?: Cam[]` (multi-key camera) + board-mode parallax behind `shot.parallax: true` | SketchReel | M |
-| Per-device transition checks (§4 table), one device at a time, when a camera plan first uses it (a 15-shot reel uses 2-4 of the 8) | board_lint | S each |
+| Per-device transition checks (§4 table), one device at a time, when a camera plan first uses it (a 10-12-shot reel uses 2-4 of the 8) | board_lint | S each |
 
 **Dropped**: the volume/contact lint (polices precision the owner waived; the cold read covers it, §4). **Line boil**:
 retired (§4; `CRAFT.md` §c).

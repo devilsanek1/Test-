@@ -81,7 +81,8 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'light'}];   // optional: ov
 
 - **Time**: `useTime()` = panel-local seconds; a voice word at VO time w lands at `t = w - start`. Lead the voice
   (ENGINE §1 rule 5). Everything in seconds, deterministic (`rng`, never `Math.random`), flat (no blur, filters,
-  gradients), **no opacity fades** (pop, grow, wipe, slide, draw on). From `ENGINE.md`: §1 rules 1-5, 7 and 10
+  gradients), **no opacity fades** (pop, grow, wipe or slide; a draw-on at frame 0 and where the drawing is the beat:
+  `docs/look/DIRECTION.md` rule 8). From `ENGINE.md`: §1 rules 1-5, 7 and 10
   (rules 6, 8 and 9 are retired: `docs/look/DIRECTION.md`), §4-§6 (stage, transitions, captions) and §7 (primitives,
   with the clean pen); its §3 template and §10 kit show the API, never the look (v1's sketch pen, drifting sun,
   per-shot push).
@@ -105,17 +106,22 @@ exception from the G3 hand-off.
 
 - **The first panel at t < 0** is the loop underlay and the frame-0 state, the scene being drawn in the clean pen: at
   `t < 0` the subject's outline (with tier B's tinted lines) draws on and the first motions already run (start times
-  slightly negative), tier C lands as flat pale shapes, and colour floods in within ~0.3 s from t 0; voice from frame
-  1, one continuous shot (`docs/look/DIRECTION.md` rule 9; the owner approves this build with the G4 look clip). The
+  slightly negative), tier C lands as flat pale shapes, and colour floods in within ~0.3 s from t 0; voice from the
+  first frames (the first word at ~0.12 s, the voice file's lead), one continuous shot (`docs/look/DIRECTION.md` rule 9; the owner approves this build with the G4 look clip). The
   last panel un-builds over its last `dur` s on top of it: build
   with `Ink` / `Fill` / kit (they read the exit value) or read `useExit()` for raw SVG (`<ExitShrink>` for characters).
 - **Caption tone**: `captionTone` keys are scene-local `{t, tone}`: `'dark'` (ink) on light walls and skies, `'light'`
   (white) on dark skies; check the contrast (`contrast(a, b)` in `lib/Captions`: v3's dusk blue #5B6A94 takes white
   5.3:1, ink only 3.1:1). Export it from the panel file (the engine merges it over scenes.json); a `wipe` key follows a
   sky wipe edge (ENGINE §6).
-- **Screen zones**: the caption band (y ~290-600, screen space) belongs to the captions: no busy detail there. Platform
-  UI covers the top (y < 180), the bottom (y > 1520) and a right rail (x > 950, y 900-1500); the draft label sits at
-  the bottom-left (y > 1850). Key action inside x 90-990, y 600-1480.
+- **Screen zones** (the one definition; the board, `LIFE_AND_DENSITY.md` §8 and `COZY_AND_SCALE.md` §5 point here):
+  the caption band (y ~290-600, screen space) belongs to the captions: no busy detail there. Platform UI covers the top
+  (y < 180), the bottom (y > 1520) and a right rail (x > 950, y 900-1500), as `scripts/qa/framecheck.py` checks them:
+  dressing may run under them, key information never. Key action (the subject's action, a label, a number, a contact
+  point) inside x 120-950, y 600-1480 (the board stages its subject in the read zone, y 600-1250:
+  `docs/look/STORYBOARD_STYLE.md` §3); the draft label sits at the bottom-left (y > 1850). Ad templates cover more (the
+  bottom 35 %, and x > 780 from y 840): a cut made for ads keeps its key reads above y 1250 and, below y 840, left of
+  x 780.
 - **Board notation is not film**: the red pencil marks and the notes strip never appear. A red focus circle becomes a
   production emphasis that fits the look (light, the hero colour, a pop), never a drawn circle.
 - **Density and life: fill what G3 decided.** Every G3 placeholder and `life:` item becomes its real dressing and life
@@ -126,9 +132,10 @@ exception from the G3 hand-off.
 - **Look**: the approved G4 look clip and its kit (the clean pen, the set's light rig, the tier palettes), the video's
   STYLE.md (v3: LOOK.md) and palette roles (one hero colour, one dark anchor, at most one pop), inside
   `docs/look/DIRECTION.md` and `CRAFT.md`; then `docs/look/COZY_AND_SCALE.md`, `docs/look/CINEMATIC_GUIDE.md`. Every
-  set, person, prop and Pip is the film's own kit (playbook: no reusable assets); `lib/cine`'s drawing pieces are
-  references, never film code, until the craft tooling lane ports them to the clean pen (`CRAFT.md` §c; its camera
-  and utilities are fine).
+  set, person, prop and Pip is the film's own kit (playbook: no reusable assets; people have no faces); `lib/cine`'s
+  drawing pieces are references, never film code, until the craft tooling lane ports them to the clean pen
+  (`CRAFT.md` §c; its camera and utilities are fine). The light and shadow layers come from `lib/light.tsx`; a film
+  never imports another film's folder (`src/vN/`).
 
 ## 3. Lane rules
 
@@ -164,8 +171,10 @@ npx remotion render src/entry-v3-film.tsx Film3-S9 /tmp/s9.mp4 --scale=0.5
 ```
 
 Tile stills with `montage` (scripts/sheet.sh does it for you). Never render the whole film at full size in a lane
-session; the owner's gate video is the orchestrator's render (`npx remotion render src/entry-v3-film.tsx Film3
-deliverables/vN/vN_g5_blocking.mp4 --scale=0.5`).
+session; the owner's gate video is the orchestrator's render, at FULL size (1080 x 1920: at 0.5 scale the fine lines
+blur and the float camera's sub-pixel drift flickers, `LIFE_AND_DENSITY.md` §9, §8b below):
+`npx remotion render src/entry-vN-film.tsx FilmN deliverables/vN/vN_g5_blocking.mp4`, or chunked per panel for a long
+film (§8b's recipe).
 
 ## 5. Captions and frame 0
 

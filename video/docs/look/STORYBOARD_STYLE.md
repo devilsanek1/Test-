@@ -72,8 +72,8 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   weight follows the TIER, never the plane (§2): A (9 px, a dark mass, or paper-white against light), B (3 px mid-grey lines, never a
   dark mass), C (no line: a flat light shape or light-grey scribble, no detail). Overlap does the rest; no perspective grids.
 - **People are gesture figures:** a head circle (r = 0.09 h), a bean-shaped torso along one curved line of action, limb lines, mitten
-  hands, and arms held away from the body so the gaps show the pose. The pose is the verb (reach, point, shrug, slump, look up). Add a face
-  only when the emotion is the beat (dot eyes, one brow line, one mouth line). A crowd is a row of small mid-grey figures, all the same size.
+  hands, and arms held away from the body so the gaps show the pose. The pose is the verb (reach, point, shrug, slump, look up) and carries
+  the emotion: people have no faces (playbook, like reference 1's); only the mascot has one. A crowd is a row of small mid-grey figures, all the same size.
 - **Objects** come from the icon kit, in their usual view (from slightly above, at 3/4), with the one feature that names them exaggerated:
   a laptop's open hinge and keyboard, a 1:2 phone with a notch, a price tag's hole and string, a chip's pins, a rack's stacked slots.
   Never a box with a word in it. If an object can't be drawn so that people recognise it, rethink the panel.
@@ -87,8 +87,9 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 - **Space:** at least 40 % of the SUBJECT ZONE is low-detail (plain paper or flat scribble tone), so the subject
   breathes. Outside the subject zone, bare paper is legal only where the final film stays plain, declared
   `negative: true`; every surface that will be dense or alive at G5 carries a placeholder mass (`G3_ANIMATIC.md` §3).
-  A set panel over ~55 % bare stage, or a wide with no `role:'dress'` layer, is a lint WARN. Nothing important sits within 120 px of a side edge or under the UI rail (x > 780,
-  y > 840). The **caption band** (y 290-600) is plain paper or one flat light sky, and no lines cross it. The captions keep today's
+  A set panel over ~55 % bare stage, or a wide with no `role:'dress'` layer, is a lint WARN. Nothing important sits within 120 px of a side edge or in a
+  platform UI zone (`docs/G5_BLOCKING.md` §2, "Screen zones": the right rail x > 950 at y 900-1500, the bottom y > 1520, the top y < 180). The
+  **caption band** (y 290-600) is plain paper or one flat light sky, and no lines cross it. The captions keep today's
   in-place pop (100 px ink), and the frame-0 payoff line sits above them.
 - **Notes strip (big words, v3 G3 fix round):** one strip at y 1680-1920, paper with a 2 px light rule, written for the director
   reading a 25 % contact sheet. Line 1, 48 px ink, bold, at most 2 lines: shot id, shot type, COZY / SCALE and the camera move
@@ -123,8 +124,10 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 - The slug always names the camera move and the transition with its carrier letter (every G3 transition is labelled).
   Never a cut by default: every join carries something (at most 2 plain cuts; `G3_ANIMATIC.md` §4); a dissolve is no
   carrier, only a declared time-passing exception (`G3_ANIMATIC.md` §4). Frame 0 follows the playbook: the scene
-  being drawn (the subject's lines, then the tones), voice from frame 1. No other drawing draws itself on except a
-  chart line, in step with the voice.
+  being drawn (the subject's lines, then the tones), voice from the first frames (the first word at ~0.12 s). After
+  frame 0, things enter as they will in the film (pop, grow, wipe or slide: `DIRECTION.md` rule 8), and a drawing
+  draws itself on only where the drawing IS the beat (a chart line in step with the voice); the board plays each
+  entrance as the film will.
 
 ## 5. Speed: how to iterate
 - **Thumbnails first:** for each beat, write the sentence, render 3 variants (a different subject size or angle) as 270 x 480 board stills
@@ -165,18 +168,19 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 New props: `role?: 'subject'|'mid'|'far'` on every element, icons and figures included; `sw?: number`, a rare stroke override (`w` is already a width);
 shot `scale?: true` for a scale panel (the lint then wants its subject BIG: >= 60 % of the frame or cut by both side edges);
 figure `pose?: 'stand'|'walk'|'point'|'reach'|'hold'|'shrug'|'slump'|'lookup'|'sit'`, `facing?: 'l'|'r'`,
-`face?: 'none'|'happy'|'sad'|'shock'|'worried'`; text `strike?: boolean`; a new element `{t: 'mark', kind: 'circle'|'arrow'|'underline'|'frame',
+`face?: 'none'|'happy'|'sad'|'shock'|'worried'` (people stay `'none'`: they have no faces, §3); text `strike?: boolean`; a new element `{t: 'mark', kind: 'circle'|'arrow'|'underline'|'frame',
 …, word?}` on the red annotation layer (5 px; `frame` = a dashed end-frame box with corner arrows), with `in` and `out` like any other element.
 **To build (tier 1, `G3_ANIMATIC.md` §7; owner-approved 2026-10-27):** `tier?: 'A'|'B'|'C'` on every element (stroke and fill by story
 role, §2: it replaces `role` for the weight), `carrier` on every transition, `rig` per set panel, and the thread object's screen time.
 **Until `tier` lands, set `role` by TIER, never by depth:** A = `role: 'subject'` (9 px ink); B = `role: 'far'` with paper or no
 fill (its 3 px mid-grey line; a filled B shape adds `sw: 3`); C = `role: 'far'` with a light fill (drawn flat, no line). Never
 `'mid'` (a 5 px INK line, darker than B may be) and never the `f` default (it picks the role by depth).
-**`board-lint` runs before every render.** Per shot it checks: at most 25 elements (warn at 30 to split); one subject group; at most 1 label and 1
+**`board-lint` runs before every render.** Built today (`scripts/v3/board_lint.py`), per shot: at most 25 elements (a WARN; over 30 an ERROR: split the panel); one subject group; at most 1 label and 1
 mark; text at least 48 px; fills from the palette only; nothing crossing y 290-600 except a `far` flat fill; the subject's box centred
 in x 380-700 and 270-460 px wide (a tall subject such as a standing figure is measured by its height, 300-650 px; a `scale` panel's
 subject at least 648 px or cut by both side edges); a bare year ("2005") counts as an axis word, not the number; the camera's zoom
-changing by at most 2x within a shot. Plus the `G3_ANIMATIC.md` §7 tier-1 checks: dress-layer exemption, move
+changing by at most 2x within a shot. NOT built yet (2026-10-27; the tier-1 lane before the next G3, `G3_ANIMATIC.md`
+§7): the tier-1 checks: dress-layer exemption, move
 five-values, speed WARN (~15 px/frame at the render rate, measured only over moves >= 2 frames, whip/carry shots
 exempt), the carrier check, the camera-plan cross-check (every plan row's move / transition device and carrier / tier
 map / rig / `life:` item exists in the board JSON), `life:` coverage, unaccounted emptiness (subject breathing ring and
@@ -185,7 +189,7 @@ edge margins exempt; FAIL = >= 4 contiguous undeclared bare cells), zero-ambient
 (`PIPELINE_V2.md` anti-waste rule 6: a carrier per join and at most 2 plain cuts, thread coverage, the mover budget, eye
 jump, colour shift). Boxes are measured on screen (clipped to the frame and the stage above the notes strip); a subject cut by a frame edge
 (a waist-up figure) is measured by its visible width. Element moves take `ease` (default `inout`; `outSine` for a
-rise-over's ledge). Implemented: `scripts/v3/board_lint.py` (props and defaults: the header of `src/v3/SketchReel.tsx`);
+rise-over's ledge). The built checks: `scripts/v3/board_lint.py` (props and defaults: the header of `src/v3/SketchReel.tsx`);
 a worked board with every pattern (home base as 1-element window, icon ticker, element reuse, two-layer rise-over):
 `scripts/v3/build_board_cine.py`.
 
@@ -210,8 +214,9 @@ Clarity and cinematics are not a trade-off. Each panel names its shot type and f
   look-alike.
 - **Scale** (`CINEMATIC_GUIDE.md`): the one big move (S1 rise-over or S5 pull-back) drawn with its planes, landing on a
   tiny figure (0.04-0.08 H, so at least ~80 px: a 3 % figure is a 15 px speck on the cold-read thumbnail; fix the plan,
-  not the floor) under something huge; a scale cut from a close panel is a declared F; a low or worm's-eye angle for
-  the colossus. Mark a move with the
+  not the floor) under something huge; a scale cut from a close panel is a plain cut (F: only on a "But" turn, within
+  the film's 2, the thread on both sides: `CRAFT.md` §a), otherwise the big move carries the scale; a low or
+  worm's-eye angle for the colossus. Mark a move with the
   red `frame` / arrow notation only when it is not animated (§4); an animated move is its own notation.
 - **Scale panels are BIG, never a centred object on paper (fix round):** shot `scale: true`. The reveal lands with the
   colossus cut by BOTH side edges (a wide hall, its sign readable), with a ruler at its foot (a row of houses, drawn paper
@@ -228,8 +233,8 @@ Clarity and cinematics are not a trade-off. Each panel names its shot type and f
   big, its cargo readable) to the source's door (far), the first in line at the door getting the goods, and one waiting cue
   (three dots over the cab). Side-on, the same objects read as "three buildings side by side". The reprise of a matched
   frame changes only what the voice says (who cuts in, who is pushed back) and moves the subject role to the newcomer.
-- **Literal reads, small things (fix round cold read):** the mildest face that carries the beat (a shock face read as
-  "something bad happened"); "better" drawn as bigger plus the voice's own word as the label; an object keeps its tone
+- **Literal reads, small things (fix round cold read):** the mildest pose (or mascot reaction) that carries the beat (a
+  shock face read as "something bad happened"; people have no faces now, §3); "better" drawn as bigger plus the voice's own word as the label; an object keeps its tone
   across panels unless the change is the idea (a laptop turned dark read as "a different, infected laptop"); a speech
   bubble's speaker is a figure and the tail ends at its head (a tail toward buildings has no speaker); the stake's number
   is on frame 0 and in the loop frame (an empty tag read as "price unknown").
@@ -249,9 +254,10 @@ plus the notes-strip lines. Then check the whole film:
   on it, so it reads as light, not a mat). Information is paper in the home place (`CRAFT.md` §a.2): a full-frame chart
   is that paper filling the frame, entered by a push (A) or a card flip (E), and counted neither cozy nor scale; cozy is
   at least 50 % of the rest of the runtime (`COZY_AND_SCALE.md` §1.3); the nook is breached once.
-- **Scale:** one moment (1.5-4 s) built as a ladder: a close-up of the one thing, the reveal of many, then the one big
-  move lands on a tiny figure (an S5 pull-back lands on it inside the move, v3, 2026-10-26); a separate scale cut is a
-  declared F (change the angle as well as the size, so the second wide steps up instead of repeating).
+- **Scale:** 1-2 moments (~1.5-4 s each, `DIRECTION.md` rule 7), one of them the film's one big move, built as a
+  ladder: a close-up of the one thing, the reveal of many, then the big move lands on a tiny figure (an S5 pull-back
+  lands on it inside the move, v3, 2026-10-26); a separate scale cut is a plain cut (F: only on a "But" turn, within
+  the 2) that changes the angle as well as the size, so the second wide steps up instead of repeating.
 - **Every join carries** (`CRAFT.md` §a: a push-through, a match, a continuous camera, an object carry, a card flip),
   taken from the through-line card, its midpoint on the first word of the new sentence and its midpoint frame drawn
   (`G3_ANIMATIC.md` §4); a plain cut (at most 2, on a "But" turn) changes size or angle, except a deliberate match (the
