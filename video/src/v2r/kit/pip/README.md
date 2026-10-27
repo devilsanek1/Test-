@@ -23,12 +23,13 @@ a push-through, riding a wipe's object, or in the same screen spot: it never hop
 
 ## The line
 The silhouette (body, head, ears, trunk, legs, scarf band) is traced every frame as the union of the part shapes
-(marching squares with bisected crossings: it moves continuously, no boil) and drawn as ONE loose tapered brush stroke
-(~3.4 px on screen at 80-120 px, 2.3 px at 44 px; it never scales with `size`) with 2-3 gaps: the head top, the base and
-the screen-right ear root (the third only at >= 58 px). A slow seeded hand wobble rides on it. Interior lines appear
-only where a part lies over another (an ear over the head, the trunk over the face, a leg over the belly). Flat fills sit
-3 px right / 2 px down of the line (2 px at 44). No opacity anywhere: the draw-on is a pen, the fills grow 20 % -> 100 %;
-the un-build shrinks the fills then retracts the ink (`lib/exit` timings).
+(marching squares with bisected crossings: it moves continuously, no boil). Under the film's clean pen (the only pen v2r
+draws with; "Tiers" below) it is ONE closed uniform line in the body's own shade (tier B: 1.6-2.2 px), with no gaps,
+wobble or taper, and the fills register exactly; the sketch-pen look this kit was first drawn in (a loose tapered
+~3.4 px brush with 2-3 gaps, a hand wobble, fills 3 px / 2 px off the line) is retired (DIRECTION rule 4). Interior
+lines appear only where a part lies over another (an ear over the head, the trunk over the face, a leg over the belly).
+No opacity anywhere: the draw-on is a pen, the fills grow 20 % -> 100 %; the un-build shrinks the fills then retracts the
+line (`lib/exit` timings).
 
 ## Use it
 ```tsx
@@ -41,17 +42,17 @@ import {Pip, PipTrack, FACING} from '../kit/pip';
 <PipTrack x={700} y={1235} size={96} facing="back" keys={[
   {t: 1.25, target: (t) => herHeadAt(t)},          // S1: the head follows her (a point or a function of t)
   {t: 4.98, pose: 'earsCover', dur: 0.1},           // "life" (a small flinch tremble is added for 0.6 s)
-  {t: 5.55, pose: 'sit', dur: 0.25},
-  {t: 5.90, hop: {to: [540, 760], height: 90}},     // take-off at 5.90; it crouches 0.12 s before
+  {t: 5.55, pose: 'sit', dur: 0.25},                // and it stays: the push-through into W sweeps it (no hop out)
 ]} />
 ```
 - **Props** (`Pip`): `x y` feet anchor · `size` px seat-to-head-top (44-120; LOD below 58 px) · `pose` · `facing`
   (`front frontRight right backRight back backLeft left frontLeft` or degrees; `back` = the 3/4-back watcher) · `look`
   (-1 screen-left .. +1 right) · `lookUp` · `target` (the head follows a screen point) · `wind` · `idle` (0..1 or
   `{amount, breeze, flick: false}`) · `squash` · `rotate` · `draw` · `exit` (default `useExit()`) · `paint`
-  (`'colour'` default: Pip stays in colour on frame 0's bare-ink page, as TREATMENT §4 asks; `'paper'`; `'look'`
-  follows the enclosing `<Look>` / cascade) · `params` (raw `PoseParams` overrides) · `inkPx`.
-- **Keys** (`PipTrack`): `pose` (blend, default 0.16 s) · `facing` / `look` / `lookUp` / `wind` (ease 0.3 s) · `target`
+  (`'colour'` the default; `'paper'`; `'look'` follows the enclosing `<Look>` / cascade: S1 uses it, since frame 0 is
+  drawn in the clean pen and Pip's tinted line draws on with the subject while its colour comes with the flood,
+  DIRECTION rule 9) · `params` (raw `PoseParams` overrides) · `inkPx`.
+- **Keys** (`PipTrack`; hops are for moves INSIDE a shot: Pip never hops across a join): `pose` (blend, default 0.16 s) · `facing` / `look` / `lookUp` / `wind` (ease 0.3 s) · `target`
   (null stops) · `hop: {to, dur, height, style: 'tuck' | 'leap', crouch, land, turn, minY}` (key t = take-off; the arc
   is `lerp(from, to, k) - height * 4k(1-k)`, the same form as map.ts `PIP_HOP_S2_S3`; the apex is clamped to stay at
   y >= `minY` = 600, the caption band, unless an end is above it) · `flick: 'A' | 'B'` · `ride: {amp, rate}` (bob +
@@ -59,20 +60,20 @@ import {Pip, PipTrack, FACING} from '../kit/pip';
 - **Poses** (`POSES`): `sit` (the watcher, perch) · `alert` · `earsCover` (from the front the leaves wrap over the eyes;
   from behind they hang forward against the cheeks, head sunk, hunched) · `earsDown` · `lookUp` (the trunk rises like
   a periscope: it reads from behind) · `crouch` · `tuck` (a hop in the air) · `leap` (a big leap) · `land` · `ride`.
-- **Pure helpers**: `hopAt` (where Pip is at any t of a hop: use it on BOTH sides of a cut it crosses), `trackAt`,
+- **Pure helpers**: `hopAt` (where Pip is at any t of a hop inside a shot), `trackAt`,
   `aimAt`, `rideAt`, `drawOn`, `unBuild`, `applyIdle`, `buildPip` (the flat parts), `clampApex`.
 
-## Per shot (TREATMENT §3 + map.ts `PIP`)
+## Per shot (map.ts `PIP` and `MATCHES` = `docs/v2/THROUGHLINE.md` §3: on both sides of every join, never a hop across one)
 | shot | how |
 |---|---|
-| S1 | `facing="back"` on `S1_BOLLARD`, in colour at f0 (default paint); `target` her from 1.25; `earsCover` at 4.98; `hop` up-left at 5.90 |
-| S2 | land on `S2.pipSeat`; on "But" 8.30 `look` toward the wall (from behind a turn of 0.6-0.8 shows the trunk hook past the cheek); `hop` at 12.85 (`PIP_HOP_S2_S3`: `dur 0.25, height 50`) |
-| S3 | land on `S3.pipSeat` (a hop from off-frame with `crouch: 0.01`); turn to her on "she" 13.90 (`look`, or `facing`); `hop` with `style: 'leap'` out through the LEFT edge at 14.70 |
-| S4 | ride the boat roof (`ride` key; the lane moves `x` with the boat and freezes it at take-off), `facing: 'left'` at 19.55; `leap` toward SUN1 at 20.25 |
-| S5 | `lookUp` (+ `look` toward the sun) at 20.76; `size` shrinks with the crane to >= 44 px; `leap` at 23.90 |
-| S6 | on the corner post; `flick: 'A'` at 26.50 (no droop); pass `idle={{flick: false}}` so no ambient flick competes |
-| S7 | sit-watch at `BOARD_BOLLARD`, NO reaction: `idle={{flick: false}}` |
-| S8 | ride the boat in, `hop` to the bollard 33.20, `earsDown` at 33.78, `lookUp` at W on "not" 37.70; hop to f0's bollard on the un-build (wrap Pip in `<NoExit>` or pass `exit={0}`: it must arrive in colour) |
+| S1 | `facing="back"` on `S1_BOLLARD` from frame 0, `paint="look"` (its tinted line draws on with the subject, its colour comes with the flood); `target` her from 1.25; `earsCover` at 4.98; it stays on the bollard: the A push-through into W sweeps it (no hop) |
+| S2 | seated on `S2.pipSeat` (590, 1050) from the first frame (no landing); on "But" 8.30 `look` toward the wall (from behind a turn of 0.6-0.8 shows the trunk hook past the cheek); it holds the spot across the B match |
+| S3 | seated on `S3.pipSeat` (590, 1050) = S2's spot from the first frame (no landing); turns to her on "she" 13.96 (`look`, or `facing`); it stays: the push-through into her sweeps it (no leap) |
+| S4 | seated on the boat roof (`S4.pipSeat` (470, 1218), `ride` key) from the first frame (no landing); `facing: 'left'` at 19.55 (leads "heading"); it stays: the push-through into SUN1 sweeps it (no leap) |
+| S5 | seated beside the stranger from the first frame (no arrival); `lookUp` at the blossom on "April" 20.76; `size` shrinks with the crane to >= 44 px; it holds the balustrade (366, 1195) until the blossom tree covers it (~23.81: no leap) |
+| S6 | seated and still at the deal board's foot (`S6.pipSeat0` (360, 1410), 98 px) from the first frame; `flick: 'A'` at 26.50 (no droop); pass `idle={{flick: false}}` so no ambient flick competes; the push-through into SUN2 sweeps it |
+| S7 | sit-watch at `BOARD_BOLLARD` from the first frame (no hop in), NO reaction: `idle={{flick: false}}`; seated until the boat's bow covers it (~32.83) |
+| S8 | rides the wiping narrowboat in on its stern (32.97: the carrier), steps off 33.00, lands on (450, 1205) at 33.20 and rides the truck to `BOARD_BOLLARD`; `earsDown` at 33.78, `lookUp` at W on "not" 37.70; on the un-build it settles 30 px down to f0's bollard (700, 1235) (no hop) and ends in frame 0's state (its tinted line, the cascade's pale fill) |
 
 Rules the lanes keep (map.ts `PIP_RULES`): 86-120 px (44 only in S5's end frame); never in the caption band y 317-556,
 the right rail (x > 780 below y 840), over her, or within 200 px of the F11 clause; one reaction per shot.

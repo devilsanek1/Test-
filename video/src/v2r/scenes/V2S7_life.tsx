@@ -10,7 +10,7 @@ import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {Batch, Paint, P, Pt, ovalPath, domePath, leafPath, lerp, rng, rand, frac, clamp01} from '../kit/canal/core';
 import {StringLights, FallingLeaves, Puffs, Pigeons} from '../kit/canal/life';
-import {twinkle} from '../../v3/film/kit/idle';
+import {twinkle} from '../../lib/idle';
 import {TREE_L_SPEC, TREE_R_SPEC, SH_PAVING} from './V2S7_set';
 import {Person, Seated, NearBack, strideFor} from '../kit/cast';
 import {

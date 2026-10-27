@@ -22,7 +22,7 @@ import {XG, mat} from '../../lib/xf';
 import {line, circle as circleInk} from '../../lib/sketch';
 import {Batch, Paint, P, rng, ovalPath, domePath, lobes, leafPath, lerp, frac, r1, Pt} from '../kit/canal/core';
 import {bikeInto} from '../kit/canal/towpath';
-import {puffs} from '../../v3/film/kit/idle';
+import {puffs} from '../../lib/idle';
 import {rideAt} from '../kit/pip/motion';
 import {S4_BEATS, s4PathSpeed, s4PlaneDx, S4_K, S4_TRUCK} from './V2S4_rig';
 import {ROW, PLANE_X, WIND, clamp01, CLEAN, WINK} from './V2S4_wcore';
