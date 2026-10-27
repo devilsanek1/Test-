@@ -334,7 +334,7 @@ const Pigeons: React.FC<{t: number}> = ({t}) => {
 export const READERS = [
   {x: 152, hv: 146, seed: 's6/reader1', traits: {hair: 'bun' as const, hairColor: CM.hair[1], coat: CM.coatOat, acc: 'scarf' as const, accColor: CM.coatMustard, broad: 1.0}},
   {x: 402, hv: 140, seed: 's6/reader2', traits: {hair: 'curls' as const, hairColor: CM.hair[4], coat: CM.brick, acc: 'tote' as const, accColor: CM.paper, broad: 1.04}},
-  {x: 652, hv: 150, seed: 's6/reader3', traits: {hair: 'beanie' as const, hatColor: CM.coatMustard, hairColor: CM.hair[0], coat: CM.coatSlate, acc: 'backpack' as const, accColor: CM.leafRust, broad: 1.06}},
+  {x: 652, hv: 150, seed: 's6/reader3', traits: {hair: 'beanie' as const, hatColor: CM.coatMustard, hairColor: CM.hair[0], coat: CM.coatSlate, acc: 'backpack' as const, accColor: CM.leafRust, broad: 0.98}},
 ];
 export const PASSER = {hv: 124, broad: 1.02};
 export const nearBackW = (hv: number, broad: number) => 0.84 * hv * broad;
