@@ -163,16 +163,21 @@ export const doorOpenK = (t: number) => {
 
 /** S7's narrowboat wiper (canal kit BoatWiper, half 630, hull half-length 590): its centre on screen at scene t
  *  (Film's wipeEdgeX for dir 'left', 32.70-33.16). S8 shows only RIGHT of this x while the wipe runs. */
-export const WIPER = {half: 630, hullHalf: 590, sternDeckY: 1642, t0: S8T.wipeT0, dur: 0.46} as const;
+export const WIPER = {half: 630, hullHalf: 590, sternDeckY: 1652, t0: S8T.wipeT0, dur: 0.46} as const;
 export const wiperX = (t: number) => {
   const p = clamp((t - WIPER.t0) / WIPER.dur);
   const e = 0.5 - 0.5 * Math.cos(Math.PI * p);
   const x = -WIPER.half - 30 + (1080 + 2 * WIPER.half + 60) * e;
   return 1080 - x;
 };
-/** Pip's entry: sits on the passing boat's stern deck (screen x = wiperX + 545, feet on the deck y 1636) from 32.97
- *  (only where S8 shows: x <= 780, never the rail), leaps at 33.00 and lands on the pre-truck board bollard 33.20. */
-export const PIP_ENTRY = {sternDx: 545, deckY: 1636, size: 100} as const;
+/** Pip's entry: sits on the passing boat's stern deck (screen x = wiperX + 545, feet on the deck y 1648) from 32.97
+ *  (only where S8 shows: x <= 780, never the rail), leaps at 33.00 and lands on the pre-truck board bollard 33.20.
+ *  S7's band-safe wiper (L5, V2S7_wiper.tsx S7_WIPER: boatInto 1180 x 980, water 2020, half 630) draws NO Pip; its
+ *  gunwale top is at y ~1652 and its stern end at wiperX + 590 (~578 at 33.00). */
+export const PIP_ENTRY = {sternDx: 545, deckY: 1648, size: 100} as const;
+/** Pip at a board bollard (S7 and S8 alike, A5; L5's S7 pose): 'sit', facing 'backLeft' (3/4 back, toward the board),
+ *  size 100, idle {flick: false}. */
+export const PIP_BOARD_FACING = 'backLeft' as const;
 /** Pip's board bollard (top centre = Pip's seat) in BOARD-PLANE landing coords. */
 export const PIP_SEAT = {x: MAP.BOARD_BOLLARD.x, y: MAP.BOARD_BOLLARD.y} as const;
 /** Pip's size at the board bollard: S7's PIP_SIZE_S7 (A5: the same Pip pose at both boards). */
