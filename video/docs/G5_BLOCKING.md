@@ -190,3 +190,28 @@ rendered the film and fixed what only shows across panels.
 - **Cold-read the new panel at phone size before the full render:** the builder's own checks passed, but a sound-off
   reader still took S9's streams for birds or drones (dark trail ticks), the lit street for "a dotted path" (posts lost
   against the house fronts) and the pile for hay (pale stick backs); fixing those in the kit first cost one render, not two.
+
+## 9. Lessons from v2 (the assembler's round, 2026-10-27)
+
+Five panel lanes, a kit lane and an engine lane, each with an art-director review and a fix round; the assembler folded
+~20 kit workarounds back in one session.
+
+- **Fold back by pixel diff, never by eye:** render `FilmNBare` stills of every panel (3 per panel + the seam) BEFORE
+  the first edit, then after each fold re-render only the touched panels and diff (`changed %` + bbox per frame,
+  ~2 s a round at 0.5 scale). A fold is right when the diff is zero or only the intended change. It made 20 folds safe
+  (moved code, not rewritten) and caught what a sheet hides: P3's local passer redrew the frosted band in the OLD
+  colour, so the band flickered for the 2 s he crossed; inside the kit room he sits behind the glass as he should.
+- **A lane that is the ONLY user of a kit set forks it whole** (v2: P3's room + table, P5's desk, P6's angle, the cold
+  set's pad + lamp, O1's cat, run-on and box): every fix the art director asks for then lands in a private copy. Next
+  time let a panel lane edit the kit pieces only its panels use (named in its brief), or keep the kit lane open to take
+  the art director's fixes; the shared pieces (her, the cat model, the palette, lettering) stay kit-lane only.
+- **Holds: check the camera against the board before lanes fan out.** Every v2 lane added a 1.5 % zoom "breathe" to
+  its HOLD by habit (v3 did it); the owner's cozy v2 rule is "never a zoom in a hold" (`look/COZY_AND_SCALE.md` 3b.5:
+  locked, or a slow 2D float), and a move the board did not play fails the G5 entry check. Put "camera = the board's,
+  holds locked" in every lane brief.
+- **The burned-in label is short:** "G5 blocking · <panel> · <time>" (ends at x ~520). A longer label (with "next:
+  ...") ran over the run-on's years at the bottom of O1 / P12. What the next stages add goes in the message that sends
+  the cut.
+- **The loop seam, a zoomed window set:** in an un-build the far plane (the town) shrinks early, so whatever sits
+  behind it (the window's trim and recess fills) shows as a solid block for a few frames; let those fills leave with
+  the far plane (the same shrink about the glass centre). Check the seam strip for any solid block of one colour.
