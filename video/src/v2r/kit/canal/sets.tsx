@@ -33,9 +33,11 @@ import {lerp, rng, leafPath, lobes} from './core';
 import {Steps} from './steps';
 import {CastSlot, PipSlot} from './slots';
 import * as MAP from '../../world/map';
+import {tiered, Slot} from '../tiers';
 
 /** A flat sun disc (the film's one pop colour), no ink, no glow. */
-export const SunDisc: React.FC<{x: number; y: number; r: number}> = ({x, y, r}) => <Fill d={ovalPath(x, y, r, r)} color={CM.sun} offset={false} seed="sun" />;
+const SunDiscBody: React.FC<{x: number; y: number; r: number}> = ({x, y, r}) => <Fill d={ovalPath(x, y, r, r)} color={CM.sun} offset={false} seed="sun" />;
+export const SunDisc = tiered('environment', {}, SunDiscBody);
 
 // ---------------------------------------------------------------- S1
 
@@ -59,7 +61,7 @@ export type S1SetProps = {
   seated?: React.ReactNode;
 };
 
-export const S1Set: React.FC<S1SetProps> = ({lampOffAt = 0.4, lettersAt = 0.97, birdsBridgeAt = 1.4, birdsRoofsAt = MAP.S1_LIFE_T, busAt = 1.1, duckLandsAt = 2.3, behindDoor, towpath, pip, walkers = true, seated}) => {
+const S1SetBody: React.FC<S1SetProps> = ({lampOffAt = 0.4, lettersAt = 0.97, birdsBridgeAt = 1.4, birdsRoofsAt = MAP.S1_LIFE_T, busAt = 1.1, duckLandsAt = 2.3, behindDoor, towpath, pip, walkers = true, seated}) => {
   const S = MAP.S1_SHEET;
   const L = s1Layout();
   const led = wingLedges(L);
@@ -112,19 +114,20 @@ export const S1Set: React.FC<S1SetProps> = ({lampOffAt = 0.4, lettersAt = 0.97, 
           ]}
         />
       ) : null}
-      {towpath}
+      <Slot>{towpath}</Slot>
       <Narrowboat x={786} water={1136} len={560} h={78} dir={-1} seed="s1boatA" cabin={CM.sage} topView={8} roofItems panel={false} bursts={[0.7]} />
       <Narrowboat x={930} water={1192} len={520} h={88} dir={-1} seed="s1boatB" cabin={CM.coatOat} topView={10} roofItems panel smoke={false} />
       <Ducks ducks={[{x: 470, y: 1180, size: 26, drake: true}, {x: 520, y: 1192, size: 24}, {x: 250, y: 1160, size: 22, vx: -6}]} seed="s1ducks" landAt={duckLandsAt} land={{from: [120, 1080], to: [330, 1196], size: 26}} />
       <FloatingLeaves y0={1150} y1={1210} n={9} size={13} seed="s1fl" current={-8} />
       {/* our bank: the steps and the seated public; Pip on the waterline bollard */}
       <Steps people={!seated} />
-      {seated}
-      {pip ?? <PipSlot seat={{id: 'V2S1', x: MAP.S1_BOLLARD.x, y: MAP.S1_BOLLARD.y, size: 100}} />}
+      <Slot>{seated}</Slot>
+      <Slot>{pip ?? <PipSlot seat={{id: 'V2S1', x: MAP.S1_BOLLARD.x, y: MAP.S1_BOLLARD.y, size: 100}} />}</Slot>
       <FallingLeaves box={[0, 640, 260, 1180]} n={4} size={13} seed="s1fall" wind={-26} />
     </>
   );
 };
+export const S1Set = tiered('environment', {}, S1SetBody);
 
 /** The S1 far towpath bends away at the left (map S1_TOWPATH_FEET): the y offset from the straight at screen x. */
 const s1Bend = (x: number) => MAP.s1TowpathFeetY(x) - MAP.S1_SHEET.herLineFeetY;
@@ -169,7 +172,7 @@ export type S2SetProps = {
   people?: boolean;
 };
 
-export const S2Set: React.FC<S2SetProps> = ({story, staffCoolAt, storyOverlay, aBoard, bench, pip, boatAt = 2.0, people = true}) => {
+const S2SetBody: React.FC<S2SetProps> = ({story, staffCoolAt, storyOverlay, aBoard, bench, pip, boatAt = 2.0, people = true}) => {
   const t = useTime();
   const uEnd = s2u(1120);
   const far = useMemo(() => {
@@ -286,7 +289,7 @@ export const S2Set: React.FC<S2SetProps> = ({story, staffCoolAt, storyOverlay, a
     const sun: Pt = [-900, 900];
     for (const [x, y, w, len] of [[600, 1230, 30, 320], [760, 1230, 30, 300], [190, 1252, 40, 360], [530, 1252, 40, 330], [120, 1650, 180, 300], [80, 1292, 120, 260]] as [number, number, number, number][]) shadowInto(b, x, y, w, len, sun, CM.stoneShade, 0.15);
     // a bike rack with two bikes behind the passers-by, a bin by the bench
-    for (const x of [250, 330, 410]) b.ink(`M${P(x, 1352)}L${P(x, 1300)}Q${P(x + 20, 1278)} ${P(x + 40, 1300)}L${P(x + 40, 1352)}`, INK_PX.mid, CM.anchor);
+    for (const x of [250, 330, 410]) b.ink(`M${P(x, 1352)}L${P(x, 1300)}Q${P(x + 20, 1278)} ${P(x + 40, 1300)}L${P(x + 40, 1352)}`, INK_PX.mid, CM.anchor, 0, {thing: true, tone: CM.anchor});
     bikeInto(b, 300, 1356, 34, 's2rb1', CM.coatSlate, 1);
     bikeInto(b, 392, 1360, 34, 's2rb2', CM.brick, -1);
     binInto(b, 836, 1262, 70, 's2bin');
@@ -327,15 +330,15 @@ export const S2Set: React.FC<S2SetProps> = ({story, staffCoolAt, storyOverlay, a
       <Paint b={near} seed="s2near" />
       <S2Railing />
       <Newsstand x0={-70} x1={124} top={918} ground={1292} seed="s2news" />
-      {aBoard}
-      {bench ?? (
+      <Slot>{aBoard}</Slot>
+      <Slot>{bench ?? (
         <>
           <CastSlot s={{id: 'reporter', x: MAP.S2.reporter.x, y: S2_BENCH_SEAT, h: MAP.S2.reporter.h, pose: 'sit', seed: 'reporter', acc: 'bag', coat: CM.coatOat}} />
           <CastSlot s={{id: 'staffer', x: MAP.S2.staffer.x, y: S2_BENCH_SEAT, h: MAP.S2.staffer.h, pose: 'sit', seed: 'staffer', acc: 'none', coat: CM.coatSlate, hair: '#9A5A3E'}} />
         </>
-      )}
+      )}</Slot>
       <Bench x={(MAP.S2.bench.x0 + MAP.S2.bench.x1) / 2} y={MAP.S2.bench.y1} w={MAP.S2.bench.x1 - MAP.S2.bench.x0} view="back" seed="s2bench" />
-      {pip ?? <PipSlot seat={{id: 'V2S2', x: MAP.S2.pipSeat.x, y: MAP.S2.pipSeat.y, size: 96}} />}
+      <Slot>{pip ?? <PipSlot seat={{id: 'V2S2', x: MAP.S2.pipSeat.x, y: MAP.S2.pipSeat.y, size: 96}} />}</Slot>
       <Planter x0={-30} x1={230} y={1650} h={190} seed="s2planter" />
       <Lamp x={930} y={1990} h={1350} w={30} variant="near" seed="s2nearlamp" />
       {people ? (
@@ -349,6 +352,7 @@ export const S2Set: React.FC<S2SetProps> = ({story, staffCoolAt, storyOverlay, a
     </>
   );
 };
+export const S2Set = tiered('environment', {}, S2SetBody);
 
 /** S2's railing along our edge, with a post exactly at Pip's seat (x 590, top y 1050). */
 const S2Railing: React.FC = () => {
@@ -371,7 +375,7 @@ const S2Railing: React.FC = () => {
       b.fill(CM.anchor, ovalPath(x, top(x) - 1, 9, 6));
     }
     for (let x = -60; x < 1120; x += 26) bars += `M${P(x, lerp(top(x), S2_BANK.edge(x), 0.55) + 3)}L${P(x, S2_BANK.edge(x) - 2)}`;
-    b.ink(bars, INK_PX.far, CM.anchor);
+    b.ink(bars, INK_PX.far, CM.anchor, 0, {thing: true, tone: CM.anchor});
     b.ink(line(-60, top(-60) + 6, 1120, top(1120) + 6, {seed: 's2rail', over: 'small'}), INK_PX.mid);
     return b;
   }, []);
@@ -398,7 +402,7 @@ export type S4SetProps = {
 
 const S4_PATH = {back: 860, edge: 1082, coping: 12, water: [1082, 1300] as [number, number]};
 
-export const S4Set: React.FC<S4SetProps> = ({dxFar = 0, dxBacks = 0, dxPath = 0, towpath, pip, birdsAt = 3.0, walkers = true}) => {
+const S4SetBody: React.FC<S4SetProps> = ({dxFar = 0, dxBacks = 0, dxPath = 0, towpath, pip, birdsAt = 3.0, walkers = true}) => {
   const t = useTime();
   const far = useMemo(() => {
     const b = new Batch();
@@ -459,7 +463,7 @@ export const S4Set: React.FC<S4SetProps> = ({dxFar = 0, dxBacks = 0, dxPath = 0,
             ]}
           />
         ) : null}
-        {towpath}
+        <Slot>{towpath}</Slot>
         <Water y0={S4_PATH.water[0]} y1={S4_PATH.water[1]} seed="s4water" bankShade={0} reflTop={S4_PATH.edge + 6} reflections={[{x0: 360, x1: 1080, color: CM.brickLight, depth: 70}, {x0: 100, x1: 330, color: CM.brickDeep, depth: 50}, {x0: 90, x1: 130, color: CM.anchor, depth: 60}]} ripples={20} glints={10} />
         <Ducks ducks={[{x: 860, y: 1150, size: 26, vx: -12, drake: true}, {x: 910, y: 1162, size: 24, vx: -12}]} seed="s4ducks" />
         <Heron x={420} y={1112} h={92} face={-1} seed="s4heron" />
@@ -468,10 +472,11 @@ export const S4Set: React.FC<S4SetProps> = ({dxFar = 0, dxBacks = 0, dxPath = 0,
       <Water y0={1700} y1={1940} seed="s4near" bankShade={0} ripples={14} glints={8} near={2.2} wake={{x: () => 1240, y: 1712, dir: -1, len: 400}} />
       <FloatingLeaves y0={1740} y1={1900} n={8} size={20} seed="s4fl" current={18} />
       <Narrowboat x={-420} water={1712} len={1780} h={370} dir={-1} seed="s4boat" cabin={CM.sage} topView={44} hullK={0.11} roofItems panel fenders chimney={0.62} />
-      {pip ?? <PipSlot seat={{id: 'V2S4', x: MAP.S4.pipSeat.x, y: MAP.S4.pipSeat.y, size: 100}} />}
+      <Slot>{pip ?? <PipSlot seat={{id: 'V2S4', x: MAP.S4.pipSeat.x, y: MAP.S4.pipSeat.y, size: 100}} />}</Slot>
     </>
   );
 };
+export const S4Set = tiered('environment', {}, S4SetBody);
 
 // ---------------------------------------------------------------- S8: the lane, looking west (landing pose)
 
@@ -492,7 +497,7 @@ export type S8SetProps = {
 /** S8's VP: the lane runs west to the bend at her house. */
 export const S8_LANE = {vp: [600, 948] as Pt, ground: 1060, edge: (x: number) => lerp(1372, 1062, Math.min(1, x / 560))};
 
-export const S8Set: React.FC<S8SetProps> = ({dxHouse = 0, dxNear = 0, wAt, lampRunAt, board, lane, pip, walkers = true}) => {
+const S8SetBody: React.FC<S8SetProps> = ({dxHouse = 0, dxNear = 0, wAt, lampRunAt, board, lane, pip, walkers = true}) => {
   const t = useTime();
   const far = useMemo(() => {
     const b = new Batch();
@@ -626,16 +631,17 @@ export const S8Set: React.FC<S8SetProps> = ({dxHouse = 0, dxNear = 0, wAt, lampR
           ]}
         />
       ) : null}
-      {lane}
+      <Slot>{lane}</Slot>
       <S8Dressing />
       <CafeDeck x0={-30} x1={540} y0={1560} y1={1940} seed="s8deck" />
       <Planter x0={900} x1={1110} y={1920} h={200} seed="s8planter" />
       <Lamp x={1010} y={2000} h={1300} w={28} variant="near" seed="s8nearlamp" />
-      {board}
-      {pip ?? <PipSlot seat={{id: 'V2S8', x: MAP.BOARD_BOLLARD.x, y: MAP.BOARD_BOLLARD.y, size: 96}} />}
+      <Slot>{board}</Slot>
+      <Slot>{pip ?? <PipSlot seat={{id: 'V2S8', x: MAP.BOARD_BOLLARD.x, y: MAP.BOARD_BOLLARD.y, size: 96}} />}</Slot>
     </>
   );
 };
+export const S8Set = tiered('environment', {}, S8SetBody);
 
 /** S8's lane dressing on the house side: wheelie bins, a bike on the area railings, pots on the steps, a bench, two
  *  bollards on the lane. Screen px at the landing pose. */

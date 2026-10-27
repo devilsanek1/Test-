@@ -20,6 +20,7 @@ import {useTime} from '../../../lib/time';
 import {S6, SUN2} from '../../world/map';
 import {Batch, Paint, mix, crownD, ellD, lineD, polyD, rng, rand, frac, blossomD, circleD, ease01, type Pt} from './core';
 import {benchBack} from './terrace';
+import {useTierLine, tiered, Slot} from '../tiers';
 
 export const S6_T0 = 24.0;
 export const GATE_DUR = 28.06 - 24.0;
@@ -102,7 +103,8 @@ export type GateFacadeProps = {
   seed?: string;
 };
 
-export const GateFacade: React.FC<GateFacadeProps> = ({lightAt = [S6.facadeWindowsLight[0] - S6_T0, S6.facadeWindowsLight[1] - S6_T0], doorPeople, seed = 'facade'}) => {
+const GateFacadeBody: React.FC<GateFacadeProps> = ({lightAt = [S6.facadeWindowsLight[0] - S6_T0, S6.facadeWindowsLight[1] - S6_T0], doorPeople, seed = 'facade'}) => {
+  const line = useTierLine();
   const t = useTime();
   const F = GATE.facade;
   const D = GATE.door;
@@ -178,8 +180,8 @@ export const GateFacade: React.FC<GateFacadeProps> = ({lightAt = [S6.facadeWindo
       <Paint b={stat} seed={seed} misreg={2} />
       <path d={unlit} fill={GT.pane} />
       <path d={lit} fill={GT.paneLit} />
-      <path d={mull} stroke={GT.stoneLit} strokeWidth={2.4} fill="none" />
-      {doorPeople}
+      <path d={mull} {...line(GT.stoneLit, 2.4, {thing: true})} fill="none" />
+      <Slot>{doorPeople}</Slot>
       {/* the leaf, clipped to the doorway (it slides into the wall on the right) */}
       <defs>
         <clipPath id={`${seed}door`}>
@@ -190,14 +192,15 @@ export const GateFacade: React.FC<GateFacadeProps> = ({lightAt = [S6.facadeWindo
         <rect x={lx} y={D.y0} width={lw} height={D.y1 - D.y0} fill={GT.door} />
         <rect x={lx + 4} y={D.y0 + 4} width={3} height={D.y1 - D.y0 - 8} fill={GT.stoneLit} />
         <ServicePlate x={lx + lw / 2} y={D.y0 + 30} />
-        <path d={`M${lx + 1} ${D.y0}V${D.y1}`} stroke={GT.ink} strokeWidth={2.2} />
+        <path d={`M${lx + 1} ${D.y0}V${D.y1}`} {...line(GT.ink, 2.2, {contour: false})} />
       </g>
     </>
   );
 };
+export const GateFacade = tiered('environment', {}, GateFacadeBody);
 
 /** The door plate: CLASSIFIED / AUTHORIZED PERSONNEL ONLY (US spelling; "classified", never "secret"). Centre x, top y. */
-export const ServicePlate: React.FC<{x: number; y: number; w?: number}> = ({x, y, w = 108}) => {
+const ServicePlateBody: React.FC<{x: number; y: number; w?: number}> = ({x, y, w = 108}) => {
   const h = w * 0.5;
   return (
     <g>
@@ -214,10 +217,11 @@ export const ServicePlate: React.FC<{x: number; y: number; w?: number}> = ({x, y
     </g>
   );
 };
+export const ServicePlate = tiered('environment', {}, ServicePlateBody);
 
 // ---------------------------------------------------------------- LAWN: blossom trees between the fence and the facade
 
-export const GateLawnTrees: React.FC<{seed?: string}> = ({seed = 'lawntrees'}) => {
+const GateLawnTreesBody: React.FC<{seed?: string}> = ({seed = 'lawntrees'}) => {
   const b = useMemo(() => {
     const B = new Batch();
     const r = rng(seed);
@@ -251,10 +255,11 @@ export const GateLawnTrees: React.FC<{seed?: string}> = ({seed = 'lawntrees'}) =
   }, [seed]);
   return <Paint b={b} seed={seed} misreg={2} />;
 };
+export const GateLawnTrees = tiered('environment', {}, GateLawnTreesBody);
 
 // ---------------------------------------------------------------- MID: footpath, fence, the tall corner post, tulips
 
-export const GateFence: React.FC<{seed?: string}> = ({seed = 'fence'}) => {
+const GateFenceBody: React.FC<{seed?: string}> = ({seed = 'fence'}) => {
   const b = useMemo(() => {
     const B = new Batch();
     const r = rng(seed);
@@ -336,10 +341,11 @@ export const GateFence: React.FC<{seed?: string}> = ({seed = 'fence'}) => {
   }, [seed]);
   return <Paint b={b} seed={seed} misreg={3} />;
 };
+export const GateFence = tiered('environment', {}, GateFenceBody);
 
 // ---------------------------------------------------------------- NEAR: kerb, bollards, chain, shrub, rack, bench
 
-export const GateNear: React.FC<{seed?: string}> = ({seed = 'near'}) => {
+const GateNearBody: React.FC<{seed?: string}> = ({seed = 'near'}) => {
   const t = useTime();
   const b = useMemo(() => {
     const B = new Batch();
@@ -369,7 +375,7 @@ export const GateNear: React.FC<{seed?: string}> = ({seed = 'near'}) => {
       B.ink(lineD([[x - 20, 1504], [x - 20, 1410], [x + 20, 1410], [x + 20, 1504]]), 4.8, GT.ink);
       chain += `M${x + 20} 1430Q${x + 165} 1470 ${x + 310} 1430`;
     }
-    B.ink(chain, 3.4, GT.iron);
+    B.ink(chain, 3.4, GT.iron, 0, {thing: true});
     // a flowering shrub cut by the left edge (blossom over sage), and a planter of tulips by it
     B.layer();
     // (low: its top stays under the board's base y 1240 while the near plane overtakes the board)
@@ -383,9 +389,9 @@ export const GateNear: React.FC<{seed?: string}> = ({seed = 'near'}) => {
     benchBack(B, 860, 1110, 1310, 1420, 4.8);
     let rack = '';
     for (let x = 790; x < 1000; x += 52) rack += `M${x} 1560V1500Q${x} 1478 ${x + 22} 1478Q${x + 44} 1478 ${x + 44} 1500V1560`;
-    B.ink(rack, 4.8, GT.iron);
+    B.ink(rack, 4.8, GT.iron, 0, {thing: true});
     B.fill(GT.ink, circleD(860, 1530, 4));
-    B.ink(`M820 1540a34 34 0 1 0 68 0a34 34 0 1 0 -68 0M900 1540a34 34 0 1 0 68 0a34 34 0 1 0 -68 0M854 1540L900 1500L934 1540M900 1500L892 1478M880 1478h26`, 3.4, GT.ink);
+    B.ink(`M820 1540a34 34 0 1 0 68 0a34 34 0 1 0 -68 0M900 1540a34 34 0 1 0 68 0a34 34 0 1 0 -68 0M854 1540L900 1500L934 1540M900 1500L892 1478M880 1478h26`, 3.4, GT.ink, 0, {thing: true});
     return B;
   }, [seed]);
   // petals drifting on the near paving (a slow skitter in the morning air)
@@ -402,12 +408,13 @@ export const GateNear: React.FC<{seed?: string}> = ({seed = 'near'}) => {
     </>
   );
 };
+export const GateNear = tiered('environment', {}, GateNearBody);
 
 /** S6's set on its truck: sky pieces + sun (fixed: SUN2), far facade, lawn trees, mid fence (with the board slot),
  *  near plane. Slots: `board` (K3 deal board, mid plane), `pip` (mid plane, on the post cap), `mid`, `lawn` (a jogger on
  *  the lawn path beyond the fence: small),
  *  `near` (K4's readers' head-backs), `doorPeople` (K4 staff at the door, far plane). */
-export const GateSet: React.FC<{board?: React.ReactNode; pip?: React.ReactNode; mid?: React.ReactNode; lawn?: React.ReactNode; near?: React.ReactNode; doorPeople?: React.ReactNode; sky?: boolean; bars?: React.ReactNode}> = ({board, pip, mid, lawn: lawnSlot, near, doorPeople, sky = false, bars}) => {
+const GateSetBody: React.FC<{board?: React.ReactNode; pip?: React.ReactNode; mid?: React.ReactNode; lawn?: React.ReactNode; near?: React.ReactNode; doorPeople?: React.ReactNode; sky?: boolean; bars?: React.ReactNode}> = ({board, pip, mid, lawn: lawnSlot, near, doorPeople, sky = false, bars}) => {
   const t = useTime();
   const far = gateDx(GATE_DRIFT.far, t);
   const lawn = gateDx(GATE_DRIFT.lawn, t);
@@ -416,25 +423,26 @@ export const GateSet: React.FC<{board?: React.ReactNode; pip?: React.ReactNode; 
   return (
     <>
       {sky ? <rect x={-50} y={-50} width={1180} height={2020} fill={CM.sky} /> : null}
-      {bars}
+      <Slot>{bars}</Slot>
       <circle cx={GATE.sun.x} cy={GATE.sun.y} r={GATE.sun.r} fill={CM.sun} />
       <g transform={`translate(${far.toFixed(2)} 0)`}>
         <GateFacade doorPeople={doorPeople} />
       </g>
       <g transform={`translate(${lawn.toFixed(2)} 0)`}>
         <GateLawnTrees />
-        {lawnSlot}
+        <Slot>{lawnSlot}</Slot>
       </g>
       <g transform={`translate(${md.toFixed(2)} 0)`}>
         <GateFence />
-        {mid}
-        {board}
-        {pip}
+        <Slot>{mid}</Slot>
+        <Slot>{board}</Slot>
+        <Slot>{pip}</Slot>
       </g>
       <g transform={`translate(${nr.toFixed(2)} 0)`}>
         <GateNear />
-        {near}
+        <Slot>{near}</Slot>
       </g>
     </>
   );
 };
+export const GateSet = tiered('environment', {}, GateSetBody);

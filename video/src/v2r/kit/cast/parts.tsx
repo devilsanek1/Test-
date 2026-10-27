@@ -6,6 +6,8 @@
 //
 // Build ("at"): ink draws on from `at` (the engine's pen pacing, 1 frame between parts), each fill pops 0.15 s after
 // (or `fillLag`). No `at` = already built. Nothing fades.
+// Clean pen (src/v2r/pen.ts): a part's line is its OWN fill's shade (`tone`: a same-hue line, never near-black), its
+// width and whether it is drawn at all come from the figure's tier (README "Tiers").
 
 import React, {useId} from 'react';
 import {Fill} from '../../../lib/Fill';
@@ -228,6 +230,7 @@ export const Parts: React.FC<PartsProps> = ({parts, at, fillLag = 0.15, inkPx, o
           taper={false}
           vary={0.04}
           seed={`${seed}/${p.k}`}
+          tone={p.fill && p.fill !== 'none' ? p.fill : undefined}
         />
       );
       const front = knockout ? parts.slice(i + 1).filter((q) => q.d) : [];

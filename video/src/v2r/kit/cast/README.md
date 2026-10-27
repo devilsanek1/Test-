@@ -53,6 +53,17 @@ street of backs) are the 216 px checks beside reference 1; `CastWalk` (1080 x 30
 Helpers: `traitsFor(seed, overrides)`, `castRow(seed, n, pin)` (no two neighbours alike), `NO_TEAL(color)`,
 `stepsAt`, `selfSteps`, `strideFor`, `inkFor`, `lodFor`.
 
+## Tiers (the clean pen, 2026-10-27)
+`src/v2r/pen.ts` switches the film to the clean pen with ATTENTION TIERS (`docs/look/CRAFT.md` §b-§c; `../tiers.tsx`).
+Every part's line is its OWN fill's shade (`Parts` passes `tone`: a same-hue line, never near-black). **Defaults:**
+`Her`, `HerWindow` = `subject` (the only full outline: 3.0 px, her own deep shade); `Person`, `Seated`, `NearBack`,
+`SeatedRow`, `WindowPerson`, `S1Seated`, `Staffer`, `Reporter`, `StaffWindow(s)`, `Blind`, `Stranger`, `CafeOwner`,
+`Dog`, and the ghosts `Ghost`, `BareOutline`, `GhostRow`, `S8Ghosts` = `support` with lines (ref 1's line-drawn
+crowd: a thin same-hue line 1.6-2.2 px, fills calmer, C* <= 25); `FarCrowd` = `environment`. Each figure has ONE tier
+(`tieredAll`: Her's Person is the subject too). Promote on the beat: `<GhostRow tier="subject">` (S1's row, S8's
+callback: the ghosts' closed outline is on purpose), `<StaffWindows tier="subject">` on "scared"; a far walker can
+drop to `tier="environment"`. `Parts` / `FigureG` have no tier of their own (a lane's figure draws in its scope).
+
 ## Rules baked in (do not undo in a lane)
 - No line inside a head: the low bun is filled over the head in its colour and inked only outside it (an inner arc
   read as a mouth); the crop cut's hairline is a fill edge; a turned head shows a cheek crescent (skin, no features)

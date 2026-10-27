@@ -30,6 +30,7 @@ import {S4, S5, shotById, type Rect, type XY} from '../../world/map';
 import {TYPE, WorldText, textW} from './WorldText';
 import {TXT_NAME_TAG, TXT_NEWS_BOX, TXT_PLAQUE, TXT_PLATES, TXT_SERVICE_DOOR} from './texts';
 import {BOARD_COLORS, KEY_WEIGHT, mixHex} from './StatementBoard';
+import {tiered} from '../tiers';
 
 // ---------------------------------------------------------------- colour (CM tokens and flat mixes of them)
 
@@ -280,7 +281,7 @@ export type PaperTagProps = {
 
 /** A paper luggage tag on a thin ink leader: cream face, ink edge (loose, open), plum keyline, a brass-reinforced
  *  string hole in its clipped head end, rows in the caption hand. Grows down for a second build. */
-export const PaperTag: React.FC<PaperTagProps> = ({x, y, rows, to = null, at, growAt, off, tilt = 0, hole = 'right', string = true, ink = INK_PX.mid, leaderInk = INK_PX.far, seed = 'tag', exit = true}) => {
+const PaperTagBody: React.FC<PaperTagProps> = ({x, y, rows, to = null, at, growAt, off, tilt = 0, hole = 'right', string = true, ink = INK_PX.mid, leaderInk = INK_PX.far, seed = 'tag', exit = true}) => {
   useCaptionFont();
   const t = useTime();
   const L = tagLayout(rows, hole);
@@ -341,7 +342,7 @@ export const PaperTag: React.FC<PaperTagProps> = ({x, y, rows, to = null, at, gr
     <XG m={mat.about(mat.scale(kOff), anchor.x, anchor.y)}>
       {to ? (
         <>
-          <Ink d={leaderD} width={leaderInk} color={C.lettering} taper={false} vary={0} at={at} seed={`${seed}/leadI`} exit={exit} />
+          <Ink d={leaderD} width={leaderInk} color={C.lettering} taper={false} vary={0} at={at} seed={`${seed}/leadI`} exit={exit} graphic />
           <Fill d={circlePath(to.x, to.y, 2.7)} color={C.lettering} offset={false} at={at} mode="snap" seed={`${seed}/dot`} exit={exit} />
         </>
       ) : null}
@@ -349,7 +350,7 @@ export const PaperTag: React.FC<PaperTagProps> = ({x, y, rows, to = null, at, gr
         <XG m={mat.about(mat.scale(kPop), B.x, B.y)}>
           <XG m={mat.about(mat.rotate(tilt), cx, y)}>
             <Fill d={paperD} color={C.face} rule="evenodd" offset={false} seed={`${seed}/paper`} exit={exit} />
-            <Ink d={keyD} width={INK_PX.hair} color={C.keyline} taper={false} vary={0} at={inkAt} seed={`${seed}/keyI`} exit={exit} />
+            <Ink d={keyD} width={INK_PX.hair} color={C.keyline} taper={false} vary={0} at={inkAt} seed={`${seed}/keyI`} exit={exit} graphic />
             {hole !== 'none' ? (
               <>
                 <Fill d={circlePath(ex, ey, TAG.ring) + holeD} color={C.brass} rule="evenodd" offset={false} seed={`${seed}/ring`} exit={exit} />
@@ -366,7 +367,7 @@ export const PaperTag: React.FC<PaperTagProps> = ({x, y, rows, to = null, at, gr
               </>
             ) : null}
             <Ink d={edgeD} width={ink} color={C.lettering} open={0.08} at={inkAt} seed={`${seed}/edgeI`} exit={exit} />
-            {stringD ? <Ink d={stringD} width={INK_PX.hair} color={C.lettering} taper={false} vary={0} at={inkAt} seed={`${seed}/string`} exit={exit} /> : null}
+            {stringD ? <Ink d={stringD} width={INK_PX.hair} color={C.lettering} taper={false} vary={0} at={inkAt} seed={`${seed}/string`} exit={exit} thing /> : null}
           </XG>
         </XG>
       ) : null}
@@ -379,6 +380,7 @@ export const PaperTag: React.FC<PaperTagProps> = ({x, y, rows, to = null, at, gr
     </XG>
   );
 };
+export const PaperTag = tiered('support', {}, PaperTagBody);
 
 /** S4's name tag rows (TREATMENT section 5): the name 44 px + three role rows (build 1, 15.07); two rows + the BBC
  *  source (build 2, 16.60). Body never under 30 px; the credit at 18. */
@@ -411,7 +413,7 @@ export type NameTagProps = {
 /** S4's name tag over her (lane L3), screen-locked. Measured layout (Patrick Hand): 269 px wide (x 600-869; the text
  *  column x 616-819), 180 px tall after build 1 (y 605-785), 270 after build 2 (y 605-875); tilted -1.2 deg its
  *  corners stay inside x 600-875, y 602-878 (above her head at 900); the leader from ~(724, 785 -> 876) to (720, 892). */
-export const NameTag: React.FC<NameTagProps> = ({
+const NameTagBody: React.FC<NameTagProps> = ({
   x = S4.nameTag.x0,
   y = S4.nameTag.y0 + 5,
   to = NAME_TAG_TO,
@@ -463,10 +465,11 @@ export type ArrowPlateProps = {
   seed?: string;
   exit?: boolean;
 };
+export const NameTag = tiered('support', {}, NameTagBody);
 
 /** One arrow plate: plum rim (misregistered), cream face (exact), a dark underside for its thickness, loose ink on
  *  the outer contour; row 1 = key 56 + body side by side on one baseline, row 2 = the credit 18. */
-export const ArrowPlate: React.FC<ArrowPlateProps> = ({rect, rootX, text, bodySize = 31, at, penAt, penEnd, ink = INK_PX.mid, seed = 'plate', exit = true}) => {
+const ArrowPlateBody: React.FC<ArrowPlateProps> = ({rect, rootX, text, bodySize = 31, at, penAt, penEnd, ink = INK_PX.mid, seed = 'plate', exit = true}) => {
   useCaptionFont();
   const t = useTime();
   if (at !== undefined && t < at) return null;
@@ -510,6 +513,7 @@ export const ArrowPlate: React.FC<ArrowPlateProps> = ({rect, rootX, text, bodySi
     </XG>
   );
 };
+export const ArrowPlate = tiered('support', {}, ArrowPlateBody);
 
 export type PostProps = {
   /** Centre x, the top of the shaft (the finial sits above it), the foot on the ground (px). */
@@ -528,7 +532,7 @@ export type PostProps = {
 
 /** The painted post: a plum shaft lit on the sun side (left), a cap collar and a brass ball finial, a flared cast foot,
  *  clamp collars with brass bolts where the plates are fixed. */
-export const SignPost: React.FC<PostProps> = ({x, top, foot, w = POST.w, at, collars = [], ink = INK_PX.mid, seed = 'post', exit = true}) => {
+const SignPostBody: React.FC<PostProps> = ({x, top, foot, w = POST.w, at, collars = [], ink = INK_PX.mid, seed = 'post', exit = true}) => {
   const t = useTime();
   const k = popK(t, at, 0.2);
   if (k <= 0.001) return null;
@@ -571,6 +575,7 @@ export const SignPost: React.FC<PostProps> = ({x, top, foot, w = POST.w, at, col
     </XG>
   );
 };
+export const SignPost = tiered('support', {}, SignPostBody);
 
 export type FingerpostProps = {
   /** The post: centre x, shaft top, foot (default map S4.post: x 575, 735, 1060). */
@@ -601,7 +606,7 @@ export type FingerpostProps = {
 
 /** S4's fingerpost (lane L3): ONE post, the DEC 2025 plate over the APR 2026 plate, both pointing west; fill-first, then
  *  a pen sweep. Nothing right of the post's foot but its shadow (x <= 594 above y 1060: clear of the right rail). */
-export const Fingerpost: React.FC<FingerpostProps> = ({
+const FingerpostBody: React.FC<FingerpostProps> = ({
   x = S4.post.x,
   top = S4.post.topY,
   foot = S4.post.footY,
@@ -649,6 +654,7 @@ export const Fingerpost: React.FC<FingerpostProps> = ({
     </>
   );
 };
+export const Fingerpost = tiered('support', {}, FingerpostBody);
 
 // =================================================================================================================
 // 3. NewsBox (S5, lane L4): a US honour newspaper box, NO masthead or brand
@@ -684,7 +690,7 @@ export type NewsBoxProps = {
  *  slot, a blank price window, the return knob), a hinged door whose window shows the front page (headline 40 px x 3
  *  + the 18 px credit; two plain rules at its head, no masthead), the pull handle, a blank coin-return plate, short
  *  legs on feet, a ground shadow. No masthead, no brand, no logo. */
-export const NewsBox: React.FC<NewsBoxProps> = ({rect = S5.start.newsBox, at, shadow = true, ink = INK_PX.far, seed = 'newsBox', exit = true}) => {
+const NewsBoxBody: React.FC<NewsBoxProps> = ({rect = S5.start.newsBox, at, shadow = true, ink = INK_PX.far, seed = 'newsBox', exit = true}) => {
   useCaptionFont();
   const t = useTime();
   if (at !== undefined && t < at) return null;
@@ -728,8 +734,9 @@ export const NewsBox: React.FC<NewsBoxProps> = ({rect = S5.start.newsBox, at, sh
         at={inkAt}
         seed={`${seed}/rules`}
         exit={exit}
+        graphic
       />
-      <Ink d={line(cx - 72, N.midRule, cx + 72, N.midRule, {over: [0, 0], drift: 0, jitter: 0.3, seed: `${seed}/rule3`})} width={1.2} color={C.pageRule} taper={false} vary={0} at={inkAt} seed={`${seed}/rule3I`} exit={exit} />
+      <Ink d={line(cx - 72, N.midRule, cx + 72, N.midRule, {over: [0, 0], drift: 0, jitter: 0.3, seed: `${seed}/rule3`})} width={1.2} color={C.pageRule} taper={false} vary={0} at={inkAt} seed={`${seed}/rule3I`} exit={exit} graphic />
       {TXT_NEWS_BOX.headline.map((s, i) => (
         <WorldText key={`h${i}`} x={cx} y={N.headline[i]} size={40} text={s} anchor="middle" weight={0.5} at={hAt === undefined ? undefined : hAt + i * 0.12} dur={0.16} maxW={W.x1 - W.x0 - 16} seed={`${seed}/h${i}`} exit={exit} />
       ))}
@@ -775,6 +782,7 @@ export const NewsBox: React.FC<NewsBoxProps> = ({rect = S5.start.newsBox, at, sh
     </XG>
   );
 };
+export const NewsBox = tiered('support', {}, NewsBoxBody);
 
 // =================================================================================================================
 // 4. Plaque (S5, lane L4): a viewpoint orientation plaque, bronze frame, limestone face; no seal, flag or insignia
@@ -828,7 +836,7 @@ export type PlaqueProps = {
 /** S5's viewpoint plaque (lane L4): "The Pentagon" (key) + "US Department of Defense" (body) on a limestone face in a
  *  bronze frame, two brass screws, a small pointer tab toward the building, on a short bronze post; it pops up from its
  *  foot with the text on it (no pen: it reads ON the word). */
-export const Plaque: React.FC<PlaqueProps> = ({x = 612, y = PLAQUE_COPING_Y + 2, keySize = TYPE.key, bodySize, at = SMALL_CLOCK.plaque.at, stand = true, pointer = 'up', ink = INK_PX.far, seed = 'plaque', exit = true}) => {
+const PlaqueBody: React.FC<PlaqueProps> = ({x = 612, y = PLAQUE_COPING_Y + 2, keySize = TYPE.key, bodySize, at = SMALL_CLOCK.plaque.at, stand = true, pointer = 'up', ink = INK_PX.far, seed = 'plaque', exit = true}) => {
   useCaptionFont();
   const t = useTime();
   const bs = bodySize ?? plaqueBodySize(keySize);
@@ -882,6 +890,7 @@ export const Plaque: React.FC<PlaqueProps> = ({x = 612, y = PLAQUE_COPING_Y + 2,
     </XG>
   );
 };
+export const Plaque = tiered('support', {}, PlaqueBody);
 
 // =================================================================================================================
 // 5. DoorSign: a small enamel plate for any door (1-3 lines; "classified", never "secret"; US spelling)
@@ -923,7 +932,7 @@ export type DoorSignProps = {
 
 /** A small enamel door plate: plum rim with its dark edge (the plate's thickness), cream face, two brass screws,
  *  centred lines; pops about its centre. */
-export const DoorSign: React.FC<DoorSignProps> = ({x, y, size = TYPE.bodySmall, lines = TXT_SERVICE_DOOR, at, ink = INK_PX.far, seed = 'doorSign', exit = true}) => {
+const DoorSignBody: React.FC<DoorSignProps> = ({x, y, size = TYPE.bodySmall, lines = TXT_SERVICE_DOOR, at, ink = INK_PX.far, seed = 'doorSign', exit = true}) => {
   useCaptionFont();
   const t = useTime();
   if (at !== undefined && t < at) return null;
@@ -951,3 +960,4 @@ export const DoorSign: React.FC<DoorSignProps> = ({x, y, size = TYPE.bodySmall, 
     </XG>
   );
 };
+export const DoorSign = tiered('support', {}, DoorSignBody);

@@ -19,6 +19,8 @@ import {Batch, Paint, PlaneMap, P, Pt, Quad, rng, rand, ovalPath, lobes, lerp, c
 import {litAt} from './life';
 import {HandLetteredGoogle} from './lettering';
 import * as MAP from '../../world/map';
+import {tiered, TierPart, Slot} from '../tiers';
+import type {TierName} from '../tiers';
 
 // ---------------------------------------------------------------- layout
 
@@ -202,10 +204,13 @@ export type WingFrontProps = {
   behindDoor?: React.ReactNode;
   /** Build: the whole front draws on from this time (ink), fills pop (lanes' t < 0 states use Look instead). */
   at?: number;
+  /** Tier of her window W (the clean pen): default 'support' (the story's window off its beat) inside the environment
+   *  wing; 'subject' on the beats it carries (S1's lamp going off). */
+  wTier?: TierName;
 };
 
 /** The canal wing's front. Static parts in one memoised batch; panes, W, the doors and the letters per frame. */
-export const WingFront: React.FC<WingFrontProps> = ({layout: L, lampOffAt, wDark = false, doorKeys = [], lettersAt, litFrac = 0.55, force, behindDoor, at}) => {
+const WingFrontBody: React.FC<WingFrontProps> = ({layout: L, lampOffAt, wDark = false, doorKeys = [], lettersAt, litFrac = 0.55, force, behindDoor, at, wTier}) => {
   const t = useTime();
   const pm = useMemo(() => new PlaneMap(L.wM, L.hM, L.quad), [L]);
   const uAt = (x: number) => pm.uAt(x, L.hM * 0.6);
@@ -232,7 +237,7 @@ export const WingFront: React.FC<WingFrontProps> = ({layout: L, lampOffAt, wDark
       u += r.range(0.35, 0.75);
       i++;
     }
-    b.ink(blades, INK_PX.hair, CM.line);
+    b.ink(blades, INK_PX.hair, CM.line, 0, {thing: true});
     b.layer();
     // the brick wall (whole plane)
     b.poly(CM.brickLight, pm.q(0, 0, L.wM, L.hM));
@@ -367,30 +372,31 @@ export const WingFront: React.FC<WingFrontProps> = ({layout: L, lampOffAt, wDark
     paneInto(dyn, pm, u0, v0, w, h, on ? 'lit' : 'unlit', `${L.seed}/p${k}${on ? 'L' : 'U'}`);
     k++;
   }
-  // W: lamp-lit with her desk lamp; plum dark from lampOffAt (one frame)
+  // W: lamp-lit with her desk lamp; plum dark from lampOffAt (one frame): its own batch, painted right over the panes
+  // in its own tier part (wTier)
+  const wB = new Batch();
   if (wLocal) {
     const [u0, v0, w, h] = wLocal;
     const dark = wDark || (lampOffAt !== undefined && t >= lampOffAt);
-    dyn.layer();
-    dyn.poly(CM.limestone, pm.q(u0 - 0.08, v0 - 0.05, w + 0.16, h + 0.12));
-    if (dark) paneInto(dyn, pm, u0, v0, w, h, 'dark', `${L.seed}/W`);
+    wB.poly(CM.limestone, pm.q(u0 - 0.08, v0 - 0.05, w + 0.16, h + 0.12));
+    if (dark) paneInto(wB, pm, u0, v0, w, h, 'dark', `${L.seed}/W`);
     else {
-      dyn.poly(CM.lamp, pm.q(u0, v0, w, h));
-      dyn.poly(CM.lampCore, pm.q(u0 + w * 0.12, v0 + h * 0.15, w * 0.7, h * 0.55));
+      wB.poly(CM.lamp, pm.q(u0, v0, w, h));
+      wB.poly(CM.lampCore, pm.q(u0 + w * 0.12, v0 + h * 0.15, w * 0.7, h * 0.55));
       // her desk lamp (an anglepoise) and a shelf with box files
       const lx = u0 + w * 0.68;
-      dyn.poly(CM.anchor, pm.q(lx, v0 + h * 0.62, w * 0.05, h * 0.3));
-      dyn.poly(CM.anchor, [pm.p(lx - w * 0.12, v0 + h * 0.5), pm.p(lx + w * 0.06, v0 + h * 0.46), pm.p(lx + w * 0.02, v0 + h * 0.62), pm.p(lx - w * 0.08, v0 + h * 0.6)]);
-      for (let j = 0; j < 4; j++) dyn.poly([CM.brick, CM.paneUnlit, CM.coatMustard, CM.sage][j], pm.q(u0 + w * (0.1 + j * 0.09), v0 + h * 0.3, w * 0.07, h * 0.16));
-      dyn.poly(CM.line, pm.q(u0 + w * 0.06, v0 + h * 0.46, w * 0.5, h * 0.03));
+      wB.poly(CM.anchor, pm.q(lx, v0 + h * 0.62, w * 0.05, h * 0.3));
+      wB.poly(CM.anchor, [pm.p(lx - w * 0.12, v0 + h * 0.5), pm.p(lx + w * 0.06, v0 + h * 0.46), pm.p(lx + w * 0.02, v0 + h * 0.62), pm.p(lx - w * 0.08, v0 + h * 0.6)]);
+      for (let j = 0; j < 4; j++) wB.poly([CM.brick, CM.paneUnlit, CM.coatMustard, CM.sage][j], pm.q(u0 + w * (0.1 + j * 0.09), v0 + h * 0.3, w * 0.07, h * 0.16));
+      wB.poly(CM.line, pm.q(u0 + w * 0.06, v0 + h * 0.46, w * 0.5, h * 0.03));
     }
-    dyn.poly(CM.glass, [pm.p(u0 + w, v0), pm.p(u0 + w, v0 + h * 0.16), pm.p(u0 + w * 0.84, v0)]);
+    wB.poly(CM.glass, [pm.p(u0 + w, v0), pm.p(u0 + w, v0 + h * 0.16), pm.p(u0 + w * 0.84, v0)]);
     // the sill and the ring her plant left on it
-    dyn.poly(CM.limestone, pm.q(u0 - 0.12, v0 + h, w + 0.24, 0.1));
+    wB.poly(CM.limestone, pm.q(u0 - 0.12, v0 + h, w + 0.24, 0.1));
     const [rx, ry] = pm.p(u0 + w * 0.3, v0 + h + 0.04);
     const s = pm.pxPerM(u0);
-    dyn.ink(`M${P(rx - s * 0.13, ry)}A${(s * 0.13).toFixed(1)} ${(s * 0.035).toFixed(1)} 0 1 0 ${P(rx + s * 0.13, ry)}A${(s * 0.13).toFixed(1)} ${(s * 0.035).toFixed(1)} 0 1 0 ${P(rx - s * 0.13, ry)}`, INK_PX.hair, CM.line);
-    dyn.ink(poly(pm.q(u0, v0, w, h), {closed: true, over: 'small', seed: `${L.seed}/Wfr`}), INK_PX.mid);
+    wB.ink(`M${P(rx - s * 0.13, ry)}A${(s * 0.13).toFixed(1)} ${(s * 0.035).toFixed(1)} 0 1 0 ${P(rx + s * 0.13, ry)}A${(s * 0.13).toFixed(1)} ${(s * 0.035).toFixed(1)} 0 1 0 ${P(rx - s * 0.13, ry)}`, INK_PX.hair, CM.line, 0, {thing: true});
+    wB.ink(poly(pm.q(u0, v0, w, h), {closed: true, over: 'small', seed: `${L.seed}/Wfr`}), INK_PX.mid);
   }
   // the lobby behind the doors (warm), then (behindDoor), then the door glass and frames
   const D = L.door;
@@ -447,14 +453,18 @@ export const WingFront: React.FC<WingFrontProps> = ({layout: L, lampOffAt, wDark
     <>
       <Paint b={stat} seed={`${L.seed}/stat`} at={at} />
       <Paint b={dyn} seed={`${L.seed}/dyn`} at={at} />
+      <TierPart def="support" tier={wTier}>
+        <Paint b={wB} seed={`${L.seed}/W`} at={at} />
+      </TierPart>
       <Paint b={lobby} seed={`${L.seed}/lobby`} at={at} />
-      {behindDoor}
+      <Slot>{behindDoor}</Slot>
       <Paint b={doors} seed={`${L.seed}/doors`} at={at} misreg={false} />
       <Paint b={side} seed={`${L.seed}/side`} at={at} />
       <HandLetteredGoogle cx={(F.x0 + F.x1) / 2} baseline={F.y0 + (F.y1 - F.y0) * 0.78} cap={Math.min(L.letterPx, (F.y1 - F.y0) * 0.86)} at={lettersAt} />
     </>
   );
 };
+export const WingFront = tiered('environment', {}, WingFrontBody);
 
 /** Door opening 0..1 at t from [t, open] keys (linear between keys, eased in-out). */
 export function doorOpen(t: number, keys: [number, number][]): number {
@@ -481,16 +491,18 @@ export const S1_DOOR_KEYS: [number, number][] = [
 ];
 
 /** S1: the wing frontal and close (map S1_SHEET). */
-export const WingS1: React.FC<Omit<WingFrontProps, 'layout'>> = (p) => {
+const WingS1Body: React.FC<Omit<WingFrontProps, 'layout'>> = (p) => {
   const L = useMemo(() => s1Layout(), []);
   return <WingFront layout={L} lampOffAt={0.4} doorKeys={S1_DOOR_KEYS} {...p} />;
 };
+export const WingS1 = tiered('environment', {}, WingS1Body);
 
 /** S7: the wing at human size from the forecourt (map S7), plain lit windows, no silhouettes. */
-export const WingS7: React.FC<Omit<WingFrontProps, 'layout'>> = (p) => {
+const WingS7Body: React.FC<Omit<WingFrontProps, 'layout'>> = (p) => {
   const L = useMemo(() => s7Layout(), []);
   return <WingFront layout={L} litFrac={0.7} {...p} />;
 };
+export const WingS7 = tiered('environment', {}, WingS7Body);
 
 /** Screen points for life on the wing (pigeon ledges etc.) for a layout: the canopy top and the first-storey sills. */
 export function wingLedges(L: WingLayout): {canopy: [number, number, number]; sills: [number, number, number][]} {

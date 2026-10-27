@@ -87,3 +87,11 @@ npx remotion render src/entry-v2r-pip.tsx PipSweep sweep.mp4 --gl=angle --concur
 #   the only jumps allowed are the test's own cuts at 4.00 / 8.00 s and the deliberate 0.12 s ears-cover
 ```
 Cost: the silhouette is re-traced every frame; the 75-Pip sheet renders in ~4 s, the 1080 x 1920 actions clip at ~70 ms/frame (0.5 scale, the page included).
+
+## Tiers (the clean pen, 2026-10-27)
+`Pip`, `PipTrack` and `PipDrawing` default to `support` with lines (CRAFT §b: the mascot is B unless the line is about
+it). Under `src/v2r/pen.ts`'s clean pen the silhouette is ONE closed uniform line (no gaps, wobble or taper) at the
+body's own shade (support: 1.6-2.2 px at L* -20; `tier="subject"`: 3.0 px at L* -35; `environment`: no line but the
+tuft and the tail tip); interior, scarf, midrib and haunch lines stay thin and same-hue; knit ribs and fringe ticks go;
+fills register exactly and calm to C* <= 25 (the periwinkle sat at 37). Promote only when the line is about Pip:
+`<PipTrack tier="subject" ...>`. Idle amplitudes are unchanged (`useTierMotion()` is there when a lane calms them).

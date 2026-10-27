@@ -6,6 +6,9 @@
 //                   Terrace and the lane use it so a slight 3/4 or a receding wall stays true.
 //   T               the scene clock, plus the shared idle clocks from src/v3/film/kit/idle.ts (a palette-free TOOL).
 // Colours come only from the palette's role tokens (CM). Nothing fades: shapes pop, grow, slide or switch.
+// Clean pen + tiers (src/v2r/pen.ts, README "Tiers"): Paint has NO tier of its own: it draws in the scope it sits in
+// (a kit set's default, a scene's <Tier>, or untagged = support with thin tinted lines). Ink that IS the thing goes in
+// with `thing` (kept as a hairline on the environment tier), shapes drawn with a stroke with `graphic`.
 
 import React from 'react';
 import {CM, INK_PX} from '../../palette';
@@ -47,7 +50,13 @@ export function inkFor(px: number): number {
 
 // ---------------------------------------------------------------- Batch: shapes grouped by colour, layer by layer
 
-type InkRun = {w: number; color: string; open: number; parts: string[]};
+/** Clean-pen flags for a run of ink (lib/tier.tsx CleanLineOpts; ignored by the sketch pen):
+ *  `thing` = the stroke IS the object (a wire, a railing bar, a bike frame, a twig, an aerial): kept on every tier (a
+ *  hairline on the environment); `graphic` = a shape drawn with a stroke (a heron's neck, a lettered sign): width and
+ *  colour kept on every tier; `tone` = the fill the line bounds (the line becomes its own shade, never near-black). */
+export type InkOpts = {thing?: boolean; graphic?: boolean; tone?: string};
+
+type InkRun = {w: number; color: string; open: number; parts: string[]} & InkOpts;
 type Layer = {fills: Map<string, string[]>; inks: Map<string, InkRun>};
 
 /** Collects flat fills (one path per colour) and ink (one path per weight), in z-ordered layers. Pure and cheap:
@@ -80,14 +89,15 @@ export class Batch {
   poly(color: string, pts: Pt[]): this {
     return pts.length > 2 ? this.fill(color, polyPath(pts)) : this;
   }
-  /** Ink (hand-drawn path data, e.g. from lib/sketch). w 0 = skipped (fill-only LOD). */
-  ink(d: string, w: number = INK_PX.mid, color: string = CM.ink, open = 0): this {
+  /** Ink (hand-drawn path data, e.g. from lib/sketch). w 0 = skipped (fill-only LOD). `o`: the clean pen's flags
+   *  (`thing`, `graphic`, `tone`: see InkOpts); runs with different flags never merge. */
+  ink(d: string, w: number = INK_PX.mid, color: string = CM.ink, open = 0, o: InkOpts = {}): this {
     if (!d || w <= 0) return this;
-    const key = `${w.toFixed(2)}|${color}|${open}`;
+    const key = `${w.toFixed(2)}|${color}|${open}|${o.thing ? 't' : ''}${o.graphic ? 'g' : ''}|${o.tone ?? ''}`;
     const m = this.L.inks;
     const a = m.get(key);
     if (a) a.parts.push(d);
-    else m.set(key, {w, color, open, parts: [d]});
+    else m.set(key, {w, color, open, parts: [d], thing: o.thing, graphic: o.graphic, tone: o.tone});
     return this;
   }
   /** Append another batch's layers (keeps their order, on top of this one's). */
@@ -124,7 +134,7 @@ export const Paint: React.FC<PaintProps> = ({b, seed, at, stagger = 0.03, misreg
         out.push(<Fill key={`f${i}${color}`} d={parts.join('')} color={color} seed={`${seed}/${i}/${color}`} at={lat} offset={misreg ? undefined : false} exit={exit} />);
       });
       l.inks.forEach((run, k) => {
-        out.push(<Ink key={`i${i}${k}`} d={run.parts.join('')} width={run.w} color={run.color} seed={`${seed}/${i}/${k}`} at={lat} order="all" open={run.open} exit={exit} />);
+        out.push(<Ink key={`i${i}${k}`} d={run.parts.join('')} width={run.w} color={run.color} seed={`${seed}/${i}/${k}`} at={lat} order="all" open={run.open} exit={exit} thing={run.thing} graphic={run.graphic} tone={run.tone} />);
       });
       return <React.Fragment key={i}>{out}</React.Fragment>;
     })}

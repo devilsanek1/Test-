@@ -20,6 +20,7 @@ import {wire as wirePath, wirePoint} from '../../../lib/sketch';
 import {puffs, windowLit, twinkle, bob} from '../../../v3/film/kit/idle';
 import {Batch, Paint, P, Pt, r1, rand, rng, ovalPath, leafPath, lobes, clamp01, frac, ease01, lerp} from './core';
 import {CastSlot, PersonSlot, Pose} from './slots';
+import {tiered, tieredAll} from '../tiers';
 
 export {windowLit};
 
@@ -50,7 +51,7 @@ export type BirdsProps = {
 };
 
 /** A row of small birds on a line: bob, peck; on `liftAt` they lift together and wheel away in a loose flock. */
-export const Birds: React.FC<BirdsProps> = ({from, to, sag = 0, n, size = 12, seed, liftAt, dir = -1, ceil = 580, landAt, color = CM.anchor}) => {
+const BirdsBody: React.FC<BirdsProps> = ({from, to, sag = 0, n, size = 12, seed, liftAt, dir = -1, ceil = 580, landAt, color = CM.anchor}) => {
   const t = useTime();
   const b = new Batch();
   const r = rng(seed);
@@ -88,9 +89,10 @@ export const Birds: React.FC<BirdsProps> = ({from, to, sag = 0, n, size = 12, se
   }
   return <Paint b={b} seed={`birds/${seed}`} misreg={false} />;
 };
+export const Birds = tiered('environment', {}, BirdsBody);
 
 /** Pigeons on a ledge: grey bodies, darker heads; shuffle a step, bob heads; optional lift at `liftAt`. */
-export const Pigeons: React.FC<{ledge: [number, number, number]; n: number; size?: number; seed: string; liftAt?: number; dir?: 1 | -1; ceil?: number; shuffleAt?: number[]}> = ({ledge, n, size = 20, seed, liftAt, dir = -1, ceil = 580, shuffleAt = []}) => {
+const PigeonsBody: React.FC<{ledge: [number, number, number]; n: number; size?: number; seed: string; liftAt?: number; dir?: 1 | -1; ceil?: number; shuffleAt?: number[]}> = ({ledge, n, size = 20, seed, liftAt, dir = -1, ceil = 580, shuffleAt = []}) => {
   const t = useTime();
   const [x0, x1, y] = ledge;
   const b = new Batch();
@@ -125,13 +127,14 @@ export const Pigeons: React.FC<{ledge: [number, number, number]; n: number; size
   }
   return <Paint b={b} seed={`pigeons/${seed}`} misreg={false} />;
 };
+export const Pigeons = tiered('environment', {}, PigeonsBody);
 
 // ---------------------------------------------------------------- water birds
 
 export type Duck = {x: number; y: number; size?: number; vx?: number; drake?: boolean};
 
 /** Ducks on the water: paddle slowly with small V wakes, bob; `landAt` brings one more in from the left. */
-export const Ducks: React.FC<{ducks: Duck[]; seed: string; landAt?: number; land?: {from: Pt; to: Pt; size?: number}; x0?: number; x1?: number}> = ({ducks, seed, landAt, land, x0 = -40, x1 = 1120}) => {
+const DucksBody: React.FC<{ducks: Duck[]; seed: string; landAt?: number; land?: {from: Pt; to: Pt; size?: number}; x0?: number; x1?: number}> = ({ducks, seed, landAt, land, x0 = -40, x1 = 1120}) => {
   const t = useTime();
   const b = new Batch();
   const draw = (x: number, y: number, s: number, face: number, drake: boolean, ph: number, wings = 0) => {
@@ -171,9 +174,10 @@ export const Ducks: React.FC<{ducks: Duck[]; seed: string; landAt?: number; land
   }
   return <Paint b={b} seed={`ducks/${seed}`} misreg={false} />;
 };
+export const Ducks = tiered('environment', {}, DucksBody);
 
 /** A grey heron standing still (on a post top, the bank), one slow head turn at `turnAt` (or on its own clock). */
-export const Heron: React.FC<{x: number; y: number; h?: number; face?: 1 | -1; turnAt?: number; seed?: string}> = ({x, y, h = 90, face = -1, turnAt, seed = 'heron'}) => {
+const HeronBody: React.FC<{x: number; y: number; h?: number; face?: 1 | -1; turnAt?: number; seed?: string}> = ({x, y, h = 90, face = -1, turnAt, seed = 'heron'}) => {
   const t = useTime();
   const b = new Batch();
   const ph = rand(seed, 0) * 6.28;
@@ -194,12 +198,13 @@ export const Heron: React.FC<{x: number; y: number; h?: number; face?: 1 | -1; t
   const ny = by - h * 0.08;
   const hx = nx + headDir * h * 0.06;
   const hy = ny - h * 0.3;
-  b.ink(`M${P(nx, ny)}C${P(nx - f * h * 0.08, ny - h * 0.12)} ${P(hx + headDir * h * 0.04, hy + h * 0.14)} ${P(hx, hy)}`, Math.max(2.2, h * 0.045), CM.paper);
+  b.ink(`M${P(nx, ny)}C${P(nx - f * h * 0.08, ny - h * 0.12)} ${P(hx + headDir * h * 0.04, hy + h * 0.14)} ${P(hx, hy)}`, Math.max(2.2, h * 0.045), CM.paper, 0, {graphic: true});
   b.fill(CM.paper, ovalPath(hx, hy, h * 0.05, h * 0.04));
   b.rect(CM.anchor, hx - h * 0.04, hy - h * 0.04, h * 0.07, h * 0.02);
   b.fill(CM.coatMustard, `M${P(hx + headDir * h * 0.03, hy - h * 0.012)}L${P(hx + headDir * h * 0.17, hy + h * 0.008)}L${P(hx + headDir * h * 0.03, hy + h * 0.02)}Z`);
   return <Paint b={b} seed={`heron/${seed}`} misreg={false} />;
 };
+export const Heron = tiered('environment', {}, HeronBody);
 
 // ---------------------------------------------------------------- smoke and steam
 
@@ -219,7 +224,7 @@ export type PuffsProps = {
 };
 
 /** A puff train that rises, drifts with the canal wind and shrinks to nothing (no fade). */
-export const Puffs: React.FC<PuffsProps> = ({x, y, seed, kind = 'smoke', scale = 1, bursts = [], ceil = 580, drift = -36}) => {
+const PuffsBody: React.FC<PuffsProps> = ({x, y, seed, kind = 'smoke', scale = 1, bursts = [], ceil = 580, drift = -36}) => {
   const t = useTime();
   const b = new Batch();
   const col = kind === 'steam' ? CM.paper : CM.stoneShade;
@@ -235,13 +240,14 @@ export const Puffs: React.FC<PuffsProps> = ({x, y, seed, kind = 'smoke', scale =
   }
   return <Paint b={b} seed={`puffs/${seed}`} misreg={false} />;
 };
+export const Puffs = tiered('environment', {}, PuffsBody);
 
 // ---------------------------------------------------------------- leaves
 
 const LEAF_COLS = [CM.leafGold, CM.leafRust, CM.leafGold, CM.coatMustard];
 
 /** Leaves falling through a box [x0, x1] x [y0, y1] (October): drift, sway and spin (scaleX), looping. */
-export const FallingLeaves: React.FC<{box: [number, number, number, number]; n: number; size?: number; seed: string; wind?: number}> = ({box, n, size = 12, seed, wind = -30}) => {
+const FallingLeavesBody: React.FC<{box: [number, number, number, number]; n: number; size?: number; seed: string; wind?: number}> = ({box, n, size = 12, seed, wind = -30}) => {
   const t = useTime();
   const [x0, y0, x1, y1] = box;
   const b = new Batch();
@@ -259,9 +265,10 @@ export const FallingLeaves: React.FC<{box: [number, number, number, number]; n: 
   }
   return <Paint b={b} seed={`leaves/${seed}`} misreg={false} />;
 };
+export const FallingLeaves = tiered('environment', {}, FallingLeavesBody);
 
 /** Leaves floating on the water, drifting with the current (px/s) and bobbing; wrap across [x0, x1]. */
-export const FloatingLeaves: React.FC<{y0: number; y1: number; x0?: number; x1?: number; n: number; size?: number; seed: string; current?: number}> = ({y0, y1, x0 = -20, x1 = 1100, n, size = 12, seed, current = -8}) => {
+const FloatingLeavesBody: React.FC<{y0: number; y1: number; x0?: number; x1?: number; n: number; size?: number; seed: string; current?: number}> = ({y0, y1, x0 = -20, x1 = 1100, n, size = 12, seed, current = -8}) => {
   const t = useTime();
   const b = new Batch();
   const r = rng(seed);
@@ -275,6 +282,7 @@ export const FloatingLeaves: React.FC<{y0: number; y1: number; x0?: number; x1?:
   }
   return <Paint b={b} seed={`fleaves/${seed}`} misreg={false} />;
 };
+export const FloatingLeaves = tiered('environment', {}, FloatingLeavesBody);
 
 // ---------------------------------------------------------------- string lights
 
@@ -299,10 +307,10 @@ export type StringLightsProps = {
 };
 
 /** A festoon of bulbs on a sagging wire: off (paper), on (lamp), a run that lights them in order, one twinkle at a time. */
-export const StringLights: React.FC<StringLightsProps> = ({from, to, sag = 24, n, seed, onAt, step = 0.035, on = false, r = 5, w = INK_PX.hair, runDir = 1}) => {
+const StringLightsBody: React.FC<StringLightsProps> = ({from, to, sag = 24, n, seed, onAt, step = 0.035, on = false, r = 5, w = INK_PX.hair, runDir = 1}) => {
   const t = useTime();
   const b = new Batch();
-  b.ink(wirePath(from[0], from[1], to[0], to[1], sag, {seed: `sl/${seed}`}), w, CM.ink);
+  b.ink(wirePath(from[0], from[1], to[0], to[1], sag, {seed: `sl/${seed}`}), w, CM.ink, 0, {thing: true});
   b.layer();
   for (let i = 0; i < n; i++) {
     const u = (i + 0.5) / n;
@@ -316,11 +324,12 @@ export const StringLights: React.FC<StringLightsProps> = ({from, to, sag = 24, n
   }
   return <Paint b={b} seed={`sl/${seed}`} misreg={false} />;
 };
+export const StringLights = tiered('environment', {}, StringLightsBody);
 
 // ---------------------------------------------------------------- sky things
 
 /** A flat lobed cloud (no ink), drifting `speed` px/s. Keep it out of the caption band (y 317-556). */
-export const Cloud: React.FC<{x: number; y: number; w: number; h: number; seed: string; speed?: number; color?: string; top?: string}> = ({x, y, w, h, seed, speed = 2, color = CM.skyHigh, top}) => {
+const CloudBody: React.FC<{x: number; y: number; w: number; h: number; seed: string; speed?: number; color?: string; top?: string}> = ({x, y, w, h, seed, speed = 2, color = CM.skyHigh, top}) => {
   const t = useTime();
   const dx = speed * t;
   const b = new Batch();
@@ -328,10 +337,11 @@ export const Cloud: React.FC<{x: number; y: number; w: number; h: number; seed: 
   if (top) b.fill(top, lobes(x + dx + w * 0.15, x + dx + w * 0.62, y + h * 0.62, h * 0.62, `${seed}/t`));
   return <Paint b={b} seed={`cloud/${seed}`} misreg={false} />;
 };
+export const Cloud = tiered('environment', {}, CloudBody);
 
 /** A plane-tree branch reaching in from a top corner (side -1 = left edge): twigs in ink, autumn leaf clusters that
  *  sway; keep it inside y 0-240 so the caption band stays clear. */
-export const Branch: React.FC<{side?: 1 | -1; y?: number; reach?: number; seed: string; drop?: number}> = ({side = -1, y = 40, reach = 330, seed, drop = 170}) => {
+const BranchBody: React.FC<{side?: 1 | -1; y?: number; reach?: number; seed: string; drop?: number}> = ({side = -1, y = 40, reach = 330, seed, drop = 170}) => {
   const t = useTime();
   const b = new Batch();
   const r = rng(seed);
@@ -355,7 +365,7 @@ export const Branch: React.FC<{side?: 1 | -1; y?: number; reach?: number; seed: 
     const a = ((side < 0 ? 0 : 180) + ang) * (Math.PI / 180);
     const tx = bx + Math.cos(a) * L + sw(i);
     const ty = Math.min(y + drop, by + Math.sin(a) * L * 0.6 + 20);
-    b.ink(`M${P(bx, by)}Q${P((bx + tx) / 2, (by + ty) / 2 - 8)} ${P(tx, ty)}`, INK_PX.mid);
+    b.ink(`M${P(bx, by)}Q${P((bx + tx) / 2, (by + ty) / 2 - 8)} ${P(tx, ty)}`, INK_PX.mid, CM.ink, 0, {thing: true, tone: CM.line});
     tips.push([tx, ty]);
   }
   b.layer();
@@ -369,6 +379,7 @@ export const Branch: React.FC<{side?: 1 | -1; y?: number; reach?: number; seed: 
   });
   return <Paint b={b} seed={`branch/${seed}`} />;
 };
+export const Branch = tiered('environment', {}, BranchBody);
 
 // ---------------------------------------------------------------- movers (K4 slots)
 
@@ -393,7 +404,7 @@ export type Mover = {
 };
 
 /** People (and dogs, bikes) moving along paths; each frame becomes a PersonSlot rendered by K4 (or a placeholder). */
-export const Movers: React.FC<{movers: Mover[]; idPrefix?: string}> = ({movers, idPrefix = 'mv'}) => {
+const MoversBody: React.FC<{movers: Mover[]; idPrefix?: string}> = ({movers, idPrefix = 'mv'}) => {
   const t = useTime();
   const out: React.ReactNode[] = [];
   movers.forEach((m, i) => {
@@ -418,5 +429,6 @@ export const Movers: React.FC<{movers: Mover[]; idPrefix?: string}> = ({movers, 
   });
   return <>{out}</>;
 };
+export const Movers = tieredAll('environment', {}, MoversBody);
 
 export {lobes};

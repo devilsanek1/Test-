@@ -9,6 +9,7 @@ import {useTime} from '../../../lib/time';
 import {line, rect as rectInk, wire as wirePath, circle as circleInk} from '../../../lib/sketch';
 import {Batch, Paint, P, r1, rng, inkFor, ovalPath, domePath, lobes, leafPath, lerp, Pt} from './core';
 import {copingInto} from './water';
+import {tiered} from '../tiers';
 
 // ---------------------------------------------------------------- the paving band
 
@@ -33,7 +34,7 @@ export type TowpathProps = {
 };
 
 /** A towpath seen side-on: paving, broken joint lines and specks, leaves, the coping and its rings; optionally bending. */
-export const Towpath: React.FC<TowpathProps> = ({x0 = -40, x1 = 1120, top, edge, seed, coping = 10, leaves = 14, ink = INK_PX.far, rings = [], color = CM.paving, bend}) => {
+const TowpathBody: React.FC<TowpathProps> = ({x0 = -40, x1 = 1120, top, edge, seed, coping = 10, leaves = 14, ink = INK_PX.far, rings = [], color = CM.paving, bend}) => {
   const b = useMemo(() => {
     const b = new Batch();
     const r = rng(seed);
@@ -92,12 +93,13 @@ export const Towpath: React.FC<TowpathProps> = ({x0 = -40, x1 = 1120, top, edge,
         b.ink(j, Math.max(1.2, (ink || 1.6) * 0.6));
         b.ink(lip, ink || 1.6, CM.ink, 0.2);
       }
-      for (const rx of rings) b.ink(circleInk(rx, edge - coping * 0.45 + off(rx), coping * 0.32, {seed: `${seed}/ring${rx}`}), Math.max(1.4, ink * 0.7));
+      for (const rx of rings) b.ink(circleInk(rx, edge - coping * 0.45 + off(rx), coping * 0.32, {seed: `${seed}/ring${rx}`}), Math.max(1.4, ink * 0.7), CM.ink, 0, {thing: true});
     }
     return b;
   }, [x0, x1, top, edge, seed, coping, leaves, ink, rings.join(','), color, bend]);
   return <Paint b={b} seed={`tow/${seed}`} />;
 };
+export const Towpath = tiered('environment', {}, TowpathBody);
 
 // ---------------------------------------------------------------- lamp posts
 
@@ -121,7 +123,7 @@ export type LampProps = {
 };
 
 /** A heritage lamp post: plinth, fluted column, ladder bar, lantern (glass off; lamp-lit on), cap and finial. */
-export const Lamp: React.FC<LampProps> = ({x, y, h, seed, lightAt, on = false, pool = 0, color = CM.anchor, variant = 'heritage', w: colW}) => {
+const LampBody: React.FC<LampProps> = ({x, y, h, seed, lightAt, on = false, pool = 0, color = CM.anchor, variant = 'heritage', w: colW}) => {
   const t = useTime();
   if (variant === 'near') {
     const b = new Batch();
@@ -153,11 +155,12 @@ export const Lamp: React.FC<LampProps> = ({x, y, h, seed, lightAt, on = false, p
   b.fill(color, `M${P(x - lw1 * 1.15, lt)}L${P(x, lt - h * 0.045)}L${P(x + lw1 * 1.15, lt)}Z`);
   b.fill(color, ovalPath(x, lt - h * 0.055, cw * 0.5, cw * 0.6));
   if (w > 0) {
-    b.ink(`M${P(x - lw0, lb)}L${P(x - lw1, lt)}M${P(x + lw0, lb)}L${P(x + lw1, lt)}M${P(x, lb)}L${P(x, lt)}`, Math.max(1.4, w * 0.6));
+    b.ink(`M${P(x - lw0, lb)}L${P(x - lw1, lt)}M${P(x + lw0, lb)}L${P(x + lw1, lt)}M${P(x, lb)}L${P(x, lt)}`, Math.max(1.4, w * 0.6), CM.ink, 0, {thing: true, tone: color});
     b.ink(line(x - cw * 0.6, y - h * 0.08, x - cw * 0.45, y - h * 0.79, {seed: `${seed}/c`, over: 'small'}), w);
   }
   return <Paint b={b} seed={`lamp/${seed}`} misreg={h > 140} />;
 };
+export const Lamp = tiered('environment', {}, LampBody);
 
 // ---------------------------------------------------------------- railings, benches, bollards and the rest
 
@@ -178,7 +181,7 @@ export function railingInto(b: Batch, x0: number, x1: number, y: number, h: numb
   if (w > 0) b.ink(line(x0, y - h, x1, y - h, {seed: `${seed}/rt`, over: 'small'}), Math.max(1.4, w * 0.6));
 }
 
-export const Railing: React.FC<{x0: number; x1: number; y: number; h: number; seed: string; pitch?: number; bars?: number; color?: string}> = (p) => {
+const RailingBody: React.FC<{x0: number; x1: number; y: number; h: number; seed: string; pitch?: number; bars?: number; color?: string}> = (p) => {
   const b = useMemo(() => {
     const b = new Batch();
     railingInto(b, p.x0, p.x1, p.y, p.h, p.seed, p);
@@ -186,6 +189,7 @@ export const Railing: React.FC<{x0: number; x1: number; y: number; h: number; se
   }, [p.x0, p.x1, p.y, p.h, p.seed, p.pitch, p.bars, p.color]);
   return <Paint b={b} seed={`rail/${p.seed}`} misreg={false} />;
 };
+export const Railing = tiered('environment', {}, RailingBody);
 
 /** A park bench. view 'back' (we see the backrest: people sit facing away), 'front', or 'side'. x = centre, y = feet. */
 export function benchInto(b: Batch, x: number, y: number, w: number, view: 'back' | 'front' | 'side', seed: string) {
@@ -220,7 +224,7 @@ export function benchInto(b: Batch, x: number, y: number, w: number, view: 'back
   if (iw > 0) b.ink(rectInk(x - w / 2, y - h, w, h * 0.42, {seed: `${seed}/bk`, over: 'small', open: 0.4}), iw * 0.7);
 }
 
-export const Bench: React.FC<{x: number; y: number; w: number; view?: 'back' | 'front' | 'side'; seed: string}> = ({x, y, w, view = 'back', seed}) => {
+const BenchBody: React.FC<{x: number; y: number; w: number; view?: 'back' | 'front' | 'side'; seed: string}> = ({x, y, w, view = 'back', seed}) => {
   const b = useMemo(() => {
     const b = new Batch();
     benchInto(b, x, y, w, view, seed);
@@ -228,6 +232,7 @@ export const Bench: React.FC<{x: number; y: number; w: number; view?: 'back' | '
   }, [x, y, w, view, seed]);
   return <Paint b={b} seed={`bench/${seed}`} />;
 };
+export const Bench = tiered('environment', {}, BenchBody);
 
 /** A cast-iron mooring bollard (dome cap, waist): x = centre, y = foot, h = height. Pip's waterline seat. */
 export function bollardInto(b: Batch, x: number, y: number, h: number, seed: string) {
@@ -239,7 +244,7 @@ export function bollardInto(b: Batch, x: number, y: number, h: number, seed: str
   if (iw > 0) b.ink(`M${P(x - w * 0.46, y - h * 0.76)}A${r1(w * 0.46)} ${r1(h * 0.26)} 0 0 1 ${P(x + w * 0.46, y - h * 0.76)}`, iw, CM.ink, 0.2);
 }
 
-export const Bollard: React.FC<{x: number; y: number; h: number; seed: string}> = ({x, y, h, seed}) => {
+const BollardBody: React.FC<{x: number; y: number; h: number; seed: string}> = ({x, y, h, seed}) => {
   const b = useMemo(() => {
     const b = new Batch();
     bollardInto(b, x, y, h, seed);
@@ -247,6 +252,7 @@ export const Bollard: React.FC<{x: number; y: number; h: number; seed: string}> 
   }, [x, y, h, seed]);
   return <Paint b={b} seed={`bollard/${seed}`} />;
 };
+export const Bollard = tiered('environment', {}, BollardBody);
 
 /** A planter box of grasses (wooden box, lobed tufts, a few seed heads). x0..x1, y = foot, h = box height. */
 export function planterInto(b: Batch, x0: number, x1: number, y: number, h: number, seed: string, t = 0) {
@@ -270,15 +276,16 @@ export function planterInto(b: Batch, x0: number, x1: number, y: number, h: numb
     g += `M${P(bx, y - h)}Q${P(bx + sw * 0.5, y - h - L * 0.5)} ${P(bx + sw + r.jitter(6), y - h - L)}`;
     if (r.chance(0.35)) b.fill(CM.coatOat, leafPath(bx + sw + r.jitter(6), y - h - L, 10, 3, 80));
   }
-  b.ink(g, Math.max(1.4, inkFor(h * 4) * 0.55), CM.sage);
+  b.ink(g, Math.max(1.4, inkFor(h * 4) * 0.55), CM.sage, 0, {thing: true});
 }
 
-export const Planter: React.FC<{x0: number; x1: number; y: number; h: number; seed: string}> = ({x0, x1, y, h, seed}) => {
+const PlanterBody: React.FC<{x0: number; x1: number; y: number; h: number; seed: string}> = ({x0, x1, y, h, seed}) => {
   const t = useTime();
   const b = new Batch();
   planterInto(b, x0, x1, y, h, seed, t);
   return <Paint b={b} seed={`planter/${seed}`} />;
 };
+export const Planter = tiered('environment', {}, PlanterBody);
 
 /** A parked bicycle in profile: x = centre, y = ground, R = wheel radius. Optional lock to a post at lockX. */
 export function bikeInto(b: Batch, x: number, y: number, R: number, seed: string, color = CM.brickDeep, dir: 1 | -1 = 1) {
@@ -286,17 +293,17 @@ export function bikeInto(b: Batch, x: number, y: number, R: number, seed: string
   const ax = x - dir * R * 1.25;
   const bx = x + dir * R * 1.25;
   const wy = y - R;
-  b.ink(circleInk(ax, wy, R, {seed: `${seed}/a`, wobble: 0.015}) + circleInk(bx, wy, R, {seed: `${seed}/b`, wobble: 0.015}), w);
+  b.ink(circleInk(ax, wy, R, {seed: `${seed}/a`, wobble: 0.015}) + circleInk(bx, wy, R, {seed: `${seed}/b`, wobble: 0.015}), w, CM.ink, 0, {thing: true});
   const seat: Pt = [x - dir * R * 0.35, wy - R * 1.15];
   const bar: Pt = [x + dir * R * 0.75, wy - R * 1.35];
   const crank: Pt = [x, wy];
-  b.ink(`M${P(ax, wy)}L${P(crank[0], crank[1])}L${P(seat[0], seat[1] + R * 0.12)}L${P(ax, wy)}M${P(crank[0], crank[1])}L${P(bar[0] - dir * R * 0.12, bar[1] + R * 0.25)}L${P(seat[0], seat[1] + R * 0.12)}M${P(bar[0] - dir * R * 0.12, bar[1] + R * 0.25)}L${P(bx, wy)}`, w * 1.3, color);
-  b.ink(`M${P(bar[0] - dir * R * 0.25, bar[1])}L${P(bar[0] + dir * R * 0.15, bar[1] - R * 0.05)}`, w * 1.2, CM.ink);
+  b.ink(`M${P(ax, wy)}L${P(crank[0], crank[1])}L${P(seat[0], seat[1] + R * 0.12)}L${P(ax, wy)}M${P(crank[0], crank[1])}L${P(bar[0] - dir * R * 0.12, bar[1] + R * 0.25)}L${P(seat[0], seat[1] + R * 0.12)}M${P(bar[0] - dir * R * 0.12, bar[1] + R * 0.25)}L${P(bx, wy)}`, w * 1.3, color, 0, {thing: true});
+  b.ink(`M${P(bar[0] - dir * R * 0.25, bar[1])}L${P(bar[0] + dir * R * 0.15, bar[1] - R * 0.05)}`, w * 1.2, CM.ink, 0, {thing: true});
   b.fill(CM.anchor, ovalPath(seat[0], seat[1], R * 0.3, R * 0.08));
   b.fill(color, ovalPath(crank[0], crank[1], R * 0.12, R * 0.12));
 }
 
-export const Bike: React.FC<{x: number; y: number; R: number; seed: string; color?: string; dir?: 1 | -1}> = ({x, y, R, seed, color, dir}) => {
+const BikeBody: React.FC<{x: number; y: number; R: number; seed: string; color?: string; dir?: 1 | -1}> = ({x, y, R, seed, color, dir}) => {
   const b = useMemo(() => {
     const b = new Batch();
     bikeInto(b, x, y, R, seed, color, dir);
@@ -304,6 +311,7 @@ export const Bike: React.FC<{x: number; y: number; R: number; seed: string; colo
   }, [x, y, R, seed, color, dir]);
   return <Paint b={b} seed={`bike/${seed}`} misreg={false} />;
 };
+export const Bike = tiered('environment', {}, BikeBody);
 
 /** A litter bin (round, slatted): x = centre, y = foot, h = height. */
 export function binInto(b: Batch, x: number, y: number, h: number, seed: string) {
@@ -339,15 +347,16 @@ export function treeInto(b: Batch, x: number, y: number, h: number, seed: string
   b.fill(cols[1], lobes(cx - R * 0.7, cx + R * 0.15, cy + R * 0.25, R * 0.9, `${seed}/b`, 3));
   b.fill(cols[3 % cols.length], lobes(cx + R * 0.05, cx + R * 0.8, cy + R * 0.55, R * 0.8, `${seed}/c`, 3));
   const iw = inkFor(h);
-  if (iw > 0) b.ink(`M${P(x, y - h * 0.4)}L${P(x - R * 0.35, cy - R * 0.1)}M${P(x, y - h * 0.45)}L${P(x + R * 0.3, cy)}`, iw * 0.7, CM.line);
+  if (iw > 0) b.ink(`M${P(x, y - h * 0.4)}L${P(x - R * 0.35, cy - R * 0.1)}M${P(x, y - h * 0.45)}L${P(x + R * 0.3, cy)}`, iw * 0.7, CM.line, 0, {thing: true});
 }
 
-export const Tree: React.FC<{x: number; y: number; h: number; seed: string; autumn?: boolean}> = ({x, y, h, seed, autumn}) => {
+const TreeBody: React.FC<{x: number; y: number; h: number; seed: string; autumn?: boolean}> = ({x, y, h, seed, autumn}) => {
   const t = useTime();
   const b = new Batch();
   treeInto(b, x, y, h, seed, t, autumn);
   return <Paint b={b} seed={`tree/${seed}`} />;
 };
+export const Tree = tiered('environment', {}, TreeBody);
 
 /** A string-light span helper for wires between posts (re-exported for sets). */
 export const wireBetween = (a: Pt, c: Pt, sag: number, seed: string) => wirePath(a[0], a[1], c[0], c[1], sag, {seed});

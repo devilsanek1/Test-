@@ -21,6 +21,7 @@ import {CM} from '../../palette';
 import {BuildProps} from './People';
 import {drawn, selfSteps} from './gait';
 import {capsule, circlePath, curve, ellipsePath, FigureG, Part, Parts, polyline, Pt, q100, q2} from './parts';
+import {tieredAll} from '../tiers';
 
 export type DogPose = 'trot' | 'walk' | 'stand' | 'sniff' | 'sit' | 'lie';
 export type DogCoat = 'gold' | 'rust' | 'brown';
@@ -258,7 +259,7 @@ function dogParts(o: {h: number; pose: DogPose; view: DogView; coat: DogCoat; st
 const WAG_DEFAULT: Record<DogPose, number> = {trot: 2.4, walk: 1.8, stand: 2.2, sniff: 3.0, sit: 1.6, lie: 1.1};
 
 /** A dog (30-90 px): trot / walk (side or back), stand, sniff, sit, lie; a tail-wag idle; an optional lead. */
-export const Dog: React.FC<DogProps> = ({x, y, h, pose = 'stand', view = 'side', coat = 'gold', flip, step, walk, wag, lead, headDown, seed = 'dog', ink, at, fillLag}) => {
+const DogBody: React.FC<DogProps> = ({x, y, h, pose = 'stand', view = 'side', coat = 'gold', flip, step, walk, wag, lead, headDown, seed = 'dog', ink, at, fillLag}) => {
   const t = useTime();
   const tq = drawn(t, 12);
   const H = q2(Math.max(DOG_SIZE.min * 0.8, h));
@@ -300,6 +301,7 @@ export const Dog: React.FC<DogProps> = ({x, y, h, pose = 'stand', view = 'side',
     </>
   );
 };
+export const Dog = tieredAll('support', {lines: true}, DogBody);
 
 const DOG_GEO = new Map<string, DogGeo>();
 function cachedGeo(key: string, build: () => DogGeo): DogGeo {

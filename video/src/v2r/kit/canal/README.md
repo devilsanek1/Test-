@@ -40,6 +40,23 @@ positions; people, ghosts, Pip and boards as kit placeholders):
 | `Newsstand` | newsstand.tsx | S2's kiosk: awning, magazines, folded papers (no legible print), urn steam, a newsagent slot |
 | life | life.tsx | `Birds` (perch, peck, `liftAt`, wheel away under `ceil` 580), `Pigeons`, `Ducks` (+ `landAt`), `Heron`, `Puffs` (smoke / steam + `bursts`), `FallingLeaves`, `FloatingLeaves`, `StringLights` (`onAt` run, twinkle), `Cloud`, `Branch` (S1's plane branch, y 0-240), `Movers` (walkers / joggers / cyclists / dogs as slots), `litAt` |
 
+## Tiers (the clean pen, 2026-10-27)
+`src/v2r/pen.ts` switches the film to `lib/pen.ts` `setPen('clean')`: every line and fill here follows its piece's
+ATTENTION TIER (by story role, `docs/look/CRAFT.md` §b-§c; wrappers in `../tiers.tsx`). **Defaults: every export is
+`environment`** (no outline; fills calmer; things that ARE lines kept as hairlines): the sets `S1Set` `S2Set` `S4Set`
+`S8Set`, `WingFront` / `WingS1` / `WingS7` / `WingS2`, `TerraceRow`, `Water`, `Towpath`, `Lamp`, `Railing`, `Bench`,
+`Bollard`, `Planter`, `Bike`, `Tree`, `Steps`, the boats, `FarRoofs` / `BridgeBus` / `ViaductTrain`, `Newsstand`,
+`HandLetteredGoogle` (its letters are `graphic`: they keep their ink), `SunDisc`, and the life (`Birds`, `Pigeons`,
+`Ducks`, `Heron`, `Puffs`, `FallingLeaves`, `FloatingLeaves`, `StringLights`, `Cloud`, `Branch`, `Movers`: its people
+too). Story parts inside a set default to `support` and take a prop to promote on their beat: `WingFront wTier` (her
+window W), `WingS2 storyTier` (hers and the five staff windows, and the `storyOverlay`), `TerraceRow herTier` (her door
+and French window). Slots (`behindDoor`, `towpath`, `seated`, `pip`, `aBoard`, `bench`, `board`, `lane`, `her.inside`)
+draw as untagged (support with thin tinted lines; `Slot` in `../tiers.tsx`): K4 / K5 / K3 pieces keep their own tier.
+`Paint` has no tier of its own: a lane's batch draws in the scope it sits in, so wrap a scene-built set in
+`<Tier tier="environment">` and mark strokes that ARE the thing `b.ink(d, w, color, open, {thing: true, tone})`
+(wires, railing bars, bike frames, twigs, aerials, ropes; `tone` = the fill they belong to) or `{graphic: true}` (a
+shape drawn with a stroke, lettering). Override per beat: `<Lamp tier="support">`, `<Movers tier="support">`.
+
 ## Rules kept
 Nothing drawn in the caption band (y 317-556): roofs, stacks, aerials, planting and tiers are clamped to y >= 600 (S1's
 roof planting to y >= 575), flyers to `ceil` 580, puffs to 580-600. Hero teal only on her door and French window frame;

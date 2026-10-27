@@ -32,6 +32,19 @@ GL=angle node scripts/render-frames.mjs CraneEnd <dir> 0.2 --entry=src/entry-v2r
 | `gate.tsx` | S6: `GateFacade` (the low limestone band, windows lighting 27.08-27.80, the sliding service door + `ServicePlate` CLASSIFIED / AUTHORIZED PERSONNEL ONLY, `doorOpen(t)`: shuts behind people at 25.0 and 27.4), `GateLawnTrees`, `GateFence` (a low open park fence, the tall corner post = Pip's seat, tulip beds, the board's kerb), `GateNear` (bollards, chain, shrub, bench + bike rack in the rail), `GateSet` (the truck: far 10, lawn 15, mid 24.63, near 65 px/s) |
 | `sheets.tsx` | the review compositions (K4 / K5 used to judge; K3 pieces are marked STAND-IN) |
 
+## Tiers (the clean pen, 2026-10-27)
+`src/v2r/pen.ts` switches the film to the clean pen with ATTENTION TIERS (`docs/look/CRAFT.md` §b-§c; `../tiers.tsx`).
+**Every export is `environment`** (the Arlington environment: no outline, calmer fills, things that ARE lines kept as
+hairlines): `CraneSet`, the vista (`FarPlane`, `SkyBands`, `HighBars`, `CloudBank`, `FarCity`, `Obelisk`, `RiverPlane`,
+`SunDisc`), `MidGround`, `NearMid`, `Pentagon`, `BloomCrowns`, the terrace (`Terrace`, `TerraceTree`, `CornerTree`,
+`LampPost`, `StrangerBench`, `Pigeons`, `NearPetals`), the gate (`GateSet`, `GateFacade`, `GateLawnTrees`,
+`GateFence`, `GateNear`, `ServicePlate`), `BirdV`, `Gulls`. Marked things: limbs and twigs, the chain, bike racks and
+the bike, mullions, the stroller handle, basket chains, birds' V's, rowers, pigeon legs. Slots (`figuresStart` /
+`figuresEnd` / `deckStart` / `deckEnd`, the gate's `doorPeople`, `bars`, `lawn`, `mid`, `board`, `pip`, `near`) draw
+as untagged (support with thin lines): K3 / K4 / K5 pieces keep their own tier. Raw SVG fills here are far-plane
+atmosphere colours and are not recoloured; raw strokes go through `useTierLine()`. A scene promotes a landmark on its
+beat: `<Obelisk tier="subject">`, `<Pentagon tier="subject">` (then its outline returns, in its own shade).
+
 ## S5: the planes (END coordinates; p 0 = each scaled k about `o` and slid by `off`)
 
 | plane | k | off (px) | contents | atm step / ink |

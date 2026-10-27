@@ -13,6 +13,8 @@ import {line, poly} from '../../../lib/sketch';
 import {Batch, Paint, P, Pt, rng, lerp, lobes, ovalPath} from './core';
 import {litAt} from './life';
 import * as MAP from '../../world/map';
+import {tiered, TierPart, Slot} from '../tiers';
+import type {TierName} from '../tiers';
 
 /** The S2 lens: the wing's lines meet at VP (off the right edge); the map's first three columns are drawn as given. */
 export const S2_WALL = {
@@ -122,10 +124,13 @@ export type WingS2Props = {
   /** Lit share of the procedural windows (the golden wing is half lit). */
   litFrac?: number;
   seed?: string;
+  /** Tier of the story windows (hers and the five staff windows; the clean pen): default 'support' (story objects off
+   *  their beat) inside the environment wing; 'subject' on the beat they carry (S2 "scared"). */
+  storyTier?: TierName;
 };
 
 /** The receding wing + its tiers. */
-export const WingS2: React.FC<WingS2Props> = ({story = {}, staffCoolAt, staffStagger = MAP.S2.staffOnStagger, storyOverlay, litFrac = 0.5, seed = 'wingS2'}) => {
+const WingS2Body: React.FC<WingS2Props> = ({story = {}, staffCoolAt, staffStagger = MAP.S2.staffOnStagger, storyOverlay, litFrac = 0.5, seed = 'wingS2', storyTier}) => {
   const t = useTime();
   const uEnd = s2u(1120);
   const stat = useMemo(() => {
@@ -265,11 +270,14 @@ export const WingS2: React.FC<WingS2Props> = ({story = {}, staffCoolAt, staffSta
     <>
       <Paint b={stat} seed={`${seed}/stat`} />
       <Paint b={dyn} seed={`${seed}/dyn`} />
-      <Paint b={sb} seed={`${seed}/story`} />
-      {storyOverlay ? S2_STORY.map((w) => <React.Fragment key={w.id}>{storyOverlay(w)}</React.Fragment>) : null}
+      <TierPart def="support" tier={storyTier}>
+        <Paint b={sb} seed={`${seed}/story`} />
+      </TierPart>
+      <Slot tier={storyTier}>{storyOverlay ? S2_STORY.map((w) => <React.Fragment key={w.id}>{storyOverlay(w)}</React.Fragment>) : null}</Slot>
     </>
   );
 };
+export const WingS2 = tiered('environment', {}, WingS2Body);
 
 /** A flat window pane in screen space (axis-aligned): lit / unlit / cool (a cooler white) / dark (plum). */
 export function windowInto(b: Batch, x: number, y: number, w: number, h: number, state: StoryState, seed: string) {

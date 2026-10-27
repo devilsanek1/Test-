@@ -12,6 +12,7 @@ import {CM} from '../../palette';
 import {useTime} from '../../../lib/time';
 import {Batch, Paint, atm, atmShade, mix, inkCol, lineD, polyD, quadD, crownD, circleD, rng, type Pt} from './core';
 import {MID, PENT, PENT_ROT, circ, facesLens, halfSide, pentagon, sideFrame, sidePt, shadowOffset, wallLight, vert} from './lens';
+import {tiered} from '../tiers';
 
 // ---------------------------------------------------------------- tones (plane 2: 22 % toward the sky)
 
@@ -106,7 +107,7 @@ export type PentagonProps = {
   seed?: string;
 };
 
-export const Pentagon: React.FC<PentagonProps> = ({warmAt, warmDur = 0.7, seed = 'pent'}) => {
+const PentagonBody: React.FC<PentagonProps> = ({warmAt, warmDur = 0.7, seed = 'pent'}) => {
   const t = useTime();
   const parts = useMemo(() => {
     const outer = pentagon(PENT.apothem);
@@ -253,6 +254,7 @@ export const Pentagon: React.FC<PentagonProps> = ({warmAt, warmDur = 0.7, seed =
     </>
   );
 };
+export const Pentagon = tiered('environment', {}, PentagonBody);
 
 const rand01 = (k: string) => rng(k).next();
 

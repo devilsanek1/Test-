@@ -17,6 +17,8 @@ import {litAt, StringLights, Puffs} from './life';
 import {CastSlot, PersonSlot} from './slots';
 import {railingInto, bikeInto} from './towpath';
 import * as MAP from '../../world/map';
+import {tiered, TierPart, Slot} from '../tiers';
+import type {TierName} from '../tiers';
 
 export type TerraceLevels = {
   /** Pavement / towpath level at the doors (screen y). */
@@ -71,6 +73,9 @@ export type TerraceRowProps = {
   ink?: number;
   /** Neighbours' actions: watering at t, kettle steam. */
   waterAt?: number;
+  /** Tier of her door and French window (the clean pen): default 'support' (her place off its beat) inside the
+   *  environment row; 'subject' on the beats it carries. */
+  herTier?: TierName;
 };
 
 const BRICKS = [CM.brick, CM.brickLight, CM.brickDeep, CM.brick, CM.brickLight];
@@ -130,7 +135,7 @@ export function potsInto(b: Batch, x0: number, x1: number, y: number, s: number,
 }
 
 /** A row of terrace houses, frontal (screen px; or local px inside a <Plane>). */
-export const TerraceRow: React.FC<TerraceRowProps> = ({x0, levels: Lv, houses, her, seed, litFrac = 0.55, lightsAt, lightsOn = false, ink = INK_PX.mid, waterAt}) => {
+const TerraceRowBody: React.FC<TerraceRowProps> = ({x0, levels: Lv, houses, her, seed, litFrac = 0.55, lightsAt, lightsOn = false, ink = INK_PX.mid, waterAt, herTier}) => {
   const t = useTime();
   // scale from the storey height (a first storey is ~3.0 m)
   const pxm = (Lv.first - Lv.cornice) / 3.0;
@@ -184,7 +189,7 @@ export const TerraceRow: React.FC<TerraceRowProps> = ({x0, levels: Lv, houses, h
         aer += `M${P(x + sw * 0.2, top + 4)}L${P(x + sw * 0.2, ay)}M${P(x + sw * 0.2 - 10, ay + 3)}L${P(x + sw * 0.2 + 10, ay + 3)}M${P(x + sw * 0.2 - 7, ay + 8)}L${P(x + sw * 0.2 + 7, ay + 8)}`;
       }
     }
-    b.ink(aer, INK_PX.hair);
+    b.ink(aer, INK_PX.hair, CM.ink, 0, {thing: true});
     b.layer();
     houses.forEach((h, i) => {
       const x = xs[i];
@@ -206,8 +211,11 @@ export const TerraceRow: React.FC<TerraceRowProps> = ({x0, levels: Lv, houses, h
     return b;
   }, [seed, x0, Lv.ground, Lv.first, Lv.cornice, Lv.mansardTop, houses.length]);
 
-  // ---- per frame: windows (lit switching), doors, balconies, her house
+  // ---- per frame: windows (lit switching), doors, balconies, her house (her door and French window in their own
+  // batches, painted in her tier part: `herTier`)
   const dyn = new Batch();
+  const herDyn = new Batch();
+  const herFront = new Batch();
   const slots: React.ReactNode[] = [];
   let k = 0;
   const nWin = houses.length * 3;
@@ -223,7 +231,7 @@ export const TerraceRow: React.FC<TerraceRowProps> = ({x0, levels: Lv, houses, h
     const dY = isHer && her!.door ? her!.door.y0 : Lv.ground - dh - pxm * 0.25;
     const dW = isHer && her!.door ? her!.door.x1 - her!.door.x0 : dw;
     const dH = isHer && her!.door ? her!.door.y1 - her!.door.y0 : dh;
-    doorInto(dyn, dX, dY, dW, dH, isHer ? CM.hero : h.doorColor ?? DOORS[i % DOORS.length], `${seed}/door${i}`, ink * 0.7, litAt(t, seed, k + 999, nWin));
+    doorInto(isHer ? herDyn : dyn, dX, dY, dW, dH, isHer ? CM.hero : h.doorColor ?? DOORS[i % DOORS.length], `${seed}/door${i}`, ink * 0.7, litAt(t, seed, k + 999, nWin));
     const gw = pxm * 1.35;
     const gh = pxm * 1.75;
     const gX = doorLeft ? x + w - w * 0.14 - gw : x + w * 0.14;
@@ -241,19 +249,19 @@ export const TerraceRow: React.FC<TerraceRowProps> = ({x0, levels: Lv, houses, h
       const fy = F.y - F.h / 2;
       const lamp = her!.lampOn ?? (her!.lampAt === undefined ? true : t >= her!.lampAt);
       // teal frame (the hero), the room (lamp-lit), blind UP (a rolled bar at the top)
-      dyn.rect(CM.hero, fx - F.w * 0.07, fy - F.w * 0.07, F.w * 1.14, F.h + F.w * 0.07);
-      dyn.rect(lamp ? CM.lamp : CM.glass, fx, fy, F.w, F.h);
-      if (lamp) dyn.rect(CM.lampCore, fx + F.w * 0.18, fy + F.h * 0.12, F.w * 0.64, F.h * 0.46);
-      dyn.rect(CM.coatOat, fx, fy, F.w, F.h * 0.06);
+      herDyn.rect(CM.hero, fx - F.w * 0.07, fy - F.w * 0.07, F.w * 1.14, F.h + F.w * 0.07);
+      herDyn.rect(lamp ? CM.lamp : CM.glass, fx, fy, F.w, F.h);
+      if (lamp) herDyn.rect(CM.lampCore, fx + F.w * 0.18, fy + F.h * 0.12, F.w * 0.64, F.h * 0.46);
+      herDyn.rect(CM.coatOat, fx, fy, F.w, F.h * 0.06);
       // shelves of books on the back wall, a standard lamp, plants
       for (let s2 = 0; s2 < 2; s2++) {
         const sy = fy + F.h * (0.3 + s2 * 0.18);
-        dyn.rect(CM.line, fx + F.w * 0.55, sy, F.w * 0.4, F.h * 0.02);
-        for (let bk = 0; bk < 5; bk++) dyn.rect([CM.brick, CM.coatMustard, CM.sage, CM.paneUnlit, CM.box][(bk + s2) % 5], fx + F.w * (0.57 + bk * 0.075), sy - F.h * 0.08, F.w * 0.055, F.h * 0.08);
+        herDyn.rect(CM.line, fx + F.w * 0.55, sy, F.w * 0.4, F.h * 0.02);
+        for (let bk = 0; bk < 5; bk++) herDyn.rect([CM.brick, CM.coatMustard, CM.sage, CM.paneUnlit, CM.box][(bk + s2) % 5], fx + F.w * (0.57 + bk * 0.075), sy - F.h * 0.08, F.w * 0.055, F.h * 0.08);
       }
-      dyn.fill(CM.coatMustard, domePath(fx + F.w * 0.2, fy + F.h * 0.32, F.w * 0.09, F.h * 0.06));
-      dyn.rect(CM.anchor, fx + F.w * 0.195, fy + F.h * 0.32, Math.max(1.5, F.w * 0.015), F.h * 0.6);
-      dyn.fill(CM.sage, lobes(fx + F.w * 0.02, fx + F.w * 0.3, fy + F.h, F.h * 0.3, `${seed}/herplant`, 3));
+      herDyn.fill(CM.coatMustard, domePath(fx + F.w * 0.2, fy + F.h * 0.32, F.w * 0.09, F.h * 0.06));
+      herDyn.rect(CM.anchor, fx + F.w * 0.195, fy + F.h * 0.32, Math.max(1.5, F.w * 0.015), F.h * 0.6);
+      herDyn.fill(CM.sage, lobes(fx + F.w * 0.02, fx + F.w * 0.3, fy + F.h, F.h * 0.3, `${seed}/herplant`, 3));
     }
   });
   // her inside (K4's silhouette) goes between the room and the frame: render a second batch after `inside`
@@ -269,13 +277,13 @@ export const TerraceRow: React.FC<TerraceRowProps> = ({x0, levels: Lv, houses, h
       const fx = F.x - F.w / 2;
       const fy = F.y - F.h / 2;
       // the French window's frame and glazing bars over her, the Juliet rail
-      front.rect(CM.hero, fx + F.w * 0.48, fy, F.w * 0.04, F.h);
-      front.rect(CM.hero, fx, fy + F.h * 0.62, F.w, F.w * 0.035);
-      front.rect(CM.hero, fx - F.w * 0.07, fy + F.h - F.w * 0.02, F.w * 1.14, F.w * 0.07);
+      herFront.rect(CM.hero, fx + F.w * 0.48, fy, F.w * 0.04, F.h);
+      herFront.rect(CM.hero, fx, fy + F.h * 0.62, F.w, F.w * 0.035);
+      herFront.rect(CM.hero, fx - F.w * 0.07, fy + F.h - F.w * 0.02, F.w * 1.14, F.w * 0.07);
       const ry = fy + F.h * 0.6;
-      front.rect(CM.anchor, fx - F.w * 0.1, ry, F.w * 1.2, Math.max(2, F.w * 0.025));
-      for (let bx = fx - F.w * 0.08; bx <= fx + F.w * 1.08; bx += F.w * 0.09) front.rect(CM.anchor, bx, ry, Math.max(1.2, F.w * 0.012), fy + F.h - ry);
-      front.ink(rectInk(fx - F.w * 0.07, fy - F.w * 0.07, F.w * 1.14, F.h + F.w * 0.07, {seed: `${seed}/herf`, over: 'small'}), INK_PX.mid);
+      herFront.rect(CM.anchor, fx - F.w * 0.1, ry, F.w * 1.2, Math.max(2, F.w * 0.025));
+      for (let bx = fx - F.w * 0.08; bx <= fx + F.w * 1.08; bx += F.w * 0.09) herFront.rect(CM.anchor, bx, ry, Math.max(1.2, F.w * 0.012), fy + F.h - ry);
+      herFront.ink(rectInk(fx - F.w * 0.07, fy - F.w * 0.07, F.w * 1.14, F.h + F.w * 0.07, {seed: `${seed}/herf`, over: 'small'}), INK_PX.mid);
       return;
     }
     const kind = h.first ?? (['two', 'french', 'one'] as const)[i % 3];
@@ -322,14 +330,21 @@ export const TerraceRow: React.FC<TerraceRowProps> = ({x0, levels: Lv, houses, h
     <>
       <Paint b={stat} seed={`${seed}/stat`} />
       <Paint b={dyn} seed={`${seed}/dyn`} />
-      {her?.inside}
+      <TierPart def="support" tier={herTier}>
+        <Paint b={herDyn} seed={`${seed}/herDyn`} />
+      </TierPart>
+      <Slot>{her?.inside}</Slot>
       <Paint b={front} seed={`${seed}/front`} />
+      <TierPart def="support" tier={herTier}>
+        <Paint b={herFront} seed={`${seed}/herFront`} />
+      </TierPart>
       {lights}
       {slots}
       {waterAt !== undefined ? null : null}
     </>
   );
 };
+export const TerraceRow = tiered('environment', {}, TerraceRowBody);
 
 /** The REAR of a terrace (S4): back extensions, small windows, drainpipes, garden walls, a tree or two, washing on a
  *  line, a shed; flat and a little cooler (it faces the towpath across the back gardens). Batched. */
@@ -384,7 +399,7 @@ export function terraceBacksInto(b: Batch, x0: number, x1: number, ground: numbe
     const y = ground - pxm * 2.4;
     let d = `M${P(xx, y)}Q${P(xx + 60, y + 8)} ${P(xx + 120, y)}`;
     for (let k = 0; k < 4; k++) b.rect(r.pick([CM.paper, CM.box, CM.coatMustard, CM.sage, CM.blossom]), xx + 12 + k * 26, y + 4 + Math.sin(k) * 2, 16, 20);
-    b.ink(d, INK_PX.hair);
+    b.ink(d, INK_PX.hair, CM.ink, 0, {thing: true});
     d = '';
   }
 }

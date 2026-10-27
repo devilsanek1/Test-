@@ -31,6 +31,7 @@ import {rng, type Rng} from '../../../lib/rng';
 import {B, B_LEGS_Y1, S2, S6, type Rect, type XY} from '../../world/map';
 import {TYPE, WorldText, penDur, textW, type TextMode} from './WorldText';
 import {TXT_DEAL, TXT_GOOGLE, TXT_HER, TXT_TOLD_THE_BBC} from './texts';
+import {tiered} from '../tiers';
 
 // ---------------------------------------------------------------- colour: CM tokens and flat mixes of them
 
@@ -471,7 +472,7 @@ const BoardText: React.FC<{l: BoardLine; g: BoardGeom; seed: string}> = ({l, g, 
 
 const BoardRuleInk: React.FC<{r: BoardRule; seed: string}> = ({r, seed}) => {
   const d = useMemo(() => skLine(r.x0, r.y, r.x1, r.y, {over: 'none', breaks: false, jitter: 0.35, drift: 0.12, bow: 0.5, seed}), [r.x0, r.x1, r.y, seed]);
-  return <Ink d={d} width={r.width ?? 2.6} color={r.color ?? BOARD_COLORS.rule} at={r.at} dur={r.dur} vary={0.03} seed={seed} />;
+  return <Ink d={d} width={r.width ?? 2.6} color={r.color ?? BOARD_COLORS.rule} at={r.at} dur={r.dur} vary={0.03} seed={seed} graphic />;
 };
 
 // ---------------------------------------------------------------- the board
@@ -514,7 +515,7 @@ export type StatementBoardProps = {
 };
 
 /** The ground shadow of a board (flat, cast right and a little toward us; colour, never grey). */
-export const BoardShadow: React.FC<{g: BoardGeom; color?: string; seed?: string}> = ({g, color = BOARD_COLORS.shadow, seed = 'board'}) => {
+const BoardShadowBody: React.FC<{g: BoardGeom; color?: string; seed?: string}> = ({g, color = BOARD_COLORS.shadow, seed = 'board'}) => {
   const H = g.legsTo - g.top;
   const dx = H * 0.26;
   const dy = Math.max(8, H * 0.04);
@@ -529,8 +530,9 @@ export const BoardShadow: React.FC<{g: BoardGeom; color?: string; seed?: string}
   ]);
   return <Fill d={d} color={color} offset={false} seed={`${seed}/shadow`} />;
 };
+export const BoardShadow = tiered('support', {}, BoardShadowBody);
 
-export const StatementBoard: React.FC<StatementBoardProps> = ({
+const StatementBoardBody: React.FC<StatementBoardProps> = ({
   face,
   stile = 40,
   rail = 20,
@@ -621,7 +623,7 @@ export const StatementBoard: React.FC<StatementBoardProps> = ({
     if (!wipe || t < wipe.at + wdur) {
       const body = (
         <>
-          <Ink d={smudge.scribbles} width={2.4} color={C.scribble} taper={false} vary={0.04} seed={`${seed}/scrib`} />
+          <Ink d={smudge.scribbles} width={2.4} color={C.scribble} taper={false} vary={0.04} seed={`${seed}/scrib`} thing />
           <Fill d={smudge.dots} color={C.scribble} offset={false} seed={`${seed}/dots`} />
           <Fill d={smudge.smearsDeep} color={C.smearDeep} offset={false} seed={`${seed}/smD`} />
           <Fill d={smudge.smears} color={C.smear} offset={false} seed={`${seed}/sm`} />
@@ -659,7 +661,7 @@ export const StatementBoard: React.FC<StatementBoardProps> = ({
         {/* the enamel plate: its thickness in shade, the face, the keyline, four brass screws */}
         <Fill d={P2.plateEdge} color={C.faceEdge} offset={false} seed={`${frameSeed}/edge`} />
         <Fill d={P2.plate} color={C.face} offset={false} seed={`${frameSeed}/face`} />
-        <Ink d={P2.keyD} width={Math.max(1.6, Math.min(2.2, g.keyInset * 0.2))} color={C.keyline} taper={false} vary={0} seed={`${frameSeed}/key`} />
+        <Ink d={P2.keyD} width={Math.max(1.6, Math.min(2.2, g.keyInset * 0.2))} color={C.keyline} taper={false} vary={0} seed={`${frameSeed}/key`} graphic />
         <Fill d={P2.screwD} color={C.screw} offset={false} seed={`${frameSeed}/screw`} />
         <Ink d={P2.slotD} width={Math.max(0.9, P2.sr * 0.34)} color={C.screwSlot} taper={false} vary={0} seed={`${frameSeed}/slot`} />
         {menu}
@@ -678,6 +680,7 @@ export const StatementBoard: React.FC<StatementBoardProps> = ({
     </>
   );
 };
+export const StatementBoard = tiered('support', {tone: BOARD_COLORS.frame}, StatementBoardBody);
 
 // ---------------------------------------------------------------- presets: layouts (baselines = dy from the face top)
 
@@ -755,12 +758,13 @@ export function dealContent(g: BoardGeom, purposeAt?: number, f12At?: number): {
 
 /** S6's deal board (the record): at the cut the frame, the tag, the FULL clause and the credit are up; the purpose
  *  line pops ON "any"; the F12 line pops on "veto"; the board clacks on the cut. No party named, no "Google" (V2). */
-export const DealBoard: React.FC<DealBoardProps> = ({face = S6_FACE, legsTo = S6_LEGS_Y1, t0 = 0, purposeAt, f12At, clackAt, seed = 'deal', ...rest}) => {
+const DealBoardBody: React.FC<DealBoardProps> = ({face = S6_FACE, legsTo = S6_LEGS_Y1, t0 = 0, purposeAt, f12At, clackAt, seed = 'deal', ...rest}) => {
   useCaptionFont();
   const g = useMemo(() => boardFrame(face, 40, 20, legsTo), [face.x0, face.y0, face.x1, face.y1, legsTo]);
   const c = dealContent(g, purposeAt ?? t0 + DEAL_T.purpose, f12At ?? t0 + DEAL_T.f12);
   return <StatementBoard face={face} legsTo={legsTo} clackAt={clackAt ?? t0 + DEAL_T.clack} lines={c.lines} rules={c.rules} seed={seed} {...rest} />;
 };
+export const DealBoard = tiered('support', {}, DealBoardBody);
 
 // ---- 2. Google's board (S7)
 
@@ -800,7 +804,7 @@ export function googleContent(g: BoardGeom, T: {header?: number; credit?: number
 }
 
 /** S7's GOOGLE SAYS board at B: the header pops with the clack, then Google's own words pen on, as heard. */
-export const GoogleBoard: React.FC<GoogleBoardProps> = ({face = B, legsTo = B_LEGS_Y1, t0 = 0, headerAt, creditAt, follows, principles, smallAt, bans, anyKind, clackAt, seed = 'google', ...rest}) => {
+const GoogleBoardBody: React.FC<GoogleBoardProps> = ({face = B, legsTo = B_LEGS_Y1, t0 = 0, headerAt, creditAt, follows, principles, smallAt, bans, anyKind, clackAt, seed = 'google', ...rest}) => {
   useCaptionFont();
   const g = useMemo(() => boardFrame(face, 40, 20, legsTo), [face.x0, face.y0, face.x1, face.y1, legsTo]);
   const h = headerAt ?? t0 + GOOGLE_T.header;
@@ -815,6 +819,7 @@ export const GoogleBoard: React.FC<GoogleBoardProps> = ({face = B, legsTo = B_LE
   });
   return <StatementBoard face={face} legsTo={legsTo} clackAt={clackAt ?? h} lines={c.lines} rules={c.rules} seed={seed} {...rest} />;
 };
+export const GoogleBoard = tiered('support', {}, GoogleBoardBody);
 
 // ---- 3. her board (S8)
 
@@ -857,7 +862,7 @@ export function herContent(g: BoardGeom, T: {header?: number; quote1?: Span; quo
 /** S8's SHE SAYS board (the cafe boat's quote-of-the-day A-board; the same face as Google's): the header over a
  *  half-wiped menu; ONE cloth stroke wipes it clean; her quote pen-draws on, with its credit. The cafe owner and the
  *  cloth are L6's figure: hold the cloth on `wipeEdgeX(face, wipe, t)`. */
-export const HerBoard: React.FC<HerBoardProps> = ({
+const HerBoardBody: React.FC<HerBoardProps> = ({
   face = B,
   legsTo = B_LEGS_Y1,
   t0 = 0,
@@ -896,6 +901,7 @@ export const HerBoard: React.FC<HerBoardProps> = ({
     />
   );
 };
+export const HerBoard = tiered('support', {}, HerBoardBody);
 
 /** HerBoard's wipe for the same props (the object HerBoard uses): a cloth follows `wipeEdgeX(face, herWipe({...}), t)`
  *  drawn in the board's own coordinates (inside the same transform as the board). */
@@ -937,12 +943,13 @@ export function bbcContent(g: BoardGeom): {lines: BoardLine[]; rules: BoardRule[
 
 /** S2's newsstand A-board TOLD THE BBC (face S2.aBoard 400 x 200; the same face and type, smaller frame); already
  *  there: L2 slides it out with its own transform at 8.44. */
-export const ToldTheBBCBoard: React.FC<ToldTheBBCBoardProps> = ({face = S2.aBoard, legsTo = S2_LEGS_Y1, stile = 26, rail = 16, seed = 'bbc', t0: _t0, ...rest}) => {
+const ToldTheBBCBoardBody: React.FC<ToldTheBBCBoardProps> = ({face = S2.aBoard, legsTo = S2_LEGS_Y1, stile = 26, rail = 16, seed = 'bbc', t0: _t0, ...rest}) => {
   useCaptionFont();
   const g = useMemo(() => boardFrame(face, stile, rail, legsTo, BBC_FRAME), [face.x0, face.y0, face.x1, face.y1, legsTo, stile, rail]);
   const c = bbcContent(g);
   return <StatementBoard face={face} legsTo={legsTo} stile={stile} rail={rail} frame={BBC_FRAME} lines={c.lines} rules={c.rules} seed={seed} {...rest} />;
 };
+export const ToldTheBBCBoard = tiered('support', {}, ToldTheBBCBoardBody);
 
 // ---------------------------------------------------------------- the presets' geometry (for figures, Pip, a cloth)
 

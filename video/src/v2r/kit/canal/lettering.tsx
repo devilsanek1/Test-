@@ -8,6 +8,7 @@ import {CM} from '../../palette';
 import {Ink} from '../../../lib/Ink';
 import {useTime, springAt, springs} from '../../../lib/time';
 import {XG, mat} from '../../../lib/xf';
+import {tiered} from '../tiers';
 
 type Glyph = {d: string; adv: number};
 
@@ -48,8 +49,9 @@ export type HandLetteredProps = {
   shear?: number;
 };
 
-/** "Google", hand-lettered in ink, letter by letter. */
-export const HandLetteredGoogle: React.FC<HandLetteredProps> = ({cx, baseline, cap, at, each = 0.06, draw = false, width, color = CM.ink, shear = 0}) => {
+/** "Google", hand-lettered in ink, letter by letter. Clean pen: the letters are `graphic` (lettering keeps its ink and
+ *  weight on every tier, like captions: never thinned or tinted away). */
+const HandLetteredGoogleBody: React.FC<HandLetteredProps> = ({cx, baseline, cap, at, each = 0.06, draw = false, width, color = CM.ink, shear = 0}) => {
   const t = useTime();
   const k = cap / 38;
   const total = googleWidth(cap);
@@ -65,9 +67,10 @@ export const HandLetteredGoogle: React.FC<HandLetteredProps> = ({cx, baseline, c
     const m = mat.compose(mat.translate(gx, baseline), [1, 0, -shear, 1, 0, 0], mat.scale(k), mat.about(mat.scale(s), g.adv / 2, -15));
     out.push(
       <XG key={i} m={m}>
-        <Ink d={g.d} width={w / k} color={color} seed={`goog${i}`} at={draw ? la : undefined} vary={0.04} taper={false} />
+        <Ink d={g.d} width={w / k} color={color} seed={`goog${i}`} at={draw ? la : undefined} vary={0.04} taper={false} graphic />
       </XG>,
     );
   });
   return <>{out}</>;
 };
+export const HandLetteredGoogle = tiered('environment', {}, HandLetteredGoogleBody);

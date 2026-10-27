@@ -19,6 +19,7 @@ import {S2} from '../../world/map';
 import {Model} from './body';
 import {Person, Seated} from './People';
 import {Traits} from './traits';
+import {tieredAll} from '../tiers';
 
 /** Silhouette colour of the staff (a cool slate against the cooler white panes). */
 export const STAFF_SIL = CM.paneUnlit;
@@ -54,7 +55,7 @@ export type BlindProps = {
 };
 
 /** A Venetian blind dropping inside a pane: slats as hair lines, an ink bottom rail, a cord. */
-export const Blind: React.FC<BlindProps> = ({x, y, w, h, keys, color = BLIND, seed = 'blind'}) => {
+const BlindBody: React.FC<BlindProps> = ({x, y, w, h, keys, color = BLIND, seed = 'blind'}) => {
   const t = useTime();
   const k = blindAt(t, keys);
   if (k <= 0.005) return null;
@@ -73,6 +74,7 @@ export const Blind: React.FC<BlindProps> = ({x, y, w, h, keys, color = BLIND, se
     </g>
   );
 };
+export const Blind = tieredAll('support', {lines: true}, BlindBody);
 
 export type StaffWindowProps = {
   /** Pane CENTRE and size (map.ts Spot). */
@@ -94,7 +96,7 @@ export type StaffWindowProps = {
 };
 
 /** One staff window: the cooler pane, a standing silhouette cut by the sill, the step back, the blind. */
-export const StaffWindow: React.FC<StaffWindowProps> = ({x, y, w, h, seed, lightAt, backAt, blind = [], pane = true, paneBefore = CM.lamp}) => {
+const StaffWindowBody: React.FC<StaffWindowProps> = ({x, y, w, h, seed, lightAt, backAt, blind = [], pane = true, paneBefore = CM.lamp}) => {
   const t = useTime();
   const uid = 'sw' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const x0 = x - w / 2;
@@ -144,10 +146,11 @@ export const StaffWindow: React.FC<StaffWindowProps> = ({x, y, w, h, seed, light
     </ExitSync>
   );
 };
+export const StaffWindow = tieredAll('support', {lines: true}, StaffWindowBody);
 
 /** S2's five staff windows, timed from the map (lights 0.04 s apart from 8.96; blinds to half 0.085 s apart from 10.26;
  *  W2 fully down at 12.20). `toScreen` maps a window spot through the shot's camera if the lane draws in screen space. */
-export const StaffWindows: React.FC<{pane?: boolean}> = ({pane = true}) => (
+const StaffWindowsBody: React.FC<{pane?: boolean}> = ({pane = true}) => (
   <>
     {S2.staffWindows.map((s, i) => {
       const keys: BlindKey[] = [{t: S2.blindsAt + i * S2.blindsStagger, k: 0.5}];
@@ -156,6 +159,7 @@ export const StaffWindows: React.FC<{pane?: boolean}> = ({pane = true}) => (
     })}
   </>
 );
+export const StaffWindows = tieredAll('support', {lines: true}, StaffWindowsBody);
 
 // ---------------------------------------------------------------- the bench
 
@@ -188,12 +192,13 @@ export type StafferProps = {
   seed?: string;
 };
 
-export const Staffer: React.FC<StafferProps> = ({x, y, h = 190, turnAt = S2.notebookOpenAt, toward = -1, hoodAt = S2.hoodAt, at, seed = 'staffer'}) => {
+const StafferBody: React.FC<StafferProps> = ({x, y, h = 190, turnAt = S2.notebookOpenAt, toward = -1, hoodAt = S2.hoodAt, at, seed = 'staffer'}) => {
   const t = useTime();
   const turn = toward * 0.7 * ease.inOutCubic(clamp((t - turnAt) / 0.25));
   const hood = clamp((t - hoodAt) / 0.2);
   return <Seated x={x} y={y} h={h} seed={seed} traits={STAFFER} model={{...STAFFER, hoodUp: hood > 0 ? ease.outCubic(hood) : undefined}} turn={turn} at={at} />;
 };
+export const Staffer = tieredAll('support', {lines: true}, StafferBody);
 
 export const REPORTER: Partial<Traits> & Partial<Model> = {
   hair: 'crop',
@@ -220,11 +225,12 @@ export type ReporterProps = {
   seed?: string;
 };
 
-export const Reporter: React.FC<ReporterProps> = ({x, y, h = 168, openAt = S2.notebookOpenAt, shutAt = S2.notebookShutAt, side = 1, at, seed = 'reporter'}) => {
+const ReporterBody: React.FC<ReporterProps> = ({x, y, h = 168, openAt = S2.notebookOpenAt, shutAt = S2.notebookShutAt, side = 1, at, seed = 'reporter'}) => {
   const t = useTime();
   let k = ease.outCubic(clamp((t - openAt) / 0.18));
   if (t >= shutAt) k = 1 - ease.inCubic(clamp((t - shutAt) / 0.08));
   return <Seated x={x} y={y} h={h} seed={seed} traits={REPORTER} model={REPORTER} notebook={k} side={side} at={at} />;
 };
+export const Reporter = tieredAll('support', {lines: true}, ReporterBody);
 
 export {STAFF_SIL as STAFF_SILHOUETTE};

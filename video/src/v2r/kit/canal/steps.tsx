@@ -13,6 +13,7 @@ import {copingInto} from './water';
 import {CastSlot, PersonSlot} from './slots';
 import {Puffs} from './life';
 import * as MAP from '../../world/map';
+import {tiered} from '../tiers';
 
 /** Nosing lines (screen y) of the S1 steps, far to near; the landing runs from the coping to the first. */
 export const S1_STEPS = {
@@ -55,7 +56,7 @@ export type StepsProps = {
 
 /** The S1 steps: coping, landing, five treads with nosings and joints converging on the far bank, the bollard, the
  *  props, and the seated public. */
-export const Steps: React.FC<StepsProps> = ({people = true, acts = [], seed = 'steps'}) => {
+const StepsBody: React.FC<StepsProps> = ({people = true, acts = [], seed = 'steps'}) => {
   const S = S1_STEPS;
   const stone = useMemo(() => {
     const b = new Batch();
@@ -103,7 +104,7 @@ export const Steps: React.FC<StepsProps> = ({people = true, acts = [], seed = 's
     const seat = MAP.S1_BOLLARD;
     bollardInto(b, seat.x, seat.y + 44, 46, `${seed}/bollard`);
     // a mooring ring set in the coping
-    b.ink(`M${P(300, 1226)}A9 6 0 1 0 ${P(318, 1226)}A9 6 0 1 0 ${P(300, 1226)}`, INK_PX.far);
+    b.ink(`M${P(300, 1226)}A9 6 0 1 0 ${P(318, 1226)}A9 6 0 1 0 ${P(300, 1226)}`, INK_PX.far, CM.ink, 0, {thing: true});
     b.layer();
     // props on the treads: cups, a tote, a backpack, a book, a bike leaning (cut by the bottom-right)
     const cup = (x: number, y: number, s: number, col = CM.paper) => {
@@ -119,7 +120,7 @@ export const Steps: React.FC<StepsProps> = ({people = true, acts = [], seed = 's
     cup(900, 1618, 34);
     // a tote bag and a backpack
     b.fill(CM.coatOat, `M${P(395, 1360)}L${P(430, 1360)}L${P(433, 1324)}L${P(392, 1324)}Z`);
-    b.ink(`M${P(400, 1326)}Q${P(412, 1306)} ${P(424, 1326)}`, INK_PX.far, CM.line);
+    b.ink(`M${P(400, 1326)}Q${P(412, 1306)} ${P(424, 1326)}`, INK_PX.far, CM.line, 0, {thing: true});
     b.fill(CM.coatSlate, `M${P(660, 1622)}L${P(724, 1622)}L${P(728, 1560)}Q${P(694, 1532)} ${P(658, 1560)}Z`);
     b.rect(CM.coatMustard, 670, 1582, 46, 8);
     // a book lying open
@@ -163,3 +164,4 @@ export const Steps: React.FC<StepsProps> = ({people = true, acts = [], seed = 's
     </>
   );
 };
+export const Steps = tiered('environment', {}, StepsBody);

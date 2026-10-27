@@ -11,6 +11,11 @@
 // it sits) and the screen-right ear root. Interior lines only where a part lies over another (an ear over the head,
 // the trunk over the face, a leg over the belly); marks for the leaf midrib, the knit ribs, the tuft. Flat fills sit
 // 3 px right / 2 px down of the line (2 px at 44 px). Ink stays the same width on screen at every size.
+// CLEAN PEN (src/v2r/pen.ts; default tier 'support' with its lines, CRAFT §b: the mascot is B): the silhouette is ONE
+// closed uniform line (no gaps, no wobble, no taper), the interior lines where a part lies over another and the scarf,
+// midrib and haunch lines thin and same-hue, the tuft and the tail tip kept as the things they are; no knit ribs or
+// fringe ticks; fills registered exactly and calmed by the tier (C* <= 25 on support); line width and colour by the tier
+// (support: 1.6-2.2 px at the body's own L* -20; subject: 3.0 px at L* -35; environment: no line but the tuft).
 
 import React from 'react';
 import {Seed} from '../../../lib/rng';
@@ -23,6 +28,9 @@ import {applyIdle, IdleOpts} from './idle';
 import {FACING, FacingName, PoseName, poseParams} from './poses';
 import {aimAt} from './motion';
 import {PIP_INK, pipFill} from './colours';
+import {isClean, PEN, tierFill, tierLineColor, tierWidth, type Tier} from '../../../lib/pen';
+import {scopeLine, useLocalScale, useTierScope} from '../../../lib/tier';
+import {tiered} from '../tiers';
 
 export type PipPaint = 'colour' | 'paper' | 'look';
 
@@ -85,7 +93,7 @@ export function resolveParams(p: PipProps, t: number, headScreen?: V2): PosePara
   return q;
 }
 
-export const Pip: React.FC<PipProps> = (props) => {
+const PipBody: React.FC<PipProps> = (props) => {
   const tNow = useTime();
   const ctxExit = useExit();
   const look = useLook();
@@ -119,6 +127,7 @@ export const Pip: React.FC<PipProps> = (props) => {
     />
   );
 };
+export const Pip = tiered('support', {lines: true}, PipBody);
 
 export const defaultInk = (size: number) => lerp(2.3, 3.4, clamp((size - 44) / 40));
 
@@ -143,13 +152,40 @@ export type PipDrawingProps = {
 
 const OPAQUE = new Set(['body', 'shade', 'scarf']);
 
-export const PipDrawing: React.FC<PipDrawingProps> = ({x, y, size, params, squash = 0, rotate = 0, draw = 1, exit = 0, paint = 'colour', inkPx, seed = 'pip', drawInk = true, yaws}) => {
+const PipDrawingBody: React.FC<PipDrawingProps> = ({x, y, size, params, squash = 0, rotate = 0, draw = 1, exit = 0, paint = 'colour', inkPx, seed = 'pip', drawInk = true, yaws}) => {
+  const scope = useTierScope();
+  const local = useLocalScale();
   if (draw <= 0 || exit >= 1) return null;
-  const out = drawPip({x, y, size, params, squash, rotate, draw, exit, paint, inkPx: inkPx ?? defaultInk(size), seed: String(seed), drawInk, yaws});
+  const ink = inkPx ?? defaultInk(size);
+  const clean = isClean() ? cleanPip(scope, ink, local) : null;
+  const out = drawPip({x, y, size, params, squash, rotate, draw, exit, paint, inkPx: ink, seed: String(seed), drawInk, yaws, clean});
   return <g>{out}</g>;
 };
+export const PipDrawing = tiered('support', {lines: true}, PipDrawingBody);
 
-type DrawArgs = Required<Omit<PipDrawingProps, 'seed' | 'yaws'>> & {seed: string; yaws?: {body: number; head: number}};
+/** The clean pen's look for Pip on a tier: calmer fills, which lines are drawn, their width and their colour. */
+type CleanPip = {
+  tier: Tier;
+  fill: (c: string) => string;
+  /** The silhouette (closed) and the open lines (interior, scarf, midrib, haunch) are drawn here. */
+  contours: boolean;
+  strokes: boolean;
+  /** Clean width (local px) of a line authored `w` local px wide. */
+  width: (w: number) => number;
+  color: string;
+  alpha: number;
+};
+
+function cleanPip(scope: ReturnType<typeof useTierScope>, inkPx: number, local: number): CleanPip {
+  const sl = scopeLine(scope);
+  const bg = scope?.bg ?? PEN.bg;
+  const fill = (c: string) => tierFill(c, sl.tier, bg);
+  const lc = tierLineColor(sl.tier, fill(pipFill('body')));
+  void inkPx;
+  return {tier: sl.tier, fill, contours: sl.contours, strokes: sl.strokes, width: (w: number) => tierWidth(w * local, sl.tier) / Math.max(1e-6, local), color: lc.color, alpha: lc.alpha};
+}
+
+type DrawArgs = Required<Omit<PipDrawingProps, 'seed' | 'yaws'>> & {seed: string; yaws?: {body: number; head: number}; clean?: CleanPip | null};
 
 function hashSeed(s: string): number {
   let h = 2166136261;
@@ -159,6 +195,7 @@ function hashSeed(s: string): number {
 
 function drawPip(a: DrawArgs): React.ReactNode[] {
   const {x, y, size, params, draw, exit, paint, inkPx, seed, drawInk} = a;
+  const cl = a.clean ?? null;
   const lod: 0 | 1 = size < 58 ? 0 : 1;
   const g: PipGeom = buildPip(params, {lod, px: size, yaws: a.yaws});
   const s = size / MODEL_H;
@@ -211,7 +248,7 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
   const loopS: V2[] = loopM.map(M);
   // hand wobble: a slow seeded offset along the normal, keyed to the angle round the centre (static per seed)
   const cM = M([(g.box[0] + g.box[2]) / 2, (g.box[1] + g.box[3]) / 2]);
-  const wob = 0.45 * (size / 96);
+  const wob = cl ? 0 : 0.45 * (size / 96);
   const n = loopS.length;
   const wobbled: V2[] = loopS.map((p, i) => {
     const a0 = loopS[(i - 1 + n) % n];
@@ -238,7 +275,8 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
     gaps.push([bi, seated ? bodyW * 0.16 : bodyW * 0.07]);
     if (lod) gaps.push([nearestIndex(wobbled, M(g.earRootRight)), Math.max(1.6, headW * 0.035)]);
   }
-  const contourPieces = n > 8 ? cutGaps(wobbled, gaps) : [];
+  // clean: ONE closed line (no gaps): the loop returns to its first point
+  const contourPieces = n > 8 ? (cl ? [[...wobbled, wobbled[0]]] : cutGaps(wobbled, gaps)) : [];
   // split further where a part in front (a scarf tail, the tail) covers the silhouette
   const nonUnionFront = parts.filter((p) => !p.union && p.fill && OPAQUE.has(p.fill));
   const ownerLayer = (qS: V2, tS: V2): number => {
@@ -264,7 +302,9 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
     if (cur.length > 1) runs.push(cur);
     return runs.filter((r) => polyLen(r) >= minLen);
   };
-  const strokes: {pts: V2[]; w: number; phase: number; order: number}[] = [];
+  // cls: 'contour' (the silhouette, islands), 'line' (interior, holes, own outlines, scarf / midrib / haunch marks),
+  // 'thing' (the tuft, the tail tip: kept on every tier under the clean pen)
+  const strokes: {pts: V2[]; w: number; phase: number; order: number; cls: 'contour' | 'line' | 'thing'}[] = [];
   contourPieces.forEach((piece, k) => {
     const runs = nonUnionFront.length
       ? splitHidden(piece, (p, i) => {
@@ -275,7 +315,7 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
           return false;
         }, 2)
       : [piece];
-    for (const r of runs) strokes.push({pts: r, w: wC, phase: sd * 6 + k, order: 0});
+    for (const r of runs) strokes.push({pts: r, w: wC, phase: sd * 6 + k, order: 0, cls: 'contour'});
   });
 
   // islands (a raised trunk tip beyond the head) and holes (inside the trunk's curl): their own closed lines
@@ -285,11 +325,12 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
     const pts = L.map(M);
     const c = centroid(L);
     const hole = inPoly(c[0], c[1], loopM);
-    if (hole) strokes.push({pts: [...pts, pts[0]], w: wC * 0.74, phase: sd * 7 + i, order: 1});
+    if (hole) strokes.push({pts: [...pts, pts[0]], w: wC * 0.74, phase: sd * 7 + i, order: 1, cls: 'line'});
     else {
       let top = 0;
       for (let k = 1; k < pts.length; k++) if (pts[k][1] < pts[top][1]) top = k;
-      for (const piece of cutGaps(pts, [[top, Math.max(1.5, 3 * s)]])) strokes.push({pts: piece, w: wC, phase: sd * 7 + i, order: 0});
+      if (cl) strokes.push({pts: [...pts, pts[0]], w: wC, phase: sd * 7 + i, order: 0, cls: 'contour'});
+      else for (const piece of cutGaps(pts, [[top, Math.max(1.5, 3 * s)]])) strokes.push({pts: piece, w: wC, phase: sd * 7 + i, order: 0, cls: 'contour'});
     }
   }
 
@@ -312,8 +353,8 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
       3 / s,
     );
     for (const r of runs) {
-      const rs = trimEnds(r.map(M), 0.9);
-      if (rs.length > 1) strokes.push({pts: rs, w: wC * 0.74, phase: sd * 9 + p.layer, order: 1});
+      const rs = cl ? r.map(M) : trimEnds(r.map(M), 0.9);
+      if (rs.length > 1) strokes.push({pts: rs, w: wC * 0.74, phase: sd * 9 + p.layer, order: 1, cls: 'line'});
     }
   }
   // ---------------- own outlines (scarf tails, knot, tail): thin, hidden under what is in front
@@ -321,18 +362,19 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
     if (!p.ownOutline) continue;
     const ol = resample([...p.shape.outline, p.shape.outline[0]], Math.max(0.5, 0.9 / s));
     const runs = splitHidden(ol, (q) => hiddenAt(q, p.layer, p.group, p), 2.5 / s);
-    for (const r of runs) strokes.push({pts: r.map(M), w: wC * 0.62, phase: sd * 3 + p.layer, order: 1});
+    for (const r of runs) strokes.push({pts: r.map(M), w: wC * 0.62, phase: sd * 3 + p.layer, order: 1, cls: 'line'});
   }
   // ---------------- marks: midribs, ribs, tuft, fringe, the tail tip
   for (const m of g.marks) {
-    if (lod === 0 && (m.kind === 'rib' || m.kind === 'fringe')) continue;
+    if ((lod === 0 || cl) && (m.kind === 'rib' || m.kind === 'fringe')) continue; // clean: no knit ribs or fringe ticks
     const pts = resample(m.pts, Math.max(0.4, 0.8 / s));
     const runs = splitHidden(pts, (q) => hiddenAt(q, m.layer, m.group), 1.6 / s);
-    for (const r of runs) strokes.push({pts: r.map(M), w: wC * m.w, phase: sd * 5 + m.layer, order: m.kind === 'tuft' ? 2 : 1});
+    const cls = m.kind === 'tuft' || m.kind === 'tailtuft' ? 'thing' : 'line';
+    for (const r of runs) strokes.push({pts: r.map(M), w: wC * m.w, phase: sd * 5 + m.layer, order: m.kind === 'tuft' ? 2 : 1, cls});
   }
 
   // ---------------- fills (layer order), misregistered
-  const off: V2 = size >= 80 ? [3, 2] : [lerp(2, 3, clamp((size - 44) / 36)), lerp(1.5, 2, clamp((size - 44) / 36))];
+  const off: V2 = cl ? [0, 0] : size >= 80 ? [3, 2] : [lerp(2, 3, clamp((size - 44) / 36)), lerp(1.5, 2, clamp((size - 44) / 36))];
   const fills = parts.filter((p) => p.fill).sort((p, q) => p.layer - q.layer);
   // build / un-build scales per fill class
   const easeOut = (k: number) => 1 - Math.pow(1 - clamp(k), 3);
@@ -357,7 +399,8 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
       const cls = classOf(p);
       const k = cls === 'core' ? kCore : cls === 'scarf' ? kScarf : kDecal;
       if (k <= 0.001) return;
-      const colour = paint === 'paper' ? (p.fill === 'eye' ? ink : pipFill('paper')) : p.fillMix ? mixHex(pipFill(p.fill!), pipFill('shade'), p.fillMix) : pipFill(p.fill!);
+      const colour0 = paint === 'paper' ? (p.fill === 'eye' ? ink : pipFill('paper')) : p.fillMix ? mixHex(pipFill(p.fill!), pipFill('shade'), p.fillMix) : pipFill(p.fill!);
+      const colour = cl ? cl.fill(colour0) : colour0;
       if (paint === 'paper' && (p.fill === 'inner' || p.fill === 'sole' || p.fill === 'cheek' || p.fill === 'glint')) return;
       const d = polyPath(p.shape.outline.map((q) => {
         const m = M(q);
@@ -397,6 +440,8 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
     const pL = draw >= 1 ? 1 : clamp((draw - 0.4) / 0.4);
     let before = 0;
     let dInk = '';
+    // clean pen: uniform round-capped strokes, grouped by width (the tier decides which classes are drawn)
+    const cleanD = new Map<string, string>();
     strokes.forEach((st) => {
       const L = polyLen(st.pts);
       let upto = L;
@@ -406,10 +451,24 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
       } else upto = pL * L;
       if (upto <= 0.3) return;
       const from = retract > 0 ? smooth(retract) * L : 0;
+      if (cl) {
+        if (st.cls === 'contour' && !cl.contours) return;
+        if (st.cls === 'line' && !cl.strokes) return;
+        const dd = polyD(st.pts, from, upto);
+        if (!dd) return;
+        const key = cl.width(st.w).toFixed(2);
+        cleanD.set(key, (cleanD.get(key) ?? '') + dd);
+        return;
+      }
       const dd = brushPath(st.pts, {w: st.w, phase: st.phase, swell: 0.1, pressIn: Math.min(5, L * 0.2), release: Math.min(12, L * 0.3)}, from, upto);
       if (dd) dInk += dd;
     });
     if (dInk) nodes.push(<path key="ink" d={dInk} fill={ink} />);
+    if (cl) {
+      cleanD.forEach((d, w) =>
+        nodes.push(<path key={`ink${w}`} d={d} fill="none" stroke={cl.color} strokeWidth={Number(w)} strokeOpacity={cl.alpha < 1 ? cl.alpha : undefined} strokeLinecap="round" strokeLinejoin="round" />),
+      );
+    }
   }
   return nodes;
 }
@@ -420,6 +479,35 @@ function mixHex(a: string, b: string, k: number): string {
   const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
   const c = pa.map((v, i) => Math.round(v + (pb[i] - v) * clamp(k)));
   return '#' + c.map((v) => v.toString(16).padStart(2, '0')).join('');
+}
+
+/** The window [from, upto] (arc length) of a polyline as an open SVG path; the whole of a closed loop (first point =
+ *  last) ends in Z. */
+function polyD(p: V2[], from: number, upto: number): string {
+  if (p.length < 2) return '';
+  const L = polyLen(p);
+  const a = Math.max(0, from);
+  const b = Math.min(L, upto);
+  if (b - a < 0.3) return '';
+  const f = (q: V2) => `${q[0].toFixed(2)} ${q[1].toFixed(2)}`;
+  const closed = a <= 0 && b >= L - 1e-6 && dist(p[0], p[p.length - 1]) < 0.01;
+  const at = (s: number, i: number, acc: number): V2 => {
+    const seg = dist(p[i], p[i + 1]) || 1;
+    const k = (s - acc) / seg;
+    return [p[i][0] + (p[i + 1][0] - p[i][0]) * k, p[i][1] + (p[i + 1][1] - p[i][1]) * k];
+  };
+  let d = '';
+  let acc = 0;
+  for (let i = 0; i < p.length - 1; i++) {
+    const seg = dist(p[i], p[i + 1]);
+    const s0 = acc;
+    const s1 = acc + seg;
+    acc = s1;
+    if (s1 < a || s0 > b) continue;
+    if (!d) d = `M${f(s0 >= a ? p[i] : at(a, i, s0))}`;
+    d += `L${f(s1 <= b ? p[i + 1] : at(b, i, s0))}`;
+  }
+  return closed ? d + 'Z' : d;
 }
 
 function polyLen(p: V2[]): number {
