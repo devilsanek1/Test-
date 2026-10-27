@@ -272,6 +272,11 @@ Maintenance at the end).
   "-> what we did" log, and the newest owner note wins; the full order, with the topic docs and the tie-breaks, is
   DIRECTION's intro. — ("evaluate this feedback and compact it with the overall
   stylistic direction ... the next agent should not be confused with conflicting instructions", 2026-10-27).
+- **Find the PRO way and the pro tools for every effect.** Before building a sky, depth, light, particles or any visual
+  effect, research how professional illustrators, motion designers and graphics engineers do it and which proven tools
+  exist (colour science such as OKLab interpolation, eased gradients, blue-noise dithering, proven libraries, encoder
+  settings); adopt the best, wrap it as a reusable lib + a QA check, never a hand-rolled approximation. — ("research some
+  libraries on GitHub"; "again find the pro way and tools to do it the best way you can", v2 G4, 2026-10-27).
 - **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
