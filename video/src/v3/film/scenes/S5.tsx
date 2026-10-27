@@ -25,6 +25,7 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER, Laptop, laptopGeo, Pip3, Pop, PriceTag, quadPt, Show, YouFront, type Pt} from '../kit';
 import {S5Ceiling, S5Customer, S5Panel, S5ShelfExtras, S5Wall, S5Window, type ShopBeats} from './S5_shop';
 import {S5Assistant, S5Counter, S5CounterTop} from './S5_counter';
+import {S5SlotBack, S5SlotCard, S5SlotSpots} from './S5_slot';
 
 const DUR = 11.48 - 9.48;
 /** "after" (VO 10.20). */
@@ -89,17 +90,22 @@ const S5: React.FC = () => {
   return (
     <World sky={EMBER.wall}>
       <XG m={mat.about(mat.scale(z), 520, 960)}>
-        <S5Ceiling tvSlides={[0.5, 1.56]} />
+        {/* the demo screen's ad changes well clear of the pop and the face turn (0.3-1.1 s stays still) */}
+        <S5Ceiling tvSlides={[0.15, 1.5]} />
         <S5Window />
         <S5Customer turnAt={BEATS.customerTurn} />
         <S5Panel />
+        {/* the slot waits for a laptop: an acrylic riser and empty hooks (the light and the laptop cover them) */}
+        <S5SlotBack popAt={NEW_AT} />
         {/* the display light behind the shelf: snaps on with the new laptop */}
         <Show at={NEW_AT}>
           <Fill d={blob(NEW.x, 800, 240, 188, {seed: 's5/spot1', wobble: 0.02})} color={EMBER.core} offset={false} />
         </Show>
+        <S5SlotSpots popAt={NEW_AT} />
         <S5Wall beats={BEATS} />
         <Shelf />
         <S5ShelfExtras beats={BEATS} />
+        <S5SlotCard popAt={NEW_AT} />
         <Pop at={NEW_AT} x={NEW.x} y={SHELF.y} dur={0.16} overshoot>
           <PriceTag x={newTag.x} y={newTag.y} w={TAG_W} value="$999" stringFrom={newTie} rot={TAG_ROT} seed="s5/tagNew" />
           <Laptop x={NEW.x} y={NEW.y} w={NEW.w} variant="new" label="BETTER" seed="s5/new" />
@@ -123,6 +129,8 @@ const S5: React.FC = () => {
           y={PIP_AT[1]}
           keys={[
             {t: 0, pose: 'sit-back'},
+            // the whip: a pose pop round to the front, eyes wide, the trunk thrown up toward the BETTER laptop
+            {t: PIP_WHIP, pose: 'trunk-up', expression: 'wide'},
             {t: BUY_ONE, pose: 'shrug'},
           ]}
           look={[
@@ -131,6 +139,7 @@ const S5: React.FC = () => {
             {t: BUY_ONE, v: 0},
           ]}
           lookDur={0.1}
+          jolts={[PIP_WHIP]}
           seed={5}
         />
         <S5Assistant turnAt={NEW_AT + 0.3} />

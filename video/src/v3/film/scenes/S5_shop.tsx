@@ -38,8 +38,9 @@ import {
   personGeo,
   rings,
   sway,
+  winterPersonMat,
 } from '../kit';
-import type {PersonMove, Pt} from '../kit';
+import type {PersonMove, Pt, WinterPersonProps} from '../kit';
 
 // ---------------------------------------------------------------- geometry (canvas px at camera rest)
 
@@ -58,6 +59,9 @@ const PLANK = 958;
 const LOW = 1262;
 /** The shop's warm wood shade (kraft boxes, cork). */
 const KRAFT = '#C98A64';
+/** The kraft box's lit top face and its shade side (one flat step each way). */
+const KRAFT_LIGHT = '#DDA27C';
+const KRAFT_DARK = '#A9694B';
 /** One flat step under the near wall (shelf backs, the pegboard holes). */
 const WALL_SHADE = '#E2BFA5';
 
@@ -247,26 +251,84 @@ export const S5Window: React.FC = () => {
   );
 };
 
-/** The customer by the window: mid-depth, back view, beanie and snowy shoulders, holding up a laptop box to read it;
- *  the box's ends show either side of the head. Head top ~905 (the plan's y 900-1400, mostly behind your shoulder). */
+/** The customer by the window: mid-depth, back view, beanie and snowy shoulders, reading a laptop box held up at the
+ *  right shoulder (between their head and your shoulder, clear of your head's ring): a real box (tilted 13 deg, its
+ *  top and side faces showing, the ink laptop icon on the face toward us, kraft so it is never the brightest shape on
+ *  the left), mittened fingers at its edges. The head is turned a quarter toward it (an ear under the beanie, a sliver of
+ *  cheek); on the pop it swings round to three-quarters, up at the new laptop (the whole cheek, the nose tip, a lash),
+ *  the body wobbles and the box dips. Box and head ride the figure's own matrix (breath, turn, lean). */
 export const S5Customer: React.FC<{turnAt: number}> = ({turnAt}) => {
   const t = useTime();
   const seed = 's5sh/cust';
   const s = 1.95;
-  const g = personGeo(seed, {torsoH: 150});
+  const torsoH = 150;
+  const g = personGeo(seed, {torsoH});
   const hip = 905 - g.headTop * s;
+  const X = 74;
   const moves: PersonMove[] = [
-    {t: turnAt, kind: 'turn', amp: 1.7},
+    {t: turnAt, kind: 'turn', amp: 2.2},
     {t: 1.62, kind: 'lean', amp: 1.2},
   ];
-  // the box rises 6 px as they read it, and dips on the turn
-  const by = 872 - ease01(t, 0.1, 0.5) * 6 + Math.abs(rings(t, [turnAt], 4, 3, 5));
+  const props: WinterPersonProps = {x: X, y: hip, s, seed, torsoH, hair: 'beanie', acc: ['scarf'], wear: ['snow'], coat: EMBER.skyLow, hat: EMBER.beam, coatDetail: ['quilt'], moves, breathe: 1.6, ink: W.mid};
+  const m = winterPersonMat(props, t);
+  const k = 1 / s;
+  const ink = W.mid * k;
+  // the box (figure-local px): centre right of the head at shoulder height; it rises a little as they read, dips and
+  // flattens on the turn
+  const turnK = ease01(t, turnAt, 0.2);
+  const bcx = (144 - X) * k;
+  const bcy = (966 - hip) * k - ease01(t, 0.1, 0.5) * 3 * k + turnK * 9 * k;
+  const ang = 13 - turnK * 5;
+  const bw = 80 * k;
+  const bh = 52 * k;
+  const dz = 8 * k; // top / side face depth
+  const box = (
+    <XG m={mat.about(mat.rotate(ang), bcx, bcy)}>
+      {/* top face, side face, the face toward us */}
+      <path d={`M${bcx - bw / 2} ${bcy - bh / 2}l${dz} ${-dz}h${bw}l${-dz} ${dz}Z`} fill={KRAFT_LIGHT} />
+      <path d={`M${bcx + bw / 2} ${bcy - bh / 2}l${dz} ${-dz}v${bh}l${-dz} ${dz}Z`} fill={KRAFT_DARK} />
+      <rect x={bcx - bw / 2} y={bcy - bh / 2} width={bw} height={bh} fill={KRAFT} />
+      <path d={`M${bcx - bw / 2} ${bcy - bh / 2}l${dz} ${-dz}h${bw}l${-dz} ${dz}M${bcx + bw / 2 + dz} ${bcy - bh / 2 - dz}v${bh}l${-dz} ${dz}`} fill="none" stroke={EMBER.ink} strokeWidth={ink * 0.8} strokeLinejoin="round" />
+      <rect x={bcx - bw / 2} y={bcy - bh / 2} width={bw} height={bh} fill="none" stroke={EMBER.ink} strokeWidth={ink} />
+      {/* the ink laptop icon and a spec sticker */}
+      <path d={`M${bcx - 15 * k} ${bcy - 14 * k}h${28 * k}v${18 * k}h${-28 * k}ZM${bcx - 21 * k} ${bcy + 9 * k}h${40 * k}`} fill="none" stroke={EMBER.ink} strokeWidth={2.2 * k} strokeLinejoin="round" strokeLinecap="round" />
+      <rect x={bcx + 20 * k} y={bcy + 12 * k} width={14 * k} height={9 * k} fill={EMBER.card} />
+      {/* mittened fingers over the edges */}
+      <path d={blob(bcx - bw / 2 + 2 * k, bcy + 8 * k, 8 * k, 12 * k, {seed: `${seed}/mL`})} fill={EMBER.beam} stroke={EMBER.ink} strokeWidth={ink * 0.8} />
+      <path d={blob(bcx + bw / 2 + 4 * k, bcy + 6 * k, 8 * k, 12 * k, {seed: `${seed}/mR`})} fill={EMBER.beam} stroke={EMBER.ink} strokeWidth={ink * 0.8} />
+      <path d={`M${bcx + bw / 2 - 3 * k} ${bcy - 4 * k}q${5 * k} ${-6 * k} ${10 * k} 0`} fill="none" stroke={EMBER.ink} strokeWidth={ink * 0.7} strokeLinecap="round" />
+    </XG>
+  );
+  // the head's turn: u 0.35 (a quarter, down at the box) -> 1 (three-quarters, up at the shelf), a 0.12 s swing
+  const u = 0.35 + 0.65 * ease01(t, turnAt, 0.12);
+  const hr = g.hr;
+  const hy = g.hy;
+  const nose = ease01(u, 0.6, 0.4);
+  const A: Pt = [hr * 0.9, hy + hr * 0.4];
+  const B: Pt = [hr * (1.0 + 0.2 * u), hy + hr * 0.64];
+  const C: Pt = [hr * (0.6 + 0.14 * u), hy + hr * 1.0];
+  const cheek = `M${A[0]} ${A[1]}Q${hr * (1.02 + 0.24 * u)} ${hy + hr * 0.42} ${B[0]} ${B[1]}Q${hr * (0.98 + 0.16 * u)} ${hy + hr * 0.94} ${C[0]} ${C[1]}Q${hr * 0.9} ${hy + hr * 0.8} ${A[0]} ${A[1]}Z`;
+  const cheekInk = `M${A[0]} ${A[1]}Q${hr * (1.02 + 0.24 * u)} ${hy + hr * 0.42} ${B[0]} ${B[1]}Q${hr * (0.98 + 0.16 * u)} ${hy + hr * 0.94} ${C[0]} ${C[1]}`;
+  const ear: Pt = [hr * (0.8 - 0.24 * u), hy + hr * 0.6];
+  const nx = hr * (1.02 + 0.22 * u);
+  const ny = hy + hr * 0.5;
   return (
     <>
-      <XG m={mat.about(mat.rotate(-4), 76, by + 30)}>
-        <LaptopBox x={-6} y={by} w={164} h={60} color={EMBER.card} seed="s5sh/custbox" ink={W.mid} />
+      <XG m={m}>{box}</XG>
+      <WinterPerson {...props} />
+      <XG m={m}>
+        <path d={cheek} fill={EMBER.reveal} />
+        <path d={cheekInk} fill="none" stroke={EMBER.ink} strokeWidth={ink} strokeLinecap="round" />
+        {nose > 0.02 ? (
+          <>
+            <path d={`M${nx - hr * 0.04} ${ny - hr * 0.06}l${hr * 0.14 * nose} ${hr * 0.1}l${-hr * 0.12 * nose} ${hr * 0.06}Z`} fill={EMBER.reveal} />
+            <path d={`M${nx - hr * 0.04} ${ny - hr * 0.06}l${hr * 0.14 * nose} ${hr * 0.1}l${-hr * 0.12 * nose} ${hr * 0.06}`} fill="none" stroke={EMBER.ink} strokeWidth={ink * 0.8} strokeLinejoin="round" strokeLinecap="round" />
+            <path d={`M${hr * (0.9 + 0.1 * u)} ${hy + hr * 0.45}l${hr * 0.13 * nose} ${-hr * 0.04}`} stroke={EMBER.ink} strokeWidth={ink * 0.8} strokeLinecap="round" />
+          </>
+        ) : null}
+        <path d={blob(ear[0], ear[1], hr * 0.15, hr * 0.21, {seed: `${seed}/ear`})} fill={EMBER.reveal} stroke={EMBER.ink} strokeWidth={ink * 0.8} />
+        <path d={`M${ear[0] + hr * 0.04} ${ear[1] - hr * 0.1}q${-hr * 0.08} ${hr * 0.1} 0 ${hr * 0.2}`} fill="none" stroke={EMBER.ink} strokeWidth={ink * 0.5} strokeLinecap="round" />
       </XG>
-      <WinterPerson x={74} y={hip} s={s} seed={seed} torsoH={150} hair="beanie" acc={['scarf']} wear={['snow']} coat={EMBER.skyLow} hat={EMBER.beam} coatDetail={['quilt']} moves={moves} breathe={1.6} ink={W.mid} />
     </>
   );
 };
