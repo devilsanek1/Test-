@@ -48,6 +48,9 @@ export const T9 = {
   nmWin: '#ECB266',
   litWall: '#C2CBE3',
   road: '#8E99C0',
+  /** The street's shade-side pavement (one step over the road; only the lamp-lit right side is bright, so the street
+   *  reads as a lit canyon, never two bright converging legs of a mast). */
+  paveShade: '#9AA5C9',
   pool: '#C9A784',
   // our roof (warm, in shade)
   deck: EMBER.brickShade,

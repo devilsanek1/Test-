@@ -82,6 +82,29 @@ const DeckFloor: React.FC = () => {
       knots += blob(kx, ky, 4 + 5 * sc, 1.6 + 2.2 * sc, {seed: `s9/knot${i}`});
     }
   }
+  // fine grain on the reach the start frame sees 5x (x ~380-610, y 1446-1530, the planks at your feet): 6 hairlines
+  // per plank there, so the close deck reads as wood, never a flat rust field; at the end they melt into the plank tone
+  let fine = '';
+  const fr = rng('s9/fineGrain');
+  for (let i = 0; i < n - 1; i++) {
+    const xb0 = x0 + ((i + 0.5) / n) * (x1 - x0);
+    const xb1 = x0 + ((i + 1.5) / n) * (x1 - x0);
+    const yb = y + h;
+    const at = (side: number, u: number): Pt => {
+      const xb = xb0 + (xb1 - xb0) * side;
+      const k = u * ((yb - y) / (yb - vp[1]));
+      return [xb + (vp[0] - xb) * k, yb + (vp[1] - yb) * k];
+    };
+    const [mx] = at(0.5, 0.95);
+    if (mx < 340 || mx > 640) continue;
+    for (let g = 0; g < 6; g++) {
+      const side = 0.12 + (g / 5) * 0.76 + fr.jitter(0.04);
+      const a = fr.range(0.82, 0.96);
+      const p0 = at(side, a);
+      const p1 = at(side + fr.jitter(0.03), Math.min(1, a + fr.range(0.025, 0.06)));
+      fine += `M${f1(p0[0])} ${f1(p0[1])}L${f1(p1[0])} ${f1(p1[1])}`;
+    }
+  }
   // drifts: along the parapet's foot, banked into the left corner (stack, vent) and against the hut
   const footDrift = smooth([[x0, y - 2], [x1, y - 2], [x1, y + 12], [760, y + 20], [600, y + 12], [420, y + 22], [200, y + 14], [x0, y + 18]], {closed: true});
   const leftDrift = smooth([[-120, 1446], [262, 1452], [286, 1490], [236, 1536], [150, 1560], [196, 1640], [120, 1760], [168, 1880], [90, 1980], [-120, 1980]], {closed: true});
@@ -122,6 +145,7 @@ const DeckFloor: React.FC = () => {
     <>
       <Fill rect={[x0, y, x1 - x0, h]} color={T9.deck} offset={false} seed="s9/floor" />
       <path d={grain} fill="none" stroke={T9.deckGrain} strokeWidth={1.3} strokeLinecap="round" />
+      <path d={fine} fill="none" stroke={T9.deckDeep} strokeWidth={0.7} strokeLinecap="round" />
       <path d={knots} fill={T9.deckGrain} />
       <Ink d={planks} width={1.6} color={T9.deckDeep} />
       <Ink d={seams} width={2.6} color={T9.deckSnow} />
