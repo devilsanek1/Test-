@@ -26,7 +26,7 @@ import {PinnedThing} from './Room';
 import {Icicles, SnowCap, SnowLayers, SnowSill, Steam} from './Weather';
 import {LampPost3} from './Street';
 import {Walker, personGeo} from './People3';
-import {tiered} from '../../../lib/tier';
+import {tiered, useTierMotion} from '../../../lib/tier';
 
 const CORK = '#C98A64';
 const KRAFT = '#C98A64';
@@ -61,6 +61,7 @@ export type CardBoardProps = {
  *  pins, glass glints, and 3-4 papers peeking out from behind the card's corners (the lost-cat flyer's tabs flutter). */
 const CardBoardBody: React.FC<CardBoardProps> = ({card, margin = 27, kind = 'notice', corners = [], flutterAt, seed = 'board', at, ink = W.mid}) => {
   const t = useTime();
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
   const x = card.x - margin;
   const y = card.y - margin;
   const w = card.w + margin * 2;
@@ -73,7 +74,7 @@ const CardBoardBody: React.FC<CardBoardProps> = ({card, margin = 27, kind = 'not
     const cx = c.corner[1] === 'l' ? card.x - iw * out : card.x + card.w - iw * (1 - out);
     const cy = c.corner[0] === 't' ? card.y - ih * out * 0.7 : card.y + card.h - ih * (1 - out);
     const rot = c.rot ?? (c.corner[1] === 'l' ? -6 : 7);
-    const fl = rings(t, flutterAt?.map((f) => f + i * 0.04), 6, 3, 3.5) + sway(t, 0.6, 3, i);
+    const fl = rings(t, flutterAt?.map((f) => f + i * 0.04), 6, 3, 3.5) + sway(t, 0.6 * km, 3, i);
     return {c, x: cx, y: cy, w: iw, h: ih, rot: rot + fl, i};
   });
   return (
@@ -255,6 +256,7 @@ export const LaptopBox = tiered('environment', {}, LaptopBoxBody);
  *  a bell over the door that rings on `bellAt`. */
 const ShopDoorBody: React.FC<{x: number; y: number; w: number; h: number; bellAt?: number[]; signX?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w, h, bellAt, signX = 0.5, seed = 'door', at, ink = W.mid}) => {
   const t = useTime();
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
   const fr = 22;
   const gx = x + fr;
   const gy = y + fr;
@@ -264,8 +266,8 @@ const ShopDoorBody: React.FC<{x: number; y: number; w: number; h: number; bellAt
   const sh = sw * 0.46;
   const sx = gx + gw * signX - sw / 2;
   const sy = gy + gh * 0.26;
-  const ang = sway(t, 4, 1.6) + rings(t, bellAt, 6, 1.4, 2);
-  const bellA = rings(t, bellAt, 18, 3.4, 3) + sway(t, 1.2, 2.2);
+  const ang = sway(t, 4 * km, 1.6) + rings(t, bellAt, 6, 1.4, 2);
+  const bellA = rings(t, bellAt, 18, 3.4, 3) + sway(t, 1.2 * km, 2.2);
   return (
     <>
       <Fill rect={[x, y, w, h]} color={EMBER.beam} at={fillAt(at)} seed={`${seed}/fr`} />
@@ -323,6 +325,7 @@ export type ShopShelvingProps = {
  *  screensaver, a router whose LEDs blink, headphones and cable packs on hooks, cream shelf talkers. */
 const ShopShelvingBody: React.FC<ShopShelvingProps> = ({x, y, w, h, shelves = 3, slot, joltAt, seed = 'shelving', at, ink = W.mid}) => {
   const t = useTime();
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
   const jolt = -Math.abs(rings(t, joltAt, 4, 5, 8));
   const plan = useMemo(() => {
     const r = rng(`shelving/${seed}`);
@@ -393,7 +396,7 @@ const ShopShelvingBody: React.FC<ShopShelvingProps> = ({x, y, w, h, shelves = 3,
     out.push(<Ink key={`pli${s}`} d={rectInk(x - 6, row.y, w + 12, 16, {seed: `${seed}/pli${s}`, over: [2, 4]})} at={at} width={ink} />);
     for (let k = 0; k < 2; k++) {
       const tx = x + 60 + k * (w * 0.45);
-      const ta = sway(t, 3, 2.6, s + k);
+      const ta = sway(t, 3 * km, 2.6, s + k);
       out.push(
         <XG key={`tk${s}${k}`} m={mat.about(mat.rotate(ta), tx + 30, row.y + 16)}>
           <Fill rect={[tx, row.y + 16, 60, 34]} color={EMBER.card} at={fillAt(at, 0.1)} offset={false} />
@@ -406,7 +409,7 @@ const ShopShelvingBody: React.FC<ShopShelvingProps> = ({x, y, w, h, shelves = 3,
   const hy = plan[plan.length - 1].y + 70;
   for (let k = 0; k < 4; k++) {
     const hx = x + 50 + k * (w - 100) / 3;
-    const sw2 = sway(t, 2, 2.8, k);
+    const sw2 = sway(t, 2 * km, 2.8, k);
     out.push(<Ink thing key={`hk${k}`} d={line(hx, hy - 20, hx, hy + 10, {over: [0, 0], seed: `${seed}/hk${k}`})} at={b(at, 0.1)} width={W.far} />);
     out.push(
       <XG key={`hg${k}`} m={mat.about(mat.rotate(sw2), hx, hy + 10)}>

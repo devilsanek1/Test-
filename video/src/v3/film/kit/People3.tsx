@@ -27,7 +27,7 @@ import {blob, circle, roundRect, smooth, torso} from '../../../lib/sketch';
 import {EMBER} from '../palette';
 import {At, Pt, TCircle, TPath, TRect} from './util';
 import {bob, loopPos, puffs, ring, shuttle, sway, windowLit, WindowForce} from './idle';
-import {tiered} from '../../../lib/tier';
+import {tiered, useTierMotion} from '../../../lib/tier';
 
 // ---------------------------------------------------------------- the winter wardrobe (Ember families only)
 
@@ -189,6 +189,7 @@ export function winterPhoneAt(p: WinterPersonProps, t: number): {top: Pt; mid: P
 const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
   const {x, y, s = 1, wear = [], acc: accIn, phoneWin, pointAt, waveAt, breathe = 2, moves = [], ink, coat, hat, bagColor, coatDetail, seed = 'wp', ...rest} = props;
   const t = useTime();
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
   const clipId = 'wp' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const pick = useMemo(() => winterPick(seed, coat, hat, bagColor), [seed, coat, hat, bagColor]);
   const g = personGeo(seed, {torsoH: rest.torsoH, legs: rest.legs});
@@ -199,7 +200,7 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
   // body colour must differ from the hair (Person also guards it)
   const hairColor = rest.hairColor ?? (pick.hair === pick.coat ? EMBER.ink : pick.hair);
   // moves: offsets in screen px
-  const {dx, dy, rot} = winterOffsets(t, moves, breathe, pick.hz, pick.ph);
+  const {dx, dy, rot} = winterOffsets(t, moves, breathe * km, pick.hz, pick.ph);
   const W = inkPx / s; // local ink
   const hy = g.hy;
   const hr = g.hr;
@@ -264,7 +265,7 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
     const bw = g.w * 0.3;
     const bh = g.w * 0.4;
     over.push(
-      <g key="clip" transform={`rotate(${(-12 + sway(t, 2, 2.4, 1)).toFixed(2)} ${cx} ${cy})`}>
+      <g key="clip" transform={`rotate(${(-12 + sway(t, 2 * km, 2.4, 1)).toFixed(2)} ${cx} ${cy})`}>
         <TPath d={`M${cx - bw / 2} ${cy}h${bw}v${bh}h${-bw}Z`} fill={EMBER.beam} />
         <TPath d={`M${cx - bw * 0.4} ${cy + bh * 0.08}h${bw * 0.8}v${bh * 0.86}h${-bw * 0.8}Z`} fill={EMBER.card} />
         <TPath d={`M${cx - bw * 0.28} ${cy + bh * 0.3}h${bw * 0.56}M${cx - bw * 0.28} ${cy + bh * 0.48}h${bw * 0.5}M${cx - bw * 0.28} ${cy + bh * 0.66}h${bw * 0.4}`} stroke={EMBER.ink} strokeWidth={W * 0.4} />

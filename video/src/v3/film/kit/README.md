@@ -90,9 +90,11 @@ theme check, which must say "0 problems").
    `Phone` + `Hand`, the building is `DataCenter` (same sign, rows of small lights, 3 roof units, snow line), the
    person is `YouFront` / `YouSeated` / `YouTiny` (dark hair, rust sweater, dusk-blue jeans), the stick is
    `MemoryStick` (gold, 4 chips). Never redraw them by hand; extend the kit (request it) instead.
-2. **Ink by depth** (screen px): front 4.8 (phone, hand, roof ledge, YouFront), mid 3.4 (sets, laptops, tags, the data
-   center), far 2.2 (town bands in the wides), hair 1.6 (details); far planes get NO ink (houses and the data center
-   behind a window, the S13 silhouette). Fills are flat and misregistered; no gradients, blur, opacity fades.
+2. **Ink by ATTENTION TIER, not by depth** (the rework, 2026-10-27; "Clean pen and tiers" below, docs/look/CRAFT.md
+   wins): the beat's subject is the only full outline (3.0 px, in its own deep shade, inside its fill); supporting life
+   has no outline (Pip: a same-hue ~2 px line); the room, the sets, the street and the town have NO line. The authored
+   widths (front 4.8, mid 3.4, far 2.2, hair 1.6) still set each piece's relative weights; the pen maps them per tier.
+   Fills are flat and registered exactly; no gradients, blur, opacity fades.
 3. **The caption band (screen y ~290-600) stays calm**: flat wall or flat sky only; no tops of buildings, roof units,
    piles or shelves' ink in it (Nook breaks the shelf upright's ink across it; the pov window's reveal starts at y 590).
    Platform UI covers the top, the bottom and the right rail (x > 950, y 900-1500): keep tags, signs and words out.
@@ -106,7 +108,8 @@ The owner on the G5 cut: "way too empty". The rules: `docs/look/LIFE_AND_DENSITY
 list: `docs/v3/density_plan_g5b.md` (§0 film-wide, §1 per panel, §2 kit list; `docs/v3/s9_scale_plan.md` wins for S9).
 Same conventions as above: canvas px at camera rest, an optional build `at` (ink first, fills `FILL_LAG` later), a
 `seed`; **every idle motion is a pure function of scene seconds** (60 fps moves every frame; only drawn poses step:
-`stepped()`), deterministic, flat fills, **no opacity** (things pop, shrink to nothing, or sweep), ink by depth.
+`stepped()`), deterministic, flat fills, **no opacity** (things pop, shrink to nothing, or sweep), ink by tier (the
+clean pen below: dressing and ambient life are tier C, no line; their idle amplitudes scale with `useTierMotion()`).
 Dressing never takes the hero orange or the blue pop; it lives in the room (warm) and outside (dusk-blue) families.
 Sheet: KitSheet3 (2160 x 9600, two columns; screens 4-10 are this kit), or alone: `npx remotion still
 src/entry-v3-kit.tsx KitSheetLife out.png --frame=90 --scale=0.5`; two dressed density-test frames at full size:
@@ -198,3 +201,82 @@ compositions `KitLifeO1`, `KitLifeS4` (kit pieces at the plan's places; the lane
 | `TownHouse`, `TownRow` | five types, never one stamped shape: cottage, terrace (a dormer run), block (balconies, a dish), mansard, shop (awning, lit sign); windows switching, chimneys smoking, antennas; `far` = fill only. A row cycles a seeded shuffle of the types, +-15 % widths, stepped heights. For the S9 lane's MidTown / FarField bands. |
 | `RoofNeighbour`, `Pennant`, `RoofAerials` | a shoveller on a 4-drawing loop (snow puff on the throw) or a balcony light-hanger (30-60 px); a pennant at 1.5-2 Hz. |
 | `FoldingChair`, `SideTable`, `LaundryLine`, `Shovel` | S9's deck: a snow cushion, a steaming mug, laundry that sways, a shovel leaning. (No tram: the S9 scale plan drops it.) |
+
+# Clean pen and tiers (the rework before publishing, 2026-10-27)
+
+The owner on G5b: "too busy ... too rough and messy, a lot of rough lines, not looking clean at all ... cleaner, more
+refined, gentle ... premium"; supporting life "a bit more subtle but yet alive". The spec is `docs/look/CRAFT.md` §b-§c
+(it wins over this page); the measurements behind it are the v3 retro (`docs/retro/2026-10-27_v3_retro.md`). The code:
+`lib/pen.ts` (the switch, the tier values, the colour maths), `lib/tier.tsx` (the scopes and hooks), the strict
+geometry in `lib/sketch.ts`, the clean paths in `lib/Ink.tsx` / `lib/Fill.tsx` / `lib/mascot/Elephant.tsx`. **All of it is
+opt-in**: `src/v3/film/look.ts` calls `setPen('clean', {bg: EMBER.wall, emissive: V3_EMISSIVE})` and is imported right
+after `../palette` by `src/entry-v3-film.tsx`, `src/entry-v3-kit.tsx` and this kit's barrel. Every other entry keeps the
+sketch pen (v1, v2 and v2r frames checked pixel-identical before and after).
+
+## The pen (every line, every tier)
+
+- One subpath per shape: `rect()` / closed `poly()` / `ellipse()` / `circle()` end in `Z` (round joins), a rect's partial
+  `edges` are one joined stroke per run; straight edges ruler-true (no bow, drift, jitter, overshoot or breaks);
+  loops are true ellipses (wobble <= 0.01 only when asked) and sit exactly on their `blob()` fill; `glint()` is one
+  light stroke; `hatch`, `scribbleMass`, `wallTicks`, `crownTicks`, `speedLines`, `scribble`, `cross` draw nothing.
+- `<Ink>`: uniform round-capped strokes (no taper, width noise, open contours or loosening on the un-build); width and
+  colour from the tier (below). `<Fill>`: registered exactly (authored offsets included); calmer tiers recoloured.
+- Kit texture that is strokes is gone under the clean pen: `DeskGrain`, `WallMarks`, the frost star ticks, the mug's
+  ink steam, the NEW laptop's sparkle crosses, a flying stick's speed ticks, a small stick's pin row; the laptop's key
+  rows are flat tone-on-tone caps (`heroDeep`; the S8 close-up keeps its anchor caps).
+
+## The tiers (by story role, never by depth)
+
+| tier | line (screen px, at camera rest) | fill | idle motion |
+|---|---|---|---|
+| `subject` (A: the beat's 1-3 objects) | the only full outline: authored x0.88, 1.2-3.0 (3.4 -> 3.0, 2.2 -> 1.9, 1.6 -> 1.4) in the object's own shade (tone L* -35, floor 16; no tone: `#4B2A1E`); an outline given `inside` is drawn inside its fill at 2x (the silhouette is the fill's clean edge) | as authored | x1 |
+| `support` (B: supporting life, story objects off-beat) | none, unless the scope says `lines` (close values touch; the mascot): same-hue x0.53, 1.4-2.2 at tone L* -20 (no tone: `#5A2E1E` at 42 %) | value pulled 8 % to the background's, chroma x0.9 (<= 40), hue kept | x0.5 |
+| `environment` (C: the room, sets, dressing, street, town, weather) | none; strokes marked `thing` (wires, rails, frames, a bird's V) as hairlines 1.2-1.6 (`#5A2E1E` at 34 %, about dL* 15) | value pulled 16 % to the background's, chroma x0.85 (<= 36), hue kept | x0.4 |
+
+On every tier: a LIGHT line (ink lighter than L* 64: glints, snow edges) stays light and <= 1.8 px; a GRAPHIC stroke
+(>= 6 px, or dashed) keeps its width and colour (the lamp rod, a mug handle, the chart line); backdrops (>= ~30 % of the
+frame, camera excluded, or `<Fill backdrop>`) and emissive colours (`V3_EMISSIVE`: lit windows, the lamp's pool and
+mouth, server lights, screens) are never recoloured; open strokes under 8 px (support) / 24 px (environment) drop.
+
+## API
+
+- **Every kit export takes `tier`** (`'subject' | 'support' | 'environment'`) and has a default (below). Resolution: an
+  explicit `tier` > a forced scope > the piece's default. A piece's `tone` (the fill its lines bound) is set at its
+  export; `bg` (what calmer fills are pulled toward: the sky outdoors, the wall inside) and `lines` inherit down.
+- **Scenes force a group:** `<Tier tier="environment" bg={EMBER.sky}>...</Tier>` (`lines` to keep tinted lines; `tone`
+  for the raw lines inside). Ink / Fill outside any scope are `support` WITH tinted lines (`PEN.untaggedLines`) until the
+  scene tiers them: a set the scene draws itself should sit in `<Tier tier="environment">`.
+- **Kit code:** `tiered(def, {tone, bg, lines}, Body)` wraps an export; `<TierPart def tone bg lines>` scopes a sub-part
+  (Nook: the window's outside gets `bg` sky); `<Ink thing>` (the stroke IS the object), `graphic`, `tone`, `inside={fillD}`
+  (subject outline inside its fill); `<Fill backdrop>`; raw SVG as `TPath` / `TRect` / `TCircle` / `TEllipse` (`kit/util.tsx`:
+  the stroke and a hex fill follow the tier; `thing`, `contour`, `tone`; a dashed stroke off the subject is texture: dropped);
+  `useTierMotion()` scales idle amplitudes; `useTierPaint()` / `useTierLine()` for anything else raw; `pipLook(tier)`.
+- **Defaults:** subject = `Laptop`, `ScreenDesktop`, `PriceTag`, `Phone`, `Hand`, `MemoryStick`, `StickFlight`,
+  `StickDetail`, `LineChart`, `BarChart`, `YouFront` / `YouSeated` / `YouBack` / `YouTiny`, `DataCenter variant="mini"`;
+  support = `DataCenter` (with tinted lines), `ChartCard`, `SpeechBubble`, `ThoughtBubble` (tinted lines), `Pip3` / `PipTiny`
+  (C* <= 25, a same-hue line ~2 px, no offset rim), `WinterPerson`, `BackRow` (tinted lines: the backs overlap), `Worker`,
+  `Guard`, `MiniCrate`, `Pile`, `Calendar` with `flipAt`, `WaitingDots`; environment = everything else (the `Nook` and its
+  window, desk, lamp, shelf, mug and notebook; `NookOutside`; the roof, deck and town pieces; `ChipFactory`, `Van`,
+  `DataCenter variant="far"`; walkers, tiny walkers, window people, dogs; all of Room, Shop, Street, Town and Weather).
+  A scene raises a piece when the beat is about it (`<DataCenter tier="subject">` at O1's 4.04; `<Van tier="subject">`
+  in S14; `<ChipMaker tier="subject">` when it speaks).
+
+## Measured (full-res frames, caption band masked; before = G5b, after = this pen; tools in the retro)
+
+| frame | line length / Mpx | dark-line px | lined colour edges | env local contrast | subject / env contrast | salience peak / median |
+|---|---|---|---|---|---|---|
+| O1 2.0 s | 23.5 k -> 7.9 k | 6.7 -> 1.9 % | 62 -> 26 % | 10.4 -> 6.8 | 1.5 -> 2.1 | 1.90 -> 2.23 |
+| S13 32.9 s | 32.2 k -> 10.1 k | 8.3 -> 2.1 % | 65 -> 20 % | 10.6 -> 6.0 | 1.2 -> 1.5 | 1.75 -> 2.19 |
+| S9 22.4 s | 23.5 k -> 15.1 k | 7.4 -> 5.5 % | 62 -> 42 % | 9.2 -> 8.3 | 1.5 -> 1.6 | 1.66 -> 1.71 |
+
+S9 moves least: most of it is drawn by the scene itself (untagged, so its tinted lines stay). The stroke-count and
+near-miss-end budgets now count flat dark shapes (key caps, LED strips, the town's gaps), not lines.
+
+## Open (for the lanes)
+
+- Scenes: tier their own sets (`<Tier tier="environment">` round S9's deck / town / far planes, S13's room dressing and
+  window view, O1's desk dressing), mark their line-built things `thing`, raise the beat's subject; raw scene strokes
+  (`<path stroke=...>`, e.g. O1's flying-stick speed ticks) bypass the pen: draw them as `TPath` or drop them.
+- Soft corners on made objects (CRAFT: r 3-6 % of the short side): a clean `rect()` outline rounds by <= 3 px only; a
+  matching rounded fill needs a shared path per object.
+- The light and shadow layer is the light engineer's (`kit/Light.tsx`): its fills are clean-pen backdrops.

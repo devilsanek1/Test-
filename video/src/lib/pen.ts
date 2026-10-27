@@ -68,7 +68,7 @@ export type TierSpec = {
 export const CLEAN_TIERS: Record<Tier, TierSpec> = {
   subject: {k: 0.88, min: 1.2, max: 3.0, drop: 35, floor: 16, color: '#4B2A1E', alpha: 1, contours: true, strokes: true, minStroke: 0, pull: 0, chromaK: 1, chromaMax: 200, motion: 1},
   support: {k: 0.53, min: 1.4, max: 2.2, drop: 20, floor: 20, color: '#5A2E1E', alpha: 0.42, contours: false, strokes: false, minStroke: 8, pull: 0.08, chromaK: 0.9, chromaMax: 40, motion: 0.5},
-  environment: {k: 0.4, min: 1.2, max: 1.6, drop: 14, floor: 24, color: '#5A2E1E', alpha: 0.22, contours: false, strokes: false, minStroke: 24, pull: 0.16, chromaK: 0.85, chromaMax: 36, motion: 0.4},
+  environment: {k: 0.4, min: 1.2, max: 1.6, drop: 14, floor: 24, color: '#5A2E1E', alpha: 0.34, contours: false, strokes: false, minStroke: 24, pull: 0.16, chromaK: 0.85, chromaMax: 36, motion: 0.4},
 };
 
 export type PenConfig = {

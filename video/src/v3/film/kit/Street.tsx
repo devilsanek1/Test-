@@ -23,7 +23,7 @@ import {At, b, fillAt, Pt, Show, Txt, W, TCircle, TEllipse, TPath, TRect} from '
 import {bob, events, rings, shuttle, stepped, sway, sweep} from './idle';
 import {Exhaust, SnowCap, Steam} from './Weather';
 import {WinterPerson, personGeo} from './People3';
-import {tiered} from '../../../lib/tier';
+import {tiered, useTierMotion} from '../../../lib/tier';
 
 /** Snow-lit edge on posts and poles (a light sliver on the left so they read against house fronts). */
 const SNOWLIT = EMBER.snow;
@@ -102,8 +102,9 @@ export const WallLamp = tiered('environment', {bg: EMBER.sky}, WallLampBody);
 /** A winter tree: 'bare' (branches with snow on them) or 'pine' (stacked tiers with snow caps); a slow sway. */
 const SnowTreeBody: React.FC<{x: number; y: number; h?: number; kind?: 'bare' | 'pine'; seed?: string; at?: At; ink?: number; far?: boolean}> = ({x, y, h = 200, kind = 'pine', seed = 'tree', at, ink, far}) => {
   const t = useTime();
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
   const iw = far ? 0 : ink ?? (h >= 200 ? W.mid : W.far);
-  const a = sway(t, 0.8, 4.6, x * 0.01);
+  const a = sway(t, 0.8 * km, 4.6, x * 0.01);
   if (kind === 'pine') {
     const tiers = 3;
     const out: React.ReactNode[] = [];
@@ -774,6 +775,7 @@ export type Wire3Props = {
  *  flapping, an arc up and away, gone in ~1.6 s (S14: the second data center cuts in). */
 const Wire3Body: React.FC<Wire3Props> = ({a, b: bb, sag = 26, n = 1, gap = 10, birds, ink = W.hair, seed = 'wire', at}) => {
   const t = useTime();
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
   if (at !== undefined && t < at) return null;
   let wd = '';
   for (let i = 0; i < n; i++) wd += wire(a[0], a[1] + i * gap, bb[0], bb[1] + i * gap, sag, {seed: `${seed}/w${i}`, over: [0, 0]});
@@ -799,7 +801,7 @@ const Wire3Body: React.FC<Wire3Props> = ({a, b: bb, sag = 26, n = 1, gap = 10, b
         out.push(<TPath thing key={`f${i}`} d={`M${fx - w} ${fy - lf}Q${fx - w * 0.4} ${fy - w * 0.3} ${fx} ${fy}Q${fx + w * 0.4} ${fy - w * 0.3} ${fx + w} ${fy - lf}`} fill="none" stroke={col} strokeWidth={2.2} strokeLinecap="round" />);
         return;
       }
-      const hb = bob(t, 1.2, 0.9, ph) + (Math.floor(t / 2.3 + ph) % 3 === 0 ? -1.5 : 0);
+      const hb = bob(t, 1.2 * km, 0.9, ph) + (Math.floor(t / 2.3 + ph) % 3 === 0 ? -1.5 : 0);
       const look = Math.floor(t / 1.7 + ph) % 2 === 0 ? dirB : -dirB;
       const s = size / 18;
       out.push(

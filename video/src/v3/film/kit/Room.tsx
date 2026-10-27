@@ -23,7 +23,7 @@ import {EMBER} from '../palette';
 import {At, b, fillAt, Pt, Show, Txt, W, TCircle, TPath, TRect} from './util';
 import {rings, sway, sway2, twinkle} from './idle';
 import {Steam} from './Weather';
-import {tiered} from '../../../lib/tier';
+import {tiered, useTierMotion} from '../../../lib/tier';
 import {isClean} from '../../../lib/pen';
 
 /** The plant greens: the palette's leaf and one flat step lighter (leaves alternate). */
@@ -238,6 +238,7 @@ export type PlantProps = {
  *  succulent: a rosette; snake: upright sword leaves with bands; floor: big leaves on stems (cut by an edge); cactus. */
 const PlantBody: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, trail = 160, snow, amp = 3, period = 3, shakeAt, seed = 'plant', at, ink = W.mid, pot = EMBER.pot}) => {
   const t = useTime();
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
   const r = rng(`plant/${seed}`);
   const shake = rings(t, shakeAt, 1, 2.6, 4);
   // ---- the pot (the rim's band one step lighter)
@@ -263,7 +264,7 @@ const PlantBody: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, trai
       const lx = x + r.range(-pw * 0.55, pw * 0.55);
       const ly = top - r.range(4, pw * 0.38);
       const s = r.range(0.8, 1.1) * pw * 0.26;
-      const dx = sway2(t, amp * 0.4, period, i) + shake * 2;
+      const dx = sway2(t, amp * 0.4 * km, period, i) + shake * 2;
       leafEls.push(<Leaf key={`m${i}`} x={lx + dx} y={ly} s={s} rot={r.range(-60, 60)} color={i % 2 ? EMBER.leaf : LEAF2} seed={`${seed}/m${i}`} at={leafAt} ink={W.hair} />);
     }
     const nv = 3 + (r.chance(0.5) ? 1 : 0);
@@ -276,14 +277,14 @@ const PlantBody: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, trai
       const nseg = 6;
       for (let k = 0; k <= nseg; k++) {
         const u = k / nseg;
-        const dx = (sway2(t, amp, period, ph0) + shake * 3) * u * u + bend * Math.sin(u * Math.PI);
+        const dx = (sway2(t, amp * km, period, ph0) + shake * 3) * u * u + bend * Math.sin(u * Math.PI);
         pts.push([vx0 + dx, top + 6 + u * len]);
       }
       vines.push(<TPath thing key={`v${v}`} d={smooth(pts)} fill="none" stroke={EMBER.leaf} strokeWidth={2.2} strokeLinecap="round" />);
       const nl = Math.max(3, Math.round(len / 34));
       for (let k = 1; k <= nl; k++) {
         const u = k / (nl + 0.3);
-        const dx = (sway2(t, amp, period, ph0) + shake * 3) * u * u + bend * Math.sin(u * Math.PI);
+        const dx = (sway2(t, amp * km, period, ph0) + shake * 3) * u * u + bend * Math.sin(u * Math.PI);
         const side = k % 2 ? 1 : -1;
         const s = pw * 0.2 * (1 - u * 0.35);
         leafEls.push(<Leaf key={`v${v}_${k}`} x={vx0 + dx + side * s * 0.5} y={top + 6 + u * len} s={s} rot={side * 50 + 180} color={(k + v) % 2 ? EMBER.leaf : LEAF2} seed={`${seed}/v${v}_${k}`} at={leafAt} ink={W.hair} />);
@@ -294,7 +295,7 @@ const PlantBody: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, trai
     for (let i = 0; i < n; i++) {
       const a = -90 + (i - (n - 1) / 2) * 26;
       const s = pw * (0.42 - Math.abs(i - (n - 1) / 2) * 0.04);
-      const dx = sway(t, 0.5, 4, i) + shake;
+      const dx = sway(t, 0.5 * km, 4, i) + shake;
       leafEls.push(<Leaf key={i} x={x + dx + Math.cos((a * Math.PI) / 180) * s * 0.35} y={top + 2 + Math.sin((a * Math.PI) / 180) * s * 0.35} s={s} rot={a + 90} color={i % 2 ? LEAF2 : EMBER.leaf} seed={`${seed}/s${i}`} at={leafAt} ink={W.hair} pointed />);
     }
   } else if (kind === 'snake') {
@@ -302,7 +303,7 @@ const PlantBody: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, trai
     for (let i = 0; i < n; i++) {
       const lx = x + (i - (n - 1) / 2) * pw * 0.2;
       const lh = size * r.range(0.55, 0.85);
-      const lean = (i - (n - 1) / 2) * 7 + sway(t, 0.8, 4.2, i) + shake * 2;
+      const lean = (i - (n - 1) / 2) * 7 + sway(t, 0.8 * km, 4.2, i) + shake * 2;
       const lw = pw * 0.16;
       const d = `M${lx - lw} ${top}Q${lx - lw * 1.2} ${top - lh * 0.6} ${lx} ${top - lh}Q${lx + lw * 1.2} ${top - lh * 0.6} ${lx + lw} ${top}Z`;
       leafEls.push(
@@ -320,7 +321,7 @@ const PlantBody: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, trai
       const a = -160 + (i / (n - 1)) * 140 + r.jitter(8);
       const len = size * r.range(0.3, 0.6) * (1 - Math.abs(a + 90) / 260);
       const tip: Pt = [x + Math.cos((a * Math.PI) / 180) * len * 0.9, top + Math.sin((a * Math.PI) / 180) * len];
-      const dx = sway2(t, amp * 0.8, period * 1.4, i) + shake * 3;
+      const dx = sway2(t, amp * 0.8 * km, period * 1.4, i) + shake * 3;
       vines.push(<TPath thing key={`st${i}`} d={`M${x} ${top}Q${(x + tip[0]) / 2} ${top - len * 0.25} ${tip[0] + dx} ${tip[1]}`} fill="none" stroke={EMBER.leaf} strokeWidth={3} strokeLinecap="round" />);
       leafEls.push(<Leaf key={`fl${i}`} x={tip[0] + dx} y={tip[1]} s={size * r.range(0.22, 0.3)} rot={a + 90} color={i % 2 ? EMBER.leaf : LEAF2} seed={`${seed}/fl${i}`} at={leafAt} ink={W.far} vein />);
     }
@@ -411,10 +412,11 @@ const BULB_DIM = EMBER.pot;
  *  one by one, one bulb twinkling about every 0.5 s; the string sways. */
 const StringLights3Body: React.FC<StringLights3Props> = ({from, to, points, sag = 40, n = 10, r = 9, onAt, onDur = 0.7, every = 0.5, halo = [EMBER.core, EMBER.ring], sway: sw = 2, swingAt, seed = 'lights', ink = W.hair, at}) => {
   const t = useTime();
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
   if (at !== undefined && t < at) return null;
   const pts: Pt[] = points ?? [from ?? [0, 0], to ?? [1080, 0]];
   const segs = pts.length - 1;
-  const swing = sway(t, sw, 3.6, pts[0][0] * 0.01) + rings(t, swingAt, 8, 1.1, 1.6);
+  const swing = sway(t, sw * km, 3.6, pts[0][0] * 0.01) + rings(t, swingAt, 8, 1.1, 1.6);
   // segment lengths for spreading bulbs
   const lens = pts.slice(1).map((p, i) => Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1]));
   const total = lens.reduce((a, c) => a + c, 0) || 1;
@@ -494,6 +496,7 @@ export type PinboardProps = {
  *  a ticket, a list); every item sways a hair about its pin and flutters on a cause. */
 const PinboardBody: React.FC<PinboardProps> = ({x, y, w, h, items = ['photo', 'note', 'postcard', 'note', 'ticket', 'photo'], flutterAt, avoid, seed = 'pin', at, ink = W.mid}) => {
   const t = useTime();
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
   const plan = useMemo(() => {
     const r = rng(`pinb/${seed}`);
     const n = items.length;
@@ -523,7 +526,7 @@ const PinboardBody: React.FC<PinboardProps> = ({x, y, w, h, items = ['photo', 'n
         if (avoid && it.x < avoid[0] + avoid[2] && it.x + it.w > avoid[0] && it.y < avoid[1] + avoid[3] && it.y + it.h > avoid[1]) return null;
         const px = it.x + it.w / 2;
         const py = it.y + 6;
-        const rot = it.rot + sway(t, 0.8, 3.2, it.ph) + rings(t, flutterAt?.map((f) => f + i * 0.03), it.kind === 'note' ? 10 : 4, 3.2, 3.5);
+        const rot = it.rot + sway(t, 0.8 * km, 3.2, it.ph) + rings(t, flutterAt?.map((f) => f + i * 0.03), it.kind === 'note' ? 10 : 4, 3.2, 3.5);
         return (
           <XG key={i} m={mat.about(mat.rotate(rot), px, py)}>
             <PinnedThing kind={it.kind} x={it.x} y={it.y} w={it.w} h={it.h} color={it.color} seed={`${seed}/${i}`} at={b(at, 0.12 + i * 0.03)} />
@@ -897,7 +900,8 @@ export const WallMarks = tiered('environment', {}, WallMarksBody);
 /** The lamp's pull chain swinging (S7's loop): beads from (x, y) down `len`, a pendulum with a jolt option. */
 const PullChainBody: React.FC<{x: number; y: number; len?: number; amp?: number; jolt?: number[]}> = ({x, y, len = 110, amp = 6, jolt}) => {
   const t = useTime();
-  const a = sway(t, amp, 1.9) + rings(t, jolt, 14, 0.9, 1.2);
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
+  const a = sway(t, amp * km, 1.9) + rings(t, jolt, 14, 0.9, 1.2);
   const rad = (a * Math.PI) / 180;
   const ex = x + Math.sin(rad) * len;
   const ey = y + Math.cos(rad) * len;
@@ -924,11 +928,12 @@ export const PullChain = tiered('environment', {}, PullChainBody);
  *  brightest block in the lower half). */
 const RadiatorBody: React.FC<{x: number; y: number; w?: number; h?: number; sock?: boolean; seed?: string; at?: At; ink?: number; color?: string; shade?: string}> = ({x, y, w = 420, h = 180, sock = true, seed = 'rad', at, ink = W.mid, color = EMBER.card, shade}) => {
   const t = useTime();
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
   const fins = Math.round(w / 34);
   let finD = '';
   for (let i = 1; i < fins; i++) finD += line(x + (w * i) / fins, y + 12, x + (w * i) / fins, y + h - 10, {over: [0, 0], seed: `${seed}/f${i}`});
   const sx = x + w * 0.62;
-  const sa = sway(t, 2.5, 3.4, 1);
+  const sa = sway(t, 2.5 * km, 3.4, 1);
   return (
     <>
       <Fill d={roundRect(x, y, w, h, 14)} color={color} at={fillAt(at)} seed={`${seed}/b`} />
@@ -982,7 +987,8 @@ export const Rug = tiered('environment', {}, RugBody);
  *  coat (over its fill, under its ink and the scarf) inside the sway, in canvas px: the coat's own detail (S13). */
 const CoatHookBody: React.FC<{x: number; y: number; h?: number; coat?: string; seed?: string; at?: At; ink?: number; children?: React.ReactNode}> = ({x, y, h = 380, coat = EMBER.dc, seed = 'coat', at, ink = W.mid, children}) => {
   const t = useTime();
-  const a = sway(t, 0.8, 4.4);
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
+  const a = sway(t, 0.8 * km, 4.4);
   const cw = h * 0.42;
   const coatD = `M${x - cw * 0.22} ${y + 10}Q${x - cw * 0.6} ${y + h * 0.2} ${x - cw * 0.55} ${y + h}L${x + cw * 0.55} ${y + h}Q${x + cw * 0.6} ${y + h * 0.2} ${x + cw * 0.22} ${y + 10}Z`;
   const scarfD = `M${x + cw * 0.05} ${y + 8}l${cw * 0.16} 0l${cw * 0.04} ${h * 0.72}l${-cw * 0.2} 0z`;

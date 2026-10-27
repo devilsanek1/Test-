@@ -20,7 +20,7 @@ import {EMBER} from '../palette';
 import {At, b, fillAt, Pt, Show, Txt, W, TCircle, TPath, TRect} from './util';
 import {stepped, sway, sway2, windowLit} from './idle';
 import {Smoke, Steam} from './Weather';
-import {tiered} from '../../../lib/tier';
+import {tiered, useTierMotion} from '../../../lib/tier';
 import {isClean} from '../../../lib/pen';
 
 export type HouseKind = 'cottage' | 'terrace' | 'block' | 'mansard' | 'shop';
@@ -261,10 +261,11 @@ export const RoofNeighbour = tiered('environment', {bg: EMBER.sky}, RoofNeighbou
 /** A pennant on a short mast flapping at 1.5-2 Hz (the stair hut's antenna). Base of the mast on (x, y). */
 const PennantBody: React.FC<{x: number; y: number; h?: number; w?: number; color?: string; seed?: string}> = ({x, y, h = 70, w = 40, color = EMBER.hl, seed = 'pen'}) => {
   const t = useTime();
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
   const pts: Pt[] = [];
   for (let i = 0; i <= 4; i++) {
     const u = i / 4;
-    pts.push([x + u * w, y - h + 4 + Math.sin(t * 2 * Math.PI * 1.7 - u * 3) * 4 * u]);
+    pts.push([x + u * w, y - h + 4 + Math.sin(t * 2 * Math.PI * 1.7 - u * 3) * 4 * km * u]);
   }
   const tip = pts[4];
   return (
@@ -324,7 +325,8 @@ export const SideTable = tiered('environment', {bg: EMBER.sky}, SideTableBody);
 /** A laundry line between two points with 3-5 pieces (sock, shirt, towel) swaying, a little snow on the line. */
 const LaundryLineBody: React.FC<{a: Pt; b: Pt; sag?: number; n?: number; size?: number; seed?: string; ink?: number}> = ({a, b: bb, sag = 24, n = 4, size = 50, seed = 'laundry', ink = W.far}) => {
   const t = useTime();
-  const swayL = sway2(t, 3, 2.8);
+  const km = useTierMotion(); // idle motion on its tier (clean pen: support x0.5, environment x0.4; sketch pen 1)
+  const swayL = sway2(t, 3 * km, 2.8);
   const P = (u: number): Pt => [a[0] + (bb[0] - a[0]) * u + swayL * Math.sin(u * Math.PI) * 0.4, a[1] + (bb[1] - a[1]) * u + 4 * (sag + swayL) * u * (1 - u)];
   const pts: Pt[] = Array.from({length: 9}, (_, i) => P(i / 8));
   const colors = [EMBER.hl, EMBER.card, EMBER.dc, EMBER.ring, EMBER.reveal];
@@ -334,7 +336,7 @@ const LaundryLineBody: React.FC<{a: Pt; b: Pt; sag?: number; n?: number; size?: 
     const [px, py] = P(u);
     const kind = i % 3;
     const s = size * (kind === 0 ? 0.6 : 1);
-    const a2 = sway(t, 6, 2.2, i * 1.3);
+    const a2 = sway(t, 6 * km, 2.2, i * 1.3);
     let d = '';
     if (kind === 0) d = `M${px - s * 0.2} ${py}h${s * 0.4}v${s * 0.7}q0 ${s * 0.3} ${-s * 0.4} ${s * 0.3}h${-s * 0.3}v${-s * 0.3}h${s * 0.3}z`;
     else if (kind === 1) d = `M${px - s * 0.5} ${py}h${s}l${s * 0.2} ${s * 0.3}l${-s * 0.2} ${s * 0.1}v${s * 0.6}h${-s}v${-s * 0.6}l${-s * 0.2} ${-s * 0.1}z`;
