@@ -132,7 +132,8 @@ const PipSeam: React.FC<{t: number}> = ({t}) => {
         facing="back"
         keys={[
           {t: s1(SEAM.t0), pose: 'tuck', dur: 0.04},
-          {t: s1(SEAM.t1 - 0.01), pose: 'sit', dur: 0.1},
+          // 'tuck' sets lookUp 0.15 and 'sit' defines none: reset it, or the last frame looks up and S1's f0 does not
+          {t: s1(SEAM.t1 - 0.01), pose: 'sit', look: 0, lookUp: 0, dur: 0.1},
         ]}
       />
     </TimeShift>
