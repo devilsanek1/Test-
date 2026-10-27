@@ -397,7 +397,7 @@ const THREAD2: Pt[] = [[YARN.x - 16, YARN.y - 10], [826, 1640], [800, 1614], [82
 /** A plaid throw: its tail on the boards and the rug's front edge (behind the pouf); the drape over the pouf is in
  *  S13FloorFront. Terracotta with cream checks. */
 const THROW_TAIL = polyPath([[150, 1772], [232, 1704], [318, 1684], [366, 1712], [306, 1764], [250, 1806]]);
-const THROW_DRAPE = polyPath([[64, 1760], [150, 1748], [224, 1760], [260, 1788], [264, 1858], [256, 1940], [214, 1928], [186, 1950], [146, 1932], [118, 1880], [96, 1832], [56, 1800]]);
+const THROW_DRAPE = polyPath([[118, 1752], [178, 1749], [228, 1762], [258, 1790], [264, 1860], [258, 1940], [222, 1930], [196, 1948], [166, 1928], [150, 1880], [132, 1830], [106, 1788]]);
 const Plaid: React.FC<{d: string; box: [number, number, number, number]; seed: string}> = ({d, box, seed}) => {
   const id = 's13plaid' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const [x0, y0, x1, y1] = box;
@@ -508,7 +508,7 @@ export const S13FloorBack: React.FC = () => {
 export const S13FloorFront: React.FC = () => (
   <>
     <Pouf x={96} y={1800} rx={150} ry={46} />
-    <Plaid d={THROW_DRAPE} box={[50, 1740, 270, 1960]} seed="s13/throwD" />
+    <Plaid d={THROW_DRAPE} box={[100, 1740, 270, 1960]} seed="s13/throwD" />
     {/* a stack of books on the floorboards (cut by the bottom edge) with your glasses on it */}
     <BookStack x={470} y={1880} w={170} n={4} seed="s13/floorstack" ink={W.far} scale={1.3} />
     <Glasses x={560} y={1762} w={100} rot={-8} seed="s13/glasses" ink={W.far} />

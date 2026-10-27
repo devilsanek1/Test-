@@ -54,8 +54,8 @@ const S13: React.FC = () => {
   const [dx, dy] = floatCam(t, {dur: DUR, seed: 's13/float'});
   // the weight shift on "better": lean toward the window (clockwise about the chair's feet), settle to ~1 deg; the head
   // tilts up toward the bubble (chin up) with it and holds
-  const lean = 2.3 * ease01(t, BETTER - 0.04, 0.35) - 1.3 * ease01(t, BETTER + 0.42, 0.55);
-  const tilt = -7.5 * ease01(t, BETTER + 0.02, 0.4) + 1.2 * ease01(t, BETTER + 0.5, 0.5);
+  const lean = 2.3 * ease01(t, BETTER - 0.04, 0.35) - 1.3 * ease01(t, BETTER + 0.36, 0.38);
+  const tilt = -7.5 * ease01(t, BETTER + 0.02, 0.38) + 1.2 * ease01(t, BETTER + 0.44, 0.3);
   const bob = 3 * Math.sin((t / 2.6) * 2 * Math.PI + 0.6);
   return (
     <World sky={EMBER.wall}>
