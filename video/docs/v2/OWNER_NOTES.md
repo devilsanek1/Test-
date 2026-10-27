@@ -39,6 +39,19 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   living character in her home only (our call for this cut; the owner may veto it), P8 with the great-scale cues, a kit critic and a
   per-lane aliveness critic + fix round. -> rules: Visual style (feel alive; great scale), Process (say the stage; no token limit).
 
+- 2026-10-27, G5 cut (`deliverables/v2/archive/v2_g5_blocking.mp4`): "No I don't like it, let's start from scratch, let's
+  reset all cache, let's not do the sketch. Do the video right away, full creative freedom, but look at our GitHub repo's
+  general direction and principles. NO LIMIT ON TOKENS" -> the whole first visual pass (board, look, G5) dropped to
+  `archive/restart_2026-10-27/`; a fresh production straight to the finished film (no sketch), new creative direction
+  judged against the repo's principles and v1; script and voice take 2 kept (approved; no API key in this session).
+  -> rule: Process (a rejected cut restarts clean).
+- 2026-10-27 (restart, direction stage): "Don't rely on reusable assets" -> everything visual and musical in the new v2
+  film is made new for it (no v1 shared sets, no v3 kit, no stock mascot drawing, no house music bed); engine primitives
+  and QA tools only. -> rule: Visual style (don't rely on reusable assets).
+- 2026-10-27 (restart, direction stage): "don't use big models of people; the people we showed in the first example video
+  are the right direction" -> no big character models or close-up faces in the new film: small, simple figures in the
+  world like reference 1 (crowds, small full figures, backs of heads). -> rule: Visual style (people small and simple).
+
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
   the caption and the pinned comment as text plus a URL people can copy; links in captions aren't clickable; a

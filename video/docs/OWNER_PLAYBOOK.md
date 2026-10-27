@@ -3,17 +3,14 @@
 This is the memory of the owner's feedback across videos: **approach-level rules only** (how we design and produce any
 video). Read it before starting any video, and before every gate of `docs/PIPELINE_V2.md`.
 
-**Capturing feedback (owner, 2026-10-26): split every note in the same turn.**
-- A note about THIS video (a pick, a line, a take, a shot) goes to `docs/vN/OWNER_NOTES.md` (date, gate, what the owner
-  said, what we did).
-- A lesson about our approach goes HERE as a general rule, worded for any video, with a short evidence tag (vN, date).
-- A concrete note that teaches something general goes to both: the instance in the video's notes, the rule here.
-Commit in the same turn; move a rule to "Retired" instead of deleting it if the owner reverses it. The owner's master creative brief is `docs/CREATIVE_BRIEF.md` (the source; this file does not
-replace it).
+**Capturing feedback (owner, 2026-10-26): split every note in the same turn and commit it.** A note about THIS video
+(pick, line, take, shot) goes to `docs/vN/OWNER_NOTES.md`; a lesson about our approach goes HERE as a general rule with a
+short evidence tag (vN, date); a concrete note that teaches something general goes to both. A reversed rule moves to
+"Retired". The owner's master creative brief is `docs/CREATIVE_BRIEF.md` (the source; this file does not replace it).
 
 Format: **rule** — why / evidence (video, date).
 
-**Last compacted: 2026-10-26 (third pass) · size budget: <= 200 lines** (raised from 150 by the owner, 2026-10-26) (see Maintenance at the end).
+**Last compacted: 2026-10-27 (fourth pass) · size budget: <= 200 lines** (raised from 150 by the owner, 2026-10-26) (see Maintenance at the end).
 
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
@@ -47,16 +44,13 @@ Format: **rule** — why / evidence (video, date).
 
 ## Visual style
 - **Hand-drawn ink, flat colour, like reference video 1.** — (v1, 2026-10-24).
-- **Every scene must FEEL ALIVE: that is the key, not an object count.** Aliveness comes from a dense, detailed world
-  (a city full of buildings and windows, a room full of real things), people near and far, layered depth, a recurring
-  living character, and ambient life that never stops (clouds drifting, birds, snow, steam, lights switching, small
-  movements). Even Arcane's rooftop shot feels alive from the city's density and detail, the clouds and the birds; and the owner's
-  riverside reference (a few cyclists, people sitting by the water) "doesn't feel empty at all": a dense, detailed world
-  makes a frame full even when little moves. The
-  references set the bar (reference 1 France, v1 PHP); numbers from `scripts/qa/density.py` are a warning signal, never
-  a quota. Big flat empty fields and an object alone on a blank wall are failures, even in a draft; density belongs to
-  the set build (G5), not to polish. — ("way too empty ... those feel a lot more alive", then "less prescriptive on
-  the amount of objects, but feeling alive is absolutely the key", v3 G5, 2026-10-26).
+- **Every scene must FEEL ALIVE: that is the key, not an object count.** A dense, detailed world (a city full of
+  buildings and windows, a room full of real things), people near and far, layered depth, a recurring living character,
+  ambient life that never stops (clouds, birds, steam, lights switching). A dense world makes a frame full even when
+  little moves (Arcane's rooftop; the owner's riverside reference "doesn't feel empty at all"). The bar: reference 1
+  (France) and v1 (PHP); `scripts/qa/density.py` is a warning signal, never a quota; how-to `docs/look/LIFE_AND_DENSITY.md`.
+  Big flat empty fields and an object alone on a blank wall are failures even in a draft. — ("way too empty", "feeling
+  alive is absolutely the key", v3 G5, 2026-10-26).
 - **Scale moments, occasionally: make the viewer feel small**, using Arcane's camera work and staging, never its footage.
   Keep it nuanced (it's still TikTok). The owner liked v1's scale scenes. — (v1, 2026-10-24/25).
   **When a scale shot comes, the scale must feel GREAT**, like Arcane's rooftop end frame: a world that keeps going
@@ -66,17 +60,21 @@ Format: **rule** — why / evidence (video, date).
 - **Arcane references: ENVIRONMENT ONLY, few and high-confidence** (buildings, cityscapes, interiors as spaces, wides;
   no faces or people). Build on our own videos incrementally (angles, composition, light, camera), never reinvent.
   Guide with sketches: `docs/look/CINEMATIC_GUIDE.md`. — ("targeted with high confidence", 2026-10-26).
-- **The owner's favourite Arcane shot: the pull-back crane reveal** (S1E1, the sisters on a rooftop, "It's nice getting
-  above it all, huh?": from the characters' small world, the camera pulls back and rises until they are tiny figures with
-  their backs to us, overlooking a vast sunlit city). "It has pretty much everything": suspense, sense of scale,
-  environment, composition and the camera movement. Use it as the model for a film's big reveal; distilled in
-  `docs/look/CINEMATIC_GUIDE.md`. — (v3, 2026-10-26).
+- **The owner's favourite Arcane shot: the pull-back crane reveal** (S1E1 rooftop: the camera pulls back and rises until
+  the sisters are tiny figures overlooking a vast city; "it has pretty much everything"): the model for a film's big reveal
+  (`docs/look/CINEMATIC_GUIDE.md`). — (v3, 2026-10-26).
 - **Second visual twist: coziness through a sense of enclosure**: framed, street-like spaces that hold the subject (ref
   `docs/look/ref_sense_of_enclosure.jpg`). Rules: `docs/look/COZY_AND_SCALE.md`. — (2026-10-25).
   **Coziness is a recurring topic we keep evolving, one reference at a time** (enclosure H:W ratios first; then the
   owner's 2026-10-26 reference: a painterly street seen from above, everyday traffic flowing calmly under flowering trees):
   each new reference is measured (composition, movement, texture, camera, details) and folded into `COZY_AND_SCALE.md`.
   — ("really figure out what about the scene brings out this feeling; this is a recurring topic we need to evolve", 2026-10-26).
+- **Don't rely on reusable assets: every film's sets, characters, props, background life and music are made new for
+  it,** in its own design (a new Pip drawing too, if the mascot appears). Engine primitives, timing, captions and QA tools
+  are tools, not assets. — ("Don't rely on reusable assets", v2 restart, 2026-10-27).
+- **People small and simple, like the first example video (reference 1):** figures that live in the world (crowds, small
+  full figures, backs of heads, simple round heads), never big character models or close-up faces. — ("don't use big
+  models of people", v2 restart, 2026-10-27).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). — (v1 posted reel, 2026-10-25).
 - **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
@@ -124,13 +122,9 @@ Format: **rule** — why / evidence (video, date).
   like a laptop, a data center like a building of servers, a plain labelled chart. No metaphors that need explaining.
   Test every animatic with a sound-off cold read before the owner sees it. — (v3 G3, 2026-10-26).
 - **No physical metaphors the facts don't support;** show the real mechanism instead. — (v3 G3, 2026-10-26).
-- **Drawn like a professional storyboard: simple, monochrome, clarity first.** No colour at the sketch stage; colour
-  belongs to G4/G5. Spec: `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
-
-- **The board carries the cinematography too: clear AND cinematic.** Framing, camera angle, scale (the rise-over reveal,
-  the scale cut to a tiny figure) and coziness (the enclosed home base, the window) are decided in the board, in
-  monochrome; clarity comes from composition, never from flattening every panel to an icon on blank paper. Every
-  panel names its shot type (CINEMATIC_GUIDE / COZY_AND_SCALE) and still passes the sound-off read. — (v3 G3, 2026-10-26).
+- **Drawn like a professional storyboard: monochrome, clarity first, and cinematic** (framing, angle, scale, coziness
+  decided in the board; clarity from composition, never icons on blank paper; every panel names its shot type). Spec:
+  `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
 
 ## Taste signals (general preferences from the owner's picks; the picks themselves are in each video's OWNER_NOTES.md)
 - **Topics: the everyday wallet consequence** wins over a bigger but more distant story. — (v3 G0).
@@ -150,41 +144,40 @@ Format: **rule** — why / evidence (video, date).
   (12-24 drawings/s) while the camera glides; the G3 reel also renders at 60 (`G3_ANIMATIC.md`, 2026-10-26). — (v3, 2026-10-26).
 
 ## Captions
-- **Captions pop in place (or rise without clipping);** a slot or scroll reveal that cuts letters looked like a glitch. — (v1 reel, 2026-10-25).
-- **Captions are burned in;** platform auto-captions stay off. — (v1).
+- **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
+  platform auto-captions stay off. — (v1 reel, 2026-10-25).
 
 ## Process and communication
 - **Playable video starts at the sketch animatic (G3); from then on every gate is a video, never only stills.** Before
   G3 (topic, core line, script, voice): text and audio only, no MP4s, never several versions unless asked. — (v1, 2026-10-25; "why are there multiple versions", v3).
 - **Lock the story with a clean sketch/animatic before big commitments; push all polish late.** — (v1, 2026-10-25).
-- **Progress: the gate deliverable is the update; between gates, a short status covering all threads.** — (v1).
+- **Progress: the gate deliverable is the update, with a short status on all threads between; lean prompts and docs.** — (v1).
 - **Every cut sent to the owner says what stage it is and what the next stages add** (e.g. "blocking: staging only;
   next: density, life, polish, full-res"), so a draft is never mistaken for the final. — ("let me know if this is just
   an initial intermediate step", v3 G5, 2026-10-26).
-- **NO LIMIT ON TOKENS for creative output.** Ideas, scripts, design explorations, set building, density, life, animation
-  and polish get as many agents, rounds and tokens as the quality needs, including workflows larger than the default size
-  guideline. Savings never decide a creative choice; only true waste is cut (rework, lost work, reviewing what will
-  still change). — (owner, 2026-10-26).
-- **Never trade quality for savings:** brainstorms, judged competing ideas and design explorations are worth their
-  tokens; waste = rework, reviews of things that will change, early polish, lost work. — (2026-10-25).
+- **NO LIMIT ON TOKENS for creative output; never trade quality for savings.** Ideas, scripts, judged competing ideas,
+  design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
+  quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
+  reviewing what will still change, early polish). — (2026-10-25; owner, 2026-10-26).
 - **Locked means dropped:** rejected options go to the video's `archive/`, the gate doc keeps only the locked choice,
   later prompts never see them; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
-- **No wasted tokens or time:** short prompts, lean docs, nothing reviewed or polished that will still change. — (v1).
 - **Every lesson goes into the generic process, committed:** this playbook, a gate in `PIPELINE_V2.md`, or the studio
   toolkit, so the next video doesn't repeat it. — ("we gradually get better as a production studio", v3, 2026-10-26).
+- **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
+  work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
+  creative freedom inside these principles; never patch the rejected cut. — ("No I don't like it, let's start from
+  scratch ... let's not do the sketch. Do the video right away, full creative freedom", v2 G5, 2026-10-27).
 - **Once the owner says "final", don't redo it;** log ideas for the next video. — (v1, 2026-10-25).
 - **Deliver videos as a download as well;** in-app previews may play muted. — (v1, 2026-10-25).
 
 ## Platforms and posting
 - **Accounts: Instagram `what.the.fuss.is.about`** (Creator, Education); TikTok and YouTube Shorts under the same name,
   handle and avatar. Posting texts per video: `docs/POSTING_KIT.md`. — (2026-10-25).
-- **AI label ON** (AI narration voice) on every platform. — (2026-10-25).
 - **Upload at the highest quality and natively on each platform** (checklist in `docs/POSTING_KIT.md`). — (2026-10-25).
-- **No paid boost until 3-5 posts exist;** then boost the best organic performer for profile visits. — (2026-10-25).
+- **AI label ON everywhere; no paid boost until 3-5 posts exist,** then boost the best organic performer. — (2026-10-25).
 
 ## Performance log (one line per video and check)
-- v1 "PHP bug", IG after 45 min: 155 views, 70 viewers, avg 21 s of 55 s, likes 3.9 %, 0 saves/shares/comments/follows;
-  ~80 % gone by 3 s, flat ~20 % until ~40 s. — 2026-10-25.
+- v1 "PHP bug", IG after 45 min: 155 views, avg 21 s of 55 s, likes 3.9 %; ~80 % gone by 3 s. — 2026-10-25.
 - v1 after ~24 h (IG):
   - ~2.1K views, 86 % from the Reels tab and 11 % from Explore (non-followers);
   - skip rate 32.2 %; likes 2.5 %, shares 0.7 %, saves 0.4 %, reposts 0;
