@@ -89,7 +89,17 @@ function pavingInto(L: Levels) {
   L.at(0).rect(CM.paving, x0, copingNear, x1 - x0, bottom - copingNear);
   const tints = L.at(1);
   const grit = L.at(2);
-  const rows: number[] = [copingNear];
+  // a band of granite setts along the coping (two courses of small stones, as on S2's stretch of our bank)
+  const SETTS = 34;
+  for (let c = 0; c < 2; c++) {
+    let x = x0 - r.range(0, 20) - c * 13;
+    while (x < x1) {
+      const w = r.range(22, 30);
+      tints.rect(r.pick([CM.stoneShade, CM.limestone, CM.coatOat, CM.stoneShade, CM.stucco]), x + 1.5, copingNear + 2 + c * 16, w - 3, 13);
+      x += w;
+    }
+  }
+  const rows: number[] = [copingNear + SETTS];
   let h = 28;
   while (rows[rows.length - 1] < bottom) {
     rows.push(rows[rows.length - 1] + h);
@@ -135,6 +145,17 @@ function pavingInto(L: Levels) {
   }
   tints.ink(joints, 2, CM.line, 0.12);
   tints.ink(cracks, 1.2, CM.line);
+  // long golden-hour shadows reaching in from things out of frame at left (posts, a bollard): they run right and a
+  // little toward us, away from the low sun; flat stone shade, tapering, never grey
+  for (const [ya, yb, xEnd, wa, wb] of [[1700, 1716, 372, 15, 9], [1884, 1910, 286, 26, 14], [1772, 1781, 150, 11, 7]] as [number, number, number, number, number][]) {
+    grit.poly(CM.stoneShade, [[x0, ya - wa / 2], [xEnd, yb - wb / 2], [xEnd + 10, yb], [xEnd, yb + wb / 2], [x0, ya + wa / 2]]);
+  }
+  // a puddle mirroring the evening sky: the mint, a streak of the sunset band, a leaf afloat
+  const pu = {x: 812, y: 1784, w: 176};
+  L.at(3).fill(CM.glass, `M${P(pu.x - pu.w / 2, pu.y)}Q${P(pu.x - pu.w * 0.25, pu.y - pu.w * 0.11)} ${P(pu.x + pu.w * 0.08, pu.y - pu.w * 0.08)}Q${P(pu.x + pu.w / 2, pu.y - pu.w * 0.07)} ${P(pu.x + pu.w * 0.46, pu.y + pu.w * 0.04)}Q${P(pu.x + pu.w * 0.1, pu.y + pu.w * 0.13)} ${P(pu.x - pu.w * 0.2, pu.y + pu.w * 0.08)}Q${P(pu.x - pu.w * 0.5, pu.y + pu.w * 0.06)} ${P(pu.x - pu.w / 2, pu.y)}Z`);
+  L.at(4).poly(CM.bandSunset, [[pu.x - pu.w * 0.32, pu.y - pu.w * 0.03], [pu.x + pu.w * 0.26, pu.y - pu.w * 0.05], [pu.x + pu.w * 0.22, pu.y - pu.w * 0.01], [pu.x - pu.w * 0.28, pu.y + pu.w * 0.01]]);
+  L.at(4).poly(CM.sky, [[pu.x - pu.w * 0.18, pu.y + pu.w * 0.035], [pu.x + pu.w * 0.3, pu.y + pu.w * 0.02], [pu.x + pu.w * 0.26, pu.y + pu.w * 0.05], [pu.x - pu.w * 0.14, pu.y + pu.w * 0.06]]);
+  L.at(5).fill(CM.leafRust, leafPath(pu.x + 34, pu.y + 2, 22, 7.5, 24));
   // the drain grate (perspective trapezoid, iron frame, slots)
   const dg = {x: 404, y: 1774, w: 92, h: 30};
   L.at(3).poly(CM.paneUnlit, [[dg.x - dg.w / 2 - 6, dg.y - 4], [dg.x + dg.w / 2 + 6, dg.y - 4], [dg.x + dg.w / 2 + 9, dg.y + dg.h + 4], [dg.x - dg.w / 2 - 9, dg.y + dg.h + 4]]);
@@ -173,7 +194,7 @@ function pavingInto(L: Levels) {
  *  leaving the frame on the right (the lantern hangs out of frame). */
 function lampInto(L: Levels) {
   const x = NG.lampX;
-  const top = 1222;
+  const top = 1240;
   const col = CM.anchor;
   // its long shadow on the paving (to the right, away from the low sun)
   groundShadow(L.at(0), x - 30, x + 30, 1930, 190, 30);
@@ -186,8 +207,9 @@ function lampInto(L: Levels) {
   // the column (tapering) up to the collar and the swan neck
   b.poly(col, [[x - 13, 1868], [x + 13, 1868], [x + 10.5, top], [x - 10.5, top]]);
   b.poly(col, [[x - 17, top + 16], [x + 17, top + 16], [x + 14, top - 8], [x - 14, top - 8]]);
-  b.fill(col, `M${P(x - 9, top - 6)}Q${P(x - 12, top - 70)} ${P(x + 60, top - 92)}Q${P(x + 150, top - 112)} ${P(1200, top - 140)}L${P(1200, top - 122)}Q${P(x + 150, top - 94)} ${P(x + 62, top - 74)}Q${P(x + 8, top - 58)} ${P(x + 9, top - 6)}Z`);
-  b.fill(col, `M${P(x + 8, top - 30)}Q${P(x + 40, top - 34)} ${P(x + 52, top - 62)}L${P(x + 46, top - 64)}Q${P(x + 36, top - 42)} ${P(x + 8, top - 40)}Z`);
+  // the swan-neck arm: it leaves the frame over the canal (y ~1140), clear of her towpath and its cyclist
+  b.fill(col, `M${P(x - 9, top - 6)}Q${P(x - 12, top - 58)} ${P(x + 58, top - 76)}Q${P(x + 150, top - 92)} ${P(1200, top - 104)}L${P(1200, top - 87)}Q${P(x + 150, top - 75)} ${P(x + 60, top - 59)}Q${P(x + 8, top - 46)} ${P(x + 9, top - 6)}Z`);
+  b.fill(col, `M${P(x + 8, top - 26)}Q${P(x + 38, top - 30)} ${P(x + 50, top - 52)}L${P(x + 44, top - 54)}Q${P(x + 34, top - 36)} ${P(x + 8, top - 35)}Z`);
   // brass bands, flutes, the shade side (warm), the lit edge (the low sun from the left)
   const c = L.at(2);
   c.rect(CM.coatMustard, x - 12.5, 1592, 25, 8);
@@ -199,7 +221,7 @@ function lampInto(L: Levels) {
   c.rect(CM.coatPlum, x - 9, top + 20, 3, 1866 - top - 24);
   // ink: the column's lit edge and the plinth's top edges (front weight, loose), the arm's upper edge
   c.ink(line(x - 13, 1868, x - 10.5, top, {seed: 's3ng/lampL', over: 'small', drift: 0.05, bow: 0.8}) + line(x - 44, 1952, x + 44, 1952, {seed: 's3ng/plinthT', over: 'small', drift: 0.1}) + line(x - 31, 1880, x + 31, 1880, {seed: 's3ng/plinth2', over: 'small', drift: 0.1}), INK_PX.front, CM.ink, 0.2);
-  c.ink(`M${P(x - 9, top - 6)}Q${P(x - 12, top - 70)} ${P(x + 60, top - 92)}Q${P(x + 150, top - 112)} ${P(1200, top - 140)}`, INK_PX.mid, CM.ink, 0.25);
+  c.ink(`M${P(x - 9, top - 6)}Q${P(x - 12, top - 58)} ${P(x + 58, top - 76)}Q${P(x + 150, top - 92)} ${P(1200, top - 104)}`, INK_PX.mid, CM.ink, 0.25);
 }
 
 // ---------------------------------------------------------------- life

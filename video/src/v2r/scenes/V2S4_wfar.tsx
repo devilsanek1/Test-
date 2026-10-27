@@ -34,7 +34,7 @@ export const GAS: Gas[] = [
 function gasFrameInto(b: Batch, g: Gas) {
   const {cx, top, r, base, seed} = g;
   const tiers = g.tiers ?? 3;
-  const n = 16;
+  const n = 12;
   const xs: number[] = [];
   for (let k = 0; k <= n / 2; k++) xs.push(cx + r * Math.cos((2 * Math.PI * k) / n));
   xs.sort((a, c) => a - c);
@@ -93,7 +93,7 @@ function gasFrameInto(b: Batch, g: Gas) {
       for (let k = 0; k < xs.length - 1; k++) {
         const xa = xs[k];
         const xb = xs[k + 1];
-        if (xb - xa < 9) continue;
+        if (xb - xa < 9 || (k + i) % 2 === 1) continue;
         lat += `M${P(xa, frontY(y, xa) + h)}L${P(xb, frontY(y2, xb))}M${P(xb, frontY(y, xb) + h)}L${P(xa, frontY(y2, xa))}`;
       }
     }
@@ -105,7 +105,7 @@ function gasFrameInto(b: Batch, g: Gas) {
     b.rect(col, x - w / 2, frontY(top, x) - 5, w, base - top + 5);
     b.rect(col, x - w / 2 - 1.4, frontY(top, x) - 7, w + 2.8, 2.6);
   });
-  b.ink(lat, 1.05, CM.ink);
+  b.ink(lat, 0.9, CM.ink);
 }
 
 // ---------------------------------------------------------------- far roof rows
@@ -294,9 +294,11 @@ export function farStatic(): Batch {
   for (const g of GAS) gasFrameInto(b, g);
   b.layer();
   const winsA = farRowInto(b, {x0: X0, x1: X1, base: ROW.wallTop, top: 728, spread: 10, seed: 's4farA', walls: [CM.limestone, CM.stoneShade, CM.glass, CM.limestone], roofs: [CM.stoneShade, CM.shadeCool, CM.stoneShade], w: [44, 96], win: 4, lit: 0});
+  b.layer();
   winsInto(b, winsA, 's4farAw', 0, 0);
   b.layer();
   const winsB = farRowInto(b, {x0: X0, x1: X1, base: ROW.wallTop, top: 752, spread: 8, seed: 's4farB', walls: [CM.brickLight, CM.stucco, CM.limestone, CM.brickLight, CM.stoneShade], roofs: [CM.shadeCool, CM.shadeWarm, CM.paneUnlit], w: [52, 120], win: 5, lit: 0.12});
+  b.layer();
   winsInto(b, winsB, 's4farBw', 0.14, 0);
   b.layer();
   viaductInto(b);

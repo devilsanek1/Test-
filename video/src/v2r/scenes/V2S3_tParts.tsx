@@ -261,7 +261,7 @@ export function winFront(b: Batch, s: WinSpec, ink = TK.detail) {
   }
   if (ink > 0) {
     const fw = Math.max(3, w * 0.06);
-    b.ink(rectInk(x - fw, y - fw, w + fw * 2, h + fw, {seed: `${s.id}/ink`, over: 'small', open: 0.35}), ink);
+    b.ink(rectInk(x - fw, y - fw, w + fw * 2, h + fw, {seed: `${s.id}/ink`, over: 'medium', open: 0.35}), ink);
     if (bars !== 'french' && bars !== 'dormer') b.ink(line(x + 1, y + h * 0.5 - open, x + w - 1, y + h * 0.5 - open, {seed: `${s.id}/mr`, over: 'none'}), TK.fine);
     if (s.sill !== false) b.ink(line(x - fw - 6, y + h, x + w + fw + 6, y + h, {seed: `${s.id}/sill`, over: 'small'}), TK.fine);
   }
@@ -382,7 +382,7 @@ export function doorInto(b: Batch, d: DoorSpec, ink = TK.struct) {
     b.rect(CM.stoneShade, x - ext - 4, sy + sh * 0.42, w + ext * 2 + 8, sh * 0.58);
   }
   if (ink > 0) {
-    let s = rectInk(x - 3, top, w + 6, h + fanH + 4, {seed: `${d.id}/f`, over: 'small', open: 0.3});
+    let s = rectInk(x - 3, top, w + 6, h + fanH + 4, {seed: `${d.id}/f`, over: 'medium', open: 0.3});
     if (d.fan === 'arch') s += `M${P(x + 2, y - 2)}A${r1(w / 2 - 2)} ${r1(fanH - 3)} 0 0 1 ${P(x + w - 2, y - 2)}`;
     b.ink(s, ink);
     let fan = '';
@@ -471,23 +471,36 @@ export function aerialInk(x: number, y0: number, y1: number, seed: string, dir =
 export function creeperInto(b: Batch, x0: number, x1: number, yTop: number, yBot: number, seed: string, cols: string[], n: number, holes: [number, number, number, number][] = []) {
   const r = rng(seed);
   const inHole = (x: number, y: number) => holes.some(([hx0, hy0, hx1, hy1]) => x > hx0 && x < hx1 && y > hy0 && y < hy1);
+  let stems = '';
   for (let v = 0; v < n; v++) {
     let x = r.range(x0, x1);
     let y = yBot - r.range(0, 30);
     const top = lerp(yTop, yBot, r.range(0, 0.45));
     let a = -Math.PI / 2 + r.jitter(0.5);
+    let pen = false;
     while (y > top) {
       a += r.jitter(0.5);
       a = Math.max(-Math.PI * 0.85, Math.min(-Math.PI * 0.15, a));
-      x += Math.cos(a) * 7;
-      y += Math.sin(a) * 7;
-      if (x < x0 - 10 || x > x1 + 10) break;
-      if (inHole(x, y)) continue;
+      const nx = x + Math.cos(a) * 7;
+      const ny = y + Math.sin(a) * 7;
+      if (nx < x0 - 10 || nx > x1 + 10) break;
+      if (inHole(nx, ny)) {
+        pen = false;
+        x = nx;
+        y = ny;
+        continue;
+      }
+      // the woody stem (thin) under the leaves
+      stems += `${pen ? 'L' : 'M'}${P(nx, ny)}`;
+      pen = true;
+      x = nx;
+      y = ny;
       const s = r.range(5, 8.5);
       b.fill(r.pick(cols), leafPath(x + r.jitter(4), y + r.jitter(3), s, s * 0.5, r.range(0, 180)));
       if (r.chance(0.5)) b.fill(r.pick(cols), leafPath(x + r.jitter(6), y + r.jitter(5), s * 0.9, s * 0.45, r.range(0, 180)));
     }
   }
+  b.ink(stems, 1.1, CM.line);
 }
 
 /** A climbing rose round a door: leaves + blooms. */

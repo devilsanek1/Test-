@@ -1,9 +1,9 @@
 // V2S3_nfolk.tsx (lane L3, V2S3 NEAR helper; WORLD px at the 12.98 match, inside V2S3's camera): two walkers on OUR
 // towpath, seen as head-backs cut by the bottom of the frame (reference 1's front row; the owner's people rule: small
 // and simple, at most ~140 px WIDE, no faces): one in a beanie strolling RIGHT, one in a cap strolling LEFT, both
-// bobbing on their steps (drawn at 12 drawings/s; the travel moves every frame). The cap turns its head toward the boat
-// for a moment. Never teal. Their cut line sits below the frame's bottom (world y 1996) so the 5 % ease-back only
-// reveals more shoulder, never their end.
+// bobbing on their steps (drawn at 12 drawings/s; the travel moves every frame). Each turns its head once: the cap
+// toward the boat, the beanie toward the robin on the logs. Never teal. Their cut line sits below the frame's bottom
+// (world y 1996), so the 5 % ease-back only reveals more shoulder, never their end.
 import React from 'react';
 import {CM} from '../palette';
 import {useTime} from '../../lib/time';
@@ -28,7 +28,7 @@ const CUT_Y = 1996;
 const T0 = 12.98;
 
 export const S3_WALKERS: Walker[] = [
-  {seed: 's3walkA', x0: 96, v: 108, rate: 1.75, phase: 0.2, hv: 168, traits: {hair: 'beanie', hatColor: CM.leafRust, hairColor: CM.hair[1], coat: CM.coatSlate, acc: 'scarf', accColor: CM.coatMustard, broad: 0.96}},
+  {seed: 's3walkA', x0: 96, v: 108, rate: 1.75, phase: 0.2, hv: 168, traits: {hair: 'beanie', hatColor: CM.leafRust, hairColor: CM.hair[1], coat: CM.coatSlate, acc: 'scarf', accColor: CM.coatMustard, broad: 0.96}, turns: [[14.06, 0.42], [14.62, 0.1]]},
   {seed: 's3walkB', x0: 772, v: -98, rate: 1.6, phase: 0.65, hv: 174, traits: {hair: 'cap', hatColor: CM.coatPlum, hairColor: CM.hair[4], coat: CM.coatOat, acc: 'strap', accColor: CM.line, broad: 0.94}, turns: [[13.52, -0.5], [14.3, 0]]},
 ];
 

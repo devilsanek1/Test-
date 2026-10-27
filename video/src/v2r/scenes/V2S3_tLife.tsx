@@ -231,8 +231,8 @@ export const S3Outside: React.FC = () => {
   return (
     <>
       <Paint b={b} seed="s3outside" misreg={false} />
-      <Puffs x={1058} y={714} seed="s3kettle" kind="steam" scale={0.95} ceil={590} drift={-34} />
-      <Puffs x={1072} y={716} seed="s3kettleB" kind="steam" scale={0.75} ceil={590} drift={-24} />
+      <Puffs x={1056} y={714} seed="s3kettle" kind="steam" scale={0.72} ceil={590} drift={-26} />
+      <Puffs x={1070} y={716} seed="s3kettleB" kind="steam" scale={0.56} ceil={590} drift={-16} />
     </>
   );
 };
@@ -245,7 +245,7 @@ export const S3RoofLife: React.FC = () => (
     <Birds from={[506, 604]} to={[532, 604]} n={3} size={9} seed="s3birdsA" liftAt={[13.8]} dir={-1} ceil={584} />
     <Birds from={[171, 603]} to={[196, 603]} n={2} size={9} seed="s3birdsB" />
     <Birds from={[1006, 603]} to={[1032, 603]} n={2} size={9} seed="s3birdsC" liftAt={[14.3]} dir={-1} ceil={584} />
-    <Pigeons ledge={[600, 720, 628]} n={2} size={15} seed="s3pig" shuffleAt={[13.6]} />
+    <Pigeons ledge={[600, 720, 640]} n={3} size={15} seed="s3pig" shuffleAt={[13.5]} liftAt={14.12} dir={-1} ceil={584} />
     <StringLights from={[830, 827]} to={[954, 825]} sag={9} n={12} r={3.2} seed="s3slA" on w={1.2} />
     <StringLights from={[842, 708]} to={[936, 708]} sag={7} n={9} r={2.8} seed="s3slB" on w={1.2} />
     <StringLights from={[58, 946]} to={[166, 968]} sag={11} n={8} r={3} seed="s3slG" on w={1.2} />
