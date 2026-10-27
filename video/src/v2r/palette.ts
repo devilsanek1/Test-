@@ -3,7 +3,7 @@
 // Import this module FIRST in every v2r entry (src/entry-v2r-*.tsx), before any lib or kit module: it rewrites the
 // house theme tokens (src/lib/theme.ts) IN PLACE at module load, so every house module evaluated after it (lib/Ink,
 // lib/Fill, lib/World, lib/Sun, lib/Captions, lib/Film; their module-level colour tables included) draws in Canal Mint.
-// Only theme.ts is evaluated before this body (this file imports nothing else); theme.ts's derived tables (skies,
+// Only ./pen (with lib/sketch, lib/rng and lib/pen: none reads a colour) and theme.ts are evaluated before this body; theme.ts's derived tables (skies,
 // todSky, todSteps, todTone, todBulbHalo, captionTones, glow, type.color) are patched here explicitly. Other entries
 // (v1, v3) are separate bundles and keep their palettes. `problems()` re-checks it all at render time.
 //
@@ -20,6 +20,7 @@
 // No state relights a fill (todSteps are empty): the palette never changes, only what the shot draws.
 
 import './pen'; // the clean pen first (STYLE.md §3), then the palette tokens
+import {PEN, tierLineColor} from '../lib/pen'; // pure TS, already loaded by ./pen (problems() reads Pip's B line)
 import {captionTones, contrastHex, deltaE, glow, palette, skies, todBulbHalo, todSky, todSteps, todTone, type as typeTok, TodName} from '../lib/theme';
 
 export const PALETTE_NAME = '10 Canal Mint';
@@ -77,20 +78,27 @@ export const CM = {
   ghostPaper: '#FBF6EE',
   ghostHead: ['#3E2A3A', '#7D7387', '#A9A5B5', '#CFCCD6', '#ECEAF0', '#ECEAF0'] as string[],
   ghostInkPx: 2.2,
-  // ---- Pip ("towpath Pip", K5)
-  pipBody: '#9497D8',
-  pipShade: '#7579C0',
-  pipEar: '#F2C3CC',
-  pipScarf: '#D4A960',
+  // ---- Pip ("towpath Pip", K5): tier B (docs/look/DIRECTION.md rule 2, CRAFT §b-§c): every Pip colour at C* <= 25,
+  //      the periwinkle hue (292 deg) kept. On screen the clean pen calms it once more (support: chroma x0.9, value 8 %
+  //      toward the ground: the body reads ~#999AC2, L* 65 / C* 22) and draws its same-hue line at the body's L* -20
+  //      (#616389, L* 43 / C* 23, 1.6-2.2 px). Before 2026-10-27: #9497D8 / #7579C0 / #D4A960 (C* 36 / 41 / 44).
+  pipBody: '#9495C1', // L* 63.0 / C* 24.6; dE76 23-50 from every ground (GROUNDS)
+  pipShade: '#73739D', // L* 49.9 / C* 24.6: the far ear, the far legs (13 L* under the body: B parts by value)
+  pipEar: '#F2C3CC', // L* 83.1 / C* 18.2: inner ear, cheeks, soles
+  pipScarf: '#D8C599', // L* 80.1 / C* 24.5: a soft straw mustard (the coats' mustard #D4A960 is C* 44: never on Pip)
   // ---- the white of paper states, signs, boards (warm; Look fills="paper" paints this)
   white: '#FBF3E6',
 };
 
 /** Coats of the public (never teal: the hero is hers only). */
 export const COATS: string[] = [CM.coatSlate, CM.coatMustard, CM.coatOat, CM.coatPlum];
-/** Ink weight by depth (on-screen px at 1080): front / mid / far / hair. Far planes get no ink. */
+/** AUTHORED ink widths (on-screen px at 1080), the sketch-era depth ladder front / mid / far / hair. Under the film's
+ *  clean pen (./pen.ts) a line's width and colour come from its attention TIER, by story role, never by depth (DIRECTION
+ *  rule 4, CRAFT §c): A 3.0 outline / ~1.9 detail in the object's own deep shade; B none, or a same-hue 1.6-2.2 px line;
+ *  C none. Author an A outline at `INK_PX.mid` or wider (the pen makes it 3.0 px); never strip these by hand. */
 export const INK_PX = {front: 4.8, mid: 3.4, far: 2.2, hair: 1.6} as const;
-/** Fill misregistration range (px): flat fills sit 2-5 px off their line. */
+/** RETIRED (2026-10-27, DIRECTION "Retired": misregistered fills): the clean pen registers every fill exactly (offset 0).
+ *  Kept only so built code compiles. */
 export const MISREG_PX = [2, 5] as const;
 
 export type CanalRole = keyof typeof CM;
@@ -242,6 +250,9 @@ export type Coverage = {page?: number; hero?: number; pop?: number; anchor?: num
  *  - the house tokens really are Canal Mint (an import-order slip shows up here);
  *  - caption ink >= 7:1 on the sky and every band; the box keeps the ink legible;
  *  - Pip's body dE76 >= 20 from every ground;
+ *  - Pip is tier B (DIRECTION rule 2, CRAFT §b-§c): every Pip colour C* <= 25 and dE >= 20 from the pop; the shade
+ *    >= 12 L* under the body; with the clean pen on, Pip's line (the pen's B line from the body) keeps the body's hue
+ *    (<= 6 deg), sits 15-25 L* under it at C* <= 25, 1.6-2.2 px wide, and the pen caps B fills at C* 25;
  *  - the hero is unique: no other role and no coat / hair / confetti within dE 20 of the canal teal;
  *  - confetti C* <= 45; nothing grey in the page (C* >= 5);
  *  - with `coverage`: page >= 50 %, hero present (<= 15 %) on her shots (0 % elsewhere is fine), pop <= 3 %, anchor <= ~8 %.
@@ -273,6 +284,29 @@ export function problems(coverage?: Coverage, captured: [string, string, string]
   for (const g of GROUNDS) {
     const d = deltaE(CM.pipBody, g);
     if (d < 20) out.push(`Pip body ${CM.pipBody} on ${g}: dE ${d.toFixed(1)} (< 20)`);
+  }
+  // Pip is tier B: soft, never the pop's hue (the hero check below covers the teal), parted by value, a same-hue line
+  for (const k of ['pipBody', 'pipShade', 'pipEar', 'pipScarf'] as const) {
+    if (chroma(CM[k]) > 25) out.push(`${k} ${CM[k]} C* ${chroma(CM[k]).toFixed(1)} (> 25: Pip is tier B)`);
+    const dp = deltaE(CM[k], CM.pop);
+    if (dp < 20) out.push(`${k} ${CM[k]} is within dE ${dp.toFixed(1)} of the pop ${CM.pop}`);
+  }
+  const pipStep = lab(CM.pipBody)[0] - lab(CM.pipShade)[0];
+  if (pipStep < 12) out.push(`Pip shade ${CM.pipShade} is only ${pipStep.toFixed(1)} L* under the body (B parts by value: >= 12)`);
+  if (PEN.mode === 'clean') {
+    const sp = PEN.tiers.support;
+    const pipLine = tierLineColor('support', CM.pipBody).color;
+    const drop = lab(CM.pipBody)[0] - lab(pipLine)[0];
+    const hue = (h: string) => {
+      const [, a, b] = lab(h);
+      return ((Math.atan2(b, a) * 180) / Math.PI + 360) % 360;
+    };
+    const dh = Math.abs(((hue(pipLine) - hue(CM.pipBody) + 540) % 360) - 180);
+    if (drop < 15 || drop > 25) out.push(`Pip's line ${pipLine} sits ${drop.toFixed(1)} L* under the body (want 15-25)`);
+    if (chroma(pipLine) > 25) out.push(`Pip's line ${pipLine} C* ${chroma(pipLine).toFixed(1)} (> 25)`);
+    if (dh > 6) out.push(`Pip's line ${pipLine} turns ${dh.toFixed(1)} deg off the body's hue (same hue: <= 6)`);
+    if (sp.min < 1.6 || sp.max > 2.2) out.push(`the pen's B line is ${sp.min}-${sp.max} px (Pip's line: 1.6-2.2 px)`);
+    if (sp.chromaMax > 25) out.push(`the pen caps B fills at C* ${sp.chromaMax} (> 25)`);
   }
   // the hero is hers only
   const nonHero: [string, string][] = Object.entries(CM)
