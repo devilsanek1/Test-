@@ -54,6 +54,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-27 (restart, kit stage): "make sure to parallelize the work as much as you can, start more instances of cloud
   machines if you have to, but clean them up after" -> lanes and kit work farmed out to helper cloud sessions (report file =
   done-signal), each archived once its work is merged and checked. -> rule: Process (parallelize; archive helpers).
+- 2026-10-27: "They must all use ultracode effort btw - all support sessions you spin up" -> every helper's prompt says
+  ultracode and COMMON.md tells it to orchestrate with workflows; the running helpers were told. -> rule: Process (helpers).
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
