@@ -49,6 +49,14 @@ your summary). Never edit another builder's file; if one breaks the bundle, wait
   product anywhere; Pip one reaction per shot (S3: turns to her on "she"; S4: turns west on "heading"), no gag.
 - **Performance:** many small things through the kit's `Batch` + `Paint` (one Fill per colour per layer), static batches in
   `useMemo`; a 1080x1920 frame must render in <= ~1 s at --gl=angle.
+- **`docs/v2/STYLE.md` (the film's style sheet, landed 2026-10-27 ~14:00) wins over this plan where they differ.** Points that
+  touch L3: shadows are SHORT flat colour polygons (<= ~3-4 % of the frame width, ~40 px, past the object; one light
+  direction; NOT long low-sun streaks) · no look-alike of her (plum round head + bun + long coat) within ~300 px · ambient life
+  never crosses lettering (the tag, the plates) · pictures lead the voice by ~0.1 s; marks and Pip's beats land ON the word
+  (±0.05 s); Pip's head turns a few frames BEFORE the voice names the thing · DENSE-CALM = flat <= 30 %, detail >= 33 %, objects
+  >= 120 / Mpx, >= 2 movers always (aim 2-4) crossing sideways at real speeds, half the people at rest, nothing coming at us ·
+  near head-backs: K4 `NearBack` hv <= ~150 (width = 0.84 x hv x broad) · no big passers-by cut by a side edge · walks at real
+  speeds (0.7-1.1 body heights/s) drawn at 12 drawings/s · linework static per seed (no boil).
 
 ## 1. V2S4 "The walk home" (film 14.86-20.55; 5.69 s; DENSE-CALM; light `lowSun`: sky `[CM.sky, CM.bandGold]`)
 **Lens:** from the water, looking north, trucking WEST (left) with our narrowboat: planes slide RIGHT on screen (`V2S4_rig.ts`:
@@ -64,10 +72,11 @@ plane from x -(k x 310 + 60) to 1140).
   King's-Cross-like gasholder frame (the lattice slides across the disc with the 0.3x plane: a parallax cue); far roof rows in flat
   depth steps, chimney stacks with pots, aerials with birds, the viaduct with a train crossing; the terrace BACKS (0.6x) over garden
   walls: rear windows (a few warmly lit), back extensions, drainpipes, a washing line flapping, a tree in autumn leaf, ivy,
-  pigeons on a wall. All tops >= 600. Long low-sun shadows fall to the EAST (screen right) as colour (`shadowInto`, light at SUN1).
+  pigeons on a wall. All tops >= 600. Shadows fall to the EAST (screen right) as SHORT flat colour (STYLE.md §2: <= ~40 px past the object).
 - **Her towpath y 860-1082 (1.0x):** paving that is never flat, garden walls / gates at the back (y ~860-990), heritage lamp
   posts (off), a bench with a seated reader (page turns), planters, a bin, a parked bike, a lifebuoy on a post, mooring rings and
-  bollards on the coping (y ~1082), leaves; walkers (see life). **The fingerpost** on this plane (section 1b).
+  bollards on the coping (y ~1082), leaves; walkers (see life); short colour shadows to the east (STYLE.md: <= ~40 px past the
+  object). **The fingerpost** on this plane (section 1b).
 - **Her** (screen-fixed, x 720, feet 1070, 170 px, walking LEFT in profile; `Her` pose walk view profile, `step = s4HerSteps(t)`,
   `stride = strideFor(62, 170)`); from 17.96 `stopLook` (head lifted toward the plates). She stays whole and >= 170 px.
 - **The canal strip y 1082-1220 (1.0x):** water (`Water`, ripples, glints, broken reflections of the backs), two ducks, a heron
