@@ -283,7 +283,9 @@ export const S1Water: React.FC = () => {
 
 // ---------------------------------------------------------------- the two moored boats (the right rail)
 
-const BOAT_A: BoatOpts = {x: 786, water: 1140, len: 560, h: 74, dir: -1, seed: 's1boatA', cabin: CM.sage, topView: 8, roofItems: true, panel: false};
+/** Boat A's stern is off the right edge (dir -1: u 0 = the stern at x 1346), so its stove chimney sits at u 0.6 (x ~1010),
+ *  on the visible part of the roof, for the 0.70 puff (TREATMENT f42). */
+const BOAT_A: BoatOpts = {x: 786, water: 1140, len: 560, h: 74, dir: -1, seed: 's1boatA', cabin: CM.sage, topView: 8, roofItems: true, panel: false, chimney: 0.6};
 const BOAT_B: BoatOpts = {x: 930, water: 1196, len: 520, h: 86, dir: -1, seed: 's1boatB', cabin: CM.coatOat, topView: 10, roofItems: true, panel: true};
 
 const OneBoat: React.FC<{o: BoatOpts; smoke?: boolean; bursts?: number[]}> = ({o, smoke, bursts}) => {
@@ -374,17 +376,12 @@ const Jogger: React.FC<{x: number; seed: string; traits: React.ComponentProps<ty
   return <Person x={xx} y={feet} h={h} seed={seed} pose="jog" view="profile" flip={flip} walk={{rate}} traits={traits} />;
 };
 
-/** A walker far right on the towpath behind the boats (calm: 0.9 body heights/s east, then gone at the edge). */
-const S1_WALKER = {x0: 905, t0: 0, speed: 0} as const;
-
 export const S1FarLife: React.FC = () => {
   const t = useTime();
   return (
     <>
       <Jogger x={s1Jog1X(t)} seed="s1/jog1" rate={2.9} flip={false} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: CM.hair[1], coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none', shoes: CM.paper}} />
       <Jogger x={s1Jog2X(t)} seed="s1/jog2" rate={2.8} flip traits={{hair: 'beanie', hatColor: CM.sage, coat: CM.leafRust, coatLen: 'jacket', trousers: CM.shadeCool, acc: 'none', shoes: CM.paper}} />
-      {/* a man reading the moorings sign far right, behind the boats: a slight sway, a turn on the ding */}
-      <Person x={S1_WALKER.x0 + 140} y={MAP.s1TowpathFeetY(1045) - 14} h={MAP.s1FigureHAt(1045) * 0.9} seed="s1/standR" pose="stand" view="back" turn={t > 0.5 && t < 1.6 ? -0.45 : Math.sin(t * 1.3) * 0.08} traits={{hair: 'short', hairColor: CM.hair[2], coat: CM.coatSlate, coatLen: 'jacket', trousers: CM.line, acc: 'backpack', accColor: CM.brick}} />
     </>
   );
 };
