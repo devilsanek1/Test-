@@ -183,9 +183,9 @@ export const TerraceTree5: React.FC<{burstAt?: number}> = ({burstAt}) => {
       [C.x0 + 280, 1168, 150, 92, 0.6],
       [C.x0 + 140, 905, 245, 180, 0.45],
       [C.x0 + 345, 990, 125, 118, 0.42],
-      [C.x0 + 245, 780, 190, 130, 0.4],
+      [C.x0 + 245, 812, 190, 130, 0.4],
       [C.x0 + 395, 850, 74, 80, 0.35],
-      [C.x0 + 60, 720, 150, 90, 0.45],
+      [C.x0 + 60, 772, 150, 90, 0.45],
     ];
     return m.map(([cx, cy, rx, ry, litK], i) => ({cx, cy, rx, ry, seed: `s5deck/tree/m${i}`, light, bloom: 0.95, litK}));
   }, []);
