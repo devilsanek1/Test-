@@ -45,9 +45,10 @@ px at 1080 x 1920.
 | S4 | 14.86-20.55 | her window ahead at the far left (backs plane, 0.6x the truck: half in by ~15.4, whole by ~16.1), under the sun at the push-through | ~5.15 |
 | S5-S7 | 20.55-~33.0 | none: the declared other side (§1.3) | 0 |
 | S8 | ~33.0-39.08 | W (pre-truck (700, 700), uncovered by the boat's stern ~33.0; at W from 35.60), lights 34.95, the seam | ~6.1 |
-**As CRAFT measures it: ~26.1 s = 67 % of 39.08 s (FAIL: < 80 %) and a 12.45 s gap, 20.55-33.0 (FAIL: > 3 s; S5's
-crane alone would be the exempt scale reveal, the gate and Google's beat are not). No thread outside S5-S7 can pass: at
-100 % there it is 68 %. With the owner's §1.3 exception: 98 % of the 26.6 s outside it, longest gap ~0.5 s (S3 -> S4).**
+**Sum ~26.1 s = 67 % of 39.08 s. With the owner-approved fairness stretch (§1.3, 20.55-33.0) set aside, as CRAFT
+§a.1 allows: 98 % of the 26.6 s outside it, longest gap ~0.5 s (S3 -> S4): both FAIL lines pass. Counted over the whole
+film they could not (68 % at most even at 100 % outside S5-S7), so the stretch must stay declared in scenes.json notes
+and in the assembly's thread check.**
 
 ## 3. Joins (0 plain cuts; shots average 4.9 s)
 At every join the midpoint leads the next sentence's first heard word by 0.12-0.23 s, in the voice's pause (two forced
@@ -174,8 +175,5 @@ placement jitter stays.
   S4->S5, S6->S7, S8->S1) and movers per join on a 0.4-scale render (CRAFT §e).
 
 ## 8. For the owner
-1. Approve §1.3 as an exception to CRAFT §a's two FAIL lines? Her window cannot be in Washington (April, before she
-   quit) or in Google's equal-weight beat, so S5-S7 (20.55-33.0, 12.4 s) run without it: 67 % of the film and a 12.4 s
-   gap where CRAFT asks >= 80 % and <= 3 s (no other placement can pass: 68 % at most). Outside S5-S7 it is on screen
-   98 % of the time. The alternative, both boards re-staged on the canal beside her window, costs ~2 lane-days and weakens
-   the fairness design (the deal next to her home, Google's words in her frame); not recommended.
+1. Answered 2026-10-27 ~20:10 UTC: "Yes" to §1.3 (S5-S7 without her window; restaging the boards on the canal rejected).
+   No open question on this card.
