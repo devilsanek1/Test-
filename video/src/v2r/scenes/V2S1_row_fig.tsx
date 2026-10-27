@@ -2,7 +2,7 @@
 // so the copies are visibly her (TREATMENT sections 3-4; STYLE section 4; critic round 0 must #1: "white gowns /
 // shrouds"). A small woman in a long belted coat walking away-left down the towpath, rear 3/4, from behind:
 //   a round head that IS the hair, a LOW BUN at the back of it (lower right: it also says which way she faces), a
-//   turned-up collar at the nape, slim shoulders (0.25 H), a belted waist with a knot at the back, sleeves as wide as
+//   turned-up collar at the nape, slim shoulders (0.225 H; ~0.25 H drawn, with the line), a belted waist with a knot at the back, sleeves as wide as
 //   an arm swinging a little with the stride (no hands: the sleeve ends at the cuff), a centre back vent that opens and
 //   a hem that flares with the stride, the hem at mid-calf so the legs and shoes walk clearly below it.
 // Legs: a near-profile scissor (forward foot screen-left and a touch higher = further away, back foot on its toes), so
