@@ -412,6 +412,35 @@ function gullInto(b: Batch, t: number) {
   b.fill(CM.coatMustard, `M${P(x - s * 0.76, y - 1)}L${P(x - s * 0.98, y)}L${P(x - s * 0.76, y + 1)}Z`);
 }
 
+
+/** A neighbour raking leaves in house 3's garden: head, shoulders and the rake above the garden wall (the path
+ *  plane's wall hides the rest); the rake sweeps on a 1.3 s stroke (12 drawings/s), a leaf pile grows nothing. */
+export const RAKER = {x: 972, base: 868, h: 104};
+function rakerInto(b: Batch, t: number) {
+  const {x, base, h} = RAKER;
+  const tq = Math.floor(t * 12 + 1e-6) / 12;
+  const ph = (tq / 1.3) * Math.PI * 2;
+  const k = 0.5 + 0.5 * Math.sin(ph); // 0 = rake pulled in, 1 = reached out
+  const lean = 4 + k * 6;
+  const sh = base - h * 0.62;
+  const hx = x - lean * 0.6;
+  // the leaf pile at the wall's foot (just its top shows), the rake's head and handle
+  b.fill(CM.leafRust, lobes(x - 64, x - 18, base + 2, 16, 's4rakepile', 3));
+  const rx = x - 34 - k * 34;
+  const ry = base + 4;
+  b.ink(`M${P(x - 6, sh + 18)}L${P(rx, ry - 4)}`, 2.2, CM.line);
+  b.layer();
+  b.fill(CM.leafGold, lobes(x - 52, x - 26, base + 2, 9, 's4rakepile2', 2));
+  // shoulders and torso (a mustard jumper), arms down the handle, a head in a beanie (no face: from behind / side)
+  b.fill(CM.coatMustard, `M${P(x - 22, base + 8)}L${P(x - 20 - lean, sh + 10)}Q${P(x - 14 - lean, sh - 4)} ${P(x - 2 - lean * 0.5, sh - 2)}Q${P(x + 14, sh)} ${P(x + 18, sh + 12)}L${P(x + 20, base + 8)}Z`);
+  b.fill(CM.coatMustard, `M${P(x - 14 - lean, sh + 6)}Q${P(x - 26 - k * 10, sh + 24)} ${P(x - 22 - k * 20, sh + 30 + k * 4)}L${P(x - 16 - k * 20, sh + 34 + k * 4)}Q${P(x - 16 - k * 6, sh + 24)} ${P(x - 4 - lean, sh + 12)}Z`);
+  b.layer();
+  b.fill(CM.brickLight, ovalPath(x - 19 - k * 20, sh + 32 + k * 4, 3.6, 3.6));
+  b.fill(CM.hair[1], ovalPath(hx, sh - 14, 11, 11));
+  b.fill(CM.sage, `M${P(hx - 11.5, sh - 15)}A11.5 11 0 0 1 ${P(hx + 11.5, sh - 15)}L${P(hx + 11.5, sh - 12)}L${P(hx - 11.5, sh - 12)}Z`);
+  b.ink(`M${P(x - 20 - lean, sh + 10)}Q${P(x - 14 - lean, sh - 4)} ${P(x - 2 - lean * 0.5, sh - 2)}Q${P(x + 14, sh)} ${P(x + 18, sh + 12)}`, HAIR, CM.ink, 0.3);
+}
+
 // ---------------------------------------------------------------- the plane
 
 export const BacksPlane: React.FC = () => {
@@ -433,6 +462,8 @@ export const BacksPlane: React.FC = () => {
   washingInto(dyn, t);
   dyn.layer();
   treesInto(dyn, t);
+  dyn.layer();
+  rakerInto(dyn, t);
   dyn.layer();
   pigeonsInto(dyn, t);
   dyn.layer();

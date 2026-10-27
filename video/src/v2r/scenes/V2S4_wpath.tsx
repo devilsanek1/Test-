@@ -35,8 +35,8 @@ const SEGS: Seg[] = [
   {x0: 566, x1: 690, kind: 'brick', c: CM.brickDeep},
   {x0: 690, x1: 830, kind: 'brick', c: CM.brick, pot: true},
   {x0: 830, x1: 882, kind: 'gate', c: CM.brick, gate: CM.sage},
-  {x0: 882, x1: 1110, kind: 'trellis', c: CM.brickLight},
-  {x0: 1110, x1: 1250, kind: 'render', c: CM.limestone, ivy: true},
+  {x0: 882, x1: 1110, kind: 'brick', c: CM.brickLight, ivy: true},
+  {x0: 1110, x1: 1250, kind: 'render', c: CM.limestone},
   {x0: 1250, x1: 1300, kind: 'gate', c: CM.brickLight, gate: CM.brickDeep},
   {x0: 1300, x1: X1, kind: 'railing', c: CM.brick},
 ];
