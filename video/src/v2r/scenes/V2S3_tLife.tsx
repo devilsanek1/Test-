@@ -11,7 +11,7 @@ import React, {useMemo} from 'react';
 import {CM} from '../palette';
 import {useTime} from '../../lib/time';
 import {Paint, frac} from '../kit/canal/core';
-import {Towpath, Lamp, benchInto, bollardInto} from '../kit/canal/towpath';
+import {Towpath, Lamp, bollardInto} from '../kit/canal/towpath';
 import {Birds, Pigeons, Puffs, StringLights} from '../kit/canal/life';
 import {Person, strideFor, drawn, TraitOverrides} from '../kit/cast';
 import {S3_START} from './V2S3_rig';
@@ -94,15 +94,35 @@ const Dog: React.FC<{w: WalkerSpec}> = ({w}) => {
   return <Paint b={b} seed="s3dog" misreg={false} />;
 };
 
+/** A London towpath bench seen from the canal: cast-iron ends with scrolled arms, a slatted back behind the seat. */
+function benchFrontInto(b: Batch, x: number, y: number, w: number) {
+  const seatY = y - 22;
+  // the shade under the seat on the paving
+  b.poly(CM.stoneShade, [[x - w / 2 + 4, y - 1], [x + w / 2 + 2, y - 1], [x + w / 2 + 12, y + 3], [x - w / 2 + 12, y + 3]]);
+  // the back: three slats with gaps (the far side), then the seat's front rail
+  for (let k = 0; k < 3; k++) b.rect(CM.line, x - w / 2 + 6, seatY - 30 + k * 8, w - 12, 5.4);
+  b.rect(CM.shadeWarm, x - w / 2 + 6, seatY - 4, w - 12, 4);
+  b.rect(CM.line, x - w / 2 + 2, seatY, w - 4, 6.5);
+  // the iron ends: a leg, an arm scroll
+  for (const s of [-1, 1]) {
+    const ex = x + s * (w / 2 - 6);
+    b.poly(CM.anchor, [[ex - 3, seatY - 32], [ex + 3, seatY - 32], [ex + 3 + s * 2, y], [ex - 3 + s * 2, y]]);
+    b.rect(CM.anchor, ex - s * 2 - 6, seatY - 14, 12, 3.2);
+    b.fill(CM.anchor, ovalPath(ex + s * 6, seatY - 13, 3.6, 3.6));
+  }
+  // a takeaway cup and a folded newspaper on the seat
+  b.rect(CM.paper, x - 30, seatY - 10, 7, 10);
+  b.rect(CM.brick, x - 30, seatY - 7, 7, 3);
+  b.poly(CM.paper, [[x + 10, seatY], [x + 34, seatY], [x + 30, seatY - 5], [x + 14, seatY - 5]]);
+  b.ink(line(x - w / 2 + 4, seatY - 30, x + w / 2 - 4, seatY - 30, {seed: 'benchTop', over: 'small'}) + line(x - w / 2, seatY, x + w / 2, seatY, {seed: 'benchSeat', over: 'small'}), TK.detail);
+}
+
 // ---------------------------------------------------------------- the towpath and its furniture
 
 function furnitureBatch(): Batch {
   const b = new Batch();
-  // a bench under the tree, facing the canal; a takeaway cup and a folded paper on it
-  benchInto(b, 118, PATH.edge - 9, 84, 'front', 's3bench');
-  b.rect(CM.paper, 88, PATH.edge - 9 - 84 * 0.42 * 0.55 - 9, 7, 9);
-  b.rect(CM.line, 88, PATH.edge - 9 - 84 * 0.42 * 0.55 - 6, 7, 2.4);
-  b.rect(CM.paper, 132, PATH.edge - 9 - 84 * 0.42 * 0.55 - 3, 18, 3);
+  // a towpath bench under the tree, facing the canal; a takeaway cup and a folded paper on it
+  benchFrontInto(b, 112, PATH.edge - 8, 104);
   // bollards on the coping, a bin, mooring rings
   bollardInto(b, 262, PATH.edge - 4, 17, 'bol1');
   bollardInto(b, 652, PATH.edge - 4, 17, 'bol2');
@@ -149,60 +169,60 @@ const tipAt = (t: number) => {
   return k * k * (3 - 2 * k) + Math.sin(t * 9) * 0.04 * Math.min(a, c);
 };
 
-/** Busts behind the glazing (drawn between the panes and the sashes). */
+/** Busts behind the glazing (drawn between the panes and the sashes): the kettle neighbour at the counter. */
 export const S3Inside: React.FC = () => {
   const t = useTime();
   const b = new Batch();
-  // the watering neighbour leans toward the open sash as the can tips
-  {
-    const lean = tipAt(t) * 4;
-    const hx = WATER.x - lean;
-    const hy = 770 + lean * 0.6;
-    b.poly(CM.box, [[hx - 26, WATER.sill], [hx - 22, hy + 22], [hx - 8, hy + 14], [hx + 10, hy + 14], [hx + 22, hy + 22], [hx + 26, WATER.sill]]);
-    b.fill(CM.hair[2], ovalPath(hx, hy, 11, 12));
-    b.fill(CM.hair[2], ovalPath(hx + 6, hy - 9, 5, 4.6));
-    b.fill(CM.brickLight, ovalPath(hx - 2, hy + 12, 3.4, 3));
-  }
-  // the kettle neighbour at the counter, swaying a hair, looking down at the kettle
-  {
-    const sw = Math.sin(t * 2.1) * 1.2;
-    const hx = KETTLE.x + sw;
-    const hy = 778;
-    b.poly(CM.coatMustard, [[hx - 24, KETTLE.sill], [hx - 20, hy + 20], [hx - 6, hy + 13], [hx + 8, hy + 13], [hx + 21, hy + 20], [hx + 24, KETTLE.sill]]);
-    b.fill(CM.hair[4], ovalPath(hx, hy, 10.5, 11.5));
-    b.fill(CM.paper, ovalPath(hx - 18, KETTLE.sill - 9, 7, 6));
-    b.rect(CM.anchor, hx - 21, KETTLE.sill - 16, 6, 3);
-  }
+  const sw = Math.sin(t * 2.1) * 1.2;
+  const hx = KETTLE.x + sw;
+  const hy = 784;
+  b.poly(CM.coatMustard, [[hx - 20, KETTLE.sill], [hx - 17, hy + 18], [hx - 5, hy + 12], [hx + 7, hy + 12], [hx + 17, hy + 18], [hx + 20, KETTLE.sill]]);
+  b.fill(CM.hair[4], ovalPath(hx, hy, 9, 10));
+  b.fill(CM.hair[4], ovalPath(hx + 5, hy - 8, 4.4, 4));
+  // the kettle on the counter
+  b.fill(CM.paper, ovalPath(hx - 17, KETTLE.sill - 8, 6.5, 5.5));
+  b.rect(CM.anchor, hx - 20, KETTLE.sill - 15, 6, 2.6);
   return <Paint b={b} seed="s3inside" misreg={false} />;
 };
 
-/** The can and its drops, the kettle's steam (in front of the windows). */
+/** Out of the windows (in front): the watering neighbour leaning out of the raised sash with a can that tips and
+ *  drips into the box; the kettle's steam out of the lowered top sash. */
 export const S3Outside: React.FC = () => {
   const t = useTime();
   const b = new Batch();
   const tip = tipAt(t);
-  // the arm out of the open lower sash, the can over the box's left half
   {
-    const sh: [number, number] = [WATER.x - 10, 826];
-    const hand: [number, number] = [WATER.x - 24 - tip * 4, 834 - tip * 2];
-    b.ink(`M${P(sh[0], sh[1])}L${P(hand[0], hand[1])}`, 6, CM.box);
-    const a = (-8 - 38 * tip) * (Math.PI / 180);
+    // the neighbour leans out a little further as the can tips
+    const lean = tip * 3;
+    const hx = WATER.x + 8 - lean;
+    const hy = 806 + lean * 0.5;
+    b.poly(CM.sage, [[hx - 22, WATER.sill + 1], [hx - 18, hy + 14], [hx - 6, hy + 9], [hx + 8, hy + 9], [hx + 19, hy + 14], [hx + 22, WATER.sill + 1]]);
+    b.fill(CM.hair[2], ovalPath(hx, hy, 9, 9.6));
+    b.fill(CM.hair[2], ovalPath(hx + 5, hy - 7, 4, 3.8));
+    b.fill(CM.brickLight, ovalPath(hx - 7, hy + 3, 2.2, 2.6));
+    // the arm out to the can over the box's west half
+    const sh: [number, number] = [hx - 12, hy + 17];
+    const hand: [number, number] = [hx - 16 - tip * 2, hy + 16 - tip * 2];
+    b.ink(`M${P(sh[0], sh[1])}Q${P(sh[0] - 8, sh[1] + 8)} ${P(hand[0], hand[1])}`, 6, CM.sage);
+    b.fill(CM.brickLight, ovalPath(hand[0], hand[1], 3, 2.8));
+    const a = (-6 - 40 * tip) * (Math.PI / 180);
     const ca = Math.cos(a);
     const sa = Math.sin(a);
     const rot = (x: number, y: number): [number, number] => [hand[0] + x * ca - y * sa, hand[1] + x * sa + y * ca];
-    const body = [rot(-2, -4), rot(-16, -4), rot(-16, 7), rot(-2, 7)];
-    b.poly(CM.coatSlate, body);
-    const sp0 = rot(-15, 0);
-    const sp1 = rot(-27, -6);
-    b.ink(`M${P(sp0[0], sp0[1])}L${P(sp1[0], sp1[1])}`, 2.2, CM.coatSlate);
-    b.ink(`M${P(rot(-4, -4)[0], rot(-4, -4)[1])}Q${P(rot(-9, -12)[0], rot(-9, -12)[1])} ${P(rot(-14, -4)[0], rot(-14, -4)[1])}`, 1.4, CM.coatSlate);
-    // drops fall from the spout to the plants while it pours
-    if (tip > 0.55) {
-      for (let k = 0; k < 4; k++) {
-        const u = frac(t * 5.5 + k * 0.25);
-        const dx = sp1[0] - 1 - u * 2 + (k % 2) * 2;
-        const dy = sp1[1] + 2 + u * (852 - sp1[1]);
-        b.fill(CM.glass, ovalPath(dx, dy, 1.4, 2.4));
+    b.poly(CM.coatSlate, [rot(2, -2), rot(-18, -2), rot(-18, 12), rot(2, 12)]);
+    b.poly(CM.shadeCool, [rot(-18, 8), rot(2, 8), rot(2, 12), rot(-18, 12)]);
+    const sp0 = rot(-17, 3);
+    const sp1 = rot(-32, -6);
+    b.ink(`M${P(sp0[0], sp0[1])}L${P(sp1[0], sp1[1])}`, 2.6, CM.coatSlate);
+    b.fill(CM.coatSlate, ovalPath(sp1[0], sp1[1], 2.6, 2.2));
+    b.ink(`M${P(rot(1, -2)[0], rot(1, -2)[1])}Q${P(rot(-8, -13)[0], rot(-8, -13)[1])} ${P(rot(-16, -2)[0], rot(-16, -2)[1])}`, 1.6, CM.coatSlate);
+    // drops fall from the rose into the plants while it pours
+    if (tip > 0.5) {
+      for (let k = 0; k < 5; k++) {
+        const u = frac(t * 4.6 + k * 0.2);
+        const dx = sp1[0] - 2 + (k % 3) * 2.4 - u * 1.5;
+        const dy = sp1[1] + 3 + u * (852 - sp1[1]);
+        b.fill(CM.paper, ovalPath(dx, dy, 1.6, 3.2));
       }
     }
   }
@@ -228,6 +248,8 @@ export const S3RoofLife: React.FC = () => (
     <Pigeons ledge={[600, 720, 628]} n={2} size={15} seed="s3pig" shuffleAt={[13.6]} />
     <StringLights from={[830, 827]} to={[954, 825]} sag={9} n={12} r={3.2} seed="s3slA" on w={1.2} />
     <StringLights from={[842, 708]} to={[936, 708]} sag={7} n={9} r={2.8} seed="s3slB" on w={1.2} />
+    <StringLights from={[58, 946]} to={[166, 968]} sag={11} n={8} r={3} seed="s3slG" on w={1.2} />
+    <StringLights from={[-70, 930]} to={[44, 944]} sag={10} n={8} r={3} seed="s3slH" on w={1.2} />
   </>
 );
 

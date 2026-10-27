@@ -50,7 +50,7 @@ export const WINDOWS: WinSpec[] = [
   {id: 'h1gl', x: 300, y: 922, w: 22, h: 112, bars: '1/1', surround: 'plain', wall: CM.brick, lit: false, unlit: 'sky', sill: false},
   {id: 'h1gr', x: 442, y: 922, w: 22, h: 112, bars: '1/1', surround: 'plain', wall: CM.brick, lit: false, unlit: 'sky', sill: false},
   // the stock-brick house: the WATERING neighbour's window (lit, lower sash up), a blind, the lit front room
-  {id: 'h2a', x: 566, y: 708, w: 66, h: 136, bars: '2/2', surround: 'hood', wall: CM.brickLight, lit: true, inner: 'frame', open: 30, box: true, curtain: CM.blossom},
+  {id: 'h2a', x: 566, y: 708, w: 66, h: 136, bars: '2/2', surround: 'hood', wall: CM.brickLight, lit: true, inner: 'frame', open: 50, box: true, curtain: CM.blossom},
   {id: 'h2b', x: 668, y: 708, w: 66, h: 136, bars: '2/2', surround: 'hood', wall: CM.brickLight, lit: false, unlit: 'blind', blind: 0.36},
   {id: 'h2g', x: 562, y: 920, w: 86, h: 114, bars: '6/6', surround: 'stucco', wall: CM.stucco, lit: true, inner: 'lamp', curtain: CM.coatMustard},
   // the dark-brick house: a narrow sash that switches on, the balcony's French door, a dormer, the kitchen

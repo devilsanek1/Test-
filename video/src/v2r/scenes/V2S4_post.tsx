@@ -39,14 +39,12 @@ const SOCK_H = 26;
 function postBatch(): Batch {
   const b = new Batch();
   const x = POST.x;
-  // the long low-sun shadow east along the paving (colour, never grey): the post's and its plinth's
+  // its shadow on the paving: colour, flat, SHORT and east (STYLE §2; the world's own quad, V2S4_wcore SHADOW)
   b.poly(CM.stoneShade, [
-    [x + 14, PLINTH_TOP + 9],
-    [x + 18, POST.footY - 1],
-    [x + 330, POST.footY + 9],
-    [x + 334, POST.footY + 12],
-    [x + 300, POST.footY + 12],
-    [x + 10, POST.footY + 4],
+    [x - 18, POST.footY - 1],
+    [x + 18, POST.footY - 2],
+    [x + 18 + 34, POST.footY + 4],
+    [x - 11 + 34 * 0.9, POST.footY + 6],
   ]);
   b.layer();
   // stone plinth: lit face, a shade side to the east

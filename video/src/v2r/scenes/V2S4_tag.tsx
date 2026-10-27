@@ -81,12 +81,11 @@ export const S4Tag: React.FC = () => {
     line(X1, bottom, X0, bottom, {...lo, seed: 's4tagB', over: [4, 6]}),
     line(X0, bottom, X0, Y0, {...lo, seed: 's4tagL', over: [3, 0]}),
   ].join('');
-  // the leader: pens up out of her head at 15.07; a gentle sway (a thread, never a jitter)
-  const sway = 2.2 * Math.sin((t - T1) * 2.1);
+  // the leader: pens up out of her head at 15.07; a thread with a slight belly (static: STYLE §3, no sway)
   const lx0 = HEAD_END.x;
   const ly0 = HEAD_END.y;
   const ly1 = bottom - 1;
-  const leader = `M${P(lx0, ly0)}Q${P((lx0 + CARD_END_X) / 2 + 6 + sway, (ly0 + ly1) / 2)} ${P(CARD_END_X, ly1)}`;
+  const leader = `M${P(lx0, ly0)}Q${P((lx0 + CARD_END_X) / 2 + 6, (ly0 + ly1) / 2)} ${P(CARD_END_X, ly1)}`;
   return (
     <XG m={outer}>
       {ly0 - ly1 > 4 ? <Ink d={leader} at={T1} dur={0.08} width={INK_PX.hair} seed="s4tagLeader" exit={false} /> : null}

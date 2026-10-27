@@ -182,12 +182,15 @@ function midBatch(): Batch {
   b.rect(CM.shadeWarm, 44, g0 + 30, 46, 3);
   b.rect(CM.shadeWarm, 44, g0 + 76, 46, 3);
   b.layer();
-  for (let i = 0; i < 26; i++) {
-    const x = r.range(XL + 10, 40);
-    const y = g0 + r.range(-6, 48);
-    b.fill(r.pick([CM.sage, CM.sage, CM.leafGold]), leafPath(x, y, 9, 4, r.range(40, 140)));
+  // ivy spilling over the coping in three clumps (dense at the top, trailing down)
+  for (const [c0, c1, drop] of [[XL + 6, 30, 46], [96, 160, 34], [-6, 26, 20]] as const) {
+    for (let i = 0; i < 34; i++) {
+      const x = r.range(c0, c1);
+      const k = r.next();
+      const y = g0 - 8 + k * k * drop + r.jitter(3);
+      b.fill(r.pick([CM.sage, CM.sage, CM.sage, CM.leafGold]), leafPath(x, y, r.range(7, 10), 3.8, r.range(30, 150)));
+    }
   }
-  for (let i = 0; i < 16; i++) b.fill(CM.sage, leafPath(r.range(100, 160), g0 + r.range(-4, 26), 8, 3.6, r.range(30, 150)));
   b.ink(line(XL, g0, 167, g0, {seed: 'gwall', over: 'small'}) + rectInk(44, g0 + 10, 46, 90, {seed: 'gate', over: 'small', open: 0.4}), TK.struct);
   return b;
 }
