@@ -1,9 +1,20 @@
-// Lane: replace this file with the real set (docs/G5_BLOCKING.md).
-// O1 board placeholder: plays the locked G3 board panel "O1" inside the Film engine (scene-local time t = board
-// time - 0). Contract: default-export a React.FC with no props; optional exports `Wiper` (foreground-wipe element)
-// and `captionTone` (ToneKey[], overrides scenes.json for this panel).
+// O1 (lane L1-desk): the HOOK, 0-6.12. HOME BASE desk, COZY, INSERT high 3/4, PULL OUT 1.05 -> 1.00 (ease-in).
+// She quit: her sleeve drops her GOOGLE badge in a box and carries the box out; a highlighter marks the clause, in words
+// ("no criticizing / Google"); then her contract runs past its own end and pours off the desk, a year every few rows,
+// faster and faster. Her cat watches every beat. The set and every beat live in O1_set.tsx (shared with P12);
+// t < 0 = the bare-line state the loop reveals under P13's un-build (frame 0's drawing, drawing on).
 import React from 'react';
-import {BoardPanel} from '../BoardPanel';
+import {World} from '../../../lib/World';
+import type {ToneKey} from '../../../lib/Film';
+import {CC} from '../kit';
+import {O1Set} from './O1_set';
 
-const O1: React.FC = () => <BoardPanel id="O1" />;
+const O1: React.FC = () => (
+  <World sky={CC.wall}>
+    <O1Set />
+  </World>
+);
 export default O1;
+
+/** Ink captions on the cream wall (the caption band is wall all shot long). */
+export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
