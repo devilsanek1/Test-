@@ -44,7 +44,7 @@ great-scale cues); (5) motion and camera (60 fps, reference shape not speed, tra
 (the channel's recurring living character: in every scene like reference 1's cat) and its design rules; (7) sound and music (beds, SFX
 rules, the positive phone sound in the first second, mix); (8) process lessons that matter for a direct-to-final production (what went
 wrong on v3 G5 and our rejected v2 cut: emptiness, stillness, tableaux); (9) a checklist of 25-40 yes/no acceptance questions a finished
-film must pass. Cite file + section for each rule (short). At most ~260 lines. Commit it.`, { label: 'house-digest', phase: 'Understand' }),
+film must pass. Cite file + section for each rule (short). At most ~260 lines. Commit it.`, { effort: 'max', label: 'house-digest', phase: 'Understand' }),
   () => agent(`${CTX}
 YOU WRITE THE BEAT MAP of the fixed narration: the clock and the meaning every visual must serve. Read ${V}/public/v2/voice_words.json
 (word timings; the token "can'tveto" is "can't veto"), ${V}/docs/v2/CORE_LINE.md (the core line and section 2: what the script must do,
@@ -59,6 +59,6 @@ FAIRNESS RULES for visuals as a strict list (from CORE_LINE section 2, guardrail
 or implied (war imagery, villains, a likeness of the real person, "for life" in quote marks, the deal's purpose line without its oversight
 clause, Google lettering where it implies wrongdoing, ...) and what must always be shown (attribution "she says", Google's side at equal
 weight, credits); (5) the open questions a treatment must answer visually (who are "Google's staff", what was the deal, why she can talk).
-At most ~220 lines. Commit it.`, { label: 'beat-map', phase: 'Understand' }),
+At most ~220 lines. Commit it.`, { effort: 'max', label: 'beat-map', phase: 'Understand' }),
 ])
 return { digest, beats }

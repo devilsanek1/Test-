@@ -37,7 +37,7 @@ const LENSES = [
 phase('Review')
 const reviews = await parallel(LENSES.map(l => () => agent(
   `${CTX}\n\nYou are ${l.lens}. Look at the v1 baseline first, then all 5 contact sheets (Read shows images; extract a larger frame with ffmpeg -loglevel error -ss <s> -i ${A}/arcane_s1.mp4 -frames:v 1 -vf scale=900:-1 ${A}/env_${l.key}_<shot>.jpg when needed, at most 8). Score EVERY shot (53) honestly; use the full range. Don't write other files.`,
-  { label: `review:${l.key}`, phase: 'Review', schema: SCORES })))
+  { effort: 'max', label: `review:${l.key}`, phase: 'Review', schema: SCORES })))
 
 const by = {}
 reviews.filter(Boolean).forEach((r, i) => r.scores.forEach(s => { (by[s.shot] = by[s.shot] || []).push({ lens: LENSES[i].key, ...s }) }))
@@ -52,11 +52,11 @@ log(`unanimous high-confidence: ${strong.length} of ${agg.length}: ${strong.map(
 phase('Guide')
 const guide = await agent(
   `${CTX}\n\nYou are the look director. Three reviewers (art director, layout, sceptic) scored every environment shot. These passed all three with every core score >= 7 (sorted by average):\n${JSON.stringify(strong)}\n\nAll scores for reference:\n${JSON.stringify(agg.slice(0, 25))}\n\nWrite ${LOOK}/CINEMATIC_GUIDE.md, SHORT and simple (max ~90 lines), for environment and architecture shots only:\n1. Why (3 lines): the owner's direction; our v1 look is the baseline; this adds targeted upgrades.\n2. "Shot types" (4-6, no more): each built only from the high-confidence shots above. For each: a name; the one idea (angle / composition / light / move); numbers for our 9:16 frame (horizon height, camera height or angle, how much is sky/flat field for captions, depth planes, camera move: % zoom or px of rise, duration, easing); which v1 shot it upgrades and how; 1-2 Arcane references as "#shot @ seconds" with a one-line description; a v1 frame it builds on as "v1 @ seconds" (pick from the 55 s v1 film).\n3. "Rules" (max 5) that apply to all of them.\n4. "Not for us" (3-5 lines): what we deliberately don't take from Arcane (darkness, faces, painterly texture...).\n5. Source and method (2-3 lines; full research archived in ${LOOK}/research/CINEMATIC_GUIDE_full_v1.md).\nDon't commit. Return the list of shot types (name, refs, v1 frame) in max 8 lines.`,
-  { label: 'look-director', phase: 'Guide' })
+  { effort: 'max', label: 'look-director', phase: 'Guide' })
 
 phase('Sketch')
 const sk = await agent(
   `${CTX}\n\nYou are our storyboard artist. Read ${LOOK}/CINEMATIC_GUIDE.md (just written). For EACH shot type in it, look at its Arcane reference frames (ffmpeg as above) and its v1 frame (ffmpeg -loglevel error -ss <s> -i ${ROOT}/deliverables/v1/php2shell_final.mp4 -frames:v 1 -vf scale=540:-1 ${A}/v1_<n>.jpg), then draw OUR 9:16 version as a simple pencil sketch for the guide: environment and buildings only (a tiny figure only if the type needs one for scale), in the spirit of our v1 frames (flat sky over the captions, the sun disc where it helps), showing the type's angle, composition, depth planes, light and the camera move as a labelled arrow at the side.\n\nWrite ${ROOT}/public/look/cine_sketches.json = {"sketches": [{"name": "<type name>", "rule": "<one short sentence>", "refs": "<Arcane refs as #shot @s, ...>", "ours": "<v1 @s>", "shot": <Shot>}, ...]}. <Shot> uses SketchReel's schema (read ${ROOT}/src/v3/SketchReel.tsx): {"id": "E1", "s": 0, "e": 1, "note": "", "transition": {"type": "cut"}, "camera": {"from": {"x": 540, "y": 960, "z": 1}, "to": {"x": 540, "y": 960, "z": 1}}, "els": [...]}, drawn at the camera's end state in a 1080x1920 world; ids E1, E2, ... in order. Elements: rect, ellipse, line (pts, closed), arrow, hatch, figure, text; fills warm / cold / dark / paper / pop. Keep the top 230 px empty (title), y 317-556 a flat field (captions), key shapes above y 1650 (rule text). 10-25 elements each.\nPreview: cd ${ROOT} && npx remotion still src/entry-v3.tsx ShotSketch ${A}/esk_<k>.png --frame=<k> --scale=0.25, look, fix (at most 8 renders). Don't commit. Return one line per sketch.`,
-  { label: 'sketch-artist', phase: 'Sketch' })
+  { effort: 'max', label: 'sketch-artist', phase: 'Sketch' })
 
 return { strong, top: agg.slice(0, 15).map(a => ({ shot: a.shot, avg: a.avg, min: a.min })), guide, sketches: sk }

@@ -8,4 +8,7 @@ that session's scratchpad: pass your own inputs. The tooling lane (retro proposa
 - `hierarchy/tiers.py`, `analyse.py`, `motion2.py` (salience, contrast and motion by tier), sheets;
 - `line/measure.py` (strokes, wobble, overshoot, near-miss ends per Mpx), `ends.py`;
 - `light/lab.py`, `value.py`, `shadepairs.py`, `blend.py`, `topcols.py` (value ladder, shadow pairs).
+- `depth/` (2026-10-27, `docs/look/research/2026-10-27_depth_analysis.md`): `depth_measure.py` (per-plane colour and
+  contrast against the air, silhouette separation, ground line directions with declared vanishing points), the run_*
+  configs for the G4 look clip, reference 1 and v1, `run_scale.py` (px/m and the camera constant), `extract_frames.sh`.
 Run Python on reference footage with `-I`, and keep footage and frames out of the repo.

@@ -38,7 +38,7 @@ work (e.g. continuous camera journeys through one world, crowds with their backs
 mascot reacting), each with timestamps; (3) the opening of each (frame 0 to 3 s) in detail; (4) the rejected v2 cut set side by side with v1
 at the same phone size: the concrete differences that most likely made the owner say no (be specific and honest: composition, motion,
 camera, story staging, colour, character animation, energy, transitions); (5) a list of DO / DON'T for the new v2 film. Put the contact
-sheet paths (scratch) in the doc. At most ~240 lines. Commit it.`, { label: 'teardown', phase: 'Understand' }),
+sheet paths (scratch) in the doc. At most ~240 lines. Commit it.`, { effort: 'max', label: 'teardown', phase: 'Understand' }),
   () => agent(`${CTX}
 YOU WRITE THE TOOLKIT INVENTORY: what the house code offers to build a FINISHED film at v1 quality, fast and reliably, and how v1 was put
 together. Read ${V}/docs/ENGINE.md, ${V}/docs/SHARED_SETS.md, ${V}/docs/SHARED_PROPS.md, ${V}/docs/CINE.md, ${V}/docs/EDGES.md, ${V}/docs/QA.md,
@@ -54,6 +54,6 @@ about a tech company, a person's home, a government building, a newsroom, a city
 actions, API), ambient life pieces (birds, clouds, traffic, steam, windows), camera tools (ShotCam, multiplane, persp), transitions
 (wipers, match cuts, unbuild loop); (4) the music beds and SFX available and how to make new ones; (5) QA tools and the exact commands;
 (6) gaps: what a fresh v2 film would have to build new; (7) render times you measured (one 2 s still/clip) to plan a full 1080x1920 60 fps
-render. Put the sheet path in the doc. At most ~240 lines. Commit it.`, { label: 'toolkit', phase: 'Understand' }),
+render. Put the sheet path in the doc. At most ~240 lines. Commit it.`, { effort: 'max', label: 'toolkit', phase: 'Understand' }),
 ])
 return { teardown, toolkit }

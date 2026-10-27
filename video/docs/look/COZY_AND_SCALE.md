@@ -122,8 +122,8 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
   facing wall closes it), lighter than the masses (C2 +15-18 L*) and it carries the life. A floor whose far end shows (a
   road to the horizon, open sea) counts as void.
 - **Closed where it matters:** >= 40 % of the frame's perimeter is mass (C2 49 %, C3 ~40 %); the open part faces the viewer
-  (bottom, lower sides) or is the sky; the far end is closed (a wall, a bend, a mouth under leaves): no vanishing point at all
-  is the coziest vista.
+  (bottom, lower sides) or is the sky; the far end is closed (a wall, a bend, a mouth under leaves): a vista whose vanishing
+  point stays hidden is the coziest (the ground in front of us still recedes toward it: DIRECTION rule 2).
 - **The viewer is the refuge** when no protagonist is in frame: up behind leaves (BALCONY) or safe across a moat (RIVERSIDE),
   unseen; the life is the prospect, small and unthreatening; nobody addresses us.
 
@@ -161,7 +161,9 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
 
 **RIVERSIDE [C3]: eye level across water (a canal, a river, a pond, a square seen across a fountain).**
 - Level, long lens: the eye line on the far path's standing heads; verticals vertical; every plane shows a little of its top
-  (roofs, stair treads); depth by overlap and stacking upward, no vanishing lines.
+  (roofs, stair treads); the far side's depth by overlap and stacking upward, no vanishing lines there. Any ground in front
+  of us (our bank, steps, a quay) still recedes to the shot's vanishing point, things smaller and joints finer with
+  distance (DIRECTION rule 2; `research/2026-10-27_depth_analysis.md`: S1's bank built as level bands read flat).
 - **BACKDROP (the facade wall):** full width, overlapping planes stacked upward (LIFE §0's stacking), many buildings across,
   each partly hidden, no base visible, each farther row higher and ~10-15 L* lighter. The back row's top is a jagged skyline
   (amplitude >= 0.12 H, never one straight roofline), kept with its sky in y 0-290 and the gutters: sky ~8-15 %, the

@@ -25,5 +25,5 @@ Do:
 4. Keep caption band y 317-556 flat and key action in x 60-940, y 620-1560.
 Write ${ROOT}/public/v3/animatic.json, and ${V3}/storyboard_g3.md (concept in 2 sentences; shot table: shot, time, what we see, camera, transition, guide type if any, and a "changed vs v1" column).
 Check: render up to 8 stills at key moments, including 3 frames across the S1 move: cd ${ROOT} && npx remotion still src/entry-v3.tsx Animatic ${SP}/sbv2_<n>.png --frame=<f> --scale=0.25 (30 fps). Look and fix. Don't render a video. Don't commit. Return at most 10 lines: what changed and the S1 shot's numbers.`,
-  { label: 'storyboard-artist', phase: 'Storyboard' })
+  { effort: 'max', label: 'storyboard-artist', phase: 'Storyboard' })
 return r

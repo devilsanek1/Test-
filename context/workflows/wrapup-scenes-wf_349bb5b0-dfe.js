@@ -28,7 +28,7 @@ const SCHEMA = {
   required: ['score', 'gate_pass', 'findings'],
 }
 const review = (id, r) => agent(`${ctx(id)}
-You are an independent REVIEWER of ${id}, round ${r}. Do NOT edit files. Render a 12-frame contact sheet of the scene from Main (half res) and strips at the beats in question; run the QA gate. Judge as a demanding art director and motion editor at once: every frame reads on a phone, carries its line's story beat with sound off, looks like the reference artist drew it, moves smoothly with no glitches or dead frames. Score = the lower of art and motion. Max 6 findings, most important first, each with a concrete fix. Severity: blocker = must fix to ship; major = clearly below the bar; minor = polish.`, { label: `review:${id}:r${r}`, phase: 'Review', schema: SCHEMA })
+You are an independent REVIEWER of ${id}, round ${r}. Do NOT edit files. Render a 12-frame contact sheet of the scene from Main (half res) and strips at the beats in question; run the QA gate. Judge as a demanding art director and motion editor at once: every frame reads on a phone, carries its line's story beat with sound off, looks like the reference artist drew it, moves smoothly with no glitches or dead frames. Score = the lower of art and motion. Max 6 findings, most important first, each with a concrete fix. Severity: blocker = must fix to ship; major = clearly below the bar; minor = polish.`, { effort: 'max', label: `review:${id}:r${r}`, phase: 'Review', schema: SCHEMA })
 
 const runScene = async (id) => {
   const hist = []
@@ -43,7 +43,7 @@ const runScene = async (id) => {
     const fx = await agent(`${ctx(id)}
 FIX ROUND ${r} for ${id}. The reviewer found:
 ${JSON.stringify(v.findings, null, 1)}
-Fix every blocker and major and only the cheap minors. Verify each fix on a render (LOOK at it), re-run the QA gate. Final message (max 12 lines): what changed per finding, QA life score, CROSS-LANE needs (exact).`, { label: `fix:${id}:r${r}`, phase: 'Fix' })
+Fix every blocker and major and only the cheap minors. Verify each fix on a render (LOOK at it), re-run the QA gate. Final message (max 12 lines): what changed per finding, QA life score, CROSS-LANE needs (exact).`, { effort: 'max', label: `fix:${id}:r${r}`, phase: 'Fix' })
     hist.push({ r, fix: (fx || 'FAILED').slice(0, 1500) })
   }
   return { id, hist }

@@ -59,7 +59,7 @@ next to the board at the same times (npx remotion still src/entry-v3.tsx Animati
 most ~10 images. Fix what doesn't match the board or doesn't read. Then save FOUR cold-read stills at phone size (270x480, captions included)
 for a sound-off reader: ${SCR}/coldread/a_19.50.png, b_20.40.png, c_21.15.png, d_22.40.png.
 ${GIT}
-REPORT (at most 12 lines): files, checks (sheet path), what is open, and any sfx times you changed.`, { label: 'S9 builder', phase: 'Build' }),
+REPORT (at most 12 lines): files, checks (sheet path), what is open, and any sfx times you changed.`, { effort: 'max', label: 'S9 builder', phase: 'Build' }),
   () => agent(`${CTX}
 YOU ARE THE DOCS AGENT (small task; do not touch ${V}/src/v3/film/** or public/v3/animatic.json). Work in ${V}.
 1. ${V}/docs/v3/storyboard_g3.md and ${V}/docs/v3/camera_plan_g3.md: merge the S9 and S9b rows into ONE S9 row (19.40-22.68, "SCALE: S5
@@ -71,7 +71,7 @@ YOU ARE THE DOCS AGENT (small task; do not touch ${V}/src/v3/film/** or public/v
 3. Re-render the locked board so the G3 record matches: npx remotion render src/entry-v3.tsx Animatic deliverables/v3/v3_g3_animatic_board.mp4
    --scale=0.5 --concurrency=2 (it is the locked story; check that it plays and the S9 window shows the pull-back).
 ${GIT}
-REPORT: at most 6 lines.`, { label: 'docs', phase: 'Build' }),
+REPORT: at most 6 lines.`, { effort: 'max', label: 'docs', phase: 'Build' }),
 ])
 
 phase('Check')
@@ -80,7 +80,7 @@ these four stills, in order, from one continuous 3-second shot (phone-size thumb
 1. ${SCR}/coldread/a_19.50.png  2. ${SCR}/coldread/b_20.40.png  3. ${SCR}/coldread/c_21.15.png  4. ${SCR}/coldread/d_22.40.png
 For each still: one or two plain sentences on what you see and what is happening. Then: what is the big pile in the last still made of (say what you
 actually see)? What is the person holding, and how does it compare with the pile? What does the whole shot tell you, in one sentence? What
-confused you, if anything? Be literal. At most 15 lines. If a file is missing, say which.`, { label: 'cold read', phase: 'Check' })
+confused you, if anything? Be literal. At most 15 lines. If a file is missing, say which.`, { effort: 'max', label: 'cold read', phase: 'Check' })
 
 phase('Finish')
 const finish = await agent(`${CTX}
@@ -101,6 +101,6 @@ COLD READ:
 ${read || 'FAILED'}
 
 DOCS REPORT:
-${docs || 'FAILED'}`, { label: 'finish', phase: 'Finish' })
+${docs || 'FAILED'}`, { effort: 'max', label: 'finish', phase: 'Finish' })
 
 return { build, docs, read, finish }

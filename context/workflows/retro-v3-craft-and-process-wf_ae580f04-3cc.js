@@ -67,7 +67,7 @@ unlit, and how much of the frame is in shadow. Give numbers and the code approac
 const diag = await parallel(LENSES.map((L) => () => agent(`${CTX}
 YOUR LENS: ${L.ask}
 Work in ${SCR}/${L.key}/ (frames, crops, tools). Look at no more than ~14 images. Do not edit repo files. Return findings (at most ~80 lines,
-numbers and concrete examples first) and save them to ${SCR}/${L.key}.md.`, { label: 'diagnose:' + L.key, phase: 'Diagnose' })))
+numbers and concrete examples first) and save them to ${SCR}/${L.key}.md.`, { effort: 'max', label: 'diagnose:' + L.key, phase: 'Diagnose' })))
 const D = LENSES.map((L, i) => `### ${L.key}\n${diag[i] || 'FAILED'}`).join('\n\n')
 
 phase('Process')
@@ -84,7 +84,7 @@ YOU ARE PIPELINE ARCHITECT ${i + 1}. Argue the strongest version of this approac
 explainer reels for a phone-first owner who reviews by watching): ${a}. Cover: the gates and what the owner sees at each (always a playable video
 from the story stage on, per the playbook), how the approach prevents each problem the owner named (busy, incoherent, no story or transitions, no
 focus, rough lines, missing light/shadow), what v1 (which the owner liked) actually did, cost and speed with agents, and the risks. Be honest about
-the weaknesses. At most 45 lines. Do not edit files.`, { label: 'architect:' + (i + 1), phase: 'Process' })))
+the weaknesses. At most 45 lines. Do not edit files.`, { effort: 'max', label: 'architect:' + (i + 1), phase: 'Process' })))
 const judge = await agent(`${CTX}
 THREE PIPELINE ARCHITECTS argued for different answers to the owner's question "did sketch-first help or hurt us?" (below), after a measured
 diagnosis (below). Judge them on: preventing every problem the owner named, the owner's review experience (playable video from the story stage on,
@@ -96,7 +96,7 @@ DIAGNOSIS:
 ${D}
 
 ARCHITECTS:
-${archs.map((a, i) => `### Architect ${i + 1}\n${a || 'FAILED'}`).join('\n\n')}`, { label: 'judge', phase: 'Process' })
+${archs.map((a, i) => `### Architect ${i + 1}\n${a || 'FAILED'}`).join('\n\n')}`, { effort: 'max', label: 'judge', phase: 'Process' })
 
 phase('Write')
 const write = await agent(`${CTX}

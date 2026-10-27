@@ -33,7 +33,9 @@ Maintenance at the end).
   - Spine first, then lines. A list of facts to prove is input, never the structure.
   - Test: someone who hears it once can retell it as a story.
   — ("just a collection of sentences", v3 G1, 2026-10-26).
-- **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24).
+- **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24). **Rhythm: never a run of
+  long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a problem.") after every 1-2
+  long ones, at the turns,** gated by `scripts/voice/check_rhythm.py` OK at G1. — (owner's reference reel, 2026-10-27).
 - **Scripts come with detailed emotional / delivery cues; the owner always gets the full script text with any take.**
   — (v1; "give me the full text to paste, not one line", v3, 2026-10-26).
 - **We generate the narration with the owner's ElevenLabs voice through the API, for every video** (voice id and model
@@ -75,6 +77,14 @@ Maintenance at the end).
   separate one from the other, no distance effect, no perspective; the bottom part: little to no perspective or depth
   ... research some libraries on GitHub ... add a bit of particles here and there to make things more natural", v2 G4,
   2026-10-27).
+- **ONE CONTINUOUS SKY, a gentle gradient, no abrupt colour seams.** The sky is one sky from the top of the frame to
+  the horizon: ONE gentle, smooth gradient (the sky is the one place a gradient is welcome), warmest around the sun and
+  toward the horizon, dithered so it never bands on a phone, nearly flat inside the caption band so captions keep their
+  contrast; the caption field is part of that sky, never a separate slab of another colour; the sun sits in sky that
+  agrees with it, and the far city takes the sky's lowest colour as its haze. Generally: two big fields of unrelated colour never
+  meet in a hard seam unless an object edge explains it. — ("what bothered me is different color of the space and sun,
+  like why is it blue sky and then suddenly abruptly orange, weird"; "maybe when it comes to sky we can find a beautiful
+  way to do a gentle gradient", v2 G4, 2026-10-27).
 - **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, line weight,
   saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle (smaller, lower contrast,
   thinner or no lines, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in
@@ -118,6 +128,8 @@ Maintenance at the end).
   mascot;** strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). —
   ("don't use big models of people; the people in the first example video are the right direction", v2 restart,
   2026-10-27; v3 retro, 2026-10-27).
+- **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
+  platform auto-captions stay off. — (v1 reel, 2026-10-25).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). Each film decides them with its G4 look clip, 'paint-subtle' at most
   (`docs/EDGES.md`). — (v1 posted reel, 2026-10-25).
@@ -195,7 +207,9 @@ Maintenance at the end).
   `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
 
 ## Taste signals (general preferences from the owner's picks; the picks themselves are in each video's OWNER_NOTES.md)
-- **Topics: the everyday wallet consequence** wins over a bigger but more distant story. — (v3 G0).
+- **Topics: tech and AI news is the channel's focus; the existing fuss (people already arguing about it) weighs as much as
+  a direct wallet hit,** and an everyday consequence beats a bigger, distant story. — (v3 G0; v4 G0: "focus on tech and AI",
+  picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
@@ -213,14 +227,18 @@ Maintenance at the end).
 - **Render at 60 fps from G5 to the final** ("smoother and more crispy"). Animate by time; drawn motion may stay stepped
   (12-24 drawings/s) while the camera glides; the G3 reel also renders at 60 (`G3_ANIMATIC.md`, 2026-10-26). — (v3, 2026-10-26).
 
-## Captions
-- **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
-  platform auto-captions stay off. — (v1 reel, 2026-10-25).
-
 ## Process and communication
-- **EFFORT IS ALWAYS MAX:** every workflow agent passes `effort: 'max'` (the Agent tool's effort setting too) and every
-  helper session runs at /effort max with ultracode; a lazy video from a low effort setting is our failure. — ("the key
-  rule is we need to ensure the effort is MAX!", v2, 2026-10-27; owner, 2026-10-27).
+- **EFFORT IS ALWAYS MAX, for ALL delegated work:** every workflow and sub-workflow agent (`effort: 'max'` in each
+  `agent()` call), every subagent (the Agent tool's `effort: "max"`; only a "fork" inherits the session's effort), every
+  agent an agent starts (each brief says that anything its agent starts runs at max too) and every helper session (first
+  prompt exactly `/effort max`, ultracode on; check `effort_level: max` with get_session). The repo enforces it, so no
+  session has to remember: the PreToolUse hook in `.claude/settings.json` (`.claude/hooks/max_effort.py`) denies an
+  Agent call, a Workflow run or a helper session that isn't at max, and `python3 .claude/hooks/max_effort.py
+  --lint|--fix <workflow.js>` checks or repairs a script before it runs (every script in `context/workflows/` passes).
+  A scheduled task fires into an existing max-effort session (a fresh session per firing can't take `/effort max` first).
+  A lazy video from a low effort setting is our failure. — ("the key rule is we need to ensure the effort is MAX!", v2,
+  2026-10-27; "remember to use max effort in the subworkflows and agents work" and "persist this rule in general in our
+  repo - like all delegated work should be max effort", v4 G0.5, 2026-10-27).
 - **Parallelize as much as possible, inside the weekly and session limits (below): split independent work across helper
   cloud sessions (each its own machine) and archive each one as soon as its work is pushed and checked;** a helper takes
   one independent lane that needs its own machine, briefed fully, and its done-signal is a report file. On one machine,
@@ -244,12 +262,17 @@ Maintenance at the end).
 - **Every cut sent to the owner says what stage it is and what the next stages add** (e.g. "G5: G3's plan in colour;
   next: G6 easing, G7 sound, full res"), so a draft is never mistaken for the final. — ("let me know if this is just an
   initial intermediate step", v3 G5, 2026-10-26).
-- **The weekly limit is the real budget: finishing the video comes first** (using up to 100 % of the week is fine if the video
-  is completed; with several films in flight they share it, and finishing them comes before starting a new one). Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. The **5-hour
-  session limit** is a hard wall shared by every session: watch both; before it hits, PAUSE in a controlled way (every lane stops its
-  agents, commits + pushes, writes its handover; schedule the resume after the reset), so nothing is lost. Before any
-  restart, re-read the current direction (`docs/look/DIRECTION.md`, the playbook and the docs they link: other sessions
-  change them) and integrate it into the film's one style page first. — (v2, 2026-10-27).
+- **The weekly limit is the real budget: finishing the video comes first** (using up to 100 % of the week is fine if the
+  video is completed; with several films in flight they share it, and finishing them comes before starting a new one).
+  Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. The
+  **5-hour session limit** is a hard wall shared by every session: watch both; before it hits, PAUSE in a controlled way
+  (every lane stops its agents, commits + pushes, writes its handover; schedule the resume after the reset), so nothing
+  is lost. **Commit progress periodically, so a limit that hits without warning costs minutes, not work:** every session
+  runs `video/scripts/autocheckpoint.sh` in the background on its own film paths (a commit and push every 10 minutes
+  whenever they changed), commits after every agent, and briefs each agent to write its output file early and keep it
+  updated as it goes (owner, v4, 2026-10-27: "make sure to commit the progress periodically if we get stopped on the
+  usage limits"). Before any restart, re-read the current direction (`docs/look/DIRECTION.md`, the playbook and the docs
+  they link: other sessions change them) and integrate it into the film's one style page first. — (v2, 2026-10-27).
 - **NO LIMIT ON TOKENS for creative output (inside the weekly limit); never trade quality for savings.** Ideas, scripts, judged competing ideas,
   design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
@@ -264,6 +287,11 @@ Maintenance at the end).
   "-> what we did" log, and the newest owner note wins; the full order, with the topic docs and the tie-breaks, is
   DIRECTION's intro. — ("evaluate this feedback and compact it with the overall
   stylistic direction ... the next agent should not be confused with conflicting instructions", 2026-10-27).
+- **Find the PRO way and the pro tools for every effect.** Before building a sky, depth, light, particles or any visual
+  effect, research how professional illustrators, motion designers and graphics engineers do it and which proven tools
+  exist (colour science such as OKLab interpolation, eased gradients, blue-noise dithering, proven libraries, encoder
+  settings); adopt the best, wrap it as a reusable lib + a QA check, never a hand-rolled approximation. — ("research some
+  libraries on GitHub"; "again find the pro way and tools to do it the best way you can", v2 G4, 2026-10-27).
 - **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full

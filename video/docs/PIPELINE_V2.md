@@ -78,7 +78,9 @@ building, and it decides the outcome:
   viewer's situation, beats joined by but/so, the turn, the payoff that lands the core line), judged; (2) 2-3 writers
   draft the winning spine; (3) a cold-read panel retells each draft (a list-like retelling fails) plus a flow critic
   (every line follows from the previous) and a fact check; (4) one merged script, then the through-line card's carriers
-  from its joins (G1 row). Never structure a script as a list of facts to prove.
+  from its joins (G1 row). Never structure a script as a list of facts to prove. **Rhythm (owner, 2026-10-27):** short
+  sentences (<= 5 words) break up the long ones, at least one after every 1-2 long sentences; the merged script must pass
+  `scripts/voice/check_rhythm.py` before it goes to the owner.
 - **G3 animatic:** 2-3 visual concepts for the whole film, judged internally; the owner sees one animatic (one-version rule).
 - **G4 look:** 2-4 style-frame directions when the topic needs a new look, judged internally; the pick becomes the one
   look clip the owner plays.
@@ -104,7 +106,9 @@ stages (building, fixing, polishing), where the measured waste happened.
 4. **No downstream build before its gate.** On video 1, engine, kit, mascot, edge lab and QA tooling were built before
    the script was locked, and a 78 s to 55 s script change threw away voice v1/v2, timing, storyboard v1/v2 and music.
 5. **Checkpoint every agent; at most about 4 at once per machine.** 66 agents died at usage limits on v1. Keep each
-   agent's task small enough to restart and commit after every agent. One machine runs at most about 4 agents at once
+   agent's task small enough to restart and commit after every agent; each agent writes its output file early and keeps
+   it updated, and `video/scripts/autocheckpoint.sh <branch> <the film's paths>` runs in the background (a commit and
+   push every 10 minutes whenever those paths changed; owner, 2026-10-27). One machine runs at most about 4 agents at once
    (this 4-CPU container runs about 2 render-heavy ones well); more parallel work goes to helper cloud sessions, each
    its own machine (playbook Process: parallelize as much as possible), inside the weekly and 5-hour limits.
 6. **Precise numbers are lint numbers, checked only where the picture shows them truly** (owner-approved 2026-10-27).
@@ -151,7 +155,8 @@ still asks for scale cuts and "size and angle at every cut", and `v3-g5b-rollout
 retired G5b bar (retired as a template). Rebuild the G3 and G5 templates on `docs/look/DIRECTION.md` and `CRAFT.md`
 before the next video's G3. The G0-G1 templates' STRUCTURE stands, but every copied brief needs four updates: today's
 date and search window (`v3-g0-topics-*.js` hard-codes 2026-10-25), the current look words from DIRECTION (its judges
-still say "hand-drawn ink"), `effort: 'max'` on every `agent()` call (none of the three sets it: playbook Process), and
+still say "hand-drawn ink"), `effort: 'max'` on every `agent()` call (every script in `context/workflows/` sets it since 2026-10-27; a copied or new
+one must pass `python3 .claude/hooks/max_effort.py --lint`, and the repo's hook denies a run that doesn't), and
 the through-line card (G0.5 drafts it from the pick, G1 completes it from the script's joins):
 
 | Gate | Tool / template | What it does |
@@ -160,7 +165,7 @@ the through-line card (G0.5 drafts it from the pick, G1 completes it from the sc
 | G0.5 core line | `v3-g05-core-line-*.js` | 6 emotional-lever writers, 4 judges, viewer personas + sceptics on finalists, top 3 |
 | G1 script | `v3-g1-story-*.js` | story spines first, judges, 3 writers, cold-read retell panel, flow critic, merge, fact-check |
 | any line | `v3-line2-fix-*.js` | replacement lines tested in context by viewer personas + a standards/flow judge |
-| G1/G2 voice | `docs/ELEVENLABS.md`; `video/scripts/voice/` | paste-file rules + `check_paste.py`; `check_take.py` (transcribe + diff), `clean_take.py`, `transcribe.py` |
+| G1/G2 voice | `docs/ELEVENLABS.md`; `video/scripts/voice/` | paste-file rules + `check_paste.py`; `check_rhythm.py` (long sentences broken by short ones); `check_take.py` (transcribe + diff), `clean_take.py`, `transcribe.py` |
 | G2 voice (API) | `video/scripts/voice/generate_take.py` | per-line generation with the owner's voice, ASR check (Parakeet + Whisper), auto-regenerate, stitch; needs `ELEVENLABS_API_KEY` |
 | G2 sound | `video/audio/tools/make_phone_sfx.py` | our own positive phone sounds (like pop, ding, swoosh, cart add) |
 | G3 animatic | `video/src/v3/SketchReel.tsx` + `v3-g3-animatic-*.js` | 3 visual concepts, judges, storyboard artist writes the animatic JSON; SketchReel draws it with voice and pop captions |
@@ -177,6 +182,10 @@ the through-line card (G0.5 drafts it from the pick, G1 completes it from the sc
 
 ## Agent prompt rules
 
+- **All delegated work runs at MAX effort** (owner, 2026-10-27; playbook Process): `effort: 'max'` in every `agent()`
+  call, `effort: "max"` on every Agent tool call, `/effort max` as a helper session's first prompt, and every brief says
+  that anything its agent starts runs at max too. The hook in `.claude/settings.json` enforces it;
+  `python3 .claude/hooks/max_effort.py --lint|--fix <workflow.js>` checks or repairs a script.
 - Context: the gate's brief plus the scene's own data. **Point to sections, never "read all docs fully".**
 - A report is at most 12 lines. Cross-lane requests go in one block, in an exact format.
 - Lanes: one scene per agent session (G5: a lane owns a SEQUENCE and builds it panel by panel; one agent owns every

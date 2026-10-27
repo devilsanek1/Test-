@@ -114,18 +114,18 @@ const VERDICT = {
 phase('Research')
 const research = await parallel(RESEARCH.map(r => () => agent(
   `${CTX}\n\nTask: research ${r.title}. ${r.brief}\n\nThe 2018-2026 Google timeline is already done in ${RES}/timeline.md: read it first and don't redo it.\n\nHow: use WebSearch (load it with ToolSearch "select:WebSearch,WebFetch" if it isn't loaded). WebFetch is often blocked here, so cross-check with results from several outlets. Never fetch bbc.co.uk. Search for 2025-2026 events rather than relying on memory.\n\nWrite the findings to ${RES}/${r.key}.md (max about 150 lines, grouped by topic). Every claim gets its date, numbers, outlet + URL, and a tag: VERIFIED (2+ reputable sources or a primary document), REPORTED (one reputable source) or UNCERTAIN. End with "Hook-worthy facts": the 5-8 most striking VERIFIED facts, one line each. Don't commit.\n\nReturn at most 10 lines: the hook-worthy facts, and anything that contradicts or weakens the BBC framing.`,
-  { label: `research:${r.key}`, phase: 'Research' })))
+  { effort: 'max', label: `research:${r.key}`, phase: 'Research' })))
 log(`research: ${RESEARCH.filter((r, i) => research[i]).map(r => r.key).join(', ') || 'none'} done`)
 
 phase('Fact lock')
 const lock = await agent(
   `${CTX}\n\nYou are the fact-lock editor. Read ${SRC}, ${RES}/timeline.md, ${RES}/industry.md and ${RES}/guardrails.md (skip any that is missing). Use WebSearch (load with ToolSearch) only to settle conflicts between them.\n\nWrite ${FACTS}, the single fact file every later step uses (max about 200 lines):\n- A header with the verdict legend: VERIFIED / REPORTED / UNCERTAIN / FALSE-as-worded.\n- Numbered sections and rows (FL 1.1, 1.2, ...) as tables: | # | Fact | Verdict | Number or exact quote | Date | Outlet + URL | Safe on-screen wording |. Sections: 1 the BBC story itself (who resigned, exact quotes, what "several" means); 2 the deal (what it allows: "any lawful government purpose"; the oversight clause; no veto; dates; the 600+ letter and how fast Google signed); 3 history (2018 Maven, the 2018 pledge and its 2025 removal, Nimbus); 4 the industry pattern (who else signed, Anthropic's refusal); 5 fear and speaking out (Liguori's lifetime-criticism quote, anonymous staff, what is legally true about such clauses, the counter-evidence that others spoke publicly); 6 Google's side (its statements verbatim); 7 AI in war decisions (Maven, Shoker's quote; what is NOT established).\n- "Never say" list: the overclaims and false implications to avoid, each with the safe alternative.\n- "Platform reach" in 5 lines: what to avoid so the video isn't throttled.\nDon't commit. Return at most 8 lines: the 5 strongest safe facts for a hook and the 3 most important "never say" items.`,
-  { label: 'fact-lock', phase: 'Fact lock' })
+  { effort: 'max', label: 'fact-lock', phase: 'Fact lock' })
 
 phase('Brainstorm')
 const written = await parallel(LEVERS.map(l => () => agent(
   `${CTX}\n\nYou are a writer whose lever is ${l.lens}.\n\nRead ${FACTS} first (and ${PLAYBOOK}, sections "Hook and pacing" and "Taste signals"). Then write 6-8 genuinely different candidate core lines that pull YOUR lever as hard as the truth allows (vary length, structure, person, with and without numbers or names).\n${LINE_RULES}\n\nDon't write files. Return the lines.`,
-  { label: `writer:${l.key}`, phase: 'Brainstorm', schema: LINES })))
+  { effort: 'max', label: `writer:${l.key}`, phase: 'Brainstorm', schema: LINES })))
 
 const norm = s => s.toLowerCase().replace(/[^a-z0-9%$ ]/g, '').replace(/\s+/g, ' ').trim()
 const seen = new Set()
@@ -139,7 +139,7 @@ const anon = cands.map(({ source, ...c }) => c)
 phase('Critique')
 const judged = await parallel(JUDGES.map(j => () => agent(
   `${CTX}\n\nYou are ${j.lens}.\n\nRead ${FACTS} first. Score EVERY candidate line below from 1 to 10 on gut, truth, clarity, payoff and share. Be harsh and use the full range; the differences matter more than the absolute values. Judge the line exactly as written (you may suggest a fix). Then name your top 5.\n${LINE_RULES}\n\nCandidates (JSON):\n${JSON.stringify(anon)}`,
-  { label: `judge:${j.key}`, phase: 'Critique', schema: SCORES })))
+  { effort: 'max', label: `judge:${j.key}`, phase: 'Critique', schema: SCORES })))
 
 const agg = {}
 cands.forEach(c => { agg[c.id] = { gut: 0, truth: 0, clarity: 0, payoff: 0, share: 0, n: 0, fixes: [], notes: [] } })
@@ -167,21 +167,21 @@ phase('Finalists')
 const [panel, sceptics] = await Promise.all([
   parallel(PERSONAS.map(p => () => agent(
     `You are ${p.who}. You're scrolling, half-paying attention. Each line below would be the big text on the first frame of a short video, and also the first thing the narrator says. React honestly in your own voice: would you stop scrolling, would you send it to someone, does it feel like clickbait or over the top? Rank them all (1 = the one that grabs you most). Don't research anything; just react.\n\nLines (JSON):\n${JSON.stringify(finAnon)}`,
-    { label: `viewer:${p.key}`, phase: 'Finalists', schema: PANEL }))),
+    { effort: 'max', label: `viewer:${p.key}`, phase: 'Finalists', schema: PANEL }))),
   parallel(finalists.flatMap(f => [0, 1].map(k => () => agent(
     `${CTX}\n\nYou are sceptic #${k + 1}, ${k === 0 ? 'a hostile fact-checker at a news-standards watchdog' : "a lawyer for Google's communications team looking for anything unfair or defamatory"}. Try to REFUTE this core line as false, misleading or unfair for a normal viewer who sees it on frame 0 of a short video: "${f.line}" (on-screen: "${f.frame0}"). Check it against ${FACTS}, and use WebSearch (load it with ToolSearch) if the fact file doesn't settle it. Consider: does it imply a mass exodus, that Google's AI kills or picks targets, that a law bans staff from speaking, or anything else a viewer would wrongly believe. Rate the severity honestly (don't invent problems; minor = fixable nuance), and give the closest safer wording that keeps the punch.`,
-    { label: `sceptic:${f.id}:${k + 1}`, phase: 'Finalists', schema: VERDICT }).then(v => v && { id: f.id, ...v })))),
+    { effort: 'max', label: `sceptic:${f.id}:${k + 1}`, phase: 'Finalists', schema: VERDICT }).then(v => v && { id: f.id, ...v })))),
 ])
 
 phase('Pick')
 const synth = await agent(
   `${CTX}\n\nYou are the editor-in-chief making the G0.5 recommendation. Read ${FACTS}.\n\nRanked candidates (weighted score out of 90: gut x3, truth x2, clarity x2, payoff, share; judges' fixes and notes included):\n${JSON.stringify(ranked)}\n\nJudge top-5 lists:\n${JSON.stringify(judged.filter(Boolean).map((j, i) => ({ judge: JUDGES[i] && JUDGES[i].key, top5: j.top5 })))}\n\nViewer panel (personas: ${PERSONAS.map(p => p.who).join(' | ')}):\n${JSON.stringify(panel.filter(Boolean))}\n\nSceptics' verdicts on the finalists:\n${JSON.stringify(sceptics.filter(Boolean))}\n\nWrite ${V2}/CORE_LINE.md:\n1. "Pick one" (fits one phone screen, max 30 lines): the top 3 core lines. For each: the line; its frame-0 / cover version (max 7 words, say if ALL CAPS); the spoken hook seed (how the narrator says it in the first 2 s); the angle it implies (what the video is really about); the emotion it hits; why (scores, viewer reactions, in a few words); the sceptics' verdict and any wording fix applied; the main risk. Then a one-line recommendation. Make the 3 genuinely different (different levers) unless the evidence clearly says otherwise. Always say where the owner's own lines ("Engineers are leaving Google!", "Engineers are resigning and afraid") landed and why; if one is the best, say so plainly.\n2. Per pick: the payoff callback (how the last line echoes it), what the script must prove for it to land (which FL rows, in what order), where Google's response sits, a first-second phone sound idea (playbook: a positive phone sound in the first second; for this serious story it may be ironic, e.g. a message ding on a resignation email, never cheerful about war), and a suggested palette from ${ROOT}/docs/look/PALETTE.md.\n3. The full score table (id, line, source lever, gut, truth, clarity, payoff, share, score), the viewer panel's top picks, and 5 runner-up lines worth keeping for the cover, the caption or the pinned comment.\nApply sceptics' safer wordings where a verdict was major; consider them where minor. ${LINE_RULES}\nDon't commit. Return at most 10 lines: the 3 lines and your recommendation.`,
-  { label: 'editor-in-chief', phase: 'Pick' })
+  { effort: 'max', label: 'editor-in-chief', phase: 'Pick' })
 
 phase('Truth check')
 const fc = await agent(
   `${CTX}\n\nYou are an adversarial fact-checker. Check ${V2}/CORE_LINE.md: every core line, frame-0 text, hook seed, payoff callback and claim, against ${FACTS} (and WebSearch, loaded with ToolSearch, if something goes beyond it). A line fails if a normal viewer would come away believing something false or unfair. Quotes must be verbatim. Fix in place with minimal wording changes that keep the punch, and add "Truth status: ..." under each of the 3 picks. Don't commit. Return at most 8 lines: what you changed.`,
-  { label: 'truth-check', phase: 'Truth check' })
+  { effort: 'max', label: 'truth-check', phase: 'Truth check' })
 
 return {
   research: research.filter(Boolean),

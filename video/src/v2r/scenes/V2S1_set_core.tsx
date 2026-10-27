@@ -30,10 +30,17 @@ export function offsetFor(seed: string, k = 1): [number, number] {
  *  from the slate to the stone shade (L* ~63), so thin dark bars never read as lines in the calm world (CRAFT §b-§c). */
 export const S1_IRON = '#939AAD';
 
-/** THE HAZE (atmospheric perspective in flat colour; the owner's depth note, 2026-10-27): what the air between us and
- *  the far city mixes every far plane toward: lighter, cooler and lower in chroma than the warm near world (pale
- *  rose-lilac, L* ~89, C* ~5), so the warm wing stands clearly in front of the city. */
-export const S1_HAZE = '#EADCD8';
+/** ONE CONTINUOUS SKY (the owner, 2026-10-27: "why is it blue sky and then suddenly abruptly orange"; playbook rule,
+ *  DIRECTION rule 6): the caption field's mint, flat down to y 572 (the band y 317-556 one value), then five flat steps
+ *  through pale cream-gold to the warm horizon, each a small turn (dE 4-6, dL* <= 2); the steps hide behind the wing's
+ *  roofline and the far skyline. Edges: S1_SKY_Y (the bottom of each step but the last). */
+export const S1_SKY = ['#BCDCCF', '#CEDECD', '#DFE1CB', '#EDE3C9', '#F8E0C3', '#FBD9BB'] as const;
+export const S1_SKY_Y = [572, 618, 664, 708, 752] as const;
+/** The evening sun's one halo: a flat disc one step warmer than the horizon step it sits in (<= 1.7x: CRAFT §d). */
+export const S1_SUN_HALO = '#FFD4AE';
+/** THE HAZE (atmospheric perspective in flat colour): the lowest sky step, so the far city's air agrees with the sky
+ *  (the owner's continuous-sky note): every far plane mixes toward it, lighter and lower in chroma than the warm wing. */
+export const S1_HAZE: string = S1_SKY[5];
 
 /** Mix a batch's fills toward the haze, layer by layer (`ks[i]` for layer i; the last k for any further layer), and
  *  drop its ink: a far plane is simpler and carries no lines. */

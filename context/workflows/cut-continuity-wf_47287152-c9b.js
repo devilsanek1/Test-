@@ -35,25 +35,25 @@ const results = await pipeline(cuts,
 ${lane(c)}
 YOU OWN THE CUT ${cutName(c)}. ${strip(c)}
 Check and fix, in this order: (1) the match / continuity objects per the storyboard (position and scale across the cut, measured in px on the full-res frames); (2) ink weight (stroke px either side; inkComp/InkScale where a dive or push ends); (3) the sun (size, position, layer); (4) Pip (pose, position, scale, direction of travel; Bit too if present); (5) the caption hand-off (no stale page over the incoming shot, no half-scrolled line over the cut; propose 'out' times if needed); (6) the tone/palette switch lands exactly on the cut frame; (7) the paper edge repaints on the cut; (8) velocity: camera and actor motion carry through (no stop-start, no reversal unless the storyboard asks for it).
-${c.notes ? `SPECIFIC TO THIS CUT: ${c.notes}\n` : ''}Fix everything you can in your lane, re-render the same strip, LOOK again, and run the QA gate on both scenes. Final message: per check what you measured before -> after, what you changed (files + what), the QA results, CROSS-LANE requests (exact), and the strip path.`, { label: `own:${cutName(c)}`, phase: 'Own' }),
+${c.notes ? `SPECIFIC TO THIS CUT: ${c.notes}\n` : ''}Fix everything you can in your lane, re-render the same strip, LOOK again, and run the QA gate on both scenes. Final message: per check what you measured before -> after, what you changed (files + what), the QA results, CROSS-LANE requests (exact), and the strip path.`, { effort: 'max', label: `own:${cutName(c)}`, phase: 'Own' }),
   async (owned, c) => {
     const v = await agent(`${CTX}
 You are an INDEPENDENT VERIFIER of the cut ${cutName(c)}. Do NOT edit any repo file. The cut owner reported:
 ${owned}
-${strip(c)} Do your own renders (fresh dir). Check every item of THE BAR: match objects (measure px), ink weight, sun, Pip/Bit, caption hand-off, tone switch, edge repaint, velocity; and look for anything new the owner broke (glitches, one-frame pops, clipped art, a beat moved off its word). Also render both scenes' single comps at 3 times each away from the cut to make sure nothing else regressed. Be concrete: film time / frame, what, exact fix. pass=true only if there is no blocker or major.`, { label: `verify:${cutName(c)}`, phase: 'Verify', schema: VERDICT })
+${strip(c)} Do your own renders (fresh dir). Check every item of THE BAR: match objects (measure px), ink weight, sun, Pip/Bit, caption hand-off, tone switch, edge repaint, velocity; and look for anything new the owner broke (glitches, one-frame pops, clipped art, a beat moved off its word). Also render both scenes' single comps at 3 times each away from the cut to make sure nothing else regressed. Be concrete: film time / frame, what, exact fix. pass=true only if there is no blocker or major.`, { effort: 'max', label: `verify:${cutName(c)}`, phase: 'Verify', schema: VERDICT })
     if (!v) return { cut: cutName(c), owned, verdict: null, incomplete: true }
     if (v.pass && !v.findings.some(f => f.severity !== 'minor')) return { cut: cutName(c), owned, verdict: v }
     const fixed = await agent(`${CTX}
 ${lane(c)}
 FIX ROUND for the cut ${cutName(c)}. The independent verifier found:
 ${JSON.stringify(v.findings, null, 1)}
-Verify each claim on a render first, fix every blocker and major and the cheap minors, re-render the strip (${strip(c)}), LOOK, run both scenes' QA gates. Final message: what changed per finding, QA results, CROSS-LANE requests (exact).`, { label: `fix:${cutName(c)}`, phase: 'Fix' })
+Verify each claim on a render first, fix every blocker and major and the cheap minors, re-render the strip (${strip(c)}), LOOK, run both scenes' QA gates. Final message: what changed per finding, QA results, CROSS-LANE requests (exact).`, { effort: 'max', label: `fix:${cutName(c)}`, phase: 'Fix' })
     const v2 = await agent(`${CTX}
 You are an INDEPENDENT VERIFIER of the cut ${cutName(c)} after a fix round. Do NOT edit any repo file. Earlier findings:
 ${JSON.stringify(v.findings, null, 1)}
 The fixer reported:
 ${fixed}
-${strip(c)} Do your own renders (fresh dir) and check THE BAR again, plus the earlier findings one by one. pass=true only if there is no blocker or major.`, { label: `verify2:${cutName(c)}`, phase: 'Verify', schema: VERDICT })
+${strip(c)} Do your own renders (fresh dir) and check THE BAR again, plus the earlier findings one by one. pass=true only if there is no blocker or major.`, { effort: 'max', label: `verify2:${cutName(c)}`, phase: 'Verify', schema: VERDICT })
     return { cut: cutName(c), owned, verdict: v, fixed, verdict2: v2 }
   })
 return results.map(r => r && ({ cut: r.cut, v1: r.verdict && { pass: r.verdict.pass, score: r.verdict.score }, v2: r.verdict2 && { pass: r.verdict2.pass, score: r.verdict2.score, findings: r.verdict2.findings }, incomplete: r.incomplete, crossLane: [r.owned, r.fixed].filter(Boolean).map(t => (t.split('CROSS-LANE')[1] || '').slice(0, 1500)) }))

@@ -37,7 +37,7 @@ Then run on the joined file: scripts/qa/gate_check.py (with --density) and scrip
 sheet (one frame per panel at its key beat, plus O1 at 0.15 / 2.0 / 4.5 s, S9 start and landing, the last frame next to frame 0) to ${SCR}/sheet.jpg.
 Do not fix anything. Do not commit renders.
 REPORT (at most 12 lines): the joined file, render time, the checks per panel (PASS/WARN/FAIL with the numbers), the sheet path, RENDER.md.`,
-  { label: 'render', phase: 'Render' })
+  { effort: 'max', label: 'render', phase: 'Render' })
 
 phase('Review')
 const review = await agent(`${CTX}
@@ -49,7 +49,7 @@ that lands off its word or a jump at a cut; matched frames that don't match (S4/
 unreadable; Pip's continuity (where it is, what it does across cuts); the loop seam S16 -> frame 0; anything broken. For each: what, where (time,
 screen area), and the concrete fix (which file). Do not edit files. At most 40 lines.
 RENDERER:
-${render || 'FAILED'}`, { label: 'review', phase: 'Review' })
+${render || 'FAILED'}`, { effort: 'max', label: 'review', phase: 'Review' })
 
 phase('Fix')
 const fix = await agent(`${CTX}
@@ -62,6 +62,6 @@ REPORT (at most 12 lines): the deliverable (length, size), what you fixed, the f
 REVIEW:
 ${review || 'FAILED'}
 RENDERER:
-${render || 'FAILED'}`, { label: 'fix', phase: 'Fix' })
+${render || 'FAILED'}`, { effort: 'max', label: 'fix', phase: 'Fix' })
 
 return { render, review, fix }

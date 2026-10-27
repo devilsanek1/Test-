@@ -72,13 +72,13 @@ const CRIT = {
 phase('Facts')
 const facts = await parallel(FACTS.map(f => () => agent(
   `${CTX}\n\nTask: ${f.brief}\n\nHow: load WebSearch with ToolSearch ("select:WebSearch,WebFetch") if needed; search for 2026 data rather than relying on memory (your training data predates these events). bls.gov may block fetching; then use reputable outlets that quote the table. Don't commit. Return at most 12 lines: the verdicts that change what the script can say.`,
-  { label: `facts:${f.key}`, phase: 'Facts' })))
+  { effort: 'max', label: `facts:${f.key}`, phase: 'Facts' })))
 log('facts done')
 
 phase('Write')
 const drafts = await parallel(WRITERS.map(w => () => agent(
   `${CTX}\n\n${CORE}\n\nYou are ${w.lens}.\n\nRead: ${V3}/CORE_LINE.md (sections 1-2), ${V3}/research/factlock.md, ${V3}/research/widen.md, ${BRIEF} sections 9-17, and in ${PLAYBOOK} the sections "Script and voice", "Music and sound" and "Hook and pacing". The pre-core-line drafts ${V3}/script/draft_auction.md, draft_personal.md and draft_retention.md are raw material you may graft from.\n\nTask: write a complete script for video 3 built around the locked core line.\n${RULES}\n\nAlso write it as readable markdown to ${V3}/script/core_draft_${w.key}.md. Don't commit. Return the draft.`,
-  { label: `writer:${w.key}`, phase: 'Write', schema: DRAFT })))
+  { effort: 'max', label: `writer:${w.key}`, phase: 'Write', schema: DRAFT })))
 const ds = WRITERS.map((w, i) => drafts[i] ? { key: w.key, ...drafts[i] } : null).filter(Boolean)
 
 phase('Critique')
@@ -88,16 +88,16 @@ const CRITICS = [
 ]
 const crits = await parallel(CRITICS.map(c => () => agent(
   `${CTX}\n\n${CORE}\n\nYou are ${c.lens}\n\nAlso judge whether every line serves the core line and whether the opening brings the jolt the plain core line lacks.\n\nReference: ${V3}/research/factlock.md and ${V3}/research/widen.md.\n\nScore each draft 1-10 on hook, clarity (a non-expert gets it once, at speed), voice, truth, payoff. Be harsh, use the full range. Give max 5 concrete line edits per draft, the best lines to graft across drafts, and the 3 best hook lines (improved if you can).\n\nDrafts (JSON):\n${JSON.stringify(ds)}`,
-  { label: `critic:${c.key}`, phase: 'Critique', schema: CRIT })))
+  { effort: 'max', label: `critic:${c.key}`, phase: 'Critique', schema: CRIT })))
 
 phase('Merge')
 const merged = await agent(
   `${CTX}\n\n${CORE}\n\nYou are the head writer. Read ${V3}/CORE_LINE.md (sections 1-2), ${V3}/research/factlock.md, ${V3}/research/widen.md, ${BRIEF} sections 9-17, and in ${PLAYBOOK} "Script and voice", "Music and sound", "Hook and pacing".\n\nDrafts:\n${JSON.stringify(ds)}\n\nCritic verdicts:\n${JSON.stringify(crits.filter(Boolean))}\n\nTask: write the G1 script to ${V3}/script/script_g1.md:\n1. Header: title, frame-0 on-screen text, word count, estimated length at 165 wpm, the first-second phone sound and where it lands.\n2. "Hook variants": exactly 3 hook lines (H1 recommended, H2, H3), each with its own frame-0 text; each must flow into the same body's first line.\n3. "Script": a table, one row per spoken line: # / voice-over / delivery cue (detailed, concrete: emotion, pace, emphasis words, pauses in ms) / key image / backing fact.\n4. "Plain voice-over": the full text of H1 + body as one paragraph, exactly as spoken, ready for TTS; then the two other hook lines alone.\n5. "Why this version": max 5 lines naming what you grafted from which draft.\n6. "Facts used": each with its source line from factlock / widen.\nAlso write ${V3}/script/radio_input.json for our radio-cut builder: {"voice":"af_heart","speed":1.05,"lead":0.08,"tail":0.8,"hooks":[{"label":"v3 G1 radio cut · H1 · stand-in voice","vo":"<hook as captioned>","tts":"<hook as spoken by TTS: numbers and symbols spelled out, e.g. 'ten percent', 'twenty twenty-seven'; '...' for a beat>","frame0":"AI IS MAKING YOUR NEXT LAPTOP PRICIER","image":"<key image>","pause":<seconds after>}, ... H2, H3],"body":[{"vo":"...","tts":"...","image":"...","pause":<seconds, from the cue's pause>}, ...],"sfx":[{"src":"v3/<phone sound>.wav","t":<seconds>,"gain":0.5}]}. One body entry per spoken line, in order; captions use "vo", so keep numbers as digits there (e.g. "10%").\nStart from the highest-scoring draft and graft the best lines and fixes. ${RULES}\nDon't commit. Return at most 12 lines: the 3 hook lines, the word count, and the plain voice-over.`,
-  { label: 'merge', phase: 'Merge' })
+  { effort: 'max', label: 'merge', phase: 'Merge' })
 
 phase('Fact-check')
 const fc = await agent(
   `${CTX}\n\nYou are an adversarial fact-checker. Check ${V3}/script/script_g1.md line by line (hooks, every spoken line, on-screen texts, implications) against ${V3}/research/factlock.md, ${V3}/research/widen.md, and fresh WebSearch checks where a line is only REPORTED or goes beyond the research (load WebSearch with ToolSearch if needed). Flag implications that mislead even if every word is true (global vs US figures, "first time ever", "AI raises all prices", blaming companies). Also check the core line is landed on frame 0 and paid off at the end. Fix in place with minimal wording changes that keep the voice and the word count, keeping section 4's plain voice-over and ${V3}/script/radio_input.json (vo and tts fields) in sync with the table. Add a line "Fact status: ..." under the header. Don't commit. Return at most 10 lines: what you changed and what is still uncertain.`,
-  { label: 'fact-check', phase: 'Fact-check' })
+  { effort: 'max', label: 'fact-check', phase: 'Fact-check' })
 
 return { facts, merged, factcheck: fc, critics: crits.filter(Boolean).map(c => c.scores.map(s => ({ key: s.key, hook: s.hook, clarity: s.clarity, voice: s.voice, truth: s.truth, payoff: s.payoff }))) }

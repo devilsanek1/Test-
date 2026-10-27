@@ -31,9 +31,9 @@ TASK: TOOLING AUDIT for a fast-feedback loop in this repo. Look at (do not read 
 Output ${OUT}/tooling.md with the concrete commands/components to build, estimated effort each, and which existing tools to drop or simplify.`
 phase('Research')
 const [spend, research, tooling] = await parallel([
-  () => agent(SPEND, { label: 'spend-forensics', phase: 'Research' }),
-  () => agent(RESEARCH, { label: 'pipeline-research', phase: 'Research' }),
-  () => agent(TOOLING, { label: 'tooling-audit', phase: 'Research' }),
+  () => agent(SPEND, { effort: 'max', label: 'spend-forensics', phase: 'Research' }),
+  () => agent(RESEARCH, { effort: 'max', label: 'pipeline-research', phase: 'Research' }),
+  () => agent(TOOLING, { effort: 'max', label: 'tooling-audit', phase: 'Research' }),
 ])
 phase('Plan')
 const plan = await agent(`${SHARED}
@@ -41,5 +41,5 @@ TASK: write ${ROOT}/docs/PIPELINE_V2.md (you MAY create this one repo file), the
 SPEND SUMMARY: ${spend || 'FAILED'}
 RESEARCH SUMMARY: ${research || 'FAILED'}
 TOOLING SUMMARY: ${tooling || 'FAILED'}
-The doc must be short and usable (max ~2 pages): (1) the stage list as a loop with owner GATES; for each stage: the artifact, what the owner gets on their phone (always a playable video from the animatic on), what is frozen after the gate, the token/time budget, and who does it (orchestrator vs N agents); (2) the anti-waste rules, each tied to a measured waste from spend.md (with its number); (3) the tooling to build before video 2, in order, with effort; (4) the agent prompt rules (what context each agent gets, max doc reads, report length, review only at gates, one combined reviewer lens, no reviews of things that will change). Plain language, no fluff. Final message: 10-line summary + the top 5 rules.`, { label: 'plan', phase: 'Plan' })
+The doc must be short and usable (max ~2 pages): (1) the stage list as a loop with owner GATES; for each stage: the artifact, what the owner gets on their phone (always a playable video from the animatic on), what is frozen after the gate, the token/time budget, and who does it (orchestrator vs N agents); (2) the anti-waste rules, each tied to a measured waste from spend.md (with its number); (3) the tooling to build before video 2, in order, with effort; (4) the agent prompt rules (what context each agent gets, max doc reads, report length, review only at gates, one combined reviewer lens, no reviews of things that will change). Plain language, no fluff. Final message: 10-line summary + the top 5 rules.`, { effort: 'max', label: 'plan', phase: 'Plan' })
 return { spend, research, tooling, plan }

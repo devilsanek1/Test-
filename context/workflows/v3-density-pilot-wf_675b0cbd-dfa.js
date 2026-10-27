@@ -50,7 +50,7 @@ YOU ARE THE DENSITY METER. Build a reusable, scripted density check so "too empt
 3. Wire it into video/scripts/qa/gate_check.py as an optional --density flag (WARN, not FAIL, unless the film is far under target).
 ${GIT}
 REPORT (at most 10 lines): the headline numbers (ref vs v1 vs v3: events/s, longest gap, flat share, objects per frame), the targets, the files.`,
-    { label: 'density meter', phase: 'Measure' }),
+    { effort: 'max', label: 'density meter', phase: 'Measure' }),
   () => agent(`${CTX}
 YOU ARE THE SET-DRESSING ANALYST. Look closely at reference 1 and v1 (sample ~10 frames of each at key moments; read style_bible.md, motion_spec.md
 sections 5, 6 and 9, and ENGINE.md sections 1, 2b and 10) and at our v3 G5 sheet, and write down concretely WHAT makes the references full and alive
@@ -62,7 +62,7 @@ when nothing is being built, per motion_spec section 9); (5) how information (ch
 wall with people looking at it) instead of on a blank card; (6) line and texture density (hatching, small detail lines, misregistered fills) at the
 draft vs final level; (7) why v3 G5 is empty: list, per v3 panel, what is missing compared with the references. Save notes to ${SCR}/dressing.md and
 return them (at most 80 lines, concrete, with frame times). Look at no more than ~12 images. Do not edit repo files.`,
-    { label: 'dressing analyst', phase: 'Measure' }),
+    { effort: 'max', label: 'dressing analyst', phase: 'Measure' }),
 ])
 
 phase('Spec')
@@ -90,7 +90,7 @@ METER:
 ${meter || 'FAILED'}
 
 ANALYST:
-${dressing || 'FAILED'}`, { label: 'art director', phase: 'Spec' })
+${dressing || 'FAILED'}`, { effort: 'max', label: 'art director', phase: 'Spec' })
 
 phase('Kit')
 const kit = await agent(`${CTX}
@@ -104,7 +104,7 @@ workers, forklifts, crates, steam). Every piece: position/size props, a seed, an
 driven by seconds (useTime), deterministic, flat (no opacity fades). Update KitSheet3 (${V}/src/entry-v3-kit.tsx) and render it at --scale=0.5 to
 ${SCR}/kit_sheet_life.png; look at it once and fix what doesn't match the style frame. Typecheck.
 ${GIT}
-REPORT (at most 10 lines): the new exports, the living character, the sheet path, what is open.`, { label: 'life kit', phase: 'Kit' })
+REPORT (at most 10 lines): the new exports, the living character, the sheet path, what is open.`, { effort: 'max', label: 'life kit', phase: 'Kit' })
 
 phase('Pilot')
 const PILOT = `
@@ -123,12 +123,12 @@ const pilots = await parallel([
 ${PILOT}
 YOUR PANEL: O1 (0-5.80), the HOOK (and S15, which reuses O1's set file O1_set.tsx: keep S15 working). The first 3 s are the most important of the film:
 the bare-line frame 0 being drawn, the colour flood, then a frame packed with life (the nook dressed, the living character, snow and neighbours'
-windows outside, steam) while the sticks fly and the tag ticks. Keep the loop (O1 at t < 0 = the bare-line state) working.`, { label: 'pilot O1', phase: 'Pilot' }),
+windows outside, steam) while the sticks fly and the tag ticks. Keep the loop (O1 at t < 0 = the bare-line state) working.`, { effort: 'max', label: 'pilot O1', phase: 'Pilot' }),
   () => agent(`${CTX}
 ${PILOT}
 YOUR PANEL: S4 (5.80-9.48), the price chart, today a lone card taped to an empty wall. Put the chart IN the world (per the plan), with people and
 life, while the line still draws downhill with the voice and stays readable at phone size. S6 (11.48-16.60) is "exactly the S4 frame plus the hook
-up and +9.7%": keep S6 a match of S4 (S6 may import S4's set; update it so the match holds).`, { label: 'pilot S4', phase: 'Pilot' }),
+up and +9.7%": keep S6 a match of S4 (S6 may import S4's set; update it so the match holds).`, { effort: 'max', label: 'pilot S4', phase: 'Pilot' }),
 ])
 
 const pilotClip = await agent(`${CTX}
@@ -142,6 +142,6 @@ ${GIT}
 REPORT (at most 8 lines): the deliverable, the density numbers (G5 vs pilot vs reference), anything open.
 
 PILOT REPORTS:
-${pilots.map((p, i) => `### ${i ? 'S4' : 'O1'}\n${p || 'FAILED'}`).join('\n\n')}`, { label: 'pilot render', phase: 'Pilot' })
+${pilots.map((p, i) => `### ${i ? 'S4' : 'O1'}\n${p || 'FAILED'}`).join('\n\n')}`, { effort: 'max', label: 'pilot render', phase: 'Pilot' })
 
 return { meter, dressing, spec, kit, pilots, pilotClip }

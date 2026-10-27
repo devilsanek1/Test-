@@ -21,12 +21,12 @@ Lanes (stay in yours):
 
 phase('Inventory')
 const inventory = await agent(`${CONTEXT}
-YOUR JOB (read-only, no repo edits): read docs/storyboard.json + storyboard.md fully and list every element, set and character that appears in 2+ scenes or carries continuity (match-cuts, returns, the loop), plus any element that is complex enough that two scene builders would draw it inconsistently. For each: name, which lane (sets/props), which scenes use it, required states/animations, size range on screen, key visual notes from the storyboard. Output a concise, structured build list for the two lanes.`, { label: 'inventory', phase: 'Inventory' })
+YOUR JOB (read-only, no repo edits): read docs/storyboard.json + storyboard.md fully and list every element, set and character that appears in 2+ scenes or carries continuity (match-cuts, returns, the loop), plus any element that is complex enough that two scene builders would draw it inconsistently. For each: name, which lane (sets/props), which scenes use it, required states/animations, size range on screen, key visual notes from the storyboard. Output a concise, structured build list for the two lanes.`, { effort: 'max', label: 'inventory', phase: 'Inventory' })
 
 phase('Build')
 await parallel([
-  () => agent(`${CONTEXT}\nBUILD LIST (from the inventory step):\n${inventory}\n\nYOU ARE THE SETS LANE. Build the sets in your lane from the list, importing props from src/scenes/shared/props when they exist (the props lane is building them in parallel; if a prop isn't ready, use a simple placeholder behind a clearly named import you can swap later, and note it). Final message: API summary, render cost, files, gaps.`, { label: 'sets:build', phase: 'Build' }),
-  () => agent(`${CONTEXT}\nBUILD LIST (from the inventory step):\n${inventory}\n\nYOU ARE THE PROPS LANE. Build the props in your lane from the list, plus SharedKitSheet. Final message: API summary, render cost, files, gaps.`, { label: 'props:build', phase: 'Build' }),
+  () => agent(`${CONTEXT}\nBUILD LIST (from the inventory step):\n${inventory}\n\nYOU ARE THE SETS LANE. Build the sets in your lane from the list, importing props from src/scenes/shared/props when they exist (the props lane is building them in parallel; if a prop isn't ready, use a simple placeholder behind a clearly named import you can swap later, and note it). Final message: API summary, render cost, files, gaps.`, { effort: 'max', label: 'sets:build', phase: 'Build' }),
+  () => agent(`${CONTEXT}\nBUILD LIST (from the inventory step):\n${inventory}\n\nYOU ARE THE PROPS LANE. Build the props in your lane from the list, plus SharedKitSheet. Final message: API summary, render cost, files, gaps.`, { effort: 'max', label: 'props:build', phase: 'Build' }),
 ])
 
 const REVIEW_SCHEMA = {
@@ -44,7 +44,7 @@ const REVIEW_SCHEMA = {
 let findings = []
 for (let round = 1; round <= 2; round++) {
   phase('Review')
-  const r = await agent(`${CONTEXT}\nYou are the ART DIRECTOR reviewing the shared world kit (src/scenes/shared/**, docs/SHARED_SETS.md, docs/SHARED_PROPS.md, SharedKitSheet). Do NOT edit repo files. Render the SharedKitSheet at several times and each set at rest into /tmp/claude-0/-home-user-Test-/59905704-1101-50eb-baa8-b5e4e9d5d2d2/scratchpad/sharedreview/, compare side by side with the reference stills. Judge: same artist as the references (ink, overshoot, misregistered flat fills, palette, people from behind)? Instantly readable at phone size (is the browser-window-on-a-building idea obvious? is the short bolt readable? is Bit charming and visible?) Scale per the playbook (baseline vs peak)? Parametric and reusable with clean APIs and docs? Render cost? Verdict ship only if a top illustrator would sign it.`, { label: `review:r${round}`, phase: 'Review', schema: REVIEW_SCHEMA })
+  const r = await agent(`${CONTEXT}\nYou are the ART DIRECTOR reviewing the shared world kit (src/scenes/shared/**, docs/SHARED_SETS.md, docs/SHARED_PROPS.md, SharedKitSheet). Do NOT edit repo files. Render the SharedKitSheet at several times and each set at rest into /tmp/claude-0/-home-user-Test-/59905704-1101-50eb-baa8-b5e4e9d5d2d2/scratchpad/sharedreview/, compare side by side with the reference stills. Judge: same artist as the references (ink, overshoot, misregistered flat fills, palette, people from behind)? Instantly readable at phone size (is the browser-window-on-a-building idea obvious? is the short bolt readable? is Bit charming and visible?) Scale per the playbook (baseline vs peak)? Parametric and reusable with clean APIs and docs? Render cost? Verdict ship only if a top illustrator would sign it.`, { effort: 'max', label: `review:r${round}`, phase: 'Review', schema: REVIEW_SCHEMA })
   findings = (r && r.findings) || []
   const blocking = findings.filter(f => f.severity !== 'minor')
   log(`Round ${round}: ${r ? r.verdict : 'no review'} — ${blocking.length} blocker/major, ${findings.length - blocking.length} minor`)
@@ -53,7 +53,7 @@ for (let round = 1; round <= 2; round++) {
   await parallel(['sets', 'props'].map(lane => () => {
     const mine = findings.filter(f => f.lane === lane)
     if (!mine.length) return Promise.resolve('nothing')
-    return agent(`${CONTEXT}\nYOU ARE THE ${lane.toUpperCase()} LANE. The art director found:\n${JSON.stringify(mine, null, 1)}\nFix every blocker and major and the cheap minors; re-render and LOOK to confirm; keep docs accurate; tsc clean. Final message: what changed per finding.`, { label: `${lane}:fix:r${round}`, phase: 'Fix' })
+    return agent(`${CONTEXT}\nYOU ARE THE ${lane.toUpperCase()} LANE. The art director found:\n${JSON.stringify(mine, null, 1)}\nFix every blocker and major and the cheap minors; re-render and LOOK to confirm; keep docs accurate; tsc clean. Final message: what changed per finding.`, { effort: 'max', label: `${lane}:fix:r${round}`, phase: 'Fix' })
   }))
 }
 return { inventory, remaining: findings }

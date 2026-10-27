@@ -95,7 +95,7 @@ const SCORES = {
 phase('Research')
 const research = await parallel(RESEARCH.map(r => () => agent(
   `${CTX}\n\nTask: research ${r.title}. ${r.brief}\n\nHow: use WebSearch (load it with ToolSearch "select:WebSearch,WebFetch" if it isn't loaded). WebFetch may be blocked for some sites, so cross-check with results from several outlets. Never fetch bbc.co.uk. Today is 2026-10-25: search for 2025-2026 events rather than relying on memory.\n\nWrite the findings to ${V2}/research/${r.key}.md (max about 150 lines, grouped by topic). Every claim gets its date, numbers, outlet + URL, and a confidence tag: VERIFIED (2+ reputable sources or a primary document), REPORTED (one reputable source) or UNCERTAIN. End the file with "Hook-worthy facts": the 5-8 most striking VERIFIED facts, one line each. Don't commit.\n\nReturn at most 12 lines: the hook-worthy facts, and anything that contradicts or weakens the BBC framing.`,
-  { label: `research:${r.key}`, phase: 'Research' })))
+  { effort: 'max', label: `research:${r.key}`, phase: 'Research' })))
 const researchOk = RESEARCH.filter((r, i) => research[i]).map(r => r.key)
 const files = researchOk.map(k => `${V2}/research/${k}.md`).join(', ')
 log(`research done: ${researchOk.join(', ')}`)
@@ -103,7 +103,7 @@ log(`research done: ${researchOk.join(', ')}`)
 phase('Brainstorm')
 const written = await parallel(WRITERS.map(w => () => agent(
   `${CTX}\n\nYou are ${w.lens}.\n\nRead: ${SRC}; the research files ${files}; and in ${PLAYBOOK} the sections "Script and voice" and "Hook and pacing".\n\nTask: propose 2 clearly different angles for video 2.\n${RULES}\n\nAlso write both angles as readable markdown to ${V2}/brainstorm/${w.key}.md. Don't commit. Return the 2 angles.`,
-  { label: `writer:${w.key}`, phase: 'Brainstorm', schema: ANGLES })))
+  { effort: 'max', label: `writer:${w.key}`, phase: 'Brainstorm', schema: ANGLES })))
 
 const angles = []
 WRITERS.forEach((w, i) => { const r = written[i]; if (!r) return; r.angles.forEach(a => angles.push({ id: `A${angles.length + 1}`, writer: w.key, ...a })) })
@@ -113,7 +113,7 @@ log(`${angles.length} angles from ${written.filter(Boolean).length} writers`)
 phase('Judge')
 const judged = await parallel(JUDGES.map(j => () => agent(
   `${CTX}\n\nYou are ${j.lens}\n\nFor reference: ${SRC} and the research files ${files} (read guardrails.md before scoring truth).\n\nScore every angle below from 1 to 10 on: hook (would a scroller stop in the first 2 s and still be there at 5 s), truth (true, fair and defensible, no overclaim, Google's side represented), stakes (why a normal person cares), freshness (not the obvious headline everyone already posted), fit (works in 30-45 s and can be drawn in our hand-drawn ink, flat-colour style), share (would people comment, rewatch or send it to someone). Be harsh and use the full range; the differences matter more than the absolute values. For each angle give its best hook line. Then pick your top 3 and list grafts.\n\nAngles (JSON):\n${JSON.stringify(anon)}`,
-  { label: `judge:${j.key}`, phase: 'Judge', schema: SCORES })))
+  { effort: 'max', label: `judge:${j.key}`, phase: 'Judge', schema: SCORES })))
 
 const agg = {}
 angles.forEach(a => { agg[a.id] = { id: a.id, writer: a.writer, title: a.title, sum: 0, truth: 0, hook: 0, n: 0 } })
@@ -131,11 +131,11 @@ log(`top: ${ranking.slice(0, 3).map(r => `${r.id} ${r.score80}`).join(', ')}`)
 phase('Synthesis')
 const synth = await agent(
   `${CTX}\n\nYou are the head writer. 5 writers proposed ${angles.length} angles and 3 judges (growth strategist, standards editor + media lawyer, creative director) scored them. First read ${SRC}, the research files ${files}, and in ${PLAYBOOK} the sections "Script and voice" and "Hook and pacing".\n\nRanking (average weighted score out of 80; hook and truth count double):\n${JSON.stringify(ranking)}\n\nJudge verdicts:\n${JSON.stringify(judged.filter(Boolean))}\n\nAll angles (JSON):\n${JSON.stringify(angles)}\n\nWrite the owner's G0 decision doc to ${V2}/G0_ANGLES.md:\n1. "Pick one" (must fit one phone screen, max 35 lines): 3 options, each with a short name; the frame-0 on-screen text; the spoken hook line plus 2 alternates; the story in 2 lines; why it should work (cite the judges' scores); the main risk. Then one line with your recommendation and why.\n2. Per option: a beat table (time / voice-over / what we see); the full voice-over draft (85-115 words, everyday spoken language, with delivery cues in brackets such as [quieter, close to the mic]); the ending and the comment prompt; the facts used, each with its source; fairness notes (where Google's response sits).\n3. The score table for all angles (id, title, writer lens, score, truth), the best unused hook lines, and 2-3 runner-up ideas worth keeping.\n4. If the story is bigger than one 45 s video, one short paragraph on how it could be a 2-3 part series.\n5. Per option, one line: the hook sound (from the angle) and a suggested palette from our house family in ${ROOT}/docs/look/PALETTE.md (pick by name, e.g. Dusk for serious, Sage Study for cozy interiors), with why.\nBuild the 3 options from the top-ranked angles, grafting the best ideas from the others. Make them genuinely different choices (a different emotional core or structure) unless the scores clearly say otherwise. Never use an angle whose average truth score is below 7 without fixing its overclaim.\n${RULES}\n\nDon't commit. Return at most 15 lines: the 3 options (name + hook line) and your recommendation.`,
-  { label: 'synthesis', phase: 'Synthesis' })
+  { effort: 'max', label: 'synthesis', phase: 'Synthesis' })
 
 phase('Fact-check')
 const fc = await agent(
   `${CTX}\n\nYou are an adversarial fact-checker. Check ${V2}/G0_ANGLES.md line by line: every claim, number, date, name, quote, on-screen text, hook line and implication. Verify against ${SRC} and ${files}, and with WebSearch (load it with ToolSearch if needed) wherever a research line is only REPORTED or UNCERTAIN or the doc goes beyond the research. Quotes must be verbatim. Flag implications that mislead even when every word is true (e.g. implying that Google's AI picks targets, that there is a mass exodus, or that a law bans staff from speaking). Fix problems in place with minimal wording changes that keep the punch. Under each option add one line "Fact status: ...". Don't commit. Return at most 15 lines: what you changed and anything still uncertain.`,
-  { label: 'fact-check', phase: 'Fact-check' })
+  { effort: 'max', label: 'fact-check', phase: 'Fact-check' })
 
 return { research: research.filter(Boolean), ranking, synthesis: synth, factcheck: fc }

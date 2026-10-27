@@ -49,9 +49,9 @@ const REVIEW_SCHEMA = {
 }
 phase('Build')
 const built = await parallel([
-  () => agent(S01, { label: 'build:S01', phase: 'Build' }),
-  () => agent(S02, { label: 'build:S02', phase: 'Build' }),
-  () => agent(S03, { label: 'build:S03', phase: 'Build' }),
+  () => agent(S01, { effort: 'max', label: 'build:S01', phase: 'Build' }),
+  () => agent(S02, { effort: 'max', label: 'build:S02', phase: 'Build' }),
+  () => agent(S03, { effort: 'max', label: 'build:S03', phase: 'Build' }),
 ])
 phase('Review')
 const review = await agent(`${BASE}
@@ -59,7 +59,7 @@ You are an independent HOOK REVIEWER (top TikTok retention editor + motion direc
 S01: ${built[0] || 'FAILED'}
 S02: ${built[1] || 'FAILED'}
 S03: ${built[2] || 'FAILED'}
-Render Main 0-10 s every 0.1 s at half res (and full-res frames where needed) and watch it as a scrolling viewer, sound off and with the words in assets/timing.json. Judge: does 0-0.5 s stop the thumb, does 0-2 s make the promise, does 2-5 s escalate to 'on PURPOSE', does 5-10 s pay off (bug, take over a site, PHP)? Also catch anything broken: glitches, pops, rings or art inside the caption band (y 280-570), a cropped label, a jump at the S01|S02 (4.715) or S02|S03 (8.393) cut, frame 0 vs the loop seam (Main 0 vs 55.3333, 0 px below y 600). Max 8 findings, most important first, each tied to one scene with an exact fix.`, { label: 'review:hook', phase: 'Review', schema: REVIEW_SCHEMA })
+Render Main 0-10 s every 0.1 s at half res (and full-res frames where needed) and watch it as a scrolling viewer, sound off and with the words in assets/timing.json. Judge: does 0-0.5 s stop the thumb, does 0-2 s make the promise, does 2-5 s escalate to 'on PURPOSE', does 5-10 s pay off (bug, take over a site, PHP)? Also catch anything broken: glitches, pops, rings or art inside the caption band (y 280-570), a cropped label, a jump at the S01|S02 (4.715) or S02|S03 (8.393) cut, frame 0 vs the loop seam (Main 0 vs 55.3333, 0 px below y 600). Max 8 findings, most important first, each tied to one scene with an exact fix.`, { effort: 'max', label: 'review:hook', phase: 'Review', schema: REVIEW_SCHEMA })
 phase('Fix')
 const fixes = {}
 if (review) {
@@ -70,7 +70,7 @@ if (review) {
   const res = await parallel(scenes.map(s => () => agent(`${prompts[s]}
 FIX ROUND: your build is done (see the code). The hook reviewer found:
 ${JSON.stringify(byScene[s], null, 1)}
-Fix these (verify on renders), keep every HARD CONSTRAINT, re-run the QA gate. Final message (max 10 lines).`, { label: `fix:${s}`, phase: 'Fix' })))
+Fix these (verify on renders), keep every HARD CONSTRAINT, re-run the QA gate. Final message (max 10 lines).`, { effort: 'max', label: `fix:${s}`, phase: 'Fix' })))
   scenes.forEach((s, i) => { fixes[s] = res[i] })
 }
 return { built, review, fixes }

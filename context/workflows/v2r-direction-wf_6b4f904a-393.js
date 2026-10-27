@@ -64,20 +64,20 @@ const judges = await parallel([
   () => agent(JUDGE(`VIEWER PANEL. Simulate six distinct viewers scrolling Reels/TikTok with the sound on and then off: a 19-year-old on TikTok,
 a 35-year-old parent who isn't into tech, a software engineer, a skeptic who distrusts media, a Google fan, a politics-curious student. For each
 treatment and viewer: stop at 1 s? still there at 3 s, 5 s, 15 s, the end? what did they understand (retell it in one line)? would they comment
-or send it to someone, and why? Sub-scores: stop1s, hold15s, clarity, share.`), { label: 'judge-viewers', phase: 'Judge', schema: SCORE }),
+or send it to someone, and why? Sub-scores: stop1s, hold15s, clarity, share.`), { effort: 'max', label: 'judge-viewers', phase: 'Judge', schema: SCORE }),
   () => agent(JUDGE(`ART DIRECTOR of this channel. Does it look like OUR house at v1's level or better (house_digest, teardown): hand-drawn ink,
 flat colour, warm never sickly, one coherent living world at the reference density, Pip in every scene, cinematic camera (the Arcane crane DNA),
 cozy + great scale, beautiful transitions, captions that sit well, a banger opening that loops? Would the owner, who rejected our last cut,
-say "yes, this"? Sub-scores: beauty, house_fit, aliveness, cinema, opening.`), { label: 'judge-art', phase: 'Judge', schema: SCORE }),
+say "yes, this"? Sub-scores: beauty, house_fit, aliveness, cinema, opening.`), { effort: 'max', label: 'judge-art', phase: 'Judge', schema: SCORE }),
   () => agent(JUDGE(`STANDARDS AND FACTS EDITOR. Check every treatment against the beat map's fairness rules, the fact lock and the master brief's
 nonpartisan, no-villain, attributed-claims standard: war imagery, a likeness of the real person, manufactured villains, implied accusations,
 quotes without attribution or out of context, the deal's purpose line shown without its oversight clause, Google's side at equal weight,
 credits, anything defamatory or misleading at phone size with the sound off. Sub-scores: fairness, accuracy, risk (10 = no risk).`),
-    { label: 'judge-standards', phase: 'Judge', schema: SCORE }),
+    { effort: 'max', label: 'judge-standards', phase: 'Judge', schema: SCORE }),
   () => agent(JUDGE(`PRODUCER. Can our engine and toolkit (toolkit.md) build it at FINISHED quality (v1 level) reliably, with many builder agents
 working in parallel lanes, in roughly a day of agent time on a 4-CPU machine (renders included)? Everything is built NEW (owner rule: no reusable assets): what must be built, where
 the risk is (character animation, crowds, long continuous moves, text legibility, 60 fps speed limits), what to simplify without losing the
-idea. Sub-scores: feasibility, build_cost (10 = cheap), risk (10 = low risk).`), { label: 'judge-producer', phase: 'Judge', schema: SCORE }),
+idea. Sub-scores: feasibility, build_cost (10 = cheap), risk (10 = low risk).`), { effort: 'max', label: 'judge-producer', phase: 'Judge', schema: SCORE }),
 ])
 const fmt = (j, name) => !j ? `### ${name}: (judge failed)` : `### ${name}\nranking: ${j.ranking.join(' > ')}\nverdict: ${j.verdict}\n` +
   j.per.map((p) => `- ${p.id} ${p.score}/10 ${p.sub ? JSON.stringify(p.sub) : ''}\n  best: ${p.best_ideas.join(' | ')}\n  flaws: ${p.flaws.join(' | ')}${p.fatal.length ? '\n  FATAL: ' + p.fatal.join(' | ') : ''}`).join('\n')
@@ -107,7 +107,7 @@ ${DIRECTOR_SPEC}
 Commit it. Final message: the winner, the grafts, and the concept in 5 lines.
 
 JUDGES:
-${panel}`, { label: 'director', phase: 'Synthesize' })
+${panel}`, { effort: 'max', label: 'director', phase: 'Synthesize' })
 
 phase('Challenge')
 const CRIT = {
@@ -128,7 +128,7 @@ and "a slideshow of tableaux" again? Does frame 0-3 s stop a thumb? Does every s
 rules)? Is the shot list really buildable and timed to the words? Is Pip in every shot without trivialising? Do the camera moves and
 transitions make it feel like one cinematic film? Is anything vague that builders would guess at? Compare against house_digest.md's
 checklist and teardown.md's DON'T list. Return 'ship' only if nothing must change; at most 15 problems, most important first, each with a
-concrete fix.`, { label: 'devils-advocate', phase: 'Challenge', schema: CRIT })
+concrete fix.`, { effort: 'max', label: 'devils-advocate', phase: 'Challenge', schema: CRIT })
 let revised = null
 if (devil && devil.problems.length) {
   revised = await agent(`${CTX}
@@ -136,6 +136,6 @@ YOU ARE THE DIRECTOR (revision). Revise ${V}/docs/v2/TREATMENT.md: fix every "mu
 (you may reject a "should" with a one-line reason in section 10). Keep it decisive and buildable; keep the section structure. Commit it.
 Final message: what changed in 5 lines.
 DEVIL'S ADVOCATE (${devil.verdict}): ${devil.summary}
-${devil.problems.map((p, i) => `${i + 1}. [${p.severity}] ${p.where}: ${p.problem} -> ${p.fix}`).join('\n')}`, { label: 'director-revise', phase: 'Challenge' })
+${devil.problems.map((p, i) => `${i + 1}. [${p.severity}] ${p.where}: ${p.problem} -> ${p.fix}`).join('\n')}`, { effort: 'max', label: 'director-revise', phase: 'Challenge' })
 }
 return { panel, director, devil, revised }

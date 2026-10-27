@@ -48,8 +48,8 @@ const REVIEW_SCHEMA = {
 }
 
 const results = await pipeline(LANES,
-  (L) => agent(`${CONTEXT}\n\n${L.task}\n\nDo every item. Final message: per item what changed (file:line), defaults changed, consumer scenes you rendered and what they show now, anything you could not do.`, { label: `build:${L.key}`, phase: 'Build' }),
-  (built, L) => agent(`${CONTEXT}\n\nYou are an ADVERSARIAL REVIEWER of the ${L.key} lane's fix. Do NOT edit repo files. The task was:\n${L.task}\n\nThe builder reported:\n${built}\n\nVerify every item yourself: read the diff (git diff -- src/scenes/shared src/lib docs), render each consumer scene at the relevant times into ${SCRATCH}/review-${L.key}/ and LOOK. Check nothing regressed in other scenes using the same pieces, backward compatibility, tsc, no opacity fades. Be concrete.`, { label: `review:${L.key}`, phase: 'Review', schema: REVIEW_SCHEMA })
+  (L) => agent(`${CONTEXT}\n\n${L.task}\n\nDo every item. Final message: per item what changed (file:line), defaults changed, consumer scenes you rendered and what they show now, anything you could not do.`, { effort: 'max', label: `build:${L.key}`, phase: 'Build' }),
+  (built, L) => agent(`${CONTEXT}\n\nYou are an ADVERSARIAL REVIEWER of the ${L.key} lane's fix. Do NOT edit repo files. The task was:\n${L.task}\n\nThe builder reported:\n${built}\n\nVerify every item yourself: read the diff (git diff -- src/scenes/shared src/lib docs), render each consumer scene at the relevant times into ${SCRATCH}/review-${L.key}/ and LOOK. Check nothing regressed in other scenes using the same pieces, backward compatibility, tsc, no opacity fades. Be concrete.`, { effort: 'max', label: `review:${L.key}`, phase: 'Review', schema: REVIEW_SCHEMA })
     .then(rv => ({ built, rv })),
   (prev, L) => {
     const todo = (prev.rv && prev.rv.findings || []).filter(f => f.severity !== 'minor' || true)
@@ -57,7 +57,7 @@ const results = await pipeline(LANES,
       log(`${L.key}: reviewer OK, ${todo.length} minors`)
       if (!todo.length) return { lane: L.key, built: prev.built, review: prev.rv, fix: 'none needed' }
     }
-    return agent(`${CONTEXT}\n\n${L.task}\n\nFIX ROUND for the ${L.key} lane. The reviewer found:\n${JSON.stringify(todo, null, 1)}\n\nFix every blocker and major and the cheap minors. Re-render the consumer scenes and LOOK. Final message: what changed per finding.`, { label: `fix:${L.key}`, phase: 'Fix' })
+    return agent(`${CONTEXT}\n\n${L.task}\n\nFIX ROUND for the ${L.key} lane. The reviewer found:\n${JSON.stringify(todo, null, 1)}\n\nFix every blocker and major and the cheap minors. Re-render the consumer scenes and LOOK. Final message: what changed per finding.`, { effort: 'max', label: `fix:${L.key}`, phase: 'Fix' })
       .then(fix => ({ lane: L.key, built: prev.built, review: prev.rv, fix }))
   },
 )

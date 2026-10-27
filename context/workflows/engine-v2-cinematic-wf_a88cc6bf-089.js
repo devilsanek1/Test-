@@ -47,8 +47,8 @@ Final message: API summary, render speed of CineDemo, files, known gaps.`
 
 phase('Build')
 const builds = await parallel([
-  () => agent(CORE, { label: 'core:build', phase: 'Build' }),
-  () => agent(CINE, { label: 'cine:build', phase: 'Build' }),
+  () => agent(CORE, { effort: 'max', label: 'core:build', phase: 'Build' }),
+  () => agent(CINE, { effort: 'max', label: 'cine:build', phase: 'Build' }),
 ])
 
 const REVIEW_SCHEMA = {
@@ -74,7 +74,7 @@ for (let round = 1; round <= 2; round++) {
   phase('Review')
   const reviews = await parallel(LENSES.map(l => () => agent(
     `${CONTEXT}\nYou are a REVIEWER of both lanes. Do NOT edit repo files. LENS: ${l.brief}\nVerdict "ship" only if a top motion designer would accept it for this direction. Tag each finding with its lane (core or cine).`,
-    { label: `review:${l.key}:r${round}`, phase: 'Review', schema: REVIEW_SCHEMA })))
+    { effort: 'max', label: `review:${l.key}:r${round}`, phase: 'Review', schema: REVIEW_SCHEMA })))
   const rs = reviews.filter(Boolean)
   findings = rs.flatMap(r => r.findings)
   const blocking = findings.filter(f => f.severity !== 'minor')
@@ -85,7 +85,7 @@ for (let round = 1; round <= 2; round++) {
     const mine = findings.filter(f => f.lane === lane)
     if (!mine.length) return Promise.resolve('nothing')
     return agent(`${CONTEXT}\nYOU ARE THE ${lane.toUpperCase()} LANE (stay in your lane). Reviewers found:\n${JSON.stringify(mine, null, 1)}\nFix every blocker and major and the cheap minors. Re-render and LOOK at the results next to the references to confirm. Keep your docs accurate. tsc must be clean. Final message: what changed per finding.`,
-      { label: `${lane}:fix:r${round}`, phase: 'Fix' })
+      { effort: 'max', label: `${lane}:fix:r${round}`, phase: 'Fix' })
   }))
 }
 

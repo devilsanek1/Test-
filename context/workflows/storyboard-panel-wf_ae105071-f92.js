@@ -62,7 +62,7 @@ const ANGLES = [
 phase('Write')
 const drafts = await parallel(ANGLES.map((a, i) => () => agent(
   `${COMMON}\nYOUR ANGLE: ${a.brief}\n\nWrite a complete, production-ready storyboard for the whole 70.7 s VO.\n${SCHEMA_DOC}\nWrite it to ${ROOT}/docs/storyboard_drafts/${a.key}.md (human-readable, with rationale per scene: why this visual, what makes it rewatchable) AND ${ROOT}/docs/storyboard_drafts/${a.key}.json (schema above; validate it with: python3 -c "import json;json.load(open('<path>'))"). Create the folder if needed. Only write inside docs/storyboard_drafts/.\nYour final message: the two file paths plus a 10-line pitch of your concept (hook, metaphor system, mascot role, loop).`,
-  { label: `write:${a.key}`, phase: 'Write' })))
+  { effort: 'max', label: `write:${a.key}`, phase: 'Write' })))
 
 log('Drafts done: ' + drafts.filter(Boolean).length + '/3')
 
@@ -90,7 +90,7 @@ const LENSES = [
 phase('Judge')
 const verdicts = await parallel(LENSES.map(l => () => agent(
   `${COMMON}\nYou are a judge. LENS: ${l.brief}\nRead all three drafts in ${ROOT}/docs/storyboard_drafts/ (editorial.md/.json, retention.md/.json, metaphor.md/.json). Judge them strictly through your lens. Be concrete: cite scene ids. Identify the winner and the specific ideas from any draft that must survive, and the must-fix problems.`,
-  { label: `judge:${l.key}`, phase: 'Judge', schema: JUDGE_SCHEMA })))
+  { effort: 'max', label: `judge:${l.key}`, phase: 'Judge', schema: JUDGE_SCHEMA })))
 
 const v = verdicts.filter(Boolean)
 const summary = v.map((x, i) => `## Judge ${LENSES[i] ? LENSES[i].key : i}\nwinner: ${x.winner}\nscores: ${x.scores.map(s => `${s.draft}=${s.score}`).join(', ')}\nmust_keep: \n- ${x.must_keep_ideas.join('\n- ')}\nmust_fix:\n- ${x.must_fix.join('\n- ')}\ndetails:\n${x.scores.map(s => `* ${s.draft}: + ${s.strengths.join('; ')} | - ${s.weaknesses.join('; ')}`).join('\n')}`).join('\n\n')
@@ -110,7 +110,7 @@ Transition types now: "loop-start|cut|matchcut|camera-continuous|foreground-wipe
 phase('Synthesize')
 const synth = await agent(
   `${COMMON}\n${CINE}\nYou are the lead director and cinematographer. Three storyboard drafts are in ${ROOT}/docs/storyboard_drafts/ (written for the old card layout: keep their story beats, metaphors, wit and timing; re-stage them cinematically for the new direction). Three judges evaluated them:\n\n${summary}\n\nProduce the FINAL storyboard: take the strongest backbone (weigh the judges' winners), graft in every must-keep idea that fits, fix every must-fix, and RE-STAGE every scene for the full-bleed baseline, with cinematic scale used with restraint. One coherent world and metaphor system (a vast city of websites is a natural fit for scale). Stage every scene in the immersive full-bleed baseline (eye-level, depth, the viewer slightly small), choose the 2–3 story peaks that get true Arcane-scale treatment and say why, and keep the rest bright, clear and quick. Every scene still gets a deliberate (usually gentle) camera, depth layers and light that fits the time of day. Make each scene concrete enough that an illustrator-coder can build it without asking questions: element inventory with positions in canvas coords, depth layers, camera moves with times, beat-by-beat choreography locked to word start times, mascot action (pose names from docs/mascot.md), sun behavior, time of day and light, transition, SFX cues, captions with highlight.\n${SCHEMA_DOC}\nWrite ${ROOT}/docs/storyboard.md (human-readable; start with a one-paragraph concept, the time-of-day arc, and a scene table) and ${ROOT}/docs/storyboard.json (validate with python3 json.load). Also write ${ROOT}/docs/storyboard_decisions.md: what you took from which draft and why, in under 40 lines.\nFinal message: concise scene table (id, time range, one-line visual, camera move) + the hook + the loop.`,
-  { label: 'synthesize-cinematic', phase: 'Synthesize' })
+  { effort: 'max', label: 'synthesize-cinematic', phase: 'Synthesize' })
 
 phase('Critique')
 const CRIT_SCHEMA = {
@@ -130,7 +130,7 @@ const CRITICS = [
 ]
 const crits = await parallel(CRITICS.map(c => () => agent(
   `${COMMON}\n${CINE}\nYou are a storyboard critic for ${ROOT}/docs/storyboard.json and storyboard.md. Do NOT edit repo files. LENS: ${c.brief}\nReport issues with concrete fixes.`,
-  { label: `critic:${c.key}`, phase: 'Critique', schema: CRIT_SCHEMA })))
+  { effort: 'max', label: `critic:${c.key}`, phase: 'Critique', schema: CRIT_SCHEMA })))
 
 const issues = crits.filter(Boolean).flatMap(c => c.issues)
 log(`Critics: ${issues.filter(i => i.severity === 'blocker').length} blockers, ${issues.filter(i => i.severity === 'major').length} major, ${issues.filter(i => i.severity === 'minor').length} minor`)
@@ -139,7 +139,7 @@ let fixed = 'no fixes needed'
 if (issues.length) {
   fixed = await agent(
     `${COMMON}\n${CINE}\nYou are the lead director. Apply these critic findings to ${ROOT}/docs/storyboard.json and ${ROOT}/docs/storyboard.md (keep them consistent; re-validate JSON; re-run timing checks in python yourself until clean). Where critics conflict, prefer the user's cinematic direction, then clarity, then retention.\n${JSON.stringify(issues, null, 1)}\nFinal message: what you changed, one line per issue, confirmation the mechanical checks pass, and the final scene table (id, time, visual, camera).`,
-    { label: 'fix', phase: 'Critique' })
+    { effort: 'max', label: 'fix', phase: 'Critique' })
 }
 
 return { synth, issues, fixed }

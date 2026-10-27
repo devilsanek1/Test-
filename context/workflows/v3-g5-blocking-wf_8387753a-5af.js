@@ -89,7 +89,7 @@ that a lane replaces. Work in ${V}.
    the first panel's line-art state, wipers if any, captionTone); lane rules (own files only, REQUESTS); the fastest preview commands for one
    panel (Film3Shot stills/sheets; reuse scripts/render-frames.mjs or scripts/sheet.sh where they help); the 60 fps notes; the gate check.
    Add one row to the studio toolkit table in video/docs/PIPELINE_V2.md: "G5 blocking | docs/G5_BLOCKING.md; src/entry-v3-film.tsx (template);
-   scripts/qa/gate_check.py | ...". Commit (your paths only) and push as described.`, { label: 'engine', phase: 'Setup' }),
+   scripts/qa/gate_check.py | ...". Commit (your paths only) and push as described.`, { effort: 'max', label: 'engine', phase: 'Setup' }),
   () => agent(`${CTX}
 YOU ARE THE KIT AGENT. Build the shared look and props every lane uses, so 15 panels built by 6 agents look like one film. Work in ${V}.
 1. video/src/v3/film/palette.ts: apply Autumn Ember to the house theme tokens (src/lib/theme.ts: palette, skies, the tod relight steps, glow,
@@ -125,7 +125,7 @@ YOU ARE THE KIT AGENT. Build the shared look and props every lane uses, so 15 pa
    (warm, never sickly; hero burnt orange; ink weights like the style frame)? Fix what doesn't. Typecheck.
 4. video/src/v3/film/kit/README.md: the kit API in one page (each export, props, sizes that read at phone size, variants, the time-of-day
    decision, the colour jobs: hero / anchor / pop), plus a "Consistency contract" (the same laptop, tag, phone, data center and You in every
-   panel; ink weights by depth; nothing busy in the caption band). Commit (your paths only) and push as described.`, { label: 'kit', phase: 'Setup' }),
+   panel; ink weights by depth; nothing busy in the caption band). Commit (your paths only) and push as described.`, { effort: 'max', label: 'kit', phase: 'Setup' }),
 ])
 log('setup done: engine ' + (engine ? 'ok' : 'FAILED') + ', kit ' + (kit ? 'ok' : 'FAILED'))
 
@@ -197,7 +197,7 @@ phase('Lanes')
 const lanes = await pipeline(LANES, (L) => agent(`${CTX}
 ${LANE_RULES}
 YOUR LANE: ${L.key}. Panels: ${L.panels}. Scratch dir: ${SCR}/${L.key}/.
-${L.brief}`, { label: L.key, phase: 'Lanes' }))
+${L.brief}`, { effort: 'max', label: L.key, phase: 'Lanes' }))
 const laneReports = LANES.map((L, i) => `### ${L.key}\n${lanes[i] || 'FAILED (no report)'}`).join('\n\n')
 log('lanes done: ' + lanes.filter(Boolean).length + '/' + LANES.length)
 
@@ -226,6 +226,6 @@ SETUP REPORTS:
 ### engine
 ${engine || 'FAILED'}
 ### kit
-${kit || 'FAILED'}`, { label: 'assemble', phase: 'Assemble' })
+${kit || 'FAILED'}`, { effort: 'max', label: 'assemble', phase: 'Assemble' })
 
 return { engine, kit, lanes: laneReports, assemble }

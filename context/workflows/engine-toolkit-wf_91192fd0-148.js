@@ -40,7 +40,7 @@ Write ${ROOT}/docs/ENGINE.md: the API cheat-sheet for scene agents (imports, eve
 Final message: summary of the API, render speed, file list, known gaps.`
 
 phase('Build')
-const built = await agent(BUILD, { label: 'engine:build', phase: 'Build' })
+const built = await agent(BUILD, { effort: 'max', label: 'engine:build', phase: 'Build' })
 
 const REVIEW_SCHEMA = {
   type: 'object',
@@ -64,7 +64,7 @@ for (let round = 1; round <= 2; round++) {
   phase('Review')
   const reviews = await parallel(LENSES.map(l => () => agent(
     `You review a Remotion hand-drawn animation toolkit at ${ROOT} (read docs/BRIEF.md and docs/ENGINE.md first). Do NOT edit files in the repo. LENS: ${l.brief}\nReport concrete findings with exact fixes. Verdict "ship" only if a top motion designer would accept it as matching the reference.`,
-    { label: `review:${l.key}:r${round}`, phase: 'Review', schema: REVIEW_SCHEMA })))
+    { effort: 'max', label: `review:${l.key}:r${round}`, phase: 'Review', schema: REVIEW_SCHEMA })))
   const rs = reviews.filter(Boolean)
   findings = rs.flatMap(r => r.findings)
   const blocking = findings.filter(f => f.severity !== 'minor')
@@ -73,7 +73,7 @@ for (let round = 1; round <= 2; round++) {
   phase('Fix')
   await agent(
     `You are the lead motion-graphics engineer of the toolkit at ${ROOT} (read docs/BRIEF.md, docs/ENGINE.md; your lane: src/lib/** except src/lib/mascot/**, src/dev/KitDemo.tsx, src/Root.tsx, src/Main.tsx, src/scenes/index.ts, placeholder scenes, src/data samples, scripts/**). Reviewers found:\n${JSON.stringify(findings, null, 1)}\nFix every blocker and major and the cheap minors. Re-render and LOOK at results next to the reference stills to confirm. Keep docs/ENGINE.md accurate. tsc must be clean. Final message: what changed per finding.`,
-    { label: `engine:fix:r${round}`, phase: 'Fix' })
+    { effort: 'max', label: `engine:fix:r${round}`, phase: 'Fix' })
 }
 
 return { built, remaining: findings }

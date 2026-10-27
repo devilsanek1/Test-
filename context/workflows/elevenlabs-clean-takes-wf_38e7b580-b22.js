@@ -22,7 +22,7 @@ const RESEARCH = [
 phase('Research')
 const research = await parallel(RESEARCH.map(r => () => agent(
   `${CTX}\n\nTask: ${r.brief}\n\nUse WebSearch and WebFetch (load them with ToolSearch "select:WebSearch,WebFetch"); WebFetch is often blocked here, so rely on search results from several sources and say when something is unconfirmed. Cite URLs and dates. Write your findings to ${OUT}/research_${r.key}.md (max ~120 lines; end with "What this means for us": concrete rules). Don't commit. Return at most 12 lines: the rules you would bet on, each with its confidence.`,
-  { label: `research:${r.key}`, phase: 'Research' })))
+  { effort: 'max', label: `research:${r.key}`, phase: 'Research' })))
 
 phase('Evidence')
 const evidence = await agent(
@@ -32,16 +32,16 @@ const evidence = await agent(
 - video 1: ${ROOT}/docs/script/original_annotated.md (the owner's own annotated script that worked) and the v1 voice takes in ${ROOT}/assets/ (vo_v2_eleven.wav, vo_v3_draft_take.wav, vo_v3_final.wav).
 For takes without word timings, transcribe with: python3 ${ROOT}/scripts/voice/transcribe.py TAKE.wav /tmp/claude-0/-home-user-Test-/59905704-1101-50eb-baa8-b5e4e9d5d2d2/scratchpad/models/sherpa-onnx-nemo-parakeet-tdt-0.6b-v2-int8 OUT_words.json (or check_take.py TAKE PASTE MODEL to diff against the paste).
 For every take: list each failure (type: repeat / loop / restart / garble / read-aloud / swallowed sound; where; which paste line and tag preceded it). Then compare features of failed vs clean lines: tag length (words), negations in tags, mid-line tags, ellipses, quotes, CAPS, line length, sentence starts that repeat ("But..." twice), total characters, number of tags. Say which features clearly correlate and which don't. Write ${OUT}/evidence.md (max ~120 lines, with a table). Don't commit. Return at most 12 lines.`,
-  { label: 'evidence', phase: 'Evidence' })
+  { effort: 'max', label: 'evidence', phase: 'Evidence' })
 
 phase('Synthesis')
 const synth = await agent(
   `${CTX}\n\nYou are the voice-pipeline lead. Read ${OUT}/research_docs.md, research_community.md, research_modes.md and ${OUT}/evidence.md (skip missing ones), plus ${ROOT}/docs/ELEVENLABS.md and ${ROOT}/scripts/voice/check_paste.py.\n\nWrite ${OUT}/PROPOSAL.md (max ~150 lines):\n1. Root causes, ranked, with the evidence for each (ours and external), and your confidence.\n2. "Paste format v2": the exact format of a paste file that is most likely to narrate cleanly in ONE paste (tag vocabulary and length, one tag per line or fewer tags, paragraphs/line breaks, punctuation, CAPS, ellipses, numbers, the opening, the ending, max length), with a full example built from the video 2 script in ${ROOT}/docs/v2/script/script_elevenlabs.md (same spoken words).\n3. "Settings": exactly what the owner should pick in the ElevenLabs UI (model, stability mode, speed, other toggles), and which mode/page to use (Text to Speech vs Studio), with why.\n4. "If a take still breaks": the fastest owner-side recovery (e.g. regenerate one paragraph in Studio) and our side (check_take + clean_take).\n5. "Option: automated takes via the API": what it takes, what the owner gives us, how we'd guarantee a clean take (generate per line or paragraph with request stitching, ASR-check, auto-regenerate), cost, and the trade-offs.\n6. "Linter spec": the exact rules check_paste.py should enforce (errors vs warnings), so a bad paste file can never reach the owner.\nBe concrete and honest about what is unconfirmed. Don't commit. Return at most 12 lines: the top 3 root causes and the recommended format + settings in brief.`,
-  { label: 'synthesis', phase: 'Synthesis' })
+  { effort: 'max', label: 'synthesis', phase: 'Synthesis' })
 
 phase('Critic')
 const critic = await agent(
   `${CTX}\n\nYou are a sceptical audio engineer who has produced hundreds of ElevenLabs voice-overs. Review ${OUT}/PROPOSAL.md against ${OUT}/research_*.md and ${OUT}/evidence.md: is every root cause supported, would the format really prevent each failure we saw, are the settings right for an expressive but stable read, is anything over-claimed, is anything missing (e.g. a cheaper fix, a setting that matters more)? Use WebSearch (load with ToolSearch) to check doubtful claims. Fix the proposal in place with minimal edits and add a "Critic notes" section at the end. Don't commit. Return at most 8 lines.`,
-  { label: 'critic', phase: 'Critic' })
+  { effort: 'max', label: 'critic', phase: 'Critic' })
 
 return { research: research.filter(Boolean), evidence, synthesis: synth, critic }

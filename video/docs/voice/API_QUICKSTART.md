@@ -14,6 +14,10 @@ owner never pastes anything. Proven on 2026-10-26: video 2's API take was clean 
   - Check it with `[ -n "$ELEVENLABS_API_KEY" ] && echo set`.
   - Never print the key, write it to a file, put it in an agent prompt or commit it.
   - If the owner pastes a key in chat, ask them to rotate it and store the new one as the secret.
+  - The key itself starts with `sk_` and is shown only once, when it is created or rotated. The 64-character hex
+    string in ElevenLabs' key list is the key's ID: the API rejects it (`api_key_id_used_as_api_key`), and it is not a
+    secret. To get a usable key again, rotate the key (or create a new one) and copy the `sk_...` value. (v4,
+    2026-10-27)
 - **Voice:** `gHYdn45bUiDI9umVTpCo` ("Test 3", the owner's cloned narrator voice; `docs/voice/VOICE.md`).
 - **Model:** `eleven_v4`, passed explicitly (the key can't list models; the API's default model is older).
 - **Tools:** `pip install sherpa-onnx faster-whisper soundfile requests numpy` if any is missing; ffmpeg.

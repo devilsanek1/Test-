@@ -20,7 +20,7 @@ LANE: src/lib/edges/** and src/dev/EdgeLab.tsx (+ registry entry), ${OUT}/**, do
 phase('Build')
 const build = await agent(`${CONTEXT}
 BUILD it and render to ${OUT}/: (a) a sheet with rows = trim (current), paint-subtle, paint-medium, paint-loose and columns = street / monument / vista shots, on a dark phone bezel like the final sheet; (b) 1:1 corner/edge zooms; (c) 6 s full-res clips of the street shot for each of the three paint presets plus one side-by-side. Look at everything next to reference 1's edges and iterate until each preset is the best version of itself. Report render cost.
-Final message: what each preset looks like, paths, cost.`, { label: 'build', phase: 'Build' })
+Final message: what each preset looks like, paths, cost.`, { effort: 'max', label: 'build', phase: 'Build' })
 
 const JS = { type: 'object', properties: {
   scores: { type: 'array', items: { type: 'object', properties: { preset: { type: 'string' }, score: { type: 'number' }, why: { type: 'string' }, improve: { type: 'string' } }, required: ['preset', 'score', 'why', 'improve'] } },
@@ -30,12 +30,12 @@ const vs = await parallel([
   { key: 'premium', brief: 'PREMIUM: which looks most polished, intentional and premium on a phone (a high-end illustrated short), not grungy or broken?' },
   { key: 'ref1', brief: 'REFERENCE-1 CHARM and the USER\'S NOTE: which best matches "white base, colour painted on top in a messy incomplete way, edges loose and messy" like reference 1?' },
 ].map(l => () => agent(`${CONTEXT}
-You are a JUDGE. Do NOT edit files. Look at ${OUT}/ (sheet, zooms, frames you extract from the clips into /tmp/claude-0/-home-user-Test-/59905704-1101-50eb-baa8-b5e4e9d5d2d2/scratchpad/loosejudge/). LENS: ${l.brief} Score trim, paint-subtle, paint-medium, paint-loose 1–10 with why + how to improve; name the best.`, { label: `judge:${l.key}`, phase: 'Judge', schema: JS })))
+You are a JUDGE. Do NOT edit files. Look at ${OUT}/ (sheet, zooms, frames you extract from the clips into /tmp/claude-0/-home-user-Test-/59905704-1101-50eb-baa8-b5e4e9d5d2d2/scratchpad/loosejudge/). LENS: ${l.brief} Score trim, paint-subtle, paint-medium, paint-loose 1–10 with why + how to improve; name the best.`, { effort: 'max', label: `judge:${l.key}`, phase: 'Judge', schema: JS })))
 const notes = vs.filter(Boolean).map(v => `${v.scores.map(s => `${s.preset} ${s.score}: ${s.why} | improve: ${s.improve}`).join('\n')}\nbest: ${v.best}`).join('\n\n')
 
 phase('Refine')
 const refined = await agent(`${CONTEXT}
 Judges' notes:
 ${notes}
-REFINE all three paint presets with these notes (the user will choose the level), keeping each distinct. Produce the FINAL material in ${OUT}/final/: a sheet (trim vs paint-subtle vs paint-medium vs paint-loose x 3 shots, phone bezel), corner zooms, a 6 s full-res street clip per paint preset, and a 4-panel side-by-side clip. Update docs/EDGES.md (presets, parameter, cost, the one-line Film integration). Final message: paths, a plain-words description of each preset, and which one you'd recommend and why.`, { label: 'refine', phase: 'Refine' })
+REFINE all three paint presets with these notes (the user will choose the level), keeping each distinct. Produce the FINAL material in ${OUT}/final/: a sheet (trim vs paint-subtle vs paint-medium vs paint-loose x 3 shots, phone bezel), corner zooms, a 6 s full-res street clip per paint preset, and a 4-panel side-by-side clip. Update docs/EDGES.md (presets, parameter, cost, the one-line Film integration). Final message: paths, a plain-words description of each preset, and which one you'd recommend and why.`, { effort: 'max', label: 'refine', phase: 'Refine' })
 return { notes, refined }

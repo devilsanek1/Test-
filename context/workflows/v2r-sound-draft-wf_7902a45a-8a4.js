@@ -66,7 +66,7 @@ SOUND_SAMPLES); audio/tools has the machinery (tools only).
 3. Premix voice (public/v2/voice.wav) + bed + cues in audio/v2r/premix.py -> ${SCR}/sound/premix.wav; measure integrated loudness, true peak
    (pyloudnorm), the voice-to-bed ratio under speech and the 1-4 kHz balance; set gains/ducking until the voice is clearly on top at
    -14 LUFS / -1 dBTP. Write docs/v2/SOUND.md (<= 70 lines: the bed's idea and arc, every cue with time and reason, the mix numbers,
-   licences). Commit your paths.`, { label: 'sound', phase: 'Sound' })
+   licences). Commit your paths.`, { effort: 'max', label: 'sound', phase: 'Sound' })
 const crit = await agent(`You are a MUSIC DIRECTOR and re-recording mixer for short documentaries. Judge the draft audio of a 39 s vertical explainer:
 ${V}/public/v2r/music_bed.wav, ${V}/public/v2r/sfx/, ${V}/public/v2r/cues.json and the premix
 /tmp/claude-0/-home-user-Test-/59905704-1101-50eb-baa8-b5e4e9d5d2d2/scratchpad/v2r/sound/premix.wav, against ${V}/docs/v2/TREATMENT.md
@@ -74,12 +74,12 @@ section 7, ${V}/docs/v2/SOUND.md and the beat map. You cannot listen, so analyse
 matplotlib) to PNGs and look at them; check the voice band under speech, the bed's dynamics against the arc, where SFX land vs the heard
 word onsets, clipping, the loop seam (the last 0.5 s into the first 0.5 s), anything harsh (sibilant highs, boomy lows) or cheap-sounding
 (pure sine tones, obvious synthesis, static loops), and whether the first-second sound reads as a positive phone-like cue. Write your
-findings as a numbered list (most important first, each with a concrete fix) in your final message, at most 25 lines.`, { label: 'music-director', phase: 'Sound' })
+findings as a numbered list (most important first, each with a concrete fix) in your final message, at most 25 lines.`, { effort: 'max', label: 'music-director', phase: 'Sound' })
 const rev = await agent(`${CTX}
 YOU ARE THE SOUND AGENT (revision). A music director reviewed your draft. Apply every fix that makes it better (say why for any you skip),
 re-render the bed, SFX, cues and the premix, re-measure, update docs/v2/SOUND.md. Commit your paths.
 YOUR DRAFT REPORT:
 ${draft || '(missing)'}
 MUSIC DIRECTOR:
-${crit || '(missing: do your own spectral check)'}`, { label: 'sound-revise', phase: 'Sound' })
+${crit || '(missing: do your own spectral check)'}`, { effort: 'max', label: 'sound-revise', phase: 'Sound' })
 return { draft, crit, rev }

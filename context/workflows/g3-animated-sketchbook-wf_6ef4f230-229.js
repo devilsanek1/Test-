@@ -119,7 +119,7 @@ const LANE_SCHEMA = {
 phase('Research')
 log('6 research lanes: story reels, layout/previs, rough pass, mograph animatics, sketchbook look, repo audit')
 const laneResults = await parallel(LANES.map(l => () =>
-  agent(l.prompt, { label: 'research:' + l.key, phase: 'Research', schema: LANE_SCHEMA })
+  agent(l.prompt, { effort: 'max', label: 'research:' + l.key, phase: 'Research', schema: LANE_SCHEMA })
 ))
 const ok = laneResults.filter(Boolean)
 log(`research lanes done: ${ok.length}/6 returned`)
@@ -158,7 +158,7 @@ Required shape (lean, <= ~220 lines, written as rules a build agent can follow; 
 7. **Tooling deltas** — exact SketchReel/board_lint/build-script changes needed (from the audit lane), each with ~effort; mark which exist already.
 Then WRITE ${RES}/g3_spec_edits.md: the exact edit list for the OTHER docs (do NOT edit them yourself): STORYBOARD_STYLE.md (which clauses §0/§4/§5 change and their new wording), PIPELINE_V2.md (new G3 row text + toolkit rows), root CLAUDE.md (the one G3 bullet update), each as old->new. Keep every existing owner rule intact unless the new direction supersedes it, and say so where it does.
 Do NOT commit. Reply with just: files written + open questions.`
-const synth = await agent(synthPrompt, { label: 'synthesize:G3 spec', phase: 'Synthesize', schema: SYNTH_SCHEMA, effort: 'high' })
+const synth = await agent(synthPrompt, { label: 'synthesize:G3 spec', phase: 'Synthesize', schema: SYNTH_SCHEMA, effort: 'max' })
 log('synthesis done: ' + (synth ? synth.files.join(', ') : 'AGENT DIED'))
 if (!synth) throw new Error('synthesis agent died — rerun from resume')
 
@@ -187,11 +187,11 @@ const criticBase = `${CONTEXT}
 YOU ARE A CRITIC. Read ${V}/docs/G3_ANIMATIC.md and ${RES}/g3_spec_edits.md (just written, not yet applied), plus ${V}/docs/OWNER_PLAYBOOK.md and ${V}/docs/PIPELINE_V2.md for the rules they must respect. Report findings (max 8, most severe first) with a concrete fix each. Default to needs_fixes only for real problems; do not invent work. Reply ONLY via the structured output.`
 const critics = await parallel([
   () => agent(criticBase + `
-YOUR LENS: TIME. The owner's goal is "the closest signal in as little time as possible". Hunt for anything in the spec that inflates build or review time without adding story signal: requirements that force per-panel hand-tuning, vague rules an agent will over-build, missing time budgets, review loops that can run more than once, polish smuggled in as "motion", tooling marked needed that a cheaper convention replaces. Also check the reverse: is the fastest path (first cut in ~2h) actually spelled out step by step?`, { label: 'critic:time', phase: 'Critique', schema: CRITIC_SCHEMA }),
+YOUR LENS: TIME. The owner's goal is "the closest signal in as little time as possible". Hunt for anything in the spec that inflates build or review time without adding story signal: requirements that force per-panel hand-tuning, vague rules an agent will over-build, missing time budgets, review loops that can run more than once, polish smuggled in as "motion", tooling marked needed that a cheaper convention replaces. Also check the reverse: is the fastest path (first cut in ~2h) actually spelled out step by step?`, { effort: 'max', label: 'critic:time', phase: 'Critique', schema: CRITIC_SCHEMA }),
   () => agent(criticBase + `
-YOUR LENS: SIGNAL FIDELITY. Replay video 3's history against this spec: the owner approved G3, then at G5 said "way too empty ... the quality and smoothness is not there"; scale felt flat; a window read as a screen; metaphors confused. Would a G3 built exactly to this spec have shown those problems BEFORE the lock? Walk each G5+ surprise from ${V}/docs/v3/OWNER_NOTES.md and ${RES}/animatic_audit.md through the spec and name any that still slip through. Also: does the signal contract really cover transitions and camera moves at near-final fidelity (shape AND timing), or does it quietly allow held panels with marks again?`, { label: 'critic:signal', phase: 'Critique', schema: CRITIC_SCHEMA }),
+YOUR LENS: SIGNAL FIDELITY. Replay video 3's history against this spec: the owner approved G3, then at G5 said "way too empty ... the quality and smoothness is not there"; scale felt flat; a window read as a screen; metaphors confused. Would a G3 built exactly to this spec have shown those problems BEFORE the lock? Walk each G5+ surprise from ${V}/docs/v3/OWNER_NOTES.md and ${RES}/animatic_audit.md through the spec and name any that still slip through. Also: does the signal contract really cover transitions and camera moves at near-final fidelity (shape AND timing), or does it quietly allow held panels with marks again?`, { effort: 'max', label: 'critic:signal', phase: 'Critique', schema: CRITIC_SCHEMA }),
   () => agent(criticBase + `
-YOUR LENS: CONSISTENCY + FEASIBILITY. Check every rule in the new spec against (a) the owner playbook (monochrome at G3, sound-off cold read, one version to the owner, no polish before story lock, 30 fps allowed at G3, signal-per-drawing, literal beats clever, no unsupported metaphors) and (b) what SketchReel/board_lint can actually do today (read the audit lane file ${RES}/animatic_audit.md, and the header of ${V}/src/v3/SketchReel.tsx if needed): every requirement must be implementable as animatic JSON today or appear in the tooling-deltas table with effort. Flag contradictions between G3_ANIMATIC.md and STORYBOARD_STYLE.md that the edits file forgets to reconcile, and any edit in g3_spec_edits.md whose old-text anchor does not actually exist in the target doc.`, { label: 'critic:consistency', phase: 'Critique', schema: CRITIC_SCHEMA }),
+YOUR LENS: CONSISTENCY + FEASIBILITY. Check every rule in the new spec against (a) the owner playbook (monochrome at G3, sound-off cold read, one version to the owner, no polish before story lock, 30 fps allowed at G3, signal-per-drawing, literal beats clever, no unsupported metaphors) and (b) what SketchReel/board_lint can actually do today (read the audit lane file ${RES}/animatic_audit.md, and the header of ${V}/src/v3/SketchReel.tsx if needed): every requirement must be implementable as animatic JSON today or appear in the tooling-deltas table with effort. Flag contradictions between G3_ANIMATIC.md and STORYBOARD_STYLE.md that the edits file forgets to reconcile, and any edit in g3_spec_edits.md whose old-text anchor does not actually exist in the target doc.`, { effort: 'max', label: 'critic:consistency', phase: 'Critique', schema: CRITIC_SCHEMA }),
 ])
 const liveCritics = critics.filter(Boolean)
 const allFindings = liveCritics.flatMap((c, i) => c.findings.map(f => ({ lens: ['time', 'signal', 'consistency'][critics.indexOf(liveCritics[i])] || 'critic', ...f })))
@@ -206,7 +206,7 @@ if (allFindings.length > 0) {
 YOU ARE THE REVISION AGENT. ${V}/docs/G3_ANIMATIC.md and ${RES}/g3_spec_edits.md were just written by a synthesis agent; three critics (time, signal-fidelity, consistency) reviewed them. Apply their findings by EDITING both files in place (read them first; keep their structure and length discipline; the research files in ${RES}/animatic_*.md are the evidence base if you need to re-check something). Findings:
 ${findingsText}
 
-Judgment call: a finding that contradicts an owner rule in ${V}/docs/OWNER_PLAYBOOK.md loses; a 'minor' finding that would grow the doc for little value may be rejected — list rejected findings with one reason each in your reply. Do NOT commit. Reply with: what changed per file, rejected findings.`, { label: 'revise:apply findings', phase: 'Revise', effort: 'high' })
+Judgment call: a finding that contradicts an owner rule in ${V}/docs/OWNER_PLAYBOOK.md loses; a 'minor' finding that would grow the doc for little value may be rejected — list rejected findings with one reason each in your reply. Do NOT commit. Reply with: what changed per file, rejected findings.`, { label: 'revise:apply findings', phase: 'Revise', effort: 'max' })
 } else {
   log('no critic findings — skipping revision')
 }

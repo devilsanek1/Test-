@@ -60,7 +60,7 @@ Commit your file. Your final message: the file path and the concept in 3 lines.`
 
 phase('Treatments')
 const r = await parallel([
-  () => agent(TASK(1, "camera-journey", "One continuous camera journey through a single living world (the DNA of the owner's favourite Arcane pull-back crane): the camera never just cuts between tableaux; it travels, rises, pulls back, passes through windows and doors, and every change of place is a move or a match cut."), { label: 'T1-camera-journey', phase: 'Treatments' }),
-  () => agent(TASK(2, "the-line", "A visual throughline: the contract's one clause becomes a physical line that keeps running through her world and beyond, for life (the expected end of a contract, then reality overtaking it); the camera follows it from her desk through the city to the places of the story and back, so the whole film is one idea made visible."), { label: 'T2-the-line', phase: 'Treatments' }),
+  () => agent(TASK(1, "camera-journey", "One continuous camera journey through a single living world (the DNA of the owner's favourite Arcane pull-back crane): the camera never just cuts between tableaux; it travels, rises, pulls back, passes through windows and doors, and every change of place is a move or a match cut."), { effort: 'max', label: 'T1-camera-journey', phase: 'Treatments' }),
+  () => agent(TASK(2, "the-line", "A visual throughline: the contract's one clause becomes a physical line that keeps running through her world and beyond, for life (the expected end of a contract, then reality overtaking it); the camera follows it from her desk through the city to the places of the story and back, so the whole film is one idea made visible."), { effort: 'max', label: 'T2-the-line', phase: 'Treatments' }),
 ])
 return { T1: r[0], T2: r[1] }

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Export this session's context into the repo (context/): the conversation (user + assistant text), an actions log,
 compaction summaries, uploads (deduped against tracked assets), workflow scripts and agent reports.
-Redacts the owner's email; flags anything that looks like a secret."""
+Redacts the owner's email and anything that looks like a secret (bare hex keys of 48+ characters too, such as an
+ElevenLabs key pasted without a prefix; 40-character git hashes stay)."""
 import base64, glob, hashlib, json, os, re, shutil, subprocess
 
 SID = '59905704-1101-50eb-baa8-b5e4e9d5d2d2'
@@ -12,7 +13,7 @@ UPLOADS = f'/root/.claude/uploads/{SID}'
 REPO = '/home/user/Test-'
 OUT = f'{REPO}/context'
 EMAIL = os.environ.get('OWNER_EMAIL', 'owner@example.invalid')  # the real address is never written into the repo
-SECRET_RE = re.compile(r'(sk_[A-Za-z0-9]{24,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|xox[bp]-[A-Za-z0-9-]{20,}|(?i:api[_-]?key|secret|password|token)\s*[:=]\s*["\']?[A-Za-z0-9_\-]{20,})')
+SECRET_RE = re.compile(r'((?<![0-9A-Fa-f])[0-9A-Fa-f]{48,}(?![0-9A-Fa-f])|sk_[A-Za-z0-9]{24,}|ghp_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|AKIA[0-9A-Z]{16}|xox[bp]-[A-Za-z0-9-]{20,}|(?i:api[_-]?key|secret|password|token)\s*[:=]\s*["\']?[A-Za-z0-9_\-]{20,})')
 SYSREM = re.compile(r'<system-reminder>.*?</system-reminder>', re.S)
 MIDTURN = re.compile(r'The user sent a new message while you were working:\n(.*?)\n\nThis is how Claude Code surfaces', re.S)
 

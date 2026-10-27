@@ -23,14 +23,14 @@ YOU ARE THE DIRECTOR. Re-map the storyboard onto the new script:
 - Engagement layer: Bit hidden in EVERY scene (rewatch game), small pause-worthy sign jokes, a first frame that already tells the story, a seamless loop.
 - Scene count about 9–12 for ~55 s; cuts at sentence/phrase boundaries; at least 5 events/s of in-frame life with no dead run over 0.4 s except deliberate, named holds; captions in the sky band kept calm.
 - Every beat, camera key, caption line/highlight, tone switch, sfx cue and transition is word-anchored.
-Write ${ROOT}/docs/storyboard_v3.md (concept, scene table, per-scene detail) and ${ROOT}/docs/storyboard_v3.json (same shape as docs/storyboard.json but every time field replaced by an anchor object {"w","dt"}, plus "wordsRef": the exact plain script used for indexing). Validate JSON. Final message: the scene table (id, words covered, est. time, visual, camera, peak?) and the loop.`, { label: 'remap:director', phase: 'Remap' }),
+Write ${ROOT}/docs/storyboard_v3.md (concept, scene table, per-scene detail) and ${ROOT}/docs/storyboard_v3.json (same shape as docs/storyboard.json but every time field replaced by an anchor object {"w","dt"}, plus "wordsRef": the exact plain script used for indexing). Validate JSON. Final message: the scene table (id, words covered, est. time, visual, camera, peak?) and the loop.`, { effort: 'max', label: 'remap:director', phase: 'Remap' }),
   () => agent(`${CONTEXT}
 YOU BUILD THE RESOLVER TOOL (lane: scripts/anchor/** and assets/timing_est_v3.json only).
 1. assets/timing_est_v3.json: an estimated word timeline for the new plain script (from docs/script/final_script.md), built from the previous take's measured pace (assets/timing.json): typical word duration by syllable count, pause lengths after commas, sentence ends, and the ellipsis after "PHP". Flag "estimated": true.
 2. scripts/anchor/resolve.py: inputs a word-anchored storyboard JSON (every time field is {"w": idx, "dt": s}) and a timing JSON (estimated or real), outputs a resolved storyboard with seconds (default: docs/storyboard_v3_resolved.json). It verifies that the storyboard's "wordsRef" matches the timing's words, and reports mismatches with a word-level diff so small script edits can be re-anchored. Also emit src/data/scenes.json and src/data/captions.json in the engine's formats (read scripts/gen-scenes.mjs and scripts/gen-captions.mjs and docs/ENGINE.md to match them exactly, or call those scripts).
 3. scripts/anchor/reanchor.py: when the user's recorded script differs slightly from wordsRef (a word added or removed), re-map anchors through a word alignment (difflib on normalized tokens) and report anchors that landed on changed words.
 4. Self-tests with a toy storyboard. Document in scripts/anchor/README.md.
-Final message: usage, test results, and the estimated total duration of the new script.`, { label: 'remap:resolver', phase: 'Remap' }),
+Final message: usage, test results, and the estimated total duration of the new script.`, { effort: 'max', label: 'remap:resolver', phase: 'Remap' }),
 ])
 log('Remap done')
 
@@ -51,7 +51,7 @@ const CRITICS = [
   { key: 'retention', brief: 'RETENTION, CLARITY & ENGAGEMENT: does the first frame tell the story with sound off? does each line\'s visual make the idea instantly obvious to a non-technical viewer (especially "install it on every single server", "not officially supported", and the joke)? any sag? are the engagement hooks (bait line, rewatch Bit, sign jokes, loop) landing subtly, not needy?' },
 ]
 const crits = await parallel(CRITICS.map(c => () => agent(`${CONTEXT}
-You are a storyboard critic for ${ROOT}/docs/storyboard_v3.json and .md. Do NOT edit repo files. LENS: ${c.brief} Report issues with concrete fixes.`, { label: `critic:${c.key}`, phase: 'Critique', schema: CRIT_SCHEMA })))
+You are a storyboard critic for ${ROOT}/docs/storyboard_v3.json and .md. Do NOT edit repo files. LENS: ${c.brief} Report issues with concrete fixes.`, { effort: 'max', label: `critic:${c.key}`, phase: 'Critique', schema: CRIT_SCHEMA })))
 const issues = crits.filter(Boolean).flatMap(c => c.issues)
 log(`Critics: ${issues.filter(i => i.severity === 'blocker').length} blockers, ${issues.filter(i => i.severity === 'major').length} major, ${issues.filter(i => i.severity === 'minor').length} minor`)
 
@@ -61,6 +61,6 @@ if (issues.length) {
   fixed = await agent(`${CONTEXT}
 You are the DIRECTOR. Apply these critic findings to ${ROOT}/docs/storyboard_v3.json and storyboard_v3.md (keep them consistent; re-validate; re-run scripts/anchor/resolve.py with the estimated timing until its checks are clean).
 ${JSON.stringify(issues, null, 1)}
-Final message: one line per finding, then the final scene table (id, words, est. time, visual, camera, peak?).`, { label: 'fix:director', phase: 'Fix' })
+Final message: one line per finding, then the final scene table (id, words, est. time, visual, camera, peak?).`, { effort: 'max', label: 'fix:director', phase: 'Fix' })
 }
 return { remap, issues, fixed }

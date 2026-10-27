@@ -44,7 +44,7 @@ const analyses = await parallel(LENSES.map((L) => () => agent(`${CTX}
 YOUR LENS: ${L.ask}
 Measure with OpenCV where you can (frames from ${SRC}; write tools and crops to ${OUT}/${L.key}/). Then give a FLAT-COLOUR 9:16 RECIPE: the cues as
 rules with numbers that a hand-drawn flat set can apply. At most ~70 lines, numbers first. Return the text and save it to ${OUT}/${L.key}.md.
-Look at no more than ~10 images. Do not edit repo files.`, { label: 'scale:' + L.key, phase: 'Analyse' })))
+Look at no more than ~10 images. Do not edit repo files.`, { effort: 'max', label: 'scale:' + L.key, phase: 'Analyse' })))
 const A = LENSES.map((L, i) => `### ${L.key}\n${analyses[i] || 'FAILED'}`).join('\n\n')
 
 phase('Write')
@@ -71,6 +71,6 @@ LIBRARIAN:
 ${writer || 'FAILED'}
 
 ANALYSES:
-${A}`, { label: 'S9 designer', phase: 'Plan' })
+${A}`, { effort: 'max', label: 'S9 designer', phase: 'Plan' })
 
 return { analyses: A, writer, plan }

@@ -56,7 +56,7 @@ const SCORE = {
 phase('Plan')
 const plans = await parallel(PLANS.map(p => () => agent(
   `${CTX}\n\nYou are a storyboard director. Approach: ${p.lens}.\n\nWrite the shot list (10-18 shots, cuts on words, tiling 0 to 41.38 s). Don't write files.`,
-  { label: `plan:${p.key}`, phase: 'Plan', schema: PLAN })))
+  { effort: 'max', label: `plan:${p.key}`, phase: 'Plan', schema: PLAN })))
 const ps = PLANS.map((p, i) => plans[i] ? { key: p.key, ...plans[i] } : null).filter(Boolean)
 
 phase('Judge')
@@ -66,7 +66,7 @@ const JUDGES = [
 ]
 const judged = await parallel(JUDGES.map(j => () => agent(
   `${CTX}\n\nYou are ${j.lens}. Score each plan 1-10 on guide, story, hook, cinematic, buildable; say what to keep and fix.\n\nPlans (JSON):\n${JSON.stringify(ps)}`,
-  { label: `judge:${j.key}`, phase: 'Judge', schema: SCORE })))
+  { effort: 'max', label: `judge:${j.key}`, phase: 'Judge', schema: SCORE })))
 const tot = {}
 ps.forEach(p => { tot[p.key] = 0 })
 judged.filter(Boolean).forEach(j => j.scores.forEach(s => { if (s.key in tot) tot[s.key] += 2 * s.guide + 3 * s.story + 2 * s.hook + 2 * s.cinematic + s.buildable }))
@@ -76,6 +76,6 @@ log(`plans: ${ranked.map(p => `${p.key} ${tot[p.key]}`).join(', ')}`)
 phase('Storyboard')
 const sb = await agent(
   `${CTX}\n\nYou are the storyboard artist. Build the winning plan, grafting the judges' "keep" ideas from the other and applying their fixes.\n\nWinner:\n${JSON.stringify(ranked[0])}\n\nOther:\n${JSON.stringify(ranked.slice(1))}\n\nJudges:\n${JSON.stringify(judged.filter(Boolean))}\n\nWrite ${ROOT}/public/v3/animatic.json for SketchReel (read ${ROOT}/src/v3/SketchReel.tsx for the exact types). It now supports: per-element "f" depth factor for TRUE parallax (1 = with the camera, 0.15 = far colossus, 1.4 = foreground ledge; the authored end frame is exact for every f), camera eases "out" | "in" | "inout" | "linear" | "unveil" | "inQuad", camera roll "r" in degrees, transitions "cut" | "dissolve" | "push-through" | "match-cut" | "wipe" | "dip" | "flash" with optional "dur", "moves" for in-shot motion, "in" for elements popping in. Use the guide's "In SketchReel" camera mapping (section 3) for every preset. Top-level fields: {"label": "v3 G3 animatic v2", "audio": "v3/voice.wav", "durationSec": 41.38, "frame0": "AI IS MAKING YOUR NEXT LAPTOP PRICIER", "frame0Until": 3.6, "words": <copy "words" from public/v3/voice_words.json unchanged>, "sfx": [{"src": "v3/phone_cart_add.wav", "t": 0.05, "gain": 0.5}, plus at most 2 more of v3/phone_notify_ding.wav / v3/phone_like_pop.wav where the plan calls for them], "shots": [...]}. Shots tile 0 to 41.38 with no gaps. In each shot's "note", start with its codes, e.g. "V2 · P2 · T1 | ...". Keep drawings simple and bold, 8-25 elements, labels on anything ambiguous; fills: warm, cold, dark, paper, pop (the ONE hot accent). Respect the bands: caption band y 317-556 flat, key action in x 60-940, y 620-1560.\n\nCheck it: render up to 8 stills at key moments: cd ${ROOT} && npx remotion still src/entry-v3.tsx Animatic /tmp/claude-0/-home-user-Test-/e0b06496-a313-5ced-bf0f-bc634eb12744/scratchpad/sb2_<n>.png --frame=<f> --scale=0.25 (30 fps), look, fix. Don't render a video. Don't commit. Also write ${V3}/storyboard_g3.md: the concept in 2 sentences and the shot list as a table (shot, time, V, P, T, what we see, light, cozy/scale). Return at most 12 lines: the concept and one line per shot.`,
-  { label: 'storyboard-artist', phase: 'Storyboard' })
+  { effort: 'max', label: 'storyboard-artist', phase: 'Storyboard' })
 
 return { ranking: ranked.map(p => ({ key: p.key, score: tot[p.key], concept: p.concept })), storyboard: sb }

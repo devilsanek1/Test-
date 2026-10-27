@@ -66,7 +66,7 @@ SOUND_SAMPLES); audio/tools has the machinery (tools only).
 3. Premix voice (public/v2/voice.wav) + bed + cues in audio/v2r/premix.py -> ${SCR}/sound/premix.wav; measure integrated loudness, true peak
    (pyloudnorm), the voice-to-bed ratio under speech and the 1-4 kHz balance; set gains/ducking until the voice is clearly on top at
    -14 LUFS / -1 dBTP. Write docs/v2/SOUND.md (<= 70 lines: the bed's idea and arc, every cue with time and reason, the mix numbers,
-   licences). Commit your paths.`, { label: 'sound', phase: 'Sound' })
+   licences). Commit your paths.`, { effort: 'max', label: 'sound', phase: 'Sound' })
 const crit = await agent(`You are a MUSIC DIRECTOR and re-recording mixer for short documentaries. Judge the draft audio of a 39 s vertical explainer:
 ${V}/public/v2r/music_bed.wav, ${V}/public/v2r/sfx/, ${V}/public/v2r/cues.json and the premix
 /tmp/claude-0/-home-user-Test-/59905704-1101-50eb-baa8-b5e4e9d5d2d2/scratchpad/v2r/sound/premix.wav, against ${V}/docs/v2/TREATMENT.md
