@@ -85,6 +85,13 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Next:** show the owner the top 3 angles on one screen. After their pick, G1 is a radio cut (TTS voice over plain
   paper with big captions) with 3 hook variants.
 
+## 2c. Video 4 (2026-10-27): G0 topic scouting started
+
+- Session https://claude.ai/code/session_014PwCXHBSouhcawFp12X9sT, branch `claude/tender-bardeen-j7duak`.
+- Owner: "research another video topic starting with step 1; the topic must not include Anthropic as the key entity."
+- Workflow `context/workflows/v4-g0-topics-wf_4d4df1c1-d0b.js` writes `video/docs/v4/scouting/*.md` and
+  `video/docs/v4/G0_TOPICS.md` (top 3 for the owner). Next: the owner picks; then G0.5 core line.
+
 ## 2b. Update 2026-10-25 20:00 UTC: two agents, split by video
 
 - **Video 2 (Google DeepMind resignations) is produced by session https://claude.ai/code/session_01BGZ47aBhF9yKpEaeiLeCPQ**
