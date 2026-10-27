@@ -140,6 +140,9 @@ export type DataCenterProps = {
   /** The server lights' colour (default EMBER.led). Additive (v3 rework): a softer value keeps the rows of lights a
    *  quiet texture when the building is not the beat's subject. */
   ledColor?: string;
+  /** 'ticks' (default: rows of small blinking server lights) | 'bands' (additive, the clean pen's version: each row is
+   *  three long lit bands, no dash rows: CRAFT §c "no specks, ticks ... dash rows"). */
+  ledStyle?: 'ticks' | 'bands';
 };
 
 export function dataCenterGeo(x: number, y: number, w: number, h?: number, variant: DataCenterVariant = 'normal', signH?: number) {
@@ -151,7 +154,7 @@ export function dataCenterGeo(x: number, y: number, w: number, h?: number, varia
   return {H, top, sign, x0: x - w / 2, x1: x + w / 2};
 }
 
-const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH, ledColor = EMBER.led}) => {
+const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH, ledColor = EMBER.led, ledStyle = 'ticks'}) => {
   const t = useTime();
   const variant: DataCenterVariant = darkAt !== undefined && t >= darkAt ? 'dark' : v0;
   const g = dataCenterGeo(x, y, w, h, v0, signH);
@@ -184,6 +187,15 @@ const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'n
     const ry = rowsTop + i * rowGap;
     strips.push(<TRect key={`s${i}`} x={g.x0 + sideW + w * 0.04} y={ry} width={w - sideW - w * 0.08} height={rowH} fill={side} />);
     if (far && !mini) continue;
+    if (ledStyle === 'bands') {
+      // three long lit bands per row (a hall's lit slots), steady: the building's light without a dash texture
+      const bx0 = g.x0 + sideW + w * 0.07;
+      const span = g.x1 - w * 0.06 - bx0;
+      const gap = w * 0.035;
+      const bw = (span - gap * 2) / 3;
+      for (let j = 0; j < 3; j++) ticks.push(<TRect key={`t${i}_${j}`} x={bx0 + j * (bw + gap)} y={ry + rowH * 0.3} width={bw} height={Math.max(2.5, rowH * 0.4)} fill={ledColor} />);
+      continue;
+    }
     for (let tx = g.x0 + sideW + w * 0.06, j = 0; tx + tickW < g.x1 - w * 0.05; tx += step, j++) {
       if (lr.chance(0.12)) continue;
       const ph = lr.range(0, 100);

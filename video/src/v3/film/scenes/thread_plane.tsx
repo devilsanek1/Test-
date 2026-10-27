@@ -98,13 +98,19 @@ export const TICKER: TickerStep[] = [
 export const OLD_AT = 1.88;
 export const STRIKE_AT = 1.92;
 export const TURN_AT = 39.7;
-export const REACT = {jolt: [15.3, 35.95], tug: 18.3, sway: 24.44};
+export const REACT = {tap: 0.0, jolt: [15.3, 35.95], tug: 18.3, sway: 24.44};
 /** The warm rim on the tag's lamp side while it ticks (CRAFT §d.8: the subject only). */
 export const RIM_WINDOW: [number, number] = [1.86, 3.3];
 
 /** Extra hang angle (deg) from the tag's reactions at film time T (the ticker's own jolts are PriceTag's). */
 export function tagReaction(T: number): number {
   let a = 0;
+  // the thumb's tap jostles the phone: the tag swings and settles over ~1.2 s (the hook's quiet stretch stays alive
+  // through the subject itself)
+  if (T >= REACT.tap) {
+    const d = T - REACT.tap;
+    a += 4.2 * Math.exp(-d * 1.5) * Math.sin(d * Math.PI * 2 * 1.3);
+  }
   for (const j of REACT.jolt) if (T >= j) a += 7 * Math.exp(-(T - j) * 9) * Math.sin((T - j) * 34);
   if (T >= REACT.tug) {
     const d = T - REACT.tug;
@@ -156,11 +162,13 @@ export const PIP_LOOK: LookKey[] = [
 /** Pose / expression keys: the ears-droop beat on "buy one." (10.92) as the 'meh' face, back on "But"; the shrug on
  *  40.30 (the WINDOW lane's 40.24-40.70). */
 export const PIP_KEYS: PipPoseKey[] = [
-  {t: -99, pose: 'peek', amount: 1},
-  {t: 10.92, pose: 'peek', amount: 1, expression: 'meh'},
-  {t: 11.48, pose: 'peek', amount: 1},
+  {t: -99, pose: 'peek', amount: 0.86},
+  {t: 1.2, pose: 'peek', amount: 1}, // "soon?": it leans out from behind the phone ...
+  {t: 1.6, pose: 'peek', amount: 0.86}, // ... and tucks back before the first launch
+  {t: 10.92, pose: 'peek', amount: 0.86, expression: 'meh'},
+  {t: 11.48, pose: 'peek', amount: 0.86},
   {t: 40.24, pose: 'shrug'},
-  {t: 40.7, pose: 'peek', amount: 1},
+  {t: 40.7, pose: 'peek', amount: 0.86},
 ];
 /** Pip's grip point on the phone's right edge (phone-local px at w 400) and its scale per phone k. */
 export const PIP_GRIP: Pt = [400, 240];
@@ -185,15 +193,28 @@ export type ThreadState = {
   dim: number;
 };
 
+/** The hand holding the phone breathes: a tiny hand-held float of the whole plane (px, deg; ~5 px/s at most), keyed
+ *  on film time so both sides of every seam draw it identically. Life on the subject itself, never a camera move. */
+export function handFloat(T: number): {dx: number; dy: number; rot: number} {
+  const w = (p: number) => (Math.PI * 2) / p;
+  return {
+    dx: 1.6 * Math.sin(T * w(4.3) + 0.7) + 0.5 * Math.sin(T * w(1.9) + 2.1),
+    dy: 2.6 * Math.sin(T * w(3.1) + 0.2) + 0.7 * Math.sin(T * w(1.7) + 1.3),
+    rot: 0.25 * Math.sin(T * w(3.7) + 1.1),
+  };
+}
+
 export function threadAt(T: number): ThreadState {
-  const s = phoneSpotAt(T);
+  const s0 = phoneSpotAt(T);
+  const f = handFloat(T);
+  const s = {x: s0.x + f.dx, y: s0.y + f.dy, w: s0.w};
   const k = s.w / 400;
-  const phone = {x: s.x, y: s.y, w: s.w, h: s.w * PHONE_H, rot: PHONE_ROT, buttonY: BUTTON_Y};
+  const phone = {x: s.x, y: s.y, w: s.w, h: s.w * PHONE_H, rot: PHONE_ROT + f.rot, buttonY: BUTTON_Y};
   const SL = phoneSlots(phone.w, 372, BUTTON_Y);
   const listing = laptopGeo(SL.laptop.x, SL.laptop.y, SL.laptop.w);
   const corner = listing.deck[3];
   const stringFrom = phonePoint(phone, corner[0] + 4 * k, corner[1] - 6 * k);
-  const m = mat.compose(mat.translate(phone.x, phone.y), mat.about(mat.rotate(PHONE_ROT), phone.w / 2, phone.h / 2));
+  const m = mat.compose(mat.translate(phone.x, phone.y), mat.about(mat.rotate(phone.rot), phone.w / 2, phone.h / 2));
   return {
     T,
     phone,
@@ -211,7 +232,7 @@ export function threadAt(T: number): ThreadState {
 
 /** The listing's calm lower half (phone-local, under the button): two light text lines and a row of rating stars in
  *  the screen's own light tones (no delivery row, no "you may also like" cards: the subject's frame stays quiet). */
-const ListingRest: React.FC<{w: number; at?: number}> = ({w, at}) => {
+const ListingRest: React.FC<{w: number; at?: number; T: number}> = ({w, at, T}) => {
   const k = w / 400;
   const y0 = (BUTTON_Y + 128) * k;
   const star = (cx: number, cy: number, r: number) => {
@@ -224,12 +245,14 @@ const ListingRest: React.FC<{w: number; at?: number}> = ({w, at}) => {
     return d + 'Z';
   };
   const stars = [0, 1, 2, 3, 4].map((i) => star((52 + i * 26) * k, y0 + 70 * k, 10 * k)).join('');
+  // the page finishes loading in the hook's quiet stretch: the rating, then the two lines (small pops on the subject)
+  const a0 = at ?? -99;
   return (
-    <Show at={at}>
-      <path d={stars} fill="#F4C98C" />
-      <rect x={40 * k} y={y0 + 108 * k} width={250 * k} height={12 * k} rx={6 * k} fill="#EFE6DF" />
-      <rect x={40 * k} y={y0 + 136 * k} width={190 * k} height={12 * k} rx={6 * k} fill="#EFE6DF" />
-    </Show>
+    <>
+      {T >= a0 + 1.0 ? <path d={stars} fill="#F4C98C" /> : null}
+      {T >= a0 + 1.12 ? <rect x={40 * k} y={y0 + 108 * k} width={250 * k} height={12 * k} rx={6 * k} fill="#EFE6DF" /> : null}
+      {T >= a0 + 1.22 ? <rect x={40 * k} y={y0 + 136 * k} width={190 * k} height={12 * k} rx={6 * k} fill="#EFE6DF" /> : null}
+    </>
   );
 };
 
@@ -319,7 +342,7 @@ export const ThreadPlane: React.FC<ThreadPlaneProps> = ({T: Tin, rig = HOME_RIG,
           <Show at={AT.phone + 0.21}>
             <rect x={30 * k} y={284 * k} width={250 * k} height={34 * k} fill={EMBER.screen} />
           </Show>
-          <ListingRest w={phone.w} at={AT.listing + 0.2} />
+          <ListingRest w={phone.w} at={AT.listing + 0.2} T={T} />
           {children}
           <ScreenDim w={phone.w} h={phone.h} dim={S.dim} />
         </Phone>
