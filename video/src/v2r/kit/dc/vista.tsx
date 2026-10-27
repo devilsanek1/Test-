@@ -50,8 +50,8 @@ export const VT = {
   cityTree: atmShade(mix(CM.sage, CM.shadeWarm, 0.15), 3),
   cityGlass: atmShade(CM.glass, 4),
   // the obelisk: one step nearer than its plane (the darkest far shape on the palest cloud)
-  obLit: atm(CM.limestone, 3),
-  obShade: atmShade(mix(CM.stoneShade, CM.limestone, 0.2), 3),
+  obLit: atm(CM.limestone, 2),
+  obShade: atmShade(mix(CM.stoneShade, CM.shadeCool, 0.3), 2),
   obInk: mix(atmShade(CM.stoneShade, 3), CM.shadeWarm, 0.35),
   // sky
   bankCrown: CM.paper,
@@ -333,22 +333,22 @@ export const Obelisk: React.FC<{x?: number; base?: number; top?: number; w?: num
   const L: Pt[] = [
     [x - w / 2, base],
     [x - wt / 2, shaftTop],
-    [x - wt * 0.1, shaftTop],
-    [x - w * 0.1, base],
+    [x + wt * 0.12, shaftTop],
+    [x + w * 0.12, base],
   ];
   const R: Pt[] = [
-    [x - w * 0.1, base],
-    [x - wt * 0.1, shaftTop],
+    [x + w * 0.12, base],
+    [x + wt * 0.12, shaftTop],
     [x + wt / 2, shaftTop],
     [x + w / 2, base],
   ];
   const capL: Pt[] = [
     [x - wt / 2, shaftTop],
     [x, top],
-    [x - wt * 0.1, shaftTop],
+    [x + wt * 0.12, shaftTop],
   ];
   const capR: Pt[] = [
-    [x - wt * 0.1, shaftTop],
+    [x + wt * 0.12, shaftTop],
     [x, top],
     [x + wt / 2, shaftTop],
   ];
