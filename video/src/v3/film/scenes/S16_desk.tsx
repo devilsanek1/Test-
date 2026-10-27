@@ -53,7 +53,7 @@ export const S16DeskBack: React.FC = () => (
     <PenCup x={1074} y={1278} w={58} seed="s16/pens" ink={W.far} />
     {/* the tea's steam: warm-white puffs that rise and shrink to nothing over the mug (the steady back-row loop) */}
     <ExitFade x={1015} y={1250}>
-      <Steam x={1015} y={1272} n={5} life={2.1} rise={120} drift={-10} r0={4} r1={13} wobble={6} seed="s16/steam" color={EMBER.card} />
+      <Steam x={1015} y={1272} n={6} life={2.2} rise={140} drift={-12} r0={5} r1={15} wobble={6} seed="s16/steam" color={EMBER.card} />
     </ExitFade>
     <Mug x={968} top={1286} w={94} seed="s16/mug" />
   </>

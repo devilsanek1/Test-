@@ -42,9 +42,11 @@ const TAG = {x: 310, y: 1010, w: 460, rot: -8};
 // ---------------------------------------------------------------- Pip
 
 const PIP = {x: 884, y: 1328, scale: 1.8};
-/** Pip watches the tag (head turned left), leans in as it turns (a small hop toward it), and keeps on it to the shrug. */
+/** Pip watches the tag (head turned left), glances up its string (0.3), leans in as it turns (a small hop toward it),
+ *  and keeps on it to the shrug. */
 const PIP_LOOK: LookKey[] = [
   {t: -9, v: -0.62},
+  {t: 0.3, v: -0.82},
   {t: TURN_AT - 0.12, v: -0.95},
   {t: SHRUG_AT, v: 0},
   {t: SHRUG_AT + 0.5, v: -0.55},
