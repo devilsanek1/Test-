@@ -1,8 +1,9 @@
 // V2S4_her.tsx (lane L3, V2S4 STORY part): HER, screen-fixed at x 720 while the world trucks (TREATMENT §3, §5 S4;
 // plan_L3 §1). She walks LEFT (west) in profile, 170 px, her steps clocked by the truck's travel (V2S4_rig): the
 // planted foot moves with the paving, the steps slow as the truck slows, and on "objected" (17.96) she stops in the
-// passing position (one foot comes down: a tiny settle, never a pop of the figure). 18.06 her head lifts to the post
-// and its plates (west, along the arrows); when the APR plate starts (19.48) her eyes come down a line to read it.
+// passing position (the walk pose is held and its stride eases out: the lifted foot comes down over three drawings,
+// never a pose switch or a pop). 18.06 her head lifts to the post and its plates (west, along the arrows) and she
+// leans back a hair; when the APR plate starts (19.48) her eyes come down a line to read it.
 // Never a protest gesture; she never touches the post. She is the ONLY teal in the frame (the kit's HER model sheet).
 //
 // Honest feet. body.ts swings the planted leg as fx = hip - L sin(A sin(pi step)): fed a step count that is linear in

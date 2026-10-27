@@ -2,10 +2,10 @@
 // objects", §8 V16; plan_L3 §1b; map.ts S4.post / plateDec2025 / plateApr2026). Drawn in PLANE coordinates at the
 // 17.96 pose (the post lands at x 575).
 //   S4Post    (inside S4Path, slides with the towpath plane): a slim heritage post in plum with a gilt ball finial,
-//             a moulded cast-iron foot on a stone plinth, four empty collars that hint where the arms go, and its long
-//             low-sun shadow running east along the paving. Bare until "military".
+//             a moulded cast-iron foot on a stone plinth, two empty sockets that hint where the arms go, and its short
+//             colour shadow east on the paving (STYLE §2). Bare until "military".
 //   S4Plates  (V2S4.tsx draws it ABOVE Pip and the boat): the two arrow plates pointing WEST, top-to-bottom = time
-//             order. 18.92 "military": the DEC 2025 plate knocks onto the post (its paper face grows out of the collars
+//             order. 18.92 "military": the DEC 2025 plate knocks onto the post (its paper face grows out of its socket
 //             to the tip in ~0.1 s with a small overshoot), its edge and plum keyline ink, then "DEC 2025" /
 //             "unclassified work" / the credit pen on. 19.43-19.80: the APR 2026 plate, complete ON "heading". They are
 //             the top layer so nothing ever moves over the lettering (Pip's leap into the sun passes BEHIND them).
@@ -83,7 +83,7 @@ function postBatch(): Batch {
     b.fill(CM.leafGold, ovalPath(x + 5, cy, 2, 2));
   }
   b.layer();
-  // ink: loose, open, only where it carries form (shaft edges with a break, the foot, the finial, the collars)
+  // ink: loose, open, only where it carries form (shaft edges with a break, the foot, the finial, the sockets)
   const w = INK_PX.far;
   b.ink(line(x - HW, SHAFT_TOP + 2, x - HW, 880, {seed: 'pL1', over: [2, 0]}), w);
   b.ink(line(x - HW, 896, x - HW, BASE_TOP - 4, {seed: 'pL2', over: [0, 2]}), w);
@@ -116,7 +116,7 @@ export const S4Post: React.FC = () => {
 type PlateSpec = {
   r: MAP.Rect;
   text: {key: string; body: string; credit: string};
-  /** The face starts to grow out of the collars. */
+  /** The face starts to grow out of its socket. */
   at: number;
   /** Spring of the face (w0 rad/s, damping ratio). */
   w0: number;
@@ -189,7 +189,7 @@ const PlateFace: React.FC<{p: PlateSpec}> = ({p}) => {
     return `M${P(xa, r.y0 + k)}L${P(r.x1 - k, r.y0 + k)}L${P(r.x1 - k, r.y1 - k)}L${P(xa + 6, r.y1 - k)}`;
   }, [r]);
   if (t < p.at) return null;
-  // the face grows out of the collars (scale x about the post end) with a small overshoot
+  // the face grows out of its socket (scale x about the post end) with a small overshoot
   const sx = Math.max(0.02, spring(t, p.at, p.w0, p.zeta));
   const ym = (r.y0 + r.y1) / 2;
   const face = `M${platePts(r)
