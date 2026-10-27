@@ -172,16 +172,17 @@ export const wiperX = (t: number) => {
 };
 /** Pip's entry: sits on the passing boat's stern deck (screen x = wiperX + 545, feet on the deck y 1636) from 32.97
  *  (only where S8 shows: x <= 780, never the rail), leaps at 33.00 and lands on the pre-truck board bollard 33.20. */
-export const PIP_ENTRY = {sternDx: 545, deckY: 1636, size: 96} as const;
+export const PIP_ENTRY = {sternDx: 545, deckY: 1636, size: 100} as const;
 /** Pip's board bollard (top centre = Pip's seat) in BOARD-PLANE landing coords. */
 export const PIP_SEAT = {x: MAP.BOARD_BOLLARD.x, y: MAP.BOARD_BOLLARD.y} as const;
-export const PIP_SIZE = 96;
+/** Pip's size at the board bollard: S7's PIP_SIZE_S7 (A5: the same Pip pose at both boards). */
+export const PIP_SIZE = 100;
 /** Pip's seam hop: 38.82 -> 38.97 from the board bollard down onto S1's f0 bollard, both in landing coords under the
  *  1.05 seam push (S1's world at its frame-0 zoom 1.05 about W is the same space): (700, 1205) -> (700, 1235). */
 export const PIP_SEAM = {t0: S8T.unbuildT0, land: L(38.97), to: {x: MAP.S1_BOLLARD.x, y: MAP.S1_BOLLARD.y}, height: 26} as const;
 /** S1's clock relative to S8's: S1 time = S8 time - S1_SHIFT (the loop underlay runs at film T - 2345 / 60). */
 export const S1_SHIFT = 2345 / 60 - S8_START;
-/** S1's frame-0 Pip, mirrored from V2S1.tsx `PipS1` (L1): from PIP_SEAM.land on, S8 draws THIS Pip on S1's clock
+/** S1's frame-0 Pip, mirrored from V2S1_pip.tsx `S1Pip` (L1; it draws nothing at t < 0): from PIP_SEAM.land on, S8 draws THIS Pip on S1's clock
  *  (TimeShift by S1_SHIFT) inside the 1.05 push, so the last S8 frame and S1's frame 0 hold the identical Pip. */
 export const S1_PIP = {x: MAP.S1_BOLLARD.x, y: MAP.S1_BOLLARD.y, size: 100, facing: 'back' as const, seed: 'pipS1'};
 
