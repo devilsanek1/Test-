@@ -325,7 +325,10 @@ own G3 density key, `LIFE_AND_DENSITY.md`); its per-panel lanes are replaced by 
   checked against a direct still. v3: 14 chunks 63.5 min + 26 min audio; this fixer round re-rendered only the 9
   touched chunks (34.5 min) and reused the audio. Trap: Film cuts at ceil(start * 60), chunks cut at round() start one
   frame early, so a fix to a panel re-renders the next chunk too (fixed: `scripts/film_chunks.py` builds the list with
-  ceil, §2b).
+  ceil, §2b). Faster since (the v3 rework): `scripts/render-media.mjs` (one bundle, renderMedia, `--frames=a-b` per
+  chunk, `--codec=wav` for the audio) with Chrome's default GL renders a full-size Film3 frame in ~0.12-0.27 s against
+  the CLI's ~2.9 s (remotion.config.ts: 'swangle'); the two differ only in anti-aliasing (4-9 % of the pixels by a few
+  levels, invisible at 1:1), so render every chunk and its seam stills with ONE GL (`GL=swangle` matches the CLI).
 - **Meter floating holds at full res:** S7 / S8 / S12 read 5.3 / 7.8 / 15.5 ev/s in the lanes but 1.8 / 3.6 / 3.1 in
   the film. A `--scale=0.5` render rasterises the float camera's sub-pixel drift as 1-3 % of a static wall flipping
   every frame (0-0.8 % at full res), and the density pass counts it as motion (static 0 %; `--cozy` removes the shift,
