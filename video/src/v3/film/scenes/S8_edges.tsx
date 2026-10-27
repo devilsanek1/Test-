@@ -7,8 +7,8 @@
 //                legends on the visible key caps, three caps that spring back up after the stick leaves the slot.
 //   desk         the spiral notebook and its pen cut by the left edge, a biscuit and crumbs, a sticky note and your phone's
 //                corner cut by the bottom edge, the charger's cable cut by the right edge, wood grain; the pool as built.
-//   Pip          bottom right (1.85x, S7's side), sitting on the desk in front of the deck with its head over the deck's
-//                front edge, eyes wide at the rising stick; on "chips" (18.76) its trunk reaches toward the stick and sniffs.
+//   Pip          bottom right (2.6x, S7's side), facing us, sitting on the desk in front of the deck with its head over the
+//                deck's front edge, eyes wide at the rising stick; on "chips" (18.76) its trunk shoots up toward the stick.
 import React from 'react';
 import {Fill} from '../../../lib/Fill';
 import {Ink} from '../../../lib/Ink';
@@ -168,13 +168,13 @@ export const KeyLegends: React.FC<{deck: Quad; lid: Quad}> = ({deck, lid}) => {
   );
 };
 
-/** Three caps by the slot that the rising stick pushed down: they spring back up (secondary, damped 0.1-0.5 s). */
+/** Three caps on the top row, by the hinge slot, that the rising stick pushed down: they spring back up (secondary, damped 0.1-0.5 s). */
 export const KeySprings: React.FC<{deck: Quad}> = ({deck}) => {
   const t = useTime();
   const caps: [number, number, number][] = [
-    [2, 1, 0.1],
-    [1, 10, 0.16],
-    [2, 10, 0.2],
+    [0, 2, 0.1],
+    [0, 9, 0.16],
+    [0, 5, 0.2],
   ];
   return (
     <>
@@ -244,19 +244,20 @@ export const S8DeskFront: React.FC = () => (
 
 // ---------------------------------------------------------------- Pip
 
-const PIP = {x: 806, y: 1586, scale: 1.85};
-/** Pip in front of the deck (S7's side), eyes wide at the rising stick; on "chips" the trunk reaches up toward the stick
- *  ('hold' pose, flipped so it curls left to the stick) and sniffs twice. */
+/** 2.6x = S7's 1.4x times the props' own ~1.9x close-size cheat (~255 px), so it stays the same Pip across the cut
+ *  (still far under the 700 px stick). */
+const PIP = {x: 800, y: 1640, scale: 2.6};
+/** Pip in front of the deck (S7's side, facing us as S7 hands it over), eyes wide at the rising stick; on "chips" it
+ *  throws its trunk up toward the stick ('trunk-up', flipped so it points up-left at the stick) and holds it. */
 const PIP_KEYS: PipPoseKey[] = [
   {t: -9, pose: 'sit-front', expression: 'wide'},
-  {t: CHIPS - 0.02, pose: 'hold', expression: 'wide'},
+  {t: CHIPS - 0.04, pose: 'trunk-up', expression: 'wide'},
 ];
 const PIP_LOOK: LookKey[] = [
-  {t: -9, v: 0.7},
-  {t: 0.2, v: 0.9},
+  {t: -9, v: 0.8},
+  {t: 0.2, v: 0.95},
 ];
 
 export const S8Pip: React.FC = () => (
-  <Pip3 x={PIP.x} y={PIP.y} scale={PIP.scale} lineWeight={1.25} seed={7} flip keys={PIP_KEYS} look={PIP_LOOK} lookDur={0.16} jolts={[0.14, CHIPS + 0.2, CHIPS + 0.38]} />
+  <Pip3 x={PIP.x} y={PIP.y} scale={PIP.scale} lineWeight={1.25} seed={7} flip keys={PIP_KEYS} look={PIP_LOOK} lookDur={0.16} jolts={[0.14]} />
 );
-

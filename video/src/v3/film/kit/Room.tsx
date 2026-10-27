@@ -61,11 +61,13 @@ export type ShelfFillProps = {
   trailing?: boolean;
   at?: At;
   ink?: number;
+  /** Book colours by index (optional; default EMBER.books, same length): a panel can swap a few for the cool family. */
+  books?: string[];
 };
 
 /** Varied books (5+ colours, 14-40 wide, 80-150 tall, upright, leaning and in lying stacks) with a framed photo, a jar,
  *  a small plant and a trailing pothos over one plank's lip. Never a stamped row. */
-export const ShelfFill: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = 'shelf', photo = true, jar = true, plant = true, trailing = true, at, ink = W.mid}) => {
+export const ShelfFill: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = 'shelf', photo = true, jar = true, plant = true, trailing = true, at, ink = W.mid, books = EMBER.books}) => {
   const items = useMemo(() => {
     const r = rng(`shelfF/${seed}`);
     const out: React.ReactNode[] = [];
@@ -110,7 +112,7 @@ export const ShelfFill: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = '
             const bw = sw * r.range(0.86, 1);
             const c = pickBook(r, lastC);
             lastC = c;
-            out.push(<Book key={`ly${pi}_${k}_${j}`} x={x + r.jitter(4) * scale} y={y - bh} w={bw} h={bh} color={EMBER.books[c]} seed={`${seed}/ly${pi}_${k}_${j}`} at={b(at, 0.06 + j * 0.02)} ink={ink} lying />);
+            out.push(<Book key={`ly${pi}_${k}_${j}`} x={x + r.jitter(4) * scale} y={y - bh} w={bw} h={bh} color={books[c]} seed={`${seed}/ly${pi}_${k}_${j}`} at={b(at, 0.06 + j * 0.02)} ink={ink} lying />);
             y -= bh;
           }
           x += sw + r.range(4, 9) * scale;
@@ -124,7 +126,7 @@ export const ShelfFill: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = '
           const c = pickBook(r, lastC);
           lastC = c;
           const lean = j === n - 1 && r.chance(0.3) ? r.range(8, 16) : 0;
-          out.push(<Book key={`b${pi}_${k}_${j}`} x={x} y={pk.y - bh} w={bw} h={bh} color={EMBER.books[c]} seed={`${seed}/b${pi}_${k}_${j}`} at={b(at, j * 0.015)} ink={ink} lean={lean} />);
+          out.push(<Book key={`b${pi}_${k}_${j}`} x={x} y={pk.y - bh} w={bw} h={bh} color={books[c]} seed={`${seed}/b${pi}_${k}_${j}`} at={b(at, j * 0.015)} ink={ink} lean={lean} />);
           x += bw + (lean ? bh * Math.sin((lean * Math.PI) / 180) : r.range(0, 2) * scale);
         }
         x += r.range(6, 16) * scale;
@@ -135,7 +137,7 @@ export const ShelfFill: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = '
       }
     });
     return out;
-  }, [planks.map((p) => `${p.x0},${p.x1},${p.y},${p.room}`).join('|'), scale, seed, photo, jar, plant, trailing, at, ink]);
+  }, [planks.map((p) => `${p.x0},${p.x1},${p.y},${p.room}`).join('|'), scale, seed, photo, jar, plant, trailing, at, ink, books.join(',')]);
   return <>{items}</>;
 };
 
@@ -193,9 +195,9 @@ const Jar: React.FC<{x: number; y: number; w: number; h: number; seed: string; a
 };
 
 /** A small wall shelf (plank on two brackets) with its own contents (S7's right shelf: a plant and 3 books). */
-export const WallShelf: React.FC<{x: number; y: number; w: number; seed?: string; at?: At; ink?: number; contents?: boolean; room?: number}> = ({x, y, w, seed = 'wshelf', at, ink = W.mid, contents = true, room = 130}) => (
+export const WallShelf: React.FC<{x: number; y: number; w: number; seed?: string; at?: At; ink?: number; contents?: boolean; room?: number; books?: string[]}> = ({x, y, w, seed = 'wshelf', at, ink = W.mid, contents = true, room = 130, books}) => (
   <>
-    {contents ? <ShelfFill planks={[{x0: x + 8, x1: x + w - 8, y, room}]} seed={seed} photo={false} jar={false} trailing={false} at={b(at, 0.1)} ink={ink} /> : null}
+    {contents ? <ShelfFill planks={[{x0: x + 8, x1: x + w - 8, y, room}]} seed={seed} photo={false} jar={false} trailing={false} at={b(at, 0.1)} ink={ink} books={books} /> : null}
     <Box x={x} y={y} w={w} h={16} color={EMBER.beam} seed={`${seed}/pk`} at={at} ink={ink} over={[4, 4]} />
     <Ink d={poly([[x + w * 0.15, y + 16], [x + w * 0.15, y + 48], [x + w * 0.15 + 30, y + 16]], {seed: `${seed}/br1`, over: [0, 0]}) + poly([[x + w * 0.85, y + 16], [x + w * 0.85, y + 48], [x + w * 0.85 - 30, y + 16]], {seed: `${seed}/br2`, over: [0, 0]})} at={b(at, 0.06)} width={W.far} />
   </>

@@ -6,7 +6,8 @@
 //   back     the pen cup cut by the right edge, the mug (steam) at the pool's right rim, behind Pip.
 //   mid      the charger from the laptop's right side across the desk to the right edge, two clementines (one half
 //            peeled), reading glasses, sticky notes (one flutters in the tag's air), headphones cut by the right edge.
-//   front    a spiral notebook and a pen cut by the left edge, letters, your phone face down cut by the bottom edge,
+//   front    a spiral notebook (dusk-blue cover) and a pen cut by the left edge, letters, a dusk-blue paperback cut by
+//            the bottom edge (your phone is in your hand in S15 and O1, so never on the desk here),
 //            O1's open planner cut by the bottom-right corner, crumbs, wood grain.
 // Everything is built from the cut (no `at`): S16 opens on a hard cut. Raw-SVG pieces sit in ExitFade so the loop's
 // un-build takes them with the fills.
@@ -14,10 +15,10 @@ import React from 'react';
 import {Fill} from '../../../lib/Fill';
 import {Ink} from '../../../lib/Ink';
 import {ExitFade} from '../../../lib/exit';
-import {blob, circle, ellipse, hline} from '../../../lib/sketch';
+import {blob, circle, ellipse, hline, polyPath} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {Letters, Planner} from './O1_life';
-import {Clementines, Pen, PhoneDown, SpiralNotebook} from './S7_desk';
+import {Clementines, Pen, SpiralNotebook} from './S7_desk';
 import {Cable, DeskGrain, EMBER, Glasses, Headphones, Mug, PenCup, Steam, StickyNotes, W, type Pt} from '../kit';
 import {S16_TURN} from './S16_wall';
 
@@ -55,6 +56,8 @@ export const S16DeskBack: React.FC = () => (
     <ExitFade x={1015} y={1250}>
       <Steam x={1015} y={1272} n={6} life={2.2} rise={140} drift={-12} r0={5} r1={15} wobble={6} seed="s16/steam" color={EMBER.card} />
     </ExitFade>
+    {/* a dusk-blue coaster under the mug */}
+    <Fill d={ellipse(1015, 1386, 70, 18, {seed: 's16/coaster'})} color={EMBER.dcSide} seed="s16/coasterF" />
     <Mug x={968} top={1286} w={94} seed="s16/mug" />
   </>
 );
@@ -67,7 +70,7 @@ const Biscuits: React.FC<{x: number; y: number; k?: number; seed: string}> = ({x
   const cookies: [number, number, number][] = [[x - 26 * k, y - 8 * k, 27 * k], [x + 22 * k, y - 2 * k, 25 * k], [x + 2 * k, y - 18 * k, 23 * k]];
   return (
     <>
-      <Fill d={plate} color={EMBER.card} seed={`${seed}/plateF`} />
+      <Fill d={plate} color={EMBER.frost} seed={`${seed}/plateF`} />
       <Ink d={plate + rim} width={W.far} />
       {cookies.map(([cx, cy, cr], i) => {
         const bite = i === 2;
@@ -136,17 +139,42 @@ const Coins: React.FC<{x: number; y: number}> = ({x, y}) => (
   </>
 );
 
+/** A paperback lying on the desk, cut by the bottom edge: a dusk-blue cover with a snow-white title band and a moon,
+ *  the page block showing along its right side. */
+const Paperback: React.FC = () => {
+  const cover = polyPath([[404, 1786], [622, 1806], [606, 1990], [386, 1972]]);
+  const pages = polyPath([[622, 1806], [634, 1814], [618, 1996], [606, 1990]]);
+  const band = polyPath([[424, 1828], [596, 1844], [592, 1880], [420, 1864]]);
+  return (
+    <>
+      <Fill d={pages} color={EMBER.card} seed="s16/pbP" />
+      <Fill d={cover} color={EMBER.dc} seed="s16/pbC" />
+      <Fill d={band} color={EMBER.snow} offset={false} />
+      <Fill d={circle(560, 1920, 16)} color={EMBER.skyLow} offset={false} />
+      <Ink d={`M440 1848L560 1858M440 1858L520 1865`} width={W.hair} color={EMBER.dcSide} />
+      <Ink d={cover + pages} width={W.far} />
+    </>
+  );
+};
+
 export const S16DeskFront: React.FC = () => (
   <>
+    {/* the notebook's dusk-blue cover, a lip showing past the pages */}
+    <Fill d={polyPath([[-84, 1560], [326, 1530], [362, 1900], [-74, 1948]])} color={EMBER.dc} seed="s16/nbCover" />
     <ExitFade x={140} y={1730}>
       <SpiralNotebook quad={[[-80, 1566], [318, 1538], [350, 1890], [-70, 1934]]} seed="s16/nb" />
     </ExitFade>
     <PageDoodle />
+    {/* a dusk-blue felt desk pad under the letters and the coins (a stitched edge) */}
+    <Fill d={polyPath([[470, 1662], [772, 1642], [780, 1846], [466, 1868]])} color={EMBER.dc} seed="s16/pad" />
+    <Ink d={polyPath([[484, 1674], [758, 1656], [766, 1832], [480, 1852]])} width={2} color={EMBER.skyLow} />
+    <Ink d={polyPath([[470, 1662], [772, 1642], [780, 1846], [466, 1868]])} width={W.far} />
     <Pen from={[40, 1900]} to={[356, 1682]} wPx={16} seed="s16/nb/pen" />
     <Pen from={[616, 1628]} to={[772, 1596]} wPx={13} color={EMBER.books[4]} seed="s16/pencil" />
     <Coins x={668} y={1772} />
     <Letters x={548} y={1690} />
-    <PhoneDown x={404} y={1790} w={220} rot={6} seed="s16/phone" />
+    {/* a dusk-blue paperback cut by the bottom edge (your phone is in your hand, S15 / O1: never face down here) */}
+    <Paperback />
     <Planner x={784} y={1712} />
     {/* crumbs strayed from a biscuit */}
     {[[396, 1610, 3], [420, 1622, 2.4], [372, 1628, 2]].map(([cx, cy, cr], i) => (

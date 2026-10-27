@@ -9,10 +9,11 @@
 // G5b (owner: "way too empty"; the approved pilot's bar): the same desk world as O1 / S7 dressed round the locked frame
 // (S16_wall.tsx: the attic slope with the paper star, string lights, photos on a cord, a hanging pothos, a sea print, the
 // wall shelf over the tag, a leaf print, the calendar, the ticking clock, the pinboard, sticky notes; S16_desk.tsx: the
-// pen cup, the mug, the charger, clementines, glasses, sticky notes, headphones, the spiral notebook, letters, your
-// phone face down, the planner), the lamp's pull chain swinging (the loop), and Pip on the desk right of the tag at
-// 1.8x, watching it: it leans in as the tag turns (39.70), a small trunk-up on the like-pop (39.88), a shrug at us
-// (40.3); it shrinks with the un-build. The tag's flip moves the room's air a beat later (pinboard notes, a sticky
+// pen cup, the mug, the charger, clementines, glasses, sticky notes, headphones, the spiral notebook, letters, a
+// dusk-blue paperback, the planner; the room's cool share >= 10 %: night prints, mittens, a scarf, blue books, a felt
+// pad, the screen's desktop), the lamp's pull chain swinging (the loop), and Pip on the desk right of the tag at 1.8x,
+// watching it: it leans in place as the tag turns (39.70), holds still through the flip, shrugs at us on "tag" (40.3);
+// it shrinks with the un-build. The tag's flip moves the room's air a beat later (pinboard notes, a sticky
 // note, the lights, the pothos settle through 40.1-40.8: no stillness before the un-build).
 // Camera (cozy v2 §3, OVERRIDES g5b: docs/v3/cozy_v2_application.md): the FLOAT replaces the invisible 1.5 % breathe:
 // translation only, 8-12 px/s legs that turn back (eased) within +-12 / +-10 px of home; it starts at home (the cut-in
@@ -24,7 +25,9 @@ import type {ToneKey} from '../../../lib/Film';
 import {ExitFade, ExitShrink, useExit} from '../../../lib/exit';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {EMBER, floatCam, Lamp, Laptop, laptopGeo, Pip3, PriceTag, PullChain, type LookKey, type PipPoseKey, type Pt} from '../kit';
+import {EMBER, floatCam, Lamp, Laptop, laptopGeo, Pip3, PriceTag, PullChain, quadPt, W, type LookKey, type PipPoseKey, type Pt} from '../kit';
+import {Fill} from '../../../lib/Fill';
+import {Ink} from '../../../lib/Ink';
 import {S16Desk, S16DeskBack, S16DeskFront, S16DeskMid, S16Grain} from './S16_desk';
 import {S16_TURN, S16WallLow, S16WallTop} from './S16_wall';
 
@@ -42,8 +45,9 @@ const TAG = {x: 310, y: 1010, w: 460, rot: -8};
 // ---------------------------------------------------------------- Pip
 
 const PIP = {x: 884, y: 1328, scale: 1.8};
-/** Pip watches the tag (head turned left), glances up its string (0.3), leans in as it turns (a small hop toward it),
- *  and keeps on it to the shrug. */
+/** Pip watches the tag (head turned left), glances up its string (0.3), leans in as it turns (a small tilt in place, no
+ *  hop), holds still through the flip (eyes on the tag), then shrugs at us on "tag" and settles: one reaction, never on
+ *  the subject's beat (LIFE_AND_DENSITY §5). */
 const PIP_LOOK: LookKey[] = [
   {t: -9, v: -0.62},
   {t: 0.3, v: -0.82},
@@ -53,16 +57,53 @@ const PIP_LOOK: LookKey[] = [
 ];
 const PIP_KEYS: PipPoseKey[] = [
   {t: -9, pose: 'sit-back'},
-  {t: POP_AT - 0.02, pose: 'trunk-up'},
   {t: SHRUG_AT, pose: 'shrug'},
   {t: SHRUG_AT + 0.44, pose: 'sit-back'},
 ];
 
-const S16Pip: React.FC = () => (
-  <ExitShrink x={PIP.x - 18} y={PIP.y}>
-    <Pip3 x={PIP.x} y={PIP.y} scale={PIP.scale} lineWeight={1.25} seed={16} keys={PIP_KEYS} look={PIP_LOOK} lookDur={0.18} hops={[{t: TURN_AT - 0.1, to: [PIP.x - 18, PIP.y], dur: 0.26, height: 10}]} />
-  </ExitShrink>
-);
+/** The lean toward the tag: ~2 deg about the feet (~6 px at the head), eased over 0.3 s into the turn. */
+const LEAN_AT = TURN_AT - 0.3;
+const LEAN_DEG = -2;
+
+const S16Pip: React.FC = () => {
+  const t = useTime();
+  const u = Math.min(1, Math.max(0, (t - LEAN_AT) / 0.3));
+  const lean = LEAN_DEG * (u * u * (3 - 2 * u));
+  return (
+    <ExitShrink x={PIP.x} y={PIP.y}>
+      <XG m={mat.about(mat.rotate(lean), PIP.x, PIP.y)}>
+        <Pip3 x={PIP.x} y={PIP.y} scale={PIP.scale} lineWeight={1.25} seed={16} keys={PIP_KEYS} look={PIP_LOOK} lookDur={0.18} />
+      </XG>
+    </ExitShrink>
+  );
+};
+
+/** THE laptop's screen as a desktop (never a landscape: it must not read as a window): a document window with a
+ *  dusk-blue title bar and lines, a dock row of app squares, a cursor. Screen-space canvas px over the lid's quad. */
+const ScreenDesktop: React.FC<{scr: [Pt, Pt, Pt, Pt]}> = ({scr}) => {
+  const P = (u: number, v: number) => quadPt(scr, u, v);
+  const q = (u0: number, v0: number, u1: number, v1: number) => {
+    const pts = [P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)];
+    return `M${pts.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join('L')}Z`;
+  };
+  const docLines = [0.3, 0.38, 0.46, 0.54, 0.62].map((v, i) => q(0.5, v, i === 4 ? 0.74 : 0.9, v + 0.025)).join('');
+  const dock = [EMBER.dc, EMBER.skyLow, EMBER.books[0], EMBER.dcSide, EMBER.hl, EMBER.sky];
+  const c = P(0.8, 0.7);
+  return (
+    <>
+      <Fill d={q(0.44, 0.1, 0.96, 0.74)} color={EMBER.frost} offset={false} />
+      <Fill d={q(0.44, 0.1, 0.96, 0.19)} color={EMBER.dcSide} offset={false} />
+      <Fill d={docLines} color={EMBER.dc} offset={false} />
+      <Fill d={q(0.36, 0.84, 0.97, 0.95)} color={EMBER.frost} offset={false} />
+      {dock.map((col, i) => (
+        <Fill key={i} d={q(0.39 + i * 0.097, 0.855, 0.46 + i * 0.097, 0.935)} color={col} offset={false} />
+      ))}
+      <Fill d={`M${c[0]} ${c[1]}l0 22l6 -6l5 10l4 -2l-5 -10l9 0Z`} color={EMBER.white} offset={false} />
+      <Ink d={q(0.44, 0.1, 0.96, 0.74)} width={W.hair} />
+      <Ink d={`M${c[0]} ${c[1]}l0 22l6 -6l5 10l4 -2l-5 -10l9 0Z`} width={1.6} />
+    </>
+  );
+};
 
 const S16: React.FC = () => {
   const t = useTime();
@@ -87,7 +128,9 @@ const S16: React.FC = () => {
           <PullChain x={96} y={938} len={44} amp={8} jolt={[TURN_AT + 0.14]} />
         </ExitFade>
         <S16DeskBack />
-        <Laptop x={LAP.x} y={LAP.y} w={LAP.w} variant="new" seed="s16/lap" />
+        <Laptop x={LAP.x} y={LAP.y} w={LAP.w} variant="new" seed="s16/lap">
+          <ScreenDesktop scr={g.scr} />
+        </Laptop>
         <S16DeskMid />
         <S16Pip />
         <S16DeskFront />

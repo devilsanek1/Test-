@@ -4,7 +4,7 @@
 // camera zoom, so the line weights stay the house's): YOUR laptop (the kit laptop, w 1400, front ink 4.8) with its
 // keyboard cut by both side edges low in the stage and its plain dark screen behind; ONE memory stick (the kit stick,
 // w 700, 65 % of the frame, the biggest thing in it) rises out of the keys over 0.4 s from the cut and stands on the
-// hinge, over the bottom bezel and the top key rows: it comes up through the third key row (clipped there, so it reads
+// hinge, over the bottom bezel and into the screen: it comes up through a slot at the hinge (clipped there, so it reads
 // as coming out of the laptop) with a small overshoot, and lands before "chips." (18.76). The lamp pool continues on
 // the desk under the deck, cut by the edges ("the pool's edge below").
 // The lid is foreshortened (kit `lidH` 0.36: seen from above at this size), so the board's wall strip shows above it
@@ -27,6 +27,7 @@ import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER, Laptop, laptopGeo, MemoryStick, quadPt, ring, STICK_RATIO, type Pt} from '../kit';
 import {s7s8Float, S7_DUR} from './S7';
+import {StickDetail} from '../kit/S8_stick';
 import {BezelNote, BezelSticker, KeyLegends, KeySprings, S8_LAND, S8DeskFront, S8Pip, S8WallTop} from './S8_edges';
 
 /** The rise (board move: from the cut, 0.4 s). */
@@ -38,8 +39,9 @@ const LAP = {x: 540, y: 1080, w: 1400, lidH: 0.36};
 /** The stick (board: w 700, centred, landing on the hinge over the bezel and the keys). */
 const STICK_W = 700;
 const STICK_H = STICK_W * STICK_RATIO;
-/** The key row the stick comes up through (the kit's third dashed row, v 0.54 of the deck). */
-const SLOT_V = 0.54;
+/** The slot the stick comes up through: at the hinge (v 0.08 of the deck, G5b fix; was the third key row, 0.54), so
+ *  its foot stands on the hinge, it covers the bottom bezel and its top runs into the calm screen (gold on navy). */
+const SLOT_V = 0.08;
 /** The pool on the desk under the deck (S7's pool on the same axis, cut by both edges). */
 const POOL = {cx: 540, cy: 1372, rx: 1150, ry: 392};
 
@@ -48,7 +50,7 @@ const S8: React.FC = () => {
   const clipId = 's8slot' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const [dx, dy] = s7s8Float(S7_DUR + t);
   const g = laptopGeo(LAP.x, LAP.y, LAP.w, LAP.lidH);
-  // the slot line: the third key row across the deck (it tilts with the deck's 3/4 view)
+  // the slot line: across the deck at the hinge (it tilts with the deck's 3/4 view)
   const sL = quadPt(g.deck, -0.4, SLOT_V);
   const sR = quadPt(g.deck, 1.4, SLOT_V);
   const slotY = (x: number) => sL[1] + ((x - sL[0]) / (sR[0] - sL[0])) * (sR[1] - sL[1]);
@@ -83,6 +85,7 @@ const S8: React.FC = () => {
         <g clipPath={`url(#${clipId})`}>
           <XG m={mat.about(mat.rotate(wob), cx, slotY(cx))}>
             <MemoryStick x={cx} y={y} w={STICK_W} rot={rot} seed="s8/stick" />
+            <StickDetail x={cx} y={y} w={STICK_W} rot={rot} seed="s8/stickD" />
           </XG>
         </g>
         <S8Pip />
