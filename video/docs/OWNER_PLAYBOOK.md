@@ -148,8 +148,8 @@ Format: **rule** — why / evidence (video, date).
 ## Process and communication
 - **Parallelize as much as possible: split independent work across helper cloud sessions (each its own machine) and
   archive each one as soon as its work is pushed and checked;** each helper's done-signal is a report file, and every
-  helper runs in ULTRACODE mode: "ultracode" in its FIRST prompt (a later cross-session message does not switch it on). —
-  ("archive them", v3; "start more instances of cloud machines ... clean them up", "all use ultracode effort", v2, 2026-10-27).
+  helper runs in ULTRACODE: its first prompt is exactly `/effort ultracode on`, then its task comes as a message
+  (check `is_ultracode_active`). — ("archive them", v3; "clean them up", "effort either max or ultracode", v2, 2026-10-27).
 - **Playable video from the sketch animatic (G3) on, never only stills; before G3 text and audio only, one version unless
   asked. Lock the story before big commitments; polish late.** — (v1, 2026-10-25; "why are there multiple versions", v3).
 - **Progress: the gate deliverable is the update, with a short status on all threads between; lean prompts and docs.** — (v1).
