@@ -39,15 +39,16 @@ export function herStepAt(t: number): number {
   return honestStep(Math.min(S4_TRUCK.steps, travel / S4_HER.stepPx));
 }
 
-/** Her head after the stop (degrees, - = up), stepped at 12 drawings/s: level -> lifts to the post and the DEC plate
- *  (18.06) -> down a line to the APR plate as it pens (19.48). */
+/** Her head after the stop, stepped at 12 drawings/s: level -> lifts to the post and the DEC plate (18.06) -> down a
+ *  line to the APR plate as it pens (19.48). Degrees, + = UP for her left-facing profile: body.ts rotates the head with
+ *  y-down maths, so its "- = up" note (and Her.tsx stopLook's -9) is inverted for a figure facing left. */
 export function herTilt(t: number): number {
   const tq = Math.floor(t * 12 + 1e-6) / 12;
   const k = (a: number, d: number) => {
     const u = Math.max(0, Math.min(1, (tq - a) / d));
     return 1 - (1 - u) * (1 - u) * (1 - u);
   };
-  return -10 * k(S4_BEATS.lookUp, 0.22) + 5 * k(19.48, 0.25);
+  return 18 * k(S4_BEATS.lookUp, 0.24) - 9 * k(19.48, 0.25);
 }
 
 /** The model as Her.tsx draws it (cheek crescent on, the cream tote). */

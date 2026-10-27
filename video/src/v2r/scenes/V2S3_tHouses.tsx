@@ -33,7 +33,7 @@ export const HOUSES: House[] = [
   {id: 'her', x0: 165, x1: 525, wall: CM.brick, roof: 'mansard', top: 607},
   {id: 'stock', x0: 525, x1: 775, wall: CM.brickLight, roof: 'parapet', top: 628},
   {id: 'deep', x0: 775, x1: 1010, wall: CM.brickDeep, roof: 'mansard', top: 604},
-  {id: 'stucco', x0: 1010, x1: 1270, wall: CM.stucco, roof: 'mansard', top: 612},
+  {id: 'stucco', x0: 1010, x1: 1270, wall: CM.sage, roof: 'mansard', top: 612},
 ];
 
 const F = MAP.W2_CUT;
@@ -59,7 +59,7 @@ export const WINDOWS: WinSpec[] = [
   {id: 'h3d', x: 866, y: 620, w: 46, h: 36, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: true, inner: 'none', sill: false},
   {id: 'h3g', x: 884, y: 920, w: 100, h: 114, bars: '6/6', surround: 'arch', wall: CM.brickDeep, lit: true, inner: 'pendant', curtain: CM.box},
   // the stucco house (cut by the right edge): the KETTLE neighbour's window, a dormer that switches on, the bay
-  {id: 'h4a', x: 1036, y: 710, w: 62, h: 134, bars: '2/2', surround: 'stucco', wall: CM.stucco, lit: true, inner: 'shelf', curtain: CM.leafRust},
+  {id: 'h4a', x: 1036, y: 710, w: 62, h: 134, bars: '2/2', surround: 'stucco', wall: CM.sage, lit: true, inner: 'shelf', curtain: CM.leafRust},
   {id: 'h4d', x: 1080, y: 626, w: 42, h: 32, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: [{t: 13.45, on: true}], inner: 'none', sill: false},
   {id: 'h4g1', x: 1030, y: 922, w: 30, h: 110, bars: '1/1', surround: 'plain', wall: CM.stucco, lit: true, inner: 'none', sill: false},
   {id: 'h4g2', x: 1068, y: 916, w: 76, h: 118, bars: '2/2', surround: 'plain', wall: CM.stucco, lit: true, inner: 'lamp', curtain: CM.sage, sill: false},
@@ -100,27 +100,28 @@ function backBatch(): Batch {
       b.rect(CM.limestone, h.x0 - 2, h.top, h.x1 - h.x0 + 4, 7);
     }
   }
-  // the stock house's stucco ground floor; a dark plinth under every house
+  // the stock house's and the painted house's stucco ground floors
   b.rect(CM.stucco, 525, TL.string + 10, 250, G - TL.string - 10);
+  b.rect(CM.stucco, 1010, TL.string + 10, 260, G - TL.string - 10);
   b.layer();
   // stucco rustication on the stock house's ground floor (thin channelled joints)
   for (let y = TL.string + 28; y < G - 4; y += 19) b.rect(CM.stoneShade, 527, y, 246, 1.6);
   // ---- party-wall pilasters + their cast shade to the east (the low sun is west)
   for (const h of HOUSES.slice(1)) {
-    b.rect(h.wall === CM.stucco ? CM.limestone : CM.brickDeep, h.x0 - 4, TL.cornice + 12, 8, G - TL.cornice - 12);
+    b.rect(h.wall === CM.sage ? CM.limestone : CM.brickDeep, h.x0 - 4, TL.cornice + 12, 8, G - TL.cornice - 12);
     b.rect(CM.shadeWarm, h.x0 + 4, TL.cornice + 14, 5, G - TL.cornice - 14);
   }
   // ---- the cornice band (limestone / stucco), gutter, dentils, the string course
   for (const h of HOUSES) {
-    const c = h.wall === CM.stucco || h.roof === 'parapet' ? CM.stucco : CM.limestone;
+    const c = h.wall === CM.sage || h.roof === 'parapet' ? CM.stucco : CM.limestone;
     b.rect(CM.shadeCool, h.x0, TL.cornice - 4, h.x1 - h.x0, 4);
     b.rect(c, h.x0 - 2, TL.cornice, h.x1 - h.x0 + 4, 14);
     b.rect(CM.stoneShade, h.x0, TL.cornice + 14, h.x1 - h.x0, 3);
     for (let x = h.x0 + 5; x < h.x1 - 4; x += 9) b.rect(CM.stoneShade, x, TL.cornice + 8, 4, 4);
-    b.rect(h.wall === CM.stucco ? CM.limestone : CM.limestone, h.x0 - 1, TL.string, h.x1 - h.x0 + 2, 10);
-    b.rect(h.wall === CM.stucco ? CM.stoneShade : CM.shadeWarm, h.x0, TL.string + 10, h.x1 - h.x0, 2.5);
+    b.rect(h.wall === CM.sage ? CM.stucco : CM.limestone, h.x0 - 1, TL.string, h.x1 - h.x0 + 2, 10);
+    b.rect(h.wall === CM.sage || h.roof === 'parapet' ? CM.stoneShade : CM.shadeWarm, h.x0, TL.string + 10, h.x1 - h.x0, 2.5);
     // a darker plinth band at the foot (behind the railings)
-    b.rect(h.wall === CM.brickDeep ? CM.anchor : CM.brickDeep, h.x0, G - 22, h.x1 - h.x0, 22);
+    b.rect(h.wall === CM.brickDeep ? CM.anchor : h.wall === CM.sage || h.roof === 'parapet' ? CM.shadeCool : CM.brickDeep, h.x0, G - 22, h.x1 - h.x0, 22);
   }
   // ---- brick ticks (clusters, never a texture), kept off the openings and her calm ring
   const holes: [number, number, number, number][] = [
@@ -238,7 +239,7 @@ function frontBatch(): Batch {
 // ---------------------------------------------------------------- the component
 
 /** The terrace facades (not her French window, which V2S3_tHer draws over this). */
-export const S3Houses: React.FC = () => {
+export const S3Houses: React.FC<{inside?: React.ReactNode}> = ({inside}) => {
   const t = useTime();
   const back = useMemo(backBatch, []);
   const panesStatic = useMemo(() => {
@@ -255,6 +256,7 @@ export const S3Houses: React.FC = () => {
       <Paint b={back} seed="s3h/back" />
       <Paint b={panesStatic} seed="s3h/panes" misreg={false} />
       <Paint b={dyn} seed="s3h/dyn" misreg={false} />
+      {inside}
       <Paint b={front} seed="s3h/front" />
     </>
   );
