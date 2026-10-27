@@ -10,24 +10,37 @@ Everything that agent knew is in this repo. This file is the map; the details li
 ## 0. Read in this order (about 30-45 minutes of reading; worth it)
 
 1. **This file**, fully.
-2. `CLAUDE.md` (root, auto-loaded) and **`video/docs/OWNER_PLAYBOOK.md`**: every piece of owner feedback as a rule.
-   It is the memory across videos. Capture new feedback in the same turn, split by scope (CLAUDE.md), and integrate it
-   (rewrite or retire whatever it contradicts).
+2. `CLAUDE.md` (root, auto-loaded; re-read it from disk at a session start or restart: a long-running session's
+   auto-loaded copy can be older than the file) and **`video/docs/OWNER_PLAYBOOK.md`**: every piece of owner feedback
+   as a rule. It is the memory across videos. Capture new feedback in the same turn, split by scope (CLAUDE.md), and
+   integrate it (rewrite or retire whatever it contradicts).
 3. **`video/docs/look/DIRECTION.md`**: the one page of the current look and storytelling direction; read it before
    any visual work. Its numbers, code and checks: `video/docs/look/CRAFT.md`; why it changed after v3 (owner-approved):
    `video/docs/retro/2026-10-27_v3_retro.md`. **Which doc wins:** owner's words (playbook; vN/OWNER_NOTES) > DIRECTION >
    CRAFT > PIPELINE_V2 > G3_ANIMATIC, G5_BLOCKING > look/*.md > the film's STYLE.md (values only) > v1-era docs (API and
-   measurements, never style).
+   measurements, never style). The owner's words are what the owner said (quoted), never the "-> what we did" half of
+   an OWNER_NOTES line; the full order, with the topic docs and the tie-breaks, is DIRECTION's intro.
 4. **`video/docs/PIPELINE_V2.md`**: how we work (gates G0-G8, a playable video at every gate from G3, where to spend
    tokens and where not to). The gate specs: `video/docs/G3_ANIMATIC.md` (the sketch animatic) and
    `video/docs/G5_BLOCKING.md` (building the film); the look by topic: `video/docs/look/*.md` (section 6). Background:
    `video/docs/PIPELINE_RESEARCH.md`.
 5. **`context/summaries/compaction_3.md`**: the most recent detailed state summary (written when the context filled up
-   for the third time; everything after it is in sections 2-3 below). Then `compaction_2.md` and `compaction_1.md` for history.
-6. **`context/conversation/USER_MESSAGES.md`**: every message the owner sent, verbatim, with timestamps. It's the
-   fastest way to learn what they want and how they talk. The full thread with the assistant's replies is
-   `context/conversation/CONVERSATION_2026-10-24.md` and `..._2026-10-25.md`; every tool call is in `ACTIONS_LOG.md`.
-7. As needed: the docs index (section 6), `context/agent_reports/` (what each multi-agent run returned) and
+   for the third time; everything after it is in sections 2-2b below and in each video's own files). Then
+   `compaction_2.md` and `compaction_1.md` for history. Their git advice (`git add -A video`) is retired: commit only
+   your own paths (section 4).
+6. **`context/conversation/USER_MESSAGES.md`**: every message the owner sent up to 2026-10-25 19:36 UTC, verbatim, with
+   timestamps. It's the fastest way to learn what they want and how they talk. Later messages are quoted where they
+   were captured: the playbook (rules) and each `video/docs/vN/OWNER_NOTES.md` (per video, newest at the bottom). The
+   full thread with the assistant's replies is `context/conversation/CONVERSATION_2026-10-24.md` and `..._2026-10-25.md`;
+   every tool call is in `ACTIONS_LOG.md`.
+7. **Where each video stands now.** Sections 2 and 2b are dated logs that each video's session appends to: section 2
+   is the state at the 2026-10-25 handoff; in 2b the v3 bullets run newest first, and the long "RESTARTED FROM
+   SCRATCH" text inside v3's "G3 LOCKED" bullet (with the sub-bullets after it) is video 2's. The live state: video 2,
+   the top snapshot of `video/docs/v2/PROGRESS.md`; video 3, the bottom of `video/docs/v3/OWNER_NOTES.md` (after G5b:
+   the owner's verdict, then the rework, `video/docs/v3/flow_v2.md`); a new video, section 1 ("Starting the next
+   video"). Where a status line and the current direction disagree (an old plan such as "G1 is a radio cut", or "the
+   pilot is the bar"), DIRECTION and PIPELINE_V2 win.
+8. As needed: the docs index (section 6), `context/agent_reports/` (what each multi-agent run returned) and
    `context/workflows/` (the workflow scripts with their full agent prompts: copy their structure, never their briefs;
    PIPELINE_V2 "Studio toolkit").
 
@@ -47,6 +60,19 @@ Everything that agent knew is in this repo. This file is the map; the details li
   real budget (playbook, Process).
 - **The assistant's role is orchestrator.** It researches, plans and runs Workflow scripts (writers, judges, builders,
   reviewers), builds the film in Remotion, mixes the sound and delivers. It keeps the playbook, pipeline and docs up to date.
+- **Open owner decisions (2026-10-27):** when video 4 starts and on what topic; whether posts cite their source by
+  default (`video/docs/v2/OWNER_NOTES.md`, Posting); the 1440x2560 YouTube master of v1 (queue item 3); and the clean
+  pen's look, which the owner first judges in the v3 rework's pilot and the next G4 look clip (if it still looks cheap,
+  ask about building the world first: retro §6).
+- **Starting the next video** (video 4 had not started on 2026-10-27). It starts when the owner asks: they name the
+  topic, or ask us to scout one. The session the owner asks owns it and adds a "Video N is produced by session ..."
+  line to section 2b. Films in flight share the weekly limit and finishing them comes first, so before the new video's
+  first big fan-out (G0's scouts and judges) check the week's usage against what the films in flight still need, and
+  ask the owner if it is tight. First steps: create `video/docs/vN/OWNER_NOTES.md`; check the voice key
+  (`[ -n "$ELEVENLABS_API_KEY" ] && echo set`; without it, tell the owner before G2: they add the secret, or they paste
+  the take); then `video/docs/PIPELINE_V2.md` from G0, copying the G0-G1 templates' structure with a fresh brief (its
+  "Studio toolkit" lists what each template's brief needs updated). The craft tooling lane (PIPELINE_V2) must land
+  before the new video's G3; G0-G2 never wait for it.
 
 ## 2. Status at handoff
 
@@ -125,7 +151,9 @@ Everything that agent knew is in this repo. This file is the map; the details li
    - Workflow: `context/workflows/v2-g0-facts-and-core-line-wf_fad013d0-cfd.js`.
    - Steps: research (industry, guardrails; timeline already done) → `video/docs/v2/research/factlock.md` → G0.5 core line (6 lever writers, 4 judges, 4 viewer personas, 2 sceptics per finalist) → `video/docs/v2/CORE_LINE.md` (top 3) → truth check.
    - Next: the owner picks the core line; archive the rest (locked-means-dropped); then G1, the story-first script (template `v3-g1-story-*.js`).
-2. **DONE 2026-10-26 (v3 session): `video/docs/look/COZY_AND_SCALE.md` + `video/docs/look/research/`. Waiting for the owner's Arcane screen recording to measure (section 8). Was: RUNNING since 2026-10-26 00:10 UTC (owner engaged again via the Arcane idea and said "continue"; don't duplicate): `context/workflows/look-cozy-scale-arcane-wf_e8c65891-2ba.js` (palette rule merged in, covers v2 and v3). It replaces the paused `look-cozy-and-scale-wf_ee30e562-0c7.js`. Research the "cozy + scale" look** (owner, 2026-10-25 17:32). Output `video/docs/look/COZY_AND_SCALE.md` plus `video/docs/look/research/*.md`. It must also follow the palette direction in `video/docs/look/PALETTE.md` (owner, after the pause).
+**The cross-video queue** (item 1, video 2's G0, became its status bullets above):
+
+2. **DONE 2026-10-26 (v3 session): `video/docs/look/COZY_AND_SCALE.md` + `video/docs/look/research/`. The owner's Arcane screen recording arrived 2026-10-26 (black from DRM; identified as compilation shot #55 and measured into `video/docs/look/CINEMATIC_GUIDE.md` S5); the rest of its section 8 is optional. Was: RUNNING since 2026-10-26 00:10 UTC (owner engaged again via the Arcane idea and said "continue"; don't duplicate): `context/workflows/look-cozy-scale-arcane-wf_e8c65891-2ba.js` (palette rule merged in, covers v2 and v3). It replaces the paused `look-cozy-and-scale-wf_ee30e562-0c7.js`. Research the "cozy + scale" look** (owner, 2026-10-25 17:32). Output `video/docs/look/COZY_AND_SCALE.md` plus `video/docs/look/research/*.md`. It must also follow the palette direction in `video/docs/look/PALETTE.md` (owner, after the pause).
    - **Owner idea, 2026-10-25 23:30 UTC (v3 session):** reverse-engineer Arcane's camera moves and cinematic shots into
      references. When relaunched, add an Arcane lane that lists 8-12 specific moments for the owner to screen-record
      (we can't download the show), then measure each clip frame by frame (OpenCV feature tracking: pan/tilt/zoom/roll
@@ -162,12 +190,15 @@ Everything that agent knew is in this repo. This file is the map; the details li
    what people associate with something positive on their phone, like a like-notification sound, and have it in the
    video as early as possible."
    - Recorded in the playbook (Music and sound).
-   - Apply it from v2's G1 radio cut on: the hook comes with its sound.
+   - Apply it in every film: the hook's sound is named in the G1 script and plays from the G3 reel on
+     (PIPELINE_V2 anti-waste rule 7; there is no G1 "radio cut": G0-G2 are text and audio only).
    - Our SFX are synthesized in `video/audio/tools/make_sfx.py`, so there are no licence issues. Design a "like pop /
      notification ding / message-sent swoosh" family that evokes those sounds, rather than copying Apple's or
      Instagram's actual sounds.
-6. **Optional, not yet approved:** the tooling list in PIPELINE_V2 (`npm run preview`, a draft flag, a SketchReel comp
-   from JSON, a hook segment, a scripted gate check). Build it when video 2 reaches G1/G3, or earlier if the owner says so.
+6. **Tooling (PIPELINE_V2, "Tooling planned before video 2" and "Craft tooling lane"):** the draft flag, the SketchReel
+   comp and the scripted gate check exist; `npm run preview` and the hook segment were never built. The G3 tier-1
+   tooling (item 6 there) and the craft tooling lane are part of the pipeline the owner approved on 2026-10-27 ("Yes"):
+   they must land before the next video's G3 (not built yet on 2026-10-27).
 7. **When the owner shares more insights** for v1 (next day), add them to the playbook's Performance log.
 
 **Reels quality research** (2026-10-25; from guides and community sources, since Instagram publishes no exact encoder specs):
@@ -225,7 +256,11 @@ Everything that agent knew is in this repo. This file is the map; the details li
     opencv-python-headless, pillow and matplotlib. Word timings used sherpa-onnx with the NVIDIA Parakeet model;
     `video/scripts/voice/transcribe.py` shows how (setup in its header; `check_take.py` wraps it).
   - ffmpeg 6, ImageMagick, and the Inter fonts (the project also ships fonts in `video/public/fonts`).
-- **Commands (from `video/`):**
+- **Commands for a current film (vN, 60 fps; from `video/`):** the scaffold, one-panel previews, the owner's gate render
+  and the scripted gate check are in `video/docs/G5_BLOCKING.md` §1, §4 and §7 (template: v3's `src/entry-v3-film.tsx`,
+  compositions `FilmN`, `FilmN-<ID>`); the owner's cut from G5 on renders at full size, chunked per panel (§8b there);
+  the G3 reel renders at 540p60; finals get the TV-range conversion below.
+- **v1's commands (30 fps `Main`, kept for v1; from `video/`):**
   - Final render: `npx remotion render src/entry-film.ts Main out/X.mp4 --crf 14`. Then convert to TV range:
     `ffmpeg -i out/X.mp4 -vf "scale=in_range=full:out_range=tv,format=yuv420p" -c:v libx264 -crf 14 -preset slow -colorspace bt709 -color_primaries bt709 -color_trc bt709 -color_range tv -c:a copy -movflags +faststart out/X_tv.mp4`.
     Remotion's output is full-range yuvj420p, which some players show wrongly.
@@ -238,7 +273,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Gotchas:**
   - A safety hook blocks unguarded `rm -rf $VAR`; write `rm -rf "${D:?}"/"${v:?}"`.
   - `pkill -f remotion` can kill your own shell; use `ps | grep "[r]emotion ..."` and kill by PID.
-  - Workflow agents run about 2 at a time on this 4-CPU container.
+  - Workflow agents ran about 2 at a time on this 4-CPU container (render-heavy work is CPU-bound); more parallel work
+    goes to helper cloud sessions, each its own machine (PIPELINE_V2 anti-waste rule 5; playbook Process).
   - **Usage limits (weekly/monthly) kill agents mid-task** (66 agents were lost on v1). Keep agent tasks small and
     commit after each one. The main loop kept working when agents could not.
   - ImageMagick circle avatar mask:
