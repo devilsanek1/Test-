@@ -261,7 +261,7 @@ export function winFront(b: Batch, s: WinSpec, ink = TK.detail) {
   }
   if (ink > 0) {
     const fw = Math.max(3, w * 0.06);
-    b.ink(rectInk(x - fw, y - fw, w + fw * 2, h + fw, {seed: `${s.id}/ink`, over: 'small', open: 0.35}), ink);
+    b.ink(rectInk(x - fw, y - fw, w + fw * 2, h + fw, {seed: `${s.id}/ink`, over: 'medium', open: 0.35}), ink);
     if (bars !== 'french' && bars !== 'dormer') b.ink(line(x + 1, y + h * 0.5 - open, x + w - 1, y + h * 0.5 - open, {seed: `${s.id}/mr`, over: 'none'}), TK.fine);
     if (s.sill !== false) b.ink(line(x - fw - 6, y + h, x + w + fw + 6, y + h, {seed: `${s.id}/sill`, over: 'small'}), TK.fine);
   }
@@ -382,7 +382,7 @@ export function doorInto(b: Batch, d: DoorSpec, ink = TK.struct) {
     b.rect(CM.stoneShade, x - ext - 4, sy + sh * 0.42, w + ext * 2 + 8, sh * 0.58);
   }
   if (ink > 0) {
-    let s = rectInk(x - 3, top, w + 6, h + fanH + 4, {seed: `${d.id}/f`, over: 'small', open: 0.3});
+    let s = rectInk(x - 3, top, w + 6, h + fanH + 4, {seed: `${d.id}/f`, over: 'medium', open: 0.3});
     if (d.fan === 'arch') s += `M${P(x + 2, y - 2)}A${r1(w / 2 - 2)} ${r1(fanH - 3)} 0 0 1 ${P(x + w - 2, y - 2)}`;
     b.ink(s, ink);
     let fan = '';
