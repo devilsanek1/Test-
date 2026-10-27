@@ -69,8 +69,8 @@ export const S1Set: React.FC<S1SetProps> = ({lampOffAt = 0.4, lettersAt = 0.97, 
       {/* the west gap: SUN0 over far roofs, the road bridge */}
       <SunDisc x={S.sun.x} y={S.sun.y} r={S.sun.r} />
       <FarRoofs x0={-60} x1={420} base={980} top={S.farRoofTopY + 6} seed="s1far" rows={3} win={8} />
+      <BridgeBus deck={S.bridgeDeckY - 8} h={56} at={busAt} from={-140} to={400} seed="s1bus" speed={230} />
       <S1Bridge />
-      <BridgeBus deck={S.bridgeDeckY - 16} h={52} at={busAt} from={-140} to={400} seed="s1bus" speed={230} />
       <Birds from={[30, S.bridgeDeckY - 44]} to={[290, S.bridgeDeckY - 50]} n={5} size={13} seed="s1bridgebirds" liftAt={[birdsBridgeAt]} dir={-1} />
       <Birds from={[40, 806]} to={[260, 800]} n={6} size={9} seed="s1roofbirds" liftAt={[birdsRoofsAt]} dir={-1} />
       {/* the water: reflections of the wing, W, the boats; ripples, glints, ducks; two moored boats right */}
@@ -139,6 +139,9 @@ const S1Bridge: React.FC = () => {
 };
 
 // ---------------------------------------------------------------- S2
+
+/** The S2 bench's seat line (the bench people sit on it, the backrest covers their lower backs). */
+export const S2_BENCH_SEAT = MAP.S2.bench.y1 - (MAP.S2.bench.x1 - MAP.S2.bench.x0) * 0.42 * 0.55;
 
 /** Our bank's water edge in S2 (the railing's foot) and the railing's top (a post at x 590 tops out at y 1050:
  *  Pip's seat, map S2.pipSeat). */
@@ -296,13 +299,13 @@ export const S2Set: React.FC<S2SetProps> = ({story, staffCoolAt, storyOverlay, a
       <S2Railing />
       <Newsstand x0={-70} x1={124} top={918} ground={1292} seed="s2news" />
       {aBoard}
-      <Bench x={(MAP.S2.bench.x0 + MAP.S2.bench.x1) / 2} y={MAP.S2.bench.y1} w={MAP.S2.bench.x1 - MAP.S2.bench.x0} view="back" seed="s2bench" />
       {bench ?? (
         <>
-          <CastSlot s={{id: 'reporter', x: MAP.S2.reporter.x, y: MAP.S2.reporter.feetY - MAP.S2.reporter.h * 0.32, h: MAP.S2.reporter.h * 0.7, pose: 'sit', seed: 'reporter', acc: 'bag', coat: CM.coatOat}} />
-          <CastSlot s={{id: 'staffer', x: MAP.S2.staffer.x, y: MAP.S2.staffer.feetY - MAP.S2.staffer.h * 0.32, h: MAP.S2.staffer.h * 0.7, pose: 'sit', seed: 'staffer', acc: 'none', coat: CM.coatSlate, hair: '#9A5A3E'}} />
+          <CastSlot s={{id: 'reporter', x: MAP.S2.reporter.x, y: S2_BENCH_SEAT, h: MAP.S2.reporter.h, pose: 'sit', seed: 'reporter', acc: 'bag', coat: CM.coatOat}} />
+          <CastSlot s={{id: 'staffer', x: MAP.S2.staffer.x, y: S2_BENCH_SEAT, h: MAP.S2.staffer.h, pose: 'sit', seed: 'staffer', acc: 'none', coat: CM.coatSlate, hair: '#9A5A3E'}} />
         </>
       )}
+      <Bench x={(MAP.S2.bench.x0 + MAP.S2.bench.x1) / 2} y={MAP.S2.bench.y1} w={MAP.S2.bench.x1 - MAP.S2.bench.x0} view="back" seed="s2bench" />
       {pip ?? <PipSlot seat={{id: 'V2S2', x: MAP.S2.pipSeat.x, y: MAP.S2.pipSeat.y, size: 96}} />}
       <Planter x0={-30} x1={230} y={1650} h={190} seed="s2planter" />
       <Lamp x={930} y={1990} h={1350} w={30} variant="near" seed="s2nearlamp" />

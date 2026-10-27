@@ -117,16 +117,16 @@ def flap(dur, lo, hi, seed, att=0.004, dec=0.010):
 # ------------------------------------------------------------------ V2S1 (0.00-6.10)
 @sound
 def pencil_flood():
-    """f0: three quick hatch strokes, then the colour wash floods out from the sun (0.10-0.55), a tiny glint at
-    0.30 when her teal coat arrives last."""
+    """f0: three quick hatch strokes, then the colour wash floods out from the sun (0.06-0.40), a tiny glint at
+    0.30 when her teal coat arrives last (f18)."""
     out = buf(0.62)
     for k, (s, d, p) in enumerate([(0.00, 0.07, -0.25), (0.075, 0.06, 0.05), (0.14, 0.08, 0.3)]):
         n = n_of(d)
         sp = 0.7 + 0.3 * np.sin(np.pi * np.arange(n) / n)
         put(out, graphite(d, 100 + k, sp) * stroke_env(n, 0.004, 0.015), s, 0.55, p)
-    d = 0.48; n = n_of(d)
-    wash = tv_bandpass(noise(d, 7), np.geomspace(480, 2600, n), bw_oct=1.0) * env_bell(n, 0.45, 1.6)
-    out[n_of(0.10): n_of(0.10) + n] += widen(wash, 0.6) * 0.55
+    d = 0.34; n = n_of(d)                     # the wash is done by ~0.40, before the lamp click and the ding
+    wash = tv_bandpass(noise(d, 7), np.geomspace(480, 2600, n), bw_oct=1.0) * env_bell(n, 0.40, 1.6)
+    out[n_of(0.06): n_of(0.06) + n] += widen(wash, 0.6) * 0.55
     gl = (np.sin(2 * np.pi * 2093.0 * tt(0.12)) + 0.5 * np.sin(2 * np.pi * 3136.0 * tt(0.12))) * env_ad(n_of(0.12), 0.003, 0.03)
     put(out, gl, 0.30, 0.10, 0.25)
     return out
@@ -147,11 +147,11 @@ def lamp_click():
 def exit_ding():
     """OUR positive phone sound: two soft glass-bell notes rising a fourth (C6 -> F6, the bed's key) + a short
     sent-swoosh rising away (~0.35 s). Never Apple's or Instagram's."""
-    out = buf(0.80)
+    out = buf(1.30)
 
     def bell(f, seed):
-        y = modal([f, 2.0 * f, 3.01 * f, 4.17 * f], [0.42, 0.20, 0.09, 0.05], [1, .22, .07, .03], 0.75, 0.9, seed)
-        y += 0.18 * np.sin(2 * np.pi * f / 2 * tt(0.75)) * env_ad(n_of(0.75), 0.004, 0.12)
+        y = modal([f, 2.0 * f, 3.01 * f, 4.17 * f], [0.42, 0.20, 0.09, 0.05], [1, .22, .07, .03], 1.15, 0.9, seed)
+        y += 0.18 * np.sin(2 * np.pi * f / 2 * tt(1.15)) * env_ad(n_of(1.15), 0.004, 0.12)
         return y
     put(out, bell(1046.50, 41), 0.000, 1.0, -0.15)
     put(out, bell(1396.91, 42), 0.085, 0.95, 0.15)
@@ -201,8 +201,9 @@ def wings():
         for k in range(nfl):
             g = np.exp(-k / (nfl * 0.45)) * (1.4 if k < 2 else 1.0)
             f = flap(0.034, 420 * c, 3300 * c, 800 + 13 * b + k, 0.003, 0.009)
-            if k < 2:
-                f[: n_of(0.004)] += 0.6 * hp(noise(0.004, 900 + b), 1200)
+            if k < 2:                       # the take-off wing clap: a soft-edged little crack, not a click
+                cl = hp(noise(0.006, 900 + b), 1200) * np.sin(np.pi * np.arange(n_of(0.006)) / n_of(0.006)) ** 2
+                f[: len(cl)] += 0.35 * cl
             put(out, f, s + k / rate + r.normal(0, 0.004), g * r.uniform(0.8, 1.0), p0 - 0.06 * k)
     return out
 
@@ -360,8 +361,8 @@ def pip_land():
 def pip_hop():
     """Pip hops: a small springy upward glide and a breath of air (the hop half of the pop family)."""
     d = 0.11; n = n_of(d)
-    y = 0.8 * chirp(420, 980, 0.075, 1.5)
-    y = np.concatenate([y, np.zeros(n - len(y))]) * env_ad(n, 0.006, 0.035)
+    f = np.concatenate([np.geomspace(420, 980, n_of(0.075)), np.full(n - n_of(0.075), 980.0)])
+    y = 0.8 * np.sin(2 * np.pi * np.cumsum(f) / SR) * env_ad(n, 0.006, 0.035)
     y += 0.12 * np.sin(2 * np.pi * np.cumsum(np.geomspace(840, 1960, n)) / SR) * env_ad(n, 0.006, 0.025)
     y += 0.25 * bp(noise(d, 240), 1000, 5000) * env_ad(n, 0.002, 0.015)
     return pan(y, 0.0)
@@ -515,8 +516,8 @@ def boat_chug():
 @sound
 def door_latch():
     """her teal door shuts behind her down the lane: a soft wooden close, the latch, a little of the street."""
-    out = buf(0.45)
-    th = wood([92, 185, 340], [0.06, 0.035, 0.02], [1, .6, .3], 0.2, 1.0, 440)
+    out = buf(0.70)
+    th = wood([92, 185, 340], [0.06, 0.035, 0.02], [1, .6, .3], 0.42, 1.0, 440)
     th[: n_of(0.06)] += 0.4 * lp(noise(0.06, 441), 600) * np.exp(-tt(0.06) / 0.025)
     put(out, th, 0.0, 1.0, 0.25)
     put(out, wood([2450, 4100, 5900], [0.006, 0.004, 0.003], [1, .6, .3], 0.03, 0.1, 442), 0.035, 0.5, 0.25)
@@ -548,7 +549,8 @@ def pencil_reverse():
 
 
 # ------------------------------------------------------------------ measurement + cue sheet
-LOCAL_UNDER = 8.5      # house: every SFX >= 8 dB under the voice where it lands (broadband, momentary)
+LOCAL_UNDER = 9.0      # house: every SFX >= 8 dB under the voice where it lands (broadband, momentary), + 1 dB margin
+#                        (the bus guard holds the same 9 dB for the cues that sound together)
 BAND_UNDER = 6.0       # and >= 6 dB under the voice's own 1-4 kHz (diction) where it lands (noise-like sounds)
 BAND_UNDER_TONAL = 0.0  # tonal sounds (sheet.TONAL): never above the voice's 1-4 kHz where it lands
 
@@ -565,47 +567,99 @@ def gain_for(V, t, under, lv_ev, lb_ev, dur, tonal):
     return rules[k], k
 
 
+def bus_guard(rows, arrs, V, iters=8, hop=0.05):
+    """The cues as one bus: wherever the SFX that sound TOGETHER come within 9 dB of the speaking voice (broadband)
+    or reach its 1-4 kHz level (with the bed's own 1-4 kHz counted), the supporting sounds of that moment come down
+    (never the moment's lead, the loudest cue right there, unless it plays alone), a whole file at a time so
+    every relation in the sheet holds. Returns {file: extra dB}."""
+    bed = load(PUBLIC / "music_bed.wav")[:N_FILM] if (PUBLIC / "music_bed.wav").exists() else np.zeros((N_FILM, 2))
+    k5 = int(round(hop / M.HOP))
+    tv, lv, lb, sp = V["t"][::k5], V["lv"][::k5], V["lb"][::k5], V["sp"][::k5]
+    tb_, bb = M.band_rms(bed, hop=hop)
+    n = min(len(tv), len(bb)); tv, lv, lb, sp, bb = tv[:n], lv[:n], lb[:n], sp[:n], bb[:n]
+    trk = []
+    for r in rows:
+        one = np.zeros((N_FILM, 2)); place(one, arrs[r["name"]], frame_t(r["t"]))
+        _, l = short_term_lufs(one, win=0.4, hop=hop); _, b = M.band_rms(one, hop=hop)
+        trk.append((np.maximum(l[:n], -120.0), np.maximum(b[:n], -150.0)))
+    extra = {r["name"]: 0.0 for r in rows}
+    for _ in range(iters):
+        g = np.array([r["g_db"] + extra[r["name"]] for r in rows])
+        pl = np.array([10 ** ((l + gi) / 10) for (l, b), gi in zip(trk, g)])
+        pb = np.array([10 ** ((b + gi) / 10) for (l, b), gi in zip(trk, g)])
+        tot_l = 10 * np.log10(pl.sum(0) + 1e-30)
+        tot_b = 10 * np.log10(pb.sum(0) + 10 ** (bb / 10) + 1e-30)
+        need = np.maximum(LOCAL_UNDER - (lv - tot_l), -(lb - tot_b) + 0.5)
+        bad = np.where(sp & (need > 0.05) & (tot_l > -90))[0]
+        if len(bad) == 0:
+            break
+        cut = {}
+        for f in bad:
+            act = [i for i in range(len(rows)) if 10 * np.log10(pl[i, f] + 1e-30) > tot_l[f] - 6]
+            if not act:
+                continue
+            lead = max(act, key=lambda i: pl[i, f])             # what the ear hears as the event right there
+            for i in (act if len(act) == 1 else [i for i in act if i != lead]):
+                nm = rows[i]["name"]
+                cut[nm] = max(cut.get(nm, 0.0), float(need[f]))
+        for nm, d in cut.items():
+            extra[nm] = max(extra[nm] - d, -12.0)
+    return extra
+
+
 def build(write=True):
     OUT.mkdir(parents=True, exist_ok=True)
     used = sorted({c[1] for c in sheet.CUES})
     missing = [u for u in used if u not in SOUNDS]
     assert not missing, f"cue sheet names sounds that do not exist: {missing}"
-    files = {}
+    files, arrs = {}, {}
     for name in used:
         y = SOUNDS[name]()
         trim = name != "pencil_reverse"
         y = finish_sfx(y, name, OUT, trim=trim, fade_out_ms=3.0 if not trim else 25.0)
+        arrs[name] = y
         c, _ = click_report(y)
         ev, eb = M.cue_levels(y)
         files[name] = {"dur": round(len(y) / SR, 3), "event_lufs": round(ev, 2), "band_db": round(eb, 2), "clicks": c}
     V = M.voice_tracks()
     vref = V["vref"]
-    cues = [{"src": "v2r/music_bed.wav", "t": 0.0, "gain": 1.0,
-             "note": "the bed 'Towpath' (music + canal / Arlington air, pre-ducked under the locked voice): play as is"}]
-    # each cue's own limit, then one common step per file (same idea = same level relation, A5 equal boards)
-    lim = []
+    # 1. each cue's own limit (sheet / local / band), 2. one common step per file (same idea = same level relation,
+    # A5's equal boards), 3. the bus guard (cues that sound together), again a whole file at a time
+    rows = []
     for (t, name, under, note) in sheet.CUES:
         f = files[name]
         g_db, rule = gain_for(V, frame_t(t), under, f["event_lufs"], f["band_db"], f["dur"], name in sheet.TONAL)
-        lim.append((g_db, rule, V["vref"] - under - f["event_lufs"]))
+        rows.append({"t": t, "name": name, "under": under, "note": note, "lim": g_db, "rule": rule,
+                     "g_sheet": vref - under - f["event_lufs"]})
     step = {}
-    for (t, name, under, note), (g_db, rule, g_sheet) in zip(sheet.CUES, lim):
-        step[name] = min(step.get(name, 0.0), g_db - g_sheet)
-    for (t, name, under, note), (g_db, rule, g_sheet) in zip(sheet.CUES, lim):
-        g_db = g_sheet + step[name]
-        rule = rule if abs(g_db - lim[sheet.CUES.index((t, name, under, note))][0]) < 0.05 else "group"
+    for r in rows:
+        step[r["name"]] = min(step.get(r["name"], 0.0), r["lim"] - r["g_sheet"])
+    for r in rows:
+        r["g_db"] = r["g_sheet"] + step[r["name"]]
+        if abs(r["g_db"] - r["lim"]) > 0.05:
+            r["rule"] = "group"
+    extra = bus_guard(rows, arrs, V)
+    cues = [{"src": "v2r/music_bed.wav", "t": 0.0, "gain": 1.0,
+             "note": "the bed 'Towpath' (music + canal / Arlington air, pre-ducked under the locked voice): play as is"}]
+    for r in rows:
+        g_db = r["g_db"] + extra[r["name"]]
+        rule = r["rule"] if extra[r["name"]] > -0.05 else f"bus {extra[r['name']]:+.1f}"
         g = float(db2a(g_db))
         if g > 1.0:
-            print(f"WARNING {name} @{t}: gain {g:.2f} > 1 (file too quiet for -{under} dB): clipped to 1", file=sys.stderr)
+            print(f"WARNING {r['name']} @{r['t']}: gain {g:.2f} > 1: clipped to 1", file=sys.stderr)
             g = 1.0
-        cues.append({"src": f"v2r/sfx/{name}.wav", "t": t, "gain": round(g, 4), "note": note,
-                     "under_db": under, "set_by": rule})
+        cues.append({"src": f"v2r/sfx/{r['name']}.wav", "t": r["t"], "gain": round(g, 4), "note": r["note"],
+                     "under_db": r["under"], "set_by": rule})
     if write:
         (PUBLIC / "cues.json").write_text(json.dumps(cues, indent=1, ensure_ascii=False) + "\n")
     print(f"voice speech level {vref:.2f} LUFS (momentary median); {len(files)} sounds, {len(cues) - 1} cues -> "
           f"{OUT} + {PUBLIC / 'cues.json'}")
     for k, v in files.items():
-        print(f"  {k:16s} {v['dur']:5.2f} s  event {v['event_lufs']:6.1f} LUFS  clicks {v['clicks']}")
+        print(f"  {k:16s} {v['dur']:5.2f} s  event {v['event_lufs']:6.1f} LUFS  1-4 kHz {v['band_db']:6.1f} dB  "
+              f"clicks {v['clicks']}")
+    for c in cues[1:]:
+        if c["set_by"] != "sheet":
+            print(f"  {c['t']:6.2f} {c['src'].split('/')[-1]:20s} gain {c['gain']:.4f}  set by {c['set_by']}")
     return cues, files, vref
 
 

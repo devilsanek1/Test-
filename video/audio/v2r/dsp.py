@@ -91,14 +91,20 @@ def env_bell(n, peak=0.5, sharp=2.0):
 
 
 def modal(freqs, decays, amps, dur, exc_ms=0.6, seed=0):
-    """Decaying partials struck by a short Hann-shaped noise burst (a mallet / knuckle / felt)."""
+    """Decaying partials struck by a short Hann-shaped noise burst (a mallet / knuckle / felt). The partials rise over
+    ~exc_ms (a raised-cosine onset, so a soft mallet never clicks) and the buffer's last 4 ms fade out (no step)."""
     t = tt(dur); r = rng(seed)
     y = np.zeros_like(t)
     for f, d, a in zip(freqs, decays, amps):
         y += a * np.sin(2 * np.pi * f * t + r.uniform(0, 2 * np.pi)) * np.exp(-t / d)
+    na = min(len(t), max(8, int(max(exc_ms, 0.3) * 1e-3 * SR)))
+    y[:na] *= np.sin(0.5 * np.pi * np.linspace(0, 1, na)) ** 2
     k = max(4, int(exc_ms * 1e-3 * SR))
     exc = r.standard_normal(k) * np.hanning(k)
-    return ss.fftconvolve(y, exc / (np.abs(exc).sum() + 1e-12))[: len(t)] * 8
+    y = ss.fftconvolve(y, exc / (np.abs(exc).sum() + 1e-12))[: len(t)] * 8
+    nf = min(len(y) // 4, int(0.004 * SR))
+    y[len(y) - nf:] *= np.cos(0.5 * np.pi * np.linspace(0, 1, nf)) ** 2
+    return y
 
 
 def chirp(f0, f1, dur, shape=2.0):

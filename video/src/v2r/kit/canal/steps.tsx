@@ -6,9 +6,8 @@
 
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../../palette';
-import {useTime} from '../../../lib/time';
 import {line} from '../../../lib/sketch';
-import {Batch, Paint, P, rng, ovalPath, lerp, leafPath, domePath, Pt} from './core';
+import {Batch, Paint, P, rng, lerp, leafPath, Pt} from './core';
 import {bollardInto, bikeInto} from './towpath';
 import {copingInto} from './water';
 import {CastSlot, PersonSlot} from './slots';
@@ -57,7 +56,6 @@ export type StepsProps = {
 /** The S1 steps: coping, landing, five treads with nosings and joints converging on the far bank, the bollard, the
  *  props, and the seated public. */
 export const Steps: React.FC<StepsProps> = ({people = true, acts = [], seed = 'steps'}) => {
-  const t = useTime();
   const S = S1_STEPS;
   const stone = useMemo(() => {
     const b = new Batch();
@@ -83,12 +81,8 @@ export const Steps: React.FC<StepsProps> = ({people = true, acts = [], seed = 's
         edges += line(-30, y, 1110, y + r.jitter(2), {seed: `${seed}/n${i}`, over: 'structural'});
       }
       // slab joints on this tread, converging on the VP (one-point, the lens looks level at the far bank)
-      const y0 = y;
-      const y1 = i === 0 ? S.nosings[0] : S.nosings[i] ?? 1920;
       const ya = i === 0 ? S.landing[0] : S.nosings[i - 1];
       const yb = i === 0 ? S.nosings[0] : S.nosings[i] ?? 1920;
-      void y0;
-      void y1;
       const span = 1400 * (1 + k * 0.9);
       for (let x = -span / 2 + r.range(0, 80); x < 1080 + span / 2; x += r.range(150, 260) * (1 + k)) {
         const pa = [lerp(S.vp[0], x, (ya - S.vp[1]) / (1920 - S.vp[1])), ya] as Pt;
@@ -149,7 +143,6 @@ export const Steps: React.FC<StepsProps> = ({people = true, acts = [], seed = 's
           ))}
         </>
       ) : null}
-      {t < -1e9 ? <path d={domePath(0, 0, 1, 1) + ovalPath(0, 0, 1, 1)} /> : null}
     </>
   );
 };

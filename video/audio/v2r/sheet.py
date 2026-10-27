@@ -41,7 +41,7 @@ CUES = [
     (0.45, "door_glide", 24, "the glass doors' glide under the ding, fully open on 'quit' 0.52"),
     (0.97, "step_thup", 20, "she steps out onto the towpath ('Google')"),
     (0.99, "letter_pops", 26, "the canopy letters fill-pop one by one"),
-    (1.40, "wings", 16, "five birds lift off the bridge rail and wheel west (in the pause 1.46-2.00)"),
+    (1.46, "wings", 16, "five birds lift off the bridge rail (f84) and wheel west: the claps land as 'Google.' ends"),
     (2.00, "ghost_tick", 14, "G1 pops (one soft wooden tick per ghost, ONE pitch)"),
     (2.53, "ghost_tick", 14, "G2 pops ('contract')"),
     (3.20, "ghost_tick", 14, "G3 pops ('bans')"),

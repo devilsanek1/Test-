@@ -29,8 +29,9 @@ THE ARC (TREATMENT s7, on heard times):
 OUT OF THE VOICE'S WAY. The male narrator (f0 ~120 Hz) owns ~120 Hz-4 kHz. Sustained notes live below ~110 Hz or
 above ~800 Hz; the only mid-register notes are short pizzicati and a few soft piano notes; a static carve (-4 dB
 around 2.2 kHz). Then the bed is PRE-DUCKED against the locked voice (public/v2/voice.wav): -14 dB on the music
-(-6 on the lows), 30 / 250 ms, a margin guard so the music stays >= 12 dB under every word, and the music level set
-so its median sits ~27 dB under the speaking voice. Play music_bed.wav at gain 1 (cues.json), no further ducking.
+(-10 on the air, -6 on the lows; less inside the two swells, SWELLS), 30 / 250 ms, the music level set so its median
+sits ~27 dB under the speaking voice, and a guard on the whole bed (music + air) so it stays >= 12 dB under every word.
+Play music_bed.wav at gain 1 (cues.json), no further ducking.
 """
 from __future__ import annotations
 
@@ -361,9 +362,20 @@ def voice_stereo():
     return v, np.stack([v, v], 1)
 
 
-def duck_curve(v, depth_db):
+# The two swells the story asks for happen UNDER speech (the crane 21.30-23.40 under "...a deal letting the
+# Pentagon use its AI for", and "facts" 37.18 inside the payoff line), so there the lows and the air duck less and the
+# swell is heard; the >= 12 dB guard still holds every word. (start, end, {group: duck dB})
+SWELLS = [(21.20, 24.05, {"mid": 10.0, "air": 5.0, "low": 2.0}), (37.05, FILM_DUR, {"mid": 10.0, "air": 6.0, "low": 3.0})]
+DUCK = {"mid": 14.0, "air": 10.0, "low": 6.0}
+
+
+def duck_curve(v, group):
     act, hop = HM.speech_envelope(v)
-    env = HM.one_pole_db(-depth_db * act, 30.0, 250.0, SR / hop)
+    tc = np.arange(len(act)) / (SR / hop)
+    depth = np.full(len(act), DUCK[group])
+    for (a, b, d) in SWELLS:
+        depth = np.where((tc >= a) & (tc < b), d[group], depth)
+    env = HM.one_pole_db(-depth * act, 30.0, 250.0, SR / hop)
     return db2a(HM.ctrl_to_audio(env, hop, N_FILM))
 
 
@@ -420,8 +432,7 @@ def main():
     groups, stems = render(notes)
     v, vs = voice_stereo()
     # music: pre-duck by group, then level so the median under speech is ~27 dB, then the >= 12 dB guard
-    ducked = groups["mid"] * duck_curve(v, 14.0)[:, None] + groups["air"] * duck_curve(v, 10.0)[:, None] \
-        + groups["low"] * duck_curve(v, 6.0)[:, None]
+    ducked = sum(groups[k] * duck_curve(v, k)[:, None] for k in ("mid", "air", "low"))
     d, _ = gap_stats(vs, ducked)
     music = ducked * db2a(np.median(d) - 27.0)
     air = world_air()
@@ -430,7 +441,8 @@ def main():
     tv, lv = short_term_lufs(vs, win=0.4, hop=0.05)
     vref = float(np.median(lv[speech_frames(tv)]))
     air = air * db2a(vref - 19.2 - float(np.median(la)))
-    air = air * duck_curve(v, 3.0)[:, None]
+    act, hop = HM.speech_envelope(v)
+    air = air * db2a(HM.ctrl_to_audio(HM.one_pole_db(-3.0 * act, 30.0, 250.0, SR / hop), hop, N_FILM))[:, None]
     g = np.ones(N_FILM)                       # the guard on the whole bed (music + air): >= 12 dB under every word
     for _ in range(4):
         g *= guard(vs, (music + air) * g[:, None])
@@ -446,6 +458,7 @@ def main():
     secs = [("hook", 0, 6.10), ("staff", 6.10, 12.98), ("her window", 12.98, 14.86), ("walk", 14.86, 20.55),
             ("crane", 20.55, 24.0), ("clause", 24.0, 28.06), ("google", 28.06, 32.93), ("her words", 32.93, FILM_DUR)]
     t1, l1 = short_term_lufs(music, win=1.0, hop=0.25)
+    tm_, lm_ = short_term_lufs(music, win=0.4, hop=0.05)
     rep = {"file": str(BED_OUT), "dur_s": round(len(bed) / SR, 4), "lufs_I_bed": round(lufs(bed), 2),
            "true_peak_dBTP": round(true_peak_db(bed), 2), "voice_speech_level_LUFS": round(vref, 2),
            "music_under_voice_median_dB": round(float(np.median(dm)), 1),
@@ -459,6 +472,11 @@ def main():
            "section_music_LUFS_1s": {nm: round(float(np.mean(l1[(t1 >= a) & (t1 < b)])), 1) for (nm, a, b) in secs},
            "clicks": click_report(bed)[0],
            "seam_step": float(np.abs(bed[0] - bed[-1]).max()),
+           "music_momentary_median_LUFS": {nm: round(float(np.median(lm_[(tm_ >= a) & (tm_ < b)])), 1) for (nm, a, b) in
+                                           [("walk 15.1-17.9", 15.1, 17.9), ("hold 20.6-21.3", 20.6, 21.3),
+                                            ("crane 21.3-22.4", 21.3, 22.4), ("landing 22.4-24.0", 22.4, 24.0),
+                                            ("clause 24.0-27.8", 24.0, 27.8), ("google 28.3-32.7", 28.3, 32.7),
+                                            ("motif alone 33.2-36.2", 33.2, 36.2), ("facts 37.2-38.8", 37.2, 38.8)]},
            "tempo_bpm": [round(60 * n / (b - a), 1) for (a, b, n) in SEG]}
     (SCRATCH / "bed_report.json").write_text(json.dumps(rep, indent=1))
     print(json.dumps(rep, indent=1))

@@ -63,7 +63,7 @@ function hull(pts: Pt[]): Pt[] {
 }
 
 /** A pentagonal annulus at height z between apothems aOut > aIn (evenodd path). */
-const annulus = (aOut: number, aIn: number, z: number) => polyD(pentagon(aOut).map((q) => P3(q, z))) + polyD(pentagon(aIn).map((q) => P3(q, z)));
+const annulus = (aOut: number, aIn: number, z: number) => polyD(pentagon(aOut).map((q) => P3(q, z))) + polyD(pentagon(aIn).map((q) => P3(q, z)).reverse());
 
 /** The windows of one outer facade side i: [row][col] screen quads. */
 type Win = {q: [Pt, Pt, Pt, Pt]; side: number; row: number; col: number};

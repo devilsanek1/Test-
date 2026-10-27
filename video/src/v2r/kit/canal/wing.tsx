@@ -118,7 +118,10 @@ export function s7Layout(): WingLayout {
     {u0: u(F.x1) + 0.3, u1: wM + 0.2, split: 0.5},
   ];
   const fins = upper.map((b) => b.u0 - 0.17);
-  return {quad, wM, hM, floorV: hM - 3.2, plinthV: hM - 0.3, copingM: 0.16, bandM: 0.14, cornerM: 0.5, upper, lower, w: null, door, fascia: F, letterPx: 40, fins, ink: INK_PX.mid, seed: 'wingS7'};
+  // the ground storey's top sits just above the canopy fascia (map S7: fascia y 760-810)
+  const floorV = (F.y0 - 6 - top) / pxm;
+  for (const bay of upper) bay.u1 = Math.min(bay.u1, wM);
+  return {quad, wM, hM, floorV, plinthV: hM - 0.3, copingM: 0.16, bandM: 0.14, cornerM: 0.5, upper, lower, w: null, door, fascia: F, letterPx: 40, fins, ink: INK_PX.mid, seed: 'wingS7'};
 }
 
 // ---------------------------------------------------------------- pane drawing (local metres on the plane)
