@@ -71,6 +71,9 @@ Format: **rule** — why / evidence (video, date).
   owner's 2026-10-26 reference: a painterly street seen from above, everyday traffic flowing calmly under flowering trees):
   each new reference is measured (composition, movement, texture, camera, details) and folded into `COZY_AND_SCALE.md`.
   — ("really figure out what about the scene brings out this feeling; this is a recurring topic we need to evolve", 2026-10-26).
+- **Don't rely on reusable assets: every film's sets, characters, props, background life and music are made new for
+  it,** in its own design (a new Pip drawing too, if the mascot appears). Engine primitives, timing, captions and QA tools
+  are tools, not assets. — ("Don't rely on reusable assets", v2 restart, 2026-10-27).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). — (v1 posted reel, 2026-10-25).
 - **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
@@ -151,12 +154,10 @@ Format: **rule** — why / evidence (video, date).
 - **Every cut sent to the owner says what stage it is and what the next stages add** (e.g. "blocking: staging only;
   next: density, life, polish, full-res"), so a draft is never mistaken for the final. — ("let me know if this is just
   an initial intermediate step", v3 G5, 2026-10-26).
-- **NO LIMIT ON TOKENS for creative output.** Ideas, scripts, design explorations, set building, density, life, animation
-  and polish get as many agents, rounds and tokens as the quality needs, including workflows larger than the default size
-  guideline. Savings never decide a creative choice; only true waste is cut (rework, lost work, reviewing what will
-  still change). — (owner, 2026-10-26).
-- **Never trade quality for savings:** brainstorms, judged competing ideas and design explorations are worth their
-  tokens; waste = rework, reviews of things that will change, early polish, lost work. — (2026-10-25).
+- **NO LIMIT ON TOKENS for creative output; never trade quality for savings.** Ideas, scripts, judged competing ideas,
+  design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
+  quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
+  reviewing what will still change, early polish). — (2026-10-25; owner, 2026-10-26).
 - **Locked means dropped:** rejected options go to the video's `archive/`, the gate doc keeps only the locked choice,
   later prompts never see them; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
 - **No wasted tokens or time:** short prompts, lean docs, nothing reviewed or polished that will still change. — (v1).

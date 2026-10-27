@@ -45,6 +45,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   `archive/restart_2026-10-27/`; a fresh production straight to the finished film (no sketch), new creative direction
   judged against the repo's principles and v1; script and voice take 2 kept (approved; no API key in this session).
   -> rule: Process (a rejected cut restarts clean).
+- 2026-10-27 (restart, direction stage): "Don't rely on reusable assets" -> everything visual and musical in the new v2
+  film is made new for it (no v1 shared sets, no v3 kit, no stock mascot drawing, no house music bed); engine primitives
+  and QA tools only. -> rule: Visual style (don't rely on reusable assets).
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
