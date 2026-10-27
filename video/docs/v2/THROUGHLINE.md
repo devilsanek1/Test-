@@ -19,13 +19,11 @@ px at 1080 x 1920.
    exception; owner yes, 2026-10-27 ~20:10 UTC, `OWNER_NOTES.md`). Fairness rules here (the owner's brief §18-19, "fair,
    nonjudgmental, no manufactured villains"; CORE_LINE §2's equal weight for Google): she and anything of hers are never
    in Washington, and April is before she quit (TREATMENT V13); Google's reply is its own beat with nothing of hers in it
-   (A5, V14). The excursion leaves
-   from the thread (S4 pushes into the sun right above her far window), goes to April and back through the same sun
-   (S4->S5, S6->S7) and returns to her window at the first join that can reach her (the S7->S8 boat wipe opens on W).
-   Tried and rejected: the sun (DIRECTION retires the sun as a character; no disc in S2; not her arc) · Pip (the mascot
-   has its own rule) · the boards (four objects, none in 0-8.4 s) · her window pinned as a card in a corner of S5-S7
-   (puts her into Washington and into Google's beat). The stretch returns to the thread at its next join (S7->S8 opens
-   on W), as the exception asks.
+   (A5, V14). The excursion leaves from the thread (S4 pushes into the sun right above her far window), goes to April and
+   back through the same sun (S4->S5, S6->S7) and returns to her window at its next join, as the exception asks (the
+   S7->S8 boat wipe opens on W). Tried and rejected: the sun (DIRECTION retires the sun as a character; no disc in S2;
+   not her arc) · Pip (the mascot has its own rule) · the boards (four objects, none in 0-8.4 s) · her window pinned as a
+   card in a corner of S5-S7 (puts her into Washington and into Google's beat).
 4. **Home place: the canal** (one London canal, one October evening: Google's bank, the towpath walk, her bank). Places:
    (1) the canal; (2) Arlington on an April morning (S5, S6), entered and left through the sun. The ONE scale reveal: S5's
    crane. Information is paper where we are: tag and plates (S4), news box and plaque (S5), deal board (S6), A-boards (S2,
@@ -61,10 +59,10 @@ wipe is centred on the incoming shot's `start`; every `transitionIn` carries its
 |---|---|---|---|---|
 | S1->S2 | 6.10 · "You'd" 6.28 | A · `push-through` {from [860,700], to **[335,785]**, zoom 12, bridge #36223A, inkComp 0.6, dur 0.30} | the dive into W, out of her dark office window at M | stays on its bollard (700,1235), swept by the zoom; already seated on its S2 post (590,1050) |
 | S2->S3 | 12.98 · "So" 13.16 | B · `matchcut` | her dark office window at M -> her lit home window at M: same spot, same size (133 x 164) | (590,1050) in both |
-| S3->S4 | 14.86 · "She" 15.07 | A · `push-through` {from [330,742] (her silhouette's head), to [720,912] (her head in S4), zoom 12, bridge #36223A, dur 0.30} | into her at her window, out of her walking (the name tag pops 15.07) | swept; seated on the boat roof (470,1218) from S4's first frame |
-| S4->S5 | 20.55 · "In" 20.67 | A · `push-through` {from [250,650], to [250,650] (SUN1), zoom 7, no bridge, dur 0.30} | into the low October sun just above her window, out of the April sun in the slot | (470,1218) -> on the bench (415,1120) from S5's first frame |
+| S3->S4 | 14.86 · "She" 15.07 | A · `push-through` {from [330,742] (her silhouette's head), to [720,912] (her head in S4), zoom 12, bridge #36223A, inkComp 0.6, dur 0.30} | into her at her window, out of her walking (the name tag pops 15.07) | swept; seated on the boat roof (470,1218) from S4's first frame |
+| S4->S5 | 20.55 · "In" 20.67 | A · `push-through` {from [250,650], to [250,650] (SUN1), zoom 7, no bridge, inkComp 0.6, dur 0.30} | into the low October sun just above her window, out of the April sun in the slot | (470,1218) -> on the bench (415,1120) from S5's first frame |
 | S5->S6 | 23.80 · "any" 24.03 (the quote's first word) | D · `foreground-wipe` {element 'scene' (S5 exports `Wiper`: a blossom tree, trunk + crown ~300 px, clipped to y >= 560), dir **'left'**, dur **0.36**}; **V2S6 start 23.80** | the tree crosses the lens right to left (23.62-23.98): S5's end sun (right edge) is covered first, S6's SUN2 and board (left) are uncovered last, so two suns never share a frame; the board is clear by ~23.90 and the purpose line pops on "any" 24.03, after the wipe | tiny at the balustrade (366,1195) -> at the deal board's foot (360,1410): the tree swaps them in the same column (215 px) |
-| S6->S7 | 28.10 · "But" 28.31 | A · `push-through` {from [260,620], to [260,620] (SUN2), zoom 7, no bridge, dur 0.30}; **V2S7 start 28.10** | into the April sun, out of the October sunset sun: back to London | swept: from the board's foot (360,1410) to S7's board bollard (700,1205), seated from S7's first frame |
+| S6->S7 | 28.10 · "But" 28.31 | A · `push-through` {from [260,620], to [260,620] (SUN2), zoom 7, no bridge, inkComp 0.6, dur 0.30}; **V2S7 start 28.10** | into the April sun, out of the October sunset sun: back to London | swept: from the board's foot (360,1410) to S7's board bollard (700,1205), seated from S7's first frame |
 | S7->S8 | 32.93 · "She" 33.16 | D · `foreground-wipe` (S7's narrowboat `Wiper`, dir 'left', dur 0.46): as built; the bow only after 32.70 (A5) | the narrowboat | rides it: S7's Pip stays put until the bow covers it (~32.83); S8's Pip on the stern 32.97, steps off 33.00, lands (450,1205) 33.20 |
 | S8->S1 | 38.95 · "She" 0.24 heard (next loop; json 0.12) | B + `unbuild` {dur 0.26, captionAt 39.04} | her lit home window W = her office window W at f0, both 150 x 170 at zoom 1.00; S8's sun un-builds before S1's shows through | board bollard (700,1205) -> f0 bollard (700,1235): a 30 px settle |
 
@@ -111,9 +109,9 @@ freezes the world). S4's truck is A's walk: its world slide is camera, not suppo
    windows.
 8. **S8** (sunset -> lamps). A: her + the three ghosts (her walk 33.16-34.75; the ghosts pop on "can't" 33.78) · W
    (34.55-34.95, and the end) · her board (35.72 the wipe, 36.54 the quote). B: Pip (ears down on "can't"), the café
-   owner (wiping from the board's left side, at its depth), her door. No readers in front of the board: two backs reading
-   a board from the foreground is v3's retired S4 model (DIRECTION, "Retired"), and Q9 (c) wants nothing singled out on
-   "facts". C: the lane, lamps (37.18 run, <= 3 per second), the café boat, canal, roofs, sun, smoke, steam, walkers.
+   owner (wiping from the board's left side, at its depth), her door. No readers in front of the board (backs reading a
+   board from the foreground: v3's retired S4 model, DIRECTION "Retired"; Q9 (c) also wants nothing singled out on
+   "facts"). C: the lane, lamps (37.18 run, <= 3 per second), the café boat, canal, roofs, sun, smoke, steam, walkers.
    Colour: rose band; teal door; W lamp-gold from 34.95; cream board; lamp-gold pools run west 37.18.
 
 ## 5. Light: one family, two rigs (CRAFT §d; `src/lib/light.tsx`, API in `src/lib/LIGHT.md`)

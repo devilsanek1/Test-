@@ -33,11 +33,11 @@ commit every ~20 min; only your shots, 0.4 scale (`--gl=angle --concurrency=2`).
 - **Out, A push-through into SUN1** (20.40-20.70, zoom 7, no bridge; the integrator's scenes.json). Nothing enters, pops
   or turns in 20.35-20.75 (the birds fly west at 19.80: fine).
 - **Thread (new): her house and window ahead at the far left**, in the backs plane: the terrace's end house (brick,
-  mansard, a chimney), her first-floor French window (teal frame, Juliet rail, blind UP, a dark pane: she is not home yet),
-  >= 90 px wide, just below-left of SUN1 (centred ~(150, 790) at the pose), so the push-through into the sun leaves from it.
-  It rides the backs plane (0.6x the path's 310 px truck): half in from the left edge by ~15.4, whole by ~16.1; at the stop
-  she looks west along the plates toward it. Tier B (the thread's home spot): never over the plates, the tag or the band. Move the gasholder lattice off
-  the sun (no line crosses the sun).
+  mansard, a chimney), her first-floor French window (teal frame, Juliet rail, blind UP, a dark pane: she is not home
+  yet), >= 90 px wide, just below-left of SUN1 (centred ~(150, 790) at the pose), so the push-through into the sun leaves
+  from it. It rides the backs plane (0.6x the path's 310 px truck): half in from the left edge by ~15.4, whole by ~16.1;
+  at the stop she looks west along the plates toward it. Tier B (the thread's home spot): never over the plates, the tag
+  or the band. Move the gasholder lattice off the sun (no line crosses the sun).
 - **Pip:** on the boat roof (470, 1218) from the first frame (delete the 14.95 landing); turns west on "heading" 19.55
   (its one reaction); delete the 20.25 hop (the push-through sweeps it; S5 seats it at (415, 1120)).
 - **Tiers:** A = her (the walk, the stop on "objected" 17.96, the look west) + the name tag (15.07-18.80) · the fingerpost

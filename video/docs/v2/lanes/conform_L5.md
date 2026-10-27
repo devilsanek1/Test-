@@ -12,8 +12,9 @@ Budget: ONE agent, ~90 min (the kit check first, then S6, then S7), a commit eve
   still and fix it in the kit if needed: ONE closed 3.0 px outline in the stiles' own deep warm shade (never near-black),
   key lines at full contrast, the outline popping on (one frame), never drawn on. Add to the README: the legs' contact
   and cast shadows come from the scene's rig.
-- The kit already gets its line from the global pen (THROUGHLINE §6 "Line"): no stripping of `INK_PX` or options. Fix
-  `NameTag`'s credit row out of the ad zone (x > 780 below y 840).
+- The kit already gets its line from the global pen (THROUGHLINE §6 "Line"): no stripping of `INK_PX` or options.
+  `NameTag`'s credit row (x 616-819, y ~861) is clear of the platform's right rail (x > 950, `G5_BLOCKING.md` §2); only
+  an ad cut would need it moved, so leave it.
 
 ## 2. V2S6 (23.80-28.10)
 - **Held locked** at its 24.00 pose (board x 120-680; DIRECTION rule 8: a hold is locked or a slow 2D float): the 4 s
@@ -43,7 +44,8 @@ Budget: ONE agent, ~90 min (the kit check first, then S6, then S7), a commit eve
 
 ## 3. V2S7 (28.10-32.93)
 - **In:** pulled back out of SUN2 by Film's push-through camera (28.10-28.25, from 7x on S7's sun at (260, 620) r 45).
-  Pip sits on the bollard (700, 1205) from the first frame: delete `pipHopAt` (the S6 -> S7 arc). The GOOGLE SAYS header
+  S7 now starts at 28.10: set `S7_T0` (and `S6_T0` / V2S6_rig `T0` to 23.80) so every beat keeps its film time. Pip
+  sits on the bollard (700, 1205) from the first frame: delete `pipHopAt` (the S6 -> S7 arc). The GOOGLE SAYS header
   and clack land after the leg and the join window (28.32-28.34, leading "Google" 28.36). Keep the 4 % push 28.40-30.04
   (its ONE story move, A5) and the float law.
 - **Foreground:** delete the café's seated backs at the bottom-left and every near head-back. The bottom third = café

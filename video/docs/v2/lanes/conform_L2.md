@@ -65,7 +65,8 @@ hood's time); the board's slide-out and text; Pip's head turn; the near lamp.
 
 ## 9. Report (<= 12 lines, `docs/v2/lanes/report_L2.md`, pushed last)
 - 0.4-scale clip of Film2R 5.9-13.2 s (S1's dive in, S3's first frames out), path in the report.
-- `check_light.py` A/B (the sky flags of THROUGHLINE §5) at 7.0 (`--subject` her window) and 11.0 (the staff windows): PASS.
+- `check_light.py` A/B (the sky flags of THROUGHLINE §5) at 7.0 (`--subject` her window) and 11.0 (the staff
+  windows): PASS.
 - `scripts/qa/retro_tools/line/measure.py` at 10.0: strokes <= 80 / Mpx, near-miss ends <= 40, dark-line px <= 3 %.
 - The match: frames 12.95 / 12.98 / 13.00 side by side: M at (335, 785) 133 x 164 and Pip at (590, 1050) in both.
 - Eye check at phone size every 1 s (her window -> the board -> the five windows -> the blinds); movers at 10.3: <= 3; a

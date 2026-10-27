@@ -20,8 +20,8 @@ and the start of "the other side" (THROUGHLINE §1.3): it runs without the threa
   field; make the two skies above it agree at the swap (S5's top-gutter cloud caps drift out before 23.62, or S6 carries
   the same caps). The deal board (x 120-680) is clear by ~23.90 and the tree gone by 23.98, before the purpose line pops
   on "any" 24.03.
-- Delete Pip's 23.90 leap: the tiny Pip stays at the balustrade (366, 1195) until the tree covers it (~23.83); S6's Pip
-  appears at the deal board's foot (360, 1410), in the same column, right after (~23.86).
+- Delete Pip's 23.90 leap: the tiny Pip stays at the balustrade (366, 1195) until the tree covers it (~23.81); S6's Pip
+  appears at the deal board's foot (360, 1410), in the same column, right after (~23.85).
 - Nothing new enters, pops or turns in 23.60-24.00 but the tree (the birds already flying keep their pace).
 
 ## 2. Retire the calendar flip (DIRECTION: the sun as a character is retired)
