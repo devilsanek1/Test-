@@ -1,5 +1,9 @@
 # SHARED PROPS: the props lane of the shared world kit
 
+> **v1's world kit (banner, 2026-10-27).** History and API patterns only: these props are drawn with v1's sketch pen
+> and are never a new film's props (playbook: no reusable assets; `docs/look/DIRECTION.md`: the clean pen, tiers by
+> story role). Current direction: DIRECTION.
+
 `src/scenes/shared/props/**` (barrel: `src/scenes/shared/props/index.ts`). Sets live in `src/scenes/shared/sets/**`
 (docs/SHARED_SETS.md); scenes use both.
 

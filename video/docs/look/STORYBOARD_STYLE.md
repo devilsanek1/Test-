@@ -112,7 +112,8 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   at the render rate (~900 px/s at 60 fps — a lint WARN resolved by the sound-on check at 1x; derivation in
   `G3_ANIMATIC.md` §4). **A push of more than 2x is a push-through (carrier A):** at most 2x per panel, into a
   sub-frame that IS the next panel, handed over at matched scale (S8's 4.2x zoom inside one panel cropped its
-  drawing while it moved); a closer view inside one place is a C push; a cut-in is a declared F. Board-mode parallax
+  drawing while it moved); a closer view inside one place is a C push; a cut-in is a plain cut (F: only on a "But"
+  turn, within the film's 2). Board-mode parallax
   only behind `shot.parallax: true` (rise-over planes).
 - **Arrows: none over a move we animate.** The move is its own notation, and an arrow would be one more thing to read. Paper boards need
   arrows because they can't move; even Storyboard Pro makes its camera frames optional in PDF exports [18] (REPORTED). A red mark appears
@@ -210,7 +211,7 @@ Clarity and cinematics are not a trade-off. Each panel names its shot type and f
   starts from the same room tone and the same lamp shade or pool, so the place visibly returns; a light desk on paper read
   as another place. In an objective return, reuse the opening's window and its outline of the landmark (scaled), never a
   new drawing: a tall slab with a cross read as a glass door, a box with notches as a castle. A closer view keeps the
-  object it moves into (a C push inside the place, or a declared F cut-in: S15's phone, 1.275x on its axis), never a
+  object it moves into (a C push inside the place, or, on a "But" turn, an F cut-in: S15's phone, 1.275x on its axis), never a
   look-alike.
 - **Scale** (`CINEMATIC_GUIDE.md`): the one big move (S1 rise-over or S5 pull-back) drawn with its planes, landing on a
   tiny figure (0.04-0.08 H, so at least ~80 px: a 3 % figure is a 15 px speck on the cold-read thumbnail; fix the plan,

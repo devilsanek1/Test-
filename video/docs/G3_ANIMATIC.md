@@ -107,7 +107,7 @@ G5 adds no new motion — only colour, line, easing polish, secondary motion (`a
   move eases in AND out; a subject-follow starts 2-4 frames after the subject; pans/rises are ONE oversized drawing
   (panel drawn 120-140 % of frame) the camera travels across. A push of more than 2x is a push-through (carrier A): at
   most 2x per panel, into a sub-frame that IS the next panel, handed over at matched scale; a closer view inside one
-  place is a C push; a cut-in is a declared F (§4 grammar). Carrier moves are joins, not story moves. Speed budget (the
+  place is a C push; a cut-in is a plain cut, F, with F's limits (only on a "But" turn, at most 2 per film: §4 grammar). Carrier moves are joins, not story moves. Speed budget (the
   one budget, `PIPELINE_V2.md` "Frame rate"): ~15 px/frame
   at the render rate = ~900 px/s at 60 fps (derivation: v1's ~450 px/s was the same 15 px/frame at 30; strobe scales
   with px/frame, and the playbook Motion rule says 60 fps allows faster moves — readability at 1x is the test, not the

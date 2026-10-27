@@ -316,15 +316,17 @@ Everything that agent knew is in this repo. This file is the map; the details li
     `look/COZY_AND_SCALE.md`, `look/LIFE_AND_DENSITY.md`, `look/PALETTE.md` (+ `palettes.json`), `look/research/`.**
   - Per video: `vN/` (`OWNER_NOTES.md`, the core line, the script, the style page, plans; rejected options in
     `vN/archive/`).
-  - Brief and story (v1): `CREATIVE_BRIEF.md` (the owner's master brief), `BRIEF.md` (the v1 project brief; history),
-    `script/` (all script versions, critiques, the fact sheet and sources; `final_script.md` is the one used),
-    `timing.md` (word timings), `storyboard_v3.md` / `.json` (v1's shot plan).
+  - The channel's brief (every video): `CREATIVE_BRIEF.md` (the owner's master brief; its banner lists the later
+    owner rules that update it).
+  - Brief and story (v1): `BRIEF.md` (the v1 project brief; history), `script/` (all script versions, critiques, the
+    fact sheet and sources; `final_script.md` is the one used), `timing.md` (word timings), `storyboard_v3.md` /
+    `.json` (v1's shot plan).
   - Look and motion (v1-era, HISTORY: the engine API and the reference measurements, each with a banner; never brief a
     lane from their look): `style_bible.md` (from reference 1), `style_bible_ref2.md` (reference 2: scale and
     full-bleed), `motion_spec.md` (the reference's animation language, measured; evidence in `motion_evidence/`),
     `ENGINE.md` (scene engine cheat-sheet: the API), `CINE.md` (cinematic-scale kit; not clean-pen-aware), `EDGES.md`
     (paper edges), `mascot.md`, `SHARED_SETS.md` / `SHARED_PROPS.md` (v1's world kit), `QA.md`.
-  - Sound: `sound_plan.md`, `sound_credits.md`.
+  - Sound: `sound_plan.md`, `sound_credits.md` (v1's; each film makes its own music and sound: playbook).
   - v2: `v2/` (the v2 session's; `v2/source_bbc_2026-10-21.md` is the source text).
 
 ## 7. The reference material the owner sent

@@ -1,5 +1,9 @@
 # SHARED SETS: the sets lane of the shared world kit
 
+> **v1's world kit (banner, 2026-10-27).** History and API patterns only: these sets are drawn with v1's sketch pen
+> (broken strokes, overshoot, jitter, misregistration, weight by depth) and are never a new film's sets (playbook: no
+> reusable assets; `docs/look/DIRECTION.md`: the clean pen, tiers by story role). Current direction: DIRECTION.
+
 `src/scenes/shared/sets/**` (barrel: `src/scenes/shared/sets/index.ts`). Props live in `src/scenes/shared/props/**`
 (docs/SHARED_PROPS.md); sets place props through ONE adapter file, `sets/propSlots.tsx`.
 

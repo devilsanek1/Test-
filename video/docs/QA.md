@@ -1,5 +1,11 @@
 # QA: dead frames, frame checks, contact sheets, beat sync (QA lane)
 
+> **v1-era (banner, 2026-10-27).** Keep it for the tools and what they measure. Its gate is v1's: the density score's
+> ">= 5 events/s" target and a scene FAIL from events or dead runs are retired as gates (`docs/look/DIRECTION.md`,
+> Retired: events/s and the meters are information). A new film's gate is `scripts/qa/gate_check.py`
+> (`docs/G5_BLOCKING.md` §7), with `density.py` as information (`docs/look/LIFE_AND_DENSITY.md` §9), CRAFT's checks
+> (`docs/look/CRAFT.md`) and `framecheck.py`'s UI zones (`docs/G5_BLOCKING.md` §2).
+
 Tools in `scripts/qa/` (Python 3.13 + OpenCV/numpy/scipy/matplotlib, ImageMagick, Remotion). They answer four
 questions about a render, and the **QA gate** at the end of this page turns the answers into PASS/FAIL:
 
