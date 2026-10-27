@@ -131,7 +131,9 @@ Everything that agent knew is in this repo. This file is the map; the details li
   (G3 + G5 rows, frame rate, anti-waste 6, toolkit), G5_BLOCKING (entry check), CLAUDE.md and the playbook are aligned.
   **Before the next video's G3: build the §7 tier-1 tooling** (one checkpointed lane, ~1-2 days: dress layer, ambient
   kit + `loop`, motion/emptiness lints, transition `device`, 60 fps reel, g5_scaffold transition carry-through); the
-  2 h first-cut budget assumes it exists. Tier 2 is built lazily, never ahead of a reel.
+  2 h first-cut budget assumes it exists. Tier 2 is built lazily, never ahead of a reel. Already built (owner yes,
+  2026-10-27): the `{t:'scribble'}` placeholder mass (sketch.ts `scribble`, SketchReel, board_lint; demo
+  `video/public/g3demo/` + `deliverables/tests/g3_sketch_demo.mp4`, entry `src/entry-g3demo.tsx`).
 
 ## 2c. ElevenLabs automation (owner, 2026-10-26)
 

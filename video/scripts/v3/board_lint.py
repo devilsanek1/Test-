@@ -114,7 +114,7 @@ def text_box(el, board):
 def box(el, board):
     """world bounding box (x0, y0, x1, y1) of an element, or None"""
     t = el.get('t')
-    if t in ('rect', 'hatch'):
+    if t in ('rect', 'hatch', 'scribble'):
         return el['x'], el['y'], el['x'] + el['w'], el['y'] + el['h']
     if t == 'ellipse':
         return el['cx'] - el['rx'], el['cy'] - el['ry'], el['cx'] + el['rx'], el['cy'] + el['ry']

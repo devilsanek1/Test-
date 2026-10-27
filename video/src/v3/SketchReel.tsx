@@ -14,7 +14,7 @@
 import React from 'react';
 import {AbsoluteFill, Audio, Easing, Sequence, interpolate, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {captionFontStack, useCaptionFont} from '../lib/font';
-import {type Pt, arrow, boardLoop, boardPen, ellipse, hatch, line, poly, rect, smooth} from '../lib/sketch';
+import {type Pt, arrow, boardLoop, boardPen, ellipse, hatch, line, poly, rect, scribbleMass, smooth} from '../lib/sketch';
 import {BOARD, type BoardFill, type Role, boardFill, boardTone, detailW, roleLine} from './board';
 import {SketchIcon, type IconName} from './SketchIcons';
 
@@ -52,6 +52,9 @@ export type El = Depth & (
   | {t: 'line'; pts: [number, number][]; closed?: boolean; fill?: Fill; in?: number}
   | {t: 'arrow'; x1: number; y1: number; x2: number; y2: number; in?: number}
   | {t: 'hatch'; x: number; y: number; w: number; h: number; in?: number}
+  /** scribble mass (G3_ANIMATIC §3, the owner's sketchbook texture): ONE wandering 3 px mid-grey zigzag stroke filling
+   *  the box; reads as flat grey tone at 25 %. The default placeholder for any surface that is dense/alive at G5. */
+  | {t: 'scribble'; x: number; y: number; w: number; h: number; gap?: number; jitter?: number; in?: number}
   /** x = between the feet, y = the ground, h = standing height (head top at y - h; sit: seat at y - 0.29 h). Board: a
    *  gesture figure (head r 0.09 h, bean torso, limb lines, mitten hands); fill = the torso tone (default: dark on the
    *  subject, light on mid, mid on far); facing default 'r'; face default 'none' (lookup shows the eyes) */
@@ -470,6 +473,11 @@ const Element: React.FC<{el: El; t: number; shot: Shot; i: number; board: boolea
       body = board
         ? <rect x={el.x} y={el.y} width={el.w} height={el.h} fill={BOARD.mid} opacity={el.fillIn !== undefined ? fillO : drawU} />
         : <Pen d={hatch(el.x, el.y, el.w, el.h, {seed})} u={drawU} style={{...stroke, strokeWidth: 2}} />;
+      break;
+    case 'scribble':
+      body = <Pen d={scribbleMass(el.x, el.y, el.w, el.h, {seed, gap: el.gap, jitter: el.jitter})} u={drawU}
+        style={{stroke: role === 'subject' ? BOARD.dark : BOARD.mid, strokeWidth: el.sw ?? 3, fill: 'none',
+          strokeLinecap: 'round', strokeLinejoin: 'round'}} />;
       break;
     case 'figure': {
       if (board) {

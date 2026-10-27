@@ -417,6 +417,34 @@ function _hatch(x: number, y: number, w: number, h: number, o: {seed?: Seed; ang
 }
 export const hatch = memo('hatch', _hatch);
 
+/** Scribble mass (G3 placeholder, docs/G3_ANIMATIC.md §3; owner asked for the sketchbook texture, 2026-10-27):
+ *  hachure scanlines joined into ONE continuous wandering stroke (boustrophedon, smoothed), per-vertex seeded jitter —
+ *  an urban sketcher's "indication" of a dense surface. At 25 % scale the squiggles melt into flat grey tone.
+ *  gap 10-20 px (default 14), jitter 4-8 px (default 6). */
+function _scribbleMass(x: number, y: number, w: number, h: number, o: {seed?: Seed; gap?: number; jitter?: number} = {}): string {
+  const r = rng(o.seed ?? autoSeed(x, y, w, h));
+  const gap = o.gap ?? 14;
+  const j = o.jitter ?? 6;
+  const pts: Pt[] = [];
+  let dir = 1;
+  const yEnd = y + h - gap * 0.3;
+  for (let yy = y + gap * 0.6; yy <= Math.max(yEnd, y + gap * 0.6); yy += gap * r.range(0.85, 1.2)) {
+    const xa = x + r.range(0, j);
+    const xb = x + w - r.range(0, j);
+    const [x0, x1] = dir > 0 ? [xa, xb] : [xb, xa];
+    const segs = Math.max(2, Math.round(w / 80));
+    for (let k = 0; k <= segs; k++) {
+      const px = x0 + ((x1 - x0) * k) / segs;
+      const py = Math.min(y + h, Math.max(y, yy + r.range(-j, j)));
+      pts.push([px, py]);
+    }
+    dir = -dir;
+    if (yy > yEnd) break;
+  }
+  return smooth(pts);
+}
+export const scribbleMass = memo('scribbleMass', _scribbleMass);
+
 /** Arrow from (x1,y1) to (x2,y2): bowed shaft + two head strokes. breaks / jitter / drift go to the shaft (see LineOpts). */
 function _arrow(x1: number, y1: number, x2: number, y2: number,
   o: {seed?: Seed; head?: number; bow?: number; spread?: number} & Pick<LineOpts, 'breaks' | 'jitter' | 'drift'> = {}): string {
