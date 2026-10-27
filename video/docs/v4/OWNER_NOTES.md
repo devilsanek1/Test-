@@ -11,3 +11,5 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   candidates carried into round 2's judging. -> rule: Taste signals (topics).
 - 2026-10-27, G0: picked round 2's B, AI songs and the shared royalty pot, over the recommended A (Spotify family QR):
   "i like B actually - i think there is good amount of fuss about AI songs". -> rule: Taste signals (topics).
+- 2026-10-27, G0.5: "lets pause for now. lets make sure the other session finishes its work" -> the G0.5 run (facts +
+  core line) stopped before any agent finished; relaunch it unchanged when the owner says go.
