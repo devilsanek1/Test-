@@ -106,7 +106,9 @@ stages (building, fixing, polishing), where the measured waste happened.
 4. **No downstream build before its gate.** On video 1, engine, kit, mascot, edge lab and QA tooling were built before
    the script was locked, and a 78 s to 55 s script change threw away voice v1/v2, timing, storyboard v1/v2 and music.
 5. **Checkpoint every agent; at most about 4 at once per machine.** 66 agents died at usage limits on v1. Keep each
-   agent's task small enough to restart and commit after every agent. One machine runs at most about 4 agents at once
+   agent's task small enough to restart and commit after every agent; each agent writes its output file early and keeps
+   it updated, and `video/scripts/autocheckpoint.sh <branch> <the film's paths>` runs in the background (a commit and
+   push every 10 minutes whenever those paths changed; owner, 2026-10-27). One machine runs at most about 4 agents at once
    (this 4-CPU container runs about 2 render-heavy ones well); more parallel work goes to helper cloud sessions, each
    its own machine (playbook Process: parallelize as much as possible), inside the weekly and 5-hour limits.
 6. **Precise numbers are lint numbers, checked only where the picture shows them truly** (owner-approved 2026-10-27).
