@@ -1,4 +1,24 @@
-# L2 handover (V2S2 "The wall"), 2026-10-27
+# L2 handover (V2S2 "The wall")
+
+## PAUSED 22:40 UTC for the depth pass (orchestrator; resume with the depth section added to conform_L2.md)
+**State (pushed):** the conform has only just started. Read DIRECTION, CRAFT §a-§d, THROUGHLINE, conform_L2, LIGHT.md, the
+tier header and the kit Tiers notes; studied the G4 look clip. The integrator's map.ts / scenes.json already carry S2's
+conform numbers (her window at M (335, 785), SW1 at (200, 795), 'W2' (465, 776) full blind 12.20, push retired, pull-back
+about M, hood 10.85, clap 12.70, Pip seat from frame 1; S2 in = A push-through to [335, 785], S3 in = B matchcut), and the
+kit wall draws the swapped story windows at their exact rects. The only code change since the 15:10 pause: V2S2_Staff.tsx
+STAFF_LOOK keyed by the new ids (fixed a crash from 8.96). V2S2 typechecks and renders 6.3-12.95 under the global clean pen.
+**Not done yet (all of conform_L2 §1-§9, in this order):** 6.10-7.5 first (push as soon as it plays): V2S2_Pip.tsx seated at
+(590, 1050) from frame 1, hop-in and the 12.85 hop deleted; the ring (V2S2.tsx RING_D) -> her window's A outline popping on
+at 6.82 (`<Tier tier="subject" tone={CM.anchor}>` closed rect at M, width INK_PX.mid); the float = straight eased legs
+turning every 0.6-1.5 s within +-12 px, home exactly at 12.98. Then: no head-backs (V2S2_Life S2NearLife out); the bottom
+third as things (2-tone paving bands, drain, flat leaves, planter, bike at the lamp foot, the lamp in CM.line x ~1030 slim
+-> send x / y / h / w / colour to L3, paper bundles + crate, the dog lying by the kiosk); delete hand marks (ripple dashes,
+reflection dashes, joint lines, leaf specks, the pictograms); tiers (set in `<Tier tier="environment">`, board
+`ToldTheBBCBoard tier="subject"` from 8.44, staff windows subject on their beats, Pip / bench / newsagent support);
+RIG_CANAL light (`<Lit rig>`, contact + cast shadows, FormShade on round things, Shade on planes away from the sun, LitWindow
+panes); life budget (<= 3 noticeable movers, the boat entering away from the beats, one far walker per towpath, steam,
+parapet pigeons once); nothing new in 12.78-13.18. Then the depth section (when it lands), one combined critic, report.
+
 
 **Done:** reading and planning only; no scene code written yet (`src/v2r/scenes/V2S2.tsx` is still the engine placeholder).
 Setup checked: `npm ci` OK, the headless shell path in remotion.config.ts exists, `CanalSample-S2` renders
