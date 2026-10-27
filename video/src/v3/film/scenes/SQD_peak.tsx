@@ -14,11 +14,12 @@ import {MemoryStick, STICK_RATIO} from '../kit';
 import {StickDetail} from '../kit/S8_stick';
 import {Rim, ContactShadow, polyD} from '../kit/Light';
 import {T9} from './S9_tones';
-import {SUMMIT} from './SQD_rig';
 
 type Pt = [number, number];
 const f1 = (v: number) => v.toFixed(2);
 
+/** The summit of the mountain (H2 px): outside's frame (flow_v2 §3). */
+export const SUMMIT: Pt = [800, 640];
 export const PEAK = {x: SUMMIT[0], y: SUMMIT[1], base: 1010, tanL: Math.tan((33 * Math.PI) / 180), tanR: Math.tan((31 * Math.PI) / 180)};
 const X1 = 1260;
 /** The pile's tones (S9's gold memory at the far plane's mix: L 71 / C 36, the warmest far shape), + its lit tops. */
