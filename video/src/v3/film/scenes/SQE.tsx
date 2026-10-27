@@ -16,19 +16,20 @@
 import React from 'react';
 import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
-import {useFilmTime} from '../../../lib/sequence';
 import {EMBER, FILM_TOD} from '../kit';
 import {H2View} from './h2_window';
-import {FrontStandIn} from './SQE_front';
+import {CrateHop, FilmClock, useFilmT} from './outside';
+import {FrontStandIn, frontSpot, listingScreenAt} from './SQE_front';
 
 /** The H2 picture at film time (shared by SQE and SQF: the J5 seam is the same drawing). */
 export const H2Scene: React.FC = () => {
-  const T = useFilmTime();
+  const T = useFilmT();
   return (
-    <>
+    <FilmClock>
       <H2View />
       <FrontStandIn T={T} />
-    </>
+      <CrateHop to={listingScreenAt(frontSpot(T).s)} />
+    </FilmClock>
   );
 };
 

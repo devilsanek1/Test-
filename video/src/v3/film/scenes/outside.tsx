@@ -1,6 +1,6 @@
 // scenes/outside.tsx: THE OUTSIDE at H2 (the WINDOW lane owns it; docs/v3/flow_v2.md §3): one geography seen from our
 // window, standing at the glass. SQD draws it through its own camera (the pull-back lands on it), SQE and SQF through
-// h2_window's cameras; every builder draws it read-only, on FILM time (wrap nothing: each plane reads useFilmTime()
+// h2_window's cameras; every builder draws it read-only, on FILM time (each plane reads useFilmT(): film seconds, also inside a
 // itself and gives its kit pieces film time), so the frames match bit for bit across J4 and J5.
 //
 // H2 at rest (canvas px): flat sky behind the caption band (white captions); horizon y 930: THE DATA CENTER (S9's hall,
@@ -23,13 +23,13 @@
 // 33.50-34.40 B leaves up the road; 34.60 the notice flips to 2027; 35.22-36.25 two DC trucks overtake the BETTER van
 // (nudged back 35.62) and take the pool; 36.98 the data center's sign steps up one value (SQF), then the street holds,
 // alive and calm. Tiers follow the beat (flow_v2 §5): the beat's subject gets the one outline and the motion.
-import React, {useId} from 'react';
+import React, {createContext, useContext, useId} from 'react';
 import {TimeProvider, clamp, ease, prog, useTime} from '../../../lib/time';
 import {mat, XG, type Mat} from '../../../lib/xf';
 import {rng} from '../../../lib/rng';
 import {Tier} from '../../../lib/tier';
 import {useFilmTime} from '../../../lib/sequence';
-import {EMBER, BirdV, ChipFactory, SnowLayers, windowLit, Txt, type Pt} from '../kit';
+import {EMBER, BirdV, SnowLayers, windowLit, puffs, Txt, type Pt} from '../kit';
 import {ContactShadow, LightPool, Lit, RIGS, ShadowLayer, mixHex, useLightOff, withKey, streetLamp} from '../kit/Light';
 import {CrateBox, CrateFlight, crateFlightPose, ellD, FleetVan, fleetVanGeo, NoticeFlip, rrect, roundPoly, type FleetVariant} from '../kit/Fleet';
 import {CornerCloud, HighClouds, CloudBank, FarGround, InfinityLine, FarField, HallB, HallPlume, HallFans, Hall, HALL, HALL_GEO, HORIZON as S9_HORIZON} from './S9_far';
@@ -84,13 +84,25 @@ export const H2_BEATS = {
 
 // ---------------------------------------------------------------- film clock
 
-/** Gives everything inside FILM seconds as useTime() (kit pieces' own idle clocks: blinking lights, steam, snow). */
+const FilmTCtx = createContext<number | null>(null);
+/** Film seconds here: useFilmTime(), or the film time a FilmClock above already set (inside one, useFilmTime() would
+ *  read its own time base as a shift: nested shared pieces must call THIS). */
+export function useFilmT(): number {
+  const c = useContext(FilmTCtx);
+  const f = useFilmTime();
+  return c ?? f;
+}
+
+/** Gives everything inside FILM seconds as useTime() (kit pieces' own idle clocks: blinking lights, steam, snow); it
+ *  nests (useFilmT keeps the film's seconds). */
 export const FilmClock: React.FC<{children?: React.ReactNode}> = ({children}) => {
-  const T = useFilmTime();
+  const T = useFilmT();
   return (
-    <TimeProvider offset={0} global={T}>
-      {children}
-    </TimeProvider>
+    <FilmTCtx.Provider value={T}>
+      <TimeProvider offset={0} global={T}>
+        {children}
+      </TimeProvider>
+    </FilmTCtx.Provider>
   );
 };
 
@@ -236,7 +248,7 @@ export const H2_SIGN = (() => {
 })();
 /** S9's pieces run on S9's clock (film seconds - 19.40), as they did in the reveal: one motion across J4. */
 const S9Clock: React.FC<{children?: React.ReactNode}> = ({children}) => {
-  const T = useFilmTime();
+  const T = useFilmT();
   return (
     <TimeProvider offset={19.4} global={T}>
       {children}
@@ -250,7 +262,7 @@ const S9Clock: React.FC<{children?: React.ReactNode}> = ({children}) => {
  *  covers their foot). From 36.98 the sign steps up one value (one lighter frame round the panel: no glow disc).
  *  `summit` = draw the summit stick (SQD draws its own J3 stick in screen px). */
 export const OutsideFar: React.FC<{streams?: React.ReactNode; summit?: boolean}> = ({streams, summit = true}) => {
-  const T = useFilmTime();
+  const T = useFilmT();
   const signUp = T >= H2_BEATS.sign;
   const s = H2_SIGN;
   return (
@@ -353,10 +365,45 @@ const HouseRow: React.FC<{hs: House[]; seed: string; T: number}> = ({hs, seed, T
   );
 };
 
+/** The chip factory behind its wall (calm C: a step toward the sky, no line): a low sawtooth roof whose north
+ *  glazing glows warm, snow on the long slopes, one chimney whose steam rises slowly and shrinks to nothing well under
+ *  the caption band. */
+const FAB = {x0: 600, x1: 944, base: 1004, h: 34, teeth: 4, tooth: 30, chim: {x: 896, w: 18, top: 900}};
+const FAB_BRICK = mixHex(EMBER.brick, EMBER.sky, 0.3);
+const FAB_SHADE = mixHex(EMBER.brickShade, EMBER.sky, 0.3);
+const FactoryRoof: React.FC<{T: number}> = ({T}) => {
+  const {x0, x1, base, h, teeth, tooth, chim} = FAB;
+  const top = base - h;
+  const tw = (x1 - x0) / teeth;
+  let roof = `M${x0} ${base}V${top}`;
+  let glaze = '';
+  let snow = '';
+  for (let i = 0; i < teeth; i++) {
+    const a = x0 + i * tw;
+    roof += `L${f1(a + tw * 0.78)} ${top - tooth}L${f1(a + tw * 0.78)} ${top}L${f1(a + tw)} ${top}`;
+    glaze += `M${f1(a + tw * 0.8)} ${top - tooth + 6}L${f1(a + tw * 0.97)} ${top - 2}L${f1(a + tw * 0.8)} ${top - 2}Z`;
+    snow += `M${f1(a - 1)} ${top + 1}L${f1(a + tw * 0.78)} ${top - tooth - 2}L${f1(a + tw * 0.78)} ${top - tooth + 5}L${f1(a + 6)} ${top + 3}Z`;
+  }
+  roof += `V${base}Z`;
+  const ps = puffs(T, {n: 4, life: 3.4, rise: 120, drift: 26, r0: 4, r1: 11, wobble: 3, seed: 'h2/fab', ceil: 700}, chim.top - 6);
+  return (
+    <>
+      {ps.map((q, i) => (
+        <path key={i} d={ellD(chim.x + chim.w / 2 + q.x, chim.top - 6 + q.y, q.r * 1.25, q.r)} fill={mixHex(EMBER.snow, EMBER.sky, 0.3)} />
+      ))}
+      <path d={rrect(chim.x, chim.top, chim.w, base - chim.top, 2)} fill={FAB_SHADE} />
+      <path d={rrect(chim.x - 3, chim.top - 4, chim.w + 6, 6, 2)} fill={EMBER.snow} />
+      <path d={roof} fill={FAB_BRICK} />
+      <path d={glaze} fill={useLightOff() ? EMBER.houseLit : '#F2C98E'} />
+      <path d={snow} fill={EMBER.snow} />
+    </>
+  );
+};
+
 /** The town on the horizon, the road up to the data center, the chip factory behind its wall. `onRoad` = what drives
  *  on the road between the back houses and the front ones (SQD's trucks: a slot). */
 export const OutsideTown: React.FC<{onRoad?: React.ReactNode}> = ({onRoad}) => {
-  const T = useFilmTime();
+  const T = useFilmT();
   return (
     <FilmClock>
       <Tier tier="environment" bg={EMBER.sky}>
@@ -368,8 +415,8 @@ export const OutsideTown: React.FC<{onRoad?: React.ReactNode}> = ({onRoad}) => {
         <path d={[[318, 1046], [346, 1000], [372, 962]].map(([x, y]) => ellD(x, y, 2.6, 2.6)).join('')} fill={'#FFE2B0'} />
         {onRoad}
         <HouseRow hs={TOWN.front} seed="h2/townF" T={T} />
-        {/* the chip factory, behind its wall: sawtooth roof, chimney with slow steam (under the caption band) */}
-        <ChipFactory x={800} y={1004} w={300} doorLit={false} steam={150} seed="h2/fab" />
+        {/* the chip factory, behind its wall: a low sawtooth roof, its glazing lit, a chimney with slow soft steam */}
+        <FactoryRoof T={T} />
       </Tier>
     </FilmClock>
   );
@@ -501,7 +548,7 @@ function barrier(T: number): number {
 /** Our street: ground, the factory's wall and gate, the booth and barrier, the floodlight and its pool, the notice,
  *  the queue, the workers, the walkers, the snow. */
 export const OutsideStreet: React.FC = () => {
-  const T = useFilmTime();
+  const T = useFilmT();
   const B = H2_BEATS;
   const off = useLightOff();
   const id = 'h2s' + useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -511,7 +558,6 @@ export const OutsideStreet: React.FC = () => {
   const G = H2_GATE;
   const W = H2_WALL;
   const crate = vanCrateAt(T);
-  const hop = crate || T < B.hop ? null : crateHop(T);
   // faces of the notice: the queue rule, the 5x (27.08), 2027 (34.60)
   const faces = [
     {t: -99, node: <FaceQueue />},
@@ -582,7 +628,7 @@ export const OutsideStreet: React.FC = () => {
         {ws.map((w, i) => (w.y < 1150 ? <Worker key={`wb${i}`} {...w} /> : null))}
         {vs.map((v) => (
           <React.Fragment key={v.id}>
-            <FleetVan x={v.x} y={v.y} w={VAN_W * v.k} variant={v.variant} dir={v.dir} line={v.line} roll={v.roll} lift={off ? 0 : poolLift(v.x, v.y, VAN_W * v.k)} />
+            <FleetVan x={v.x} y={v.y} w={VAN_W * v.k} variant={v.variant} dir={v.dir} line={v.line} roll={v.roll} lift={off || v.variant === 'dc' ? 0 : poolLift(v.x, v.y, VAN_W * v.k)} />
             {v.crate && crate ? <CrateBox x={crate.x} y={crate.y} w={crate.w} line={T >= B.vanGo - 0.1} /> : null}
           </React.Fragment>
         ))}
@@ -595,7 +641,6 @@ export const OutsideStreet: React.FC = () => {
           <path d={[0, 2, 4].map((i) => rrect(334 + 10 + i * 20, 1155, 18, 10, 1)).join('')} fill={EMBER.beam} />
         </XG>
         <path d={rrect(328, 1150, 12, 52, 3)} fill={EMBER.dcSide} />
-        {hop ? <CrateBox x={hop.x} y={hop.y + (hop.w * 0.62) / 2} w={hop.w} rot={hop.rot} line /> : null}
         {/* falling snow (far + mid), kept under the caption band */}
         <clipPath id={id}>
           <rect x={-200} y={612} width={1480} height={1400} />
@@ -620,12 +665,21 @@ const CRATE_ON = (() => {
   return {from: [590, 1128] as Pt, to, t0: H2_BEATS.crate - 0.24, t1: H2_BEATS.crate + 0.02, arc: 40, w0: 22, w1: 34, rot0: -12, rot1: 0};
 })();
 
-/** The hop: from the van's roof over the sill into the listing laptop (29.90-30.25, shrinking into the screen). */
-export function crateHop(T: number) {
+/** The hop: from the van's roof over the sill into the listing laptop (29.90-30.25, shrinking into the screen), in
+ *  SCREEN px (the push has released by 29.60: the street plane is at rest). `to` = the thread plane's listing laptop
+ *  screen (default H2_CRATE_TO). Drawn ABOVE the front plane (it lands in the phone): <CrateHop> in the sequence. */
+export function crateHop(T: number, to: Pt = H2_CRATE_TO) {
   const c = vanCrateAt(H2_BEATS.hop - 1 / 60);
   if (!c) return null;
-  return crateFlightPose(T, {from: [c.x, c.y - 10], to: H2_CRATE_TO, t0: H2_BEATS.hop, t1: H2_BEATS.hopEnd, arc: 90, w0: 34, w1: 18, rot0: 0, rot1: -14});
+  return crateFlightPose(T, {from: [c.x, c.y - 10], to, t0: H2_BEATS.hop, t1: H2_BEATS.hopEnd, arc: 90, w0: 34, w1: 16, rot0: 0, rot1: -14});
 }
+
+/** The crate's hop drawn in screen px over the front plane (the subject's outline). */
+export const CrateHop: React.FC<{to?: Pt}> = ({to}) => {
+  const T = useFilmT();
+  const q = crateHop(T, to);
+  return q ? <CrateBox x={q.x} y={q.y + (q.w * 0.62) / 2} w={q.w} rot={q.rot} line /> : null;
+};
 
 /** A walker with a dog on the far pavement (C: flat, no line, slow). */
 const Walker: React.FC<{x: number; y: number; dir: 1 | -1; T: number}> = ({x, y, dir, T}) => {
