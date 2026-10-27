@@ -7,7 +7,7 @@
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
-import {line, arc as arcInk} from '../../lib/sketch';
+import {arc as arcInk, circle as circleInk} from '../../lib/sketch';
 import {Batch, Paint, P, rng, ovalPath, leafPath} from '../kit/canal/core';
 import type {Pt} from '../kit/canal/core';
 import {Levels} from './V2S3_nboat';
@@ -33,40 +33,34 @@ function logsInto(L: Levels) {
   const {x0, x1, y} = ND.logs;
   const r = rng('s3nd/logs');
   groundShadow(L.at(0), x0, x1, y, 96, 16);
-  // rows of split-log ends (wedges and rounds), bottom row widest; bark behind them
+  // a pile of split logs seen end-on, like the roof's (V2S4's) log pile: each a bark round (warm brown) with its cut
+  // end (cream; the middle row golden) and growth rings; rows staggered, the pile narrowing to the top
   const rows = [
-    {n: 6, y: y - 12, r: 13},
-    {n: 5, y: y - 35, r: 12.5},
-    {n: 4, y: y - 57, r: 12},
+    {n: 6, y: y - 13, r: 13},
+    {n: 5, y: y - 37, r: 12.5},
+    {n: 4, y: y - 60, r: 12},
   ];
   const bark = L.at(1);
-  bark.poly(CM.line, [[x0 - 4, y], [x1 + 4, y], [x1 - 14, y - 72], [x0 + 16, y - 72]]);
   const end = L.at(2);
   const ring = L.at(3);
   let rings = '';
+  let outline = '';
   for (const [k, row] of rows.entries()) {
     const span = (x1 - x0) * (1 - k * 0.16);
     const cx0 = (x0 + x1) / 2 - span / 2 + row.r;
     for (let i = 0; i < row.n; i++) {
-      const cx = cx0 + ((span - row.r * 2) * i) / Math.max(1, row.n - 1) + r.jitter(2);
-      const cy = row.y + r.jitter(1.5);
-      const rr = row.r * r.range(0.86, 1.08);
-      const wedge = r.chance(0.5);
-      if (wedge) {
-        const a = r.range(0, Math.PI * 2);
-        const pts: Pt[] = [];
-        for (let q = 0; q < 3; q++) {
-          const ang = a + (q * Math.PI * 2) / 3;
-          pts.push([cx + Math.cos(ang) * rr * 1.15, cy + Math.sin(ang) * rr * 1.05]);
-        }
-        end.poly(CM.coatOat, pts);
-      } else end.fill(CM.coatOat, ovalPath(cx, cy, rr, rr * 0.94));
-      ring.fill(CM.leafGold, ovalPath(cx + 1, cy + 1, rr * 0.42, rr * 0.38));
-      rings += arcInk(cx, cy, rr * 0.7, rr * 0.66, 30, 250, {seed: `s3nd/r${k}${i}`});
+      const cx = cx0 + ((span - row.r * 2) * i) / Math.max(1, row.n - 1) + r.jitter(1.5);
+      const cy = row.y + r.jitter(1.2);
+      const rr = row.r * r.range(0.9, 1.06);
+      bark.fill(CM.line, ovalPath(cx, cy, rr * 1.12, rr * 1.02));
+      end.fill(k === 1 ? CM.leafGold : CM.coatOat, ovalPath(cx + 0.8, cy + 0.6, rr * 0.82, rr * 0.74));
+      rings += circleInk(cx + 0.8, cy + 0.6, rr * 0.34, {seed: `s3nd/r${k}${i}`, wobble: 0.05});
+      if (r.chance(0.45)) rings += `M${P(cx + 0.8, cy + 0.6)}L${P(cx + 0.8 + rr * 0.7, cy + 0.6 - rr * 0.3)}`;
+      if (k === rows.length - 1 || i === 0 || i === row.n - 1) outline += arcInk(cx, cy, rr * 1.12, rr * 1.02, 180, 330, {seed: `s3nd/o${k}${i}`});
     }
   }
-  ring.ink(rings, 1.1, CM.line);
-  ring.ink(line(x0 - 4, y, x1 + 4, y, {seed: 's3nd/logBase', over: 'small', drift: 0.1}), INK_PX.far, CM.ink, 0.3);
+  ring.ink(rings, 1, CM.line);
+  ring.ink(outline, INK_PX.hair, CM.ink, 0.3);
 }
 
 function sackInto(L: Levels) {

@@ -477,23 +477,23 @@ const wrapX = (px: number, off: number) => NX0 + frac((px + off - NX0) / NSPAN) 
 function nearLayout() {
   const r = rng('s4near');
   const refl: {px: number; len: number; y: number; h: number; row: number; keep: number}[] = [];
-  const rows = [5, 13, 22, 32, 43, 56, 71, 89, 110];
+  const rows = [4, 11, 19, 29, 41, 56, 74];
   rows.forEach((dy, k) => {
     const keep = 1 - k / rows.length;
     let px = NX0 + r.range(0, 30);
     while (px < NX1) {
-      const len = r.range(22, 80) * (0.5 + keep * 0.6);
-      const dens = k === 3 ? 0.35 : 0.25 + keep * 0.65;
+      const len = (k < 3 ? r.range(60, 150) : r.range(22, 70)) * (0.5 + keep * 0.6);
+      const dens = k < 3 ? 0.85 : k === 3 ? 0.22 : 0.15 + keep * 0.45;
       if (r.chance(dens)) refl.push({px, len, y: NY0 + dy + r.jitter(1.8 + k * 0.3), h: 3.6 + k * 0.6 + r.range(0, 1.4), row: k, keep});
-      px += len + r.range(10, 40) * (1.4 - keep * 0.7);
+      px += len + (k < 3 ? r.range(4, 14) : r.range(14, 46) * (1.4 - keep * 0.7));
     }
   });
-  const rip = Array.from({length: 44}, () => {
+  const rip = Array.from({length: 30}, () => {
     const v = r.next();
     return {px: r.range(NX0, NX1), y: NY0 + 34 + v * (NY1 - NY0 - 44), s: lerp(1, 2, v), w: r.range(30, 92)};
   });
-  const foam = Array.from({length: 30}, () => ({px: r.range(NX0, NX1), len: r.range(24, 70), dy: r.range(-2, 5)}));
-  const glints = Array.from({length: 18}, () => ({x: r.range(XL, XR), y: NY0 + 26 + r.next() * (NY1 - NY0 - 36), per: r.range(1.2, 2.6), ph: r.next()}));
+  const foam = Array.from({length: 22}, () => ({px: r.range(NX0, NX1), len: r.range(24, 64), dy: r.range(-2, 4)}));
+  const glints = Array.from({length: 10}, () => ({x: r.range(XL, XR), y: NY0 + 40 + r.next() * (NY1 - NY0 - 50), per: r.range(1.4, 2.8), ph: r.next()}));
   const leaves = Array.from({length: 13}, (_, i) => ({px: r.range(NX0, NX1), y: r.range(NY0 + 44, NY1 - 24), rot: r.range(-30, 30), i}));
   const twigs = Array.from({length: 2}, (_, i) => ({px: r.range(NX0, NX1), y: r.range(NY0 + 70, NY1 - 40), i}));
   return {refl, rip, foam, glints, leaves, twigs};
@@ -549,14 +549,14 @@ export const NearWater: React.FC<{lay: ReturnType<typeof nearLayout>}> = ({lay})
     const ux = (w.x1 - w.x0) / L;
     const uy = (w.y1 - w.y0) / L;
     const reach = L * (0.15 + 0.85 * go);
-    const flow = (t * (60 + 160 * go) + i * 37) % 90;
-    for (let s = -flow; s < reach; s += 90) {
+    const flow = (t * (60 + 160 * go) + i * 37) % 130;
+    for (let s = -flow; s < reach; s += 130) {
       if (s < 0) continue;
       const len = Math.min(52, reach - s) * (0.6 + 0.4 * go);
       if (len < 6) continue;
       const ax = w.x0 + ux * s;
       const ay = w.y0 + uy * s;
-      const th = 2.8 - (s / L) * 1.4;
+      const th = 2.0 - (s / L) * 1.0;
       b.fill(CM.paper, `M${P(ax, ay)}L${P(ax + ux * len, ay + uy * len)}L${P(ax + ux * len - 2, ay + uy * len + th)}L${P(ax - 2, ay + th)}Z`);
     }
   });

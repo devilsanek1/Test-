@@ -17,7 +17,7 @@
 //              stair light following her up (34.80-35.40), the knocker's jolt on the latch (34.75).
 //   THE LAMP RUN on "facts" (lampRunAt): 'houseLamp', 'carriageR', 'festoon' (16 bulbs strung right -> left under the
 //              first-floor sills, 0.03 s apart, the first one IN FRAME lighting at its slot), 'carriageL', 'canalLamp1',
-//              'canalLamp2' (and the far street lamp after them): a 3-frame flicker each, unlit glass before, all alike.
+//              'canalLamp2' (and the far street lamp after them): each switches on ONCE (STYLE.md flash safety), unlit glass before, all alike.
 //   S8Window   W (LateExit: it un-builds last): TerraceRow's French window for her house on exactly W (860, 700)
 //              150 x 170 (its frame's head trimmed to 7 px so the 1.05 push keeps it under the band): dim until 34.95,
 //              the lamp clicks on (3 frames), lamp-lit after (blind up, the standard lamp, the shelf, plants); from
@@ -115,8 +115,8 @@ const FR_QUAD: [Pt, Pt, Pt, Pt] = [
 
 // ---------------------------------------------------------------- small helpers
 
-/** On from `at` with the kit lamps' 3-frame flicker (on, off, off, on). */
-const flickOn = (t: number, at: number) => t >= at && !(t >= at + 1 / 60 && t < at + 3 / 60);
+/** On from `at`, ONCE (STYLE.md flash safety: a lamp, bulb or window switches on once; the kit Lamp's 3-frame flicker is dropped). */
+const flickOn = (t: number, at: number) => t >= at;
 const smooth01 = (u: number) => {
   const c = clamp(u);
   return c * c * (3 - 2 * c);
@@ -970,12 +970,12 @@ export const S8House: React.FC = () => {
       </defs>
       {/* beyond the bend */}
       <Paint b={beyond.b} seed="s8h/beyond" />
-      <Lamp x={622} y={943} h={84} seed="s8h/farLamp" lightAt={farLampAt} />
+      <Lamp x={622} y={943} h={84} seed="s8h/farLamp" on={t >= farLampAt} />
       <EarlyExit>
         <Puffs x={632} y={742} seed="s8h/frSmoke" kind="smoke" scale={0.5} ceil={TOP + 4} drift={-24} />
       </EarlyExit>
       {CANAL_LAMPS.map((c) => (
-        <Lamp key={c.id} x={c.x} y={c.y} h={c.h} seed={`s8h/${c.id}`} lightAt={lampRunAt(c.id)} />
+        <Lamp key={c.id} x={c.x} y={c.y} h={c.h} seed={`s8h/${c.id}`} on={t >= lampRunAt(c.id)} />
       ))}
       {/* the terrace */}
       <Paint b={facade} seed="s8h/facade" />
@@ -1004,7 +1004,7 @@ export const S8House: React.FC = () => {
       {/* the forecourt and the heritage lamp (nearest), then the pigeons (one lands on the lamp) */}
       <Paint b={forecourt} seed="s8h/forecourt" />
       {spill ? <Paint b={spill} seed="s8h/spill" misreg={false} /> : null}
-      <Lamp x={HOUSE_LAMP.x} y={HOUSE_LAMP.y} h={HOUSE_LAMP.h} seed="s8h/houseLamp" lightAt={lampRunAt('houseLamp')} />
+      <Lamp x={HOUSE_LAMP.x} y={HOUSE_LAMP.y} h={HOUSE_LAMP.h} seed="s8h/houseLamp" on={t >= lampRunAt('houseLamp')} />
       <EarlyExit>
         <Paint b={pg} seed="s8h/pigeons" misreg={false} />
       </EarlyExit>
