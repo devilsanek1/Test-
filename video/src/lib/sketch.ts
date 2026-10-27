@@ -35,8 +35,8 @@ export const penMode = (): PenMode => PEN;
 // The FULL clean pen (lib/pen.ts setPen('clean'): v3's rework) is stricter than 'clean' above and is read at call time
 // (strictPen()): every rect / closed poly / loop is ONE subpath closed with Z, straight lines are ruler-true (no bow),
 // loops are true ellipses (wobble <= 0.01 only when asked), polylines are one joined stroke, no glint pairs, and the
-// texture marks (hatch, scribbleMass, wallTicks, crownTicks, speedLines) draw nothing. Off by default: v1 / v2 / v2r
-// paths are byte-identical.
+// texture marks and board notation (hatch, scribbleMass, wallTicks, crownTicks, speedLines, scribble, cross) draw
+// nothing (docs/look/CRAFT.md §c). Off by default: v1 / v2 / v2r paths are byte-identical.
 
 // ---------------------------------------------------------------- memoisation
 // All path generators are pure, so results are cached by (name, args). Kit components call them on every
@@ -518,8 +518,10 @@ function _arrow(x1: number, y1: number, x2: number, y2: number,
   const shaft = line(x1, y1, x2, y2, {seed: `${seed}/s`, over: [r.range(0, 4), 0], bow: o.bow, breaks: o.breaks, jitter: o.jitter, drift: o.drift});
   const a = Math.atan2(y2 - y1, x2 - x1) + Math.PI;
   const h1 = `M${P(x2 + Math.cos(a - spread) * head, y2 + Math.sin(a - spread) * head)}L${P(x2, y2)}`;
-  const hk = strictPen() ? 1 : r.range(0.85, 1.1);
-  const h2 = `L${P(x2 + Math.cos(a + spread) * head * hk, y2 + Math.sin(a + spread) * head * hk)}`;
+  // the sketch pen draws two separate factors (x, then y): keep both draws, in order, so its paths stay identical
+  const hx = strictPen() ? 1 : r.range(0.85, 1.1);
+  const hy = strictPen() ? 1 : r.range(0.85, 1.1);
+  const h2 = `L${P(x2 + Math.cos(a + spread) * head * hx, y2 + Math.sin(a + spread) * head * hy)}`;
   return shaft + h1 + h2;
 }
 export const arrow = memo('arrow', _arrow);
@@ -538,6 +540,7 @@ export const check = memo('check', _check);
 
 /** Cross mark: two overshooting diagonal strokes centred at (x,y). */
 function _cross(x: number, y: number, size = 80, o: {seed?: Seed} = {}): string {
+  if (strictPen()) return ''; // board notation: G3 only (CRAFT §c)
   const seed = o.seed ?? autoSeed(x, y, size, 2);
   const h = size / 2;
   return (
@@ -610,6 +613,7 @@ export const speedLines = memo('speedLines', _speedLines);
 
 /** Zig-zag scribble (crossing things out). */
 function _scribble(x: number, y: number, w: number, h: number, o: {seed?: Seed; n?: number} = {}): string {
+  if (strictPen()) return ''; // board notation: G3 only (CRAFT §c)
   const r = rng(o.seed ?? autoSeed(x, y, w, h, 13));
   const n = o.n ?? 6;
   const pts: Pt[] = [];

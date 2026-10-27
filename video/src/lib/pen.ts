@@ -3,7 +3,7 @@
 // read it at render time and get the tier of what they draw from lib/tier.tsx (a React context the kit sets).
 // Owner, 2026-10-27 (v3 G5b): "too busy ... too rough and messy, a lot of rough lines, not looking clean at all ...
 // cleaner, more refined, gentle, premium"; the supporting life "a bit more subtle but yet alive". Measured spec:
-// docs/look/CRAFT.md (the retro) and src/v3/film/kit/README.md "Clean pen and tiers".
+// docs/look/CRAFT.md §b-§c (the retro: it wins) and src/v3/film/kit/README.md "Clean pen and tiers".
 //
 //   setPen('clean', {bg: EMBER.wall, emissive: [...]})   // once, at module load, in a film's look module (v3: look.ts)
 //
@@ -14,19 +14,21 @@
 // CLEAN: every shape is ONE subpath (a rect or a closed poly ends in Z, round joins), straight edges ruler-true (no
 //   bow), loops are true ellipses closed with Z, no overshoot, breaks, jitter, open contours, taper, width noise or
 //   loosening on the un-build, no texture marks (ticks, hatching, scribble); fills registered exactly. And the ink is
-//   set by ATTENTION TIER, not by depth:
-//   subject      the story's 1-3 objects (THE laptop, the tag, the phone, you, the stick, the chart): a clean line in
-//                the object's OWN deep shade (its tone L* -35, hue kept, never below L* 16; no tone: a deep warm
-//                brown, never near-black), widths x0.88 of the authored (3.4 -> 3.0 contour, 2.2 -> 1.9 detail,
-//                1.6 -> 1.4 hair; <= 3.4). Fills and motion untouched.
-//   support      what the story touches and the supporting life (the desk, the window, the lamp, Pip, people near,
-//                the van): tone-on-tone lines x0.53 (3.4 -> 1.8, 1.0-2.2 px) in the tone's shade (-22 L*), or with
-//                no tone a deep warm brown at 42 % over whatever is under it; specks under 8 px dropped; fills pulled
-//                10 % toward the background, chroma x0.9 (<= 40); motion x0.6.
-//   environment  dressing and ambient life (the shelves' contents, plants, mugs, crowds far, birds, snow, the town):
-//                NO contours and no contour strokes; only strokes that ARE the thing (wires, strings, a bird's V)
-//                as faint hairlines (0.9-1.6 px); fills pulled 22 % toward the background, chroma x0.8 (<= 34);
-//                motion x0.4.
+//   set by ATTENTION TIER (CRAFT §b), by story role, never by depth:
+//   subject      A: the beat's 1-3 objects (THE laptop, the tag, the phone, you, the stick, the chart): the only full
+//                outline, in the object's OWN deep shade (its tone L* -35, hue kept, never below L* 16; no tone: a deep
+//                warm brown, never near-black), widths x0.88 of the authored (3.4 -> 3.0 outline, 2.2 -> 1.9 detail,
+//                1.6 -> 1.4 hair; <= 3.0); an outline given `inside` (its fill) is drawn inside the fill at 2x, so
+//                the silhouette is the clean fill edge. Fills and motion untouched.
+//   support      B: supporting life (Pip, people, an audience, steam) and story objects off-beat (the data center):
+//                NO outline: shapes part by value; a scope with `lines` (close values touch; the mascot) draws
+//                same-hue lines x0.53 (3.4 -> 1.8; 1.4-2.2 px) at the tone's L* -20, or with no tone a deep warm
+//                brown at 42 % over what is under it; fills pulled 10 % toward the background, chroma x0.85 (<= 30);
+//                motion x0.5.
+//   environment  C: the room, shelves, desk dressing, the street, the town, weather: NO line. Strokes that ARE the
+//                thing (wires, rails, a bird's V) as hairlines 1.2-1.6 px near their background's value; fills
+//                pulled 22 % toward the background, chroma x0.8 (<= 34); motion x0.4.
+//   Untagged ink (a scene's own hand-drawn pieces) is 'support' WITH lines (thin, tinted) until the scene tiers it.
 //   On every tier: a LIGHT line (an ink lighter than L* 64: glints, snow edges, rims) stays light and <= 1.8 px; a
 //   GRAPHIC mark (a stroke >= 6 px wide, or dashed: the lamp rod, a mug handle, key rows) keeps its width and colour;
 //   a backdrop fill (>= ~30 % of the frame: the wall, the sky, the desk plane) and an EMISSIVE colour (lit windows,
@@ -64,16 +66,18 @@ export type TierSpec = {
 };
 
 export const CLEAN_TIERS: Record<Tier, TierSpec> = {
-  subject: {k: 0.88, min: 1.2, max: 3.4, drop: 35, floor: 16, color: '#4B2A1E', alpha: 1, contours: true, strokes: true, minStroke: 0, pull: 0, chromaK: 1, chromaMax: 200, motion: 1},
-  support: {k: 0.53, min: 1.0, max: 2.2, drop: 22, floor: 20, color: '#5A2E1E', alpha: 0.42, contours: true, strokes: true, minStroke: 8, pull: 0.1, chromaK: 0.9, chromaMax: 40, motion: 0.6},
-  environment: {k: 0.4, min: 0.9, max: 1.6, drop: 14, floor: 24, color: '#5A2E1E', alpha: 0.26, contours: false, strokes: false, minStroke: 24, pull: 0.22, chromaK: 0.8, chromaMax: 34, motion: 0.4},
+  subject: {k: 0.88, min: 1.2, max: 3.0, drop: 35, floor: 16, color: '#4B2A1E', alpha: 1, contours: true, strokes: true, minStroke: 0, pull: 0, chromaK: 1, chromaMax: 200, motion: 1},
+  support: {k: 0.53, min: 1.4, max: 2.2, drop: 20, floor: 20, color: '#5A2E1E', alpha: 0.42, contours: false, strokes: false, minStroke: 8, pull: 0.1, chromaK: 0.85, chromaMax: 30, motion: 0.5},
+  environment: {k: 0.4, min: 1.2, max: 1.6, drop: 14, floor: 24, color: '#5A2E1E', alpha: 0.22, contours: false, strokes: false, minStroke: 24, pull: 0.22, chromaK: 0.8, chromaMax: 34, motion: 0.4},
 };
 
 export type PenConfig = {
   mode: PenMode;
   tiers: Record<Tier, TierSpec>;
-  /** The tier of Ink / Fill drawn outside any tier scope (a scene's own hand-drawn pieces). */
+  /** The tier of Ink / Fill drawn outside any tier scope (a scene's own hand-drawn pieces) ... */
   untagged: Tier;
+  /** ... and whether its contours and strokes are drawn (as the tier's tinted lines) until the scene tiers them. */
+  untaggedLines: boolean;
   /** The background the calmer tiers' fills are pulled toward (a tier scope's `bg` wins: e.g. the sky outdoors). */
   bg: string;
   /** Fills at least this big (sqrt of the frame fraction, camera excluded; 0.55 = 30 % of the frame) are backdrops. */
@@ -94,6 +98,7 @@ export const PEN: PenConfig = {
   mode: 'sketch',
   tiers: {subject: {...CLEAN_TIERS.subject}, support: {...CLEAN_TIERS.support}, environment: {...CLEAN_TIERS.environment}},
   untagged: 'support',
+  untaggedLines: true,
   bg: '#F6E3D4',
   backdrop: 0.55,
   light: 64,
@@ -108,6 +113,7 @@ export const isClean = () => PEN.mode === 'clean';
 
 export type SetPenOpts = {
   untagged?: Tier;
+  untaggedLines?: boolean;
   bg?: string;
   emissive?: string[];
   tiers?: Partial<Record<Tier, Partial<TierSpec>>>;
@@ -117,6 +123,7 @@ export type SetPenOpts = {
 export function setPen(mode: PenMode, o: SetPenOpts = {}) {
   PEN.mode = mode;
   if (o.untagged) PEN.untagged = o.untagged;
+  if (o.untaggedLines !== undefined) PEN.untaggedLines = o.untaggedLines;
   if (o.bg) PEN.bg = o.bg;
   if (o.emissive) PEN.emissive = new Set(o.emissive.map((c) => c.toUpperCase()));
   if (o.tiers) for (const k of Object.keys(o.tiers) as Tier[]) PEN.tiers[k] = {...PEN.tiers[k], ...o.tiers[k]};

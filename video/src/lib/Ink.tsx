@@ -18,7 +18,7 @@
 // in effect (lib/tier.tsx: subject = the object's own deep shade, support = thin tone-on-tone, environment = no
 // contours, only strokes marked `thing`); light lines stay light and thin; graphic marks (>= 6 px, dashed) keep theirs.
 
-import React, {useMemo} from 'react';
+import React, {useId, useMemo} from 'react';
 import {getBoundingBox, getLength, getPointAtLength} from '@remotion/paths';
 import {palette, stroke} from './theme';
 import {clamp, Ease, ease as E, prog, useTime} from './time';
@@ -165,6 +165,9 @@ export type InkProps = {
   graphic?: boolean;
   /** Clean pen: the fill this line bounds (the line is its shade). Default: the tier scope's tone. */
   tone?: string;
+  /** Clean pen: the closed fill this outline bounds (same coordinates). The outline is drawn INSIDE it at 2x width
+   *  (clipped to it), so the silhouette is the fill's own clean edge and no line overhangs (CRAFT §c, the subject). */
+  inside?: string;
 };
 
 type Seg = {i: number; a: number; b: number; w: number};
@@ -191,6 +194,7 @@ export const Ink: React.FC<InkProps> = ({
   thing,
   graphic,
   tone,
+  inside,
 }) => {
   const t = useTime();
   const e = useExit();
@@ -200,6 +204,8 @@ export const Ink: React.FC<InkProps> = ({
   const ks = useInkScale(); // opt-in camera ink compensation (inkComp.tsx): 1 outside an <InkScale>
   const scope = useTierScope();
   const local = useLocalScale();
+  const insideProj = useProjected(inside ?? '');
+  const clipUid = 'ki' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const jit = useMemo(() => rand(seed ?? dIn.slice(0, 40), 'ink'), [seed, dIn]);
   if (!look.ink) return null;
   // ---- clean pen: the tier sets width and colour; subpaths the tier does not draw are dropped (default pen: as authored)
@@ -211,8 +217,9 @@ export const Ink: React.FC<InkProps> = ({
   let taper = taper0;
   let open = open0;
   let d = dProj;
+  let clipTo: string | null = null;
   if (clean) {
-    const cl = cleanLine(scope?.tier ?? PEN.untagged, scope?.tone, colorProp, width0, local, {thing, graphic, tone, dash: !!dash});
+    const cl = cleanLine(scope, colorProp, width0, local, {thing, graphic, tone, dash: !!dash});
     width = cl.width;
     color = cl.color;
     if (cl.alpha < 1) opacity = (opacity0 ?? 1) * cl.alpha;
@@ -222,17 +229,68 @@ export const Ink: React.FC<InkProps> = ({
     if (cl.kind === 'ink' || cl.kind === 'tone' || cl.kind === 'light') {
       const P0 = parseInk(dProj);
       const shut = closedOf(P0);
-      const spec = cl.spec;
       const lineKind = cl.kind !== 'light';
+      const minS = thing || !lineKind ? Math.min(cl.spec.minStroke, 6) : cl.spec.minStroke;
       const keep = P0.subs.filter((_, i) => {
-        if (shut[i]) return thing || !lineKind || spec.contours;
-        if (lineKind && !thing && !spec.strokes) return false;
-        return P0.lens[i] * local >= (thing || !lineKind ? Math.min(spec.minStroke, 6) : spec.minStroke);
+        if (shut[i]) return thing || !lineKind || cl.contours;
+        if (lineKind && !thing && !cl.strokes) return false;
+        return P0.lens[i] * local >= minS;
       });
       if (!keep.length) return null;
       if (keep.length !== P0.subs.length) d = keep.join('');
     }
+    // the subject's outline inside its fill: 2x wide, clipped to the fill (CRAFT §c)
+    if (insideProj && (cl.kind === 'ink' || cl.kind === 'tone')) {
+      clipTo = insideProj;
+      width *= 2;
+    }
   }
+  if (clipTo) {
+    const body = <InkStrokes {...{d, at, t, dur, ease, width, ks, jit, vary, color, order, pace, opacity, seed, dIn, exit, e, sync, taper, open, dash, cap, join, style, clean}} />;
+    return (
+      <>
+        <defs>
+          <clipPath id={clipUid} clipPathUnits="userSpaceOnUse">
+            <path d={clipTo} />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${clipUid})`}>{body}</g>
+      </>
+    );
+  }
+  return <InkStrokes {...{d, at, t, dur, ease, width, ks, jit, vary, color, order, pace, opacity, seed, dIn, exit, e, sync, taper, open, dash, cap, join, style, clean}} />;
+};
+
+type InkStrokesProps = {
+  d: string;
+  dIn: string;
+  at?: number;
+  t: number;
+  dur?: number;
+  ease?: Ease;
+  width: number;
+  ks: number;
+  jit: number;
+  vary: number;
+  color: string;
+  order: 'seq' | 'all';
+  pace: 'spec' | 'free';
+  opacity?: number;
+  seed?: Seed;
+  exit: boolean;
+  e: number;
+  sync: ReturnType<typeof useExitSync>;
+  taper: boolean;
+  open: number;
+  dash?: string;
+  cap: 'round' | 'butt' | 'square';
+  join: 'round' | 'miter' | 'bevel';
+  style?: React.CSSProperties;
+  clean: boolean;
+};
+
+/** The strokes of one <Ink> (draw-on, taper tiers, open contours, un-build), after the pen has set its look. */
+const InkStrokes: React.FC<InkStrokesProps> = ({d, dIn, at, t, dur, ease, width, ks, jit, vary, color, order, pace, opacity, seed, exit, e, sync, taper, open, dash, cap, join, style, clean}) => {
   // un-build: retract after the fills (recipe), or WITH its group's fills inside an <ExitSync> (a figure in a crowd)
   const retract = sync ? exitInkSyncProgress(e, sync.jitter) : exitInkProgress(e, jit);
   const w = width * ks * (1 + (jit * 2 - 1) * vary);

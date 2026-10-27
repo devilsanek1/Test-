@@ -1,5 +1,6 @@
-// tier.tsx — ATTENTION TIERS for the clean pen (lib/pen.ts): which tier a piece of linework or a fill belongs to.
-// Everything here is a no-op under the default sketch pen (lib/pen.ts PEN.mode 'sketch'): v1 / v2 render as before.
+// tier.tsx — ATTENTION TIERS for the clean pen (lib/pen.ts; docs/look/CRAFT.md §b-§c): which tier a piece of linework
+// or a fill belongs to. Everything here is a no-op under the default sketch pen (PEN.mode 'sketch'): v1 / v2 / v2r
+// render exactly as before.
 //
 //   Kit pieces declare a DEFAULT tier (and their tone, the fill their lines bound) once, at the export:
 //     export const Mug = tiered('environment', {tone: EMBER.mug}, MugBody);    // <Mug tier="support" /> overrides
@@ -11,8 +12,9 @@
 //   Idle motion: const k = useTierMotion(); sway(t, 3 * k, ...).
 //
 // Resolution: an explicit `tier` prop > a forced scope (<Tier>, or an explicit prop higher up) > the piece's default.
-// Ink / Fill outside any scope use PEN.untagged ('support'). `bg` (what calmer fills are pulled toward) inherits down
-// the tree; `tone` belongs to the piece that sets it.
+// Ink / Fill outside any scope use PEN.untagged ('support', with its tinted lines kept: PEN.untaggedLines). `bg` (what
+// calmer fills are pulled toward) and `lines` (draw the tier's tinted lines: CRAFT B "where close values touch, and
+// round the mascot") inherit down the tree unless a piece sets its own; `tone` belongs to the piece that sets it.
 
 import React, {createContext, useContext} from 'react';
 import {isClean, PEN, PenMode, Tier as TierT, tierFill, tierLightWidth, tierLineColor, tierWidth, lightness, TierSpec} from './pen';
@@ -33,6 +35,8 @@ export type TierScope = {
   tone?: string;
   /** The background calmer fills are pulled toward (default PEN.bg). */
   bg?: string;
+  /** Draw this tier's contours and strokes as its tinted lines (a tier that draws none by default: support, environment). */
+  lines?: boolean;
 };
 
 const TierCtx = createContext<TierScope | null>(null);
@@ -50,17 +54,18 @@ export type TierProps = {
 };
 
 /** Force a tier on everything inside (scene level). `tone` = the fill the raw lines inside bound; `bg` = what calmer
- *  fills inside are pulled toward (e.g. the sky for a far town). */
-export const Tier: React.FC<{tier: Tier; tone?: string; bg?: string; children?: React.ReactNode}> = ({tier, tone, bg, children}) => {
+ *  fills inside are pulled toward (e.g. the sky for a far town); `lines` = draw the tier's tinted lines. */
+export const Tier: React.FC<{tier: Tier; tone?: string; bg?: string; lines?: boolean; children?: React.ReactNode}> = ({tier, tone, bg, lines, children}) => {
   const parent = useContext(TierCtx);
-  return <TierCtx.Provider value={{tier, forced: true, tone, bg: bg ?? parent?.bg}}>{children}</TierCtx.Provider>;
+  return <TierCtx.Provider value={{tier, forced: true, tone, bg: bg ?? parent?.bg, lines: lines ?? parent?.lines}}>{children}</TierCtx.Provider>;
 };
 
 /** A piece's scope: explicit prop > forced parent scope > the piece's default. */
-export function resolveTier(parent: TierScope | null, prop: Tier | undefined, def: Tier, tone?: string, bg?: string): TierScope {
-  if (prop) return {tier: prop, forced: true, tone, bg: bg ?? parent?.bg};
-  if (parent?.forced) return {tier: parent.tier, forced: true, tone, bg: bg ?? parent.bg};
-  return {tier: def, forced: false, tone, bg: bg ?? parent?.bg};
+export function resolveTier(parent: TierScope | null, prop: Tier | undefined, def: Tier, tone?: string, bg?: string, lines?: boolean): TierScope {
+  const inherit = {bg: bg ?? parent?.bg, lines: lines ?? parent?.lines};
+  if (prop) return {tier: prop, forced: true, tone, ...inherit};
+  if (parent?.forced) return {tier: parent.tier, forced: true, tone, ...inherit};
+  return {tier: def, forced: false, tone, ...inherit};
 }
 
 type TierOpts<P> = {
@@ -68,6 +73,8 @@ type TierOpts<P> = {
   tone?: string | ((p: P) => string | undefined);
   /** The background its calmer fills are pulled toward (default: inherited, then PEN.bg). */
   bg?: string;
+  /** Draw its tier's tinted lines (support / environment draw none by default). Default: inherited. */
+  lines?: boolean;
 };
 
 /** Wrap a kit piece: it takes an optional `tier` prop, resolves its tier (prop > forced scope > `def`) and provides it
@@ -77,7 +84,7 @@ export function tiered<P extends object>(def: Tier | ((p: P) => Tier), opts: Tie
     const parent = useContext(TierCtx);
     const d = typeof def === 'function' ? def(props) : def;
     const tone = typeof opts.tone === 'function' ? opts.tone(props) : opts.tone;
-    const scope = resolveTier(parent, props.tier, d, tone, opts.bg);
+    const scope = resolveTier(parent, props.tier, d, tone, opts.bg, opts.lines);
     return (
       <TierCtx.Provider value={scope}>
         <C {...props} />
@@ -88,12 +95,12 @@ export function tiered<P extends object>(def: Tier | ((p: P) => Tier), opts: Tie
   return W;
 }
 
-/** Provide a scope for part of a piece (e.g. a sub-part with its own tone): same resolution as tiered(). */
-export const TierPart: React.FC<{def?: Tier; tier?: Tier; tone?: string; bg?: string; children?: React.ReactNode}> = ({def, tier, tone, bg, children}) => {
+/** A scope for a part of a piece (a sub-part with its own default tier or tone): same resolution as tiered(); with
+ *  no `def` the part keeps its piece's tier. */
+export const TierPart: React.FC<{def?: Tier; tier?: Tier; tone?: string; bg?: string; lines?: boolean; children?: React.ReactNode}> = ({def, tier, tone, bg, lines, children}) => {
   const parent = useContext(TierCtx);
-  const scope = resolveTier(parent, tier, def ?? parent?.tier ?? PEN.untagged, tone, bg);
-  // a part inherits its piece's forcing (a sub-part never escapes a forced scope)
-  if (!tier && parent && !def) scope.forced = parent.forced;
+  const scope = resolveTier(parent, tier, def ?? parent?.tier ?? PEN.untagged, tone ?? (def ? undefined : parent?.tone), bg, lines);
+  if (!tier && !def && parent) scope.forced = parent.forced;
   return <TierCtx.Provider value={scope}>{children}</TierCtx.Provider>;
 };
 
@@ -112,18 +119,18 @@ export function useLocalScale(): number {
 // ---------------------------------------------------------------- the clean line
 
 export type CleanLineOpts = {
-  /** This stroke IS the thing (a wire, a string, a bird's V, steam), not a contour: kept on the environment tier. */
+  /** This stroke IS the thing (a wire, a string, a bird's V), not a contour: kept on every tier. */
   thing?: boolean;
-  /** A graphic mark (a shape drawn with a stroke: key rows, a rod): width and colour kept. */
+  /** A graphic mark (a shape drawn with a stroke: a rod, a bar): width and colour kept. */
   graphic?: boolean;
   /** The fill this stroke bounds (overrides the scope's tone). */
   tone?: string;
-  /** The stroke is a closed outline (raw SVG only: Ink measures it). */
+  /** Raw SVG: the stroke is an open edge stroke (false) rather than a closed outline (default true). */
   contour?: boolean;
 };
 
 export type CleanLine = {
-  /** Screen-px width to draw (before camera ink compensation) — multiply nothing, it is final for this space. */
+  /** Width in the local units of the space it is drawn in (before the camera ink compensation). */
   width: number;
   color: string;
   /** Static opacity (the tone-on-tone fallback); 1 = opaque. */
@@ -131,28 +138,40 @@ export type CleanLine = {
   kind: 'graphic' | 'light' | 'ink' | 'tone';
   tier: Tier;
   spec: TierSpec;
+  /** Contours (closed outlines) and plain open strokes are drawn here (things, lights and graphics always are). */
+  contours: boolean;
+  strokes: boolean;
 };
 
-/** Resolve a stroke under the clean pen: width (local units: authored width in, clean width out), colour and alpha.
- *  `local` = the local scale (useLocalScale). Returns the tier spec too (for the subpath filters). */
-export function cleanLine(tier: Tier, scopeTone: string | undefined, authoredColor: string | undefined, authoredW: number, local: number, o: CleanLineOpts & {dash?: boolean} = {}): CleanLine {
+/** The tier, line flags and tone in effect for a scope (null = untagged). */
+export function scopeLine(scope: TierScope | null): {tier: Tier; tone?: string; contours: boolean; strokes: boolean} {
+  const tier = scope?.tier ?? PEN.untagged;
   const spec = PEN.tiers[tier];
+  const lines = scope ? scope.lines : PEN.untaggedLines;
+  return {tier, tone: scope?.tone, contours: spec.contours || !!lines, strokes: spec.strokes || !!lines};
+}
+
+/** Resolve a stroke under the clean pen: width (authored local width in, clean local width out), colour and alpha.
+ *  `local` = the local scale (useLocalScale). */
+export function cleanLine(scope: TierScope | null, authoredColor: string | undefined, authoredW: number, local: number, o: CleanLineOpts & {dash?: boolean} = {}): CleanLine {
+  const sl = scopeLine(scope);
+  const spec = PEN.tiers[sl.tier];
+  const base = {tier: sl.tier, spec, contours: sl.contours, strokes: sl.strokes};
   const color0 = authoredColor ?? palette.ink;
   const screen = authoredW * local;
-  if (o.graphic || o.dash || screen >= PEN.graphic) return {width: authoredW, color: color0, alpha: 1, kind: 'graphic', tier, spec};
+  if (o.graphic || o.dash || screen >= PEN.graphic) return {width: authoredW, color: color0, alpha: 1, kind: 'graphic', ...base};
   const L = lightness(color0);
-  if (L !== null && L >= PEN.light) return {width: tierLightWidth(screen, tier) / local, color: color0, alpha: 1, kind: 'light', tier, spec};
-  const width = tierWidth(screen, tier) / local;
+  if (L !== null && L >= PEN.light) return {width: tierLightWidth(screen, sl.tier) / local, color: color0, alpha: 1, kind: 'light', ...base};
+  const width = tierWidth(screen, sl.tier) / local;
   if (L === null || L <= PEN.dark) {
-    const c = tierLineColor(tier, o.tone ?? scopeTone);
-    return {width, color: c.color, alpha: c.alpha, kind: 'ink', tier, spec};
+    const c = tierLineColor(sl.tier, o.tone ?? sl.tone);
+    return {width, color: c.color, alpha: c.alpha, kind: 'ink', ...base};
   }
-  return {width, color: color0, alpha: 1, kind: 'tone', tier, spec};
+  return {width, color: color0, alpha: 1, kind: 'tone', ...base};
 }
 
 /** Raw SVG strokes in a kit piece: `line(color, width, opts)` -> props to spread on the <path> (stroke, strokeWidth,
- *  strokeOpacity), or {display: 'none'} when the tier draws no such line. Sketch pen: the authored values unchanged
- *  (times the camera ink compensation, as lib Ink does). */
+ *  strokeOpacity), or {display: 'none'} when the tier draws no such line. Sketch pen: the authored values unchanged. */
 export function useTierLine(): (color: string | undefined, width: number, o?: CleanLineOpts) => {stroke?: string; strokeWidth?: number; strokeOpacity?: number; display?: 'none'} {
   const scope = useContext(TierCtx);
   const ks = useInkScale();
@@ -160,12 +179,8 @@ export function useTierLine(): (color: string | undefined, width: number, o?: Cl
   const clean = isClean();
   return (color, width, o = {}) => {
     if (!clean) return {stroke: color ?? palette.ink, strokeWidth: width};
-    const tier = scope?.tier ?? PEN.untagged;
-    const c = cleanLine(tier, scope?.tone, color, width, local, o);
-    if ((c.kind === 'ink' || c.kind === 'tone') && !o.thing) {
-      // a raw stroke is a contour unless the caller says it is an open edge stroke (contour: false) or a thing
-      if ((o.contour ?? true) ? !c.spec.contours : !c.spec.strokes) return {display: 'none'};
-    }
+    const c = cleanLine(scope, color, width, local, o);
+    if ((c.kind === 'ink' || c.kind === 'tone') && !o.thing && !((o.contour ?? true) ? c.contours : c.strokes)) return {display: 'none'};
     return {stroke: c.color, strokeWidth: c.width * ks, strokeOpacity: c.alpha < 1 ? c.alpha : undefined};
   };
 }
@@ -177,8 +192,7 @@ export function useTierPaint(): (color: string, o?: {backdrop?: boolean}) => str
   const clean = isClean();
   return (color, o = {}) => {
     if (!clean || o.backdrop) return color;
-    const tier = scope?.tier ?? PEN.untagged;
-    return tierFill(color, tier, scope?.bg ?? PEN.bg);
+    return tierFill(color, scope?.tier ?? PEN.untagged, scope?.bg ?? PEN.bg);
   };
 }
 
