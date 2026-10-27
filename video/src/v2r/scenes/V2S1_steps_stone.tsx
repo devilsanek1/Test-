@@ -1,8 +1,8 @@
 // V2S1 helper (lane L1, our bank): the STONE of our canal-side steps, in the clean pen (docs/v2/lanes/conform_L1.md §4,
 // §7; CRAFT §c-§d): the waterline coping (y 1215-1234), the landing (1234-1302) and five broad treads stepping up toward
 // us (nosings 1302 / 1392 / 1508 / 1660 / 1850). Tier C (environment): no lines, big flat shapes in two tones per step
-// (the lit tread top, the step edge one shade step down), a few long slabs in neighbouring light stones; no joints,
-// dabs, specks or hatching. The step edges are what `Shade` darkens (S1Steps), so their tone here is the lit stone.
+// (the lit tread top, the step edge one shade step down), stone blocks in the two warm stones alternating; no joint
+// lines, dabs, specks or hatching. The step edges are what `Shade` darkens (S1Steps), so their tone here is the lit stone.
 import React, {useMemo} from 'react';
 import {Fill} from '../../lib/Fill';
 import {rng} from '../../lib/rng';
@@ -40,8 +40,8 @@ export const edgePath = (k: number): string => {
 
 const xOf = (u: number, y: number) => BANK.vp[0] + u * (y - BANK.vp[1]);
 const uOf = (x: number, y: number) => (x - BANK.vp[0]) / (y - BANK.vp[1]);
-// warm stones only: a shadow multiplied onto limestone (C* ~8) drops under C* 8 and reads grey (check_light)
-const TONES = [CM.stucco, CM.paving, CM.stucco];
+// warm stones only (stucco, paving): a shadow multiplied onto limestone (C* ~8) drops under C* 8 and reads grey
+// (check_light)
 
 /** One tread: the lit top as a few long slabs in neighbouring light stones (each its own Fill so the flood ripples
  *  across the steps), the step edge strip at its top. */
@@ -53,15 +53,16 @@ export const StoneBand: React.FC<{k: number; seed?: string}> = ({k, seed = 'v2s1
     const bot = b.y1 + 1;
     const base = poly([[-80, b.y0 - 1], [1160, b.y0 - 1], [1160, bot + 2], [-80, bot + 2]]);
     const slabs: {d: string; color: string; seed: string}[] = [];
-    // long slabs: ground widths of 2-3 m (330-700 px at the near tread): few, calm
-    const uL = uOf(-120, top);
+    // stone blocks ~1-1.4 m (120-180 px on the far tread, 230-340 px on the near ones), the two warm tones strictly
+    // alternating, each course staggered by half a block: structure as flat value steps, never a joint line
+    const uL = uOf(-120, top) - (k % 2) * 0.19;
     const uR = uOf(1200, top);
+    const other = b.top === CM.stucco ? CM.paving : CM.stucco;
     let u0 = uL;
     let i = 0;
     while (u0 < uR) {
-      const u1 = Math.min(uR + 0.4, u0 + (k === 0 ? 1.1 : 0.85) * r.range(0.8, 1.35));
-      const color = TONES[(i + k) % 3];
-      if (color !== b.top) slabs.push({d: poly([[xOf(u0, top), top], [xOf(u1, top), top], [xOf(u1, bot), bot], [xOf(u0, bot), bot]]), color, seed: `${seed}/${k}/s${i}`});
+      const u1 = Math.min(uR + 0.4, u0 + (k === 0 ? 0.6 : 0.38) * r.range(0.85, 1.2));
+      if (i % 2) slabs.push({d: poly([[xOf(u0, top), top], [xOf(u1, top), top], [xOf(u1, bot), bot], [xOf(u0, bot), bot]]), color: other, seed: `${seed}/${k}/s${i}`});
       u0 = u1;
       i++;
     }
