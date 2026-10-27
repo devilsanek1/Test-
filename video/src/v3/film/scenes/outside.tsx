@@ -34,6 +34,7 @@ import {ContactShadow, LightPool, Lit, RIGS, ShadowLayer, mixHex, useLightOff, w
 import {CrateBox, CrateFlight, crateFlightPose, ellD, FleetVan, fleetVanGeo, NoticeFlip, rrect, roundPoly, type FleetVariant} from '../kit/Fleet';
 import {CornerCloud, HighClouds, CloudBank, FarGround, InfinityLine, FarField, HallB, HallPlume, HallFans, Hall, HALL, HALL_GEO, HORIZON as S9_HORIZON} from './S9_far';
 import {RevealPeak, J3Stick, J3StickLight} from './SQD_peak';
+import {RevealBirds} from './SQD_life';
 
 const f1 = (v: number) => (Math.round(v * 10) / 10).toString();
 
@@ -260,8 +261,9 @@ const S9Clock: React.FC<{children?: React.ReactNode}> = ({children}) => {
  *  (800, 640)) with the summit stick, hall B and its plume, `streams` (SQD's stick streams: a slot), the hall's fans and
  *  THE DATA CENTER (dark, its sign lit: the brightest cold light), the infinity line, the far field's roofs (the town
  *  covers their foot). From 36.98 the sign steps up one value (one lighter frame round the panel: no glow disc).
- *  `summit` = draw the summit stick (SQD draws its own J3 stick in screen px). */
-export const OutsideFar: React.FC<{streams?: React.ReactNode; summit?: boolean}> = ({streams, summit = true}) => {
+ *  `summit` = draw the summit stick (SQD draws its own J3 stick in screen px); `birds` = the reveal's V of birds
+ *  (SQD_life's RevealBirds, from 21.30). */
+export const OutsideFar: React.FC<{streams?: React.ReactNode; summit?: boolean; birds?: boolean}> = ({streams, summit = true, birds = true}) => {
   const T = useFilmT();
   const signUp = T >= H2_BEATS.sign;
   const s = H2_SIGN;
@@ -274,6 +276,8 @@ export const OutsideFar: React.FC<{streams?: React.ReactNode; summit?: boolean}>
           <CloudBank />
           <FarGround />
         </XG>
+        {/* the reveal's V of birds (SQD_life: from 21.30, film time, H2 px), carried across J4 by this plane */}
+        {birds ? <RevealBirds T={T} /> : null}
         <RevealPeak />
         {summit ? <SummitStick /> : null}
         <XG m={S9_TO_H2}>
@@ -643,6 +647,10 @@ export const OutsideStreet: React.FC = () => {
         <FarCar T={T} />
         {/* ONE small crate onto our van's roof on "left" (26.04) */}
         <CrateFlight {...CRATE_ON} line />
+        {/* OUR side of the street, under our window (H2 y 1250-1520): hidden by the sill at rest, seen in J4's entry
+            (street x1.12 under the window's x3): the kerb stones, a soft snowbank, our pavement with footprints, a
+            row of bollards, a bench and a parked bike. C: flat, still, no line. */}
+        <OurPavement />
         {/* the barrier across the lane's exit: striped arm on a post, lifts on "first dibs" */}
         <XG m={mat.about(mat.rotate(-barrier(T)), 334, 1160)}>
           <path d={rrect(334, 1155, 118, 10, 4)} fill={EMBER.snow} />
@@ -702,6 +710,50 @@ const FarCar: React.FC<{T: number}> = ({T}) => {
       <path d={rrect(x - 22, y - 30, 30, 5, 2.5)} fill={EMBER.snow} />
       <path d={ellD(x - 38, y - 8, 2.4, 2.4)} fill={EMBER.core} />
       <path d={ellD(x - 20, y, 6, 6) + ellD(x + 22, y, 6, 6)} fill={EMBER.anchor} />
+    </g>
+  );
+};
+
+/** Our pavement (see OutsideStreet): everything below the near kerb, tops >= y 1254 so the sill hides it at rest. */
+const PAVE = (() => {
+  const r = rng('h2/pave');
+  let stones = '';
+  for (let x = -60; x < 1140; x += 58) stones += rrect(x, 1254, 54, 9, 2);
+  let bank = 'M-80 1300';
+  for (let x = -80; x <= 1160; x += 70) bank += `Q${x + 35} ${f1(1266 + r.range(-4, 4))} ${x + 70} ${f1(1278 + r.range(-3, 3))}`;
+  bank += 'L1160 1300Z';
+  let prints = '';
+  for (let i = 0; i < 26; i++) {
+    const x = 60 + i * 38 + r.range(-6, 6);
+    const y = 1372 + (i % 2 ? 14 : 0) + Math.sin(i * 0.5) * 18;
+    prints += ellD(x, y, 5.5, 3.2);
+  }
+  const bollards = [130, 330, 530, 730, 930].map((x) => ({x, top: 1300, base: 1352}));
+  return {stones, bank, prints, bollards};
+})();
+const OurPavement: React.FC = () => {
+  const pale = '#D3D8EC';
+  const post = mixHex(EMBER.dcSide, EMBER.sky, 0.25);
+  return (
+    <g>
+      <path d={`M-200 1262H1280V1560H-200Z`} fill={pale} />
+      <path d={PAVE.stones} fill={mixHex(EMBER.road, pale, 0.3)} />
+      <path d={PAVE.bank} fill={EMBER.snow} />
+      <path d={PAVE.prints} fill={mixHex(pale, EMBER.road, 0.55)} />
+      {PAVE.bollards.map((b, i) => (
+        <g key={i}>
+          <path d={ellD(b.x, b.base, 16, 4)} fill={mixHex(pale, EMBER.road, 0.7)} />
+          <path d={rrect(b.x - 7, b.top, 14, b.base - b.top, 4)} fill={post} />
+          <path d={rrect(b.x - 9, b.top - 4, 18, 7, 3.5)} fill={EMBER.snow} />
+        </g>
+      ))}
+      {/* a bench (seat and back, snow on both) and a parked bike against the fourth bollard */}
+      <path d={rrect(410, 1388, 150, 10, 3) + rrect(410, 1350, 150, 9, 3)} fill={EMBER.beam} />
+      <path d={rrect(420, 1398, 8, 30, 2) + rrect(542, 1398, 8, 30, 2) + rrect(424, 1359, 6, 30, 2) + rrect(540, 1359, 6, 30, 2)} fill={mixHex(EMBER.beam, EMBER.anchor, 0.4)} />
+      <path d={rrect(410, 1345, 150, 6, 3) + rrect(410, 1383, 150, 6, 3)} fill={EMBER.snow} />
+      <path d={ellD(485, 1430, 82, 6)} fill={mixHex(pale, EMBER.road, 0.6)} />
+      <path d={`M700 1392m-22 0a22 22 0 1 0 44 0a22 22 0 1 0 -44 0M770 1392m-22 0a22 22 0 1 0 44 0a22 22 0 1 0 -44 0M700 1392L726 1360L760 1360L770 1392M726 1360L716 1350M752 1360L756 1346`} fill="none" stroke={post} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={rrect(708, 1346, 18, 5, 2.5)} fill={EMBER.snow} />
     </g>
   );
 };
