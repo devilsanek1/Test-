@@ -1,6 +1,6 @@
 # Production pipeline v2 (for video 2 onwards)
 
-> **Proposal pending (v3 retro, 2026-10-27):** new steps for G0.5-G5 (a through-line card, a world bible, a designed G3, a G4 look clip) in `docs/retro/2026-10-27_v3_retro.md` §5 wait for the owner's yes. Already applied, because they contradicted the owner's verdict and `docs/look/CRAFT.md` (in force): a carrier at every join instead of a default cut (G3), the film's clean pen from G5 on, no events-per-second quota at G6.
+> **The pipeline after v3 (owner APPROVED, 2026-10-27: "Yes"; why and evidence: `docs/retro/2026-10-27_v3_retro.md`):** a DESIGNED sketch. A through-line card with the core line and the script (G0.5/G1), a text world bible beside the script (W1), a G3 that decides the flow, the focus and the light (not just the story), a playable G4 look clip approved before the G5 lanes, G5 lanes per sequence that fill what G3 decided (no new places, movers or tier promotions), life checked by tiers at G6, `docs/look/CRAFT.md`'s thresholds as lint numbers (anti-waste rule 6) and a craft tooling lane before v4 (below). The craft target, in force, is `CRAFT.md`.
 
 Why: on video 1 the owner first saw a playable film **18.7 h** in. Before that there were only stills, so they could not
 steer. Story problems (S08's peak, S10's readability, the weak hook) surfaced during polish, where every change costs
@@ -24,7 +24,7 @@ a full scene round. Background research: `docs/PIPELINE_RESEARCH.md`.
 **The cost driver is long, image-heavy agent sessions repeated on finished-looking scenes.** Every turn re-reads the
 whole context, and every rendered frame an agent looks at stays in that context. Reading docs was a minor cost.
 
-## The loop: gates G0-G8 (with G0.5, the core line)
+## The loop: gates G0-G8 (with G0.5, the core line, and W1, the world bible)
 
 Start every video by reading `docs/OWNER_PLAYBOOK.md` (the owner's rules), and add any new feedback to it at every gate.
 
@@ -35,17 +35,19 @@ one is approved.
 | Gate | Owner plays / sees | Owner approves | Frozen after | Budget |
 |---|---|---|---|---|
 | G0 Angle | 1 screen of text | topic, audience, takeaway, length | topic, length band | 15 min, orchestrator only |
-| **G0.5 Core line** (owner, 2026-10-25) | the top 3 candidate lines on one screen | **the one sentence** the whole video exists to land, the one that gets the biggest emotional reaction (v3 example: "AI is making your PC more expensive") | the core line: it becomes the frame-0 text, the hook's seed, the cover and title text and the payoff's callback, and every script line must serve it | 1 h, after the facts are locked |
-| G1 Script | **the ElevenLabs-ready script** (a short emotional cue per line, v1 format), plus **3 hook-line variants**; no voice from us (owner rule, 2026-10-25) | every word, hook line | meaning and order of lines | 1 h, then 15 min per round |
+| **G0.5 Core line** (owner, 2026-10-25) | the top 3 candidate lines on one screen; the picked line ships with the first draft of its **THROUGH-LINE CARD** (G1 row) | **the one sentence** the whole video exists to land, the one that gets the biggest emotional reaction (v3 example: "AI is making your PC more expensive") | the core line: it becomes the frame-0 text, the hook's seed, the cover and title text and the payoff's callback, and every script line must serve it | 1 h, after the facts are locked |
+| G1 Script | **the ElevenLabs-ready script** (a short emotional cue per line, v1 format), plus **3 hook-line variants**, plus the **THROUGH-LINE CARD** (one screen of text, `docs/look/CRAFT.md` §a; owner-approved 2026-10-27): the thread object and its home spot, the one home place (at most 3 places and 1 scale reveal), the one "you", the mascot rule, and a carrier (A-F) for every join between the script's lines, taken from the script's own joins (the card follows the script, never the other way round); no voice from us (owner rule, 2026-10-25) | every word, hook line, the card | meaning and order of lines; the card | 1 h, then 15 min per round |
 | G2 Voice lock | the owner records the take in ElevenLabs; we clean it (cut anything misread) and take word timings; no video (owner, 2026-10-25) | voice, pace | the clock (word timings) | 30 min |
-| **G3 Sketch animatic** | ONE video at 60 fps: the whole film as an ANIMATED SKETCHBOOK (spec: `docs/G3_ANIMATIC.md`) — every cut, camera move, transition and key action PLAYED at sketch fidelity, density and life as grey placeholders, timed to the locked voice (visual concepts judged internally; owner rule: one version) — tool: `SketchReel` board mode + `board_lint` | **the film's rough pass**: story in pictures, cuts, transitions, camera moves, key actions, the density/life plan (the hand-off states the fidelity ladder) | the signal contract (`G3_ANIMATIC.md` §2): scene list, cut points, shot content, framing, transition devices, camera moves, motion plan, density promises | first cut 2 h (assumes `G3_ANIMATIC.md` §7 tier-1 tooling, built once beforehand); rounds 30 min |
-| G4 Look (parallel to G3) | 1-3 finished stills plus a 3-5 s motion test | palette, line, mascot, edges | visual language | house style: 15-min check |
-| G5 Blocking cut | real sets and props drawn with the film's clean pen and attention tiers (`docs/look/CRAFT.md` §b-c; draft finish, never the sketch pen) that already **feel alive** (a dense, detailed world, people, a living character, ambient life always on; judged against the references, `OWNER_PLAYBOOK` Visual style; v3 G5 was "way too empty"), final camera, key poses, **no edges/paper/texture**; **entry check before lanes fan out** (`G5_BLOCKING.md`): scripted diff of scenes.json + built scenes against the locked board JSON (every camera move, element move, transition device, `life:`/promise item matches; no new motion), plus a sound-off cold read of the first fully dressed set (the density-key build) | staging, readability at phone size, transitions that play | compositions, camera, timing | 4 h |
-| G6 Polish cut | life refined inside the attention tiers (`CRAFT.md` §b: the subject leads, supporting life small and steady, never a still frame; events/s is information, never a target), easing, secondary motion, edges, paper, full-res 60 fps; **AI critics start here**; last, an *optional* tactical texture pass on a few elements (playbook) | feel only (no restaging) | the picture | 6 h, 1 round + bug fixes |
+| **W1 World bible** (text, beside G1-G2; owner-approved 2026-10-27) | no owner step (internal text): the set list (the home place first), one light rig per set (the key and its side, the shadow tint family, the pool colours: `CRAFT.md` §d.1), one colour-script line per beat, tiers A/B/C per shot (`CRAFT.md` §b); its choices reach the owner as G3's grey and the G4 look clip | — (judged at G3 and G4) | — (G3 freezes the tiers and the rig's shapes, G4 the pen, the rigs and the tier palettes) | in parallel with G1-G2 |
+| **G3 Sketch animatic** | ONE video at 60 fps: the whole film as an ANIMATED SKETCHBOOK (spec: `docs/G3_ANIMATIC.md`) — every cut, camera move, transition and key action PLAYED at sketch fidelity, every join with its carrier, the tiers at their final weights in grey and each set's light rig as shapes, density and life as grey placeholders, timed to the locked voice (visual concepts judged internally; owner rule: one version) — tool: `SketchReel` board mode + `board_lint` | **the film's rough pass**: story in pictures, cuts, transitions, camera moves, key actions, the density/life plan, and **where the eye goes and what carries each join** (2026-10-27; the hand-off states the fidelity ladder) | the signal contract (`G3_ANIMATIC.md` §2): scene list, cut points, shot content, framing, transition devices and carriers, camera moves, motion plan, density promises, thread coverage, tiers, the light rig, the mover budget | first cut ~3 h (was 2; the hour goes to tiers, carriers and the light marks; assumes `G3_ANIMATIC.md` §7 tier-1 tooling, built once beforehand); rounds 30 min |
+| **G4 Look clip** (parallel to G3; approved before the G5 lanes start) | a **6-8 s playable LOOK CLIP of the home set** in the final style (replaces "1-3 stills + a 3-5 s test", 2026-10-27): the clean pen, the set's light rig with contact, form and cast shadows, tiers at final weight, one real transition, tier-B life; checked before the owner sees it (`CRAFT.md` §b-d: salience peak/median >= 2.4, environment local contrast <= 7, strokes <= 80/Mpx, near-miss ends <= 40/Mpx, dark-line pixels <= 3 %, `scripts/qa/check_light.py`; carry and movers on its transition, rule 6) | palette and tier colours, line, light and shadow, mascot, edges | visual language: the pen, the light rigs and the tier palettes freeze | ~1 day before the G5 lanes (the retro's estimate) |
+| G5 Blocking cut | **the G3 tier masks filled in colour from the G4 kit** (2026-10-27): real sets and props in the film's clean pen, light rigs and tiers (`docs/look/CRAFT.md` §b-d; draft finish, never the sketch pen), every G3 placeholder made real, so the world is full and alive, calm and tiered (`LIFE_AND_DENSITY.md`; v3 G5 was "way too empty"), with **no new places, movers or tier promotions**; final camera, key poses, **no edges/paper/texture**; **one lane per SEQUENCE, and one agent owns every transition**; **entry and exit checks** (`G5_BLOCKING.md` §1): the scripted diff of scenes.json + built scenes against the locked board JSON (every camera move, element move, transition device and carrier, `life:`/promise item matches; no new motion), a sound-off cold read of the first fully dressed set (the home set, the density key), and CRAFT's measures rerun on the render and compared with the G3 render | staging, readability at phone size, transitions that play | compositions, camera, timing | 4 h of work; longer on the clock (one lane per sequence, one transition owner) |
+| G6 Polish cut | life checked by tiers (`CRAFT.md` §b: at most 3-4 noticeable supporting movers at once, B <= 30 % of the motion, the subject >= 60 % in its beat; supporting life small and steady, never a still frame; events/s is information, never a target), easing and secondary motion only on movers that already exist, edges, paper, full-res 60 fps; **AI critics start here**; last, an *optional* tactical texture pass on a few elements (playbook) | feel only (no restaging) | the picture | 6 h, 1 round + bug fixes |
 | G7 Sound | SFX from the final beats, music, -14 LUFS mix | mix | audio | 1 h |
 | G8 Final | full-res render, QA, cover, posting kit | blockers only | everything | 1.5 h |
 
-Target: playable cuts at about hours 1, 3, 8 and 14 (video 1: hour 18.7).
+Target: the first playable cut (the G3 reel) about 3 h after the voice lock, then the G4 look clip before the G5 lanes,
+then G5 and G6 (video 1: the first playable film at hour 18.7).
 
 ## Creative exploration is not waste (owner rule)
 
@@ -62,15 +64,16 @@ building, and it decides the outcome:
   sentence. Brainstorm: 5-6 writers, each pulling a different emotional lever (loss, unfairness, reversal, personal,
   curiosity, headline punch), 6-8 lines each, plus the owner's own suggestion. Critique: judges score every line for gut
   reaction, truth, read-at-a-glance clarity and whether the video can pay it off; a viewer-persona panel gives gut
-  rankings; sceptics try to refute the finalists as misleading. Pick: the owner picks from the top 3. Workflow:
-  `context/workflows/v3-g05-core-line*.js`.
+  rankings; sceptics try to refute the finalists as misleading. Pick: the owner picks from the top 3, and the
+  through-line card is drafted from the pick (G1 completes it). Workflow: `context/workflows/v3-g05-core-line*.js`.
 - **G1 script = story first (owner, 2026-10-26):** (1) 3-4 competing **story spines** (the throughline question, the
   viewer's situation, beats joined by but/so, the turn, the payoff that lands the core line), judged; (2) 2-3 writers
   draft the winning spine; (3) a cold-read panel retells each draft (a list-like retelling fails) plus a flow critic
-  (every line follows from the previous) and a fact check; (4) one merged script. Never structure a script as a list of
-  facts to prove.
+  (every line follows from the previous) and a fact check; (4) one merged script, then the through-line card's carriers
+  from its joins (G1 row). Never structure a script as a list of facts to prove.
 - **G3 animatic:** 2-3 visual concepts for the whole film, judged internally; the owner sees one animatic (one-version rule).
-- **G4 look:** 2-4 style-frame directions when the topic needs a new look.
+- **G4 look:** 2-4 style-frame directions when the topic needs a new look, judged internally; the pick becomes the one
+  look clip the owner plays.
 
 These are divergent stages: many agents, short outputs, judged together. The rules below target the convergent
 stages (building, fixing, polishing), where the measured waste happened.
@@ -78,7 +81,8 @@ stages (building, fixing, polishing), where the measured waste happened.
 ## Anti-waste rules (each one fixes a measured waste)
 
 1. **No AI critics before G6** (reviews were 28 % of spend, mostly on scenes that changed afterwards). Before G6 the
-   owner is the reviewer, plus one scripted check (duration, A/V sync, captions inside the safe area).
+   owner is the reviewer, plus scripted checks (the gate check: duration, A/V sync, captions inside the safe area; from
+   G3 on, CRAFT's lints, rule 6).
 2. **One combined reviewer per scene, one round at G6, max 6 findings**, then fix and stop. No re-review loops: a
    scene that is still under the bar after one fix goes to the owner (S08 took 25 reviews and still shipped at 7).
 3. **Fix agents get a turn cap and an image budget** (avg 163 turns): render contact sheets at 0.33-0.5 scale, view at
@@ -87,9 +91,14 @@ stages (building, fixing, polishing), where the measured waste happened.
    the script was locked, and a 78 s to 55 s script change threw away voice v1/v2, timing, storyboard v1/v2 and music.
 5. **Lower concurrency, checkpoint every agent.** 66 agents died at usage limits. Run at most about 4 agents at once, commit
    after every agent, and keep each agent's task small enough to restart.
-6. **Precise numbers only at G5 or later**, except the G3 motion numbers that are the contract (move durations, the
-   five values, the ~15 px/frame speed budget): they live in the board JSON and the camera plan, enforced by lint,
-   never as a prose spec.
+6. **Precise numbers are lint numbers, checked only where the picture shows them truly** (owner-approved 2026-10-27).
+   The G3 motion numbers are the contract (move durations, the five values, the ~15 px/frame speed budget): they live
+   in the board JSON and the camera plan, enforced by lint, never as a prose spec. `CRAFT.md`'s thresholds are lint
+   numbers too: warnings with a declared exception (they come from two films only), never quotas. At G3 a board is
+   linted only for what it shows truly: the declared ones (a carrier per join, the plain cuts, thread coverage, the
+   mover budget) plus eye jump and colour shift (v3's board: 0.21 and 35, both over); carry, movers, contrast, line and
+   light count from the G4 look clip on (blank paper flatters them: v3's board carried 0.41 with 0 movers). Two FAIL
+   outright: a thread gap over 3 s (the declared scale reveal aside) and more than 2 plain cuts.
 7. **The hook goes first at every gate**, as a swappable segment (the first 3-5 s), with its sound cue from G1 on (a
    positive phone sound in the first second, per the playbook), and with variants at G1 (line) and G3 (visual). It is never polished last.
 8. **One deliverable per gate, no status reels.** Drop the 30-minute strips of every composition. The owner gets the gate video;
@@ -125,22 +134,23 @@ in `context/workflows/` (the v3 ones are the current best versions):
 | G2 voice (API) | `video/scripts/voice/generate_take.py` | per-line generation with the owner's voice, ASR check (Parakeet + Whisper), auto-regenerate, stitch; needs `ELEVENLABS_API_KEY` |
 | G2 sound | `video/audio/tools/make_phone_sfx.py` | our own positive phone sounds (like pop, ding, swoosh, cart add) |
 | G3 animatic | `video/src/v3/SketchReel.tsx` + `v3-g3-animatic-*.js` | 3 visual concepts, judges, storyboard artist writes the animatic JSON; SketchReel draws it with voice and pop captions |
-| G3 board style | `docs/G3_ANIMATIC.md` (stage) + `docs/look/STORYBOARD_STYLE.md` (drawing); SketchReel `style: "board"`; `scripts/v3/board_lint.py`; `v3-g3-board-*.js` | the animated sketchbook: monochrome boards, every final move/transition played, placeholder density; tier-1 lint (motion + emptiness checks) before render; sound-off + sound-on cold reads, ONE batched fix round |
-| G3 motion + density | `G3_ANIMATIC.md` §3-4 + §7 tier 1 — **to build**, one checkpointed lane before the next video's G3 (not yet kit) | pose-test actions (2-4 stepped keys, smears), kit ambient loops, transition `device` field + carrier check (`CRAFT.md` §a), density placeholders + `life:` lists, 60 fps reel |
+| G3 board style | `docs/G3_ANIMATIC.md` (stage) + `docs/look/STORYBOARD_STYLE.md` (drawing); SketchReel `style: "board"`; `scripts/v3/board_lint.py`; `v3-g3-board-*.js` | the animated sketchbook: monochrome boards at their tier weights, every final move/transition played with its carrier, the light rig as shapes, placeholder density; tier-1 lint (motion, emptiness, carrier, thread, tier and rig checks; eye jump and colour shift on the reel: anti-waste rule 6) before render; sound-off + sound-on cold reads, ONE batched fix round |
+| G3 motion + density | `G3_ANIMATIC.md` §3-4 + §7 tier 1 — **to build**, one checkpointed lane before the next video's G3 (not yet kit) | pose-test actions (2-4 stepped keys, smears), kit ambient loops, transition `device` + `carrier` fields and the carrier check (`CRAFT.md` §a), the `tier` and `rig` fields and the thread's coverage, density placeholders + `life:` lists, 60 fps reel |
 | G3 clarity | SketchReel `icon` elements; sound-off cold read (`v3-g3-clarity-*.js`) | recognisable objects instead of boxes; viewer personas say what each shot shows with the sound off; confusing shots get redrawn literally before the owner sees the animatic |
-| G3-G5 camera | `docs/look/CINEMATIC_GUIDE.md` (+ `research/arcane_shots.json`, sketches in `docs/look/cine_sketches/`) | Arcane-measured shot vocabulary V1-V12, camera presets, 9:16 composition, light, transitions, sequence templates; storyboard and blocking pick from it. At G3, a per-film camera plan (`docs/vN/camera_plan_g3.md`, one row per panel; checks in `STORYBOARD_STYLE.md` §7) comes before the re-board |
+| G3-G5 camera | `docs/look/CINEMATIC_GUIDE.md` (+ `research/arcane_shots.json`, sketches in `docs/look/cine_sketches/`) | Arcane-measured shot vocabulary V1-V12, camera presets, 9:16 composition, light, transitions, sequence templates; storyboard and blocking pick from it. At G3, a per-film camera plan (`docs/vN/camera_plan_g3.md`, one row per panel, with its carrier, tier map and rig; checks in `STORYBOARD_STYLE.md` §7) comes before the re-board |
 | references | `arcane-cinematic-guide-*.js`, `scripts/look/shot_sheets.py` | dissect any reference video: measure, contact sheets, per-shot analysis agents, guidebook |
 | opening (every video) | `v3-opening-banger-*.js`; SketchReel `draw` / `fillIn` | 3 concepts for the one continuous opening shot (drawn live, expectation then reality, never still), judge, build; loop to the bare-line frame 0 |
-| G4 look | `docs/look/COZY_AND_SCALE.md`, `docs/look/PALETTE.md`, `look-cozy-scale-arcane-*.js` | look rules; research template |
-| G5 blocking | `docs/G5_BLOCKING.md`; `src/entry-v3-film.tsx` (template); `scripts/qa/gate_check.py` | the film shell plays end to end from minute one: `scripts/g5_scaffold.py` turns the locked board into scenes.json + one placeholder file per panel (the board panel inside `<Film>`), lanes replace panel files; pop captions from `scripts/film_captions.py`; frame-0 words, voice, sound cues, draft label; the scripted gate check (fps 60, duration, audio, cuts vs scene starts, captions in the band) |
-| G5-G6 density and life | `docs/look/LIFE_AND_DENSITY.md`; `scripts/qa/density.py` (+ `gate_check.py --density`); v3 example `docs/v3/density_plan_g5b.md` | every frame full and alive at the level of reference 1 and v1: targets, dressing by setting, people by depth, the recurring living character (Pip), the idle layer, information in the world, what stays calm; the meter flags flat, empty or static shots (a warning signal, never a quota) |
+| G4 look clip | `docs/look/CRAFT.md` (§b-d and their checks), `docs/look/COZY_AND_SCALE.md`, `docs/look/PALETTE.md`; `scripts/qa/check_light.py`; the clean pen (`lib/pen.ts`, `lib/tier.tsx`) and the light kit (v3: `src/v3/film/kit/Light.tsx`); `look-cozy-scale-arcane-*.js` | look rules and checks; the pen, light and tiers the clip is built with; research template |
+| G5 blocking | `docs/G5_BLOCKING.md`; `src/entry-v3-film.tsx` (template); `scripts/qa/gate_check.py` | the film shell plays end to end from minute one: `scripts/g5_scaffold.py` turns the locked board into scenes.json + one placeholder file per panel (the board panel inside `<Film>`), sequence lanes replace panel files and one agent builds every join; pop captions from `scripts/film_captions.py`; frame-0 words, voice, sound cues, draft label; the scripted gate check (fps 60, duration, audio, cuts vs scene starts, captions in the band) plus the entry and exit checks (CRAFT's measures against the G3 render) |
+| G5-G6 density and life | `docs/look/LIFE_AND_DENSITY.md`; `scripts/qa/density.py` (+ `gate_check.py --density`); v3 example `docs/v3/density_plan_g5b.md` | every frame full and alive at the level of reference 1 and v1: targets, dressing by setting, people by depth, the recurring living character (Pip), the idle layer, information in the world, what stays calm; the meter flags flat, empty or static shots (a warning signal, never a quota; the craft tooling lane makes it count tier-C dressing only, its events/s and gap information) |
 | references | `video/scripts/look/measure_camera.py` | cuts + per-shot camera curves, easing, parallax from a reference video (keep copyrighted clips out of git) |
 
 ## Agent prompt rules
 
 - Context: the gate's brief plus the scene's own data. **Point to sections, never "read all docs fully".**
 - A report is at most 12 lines. Cross-lane requests go in one block, in an exact format.
-- Lanes: one scene per agent; shared kit / engine changes go only through the orchestrator.
+- Lanes: one scene per agent session (G5: a lane owns a SEQUENCE and builds it panel by panel; one agent owns every
+  transition); shared kit / engine changes go only through the orchestrator.
 - Renders: 0.33-0.5 scale strips; full res only for a 1-2 frame measurement.
 
 ## Tooling to build before video 2 (in this order)
@@ -157,13 +167,28 @@ in `context/workflows/` (the v3 ones are the current best versions):
 5. **Scripted gate check**: duration, A/V sync, caption safe area, cut list vs word anchors. It replaces review agents for
    mechanical checks. *(~1 h)*
 6. **G3 animatic tier-1 tooling** (`G3_ANIMATIC.md` §7 tier 1): dress layer, `loop` + the shared ambient kit, the tier-1
-   lints, the transition `device` field, the 60 fps reel render, g5_scaffold `transition.type` carry-through. One
-   checkpointed lane before the next video's G3, outside the gate budget; the G3 row's 2 h first cut assumes it exists. *(~1-2 days)*
+   lints, the transition `device` and `carrier` fields, the `tier` and `rig` fields and the thread's coverage, the 60 fps
+   reel render, g5_scaffold carry-through of `transition.type`, `carrier`, `tier` and `rig`. One checkpointed lane
+   before the next video's G3, outside the gate budget; the G3 row's ~3 h first cut assumes it exists. *(~1-2 days)*
 
 Defaults learned from video 1's posted reel: captions use `skyCaption.motion = 'pop'`, or a line rise that stays
 inside the caption window. The 'scroll' slot reveal clipped letters mid-rise on a plain sky and looked like a glitch on
 the phone. Paper edges never at the top or beside the caption band, because that looks like a screen recording under
-the status bar. The G4 look check includes a phone screen recording of a 5 s clip.
+the status bar. The G4 look check includes a phone screen recording of the look clip.
 
 Drop or slim: per-scene QA charts in every check-in, beat-sync against the old storyboard, critic panels before G6, edge
 labs before G4.
+
+## Craft tooling lane (owner-approved 2026-10-27; before v4)
+
+One checkpointed lane in small restartable tasks, outside the gate budgets (the retro's estimate: about 2-3
+agent-days); the G3 side (the `carrier`, `tier` and `rig` fields and their lints) is item 6 above:
+1. **Port the measures into `scripts/qa`** as checks (`CRAFT.md` §e; the raw retro versions are in
+   `scripts/qa/retro_tools/`): carry, eye jump and colour shift per join; tiers (salience, local contrast, motion share);
+   line (strokes, short strokes, near-miss ends, dark-line pixels); light (`scripts/qa/check_light.py`, the first one,
+   from the v3 rework).
+2. **Finish the clean pen** (`lib/sketch.ts`, `lib/pen.ts`, `Ink`, `Fill`: `CRAFT.md` §c) and **build `lib/light.tsx`**
+   (`CRAFT.md` §d; v3's `src/v3/film/kit/Light.tsx` is the first version).
+3. **A film-code lint** that bans hatch, scribble, `over` and `misreg` in film code (`CRAFT.md` §c's grep).
+4. **The density meter** (`scripts/qa/density.py`) counts tier-C dressing only; its events/s and gap become
+   information (no FAR, no gate FAIL).
