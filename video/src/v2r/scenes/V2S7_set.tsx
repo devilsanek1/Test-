@@ -28,6 +28,12 @@ import {
   LIGHT, SHADOW_LEN, mixHex, DOOR_KEYS,
 } from './V2S7_rig';
 
+// ---------------------------------------------------------------- the clean pen
+
+/** The house line for this set (OWNER_PLAYBOOK 2026-10-27: clean, confident, few lines; no jitter, no sketchy
+ *  overshoot, no double strokes): one smooth stroke, ends exact. */
+export const pen = (x1: number, y1: number, x2: number, y2: number, seed: string) => line(x1, y1, x2, y2, {seed, over: 'none', jitter: 0.15, drift: 0.08, bow: 0.25, breaks: false});
+
 // ---------------------------------------------------------------- shared tones
 
 /** Shadows are colour: warm plum-turned steps of the ground they fall on (never grey). */
@@ -93,13 +99,12 @@ export const S7Far: React.FC<{t: number}> = ({t}) => {
     for (let x = -36; x < 84; x += 13) rail += `M${P(x, 1000)}L${P(x, 954)}`;
     rail += `M${P(-40, 958)}L${P(84, 958)}M${P(-40, 986)}L${P(84, 986)}`;
     b.ink(rail, 1.6, CM.anchor);
-    b.ink(line(-40, 1000, 160, 1000, {seed: 's7/wallTop', over: 'small'}), INK_PX.far, CM.ink, 0.25);
-    b.ink(line(84, 952, 84, 1044, {seed: 's7/pier', over: 'small'}), INK_PX.far);
+    b.ink(pen(-40, 1000, 160, 1000, 's7/wallTop') + pen(84, 952, 84, 1044, 's7/pier'), INK_PX.hair, CM.ink, 0.2);
     return b;
   }, []);
   // row 3, the nearest far row: brick, its windows switching (sunset), hairline ink
   const near = new Batch();
-  roofRowInto(near, {x0: -60, x1: 380, base: 880, top: 712, spread: 14, seed: 's7/far3', walls: [CM.brick, CM.stucco, CM.brickLight, CM.brickDeep], roof: CM.brickDeep, wRange: [60, 130], ink: INK_PX.hair, win: 7, lit: 0.55, t, ceil: SKY_CLIP_Y + 2});
+  roofRowInto(near, {x0: -60, x1: 380, base: 880, top: 712, spread: 14, seed: 's7/far3', walls: [CM.brick, CM.stucco, CM.brickLight, CM.brickDeep], roof: CM.brickDeep, wRange: [60, 130], ink: 0, win: 7, lit: 0.55, t, ceil: SKY_CLIP_Y + 2});
   return (
     <>
       <Paint b={stat} seed="s7/far" misreg={false} />
@@ -170,20 +175,9 @@ function trunkInto(b: Batch, s: TreeSpec) {
     [s.x + wb / 2 - wb * 0.28, s.base],
   ]);
   // ink: the lit edge (left), a broken right edge, a couple of bark marks; limbs on their top edge
-  let d = line(s.x - wb / 2 - flare * 0.6, s.base, s.x - wt / 2, s.trunkTop, {seed: `${s.seed}/tl`, over: [2, 4]});
-  d += line(s.x + wt / 2, s.trunkTop + h * 0.3, s.x + wb / 2 + 1, s.base - 10, {seed: `${s.seed}/tr`, over: [0, 3]});
-  for (const L of s.limbs) d += line(L.a[0], L.a[1], L.c[0], L.c[1], {seed: `${s.seed}/l${L.c[0].toFixed(0)}`, over: [0, 4]});
-  b.ink(d, INK_PX.mid, CM.ink, 0.22);
-  // twigs: thin ink sprays from the knuckles into the crown
-  let tw = '';
-  for (const L of s.limbs) {
-    for (let k = 0; k < 3; k++) {
-      const a = r.range(-2.4, -0.7);
-      const len = r.range(16, 34);
-      tw += `M${P(L.c[0], L.c[1])}Q${P(L.c[0] + Math.cos(a) * len * 0.5 + r.jitter(4), L.c[1] + Math.sin(a) * len * 0.5)} ${P(L.c[0] + Math.cos(a) * len, L.c[1] + Math.sin(a) * len)}`;
-    }
-  }
-  b.ink(tw, INK_PX.hair, CM.line);
+  let d = pen(s.x - wb / 2 - flare * 0.6, s.base, s.x - wt / 2, s.trunkTop, `${s.seed}/tl`);
+  for (const L of s.limbs.slice(0, 2)) d += pen(L.a[0] - L.w0 * 0.4, L.a[1], L.c[0] - L.w1 * 0.4, L.c[1], `${s.seed}/l${L.c[0].toFixed(0)}`);
+  b.ink(d, INK_PX.far, CM.ink, 0.2);
 }
 
 /** The crown: autumn leaf clusters (scalloped, flat, misregistered), a few gaps showing limbs, leaf marks on the rim. */
@@ -210,10 +204,11 @@ function crownInto(b: Batch, s: TreeSpec, topMin: number) {
   });
   let ticks = '';
   s.clusters.forEach((c, i) => {
+    if (i % 2) return;
     const ry = Math.min(c.ry, (c.y - topMin) / 1.06);
-    ticks += crownTicks(c.x, c.y, c.rx, ry, {seed: `${s.seed}/t${i}`, n: 3, size: 8});
+    ticks += crownTicks(c.x, c.y, c.rx, ry, {seed: `${s.seed}/t${i}`, n: 2, size: 7});
   });
-  b.ink(ticks, INK_PX.hair, CM.line);
+  b.ink(ticks, INK_PX.hair, mixHex(CM.line, CM.sage, 0.35));
 }
 
 const TREE_R_SPEC: TreeSpec = {
@@ -348,19 +343,7 @@ export const S7Steps: React.FC = () => {
       k.rect(SH_STONE, x0, y0 + nose, x1 - x0, 1.6);
     }
     // the steps' west end (lit by the low sun) beyond the board, and their joints
-    let j = '';
-    const r = rng('s7/steps');
-    for (let i = 0; i < T.length - 1; i++) {
-      let x = x0 + r.range(20, 80);
-      while (x < x1) {
-        j += `M${P(x, T[i] + 2)}L${P(x + r.jitter(1), T[i + 1] - 1)}`;
-        x += r.range(90, 170);
-      }
-    }
-    k.ink(j, 1.2, JOINT);
-    let n = '';
-    for (let i = 0; i < T.length - 1; i++) n += line(x0, T[i], x1, T[i] + r.jitter(0.8), {seed: `s7/nose${i}`, over: 'none', breaks: true});
-    k.ink(n, INK_PX.hair, CM.ink, 0.3);
+    k.ink(pen(x0, T[0], x1, T[0], 's7/stepTop'), INK_PX.hair, CM.ink, 0.25);
     return k;
   }, []);
   return <Paint b={b} seed="s7/steps" />;
@@ -373,9 +356,9 @@ const F_GROUND = (1012 - VP.y) * 25;
 const depthAt = (y: number) => F_GROUND / Math.max(1e-6, y - VP.y);
 const yAtDepth = (d: number) => VP.y + F_GROUND / d;
 
-/** Granary-Square-like paving: E-W bands of small granite setts (0.30 x 0.18 m, running bond, joints receding to VP)
- *  between limestone kerb bands, a slot drain, a few setts in other tones, specks and leaves. A field MADE of small
- *  things (LIFE_AND_DENSITY section 0), never one slab. */
+/** Granary-Square-like paving: E-W bands of small granite setts (0.30 x 0.18 m, running bond, in perspective to VP)
+ *  between limestone kerb bands, a slot drain, specks and leaves. The setts read by COLOUR (scattered setts in close
+ *  tones, no joint lines): a field made of small things (LIFE_AND_DENSITY section 0), clean (OWNER_PLAYBOOK). */
 export const S7Ground: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
@@ -384,46 +367,32 @@ export const S7Ground: React.FC = () => {
     k.rect(CM.paving, -60, top, 1200, 1960 - top);
     const gx = (x0g: number, y: number) => VP.x + x0g * kAt(y);
     const quad = (ga: number, gb: number, ya: number, yb: number): Pt[] => [[gx(ga, ya), ya], [gx(gb, ya), ya], [gx(gb, yb), yb], [gx(ga, yb), yb]];
-    let joints = '';
-    let kerbs = '';
+    // bands from the far end (the steps' foot) toward the lens: a limestone kerb band, then a band of setts whose
+    // texture is COLOUR (setts in close tones, no joint lines: the owner's clean, few-lines rule)
     const tones = [CM.stucco, CM.limestone, PAVING_DARK, CM.stucco, mixHex(CM.paving, CM.coatOat, 0.5)];
-    // bands from the far end (the steps' foot) toward the lens
     let d = depthAt(top);
     let band = 0;
     while (d > 7.4) {
-      // a kerb band (0.3 m limestone) then a sett band (1.6-2.2 m)
       const dk = d - 0.3;
       const ya = yAtDepth(d);
       const yb = yAtDepth(dk);
       k.poly(band % 2 ? CM.limestone : CM.stucco, quad(-12, 12, Math.max(top, ya), yb));
-      k.rect(SH_STONE, -60, yb - 1.2, 1200, Math.max(1.4, (yb - ya) * 0.12));
-      kerbs += `M${P(-60, yb)}L${P(1140, yb + r.jitter(0.8))}`;
-      // kerb joints every 0.9 m
-      for (let g = -12; g < 12; g += 0.9) joints += `M${P(gx(g, ya), ya + 1)}L${P(gx(g, yb), yb - 1)}`;
+      k.rect(SH_STONE, -60, yb - 1, 1200, Math.max(1.2, (yb - ya) * 0.1));
       d = dk;
       const bandDepth = r.range(1.6, 2.2);
       const dEnd = Math.max(7.0, d - bandDepth);
-      // rows of setts
+      // the band's own ground tone (alternating), then setts in other tones scattered over it
+      if (band % 2) k.poly(mixHex(CM.paving, CM.stucco, 0.45), quad(-12, 12, yAtDepth(d), yAtDepth(dEnd)));
       let row = 0;
       while (d > dEnd + 0.01) {
         const dn = Math.max(dEnd, d - 0.18);
         const y0 = yAtDepth(d);
         const y1 = yAtDepth(dn);
-        const tall = y1 - y0;
-        if (tall >= 5.5) {
+        if (y1 - y0 >= 4) {
           const off = row % 2 ? 0.15 : 0;
           for (let g = -12 + off; g < 12; g += 0.3) {
-            const xa = gx(g, y0);
-            if (xa > 1150 || gx(g + 0.3, y1) < -70) continue;
-            if (r.chance(0.72)) joints += `M${P(xa, y0 + 0.8)}L${P(gx(g, y1), y1 - 0.8)}`;
-            if (r.chance(0.09)) k.poly(tones[Math.floor(r.next() * tones.length)], quad(g + 0.012, g + 0.288, y0 + 1, y1 - 1));
-          }
-          // the row joint, broken
-          let x = -60 + r.range(0, 40);
-          while (x < 1140) {
-            const L = r.range(80, 260);
-            if (r.chance(0.78)) joints += `M${P(x, y1 + r.jitter(0.5))}L${P(x + L, y1 + r.jitter(0.6))}`;
-            x += L + r.range(6, 30);
+            if (gx(g, y0) > 1150 || gx(g + 0.3, y1) < -70) continue;
+            if (r.chance(0.13)) k.poly(tones[Math.floor(r.next() * tones.length)], quad(g + 0.015, g + 0.285, y0 + 0.8, y1 - 0.8));
           }
         }
         d = dn;
@@ -431,8 +400,6 @@ export const S7Ground: React.FC = () => {
       }
       band++;
     }
-    k.ink(joints, 1.15, JOINT);
-    k.ink(kerbs, 1.4, mixHex(CM.paving, CM.line, 0.7));
     // a slot drain across the forecourt (a dark slot with a steel lip)
     const yd = yAtDepth(10.6);
     for (let x = -60; x < 1140; x += 230) {
@@ -441,7 +408,7 @@ export const S7Ground: React.FC = () => {
     }
     // specks and fallen leaves (more near the trees and the bottom)
     k.layer();
-    for (let i = 0; i < 90; i++) {
+    for (let i = 0; i < 50; i++) {
       const y = r.range(top + 10, 1915);
       const sx = r.range(-20, 1100);
       const s = 0.035 * kAt(y);
@@ -516,7 +483,7 @@ export const S7Bollard: React.FC = () => {
     k.fill(CM.limestone, domePath(x, shaftTop + 1, w / 2 + 3, capH + 2));
     k.fill(CM.paper, domePath(x - w * 0.14, shaftTop - 1, w * 0.22, capH * 0.55));
     k.rect(CM.stoneShade, x - w / 2 - 2, shaftTop, w + 4, 3);
-    let d = line(x - w / 2 - 1, shaftTop + 2, x - w / 2 - 3, base - 8, {seed: 's7/bol/l', over: [0, 2]});
+    let d = pen(x - w / 2 - 1, shaftTop + 2, x - w / 2 - 3, base - 8, 's7/bol/l');
     d += `M${P(x - w / 2 - 3, shaftTop + 1)}A${(w / 2 + 3).toFixed(1)} ${(capH + 2).toFixed(1)} 0 0 1 ${P(x + w / 2 + 3, shaftTop + 1)}`;
     k.ink(d, INK_PX.mid, CM.ink, 0.18);
     return k;
@@ -572,10 +539,8 @@ export const S7Basin: React.FC = () => {
     k.ink(j, 1.6, JOINT);
     k.rect(SH_PAVING, nl - 30, faceY, x1 - nl + 30, 9);
     // ink: the near rim's top edge and its west corner (front plane, 4.8), the far rim's edge (mid), open
-    let ink = line(nl - 22, nearY, x1 + 10, nearY + 1, {seed: 's7/b/nr', over: [6, 0]});
-    ink += line(nl - 22, nearY, nl - 22, faceY, {seed: 's7/b/nc', over: [3, 0]});
-    k.ink(ink, INK_PX.front, CM.ink, 0.15);
-    k.ink(line(fl - 18, farY, x1, farY, {seed: 's7/b/fr', over: [4, 0]}) + line(fl - 18, farY, nl - 22, nearY, {seed: 's7/b/le', over: 'none'}), INK_PX.mid, CM.ink, 0.25);
+    k.ink(pen(nl - 22, nearY, x1 + 10, nearY + 1, 's7/b/nr') + pen(nl - 22, nearY, nl - 22, faceY, 's7/b/nc'), INK_PX.mid, CM.ink, 0.15);
+    k.ink(pen(fl - 18, farY, x1, farY, 's7/b/fr') + pen(fl - 18, farY, nl - 22, nearY, 's7/b/le'), INK_PX.far, CM.ink, 0.25);
     return k;
   }, []);
   return <Paint b={b} seed="s7/basin" />;
@@ -604,7 +569,7 @@ function tableInto(b: Batch, T: TableSpec, seed: string, items: 'far' | 'near') 
   const rx = T.rx;
   const ry = rx * 0.27;
   const legH = 0.68 * k;
-  const iw = items === 'near' ? INK_PX.front : INK_PX.mid;
+  const iw = items === 'near' ? INK_PX.mid : INK_PX.far;
   b.rect(CM.anchor, T.x - k * 0.022, T.top + ry, k * 0.044, legH);
   b.poly(CM.anchor, [[T.x - k * 0.19, T.top + ry + legH], [T.x + k * 0.19, T.top + ry + legH], [T.x + k * 0.05, T.top + ry + legH - k * 0.05], [T.x - k * 0.05, T.top + ry + legH - k * 0.05]]);
   b.fill(CM.stoneShade, ovalPath(T.x, T.top + Math.max(3, k * 0.02), rx, ry));
@@ -651,11 +616,10 @@ function chairInto(b: Batch, x: number, seatY: number, W: number, o: {empty?: bo
   const sw = W * 0.92;
   const back = W * 0.95;
   const legH = W * 1.0;
-  const iw = o.ink ?? Math.max(1.6, Math.min(INK_PX.front, W * 0.045));
+  const iw = o.ink ?? Math.max(1.6, Math.min(INK_PX.mid, W * 0.03));
   if (o.empty) b.fill(col, ovalPath(x, seatY, sw / 2, Math.max(3, sw * 0.14)));
   let d = `M${P(x - sw * 0.42, seatY + 2)}L${P(x - sw * 0.5, seatY + legH)}M${P(x + sw * 0.42, seatY + 2)}L${P(x + sw * 0.5, seatY + legH)}`;
   d += `M${P(x - sw * 0.2, seatY + 3)}L${P(x - sw * 0.24, seatY + legH * 0.95)}M${P(x + sw * 0.2, seatY + 3)}L${P(x + sw * 0.24, seatY + legH * 0.95)}`;
-  d += `M${P(x - sw * 0.46, seatY + legH * 0.55)}Q${P(x, seatY + legH * 0.62)} ${P(x + sw * 0.46, seatY + legH * 0.55)}`;
   b.ink(d, iw, col);
   const hb = `M${P(x - sw * 0.4, seatY)}L${P(x - sw * 0.44, seatY - back)}Q${P(x, seatY - back * 1.18)} ${P(x + sw * 0.44, seatY - back)}L${P(x + sw * 0.4, seatY)}`;
   b.ink(hb, iw * 1.15, col);
@@ -667,8 +631,8 @@ export const S7CafeBack: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
     const {t0: T0, t1: T1} = CAFE;
-    chairInto(k, T1.x + 4, T1.top - 6, 64, {empty: true, color: CM.coatSlate, ink: INK_PX.far});
-    chairInto(k, T0.x + 6, T0.top - 6, 60, {empty: true, color: CM.line, ink: INK_PX.far});
+    chairInto(k, T1.x + 4, T1.top - 6, 64, {empty: true, color: CM.coatSlate, ink: INK_PX.hair});
+    chairInto(k, T0.x + 6, T0.top - 6, 60, {empty: true, color: CM.line, ink: INK_PX.hair});
     k.layer();
     tableInto(k, T1, 's7/t1', 'far');
     tableInto(k, T0, 's7/t0', 'far');
@@ -681,8 +645,8 @@ export const S7CafeBack: React.FC = () => {
 export const S7CafeT1Chairs: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
-    for (const s of [...CAFE.s1, CAFE.s0]) chairInto(k, s.x, s.seat + 3, s.h * 0.62, {color: s.x > 300 ? CM.coatSlate : CM.line, ink: INK_PX.mid});
-    chairInto(k, CAFE.t1.x - 110, 1478, 70, {empty: true, color: CM.coatSlate, ink: INK_PX.mid});
+    for (const s of [...CAFE.s1, CAFE.s0]) chairInto(k, s.x, s.seat + 3, s.h * 0.62, {color: s.x > 300 ? CM.coatSlate : CM.line, ink: INK_PX.far});
+    chairInto(k, CAFE.t1.x - 110, 1478, 70, {empty: true, color: CM.coatSlate, ink: INK_PX.far});
     return k;
   }, []);
   return <Paint b={b} seed="s7/cafeT1Chairs" />;
@@ -693,7 +657,7 @@ export const S7CafeNear: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
     const T2 = CAFE.t2;
-    chairInto(k, T2.x + 196, 1812, 96, {empty: true, color: CM.coatSlate, ink: INK_PX.front});
+    chairInto(k, T2.x + 196, 1812, 96, {empty: true, color: CM.coatSlate, ink: INK_PX.far + 0.4});
     k.layer();
     tableInto(k, T2, 's7/t2', 'near');
     return k;
@@ -713,7 +677,7 @@ export const S7Rack: React.FC = () => {
     let tube = '';
     for (const x of xs) tube += `M${P(x, base)}L${P(x, base - h + w * 0.28)}Q${P(x, base - h)} ${P(x + w * 0.28, base - h)}L${P(x + w * 0.72, base - h)}Q${P(x + w, base - h)} ${P(x + w, base - h + w * 0.28)}L${P(x + w, base)}`;
     k.ink(tube, 7.5, CM.shadeCool);
-    k.ink(tube, 2.2, CM.ink, 0.35);
+    k.ink(tube, 1.4, CM.ink, 0.45);
     for (const x of xs) {
       k.rect(SH_PAVING, x - 4, base - 2, 10, 6);
       k.rect(SH_PAVING, x + w - 4, base - 2, 10, 6);
@@ -751,8 +715,8 @@ export const S7Planter: React.FC = () => {
     k.rect(mixHex(CM.line, CM.shadeWarm, 0.35), x1 - (x1 - x0) * 0.22, base - h + 6, (x1 - x0) * 0.22, h - 6);
     let p = '';
     for (let i = 1; i < 4; i++) p += `M${P(x0 + 3, base - h + (h * i) / 4)}L${P(x1 - 3, base - h + (h * i) / 4 + r.jitter(1))}`;
-    k.ink(p, 1.6, CM.brickDeep);
-    k.ink(line(x0 - 4, base - h - 4, x1 + 4, base - h - 3, {seed: 's7/pl/top', over: [4, 2]}) + line(x0, base - h, x0, base, {seed: 's7/pl/l', over: 'none'}), INK_PX.front, CM.ink, 0.2);
+    k.ink(p, 1.3, mixHex(CM.line, CM.brickDeep, 0.5));
+    k.ink(pen(x0 - 4, base - h - 4, x1 + 4, base - h - 3, 's7/pl/top') + pen(x0, base - h, x0, base, 's7/pl/l'), INK_PX.mid, CM.ink, 0.2);
     return k;
   }, []);
   return <Paint b={b} seed="s7/planter" />;
