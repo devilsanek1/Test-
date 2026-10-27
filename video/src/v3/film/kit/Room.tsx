@@ -951,8 +951,9 @@ export const Rug: React.FC<{quad: [Pt, Pt, Pt, Pt]; stripes?: number; colors?: s
   return <>{out}</>;
 };
 
-/** A coat hook rail with a coat and a striped scarf hanging (they sway a hair). */
-export const CoatHook: React.FC<{x: number; y: number; h?: number; coat?: string; seed?: string; at?: At; ink?: number}> = ({x, y, h = 380, coat = EMBER.dc, seed = 'coat', at, ink = W.mid}) => {
+/** A coat hook rail with a coat and a striped scarf hanging (they sway a hair). `children` (optional) are drawn on the
+ *  coat (over its fill, under its ink and the scarf) inside the sway, in canvas px: the coat's own detail (S13). */
+export const CoatHook: React.FC<{x: number; y: number; h?: number; coat?: string; seed?: string; at?: At; ink?: number; children?: React.ReactNode}> = ({x, y, h = 380, coat = EMBER.dc, seed = 'coat', at, ink = W.mid, children}) => {
   const t = useTime();
   const a = sway(t, 0.8, 4.4);
   const cw = h * 0.42;
@@ -964,6 +965,7 @@ export const CoatHook: React.FC<{x: number; y: number; h?: number; coat?: string
       <Ink d={rectInk(x - 90, y - 16, 180, 22, {seed: `${seed}/ri`, over: [4, 4]})} at={at} width={ink} />
       <XG m={mat.about(mat.rotate(a), x, y)}>
         <Fill d={coatD} color={coat} at={fillAt(at, 0.06)} seed={`${seed}/c`} />
+        {children}
         <Ink d={coatD + `M${x} ${y + 20}L${x} ${y + h * 0.95}`} at={b(at, 0.04)} width={ink} />
         <Fill d={scarfD} color={EMBER.hl} at={fillAt(at, 0.1)} seed={`${seed}/s`} />
         <Fill d={`M${x + cw * 0.06} ${y + h * 0.3}h${cw * 0.18}v${h * 0.06}h${-cw * 0.18}zM${x + cw * 0.07} ${y + h * 0.5}h${cw * 0.18}v${h * 0.06}h${-cw * 0.18}z`} color={EMBER.beam} at={fillAt(at, 0.12)} offset={false} />

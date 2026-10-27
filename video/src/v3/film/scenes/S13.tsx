@@ -15,8 +15,10 @@
 //   the window    the street seen from above as a sliver (S13_window.tsx): far roofs, the opposite houses' snowy roofs and
 //                 warm fronts, a lit shop, the lamp, the road; 2-3 movers at every moment (a car, two walkers), half the
 //                 people at rest; the plume, smoke, icicles, two snow layers.
-//   you           hold still (the kit's 1-2 px breath); ONE weight shift on "better" (VO 32.60 = 1.28): a 0.9 deg lean
-//                 toward the window about the chair's feet, settling half back (cozy v2 §2: the foot tap is dropped).
+//   you           hold still (the kit's 1-2 px breath); ONE gesture on "better" (VO 32.60 = 1.28), big enough to read at
+//                 phone size (review): a 2.3 deg lean toward the window about the chair's feet (~15 px at the head) over
+//                 0.35 s, settling to ~1 deg, with the head tilting up 7 deg toward the bubble, then held (cozy v2 §2:
+//                 the foot tap is dropped).
 //   the bubble    the BETTER laptop bobs +-3 px in it (slow).
 //   camera        the FLOAT (cozy v2 §3, replaces the invisible 1.5 % breathe): translation only, 2 legs at 8-12 px/s that
 //                 turn back (eased), within +-12 x / +-10 y of home; the captions and the UI stay fixed.
@@ -26,7 +28,7 @@ import type {ToneKey} from '../../../lib/Film';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {ease01, EMBER, floatCam, Laptop, Nook, NOOK_LAYOUT, ThoughtBubble, WallClock, YouSeated, type Pt} from '../kit';
-import {S13Desk, S13FloorBack, S13FloorFront, S13Pip, S13ToteAndBin, S13WallLow, S13WallTop, S13WindowLights} from './S13_room';
+import {S13Desk, S13FloorBack, S13FloorFront, S13Pip, S13RugThings, S13ToteAndBin, S13WallLow, S13WallTop, S13WindowLights} from './S13_room';
 import {S13Outside} from './S13_window';
 
 const DUR = 33.4 - 31.32;
@@ -45,13 +47,15 @@ const BETTER = 32.6 - 31.32;
 const PIP = {x: 704, y: 1546};
 
 /** The nook: the objective layout with the attic slope and beam on (O1's room: the string lights hang under it). */
-const NOOK_S13 = {slope: true, shelf: {...NOOK_LAYOUT.objective.shelf!}};
+const NOOK_S13 = {slope: true, shelf: {...NOOK_LAYOUT.objective.shelf!}, mug: null};
 
 const S13: React.FC = () => {
   const t = useTime();
   const [dx, dy] = floatCam(t, {dur: DUR, seed: 's13/float'});
-  // the weight shift on "better": lean toward the window (clockwise about the chair's feet), settle half back
-  const lean = 0.9 * ease01(t, BETTER - 0.04, 0.34) - 0.42 * ease01(t, BETTER + 0.4, 0.5);
+  // the weight shift on "better": lean toward the window (clockwise about the chair's feet), settle to ~1 deg; the head
+  // tilts up toward the bubble (chin up) with it and holds
+  const lean = 2.3 * ease01(t, BETTER - 0.04, 0.35) - 1.3 * ease01(t, BETTER + 0.42, 0.55);
+  const tilt = -7.5 * ease01(t, BETTER + 0.02, 0.4) + 1.2 * ease01(t, BETTER + 0.5, 0.5);
   const bob = 3 * Math.sin((t / 2.6) * 2 * Math.PI + 0.6);
   return (
     <World sky={EMBER.wall}>
@@ -64,10 +68,11 @@ const S13: React.FC = () => {
         <S13WallLow />
         <S13Desk />
         <S13FloorBack />
+        <S13RugThings />
         <S13ToteAndBin />
         <WallClock cx={CLOCK.cx} cy={CLOCK.cy} r={CLOCK.r} startMin={50} seed="s13/clock" />
         <XG m={mat.about(mat.rotate(lean), YOU.x + 30, FLOOR_Y)}>
-          <YouSeated x={YOU.x} y={YOU.y} head={YOU.head} floorY={FLOOR_Y} seed="s13/you" />
+          <YouSeated x={YOU.x} y={YOU.y} head={YOU.head} floorY={FLOOR_Y} seed="s13/you" headRot={tilt} />
         </XG>
         <S13Pip x={PIP.x} y={PIP.y} />
         <S13FloorFront />

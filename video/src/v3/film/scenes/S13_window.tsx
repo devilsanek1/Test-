@@ -1,6 +1,8 @@
 // S13_window (lane S13, G5b): the outside through S13's ONE window (the kit Nook 'objective' glass, x 470-1110,
 // y 640-1006, mullion 1023; everything here is clipped to the glass and drawn fill-only: far planes get no ink).
 // Locked board: the far data center silhouette (no sign, its 3 roof units name it) on the horizon (y 912), x 591-961.
+// Fix pass (review): the building is 200 px tall (not the kit's 0.7 w) so its parapet (y ~714) and the 3 units (y ~684-714)
+// sit in CLEAR sky under the glass top (640), the plume lifts off the units' tops, and the icicles are short over it.
 // Added around it (docs/v3/density_plan_g5b.md S13, docs/v3/cozy_v2_application.md §1-2: DENSE-CALM, "the window
 // street seen from above, as a sliver"):
 //   sky        the dusk sky (the one cool calm field), the cooling plume sliding off the units along the glass top,
@@ -154,18 +156,19 @@ const KerbThings: React.FC = () => (
 
 // ---------------------------------------------------------------- the people and the car (movers and resters)
 
-const CAR_V = 100; // px / s (~1.1 lengths / s)
+const CAR_V = 95; // px / s (~1 length / s)
 
 /** Movers' lanes, kept >= 71 px apart along x at every moment (car half-length 46 + a walker's 9 + the meter's 16 px
  *  merge), so each reads (and measures) as its own figure: walker A and walker B (a dog leading) go left to right in
- *  the left half, the car right to left in the right half. */
+ *  the left half, the car right to left in the right half, its headlights in the OPEN left pane from the cut (it
+ *  starts just left of the mullion, so they cross the glass during the hold, never only behind the frost). */
 const People: React.FC = () => {
   const t = useTime();
   const bobA = Math.sin(t * 2.1) * 0.8;
   const bobB = Math.sin(t * 1.7 + 1.2) * 0.8;
-  const aX = 600 + 54 * t; // walker A: out from behind the lamp head (~1.1 body h / s at 50 px)
-  const bX = 724 + 48 * t; // walker B + dog
-  const carX = 1122 - CAR_V * t; // the car: in from the right glass edge (headlights ahead)
+  const aX = 600 + 46 * t; // walker A: out from behind the lamp head (~0.9 body h / s at 50 px)
+  const bX = 700 + 40 * t; // walker B + dog
+  const carX = 1050 - CAR_V * t; // the car: its nose already in the open left pane (headlights ahead)
   return (
     <>
       {/* at rest: a kid on a sledge with a parent (far left), two neighbours chatting at the shop door, one at the lamp */}
@@ -188,6 +191,16 @@ const People: React.FC = () => {
 // ---------------------------------------------------------------- the whole view (children of <Nook variant="objective">)
 
 const DC_X = 776;
+const DC_W = 371;
+/** The building's height: 200 (the kit default 0.7 w = 260 put the units above the glass top). */
+const DC_H = 200;
+/** The 3 roof units' centres and top (the kit's own geometry and jitter for seed 'dc/objective'), for the plume. */
+const DC_UNITS = (() => {
+  const r = rng('dcu/dc/objective');
+  const unitW = Math.min(DC_W * 0.13, DC_H * 0.22);
+  const top = HOR + 2 - DC_H - unitW * 0.62;
+  return {top, xs: [0, 1, 2].map((i) => DC_X - DC_W * 0.34 + ((i + 0.5) / 3) * DC_W * 0.68 + r.jitter(DC_W * 0.03))};
+})();
 
 export const S13Outside: React.FC = () => {
   const g = S13_GLASS;
@@ -200,10 +213,10 @@ export const S13Outside: React.FC = () => {
       <TownHouse x={466} y={HOR + 4} w={56} kind="terrace" color={FAR_ROW} far seed="s13/fl1" litFrac={0.6} />
       <TownHouse x={516} y={HOR + 6} w={50} kind="cottage" color={EMBER.roofs} far seed="s13/fl2" litFrac={0.7} />
       <SnowTree x={572} y={HOR + 8} h={88} kind="pine" far seed="s13/pine" />
-      <DataCenter x={DC_X} y={HOR + 2} w={371} variant="far" sign={null} seed="dc/objective" />
-      {/* the cooling plume slides off the 3 roof units and drifts right along the glass top (the quiet ambient loop) */}
-      {[692, 776, 860].map((x, i) => (
-        <PuffTrain key={i} x={x} y={650} n={6} life={3.4} rise={14} drift={140} r0={6} r1={18} wobble={3} stretch={1.7} color={EMBER.skyLow} seed={`s13/plume${i}`} at={-3 - i * 1.1} />
+      <DataCenter x={DC_X} y={HOR + 2} w={DC_W} h={DC_H} variant="far" sign={null} seed="dc/objective" />
+      {/* the cooling plume lifts off the 3 roof units' tops in clear sky and drifts right (the quiet ambient loop) */}
+      {DC_UNITS.xs.map((x, i) => (
+        <PuffTrain key={i} x={x} y={DC_UNITS.top - 2} n={6} life={3.2} rise={52} drift={96} r0={5} r1={17} wobble={3} stretch={1.5} color={EMBER.skyLow} seed={`s13/plume${i}`} at={-3 - i * 1.1} />
       ))}
       <TownHouse x={960} y={HOR + 6} w={62} h={128} kind="block" color={FAR_ROW} far dish seed="s13/fr1" litFrac={0.7} />
       <WindowSilhouette x={970} y={806} w={16} h={20} who="cook" lit far seed="s13/blockwin" dark={EMBER.dcDark} />
@@ -216,7 +229,10 @@ export const S13Outside: React.FC = () => {
       <Street />
       <KerbThings />
       <People />
-      <Icicles x0={486} x1={1104} y={g.y + 2} n={7} len={[12, 34]} seed="s13/ice" ink={0} />
+      {/* icicles: long at the glass's ends, short (<= 14 px) over the building so its roof line stays clear */}
+      <Icicles x0={486} x1={590} y={g.y + 2} n={2} len={[18, 34]} seed="s13/ice" ink={0} />
+      <Icicles x0={610} x1={950} y={g.y + 2} n={4} len={[7, 13]} drip={false} seed="s13/iceM" ink={0} />
+      <Icicles x0={968} x1={1104} y={g.y + 2} n={3} len={[14, 32]} seed="s13/iceR" ink={0} />
       <SnowLayers x={g.x} y={g.y} w={g.w} h={g.h} layers={['far', 'mid']} band={null} density={1.3} wind={-6} seed="s13/snow" />
     </>
   );
