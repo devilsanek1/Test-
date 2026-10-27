@@ -64,7 +64,8 @@ export const S1_PIP = {seat: [700, 1235] as [number, number], from: 0, drawDur: 
  */
 export const S1_F0 = {
   pale: S1_PALE,
-  paper: '#FFFFFF',
+  /** The page (CM.white, the World sky at f0): what the pale shapes are mixed toward. */
+  paper: '#FBF3E6',
   outline: {at: S1_DRAW.at, dur: S1_DRAW.dur, perObject: 'one stroke (all parts at once)'},
   drawn: ['her behind the glass door', 'the door frame + leaves', "W's frame"],
   sunHalf: true,
