@@ -15,7 +15,8 @@ import {Batch, P, Pt, rng, ovalPath, lobes, lerp, domePath, r1} from '../kit/can
 import {litAt} from '../kit/canal/life';
 import {Person} from '../kit/cast';
 import * as MAP from '../world/map';
-import {CellPaint, Under, UnderPaint, barPath} from './V2S1_set_core';
+import {CellPaint, Under, UnderPaint, barPath, ringPath} from './V2S1_set_core';
+import {floodAt} from './V2S1_clock';
 
 const S = MAP.S1_SHEET;
 /** The bridge (screen px at zoom 1.00). */
@@ -373,7 +374,32 @@ const Cyclist: React.FC = () => {
   const t = useTime();
   const x = s1CyclistX(t);
   if (x > 380 || x < -60) return null;
-  return <Person x={x} y={BRIDGE.deck} h={S1_CYCLIST.h} seed="s1/cyclist" pose="cycle" view="profile" pedal={1.4} traits={{hair: 'cap', coat: CM.coatMustard, trousers: CM.coatSlate, acc: 'backpack', accColor: CM.coatSlate, hatColor: CM.brick}} />;
+  // a far figure (55 px) is fill only in colour (STYLE section 4); its lines only in the bare-line state. K4's bike is ink
+  // only (wheels + frame), so in colour the bike is drawn here as thin FILLS on K4's own cycle geometry (body.ts
+  // cycleParts, drawn facing left, H = h exact): slate tyres, frame and bar.
+  const bare = t < floodAt(x, BRIDGE.deck - 30);
+  const H = S1_CYCLIST.h;
+  const y = BRIDGE.deck;
+  const wr = H * 0.2;
+  const wb = H * 0.62;
+  const at = (dx: number, dy: number): Pt => [x + dx, y + dy];
+  const bb = at(H * 0.04, -wr * 0.95);
+  const seat = at(H * 0.12, -H * 0.58);
+  const head = at(-H * 0.18, -H * 0.56);
+  const bar = at(-H * 0.22, -H * 0.66);
+  const b = new Batch();
+  if (!bare) {
+    for (const wx of [-wb / 2, wb / 2]) b.fill(CM.paneUnlit, ringPath(x + wx, y - wr, wr, wr, 1.9));
+    const fw = 1.7;
+    for (const [a, c] of [[at(wb / 2, -wr), bb], [bb, seat], [bb, head], [head, bar], [seat, at(-H * 0.17, -H * 0.56)], [head, at(-wb / 2, -wr)]] as [Pt, Pt][]) b.fill(CM.coatSlate, barPath(a, c, fw));
+    b.fill(CM.paneUnlit, barPath([bar[0] - H * 0.04, bar[1] - H * 0.01], [bar[0] + H * 0.04, bar[1] + H * 0.01], 1.8));
+  }
+  return (
+    <>
+      <CellPaint b={b} seed="s1cycbike" cell={1000} misreg={0} live />
+      <Person x={x} y={y} h={H} exact seed="s1/cyclist" pose="cycle" view="profile" pedal={1.4} ink={bare ? INK_PX.hair : 0} traits={{hair: 'cap', coat: CM.coatMustard, trousers: CM.coatSlate, acc: 'backpack', accColor: CM.coatSlate, hatColor: CM.brick}} />
+    </>
+  );
 };
 
 // ---------------------------------------------------------------- birds
