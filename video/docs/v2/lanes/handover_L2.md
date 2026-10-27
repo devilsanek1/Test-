@@ -25,3 +25,29 @@ Setup checked: `npm ci` OK, the headless shell path in remotion.config.ts exists
   pushes it out; swap to L5's StatementBoard when it lands (REQUEST line in the report).
 
 **Next:** write V2S2_Set.tsx / V2S2_Board.tsx / V2S2.tsx, render review files per brief_L2.md, critic loop, report_L2.md.
+
+## 2026-10-27, second helper (ultracode session), handed over to the /effort max session
+**Done (pushed, WIP first build, typechecks, renders at ~0.25 s/frame at 0.5 scale):**
+- `src/v2r/scenes/V2S2_Set.tsx`: `V2S2Set`, forked from kit `S2Set`. Layer order: A-board, kiosk, newsagent, Pip, bench people, bench.
+  No kit near busts. Lamp lowered (h 1290). Passing boat props `boatAt` 7.0 / `boatU0` 17 / `boatSpeed` 1.4. Slots `farLife` / `near`.
+  Falling leaves kept to x >= 600, so none cross the lettering.
+- `src/v2r/scenes/V2S2_Board.tsx`: stand-in A-board (plum stiles and rails, paper face, keyline, legs, shadow).
+  Uses K3 `WorldText` + `TXT_TOLD_THE_BBC`: header 56, body 30 re-wrapped to 3 lines (words unchanged), credit 20.
+  `boardDx`: slides out from behind the kiosk 8.44-8.74 with a settle. `S2Newsagent` (K4 Person, plum coat) pushes it out.
+- `src/v2r/scenes/V2S2_Life.tsx`: a far cyclist + a walker with a dog, a near beanie head-back gliding L->R (hv 196),
+  a cap head-back standing at x 800 (head turns), a dog (sniffs, sits, trots off), two pigeons on the paving.
+- `src/v2r/scenes/V2S2.tsx`: everything inside `<TimeShift by={-6.1}>` (film s). Camera `s2Cam`: push 1.06 about W2,
+  then a float (-10 px/s from 6.7, back to 0 by 12.8), then the pull 1.12->1.00 about (200,795); `InkScale` on the zoom.
+  The ring is a 4.8 px ink pen at 6.82. `StaffWindow` overlays (pane=false, cool via `staffCoolAt`, blinds half
+  10.26+i*0.085, W2 full 12.20). Reporter x 634 h 156 and staffer x 728 h 184: moved off Pip, who sits behind them.
+  PipTrack: hops in from (-70,1270) at 6.14, looks at the reporter from 6.95, at W2 on 8.30, and hops at 12.85
+  to the world inverse of S3.pipSeat under 1.06 (height 50/1.06).
+**First stills (6.40 ... 12.97) read well:** the wall, the ring, the five silhouettes, the blinds, the board, the hood, Pip.
+**Next / open:**
+1. Check the A-board body at full size (3 lines at 30 px are tight against the credit).
+2. Check the newsagent's reach pose (the profile flip looks stiff).
+3. Pip partly overlaps the reporter's head at the post: check it at full size.
+4. Verify the W2_CUT match + `pipHopS2S3At` at 12.98 against L3.
+5. Measure head-back widths (<= ~140 px) and add more near-ground life if density/deadframes ask for it.
+6. Review files per brief_L2.md, the critic loop (no workflow or critic round was run yet), report_L2.md.
+- REQUEST: swap to L5's ToldTheBBCBoard when it lands.
