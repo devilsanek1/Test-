@@ -20,8 +20,15 @@ export const FILM3_VOICE = 'v3/voice.wav';
 /** The gate label burned into every pre-final cut. */
 export const FILM3_GATE = 'G5';
 
-/** The panels, with each lane's own captionTone (exported by its panel module) over the scenes.json default. */
-export const film3Scenes: FilmScene[] = (scenesJson as FilmScene[]).map((s) => (sceneTones[s.id] ? {...s, captionTone: sceneTones[s.id]} : s));
+/** The loop's caption roll back to page 1 (the frame-0 words return): 41.00 s (f2460), when S16's un-build has handed
+ *  the frame to the lines, never over the still full-colour S16 (the default end - 0.22 = 40.93 s, f2456: G5b review). */
+export const FILM3_LOOP_CAPTION_AT = 41.0;
+
+/** The panels, with each lane's own captionTone (exported by its panel module) over the scenes.json default, and the
+ *  loop's caption roll on the last panel's un-build. */
+export const film3Scenes: FilmScene[] = (scenesJson as FilmScene[])
+  .map((s) => (sceneTones[s.id] ? {...s, captionTone: sceneTones[s.id]} : s))
+  .map((s) => (s.transitionOut?.type === 'unbuild' ? {...s, transitionOut: {...s.transitionOut, captionAt: FILM3_LOOP_CAPTION_AT}} : s));
 export const film3Captions = captionsJson as CaptionBeat[];
 export const film3Sfx = (animatic as {sfx: FilmSfx[]}).sfx;
 /** Film seconds (the voice: 41.15 s). */

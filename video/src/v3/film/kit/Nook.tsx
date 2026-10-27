@@ -130,6 +130,20 @@ export const Nook: React.FC<NookProps> = ({variant = 'pov', layout, frost = true
   );
 };
 
+/** The home base's ONE window alone (reveal, frame, the glass with the outside as children, mullion, latch, frost, the
+ *  inside sill), in the variant's canvas px, without the wall, desk or lamp: for the desk shots that hang the same window
+ *  behind their own desk through an XG (S7, S8, S12, S16: scenes/desk_window.tsx). A `layout.glass` with a lower top
+ *  crops the outside's top (the window seen closer, under the caption band). */
+export const NookWindow: React.FC<{variant?: 'pov' | 'objective'; layout?: Partial<NookLayout>; frost?: boolean; at?: At; seed?: string; children?: React.ReactNode}> = ({variant = 'pov', layout, frost = true, at, seed = 'nook', children}) => {
+  const L: NookLayout = {...NOOK_LAYOUT[variant], ...(layout ?? {})};
+  const t = useTime();
+  return (
+    <WindowView L={L} frost={frost} t={t} at={b(at, 0.04)} seed={seed}>
+      {children ?? <NookOutside variant={variant} at={b(at, 0.1)} />}
+    </WindowView>
+  );
+};
+
 // ---------------------------------------------------------------- the outside through the window (board layouts)
 
 export type NookOutsideProps = {

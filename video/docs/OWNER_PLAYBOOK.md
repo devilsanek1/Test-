@@ -57,9 +57,7 @@ Format: **rule** — why / evidence (video, date).
   (hundreds of buildings shrinking into haze), a landmark that is huge yet far, tiny anchors (figures, birds, airships),
   the drop below the camera, a big sky with huge clouds, many depth layers. Recipe: `docs/look/CINEMATIC_GUIDE.md`
   ("Scale cues"). — ("another point in the Arcane shot is how great the scale feels", v3, 2026-10-26).
-- **Arcane references: ENVIRONMENT ONLY, few and high-confidence** (buildings, cityscapes, interiors as spaces, wides;
-  no faces or people). Build on our own videos incrementally (angles, composition, light, camera), never reinvent.
-  Guide with sketches: `docs/look/CINEMATIC_GUIDE.md`. — ("targeted with high confidence", 2026-10-26).
+- **Arcane references: ENVIRONMENT ONLY** (cities, interiors as spaces, wides; no people), few and high-confidence; build on our own videos. — (2026-10-26).
 - **The owner's favourite Arcane shot: the pull-back crane reveal** (S1E1 rooftop: the camera pulls back and rises until
   the sisters are tiny figures overlooking a vast city; "it has pretty much everything"): the model for a film's big reveal
   (`docs/look/CINEMATIC_GUIDE.md`). — (v3, 2026-10-26).
@@ -78,8 +76,7 @@ Format: **rule** — why / evidence (video, date).
   as a screen recording under the status bar). — (v1 posted reel, 2026-10-25).
 - **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
   palette per video; within it one hero, one dark anchor, at most one pop. Rules: `docs/look/PALETTE.md`. — (2026-10-25).
-- **Warm, never sickly.** Beige, muddy tan, olive-brown lines and grey read "sick"; warmth = peach creams, terracotta,
-  red-brown lines, a golden lamp pool, warm shadows, a saturated dusk-blue outside. — ("not sick", v3 G4, 2026-10-26).
+- **Warm, never sickly:** no beige, muddy tan, olive or grey; peach creams, terracotta, red-brown lines, golden light, warm shadows. — (v3 G4, 2026-10-26).
 - **Texture and lines: VERY subtle.** Thin tapered lines only in key places; halftone tactically on a few elements as
   an optional last step (the film must work flat; the owner decides per video). — (texture test, 2026-10-25).
 - **Profile identity: mascot Pip (the purple PHP elephant), drawn in each film's style;** avatar `deliverables/profile/pip_power_button.png`. — (2026-10-25).
@@ -159,7 +156,9 @@ Format: **rule** — why / evidence (video, date).
   an initial intermediate step", v3 G5, 2026-10-26).
 - **EFFORT IS ALWAYS MAX:** every workflow agent passes `effort: 'max'`, every helper session runs at /effort max; a lazy
   video from a low effort setting is our failure. — ("the key rule is we need to ensure the effort is MAX!", v2, 2026-10-27).
-- **NO LIMIT ON TOKENS for creative output; never trade quality for savings.** Ideas, scripts, judged competing ideas,
+- **The weekly limit is the real budget: finishing the video comes first** (using up to 100 % of the week is fine if the video
+  is completed). Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. — (v2, 2026-10-27).
+- **NO LIMIT ON TOKENS for creative output (inside the weekly limit); never trade quality for savings.** Ideas, scripts, judged competing ideas,
   design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
   reviewing what will still change, early polish). — (2026-10-25; owner, 2026-10-26).

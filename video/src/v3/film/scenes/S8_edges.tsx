@@ -3,6 +3,8 @@
 // clutter is S7's, cheated in at the frame edges at close size:
 //   wall top     (y < 290) the lowest string-light bulbs, big (the strand hangs closer here), a pothos trailing from the
 //                shelf above the top-right corner, plaster ticks. The strip under them is the calm caption band.
+//   window       (fixer pass) O1's window's lower edge above the lid, under the caption band: the sash rail, a strip of
+//                frosted glass with the town's lit fronts and the snow, the sill going down behind the lid (S8Window).
 //   the laptop   a sticky note with a scribble on the bezel's top-left corner (it lifts when the stick lands), hairline
 //                legends on the visible key caps, three caps that spring back up after the stick leaves the slot.
 //   desk         the spiral notebook and its pen cut by the left edge, a biscuit and crumbs, a sticky note and your phone's
@@ -19,6 +21,7 @@ import {mat, XG} from '../../../lib/xf';
 import {Cable, DeskGrain, EMBER, FramedPrint, Glasses, Leaf, Pip3, quadPt, ring, StringLights3, sway, Txt, WallMarks, W, type LookKey, type PipPoseKey, type Pt} from '../kit';
 import {PhotoLine} from './O1_life';
 import {Clementines, Pen, PhoneDown, SpiralNotebook} from './S7_desk';
+import {DeskWindow, deskWindowMat} from './desk_window';
 
 type Quad = [Pt, Pt, Pt, Pt];
 
@@ -69,6 +72,15 @@ export const S8WallTop: React.FC = () => (
     <Vines />
   </>
 );
+
+// ---------------------------------------------------------------- the window's lower edge above the lid
+
+/** O1's window behind the laptop (S7's, fixer pass, G5b review: one back wall for the desk): at the 3.3x cut-in only its
+ *  lower edge shows above the lid, under the caption band: the lower sash's rail, a strip of the frosted glass with the
+ *  town's lit fronts, the street and the snow, and the inside sill going down behind the lid. Drawn at a close-size cheat
+ *  (1.4x O1, as the props' ~1.9x), the sill's bottom at y 600 (S7's sill through the cut-in: 597), the glass's left edge
+ *  near the cut-in's (S7 x 520 -> 473 here). O1 time continues S7's (6.2 + S7's 1.68 s). */
+export const S8Window: React.FC = () => <DeskWindow m={deskWindowMat(1.4, 507, 600)} o1At={6.2 + (18.28 - 16.6)} clipTop={496} succulent={false} />;
 
 // ---------------------------------------------------------------- the laptop's edges
 
