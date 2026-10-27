@@ -6,7 +6,8 @@
 //
 // Builders:
 //   standParts   standing / walking / jogging / cycling figures (views back | rear34 | profile)
-//   seatParts    seated backs (steps, benches, café chairs): sit, cup, read, phone, notebook, hood up
+//   seatParts    seated figures (steps, benches, café chairs): back / rear 3/4 / profile; arms lap / knees / back / hug;
+//                lean, child, an arm round a partner; cup, read, phone, notebook, hood up
 //   nearParts    head-and-shoulder backs cut by the frame bottom (the near row)
 //   bustParts    window figures (a head and shoulders behind a sill): neighbours, staff silhouettes
 // Proportions (fractions of the standing height H): head radius 0.112, shoulders 0.75 below the top, torso width
@@ -55,6 +56,8 @@ export type Model = Traits & {
   apron?: string;
   /** Satchel (the reporter): a crossbody strap + a flap bag at the hip. */
   satchel?: string;
+  /** A child: a bigger head (0.14 H), narrower shoulders (standing and seated). */
+  child?: boolean;
 };
 
 export type StandOpts = {
@@ -452,8 +455,8 @@ export function standParts(m: Model, o: StandOpts): Part[] {
   const pose = o.pose;
   const moving = o.moving ?? (pose === 'walk' || pose === 'jog');
   const amp = (o.stride ?? 1) * (pose === 'jog' ? 1.45 : 1);
-  const br = m.broad;
-  const r = H * 0.112;
+  const br = m.broad * (m.child ? 0.92 : 1);
+  const r = H * (m.child ? 0.14 : 0.112);
   const bobY = moving ? g.bob * H * (pose === 'jog' ? 0.03 : 0.013) : 0;
   const lean = pose === 'jog' ? H * 0.04 : pose === 'cycle' ? H * 0.12 : 0;
   const inkOn = lod <= 1;
@@ -786,117 +789,217 @@ function cycleParts(m: Model, col: Col, o: StandOpts): Part[] {
   return out;
 }
 
-// ---------------------------------------------------------------- seated backs
+// ---------------------------------------------------------------- seated figures
+
+/** What a seated figure's arms do (the art director, 2026-10-27: never the same upright bust everywhere):
+ *   lap    hands in the lap, the arms inside the coat (seams); the default
+ *   knees  leaning forward, elbows on the knees: the knees peek out beside the hips, the head sinks between the shoulders
+ *   back   leaning back on both hands planted on the step behind the hips (an A-frame of arms)
+ *   hug    hugging the knees: a compact rounded back, the arms wrapped forward */
+export type SeatArms = 'lap' | 'knees' | 'back' | 'hug';
+/** Seated views: a back (steps, benches), a rear 3/4 or a profile (turned to a neighbour: the lap, the knees and the
+ *  shins show). Side views face LEFT like every drawing (flip mirrors). */
+export type SeatView = 'back' | 'rear34' | 'profile';
+export const SEAT_ARMS: readonly SeatArms[] = ['lap', 'knees', 'back', 'hug'];
 
 export type SeatOpts = {
-  /** Visible seated height: head top to the seat line (px). */
+  /** Visible seated height: head top to the seat line (px) for an upright back; a pose may lower the head (knees,
+   *  hug) but never raises it. */
   h: number;
   lod: Lod;
   seed: string;
   turn?: number;
   /** 0..1: a takeaway cup lifting from the lap to the mouth (it peeks beside the head). */
   cup?: number;
-  /** An open newspaper held up (its spread shows past both shoulders). */
+  /** An open newspaper held up (back view: its spread shows past both shoulders; side views: a paper on the knees). */
   read?: boolean;
   /** A raised phone (arm up). */
   phone?: boolean;
   /** 0 closed .. 1 open: a notebook held at the side (the reporter). */
   notebook?: number;
-  /** Which side the cup / phone / notebook is on (+1 right). */
+  /** Which side the cup / phone / notebook is on (+1 right; back view). Side views use the near arm. */
   side?: 1 | -1;
+  /** The arms' pose (default lap). A cup / phone / notebook takes its own arm; a newspaper takes both. */
+  arms?: SeatArms;
+  /** Body lean in degrees (+ = the head toward screen right in the drawn frame): a shear about the seat, the hips
+   *  stay put. Pairs lean together with it. */
+  lean?: number;
+  view?: SeatView;
+  /** A child: a bigger head on a smaller, narrower body. */
+  child?: boolean;
+  /** An arm over a partner's shoulders: the hand at this point (local px from the seat point; drawn over the partner
+   *  when this figure is drawn after it). */
+  armAround?: Pt;
 };
 
+/** Seated geometry shared by the views: head, shoulder line, widths (local px; seat line y 0). */
+function seatFrame(m: Model, o: SeatOpts) {
+  const {h} = o;
+  const child = !!(o.child ?? m.child);
+  const H = h / 0.56;
+  const r = child ? h * 0.245 : H * 0.112;
+  const tanL = Math.tan(((o.lean ?? 0) * Math.PI) / 180);
+  return {child, H, r, tanL};
+}
+
+/** A seated figure: back view (steps, benches, café chairs) or a rear 3/4 / profile with the lap, knees and shins. */
 export function seatParts(m: Model, o: SeatOpts): Part[] {
+  const view = o.view ?? 'back';
+  return view === 'back' ? seatBackParts(m, o) : seatSideParts(m, o, view);
+}
+
+function seatBackParts(m: Model, o: SeatOpts): Part[] {
   const col = colorer(m);
   const {h, lod} = o;
-  const H = h / 0.56;
-  const r = H * 0.112;
+  const busyArm = o.cup !== undefined || !!o.phone || o.notebook !== undefined;
+  const arms: SeatArms = o.read ? 'lap' : o.arms ?? 'lap';
+  const {child, H, r, tanL} = seatFrame(m, o);
   const side = o.side ?? 1;
   const turn = o.turn ?? 0;
   const inkOn = lod <= 1;
   const out: Part[] = [];
-  const headCx = turn * r * 0.12;
-  const headCy = -h + r;
-  const shoulderY = -h + 2 * r + H * 0.03;
-  const W = H * 0.35 * m.broad;
-  const flare = 0.16;
+  // the lean: a shear that is 0 at the seat and grows up the back
+  const sx = (y: number) => tanL * Math.max(0, -y - h * 0.04);
+  const S = (x: number, y: number): Pt => [x + sx(y), y];
+  // a forward pose lowers the head between the shoulders
+  const drop = arms === 'knees' ? 0.1 * h : arms === 'hug' ? 0.06 * h : 0;
+  const hy = -h + r + drop;
+  const ys = arms === 'knees' ? hy + r * 0.62 + 0.03 * h : arms === 'hug' ? hy + r * 0.8 + 0.04 * h : hy + r + 0.0536 * h;
+  // shoulders, waist, the hip base (wider than the shoulders: a seated body, never a standing bust)
+  const ws = (child ? 0.27 : 0.3125) * h * m.broad * (arms === 'hug' ? 0.93 : arms === 'back' ? 1.03 : 1);
+  const wh = ws * (arms === 'hug' ? 1.08 : arms === 'knees' ? 1.18 : arms === 'back' ? 1.15 : 1.2);
+  const ww = ws * 0.9;
+  const R = ws * (arms === 'knees' || arms === 'hug' ? 1.0 : 0.82);
+  const hump = arms === 'knees' ? 0.05 * h : arms === 'hug' ? 0.035 * h : 0.006 * h;
+  const yR = Math.min(ys + R * 0.95, -0.2 * h);
+  const wy = (yR - 0.12 * h) / 2;
+  const W = 2 * ws;
+  const [hcx, hcy] = S(turn * r * 0.12, hy);
+
   // the open newspaper sits in front of the person: drawn first (behind)
   if (o.read) {
-    const top = headCy + r * 0.3;
-    const bot = shoulderY + H * 0.2;
+    const top = hcy + r * 0.3;
+    const bot = ys + H * 0.2;
     const xw = W * 0.78;
+    const c0 = sx((top + bot) / 2);
     const pc = col(CM.paper);
-    const dl = polyline([[-xw, top + H * 0.02], [-H * 0.01, top - H * 0.015], [-H * 0.01, bot], [-xw, bot + H * 0.025]], true);
-    const dr = polyline([[xw, top + H * 0.02], [H * 0.01, top - H * 0.015], [H * 0.01, bot], [xw, bot + H * 0.025]], true);
+    const dl = polyline([[c0 - xw, top + H * 0.02], [c0 - H * 0.01, top - H * 0.015], [c0 - H * 0.01, bot], [c0 - xw, bot + H * 0.025]], true);
+    const dr = polyline([[c0 + xw, top + H * 0.02], [c0 + H * 0.01, top - H * 0.015], [c0 + H * 0.01, bot], [c0 + xw, bot + H * 0.025]], true);
     out.push({k: 'paperL', d: dl, fill: pc, ink: inkOn ? dl : undefined, w: 0.8});
     out.push({k: 'paperR', d: dr, fill: pc, ink: inkOn ? dr : undefined, w: 0.8});
     if (lod === 0 && !m.mono) {
       let tl = '';
       for (let i = 0; i < 5; i++) {
         const y = top + H * 0.035 + (i * (bot - top - H * 0.04)) / 5;
-        tl += `M${P(-xw + H * 0.02)} ${P(y + H * 0.004)}L${P(-xw + H * 0.07)} ${P(y)}M${P(xw - H * 0.02)} ${P(y + H * 0.004)}L${P(xw - H * 0.07)} ${P(y)}`;
+        tl += `M${P(c0 - xw + H * 0.02)} ${P(y + H * 0.004)}L${P(c0 - xw + H * 0.07)} ${P(y)}M${P(c0 + xw - H * 0.02)} ${P(y + H * 0.004)}L${P(c0 + xw - H * 0.07)} ${P(y)}`;
       }
       out.push({k: 'paperText', ink: tl, w: 0.4});
     }
   }
-  // neck
-  if (lod <= 1 && m.hair !== 'long' && m.hair !== 'hood') {
-    const nd = `M${P(headCx - r * 0.34)} ${P(headCy + r * 0.5)}L${P(headCx + r * 0.34)} ${P(headCy + r * 0.5)}L${P(r * 0.36)} ${P(shoulderY + H * 0.02)}L${P(-r * 0.36)} ${P(shoulderY + H * 0.02)}Z`;
+  // knees spread beside the hips (leaning forward): behind the body
+  if (arms === 'knees' && lod <= 2) {
+    for (const s of [-1, 1] as const) {
+      const kd = ellipsePath(s * (wh + 0.015 * h), -0.15 * h, 0.085 * h, 0.072 * h);
+      out.push({k: `knee${s}`, d: kd, fill: col(m.coatLen === 'long' ? m.coat : m.trousers), ink: inkOn ? kd : undefined, w: 0.85});
+    }
+  }
+  // neck (hidden when the head sinks between the shoulders)
+  if (lod <= 1 && m.hair !== 'long' && m.hair !== 'hood' && hcy + r * 0.5 < ys) {
+    const nd = polyline([[hcx - r * 0.34, hcy + r * 0.5], [hcx + r * 0.34, hcy + r * 0.5], S(r * 0.36, ys + H * 0.02), S(-r * 0.36, ys + H * 0.02)], true);
     out.push({k: 'neck', d: nd, fill: col(m.skin, 'skin')});
   }
-  const acc = backAcc(m, col, {cx: 0, W, shoulderY, H, lod, view: 'back', seated: true});
+  const acc = backAcc(m, col, {cx: sx(ys + 0.28 * h), W, shoulderY: ys, H, lod, view: 'back', seated: true});
   out.push(...acc.under);
-  const fillD = tomb(0, 0, W, -shoulderY, 0.45 + (m.soft ?? 0) * 0.08, flare, true);
-  out.push({k: 'coat', d: fillD, fill: col(m.coat), ink: inkOn ? (m.closed ? fillD : tomb(0, 0, W, -shoulderY, 0.45, flare, false)) : undefined});
-  if (inkOn && !m.closed) out.push({k: 'seat', ink: hemLine(0, 0, W, flare, `${o.seed}/seat`, 0.12), w: 0.9});
-  if (lod === 0 && !m.mono && !o.read) {
-    out.push({k: 'seams', ink: `M${P(-W / 2 + H * 0.06)} ${P(shoulderY + H * 0.1)}Q${P(-W / 2 + H * 0.05)} ${P(shoulderY * 0.5)} ${P(-W / 2 + H * 0.07)} ${P(-H * 0.03)}M${P(W / 2 - H * 0.06)} ${P(shoulderY + H * 0.1)}Q${P(W / 2 - H * 0.05)} ${P(shoulderY * 0.5)} ${P(W / 2 - H * 0.07)} ${P(-H * 0.03)}`, w: 0.6});
+  // the body: shoulders -> waist -> the hip base on the seat
+  const outline: Pt[] = [
+    [-wh * 0.94, 0.014 * h],
+    [-wh, -0.045 * h],
+    S(-wh * 0.96, -0.12 * h),
+    S(-ww, wy),
+    S(-ws * 0.99, yR),
+    S(-ws * 0.88, ys + R * 0.38),
+    S(-ws * 0.58, ys + R * 0.06),
+    S(0, ys - hump),
+    S(ws * 0.58, ys + R * 0.06),
+    S(ws * 0.88, ys + R * 0.38),
+    S(ws * 0.99, yR),
+    S(ww, wy),
+    S(wh * 0.96, -0.12 * h),
+    [wh, -0.045 * h],
+    [wh * 0.94, 0.014 * h],
+  ];
+  const bottom: Pt[] = [
+    [wh * 0.45, 0.024 * h],
+    [0, 0.026 * h],
+    [-wh * 0.45, 0.024 * h],
+  ];
+  const coatD = curve([...outline, ...bottom], true, 0.5);
+  out.push({k: 'coat', d: coatD, fill: col(m.coat), ink: inkOn ? (m.closed ? coatD : curve(outline, false, 0.5)) : undefined});
+  if (inkOn && !m.closed) out.push({k: 'seat', ink: hemLine(0, 0.018 * h, 2 * wh * 0.92, 0, `${o.seed}/seat`, 0.12), w: 0.9});
+  // the arms: the pose on every free side (a cup / phone / notebook takes its side, a newspaper both)
+  const freeSides = (o.read ? [] : ([-1, 1] as const).filter((s) => !(busyArm && s === side))) as (1 | -1)[];
+  if (arms === 'lap') {
+    if (lod === 0 && !m.mono && freeSides.length) {
+      let seams = '';
+      for (const s of freeSides) {
+        const a = S(s * (ws - 0.1 * h), ys + 0.12 * h);
+        const b = S(s * (ww - 0.035 * h), wy);
+        const c = S(s * (ww - 0.075 * h), -0.05 * h);
+        seams += `M${P(a[0])} ${P(a[1])}Q${P(b[0])} ${P(b[1])} ${P(c[0])} ${P(c[1])}`;
+      }
+      out.push({k: 'seams', ink: seams, w: 0.6});
+    }
+  } else if (lod <= 2) {
+    for (const s of freeSides) {
+      if (arms === 'knees') {
+        out.push(...armParts(col, m, {from: S(s * ws * 0.8, ys + 0.1 * h), to: [s * (wh + 0.035 * h), -0.21 * h], H, lod, k: `kArm${s}`, noHand: true}));
+      } else if (arms === 'back') {
+        out.push(...armParts(col, m, {from: S(s * ws * 0.86, ys + 0.08 * h), to: [s * (wh + 0.15 * h), 0.03 * h], H, lod, k: `bArm${s}`}));
+      } else {
+        out.push(...armParts(col, m, {from: S(s * ws * 0.84, ys + 0.09 * h), elbow: S(s * ws * 1.03, -0.25 * h), to: S(s * ws * 0.74, -0.15 * h), H, lod, k: `hArm${s}`, noHand: true}));
+      }
+    }
   }
   out.push(...acc.over);
   if (m.satchel) {
     const sc = col(m.satchel);
-    out.push({k: 'satStrap', ink: `M${P(-W * 0.3)} ${P(shoulderY + H * 0.01)}L${P(W * 0.46)} ${P(-H * 0.09)}`, w: 1.1});
+    const a = S(-W * 0.3, ys + H * 0.01);
+    out.push({k: 'satStrap', ink: `M${P(a[0])} ${P(a[1])}L${P(W * 0.46)} ${P(-H * 0.09)}`, w: 1.1});
     const bw = H * 0.16;
     const sd = `M${P(W * 0.42)} ${P(-H * 0.15)}L${P(W * 0.42 + bw)} ${P(-H * 0.15)}L${P(W * 0.42 + bw)} 0L${P(W * 0.42)} 0Z`;
     out.push({k: 'satchel', d: sd, fill: sc, ink: inkOn ? sd : undefined});
     if (lod === 0) out.push({k: 'satFlap', ink: `M${P(W * 0.42)} ${P(-H * 0.15)}L${P(W * 0.42)} ${P(-H * 0.08)}Q${P(W * 0.42 + bw / 2)} ${P(-H * 0.05)} ${P(W * 0.42 + bw)} ${P(-H * 0.08)}`, w: 0.7});
   }
-  if (m.scarf || m.acc === 'scarf') out.push(...scarfParts(col(m.scarf ?? m.accColor), {cx: 0, y: shoulderY, w: r * 1.95, H, view: 'back', lod, k: 'scarf'}));
+  const shx = sx(ys);
+  if (m.scarf || m.acc === 'scarf') out.push(...scarfParts(col(m.scarf ?? m.accColor), {cx: shx, y: ys, w: r * 1.95, H, view: 'back', lod, k: 'scarf'}));
   if (m.hoodDown && (m.hoodUp === undefined || m.hoodUp <= 0)) {
-    const d = curve([[-r * 1.15, shoulderY + H * 0.03], ...arcPts(0, shoulderY + H * 0.02, r * 1.15, r * 0.62, 190, 350, 10), [r * 1.15, shoulderY + H * 0.03], [0, shoulderY + H * 0.08]], true, 0.4);
+    const d = curve([[shx - r * 1.15, ys + H * 0.03], ...arcPts(shx, ys + H * 0.02, r * 1.15, r * 0.62, 190, 350, 10), [shx + r * 1.15, ys + H * 0.03], [shx, ys + H * 0.08]], true, 0.4);
     out.push({k: 'hoodDown', d, fill: col(m.coat), ink: inkOn ? d : undefined});
   }
   // the lanyard cord over the collar (and over a hood that is down)
   if (m.lanyard && lod <= 1 && (m.hoodUp === undefined || m.hoodUp <= 0)) {
-    const ly = m.hoodDown ? shoulderY - H * 0.012 : shoulderY + H * 0.004;
-    out.push({k: 'lanyard', ink: `M${P(-r * 0.7)} ${P(ly + H * 0.02)}Q${P(-r * 0.5)} ${P(ly - H * 0.01)} 0 ${P(ly - H * 0.012)}Q${P(r * 0.5)} ${P(ly - H * 0.01)} ${P(r * 0.7)} ${P(ly + H * 0.02)}`, w: 1.5, inkColor: m.mono ?? m.lanyard});
+    const ly = m.hoodDown ? ys - H * 0.012 : ys + H * 0.004;
+    out.push({k: 'lanyard', ink: `M${P(shx - r * 0.7)} ${P(ly + H * 0.02)}Q${P(shx - r * 0.5)} ${P(ly - H * 0.01)} ${P(shx)} ${P(ly - H * 0.012)}Q${P(shx + r * 0.5)} ${P(ly - H * 0.01)} ${P(shx + r * 0.7)} ${P(ly + H * 0.02)}`, w: 1.5, inkColor: m.mono ?? m.lanyard});
   }
   // cup / phone / notebook arm on `side`
-  const sh: Pt = [side * W * 0.36, shoulderY + H * 0.06];
+  const sh = S(side * W * 0.36, ys + H * 0.06);
   if (o.cup !== undefined) {
     const k = Math.max(0, Math.min(1, o.cup));
-    const elbow: Pt = [side * (W * 0.55 + H * 0.03 * k), shoulderY + H * (0.2 - 0.09 * k)];
-    const hand: Pt = [side * (W * (0.52 - 0.18 * k)), -H * 0.05 + (headCy + r * 0.55 + H * 0.05) * k];
+    const elbow: Pt = [side * (W * 0.55 + H * 0.03 * k) + sx(ys + 0.2 * h), ys + H * (0.2 - 0.09 * k)];
+    const hand: Pt = [side * (W * (0.52 - 0.18 * k)) + sx((hcy + r) * k), -H * 0.05 + (hcy + r * 0.55 + H * 0.05) * k];
     out.push(...armParts(col, m, {from: sh, to: hand, H, lod, k: 'cupArm', elbow}));
-    const cw = H * 0.045;
-    const chh = H * 0.07;
-    const cx = hand[0] + side * H * 0.01;
-    const cy = hand[1] - H * 0.01;
-    const cd = polyline([[cx - cw / 2, cy - chh], [cx + cw / 2, cy - chh], [cx + cw * 0.38, cy], [cx - cw * 0.38, cy]], true);
-    out.push({k: 'cup', d: cd, fill: col(CM.paper), ink: inkOn ? cd : undefined, w: 0.7});
-    if (lod === 0) out.push({k: 'cupSleeve', d: polyline([[cx - cw * 0.47, cy - chh * 0.62], [cx + cw * 0.47, cy - chh * 0.62], [cx + cw * 0.43, cy - chh * 0.3], [cx - cw * 0.43, cy - chh * 0.3]], true), fill: col(CM.brick), exact: true});
-    if (lod === 0) out.push({k: 'cupLid', d: polyline([[cx - cw * 0.58, cy - chh - H * 0.012], [cx + cw * 0.58, cy - chh - H * 0.012], [cx + cw * 0.56, cy - chh + H * 0.004], [cx - cw * 0.56, cy - chh + H * 0.004]], true), fill: col(CM.coatOat), ink: polyline([[cx - cw * 0.58, cy - chh - H * 0.012], [cx + cw * 0.58, cy - chh - H * 0.012]]), w: 0.6, exact: true});
+    out.push(...cupParts(col, hand, side, H, lod, inkOn));
   }
   if (o.phone) {
-    const hand: Pt = [side * W * 0.5, headCy - r * 0.6];
-    out.push(...armParts(col, m, {from: sh, to: hand, H, lod, k: 'phoneArm', elbow: [side * W * 0.62, shoulderY + H * 0.05]}));
+    const hand: Pt = [side * W * 0.5 + sx(hcy), hcy - r * 0.6];
+    out.push(...armParts(col, m, {from: sh, to: hand, H, lod, k: 'phoneArm', elbow: S(side * W * 0.62, ys + H * 0.05)}));
     const pd = polyline([[hand[0] - H * 0.026, hand[1] - H * 0.1], [hand[0] + H * 0.026, hand[1] - H * 0.1], [hand[0] + H * 0.026, hand[1] + H * 0.005], [hand[0] - H * 0.026, hand[1] + H * 0.005]], true);
     out.push({k: 'phone', d: pd, fill: col(CM.anchor), ink: inkOn ? pd : undefined, w: 0.7, exact: true});
   }
   if (o.notebook !== undefined) {
     const k = Math.max(0, Math.min(1, o.notebook));
-    const hand: Pt = [side * W * 0.56, shoulderY + H * 0.14];
-    out.push(...armParts(col, m, {from: sh, to: hand, H, lod, k: 'nbArm', elbow: [side * W * 0.6, shoulderY + H * 0.2]}));
+    const hand = S(side * W * 0.56, ys + H * 0.14);
+    out.push(...armParts(col, m, {from: sh, to: hand, H, lod, k: 'nbArm', elbow: S(side * W * 0.6, ys + H * 0.2)}));
     const nh = H * 0.13;
     const nw = H * (0.035 + 0.1 * k);
     const nx = hand[0] + side * nw * 0.35;
@@ -909,16 +1012,250 @@ export function seatParts(m: Model, o: SeatOpts): Part[] {
       out.push({k: 'nbLines', ink: tl, w: 0.45});
     }
   }
-  const hd = head(m, col, {cx: headCx, cy: headCy, r, view: 'back', lod, seed: o.seed, shoulderY, hairEnd: shoulderY + H * 0.15, turn});
+  // an arm round a partner (drawn over the partner when this figure is drawn after it)
+  if (o.armAround && lod <= 2) {
+    const s = o.armAround[0] >= 0 ? 1 : -1;
+    const from = S(s * ws * 0.78, ys + 0.07 * h);
+    const to = o.armAround;
+    const el: Pt = [(from[0] + to[0]) / 2, Math.min(from[1], to[1]) - 0.035 * h];
+    out.push(...armParts(col, m, {from, to, elbow: el, H, lod, k: 'around'}));
+  }
+  const hd = head(m, col, {cx: hcx, cy: hcy, r, view: 'back', lod, seed: o.seed, shoulderY: ys, hairEnd: ys + H * 0.15, turn});
   out.push(...hd.behind, ...hd.front);
   // the reading arms reach out to the paper's edges
   if (o.read && lod <= 1) {
-    for (const s of [-1, 1]) out.push({k: `readArm${s}`, ink: `M${P(s * W * 0.45)} ${P(shoulderY + H * 0.06)}Q${P(s * W * 0.62)} ${P(shoulderY + H * 0.06)} ${P(s * W * 0.72)} ${P(shoulderY + H * 0.02)}`, w: 0.7});
+    for (const s of [-1, 1]) {
+      const a = S(s * W * 0.45, ys + H * 0.06);
+      const b = S(s * W * 0.62, ys + H * 0.06);
+      const c = S(s * W * 0.72, ys + H * 0.02);
+      out.push({k: `readArm${s}`, ink: `M${P(a[0])} ${P(a[1])}Q${P(b[0])} ${P(b[1])} ${P(c[0])} ${P(c[1])}`, w: 0.7});
+    }
   }
   return out;
 }
 
+/** A takeaway cup in a hand (paper cup, brick sleeve, oat lid). */
+function cupParts(col: Col, hand: Pt, side: number, H: number, lod: Lod, inkOn: boolean): Part[] {
+  const out: Part[] = [];
+  const cw = H * 0.045;
+  const chh = H * 0.07;
+  const cx = hand[0] + side * H * 0.01;
+  const cy = hand[1] - H * 0.01;
+  const cd = polyline([[cx - cw / 2, cy - chh], [cx + cw / 2, cy - chh], [cx + cw * 0.38, cy], [cx - cw * 0.38, cy]], true);
+  out.push({k: 'cup', d: cd, fill: col(CM.paper), ink: inkOn ? cd : undefined, w: 0.7});
+  if (lod === 0) out.push({k: 'cupSleeve', d: polyline([[cx - cw * 0.47, cy - chh * 0.62], [cx + cw * 0.47, cy - chh * 0.62], [cx + cw * 0.43, cy - chh * 0.3], [cx - cw * 0.43, cy - chh * 0.3]], true), fill: col(CM.brick), exact: true});
+  if (lod === 0) out.push({k: 'cupLid', d: polyline([[cx - cw * 0.58, cy - chh - H * 0.012], [cx + cw * 0.58, cy - chh - H * 0.012], [cx + cw * 0.56, cy - chh + H * 0.004], [cx - cw * 0.56, cy - chh + H * 0.004]], true), fill: col(CM.coatOat), ink: polyline([[cx - cw * 0.58, cy - chh - H * 0.012], [cx + cw * 0.58, cy - chh - H * 0.012]]), w: 0.6, exact: true});
+  return out;
+}
+
+/** Rear 3/4 and profile seated figures (facing LEFT): the thighs run forward to the knees, the shins drop to the
+ *  step below; the near arm carries the pose. */
+function seatSideParts(m: Model, o: SeatOpts, view: 'rear34' | 'profile'): Part[] {
+  const col = colorer(m);
+  const {h, lod} = o;
+  const arms: SeatArms = o.arms ?? 'lap';
+  const {child, H, r} = seatFrame(m, o);
+  const inkOn = lod <= 1;
+  const out: Part[] = [];
+  const r34 = view === 'rear34';
+  // forward poses bend the back toward the knees (left), leaning back tips it right
+  const fwd = arms === 'knees' ? -13 : arms === 'hug' ? -8 : arms === 'back' ? 7 : 0;
+  const tanL = Math.tan((((o.lean ?? 0) + fwd) * Math.PI) / 180);
+  const sx = (y: number) => tanL * Math.max(0, -y - h * 0.05);
+  const S = (x: number, y: number): Pt => [x + sx(y), y];
+  const hy = -h + r + (arms === 'knees' ? 0.05 * h : arms === 'hug' ? 0.035 * h : 0);
+  const ys = hy + r + 0.0536 * h;
+  const legC = col(m.trousers);
+  const thighC = m.coatLen === 'long' ? col(m.coat) : legC;
+  const shoeC = col(m.shoes);
+  const coatC = col(m.coat);
+  const hug = arms === 'hug';
+  const off = r34 ? 0.035 * h : 0;
+  const hip: Pt = [r34 ? -0.06 * h : -0.03 * h, -0.085 * h];
+  const knee: Pt = hug ? [-0.3 * h, -0.37 * h] : [-0.46 * h, -0.15 * h];
+  const ankle: Pt = hug ? [-0.37 * h, 0.015 * h] : [-0.52 * h, 0.03 * h];
+  const lw = (child ? 0.072 : 0.08) * h;
+  const leg = (k: string, dx: number, dy: number) => {
+    if (lod > 2) return;
+    const hp: Pt = [hip[0] + dx, hip[1] + dy];
+    const kn: Pt = [knee[0] + dx, knee[1] + dy];
+    const an: Pt = [ankle[0] + dx, ankle[1] + dy];
+    const sD = capsule(kn, an, lw * 0.82, lw * 0.68);
+    const tD = capsule(hp, kn, lw, lw * 0.9);
+    out.push({k: `${k}Sh`, d: sD, fill: legC, ink: inkOn ? sD : undefined});
+    out.push({k: `${k}Th`, d: tD, fill: thighC, ink: inkOn ? tD : undefined});
+    if (lod <= 1) {
+      const tl = 0.13 * h;
+      const sd = `M${P(an[0] + 0.035 * h)} ${P(an[1] - 0.05 * h)}L${P(an[0] - tl * 0.5)} ${P(an[1] - 0.05 * h)}Q${P(an[0] - tl)} ${P(an[1] - 0.045 * h)} ${P(an[0] - tl)} ${P(an[1] - 0.008 * h)}L${P(an[0] + 0.035 * h)} ${P(an[1])}Z`;
+      out.push({k: `${k}Shoe`, d: sd, fill: shoeC, ink: lod === 0 ? sd : undefined, w: 0.75});
+    }
+  };
+  // the far leg first (a little up and right), then, in rear 3/4, the near one: both in front of the body
+  leg('far', 0.06 * h, -0.03 * h);
+  if (r34) leg('near', 0, 0);
+  // accessories behind the body (a tote set down behind the hip)
+  const accC = col(m.accColor);
+  if (m.acc === 'tote' && lod <= 2) {
+    const bw = H * 0.13;
+    const bh = H * 0.13;
+    const bx = (r34 ? off + 0.3 * h : 0.26 * h) + bw * 0.4;
+    const d = `M${P(bx - bw / 2)} ${P(-bh)}L${P(bx + bw / 2)} ${P(-bh)}L${P(bx + bw * 0.55)} 0L${P(bx - bw * 0.55)} 0Z`;
+    out.push({k: 'bag', d, fill: accC, ink: inkOn ? d : undefined});
+    if (inkOn) out.push({k: 'bagHandle', ink: `M${P(bx - bw * 0.28)} ${P(-bh)}Q${P(bx)} ${P(-bh - H * 0.09)} ${P(bx + bw * 0.28)} ${P(-bh)}`, w: 0.8});
+  }
+  // the body
+  let outline: Pt[];
+  let ws: number;
+  if (r34) {
+    ws = (child ? 0.24 : 0.27) * h * m.broad;
+    const wh = ws * 1.22;
+    const ww = ws * 0.9;
+    const R = ws * 0.82;
+    const yR = Math.min(ys + R * 0.95, -0.2 * h);
+    const wy = (yR - 0.12 * h) / 2;
+    outline = [
+      [off - wh * 0.95, 0.012 * h],
+      [off - wh, -0.05 * h],
+      S(off - wh * 0.95, -0.12 * h),
+      S(off - ww, wy),
+      S(off - ws * 0.99, yR),
+      S(off - ws * 0.86, ys + R * 0.36),
+      S(off - ws * 0.55, ys + R * 0.05),
+      S(off + ws * 0.1, ys - 0.004 * h),
+      S(off + ws * 0.62, ys + R * 0.07),
+      S(off + ws * 0.9, ys + R * 0.4),
+      S(off + ws, yR),
+      S(off + ww, wy),
+      S(off + wh * 0.95, -0.12 * h),
+      [off + wh, -0.05 * h],
+      [off + wh * 0.94, 0.012 * h],
+    ];
+  } else {
+    const tw = (child ? 0.27 : 0.3) * h * m.broad;
+    ws = tw / 2;
+    const fx = -tw * 0.45;
+    const bx = tw * 0.55;
+    outline = [
+      [fx - 0.03 * h, 0.012 * h],
+      [fx - 0.045 * h, -0.08 * h],
+      S(fx - 0.005 * h, -0.22 * h),
+      S(fx + 0.012 * h, ys + 0.12 * h),
+      S(fx + 0.04 * h, ys + 0.025 * h),
+      S(fx + tw * 0.42, ys - 0.012 * h),
+      S(bx - 0.02 * h, ys + 0.03 * h),
+      S(bx + 0.012 * h, ys + 0.14 * h),
+      S(bx, -0.24 * h),
+      [bx + 0.025 * h, -0.08 * h],
+      [bx + 0.012 * h, 0.012 * h],
+    ];
+  }
+  const bottomY = 0.022 * h;
+  const ox = outline[0][0];
+  const ex = outline[outline.length - 1][0];
+  const bottom: Pt[] = [
+    [ex - (ex - ox) * 0.2, bottomY],
+    [(ex + ox) / 2, bottomY + 0.004 * h],
+    [ox + (ex - ox) * 0.2, bottomY],
+  ];
+  // the body, with a backpack on its back (rear 3/4: the back view's pack over the coat; profile: beside the back)
+  const coatD = curve([...outline, ...bottom], true, 0.5);
+  let packOver: Part[] = [];
+  if (m.acc === 'backpack' && lod <= 2) {
+    if (r34) {
+      const acc = backAcc(m, col, {cx: off + sx(ys + 0.28 * h), W: 2 * ws, shoulderY: ys, H, lod, view: 'rear34', seated: true});
+      out.push(...acc.under);
+      packOver = acc.over;
+    } else {
+      const bxp = ws * 1.05 + sx(ys + 0.2 * h);
+      const t0 = ys + 0.05 * h;
+      const d = `M${P(bxp - ws * 0.2)} ${P(t0)}L${P(bxp + ws * 0.85)} ${P(t0 + 0.02 * h)}Q${P(bxp + ws * 1.05)} ${P(t0 + 0.2 * h)} ${P(bxp + ws * 0.8)} ${P(t0 + 0.36 * h)}L${P(bxp - ws * 0.1)} ${P(t0 + 0.36 * h)}Z`;
+      out.push({k: 'pack', d, fill: accC, ink: inkOn ? d : undefined});
+    }
+  }
+  out.push({k: 'coat', d: coatD, fill: coatC, ink: inkOn ? (m.closed ? coatD : curve(outline, false, 0.5)) : undefined});
+  out.push(...packOver);
+  if (inkOn && !m.closed) {
+    out.push({k: 'seat', ink: `M${P(ox + (ex - ox) * 0.12)} ${P(bottomY)}L${P(ex - (ex - ox) * 0.1)} ${P(bottomY + 0.002 * h)}`, w: 0.9});
+  }
+  // profile: the near leg over the hip
+  if (!r34) leg('near', 0, 0);
+  if (m.acc === 'backpack' && !r34 && lod <= 1) {
+    const a = S(0.02 * h, ys + 0.004 * h);
+    const b = S(-ws * 0.3, ys + 0.12 * h);
+    const c = S(ws * 0.4, ys + 0.26 * h);
+    out.push({k: 'packStrap', ink: `M${P(a[0])} ${P(a[1])}Q${P(b[0])} ${P(b[1])} ${P(c[0])} ${P(c[1])}`, w: 0.9});
+  }
+  if (m.acc === 'strap' && lod <= 1) {
+    const a = S(0.02 * h, ys + 0.004 * h);
+    out.push({k: 'strapLine', ink: `M${P(a[0])} ${P(a[1])}L${P(-ws * 0.7)} ${P(-0.12 * h)}`, w: 0.9});
+    const d = ellipsePath(-ws * 0.8, -0.1 * h, H * 0.04, H * 0.035);
+    out.push({k: 'strapBag', d, fill: accC, ink: d});
+  }
+  if (m.scarf || m.acc === 'scarf') out.push(...scarfParts(col(m.scarf ?? m.accColor), {cx: (r34 ? off - 0.02 * h : 0.004 * h) + sx(ys), y: ys + 0.004 * h, w: r34 ? r * 1.85 : ws * 1.5, H, view, lod, k: 'scarf'}));
+  // the head (rear 3/4 turned a little toward us; profile faces left)
+  const [hcx, hcy] = S(r34 ? off - 0.06 * h : -0.02 * h + (arms === 'knees' ? -0.03 * h : 0), hy);
+  // the near arm carries the pose (or the cup / phone / paper)
+  const sh = r34 ? S(off - ws * 0.72, ys + 0.07 * h) : S(0.02 * h, ys + 0.06 * h);
+  const lapHand: Pt = [knee[0] + 0.15 * h, knee[1] - 0.025 * h];
+  const mouth: Pt = [hcx - r * 0.95, hcy + r * 0.45];
+  let el: Pt;
+  let hand: Pt;
+  let noHand = false;
+  if (o.cup !== undefined) {
+    const k = Math.max(0, Math.min(1, o.cup));
+    hand = [lapHand[0] + (mouth[0] - lapHand[0]) * k, lapHand[1] + (mouth[1] - lapHand[1]) * k];
+    el = [sh[0] - 0.03 * h - 0.04 * h * k, -0.2 * h + (ys + 0.2 * h + 0.2 * h) * k * 0.35];
+  } else if (o.phone) {
+    hand = [hcx - r * 1.05, hcy + r * 0.1];
+    el = [sh[0] - 0.05 * h, ys + 0.22 * h];
+  } else if (o.read || o.notebook !== undefined) {
+    hand = [knee[0] + 0.08 * h, knee[1] - 0.1 * h];
+    el = [sh[0] - 0.02 * h, -0.2 * h];
+  } else if (arms === 'knees') {
+    el = [knee[0] + 0.05 * h, knee[1] - 0.06 * h];
+    hand = [hcx - r * 0.85, hcy + r * 0.8];
+  } else if (arms === 'back') {
+    hand = [r34 ? off + ws * 1.4 : sh[0] + 0.3 * h, 0.025 * h];
+    el = [(sh[0] + hand[0]) / 2 + 0.01 * h, (sh[1] + hand[1]) / 2];
+  } else if (arms === 'hug') {
+    el = [knee[0] + 0.13 * h, -0.27 * h];
+    hand = [ankle[0] + 0.08 * h, -0.2 * h];
+    noHand = lod > 0;
+  } else {
+    el = [sh[0] - 0.015 * h, -0.2 * h];
+    hand = lapHand;
+  }
+  // a paper / notebook on the knees under the hand
+  if ((o.read || o.notebook !== undefined) && lod <= 2) {
+    const px = knee[0] + 0.06 * h;
+    const py = knee[1] - 0.14 * h;
+    const pw = o.read ? 0.26 * h : 0.15 * h;
+    const ph = o.read ? 0.17 * h : 0.12 * h;
+    const pd = polyline([[px - pw / 2, py], [px + pw / 2, py - 0.02 * h], [px + pw / 2 + 0.01 * h, py + ph], [px - pw / 2 + 0.01 * h, py + ph + 0.02 * h]], true);
+    out.push({k: 'lapPaper', d: pd, fill: col(CM.paper), ink: inkOn ? pd : undefined, w: 0.75});
+  }
+  out.push(...armParts(col, m, {from: sh, to: hand, elbow: el, H, lod, k: 'armNear', noHand}));
+  if (o.cup !== undefined) out.push(...cupParts(col, hand, -1, H, lod, inkOn));
+  if (o.phone) {
+    const pd = polyline([[hand[0] - H * 0.022, hand[1] - H * 0.09], [hand[0] + H * 0.02, hand[1] - H * 0.09], [hand[0] + H * 0.02, hand[1] + H * 0.005], [hand[0] - H * 0.022, hand[1] + H * 0.005]], true);
+    out.push({k: 'phone', d: pd, fill: col(CM.anchor), ink: inkOn ? pd : undefined, w: 0.7, exact: true});
+  }
+  if (o.armAround && lod <= 2) {
+    const s = o.armAround[0] >= 0 ? 1 : -1;
+    const from = S(s * ws * 0.7 + off, ys + 0.07 * h);
+    const to = o.armAround;
+    out.push(...armParts(col, m, {from, to, elbow: [(from[0] + to[0]) / 2, Math.min(from[1], to[1]) - 0.035 * h], H, lod, k: 'around'}));
+  }
+  const hd = head(m, col, {cx: hcx, cy: hcy, r, view, lod, seed: o.seed, shoulderY: ys, hairEnd: ys + H * 0.15, turn: o.turn});
+  out.push(...hd.behind, ...hd.front);
+  return out;
+}
+
 // ---------------------------------------------------------------- the near row: head-and-shoulder backs cut by the frame bottom
+
+/** The owner's people rule (2026-10-27, measured on reference 1's front row: head-backs ~90-110 px wide): a near
+ *  head-back is at most ~140 px wide. nearParts holds every near back to it whatever `hv` asks. */
+export const NEAR_MAX_W = 140;
 
 export type NearOpts = {
   /** Visible height: head top to the frame bottom (px). The torso runs `bleed` px past it. */
@@ -926,43 +1263,61 @@ export type NearOpts = {
   seed: string;
   turn?: number;
   bleed?: number;
+  /** Lean (deg, + = the head toward screen right): a shear about the cut; pairs lean together. */
+  lean?: number;
 };
 
+/** Head-and-shoulder back cut by the frame bottom. Width = 0.84 hv x broad up to NEAR_MAX_W; past the cap the head
+ *  and shoulders are drawn at the capped size with the head top still at -hv (a longer back shows instead). */
 export function nearParts(m: Model, o: NearOpts): Part[] {
   const col = colorer(m);
   const {hv, seed} = o;
   const bleed = o.bleed ?? 40;
-  const r = hv * 0.205;
+  const W0 = hv * 0.84 * m.broad;
+  const k = Math.min(1, NEAR_MAX_W / W0);
+  const s = hv * k;
+  const r = s * 0.205;
   const H = r / 0.112; // the standing height this head belongs to (accessory sizes)
-  const headCx = (o.turn ?? 0) * r * 0.16;
+  const tanL = Math.tan(((o.lean ?? 0) * Math.PI) / 180);
+  const sx = (y: number) => tanL * Math.max(0, -y);
   const headCy = -hv + r;
-  const shoulderY = -hv + 2 * r + hv * 0.06;
-  const W = hv * 0.84 * m.broad;
+  const headCx = (o.turn ?? 0) * r * 0.16 + sx(headCy);
+  const shoulderY = -hv + 2 * r + s * 0.06;
+  const W = W0 * k;
+  const c = sx(shoulderY);
   const out: Part[] = [];
   if (m.hair !== 'long' && m.hair !== 'hood') {
-    const nd = `M${P(headCx - r * 0.36)} ${P(headCy + r * 0.45)}L${P(headCx + r * 0.36)} ${P(headCy + r * 0.45)}L${P(r * 0.4)} ${P(shoulderY + hv * 0.03)}L${P(-r * 0.4)} ${P(shoulderY + hv * 0.03)}Z`;
-    out.push({k: 'neck', d: nd, fill: col(m.skin, 'skin'), ink: `M${P(headCx - r * 0.36)} ${P(headCy + r * 0.62)}L${P(-r * 0.4)} ${P(shoulderY + hv * 0.015)}M${P(headCx + r * 0.36)} ${P(headCy + r * 0.62)}L${P(r * 0.4)} ${P(shoulderY + hv * 0.015)}`, w: 0.7});
+    const nd = `M${P(headCx - r * 0.36)} ${P(headCy + r * 0.45)}L${P(headCx + r * 0.36)} ${P(headCy + r * 0.45)}L${P(c + r * 0.4)} ${P(shoulderY + s * 0.03)}L${P(c - r * 0.4)} ${P(shoulderY + s * 0.03)}Z`;
+    out.push({k: 'neck', d: nd, fill: col(m.skin, 'skin'), ink: `M${P(headCx - r * 0.36)} ${P(headCy + r * 0.62)}L${P(c - r * 0.4)} ${P(shoulderY + s * 0.015)}M${P(headCx + r * 0.36)} ${P(headCy + r * 0.62)}L${P(c + r * 0.4)} ${P(shoulderY + s * 0.015)}`, w: 0.7});
   }
-  const fillD = tomb(0, bleed, W, bleed - shoulderY, 0.36, 0.02, true);
-  out.push({k: 'coat', d: fillD, fill: col(m.coat), ink: tomb(0, bleed, W, bleed - shoulderY, 0.36, 0.02, false)});
-  if (m.hair !== 'hood') out.push({k: 'collar', ink: `M${P(-r * 0.62)} ${P(shoulderY + hv * 0.005)}Q0 ${P(shoulderY + hv * 0.07)} ${P(r * 0.62)} ${P(shoulderY + hv * 0.005)}`, w: 0.7});
+  // the coat: a tombstone from the shoulders to past the cut, its top sheared by the lean
+  const R = Math.min(W * 0.36, (bleed - shoulderY) * 0.85);
+  const kq = 0.45;
+  const hw = W / 2;
+  const bx = hw * 1.02;
+  const T = (x: number, y: number) => `${P(x + sx(y))} ${P(y)}`;
+  const top = shoulderY;
+  const side = `M${T(-bx, bleed)}L${T(-hw, top + R)}C${T(-hw, top + R * kq)} ${T(-hw + R * kq, top)} ${T(-hw + R, top)}L${T(hw - R, top)}C${T(hw - R * kq, top)} ${T(hw, top + R * kq)} ${T(hw, top + R)}L${T(bx, bleed)}`;
+  out.push({k: 'coat', d: side + 'Z', fill: col(m.coat), ink: side});
+  if (m.hair !== 'hood') out.push({k: 'collar', ink: `M${P(c - r * 0.62)} ${P(shoulderY + s * 0.005)}Q${P(c)} ${P(shoulderY + s * 0.07)} ${P(c + r * 0.62)} ${P(shoulderY + s * 0.005)}`, w: 0.7});
   const accC = col(m.accColor);
   if (m.acc === 'backpack') {
     const pw = W * 0.5;
-    const top = shoulderY + hv * 0.16;
-    const d = `M${P(-pw / 2)} ${P(bleed)}L${P(-pw / 2)} ${P(top + pw * 0.2)}Q${P(-pw / 2)} ${P(top)} 0 ${P(top - hv * 0.01)}Q${P(pw / 2)} ${P(top)} ${P(pw / 2)} ${P(top + pw * 0.2)}L${P(pw / 2)} ${P(bleed)}Z`;
+    const ptop = shoulderY + s * 0.16;
+    const pc = sx((ptop + bleed) / 2);
+    const d = `M${P(pc - pw / 2)} ${P(bleed)}L${P(pc - pw / 2)} ${P(ptop + pw * 0.2)}Q${P(pc - pw / 2)} ${P(ptop)} ${P(pc)} ${P(ptop - s * 0.01)}Q${P(pc + pw / 2)} ${P(ptop)} ${P(pc + pw / 2)} ${P(ptop + pw * 0.2)}L${P(pc + pw / 2)} ${P(bleed)}Z`;
     out.push({k: 'pack', d, fill: accC, ink: d});
-    out.push({k: 'packFlap', ink: `M${P(-pw * 0.42)} ${P(top + hv * 0.08)}Q0 ${P(top + hv * 0.13)} ${P(pw * 0.42)} ${P(top + hv * 0.08)}`, w: 0.7});
-    for (const s of [-1, 1]) out.push({k: `strap${s}`, ink: `M${P(s * W * 0.3)} ${P(shoulderY + hv * 0.004)}Q${P(s * W * 0.32)} ${P(top - hv * 0.02)} ${P(s * pw * 0.4)} ${P(top + hv * 0.04)}`, w: 0.9});
+    out.push({k: 'packFlap', ink: `M${P(pc - pw * 0.42)} ${P(ptop + s * 0.08)}Q${P(pc)} ${P(ptop + s * 0.13)} ${P(pc + pw * 0.42)} ${P(ptop + s * 0.08)}`, w: 0.7});
+    for (const sg of [-1, 1]) out.push({k: `strap${sg}`, ink: `M${P(c + sg * W * 0.3)} ${P(shoulderY + s * 0.004)}Q${P(c + sg * W * 0.32)} ${P(ptop - s * 0.02)} ${P(pc + sg * pw * 0.4)} ${P(ptop + s * 0.04)}`, w: 0.9});
   } else if (m.acc === 'tote' || m.acc === 'strap') {
-    out.push({k: 'bagStrap', ink: m.acc === 'tote' ? `M${P(W * 0.24)} ${P(shoulderY + hv * 0.004)}Q${P(W * 0.3)} ${P(shoulderY + hv * 0.2)} ${P(W * 0.28)} ${P(bleed)}` : `M${P(-W * 0.3)} ${P(shoulderY + hv * 0.01)}L${P(W * 0.42)} ${P(bleed)}`, w: 1.2});
+    out.push({k: 'bagStrap', ink: m.acc === 'tote' ? `M${P(c + W * 0.24)} ${P(shoulderY + s * 0.004)}Q${P(c * 0.5 + W * 0.3)} ${P(shoulderY + s * 0.2)} ${P(W * 0.28)} ${P(bleed)}` : `M${P(c - W * 0.3)} ${P(shoulderY + s * 0.01)}L${P(W * 0.42)} ${P(bleed)}`, w: 1.2});
   }
-  if (m.scarf || m.acc === 'scarf') out.push(...scarfParts(col(m.scarf ?? m.accColor), {cx: 0, y: shoulderY + hv * 0.01, w: r * 2.05, H, view: 'back', lod: 0, k: 'scarf'}));
+  if (m.scarf || m.acc === 'scarf') out.push(...scarfParts(col(m.scarf ?? m.accColor), {cx: c, y: shoulderY + s * 0.01, w: r * 2.05, H, view: 'back', lod: 0, k: 'scarf'}));
   if (m.hoodDown) {
-    const d = curve([[-r * 1.2, shoulderY + hv * 0.03], ...arcPts(0, shoulderY + hv * 0.02, r * 1.2, r * 0.6, 190, 350, 10), [r * 1.2, shoulderY + hv * 0.03], [0, shoulderY + hv * 0.09]], true, 0.4);
+    const d = curve([[c - r * 1.2, shoulderY + s * 0.03], ...arcPts(c, shoulderY + s * 0.02, r * 1.2, r * 0.6, 190, 350, 10), [c + r * 1.2, shoulderY + s * 0.03], [c, shoulderY + s * 0.09]], true, 0.4);
     out.push({k: 'hoodDown', d, fill: col(m.coat), ink: d});
   }
-  const hd = head(m, col, {cx: headCx, cy: headCy, r, view: 'back', lod: 0, seed, shoulderY, hairEnd: shoulderY + hv * 0.2, turn: o.turn, noCheek: true});
+  const hd = head(m, col, {cx: headCx, cy: headCy, r, view: 'back', lod: 0, seed, shoulderY, hairEnd: shoulderY + s * 0.2, turn: o.turn, noCheek: true});
   out.push(...hd.behind, ...hd.front);
   return out;
 }

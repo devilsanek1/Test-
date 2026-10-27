@@ -722,9 +722,10 @@ def bus_guard(rows, arrs, V, bed, iters=8, hop=0.05):
     n = min(len(tv), len(bb)); tv, lv, lb, sp, bb = tv[:n], lv[:n], lb[:n], sp[:n], bb[:n]
     trk = []
     for r in rows:
-        one = np.zeros((N_FILM, 2)); M.place_wrapped(one, arrs[r["name"]], frame_t(r["t"]))
-        _, l = short_term_lufs(one, win=0.4, hop=hop); _, b = M.band_rms(one, hop=hop)
-        trk.append((np.maximum(l[:n], -120.0), np.maximum(b[:n], -150.0)))
+        y, t = arrs[r["name"]], frame_t(r["t"])
+        l = local_frames(y, t, 0.4, hop, lambda z: short_term_lufs(z, win=0.4, hop=hop)[1], -120.0, n)
+        b = local_frames(y, t, 0.4, hop, lambda z: M.band_rms(z, hop=hop)[1], -150.0, n)
+        trk.append((np.maximum(l, -120.0), np.maximum(b, -150.0)))
     extra = {r["fam"]: 0.0 for r in rows}
     for _ in range(iters):
         g = np.array([r["g_db"] + extra[r["fam"]] for r in rows])
@@ -754,6 +755,27 @@ def bus_guard(rows, arrs, V, bed, iters=8, hop=0.05):
     return extra
 
 
+def local_frames(y, t, win, hop, fn, floor, n_frames):
+    """a cue's frame track on the film's frame grid (frame j = samples [j*hop, j*hop + win)), computed only on a
+    window around the cue (zeros outside it give the same values as the whole film would) and `floor` elsewhere.
+    A cue that runs past the film's end is computed on the whole (wrapped) film."""
+    h, w = n_of(hop), n_of(win)
+    i0 = n_of(t); y = st(y)
+    if i0 + len(y) > N_FILM:
+        one = np.zeros((N_FILM, 2)); M.place_wrapped(one, y, t)
+        v = fn(one)
+        out = np.full(n_frames, floor); k = min(n_frames, len(v)); out[:k] = v[:k]
+        return out
+    pad = w + n_of(0.25)
+    s0 = max(0, ((i0 - pad) // h) * h); s1 = min(N_FILM, i0 + len(y) + pad)
+    seg = np.zeros((s1 - s0, 2)); seg[i0 - s0: i0 - s0 + len(y)] = y
+    v = fn(seg)
+    out = np.full(n_frames, floor)
+    j0 = s0 // h; k = max(0, min(len(v), n_frames - j0))
+    out[j0: j0 + k] = v[:k]
+    return out
+
+
 def band_track(x, band, win=0.03, hop=0.01):
     """band power (linear, mean square) of a stereo / mono signal in `win` windows every `hop` s."""
     m = st(x).mean(axis=1)
@@ -774,19 +796,24 @@ def word_frames(tv, ev, span, act_db=12.0):
     return m & (lv >= mx - act_db) & (lv > -75.0)
 
 
-def word_metrics(Ev, Erest, tv):
+def word_metrics(Ev, Erest, tv, Erest_tonal=None):
     """per hit word and band: the voice over the rest (dB) summed over the word's active frames, and the worst
-    single frame there."""
+    single frame there. For the words in sheet.TONAL_RELAXED the enforced number counts measured-tonal maskers
+    TONAL_MASKING_DB less (`Erest_tonal`); "raw" keeps the plain energy ratio."""
     out = []
     for (w, s) in sheet.HIT_WORDS:
         span = sheet.word_span(w, s)
         row = {"word": w, "t": s}
+        relaxed = (w, s) in sheet.TONAL_RELAXED and Erest_tonal is not None
         for bn in BANDS:
             act = word_frames(tv, Ev[bn], span)
             if not act.any():
                 row[bn] = None; continue
-            row[bn] = round(float(10 * np.log10(Ev[bn][act].sum() / (Erest[bn][act].sum() + 1e-30))), 1)
-            row[bn + "_min"] = round(float(np.min(10 * np.log10(Ev[bn][act] / (Erest[bn][act] + 1e-30)))), 1)
+            R = Erest_tonal[bn] if relaxed else Erest[bn]
+            row[bn] = round(float(10 * np.log10(Ev[bn][act].sum() / (R[act].sum() + 1e-30))), 1)
+            row[bn + "_min"] = round(float(np.min(10 * np.log10(Ev[bn][act] / (R[act] + 1e-30)))), 1)
+            if relaxed:
+                row[bn + "_raw"] = round(float(10 * np.log10(Ev[bn][act].sum() / (Erest[bn][act].sum() + 1e-30))), 1)
         out.append(row)
     return out
 
@@ -802,18 +829,23 @@ def word_guard(rows, arrs, bed, extra, iters=12):
         _, Eb[bn] = band_track(bed, band)
         Ec[bn] = []
         for r in rows:
-            one = np.zeros((N_FILM, 2)); M.place_wrapped(one, arrs[r["name"]], frame_t(r["t"]))
-            _, e = band_track(one, band)
+            e = local_frames(arrs[r["name"]], frame_t(r["t"]), 0.03, 0.01,
+                             lambda z, band=band: band_track(z, band)[1], 0.0, len(tv))
             Ec[bn].append(e)
     fams = [r["fam"] for r in rows]
 
-    def rest(bn, ex):
+    tw = np.array([db2a(-sheet.TONAL_MASKING_DB) ** 2 if r.get("tonal") else 1.0 for r in rows])
+
+    def rest(bn, ex, w=None):
         g = np.array([10 ** ((r["g_db"] + ex[r["fam"]]) / 10) for r in rows])
+        if w is not None:
+            g = g * w
         return Eb[bn] + (g[:, None] * np.array(Ec[bn])).sum(0)
     bed_limited = set()
     for _ in range(iters):
         R = {bn: rest(bn, extra) for bn in BANDS}
-        met = word_metrics(Ev, R, tv)
+        RT = {bn: rest(bn, extra, tw) for bn in BANDS}
+        met = word_metrics(Ev, R, tv, RT)
         worst = None
         for row in met:
             for bn in BANDS:
@@ -822,8 +854,9 @@ def word_guard(rows, arrs, bed, extra, iters=12):
                 span = sheet.word_span(row["word"], row["t"]); act = word_frames(tv, Ev[bn], span)
                 share = {}
                 g = {r["fam"]: 10 ** ((r["g_db"] + extra[r["fam"]]) / 10) for r in rows}
+                relaxed = (row["word"], row["t"]) in sheet.TONAL_RELAXED
                 for i, r in enumerate(rows):
-                    e = g[r["fam"]] * Ec[bn][i][act].sum()
+                    e = g[r["fam"]] * Ec[bn][i][act].sum() * (tw[i] if relaxed else 1.0)
                     if e > 0:
                         share[r["fam"]] = share.get(r["fam"], 0.0) + e
                 bed_e = Eb[bn][act].sum()
@@ -838,7 +871,8 @@ def word_guard(rows, arrs, bed, extra, iters=12):
         short, fam, w, bn = worst
         extra[fam] = max(extra[fam] - min(short + 0.3, 4.0), -18.0)
     R = {bn: rest(bn, extra) for bn in BANDS}
-    return extra, word_metrics(Ev, R, tv), sorted(bed_limited)
+    RT = {bn: rest(bn, extra, tw) for bn in BANDS}
+    return extra, word_metrics(Ev, R, tv, RT), sorted(bed_limited)
 
 
 def match_seam(rows, arrs):
@@ -902,7 +936,7 @@ def build(write=True):
                 if cap < lim:
                     lim, rule = cap, f"draft {sheet.VS_DRAFT[fam]:+.0f} dB"
         rows.append({"t": t, "name": name, "fam": fam, "under": under, "note": note, "lim": lim, "rule": rule,
-                     "g_sheet": g_sheet})
+                     "g_sheet": g_sheet, "tonal": f["tonality"] >= TONAL_MIN})
     step = {}
     for r in rows:
         step[r["fam"]] = min(step.get(r["fam"], 99.0), r["lim"] - r["g_sheet"])
@@ -950,7 +984,8 @@ def build(write=True):
         print(f"  {c['t']:7.3f} {c['src'].split('/')[-1]:20s} gain {c['gain']:.4f}  set by {c['set_by']}")
     print("hit words (voice over bed + SFX, dB: 1-4 kHz [worst frame], 4-10 kHz [worst frame]):")
     for w in words:
-        print(f"  {w['t']:6.2f} {w['word']:13s} {w['1-4k']} [{w.get('1-4k_min')}]  {w['4-10k']} [{w.get('4-10k_min')}]")
+        raw = f"  (raw {w.get('1-4k_raw')} / {w.get('4-10k_raw')})" if "1-4k_raw" in w else ""
+        print(f"  {w['t']:6.2f} {w['word']:13s} {w['1-4k']} [{w.get('1-4k_min')}]  {w['4-10k']} [{w.get('4-10k_min')}]{raw}")
     print("bed-limited:", bed_limited, " seam match", round(seam_db, 2), "dB  ting decay", rep["glass_ting_decay"])
     return cues, files, vref
 
