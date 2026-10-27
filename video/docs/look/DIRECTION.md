@@ -61,7 +61,7 @@ A clash is a bug: fix the lower doc in the same turn.
   the sketch pen and the scribble mass stay on the G3 board. -> `CRAFT.md` §c.
 - **5. Gentle light and shadow, always there.** One light rig per set (a key on one side, one shadow tint family, the
   pool colours), kept in all its shots; a source never moves between cuts; the brightest area sits on the subject;
-  light is lighter than what it lights, shown on what it hits (never glow discs, blur or gradients; a halo is one step
+  light is lighter than what it lights, shown on what it hits (never glow discs, blur or gradients, the sky's gentle gradient aside: rule 6; a halo is one step
   of at most 1.7x, or none). Shadows are colour, never grey, gentle in value, flat in shape: contact under all that
   touches a surface, form away from the key, cast along the light; rim light only on the subject; night is
   temperature, not darkness. -> `CRAFT.md` §d; `scripts/qa/check_light.py`.
@@ -71,9 +71,10 @@ A clash is a bug: fix the lower doc in the same turn.
   creams, terracotta, rose, leaf sage, golden light, plum and red-brown shadows; never beige, muddy tan, olive or
   grey; a warm world held by one cool field; saturation as confetti, never fields. Money and everyday life: #9 Autumn
   Ember (#7 Autumn Ochre read sick). **One continuous sky** (owner, v2 G4): from the frame top to the horizon the sky
-  changes in a few small flat steps (value and hue), warmest at the sun and the horizon; the caption field is part of it
-  (never a slab of another colour above an abrupt band); the far haze takes the lowest sky step; no two big fields of
-  unrelated colour meet in a seam no object explains. -> `PALETTE.md`; `COZY_AND_SCALE.md` 3b.6; `CRAFT.md` §f.
+  is ONE gentle, smooth gradient (the owner's opt-in: the sky is the one place a gradient is welcome; "find a beautiful
+  way to do a gentle gradient"), warmest at the sun and the horizon, dithered so it never bands on a phone, nearly
+  flat inside the caption band (captions keep their contrast); the far haze takes the sky's lowest colour; no two big
+  fields of unrelated colour meet in a seam no object explains. -> `PALETTE.md`; `COZY_AND_SCALE.md` 3b.6; `CRAFT.md` §f.
 - **7. Cozy, with occasional great scale.** Cozy is the home feeling (>= 50 % of the runtime outside full-frame charts):
   a place that holds you without shutting you in (masses on 2-3 sides, one opening the subject faces), life passing
   through sideways, broken once at most, at the turn; it evolves one measured owner reference at a time. Scale: 1-2

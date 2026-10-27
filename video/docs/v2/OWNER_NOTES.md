@@ -96,6 +96,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   is different color of the space and sun, like why is it blue sky and then suddenly abruptly orange, weird" -> playbook ONE CONTINUOUS
   SKY + DIRECTION rule 6; S1: the sky steps from the caption field to a warm horizon, the sun smaller/lower in agreeing sky, the far
   haze = the lowest sky step; every lane's brief gets it.
+- 2026-10-27 ~22:55 UTC: "maybe when it comes to sky we can find a beautiful way to do a gentle gradient" -> the sky is one gentle,
+  dithered gradient (the one place a gradient is welcome; DIRECTION rules 5/6, playbook), nearly flat in the caption band.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
