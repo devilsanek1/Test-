@@ -70,8 +70,14 @@ export const BOARD_COLORS = {
 } as const;
 
 /** The shared faux weight of every key line (>= 56 px: headers and keys) so it holds at 216 px wide. ONE value for
- *  every board (fairness: no board gets extra weight). Body and credits carry none. */
+ *  every board (fairness: no board gets extra weight). */
 export const KEY_WEIGHT = 1.2;
+/** The frame's shared seed: the hand-drawn contour, screws and keyline are the same on every board (A5). */
+export const FRAME_SEED = 'statement-board';
+/** The shared faux weight of credits and small rows (<= 20 px) so they hold at full-screen phone width (~390 px). */
+export const CREDIT_WEIGHT = 0.45;
+/** The faux weight of a line by its size (the same on every board): keys KEY_WEIGHT, credits CREDIT_WEIGHT, body 0. */
+export const weightFor = (size: number) => (size >= TYPE.key ? KEY_WEIGHT : size <= TYPE.creditLarge ? CREDIT_WEIGHT : 0);
 
 // ---------------------------------------------------------------- geometry
 
@@ -175,10 +181,13 @@ export function boardFrame(face: Rect, stile = 40, rail = 20, legsTo: number = B
 
 /** The face of the big boards inside S6's 560 x 560 contract rect (x 160-640, y 700-1220 at the cut). */
 export const S6_FACE: Rect = {x0: S6.board0.x0 + 40, y0: S6.board0.y0 + 20, x1: S6.board0.x1 - 40, y1: S6.board0.y1 - 20};
-/** S6's ground line: the footpath's back kerb (dc/gate GATE.kerbY). */
-export const S6_LEGS_Y1 = 1252;
+/** S6's ground line: the feet stand on the footpath's back kerb (dc/gate draws it y 1248-1255, GATE.kerbY 1252). It is
+ *  B_LEGS_Y1, so the deal board's frame, legs and shadow are IDENTICAL to Google's (fairness, A5). */
+export const S6_LEGS_Y1 = B_LEGS_Y1;
 /** S2: L2's paving line under the newsstand board. */
 export const S2_LEGS_Y1 = 1298;
+/** The small S2 face's frame options (the keyline and margin scaled with the 26 px stile). */
+export const BBC_FRAME: BoardFrameOpts = {keyInset: 7, margin: 10};
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
 const P = (x: number, y: number) => `${r1(x)} ${r1(y)}`;
@@ -230,6 +239,8 @@ export type Wipe = {
   seed?: string;
 };
 export const WIPE_DUR = 0.35;
+/** The seed of her board's wipe edge (HerBoard and herWipe share it, so a cloth on wipeEdgeX matches the erase). */
+export const HER_WIPE_SEED = 'her-wipe';
 
 const wipeNoise = (y: number, seed: string) => {
   const r = rng(`wipe/${seed}`);
@@ -269,33 +280,34 @@ function dirtyD(face: Rect, w: Wipe, u: number): string {
   return polyD(pts);
 }
 
-/** One row of faded handwriting with no letters in it: cursive loops (a looped trochoid) whose heights vary like
- *  x-height and ascender strokes, broken into "words". */
-function scribbleWords(x0: number, x1: number, yb: number, r: Rng): string {
+/** One run of faded handwriting with no letters in it: slanted cursive humps (a looped trochoid per hump) whose
+ *  height, loop and width vary like x-height strokes, ascender loops and the odd descender, broken into "words". */
+function scribbleWords(x0: number, x1: number, yb: number, r: Rng, scale = 1): string {
   let d = '';
   let x = x0;
-  while (x < x1 - 14) {
-    const xe = Math.min(x1, x + r.range(34, 96));
-    const a = r.range(1.15, 1.45);
-    const b = r.range(1.7, 2.4);
-    const step = Math.PI / 6;
-    let th = 0;
-    let hump = -1;
-    let hgt = 8;
+  while (x < x1 - 12 * scale) {
+    const xe = Math.min(x1, x + r.range(30, 92) * scale);
+    const slant = r.range(0.18, 0.34);
     const pts: Pt[] = [];
-    for (;;) {
-      const px = x + a * th + b * Math.sin(th);
-      if (px > xe) break;
-      const k = Math.floor(th / (Math.PI * 2));
-      if (k !== hump) {
-        hump = k;
-        hgt = r.chance(0.22) ? r.range(13, 17) : r.range(5.5, 9);
+    let hx = x;
+    while (hx < xe) {
+      // one hump: x-height (most), an ascender loop, a descender loop, or a flat wave (n / u / m)
+      const k = r.next();
+      const a = r.range(1.05, 1.5) * scale;
+      const up = k < 0.18 ? r.range(13, 18) : k < 0.27 ? -r.range(7, 10) : r.range(5.5, 9);
+      const b = k < 0.27 ? r.range(1.8, 2.6) * scale : r.chance(0.5) ? r.range(1.4, 2.2) * scale : r.range(0.3, 0.9) * scale;
+      const h = Math.abs(up) * scale;
+      for (let i = 0; i <= 12; i++) {
+        const th = (i / 12) * Math.PI * 2;
+        const px = hx + a * th + b * Math.sin(th);
+        const lift = (h * (1 - Math.cos(th))) / 2;
+        const py = up > 0 ? yb - lift : yb + lift;
+        if (i > 0 || pts.length === 0) pts.push([px + (yb - py) * slant, py + r.jitter(0.35)]);
       }
-      pts.push([px, yb - (hgt * (1 - Math.cos(th))) / 2 + r.jitter(0.5)]);
-      th += step;
+      hx += a * Math.PI * 2;
     }
     if (pts.length > 3) d += pts.map(([px, py], i) => `${i ? 'L' : 'M'}${P(px, py)}`).join('');
-    x = xe + r.range(10, 18);
+    x = hx + r.range(9, 17) * scale;
   }
   return d;
 }
@@ -322,32 +334,43 @@ function smearD(cx: number, cy: number, rx: number, ry: number, rot: number, r: 
   return d + 'Z';
 }
 
-/** The half-wiped cafe menu inside `area`: rows of faded handwriting (no letters) partly smeared by earlier wipes. */
-export function menuSmudges(area: Rect, seed: string): {scribbles: string; smears: string; smearsDeep: string} {
+/** The half-wiped cafe menu inside `area`: a scribbled title, rows of faded handwriting (no letters) with dot leaders
+ *  to a "price", partly smeared by earlier wipes (pale flat blobs over the writing). */
+export function menuSmudges(area: Rect, seed: string): {scribbles: string; dots: string; smears: string; smearsDeep: string} {
   const r = rng(`menu/${seed}`);
   let scribbles = '';
+  let dots = '';
   let smears = '';
   let smearsDeep = '';
-  const rowGap = 44;
-  const n = Math.max(1, Math.floor((area.y1 - area.y0 - 20) / rowGap));
+  const w = area.x1 - area.x0;
+  // the title: one larger scribbled word, centred, with a wavy underline
+  const tw = r.range(150, 200);
+  const tx = area.x0 + (w - tw) / 2;
+  const ty = area.y0 + 34;
+  scribbles += scribbleWords(tx, tx + tw, ty, r, 1.35);
+  scribbles += `M${P(tx + 6, ty + 10)}Q${P(tx + tw * 0.3, ty + 15)} ${P(tx + tw * 0.55, ty + 9)}T${P(tx + tw - 4, ty + 11)}`;
+  const rowGap = 42;
+  const n = Math.max(1, Math.floor((area.y1 - area.y0 - 70) / rowGap));
   for (let i = 0; i < n; i++) {
-    const yb = area.y0 + 30 + i * rowGap + r.jitter(3);
-    const dishEnd = area.x0 + r.range(0.45, 0.78) * (area.x1 - area.x0);
-    scribbles += scribbleWords(area.x0 + r.range(4, 22), dishEnd, yb, r);
-    if (r.chance(0.65)) scribbles += scribbleWords(area.x1 - r.range(52, 74), area.x1 - r.range(4, 14), yb, r);
-    // an earlier wipe smeared part of this row (pale flat blobs over the writing: the words are gone)
-    if (r.chance(0.72)) {
-      const cx = area.x0 + r.range(0.15, 0.85) * (area.x1 - area.x0);
-      smears += smearD(cx, yb - 6, r.range(46, 120), r.range(9, 15), r.jitter(0.08), r);
+    const yb = area.y0 + 92 + i * rowGap + r.jitter(2.5);
+    if (yb > area.y1 - 6) break;
+    const dishEnd = area.x0 + r.range(0.38, 0.66) * w;
+    scribbles += scribbleWords(area.x0 + r.range(6, 18), dishEnd, yb, r);
+    if (r.chance(0.75)) {
+      const px0 = area.x1 - r.range(46, 64);
+      scribbles += scribbleWords(px0, area.x1 - r.range(6, 12), yb, r);
+      if (r.chance(0.6)) for (let x = dishEnd + 14; x < px0 - 12; x += 10) dots += circD(x, yb - 1, 1.5);
     }
+    // an earlier wipe smeared part of this row (pale flat blobs over the writing)
+    if (r.chance(0.45)) smears += smearD(area.x0 + r.range(0.2, 0.8) * w, yb - 5, r.range(40, 96), r.range(8, 13), r.jitter(0.07), r);
   }
   // two broad arcs of an earlier, lazier wipe across several rows
   for (let k = 0; k < 2; k++) {
-    const cx = area.x0 + r.range(0.25, 0.75) * (area.x1 - area.x0);
-    const cy = area.y0 + r.range(0.25, 0.75) * (area.y1 - area.y0);
-    smearsDeep += smearD(cx, cy, r.range(110, 170), r.range(20, 30), r.range(-0.35, 0.35), r);
+    const cx = area.x0 + (k === 0 ? r.range(0.22, 0.42) : r.range(0.58, 0.78)) * w;
+    const cy = area.y0 + (k === 0 ? r.range(0.35, 0.55) : r.range(0.6, 0.8)) * (area.y1 - area.y0);
+    smearsDeep += smearD(cx, cy, r.range(80, 120), r.range(15, 22), r.range(-0.25, 0.25), r);
   }
-  return {scribbles, smears, smearsDeep};
+  return {scribbles, dots, smears, smearsDeep};
 }
 
 // ---------------------------------------------------------------- lines and rules
@@ -369,7 +392,7 @@ export type BoardLine = {
   mode?: TextMode;
   /** Pen duration (s) for the whole line or block. */
   dur?: number;
-  /** Faux weight (px). Default: KEY_WEIGHT for key lines (>= 56 px), 0 below. */
+  /** Faux weight (px). Default weightFor(size): KEY_WEIGHT for key lines, CREDIT_WEIGHT for credits, 0 for body. */
   weight?: number;
   letterSpacing?: number;
   color?: string;
@@ -412,7 +435,7 @@ const BoardText: React.FC<{l: BoardLine; g: BoardGeom; seed: string}> = ({l, g, 
   const anchor = l.anchor ?? 'start';
   const x = l.x ?? (anchor === 'middle' ? g.centre.x : anchor === 'end' ? g.column.x1 : g.column.x0);
   const lead = l.lead ?? Math.round(l.size * TYPE.lead);
-  const weight = l.weight ?? (l.size >= TYPE.key ? KEY_WEIGHT : 0);
+  const weight = l.weight ?? weightFor(l.size);
   const mode: TextMode = l.mode ?? (l.at === undefined ? 'none' : 'pen');
   const common = {size: l.size, anchor, weight, letterSpacing: l.letterSpacing, color: l.color ?? BOARD_COLORS.lettering, off: l.off, maxW: l.maxW};
   if (lines.length === 1) return <WorldText x={x} y={l.y} text={lines[0]} at={l.at} mode={mode} dur={l.dur} seed={seed} {...common} />;
@@ -482,7 +505,10 @@ export type StatementBoardProps = {
   frame?: BoardFrameOpts;
   /** Contour ink weight (outer edges); inner edges get INK_PX.far. Default INK_PX.mid. */
   inkWidth?: number;
+  /** Seed of the lettering, rules and menu. */
   seed?: string;
+  /** Seed of the frame's hand-drawn contour (shared by default: every board is the SAME face, A5). */
+  frameSeed?: string;
   /** Extra face content (drawn over the face and under the lettering; moves with the jolt). */
   children?: React.ReactNode;
 };
@@ -520,6 +546,7 @@ export const StatementBoard: React.FC<StatementBoardProps> = ({
   frame,
   inkWidth = INK_PX.mid,
   seed = 'board',
+  frameSeed = FRAME_SEED,
   children,
 }) => {
   const t = useTime();
@@ -552,7 +579,7 @@ export const StatementBoard: React.FC<StatementBoardProps> = ({
     const keyD = notchedD(g.keyline, g.notch);
     const sr = Math.max(2.6, g.keyInset * 0.36);
     const screwD = g.screws.map((s) => circD(s.x, s.y, sr)).join('');
-    const r = rng(`${seed}/screws`);
+    const r = rng(`${frameSeed}/screws`);
     const slotD = g.screws
       .map((s) => {
         const a = r.range(0, Math.PI);
@@ -564,17 +591,17 @@ export const StatementBoard: React.FC<StatementBoardProps> = ({
     // with a small overshoot; the A's back edge thinner (it recedes). Open: Ink leaves a seeded gap in each stroke.
     const o = {over: 'small' as const, jitter: 0.5, drift: 0.25, breaks: false};
     const outerInk =
-      skLine(O.x0, O.y0 + 3, O.x0, O.y1, {...o, over: [6, 0], seed: `${seed}/cL`}) +
-      skLine(O.x0, O.y0, O.x1, O.y0, {...o, over: [9, 5], seed: `${seed}/cT`}) +
-      skLine(O.x1, O.y0 + 3, O.x1, O.y1, {...o, over: [4, 0], seed: `${seed}/cR`});
-    const backInk = g.side ? skLine(g.side[1][0], g.side[1][1] + 4, g.side[2][0], g.side[2][1], {...o, over: [0, 0], seed: `${seed}/cS`}) : '';
+      skLine(O.x0, O.y0 + 3, O.x0, O.y1, {...o, over: [6, 0], seed: `${frameSeed}/cL`}) +
+      skLine(O.x0, O.y0, O.x1, O.y0, {...o, over: [9, 5], seed: `${frameSeed}/cT`}) +
+      skLine(O.x1, O.y0 + 3, O.x1, O.y1, {...o, over: [4, 0], seed: `${frameSeed}/cR`});
+    const backInk = g.side ? skLine(g.side[1][0], g.side[1][1] + 4, g.side[2][0], g.side[2][1], {...o, over: [0, 0], seed: `${frameSeed}/cS`}) : '';
     const innerInk =
-      skLine(F.x0 + 1, railB.y1, F.x1 - 1, railB.y1, {over: [0, 0], jitter: 0.4, drift: 0.15, breaks: false, seed: `${seed}/cB`}) +
+      skLine(F.x0 + 1, railB.y1, F.x1 - 1, railB.y1, {over: [0, 0], jitter: 0.4, drift: 0.15, breaks: false, seed: `${frameSeed}/cB`}) +
       (O.y1 - railB.y1 > 6
-        ? skLine(F.x0, railB.y1 + 2, F.x0, O.y1, {over: [0, 0], breaks: false, seed: `${seed}/cl`}) + skLine(F.x1, railB.y1 + 2, F.x1, O.y1, {over: [0, 0], breaks: false, seed: `${seed}/cr`})
+        ? skLine(F.x0, railB.y1 + 2, F.x0, O.y1, {over: [0, 0], breaks: false, seed: `${frameSeed}/cl`}) + skLine(F.x1, railB.y1 + 2, F.x1, O.y1, {over: [0, 0], breaks: false, seed: `${frameSeed}/cr`})
         : '');
     return {frameD, litD, plate, plateEdge, keyD, screwD, slotD, outerInk, backInk, innerInk, sr};
-  }, [g, stile, rail, seed]);
+  }, [g, stile, rail, frameSeed]);
   const smudge = useMemo(() => {
     if (!smudges) return null;
     const k = g.keyline;
@@ -594,42 +621,47 @@ export const StatementBoard: React.FC<StatementBoardProps> = ({
     if (!wipe || t < wipe.at + wdur) {
       const body = (
         <>
-          <Ink d={smudge.scribbles} width={2.3} color={C.scribble} taper={false} vary={0.04} seed={`${seed}/scrib`} />
+          <Ink d={smudge.scribbles} width={2.4} color={C.scribble} taper={false} vary={0.04} seed={`${seed}/scrib`} />
+          <Fill d={smudge.dots} color={C.scribble} offset={false} seed={`${seed}/dots`} />
           <Fill d={smudge.smearsDeep} color={C.smearDeep} offset={false} seed={`${seed}/smD`} />
           <Fill d={smudge.smears} color={C.smear} offset={false} seed={`${seed}/sm`} />
         </>
       );
-      menu =
-        wipe && t >= wipe.at ? (
-          <>
-            <defs>
+      // clipped to the enamel inside the keyline, and (during the stroke) to the not-yet-wiped side of the edge
+      const k = g.keyline;
+      menu = (
+        <>
+          <defs>
+            <clipPath id={`menu${uid}`}>
+              <rect x={k.x0 + 3} y={k.y0 + 3} width={k.x1 - k.x0 - 6} height={k.y1 - k.y0 - 6} />
+            </clipPath>
+            {wipe && t >= wipe.at ? (
               <clipPath id={`wipe${uid}`}>
                 <path d={dirtyD(face, wipe, u)} />
               </clipPath>
-            </defs>
-            <g clipPath={`url(#wipe${uid})`}>{body}</g>
-          </>
-        ) : (
-          body
-        );
+            ) : null}
+          </defs>
+          <g clipPath={`url(#menu${uid})`}>{wipe && t >= wipe.at ? <g clipPath={`url(#wipe${uid})`}>{body}</g> : body}</g>
+        </>
+      );
     }
   }
   return (
     <>
-      {shadow !== false && landed ? <BoardShadow g={g} color={shadow || BOARD_COLORS.shadow} seed={seed} /> : null}
+      {shadow !== false && landed ? <BoardShadow g={g} color={shadow || BOARD_COLORS.shadow} seed={frameSeed} /> : null}
       <XG m={mat.translate(0, dy)}>
         {/* the A's back frame on the shade side: the wedge past the right stile, the back leg under the rail */}
-        {g.side ? <Fill d={polyD(g.side)} color={C.frameShade} offset={frameOff} seed={`${seed}/side`} /> : null}
-        {g.backLeg ? <Fill d={polyD(g.backLeg)} color={C.frameShade} offset={frameOff} seed={`${seed}/back`} /> : null}
+        {g.side ? <Fill d={polyD(g.side)} color={C.frameShade} offset={frameOff} seed={`${frameSeed}/side`} /> : null}
+        {g.backLeg ? <Fill d={polyD(g.backLeg)} color={C.frameShade} offset={frameOff} seed={`${frameSeed}/back`} /> : null}
         {/* the plum frame (one silhouette, the handle slot open), its lit strips on the sun side */}
-        <Fill d={P2.frameD} color={C.frame} rule="evenodd" offset={frameOff} seed={`${seed}/frame`} />
-        <Fill d={P2.litD} color={C.frameLit} offset={frameOff} seed={`${seed}/lit`} />
+        <Fill d={P2.frameD} color={C.frame} rule="evenodd" offset={frameOff} seed={`${frameSeed}/frame`} />
+        <Fill d={P2.litD} color={C.frameLit} offset={frameOff} seed={`${frameSeed}/lit`} />
         {/* the enamel plate: its thickness in shade, the face, the keyline, four brass screws */}
-        <Fill d={P2.plateEdge} color={C.faceEdge} offset={false} seed={`${seed}/edge`} />
-        <Fill d={P2.plate} color={C.face} offset={false} seed={`${seed}/face`} />
-        <Ink d={P2.keyD} width={Math.max(1.6, Math.min(2.2, g.keyInset * 0.2))} color={C.keyline} taper={false} vary={0} seed={`${seed}/key`} />
-        <Fill d={P2.screwD} color={C.screw} offset={false} seed={`${seed}/screw`} />
-        <Ink d={P2.slotD} width={Math.max(0.9, P2.sr * 0.34)} color={C.screwSlot} taper={false} vary={0} seed={`${seed}/slot`} />
+        <Fill d={P2.plateEdge} color={C.faceEdge} offset={false} seed={`${frameSeed}/edge`} />
+        <Fill d={P2.plate} color={C.face} offset={false} seed={`${frameSeed}/face`} />
+        <Ink d={P2.keyD} width={Math.max(1.6, Math.min(2.2, g.keyInset * 0.2))} color={C.keyline} taper={false} vary={0} seed={`${frameSeed}/key`} />
+        <Fill d={P2.screwD} color={C.screw} offset={false} seed={`${frameSeed}/screw`} />
+        <Ink d={P2.slotD} width={Math.max(0.9, P2.sr * 0.34)} color={C.screwSlot} taper={false} vary={0} seed={`${frameSeed}/slot`} />
         {menu}
         {children}
         {rules.map((r, i) => (
@@ -639,9 +671,9 @@ export const StatementBoard: React.FC<StatementBoardProps> = ({
           <BoardText key={`l${i}`} l={l} g={g} seed={l.seed ?? `${seed}/l${i}`} />
         ))}
         {/* loose ink on the frame's outer contour only (never on the face, never round the letters) */}
-        <Ink d={P2.outerInk} width={inkWidth} open={0.12} seed={`${seed}/ink`} />
-        {P2.backInk ? <Ink d={P2.backInk} width={INK_PX.far} open={0.2} seed={`${seed}/inkBack`} /> : null}
-        <Ink d={P2.innerInk} width={INK_PX.far} open={0.1} seed={`${seed}/inkIn`} />
+        <Ink d={P2.outerInk} width={inkWidth} color={C.contour} open={0.12} seed={`${frameSeed}/ink`} />
+        {P2.backInk ? <Ink d={P2.backInk} width={INK_PX.far} color={C.contour} open={0.2} seed={`${frameSeed}/inkBack`} /> : null}
+        <Ink d={P2.innerInk} width={INK_PX.far} color={C.contour} open={0.1} seed={`${frameSeed}/inkIn`} />
       </XG>
     </>
   );
@@ -651,13 +683,13 @@ export const StatementBoard: React.FC<StatementBoardProps> = ({
 
 /** S6 deal board layout (480 x 520 face): px below the face's top edge. The clause starts at y >= 920 at the cut
  *  (S6.clauseTopMinY: Pip on the corner post keeps >= 200 px away). */
-export const DEAL_LAYOUT = {tag: 44, purpose: 118, purposeLead: 60, clause: 247, clauseLead: 39, rule: 421, f12: 454, credit: 494} as const;
+export const DEAL_LAYOUT = {tag: 46, purpose: 120, purposeLead: 60, clause: 247, clauseLead: 38, rule: 420, f12: 455, credit: 494} as const;
 /** S7 Google's board layout (480 x 520 face). */
 export const GOOGLE_LAYOUT = {header: 70, rule: 92, follows: 162, principles: 222, small: 268, bans: 352, anyKind: 412, credit: 494} as const;
 /** S8 her board layout (480 x 520 face): the quote centred between the header rule and the credit. */
 export const HER_LAYOUT = {header: 70, rule: 92, quote: 262, quoteLead: 64, credit: 494} as const;
 /** S2 newsstand board layout (400 x 200 face). */
-export const BBC_LAYOUT = {header: 52, rule: 62, body: 92, bodyLead: 30, credit: 183} as const;
+export const BBC_LAYOUT = {header: 53, body: 92, bodyLead: 30, credit: 183} as const;
 
 /** Scene-local default times (s from each shot's start; TREATMENT section 5 + the heard word times). */
 export const DEAL_T = {clack: 0, purpose: 0.03, f12: 2.4} as const;
@@ -701,21 +733,30 @@ export function dealContent(g: BoardGeom, purposeAt?: number, f12At?: number): {
   const L = DEAL_LAYOUT;
   const y0 = g.face.y0;
   const x = g.column.x0;
+  const tagLS = 1.5;
+  // the tag is a ruled caps line: the caps, then a hairline to the column's right edge at the caps' middle
+  const tagEnd = x + textW(TXT_DEAL.tag, TYPE.body, tagLS);
+  const capMid = y0 + L.tag - TYPE.body * 0.661 * 0.5;
   return {
     lines: [
-      {text: TXT_DEAL.tag, size: TYPE.body, x, y: y0 + L.tag, letterSpacing: 1.5},
+      {text: TXT_DEAL.tag, size: TYPE.body, x, y: y0 + L.tag, letterSpacing: tagLS},
       {text: TXT_DEAL.purpose, size: TYPE.key, x, y: y0 + L.purpose, lead: L.purposeLead, at: purposeAt, mode: 'pop'},
       {text: TXT_DEAL.clause, size: TYPE.body, x, y: y0 + L.clause, lead: L.clauseLead},
       {text: TXT_DEAL.f12, size: TYPE.body, x, y: y0 + L.f12, at: f12At, mode: 'pop'},
       {text: TXT_DEAL.credit, size: TYPE.credit, x, y: y0 + L.credit},
     ],
-    rules: [{x0: x, x1: x + 64, y: y0 + L.rule}],
+    rules: [
+      {x0: tagEnd + 14, x1: g.column.x1, y: capMid, width: 2.2},
+      // the divider under the clause draws on with the F12 line (never an empty slot at the cut)
+      {x0: x, x1: g.column.x1, y: y0 + L.rule, width: 2.2, at: f12At === undefined ? undefined : f12At - 0.04, dur: 0.14},
+    ],
   };
 }
 
 /** S6's deal board (the record): at the cut the frame, the tag, the FULL clause and the credit are up; the purpose
  *  line pops ON "any"; the F12 line pops on "veto"; the board clacks on the cut. No party named, no "Google" (V2). */
 export const DealBoard: React.FC<DealBoardProps> = ({face = S6_FACE, legsTo = S6_LEGS_Y1, t0 = 0, purposeAt, f12At, clackAt, seed = 'deal', ...rest}) => {
+  useCaptionFont();
   const g = useMemo(() => boardFrame(face, 40, 20, legsTo), [face.x0, face.y0, face.x1, face.y1, legsTo]);
   const c = dealContent(g, purposeAt ?? t0 + DEAL_T.purpose, f12At ?? t0 + DEAL_T.f12);
   return <StatementBoard face={face} legsTo={legsTo} clackAt={clackAt ?? t0 + DEAL_T.clack} lines={c.lines} rules={c.rules} seed={seed} {...rest} />;
@@ -839,7 +880,7 @@ export const HerBoard: React.FC<HerBoardProps> = ({
     {header: headerAt, quote1: quote1 ?? sp(HER_T.quote1, t0), quote2: quote2 ?? sp(HER_T.quote2, t0), credit: creditAt ?? t0 + HER_T.credit},
     creditLines,
   );
-  const wipe: Wipe = {at: wipeAt ?? t0 + HER_T.wipe, dur: wipeDur ?? HER_T.wipeDur, dir: wipeDir, seed};
+  const wipe = herWipe({t0, wipeAt, wipeDur, wipeDir});
   return (
     <StatementBoard
       face={face}
@@ -856,13 +897,11 @@ export const HerBoard: React.FC<HerBoardProps> = ({
   );
 };
 
-/** HerBoard's wipe for a face and clock (the same object HerBoard uses): pass it to wipeEdgeX for the cloth. */
-export const herWipe = (o: {face?: Rect; t0?: number; wipeAt?: number; wipeDur?: number; wipeDir?: 'right' | 'left'; seed?: string} = {}): Wipe => ({
-  at: o.wipeAt ?? (o.t0 ?? 0) + HER_T.wipe,
-  dur: o.wipeDur ?? HER_T.wipeDur,
-  dir: o.wipeDir ?? 'right',
-  seed: o.seed ?? 'her',
-});
+/** HerBoard's wipe for the same props (the object HerBoard uses): a cloth follows `wipeEdgeX(face, herWipe({...}), t)`
+ *  drawn in the board's own coordinates (inside the same transform as the board). */
+export function herWipe(o: {t0?: number; wipeAt?: number; wipeDur?: number; wipeDir?: 'right' | 'left'} = {}): Wipe {
+  return {at: o.wipeAt ?? (o.t0 ?? 0) + HER_T.wipe, dur: o.wipeDur ?? HER_T.wipeDur, dir: o.wipeDir ?? 'right', seed: HER_WIPE_SEED};
+}
 
 // ---- 4. the newsstand board (S2)
 
@@ -891,16 +930,25 @@ export function bbcContent(g: BoardGeom): {lines: BoardLine[]; rules: BoardRule[
       {text: body, size: TYPE.bodySmall, x, y: y0 + L.body, lead: L.bodyLead},
       {text: TXT_TOLD_THE_BBC.credit, size: TYPE.creditLarge, x, y: y0 + L.credit},
     ],
-    rules: [headerRule(g, y0 + L.rule, 96)],
+    // no rule under the header: the 200 px face has no room for one (it would underline THE)
+    rules: [],
   };
 }
 
 /** S2's newsstand A-board TOLD THE BBC (face S2.aBoard 400 x 200; the same face and type, smaller frame); already
  *  there: L2 slides it out with its own transform at 8.44. */
-export const ToldTheBBCBoard: React.FC<ToldTheBBCBoardProps> = ({face = S2.aBoard, legsTo = S2_LEGS_Y1, stile = 26, rail = 16, seed = 'bbc', ...rest}) => {
+export const ToldTheBBCBoard: React.FC<ToldTheBBCBoardProps> = ({face = S2.aBoard, legsTo = S2_LEGS_Y1, stile = 26, rail = 16, seed = 'bbc', t0: _t0, ...rest}) => {
   useCaptionFont();
-  const frame: BoardFrameOpts = {keyInset: 7, margin: 10};
-  const g = useMemo(() => boardFrame(face, stile, rail, legsTo, frame), [face.x0, face.y0, face.x1, face.y1, legsTo, stile, rail]);
+  const g = useMemo(() => boardFrame(face, stile, rail, legsTo, BBC_FRAME), [face.x0, face.y0, face.x1, face.y1, legsTo, stile, rail]);
   const c = bbcContent(g);
-  return <StatementBoard face={face} legsTo={legsTo} stile={stile} rail={rail} frame={frame} lines={c.lines} rules={c.rules} seed={seed} {...rest} />;
+  return <StatementBoard face={face} legsTo={legsTo} stile={stile} rail={rail} frame={BBC_FRAME} lines={c.lines} rules={c.rules} seed={seed} {...rest} />;
 };
+
+// ---------------------------------------------------------------- the presets' geometry (for figures, Pip, a cloth)
+
+/** S6's deal board at the cut (the scene moves it with its mid plane). */
+export const DEAL_GEOM: BoardGeom = boardFrame(S6_FACE, 40, 20, S6_LEGS_Y1);
+/** Google's board (S7) and hers (S8, after the truck) at B. */
+export const B_GEOM: BoardGeom = boardFrame(B, 40, 20, B_LEGS_Y1);
+/** The S2 newsstand board at S2.aBoard (before L2's slide transform). */
+export const BBC_GEOM: BoardGeom = boardFrame(S2.aBoard, 26, 16, S2_LEGS_Y1, BBC_FRAME);
