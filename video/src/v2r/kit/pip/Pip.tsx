@@ -335,9 +335,10 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
   const easeOut = (k: number) => 1 - Math.pow(1 - clamp(k), 3);
   const grow = (from: number, span: number) => (draw >= 1 ? 1 : draw < from ? 0 : 0.2 + 0.8 * easeOut((draw - from) / span));
   const shrink = (jit: number, sz: number) => (exit <= 0 ? 1 : 1 - Math.pow(exitFillProgress(exit, jit, sz), 3));
-  const kCore = Math.min(grow(0.16, 0.3), shrink(0.55, 0.14));
-  const kScarf = Math.min(grow(0.5, 0.25), shrink(0.25, 0.06));
-  const kDecal = Math.min(grow(0.66, 0.2), shrink(0.05, 0.02));
+  // the pen goes round first; the body fill lands once ~60 % of the contour is down, the scarf and the decals after
+  const kCore = Math.min(grow(0.33, 0.22), shrink(0.55, 0.14));
+  const kScarf = Math.min(grow(0.56, 0.2), shrink(0.25, 0.06));
+  const kDecal = Math.min(grow(0.7, 0.18), shrink(0.05, 0.02));
   const classOf = (p: Part) => (p.fill === 'scarf' ? 'scarf' : p.fill === 'body' || p.fill === 'shade' ? 'core' : 'decal');
   const centreOf = (cls: string): V2 => {
     if (cls === 'scarf') {
@@ -353,7 +354,7 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
       const cls = classOf(p);
       const k = cls === 'core' ? kCore : cls === 'scarf' ? kScarf : kDecal;
       if (k <= 0.001) return;
-      const colour = paint === 'paper' ? (p.fill === 'eye' ? ink : pipFill('paper')) : pipFill(p.fill!);
+      const colour = paint === 'paper' ? (p.fill === 'eye' ? ink : pipFill('paper')) : p.fillMix ? mixHex(pipFill(p.fill!), pipFill('shade'), p.fillMix) : pipFill(p.fill!);
       if (paint === 'paper' && (p.fill === 'inner' || p.fill === 'sole' || p.fill === 'cheek' || p.fill === 'glint')) return;
       const d = polyPath(p.shape.outline.map((q) => {
         const m = M(q);
@@ -408,6 +409,14 @@ function drawPip(a: DrawArgs): React.ReactNode[] {
     if (dInk) nodes.push(<path key="ink" d={dInk} fill={ink} />);
   }
   return nodes;
+}
+
+/** Linear mix of two hex colours (a colour value, never a transparency). */
+function mixHex(a: string, b: string, k: number): string {
+  const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16));
+  const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
+  const c = pa.map((v, i) => Math.round(v + (pb[i] - v) * clamp(k)));
+  return '#' + c.map((v) => v.toString(16).padStart(2, '0')).join('');
 }
 
 function polyLen(p: V2[]): number {

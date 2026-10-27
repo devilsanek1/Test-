@@ -36,7 +36,30 @@ export type PipHop = {
   land?: number;
   /** Turn side-on to the travel direction while airborne (default true). */
   turn?: boolean;
+  /** Keep the arc at or below this screen y (the caption band: map.ts PIP_RULES.arcMinY = 600). Default 600. */
+  minY?: number;
 };
+
+/** Largest apex height <= h whose arc never rises above minY (the arc's top is the parabola's minimum y). */
+export function clampApex(from: V2, to: V2, h: number, minY: number): number {
+  const top = (hh: number) => {
+    let m = Infinity;
+    for (let i = 0; i <= 40; i++) {
+      const k = i / 40;
+      m = Math.min(m, from[1] + (to[1] - from[1]) * k - hh * 4 * k * (1 - k));
+    }
+    return m;
+  };
+  if (top(h) >= minY || Math.min(from[1], to[1]) < minY) return h;
+  let lo = 0;
+  let hi = h;
+  for (let i = 0; i < 24; i++) {
+    const m = (lo + hi) / 2;
+    if (top(m) >= minY) lo = m;
+    else hi = m;
+  }
+  return lo;
+}
 
 export type PipKey = {
   /** Scene seconds. For a hop: the take-off (the crouch starts ~0.12 s before). */
@@ -102,6 +125,7 @@ export function trackAt(p: PipTrackProps, t: number): PipTrackState {
   let unT: number | null = null;
   let unDur = 0.5;
   const flicks: [number, 'A' | 'B'][] = [];
+  let coverAt = -1e9;
   for (const k of keys) {
     if (k.t > t) {
       // a hop's crouch starts before its key: handled below; everything else waits
@@ -148,6 +172,7 @@ export function trackAt(p: PipTrackProps, t: number): PipTrackState {
     }
     if (k.ride !== undefined) ride = k.ride;
     if (k.flick) flicks.push([k.t, k.flick]);
+    if (k.pose === 'earsCover') coverAt = k.t;
     if (k.draw !== undefined) {
       drawT = k.t;
       drawDur = k.draw || 0.9;
@@ -169,7 +194,9 @@ export function trackAt(p: PipTrackProps, t: number): PipTrackState {
     const h = k.hop;
     const span = Math.hypot(h.to[0] - x, h.to[1] - y);
     const style = h.style ?? (span > 260 ? 'leap' : 'tuck');
-    const spec = {t0: k.t, dur: h.dur ?? (style === 'leap' ? 0.6 : 0.4), from: [x, y] as V2, to: h.to, height: h.height ?? Math.max(40, span * 0.35), style, crouch: h.crouch, land: h.land};
+    const from: V2 = [x, y];
+    const height = clampApex(from, h.to, h.height ?? Math.max(40, span * 0.35), h.minY ?? 600);
+    const spec = {t0: k.t, dur: h.dur ?? (style === 'leap' ? 0.6 : 0.4), from, to: h.to, height, style, crouch: h.crouch, land: h.land};
     const cr = spec.crouch ?? 0.12;
     if (t < spec.t0 - cr) break;
     const st = hopAt(t, spec);
@@ -218,6 +245,9 @@ export function trackAt(p: PipTrackProps, t: number): PipTrackState {
     if (side === 'A') params = {...params, earDroopA: params.earDroopA - 30 * k, earSwingA: params.earSwingA + 14 * k, earFoldA: params.earFoldA + 0.35 * Math.max(0, k)};
     else params = {...params, earDroopB: params.earDroopB - 30 * k, earSwingB: params.earSwingB + 14 * k, earFoldB: params.earFoldB + 0.35 * Math.max(0, k)};
   }
+  // ---- the flinch: a small tremble after an ears-cover (decays in ~0.6 s)
+  const dc = t - coverAt;
+  if (dc >= 0 && dc < 0.7) x += 1.1 * Math.sin(dc * 13 * Math.PI * 2) * Math.exp(-dc * 5);
   // ---- idle
   const idle = p.idle ?? 1;
   const idleOpts: IdleOpts = typeof idle === 'number' ? {amount: idle} : idle;

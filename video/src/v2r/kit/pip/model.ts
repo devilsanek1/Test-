@@ -12,7 +12,7 @@
 // MODEL UNITS: the seated Pip is 95 units from its base to the top of its head (the tuft rises ~9 more). The base
 // centre is (0, 0); y grows DOWN (SVG). Pip.tsx scales by size / 95.
 
-import {BBox, bboxOf, clamp, D2R, ellipseShape, fieldShape, lerp, polyShape, Shape, tubeShape, V2, V3, v3} from './geom';
+import {BBox, bboxOf, clamp, D2R, ellipseShape, fieldShape, lerp, polyShape, Shape, smooth, tubeShape, V2, V3, v3} from './geom';
 
 export const MODEL_H = 96;
 
@@ -43,6 +43,8 @@ export type PoseParams = {
   trunkCurl: number;
   trunkRaise: number;
   trunkSide: number;
+  /** Trunk length multiplier (1 = the short trunk; a raised "sniffing the sky" trunk reaches longer). */
+  trunkLen: number;
   /** Legs: tuck 0..1 (curled under, a small hop), leap 0..1 (front reaching, hind pushing back, soles out). */
   tuck: number;
   leap: number;
@@ -80,6 +82,7 @@ export const NEUTRAL: PoseParams = {
   trunkCurl: 1,
   trunkRaise: 0,
   trunkSide: 0,
+  trunkLen: 1,
   tuck: 0,
   leap: 0,
   hunch: 0,
@@ -121,6 +124,8 @@ export type Part = {
   shape: Shape;
   layer: number;
   fill: FillRole | null;
+  /** 0..1: mix the fill toward the shade colour (an ear turning round the back of the head). */
+  fillMix?: number;
   /** In the silhouette union (its outline is part of the ONE stroke). */
   union: boolean;
   /** Draw its outline where it lies over lower parts (interior lines). */
@@ -156,9 +161,9 @@ export type PipGeom = {
 
 // ---------------------------------------------------------------- dimensions (model units)
 
-const BODY = {cy: -26, rx: 33, ry: 27, rz: 31};
-const HEAD = {x: 0, y: -70, z: 4, rx: 29, ry: 26, rz: 27};
-const EAR = {len: 43, wUp: 14.5, wLow: 18.5, bend: 0.1};
+const BODY = {cy: -25, rx: 31, ry: 26, rz: 30};
+const HEAD = {x: 0, y: -70, z: 4, rx: 30, ry: 26, rz: 27};
+const EAR = {len: 46, wUp: 16.5, wLow: 21, bend: 0.1};
 const ELEV = 9 * D2R;
 
 // ---------------------------------------------------------------- the build
@@ -206,14 +211,20 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
   // seen from behind a head turn is nearly invisible, so it is played big: the head leans and tilts toward the side
   // it looks at, and the trunk lifts out past the cheek (backness 0 facing us .. 1 facing away)
   const backness = clamp(-Math.cos(p.yaw * D2R) * 1.3);
-  const turnedAway = backness > 0.4 && Math.abs(p.look) > 0.22;
+  const turnedAway = backness > 0.4 && Math.abs(p.look) > 0.38 && Math.max(p.earSwingA, p.earSwingB) < 95;
   const H0: V3 = [HEAD.x - p.look * 3.5 * backness * Math.sign(-Math.cos(p.yaw * D2R) || 1), HEAD.y + headDrop, HEAD.z];
   const sgn = cT < -0.05 ? -1 : 1;
   // a near-front / near-back body: the head squares up to the camera axis at look 0 (so look +-1 turns it the same
   // amount either way); a profile keeps its head in line with the body
   const yawD = ((p.yaw % 360) + 360) % 360;
-  const squareTo = Math.abs(yawD - 180) <= 32 ? 180 - yawD : yawD <= 32 ? -yawD : yawD >= 328 ? 360 - yawD : 0;
-  const psi = (p.look * 95 * D2R) / sgn + squareTo * D2R;
+  // (continuous: full within 30 deg of front / back, fading out by 45 deg, so a turning body never snaps its head)
+  const dBack = 180 - yawD;
+  const dFront = yawD <= 180 ? -yawD : 360 - yawD;
+  const fade = (dd: number) => dd * clamp((45 - Math.abs(dd)) / 15);
+  const squareTo = Math.abs(dBack) < Math.abs(dFront) ? fade(dBack) : fade(dFront);
+  // look is screen-relative and full-strength within 50 deg of front / back; side-on it fades to nothing (no flip)
+  const psi = p.look * 95 * D2R * clamp(cT * 1.6, -1, 1) + squareTo * D2R;
+  void sgn;
   const phi = p.lookUp * 38 * D2R;
   const rho = (p.headTilt + p.look * 8 * backness) * D2R;
   const makeRot = (yawR: number, pitchR: number, rollR: number) => {
@@ -262,10 +273,14 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
   let earRootRightX = -Infinity;
   for (const s of [1, -1] as const) {
     const A = s === 1 ? 'A' : 'B';
-    const droop = (s === 1 ? p.earDroopA : p.earDroopB) * D2R;
+    const droop0 = s === 1 ? p.earDroopA : p.earDroopB;
+    const droop = lerp(droop0, lerp(droop0, 72, backness), clamp(((s === 1 ? p.earSwingA : p.earSwingB) - 110) / 15)) * D2R;
     const swing0 = s === 1 ? p.earSwingA : p.earSwingB;
     // from behind, an ear swung past 100 deg would vanish round the face: keep it at the side, pressed forward
-    const swingV = swing0 > 100 ? lerp(swing0, 100, backness) : swing0;
+    // ears-cover (a swing past 110): from the front the leaves wrap over the eyes; from behind they hang forward-down
+    // against the cheeks (a leaf wrapped out of sight would leave a bald blob)
+    const cover = clamp((swing0 - 110) / 15);
+    const swingV = lerp(swing0, lerp(165, 82, backness), cover);
     const swing = (swingV - earBack) * D2R;
     const fold = clamp(s === 1 ? p.earFoldA : p.earFoldB, 0, 1);
     const att: V3 = [s * 22.5, -9, -6];
@@ -334,13 +349,16 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
     const rootX = earPt(att)[0];
     const lookSide = turnedAway && Math.sign(rootX - hc[0]) === Math.sign(p.look);
     const layer = lookSide ? 0.35 + rootDepth * 0.0005 : front ? 0.6 + rootDepth * 0.001 : -2 + rootDepth * 0.001;
-    const fillRole: FillRole = front ? 'body' : 'shade';
+    const fillRole: FillRole = 'body';
+    // the ear darkens to the shade colour as it turns round the back of the head (a colour mix, continuous: no pop
+    // when its layer flips at -0.42 R)
+    const shadeMix = wrap > 0.3 ? (front ? 0 : 1) : smooth((-rootDepth / HEAD.rz - 0.27) / 0.3);
     const nUp = earVec(nFront);
     const nLow = earVec(nB);
     // lower blade first (it folds behind / over depending on the side we see)
     const lowOnTop = fold > 0.5 && nUp[2] > 0; // folded toward its pink face: the folded blade lies on top when we see that face
-    const pUp: Part = {id: `ear${A}u`, group: `ear${A}`, shape: polyShape(up.P), layer, fill: fillRole, union: true, lines: front};
-    const pLow: Part = {id: `ear${A}l`, group: `ear${A}`, shape: polyShape(low.P), layer: layer + (lowOnTop ? 0.0005 : -0.0005), fill: fillRole, union: true, lines: front};
+    const pUp: Part = {id: `ear${A}u`, group: `ear${A}`, shape: polyShape(up.P), layer, fill: fillRole, fillMix: shadeMix, union: true, lines: front};
+    const pLow: Part = {id: `ear${A}l`, group: `ear${A}`, shape: polyShape(low.P), layer: layer + (lowOnTop ? 0.0005 : -0.0005), fill: fillRole, fillMix: shadeMix, union: true, lines: front};
     parts.push(pUp, pLow);
     // the pink inner face where it faces us
     for (const [bl, n, dir, W, lay] of [
@@ -365,7 +383,7 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
       }
     }
     // the midrib (a leaf's vein): the fold line when folded, a short vein when open
-    if (front) {
+    {
       const M: V2[] = [];
       const u0 = fold > 0.5 ? 0.02 : 0.18;
       const u1 = fold > 0.5 ? 0.97 : 0.7;
@@ -373,7 +391,16 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
         const q = earPt(mid(u0 + ((u1 - u0) * i) / 8));
         M.push([q[0], q[1]]);
       }
-      marks.push({pts: M, w: fold > 0.5 ? 0.8 : 0.55, layer: layer + 0.001, group: `ear${A}`, kind: 'midrib'});
+      marks.push({pts: M, w: fold > 0.5 ? 0.8 : 0.62, layer: layer + 0.001, group: `ear${A}`, kind: 'midrib'});
+      // one pair of side veins (the leaf read at close sizes)
+      if (o.lod && fold < 0.5) {
+        for (const [dir, W] of [[w, EAR.wUp], [wB, EAR.wLow]] as const) {
+          const u = 0.42;
+          const a = earPt(mid(u));
+          const b = earPt(v3.add(mid(u + 0.17), v3.mul(dir, W * 0.55 * hw(u + 0.17))));
+          marks.push({pts: [[a[0], a[1]], [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], [b[0], b[1]]], w: 0.4, layer: layer + 0.001, group: `ear${A}`, kind: 'rib'});
+        }
+      }
     }
     const rootV = earPt(att);
     if (rootV[0] > earRootRightX) {
@@ -384,35 +411,52 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
 
   // ---- trunk: down a little, then one curl forward and up
   {
-    const raise = (p.trunkRaise + 60 * Math.abs(p.look) * backness) * D2R;
+    const raise = (p.trunkRaise + 80 * Math.abs(p.look) * backness) * D2R;
     const g: V3 = [0, Math.cos(raise), Math.sin(raise)];
     const f0: V3 = [0, -Math.sin(raise), Math.cos(raise)];
-    const chi = (38 + p.trunkSide) * D2R;
-    const f = v3.norm(v3.add(v3.mul(f0, Math.cos(chi)), v3.mul(v3.cross(g, f0), Math.sin(chi))));
     const T0: V3 = [0, 6, 25.3];
-    const curl = clamp(p.trunkCurl, 0, 1.4);
-    const Ls = 10 + 4 * (1 - Math.min(1, curl));
-    const rc = 6.6;
+    // turned away from us the trunk is all we see of the face: a longer, looser hook reads at 86 px (a tight curl
+    // closes into a ball)
+    const away = backness * smooth((Math.abs(p.look) - 0.15) / 0.3); // 0..1, continuous
+    const curl = clamp(p.trunkCurl * (1 - 0.28 * away), 0, 1.4);
+    const len = clamp(p.trunkLen * (1 + 0.25 * away), 0.5, 2);
+    const Ls = (10 + 4 * (1 - Math.min(1, curl))) * len;
+    const rc = 6.6 * Math.sqrt(len);
     const arc = curl * 250 * D2R;
     const total = Ls + rc * arc;
-    const C: V2[] = [];
-    const R: number[] = [];
-    let pos = T0;
-    let depthSum = 0;
     const steps = Math.max(8, Math.ceil(total / 1.6));
-    for (let i = 0; i <= steps; i++) {
-      const sArc = (i / steps) * total;
-      if (i > 0) {
-        const s0 = ((i - 1) / steps) * total;
-        const ang = 18 * D2R + Math.max(0, (s0 + sArc) / 2 - Ls) / rc;
-        const ds = total / steps;
-        pos = v3.add(pos, v3.add(v3.mul(g, Math.cos(ang) * ds), v3.mul(f, Math.sin(ang) * ds)));
+    const trace = (chiDeg: number) => {
+      const chi = chiDeg * D2R;
+      const f = v3.norm(v3.add(v3.mul(f0, Math.cos(chi)), v3.mul(v3.cross(g, f0), Math.sin(chi))));
+      const C: V2[] = [];
+      const R: number[] = [];
+      let pos = T0;
+      let depthSum = 0;
+      for (let i = 0; i <= steps; i++) {
+        const sArc = (i / steps) * total;
+        if (i > 0) {
+          const s0 = ((i - 1) / steps) * total;
+          const ang = 18 * D2R + Math.max(0, (s0 + sArc) / 2 - Ls) / rc;
+          const ds = total / steps;
+          pos = v3.add(pos, v3.add(v3.mul(g, Math.cos(ang) * ds), v3.mul(f, Math.sin(ang) * ds)));
+        }
+        const q = headPt(pos);
+        C.push([q[0], q[1]]);
+        R.push(lerp(5.6, 2.5, Math.pow(sArc / total, 0.8)));
+        depthSum += q[2] - hc[2];
       }
-      const q = headPt(pos);
-      C.push([q[0], q[1]]);
-      R.push(lerp(5.6, 2.5, Math.pow(sArc / total, 0.8)));
-      depthSum += q[2] - hc[2];
+      return {C, R, depthSum};
+    };
+    // the curl leans to one side; turned away from us it leans OUT toward the look side, so it clears the cheek
+    let tr = trace(38 + p.trunkSide);
+    if (away > 0.001) {
+      // which way is "out" for this look (fixed by the geometry), then lean the curl there continuously
+      const alt = trace(-38 - p.trunkSide);
+      const out = (c: V2[]) => (c[c.length - 1][0] - hc[0]) * Math.sign(p.look) + (c[Math.round(c.length * 0.6)][0] - hc[0]) * Math.sign(p.look);
+      const outSign = out(alt.C) > out(tr.C) ? -1 : 1;
+      if (outSign < 0) tr = trace(lerp(38 + p.trunkSide, -38 - p.trunkSide, smooth(Math.abs(p.look) / 0.4) * clamp(backness * 2)));
     }
+    const {C, R, depthSum} = tr;
     const front = depthSum / (steps + 1) > -HEAD.rz * 0.3;
     parts.push({id: 'trunk', group: 'trunk', shape: tubeShape(C, R), layer: front ? 0.7 : turnedAway ? 0.38 : -2.5, fill: 'body', union: true, lines: front || turnedAway});
     // two little trunk creases (only side-on: seen end-on they read as a mouth)
@@ -490,7 +534,8 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
     const fc = view(fc3);
     const footDepth = fc[2] - bodyC[2];
     const frontFoot = footDepth > 6;
-    const solN = v3.norm(lerp3([s * 0.28, 0.12, 1], [0, 1, -0.35], [s * 0.1, 0.35, -1]));
+    // soles: forward when seated, down-and-out when tucked, back-and-out in a leap (out = toward us side-on)
+    const solN = v3.norm(lerp3([s * 0.28, 0.12, 1], [s * 0.55, 0.8, -0.3], [s * 0.65, 0.3, -0.7]));
     const sv = viewDir(solN);
     const footRot = Math.atan2(sv[1], sv[0]) + Math.PI / 2;
     parts.push({id: `foot${s}`, group: `foot${s}`, shape: ellipseShape(fc[0], fc[1], 11.5, 9.6, Math.abs(sv[2]) > 0.7 ? 0 : footRot * 0.25, 30), layer: frontFoot ? 0.25 + footDepth * 0.0005 : -0.9 + footDepth * 0.0005, fill: frontFoot ? 'body' : 'shade', union: true, lines: frontFoot});

@@ -24,7 +24,7 @@ export const POSES: Record<PoseName, Partial<PoseParams>> = {
     hunch: 0.38, headDrop: 3.5, lookUp: -0.38, trunkCurl: 1.3, trunkRaise: -8, tailAngle: -4, eyes: 0, scarfLift: 0.25,
   },
   earsDown: {earDroopA: 82, earDroopB: 82, earSwingA: -4, earSwingB: -4, earFoldA: 0.3, earFoldB: 0.3, headDrop: 2.5, lookUp: -0.28, hunch: 0.12, trunkCurl: 1.15},
-  lookUp: {lookUp: 1, earDroopA: 52, earDroopB: 52, earSwingA: -22, earSwingB: -22, trunkRaise: 15, trunkCurl: 1.05, headDrop: 1.5},
+  lookUp: {lookUp: 1, earDroopA: 52, earDroopB: 52, earSwingA: -22, earSwingB: -22, trunkRaise: 105, trunkCurl: 0.85, trunkLen: 1.45, headDrop: 1.5},
   crouch: {hunch: 0.5, earDroopA: 16, earDroopB: 16, earSwingA: -22, earSwingB: -22, lookUp: 0.18, tailAngle: 30},
   tuck: {
     tuck: 1, earDroopA: -14, earDroopB: -14, earSwingA: -48, earSwingB: -48, earFoldA: 0.18, earFoldB: 0.18,
