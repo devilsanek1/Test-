@@ -24,10 +24,10 @@
  {
   "src": "v2r/sfx/exit_ding.wav",
   "t": 0.45,
-  "gain": 0.063,
+  "gain": 0.086,
   "note": "OUR exit ding, a struck glass chime C6 -> F6: the glass doors start to slide (first-second phone sound)",
   "under_db": 9,
-  "set_by": "fixed (draft +4 dB), words -2.7"
+  "set_by": "fixed (draft +4 dB)"
  },
  {
   "src": "v2r/sfx/door_glide.wav",
@@ -64,7 +64,7 @@
  {
   "src": "v2r/sfx/ghost_tick_1.wav",
   "t": 1.9667,
-  "gain": 0.0588,
+  "gain": 0.1174,
   "note": "G1 pops (one soft wooden tick per ghost, ONE pitch) ('And' 2.00)",
   "under_db": 14,
   "set_by": "group"
@@ -72,7 +72,7 @@
  {
   "src": "v2r/sfx/ghost_tick_2.wav",
   "t": 2.5,
-  "gain": 0.0622,
+  "gain": 0.124,
   "note": "G2 pops ('contract')",
   "under_db": 14,
   "set_by": "group"
@@ -80,7 +80,7 @@
  {
   "src": "v2r/sfx/ghost_tick_3.wav",
   "t": 3.1667,
-  "gain": 0.0753,
+  "gain": 0.1503,
   "note": "G3 pops ('bans')",
   "under_db": 14,
   "set_by": "group"
@@ -88,7 +88,7 @@
  {
   "src": "v2r/sfx/ghost_tick_4.wav",
   "t": 3.7667,
-  "gain": 0.0521,
+  "gain": 0.104,
   "note": "G4 pops ('criticizing')",
   "under_db": 14,
   "set_by": "group"
@@ -96,7 +96,7 @@
  {
   "src": "v2r/sfx/ghost_tick_1.wav",
   "t": 4.2,
-  "gain": 0.0588,
+  "gain": 0.1174,
   "note": "G5 pops",
   "under_db": 14,
   "set_by": "group"
@@ -104,7 +104,7 @@
  {
   "src": "v2r/sfx/ghost_tick_2.wav",
   "t": 4.75,
-  "gain": 0.0622,
+  "gain": 0.124,
   "note": "G6 pops ('for'); the ambience dip 4.54-4.79 is in the bed",
   "under_db": 14,
   "set_by": "band"
@@ -424,7 +424,7 @@
  {
   "src": "v2r/sfx/ghost_tick_3.wav",
   "t": 33.75,
-  "gain": 0.0533,
+  "gain": 0.1064,
   "note": "'can't': three ghosts pop ahead of her (3 dB softer, one pitch)",
   "under_db": 17,
   "set_by": "group"
@@ -432,7 +432,7 @@
  {
   "src": "v2r/sfx/ghost_tick_4.wav",
   "t": 33.8333,
-  "gain": 0.0369,
+  "gain": 0.0736,
   "note": "second ghost",
   "under_db": 17,
   "set_by": "group"
@@ -440,7 +440,7 @@
  {
   "src": "v2r/sfx/ghost_tick_1.wav",
   "t": 33.9,
-  "gain": 0.0416,
+  "gain": 0.0831,
   "note": "third ghost",
   "under_db": 17,
   "set_by": "group"
@@ -464,10 +464,10 @@
  {
   "src": "v2r/sfx/cloth_wipe.wav",
   "t": 35.6833,
-  "gain": 0.0288,
+  "gain": 0.1228,
   "note": "'her words': the cafe owner wipes the board clean in one stroke",
   "under_db": 17,
-  "set_by": "sheet, words -16.4"
+  "set_by": "sheet, words -1.2"
  },
  {
   "src": "v2r/sfx/pen_long.wav",

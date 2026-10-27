@@ -582,6 +582,45 @@ export const WalkTest: React.FC = () => {
   );
 };
 
+
+/** Seated variants (the art director's must, 2026-10-27): the four arm states x three views, leans, a pair, a child. */
+export const SeatTest: React.FC = () => {
+  const ARMS = ['lap', 'knees', 'back', 'hug'] as const;
+  const VIEWS = ['back', 'rear34', 'profile'] as const;
+  return (
+    <AbsoluteFill style={{background: CM.stucco}}>
+      <svg width={1080} height={1920} viewBox="0 0 1080 1920">
+        {VIEWS.map((v, j) => (
+          <g key={v}>
+            <Fill rect={[0, 380 + j * 360, 1080, 40]} color={CM.limestone} offset={false} />
+            {ARMS.map((a, i) => (
+              <g key={a}>
+                <Seated x={140 + i * 250} y={380 + j * 360} h={200} seed={`st/${v}/${a}`} arms={a} view={v} traits={{hair: (['short', 'bun', 'curls', 'beanie'] as const)[i], acc: (['backpack', 'scarf', 'tote', 'none'] as const)[i]}} />
+                <Label x={140 + i * 250} y={420 + j * 360} size={22} anchor="middle">{`${v} ${a}`}</Label>
+              </g>
+            ))}
+          </g>
+        ))}
+        <Fill rect={[0, 1460, 1080, 40]} color={CM.limestone} offset={false} />
+        <Seated x={90} y={1460} h={150} seed="st/l1" lean={-6} arms="lap" />
+        <Seated x={230} y={1460} h={150} seed="st/l2" lean={6} arms="knees" />
+        <Seated x={400} y={1460} h={150} seed="st/p1" lean={7} arms="lap" traits={{hair: 'long'}} />
+        <Seated x={490} y={1466} h={146} seed="st/p2" lean={-7} arms="lap" armAround={[-80, -100]} traits={{hair: 'short'}} />
+        <Seated x={650} y={1460} h={150} seed="st/c1" arms="back" />
+        <Seated x={760} y={1462} h={92} seed="st/kid" child arms="hug" traits={{hair: 'beanie'}} />
+        <Seated x={900} y={1460} h={150} seed="st/cup" cup={1} side={1} view="rear34" flip />
+        <Fill rect={[0, 1780, 1080, 40]} color={CM.limestone} offset={false} />
+        {[100, 92, 76, 60, 44].map((h, i) => (
+          <Seated key={h} x={80 + i * 120} y={1780} h={h} seed={`st/sz${i}`} arms={ARMS[i % 4]} view={i === 3 ? 'rear34' : 'back'} />
+        ))}
+        <Person x={760} y={1780} h={120} seed="st/kidS" child traits={{hair: 'curls'}} />
+        <Person x={850} y={1780} h={190} seed="st/adultS" />
+        <NearBack x={990} y={1920} hv={210} seed="st/nb" lean={5} />
+      </svg>
+    </AbsoluteFill>
+  );
+};
+
 // ---------------------------------------------------------------- the sheet
 
 export const KitCast: React.FC = () => {
