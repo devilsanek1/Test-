@@ -1,5 +1,31 @@
 # L6 handover (V2S8 + the seam): first session, stopped at the orchestrator's request before writing code
 
+## PAUSED 22:40 UTC for the depth pass (resume when the orchestrator says; read this first)
+State: conform_L6 started (owner-approved DIRECTION / CRAFT / THROUGHLINE; the brief `conform_L6.md` wins over everything
+below). Pushed: `V2S8_clock.ts` conformed (seam push retired: SEAM_ZOOM 1.00; the 2D float's second run home at 38.82;
+the lamp run flash-safe: 4 lamps 0.34 s apart from 37.18, every other light on from the start via `lampRunAt` -> -10;
+`PIP_SEAM` = a 30 px settle (700, 1205) -> (700, 1235) 38.82-38.98, no hop). Typecheck 0 errors. Nothing running.
+Next, in order (one agent at a time, ONE combined critic round, 0.4 scale, commit every <= 20 min):
+1. V2S8.tsx: `<Lit rig={RIG_CANAL_S8}>`; cam = floatXY only; drop S8Readers; tiers per THROUGHLINE §4 S8 (C: set +
+   house + public; A: her + ghosts at the pop then B with lines, W 34.55-34.95 and the end, the board from 35.72; B: Pip,
+   the cafe owner, her door); the sun in EarlyExit (it un-builds before S1's sun shows).
+2. V2S8_pip.tsx: the settle (straight, no arc) + Pip un-builds LATE (LateExit, not NoExit): S1's Pip is absent at t < 0
+   and draws on from t 0 (V2S1_clock S1_F0); head back to neutral by 38.70 (nothing turns in 38.72-39.08); the S1-clock
+   TimeShift is no longer needed for the seam.
+3. V2S8_board.tsx: readers removed; the cafe owner LEFT of the board at its depth (feet <= ~1265, ~210 px, rear 3/4 or
+   profile), a long-handled squeegee riding L5's wipe edge across the half-wiped menu, staying there, never in front of
+   the face; Pip's bollard slate (no plum on lamps / bollards / railings / birds).
+4. New V2S8_light.tsx: contact + cast shadows (her, the ghosts, Pip + bollard, the board's legs, the cafe furniture,
+   planter, the owner, lamp posts; toward 85), FormShade + Rim on her (top + left edge, see V2S1_row), W's WindowSpill at
+   34.95, LightPool per lamp at its run time (CANAL_POOL colours), nothing before; then the DEPTH section the
+   orchestrator adds to conform_L6.
+5. V2S8_set / V2S8_house: lamps and the near lamp column off plum (slate); delete hand-drawn specks / dash rows /
+   ripple dashes / dabs the clean pen cannot know (CRAFT §c); the near pool -> two flat CANAL_POOL steps.
+6. Checks for report_L6.md (conform_L6 §9): 0.4 clip 32.5-39.08 + the seam into frame 0; check_light A/B at 34.0
+   (--subject her), 36.0, 38.0 with --sky '#BCDCCF'; line measure at 36.0; the wipe + seam frames; a still at 38.7;
+   flashes <= 3/s; movers <= 3; tsc clean; ONE combined critic, fixes, report, message the orchestrator one line.
+
+
 **Done:** read COMMON, brief_L6, TREATMENT (all), BUILD.md, map.ts S8 / PIP / MATCHES, the canal / cast / Pip READMEs,
 lib/Film.tsx (foreground-wipe + unbuild + loop underlay), lib/exit.tsx; rendered `CanalSample-S8` (kit sample at the
 landing pose). No V2S8 code written yet; `src/v2r/scenes/V2S8.tsx` is still the placeholder. No kit/boards yet (L5).
