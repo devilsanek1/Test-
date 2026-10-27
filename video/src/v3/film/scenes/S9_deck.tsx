@@ -304,6 +304,45 @@ const StairHut: React.FC = () => {
 
 export type DeckPlaneProps = {tiny: boolean; thoom: number};
 /** The deck plane, back to front. */
+/** Spindrift: a gust lifts powder off the parapet's snow lip early in the move (0.80 s, right of your raised arm), a
+ *  stream of puffs blown right and up that swell and thin out in 0.55 s. Near air in the move (4x -> 3x here), the
+ *  wind the falling snow already shows; gone as the pot crosses. (Not on the left: the vent covers that lip, and
+ *  further in it would land beside Pip.) End coords. */
+const GUSTS = [{t0: 0.8, x0: 556, x1: 650}];
+export const SpinDrift: React.FC = () => {
+  const t = useTime();
+  let d = '';
+  let grains = '';
+  GUSTS.forEach((g, gi) => {
+    const r = rng(`s9/drift${gi}`);
+    const n = 7;
+    for (let i = 0; i < n; i++) {
+      const born = g.t0 + i * 0.045 + r.range(0, 0.03);
+      const kk = (t - born) / 0.55;
+      const sz = r.range(3, 4.4);
+      const x = g.x0 + ((g.x1 - g.x0) * i) / (n - 1) + r.jitter(4);
+      const dx = r.range(20, 30);
+      const dy = r.range(7, 12);
+      if (kk <= 0 || kk >= 1) continue;
+      const rad = sz * Math.sin(kk * Math.PI) * (1 - kk * 0.35);
+      const px = x + dx * kk;
+      const py = PARAPET.y - 2 - dy * (1 - (1 - kk) * (1 - kk));
+      d += blob(px, py, rad * 1.6, rad, {seed: `s9/dr${gi}_${i}`});
+      // a trail of loose grains behind each puff
+      for (let j = 1; j <= 2; j++) {
+        const q = Math.max(0, kk - j * 0.12);
+        grains += `M${f1(x + dx * q - 0.5)} ${f1(PARAPET.y - 2 - dy * (1 - (1 - q) * (1 - q)))}h1v1h-1Z`;
+      }
+    }
+  });
+  return d ? (
+    <>
+      <path d={d} fill={T9.deckSnowLit} />
+      <path d={grains} fill={T9.deckSnowLit} />
+    </>
+  ) : null;
+};
+
 export const DeckPlane: React.FC<DeckPlaneProps> = ({tiny, thoom}) => (
   <>
     <Parapet />

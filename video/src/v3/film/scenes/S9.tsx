@@ -31,6 +31,9 @@
 // with its door ajar, chair, table and mug, fairy lights, footprints, PipTiny beside you (S9_deck.tsx) | the near
 // flakes and, in the hold, a V of birds in a size ladder (S9_sky.tsx). Pip rides your shoulder at the start and moves
 // to the lip behind the pot's wipe; the thoom on "mountain" (2.32) shakes snow off the roofs and makes Pip hop.
+// G5b review fixes (r11): the close back wears an aran cable knit, the deck at your feet has fine grain for the 5x start,
+// a spindrift gust lifts off the lip at 0.80, the crossing pot has its round and throwing lines; the street up the town
+// is hazed and glimpsed between roofs (lamps on the lit kerb only), so it reads as a road, never a lit tower.
 import React, {useId} from 'react';
 import {World, ShotCam, useTime, type ToneKey} from '../../../lib';
 import {Layer} from '../../../lib/cine/camera';
@@ -63,7 +66,7 @@ import {CornerCloud, HighClouds, CloudBank, FarGround, HillTown, FarField, Infin
 import {PeakPile} from './S9_peak';
 import {MidBand, NearMid} from './S9_town';
 import {NearRoofs, NEAR_PUFFS} from './S9_near';
-import {DeckPlane, PARAPET, StackDress, VentDress} from './S9_deck';
+import {DeckPlane, PARAPET, SpinDrift, StackDress, VentDress} from './S9_deck';
 import {S9Birds, NearFlakes} from './S9_sky';
 import {T9} from './S9_tones';
 
@@ -346,6 +349,7 @@ const S9: React.FC = () => {
           </PullLayer>
           <PullLayer m={planeMat(S9_DECK, p)}>
             <DeckPlane tiny={t >= SWAP} thoom={THOOM} />
+            <SpinDrift />
             <ThoomPuffs at={THOOM} pts={[[120, PARAPET.y], [300, PARAPET.y], [660, PARAPET.y], [860, 1176]]} size={11} seed="deck" />
           </PullLayer>
           {/* our vent (near clutter, on the deck) */}
