@@ -7,7 +7,8 @@
 // three bare outlines are the shot's subject (<Tier tier="subject">): the only full outline in the frame, one closed
 // 3.0 px line in a deep warm shade (authored at INK_PX.mid, the clean pen sets it). Behind the glass (frame 0 and the
 // loop underlay) her outline DRAWS ON as one stroke from S1_DRAW.at, her fills pale until the flood. Light: her form
-// shade (the right, away from the sun) and her rim (her left edge, the key side) here; the ground shadows V2S1_light.
+// shade (the right, away from the sun) and her rim (her coat's left edge, the key side) here; the ground shadows
+// V2S1_light.
 import React, {createContext, useContext} from 'react';
 import {useTime, clamp} from '../../lib/time';
 import * as MAP from '../world/map';
@@ -18,7 +19,8 @@ import {S1LobbyContact} from './V2S1_light';
 import {HER} from '../kit/cast/Her';
 import {drawn} from '../kit/cast/gait';
 import {C, s1Step, s1HerXAt, HER_COAT_AT, S1_DRAW} from './V2S1_clock';
-import {FigSpec, RowFigure} from './V2S1_row_fig';
+import {FigSpec, RowFigure, figParts, FIG_H} from './V2S1_row_fig';
+import {XG, mat} from '../../lib/xf';
 
 // ---------------------------------------------------------------- the looks (one model sheet)
 
@@ -95,6 +97,19 @@ export const S1Row: React.FC = () => {
   const herFig = <RowFigure seed="s1row/her" spec={herSpec(CM.hero)} x={hx} y={her.feetY} h={her.h} step={step} turn={lookBack(t)} inkPx={HER_INK} />;
   const herC: [number, number] = [hx, her.feetY - her.h / 2];
   const herSize: [number, number] = [her.h * 0.36, her.h];
+  // the rim on her COAT's left edge only (CRAFT §d.8: the subject's key side; conform_L1 §7): the coat part alone
+  const coatD = figParts(herSpec(CM.hero), {step: Math.round(step * 100) / 100, stride: 1, turn: Math.round(lookBack(t) * 50) / 50})
+    .filter((q) => q.d && ['coat', 'armN', 'collar'].includes(q.k))
+    .map((q) => q.d)
+    .join('');
+  const sc = her.h / FIG_H;
+  const coatEl = coatD ? (
+    <XG m={mat.compose(mat.translate(hx, her.feetY), mat.scale(sc, sc))}>
+      <path d={coatD} fill="#FFFFFF" />
+    </XG>
+  ) : (
+    herFig
+  );
   return (
     <Tier tier="subject">
       {members.map(({m, p}) => {
@@ -118,7 +133,7 @@ export const S1Row: React.FC = () => {
       })}
       {herFig}
       <FormShade of={herFig} c={herC} size={herSize} />
-      <Rim of={herFig} c={herC} size={herSize} width={4} />
+      <Rim of={coatEl} c={[hx, her.feetY - her.h * 0.45]} size={[her.h * 0.34, her.h * 0.6]} width={3.5} cover={0.35} />
     </Tier>
   );
 };
