@@ -79,10 +79,10 @@ const HANDS: [number, number] = [-12, -71];
 
 export const WALKERS: Record<string, Walker> = {
   jogger: {seed: 's4jog', x0: 760 + 310, dir: -1, speed: 300, stepPx: 118, feet: 1061, h: 150, pose: 'jog', hw: 22, phase: 0.3, traits: {hair: 'cap', hairColor: CM.hair[2], hatColor: CM.coatSlate, coat: CM.leafRust, coatLen: 'jacket', trousers: CM.anchor, shoes: CM.paper, acc: 'headphones', accColor: CM.coatOat, broad: 0.95}},
-  parent: {seed: 's4parent', x0: 590 + 310, dir: -1, speed: 15, stepPx: 30, feet: 1045, h: PARENT_H, pose: 'walk', stopAt: 18.0, hw: 40, phase: 0.1, reach: HANDS, traits: {hair: 'curls', hairColor: CM.hair[1], coat: CM.coatSlate, coatLen: 'jacket', trousers: CM.line, shoes: CM.hair[0], acc: 'backpack', accColor: CM.coatMustard, broad: 1.04}},
-  kid: {seed: 's4kid', x0: 590 + 310 - 22, dir: -1, speed: 15, stepPx: 15, feet: 1052, h: KID_H, pose: 'walk', stopAt: 18.0, hw: 18, phase: 0.6, reach: [HANDS[0] + 22, HANDS[1] - 7], traits: {hair: 'beanie', hairColor: CM.hair[4], hatColor: CM.coatMustard, coat: CM.box, coatLen: 'jacket', trousers: CM.coatPlum, shoes: CM.brickDeep, acc: 'none', broad: 1.08}},
+  parent: {seed: 's4parent', x0: 590 + 310, dir: -1, speed: 15, stepPx: 30, feet: 1045, h: PARENT_H, pose: 'walk', hw: 40, phase: 0.1, reach: HANDS, traits: {hair: 'curls', hairColor: CM.hair[1], coat: CM.coatSlate, coatLen: 'jacket', trousers: CM.line, shoes: CM.hair[0], acc: 'backpack', accColor: CM.coatMustard, broad: 1.04}},
+  kid: {seed: 's4kid', x0: 590 + 310 - 22, dir: -1, speed: 15, stepPx: 15, feet: 1052, h: KID_H, pose: 'walk', hw: 18, phase: 0.6, reach: [HANDS[0] + 22, HANDS[1] - 7], traits: {hair: 'beanie', hairColor: CM.hair[4], hatColor: CM.coatMustard, coat: CM.box, coatLen: 'jacket', trousers: CM.coatPlum, shoes: CM.brickDeep, acc: 'none', broad: 1.08}},
   cyclist: {seed: 's4cyc', x0: 820 + 310, dir: 1, speed: 340, stepPx: 1, feet: 1063, h: 152, pose: 'cycle', hw: 50, traits: {hair: 'cap', hairColor: CM.hair[3], hatColor: CM.brick, coat: CM.coatMustard, trousers: CM.coatSlate, shoes: CM.anchor, acc: 'none'}},
-  dogger: {seed: 's4dogw', x0: 1105 + 310, dir: -1, speed: 78, stepPx: 54, feet: 1058, h: 142, pose: 'walk', hw: 60, phase: 0.4, reach: [-30, -62], elbow: [-14, -82], traits: {hair: 'beanie', hairColor: CM.hair[1], hatColor: CM.coatSlate, coat: CM.coatOat, coatLen: 'mid', trousers: CM.shadeWarm, shoes: CM.line, acc: 'scarf', accColor: CM.brick, broad: 1.0}},
+  dogger: {seed: 's4dogw', x0: 1110 + 310, dir: -1, speed: 80, stepPx: 52, feet: 1058, h: 142, pose: 'walk', hw: 60, phase: 0.4, reach: [-30, -62], elbow: [-14, -82], traits: {hair: 'beanie', hairColor: CM.hair[1], hatColor: CM.coatSlate, coat: CM.coatOat, coatLen: 'mid', trousers: CM.shadeWarm, shoes: CM.line, acc: 'scarf', accColor: CM.brick, broad: 1.0}},
 };
 
 /** The dog on the lead (leads its walker west by ~64 px; trots 12 drawings/s, tail wagging). */
@@ -173,7 +173,7 @@ export const Walkers: React.FC = () => {
 
 // ---------------------------------------------------------------- the reader on a bench
 
-export const READER = {x: 994, seat: 1006, h: 96, pageAt: [16.42, 19.95]};
+export const READER = {x: 1150, seat: 1006, h: 96, pageAt: [15.62]};
 
 /** A bench by the garden wall (front view) with a reader, head bowed over a book: one page turns. */
 export function benchReaderInto(b: Batch, t: number) {

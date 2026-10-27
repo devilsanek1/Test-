@@ -226,20 +226,19 @@ function furnitureInto(b: Batch) {
   for (const l of LAMPS) sh(l.x, 1062, 16, 30);
   // planters of grasses at the wall foot (one under the plates, one by the far gate)
   sh(190, 1006, 90);
-  sh(1340, 1006, 110);
   // the litter bin (short: it never reaches the plates)
   sh(482, 1012, 26);
   // the lifebuoy post near the coping
-  sh(1012, 1068, 10, 22);
+  sh(1086, 1068, 10, 22);
   b.layer();
   planterInto(b, 146, 236, 1006, 40, 's4pl1');
-  planterInto(b, 1286, 1396, 1006, 40, 's4pl2');
+
   binInto(b, 482, 1012, 48, 's4bin');
   // a bike leaning on the rendered wall, another locked to the railings by the far gate
-  bikeInto(b, 1186, 1004, 22, 's4bk1', CM.coatMustard, -1);
+  bikeInto(b, 1342, 1004, 22, 's4bk1', CM.coatMustard, -1);
   bikeInto(b, 1440, 1000, 21, 's4bk2', CM.brick, 1);
   // the lifebuoy: a short post with a ring (peach and paper quarters, never the sun's orange)
-  const lx = 1012;
+  const lx = 1086;
   b.rect(CM.line, lx - 3, 1000, 6, 68);
   b.rect(CM.line, lx - 10, 1000, 20, 4);
   const cy = 1030;
@@ -303,7 +302,7 @@ export const PathPlane: React.FC = () => {
         <Lamp key={l.x} x={l.x} y={1064} h={l.h} seed={`s4lamp${l.x}`} />
       ))}
       <Paint b={dyn} seed="s4pathDyn" />
-      <Heron x={236} y={COP + 4} h={96} face={1} turnAt={16.3} seed="s4heron" />
+      <Heron x={236} y={COP + 4} h={96} face={1} turnAt={18.5} seed="s4heron" />
     </>
   );
 };
