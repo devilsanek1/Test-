@@ -87,7 +87,7 @@ export const NEUTRAL: PoseParams = {
   tailAngle: 6,
   tailCurl: 0.5,
   tailLen: 1,
-  scarfLift: 0.45,
+  scarfLift: 0.6,
   wind: -1,
   flutter: 0,
   tuftLean: 0,
@@ -158,7 +158,7 @@ export type PipGeom = {
 
 const BODY = {cy: -26, rx: 33, ry: 27, rz: 31};
 const HEAD = {x: 0, y: -70, z: 4, rx: 29, ry: 26, rz: 27};
-const EAR = {len: 39, wUp: 13.5, wLow: 17, bend: 0.1};
+const EAR = {len: 43, wUp: 14.5, wLow: 18.5, bend: 0.1};
 const ELEV = 9 * D2R;
 
 // ---------------------------------------------------------------- the build
@@ -212,24 +212,32 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
   const psi = (p.look * 95 * D2R) / sgn + squareTo * D2R;
   const phi = p.lookUp * 38 * D2R;
   const rho = p.headTilt * D2R;
-  const cP = Math.cos(phi);
-  const sP = Math.sin(phi);
-  const cY = Math.cos(psi);
-  const sY = Math.sin(psi);
-  const cR = Math.cos(rho);
-  const sR = Math.sin(rho);
-  const headRot = (q: V3): V3 => {
-    // roll about the forward axis
-    const x0 = q[0] * cR - q[1] * sR;
-    const y0 = q[0] * sR + q[1] * cR;
-    // pitch: face up for phi > 0
-    const y1 = y0 * cP - q[2] * sP;
-    const z1 = y0 * sP + q[2] * cP;
-    // yaw relative to the body
-    return [x0 * cY + z1 * sY, y1, -x0 * sY + z1 * cY];
+  const makeRot = (yawR: number, pitchR: number, rollR: number) => {
+    const cP = Math.cos(pitchR);
+    const sP = Math.sin(pitchR);
+    const cY = Math.cos(yawR);
+    const sY = Math.sin(yawR);
+    const cR = Math.cos(rollR);
+    const sR = Math.sin(rollR);
+    return (q: V3): V3 => {
+      // roll about the forward axis
+      const x0 = q[0] * cR - q[1] * sR;
+      const y0 = q[0] * sR + q[1] * cR;
+      // pitch: face up for > 0
+      const y1 = y0 * cP - q[2] * sP;
+      const z1 = y0 * sP + q[2] * cP;
+      // yaw relative to the body
+      return [x0 * cY + z1 * sY, y1, -x0 * sY + z1 * cY];
+    };
   };
+  const headRot = makeRot(psi, phi, rho);
   const headPt = (q: V3): V3 => view(v3.add(headRot(q), H0));
   const headVec = (q: V3): V3 => viewDir(headRot(q));
+  // the ears turn only part of the way with the head (a cartoonist's lag: seen from behind, a turned head keeps one
+  // leaf on each side instead of swinging one ear into the middle of the back of the head)
+  const earRot = makeRot(psi * 0.5, phi * 0.6, rho);
+  const earPt = (q: V3): V3 => view(v3.add(earRot(q), H0));
+  const earVec = (q: V3): V3 => viewDir(earRot(q));
   const hc = view(H0);
   const headShape = ellipseShape(hc[0], hc[1], HEAD.rx, HEAD.ry, rho * 0.6, 44);
   const relDepth = (q: V3) => headPt(q)[2] - hc[2];
@@ -265,14 +273,14 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
     // never edge-on: a leaf seen side-on is a sliver, so it twists about its midrib toward us (the smallest twist
     // that shows it at >= 0.4 of its width; a cheat every cartoonist makes)
     {
-      const nz0 = Math.abs(headVec(nFront)[2]);
+      const nz0 = Math.abs(earVec(nFront)[2]);
       if (nz0 < 0.4) {
         let bestT = 0;
         let bestZ = nz0;
         for (let k = 1; k <= 14; k++) {
           for (const sg of [1, -1]) {
             const tau = sg * k * 5 * D2R;
-            const z = Math.abs(headVec(v3.rot(nFront, d, tau))[2]);
+            const z = Math.abs(earVec(v3.rot(nFront, d, tau))[2]);
             if (z > bestZ + 1e-6 && bestZ < 0.4) {
               bestZ = z;
               bestT = tau;
@@ -299,25 +307,25 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
       const M: V2[] = [];
       for (let i = 0; i <= N; i++) {
         const u = i / N;
-        const q = headPt(v3.add(mid(u), v3.mul(dir, W * hw(u))));
+        const q = earPt(v3.add(mid(u), v3.mul(dir, W * hw(u))));
         P.push([q[0], q[1]]);
       }
       for (let i = N; i >= 0; i--) {
-        const q = headPt(mid(i / N));
+        const q = earPt(mid(i / N));
         M.push([q[0], q[1]]);
       }
       return {P: [...P, ...M], mid: M};
     };
     const up = blade(w, EAR.wUp);
     const low = blade(wB, EAR.wLow * (1 - 0.12 * fold));
-    const rootDepth = relDepth(att);
-    const bladeDepth = relDepth(mid(0.6));
+    const rootDepth = earPt(att)[2] - hc[2];
+    const bladeDepth = earPt(mid(0.6))[2] - hc[2];
     // in front of the head unless the root has gone round the back (the far ear in a profile)
     const front = wrap > 0.3 ? bladeDepth > 0 : rootDepth > -HEAD.rz * 0.42;
     const layer = front ? 0.6 + rootDepth * 0.001 : -2 + rootDepth * 0.001;
     const fillRole: FillRole = front ? 'body' : 'shade';
-    const nUp = headVec(nFront);
-    const nLow = headVec(nB);
+    const nUp = earVec(nFront);
+    const nLow = earVec(nB);
     // lower blade first (it folds behind / over depending on the side we see)
     const lowOnTop = fold > 0.5 && nUp[2] > 0; // folded toward its pink face: the folded blade lies on top when we see that face
     const pUp: Part = {id: `ear${A}u`, group: `ear${A}`, shape: polyShape(up.P), layer, fill: fillRole, union: true, lines: front};
@@ -334,12 +342,12 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
         const NN = 10;
         for (let i = 0; i <= NN; i++) {
           const u = 0.12 + (0.8 * i) / NN;
-          const q = headPt(v3.add(mid(u), v3.mul(dir, W * 0.62 * hw(u))));
+          const q = earPt(v3.add(mid(u), v3.mul(dir, W * 0.62 * hw(u))));
           P.push([q[0], q[1]]);
         }
         for (let i = NN; i >= 0; i--) {
           const u = 0.12 + (0.8 * i) / NN;
-          const q = headPt(v3.add(mid(u), v3.mul(dir, W * 0.12 * hw(u))));
+          const q = earPt(v3.add(mid(u), v3.mul(dir, W * 0.12 * hw(u))));
           P.push([q[0], q[1]]);
         }
         parts.push({id: `ear${A}in${lay}`, group: `ear${A}`, shape: polyShape(P), layer: lay + 0.0002, fill: 'inner', union: false, lines: false});
@@ -351,12 +359,12 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
       const u0 = fold > 0.5 ? 0.02 : 0.18;
       const u1 = fold > 0.5 ? 0.97 : 0.7;
       for (let i = 0; i <= 8; i++) {
-        const q = headPt(mid(u0 + ((u1 - u0) * i) / 8));
+        const q = earPt(mid(u0 + ((u1 - u0) * i) / 8));
         M.push([q[0], q[1]]);
       }
       marks.push({pts: M, w: fold > 0.5 ? 0.8 : 0.55, layer: layer + 0.001, group: `ear${A}`, kind: 'midrib'});
     }
-    const rootV = headPt(att);
+    const rootV = earPt(att);
     if (rootV[0] > earRootRightX) {
       earRootRightX = rootV[0];
       earRootRight = [rootV[0], rootV[1]];
@@ -433,8 +441,8 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
   const upV = headVec([0, -1, 0]);
   {
     const base = Math.atan2(upV[1], upV[0]) + p.tuftLean * D2R;
-    const hairs = o.lod ? [-30, 0, 28] : [-20, 20];
-    const lens = o.lod ? [8, 10.5, 7.5] : [8.5, 8.5];
+    const hairs = o.lod ? [-32, 0, 30] : [-22, 22];
+    const lens = o.lod ? [10, 13, 9.5] : [11, 11];
     hairs.forEach((a0, i) => {
       const a = base + a0 * D2R;
       const L = lens[i];
@@ -446,7 +454,7 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
         const aa = a + bend * u;
         pts.push([r0[0] + Math.cos(aa) * L * u, r0[1] + Math.sin(aa) * L * u]);
       }
-      marks.push({pts, w: 0.62, layer: 0.95, group: 'tuft', kind: 'tuft'});
+      marks.push({pts, w: 0.72, layer: 0.95, group: 'tuft', kind: 'tuft'});
     });
   }
 

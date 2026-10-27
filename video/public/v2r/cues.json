@@ -8,428 +8,489 @@
  {
   "src": "v2r/sfx/pencil_flood.wav",
   "t": 0.0,
-  "gain": 0.1086,
+  "gain": 0.1091,
   "note": "f0: the bare ink scene, colour floods from the sun outward (f1-f18)",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/lamp_click.wav",
   "t": 0.4,
-  "gain": 0.4135,
+  "gain": 0.382,
   "note": "her lamp at W clicks OFF: the biggest window goes dark (the first picture of 'quit')",
-  "under_db": 18
+  "under_db": 18,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/exit_ding.wav",
   "t": 0.45,
-  "gain": 0.1259,
+  "gain": 0.0375,
   "note": "OUR exit ding: the glass doors start to slide apart (first-second phone sound)",
-  "under_db": 9
+  "under_db": 9,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/door_glide.wav",
   "t": 0.45,
-  "gain": 0.1139,
+  "gain": 0.1144,
   "note": "the glass doors' glide under the ding, fully open on 'quit' 0.52",
-  "under_db": 21
+  "under_db": 21,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/step_thup.wav",
   "t": 0.97,
-  "gain": 0.103,
+  "gain": 0.1035,
   "note": "she steps out onto the towpath ('Google')",
-  "under_db": 20
+  "under_db": 20,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/letter_pops.wav",
   "t": 0.99,
-  "gain": 0.0779,
+  "gain": 0.0258,
   "note": "the canopy letters fill-pop one by one",
-  "under_db": 21
+  "under_db": 21,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/wings.wav",
   "t": 1.4,
-  "gain": 0.2825,
+  "gain": 0.2837,
   "note": "five birds lift off the bridge rail and wheel west (in the pause 1.46-2.00)",
-  "under_db": 16
+  "under_db": 16,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 2.0,
-  "gain": 0.2239,
+  "gain": 0.2241,
   "note": "G1 pops (one soft wooden tick per ghost, ONE pitch)",
-  "under_db": 14
+  "under_db": 14,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 2.53,
-  "gain": 0.2239,
+  "gain": 0.2196,
   "note": "G2 pops ('contract')",
-  "under_db": 14
+  "under_db": 14,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 3.2,
-  "gain": 0.2239,
+  "gain": 0.1665,
   "note": "G3 pops ('bans')",
-  "under_db": 14
+  "under_db": 14,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 3.8,
-  "gain": 0.2239,
+  "gain": 0.124,
   "note": "G4 pops",
-  "under_db": 14
+  "under_db": 14,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 4.2,
-  "gain": 0.2239,
+  "gain": 0.1033,
   "note": "G5 pops",
-  "under_db": 14
+  "under_db": 14,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 4.79,
-  "gain": 0.2239,
+  "gain": 0.0605,
   "note": "G6 pops ('for'); the ambience dip 4.54-4.79 is in the bed",
-  "under_db": 14
+  "under_db": 14,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/outline_pops.wav",
   "t": 4.98,
-  "gain": 0.3034,
+  "gain": 0.2522,
   "note": "'life': three bare outlines pop in down the towpath (then air: no note, no riser)",
-  "under_db": 15
+  "under_db": 15,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/ear_flap.wav",
   "t": 4.98,
-  "gain": 0.2793,
+  "gain": 0.2805,
   "note": "Pip's ears-cover on 'life'",
-  "under_db": 19
+  "under_db": 19,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/whoosh_dive.wav",
   "t": 5.95,
-  "gain": 0.1772,
+  "gain": 0.0479,
   "note": "push-through dive into the dark window (in the pause 5.59-6.28)",
-  "under_db": 12
+  "under_db": 12,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/pencil_ring.wav",
   "t": 6.82,
-  "gain": 0.1202,
+  "gain": 0.1135,
   "note": "an ink ring draws round her dark window",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/board_clack.wav",
   "t": 8.44,
-  "gain": 0.2355,
+  "gain": 0.2365,
   "note": "the newsstand A-board slides out: TOLD THE BBC (the ONE board sound)",
-  "under_db": 13
+  "under_db": 13,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/light_clicks.wav",
   "t": 8.96,
-  "gain": 0.26,
+  "gain": 0.2611,
   "note": "'staff': the five windows turn a cooler white",
-  "under_db": 19
+  "under_db": 19,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/notebook_flap.wav",
   "t": 9.48,
-  "gain": 0.1724,
+  "gain": 0.1731,
   "note": "'BBC': the reporter's notebook opens",
-  "under_db": 19
+  "under_db": 19,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/blinds_five.wav",
   "t": 10.26,
-  "gain": 0.2223,
+  "gain": 0.2645,
   "note": "'scared': five blinds drop to half one by one (10.26-10.60)",
-  "under_db": 16
+  "under_db": 16,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/blind_thump.wav",
   "t": 12.2,
-  "gain": 0.2941,
+  "gain": 0.1429,
   "note": "'contracts': W2's blind comes fully down",
-  "under_db": 15
+  "under_db": 15,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/notebook_clap.wav",
   "t": 12.85,
-  "gain": 0.4576,
+  "gain": 0.4596,
   "note": "the notebook claps shut (pause 12.81-13.16)",
-  "under_db": 14
+  "under_db": 14,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/swap_pop.wav",
   "t": 12.98,
-  "gain": 0.2738,
+  "gain": 0.275,
   "note": "the window match-cut swap",
-  "under_db": 14
+  "under_db": 14,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pip_land.wav",
   "t": 13.1,
-  "gain": 0.1722,
+  "gain": 0.1729,
   "note": "Pip lands on her window box",
-  "under_db": 18
+  "under_db": 18,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pip_hop.wav",
   "t": 14.7,
-  "gain": 0.1581,
+  "gain": 0.1588,
   "note": "Pip leaps out of the top (pause 14.64-15.07)",
-  "under_db": 15
+  "under_db": 15,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pip_land.wav",
   "t": 14.95,
-  "gain": 0.1932,
+  "gain": 0.194,
   "note": "Pip lands on the boat roof",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pop_high.wav",
   "t": 15.07,
-  "gain": 0.2688,
+  "gain": 0.27,
   "note": "her name tag pops (first build)",
-  "under_db": 16
+  "under_db": 16,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pen_tick.wav",
   "t": 16.6,
-  "gain": 0.3221,
+  "gain": 0.2155,
   "note": "the tag's second build",
-  "under_db": 18
+  "under_db": 18,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/steps_stop.wav",
   "t": 17.66,
-  "gain": 0.122,
+  "gain": 0.1226,
   "note": "her last two steps; the stop lands at 17.96 ('objected')",
-  "under_db": 19
+  "under_db": 19,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/plate_knock.wav",
   "t": 18.92,
-  "gain": 0.2065,
+  "gain": 0.2074,
   "note": "'military': the DEC 2025 plate builds (wood knock + pop)",
-  "under_db": 15
+  "under_db": 15,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pen_short.wav",
   "t": 19.45,
-  "gain": 0.1712,
+  "gain": 0.138,
   "note": "the APR 2026 plate pen-reveals, complete on 'heading'",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/wings.wav",
   "t": 19.8,
-  "gain": 0.2,
+  "gain": 0.2008,
   "note": "birds fly west into the sun (callback, 3 dB softer)",
-  "under_db": 19
+  "under_db": 19,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/glass_tone.wav",
   "t": 20.45,
-  "gain": 0.0839,
+  "gain": 0.0842,
   "note": "sun match-cut S4 -> S5 (pause 20.10-20.67)",
-  "under_db": 14
+  "under_db": 14,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/calendar_flip.wav",
   "t": 20.76,
-  "gain": 0.191,
+  "gain": 0.1918,
   "note": "'April': the sun flips into a calendar page and back by 21.20",
-  "under_db": 16
+  "under_db": 16,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/blossom_pops.wav",
   "t": 20.76,
-  "gain": 0.1679,
+  "gain": 0.1686,
   "note": "the slot's trees burst into blossom in 4 frames",
-  "under_db": 18
+  "under_db": 18,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/wipe_air.wav",
   "t": 22.12,
-  "gain": 0.1122,
+  "gain": 0.1127,
   "note": "the lamppost wipes the backs at peak speed",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pop_low.wav",
   "t": 22.43,
-  "gain": 0.2018,
+  "gain": 0.2027,
   "note": "'Pentagon': the plaque pops (the bed's soft accent 1 is here too)",
-  "under_db": 16
+  "under_db": 16,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/window_ticks.wav",
   "t": 23.08,
-  "gain": 0.2396,
+  "gain": 0.2406,
   "note": "windows warm on along one wing",
-  "under_db": 20
+  "under_db": 20,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pip_hop.wav",
   "t": 23.9,
-  "gain": 0.1256,
+  "gain": 0.1261,
   "note": "Pip leaps",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/board_clack.wav",
   "t": 24.0,
-  "gain": 0.2355,
+  "gain": 0.2365,
   "note": "the deal board lands at the cut",
-  "under_db": 13
+  "under_db": 13,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pop.wav",
   "t": 24.03,
-  "gain": 0.1813,
+  "gain": 0.1821,
   "note": "'any': the purpose line pops (never before the clause)",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pop_high.wav",
   "t": 26.4,
-  "gain": 0.2396,
+  "gain": 0.2406,
   "note": "'veto': Lawful use: decided by the Pentagon",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/window_ticks.wav",
   "t": 27.1,
-  "gain": 0.2396,
+  "gain": 0.2406,
   "note": "facade windows light one by one (27.10-27.80)",
-  "under_db": 20
+  "under_db": 20,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pip_hop.wav",
   "t": 27.95,
-  "gain": 0.1409,
+  "gain": 0.1415,
   "note": "Pip leaps (pause 27.82-28.31)",
-  "under_db": 16
+  "under_db": 16,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/glass_tone.wav",
   "t": 28.0,
-  "gain": 0.0594,
+  "gain": 0.0596,
   "note": "sun match-cut S6 -> S7 (callback, 3 dB softer)",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/board_clack.wav",
   "t": 28.36,
-  "gain": 0.2355,
+  "gain": 0.2365,
   "note": "GOOGLE SAYS: the header pops (same board sound, same level as hers)",
-  "under_db": 13
+  "under_db": 13,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pen_short.wav",
   "t": 29.65,
-  "gain": 0.1712,
+  "gain": 0.1529,
   "note": "'AI principles' pen-builds, complete on 30.04",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/lamp_run.wav",
   "t": 30.04,
-  "gain": 0.1517,
+  "gain": 0.1491,
   "note": "the string lights come on in a run (same sound and level as hers at 37.18)",
-  "under_db": 16
+  "under_db": 16,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pen_long.wav",
   "t": 30.74,
-  "gain": 0.2288,
+  "gain": 0.2195,
   "note": "'of any kind' pen-builds, complete on 32.08",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/boat_chug.wav",
   "t": 32.7,
-  "gain": 0.0984,
+  "gain": 0.0988,
   "note": "the narrowboat foreground wipe (nothing starts before 32.70)",
-  "under_db": 15
+  "under_db": 15,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/board_clack.wav",
   "t": 33.16,
-  "gain": 0.2355,
+  "gain": 0.2365,
   "note": "the wipe clears: SHE SAYS (same board sound, same level as Google's)",
-  "under_db": 13
+  "under_db": 13,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 33.78,
-  "gain": 0.1585,
+  "gain": 0.1723,
   "note": "'can't': three ghosts pop ahead of her (3 dB softer, one pitch)",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 33.86,
-  "gain": 0.1585,
+  "gain": 0.1589,
   "note": "second ghost",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 33.94,
-  "gain": 0.1585,
+  "gain": 0.1444,
   "note": "third ghost",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/door_latch.wav",
   "t": 34.75,
-  "gain": 0.2713,
+  "gain": 0.2095,
   "note": "her door shuts behind her",
-  "under_db": 16
+  "under_db": 16,
+  "set_by": "band"
  },
  {
   "src": "v2r/sfx/lamp_click.wav",
   "t": 34.95,
-  "gain": 0.2928,
+  "gain": 0.294,
   "note": "W lights (her home lamp: the 0.40 click as a callback, 3 dB softer)",
-  "under_db": 21
+  "under_db": 21,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/cloth_wipe.wav",
   "t": 35.72,
-  "gain": 0.1314,
+  "gain": 0.1319,
   "note": "'her words': the café owner wipes the board clean in one stroke",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pen_long.wav",
   "t": 36.54,
-  "gain": 0.2288,
+  "gain": 0.2195,
   "note": "her quote pen-draws on (the same pen as Google's)",
-  "under_db": 17
+  "under_db": 17,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/lamp_run.wav",
   "t": 37.18,
-  "gain": 0.1517,
+  "gain": 0.1491,
   "note": "'facts': the lamps light in a run down the lane (= Google's 30.04, never the ding)",
-  "under_db": 16
+  "under_db": 16,
+  "set_by": "sheet"
  },
  {
   "src": "v2r/sfx/pencil_reverse.wav",
   "t": 38.82,
-  "gain": 0.1939,
+  "gain": 0.1947,
   "note": "the un-build: a reversed pencil into frame 0 (meets 0.00's pencil flood)",
-  "under_db": 16
+  "under_db": 16,
+  "set_by": "sheet"
  }
 ]

@@ -12,7 +12,7 @@ import {Pip, PipProps} from './Pip';
 import {PipKey, PipTrack} from './PipTrack';
 import {V2} from './geom';
 
-export const SHEET = {w: 2160, h: 4200};
+export const SHEET = {w: 2160, h: 4560};
 
 const Label: React.FC<{x: number; y: number; size?: number; anchor?: 'start' | 'middle'; children: React.ReactNode; colour?: string}> = ({x, y, size = 30, anchor = 'middle', children, colour = CM.ink}) => (
   <text x={x} y={y} fontFamily={captionFontStack} fontSize={size} fill={colour} textAnchor={anchor}>

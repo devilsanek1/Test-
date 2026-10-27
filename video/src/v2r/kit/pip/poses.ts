@@ -20,7 +20,7 @@ export const POSES: Record<PoseName, Partial<PoseParams>> = {
   sit: {},
   alert: {earDroopA: 8, earDroopB: 8, earSwingA: 24, earSwingB: 24, earFoldA: 0, earFoldB: 0, lookUp: 0.14, trunkRaise: 8},
   earsCover: {
-    earDroopA: 38, earDroopB: 38, earSwingA: 165, earSwingB: 165, earFoldA: 0.15, earFoldB: 0.15,
+    earDroopA: 50, earDroopB: 50, earSwingA: 128, earSwingB: 128, earFoldA: 0.3, earFoldB: 0.3,
     hunch: 0.38, headDrop: 3.5, lookUp: -0.38, trunkCurl: 1.3, trunkRaise: -8, tailAngle: -4, eyes: 0, scarfLift: 0.25,
   },
   earsDown: {earDroopA: 82, earDroopB: 82, earSwingA: -4, earSwingB: -4, earFoldA: 0.3, earFoldB: 0.3, headDrop: 2.5, lookUp: -0.28, hunch: 0.12, trunkCurl: 1.15},

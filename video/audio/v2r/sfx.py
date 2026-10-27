@@ -22,6 +22,7 @@ from dsp import (SR, PUBLIC, VOICE, N_FILM, np, bp, lp, hp, peak_eq, env_ad, env
                  place, pan, pan_sweep, widen, st, noise, rng, n_of, tt, finish_sfx, db2a, load, short_term_lufs,
                  click_report, frame_t, FPS, FILM_DUR)
 import sheet  # noqa: E402
+import measure as M  # noqa: E402
 
 OUT = PUBLIC / "sfx"
 SOUNDS = {}
@@ -76,14 +77,14 @@ def felt_pen(n_strokes, seed, total=None):
     for k, (s, d) in enumerate(segs):
         n = n_of(d); tl = np.arange(n) / SR
         speed = 0.65 + 0.35 * np.sin(np.pi * tl / d) ** 0.7
-        fib = bp(r.standard_normal(n), 900, 5200, 2) * 0.6
-        grains = bp((r.random(n) < 0.03) * r.standard_normal(n), 3000, 9000, 2) * 0.5
-        f_sq = r.uniform(2300, 3100) * (0.92 + 0.12 * speed)
+        fib = bp(r.standard_normal(n), 2200, 7500, 2) * 0.6 + bp(r.standard_normal(n), 500, 1000, 1) * 0.08
+        grains = bp((r.random(n) < 0.03) * r.standard_normal(n), 4000, 10000, 2) * 0.5
+        f_sq = r.uniform(4200, 5000) * (0.92 + 0.12 * speed)
         squeak = np.sin(2 * np.pi * np.cumsum(f_sq) / SR) * 0.05 * speed
         tap = np.zeros(n); tap[: n_of(0.012)] = modal([3100, 5200], [0.003, 0.002], [1, .4], 0.012, 0.15, seed + k)
         y = (fib + grains) * speed * stroke_env(n, 0.005, 0.015) + squeak * stroke_env(n, 0.01, 0.02) + 0.35 * tap
         place(out, y, s, r.uniform(0.8, 1.0))
-    return lp(out, 7500, 2)
+    return lp(out, 9000, 2)
 
 
 def thud(f0=110, f1=70, dur=0.09, dec=0.024, seed=0):
@@ -105,7 +106,7 @@ def wood(freqs, decs, amps, dur, exc=0.5, seed=0):
     return modal(freqs, decs, amps, dur, exc_ms=exc, seed=seed)
 
 
-def glass_tink(f=3520.0, seed=0):
+def glass_tink(f=4698.6, seed=0):
     return modal([f, 1.503 * f, 2.01 * f], [0.020, 0.010, 0.006], [1, .35, .12], 0.09, exc_ms=0.15, seed=seed)
 
 
@@ -149,13 +150,13 @@ def exit_ding():
     out = buf(0.80)
 
     def bell(f, seed):
-        y = modal([f, 2.0 * f, 3.01 * f, 4.17 * f], [0.42, 0.20, 0.09, 0.05], [1, .30, .11, .04], 0.75, 0.7, seed)
-        y += 0.15 * np.sin(2 * np.pi * f / 2 * tt(0.75)) * env_ad(n_of(0.75), 0.004, 0.12)
+        y = modal([f, 2.0 * f, 3.01 * f, 4.17 * f], [0.42, 0.20, 0.09, 0.05], [1, .22, .07, .03], 0.75, 0.9, seed)
+        y += 0.18 * np.sin(2 * np.pi * f / 2 * tt(0.75)) * env_ad(n_of(0.75), 0.004, 0.12)
         return y
     put(out, bell(1046.50, 41), 0.000, 1.0, -0.15)
     put(out, bell(1396.91, 42), 0.085, 0.95, 0.15)
     d = 0.27; n = n_of(d)
-    sw = tv_bandpass(noise(d, 43), np.geomspace(1500, 6500, n), bw_oct=0.7) * env_bell(n, 0.7, 1.5)
+    sw = tv_bandpass(noise(d, 43), np.geomspace(2600, 8000, n), bw_oct=0.7) * env_bell(n, 0.7, 1.5)
     out[n_of(0.10): n_of(0.10) + n] += pan_sweep(sw, -0.3, 0.5) * 0.22
     return out
 
@@ -209,10 +210,10 @@ def wings():
 @sound
 def ghost_tick():
     """ONE soft wooden tick, ONE pitch (C6 main mode): felt mallet on a small hard-wood block."""
-    y = wood([1046.5, 2721.0, 4605.0], [0.026, 0.011, 0.006], [1.0, 0.28, 0.09], 0.12, exc=1.4, seed=91)
-    y += 0.35 * np.sin(2 * np.pi * 523.25 * tt(0.12)) * np.exp(-tt(0.12) / 0.010)
-    y[: n_of(0.003)] += 0.08 * lp(noise(0.003, 92), 3000)
-    return pan(y, -0.1)
+    y = wood([1046.5, 2721.0, 4605.0], [0.022, 0.008, 0.004], [1.0, 0.12, 0.03], 0.12, exc=1.6, seed=91)
+    y += 0.55 * np.sin(2 * np.pi * 523.25 * tt(0.12)) * np.exp(-tt(0.12) / 0.016)
+    y[: n_of(0.003)] += 0.06 * lp(noise(0.003, 92), 2500)
+    return pan(lp(y, 3000, 2), -0.1)
 
 
 @sound
@@ -221,8 +222,9 @@ def outline_pops():
     out = buf(0.24)
     for k, (g, p) in enumerate([(1.0, -0.2), (0.78, -0.32), (0.6, -0.44)]):
         d = 0.05; n = n_of(d)
-        puff = bp(noise(d, 110 + k), 800, 4000) * env_ad(n, 0.002, 0.012) * 0.6
-        blip = np.sin(2 * np.pi * 2093.0 * tt(d)) * env_ad(n, 0.001, 0.009) * 0.5
+        puff = bp(noise(d, 110 + k), 2500, 8000) * env_ad(n, 0.002, 0.012) * 0.6
+        puff += 0.25 * lp(noise(d, 115 + k), 700) * env_ad(n, 0.002, 0.010)
+        blip = np.sin(2 * np.pi * 4186.0 * tt(d)) * env_ad(n, 0.001, 0.009) * 0.5
         put(out, puff + blip, 0.06 * k, g, p)
     return out
 
@@ -299,7 +301,7 @@ def slat_rattle(dur, seed, rate=72.0, dense=1.0):
     while t < dur:
         imp[min(n - 1, n_of(t))] += r.uniform(0.4, 1.0)
         t += r.uniform(0.6, 1.4) / (rate * dense)
-    ir = wood([2100, 3350, 5200, 1250], [0.004, 0.003, 0.002, 0.006], [1, .6, .3, .4], 0.02, 0.2, seed + 1)
+    ir = wood([1650, 2900, 5200, 900], [0.004, 0.003, 0.002, 0.006], [.8, .4, .3, .6], 0.02, 0.3, seed + 1)
     y = np.convolve(imp, ir)[:n]
     return y * env_ad(n, 0.01, dur * 0.6)
 
@@ -488,10 +490,10 @@ def window_ticks():
 @sound
 def lamp_run():
     """lights coming on in a run (Google's string lights 30.04 = her lane's lamps 37.18, identical): eight small
-    glass tinks at one pitch (A7), evenly spaced, panning across; never the exit ding."""
+    glass tinks at one pitch (D8, above the voice's diction band), evenly spaced, panning across; never the ding."""
     out = buf(0.66)
     for k in range(8):
-        put(out, glass_tink(3520.0 * (1 + 0.003 * ((k % 3) - 1)), 400 + k), 0.075 * k, 1.0 - 0.04 * k, -0.4 + 0.8 * k / 7)
+        put(out, glass_tink(4698.6 * (1 + 0.003 * ((k % 3) - 1)), 400 + k), 0.075 * k, 1.0 - 0.04 * k, -0.4 + 0.8 * k / 7)
     return out
 
 
@@ -546,22 +548,20 @@ def pencil_reverse():
 
 
 # ------------------------------------------------------------------ measurement + cue sheet
-def voice_ref():
-    """The voice's speech level: median momentary (400 ms) loudness over frames where it speaks (stereo, as played)."""
-    v = load(VOICE, mono=True)
-    vs = np.stack([v, v], 1)
-    t, lv = short_term_lufs(vs, win=0.4, hop=0.05)
-    sp = np.zeros(len(t), bool)
-    for (a, b) in sheet.VOICED:
-        sp |= (t >= a + 0.2) & (t <= b - 0.2)
-    return float(np.median(lv[sp]))
+LOCAL_UNDER = 8.5      # house: every SFX >= 8 dB under the voice where it lands (broadband, momentary)
+BAND_UNDER = 6.0       # and >= 6 dB under the voice's own 1-4 kHz (diction) where it lands
 
 
-def event_loudness(y):
-    """the cue's loudest 400 ms (K-weighted momentary loudness), as played at gain 1."""
-    z = np.concatenate([np.zeros((n_of(0.4), 2)), st(y), np.zeros((n_of(0.4), 2))])
-    _, l = short_term_lufs(z, win=0.4, hop=0.01)
-    return float(l.max())
+def gain_for(V, t, under, lv_ev, lb_ev, dur):
+    """the cue's gain (dB): `under` the voice's speech level, and, where it lands on speech, LOCAL_UNDER under the
+    voice there and BAND_UNDER under its 1-4 kHz there. Returns (gain_db, the rule that set it)."""
+    rules = {"sheet": V["vref"] - under - lv_ev}
+    here = M.local_voice(V, t, dur)
+    if here is not None:
+        rules["local"] = here[0] - LOCAL_UNDER - lv_ev
+        rules["band"] = here[1] - BAND_UNDER - lb_ev
+    k = min(rules, key=rules.get)
+    return rules[k], k
 
 
 def build(write=True):
@@ -575,18 +575,21 @@ def build(write=True):
         trim = name != "pencil_reverse"
         y = finish_sfx(y, name, OUT, trim=trim, fade_out_ms=3.0 if not trim else 25.0)
         c, _ = click_report(y)
-        files[name] = {"dur": round(len(y) / SR, 3), "event_lufs": round(event_loudness(y), 2), "clicks": c}
-    vref = voice_ref()
+        ev, eb = M.cue_levels(y)
+        files[name] = {"dur": round(len(y) / SR, 3), "event_lufs": round(ev, 2), "band_db": round(eb, 2), "clicks": c}
+    V = M.voice_tracks()
+    vref = V["vref"]
     cues = [{"src": "v2r/music_bed.wav", "t": 0.0, "gain": 1.0,
              "note": "the bed 'Towpath' (music + canal / Arlington air, pre-ducked under the locked voice): play as is"}]
     for (t, name, under, note) in sheet.CUES:
-        g_db = vref - under - files[name]["event_lufs"]
+        f = files[name]
+        g_db, rule = gain_for(V, frame_t(t), under, f["event_lufs"], f["band_db"], f["dur"])
         g = float(db2a(g_db))
         if g > 1.0:
             print(f"WARNING {name} @{t}: gain {g:.2f} > 1 (file too quiet for -{under} dB): clipped to 1", file=sys.stderr)
             g = 1.0
         cues.append({"src": f"v2r/sfx/{name}.wav", "t": t, "gain": round(g, 4), "note": note,
-                     "under_db": under})
+                     "under_db": under, "set_by": rule})
     if write:
         (PUBLIC / "cues.json").write_text(json.dumps(cues, indent=1, ensure_ascii=False) + "\n")
     print(f"voice speech level {vref:.2f} LUFS (momentary median); {len(files)} sounds, {len(cues) - 1} cues -> "

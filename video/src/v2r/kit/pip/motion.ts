@@ -91,7 +91,7 @@ export function rideAt(t: number, amp = 1.6, rate = 0.55, phase = 0): {dy: numbe
 export function aimAt(head: V2, target: V2): {look: number; lookUp: number} {
   const dx = target[0] - head[0];
   const dy = target[1] - head[1];
-  const look = clamp(dx / (Math.abs(dx) + 170), -1, 1) * 1.15;
+  const look = clamp(dx / (Math.abs(dx) + 120), -1, 1) * 1.3;
   const lookUp = clamp(-dy / (Math.abs(dy) + 420), -0.6, 1) * 1.2;
   return {look: clamp(look, -1, 1), lookUp: clamp(lookUp, -0.6, 1)};
 }
