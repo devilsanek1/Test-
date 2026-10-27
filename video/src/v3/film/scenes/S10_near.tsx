@@ -180,8 +180,8 @@ const FRONT_TOP = 1482;
 const frontRow = (beats: QueueBeats): BackRowProps => {
   // the kid is drawn last (index 2) but stands in the middle, in front of the adults, so the pointing arm stays on top
   const people: BackRowPerson[] = [
-    {hair: 'bun', wear: ['bag'], coat: '#6B4A6E', coatDetail: ['quilt', 'yoke'], sMul: 1.04, dy: 0, dx: -6},
-    {hair: 'short', acc: ['scarf'], wear: ['coffee'], coat: EMBER.dc, coatDetail: ['quilt', 'yoke'], sMul: 1.0, dy: 14, dx: 146},
+    {hair: 'bun', wear: ['bag'], coat: '#6B4A6E', coatDetail: ['quilt', 'yoke'], sMul: 1.04, dy: 0, dx: -6, moves: [{t: 0.86, kind: 'turn', amp: 1.3}, {t: 2.1, kind: 'lean', amp: 0.8, dir: -1}]},
+    {hair: 'short', acc: ['scarf'], wear: ['coffee'], coat: EMBER.dc, coatDetail: ['quilt', 'yoke'], sMul: 1.0, dy: 14, dx: 146, moves: [{t: 1.22, kind: 'nudge', amp: 0.9, dir: -1}, {t: 1.98, kind: 'turn', amp: 1.1}]},
     {hair: 'beanie', wear: ['point'], pointAt: beats.kidPointAt, coat: EMBER.pot, hat: EMBER.dcSide, coatDetail: ['quilt', 'zip'], sMul: 0.72, dy: 84, dx: -134},
   ];
   return {x0: 600, x1: 990, top: FRONT_TOP, head: 106, n: 3, seed: 'q/front', people, snow: true, lookX: 760};

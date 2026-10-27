@@ -340,6 +340,47 @@ const Chatters: React.FC<{z: number; X: number; seed: string}> = ({z, X, seed}) 
   return <>{out}</>;
 };
 
+/** A slab of snow sliding off an eave (z0..z1 along the wall at eave height h): it creeps out, tips, drops in three
+ *  pieces and bursts into powder on the pavement. Secondary life on the street (S10 1.05; S14 the same frame: 1.05). */
+const SnowSlide: React.FC<{z0: number; z1: number; h: number; at: number; seed: string}> = ({z0, z1, h, at, seed}) => {
+  const t = useTime();
+  const d = t - at;
+  if (d < 0 || d > 1.1) return null;
+  const r = rng(`slide/${seed}`);
+  const out: React.ReactNode[] = [];
+  const pieces = 3;
+  for (let i = 0; i < pieces; i++) {
+    const za = z0 + ((z1 - z0) * i) / pieces;
+    const zb = z0 + ((z1 - z0) * (i + 1)) / pieces;
+    const zc = (za + zb) / 2;
+    const k = kAtZ(zc);
+    const creep = Math.min(1, d / 0.25) * 0.35;
+    const fall = Math.max(0, d - 0.25 - i * 0.04);
+    const hh = Math.max(0, h - 4.9 * fall * fall * 2.4);
+    if (hh <= 0.05) continue;
+    const a = P(X_WALL_L + 0.35 + creep, kAtZ(za), hh);
+    const c = P(X_WALL_L + 0.35 + creep, kAtZ(zb), hh);
+    const th = 0.32 * k;
+    out.push(<path key={`p${i}`} d={quad([[a[0], a[1] - th], [c[0], c[1] - th], [c[0], c[1]], [a[0], a[1]]])} fill={EMBER.snow} />);
+    out.push(<path key={`pi${i}`} d={`M${a[0].toFixed(1)} ${(a[1] - th).toFixed(1)}L${c[0].toFixed(1)} ${(c[1] - th).toFixed(1)}`} stroke={EMBER.ink} strokeWidth={1.4} />);
+  }
+  // the powder burst where it lands (flat puffs that grow and shrink to nothing)
+  const land = 0.25 + Math.sqrt(h / (4.9 * 2.4));
+  const b = d - land;
+  if (b > 0 && b < 0.55) {
+    const k = kAtZ((z0 + z1) / 2);
+    const [gx, gy] = P(X_WALL_L + 0.9, k, 0);
+    let pd = '';
+    for (let q = 0; q < 5; q++) {
+      const g = Math.sin((b / 0.55) * Math.PI);
+      const rr = (0.25 + r.range(0, 0.25)) * k * g;
+      if (rr > 0.6) pd += blob(gx + (q - 2) * 0.35 * k + r.jitter(4), gy - 0.25 * k - b * 0.6 * k, rr, rr * 0.7, {seed: `${seed}/b${q}`});
+    }
+    if (pd) out.push(<path key="burst" d={pd} fill={EMBER.snow} />);
+  }
+  return <>{out}</>;
+};
+
 export function leftItems(beats: QueueBeats): Item[] {
   const items: Item[] = [];
   // houses far to near: each sorts by its near end
@@ -377,7 +418,13 @@ export function leftItems(beats: QueueBeats): Item[] {
     const a2 = pave(-17.6, 22);
     const b2 = pave(-17.6, 34);
     items.push({k: kAtZ(29), el: <Walker key="wk2" from={a2} to={b2} h={1.7 * kAtZ(22)} h1={1.7 * kAtZ(34)} speed={46} phase={0.62} pause={0.4} seed="q/wk2" wear={['bag', 'snow']} />});
+    // one coming DOWN the pavement under an umbrella (two-way traffic), on a fixed window so both panels match
+    const a3 = pave(-17.0, 37);
+    const b3 = pave(-17.0, 23.5);
+    items.push({k: kAtZ(31), el: <Walker key="wk3" from={a3} to={b3} h={1.72 * kAtZ(37)} h1={1.72 * kAtZ(23.5)} window={[-1.6, 4.6]} seed="q/wk3" wear={['umbrella']} />});
   }
+  // a slab of snow slides off the bakery's eave
+  items.push({k: kAtZ(33.5), el: <SnowSlide key="slide" z0={32.4} z1={35.6} h={9.55} at={1.05} seed="q/slide" />});
   return items;
 }
 
