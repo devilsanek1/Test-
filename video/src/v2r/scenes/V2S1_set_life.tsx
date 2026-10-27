@@ -287,11 +287,14 @@ export const S1FarLife: React.FC = () => {
 // ---------------------------------------------------------------- the plane branch (the top-left gutter, y 0-240)
 
 /** A plane-tree twig reaching in from the top-left corner: one clean ink line (it carries form), five palmate leaves
- *  in gold and rust, swaying gently about the stem (drawn poses at 12/s); one leaf lets go at 2.6 and falls. */
+ *  in gold and rust, held still (SWAY 0 in S1); one leaf lets go at 2.6 and falls. */
 export const S1PlaneBranch: React.FC = () => {
   const t = useTime();
   const tq = Math.floor(t * 12) / 12;
-  const sway = Math.sin(tq * 1.6) * 2.2;
+  // held still in S1 (critic G4: the sway was one supporting mover too many around the clauses); the falling leaf
+  // is the branch's life
+  const SWAY = 0;
+  const sway = Math.sin(tq * 1.6) * 2.2 * SWAY;
   const stem: Pt[] = [[-10, 46], [60, 70], [128, 104], [176, 136], [206, 168]];
   const at = (k: number): Pt => {
     const i = Math.min(stem.length - 2, Math.floor(k * (stem.length - 1)));
@@ -314,7 +317,7 @@ export const S1PlaneBranch: React.FC = () => {
   let outl = '';
   leaves.forEach((L, i) => {
     const [bx, by] = at(L.k);
-    const wob = Math.sin(tq * 2.3 + i * 1.7) * 6;
+    const wob = Math.sin(tq * 2.3 + i * 1.7) * 6 * SWAY;
     // the petiole: a short ink stroke from the stem
     const pl = 12;
     const a = ((L.deg + wob) * Math.PI) / 180;

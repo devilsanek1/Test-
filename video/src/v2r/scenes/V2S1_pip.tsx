@@ -18,7 +18,7 @@ import {useTime} from '../../lib/time';
 import {CM} from '../palette';
 import {PipTrack} from '../kit/pip';
 import {POSES} from '../kit/pip/poses';
-import {C, S1_PIP, floodAt, s1HerHead} from './V2S1_clock';
+import {C, S1_PIP, floodAt} from './V2S1_clock';
 
 /** The bollard (screen px): top centre = Pip's seat. */
 export const S1_PIP_BOLLARD = {x: S1_PIP.seat[0], top: S1_PIP.seat[1], w: 48, h: 50} as const;
@@ -80,7 +80,7 @@ export const S1Pip: React.FC = () => {
             tier="support"
             keys={[
               {t: S1_PIP.from, draw: S1_PIP.drawDur},
-              {t: C.pipHeadFollows, target: s1HerHead},
+              // no head-follow: the target key turned Pip's whole body (critic G4); Pip watches the water, steady
               {t: C.life, pose: EARS_COVER, dur: 0.1},
               {t: 5.55, pose: 'sit', dur: 0.25},
             ]}

@@ -81,6 +81,10 @@ export const FOOT: Foot[] = [
   {x: 352, y: 1812, w: 230, h: 10}, // picnic cloth
   {x: 300, y: 1792, w: 64, h: 48, cast: true}, // basket
   {x: 610, y: 1820, w: 190, h: 30, cast: true}, // guitar case
+  {x: 728, y: 1486, w: 62, h: 40, cast: true}, // coffee carrier
+  {x: 792, y: 1640, w: 44, h: 64, cast: true}, // potted plant
+  {x: 842, y: 1378, w: 96, h: 10}, // umbrella
+  {x: 432, y: 1800, w: 40, h: 34, cast: true}, // thermos + mugs
 ];
 
 const Tote: React.FC = () => {
@@ -154,18 +158,25 @@ const Bike: React.FC = () => {
   const crank: Pt = [1000, wy + 6];
   const seat: Pt = [948, wy - 132];
   const bar: Pt = [1088, wy - 150];
-  const wheel = (cx: number) => `M${cx - R} ${wy}A${R} ${R} 0 1 0 ${cx + R} ${wy}A${R} ${R} 0 1 0 ${cx - R} ${wy}`;
+  // a tyre: a filled ring (outer one way, inner the other: the nonzero rule leaves the hole), never a wire circle
+  const tyre = (cx: number, r: number) =>
+    `M${cx - R} ${wy}A${R} ${R} 0 1 0 ${cx + R} ${wy}A${R} ${R} 0 1 0 ${cx - R} ${wy}Z` +
+    `M${cx - r} ${wy}A${r} ${r} 0 1 1 ${cx + r} ${wy}A${r} ${r} 0 1 1 ${cx - r} ${wy}Z`;
   const frame = `M${ax} ${wy}L${crank[0]} ${crank[1]}L${seat[0]} ${seat[1] + 14}L${ax} ${wy}M${crank[0]} ${crank[1]}L${bar[0] - 14} ${bar[1] + 30}L${seat[0]} ${seat[1] + 14}M${bar[0] - 14} ${bar[1] + 30}L${bx} ${wy}`;
   return (
     <>
-      <Ink d={wheel(ax) + wheel(bx)} width={3} color={CM.line} thing at={floodAt(1000, 1800)} seed="bank/bikeW" />
-      <Ink d={frame} width={4} color={CM.brickDeep} thing tone={CM.brickDeep} at={floodAt(1000, 1800)} seed="bank/bikeF" />
+      <Fill d={tyre(ax, R - 10) + tyre(bx, R - 10)} color={CM.coatSlate} seed="bank/bikeT" offset={false} />
+      <Fill d={ell(ax, wy, 9, 9) + ell(bx, wy, 9, 9)} color={CM.coatSlate} seed="bank/bikeHub" offset={false} />
+      <Ink d={frame} width={7} color={CM.brickDeep} thing tone={CM.brickDeep} at={floodAt(1000, 1800)} seed="bank/bikeF" />
       <Ink d={`M${bar[0] - 30} ${bar[1]}L${bar[0] + 16} ${bar[1] - 6}`} width={3.4} color={CM.line} thing at={floodAt(1000, 1800)} seed="bank/bikeBar" />
       <Fill d={ell(seat[0], seat[1], 26, 8)} color={CM.coatSlate} seed="bank/bikeSeat" offset={false} />
       <Fill d={ell(crank[0], crank[1], 14, 14)} color={CM.brickDeep} seed="bank/bikeCrank" offset={false} />
     </>
   );
 };
+
+/** The planter's wood: a light warm wood (L* ~64), never a dark slab in the calm C band (critic G4). */
+const PLANTER_WOOD = '#C48F70';
 
 /** A planter of grasses cut by the left edge: a wooden box, tufts in two sages. */
 const Planter: React.FC = () => {
@@ -184,9 +195,10 @@ const Planter: React.FC = () => {
   };
   return (
     <>
+      {blades(29, CM.sage, 1.25)}
       {blades(3, CM.sage, 1)}
       {blades(17, CM.leafGold, 0.7)}
-      <Fill d={poly([[x0, y0], [x1, y0], [x1, 1940], [x0, 1940]])} color={CM.line} seed="bank/planterBox" offset={false} />
+      <Fill d={poly([[x0, y0], [x1, y0], [x1, 1940], [x0, 1940]])} color={PLANTER_WOOD} seed="bank/planterBox" offset={false} />
       <Fill d={poly([[x0, y0], [x1, y0], [x1, y0 + 14], [x0, y0 + 14]])} color={CM.brickDeep} seed="bank/planterLip" offset={false} />
     </>
   );
@@ -201,6 +213,11 @@ const LEAVES: [number, number, number, number, string][] = [
   [700, 1624, 18, -60, CM.leafGold],
   [420, 1770, 22, 35, CM.leafGold],
   [760, 1730, 22, -15, CM.leafRust],
+  [330, 1452, 14, 70, CM.leafRust],
+  [980, 1560, 16, -40, CM.leafGold],
+  [520, 1590, 17, 20, CM.leafRust],
+  [208, 1760, 20, -50, CM.leafGold],
+  [700, 1880, 24, 15, CM.leafRust],
 ];
 const Leaves: React.FC = () => {
   const d = (x: number, y: number, L: number, a: number) => {
@@ -293,7 +310,69 @@ const Picnic: React.FC = () => {
 const GuitarCase: React.FC = () => {
   const x = 610;
   const y = 1820;
-  return <Fill d={`M${x - 96} ${y - 6}Q${x - 98} ${y - 30} ${x - 70} ${y - 30}Q${x - 46} ${y - 30} ${x - 36} ${y - 20}L${x + 60} ${y - 14}Q${x + 96} ${y - 12} ${x + 94} ${y - 2}Q${x + 92} ${y + 8} ${x + 60} ${y + 6}L${x - 36} ${y + 6}Q${x - 46} ${y + 12} ${x - 70} ${y + 12}Q${x - 96} ${y + 12} ${x - 96} ${y - 6}Z`} color={CM.coatPlum} seed="bank/guitar" offset={false} />;
+  // a slate case (the plum blob did not read, critic G4): its handle on top and a pale seam along the lid
+  return (
+    <>
+      <Fill d={`M${x + 4} ${y - 16}Q${x + 14} ${y - 32} ${x + 24} ${y - 15}L${x + 19} ${y - 15}Q${x + 14} ${y - 25} ${x + 9} ${y - 16}Z`} color={CM.coatSlate} seed="bank/guitarH" offset={false} />
+      <Fill d={`M${x - 96} ${y - 6}Q${x - 98} ${y - 30} ${x - 70} ${y - 30}Q${x - 46} ${y - 30} ${x - 36} ${y - 20}L${x + 60} ${y - 14}Q${x + 96} ${y - 12} ${x + 94} ${y - 2}Q${x + 92} ${y + 8} ${x + 60} ${y + 6}L${x - 36} ${y + 6}Q${x - 46} ${y + 12} ${x - 70} ${y + 12}Q${x - 96} ${y + 12} ${x - 96} ${y - 6}Z`} color={CM.coatSlate} seed="bank/guitar" offset={false} />
+      <Fill d={`M${x - 88} ${y - 4}Q${x - 60} ${y - 6} ${x - 36} ${y - 4}L${x + 84} ${y - 2}L${x + 84} ${y + 1}L${x - 36} ${y - 1}Q${x - 60} ${y - 3} ${x - 88} ${y - 1}Z`} color={CM.stoneShade} seed="bank/guitarS" offset={false} />
+    </>
+  );
+};
+
+/** A cardboard carrier with four takeaway cups (a round left for friends). */
+const Carrier: React.FC = () => {
+  const x = 728;
+  const y = 1486;
+  return (
+    <>
+      <Fill d={poly([[x - 31, y - 16], [x + 31, y - 16], [x + 28, y], [x - 28, y]])} color={CM.coatOat} seed="bank/carrier" offset={false} />
+      {[-21, -7, 7, 21].map((dx, i) => (
+        <React.Fragment key={i}>
+          <Fill d={poly([[x + dx - 7, y - 40], [x + dx + 7, y - 40], [x + dx + 5, y - 16], [x + dx - 5, y - 16]])} color={CM.paper} seed={`bank/cc${i}`} offset={false} />
+          <Fill d={poly([[x + dx - 8, y - 43], [x + dx + 8, y - 43], [x + dx + 7, y - 39], [x + dx - 7, y - 39]])} color={i % 2 ? CM.line : CM.coatSlate} seed={`bank/ccl${i}`} offset={false} />
+        </React.Fragment>
+      ))}
+    </>
+  );
+};
+
+/** A small potted plant someone brought (a sign of care). */
+const PottedPlant: React.FC = () => {
+  const x = 792;
+  const y = 1640;
+  return (
+    <>
+      <Fill d={`M${x - 4} ${y - 30}C${x - 26} ${y - 40} ${x - 30} ${y - 66} ${x - 10} ${y - 64}C${x - 4} ${y - 60} ${x - 2} ${y - 44} ${x - 4} ${y - 30}ZM${x + 4} ${y - 30}C${x + 24} ${y - 44} ${x + 30} ${y - 70} ${x + 8} ${y - 68}C${x + 2} ${y - 62} ${x + 2} ${y - 46} ${x + 4} ${y - 30}ZM${x} ${y - 30}C${x - 8} ${y - 52} ${x - 4} ${y - 78} ${x + 2} ${y - 78}C${x + 8} ${y - 76} ${x + 6} ${y - 50} ${x} ${y - 30}Z`} color={CM.sage} seed="bank/plantLeaves" offset={false} />
+      <Fill d={poly([[x - 20, y - 32], [x + 20, y - 32], [x + 15, y], [x - 15, y]])} color={CM.brick} seed="bank/plantPot" offset={false} />
+      <Fill d={poly([[x - 22, y - 36], [x + 22, y - 36], [x + 21, y - 29], [x - 21, y - 29]])} color={CM.brickDeep} seed="bank/plantRim" offset={false} />
+    </>
+  );
+};
+
+/** A folded umbrella lying on the step (October, London). */
+const Umbrella: React.FC = () => {
+  const x = 842;
+  const y = 1378;
+  return (
+    <>
+      <Fill d={`M${x - 50} ${y - 2}L${x + 30} ${y - 9}Q${x + 40} ${y - 6} ${x + 30} ${y - 1}L${x - 50} ${y + 4}Z`} color={CM.coatPlum} seed="bank/umbrella" offset={false} />
+      <Ink d={`M${x + 32} ${y - 5}L${x + 44} ${y - 6}Q${x + 52} ${y - 2} ${x + 46} ${y + 4}`} width={2.4} color={CM.line} thing at={floodAt(x, y)} seed="bank/umbrellaH" />
+    </>
+  );
+};
+
+/** A thermos and two mugs on the picnic cloth. */
+const Thermos: React.FC = () => {
+  const x = 432;
+  const y = 1800;
+  return (
+    <>
+      <Fill d={poly([[x - 7, y - 34], [x + 7, y - 34], [x + 7, y], [x - 7, y]])} color={CM.coatSlate} seed="bank/thermos" offset={false} />
+      <Fill d={poly([[x + 12, y - 14], [x + 26, y - 14], [x + 25, y], [x + 13, y]])} color={CM.paper} seed="bank/mug1" offset={false} />
+      <Fill d={poly([[x - 28, y - 13], [x - 14, y - 13], [x - 15, y + 1], [x - 27, y + 1]])} color={CM.box} seed="bank/mug2" offset={false} />
+    </>
+  );
 };
 
 /** The things on a given band (drawn after that tread's stone, so the next step's edge covers what sits behind it). */
@@ -304,6 +383,7 @@ export const ThingsOn: React.FC<{band: number}> = ({band}) => {
         <>
           <Book />
           <Cup x={470} y={1384} h={26} k="cupA" />
+          <Umbrella />
         </>
       );
     case 2:
@@ -312,6 +392,7 @@ export const ThingsOn: React.FC<{band: number}> = ({band}) => {
           <Tote />
           <Scarf />
           <Flowers />
+          <Carrier />
           <Backpack />
           <Flask />
         </>
@@ -322,6 +403,7 @@ export const ThingsOn: React.FC<{band: number}> = ({band}) => {
           <Jacket />
           <Newspaper />
           <Skateboard />
+          <PottedPlant />
           <Cup x={908} y={1642} h={38} k="cupB" />
         </>
       );
@@ -329,6 +411,7 @@ export const ThingsOn: React.FC<{band: number}> = ({band}) => {
       return (
         <>
           <Picnic />
+          <Thermos />
           <GuitarCase />
         </>
       );

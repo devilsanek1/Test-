@@ -15,7 +15,7 @@
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime, clamp} from '../../lib/time';
-import {line, poly, glint, ellipse} from '../../lib/sketch';
+import {line, poly, glint} from '../../lib/sketch';
 import {Batch, PlaneMap, P, Pt, rng, ovalPath, lobes, lerp, leafPath, domePath} from '../kit/canal/core';
 import {s1Layout} from '../kit/canal/wing';
 import {litAt, Pigeons} from '../kit/canal/life';
@@ -273,8 +273,8 @@ function paneInto(b: Batch, ink: string[], u0: number, v0: number, w: number, h:
     b.poly(CM.paper, [pp(0.62, 0), pp(0.7, 0), pp(0.44, 0.28), pp(0.38, 0.28)]);
     return;
   }
+  // one flat lamp value (no brighter core): the lit panes stay a step under W, the thread (critic G4)
   b.poly(CM.lamp, qq(0, 0, 1, 1));
-  b.poly(CM.lampCore, qq(0.08, 0.1, 0.84, 0.46));
   if (kind === 0) {
     // a pendant lamp over a long table
     b.poly(S1_IRON, [pp(0.36, 0.3), pp(0.64, 0.3), pp(0.56, 0.21), pp(0.44, 0.21)]);
@@ -361,8 +361,8 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
   b.poly(CM.limestone, q(u0 - 0.14, v0 + h, w + 0.28, 0.1));
   b.poly(CM.stoneShade, q(u0 - 0.14, v0 + h + 0.085, w + 0.28, 0.035));
   b.layer();
-  // the ring her plant left: a dark stain ring with a pale dust-free centre, a few soil crumbs and a dropped leaf;
-  // sized to read at 216 px (~44 x 12 px), every line in ink (the kit drew it in CM.line)
+  // the ring her plant left: a stain ring one step darker than the sill with a pale dust-free centre and a dropped
+  // leaf; sized to read at 216 px (~44 x 12 px), flat fills only (an inked ring read as a halo, critic G4)
   const [rx, ry] = pp(0.42, 1.04);
   const s = PM.pxPerM(u0 + w * 0.42);
   const RX = s * 0.24;
@@ -370,16 +370,12 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
   b.fill(CM.shadeWarm, `M${P(rx - RX, ry)}A${RX.toFixed(1)} ${RY.toFixed(1)} 0 1 0 ${P(rx + RX, ry)}A${RX.toFixed(1)} ${RY.toFixed(1)} 0 1 0 ${P(rx - RX, ry)}Z`);
   b.fill(CM.paper, ovalPath(rx, ry - 0.3, RX * 0.7, RY * 0.52));
   b.fill(CM.sage, leafPath(rx + RX * 1.75, ry - 1.5, 16, 5, -18));
-  inkM.push(ellipse(rx, ry, RX, RY, {seed: 's1W/ring', wobble: 0.02, overlap: 16}));
-  inkF.push(ellipse(rx, ry - 0.3, RX * 0.7, RY * 0.52, {seed: 's1W/ring2', wobble: 0.03, overlap: 6}));
-  // W's lines: the frame (closed), the glass edge, the mullions, the sill, the chair and the lamp
+  // W's lines: the frame (one closed path), the mullions, the sill; the shelf, the chair and the lamp are flat fills
+  // (their short strokes broke the line budget, critic G4)
   inkM.push(poly(qq(0, 0, 1, 1), {closed: true, over: 'small', seed: 's1W/frame'}));
   inkF.push(line(...pp(0.12 - 0.022, 0.01), ...pp(0.12 - 0.022, 0.99), {seed: 's1W/m1', over: 'none'}));
   inkF.push(line(...pp(0.88 + 0.022, 0.01), ...pp(0.88 + 0.022, 0.99), {seed: 's1W/m2', over: 'none'}));
   inkF.push(line(...p(u0 - 0.14, v0 + h), ...p(u0 + w + 0.14, v0 + h), {seed: 's1W/sill', over: 'small'}));
-  inkF.push(line(...pp(0.05, 0.27), ...pp(0.35, 0.27), {seed: 's1W/shelf', over: 'none'}));
-  inkF.push(`M${P(...pp(0.14, 0.94))}L${P(...pp(0.14, 0.64))}Q${P(...pp(0.24, 0.56))} ${P(...pp(0.34, 0.64))}L${P(...pp(0.34, 0.78))}`);
-  inkF.push(`M${P(...pp(0.8, 0.76))}L${P(...pp(0.86, 0.6))}L${P(...pp(0.76, 0.5))}M${P(...pp(0.7, 0.5))}L${P(...pp(0.79, 0.44))}L${P(...pp(0.82, 0.53))}`);
 }
 
 // ---------------------------------------------------------------- the lobby behind the door
@@ -458,14 +454,17 @@ export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
     const lit = k === WING_SWITCH.pane ? t >= WING_SWITCH.at : litAt(0, 's1wing', k, panes.length, {litFrac: 0.55});
     paneInto(dyn, inkP, u0, v0, w, h, lit, `s1pane/${k}/${lit ? 'L' : 'U'}`, k % 4);
   });
-  dyn.ink(inkP.join(''), INK_PX.hair);
+  // tier C: the panes carry no lines (their cords, shelves and frames were short strokes, critic G4); inkP unused
+  void inkP;
   // W: lamp-lit, then plum dark from the lamp click (one frame)
   const wb = new Batch();
   const wInkF: string[] = [];
   const wInkM: string[] = [];
   wInto(wb, wInkF, wInkM, t >= W_LAMP_OFF);
-  wb.ink(wInkF.join(''), INK_PX.far);
-  wb.ink(wInkM.join(''), INK_PX.mid);
+  // every W line in the shade of the pane it bounds (CRAFT §c: never one near-black ink): the lamp's, then the plum's
+  const wTone = t >= W_LAMP_OFF ? CM.anchor : CM.lamp;
+  wb.ink(wInkF.join(''), INK_PX.far, CM.ink, 0, {tone: wTone});
+  wb.ink(wInkM.join(''), INK_PX.mid, CM.ink, 0, {tone: wTone});
   const F = S.canopyFascia;
   return (
     <>
