@@ -33,7 +33,9 @@ Maintenance at the end).
   - Spine first, then lines. A list of facts to prove is input, never the structure.
   - Test: someone who hears it once can retell it as a story.
   — ("just a collection of sentences", v3 G1, 2026-10-26).
-- **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24).
+- **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24). **Rhythm: never a run of
+  long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a problem.") after every 1-2
+  long ones, at the turns,** gated by `scripts/voice/check_rhythm.py` OK at G1. — (owner's reference reel, 2026-10-27).
 - **Scripts come with detailed emotional / delivery cues; the owner always gets the full script text with any take.**
   — (v1; "give me the full text to paste, not one line", v3, 2026-10-26).
 - **We generate the narration with the owner's ElevenLabs voice through the API, for every video** (voice id and model
@@ -118,6 +120,8 @@ Maintenance at the end).
   mascot;** strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). —
   ("don't use big models of people; the people in the first example video are the right direction", v2 restart,
   2026-10-27; v3 retro, 2026-10-27).
+- **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
+  platform auto-captions stay off. — (v1 reel, 2026-10-25).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). Each film decides them with its G4 look clip, 'paint-subtle' at most
   (`docs/EDGES.md`). — (v1 posted reel, 2026-10-25).
@@ -195,7 +199,9 @@ Maintenance at the end).
   `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
 
 ## Taste signals (general preferences from the owner's picks; the picks themselves are in each video's OWNER_NOTES.md)
-- **Topics: the everyday wallet consequence** wins over a bigger but more distant story. — (v3 G0).
+- **Topics: tech and AI news is the channel's focus; the existing fuss (people already arguing about it) weighs as much as
+  a direct wallet hit,** and an everyday consequence beats a bigger, distant story. — (v3 G0; v4 G0: "focus on tech and AI",
+  picked AI songs over the wallet pick: "good amount of fuss about AI songs", 2026-10-27).
 - **Lines: plain, direct and personal over clever;** a question to the viewer works as a hook. A plain line needs the
   frame-0 image, the first-second sound and the second line to bring the jolt. — (v3 G0.5-G2).
 - **Core lines: one real person in their own (attributed) words over a plural headline.** — (v2 G0.5).
@@ -212,10 +218,6 @@ Maintenance at the end).
   ... in a short reel we would speed it up", v3, 2026-10-26).
 - **Render at 60 fps from G5 to the final** ("smoother and more crispy"). Animate by time; drawn motion may stay stepped
   (12-24 drawings/s) while the camera glides; the G3 reel also renders at 60 (`G3_ANIMATIC.md`, 2026-10-26). — (v3, 2026-10-26).
-
-## Captions
-- **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
-  platform auto-captions stay off. — (v1 reel, 2026-10-25).
 
 ## Process and communication
 - **EFFORT IS ALWAYS MAX:** every workflow agent passes `effort: 'max'` (the Agent tool's effort setting too) and every

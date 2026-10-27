@@ -121,6 +121,17 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Next:** show the owner the top 3 angles on one screen. After their pick, G1 is a radio cut (TTS voice over plain
   paper with big captions) with 3 hook variants.
 
+## 2c. Video 4 (2026-10-27): G0 topic scouting started
+
+- Session https://claude.ai/code/session_014PwCXHBSouhcawFp12X9sT, branch `claude/tender-bardeen-j7duak`.
+- Owner: "research another video topic starting with step 1; the topic must not include Anthropic as the key entity."
+- Workflow `context/workflows/v4-g0-topics-wf_4d4df1c1-d0b.js` writes `video/docs/v4/scouting/*.md` and
+  `video/docs/v4/G0_TOPICS.md` (top 3 for the owner). DONE 2026-10-27: A gas tanks (recommended), B commute to Zoom,
+  C padlock key was 4. Owner: "lets focus on tech and AI related news" -> round 1 archived; round 2 (tech + AI only)
+  `context/workflows/v4-g0-topics-tech-*.js` -> `video/docs/v4/scouting_r2/`, `G0_TOPICS.md`. **LOCKED: B, AI songs and the shared royalty pot** (owner: "good amount of fuss about AI songs").
+- **Pick-up notes: `video/docs/v4/README.md`.** **PAUSED 2026-10-27 ~14:40 UTC (owner: "lets pause for now. lets make sure the other session finishes its work")**: the G0.5 run was stopped before any agent finished (nothing produced). To resume, relaunch `context/workflows/v4-g05-facts-and-core-line-*.js` unchanged once the owner says go.
+- G0.5 (paused): `context/workflows/v4-g05-facts-and-core-line-*.js` -> `video/docs/v4/research/`, `CORE_LINE.md`. Next: owner picks the core line; then G1 story-first script.
+
 ## 2b. Update 2026-10-25 20:00 UTC: two agents, split by video
 
 - **Video 2 (Google DeepMind resignations) is produced by session https://claude.ai/code/session_01BGZ47aBhF9yKpEaeiLeCPQ**
