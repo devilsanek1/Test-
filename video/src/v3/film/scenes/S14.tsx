@@ -40,6 +40,7 @@ const BEATS: QueueBeats = {
   guardWaveAt: 1.75,
   barrierLiftAt: [1.7],
   pipShakeAt: 1.9,
+  rowLeanAt: 1.85,
 };
 
 const S14: React.FC = () => <QueueSet id="S14" dur={DUR} s14={CHANGES} beats={BEATS} />;

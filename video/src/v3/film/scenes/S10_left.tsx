@@ -441,6 +441,26 @@ export const LeftGround: React.FC = () => {
     const [x, y] = P(p.X, k, 0);
     pools.push(<ellipse key={i} cx={x} cy={y} rx={p.r * k} ry={p.r * k * 0.28} fill={p.c} />);
   });
-  return <>{pools}</>;
+  // the CAFE's and BAKERY's windows spill warm light across the pavement onto the road's edge (two flat steps)
+  const spills: React.ReactNode[] = [];
+  [
+    {z0: 24.3, z1: 28.7, reach: 4.4},
+    {z0: 33.0, z1: 37.4, reach: 3.6},
+  ].forEach((sp, i) => {
+    const a = P(X_WALL_L, kAtZ(sp.z0), 0);
+    const b = P(X_WALL_L, kAtZ(sp.z1), 0);
+    const c = P(X_WALL_L + sp.reach, kAtZ(sp.z1 - 1.2), 0);
+    const d = P(X_WALL_L + sp.reach, kAtZ(sp.z0 - 1.6), 0);
+    spills.push(<path key={`so${i}`} d={quad([a, b, c, d])} fill={mixHex(EMBER.snow, EMBER.ring, 0.5)} />);
+    const c2 = P(X_WALL_L + sp.reach * 0.5, kAtZ(sp.z1 - 0.6), 0);
+    const d2 = P(X_WALL_L + sp.reach * 0.5, kAtZ(sp.z0 - 0.8), 0);
+    spills.push(<path key={`si${i}`} d={quad([a, b, c2, d2])} fill={mixHex(EMBER.ring, EMBER.core, 0.4)} />);
+  });
+  return (
+    <>
+      {spills}
+      {pools}
+    </>
+  );
 };
 
