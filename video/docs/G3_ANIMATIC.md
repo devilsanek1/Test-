@@ -47,8 +47,8 @@ edit, never silently inside a build (`animatic_mograph.md`).
 | Story, shot order, cuts | near-final (FROZEN) | one idea/panel, cuts on the locked words, in the VO's breaths | sound-off cold read; full-reel watch |
 | Shot framing + staging | near-final (FROZEN) | shot type, subject size/position, 3 planes; both end frames of a move pass the STORYBOARD_STYLE §5 checklist as stills | board_lint boxes; cold read |
 | Camera moves | near-final shape+timing | each move with the five values: move word, duration (s), start/end offset or scale, anchor, ease; path shape real; eases in AND out | lint: five values present; speed inside the §4 budget (WARN) |
-| Transitions + carriers | near-final (FROZEN) | every join's device and carrier letter named from the §4 grammar (A-F, at most 2 plain cuts), its board-time requirement met, PLAYED in the reel, its midpoint frame drawn | lint: a carrier per join, plain cuts (more than 2 FAIL), per-device checks; pair watch; "what carried you across each cut?" |
-| Thread object | near-final (FROZEN) | the through-line card's thread on screen >= 80 % of the runtime, no gap over 3 s (the declared scale reveal aside), a home spot when the shot is elsewhere; it reacts at the end of every cause beat (`CRAFT.md` §a.1) | lint from the board JSON (a gap over 3 s FAILs); cold read |
+| Transitions + carriers | near-final (FROZEN) | every join's device and carrier letter named from the §4 grammar (A-F, at most 2 plain cuts), its board-time requirement met, PLAYED in the reel, its midpoint frame drawn | lint: a carrier per join and at most 2 plain cuts (FAIL), per-device checks; pair watch; "what carried you across each cut?" |
+| Thread object | near-final (FROZEN) | the through-line card's thread on screen >= 80 % of the runtime, no gap over 3 s (the declared scale reveal aside), a home spot when the shot is elsewhere; it reacts at the end of every cause beat (`CRAFT.md` §a.1) | lint from the board JSON (under 80 % or a gap over 3 s FAILs); cold read |
 | Attention tiers | final weight, in grey (FROZEN) | every element's tier by story role, A/B/C (§3), drawn at its final weight: one subject per beat, a calm world around it | lint: a tier per element; eye jump at each join; "where is your eye, every 2 s?" |
 | Light rig | its shapes (FROZEN) | per set, from the world bible: the key's side, the pool shapes, one grey shadow value, the same in every shot of the set | lint: a rig per set panel; colour shift at each join (unless a light change is declared) |
 | Mover budget | near-final (FROZEN) | at most 3-4 noticeable supporting movers at once, at most 4 within 0.4 s of a cut; supporting life at its tier, final size and speed (§4) | lint on the declared counts; measured from the G4 look clip on |
@@ -76,8 +76,8 @@ texture (tier C only, at a light grey: the tiers below).
   FULL set (shelf clutter, wall fill, street fill), tier C — exempt from the 25-element cap and subject lint. Required
   on every home-base and wide panel.
 - **Tiers by story role, never by depth** (`CRAFT.md` §b; owner-approved 2026-10-27, replacing the depth "detail
-  gradient"): **A**, the beat's 1-3 subject objects: the ink contour (continuous, 9 px) and the only dark mass, the only
-  real details; **B**, supporting life near the story (the mascot, people, story objects off their beat): mid-grey lines
+  gradient"): **A**, the beat's 1-3 subject objects: the ink contour (continuous, 9 px), the only dark mass and the only
+  inner details; **B**, supporting life near the story (the mascot, people, story objects off their beat): mid-grey lines
   only, never a dark mass; **C**, the environment (room, street, town, sky, weather, far life): a pale tone with no
   contour, the owner's scribble mass (yes, 2026-10-27) at a light grey, or a flat tint. More than one fully detailed
   region is a smell. Windows, signage and crowds in tiers B and C are never drawn at G3. An **identity-critical**

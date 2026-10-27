@@ -6,16 +6,17 @@ sources agree; **REPORTED** = one secondary source or search summary; numbers wi
 
 **The film's craft target is `CRAFT.md`** (owner, 2026-10-27: one flowing story, one focus at a time, a clean line, gentle
 light): the board plans for it in grey (what carries each join, each beat's one subject, where the light comes from) and
-keeps its own sketch pen, never the film's. A carrier for every join (`CRAFT.md` §a) already replaces "cut by default" and
-§7's "size or angle changes at every cut"; the other board-side changes (tiers drawn as grey weights, the light rig) are
-proposed in `docs/retro/2026-10-27_v3_retro.md` §5 and wait for the owner.
+keeps its own sketch pen, never the film's. Owner-approved 2026-10-27 (the designed sketch: `docs/G3_ANIMATIC.md` §1-3):
+a carrier for every join (`CRAFT.md` §a) replaces "cut by default" and §7's "size or angle changes at every cut"; line
+weights follow the attention TIER (story role), never the depth (§2-3); each set's light rig is drawn as shapes (§2).
 
 ## 0. The principle (owner, 2026-10-26): signal per drawing
 A board exists to give the director (the owner) the most signal about the final film in the least drawing and review
 time. Draw at thumbnail level, make the intent explicit (one action, the framing, the shot type, cozy/scale, all stated
-in the notes strip in big words), PLAY every move and transition the film will have at sketch fidelity (shape and
-timing real, polish absent — stage spec: `docs/G3_ANIMATIC.md`), place a grey placeholder wherever the final film is
-dense or alive, and stop the moment the panel says what it must. Quality is not the goal at G3; completeness of signal is.
+in the notes strip in big words), PLAY every move and transition the film will have at sketch fidelity, each join with
+its carrier (shape and timing real, polish absent — stage spec: `docs/G3_ANIMATIC.md`), draw every element at its
+tier's grey weight and each set's light rig as shapes, place a grey placeholder wherever the final film is dense or
+alive, and stop the moment the panel says what it must. Quality is not the goal at G3; completeness of signal is.
 
 ## 1. Why
 The v3 animatic (frames at 1, 3.4, 7, 18 and 22 s) gives the eye nothing to follow. Five fills are used as decoration (warm walls, blue
@@ -41,17 +42,21 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 | Token | Hex | L\* | Use |
 |---|---|---|---|
 | paper | `#F7F5F0` | 97 | The page, sky, far plane and caption band. A neutral off-white: today's cream `#f3ebdd` reads as finished design. |
-| light | `#CDCBC6` | 82 | Middle-plane masses (walls, a table, buildings behind); sky only when it must separate from the ground. |
-| mid | `#9A9893` | 63 | Cast shadows and the subject's ground shadow, far-plane lines, slug and notes text. |
-| dark | `#3A3835` | 24 | The subject's one mass (a screen, a body, the bar that matters). The only dark area in the panel. |
-| ink | `#1F1E1C` | 11 | All subject and middle-plane lines, labels, numbers and captions. |
+| light | `#CDCBC6` | 82 | Tier-C masses with no contour (walls, a table, buildings behind) and the tier-C scribble; sky only when it must separate from the ground. |
+| mid | `#9A9893` | 63 | The light rig's one shadow value (cast and ground shadows, on the side away from the key), tier-B lines, the home base's one flat room tone (§7), slug and notes text. |
+| dark | `#3A3835` | 24 | The tier-A subject's one mass (a screen, a body, the bar that matters). The only dark area in the panel. |
+| ink | `#1F1E1C` | 11 | All tier-A lines, labels, numbers and captions. |
 | red pencil | `#C23B22` | 45 | **Annotation layer only** (§4): one focus or camera mark. Never a fill, never on an object in the scene; most panels have none. |
 - Neighbouring tones are 15+ L\* apart, so they hold up on a phone and at small size. The darkest tone meets the lightest only at the subject.
   Nothing in the scene has a hue. Marks are red because a grey arrow reads as an object in the scene; if the owner sees red as colour, marks become dashed ink.
-- **Line weights:** subject outline 9 px ink; the subject's inner details and middle-plane lines 5 px ink; far plane 3 px mid grey, or no
-  line (a flat light shape); marks 5 px. Nothing that has to be read is under 3 px. One clean round-capped stroke per edge: at most 8 px of
-  overshoot (none on the subject), no construction tails, no breaks in long lines. **Texture: placeholder tone only** (the `{t:'scribble'}` mass — owner-approved sketchbook texture, 2026-10-27 — and
-  flat mid-grey rects; the remaining `G3_ANIMATIC.md` §3 primitives when built — mid/far/dress roles, placeholder tone, never decoration). Still banned: hatching as rendering, grain, gradients, caption glow.
+- **Line weights follow the TIER (story role), never the depth** (`CRAFT.md` §b; `G3_ANIMATIC.md` §3): **A**, the subject:
+  outline 9 px ink, inner details 5 px ink; **B**, supporting life (the mascot, people, story objects off their beat):
+  3 px mid-grey lines only, never a dark mass; **C**, the environment: no line (a flat light shape, or the scribble mass
+  at light grey); marks 5 px. Nothing that has to be read is under 3 px. One clean round-capped stroke per edge: at most
+  8 px of overshoot (none on the subject), no construction tails, no breaks in long lines. **Texture: placeholder tone
+  only** (the `{t:'scribble'}` mass — owner-approved sketchbook texture, 2026-10-27 — and flat mid-grey rects; the
+  remaining `G3_ANIMATIC.md` §3 primitives when built — tier C and dress roles, placeholder tone, never decoration).
+  Still banned: hatching as rendering, grain, gradients, caption glow.
 
 ## 3. Drawing rules
 - **One idea per panel.** Write the idea as one sentence first ("a hand taps Add to cart; the price jumps"). Two ideas means two panels,
@@ -61,8 +66,9 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   Before goes on the left, after on the right; more goes up or taller; time runs left to right. A scale panel inverts the
   size rule: its subject is too big to take in (§7, shot `scale: true`).
 - **Silhouette and depth:** filled solid black at 270 x 480, the subject and its action can still be named; nothing touches its key edge,
-  hands stay off faces and bodies, objects overlap clearly or keep 30 px apart. At most 3 planes: subject (9 px, a dark mass, or paper-white
-  against light), middle (5 px, light fill), far (3 px mid-grey lines or a flat light shape, no detail). Overlap does the rest; no perspective grids.
+  hands stay off faces and bodies, objects overlap clearly or keep 30 px apart. At most 3 planes for staging (near, middle, far); the
+  weight follows the TIER, never the plane (§2): A (9 px, a dark mass, or paper-white against light), B (3 px mid-grey lines, never a
+  dark mass), C (no line: a flat light shape or light-grey scribble, no detail). Overlap does the rest; no perspective grids.
 - **People are gesture figures:** a head circle (r = 0.09 h), a bean-shaped torso along one curved line of action, limb lines, mitten
   hands, and arms held away from the body so the gaps show the pose. The pose is the verb (reach, point, shrug, slump, look up). Add a face
   only when the emotion is the beat (dot eyes, one brow line, one mouth line). A crowd is a row of small mid-grey figures, all the same size.
@@ -93,7 +99,8 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 - **Every cut, camera move, element animation and transition the final film will have is PLAYED in the animatic**
   with its real path shape and real timing (retimed to the reel: the reference gives the shape, never the speed), at
   sketch fidelity: drawn actions as 2-4 stepped key poses on their words, fast transits as one smear, ambient life as
-  2-3 looping micro-moves per set panel, rough in/out easing only. A still panel is a claim that the G5 shot is still.
+  2-3 looping micro-moves per set panel at their tier, final size and speed (taking turns, none entering in the 0.4 s
+  around a cut), every join with its carrier, rough in/out easing only. A still panel is a claim that the G5 shot is still.
   Deferred to G5/G6: overshoot, settle, secondary motion, easing feel, morph tweens. Full rules and the transition
   grammar: `docs/G3_ANIMATIC.md` §4.
 - **Real camera moves:** a push-in that reveals or isolates, or a rise or pan that reveals scale. Both end frames have to
@@ -109,8 +116,10 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   animated (one arrow beside the subject). Words: PUSH IN, PULL OUT, PAN L/R, RISE, TILT UP, HOLD (never "truck" or "zoom", which are ambiguous).
   Cases (1) and (3) are legal only in internal interim drafts: on any owner-facing render they are a lint FAIL — a mark
   where a played move belongs is the held-drawing loophole the animated-sketchbook rule retires (owner, 2026-10-26).
-- The slug always names the camera move and the transition (every G3 transition is labelled). Cut by default; dissolves per `G3_ANIMATIC.md` §4: 0.2-0.4 s to
-  soften, 1-2 s only for time passing. Frame 0 follows the playbook: lines, then tones, voice from frame 1. No other drawing draws itself on except a chart line, in step with the voice.
+- The slug always names the camera move and the transition with its carrier letter (every G3 transition is labelled).
+  Never a cut by default: every join carries something (at most 2 plain cuts; `G3_ANIMATIC.md` §4); dissolves per
+  `G3_ANIMATIC.md` §4: 0.2-0.4 s to soften, 1-2 s only for time passing. Frame 0 follows the playbook: lines, then
+  tones, voice from frame 1. No other drawing draws itself on except a chart line, in step with the voice.
 
 ## 5. Speed: how to iterate
 - **Thumbnails first:** for each beat, write the sentence, render 3 variants (a different subject size or angle) as 270 x 480 board stills
@@ -122,14 +131,16 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
 - **Re-board only the panel that fails:** each note (from the owner or a cold read) maps to a shot id plus a checklist number. Change that shot's JSON
   only, re-render its stills, then the 540p 60 fps reel (smoothness is judged at the film's real rate; `G3_ANIMATIC.md` §5). Panels that passed stay frozen. A fix is usually a swap from the kit (an icon,
   a pose, a size). Nothing is polished at G3: no colour, no final line, no easing feel, no line boil — but density placeholders,
-  ambient loops and played moves are SIGNAL, not polish, and are required (`G3_ANIMATIC.md` §2).
+  ambient loops, played moves and their carriers, the tier weights and the rig's shapes are SIGNAL, not polish, and are
+  required (`G3_ANIMATIC.md` §2).
 - **Sound-off checklist, per panel, at 270 x 480:** (1) one sentence, one subject; (2) filled black, subject and action still named;
-  (3) squinting or at 25 %, the eye lands on the subject within ~1 s (heaviest line, darkest against lightest); (4) 3 weights, 4 tones, no hue
+  (3) squinting or at 25 %, the eye lands on the subject within ~1 s (heaviest line, darkest against lightest); (4) 3 tier weights (A, B, C), 4 tones, no hue
   but at most one red mark; (5) subject centred, 35-60 % of the stage (a scale panel: >= 60 % of the frame or cut by both sides), 80 px clear, caption band empty, nothing key at an edge; (6) every object
   named by its shape (no words in boxes), lines that add nothing deleted; (7) at most 1 label (56+ px) and 1 number, no text repeating the
   caption, no sources in frame; (8) a cold reader, sound off, says the sentence from (1); (9) the notes strip's line 1 names the
   shot type, COZY / SCALE and the move, line 2 the idea, both readable on the sheet; (10) sound on at 1x: every move
-  readable, no strobe, every cut lands on its word, cuts judged in pairs; (11) no panel surface both empty and
+  readable, no strobe, every cut lands on its word, cuts judged in pairs, and the reader says where the eye is every 2 s
+  and what carried it across each cut; (11) no panel surface both empty and
   undeclared (`negative: true` or a placeholder), and each set panel answers 'does this place feel inhabited?';
   (12) the subject stays the same size and on its ground line across a shot's poses unless the change is the idea.
 
@@ -150,16 +161,20 @@ shot `scale?: true` for a scale panel (the lint then wants its subject BIG: >= 6
 figure `pose?: 'stand'|'walk'|'point'|'reach'|'hold'|'shrug'|'slump'|'lookup'|'sit'`, `facing?: 'l'|'r'`,
 `face?: 'none'|'happy'|'sad'|'shock'|'worried'`; text `strike?: boolean`; a new element `{t: 'mark', kind: 'circle'|'arrow'|'underline'|'frame',
 …, word?}` on the red annotation layer (5 px; `frame` = a dashed end-frame box with corner arrows), with `in` and `out` like any other element.
+**To build (tier 1, `G3_ANIMATIC.md` §7; owner-approved 2026-10-27):** `tier?: 'A'|'B'|'C'` on every element (stroke and fill by story
+role, §2: it replaces `role` for the weight), `carrier` on every transition, `rig` per set panel, and the thread object's screen time.
 **`board-lint` runs before every render.** Per shot it checks: at most 25 elements (warn at 30 to split); one subject group; at most 1 label and 1
 mark; text at least 48 px; fills from the palette only; nothing crossing y 290-600 except a `far` flat fill; the subject's box centred
 in x 380-700 and 270-460 px wide (a tall subject such as a standing figure is measured by its height, 300-650 px; a `scale` panel's
 subject at least 648 px or cut by both side edges); a bare year ("2005") counts as an axis word, not the number; the camera's zoom
 changing by at most 2x within a shot. Plus the `G3_ANIMATIC.md` §7 tier-1 checks: dress-layer exemption, move
 five-values, speed WARN (~15 px/frame at the render rate, measured only over moves >= 2 frames, whip/carry shots
-exempt), the carrier check, the camera-plan cross-check (every plan row's move / transition device / `life:` item
-exists in the board JSON), `life:` coverage, unaccounted emptiness (subject breathing ring and edge margins exempt;
-FAIL = >= 4 contiguous undeclared bare cells), zero-ambient FAIL on set panels, red-mark cases (1)/(3) FAIL on
-owner-facing renders. Boxes are measured on screen (clipped to the frame and the stage above the notes strip); a subject cut by a frame edge
+exempt), the carrier check, the camera-plan cross-check (every plan row's move / transition device and carrier / tier
+map / rig / `life:` item exists in the board JSON), `life:` coverage, unaccounted emptiness (subject breathing ring and
+edge margins exempt; FAIL = >= 4 contiguous undeclared bare cells), zero-ambient FAIL on set panels, red-mark cases
+(1)/(3) FAIL on owner-facing renders, a tier per element and a rig per set panel; plus CRAFT's board-readable checks
+(`PIPELINE_V2.md` anti-waste rule 6: a carrier per join and at most 2 plain cuts, thread coverage, the mover budget, eye
+jump, colour shift). Boxes are measured on screen (clipped to the frame and the stage above the notes strip); a subject cut by a frame edge
 (a waist-up figure) is measured by its visible width. Element moves take `ease` (default `inout`; `outSine` for a
 rise-over's ledge). Implemented: `scripts/v3/board_lint.py` (props and defaults: the header of `src/v3/SketchReel.tsx`);
 a worked board with every pattern (home base as 1-element window, icon ticker, element reuse, two-layer rise-over):
@@ -167,8 +182,9 @@ a worked board with every pattern (home base as 1-element window, icon ticker, e
 
 ## 7. Cinematography belongs in the board (owner, 2026-10-26)
 Clarity and cinematics are not a trade-off. Each panel names its shot type and framing, drawn in monochrome:
-- **Home base = cozy enclosure** (`COZY_AND_SCALE.md` §2-3): walls/shelf as dark masses cut by 2 frame edges, ONE opening
-  (the window, 15-30 % of the frame) in light grey; the lamp pool as a light-grey shape. The subject stays the darkest.
+- **Home base = cozy enclosure** (`COZY_AND_SCALE.md` §2-3): walls/shelf as the room-tone mass (next bullet; tier C, no
+  contour) cut by 2 frame edges, ONE opening (the window, 15-30 % of the frame) in light grey; the lamp pool as a
+  light-grey shape. The subject stays the darkest.
   Reads as a window, not a screen (v3 G3): landscape glass, a sill, the lamp shade over one lower corner, the view in it
   (horizon, landmark) and ONE mullion in clear glass, never across the landmark or its sign (a cross over the subject
   brought back "screen or blinds?"); the landmark's body in paper so it separates from the light glass. The pool sits
@@ -206,9 +222,10 @@ Clarity and cinematics are not a trade-off. Each panel names its shot type and f
   is on frame 0 and in the loop frame (an empty tag read as "price unknown").
 - The sound-off read still rules: if a cinematic choice makes a panel unreadable, simplify the drawing, not the framing.
 
-**Camera plan first (v3 G3, 2026-10-26; example `docs/v3/camera_plan_g3.md`).** Before re-boarding, the cinematographer
-writes one row per panel: time, idea, shot type, framing, cozy/scale element, move, readability note, plus the notes-strip
-lines. Then check the whole film:
+**Camera plan first (v3 G3, 2026-10-26; example `docs/v3/camera_plan_g3.md`).** Starting from the through-line card and
+the world bible, before boarding, the cinematographer writes one row per panel: time, idea, shot type, framing, cozy/scale
+element, move, the join's carrier, the tier map (what is A, B and C), the set's rig (key side, pools), readability note,
+plus the notes-strip lines. Then check the whole film:
 - **Moves:** every cut, camera move, element action and transition the final film will have is PLAYED at sketch
   fidelity (`G3_ANIMATIC.md` §4-5; speed budget ~15 px/frame at the render rate, a lint WARN). "At most two" is retired;
   a held panel is a CLAIM that the G5 shot is still: G5 adds only the hold cameras (cozy wides locked or the
@@ -220,9 +237,11 @@ lines. Then check the whole film:
 - **Scale:** one moment (1.5-4 s) built as a ladder: a close-up of the one thing, the reveal of many, then ONE cut to a
   tiny figure (change the angle as well as the size, so the second wide steps up instead of repeating).
 - **An S5 pull-back lands on the tiny figure inside the move** instead of a separate scale cut (v3, 2026-10-26).
-- **Every join carries** (`CRAFT.md` §a: a push-through, a match, a continuous camera, an object carry, a card flip); a
-  plain cut (at most 2, on a "But" turn) changes size or angle, except a deliberate match (the same chart again, the same
-  place later, the callback to the opening's end frame), which keeps the exact frame so the change is the only difference.
+- **Every join carries** (`CRAFT.md` §a: a push-through, a match, a continuous camera, an object carry, a card flip),
+  taken from the through-line card, its midpoint on the first word of the new sentence and its midpoint frame drawn
+  (`G3_ANIMATIC.md` §4); a plain cut (at most 2, on a "But" turn) changes size or angle, except a deliberate match (the
+  same chart again, the same place later, the callback to the opening's end frame), which keeps the exact frame so the
+  change is the only difference.
 - **Rise-over in board mode = two layers:** the camera rises a little (the world sinks ~120 px, so nothing enters the
   caption band; ease `unveil`, landing on the key word) while the near ledge drops on its own move with ease `outSine`
   over the WHOLE panel. Budget the speed on screen: camera + own move at most 15 px per 30 fps frame (a sine ease-out

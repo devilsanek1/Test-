@@ -5,12 +5,12 @@ The owner on v3 G5b (2026-10-27): "too busy, too incoherent ... no clean transit
 gentle ... premium ... lighting and shadows should be gentle but should probably exist." This page turns the playbook's
 four rules (clean premium, light and shadow, attention hierarchy, one flowing story) into numbers, code and checks,
 measured on v3 G5b against reference 1, v1 and the owner's two cozy references (`docs/retro/2026-10-27_v3_retro.md`). It
-applies now, from the v3 rework on. The new gate steps that make the pipeline produce it wait for the owner (same file);
-the old rules that contradicted it are already rewritten (a plain cut as G3's default, G5's draft line, the
-events-per-second quota). Subtle never means removed and clean never means empty: keep the life and the things a scene
-needs, lower their weight. A film's STYLE.md picks its values inside these rules; an older look doc that disagrees loses.
-Two-film thresholds are warnings with a declared exception, except §a's two FAILs. Px at 1080 x 1920, CIE L* and C*,
-%W/s = % of frame width/s; measures: §e.
+applies now, from the v3 rework on. The gate steps that make the pipeline produce it are owner-approved (2026-10-27) and
+live in `PIPELINE_V2.md`, `G3_ANIMATIC.md` and `G5_BLOCKING.md`; the old rules that contradicted it are rewritten (a
+plain cut as G3's default, G5's draft line, the events-per-second quota). Subtle never means removed and clean never
+means empty: keep the life and the things a scene needs, lower their weight. A film's STYLE.md picks its values inside
+these rules; an older look doc that disagrees loses. Two-film thresholds are warnings with a declared exception, except
+§a's two FAILs. Px at 1080 x 1920, CIE L* and C*, %W/s = % of frame width/s; measures: §e.
 
 ## a. One flowing story
 **The through-line** (written down beside the core line, before any drawing):
@@ -168,10 +168,10 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
   `<CastShadow>` (the footprint swept along the light) and `<FormShade>` (the path clipped to the side away from the key);
   then `<LightPool>`, `<PoolLift>`, `<Rim>`; ink and captions on top, unlit. Soft edges: 2 flat steps, no `feGaussianBlur`.
 
-**Check** (the G4 frame and every render; to port as `scripts/qa/check_light.py`): every pool at least +4 L* over its
+**Check** (the G4 look clip and every render; to port as `scripts/qa/check_light.py`): every pool at least +4 L* over its
 ground; a halo's radius at most 1.7x its lantern; the brightest 5 % (sky and caption band out) centred within 0.15 H of
 the subject; no shadow pixel under C* 8, nor under L* 35 except on an anchor-dark surface; one value in the caption band;
-the style frame already shows the rig with form, cast and contact shadows. Eye check: for every shadow, point at its
+the G4 look clip already shows the rig with form, cast and contact shadows. Eye check: for every shadow, point at its
 light; for every object in the light, point at its shadow.
 
 ## e. How to measure (until `scripts/qa` has these: the retro's tooling lane)

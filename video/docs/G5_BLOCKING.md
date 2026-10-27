@@ -1,10 +1,13 @@
 # G5 blocking cut: how to build any video's film (engine shell + lanes)
 
-G5 (`PIPELINE_V2.md` gate table): **real sets and props at draft finish in the film's clean pen and attention tiers
-(`docs/look/CRAFT.md`, never the sketch pen), the FINAL camera, key poses, NO edges / paper / texture, 60 fps.** The
-owner judges staging, readability at phone size and transitions that play. The story, cut points, shot content and
-transitions are locked by the G3 board; G5 translates the monochrome board into real sets.
-Video 3 is the reference implementation (`src/entry-v3-film.tsx`, `src/v3/film/`).
+G5 (`PIPELINE_V2.md` gate table) **fills what G3 decided: the G3 tier masks filled in colour from the G4 kit (the clean
+pen, the light rigs, the tier palettes: `docs/look/CRAFT.md`, never the sketch pen) — real sets and props at draft
+finish, the FINAL camera, key poses, NO edges / paper / texture, 60 fps.** Nothing appears that G3 did not show: no new
+places, movers or tier promotions (owner-approved 2026-10-27; `docs/retro/2026-10-27_v3_retro.md`). The owner judges
+staging, readability at phone size and transitions that play. The story, cut points, shot content, transitions and
+their carriers, the thread, the tiers, the light rigs and the mover budget are locked by the G3 board, the look by the
+G4 look clip; G5 translates the monochrome board into real sets, one lane per SEQUENCE, with one agent owning every
+transition (§3). Video 3 is the reference implementation (`src/entry-v3-film.tsx`, `src/v3/film/`).
 
 ## 1. The shape: the whole film plays from minute one
 
@@ -21,7 +24,7 @@ one by one; the film never breaks.
 | `src/vN/film/scenes/index.ts` | engine | the static registry: every panel imported by name. |
 | `src/vN/film/BoardPanel.tsx` | engine | the placeholder: draws the locked board panel with SketchReel's `ShotView` at board time `start + t` (red marks dropped). |
 | `src/vN/film/palette.ts`, `src/vN/film/kit/**`, `src/entry-vN-kit.tsx` | kit | the palette module, shared sets and props (`kit/README.md`). |
-| `src/vN/film/scenes/<ID>.tsx` (+ helpers `<ID>_*.tsx`) | that panel's lane | the real set for one panel. |
+| `src/vN/film/scenes/<ID>.tsx` (+ helpers `<ID>_*.tsx`) | its sequence's lane | the real set for one panel. |
 
 Scaffold it from the locked board in one command (writes scenes.json, the registry, and a placeholder for every panel
 file that does not exist yet; never overwrites a lane's file):
@@ -30,9 +33,9 @@ file that does not exist yet; never overwrites a lane's file):
 python3 -I scripts/g5_scaffold.py --animatic public/vN/animatic.json --film src/vN/film --drop LOOP --end <voice s> --loop-dur 0.3
 ```
 
-Every `transitionIn` carries the board's `transition.type` (the labels also stay in `note`; `G3_ANIMATIC.md` §7 tier 1 —
-until g5_scaffold.py is updated it still flattens to `cut`, so fix scenes.json by hand after scaffolding: a transition
-the board PLAYED never ships flattened); the board's LOOP panel is dropped:
+Every `transitionIn` carries the board's `transition.type` and its `carrier` (the labels also stay in `note`;
+`G3_ANIMATIC.md` §7 tier 1 — until g5_scaffold.py is updated it still flattens to `cut`, so fix scenes.json by hand
+after scaffolding: a transition the board PLAYED never ships flattened); the board's LOOP panel is dropped:
 the last panel ends on the voice's end with the house loop `transitionOut {type: 'unbuild', loop: true, dur: 0.3}`,
 un-building into the FIRST panel's `t < 0` bare-line state, so the film loops to the bare-line frame 0. Then copy
 `BoardPanel.tsx`, `FilmN.tsx` and the entry from v3 and change the imports.
@@ -43,12 +46,21 @@ un-building into the FIRST panel's `t < 0` bare-line state, so the film loops to
 "G5 · <panel id> · <m:ss.ss>" bottom-left, small, mid grey with a light halo, so the owner can name a shot), and
 `edges={false}` (no edges / paper / texture before G6).
 
-**G5 entry check, before lanes fan out** (`G3_ANIMATIC.md` §2: G4+ may only ADD — these two checks are where that
-promise is enforced): (1) a scripted diff of scenes.json and each built scene against the locked board JSON — every
-camera move, element move, transition device and `life:`/promise item matches, and no motion exists that G3 did not
-play; a mismatch is a FAIL or an explicit, owner-visible G3 reopen. (2) A sound-off cold read of the first fully
-dressed set (the density-key build): map each board `promise` line to what a cold reader names (v3: streams read as
-birds). Lanes start only after both pass.
+**G5 entry and exit checks** (`G3_ANIMATIC.md` §2: G4+ may only ADD, never a mover, a place or a tier promotion —
+these checks are where that promise is enforced; owner-approved 2026-10-27):
+- **Entry, before lanes fan out:** (1) a scripted diff of scenes.json and each built scene against the locked board
+  JSON — every camera move, element move, transition device and carrier, and `life:`/promise item matches, and no
+  motion exists that G3 did not play; a mismatch is a FAIL or an explicit, owner-visible G3 reopen. (2) A sound-off
+  cold read of the first fully dressed set (the home set, the density key, as built for the G4 look clip): map each
+  board `promise` line to what a cold reader names (v3: streams read as birds). (3) CRAFT's measures (`CRAFT.md` §e:
+  carry, eye jump and colour shift per join; tiers and salience; line; light with `scripts/qa/check_light.py`) run on
+  the G3 reel and on the approved G4 look clip: the baseline the exit is compared with. Lanes start only after (1) and
+  (2) pass and the baseline is recorded.
+- **Exit, before the owner sees the cut** (with the gate check, §7): the same diff and measures rerun on the G5 render
+  and compared with the baseline and CRAFT's numbers (warnings with a declared exception; `CRAFT.md` §a's two FAILs, a
+  carrier per join with at most 2 plain cuts and the thread >= 80 % with no gap over 3 s, stay FAILs): every join keeps
+  its carrier, nothing rises above its G3 tier, no mover or place appears that G3 did not show. Until the craft tooling
+  lane ports the measures into `scripts/qa` (`PIPELINE_V2.md`), the raw versions are in `scripts/qa/retro_tools/`.
 
 ## 2. The scene contract (what a lane implements)
 
@@ -85,17 +97,27 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'light'}];   // optional: ov
   the bottom-left (y > 1850). Key action inside x 90-990, y 600-1480.
 - **Board notation is not film**: the red pencil marks and the notes strip never appear. A red focus circle becomes a
   production emphasis that fits the look (light, the hero colour, a pop), never a drawn circle.
-- **Density and life**: every panel is dressed and alive at G5 (a world around the subject, people, the living character,
-  the idle layer always on): `docs/look/LIFE_AND_DENSITY.md`; check with `scripts/qa/density.py` before the owner sees a cut.
-- **Look**: the video's LOOK.md, its approved style frame and palette roles (one hero colour, one dark anchor, at most
-  one pop), `docs/look/COZY_AND_SCALE.md`, `docs/look/CINEMATIC_GUIDE.md`.
+- **Density and life: fill what G3 decided.** Every G3 placeholder and `life:` item becomes its real dressing and life
+  at its G3 tier, so every panel is full and alive, calm and tiered (a world around the subject, people, the living
+  character, slow life that never stops): `docs/look/CRAFT.md` §b, `docs/look/LIFE_AND_DENSITY.md`. Nothing the board
+  did not show: no new places, movers or tier promotions. `scripts/qa/density.py` is information before the owner sees
+  a cut (its events/s and gap are never a reason to add movers).
+- **Look**: the approved G4 look clip and its kit (the clean pen, the set's light rig, the tier palettes), the video's
+  LOOK.md and palette roles (one hero colour, one dark anchor, at most one pop), `docs/look/COZY_AND_SCALE.md`,
+  `docs/look/CINEMATIC_GUIDE.md`.
 
 ## 3. Lane rules
 
-- Edit only your own files: `scenes/<ID>.tsx` and new helpers named `<ID>_*.tsx`. Never touch scenes.json,
-  captions.json, the registry, the entry, the palette or the kit: put a change you need in your report under
-  `REQUESTS:`, one exact line each (e.g. `REQUESTS: engine: scenes.json S9 captionTone -> [{"t":0,"tone":"light"}]`;
-  prefer exporting `captionTone` yourself).
+- **One lane per SEQUENCE** (owner-approved 2026-10-27): a lane owns the consecutive panels in one place (with their
+  shared set files) and builds them panel by panel, to the G3 tier masks, from the G4 kit. **One transition agent owns
+  every join** of the film, in film order: the carrier's motion across each cut on both sides, and the `transitionIn` /
+  `carrier` rows (through the engine lane) and any `Wiper`; a lane builds its panels to each join's in and out frames
+  and sends a change at a join to it under `REQUESTS:`. (v3 G5b: per-panel lanes re-made the recurring places
+  differently, and nobody owned what crossed a lane border, §8b.)
+- Edit only your own files: your sequence's `scenes/<ID>.tsx` and new helpers named `<ID>_*.tsx` (the transition agent
+  edits a join's in and out frames there, in turn). Never touch scenes.json, captions.json, the registry, the entry, the
+  palette or the kit: put a change you need in your report under `REQUESTS:`, one exact line each (e.g.
+  `REQUESTS: engine: scenes.json S9 captionTone -> [{"t":0,"tone":"light"}]`; prefer exporting `captionTone` yourself).
 - Commit only your own paths (`git add <paths>`, never `-A` or `.`); never pull, merge, rebase, reset, stash or checkout.
 - Keep a session small (one panel), check stills at 0.5 scale plus one 0.25 phone-size look, at most ~10 images.
 
@@ -130,7 +152,7 @@ deliverables/vN/vN_g5_blocking.mp4 --scale=0.5`).
   The script aligns it to the transcript by characters and fails if a word is missing or out of order.
 - Pop captions (`captionMotion: 'pop'`): pages, lines and highlight boxes pop in place (owner playbook).
 - **Frame 0 states the payoff in words** (`frame0`): the core line in the caption band from frame 0 until the board's
-  `frame0Until`, in the style frame's caption look (caption tone colours, the highlight box), with the spoken captions
+  `frame0Until`, in the G4 look's caption style (caption tone colours, the highlight box), with the spoken captions
   lowered and scaled under it (one line, inside the band); they move back up on the first page change after `until`.
   From the loop roll (the last page rolls back to page 1 at `captionAt`, default end - 0.22 s) the words return, so
   the last frame lands on frame 0.
@@ -215,7 +237,8 @@ rendered the film and fixed what only shows across panels.
   `docs/v3/g5b_reports/fix_*.md`; the orchestrator ran S9 + the assembly): parallel fix rounds with no conflicts
   (each commits only its own paths), but nobody owned what crosses a session border (S12 vs S16's screen, the S15 ->
   S16 cut-in, the S16 -> O1 seam that only the full Film3 shows). Next time: neighbours' panels as read-only references
-  in each brief, and a named owner for every cut on its border.
+  in each brief, and a named owner for every cut on its border (now the rule: sequence lanes and one transition agent,
+  §3).
 - **The chunked render** (~1 h for the film at 1080x1920): bundle ONCE, one chunk per panel (`--frames=a-b
   --concurrency=3 --timeout=120000`, to a .tmp file moved on success), stream-copy join with each chunk's exact
   duration n/60, audio from ONE direct audio-only render (a chunk starting inside a sound cue ticks), every seam frame

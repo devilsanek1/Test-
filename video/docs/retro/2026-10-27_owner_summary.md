@@ -10,3 +10,4 @@
 - **Change 4:** we keep a quick sketch, but it now plans the flow, where to look and the light. Then you get a short clip in the final style to approve before we build the whole film.
 - The v3 rework you asked for is being built this way now.
 - **The one decision we need:** OK to make every video this way from now on? The other option is to skip the sketch and build the finished world first: a stronger look early on, but a slower first watchable cut.
+- **Your answer (2026-10-27): "Yes".** Every video is made this way from now on.

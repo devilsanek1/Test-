@@ -97,8 +97,9 @@ stages (building, fixing, polishing), where the measured waste happened.
    numbers too: warnings with a declared exception (they come from two films only), never quotas. At G3 a board is
    linted only for what it shows truly: the declared ones (a carrier per join, the plain cuts, thread coverage, the
    mover budget) plus eye jump and colour shift (v3's board: 0.21 and 35, both over); carry, movers, contrast, line and
-   light count from the G4 look clip on (blank paper flatters them: v3's board carried 0.41 with 0 movers). Two FAIL
-   outright: a thread gap over 3 s (the declared scale reveal aside) and more than 2 plain cuts.
+   light count from the G4 look clip on (blank paper flatters them: v3's board carried 0.41 with 0 movers). Two checks
+   FAIL outright (`CRAFT.md` §a): a carrier for every join with at most 2 plain cuts, and the thread on screen >= 80 %
+   with no gap over 3 s (the declared scale reveal aside).
 7. **The hook goes first at every gate**, as a swappable segment (the first 3-5 s), with its sound cue from G1 on (a
    positive phone sound in the first second, per the playbook), and with variants at G1 (line) and G3 (visual). It is never polished last.
 8. **One deliverable per gate, no status reels.** Drop the 30-minute strips of every composition. The owner gets the gate video;

@@ -126,8 +126,8 @@ Format: **rule** — why / evidence (video, date).
   shot (a shared object, a match, a continuous camera, the subject's motion leading out and in); the main arc is visible
   across the whole film. Life and detail are DESIGNED into the shot together with its hierarchy from the start, never
   bolted onto a finished sketch afterwards ("we did the sketch first and then added a whole bunch of details to make it
-  feel alive, which is wrong"). Through-line and transition grammar: `docs/look/CRAFT.md` §a. Whether sketch-first helps
-  at all is under review (proposal: `docs/retro/2026-10-27_v3_retro.md`). — (v3 G5b, 2026-10-27).
+  feel alive, which is wrong"). Through-line and transition grammar: `docs/look/CRAFT.md` §a. Sketch-first stays, as
+  the designed sketch above (owner yes, 2026-10-27). — (v3 G5b, 2026-10-27).
 - **G3 is the most important gate: an ANIMATED SKETCHBOOK of the final film, optimised for SIGNAL, not quality.** With
   script and voice locked, the animatic gives the director the closest signal to the final story in the least drawing
   and review time: story, transitions, animations and camera moves already very close to final — PLAYED, not only
