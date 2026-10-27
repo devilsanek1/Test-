@@ -35,6 +35,9 @@ export type CrowdLife = {
 
 /** Which back does what (row order). */
 export const ROLE = {phone: 0, van: 1, coffee: 2, clip: 3} as const;
+/** Draw order: the coffee driver stands a step back (drawn before the van driver and the clipboard), so the van
+ *  driver's raised arm and the clipboard both overlap him and his raised cup sits clear between them. */
+const ORDER = [0, 2, 1, 3];
 
 export const ROW_BASE: Omit<BackRowProps, 'people' | 'moves'> = {x0: -40, x1: 800, top: 1452, head: 128, n: 4, seed: 's11/row', lookX: 640};
 
@@ -58,16 +61,17 @@ const Sleeve: React.FC<{arm: Arm; w: number; coat: string; ink: number; seed: st
   );
 };
 
-/** The coffee driver's left arm: the cup held low at the side, raised to the mouth in each sip (steam always). */
+/** The coffee driver's right arm: the cup held low at the side (behind the next back), raised to the mouth in each sip
+ *  (steam always). */
 const CoffeeArm: React.FC<{g: ReturnType<typeof personGeo>; coat: string; ink: number; sips: [number, number][]; seed: string}> = ({g, coat, ink, sips, seed}) => {
   const t = useTime();
   const hw = g.w / 2;
-  const rest: Arm = {sh: [-hw * 0.74, -g.h + g.w * 0.3], el: [-hw * 1.04, -g.h + g.w * 0.7], ha: [-hw * 1.08, -g.h + g.w * 1.18]};
-  const up: Arm = {sh: [-hw * 0.74, -g.h + g.w * 0.3], el: [-hw * 1.32, -g.h + g.w * 0.12], ha: [-g.hr * 1.22, g.hy + g.hr * 0.55]};
+  const rest: Arm = {sh: [hw * 0.74, -g.h + g.w * 0.3], el: [hw * 1.04, -g.h + g.w * 0.7], ha: [hw * 1.08, -g.h + g.w * 1.18]};
+  const up: Arm = {sh: [hw * 0.74, -g.h + g.w * 0.3], el: [hw * 1.34, -g.h + g.w * 0.1], ha: [g.hr * 1.24, g.hy + g.hr * 0.55]};
   const k = raised(t, sips);
   const arm = lerpArm(rest, up, k);
   const cw = g.w * 0.15;
-  const cx = arm.ha[0] - cw * 0.1;
+  const cx = arm.ha[0] + cw * 0.1;
   const cy = arm.ha[1] - cw * 1.25;
   const tilt = -28 * k;
   const steam = puffs(t, {n: 3, life: 1.5, rise: g.w * 0.7, drift: -5, r0: 1.4, r1: 4.2, seed: `${seed}/st`});
@@ -99,12 +103,13 @@ const HeadArm: React.FC<{g: ReturnType<typeof personGeo>; coat: string; ink: num
   return <Sleeve arm={lerpArm(low, up, k)} w={g.w} coat={coat} ink={ink} seed={seed} />;
 };
 
-/** The hooded driver's left hand holding a clipboard up beside him (the sheet lifts on a cue). */
+/** The hooded driver's left hand holding a clipboard at chest height beside him, under his neighbour's head (the sheet
+ *  lifts on a cue). */
 const ClipArm: React.FC<{g: ReturnType<typeof personGeo>; coat: string; ink: number; flutter?: number[]; seed: string}> = ({g, coat, ink, flutter, seed}) => {
   const t = useTime();
   const hw = g.w / 2;
   const bob = sway(t, g.w * 0.012, 2.6, 0.8);
-  const arm: Arm = {sh: [-hw * 0.74, -g.h + g.w * 0.3], el: [-hw * 1.3, -g.h + g.w * 0.22], ha: [-hw * 1.18, -g.h - g.w * 0.08 + bob]};
+  const arm: Arm = {sh: [-hw * 0.74, -g.h + g.w * 0.3], el: [-hw * 1.16, -g.h + g.w * 1.0], ha: [-hw * 1.0, -g.h + g.w * 0.58 + bob]};
   const bw = g.w * 0.4;
   const bh = g.w * 0.52;
   const bx = arm.ha[0] - bw * 0.5;
@@ -194,7 +199,7 @@ const CratesAndPip: React.FC<{pip?: Omit<Pip3Props, 'x' | 'y'>}> = ({pip = {}}) 
 export const S11Crowd: React.FC<{life: CrowdLife}> = ({life}) => {
   const t = useTime();
   const row: BackRowProps = {...ROW_BASE, people: life.row, moves: life.rowMoves};
-  const layout = backRowLayout(row, t);
+  const layout = backRowLayout(row, t).sort((a, b) => ORDER.indexOf(a.i) - ORDER.indexOf(b.i));
   return (
     <>
       <CratesAndPip pip={life.pip} />

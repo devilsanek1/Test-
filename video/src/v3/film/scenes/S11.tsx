@@ -50,10 +50,10 @@ const CROWD: CrowdLife = {
     // the laptop van's driver: the cap with the badge; a hand to the back of his head on "five", then turns to his
     // neighbour in the settle
     {hair: 'cap', wear: ['badge'], coat: EMBER.dc, hat: EMBER.dcSide, coatDetail: ['quilt', 'yoke'], moves: [{t: 2.92, kind: 'lean', dir: 1, amp: 1.2}]},
-    // the coffee: two sips, turns back to the van driver in the settle
-    {hair: 'beanie', acc: ['scarf'], coat: '#6B4A6E', hat: EMBER.hl, coatDetail: ['zip'], moves: [{t: 3.0, kind: 'lean', dir: -1, amp: 1.2}]},
-    // the hood with the clipboard
-    {acc: ['hood'], coat: '#C98A64', coatDetail: ['quilt'], moves: [{t: FIVE + 0.12, kind: 'turn', amp: 1.6}]},
+    // the coffee (a step back): two sips with the right hand, turns back to the van driver in the settle
+    {hair: 'beanie', acc: ['scarf'], coat: '#6B4A6E', hat: EMBER.hl, coatDetail: ['zip'], sMul: 0.95, dy: -8, moves: [{t: 3.0, kind: 'lean', dir: -1, amp: 1.2}]},
+    // the clipboard (curly hair, headphones round the neck)
+    {hair: 'curly', hairColor: '#7A3A24', acc: ['headphones'], coat: '#C98A64', coatDetail: ['quilt'], moves: [{t: FIVE + 0.12, kind: 'turn', amp: 1.6}]},
   ],
   // "costs": the row leans in after the tall bar as it climbs (staggered 2 frames)
   rowMoves: [{t: BIG_AT + 0.12, kind: 'lean', amp: 1}],

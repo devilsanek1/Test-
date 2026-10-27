@@ -20,7 +20,6 @@ import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {
   Bench,
-  CableTray,
   CardBoard,
   ChartCard,
   CoffeeMachine,
@@ -178,13 +177,35 @@ const DriversSign: React.FC<{joltAt?: number[]}> = ({joltAt}) => {
   return (
     <XG m={mat.about(mat.rotate(a), x0 + w / 2, TRAY_Y + 22)}>
       <path d={`M${x0 + 30} ${TRAY_Y + 22}L${x0 + 30} ${y0}M${x0 + w - 30} ${TRAY_Y + 22}L${x0 + w - 30} ${y0}`} stroke={EMBER.ink} strokeWidth={W.hair} strokeDasharray="5 3" />
-      <Fill d={roundRect(x0, y0, w, h, 6)} color={EMBER.card} seed="s11/sign" />
-      <rect x={x0 + 6} y={y0 + 6} width={w - 12} height={h - 12} rx={4} fill="none" stroke={EMBER.beam} strokeWidth={2.4} />
-      <Txt x={x0 + w / 2} y={y0 + h * 0.73} size={32} fill={EMBER.beam} fit={w - 40}>
+      <Fill d={roundRect(x0, y0, w, h, 6)} color={EMBER.dc} seed="s11/sign" />
+      <rect x={x0 + 6} y={y0 + 6} width={w - 12} height={h - 12} rx={4} fill="none" stroke={EMBER.skyLow} strokeWidth={2.4} />
+      <Txt x={x0 + w / 2} y={y0 + h * 0.73} size={32} fill={EMBER.core} fit={w - 40}>
         DRIVERS
       </Txt>
       <Ink d={roundRect(x0, y0, w, h, 6, {closed: false, seed: 's11/signI'})} width={W.far} />
     </XG>
+  );
+};
+
+/** The cable tray in the cool dark metal (a strong line across the top, like S4's fascia): cable bundles showing over
+ *  its lip and a few loops sagging out of it in the room's colours. */
+const Tray: React.FC = () => {
+  const x0 = -30;
+  const x1 = 1110;
+  const y = TRAY_Y;
+  let rungs = '';
+  for (let x = x0 + 40; x < x1; x += 46) rungs += `M${x} ${y + 4}V${y + 18}`;
+  return (
+    <>
+      <path d={`M${x0} ${y + 2}Q300 ${y - 8} 560 ${y + 1}T${x1} ${y}`} fill="none" stroke={EMBER.dcSide} strokeWidth={9} />
+      <path d={`M${x0} ${y + 4}Q420 ${y - 5} 780 ${y + 2}T${x1} ${y + 3}`} fill="none" stroke={EMBER.pot} strokeWidth={5} />
+      <Fill rect={[x0, y, x1 - x0, 22]} color={EMBER.dc} offset={false} />
+      <path d={rungs} stroke={EMBER.skyLow} strokeWidth={2.4} />
+      <Ink d={rectInk(x0, y, x1 - x0, 22, {seed: 's11/trayI', over: [6, 12], edges: 'tb'})} width={W.far} />
+      <path d={`M880 ${y + 22}q34 40 70 6M150 ${y + 22}q26 26 52 0M300 ${y + 22}q50 54 104 4`} fill="none" stroke={EMBER.pot} strokeWidth={5} />
+      <path d={`M470 ${y + 22}q30 30 62 2M760 ${y + 22}q22 22 44 0`} fill="none" stroke={EMBER.hl} strokeWidth={5} />
+      <path d={`M90 ${y + 22}q40 44 82 6`} fill="none" stroke={EMBER.dcSide} strokeWidth={6} />
+    </>
   );
 };
 
@@ -198,14 +219,14 @@ const HighWall: React.FC<{life: RoomLife}> = ({life}) => {
   return (
     <>
       <Ink d={hangers} width={W.hair} />
-      <CableTray x0={-30} x1={1110} y={TRAY_Y} seed="s11/tray" />
-      <path d={`M880 ${TRAY_Y + 22}q34 40 70 6M150 ${TRAY_Y + 22}q26 26 52 0`} fill="none" stroke={EMBER.pot} strokeWidth={5} />
+      <Tray />
       <StripLight x={150} y={180} w={400} flickerAt={life.flickerAt} seed="s11/strip" />
       <DriversSign joltAt={life.flickerAt} />
       <ExtractorFan />
       {/* the heating pipe along the wall top, a valve wheel by the window */}
-      <Fill rect={[WIN.x + WIN.w + WFR - 4, PIPE_Y, 1200, 14]} color={EMBER.card} offset={false} />
-      <Fill rect={[WIN.x + WIN.w + WFR - 4, PIPE_Y + 9, 1200, 5]} color={EMBER.shelf} offset={false} />
+      <Fill rect={[WIN.x + WIN.w + WFR - 4, PIPE_Y, 1200, 14]} color={EMBER.pot} offset={false} />
+      <Fill rect={[WIN.x + WIN.w + WFR - 4, PIPE_Y + 9, 1200, 5]} color={EMBER.beam} offset={false} />
+      <Fill rect={[WIN.x + WIN.w + WFR - 4, PIPE_Y + 2, 1200, 3]} color={EMBER.books[0]} offset={false} />
       <Ink d={line(WIN.x + WIN.w + WFR, PIPE_Y, 1120, PIPE_Y, {seed: 's11/pipeT', over: [0, 0]}) + line(WIN.x + WIN.w + WFR, PIPE_Y + 14, 1120, PIPE_Y + 14, {seed: 's11/pipeB', over: [0, 0]})} width={W.far} />
       <Ink d={brackets} width={W.hair} />
       <circle cx={146} cy={PIPE_Y + 7} r={13} fill="none" stroke={EMBER.beam} strokeWidth={4} />
