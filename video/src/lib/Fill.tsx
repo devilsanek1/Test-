@@ -10,6 +10,7 @@
 // Modes: pop (default: centre grow 0.2 -> 1 over MOTION.fillGrow, no overshoot) | snap (1-frame pop) | wipe (reveal
 // toward `dir`, linear) | grow (scale from the edge opposite `dir`, out-expo 0.2 s) | spring (centre pop with the 7%
 // overshoot spring) | none. 'fade' is accepted for old code and behaves like 'snap' (@deprecated: nothing fades).
+// Inside a <Look snapPops> (opt-in, lib/exit.tsx: the clean pen's frame 0) the default 'pop' lands as 'snap'.
 // Time of day: the colour goes through the current <Tod> (lib/tod.tsx: reference 2's relight step table). When a timed
 // <World sky> key changes the light, each fill flips WHOLE in one frame as the sky's wipe edge reaches its centre (or
 // its <TodAnchor>), so objects relight staggered by height. The World sky itself (lookExempt) is never relit.
@@ -233,7 +234,8 @@ export const Fill: React.FC<FillProps> = ({
   if (drain >= 1) return null;
   const org0: [number, number] | undefined = origin ? (proj ? applyH(proj.H, origin[0], origin[1]) : origin) : undefined;
 
-  const md: FillMode = mode === 'fade' ? 'snap' : mode;
+  // a Look with snapPops (opt-in: the clean pen's frame 0) lands the default centre-grow pop as a one-frame step
+  const md: FillMode = mode === 'fade' ? 'snap' : mode === 'pop' && look.snapPops && !lookExempt ? 'snap' : mode;
   const wdir: Dir = dir ?? (md === 'grow' ? 'up' : 'right');
   let scale = 1;
   let sx = 1;

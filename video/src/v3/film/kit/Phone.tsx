@@ -11,7 +11,7 @@ import {blob, circle, glint, line, poly, polyPath, roundRect, smooth, textLines}
 import {useTime, prog, ease} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
-import {At, b, fillAt, Pt, Show, Txt} from './util';
+import {At, b, fillAt, mixRgb, Pt, Show, Txt} from './util';
 import {Laptop} from './Laptop';
 import {tiered} from '../../../lib/tier';
 
@@ -41,6 +41,19 @@ export type PhoneProps = {
   pressAt?: number;
   /** Draw the listing's product laptop (default true); false leaves the photo panel empty (e.g. the laptop lifted off). */
   photoLaptop?: boolean;
+  /** OPT-IN (v3 rework): when the dark body (the bezel) and the notch land (default with the outline's fills, first).
+   *  The clean pen's frame 0 lands it LAST, after the screen and the UI: the bezel closes round a lit screen, never a
+   *  dark slab under a missing screen. */
+  bodyFillAt?: At;
+  /** OPT-IN (v3 rework, CRAFT §b: a story object off its beat is tier B): 0 = full strength, 1 = off-beat (the button
+   *  and the cart badge a soft blue at C* <= 20 with no outline, the listing's laptop at tier 'support'); 0.5 = the
+   *  half step of a 2-step change (never a fade). Default 0. */
+  dim?: number;
+  /** OPT-IN: the button steps one value darker while the thumb presses it (the press's 0.14 s). */
+  pressDark?: boolean;
+  /** OPT-IN: the description lines' colour (default: the house ink, the subject's dark line). A light tone (L* >= 64)
+   *  draws them as soft hairlines: the listing's text stays quiet next to the tag. */
+  descTone?: string;
   at?: At;
   seed?: string;
   ink?: number;
@@ -63,6 +76,11 @@ export function phoneSlots(w = 400, priceY = 372, buttonY = 400) {
     badge: {x: 352 * k, y: 64 * k, r: 16 * k},
   };
 }
+
+/** The off-beat button / badge colour (`dim` 1): the pop's hue at C* 18, L* 70 (#9AACCB): still the blue button, quiet. */
+export const PHONE_DIM_POP = '#9AACCB';
+/** The button while pressed (`pressDark`): one value step down (L* 58 -> 49), hue and chroma kept. */
+export const PHONE_PRESS_POP = '#2276C9';
 
 /** Canvas point of a phone-local point (follows the phone's rotation). */
 export function phonePoint(p: {x: number; y: number; w?: number; h?: number; rot?: number}, lx: number, ly: number): Pt {
@@ -96,6 +114,10 @@ const PhoneBody: React.FC<PhoneProps> = ({
   buttonText = 'Add to cart',
   pressAt,
   photoLaptop = true,
+  bodyFillAt,
+  dim = 0,
+  pressDark,
+  descTone,
   at,
   seed = 'phone',
   ink = 4.8,
@@ -106,15 +128,19 @@ const PhoneBody: React.FC<PhoneProps> = ({
   const k = S.k;
   const h = hIn ?? w * 2.2;
   const thin = 2.2;
+  const pressing = pressAt !== undefined && t >= pressAt && t < pressAt + 0.14;
   const press = pressAt !== undefined && t >= pressAt ? 1 - 0.05 * Math.sin(Math.PI * prog(t, pressAt, 0.14)) : 1;
   const bt = S.button;
   const strikeW = price ? price.length * S.price.size * 0.44 : 0;
+  // the button and the badge: the pop, one value darker while pressed, a soft blue off-beat (2-step: dim 0 / 0.5 / 1)
+  const popNow = mixRgb(pressDark && pressing ? PHONE_PRESS_POP : EMBER.pop, PHONE_DIM_POP, dim);
+  const bodyAt = bodyFillAt ?? fillAt(at);
   return (
     <XG m={phoneMat(x, y, w, h, rot)}>
-      <Fill d={roundRect(0, 0, w, h, 56 * k)} color={EMBER.anchor} at={fillAt(at)} seed={`${seed}/body`} />
+      <Fill d={roundRect(0, 0, w, h, 56 * k)} color={EMBER.anchor} at={bodyAt} seed={`${seed}/body`} />
       <Fill d={roundRect(16 * k, 16 * k, w - 32 * k, h - 32 * k, 42 * k)} color={EMBER.screen} at={fillAt(at, 0.03)} offset={false} />
       <Ink d={roundRect(0, 0, w, h, 56 * k, {seed: `${seed}/o`})} inside={roundRect(0, 0, w, h, 56 * k)} at={at} width={ink} />
-      <Fill d={roundRect(160 * k, 30 * k, 80 * k, 20 * k, 10 * k)} color={EMBER.anchor} at={fillAt(at, 0.05)} offset={false} />
+      <Fill d={roundRect(160 * k, 30 * k, 80 * k, 20 * k, 10 * k)} color={EMBER.anchor} at={bodyFillAt ?? fillAt(at, 0.05)} offset={false} />
       {/* header: back chevron, title, cart (+ badge) */}
       <Ink d={poly([[52 * k, 70 * k], [40 * k, 82 * k], [52 * k, 94 * k]], {joined: true, seed: `${seed}/chev`})} at={b(at, 0.08)} width={thin} />
       <Show at={fillAt(at, 0.06)}>
@@ -129,7 +155,7 @@ const PhoneBody: React.FC<PhoneProps> = ({
       />
       {badge !== null ? (
         <>
-          <Fill d={blob(S.badge.x, S.badge.y, S.badge.r, S.badge.r, {seed: `${seed}/badge`})} color={EMBER.pop} at={badgeAt ?? fillAt(at, 0.1)} mode="spring" offset={false} />
+          <Fill d={blob(S.badge.x, S.badge.y, S.badge.r, S.badge.r, {seed: `${seed}/badge`})} color={mixRgb(EMBER.pop, PHONE_DIM_POP, dim)} at={badgeAt ?? fillAt(at, 0.1)} mode="spring" offset={false} />
           <Show at={badgeAt ?? fillAt(at, 0.1)}>
             <Txt x={S.badge.x} y={S.badge.y + 9 * k} size={26 * k} fill={EMBER.popText}>
               {String(badge)}
@@ -139,7 +165,7 @@ const PhoneBody: React.FC<PhoneProps> = ({
       ) : null}
       {/* product photo: THE laptop (the 'new' one, lit) on the listing panel */}
       <Fill d={roundRect(S.photo.x, S.photo.y, S.photo.w, S.photo.h, 18 * k)} color={EMBER.paper} at={fillAt(at, 0.04)} offset={false} />
-      {photoLaptop ? <Laptop x={S.laptop.x} y={S.laptop.y} w={S.laptop.w} variant="new" at={b(at, 0.06)} seed={`${seed}/lap`} ink={3} /> : null}
+      {photoLaptop ? <Laptop x={S.laptop.x} y={S.laptop.y} w={S.laptop.w} variant="new" at={b(at, 0.06)} seed={`${seed}/lap`} ink={3} tier={dim >= 0.5 ? 'support' : undefined} /> : null}
       <Ink d={textLines(40 * k, 300 * k, 230 * k, {n: 1, gap: 18 * k, seed: `${seed}/title`, heading: false})} at={b(at, 0.14)} width={thin} />
       {/* the listing price (struck when it goes up; the new price pops beside it) */}
       {price ? (
@@ -159,15 +185,16 @@ const PhoneBody: React.FC<PhoneProps> = ({
       ) : null}
       {/* "Add to cart": the pop */}
       <XG m={mat.about(mat.scale(press), bt.x + bt.w / 2, bt.y + bt.h / 2)}>
-        <Fill d={roundRect(bt.x, bt.y, bt.w, bt.h, 20 * k)} color={EMBER.pop} at={fillAt(at, 0.1)} seed={`${seed}/btn`} />
-        <Ink d={roundRect(bt.x, bt.y, bt.w, bt.h, 20 * k, {seed: `${seed}/btnI`})} inside={roundRect(bt.x, bt.y, bt.w, bt.h, 20 * k)} at={b(at, 0.1)} width={3.4} tone={EMBER.pop} />
+        <Fill d={roundRect(bt.x, bt.y, bt.w, bt.h, 20 * k)} color={popNow} at={fillAt(at, 0.1)} seed={`${seed}/btn`} />
+        {/* its outline only on its beat (off-beat it parts from the screen by value: CRAFT §b, tier B) */}
+        {dim < 0.5 ? <Ink d={roundRect(bt.x, bt.y, bt.w, bt.h, 20 * k, {seed: `${seed}/btnI`})} inside={roundRect(bt.x, bt.y, bt.w, bt.h, 20 * k)} at={b(at, 0.1)} width={3.4} tone={popNow} /> : null}
         <Show at={fillAt(at, 0.12)}>
           <Txt x={bt.x + bt.w / 2} y={bt.y + bt.h * 0.69} size={46 * k} fill={EMBER.popText} fit={bt.w * 0.86}>
             {buttonText}
           </Txt>
         </Show>
       </XG>
-      <Ink d={textLines(40 * k, (buttonY + 110) * k, 300 * k, {n: 4, gap: 22 * k, seed: `${seed}/desc`, heading: false})} at={b(at, 0.2)} width={1.6} />
+      <Ink d={textLines(40 * k, (buttonY + 110) * k, 300 * k, {n: 4, gap: 22 * k, seed: `${seed}/desc`, heading: false})} at={b(at, 0.2)} width={1.6} color={descTone} />
       {children}
     </XG>
   );
@@ -183,6 +210,12 @@ export type HandProps = {
   thumbTo?: Pt;
   /** The thumb taps (dips 8 px) at this time. */
   pressAt?: number;
+  /** OPT-IN (v3 rework): the skin colour (default EMBER.skin); its lines are its shade. A hand over a desk of the same
+   *  value needs its own value (CRAFT §c B: neighbouring fills at least dL* 12 apart). */
+  skin?: string;
+  /** Draw the small marks (the thumb's knuckle creases, the fingers' nail lines). Default true; the clean B-tier hand
+   *  leaves them out (flat: one tone + one shade). */
+  details?: boolean;
   at?: At;
   seed?: string;
   ink?: number;
@@ -190,7 +223,7 @@ export type HandProps = {
 
 const addP = (a: Pt, c: Pt, s = 1): Pt => [a[0] + c[0] * s, a[1] + c[1] * s];
 
-const HandBody: React.FC<HandProps> = ({phone, thumbTo, pressAt, at, seed = 'hand', ink = 4.8}) => {
+const HandBody: React.FC<HandProps> = ({phone, thumbTo, pressAt, skin = EMBER.skin, details = true, at, seed = 'hand', ink = 4.8}) => {
   const t = useTime();
   const w = phone.w ?? 400;
   const h = phone.h ?? w * 2.2;
@@ -223,27 +256,27 @@ const HandBody: React.FC<HandProps> = ({phone, thumbTo, pressAt, at, seed = 'han
     <XG m={phoneMat(phone.x, phone.y, w, h, phone.rot ?? -3)}>
       {fingers.map((f, i) => (
         <XG key={i} m={mat.compose(mat.translate(f.x, f.y), mat.rotate(f.r))}>
-          <Fill d={roundRect(-56 * k, -22 * k, 82 * k, 44 * k, 21 * k)} color={EMBER.skin} at={fillAt(at, 0.04 * i)} seed={`${seed}/f${i}`} />
+          <Fill d={roundRect(-56 * k, -22 * k, 82 * k, 44 * k, 21 * k)} color={skin} at={fillAt(at, 0.04 * i)} seed={`${seed}/f${i}`} />
           <Ink d={roundRect(-56 * k, -22 * k, 82 * k, 44 * k, 21 * k, {seed: `${seed}/fI${i}`})} inside={roundRect(-56 * k, -22 * k, 82 * k, 44 * k, 21 * k)} at={b(at, 0.03 * i)} width={3.4} />
-          <Ink d={line(4 * k, -11 * k, 7 * k, 11 * k, {over: [0, 0], seed: `${seed}/fn${i}`})} at={b(at, 0.1)} width={1.6} />
+          {details ? <Ink d={line(4 * k, -11 * k, 7 * k, 11 * k, {over: [0, 0], seed: `${seed}/fn${i}`})} at={b(at, 0.1)} width={1.6} /> : null}
         </XG>
       ))}
-      <Fill d={smooth(thumb, {closed: true})} color={EMBER.skin} at={fillAt(at)} seed={`${seed}/thumb`} />
+      <Fill d={smooth(thumb, {closed: true})} color={skin} at={fillAt(at)} seed={`${seed}/thumb`} />
       <Ink d={smooth(thumb.slice(0, 6))} at={at} width={ink} />
       <Ink d={line(...thumb[5], ...addP(thumb[6], u, 40 * k), {over: [0, 0], seed: `${seed}/thE`})} at={b(at, 0.04)} width={ink} />
       <XG m={mat.compose(mat.translate(nailC[0], nailC[1]), mat.rotate(ang))}>
         <Fill d={roundRect(-19 * k, -22 * k, 38 * k, 42 * k, 14 * k)} color={EMBER.nail} at={fillAt(at, 0.06)} offset={false} />
         <Ink d={roundRect(-19 * k, -22 * k, 38 * k, 42 * k, 14 * k, {seed: `${seed}/nail`})} at={b(at, 0.08)} width={2.2} />
       </XG>
-      <Ink d={crease(118, 20) + crease(132, 14)} at={b(at, 0.12)} width={2.2} />
-      <Fill d={palm} color={EMBER.skin} at={fillAt(at, 0.02)} seed={`${seed}/palm`} />
+      {details ? <Ink d={crease(118, 20) + crease(132, 14)} at={b(at, 0.12)} width={2.2} /> : null}
+      <Fill d={palm} color={skin} at={fillAt(at, 0.02)} seed={`${seed}/palm`} />
       <Ink d={palmInk} at={b(at, 0.02)} width={ink} />
       <Fill d={sleeve} color={EMBER.sleeve} at={fillAt(at, 0.05)} seed={`${seed}/sleeve`} />
       <Ink d={line(450 * k, 814 * k + py, 640 * k, 766 * k + py, {seed: `${seed}/cuff`, over: 'medium'}) + line(470 * k, 840 * k + py, 640 * k, 798 * k + py, {seed: `${seed}/cuff2`, over: 'small'})} at={b(at, 0.06)} width={ink} />
     </XG>
   );
 };
-export const Hand = tiered('subject', {tone: EMBER.skin}, HandBody);
+export const Hand = tiered('subject', {tone: (p) => p.skin ?? EMBER.skin}, HandBody);
 
 /** The glint of a phone screen (for an off / lowered phone). */
 export const screenGlint = (x: number, y: number, len = 40, seed = 'pg') => glint(x, y, len, {seed});

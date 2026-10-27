@@ -69,6 +69,15 @@ export const Scale: React.FC<{s?: number; sx?: number; sy?: number; x: number; y
   s * sx === 1 && s * sy === 1 ? <>{children}</> : <XG m={mat.about(mat.scale(s * sx, s * sy), x, y)}>{children}</XG>;
 
 export const lerp = (a: number, b2: number, p: number) => a + (b2 - a) * p;
+/** sRGB mix of two '#RRGGBB' colours by k (0 = a, 1 = c): a 2-step state change's half step (never animated as a fade). */
+export const mixRgb = (a: string, c: string, k: number): string => {
+  if (k <= 0) return a;
+  if (k >= 1) return c;
+  const p = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const A = p(a);
+  const C = p(c);
+  return '#' + A.map((v, i) => Math.round(v + (C[i] - v) * k).toString(16).padStart(2, '0')).join('').toUpperCase();
+};
 export const clamp01 = (v: number) => clamp(v, 0, 1);
 export type Pt = [number, number];
 /** Bilinear point in a quad [tl, tr, br, bl] at (u, v) in 0..1. */

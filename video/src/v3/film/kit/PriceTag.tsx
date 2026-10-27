@@ -10,7 +10,7 @@ import {blob, circle, line, poly, polyPath, smooth} from '../../../lib/sketch';
 import {useTime, prog, ease, clamp} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
-import {At, b, fillAt, Pt, Show, Txt} from './util';
+import {At, b, fillAt, mixRgb, Pt, Show, Txt} from './util';
 import {DataCenter} from './Outside';
 import {tiered} from '../../../lib/tier';
 
@@ -49,6 +49,13 @@ export type PriceTagProps = {
   backSign?: string;
   /** 'hero' (burnt orange, default) | 'pop' (the style frame's blue tag). */
   tone?: 'hero' | 'pop';
+  /** OPT-IN (v3 rework, CRAFT §b: a story object off its beat is tier B): 0 = full strength (default); 1 = off-beat:
+   *  the body a soft terracotta (C* ~38), the prices in the tag's light tint, the eyelet a soft blue, NO outline;
+   *  0.5 = the half step of a 2-step change (never a fade). The front only (the back is the payoff's beat). */
+  dim?: number;
+  /** OPT-IN: the string is TIED THROUGH THE HOLE: its last stretch runs over the paper into the eyelet (drawn after
+   *  the body, under the eyelet ring), in the tag's own deep red (L* ~20), never hidden behind the tag's top edge. */
+  stringThrough?: boolean;
   at?: At;
   seed?: string;
   ink?: number;
@@ -71,6 +78,12 @@ export function tagShape(w: number): Pt[] {
 }
 export const tagHole = (w: number): Pt => [w * 0.12, w * 0.25];
 
+/** The off-beat tag (`dim` 1): body L* 58 C* 38 (the hero's hue), prices L* 86 C* 14, eyelet the pop's hue at C* 18,
+ *  the string and the strike a soft red-brown (L* 44: a tone line, kept as is by the clean pen). */
+export const TAG_DIM = {body: '#C4785F', text: '#F1D0C4', ring: '#9AACCB', line: '#A0503A'};
+/** The string's deep red: the hero's own line shade (CRAFT §c A: fill L* -35, never under L* 16). */
+export const TAG_STRING = '#7A1A0C';
+
 /** Current ticker value and the time of its last change. */
 function tickerNow(t: number, value?: string, ticker?: TickerStep[]): {v: string; since: number | undefined} {
   if (!ticker || !ticker.length) return {v: value ?? '', since: undefined};
@@ -83,12 +96,14 @@ function tickerNow(t: number, value?: string, ticker?: TickerStep[]): {v: string
   return {v, since};
 }
 
-const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, oldSize: oldK = 0.16, oldTone = 'white', oldAt, strikeAt, stringFrom, rot = 0, sway = 0, turnAt, turn, backSign = 'AI', tone = 'hero', at, seed = 'tag', ink = 3.4}) => {
+const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, oldSize: oldK = 0.16, oldTone = 'white', oldAt, strikeAt, stringFrom, rot = 0, sway = 0, turnAt, turn, backSign = 'AI', tone = 'hero', dim = 0, stringThrough, at, seed = 'tag', ink = 3.4}) => {
   const t = useTime();
   const h = w * 0.5;
   const shape = tagShape(w);
   const [hx, hy] = tagHole(w);
-  const body = tone === 'pop' ? EMBER.pop : EMBER.hero;
+  const body = mixRgb(tone === 'pop' ? EMBER.pop : EMBER.hero, TAG_DIM.body, dim);
+  const white = mixRgb(EMBER.white, TAG_DIM.text, dim);
+  const ringC = mixRgb(tone === 'pop' ? EMBER.card : EMBER.pop, TAG_DIM.ring, dim);
   const {v, since} = tickerNow(t, value, ticker);
   // a step: the price pops (1.3 -> 1) and the tag jolts (a damped swing about the hole)
   const k = since === undefined ? 1 : prog(t, since, 0.14, ease.outCubic);
@@ -123,16 +138,21 @@ const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, old
     const my = Math.max(ay, holeAbs[1]) + Math.abs(holeAbs[0] - ax) * 0.08 + 6;
     stringD = smooth([stringFrom, [mx, my], holeAbs]);
   }
+  const stringInk = stringD ? <Ink thing d={stringD} at={at} width={2.2} color={stringThrough ? (dim >= 0.5 ? TAG_DIM.line : TAG_STRING) : undefined} /> : null;
   return (
     <>
-      {stringD ? <Ink d={stringD} at={at} width={2.2} /> : null}
+      {stringThrough ? null : stringInk}
       <XG m={m}>
         <Fill d={polyPath(shape)} color={back ? EMBER.heroDeep : body} at={fillAt(at)} seed={`${seed}/body`} />
-        <Ink d={poly(shape, {closed: true, seed: `${seed}/o`, over: w < 240 ? [0, 3] : [2, 7]})} inside={polyPath(shape)} at={at} width={ink} />
+        {back || dim < 0.5 ? <Ink d={poly(shape, {closed: true, seed: `${seed}/o`, over: w < 240 ? [0, 3] : [2, 7]})} inside={polyPath(shape)} at={at} width={ink} /> : null}
+      </XG>
+      {/* tied through the hole: the string runs over the paper and into the eyelet (the ring is drawn over its end) */}
+      {stringThrough ? stringInk : null}
+      <XG m={m}>
         {/* the eyelet: the blue pop ring around the hole */}
-        <Fill d={blob(hx, hy, w * 0.045, w * 0.045, {seed: `${seed}/ring`})} color={tone === 'pop' ? EMBER.card : EMBER.pop} at={fillAt(at, 0.04)} offset={false} />
+        <Fill d={blob(hx, hy, w * 0.045, w * 0.045, {seed: `${seed}/ring`})} color={ringC} at={fillAt(at, 0.04)} offset={false} />
         <Fill d={blob(hx, hy, w * 0.022, w * 0.022, {seed: `${seed}/hole`})} color={EMBER.wall} at={fillAt(at, 0.06)} offset={false} />
-        <Ink d={circle(hx, hy, w * 0.045, {seed: `${seed}/ringI`})} at={b(at, 0.06)} width={Math.max(1.6, ink * 0.6)} />
+        {back || dim < 0.5 ? <Ink d={circle(hx, hy, w * 0.045, {seed: `${seed}/ringI`})} at={b(at, 0.06)} width={Math.max(1.6, ink * 0.6)} /> : null}
         {back ? (
           <Show at={fillAt(at)}>
             <DataCenter x={w * 0.6} y={h * 0.8} w={w * 0.52} variant="mini" sign={backSign} seed={`${seed}/back`} ink={Math.max(1.6, ink * 0.6)} />
@@ -141,15 +161,15 @@ const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, old
           <>
             {old ? (
               <Show at={oldAt ?? fillAt(at)}>
-                <Txt x={textX} y={oldY} size={oldSize} fill={oldTone === 'white' ? EMBER.white : EMBER.core} fit={fit * 0.76}>
+                <Txt x={textX} y={oldY} size={oldSize} fill={oldTone === 'white' ? white : EMBER.core} fit={fit * 0.76}>
                   {old}
                 </Txt>
               </Show>
             ) : null}
-            {old ? <Ink d={strikeD} at={strikeAt ?? oldAt ?? b(at, 0.2)} width={Math.max(2.6, w * 0.013)} color={EMBER.ink} /> : null}
+            {old ? <Ink d={strikeD} at={strikeAt ?? oldAt ?? b(at, 0.2)} width={Math.max(2.6, w * 0.013)} color={dim >= 0.5 ? TAG_DIM.line : EMBER.ink} /> : null}
             <Show at={fillAt(at)}>
               <XG m={mat.about(mat.scale(clamp(popS, 1, 1.3)), textX, priceY - priceSize * 0.3)}>
-                <Txt x={textX} y={priceY} size={priceSize} fill={EMBER.white} fit={fit}>
+                <Txt x={textX} y={priceY} size={priceSize} fill={white} fit={fit}>
                   {v}
                 </Txt>
               </XG>
@@ -160,7 +180,7 @@ const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, old
     </>
   );
 };
-export const PriceTag = tiered('subject', {tone: (p) => (p.tone === 'pop' ? EMBER.pop : EMBER.hero)}, PriceTagBody);
+export const PriceTag = tiered('subject', {tone: (p) => mixRgb(p.tone === 'pop' ? EMBER.pop : EMBER.hero, TAG_DIM.body, p.dim ?? 0)}, PriceTagBody);
 
 /** Screen position of the tag's hole (where a string ties on), for lanes chaining a tag to a phone or a laptop. */
 export const tagHoleAt = (x: number, y: number, w: number): Pt => [x + tagHole(w)[0], y + tagHole(w)[1]];

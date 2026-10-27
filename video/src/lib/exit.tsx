@@ -133,6 +133,10 @@ export type LookV = {
     pale?: number;
     paper?: string;
   };
+  /** OPT-IN (the clean pen's frame 0, v3 rework): a <Fill> entrance in the default 'pop' mode (a grow from the centre)
+   *  lands as a ONE-FRAME step instead, so a fill never sits loose inside an outline that is already drawn ('spring',
+   *  'grow' and 'wipe' entrances keep their motion: a badge's pop is a beat). Omit = as before. */
+  snapPops?: boolean;
 };
 const LookCtx = createContext<LookV>({ink: true, fills: 'color'});
 export const useLook = () => useContext(LookCtx);
@@ -140,8 +144,8 @@ export const useLook = () => useContext(LookCtx);
 /** Render states the style bible requires (section 3): <Look fills="paper"> = ink on white fills (frame 0 / loop),
  *  <Look ink={false}> = flat fills only, <Look cascade={{at: 0.03, origin: [540, 880]}}> = paper, then colour
  *  floods out from the vanishing point. The sky (<World sky>) keeps its colour. */
-export const Look: React.FC<Partial<LookV> & {children?: React.ReactNode}> = ({ink, fills, cascade, children}) => {
+export const Look: React.FC<Partial<LookV> & {children?: React.ReactNode}> = ({ink, fills, cascade, snapPops, children}) => {
   const parent = useContext(LookCtx);
-  const v: LookV = {ink: ink ?? parent.ink, fills: fills ?? parent.fills, cascade: cascade ?? parent.cascade};
+  const v: LookV = {ink: ink ?? parent.ink, fills: fills ?? parent.fills, cascade: cascade ?? parent.cascade, snapPops: snapPops ?? parent.snapPops};
   return <LookCtx.Provider value={v}>{children}</LookCtx.Provider>;
 };

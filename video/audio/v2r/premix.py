@@ -15,7 +15,9 @@ Measured (speech = the voiced spans in sheet.py, momentary 400 ms K-weighted lou
   sheet.HIT_WORDS (raw energy; the two opening words count a measured-tonal masker 10 dB less, raw reported); every
   other word reported; the cue onsets against the word onsets (review item 11); the mono fold-down (review item 7);
   the arc on full range and through a phone-speaker model, and the music's swell in each pause (items 4, 5); the loop
-  seam: sample step, level, and the 2-8 kHz level and the deepest 5 ms dip across it (item 10); clicks; the raw sum.
+  seam: sample step, level, and the 2-8 kHz level and the deepest 5 ms dip across it (item 10); THE JOINS
+  (THROUGHLINE s3): each carrier's loudest 20 ms against its midpoint, and nothing else (cue, life, bird, note) starting
+  in a join's window; clicks, each checked against the voice's own edges (its plosives); the raw sum.
 """
 from __future__ import annotations
 

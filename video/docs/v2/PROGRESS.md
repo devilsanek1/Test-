@@ -2,6 +2,14 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Note 2026-10-27 23:05 UTC: sound revision 2 DONE (be9ecc0)
+
+Joins on their carriers and midpoints, no Pip hops, a positive glass-chime ding at 0.45, calm air from the conformed life, the music director's 12
+fixes; -14.01 LUFS / -1.25 dBTP; every hit word has the voice >= 6 dB over everything at 1-4 and 4-10 kHz; Film2R now plays `public/v2r/mix.wav`
+(cues.json points at it). Open: one listen on phone speakers + earbuds; re-time `sheet.CUES` from the final picture (W4). Requests for the lanes when
+they resume: L5 S7 festoon in three switch-ons on f1812 / 1836 / 1848; S6 `f12LineAt` 26.40 -> 26.467 (f1588) and facade windows on f1626 / 1647 /
+1670; L6 S8 lamp run on f2237 / 2261 / 2273 (same spacing as S7, fairness A5).
+
 ## Snapshot 2026-10-27 22:45 UTC: the owner's depth notes come first
 
 The owner on the G4 look clip: the subject blurs with the background (the Google wing melts into the far city), no distance effect, no
