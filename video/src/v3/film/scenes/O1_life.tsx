@@ -294,7 +294,8 @@ export const LandSprays: React.FC<{lands: {t: number; x: number; y: number}[]}> 
 };
 
 /** A car rolling along the street under the neighbours' fronts (right to left, headlights on, exhaust), fill only.
- *  Seen in S15's hold (O1 5.9-9.2), once the lowered phone has cleared the street; ~2.4 car lengths / s. */
+ *  In from behind the window reveal and Pip after O1's sign lights, on through S15's hold (the lowered phone clears the
+ *  street); ~1.6 car lengths / s. */
 export const StreetCar: React.FC<{t0: number; t1: number; x0: number; x1: number; y: number; w?: number}> = ({t0, t1, x0, x1, y, w = 86}) => {
   const t = useTime();
   if (t < t0 || t > t1) return null;
@@ -311,10 +312,10 @@ export const O1GlassLife: React.FC = () => (
     </Show>
     <SnowSill x0={176} x1={904} y={1060} h={13} seed="o1/osill" ink={0} at={0.04} drips={0} />
     {/* snow sliding off the eaves: during the question (O1 1.18, left of the building), after the sign (5.36, right
-        of the mullion, behind Pip) and twice in S15's hold (O1 6.80 / 7.80 = VO 37.36 / 38.36) */}
+        of the mullion, behind Pip) and twice in S15's hold (O1 6.62 / 7.80 = VO 37.18 / 38.36) */}
     <SnowSlide x={286} t0={1.18} seed="o1/slide1" />
     <SnowSlide x={872} t0={5.36} w={40} y1={1050} seed="o1/slide2" />
-    <SnowSlide x={262} t0={6.8} w={42} seed="o1/slide3" />
+    <SnowSlide x={262} t0={6.62} w={42} seed="o1/slide3" />
     <SnowSlide x={792} t0={7.8} w={38} seed="o1/slide4" />
   </>
 );
