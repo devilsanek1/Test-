@@ -21,3 +21,32 @@
 3. Pull for `report_KIT.md` (not landed yet) and apply its fixes.
 4. Review files, critic loop (brief_L1.md), the six-viewer cold read, then `report_L1.md`.
 References extracted at 216 px: reference 1 and v1 frames (regenerate with ffmpeg fps=1, scale=216:-2; never commit them).
+
+## 2026-10-27, second helper (ultracode), handed over before building
+No code changed (V2S1*.tsx are still the first helper's build). What I did: rendered the build (it works: 14 stills
+in ~3 s after a ~22 s bundle; a 0-6.5 s clip at 0.5 scale in ~30 s), extracted reference 1 / v1 frames at 216 px, and
+ran a critic round 0. `density.py` on the 0-6.5 s clip, after `pip install opencv-python-headless`: **PASS, 7.5 ev/s,
+max gap 0.53 s, flat 25 %, 343 objects/frame, detail 48 %.** (The critics saw an earlier copy of density.txt that
+still held the cv2 traceback, so ignore their "density never ran" point.) `report_KIT.md` had not landed yet.
+**Critic round 0, FAIL** (art director + sound-off lenses finished; the standards / timing lenses and the code map were stopped). Musts, by agreement:
+1. **The ghosts read as a queue of white gowns or shrouds (a death read), not copies of her.** Each needs HER silhouette:
+   coat cut (collar, hem flare), the bun, a mid-stride lockstep with a visible ~25 px leg scissor, and clear gaps
+   between figures (they bunch shoulder to shoulder; widen toward ~55-60 px clear). The fill change (e.g. a
+   desaturated tint vs paper) is a TREATMENT question: paper + whole-head value is the spec, so raise any change as a REQUEST.
+2. **The doorway is shared:** a grey-haired figure in mustard stands or walks beside her at 0.6, so she reads as half
+   of a pair walking IN. Keep the doorway hers alone from 0.40 to 1.40. Make the glass leaves visibly slide (frames + glints).
+3. **A plum walker with a dark bun (x ~680-760, 4.7-5.8) carries her head signature.** Recast: no plum, no bun, no long coat within 300 px of her.
+4. **The life on the far towpath hides the row:** the cyclist crosses her at the G1 pop (2.00) and covers the three bare
+   outlines at x 0-200 (4.98-5.95). Keep x 0-220 clear 4.5-6.1 and nothing over her or G1 at 1.8-2.4. Draw the bend visibly.
+5. **The bottom third is sparse versus reference 1:** bare paving, gaps of 180-250 px. Go to 20-24 seated people, staggered
+   and overlapping, with specific dressing (leaves, a picnic cloth, a guitar case, a pram, a dog). Life every 0.4-0.8 s,
+   >= 40 px of motion. Turn a few sitters toward each other so the steps don't read as an audience.
+Shoulds: the five birds at 1.40 are too small (30-40 px wingspan, arcing across SUN0); Pip's ears-cover at 4.98 doesn't
+read (make it a whole-silhouette change) and the bollard is too small (a 40-50 px post); W reads as a flat black hole
+(add bars in ink and the plant ring on the sill); "She quit Google." vanishes at 1.88; the dive at 6.00 reads as a centre zoom (an engine push-through, so check
+its origin is W). My own read of f0 at full size: the bike (bottom right) and a blue double line are already in colour at
+f0 (they should be ink only); the far roofs / bridge in the west gap are bare vertical lines that don't read; the plane branch reads as noise.
+**Next:** fix the musts (most in `V2S1_public.tsx` and `V2S1.tsx`; the ghost shape is in the cast kit's `Ghosts.tsx`:
+work around it in a `V2S1_*.tsx` helper plus a REQUESTS line); then the review loop, the six-viewer cold read and `report_L1.md`.
+Review tooling (scratch only, not committed): a script that renders 20 key-time stills, three full-size frames (0 / 0.6 / 5.3),
+the busy / calm strips, a labelled 216 px sheet beside ref 1 / v1, the 0-6.5 s clip and density. Run density with `python3 -I scripts/qa/density.py <clip>.mp4`.
