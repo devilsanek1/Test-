@@ -13,8 +13,10 @@ the playbook if its Maintenance trigger fires (7+ days since "Last compacted" wi
 
 Top rules (details in the playbook):
 - From the sketch animatic (G3) on, show one playable video per gate, never only stills; before that, text/audio only (no MP4s). Lock the story (sketch animatic) before building; polish last.
-- The G3 animatic is a monochrome studio storyboard (`video/docs/look/STORYBOARD_STYLE.md`) built for SIGNAL per drawing,
-  not quality: literal and readable with the sound off, yet it carries the cinematography (framing, scale, cozy home base).
+- The G3 animatic is an ANIMATED SKETCHBOOK (stage spec `video/docs/G3_ANIMATIC.md`, drawing spec
+  `video/docs/look/STORYBOARD_STYLE.md`): the film's rough pass at 60 fps — story, cuts, framing, every camera move,
+  transition and key action PLAYED with real shape and timing, density and life as grey placeholders (loose never means
+  empty) — monochrome, readable with the sound off; G4+ only ADDS (colour, detail, polish), never changes what G3 locked.
 - Every video gets ONE core line (its own step, G0.5: brainstorm, critique, owner picks) before the script is written.
 - The first 3 s must be a banger: frame 0 is the scene being drawn (lines, then colour), voice from frame 1, the hook made
   physical (the expected thing, then reality overtaking it), never a still frame; state the payoff in words on frame 0. Target 30-45 s.
