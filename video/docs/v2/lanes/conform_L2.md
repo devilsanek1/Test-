@@ -8,7 +8,8 @@ look clip's one transition; push it as soon as it plays and tell the orchestrato
 
 ## 1. Her window takes the match spot M (the thread; THROUGHLINE §1.2)
 - Her dark office window moves to **M (335, 785), 133 x 164** (= map `W2_CUT`); the staff window that sat there moves to
-  her old spot (200, 795), 125 x 155. The five staff windows now sit round hers: (200, 795), (465, 776), (460, 948),
+  her old spot (200, 795) at her old size, 140 x 170 (nearer the lens, bigger: the wall's perspective holds). The five
+  staff windows now sit round hers: (200, 795), (465, 776), (460, 948),
   (330, 955), (190, 960). The 12.20 "contracts" full blind-down goes to (465, 776), beside hers.
 - 6.82 "one": the ink ring is board notation (`G5_BLOCKING.md` §2, never a drawn circle). Instead her window's own A
   outline pops on (one frame; DIRECTION rule 8 keeps draw-ons for frame 0): one closed 3.0 px line in the frame's own

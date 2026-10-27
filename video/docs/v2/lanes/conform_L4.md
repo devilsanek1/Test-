@@ -13,8 +13,9 @@ and the start of "the other side" (THROUGHLINE §1.3): it runs without the threa
   (-0.12 tuck) and any landing.
 - **Out, D foreground wipe** 23.72-24.12 (midpoint 23.92, on "any" 24.03; V2S6 starts 23.92): export `Wiper` from
   `V2S5.tsx` (a `WiperComponent`, like `V2S7_wiper.tsx`): one blossom tree passing close to the lens, trunk + crown,
-  ~300 px wide (`half` ~150), crossing left to right (dir 'right'), its crown kept below y 600 or as a flat mass whose
-  `captionRegions` hold the caption tone; flat fills, no outline (C). The deal board is uncovered by 24.00.
+  ~300 px wide (`half` ~150), crossing left to right (dir 'right'), flat fills, no outline (C). Keep the caption band one
+  flat field: clip the wiper to y >= 600 like S7's band-safe wiper, and make the two skies above it agree at the swap
+  (S5's top-gutter cloud caps drift out before 23.72, or S6 carries the same caps). The deal board is uncovered by 24.00.
 - Delete Pip's 23.90 leap: the tiny Pip stays at the balustrade (366, 1195) until the tree covers it; S6's Pip waits at the
   deal board's foot in the same screen area.
 - Nothing new enters, pops or turns in 23.72-24.12 but the tree (the birds already flying keep their pace).
