@@ -240,7 +240,7 @@ const PlateText: React.FC<{p: PlateSpec}> = ({p}) => {
   return (
     <>
       <WorldText x={keyX} y={base} size={56} text={text.key} at={p.key[0]} dur={p.key[1] - p.key[0]} weight={0.9} seed={`${p.seed}K`} maxW={232} />
-      <WorldText x={bodyX} y={base} size={31} text={text.body} at={p.body[0]} dur={p.body[1] - p.body[0]} seed={`${p.seed}B`} maxW={r.x1 - 14 - bodyX} />
+      <WorldText x={bodyX} y={base} size={31} text={text.body} at={p.body[0]} dur={p.body[1] - p.body[0]} weight={0.55} seed={`${p.seed}B`} maxW={r.x1 - 14 - bodyX} />
       <WorldText x={keyX} y={r.y0 + 85} size={18} text={text.credit} at={p.credit[0]} dur={p.credit[1] - p.credit[0]} seed={`${p.seed}C`} maxW={r.x1 - 18 - keyX} />
     </>
   );
