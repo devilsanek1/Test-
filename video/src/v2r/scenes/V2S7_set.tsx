@@ -392,7 +392,7 @@ export const S7Ground: React.FC = () => {
           const off = row % 2 ? 0.15 : 0;
           for (let g = -12 + off; g < 12; g += 0.3) {
             if (gx(g, y0) > 1150 || gx(g + 0.3, y1) < -70) continue;
-            if (r.chance(0.13)) k.poly(tones[Math.floor(r.next() * tones.length)], quad(g + 0.015, g + 0.285, y0 + 0.8, y1 - 0.8));
+            if (r.chance(y0 > 1250 ? 0.2 : 0.13)) k.poly(tones[Math.floor(r.next() * tones.length)], quad(g + 0.015, g + 0.285, y0 + 0.8, y1 - 0.8));
           }
         }
         d = dn;
@@ -426,7 +426,7 @@ export const S7Ground: React.FC = () => {
     };
     nearTree(TREE_R.x - 20, TREE_R.base + 8, 20, 130, 's7/leavesR');
     nearTree(TREE_L.x + 30, TREE_L.base + 10, 16, 120, 's7/leavesL');
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 64; i++) {
       const y = r.range(1240, 1910);
       const x = r.range(-10, 1090);
       const sz = 0.1 * kAt(y);
