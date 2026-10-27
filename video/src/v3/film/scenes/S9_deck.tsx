@@ -31,12 +31,22 @@ const WIN = {x: 902, y: 1292, w: 72, h: 92};
 const DeckFloor: React.FC = () => {
   const {y, x0, x1, h, vp} = DECK;
   let planks = '';
+  let seams = '';
   const n = 34;
+  const sr = rng('s9/seams');
   for (let i = 0; i < n; i++) {
     const xb = x0 + ((i + 0.5) / n) * (x1 - x0);
     const yb = y + h;
     const u = (yb - y) / (yb - vp[1]);
-    planks += line(xb, yb, xb + (vp[0] - xb) * u, yb + (vp[1] - yb) * u, {over: [0, 0], seed: `s9/pl${i}`});
+    const xe = xb + (vp[0] - xb) * u;
+    const ye = yb + (vp[1] - yb) * u;
+    planks += line(xb, yb, xe, ye, {over: [0, 0], seed: `s9/pl${i}`});
+    // snow caught in some seams (thin light lines: cheap fullness on the dark deck)
+    if (sr.chance(0.45)) {
+      const a = sr.range(0, 0.6);
+      const bb = Math.min(1, a + sr.range(0.15, 0.4));
+      seams += `M${(xb + (xe - xb) * a).toFixed(1)} ${(yb + (ye - yb) * a).toFixed(1)}L${(xb + (xe - xb) * bb).toFixed(1)} ${(yb + (ye - yb) * bb).toFixed(1)}`;
+    }
   }
   // drifts: along the parapet's foot, banked into the left corner (stack, vent) and against the hut
   const footDrift = smooth([[x0, y - 2], [x1, y - 2], [x1, y + 12], [760, y + 20], [600, y + 12], [420, y + 22], [200, y + 14], [x0, y + 18]], {closed: true});
@@ -65,6 +75,7 @@ const DeckFloor: React.FC = () => {
     <>
       <Fill rect={[x0, y, x1 - x0, h]} color={T9.deck} offset={false} seed="s9/floor" />
       <Ink d={planks} width={1.6} color={T9.deckDeep} />
+      <Ink d={seams} width={2.4} color={T9.deckSnow} />
       <path d={leftDrift} fill={T9.deckSnow} />
       <path d={hutDrift} fill={T9.deckSnow} />
       <path d={poolOut} fill={EMBER.desk} />

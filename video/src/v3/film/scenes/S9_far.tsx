@@ -94,11 +94,12 @@ const LOBES: Lobe[] = [
   {cx: -900, w: 320, top: 778, h: 20},
   {cx: -640, w: 360, top: 782, h: 22},
   {cx: -400, w: 300, top: 776, h: 20},
-  // rising into the reveal: the biggest lobes behind the hall, ~760 behind the mountain
+  // rising into the reveal: the biggest lobes behind the hall (top >= 622: at p 0.22, when they slide in, the far map
+  // lifts them 8 %, and they must stay under the caption band), ~760 behind the mountain
   {cx: -170, w: 300, top: 730, h: 60},
   {cx: 60, w: 250, top: 682, h: 80},
-  {cx: 250, w: 290, top: 636, h: 96},
-  {cx: 470, w: 400, top: 602, h: 110},
+  {cx: 250, w: 290, top: 640, h: 96},
+  {cx: 470, w: 400, top: 624, h: 110},
   {cx: 690, w: 260, top: 676, h: 84},
   {cx: 880, w: 300, top: 742, h: 70},
   {cx: 1100, w: 300, top: 760, h: 60},
