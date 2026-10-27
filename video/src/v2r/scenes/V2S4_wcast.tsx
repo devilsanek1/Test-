@@ -2,9 +2,9 @@
 // pose). Small and simple (K4 `Person` in profile, round heads, one accessory, never teal, never a look-alike of her);
 // every walker's position is in PLANE coordinates and its walk is clocked by its own speed in the plane, so the feet
 // never slide (12 drawings/s; `honestStep` makes the planted foot track the ground linearly, as V2S4_her does for her).
-//   jogger      westbound, faster than her: overtakes her at the cut (passes BEHIND her), runs off west by ~18.6
-//   pair        a parent and a toddler, westbound at a toddler's pace: she passes them (they slide right on screen,
-//               behind her, 15.96-17.36), then they stop hand in hand to watch the water
+//   jogger      westbound, faster than her: has just overtaken her at the cut and runs off west (gone by ~17.45)
+//   pair        a parent and a toddler hand in hand, westbound at a toddler's pace: she passes them (they slide right
+//               on screen, BEHIND her, 15.07-16.27), then dawdle on
 //   cyclist     eastbound, early, on the right
 //   dog walker  westbound, a dog leading on its lead, arrives from the right after the stop
 //   reader      on a bench by the garden wall, head bowed over a book; one page turn
@@ -16,7 +16,7 @@ import {useTime} from '../../lib/time';
 import {Person, Seated, TraitOverrides} from '../kit/cast';
 import {Batch, Paint, P, ovalPath, lerp, rng} from '../kit/canal/core';
 import {S4_START, s4PlaneDx} from './V2S4_rig';
-import {SHADOW, q12, clamp01, smooth01} from './V2S4_wcore';
+import {SHADOW, WINK, q12, clamp01, smooth01} from './V2S4_wcore';
 
 // ---------------------------------------------------------------- honest feet
 
@@ -78,11 +78,11 @@ const KID_H = 80;
 const HANDS: [number, number] = [-12, -71];
 
 export const WALKERS: Record<string, Walker> = {
-  jogger: {seed: 's4jog', x0: 760 + 310, dir: -1, speed: 300, stepPx: 118, feet: 1065, h: 150, pose: 'jog', hw: 22, phase: 0.3, traits: {hair: 'cap', hairColor: CM.hair[2], hatColor: CM.coatSlate, coat: CM.leafRust, coatLen: 'jacket', trousers: CM.anchor, shoes: CM.paper, acc: 'headphones', accColor: CM.coatOat, broad: 0.95}},
-  parent: {seed: 's4parent', x0: 590 + 310, dir: -1, speed: 15, stepPx: 30, feet: 1021, h: PARENT_H, pose: 'walk', hw: 40, phase: 0.1, reach: HANDS, traits: {hair: 'curls', hairColor: CM.hair[1], coat: CM.coatSlate, coatLen: 'jacket', trousers: CM.line, shoes: CM.hair[0], acc: 'backpack', accColor: CM.coatMustard, broad: 1.04}},
-  kid: {seed: 's4kid', x0: 590 + 310 - 22, dir: -1, speed: 15, stepPx: 15, feet: 1027, h: KID_H, pose: 'walk', hw: 18, phase: 0.6, reach: [HANDS[0] + 22, HANDS[1] - 7], traits: {hair: 'beanie', hairColor: CM.hair[4], hatColor: CM.coatMustard, coat: CM.box, coatLen: 'jacket', trousers: CM.coatPlum, shoes: CM.brickDeep, acc: 'none', broad: 1.08}},
-  cyclist: {seed: 's4cyc', x0: 820 + 310, dir: 1, speed: 340, stepPx: 1, feet: 1066, h: 152, pose: 'cycle', hw: 50, traits: {hair: 'cap', hairColor: CM.hair[3], hatColor: CM.brick, coat: CM.coatMustard, trousers: CM.coatSlate, shoes: CM.anchor, acc: 'none'}},
-  dogger: {seed: 's4dogw', x0: 1110 + 310, dir: -1, speed: 70, stepPx: 50, feet: 1050, h: 142, pose: 'walk', hw: 60, phase: 0.4, reach: [-30, -62], elbow: [-14, -82], traits: {hair: 'beanie', hairColor: CM.hair[1], hatColor: CM.coatSlate, coat: CM.coatOat, coatLen: 'mid', trousers: CM.shadeWarm, shoes: CM.line, acc: 'scarf', accColor: CM.brick, broad: 1.0}},
+  jogger: {seed: 's4jog', x0: 440 + 310, dir: -1, speed: 300, stepPx: 118, feet: 1065, h: 150, pose: 'jog', hw: 22, phase: 0.3, traits: {hair: 'cap', hairColor: CM.hair[2], hatColor: CM.stoneShade, coat: CM.brickLight, coatLen: 'jacket', trousers: CM.shadeWarm, shoes: CM.paper, acc: 'headphones', accColor: CM.coatOat, broad: 0.95}},
+  parent: {seed: 's4parent', x0: 650 + 310, dir: -1, speed: 15, stepPx: 30, feet: 1021, h: PARENT_H, pose: 'walk', hw: 40, phase: 0.1, reach: HANDS, traits: {hair: 'curls', hairColor: CM.hair[2], coat: CM.sage, coatLen: 'jacket', trousers: CM.line, shoes: CM.shadeWarm, acc: 'backpack', accColor: CM.coatMustard, broad: 1.04}},
+  kid: {seed: 's4kid', x0: 650 + 310 - 22, dir: -1, speed: 15, stepPx: 15, feet: 1027, h: KID_H, pose: 'walk', hw: 18, phase: 0.6, reach: [HANDS[0] + 22, HANDS[1] - 7], traits: {hair: 'beanie', hairColor: CM.hair[4], hatColor: CM.coatMustard, coat: CM.box, coatLen: 'jacket', trousers: CM.shadeWarm, shoes: CM.brickDeep, acc: 'none', broad: 1.08}},
+  cyclist: {seed: 's4cyc', x0: 820 + 310, dir: 1, speed: 340, stepPx: 1, feet: 1066, h: 152, pose: 'cycle', hw: 50, traits: {hair: 'cap', hairColor: CM.hair[4], hatColor: CM.brickLight, coat: CM.coatMustard, trousers: CM.shadeCool, shoes: CM.line, acc: 'none'}},
+  dogger: {seed: 's4dogw', x0: 1110 + 310, dir: -1, speed: 70, stepPx: 50, feet: 1050, h: 142, pose: 'walk', hw: 60, phase: 0.4, reach: [-30, -62], elbow: [-14, -82], traits: {hair: 'beanie', hairColor: CM.hair[2], hatColor: CM.sage, coat: CM.coatOat, coatLen: 'mid', trousers: CM.shadeWarm, shoes: CM.line, acc: 'scarf', accColor: CM.brickLight, broad: 1.0}},
 };
 
 /** The dog on the lead (leads its walker west by ~64 px; trots 12 drawings/s, tail wagging). */
@@ -121,7 +121,7 @@ function dogInto(b: Batch, x: number, y: number, t: number, moving: boolean, see
   b.fill(patch, `M${P(hx + H * 0.02, hy - H * 0.14)}Q${P(hx + H * 0.16, hy - H * 0.12)} ${P(hx + H * 0.12, hy + H * 0.2)}Q${P(hx + H * 0.02, hy + H * 0.14)} ${P(hx + H * 0.02, hy - H * 0.14)}Z`);
   b.rect(CM.box, hx + H * 0.08, hy + H * 0.08, 4, H * 0.2);
   b.fill(body, `M${P(hx + H * 0.06, hy + H * 0.08)}L${P(x - H * 0.36, by - H * 0.12)}L${P(x - H * 0.3, by + H * 0.12)}L${P(hx + H * 0.06, hy + H * 0.22)}Z`);
-  b.ink(`M${P(x - H * 0.5, by - H * 0.2)}Q${P(x, by - H * 0.28)} ${P(x + H * 0.48, by - H * 0.18)}`, 1.4, CM.ink, 0.3);
+  b.ink(`M${P(x - H * 0.5, by - H * 0.2)}Q${P(x, by - H * 0.28)} ${P(x + H * 0.48, by - H * 0.18)}`, 1.2, CM.ink, 0.1);
 }
 
 /** A short colour shadow east of a walker's feet (STYLE: <= ~40 px, flat). */
@@ -143,13 +143,13 @@ export const Walkers: React.FC = () => {
     const moving = t < (w.stopAt ?? Infinity);
     footShadow(sh, x, w.feet, w.pose === 'cycle' ? 110 : w.h * 0.22);
     if (w.pose === 'cycle') {
-      figs.push(<Person key={id} x={x} y={w.feet} h={w.h} exact seed={w.seed} pose="cycle" view="profile" flip={w.dir > 0} traits={w.traits} pedal={1.2} />);
+      figs.push(<Person key={id} x={x} y={w.feet} h={w.h} exact seed={w.seed} pose="cycle" view="profile" flip={w.dir > 0} traits={w.traits} pedal={1.2} ink={WINK.people} />);
       continue;
     }
     const stride = strideOf(swingFor(w.stepPx, w.h), w.pose);
     const pose = w.reach ? 'reach' : moving ? w.pose : 'stand';
     figs.push(
-      <Person key={id} x={x} y={w.feet} h={w.h} exact seed={w.seed} pose={pose} view="profile" flip={w.dir > 0} step={moving ? walkerStep(w, t) : undefined} stride={stride} traits={w.traits} reach={w.reach} elbow={w.elbow} />,
+      <Person key={id} x={x} y={w.feet} h={w.h} exact seed={w.seed} pose={pose} view="profile" flip={w.dir > 0} step={moving ? walkerStep(w, t) : undefined} stride={stride} traits={w.traits} reach={w.reach} elbow={w.elbow} ink={w.h < 100 ? WINK.kid : WINK.people} />,
     );
     if (id === 'dogger') {
       // the dog leads west on its lead (it trots at the walker's speed; the lead sags)
@@ -191,7 +191,7 @@ export function benchReaderInto(b: Batch, t: number) {
   for (let s = 0; s < 3; s++) b.rect(s === 1 ? CM.brickDeep : CM.line, x - bw / 2, seat - 50 + s * 13, bw, 9);
   b.rect(CM.line, x - bw / 2 - 4, seat - 6, bw + 8, 9);
   b.rect(CM.shadeWarm, x - bw / 2, seat + 3, bw, 3);
-  b.ink(`M${P(x - bw / 2 - 4, seat - 6)}L${P(x + bw / 2 + 4, seat - 6)}M${P(x - bw / 2, seat - 50)}L${P(x + bw / 2, seat - 50)}`, INK_PX.far * 0.8, CM.ink);
+  b.ink(`M${P(x - bw / 2 - 4, seat - 6)}L${P(x + bw / 2 + 4, seat - 6)}M${P(x - bw / 2, seat - 50)}L${P(x + bw / 2, seat - 50)}`, WINK.props * 0.8, CM.ink);
   b.layer();
   // the reader: front view, head BOWED (we see the crown of the hair, never a face), shoulders, knees, shoes
   const rx = x - 18;
@@ -227,7 +227,7 @@ export function benchReaderInto(b: Batch, t: number) {
     b.poly(CM.paper, [[rx, by], [ex, by - 2 - lift], [ex, by + 5 - lift * 0.6], [rx, by + 6]]);
     b.ink(`M${P(rx, by)}L${P(ex, by - 2 - lift)}`, 0.8, CM.line);
   }
-  b.ink(`M${P(rx - 24, hy + 24)}Q${P(rx - 22, hy + 10)} ${P(rx, hy + 9)}M${P(rx + 9, hy - 6)}A12 12 0 0 1 ${P(rx + 12, hy + 6)}`, INK_PX.far, CM.ink);
+  b.ink(`M${P(rx - 24, hy + 24)}Q${P(rx - 22, hy + 10)} ${P(rx, hy + 9)}M${P(rx + 9, hy - 6)}A12 12 0 0 1 ${P(rx + 12, hy + 6)}`, WINK.people, CM.ink);
   // a tote on the bench beside them, a flask
   b.poly(CM.coatOat, [[x + 22, seat - 30], [x + 48, seat - 30], [x + 50, seat - 2], [x + 20, seat - 2]]);
   b.ink(`M${P(x + 26, seat - 30)}Q${P(x + 35, seat - 46)} ${P(x + 44, seat - 30)}`, 1.2, CM.line);
@@ -285,7 +285,7 @@ export function anglerInto(b: Batch, t: number) {
   b.poly(CM.anchor, [[bx + 8, byy + 2], [bx + 8, byy - 2], [tx, ty - 0.6], [tx, ty + 0.6]]);
   b.rect(CM.coatMustard, bx - 4, byy - 3, 6, 6);
   b.ink(`M${P(bx + 6, byy)}L${P(tx, ty)}`, 1.4, CM.ink);
-  b.ink(`M${P(sx - 10, sy + 4)}Q${P(sx + 2, sy - 4)} ${P(sx + 14, sy + 4)}M${P(hx - 12, hy)}A12 12 0 0 1 ${P(hx + 12, hy)}`, INK_PX.far, CM.ink);
+  b.ink(`M${P(sx - 10, sy + 4)}Q${P(sx + 2, sy - 4)} ${P(sx + 14, sy + 4)}M${P(hx - 12, hy)}A12 12 0 0 1 ${P(hx + 12, hy)}`, WINK.people, CM.ink);
 }
 
 export {Seated, clamp01};
