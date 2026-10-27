@@ -17,6 +17,10 @@
 // the frame: sky, a bleed ground, a wall) collapses downward last, under the World sky's ONE falling edge (a slab fill
 // is eaten by that shared edge when it reaches it: never a second slab with its own top edge). Inside an <ExitSync>
 // (every Person) all fills share the group's jitter, so a figure leaves as one.
+// CLEAN PEN (opt-in, lib/pen.ts setPen('clean'); off by default): fills are registered EXACTLY (no offset, authored
+// offsets included), and on the calmer ATTENTION TIERS (lib/tier.tsx: support, environment) the colour is pulled toward
+// the scope's background and its chroma eased. Backdrops (>= ~30 % of the frame, camera excluded), emissive colours
+// and lookExempt fills keep theirs.
 
 import React, {createContext, useContext, useId, useMemo} from 'react';
 import {getBoundingBox} from '@remotion/paths';
@@ -29,6 +33,8 @@ import {Ink, InkProps} from './Ink';
 import {MOTION} from './spec';
 import {applyH, projectPath} from './persp';
 import {relightAt, useTodValue} from './tod';
+import {isClean, PEN, tierFill} from './pen';
+import {useLocalScale, useTierScope} from './tier';
 
 import {rectPath} from './sketch';
 import {mat, useProj, useXf} from './xf';
@@ -178,13 +184,16 @@ export const Fill: React.FC<FillProps> = ({
   const proj = useProj();
   const m = useXf();
   const localId = 'fc' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const scope = useTierScope();
+  const local = useLocalScale();
+  const clean = isClean();
   const dLocal = useMemo(() => dIn ?? (rect ? rectPath(rect[0], rect[1], rect[2], rect[3]) : ''), [dIn, rect?.[0], rect?.[1], rect?.[2], rect?.[3]]);
   const d = proj && dLocal ? projectPath(dLocal, proj.H, proj.key) : dLocal;
   const {jit, off} = useMemo(() => {
     const r = rng(seed ?? dLocal.slice(0, 48));
     const o: [number, number] = offset === false ? [0, 0] : offset ?? [misreg.dx + r.jitter(misreg.jitter), misreg.dy + r.jitter(misreg.jitter)];
-    return {jit: r.next(), off: o};
-  }, [seed, dLocal, offset === false ? 0 : offset?.[0], offset === false ? 0 : offset?.[1]]);
+    return {jit: r.next(), off: clean ? ([0, 0] as [number, number]) : o};
+  }, [seed, dLocal, offset === false ? 0 : offset?.[0], offset === false ? 0 : offset?.[1], clean]);
   if (!d) return null;
   if (at !== undefined && t < at) return null;
   if (!lookExempt && look.fills === 'none') return null;
@@ -193,6 +202,11 @@ export const Fill: React.FC<FillProps> = ({
   // (or its <TodAnchor>): motion spec #12, never a clip edge through the object
   const screenC: [number, number] | undefined = tv.wave && !tv.anchor ? [m[0] * (box.x + box.w / 2) + m[2] * (box.y + box.h / 2) + m[4], m[1] * (box.x + box.w / 2) + m[3] * (box.y + box.h / 2) + m[5]] : undefined;
   let paint = lookExempt ? color : tv.tod === 'day' && !tv.wave && !tv.map ? color : relightAt(tv, color, screenC);
+  if (clean && !lookExempt) {
+    // the calmer tiers: pulled toward the background, chroma eased (never a backdrop or an emissive colour)
+    const tier = scope?.tier ?? PEN.untagged;
+    if (tier !== 'subject' && Math.sqrt(Math.min(1, (box.w * box.h * local * local) / area)) < PEN.backdrop) paint = tierFill(paint, tier, scope?.bg ?? PEN.bg);
+  }
   if (!lookExempt && look.fills === 'paper') paint = palette.white;
   else if (!lookExempt && look.cascade) {
     const c = look.cascade;

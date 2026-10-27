@@ -11,6 +11,7 @@
 // Coordinates are card-local px (960 x 1400). Angles are DEGREES, 0 = right, 90 = down (SVG y-down).
 
 import {Rng, rng, Seed} from './rng';
+import {isClean as strictPen, PEN as PEN_CFG} from './pen';
 
 export type Pt = [number, number];
 
@@ -31,6 +32,11 @@ export const setPenMode = (m: PenMode): void => {
   PATH_CACHE.clear();
 };
 export const penMode = (): PenMode => PEN;
+// The FULL clean pen (lib/pen.ts setPen('clean'): v3's rework) is stricter than 'clean' above and is read at call time
+// (strictPen()): every rect / closed poly / loop is ONE subpath closed with Z, straight lines are ruler-true (no bow),
+// loops are true ellipses (wobble <= 0.01 only when asked), polylines are one joined stroke, no glint pairs, and the
+// texture marks (hatch, scribbleMass, wallTicks, crownTicks, speedLines) draw nothing. Off by default: v1 / v2 / v2r
+// paths are byte-identical.
 
 // ---------------------------------------------------------------- memoisation
 // All path generators are pure, so results are cached by (name, args). Kit components call them on every
@@ -38,7 +44,7 @@ export const penMode = (): PenMode => PEN;
 const PATH_CACHE = new Map<string, string>();
 function memo<A extends unknown[]>(name: string, fn: (...a: A) => string): (...a: A) => string {
   return (...args: A) => {
-    const key = name + JSON.stringify(args);
+    const key = (strictPen() ? '!' : '') + name + JSON.stringify(args);
     let v = PATH_CACHE.get(key);
     if (v === undefined) {
       v = fn(...args);
@@ -104,7 +110,8 @@ const quadAt = (p0: number, c: number, p1: number, t: number) => (1 - t) * (1 - 
 /** A single hand-drawn straight stroke from (x1,y1) to (x2,y2): overshoots, drifts slightly off-axis, bows a
  *  hair, and (if > 400 px) is broken into 2-4 strokes with small gaps. */
 function _line(x1: number, y1: number, x2: number, y2: number, o: LineOpts = {}): string {
-  if (PEN === 'clean') o = {...o, over: 'none', breaks: false, jitter: 0, drift: 0, bow: Math.min(o.bow ?? 0.3, 0.3)};
+  if (strictPen()) o = {...o, over: 'none', breaks: false, jitter: 0, drift: 0, bow: 0};
+  else if (PEN === 'clean') o = {...o, over: 'none', breaks: false, jitter: 0, drift: 0, bow: Math.min(o.bow ?? 0.3, 0.3)};
   const r = rng(o.seed ?? autoSeed(x1, y1, x2, y2));
   const dx = x2 - x1;
   const dy = y2 - y1;
@@ -163,6 +170,7 @@ export type RectOpts = LineOpts & {
 
 /** Rectangle as separate edge strokes that overshoot at the corners (reference windows/boards/facades). */
 function _rect(x: number, y: number, w: number, h: number, o: RectOpts = {}): string {
+  if (strictPen()) return cleanRect(x, y, w, h, o.edges ?? 'tlrb');
   const seed = o.seed ?? autoSeed(x, y, w, h);
   const r = rng(seed);
   let edges = o.edges ?? 'tlrb';
@@ -180,6 +188,40 @@ function _rect(x: number, y: number, w: number, h: number, o: RectOpts = {}): st
 }
 export const rect = memo('rect', _rect);
 
+/** Clean pen rect: all four edges = ONE closed subpath (corners softened by a radius hidden under the line); some edges
+ *  = one joined stroke per run of adjacent edges (clockwise t, r, b, l), never a random open edge. */
+function cleanRect(x: number, y: number, w: number, h: number, edges: string): string {
+  const has = (e: string) => edges.includes(e);
+  if (has('t') && has('r') && has('b') && has('l')) {
+    const rr = Math.min(PEN_CFG.corner.max, PEN_CFG.corner.k * Math.min(Math.abs(w), Math.abs(h)));
+    if (rr < 0.5) return `M${P(x, y)}H${r1(x + w)}V${r1(y + h)}H${r1(x)}Z`;
+    return (
+      `M${P(x + rr, y)}H${r1(x + w - rr)}Q${P(x + w, y)} ${P(x + w, y + rr)}V${r1(y + h - rr)}Q${P(x + w, y + h)} ${P(x + w - rr, y + h)}` +
+      `H${r1(x + rr)}Q${P(x, y + h)} ${P(x, y + h - rr)}V${r1(y + rr)}Q${P(x, y)} ${P(x + rr, y)}Z`
+    );
+  }
+  const cyc: [string, Pt, Pt][] = [
+    ['t', [x, y], [x + w, y]],
+    ['r', [x + w, y], [x + w, y + h]],
+    ['b', [x + w, y + h], [x, y + h]],
+    ['l', [x, y + h], [x, y]],
+  ];
+  const miss = cyc.findIndex(([e]) => !has(e));
+  let d = '';
+  let open = false;
+  for (let k = 1; k <= 4; k++) {
+    const [e, a, b] = cyc[(miss + k) % 4];
+    if (!has(e)) {
+      open = false;
+      continue;
+    }
+    if (!open) d += `M${P(a[0], a[1])}`;
+    d += `L${P(b[0], b[1])}`;
+    open = true;
+  }
+  return d;
+}
+
 export type PolyOpts = LineOpts & {
   closed?: boolean;
   /** true: one continuous stroke (slight vertex jitter). false (default): one overshooting stroke per segment. */
@@ -188,6 +230,7 @@ export type PolyOpts = LineOpts & {
 
 /** Polyline through points. Default: each segment its own overshooting stroke (roofs, frames, perspective lines). */
 function _poly(points: Pt[], o: PolyOpts = {}): string {
+  if (strictPen()) return points.length < 2 ? '' : points.map(([x, y], i) => `${i ? 'L' : 'M'}${P(x, y)}`).join('') + (o.closed ? 'Z' : '');
   const seed = o.seed ?? autoSeed(...points.flat());
   const pts = o.closed ? [...points, points[0]] : points;
   if (o.joined) {
@@ -242,7 +285,7 @@ export type CircleOpts = {
 function ellipsePts(cx: number, cy: number, rx: number, ry: number, o: CircleOpts, closedLoop: boolean): Pt[] {
   const r = rng(o.seed ?? autoSeed(cx, cy, rx, ry));
   const clean = PEN === 'clean';
-  const wob = clean ? Math.min(o.wobble ?? 0.008, 0.008) : o.wobble ?? 0.035;
+  const wob = strictPen() ? Math.min(o.wobble ?? 0, 0.01) : clean ? Math.min(o.wobble ?? 0.008, 0.008) : o.wobble ?? 0.035;
   const a0 = (o.start ?? r.range(0, 360)) * D2R;
   const over = closedLoop ? 0 : clean ? 3 * D2R : (o.overlap ?? r.range(-8, 28)) * D2R;
   const per = Math.PI * (rx + ry);
@@ -266,6 +309,8 @@ function ellipsePts(cx: number, cy: number, rx: number, ry: number, o: CircleOpt
 
 /** Hand-drawn ellipse outline: slightly wobbly, ends overlap (or leave a tiny gap) like a pen loop. */
 function _ellipse(cx: number, cy: number, rx: number, ry: number, o: CircleOpts = {}): string {
+  // clean pen: the same closed loop as blob() (so the line sits exactly on its fill), closed with Z
+  if (strictPen()) return smooth(ellipsePts(cx, cy, rx, ry, o, true), {closed: true});
   return smooth(ellipsePts(cx, cy, rx, ry, o, false));
 }
 export const ellipse = memo('ellipse', _ellipse);
@@ -282,7 +327,7 @@ export const blob = memo('blob', _blob);
 /** Partial ellipse arc from a0 to a1 (degrees, clockwise when a1 > a0). Slight wobble. */
 function _arc(cx: number, cy: number, rx: number, ry: number, a0: number, a1: number, o: {seed?: Seed; wobble?: number} = {}): string {
   const r = rng(o.seed ?? autoSeed(cx, cy, rx, a0, a1));
-  const wob = o.wobble ?? 0.02;
+  const wob = strictPen() ? Math.min(o.wobble ?? 0, 0.01) : o.wobble ?? 0.02;
   const span = Math.abs(a1 - a0) * D2R * (rx + ry) * 0.5;
   const n = Math.max(3, Math.min(24, Math.round(span / 20)));
   const ph = r.range(0, 6.28);
@@ -299,7 +344,7 @@ export const arc = memo('arc', _arc);
 /** Sagging wire / cable from (x1,y1) to (x2,y2); sag in px (positive = down). */
 function _wire(x1: number, y1: number, x2: number, y2: number, sag = 18, o: LineOpts = {}): string {
   const r = rng(o.seed ?? autoSeed(x1, y1, x2, y2, sag));
-  const [o1, o2] = Array.isArray(o.over) ? o.over : [r.range(2, 10), r.range(2, 10)];
+  const [o1, o2] = strictPen() ? [0, 0] : Array.isArray(o.over) ? o.over : [r.range(2, 10), r.range(2, 10)];
   const dx = x2 - x1;
   const dy = y2 - y1;
   const len = Math.hypot(dx, dy) || 1;
@@ -350,6 +395,7 @@ export const crown = memo('crown', _crown);
 
 /** Small "smile" ticks inside a crown (the reference's leaf marks). */
 function _crownTicks(cx: number, cy: number, rx: number, ry: number, o: {seed?: Seed; n?: number; size?: number} = {}): string {
+  if (strictPen()) return ''; // texture made of strokes: G3 only
   const r = rng(o.seed ?? autoSeed(cx, cy, rx, ry, 7));
   const n = o.n ?? Math.max(3, Math.min(7, Math.round((rx * ry) / 1800)));
   const s = o.size ?? Math.max(6, Math.min(12, rx * 0.095));
@@ -384,12 +430,14 @@ function _glint(x: number, y: number, len = 40, o: {seed?: Seed; angle?: number;
   const ny = ux;
   const ox = x + nx * gap + ux * len * 0.12;
   const oy = y + ny * gap + uy * len * 0.12;
+  if (strictPen()) return `M${P(x, y)}L${P(x + ux * len * 0.8, y + uy * len * 0.8)}`; // one light stroke, never a pair
   return `M${P(x, y)}L${P(x + ux * len, y + uy * len)}M${P(ox, oy)}L${P(ox + ux * l2, oy + uy * l2)}`;
 }
 export const glint = memo('glint', _glint);
 
 /** Parallel hatching clipped to a rect. angle in degrees, gap in px. */
 function _hatch(x: number, y: number, w: number, h: number, o: {seed?: Seed; angle?: number; gap?: number; jitter?: number} = {}): string {
+  if (strictPen()) return ''; // texture made of strokes: G3 only
   const r = rng(o.seed ?? autoSeed(x, y, w, h, 3));
   const a = (o.angle ?? 45) * D2R;
   const gap = o.gap ?? 12;
@@ -436,6 +484,7 @@ export const hatch = memo('hatch', _hatch);
  *  an urban sketcher's "indication" of a dense surface. At 25 % scale the squiggles melt into flat grey tone.
  *  gap 10-20 px (default 14), jitter 4-8 px (default 6). */
 function _scribbleMass(x: number, y: number, w: number, h: number, o: {seed?: Seed; gap?: number; jitter?: number} = {}): string {
+  if (strictPen()) return ''; // the G3 placeholder texture never reaches a clean film
   const r = rng(o.seed ?? autoSeed(x, y, w, h));
   const gap = o.gap ?? 14;
   const j = o.jitter ?? 6;
@@ -469,7 +518,8 @@ function _arrow(x1: number, y1: number, x2: number, y2: number,
   const shaft = line(x1, y1, x2, y2, {seed: `${seed}/s`, over: [r.range(0, 4), 0], bow: o.bow, breaks: o.breaks, jitter: o.jitter, drift: o.drift});
   const a = Math.atan2(y2 - y1, x2 - x1) + Math.PI;
   const h1 = `M${P(x2 + Math.cos(a - spread) * head, y2 + Math.sin(a - spread) * head)}L${P(x2, y2)}`;
-  const h2 = `L${P(x2 + Math.cos(a + spread) * head * r.range(0.85, 1.1), y2 + Math.sin(a + spread) * head * r.range(0.85, 1.1))}`;
+  const hk = strictPen() ? 1 : r.range(0.85, 1.1);
+  const h2 = `L${P(x2 + Math.cos(a + spread) * head * hk, y2 + Math.sin(a + spread) * head * hk)}`;
   return shaft + h1 + h2;
 }
 export const arrow = memo('arrow', _arrow);
@@ -478,9 +528,10 @@ export const arrow = memo('arrow', _arrow);
 function _check(x: number, y: number, size = 80, o: {seed?: Seed} = {}): string {
   const r = rng(o.seed ?? autoSeed(x, y, size, 1));
   const s = size;
-  const a: Pt = [x - 0.38 * s, y + 0.02 * s + r.jitter(0.03 * s)];
+  const jj = strictPen() ? 0 : 0.03 * s;
+  const a: Pt = [x - 0.38 * s, y + 0.02 * s + r.jitter(jj)];
   const b: Pt = [x - 0.12 * s, y + 0.42 * s];
-  const c: Pt = [x + 0.42 * s + r.jitter(0.03 * s), y - 0.5 * s];
+  const c: Pt = [x + 0.42 * s + r.jitter(jj), y - 0.5 * s];
   return `M${P(...a)}Q${P(a[0] + 0.12 * s, b[1] - 0.15 * s)} ${P(...b)}Q${P(x + 0.1 * s, y - 0.05 * s)} ${P(...c)}`;
 }
 export const check = memo('check', _check);
@@ -507,7 +558,8 @@ function _textLines(x: number, y: number, w: number, o: {seed?: Seed; n?: number
     const lw = w * frac;
     const lx = o.align === 'center' ? x + (w - lw) / 2 : x;
     const ly = y + i * gap + (i > 0 && o.heading !== false ? gap * 0.35 : 0);
-    d += `M${P(lx, ly + r.jitter(0.6))}L${P(lx + lw, ly + r.jitter(0.8))}`;
+    const tj = strictPen() ? 0 : 1;
+    d += `M${P(lx, ly + r.jitter(0.6 * tj))}L${P(lx + lw, ly + r.jitter(0.8 * tj))}`;
   }
   return d;
 }
@@ -515,6 +567,7 @@ export const textLines = memo('textLines', _textLines);
 
 /** Scattered little wall marks ("-", "L", "_|", "⌐") like the reference brick ticks. */
 function _wallTicks(x: number, y: number, w: number, h: number, o: {seed?: Seed; n?: number; size?: number} = {}): string {
+  if (strictPen()) return ''; // texture made of strokes: G3 only
   const r = rng(o.seed ?? autoSeed(x, y, w, h, 5));
   const n = o.n ?? Math.max(3, Math.round((w * h) / 22000));
   const s = o.size ?? 22;
@@ -535,6 +588,7 @@ export const wallTicks = memo('wallTicks', _wallTicks);
 
 /** Small speed / motion marks: n short parallel strokes trailing behind a moving object (pointing -dir). */
 function _speedLines(x: number, y: number, o: {seed?: Seed; n?: number; len?: number; gap?: number; angle?: number} = {}): string {
+  if (strictPen()) return ''; // board notation: G3 only
   const r = rng(o.seed ?? autoSeed(x, y, 11));
   const n = o.n ?? 3;
   const len = o.len ?? 30;
@@ -573,9 +627,10 @@ export const rectPath = (x: number, y: number, w: number, h: number) => `M${P(x,
 function _roundRect(x: number, y: number, w: number, h: number, rad: number, o: {seed?: Seed; closed?: boolean} = {}): string {
   const rr = Math.min(rad, w / 2, h / 2);
   const r = rng(o.seed ?? autoSeed(x, y, w, h, rad));
-  const j = (a: number) => a + r.jitter(0.6);
+  const strict = strictPen();
+  const j = (a: number) => (strict ? a : a + r.jitter(0.6));
   let d = `M${P(x + rr, y)}H${r1(j(x + w - rr))}A${r1(rr)} ${r1(rr)} 0 0 1 ${P(x + w, y + rr)}V${r1(j(y + h - rr))}A${r1(rr)} ${r1(rr)} 0 0 1 ${P(x + w - rr, y + h)}H${r1(j(x + rr))}A${r1(rr)} ${r1(rr)} 0 0 1 ${P(x, y + h - rr)}V${r1(j(y + rr))}A${r1(rr)} ${r1(rr)} 0 0 1 ${P(x + rr, y)}`;
-  if (o.closed === false) d += `H${r1(x + rr + Math.min(w * 0.12, 14))}`;
+  if (o.closed === false && !strict) d += `H${r1(x + rr + Math.min(w * 0.12, 14))}`;
   else d += 'Z';
   return d;
 }

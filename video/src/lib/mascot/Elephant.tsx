@@ -5,6 +5,7 @@ import {COLORWAYS, Colorway, ColorwayKey, MASCOT} from './colors';
 import {Pt, brush, clamp, polyPath, rand} from './ink';
 import {Layer, Pen} from './pen';
 import {Expression, POSE_BUILDERS, PoseName} from './poses';
+import {isClean} from '../pen';
 
 export type ElephantProps = {
   /** feet anchor in the parent's coordinates (card space) */
@@ -49,6 +50,9 @@ export type ElephantProps = {
   ink?: number;
   /** 0..1 fill size about each fill's centre (0 = ink-only state, like the reference's loop frame). Never an opacity. */
   fill?: number;
+  /** The clean pen's brush (default: on when lib/pen.ts setPen('clean') is on, else off): no overshoot, wander,
+   *  pressure noise or width noise, fills registered exactly. The default sketch brush is unchanged. */
+  clean?: boolean;
 };
 
 // Fill offset in screen px. The reference cat's fill sits ~3 px right / 2 px down of its ink (style bible §9);
@@ -113,7 +117,9 @@ export const Elephant: React.FC<ElephantProps> = ({
   lineWeight = 1,
   ink = 1,
   fill = 1,
+  clean: cleanProp,
 }) => {
+  const cleanPen = cleanProp ?? isClean();
   const rawId = useId();
   const inkScale = useInkScale(); // opt-in camera ink compensation (lib/inkComp.tsx): 1 outside an <InkScale>
   const clipId = `ele-clip-${rawId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
@@ -124,8 +130,8 @@ export const Elephant: React.FC<ElephantProps> = ({
 
   const baseW = (stroke.ink * 1.12 * lineWeight * inkScale) / scale;
   const fx = flip ? -1 : 1;
-  const mx = (MISREG.x * fx) / scale;
-  const my = MISREG.y / scale;
+  const mx = cleanPen ? 0 : (MISREG.x * fx) / scale;
+  const my = cleanPen ? 0 : MISREG.y / scale;
   const inkState = clamp(ink);
   const fillState = clamp(fill);
   const building = draw < 1;
@@ -215,12 +221,14 @@ export const Elephant: React.FC<ElephantProps> = ({
     const d = brush(l.pts, {
       w: baseW * (l.w ?? 1),
       seed: l.seed,
-      over: l.over,
-      overStart: l.overStart,
-      overEnd: l.overEnd,
+      over: cleanPen ? 0 : l.over,
+      overStart: cleanPen ? 0 : l.overStart,
+      overEnd: cleanPen ? 0 : l.overEnd,
       tipIn: l.tipIn,
       tipOut: l.tipOut,
-      wobble: l.wobble,
+      wobble: cleanPen ? 0 : l.wobble,
+      press: cleanPen ? 0 : undefined,
+      wVar: cleanPen ? 0 : undefined,
       draw: frac,
     });
     if (d) bucket.push(<path key={i} d={d} fill={l.color ?? c.ink} />);

@@ -13,9 +13,13 @@
 // strokes start 1 frame apart, so 3-6 strokes are in flight at once. `dur`, if given, is the time budget over which
 // the stroke STARTS are spread (it never slows a stroke down). pace="free" = the old behaviour (dur = total time,
 // split by length). Times are scene seconds. Subpaths longer than 150 px taper toward both ends (style bible 3).
+// CLEAN PEN (opt-in, lib/pen.ts setPen('clean'); off by default, so every film before v3's rework is unchanged): no
+// taper, width noise, open contours or loosening on the un-build; the width and colour come from the ATTENTION TIER
+// in effect (lib/tier.tsx: subject = the object's own deep shade, support = thin tone-on-tone, environment = no
+// contours, only strokes marked `thing`); light lines stay light and thin; graphic marks (>= 6 px, dashed) keep theirs.
 
 import React, {useMemo} from 'react';
-import {getBoundingBox, getLength} from '@remotion/paths';
+import {getBoundingBox, getLength, getPointAtLength} from '@remotion/paths';
 import {palette, stroke} from './theme';
 import {clamp, Ease, ease as E, prog, useTime} from './time';
 import {exitInkProgress, exitInkSyncProgress, exitLoose, useExit, useExitSync, useLook} from './exit';
@@ -23,6 +27,8 @@ import {rand, Seed} from './rng';
 import {MOTION, strokeDur} from './spec';
 import {useProjected} from './persp';
 import {useInkScale} from './inkComp';
+import {isClean, PEN} from './pen';
+import {cleanLine, useLocalScale, useTierScope} from './tier';
 
 // ---------------------------------------------------------------- length cache
 
@@ -41,7 +47,7 @@ export function pathLength(d: string): number {
   return v;
 }
 
-type Parsed = {subs: string[]; lens: number[]; cum: number[]; total: number; maxLen: number; centers?: [number, number][]};
+type Parsed = {subs: string[]; lens: number[]; cum: number[]; total: number; maxLen: number; centers?: [number, number][]; closed?: boolean[]};
 const parseCache = new Map<string, Parsed>();
 
 /** Split a path on absolute "M" commands and measure each piece (cached). */
@@ -78,6 +84,26 @@ function centersOf(P: Parsed): [number, number][] {
     });
   }
   return P.centers;
+}
+
+/** Which subpaths are closed outlines (end in Z, or end where they start): the clean pen's contour test. */
+function closedOf(P: Parsed): boolean[] {
+  if (!P.closed) {
+    P.closed = P.subs.map((s, i) => {
+      if (/[Zz]\s*$/.test(s)) return true;
+      const L = P.lens[i];
+      if (L < 12) return false;
+      try {
+        const a = getPointAtLength(s, 0);
+        const b = getPointAtLength(s, L);
+        if (!a || !b) return false;
+        return Math.hypot(a.x - b.x, a.y - b.y) < Math.max(1.5, L * 0.004);
+      } catch {
+        return false;
+      }
+    });
+  }
+  return P.closed;
 }
 
 /** Pen speed (px/s) used by pace="free". */
@@ -133,6 +159,12 @@ export type InkProps = {
   cap?: 'round' | 'butt' | 'square';
   join?: 'round' | 'miter' | 'bevel';
   style?: React.CSSProperties;
+  /** Clean pen: this stroke IS the thing (a wire, a string, a bird's V, steam), not a contour: kept on every tier. */
+  thing?: boolean;
+  /** Clean pen: a graphic mark (a shape drawn with a stroke): width and colour kept on every tier. */
+  graphic?: boolean;
+  /** Clean pen: the fill this line bounds (the line is its shade). Default: the tier scope's tone. */
+  tone?: string;
 };
 
 type Seg = {i: number; a: number; b: number; w: number};
@@ -142,29 +174,65 @@ export const Ink: React.FC<InkProps> = ({
   at,
   dur,
   ease,
-  width = stroke.ink,
-  color = palette.ink,
+  width: width0 = stroke.ink,
+  color: colorProp,
   order = 'seq',
   pace = 'spec',
-  opacity,
-  vary = 0.08,
+  opacity: opacity0,
+  vary: vary0 = 0.08,
   seed,
   exit = true,
-  taper = true,
-  open = 0,
+  taper: taper0 = true,
+  open: open0 = 0,
   dash,
   cap = 'round',
   join = 'round',
   style,
+  thing,
+  graphic,
+  tone,
 }) => {
   const t = useTime();
   const e = useExit();
   const sync = useExitSync();
   const look = useLook();
-  const d = useProjected(dIn);
+  const dProj = useProjected(dIn);
   const ks = useInkScale(); // opt-in camera ink compensation (inkComp.tsx): 1 outside an <InkScale>
+  const scope = useTierScope();
+  const local = useLocalScale();
   const jit = useMemo(() => rand(seed ?? dIn.slice(0, 40), 'ink'), [seed, dIn]);
   if (!look.ink) return null;
+  // ---- clean pen: the tier sets width and colour; subpaths the tier does not draw are dropped (default pen: as authored)
+  const clean = isClean();
+  let width = width0;
+  let color = colorProp ?? palette.ink;
+  let opacity = opacity0;
+  let vary = vary0;
+  let taper = taper0;
+  let open = open0;
+  let d = dProj;
+  if (clean) {
+    const cl = cleanLine(scope?.tier ?? PEN.untagged, scope?.tone, colorProp, width0, local, {thing, graphic, tone, dash: !!dash});
+    width = cl.width;
+    color = cl.color;
+    if (cl.alpha < 1) opacity = (opacity0 ?? 1) * cl.alpha;
+    vary = 0;
+    taper = false;
+    open = 0;
+    if (cl.kind === 'ink' || cl.kind === 'tone' || cl.kind === 'light') {
+      const P0 = parseInk(dProj);
+      const shut = closedOf(P0);
+      const spec = cl.spec;
+      const lineKind = cl.kind !== 'light';
+      const keep = P0.subs.filter((_, i) => {
+        if (shut[i]) return thing || !lineKind || spec.contours;
+        if (lineKind && !thing && !spec.strokes) return false;
+        return P0.lens[i] * local >= (thing || !lineKind ? Math.min(spec.minStroke, 6) : spec.minStroke);
+      });
+      if (!keep.length) return null;
+      if (keep.length !== P0.subs.length) d = keep.join('');
+    }
+  }
   // un-build: retract after the fills (recipe), or WITH its group's fills inside an <ExitSync> (a figure in a crowd)
   const retract = sync ? exitInkSyncProgress(e, sync.jitter) : exitInkProgress(e, jit);
   const w = width * ks * (1 + (jit * 2 - 1) * vary);
@@ -180,7 +248,7 @@ export const Ink: React.FC<InkProps> = ({
   const n = P.subs.length;
   const r = exit ? E.inQuad(retract) : 0;
   if (r >= 1 || n === 0) return null;
-  const loose = exit ? exitLoose(e) : 0;
+  const loose = exit && !clean ? exitLoose(e) : 0;
 
   // ---- per-subpath draw progress (0..1)
   const drawn: number[] = new Array(n);

@@ -149,6 +149,8 @@ export type BrushOpts = {
   tipIn?: number; // width ratio at the start tip
   tipOut?: number; // width ratio at the end tip
   draw?: number; // 0..1 reveal along the stroke
+  press?: number; // pressure noise amplitude (default 0.14; the clean pen: 0)
+  wVar?: number; // per-stroke width variation range (default 0.28: x0.86-1.14; the clean pen: 0)
 };
 
 const lengths = (pts: Pt[]) => {
@@ -198,7 +200,9 @@ export const brush = (center: Pt[], o: BrushOpts): string => {
   const full = total;
   total = L[n - 1];
   const wob = o.wobble ?? 0.45;
-  const wMul = 0.86 + rand(seed, 3) * 0.28;
+  const wv = o.wVar ?? 0.28;
+  const wMul = 1 - wv / 2 + rand(seed, 3) * wv;
+  const pressK = o.press ?? 0.14;
   const tipIn = o.tipIn ?? 0.35;
   const tipOut = o.tipOut ?? 0.18;
   const left: Pt[] = [];
@@ -220,7 +224,7 @@ export const brush = (center: Pt[], o: BrushOpts): string => {
     const inK = smooth(0, Math.min(0.22, 5 / full + 0.04), u);
     const outK = 1 - smooth(1 - Math.min(0.32, 7 / full + 0.08), 1, u);
     const prof = lerp(tipIn, 1, inK) * lerp(tipOut, 1, outK) / 1;
-    const press = 1 + noise1(s / 9, seed + 23) * 0.14;
+    const press = 1 + (pressK ? noise1(s / 9, seed + 23) * pressK : 0);
     let hw = (o.w * wMul * prof * press) / 2;
     // the moving tip of a stroke being drawn is round, not cut
     if (draw < 1 && i === n - 1) hw *= 0.7;
