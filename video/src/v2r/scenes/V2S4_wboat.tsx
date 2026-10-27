@@ -194,20 +194,22 @@ function cabinInto(b: Batch) {
   b.rect(CM.line, wb.x - 50, PORT_Y + 64, 100, 22);
   b.rect(CM.brickDeep, wb.x - 52, PORT_Y + 62, 104, 5);
   b.layer();
-  b.fill(CM.sage, lobes(wb.x - 54, wb.x + 54, PORT_Y + 64, 30, 's4wbox', 5));
-  b.fill(CM.sage, leafPath(wb.x - 44, PORT_Y + 92, 22, 6, 70));
-  b.fill(CM.sage, leafPath(wb.x + 40, PORT_Y + 96, 26, 6, 100));
+  b.fill(CM.leafGold, lobes(wb.x - 54, wb.x + 54, PORT_Y + 64, 30, 's4wbox', 5));
+  b.fill(CM.leafRust, leafPath(wb.x - 46, PORT_Y + 92, 22, 6, 70));
+  b.fill(CM.leafGold, leafPath(wb.x + 42, PORT_Y + 96, 26, 6, 100));
+  b.fill(CM.leafRust, leafPath(wb.x - 30, PORT_Y + 98, 18, 5, 80));
+  b.layer();
   for (let k = 0; k < 7; k++) b.fill([CM.box, CM.blossom, CM.paper, CM.coatMustard][k % 4], ovalPath(wb.x - 42 + k * 14, PORT_Y + 46 + (k % 3) * 6, 5, 4.6));
+  b.ink(lobes(wb.x - 54, wb.x + 54, PORT_Y + 64, 30, 's4wbox', 5).replace(/Z$/, ''), 1.4, CM.ink, 0.35);
   b.ink(sw.join(''), 1.4, CM.ink);
 }
 
 function cabinInk(b: Batch) {
   b.layer();
   let d = '';
-  d += line(XL, CT, XR, CT, {seed: 's4cab/top', over: 'none'});
-  d += line(XL, GW, XR, GW + 1, {seed: 's4cab/gw', over: 'none'});
-  d += line(XL, WL - 1, XR, WL, {seed: 's4cab/wl', over: 'none'});
-  b.ink(d, FRONT, CM.ink, 0.25);
+  d += line(XL, CT, XR, CT, {seed: 's4cab/top', over: 'none', breaks: false});
+  d += line(XL, GW, XR, GW + 1, {seed: 's4cab/gw', over: 'none', breaks: false});
+  b.ink(d, MID, CM.ink, 0.25);
   let m = '';
   const {x0, x1, y0, y1} = DOORS;
   m += line(x0 - 9, y0 - 9, x1 + 9, y0 - 9, {seed: 's4door/t', over: 'small'}) + line(x0 - 9, y0 - 9, x0 - 9, y1 + 3, {seed: 's4door/l', over: 'small'}) + line(x1 + 9, y0 - 9, x1 + 9, y1 + 3, {seed: 's4door/r', over: 'small'});
@@ -419,8 +421,14 @@ function herbsInto(b: Batch, t: number) {
 function smokeInto(b: Batch, t: number) {
   const x = 944;
   const y = RF - 116;
-  const ps = puffs(t, {n: 8, life: 3.8, rise: 360, drift: WIND * 170, r0: 8, r1: 25, wobble: 7, seed: 's4boatsmoke', ceil: ROW.ceil}, y);
-  ps.forEach((p, i) => b.fill(p.k < 0.3 ? CM.stoneShade : i % 2 ? CM.paving : CM.limestone, ovalPath(x + p.x, y + p.y, p.r, p.r * 0.84)));
+  const ps = puffs(t, {n: 9, life: 3.8, rise: 330, drift: WIND * 150, r0: 6, r1: 17, wobble: 6, seed: 's4boatsmoke', ceil: ROW.ceil}, y);
+  // each puff a lumpy cluster of three flat ovals (no fade: it shrinks away)
+  ps.forEach((p, i) => {
+    const c = p.k < 0.25 ? CM.stoneShade : i % 2 ? CM.paving : CM.limestone;
+    b.fill(c, ovalPath(x + p.x, y + p.y, p.r, p.r * 0.8));
+    b.fill(c, ovalPath(x + p.x + p.r * 0.7, y + p.y + p.r * 0.2, p.r * 0.62, p.r * 0.5));
+    b.fill(c, ovalPath(x + p.x - p.r * 0.55, y + p.y + p.r * 0.28, p.r * 0.5, p.r * 0.42));
+  });
 }
 
 // ---------------------------------------------------------------- the near water (2.0x)
@@ -444,14 +452,15 @@ const wrapX = (px: number, off: number) => NX0 + frac((px + off - NX0) / NSPAN) 
 function nearLayout() {
   const r = rng('s4near');
   const refl: {px: number; len: number; y: number; h: number; row: number; keep: number}[] = [];
-  const rows = [4, 12, 21, 31, 42, 55, 70, 88, 108];
+  const rows = [5, 13, 22, 32, 43, 56, 71, 89, 110];
   rows.forEach((dy, k) => {
     const keep = 1 - k / rows.length;
     let px = NX0 + r.range(0, 30);
     while (px < NX1) {
-      const len = r.range(26, 74) * (0.5 + keep * 0.6);
-      if (r.chance(0.25 + keep * 0.65)) refl.push({px, len, y: NY0 + dy, h: 4 + k * 0.7, row: k, keep});
-      px += len + r.range(10, 36) * (1.4 - keep * 0.7);
+      const len = r.range(22, 80) * (0.5 + keep * 0.6);
+      const dens = k === 3 ? 0.35 : 0.25 + keep * 0.65;
+      if (r.chance(dens)) refl.push({px, len, y: NY0 + dy + r.jitter(1.8 + k * 0.3), h: 3.6 + k * 0.6 + r.range(0, 1.4), row: k, keep});
+      px += len + r.range(10, 40) * (1.4 - keep * 0.7);
     }
   });
   const rip = Array.from({length: 44}, () => {
@@ -486,7 +495,11 @@ export const NearWater: React.FC<{lay: ReturnType<typeof nearLayout>}> = ({lay})
     if (sx + d.len < XL || sx > XR) continue;
     const c = d.row < 3 ? CM.paneUnlit : d.row === 3 ? CM.anchor : reflColour(sx + d.len / 2);
     const wob = Math.sin(t * 1.6 + d.row + d.px * 0.01) * (2 + d.row * 0.4);
-    b.fill(c, `M${P(sx + wob, d.y)}L${P(sx + d.len + wob, d.y)}L${P(sx + d.len - 3 + wob, d.y + d.h)}L${P(sx + 3 + wob, d.y + d.h)}Z`);
+    const x0 = sx + wob;
+    const x1 = sx + d.len + wob;
+    const ym = d.y + d.h * 0.5;
+    // a lens: tapered ends, a fuller belly
+    b.fill(c, `M${P(x0, ym)}Q${P(x0 + d.len * 0.18, d.y)} ${P((x0 + x1) / 2, d.y)}Q${P(x1 - d.len * 0.18, d.y)} ${P(x1, ym)}Q${P(x1 - d.len * 0.2, d.y + d.h)} ${P((x0 + x1) / 2, d.y + d.h)}Q${P(x0 + d.len * 0.2, d.y + d.h)} ${P(x0, ym)}Z`);
   }
   b.layer();
   // ripples streaming right (bigger toward us)
