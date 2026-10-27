@@ -144,16 +144,23 @@ export const PIP_LOOK: LookKey[] = [
   {t: 1.5, v: -0.62}, // ... and back to the tag before "AI's"
   {t: 9.04, v: -0.95}, // SQB: up at the card
   {t: 11.14, v: -0.62}, // back to the tag
-  {t: 30.97, v: 0.3}, // after the $1,099 tick: at you
-  {t: 31.25, v: -0.62},
-  {t: 33.13, v: 0.75}, // out of the window (the BETTER van)
-  {t: 33.4, v: -0.62},
+  // SQE / SQF (the WINDOW lane's beats): it watches the street, the tag after the $1,099 tick, the BETTER van
+  {t: 22.45, v: 0.35},
+  {t: 30.95, v: -0.5},
+  {t: 31.42, v: 0.35},
+  {t: 33.11, v: 0.55},
+  {t: 33.49, v: 0.35},
+  {t: 38.2, v: -0.6}, // PAYOFF: down at the tag
+  {t: 40.24, v: 0.05},
 ];
-/** Expression keys: the ears-droop beat on "buy one." (10.92) as the 'meh' face, back on "But". */
+/** Pose / expression keys: the ears-droop beat on "buy one." (10.92) as the 'meh' face, back on "But"; the shrug on
+ *  40.30 (the WINDOW lane's 40.24-40.70). */
 export const PIP_KEYS: PipPoseKey[] = [
   {t: -99, pose: 'peek', amount: 1},
   {t: 10.92, pose: 'peek', amount: 1, expression: 'meh'},
   {t: 11.48, pose: 'peek', amount: 1},
+  {t: 40.24, pose: 'shrug'},
+  {t: 40.7, pose: 'peek', amount: 1},
 ];
 /** Pip's grip point on the phone's right edge (phone-local px at w 400) and its scale per phone k. */
 export const PIP_GRIP: Pt = [400, 240];
