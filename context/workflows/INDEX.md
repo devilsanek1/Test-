@@ -65,3 +65,4 @@
 | 2026-10-27 | `v3-g5b-rollout-wf_6a965600-a92.js` | 25 | 0 | (running) |
 | 2026-10-27 | `v2r-understand-a-wf_f778c5a9-855.js` | 2 | 0 | v2 restart: house digest + beat map -> `video/docs/v2/direction/` |
 | 2026-10-27 | `v2r-understand-b-wf_a6c52303-658.js` | 2 | 0 | v2 restart: teardown + toolkit -> `video/docs/v2/direction/` |
+| 2026-10-27 | `v2r-treatments-{1,2,3}-*.js` | 6 | 0 | v2 restart: six competing treatments (camera journey, the line, Pip witness, documentary, small vs vast, retention) -> `video/docs/v2/direction/treatments/` |
