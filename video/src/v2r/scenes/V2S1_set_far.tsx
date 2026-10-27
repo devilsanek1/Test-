@@ -14,7 +14,7 @@ import {Batch, P, Pt, rng, ovalPath, lobes, lerp, domePath, r1} from '../kit/can
 import {litAt} from '../kit/canal/life';
 import {Person} from '../kit/cast';
 import * as MAP from '../world/map';
-import {CellPaint, Under, barPath, ringPath} from './V2S1_set_core';
+import {CellPaint, Under, barPath, ringPath, S1_IRON} from './V2S1_set_core';
 import {floodAt} from './V2S1_clock';
 
 const S = MAP.S1_SHEET;
@@ -90,7 +90,7 @@ function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 5
     for (let k = 0; k < nd; k++) {
       const dx = x0 + w * 0.14 + (k * (w * 0.72)) / Math.max(1, nd - 1 || 1) - (nd === 1 ? -w * 0.22 : 0);
       b.rect(CM.stucco, dx - 1, top - rh * 0.78, 11, rh * 0.62);
-      b.rect(CM.paneUnlit, dx + 1.5, top - rh * 0.66, 6, rh * 0.44);
+      b.rect(S1_IRON, dx + 1.5, top - rh * 0.66, 6, rh * 0.44);
       sil += rectInk(dx - 1, top - rh * 0.78, 11, rh * 0.62, {seed: `s1farD/${key}${k}`, over: 'none', open: 0.3});
     }
     sil += poly([[x0 - 1, top], [x0 + w * 0.08, top - rh], [x1 - w * 0.08, top - rh], [x1 + 1, top]], {seed: `s1farM/${key}`, over: 'small'});
@@ -122,14 +122,14 @@ function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 5
     const stack = (o.stacks ?? []).find(([sx]) => sx === ax);
     const base = (o.roof === 'pitch' || o.roof === 'mansard' ? top - rh * 0.55 : top - 4) - (stack ? stack[1] : 0) - 5;
     const at = Math.max(ceil + 4, base - 20);
-    b.fill(CM.shadeCool, barPath([ax, base], [ax, at], 1.6));
-    b.fill(CM.shadeCool, barPath([ax - 8, at + 4], [ax + 8, at + 4], 1.4));
-    b.fill(CM.shadeCool, barPath([ax - 5, at + 9], [ax + 5, at + 9], 1.4));
+    b.fill(S1_IRON, barPath([ax, base], [ax, at], 1.6));
+    b.fill(S1_IRON, barPath([ax - 8, at + 4], [ax + 8, at + 4], 1.4));
+    b.fill(S1_IRON, barPath([ax - 5, at + 9], [ax + 5, at + 9], 1.4));
     sil += `M${P(ax, base)}L${P(ax, at)}M${P(ax - 8, at + 4)}L${P(ax + 8, at + 4)}`;
   }
   if (o.tank) {
     b.rect(CM.stoneShade, x0 + w * 0.6, top - 20, 18, 16);
-    b.rect(CM.shadeCool, x0 + w * 0.6 - 1, top - 22, 20, 3);
+    b.rect(S1_IRON, x0 + w * 0.6 - 1, top - 22, 20, 3);
     sil += rectInk(x0 + w * 0.6, top - 20, 18, 16, {seed: `s1farT/${key}`, over: 'none', edges: 'tlr'});
   }
   if (o.garden) {
@@ -183,7 +183,7 @@ const FarRoofs: React.FC = () => {
     // every other far window holds its frame-0 state
     const on = forced ? t >= FAR_LIGHT.at : litAt(0, 's1farwin', i, n, {litFrac: 0.2, gap: [0.7, 1.6]});
     const v = rng(`s1farwc/${w.key}`).next();
-    const col = on ? CM.lamp : v < 0.5 ? CM.paneUnlit : v < 0.82 ? CM.glass : CM.shadeCool;
+    const col = on ? CM.lamp : v < 0.5 ? S1_IRON : v < 0.82 ? CM.glass : CM.stoneShade;
     if (w.arch) wb.fill(col, `M${P(w.x, w.y + w.h)}L${P(w.x, w.y + w.w / 2)}A${r1(w.w / 2)} ${r1(w.w / 2)} 0 0 1 ${P(w.x + w.w, w.y + w.w / 2)}L${P(w.x + w.w, w.y + w.h)}Z`);
     else wb.rect(col, w.x, w.y, w.w, w.h);
     if (row === 'near') wb.rect(CM.limestone, w.x - 1.5, w.y + w.h, w.w + 3, 2.5);
@@ -302,7 +302,7 @@ function bridgeRail(): {b: Batch; u: Under} {
   const b = new Batch();
   const u = new Under();
   const {x0, x1, railTop, deck} = BRIDGE;
-  const iron = CM.shadeCool;
+  const iron = S1_IRON;
   b.rect(iron, x0, railTop, x1 - x0, 3);
   b.rect(iron, x0, deck - 4, x1 - x0, 2.4);
   let bars = '';
@@ -355,7 +355,7 @@ const Bus: React.FC = () => {
   }
   b.rect(CM.box, xl + L - 24, y0 + 5, 18, 8);
   b.rect(CM.brickDeep, xl, y1 - 10, L, 3);
-  for (const wx of [xl + 30, xl + L - 40]) b.fill(CM.anchor, ovalPath(wx, y1 - 4, 9, 9));
+  for (const wx of [xl + 30, xl + L - 40]) b.fill(CM.coatSlate, ovalPath(wx, y1 - 4, 9, 9));
   return <CellPaint b={b} seed="s1bus" cell={1000} misreg={0} live />;
 };
 

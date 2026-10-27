@@ -21,7 +21,7 @@ import {s1Layout} from '../kit/canal/wing';
 import {litAt, Pigeons} from '../kit/canal/life';
 import {HandLetteredGoogle} from '../kit/canal/lettering';
 import * as MAP from '../world/map';
-import {CellPaint, barPath} from './V2S1_set_core';
+import {CellPaint, barPath, S1_IRON} from './V2S1_set_core';
 import {Tier} from '../../lib/tier';
 import {S1_DRAW, wIsSubject, doorIsSubject} from './V2S1_clock';
 
@@ -182,12 +182,12 @@ function facadeStatic(): Batch {
   ];
   for (const [bay, va, vb] of frames) {
     const fw = 0.045;
-    b.poly(CM.paneUnlit, q(bay.u0, va, bay.u1 - bay.u0, fw));
-    b.poly(CM.paneUnlit, q(bay.u0, vb - fw * 1.4, bay.u1 - bay.u0, fw * 1.4));
-    b.poly(CM.paneUnlit, q(bay.u0, va, fw, vb - va));
-    b.poly(CM.paneUnlit, q(bay.u1 - fw, va, fw, vb - va));
-    if (bay.split) b.poly(CM.paneUnlit, q(bay.u0 + (bay.u1 - bay.u0) * bay.split - 0.025, va, 0.05, vb - va));
-    if (bay.transom) b.poly(CM.paneUnlit, q(bay.u0, va + (vb - va) * bay.transom, bay.u1 - bay.u0, 0.035));
+    b.poly(S1_IRON, q(bay.u0, va, bay.u1 - bay.u0, fw));
+    b.poly(S1_IRON, q(bay.u0, vb - fw * 1.4, bay.u1 - bay.u0, fw * 1.4));
+    b.poly(S1_IRON, q(bay.u0, va, fw, vb - va));
+    b.poly(S1_IRON, q(bay.u1 - fw, va, fw, vb - va));
+    if (bay.split) b.poly(S1_IRON, q(bay.u0 + (bay.u1 - bay.u0) * bay.split - 0.025, va, 0.05, vb - va));
+    if (bay.transom) b.poly(S1_IRON, q(bay.u0, va + (vb - va) * bay.transom, bay.u1 - bay.u0, 0.035));
   }
   // ---- the ink: coping, band, plinth, corner, fins, window frames + bars, canopy, door surround (loose, open)
   let st = '';
@@ -276,7 +276,7 @@ function paneInto(b: Batch, ink: string[], u0: number, v0: number, w: number, h:
   b.poly(CM.lampCore, qq(0.08, 0.1, 0.84, 0.46));
   if (kind === 0) {
     // a pendant lamp over a long table
-    b.poly(CM.anchor, [pp(0.36, 0.3), pp(0.64, 0.3), pp(0.56, 0.21), pp(0.44, 0.21)]);
+    b.poly(CM.coatSlate, [pp(0.36, 0.3), pp(0.64, 0.3), pp(0.56, 0.21), pp(0.44, 0.21)]);
     b.poly(CM.paper, qq(0.46, 0.3, 0.08, 0.03));
     b.poly(CM.brickLight, qq(0, 0.72, 1, 0.07));
     b.poly(CM.line, qq(0.1, 0.79, 0.04, 0.21));
@@ -348,10 +348,10 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
     b.poly(CM.brickLight, qq(0, 0.78, 1, 0.03));
     b.poly(CM.lampCore, [pp(0.62, 0.78), pp(0.96, 0.78), pp(0.9, 0.7), pp(0.7, 0.7)]);
     b.fill(CM.coatSlate, `M${P(...pp(0.14, 1))}L${P(...pp(0.14, 0.64))}Q${P(...pp(0.24, 0.56))} ${P(...pp(0.34, 0.64))}L${P(...pp(0.34, 0.78))}L${P(...pp(0.3, 0.78))}L${P(...pp(0.3, 1))}Z`);
-    b.fill(CM.anchor, `M${P(...pp(0.74, 0.78))}L${P(...pp(0.86, 0.78))}L${P(...pp(0.84, 0.75))}L${P(...pp(0.76, 0.75))}Z`);
-    b.fill(CM.anchor, barPath(pp(0.8, 0.76), pp(0.86, 0.6), 3));
-    b.fill(CM.anchor, barPath(pp(0.86, 0.6), pp(0.76, 0.5), 3));
-    b.fill(CM.anchor, `M${P(...pp(0.7, 0.5))}L${P(...pp(0.79, 0.44))}L${P(...pp(0.82, 0.53))}Z`);
+    b.fill(CM.coatSlate, `M${P(...pp(0.74, 0.78))}L${P(...pp(0.86, 0.78))}L${P(...pp(0.84, 0.75))}L${P(...pp(0.76, 0.75))}Z`);
+    b.fill(CM.coatSlate, barPath(pp(0.8, 0.76), pp(0.86, 0.6), 3));
+    b.fill(CM.coatSlate, barPath(pp(0.86, 0.6), pp(0.76, 0.5), 3));
+    b.fill(CM.coatSlate, `M${P(...pp(0.7, 0.5))}L${P(...pp(0.79, 0.44))}L${P(...pp(0.82, 0.53))}Z`);
     b.fill(CM.paper, ovalPath(...pp(0.765, 0.53), 3.5, 2.5));
   }
   // the glazing: two slim stone mullions near the sides (kept out of the dive's centre) as fills; their lines in ink
@@ -404,7 +404,7 @@ function lobbyStatic(): Batch {
   b.fill(CM.sage, lobes(plx - pls * 0.3, plx + pls * 0.3, ply - pls * 0.34, pls * 1.05, 's1lobby/plant', 3));
   for (let j = 0; j < 3; j++) {
     const [lx, ly] = p(du0 + (du1 - du0) * (0.22 + j * 0.28), dv0 + 0.34);
-    b.fill(CM.anchor, domePath(lx, ly, 7, 6));
+    b.fill(CM.coatSlate, domePath(lx, ly, 7, 6));
     b.fill(CM.lampCore, ovalPath(lx, ly + 1.5, 4.5, 2));
   }
   let d = '';

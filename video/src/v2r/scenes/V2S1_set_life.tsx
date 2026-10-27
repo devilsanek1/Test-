@@ -20,7 +20,7 @@ import {bollardInto} from '../kit/canal/towpath';
 import {Puffs} from '../kit/canal/life';
 import {Person, Seated} from '../kit/cast';
 import * as MAP from '../world/map';
-import {CellPaint, Under, barPath, planeLeaf} from './V2S1_set_core';
+import {CellPaint, Under, barPath, planeLeaf, S1_IRON} from './V2S1_set_core';
 import {s1ArchOpening} from './V2S1_set_far';
 import {floodAt} from './V2S1_clock';
 
@@ -84,7 +84,7 @@ export const S1PathFurniture: React.FC = () => {
     const {edge, coping} = S1_PATH;
     for (const x of S1_BOLLARDS) {
       const k = MAP.s1FigureHAt(x) / S.herH;
-      bollardInto(b, x, edge - coping * 0.5 + s1Bend(x) - 2, 22 * k, `s1bol/${x}`);
+      s1BollardInto(b, x, edge - coping * 0.5 + s1Bend(x) - 2, 22 * k);
     }
     // lamp posts (heritage: plinth, fluted column, lantern), sized by the bend's scale
     for (const L of S1_FAR_LAMPS) {
@@ -98,9 +98,17 @@ export const S1PathFurniture: React.FC = () => {
   return <CellPaint b={b} seed="s1furn" cell={120} misreg={0.5} />;
 };
 
+/** A mooring bollard on the coping (kit towpath bollardInto, copied: the kit's is the plum anchor, which is W's alone;
+ *  here slate iron, flat, no line: tier C). */
+function s1BollardInto(b: Batch, x: number, y: number, h: number) {
+  const w = h * 0.9;
+  b.fill(S1_IRON, `M${P(x - w * 0.42, y)}L${P(x - w * 0.3, y - h * 0.55)}L${P(x - w * 0.42, y - h * 0.78)}L${P(x + w * 0.42, y - h * 0.78)}L${P(x + w * 0.3, y - h * 0.55)}L${P(x + w * 0.42, y)}Z`);
+  b.fill(S1_IRON, `M${P(x - w * 0.46, y - h * 0.76)}A${(w * 0.46).toFixed(1)} ${(h * 0.26).toFixed(1)} 0 0 1 ${P(x + w * 0.46, y - h * 0.76)}Z`);
+}
+
 /** A heritage lamp post (kit towpath Lamp, copied: its Paint can't be split by region), off (the golden hour). */
 function lampInto(b: Batch, x: number, y: number, h: number, seed: string) {
-  const color = CM.anchor;
+  const color = S1_IRON; // never the plum anchor (W's alone): a mid-slate iron (tier C)
   const cw = Math.max(2.2, h * 0.034);
   b.fill(color, `M${P(x - cw * 1.6, y)}L${P(x - cw * 1.2, y - h * 0.08)}L${P(x + cw * 1.2, y - h * 0.08)}L${P(x + cw * 1.6, y)}Z`);
   b.fill(color, `M${P(x - cw * 0.7, y - h * 0.08)}L${P(x - cw * 0.45, y - h * 0.8)}L${P(x + cw * 0.45, y - h * 0.8)}L${P(x + cw * 0.7, y - h * 0.08)}Z`);
@@ -146,33 +154,32 @@ export const S1Water: React.FC = () => {
     }
     return b;
   }, []);
-  const b = new Batch();
-  const r = rng('s1water');
-  const rt = y0 + 10;
-  REFL.forEach((ref, i) => {
-    const color = ref.color === CM.sun ? CM.lamp : ref.color;
-    const depth = ref.depth || 60;
-    const rows = Math.max(3, Math.round(depth / 7));
-    const W = ref.x1 - ref.x0;
-    for (let k = 0; k < rows; k++) {
-      const yy = rt + 2 + (k / rows) * depth;
-      const keep = 1 - k / rows;
-      const hh = Math.max(2, 3 + k * 0.3);
-      let x = ref.x0 + r.range(0, 30);
-      while (x < ref.x1) {
-        const len = Math.min(ref.x1 - x, r.range(14, 46) * (0.5 + keep * 0.6) * Math.max(0.5, Math.min(1.4, W / 300)));
-        if (r.chance(0.35 + 0.5 * keep)) {
-          const xx = x + Math.sin(t * 1.1 + k * 0.9 + i + x * 0.01) * (2 + k * 0.4);
-          b.fill(color, `M${P(xx, yy)}L${P(xx + len, yy)}L${P(xx + len - 2, yy + hh)}L${P(xx + 2, yy + hh)}Z`);
-        }
-        x += len + r.range(8, 30) * (1.2 - keep * 0.5);
-      }
-    }
-  });
+  // the reflections as a few LONG flat bands (no dash rows, CRAFT §c), static: the wing's broken in two by a calm
+  // gap, the sun's gold column under the disc, the lit lobby's gold under the doors
+  const b = useMemo(() => {
+    const b = new Batch();
+    const rt = y0 + 10;
+    REFL.forEach((ref, i) => {
+      const color = ref.color === CM.sun ? CM.lamp : ref.color;
+      const depth = ref.depth || 60;
+      const W = ref.x1 - ref.x0;
+      const rr = rng(`s1refl/${i}`);
+      // band 1: most of the width, band 2 under it: shorter, inset, a calm gap between
+      const h1 = Math.max(4, depth * 0.34);
+      const h2 = Math.max(3, depth * 0.22);
+      const g1 = W > 300 ? rr.range(0.38, 0.5) : -1;
+      if (g1 > 0) {
+        b.rect(color, ref.x0 + W * 0.02, rt + 2, W * (g1 - 0.04), h1);
+        b.rect(color, ref.x0 + W * (g1 + 0.03), rt + 2, W * (0.95 - g1), h1);
+      } else b.rect(color, ref.x0 + W * 0.04, rt + 2, W * 0.92, h1);
+      b.rect(color, ref.x0 + W * 0.16, rt + 2 + h1 + depth * 0.18, W * 0.62, h2);
+    });
+    return b;
+  }, []);
   return (
     <>
       <CellPaint b={base} seed="s1water/base" cell={140} misreg={0} />
-      <CellPaint b={b} seed="s1water/life" cell={140} misreg={0} live />
+      <CellPaint b={b} seed="s1water/refl" cell={140} misreg={0} />
     </>
   );
 };
@@ -223,7 +230,7 @@ const Boater: React.FC = () => {
   const y = g.roofY - g.roofH - (BOAT_A.topView ?? 0) * 0.4;
   // at rest (the life budget): the cup held low, no turn. Seated height ~0.55 of a 1.70 m figure on the boat's plane.
   const cup = 0 * t;
-  return <Seated x={x} y={y} h={88} seed="s1/boater" cup={cup} turn={0.1} traits={{hair: 'beanie', hatColor: CM.brick, coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />;
+  return <Seated x={x} y={y} h={88} seed="s1/boater" cup={cup} turn={0.1} ink={0} traits={{hair: 'beanie', hatColor: CM.brick, coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />;
 };
 
 /** A ginger cat curled on boat B's roof: a loaf of leafRust with a tail curl; lifts its head at 1.10 and 4.98. */
@@ -271,7 +278,7 @@ export const S1FarLife: React.FC = () => {
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>
-        <Person x={s1JogX(t)} y={S1_JOG.feet} h={S1_JOG.h} seed="s1/jog1" pose="jog" view="profile" flip={false} walk={{rate: 2.6}} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: CM.hair[1], coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none', shoes: CM.paper}} />
+        <Person x={s1JogX(t)} y={S1_JOG.feet} h={S1_JOG.h} seed="s1/jog1" ink={0} pose="jog" view="profile" flip={false} walk={{rate: 2.6}} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: CM.hair[1], coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none', shoes: CM.paper}} />
       </g>
     </>
   );

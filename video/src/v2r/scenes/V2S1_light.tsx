@@ -6,29 +6,34 @@
 //   S1WingShades       the fins' short shades right on the facade (Shadow) + the canopy soffit one Shade step
 //   S1TowpathShadows   contact + cast under her and every ghost and outline (parallel), the lamp posts, the bollards
 //   S1BoatStrips       a cast-strength strip at each moored boat's waterline (never a contact strip on water)
+//   S1BankShade        the near steps' lower band in the shade of something off-screen left (one cast step, soft edge):
+//                      the brightest 5 % stays on the subject (CRAFT §d.2), not on the pale near steps
+// Every shape lands with the flood at its spot (`at` = floodAt): frame 0 is pale shapes only, no shadow smudges.
 // Her form shade and rim (her left edge, the key side) are in V2S1_row (they need her drawing).
 import React from 'react';
 import {CastShadow, ContactShadow, Shade, Shadow, ShadowLayer} from '../../lib/light';
 import {useTime} from '../../lib/time';
 import * as MAP from '../world/map';
 import {boatGeom} from '../kit/canal/boat';
-import {C, s1HerXAt} from './V2S1_clock';
+import {C, floodAt, s1HerXAt} from './V2S1_clock';
 import {POP} from './V2S1_row_fig';
 import {s1WingShadows} from './V2S1_set_wing';
 import {BOAT_A, BOAT_B, S1_BOLLARDS, S1_FAR_LAMPS, S1_PATH, s1Bend} from './V2S1_set_life';
 
 const S = MAP.S1_SHEET;
 const WING = s1WingShadows();
+/** The wing's shades land with its colour (the flood crosses the wing f6-12). */
+const WING_AT = floodAt(700, 800);
 
 /** The wing's facade: each fin casts a short shade to its right; the canopy's underside is one step down. */
 export const S1WingShades: React.FC = () => (
   <>
     <ShadowLayer>
       {WING.fins.map((d, i) => (
-        <Shadow key={i} d={d} tint="form" />
+        <Shadow key={i} d={d} tint="form" at={WING_AT} />
       ))}
     </ShadowLayer>
-    <Shade d={WING.soffit} />
+    <Shade d={WING.soffit} at={WING_AT} />
   </>
 );
 
@@ -44,14 +49,16 @@ export const S1TowpathShadows: React.FC = () => {
     const k = MAP.s1FigureHAt(L.x) / S.herH;
     const h = L.h || 350 * k;
     const y = S1_PATH.top + 6 + s1Bend(L.x);
-    out.push(<ContactShadow key={`lc${L.x}`} x={L.x} y={y} w={Math.max(10, 30 * k)} />);
-    out.push(<CastShadow key={`ls${L.x}`} x={L.x} y={y} w={Math.max(6, 14 * k)} h={h} />);
+    const at = floodAt(L.x, y);
+    out.push(<ContactShadow key={`lc${L.x}`} x={L.x} y={y} w={Math.max(10, 30 * k)} at={at} />);
+    out.push(<CastShadow key={`ls${L.x}`} x={L.x} y={y} w={Math.max(6, 14 * k)} h={h} at={at} />);
   }
   for (const x of S1_BOLLARDS) {
     const k = MAP.s1FigureHAt(x) / S.herH;
     const y = S1_PATH.edge - S1_PATH.coping * 0.5 + s1Bend(x) - 2;
-    out.push(<ContactShadow key={`bc${x}`} x={x} y={y} w={22 * k * 0.9} h={6} />);
-    out.push(<CastShadow key={`bs${x}`} x={x} y={y} w={20 * k * 0.8} h={22 * k} />);
+    const at = floodAt(x, y);
+    out.push(<ContactShadow key={`bc${x}`} x={x} y={y} w={22 * k * 0.9} h={6} at={at} />);
+    out.push(<CastShadow key={`bs${x}`} x={x} y={y} w={20 * k * 0.8} h={22 * k} at={at} />);
   }
   // her (from the step-out) and the row: contact at the feet, casts parallel along the light
   if (t >= C.steppingOut) {
@@ -70,7 +77,7 @@ export const S1TowpathShadows: React.FC = () => {
 /** Her contact shadow on the lobby floor while she is behind the glass (no sun reaches inside: contact only). */
 export const S1LobbyContact: React.FC<{x: number; y: number; h: number}> = ({x, y, h}) => (
   <ShadowLayer>
-    <ContactShadow x={x} y={y} w={h * 0.26} k={1.2} />
+    <ContactShadow x={x} y={y} w={h * 0.26} k={1.2} at={floodAt(x, y)} />
   </ShadowLayer>
 );
 
@@ -84,7 +91,15 @@ export const S1BoatStrips: React.FC<{which: 'A' | 'B'}> = ({which}) => {
   const d = `M${xa} ${y - 1}L${xb} ${y - 1}L${xb} ${y + 6}L${xa + 6} ${y + 6}Z`;
   return (
     <ShadowLayer>
-      <Shadow d={d} tint="cast" />
+      <Shadow d={d} tint="cast" at={floodAt((xa + xb) / 2, y)} />
     </ShadowLayer>
   );
 };
+
+/** The near steps' lower band in the shade of something off-screen left (a plane tree on our bank, west of us): one cast
+ *  step with a 12 px soft edge, its edge running along the light (right, a little toward us). Below the caption band. */
+export const S1BankShade: React.FC = () => (
+  <ShadowLayer>
+    <Shadow d="M-40 1590L1120 1680L1120 1960L-40 1960Z" tint="cast" soft={12} at={floodAt(540, 1760)} />
+  </ShadowLayer>
+);

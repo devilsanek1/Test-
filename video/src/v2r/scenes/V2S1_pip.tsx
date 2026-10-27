@@ -18,7 +18,7 @@ import {useTime} from '../../lib/time';
 import {CM} from '../palette';
 import {PipTrack} from '../kit/pip';
 import {POSES} from '../kit/pip/poses';
-import {C, S1_PIP, s1HerHead} from './V2S1_clock';
+import {C, S1_PIP, floodAt, s1HerHead} from './V2S1_clock';
 
 /** The bollard (screen px): top centre = Pip's seat. */
 export const S1_PIP_BOLLARD = {x: S1_PIP.seat[0], top: S1_PIP.seat[1], w: 48, h: 50} as const;
@@ -39,6 +39,8 @@ const bollardCap = (): string => {
 };
 const BODY = bollardBody();
 const CAP = bollardCap();
+/** Its shadows land with the flood at its spot (frame 0: pale shapes only). */
+const LIGHT_AT = floodAt(B.x, BASE);
 
 /** EARS-COVER, strengthened for a back view at phone size (the kit's pose reads small from behind). */
 const EARS_COVER = {...POSES.earsCover, hunch: 0.72, headDrop: 8.5, earDroopA: 72, earDroopB: 72, earSwingA: 150, earSwingB: 150, earFoldA: 0.5, earFoldB: 0.5, trunkCurl: 1.55, scarfLift: 0.4};
@@ -46,14 +48,14 @@ const EARS_COVER = {...POSES.earsCover, hunch: 0.72, headDrop: 8.5, earDroopA: 7
 const Bollard: React.FC = () => (
   <>
     <ShadowLayer>
-      <ContactShadow x={B.x} y={BASE} w={B.w * 0.84} />
-      <CastShadow x={B.x} y={BASE} w={B.w * 0.8} h={B.h} />
+      <ContactShadow x={B.x} y={BASE} w={B.w * 0.84} at={LIGHT_AT} />
+      <CastShadow x={B.x} y={BASE} w={B.w * 0.8} h={B.h} at={LIGHT_AT} />
     </ShadowLayer>
     <Tier tier="environment">
       <Fill d={BODY} color={CM.coatSlate} seed="s1pipBollardBody" />
       <Fill d={CAP} color={CM.coatSlate} seed="s1pipBollardCap" />
     </Tier>
-    <FormShade d={BODY} kind="band" />
+    <FormShade d={BODY} kind="band" at={LIGHT_AT} />
   </>
 );
 
@@ -66,7 +68,7 @@ export const S1Pip: React.FC = () => {
       {t >= S1_PIP.from ? (
         <>
           <ShadowLayer>
-            <ContactShadow x={B.x} y={B.top + 1} w={B.w * 0.9} h={6} />
+            <ContactShadow x={B.x} y={B.top + 1} w={B.w * 0.9} h={6} at={LIGHT_AT} />
           </ShadowLayer>
           <PipTrack
             x={B.x}

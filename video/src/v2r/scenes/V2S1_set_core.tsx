@@ -25,6 +25,10 @@ export function offsetFor(seed: string, k = 1): [number, number] {
   return [Math.cos(a) * m, Math.sin(a) * m * 0.8];
 }
 
+/** Tier C's iron and frames (window frames, railings, lamp posts, bollards, aerials, far panes): a MID slate, half way
+ *  from the slate to the stone shade (L* ~63), so thin dark bars never read as lines in the calm world (CRAFT §b-§c). */
+export const S1_IRON = '#939AAD';
+
 // ---------------------------------------------------------------- CellPaint
 
 type Group = {key: string; color: string; d: string; off: [number, number] | false};
