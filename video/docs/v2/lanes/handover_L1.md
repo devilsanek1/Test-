@@ -88,3 +88,10 @@ figures at 216 px: a lighter backing behind x 40-160, y 930-1060); (4) review fi
 -> fix rounds (`<scratchpad>/tools/critics.js`: the brief's prompt + standards / motion / completeness, 2 agents at a time);
 (6) the six-viewer cold read once (`<scratchpad>/tools/coldread.js`, args {dir: <review>/coldread}); (7) report_L1.md.
 Budget (orchestrator 14:34): <= 2 agents at a time, <= 2 critic rounds, shot-only 0.5-scale renders, one cold read.
+**Resume plan as tightened by the orchestrator (14:58 / 15:01 messages, they override the plan above):** ONE agent at a time
+(steps first, then pip); ONE combined critic round (brief + standards + motion + completeness in one agent) -> one fix pass
+-> report (a second round only if a must breaks the story); the cold read = ONE cold viewer (the orchestrator runs the
+whole-film read); no polling. Style decisions to fold in: map `S1_SHEET.seatedHeadPx.near` is now [110, 140] (the whole near
+back <= ~140 px wide, head ~55-65); `BOTTOM_THIRD.V2S1` drops the "low bun with a mustard scarf" (her look-alike): a knitted
+hat instead; S1's window switching never more than 3 flashes in any 1 s; the kit's S1Seated / NearBack cap lands with
+report_KIT.md (pull before the fix pass).
