@@ -74,8 +74,13 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   cost_usd + workflow tokens); measured ~$350 in the helpers' first 69 min (~$300/h); QA lane told to wrap up; every lane
   gets a finish-first budget (acceptance bar, at most 2 critic rounds, no full-film renders); the owner's % reading calibrates.
   -> rule: Process (the weekly limit is the real budget).
+- 2026-10-27 ~15:05 UTC, plan usage screenshot (session limit 89 %, resets 18:30; weekly 58 %, resets Mon 10:00): "make sure that if we do hit the current
+  session limit we are not losing any progress" -> controlled pause of every lane and local workflow (all pushed, handovers, resume scheduled 18:33 UTC).
+  Then: "before you restart the work read the updated overall stylistic instructions and the guideline from the repo" -> the playbook's new
+  clean / light / hierarchy / flowing-story rules integrated into STYLE.md + a clean pen for v2r (15:40 UTC).
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
   the caption and the pinned comment as text plus a URL people can copy; links in captions aren't clickable; a
   link-in-bio sources page later. Waiting for the owner's yes to make it a default.
+
