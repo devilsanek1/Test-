@@ -69,3 +69,6 @@
 | 2026-10-27 | `v2r-direction-wf_6b4f904a-393.js` | 7 | 0 | four judges -> director -> devil -> revision: `video/docs/v2/TREATMENT.md` (One Small Window) |
 | 2026-10-27 | `v2r-w0 / sound-draft / w1a / w1b` | 9 | 0 | (running) shell + palette + map; new bed + SFX; cast + new Pip; canal + Arlington kits |
 | 2026-10-27 | `v3-g5b-assemble-wf_180b3ca4-a34.js` | 3 | 0 | `context/agent_reports/2026-10-27_v3-g5b-assemble.md` |
+| 2026-10-27 | `retro-v3-craft-and-process-wf_ae580f04-3cc.js` | 10 | 0 | `context/agent_reports/2026-10-27_retro-v3.md` |
+| 2026-10-27 | `v3-rework-design-and-pilot-wf_b112ce1c-25d.js` (run wf_4299366f-37e, max effort) | 10 | 0 | (running) |
+| 2026-10-27 | `docs-coherence-pass-wf_1c51fee9-71b.js` | 5 | 0 | (running) |
