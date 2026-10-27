@@ -1,17 +1,23 @@
 // O1_dress (lane L1-desk): the extra dressing and life of HER desk insert (O1 + P12), on top of the kit's desk (kit/Desk:
 // DeskBack + the front pieces), so the approved style frame (desk_A.png) becomes a full, lived-in, LIVING corner:
 //   WallDress     above the caption band: a framed print and a wall clock (its second hand ticks)
+//   FairyLights   swagged under the wall shelf; ShelfTendril: a long trailing stem off the shelf's pot that sways
+//                 (both drawn by O1_set raised with the shelf, so P12's credit tab sits on bare wall)
 //   TownLines     the town's bare ink lines in the window strip on frame 0 (the kit town is fills only: a far plane),
 //                 gone the frame the window's colour lands
-//   UnderBox      what the box stood on / behind: a closed folder with a label, a succulent (revealed when the box goes)
-//   DeskBits      the desk's front-left: her reading glasses, her phone; the back-right: a pencil cup
-//   UnderDesk     the knee space: a tote bag, a power strip and its cables
+//   UnderBox      what the box stood on / behind: a closed folder with a label, papers sticking out, a sticky note,
+//                 a paperclip, a coffee ring; a succulent (revealed when the box goes)
+//   DeskBits      the desk's front-left: her reading glasses; the back-right: a pencil cup
+//   Phone         her phone (front-left): it buzzes and lights up with a notification (O1 between two years, P12 on
+//                 "Google.")
+//   UnderDesk     the knee space: a tote bag, her slippers, a stack of magazines, a power strip, its cables, a
+//                 charger LED that blinks
 //   Moth          a pale moth circling under the lamp (ambient life, always on, sized to read on a phone)
 // Canvas px at camera rest (the style frame's numbers). Kit Ink / Fill: inside O1's BuildWave they build by position.
 import React from 'react';
 import {blob, ellipse, hline, line, poly, polyPath, rect, roundRect, smooth} from '../../../lib/sketch';
-import {useTime} from '../../../lib/time';
-import {CC, DESK, Fill, FramedPicture, Ink, Live, loopT, Placed, PotPlant, type Pt, stepT, useWaveColour, W, WallClock} from '../kit';
+import {prog, useTime} from '../../../lib/time';
+import {CC, DESK, Fill, FramedPicture, Ink, leafD, Live, loopT, Placed, PotPlant, type Pt, stepT, Sway, useWaveColour, W, WallClock} from '../kit';
 
 // ---------------------------------------------------------------- the wall above the caption band
 
@@ -51,6 +57,22 @@ export const FairyLights: React.FC = () => {
         );
       })}
     </>
+  );
+};
+
+/** A long trailing stem off the wall shelf's pot (style-frame px, drawn raised with the shelf): it sways visibly
+ *  (~6 deg, 0.33 Hz), its leaves stepping with it; it ends above y ~225 once raised (the credit tab starts at 236). */
+export const ShelfTendril: React.FC = () => {
+  const stem: Pt[] = [[334, 172], [348, 196], [344, 226], [360, 250], [356, 272]];
+  const leaves: [number, number, number][] = [[346, 192, 10], [345, 214, 170], [350, 236, 20], [358, 254, 160], [356, 270, 70]];
+  return (
+    <Sway x={334} y={172} amp={6} hz={0.33} seed="o1/tendril">
+      <Ink d={smooth(stem)} width={W.far} />
+      {leaves.map(([x, y, deg], i) => (
+        <Fill key={i} d={leafD(x, y, 22, deg)} color={i % 2 ? CC.leafDark : CC.leaf} offset={false} />
+      ))}
+      <Ink d={leaves.map(([x, y, deg]) => leafD(x, y, 22, deg)).join('')} width={W.hair} open={0.3} />
+    </Sway>
   );
 };
 
@@ -112,6 +134,19 @@ export const UnderBox: React.FC = () => {
     [198, 983],
     [72, 988],
   ];
+  const sheets: Pt[][] = [
+    [[318, 852], [344, 856], [346, 944], [322, 940]],
+    [[320, 952], [338, 954], [340, 1010], [324, 1008]],
+    [[40, 1046], [196, 1040], [198, 1056], [42, 1062]],
+  ];
+  const noteC: Pt = [262, 902];
+  const rotq = (p: Pt, deg: number): Pt => {
+    const a = (deg * Math.PI) / 180;
+    return [noteC[0] + (p[0] - noteC[0]) * Math.cos(a) - (p[1] - noteC[1]) * Math.sin(a), noteC[1] + (p[0] - noteC[0]) * Math.sin(a) + (p[1] - noteC[1]) * Math.cos(a)];
+  };
+  const note: Pt[] = ([[noteC[0] - 36, noteC[1] - 34], [noteC[0] + 36, noteC[1] - 34], [noteC[0] + 36, noteC[1] + 22], [noteC[0] + 24, noteC[1] + 34], [noteC[0] - 36, noteC[1] + 34]] as Pt[]).map((p) => rotq(p, 7));
+  const noteCurl: Pt[] = ([[noteC[0] + 36, noteC[1] + 22], [noteC[0] + 24, noteC[1] + 34], [noteC[0] + 22, noteC[1] + 20]] as Pt[]).map((p) => rotq(p, 7));
+  const clip = `M58 834L58 866Q58 874 66 874Q74 874 74 866L74 830Q74 822 67 822Q61 822 61 830L61 860`;
   return (
     <>
       <Fill d={polyPath([[18, 852], [332, 838], [340, 1046], [12, 1060]])} color={CC.deskShade} offset={false} />
@@ -122,6 +157,18 @@ export const UnderBox: React.FC = () => {
       <Ink d={poly(folder, {closed: true, seed: 'o1/folderI', over: 'small'})} width={W.mid} />
       <Fill d={polyPath(label)} color={CC.paper} offset={false} />
       <Ink d={poly(label, {closed: true, seed: 'o1/labelI', over: [0, 0]}) + line(84, 961, 170, 958, {seed: 'o1/lab1', over: [0, 0]}) + line(84, 974, 140, 972, {seed: 'o1/lab2', over: [0, 0]})} width={W.hair} />
+      {/* papers sticking out of it (right side and bottom), a coffee ring, a paperclip on its top edge, a sticky note */}
+      {sheets.map((q, i) => (
+        <React.Fragment key={i}>
+          <Fill d={polyPath(q)} color={CC.paper} offset={false} />
+          <Ink d={poly(q.slice(1, 3), {seed: `o1/fsh${i}`, over: [0, 0]})} width={W.far} />
+        </React.Fragment>
+      ))}
+      <Ink d={ellipse(236, 1004, 36, 13, {seed: 'o1/ring', wobble: 0.04})} width={3.2} color={CC.boxIn} open={0.22} taper={false} />
+      <Ink d={clip} width={W.far} color={CC.anchor} taper={false} />
+      <Fill d={polyPath(note)} color={CC.cheek} seed="o1/note" />
+      <Fill d={polyPath(noteCurl)} color={CC.catEar} offset={false} />
+      <Ink d={poly(note, {closed: true, seed: 'o1/noteI', over: [0, 0]}) + line(noteC[0] - 22, noteC[1] - 8, noteC[0] + 18, noteC[1] - 4, {seed: 'o1/n1', over: [0, 0]}) + line(noteC[0] - 20, noteC[1] + 8, noteC[0] + 8, noteC[1] + 11, {seed: 'o1/n2', over: [0, 0]})} width={W.hair} />
       <PotPlant x={210} y={706} w={58} h={48} kind="succulent" seed="o1/succ" />
     </>
   );
@@ -129,7 +176,7 @@ export const UnderBox: React.FC = () => {
 
 // ---------------------------------------------------------------- the desk's other things
 
-/** Her reading glasses and her phone (front-left), the pencil cup (back-right, by the lamp). */
+/** Her reading glasses (front-left), the pencil cup (back-right, by the lamp). */
 export const DeskBits: React.FC = () => {
   // glasses: two lenses, the bridge, the folded temples (lying on the desk, seen from above at 3/4)
   const L1: Pt = [118, 1168];
@@ -140,7 +187,6 @@ export const DeskBits: React.FC = () => {
       <Ink d={ellipse(c[0], c[1], 40, 28, {seed: `o1/glI${k}`})} width={W.mid} color={CC.anchor} />
     </>
   );
-  // phone: a dark slab lying at an angle, its screen one step lighter, a camera dot
   // pencil cup by the lamp (back-right): a cylinder, pencils, a ruler, scissors' rings
   const cx = 800;
   const top = 646;
@@ -153,13 +199,6 @@ export const DeskBits: React.FC = () => {
       <Ink d={smooth([[L1[0] + 38, L1[1] - 6], [166, L1[1] - 14], [L2[0] - 38, L2[1] - 8]])} width={W.mid} color={CC.anchor} />
       <Ink d={line(L1[0] - 38, L1[1] - 10, L1[0] + 30, L1[1] - 30, {seed: 'o1/tmp1', over: [0, 0]}) + line(L2[0] + 38, L2[1] - 8, L2[0] - 26, L2[1] - 30, {seed: 'o1/tmp2', over: [0, 0]})} width={W.mid} color={CC.anchor} />
       <Ink d={glintPath(L1[0] - 12, L1[1] - 8) + glintPath(L2[0] - 12, L2[1] - 8)} width={W.hair} color={CC.paper} />
-      <Placed x={22} y={1232} s={0.78} rot={-6}>
-        <Fill d={roundRect(-6, 8, 104, 176, 18)} color={CC.deskShade} offset={false} />
-        <Fill d={roundRect(-12, 0, 104, 176, 18)} color={CC.anchor} seed="o1/phone" />
-        <Fill d={roundRect(-4, 12, 88, 152, 10)} color={CC.laptopDeck} offset={false} />
-        <Ink d={roundRect(-12, 0, 104, 176, 18, {seed: 'o1/phoneI'})} width={W.mid} />
-        <Fill d={blob(40, 6, 4, 3, {seed: 'o1/phcam'})} color={CC.ink} offset={false} />
-      </Placed>
       {/* the pencil cup */}
       <Fill d={blob(cx + 36, bot + 4, 44, 9, {seed: 'o1/pcsh'})} color={CC.deskShade} offset={false} />
       {[
@@ -179,6 +218,38 @@ export const DeskBits: React.FC = () => {
       <Ink d={`M${cx - 26} ${top}L${cx - 22} ${bot - 6}Q${cx - 20} ${bot} ${cx - 12} ${bot}L${cx + 30} ${bot}Q${cx + 38} ${bot} ${cx + 38} ${bot - 6}L${cx + 42} ${top}` + ellipse(cx + 8, top, 34, 7, {seed: 'o1/cupRI'})} width={W.far} />
       <Ink d={hline(cx - 22, cx + 40, top + 22, {seed: 'o1/cupB', over: [0, 0]})} width={W.hair} />
     </>
+  );
+};
+
+/** Her phone lying at an angle (front-left): a dark slab, its screen one step lighter. At `buzzAt` it buzzes (0.42 s of
+ *  stepped jitter with buzz ticks either side) and lights up for 1.5 s with a notification card (no logos). */
+export const Phone: React.FC<{buzzAt: number}> = ({buzzAt}) => {
+  const t = useTime();
+  const d = t - buzzAt;
+  const buzzing = d >= 0 && d < 0.42;
+  const lit = d >= 0 && d < 1.5;
+  const jig = buzzing ? (Math.floor(d * 30) % 2 ? 3 : -3) : 0;
+  const card = lit ? prog(d, 0.04, 0.12) : 0;
+  return (
+    <Placed x={22 + jig} y={1232} s={0.78} rot={-6}>
+      <Fill d={roundRect(-6, 8, 104, 176, 18)} color={CC.deskShade} offset={false} />
+      <Fill d={roundRect(-12, 0, 104, 176, 18)} color={CC.anchor} seed="o1/phone" />
+      <Fill d={roundRect(-4, 12, 88, 152, 10)} color={lit ? CC.screen : CC.laptopDeck} offset={false} />
+      {card > 0 ? (
+        <>
+          <Fill d={roundRect(2, 34, 76 * card, 44, 8)} color={CC.paper} offset={false} />
+          {card >= 1 ? (
+            <>
+              <Fill d={blob(14, 48, 6, 6, {seed: 'o1/phapp'})} color={CC.trim} offset={false} />
+              <Ink d={line(26, 48, 66, 48, {seed: 'o1/phl1', over: [0, 0]}) + line(12, 64, 56, 64, {seed: 'o1/phl2', over: [0, 0]})} width={W.far} taper={false} />
+            </>
+          ) : null}
+        </>
+      ) : null}
+      <Ink d={roundRect(-12, 0, 104, 176, 18, {seed: 'o1/phoneI'})} width={W.mid} />
+      <Fill d={blob(40, 6, 4, 3, {seed: 'o1/phcam'})} color={CC.ink} offset={false} />
+      {buzzing ? <Ink d={`M106 40Q116 52 106 64M116 32Q130 52 116 72M-26 104Q-36 116 -26 128M-36 96Q-50 116 -36 136`} width={W.mid} taper={false} /> : null}
+    </Placed>
   );
 };
 
@@ -217,10 +288,40 @@ export const UnderDesk: React.FC = () => {
     [332, 1771],
     [198, 1777],
   ];
-  // the charger's LED: a slow pulse (two flat steps, never a fade)
-  const led = loopT(stepT(t, 6), 2.4, 0.3) < 1.2 ? CC.lit : CC.glow;
+  // the charger's LED: blinks (on 0.5 s / off 0.5 s, flat steps, never a fade)
+  const led = loopT(t, 1.0, 0.3) < 0.5 ? CC.lit : CC.anchor;
+  // her slippers (the knee space, left of where the paper will hang) and a stack of magazines (right)
+  const slipper = (cx: number, cy: number, rot: number, k: string) => {
+    const a = (rot * Math.PI) / 180;
+    const R = (p: Pt): Pt => [cx + p[0] * Math.cos(a) - p[1] * Math.sin(a), cy + p[0] * Math.sin(a) + p[1] * Math.cos(a)];
+    const sole = smooth(([[-52, 4], [-48, -12], [-10, -18], [40, -16], [56, -4], [44, 10], [-8, 14], [-46, 12]] as Pt[]).map(R), {closed: true});
+    const upper = smooth(([[4, -14], [18, -30], [44, -26], [56, -8], [44, 6], [10, 4]] as Pt[]).map(R), {closed: true});
+    const lining = smooth(([[-40, 0], [-34, -8], [-8, -10], [2, -2], [-12, 6], [-36, 6]] as Pt[]).map(R), {closed: true});
+    return (
+      <React.Fragment key={k}>
+        <Fill d={sole} color={CC.rugEdge} seed={`o1/slS${k}`} />
+        <Fill d={lining} color={CC.rugBand} offset={false} />
+        <Fill d={upper} color={CC.rug} seed={`o1/slU${k}`} />
+        <Ink d={sole + upper} width={W.far} />
+      </React.Fragment>
+    );
+  };
+  const mags: [number, number, number, string][] = [
+    [586, 1752, 150, CC.books[1]],
+    [596, 1732, 136, CC.paperEdge],
+    [580, 1714, 146, CC.books[4]],
+    [594, 1696, 128, CC.books[0]],
+  ];
   return (
     <>
+      {slipper(410, 1750, -4, 'a')}
+      {slipper(500, 1762, 6, 'b')}
+      {mags.map(([x, y, w, c], i) => (
+        <React.Fragment key={`m${i}`}>
+          <Fill rect={[x, y, w, 18]} color={c} seed={`o1/mag${i}`} />
+          <Ink d={rect(x, y, w, 18, {seed: `o1/magI${i}`, over: 'small'}) + line(x + 8, y + 9, x + w * 0.5, y + 9, {seed: `o1/magL${i}`, over: [0, 0]})} width={W.hair} />
+        </React.Fragment>
+      ))}
       <Ink d={smooth([[200, 1766], [176, 1786], [110, 1796], [40, 1790], [-20, 1796]]) + smooth([[318, 1752], [300, 1728], [262, 1716], [236, 1700]])} width={5} color={CC.cable} taper={false} />
       <Fill d={polyPath([[28, 1780], [254, 1772], [262, 1790], [24, 1798]])} color={CC.wallDeep} offset={false} />
       {[
@@ -242,7 +343,7 @@ export const UnderDesk: React.FC = () => {
         <Fill key={i} rect={[x, 1745, 18, 14]} color={CC.anchor} offset={false} />
       ))}
       <Live c={[314, 1760]}>
-        <circle cx={314} cy={1760} r={5} fill={led} />
+        <circle cx={314} cy={1760} r={7} fill={led} stroke={CC.ink} strokeWidth={1.6} />
       </Live>
     </>
   );

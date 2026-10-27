@@ -1,7 +1,8 @@
 // O1 (lane L1-desk): the HOOK, 0-6.12. HOME BASE desk, COZY, INSERT high 3/4, PULL OUT 1.05 -> 1.00 (ease-in).
 // She quit: her sleeve drops her GOOGLE badge in a box and carries the box out; a highlighter marks the clause, in words
 // ("no criticizing / Google"); then her contract runs past its own end and pours off the desk, a year every few rows,
-// faster and faster. Her cat watches every beat. The set and every beat live in O1_set.tsx (shared with P12);
+// faster and faster (2040 / 2050 / 2060 / 2070 / 2080 at shrinking intervals), out past the frame's bottom edge. Her
+// cat watches every beat (its head turns, dips and leans). The set and every beat live in O1_set.tsx (shared with P12);
 // t < 0 = the bare-line state the loop reveals under P13's un-build (frame 0's drawing, drawing on).
 import React from 'react';
 import {World} from '../../../lib/World';
