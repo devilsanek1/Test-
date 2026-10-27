@@ -20,6 +20,7 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
 import {At, b, fillAt, Pt} from './util';
 import {DataCenter, DataCenterProps, NightSky, Snowfall, TownBand} from './Outside';
+import {tiered} from '../../../lib/tier';
 
 const W_MID = 3.4;
 const W_THIN = 2.2;
@@ -110,7 +111,7 @@ export type NookProps = {
   children?: React.ReactNode;
 };
 
-export const Nook: React.FC<NookProps> = ({variant = 'pov', layout, frost = true, lampOn = true, at, seed = 'nook', children}) => {
+const NookBody: React.FC<NookProps> = ({variant = 'pov', layout, frost = true, lampOn = true, at, seed = 'nook', children}) => {
   const L: NookLayout = {...NOOK_LAYOUT[variant], ...(layout ?? {})};
   const t = useTime();
   return (
@@ -129,12 +130,13 @@ export const Nook: React.FC<NookProps> = ({variant = 'pov', layout, frost = true
     </>
   );
 };
+export const Nook = tiered('support', {tone: EMBER.wall}, NookBody);
 
 /** The home base's ONE window alone (reveal, frame, the glass with the outside as children, mullion, latch, frost, the
  *  inside sill), in the variant's canvas px, without the wall, desk or lamp: for the desk shots that hang the same window
  *  behind their own desk through an XG (S7, S8, S12, S16: scenes/desk_window.tsx). A `layout.glass` with a lower top
  *  crops the outside's top (the window seen closer, under the caption band). */
-export const NookWindow: React.FC<{variant?: 'pov' | 'objective'; layout?: Partial<NookLayout>; frost?: boolean; at?: At; seed?: string; children?: React.ReactNode}> = ({variant = 'pov', layout, frost = true, at, seed = 'nook', children}) => {
+const NookWindowBody: React.FC<{variant?: 'pov' | 'objective'; layout?: Partial<NookLayout>; frost?: boolean; at?: At; seed?: string; children?: React.ReactNode}> = ({variant = 'pov', layout, frost = true, at, seed = 'nook', children}) => {
   const L: NookLayout = {...NOOK_LAYOUT[variant], ...(layout ?? {})};
   const t = useTime();
   return (
@@ -143,6 +145,7 @@ export const NookWindow: React.FC<{variant?: 'pov' | 'objective'; layout?: Parti
     </WindowView>
   );
 };
+export const NookWindow = tiered('support', {tone: EMBER.trim}, NookWindowBody);
 
 // ---------------------------------------------------------------- the outside through the window (board layouts)
 
@@ -157,7 +160,7 @@ export type NookOutsideProps = {
 /** The board's view: the dusk-blue sky, the horizon with two snow-capped houses, the data center ~4x their height on
  *  it, falling snow. pov: horizon 950, the data center x 322-758 (w 436); objective: horizon 912, a far silhouette
  *  x 591-961 (w 371) with its 3 roof units. */
-export const NookOutside: React.FC<NookOutsideProps> = ({variant = 'pov', dc, snow = true, at}) => {
+const NookOutsideBody: React.FC<NookOutsideProps> = ({variant = 'pov', dc, snow = true, at}) => {
   const L = NOOK_LAYOUT[variant];
   const g = L.glass;
   const pov = variant === 'pov';
@@ -172,6 +175,7 @@ export const NookOutside: React.FC<NookOutsideProps> = ({variant = 'pov', dc, sn
     </>
   );
 };
+export const NookOutside = tiered('environment', {bg: EMBER.sky}, NookOutsideBody);
 
 // ---------------------------------------------------------------- room pieces
 
@@ -406,7 +410,7 @@ const Desk: React.FC<{L: NookLayout; lampOn: boolean; at?: At; seed: string}> = 
 
 /** The anglepoise lamp: anchor-dark rod and shade, the lit mouth in the pool's core colour. Exported for S7/S16
  *  (the shade cut by the left edge). */
-export const Lamp: React.FC<{pose: LampPose; lit?: boolean; at?: At; seed?: string}> = ({pose, lit = true, at, seed = 'lamp'}) => {
+const LampBody: React.FC<{pose: LampPose; lit?: boolean; at?: At; seed?: string}> = ({pose, lit = true, at, seed = 'lamp'}) => {
   const {base, elbow, head, rot, scale = 1} = pose;
   const s = scale;
   const rodD = `M${base[0]} ${base[1] - 10}L${elbow[0]} ${elbow[1]}L${head[0]} ${head[1]}`;
@@ -429,10 +433,11 @@ export const Lamp: React.FC<{pose: LampPose; lit?: boolean; at?: At; seed?: stri
     </>
   );
 };
+export const Lamp = tiered('support', {tone: EMBER.anchor}, LampBody);
 
 /** The steaming mug (a sign of care; steam = a small slow loop). (x, top) = its left side and rim. `steam={false}` drops
  *  the ink steam lines (S13: ink lines over the navy glass read as wires; the lane draws light puffs instead). */
-export const Mug: React.FC<{x: number; top: number; t?: number; at?: At; seed?: string; w?: number; steam?: boolean}> = ({x, top, t: tIn, at, seed = 'mug', w = 98, steam: steamOn = true}) => {
+const MugBody: React.FC<{x: number; top: number; t?: number; at?: At; seed?: string; w?: number; steam?: boolean}> = ({x, top, t: tIn, at, seed = 'mug', w = 98, steam: steamOn = true}) => {
   const tNow = useTime();
   const t = tIn ?? tNow;
   const x0 = x;
@@ -457,9 +462,10 @@ export const Mug: React.FC<{x: number; top: number; t?: number; at?: At; seed?: 
     </>
   );
 };
+export const Mug = tiered('environment', {tone: EMBER.mug}, MugBody);
 
 /** An open notebook + pencil in the foreground, cut by the left edge (POV, bottom left). */
-export const Notebook: React.FC<{at?: At; seed?: string; dy?: number}> = ({at, seed = 'nb', dy = 0}) => {
+const NotebookBody: React.FC<{at?: At; seed?: string; dy?: number}> = ({at, seed = 'nb', dy = 0}) => {
   const o = (p: Pt[]): Pt[] => p.map(([x, y]) => [x, y + dy]);
   const L = o([[-60, 1600], [150, 1580], [160, 1830], [-50, 1850]]);
   const R = o([[150, 1580], [352, 1606], [348, 1852], [160, 1830]]);
@@ -477,3 +483,4 @@ export const Notebook: React.FC<{at?: At; seed?: string; dy?: number}> = ({at, s
     </>
   );
 };
+export const Notebook = tiered('support', {tone: EMBER.paper}, NotebookBody);

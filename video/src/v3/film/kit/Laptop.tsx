@@ -11,6 +11,7 @@ import {glint, line, poly, polyPath} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
 import {At, b, fillAt, lerp, Pt, quadPt, Show, Txt, W} from './util';
+import {tiered} from '../../../lib/tier';
 
 export type LaptopProps = {
   /** Centre of the hinge line (canvas px). */
@@ -59,7 +60,7 @@ export function laptopGeo(x: number, y: number, w: number, lidH = 0.64) {
   return {H, D, lid, scr, deck, edge, screenC: quadPt(scr, 0.5, 0.5), keysC: quadPt(deck, 0.5, 0.42)};
 }
 
-export const Laptop: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = 'old', screen, taped, label, labelAt, rot = 0, at, seed = 'laptop', ink = 3.4, lidOnly, children}) => {
+const LaptopBody: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = 'old', screen, taped, label, labelAt, rot = 0, at, seed = 'laptop', ink = 3.4, lidOnly, children}) => {
   const g = laptopGeo(x, y, w, lidH);
   const isNew = variant === 'new';
   const scr = screen ?? (isNew ? EMBER.newScreen : EMBER.anchor);
@@ -144,6 +145,7 @@ export const Laptop: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = '
   );
   return rot ? <XG m={mat.about(mat.rotate(rot), x, y)}>{body}</XG> : body;
 };
+export const Laptop = tiered('subject', {tone: EMBER.hero}, LaptopBody);
 
 /** The label badge over a laptop ("BETTER"): a small warm-white card with ink lettering, sized from the laptop. */
 const LaptopLabel: React.FC<{x: number; y: number; w: number; text: string; at?: At; seed: string}> = ({x, y, w, text, at, seed}) => {
@@ -171,7 +173,7 @@ const LaptopLabel: React.FC<{x: number; y: number; w: number; text: string; at?:
 
 /** THE laptop's screen as a desktop (S16's; S12 shows the same laptop, so the same desktop) (never a landscape: it must not read as a window): a document window with a
  *  dusk-blue title bar and lines, a dock row of app squares, a cursor. Screen-space canvas px over the lid's quad. */
-export const ScreenDesktop: React.FC<{scr: [Pt, Pt, Pt, Pt]}> = ({scr}) => {
+const ScreenDesktopBody: React.FC<{scr: [Pt, Pt, Pt, Pt]}> = ({scr}) => {
   const P = (u: number, v: number) => quadPt(scr, u, v);
   const q = (u0: number, v0: number, u1: number, v1: number) => {
     const pts = [P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)];
@@ -195,3 +197,4 @@ export const ScreenDesktop: React.FC<{scr: [Pt, Pt, Pt, Pt]}> = ({scr}) => {
     </>
   );
 };
+export const ScreenDesktop = tiered('subject', {tone: EMBER.frost}, ScreenDesktopBody);

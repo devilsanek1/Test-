@@ -16,6 +16,7 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
 import {At, b, fillAt, Pt} from './util';
 import {MemoryStick} from './Memory';
+import {tiered} from '../../../lib/tier';
 
 export const YOU = {hair: EMBER.hair, skin: EMBER.skin, sweater: EMBER.sleeve, rib: EMBER.sweaterRib, jeans: EMBER.jeans, shoe: EMBER.shoe, chair: EMBER.chair} as const;
 
@@ -50,7 +51,7 @@ const faceAt = (t: number, f: YouFrontProps['face']): Face => {
   return cur;
 };
 
-export const YouFront: React.FC<YouFrontProps> = ({x, y: y0, head: H = 250, face, look = 0, hands, at, seed = 'you', ink = 4.8, children}) => {
+const YouFrontBody: React.FC<YouFrontProps> = ({x, y: y0, head: H = 250, face, look = 0, hands, at, seed = 'you', ink = 4.8, children}) => {
   const t = useTime();
   const bob = Math.sin(t * 1.9) * 1.5; // breathing
   const y = y0 + bob;
@@ -213,6 +214,7 @@ export const YouFront: React.FC<YouFrontProps> = ({x, y: y0, head: H = 250, face
     </>
   );
 };
+export const YouFront = tiered('subject', {tone: EMBER.sleeve}, YouFrontBody);
 
 // ---------------------------------------------------------------- seated, 3/4 back (S13)
 
@@ -231,7 +233,7 @@ export type YouSeatedProps = {
   headRot?: number;
 };
 
-export const YouSeated: React.FC<YouSeatedProps> = ({x, y, head: H = 92, floorY, at, seed = 'youS', ink = 4.8, headRot = 0}) => {
+const YouSeatedBody: React.FC<YouSeatedProps> = ({x, y, head: H = 92, floorY, at, seed = 'youS', ink = 4.8, headRot = 0}) => {
   const t = useTime();
   const breathe = Math.sin(t * 1.6) * 1.2;
   const floor = floorY ?? y + H * 1.45;
@@ -312,6 +314,7 @@ export const YouSeated: React.FC<YouSeatedProps> = ({x, y, head: H = 92, floorY,
     </>
   );
 };
+export const YouSeated = tiered('subject', {tone: EMBER.sleeve}, YouSeatedBody);
 
 // ---------------------------------------------------------------- standing back view, waist-up (S9 start)
 
@@ -334,7 +337,7 @@ export type YouBackProps = {
 /** You from behind, 3/4, head turned right (the back of the head, the right ear and a sliver of cheek: no face), the
  *  left arm down, the right arm raised holding something up beside the head. The torso runs ~6 heads down (the frame
  *  cuts it at the hips). Same cast as YouSeated: dark hair, rust sweater with rib collar and cuff, warm skin. */
-export const YouBack: React.FC<YouBackProps> = ({x, y: y0, head: H = 184, hand, at, seed = 'youB', ink = 4.8, children}) => {
+const YouBackBody: React.FC<YouBackProps> = ({x, y: y0, head: H = 184, hand, at, seed = 'youB', ink = 4.8, children}) => {
   const t = useTime();
   const y = y0 + Math.sin(t * 1.7) * 1.2; // breathing
   const inner = Math.max(2.2, ink * 0.65);
@@ -428,6 +431,7 @@ export const YouBack: React.FC<YouBackProps> = ({x, y: y0, head: H = 184, hand, 
     </>
   );
 };
+export const YouBack = tiered('subject', {tone: EMBER.sleeve}, YouBackBody);
 
 // ---------------------------------------------------------------- tiny, standing back view (S9's landing)
 
@@ -445,7 +449,7 @@ export type YouTinyProps = {
   ink?: number;
 };
 
-export const YouTiny: React.FC<YouTinyProps> = ({x, y, h = 86, stick = true, stickW = 46, at, seed = 'youT', ink = 2.2}) => {
+const YouTinyBody: React.FC<YouTinyProps> = ({x, y, h = 86, stick = true, stickW = 46, at, seed = 'youT', ink = 2.2}) => {
   const u = h / 86;
   const headR = 9.5 * u;
   const headC: Pt = [x, y - h + headR];
@@ -473,6 +477,7 @@ export const YouTiny: React.FC<YouTinyProps> = ({x, y, h = 86, stick = true, sti
     </>
   );
 };
+export const YouTiny = tiered('subject', {tone: EMBER.sleeve}, YouTinyBody);
 
 /** A sweater-sleeve rib (for lanes drawing a cut-off arm, e.g. a hand reaching in). */
 export const youColors = YOU;

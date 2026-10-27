@@ -12,10 +12,11 @@ import {line} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
 import {STICK_RATIO} from './Memory';
+import {tiered} from '../../../lib/tier';
 
 export type StickDetailProps = {x: number; y: number; w: number; rot?: number; chips?: number; seed?: string};
 
-export const StickDetail: React.FC<StickDetailProps> = ({x, y, w, rot = 0, chips = 4, seed = 'stickD'}) => {
+const StickDetailBody: React.FC<StickDetailProps> = ({x, y, w, rot = 0, chips = 4, seed = 'stickD'}) => {
   const h = w * STICK_RATIO;
   const x0 = -w / 2;
   const y0 = -h / 2;
@@ -84,3 +85,4 @@ export const StickDetail: React.FC<StickDetailProps> = ({x, y, w, rot = 0, chips
     </XG>
   );
 };
+export const StickDetail = tiered('subject', {tone: EMBER.board}, StickDetailBody);

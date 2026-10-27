@@ -20,6 +20,7 @@ import {EMBER} from '../palette';
 import {At, b, fillAt, Pt, Show, Txt, W} from './util';
 import {stepped, sway, sway2, windowLit} from './idle';
 import {Smoke, Steam} from './Weather';
+import {tiered} from '../../../lib/tier';
 
 export type HouseKind = 'cottage' | 'terrace' | 'block' | 'mansard' | 'shop';
 
@@ -52,7 +53,7 @@ const HEIGHT: Record<HouseKind, number> = {cottage: 0.8, terrace: 1.25, block: 1
 
 /** One house of the town at blue hour: body, snowy roof, warm windows (some lit, switching), chimney with smoke,
  *  antenna and dish; five distinct types. */
-export const TownHouse: React.FC<TownHouseProps> = ({x, y, w, h: hIn, kind = 'cottage', color = EMBER.roofs, litFrac = 0.6, smoke, antenna, dish, sign = 'CAFE', far, seed = 'house', at, ink}) => {
+const TownHouseBody: React.FC<TownHouseProps> = ({x, y, w, h: hIn, kind = 'cottage', color = EMBER.roofs, litFrac = 0.6, smoke, antenna, dish, sign = 'CAFE', far, seed = 'house', at, ink}) => {
   const t = useTime();
   const h = hIn ?? w * HEIGHT[kind];
   const iw = far ? 0 : ink ?? (w >= 120 ? W.far : W.hair);
@@ -171,10 +172,11 @@ export const TownHouse: React.FC<TownHouseProps> = ({x, y, w, h: hIn, kind = 'co
     </>
   );
 };
+export const TownHouse = tiered('environment', {bg: EMBER.sky}, TownHouseBody);
 
 /** A row of varied town houses (never one stamped shape): kinds cycle through a seeded shuffle of all five, widths
  *  +-15 %, heights stepped, 30 % overlap allowed by `gap` < 0. */
-export const TownRow: React.FC<{x0: number; x1: number; y: number; w?: number; gap?: number; kinds?: HouseKind[]; color?: string; far?: boolean; seed?: string; at?: At; litFrac?: number}> = ({x0, x1, y, w = 70, gap = -4, kinds = ['cottage', 'terrace', 'block', 'mansard', 'shop'], color, far, seed = 'row', at, litFrac}) => {
+const TownRowBody: React.FC<{x0: number; x1: number; y: number; w?: number; gap?: number; kinds?: HouseKind[]; color?: string; far?: boolean; seed?: string; at?: At; litFrac?: number}> = ({x0, x1, y, w = 70, gap = -4, kinds = ['cottage', 'terrace', 'block', 'mansard', 'shop'], color, far, seed = 'row', at, litFrac}) => {
   const list = useMemo(() => {
     const r = rng(`trow/${seed}`);
     const order = r.shuffle(kinds);
@@ -197,12 +199,13 @@ export const TownRow: React.FC<{x0: number; x1: number; y: number; w?: number; g
     </>
   );
 };
+export const TownRow = tiered('environment', {bg: EMBER.sky}, TownRowBody);
 
 // ---------------------------------------------------------------- neighbours on the roofs
 
 /** A neighbour on a roof (30-60 px): 'shovel' (a 4-drawing loop: dig, lift, throw with a snow puff, return) or
  *  'lights' (on a balcony, reaching up to hang a string of bulbs). Feet on (x, y). */
-export const RoofNeighbour: React.FC<{x: number; y: number; h?: number; kind?: 'shovel' | 'lights'; flip?: boolean; seed?: string; coat?: string}> = ({x, y, h = 44, kind = 'shovel', flip, seed = 'nb', coat = EMBER.reveal}) => {
+const RoofNeighbourBody: React.FC<{x: number; y: number; h?: number; kind?: 'shovel' | 'lights'; flip?: boolean; seed?: string; coat?: string}> = ({x, y, h = 44, kind = 'shovel', flip, seed = 'nb', coat = EMBER.reveal}) => {
   const t = useTime();
   const k = h / 44;
   const f = flip ? -1 : 1;
@@ -252,9 +255,10 @@ export const RoofNeighbour: React.FC<{x: number; y: number; h?: number; kind?: '
     </g>
   );
 };
+export const RoofNeighbour = tiered('environment', {bg: EMBER.sky}, RoofNeighbourBody);
 
 /** A pennant on a short mast flapping at 1.5-2 Hz (the stair hut's antenna). Base of the mast on (x, y). */
-export const Pennant: React.FC<{x: number; y: number; h?: number; w?: number; color?: string; seed?: string}> = ({x, y, h = 70, w = 40, color = EMBER.hl, seed = 'pen'}) => {
+const PennantBody: React.FC<{x: number; y: number; h?: number; w?: number; color?: string; seed?: string}> = ({x, y, h = 70, w = 40, color = EMBER.hl, seed = 'pen'}) => {
   const t = useTime();
   const pts: Pt[] = [];
   for (let i = 0; i <= 4; i++) {
@@ -271,11 +275,12 @@ export const Pennant: React.FC<{x: number; y: number; h?: number; w?: number; co
     </>
   );
 };
+export const Pennant = tiered('environment', {bg: EMBER.sky}, PennantBody);
 
 // ---------------------------------------------------------------- our deck's clutter
 
 /** A folding chair (side view) with a snow cushion on the seat. Feet on y. */
-export const FoldingChair: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 110, seed = 'chair', at, ink}) => {
+const FoldingChairBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 110, seed = 'chair', at, ink}) => {
   const iw = ink ?? (w >= 100 ? W.mid : W.far);
   const h = w * 1.3;
   const d = `M${x - w * 0.35} ${y}L${x + w * 0.3} ${y - h * 0.48}M${x + w * 0.3} ${y}L${x - w * 0.3} ${y - h * 0.48}M${x - w * 0.36} ${y - h * 0.48}L${x + w * 0.36} ${y - h * 0.48}M${x + w * 0.3} ${y - h * 0.48}L${x + w * 0.38} ${y - h}`;
@@ -289,9 +294,10 @@ export const FoldingChair: React.FC<{x: number; y: number; w?: number; seed?: st
     </>
   );
 };
+export const FoldingChair = tiered('environment', {bg: EMBER.sky}, FoldingChairBody);
 
 /** A small round table with a steaming mug (the deck). Feet on y. */
-export const SideTable: React.FC<{x: number; y: number; w?: number; mug?: boolean; seed?: string; at?: At; ink?: number}> = ({x, y, w = 90, mug = true, seed = 'table', at, ink}) => {
+const SideTableBody: React.FC<{x: number; y: number; w?: number; mug?: boolean; seed?: string; at?: At; ink?: number}> = ({x, y, w = 90, mug = true, seed = 'table', at, ink}) => {
   const iw = ink ?? (w >= 90 ? W.mid : W.far);
   const h = w * 0.9;
   const mw = w * 0.26;
@@ -312,9 +318,10 @@ export const SideTable: React.FC<{x: number; y: number; w?: number; mug?: boolea
     </>
   );
 };
+export const SideTable = tiered('environment', {bg: EMBER.sky}, SideTableBody);
 
 /** A laundry line between two points with 3-5 pieces (sock, shirt, towel) swaying, a little snow on the line. */
-export const LaundryLine: React.FC<{a: Pt; b: Pt; sag?: number; n?: number; size?: number; seed?: string; ink?: number}> = ({a, b: bb, sag = 24, n = 4, size = 50, seed = 'laundry', ink = W.far}) => {
+const LaundryLineBody: React.FC<{a: Pt; b: Pt; sag?: number; n?: number; size?: number; seed?: string; ink?: number}> = ({a, b: bb, sag = 24, n = 4, size = 50, seed = 'laundry', ink = W.far}) => {
   const t = useTime();
   const swayL = sway2(t, 3, 2.8);
   const P = (u: number): Pt => [a[0] + (bb[0] - a[0]) * u + swayL * Math.sin(u * Math.PI) * 0.4, a[1] + (bb[1] - a[1]) * u + 4 * (sag + swayL) * u * (1 - u)];
@@ -347,9 +354,10 @@ export const LaundryLine: React.FC<{a: Pt; b: Pt; sag?: number; n?: number; size
     </>
   );
 };
+export const LaundryLine = tiered('environment', {bg: EMBER.sky}, LaundryLineBody);
 
 /** A snow shovel leaning (on a vent or a wall): handle, blade with snow. Blade foot on (x, y). */
-export const Shovel: React.FC<{x: number; y: number; h?: number; lean?: number; seed?: string; at?: At; ink?: number}> = ({x, y, h = 160, lean = 12, seed = 'shovel', at, ink = W.far}) => (
+const ShovelBody: React.FC<{x: number; y: number; h?: number; lean?: number; seed?: string; at?: At; ink?: number}> = ({x, y, h = 160, lean = 12, seed = 'shovel', at, ink = W.far}) => (
   <XG m={mat.about(mat.rotate(lean), x, y)}>
     <Ink d={line(x, y - h * 0.22, x, y - h, {over: [0, 0], seed: `${seed}/h`})} at={at} width={h * 0.04} color={EMBER.beam} taper={false} />
     <Ink d={line(x - h * 0.06, y - h, x + h * 0.06, y - h, {over: [0, 0], seed: `${seed}/g`})} at={at} width={h * 0.03} color={EMBER.anchor} taper={false} />
@@ -358,9 +366,10 @@ export const Shovel: React.FC<{x: number; y: number; h?: number; lean?: number; 
     <Ink d={poly([[x - h * 0.15, y - h * 0.24], [x + h * 0.15, y - h * 0.24], [x + h * 0.17, y], [x - h * 0.17, y]], {closed: true, seed: `${seed}/bi`, over: [0, 1]})} at={at} width={ink} />
   </XG>
 );
+export const Shovel = tiered('environment', {bg: EMBER.sky}, ShovelBody);
 
 /** A satellite dish and an antenna for any roof (base on (x, y)). */
-export const RoofAerials: React.FC<{x: number; y: number; s?: number; dish?: boolean; antenna?: boolean}> = ({x, y, s = 1, dish = true, antenna = true}) => (
+const RoofAerialsBody: React.FC<{x: number; y: number; s?: number; dish?: boolean; antenna?: boolean}> = ({x, y, s = 1, dish = true, antenna = true}) => (
   <g transform={`translate(${x} ${y}) scale(${s})`}>
     {antenna ? <path d={`M0 0v-60M-18 -44h36M-12 -30h24M-8 -18h16`} stroke={EMBER.dcSide} strokeWidth={2.4} /> : null}
     {dish ? (
@@ -372,3 +381,4 @@ export const RoofAerials: React.FC<{x: number; y: number; s?: number; dish?: boo
     <path d={blob(0, -61, 4, 2, {seed: 'aer'})} fill={EMBER.snow} />
   </g>
 );
+export const RoofAerials = tiered('environment', {bg: EMBER.sky}, RoofAerialsBody);

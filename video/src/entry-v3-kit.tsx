@@ -2,6 +2,7 @@
 // before any lib module is evaluated (src/v3/film/palette.ts). Render:
 //   npx remotion still src/entry-v3-kit.tsx KitSheet3 out/kit_sheet.png --frame=90 --scale=0.5
 import './v3/film/palette';
+import './v3/film/look'; // the clean pen + attention tiers (after the palette, before any kit module)
 import React from 'react';
 import {Composition, registerRoot} from 'remotion';
 import {KitSheet3, SHEET} from './v3/film/kit/KitSheet3';

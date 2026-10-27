@@ -23,6 +23,7 @@ import {EMBER} from '../palette';
 import {At, b, fillAt, Pt, Show, Txt, W} from './util';
 import {rings, sway, sway2, twinkle} from './idle';
 import {Steam} from './Weather';
+import {tiered} from '../../../lib/tier';
 
 /** The plant greens: the palette's leaf and one flat step lighter (leaves alternate). */
 export const LEAF2 = '#5B7A50';
@@ -67,7 +68,7 @@ export type ShelfFillProps = {
 
 /** Varied books (5+ colours, 14-40 wide, 80-150 tall, upright, leaning and in lying stacks) with a framed photo, a jar,
  *  a small plant and a trailing pothos over one plank's lip. Never a stamped row. */
-export const ShelfFill: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = 'shelf', photo = true, jar = true, plant = true, trailing = true, at, ink = W.mid, books = EMBER.books}) => {
+const ShelfFillBody: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = 'shelf', photo = true, jar = true, plant = true, trailing = true, at, ink = W.mid, books = EMBER.books}) => {
   const items = useMemo(() => {
     const r = rng(`shelfF/${seed}`);
     const out: React.ReactNode[] = [];
@@ -140,6 +141,7 @@ export const ShelfFill: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = '
   }, [planks.map((p) => `${p.x0},${p.x1},${p.y},${p.room}`).join('|'), scale, seed, photo, jar, plant, trailing, at, ink, books.join(',')]);
   return <>{items}</>;
 };
+export const ShelfFill = tiered('environment', {}, ShelfFillBody);
 
 const pickBook = (r: ReturnType<typeof rng>, last: number) => {
   let c = r.int(0, EMBER.books.length - 1);
@@ -150,7 +152,7 @@ const pickBook = (r: ReturnType<typeof rng>, last: number) => {
 };
 
 /** One book: spine (upright) or side (lying), with bands and a label. */
-export const Book: React.FC<{x: number; y: number; w: number; h: number; color: string; seed: string; at?: At; ink?: number; lying?: boolean; lean?: number}> = ({x, y, w, h, color, seed, at, ink = W.mid, lying, lean = 0}) => {
+const BookBody: React.FC<{x: number; y: number; w: number; h: number; color: string; seed: string; at?: At; ink?: number; lying?: boolean; lean?: number}> = ({x, y, w, h, color, seed, at, ink = W.mid, lying, lean = 0}) => {
   const r = rng(`book/${seed}`);
   let detail = '';
   if (!lying) {
@@ -168,6 +170,7 @@ export const Book: React.FC<{x: number; y: number; w: number; h: number; color: 
   );
   return lean ? <XG m={mat.about(mat.rotate(lean), x, y + h)}>{g}</XG> : g;
 };
+export const Book = tiered('environment', {}, BookBody);
 
 const PhotoFrame: React.FC<{x: number; y: number; w: number; h: number; seed: string; at?: At; ink?: number}> = ({x, y, w, h, seed, at, ink = W.mid}) => {
   const m = w * 0.12;
@@ -195,13 +198,14 @@ const Jar: React.FC<{x: number; y: number; w: number; h: number; seed: string; a
 };
 
 /** A small wall shelf (plank on two brackets) with its own contents (S7's right shelf: a plant and 3 books). */
-export const WallShelf: React.FC<{x: number; y: number; w: number; seed?: string; at?: At; ink?: number; contents?: boolean; room?: number; books?: string[]}> = ({x, y, w, seed = 'wshelf', at, ink = W.mid, contents = true, room = 130, books}) => (
+const WallShelfBody: React.FC<{x: number; y: number; w: number; seed?: string; at?: At; ink?: number; contents?: boolean; room?: number; books?: string[]}> = ({x, y, w, seed = 'wshelf', at, ink = W.mid, contents = true, room = 130, books}) => (
   <>
     {contents ? <ShelfFill planks={[{x0: x + 8, x1: x + w - 8, y, room}]} seed={seed} photo={false} jar={false} trailing={false} at={b(at, 0.1)} ink={ink} books={books} /> : null}
     <Box x={x} y={y} w={w} h={16} color={EMBER.beam} seed={`${seed}/pk`} at={at} ink={ink} over={[4, 4]} />
     <Ink d={poly([[x + w * 0.15, y + 16], [x + w * 0.15, y + 48], [x + w * 0.15 + 30, y + 16]], {seed: `${seed}/br1`, over: [0, 0]}) + poly([[x + w * 0.85, y + 16], [x + w * 0.85, y + 48], [x + w * 0.85 - 30, y + 16]], {seed: `${seed}/br2`, over: [0, 0]})} at={b(at, 0.06)} width={W.far} />
   </>
 );
+export const WallShelf = tiered('environment', {}, WallShelfBody);
 
 // ---------------------------------------------------------------- plants
 
@@ -231,7 +235,7 @@ export type PlantProps = {
 
 /** A potted plant. pothos: vines trailing over a lip, swaying +-3 px over 3 s (heart leaves in two greens);
  *  succulent: a rosette; snake: upright sword leaves with bands; floor: big leaves on stems (cut by an edge); cactus. */
-export const Plant: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, trail = 160, snow, amp = 3, period = 3, shakeAt, seed = 'plant', at, ink = W.mid, pot = EMBER.pot}) => {
+const PlantBody: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, trail = 160, snow, amp = 3, period = 3, shakeAt, seed = 'plant', at, ink = W.mid, pot = EMBER.pot}) => {
   const t = useTime();
   const r = rng(`plant/${seed}`);
   const shake = rings(t, shakeAt, 1, 2.6, 4);
@@ -353,9 +357,10 @@ export const Plant: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, t
     </>
   );
 };
+export const Plant = tiered('environment', {}, PlantBody);
 
 /** One leaf: a heart / teardrop (pointed = a succulent's), centred at its base (x, y), pointing along rot (deg; 0 = up). */
-export const Leaf: React.FC<{x: number; y: number; s: number; rot?: number; color?: string; seed: string; at?: At; ink?: number; pointed?: boolean; vein?: boolean}> = ({x, y, s, rot = 0, color = EMBER.leaf, seed, at, ink = W.hair, pointed, vein}) => {
+const LeafBody: React.FC<{x: number; y: number; s: number; rot?: number; color?: string; seed: string; at?: At; ink?: number; pointed?: boolean; vein?: boolean}> = ({x, y, s, rot = 0, color = EMBER.leaf, seed, at, ink = W.hair, pointed, vein}) => {
   const w = pointed ? s * 0.32 : s * 0.5;
   const d = `M0 0Q${-w * 1.3} ${-s * 0.45} 0 ${-s}Q${w * 1.3} ${-s * 0.45} 0 0Z`;
   return (
@@ -366,6 +371,7 @@ export const Leaf: React.FC<{x: number; y: number; s: number; rot?: number; colo
     </XG>
   );
 };
+export const Leaf = tiered('environment', {}, LeafBody);
 
 // ---------------------------------------------------------------- string lights
 
@@ -402,7 +408,7 @@ const BULB_DIM = EMBER.pot;
 
 /** Warm string lights: a sagging wire with round bulbs (four warm colours) on short stems, flat halo steps, blinking on
  *  one by one, one bulb twinkling about every 0.5 s; the string sways. */
-export const StringLights3: React.FC<StringLights3Props> = ({from, to, points, sag = 40, n = 10, r = 9, onAt, onDur = 0.7, every = 0.5, halo = [EMBER.core, EMBER.ring], sway: sw = 2, swingAt, seed = 'lights', ink = W.hair, at}) => {
+const StringLights3Body: React.FC<StringLights3Props> = ({from, to, points, sag = 40, n = 10, r = 9, onAt, onDur = 0.7, every = 0.5, halo = [EMBER.core, EMBER.ring], sway: sw = 2, swingAt, seed = 'lights', ink = W.hair, at}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const pts: Pt[] = points ?? [from ?? [0, 0], to ?? [1080, 0]];
@@ -461,6 +467,7 @@ export const StringLights3: React.FC<StringLights3Props> = ({from, to, points, s
     </>
   );
 };
+export const StringLights3 = tiered('environment', {}, StringLights3Body);
 
 // ---------------------------------------------------------------- the pinboard
 
@@ -484,7 +491,7 @@ export type PinboardProps = {
 
 /** A cork pinboard in a red-brown frame with 5-7 pinned things (photos, sticky notes in room colours, a sea postcard,
  *  a ticket, a list); every item sways a hair about its pin and flutters on a cause. */
-export const Pinboard: React.FC<PinboardProps> = ({x, y, w, h, items = ['photo', 'note', 'postcard', 'note', 'ticket', 'photo'], flutterAt, avoid, seed = 'pin', at, ink = W.mid}) => {
+const PinboardBody: React.FC<PinboardProps> = ({x, y, w, h, items = ['photo', 'note', 'postcard', 'note', 'ticket', 'photo'], flutterAt, avoid, seed = 'pin', at, ink = W.mid}) => {
   const t = useTime();
   const plan = useMemo(() => {
     const r = rng(`pinb/${seed}`);
@@ -526,6 +533,7 @@ export const Pinboard: React.FC<PinboardProps> = ({x, y, w, h, items = ['photo',
     </>
   );
 };
+export const Pinboard = tiered('environment', {}, PinboardBody);
 
 const corkSpecks = (x: number, y: number, w: number, h: number, seed: string) => {
   const r = rng(`cork/${seed}`);
@@ -540,7 +548,7 @@ const corkSpecks = (x: number, y: number, w: number, h: number, seed: string) =>
 };
 
 /** One pinned item (shared by Pinboard and the boards round the cards). */
-export const PinnedThing: React.FC<{kind: PinItem | 'flyer' | 'concert' | 'card' | 'slip'; x: number; y: number; w: number; h: number; color?: string; seed: string; at?: At; tabsT?: number}> = ({kind, x, y, w, h, color = EMBER.hl, seed, at, tabsT}) => {
+const PinnedThingBody: React.FC<{kind: PinItem | 'flyer' | 'concert' | 'card' | 'slip'; x: number; y: number; w: number; h: number; color?: string; seed: string; at?: At; tabsT?: number}> = ({kind, x, y, w, h, color = EMBER.hl, seed, at, tabsT}) => {
   const t = useTime();
   const fA = fillAt(at);
   if (kind === 'note') {
@@ -654,11 +662,12 @@ export const PinnedThing: React.FC<{kind: PinItem | 'flyer' | 'concert' | 'card'
     </>
   );
 };
+export const PinnedThing = tiered('environment', {}, PinnedThingBody);
 
 // ---------------------------------------------------------------- framed print, poster
 
 /** A framed print on the wall: mountain, sea, a leaf or an abstract sun. */
-export const FramedPrint: React.FC<{x: number; y: number; w: number; h: number; picture?: 'mountain' | 'sea' | 'leaf' | 'sun'; seed?: string; at?: At; ink?: number; frame?: string}> = ({x, y, w, h, picture = 'mountain', seed = 'print', at, ink = W.mid, frame = EMBER.beam}) => {
+const FramedPrintBody: React.FC<{x: number; y: number; w: number; h: number; picture?: 'mountain' | 'sea' | 'leaf' | 'sun'; seed?: string; at?: At; ink?: number; frame?: string}> = ({x, y, w, h, picture = 'mountain', seed = 'print', at, ink = W.mid, frame = EMBER.beam}) => {
   const m = Math.max(8, w * 0.08);
   const ix = x + m;
   const iy = y + m;
@@ -706,19 +715,21 @@ export const FramedPrint: React.FC<{x: number; y: number; w: number; h: number; 
     </>
   );
 };
+export const FramedPrint = tiered('environment', {}, FramedPrintBody);
 
 /** A poster taped / pinned on a wall: 'concert' or the 'flyer' (lost cat with tabs). */
-export const Poster: React.FC<{x: number; y: number; w: number; h: number; kind?: 'concert' | 'flyer'; rot?: number; seed?: string; at?: At}> = ({x, y, w, h, kind = 'concert', rot = 0, seed = 'poster', at}) => (
+const PosterBody: React.FC<{x: number; y: number; w: number; h: number; kind?: 'concert' | 'flyer'; rot?: number; seed?: string; at?: At}> = ({x, y, w, h, kind = 'concert', rot = 0, seed = 'poster', at}) => (
   <XG m={mat.about(mat.rotate(rot), x + w / 2, y)}>
     <PinnedThing kind={kind} x={x} y={y} w={w} h={h} seed={seed} at={at} />
     <Fill rect={[x + w * 0.38, y - 8, w * 0.24, 16]} color={EMBER.tape} at={fillAt(at, 0.08)} offset={false} />
   </XG>
 );
+export const Poster = tiered('environment', {}, PosterBody);
 
 // ---------------------------------------------------------------- desk clutter
 
 /** A pen cup with pens and pencils (base centre on y). */
-export const PenCup: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({x, y, w = 60, seed = 'pens', at, ink = W.mid, color = EMBER.dc}) => {
+const PenCupBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({x, y, w = 60, seed = 'pens', at, ink = W.mid, color = EMBER.dc}) => {
   const h = w * 1.15;
   const r = rng(`pens/${seed}`);
   const pens: React.ReactNode[] = [];
@@ -743,9 +754,10 @@ export const PenCup: React.FC<{x: number; y: number; w?: number; seed?: string; 
     </>
   );
 };
+export const PenCup = tiered('environment', {}, PenCupBody);
 
 /** Headphones lying on the desk (band arc and two cups), base on y. */
-export const Headphones: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({x, y, w = 150, seed = 'hp', at, ink = W.mid, color = EMBER.dcSide}) => {
+const HeadphonesBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({x, y, w = 150, seed = 'hp', at, ink = W.mid, color = EMBER.dcSide}) => {
   const cw = w * 0.26;
   const ch = w * 0.22;
   const band = `M${x - w * 0.38} ${y - ch * 0.6}C${x - w * 0.4} ${y - w * 0.55} ${x + w * 0.4} ${y - w * 0.55} ${x + w * 0.38} ${y - ch * 0.6}`;
@@ -763,9 +775,10 @@ export const Headphones: React.FC<{x: number; y: number; w?: number; seed?: stri
     </>
   );
 };
+export const Headphones = tiered('environment', {}, HeadphonesBody);
 
 /** A stack of n lying books (base on y, left x). */
-export const BookStack: React.FC<{x: number; y: number; w?: number; n?: number; seed?: string; at?: At; ink?: number; scale?: number}> = ({x, y, w = 120, n = 3, seed = 'stack', at, ink = W.mid, scale = 1}) => {
+const BookStackBody: React.FC<{x: number; y: number; w?: number; n?: number; seed?: string; at?: At; ink?: number; scale?: number}> = ({x, y, w = 120, n = 3, seed = 'stack', at, ink = W.mid, scale = 1}) => {
   const r = rng(`stack/${seed}`);
   const out: React.ReactNode[] = [];
   let yy = y;
@@ -780,9 +793,10 @@ export const BookStack: React.FC<{x: number; y: number; w?: number; n?: number; 
   }
   return <>{out}</>;
 };
+export const BookStack = tiered('environment', {}, BookStackBody);
 
 /** A few sticky notes (room colours only), lying or stuck, slightly rotated; one lifts on `flutterAt`. */
-export const StickyNotes: React.FC<{x: number; y: number; n?: number; size?: number; seed?: string; at?: At; flutterAt?: number[]; spread?: number}> = ({x, y, n = 3, size = 70, seed = 'sticky', at, flutterAt, spread = 1}) => {
+const StickyNotesBody: React.FC<{x: number; y: number; n?: number; size?: number; seed?: string; at?: At; flutterAt?: number[]; spread?: number}> = ({x, y, n = 3, size = 70, seed = 'sticky', at, flutterAt, spread = 1}) => {
   const t = useTime();
   const r = rng(`sticky/${seed}`);
   const out: React.ReactNode[] = [];
@@ -800,10 +814,11 @@ export const StickyNotes: React.FC<{x: number; y: number; n?: number; size?: num
   }
   return <>{out}</>;
 };
+export const StickyNotes = tiered('environment', {}, StickyNotesBody);
 
 /** A charger / laptop cable: a smooth dark path through `points` (the lane moves the points with the phone), an
  *  optional plug at the start (lying on the desk or in a port). */
-export const Cable: React.FC<{points: Pt[]; plug?: boolean; width?: number; color?: string; ink?: number; at?: At}> = ({points, plug, width = 7, color = EMBER.dcSide, ink = W.hair, at}) => {
+const CableBody: React.FC<{points: Pt[]; plug?: boolean; width?: number; color?: string; ink?: number; at?: At}> = ({points, plug, width = 7, color = EMBER.dcSide, ink = W.hair, at}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const d = smooth(points);
@@ -823,9 +838,10 @@ export const Cable: React.FC<{points: Pt[]; plug?: boolean; width?: number; colo
     </>
   );
 };
+export const Cable = tiered('environment', {}, CableBody);
 
 /** Reading glasses lying on the desk (two round lenses, a bridge, folded temples). */
-export const Glasses: React.FC<{x: number; y: number; w?: number; rot?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 110, rot = -8, seed = 'glasses', at, ink = W.mid}) => {
+const GlassesBody: React.FC<{x: number; y: number; w?: number; rot?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 110, rot = -8, seed = 'glasses', at, ink = W.mid}) => {
   const r = w * 0.22;
   return (
     <XG m={mat.about(mat.rotate(rot), x, y)}>
@@ -835,9 +851,10 @@ export const Glasses: React.FC<{x: number; y: number; w?: number; rot?: number; 
     </XG>
   );
 };
+export const Glasses = tiered('environment', {}, GlassesBody);
 
 /** A small speaker (box with a round grille), base on y. */
-export const Speaker: React.FC<{x: number; y: number; w?: number; h?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({x, y, w = 70, h = 100, seed = 'spk', at, ink = W.mid, color = EMBER.anchor}) => (
+const SpeakerBody: React.FC<{x: number; y: number; w?: number; h?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({x, y, w = 70, h = 100, seed = 'spk', at, ink = W.mid, color = EMBER.anchor}) => (
   <>
     <Fill d={roundRect(x - w / 2, y - h, w, h, w * 0.12)} color={color} at={fillAt(at)} seed={`${seed}/b`} />
     <Fill d={circle(x, y - h * 0.38, w * 0.3)} color={EMBER.dcSide} at={fillAt(at, 0.04)} offset={false} />
@@ -845,10 +862,11 @@ export const Speaker: React.FC<{x: number; y: number; w?: number; h?: number; se
     <Ink d={roundRect(x - w / 2, y - h, w, h, w * 0.12, {closed: false, seed: `${seed}/i`}) + circle(x, y - h * 0.38, w * 0.3, {seed: `${seed}/g`})} at={at} width={ink} />
   </>
 );
+export const Speaker = tiered('environment', {}, SpeakerBody);
 
 /** Wood-grain strokes on the desk: 4-8 short organic pairs (a wavy stroke and a shorter companion), the odd knot, one
  *  flat step under the desk colour; never a long straight line (that reads as a table edge). */
-export const DeskGrain: React.FC<{x: number; y: number; w: number; h: number; n?: number; seed?: string; at?: At; color?: string}> = ({x, y, w, h, n = 6, seed = 'grain', at, color = GRAIN}) => {
+const DeskGrainBody: React.FC<{x: number; y: number; w: number; h: number; n?: number; seed?: string; at?: At; color?: string}> = ({x, y, w, h, n = 6, seed = 'grain', at, color = GRAIN}) => {
   const r = rng(`grain/${seed}`);
   let d = '';
   for (let i = 0; i < n; i++) {
@@ -868,12 +886,14 @@ export const DeskGrain: React.FC<{x: number; y: number; w: number; h: number; n?
   }
   return <Ink d={d} at={at} width={W.hair} color={color} />;
 };
+export const DeskGrain = tiered('environment', {}, DeskGrainBody);
 
 /** Plaster hints on a wall (scattered little ticks, one step under the wall). */
-export const WallMarks: React.FC<{x: number; y: number; w: number; h: number; n?: number; seed?: string; at?: At; color?: string}> = ({x, y, w, h, n = 8, seed = 'wall', at, color = PLASTER}) => <Ink d={wallTicks(x, y, w, h, {seed: `wm/${seed}`, n, size: 16})} at={at} width={W.far} color={color} />;
+const WallMarksBody: React.FC<{x: number; y: number; w: number; h: number; n?: number; seed?: string; at?: At; color?: string}> = ({x, y, w, h, n = 8, seed = 'wall', at, color = PLASTER}) => <Ink d={wallTicks(x, y, w, h, {seed: `wm/${seed}`, n, size: 16})} at={at} width={W.far} color={color} />;
+export const WallMarks = tiered('environment', {}, WallMarksBody);
 
 /** The lamp's pull chain swinging (S7's loop): beads from (x, y) down `len`, a pendulum with a jolt option. */
-export const PullChain: React.FC<{x: number; y: number; len?: number; amp?: number; jolt?: number[]}> = ({x, y, len = 110, amp = 6, jolt}) => {
+const PullChainBody: React.FC<{x: number; y: number; len?: number; amp?: number; jolt?: number[]}> = ({x, y, len = 110, amp = 6, jolt}) => {
   const t = useTime();
   const a = sway(t, amp, 1.9) + rings(t, jolt, 14, 0.9, 1.2);
   const rad = (a * Math.PI) / 180;
@@ -893,13 +913,14 @@ export const PullChain: React.FC<{x: number; y: number; len?: number; amp?: numb
     </>
   );
 };
+export const PullChain = tiered('environment', {}, PullChainBody);
 
 // ---------------------------------------------------------------- S13: radiator, rug, coat hook, tote, slippers
 
 /** A radiator under the window (cream fins), a sock drying on it that sways. `color` repaints the body (default the
  *  cream card); `shade` adds a flat shade strip on the right of every fin (S13: a warm painted radiator, never the
  *  brightest block in the lower half). */
-export const Radiator: React.FC<{x: number; y: number; w?: number; h?: number; sock?: boolean; seed?: string; at?: At; ink?: number; color?: string; shade?: string}> = ({x, y, w = 420, h = 180, sock = true, seed = 'rad', at, ink = W.mid, color = EMBER.card, shade}) => {
+const RadiatorBody: React.FC<{x: number; y: number; w?: number; h?: number; sock?: boolean; seed?: string; at?: At; ink?: number; color?: string; shade?: string}> = ({x, y, w = 420, h = 180, sock = true, seed = 'rad', at, ink = W.mid, color = EMBER.card, shade}) => {
   const t = useTime();
   const fins = Math.round(w / 34);
   let finD = '';
@@ -925,9 +946,10 @@ export const Radiator: React.FC<{x: number; y: number; w?: number; h?: number; s
     </>
   );
 };
+export const Radiator = tiered('environment', {}, RadiatorBody);
 
 /** A striped rug on the floor in perspective (quad: back-left, back-right, front-right, front-left), fringe ticks. */
-export const Rug: React.FC<{quad: [Pt, Pt, Pt, Pt]; stripes?: number; colors?: string[]; seed?: string; at?: At; ink?: number}> = ({quad, stripes = 7, colors = [EMBER.hl, EMBER.wall, EMBER.dc, EMBER.wall], seed = 'rug', at, ink = W.mid}) => {
+const RugBody: React.FC<{quad: [Pt, Pt, Pt, Pt]; stripes?: number; colors?: string[]; seed?: string; at?: At; ink?: number}> = ({quad, stripes = 7, colors = [EMBER.hl, EMBER.wall, EMBER.dc, EMBER.wall], seed = 'rug', at, ink = W.mid}) => {
   const [bl, br, fr, fl] = quad;
   const P = (u: number, v: number): Pt => {
     const top: Pt = [bl[0] + (br[0] - bl[0]) * u, bl[1] + (br[1] - bl[1]) * u];
@@ -952,10 +974,11 @@ export const Rug: React.FC<{quad: [Pt, Pt, Pt, Pt]; stripes?: number; colors?: s
   out.push(<Ink key="fr" d={fringe} at={b(at, 0.1)} width={W.hair} order="all" />);
   return <>{out}</>;
 };
+export const Rug = tiered('environment', {}, RugBody);
 
 /** A coat hook rail with a coat and a striped scarf hanging (they sway a hair). `children` (optional) are drawn on the
  *  coat (over its fill, under its ink and the scarf) inside the sway, in canvas px: the coat's own detail (S13). */
-export const CoatHook: React.FC<{x: number; y: number; h?: number; coat?: string; seed?: string; at?: At; ink?: number; children?: React.ReactNode}> = ({x, y, h = 380, coat = EMBER.dc, seed = 'coat', at, ink = W.mid, children}) => {
+const CoatHookBody: React.FC<{x: number; y: number; h?: number; coat?: string; seed?: string; at?: At; ink?: number; children?: React.ReactNode}> = ({x, y, h = 380, coat = EMBER.dc, seed = 'coat', at, ink = W.mid, children}) => {
   const t = useTime();
   const a = sway(t, 0.8, 4.4);
   const cw = h * 0.42;
@@ -977,9 +1000,10 @@ export const CoatHook: React.FC<{x: number; y: number; h?: number; coat?: string
     </>
   );
 };
+export const CoatHook = tiered('environment', {}, CoatHookBody);
 
 /** A slouched tote bag (base on y), a simple print. */
-export const ToteBag: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({x, y, w = 150, seed = 'tote', at, ink = W.mid, color = EMBER.card}) => {
+const ToteBagBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({x, y, w = 150, seed = 'tote', at, ink = W.mid, color = EMBER.card}) => {
   const h = w * 1.05;
   const d = `M${x - w / 2} ${y - h}L${x + w / 2} ${y - h * 0.94}L${x + w * 0.56} ${y}L${x - w * 0.56} ${y}Z`;
   return (
@@ -991,9 +1015,10 @@ export const ToteBag: React.FC<{x: number; y: number; w?: number; seed?: string;
     </>
   );
 };
+export const ToteBag = tiered('environment', {}, ToteBagBody);
 
 /** A pair of slippers on the floor. */
-export const Slippers: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({x, y, w = 160, seed = 'slip', at, ink = W.mid, color = EMBER.hl}) => (
+const SlippersBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({x, y, w = 160, seed = 'slip', at, ink = W.mid, color = EMBER.hl}) => (
   <>
     {[0, 1].map((i) => {
       const sx = x + i * w * 0.55;
@@ -1009,17 +1034,20 @@ export const Slippers: React.FC<{x: number; y: number; w?: number; seed?: string
     })}
   </>
 );
+export const Slippers = tiered('environment', {}, SlippersBody);
 
 /** Steam above a cup or a mug top (re-export for the desk sets). */
-export const CupSteam: React.FC<{x: number; y: number; seed?: string}> = ({x, y, seed = 'cup'}) => <Steam x={x} y={y} seed={seed} rise={60} r1={7} />;
+const CupSteamBody: React.FC<{x: number; y: number; seed?: string}> = ({x, y, seed = 'cup'}) => <Steam x={x} y={y} seed={seed} rise={60} r1={7} />;
+export const CupSteam = tiered('environment', {}, CupSteamBody);
 
 /** A cosy glow ring: a flat lighter disc under a light source on a wall (the halo step, no gradient). */
-export const HaloStep: React.FC<{cx: number; cy: number; r: number; colors?: [string, string]}> = ({cx, cy, r, colors = [EMBER.core, EMBER.ring]}) => (
+const HaloStepBody: React.FC<{cx: number; cy: number; r: number; colors?: [string, string]}> = ({cx, cy, r, colors = [EMBER.core, EMBER.ring]}) => (
   <>
     <circle cx={cx} cy={cy} r={r} fill={colors[0]} />
     <circle cx={cx} cy={cy} r={r * 0.62} fill={colors[1]} />
   </>
 );
+export const HaloStep = tiered('environment', {}, HaloStepBody);
 
 /** A jolt helper for the desk sets: the y offset of things that hop on a cause (S5: the shelf jolts 4 px). */
 export const useJolt = (ats: number[] | undefined, amp = 4) => {

@@ -13,6 +13,7 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
 import {At, b, fillAt, Pt, Show, Txt} from './util';
 import {Laptop} from './Laptop';
+import {tiered} from '../../../lib/tier';
 
 export type PhoneProps = {
   /** Top-left of the phone (canvas px), before rotation. */
@@ -77,7 +78,7 @@ export function phonePoint(p: {x: number; y: number; w?: number; h?: number; rot
 
 const phoneMat = (x: number, y: number, w: number, h: number, rot: number) => mat.compose(mat.translate(x, y), mat.about(mat.rotate(rot), w / 2, h / 2));
 
-export const Phone: React.FC<PhoneProps> = ({
+const PhoneBody: React.FC<PhoneProps> = ({
   x,
   y,
   w = 400,
@@ -171,6 +172,7 @@ export const Phone: React.FC<PhoneProps> = ({
     </XG>
   );
 };
+export const Phone = tiered('subject', {tone: EMBER.anchor}, PhoneBody);
 
 // ---------------------------------------------------------------- the hand (POV)
 
@@ -188,7 +190,7 @@ export type HandProps = {
 
 const addP = (a: Pt, c: Pt, s = 1): Pt => [a[0] + c[0] * s, a[1] + c[1] * s];
 
-export const Hand: React.FC<HandProps> = ({phone, thumbTo, pressAt, at, seed = 'hand', ink = 4.8}) => {
+const HandBody: React.FC<HandProps> = ({phone, thumbTo, pressAt, at, seed = 'hand', ink = 4.8}) => {
   const t = useTime();
   const w = phone.w ?? 400;
   const h = phone.h ?? w * 2.2;
@@ -241,6 +243,7 @@ export const Hand: React.FC<HandProps> = ({phone, thumbTo, pressAt, at, seed = '
     </XG>
   );
 };
+export const Hand = tiered('subject', {tone: EMBER.skin}, HandBody);
 
 /** The glint of a phone screen (for an off / lowered phone). */
 export const screenGlint = (x: number, y: number, len = 40, seed = 'pg') => glint(x, y, len, {seed});

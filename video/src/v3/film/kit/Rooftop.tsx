@@ -15,6 +15,7 @@ import {rng} from '../../../lib/rng';
 import {EMBER} from '../palette';
 import {At, b, fillAt, Pt} from './util';
 import {TownBand, type HouseSpec} from './Outside';
+import {tiered} from '../../../lib/tier';
 
 // ---------------------------------------------------------------- the brick stack
 
@@ -42,7 +43,7 @@ export type BrickStackProps = {
 };
 
 /** A chimney stack: brick body with a shade side, a corbelled cap with snow, optional terracotta pots. */
-export const BrickStack: React.FC<BrickStackProps> = ({x, y, w, h, capH = w * 0.07, pots = [], potW = w * 0.14, color = EMBER.brick, shade = EMBER.brickShade, bricks, exact, at, seed = 'stack', ink = 3.4}) => {
+const BrickStackBody: React.FC<BrickStackProps> = ({x, y, w, h, capH = w * 0.07, pots = [], potW = w * 0.14, color = EMBER.brick, shade = EMBER.brickShade, bricks, exact, at, seed = 'stack', ink = 3.4}) => {
   const off = exact ? false : undefined;
   const o = w * 0.04;
   const bodyTop = y + capH;
@@ -87,13 +88,14 @@ export const BrickStack: React.FC<BrickStackProps> = ({x, y, w, h, capH = w * 0.
     </>
   );
 };
+export const BrickStack = tiered('support', {tone: EMBER.brick, bg: EMBER.sky}, BrickStackBody);
 
 // ---------------------------------------------------------------- the chimney pot that crosses the lens
 
 /** A chimney pot right at the lens: ONE flat soft mass (no ink, two flat values: a rolled rim one step lighter), wider
  *  than the frame, its rim at y. Screen px; the scene moves x (S5: up to ~90 px per 60 fps frame, the only layer
  *  allowed that speed). */
-export const ChimneyPot: React.FC<{x: number; y: number; w: number; color?: string; rim?: string; seed?: string}> = ({x, y, w, color = EMBER.brickShade, rim = EMBER.brick, seed = 'cpot'}) => {
+const ChimneyPotBody: React.FC<{x: number; y: number; w: number; color?: string; rim?: string; seed?: string}> = ({x, y, w, color = EMBER.brickShade, rim = EMBER.brick, seed = 'cpot'}) => {
   const rimH = w * 0.07;
   const rimD = smooth([[x, y + rimH], [x + w * 0.01, y + rimH * 0.3], [x + w * 0.08, y], [x + w * 0.5, y - rimH * 0.12], [x + w * 0.92, y], [x + w * 0.99, y + rimH * 0.3], [x + w, y + rimH], [x + w * 0.5, y + rimH * 1.08]], {closed: true});
   const body = polyPath([[x + w * 0.05, y + rimH * 0.8], [x + w * 0.95, y + rimH * 0.8], [x + w * 0.94, y + 2600], [x + w * 0.06, y + 2600]]);
@@ -104,6 +106,7 @@ export const ChimneyPot: React.FC<{x: number; y: number; w: number; color?: stri
     </>
   );
 };
+export const ChimneyPot = tiered('support', {tone: EMBER.pot, bg: EMBER.sky}, ChimneyPotBody);
 
 // ---------------------------------------------------------------- the mid town with the lit street
 
@@ -137,7 +140,7 @@ export type MidTownProps = {
 /** The mid roofs: rows of snow-capped houses with chimneys and lit windows (TownBand houses), a lit street between
  *  them (a trodden road with lamp posts, small warm lamp pools and the lit windows of the houses that line it), and
  *  optional chimney stacks. */
-export const MidTown: React.FC<MidTownProps> = ({x0, x1, rows, street: st, lamps = 5, stacks = [], ground = EMBER.dc, exact, at, seed = 'mid'}) => {
+const MidTownBody: React.FC<MidTownProps> = ({x0, x1, rows, street: st, lamps = 5, stacks = [], ground = EMBER.dc, exact, at, seed = 'mid'}) => {
   const r = rng(`midtown/${seed}`);
   const off = exact ? false : undefined;
   const top = Math.min(...rows.map((rw) => rw.y)) - 6;
@@ -221,6 +224,7 @@ export const MidTown: React.FC<MidTownProps> = ({x0, x1, rows, street: st, lamps
     </>
   );
 };
+export const MidTown = tiered('environment', {tone: EMBER.roofs, bg: EMBER.sky}, MidTownBody);
 
 // ---------------------------------------------------------------- our roof deck
 
@@ -240,7 +244,7 @@ export type RoofDeckProps = {
 };
 
 /** OUR roof deck: warm terracotta planks whose seams converge toward a point beyond the parapet (they lead to you), a snow drift along the parapet's foot, a few snow patches. */
-export const RoofDeck: React.FC<RoofDeckProps> = ({y, x0, x1, h, vp, planks = 9, exact, at, seed = 'deck'}) => {
+const RoofDeckBody: React.FC<RoofDeckProps> = ({y, x0, x1, h, vp, planks = 9, exact, at, seed = 'deck'}) => {
   const off = exact ? false : undefined;
   const r = rng(`deck/${seed}`);
   let d = '';
@@ -268,3 +272,4 @@ export const RoofDeck: React.FC<RoofDeckProps> = ({y, x0, x1, h, vp, planks = 9,
     </>
   );
 };
+export const RoofDeck = tiered('support', {tone: EMBER.desk, bg: EMBER.sky}, RoofDeckBody);

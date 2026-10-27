@@ -9,6 +9,7 @@
 // Render: npx remotion render src/entry-v3-film.tsx Film3 out/v3_g5.mp4 --scale=0.5
 // Stills: node scripts/render-frames.mjs Film3Shot <dir> 0,1.5 --entry=src/entry-v3-film.tsx --props='{"id":"S9"}' --scale=0.5
 import './v3/film/palette';
+import './v3/film/look'; // the clean pen + attention tiers (after the palette, before any kit or scene module)
 import React from 'react';
 import {Composition, registerRoot} from 'remotion';
 import {Cover3} from './v3/film/Cover3';

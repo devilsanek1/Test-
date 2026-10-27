@@ -26,6 +26,7 @@ import {PinnedThing} from './Room';
 import {Icicles, SnowCap, SnowLayers, SnowSill, Steam} from './Weather';
 import {LampPost3} from './Street';
 import {Walker, personGeo} from './People3';
+import {tiered} from '../../../lib/tier';
 
 const CORK = '#C98A64';
 const KRAFT = '#C98A64';
@@ -58,7 +59,7 @@ export type CardBoardProps = {
 
 /** The board round an information card (the card stays straight-on and level; the world goes round it): frame, face,
  *  pins, glass glints, and 3-4 papers peeking out from behind the card's corners (the lost-cat flyer's tabs flutter). */
-export const CardBoard: React.FC<CardBoardProps> = ({card, margin = 27, kind = 'notice', corners = [], flutterAt, seed = 'board', at, ink = W.mid}) => {
+const CardBoardBody: React.FC<CardBoardProps> = ({card, margin = 27, kind = 'notice', corners = [], flutterAt, seed = 'board', at, ink = W.mid}) => {
   const t = useTime();
   const x = card.x - margin;
   const y = card.y - margin;
@@ -107,9 +108,10 @@ export const CardBoard: React.FC<CardBoardProps> = ({card, margin = 27, kind = '
     </>
   );
 };
+export const CardBoard = tiered('support', {tone: EMBER.beam}, CardBoardBody);
 
 /** A clipboard with a sheet and a metal clip (hangs on a board's corner, or a driver holds it). */
-export const Clipboard: React.FC<{x: number; y: number; w: number; h: number; seed?: string; at?: At; ink?: number; flutterAt?: number[]}> = ({x, y, w, h, seed = 'clip', at, ink = W.mid, flutterAt}) => {
+const ClipboardBody: React.FC<{x: number; y: number; w: number; h: number; seed?: string; at?: At; ink?: number; flutterAt?: number[]}> = ({x, y, w, h, seed = 'clip', at, ink = W.mid, flutterAt}) => {
   const t = useTime();
   const lift = rings(t, flutterAt, 1, 3, 3.5);
   let lines = '';
@@ -126,12 +128,13 @@ export const Clipboard: React.FC<{x: number; y: number; w: number; h: number; se
     </>
   );
 };
+export const Clipboard = tiered('support', {tone: EMBER.card}, ClipboardBody);
 
 // ---------------------------------------------------------------- the shop's street wall (S4 / S6)
 
 /** The shop's cornice above the caption band: a double line overshooting both edges, a moulding one step darker,
  *  snow on top, icicles (that drip) under it. y = the cornice's top line. */
-export const Cornice: React.FC<{x0?: number; x1?: number; y: number; h?: number; icicles?: number; seed?: string; at?: At; ink?: number}> = ({x0 = -60, x1 = 1140, y, h = 46, icicles = 4, seed = 'cornice', at, ink = W.mid}) => (
+const CorniceBody: React.FC<{x0?: number; x1?: number; y: number; h?: number; icicles?: number; seed?: string; at?: At; ink?: number}> = ({x0 = -60, x1 = 1140, y, h = 46, icicles = 4, seed = 'cornice', at, ink = W.mid}) => (
   <>
     <Fill rect={[x0, y, x1 - x0, h]} color={EMBER.reveal} at={fillAt(at)} offset={false} />
     <Fill rect={[x0, y + h * 0.62, x1 - x0, h * 0.38]} color={EMBER.shelf} at={fillAt(at, 0.02)} offset={false} />
@@ -140,9 +143,10 @@ export const Cornice: React.FC<{x0?: number; x1?: number; y: number; h?: number;
     {icicles > 0 ? <Icicles x0={x0 + 140} x1={x1 - 140} y={y + h} n={icicles} seed={`${seed}/ice`} /> : null}
   </>
 );
+export const Cornice = tiered('environment', {}, CorniceBody);
 
 /** The shop's fascia sign (letters ~56 px): a dusk-blue board with warm lit letters and a small laptop pictogram. */
-export const Fascia: React.FC<{x: number; y: number; w: number; h?: number; text?: string; size?: number; color?: string; textColor?: string; icon?: boolean; seed?: string; at?: At; ink?: number}> = ({x, y, w, h = 120, text = 'COMPUTERS', size = 56, color = EMBER.dc, textColor = EMBER.core, icon = true, seed = 'fascia', at, ink = W.mid}) => {
+const FasciaBody: React.FC<{x: number; y: number; w: number; h?: number; text?: string; size?: number; color?: string; textColor?: string; icon?: boolean; seed?: string; at?: At; ink?: number}> = ({x, y, w, h = 120, text = 'COMPUTERS', size = 56, color = EMBER.dc, textColor = EMBER.core, icon = true, seed = 'fascia', at, ink = W.mid}) => {
   const iw = h * 0.5;
   return (
     <>
@@ -164,9 +168,10 @@ export const Fascia: React.FC<{x: number; y: number; w: number; h?: number; text
     </>
   );
 };
+export const Fascia = tiered('environment', {}, FasciaBody);
 
 /** A drainpipe down a wall, brackets, and an ice drip at its foot. */
-export const Drainpipe: React.FC<{x: number; y0: number; y1: number; w?: number; seed?: string; at?: At; ink?: number}> = ({x, y0, y1, w = 24, seed = 'pipe', at, ink = W.mid}) => {
+const DrainpipeBody: React.FC<{x: number; y0: number; y1: number; w?: number; seed?: string; at?: At; ink?: number}> = ({x, y0, y1, w = 24, seed = 'pipe', at, ink = W.mid}) => {
   let br = '';
   for (let yy = y0 + 120; yy < y1 - 60; yy += 220) br += line(x - w * 0.8, yy, x + w * 0.8, yy, {over: [0, 0], seed: `${seed}/b${yy}`});
   return (
@@ -179,10 +184,11 @@ export const Drainpipe: React.FC<{x: number; y0: number; y1: number; w?: number;
     </>
   );
 };
+export const Drainpipe = tiered('environment', {}, DrainpipeBody);
 
 /** The shop's lit display window (a corner of it, cut by the frame edge): warm inside, laptop boxes with an ink laptop
  *  icon, a monitor with a screensaver loop, a price card, glass glints, snow on the sill. Never hero laptops. */
-export const DisplayWindow: React.FC<{x: number; y: number; w: number; h: number; seed?: string; at?: At; ink?: number}> = ({x, y, w, h, seed = 'disp', at, ink = W.mid}) => {
+const DisplayWindowBody: React.FC<{x: number; y: number; w: number; h: number; seed?: string; at?: At; ink?: number}> = ({x, y, w, h, seed = 'disp', at, ink = W.mid}) => {
   const t = useTime();
   const fr = 18;
   const ix = x + fr;
@@ -226,9 +232,10 @@ export const DisplayWindow: React.FC<{x: number; y: number; w: number; h: number
     </>
   );
 };
+export const DisplayWindow = tiered('environment', {}, DisplayWindowBody);
 
 /** A laptop box (kraft or cream) with an ink laptop icon (never the hero colour). */
-export const LaptopBox: React.FC<{x: number; y: number; w: number; h: number; color?: string; seed?: string; at?: At; ink?: number}> = ({x, y, w, h, color, seed = 'box', at, ink = W.far}) => {
+const LaptopBoxBody: React.FC<{x: number; y: number; w: number; h: number; color?: string; seed?: string; at?: At; ink?: number}> = ({x, y, w, h, color, seed = 'box', at, ink = W.far}) => {
   const c = color ?? (rng(`lbox/${seed}`).chance(0.5) ? KRAFT : EMBER.card);
   const iw = Math.min(w * 0.3, h * 0.9);
   const icx = x + w * 0.5;
@@ -241,11 +248,12 @@ export const LaptopBox: React.FC<{x: number; y: number; w: number; h: number; co
     </>
   );
 };
+export const LaptopBox = tiered('environment', {}, LaptopBoxBody);
 
 /** The shop's glass door cut by the frame edge: a warm glimpse inside (shelves), a push bar, the OPEN sign on a string
  *  swinging +-4 deg over 1.6 s (S4's loop; `signX` = where across the glass it hangs, so it stays on the visible part),
  *  a bell over the door that rings on `bellAt`. */
-export const ShopDoor: React.FC<{x: number; y: number; w: number; h: number; bellAt?: number[]; signX?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w, h, bellAt, signX = 0.5, seed = 'door', at, ink = W.mid}) => {
+const ShopDoorBody: React.FC<{x: number; y: number; w: number; h: number; bellAt?: number[]; signX?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w, h, bellAt, signX = 0.5, seed = 'door', at, ink = W.mid}) => {
   const t = useTime();
   const fr = 22;
   const gx = x + fr;
@@ -292,6 +300,7 @@ export const ShopDoor: React.FC<{x: number; y: number; w: number; h: number; bel
     </>
   );
 };
+export const ShopDoor = tiered('environment', {}, ShopDoorBody);
 
 // ---------------------------------------------------------------- inside the shop (S5)
 
@@ -312,7 +321,7 @@ export type ShopShelvingProps = {
 
 /** A shop shelving unit: uprights and 3 shelves of laptop boxes (kraft and cream, ink icons), a monitor with a
  *  screensaver, a router whose LEDs blink, headphones and cable packs on hooks, cream shelf talkers. */
-export const ShopShelving: React.FC<ShopShelvingProps> = ({x, y, w, h, shelves = 3, slot, joltAt, seed = 'shelving', at, ink = W.mid}) => {
+const ShopShelvingBody: React.FC<ShopShelvingProps> = ({x, y, w, h, shelves = 3, slot, joltAt, seed = 'shelving', at, ink = W.mid}) => {
   const t = useTime();
   const jolt = -Math.abs(rings(t, joltAt, 4, 5, 8));
   const plan = useMemo(() => {
@@ -420,10 +429,11 @@ export const ShopShelving: React.FC<ShopShelvingProps> = ({x, y, w, h, shelves =
   out.push(<Ink key="up" d={line(x, y, x, y + h + 60, {over: [0, 0], seed: `${seed}/u1`}) + line(x + w, y, x + w, y + h + 60, {over: [0, 0], seed: `${seed}/u2`})} at={at} width={ink} />);
   return <>{out}</>;
 };
+export const ShopShelving = tiered('environment', {}, ShopShelvingBody);
 
 /** The shop's front window onto the snowy street: dusk glass, a snowy ground band, a lit lamp post, falling snow,
  *  passers-by (each walks across once in its window of time), a headphone stand on the sill. */
-export const ShopWindowView: React.FC<{x: number; y: number; w: number; h: number; walkers?: {t0: number; t1: number; dir?: 1 | -1; h?: number; wear?: ('umbrella' | 'snow')[]; dog?: boolean}[]; seed?: string; at?: At; ink?: number}> = ({x, y, w, h, walkers = [], seed = 'swin', at, ink = W.mid}) => {
+const ShopWindowViewBody: React.FC<{x: number; y: number; w: number; h: number; walkers?: {t0: number; t1: number; dir?: 1 | -1; h?: number; wear?: ('umbrella' | 'snow')[]; dog?: boolean}[]; seed?: string; at?: At; ink?: number}> = ({x, y, w, h, walkers = [], seed = 'swin', at, ink = W.mid}) => {
   const id = `swv-${seed}`;
   const ground = y + h * 0.72;
   return (
@@ -455,9 +465,10 @@ export const ShopWindowView: React.FC<{x: number; y: number; w: number; h: numbe
     </>
   );
 };
+export const ShopWindowView = tiered('environment', {}, ShopWindowViewBody);
 
 /** A card reader on the counter (its LED blinks). Base centre on y. */
-export const CardReader: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 90, seed = 'reader', at, ink = W.mid}) => {
+const CardReaderBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 90, seed = 'reader', at, ink = W.mid}) => {
   const t = useTime();
   const h = w * 1.2;
   const on = Math.floor(t * 1.6) % 2 === 0;
@@ -473,10 +484,11 @@ export const CardReader: React.FC<{x: number; y: number; w?: number; seed?: stri
     </>
   );
 };
+export const CardReader = tiered('environment', {}, CardReaderBody);
 
 /** The receipt printer: a receipt feeds out of the slot from `feedAt` over `feedDur` and curls over the counter edge
  *  (S5's loop). Base centre on y; `curlTo` = how far down the paper hangs past the counter front at the end. */
-export const ReceiptPrinter: React.FC<{x: number; y: number; w?: number; feedAt?: number; feedDur?: number; len?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 120, feedAt = 0, feedDur = 0.6, len = 220, seed = 'printer', at, ink = W.mid}) => {
+const ReceiptPrinterBody: React.FC<{x: number; y: number; w?: number; feedAt?: number; feedDur?: number; len?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 120, feedAt = 0, feedDur = 0.6, len = 220, seed = 'printer', at, ink = W.mid}) => {
   const t = useTime();
   const h = w * 0.5;
   const k = ease01(t, feedAt, feedDur);
@@ -525,9 +537,10 @@ export const ReceiptPrinter: React.FC<{x: number; y: number; w?: number; feedAt?
     </>
   );
 };
+export const ReceiptPrinter = tiered('environment', {}, ReceiptPrinterBody);
 
 /** A paper shopping bag with handles (base centre on y). */
-export const PaperBag: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 130, seed = 'bag', at, ink = W.mid}) => {
+const PaperBagBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 130, seed = 'bag', at, ink = W.mid}) => {
   const h = w * 1.1;
   return (
     <>
@@ -538,9 +551,10 @@ export const PaperBag: React.FC<{x: number; y: number; w?: number; seed?: string
     </>
   );
 };
+export const PaperBag = tiered('environment', {}, PaperBagBody);
 
 /** A jar of USB sticks on the counter (base centre on y). */
-export const UsbJar: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 80, seed = 'usb', at, ink = W.mid}) => {
+const UsbJarBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 80, seed = 'usb', at, ink = W.mid}) => {
   const h = w * 1.2;
   const r = rng(`usb/${seed}`);
   const sticks: React.ReactNode[] = [];
@@ -558,9 +572,10 @@ export const UsbJar: React.FC<{x: number; y: number; w?: number; seed?: string; 
     </>
   );
 };
+export const UsbJar = tiered('environment', {}, UsbJarBody);
 
 /** A counter bell (rings: a small hop on `ringAt`). Base centre on y. */
-export const CounterBell: React.FC<{x: number; y: number; w?: number; ringAt?: number[]; seed?: string; at?: At; ink?: number}> = ({x, y, w = 70, ringAt, seed = 'bell', at, ink = W.mid}) => {
+const CounterBellBody: React.FC<{x: number; y: number; w?: number; ringAt?: number[]; seed?: string; at?: At; ink?: number}> = ({x, y, w = 70, ringAt, seed = 'bell', at, ink = W.mid}) => {
   const t = useTime();
   const hop = -Math.abs(rings(t, ringAt, 4, 6, 8));
   return (
@@ -574,10 +589,11 @@ export const CounterBell: React.FC<{x: number; y: number; w?: number; ringAt?: n
     </>
   );
 };
+export const CounterBell = tiered('environment', {}, CounterBellBody);
 
 /** A ceiling strip light (above the caption band): housing, a lit tube, flat light steps below; one stepped flicker
  *  at each `flickerAt` (lit, dark, lit, dark, lit over 0.2 s). */
-export const StripLight: React.FC<{x: number; y: number; w: number; flickerAt?: number[]; halo?: boolean; seed?: string; at?: At; ink?: number}> = ({x, y, w, flickerAt = [], halo = true, seed = 'strip', at, ink = W.mid}) => {
+const StripLightBody: React.FC<{x: number; y: number; w: number; flickerAt?: number[]; halo?: boolean; seed?: string; at?: At; ink?: number}> = ({x, y, w, flickerAt = [], halo = true, seed = 'strip', at, ink = W.mid}) => {
   const t = useTime();
   let lit = true;
   for (const f of flickerAt) {
@@ -593,19 +609,21 @@ export const StripLight: React.FC<{x: number; y: number; w: number; flickerAt?: 
     </>
   );
 };
+export const StripLight = tiered('environment', {}, StripLightBody);
 
 /** A cable tray along the ceiling with a few cables sagging out of it. */
-export const CableTray: React.FC<{x0: number; x1: number; y: number; seed?: string; at?: At; ink?: number}> = ({x0, x1, y, seed = 'tray', at, ink = W.far}) => (
+const CableTrayBody: React.FC<{x0: number; x1: number; y: number; seed?: string; at?: At; ink?: number}> = ({x0, x1, y, seed = 'tray', at, ink = W.far}) => (
   <>
     <Fill rect={[x0, y, x1 - x0, 22]} color={EMBER.frost} at={fillAt(at)} offset={false} />
     <path d={`M${x0 + (x1 - x0) * 0.3} ${y + 22}q60 50 120 0M${x0 + (x1 - x0) * 0.62} ${y + 22}q40 34 80 0`} fill="none" stroke={EMBER.dcSide} strokeWidth={6} />
     <Ink d={rectInk(x0, y, x1 - x0, 22, {seed: `${seed}/i`, over: [6, 12], edges: 'tb'})} at={at} width={ink} />
   </>
 );
+export const CableTray = tiered('environment', {}, CableTrayBody);
 
 /** The dock window (cut by an edge): dusk glass, snow, a truck's back with lit tail lights, a forklift crossing in
  *  each window of time. */
-export const DockWindow: React.FC<{x: number; y: number; w: number; h: number; forklift?: [number, number][]; seed?: string; at?: At; ink?: number}> = ({x, y, w, h, forklift = [], seed = 'dock', at, ink = W.mid}) => {
+const DockWindowBody: React.FC<{x: number; y: number; w: number; h: number; forklift?: [number, number][]; seed?: string; at?: At; ink?: number}> = ({x, y, w, h, forklift = [], seed = 'dock', at, ink = W.mid}) => {
   const t = useTime();
   const id = `dock-${seed}`;
   const ground = y + h * 0.74;
@@ -650,10 +668,11 @@ export const DockWindow: React.FC<{x: number; y: number; w: number; h: number; f
     </>
   );
 };
+export const DockWindow = tiered('environment', {}, DockWindowBody);
 
 /** A coffee machine (cut by an edge): a lit button that blinks, a cup in the tray with steam. */
 /** `body`: the casing colour (optional; default the anchor brown). */
-export const CoffeeMachine: React.FC<{x: number; y: number; w?: number; h?: number; seed?: string; at?: At; ink?: number; body?: string}> = ({x, y, w = 200, h = 380, seed = 'coffee', at, ink = W.mid, body = EMBER.anchor}) => {
+const CoffeeMachineBody: React.FC<{x: number; y: number; w?: number; h?: number; seed?: string; at?: At; ink?: number; body?: string}> = ({x, y, w = 200, h = 380, seed = 'coffee', at, ink = W.mid, body = EMBER.anchor}) => {
   const t = useTime();
   const on = Math.floor(t * 1.1) % 2 === 0;
   return (
@@ -671,18 +690,20 @@ export const CoffeeMachine: React.FC<{x: number; y: number; w?: number; h?: numb
     </>
   );
 };
+export const CoffeeMachine = tiered('environment', {}, CoffeeMachineBody);
 
 /** A small no-smoking plate (a circle with a bar; the bar in the red-brown, never the hero). */
-export const NoSmoking: React.FC<{x: number; y: number; r?: number; at?: At; seed?: string}> = ({x, y, r = 34, at, seed = 'nosmoke'}) => (
+const NoSmokingBody: React.FC<{x: number; y: number; r?: number; at?: At; seed?: string}> = ({x, y, r = 34, at, seed = 'nosmoke'}) => (
   <>
     <Fill rect={[x - r * 1.2, y - r * 1.2, r * 2.4, r * 2.4]} color={EMBER.card} at={fillAt(at)} seed={`${seed}/p`} />
     <Ink d={circle(x, y, r, {seed: `${seed}/c`}) + line(x - r * 0.7, y - r * 0.7, x + r * 0.7, y + r * 0.7, {over: [0, 0], seed: `${seed}/s`}) + rectInk(x - r * 1.2, y - r * 1.2, r * 2.4, r * 2.4, {seed: `${seed}/pi`, over: [0, 0]})} at={at} width={W.far} color={EMBER.beam} />
     <Fill rect={[x - r * 0.5, y - r * 0.1, r * 0.9, r * 0.2]} color={EMBER.anchor} at={fillAt(at, 0.05)} offset={false} />
   </>
 );
+export const NoSmoking = tiered('environment', {}, NoSmokingBody);
 
 /** A bench edge (seat + legs), base on y. */
-export const Bench: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 400, seed = 'bench', at, ink = W.mid}) => (
+const BenchBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 400, seed = 'bench', at, ink = W.mid}) => (
   <>
     <Fill rect={[x, y - 90, w, 22]} color={EMBER.beam} at={fillAt(at)} seed={`${seed}/s`} />
     <Fill rect={[x + 20, y - 68, 14, 68]} color={EMBER.anchor} at={fillAt(at)} offset={false} />
@@ -690,9 +711,10 @@ export const Bench: React.FC<{x: number; y: number; w?: number; seed?: string; a
     <Ink d={rectInk(x, y - 90, w, 22, {seed: `${seed}/i`, over: [3, 6]})} at={at} width={ink} />
   </>
 );
+export const Bench = tiered('environment', {}, BenchBody);
 
 /** A door mat with snowy boot prints. */
-export const BootMat: React.FC<{x: number; y: number; w?: number; h?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 360, h = 110, seed = 'mat', at, ink = W.far}) => {
+const BootMatBody: React.FC<{x: number; y: number; w?: number; h?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 360, h = 110, seed = 'mat', at, ink = W.far}) => {
   const r = rng(`mat/${seed}`);
   let prints = '';
   for (let i = 0; i < 5; i++) prints += blob(x + w * (0.15 + i * 0.17), y + h * (0.35 + (i % 2) * 0.3), 16, 9, {seed: `${seed}/p${i}${r.next()}`});
@@ -706,6 +728,7 @@ export const BootMat: React.FC<{x: number; y: number; w?: number; h?: number; se
     </>
   );
 };
+export const BootMat = tiered('environment', {}, BootMatBody);
 
 /** A driver / customer holding a coffee and a clipboard (re-export helper for S11's row: WinterPerson wears). */
 export const personHeight = (seed: string, s: number) => {

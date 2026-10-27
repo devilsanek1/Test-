@@ -19,6 +19,7 @@ import {EMBER} from '../palette';
 import {At, Pt} from './util';
 import {events, puffs, PuffOpts, windowLit, WindowForce} from './idle';
 import {WindowSilhouette, SilWho} from './People3';
+import {tiered} from '../../../lib/tier';
 
 /** The caption band (screen y): weather passes here at half density, flakes <= 6 px. */
 export const BAND: [number, number] = [290, 600];
@@ -58,7 +59,7 @@ export type SnowLayersProps = {
 
 /** Falling snow in parallax layers: far (tiny, slow, dense), mid, near (big, fast, sparse). Inside the caption band
  *  every other flake shrinks to nothing over 24 px (half density) and no flake is drawn over 6 px. Deterministic. */
-export const SnowLayers: React.FC<SnowLayersProps> = ({x = -100, y = -100, w = 1280, h = 2120, layers = ['far', 'mid', 'near'], density = 1, speed = 1, wind = 0, offset, band = BAND, color, seed = 'snow', at}) => {
+const SnowLayersBody: React.FC<SnowLayersProps> = ({x = -100, y = -100, w = 1280, h = 2120, layers = ['far', 'mid', 'near'], density = 1, speed = 1, wind = 0, offset, band = BAND, color, seed = 'snow', at}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const out: React.ReactNode[] = [];
@@ -90,11 +91,12 @@ export const SnowLayers: React.FC<SnowLayersProps> = ({x = -100, y = -100, w = 1
   }
   return <>{out}</>;
 };
+export const SnowLayers = tiered('environment', {bg: EMBER.sky}, SnowLayersBody);
 
 // ---------------------------------------------------------------- snow ridges, caps, frost
 
 /** A snow ridge on a sill or ledge: a bumpy mound from x0 to x1 sitting on y, height h, with a hair ink top. */
-export const SnowSill: React.FC<{x0: number; x1: number; y: number; h?: number; seed?: string; ink?: number; at?: At; drips?: number}> = ({x0, x1, y, h = 16, seed = 'sill', ink = 1.6, at, drips = 0}) => {
+const SnowSillBody: React.FC<{x0: number; x1: number; y: number; h?: number; seed?: string; ink?: number; at?: At; drips?: number}> = ({x0, x1, y, h = 16, seed = 'sill', ink = 1.6, at, drips = 0}) => {
   const t = useTime();
   const pts = useMemo(() => {
     const r = rng(`sill/${seed}`);
@@ -122,9 +124,10 @@ export const SnowSill: React.FC<{x0: number; x1: number; y: number; h?: number; 
     </>
   );
 };
+export const SnowSill = tiered('environment', {bg: EMBER.sky}, SnowSillBody);
 
 /** A snow cap on top of a box (a sign, a car roof, a booth, a lamp head): a soft slab overhanging by `over`. */
-export const SnowCap: React.FC<{x: number; y: number; w: number; h?: number; over?: number; seed?: string; ink?: number}> = ({x, y, w, h = 10, over = 4, seed = 'cap', ink = 0}) => {
+const SnowCapBody: React.FC<{x: number; y: number; w: number; h?: number; over?: number; seed?: string; ink?: number}> = ({x, y, w, h = 10, over = 4, seed = 'cap', ink = 0}) => {
   const d = blob(x + w / 2, y - h * 0.35, w / 2 + over, h * 0.65, {seed: `cap/${seed}`});
   return (
     <>
@@ -133,9 +136,10 @@ export const SnowCap: React.FC<{x: number; y: number; w: number; h?: number; ove
     </>
   );
 };
+export const SnowCap = tiered('environment', {bg: EMBER.sky}, SnowCapBody);
 
 /** Frost in the corners of a pane: scalloped flat blobs (frost) with small star ticks, like the G4 style frame. */
-export const Frost: React.FC<{x: number; y: number; w: number; h: number; corners?: ('tl' | 'tr' | 'bl' | 'br')[]; size?: number; seed?: string; ink?: number}> = ({x, y, w, h, corners = ['bl', 'br'], size = 90, seed = 'frost', ink = 1.6}) => {
+const FrostBody: React.FC<{x: number; y: number; w: number; h: number; corners?: ('tl' | 'tr' | 'bl' | 'br')[]; size?: number; seed?: string; ink?: number}> = ({x, y, w, h, corners = ['bl', 'br'], size = 90, seed = 'frost', ink = 1.6}) => {
   const out: React.ReactNode[] = [];
   corners.forEach((c, i) => {
     const cx = c[1] === 'l' ? x : x + w;
@@ -169,6 +173,7 @@ export const Frost: React.FC<{x: number; y: number; w: number; h: number; corner
     </g>
   );
 };
+export const Frost = tiered('environment', {bg: EMBER.sky}, FrostBody);
 
 // ---------------------------------------------------------------- puff trains
 
@@ -185,7 +190,7 @@ export type PuffTrainProps = PuffOpts & {
 };
 
 /** A flat puff train: each puff grows, rises, drifts and shrinks to nothing (no fade), 2-3 s loop. */
-export const PuffTrain: React.FC<PuffTrainProps> = ({x, y, color = EMBER.skyLow, ink = 0, at, stretch = 1.5, ...o}) => {
+const PuffTrainBody: React.FC<PuffTrainProps> = ({x, y, color = EMBER.skyLow, ink = 0, at, stretch = 1.5, ...o}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const ps = puffs(t - (at ?? 0), o, y);
@@ -200,20 +205,25 @@ export const PuffTrain: React.FC<PuffTrainProps> = ({x, y, color = EMBER.skyLow,
     </>
   );
 };
+export const PuffTrain = tiered('environment', {bg: EMBER.sky}, PuffTrainBody);
 
 /** Chimney smoke against the dusk sky: a lighter flat step, drifting right. */
-export const Smoke: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={8} life={3} rise={90} drift={70} r0={3} r1={11} wobble={2} stretch={2.2} {...p} color={p.color ?? EMBER.skyLow} />;
+const SmokeBody: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={8} life={3} rise={90} drift={70} r0={3} r1={11} wobble={2} stretch={2.2} {...p} color={p.color ?? EMBER.skyLow} />;
+export const Smoke = tiered('environment', {bg: EMBER.sky}, SmokeBody);
 
 /** Steam (a mug, a vent, a coffee cup, a manhole): small white puffs rising straight. */
-export const Steam: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={4} life={1.8} rise={70} drift={4} r0={3} r1={9} wobble={5} stretch={1.1} {...p} color={p.color ?? EMBER.snow} />;
+const SteamBody: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={4} life={1.8} rise={70} drift={4} r0={3} r1={9} wobble={5} stretch={1.1} {...p} color={p.color ?? EMBER.snow} />;
+export const Steam = tiered('environment', {bg: EMBER.sky}, SteamBody);
 
 /** The data center's cooling plume (one per roof unit): big slow puffs, never above `ceil` (default 600: the band). */
-export const CoolingPlume: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={8} life={3.4} rise={150} drift={34} r0={9} r1={24} wobble={5} ceil={600} {...p} color={p.color ?? EMBER.skyLow} />;
+const CoolingPlumeBody: React.FC<Omit<PuffTrainProps, 'color'> & {color?: string}> = (p) => <PuffTrain n={8} life={3.4} rise={150} drift={34} r0={9} r1={24} wobble={5} ceil={600} {...p} color={p.color ?? EMBER.skyLow} />;
+export const CoolingPlume = tiered('environment', {bg: EMBER.sky}, CoolingPlumeBody);
 
 /** Exhaust from a vehicle's pipe: a puff every ~0.6 s drifting back (dir -1 = left). */
-export const Exhaust: React.FC<{x: number; y: number; dir?: number; size?: number; seed?: string; color?: string}> = ({x, y, dir = -1, size = 1, seed = 'ex', color = EMBER.frost}) => (
+const ExhaustBody: React.FC<{x: number; y: number; dir?: number; size?: number; seed?: string; color?: string}> = ({x, y, dir = -1, size = 1, seed = 'ex', color = EMBER.frost}) => (
   <PuffTrain x={x} y={y} n={3} life={1.8} rise={26 * size} drift={dir * 60 * size} r0={3 * size} r1={10 * size} wobble={3} seed={seed} color={color} />
 );
+export const Exhaust = tiered('environment', {bg: EMBER.sky}, ExhaustBody);
 
 // ---------------------------------------------------------------- near house fronts (through a window)
 
@@ -240,7 +250,7 @@ export type NearFrontsProps = {
 
 /** 2-4 house fronts face-on behind the window: varied gables and flat tops in the cold roofs blue, snowy roofs, 6-10
  *  warm lit windows on one switching schedule (2 with silhouettes), chimneys with smoke drifting right. Fill only. */
-export const NearFronts: React.FC<NearFrontsProps> = ({x0, x1, y, h = [70, 110], n = 3, seed = 'near', far = true, smoke = true, sil = {1: 'cross', 4: 'read'}, force, gap, at}) => {
+const NearFrontsBody: React.FC<NearFrontsProps> = ({x0, x1, y, h = [70, 110], n = 3, seed = 'near', far = true, smoke = true, sil = {1: 'cross', 4: 'read'}, force, gap, at}) => {
   const t = useTime();
   const plan = useMemo(() => {
     const r = rng(`nearR/${seed}`);
@@ -291,6 +301,7 @@ export const NearFronts: React.FC<NearFrontsProps> = ({x0, x1, y, h = [70, 110],
   });
   return <>{out}</>;
 };
+export const NearFronts = tiered('environment', {bg: EMBER.sky}, NearFrontsBody);
 
 // ---------------------------------------------------------------- sky: clouds, a low bank, birds
 
@@ -310,7 +321,7 @@ export type SkyCloudsProps = {
 };
 
 /** Big flat cloud masses drifting (a lighter or darker flat step of the sky), wrapping. */
-export const SkyClouds: React.FC<SkyCloudsProps> = ({x0 = -200, x1 = 1280, y0 = 40, y1 = 280, n = 4, w = [300, 620], speed = 8, color = '#66759E', seed = 'clouds'}) => {
+const SkyCloudsBody: React.FC<SkyCloudsProps> = ({x0 = -200, x1 = 1280, y0 = 40, y1 = 280, n = 4, w = [300, 620], speed = 8, color = '#66759E', seed = 'clouds'}) => {
   const t = useTime();
   const r = rng(`cl/${seed}`);
   const span = x1 - x0;
@@ -327,9 +338,10 @@ export const SkyClouds: React.FC<SkyCloudsProps> = ({x0 = -200, x1 = 1280, y0 = 
   }
   return <path d={d} fill={color} />;
 };
+export const SkyClouds = tiered('environment', {bg: EMBER.sky}, SkyCloudsBody);
 
 /** A pale low snow-cloud bank on the horizon (S9: the dark hall and the mountain stand against the palest shape). */
-export const LowClouds: React.FC<{y: number; h?: number; x0?: number; x1?: number; color?: string; seed?: string; drift?: number}> = ({y, h = 70, x0 = -200, x1 = 1280, color = EMBER.skyLow, seed = 'bank', drift = 3}) => {
+const LowCloudsBody: React.FC<{y: number; h?: number; x0?: number; x1?: number; color?: string; seed?: string; drift?: number}> = ({y, h = 70, x0 = -200, x1 = 1280, color = EMBER.skyLow, seed = 'bank', drift = 3}) => {
   const t = useTime();
   const r = rng(`bank/${seed}`);
   const pts: Pt[] = [];
@@ -337,9 +349,10 @@ export const LowClouds: React.FC<{y: number; h?: number; x0?: number; x1?: numbe
   for (let i = 0; i <= n; i++) pts.push([x0 + ((x1 - x0) * i) / n + Math.sin(t * 0.2 + i) * drift, y - h * r.range(0.45, 1)]);
   return <path d={smooth(pts) + `L${x1} ${y + 2}L${x0} ${y + 2}Z`} fill={color} />;
 };
+export const LowClouds = tiered('environment', {bg: EMBER.sky}, LowCloudsBody);
 
 /** A V of 4-5 birds crossing (16-24 px, clear V wings flapping; lighter than the sticks: dcSide by default). */
-export const BirdV: React.FC<{at: number; from: Pt; to: Pt; dur?: number; n?: number; size?: number; color?: string; seed?: string; width?: number}> = ({at, from, to, dur = 2.4, n = 5, size = 20, color = EMBER.dcSide, seed = 'bv', width = 2.2}) => {
+const BirdVBody: React.FC<{at: number; from: Pt; to: Pt; dur?: number; n?: number; size?: number; color?: string; seed?: string; width?: number}> = ({at, from, to, dur = 2.4, n = 5, size = 20, color = EMBER.dcSide, seed = 'bv', width = 2.2}) => {
   const t = useTime();
   if (t < at || t > at + dur) return null;
   const k = (t - at) / dur;
@@ -356,11 +369,12 @@ export const BirdV: React.FC<{at: number; from: Pt; to: Pt; dur?: number; n?: nu
   }
   return <path d={d} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" />;
 };
+export const BirdV = tiered('environment', {bg: EMBER.sky}, BirdVBody);
 
 // ---------------------------------------------------------------- icicles
 
 /** Icicles hanging under a ledge (frost fill, hair ink); with `drip`, a drop falls from one of them every ~1.2 s. */
-export const Icicles: React.FC<{x0: number; x1: number; y: number; n?: number; len?: [number, number]; drip?: boolean; seed?: string; ink?: number}> = ({x0, x1, y, n = 5, len = [16, 44], drip = true, seed = 'ice', ink = 1.6}) => {
+const IciclesBody: React.FC<{x0: number; x1: number; y: number; n?: number; len?: [number, number]; drip?: boolean; seed?: string; ink?: number}> = ({x0, x1, y, n = 5, len = [16, 44], drip = true, seed = 'ice', ink = 1.6}) => {
   const t = useTime();
   const ice = useMemo(() => {
     const r = rng(`ice/${seed}`);
@@ -393,3 +407,4 @@ export const Icicles: React.FC<{x0: number; x1: number; y: number; n?: number; l
     </>
   );
 };
+export const Icicles = tiered('environment', {bg: EMBER.sky}, IciclesBody);

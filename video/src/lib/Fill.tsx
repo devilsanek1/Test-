@@ -132,6 +132,8 @@ export type FillProps = {
   style?: React.CSSProperties;
   /** Ignore <Look> (keep the colour in paper / cascade states). The World sky uses this. */
   lookExempt?: boolean;
+  /** Clean pen: a backdrop (a sky, a wall, a ground plane): never recoloured by an attention tier, whatever its size. */
+  backdrop?: boolean;
 };
 
 const growOrigin = (b: BBox, dir: Dir): [number, number] =>
@@ -172,6 +174,7 @@ export const Fill: React.FC<FillProps> = ({
   rule,
   style,
   lookExempt,
+  backdrop,
 }) => {
   const t = useTime();
   const e = useExit();
@@ -202,7 +205,7 @@ export const Fill: React.FC<FillProps> = ({
   // (or its <TodAnchor>): motion spec #12, never a clip edge through the object
   const screenC: [number, number] | undefined = tv.wave && !tv.anchor ? [m[0] * (box.x + box.w / 2) + m[2] * (box.y + box.h / 2) + m[4], m[1] * (box.x + box.w / 2) + m[3] * (box.y + box.h / 2) + m[5]] : undefined;
   let paint = lookExempt ? color : tv.tod === 'day' && !tv.wave && !tv.map ? color : relightAt(tv, color, screenC);
-  if (clean && !lookExempt) {
+  if (clean && !lookExempt && !backdrop) {
     // the calmer tiers: pulled toward the background, chroma eased (never a backdrop or an emissive colour)
     const tier = scope?.tier ?? PEN.untagged;
     if (tier !== 'subject' && Math.sqrt(Math.min(1, (box.w * box.h * local * local) / area)) < PEN.backdrop) paint = tierFill(paint, tier, scope?.bg ?? PEN.bg);

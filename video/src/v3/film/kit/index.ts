@@ -1,6 +1,7 @@
 // Video 3 G5 kit: the shared sets and props in the Autumn Ember house style (kit/README.md: API, sizes, colour jobs,
 // the consistency contract). The palette import comes first so the house tokens are Ember before any lib module loads.
 import '../palette';
+import '../look'; // the clean pen + attention tiers (lib/pen.ts; kit/README.md "Clean pen and tiers")
 
 export {EMBER, FILM_TOD, PALETTE_NAME, emberProblems} from '../palette';
 export {b, fillAt, FILL_LAG, W, Show, Pop, Txt, textW, Rot, Scale, quadPt} from './util';

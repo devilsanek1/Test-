@@ -10,6 +10,7 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
 import {At, b, fillAt, Pt, Show, Txt} from './util';
 import {Laptop} from './Laptop';
+import {tiered} from '../../../lib/tier';
 
 // ---------------------------------------------------------------- chip factory
 
@@ -38,7 +39,7 @@ export function chipFactoryGeo(x: number, y: number, w = 300) {
   return {h, x0, x1: x + w / 2, top: y - h, door, doorC: [door.x + door.w / 2, y] as Pt};
 }
 
-export const ChipFactory: React.FC<ChipFactoryProps> = ({doorSide = 'l', ...p}) =>
+const ChipFactoryBody: React.FC<ChipFactoryProps> = ({doorSide = 'l', ...p}) =>
   doorSide === 'r' ? (
     <XG m={mat.about(mat.scale(-1, 1), p.x, p.y)}>
       <ChipFactoryL {...p} />
@@ -108,12 +109,13 @@ const ChipFactoryL: React.FC<Omit<ChipFactoryProps, 'doorSide'>> = ({x, y, w = 3
     </>
   );
 };
+export const ChipFactory = tiered('support', {tone: EMBER.brick, bg: EMBER.sky}, ChipFactoryBody);
 
 // ---------------------------------------------------------------- the chip maker (S14's speaker)
 
 /** A small chip-fab worker in a white clean-room suit (hood, frost visor), standing at the factory door, one arm out
  *  (pointing / speaking). (x, y) = feet centre, h = height (board: 112). Faces left by default (toward the road). */
-export const ChipMaker: React.FC<{x: number; y: number; h?: number; facing?: 'l' | 'r'; point?: boolean; at?: At; seed?: string; ink?: number}> = ({x, y, h = 112, facing = 'l', point = true, at, seed = 'maker', ink = 2.6}) => {
+const ChipMakerBody: React.FC<{x: number; y: number; h?: number; facing?: 'l' | 'r'; point?: boolean; at?: At; seed?: string; ink?: number}> = ({x, y, h = 112, facing = 'l', point = true, at, seed = 'maker', ink = 2.6}) => {
   const t = useTime();
   const u = h / 112;
   const s = facing === 'l' ? -1 : 1;
@@ -139,6 +141,7 @@ export const ChipMaker: React.FC<{x: number; y: number; h?: number; facing?: 'l'
     </>
   );
 };
+export const ChipMaker = tiered('support', {tone: EMBER.card}, ChipMakerBody);
 
 // ---------------------------------------------------------------- the laptop van
 
@@ -158,7 +161,7 @@ export type VanProps = {
   ink?: number;
 };
 
-export const Van: React.FC<VanProps> = ({x, y, w = 380, flip, lights = true, decalW, at, seed = 'van', ink = 3.4}) => {
+const VanBody: React.FC<VanProps> = ({x, y, w = 380, flip, lights = true, decalW, at, seed = 'van', ink = 3.4}) => {
   const h = w * 0.5;
   const x0 = x - w / 2;
   const wheelR = w * 0.085;
@@ -196,12 +199,13 @@ export const Van: React.FC<VanProps> = ({x, y, w = 380, flip, lights = true, dec
   );
   return flip ? <XG m={mat.about(mat.scale(-1, 1), x, y)}>{content}</XG> : content;
 };
+export const Van = tiered('support', {tone: EMBER.reveal, bg: EMBER.sky}, VanBody);
 
 // ---------------------------------------------------------------- waiting dots
 
 /** Three dots that bob one after another (waiting). (x, y) = the first dot; they step along `dir` (default up-right,
  *  as over the van's cab on the board). */
-export const WaitingDots: React.FC<{x: number; y: number; r?: number; gap?: Pt; n?: number; at?: At; color?: string}> = ({x, y, r = 11, gap = [36, -16], n = 3, at, color = EMBER.anchor}) => {
+const WaitingDotsBody: React.FC<{x: number; y: number; r?: number; gap?: Pt; n?: number; at?: At; color?: string}> = ({x, y, r = 11, gap = [36, -16], n = 3, at, color = EMBER.anchor}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   return (
@@ -216,6 +220,7 @@ export const WaitingDots: React.FC<{x: number; y: number; r?: number; gap?: Pt; 
     </>
   );
 };
+export const WaitingDots = tiered('support', {}, WaitingDotsBody);
 
 // ---------------------------------------------------------------- bubbles
 
@@ -234,7 +239,7 @@ export type BubbleProps = {
 };
 
 /** A speech bubble: a warm-white oval with a tail to the speaker; content as children (canvas px). Pops in. */
-export const SpeechBubble: React.FC<BubbleProps> = ({cx, cy, rx, ry, to, at, seed = 'speech', ink = 3.4, children}) => {
+const SpeechBubbleBody: React.FC<BubbleProps> = ({cx, cy, rx, ry, to, at, seed = 'speech', ink = 3.4, children}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const s = at === undefined ? 1 : 0.2 + 0.8 * prog(t, at, 0.14, ease.outBack(1.3));
@@ -254,9 +259,10 @@ export const SpeechBubble: React.FC<BubbleProps> = ({cx, cy, rx, ry, to, at, see
     </XG>
   );
 };
+export const SpeechBubble = tiered('support', {tone: EMBER.card}, SpeechBubbleBody);
 
 /** A thought bubble: a cloud with two small circles trailing to the thinker's head; content as children. */
-export const ThoughtBubble: React.FC<BubbleProps> = ({cx, cy, rx, ry, to, at, seed = 'thought', ink = 3.4, children}) => {
+const ThoughtBubbleBody: React.FC<BubbleProps> = ({cx, cy, rx, ry, to, at, seed = 'thought', ink = 3.4, children}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const s = at === undefined ? 1 : 0.2 + 0.8 * prog(t, at, 0.16, ease.outBack(1.3));
@@ -282,12 +288,13 @@ export const ThoughtBubble: React.FC<BubbleProps> = ({cx, cy, rx, ry, to, at, se
     </XG>
   );
 };
+export const ThoughtBubble = tiered('support', {tone: EMBER.card}, ThoughtBubbleBody);
 
 // ---------------------------------------------------------------- wall clock
 
 /** A round wall clock: wood rim, warm-white face, 12 ticks; the second hand ticks once a second, the minute hand
  *  creeps (waiting). */
-export const WallClock: React.FC<{cx: number; cy: number; r?: number; at?: At; seed?: string; ink?: number; startMin?: number}> = ({cx, cy, r = 46, at, seed = 'clock', ink = 3.4, startMin = 41}) => {
+const WallClockBody: React.FC<{cx: number; cy: number; r?: number; at?: At; seed?: string; ink?: number; startMin?: number}> = ({cx, cy, r = 46, at, seed = 'clock', ink = 3.4, startMin = 41}) => {
   const t = useTime();
   const sec = Math.floor(t);
   const handD = (deg: number, len: number) => `M${cx} ${cy}L${cx + Math.sin((deg * Math.PI) / 180) * len} ${cy - Math.cos((deg * Math.PI) / 180) * len}`;
@@ -313,12 +320,13 @@ export const WallClock: React.FC<{cx: number; cy: number; r?: number; at?: At; s
     </>
   );
 };
+export const WallClock = tiered('environment', {tone: EMBER.card}, WallClockBody);
 
 // ---------------------------------------------------------------- calendar (2026 -> 2027)
 
 /** A wall calendar: anchor header with two rings, a warm-white page with the year; at `flipAt` the page flips up over
  *  the binding (0.18 s squash, no fade) and the next year is underneath. (x, y) = top-left, w = width (board: 170). */
-export const Calendar: React.FC<{x: number; y: number; w?: number; from?: string; to?: string; flipAt?: number; at?: At; seed?: string; ink?: number}> = ({x, y, w = 170, from = '2026', to = '2027', flipAt, at, seed = 'cal', ink = 3.4}) => {
+const CalendarBody: React.FC<{x: number; y: number; w?: number; from?: string; to?: string; flipAt?: number; at?: At; seed?: string; ink?: number}> = ({x, y, w = 170, from = '2026', to = '2027', flipAt, at, seed = 'cal', ink = 3.4}) => {
   const t = useTime();
   const h = w * 0.92;
   const headH = h * 0.26;
@@ -350,5 +358,6 @@ export const Calendar: React.FC<{x: number; y: number; w?: number; from?: string
     </>
   );
 };
+export const Calendar = tiered((p) => (p.flipAt !== undefined ? 'support' : 'environment'), {tone: EMBER.card}, CalendarBody);
 void line;
 void smooth;

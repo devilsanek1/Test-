@@ -12,6 +12,7 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
 import {At, b, fillAt, Pt, Show, Txt} from './util';
 import {DataCenter} from './Outside';
+import {tiered} from '../../../lib/tier';
 
 export type TickerStep = {t: number; v: string};
 
@@ -82,7 +83,7 @@ function tickerNow(t: number, value?: string, ticker?: TickerStep[]): {v: string
   return {v, since};
 }
 
-export const PriceTag: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, oldSize: oldK = 0.16, oldTone = 'white', oldAt, strikeAt, stringFrom, rot = 0, sway = 0, turnAt, turn, backSign = 'AI', tone = 'hero', at, seed = 'tag', ink = 3.4}) => {
+const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, oldSize: oldK = 0.16, oldTone = 'white', oldAt, strikeAt, stringFrom, rot = 0, sway = 0, turnAt, turn, backSign = 'AI', tone = 'hero', at, seed = 'tag', ink = 3.4}) => {
   const t = useTime();
   const h = w * 0.5;
   const shape = tagShape(w);
@@ -159,6 +160,7 @@ export const PriceTag: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, 
     </>
   );
 };
+export const PriceTag = tiered('subject', {tone: (p) => (p.tone === 'pop' ? EMBER.pop : EMBER.hero)}, PriceTagBody);
 
 /** Screen position of the tag's hole (where a string ties on), for lanes chaining a tag to a phone or a laptop. */
 export const tagHoleAt = (x: number, y: number, w: number): Pt => [x + tagHole(w)[0], y + tagHole(w)[1]];

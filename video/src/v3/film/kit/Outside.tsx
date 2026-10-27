@@ -10,20 +10,22 @@ import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {EMBER} from '../palette';
 import {At, b, fillAt, Pt, Show, Txt} from './util';
+import {tiered} from '../../../lib/tier';
 
 // ---------------------------------------------------------------- sky + snow
 
 /** The flat dusk-blue sky over a rect (default: the whole frame plus bleed), with an optional lighter band (one flat
  *  step, no gradient) from `bandY` down to the horizon. */
-export const NightSky: React.FC<{x?: number; y?: number; w?: number; h?: number; bandY?: number; horizon?: number; at?: At}> = ({x = -200, y = -200, w = 1480, h = 2320, bandY, horizon, at}) => (
+const NightSkyBody: React.FC<{x?: number; y?: number; w?: number; h?: number; bandY?: number; horizon?: number; at?: At}> = ({x = -200, y = -200, w = 1480, h = 2320, bandY, horizon, at}) => (
   <>
     <Fill rect={[x, y, w, h]} color={EMBER.sky} at={at} mode="snap" offset={false} />
     {bandY !== undefined && horizon !== undefined && horizon > bandY ? <Fill rect={[x, bandY, w, horizon - bandY]} color={EMBER.skyLow} at={at} mode="snap" offset={false} /> : null}
   </>
 );
+export const NightSky = tiered('environment', {bg: EMBER.sky}, NightSkyBody);
 
 /** Steady falling snow inside a rect: seeded flakes that drift down and wrap (deterministic in t). */
-export const Snowfall: React.FC<{x: number; y: number; w: number; h: number; n?: number; size?: number; speed?: number; seed?: string; at?: At}> = ({x, y, w, h, n = 26, size = 1, speed = 1, seed = 'snow', at}) => {
+const SnowfallBody: React.FC<{x: number; y: number; w: number; h: number; n?: number; size?: number; speed?: number; seed?: string; at?: At}> = ({x, y, w, h, n = 26, size = 1, speed = 1, seed = 'snow', at}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const r = rng(`flakes/${seed}`);
@@ -39,6 +41,7 @@ export const Snowfall: React.FC<{x: number; y: number; w: number; h: number; n?:
   }
   return <>{out}</>;
 };
+export const Snowfall = tiered('environment', {bg: EMBER.sky}, SnowfallBody);
 
 // ---------------------------------------------------------------- the town band
 
@@ -48,7 +51,7 @@ export type HouseSpec = {x: number; w: number; h?: number; lit?: boolean; chimne
 
 /** Snow-capped pitched-roof houses standing on the ground line `y` (two by default, as on the board's horizon).
  *  `far`: fill only (behind a window or far in a wide); otherwise thin ink. */
-export const TownBand: React.FC<{y: number; houses?: HouseSpec[]; x0?: number; x1?: number; n?: number; houseW?: number; far?: boolean; at?: At; seed?: string; ground?: string | false; groundH?: number}> = ({
+const TownBandBody: React.FC<{y: number; houses?: HouseSpec[]; x0?: number; x1?: number; n?: number; houseW?: number; far?: boolean; at?: At; seed?: string; ground?: string | false; groundH?: number}> = ({
   y,
   houses,
   x0 = 180,
@@ -78,6 +81,7 @@ export const TownBand: React.FC<{y: number; houses?: HouseSpec[]; x0?: number; x
     </>
   );
 };
+export const TownBand = tiered('environment', {tone: EMBER.roofs, bg: EMBER.sky}, TownBandBody);
 
 const House: React.FC<HouseSpec & {y: number; far: boolean; at?: At; seed: string}> = ({x, w, h, lit = true, chimney, y, far, at, seed}) => {
   const bodyH = h ?? w * 0.62;
@@ -144,7 +148,7 @@ export function dataCenterGeo(x: number, y: number, w: number, h?: number, varia
   return {H, top, sign, x0: x - w / 2, x1: x + w / 2};
 }
 
-export const DataCenter: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH}) => {
+const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH}) => {
   const t = useTime();
   const variant: DataCenterVariant = darkAt !== undefined && t >= darkAt ? 'dark' : v0;
   const g = dataCenterGeo(x, y, w, h, v0, signH);
@@ -238,6 +242,7 @@ export const DataCenter: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 =
     </>
   );
 };
+export const DataCenter = tiered((p) => (p.variant === 'far' ? 'environment' : p.variant === 'mini' ? 'subject' : 'support'), {tone: (p) => (p.variant === 'dark' || p.darkAt !== undefined ? EMBER.dcDark : EMBER.dc), bg: EMBER.sky}, DataCenterBody);
 
 // ---------------------------------------------------------------- our roof: the ledge (parapet) and a vent
 
@@ -263,7 +268,7 @@ export type RoofLedgeProps = {
 
 /** Our building's roof parapet: warm brick (our side is warm), a light snow coping lip, one vent with a snow cap; cut
  *  by both side edges. Front ink (4.8). */
-export const RoofLedge: React.FC<RoofLedgeProps> = ({y, x0 = -60, x1 = 1140, h = 1400, ventX = 220, lipH = 36, bricks: nBricks = 9, exact, at, seed = 'ledge', ink = 4.8}) => {
+const RoofLedgeBody: React.FC<RoofLedgeProps> = ({y, x0 = -60, x1 = 1140, h = 1400, ventX = 220, lipH = 36, bricks: nBricks = 9, exact, at, seed = 'ledge', ink = 4.8}) => {
   const r = rng(`ledge/${seed}`);
   const off = exact ? false : undefined;
   // a few brick ticks on the parapet face (short marks, not a pattern), kept inside the face
@@ -285,6 +290,7 @@ export const RoofLedge: React.FC<RoofLedgeProps> = ({y, x0 = -60, x1 = 1140, h =
     </>
   );
 };
+export const RoofLedge = tiered('support', {tone: EMBER.brick, bg: EMBER.sky}, RoofLedgeBody);
 
 export type RoofVentProps = {
   /** Body centre x and the roof line it stands on (canvas px). */
@@ -303,7 +309,7 @@ export type RoofVentProps = {
 };
 
 /** OUR roof's vent: a warm brick-shade body under a dark cowl with a snow cap (RoofLedge's vent; S9's near clutter). */
-export const RoofVent: React.FC<RoofVentProps> = ({x: vx, y, w: vw = 64, h: vh = 70, capH = vw * 0.344, exact, at, seed = 'ledge', ink = 3.84}) => {
+const RoofVentBody: React.FC<RoofVentProps> = ({x: vx, y, w: vw = 64, h: vh = 70, capH = vw * 0.344, exact, at, seed = 'ledge', ink = 3.84}) => {
   const vy = y - vh;
   const off = exact ? false : undefined;
   const cap: Pt[] = [[vx - vw * 0.75, vy], [vx + vw * 0.75, vy], [vx + vw * 0.55, vy - capH], [vx - vw * 0.55, vy - capH]];
@@ -316,3 +322,4 @@ export const RoofVent: React.FC<RoofVentProps> = ({x: vx, y, w: vw = 64, h: vh =
     </>
   );
 };
+export const RoofVent = tiered('support', {tone: EMBER.brickShade, bg: EMBER.sky}, RoofVentBody);

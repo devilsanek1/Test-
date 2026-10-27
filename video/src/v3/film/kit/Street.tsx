@@ -23,6 +23,7 @@ import {At, b, fillAt, Pt, Show, Txt, W} from './util';
 import {bob, events, rings, shuttle, stepped, sway, sweep} from './idle';
 import {Exhaust, SnowCap, Steam} from './Weather';
 import {WinterPerson, personGeo} from './People3';
+import {tiered} from '../../../lib/tier';
 
 /** Snow-lit edge on posts and poles (a light sliver on the left so they read against house fronts). */
 const SNOWLIT = EMBER.snow;
@@ -49,7 +50,7 @@ export type LampPost3Props = {
 };
 
 /** A street lamp: a dark post with a snow-lit edge, a lantern with a bright core and flat halo steps, snow on top. */
-export const LampPost3: React.FC<LampPost3Props> = ({x, y, h = 300, arm = 'top', lit = true, halo = [EMBER.skyLow, EMBER.ring], snow = true, at, seed = 'lamp', ink}) => {
+const LampPost3Body: React.FC<LampPost3Props> = ({x, y, h = 300, arm = 'top', lit = true, halo = [EMBER.skyLow, EMBER.ring], snow = true, at, seed = 'lamp', ink}) => {
   const k = h / 300;
   const pw = Math.max(4, 12 * k);
   const iw = ink ?? (h >= 220 ? W.mid : h >= 120 ? W.far : W.hair);
@@ -79,9 +80,10 @@ export const LampPost3: React.FC<LampPost3Props> = ({x, y, h = 300, arm = 'top',
     </>
   );
 };
+export const LampPost3 = tiered('environment', {bg: EMBER.sky}, LampPost3Body);
 
 /** A round wall lamp with a flat halo step on the wall (S4: by the shop door; colours = the wall's lighter steps). */
-export const WallLamp: React.FC<{x: number; y: number; r?: number; halo?: [string, string]; at?: At; seed?: string; ink?: number}> = ({x, y, r = 34, halo = [EMBER.core, EMBER.ring], at, seed = 'wlamp', ink = W.mid}) => (
+const WallLampBody: React.FC<{x: number; y: number; r?: number; halo?: [string, string]; at?: At; seed?: string; ink?: number}> = ({x, y, r = 34, halo = [EMBER.core, EMBER.ring], at, seed = 'wlamp', ink = W.mid}) => (
   <>
     <Show at={fillAt(at, 0.1)}>
       <circle cx={x} cy={y} r={r * 3.2} fill={halo[0]} />
@@ -93,11 +95,12 @@ export const WallLamp: React.FC<{x: number; y: number; r?: number; halo?: [strin
     <path d={blob(x, y - r * 1.62, r * 0.42, r * 0.14 + 1, {seed: `${seed}/sn`})} fill={EMBER.snow} />
   </>
 );
+export const WallLamp = tiered('environment', {bg: EMBER.sky}, WallLampBody);
 
 // ---------------------------------------------------------------- trees
 
 /** A winter tree: 'bare' (branches with snow on them) or 'pine' (stacked tiers with snow caps); a slow sway. */
-export const SnowTree: React.FC<{x: number; y: number; h?: number; kind?: 'bare' | 'pine'; seed?: string; at?: At; ink?: number; far?: boolean}> = ({x, y, h = 200, kind = 'pine', seed = 'tree', at, ink, far}) => {
+const SnowTreeBody: React.FC<{x: number; y: number; h?: number; kind?: 'bare' | 'pine'; seed?: string; at?: At; ink?: number; far?: boolean}> = ({x, y, h = 200, kind = 'pine', seed = 'tree', at, ink, far}) => {
   const t = useTime();
   const iw = far ? 0 : ink ?? (h >= 200 ? W.mid : W.far);
   const a = sway(t, 0.8, 4.6, x * 0.01);
@@ -146,6 +149,7 @@ export const SnowTree: React.FC<{x: number; y: number; h?: number; kind?: 'bare'
     </XG>
   );
 };
+export const SnowTree = tiered('environment', {bg: EMBER.sky}, SnowTreeBody);
 
 // ---------------------------------------------------------------- cars
 
@@ -174,7 +178,7 @@ export type Car3Props = {
 };
 
 /** A small car (Ember: cold blues, red-brown, cream; never the hero or the pop) with snow on its roof and its lights. */
-export const Car3: React.FC<Car3Props> = ({x, y, w = 220, view = 'side', dir = 1, color = EMBER.dc, lights = true, beam = EMBER.snow, snow = true, exhaust, rolling, at, seed = 'car', ink}) => {
+const Car3Body: React.FC<Car3Props> = ({x, y, w = 220, view = 'side', dir = 1, color = EMBER.dc, lights = true, beam = EMBER.snow, snow = true, exhaust, rolling, at, seed = 'car', ink}) => {
   const t = useTime();
   const iw = ink ?? (w >= 200 ? W.mid : w >= 110 ? W.far : W.hair);
   if (view === 'side') {
@@ -245,10 +249,11 @@ export const Car3: React.FC<Car3Props> = ({x, y, w = 220, view = 'side', dir = 1
     </>
   );
 };
+export const Car3 = tiered('environment', {bg: EMBER.sky}, Car3Body);
 
 /** A car's headlights sweeping across a wall: a flat band one step lighter, skewed, crossing the rect in `dur` at each
  *  time in `at` (S4: ~6.4 and ~8.6, 0.8 s). */
-export const HeadlightSweep: React.FC<{rect: [number, number, number, number]; at: number[]; dur?: number; color?: string; width?: number; dir?: 1 | -1; id?: string}> = ({rect, at, dur = 0.8, color = EMBER.core, width = 160, dir = 1, id = 'hls'}) => {
+const HeadlightSweepBody: React.FC<{rect: [number, number, number, number]; at: number[]; dur?: number; color?: string; width?: number; dir?: 1 | -1; id?: string}> = ({rect, at, dur = 0.8, color = EMBER.core, width = 160, dir = 1, id = 'hls'}) => {
   const t = useTime();
   const p = sweep(t, at, dur);
   if (p === null) return null;
@@ -265,6 +270,7 @@ export const HeadlightSweep: React.FC<{rect: [number, number, number, number]; a
     </g>
   );
 };
+export const HeadlightSweep = tiered('environment', {bg: EMBER.sky}, HeadlightSweepBody);
 
 // ---------------------------------------------------------------- the road, pavements, footprints
 
@@ -310,7 +316,7 @@ export type RoadDressProps = {
 
 /** The road dressed so the flat slab becomes a street: kerbs both sides (2-3 long lines with gaps), snowbanks along
  *  them (ink on the ridge only), two tyre tracks one step darker, faint lane dashes, a manhole, footprints. */
-export const RoadDress: React.FC<RoadDressProps> = ({road: R, fill = EMBER.road, kerbs = true, banks = true, tracks = true, dashes = true, manhole = {u: 0.42, d: 0.22, steam: true}, footprints = true, seed = 'road', at}) => {
+const RoadDressBody: React.FC<RoadDressProps> = ({road: R, fill = EMBER.road, kerbs = true, banks = true, tracks = true, dashes = true, manhole = {u: 0.42, d: 0.22, steam: true}, footprints = true, seed = 'road', at}) => {
   const P = (u: number, d: number) => roadPt(R, u, d);
   const out: React.ReactNode[] = [];
   const N = 24;
@@ -383,9 +389,10 @@ export const RoadDress: React.FC<RoadDressProps> = ({road: R, fill = EMBER.road,
   }
   return <>{out}</>;
 };
+export const RoadDress = tiered('environment', {bg: EMBER.sky}, RoadDressBody);
 
 /** Footprints along a path: alternating small ovals one step under the snow (sizes shrink toward the last point). */
-export const Footprints: React.FC<{points: Pt[]; size?: number; shrink?: number; color?: string; seed?: string}> = ({points, size = 9, shrink = 1, color = EMBER.frost, seed = 'fp'}) => {
+const FootprintsBody: React.FC<{points: Pt[]; size?: number; shrink?: number; color?: string; seed?: string}> = ({points, size = 9, shrink = 1, color = EMBER.frost, seed = 'fp'}) => {
   let d = '';
   points.forEach(([px, py], i) => {
     const k = 1 + (shrink - 1) * (i / Math.max(1, points.length - 1));
@@ -395,9 +402,10 @@ export const Footprints: React.FC<{points: Pt[]; size?: number; shrink?: number;
   });
   return <path d={d} fill={color} />;
 };
+export const Footprints = tiered('environment', {bg: EMBER.sky}, FootprintsBody);
 
 /** A straight-on snowy pavement (S4: y 1380-1920): kerb lines (2-3, with gaps), footprints, specks. */
-export const Pavement: React.FC<{y0: number; y1?: number; x0?: number; x1?: number; kerbs?: number[]; seed?: string; at?: At; color?: string}> = ({y0, y1 = 2000, x0 = -100, x1 = 1180, kerbs, seed = 'pave', at, color = EMBER.snow}) => {
+const PavementBody: React.FC<{y0: number; y1?: number; x0?: number; x1?: number; kerbs?: number[]; seed?: string; at?: At; color?: string}> = ({y0, y1 = 2000, x0 = -100, x1 = 1180, kerbs, seed = 'pave', at, color = EMBER.snow}) => {
   const r = rng(`pave/${seed}`);
   const ks = kerbs ?? [y0 + (y1 - y0) * 0.22, y0 + (y1 - y0) * 0.5];
   let kd = '';
@@ -426,12 +434,13 @@ export const Pavement: React.FC<{y0: number; y1?: number; x0?: number; x1?: numb
     </>
   );
 };
+export const Pavement = tiered('environment', {bg: EMBER.sky}, PavementBody);
 
 // ---------------------------------------------------------------- bus stop, fence, booth, signs, floodlights
 
 /** A bus stop shelter (snow on the roof, a frost glass back with a glint, a bench, the round sign, a lit ad panel)
  *  with 2-3 people waiting (one checks a phone). Base on y, h = shelter height (160-240). */
-export const BusStop: React.FC<{x: number; y: number; h?: number; people?: number; turnAt?: number; seed?: string; at?: At; ink?: number}> = ({x, y, h = 200, people = 3, turnAt, seed = 'bus', at, ink}) => {
+const BusStopBody: React.FC<{x: number; y: number; h?: number; people?: number; turnAt?: number; seed?: string; at?: At; ink?: number}> = ({x, y, h = 200, people = 3, turnAt, seed = 'bus', at, ink}) => {
   const k = h / 200;
   const w = 240 * k;
   const iw = ink ?? (h >= 180 ? W.far : W.hair);
@@ -466,9 +475,10 @@ export const BusStop: React.FC<{x: number; y: number; h?: number; people?: numbe
   out.push(<Ink key="gl" d={`M${x0 + 30 * k} ${y - h * 0.7}l${18 * k} ${-22 * k}M${x0 + 42 * k} ${y - h * 0.66}l${18 * k} ${-22 * k}`} at={b(at, 0.1)} width={W.hair} color={EMBER.white} />);
   return <>{out}</>;
 };
+export const BusStop = tiered('environment', {bg: EMBER.sky}, BusStopBody);
 
 /** A fence receding from `a` to `b` (base points) with post heights h0 -> h1, two rails, snow on the top rail. */
-export const Fence: React.FC<{a: Pt; b: Pt; h0?: number; h1?: number; posts?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({a, b: bb, h0 = 90, h1 = 30, posts = 10, seed = 'fence', at, ink = W.far, color = EMBER.dcSide}) => {
+const FenceBody: React.FC<{a: Pt; b: Pt; h0?: number; h1?: number; posts?: number; seed?: string; at?: At; ink?: number; color?: string}> = ({a, b: bb, h0 = 90, h1 = 30, posts = 10, seed = 'fence', at, ink = W.far, color = EMBER.dcSide}) => {
   let postD = '';
   let snow = '';
   const topPts: Pt[] = [];
@@ -496,6 +506,7 @@ export const Fence: React.FC<{a: Pt; b: Pt; h0?: number; h1?: number; posts?: nu
     </>
   );
 };
+export const Fence = tiered('environment', {bg: EMBER.sky}, FenceBody);
 
 export type GateBoothProps = {
   /** Booth base centre (canvas px) and width (120-180). */
@@ -528,7 +539,7 @@ export function barrierAngle(t: number, liftAt: number[] = [], lowerAt: number[]
 
 /** The factory gate: a lit guard booth (snowy roof, a warm window, a door) and a striped barrier arm that lifts in
  *  0.25 s on a stepped pivot. */
-export const GateBooth: React.FC<GateBoothProps> = ({x, y, w = 150, arm = 240, armSide = 'left', liftAt, lowerAt, guardInside = true, seed = 'booth', at, ink}) => {
+const GateBoothBody: React.FC<GateBoothProps> = ({x, y, w = 150, arm = 240, armSide = 'left', liftAt, lowerAt, guardInside = true, seed = 'booth', at, ink}) => {
   const t = useTime();
   const k = w / 150;
   const h = w * 1.1;
@@ -562,9 +573,10 @@ export const GateBooth: React.FC<GateBoothProps> = ({x, y, w = 150, arm = 240, a
     </>
   );
 };
+export const GateBooth = tiered('environment', {bg: EMBER.sky}, GateBoothBody);
 
 /** A sign on two posts (DELIVERIES, a shop sign): board, letters >= 22 px, snow on top. Base centre on y. */
-export const PostSign: React.FC<{x: number; y: number; w?: number; h?: number; text?: string; size?: number; color?: string; textColor?: string; post?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 200, h = 54, text = 'DELIVERIES', size, color = EMBER.card, textColor = EMBER.ink, post = 80, seed = 'sign', at, ink = W.far}) => {
+const PostSignBody: React.FC<{x: number; y: number; w?: number; h?: number; text?: string; size?: number; color?: string; textColor?: string; post?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 200, h = 54, text = 'DELIVERIES', size, color = EMBER.card, textColor = EMBER.ink, post = 80, seed = 'sign', at, ink = W.far}) => {
   const top = y - post - h;
   const fs = Math.max(22, size ?? h * 0.6);
   return (
@@ -582,9 +594,10 @@ export const PostSign: React.FC<{x: number; y: number; w?: number; h?: number; t
     </>
   );
 };
+export const PostSign = tiered('environment', {bg: EMBER.sky}, PostSignBody);
 
 /** A floodlight on a bracket with flat halo steps on the wall below (factory brick: warm steps). */
-export const Floodlight: React.FC<{x: number; y: number; s?: number; halo?: [string, string]; dir?: 1 | -1; at?: At; seed?: string; ink?: number}> = ({x, y, s = 1, halo = [EMBER.pot, EMBER.books[0]], dir = 1, at, seed = 'flood', ink = W.far}) => (
+const FloodlightBody: React.FC<{x: number; y: number; s?: number; halo?: [string, string]; dir?: 1 | -1; at?: At; seed?: string; ink?: number}> = ({x, y, s = 1, halo = [EMBER.pot, EMBER.books[0]], dir = 1, at, seed = 'flood', ink = W.far}) => (
   <>
     <Show at={fillAt(at, 0.1)}>
       <ellipse cx={x + dir * 18 * s} cy={y + 60 * s} rx={70 * s} ry={80 * s} fill={halo[0]} />
@@ -596,11 +609,12 @@ export const Floodlight: React.FC<{x: number; y: number; s?: number; halo?: [str
     <Ink d={poly([[x + dir * 16 * s, y - 14 * s], [x + dir * 40 * s, y - 8 * s], [x + dir * 36 * s, y + 14 * s], [x + dir * 14 * s, y + 8 * s]], {closed: true, seed: `${seed}/i`, over: [0, 1]})} at={at} width={ink} />
   </>
 );
+export const Floodlight = tiered('environment', {bg: EMBER.sky}, FloodlightBody);
 
 // ---------------------------------------------------------------- pallets, crates, forklift
 
 /** A wooden pallet (slats) with optional snow on top; base centre on y. */
-export const Pallet: React.FC<{x: number; y: number; w?: number; snow?: boolean; seed?: string; at?: At; ink?: number}> = ({x, y, w = 120, snow = true, seed = 'pallet', at, ink = W.far}) => {
+const PalletBody: React.FC<{x: number; y: number; w?: number; snow?: boolean; seed?: string; at?: At; ink?: number}> = ({x, y, w = 120, snow = true, seed = 'pallet', at, ink = W.far}) => {
   const h = w * 0.16;
   const x0 = x - w / 2;
   return (
@@ -614,10 +628,11 @@ export const Pallet: React.FC<{x: number; y: number; w?: number; snow?: boolean;
     </>
   );
 };
+export const Pallet = tiered('support', {tone: EMBER.board, bg: EMBER.sky}, PalletBody);
 
 /** A crate of memory sticks: slatted box, gold sticks with black chips showing over the top (S10 forklift, S11 crate,
  *  workers' loads). Base centre on y. */
-export const StickCrate: React.FC<{x: number; y: number; w?: number; h?: number; sticks?: number; snow?: boolean; seed?: string; at?: At; ink?: number}> = ({x, y, w = 120, h, sticks = 5, snow, seed = 'crate', at, ink}) => {
+const StickCrateBody: React.FC<{x: number; y: number; w?: number; h?: number; sticks?: number; snow?: boolean; seed?: string; at?: At; ink?: number}> = ({x, y, w = 120, h, sticks = 5, snow, seed = 'crate', at, ink}) => {
   const H = h ?? w * 0.62;
   const x0 = x - w / 2;
   const iw = ink ?? (w >= 100 ? W.mid : W.far);
@@ -650,6 +665,7 @@ export const StickCrate: React.FC<{x: number; y: number; w?: number; h?: number;
     </>
   );
 };
+export const StickCrate = tiered('support', {tone: EMBER.board, bg: EMBER.sky}, StickCrateBody);
 
 export type ForkliftProps = {
   /** Ground y and size (body length, 120-200 px). x: a fixed position, or a loop between a and b. */
@@ -668,7 +684,7 @@ export type ForkliftProps = {
 
 /** A forklift (side view): terracotta body and counterweight, a cab cage with the driver, the mast and forks carrying a
  *  crate of sticks; on a back-and-forth loop (drives to b, lifts, reverses to a). */
-export const Forklift: React.FC<ForkliftProps> = ({x = 0, y, w = 150, loop, dir = 1, carry = true, seed = 'fork', at, ink}) => {
+const ForkliftBody: React.FC<ForkliftProps> = ({x = 0, y, w = 150, loop, dir = 1, carry = true, seed = 'fork', at, ink}) => {
   const t = useTime();
   let fx = x;
   let lift = 0;
@@ -713,12 +729,13 @@ export const Forklift: React.FC<ForkliftProps> = ({x = 0, y, w = 150, loop, dir 
   );
   return <XG m={mat.compose(mat.translate(fx, jig), mat.scale(dir, 1))}>{g}</XG>;
 };
+export const Forklift = tiered('environment', {bg: EMBER.sky}, ForkliftBody);
 const WINTER_HAT = EMBER.ring;
 
 // ---------------------------------------------------------------- poles, wires, birds
 
 /** A wooden utility pole with a crossbar, insulators and a snow cap; base on y. */
-export const UtilityPole3: React.FC<{x: number; y: number; h?: number; seed?: string; at?: At; ink?: number}> = ({x, y, h = 520, seed = 'pole', at, ink}) => {
+const UtilityPole3Body: React.FC<{x: number; y: number; h?: number; seed?: string; at?: At; ink?: number}> = ({x, y, h = 520, seed = 'pole', at, ink}) => {
   const k = h / 520;
   const pw = 14 * k;
   const top = y - h;
@@ -736,6 +753,7 @@ export const UtilityPole3: React.FC<{x: number; y: number; h?: number; seed?: st
     </>
   );
 };
+export const UtilityPole3 = tiered('environment', {bg: EMBER.sky}, UtilityPole3Body);
 
 export type Wire3Props = {
   a: Pt;
@@ -754,7 +772,7 @@ export type Wire3Props = {
 
 /** Utility wires with sitting birds (head bobs, a turn now and then) that LIFT on a cause: staggered take-offs, wings
  *  flapping, an arc up and away, gone in ~1.6 s (S14: the second data center cuts in). */
-export const Wire3: React.FC<Wire3Props> = ({a, b: bb, sag = 26, n = 1, gap = 10, birds, ink = W.hair, seed = 'wire', at}) => {
+const Wire3Body: React.FC<Wire3Props> = ({a, b: bb, sag = 26, n = 1, gap = 10, birds, ink = W.hair, seed = 'wire', at}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   let wd = '';
@@ -796,9 +814,10 @@ export const Wire3: React.FC<Wire3Props> = ({a, b: bb, sag = 26, n = 1, gap = 10
   }
   return <>{out}</>;
 };
+export const Wire3 = tiered('environment', {bg: EMBER.sky}, Wire3Body);
 
 /** An ink-only bike leaning (S4: at the left edge), snow on the saddle. Wheel base on y, w = length. */
-export const Bike3: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number; flip?: boolean}> = ({x, y, w = 200, seed = 'bike', at, ink = W.far, flip}) => {
+const Bike3Body: React.FC<{x: number; y: number; w?: number; seed?: string; at?: At; ink?: number; flip?: boolean}> = ({x, y, w = 200, seed = 'bike', at, ink = W.far, flip}) => {
   const r = w * 0.2;
   const k = flip ? -1 : 1;
   const xa = x - k * w * 0.32;
@@ -815,9 +834,10 @@ export const Bike3: React.FC<{x: number; y: number; w?: number; seed?: string; a
     </>
   );
 };
+export const Bike3 = tiered('environment', {bg: EMBER.sky}, Bike3Body);
 
 /** One-off moving car along a line between two times (S10: a car passes on the far cross street at 23.4). */
-export const PassingCar: React.FC<{from: Pt; to: Pt; t0: number; t1: number; w?: number; color?: string; seed?: string}> = ({from, to, t0, t1, w = 90, color = EMBER.beam, seed = 'pass'}) => {
+const PassingCarBody: React.FC<{from: Pt; to: Pt; t0: number; t1: number; w?: number; color?: string; seed?: string}> = ({from, to, t0, t1, w = 90, color = EMBER.beam, seed = 'pass'}) => {
   const t = useTime();
   if (t < t0 || t > t1) return null;
   const k = (t - t0) / (t1 - t0);
@@ -825,6 +845,7 @@ export const PassingCar: React.FC<{from: Pt; to: Pt; t0: number; t1: number; w?:
   const y = from[1] + (to[1] - from[1]) * k;
   return <Car3 x={x} y={y} w={w} view="side" dir={to[0] >= from[0] ? 1 : -1} color={color} lights snow={false} rolling seed={seed} />;
 };
+export const PassingCar = tiered('environment', {bg: EMBER.sky}, PassingCarBody);
 
 /** Seeded random-time helper for set lanes: the times (in [t0, t1)) at which "something small happens" every gap. */
 export const lifeBeats = (seed: string, t0: number, t1: number, gap: [number, number] = [0.6, 1.2]) => events(`beats/${seed}`, t0, t1, gap).filter((v) => v >= t0 && v < t1);

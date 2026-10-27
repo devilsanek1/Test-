@@ -27,6 +27,7 @@ import {blob, circle, roundRect, smooth, torso} from '../../../lib/sketch';
 import {EMBER} from '../palette';
 import {At, Pt} from './util';
 import {bob, loopPos, puffs, ring, shuttle, sway, windowLit, WindowForce} from './idle';
+import {tiered} from '../../../lib/tier';
 
 // ---------------------------------------------------------------- the winter wardrobe (Ember families only)
 
@@ -185,7 +186,7 @@ export function winterPhoneAt(p: WinterPersonProps, t: number): {top: Pt; mid: P
   return {top: applyM(m, [hx, hyy - 42]), mid: applyM(m, [hx, hyy - 19])};
 }
 
-export const WinterPerson: React.FC<WinterPersonProps> = (props) => {
+const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
   const {x, y, s = 1, wear = [], acc: accIn, phoneWin, pointAt, waveAt, breathe = 2, moves = [], ink, coat, hat, bagColor, coatDetail, seed = 'wp', ...rest} = props;
   const t = useTime();
   const clipId = 'wp' + useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -403,6 +404,7 @@ export const WinterPerson: React.FC<WinterPersonProps> = (props) => {
     </XG>
   );
 };
+export const WinterPerson = tiered('support', {}, WinterPersonBody);
 
 /** The coat detail of one WinterPerson (figure-local px; see CoatDetail). Tone-on-tone folds in the coat's own hue
  *  (mixed toward the warm dark anchor: colour, never grey), thin ink, everything clipped to the coat's outline and
@@ -567,7 +569,7 @@ export function backRowLayout(props: BackRowProps, t: number) {
 /** A row of 3-6 backs along the bottom of an insert, shoulders nearly touching, looking at the subject; they breathe
  *  (staggered bobs), react on the voice's words (lean, recoil, nudge, phone up / down, point) and carry the density of a
  *  wall shot. Long torsos run past the frame bottom. */
-export const BackRow: React.FC<BackRowProps> = (props) => {
+const BackRowBody: React.FC<BackRowProps> = (props) => {
   const t = useTime();
   if (props.at !== undefined && t < props.at) return null;
   return (
@@ -580,6 +582,7 @@ export const BackRow: React.FC<BackRowProps> = (props) => {
     </>
   );
 };
+export const BackRow = tiered('support', {}, BackRowBody);
 
 /** Every raised phone in a BackRow at t (canvas px, the row's space): {i, top (camera end), mid}. A flash or a glint
  *  aimed at `top` follows the phone through the row's layout, leans and breath. */
@@ -622,7 +625,7 @@ export type WalkerProps = {
 
 /** A mid-ground walker (110-260 px): a full house figure walking (stepping legs, a bob), seen from behind, crossing a
  *  street or a window view, wrapping or crossing once. */
-export const Walker: React.FC<WalkerProps> = ({from, to, h, h1, speed = 60, phase = 0, pause = 1.5, window, seed = 'walker', hair, acc, wear, dog, steps = 1.7, ink}) => {
+const WalkerBody: React.FC<WalkerProps> = ({from, to, h, h1, speed = 60, phase = 0, pause = 1.5, window, seed = 'walker', hair, acc, wear, dog, steps = 1.7, ink}) => {
   const t = useTime();
   let pos: {x: number; y: number; u: number} | null;
   if (window) {
@@ -646,9 +649,10 @@ export const Walker: React.FC<WalkerProps> = ({from, to, h, h1, speed = 60, phas
     </>
   );
 };
+export const Walker = tiered('environment', {}, WalkerBody);
 
 /** A small dog trotting (side view, flat with hair ink). */
-export const Dog: React.FC<{x: number; y: number; h: number; t: number; dir?: number; color?: string}> = ({x, y, h, t, dir = 1, color = EMBER.beam}) => {
+const DogBody: React.FC<{x: number; y: number; h: number; t: number; dir?: number; color?: string}> = ({x, y, h, t, dir = 1, color = EMBER.beam}) => {
   const k = h / 30;
   const leg = Math.sin(t * 9) * 3;
   return (
@@ -662,6 +666,7 @@ export const Dog: React.FC<{x: number; y: number; h: number; t: number; dir?: nu
     </g>
   );
 };
+export const Dog = tiered('environment', {}, DogBody);
 
 // ---------------------------------------------------------------- tiny far walkers (tier D, fill only)
 
@@ -687,7 +692,7 @@ export type TinyWalkersProps = {
 
 /** A street's far life: 10-16 tiny figures (15-60 px) walking along it, fill-only flat shapes (head, coat, stepping
  *  legs), a few with a dog, one pulling a sledge, one under an umbrella. Deterministic, wrapping. */
-export const TinyWalkers: React.FC<TinyWalkersProps> = ({from, to, n = 12, h = [40, 18], speed = 22, seed = 'tiny', kinds = ['walker', 'walker', 'dog', 'walker', 'sledge', 'umbrella', 'walker', 'pair'], both = true, spread = 30}) => {
+const TinyWalkersBody: React.FC<TinyWalkersProps> = ({from, to, n = 12, h = [40, 18], speed = 22, seed = 'tiny', kinds = ['walker', 'walker', 'dog', 'walker', 'sledge', 'umbrella', 'walker', 'pair'], both = true, spread = 30}) => {
   const t = useTime();
   const r = rng(`tiny/${seed}`);
   const items: {key: number; x: number; y: number; h: number; ph: number; coat: string; hair: string; kind: TinyKind; dir: number}[] = [];
@@ -720,9 +725,10 @@ export const TinyWalkers: React.FC<TinyWalkersProps> = ({from, to, n = 12, h = [
     </>
   );
 };
+export const TinyWalkers = tiered('environment', {}, TinyWalkersBody);
 
 /** One tiny figure (tier D/E, 12-60 px): flat head, coat and stepping legs; above 34 px a hair ink outline. */
-export const Tiny: React.FC<{x: number; y: number; h: number; t: number; coat: string; hair?: string; kind?: TinyKind; dir?: number}> = ({x, y, h, t, coat, hair = EMBER.anchor, kind = 'walker', dir = 1}) => {
+const TinyBody: React.FC<{x: number; y: number; h: number; t: number; coat: string; hair?: string; kind?: TinyKind; dir?: number}> = ({x, y, h, t, coat, hair = EMBER.anchor, kind = 'walker', dir = 1}) => {
   const k = h / 40;
   const ph = Math.sin(t * 2 * Math.PI * 1.6);
   const ink = h >= 34;
@@ -756,6 +762,7 @@ export const Tiny: React.FC<{x: number; y: number; h: number; t: number; coat: s
     </g>
   );
 };
+export const Tiny = tiered('environment', {}, TinyBody);
 
 // ---------------------------------------------------------------- window people (tier E)
 
@@ -788,7 +795,7 @@ export type WindowSilhouetteProps = {
 
 /** A neighbour's lit window with a silhouette that lives: crosses the room, sits reading (a slow head bob, a page
  *  turn), waves, stands, cooks; the light pops on / off with the schedule. */
-export const WindowSilhouette: React.FC<WindowSilhouetteProps> = ({x, y, w, h, who = 'cross', lit = true, dark = EMBER.roofs, litColor = EMBER.houseLit, curtains, plant, far = true, seed = 'ws', speed = 0.35, pause = 2.5, ink = 2.2}) => {
+const WindowSilhouetteBody: React.FC<WindowSilhouetteProps> = ({x, y, w, h, who = 'cross', lit = true, dark = EMBER.roofs, litColor = EMBER.houseLit, curtains, plant, far = true, seed = 'ws', speed = 0.35, pause = 2.5, ink = 2.2}) => {
   const t = useTime();
   const id = 'ws' + useId().replace(/[^a-zA-Z0-9]/g, '');
   const on = typeof lit === 'function' ? lit(t) : lit;
@@ -852,6 +859,7 @@ export const WindowSilhouette: React.FC<WindowSilhouetteProps> = ({x, y, w, h, w
     </g>
   );
 };
+export const WindowSilhouette = tiered('environment', {}, WindowSilhouetteBody);
 
 /** Head and shoulders (a window silhouette), bottom-centre at (x, y). */
 const Bust: React.FC<{x: number; y: number; h: number; color: string; bobT: number; nod?: number}> = ({x, y, h, color, bobT, nod = 0}) => {
@@ -870,13 +878,14 @@ export type LifeWindow = {x: number; y: number; w: number; h: number; who?: SilW
 
 /** A block of neighbours' windows on one switching schedule (one window somewhere every 0.6-1.5 s), some with
  *  silhouettes. `force` pins scripted switches (O1: a neighbour's window goes off at 4.6). */
-export const WindowLife: React.FC<{windows: LifeWindow[]; seed?: string; gap?: [number, number]; litFrac?: number; force?: WindowForce[]; far?: boolean; dark?: string; ink?: number}> = ({windows, seed = 'life', gap, litFrac = 0.72, force, far = true, dark, ink}) => (
+const WindowLifeBody: React.FC<{windows: LifeWindow[]; seed?: string; gap?: [number, number]; litFrac?: number; force?: WindowForce[]; far?: boolean; dark?: string; ink?: number}> = ({windows, seed = 'life', gap, litFrac = 0.72, force, far = true, dark, ink}) => (
   <>
     {windows.map((wd, i) => (
       <WindowSilhouette key={i} {...wd} who={wd.who ?? 'none'} far={far} dark={dark} ink={ink} seed={`${seed}/${i}`} lit={(tt) => windowLit(tt, seed, i, windows.length, {gap, litFrac, force})} />
     ))}
   </>
 );
+export const WindowLife = tiered('environment', {}, WindowLifeBody);
 
 // ---------------------------------------------------------------- factory people
 
@@ -896,7 +905,7 @@ export type WorkerProps = {
 };
 
 /** A worker in hi-vis and a hard hat (back view), optionally pacing with a crate of sticks on the shoulder. */
-export const Worker: React.FC<WorkerProps> = ({x, y, h = 90, carry, walk, stopAt, seed = 'worker', hardhat = true}) => {
+const WorkerBody: React.FC<WorkerProps> = ({x, y, h = 90, carry, walk, stopAt, seed = 'worker', hardhat = true}) => {
   const t = useTime();
   const tt = stopAt !== undefined && t > stopAt ? stopAt : t;
   let fx = x;
@@ -918,9 +927,10 @@ export const Worker: React.FC<WorkerProps> = ({x, y, h = 90, carry, walk, stopAt
     </g>
   );
 };
+export const Worker = tiered('support', {}, WorkerBody);
 
 /** A small crate of gold sticks (on a shoulder, a forklift, a pallet): kit/Street.tsx has the full StickCrate. */
-export const MiniCrate: React.FC<{x: number; y: number; w: number}> = ({x, y, w}) => {
+const MiniCrateBody: React.FC<{x: number; y: number; w: number}> = ({x, y, w}) => {
   const h = w * 0.55;
   return (
     <g>
@@ -930,10 +940,11 @@ export const MiniCrate: React.FC<{x: number; y: number; w: number}> = ({x, y, w}
     </g>
   );
 };
+export const MiniCrate = tiered('support', {tone: EMBER.board}, MiniCrateBody);
 
 /** The gate guard (back view, cap and hi-vis): stands by the booth, steps out at `stepAt` (toward stepTo), waves from
  *  `waveAt`. */
-export const Guard: React.FC<{x: number; y: number; h?: number; stepAt?: number; stepTo?: number; waveAt?: number; seed?: string}> = ({x, y, h = 96, stepAt, stepTo, waveAt, seed = 'guard'}) => {
+const GuardBody: React.FC<{x: number; y: number; h?: number; stepAt?: number; stepTo?: number; waveAt?: number; seed?: string}> = ({x, y, h = 96, stepAt, stepTo, waveAt, seed = 'guard'}) => {
   const t = useTime();
   const g = personGeo(seed, {legs: true});
   const s = h / (g.legH - g.headTop);
@@ -946,3 +957,4 @@ export const Guard: React.FC<{x: number; y: number; h?: number; stepAt?: number;
   }
   return <WinterPerson x={fx} y={y - g.legH * s} s={s} seed={seed} legs walk={moving ? 2.2 : undefined} hair="cap" wear={['hivis', 'wave']} waveAt={waveAt} breathe={0.8} ink={2.6} />;
 };
+export const Guard = tiered('support', {}, GuardBody);

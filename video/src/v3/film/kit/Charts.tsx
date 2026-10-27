@@ -11,17 +11,19 @@ import {useTime, prog, ease, clamp} from '../../../lib/time';
 import {EMBER} from '../palette';
 import {At, b, fillAt, lerp, Pt, Pop, Show, Txt} from './util';
 import {MemoryStick} from './Memory';
+import {tiered} from '../../../lib/tier';
 
 // ---------------------------------------------------------------- the card
 
 /** A flat insert card (no shadow, no texture): warm white with a mid ink edge. */
-export const ChartCard: React.FC<{x: number; y: number; w: number; h: number; at?: At; seed?: string; color?: string; children?: React.ReactNode}> = ({x, y, w, h, at, seed = 'card', color = EMBER.card, children}) => (
+const ChartCardBody: React.FC<{x: number; y: number; w: number; h: number; at?: At; seed?: string; color?: string; children?: React.ReactNode}> = ({x, y, w, h, at, seed = 'card', color = EMBER.card, children}) => (
   <>
     <Fill rect={[x, y, w, h]} color={color} at={fillAt(at)} seed={`${seed}/f`} />
     <Ink d={rectInk(x, y, w, h, {seed: `${seed}/i`, over: 'medium'})} at={at} width={3.4} />
     {children}
   </>
 );
+export const ChartCard = tiered('support', {tone: EMBER.card}, ChartCardBody);
 
 // ---------------------------------------------------------------- line chart
 
@@ -96,7 +98,7 @@ function partial(pts: Pt[], p: number): Pt[] {
 
 const pathOf = (pts: Pt[]) => pts.map(([px, py], i) => `${i ? 'L' : 'M'}${px.toFixed(1)} ${py.toFixed(1)}`).join('');
 
-export const LineChart: React.FC<LineChartProps> = ({
+const LineChartBody: React.FC<LineChartProps> = ({
   x,
   y,
   w,
@@ -163,6 +165,7 @@ export const LineChart: React.FC<LineChartProps> = ({
     </>
   );
 };
+export const LineChart = tiered('subject', {}, LineChartBody);
 
 // ---------------------------------------------------------------- bar chart
 
@@ -182,7 +185,7 @@ export type BarChartProps = {
   seed?: string;
 };
 
-export const BarChart: React.FC<BarChartProps> = ({
+const BarChartBody: React.FC<BarChartProps> = ({
   x,
   y,
   w,
@@ -237,6 +240,7 @@ export const BarChart: React.FC<BarChartProps> = ({
     </>
   );
 };
+export const BarChart = tiered('subject', {}, BarChartBody);
 void polyPath;
 void clamp;
 void b;

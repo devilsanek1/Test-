@@ -27,6 +27,7 @@ import {blob, circle, smooth} from '../../../lib/sketch';
 import {EMBER} from '../palette';
 import {At, Pt} from './util';
 import {ease01, hopY} from './idle';
+import {tiered} from '../../../lib/tier';
 
 // ---------------------------------------------------------------- the colourway
 
@@ -133,7 +134,7 @@ export function pipPlace(t: number, x: number, y: number, hops: PipHop[] = []) {
   return {x: from[0], y: from[1], squash, rot, airborne};
 }
 
-export const Pip3: React.FC<Pip3Props> = ({
+const Pip3Body: React.FC<Pip3Props> = ({
   x,
   y,
   scale = 1,
@@ -227,6 +228,7 @@ export const Pip3: React.FC<Pip3Props> = ({
     </>
   );
 };
+export const Pip3 = tiered('support', {}, Pip3Body);
 
 // ---------------------------------------------------------------- PipTiny (S9's end: two backs at the rail)
 
@@ -249,7 +251,7 @@ export type PipTinyProps = {
 
 /** A simple back-view silhouette that reads at 40-60 px: a pear body, a round head, two big round ears sticking out,
  *  the trunk's curl peeking past one cheek, a tail with a tuft; idle ear flicks and tail swish. */
-export const PipTiny: React.FC<PipTinyProps> = ({x, y, h = 56, side = 'r', hopAt, at, seed = 5, ink = 2.2, outdoor = true}) => {
+const PipTinyBody: React.FC<PipTinyProps> = ({x, y, h = 56, side = 'r', hopAt, at, seed = 5, ink = 2.2, outdoor = true}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const pop = at === undefined ? 1 : Math.min(1, 0.2 + 0.8 * ease01(t, at, 0.12));
@@ -304,3 +306,4 @@ export const PipTiny: React.FC<PipTinyProps> = ({x, y, h = 56, side = 'r', hopAt
   );
   return g;
 };
+export const PipTiny = tiered('support', {}, PipTinyBody);

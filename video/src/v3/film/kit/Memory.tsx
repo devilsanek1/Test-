@@ -11,6 +11,7 @@ import {useTime, prog, ease, clamp} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
 import {At, b, fillAt, lerp, Pt, Show} from './util';
+import {tiered} from '../../../lib/tier';
 
 // ---------------------------------------------------------------- one stick
 
@@ -69,7 +70,7 @@ function stickGeo(w: number, chips: number) {
   return {h, x0, y0, outline, pinTop, chipRects, notch, pins};
 }
 
-export const MemoryStick: React.FC<MemoryStickProps> = ({x, y, w, rot = 0, at, seed = 'stick', ink, chips = 4, board = EMBER.board, flat}) => {
+const MemoryStickBody: React.FC<MemoryStickProps> = ({x, y, w, rot = 0, at, seed = 'stick', ink, chips = 4, board = EMBER.board, flat}) => {
   const g = stickGeo(w, chips);
   const iw = ink ?? (w < 100 ? W_FAR : w < 400 ? 3.4 : 4.8);
   const small = w < 200;
@@ -106,6 +107,7 @@ export const MemoryStick: React.FC<MemoryStickProps> = ({x, y, w, rot = 0, at, s
     </XG>
   );
 };
+export const MemoryStick = tiered('subject', {tone: EMBER.board}, MemoryStickBody);
 const W_FAR = 2.2;
 
 // ---------------------------------------------------------------- flight (a stick along an arc from A to B)
@@ -154,7 +156,7 @@ export function flightPose(t: number, o: StickFlightOpts): {x: number; y: number
 }
 
 /** A memory stick flying along an arc from A to B over [t0, t1], shrinking into the target. Speed ticks trail it. */
-export const StickFlight: React.FC<StickFlightOpts & {seed?: string; ink?: number; trail?: boolean}> = ({seed = 'fly', ink, trail = true, ...o}) => {
+const StickFlightBody: React.FC<StickFlightOpts & {seed?: string; ink?: number; trail?: boolean}> = ({seed = 'fly', ink, trail = true, ...o}) => {
   const t = useTime();
   const pose = flightPose(t, o);
   if (!pose || pose.w < 4) return null;
@@ -186,6 +188,7 @@ export const StickFlight: React.FC<StickFlightOpts & {seed?: string; ink?: numbe
     </>
   );
 };
+export const StickFlight = tiered('subject', {tone: EMBER.board}, StickFlightBody);
 
 // ---------------------------------------------------------------- the pile (a mountain of sticks)
 
@@ -282,7 +285,7 @@ const RawStick: React.FC<{s: PileStick; scale: number}> = ({s, scale}) => {
   );
 };
 
-export const Pile: React.FC<PileProps> = ({x, y, w, h, stickW = 130, at, dur = 0.8, seed = 'pile', ink = 3.4}) => {
+const PileBody: React.FC<PileProps> = ({x, y, w, h, stickW = 130, at, dur = 0.8, seed = 'pile', ink = 3.4}) => {
   const t = useTime();
   const sw = Math.min(130, stickW);
   const L = pileLayout(x, y, w, h, sw, seed);
@@ -298,6 +301,7 @@ export const Pile: React.FC<PileProps> = ({x, y, w, h, stickW = 130, at, dur = 0
     </>
   );
 };
+export const Pile = tiered('support', {tone: EMBER.board, bg: EMBER.sky}, PileBody);
 
 /** The stick count of a pile (for the README's sizing notes and lint). */
 export const pileCount = (w: number, h: number, stickW = 130, seed = 'pile') => pileLayout(0, 0, w, h, Math.min(130, stickW), seed).sticks.length;
