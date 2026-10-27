@@ -73,6 +73,11 @@ type Seat = {
   sips?: [number, number][];
   /** Phone windows [up, down] (the one hand allowed). */
   phone?: [number, number][];
+  /** Point windows [up, down]: a sleeve (no hand) up and out across the canal toward `pointTo` (local px). */
+  point?: [number, number][];
+  pointTo?: [number, number];
+  /** Drawn after the band's special pieces (it sits in front of them on the tread). */
+  front?: boolean;
   ink: number;
 };
 
@@ -80,6 +85,8 @@ const T = (o: TraitOverrides): TraitOverrides => o;
 
 /** On the coping, legs over the water by the moored boat (the low row's farthest edge): a couple. */
 const COPING: Seat[] = [
+  {id: 'c0', x: 62, y: 1224, h: 33, t: T({hair: 'beanie', hatColor: CM.brick, hairColor: H[1], coat: CM.coatSlate, acc: 'none'}), turn: [[1.5, 0.4], [3.3, 0]], ink: 1.6},
+  {id: 'c1', x: 318, y: 1223, h: 34, t: T({hair: 'curls', hairColor: H[0], coat: CM.coatOat, acc: 'none', skin: CM.brick}), quarter: 1, ink: 1.6},
   {id: 'c2', x: 846, y: 1223, h: 35, t: T({hair: 'short', hairColor: H[1], coat: CM.coatMustard, acc: 'none', skin: CM.paving}), turn: [[0.62, 0.55], [2.2, 0.2], [3.4, 0.6]], ink: 1.6},
   {id: 'c3', x: 884, y: 1224, h: 34, t: T({hair: 'long', hairColor: H[4], coat: CM.sage, acc: 'none', skin: CM.brickLight}), turn: [[1.2, -0.5], [2.9, -0.2]], lean: -4, ink: 1.6},
 ];
@@ -88,35 +95,53 @@ const COPING: Seat[] = [
 const LANDING: Seat[] = [
   {id: 'l2', x: 150, y: 1293, h: 45, t: T({hair: 'curls', hairColor: H[1], coat: CM.coatOat, acc: 'tote', accColor: CM.sage}), turn: [[-1, 0.5], [2.2, 0.15], [3.45, 0.55]], ink: 1.6},
   {id: 'l3', x: 190, y: 1299, h: 47, t: T({hair: 'short', hairColor: H[2], coat: CM.coatSlate, acc: 'none', skin: CM.brickDeep}), turn: [[-1, -0.45], [1.6, -0.1], [2.85, -0.5]], ink: 1.6},
+  {id: 'l4', x: 418, y: 1294, h: 45, t: T({hair: 'long', hairColor: H[2], coat: CM.brickLight, acc: 'none', skin: CM.paving}), quarter: 1, turn: [[-1, 0.7], [2.7, 0.45], [3.5, 0.75]], ink: 1.6},
+  {id: 'l5', x: 461, y: 1299, h: 46, t: T({hair: 'cap', hatColor: CM.sage, hairColor: H[1], coat: CM.coatSlate, acc: 'none', skin: CM.brickLight}), quarter: -1, ink: 1.6},
+  {id: 'l6', x: 896, y: 1296, h: 44, t: T({hair: 'crop', hairColor: H[3], coat: CM.stoneShade, acc: 'none'}), turn: [[0.9, 0.4], [2.75, -0.2], [4.1, 0.3]], ink: 1.6},
   {id: 'l7', x: 962, y: 1297, h: 47, t: T({hair: 'beanie', hatColor: CM.sage, hairColor: H[4], coat: CM.leafRust, acc: 'none', skin: CM.brickLight}), phone: [[1.06, 3.34]], side: -1, ink: 1.6},
 ];
 
 /** Tread 1 (band 1302-1392; heads ~21 px): a reader, a parent with a child, two friends turned to each other. */
 const TREAD1: Seat[] = [
-  {id: 't1a', x: 88, y: 1350, h: 53, t: T({hair: 'short', hairColor: H[3], coat: CM.brickDeep, acc: 'none', skin: CM.paving}), read: true, ink: 1.6},
-  {id: 't1c', x: 330, y: 1374, h: 56, t: T({hair: 'long', hairColor: H[1], coat: CM.coatMustard, acc: 'none'}), turn: [[-1, 0.5]], ink: 1.6},
+  {id: 't1a', x: 88, y: 1318, h: 53, t: T({hair: 'short', hairColor: H[3], coat: CM.brickDeep, acc: 'none', skin: CM.paving}), read: true, ink: 1.6},
+  {id: 't1c', x: 330, y: 1322, h: 56, t: T({hair: 'long', hairColor: H[1], coat: CM.coatMustard, acc: 'none'}), turn: [[-1, 0.5]], ink: 1.6},
   {id: 't1f', x: 536, y: 1364, h: 55, t: T({hair: 'short', hairColor: H[0], coat: CM.sage, acc: 'strap', accColor: CM.coatOat}), quarter: 1, ink: 1.6},
   {id: 't1g', x: 584, y: 1352, h: 52, t: T({hair: 'curls', hairColor: H[2], coat: CM.stoneShade, acc: 'none'}), quarter: -1, ink: 1.6},
+  {id: 't1h', x: 752, y: 1362, h: 53, t: T({hair: 'beanie', hatColor: CM.leafRust, hairColor: H[1], coat: CM.coatOat, acc: 'none', skin: CM.brickLight}), quarter: 1, ink: 1.6},
+  {id: 't1i', x: 800, y: 1378, h: 56, t: T({hair: 'long', hairColor: H[4], coat: CM.brick, acc: 'none'}), quarter: -1, point: [[2.68, 3.02]], pointTo: [-30, -64], side: -1, ink: 1.6},
+  {id: 't1j', x: 1046, y: 1316, h: 52, t: T({hair: 'short', hairColor: H[2], coat: CM.sage, acc: 'none', skin: CM.paving}), turn: [[1.3, -0.4], [3.1, -0.1]], ink: 1.6},
 ];
 
 /** Tread 2 (band 1392-1508; heads ~27 px): a couple leaning in (the cup pair, the newcomer and the leaver are
  *  their own pieces below). */
 const TREAD2: Seat[] = [
-  {id: 't2b', x: 206, y: 1456, h: 68, t: T({hair: 'long', hairColor: H[2], coat: CM.coatOat, acc: 'none'}), turn: [[-1, 0.4]], lean: 5, ink: 2.2},
-  {id: 't2c', x: 249, y: 1463, h: 70, t: T({hair: 'short', hairColor: H[1], coat: CM.coatSlate, acc: 'backpack', accColor: CM.sage, skin: CM.brickLight}), turn: [[-1, -0.2], [2.9, -0.5], [4.2, -0.2]], ink: 2.2},
+  {id: 't2b', x: 206, y: 1408, h: 68, t: T({hair: 'long', hairColor: H[2], coat: CM.coatOat, acc: 'none'}), turn: [[-1, 0.4]], lean: 5, ink: 2.2},
+  {id: 't2k', x: 598, y: 1410, h: 67, t: T({hair: 'hood', coat: CM.coatMustard, acc: 'none'}), turn: [[2.75, 0.3], [3.6, 0]], ink: 2.2},
+  {id: 't2f', x: 712, y: 1452, h: 66, t: T({hair: 'curls', hairColor: H[2], coat: CM.coatPlum, acc: 'none', skin: CM.brickLight}), point: [[1.22, 1.8]], pointTo: [26, -70], side: 1, turn: [[1.12, 0.3], [1.9, 0]], ink: 2.2},
+  {id: 't2g', x: 1004, y: 1414, h: 69, t: T({hair: 'beanie', hatColor: CM.box, hairColor: H[1], coat: CM.sage, acc: 'none'}), sips: [[0.62, 1.12], [3.42, 3.95]], ink: 2.2},
+  {id: 't2c', x: 249, y: 1415, h: 70, t: T({hair: 'short', hairColor: H[1], coat: CM.coatSlate, acc: 'backpack', accColor: CM.sage, skin: CM.brickLight}), turn: [[-1, -0.2], [2.9, -0.5], [4.2, -0.2]], ink: 2.2},
 ];
 
 /** Tread 3 (band 1508-1660; heads ~35 px): the picnic pair, the guitar (its own piece), the dogs, the stretcher. */
 const TREAD3: Seat[] = [
   {id: 't3b', x: 172, y: 1641, h: 93, t: T({hair: 'beanie', hatColor: CM.coatSlate, hairColor: H[1], coat: CM.sage, acc: 'scarf', accColor: CM.coatMustard, skin: CM.brickLight}), turn: [[-1, 0.35], [1.5, 0.1], [3.4, 0.4]], ink: 2.2},
+  {id: 't3h', x: 382, y: 1606, h: 88, t: T({hair: 'cap', hatColor: CM.coatPlum, hairColor: H[1], coat: CM.coatOat, acc: 'none', skin: CM.brick}), quarter: 1, turn: [[3.4, 0.95], [4.3, 0.7]], ink: 2.2},
+  {id: 't3k', x: 566, y: 1526, h: 85, t: T({hair: 'long', hairColor: H[3], coat: CM.coatSlate, acc: 'none', skin: CM.brickLight}), quarter: -1, ink: 2.2},
+  {id: 't3i', x: 690, y: 1528, h: 84, t: T({hair: 'short', hairColor: H[4], coat: CM.brick, acc: 'strap', accColor: CM.coatSlate}), turn: [[0.7, -0.3], [2.3, 0.2], [3.5, -0.2]], ink: 2.2},
+  {id: 't3m', x: 1058, y: 1646, h: 90, t: T({hair: 'curls', hairColor: H[1], coat: CM.coatSlate, acc: 'backpack', accColor: CM.leafRust, skin: CM.paving}), turn: [[2.9, -0.45], [3.9, -0.15]], ink: 2.2},
   {id: 't3c', x: 296, y: 1626, h: 91, t: T({hair: 'long', hairColor: H[4], coat: CM.brickLight, acc: 'none'}), quarter: -1, ink: 2.2},
-  {id: 't3g', x: 1024, y: 1604, h: 87, t: T({hair: 'bun', hairColor: H[1], coat: CM.coatMustard, acc: 'tote', accColor: CM.coatSlate}), sips: [[1.1, 1.75], [3.95, 4.5]], ink: 2.2},
+  {id: 't3g', x: 1024, y: 1532, h: 87, t: T({hair: 'bun', hairColor: H[1], coat: CM.coatMustard, acc: 'tote', accColor: CM.coatSlate}), sips: [[1.1, 1.75], [3.95, 4.5]], ink: 2.2},
 ];
 
 /** Tread 4 (band 1660-1850; heads ~45 px): a parent with a pram, a skater, a phone up for the sunset. */
 const TREAD4: Seat[] = [
   {id: 't4a', x: 214, y: 1801, h: 116, t: T({hair: 'short', hairColor: H[1], coat: CM.coatOat, acc: 'none', skin: CM.paving}), turn: [[-1, -0.6], [1.2, -0.25], [2.1, -0.65], [4.4, -0.3]], quarter: -1, ink: 3.4},
-  {id: 't4c', x: 548, y: 1786, h: 113, t: T({hair: 'cap', hatColor: CM.coatMustard, hairColor: H[0], coat: CM.brickDeep, acc: 'none'}), turn: [[2.7, 0.4], [3.6, 0]], ink: 3.4},
+  {id: 't4k', x: 262, y: 1680, h: 108, t: T({hair: 'curls', hairColor: H[4], coat: CM.coatPlum, acc: 'none', skin: CM.brick}), turn: [[0.66, -0.3], [2.25, 0.25], [3.45, -0.2]], ink: 3.4},
+  {id: 't4m', x: 474, y: 1764, h: 111, t: T({hair: 'hood', coat: CM.brickLight, acc: 'none'}), turn: [[1.25, 0.3], [2.3, -0.1], [4.35, 0.25]], ink: 3.4},
+  {id: 't4n', x: 640, y: 1744, h: 108, t: T({hair: 'short', hairColor: H[0], coat: CM.coatOat, acc: 'headphones', accColor: CM.brick, skin: CM.brickDeep}), quarter: -1, ink: 3.4},
+  {id: 't4f', x: 380, y: 1830, h: 115, t: T({hair: 'long', hairColor: H[1], coat: CM.sage, acc: 'none', skin: CM.brickLight}), quarter: 1, sips: [[1.15, 1.7], [3.42, 3.96]], side: 1, front: true, ink: 3.4},
+  {id: 't4g', x: 746, y: 1756, h: 110, t: T({hair: 'bun', hairColor: H[2], coat: CM.stoneShade, acc: 'strap', accColor: CM.brick}), turn: [[0.62, 0.35], [2.2, 0], [3.4, 0.4], [4.35, 0.1]], ink: 3.4},
+  {id: 't4c', x: 548, y: 1690, h: 113, t: T({hair: 'cap', hatColor: CM.coatMustard, hairColor: H[0], coat: CM.brickDeep, acc: 'none'}), turn: [[2.7, 0.4], [3.6, 0]], ink: 3.4},
   {id: 't4e', x: 902, y: 1802, h: 117, t: T({hair: 'crop', hairColor: H[2], coat: CM.coatSlate, acc: 'backpack', accColor: CM.coatPlum, skin: CM.brickDeep}), phone: [[4.33, 5.4]], side: -1, ink: 3.4},
 ];
 
@@ -150,21 +175,28 @@ const Standers: React.FC<{band: number}> = ({band}) => (
   </>
 );
 
-const SitAt: React.FC<{s: Seat; arms?: SitArms; cupK?: number; dy?: number; dx?: number}> = ({s, arms, cupK, dy, dx}) => {
+const SitAt: React.FC<{s: Seat; arms?: SitArms; cupK?: number; dy?: number; dx?: number}> = ({s, arms: arms0, cupK, dy, dx}) => {
+  let arms = arms0;
   const t = useTime();
   const turn = s.turn ? keyed(t, s.turn) : undefined;
   const cupv = cupK ?? (s.sips ? lifts(t, s.sips, 0.32) : undefined);
   const ph = s.phone ? s.phone.some(([a, b]) => d12(t) >= a && d12(t) < b) : false;
+  const pk = s.point ? lifts(t, s.point, 0.22) : 0;
+  if (!arms && pk > 0.02) arms = {reach: {to: s.pointTo ?? [30, -64], k: pk, cup: false, side: s.side ?? 1}};
   return (
     <Sit x={s.x + (dx ?? 0)} y={s.y} h={s.h} seed={`v2s1/bank/${s.id}`} traits={s.t} model={(s.t as {scarf?: string}).scarf ? {scarf: (s.t as {scarf?: string}).scarf} : undefined} turn={turn} cup={cupv} read={s.read} phone={ph} side={s.side} ink={s.ink} lean={s.lean} quarter={s.quarter} arms={arms} dy={dy} />
   );
 };
 
-const Row: React.FC<{seats: Seat[]}> = ({seats}) => (
+/** A tread's seats, back to front by seat line (`front` ones are drawn after the band's special pieces). */
+const Row: React.FC<{seats: Seat[]; front?: boolean}> = ({seats, front = false}) => (
   <>
-    {seats.map((s) => (
-      <SitAt key={s.id} s={s} />
-    ))}
+    {seats
+      .filter((s) => !!s.front === front)
+      .sort((a, b) => a.y - b.y)
+      .map((s) => (
+        <SitAt key={s.id} s={s} />
+      ))}
   </>
 );
 
@@ -366,23 +398,27 @@ const PROPS: Record<number, {parts: () => ReturnType<typeof cup>; ink: number; s
     {parts: () => scooter('sc', 262, 1288, 70, -4), ink: 1.6, seed: 'scooter'},
     {parts: () => [...cup('lc1', 222, 1298, 11), ...cup('lc2', 512, 1296, 11)], ink: 1.6, seed: 'lcups'},
     {parts: () => tote('lt', 1006, 1296, 0.46, CM.sage), ink: 1.6, seed: 'ltote'},
+    {parts: () => [...paperBag('lpb', 362, 1298, 15), ...cup('lc3', 858, 1297, 10)], ink: 1.6, seed: 'lbag'},
   ],
   1: [
     {parts: () => umbrella('um', 690, 1366, 92, -6), ink: 1.6, seed: 'umbrella'},
     {parts: () => [...cup('t1cu', 742, 1376, 13), ...cup('t1cu2', 600, 1352, 12)], ink: 1.6, seed: 't1cups'},
     {parts: () => jacket('t1j', 150, 1368, 0.52, CM.coatPlum, 6), ink: 1.6, seed: 't1jacket'},
     {parts: () => backpack('t1bp', 966, 1370, 0.5, CM.coatMustard, CM.brick), ink: 1.6, seed: 't1pack'},
+    {parts: () => [...paperBag('t1pb', 872, 1380, 17), ...cup('t1cu3', 1084, 1366, 12)], ink: 1.6, seed: 't1bag'},
   ],
   2: [
     {parts: () => backpack('t2bp', 128, 1478, 0.62, CM.coatPlum, CM.coatOat), ink: 2.2, seed: 't2pack'},
     {parts: () => bookOpen('t2bk', 318, 1478, 0.62, CM.brick, -10), ink: 1.6, seed: 't2book'},
     {parts: () => [...cup('t2c1', 560, 1482, 16), ...cup('t2c2', 958, 1490, 16)], ink: 1.6, seed: 't2cups'},
     {parts: () => tote('t2t', 1062, 1470, 0.62, CM.coatOat), ink: 2.2, seed: 't2tote'},
+    {parts: () => [...flask('t2f', 856, 1494, 24, CM.brick), ...cup('t2c3', 760, 1468, 15)], ink: 1.6, seed: 't2flask'},
   ],
   3: [
     {parts: () => [...cloth('pc', 74, 326, 1540, 1596), ...flask('pf', 132, 1574, 30), ...cup('pc1', 178, 1580, 17), ...cup('pc2', 244, 1572, 16), ...paperBag('pb', 286, 1574, 26), ...apple('pa', 214, 1588, 5)], ink: 2.2, seed: 'picnic'},
     {parts: () => guitarCase('gc', 600, 1632, 124, CM.coatPlum, -4), ink: 2.2, seed: 'gcase'},
     {parts: () => [...bowl('db', 870, 1600, 12), ...lead('dl', 732, 1636, 0.9)], ink: 1.6, seed: 'dogbowl'},
+    {parts: () => [...cup('t3cu', 430, 1640, 19), ...tote('t3t', 958, 1648, 0.8, CM.brickLight)], ink: 2.2, seed: 't3cup'},
   ],
   4: [
     {parts: () => pram('pr', 52, 1792, 128), ink: 3.4, seed: 'pram'},
@@ -480,6 +516,7 @@ export const BankRow: React.FC<{band: number}> = ({band}) => {
         <Props band={4} />
         <TrotDog band={4} />
         <Row seats={TREAD4} />
+        <Row seats={TREAD4} front />
       </>
     );
   return null;
