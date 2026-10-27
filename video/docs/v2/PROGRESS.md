@@ -2,6 +2,18 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-27 23:18 UTC (hourly)
+
+| part | owner | status |
+|---|---|---|
+| S1 look clip v3 | L1 (idle, waiting for the libs) | done: depth pass (far city in 3 haze steps, the wing separated), ground pass (2-point perspective, treads foreshortened 4.4x, near things in 3 layers), corner polish, stepped sky + smaller, lower sun (SUN0 now (196, 772) r 52); next: wire lib/sky + lib/particles + lib/depth, render v3 |
+| Depth + particles toolkit | local `wf_5d776523-d28` | scout + analyst DONE (research docs in docs/look/research/); builder running; critic next |
+| Pro sky | local `wf_951757bf-213` | sky engineer running (OKLab eased gradient, sun warmth, blue-noise dither, check_banding, encode settings); critic next |
+| Sound revision 2 | done (be9ecc0) | the film plays public/v2r/mix.wav; requests for L5 / L6 held for their resume |
+| L2-L6 | paused (handovers) | resume after the owner sees S1 v3, with depth + sky sections in their briefs (+ L6: SUN0 moved) |
+
+**Spend:** orchestrator $3,684.85 (+$51 in the last hour), L1 $139.21. Owner readings needed (last: 20:59 session 13 %, weekly 62 %).
+
 ## Note 2026-10-27 23:05 UTC: sound revision 2 DONE (be9ecc0)
 
 Joins on their carriers and midpoints, no Pip hops, a positive glass-chime ding at 0.45, calm air from the conformed life, the music director's 12
