@@ -5,8 +5,8 @@ light layers OFF (A) and ON (B). Any composition renders its A side with the inp
 (lighter than A) and every shadow / ambient pixel (darker than A, by a gentle multiply: all three channels down by
 similar ratios; a pixel that changed into another colour is not a shadow).
 
-  node scripts/render-frames.mjs Film3-S7 /tmp/s7on 1.0 --entry=src/entry-v3-film.tsx
-  node scripts/render-frames.mjs Film3-S7 /tmp/s7off 1.0 --entry=src/entry-v3-film.tsx --props='{"lightOff":true}'
+  node scripts/render-frames.mjs Film3-SQC /tmp/s7on 1.0 --entry=src/entry-v3-film.tsx
+  node scripts/render-frames.mjs Film3-SQC /tmp/s7off 1.0 --entry=src/entry-v3-film.tsx --props='{"lightOff":true}'
   python3 -I scripts/qa/check_light.py /tmp/s7off/f00060.png /tmp/s7on/f00060.png --subject 330,860,750,1240 --interior
   python3 -I scripts/qa/check_light.py off.png on.png --crop 1080,0,2160,1920 --subject 700,1430,830,1705 --exterior
 

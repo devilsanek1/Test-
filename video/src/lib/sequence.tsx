@@ -18,14 +18,14 @@
 //                          the SEAM PROBE. A seam is `{"type": "matchcut", "seam": true, "carrier": X}`: Film hard-cuts
 //                          at frame f = ceil(c * fps) between two builders that must draw the IDENTICAL picture there.
 //                          Frame k of a probe composition draws ONE side of one seam alone (<Film only>, no captions,
-//                          no audio, the film's exact frame time), 4 frames per seam in scenes order:
+//                          no audio, at the film's exact frame time), 4 frames per seam in scenes order:
 //                            4j + 0: the outgoing scene at f - 1 (the film's own frame)   4j + 1: the incoming one at f - 1
 //                            4j + 2: the outgoing scene at f                              4j + 3: the incoming one at f (the film's own frame)
 //                          scripts/qa/gate_check.py --seam-comp <probe comp> renders it and compares the pairs
 //                          (FAIL when more than 1 % of the pixels differ by more than 4 L*).
 
 import React from 'react';
-import {Freeze, useCurrentFrame, useVideoConfig} from 'remotion';
+import {Sequence, useCurrentFrame, useVideoConfig} from 'remotion';
 import {Film, type FilmProps, type FilmScene, type ToneKey} from './Film';
 import {SceneProvider, type SceneInfo, type SceneTransitionIn, useScene} from './stage';
 import {TimeProvider, useGlobalTime, useTime} from './time';
@@ -149,16 +149,17 @@ export function seamProbeFrames(scenes: FilmScene[], fps: number): SeamProbeFram
 export type FilmSeamProbeProps = Pick<FilmProps, 'scenes' | 'components' | 'wipers' | 'edges'>;
 
 /** The seam probe composition's component (register it with durationInFrames = max(1, seamProbeFrames(...).length)):
- *  frame k draws seamProbeFrames(...)[k] — one scene alone at the film's exact frame time (Freeze), no captions, no
- *  label, no audio. */
+ *  frame k draws seamProbeFrames(...)[k] — one scene alone at the film's exact frame time, no captions, no label, no
+ *  audio. The film frame is reached with a <Sequence from={k - frame}> (integer frames, so Film's T = frame / fps is
+ *  the same double as in the film; a <Freeze> would clamp it to the probe's own 4-per-seam length). */
 export const FilmSeamProbe: React.FC<FilmSeamProbeProps> = ({scenes, components, wipers, edges}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const p = seamProbeFrames(scenes, fps)[frame];
   if (!p) return null;
   return (
-    <Freeze frame={p.frame}>
+    <Sequence from={frame - p.frame} layout="none">
       <Film scenes={scenes} components={components} wipers={wipers} edges={edges} captions={[]} only={p.id} audio={false} showCaptions={false} />
-    </Freeze>
+    </Sequence>
   );
 };
