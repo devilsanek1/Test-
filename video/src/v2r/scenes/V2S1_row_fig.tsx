@@ -408,23 +408,23 @@ export function figParts(spec: FigSpec, pose: FigPose): FigPart[] {
     ]);
     out.push({k: 'potRim', d: rim, fill: spec.plant.pot, ink: rim, w: 0.75});
     const leafs: [number, number, number][] = [
-      [-24.0 + PX, -109.0, 3.0],
-      [-22.6 + PX, -117.5, 3.3],
-      [-18.4 + PX, -121.0, 3.4],
-      [-13.8 + PX, -116.5, 3.2],
-      [-10.4 + PX, -108.0, 2.8],
+      // four broad round-tipped leaves (a small desk plant, not a fern: the sage fill has to show inside the line)
+      [-25.0 + PX, -106.5, 4.7],
+      [-21.0 + PX, -117.0, 5.1],
+      [-14.6 + PX, -118.0, 5.0],
+      [-10.6 + PX, -107.0, 4.3],
     ];
     const base: Pt = [-18.6 + PX, -92.6 + pb];
     leafs.forEach(([tx, ty, hw], i) => {
       const tip: Pt = [tx + Math.sin(pose.step * 1.7 + i * 1.3) * 0.5, ty + pb];
-      const mx = (base[0] + tip[0]) / 2;
-      const my = (base[1] + tip[1]) / 2;
+      const mx = base[0] + (tip[0] - base[0]) * 0.6;
+      const my = base[1] + (tip[1] - base[1]) * 0.6;
       const L = Math.hypot(tip[0] - base[0], tip[1] - base[1]) || 1;
       const nx = -(tip[1] - base[1]) / L;
       const ny = (tip[0] - base[0]) / L;
       const ld = crClosed([base, [mx + nx * hw, my + ny * hw], tip, [mx - nx * hw, my - ny * hw]], 0.55);
-      out.push({k: `leaf${i}`, d: ld, fill: spec.plant!.leaf, ink: ld, w: 0.55});
-      out.push({k: `vein${i}`, ink: `M${PT([base[0] + (tip[0] - base[0]) * 0.25, base[1] + (tip[1] - base[1]) * 0.25])}L${PT([base[0] + (tip[0] - base[0]) * 0.72, base[1] + (tip[1] - base[1]) * 0.72])}`, w: 0.4});
+      out.push({k: `leaf${i}`, d: ld, fill: spec.plant!.leaf, ink: ld, w: 0.42});
+      out.push({k: `vein${i}`, ink: `M${PT([base[0] + (tip[0] - base[0]) * 0.38, base[1] + (tip[1] - base[1]) * 0.38])}L${PT([base[0] + (tip[0] - base[0]) * 0.7, base[1] + (tip[1] - base[1]) * 0.7])}`, w: 0.3});
     });
   } else {
     out.push(...nearArm());
