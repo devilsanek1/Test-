@@ -20,7 +20,8 @@ import {bollardInto} from '../kit/canal/towpath';
 import {Puffs} from '../kit/canal/life';
 import {Person, Seated} from '../kit/cast';
 import * as MAP from '../world/map';
-import {CellPaint, Under, UnderPaint, barPath, planeLeaf} from './V2S1_set_core';
+import {CellPaint, Under, barPath, planeLeaf} from './V2S1_set_core';
+import {s1ArchOpening} from './V2S1_set_far';
 import {floodAt} from './V2S1_clock';
 
 const S = MAP.S1_SHEET;
@@ -40,9 +41,8 @@ function band(x0: number, x1: number, a: number, c: number, off: (x: number) => 
   return pts;
 }
 
-/** The far towpath: paving in regions (the flood ripples along it), broken joints as thin stone fills (their ink only
- *  at f0), specks, fallen leaves, the limestone coping with its lip line in ink (it carries the canal's edge and the
- *  bend), mooring rings and bollards that recede round the curve. */
+/** The far towpath: paving in regions (the flood ripples along it), the wall's foot, the limestone coping (it carries
+ *  the canal's edge and the bend) and its shade: flat 2-tone planes, no line (tier C), no specks or joints. */
 export const S1FarTowpath: React.FC = () => {
   const {b, u} = useMemo(() => {
     const b = new Batch();
@@ -56,40 +56,7 @@ export const S1FarTowpath: React.FC = () => {
     // the wall's foot: a darker strip along the back
     for (let x = x0; x < x1; x += 120) b.poly(CM.stucco, band(x - 1, Math.min(x1, x + 121), top, top + 6, off));
     b.layer();
-    // broken joints: short runs + a few cross ticks (thin stone fills; the f0 drawing has them in ink)
-    const rows = Math.max(1, Math.round(H / 18));
-    for (let k = 1; k <= rows; k++) {
-      const yy = top + (H * k) / (rows + 1) - 3;
-      let x = x0 + r.range(0, 60);
-      while (x < x1) {
-        const L = r.range(36, 110) * lerp(0.7, 1, Math.min(1, Math.max(0, x / 500)));
-        if (r.chance(0.55)) {
-          const a: Pt = [x, yy + off(x) + r.jitter(1)];
-          const c: Pt = [x + L, yy + off(x + L) + r.jitter(1.2)];
-          b.fill(CM.stoneShade, barPath(a, c, 1.3));
-          u.add(Math.round((x + L / 2) / 140) * 140, yy, `M${P(a[0], a[1])}L${P(c[0], c[1])}`, INK_PX.hair);
-        }
-        if (r.chance(0.3)) {
-          const a: Pt = [x + L * 0.5, yy + off(x + L * 0.5)];
-          const c: Pt = [x + L * 0.5 + r.jitter(3), yy + off(x + L * 0.5) + H / (rows + 1) - 2];
-          b.fill(CM.stoneShade, barPath(a, c, 1.2));
-        }
-        x += L + r.range(20, 90);
-      }
-    }
-    // specks
-    for (let i = 0; i < (x1 - x0) / 26; i++) {
-      const sx = r.range(x0, x1);
-      b.fill(CM.stoneShade, ovalPath(sx, r.range(top + 4, edge - coping - 2) + off(sx), r.range(1.2, 2.6), r.range(0.8, 1.5)));
-    }
-    b.layer();
-    // fallen leaves (bigger toward the near edge)
-    for (let i = 0; i < 16; i++) {
-      const yy = r.range(top + H * 0.2, edge - coping - 2);
-      const s = lerp(7, 12, (yy - top) / Math.max(1, H)) * lerp(0.7, 1, Math.min(1, Math.max(0, r.next())));
-      const lx = r.range(x0 + 20, x1);
-      b.fill(r.pick([CM.leafGold, CM.leafRust, CM.coatMustard]), leafPath(lx, yy + off(lx), s, s * 0.35, r.range(-30, 30)));
-    }
+    // (the broken joints, specks and fallen-leaf specks are gone: CRAFT §c, big areas flat)
     b.layer();
     // the coping (limestone) + its shade, the shade it casts on the water below
     for (let x = x0; x < x1; x += 120) {
@@ -98,39 +65,19 @@ export const S1FarTowpath: React.FC = () => {
       b.poly(CM.limestone, band(x - 1, xe, edge - coping, edge, off));
       b.poly(CM.stoneShade, band(x - 1, xe, edge - coping * 0.3, edge, off));
     }
-    // coping joints (ink: short ticks), the lip line (ink, open, following the bend)
-    let j = '';
-    let lip = '';
-    for (let x = x0 + 30; x < x1; x += r.range(64, 120)) {
-      const k = Math.min(1, Math.max(0.55, x / 400));
-      j += `M${P(x, edge - coping * k + 1 + off(x))}L${P(x + r.jitter(1), edge - coping * 0.3 + off(x))}`;
-    }
-    for (let x = x0; x <= x1; x += 20) lip += `${x === x0 ? 'M' : 'L'}${P(x, edge - coping + off(x))}`;
-    b.ink(j, INK_PX.hair);
-    b.ink(lip, INK_PX.far, CM.ink, 0.15);
-    // the water's far edge under the coping (ink on the stone's foot, not on the water)
-    let foot = '';
-    for (let x = x0; x <= x1; x += 20) foot += `${x === x0 ? 'M' : 'L'}${P(x, edge + off(x))}`;
-    b.ink(foot, INK_PX.hair, CM.ink, 0.35);
-    // mooring rings (ink circles) on the coping
-    for (const rx of [380, 900]) {
-      const ry = edge - coping * 0.45 + off(rx);
-      b.ink(`M${P(rx - 4, ry)}A4 4 0 1 0 ${P(rx + 4, ry)}A4 4 0 1 0 ${P(rx - 4, ry)}`, INK_PX.hair);
-    }
     return {b, u};
   }, []);
   return (
     <>
       <CellPaint b={b} seed="s1path" cell={140} misreg={0.6} />
-      <UnderPaint u={u} seed="s1pathU" />
     </>
   );
 };
 
 /** Bollards and lamp posts along the far towpath, shrinking round the bend (the row's diminishing reads as "down the
  *  bending towpath"). Lamps stand at the path's back (the wall side), bollards on the coping. */
-const S1_BOLLARDS = [770, 430, 262, 160, 66];
-const S1_FAR_LAMPS = [{x: 1046, h: 366}, {x: 752, h: 340}, {x: 360, h: 0}, {x: 6, h: 0}];
+export const S1_BOLLARDS = [770, 430, 262, 160, 66];
+export const S1_FAR_LAMPS = [{x: 1046, h: 366}, {x: 752, h: 340}, {x: 360, h: 0}, {x: 6, h: 0}];
 export const S1PathFurniture: React.FC = () => {
   const b = useMemo(() => {
     const b = new Batch();
@@ -174,22 +121,6 @@ function lampInto(b: Batch, x: number, y: number, h: number, seed: string) {
   }
 }
 
-/** The bend's lamps and bollards in ink at f0 too (the small ones get no ink in colour). */
-export const S1PathFurnitureUnder: React.FC = () => {
-  const u = useMemo(() => {
-    const u = new Under();
-    for (const L of S1_FAR_LAMPS) {
-      if (L.h) continue;
-      const k = MAP.s1FigureHAt(L.x) / S.herH;
-      const h = 350 * k;
-      const y = S1_PATH.top + 6 + s1Bend(L.x);
-      u.add(L.x, y - h / 2, `M${P(L.x, y)}L${P(L.x, y - h * 0.8)}M${P(L.x - 6, y - h * 0.82)}L${P(L.x - 8, y - h * 0.94)}L${P(L.x + 8, y - h * 0.94)}L${P(L.x + 6, y - h * 0.82)}Z`, INK_PX.hair);
-    }
-    return u;
-  }, []);
-  return <UnderPaint u={u} seed="s1furnU" />;
-};
-
 // ---------------------------------------------------------------- the water
 
 type Refl = {x0: number; x1: number; color: string; depth: number};
@@ -201,9 +132,8 @@ const REFL: Refl[] = [
 ];
 const WATER = {y0: S.water.y0 - 2, y1: S.water.y1 + 2, x0: -40, x1: 1120} as const;
 
-/** The canal between the far coping and our bank: base colour in regions, the wing's broken reflection, the sun's
- *  (orange only on the sun disc: its reflection is gold), ripple lenses drifting west, paper glints switching; the
- *  frame-0 drawing = ripple strokes in ink that vanish on the frame the water's colour reaches them. */
+/** The canal between the far coping and our bank: base colour in regions, the wing's broken reflection and the sun's
+ *  (orange only on the sun disc: its reflection is gold), swaying slowly. No ripple dashes, no glints (CRAFT §c). */
 export const S1Water: React.FC = () => {
   const t = useTime();
   const {y0, y1, x0, x1} = WATER;
@@ -215,19 +145,6 @@ export const S1Water: React.FC = () => {
       b.rect(CM.waterDeep, x - 0.5, y0, 141, 9);
     }
     return b;
-  }, []);
-  const under = useMemo(() => {
-    const u = new Under();
-    const r = rng('s1waterU');
-    for (let i = 0; i < 34; i++) {
-      const v = r.next();
-      const yy = y0 + 14 + v * (H - 20);
-      const w = r.range(26, 64) * lerp(0.8, 1.3, v);
-      const x = r.range(x0 + 30, x1 - 30);
-      const d = `M${P(x - w / 2, yy)}Q${P(x - w / 4, yy - 2.5)} ${P(x, yy)}Q${P(x + w / 4, yy + 2.5)} ${P(x + w / 2, yy)}`;
-      u.add(Math.round(x / 140) * 140 + 70, y0 + H / 2, d, INK_PX.hair);
-    }
-    return u;
   }, []);
   const b = new Batch();
   const r = rng('s1water');
@@ -252,31 +169,10 @@ export const S1Water: React.FC = () => {
       }
     }
   });
-  b.layer();
-  const span = x1 - x0;
-  for (let i = 0; i < 32; i++) {
-    const v = r.next();
-    const yy = y0 + 16 + v * (H - 22);
-    const s = lerp(1, 1.6, v);
-    const w = r.range(22, 70) * s;
-    const x = x0 + frac((r.range(0, span) - 9 * s * t) / span) * span;
-    const hh = 2.2 * s;
-    b.fill(CM.waterDeep, `M${P(x - w / 2, yy)}Q${P(x, yy - hh)} ${P(x + w / 2, yy)}Q${P(x, yy + hh)} ${P(x - w / 2, yy)}Z`);
-  }
-  for (let i = 0; i < 18; i++) {
-    const v = r.next();
-    const yy = y0 + 14 + v * (H - 18);
-    const per = r.range(1.2, 2.6);
-    const on = frac(t / per + r.next()) < 0.42;
-    const s = lerp(1, 1.6, v);
-    const x = r.range(x0 + 20, x1 - 20) + Math.sin(t * 0.8 + i) * 6;
-    if (on) b.fill(CM.paper, `M${P(x - 9 * s, yy)}L${P(x + 9 * s, yy - 1)}L${P(x + 7 * s, yy + 2.2 * s)}L${P(x - 7 * s, yy + 2.2 * s)}Z`);
-  }
   return (
     <>
       <CellPaint b={base} seed="s1water/base" cell={140} misreg={0} />
       <CellPaint b={b} seed="s1water/life" cell={140} misreg={0} live />
-      <UnderPaint u={under} seed="s1water/u" />
     </>
   );
 };
@@ -285,8 +181,8 @@ export const S1Water: React.FC = () => {
 
 /** Boat A's stern is off the right edge (dir -1: u 0 = the stern at x 1346), so its stove chimney sits at u 0.6 (x ~1010),
  *  on the visible part of the roof, for the 0.70 puff (TREATMENT f42). */
-const BOAT_A: BoatOpts = {x: 786, water: 1140, len: 560, h: 74, dir: -1, seed: 's1boatA', cabin: CM.sage, topView: 8, roofItems: true, panel: false, chimney: 0.6};
-const BOAT_B: BoatOpts = {x: 930, water: 1196, len: 520, h: 86, dir: -1, seed: 's1boatB', cabin: CM.coatOat, topView: 10, roofItems: true, panel: true};
+export const BOAT_A: BoatOpts = {x: 786, water: 1140, len: 560, h: 74, dir: -1, seed: 's1boatA', cabin: CM.sage, topView: 8, roofItems: true, panel: false, chimney: 0.6};
+export const BOAT_B: BoatOpts = {x: 930, water: 1196, len: 520, h: 86, dir: -1, seed: 's1boatB', cabin: CM.coatOat, topView: 10, roofItems: true, panel: true};
 
 const OneBoat: React.FC<{o: BoatOpts; smoke?: boolean; bursts?: number[]}> = ({o, smoke, bursts}) => {
   const b = useMemo(() => {
@@ -325,12 +221,9 @@ const Boater: React.FC = () => {
   const g = boatGeom(BOAT_A);
   const x = 962;
   const y = g.roofY - g.roofH - (BOAT_A.topView ?? 0) * 0.4;
-  const ph = (t + 0.4) / 3.1;
-  const k = ph - Math.floor(ph);
-  const cup = k < 0.18 ? k / 0.18 : k < 0.42 ? 1 : k < 0.6 ? 1 - (k - 0.42) / 0.18 : 0;
-  // seated height ~0.55 of a 1.70 m figure on the boat's plane (a touch nearer than her line): ~88 px; it also hides
-  // jogger 2's head as it passes behind (no head stacked on a head)
-  return <Seated x={x} y={y} h={88} seed="s1/boater" cup={cup} turn={t > 0.47 && t < 1.3 ? 0.55 : Math.sin(t * 0.9) * 0.12} traits={{hair: 'beanie', hatColor: CM.brick, coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />;
+  // at rest (the life budget): the cup held low, no turn. Seated height ~0.55 of a 1.70 m figure on the boat's plane.
+  const cup = 0 * t;
+  return <Seated x={x} y={y} h={88} seed="s1/boater" cup={cup} turn={0.1} traits={{hair: 'beanie', hatColor: CM.brick, coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />;
 };
 
 /** A ginger cat curled on boat B's roof: a loaf of leafRust with a tail curl; lifts its head at 1.10 and 4.98. */
@@ -340,7 +233,8 @@ const Cat: React.FC = () => {
   const x = 1004;
   const y = g.roofY - g.roofH - (BOAT_B.topView ?? 0) * 0.45;
   const up = (a: number) => Math.max(0, Math.min(1, (t - a) / 0.12)) * Math.max(0, Math.min(1, (a + 1.3 - t) / 0.2));
-  const lift = Math.max(up(MAP.S1_CLOCK.doorsShut), up(MAP.S1_LIFE_T));
+  // asleep: no head lifts (the life budget: the hook's novelty is her build only)
+  const lift = 0 * Math.max(up(MAP.S1_CLOCK.doorsShut), up(MAP.S1_LIFE_T));
   const b = new Batch();
   b.fill(CM.leafRust, `M${P(x - 22, y)}Q${P(x - 24, y - 15)} ${P(x - 4, y - 16)}Q${P(x + 16, y - 16)} ${P(x + 20, y)}Z`);
   // the tail round the front
@@ -358,32 +252,27 @@ const Cat: React.FC = () => {
 
 // ---------------------------------------------------------------- the far-towpath life
 
-/** Jogger 1: in frame at f0 on the bend (x 236, ink only), runs WEST at 340 px/s (~2.3 body heights/s) under the
- *  bridge and out of the left edge by ~0.9: the hook's first second has a runner and the bare-line bend a figure, and
- *  the doorway (0.40-1.25) and her 1.25-2.45 stand-alone stay clear (V2S1_clock KEEP_CLEAR: a pass at 1.60 would cross
- *  her and the doorway, so TREATMENT f96's "a jogger passes her" is jogger 2's pass at 3.85). Cap, mustard top. */
-export const S1_JOG1 = {pass: 0, at: 236, speed: -340} as const;
-/** Jogger 2 (TREATMENT f195): enters left ~2.26, runs EAST at 380 px/s (~2.4 body heights/s) through the row unaware
- *  (G3 ~3.40, 100+ px clear of G3's pop at 3.20), passes behind her at 3.85, beyond x 600 by 4.4 (the row's zone) and
- *  off the right edge before the cover (5.30). Beanie, rust top. */
-export const S1_JOG2 = {pass: 3.85, at: 565, speed: 380} as const;
-export const s1Jog1X = (t: number) => S1_JOG1.at + S1_JOG1.speed * (t - S1_JOG1.pass);
-export const s1Jog2X = (t: number) => S1_JOG2.at + S1_JOG2.speed * (t - S1_JOG2.pass);
-
-const Jogger: React.FC<{x: number; seed: string; traits: React.ComponentProps<typeof Person>['traits']; rate: number; flip: boolean}> = ({x, seed, traits, rate, flip}) => {
-  if (x < -70 || x > 1150) return null;
-  const xx = Math.max(-200, Math.min(1300, x));
-  const feet = MAP.s1TowpathFeetY(Math.max(0, Math.min(1080, xx))) - 9;
-  const h = MAP.s1FigureHAt(Math.max(0, Math.min(1080, xx))) * 0.94;
-  return <Person x={xx} y={feet} h={h} seed={seed} pose="jog" view="profile" flip={flip} walk={{rate}} traits={traits} />;
-};
+/** THE far jogger (the life budget's ONE: conform_L1 §6): small (tier C, ~50 px) on the far bank seen through the
+ *  road bridge's arch, beyond the row's far end, jogging WEST 250 -> 140 from 0.30 to 2.50 s and gone behind the
+ *  arch's west spring by then: it never crosses her, the doorway or the row (V2S1_clock KEEP_CLEAR), and the row reaches
+ *  that x only after 4.0. Cap, mustard top: no lookalike of her. */
+export const S1_JOG = {t0: 0.3, t1: 2.5, x0: 250, x1: 130, feet: 1041, h: 50} as const;
+export const s1JogX = (t: number) => S1_JOG.x0 + ((S1_JOG.x1 - S1_JOG.x0) * (t - S1_JOG.t0)) / (S1_JOG.t1 - S1_JOG.t0);
 
 export const S1FarLife: React.FC = () => {
   const t = useTime();
+  const id = 's1jogclip';
+  if (t < S1_JOG.t0 - 0.2 || t > S1_JOG.t1 + 0.2) return null;
   return (
     <>
-      <Jogger x={s1Jog1X(t)} seed="s1/jog1" rate={2.9} flip={false} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: CM.hair[1], coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none', shoes: CM.paper}} />
-      <Jogger x={s1Jog2X(t)} seed="s1/jog2" rate={2.8} flip traits={{hair: 'beanie', hatColor: CM.sage, coat: CM.leafRust, coatLen: 'jacket', trousers: CM.shadeCool, acc: 'none', shoes: CM.paper}} />
+      <defs>
+        <clipPath id={id} clipPathUnits="userSpaceOnUse">
+          <path d={s1ArchOpening(1042)} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>
+        <Person x={s1JogX(t)} y={S1_JOG.feet} h={S1_JOG.h} seed="s1/jog1" pose="jog" view="profile" flip={false} walk={{rate: 2.6}} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: CM.hair[1], coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none', shoes: CM.paper}} />
+      </g>
     </>
   );
 };
@@ -433,9 +322,8 @@ export const S1PlaneBranch: React.FC = () => {
   return (
     <>
       {fills}
-      <Ink d={stemD} width={INK_PX.far} seed="s1brStem" />
-      <Ink d={outl} width={INK_PX.hair} seed="s1brOut" open={0.25} />
-      <Ink d={ribs} width={INK_PX.hair} seed="s1brRib" />
+      {/* tier C: the twig IS a line (a hairline thing); the leaves are flat shapes, no outline or ribs */}
+      <Ink d={stemD} width={INK_PX.far} seed="s1brStem" thing />
     </>
   );
 };

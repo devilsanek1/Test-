@@ -21,7 +21,9 @@ import {s1Layout} from '../kit/canal/wing';
 import {litAt, Pigeons} from '../kit/canal/life';
 import {HandLetteredGoogle} from '../kit/canal/lettering';
 import * as MAP from '../world/map';
-import {CellPaint, barPath, Under, UnderPaint} from './V2S1_set_core';
+import {CellPaint, barPath} from './V2S1_set_core';
+import {Tier} from '../../lib/tier';
+import {S1_DRAW, wIsSubject, doorIsSubject} from './V2S1_clock';
 
 // ---------------------------------------------------------------- the layout (local metres: u east, v down)
 
@@ -127,24 +129,7 @@ function facadeStatic(): Batch {
     b.poly(CM.brickLight, q(a - 0.01, 0, c - a + 0.02, HM));
   }
   b.layer();
-  // brick coursing hints: short tick fills in clusters on the solid brick (piers, the corner panel, the door piers)
-  const solid: [number, number, number, number][] = [
-    [CORNER + 0.04, V_HEAD + 0.1, 0.2, V_SILL - V_HEAD - 0.2],
-    [PIER_L.u0 + 0.05, V_FLOOR + 0.25, PIER_L.u1 - PIER_L.u0 - 0.1, V_PLINTH - V_FLOOR - 0.4],
-    [PIER_R.u0 + 0.05, V_FLOOR + 0.25, PIER_R.u1 - PIER_R.u0 - 0.1, V_PLINTH - V_FLOOR - 0.4],
-    [UPPER[2].u1 + 0.02, V_HEAD + 0.12, WU0 - UPPER[2].u1 - 0.04, V_SILL - V_HEAD - 0.25],
-  ];
-  for (const [u0, v0, w, h] of solid) {
-    const n = Math.max(2, Math.round((w * h) / 0.35));
-    for (let k = 0; k < n; k++) {
-      const uu = u0 + r.range(0, w);
-      const vv = v0 + r.range(0, h);
-      for (let j = 0; j < r.int(2, 3); j++) {
-        const [x, y] = p(uu + (j % 2) * 0.13, vv + j * 0.075);
-        b.rect(j % 2 ? CM.brick : CM.stucco, x, y, 8, 2.2);
-      }
-    }
-  }
+  // (no brick coursing ticks: CRAFT §c, big areas flat)
   b.layer();
   // the coping cap, the band between the storeys (W's sill course), the plinth, each in strips
   for (let k = 0; k < strips.length - 1; k++) {
@@ -177,15 +162,15 @@ function facadeStatic(): Batch {
   b.poly(CM.limestone, q(DU1, DV0 - 0.1, 0.12, HM - DV0 + 0.1));
   b.poly(CM.stoneShade, q(DU0, DV0, 0.07, HM - DV0));
   b.layer();
-  // ---- fins: slim limestone, a warm shadow strip to their right (the sun is west)
+  // ---- fins: slim limestone (their short shades to the right are the light layer's: s1WingShadows)
   for (const [u, full] of FINS) {
     const v1 = full ? V_PLINTH : V_SILL;
     b.poly(CM.limestone, q(u - 0.065, 0.02, 0.13, v1 - 0.02));
-    b.poly(CM.shadeWarm, q(u + 0.065, 0.06, 0.05, v1 - 0.06));
   }
   // ---- the canopy slab: soffit shadow under the fascia, the fascia (sign face), its top band
   const F = S.canopyFascia;
-  b.rect(CM.shadeWarm, F.x0 - 6, F.y1, F.x1 - F.x0 + 12, 8);
+  // the soffit is limestone; its one Shade step is the light layer's (s1WingShadows)
+  b.rect(CM.limestone, F.x0 - 6, F.y1, F.x1 - F.x0 + 12, 8);
   b.rect(CM.stoneShade, F.x0 - 6, F.y1 + 8, F.x1 - F.x0 + 12, 3);
   b.rect(CM.paper, F.x0, F.y0, F.x1 - F.x0, F.y1 - F.y0);
   b.rect(CM.limestone, F.x0 - 10, F.y0 - 7, F.x1 - F.x0 + 20, 8);
@@ -354,9 +339,6 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
     b.fill(CM.coatPlum, barPath(pp(0.8, 0.76), pp(0.86, 0.6), 3));
     b.fill(CM.coatPlum, barPath(pp(0.86, 0.6), pp(0.76, 0.5), 3));
     b.fill(CM.coatPlum, `M${P(...pp(0.7, 0.5))}L${P(...pp(0.79, 0.44))}L${P(...pp(0.82, 0.53))}Z`);
-    // a glint: the glass still catches the sky at the top-right corner
-    b.poly(CM.paneUnlit, [pp(0.98, 0.02), pp(0.98, 0.2), pp(0.8, 0.02)]);
-    b.poly(CM.skyHigh, [pp(0.98, 0.03), pp(0.98, 0.09), pp(0.92, 0.03)]);
   } else {
     // lamp-lit: her desk lamp on (a flat pool on the desk, never a glow), the shelf of box files, the chair back
     b.poly(CM.lamp, qq(0, 0, 1, 1));
@@ -371,7 +353,6 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
     b.fill(CM.anchor, barPath(pp(0.86, 0.6), pp(0.76, 0.5), 3));
     b.fill(CM.anchor, `M${P(...pp(0.7, 0.5))}L${P(...pp(0.79, 0.44))}L${P(...pp(0.82, 0.53))}Z`);
     b.fill(CM.paper, ovalPath(...pp(0.765, 0.53), 3.5, 2.5));
-    b.poly(CM.glass, [pp(0.98, 0.02), pp(0.98, 0.18), pp(0.82, 0.02)]);
   }
   // the glazing: two slim stone mullions near the sides (kept out of the dive's centre) as fills; their lines in ink
   b.layer();
@@ -389,7 +370,6 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
   const RY = s * 0.066;
   b.fill(CM.shadeWarm, `M${P(rx - RX, ry)}A${RX.toFixed(1)} ${RY.toFixed(1)} 0 1 0 ${P(rx + RX, ry)}A${RX.toFixed(1)} ${RY.toFixed(1)} 0 1 0 ${P(rx - RX, ry)}Z`);
   b.fill(CM.paper, ovalPath(rx, ry - 0.3, RX * 0.7, RY * 0.52));
-  for (const [dx, dy, sz] of [[1.25, -0.3, 2.2], [1.45, 0.35, 1.6], [-1.3, 0.3, 2], [-1.12, -0.5, 1.4], [1.1, 0.8, 1.3]] as [number, number, number][]) b.fill(CM.brickDeep, ovalPath(rx + dx * RX, ry + dy * RY, sz, sz * 0.7));
   b.fill(CM.sage, leafPath(rx + RX * 1.75, ry - 1.5, 16, 5, -18));
   inkM.push(ellipse(rx, ry, RX, RY, {seed: 's1W/ring', wobble: 0.02, overlap: 16}));
   inkF.push(ellipse(rx, ry - 0.3, RX * 0.7, RY * 0.52, {seed: 's1W/ring2', wobble: 0.03, overlap: 6}));
@@ -451,6 +431,9 @@ function doorFrameStatic(): Batch {
 
 // ---------------------------------------------------------------- the wing
 
+/** The life budget's window switches: one at a time, >= 2 s apart (the far terrace's at 1.80, this one at 3.90). */
+const WING_SWITCH = {pane: 6, at: 3.9} as const;
+
 export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) => {
   const t = useTime();
   const stat = useMemo(() => facadeStatic(), []);
@@ -472,24 +455,8 @@ export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
     const parts = bay.split ? [[bay.u0 + 0.045, bay.u0 + (bay.u1 - bay.u0) * bay.split - 0.025], [bay.u0 + (bay.u1 - bay.u0) * bay.split + 0.025, bay.u1 - 0.045]] : [[bay.u0 + 0.045, bay.u1 - 0.045]];
     for (const [a, c] of parts) panes.push([a, va, c - a, vb - va]);
   }
-  // the frame-0 drawing of the panes (their fills are paper until the flood): a room line, a desk or a sill line and a
-  // glass glint per pane, each pane's group gone on the frame its colour lands (the bare-line state reads dense)
-  const under = useMemo(() => {
-    const u = new Under();
-    panes.forEach(([u0, v0, w, h], k) => {
-      const r = rng(`s1paneU/${k}`);
-      const pp = (a: number, c: number) => p(u0 + a * w, v0 + c * h);
-      const [cx, cy] = pp(0.5, 0.5);
-      const lo = r.range(0.56, 0.68);
-      let d = `M${P(...pp(0.04, lo))}L${P(...pp(0.96, lo - r.range(0.06, 0.16)))}`;
-      d += `M${P(...pp(0.12, 0.86))}L${P(...pp(0.88, 0.86))}`;
-      d += `M${P(...pp(0.62, 0.04))}L${P(...pp(0.42, 0.3))}M${P(...pp(0.74, 0.04))}L${P(...pp(0.56, 0.26))}`;
-      u.add(cx, cy, d, INK_PX.hair);
-    });
-    return u;
-  }, []);
   panes.forEach(([u0, v0, w, h], k) => {
-    const lit = litAt(t, 's1wing', k, panes.length, {litFrac: 0.55});
+    const lit = k === WING_SWITCH.pane ? t >= WING_SWITCH.at : litAt(0, 's1wing', k, panes.length, {litFrac: 0.55});
     paneInto(dyn, inkP, u0, v0, w, h, lit, `s1pane/${k}/${lit ? 'L' : 'U'}`, k % 4);
   });
   dyn.ink(inkP.join(''), INK_PX.hair);
@@ -505,12 +472,17 @@ export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
     <>
       <CellPaint b={stat} seed="s1wing/stat" cell={110} />
       <CellPaint b={dyn} seed="s1wing/panes" cell={110} live />
-      <UnderPaint u={under} seed="s1wing/paneU" />
-      <CellPaint b={wb} seed="s1wing/W" cell={400} live />
+      {/* W: the subject (one closed outline drawing on at frame 0) before the lamp click and from her look back */}
+      <Tier tier={wIsSubject(t) ? 'subject' : 'environment'}>
+        <CellPaint b={wb} seed="s1wing/W" cell={400} live draw={S1_DRAW} />
+      </Tier>
       <CellPaint b={lobby} seed="s1wing/lobby" cell={400} />
       {behindDoor}
-      <CellPaint b={frame} seed="s1wing/doorframe" cell={400} misreg={0.5} />
-      <HandLetteredGoogle cx={(F.x0 + F.x1) / 2} baseline={F.y0 + (F.y1 - F.y0) * 0.8} cap={Math.min(S.canopyLetterPx, (F.y1 - F.y0) * 0.84)} at={MAP.S1_CLOCK.steppingOut} each={0.06} />
+      {/* the glass door + its canopy letters: the subject from frame 0 through her step-out (the letters pop on 0.97) */}
+      <Tier tier={doorIsSubject(t) ? 'subject' : 'environment'}>
+        <CellPaint b={frame} seed="s1wing/doorframe" cell={400} misreg={0.5} draw={S1_DRAW} />
+        <HandLetteredGoogle cx={(F.x0 + F.x1) / 2} baseline={F.y0 + (F.y1 - F.y0) * 0.8} cap={Math.min(S.canopyLetterPx, (F.y1 - F.y0) * 0.84)} at={MAP.S1_CLOCK.steppingOut} each={0.06} />
+      </Tier>
     </>
   );
 };
@@ -569,13 +541,14 @@ export const S1DoorLeaves: React.FC = () => {
     b.poly(CM.line, q(hu, v0 + (v1 - v0) * 0.36, 0.04, 0.025));
     outer += poly(q(a, v0, leafW, v1 - v0), {closed: true, over: 'small', seed: `s1leaf${side}/o`});
     inner += poly(q(a + st, v0 + rail, leafW - 2 * st, v1 - v0 - rail - kick), {closed: true, over: 'none', seed: `s1leaf${side}/i`});
-    // the glint: two ink strokes in the upper glass (above her head at f0)
-    const [gx, gy] = p(a + st + 0.14, v0 + rail + 0.68);
-    inner += glint(gx, gy, 30, {seed: `s1leaf${side}/g`, angle: -58, gap: 8});
   }
   b.ink(outer, INK_PX.mid);
   b.ink(inner, INK_PX.far);
-  return <CellPaint b={b} seed="s1leaves" cell={400} misreg={0.6} live />;
+  return (
+    <Tier tier={doorIsSubject(t) ? 'subject' : 'environment'}>
+      <CellPaint b={b} seed="s1leaves" cell={400} misreg={0.6} live draw={S1_DRAW} />
+    </Tier>
+  );
 };
 
 // ---------------------------------------------------------------- life on the wing
@@ -590,6 +563,16 @@ export const S1WingLife: React.FC = () => {
       <Pigeons ledge={[x0, x1, ys]} n={2} size={15} seed="s1sill2" />
     </>
   );
+};
+
+/** The wing's shadow shapes for the light layer (V2S1_light): each fin's short shade falling right on the facade
+ *  (the sun is west), and the canopy soffit (one Shade step). Screen px. */
+export const s1WingShadows = (): {fins: string[]; soffit: string} => {
+  const toD = (pts: Pt[]) => `M${pts.map((pt) => P(pt[0], pt[1])).join('L')}Z`;
+  const fins = FINS.map(([u, full]) => toD(q(u + 0.065, 0.06, 0.07, (full ? V_PLINTH : V_SILL) - 0.06)));
+  const F = S.canopyFascia;
+  const soffit = `M${P(F.x0 - 6, F.y1)}L${P(F.x1 + 6, F.y1)}L${P(F.x1 + 6, F.y1 + 8)}L${P(F.x0 - 6, F.y1 + 8)}Z`;
+  return {fins, soffit};
 };
 
 export {PM as S1_WING_PLANE, UPPER as S1_WING_UPPER, LOWER as S1_WING_LOWER, V_SILL as S1_WING_V_SILL, V_PLINTH as S1_WING_V_PLINTH, HM as S1_WING_HM};

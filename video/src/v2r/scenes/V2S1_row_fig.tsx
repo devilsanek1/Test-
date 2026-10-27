@@ -591,6 +591,9 @@ export type RowFigureProps = {
   offset?: [number, number] | false;
   /** Scale of the default misregistration's x part (the row's ghosts keep it small: their gaps are x). */
   misregX?: number;
+  /** Frame 0's draw-on (instead of a pop): the fills are there (pale until the flood), the outline draws on as ONE
+   *  stroke (every part at once) from `at` over `dur`. */
+  draw?: {at: number; dur: number};
   seed: string;
   /** Inside a parent's ExitSync already. */
   noSync?: boolean;
@@ -598,7 +601,7 @@ export type RowFigureProps = {
 
 export const POP = {outlineS: 0.1, fillDelayS: 2 / 60, settleS: 4 / 60, settleFrom: 1.06} as const;
 
-export const RowFigure: React.FC<RowFigureProps> = ({spec, x, y, h, step, stride = 1, turn = 0, inkPx, at, knockout, offset, misregX = 1, seed, noSync}) => {
+export const RowFigure: React.FC<RowFigureProps> = ({spec, x, y, h, step, stride = 1, turn = 0, inkPx, at, knockout, offset, misregX = 1, draw, seed, noSync}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const sq = Math.round(step * 100) / 100;
@@ -614,7 +617,7 @@ export const RowFigure: React.FC<RowFigureProps> = ({spec, x, y, h, step, stride
   const off = offset ?? misreg(h, seed, misregX);
   const g = (
     <XG m={mat.compose(mat.translate(x, y), mat.scale(s, s))}>
-      <FigDraw parts={parts} inkPx={inkPx} scale={s} at={at} inkDur={POP.outlineS} fillAt={fillAt} knockout={knockout} offset={off} seed={seed} />
+      <FigDraw parts={parts} inkPx={inkPx} scale={s} at={draw ? draw.at : at} inkDur={draw ? draw.dur : POP.outlineS} fillAt={fillAt} knockout={knockout} offset={off} seed={seed} />
     </XG>
   );
   return noSync ? g : <ExitSync seed={`fig/${seed}`}>{g}</ExitSync>;
