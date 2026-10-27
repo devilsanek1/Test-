@@ -63,3 +63,6 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   density rule: "less prescriptive on the amount of objects, but having a scene feel alive is absolutely the key; even the
   Arcane scene felt alive because of the density of the city, the details, the clouds and birds". -> rules: Visual style
   (feel alive; great scale); S9's end frame gets the scale cues in the rollout.
+- 2026-10-27, G5b density pilot (`deliverables/v3/v3_g5b_pilot.mp4`: O1 nook dressed + Pip + window town life; S4/S6 chart in
+  the shop's street noticeboard with a row of backs): "go ahead yes". -> the pilot is the density bar; roll out to the other
+  panels (S5, S7-S14, S16), then G6 polish.

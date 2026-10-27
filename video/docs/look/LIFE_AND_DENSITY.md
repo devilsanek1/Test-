@@ -207,3 +207,10 @@ python3 -I scripts/qa/gate_check.py ... --density     # WARN per shot; FAIL when
 | kit (before the G5 lanes) | the dressing inventory for the video's settings, the people variants and the character's colourway; every piece on the kit sheet at each size a panel uses, checked at 0.25 scale |
 | G5 blocking | sets at full density, people placed, the character in every shot with key poses, the idle layer on (weather, lights, people idle, the character's idle, one loop per shot); each set judged paused first (§0); density.py before the owner sees it, cozy holds by `--cozy` (§9) with a locked or floating camera |
 | G6 polish | motion life refined: secondary motion, reactions on the voice's words, the cadence measured (BUSY shots: >= 5/s, gap <= 1 s; cozy holds: `--cozy`, §9), the character's hops across cuts and the loop; then edges and texture |
+
+## Approved bar (our own frames)
+The owner approved v3's G5b density pilot as the level to hit (2026-10-27, "go ahead yes"):
+`deliverables/v3/v3_g5b_pilot.mp4`, O1 (the dressed nook: photos on a cord, string lights, star, calendar, desk clutter,
+Pip, the snowy town with lit windows, a shoveller, sliding snow, a car) and S4 (the chart in a glass noticeboard on the
+computer shop's street wall, a row of winter backs, a phone flash, Pip on the rail). Measured: O1 flat 18 %, detail 50 %,
+7.9 ev/s; S4 flat 24 %, detail 56 %, 6.5 ev/s. Judge new sets beside these frames and the references.
