@@ -86,6 +86,12 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-27 ~22:20 UTC, G4 look clip (`deliverables/v2/v2r_G4_look.mp4`, S1 0-6.13 s in the clean pen, tiers, RIG_CANAL): "okay good
   continue" -> the look is APPROVED for the lanes (incl. the row change: oat coats, white-haired copies on "life" instead of see-through
   outlines); no comment on the big orange sun -> kept as is; the foreground fix (things at foreground scale on the steps) goes on as v2.
+- 2026-10-27 ~22:30 UTC, on the G4 look clip (two screenshots: the Google facade + far city; the steps): "the foreground and the
+  main focus still blurs with the background supporting entities ... the Google office vs the building on the background - they are all
+  blurred together ... no distance effect nor perspective; similarly the bottom part ... little to no perspective or depth at all; the
+  shadows added are better; research some libraries on github that would help you achieve better, more natural effects and add perhaps a
+  bit of particles here and there". -> playbook rule DEPTH AND SEPARATION (+ DIRECTION rule 2); S1 v2: the far city recedes (atmospheric
+  perspective), the Google wing separates, the steps recede in perspective; a researched particles + depth toolkit for every lane.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
