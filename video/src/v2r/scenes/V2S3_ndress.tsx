@@ -7,7 +7,7 @@ import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {line, arc as arcInk} from '../../lib/sketch';
-import {Batch, Paint, P, rng, ovalPath, lobes, leafPath} from '../kit/canal/core';
+import {Batch, Paint, P, rng, ovalPath, leafPath} from '../kit/canal/core';
 import type {Pt} from '../kit/canal/core';
 import {Levels} from './V2S3_nboat';
 
@@ -107,13 +107,17 @@ function bayInto(L: Levels) {
   const cy = y - 158;
   const lumps: [number, number, number][] = [[0, 0, 44], [-30, -14, 24], [26, -20, 26], [-6, -36, 24], [32, 12, 22], [-34, 14, 22]];
   const d = L.at(3);
-  for (const [dx, dy, R] of lumps) d.fill(CM.sage, ovalPath(x + dx, cy + dy, R, R * 0.96));
+  for (const [dx, dy, R] of lumps) d.fill(CM.waterDeep, ovalPath(x + dx, cy + dy, R, R * 0.96));
   const e = L.at(4);
   e.fill(CM.shadeCool, `M${P(x + 14, cy + 40)}Q${P(x + 52, cy + 30)} ${P(x + 52, cy - 4)}Q${P(x + 40, cy + 22)} ${P(x + 14, cy + 30)}Z`);
-  e.fill(CM.glass, ovalPath(x - 30, cy - 18, 11, 8));
-  e.fill(CM.glass, ovalPath(x - 12, cy - 40, 9, 6));
-  e.fill(CM.leafGold, ovalPath(x + 20, cy - 26, 6, 5));
-  e.ink(arcInk(x, cy - 2, 50, 50, 150, 300, {seed: 's3nd/bayInk'}) + `M${P(x - 34, y - 56)}L${P(x - 26, y)}L${P(x + 26, y)}`, INK_PX.far, CM.ink, 0.2);
+  e.fill(CM.sage, ovalPath(x - 22, cy - 16, 20, 15));
+  e.fill(CM.sage, ovalPath(x - 4, cy - 38, 16, 10));
+  e.fill(CM.sage, ovalPath(x - 36, cy + 8, 12, 9));
+  const f = L.at(5);
+  f.fill(CM.glass, ovalPath(x - 28, cy - 20, 7, 5));
+  f.fill(CM.glass, ovalPath(x - 8, cy - 41, 6, 4));
+  f.fill(CM.leafGold, ovalPath(x + 22, cy - 24, 5, 4));
+  f.ink(arcInk(x, cy - 2, 50, 50, 150, 300, {seed: 's3nd/bayInk'}) + `M${P(x - 34, y - 56)}L${P(x - 26, y)}L${P(x + 26, y)}`, INK_PX.far, CM.ink, 0.2);
   // a few leaves the tree has dropped
   for (const [k, [lx, ly, ang]] of ([[x - 52, y + 6, 20], [x + 44, y + 12, 140], [x - 10, y + 16, 70]] as [number, number, number][]).entries()) e.fill(k % 2 ? CM.leafGold : CM.sage, leafPath(lx, ly, 14, 5, ang));
 }
