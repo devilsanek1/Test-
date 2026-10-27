@@ -237,6 +237,23 @@ def bird_events(n, rate, seed, kind="london", windows=((0, 1e9),), level=1.0):
     return y
 
 
+def rustle(n, seed, gust, rate=70.0):
+    """leaves in the wind: short dry grains (5-25 ms, 1.8-7 kHz), their density following the gusts (circular)."""
+    r = rng(seed); y = np.zeros((n, 2)); t = 0.0; T = n / SR
+    while t < T:
+        t += r.exponential(1.0 / rate)
+        i = n_of(t) % n
+        if r.random() > gust[i] ** 1.5:
+            continue
+        d = r.uniform(0.005, 0.025); m = n_of(d)
+        g = bp(r.standard_normal(m), r.uniform(1800, 3000), r.uniform(4500, 7000), 2) * np.hanning(m)
+        sx = pan(g * r.uniform(0.2, 1.0), r.uniform(-0.8, 0.8))
+        k = min(len(sx), n - i); y[i:i + k] += sx[:k]
+        if k < len(sx):
+            y[: len(sx) - k] += sx[k:]
+    return y
+
+
 def gain_curve(points, n=N_FILM, ramp=0.06):
     """step levels (dB) per span with short ramps at the edges; circular (the value at the end = at 0)."""
     t = np.arange(n) / SR
@@ -267,10 +284,15 @@ def world_air():
     park = np.stack([circ_noise(n, 70, 1300, 504, -3.5), circ_noise(n, 70, 1300, 505, -3.5)], 1)
     park *= smooth_rand(n, 0.35, 506, 0.45, 1.0)[:, None]
     layers["parkway"] = (park * 0.11, [(20.55, 28.06, 0)])
-    # air: a breeze high above the voice (3-10 kHz), gusting slowly
-    air = np.stack([circ_noise(n, 3000, 10000, 507, -3), circ_noise(n, 3000, 10000, 508, -3)], 1)
-    air *= smooth_rand(n, 0.25, 509, 0.35, 1.0)[:, None]
-    layers["air"] = (air * 0.050, [(0.00, 6.10, 0), (6.10, 20.55, -2), (20.55, 28.06, 1), (28.06, FILM_DUR, -2)])
+    # air: a breeze (gusting slowly, falling off toward the top: never a steady hiss) + the leaves it moves (dry
+    # rustle grains, denser in the gusts: October plane trees in London, blossom in Arlington) + a faint open-air
+    # body in the mids so the place is one continuous sound, not a rumble and a hiss with a hole between them
+    gust = smooth_rand(n, 0.22, 509, 0.12, 1.0)
+    air = np.stack([circ_noise(n, 2500, 9000, 507, -6), circ_noise(n, 2500, 9000, 508, -6)], 1) * gust[:, None]
+    layers["air"] = (air * 0.024, [(0.00, 6.10, 0), (6.10, 20.55, -2), (20.55, 28.06, 1), (28.06, FILM_DUR, -2)])
+    layers["leaves"] = (rustle(n, 520, gust) * 0.05, [(0.00, 20.55, 0), (20.55, 28.06, 2), (28.06, FILM_DUR, -1)])
+    body = np.stack([circ_noise(n, 450, 2600, 521, -4), circ_noise(n, 450, 2600, 522, -4)], 1)
+    layers["body"] = (body * 0.010 * (0.6 + 0.4 * gust)[:, None], [(0.00, FILM_DUR, 0)])
     # the canal: a low wash + lapping on stone (S1-S3, S7-S8); along the hull while the boat glides (S4)
     wash = np.stack([circ_noise(n, 90, 700, 510, -3), circ_noise(n, 90, 700, 511, -3)], 1)
     wash *= smooth_rand(n, 0.3, 512, 0.5, 1.0)[:, None]
@@ -287,7 +309,7 @@ def world_air():
     ab = bird_events(n, 0.9, 518, "spring", windows=((20.6, 27.9),))
     layers["birds_arl"] = (ab * 0.028, [(20.55, 28.06, 0)])
     y = np.zeros((n, 2))
-    s1 = {"city": 0, "air": 0, "wash": 0, "laps": 0, "birds_ldn": 0}
+    s1 = {"city": 0, "air": 0, "wash": 0, "laps": 0, "birds_ldn": 0, "leaves": 0}
     for k, (x, pts) in layers.items():
         if k in s1:      # the un-build (38.82 -> the seam): S8's air turns into S1's, so the loop is one place
             pts = [(a, min(b, 38.82) if b >= FILM_DUR - 1e-6 else b, db) for (a, b, db) in pts]
@@ -334,6 +356,9 @@ def render(notes):
     swell = db2a(np.interp(t, [0, 21.30, 22.43, 23.2, 24.0, NT / SR], [0, -10, 0, -2, -3, -3]))
     for k in ("low_cb", "low_vc", "air_vln"):
         stems[k] = stems[k] * np.where((t > 21.0) & (t < 24.6), swell, 1.0)[:, None]
+    lift = db2a(np.interp(t, [0, 37.05, 37.25, NT / SR], [0, 0, 4.0, 4.0]))       # "facts": the resolution, a touch up
+    for k in ("motif", "low_cb", "low_vc", "air_vib", "air_vln", "bloom"):
+        stems[k] = stems[k] * lift[:, None]
     tail = db2a(np.interp(t, [0, 38.70, FILM_DUR, FILM_DUR + 0.5, NT / SR], [0, 0, -8, -60, -90]))
     for k in stems:
         stems[k] = stems[k] * tail[:, None]
@@ -435,6 +460,12 @@ def main():
     ducked = sum(groups[k] * duck_curve(v, k)[:, None] for k in ("mid", "air", "low"))
     d, _ = gap_stats(vs, ducked)
     music = ducked * db2a(np.median(d) - 27.0)
+    # A5: Google's side (28.31-32.70) plays the clause's pulse (24.00-27.82) at the SAME measured level: the voice
+    # runs straight through Google's line, so the duck sits longer there; trim it back to the clause's median
+    tq, lq = short_term_lufs(music, win=0.4, hop=0.05)
+    trim = float(np.median(lq[(tq >= 24.2) & (tq < 27.6)]) - np.median(lq[(tq >= 28.5) & (tq < 32.5)]))
+    tt_ = np.arange(N_FILM) / SR
+    music = music * db2a(np.interp(tt_, [0, 28.20, 28.30, 32.75, 32.85, FILM_DUR], [0, 0, trim, trim, 0, 0]))[:, None]
     air = world_air()
     # the air: ~22 dB under the speaking voice (a touch more in the hook, where it is the only bed), ducked 3 dB
     _, la = short_term_lufs(air, win=0.4, hop=0.05)
@@ -451,7 +482,7 @@ def main():
     tp = true_peak_db(bed)
     if tp > -3.0:
         bed *= db2a(-3.0 - tp)
-    save(BED_OUT, bed)
+    save(BED_OUT, bed + (rng(77).random(bed.shape) - rng(78).random(bed.shape)) / 32768.0, subtype="PCM_16")
     save(SCRATCH / "bed_music.wav", music); save(SCRATCH / "bed_air.wav", air)
     # report
     dm, tm = gap_stats(vs, music); dall, _ = gap_stats(vs, bed); da, _ = gap_stats(vs, air)
@@ -467,6 +498,7 @@ def main():
            "air_under_voice_median_dB": round(float(np.median(da)), 1),
            "bed_under_voice_median_dB": round(float(np.median(dall)), 1),
            "bed_under_voice_min_dB": round(float(dall.min()), 1),
+           "google_side_trim_dB": round(trim, 2),
            "guard_extra_dB_max": round(float(-a2db(g).min()), 1),
            "guard_active_s": guard_spans(a2db(g)),
            "section_music_LUFS_1s": {nm: round(float(np.mean(l1[(t1 >= a) & (t1 < b)])), 1) for (nm, a, b) in secs},

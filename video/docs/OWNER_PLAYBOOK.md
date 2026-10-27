@@ -83,8 +83,7 @@ Format: **rule** — why / evidence (video, date).
   red-brown lines, a golden lamp pool, warm shadows, a saturated dusk-blue outside. — ("not sick", v3 G4, 2026-10-26).
 - **Texture and lines: VERY subtle.** Thin tapered lines only in key places; halftone tactically on a few elements as
   an optional last step (the film must work flat; the owner decides per video). — (texture test, 2026-10-25).
-- **Profile identity: mascot Pip (the purple PHP elephant) in the film's style;** avatar
-  `video/deliverables/profile/pip_power_button.png`. — (2026-10-25).
+- **Profile identity: mascot Pip (the purple PHP elephant), drawn in each film's style;** avatar `deliverables/profile/pip_power_button.png`. — (2026-10-25).
 
 ## Hook and pacing
 - **Every video has ONE core line, picked in its own step (G0.5) before the script:** the single sentence at the core
@@ -148,8 +147,9 @@ Format: **rule** — why / evidence (video, date).
 
 ## Process and communication
 - **Parallelize as much as possible: split independent work across helper cloud sessions (each its own machine) and
-  archive each one as soon as its work is pushed and checked;** each helper's done-signal is a report file. — ("archive
-  them so we don't have the mess", v3; "start more instances of cloud machines ... clean them up", v2, 2026-10-27).
+  archive each one as soon as its work is pushed and checked;** each helper's done-signal is a report file, and every
+  helper runs in ULTRACODE mode (its prompt says "ultracode"). — ("archive them so we don't have the mess", v3; "start more
+  instances of cloud machines ... clean them up", "they must all use ultracode effort", v2, 2026-10-27).
 - **Playable video from the sketch animatic (G3) on, never only stills; before G3 text and audio only, one version unless
   asked. Lock the story before big commitments; polish late.** — (v1, 2026-10-25; "why are there multiple versions", v3).
 - **Progress: the gate deliverable is the update, with a short status on all threads between; lean prompts and docs.** — (v1).

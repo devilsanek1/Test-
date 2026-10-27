@@ -17,14 +17,14 @@ import {MID, PENT, PENT_ROT, circ, facesLens, halfSide, pentagon, sideFrame, sid
 
 export const PT = {
   facadeLit: atm(CM.limestone, 2),
-  facadeShade: atmShade(mix(CM.stoneShade, CM.limestone, 0.25), 2),
+  facadeShade: atmShade(mix(CM.stoneShade, CM.shadeCool, 0.22), 2),
   facadeShadeDeep: atmShade(CM.stoneShade, 2),
   cornice: atm(CM.paper, 2),
   roofLit: atm(mix(CM.limestone, CM.stoneShade, 0.3), 2),
   roofShade: atmShade(mix(CM.stoneShade, CM.limestone, 0.2), 2),
-  well: atmShade(mix(CM.shadeCool, CM.stoneShade, 0.25), 2),
+  well: atmShade(mix(CM.shadeCool, CM.paneUnlit, 0.4), 2),
   wellDeep: atmShade(CM.shadeCool, 2),
-  paneShade: atmShade(mix(CM.paneUnlit, CM.stoneShade, 0.35), 2),
+  paneShade: atmShade(mix(CM.paneUnlit, CM.anchor, 0.15), 2),
   paneLit: atm(mix(CM.paneUnlit, CM.limestone, 0.45), 2),
   paneWarm: atm(CM.lamp, 2),
   courtLawn: atmShade(mix(CM.sage, CM.shadeCool, 0.18), 2),
@@ -34,7 +34,7 @@ export const PT = {
   courtBlossom: atm(CM.blossom, 2),
   pavilion: atm(CM.paper, 2),
   pavilionRoof: atm(CM.brick, 2),
-  shadow: atmShade(mix(CM.sage, CM.shadeWarm, 0.5), 2),
+  shadow: atm(mix(CM.sage, CM.anchor, 0.3), 2),
   ink: inkCol(2),
 };
 
@@ -173,18 +173,6 @@ export const Pentagon: React.FC<PentagonProps> = ({warmAt, warmDur = 0.7, seed =
     // ---- 4. the roof: the outer pentagon at the roofline minus the courtyard (evenodd), lit
     b.layer();
     b.fill(PT.roofLit, annulus(PENT.apothem, PENT.courtApothem, H));
-    // two tones per ring per side: each band's half that slopes away from the sun is a step darker
-    for (let i = 0; i < 5; i++) {
-      const {n} = sideFrame(i);
-      const sunward = wallLight(n) > 0; // the outward slope of this side faces the sun
-      for (const [aO, aI] of PENT.rings) {
-        const mid = (aO + aI) / 2;
-        const [x0, x1] = sunward ? [mid, aI] : [aO, mid];
-        const hsO = halfSide(x0);
-        const hsI = halfSide(x1);
-        b.poly(PT.roofShade, [P3(sidePt(i, x0, -hsO), H), P3(sidePt(i, x0, hsO), H), P3(sidePt(i, x1, hsI), H), P3(sidePt(i, x1, -hsI), H)]);
-      }
-    }
     // ---- 5. the four light wells (deep, narrow, in shade) ...
     b.layer();
     for (let k = 0; k < PENT.rings.length - 1; k++) {
