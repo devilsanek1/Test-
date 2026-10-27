@@ -110,6 +110,9 @@ export const HOME_RIG: LightRig = (() => {
 })();
 /** The chart card on the wall right of the window (flow_v2 §3) and its plot box (SQB draws the line in it). */
 export const CARD = {x: 975, y: 612, w: 740, h: 416};
+/** The card's paper: a soft warm white (L* ~95), unlit (CRAFT §d.9): the brightest thing on the wall when the stage
+ *  leads (SQB), and only a soft light strip at the frame's edge in H1. */
+export const CARD_PAPER = '#FBF0E4';
 export const PLOT = {x: CARD.x + 137, y: CARD.y + 150, w: CARD.w - 197, h: CARD.h - 232};
 /** Plot units (u 0..1 = 2005..2026, v 0..1 bottom..top) -> H1 px. The year labels sit at u 0 (2005) and u 0.95 (2025). */
 export const plotPt = ([u, v]: Pt): Pt => [PLOT.x + u * PLOT.w, PLOT.y + PLOT.h - v * PLOT.h];
@@ -448,7 +451,7 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
       {/* the card (paper, exact) and the notes on the wall */}
       {/* the card's paper and pins keep their exact colours (the subject tier recolours nothing) */}
       <Tier tier="subject">
-        <Fill rect={[CARD.x, CARD.y, CARD.w, CARD.h]} color={EMBER.card} at={-0.4} offset={false} />
+        <Fill rect={[CARD.x, CARD.y, CARD.w, CARD.h]} color={CARD_PAPER} at={-0.4} offset={false} />
         {PINS.map(([x, y], i) => (
           <Fill key={i} d={ellipseD({cx: x, cy: y, rx: 9, ry: 9})} color={EMBER.beam} at={-0.3} offset={false} />
         ))}
