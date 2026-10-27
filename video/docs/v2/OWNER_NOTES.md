@@ -105,6 +105,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   own (plus the idle v4 research session); recalibrated to ~$25 per weekly % (23-29): ~$800 left, video 2 needs ~$500-700 -> ~88-96 %.
 - 2026-10-27 ~23:40 UTC: "Dedicate the full budget to finishing this video" -> the whole remaining week (to 100 %) goes to video 2; the guard
   becomes "finish inside 100 %": quality where it shows (the S1 look, the lanes' one critic round, the whole-film review), no waste.
+- 2026-10-27 ~23:45 UTC: "Let's do the best job we can" -> quality first inside the full budget: a fresh-eyes art-director check of S1 v3
+  before the owner sees it; lanes may take a second critic round when a must-fix remains; a full whole-film review panel (cold viewer, art,
+  flow/motion, fairness, sound) and a G6 polish pass on the hook and the key beats before the master.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
