@@ -82,3 +82,8 @@ REQUESTS still to file: L1 draw no Pip at t < 0 (S8's Pip arrives on the seam); 
 REQUESTS so far: K2 SUN8 -> (420, 625); kit cast `S8Ghosts` default `at` is FILM time (33.78) while scenes run shot time (S8 passes S8T.cant);
 kit canal `Lamp` lightAt has a 3-frame flicker (STYLE.md flash safety: S7 / S8 pass `on`); L1 keep `S1Pip`'s props (x 700, y 1235, size 100,
 facing 'back', seed 'pipS1') or export them, S8 mirrors them for the seam.
+Messages handled during the pause: (a) L3 will MATCH my S8Window (closed leaves + central teal mullion, gold lamp shade, two shelves, plants on the
+sill): keep S8Window's design unchanged. (b) Orchestrator: L6 owns Pip from 32.70; agreed with L5 in one message: the hand-over spot is S7's own
+board bollard (S7 keeps its seated Pip there, unmoved, until the wiper's bow covers it ~32.83; no hop), S8 shows Pip on the stern deck from 32.97 and
+its leap (PIP_ENTRY in V2S8_clock; no map.ts change). (c) Flash safety: lamps switch on once, staggered 0.06 s; still to check after the resume: the
+terrace's switching windows must not add up to > 3 on-off flashes in any 1 s.

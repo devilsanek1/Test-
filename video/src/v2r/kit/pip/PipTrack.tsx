@@ -18,7 +18,7 @@ import {useTime} from '../../../lib/time';
 import {useExit, useLook} from '../../../lib/exit';
 import {useInkScale} from '../../../lib/inkComp';
 import {clamp, lerp, smooth, V2} from './geom';
-import {blendParams, PoseParams} from './model';
+import {blendParams, nearEar, PoseParams} from './model';
 import {applyIdle, flickShape, IdleOpts} from './idle';
 import {FACING, FacingName, PoseName, poseParams, POSES} from './poses';
 import {aimAt, drawOn, hopAt, HopState, rideAt, unBuild} from './motion';
@@ -261,10 +261,12 @@ export function trackAt(p: PipTrackProps, t: number): PipTrackState {
     rotate += r.rotate;
     params = {...params, scarfLift: Math.max(params.scarfLift, 0.85)};
   }
-  // ---- one ear flick
-  for (const [tf, side] of flicks) {
+  // ---- one ear flick (a face-on watcher hides its far ear behind its head: the flick goes to the ear we see)
+  for (const [tf, named] of flicks) {
     const k = flickShape(t - tf);
     if (!k) continue;
+    const ne = nearEar(params, p.size ?? 96);
+    const side = ne === 0 ? named : ne === 1 ? 'A' : 'B';
     if (side === 'A') params = {...params, earDroopA: params.earDroopA - 30 * k, earSwingA: params.earSwingA + 14 * k, earFoldA: params.earFoldA + 0.35 * Math.max(0, k)};
     else params = {...params, earDroopB: params.earDroopB - 30 * k, earSwingB: params.earSwingB + 14 * k, earFoldB: params.earFoldB + 0.35 * Math.max(0, k)};
   }

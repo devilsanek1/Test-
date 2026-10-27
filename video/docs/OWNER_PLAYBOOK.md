@@ -174,7 +174,9 @@ Format: **rule** — why / evidence (video, date).
 - **EFFORT IS ALWAYS MAX:** every workflow agent passes `effort: 'max'`, every helper session runs at /effort max; a lazy
   video from a low effort setting is our failure. — ("the key rule is we need to ensure the effort is MAX!", v2, 2026-10-27).
 - **The weekly limit is the real budget: finishing the video comes first** (using up to 100 % of the week is fine if the video
-  is completed). Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. — (v2, 2026-10-27).
+  is completed). Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. The **5-hour
+  session limit** is a hard wall shared by every session: watch both; before it hits, PAUSE in a controlled way (every lane stops its
+  agents, commits + pushes, writes its handover; schedule the resume after the reset), so nothing is lost. — (v2, 2026-10-27).
 - **NO LIMIT ON TOKENS for creative output (inside the weekly limit); never trade quality for savings.** Ideas, scripts, judged competing ideas,
   design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
