@@ -40,9 +40,10 @@ any switching stays away from the story panes and never within 1 s of 8.96 or 10
 far walkers, pigeons, urn steam.
 
 ## 5. Life (<= 3 noticeable supporting movers at once, taking turns)
-Keep: the board's slide (8.44), the passing narrowboat (from the right edge ~10.65, steady), one far walker per towpath,
-urn steam, parapet pigeons lifting once. Cut: the dog's trot, paving pigeons fluttering, every near head-back move, any
-far mover that pops or stops in open view (movers enter and leave at an edge or behind a mass, already moving).
+Keep: the board's slide (8.44), the passing narrowboat (steady, entering at the right edge when nothing else starts: not
+within 0.4 s of 8.44, 8.96, 10.26-10.60, the hood ~10.85 or 12.20), one far walker per towpath, urn steam, parapet
+pigeons lifting once. Cut: the dog's trot, paving pigeons fluttering, every near head-back move, any far mover that pops
+or stops in open view (movers enter and leave at an edge or behind a mass, already moving).
 
 ## 6. Light: RIG_CANAL (`src/v2r/world/rigs.ts`)
 - The sun is off-screen left (west): shadows fall right and a little toward us (`toward` ~15, `el` 36, cap 0.8 h).
@@ -53,9 +54,10 @@ far mover that pops or stops in open view (movers enter and leave at an edge or 
   here is a figure).
 
 ## 7. Line
-In `V2S2_*` delete `INK_PX.*` per-element weights and every `over` / `breaks` / `jitter:` / `drift` / `misreg` / `open` /
-`exitLoose` option, hatching, ripple dashes, stone dabs, leaf specks; delete the paper-white pictograms. Keep rng
-placement jitter. Swap the stand-in board for K3's `ToldTheBBCBoard` (L5's API, its README).
+THROUGHLINE §6 "Line": the global pen already cleans every stroke, so don't strip `INK_PX` or sketch options by hand;
+tier your pieces, author A outlines at `INK_PX.mid` or wider, and delete the hand-drawn marks in `V2S2_*` (ripple dashes,
+stone dabs, leaf specks) and the paper-white pictograms. Swap the stand-in board for K3's `ToldTheBBCBoard` (L5's API,
+its README).
 
 ## 8. Keep exactly
 The wall and its receding geometry; the staff windows' story and timings; the bench figures and their actions (but the
@@ -63,7 +65,8 @@ hood's time); the board's slide-out and text; Pip's head turn; the near lamp.
 
 ## 9. Report (<= 12 lines, `docs/v2/lanes/report_L2.md`, pushed last)
 - 0.4-scale clip of Film2R 5.9-13.2 s (S1's dive in, S3's first frames out), path in the report.
-- `check_light.py` A/B at 7.0 (`--subject` her window) and 11.0 (the staff windows): PASS.
+- `check_light.py` A/B (the sky flags of THROUGHLINE §5) at 7.0 (`--subject` her window) and 11.0 (the staff
+  windows): PASS.
 - `scripts/qa/retro_tools/line/measure.py` at 10.0: strokes <= 80 / Mpx, near-miss ends <= 40, dark-line px <= 3 %.
 - The match: frames 12.95 / 12.98 / 13.00 side by side: M at (335, 785) 133 x 164 and Pip at (590, 1050) in both.
 - Eye check at phone size every 1 s (her window -> the board -> the five windows -> the blinds); movers at 10.3: <= 3; a

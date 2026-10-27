@@ -11,14 +11,18 @@ and the start of "the other side" (THROUGHLINE §1.3): it runs without the threa
   camera opens S5 zoomed ~7x on its SUN1 at (250, 650) r 65 in the bright slot and pulls back by 20.70 (no camera code of
   yours). Pip is already seated beside the stranger on the bench (415, 1120) on the first frame: delete the arrival hop
   (-0.12 tuck) and any landing.
-- **Out, D foreground wipe** 23.72-24.12 (midpoint 23.92, on "any" 24.03; V2S6 starts 23.92): export `Wiper` from
-  `V2S5.tsx` (a `WiperComponent`, like `V2S7_wiper.tsx`): one blossom tree passing close to the lens, trunk + crown,
-  ~300 px wide (`half` ~150), crossing left to right (dir 'right'), flat fills, no outline (C). Keep the caption band one
-  flat field: clip the wiper to y >= 600 like S7's band-safe wiper, and make the two skies above it agree at the swap
-  (S5's top-gutter cloud caps drift out before 23.72, or S6 carries the same caps). The deal board is uncovered by 24.00.
-- Delete Pip's 23.90 leap: the tiny Pip stays at the balustrade (366, 1195) until the tree covers it; S6's Pip waits at the
-  deal board's foot in the same screen area.
-- Nothing new enters, pops or turns in 23.72-24.12 but the tree (the birds already flying keep their pace).
+- **Out, D foreground wipe** 23.62-23.98 (midpoint 23.80, 0.23 s before "any" 24.03; V2S6 starts 23.80): export `Wiper`
+  from `V2S5.tsx` (a `WiperComponent`, like `V2S7_wiper.tsx`): one blossom tree passing close to the lens, trunk + crown,
+  ~300 px wide (`half` ~150), crossing RIGHT TO LEFT (dir 'left'), flat fills, no outline (C). Why this way: your end
+  sun sits at the right edge (1058, 646) and S6's sun at the left (260, 620); a left-to-right tree would show both suns
+  for ~5 frames. Right to left, yours is covered first (~23.68) and S6's appears last (~23.88). Clip the wiper at y >=
+  560 like S7's (`CLIP_Y`): the crown then covers both discs (tops 586 and 575) and the caption band stays one flat
+  field; make the two skies above it agree at the swap (S5's top-gutter cloud caps drift out before 23.62, or S6 carries
+  the same caps). The deal board (x 120-680) is clear by ~23.90 and the tree gone by 23.98, before the purpose line pops
+  on "any" 24.03.
+- Delete Pip's 23.90 leap: the tiny Pip stays at the balustrade (366, 1195) until the tree covers it (~23.81); S6's Pip
+  appears at the deal board's foot (360, 1410), in the same column, right after (~23.85).
+- Nothing new enters, pops or turns in 23.60-24.00 but the tree (the birds already flying keep their pace).
 
 ## 2. Retire the calendar flip (DIRECTION: the sun as a character is retired)
 The disc stays a disc. "April" (20.76) reads from the beat's own build: the slot's trees burst into blossom (4 frames, the
@@ -53,14 +57,16 @@ page once (B); taking turns.
   sun; FormShade on round things. No rim (the subject is a building).
 
 ## 8. Line
-In `V2S5_*` delete `INK_PX.*` per-element weights and every `over` / `breaks` / `jitter:` / `drift` / `misreg` / `open` /
-`exitLoose` option, hatching, specks, dash rows (`V2S5_deck_floor` first). Keep rng placement jitter. K3's NewsBox and
-Plaque are L5's.
+THROUGHLINE §6 "Line": the global pen already cleans every stroke, so don't strip `INK_PX` or sketch options by hand;
+tier your pieces, author the Pentagon's A outline at `INK_PX.mid` or wider, and delete the hand-drawn specks and dash
+rows in `V2S5_*` (`V2S5_deck_floor` first). K3's NewsBox and Plaque are L5's.
 
 ## 9. Report (<= 12 lines, `docs/v2/lanes/report_L4.md`, pushed last)
 - A 0.4-scale clip of Film2R 20.3-24.3 s (S4's push-through in, the wipe out), path in the report.
-- `check_light.py` A/B at 21.0 (`--subject` the news box) and 23.7 (the Pentagon): PASS.
-- `scripts/qa/retro_tools/line/measure.py` at 23.7: strokes <= 80 / Mpx, near-miss ends <= 40, dark-line px <= 3 %.
-- Frames 20.40 / 20.55 / 20.70 (out of the sun) and 23.72 / 23.92 / 24.12 (the wipe; the board clear by 24.00).
+- `check_light.py` A/B (the sky flags of THROUGHLINE §5) at 21.0 (`--subject` the news box) and 23.4 (the Pentagon):
+  PASS.
+- `scripts/qa/retro_tools/line/measure.py` at 23.4: strokes <= 80 / Mpx, near-miss ends <= 40, dark-line px <= 3 %.
+- Frames 20.40 / 20.55 / 20.70 (out of the sun) and 23.62 / 23.70 / 23.80 / 23.88 / 23.98 (the wipe: never two suns,
+  the board clear by ~23.90).
 - `camspeed` <= 15 px/frame on detailed layers through the crane; the band check (y 317-556 pure sky every frame);
   movers in the hold <= 4; `npx tsc --noEmit -p .` clean; REQUEST lines.

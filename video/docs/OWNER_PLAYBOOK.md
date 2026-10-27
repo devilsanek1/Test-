@@ -126,7 +126,9 @@ Maintenance at the end).
   of the message with the biggest emotional reaction. It drives frame 0, the hook, the cover and the payoff; every line
   serves it. From the pick we draft its THROUGH-LINE CARD (one thread object, one home place, one "you":
   `docs/look/CRAFT.md` §a); the script (G1) completes it with a carrier for every join, taken from the script's own
-  joins, and the owner approves the card with the script. — (v3, 2026-10-25; card: v3 retro, owner yes, 2026-10-27).
+  joins, and the owner approves the card with the script. The thread may also leave for a FAIRNESS beat the owner approves
+  (the other side's equal-weight reply, a place the subject must never be): declare it on the card. — (v3, 2026-10-25; card:
+  v3 retro, owner yes, 2026-10-27; fairness exception: v2, owner yes, 2026-10-27).
 - **The first 3 s / first scene must be a banger ("something is about to happen"):**
   - frame 0 is the scene being made, drawn on in the clean pen: the subject's outline (with the supporting lines)
     first, then colour floods in within ~0.3 s (the lined films drew every line first; the owner sees the clean-pen
