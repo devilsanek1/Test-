@@ -1,9 +1,11 @@
 // V2S5_far.tsx (lane L4): the S5 FAR plane (sky, clouds, the sun, the cloud bank, hills, the low city, the obelisk) in
-// END coords. FAR_END is the contract the rig (V2S5_rig.ts) pins on: the horizon, its shift from the kit's 800, and the
-// END sun (the rig maps it onto SUN1 at p 0 exactly).
+// END coords, and the sky life. FAR_END is the contract the rig (V2S5_rig.ts) pins on: the end horizon and the END sun
+// (the rig maps it onto SUN1 at p 0 exactly).
+// Import rule: never import V2S5_rig / V2S5_set / V2S5_figs (the rig imports this file).
 import React from 'react';
 import {FarPlane, VISTA} from '../kit/dc/vista';
 import {CRANE_T} from '../kit/dc/crane';
+import {Gulls, BirdV} from '../kit/dc/life';
 
 export const FAR_END = {
   /** The end horizon (screen y) and its shift from the kit's 800. */
@@ -16,5 +18,10 @@ export const FAR_END = {
 /** The far plane (drawn inside the rig's FAR_S5 PullLayer). */
 export const S5Far: React.FC = () => <FarPlane sun={{flip: CRANE_T.flip}} />;
 
-/** Life in screen space between the far and the river planes (gulls, the V of birds). */
-export const S5FarLife: React.FC = () => null;
+/** Life in screen space between the far and the river planes (gulls, the V of birds); p = the crane progress. */
+export const S5FarLife: React.FC<{p: number}> = () => (
+  <>
+    <Gulls centre={[700, 720]} r={[220, 36]} />
+    <BirdV at={CRANE_T.t0 + 0.75 * (CRANE_T.t1 - CRANE_T.t0)} from={[-120, 760]} to={[700, 640]} dur={2.4} span={30} />
+  </>
+);

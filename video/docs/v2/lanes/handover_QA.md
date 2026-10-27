@@ -29,3 +29,10 @@ Next:
   then write report_QA.md (done signal) with the numbers above + the critic verdict + the BUILD.md section 5 REQUEST.
 - Note: BUILD.md section 5's command uses captionScale 0.5306 and keys ["SAYS:","NO","NO CRITICIZING","FOR LIFE."]; the script header
   example uses 0.531 and three keys: align the header to BUILD.md / Film2R.tsx.
+
+## 2026-10-27 (third helper, ultracode, session 014PwCXJbB6cqdwRoHUM7tta)
+- Re-rendered at 0becffe (--scale=0.25 --gl=angle): out/v3_check.mp4 (Film3), out/v2r_q.mp4 (Film2R). Old script = `git show 5760d6f~1:video/scripts/qa/gate_check.py` run from a symlink root (same src/ and public/).
+- v3 old vs new: byte-identical text + JSON + exit code with --frame0, without it, and with --entry/--comp: PASS (0 fail, 2 warn).
+- v2r new (BUILD.md command): PASS (0 fail, 2 warn: V2S2's out-of-bridge cut at f370 not f369, since the dark window is colour-matched to the
+  plum bridge, f369 d=5.1; extra cut-like 9, 14, 24, 1248, 2330, 2336). Old script: FAIL cuts V2S2 (366) + V2S8 (1976).
+- Running: critic workflow (lenses v3 compat, v2r transitions, frame-0 geometry vs pixels, edge cases, docs) -> merge -> adversarial verify -> fixes.
