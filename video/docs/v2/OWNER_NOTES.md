@@ -83,6 +83,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-27 ~20:10 UTC: "Yes": S5-S7 (12.4 s: the Arlington crane reveal, the deal board, Google's reply) run without her window
   (the thread) as a declared fairness exception; the window holds 67 % of the film (98 % outside S5-S7). Rejected: restaging the
   boards on the canal beside her window (~2 lane-days, weakens equal weight). General rule added (playbook core-line rule, CRAFT §a.1, DIRECTION 1).
+- 2026-10-27 ~22:20 UTC, G4 look clip (`deliverables/v2/v2r_G4_look.mp4`, S1 0-6.13 s in the clean pen, tiers, RIG_CANAL): "okay good
+  continue" -> the look is APPROVED for the lanes (incl. the row change: oat coats, white-haired copies on "life" instead of see-through
+  outlines); no comment on the big orange sun -> kept as is; the foreground fix (things at foreground scale on the steps) goes on as v2.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
