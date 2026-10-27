@@ -1,7 +1,7 @@
 # T5 "small-vs-vast": ONE SMALL WINDOW (treatment for the finished v2 film)
 
 T5, 2026-10-27. Take 2 (39.08 s, 2345 f at 60 fps), seconds per `beat_map.md`. **W** = "her window" spot (300, 700),
-**W2** = (640, 820). All art and sound new; nothing from the dropped pass (desk, contract, years, cat, Cream & Cobalt).
+**W2** = (640, 820). All new; nothing from the dropped pass (desk, contract page, scroll of years, cat, Cream & Cobalt).
 
 ## 1. Title, concept, why it works
 **One Small Window.** A small woman walks out of a vast building by a London canal, and the film keeps measuring her
@@ -14,7 +14,7 @@ what she says: facts.
 - **Understands:** every shot sets ONE small thing against ONE vast thing (her / her life ahead; her dark window / a
   wall of ~400; one person on a bench / the Pentagon; her lit window / the dusk city), so the stakes are seen, not
   narrated (Google's own beat is human-sized: fair). The shift is the beat map's, from "once you quit, you're free".
-- **Shares:** the row of her older selves; the ocean's far side behind one person on a bench; a loop that bites.
+- **Shares:** the row of her older selves; the ocean's far side behind one stranger; the loop ("not criticising" -> f0).
 
 ## 2. World, light, palette
 **One canal neighbourhood in London** (King's-Cross-like, generic, never traced), plus ONE trip across the ocean under
