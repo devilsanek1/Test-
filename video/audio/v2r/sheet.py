@@ -215,7 +215,7 @@ CUES = [
     (lead(29.64), "pen_short:2", 17, "'AI principles' pen-builds, complete on 30.04"),
     (LAMP_RUN_GOOGLE, "lamp_run", 16, "the forecourt lights come on in a run: three switch-ons (frames 1812 / 1836 / "
                                       "1848; THE same file and level as hers)"),
-    (30.74, "pen_long", 19, "'of any kind' pen-builds (THE same pen file and level as her quote)"),
+    (30.74, "pen_long", 21, "'of any kind' pen-builds (THE same pen file and level as her quote)"),
     (32.70, "boat_pass", 15, "JOIN S7>S8, the D wipe: the narrowboat glides west past the lens 32.70-33.16, nearest on "
                              "the midpoint 32.93 (nothing starts before 32.70)"),
     # V2S8 Her words (32.93-39.08)
@@ -226,7 +226,8 @@ CUES = [
     (34.75, "door_latch", 16, "her door shuts behind her"),
     (34.95, "lamp_click:2", 23, "W lights: her home lamp ON (the 12.98 click; the 0.40 click's answer), 3 dB softer"),
     (lead(35.72), "cloth_wipe", 17, "'her words': the cafe owner wipes the board clean in one stroke"),
-    (lead(36.54), "pen_long", 19, "her quote pen-draws on (THE same pen as Google's); its strokes end by 36.97, before 'facts'"),
+    (lead(36.54), "pen_long", 21, "her quote pen-draws on (THE same pen as Google's, a whisper under 'talking'); its "
+                                  "strokes end by 36.95, before 'facts'"),
     (LAMP_RUN_HER, "lamp_run", 16, "'facts': the lamps light west down the lane: three switch-ons (frames 2237 / 2261 / "
                                    "2273; = Google's run, never the ding)"),
     (38.82, "pen_unbuild", 16, "JOIN S8>S1, the un-build 38.82-39.08: the pen's line rewinds, turns into frame 0's "

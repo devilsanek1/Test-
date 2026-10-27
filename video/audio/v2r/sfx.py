@@ -489,8 +489,8 @@ def plate_knock(v=1):
     return slap(out, -6.0)
 
 
-def pen_line(plan, seed, dur):
-    """THE pen drawing one board line: (kind, start, length) taps and strokes; silent between them."""
+def pen_line(plan, seed, dur, strokes=(1.0, 0.9, 0.8, 0.75)):
+    """THE pen drawing one board line: (kind, start, length) taps and strokes (at `strokes` gains); silent between."""
     out = np.zeros(n_of(dur))
     k = 0
     for item in plan:
@@ -498,7 +498,7 @@ def pen_line(plan, seed, dur):
             place(out, pen_tap(seed, 0.6), item[1])
         else:
             k += 1
-            place(out, pen_stroke(item[2], seed + 31 * k, k), item[1], [1.0, 0.9, 0.8, 0.75][k - 1])
+            place(out, pen_stroke(item[2], seed + 31 * k, k), item[1], strokes[k - 1])
     return lp(out, 9000, 2)
 
 
@@ -524,7 +524,8 @@ PEN_LONG = [("tap", 0.000), ("stroke", 0.115, 0.090), ("stroke", 0.255, 0.050), 
 
 @sound
 def pen_long(v=1):
-    """THE pen, the long line: the tip touches, then three strokes (PEN_LONG); the rest of the build is silent."""
+    """THE pen, the long line: the tip touches (in the pause before the line), then three strokes (PEN_LONG) in the
+    vowels of "talking" / "bans" (their consonants stay clear); the rest of the build is silent."""
     return pan(pen_line(PEN_LONG, 320, 0.50), -0.15)
 
 
@@ -671,9 +672,9 @@ def boat_pass(v=1):
 def door_latch(v=1):
     """her teal door shuts behind her down the lane: a soft wooden close, the latch, the lane's slap."""
     out = buf(0.50)
-    th = struck([92, 185, 340], [0.06, 0.035, 0.02], [1, .6, .3], 0.42, 440, exc_ms=1.0, noise_body=0.45,
-                contact_amp=0.25, contact_band=(150, 3000), contact_dec=0.004)
-    th[: n_of(0.06)] += 0.4 * lp(noise(0.06, 441), 600) * np.exp(-tt(0.06) / 0.025)
+    th = struck([92, 185, 340], [0.05, 0.03, 0.018], [1, .6, .3], 0.42, 440, exc_ms=1.0, noise_body=0.8,
+                contact_amp=0.5, contact_band=(150, 3000), contact_dec=0.005)
+    th[: n_of(0.08)] += 0.7 * lp(noise(0.08, 441), 700) * np.exp(-tt(0.08) / 0.03)   # the wooden body's thud: noise, not a hum
     put(out, th, 0.0, 1.0, 0.25)
     put(out, struck([2450, 4100, 5900], [0.006, 0.004, 0.003], [1, .6, .3], 0.03, 442, exc_ms=0.1, noise_body=0.3,
                     contact_amp=0.4, contact_band=(2000, 10000), contact_dec=0.0006), 0.035, 0.5, 0.25)
