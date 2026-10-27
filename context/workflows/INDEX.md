@@ -66,3 +66,5 @@
 | 2026-10-27 | `v2r-understand-a-wf_f778c5a9-855.js` | 2 | 0 | v2 restart: house digest + beat map -> `video/docs/v2/direction/` |
 | 2026-10-27 | `v2r-understand-b-wf_a6c52303-658.js` | 2 | 0 | v2 restart: teardown + toolkit -> `video/docs/v2/direction/` |
 | 2026-10-27 | `v2r-treatments-{1,2,3}-*.js` | 6 | 0 | v2 restart: six competing treatments (camera journey, the line, Pip witness, documentary, small vs vast, retention) -> `video/docs/v2/direction/treatments/` |
+| 2026-10-27 | `v2r-direction-wf_6b4f904a-393.js` | 7 | 0 | four judges -> director -> devil -> revision: `video/docs/v2/TREATMENT.md` (One Small Window) |
+| 2026-10-27 | `v2r-w0 / sound-draft / w1a / w1b` | 9 | 0 | (running) shell + palette + map; new bed + SFX; cast + new Pip; canal + Arlington kits |
