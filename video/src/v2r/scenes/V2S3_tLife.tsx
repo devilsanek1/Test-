@@ -231,8 +231,8 @@ export const S3Outside: React.FC = () => {
   return (
     <>
       <Paint b={b} seed="s3outside" misreg={false} />
-      <Puffs x={1058} y={714} seed="s3kettle" kind="steam" scale={0.95} ceil={590} drift={-34} />
-      <Puffs x={1072} y={716} seed="s3kettleB" kind="steam" scale={0.75} ceil={590} drift={-24} />
+      <Puffs x={1056} y={714} seed="s3kettle" kind="steam" scale={0.72} ceil={590} drift={-26} />
+      <Puffs x={1070} y={716} seed="s3kettleB" kind="steam" scale={0.56} ceil={590} drift={-16} />
     </>
   );
 };

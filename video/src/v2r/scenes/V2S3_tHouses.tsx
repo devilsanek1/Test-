@@ -168,12 +168,15 @@ function backBatch(): Batch {
   b.rect(CM.stoneShade, 1022, 1036, 136, 3);
   // ---- structure ink: cornice, string course, the mansard tops, party walls (loose, broken, open)
   let st = '';
-  st += line(160, TL.cornice, 1180, TL.cornice + 1, {seed: 'cor', over: 'medium'});
-  st += line(160, TL.string, 1180, TL.string + 1, {seed: 'str', over: 'medium'});
+  // long construction strokes: the cornice and the string course run past her end wall into the gap
+  st += line(165, TL.cornice, 1180, TL.cornice + 1, {seed: 'cor', over: [34, 10]});
+  st += line(165, TL.string, 1180, TL.string + 1, {seed: 'str', over: [26, 10]});
+  st += line(165, TL.ground - 22, 1180, TL.ground - 21, {seed: 'plinth', over: [14, 10]});
   for (const h of HOUSES) {
-    if (h.roof === 'mansard') st += line(h.x0 + 12, h.top + 3, h.x1 - 12, h.top + 3, {seed: `mt${h.id}`, over: 'small'});
-    else st += line(h.x0 - 2, h.top, h.x1 + 2, h.top, {seed: `pt${h.id}`, over: 'small'});
-    st += line(h.x0, TL.cornice + 16, h.x0, h.id === 'her' ? TL.ground : TL.ground - 30, {seed: `pw${h.id}`, over: 'small'});
+    if (h.roof === 'mansard') st += line(h.x0 + 12, h.top + 3, h.x1 - 12, h.top + 3, {seed: `mt${h.id}`, over: 'medium'});
+    else st += line(h.x0 - 2, h.top, h.x1 + 2, h.top, {seed: `pt${h.id}`, over: 'medium'});
+    // party walls: from the roof down, overshooting at both ends
+    st += line(h.x0, h.top + 6, h.x0, h.id === 'her' ? TL.ground : TL.ground - 30, {seed: `pw${h.id}`, over: [10, 6]});
   }
   b.ink(st, TK.struct, CM.ink, 0.12);
   return b;

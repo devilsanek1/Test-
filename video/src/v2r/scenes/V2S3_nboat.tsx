@@ -358,6 +358,7 @@ function herbsInto(L: Levels, t: number) {
   const a = L.at(0);
   const c = L.at(1);
   let stems = '';
+  let outline = '';
   for (const [i, p] of HERB_POTS.entries()) {
     const top = p.y - p.h;
     const r = rng(`s3nb/herb${i}`);
@@ -375,16 +376,22 @@ function herbsInto(L: Levels, t: number) {
         }
       }
     } else if (p.kind === 'basil') {
-      a.fill(CM.sage, lobes(p.x - p.w * 0.62 + breeze(i, 1.2), p.x + p.w * 0.62 + breeze(i + 1, 1.2), top + 4, p.h * 1.25, `s3nb/basil${i}`, 4));
+      const lb = lobes(p.x - p.w * 0.62 + breeze(i, 1.2), p.x + p.w * 0.62 + breeze(i + 1, 1.2), top + 4, p.h * 1.25, `s3nb/basil${i}`, 4);
+      a.fill(CM.sage, lb);
+      outline += lb;
       for (let k = 0; k < 6; k++) {
         const ang = -150 + k * 24 + breeze(i + k, 8);
-        c.fill(k % 2 ? CM.leafGold : CM.paper, leafPath(p.x + (k - 2.5) * 7 + breeze(i + k, 1.6), top - p.h * 0.55 + Math.abs(k - 2.5) * 4, 13, 4.4, ang));
+        c.fill(k % 2 ? CM.glass : CM.sage, leafPath(p.x + (k - 2.5) * 7 + breeze(i + k, 1.6), top - p.h * 0.55 + Math.abs(k - 2.5) * 4, 13, 4.4, ang));
       }
     } else if (p.kind === 'thyme') {
-      a.fill(CM.sage, lobes(p.x - p.w * 0.7, p.x + p.w * 0.7, top + 3, p.h * 0.9, `s3nb/thyme${i}`, 5));
+      const lb = lobes(p.x - p.w * 0.7 + breeze(i, 0.8), p.x + p.w * 0.7 + breeze(i + 2, 0.8), top + 3, p.h * 0.9, `s3nb/thyme${i}`, 5);
+      a.fill(CM.sage, lb);
+      outline += lb;
       for (let k = 0; k < 5; k++) c.fill(CM.blossom, ovalPath(p.x - 12 + k * 6 + breeze(i + k, 1), top - 10 - (k % 2) * 5, 2.2, 2.2));
     } else {
-      a.fill(CM.sage, lobes(p.x - p.w * 0.66, p.x + p.w * 0.66, top + 3, p.h * 1.15, `s3nb/chil${i}`, 4));
+      const lb = lobes(p.x - p.w * 0.66 + breeze(i, 1), p.x + p.w * 0.66 + breeze(i + 3, 1), top + 3, p.h * 1.15, `s3nb/chil${i}`, 4);
+      a.fill(CM.sage, lb);
+      outline += lb;
       for (let k = 0; k < 4; k++) {
         const px = p.x - 12 + k * 8 + breeze(i + k, 1.6);
         const py = top - 12 - (k % 2) * 9;
@@ -394,7 +401,9 @@ function herbsInto(L: Levels, t: number) {
   }
   c.ink(stems, 1.6, CM.line);
   // geraniums in the trough (cut by the right edge)
-  a.fill(CM.sage, lobes(1066, 1210, 1298, 34, 's3nb/ger', 6));
+  const ger = lobes(1066 + breeze(7, 1.2), 1210, 1298, 34, 's3nb/ger', 6);
+  a.fill(CM.sage, ger);
+  outline += ger;
   for (let k = 0; k < 6; k++) {
     const gx = 1076 + k * 22 + breeze(k * 1.3, 2);
     const gy = 1268 - (k % 3) * 6 + breeze(k, 1);
@@ -406,15 +415,8 @@ function herbsInto(L: Levels, t: number) {
     const gy = 1268 - (k % 3) * 6 + breeze(k, 1);
     dlev.fill(k % 2 ? CM.box : CM.brick, ovalPath(gx + 2, gy + 1, 3.4, 3));
   }
-  // ink on the foliage masses (open: they carry the form against the water behind)
-  let fo = '';
-  for (const [i, p] of HERB_POTS.entries()) {
-    if (p.kind === 'rosemary') continue;
-    const top = p.y - p.h;
-    fo += arcInk(p.x + breeze(i, 0.8), top + 2, p.w * 0.62, p.h * (p.kind === 'thyme' ? 0.8 : 1.1), 200, 340, {seed: `s3nb/fo${i}`});
-  }
-  fo += arcInk(1150, 1298, 90, 34, 200, 300, {seed: 's3nb/gerInk'});
-  dlev.ink(fo, INK_PX.hair, CM.ink);
+  // ink on the foliage masses: their own lobed outline, left open in places (it carries the form against the water)
+  a.ink(outline, INK_PX.hair, CM.ink, 0.4);
 }
 
 /** The porthole interiors (warm lamp-lit glass + what is inside), drawn per frame under the curtains. */

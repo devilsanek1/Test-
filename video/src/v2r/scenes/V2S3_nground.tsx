@@ -89,7 +89,17 @@ function pavingInto(L: Levels) {
   L.at(0).rect(CM.paving, x0, copingNear, x1 - x0, bottom - copingNear);
   const tints = L.at(1);
   const grit = L.at(2);
-  const rows: number[] = [copingNear];
+  // a band of granite setts along the coping (two courses of small stones, as on S2's stretch of our bank)
+  const SETTS = 34;
+  for (let c = 0; c < 2; c++) {
+    let x = x0 - r.range(0, 20) - c * 13;
+    while (x < x1) {
+      const w = r.range(22, 30);
+      tints.rect(r.pick([CM.stoneShade, CM.limestone, CM.coatOat, CM.stoneShade, CM.stucco]), x + 1.5, copingNear + 2 + c * 16, w - 3, 13);
+      x += w;
+    }
+  }
+  const rows: number[] = [copingNear + SETTS];
   let h = 28;
   while (rows[rows.length - 1] < bottom) {
     rows.push(rows[rows.length - 1] + h);
@@ -135,6 +145,17 @@ function pavingInto(L: Levels) {
   }
   tints.ink(joints, 2, CM.line, 0.12);
   tints.ink(cracks, 1.2, CM.line);
+  // long golden-hour shadows reaching in from things out of frame at left (posts, a bollard): they run right and a
+  // little toward us, away from the low sun; flat stone shade, tapering, never grey
+  for (const [ya, yb, xEnd, wa, wb] of [[1700, 1716, 372, 15, 9], [1884, 1910, 286, 26, 14], [1772, 1781, 150, 11, 7]] as [number, number, number, number, number][]) {
+    grit.poly(CM.stoneShade, [[x0, ya - wa / 2], [xEnd, yb - wb / 2], [xEnd + 10, yb], [xEnd, yb + wb / 2], [x0, ya + wa / 2]]);
+  }
+  // a puddle mirroring the evening sky: the mint, a streak of the sunset band, a leaf afloat
+  const pu = {x: 812, y: 1784, w: 176};
+  L.at(3).fill(CM.glass, `M${P(pu.x - pu.w / 2, pu.y)}Q${P(pu.x - pu.w * 0.25, pu.y - pu.w * 0.11)} ${P(pu.x + pu.w * 0.08, pu.y - pu.w * 0.08)}Q${P(pu.x + pu.w / 2, pu.y - pu.w * 0.07)} ${P(pu.x + pu.w * 0.46, pu.y + pu.w * 0.04)}Q${P(pu.x + pu.w * 0.1, pu.y + pu.w * 0.13)} ${P(pu.x - pu.w * 0.2, pu.y + pu.w * 0.08)}Q${P(pu.x - pu.w * 0.5, pu.y + pu.w * 0.06)} ${P(pu.x - pu.w / 2, pu.y)}Z`);
+  L.at(4).poly(CM.bandSunset, [[pu.x - pu.w * 0.32, pu.y - pu.w * 0.03], [pu.x + pu.w * 0.26, pu.y - pu.w * 0.05], [pu.x + pu.w * 0.22, pu.y - pu.w * 0.01], [pu.x - pu.w * 0.28, pu.y + pu.w * 0.01]]);
+  L.at(4).poly(CM.sky, [[pu.x - pu.w * 0.18, pu.y + pu.w * 0.035], [pu.x + pu.w * 0.3, pu.y + pu.w * 0.02], [pu.x + pu.w * 0.26, pu.y + pu.w * 0.05], [pu.x - pu.w * 0.14, pu.y + pu.w * 0.06]]);
+  L.at(5).fill(CM.leafRust, leafPath(pu.x + 34, pu.y + 2, 22, 7.5, 24));
   // the drain grate (perspective trapezoid, iron frame, slots)
   const dg = {x: 404, y: 1774, w: 92, h: 30};
   L.at(3).poly(CM.paneUnlit, [[dg.x - dg.w / 2 - 6, dg.y - 4], [dg.x + dg.w / 2 + 6, dg.y - 4], [dg.x + dg.w / 2 + 9, dg.y + dg.h + 4], [dg.x - dg.w / 2 - 9, dg.y + dg.h + 4]]);
