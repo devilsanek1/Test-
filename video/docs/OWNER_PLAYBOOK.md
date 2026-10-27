@@ -72,9 +72,8 @@ Format: **rule** — why / evidence (video, date).
 - **Don't rely on reusable assets: every film's sets, characters, props, background life and music are made new for
   it,** in its own design (a new Pip drawing too, if the mascot appears). Engine primitives, timing, captions and QA tools
   are tools, not assets. — ("Don't rely on reusable assets", v2 restart, 2026-10-27).
-- **People small and simple, like the first example video (reference 1):** figures that live in the world (crowds, small
-  full figures, backs of heads, simple round heads), never big character models or close-up faces. — ("don't use big
-  models of people", v2 restart, 2026-10-27).
+- **People small and simple like reference 1** (crowds, small full figures, backs of heads, round heads; near heads <= ~140 px),
+  never big character models or close-up faces. — ("don't use big models of people", v2 restart, 2026-10-27).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). — (v1 posted reel, 2026-10-25).
 - **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
@@ -149,7 +148,9 @@ Format: **rule** — why / evidence (video, date).
 - **Parallelize as much as possible: split independent work across helper cloud sessions (each its own machine) and
   archive each one as soon as its work is pushed and checked;** each helper's done-signal is a report file, and every
   helper runs at MAX effort with ultracode: boot it from a branch whose `.claude/settings.json` says `"ultracode": true`
-  with the first prompt `/effort max`, send the task as a message, check `effort_level: max` + `is_ultracode_active`. — (v2/v3, 2026-10-27).
+  with the first prompt `/effort max`, send the task as a message, check `effort_level: max` + `is_ultracode_active`. Every
+  lane must PROVE it knows the film's style: one STYLE.md per film (colours, line, people, cinema, references, NEVERs) and a
+  graded style check before it builds. — (v2/v3, 2026-10-27; "do each subsection understand ... the full stylistic direction?").
 - **Playable video from the sketch animatic (G3) on, never only stills; before G3 text and audio only, one version unless
   asked. Lock the story before big commitments; polish late.** — (v1, 2026-10-25; "why are there multiple versions", v3).
 - **Progress: the gate deliverable is the update, with a short status on all threads between; lean prompts and docs.** — (v1).
