@@ -328,7 +328,9 @@ const Boater: React.FC = () => {
   const ph = (t + 0.4) / 3.1;
   const k = ph - Math.floor(ph);
   const cup = k < 0.18 ? k / 0.18 : k < 0.42 ? 1 : k < 0.6 ? 1 - (k - 0.42) / 0.18 : 0;
-  return <Seated x={x} y={y} h={64} seed="s1/boater" cup={cup} turn={t > 0.47 && t < 1.3 ? 0.55 : Math.sin(t * 0.9) * 0.12} traits={{hair: 'beanie', hatColor: CM.brick, coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />;
+  // seated height ~0.55 of a 1.70 m figure on the boat's plane (a touch nearer than her line): ~88 px; it also hides
+  // jogger 2's head as it passes behind (no head stacked on a head)
+  return <Seated x={x} y={y} h={88} seed="s1/boater" cup={cup} turn={t > 0.47 && t < 1.3 ? 0.55 : Math.sin(t * 0.9) * 0.12} traits={{hair: 'beanie', hatColor: CM.brick, coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />;
 };
 
 /** A ginger cat curled on boat B's roof: a loaf of leafRust with a tail curl; lifts its head at 1.10 and 4.98. */
