@@ -70,9 +70,11 @@ reducing the forecourt paving's flat share; Pip-landing renders). Neither return
 re-run both builders from scratch). Workflow `v2r-l5-k3-boards` (`wf_2e82bdf7-3ab`) stopped after its integrator. Last renders (scratch, if it survives):
 `s6/sheet_r7a.png`, `s6/s6_r6.mp4`, `s7/build/review1/strip_a.png`, `s7/build/full2/`, `k3/int/KitBoards_sheet_0.5.png`.
 **Next, in order** (orchestrator budget: ONE agent at a time; no second critic round unless a must-fix breaks the story; no polling):
-1. **Pip at the S7 -> S8 wipe** (orchestrator decision): L6 OWNS Pip from 32.70 (riding the boat roof, drawn by S8 above the band-safe wiper). Agree the
-   hand-over spot with L6 (one send_message each): S7's Pip sits on `BOARD_BOLLARD` = screen `s7Screen(BOARD_BOLLARD, 32.70)`; S7 stops drawing it from
-   32.70. Write the spot into `map.ts` in ONE commit.
+1. **Pip at the S7 -> S8 wipe: AGREED with L6 (15:07, one message each):** S7 keeps its seated Pip on its board bollard (`BOARD_BOLLARD` under S7's
+   camera), unmoved, NO hop, never removed at 32.70, until the wiper's bow covers it (~32.83); S8 owns Pip from the boat's stern deck at 32.97 (x =
+   `wipeEdgeX(p, 'left', 630) + 545`, feet y 1648 on the water-2020 hull), leaps 33.00, lands (450, 1205) at 33.20 (L6 keeps it in `V2S8_clock.ts`
+   `PIP_ENTRY`; L6 says no map.ts change is needed; the orchestrator asked for the spot in `map.ts`: one comment line on `BOARD_BOLLARD` after resume).
+   Check S7 draws Pip on the bollard to its last frame (33.16) and the wiper keeps `half` 630 / water 2020.
 2. **Flash safety** (STYLE.md §5 + orchestrator): <= 3 flashes in any 1 s at any size: regroup S7's 30.04 light run (`V2S7_life` festoons / cafe lights,
    `V2S7_set` tree + basin lights) and S6's facade window ticks 27.08-27.80 (dc `GateFacade lightAt`: pass `lightAt` or group the windows in V2S6) into <= 3
    switch-ons per second; no kit `Lamp` 3-frame flicker; one bulb twinkles at a time.
