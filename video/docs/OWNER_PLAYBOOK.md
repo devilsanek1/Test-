@@ -147,9 +147,9 @@ Format: **rule** — why / evidence (video, date).
   platform auto-captions stay off. — (v1 reel, 2026-10-25).
 
 ## Process and communication
-- **Helper cloud sessions are archived as soon as their work is pushed and checked** (keep the owner's session list
-  clean); a split names each helper's done-signal (a report file) so the orchestrator knows when to archive. — ("archive
-  them so we don't have the mess in the left side panel", v3, 2026-10-27).
+- **Parallelize as much as possible: split independent work across helper cloud sessions (each its own machine) and
+  archive each one as soon as its work is pushed and checked;** each helper's done-signal is a report file. — ("archive
+  them so we don't have the mess", v3; "start more instances of cloud machines ... clean them up", v2, 2026-10-27).
 - **Playable video from the sketch animatic (G3) on, never only stills; before G3 text and audio only, one version unless
   asked. Lock the story before big commitments; polish late.** — (v1, 2026-10-25; "why are there multiple versions", v3).
 - **Progress: the gate deliverable is the update, with a short status on all threads between; lean prompts and docs.** — (v1).

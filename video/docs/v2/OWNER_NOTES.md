@@ -51,6 +51,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-27 (restart, direction stage): "don't use big models of people; the people we showed in the first example video
   are the right direction" -> no big character models or close-up faces in the new film: small, simple figures in the
   world like reference 1 (crowds, small full figures, backs of heads). -> rule: Visual style (people small and simple).
+- 2026-10-27 (restart, kit stage): "make sure to parallelize the work as much as you can, start more instances of cloud
+  machines if you have to, but clean them up after" -> lanes and kit work farmed out to helper cloud sessions (report file =
+  done-signal), each archived once its work is merged and checked. -> rule: Process (parallelize; archive helpers).
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
