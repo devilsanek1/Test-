@@ -92,7 +92,10 @@ export const PORTHOLES: Porthole[] = [
 ];
 /** The rectangular saloon window cut by the right edge; the painted flower panel; the side doors. */
 const SALOON = {x0: 1092, x1: 1214, y0: 1386, y1: 1490};
-const PANEL = {x: 566, y: 1452, rx: 94, ry: 62};
+/** The flower panel: a cream-grounded oval (a calm read beside her window, which stays the strongest), scale PK of
+ *  the original 188 x 124 design. */
+const PK = 0.8;
+const PANEL = {x: 566, y: 1452, rx: 94 * PK, ry: 62 * PK};
 const DOORS = {x0: 166, x1: 306, y0: 1362, y1: 1556};
 const DW = (DOORS.x1 - DOORS.x0 - 4) / 2;
 
@@ -144,7 +147,7 @@ function cabinInto(L: Levels) {
     b3.poly(CM.coatMustard, [[cx, cy - 26], [cx + 15, cy], [cx, cy + 26], [cx - 15, cy]]);
     b3.fill(CM.coatMustard, ovalPath(k === 0 ? dx + DW - 10 : dx + 10, DOORS.y0 + 100, 4.2, 4.2));
   }
-  b3.fill(CM.paneUnlit, ovalPath(PANEL.x, PANEL.y, PANEL.rx, PANEL.ry));
+  b3.fill(CM.coatOat, ovalPath(PANEL.x, PANEL.y, PANEL.rx, PANEL.ry));
   b3.fill(CM.lamp, rr(SALOON.x0, SALOON.y0, SALOON.x1 - SALOON.x0, SALOON.y1 - SALOON.y0, 10));
   // ---- level 4: diamond hearts, the panel's leaves, the saloon's interior (light, shelf, jars, lamp shade)
   const b4 = L.at(4);
@@ -158,7 +161,7 @@ function cabinInto(L: Levels) {
     const ar = (a * Math.PI) / 180;
     return `M${P(PANEL.x + dx - Math.cos(ar) * Lf * 0.42, PANEL.y + dy - Math.sin(ar) * Lf * 0.42)}L${P(PANEL.x + dx + Math.cos(ar) * Lf * 0.42, PANEL.y + dy + Math.sin(ar) * Lf * 0.42)}`;
   }).join(''), 1.2, CM.coatMustard);
-  b4.ink(ellipseInk(PANEL.x, PANEL.y, PANEL.rx - 8, PANEL.ry - 8, {seed: 's3nb/pl2', wobble: 0.01, overlap: 4}), 1.6, CM.coatMustard);
+  b4.ink(ellipseInk(PANEL.x, PANEL.y, PANEL.rx - 7, PANEL.ry - 7, {seed: 's3nb/pl2', wobble: 0.01, overlap: 4}), 1.6, CM.leafRust);
   b4.rect(CM.lampCore, SALOON.x0 + 10, SALOON.y0 + 26, 34, 50);
   b4.rect(CM.line, SALOON.x0 + 4, SALOON.y0 + 44, 110, 4);
   for (const [jx, jh, jc] of [[SALOON.x0 + 52, 16, CM.brick], [SALOON.x0 + 66, 11, CM.coatSlate], [SALOON.x0 + 80, 19, CM.sage]] as [number, number, string][]) b4.rect(jc, jx, SALOON.y0 + 44 - jh, 10, jh);
@@ -175,10 +178,10 @@ function cabinInto(L: Levels) {
   for (const [dx, dy] of PANEL_DAISIES) {
     for (let k = 0; k < 6; k++) {
       const a = (k / 6) * Math.PI * 2;
-      b6.fill(CM.coatMustard, ovalPath(PANEL.x + dx + Math.cos(a) * 5.5, PANEL.y + dy + Math.sin(a) * 5, 3.4, 3.4));
+      b6.fill(CM.coatMustard, ovalPath(PANEL.x + dx + Math.cos(a) * 4.6, PANEL.y + dy + Math.sin(a) * 4.2, 2.9, 2.9));
     }
   }
-  for (const [dx, dy] of [[-76, 6], [78, -22], [-36, -48], [34, 50], [-70, 38], [74, 34]] as [number, number][]) b6.fill(CM.paper, ovalPath(PANEL.x + dx, PANEL.y + dy, 2.2, 2.2));
+  for (const [dx, dy] of [[-76, 6], [78, -22], [-36, -48], [34, 50], [-70, 38], [74, 34]] as [number, number][]) b6.fill(CM.brick, ovalPath(PANEL.x + dx * PK, PANEL.y + dy * PK, 2, 2));
   b6.fill(CM.sage, lobes(SALOON.x0 + 10, SALOON.x0 + 52, SALOON.y1 - 18, 30, 's3nb/sal1', 3));
   b6.fill(CM.sage, lobes(SALOON.x0 + 68, SALOON.x0 + 98, SALOON.y1 - 14, 22, 's3nb/sal2', 3));
   // ---- level 7: rose hearts + highlight strokes, daisy hearts
@@ -190,15 +193,15 @@ function cabinInto(L: Levels) {
   b7.ink(hl, 1.8, CM.paper);
 }
 
-const PANEL_LEAVES: [number, number, number, number][] = [
+const PANEL_LEAVES: [number, number, number, number][] = ([
   [-58, -6, 34, -150], [-50, 22, 32, 160], [-6, -36, 30, -100], [30, 30, 32, 60], [62, -14, 34, -20], [58, 20, 30, 25], [-28, 40, 28, 120], [16, -40, 26, -70],
-];
-const PANEL_ROSES: [number, number, number, string, string][] = [
+] as [number, number, number, number][]).map(([x, y, l, a]) => [x * PK, y * PK, l * PK, a] as [number, number, number, number]);
+const PANEL_ROSES: [number, number, number, string, string][] = ([
   [-24, 2, 26, CM.box, CM.leafRust],
   [24, -8, 22, CM.blossom, CM.brick],
   [6, 26, 17, CM.leafRust, CM.brickDeep],
-];
-const PANEL_DAISIES: [number, number][] = [[-62, -24], [66, 2], [-46, 30], [44, 34], [-6, -44]];
+] as [number, number, number, string, string][]).map(([x, y, r, a, b]) => [x * PK, y * PK, r * PK, a, b] as [number, number, number, string, string]);
+const PANEL_DAISIES: [number, number][] = ([[-62, -24], [66, 2], [-46, 30], [44, 34], [-6, -44]] as [number, number][]).map(([x, y]) => [x * PK, y * PK] as [number, number]);
 
 // ---------------------------------------------------------------- the roof dressing (static)
 
