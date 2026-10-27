@@ -30,10 +30,10 @@ export type House = {id: HouseId; x0: number; x1: number; wall: string; roof: 'm
 
 /** West -> east. Her house is the terrace's WEST END (the west gap with the sun is beyond it). */
 export const HOUSES: House[] = [
-  {id: 'her', x0: 165, x1: 525, wall: CM.brick, roof: 'mansard', top: 607},
-  {id: 'stock', x0: 525, x1: 775, wall: CM.brickLight, roof: 'parapet', top: 628},
-  {id: 'deep', x0: 775, x1: 1010, wall: CM.brickDeep, roof: 'mansard', top: 604},
-  {id: 'stucco', x0: 1010, x1: 1270, wall: CM.sage, roof: 'mansard', top: 612},
+  {id: 'her', x0: 165, x1: 525, wall: CM.brick, roof: 'mansard', top: 630},
+  {id: 'stock', x0: 525, x1: 775, wall: CM.brickLight, roof: 'parapet', top: 640},
+  {id: 'deep', x0: 775, x1: 1010, wall: CM.brickDeep, roof: 'mansard', top: 626},
+  {id: 'stucco', x0: 1010, x1: 1270, wall: CM.sage, roof: 'mansard', top: 634},
 ];
 
 const F = MAP.W2_CUT;
@@ -44,8 +44,8 @@ export const HER_OPENING = {x0: F.x - F.w / 2, y0: F.y - F.h / 2, x1: F.x + F.w 
 
 export const WINDOWS: WinSpec[] = [
   // her house: two dormers (one lit), the ground-floor tripartite window behind lace nets
-  {id: 'h1d1', x: 228, y: 622, w: 40, h: 34, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: false, unlit: 'blind', blind: 0.4, sill: false},
-  {id: 'h1d2', x: 402, y: 622, w: 40, h: 34, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: true, inner: 'pendant', sill: false},
+  {id: 'h1d1', x: 230, y: 637, w: 36, h: 21, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: false, unlit: 'blind', blind: 0.4, sill: false},
+  {id: 'h1d2', x: 404, y: 637, w: 36, h: 21, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: true, inner: 'pendant', sill: false},
   {id: 'h1g', x: 330, y: 922, w: 104, h: 112, bars: '2/2', surround: 'stone', wall: CM.brick, lit: false, unlit: 'plant', blind: 0.2},
   {id: 'h1gl', x: 300, y: 922, w: 22, h: 112, bars: '1/1', surround: 'plain', wall: CM.brick, lit: false, unlit: 'sky', sill: false},
   {id: 'h1gr', x: 442, y: 922, w: 22, h: 112, bars: '1/1', surround: 'plain', wall: CM.brick, lit: false, unlit: 'sky', sill: false},
@@ -56,11 +56,11 @@ export const WINDOWS: WinSpec[] = [
   // the dark-brick house: a narrow sash that switches on, the balcony's French door, a dormer, the kitchen
   {id: 'h3n', x: 794, y: 714, w: 38, h: 130, bars: '2/2', surround: 'arch', wall: CM.brickDeep, lit: [{t: 14.05, on: true}], inner: 'curtains', curtain: CM.sage},
   {id: 'h3f', x: 852, y: 706, w: 74, h: 158, bars: 'french', surround: 'arch', wall: CM.brickDeep, lit: true, inner: 'shelf', sill: false},
-  {id: 'h3d', x: 866, y: 620, w: 46, h: 36, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: true, inner: 'none', sill: false},
+  {id: 'h3d', x: 868, y: 633, w: 42, h: 24, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: true, inner: 'none', sill: false},
   {id: 'h3g', x: 884, y: 920, w: 100, h: 114, bars: '6/6', surround: 'arch', wall: CM.brickDeep, lit: true, inner: 'pendant', curtain: CM.box},
   // the stucco house (cut by the right edge): the KETTLE neighbour's window, a dormer that switches on, the bay
   {id: 'h4a', x: 1036, y: 710, w: 62, h: 134, bars: '2/2', surround: 'stucco', wall: CM.sage, lit: true, inner: 'shelf', curtain: CM.leafRust},
-  {id: 'h4d', x: 1080, y: 626, w: 42, h: 32, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: [{t: 13.45, on: true}], inner: 'none', sill: false},
+  {id: 'h4d', x: 1082, y: 641, w: 38, h: 18, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: [{t: 13.45, on: true}], inner: 'none', sill: false},
   {id: 'h4g1', x: 1030, y: 922, w: 30, h: 110, bars: '1/1', surround: 'plain', wall: CM.stucco, lit: true, inner: 'none', sill: false},
   {id: 'h4g2', x: 1068, y: 916, w: 76, h: 118, bars: '2/2', surround: 'plain', wall: CM.stucco, lit: true, inner: 'lamp', curtain: CM.sage, sill: false},
 ];
@@ -135,12 +135,12 @@ function backBatch(): Batch {
   brickTicks(b, 775, TL.cornice + 18, 1010, TL.ground - 26, [CM.brick, CM.leafRust], 'h3t', 24, holes);
   b.layer();
   // ---- chimney stacks on the party walls (pots >= 600) + the end stack on her west wall
-  stackInto(b, 165, 46, 608, TL.cornice + 2, CM.brickDeep, 'stk0', {pots: 4});
-  stackInto(b, 502, 46, 610, TL.cornice + 2, CM.brick, 'stk1', {pots: 3});
-  stackInto(b, 752, 46, 610, TL.cornice + 2, CM.brick, 'stk2', {pots: 4});
-  stackInto(b, 988, 44, 609, TL.cornice + 2, CM.brickLight, 'stk3', {pots: 3});
+  stackInto(b, 165, 46, 610, TL.cornice + 2, CM.brickDeep, 'stk0', {pots: 4});
+  stackInto(b, 502, 46, 614, TL.cornice + 2, CM.brick, 'stk1', {pots: 3});
+  stackInto(b, 752, 46, 611, TL.cornice + 2, CM.brick, 'stk2', {pots: 4});
+  stackInto(b, 988, 44, 616, TL.cornice + 2, CM.brickLight, 'stk3', {pots: 3});
   b.ink(
-    aerialInk(176, 610, 600, 'aer0', 1) + aerialInk(528, 612, 601, 'aer1', -1) + aerialInk(1010, 611, 600, 'aer3', 1) + `M${P(790, 612)}L${P(790, 603)}`,
+    aerialInk(176, 612, 600, 'aer0', 1) + aerialInk(528, 616, 601, 'aer1', -1) + aerialInk(1010, 618, 600, 'aer3', 1) + aerialInk(786, 613, 602, 'aer2', 1),
     TK.detail,
   );
   // a satellite dish on the stucco house's stack
