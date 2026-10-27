@@ -177,7 +177,7 @@ def door_glide():
 def step_thup():
     """she steps out onto the towpath: a soft heel on stone + a little grit."""
     y = thud(115, 72, 0.10, 0.022, 61)
-    y[: n_of(0.02)] += 0.06 * hp(noise(0.02, 62), 2500) * np.exp(-tt(0.02) / 0.005)
+    y[: n_of(0.02)] += 0.06 * hp(noise(0.02, 62), 2500) * env_ad(n_of(0.02), 0.001, 0.005)
     return pan(y, 0.1)
 
 
@@ -202,10 +202,10 @@ def wings():
             g = np.exp(-k / (nfl * 0.45)) * (1.4 if k < 2 else 1.0)
             f = flap(0.034, 420 * c, 3300 * c, 800 + 13 * b + k, 0.003, 0.009)
             if k < 2:                       # the take-off wing clap: a soft-edged little crack, not a click
-                cl = hp(noise(0.006, 900 + b), 1200) * np.sin(np.pi * np.arange(n_of(0.006)) / n_of(0.006)) ** 2
+                cl = bp(noise(0.006, 900 + b), 1200, 6000) * np.sin(np.pi * np.arange(n_of(0.006)) / n_of(0.006)) ** 2
                 f[: len(cl)] += 0.35 * cl
             put(out, f, s + k / rate + r.normal(0, 0.004), g * r.uniform(0.8, 1.0), p0 - 0.06 * k)
-    return out
+    return lp(out, 8000, 2)
 
 
 @sound
@@ -302,9 +302,11 @@ def slat_rattle(dur, seed, rate=72.0, dense=1.0):
     while t < dur:
         imp[min(n - 1, n_of(t))] += r.uniform(0.4, 1.0)
         t += r.uniform(0.6, 1.4) / (rate * dense)
-    ir = wood([1650, 2900, 5200, 900], [0.004, 0.003, 0.002, 0.006], [.8, .4, .3, .6], 0.02, 0.3, seed + 1)
-    y = np.convolve(imp, ir)[:n]
-    return y * env_ad(n, 0.01, dur * 0.6)
+    ir = wood([1650, 2900, 5200, 900], [0.004, 0.003, 0.002, 0.006], [.8, .4, .3, .6], 0.02, 0.7, seed + 1)
+    y = np.convolve(imp, ir)[:n] * env_ad(n, 0.01, dur * 0.6)
+    f = min(n // 3, n_of(0.012))
+    y[n - f:] *= np.cos(0.5 * np.pi * np.linspace(0, 1, f)) ** 2          # the slats settle: no cut-off step
+    return y
 
 
 @sound
@@ -325,7 +327,7 @@ def blind_thump():
     out = buf(0.36)
     put(out, slat_rattle(0.16, 200, 80, 1.2), 0.0, 0.8, -0.38)
     t_ = wood([160, 410, 980], [0.045, 0.02, 0.01], [1, .5, .25], 0.16, 0.8, 201)
-    t_[: n_of(0.004)] += 0.3 * hp(noise(0.004, 202), 1500)
+    t_[: n_of(0.006)] += 0.12 * bp(noise(0.006, 202), 1500, 6000) * np.hanning(n_of(0.006))
     put(out, t_, 0.15, 1.0, -0.38)
     return out
 
@@ -400,7 +402,7 @@ def steps_stop():
     out = buf(0.52)
     put(out, thud(105, 70, 0.08, 0.016, 290) * 0.7, 0.0, 1.0, 0.3)
     s = thud(120, 74, 0.10, 0.022, 291)
-    s[: n_of(0.04)] += 0.05 * hp(noise(0.04, 292), 1500) * np.exp(-tt(0.04) / 0.012)
+    s[: n_of(0.04)] += 0.05 * hp(noise(0.04, 292), 1500) * env_ad(n_of(0.04), 0.001, 0.012)
     put(out, s, 0.30, 1.0, 0.3)
     sc = bp(noise(0.08, 293), 1000, 5000) * env_bell(n_of(0.08), 0.3, 1.5) * 0.06
     put(out, sc, 0.33, 1.0, 0.3)
@@ -507,6 +509,7 @@ def boat_chug():
         p = np.sin(2 * np.pi * 62 * tt(0.08)) * np.exp(-tt(0.08) / 0.03)
         p += 0.3 * np.sin(2 * np.pi * 124 * tt(0.08)) * np.exp(-tt(0.08) / 0.02)
         p += 0.5 * lp(noise(0.08, 410 + k), 300) * np.exp(-tt(0.08) / 0.02)
+        p *= env_ad(len(p), 0.004, 10.0)                     # a soft 4 ms onset per putter stroke
         place(y, p, k / 6.2)
     y *= env_bell(n, 0.45, 1.5)
     y += 0.35 * hp(lp(noise(d, 430), 900), 150) * env_bell(n, 0.55, 1.6)

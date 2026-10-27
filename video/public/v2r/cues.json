@@ -16,7 +16,7 @@
  {
   "src": "v2r/sfx/lamp_click.wav",
   "t": 0.4,
-  "gain": 0.2029,
+  "gain": 0.2024,
   "note": "her lamp at W clicks OFF: the biggest window goes dark (the first picture of 'quit')",
   "under_db": 20,
   "set_by": "bus -4.4"
@@ -40,7 +40,7 @@
  {
   "src": "v2r/sfx/step_thup.wav",
   "t": 0.97,
-  "gain": 0.1035,
+  "gain": 0.1043,
   "note": "she steps out onto the towpath ('Google')",
   "under_db": 20,
   "set_by": "sheet"
@@ -56,7 +56,7 @@
  {
   "src": "v2r/sfx/wings.wav",
   "t": 1.46,
-  "gain": 0.2256,
+  "gain": 0.2103,
   "note": "five birds lift off the bridge rail (f84) and wheel west: the claps land as 'Google.' ends",
   "under_db": 16,
   "set_by": "sheet"
@@ -64,63 +64,63 @@
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 2.0,
-  "gain": 0.1424,
+  "gain": 0.1427,
   "note": "G1 pops (one soft wooden tick per ghost, ONE pitch)",
   "under_db": 14,
-  "set_by": "bus -3.0"
+  "set_by": "bus -2.9"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 2.53,
-  "gain": 0.1424,
+  "gain": 0.1427,
   "note": "G2 pops ('contract')",
   "under_db": 14,
-  "set_by": "bus -3.0"
+  "set_by": "bus -2.9"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 3.2,
-  "gain": 0.1424,
+  "gain": 0.1427,
   "note": "G3 pops ('bans')",
   "under_db": 14,
-  "set_by": "bus -3.0"
+  "set_by": "bus -2.9"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 3.8,
-  "gain": 0.1424,
+  "gain": 0.1427,
   "note": "G4 pops",
   "under_db": 14,
-  "set_by": "bus -3.0"
+  "set_by": "bus -2.9"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 4.2,
-  "gain": 0.1424,
+  "gain": 0.1427,
   "note": "G5 pops",
   "under_db": 14,
-  "set_by": "bus -3.0"
+  "set_by": "bus -2.9"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 4.79,
-  "gain": 0.1424,
+  "gain": 0.1427,
   "note": "G6 pops ('for'); the ambience dip 4.54-4.79 is in the bed",
   "under_db": 14,
-  "set_by": "bus -3.0"
+  "set_by": "bus -2.9"
  },
  {
   "src": "v2r/sfx/outline_pops.wav",
   "t": 4.98,
-  "gain": 0.1491,
+  "gain": 0.1493,
   "note": "'life': three bare outlines pop in down the towpath (then air: no note, no riser)",
   "under_db": 15,
-  "set_by": "bus -3.9"
+  "set_by": "bus -3.8"
  },
  {
   "src": "v2r/sfx/ear_flap.wav",
   "t": 4.98,
-  "gain": 0.1439,
+  "gain": 0.144,
   "note": "Pip's ears-cover on 'life'",
   "under_db": 23,
   "set_by": "bus -1.8"
@@ -168,7 +168,7 @@
  {
   "src": "v2r/sfx/blinds_five.wav",
   "t": 10.26,
-  "gain": 0.1874,
+  "gain": 0.1864,
   "note": "'scared': five blinds drop to half one by one (10.26-10.60)",
   "under_db": 16,
   "set_by": "sheet"
@@ -176,10 +176,10 @@
  {
   "src": "v2r/sfx/blind_thump.wav",
   "t": 12.2,
-  "gain": 0.1341,
+  "gain": 0.1258,
   "note": "'contracts': W2's blind comes fully down",
   "under_db": 15,
-  "set_by": "band"
+  "set_by": "bus -0.8"
  },
  {
   "src": "v2r/sfx/notebook_clap.wav",
@@ -240,7 +240,7 @@
  {
   "src": "v2r/sfx/steps_stop.wav",
   "t": 17.66,
-  "gain": 0.1226,
+  "gain": 0.1231,
   "note": "her last two steps; the stop lands at 17.96 ('objected')",
   "under_db": 19,
   "set_by": "sheet"
@@ -264,7 +264,7 @@
  {
   "src": "v2r/sfx/wings.wav",
   "t": 19.8,
-  "gain": 0.1597,
+  "gain": 0.1489,
   "note": "birds fly west into the sun (callback, 3 dB softer)",
   "under_db": 19,
   "set_by": "sheet"
@@ -400,15 +400,15 @@
  {
   "src": "v2r/sfx/pen_long.wav",
   "t": 30.74,
-  "gain": 0.1475,
+  "gain": 0.147,
   "note": "'of any kind' pen-builds, complete on 32.08",
   "under_db": 19,
-  "set_by": "bus -1.5"
+  "set_by": "bus -1.6"
  },
  {
   "src": "v2r/sfx/boat_chug.wav",
   "t": 32.7,
-  "gain": 0.0988,
+  "gain": 0.0947,
   "note": "the narrowboat foreground wipe (nothing starts before 32.70)",
   "under_db": 15,
   "set_by": "sheet"
@@ -424,26 +424,26 @@
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 33.78,
-  "gain": 0.1008,
+  "gain": 0.101,
   "note": "'can't': three ghosts pop ahead of her (3 dB softer, one pitch)",
   "under_db": 17,
-  "set_by": "bus -3.0"
+  "set_by": "bus -2.9"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 33.86,
-  "gain": 0.1008,
+  "gain": 0.101,
   "note": "second ghost",
   "under_db": 17,
-  "set_by": "bus -3.0"
+  "set_by": "bus -2.9"
  },
  {
   "src": "v2r/sfx/ghost_tick.wav",
   "t": 33.94,
-  "gain": 0.1008,
+  "gain": 0.101,
   "note": "third ghost",
   "under_db": 17,
-  "set_by": "bus -3.0"
+  "set_by": "bus -2.9"
  },
  {
   "src": "v2r/sfx/door_latch.wav",
@@ -456,7 +456,7 @@
  {
   "src": "v2r/sfx/lamp_click.wav",
   "t": 34.95,
-  "gain": 0.1436,
+  "gain": 0.1433,
   "note": "W lights (her home lamp: the 0.40 click as a callback, 3 dB softer)",
   "under_db": 23,
   "set_by": "bus -4.4"
@@ -472,10 +472,10 @@
  {
   "src": "v2r/sfx/pen_long.wav",
   "t": 36.54,
-  "gain": 0.1475,
+  "gain": 0.147,
   "note": "her quote pen-draws on (the same pen as Google's)",
   "under_db": 19,
-  "set_by": "bus -1.5"
+  "set_by": "bus -1.6"
  },
  {
   "src": "v2r/sfx/lamp_run.wav",
