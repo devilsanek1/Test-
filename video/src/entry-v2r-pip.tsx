@@ -10,6 +10,7 @@ import {PipZoom, ZOOM} from './v2r/kit/pip/PipZoom';
 import {KitPip, SHEET} from './v2r/kit/pip/KitPip';
 import {ACTIONS_DUR, PipActions} from './v2r/kit/pip/PipActions';
 import {PipSweep} from './v2r/kit/pip/PipSweep';
+import {PipWatchStudy, WATCH_STUDY} from './v2r/kit/pip/PipWatchStudy';
 
 const PipRoot: React.FC = () => (
   <>
@@ -17,6 +18,7 @@ const PipRoot: React.FC = () => (
     <Composition id="PipActions" component={PipActions} fps={60} width={1080} height={1920} durationInFrames={Math.round(ACTIONS_DUR * 60)} />
     <Composition id="PipSweep" component={PipSweep} fps={60} width={600} height={400} durationInFrames={720} />
     <Composition id="PipStudy" component={PipStudy} fps={60} width={STUDY.w} height={STUDY.h} durationInFrames={120} defaultProps={{size: 200}} />
+    <Composition id="PipWatchStudy" component={PipWatchStudy} fps={60} width={WATCH_STUDY.w} height={WATCH_STUDY.h} durationInFrames={60} />
     <Composition id="PipZoom" component={PipZoom} fps={60} width={ZOOM.w} height={ZOOM.h} durationInFrames={900} defaultProps={{size: 300}} />
   </>
 );

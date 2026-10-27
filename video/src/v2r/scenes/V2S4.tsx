@@ -7,9 +7,12 @@
 // Everything inside runs on FILM seconds (<TimeShift by={-S4_START}>): map.ts and V2S4_rig.ts land as written.
 //
 // Parts (back to front; each plane part slides itself by its V2S4_rig plane offset):
-//   SunDisc (fixed) · S4Far 0.3x + S4Backs 0.6x (V2S4_far) · S4Path 1.0x with the post inside (V2S4_path, V2S4_post)
-//   · S4Her screen-fixed (V2S4_her) · S4Canal 1.0x (V2S4_path) · S4Boat screen-fixed + near water 2.0x (V2S4_boat)
-//   · S4Pip (V2S4_pip) · S4Tag (V2S4_tag). All inside ONE camera: the 6 % push about SUN1 (V2S4_rig `s4Zoom`).
+//   SunDisc (fixed) · S4Far 0.3x + S4Backs 0.6x (V2S4_far) · S4Path 1.0x with the bare post inside (V2S4_path,
+//   V2S4_post S4Post) · S4Her screen-fixed (V2S4_her) · S4Canal 1.0x (V2S4_path) · S4Boat screen-fixed + near water 2.0x
+//   (V2S4_boat) · S4Pip (V2S4_pip) · S4Plates (V2S4_post: the arrow plates, ABOVE Pip and the boat, so nothing ever
+//   moves over their lettering; Pip's leap into the sun passes behind them) · S4Tag (V2S4_tag).
+// ONE camera: the 6 % push about SUN1 18.40-20.10 (V2S4_rig `s4Zoom`, a soft landing, then locked to the cut), so SUN1
+// is exactly (250, 650) r 65 on screen at 20.55. No other camera move (the truck is the planes' own parallax).
 import React from 'react';
 import {World} from '../../lib/World';
 import {useTime, TimeShift} from '../../lib/time';
@@ -25,7 +28,7 @@ import {S4_START, s4Zoom} from './V2S4_rig';
 import {S4Far, S4Backs} from './V2S4_far';
 import {S4Path, S4Canal} from './V2S4_path';
 import {S4Boat} from './V2S4_boat';
-import {S4Post} from './V2S4_post';
+import {S4Post, S4Plates} from './V2S4_post';
 import {S4Her} from './V2S4_her';
 import {S4Pip} from './V2S4_pip';
 import {S4Tag} from './V2S4_tag';
@@ -50,6 +53,7 @@ const Shot: React.FC = () => {
           <S4Canal />
           <S4Boat />
           <S4Pip />
+          <S4Plates />
           <S4Tag />
         </CanalCast>
       </InkScale>

@@ -67,6 +67,11 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   references, etc?" -> not provably yet: a workflow writes one definitive `docs/v2/STYLE.md` from every style source, an
   independent audit finds what the helpers could miss or what contradicts, COMMON.md makes STYLE.md the first mandatory read,
   and every lane answers `lanes/STYLE_CHECK.md` (graded against a private key). -> rule: Process (lanes prove the style).
+- 2026-10-27 ~14:30: "the key rule tho is to fit within the weekly limit of tokens - we are now at 50% overall usage this week -
+  monitor it", then "using all 100% is fine if we are able to complete the video fully" -> spend tracked hourly (helpers'
+  cost_usd + workflow tokens); measured ~$350 in the helpers' first 69 min (~$300/h); QA lane told to wrap up; every lane
+  gets a finish-first budget (acceptance bar, at most 2 critic rounds, no full-film renders); the owner's % reading calibrates.
+  -> rule: Process (the weekly limit is the real budget).
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in

@@ -191,6 +191,46 @@ rendered the film and fixed what only shows across panels.
   reader still took S9's streams for birds or drones (dark trail ticks), the lit street for "a dotted path" (posts lost
   against the house fronts) and the pile for hay (pale stick backs); fixing those in the kit first cost one render, not two.
 
+## 8b. v3 G5b lessons (the dense rollout: 8 lanes, 3 helper sessions, a chunked full-res render, 2026-10-27)
+
+- **What made the rollout consistent:** a RENDERED bar (the approved pilot MP4 and its source files named in every
+  brief), one per-panel plan (`docs/v3/density_plan_g5b.md`) with an override doc that wins (`cozy_v2_application.md`),
+  life added only through the kit (Pip3, WinterPerson, weather, room dressing, `floatCam`; shared props only as new kit
+  files or additive optional props), the G5 shared-set files (`O1_set`, `S10_set`), one meter for all (`density.py
+  --cozy`). Tag, sky, snow, You and the matched frames held across all 13 cuts on the first full assembly.
+- **What it missed: PLACES, not things.** Each lane dressed its own panel and was right alone, but the desk the film
+  returns to seven times got two back walls (the plan's "S7: no window"), S16 (a cut-in on S15's tag) became another
+  room with the props on the other side, S12 (S7's angle) re-hung S7's wall and showed another screen, and Pip jumped
+  across the S7 -> S8 cut-in. Fix pattern: ONE set file per recurring place mapped into each shot by one matrix
+  (`scenes/desk_window.tsx`: O1's own window + outside, `deskWindowMat(k, x, deskY)`: S16 1.275x on S15's axis, S7 /
+  S12 0.85x, S8 a strip under the band), and positions across a cut-in mapped back through its scale (S8's Pip -> S7).
+  Also read at panel size: a shared expression ('worried' read cross: override per panel), a mascot on a vehicle
+  against the people at its depth (Pip 0.94 -> 0.48 on the van), a building's state in every shot (gone dark = dark).
+- **A dense last panel's loop seam:** big flat fills (desk slab, window view, notebook cover) shrink as bare rects after
+  their lines retract. Let them leave with their lines under ONE falling erase edge (`EraseDown`), let the subject
+  travel onto frame 0's own copy (S16's tag turns back and lands on O1's frame-0 tag), and hold the caption roll until
+  the lines take over (`transitionOut.captionAt`, set in `Film3.tsx`: 41.00 s).
+- **The split across helper sessions** (owner: "split it yes"; briefs `docs/v3/g5b_split/brief_{A,B,C}.md`, reports
+  `docs/v3/g5b_reports/fix_*.md`; the orchestrator ran S9 + the assembly): parallel fix rounds with no conflicts
+  (each commits only its own paths), but nobody owned what crosses a session border (S12 vs S16's screen, the S15 ->
+  S16 cut-in, the S16 -> O1 seam that only the full Film3 shows). Next time: neighbours' panels as read-only references
+  in each brief, and a named owner for every cut on its border.
+- **The chunked render** (~1 h for the film at 1080x1920): bundle ONCE, one chunk per panel (`--frames=a-b
+  --concurrency=3 --timeout=120000`, to a .tmp file moved on success), stream-copy join with each chunk's exact
+  duration n/60, audio from ONE direct audio-only render (a chunk starting inside a sound cue ticks), every seam frame
+  checked against a direct still. v3: 14 chunks 63.5 min + 26 min audio; this fixer round re-rendered only the 9
+  touched chunks (34.5 min) and reused the audio. Trap: Film cuts at ceil(start * 60), chunks cut at round() start one
+  frame early, so a fix to a panel re-renders the next chunk too (or build the list with ceil).
+- **Meter floating holds at full res:** S7 / S8 / S12 read 5.3 / 7.8 / 15.5 ev/s in the lanes but 1.8 / 3.6 / 3.1 in
+  the film. A `--scale=0.5` render rasterises the float camera's sub-pixel drift as 1-3 % of a static wall flipping
+  every frame (0-0.8 % at full res), and the density pass counts it as motion (static 0 %; `--cozy` removes the shift,
+  the density pass does not). The full-res number is the honest one.
+- **Set up first next time:** (1) a location sheet before the lanes fan out (per recurring place: which wall each shot
+  faces, which props on which side, the shared set file + matrix per shot); (2) each cut-in pair owned by one lane and
+  checked with the outer frame mapped onto the inner; (3) the chunk list (with ceil) and the render / join / seam /
+  audio scripts ready before the last fix lands; (4) one meter recipe (full res) for lanes and assembler; (5) the seam
+  strip (last 0.3 s + frames 0-6) on the last panel's lane sheet.
+
 ## 9. Lessons from v2 (the assembler's round, 2026-10-27)
 
 Five panel lanes, a kit lane and an engine lane, each with an art-director review and a fix round; the assembler folded

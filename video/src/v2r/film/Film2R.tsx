@@ -127,7 +127,8 @@ const Credits: React.FC<{offset: number}> = ({offset}) => {
 /** The push-through's flat bridge colour (V2S1 -> V2S2: plum, 6.05-6.15). lib/Film computes the hold (0.1 s, its
  *  PT_HOLD) but culls the outgoing scene at c - hold / 2 before it pushes the bridge overlay, so the bridge never
  *  draws (no other film uses a bridge yet); Film2R draws it here, above everything, for the hold's frames. Full film
- *  only (a one-shot preview has no outgoing scene). */
+ *  only (a one-shot preview has no outgoing scene). The bridge ends exactly where Film shows the incoming scene
+ *  (c + hold / 2, same expression, no epsilon), so no frame draws neither. */
 const PT_HOLD = 0.1;
 const Bridges: React.FC = () => {
   const frame = useCurrentFrame();
@@ -135,7 +136,7 @@ const Bridges: React.FC = () => {
   const T = frame / fps;
   for (const s of film2rScenes) {
     const tin = s.transitionIn;
-    if (tin?.type === 'push-through' && tin.bridge && T >= s.start - PT_HOLD / 2 - 1e-6 && T < s.start + PT_HOLD / 2 - 1e-6) return <AbsoluteFill style={{background: tin.bridge}} />;
+    if (tin?.type === 'push-through' && tin.bridge && T >= s.start - PT_HOLD / 2 - 1e-6 && T < s.start + PT_HOLD / 2) return <AbsoluteFill style={{background: tin.bridge}} />;
   }
   return null;
 };

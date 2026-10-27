@@ -5,7 +5,8 @@
 import {NEUTRAL, PoseParams} from './model';
 
 export type PoseName =
-  | 'sit' // the watcher: seated, ears relaxed, tail hanging over the seat's edge (perch on a bollard / post / box)
+  | 'sit' // seated, ears relaxed, tail hanging over the seat's edge (perch on a bollard / post / box); keeps the facing
+  | 'watch34' // THE WATCHER: body 3/4 back on the perch, the head turned round to show its face (trunk curl, eye, blush)
   | 'alert' // ears up and forward, head up a hair: something is about to happen
   | 'earsCover' // S1 "life": the leaf ears swing forward and fold over the face, a hunch, the trunk tucks
   | 'earsDown' // S8 "can't": ears hang straight down, head low (sad, small; no droop of the body)
@@ -18,10 +19,14 @@ export type PoseName =
 
 export const POSES: Record<PoseName, Partial<PoseParams>> = {
   sit: {},
+  // the body squares to "away" and the watcher cheat (model.ts watchYaw) turns it 40 deg toward the side it looks, the
+  // head round to a 3/4 front on that side (a clean profile at <= 60 px); no target / look: screen left (west)
+  watch34: {yaw: 180, watch: 1, earSwingA: 12, earSwingB: 12, lookUp: 0.05},
   alert: {earDroopA: 8, earDroopB: 8, earSwingA: 24, earSwingB: 24, earFoldA: 0, earFoldB: 0, lookUp: 0.14, trunkRaise: 8},
   earsCover: {
     earDroopA: 50, earDroopB: 50, earSwingA: 128, earSwingB: 128, earFoldA: 0.3, earFoldB: 0.3,
     hunch: 0.38, headDrop: 3.5, lookUp: -0.38, trunkCurl: 1.3, trunkRaise: -8, tailAngle: -4, eyes: 0, scarfLift: 0.25,
+    toCam: 1, // played from the FRONT: the head turns to us first (PipTrack leads it by 0.12 s), the leaves fold over the eyes
   },
   earsDown: {earDroopA: 82, earDroopB: 82, earSwingA: -4, earSwingB: -4, earFoldA: 0.3, earFoldB: 0.3, headDrop: 2.5, lookUp: -0.28, hunch: 0.12, trunkCurl: 1.15},
   lookUp: {lookUp: 1, earDroopA: 52, earDroopB: 52, earSwingA: -22, earSwingB: -22, trunkRaise: 105, trunkCurl: 0.85, trunkLen: 1.45, headDrop: 1.5},

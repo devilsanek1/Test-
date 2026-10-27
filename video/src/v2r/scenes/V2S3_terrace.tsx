@@ -1,38 +1,41 @@
-// V2S3_terrace.tsx (lane L3, V2S3 FAR part; drawn in WORLD px at the 12.98 match, inside V2S3's camera): the low sun at
-// left (S3Sun), her brick terrace across the water with her French window at W2_CUT and her silhouette inside, the
-// neighbours, balconies and string lights, her towpath in front of it (S3Terrace), and the canal (S3Canal: warm
-// reflections, the heron on a post, ducks). STUB (v0, the kit terrace): the far build replaces it.
+// V2S3_terrace.tsx (lane L3, V2S3 FAR part; drawn in WORLD px at the 12.98 match, inside V2S3's camera, FILM seconds):
+//   S3Sun      the low sun at left (CM.sun, r 46 at (96, 652), top 606), no ink; the west gap's far roofs and stacks
+//              (in S3Terrace) hide its lower half
+//   S3Terrace  the west gap (gasholder, far roofs, the viaduct with a train heading west, a warehouse, an autumn tree,
+//              a garden wall), her brick terrace (V2S3_tHouses), HER French window at W2_CUT with her silhouette on the
+//              phone and the blind rolling UP (V2S3_tHer), the two lit neighbours (watering, kettle steam), string
+//              lights, birds, smoke, and her towpath with its lit lamp, a bench, walkers both ways and a cyclist
+//              (V2S3_tLife)
+//   S3Canal    the canal: warm broken reflections, ripples, glints, leaves, a heron on a post, two ducks (V2S3_tCanal)
+// Everything is drawn over S3_BLEED (x -60..1160) so no edge shows through the ease-back and the float. The shot's ONE
+// read: her lit window with her silhouette is the brightest, clearest thing in the frame; the rest is a calm, alive
+// evening round it.
 import React from 'react';
-import {CM, INK_PX} from '../palette';
-import * as MAP from '../world/map';
-import {TerraceRow} from '../kit/canal/terrace';
-import {Water} from '../kit/canal/water';
-import {Towpath, Lamp} from '../kit/canal/towpath';
-import {SunDisc} from '../kit/canal/sets';
-import {HerWindow} from '../kit/cast';
-import {S3_BEATS, S3_HER} from './V2S3_rig';
+import {CM} from '../palette';
+import {Fill} from '../../lib/Fill';
+import {ovalPath} from '../kit/canal/core';
+import {S3West, SUN3} from './V2S3_tWest';
+import {S3Houses} from './V2S3_tHouses';
+import {S3Her} from './V2S3_tHer';
+import {S3Path, S3Inside, S3Outside, S3RoofLife} from './V2S3_tLife';
+import {S3Water, S3CanalLife} from './V2S3_tCanal';
 
-const LV = {ground: 1100, first: 878, cornice: 664, mansardTop: 602};
-
-export const S3Sun: React.FC = () => <SunDisc x={96} y={652} r={46} />;
+export const S3Sun: React.FC = () => <Fill d={ovalPath(SUN3.x, SUN3.y, SUN3.r, SUN3.r)} color={CM.sun} offset={false} seed="s3sun" />;
 
 export const S3Terrace: React.FC = () => (
   <>
-    <TerraceRow
-      x0={-150}
-      levels={LV}
-      houses={[{w: 330, first: 'two'}, {w: 330, first: 'french'}, {w: 300, first: 'french', lights: true, neighbour: 'first'}, {w: 320, first: 'two', stucco: true, neighbour: 'ground'}]}
-      her={{index: 1, french: MAP.W2_CUT, inside: <HerWindow x0={S3_HER.x0} x1={S3_HER.x1} y={S3_HER.y} h={S3_HER.h} gestureAt={S3_BEATS.hand} phase={0.3} />}}
-      seed="s3terrace"
-      litFrac={0.6}
-      lightsOn
-      waterAt={13.4}
-    />
-    <Towpath x0={-80} x1={1180} top={1100} edge={1128} seed="s3herpath" leaves={10} ink={INK_PX.far} />
-    <Lamp x={620} y={1120} h={260} seed="s3lamp" on />
+    <S3West />
+    <S3Houses inside={<S3Inside />} />
+    <S3Her />
+    <S3Outside />
+    <S3RoofLife />
+    <S3Path />
   </>
 );
 
 export const S3Canal: React.FC = () => (
-  <Water y0={1128} y1={1300} seed="s3water" reflTop={1132} reflections={[{x0: 250, x1: 420, color: CM.lamp, depth: 70}, {x0: 600, x1: 760, color: CM.brickLight, depth: 60}]} ripples={22} glints={12} />
+  <>
+    <S3Water />
+    <S3CanalLife />
+  </>
 );
