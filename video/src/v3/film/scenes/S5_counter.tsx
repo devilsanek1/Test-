@@ -223,19 +223,29 @@ const SLOT_Y = PRINTER.y - PRINTER.w * 0.5;
 const PRINT = '#8C7466';
 /** The paper in the counter's shadow (the hanging end) and its back (the rise out of the slot). */
 const PAPER_SHADE = '#EBD8C8';
+/** The paper's lit face: a warm off-white, a step under the card white so it is never the palest thing down here. */
+const PAPER = '#F8EADC';
 
 /** The receipt's centre line from the slot (canvas px) and what part of the paper each run is: up out of the slot
- *  (its back), round the loop and down over the printer's face, flat on the counter top (foreshortened), over the near
- *  edge's roll, then a short S-curve hang down the lip. Built once. */
+ *  (its back), round the loop and down over the printer's face drifting left (paper curls sideways), flat on the
+ *  counter top on a diagonal (foreshortened), over the near edge's roll, then a short S-curve hang down the lip. Built
+ *  once. */
 const RECEIPT_PATH: {p: [number, number]; part: 'back' | 'face' | 'flat' | 'hang'}[] = (() => {
   const out: {p: [number, number]; part: 'back' | 'face' | 'flat' | 'hang'}[] = [];
   const x = SLOT_X;
-  for (let y = SLOT_Y + 2; y >= SLOT_Y - 22; y -= 2) out.push({p: [x, y], part: 'back'});
-  for (let a = 0; a <= 1; a += 0.25) out.push({p: [x + 3 * a, SLOT_Y - 22 - 3 * Math.sin(a * Math.PI)], part: 'face'});
-  for (let y = SLOT_Y - 22; y <= PRINTER.y; y += 2) out.push({p: [x + 3, y], part: 'face'});
-  for (let y = PRINTER.y; y <= NEAR_Y; y += 2) out.push({p: [x + 3 + (y - PRINTER.y) * 0.08, y], part: 'flat'});
-  const x0 = x + 3 + (NEAR_Y - PRINTER.y) * 0.08;
-  for (let k = 0; k <= 1.0001; k += 0.05) out.push({p: [x0 + 7 * Math.sin(k * Math.PI * 1.5), NEAR_Y + 2 + k * 26], part: 'hang'});
+  const top = SLOT_Y - 14;
+  for (let y = SLOT_Y + 2; y >= top; y -= 2) out.push({p: [x, y], part: 'back'});
+  for (let a = 0.25; a <= 1; a += 0.25) out.push({p: [x + 3 * a, top - 3 * Math.sin(a * Math.PI)], part: 'face'});
+  // down the face: bowing out and drifting 16 px left by the counter
+  for (let y = top + 2; y <= PRINTER.y; y += 2) {
+    const k = (y - top) / (PRINTER.y - top);
+    out.push({p: [x + 3 - 16 * k * k, y], part: 'face'});
+  }
+  const xf = x + 3 - 16;
+  // flat on the top: a diagonal run toward us and to the left
+  for (let y = PRINTER.y + 2; y <= NEAR_Y; y += 2) out.push({p: [xf - (y - PRINTER.y) * 0.55, y], part: 'flat'});
+  const x0 = xf - (NEAR_Y - PRINTER.y) * 0.55;
+  for (let k = 0.05; k <= 1.0001; k += 0.05) out.push({p: [x0 - 4 + 7 * Math.sin(k * Math.PI * 1.5) - 4 * k, NEAR_Y + 2 + k * 24], part: 'hang'});
   return out;
 })();
 const RECEIPT_CUM: number[] = RECEIPT_PATH.reduce<number[]>((acc, q, i) => {
@@ -287,19 +297,21 @@ const Receipt: React.FC<{feedAt: number; feedDur: number}> = ({feedAt, feedDur})
   const [ex, ey] = pts[pts.length - 1];
   return (
     <>
-      <path d={all} fill="none" stroke={EMBER.ink} strokeWidth={pw + W.hair * 2} strokeLinejoin="round" />
-      <path d={seg(['back'])} fill="none" stroke={PAPER_SHADE} strokeWidth={pw} />
-      <path d={seg(['face', 'flat'])} fill="none" stroke={EMBER.card} strokeWidth={pw} strokeLinejoin="round" />
-      <path d={seg(['hang'])} fill="none" stroke={PAPER_SHADE} strokeWidth={pw} strokeLinejoin="round" />
+      {/* its shadow on the top, under the flat run's right edge (shadows are colour) */}
+      <path d={seg(['flat'])} fill="none" stroke={EMBER.desk} strokeWidth={pw + 10} strokeLinejoin="round" transform="translate(5 2)" />
+      <path d={all} fill="none" stroke={EMBER.ink} strokeWidth={pw + W.hair * 2} strokeLinejoin="round" strokeLinecap="round" />
+      <path d={seg(['back'])} fill="none" stroke={PAPER_SHADE} strokeWidth={pw} strokeLinecap="round" />
+      <path d={seg(['hang'])} fill="none" stroke={PAPER_SHADE} strokeWidth={pw} strokeLinejoin="round" strokeLinecap="round" />
+      <path d={seg(['face', 'flat'])} fill="none" stroke={PAPER} strokeWidth={pw} strokeLinejoin="round" strokeLinecap="round" />
       <path d={print} stroke={PRINT} strokeWidth={1.4} strokeLinecap="round" />
       {/* the roll over the near edge: a light ridge across the paper */}
       {L > RECEIPT_CUM[RECEIPT_PATH.findIndex((q) => q.part === 'hang')] ? (
-        <path d={`M${SLOT_X + 3 + (NEAR_Y - PRINTER.y) * 0.08 - pw / 2} ${NEAR_Y + 1}h${pw}`} stroke={EMBER.white} strokeWidth={2} />
+        <path d={`M${SLOT_X - 13 - (NEAR_Y - PRINTER.y) * 0.55 - pw / 2} ${NEAR_Y + 1}h${pw}`} stroke={EMBER.white} strokeWidth={2} />
       ) : null}
       {/* the end curls up toward us once it hangs free */}
       {done ? (
         <>
-          <path d={roundRect(ex - pw / 2 - 1, ey - 4, pw + 2, 10, 5)} fill={EMBER.card} stroke={EMBER.ink} strokeWidth={W.hair} />
+          <path d={roundRect(ex - pw / 2 - 1, ey - 4, pw + 2, 10, 5)} fill={PAPER} stroke={EMBER.ink} strokeWidth={W.hair} />
           <path d={`M${ex + pw / 2 - 6} ${ey + 1}a3 3 0 1 1 -3 -3`} fill="none" stroke={PRINT} strokeWidth={1.2} />
         </>
       ) : null}

@@ -24,7 +24,9 @@ const PLANK = 958;
 /** The track rail under the panel top. */
 const RAIL_Y = 630;
 /** A soft clear-acrylic edge (one warm-white step over the slatwall). */
-const ACRYLIC = '#F7DCC8';
+const ACRYLIC = '#EFCDB4';
+/** The acrylic's lit edge (a soft warm white, never the card white). */
+const ACRYLIC_EDGE = '#F8E0CE';
 
 /** One empty slatwall hook (base on the groove at x, y) with a blank price clip on its tip that swings a little. */
 const Hook: React.FC<{x: number; y: number; dir: 1 | -1; t: number; i: number; popAt: number}> = ({x, y, dir, t, i, popAt}) => {
@@ -50,11 +52,11 @@ export const S5SlotBack: React.FC<{popAt: number}> = ({popAt}) => {
   return (
     <>
       <path d={plate} fill={ACRYLIC} />
-      <path d={plate} fill="none" stroke={EMBER.card} strokeWidth={3.4} strokeLinejoin="round" />
+      <path d={plate} fill="none" stroke={ACRYLIC_EDGE} strokeWidth={2.2} strokeLinejoin="round" />
       <Ink d={line(CX - 78, 776, CX - 84, PLANK - 10, {seed: 's5sl/plL', over: [0, 0]}) + line(CX - 78, 776, CX + 76, 770, {seed: 's5sl/plT', over: [0, 0]})} width={W.hair} />
       <path d={glint(CX + 40, 806, 38, {seed: 's5sl/g1'}) + glint(CX - 30, 880, 26, {seed: 's5sl/g2'})} fill="none" stroke={EMBER.white} strokeWidth={2.4} strokeLinecap="round" />
       {/* the lip: a clear strip standing on the plank, its top edge catching the light */}
-      <path d={`M${CX - 96} ${PLANK}V${PLANK - 16}H${CX + 94}V${PLANK}`} fill={ACRYLIC} stroke={EMBER.card} strokeWidth={2.6} />
+      <path d={`M${CX - 96} ${PLANK}V${PLANK - 16}H${CX + 94}V${PLANK}`} fill={ACRYLIC} stroke={ACRYLIC_EDGE} strokeWidth={2.2} />
       <Ink d={line(CX - 96, PLANK - 16, CX + 94, PLANK - 16, {seed: 's5sl/lip', over: [0, 0]})} width={W.hair} />
       {/* four empty hooks, inside the new laptop's lid */}
       <Hook x={572} y={712} dir={1} t={t} i={0} popAt={popAt} />

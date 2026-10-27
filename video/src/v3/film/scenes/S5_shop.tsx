@@ -300,18 +300,18 @@ export const S5Customer: React.FC<{turnAt: number}> = ({turnAt}) => {
     </XG>
   );
   // the head's turn: u 0.35 (a quarter, down at the box) -> 1 (three-quarters, up at the shelf), a 0.12 s swing
-  const u = 0.35 + 0.65 * ease01(t, turnAt, 0.12);
+  const u = 0.3 + 0.7 * ease01(t, turnAt, 0.12);
   const hr = g.hr;
   const hy = g.hy;
   const nose = ease01(u, 0.6, 0.4);
   const A: Pt = [hr * 0.9, hy + hr * 0.4];
-  const B: Pt = [hr * (1.0 + 0.2 * u), hy + hr * 0.64];
-  const C: Pt = [hr * (0.6 + 0.14 * u), hy + hr * 1.0];
-  const cheek = `M${A[0]} ${A[1]}Q${hr * (1.02 + 0.24 * u)} ${hy + hr * 0.42} ${B[0]} ${B[1]}Q${hr * (0.98 + 0.16 * u)} ${hy + hr * 0.94} ${C[0]} ${C[1]}Q${hr * 0.9} ${hy + hr * 0.8} ${A[0]} ${A[1]}Z`;
-  const cheekInk = `M${A[0]} ${A[1]}Q${hr * (1.02 + 0.24 * u)} ${hy + hr * 0.42} ${B[0]} ${B[1]}Q${hr * (0.98 + 0.16 * u)} ${hy + hr * 0.94} ${C[0]} ${C[1]}`;
-  const ear: Pt = [hr * (0.8 - 0.24 * u), hy + hr * 0.6];
-  const nx = hr * (1.02 + 0.22 * u);
-  const ny = hy + hr * 0.5;
+  const B: Pt = [hr * (0.98 + 0.36 * u), hy + hr * 0.66];
+  const C: Pt = [hr * (0.56 + 0.22 * u), hy + hr * 1.02];
+  const cheek = `M${A[0]} ${A[1]}Q${hr * (1.0 + 0.42 * u)} ${hy + hr * 0.42} ${B[0]} ${B[1]}Q${hr * (0.98 + 0.26 * u)} ${hy + hr * 0.96} ${C[0]} ${C[1]}Q${hr * 0.9} ${hy + hr * 0.8} ${A[0]} ${A[1]}Z`;
+  const cheekInk = `M${A[0]} ${A[1]}Q${hr * (1.0 + 0.42 * u)} ${hy + hr * 0.42} ${B[0]} ${B[1]}Q${hr * (0.98 + 0.26 * u)} ${hy + hr * 0.96} ${C[0]} ${C[1]}`;
+  const ear: Pt = [hr * (0.84 - 0.4 * u), hy + hr * 0.6];
+  const nx = hr * (1.04 + 0.36 * u);
+  const ny = hy + hr * 0.52;
   return (
     <>
       <XG m={m}>{box}</XG>
@@ -321,9 +321,9 @@ export const S5Customer: React.FC<{turnAt: number}> = ({turnAt}) => {
         <path d={cheekInk} fill="none" stroke={EMBER.ink} strokeWidth={ink} strokeLinecap="round" />
         {nose > 0.02 ? (
           <>
-            <path d={`M${nx - hr * 0.04} ${ny - hr * 0.06}l${hr * 0.14 * nose} ${hr * 0.1}l${-hr * 0.12 * nose} ${hr * 0.06}Z`} fill={EMBER.reveal} />
-            <path d={`M${nx - hr * 0.04} ${ny - hr * 0.06}l${hr * 0.14 * nose} ${hr * 0.1}l${-hr * 0.12 * nose} ${hr * 0.06}`} fill="none" stroke={EMBER.ink} strokeWidth={ink * 0.8} strokeLinejoin="round" strokeLinecap="round" />
-            <path d={`M${hr * (0.9 + 0.1 * u)} ${hy + hr * 0.45}l${hr * 0.13 * nose} ${-hr * 0.04}`} stroke={EMBER.ink} strokeWidth={ink * 0.8} strokeLinecap="round" />
+            <path d={`M${nx - hr * 0.06} ${ny - hr * 0.08}l${hr * 0.2 * nose} ${hr * 0.13}l${-hr * 0.17 * nose} ${hr * 0.08}Z`} fill={EMBER.reveal} />
+            <path d={`M${nx - hr * 0.06} ${ny - hr * 0.08}l${hr * 0.2 * nose} ${hr * 0.13}l${-hr * 0.17 * nose} ${hr * 0.08}`} fill="none" stroke={EMBER.ink} strokeWidth={ink * 0.8} strokeLinejoin="round" strokeLinecap="round" />
+            <path d={`M${hr * (0.92 + 0.2 * u)} ${hy + hr * 0.46}l${hr * 0.16 * nose} ${-hr * 0.05}`} stroke={EMBER.ink} strokeWidth={ink * 0.8} strokeLinecap="round" />
           </>
         ) : null}
         <path d={blob(ear[0], ear[1], hr * 0.15, hr * 0.21, {seed: `${seed}/ear`})} fill={EMBER.reveal} stroke={EMBER.ink} strokeWidth={ink * 0.8} />
