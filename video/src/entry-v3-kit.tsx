@@ -7,7 +7,7 @@ import React from 'react';
 import {Composition, registerRoot} from 'remotion';
 import {KitSheet3, SHEET} from './v3/film/kit/KitSheet3';
 import {KitLifeFrame, KitSheetLife, LIFE_SHEET} from './v3/film/kit/KitSheetLife';
-import {LIGHT_SHEET, LightDemo, LightNookFrame, LightStreetFrame} from './v3/film/kit/KitSheetLight';
+import {LIGHT_SHEET, LightDemo, LightNookFrame, LightRigCheck, LightStreetFrame} from './v3/film/kit/KitSheetLight';
 
 const KitRoot: React.FC = () => (
   <>
@@ -19,6 +19,7 @@ const KitRoot: React.FC = () => (
     <Composition id="LightDemo" component={LightDemo} defaultProps={{lit: true}} fps={60} width={LIGHT_SHEET.w} height={LIGHT_SHEET.h} durationInFrames={360} />
     <Composition id="LightNook" component={LightNookFrame} defaultProps={{lit: true}} fps={60} width={1080} height={1920} durationInFrames={360} />
     <Composition id="LightStreet" component={LightStreetFrame} defaultProps={{lit: true}} fps={60} width={1080} height={1920} durationInFrames={360} />
+    <Composition id="LightRigCheck" component={LightRigCheck} fps={60} width={1080} height={900} durationInFrames={60} />
   </>
 );
 

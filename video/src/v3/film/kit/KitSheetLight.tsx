@@ -47,6 +47,7 @@ import {
   Lit,
   LightHole,
   LightPool,
+  lightProblems,
   LitWindow,
   nookRig,
   PoolLift,
@@ -375,6 +376,51 @@ const WalkerShadows: React.FC = () => {
       <ContactShadow x={p.x} y={p.y} w={46} k={1.2} />
       <CastShadow x={p.x} y={p.y} w={40} h={WALK.h} light={MAIN_LAMP} />
     </>
+  );
+};
+
+// ================================================================= the rig check (lightProblems for every rig)
+
+/** The surfaces each rig's shadows land on (lit palette colours), and the ground its pools sit on. */
+const RIG_SURFACES: {name: string; rig: () => import('./Light').LightRig; surfaces: Record<string, string>; ground?: string}[] = [
+  {name: 'nook (O1 pov)', rig: () => RIGS.nook, surfaces: {wall: EMBER.wall, desk: EMBER.desk, mug: EMBER.mug, hero: EMBER.hero, book: EMBER.books[0], sleeve: EMBER.sleeve}, ground: EMBER.desk},
+  {name: 'nook (demo)', rig: () => RIG_NOOK_DEMO, surfaces: {wall: EMBER.wall, desk: EMBER.desk, paper: EMBER.paper, hero: EMBER.hero}, ground: EMBER.desk},
+  {name: 'shop', rig: () => RIGS.shop, surfaces: {wall: EMBER.wall, shelf: EMBER.shelf, desk: EMBER.desk, sleeve: EMBER.sleeve, skin: EMBER.skin}},
+  {name: 'street (demo)', rig: () => RIG_STREET_DEMO, surfaces: {snow: '#C9CFE6', pool: '#EADBD2', brick: EMBER.brick, road: EMBER.road, frost: EMBER.frost}, ground: EMBER.snow},
+  {name: 'roof', rig: () => RIGS.roof, surfaces: {snow: '#C9CFE6', brick: EMBER.brick, deck: EMBER.desk, sleeve: EMBER.sleeve}, ground: EMBER.snow},
+];
+
+export const LightRigCheck: React.FC = () => {
+  const rows = RIG_SURFACES.map((r) => {
+    const rig = r.rig();
+    return {name: r.name, problems: lightProblems(rig, r.surfaces, {ground: r.ground})};
+  });
+  const total = rows.reduce((a, r) => a + r.problems.length, 0);
+  let y = 70;
+  return (
+    <div style={{position: 'absolute', inset: 0, background: EMBER.card}}>
+      <svg width={1080} height={900} viewBox="0 0 1080 900" style={{position: 'absolute', left: 0, top: 0}}>
+        <Txt x={40} y={y} size={44} anchor="start">{`light rigs: ${total} problem${total === 1 ? '' : 's'}`}</Txt>
+        {rows.map((r) => {
+          y += 64;
+          const head = <Txt key={r.name} x={40} y={y} size={34} anchor="start">{`${r.name}: ${r.problems.length ? r.problems.length + ' problem(s)' : 'OK'}`}</Txt>;
+          const lines = r.problems.slice(0, 4).map((p, i) => {
+            y += 40;
+            return (
+              <Txt key={`${r.name}${i}`} x={70} y={y} size={24} anchor="start" fit={980}>
+                {p}
+              </Txt>
+            );
+          });
+          return (
+            <React.Fragment key={r.name}>
+              {head}
+              {lines}
+            </React.Fragment>
+          );
+        })}
+      </svg>
+    </div>
   );
 };
 

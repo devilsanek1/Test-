@@ -1198,9 +1198,12 @@ export function lightProblems(rig: LightRig, surfaces: Record<string, string>, o
   const hues = (['form', 'cast', 'contact'] as (keyof Tints)[]).map((j) => lch(rig.tints[j]).h);
   const spread = Math.max(...hues.map((a) => Math.max(...hues.map((b) => Math.abs(((a - b + 540) % 360) - 180)))));
   if (spread > 6) out.push(`form / cast / contact are not one family (hues ${hues.map((h) => h.toFixed(0)).join(' / ')})`);
-  const cap = L(rig.snowCap);
-  if (cap < 87 || cap > 89.5) out.push(`snow cap ${rig.snowCap} L${cap.toFixed(1)} outside 87-89`);
-  if (cap > L(rig.pool[1])) out.push(`snow cap L${cap.toFixed(1)} above the pool core L${L(rig.pool[1]).toFixed(1)}`);
+  if (rig.groundAmbient !== undefined) {
+    // outdoors (a ground in ambient light): sky-facing caps stay thin and under the pool's inner step
+    const cap = L(rig.snowCap);
+    if (cap < 87 || cap > 89.5) out.push(`snow cap ${rig.snowCap} L${cap.toFixed(1)} outside 87-89`);
+    if (cap > L(rig.pool[1])) out.push(`snow cap L${cap.toFixed(1)} above the pool core L${L(rig.pool[1]).toFixed(1)}`);
+  }
   for (const [name, s] of Object.entries(surfaces)) {
     const base = lch(s);
     const amb = multiply(s, rig.tints.ambient);
