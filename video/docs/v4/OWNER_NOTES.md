@@ -39,3 +39,6 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   setup note. Owner: "its fine if it works only in this chat" -> the voice step may use a key in this session only; the
   owner rotates the key (or makes a new one) to get the `sk_...` value; the recommended home is the environment's
   network secret `ELEVENLABS_API_KEY` (a helper session in the same environment sees it).
+- 2026-10-27 ~23:30 UTC: "make sure to commit the progress periodically if we get stopped on the usage limits" ->
+  `video/scripts/autocheckpoint.sh` runs in the background on v4's paths (a commit and push every 10 minutes when they
+  changed), on top of a commit after every agent; agents write their output file early. -> rule: Process (limits).
