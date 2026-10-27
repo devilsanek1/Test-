@@ -31,8 +31,11 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   Owner: "let me know how to setup the elevenlabs key - lets actually do it here" -> steps given: a new restricted key
   (Text to Speech + Voices read, credit limit), delete the pasted one, store it as the environment's network secret
   `ELEVENLABS_API_KEY`; a new session (a helper in the same environment) sees it.
-- 2026-10-27 ~23:15 UTC: the owner pasted the ElevenLabs key they had created before into the chat ("this is the key
-  i already created before ...") -> not repeated, filed, committed or put in any prompt; the chat export's redaction
-  (`context/scratchpad_tools/export_context.py`) missed a bare 64-hex key, so it now redacts hex runs of 48+ characters;
-  the owner was asked to regenerate the key (it has now been in two chats) and store the new one as the environment's
-  network secret `ELEVENLABS_API_KEY`, with this session's inline use as the fallback.
+- 2026-10-27 ~23:15 UTC: the owner pasted the ElevenLabs key they had created before ("this is the key i already
+  created before ...") -> not repeated, filed or put in any prompt; the chat export's redaction
+  (`context/scratchpad_tools/export_context.py`) missed a bare 64-hex string, so it now redacts hex runs of 48+
+  characters. The API showed it was the key's ID, not the key (`api_key_id_used_as_api_key`: keys start with `sk_` and
+  are shown only when created or rotated), so it is not a secret and can't authenticate. -> `docs/voice/API_QUICKSTART.md`
+  setup note. Owner: "its fine if it works only in this chat" -> the voice step may use a key in this session only; the
+  owner rotates the key (or makes a new one) to get the `sk_...` value; the recommended home is the environment's
+  network secret `ELEVENLABS_API_KEY` (a helper session in the same environment sees it).
