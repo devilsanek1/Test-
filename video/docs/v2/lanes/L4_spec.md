@@ -57,8 +57,7 @@ Words heard: In 0.12 · April 0.21-0.69 · that 0.82 · meant 0.93 · a 1.17 · 
   cloud, crown, branch, Pip, hop arc, bird, finial, petal); the band margin y 290-600 is flat sky except the sun disc and
   its calendar page (top >= 575); no built top, crown or branch above y 600 (the start included); the cloud bank and the
   obelisk tops >= 610 at every p (the far plane is 1.08x at the start, so END tops >= ~625: the QA prints the mapping);
-  the top gutter (y 0-290) holds only clouds (and, at the start only, an optional canopy fringe at y <= 240 that leaves
-  SIDEWAYS, never down through the band). Key reads (the news box, the plaque, Pip's beat) in x 120-880, y 290-1250;
+  the top gutter (y 0-290) holds only clouds: NOTHING overhead at the start (STYLE §6: a crane-up drops it through the band). Key reads (the news box, the plaque, Pip's beat) in x 120-880, y 290-1250;
   nothing to read below y 1250; no Pip, board or key read in the right rail (x > 780 below y 840) at rest.
 - **Speeds (60 fps, on-screen px per frame):** detailed layers <= 15 (the move peaks ~12 now: keep it there), long flat
   ink moves <= 7.5, the wipe is a flat mass (it may run ~40); no zoom in a hold; no opacity anywhere; strobe-free (a
@@ -146,8 +145,8 @@ never 1 s still. Then, at phone size: does the world keep going, and is it alive
   IS this floor at 2.42x: the deck builder draws it as the canopy's shade zone (warm-dark paving, 2-value dapple, sun
   flecks, petals at a size that reads at both scales); the start builder adds start-only near masses on top (the canopy
   tree's trunk + roots at the bottom-left, a tulip bed rim or planter cut by the bottom-right, fallen blossom twigs, a
-  pigeon or two) that DROP OUT down-left as the crane rises (near things move fastest; gone by p ~0.35), plus an optional
-  blossom fringe in the top-left gutter (y <= 240) that leaves LEFT by p ~0.12. Life in the hold: Pip lands and looks up,
+  pigeon or two) that DROP OUT down-left as the crane rises (near things move fastest; gone by p ~0.35); nothing overhead
+  (STYLE §6). Life in the hold: Pip lands and looks up,
   the calendar flip, the 4-frame burst, petals drifting down through the frame below y 600, the stranger turns a page,
   pigeons peck, a far jogger crosses the slot, gulls. The dapple is STATIC (STYLE §3: no boil, shimmer or visible sway).
 - **Sizes:** the stranger 150 px (feet to head top; seated), Pip 108 px: both are the legibility floor's carriers here.
@@ -201,6 +200,9 @@ never 1 s still. Then, at phone size: does the world keep going, and is it alive
   `S/review/r0_baseline/sheet_216_vs_refs.png` is the baseline beside them).
 - Band: `python3 S/tools/bandcheck.py` (renders Film2RBare f1233-1439 at 0.5 and counts non-sky pixels; `--step 3` for a
   quick pass). Camera: the `V2S5_qa.ts` header command. Typecheck: `npx tsc --noEmit -p .` (~25 s).
+- STYLE.md §5 proof in the review files: density.py, `colour_meter.py <stills> --hero '#0B8577' --pop '#EE6A2E' --band
+  290,600`, `deadframes.py <clip>`, `python3 -I scripts/camspeed.py --frames <dir> --fps 60 --limit 15 --allow 1.47-1.64`, the
+  band check, the paused sheet beside reference 1, v1 AND the G5b pilot, and a cold viewer's tell-back (frames only, sound off).
 - Full review set (the critics' input): `bash S/tools/make_review.sh <tag>` (~2 min): keys at 216 px beside refs, full-size
   start / end, motion strips, the 0.5-scale clip with voice + cues, density.py (+ --cozy), the band + camera checks.
 - Renders: always `--gl=angle`, `--concurrency=2` (4 shared CPUs; another builder may be rendering too).

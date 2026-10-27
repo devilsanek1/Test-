@@ -26,7 +26,7 @@ export const BACKLIT: Tones5 = {
   mid: mix(CM.shadeWarm, CM.blossom, 0.3),
   lit: mix(CM.blossom, CM.brickLight, 0.14),
   flower: CM.blossom,
-  flowerShade: mix(CM.blossom, CM.shadeWarm, 0.42),
+  flowerShade: mix(CM.blossom, CM.shadeWarm, 0.55),
   white: CM.paper,
   bud: mix(CM.leafRust, CM.shadeWarm, 0.25),
 };
@@ -62,7 +62,7 @@ function layout(c: Crown5, T: Tones5) {
     const x = c.cx + Math.cos(a) * c.rx * d;
     const y = c.cy + Math.sin(a) * c.ry * d * 0.92;
     const side = (Math.cos(a) * c.light[0] + Math.sin(a) * c.light[1]) * d;
-    const col = side > litK ? T.lit : side > 0.05 ? T.mid : T.shade;
+    const col = side > litK ? T.lit : side > 0.22 ? T.mid : T.shade;
     const s = r.range(0.15, 0.27);
     clumps.push({x, y, rx: c.rx * s, ry: c.ry * s * 0.8, col, seed: `${c.seed}/c${i}`, i});
   }
@@ -73,7 +73,7 @@ function layout(c: Crown5, T: Tones5) {
     const a = r.range(0, Math.PI * 2);
     const d = Math.sqrt(r.next()) * 0.94;
     const side = (Math.cos(a) * c.light[0] + Math.sin(a) * c.light[1]) * d;
-    const col = side > 0.6 && r.chance(0.4) ? T.white : side > 0.2 ? T.flower : T.flowerShade;
+    const col = side > 0.62 && r.chance(0.4) ? T.white : side > 0.32 ? T.flower : T.flowerShade;
     flowers.push({x: c.cx + Math.cos(a) * c.rx * d, y: c.cy + Math.sin(a) * c.ry * d * 0.9, r: Math.max(3, Math.min(13, c.rx * r.range(0.045, 0.085))), col, i: i + nc});
   }
   return {base, limbs, twigs, clumps, flowers};
@@ -183,9 +183,9 @@ export const TerraceTree5: React.FC<{burstAt?: number}> = ({burstAt}) => {
       [C.x0 + 280, 1168, 150, 92, 0.6],
       [C.x0 + 140, 905, 245, 180, 0.45],
       [C.x0 + 345, 990, 125, 118, 0.42],
-      [C.x0 + 245, 780, 190, 130, 0.4],
+      [C.x0 + 245, 812, 190, 130, 0.4],
       [C.x0 + 395, 850, 74, 80, 0.35],
-      [C.x0 + 60, 720, 150, 90, 0.45],
+      [C.x0 + 60, 772, 150, 90, 0.45],
     ];
     return m.map(([cx, cy, rx, ry, litK], i) => ({cx, cy, rx, ry, seed: `s5deck/tree/m${i}`, light, bloom: 0.95, litK}));
   }, []);

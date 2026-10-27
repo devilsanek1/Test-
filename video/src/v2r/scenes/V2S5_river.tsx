@@ -158,7 +158,7 @@ function deepPark(seed: string): Batch {
     }
     y += rr * 0.78;
   }
-  drawCrowns(B, crowns, RIV.parkShade);
+  drawCrowns(B, crowns, RIV.parkShade, 15);
   return B;
 }
 
@@ -217,8 +217,8 @@ function riverBack(seed: string): Batch {
   {
     // Memorial Bridge: a stone face with its arches, from the Lincoln Memorial to the near shore (left)
     const {far, near: nr} = RIVER.memorial;
-    const thF = 3.6;
-    const thN = 6.6;
+    const thF = 4.6;
+    const thN = 9;
     B.poly(RIV.bridge, [
       [far[0], far[1] - 1.4],
       [nr[0], nr[1] - 1.8],
@@ -244,7 +244,7 @@ function riverBack(seed: string): Batch {
       const a = bot(k0);
       const b = bot(k1);
       const m = bot(km);
-      const ah = th(km) * 0.62;
+      const ah = th(km) * 0.7;
       B.fill(RIV.arch, `M${a[0].toFixed(1)} ${a[1].toFixed(1)}Q${m[0].toFixed(1)} ${(m[1] - ah * 2).toFixed(1)} ${b[0].toFixed(1)} ${b[1].toFixed(1)}Z`);
     }
     // the 14th Street spans: a lit deck edge over a shaded face on slim piers (the third the darker rail bridge)
