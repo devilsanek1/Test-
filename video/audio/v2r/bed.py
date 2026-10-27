@@ -162,6 +162,8 @@ def compose(seed=2610):
     # "heading" 19.80
     N("low_cb", 18.92, 38, 46, 1.15, False)
     N("low_vc", 18.95, 50, 40, 1.1, False); N("low_vc", 18.97, 53, 38, 1.05, False); N("low_vc", 18.99, 57, 32, 1.0, False)
+    # ... and a pp open fifth high in the violins (A5 + D6: neither major nor minor), the weight a phone can hear
+    N("air_vln", 18.96, 81, 38, 1.05, False); N("air_vln", 18.98, 86, 36, 1.0, False)
 
     # S5: April air from 20.70 (B-flat maj7 colours: D6, A5), 21.30 low strings open (Bb1 + F2) and swell,
     # 22.43 accent 1: lydian bloom (vibes C6 + E6, violins D6), the felt low bloom (added in render)
@@ -179,11 +181,11 @@ def compose(seed=2610):
         e = blen(s) / 2
         for k in range(2 * nb):
             dt, dv = HUMANIZE[k]
-            N("pizz", beat(s, k / 2) + dt, 72 if k % 2 == 0 else 77, (30 if k % 2 == 0 else 27) + dv, e, human=False)
+            N("pizz", beat(s, k / 2) + dt, 72 if k % 2 == 0 else 77, (28 if k % 2 == 0 else 25) + dv, e, human=False)
         for j, (k, p) in enumerate(((0, 34), (4, 33), (8, 31), (10, 36)) + (((12, 36),) if nb == 7 else ())):
             dt, dv = HUMANIZE[16 + j]
-            N("bass", beat(s, k / 2) + dt, p, 44 + dv, 2 * e, human=False)
-            N("bass8", beat(s, k / 2) + dt, p + 12, 34 + dv, 2 * e, human=False)
+            N("bass", beat(s, k / 2) + dt, p, 42 + dv, 2 * e, human=False)
+            N("bass8", beat(s, k / 2) + dt, p + 12, 32 + dv, 2 * e, human=False)
 
     # 33.16-36.18 the motif alone, quieter: C5 F5 E5 C5 (released before the held breath at 36.18)
     s = 11
@@ -274,7 +276,7 @@ LAP_SOURCES = [(758858, (100, 3000), 8, (0.0, 70.0), 0.62), (480838, (150, 3000)
                (318064, (150, 3000), 8, None, 0.16)]
 # laps per second by scene (the canal under our steps, the wall's towpath, her terrace, our boat, the forecourt, the
 # lane); none in Arlington. Calm (DIRECTION rule 3): small events, never a texture.
-LAP_RATE = [(0.00, 6.10, 2.0), (6.10, 12.98, 1.4), (12.98, 14.86, 1.6), (14.86, 20.55, 1.6), (28.10, 32.93, 0.9),
+LAP_RATE = [(0.00, 6.10, 2.0), (6.10, 12.98, 1.2), (12.98, 14.86, 1.6), (14.86, 20.55, 1.2), (28.10, 32.93, 0.9),
             (32.93, FILM_DUR, 1.0)]
 # the "..." stop and the held breath: the water holds too; and nothing new starts in a join's window
 QUIET = [(4.48, 4.86), (36.16, 36.56)] + [(lo, hi) for (lo, hi, _) in sheet.join_windows()]
@@ -355,28 +357,31 @@ def life_layer(n):
     window (midpoint + 0.12 s): it never starts inside it."""
     y = np.zeros((n, 2)); rep = []
     for (t, kind, p, note) in sheet.LIFE:
-        if kind == "bus":              # far, on the road bridge in the west gap: a low diesel swell going left
-            g = FLD.cut(FLD.load(138247), 7.6, 13.4, 0.6).mean(axis=1)
-            g = lp(hp(g, 60, 2), 1300, 2)
-            place_c(y, unit_rms(g) * db2a(-14), t, 1.0, p)
+        if kind == "bus":              # far, on the road bridge in the west gap (visible ~0.25-2.3, nearest the
+            # gap's middle ~1.2): the recording's pass-by peak (11.1 s in) lands at t + 0.10; it fades in from 0.40,
+            # after the first second's own sounds have started, and drifts from the left toward the wing
+            g = fade_in(FLD.cut(FLD.load(138247), 10.3, 12.6, 0.4).mean(axis=1), 0.4)
+            g = unit_rms(lp(hp(g, 60, 2), 1300, 2)) * db2a(-21)
+            th = (np.clip(np.linspace(p, p + 0.35, len(g)), -1, 1) + 1) * np.pi / 4
+            place_c(y, np.stack([g * np.cos(th), g * np.sin(th)], axis=1) * np.sqrt(2), t - 0.70)
         elif kind == "boat_pass":      # S2: a narrowboat comes up the canal from the vanishing point, ends at the cut
             d = 12.98 - t - 0.05; g = FLD.cut(FLD.load(576577), 3.0, 3.0 + d, 0.6).mean(axis=1)
             k_ = np.linspace(0, 1, len(g))
             g = lp(hp(g, 70, 2), 900, 2) * (0.35 + 0.65 * k_) + lp(hp(g, 900, 2), 1800, 2) * 0.35 * k_ ** 2
-            place_c(y, unit_rms(g) * db2a(-13), t, 1.0, p)
+            place_c(y, unit_rms(g) * db2a(-16), t, 1.0, p)
         elif kind == "boat_ride":      # S4: our narrowboat's engine at idle-ahead beside us, its bow wash
             t0 = t + sheet.JOIN_AFTER; d = 20.55 - t0
             g = fade_in(FLD.cut(FLD.load(576577), 14.0, 14.0 + d, 0.25).mean(axis=1), 0.4)
             g = lp(hp(g, 75, 2), 1500, 2)
-            place_c(y, unit_rms(g) * db2a(-20), t0, 1.0, 0.05)
+            place_c(y, unit_rms(g) * db2a(-24), t0, 1.0, 0.05)
             w = fade_in(FLD.cut(FLD.load(318064), 30.0, 30.0 + d, 0.25), 0.4)
-            place_c(y, unit_rms(lp(hp(w, 200, 2), 3200, 2)) * db2a(-21), t0)
+            place_c(y, unit_rms(lp(hp(w, 200, 2), 3200, 2)) * db2a(-25), t0)
         elif kind == "train":
             place_c(y, unit_rms(train_far()) * db2a(-18), t, 1.0, p)
         elif kind == "fountain":      # S7: the forecourt fountain jets, the whole shot
             t0 = t + sheet.JOIN_AFTER; d = 32.93 - t0
             g = fade_in(FLD.cut(FLD.load(415027), 5.0, 5.0 + d, 0.12), 0.3)
-            place_c(y, unit_rms(lp(hp(g, 220, 2), 8000, 2)) * db2a(-15), t0)
+            place_c(y, unit_rms(lp(hp(g, 220, 2), 8000, 2)) * db2a(-18), t0)
         else:
             raise ValueError(kind)
         rep.append((t, kind))
@@ -388,7 +393,9 @@ def life_layer(n):
 # city's floor; the birds and the life are events too; the beds are a floor, never a hiss.
 AIR_LEVEL = {"laps": 0.0, "city": -8.0, "parkway": -5.0, "water_bed": -13.0, "leaves": -14.0, "birds": -1.0,
              "life": -2.0}
+AIR_UNDER_VOICE = 21.0  # the hook's air (its median) under the voice's speech level (TREATMENT s7: ambiences 20-25 under)
 UNDER_MUSIC_DB = -7.0  # the air steps back wherever the music plays (review item 4: the arc over the air on a phone)
+LAPS_UNDER_MUSIC_DB = -3.0   # and its loudest events, the water laps, 3 dB more
 
 
 def level_to(x, curve, target):
@@ -438,9 +445,12 @@ def world_air():
     dip = db2a(np.interp(t, [0, 4.50, 4.54, 4.79, 4.94, FILM_DUR], [0, 0, -12, -12, 0, 0]))
     # wherever music plays the air steps back (review item 4); the hook and the seam keep the full air
     mus = db2a(np.interp(t, [0, 6.05, 6.35, 38.55, 39.0, FILM_DUR], [0, 0, UNDER_MUSIC_DB, UNDER_MUSIC_DB, 0, 0]))
-    y *= (dip * mus)[:, None]
+    # the laps are the air's loudest events: under the music they step back 3 dB more (calm; the beat owns the sound)
+    lapsk = db2a(np.interp(t, [0, 6.05, 6.35, 38.55, 39.0, FILM_DUR], [0, 0, LAPS_UNDER_MUSIC_DB, LAPS_UNDER_MUSIC_DB, 0, 0]))
+    layers["laps"] = layers["laps"] * lapsk[:, None]
     for k in layers:
         layers[k] = layers[k] * (dip * mus)[:, None]
+    y = sum(layers.values())
     return y, layers, rep
 
 
@@ -496,6 +506,11 @@ def render(notes):
     lift = db2a(np.interp(t, [0, 37.05, 37.25, NT / SR], [0, 0, 4.0, 4.0]))       # "facts": the resolution, a touch up
     for k in ("motif", "low_cb", "low_vc", "air_vib", "air_vln", "bloom"):
         stems[k] = stems[k] * lift[:, None]
+    # accent 1 (the landing, 22.43) a touch up too, so both designed accents sit over every note of the level pulses
+    # (review item 5: a pulse note in a pause must never outshine an accent)
+    lift1 = db2a(np.interp(t, [0, 22.30, 22.45, 23.70, 24.30, NT / SR], [0, 0, 2.5, 2.5, 0, 0]))
+    for k in ("low_cb", "low_vc", "air_vib", "air_vln", "bloom"):
+        stems[k] = stems[k] * lift1[:, None]
     tail = db2a(np.interp(t, [0, 38.70, FILM_DUR, FILM_DUR + 0.5, NT / SR], [0, 0, -8, -60, -90]))
     for k in stems:
         stems[k] = stems[k] * tail[:, None]
@@ -750,12 +765,13 @@ def main():
     tt_ = np.arange(N_FILM) / SR
     music = music * db2a(np.interp(tt_, [0, 28.20, 28.30, 32.75, 32.85, FILM_DUR], [0, 0, trim, trim, 0, 0]))[:, None]
     air, air_layers, life_rep = world_air()
-    # the air: ~19 dB under the speaking voice before its own 3 dB duck (with the same hold); 7 dB less under music
+    # the air: AIR_UNDER_VOICE (21 dB) under the speaking voice before its own 3 dB duck (with the same hold), so the
+    # guard barely touches the soft opening line; 7 dB less under music
     tv, lv = short_term_lufs(vs, win=0.4, hop=0.05)
     vref = float(np.median(lv[speech_frames(tv)]))
     th, la = short_term_lufs(air, win=0.4, hop=0.05)
     hook = (th < 6.0)
-    air_gain = db2a(vref - 19.2 - float(np.median(la[hook])))
+    air_gain = db2a(vref - AIR_UNDER_VOICE - float(np.median(la[hook])))
     air = air * air_gain
     air_layers = {k: x * air_gain for k, x in air_layers.items()}
     aduck = duck_curve(v, "air", depth_db=3.0)[:, None]

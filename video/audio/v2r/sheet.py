@@ -118,7 +118,8 @@ ARL = [(20.55, 28.10)]
 # picture keeps (conform_L1-L6: S1's cyclist, duck and dog, S2's trotting dog, the S5 gulls are cut). (t, kind, pan,
 # note). W4: re-spot from the final picture and rerun bed.py.
 LIFE = [
-    (1.10, "bus", -0.6, "V2S1: the bus crosses the road bridge in the west gap, once (map S1_CLOCK doorsShut 1.10)"),
+    (1.10, "bus", -0.6, "V2S1: the bus crosses the road bridge in the west gap once (V2S1_set_far S1_BUS: in view "
+                        "~0.25-2.3, at 1.10 on the doors' shut); heard 0.40-2.70, nearest ~1.20, left toward the wing"),
     (7.00, "boat_pass", 0.6, "V2S2: a narrowboat glides up from the vanishing point toward us (V2S2_Set boatAt 7.0)"),
     (14.86, "boat_ride", 0.0, "V2S4: our narrowboat glides with us at idle-ahead (14.86-20.55; fades in under the push-through)"),
     (15.25, "train", -0.5, "V2S4: a train on the far viaduct (V2S4_wfar TRAIN t0 15.25), gone before 'military'"),
@@ -233,11 +234,13 @@ CUES = [
 ]
 
 # Levels the review set relative to the first draft (dB vs the draft's momentary max at its gain, DRAFT_LEVEL):
-# the ding is THE first-second sound, set to exactly +4 dB (LEAD_SOUNDS: no sheet / local / band / bus cap; only the
-# word guard may lower it); the others are caps (the sheet and the voice rules may set them lower still).
+# the ding is THE first-second sound, set to exactly its level (LEAD_SOUNDS: no sheet / local / band / bus cap; only
+# the word guard may lower it); the others are caps (the sheet and the voice rules may set them lower still).
 DRAFT_LEVEL = {"exit_ding": -33.79, "lamp_click": -37.77, "door_glide": -37.71, "letter_pops": -39.40,
                "outline_pops": -35.17, "ear_flap": -38.19, "lamp_run": -31.97}
-VS_DRAFT = {"exit_ding": +4.0, "lamp_click": -5.0, "door_glide": -6.0, "letter_pops": -6.0, "outline_pops": -5.0,
+# The ding takes +3.2 dB, not the review's +4: at +4 it sat 7.2 dB under the voice where it lands, against TREATMENT
+# s7's "SFX >= 8 dB under"; +3.2 puts it exactly there, and it is still the first second's loudest sound.
+VS_DRAFT = {"exit_ding": +3.2, "lamp_click": -5.0, "door_glide": -6.0, "letter_pops": -6.0, "outline_pops": -5.0,
             "ear_flap": -5.0, "lamp_run": -6.0}
 LEAD_SOUNDS = {"exit_ding"}      # never lowered by the bus guard (the moment's hero)
 
