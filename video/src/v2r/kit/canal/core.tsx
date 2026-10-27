@@ -246,3 +246,24 @@ export const pl = (pts: Pt[]) => pts.map(([x, y], i) => `${i ? 'L' : 'M'}${P(x, 
 
 /** Width of the canvas (1080) and height (1920); the caption band no set may draw into (y 317-556). */
 export const FRAME = {w: 1080, h: 1920, band: [317, 556] as [number, number]} as const;
+
+/** A cast shadow on the ground: a flat parallelogram from an object's foot (x, y), width w, reaching `len` px in the
+ *  direction away from a light at (lx, ly) (screen). Shadows are colour (stone shade on paving), never grey. */
+export function shadowInto(b: Batch, x: number, y: number, w: number, len: number, light: Pt, color: string, squash = 0.42) {
+  let dx = x - light[0];
+  let dy = (y - light[1]) * squash;
+  const m = Math.hypot(dx, dy) || 1;
+  dx /= m;
+  dy /= m;
+  const ex = x + dx * len;
+  const ey = y + Math.max(0, dy) * len;
+  const nx = -dy;
+  const ny = dx;
+  const hw = w / 2;
+  b.poly(color, [
+    [x - nx * hw, y - ny * hw * 0.3],
+    [x + nx * hw, y + ny * hw * 0.3],
+    [ex + nx * hw * 0.8, ey + ny * hw * 0.24],
+    [ex - nx * hw * 0.8, ey - ny * hw * 0.24],
+  ]);
+}

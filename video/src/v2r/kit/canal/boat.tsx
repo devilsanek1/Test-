@@ -40,13 +40,15 @@ export type BoatOpts = {
   cafe?: boolean;
   /** Ink scale (front boats 4.8, far 2.2...). Default by h. */
   ink?: number;
+  /** Hull depth below the gunwale as a fraction of h (0.3 level view; ~0.11 seen from a little above, S4). */
+  hullK?: number;
 };
 
 const CABINS = [CM.sage, CM.coatOat, CM.brickLight, CM.stoneShade];
 
 /** Geometry helpers of a boat (screen px). */
 export function boatGeom(o: BoatOpts) {
-  const hullH = o.h * 0.3;
+  const hullH = o.h * (o.hullK ?? 0.3);
   const gunH = Math.max(3, o.h * 0.075);
   const roofH = Math.max(3, o.h * 0.07);
   const gunTop = o.water - hullH - gunH;
@@ -87,6 +89,12 @@ export function boatInto(b: Batch, o: BoatOpts, t = 0) {
   b.rect(cabin, L, g.roofY, R - L, g.gunTop - g.roofY);
   // a thin painted coach line under the roof
   b.rect(CM.coatMustard, L + 4 * s, g.roofY + g.roofH + 4 * s, R - L - 8 * s, Math.max(1.4, 2.4 * s));
+  b.rect(CM.anchor, L + 4 * s, g.gunTop - 9 * s, R - L - 8 * s, Math.max(1.2, 1.6 * s));
+  if (o.h > 200) {
+    // a roof handrail (wood) on stanchions, mushroom vents
+    b.rect(CM.line, L + 10 * s, g.roofY - g.roofH - 9 * s, R - L - 20 * s, 3 * s);
+    for (let x = L + 30 * s; x < R - 20 * s; x += 80 * s) b.rect(CM.line, x, g.roofY - g.roofH - 9 * s, 2.4 * s, 9 * s);
+  }
   // roof edge (overhanging a little) and the roof seen from above
   b.rect(CM.limestone, L - 3 * s, g.roofY - g.roofH, R - L + 6 * s, g.roofH + 1);
   if (o.topView && o.topView > 0) b.rect(CM.stucco, L - 3 * s, g.roofY - g.roofH - o.topView, R - L + 6 * s, o.topView);
@@ -100,15 +108,15 @@ export function boatInto(b: Batch, o: BoatOpts, t = 0) {
   b.ink(`M${P(tx, g.gunTop)}Q${P(tx - o.dir * 6 * s, g.roofY - 4 * s)} ${P(tx + o.dir * 34 * s, g.roofY - 22 * s)}`, Math.max(1.6, w * 0.9), CM.ink);
   b.fill(CM.coatMustard, ovalPath(tx + o.dir * 34 * s, g.roofY - 22 * s, 3.5 * s, 3.5 * s));
   // ---- windows: portholes (cream rims, curtains) and a few rectangular windows; the painted panel
-  const nW = Math.max(3, Math.round((R - L) / (40 * s + 36)));
+  const nW = Math.max(3, Math.round((R - L) / (62 * s + 20)));
   const panelAt = o.panel ? Math.floor(nW * 0.55) : -1;
   for (let k = 0; k < nW; k++) {
     const u = (k + 0.5) / nW;
     const wx = lerp(L + 18 * s, R - 18 * s, u);
     const wy = g.roofY + (g.gunTop - g.roofY) * 0.46;
     if (k === panelAt) {
-      const pw = 44 * s;
-      const ph = 30 * s;
+      const pw = 30 * s;
+      const ph = 19 * s;
       b.fill(CM.stucco, ovalPath(wx, wy, pw, ph));
       b.fill(CM.sage, leafPath(wx - pw * 0.3, wy + ph * 0.1, pw * 0.5, ph * 0.22, -20));
       b.fill(CM.sage, leafPath(wx + pw * 0.32, wy + ph * 0.05, pw * 0.5, ph * 0.22, 25));
@@ -119,7 +127,7 @@ export function boatInto(b: Batch, o: BoatOpts, t = 0) {
     }
     const round = k % 3 !== 1;
     if (round) {
-      const rr = 13 * s;
+      const rr = 9.5 * s;
       b.fill(CM.coatOat, ovalPath(wx, wy, rr * 1.32, rr * 1.32));
       b.fill(o.lit ? CM.lamp : CM.glass, ovalPath(wx, wy, rr, rr));
       // curtains: two drapes tied back
@@ -128,8 +136,8 @@ export function boatInto(b: Batch, o: BoatOpts, t = 0) {
       b.fill(cc, `M${P(wx + rr, wy - rr * 0.6)}Q${P(wx + rr * 0.2, wy - rr)} ${P(wx + rr * 0.3, wy + rr * 0.6)}L${P(wx + rr, wy + rr * 0.4)}Z`);
       if (w > 0) b.ink(circleInk(wx, wy, rr * 1.32, {seed: `${o.seed}/ph${k}`}), Math.max(1.2, w * 0.55));
     } else {
-      const ww = 46 * s;
-      const wh = 30 * s;
+      const ww = 34 * s;
+      const wh = 22 * s;
       b.rect(CM.coatOat, wx - ww / 2 - 3 * s, wy - wh / 2 - 3 * s, ww + 6 * s, wh + 6 * s);
       b.rect(o.lit ? CM.lamp : CM.glass, wx - ww / 2, wy - wh / 2, ww, wh);
       b.rect(CM.box, wx - ww / 2, wy - wh / 2, ww, wh * 0.28);
@@ -183,9 +191,20 @@ export function boatInto(b: Batch, o: BoatOpts, t = 0) {
     // a bike lying along the roof
     const [bx, by] = onRoof(0.53, 0.1);
     bikeInto(b, bx, by, 12 * s, `${o.seed}/rb`, CM.brickDeep, o.dir);
-    // a plank and a pole
+    // a plank, a boat pole and a mop
     const [pkx, pky] = onRoof(0.78, 0.5);
     b.rect(CM.line, Math.min(pkx, pkx + o.dir * 90 * s), pky - 4 * s, 90 * s, 5 * s);
+    const [px2, py2] = onRoof(0.86, 0.2);
+    b.rect(CM.coatOat, Math.min(px2, px2 + o.dir * 130 * s), py2 - 3 * s, 130 * s, 2.6 * s);
+    b.fill(CM.paper, ovalPath(px2 + o.dir * 134 * s, py2 - 2 * s, 9 * s, 5 * s));
+    // more potted herbs and a geranium trough near the stern
+    for (let k = 0; k < 3; k++) {
+      const [qx, qy] = onRoof(0.14 + k * 0.04, 0.6);
+      const pw = 12 * s;
+      b.rect(CM.leafRust, qx - pw / 2, qy - pw * 0.8, pw, pw * 0.8);
+      b.fill(CM.sage, lobes(qx - pw * 0.7, qx + pw * 0.7, qy - pw * 0.8, pw * 1.4, `${o.seed}/g${k}`, 2));
+      b.fill(CM.box, ovalPath(qx, qy - pw * 1.7, 3 * s, 3 * s));
+    }
   }
   function finishBoat() {
   // the stove chimney: a pipe with a brass band and a cap
@@ -243,7 +262,7 @@ export const Narrowboat: React.FC<NarrowboatProps> = ({smoke = true, bursts, spe
     const b = new Batch();
     boatInto(b, o, 0);
     return b;
-  }, [static_, o.x, o.water, o.len, o.h, o.dir, o.seed, o.cabin, o.topView, o.roofItems, o.chimney, o.panel, o.fenders, o.lit, o.cafe, o.ink]);
+  }, [static_, o.x, o.water, o.len, o.h, o.dir, o.seed, o.cabin, o.topView, o.roofItems, o.chimney, o.panel, o.fenders, o.lit, o.cafe, o.ink, o.hullK]);
   let b = memo;
   if (!b) {
     b = new Batch();
@@ -255,7 +274,7 @@ export const Narrowboat: React.FC<NarrowboatProps> = ({smoke = true, bursts, spe
   return (
     <>
       <Paint b={b} seed={`boat/${o.seed}`} />
-      {smoke ? <Puffs x={chX} y={chTop - 2} seed={`${o.seed}/smoke`} kind="smoke" scale={Math.max(0.4, o.h / 110)} bursts={bursts} drift={-o.dir * 30 - 20} /> : null}
+      {smoke ? <Puffs x={chX} y={chTop - 2} seed={`${o.seed}/smoke`} kind="smoke" scale={Math.max(0.4, Math.min(1.5, o.h / 110))} bursts={bursts} drift={-o.dir * 30 - 20} /> : null}
     </>
   );
 };
@@ -271,13 +290,14 @@ export const CafeDeck: React.FC<{x0: number; x1: number; y0: number; y1: number;
     const k = 0.18;
     const fx0 = lerp(x0, vp[0], k);
     const fx1 = lerp(x1, vp[0], k * 0.6);
-    b.poly(CM.line, [[fx0, y0], [fx1, y0], [x1, y1], [x0 - 40, y1]]);
+    b.poly(CM.leafGold, [[fx0, y0], [fx1, y0], [x1, y1], [x0 - 40, y1]]);
     let d = '';
     for (let i = 1; i < 9; i++) {
       const u = i / 9;
       d += `M${P(lerp(fx0, fx1, u), y0)}L${P(lerp(x0 - 40, x1, u), y1)}`;
+      if (i % 2) b.poly(CM.coatMustard, [[lerp(fx0, fx1, u), y0], [lerp(fx0, fx1, u + 0.04), y0], [lerp(x0 - 40, x1, u + 0.04), y1], [lerp(x0 - 40, x1, u), y1]]);
     }
-    b.ink(d, INK_PX.hair, CM.brickDeep);
+    b.ink(d, INK_PX.far, CM.line);
     // the gunwale rail along the deck's outer edge (plum stripe) and the hull below
     b.poly(CM.anchor, [[fx1, y0 - 6], [fx1 + 10, y0 - 6], [x1 + 14, y1], [x1, y1]]);
     b.layer();

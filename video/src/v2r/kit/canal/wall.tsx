@@ -235,6 +235,11 @@ export const WingS2: React.FC<WingS2Props> = ({story = {}, staffCoolAt, staffSta
       if (x - w / 2 > 1100 || w < 1) continue;
       const on = litAt(t, seed, k, N, {litFrac});
       windowInto(dyn, x - w / 2, y0, w, y1 - y0, on ? 'lit' : 'unlit', `${seed}/w${c}${row}${on ? 'L' : 'U'}`);
+      if (w > 14) {
+        dyn.rect(CM.shadeCool, x - Math.max(0.8, w * 0.015), y0, Math.max(1.6, w * 0.03), y1 - y0);
+        dyn.rect(CM.shadeCool, x - w / 2, y0 + (y1 - y0) * 0.2, w, Math.max(1.2, (y1 - y0) * 0.018));
+      }
+      if (w > 6) dyn.rect(CM.limestone, x - w / 2 - w * 0.06, y1, w * 1.12, Math.max(1.5, 6 * g));
       if (w > 22) frames += poly([[x - w / 2, y0], [x + w / 2, y0], [x + w / 2, y1], [x - w / 2, y1]], {closed: true, over: 'small', seed: `${seed}/f${c}${row}`});
     }
   }
@@ -248,9 +253,11 @@ export const WingS2: React.FC<WingS2Props> = ({story = {}, staffCoolAt, staffSta
     if (staffCoolAt !== undefined && staffIdx >= 0 && t >= staffCoolAt + staffIdx * staffStagger && !story[w.id]) st = 'cool';
     const x0 = w.x - w.w / 2;
     const y0 = w.y - w.h / 2;
-    sb.rect(CM.limestone, x0 - 6, y0 - 6, w.w + 12, w.h + 14);
+    sb.rect(CM.stoneShade, x0 - 5, y0, 5, w.h);
     windowInto(sb, x0, y0, w.w, w.h, st, `${seed}/story${i}`);
-    sb.rect(CM.limestone, x0 - 10, y0 + w.h, w.w + 20, 8);
+    sb.rect(CM.shadeCool, x0 + w.w * 0.5 - 2, y0, 4, w.h);
+    sb.rect(CM.shadeCool, x0, y0 + w.h * 0.2, w.w, 3);
+    sb.rect(CM.limestone, x0 - 8, y0 + w.h, w.w + 16, 7);
     sfr += poly([[x0, y0], [x0 + w.w, y0], [x0 + w.w, y0 + w.h], [x0, y0 + w.h]], {closed: true, over: 'small', seed: `${seed}/sf${i}`});
   });
   sb.ink(sfr, INK_PX.mid);

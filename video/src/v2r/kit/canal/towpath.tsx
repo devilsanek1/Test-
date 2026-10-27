@@ -114,11 +114,25 @@ export type LampProps = {
   /** A flat lamp pool on the ground once lit (rx px; 0 = none). */
   pool?: number;
   color?: string;
+  /** 'near': a column right in front of the lens whose swan-neck arm leaves the frame (no lantern in frame):
+   *  y = foot (may be below the frame), h = the column top's height above the foot, w = column width. */
+  variant?: 'heritage' | 'near';
+  w?: number;
 };
 
 /** A heritage lamp post: plinth, fluted column, ladder bar, lantern (glass off; lamp-lit on), cap and finial. */
-export const Lamp: React.FC<LampProps> = ({x, y, h, seed, lightAt, on = false, pool = 0, color = CM.anchor}) => {
+export const Lamp: React.FC<LampProps> = ({x, y, h, seed, lightAt, on = false, pool = 0, color = CM.anchor, variant = 'heritage', w: colW}) => {
   const t = useTime();
+  if (variant === 'near') {
+    const b = new Batch();
+    const cw = colW ?? 34;
+    const top = y - h;
+    b.fill(color, `M${P(x - cw * 0.7, y)}L${P(x - cw * 0.5, top + cw * 3)}L${P(x - cw * 0.5, top)}Q${P(x - cw * 0.4, top - cw * 2.6)} ${P(x + cw * 3, top - cw * 2.8)}L${P(1200, top - cw * 2.4)}L${P(1200, top - cw * 1.7)}L${P(x + cw * 3, top - cw * 2.0)}Q${P(x + cw * 0.5, top - cw * 1.8)} ${P(x + cw * 0.5, top)}L${P(x + cw * 0.5, top + cw * 3)}L${P(x + cw * 0.7, y)}Z`);
+    b.rect(CM.coatMustard, x - cw * 0.55, top + h * 0.42, cw * 1.1, cw * 0.3);
+    b.rect(color, x - cw * 0.75, top + h * 0.62, cw * 1.5, cw * 0.5);
+    b.ink(line(x - cw * 0.5, top, x - cw * 0.6, y, {seed: `${seed}/n`, over: 'small'}), INK_PX.front);
+    return <Paint b={b} seed={`nearlamp/${seed}`} />;
+  }
   const lit = lightAt !== undefined ? t >= lightAt && !(t >= lightAt + 1 / 60 && t < lightAt + 3 / 60) : on;
   const w = inkFor(h);
   const b = new Batch();
@@ -251,12 +265,12 @@ export function planterInto(b: Batch, x0: number, x1: number, y: number, h: numb
   const n = Math.round(w / 12);
   for (let i = 0; i < n; i++) {
     const bx = x0 + 8 + ((w - 16) * (i + r.next() * 0.5)) / n;
-    const L = h * r.range(1.2, 2.4);
+    const L = h * r.range(0.5, 1.0);
     const sw = Math.sin(t * 1.3 + i * 0.7) * L * 0.08;
     g += `M${P(bx, y - h)}Q${P(bx + sw * 0.5, y - h - L * 0.5)} ${P(bx + sw + r.jitter(6), y - h - L)}`;
     if (r.chance(0.35)) b.fill(CM.coatOat, leafPath(bx + sw + r.jitter(6), y - h - L, 10, 3, 80));
   }
-  b.ink(g, Math.max(1.4, inkFor(h * 4) * 0.55), CM.line);
+  b.ink(g, Math.max(1.4, inkFor(h * 4) * 0.55), CM.sage);
 }
 
 export const Planter: React.FC<{x0: number; x1: number; y: number; h: number; seed: string}> = ({x0, x1, y, h, seed}) => {
