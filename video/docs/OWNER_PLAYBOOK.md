@@ -10,7 +10,8 @@ short evidence tag (vN, date); a concrete note that teaches something general go
 
 Format: **rule** — why / evidence (video, date).
 
-**Last compacted: 2026-10-27 (fourth pass) · size budget: <= 200 lines** (raised from 150 by the owner, 2026-10-26) (see Maintenance at the end).
+**Last reviewed for coherence: 2026-10-27 (fourth pass) · no size budget: coherent and clear wins over short** (owner,
+2026-10-27; see Maintenance at the end).
 
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
@@ -210,11 +211,13 @@ Format: **rule** — why / evidence (video, date).
 ## Retired rules
 - ~~The owner records the voice in ElevenLabs (we hand over the paste text)~~ → generated through the API with the owner's voice (2026-10-26).
 
-## Maintenance (keep this file short)
-Compact when, at the start of a session, **it has been 7+ days since "Last compacted" and entries were added since**,
-or **the file is over 200 lines**. The orchestrator does it in one pass, with no agents:
-1. Merge duplicate and near-duplicate rules into one; cluster by area; one line per rule, with the evidence shortened to (video, date).
-2. Turn rules that several videos confirmed into short principles; drop wording that only mattered for one video.
-3. Performance log: keep the last ~5 raw lines; fold older ones into a "Trends" paragraph (what the numbers keep saying).
-4. Retired: keep the 10 most recent, one line each; drop older ones (git history keeps them).
-5. Update "Last compacted", then commit "Compact owner playbook".
+## Maintenance (keep this file coherent and clear)
+No size budget (owner, 2026-10-27: "let's not focus on the playbook being a certain size; keep it as coherent and clear as
+we can"). Review it **whenever a note changes the direction** (in the same turn) and at the start of a session if it has
+been 7+ days since "Last reviewed" and entries were added since. The orchestrator:
+1. Integrates: rewrites or retires every rule the new note contradicts, here and in the docs the rules link to, so no two
+   instructions conflict; the newest owner direction wins, and the old rule moves to "Retired" with what replaced it.
+2. Merges duplicate and near-duplicate rules into one, clustered by area, each with its evidence as (video, date).
+3. Turns rules that several videos confirmed into short principles; drops wording that only mattered for one video.
+4. Performance log: keeps the last ~5 raw lines and folds older ones into a "Trends" paragraph.
+5. Updates "Last reviewed", then commits "Review owner playbook".

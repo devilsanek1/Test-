@@ -8,8 +8,8 @@ The video project lives in `video/` (Remotion). Before starting or continuing an
 
 **Whenever the owner gives feedback, capture it in the same turn and commit it, split by scope:** approach-level lessons go to
 `video/docs/OWNER_PLAYBOOK.md` as general rules; notes on one concrete video (picks, lines, takes, shots) go to
-`video/docs/vN/OWNER_NOTES.md`; a concrete note that teaches something general goes to both. Post-publish numbers go in its "Performance log". At session start, compact
-the playbook if its Maintenance trigger fires (7+ days since "Last compacted" with new entries, or over 200 lines; budget raised by the owner, 2026-10-26).
+`video/docs/vN/OWNER_NOTES.md`; a concrete note that teaches something general goes to both. Post-publish numbers go in its "Performance log". Keep the playbook
+COHERENT and CLEAR, with no size budget (owner, 2026-10-27): integrate every note (rewrite or retire what it contradicts), and review it per its Maintenance section.
 
 Top rules (details in the playbook):
 - From the sketch animatic (G3) on, show one playable video per gate, never only stills; before that, text/audio only (no MP4s). Lock the story (sketch animatic) before building; polish last.
