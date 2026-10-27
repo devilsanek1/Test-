@@ -55,7 +55,7 @@ its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = %
 
 **Check** (every join; in brackets ref 1 / v1 / v3 G5b):
 - Shot list (scenes.json `carrier` once the field lands): every join has a carrier letter, at most 2 are F; the thread's
-  screen time summed from it is >= 80 % with no gap over 3 s (the declared scale reveal aside). These two are the FAILs.
+  screen time summed from it is >= 80 % with no gap over 3 s (the declared scale reveal and an owner-approved fairness stretch aside: the 80 % is counted outside them). These two are the FAILs.
 - carry >= 0.25 unless B or D is declared (0.53 / 0.19 / 0.085); eye jump <= 0.10 (0.05 / 0.12 / 0.17); colour shift
   <= 15 unless a light change is declared (10.7 / 11.8 / 24.1); <= 4 movers within 0.4 s of the join, falling weather
   declared aside (2 / 4 / 20). Eye jump and colour shift already flag jumps on a G3 board (v3's board: 0.21 and 35, over
