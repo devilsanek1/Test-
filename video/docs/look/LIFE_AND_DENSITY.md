@@ -9,6 +9,11 @@ motion_spec §5, 6, 9, `look/research/density_numbers.md`. Worked example: `docs
 the bar is the owner's cozy references (a street seen from a balcony, a riverside: `COZY_AND_SCALE.md` 3b), the fullest and
 the calmest we have measured: fullness first, motion second (§0).
 
+**Density respects the attention hierarchy** (owner, v3 G5b, 2026-10-27: "too busy ... too many moving parts and I'm not
+sure what to keep my attention on"): fullness comes from a calm, well-tiered world, never from equal-weight clutter. The
+subject keeps the contrast, the line and the motion; dressing is tier C (no outlines, low contrast, still) and life is tier
+B (small, soft, slow, taking turns), as `CRAFT.md` §b sets them. Every rule below works inside those tiers.
+
 ## 0. Fullness first, motion second (owner's riverside reference, 2026-10-26: "it doesn't feel empty at all")
 - **The world's density and detail make a frame full even when little moves; motion only has to prove the place is
   alive.** The riverside (C3 in `COZY_AND_SCALE.md` 3b) moves the least of all our references (~1 medium event/s, ~1.4 %
@@ -84,11 +89,12 @@ What one frame holds (count it on a still at phone size):
   drawn detail in most 240 px bands (§0), and calm sits only at a frame edge, round the subject or behind the captions,
   never as a slab mid-frame (§0; `COZY_AND_SCALE.md` 3b.3: busy edges and far side, calm centre or floor).
 - **Hierarchy keeps the read.** The subject keeps the strongest value contrast, the hero colour and a calm ring (30-60 px
-  of one value) round its silhouette; dressing sits one value step off its ground, ink by depth (front 4.8, mid 3.4,
-  far 2.2, far planes fill only). The sound-off cold read must still pass at phone size.
+  of one value) round its silhouette; dressing sits one value step off its ground, its line and contrast set by its tier,
+  never by depth (`CRAFT.md` §b-c: no outlines on dressing, far planes fill only). The sound-off cold read must still pass
+  at phone size.
 - **Specific, varied, cut by the edges.** A pharmacy cross, a cart sign, a clock, never a generic block. Repeats vary
   (4-5 building types, books of 5+ widths, a different hat on each head). At least 2 elements cut by a frame edge in
-  every shot; structural ink overshoots; the world goes on past the frame.
+  every shot; the world goes on past the frame.
 - **Colour jobs survive density.** Dressing never takes the hero colour or the pop (a shop's other laptops are boxes or
   neutral); it lives in the palette's room and outside families.
 
@@ -115,7 +121,9 @@ What one frame holds (count it on a still at phone size):
   ~y 1380-1560), 3-6 across, shoulders nearly touching, looking at the subject (on inserts and wall shots this row IS the
   density). B, passers-by cut by a side edge: 500-1000 px tall, as framing. C, mid walkers: 110-260 px tall (backpacks,
   bags, phones, a dog). D, far crowd: 15-60 px, fill only, rows x0.85 toward the horizon. E, window and balcony
-  people: 12-40 px silhouettes in lit windows, moving.
+  people: 12-40 px silhouettes in lit windows, moving. A and B are framing in tier B (`CRAFT.md` §b): still or breathing
+  (<= 2 %W/s) while the subject acts; a film with a "you" figure has no strangers in the foreground (they read as you:
+  `CRAFT.md` §a).
 - **They do things:** walk, carry, point, raise a phone, shovel, lean in, bob 2-3 px; on the voice's key word heads turn
   or a phone goes up, 0.1-0.3 s after the cause.
 - **Rest counts; cozy life passes through.** In a wide about half the people are at rest (sitting on an edge, leaning,
@@ -126,16 +134,21 @@ What one frame holds (count it on a still at phone size):
 ## 5. The recurring living character
 - **One, in every shot** (reference 1: the cat and the sun; v1: Pip and the sun). Default: the channel's mascot **Pip**
   (`src/lib/mascot`, `docs/mascot.md`) in a colourway for the video's palette that stays its own hue (ΔE76 >= 20 from
-  every ground it sits on, never the hero or the pop colour). A non-character anchor may join it (the sun by day, snow).
+  every ground it sits on, never the hero or the pop colour) and in tier B (`CRAFT.md` §b: C* <= 25, a tinted outline)
+  unless the line is about it. A non-character anchor may join it (the sun by day, snow).
 - **Jobs:** (1) perch on or beside the subject and watch it (sit-back, right or middle third); (2) point the eye: its
   head turns to the next subject a few frames before the voice names it; (3) react on a stressed word (ear flick, hop,
   trunk-up, ears-cover, shrug): one big reaction per shot at most, never on the subject's own beat; (4) idle always
-  (blink, ears, tail, breath); (5) carry continuity: it goes where the story goes, and from G6 it hops in across cuts
-  and the loop; (6) sleep or wait in the calm beat.
-- **Size:** 86-130 px in wides and mediums, 1.8-2x in close-ups, a simple silhouette (>= 40 px) beside a tiny figure in
-  a scale wide (where it becomes a scale anchor). Never in the caption band or the right rail, never over the subject.
+  (blink, ears, tail, breath; only blinks and ear moves while the subject moves); (5) carry continuity: it goes where
+  the story goes, and from G6 it hops in across cuts and the loop; (6) sleep or wait in the calm beat.
+- **Size:** 86-130 px in wides and mediums, no bigger in close-ups (at most 1 % of the frame unless the line is about it),
+  a simple silhouette (>= 40 px) beside a tiny figure in a scale wide (where it becomes a scale anchor). Never in the
+  caption band or the right rail, never over the subject.
 
 ## 6. The idle layer and secondary motion (never a still frame)
+- **All idle life is tier B or C** (`CRAFT.md` §b): at most 3-4 supporting movers at a time, together <= 30 % of the
+  motion, taking turns (~0.6 entries/s) and out of the 0.4 s around a join, so the subject keeps >= 60 % of the motion in
+  its beat. A BUSY shot's cadence comes from the story building to the words (as in reference 1), never from more movers.
 - **Profile first (§0).** BUSY shots run the full idle layer and cadence below. DENSE-CALM (cozy) holds run on a steady lane
   (1-5 movers, never zero: `COZY_AND_SCALE.md` 3b.4) and a locked or floating camera (3b.5), and keep at least ONE quiet
   ambient element on (the playbook's "ambient life that never stops"): slow weather or a slow cloud, steam, a window
@@ -155,11 +168,12 @@ What one frame holds (count it on a still at phone size):
   drawings/s); no opacity fades; deterministic (`rng`, seeds).
 
 ## 7. Information in the world (never a card on a blank wall)
-- A chart, number or quote lives on a real object in a real place, with people looking at it: a paper on a noticeboard on
+- A chart, number or quote lives on a real object in the place the story is already in (the home place or the sequence's
+  place, never a new location made for it: `CRAFT.md` §a), with people looking at it: a paper on a noticeboard on
   a street wall (ref 9.0), an ATM receipt (ref 22.0), posters on a board (ref 25.8), a paper pinned to a street board
   with more on a wire (v1 23.0), a rooftop billboard (v1 30.0), an A-frame sign (v1 44.0), a price board, a shop window,
-  a phone in a hand. Around it: the place (wall, cornice, door, lamp, window corner, ground), a row of backs, the
-  character on or under it.
+  a phone in a hand. Around it: the place (wall, cornice, door, lamp, window corner, ground), a row of backs (tier B),
+  the character on or under it.
 - The information stays straight-on, level and big (charts are never angled); the world goes round it. A matched
   insert (the same chart frame twice) keeps the same dressing; the audience's reaction carries the change.
 
@@ -213,4 +227,6 @@ The owner approved v3's G5b density pilot as the level to hit (2026-10-27, "go a
 `deliverables/v3/v3_g5b_pilot.mp4`, O1 (the dressed nook: photos on a cord, string lights, star, calendar, desk clutter,
 Pip, the snowy town with lit windows, a shoveller, sliding snow, a car) and S4 (the chart in a glass noticeboard on the
 computer shop's street wall, a row of winter backs, a phone flash, Pip on the rail). Measured: O1 flat 18 %, detail 50 %,
-7.9 ev/s; S4 flat 24 %, detail 56 %, 6.5 ev/s. Judge new sets beside these frames and the references.
+7.9 ev/s; S4 flat 24 %, detail 56 %, 6.5 ev/s. Judge new sets beside these frames and the references. The pilot shows how
+FULL a world can be, never how much may move or how it is drawn: the full G5b cut was judged too busy, incoherent and rough
+(2026-10-27; `CRAFT.md`).

@@ -1,5 +1,7 @@
 # Production pipeline v2 (for video 2 onwards)
 
+> **Proposal pending (v3 retro, 2026-10-27):** gate changes for G0.5-G6 (a through-line card, a world bible, a designed G3, a G4 look clip) in `docs/retro/2026-10-27_v3_retro.md` §5; this file runs as written until the owner approves them.
+
 Why: on video 1 the owner first saw a playable film **18.7 h** in. Before that there were only stills, so they could not
 steer. Story problems (S08's peak, S10's readability, the weak hook) surfaced during polish, where every change costs
 a full scene round. Background research: `docs/PIPELINE_RESEARCH.md`.

@@ -4,6 +4,12 @@ Owner, v3 G3: "the sketch is making it confusing ... very simple, avoid colours 
 `board` mode and the brief for storyboard agents (evidence: `research/storyboard_{feature,series,craft}.md`). **VERIFIED** = primary page or
 sources agree; **REPORTED** = one secondary source or search summary; numbers without a source are our own choices for a 1080 x 1920 phone frame.
 
+**The film's craft target is `CRAFT.md`** (owner, 2026-10-27: one flowing story, one focus at a time, a clean line, gentle
+light): the board plans for it in grey (what carries each join, each beat's one subject, where the light comes from) and
+keeps its own sketch pen, never the film's. The board-side changes (tiers drawn as grey weights, a carrier for every join
+instead of "cut by default" and §7's "size or angle changes at every cut") are proposed in `docs/retro/2026-10-27_v3_retro.md`
+§5 and wait for the owner.
+
 ## 0. The principle (owner, 2026-10-26): signal per drawing
 A board exists to give the director (the owner) the most signal about the final film in the least drawing and review
 time. Draw at thumbnail level, make the intent explicit (one action, the framing, the shot type, cozy/scale, all stated

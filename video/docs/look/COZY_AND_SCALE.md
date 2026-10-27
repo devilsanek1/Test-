@@ -248,9 +248,11 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
 - **Good-weather light, one sun:** lit tones lean yellow-gold; lit : shade on buildings ~3:1 (C3); shadows short (<= 3-4 % W
   past the object, C2) and soft in value and edge: flat, or a 2-step band with a lighter 15-25 px penumbra (C2's soft edge,
   25 px at 1080), never a blur or a gradient.
-- **Shadows are colour, never grey:** dL* -25 to -40, chroma x0.6-0.7, hue turned away from yellow: 10-15° toward blue on a
-  cool surface (C2), toward plum on warm walls (C3: orange to plum), a deep red-brown under eaves (L* ~29); cast shadows on
-  the ground take the darker tone of the cool field. On a warm palette: red-brown and plum, never grey or olive.
+- **Shadows are colour, never grey:** the references measure dL* -25 to -40 at chroma x0.6-0.7, too hard for our pale
+  palettes, so depth and chroma come from `CRAFT.md` §d (form dL* -7 to -12, chroma kept >= 0.95x). Their hue turns away
+  from yellow: 10-15° toward blue on a cool surface (C2), toward plum on warm walls (C3: orange to plum), a deep red-brown
+  under eaves (L* ~29); cast shadows on the ground take the darker tone of the cool field. On a warm palette: red-brown and
+  plum, never grey or olive.
 - **Tinted extremes, both rare:** whites carry the scene's tint (C 7-15: a cream on a warm set, pale cyan on water); pure
   white only as glints (<= 5 % of one object); darks warm and rare (L* < 25 on <= 6 % of the frame) in the palette's anchor
   (red-brown, aubergine). The references' olive darks and lines are NOT copied (playbook: "Warm, never sickly").
@@ -266,8 +268,9 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
 - **Locked to the world, never boiling** (both references: no boil, no crawl you can see).
 - **Must read full with texture OFF:** C3 flattened to 24 flat colours still reads full and cozy (flat 18 %, detail 37 %);
   texture is worth the last ~5-15 points of flat share, never the fix for an empty set.
-- **Lines:** no outlines; thin warm-dark lines (~2.5-3 px at 1080) only in key places (poles, wires, tyres, rails,
-  mullions; C2 ~1.6 % of the pixels, C3 3.8 %: examples, never a quota); light lines too (railings, lane marks).
+- **Lines:** no outlines; thin warm-dark lines only in key places (poles, wires, tyres, rails, mullions; C2 ~1.6 % of the
+  pixels, C3 3.8 %: examples, never a quota); light lines too (railings, lane marks). Weight and contrast go by attention
+  tier (`CRAFT.md` §c wins over the references' ~2.5-3 px: environment lines are hairlines within dL* 15 of their ground).
 - **Paper edges:** both references edge all four sides; we never put one at the top or beside the caption band. If used:
   the bottom and the sides from y >= 640 (fading in), inset 12-40 px, ragged (peak-to-peak 20-45 px), a dry-brush zone of
   10-40 px, the surround a dark warm tint (anchor family, L* 15-35), never grey, white paper or a photo. At the top, the lid

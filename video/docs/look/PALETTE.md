@@ -54,7 +54,8 @@ every palette against the DNA below.
 - **Background:** soft and light (L* >= 75, C <= 20), never saturated or dark. It fills 50-80 % of the frame.
 - **Mids:** soft, from our clay family (cream, peach, sand, tan, sage) or the palette's own tints. Background props can
   be single-colour line drawings.
-- **Ink:** dark and warm (L* <= 25), never pure black, for lines and captions. At least 7:1 contrast on the background.
+- **Ink:** dark and warm (L* <= 25), never pure black, for captions and the darkest lines; drawn lines take their colour by
+  attention tier (`CRAFT.md` §c: the subject's in its own shade). At least 7:1 contrast on the background.
 - **The references' trick, used tactically:**
   - **one hero** (C >= 30): saturated, on the subject or the story's object, 5-15 % of the frame;
   - **one dark anchor** (L* <= 40): tinted, instead of black, about 5 %;
