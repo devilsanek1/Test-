@@ -66,3 +66,5 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-27, G5b density pilot (`deliverables/v3/v3_g5b_pilot.mp4`: O1 nook dressed + Pip + window town life; S4/S6 chart in
   the shop's street noticeboard with a row of backs): "go ahead yes". -> the pilot is the density bar; roll out to the other
   panels (S5, S7-S14, S16), then G6 polish.
+- 2026-10-27, G5b (`deliverables/v3/v3_g5b.mp4`): "Okay let's post this, give me the cover page and the text". -> shipped at
+  G5b (no G6 polish, no music bed): posting master `v3_final.mp4` (no draft label, -14 LUFS, TV range), cover, `POSTING.md`.

@@ -28,19 +28,25 @@ export const CITY = {
   castle: {x: 566, base: 786},
 };
 
-type Tone = {faces: [string, number][]; shade: string; roofs: string[]; tree: string; tree2: string; blossom: string};
+type Tone = {faces: [string, number][]; shade: string; shadeDeep: string; roofs: [string, number][]; tree: string; tree2: string; blossom: string; windows: boolean};
 
 const BACK: Tone = {
   faces: [
     [FAR.backLit, 5],
     [FAR.backStone, 3],
-    [FAR.backShade, 1],
   ],
   shade: FAR.backShade,
-  roofs: [FAR.backRoof, FAR.backSlate, FAR.backLit, FAR.backTree],
+  shadeDeep: FAR.backSlate,
+  roofs: [
+    [FAR.backRoof, 3],
+    [FAR.backSlate, 3],
+    [FAR.backShade, 2],
+    [FAR.backTree, 1],
+  ],
   tree: FAR.backTree,
   tree2: FAR.backTree,
   blossom: FAR.backRoof,
+  windows: false,
 };
 const FRONT: Tone = {
   faces: [
@@ -49,120 +55,150 @@ const FRONT: Tone = {
     [FAR.warm, 3],
   ],
   shade: FAR.shade,
-  roofs: [FAR.roofPink, FAR.roofSlate, FAR.roofCopper, FAR.roofLit],
+  shadeDeep: FAR.shadeDeep,
+  roofs: [
+    [FAR.roofSlate, 4],
+    [FAR.roofPink, 3],
+    [FAR.roofCopper, 2],
+    [FAR.roofBrick, 1.2],
+    [FAR.roofLit, 1.5],
+  ],
   tree: FAR.tree,
   tree2: FAR.treeDark,
   blossom: FAR.blossom,
+  windows: true,
 };
 
 type Kind = 'block' | 'gable' | 'hip' | 'tower' | 'long' | 'trees';
+type R = ReturnType<typeof rng>;
 
-/** One far building (2-4 flat shapes: a face, its shade side on the left (the sun is to the right), a roof). */
-function building(B: Batch, kind: Kind, x: number, base: number, w: number, h: number, tone: Tone, face: string, roof: string, r: ReturnType<typeof rng>): {roofY: number} {
-  const sh = Math.max(1, w * r.range(0.22, 0.34));
+/** A row of window dots across a facade (front rows only; 1.4 px dots on a ~4 px period, a third of them dark). */
+function windows(B: Batch, x: number, w: number, y: number, tone: Tone, r: R) {
+  for (let wx = x + Math.max(1.6, w * 0.3) + 1; wx < x + w - 1.8; wx += r.range(3.4, 4.4)) if (r.chance(0.72)) B.rect(tone.shadeDeep, wx, y, 1.4, 1.5);
+}
+
+/** One far building (3-5 flat shapes: a face, its shade side on the left (the sun is to the right), a roof band). */
+function building(B: Batch, kind: Kind, x: number, base: number, w: number, h: number, tone: Tone, face: string, roof: string, r: R): {roofY: number} {
+  const sh = Math.max(1.1, w * r.range(0.24, 0.34));
   switch (kind) {
     case 'gable': {
+      const eave = base - h * 0.66;
+      B.rect(face, x, eave, w, base - eave);
+      B.rect(tone.shade, x, eave, sh, base - eave);
+      B.poly(roof, [
+        [x - 0.7, eave + 0.5],
+        [x + w * 0.5, base - h],
+        [x + w + 0.7, eave + 0.5],
+      ]);
+      if (tone.windows && base - eave > 6) windows(B, x, w, eave + 2.4, tone, r);
+      return {roofY: base - h};
+    }
+    case 'hip': {
       const eave = base - h * 0.7;
       B.rect(face, x, eave, w, base - eave);
       B.rect(tone.shade, x, eave, sh, base - eave);
       B.poly(roof, [
-        [x - 0.6, eave + 0.4],
-        [x + w * 0.5, base - h],
-        [x + w + 0.6, eave + 0.4],
-      ]);
-      return {roofY: base - h};
-    }
-    case 'hip': {
-      const eave = base - h * 0.74;
-      B.rect(face, x, eave, w, base - eave);
-      B.rect(tone.shade, x, eave, sh, base - eave);
-      B.poly(roof, [
-        [x - 0.4, eave + 0.3],
+        [x - 0.5, eave + 0.4],
         [x + w * 0.16, base - h],
         [x + w * 0.84, base - h],
-        [x + w + 0.4, eave + 0.3],
+        [x + w + 0.5, eave + 0.4],
       ]);
+      if (tone.windows && base - eave > 6) windows(B, x, w, eave + 2.4, tone, r);
       return {roofY: base - h};
     }
     case 'tower': {
       B.rect(face, x, base - h, w, h);
       B.rect(tone.shade, x, base - h, sh, h);
-      // a column of windows as one darker strip (no ink on far planes)
-      if (w > 5) B.rect(tone.shade, x + w * 0.55, base - h + 2, Math.max(0.8, w * 0.14), h - 3);
-      B.rect(roof, x - 0.3, base - h - 1.2, w + 0.6, 1.6);
-      return {roofY: base - h - 1.2};
+      if (w > 4.5) for (let wy = base - h + 3; wy < base - 3; wy += 3.6) B.rect(tone.shadeDeep, x + w * 0.5, wy, Math.max(1, w * 0.18), 1.6);
+      B.rect(roof, x - 0.4, base - h - 2, w + 0.8, 2.2);
+      return {roofY: base - h - 2};
     }
     case 'long': {
       // a long federal block: a colonnade band in shade under a flat roof slab
       B.rect(face, x, base - h, w, h);
-      B.rect(tone.shade, x + w * 0.04, base - h * 0.62, w * 0.92, h * 0.34);
+      B.rect(tone.shade, x + w * 0.04, base - h * 0.64, w * 0.92, h * 0.36);
+      for (let cx = x + w * 0.07; cx < x + w * 0.95; cx += 2.6) B.rect(face, cx, base - h * 0.64, 1, h * 0.36);
       B.rect(tone.shade, x, base - h, sh * 0.7, h);
-      B.rect(roof, x - 0.5, base - h - 1.6, w + 1, 2);
-      return {roofY: base - h - 1.6};
+      B.rect(roof, x - 0.6, base - h - 2.2, w + 1.2, 2.6);
+      return {roofY: base - h - 2.2};
     }
     case 'trees': {
       const n = Math.max(1, Math.round(w / 6));
       for (let i = 0; i < n; i++) {
         const cx = x + ((i + 0.5) * w) / n + r.jitter(1);
         const rr = r.range(3, 5.5) * Math.min(1.4, h / 10);
-        B.fill(r.chance(0.3) ? tone.blossom : r.chance(0.5) ? tone.tree : tone.tree2, crownD(cx, base - rr * 0.85, rr, rr * 0.82, `t${x.toFixed(1)}/${i}`, 5, 0.5));
+        B.fill(r.chance(0.28) ? tone.blossom : r.chance(0.5) ? tone.tree : tone.tree2, crownD(cx, base - rr * 0.85, rr, rr * 0.82, `t${x.toFixed(1)}/${i}`, 5, 0.5));
       }
       return {roofY: base - h};
     }
     default: {
       B.rect(face, x, base - h, w, h);
       B.rect(tone.shade, x, base - h, sh, h);
-      B.rect(roof, x - 0.3, base - h - 1, w + 0.6, 1.5);
-      return {roofY: base - h - 1};
+      const rh = r.range(1.6, 2.8);
+      B.rect(roof, x - 0.4, base - h - rh * 0.5, w + 0.8, rh);
+      if (tone.windows && h > 8) {
+        windows(B, x, w, base - h + rh + 1.6, tone, r);
+        if (h > 13) windows(B, x, w, base - h + rh + 5.6, tone, r);
+      }
+      return {roofY: base - h - rh * 0.5};
     }
   }
 }
 
 /** A tick on a roof (every 3-4 roofs): a chimney, a cupola, a spire or a tree in front. */
-function tick(B: Batch, x: number, w: number, roofY: number, base: number, tone: Tone, r: ReturnType<typeof rng>) {
+function tick(B: Batch, x: number, w: number, roofY: number, base: number, tone: Tone, r: R) {
   const k = r.pick(['chimney', 'chimney', 'cupola', 'spire', 'tree', 'tree'] as const);
   const cx = x + w * r.range(0.3, 0.75);
-  if (k === 'chimney') B.rect(tone.shade, cx, roofY - r.range(2.2, 3.6), r.range(1.4, 2.2), r.range(2.6, 4));
+  if (k === 'chimney') B.rect(tone.shadeDeep, cx, roofY - r.range(2.4, 3.8), r.range(1.4, 2.2), r.range(2.8, 4.2));
   else if (k === 'cupola') {
-    const rr = r.range(1.6, 2.6);
-    B.rect(tone.roofs[0] === FAR.backRoof ? FAR.backLit : FAR.lit, cx - rr, roofY - rr * 0.9, rr * 2, rr * 0.9 + 0.4);
-    B.poly(tone.roofs[2] ?? tone.shade, [
+    const rr = r.range(1.7, 2.7);
+    B.rect(tone.faces[0][0], cx - rr, roofY - rr * 0.9, rr * 2, rr * 0.9 + 0.4);
+    B.poly(tone.roofs[2][0], [
       [cx - rr, roofY - rr * 0.85],
       [cx - rr * 0.5, roofY - rr * 1.9],
       [cx + rr * 0.5, roofY - rr * 1.9],
       [cx + rr, roofY - rr * 0.85],
     ]);
   } else if (k === 'spire') {
-    B.poly(tone.shade, [
-      [cx - 1.1, roofY + 0.5],
-      [cx, roofY - r.range(5, 8)],
-      [cx + 1.1, roofY + 0.5],
+    B.poly(tone.shadeDeep, [
+      [cx - 1.2, roofY + 0.5],
+      [cx, roofY - r.range(5, 9)],
+      [cx + 1.2, roofY + 0.5],
     ]);
   } else {
     const rr = r.range(2.6, 4.2);
-    B.fill(r.chance(0.35) ? tone.blossom : tone.tree, crownD(cx, base - rr * 0.7, rr, rr * 0.85, `tk${cx.toFixed(1)}`, 5, 0.45));
+    B.fill(r.chance(0.3) ? tone.blossom : tone.tree, crownD(cx, base - rr * 0.7, rr, rr * 0.85, `tk${cx.toFixed(1)}`, 5, 0.45));
+  }
+}
+
+/** A line of street trees along a row's base (separates the rows: the eye reads them as stacked streets). */
+function streetTrees(B: Batch, y: number, tone: Tone, r: R, skip?: (x: number) => boolean) {
+  for (let x = CITY.x0 + r.range(0, 8); x < CITY.x1; x += r.range(5, 12)) {
+    if (r.chance(0.3) || (skip && skip(x))) continue;
+    const rr = r.range(2.4, 3.8);
+    B.fill(r.chance(0.25) ? tone.blossom : r.chance(0.6) ? tone.tree : tone.tree2, crownD(x, y - rr * 0.6, rr, rr * 0.8, `st${y}/${x.toFixed(1)}`, 5, 0.45));
   }
 }
 
 const KINDS_BACK: [Kind, number][] = [
-  ['block', 5],
+  ['block', 6],
   ['gable', 3],
   ['hip', 2],
-  ['tower', 1],
-  ['trees', 2],
+  ['tower', 1.2],
+  ['trees', 1.6],
 ];
 const KINDS_FRONT: [Kind, number][] = [
   ['block', 5],
   ['gable', 3],
   ['hip', 3],
-  ['long', 1.4],
-  ['tower', 0.7],
-  ['trees', 2.2],
+  ['long', 1.2],
+  ['tower', 0.8],
+  ['trees', 1.6],
 ];
 
 /** Row spec: [base, width range, height range, tone, tick period]. Back rows smaller and denser (the detail peak). */
 const ROWSPEC: {base: number; w: [number, number]; h: [number, number]; tone: Tone; tickEvery: number}[] = [
-  {base: CITY.rows[0], w: [4.5, 8], h: [6, 11], tone: BACK, tickEvery: 3},
+  {base: CITY.rows[0], w: [4, 7.5], h: [6, 11], tone: BACK, tickEvery: 3},
   {base: CITY.rows[1], w: [5, 9], h: [8, 13], tone: BACK, tickEvery: 3},
   {base: CITY.rows[2], w: [6, 11], h: [10, 15], tone: FRONT, tickEvery: 3},
   {base: CITY.rows[3], w: [7, 13], h: [11, 17], tone: FRONT, tickEvery: 4},
@@ -179,7 +215,7 @@ function cityRow(B: Batch, i: number, seed: string, skip?: (x: number, w: number
   let x = CITY.x0 + r.range(0, 10);
   let run = 0;
   let kind: Kind = 'block';
-  let roof = spec.tone.roofs[0];
+  let roof = spec.tone.roofs[0][0];
   let face = spec.tone.faces[0][0];
   let baseW = (spec.w[0] + spec.w[1]) / 2;
   let n = 0;
@@ -187,13 +223,13 @@ function cityRow(B: Batch, i: number, seed: string, skip?: (x: number, w: number
     if (run <= 0) {
       run = r.int(4, 6);
       kind = r.weighted(kinds);
-      roof = r.pick(spec.tone.roofs);
+      roof = r.weighted(spec.tone.roofs);
       face = r.weighted(spec.tone.faces);
       baseW = r.range(spec.w[0], spec.w[1]);
     }
     run--;
     const w = baseW * r.range(0.85, 1.15) * (kind === 'long' ? 2.6 : kind === 'tower' ? 0.7 : 1);
-    const h = r.range(spec.h[0], spec.h[1]) * (kind === 'tower' ? 1.55 : kind === 'long' ? 0.8 : 1);
+    const h = r.range(spec.h[0], spec.h[1]) * (kind === 'tower' ? 1.6 : kind === 'long' ? 0.8 : 1);
     if (!skip || !skip(x, w)) {
       const f = r.chance(0.18) ? r.weighted(spec.tone.faces) : face;
       const {roofY} = building(B, kind, x, spec.base + r.range(-0.8, 0.8), w, h, spec.tone, f, roof, r);
@@ -266,7 +302,7 @@ export const FarCityS5: React.FC<{seed?: string; obelisk?: React.ReactNode}> = (
       const y = CITY.mall.y - 7;
       for (let x = CITY.mall.x0 + 40; x < CITY.mall.x1 - 30; x += r.range(46, 70)) {
         if (Math.abs(x - CITY.obelisk.x) < 50 || Math.abs(x - CITY.castle.x) < 34) continue;
-        building(B, 'long', x, y, r.range(26, 40), r.range(9, 12), FRONT, r.pick([FAR.lit, FAR.stone, FAR.warm]), r.pick([FAR.roofSlate, FAR.roofCopper, FAR.roofLit]), r);
+        building(B, 'long', x, y, r.range(26, 40), r.range(9, 12), FRONT, r.pick([FAR.lit, FAR.stone, FAR.warm]), r.pick([FAR.roofSlate, FAR.roofCopper, FAR.roofSlate]), r);
       }
       // the castle: red sandstone, towers and turrets
       const {x: cx, base} = CITY.castle;
@@ -283,7 +319,11 @@ export const FarCityS5: React.FC<{seed?: string; obelisk?: React.ReactNode}> = (
       B.rect(FAR.brickShade, cx + 13, base - 16, 3, 5);
     }
     B.layer();
+    streetTrees(B, CITY.rows[2] + 1.5, FRONT, rng(`${seed}/st2`), (x) => Math.abs(x - CITY.obelisk.x) < 20);
+    B.layer();
     cityRow(B, 3, seed, (x, w) => (x + w > CITY.castle.x - 20 && x < CITY.castle.x + 20) || (x + w > CITY.obelisk.x - 18 && x < CITY.obelisk.x + 18));
+    B.layer();
+    streetTrees(B, CITY.rows[3] + 1.5, FRONT, rng(`${seed}/st3`), (x) => Math.abs(x - CITY.obelisk.x) < 20);
     const backB = B;
     // in front of the obelisk: the Mall's lawn strip + two tree rows, then the two front rows
     const F = new Batch();
@@ -307,6 +347,8 @@ export const FarCityS5: React.FC<{seed?: string; obelisk?: React.ReactNode}> = (
     }
     F.layer();
     cityRow(F, 4, seed, (x, w) => x + w > CITY.obelisk.x - 30 && x < CITY.obelisk.x + 30);
+    F.layer();
+    streetTrees(F, CITY.rows[4] + 1.5, FRONT, rng(`${seed}/st4`));
     F.layer();
     cityRow(F, 5, seed);
     return [backB, F];

@@ -2,6 +2,8 @@
 // The palette module is imported FIRST, so the Autumn Ember tokens are in place before any lib / kit module reads
 // them. Compositions (1080 x 1920, 60 fps):
 //   Film3         the whole film, ceil(41.15 * 60) = 2469 frames, voice + sound cues + captions + draft label
+//   Film3Final    the posting master: Film3 without the draft label
+//   Cover3        the cover: a film frame without captions + the core line as the title (--frame=<f>)
 //   Film3Shot     props {id}: one panel alone (its captions and its slice of the voice), composition time = panel time
 //   Film3-<ID>    the same per panel without props (sheet.sh's caption check passes its own --props)
 // Render: npx remotion render src/entry-v3-film.tsx Film3 out/v3_g5.mp4 --scale=0.5
@@ -9,7 +11,8 @@
 import './v3/film/palette';
 import React from 'react';
 import {Composition, registerRoot} from 'remotion';
-import {Film3, Film3Shot, FILM3_FPS, film3Frames, film3Scenes} from './v3/film/Film3';
+import {Cover3} from './v3/film/Cover3';
+import {Film3, Film3Final, Film3Shot, FILM3_FPS, film3Frames, film3Scenes} from './v3/film/Film3';
 
 const W = 1080;
 const H = 1920;
@@ -22,6 +25,8 @@ const ShotById: React.FC<{id: string}> = ({id}) => <Film3Shot id={id} />;
 const V3FilmRoot: React.FC = () => (
   <>
     <Composition id="Film3" component={Film3} durationInFrames={film3Frames()} fps={FILM3_FPS} width={W} height={H} />
+    <Composition id="Film3Final" component={Film3Final} durationInFrames={film3Frames()} fps={FILM3_FPS} width={W} height={H} />
+    <Composition id="Cover3" component={Cover3} durationInFrames={film3Frames()} fps={FILM3_FPS} width={W} height={H} />
     <Composition
       id="Film3Shot"
       component={ShotById}
