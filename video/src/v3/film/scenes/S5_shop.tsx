@@ -503,7 +503,7 @@ const HookBar: React.FC<{popAt: number}> = ({popAt}) => {
 /** The near wall is a slatwall display panel one step darker than the back wall (from just under the caption band,
  *  starting beside your head's ring): its grooves make the empty slot read as an empty display space, and the
  *  display light lands on it (the light is drawn over the panel). */
-export const PANEL = {x: 478, y: 616};
+export const PANEL = {x: 490, y: 616};
 const GROOVE = '#DDAF8F';
 export const S5Panel: React.FC = () => {
   const grooves = useMemo(() => {
