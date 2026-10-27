@@ -19,7 +19,7 @@ import {CM} from '../../palette';
 import {useTime} from '../../../lib/time';
 import {line as skLine} from '../../../lib/sketch';
 import {Batch, Paint, mix, crownD, ellD, lineD, polyD, rng, rand, frac, blossomD, burstScale, smoothClosed, circleD, type Pt} from './core';
-import {BloomCrowns, type CrownSpec} from './bloom';
+import {BloomCrowns, BLOOM_NEAR, type CrownSpec} from './bloom';
 
 // ---------------------------------------------------------------- the deck camera
 
@@ -225,21 +225,32 @@ function paving(B: Batch, seed: string) {
   B.ink(skLine(-1100, yBand, 2200, yBand, {seed: 'band'}), 2.2, TT.ink, 0.25);
 }
 
-/** A clipped box hedge along the bottom edge (cut by it): the near mass under the platform UI, END coords. */
+/** The planted border along the bottom edge (cut by it): a clipped box hedge with blossoming shrubs and tulips on its
+ *  crest, the near dark mass under the platform UI (END coords; off-screen at the start). */
 function hedgeBorder(B: Batch, seed: string) {
   const r = rng(seed);
   B.layer();
-  const top = 1838;
-  const pts: Pt[] = [[110, 2000]];
-  for (let x = 110; x <= 930; x += 22) pts.push([x, top + Math.sin(x * 0.05) * 3 + r.range(-3, 3)]);
-  pts.push([930, 2000]);
+  const top = 1772;
+  const pts: Pt[] = [[90, 2000]];
+  for (let x = 90; x <= 950; x += 22) pts.push([x, top + Math.sin(x * 0.05) * 3 + r.range(-3, 3)]);
+  pts.push([950, 2000]);
   B.poly(TT.hedge, pts);
-  B.rect(TT.hedgeLit, 110, top - 2, 820, 14);
+  B.rect(TT.hedgeLit, 90, top - 2, 860, 14);
   let tufts = '';
-  for (let x = 118; x < 925; x += r.range(14, 26)) tufts += crownD(x, top + r.range(18, 60), r.range(8, 14), r.range(5, 8), `${seed}/t${Math.round(x)}`, 5, 0.3);
+  for (let x = 98; x < 945; x += r.range(14, 26)) tufts += crownD(x, top + r.range(24, 120), r.range(9, 16), r.range(6, 9), `${seed}/t${Math.round(x)}`, 5, 0.3);
   B.fill(TT.hedgeDeep, tufts);
+  // blossoming shrubs rising from the hedge's crest (pink masses), and a run of tulips
+  let shrubs = '';
+  let bl = '';
+  for (let x = 140; x < 920; x += r.range(120, 190)) {
+    const rr = r.range(42, 64);
+    shrubs += crownD(x, top - rr * 0.35, rr, rr * 0.62, `${seed}/sh${Math.round(x)}`, 8, 0.4);
+    for (let k = 0; k < 9; k++) bl += blossomD(x + r.range(-0.8, 0.8) * rr, top - rr * 0.35 + r.range(-0.5, 0.4) * rr * 0.62, r.range(7, 11), `${seed}/b${Math.round(x)}${k}`, 4);
+  }
+  B.fill(BLOOM_NEAR.mid, shrubs);
+  B.fill(TT.petal, bl);
   let tul = '';
-  for (let x = 130; x < 920; x += r.range(18, 30)) tul += ellD(x, top - 8 + r.range(-4, 4), 7, 9);
+  for (let x = 110; x < 940; x += r.range(16, 26)) tul += ellD(x, top - 8 + r.range(-4, 4), 7, 9);
   B.fill(CM.box, tul);
   B.ink(lineD(pts.slice(1, -1)), 4.8, TT.ink, 0.2);
 }
