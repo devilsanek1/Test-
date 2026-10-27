@@ -5,7 +5,15 @@ before G6, instead of review agents). Generic: any entry / composition + its MP4
   python3 -I scripts/qa/gate_check.py --mp4 out/v3_g5.mp4 --scenes src/v3/film/scenes.json \
       --captions src/v3/film/captions.json --voice public/v3/voice.wav \
       [--entry src/entry-v3-film.tsx --comp Film3] [--fps 60] [--only S9] \
-      [--frame0 "AI is making your|next laptop pricier." --frame0-until 3.37] [--density] [--json report.json]
+      [--frame0 "AI is making your|next laptop pricier." --frame0-until 3.37] [--frame0-geom JSON] [--density] [--json report.json]
+
+  v2r (src/v2r/film/Film2R.tsx: FILM2R_FRAME0's numbers):
+  python3 -I scripts/qa/gate_check.py --mp4 out/v2r.mp4 --scenes src/v2r/film/scenes.json \
+      --captions src/v2r/film/captions.json --voice public/v2/voice.wav \
+      --frame0 "SHE SAYS: NO CRITICIZING|GOOGLE. FOR LIFE." --frame0-until 5.95 \
+      --frame0-geom '{"size":72,"baselines":[372,452],"captionBaseline":516,"captionScale":0.531,"spoken":"first",
+                      "keys":["SAYS:","NO CRITICIZING","FOR LIFE."],"source":"Source: BBC News, 21 Oct 2026",
+                      "sourceSize":20,"sourceBaseline":550}'
 
 Checks (FAIL = exit 1; WARN never fails):
   fps        the video stream is --fps (default 60); with --entry/--comp also the composition's own fps and length
@@ -16,13 +24,25 @@ Checks (FAIL = exit 1; WARN never fails):
   cuts       hard cuts detected in the MP4 (frame difference outside the caption band and the draft label strip, a
              local peak well above its neighbourhood) vs the scenes' starts: every scene start must have a detected cut
              within 1 frame (first frame of a scene = ceil(start * fps)). Extra detected cuts are listed as WARN
-             (a big in-shot event looks like a cut).
+             (a big in-shot event looks like a cut). The expected cuts follow each scene's `transitionIn.type`
+             (lib/Film.tsx): cut / matchcut / camera-continuous / unbuild / none = one hard cut at the start c;
+             push-through WITH a `bridge` colour = two cuts, into the flat bridge at c - 0.05 and out of it at
+             c + 0.05 (Film's PT_HOLD 0.1 s), cut-like frames on its zoom legs (c - hold/2 - (dur - hold) * 0.45 ..
+             c + hold/2 + (dur - hold) * 0.55, +-1 frame) are expected (not listed as extra);
+             push-through without a bridge = one cut at c; foreground-wipe = NO hard cut (the element covers the
+             change; its window c +- dur / 2 may hold cut-like frames, a cut within 1 frame of c is a WARN).
   captions   from the JSON, laid out like SkyCaptions (src/lib/Captions.tsx, tokens read from src/lib/theme.ts,
              glyph extents from the caption font): every page's ink and highlight boxes inside the caption band
              (--band, default 290-600) and inside the caption clip (no clipped letters), lines within the safe width
              (x 90-950: the right rail), 1-2 lines per page, ~20 characters per line (WARN), pages in time order.
              --frame0: the frame-0 words (Film `frame0`, lines split by '|') and the spoken pages lowered under them,
-             with Film.tsx's F0 layout.
+             with Film.tsx's F0 layout. --frame0-geom (JSON) overrides that layout with a film's own Frame0Text
+             numbers: size, baselines, captionBaseline, captionScale (as in F0), plus the optional v2r fields:
+             "spoken": "first" (only page 1 under the block: the later pages before the first page change after
+             --frame0-until are never drawn, so they are skipped), "keys": [texts] (the box walks these words: every
+             line holding one gets the highlight box's extents), "highlight" (the box on the last line, as before)
+             and "source" / "sourceSize" / "sourceBaseline" (the source line: inside the band and the safe width,
+             clear of the lowered captions). Without it the result is exactly as before.
   density    (--density, optional) scripts/qa/density.py on the MP4 with the scenes: medium events per second, the
              longest gap, near-static frames, flat share, objects and fine detail per shot vs targets measured on
              reference 1 and v1 (docs/look/research/density_numbers.md). WARN per shot under target; FAIL only when
@@ -184,6 +204,7 @@ def page_layout(b: dict, sky: dict, typ: dict, font: Font) -> list[dict]:
 
 def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
     sky, hb, typ, f0 = tokens()
+    f0 = {**f0, **a.frame0_geom}
     font = Font()
     if not font.ok:
         report("WARN", "captions", "caption font not readable by PIL: widths and glyph extents are estimates")
@@ -196,6 +217,12 @@ def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
     if f0_lines:
         nxt = next((b for b in sorted(caps, key=lambda c: c["s"]) if b["s"] - lead >= a.frame0_until - 1e-6), None)
         lower_until = nxt["s"] - lead if nxt else math.inf
+    # spoken: 'first' (Film.tsx f0HideSpoken): pages 2.. that start before lower_until are never drawn
+    first_only = bool(f0_lines) and f0.get("spoken") == "first"
+    hidden: set[int] = set()
+    if first_only:
+        order = sorted(range(len(caps)), key=lambda j: caps[j]["s"])
+        hidden = {j for j in order[1:] if caps[j]["s"] - lead < lower_until}
     bad = 0
     prev_s = -1.0
     for i, b in enumerate(caps):
@@ -204,6 +231,8 @@ def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
             report("FAIL", "captions", f"{tag} starts before the page before it")
             bad += 1
         prev_s = b["s"]
+        if i in hidden:
+            continue
         if not 1 <= len(b["lines"]) <= 2:
             report("WARN", "captions", f"{tag}: {len(b['lines'])} lines (pages are 1-2 lines)")
         for l in b["lines"]:
@@ -239,11 +268,14 @@ def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
         widest = max(font.width(x, size) for x in f0_lines)
         if widest > sky["maxWidth"]:
             size = math.floor(size * sky["maxWidth"] / widest)
+        # the highlight box: the last line (as before) + every line holding one of the keys' words
+        key_texts = [k["text"] if isinstance(k, dict) else str(k) for k in f0.get("keys", [])]
+        boxed = {len(f0_lines) - 1} | {i for i, x in enumerate(f0_lines) if any(k and k in x for k in key_texts)}
         for i, text in enumerate(f0_lines):
             bl = f0["baselines"][min(i, len(f0["baselines"]) - 1)]
             t, bt = font.ink(text, size)
             top, bot = bl + t, bl + bt
-            if i == len(f0_lines) - 1:
+            if i in boxed:
                 top, bot = min(top, bl - hb["topEm"] * size), max(bot, bl + hb["bottomEm"] * size)
             w = font.width(text, size)
             if top < band[0] - 0.5 or bot > band[1] + 0.5 or sky["cx"] - w / 2 < x_lo or sky["cx"] + w / 2 > x_hi:
@@ -251,19 +283,33 @@ def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
                 bad += 1
         # the frame-0 words must clear the lowered captions under them
         f0_bottom = f0["baselines"][min(len(f0_lines), len(f0["baselines"])) - 1] + hb["bottomEm"] * size
-        low = [b for b in caps if b["s"] - lead < lower_until]
+        low = [b for j, b in enumerate(caps) if b["s"] - lead < lower_until and j not in hidden]
+        src = f0.get("source")
+        src_top = math.inf
+        if src:
+            ss, sbl = float(f0.get("sourceSize", 20)), float(f0.get("sourceBaseline", 550))
+            t, bt = font.ink(src, ss)
+            w = font.width(src, ss)
+            src_top = sbl + t
+            if sbl + t < band[0] - 0.5 or sbl + bt > band[1] + 0.5 or sky["cx"] - w / 2 < x_lo or sky["cx"] + w / 2 > x_hi:
+                report("FAIL", "captions", f"frame-0 source '{src}': y {sbl + t:.0f}-{sbl + bt:.0f}, x {sky['cx'] - w / 2:.0f}-{sky['cx'] + w / 2:.0f} outside the band / safe width")
+                bad += 1
         for b in low:
             for ln in page_layout(b, sky, typ, font):
                 y_top = f0["captionBaseline"] + (ln["baseline"] - hb["topEm"] * ln["size"] - sky["oneLine"]) * f0["captionScale"]
                 if y_top < f0_bottom - 0.5:
                     report("FAIL", "captions", f"lowered page '{ln['text']}' (top y {y_top:.0f}) overlaps the frame-0 words (bottom y {f0_bottom:.0f})")
                     bad += 1
+                y_bot = f0["captionBaseline"] + (ln["baseline"] + hb["bottomEm"] * ln["size"] - sky["oneLine"]) * f0["captionScale"]
+                if y_bot > src_top + 0.5:
+                    report("FAIL", "captions", f"lowered page '{ln['text']}' (bottom y {y_bot:.0f}) overlaps the frame-0 source line (top y {src_top:.0f})")
+                    bad += 1
     end = caps[-1].get("e", caps[-1]["s"]) if caps else 0
     if abs(end - voice_s) > 1 / fps + 1e-6:
         report("FAIL", "captions", f"the last page ends at {end:.3f} s, the voice at {voice_s:.3f} s")
         bad += 1
     if not bad:
-        report("PASS", "captions", f"{len(caps)} pages inside the band {band[0]:.0f}-{band[1]:.0f} and the clip {clip[0]:.0f}-{clip[1]:.0f}, x {x_lo}-{x_hi}" + (f"; frame-0 words + {len([b for b in caps if b['s'] - lead < lower_until])} lowered pages" if f0_lines else ""))
+        report("PASS", "captions", f"{len(caps)} pages inside the band {band[0]:.0f}-{band[1]:.0f} and the clip {clip[0]:.0f}-{clip[1]:.0f}, x {x_lo}-{x_hi}" + (f"; frame-0 words + {len(low)} lowered pages" + (f" ({len(hidden)} hidden under the block)" if hidden else "") + (" + source line" if f0.get("source") else "") if f0_lines else ""))
 
 
 # ---------------------------------------------------------------- density (scripts/qa/density.py)
@@ -290,6 +336,44 @@ def check_density(a, mp4: Path, scenes: list[dict]) -> None:
             report("WARN", "density", f"{r['id']}: " + ", ".join(bad))
 
 
+# ---------------------------------------------------------------- transitions (lib/Film.tsx)
+
+TDUR = {"camera-continuous": 1.4, "foreground-wipe": 0.8, "push-through": 1.1}  # Film.tsx default durations
+PT_HOLD = 0.1  # Film.tsx PT_HOLD: a push-through's flat bridge, c - hold / 2 .. c + hold / 2
+
+
+def film_const(name: str, default: float) -> float:
+    m = re.search(rf"^const {name} = ([\d.]+);", (ROOT / "src/lib/Film.tsx").read_text(), re.M)
+    return float(m.group(1)) if m else default
+
+
+def transition_model(scenes: list[dict], fps: float) -> tuple[list, list, list]:
+    """From each scene's transitionIn: the expected hard cuts [(label, frame)], the windows [(label, f0, f1)] whose
+    cut-like frames belong to a transition (not listed as extra), and the frames that must NOT cut [(label, frame)]."""
+    fr = lambda t: math.ceil(t * fps - 1e-6)  # noqa: E731
+    expect, windows, no_cut = [], [], []
+    hold = film_const("PT_HOLD", PT_HOLD)
+    for s in scenes:
+        c, sid = s["start"], s["id"]
+        tr = s.get("transitionIn") or {"type": "cut"}
+        typ = tr.get("type", "cut")
+        d = float(tr.get("dur", TDUR.get(typ, 0.0)))
+        if typ == "push-through":
+            # Film.tsx pushThrough: the zoom-in leg (d - hold) * 0.45 before the bridge, the pull-back 0.55 after it
+            h = hold if tr.get("bridge") else 0.0
+            if h:
+                expect += [(f"{sid} (into the push-through bridge)", fr(c - h / 2)), (f"{sid} (out of the push-through bridge)", fr(c + h / 2))]
+            else:
+                expect.append((sid, fr(c)))
+            windows.append((sid, fr(c - h / 2 - (d - h) * 0.45) - 1, fr(c + h / 2 + (d - h) * 0.55) + 1))
+        elif typ == "foreground-wipe":
+            no_cut.append((f"{sid} (foreground wipe)", fr(c)))
+            windows.append((sid, fr(c - d / 2) - 1, fr(c + d / 2) + 1))
+        else:
+            expect.append((sid, fr(c)))
+    return expect, windows, no_cut
+
+
 # ---------------------------------------------------------------- main
 
 def main() -> int:
@@ -307,11 +391,18 @@ def main() -> int:
     ap.add_argument("--max-chars", type=int, default=20)
     ap.add_argument("--frame0", help="frame-0 words, lines split by '|'")
     ap.add_argument("--frame0-until", type=float, default=0.0)
+    ap.add_argument("--frame0-geom", default="{}", help="JSON: the film's own Frame0Text layout over Film.tsx's F0, e.g. "
+                    '\'{"size":72,"baselines":[372,452],"captionBaseline":516,"captionScale":0.531,"spoken":"first"}\'')
     ap.add_argument("--cut-min", type=float, default=2.0, help="minimum mean grey difference of a cut (0-255)")
     ap.add_argument("--density", action="store_true", help="also run the density meter (scripts/qa/density.py)")
     ap.add_argument("--json", help="write the results here")
     a = ap.parse_args()
     a.safe_x = tuple(int(x) for x in a.safe_x.split(","))
+    try:
+        a.frame0_geom = json.loads(a.frame0_geom)
+        assert isinstance(a.frame0_geom, dict)
+    except Exception:  # noqa: BLE001
+        ap.error(f"--frame0-geom is not a JSON object: {a.frame0_geom}")
 
     mp4 = Path(a.mp4)
     scenes = sorted(json.loads(Path(a.scenes).read_text()), key=lambda s: s["start"])
@@ -380,7 +471,7 @@ def main() -> int:
         base = float(np.median(neigh)) if len(neigh) else 0.0
         if d[n] >= a.cut_min and d[n] >= 4 * base + 0.5 and d[n] >= d[max(1, n - 1)] and d[n] >= d[min(len(d) - 1, n + 1)]:
             cuts.append(n)
-    expect = [] if a.only else [(s["id"], math.ceil(s["start"] * fps - 1e-6)) for s in scenes[1:]]
+    expect, windows, no_cut = transition_model([] if a.only else scenes[1:], fps)
     miss = []
     used = set()
     for sid, f in expect:
@@ -392,11 +483,20 @@ def main() -> int:
         else:
             near = min(cuts, key=lambda c: abs(c - f)) if cuts else None
             miss.append(f"{sid} (frame {f}, d={d[f] if f < len(d) else float('nan'):.1f}{'' if near is None else f', nearest detected cut {near}'})")
-    extra = [c for c in cuts if c not in used]
+    for sid, f in no_cut:
+        hit = [c for c in cuts if abs(c - f) <= 1]
+        if hit:
+            report("WARN", "cuts", f"{sid}: a hard cut at frame {hit[0]}, but its foreground wipe should cover the change (no cut)")
+    in_tr = [c for c in cuts if c not in used and any(lo <= c <= hi for _, lo, hi in windows)]
+    extra = [c for c in cuts if c not in used and c not in in_tr]
+    trs = f"; {len(no_cut)} foreground wipe(s) without a cut" if no_cut else ""
+    trs += f"; {len(in_tr)} cut-like frame(s) inside transition windows (expected)" if in_tr else ""
     if miss:
         report("FAIL", "cuts", f"{len(miss)} scene start(s) without a cut within 1 frame: " + "; ".join(miss))
     elif expect:
-        report("PASS", "cuts", f"all {len(expect)} cuts at their scene starts (+-1 frame)")
+        report("PASS", "cuts", f"all {len(expect)} cuts at their scene starts (+-1 frame)" + trs)
+    elif no_cut:
+        report("PASS", "cuts", trs.lstrip("; "))
     if extra:
         report("WARN", "cuts", f"{len(extra)} extra cut-like frame(s) inside shots: " + ", ".join(f"{c} ({c / fps:.2f} s, d={d[c]:.1f})" for c in extra[:12]))
 
