@@ -11,7 +11,7 @@ import {useTime} from '../../lib/time';
 import {Batch, Paint, P, Pt, ovalPath, domePath, leafPath, lerp, rng, rand, frac, clamp01} from '../kit/canal/core';
 import {StringLights, FallingLeaves, Puffs, Pigeons} from '../kit/canal/life';
 import {twinkle} from '../../v3/film/kit/idle';
-import {TREE_L_SPEC, TREE_R_SPEC} from './V2S7_set';
+import {TREE_L_SPEC, TREE_R_SPEC, SH_PAVING} from './V2S7_set';
 import {Person, Seated, NearBack, strideFor} from '../kit/cast';
 import {
   LANE, walkerH, kAt, kpAt, seatedH, TREE_L, TREE_R, FESTOON_A, FESTOON_B, JETS, BASIN, basinLeftAt, CAFE, WING, BULB_STEP,
@@ -46,18 +46,39 @@ const WalkerFig: React.FC<{w: Walk; t: number}> = ({w, t}) => {
   if (w.to !== undefined && t > w.to) return null;
   if (x < -120 || x > 1200) return null;
   const step = rate * (Math.floor((t - w.t0) * 12 + 1e-6) / 12) + rand(w.seed, 'ph') * 2;
-  return <Person x={x} y={w.y} h={h} seed={w.seed} pose="walk" view="profile" flip={w.dir > 0} step={step} stride={strideFor(speed / rate, h, 'profile')} traits={w.traits} exact />;
+  return (
+    <>
+      <FootShadow x={x} y={w.y} h={h} />
+      <Person x={x} y={w.y} h={h} seed={w.seed} pose="walk" view="profile" flip={w.dir > 0} step={step} stride={strideFor(speed / rate, h, 'profile')} traits={w.traits} ink={SUPPORT_INK} exact />
+    </>
+  );
 };
 
-/** The forecourt's walkers: lanes A (behind the right plane), B and C (in front of it). The left column too. */
+/** Supporting life stays subtle (OWNER_PLAYBOOK 2026-10-27, attention hierarchy): thin lines on the people. */
+export const SUPPORT_INK = 2.0;
+
+/** A soft short cast shadow at a figure's feet (the sun is screen-left: it falls right, flat, colour, never grey). */
+export const FootShadow: React.FC<{x: number; y: number; h: number; w?: number}> = ({x, y, h, w}) => {
+  const b = new Batch();
+  const half = w ?? h * 0.16;
+  b.fill(SH_PAVING, `M${P(x - half, y)}L${P(x + half, y - h * 0.012)}L${P(x + half + h * 0.24, y + h * 0.03)}L${P(x - half + h * 0.18, y + h * 0.045)}Z`);
+  return <Paint b={b} seed="s7/footShadow" misreg={false} />;
+};
+
+/** The forecourt's walkers, scheduled so 2-4 SEPARATE movers cross sideways at every moment (never three in one spot):
+ *  the left column (left of the board) has its own lanes; right of the board lane B and lane C, the staff on the steps.
+ *  Lane A (behind the right plane) carries the left-column exit only. */
 export const WALKERS_A: Walk[] = [
-  {seed: 's7/w/a2', y: LANE.A, x0: 652, t0: 0.5, dir: 1, from: 0.5, traits: {hair: 'beanie', acc: 'backpack', coat: CM.coatSlate}},
-  {seed: 's7/w/l2', y: LANE.A, x0: 118, t0: 3.7, dir: -1, from: 3.7, traits: {hair: 'long', acc: 'tote', coat: CM.brick}},
+  {seed: 's7/w/l2', y: LANE.A, x0: 118, t0: 3.5, dir: -1, from: 3.5, traits: {hair: 'long', acc: 'tote', coat: CM.brickLight, hairColor: CM.hair[2]}},
 ];
 export const WALKERS_B: Walk[] = [
-  {seed: 's7/w/b1', y: LANE.B, x0: 1062, t0: 0, dir: -1, to: 3.2, traits: {hair: 'short', acc: 'strap', coat: CM.coatOat}},
-  {seed: 's7/w/l1', y: LANE.B, x0: -50, t0: 0, dir: 1, to: 1.5, traits: {hair: 'curls', acc: 'headphones', coat: CM.coatPlum}},
-  {seed: 's7/w/b2', y: LANE.B + 6, x0: 640, t0: 3.1, dir: 1, from: 3.1, hps: 0.7, traits: {hair: 'cap', acc: 'none', coat: CM.sage}},
+  {seed: 's7/w/b1', y: LANE.B, x0: 1062, t0: 0, dir: -1, to: 3.2, traits: {hair: 'short', acc: 'strap', coat: CM.coatOat, hairColor: CM.hair[1]}},
+  {seed: 's7/w/l1', y: LANE.B, x0: -50, t0: 0, dir: 1, to: 1.5, traits: {hair: 'curls', acc: 'headphones', coat: CM.sage, hairColor: CM.hair[3]}},
+  {seed: 's7/w/b2', y: LANE.B + 6, x0: 640, t0: 3.6, dir: 1, from: 3.6, hps: 0.7, traits: {hair: 'cap', acc: 'none', coat: CM.brick, hairColor: CM.hair[1], hatColor: CM.sage}},
+];
+export const WALKERS_C: Walk[] = [
+  {seed: 's7/w/l3', y: LANE.C, x0: -70, t0: 1.7, dir: 1, from: 1.7, to: 3.2, traits: {hair: 'beanie', acc: 'backpack', coat: CM.stoneShade, hairColor: CM.hair[1], hatColor: CM.coatMustard}},
+  {seed: 's7/w/c2', y: LANE.C, x0: 1130, t0: 3.0, dir: -1, from: 3.0, traits: {hair: 'bun', acc: 'scarf', coat: CM.coatMustard, hairColor: CM.hair[2], accColor: CM.sage}},
 ];
 
 export const S7WalkersA: React.FC = () => {
@@ -82,20 +103,28 @@ export const S7WalkersBC: React.FC = () => {
       {WALKERS_B.map((w) => (
         <WalkerFig key={w.seed} w={w} t={t} />
       ))}
+      {WALKERS_C.map((w) => (
+        <WalkerFig key={w.seed} w={w} t={t} />
+      ))}
       {t >= b2.t0 ? <Dog x={xb2 + hb2 * 0.62} y={b2.y + 4} h={kpAt(b2.y) * 0.42} t={t} lead={[xb2 + hb2 * 0.12, b2.y - hb2 * 0.44]} /> : null}
       <Cyclist t={t} />
     </>
   );
 };
 
-/** The cyclist: lane C, left to right, ~2.2 body heights / s, 2.30-3.75 (out from behind the board). */
+/** The cyclist: lane C, left to right, ~2.2 body heights / s, 1.00-2.77 (out from behind the board). */
 const Cyclist: React.FC<{t: number}> = ({t}) => {
-  const t0 = 2.3;
+  const t0 = 1.0;
   if (t < t0) return null;
   const h = walkerH(LANE.C) * 1.02;
   const x = 600 + 2.2 * h * (t - t0);
   if (x > 1220) return null;
-  return <Person x={x} y={LANE.C} h={h} seed="s7/cyclist" pose="cycle" view="profile" flip pedal={1.3} traits={{hair: 'cap', acc: 'backpack', coat: CM.leafRust}} exact />;
+  return (
+    <>
+      <FootShadow x={x} y={LANE.C} h={h} w={h * 0.36} />
+      <Person x={x} y={LANE.C} h={h} seed="s7/cyclist" pose="cycle" view="profile" flip pedal={1.3} traits={{hair: 'cap', acc: 'backpack', coat: CM.leafRust, hairColor: CM.hair[2], hatColor: CM.coatOat}} ink={SUPPORT_INK} exact />
+    </>
+  );
 };
 
 /** A small dog trotting on a lead (a terrier in profile, facing right): body, head, ears, a raised tail, four legs. */
@@ -153,7 +182,7 @@ const DoorClip: React.FC<{children?: React.ReactNode}> = ({children}) => (
 const hStaff = (feet: number) => 1.7 * kAt(Math.max(feet, 1000));
 
 /** Staffer IN: walks up the steps to the doors (a back, walking away), through them 0.92, then left inside the lobby.
- *  Staffer OUT: from inside, out through the doors at ~2.95 and right along the top step (profile). */
+ *  Staffer OUT: from inside, out through the doors at ~3.12 and right along the top step (profile). */
 function staffIn(t: number): {x: number; y: number; h: number; inside: boolean; view: 'back' | 'profile'; flip: boolean} | null {
   if (t < 0 || t > 1.9) return null;
   if (t < 0.92) {
@@ -169,21 +198,24 @@ function staffIn(t: number): {x: number; y: number; h: number; inside: boolean; 
   return {x: lerp(772, 650, u), y: 984, h: hStaff(1000) * 0.95, inside: true, view: 'profile', flip: false};
 }
 function staffOut(t: number): {x: number; y: number; h: number; inside: boolean; view: 'back' | 'profile'; flip: boolean} | null {
-  if (t < 2.44) return null;
-  if (t < 2.96) {
-    const u = (t - 2.44) / 0.52;
+  if (t < 2.6) return null;
+  if (t < 3.12) {
+    const u = (t - 2.6) / 0.52;
     return {x: lerp(724, 792, u), y: lerp(983, 991, u), h: hStaff(1000) * 0.95, inside: true, view: 'profile', flip: true};
   }
-  const u = t - 2.96;
+  const u = t - 3.12;
   const y = lerp(991, 1009, clamp01(u / 0.4));
   return {x: 792 + 112 * u, y, h: hStaff(y), inside: false, view: 'profile', flip: true};
 }
 
 const StaffFig: React.FC<{s: NonNullable<ReturnType<typeof staffIn>>; seed: string; traits: React.ComponentProps<typeof Person>['traits']; t: number}> = ({s, seed, traits, t}) => (
-  <Person x={s.x} y={s.y} h={s.h} seed={seed} pose="walk" view={s.view} flip={s.flip} step={1.8 * (Math.floor(t * 12) / 12)} stride={strideFor(52, s.h, s.view === 'back' ? 'back' : 'profile')} traits={traits} exact />
+  <>
+    {!s.inside ? <FootShadow x={s.x} y={s.y} h={s.h} /> : null}
+    <Person x={s.x} y={s.y} h={s.h} seed={seed} pose="walk" view={s.view} flip={s.flip} step={1.8 * (Math.floor(t * 12) / 12)} stride={strideFor(52, s.h, s.view === 'back' ? 'back' : 'profile')} traits={traits} ink={1.6} exact />
+  </>
 );
-const STAFF_A = {hair: 'bun', acc: 'tote', coat: CM.coatMustard} as const;
-const STAFF_B = {hair: 'short', acc: 'strap', coat: CM.coatSlate} as const;
+const STAFF_A = {hair: 'bun', acc: 'tote', coat: CM.coatMustard, hairColor: CM.hair[2]} as const;
+const STAFF_B = {hair: 'short', acc: 'strap', coat: CM.stoneShade, hairColor: CM.hair[1]} as const;
 
 /** The staff seen through the door glass (the wing's behindDoor slot). */
 export const S7StaffInside: React.FC = () => {
@@ -219,9 +251,9 @@ export const S7StepSitters: React.FC = () => {
   const cup = clamp01((t - 3.3) / 0.5) * (1 - clamp01((t - 4.4) / 0.5));
   return (
     <>
-      <Seated x={918} y={1022} h={h} seed="s7/step/a" phone side={-1} traits={{hair: 'lowBun', acc: 'scarf', coat: CM.box}} />
-      <Seated x={966} y={1023} h={h * 0.96} seed="s7/step/b" cup={cup} traits={{hair: 'crop', acc: 'none', coat: CM.coatPlum}} />
-      <Seated x={1076} y={1022} h={h * 1.02} seed="s7/step/c" read traits={{hair: 'beanie', acc: 'none', coat: CM.coatSlate}} />
+      <Seated x={918} y={1022} h={h} seed="s7/step/a" phone side={-1} ink={1.6} traits={{hair: 'lowBun', acc: 'scarf', coat: CM.box, hairColor: CM.hair[1]}} />
+      <Seated x={966} y={1023} h={h * 0.96} seed="s7/step/b" cup={cup} ink={1.6} traits={{hair: 'crop', acc: 'none', coat: CM.sage, hairColor: CM.hair[4]}} />
+      <Seated x={1076} y={1022} h={h * 1.02} seed="s7/step/c" read ink={1.6} traits={{hair: 'beanie', acc: 'none', coat: CM.coatOat, hatColor: CM.brick}} />
     </>
   );
 };
@@ -236,14 +268,16 @@ export const S7CafeT1People: React.FC = () => {
   const turnB = 0.45 * clamp01((t - 3.6) / 0.4) * (1 - clamp01((t - 4.5) / 0.4));
   return (
     <>
-      <Seated x={c.x} y={c.seat} h={c.h} seed={c.seed} read traits={{hair: 'long', acc: 'none', coat: CM.coatOat, hairColor: CM.hair[4], broad: 0.97}} />
-      <Seated x={a.x} y={a.seat} h={a.h} seed={a.seed} cup={cupA} side={1} traits={{hair: 'curls', acc: 'scarf', coat: CM.brickLight, broad: 0.98}} />
-      <Seated x={b.x} y={b.seat} h={b.h} seed={b.seed} turn={turnB} traits={{hair: 'short', acc: 'backpack', coat: CM.coatMustard, broad: 0.96}} />
+      <Seated x={c.x} y={c.seat} h={c.h} seed={c.seed} read ink={SUPPORT_INK} traits={{hair: 'long', acc: 'none', coat: CM.coatOat, hairColor: CM.hair[4], broad: 0.97}} />
+      <Seated x={a.x} y={a.seat} h={a.h} seed={a.seed} cup={cupA} side={1} ink={SUPPORT_INK} traits={{hair: 'curls', acc: 'scarf', coat: CM.brickLight, hairColor: CM.hair[3], broad: 0.98}} />
+      <Seated x={b.x} y={b.seat} h={b.h} seed={b.seed} turn={turnB} ink={SUPPORT_INK} traits={{hair: 'short', acc: 'backpack', coat: CM.coatMustard, hairColor: CM.hair[1], broad: 0.96}} />
     </>
   );
 };
 
-/** The front row: head-backs cut by the frame bottom (hv <= 150: the widest is <= ~140 px at the shoulders). */
+/** The front row: head-backs cut by the frame bottom (hv <= 150: the widest is <= ~140 px at the shoulders), in soft
+ *  coats and a thin line: big shapes, but supporting life (the attention hierarchy keeps the board the focus). */
+const NEAR_INK = 2.6;
 export const S7NearBacks: React.FC = () => {
   const t = useTime();
   const [a, b, c, d] = NEAR_BACKS;
@@ -251,10 +285,10 @@ export const S7NearBacks: React.FC = () => {
   const turnD = -0.4 * clamp01((t - 1.2) / 0.4) * (1 - clamp01((t - 2.3) / 0.4));
   return (
     <>
-      <NearBack x={a.x} y={1920} hv={a.hv} seed={a.seed} turn={turnA} traits={{hair: 'lowBun', acc: 'scarf', coat: CM.sage, hairColor: CM.hair[1], broad: 0.98}} />
-      <NearBack x={b.x} y={1920} hv={b.hv} seed={b.seed} traits={{hair: 'beanie', acc: 'none', coat: CM.coatPlum, hatColor: CM.coatMustard, broad: 0.95}} />
-      <NearBack x={c.x} y={1920} hv={c.hv} seed={c.seed} traits={{hair: 'short', acc: 'backpack', coat: CM.brick, hairColor: CM.hair[3], accColor: CM.coatSlate, broad: 0.97}} />
-      <NearBack x={d.x} y={1920} hv={d.hv} seed={d.seed} turn={turnD} traits={{hair: 'curls', acc: 'tote', coat: CM.coatOat, hairColor: CM.hair[2], broad: 0.94}} />
+      <NearBack x={a.x} y={1920} hv={a.hv} seed={a.seed} turn={turnA} ink={NEAR_INK} traits={{hair: 'lowBun', acc: 'scarf', coat: CM.sage, hairColor: CM.hair[1], accColor: CM.coatMustard, broad: 0.98}} />
+      <NearBack x={b.x} y={1920} hv={b.hv} seed={b.seed} ink={NEAR_INK} traits={{hair: 'beanie', acc: 'none', coat: CM.brick, hatColor: CM.coatMustard, broad: 0.95}} />
+      <NearBack x={c.x} y={1920} hv={c.hv} seed={c.seed} ink={NEAR_INK} traits={{hair: 'short', acc: 'backpack', coat: CM.coatMustard, hairColor: CM.hair[3], accColor: CM.stoneShade, broad: 0.97}} />
+      <NearBack x={d.x} y={1920} hv={d.hv} seed={d.seed} turn={turnD} ink={NEAR_INK} traits={{hair: 'curls', acc: 'tote', coat: CM.coatOat, hairColor: CM.hair[2], broad: 0.94}} />
     </>
   );
 };
@@ -264,8 +298,8 @@ export const S7RimSitters: React.FC = () => {
   const [a, b] = RIM_SITTERS;
   return (
     <>
-      <Seated x={a.x} y={a.seat} h={seatedH(a.seat)} seed={a.seed} traits={{hair: 'cap', acc: 'backpack', coat: CM.coatSlate, hatColor: CM.leafRust, broad: 0.96}} />
-      <Seated x={b.x} y={b.seat} h={seatedH(b.seat) * 0.96} seed={b.seed} phone side={1} traits={{hair: 'bun', acc: 'scarf', coat: CM.box, hairColor: CM.hair[0], broad: 0.95}} />
+      <Seated x={a.x} y={a.seat} h={seatedH(a.seat)} seed={a.seed} ink={SUPPORT_INK} traits={{hair: 'cap', acc: 'backpack', coat: CM.stoneShade, hatColor: CM.leafRust, hairColor: CM.hair[1], broad: 0.96}} />
+      <Seated x={b.x} y={b.seat} h={seatedH(b.seat) * 0.96} seed={b.seed} phone side={1} ink={SUPPORT_INK} traits={{hair: 'bun', acc: 'scarf', coat: CM.box, hairColor: CM.hair[1], broad: 0.95}} />
     </>
   );
 };
@@ -273,7 +307,12 @@ export const S7RimSitters: React.FC = () => {
 /** A person at rest left of the board, on the phone (rear 3/4, never facing us). */
 export const S7Stander: React.FC = () => {
   const t = useTime();
-  return <Person x={STANDER.x} y={STANDER.feet} h={STANDER.h} seed="s7/stander" pose="phoneEar" view="rear34" gesture={0.3 + 0.3 * Math.sin(t * 1.7)} traits={{hair: 'short', acc: 'tote', coat: CM.coatMustard, hairColor: CM.hair[1]}} exact />;
+  return (
+    <>
+      <FootShadow x={STANDER.x} y={STANDER.feet} h={STANDER.h} />
+      <Person x={STANDER.x} y={STANDER.feet} h={STANDER.h} seed="s7/stander" pose="phoneEar" view="rear34" gesture={0.3 + 0.3 * Math.sin(t * 1.7)} traits={{hair: 'short', acc: 'tote', coat: CM.brickLight, hairColor: CM.hair[1]}} ink={SUPPORT_INK} exact />
+    </>
+  );
 };
 
 /** Far tiny walkers beyond the west railing (fill only), in the column left of the board. */
@@ -288,7 +327,7 @@ export const S7FarWalkers: React.FC = () => {
     const span = 260;
     const x = -60 + frac((f.x0 + 60 + f.v * t) / span) * span;
     if (x > 92) return;
-    out.push(<Person key={f.seed} x={x} y={f.y} h={f.h} seed={f.seed} pose="walk" view="profile" flip={f.v > 0} walk={{rate: 1.8}} exact />);
+    out.push(<Person key={f.seed} x={x} y={f.y} h={f.h} seed={f.seed} pose="walk" view="profile" flip={f.v > 0} walk={{rate: 1.8}} ink={0} exact />);
   });
   return <>{out}</>;
 };
@@ -338,8 +377,8 @@ export const S7Jets: React.FC = () => {
     b.fill(CM.paper, ovalPath(xt - 3, yt + 1, 5.5, 5));
     b.fill(CM.paper, ovalPath(xt + 4, yt + 5, 3.6, 3.4));
     for (const side of [-1, 1]) {
-      for (let k = 0; k < 4; k++) {
-        const v = frac(t / 0.62 + k / 4 + i * 0.19 + (side > 0 ? 0.37 : 0));
+      for (let k = 0; k < 3; k++) {
+        const v = frac(t / 0.8 + k / 3 + i * 0.19 + (side > 0 ? 0.37 : 0));
         const spread = H * (0.06 + 0.035 * (k % 2));
         const ex = xt + side * (4 + spread * v);
         const ey = yt - 6 * v + (6 + H * 0.42) * v * v;
