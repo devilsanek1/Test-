@@ -2,7 +2,8 @@
 // on OUR towpath beside the moored boat, so the near ground is a field MADE of things (LIFE_AND_DENSITY §0), never
 // flat paving: a stack of split logs and a coal sack for the stove (the chimney's smoke has a reason), a pair of
 // wellies on the coping by the side doors, a bay tree in a terracotta pot (a mass in the right rail), and a robin that
-// hops along the log stack and pecks (life). Cast shadows run right, away from the low sun at left, as colour.
+// hops along the log stack and pecks, and two pigeons pecking by the puddle (life). Cast shadows run right, away
+// from the low sun at left, as colour.
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
@@ -10,6 +11,7 @@ import {line, arc as arcInk} from '../../lib/sketch';
 import {Batch, Paint, P, rng, ovalPath, leafPath} from '../kit/canal/core';
 import type {Pt} from '../kit/canal/core';
 import {Levels} from './V2S3_nboat';
+import {Pigeons} from '../kit/canal/life';
 
 /** A long low-sun shadow lying on the towpath: from an object's foot (x0..x1 at y) it runs RIGHT and a little toward
  *  us (the sun is low at left), as a flat stone-shade shape attached to the foot. */
@@ -172,6 +174,7 @@ export const S3Dress: React.FC = () => {
     <>
       <Paint b={stat} seed="s3nDress" />
       <Paint b={life} seed="s3nRobin" misreg={false} />
+      <Pigeons ledge={[596, 800, 1760]} n={2} size={50} seed="s3pave" shuffleAt={[13.9]} />
     </>
   );
 };
