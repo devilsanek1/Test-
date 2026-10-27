@@ -77,7 +77,8 @@ export function resolveParams(p: PipProps, t: number, headScreen?: V2): PosePara
     const a = aimAt(head, p.target);
     const w = clamp(p.targetWeight ?? 1);
     q.look = lerp(q.look, a.look, w);
-    q.lookUp = lerp(q.lookUp, a.lookUp, w);
+    // turned to the camera (toCam) the target no longer lifts the head; its look still picks the side
+    q.lookUp = lerp(q.lookUp, a.lookUp, w * (1 - clamp(q.toCam)));
   }
   const idle = p.idle ?? 1;
   q = applyIdle(q, t, p.seed ?? 'pip', typeof idle === 'number' ? {amount: idle} : idle);

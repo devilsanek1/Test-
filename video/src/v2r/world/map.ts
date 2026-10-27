@@ -461,8 +461,9 @@ export const S1_SHEET = {
   ourBank: {y0: 1215, y1: FRAME_H},
   stepsCount: 5,
   stepsSeated: 14,
-  /** Seated head-backs: near row cut by the bottom (250-330 px), middle (~110), low by the water (~60). */
-  seatedHeadPx: {near: [250, 330] as const, middle: 110, low: 60},
+  /** Seated head-backs: near row cut by the bottom (the whole back <= ~140 px WIDE at the shoulders, head ~55-65: the
+   *  owner's people rule, STYLE.md), middle (~110), low by the water (~60). */
+  seatedHeadPx: {near: [110, 140] as const, middle: 110, low: 60},
   pipBollard: S1_BOLLARD,
   heroCloud: {x0: 640, y0: 120, x1: 1000, y1: 280} as Rect,
   heroCloudDriftPxS: 2,
@@ -782,8 +783,8 @@ export const S6 = {
   pipEarFlickAt: 26.5,
   pipHopAt: 27.95,
   sun: SUN2,
-  /** Near plane: three readers' head-backs cut by the bottom (240-300 px, x 60-700), crossing with the truck. */
-  nearHeads: {x0: 60, x1: 700, hPx: [240, 300] as const},
+  /** Near plane: three readers' head-backs cut by the bottom (<= ~140 px wide, STYLE.md; x 60-700), crossing with the truck. */
+  nearHeads: {x0: 60, x1: 700, hPx: [110, 140] as const},
 } as const;
 const s6u = (t: number): number => Math.min(28.06, Math.max(24, t)) - 24;
 export const s6BoardAt = (t: number): Rect => shiftRect(S6.board0, s6u(t) * S6.boardDriftPxS);
@@ -1004,13 +1005,13 @@ export const MATCHES: MatchPoint[] = [
 // 10. The bottom third, y 1250-1920 (TREATMENT section 5): never flat paving or bare water, nothing to read.
 // ---------------------------------------------------------------------------------------------------------------
 export const BOTTOM_THIRD: Record<ShotId, string> = {
-  V2S1: 'our canal-side steps: five broad stone steps (edges 3.4-4.8 px), ~14 seated backs in three rows: near heads cut by the bottom (250-330 px: a hood, a beanie, a low bun with a mustard scarf, curls, a cap), a middle row (~110 px), a low row by the water (~60 px); cups, tote bags, a dog lying down, a bike cut by the bottom-right',
-  V2S2: 'our towpath: broken paving lines, leaves, a drain cover, the A-board and bench legs; a planter of grasses cut by the left edge (x 0-230, y 1290-1650); a bike locked to a lamp-post whose foot is cut by the bottom-right (x 860-960); two head-backs cut by the bottom (260-320 px, x 300-720: a beanie, a cap); a dog nosing a leaf',
-  V2S3: 'the narrowboat moored along our bank, cut by both edges: roof y ~1260-1330 (herb pots, a bike, a coiled rope, a chimney with smoke), cabin side y 1330-1580 (sage, plum gunwale stripe, cream portholes); our coping; our towpath y 1640-1920 with two head-backs cut by the bottom (260-300 px) and a lamp-post foot bottom-right',
+  V2S1: 'our canal-side steps: five broad stone steps (edges 3.4-4.8 px), ~14 seated backs in three rows: near head-backs cut by the bottom (<= ~140 px wide at the shoulders: a hood, a beanie, a knitted hat, curls, a cap), a middle row (~110 px), a low row by the water (~60 px); cups, tote bags, a dog lying down, a bike cut by the bottom-right',
+  V2S2: 'our towpath: broken paving lines, leaves, a drain cover, the A-board and bench legs; a planter of grasses cut by the left edge (x 0-230, y 1290-1650); a bike locked to a lamp-post whose foot is cut by the bottom-right (x 860-960); two head-backs cut by the bottom (<= ~140 px wide, x 300-720: a beanie, a cap); a dog nosing a leaf',
+  V2S3: 'the narrowboat moored along our bank, cut by both edges: roof y ~1260-1330 (herb pots, a bike, a coiled rope, a chimney with smoke), cabin side y 1330-1580 (sage, plum gunwale stripe, cream portholes); our coping; our towpath y 1640-1920 with two head-backs cut by the bottom (<= ~140 px wide) and a lamp-post foot bottom-right',
   V2S4: 'the narrowboat beside us: cabin side y 1290-1660 (sage, plum gunwale stripe, cream portholes with curtains, a painted flower panel, fenders); water y 1700-1920 with the wake and floating leaves',
   V2S5: "start: the bench front, the stranger's bag, petal-strewn paving, the news box's base, a tree root cut by the bottom-left. End: the terrace floor from the crane's height (paving joints, petal drifts, a bench, a bin, a stroller), roots bottom-left, the lamppost base bottom-right",
-  V2S6: "the fence's kerb and tulip beds; three readers' head-backs cut by the bottom (240-300 px, x 60-700) crossing with the truck; a bike rack and a bench in the rail",
-  V2S7: 'the forecourt: two cafe tables with seated backs (heads 200-260 px cut by the bottom-left), a bike rack, a planter of grasses, paving joints, the fountain basin rim bottom-right',
+  V2S6: "the fence's kerb and tulip beds; three readers' head-backs cut by the bottom (<= ~140 px wide, x 60-700) crossing with the truck; a bike rack and a bench in the rail",
+  V2S7: 'the forecourt: two cafe tables with seated backs (<= ~140 px wide, cut by the bottom-left), a bike rack, a planter of grasses, paving joints, the fountain basin rim bottom-right',
   V2S8: "the cafe boat's stern deck bottom-left (x 0-560: two small tables, mugs, a folded chair, a potted bay, a coiled rope), towpath paving with leaves and a drain, a planter and a lamp-post foot bottom-right. NO near heads",
 };
 
@@ -1171,7 +1172,7 @@ const s6Shapes = (t: number): Shape[] => {
     R('text', 'the F11 clause block (top >= 920)', {x0: b.x0 + 20, y0: S6.clauseTopMinY, x1: b.x1 - 20, y1: b.y1 - 70}),
     P('Pip: corner post (ear flick 26.50)', s6PipSeatAt(t)),
     R('mass', 'kerb, tulip beds, near posts + blossom (65 px/s)', {x0: 0, y0: 1240, x1: FRAME_W, y1: 1400}),
-    R('mass', "three readers' head-backs (240-300 px)", {x0: S6.nearHeads.x0, y0: 1620, x1: S6.nearHeads.x1, y1: FRAME_H}),
+    R('mass', "three readers' head-backs (<= ~140 px wide)", {x0: S6.nearHeads.x0, y0: 1620, x1: S6.nearHeads.x1, y1: FRAME_H}),
   ];
 };
 
