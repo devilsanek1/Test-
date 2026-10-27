@@ -30,7 +30,7 @@ type House = {
   roof: Roof;
   wall: string;
   /** A shopfront on the ground floor: its window colour, its awning colour and the blade sign (text or picto). */
-  shop?: {win: string; awning: string; sign: string; signColor: string; lights?: boolean};
+  shop?: {win: string; awning: string; sign: string; signColor: string; lights?: boolean; bladeU?: number};
   /** Silhouettes in these window indices. */
   sil?: Record<number, 'cross' | 'stand' | 'read'>;
   chimney?: number[];
@@ -47,18 +47,16 @@ const WALLS = {
   terra: '#B0603E',
 };
 
-/** The street, near to far (Z in m). The near ones are cut by the left edge and the van; past Z ~45 only the roofs show
- *  over the first data center, and past ~90 the factory hides them. */
+/** The street, near to far (Z in m). The near ones are cut by the left edge and the van; past Z ~42 the walls hide
+ *  behind the first data center and only their snowy roofs show over it (a calm ground for the landing sticks: low
+ *  eaves, no lit windows there); the street stops at Z ~64, where its walls would start to cover the factory's facade. */
 const HOUSES: House[] = [
-  {z: 13.5, len: 9.5, h: 9.2, rise: 3.0, dep: 10, roof: 'side', wall: WALLS.plum, shop: {win: EMBER.core, awning: EMBER.hl, sign: 'CAFE', signColor: EMBER.card, lights: true}, sil: {3: 'stand'}, chimney: [0.7]},
-  {z: 23.3, len: 8.2, h: 7.4, rise: 3.2, dep: 9, roof: 'front', wall: WALLS.steel, sil: {1: 'cross'}, chimney: [0.3], skylight: true},
-  {z: 31.8, len: 10, h: 9.6, rise: 2.8, dep: 10, roof: 'side', wall: WALLS.terra, shop: {win: EMBER.houseLit, awning: EMBER.dcSide, sign: 'BAKERY', signColor: EMBER.wall}, sil: {4: 'read'}, chimney: [0.25, 0.8], skylight: true},
-  {z: 42.2, len: 7.2, h: 8.2, dep: 9, roof: 'flat', wall: WALLS.navy},
-  {z: 49.8, len: 9, h: 10.4, rise: 2.6, dep: 10, roof: 'side', wall: WALLS.violet, chimney: [0.6]},
-  {z: 59.2, len: 8, h: 7.2, rise: 3.0, dep: 9, roof: 'front', wall: WALLS.brick, chimney: [0.5]},
-  {z: 67.6, len: 10, h: 9, rise: 2.8, dep: 10, roof: 'side', wall: WALLS.dusk, chimney: [0.4], skylight: true},
-  {z: 78, len: 8.5, h: 8, dep: 9, roof: 'flat', wall: WALLS.plum},
-  {z: 86.9, len: 9.5, h: 9.8, rise: 2.6, dep: 10, roof: 'side', wall: WALLS.steel, chimney: [0.5]},
+  {z: 13.5, len: 9.5, h: 9.2, rise: 3.0, dep: 10, roof: 'side', wall: WALLS.plum, sil: {3: 'stand'}, chimney: [0.7]},
+  {z: 23.3, len: 8.2, h: 7.4, rise: 3.2, dep: 9, roof: 'front', wall: WALLS.steel, shop: {win: EMBER.core, awning: EMBER.hl, sign: 'CAFE', signColor: EMBER.card, lights: true}, sil: {1: 'cross'}, chimney: [0.3], skylight: true},
+  {z: 31.8, len: 10, h: 9.6, rise: 2.8, dep: 10, roof: 'side', wall: WALLS.terra, shop: {win: EMBER.houseLit, awning: EMBER.dcSide, sign: 'BAKERY', signColor: EMBER.wall, bladeU: 0.24}, sil: {4: 'read'}, chimney: [0.25, 0.8], skylight: true},
+  {z: 42.2, len: 7.2, h: 6.6, dep: 9, roof: 'flat', wall: WALLS.navy},
+  {z: 49.8, len: 9, h: 7, rise: 3, dep: 10, roof: 'side', wall: WALLS.violet, chimney: [0.6]},
+  {z: 59.2, len: 5, h: 6.5, rise: 2.6, dep: 9, roof: 'front', wall: WALLS.brick, chimney: [0.5]},
 ];
 
 const shade = (c: string) => mixHex(c, EMBER.dcDark, 0.42);
@@ -267,7 +265,7 @@ const StreetHouse: React.FC<{hs: House; i: number; beats: QueueBeats}> = ({hs, i
   });
   // blade sign (faces the camera: hangs from the wall over the pavement)
   if (hs.shop) {
-    const kz = kAtZ(z0 + hs.len * 0.1);
+    const kz = kAtZ(z0 + hs.len * (hs.shop.bladeU ?? 0.1));
     const s0 = P(Xw + 0.2, kz, 4.3);
     const s1 = P(Xw + 1.9, kz, 3.4);
     const bw = s1[0] - s0[0];
