@@ -368,13 +368,15 @@ def board_clack(v=1):
 
 @sound
 def light_clicks(v=1):
-    """'staff': the five windows round hers turn a cooler white: five tiny switch clicks, left of frame."""
+    """'staff': the five windows round hers turn a cooler white in ONE step (conform_L2 s6): five tiny switch clicks
+    within 40 ms, one cluster, left of frame (done before the vowel of "staff" opens)."""
     out = buf(0.22); r = rng(160)
-    for k, (s, p) in enumerate(zip([0, 0.035, 0.08, 0.12, 0.165], [-0.38, -0.14, -0.65, -0.39, -0.15])):
+    for k, (s, p) in enumerate(zip([0, 0.011, 0.019, 0.029, 0.04], [-0.38, -0.14, -0.65, -0.39, -0.15])):
         f = r.uniform(0.95, 1.05)
-        c = struck([2600 * f, 4300 * f], [0.003, 0.002], [1, .5], 0.02, 160 + k, exc_ms=0.12, noise_body=0.3,
-                   contact_amp=0.4, contact_band=(1500, 9000), contact_dec=0.0006, n_extra=1)
-        put(out, c, s, r.uniform(0.8, 1.0), p)
+        c = struck([900 * f, 1450 * f, 2300 * f], [0.006, 0.004, 0.002], [1, .5, .2], 0.03, 160 + k, exc_ms=0.2,
+                   noise_body=0.35, contact_amp=0.4, contact_band=(400, 2500), contact_dec=0.0008, n_extra=1)
+        put(out, lp(c, 2600, 4), s, r.uniform(0.8, 1.0), p)          # a soft bank of switches, under 2.6 kHz: the
+        #                                                              /z s t/ of "Google's staff" keep their band
     return slap(out, -8.0)
 
 
@@ -574,7 +576,7 @@ def wipe_air(v=1):
     c = np.concatenate([np.geomspace(300, 1800, n // 2), np.geomspace(1800, 600, n - n // 2)])
     y = tv_bandpass(noise(d, 380), c, bw_oct=1.0) * env_bell(n, 0.5, 1.4)
     y += 0.3 * lp(noise(d, 381), 250) * env_bell(n, 0.5, 2.0)
-    return pan_sweep(y, 0.7, -0.7)
+    return pan_sweep(lp(y, 2800, 4), 0.7, -0.7)                       # under 2.8 kHz: "letting"'s /t/ keeps its band
 
 
 def far_switch(seed):
@@ -605,14 +607,14 @@ TREE_MID = 0.18        # tree_wipe: the wipe's midpoint, s after the cue (23.62 
 @sound
 def tree_wipe(v=1):
     """the blossom tree crossing the lens right to left (23.62-23.98, S5's Wiper): a soft close rush of leaves (a CC0
-    rustle grain, kept under 2.6 kHz: the voice is saying 'AI for', its /f/ keeps its band) and the air of the trunk passing, right -> left,
+    rustle grain, kept under 2.4 kHz: the voice is saying 'AI for', its /f/ keeps its band) and the air of the trunk passing, right -> left,
     peaking on the midpoint 23.80; down 20 dB by 'any' (24.03)."""
     d = 0.42; n = n_of(d); t = tt(d); k = TREE_MID / d
     g = FLD.cut(FLD.load(347557, mono=True), 11.10, 11.10 + d, 0.01)
-    leaves = unit(lp(bp(g, 300, 2600, 2), 2600, 2)) * env_bell(n, k, 3.0)
+    leaves = unit(lp(bp(g, 300, 2400, 2), 2400, 4)) * env_bell(n, k, 3.0)
     c = np.interp(t, [0, TREE_MID, d], [250, 900, 300])
     air = tv_bandpass(noise(d, 371), c, bw_oct=1.1) * env_bell(n, k, 3.4)
-    y = 0.6 * leaves + 0.45 * unit(air)
+    y = lp(0.6 * leaves + 0.45 * unit(air), 2200, 4)              # all of it under 2.2 kHz: the /f/ of "for" (23.76)
     p = -0.8 * np.tanh((t - TREE_MID) / 0.09)
     return pan_curve(y, p)
 

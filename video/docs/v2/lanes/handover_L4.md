@@ -1,3 +1,22 @@
+> **Paused 22:40 UTC for the depth pass (orchestrator; resume when it adds a depth section to conform_L4.md).** Conform state
+> (typecheck clean, committed, NOT yet rendered): DONE `V2S5_figs.tsx` (Pip seated at (415, 1120) from frame 0, no arrival
+> hop, no 23.90 leap, its one reaction = lookUp at the slot's blossom (330, 885) on "April" 0.21; the stranger turns a page
+> once at 0.60; the end Pip still at (366, 1195)) · `V2S5_far.tsx` (calendar flip retired: the disc stays a disc; the top
+> gutter = L5's `S6Clouds` under a TimeShift of 3.25 s (S6 starts at film 23.80) + two same-make clouds past the end frame's
+> right edge for the start, so the two skies agree above the wipe's tree) · `V2S5_mid.tsx` (`<Pentagon tier="subject">` from
+> scene 1.88 = 22.43, else environment; windows warm in ONE step: `warmDur` 0.001). NEXT, in order: (1) `V2S5.tsx` exports
+> `Wiper` (a new `V2S5_wiper.tsx`: one blossom tree, trunk + crown ~300 px wide, `half` ~150, flat fills, no outline, clipped
+> at y >= 560, `captionRegions` [] ; dir 'left', 23.62-23.98) · (2) tiers: wrap the far / river / near-mid / deck planes in
+> `<Tier tier="environment">` (my forked V2S5_* code is untagged = support with lines), figures B, the news box A
+> ~20.90-21.75 (a forced `<Tier tier="subject">` round K3's NewsBox) · (3) light: `<Lit rig={RIG_APRIL}>`, switching to
+> `RIG_APRIL_S5_END` at `swapAt` (src/v2r/world/rigs.ts); contact shadows (bench, news box, stranger, Pip, terrace benches,
+> bin, stroller, lamp bases, people), casts (people, lampposts, trees), `Shade` on the Pentagon / obelisk faces turned from
+> the sun · (4) line: delete hand-drawn specks and dash rows in `V2S5_deck_floor` and the other V2S5_* files (CRAFT §c) ·
+> (5) nothing new enters or pops in 23.60-24.00 (deck life: pigeons' take-off times) · (6) the depth section when it lands
+> · (7) QA (conform_L4 §9): Film2R 20.3-24.3 at 0.4, `check_light.py` A/B at 21.0 (news box) and 23.4 (Pentagon),
+> `scripts/qa/retro_tools/line/measure.py` at 23.4, the join frames, camspeed, band check, movers in the hold <= 4, tsc ·
+> (8) ONE combined critic, fixes, `report_L4.md`.
+
 # L4 handover (V2S5, the crane): work in progress
 
 **Done**

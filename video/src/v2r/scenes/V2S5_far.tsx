@@ -19,7 +19,10 @@ import {CRANE_T, planeMat, type PullPlane} from '../kit/dc/crane';
 import {mix} from '../kit/dc/core';
 import {CM} from '../palette';
 import type {Pt} from '../../lib/sketch';
-import {TopClouds, HeroBank, AprilBands, SunS5, SUN_END} from './V2S5_far_sky';
+import {HeroBank, AprilBands, SunS5, SUN_END} from './V2S5_far_sky';
+import {TimeShift} from '../../lib/time';
+import {cloudD} from '../kit/dc/core';
+import {S6Clouds} from './V2S6_life';
 import {FarHills, FarCityS5, ObeliskS5, CITY} from './V2S5_far_city';
 
 export const FAR_END = {
@@ -40,11 +43,52 @@ export const FAR_PL: PullPlane = (() => {
 export const farMat = (p: number) => planeMat(FAR_PL, p);
 
 /** The far plane (drawn inside the rig's FAR_S5 PullLayer): back to front. */
+/** The top gutter = S6's clouds (lane L5's `S6Clouds`, film-time aligned: S6 starts at film 23.80 = S5 scene 3.25),
+ *  so at the S5 -> S6 wipe (23.62-23.98, its tree clipped at y >= 560) the two skies above the tree are the SAME and
+ *  the swap edge never shows in the sky (conform_L4 §1). Two more clouds of the same make lie past the end frame's
+ *  right edge (END x >= 1460): the start's top gutter sees them (the far plane is slid ~850 px at p 0). */
+const S6_T0_IN_S5 = 23.8 - 20.55;
+const START_CLOUDS: [number, number, number, number][] = [
+  [1470, 470, 236, 104],
+  [1880, 420, 160, 86],
+];
+const S5TopGutter: React.FC = () => {
+  const t = useTime();
+  const dx = 3 * (t - S6_T0_IN_S5);
+  let body = '';
+  let lit = '';
+  let belly = '';
+  for (const [x0, w, base, hh] of START_CLOUDS) {
+    const x = x0 + dx;
+    body += cloudD(x, x + w, base, [
+      [x + w * 0.18, w * 0.34, hh * 0.58],
+      [x + w * 0.42, w * 0.4, hh],
+      [x + w * 0.68, w * 0.36, hh * 0.76],
+      [x + w * 0.88, w * 0.2, hh * 0.42],
+    ]);
+    lit += cloudD(x + w * 0.22, x + w * 0.78, base - hh * 0.32, [
+      [x + w * 0.42, w * 0.32, hh * 0.6],
+      [x + w * 0.62, w * 0.24, hh * 0.4],
+    ]);
+    belly += `M${(x + w * 0.1).toFixed(1)} ${base}h${(w * 0.8).toFixed(1)}v-7h${(-w * 0.8).toFixed(1)}Z`;
+  }
+  return (
+    <>
+      <TimeShift by={S6_T0_IN_S5}>
+        <S6Clouds />
+      </TimeShift>
+      <path d={body} fill={CM.skyHigh} />
+      <path d={belly} fill={mix(CM.skyHigh, CM.stoneShade, 0.35)} />
+      <path d={lit} fill={CM.paper} />
+    </>
+  );
+};
+
 export const S5Far: React.FC = () => (
   <>
     <AprilBands x0={CITY.x0} x1={CITY.x1} horizon={FAR_END.horizon} />
-    <TopClouds />
-    <SunS5 flip={CRANE_T.flip} />
+    <S5TopGutter />
+    <SunS5 />
     <HeroBank />
     <FarHills />
     <FarCityS5 obelisk={<ObeliskS5 />} />
