@@ -53,6 +53,39 @@ export const CornerCloud: React.FC = () => {
   );
 };
 
+/** Two flat cloud bars high over the start slot (far x -900..-80, y <= 275: above the caption band; at p 0 they sit in
+ *  the start's sky, at p 1 they have slid off the left edge, leaving the end frame its one corner cloud). */
+const HIGH = [
+  {cx: -620, cy: 214, rx: 210, ry: 34},
+  {cx: -250, cy: 150, rx: 150, ry: 26},
+  {cx: -820, cy: 120, rx: 120, ry: 22},
+];
+const HIGH_D = (() => {
+  let body = '';
+  let rim = '';
+  HIGH.forEach((c, i) => {
+    const pts: Pt[] = [];
+    for (let k = 0; k <= 24; k++) {
+      const u = k / 24;
+      const x = c.cx - c.rx + u * 2 * c.rx;
+      const bump = Math.abs(Math.sin(u * Math.PI * (3 + (i % 2)))) * c.ry * 0.5;
+      pts.push([x, c.cy - Math.sin(u * Math.PI) * c.ry - bump * Math.sin(u * Math.PI)]);
+    }
+    body += polyD([...pts, [c.cx + c.rx, c.cy + 2], [c.cx - c.rx, c.cy + 2]]);
+    rim += rectD(c.cx - c.rx * 0.8, c.cy - 4, c.rx * 1.6, 6);
+  });
+  return {body, rim};
+})();
+export const HighClouds: React.FC = () => {
+  const t = useTime();
+  return (
+    <g transform={`translate(${f1(t * 7)} 0)`}>
+      <path d={HIGH_D.body} fill={T9.cloud} />
+      <path d={HIGH_D.rim} fill={EMBER.skyLow} />
+    </g>
+  );
+};
+
 // ---------------------------------------------------------------- the hero cloud bank and its glow strip
 type Lobe = {cx: number; w: number; top: number; h: number};
 const LOBES: Lobe[] = [

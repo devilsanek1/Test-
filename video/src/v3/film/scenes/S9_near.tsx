@@ -56,7 +56,7 @@ const SLOT = (() => {
     const x0 = wallX(y) + 3;
     const x1 = canyonAt(y)[1] + 2;
     for (let x = x0; x + tw < x1; x += tw * 1.9) {
-      if (y < yL ? r.chance(0.7) : r.chance(0.3)) lit += rectD(x, y - th, tw, th);
+      if (r.chance(y < yL ? 0.35 : 0.3)) lit += rectD(x, y - th, tw, th);
       else ticks += rectD(x, y - th, tw, th);
     }
     y -= th * 2.1;

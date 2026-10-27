@@ -34,6 +34,7 @@
 import React, {useId} from 'react';
 import {World, ShotCam, useTime, type ToneKey} from '../../../lib';
 import {Layer} from '../../../lib/cine/camera';
+import {Ink} from '../../../lib/Ink';
 import {rng} from '../../../lib/rng';
 import {
   EMBER,
@@ -57,11 +58,11 @@ import {
   type StickFlightOpts,
   type Pt,
 } from '../kit';
-import {CornerCloud, CloudBank, FarGround, HillTown, FarField, InfinityLine, Pylons, HallB, HallPlume, HallFans, Hall, ThoomPuffs, FAR_HOUSES, HALL, HALL_ROOF, farRoofTop} from './S9_far';
+import {CornerCloud, HighClouds, CloudBank, FarGround, HillTown, FarField, InfinityLine, Pylons, HallB, HallPlume, HallFans, Hall, ThoomPuffs, FAR_HOUSES, HALL, HALL_ROOF, farRoofTop} from './S9_far';
 import {PeakPile} from './S9_peak';
 import {MidBand, NearMid} from './S9_town';
 import {NearRoofs, NEAR_PUFFS} from './S9_near';
-import {DeckPlane, PARAPET} from './S9_deck';
+import {DeckPlane, PARAPET, StackDress, VentDress} from './S9_deck';
 import {S9Birds, NearFlakes} from './S9_sky';
 import {T9} from './S9_tones';
 
@@ -115,6 +116,7 @@ const STREAMS: StickFlightOpts[] = (() => {
 const FarPlane: React.FC = () => (
   <>
     <CornerCloud />
+    <HighClouds />
     <CloudBank />
     <FarGround />
     <PeakPile />
@@ -136,11 +138,26 @@ const FarPlane: React.FC = () => (
 
 // ---- you, close (START coords, the deck plane's start map): back view, raising the one stick (S8's stick), Pip on
 // your left shoulder looking where you look (it moves to the lip behind the pot's wipe)
+/** Tone-on-tone folds and raglan seams on the sweater (the close back never stays one flat fill; LIFE_AND_DENSITY §4
+ *  coatDetail), breathing with YouBack. Start coords (head 184 at (470, 1058)). */
+const SWEATER_FOLDS =
+  'M414 1270C380 1300 330 1330 298 1360M528 1266C568 1290 604 1316 628 1340' +
+  'M560 1424C590 1396 616 1366 640 1336M520 1508C560 1470 600 1430 632 1396M486 1590C530 1550 580 1500 624 1462' +
+  'M322 1452C316 1540 316 1630 310 1720M352 1560C350 1620 352 1680 348 1740M470 1330C472 1450 474 1580 478 1700';
+const SweaterFolds: React.FC = () => {
+  const t = useTime();
+  return (
+    <g transform={`translate(0 ${(Math.sin(t * 1.7) * 1.2).toFixed(2)})`}>
+      <Ink d={SWEATER_FOLDS} width={2.6} color={EMBER.sweaterRib} />
+    </g>
+  );
+};
 const YouClose: React.FC = () => (
   <>
     <YouBack x={470} y={1058} head={184} hand={[748, 1214]} seed="s9/youB">
       <MemoryStick x={748} y={1172} w={330} rot={-6} seed="s9/stick" />
     </YouBack>
+    <SweaterFolds />
     <Pip3 x={352} y={1276} scale={0.92} pose="sit-back" look={[{t: 0, v: 0.2}, {t: 0.7, v: 0.55}]} outdoor seed={9} />
   </>
 );
@@ -186,6 +203,7 @@ const S9: React.FC = () => {
           <PullLayer m={boxMat(S9_STACK, p)}>
             <BrickStack x={-76} y={980} w={326} h={480} pots={[0.8, 0.93]} potW={33} color={EMBER.brickShade} shade={T9.stackShade} exact seed="s9/stack" />
             <path d="M-72 1003h98v457h-98Z" fill={EMBER.brick} />
+            <StackDress />
           </PullLayer>
           <PullLayer m={planeMat(S9_DECK, p)}>
             <DeckPlane tiny={t >= SWAP} thoom={THOOM} />
@@ -194,6 +212,7 @@ const S9: React.FC = () => {
           {/* our vent (near clutter, on the deck) */}
           <PullLayer m={boxMat(S9_VENT, p)}>
             <RoofVent x={75} y={1964} w={100} h={330} exact seed="s9/vent" />
+            <VentDress />
           </PullLayer>
           {t < SWAP ? (
             <PullLayer m={startMat(S9_DECK, p)}>

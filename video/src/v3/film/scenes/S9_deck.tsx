@@ -31,7 +31,7 @@ const WIN = {x: 902, y: 1292, w: 72, h: 92};
 const DeckFloor: React.FC = () => {
   const {y, x0, x1, h, vp} = DECK;
   let planks = '';
-  const n = 15;
+  const n = 34;
   for (let i = 0; i < n; i++) {
     const xb = x0 + ((i + 0.5) / n) * (x1 - x0);
     const yb = y + h;
@@ -89,9 +89,15 @@ const Parapet: React.FC = () => {
     const by = y + lipH + r.range(8, h - 4);
     bricks += line(bx, by, bx + r.range(26, 44), by, {over: [0, 0], seed: `s9/bk${i}`});
   }
+  let mortar = `M${x0} ${y + lipH + h * 0.5}H${x1}`;
+  for (let x = x0 + 10, i = 0; x < x1; x += 44, i++) {
+    const yy = i % 2 ? y + lipH + h * 0.5 : y + lipH + 6;
+    mortar += `M${x + (i % 2 ? 22 : 0)} ${yy}v${h * 0.5 - 6}`;
+  }
   return (
     <>
       <Fill rect={[x0, y + lipH, x1 - x0, h + 2]} color={T9.parapet} offset={false} seed="s9/pmass" />
+      <Ink d={mortar} width={1.3} color={EMBER.brickShade} />
       <Fill rect={[x0, y + lipH, x1 - x0, 6]} color={EMBER.brickShade} offset={false} />
       <Fill rect={[x0, y, x1 - x0, lipH]} color={T9.deckSnow} offset={false} seed="s9/plip" />
       <Fill rect={[x0, y - 3, x1 - x0, 5]} color={T9.deckSnowLit} offset={false} />
@@ -151,9 +157,9 @@ export const DeckPlane: React.FC<DeckPlaneProps> = ({tiny, thoom}) => (
     <DeckThings />
     <StairHut />
     {/* a laundry line from a post on the deck to the hut's wall: three pieces swaying (colour without the hero) */}
-    <Ink d={`M598 1716V1532M590 1534h16`} width={4} color={EMBER.anchor} />
-    <path d={blob(598, 1530, 9, 3, {seed: 's9/postsn'})} fill={T9.deckSnowLit} />
-    <LaundryLine a={[600, 1540]} b={[812, 1508]} sag={20} n={4} size={46} seed="s9/laundry" ink={2.6} />
+    <Ink d={`M652 1716V1552M644 1554h16`} width={4} color={EMBER.anchor} />
+    <path d={blob(652, 1550, 9, 3, {seed: 's9/postsn'})} fill={T9.deckSnowLit} />
+    <LaundryLine a={[654, 1560]} b={[812, 1520]} sag={18} n={3} size={44} seed="s9/laundry" ink={2.6} />
     {/* the chair and the small table with the steaming mug, by the hut's door */}
     <FoldingChair x={640} y={1772} w={112} seed="s9/chair" ink={3} />
     <SideTable x={758} y={1758} w={92} mug seed="s9/table" ink={3} />
@@ -163,6 +169,57 @@ export const DeckPlane: React.FC<DeckPlaneProps> = ({tiny, thoom}) => (
         <YouTiny x={YOU_FEET[0]} y={YOU_FEET[1]} h={184} stickW={56} ink={2.6} seed="s9/youT" />
       </>
     ) : null}
+  </>
+);
+
+/** The brick stack's dressing (in the stack's box, end coords: x -76..250, y 980..1460): mortar courses with staggered
+ *  joints (the start frame sees x -76..58 of it at 3.2x: a wall MADE of bricks, never a flat slab), a string course with
+ *  snow, an aerial's strapping with its cable, iron rungs. Raw strokes: they grow with the box (mortar up close). */
+const STACK_D = (() => {
+  const x0 = -72;
+  const x1 = 248;
+  const split = 26; // the lit strip | the shade side
+  const top = 1004;
+  const r = rng('s9/stackBricks');
+  let lit = '';
+  let shade = '';
+  for (let y = top + 12, k = 0; y < 1460; y += 12, k++) {
+    if (y > 1172 && y < 1196) continue; // the string course
+    lit += `M${x0} ${y}H${split}`;
+    shade += `M${split} ${y}H${x1}`;
+    for (let x = x0 + (k % 2 ? 17 : 0); x < x1; x += 34) {
+      if (r.chance(0.14)) continue;
+      const d = `M${x.toFixed(1)} ${y - 12}v12`;
+      if (x < split) lit += d;
+      else shade += d;
+    }
+  }
+  const rungs: string[] = [];
+  for (let y = 1048; y < 1450; y += 42) rungs.push(`M36 ${y}h18v-3h-18Z`);
+  return {lit, shade, rungs: rungs.join('')};
+})();
+export const StackDress: React.FC = () => (
+  <>
+    <path d={STACK_D.lit} fill="none" stroke={EMBER.brickShade} strokeWidth={1.1} />
+    <path d={STACK_D.shade} fill="none" stroke={T9.deckDeep} strokeWidth={1.1} />
+    {/* the string course: a corbelled band with snow on it */}
+    <path d="M-80 1176h334v14h-334Z" fill={T9.stackShade} />
+    <path d="M-80 1176h106v14h-106Z" fill={EMBER.brickShade} />
+    <path d={blob(86, 1173, 168, 4.5, {seed: 's9/scSnow'})} fill={T9.deckSnow} />
+    {/* an aerial's strapping round the stack and its cable running down */}
+    <path d="M-76 1046h326v4h-326ZM-76 1112h326v4h-326Z" fill={EMBER.anchor} />
+    <path d="M14 1040h12v80h-12Z" fill={EMBER.anchor} />
+    <path d="M20 1120C22 1200 8 1260 14 1460" fill="none" stroke={EMBER.anchor} strokeWidth={2.2} />
+    {/* iron rungs up the face */}
+    <path d={STACK_D.rungs} fill={EMBER.anchor} />
+  </>
+);
+
+/** The vent's louvres and seam (in the vent's box, end coords). */
+export const VentDress: React.FC = () => (
+  <>
+    <path d={Array.from({length: 13}, (_, i) => `M32 ${1652 + i * 24}h86`).join('')} fill="none" stroke={EMBER.anchor} strokeWidth={1.4} />
+    <path d="M75 1640V1964" fill="none" stroke={EMBER.anchor} strokeWidth={1} />
   </>
 );
 
