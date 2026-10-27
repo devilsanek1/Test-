@@ -2,6 +2,7 @@
 
 Concrete notes on this one video: picks, lines, takes, shots. Approach-level lessons drawn from them live in
 `docs/OWNER_PLAYBOOK.md` (linked as "-> rule"). Newest at the bottom. Format: date, gate: what the owner said -> what we did.
+Only the owner's quoted words carry owner rank; the "->" half is our log, and a later note can retire it.
 
 ## Topic, core line, script, voice
 - 2026-10-25, G0: picked topic B, laptop prices (AI data centers outbid us for memory chips), over the recommended Meta
@@ -65,7 +66,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   (feel alive; great scale); S9's end frame gets the scale cues in the rollout.
 - 2026-10-27, G5b density pilot (`deliverables/v3/v3_g5b_pilot.mp4`: O1 nook dressed + Pip + window town life; S4/S6 chart in
   the shop's street noticeboard with a row of backs): "go ahead yes". -> the pilot is the density bar; roll out to the other
-  panels (S5, S7-S14, S16), then G6 polish.
+  panels (S5, S7-S14, S16), then G6 polish. (Retired the same day by the G5b verdict below: the pilot's O1 shows only how
+  full a world can be, its S4 is no model; `docs/look/DIRECTION.md`, Retired.)
 - 2026-10-27, G5b (`deliverables/v3/v3_g5b.mp4`): "Okay let's post this, give me the cover page and the text". -> shipped at
   G5b (no G6 polish, no music bed): posting master `v3_final.mp4` (no draft label, -14 LUFS, TV range), cover, `POSTING.md`.
 - 2026-10-27, after G5b, "let's finish this" (post it) plus general feedback: "too busy, too incoherent; no story, no clean

@@ -3,7 +3,9 @@
 The owner's two visual twists (playbook, 2026-10-25) for G3 (sketch animatic), G4 (look) and G5 (blocking), for v3 (laptop
 prices) and v2 (DeepMind resignations). Evidence: `research/` enclosure [EN], coziness [CO], arcane [AR], vertical [VE], audit
 [AU]. Colour obeys `PALETTE.md`; line, tiers and light obey `CRAFT.md` (it wins where this file differs: the chain in
-`DIRECTION.md`). Tags VERIFIED / REPORTED / UNCERTAIN; untagged numbers are proposals, to test at G4. 1080 x
+`DIRECTION.md`). Tags VERIFIED / REPORTED / UNCERTAIN; untagged numbers are our proposals, starting values that the
+G4 look clip tests, except where `DIRECTION.md` rule 7 makes one a rule (cozy >= 50 % of the runtime outside full-frame
+charts, 1-2 scale moments with ONE big move, holds locked or floating): those are rules. 1080 x
 1920 at 60 fps throughout (G3 too), captions 98 px at y 387 / 510 (block y 317-556, x 95-945). Arcane in words only: never
 traced, recorded or copied. **Coziness evolves one measured reference at a time** (playbook): the owner's cozy references
 C1-C3 and what each taught are logged in words at the end of section 3b; section 3b (Coziness v2) wins where 2-3 differ.
@@ -19,7 +21,8 @@ C1-C3 and what each taught are logged in words at the end of section 3b; section
    when it fills the frame (entered by a push, A, or a card flip, E) it counts neither cozy nor scale (v3 G3 was 38 % of
    all 41 s, 55 % of the non-chart time); 1-2 scale moments, never 3 (v2: 1), 1.5-4 s each, <= 20 % of
    the runtime (VE: 25 %).
-4. **ONE big move per video** (2.5-4 s + 0.8-1.5 s hold), <= 1 mid-size move, other story moves push 3-8 %; carrier moves
+4. **ONE big move per video** (S1 or S5, `CINEMATIC_GUIDE.md`, retimed to the reel: S5's default is a 2.6 s move + a
+   0.7 s hold), <= 1 mid-size move, other story moves push 3-8 %; carrier moves
    at the joins (`CRAFT.md` §a: push-throughs, a continuous camera) are joins, not story moves, and don't count; cozy
    holds are locked or float, never an invisible push (3b.5). Never two scale wides in a row; within ~5 s of each small-making beat, a
    beat of agency (a face, a voice, what is being done or can be done)
@@ -325,7 +328,7 @@ sound off. [C2] / [C3] = our measurement [VERIFIED]; the 9:16 translations are p
 > **Measured update (2026-10-26):** the camera and shot numbers below are superseded where they differ by
 > `CINEMATIC_GUIDE.md` (165 measured Arcane shots; `research/CINEMATIC_GUIDE_full_v1.md` §7 lists exactly what changed).
 
-## 4. Scale shot grammar (Arcane-inspired; framing [UNCERTAIN] until we measure the scenes in section 8)
+## 4. Scale shot grammar (Arcane-inspired; measured since in `CINEMATIC_GUIDE.md`, which wins where this section differs)
 **Scale must feel GREAT (owner, 2026-10-26).** A scale wide (any K wide, the S1/S5 landings) is judged by whether it feels
 vast and alive, never by an object count: run the 11 cues and the checklist in `CINEMATIC_GUIDE.md` "Scale cues: why a wide
 feels vast" (a world that keeps going past every edge, a size gradient, a huge-yet-far landmark, tiny anchors, the drop, a
@@ -351,7 +354,7 @@ The kit column names engine pieces as references only (playbook: no reusable ass
 
 | # | move | emotion | 2D recipe | kit |
 |---|---|---|---|---|
-| K1 | **Close-up -> wide cut** | the jolt of smallness | a declared F cut (at most 2 per film: `CRAFT.md` §a), or made one move by the S5 pull-back: face / object 0.5-0.7 H, cut on a breath to the observer at 0.04-0.08 H and <= 1/8 of the close-up (0.5 H -> <= 0.06 H); wide 2.5-4 s, line <= 6 words; back by a carrier (a push-through into the home place, A), never a second plain cut; incoming camera already moving (first key 0.5-1.5 s before the cut) | EXISTS: `camSpeedAt` (`cine/camera.tsx`), `WipeCut` (`cine/props.tsx`) |
+| K1 | **Close-up -> wide cut** | the jolt of smallness | a plain cut (F: at most 2 per film, only on a "But" turn, the thread on both sides: `CRAFT.md` §a), or made one move by the S5 pull-back: face / object 0.5-0.7 H, cut on a breath to the observer at 0.04-0.08 H and <= 1/8 of the close-up (0.5 H -> <= 0.06 H); wide 2.5-4 s, line <= 6 words; back by a carrier (a push-through into the home place, A), never a second plain cut; incoming camera already moving (first key 0.5-1.5 s before the cut) | EXISTS: `camSpeedAt` (`cine/camera.tsx`), `WipeCut` (`cine/props.tsx`) |
 | K2 | **Tilt-up reveal** | "it keeps going" | `tilt` 600-900 px in 2.5-3.2 s (900 px needs >= 2.9 s), `CAM.reveal`; horizon 0.40 -> 0.70 H; top lands 0.08-0.15 H or cut; + 3-5 % zoom-out (a tilt has no parallax); flat across y 280-570 | EXISTS: `CineCamera tilt`, CineDemo A, `EndlessCity` colossal `quietAbove` (`cine/city.tsx`), `Tower` (`cine/tower.tsx`) |
 | K3 | **Rise-over (crane)** | the world opens past the wall | crane `y` 400-700 px in 2.5-3.5 s (the ledge moves 1.3x: 700 px needs >= 2.9 s), `CAM.reveal`; a roof / ledge (depth -0.3, `#8A9AA8`, `#545F6D` lip) fills the bottom 30-45 % and slides out the bottom; horizon hidden behind rows; the colossus (depth 0.85) drifts down only 0.15x the crane and "rises" against the falling ledge, so start it cut by the top with that margin | EXISTS: `y` keys, `Ledge` / `Balustrade` (`cine/props.tsx`), `Monument quietY`, CineDemo B |
 | K4 | **Pull-back, intimate -> vast** | our world becomes a dot | dolly from push ~0.8 to 0 anchored on the subject; far x0.95 / mid x0.75 / fore x0.67 (ref-2 shot 16); dolly not zoom, so the room shrinks 5x and a depth-0.85 colossus 1.14x; land at 0.04-0.08 H, hold 0.6-1.0 s. Budget: 5x takes 5.6 s centred (9 s anchored low) at peak 15, so skip ~2x of it in a hidden cut on a dark wiper (S09's door match-cut) or settle for 2.3x in 3 s; never a bare allow-list (S09 hit 80 px/frame) | EXISTS: `push` / `anchor`, CineDemo C, `WindowCloseup` LOD hand-off (`cine/props.tsx`); `revealPlan()` TO BUILD |
@@ -363,8 +366,10 @@ The kit column names engine pieces as references only (playbook: no reusable ass
 | K10 | **High angle from the institution** | being looked down on by power | horizon 0.15-0.30 H, verticals converging down; calm, linear; once per video, on a crowd or plaza, never on the lone subject | PARTLY: `EndlessCity vp` roof tops (`cine/city.tsx`) |
 
 ## 5. Vertical short-form rules
-- **Stage:** key reads in x 120-880, y 290-1250, minus the right rail (x > 780 from y 840); the bottom 35 % and the rail are
-  platform UI (ad templates [VE §2, REPORTED]). Masses may run under the UI; figures, labels, the pop and contact points never.
+- **Stage:** key reads stay out of the platform UI zones (`G5_BLOCKING.md` §2 "Screen zones", the one definition: top
+  y < 180, bottom y > 1520, right rail x > 950 at y 900-1500) and 120 px from the side edges, the subject's read in
+  y 600-1250; ad templates cover more (the bottom 35 %, x > 780 from y 840 [VE §2, REPORTED]). Masses may run under the
+  UI; figures, labels, the pop and contact points never.
 - **Stack the depth vertically:** captions on a flat field at L* >= 70 (7:1 with the ink; `#8A9AA8` is 5.9:1) in y 290-600,
   the read in y 600-1250, a foreground mass cut by the bottom; <= 2 points of interest per scale shot, x 380-700 [VE §3].
 - **Observer** 60-150 px (floor 40), fill-only below 80 px, the stage's only high-contrast mark. **Horizon** in eye-height
@@ -388,6 +393,9 @@ missing, the meter's void, thing counts, colours per patch, layers and per-shot 
 craft tooling lane of `docs/PIPELINE_V2.md`; street templates are built when a film's G3 first needs them.
 
 ## 8. Arcane scenes for the owner to measure [AR §7]
+**Status (2026-10-26):** the owner's one recording came out black (Netflix DRM) and was identified from its subtitle and
+timecode as S1E1 ~2:30, compilation shot #55: measured as `CINEMATIC_GUIDE.md` S5, which with its 165 measured
+compilation shots supersedes the framings below; recording the rest is optional. The plan was:
 The owner screen-records one longer video of these scenes from their own account and uploads it to the session. It is
 analysed only in the session scratchpad with `video/scripts/look/measure_camera.py` (cuts, per-shot pan/tilt/zoom/roll
 curves, easing, parallax), never committed or published (the repo is public): only the measured numbers and our own

@@ -15,7 +15,8 @@ From the owner's reference (an explainer reel in our hand-drawn style, 1080x1350
 measured, not stored):
 - **0.00-0.35 s, the scene is made:** frame 0 is bare ink lines only; flat colour floods in shape by shape within
   ~0.3 s. Motion and "making" from the first frame.
-- **The voice starts at ~0.05 s.** No silent lead, no title card.
+- **The voice starts at ~0.05 s.** No silent lead, no title card. (Ours: the first word at ~0.12 s, the locked voice
+  file's lead, `docs/voice/API_QUICKSTART.md`.)
 - **0.3-2.2 s, the expectation:** the hook's claim is staged as what SHOULD happen (neat empty markers filling the
   street for "France expected 200,000 marchers"), building up row by row.
 - **~2.2 s, reality overtakes it:** on the payoff number ("Half a million came") the scene escalates and overflows
@@ -49,8 +50,10 @@ pull-out; the big scale move belongs to the reveal later in the film (S1 or S5).
   horizon at 0.37 H. Land: the wall is gone, horizon at 0.40 H (y ~770), city in the lower 60 %, flat sky in the top 40 %.
 - **Planes (5), travel down during the rise:** wall + the "you" ~520 px (they leave the frame), near
   towers ~400 px (cut by both side edges, tops kept out of the caption band), mid city ~220 px, horizon ~60 px, sky 0.
-- **Move:** 4-4.5 s, scale 1.00 -> 1.04, ease-out (fast start, lands in the last third), then hold 1 s. Draw the city
-  layers ~500 px taller than the start frame shows, so nothing runs out at the bottom.
+- **Move:** 4-4.5 s, scale 1.00 -> 1.04, ease-out (fast start, lands in the last third), then hold 1 s: #94's measured
+  shape. Retime it to the reel as S5 is (playbook Motion: the shape, never the speed; usually faster), so the scale
+  moment stays within ~1.5-4 s (`DIRECTION.md` rule 7). Draw the city layers ~500 px taller than the start frame
+  shows, so nothing runs out at the bottom.
 - **Light:** sun upper-left on the sky plane; every tower gets one lit side and one shade side, flat.
 - **Upgrades v1 @25** (rooftop wall, backs, skyline and sun, held static) into one reveal that ends on the whole city.
   Put it on a scale line ("tens of thousands", "every single server").
@@ -224,8 +227,8 @@ hero cloud behind it | 3 tiers of life, never 1 s still. Then, at phone size: do
    new place made for a beat (`CRAFT.md` §a.2); the cozy, enclosed streets stay the majority (`COZY_AND_SCALE.md`).
 
 ## Not for us
-- Faces, close-ups and people as the subject (owner, 2026-10-26): people stay small and seen from behind; in the
-  foreground only the film's "you" or the mascot (`CRAFT.md` §a.3).
+- Faces, close-ups and people as the subject (owner, 2026-10-26): people stay small and seen from behind, with no
+  faces at all (playbook); in the foreground only the film's "you" or the mascot (`CRAFT.md` §a.3).
 - Darkness: near-black frames (#81's arch), red and crimson skies, smoke and embers. A night is a light night:
   temperature, not darkness (`CRAFT.md` §d.2, `COZY_AND_SCALE.md` §3).
 - Painterly texture: haze, bloom, god rays, volumetric light, billowing cumulus. Clouds are 2-3 flat shapes.

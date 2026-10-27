@@ -51,7 +51,7 @@ tinted line or none, no line on the environment.)
   not get completely stuck in the given set of colours: expand if needed and where relevant."
 
 **The board** is `palette_family.png`: the same small scene drawn in each palette (8 when it was made; #9 Autumn Ember
-was added for v3, so regenerate it). The data (role → hex) is in
+came with v3 and #10 Canal Mint with v2's restart, so regenerate it). The data (role → hex) is in
 `palettes.json`. Regenerate the board after any change, with
 `python3 scripts/look/palette_board.py && node scripts/look/shoot.cjs` (run from `video/`). The Python step also checks
 every palette against the DNA below.
@@ -75,7 +75,7 @@ every palette against the DNA below.
 | # | Palette | What it is | Use cases |
 |---|---|---|---|
 | 1 | Mint & Clay (v1) | video 1 as shipped; the reference point | anything; our signature |
-| 2 | Mint & Clay 1.1 | **the incremental polish of v1:** same world, a saturated teal hero `#00857F`, a deeper anchor `#203A3B`, a tiny marigold pop `#F9A31B` | the default from video 2 on, unless a story asks for another |
+| 2 | Mint & Clay 1.1 | **the incremental polish of v1:** same world, a saturated teal hero `#00857F`, a deeper anchor `#203A3B`, a tiny marigold pop `#F9A31B` | a candidate for any story (it was planned as the default from video 2 on; v2 and v3 picked others for their stories) |
 | 3 | Cream & Cobalt | our cream as the page, cobalt hero, our orange as the pop | tech, clear explainers |
 | 4 | Blush & Pip | blush page, periwinkle hero (Pip's colour), aubergine anchor | human, light, brand moments |
 | 5 | Sage Study | sage and oat, lamp light, forest anchor, amber pop | cozy enclosure: home, desk, quiet interiors |
@@ -83,10 +83,12 @@ every palette against the DNA below.
 | 7 | Autumn Ochre | our clay family warmer, burnt-orange hero, a small cool blue pop | read sick on v3's G4 frame ("we need to have a warm feeling, not sick"): use #9 instead |
 | 8 | Harbour | a cool, fresh page with a warm coral hero and a deep sea anchor | science, health, the outdoors |
 | 9 | Autumn Ember | Autumn Ochre made warm (owner, v3 G4: "much better"): peach-cream page, terracotta-apricot ground, red-brown wood and lines, golden lamp light, burnt-orange hero, blue pop, a saturated dusk blue outside | money, everyday life, cozy interiors at night (v3: `docs/v3/LOOK.md`) |
+| 10 | Canal Mint | v2's restart (chosen by its judges, not yet shown to the owner as a palette pick): a flat mint sky `#BCDCCF` over warm stucco `#F4E4D2` and brick, a canal-teal hero `#0B8577`, a plum anchor `#36223A`, a sun-orange pop `#EE6A2E` | an evening outdoors by water, a serious personal story (roles: `src/v2r/palette.ts` `CM`, `docs/v2/STYLE.md` §2); not yet in `palettes.json` or on the board: add it at the next regeneration |
 
 **How to use it:**
-- **Each video picks one main palette** at G4: 2-3 candidates judged internally, the pick shown in the one look clip
-  (`PIPELINE_V2.md` G4). A sister palette may carry a
+- **Each video picks one main palette:** the W1 world bible proposes it (by the story's use case; 2-3 candidates judged
+  internally when the topic needs a new look) and writes its light rigs and colour script in its terms; the G4 look
+  clip shows it and the owner approves it there (`PIPELINE_V2.md` W1, G4). A sister palette may carry a
   deliberate shift inside the story, for example a Sage Study interior followed by a Dusk exterior for the scale
   reveal, because they share the DNA. Never mix many at once.
 - **Within a video, colours keep their jobs:** hero = what the story is about, anchor = weight, pop = "look here".

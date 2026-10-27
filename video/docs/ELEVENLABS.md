@@ -34,7 +34,8 @@ the format.**
 - **Ending:** the last paragraph ends on a full stop; nothing after it.
 - **Length:** 650-900 characters with tags (take 2: 714), and tags under 15 % of them.
 - **Cues in the script doc:** the owner's rule "detailed emotional cues" stays met in `script_gN.md` (a full cue per
-  line, to read). The paste carries only the short tags v4 needs.
+  line, to read). The paste carries only the short tags v4 needs. This replaces the paste format in
+  `CREATIVE_BRIEF.md` ("a bracketed cue on its own line before each beat"), which broke takes (2026-10-26).
 - **The linter enforces all of this:** `python3 scripts/voice/check_paste.py PASTE` errors on every pattern that broke a
   take. Its regression set: it fails the v2 take-1 paste and three v3 pastes, and passes the v2 take-2 paste. Nothing
   reaches the owner except its `--handoff` output, and `generate_take.py` refuses a paste that fails it.

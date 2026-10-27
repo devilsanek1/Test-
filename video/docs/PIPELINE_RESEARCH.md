@@ -1,5 +1,9 @@
 # Pipeline research: fast feedback loops for short animated explainers
 
+> **Background (2026-10-25); the process is `docs/PIPELINE_V2.md`.** The owner later narrowed two of its constraints:
+> no MP4s before the sketch animatic (G3: text and audio only, one version), and the G4 look is a clip made after the
+> G3 lock, never a lane beside G3.
+
 Scope: how studios structure animation production for feedback, mapped to our Remotion + AI-agent setup.
 Constraint from the owner: every gate gives a **playable low-res video with voice** on the phone, not stills.
 Web searches used: 6. Sources are listed at the end. Most are studio or agency process pages, not peer-reviewed.

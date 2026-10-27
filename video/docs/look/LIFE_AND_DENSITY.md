@@ -130,7 +130,8 @@ The kit is new for each film (playbook: no reusable assets); `lib/kit` `Person` 
 references and primitives, never the film's people.
 - **Back view always** (or rear 3/4): the head in the hair colour, a neck, a tombstone torso and one accessory each
   (beanie, hood, headphones, scarf, backpack, bag, raised phone); neighbours never share both hair and coat colour.
-  Faces only in the protagonist's face beat. Extras are smaller and in mid colours, never mistaken for the protagonist.
+  No faces (playbook: people act with their pose, like reference 1's); only the mascot has one. Extras are smaller and
+  in mid colours, never mistaken for the protagonist.
 - **Sizes by depth (1080 x 1920 canvas; size names, never the attention tiers A-C of `CRAFT.md`):** in the foreground
   only the film's one "you" (head 90-140 px, playbook: near heads <= ~140; cut by the bottom edge, head top ~y
   1380-1560) or the mascot, never a row of strangers' backs (they read as "you": `CRAFT.md` §a.3); a passer-by at the
@@ -146,7 +147,8 @@ references and primitives, never the film's people.
   face the viewer across water stay featureless, in side or 3/4 view (3b.2 RIVERSIDE).
 
 ## 5. The recurring living character
-- **One, in every shot** (reference 1: the cat and the sun; v1: Pip and the sun). Default: the channel's mascot **Pip**,
+- **One, in every shot** (reference 1: the cat and the sun; v1: Pip and the sun). Default: the channel's mascot **Pip**
+  (another character only if the story asks for it, named in the W1 world bible and seen by the owner at G3),
   drawn new in the film's design (playbook: no reusable assets; `src/lib/mascot` and `docs/mascot.md` are the reference
   and the API), in a colourway for the video's palette that stays its own hue (ΔE76 >= 20 from
   every ground it sits on, never the hero or the pop colour) and in tier B (`CRAFT.md` §b: C* <= 25, a tinted outline)
@@ -177,8 +179,9 @@ references and primitives, never the film's people.
 - **STORY-LED: ambient on in every shot, from frame 0, at tier weight:** weather (snow, rain, leaves) or smoke or steam;
   clouds drifting by their size (a big cloud 0-6 px/s, thin bars 5-15: a fast cloud reads small, `CINEMATIC_GUIDE.md`
   Scale cues 10); one window or bulb changing at a time (every ~2-4 s, never a twinkle on every bulb); people at
-  rest or walking; the character's idle; at most ONE small loop per shot (a swinging sign or tag, a fan, a clock hand, a
-  forklift). Never all of them loud at once: the story's motion leads.
+  rest or walking; the character's idle; at most ONE periodic prop per shot (a swinging sign or tag, a fan, a clock
+  hand, a forklift). On the G3 board these are the set panel's 2-3 ambient micro-moves (`loop: true`, at most one of
+  them that prop: `G3_ANIMATIC.md` §4). Never all of them loud at once: the story's motion leads.
 - **Cadence:** the story's beats land on the voice's words; between them supporting life keeps going, so no stretch over
   1 s has nothing moving; a burst (10+ items within 4 frames) only where the burst IS the beat (a number, a hero word:
   motion_spec §6, §9), never extra life competing with it. Events/s is information, never a target (2026-10-27).
@@ -203,8 +206,9 @@ references and primitives, never the film's people.
 ## 8. What may stay calm
 - **The caption band** (screen y ~290-600): flat wall or sky; weather may pass at half density or less, flakes <= 6 px;
   no ink, roof tops, heads or props.
-- **Platform UI zones** (top y < 180, bottom y > 1520, right rail x > 950 / y 900-1500): dressing yes (kerbs, the
-  edges of things; no strangers' backs in front), key information no.
+- **Platform UI zones** (top y < 180, bottom y > 1520, right rail x > 950 / y 900-1500; the one definition:
+  `G5_BLOCKING.md` §2 "Screen zones"): dressing yes (kerbs, the edges of things; no strangers' backs in front), key
+  information no.
 - **The quiet field** (15-35 %; a bounded floor seen from a balcony up to 50-60 %, `COZY_AND_SCALE.md` 3b.1) and **the
   subject's ring**. **One breath beat per film** (at most 2.5 s, usually after
   the heaviest line): the story pauses, the idle layer stays on, never a frozen frame.

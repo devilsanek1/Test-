@@ -42,7 +42,8 @@ owner never pastes anything. Proven on 2026-10-26: video 2's API take was clean 
    must print MATCH (exit 0). Listen once to anything marked "OK (Whisper)" or "LISTEN".
 4. **Deliver:** send `take.wav` to the owner as an attachment (audio only before G3).
 5. **Lock it for G3:** add a 0.12 s lead and write `public/vN/voice.wav` + `public/vN/voice_words.json`, as for video
-   2 in commit 93852c3.
+   2 in commit 93852c3. The first word then lands at ~0.12 s (frame 7 at 60 fps): that is the playbook's "voice from
+   the first frames", with room for frame 0's drawing to lead it; never a longer silent lead.
 6. **Log:** add the take (paste stats, settings, outcome) to `docs/ELEVENLABS.md` section 5.
 
 Cost: about 1 credit per character per try (~700 for a 40 s script). Every API try is charged.

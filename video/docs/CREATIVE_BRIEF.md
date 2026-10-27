@@ -1,5 +1,19 @@
 # What's All the Fuss About? Master Creative Brief (from the user, verbatim in substance)
 
+> **Later owner rules that update this brief** (`docs/OWNER_PLAYBOOK.md` wins where they differ; the brief stays the
+> source for the channel, story selection and writing):
+> - **Length:** target 30-45 s, ending close to the payoff (v1's insights, 2026-10-25), not §11's 45-60 s; keep §11's
+>   order (hook, stakes, explanation, twist, payoff) inside it.
+> - **Sound effects:** more of them, our own positive phone sounds (a like pop, a notification ding) with one in the
+>   first second (2026-10-25); §20-21's "only where they communicate something" still holds for each one: every
+>   sound marks something on screen.
+> - **The voice:** generated through the ElevenLabs API with the owner's voice (2026-10-26). The full delivery cue per
+>   line lives in the script doc; the paste carries only a few short tags at a paragraph's start (`docs/ELEVENLABS.md`
+>   §1, paste format v2). The "DELIVERY CUES" section's paste format (a bracketed cue on its own line before each
+>   beat) is retired for the paste: it broke takes.
+> - **Visuals:** the current look is `docs/look/DIRECTION.md`.
+> - The notes on "THIS script" and the PHP lines below are video 1's (history).
+
 Channel identity, editorial strategy and storytelling for "What's All the Fuss About?", a short-form channel
 (Instagram Reels, TikTok, YouTube Shorts).
 
