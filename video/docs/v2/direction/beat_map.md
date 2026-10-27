@@ -116,15 +116,12 @@ BBC quote or BBC-reported claim is on screen, show "Source: BBC News, 21 Oct 202
 | F20 | "The Pentagon" = the US Department of Defense | VERIFIED | guardrails s1 | "the Pentagon (US Department of Defense)". Never "Department of War". |
 
 **Verified, but NOT on screen:**
-- Her opinion quotes: "ashamed" (1.5), "I don't agree with this direction..." (1.6), "watched... can't speak" (5.5). Any one
-  lets a viewer say "but that IS criticism" and blunts the payoff.
-- Andreas Kirsch (1.9-1.12): a second person, and his resignation is BBC-only.
-- The ~600-staff letter and "within a day" (2.7, 2.8): not narrated, and they read as a villain beat.
-- Safety filters (2.5), and experts on whether "should not" binds (2.6).
-- Maven, targets, Shoker and Shanahan (7.x): general military AI, not Google, and they invite war imagery.
-- Nimbus, Israel and NAZA (3.6, N13); the 2018 pledge and its 2025 deletion (3.4, 3.5).
-- Any legal point (5.8, N10).
-- Her sick-out and protest (1.8): context only, so she is shown as someone who objected and then quit.
+- Her opinion quotes, "ashamed" (1.5), "I don't agree with this direction..." (1.6) and "watched... can't speak" (5.5):
+  any one lets a viewer say "but that IS criticism" and blunts the payoff.
+- Kirsch (1.9-1.12: a second person, resignation BBC-only); the ~600-staff letter and "within a day" (2.7, 2.8: not
+  narrated, a villain beat); safety filters (2.5); whether "should not" binds (2.6); Maven, targets, Shoker, Shanahan
+  (7.x: not Google, invites war imagery); Nimbus, Israel, NAZA (3.6, N13); the 2018 pledge and its 2025 deletion (3.4,
+  3.5); any legal point (5.8, N10). Her sick-out and protest (1.8) are context only: she objected, then quit.
 
 ## 4. Fairness rules for visuals (strict)
 
@@ -137,23 +134,15 @@ manufactured villains). A frame that breaks one of these doesn't ship.
   institutional: buildings, doors, paper, clearance stamps.
 - V2. **Google near violence:** no Google lettering, colours or products near weapons, targets, strikes, Maven, Iran,
   Israel or Gaza. Never imply Google's AI picks targets or was used in a strike; that is not reported (FL 7.2, N3).
-- V3. **Villains:**
-  - no sinister Google HQ, shadowy executives or Pentagon-as-monster;
-  - no Pichai, Hegseth or Trump;
-  - no looming figures over her, no ominous stings, no "EXPOSED", glitch or siren graphics;
-  - no hero lighting on her and villain lighting on Google.
-- V4. **A likeness of Sofia Liguori:**
-  - never traced from or matched to BBC or Intercept photos (face, hair, clothes), and no realistic face; she is a
-    generic figure with a name caption;
-  - anonymous staff are faceless and unnamed;
-  - never a synthetic voice of her: the narrator reads every quote.
-- V5. **"For life" as fact:**
-  - "for life" never goes in quote marks;
-  - the lifetime ban never appears as text without "she says" in the same frame;
-  - no stamp or label that presents it as an established contract term.
-- V6. **Invented documents:**
-  - any drawn contract is illustrative, with unreadable lines and no printed clause;
-  - nothing goes in quote marks that the person didn't say: no paraphrase in quotes, no two quotes spliced into one.
+- V3. **Villains:** no sinister Google HQ, shadowy executives or Pentagon-as-monster; no Pichai, Hegseth or Trump; no
+  looming figures over her, ominous stings, "EXPOSED", glitch or siren graphics; no hero light on her, villain light on Google.
+- V4. **A likeness of Sofia Liguori:** never traced from or matched to BBC or Intercept photos (face, hair, clothes), no
+  realistic face: a generic figure with a name caption. Anonymous staff stay faceless and unnamed. Never a synthetic
+  voice of her: the narrator reads every quote.
+- V5. **"For life" as fact:** "for life" never goes in quote marks; the lifetime ban never appears as text without
+  "she says" in the same frame; no stamp or label presents it as an established contract term.
+- V6. **Invented documents:** any drawn contract is illustrative, with unreadable lines and no printed clause. Nothing
+  goes in quote marks that the person didn't say: no paraphrase in quotes, no two quotes spliced into one.
 - V7. **Gag imagery:** no tape over mouths, padlocked lips, zips, muzzles, chains, handcuffs or cages ("silenced" and
   "gagged" are overclaims, since others did speak publicly: FL 5.9, N2).
 - V8. **A legal verdict:** no gavel, ILLEGAL, VOID or UNENFORCEABLE stamps, courtrooms, or scales of justice (N10).
@@ -175,10 +164,8 @@ manufactured villains). A frame that breaks one of these doesn't ship.
   never defaced. No Pentagon or DoD seal, no military insignia, and no flags used as partisan symbols.
 - V16. **Invented data:** no charts, growth curves or numbers for "where its military work was heading". No figure
   exists; show direction, not quantity. F8 is the only sourced step.
-- V17. **Reach and partisanship:**
-  - no Hegseth, Trump, elections, or Israel and Gaza imagery;
-  - "kill", "bomb", "genocide" and "Gaza" never appear in on-screen text;
-  - never "Department of War" and never "BBC exclusive".
+- V17. **Reach and partisanship:** no Hegseth, Trump, elections, or Israel and Gaza imagery; "kill", "bomb", "genocide"
+  and "Gaza" never in on-screen text; never "Department of War", never "BBC exclusive".
 
 **ALWAYS show:**
 - A1. "SHE SAYS" / "she says" in the frame whenever her contract claim appears as text (frame 0, the cover, #23).
@@ -189,17 +176,13 @@ manufactured villains). A frame that breaks one of these doesn't ship.
   "Statement to the BBC, 21 Oct 2026".
 - A3. Deal facts carry their own credit, e.g. "Reported Apr 2026 · BBC; The Information via Japan Times / 9to5Google".
 - A4. The full oversight clause whenever F10 shows (V9).
-- A5. Google's side at equal weight:
-  - the same size, light and colour temperature as her material;
-  - the whole 28.31-33.16 beat, uninterrupted;
-  - its own words under "Google says", with quote marks only on exact words.
+- A5. Google's side at equal weight: the same size, light and colour temperature as her material, the whole
+  28.31-33.16 beat uninterrupted, its own words under "Google says", quote marks only on exact words.
 - A6. Her name caption (F1) when she is introduced (#10-13).
 - A7. Quotes are exact, marked as quotes and read by the narrator. British spelling inside her quotes ("criticise",
   "criticising"), US spelling everywhere else.
-- A8. Three kinds of statement, told apart at a glance and readable with the sound off:
-  - an account carries "she says" or "told the BBC";
-  - a document carries its source;
-  - Google's words carry "Google says".
+- A8. Three kinds of statement, told apart at a glance with the sound off: an account carries "she says" or "told the
+  BBC", a document carries its source, Google's words carry "Google says".
 - A9. Credits: per-beat source lines in the film, and full sources (headline, byline, date, URL) in the post caption and
   the pinned comment. Nothing follows the payoff line in the film: it loops.
 - A10. The platform AI label is ON for the synthetic narration.
@@ -217,11 +200,9 @@ manufactured villains). A frame that breaks one of these doesn't ship.
 4. **What is "its AI", and what does "use" mean (#16)?** Google's AI models (Gemini), brought onto classified networks.
    The only reported military use so far is unclassified office work (F8). How does "use" read concretely without
    inventing uses or going near targeting (V1, V2)?
-5. **What was the deal (#14-18)?** An April 2026 amendment between Google and the Pentagon. How do we show it with the
-   following constraints?
-   - "classified" without war or "secret", and the Pentagon without a seal;
-   - its exact words with the 24-word clause readable inside 24.03-27.82 (or held to 28.31);
-   - optionally, that seven other firms signed similar deals (F17).
+5. **What was the deal (#14-18)?** An April 2026 amendment between Google and the Pentagon: "classified" without war
+   or "secret", the Pentagon without a seal, its exact words with the 24-word clause readable inside 24.03-27.82 (or
+   held to 28.31), and optionally that seven other firms signed similar deals (F17).
 6. **What does "can't veto" mean physically (#18)?** Who decides once it's handed over (the Pentagon decides lawful
    operational use, and Google has no right to control it). Show the mechanism, not a judgement (V10).
 7. **"Where its military work was heading" (#12-13)?** It's a direction with no numbers (V16). F8 to F9 (unclassified
@@ -231,12 +212,7 @@ manufactured villains). A frame that breaks one of these doesn't ship.
    deal and "retaliation" against the fear, with no irony (V14)? And how does the story still turn cleanly back to her
    at 33.16?
 9. **Why can she talk (#23-26)?** Her answer is the payoff. At 36.54-37.48 the viewer must FEEL that the film's facts
-   were "the facts", without:
-   - (a) narrating it;
-   - (b) implying she is legally safe;
-   - (c) implying she told the BBC only facts, or leaked anything;
-   - (d) folding Google's statement into "her facts".
-
-   After that, how do 38.82-39.08 close the loop to frame 0?
+   were "the facts", without (a) narrating it, (b) implying she is legally safe, (c) implying she told the BBC only
+   facts or leaked anything, or (d) folding Google's statement into "her facts". Then 38.82-39.08 closes the loop to frame 0.
 10. **Sound off.** Every beat must read literally without audio, and the three kinds of statement (A8) must be
     distinguishable. What carries "she says" vs "Google says" vs "the deal says" in the picture itself?
