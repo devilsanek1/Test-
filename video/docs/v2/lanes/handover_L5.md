@@ -31,3 +31,20 @@
 3. V2S6 / V2S7 scenes (S7 forecourt set: fountains, cafe tables + seated backs, plane trees with string lights on at 30.04,
    bikes, planter, basin rim; staff backs in/out of the doors), review files, critic loop, report_L5.md.
 Setup notes: `npm ci` done fast; pip opencv-python-headless + fonttools brotli needed; the config's browser path exists.
+
+## Handover 2 (ultracode session, 2026-10-27): stopped at the orchestrator's request (lane moves to an /effort max session)
+- Finished: re-read COMMON, brief_L5, handover_L5, TREATMENT (full), BUILD.md, map.ts S6/S7/B, the dc/canal/cast/pip READMEs,
+  dc/gate.tsx (`GateSet` slots, `GATE.post`, `doorOpen`), dc/sheets.tsx `GateDC` (a near-complete S6 sample with a STAND-IN
+  board: reuse its people/door logic), canal wing.tsx `WingS7` + boat.tsx `BoatWiper` (`half` = 630). `npm ci` done.
+- No new repo files: two workflows were launched and STOPPED before any agent wrote code (K3: StatementBoard/presets +
+  small.tsx builders -> integrator (index, README, `src/entry-v2r-boards.tsx` sheet + per-preset comps) -> 4 critics (art
+  director/readability, standards/fairness, lane API, motion) -> fix loop; S7: planner -> set + life builders
+  (`V2S7_set.tsx`, `V2S7_life.tsx`) -> assembler (V2S7.tsx, push, Wiper = BoatWiper)). That plan is still the right one.
+- Heard word times (public/v2r/voice_words_heard.json): any 24.03 · veto 26.50 · But 28.31 · Google 28.36 · AI 29.64 ·
+  principles 30.04 · bans 30.84 · of 32.08 · kind 32.52-32.70. Shot-local preset defaults: Deal purpose 0.03, F12 2.40;
+  Google header 0.30, "AI principles" pen 1.59 -> 1.98, small row 2.24, bans 2.78 -> "of any kind" complete 4.02; Her wipe
+  2.79, quote pen 3.61 (S8 start 32.93); BBC board out 2.34 (S2 start 6.10, face 400 x 200: different size, same face/type).
+- Next (unchanged): 1) K3 first and push (L2 needs ToldTheBBCBoard at S2.aBoard; L3 PaperTag/Fingerpost; L4 NewsBox/Plaque;
+  L6 HerBoard). 2) V2S6 = GateSet + DealBoard (mid plane) + GateDC's people + Pip on the post, flick 'A' 26.50. 3) V2S7
+  forecourt on WingS7. Open asks: L6 wants Pip drawn on the S7 wiper roof until 33.00 (handover_L6.md); L3 says the 280x200
+  tag is too small at the scale.
