@@ -42,7 +42,8 @@ export const S1_PALE = 0.7;
 /** The subject's outline draws on as ONE stroke per object (every part at once over `dur`), from `at`, so f0 (t 0) shows
  *  it mid-draw (~half): her behind the glass, the door (frame + leaves), W's frame. */
 export const S1_DRAW = {at: -0.26, dur: 0.52} as const;
-/** Tier A spans (film s): W is the subject before the lamp click and from her look back to the dive; the door (with its
+/** Tier A spans (film s): W is the subject before the lamp click and from her look back to the dive (support, no
+ *  outline, between them); the door (with its
  *  canopy letters) from frame 0 through her step-out and the doors shutting (A at 0.45-1.40 in conform_L1 §5; it is
  *  also one of frame 0's three drawn subjects, so it holds A from the loop underlay on). */
 export const S1_TIER_A = {w: [[-1, 0.4], [5.59, 6.25]] as [number, number][], door: [-1, 1.4] as [number, number]} as const;

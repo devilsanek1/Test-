@@ -471,8 +471,9 @@ export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
     <>
       <CellPaint b={stat} seed="s1wing/stat" cell={110} />
       <CellPaint b={dyn} seed="s1wing/panes" cell={110} live />
-      {/* W: the subject (one closed outline drawing on at frame 0) before the lamp click and from her look back */}
-      <Tier tier={wIsSubject(t) ? 'subject' : 'environment'}>
+      {/* W, the thread: the subject (one closed outline drawing on at frame 0) before the lamp click and from her look
+          back; support otherwise (no outline, its plum anchor barely calmed) */}
+      <Tier tier={wIsSubject(t) ? 'subject' : 'support'}>
         <CellPaint b={wb} seed="s1wing/W" cell={400} live draw={S1_DRAW} />
       </Tier>
       <CellPaint b={lobby} seed="s1wing/lobby" cell={400} />
