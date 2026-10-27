@@ -148,22 +148,22 @@ Format: **rule** — why / evidence (video, date).
 ## Process and communication
 - **Parallelize as much as possible: split independent work across helper cloud sessions (each its own machine) and
   archive each one as soon as its work is pushed and checked;** each helper's done-signal is a report file, and every
-  helper runs in ULTRACODE: its first prompt is exactly `/effort ultracode on`, then its task comes as a message
-  (check `is_ultracode_active`). — ("archive them", v3; "clean them up", "effort either max or ultracode", v2, 2026-10-27).
+  helper runs at MAX effort with ultracode: boot it from a branch whose `.claude/settings.json` says `"ultracode": true`
+  with the first prompt `/effort max`, send the task as a message, check `effort_level: max` + `is_ultracode_active`. — (v2/v3, 2026-10-27).
 - **Playable video from the sketch animatic (G3) on, never only stills; before G3 text and audio only, one version unless
   asked. Lock the story before big commitments; polish late.** — (v1, 2026-10-25; "why are there multiple versions", v3).
 - **Progress: the gate deliverable is the update, with a short status on all threads between; lean prompts and docs.** — (v1).
 - **Every cut sent to the owner says what stage it is and what the next stages add** (e.g. "blocking: staging only;
   next: density, life, polish, full-res"), so a draft is never mistaken for the final. — ("let me know if this is just
   an initial intermediate step", v3 G5, 2026-10-26).
+- **EFFORT IS ALWAYS MAX:** every workflow agent passes `effort: 'max'`, every helper session runs at /effort max; a lazy
+  video from a low effort setting is our failure. — ("the key rule is we need to ensure the effort is MAX!", v2, 2026-10-27).
 - **NO LIMIT ON TOKENS for creative output; never trade quality for savings.** Ideas, scripts, judged competing ideas,
   design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
   reviewing what will still change, early polish). — (2026-10-25; owner, 2026-10-26).
-- **Locked means dropped:** rejected options go to the video's `archive/`, the gate doc keeps only the locked choice,
-  later prompts never see them; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
-- **Every lesson goes into the generic process, committed:** this playbook, a gate in `PIPELINE_V2.md`, or the studio
-  toolkit, so the next video doesn't repeat it. — ("we gradually get better as a production studio", v3, 2026-10-26).
+- **Locked means dropped:** rejected options go to `archive/`, never seen by later prompts; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
+- **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
   creative freedom inside these principles; never patch the rejected cut. — ("No I don't like it, let's start from
