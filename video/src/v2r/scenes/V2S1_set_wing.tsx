@@ -331,27 +331,28 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
     // one step lighter than the plum: the shelf + box files, the chair back, the desk edge, the anglepoise she
     // switched off (arm up, shade tipped); all kept off W's very centre (the dive goes through it)
     b.poly(CM.coatPlum, qq(0.05, 0.27, 0.3, 0.025));
-    for (let k = 0; k < 3; k++) b.poly(CM.coatPlum, qq(0.07 + k * 0.085, 0.15, 0.06, 0.12));
+    // the box files as one stepped block (the dark slivers between them read as ticks)
+    for (let k = 0; k < 3; k++) b.poly(CM.coatPlum, qq(0.07 + k * 0.085, 0.15 + [0, 0.015, 0.006][k], 0.086, 0.12 - [0, 0.015, 0.006][k]));
     b.poly(CM.coatPlum, qq(0, 0.78, 1, 0.03));
     b.fill(CM.coatPlum, `M${P(...pp(0.14, 1))}L${P(...pp(0.14, 0.64))}Q${P(...pp(0.24, 0.56))} ${P(...pp(0.34, 0.64))}L${P(...pp(0.34, 0.78))}L${P(...pp(0.3, 0.78))}L${P(...pp(0.3, 1))}Z`);
-    b.fill(CM.coatPlum, `M${P(...pp(0.74, 0.78))}L${P(...pp(0.86, 0.78))}L${P(...pp(0.84, 0.75))}L${P(...pp(0.76, 0.75))}Z`);
-    b.fill(CM.coatPlum, barPath(pp(0.8, 0.76), pp(0.86, 0.6), 3));
-    b.fill(CM.coatPlum, barPath(pp(0.86, 0.6), pp(0.76, 0.5), 3));
-    b.fill(CM.coatPlum, `M${P(...pp(0.7, 0.5))}L${P(...pp(0.79, 0.44))}L${P(...pp(0.82, 0.53))}Z`);
+    b.fill(CM.coatPlum, `M${P(...pp(0.7, 0.78))}L${P(...pp(0.82, 0.78))}L${P(...pp(0.8, 0.75))}L${P(...pp(0.72, 0.75))}Z`);
+    b.fill(CM.coatPlum, barPath(pp(0.76, 0.76), pp(0.8, 0.6), 3));
+    b.fill(CM.coatPlum, barPath(pp(0.8, 0.6), pp(0.7, 0.5), 3));
+    b.fill(CM.coatPlum, `M${P(...pp(0.64, 0.5))}L${P(...pp(0.73, 0.44))}L${P(...pp(0.76, 0.53))}Z`);
   } else {
     // lamp-lit: her desk lamp on (a flat pool on the desk, never a glow), the shelf of box files, the chair back
     b.poly(CM.lamp, qq(0, 0, 1, 1));
     b.poly(CM.lampCore, qq(0.36, 0.08, 0.58, 0.62));
     b.poly(CM.line, qq(0.05, 0.27, 0.3, 0.025));
-    for (let k = 0; k < 3; k++) b.poly([CM.brick, CM.paneUnlit, CM.coatMustard][k], qq(0.07 + k * 0.085, 0.15, 0.06, 0.12));
+    for (let k = 0; k < 3; k++) b.poly([CM.brick, CM.paneUnlit, CM.coatMustard][k], qq(0.07 + k * 0.085, 0.15 + [0, 0.015, 0.006][k], 0.086, 0.12 - [0, 0.015, 0.006][k]));
     b.poly(CM.brickLight, qq(0, 0.78, 1, 0.03));
     b.poly(CM.lampCore, [pp(0.62, 0.78), pp(0.96, 0.78), pp(0.9, 0.7), pp(0.7, 0.7)]);
     b.fill(CM.coatSlate, `M${P(...pp(0.14, 1))}L${P(...pp(0.14, 0.64))}Q${P(...pp(0.24, 0.56))} ${P(...pp(0.34, 0.64))}L${P(...pp(0.34, 0.78))}L${P(...pp(0.3, 0.78))}L${P(...pp(0.3, 1))}Z`);
-    b.fill(CM.coatSlate, `M${P(...pp(0.74, 0.78))}L${P(...pp(0.86, 0.78))}L${P(...pp(0.84, 0.75))}L${P(...pp(0.76, 0.75))}Z`);
-    b.fill(CM.coatSlate, barPath(pp(0.8, 0.76), pp(0.86, 0.6), 3));
-    b.fill(CM.coatSlate, barPath(pp(0.86, 0.6), pp(0.76, 0.5), 3));
-    b.fill(CM.coatSlate, `M${P(...pp(0.7, 0.5))}L${P(...pp(0.79, 0.44))}L${P(...pp(0.82, 0.53))}Z`);
-    b.fill(CM.paper, ovalPath(...pp(0.765, 0.53), 3.5, 2.5));
+    b.fill(CM.coatSlate, `M${P(...pp(0.7, 0.78))}L${P(...pp(0.82, 0.78))}L${P(...pp(0.8, 0.75))}L${P(...pp(0.72, 0.75))}Z`);
+    b.fill(CM.coatSlate, barPath(pp(0.76, 0.76), pp(0.8, 0.6), 3));
+    b.fill(CM.coatSlate, barPath(pp(0.8, 0.6), pp(0.7, 0.5), 3));
+    b.fill(CM.coatSlate, `M${P(...pp(0.64, 0.5))}L${P(...pp(0.73, 0.44))}L${P(...pp(0.76, 0.53))}Z`);
+    b.fill(CM.paper, ovalPath(...pp(0.705, 0.53), 3.5, 2.5));
   }
   // the glazing: two slim stone mullions near the sides (kept out of the dive's centre) as fills; their lines in ink
   b.layer();
@@ -370,12 +371,9 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
   b.fill(CM.shadeWarm, `M${P(rx - RX, ry)}A${RX.toFixed(1)} ${RY.toFixed(1)} 0 1 0 ${P(rx + RX, ry)}A${RX.toFixed(1)} ${RY.toFixed(1)} 0 1 0 ${P(rx - RX, ry)}Z`);
   b.fill(CM.paper, ovalPath(rx, ry - 0.3, RX * 0.7, RY * 0.52));
   b.fill(CM.sage, leafPath(rx + RX * 1.75, ry - 1.5, 16, 5, -18));
-  // W's lines: the frame (one closed path), the mullions, the sill; the shelf, the chair and the lamp are flat fills
-  // (their short strokes broke the line budget, critic G4)
-  inkM.push(poly(qq(0, 0, 1, 1), {closed: true, over: 'small', seed: 's1W/frame'}));
-  inkF.push(line(...pp(0.12 - 0.022, 0.01), ...pp(0.12 - 0.022, 0.99), {seed: 's1W/m1', over: 'none'}));
-  inkF.push(line(...pp(0.88 + 0.022, 0.01), ...pp(0.88 + 0.022, 0.99), {seed: 's1W/m2', over: 'none'}));
-  inkF.push(line(...p(u0 - 0.14, v0 + h), ...p(u0 + w + 0.14, v0 + h), {seed: 's1W/sill', over: 'small'}));
+  // W's line: the frame, one closed path with no corner overshoot; the mullions, the sill, the shelf, the chair and the
+  // lamp are flat fills (their lines and the overshoot ticks broke the short-stroke budget, critic G4)
+  inkM.push(poly(qq(0, 0, 1, 1), {closed: true, over: 'none', seed: 's1W/frame'}));
 }
 
 // ---------------------------------------------------------------- the lobby behind the door

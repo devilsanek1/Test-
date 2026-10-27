@@ -1,6 +1,7 @@
 // V2S1 helper (lane L1): HER and THE GHOST ROW (TREATMENT sections 3-4; map s1RowAt / S1_ROW / GHOST_POP; the shot
 // clock V2S1_clock). She walks out of the glass doors at 0.97 and strolls west; on each clause an outline copy of her,
-// greyer each time, pops one step ahead; on "life" the whole row takes ONE step and three bare outlines pop down the bend.
+// greyer each time, pops one step ahead; on "life" the whole row takes ONE step and three more white-haired copies pop
+// down the bend (bare see-through outlines read as ghosts: the G4 cold viewer).
 // Every member is the SAME drawing (V2S1_row_fig: her long belted coat, collar, low bun, sleeves, a walking scissor), so
 // the copies read as her, never as gowns: G1 = her now (dark plum head) -> G6 white-silver with a scarf; the coats
 // paper; legs and shoes walk below a mid-calf hem in lockstep (s1Step). TIER A (CRAFT §b): her, the ghosts and the
@@ -56,7 +57,8 @@ export const ghostSpec = (age: number, v: LegVariant = 'clamp'): FigSpec => {
   const a = Math.max(1, Math.min(6, Math.round(age)));
   return {
     kind: 'ghost',
-    coat: CM.ghostPaper,
+    // an oat coat, never paper-white: white coats read as lab coats or gowns tied at the back (cold viewer, G4)
+    coat: CM.coatOat,
     head: GH[a - 1],
     ...legValues(a, v),
     // the scarf one fixed grey-silver (G3's head value): one step under G4's silver, and it still reads at 216 px on G5-G6's white
@@ -66,7 +68,8 @@ export const ghostSpec = (age: number, v: LegVariant = 'clamp'): FigSpec => {
 };
 /** G4 a slightly shorter stride, G5-G6 shorter (same cadence: lockstep). */
 export const ghostStride = (age: number) => (age >= 5 ? 0.78 : age >= 4 ? 0.9 : 1);
-/** O1-O3: ink only, no fill, no age cue. */
+/** O1-O3 (kept for other readers): ink only, no fill, no age cue. NOT drawn in S1 since the G4 cold read: the bare
+ *  see-through outlines read as "ghosts: until she dies"; on "life" three more white-haired copies (G6) pop instead. */
 export const OUTLINE_SPEC: FigSpec = {kind: 'outline'};
 
 /** Ink as authored (the clean pen's subject tier makes it 3.0 px on screen): ONE weight for the whole row (line weight
@@ -118,15 +121,15 @@ export const S1Row: React.FC = () => {
           <RowFigure
             key={m.id}
             seed={`s1row/${m.id}`}
-            spec={m.kind === 'ghost' ? ghostSpec(age, legs) : OUTLINE_SPEC}
+            spec={m.kind === 'ghost' ? ghostSpec(age, legs) : ghostSpec(6, legs)}
             x={p.x}
             y={p.feetY}
             h={p.h}
             step={step}
-            stride={m.kind === 'ghost' ? ghostStride(age) : 1}
+            stride={ghostStride(m.kind === 'ghost' ? age : 6)}
             inkPx={GHOST_INK}
             at={m.popT ?? undefined}
-            knockout={m.kind === 'outline'}
+            knockout={false}
             misregX={0.3}
           />
         );
