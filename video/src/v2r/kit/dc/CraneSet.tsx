@@ -23,6 +23,7 @@ import {Pentagon} from './pentagon';
 import {Terrace, StrangerBench, TerraceTree, CornerTree, LampPost, LAMP_RIGHT, NearPetals, Pigeons} from './terrace';
 import {BirdV, Gulls} from './life';
 import {CM} from '../../palette';
+import {tiered, Slot} from '../tiers';
 
 export type CraneSetProps = {
   /** Override the progress (sheets, stills). Default: craneP(scene time). */
@@ -39,7 +40,7 @@ export type CraneSetProps = {
   swap?: number;
 };
 
-export const CraneSet: React.FC<CraneSetProps> = ({p: pIn, figuresStart, figuresEnd, deckStart, deckEnd, wipe = true, sky = false, swap = swapAt}) => {
+const CraneSetBody: React.FC<CraneSetProps> = ({p: pIn, figuresStart, figuresEnd, deckStart, deckEnd, wipe = true, sky = false, swap = swapAt}) => {
   const t = useTime();
   const p = pIn ?? craneP(t);
   const swapped = pIn !== undefined ? pIn >= 0.47 : t >= swap;
@@ -64,14 +65,14 @@ export const CraneSet: React.FC<CraneSetProps> = ({p: pIn, figuresStart, figures
       <PullLayer m={planeMat(DECK, p)}>
         <Terrace />
         <Pigeons />
-        {deckEnd}
-        {swapped ? figuresEnd : null}
+        <Slot>{deckEnd}</Slot>
+        <Slot>{swapped ? figuresEnd : null}</Slot>
       </PullLayer>
-      {swapped ? null : <PullLayer m={startMat(DECK, p)}>{figuresStart}</PullLayer>}
+      {swapped ? null : <PullLayer m={startMat(DECK, p)}><Slot>{figuresStart}</Slot></PullLayer>}
       <PullLayer m={planeMat(DECK, p)}>
         <StrangerBench />
       </PullLayer>
-      <PullLayer m={startMat(DECK, p)}>{deckStart}</PullLayer>
+      <PullLayer m={startMat(DECK, p)}><Slot>{deckStart}</Slot></PullLayer>
       <PullLayer m={boxMat(T1_BOX, p)}>
         <TerraceTree burstAt={CRANE_T.april} />
       </PullLayer>
@@ -90,5 +91,6 @@ export const CraneSet: React.FC<CraneSetProps> = ({p: pIn, figuresStart, figures
     </>
   );
 };
+export const CraneSet = tiered('environment', {}, CraneSetBody);
 
 void VISTA;

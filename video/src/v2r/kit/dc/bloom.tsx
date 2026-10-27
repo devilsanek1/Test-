@@ -9,6 +9,7 @@ import React, {useMemo} from 'react';
 import {CM} from '../../palette';
 import {useTime} from '../../../lib/time';
 import {Batch, Paint, mix, crownD, ellD, rng, blossomD, burstScale, type Pt} from './core';
+import {tiered} from '../tiers';
 
 export type BloomTones = {
   base: string;
@@ -113,7 +114,7 @@ export type BloomCrownsProps = {
 };
 
 /** Several blossoming crowns, back to front, in one batched drawing (each crown: mass, limbs, clumps, flowers). */
-export const BloomCrowns: React.FC<BloomCrownsProps> = ({crowns, tones = BLOOM_NEAR, burstAt, seed = 'bloom', misreg = 3}) => {
+const BloomCrownsBody: React.FC<BloomCrownsProps> = ({crowns, tones = BLOOM_NEAR, burstAt, seed = 'bloom', misreg = 3}) => {
   const t = useTime();
   const L = useMemo(() => crowns.map((c) => layout(c, tones)), [crowns, tones]);
   const build = (scaleOf: (i: number) => number) => {
@@ -124,8 +125,8 @@ export const BloomCrowns: React.FC<BloomCrownsProps> = ({crowns, tones = BLOOM_N
       B.fill(tones.base, l.base);
       if (c.limbs !== false) {
         const w = c.ink ?? Math.max(2.2, Math.min(5, c.rx / 30));
-        B.ink(l.limbs, w, tones.limb);
-        B.ink(l.twigs, w * 0.55, tones.limb);
+        B.ink(l.limbs, w, tones.limb, 0, {thing: true});
+        B.ink(l.twigs, w * 0.55, tones.limb, 0, {thing: true});
       }
       B.layer();
       let buds = '';
@@ -149,3 +150,4 @@ export const BloomCrowns: React.FC<BloomCrownsProps> = ({crowns, tones = BLOOM_N
   const b = bloomed ? full : before ? bare : build((i) => burstScale(t, burstAt, i));
   return <Paint b={b} seed={seed} misreg={misreg} />;
 };
+export const BloomCrowns = tiered('environment', {}, BloomCrownsBody);

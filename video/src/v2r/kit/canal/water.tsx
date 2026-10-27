@@ -6,6 +6,7 @@ import React, {useMemo} from 'react';
 import {CM} from '../../palette';
 import {useTime} from '../../../lib/time';
 import {Batch, Paint, P, rng, frac, lerp, ovalPath} from './core';
+import {tiered} from '../tiers';
 
 export type Reflection = {
   /** Screen x range of the thing reflected (a facade, a boat, a lamp post). */
@@ -38,7 +39,7 @@ export type WaterProps = {
   reflTop?: number;
 };
 
-export const Water: React.FC<WaterProps> = ({y0, y1, x0 = -40, x1 = 1120, seed, reflections = [], bankShade = 10, ripples = 26, glints = 14, current = -10, wake, near = 1.6, reflTop}) => {
+const WaterBody: React.FC<WaterProps> = ({y0, y1, x0 = -40, x1 = 1120, seed, reflections = [], bankShade = 10, ripples = 26, glints = 14, current = -10, wake, near = 1.6, reflTop}) => {
   const t = useTime();
   const H = y1 - y0;
   // static base: the water, the bank shade, the reflections' broken strips (they wobble slowly: per frame below)
@@ -114,6 +115,7 @@ export const Water: React.FC<WaterProps> = ({y0, y1, x0 = -40, x1 = 1120, seed, 
     </>
   );
 };
+export const Water = tiered('environment', {}, WaterBody);
 
 /** A stone coping (the canal's edge): a thin limestone strip with joints and a dark lip line toward the water. */
 export function copingInto(b: Batch, x0: number, x1: number, y: number, h: number, seed: string, ink = 2.2) {

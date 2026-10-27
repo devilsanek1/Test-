@@ -12,6 +12,7 @@ import {Model} from './body';
 import {BuildProps, Person, Seated} from './People';
 import {Traits} from './traits';
 import {circlePath, curve, FigureG, Parts, Pt} from './parts';
+import {tieredAll} from '../tiers';
 
 export const STRANGER: Partial<Traits> & Partial<Model> = {
   hair: 'short',
@@ -36,12 +37,13 @@ export type StrangerProps = BuildProps & {
 };
 
 /** The stranger on the S5 bench, reading an open newspaper (no masthead, no legible words). */
-export const Stranger: React.FC<StrangerProps> = ({x, y, h = 150, turnPageAt = [], at, fillLag, seed = 'stranger'}) => {
+const StrangerBody: React.FC<StrangerProps> = ({x, y, h = 150, turnPageAt = [], at, fillLag, seed = 'stranger'}) => {
   const t = useTime();
   let lift = 0;
   for (const a of turnPageAt) if (t >= a && t < a + 0.4) lift = Math.sin(((t - a) / 0.4) * Math.PI) * h * 0.02;
   return <Seated x={x} y={y - lift} h={h} seed={seed} traits={STRANGER} model={STRANGER} read at={at} fillLag={fillLag} />;
 };
+export const Stranger = tieredAll('support', {lines: true}, StrangerBody);
 
 export const CAFE_OWNER: Partial<Traits> & Partial<Model> = {
   hair: 'bun',
@@ -73,7 +75,7 @@ export type CafeOwnerProps = BuildProps & {
 };
 
 /** The café owner: a small back in an apron with a cloth; one wiping stroke across the board. */
-export const CafeOwner: React.FC<CafeOwnerProps> = ({x, y, h = 170, wipeAt, wipeDur = 0.45, reachFrom, reachTo, flip, at, fillLag, seed = 'cafeOwner'}) => {
+const CafeOwnerBody: React.FC<CafeOwnerProps> = ({x, y, h = 170, wipeAt, wipeDur = 0.45, reachFrom, reachTo, flip, at, fillLag, seed = 'cafeOwner'}) => {
   const t = useTime();
   const from: Pt = reachFrom ?? [-h * 0.12, -h * 0.68];
   const to: Pt = reachTo ?? [-h * 0.5, -h * 0.6];
@@ -89,6 +91,7 @@ export const CafeOwner: React.FC<CafeOwnerProps> = ({x, y, h = 170, wipeAt, wipe
     </>
   );
 };
+export const CafeOwner = tieredAll('support', {lines: true}, CafeOwnerBody);
 
 function clothParts(hand: Pt, h: number) {
   const [x, y] = hand;

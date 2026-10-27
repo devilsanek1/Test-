@@ -21,6 +21,7 @@ import {castRow, TraitOverrides, Traits, traitsFor} from './traits';
 import {bustParts, BustOpts, Model, nearParts, SeatArms, seatParts, SeatOpts, SeatView, StandPose, standParts, View} from './body';
 import {drawn, gaitOf, selfSteps, STILL} from './gait';
 import {cached, FigureG, inkFor, Lod, lodFor, misregFor, Parts, q100, q2} from './parts';
+import {tieredAll} from '../tiers';
 
 export type BuildProps = {
   /** Build start (scene s): ink draws on, then the fills pop 0.15 s later. Omit = already there. */
@@ -89,7 +90,7 @@ export type PersonProps = BuildProps & {
 export const CYCLIST_MAX_H = 172;
 
 /** A standing / walking / jogging / cycling member of the public, or (via `model`) any named standing figure. */
-export const Person: React.FC<PersonProps> = (p) => {
+const PersonBody: React.FC<PersonProps> = (p) => {
   const t = useTime();
   const tr = traitsFor(p.seed, p.traits);
   const m: Model = {...tr, ...(p.model ?? {}), ...(p.child ? {child: true} : {})};
@@ -114,6 +115,7 @@ export const Person: React.FC<PersonProps> = (p) => {
     </FigureG>
   );
 };
+export const Person = tieredAll('support', {lines: true}, PersonBody);
 
 export type SeatedProps = BuildProps & {
   /** The seat line (canvas px): where the torso meets the step / bench. */
@@ -152,7 +154,7 @@ export type SeatedProps = BuildProps & {
 };
 
 /** A seated figure (steps, benches, café chairs): a back by default, or a rear 3/4 / profile with the lap and knees. */
-export const Seated: React.FC<SeatedProps> = (p) => {
+const SeatedBody: React.FC<SeatedProps> = (p) => {
   const tr = traitsFor(p.seed, p.traits);
   const m: Model = {...tr, ...(p.model ?? {}), ...(p.child ? {child: true} : {})};
   const h = q2(p.h * (0.96 + (tr.tall - 0.93) * 0.6));
@@ -183,6 +185,7 @@ export const Seated: React.FC<SeatedProps> = (p) => {
     </FigureG>
   );
 };
+export const Seated = tieredAll('support', {lines: true}, SeatedBody);
 
 export type NearBackProps = BuildProps & {
   /** Centre of the shoulders at the CUT line (canvas px; usually y = 1920). */
@@ -202,7 +205,7 @@ export type NearBackProps = BuildProps & {
 };
 
 /** A head-and-shoulders back cut by the frame bottom (the near row: S1's steps, S2 / S6 passers-by, S7's tables). */
-export const NearBack: React.FC<NearBackProps> = (p) => {
+const NearBackBody: React.FC<NearBackProps> = (p) => {
   const tr = traitsFor(p.seed, p.traits);
   const m: Model = {...tr, ...(p.model ?? {})};
   const hv = q2(p.hv);
@@ -215,6 +218,7 @@ export const NearBack: React.FC<NearBackProps> = (p) => {
     </FigureG>
   );
 };
+export const NearBack = tieredAll('support', {lines: true}, NearBackBody);
 
 export type WindowPersonProps = BuildProps & {
   /** Centre of the shoulders at the SILL (canvas px). */
@@ -237,7 +241,7 @@ export type WindowPersonProps = BuildProps & {
 };
 
 /** A neighbour in a window (12-60 px): a head and shoulders behind the sill, moving (sway, watering, reading). */
-export const WindowPerson: React.FC<WindowPersonProps> = (p) => {
+const WindowPersonBody: React.FC<WindowPersonProps> = (p) => {
   const t = useTime();
   const tr = traitsFor(p.seed, p.traits);
   const m: Model = {...tr, mono: p.mono};
@@ -253,13 +257,14 @@ export const WindowPerson: React.FC<WindowPersonProps> = (p) => {
     </FigureG>
   );
 };
+export const WindowPerson = tieredAll('support', {lines: true}, WindowPersonBody);
 
 // ---------------------------------------------------------------- rows
 
 export type SeatedRowSpot = {x: number; y: number; h: number; turn?: number; cup?: number; read?: boolean; phone?: boolean; side?: 1 | -1; traits?: TraitOverrides; arms?: SeatArms; lean?: number; view?: SeatView; flip?: boolean; child?: boolean};
 
 /** A row of seated backs with no two neighbours alike (castRow). `spots` left to right. */
-export const SeatedRow: React.FC<BuildProps & {seed: string; spots: SeatedRowSpot[]; stagger?: number; ink?: number}> = ({seed, spots, at, stagger = 0.05, ink}) => {
+const SeatedRowBody: React.FC<BuildProps & {seed: string; spots: SeatedRowSpot[]; stagger?: number; ink?: number}> = ({seed, spots, at, stagger = 0.05, ink}) => {
   const row = castRow(seed, spots.length, {over: spots.map((s) => s.traits ?? {})});
   return (
     <>
@@ -269,6 +274,7 @@ export const SeatedRow: React.FC<BuildProps & {seed: string; spots: SeatedRowSpo
     </>
   );
 };
+export const SeatedRow = tieredAll('support', {lines: true}, SeatedRowBody);
 
 /** Freeze a castRow pick as overrides (so a figure's traits do not depend on its own seed's draws). */
 export const pin = (t: Traits): TraitOverrides => ({...t});

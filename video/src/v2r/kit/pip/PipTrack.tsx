@@ -23,6 +23,7 @@ import {applyIdle, flickShape, IdleOpts} from './idle';
 import {FACING, FacingName, PoseName, poseParams, POSES} from './poses';
 import {aimAt, drawOn, hopAt, HopState, rideAt, unBuild} from './motion';
 import {defaultInk, PipDrawing, PipPaint} from './Pip';
+import {tiered} from '../tiers';
 
 export type PipHop = {
   /** Landing seat (feet anchor, screen px). Off-frame is fine (a leap out of the shot). */
@@ -282,7 +283,7 @@ export function trackAt(p: PipTrackProps, t: number): PipTrackState {
   return {x, y, params, squash, rotate, draw, exit, hop};
 }
 
-export const PipTrack: React.FC<PipTrackProps> = (p) => {
+const PipTrackBody: React.FC<PipTrackProps> = (p) => {
   const tNow = useTime();
   const ctxExit = useExit();
   const look = useLook();
@@ -314,3 +315,4 @@ export const PipTrack: React.FC<PipTrackProps> = (p) => {
     />
   );
 };
+export const PipTrack = tiered('support', {lines: true}, PipTrackBody);

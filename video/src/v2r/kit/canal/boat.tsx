@@ -14,6 +14,7 @@ import {Plane} from '../../../lib/persp';
 import {Batch, Paint, P, r1, rng, inkFor, ovalPath, domePath, lobes, leafPath, lerp, Pt} from './core';
 import {bikeInto} from './towpath';
 import {Puffs} from './life';
+import {tiered} from '../tiers';
 
 export type BoatOpts = {
   /** Screen x of the STERN end and the bow end follows `dir`: the boat spans [x, x + len] (dir +1: bow right). */
@@ -105,7 +106,7 @@ export function boatInto(b: Batch, o: BoatOpts, t = 0) {
   // stern: the tiller arm and a brass pin
   const tx = X(0.02);
   b.layer();
-  b.ink(`M${P(tx, g.gunTop)}Q${P(tx - o.dir * 6 * s, g.roofY - 4 * s)} ${P(tx + o.dir * 34 * s, g.roofY - 22 * s)}`, Math.max(1.6, w * 0.9), CM.ink);
+  b.ink(`M${P(tx, g.gunTop)}Q${P(tx - o.dir * 6 * s, g.roofY - 4 * s)} ${P(tx + o.dir * 34 * s, g.roofY - 22 * s)}`, Math.max(1.6, w * 0.9), CM.ink, 0, {thing: true});
   b.fill(CM.coatMustard, ovalPath(tx + o.dir * 34 * s, g.roofY - 22 * s, 3.5 * s, 3.5 * s));
   // ---- windows: portholes (cream rims, curtains) and a few rectangular windows; the painted panel
   const nW = Math.max(3, Math.round((R - L) / (62 * s + 20)));
@@ -218,7 +219,7 @@ export function boatInto(b: Batch, o: BoatOpts, t = 0) {
       for (const u of [0.04, 0.3, 0.6, 0.9]) {
         const fx = X(u);
         b.fill(CM.coatOat, ovalPath(fx, o.water - g.hullH * 0.45, 9 * s, 12 * s));
-        if (w > 0) b.ink(`M${P(fx, g.gunTop)}L${P(fx, o.water - g.hullH * 0.45 - 12 * s)}`, Math.max(1.2, w * 0.45), CM.line);
+        if (w > 0) b.ink(`M${P(fx, g.gunTop)}L${P(fx, o.water - g.hullH * 0.45 - 12 * s)}`, Math.max(1.2, w * 0.45), CM.line, 0, {thing: true});
       }
     }
     // bunting along the cafe boat's roof
@@ -232,7 +233,7 @@ export function boatInto(b: Batch, o: BoatOpts, t = 0) {
         d += `${k ? 'L' : 'M'}${P(px, py)}`;
         if (k < n) b.fill([CM.box, CM.sage, CM.coatMustard, CM.paper][k % 4], `M${P(px, py)}L${P(X(lerp(g.c0, g.c1, (k + 1) / n)), py)}L${P((px + X(lerp(g.c0, g.c1, (k + 1) / n))) / 2, py + 14 * s)}Z`);
       }
-      b.ink(d, Math.max(1.2, w * 0.5));
+      b.ink(d, Math.max(1.2, w * 0.5), CM.ink, 0, {thing: true});
     }
     // ---- ink: the cabin's top and ends, the hull sheer (loose, open)
     if (w > 0) {
@@ -253,7 +254,7 @@ export type NarrowboatProps = BoatOpts & {
 };
 
 /** A narrowboat (static or gliding) with its chimney smoke. */
-export const Narrowboat: React.FC<NarrowboatProps> = ({smoke = true, bursts, speed = 0, ...o}) => {
+const NarrowboatBody: React.FC<NarrowboatProps> = ({smoke = true, bursts, speed = 0, ...o}) => {
   const t = useTime();
   const x = o.x + o.dir * speed * t;
   const static_ = speed === 0;
@@ -278,12 +279,13 @@ export const Narrowboat: React.FC<NarrowboatProps> = ({smoke = true, bursts, spe
     </>
   );
 };
+export const Narrowboat = tiered('environment', {}, NarrowboatBody);
 
 // ---------------------------------------------------------------- the cafe boat's stern deck (S8 bottom-left)
 
 /** The cafe boat's stern deck seen from the towpath, close and from above: planks converging away, two small tables
  *  with mugs (steam), a folded chair, a potted bay, a coiled rope. Region x0..x1, y0 (far edge) .. y1 (near edge). */
-export const CafeDeck: React.FC<{x0: number; x1: number; y0: number; y1: number; seed: string; vp?: Pt}> = ({x0, x1, y0, y1, seed, vp = [520, 760]}) => {
+const CafeDeckBody: React.FC<{x0: number; x1: number; y0: number; y1: number; seed: string; vp?: Pt}> = ({x0, x1, y0, y1, seed, vp = [520, 760]}) => {
   const stat = useMemo(() => {
     const b = new Batch();
     // deck boards: a trapezoid narrowing toward the VP
@@ -343,6 +345,7 @@ export const CafeDeck: React.FC<{x0: number; x1: number; y0: number; y1: number;
     </>
   );
 };
+export const CafeDeck = tiered('environment', {}, CafeDeckBody);
 
 // ---------------------------------------------------------------- S7 -> S8: the narrowboat foreground wipe
 
@@ -352,7 +355,7 @@ const WIPE_H = 980;
 /** A narrowboat gliding right past the lens (S7's `Wiper`): its cabin side covers y ~600-1920 around the seam, the
  *  roof and chimney above; the sky above y 556 is mint in both shots, so the seam there is invisible. Screen px,
  *  centred on the wipe edge x; dir is the travel direction (the bow leads). */
-export const BoatWiper: React.FC<WiperProps> & {half?: number} = ({x, dir}) => {
+const BoatWiperBody: React.FC<WiperProps> = ({x, dir}) => {
   const d: 1 | -1 = dir === 'right' ? 1 : -1;
   const b = useMemo(() => {
     const b = new Batch();
@@ -365,7 +368,7 @@ export const BoatWiper: React.FC<WiperProps> & {half?: number} = ({x, dir}) => {
     </g>
   );
 };
-BoatWiper.half = WIPE_LEN / 2 + 40;
+export const BoatWiper = Object.assign(tiered('environment', {}, BoatWiperBody), {half: WIPE_LEN / 2 + 40});
 
 export {rectInk};
 
@@ -376,7 +379,7 @@ const PB_H = 300;
 
 /** A narrowboat seen obliquely: the flat side model mapped onto a screen quad between its stern and bow waterline
  *  points (hStern / hBow = the model's full height there, px). Fill / Ink are projected by lib/persp's Plane. */
-export const PerspBoat: React.FC<{stern: Pt; bow: Pt; hStern: number; hBow: number; seed: string; cabin?: string; lit?: boolean; cafe?: boolean}> = ({stern, bow, hStern, hBow, seed, cabin, lit, cafe}) => {
+const PerspBoatBody: React.FC<{stern: Pt; bow: Pt; hStern: number; hBow: number; seed: string; cabin?: string; lit?: boolean; cafe?: boolean}> = ({stern, bow, hStern, hBow, seed, cabin, lit, cafe}) => {
   const b = useMemo(() => {
     const b = new Batch();
     boatInto(b, {x: 0, water: PB_H - 8, len: PB_LEN, h: 160, dir: 1, seed, cabin, topView: 0, roofItems: false, panel: true, lit, cafe, ink: INK_PX.far}, 0);
@@ -394,3 +397,4 @@ export const PerspBoat: React.FC<{stern: Pt; bow: Pt; hStern: number; hBow: numb
     </Plane>
   );
 };
+export const PerspBoat = tiered('environment', {}, PerspBoatBody);

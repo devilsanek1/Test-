@@ -15,6 +15,7 @@ import React, {useMemo} from 'react';
 import {CM} from '../../palette';
 import {useTime} from '../../../lib/time';
 import {Batch, Paint, atm, atmShade, mix, cloudD, crownD, circleD, ellD, lineD, polyD, ribbonD, rng, rand, frac, type Pt} from './core';
+import {useTierLine, tiered} from '../tiers';
 
 // ---------------------------------------------------------------- the frame's numbers (end coords)
 
@@ -100,7 +101,7 @@ const BANK_LOBES: [number, number, number][] = [
   [1975, 200, 80],
 ];
 
-export const CloudBank: React.FC<{seed?: string}> = ({seed = 'bank'}) => {
+const CloudBankBody: React.FC<{seed?: string}> = ({seed = 'bank'}) => {
   const b = useMemo(() => {
     const B = new Batch();
     const {x0, x1, base} = VISTA.bank;
@@ -122,9 +123,10 @@ export const CloudBank: React.FC<{seed?: string}> = ({seed = 'bank'}) => {
   }, []);
   return <Paint b={b} seed={seed} misreg={false} />;
 };
+export const CloudBank = tiered('environment', {}, CloudBankBody);
 
 /** Thin high cloud bars in the top gutter (y 120-290), drifting `drift` px/s (huge means slow: <= 6). */
-export const HighBars: React.FC<{drift?: number; seed?: string}> = ({drift = 4, seed = 'bars'}) => {
+const HighBarsBody: React.FC<{drift?: number; seed?: string}> = ({drift = 4, seed = 'bars'}) => {
   const t = useTime();
   const bars = useMemo(() => {
     const r = rng(seed);
@@ -169,14 +171,16 @@ export const HighBars: React.FC<{drift?: number; seed?: string}> = ({drift = 4, 
     </>
   );
 };
+export const HighBars = tiered('environment', {}, HighBarsBody);
 
 /** The April morning's flat horizon bands (below y 600 only): a cool high step over the gold band. */
-export const SkyBands: React.FC = () => (
+const SkyBandsBody: React.FC = () => (
   <>
     <rect x={VISTA.x0} y={694} width={VISTA.x1 - VISTA.x0} height={60} fill={VT.bandHigh} />
     <rect x={VISTA.x0} y={754} width={VISTA.x1 - VISTA.x0} height={60} fill={VT.bandGold} />
   </>
 );
+export const SkyBands = tiered('environment', {}, SkyBandsBody);
 
 // ---------------------------------------------------------------- the sun (+ the APRIL 2026 calendar flip)
 
@@ -190,7 +194,7 @@ export type SunProps = {
 };
 
 /** The sun disc (the pop, 1-3 %), optionally flipping into a calendar page and back (a squash-flip, never a fade). */
-export const SunDisc: React.FC<SunProps> = ({x = VISTA.sun.x, y = VISTA.sun.y, r = VISTA.sun.r, flip, label = ['APRIL', '2026']}) => {
+const SunDiscBody: React.FC<SunProps> = ({x = VISTA.sun.x, y = VISTA.sun.y, r = VISTA.sun.r, flip, label = ['APRIL', '2026']}) => {
   const t = useTime();
   // flip phases: 0 -> 0.12 s squash the disc to a line; the page grows; hold; squash the page; the disc returns
   let mode: 'disc' | 'page' = 'disc';
@@ -234,6 +238,7 @@ export const SunDisc: React.FC<SunProps> = ({x = VISTA.sun.x, y = VISTA.sun.y, r
     </g>
   );
 };
+export const SunDisc = tiered('environment', {}, SunDiscBody);
 
 // ---------------------------------------------------------------- the far city + the obelisk
 
@@ -268,7 +273,7 @@ function cityBlocks(seed: string): {blocks: Block[]; marks: string[]} {
 }
 
 /** The far hills (beyond the city), the city rows, the landmark marks and the obelisk. */
-export const FarCity: React.FC<{seed?: string}> = ({seed = 'city'}) => {
+const FarCityBody: React.FC<{seed?: string}> = ({seed = 'city'}) => {
   const b = useMemo(() => {
     const B = new Batch();
     // far hills: two flat stepped ridges on the horizon, running past both ends of the plane
@@ -323,10 +328,12 @@ export const FarCity: React.FC<{seed?: string}> = ({seed = 'city'}) => {
   }, [seed]);
   return <Paint b={b} seed={seed} misreg={false} />;
 };
+export const FarCity = tiered('environment', {}, FarCityBody);
 
 /** THE OBELISK (the Washington Monument's shape: a tapering square shaft ~10:1, a small pyramid cap; marble). The
  *  morning sun is to the right: the right face lit, the left face a step darker; a hairline in its shade colour. */
-export const Obelisk: React.FC<{x?: number; base?: number; top?: number; w?: number}> = ({x = VISTA.obelisk.x, base = VISTA.obelisk.base, top = VISTA.obelisk.top, w = VISTA.obelisk.w}) => {
+const ObeliskBody: React.FC<{x?: number; base?: number; top?: number; w?: number}> = ({x = VISTA.obelisk.x, base = VISTA.obelisk.base, top = VISTA.obelisk.top, w = VISTA.obelisk.w}) => {
+  const line = useTierLine();
   const capH = w * 1.15;
   const shaftTop = top + capH;
   const wt = w * 0.72; // the shaft tapers
@@ -364,11 +371,12 @@ export const Obelisk: React.FC<{x?: number; base?: number; top?: number; w?: num
       <path d={polyD(R)} fill={VT.obLit} />
       <path d={polyD(capL)} fill={VT.obShade} />
       <path d={polyD(capR)} fill={VT.obLit} />
-      <path d={band} stroke={VT.obInk} strokeWidth={1} fill="none" />
-      <path d={outline} stroke={VT.obInk} strokeWidth={1.3} fill="none" strokeLinejoin="round" strokeLinecap="round" />
+      <path d={band} {...line(VT.obInk, 1, {contour: false})} fill="none" />
+      <path d={outline} {...line(VT.obInk, 1.3)} fill="none" strokeLinejoin="round" strokeLinecap="round" />
     </>
   );
 };
+export const Obelisk = tiered('environment', {}, ObeliskBody);
 
 // ---------------------------------------------------------------- the river plane
 
@@ -396,7 +404,8 @@ function bridges(B: Batch) {
   }
 }
 
-export const RiverPlane: React.FC<{seed?: string}> = ({seed = 'river'}) => {
+const RiverPlaneBody: React.FC<{seed?: string}> = ({seed = 'river'}) => {
+  const line = useTierLine();
   const t = useTime();
   const R = VISTA.river;
   const stat = useMemo(() => {
@@ -478,15 +487,16 @@ export const RiverPlane: React.FC<{seed?: string}> = ({seed = 'river'}) => {
     <>
       <Paint b={stat} seed={seed} misreg={false} />
       <path d={gd} stroke={VT.glint} strokeWidth={1.6} strokeLinecap="round" />
-      <path d={rw} stroke={VT.rower} strokeWidth={1.3} strokeLinecap="round" fill="none" />
+      <path d={rw} {...line(VT.rower, 1.3, {thing: true})} strokeLinecap="round" fill="none" />
       <path d={sd} fill={VT.boat} />
       {cars}
     </>
   );
 };
+export const RiverPlane = tiered('environment', {}, RiverPlaneBody);
 
 /** The whole far plane in one piece (sky bands, high bars, the sun, the cloud bank, the hills, city and obelisk). */
-export const FarPlane: React.FC<{sun?: SunProps; seed?: string; bars?: boolean}> = ({sun, seed = 'far', bars = true}) => (
+const FarPlaneBody: React.FC<{sun?: SunProps; seed?: string; bars?: boolean}> = ({sun, seed = 'far', bars = true}) => (
   <>
     <SkyBands />
     {bars ? <HighBars seed={`${seed}/bars`} /> : null}
@@ -496,6 +506,7 @@ export const FarPlane: React.FC<{sun?: SunProps; seed?: string; bars?: boolean}>
     <Obelisk />
   </>
 );
+export const FarPlane = tiered('environment', {}, FarPlaneBody);
 
 void circleD;
 void ribbonD;

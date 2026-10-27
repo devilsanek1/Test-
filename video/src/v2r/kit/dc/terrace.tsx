@@ -20,6 +20,7 @@ import {useTime} from '../../../lib/time';
 import {line as skLine} from '../../../lib/sketch';
 import {Batch, Paint, mix, crownD, ellD, lineD, polyD, rng, rand, frac, blossomD, burstScale, smoothClosed, circleD, type Pt} from './core';
 import {BloomCrowns, BLOOM_NEAR, type CrownSpec} from './bloom';
+import {useTierLine, tiered} from '../tiers';
 
 // ---------------------------------------------------------------- the deck camera
 
@@ -314,7 +315,7 @@ export function benchBack(B: Batch, x0: number, x1: number, yTop: number, yFeet:
 export type TerraceProps = {seed?: string};
 
 /** The deck (END coords): balustrade, paving, drifts, benches, bin, stroller, tulip bed, fountain. */
-export const Terrace: React.FC<TerraceProps> = ({seed = 'deck'}) => {
+const TerraceBody: React.FC<TerraceProps> = ({seed = 'deck'}) => {
   const b = useMemo(() => {
     const B = new Batch();
     paving(B, `${seed}/pav`);
@@ -352,7 +353,7 @@ export const Terrace: React.FC<TerraceProps> = ({seed = 'deck'}) => {
     B.poly(mix(CM.coatSlate, CM.paper, 0.15), [...hood, [sx + 0.36 * pxm, sy - 0.42 * pxm], [sx - 0.42 * pxm, sy - 0.42 * pxm]]);
     B.rect(CM.coatOat, sx - 0.4 * pxm, sy - 0.46 * pxm, 0.76 * pxm, 0.12 * pxm);
     for (const wx of [sx - 0.34 * pxm, sx + 0.3 * pxm]) B.fill(TT.iron, circleD(wx, sy - 0.1 * pxm, 0.11 * pxm));
-    B.ink(lineD([[sx + 0.36 * pxm, sy - 0.6 * pxm], [sx + 0.62 * pxm, sy - 1.05 * pxm]]), 3.4, TT.ink);
+    B.ink(lineD([[sx + 0.36 * pxm, sy - 0.6 * pxm], [sx + 0.62 * pxm, sy - 1.05 * pxm]]), 3.4, TT.ink, 0, {thing: true});
     B.ink(lineD(hood), 3.4, TT.ink);
     // ---- the tulip bed (left, by the tree): a kerbed bed with rows of tulips
     const tb0 = deckPt(-4.4, 10.4);
@@ -442,20 +443,22 @@ export const Terrace: React.FC<TerraceProps> = ({seed = 'deck'}) => {
   }, [seed]);
   return <Paint b={b} seed={seed} misreg={3} />;
 };
+export const Terrace = tiered('environment', {}, TerraceBody);
 
 /** The stranger's bench at the balustrade (END coords). Draw it AFTER the seated stranger and Pip. */
-export const StrangerBench: React.FC<{seed?: string}> = ({seed = 'sbench'}) => {
+const StrangerBenchBody: React.FC<{seed?: string}> = ({seed = 'sbench'}) => {
   const b = useMemo(() => {
     const B = new Batch();
     const bn = TERRACE.bench;
     benchBack(B, bn.x0, bn.x1, bn.y0, bn.y1, 2.6);
     // the stranger's tote on the ground by the bench's right end
     B.poly(CM.coatOat, [[bn.x1 + 2, bn.y1], [bn.x1 + 4, bn.y1 - 12], [bn.x1 + 16, bn.y1 - 12], [bn.x1 + 18, bn.y1]]);
-    B.ink(`M${bn.x1 + 6} ${bn.y1 - 12}q4 -7 8 0`, 1.6, TT.ink);
+    B.ink(`M${bn.x1 + 6} ${bn.y1 - 12}q4 -7 8 0`, 1.6, TT.ink, 0, {thing: true});
     return B;
   }, []);
   return <Paint b={b} seed={seed} misreg={2} />;
 };
+export const StrangerBench = tiered('environment', {}, StrangerBenchBody);
 
 // ---------------------------------------------------------------- the terrace tree (LEFT frame), END coords
 
@@ -467,7 +470,7 @@ export const TREE_LEFT = {
 
 /** The blossoming terrace tree (cherry): plum-dark trunk and limbs, a crown of pink and fresh-sage masses, lit from
  *  the right (the sun beyond the view), shadow side to the left; blossom clusters on top. Optional burst. */
-export const TerraceTree: React.FC<{burstAt?: number; seed?: string}> = ({burstAt, seed = 'tree'}) => {
+const TerraceTreeBody: React.FC<{burstAt?: number; seed?: string}> = ({burstAt, seed = 'tree'}) => {
   const trunk = useMemo(() => {
     const B = new Batch();
     const {trunk: T} = TREE_LEFT;
@@ -518,11 +521,12 @@ export const TerraceTree: React.FC<{burstAt?: number; seed?: string}> = ({burstA
     </>
   );
 };
+export const TerraceTree = tiered('environment', {}, TerraceTreeBody);
 
 /** The bottom-right corner: a blossoming crown cut by the right edge and the bottom (the end lamppost stands in front
  *  of it). With the terrace tree and the hedge it frames the view in dark masses (CINEMATIC_GUIDE Scale cues 8). */
 export const CORNER_TREE = {cx: 1110, cy: 1700, rx: 250, ry: 200};
-export const CornerTree: React.FC<{seed?: string}> = ({seed = 'corner'}) => {
+const CornerTreeBody: React.FC<{seed?: string}> = ({seed = 'corner'}) => {
   const crowns = useMemo<CrownSpec[]>(() => {
     const C = CORNER_TREE;
     const light: Pt = [-0.3, -0.95];
@@ -534,12 +538,13 @@ export const CornerTree: React.FC<{seed?: string}> = ({seed = 'corner'}) => {
   }, [seed]);
   return <BloomCrowns crowns={crowns} seed={`${seed}/bl`} />;
 };
+export const CornerTree = tiered('environment', {}, CornerTreeBody);
 
 // ---------------------------------------------------------------- lampposts
 
 /** A terrace lamppost (cast iron, a lantern head), drawn with its BASE at (0, 0), `h` px tall to the finial. Optional
  *  hanging flower basket (the wipe's mass). */
-export const LampPost: React.FC<{h: number; basket?: boolean; ink?: number; seed?: string}> = ({h, basket = false, ink = 4.8, seed = 'lamp'}) => {
+const LampPostBody: React.FC<{h: number; basket?: boolean; ink?: number; seed?: string}> = ({h, basket = false, ink = 4.8, seed = 'lamp'}) => {
   const t = useTime();
   const k = h / 560; // the reference drawing is 560 px tall
   const b = useMemo(() => {
@@ -560,7 +565,7 @@ export const LampPost: React.FC<{h: number; basket?: boolean; ink?: number; seed
     if (basket) {
       // a bracket arm and a hanging basket of flowers (a wide soft mass at the lantern's height)
       B.rect(TT.iron, 0, -452 * k, 120 * k, 7 * k);
-      B.ink(lineD([[118 * k, -452 * k], [118 * k, -420 * k]]), Math.max(1.6, 2.2 * k), TT.ink);
+      B.ink(lineD([[118 * k, -452 * k], [118 * k, -420 * k]]), Math.max(1.6, 2.2 * k), TT.ink, 0, {thing: true});
       B.fill(TT.basketLeaf, crownD(118 * k, -380 * k, 112 * k, 58 * k, `${seed}/bk`, 9, 0.1));
       B.fill(TT.soil, `M${(118 - 70) * k} ${-372 * k}Q${118 * k} ${-310 * k} ${(118 + 70) * k} ${-372 * k}Z`);
       B.rect(TT.iron, -120 * k, -452 * k, 120 * k, 7 * k);
@@ -589,6 +594,7 @@ export const LampPost: React.FC<{h: number; basket?: boolean; ink?: number; seed
     </>
   );
 };
+export const LampPost = tiered('environment', {}, LampPostBody);
 
 /** The END lamppost (right frame): base cut by the bottom-right, its lantern below the horizon (the crane is above
  *  it). END coords. */
@@ -600,7 +606,8 @@ export const LAMP_RIGHT = {x: 1006, base: 1990, h: 640};
 export const castShadowD = (x: number, y: number, w: number) => ellD(x - w * 0.18, y + w * 0.1, w * 0.62, w * 0.16);
 
 /** Pigeons on the terrace floor (END coords): pecking (head bobs), one hops now and then. Life on the deck. */
-export const Pigeons: React.FC<{seed?: string; spots?: [number, number][]}> = ({seed = 'pig', spots = [[-1.2, 17.5], [-0.7, 18.2], [0.2, 17.0], [1.6, 19.0], [2.2, 16.2], [-2.6, 15.4], [3.4, 18.6]]}) => {
+const PigeonsBody: React.FC<{seed?: string; spots?: [number, number][]}> = ({seed = 'pig', spots = [[-1.2, 17.5], [-0.7, 18.2], [0.2, 17.0], [1.6, 19.0], [2.2, 16.2], [-2.6, 15.4], [3.4, 18.6]]}) => {
+  const line = useTierLine();
   const t = useTime();
   let body = '';
   let head = '';
@@ -638,16 +645,17 @@ export const Pigeons: React.FC<{seed?: string; spots?: [number, number][]}> = ({
       <path d={body} fill={mix(CM.stoneShade, CM.paneUnlit, 0.35)} />
       <path d={bar} fill={CM.paper} />
       <path d={head} fill={CM.paneUnlit} />
-      <path d={legs} stroke={CM.brickDeep} strokeWidth={1.2} fill="none" />
+      <path d={legs} {...line(CM.brickDeep, 1.2, {thing: true})} fill="none" />
     </>
   );
 };
+export const Pigeons = tiered('environment', {}, PigeonsBody);
 
 // ---------------------------------------------------------------- petals near the lens (screen space)
 
 /** Petals drifting down near the lens: born below y 600 (never in the caption band), falling 36-70 px/s with a sway,
  *  flipping (a squash, never a fade). `n` at once. */
-export const NearPetals: React.FC<{n?: number; seed?: string; x0?: number; x1?: number}> = ({n = 14, seed = 'petals', x0 = -40, x1 = 1120}) => {
+const NearPetalsBody: React.FC<{n?: number; seed?: string; x0?: number; x1?: number}> = ({n = 14, seed = 'petals', x0 = -40, x1 = 1120}) => {
   const t = useTime();
   let a = '';
   let b = '';
@@ -672,3 +680,4 @@ export const NearPetals: React.FC<{n?: number; seed?: string; x0?: number; x1?: 
     </>
   );
 };
+export const NearPetals = tiered('environment', {}, NearPetalsBody);

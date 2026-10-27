@@ -12,6 +12,7 @@ import {Batch, Paint, ovalPath, P, pickOf, rand, r1} from './core';
 import {INK_PX} from '../../palette';
 import {torso} from '../../../lib/sketch';
 import {useTime} from '../../../lib/time';
+import {tiered} from '../tiers';
 
 /** What a person is doing in a slot. 'bust' = a head-back cut by the bottom edge (foreground row). */
 export type Pose = 'stand' | 'walk' | 'jog' | 'sit' | 'bust' | 'cycle' | 'dog' | 'lean' | 'read' | 'window';
@@ -83,12 +84,13 @@ export function slotLook(s: PersonSlot): {coat: string; hair: string; acc: strin
 }
 
 /** A back-view placeholder in the house grammar (round head, tombstone torso, one accessory; legs only on walkers). */
-export const PlaceholderPerson: React.FC<{s: PersonSlot}> = ({s}) => {
+const PlaceholderPersonBody: React.FC<{s: PersonSlot}> = ({s}) => {
   const t = useTime();
   const b = new Batch();
   drawPlaceholder(b, s, t);
   return <Paint b={b} seed={`pp/${s.seed}`} misreg={s.h > 60} />;
 };
+export const PlaceholderPerson = tiered('support', {lines: true}, PlaceholderPersonBody);
 
 /** Draws a placeholder person into a batch (exported so crowds can batch many people in one paint). */
 export function drawPlaceholder(b: Batch, s: PersonSlot, t: number) {
@@ -178,7 +180,7 @@ export function drawPlaceholder(b: Batch, s: PersonSlot, t: number) {
 }
 
 /** A placeholder Pip: a periwinkle pebble with two leaf ears and a mustard scarf (kit sheets only). */
-export const PlaceholderPip: React.FC<{seat: PipSeat}> = ({seat}) => {
+const PlaceholderPipBody: React.FC<{seat: PipSeat}> = ({seat}) => {
   const t = useTime();
   const s = seat.size;
   const b = new Batch();
@@ -195,3 +197,4 @@ export const PlaceholderPip: React.FC<{seat: PipSeat}> = ({seat}) => {
   b.ink(`M${P(cx - s * 0.4, cy - s * 0.1)}A${r1(s * 0.42)} ${r1(s * 0.42)} 0 1 1 ${P(cx + s * 0.4, cy + s * 0.12)}`, INK_PX.mid);
   return <Paint b={b} seed={`pip/${seat.id}`} />;
 };
+export const PlaceholderPip = tiered('support', {lines: true}, PlaceholderPipBody);

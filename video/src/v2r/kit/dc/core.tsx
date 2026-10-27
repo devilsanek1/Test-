@@ -7,6 +7,8 @@
 //                   none, none.
 //   shapes          lobed crowns, cloud lobes, blossom clusters, small screen-space helpers (paths only).
 // Colours come only from the palette's role tokens (CM) and their steps toward the sky. Nothing fades.
+// Clean pen + tiers (src/v2r/pen.ts, README "Tiers"): Paint has NO tier of its own (it draws in the scope it sits in);
+// ink that IS the thing goes in with `thing`, shapes drawn with a stroke with `graphic`.
 
 import React from 'react';
 import {CM, INK_PX} from '../../palette';
@@ -67,7 +69,12 @@ export const inkCol = (d: Depth) => (d <= 1 ? CM.ink : mix(CM.ink, CM.shadeWarm,
 
 // ---------------------------------------------------------------- Batch: shapes grouped by colour, layer by layer
 
-type InkRun = {w: number; color: string; open: number; parts: string[]};
+/** Clean-pen flags for a run of ink (lib/tier.tsx CleanLineOpts; ignored by the sketch pen): `thing` = the stroke IS
+ *  the object (a wire, a fence bar, a twig, a mast): kept on every tier (a hairline on the environment); `graphic` = a
+ *  shape drawn with a stroke: width and colour kept; `tone` = the fill the line bounds (the line is its own shade). */
+export type InkOpts = {thing?: boolean; graphic?: boolean; tone?: string};
+
+type InkRun = {w: number; color: string; open: number; parts: string[]} & InkOpts;
 type BLayer = {fills: Map<string, string[]>; inks: Map<string, InkRun>};
 
 /** Collects flat fills (one path per colour) and ink (one path per weight) in z-ordered layers. */
@@ -98,13 +105,14 @@ export class Batch {
   poly(color: string, pts: Pt[]): this {
     return pts.length > 2 ? this.fill(color, polyPath(pts)) : this;
   }
-  /** Ink (path data, e.g. lib/sketch). w 0 = skipped (fill-only LOD). */
-  ink(d: string, w: number = INK_PX.mid, color: string = CM.ink, open = 0): this {
+  /** Ink (path data, e.g. lib/sketch). w 0 = skipped (fill-only LOD). `o`: the clean pen's flags (InkOpts); runs
+   *  with different flags never merge. */
+  ink(d: string, w: number = INK_PX.mid, color: string = CM.ink, open = 0, o: InkOpts = {}): this {
     if (!d || w <= 0) return this;
-    const key = `${w.toFixed(2)}|${color}|${open}`;
+    const key = `${w.toFixed(2)}|${color}|${open}|${o.thing ? 't' : ''}${o.graphic ? 'g' : ''}|${o.tone ?? ''}`;
     const a = this.L.inks.get(key);
     if (a) a.parts.push(d);
-    else this.L.inks.set(key, {w, color, open, parts: [d]});
+    else this.L.inks.set(key, {w, color, open, parts: [d], thing: o.thing, graphic: o.graphic, tone: o.tone});
     return this;
   }
   get empty(): boolean {
@@ -141,7 +149,7 @@ export const Paint: React.FC<PaintProps> = ({b, seed, at, stagger = 0.03, misreg
         out.push(<Fill key={`f${i}${color}`} d={parts.join('')} color={color} seed={`${seed}/${i}/${color}`} at={lat} offset={off} exit={exit} />);
       });
       l.inks.forEach((run, k) => {
-        out.push(<Ink key={`i${i}${k}`} d={run.parts.join('')} width={run.w} color={run.color} seed={`${seed}/${i}/${k}`} at={lat} order="all" open={run.open} exit={exit} />);
+        out.push(<Ink key={`i${i}${k}`} d={run.parts.join('')} width={run.w} color={run.color} seed={`${seed}/${i}/${k}`} at={lat} order="all" open={run.open} exit={exit} thing={run.thing} graphic={run.graphic} tone={run.tone} />);
       });
       return <React.Fragment key={i}>{out}</React.Fragment>;
     })}

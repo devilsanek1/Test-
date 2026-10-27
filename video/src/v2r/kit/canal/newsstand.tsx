@@ -9,6 +9,7 @@ import {line, rect as rectInk, textLines} from '../../../lib/sketch';
 import {Batch, Paint, P, rng, ovalPath, domePath} from './core';
 import {Puffs} from './life';
 import {CastSlot, PersonSlot} from './slots';
+import {tiered} from '../tiers';
 
 export type NewsstandProps = {
   /** Kiosk box: x0..x1 (x0 usually off the left edge), roof y and ground y. */
@@ -21,7 +22,7 @@ export type NewsstandProps = {
   agent?: PersonSlot;
 };
 
-export const Newsstand: React.FC<NewsstandProps> = ({x0, x1, top, ground, seed = 'news', agent}) => {
+const NewsstandBody: React.FC<NewsstandProps> = ({x0, x1, top, ground, seed = 'news', agent}) => {
   const W = x1 - x0;
   const H = ground - top;
   const b = useMemo(() => {
@@ -81,7 +82,7 @@ export const Newsstand: React.FC<NewsstandProps> = ({x0, x1, top, ground, seed =
     b.fill(CM.stoneShade, domePath(ux, cy - 46, 16, 10));
     b.rect(CM.anchor, ux + 14, cy - 18, 8, 4);
     b.fill(CM.paper, ovalPath(x0 + W * 0.5, top + H * 0.17, 12, 12));
-    b.ink(`M${P(x0 + W * 0.5, top + H * 0.17)}l0 -8M${P(x0 + W * 0.5, top + H * 0.17)}l6 2`, INK_PX.hair);
+    b.ink(`M${P(x0 + W * 0.5, top + H * 0.17)}l0 -8M${P(x0 + W * 0.5, top + H * 0.17)}l6 2`, INK_PX.hair, CM.ink, 0, {thing: true});
     b.ink(rectInk(x0, top + H * 0.12, W, H * 0.88, {seed: `${seed}/k`, over: 'small', open: 0.3}) + line(ox0, oy0, ox1, oy0, {seed: `${seed}/o`, over: 'small'}), INK_PX.mid);
     return b;
   }, [x0, x1, top, ground, seed]);
@@ -93,3 +94,4 @@ export const Newsstand: React.FC<NewsstandProps> = ({x0, x1, top, ground, seed =
     </>
   );
 };
+export const Newsstand = tiered('environment', {}, NewsstandBody);

@@ -17,6 +17,7 @@ import {CM} from '../../palette';
 import {castRow, HairKind, TraitOverrides} from './traits';
 import {NearBack, pin, Seated} from './People';
 import {FigureG, Parts, Part, polyline} from './parts';
+import {tieredAll} from '../tiers';
 
 export type SeatSpot = {x: number; y: number; h: number; traits?: TraitOverrides; side?: 1 | -1; beside?: 'cup' | 'tote' | null};
 export type NearSpot = {x: number; y: number; hv: number; traits?: TraitOverrides};
@@ -120,7 +121,7 @@ export type S1SeatedProps = {
   only?: ('low' | 'middle' | 'near')[];
 };
 
-export const S1Seated: React.FC<S1SeatedProps> = ({rows = S1_SEATED, life, at, ink, only}) => {
+const S1SeatedBody: React.FC<S1SeatedProps> = ({rows = S1_SEATED, life, at, ink, only}) => {
   const t = useTime();
   const L = {...DEFAULT_LIFE, ...(life ?? {})};
   const lowT = castRow('s1/low', rows.low.length, {over: rows.low.map((s) => s.traits ?? {})});
@@ -166,3 +167,4 @@ export const S1Seated: React.FC<S1SeatedProps> = ({rows = S1_SEATED, life, at, i
   }
   return <>{out}</>;
 };
+export const S1Seated = tieredAll('support', {lines: true}, S1SeatedBody);

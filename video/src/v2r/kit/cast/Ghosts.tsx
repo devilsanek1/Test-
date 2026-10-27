@@ -17,6 +17,7 @@ import {GHOST_POP, S1_ROW, s1RowAt, S8} from '../../world/map';
 import {Model, View} from './body';
 import {HER} from './Her';
 import {Person} from './People';
+import {tieredAll} from '../tiers';
 
 /** The ghost model at an age 1..6 (G1-G6). */
 export function ghostModel(age: number): Partial<Model> {
@@ -59,7 +60,7 @@ export type GhostProps = {
   seed?: string;
 };
 
-export const Ghost: React.FC<GhostProps> = ({x, y, h, age, step, stride = 1, view = 'rear34', flip, at, seed}) => (
+const GhostBody: React.FC<GhostProps> = ({x, y, h, age, step, stride = 1, view = 'rear34', flip, at, seed}) => (
   <Person
     x={x}
     y={y}
@@ -83,11 +84,12 @@ export const Ghost: React.FC<GhostProps> = ({x, y, h, age, step, stride = 1, vie
     lod={0}
   />
 );
+export const Ghost = tieredAll('support', {lines: true}, GhostBody);
 
 export type BareOutlineProps = Omit<GhostProps, 'age'>;
 
 /** A bare ink outline of her (no fill, no age cues, whole): the row goes on. */
-export const BareOutline: React.FC<BareOutlineProps> = ({x, y, h, step, stride = 1, view = 'rear34', flip, at, seed = 'outline'}) => (
+const BareOutlineBody: React.FC<BareOutlineProps> = ({x, y, h, step, stride = 1, view = 'rear34', flip, at, seed = 'outline'}) => (
   <Person
     x={x}
     y={y}
@@ -110,6 +112,7 @@ export const BareOutline: React.FC<BareOutlineProps> = ({x, y, h, step, stride =
     lod={0}
   />
 );
+export const BareOutline = tieredAll('support', {lines: true}, BareOutlineBody);
 
 export type GhostRowProps = {
   /** Film time (S1 starts at 0, so scene time = film time). Default: the scene clock. */
@@ -125,7 +128,7 @@ export type GhostRowProps = {
 };
 
 /** S1's row: G1-G6 and O1-O3 placed, sized and popped by map.ts (s1RowAt, S1_ROW pop times). Every figure whole. */
-export const GhostRow: React.FC<GhostRowProps> = ({t: tIn, step, stride = 1, toScreen, ids}) => {
+const GhostRowBody: React.FC<GhostRowProps> = ({t: tIn, step, stride = 1, toScreen, ids}) => {
   const tScene = useTime();
   const t = tIn ?? tScene;
   const poses = s1RowAt(t);
@@ -148,6 +151,7 @@ export const GhostRow: React.FC<GhostRowProps> = ({t: tIn, step, stride = 1, toS
   // far members first (smaller, behind), her side last
   return <>{out.reverse()}</>;
 };
+export const GhostRow = tieredAll('support', {lines: true}, GhostRowBody);
 
 export type S8GhostsProps = {
   /** Pop time (default 33.78, "can't"; three ticks, one pitch). */
@@ -161,7 +165,7 @@ export type S8GhostsProps = {
 };
 
 /** S8's callback: three ghosts with G4-G6's cues, 140 -> 130 px, at map.ts S8.ghosts (L6 owns the final staging). */
-export const S8Ghosts: React.FC<S8GhostsProps> = ({at = S8.ghostsPopAt, dx = 0, view = 'back', stagger = 0.04}) => (
+const S8GhostsBody: React.FC<S8GhostsProps> = ({at = S8.ghostsPopAt, dx = 0, view = 'back', stagger = 0.04}) => (
   <>
     {[...S8.ghosts].reverse().map((g, j) => {
       const i = S8.ghosts.length - 1 - j;
@@ -169,3 +173,4 @@ export const S8Ghosts: React.FC<S8GhostsProps> = ({at = S8.ghostsPopAt, dx = 0, 
     })}
   </>
 );
+export const S8Ghosts = tieredAll('support', {lines: true}, S8GhostsBody);

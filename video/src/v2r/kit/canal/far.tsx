@@ -9,6 +9,7 @@ import {useTime} from '../../../lib/time';
 import {line} from '../../../lib/sketch';
 import {Batch, Paint, P, rng, ovalPath, domePath, lobes, lerp, frac, r1} from './core';
 import {litAt} from './life';
+import {tiered} from '../tiers';
 
 export type RowOpts = {
   x0: number;
@@ -146,7 +147,7 @@ export type FarRoofsProps = {
 };
 
 /** Two or three rows of far roofs in flat depth steps (cool stone far, light brick mid, brick near). */
-export const FarRoofs: React.FC<FarRoofsProps> = ({x0 = -60, x1 = 1140, base, top, seed, rows = 3, lit = 0, ceil = 590, win = 7}) => {
+const FarRoofsBody: React.FC<FarRoofsProps> = ({x0 = -60, x1 = 1140, base, top, seed, rows = 3, lit = 0, ceil = 590, win = 7}) => {
   const t = useTime();
   const staticB = useMemo(() => {
     const b = new Batch();
@@ -164,6 +165,7 @@ export const FarRoofs: React.FC<FarRoofsProps> = ({x0 = -60, x1 = 1140, base, to
     </>
   );
 };
+export const FarRoofs = tiered('environment', {}, FarRoofsBody);
 
 /** A gasholder guide frame (King's Cross style): columns in a ring seen side-on, ring girders, lattice crosses; an
  *  optional drum inside. cx, base y, radius r (px), height h. */
@@ -190,7 +192,7 @@ export function gasholderInto(b: Batch, cx: number, base: number, r: number, h: 
       for (let j = 0; j < n - 1; j++) d += `M${P(xs[j], y)}L${P(xs[j + 1], y2)}M${P(xs[j + 1], y)}L${P(xs[j], y2)}`;
     }
   }
-  b.ink(d, o.ink ?? 1.2, col);
+  b.ink(d, o.ink ?? 1.2, col, 0, {thing: true});
 }
 
 /** A brick viaduct: a deck on a row of arches (x0..x1), deck top y, base y, arch pitch. */
@@ -210,7 +212,7 @@ export function viaductInto(b: Batch, x0: number, x1: number, deck: number, base
 }
 
 /** A train of carriages crossing a viaduct deck: from the left at speed px/s, every `every` s. */
-export const ViaductTrain: React.FC<{x0: number; x1: number; deck: number; h: number; seed: string; speed?: number; every?: number; phase?: number}> = ({x0, x1, deck, h, seed, speed = 160, every = 9, phase = 0}) => {
+const ViaductTrainBody: React.FC<{x0: number; x1: number; deck: number; h: number; seed: string; speed?: number; every?: number; phase?: number}> = ({x0, x1, deck, h, seed, speed = 160, every = 9, phase = 0}) => {
   const t = useTime();
   const len = h * 14;
   const span = x1 - x0 + len;
@@ -226,6 +228,7 @@ export const ViaductTrain: React.FC<{x0: number; x1: number; deck: number; h: nu
   }
   return <Paint b={b} seed={`train/${seed}`} misreg={false} />;
 };
+export const ViaductTrain = tiered('environment', {}, ViaductTrainBody);
 
 /** A road bridge over the canal seen side-on: a parapet and deck (top y `deck`), an arch opening down to the water,
  *  brick spandrels and stone voussoirs. x0..x1 span; the arch centre at archX. */
@@ -258,7 +261,7 @@ export function roadBridgeInto(b: Batch, x0: number, x1: number, deck: number, w
 }
 
 /** A bus crossing the road bridge (a flat double-decker, no livery or lettering): enters at `at`, px/s, dir. */
-export const BridgeBus: React.FC<{deck: number; h: number; at: number; from: number; to: number; seed?: string; speed?: number}> = ({deck, h, at, from, to, seed = 'bus', speed = 180}) => {
+const BridgeBusBody: React.FC<{deck: number; h: number; at: number; from: number; to: number; seed?: string; speed?: number}> = ({deck, h, at, from, to, seed = 'bus', speed = 180}) => {
   const t = useTime();
   const dir = to >= from ? 1 : -1;
   const L = h * 2.3;
@@ -273,6 +276,7 @@ export const BridgeBus: React.FC<{deck: number; h: number; at: number; from: num
   b.rect(CM.anchor, x + L / 2 - h * 0.42, deck - h * 0.08, h * 0.22, h * 0.1);
   return <Paint b={b} seed={`bus/${seed}`} misreg={false} />;
 };
+export const BridgeBus = tiered('environment', {}, BridgeBusBody);
 
 /** A canal warehouse: brick, arched windows in rows, a loading door with a hoist beam, a parapet name band (blank). */
 export function warehouseInto(b: Batch, x: number, base: number, w: number, h: number, seed: string, o: {ink?: number; lit?: number; t?: number; ceil?: number; color?: string} = {}) {

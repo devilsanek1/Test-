@@ -6,6 +6,7 @@ import React from 'react';
 import {CM} from '../../palette';
 import {useTime} from '../../../lib/time';
 import {mix} from './core';
+import {useTierLine, tiered} from '../tiers';
 
 /** One bird: a flat "m" (two wing strokes) of span w, flap phase in 0..1 (wings up -> down). */
 export function birdD(x: number, y: number, w: number, phase: number): string {
@@ -31,7 +32,8 @@ export type BirdVProps = {
 };
 
 /** A V of birds (5-6 wingspans/s, flap ~3.5 Hz), crossing toward the landmark. */
-export const BirdV: React.FC<BirdVProps> = ({at, from, to, dur = 2.2, span = 30, n = 7, minY = 580, seed = 'v'}) => {
+const BirdVBody: React.FC<BirdVProps> = ({at, from, to, dur = 2.2, span = 30, n = 7, minY = 580, seed = 'v'}) => {
+  const line = useTierLine();
   const t = useTime();
   if (t < at || t > at + dur + 0.3) return null;
   const k = (t - at) / dur;
@@ -58,14 +60,16 @@ export const BirdV: React.FC<BirdVProps> = ({at, from, to, dur = 2.2, span = 30,
   }
   return (
     <>
-      <path d={far} stroke={mix(CM.anchor, CM.sky, 0.45)} strokeWidth={2.2} fill="none" strokeLinecap="round" />
-      <path d={near} stroke={mix(CM.anchor, CM.sky, 0.2)} strokeWidth={2.6} fill="none" strokeLinecap="round" />
+      <path d={far} {...line(mix(CM.anchor, CM.sky, 0.45), 2.2, {thing: true})} fill="none" strokeLinecap="round" />
+      <path d={near} {...line(mix(CM.anchor, CM.sky, 0.2), 2.6, {thing: true})} fill="none" strokeLinecap="round" />
     </>
   );
 };
+export const BirdV = tiered('environment', {}, BirdVBody);
 
 /** Gulls wheeling slowly over the valley (2-3 tiny birds on loops below the horizon band), for the hold's life. */
-export const Gulls: React.FC<{seed?: string; centre?: [number, number]; r?: [number, number]; n?: number}> = ({seed = 'gull', centre = [640, 700], r = [180, 40], n = 3}) => {
+const GullsBody: React.FC<{seed?: string; centre?: [number, number]; r?: [number, number]; n?: number}> = ({seed = 'gull', centre = [640, 700], r = [180, 40], n = 3}) => {
+  const line = useTierLine();
   const t = useTime();
   let d = '';
   for (let i = 0; i < n; i++) {
@@ -74,5 +78,6 @@ export const Gulls: React.FC<{seed?: string; centre?: [number, number]; r?: [num
     const y = centre[1] + Math.sin(a) * r[1] * (0.8 + i * 0.1);
     d += birdD(x, y, 13 - i * 2, (t * 2.4 + i * 0.3) % 1);
   }
-  return <path d={d} stroke={mix(CM.anchor, CM.sky, 0.4)} strokeWidth={1.8} fill="none" strokeLinecap="round" />;
+  return <path d={d} {...line(mix(CM.anchor, CM.sky, 0.4), 1.8, {thing: true})} fill="none" strokeLinecap="round" />;
 };
+export const Gulls = tiered('environment', {}, GullsBody);

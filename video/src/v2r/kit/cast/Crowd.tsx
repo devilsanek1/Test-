@@ -12,6 +12,7 @@ import {rng} from '../../../lib/rng';
 import {Fill} from '../../../lib/Fill';
 import {COAT, HAIR, SKIN, TROUSERS} from './traits';
 import {drawn} from './gait';
+import {tieredAll} from '../tiers';
 
 export type FarSpot = {
   /** Feet (canvas px) at t = 0. */
@@ -88,7 +89,7 @@ export type FarCrowdProps = {
 };
 
 /** A batched far crowd: one path per colour per band. Fill only. */
-export const FarCrowd: React.FC<FarCrowdProps> = ({spots, at, band = 240}) => {
+const FarCrowdBody: React.FC<FarCrowdProps> = ({spots, at, band = 240}) => {
   const t = useTime();
   const tq = drawn(t, 12);
   const groups = new Map<string, {d: string; color: string; bx: number}>();
@@ -147,3 +148,4 @@ export const FarCrowd: React.FC<FarCrowdProps> = ({spots, at, band = 240}) => {
     </>
   );
 };
+export const FarCrowd = tieredAll('environment', {}, FarCrowdBody);

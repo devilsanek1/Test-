@@ -12,6 +12,7 @@ import {useTime} from '../../../lib/time';
 import {Batch, Paint, atm, atmShade, mix, crownD, ellD, lineD, polyD, ribbonD, rng, rand, frac, along, burstScale, blossomD, type Pt} from './core';
 import {MID, PENT, pentagon, shadowOffset} from './lens';
 import {BloomCrowns, type CrownSpec} from './bloom';
+import {tiered} from '../tiers';
 
 // ---------------------------------------------------------------- MID ground tones (22 %)
 
@@ -118,7 +119,7 @@ function tree(B: {shadow: string[]; crowns: Map<string, string[]>}, x: number, y
   B.crowns.set(col, arr);
 }
 
-export const MidGround: React.FC<{seed?: string}> = ({seed = 'midg'}) => {
+const MidGroundBody: React.FC<{seed?: string}> = ({seed = 'midg'}) => {
   const t = useTime();
   const stat = useMemo(() => {
     const B = new Batch();
@@ -250,6 +251,7 @@ export const MidGround: React.FC<{seed?: string}> = ({seed = 'midg'}) => {
     </>
   );
 };
+export const MidGround = tiered('environment', {}, MidGroundBody);
 
 // ---------------------------------------------------------------- the NEAR-MID slope (START coordinates)
 
@@ -310,7 +312,7 @@ export type NearMidProps = {
 
 /** The near-mid slope in START coords: the slope's crowns (dark masses, limbs, then blossom that bursts in 4 frames on
  *  "April"), lit on the side facing the sun in the slot; the big tree's trunk. */
-export const NearMid: React.FC<NearMidProps> = ({burstAt, seed = 'nm'}) => {
+const NearMidBody: React.FC<NearMidProps> = ({burstAt, seed = 'nm'}) => {
   const crowns = useMemo(() => nearCrowns(seed), [seed]);
   const specs = useMemo<CrownSpec[]>(
     () =>
@@ -345,5 +347,6 @@ export const NearMid: React.FC<NearMidProps> = ({burstAt, seed = 'nm'}) => {
     </>
   );
 };
+export const NearMid = tiered('environment', {}, NearMidBody);
 
 void ribbonD;

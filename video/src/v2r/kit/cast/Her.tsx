@@ -22,6 +22,7 @@ import {BuildProps, Person} from './People';
 import {drawn} from './gait';
 import {Traits} from './traits';
 import {ExitSync} from '../../../lib/exit';
+import {tieredAll} from '../tiers';
 
 /** Her model sheet (the one source of her colours and cut). */
 export const HER: Traits & Partial<Model> = {
@@ -77,7 +78,7 @@ export type HerProps = BuildProps & {
 };
 
 /** Her, at any size the shot list uses. */
-export const Her: React.FC<HerProps> = ({x, y, h = 170, pose = 'walk', view, flip, step, walk, stride, plant, tote = true, look = 1, reach, coatAt, ink, seed = 'her', at, fillLag}) => {
+const HerBody: React.FC<HerProps> = ({x, y, h = 170, pose = 'walk', view, flip, step, walk, stride, plant, tote = true, look = 1, reach, coatAt, ink, seed = 'her', at, fillLag}) => {
   const t = useTime();
   const coat = coatAt !== undefined && t < coatAt ? CM.white : CM.hero;
   const model: Partial<Model> = {...HER, coat, plant, tote: tote ? HER.tote : undefined, cheek: true};
@@ -96,6 +97,7 @@ export const Her: React.FC<HerProps> = ({x, y, h = 170, pose = 'walk', view, fli
       return <Person {...common} pose="walk" step={step} walk={walk ?? (step === undefined ? {rate: 1.6} : undefined)} view={view ?? 'rear34'} />;
   }
 };
+export const Her = tieredAll('subject', {}, HerBody);
 
 export type HerWindowProps = BuildProps & {
   /** Pacing range for her feet (canvas px) on the room floor behind the French window. */
@@ -117,7 +119,7 @@ export type HerWindowProps = BuildProps & {
 };
 
 /** Her full-figure silhouette pacing in her lamp-lit French window, phone at her ear (S3 flash-forward). */
-export const HerWindow: React.FC<HerWindowProps> = ({x0, x1, y, h = 136, pace = 1.7, hold = 0.45, phase = 0, gestureAt, color = CM.anchor, seed = 'herWin', at, fillLag}) => {
+const HerWindowBody: React.FC<HerWindowProps> = ({x0, x1, y, h = 136, pace = 1.7, hold = 0.45, phase = 0, gestureAt, color = CM.anchor, seed = 'herWin', at, fillLag}) => {
   const t = useTime();
   const T = 2 * (pace + hold);
   const v = (((t + phase) % T) + T) % T;
@@ -168,6 +170,7 @@ export const HerWindow: React.FC<HerWindowProps> = ({x0, x1, y, h = 136, pace = 
     </ExitSync>
   );
 };
+export const HerWindow = tieredAll('subject', {}, HerWindowBody);
 
 const smooth = (k: number) => {
   const c = Math.max(0, Math.min(1, k));

@@ -35,6 +35,16 @@ convert <frame.png> -resize 216x <f_216.png>   # key lines must read here; -resi
 | `small.tsx` | the small lettered objects: `PaperTag` + the S4 `NameTag`, the S4 `Fingerpost` (= `SignPost` + two `ArrowPlate`s), the S5 `NewsBox`, the S5 `Plaque`, a generic `DoorSign` |
 | `sheets.tsx` | the review compositions (stand-in grounds; not exported from the barrel) |
 
+## Tiers (the clean pen, 2026-10-27)
+`src/v2r/pen.ts` switches the film to the clean pen with ATTENTION TIERS (`docs/look/CRAFT.md` §b-§c; `../tiers.tsx`).
+**Every board and small object defaults to `support`** (a story object off its beat: no outline, calmer fills):
+`StatementBoard` (its lines, when drawn, in the frame's own plum shade), `DealBoard`, `GoogleBoard`, `HerBoard`,
+`ToldTheBBCBoard`, `BoardShadow`, `PaperTag`, `NameTag`, `ArrowPlate`, `SignPost`, `Fingerpost`, `NewsBox`, `Plaque`,
+`DoorSign`. A scene PROMOTES the board on the beat it carries: `<GoogleBoard tier="subject" ...>` (its frame outline
+returns at 3.0 px in its own shade). Lettering never changes: `WorldText` is raw text in ink on every tier; the
+keyline, the header rules, the tag's keyline and leader and the news box's rules are `graphic` (kept); the tag's string
+and the half-wiped menu's scribbles are things (kept, thin); screw slots and edge contours follow the tier.
+
 ## The type scale and the readability rule (ONE scale for the whole film)
 
 | `TYPE` | px | faux weight (the same on every board) | what | must read at |
