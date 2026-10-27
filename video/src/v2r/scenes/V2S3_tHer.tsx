@@ -102,6 +102,9 @@ function roomBatch(): Batch {
   b.fill(CM.line, ovalPath(369, 857, 9, 2.6));
   b.poly(CM.box, [[357, 760], [381, 760], [376, 742], [362, 742]]);
   b.rect(CM.paper, 360, 760, 18, 3);
+  // a tall plant in a pot on the floor at the right (partly behind the open leaf)
+  b.poly(CM.leafRust, [[380, 846], [396, 846], [393, 860], [383, 860]]);
+  for (let k = 0; k < 9; k++) b.fill(CM.sage, leafPath(388 + Math.sin(k * 2.1) * 7, 842 - k * 7, 12, 4.4, k % 2 ? 30 : 150));
   // a low shelf with books at the left, a trailing plant on it
   b.rect(CM.line, X0 + 2, 790, 40, 3);
   let bx = X0 + 4;
