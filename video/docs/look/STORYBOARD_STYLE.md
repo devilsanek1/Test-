@@ -44,8 +44,8 @@ sky, a red button), every line is the same 4 px brown, and a shot holds 13 to 22
   Nothing in the scene has a hue. Marks are red because a grey arrow reads as an object in the scene; if the owner sees red as colour, marks become dashed ink.
 - **Line weights:** subject outline 9 px ink; the subject's inner details and middle-plane lines 5 px ink; far plane 3 px mid grey, or no
   line (a flat light shape); marks 5 px. Nothing that has to be read is under 3 px. One clean round-capped stroke per edge: at most 8 px of
-  overshoot (none on the subject), no construction tails, no breaks in long lines. **Texture: placeholder tone only** (flat mid-grey rects today; the scribble primitives of `G3_ANIMATIC.md` §3
-  when built — mid/far/dress roles, placeholder tone, never decoration). Still banned: hatching as rendering, grain, gradients, caption glow.
+  overshoot (none on the subject), no construction tails, no breaks in long lines. **Texture: placeholder tone only** (the `{t:'scribble'}` mass — owner-approved sketchbook texture, 2026-10-27 — and
+  flat mid-grey rects; the remaining `G3_ANIMATIC.md` §3 primitives when built — mid/far/dress roles, placeholder tone, never decoration). Still banned: hatching as rendering, grain, gradients, caption glow.
 
 ## 3. Drawing rules
 - **One idea per panel.** Write the idea as one sentence first ("a hand taps Add to cart; the price jumps"). Two ideas means two panels,
