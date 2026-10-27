@@ -60,7 +60,7 @@ Commit your file. Your final message: the file path and the concept in 3 lines.`
 
 phase('Treatments')
 const r = await parallel([
-  () => agent(TASK(3, "pip-witness", "Pip, the channel's mascot, is the viewer's stand-in: a small curious witness who follows her story through a dense living world, reacting with warmth and dry wit (never mocking the people affected or the stakes); the humour comes from the situation, as in the master brief's loved line."), { label: 'T3-pip-witness', phase: 'Treatments' }),
-  () => agent(TASK(4, "documentary", "A premium hand-drawn documentary: big expressive environments, light and silhouettes, restraint, gravity; the feel of a great short documentary edited for Reels, serious but warm, every frame a painting at the density of v1."), { label: 'T4-documentary', phase: 'Treatments' }),
+  () => agent(TASK(3, "pip-witness", "Pip, the channel's mascot, is the viewer's stand-in: a small curious witness who follows her story through a dense living world, reacting with warmth and dry wit (never mocking the people affected or the stakes); the humour comes from the situation, as in the master brief's loved line."), { effort: 'max', label: 'T3-pip-witness', phase: 'Treatments' }),
+  () => agent(TASK(4, "documentary", "A premium hand-drawn documentary: big expressive environments, light and silhouettes, restraint, gravity; the feel of a great short documentary edited for Reels, serious but warm, every frame a painting at the density of v1."), { effort: 'max', label: 'T4-documentary', phase: 'Treatments' }),
 ])
 return { T3: r[0], T4: r[1] }

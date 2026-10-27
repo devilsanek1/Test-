@@ -72,7 +72,7 @@ src/v3/film/Film3.tsx, src/v3/film/palette.ts, docs/G5_BLOCKING.md sections 1, 5
    look at a contact sheet.
 6. ${V}/docs/v2/BUILD.md (<= 80 lines): the wiring, the scene contract (default export, useTime local seconds, captionTone export, the
    first shot's t < 0 bare state, Wiper / matchcut hooks), ownership, preview commands with --gl=angle, the gate check. Commit your paths.`,
-    { label: 'engine', phase: 'W0' }),
+    { effort: 'max', label: 'engine', phase: 'W0' }),
   () => agent(`${CTX}
 YOU ARE THE MAP AGENT (K2: the contract every lane and kit agent builds to). Work in ${V}. Write ${V}/src/v2r/world/map.ts exactly from
 TREATMENT.md (sections 2-5 and 9): the map (the canal east-west, every place in order), the shared spots (W, W2, SUN0-SUN2, B, the board
@@ -84,6 +84,6 @@ Then ${V}/src/entry-v2r-map.tsx (palette import first, once src/v2r/palette.ts e
 a 1080x1920 frame drawing the contract as labelled boxes, lines and points over the palette's sky/ground (no art), so builders and critics can
 overlay it; render the eight frames at 0.25 to ${SCR}/map/contract.jpg and check every number against TREATMENT.md (sizes above the
 legibility floor, nothing in the caption band, key reads in x 120-880 / y 290-1250, Pip never in the band or the right rail). Write
-${V}/src/v2r/world/README.md (<= 50 lines). Commit your paths.`, { label: 'map', phase: 'W0' }),
+${V}/src/v2r/world/README.md (<= 50 lines). Commit your paths.`, { effort: 'max', label: 'map', phase: 'W0' }),
 ])
 return { engine, map }

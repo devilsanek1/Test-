@@ -17,3 +17,17 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   https://claude.ai/code/session_01XBbv5cud3NnzxxSLqPjWNt (branch `claude/busy-lovelace-83r39e`, the v4 branch merged
   into it); G0.5 relaunched with the same stages and briefs, run as max-effort subagents (that session has no Workflow
   tool). The voice key `ELEVENLABS_API_KEY` is not set in that session: the owner was told before G2.
+- 2026-10-27 ~22:45 UTC, G0.5: "remember to use max effort in the subworkflows and agents work" -> confirmed: this
+  session runs at effort_level max (get_session) and every G0.5 agent is launched with effort max; the reusable workflow
+  templates had no effort setting, so they now pass `effort: 'max'` on every agent() call. -> rule: Process (effort).
+- 2026-10-27 ~22:50 UTC: "make sure to persist this rule in general in our repo - like all delegated work should be max
+  effort" -> the repo enforces it: a PreToolUse hook (`.claude/settings.json`, `.claude/hooks/max_effort.py`) denies an
+  Agent call, a Workflow run or a helper session that isn't at max; the same tool lints and fixes workflow scripts
+  (all 82 in `context/workflows/` fixed: 199 calls); CLAUDE.md, playbook, PIPELINE_V2 and HANDOFF updated.
+  -> rule: Process (effort).
+- 2026-10-27 ~22:50 UTC: "i don't remember us setting the explicit secret key in the other chats - i think it just
+  worked somehow - can you dig up the repo" -> found in HANDOFF's 26 Oct log (2c update, ~19:30 UTC): the owner pasted
+  the key into the video 2 chat; that session used it inline only (never stored), so every later session lacked it.
+  Owner: "let me know how to setup the elevenlabs key - lets actually do it here" -> steps given: a new restricted key
+  (Text to Speech + Voices read, credit limit), delete the pasted one, store it as the environment's network secret
+  `ELEVENLABS_API_KEY`; a new session (a helper in the same environment) sees it.

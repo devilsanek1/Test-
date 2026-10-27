@@ -68,7 +68,7 @@ const LENSES = [
 ]
 const concepts = await parallel(LENSES.map(l => () => agent(
   `${CTX}\n\nYou are a storyboard director. Your concept lens: ${l.lens}.\n\nRead the script, CORE_LINE section 2, the playbook sections and the docs first. Design the WHOLE film as a board: the opening as one continuous shot (beats with times), then one panel per idea (cut on the line timings; 8-14 panels total incl. a LOOP back to frame 0), each with the one idea, the fewest elements that say it, the shot type (COZY home base / SCALE reveal or cut / plain), framing, any camera move, the transition, and the sound cues (the first-second phone sound first). Don't write files.`,
-  { label: `concept:${l.key}`, phase: 'Concepts', schema: CONCEPT })))
+  { effort: 'max', label: `concept:${l.key}`, phase: 'Concepts', schema: CONCEPT })))
 const cs = LENSES.map((l, i) => concepts[i] ? { key: l.key, ...concepts[i] } : null).filter(Boolean)
 
 phase('Judge')
@@ -87,7 +87,7 @@ const JUDGES = [
 ]
 const js = await parallel(JUDGES.map(j => () => agent(
   `${CTX}\n\nYou are ${j.lens}. Score each concept 1-10 on clarity, opening, cinematic, story, fairness. Be harsh; use the full range. Say what to keep or graft and the problems.\n\nConcepts (JSON):\n${JSON.stringify(cs)}`,
-  { label: `judge:${j.key}`, phase: 'Judge', schema: SCORE })))
+  { effort: 'max', label: `judge:${j.key}`, phase: 'Judge', schema: SCORE })))
 const tot = {}
 cs.forEach(c => { tot[c.key] = 0 })
 js.filter(Boolean).forEach(j => j.scores.forEach(s => { if (s.key in tot) tot[s.key] += 3 * s.clarity + 2 * s.opening + 2 * s.cinematic + 2 * s.story + 2 * s.fairness }))
@@ -98,7 +98,7 @@ const notes = JSON.stringify(js.filter(Boolean).map((j, i) => ({ judge: JUDGES[i
 phase('Build')
 const build = await agent(
   `${CTX}\n\nYou are the story artist. Build the board animatic from the winning concept, grafting the judges' best ideas from the others and fixing their problems.\n\nWinner:\n${JSON.stringify(ranked[0])}\n\nOthers:\n${JSON.stringify(ranked.slice(1))}\n\nJudges:\n${notes}\n\nDo this:\n1. Write ${ROOT}/public/v2/animatic.json in SketchReel's board format (style "board"; label "v2 G3 board"; audio "v2/voice.wav"; durationSec = the voice length + ~0.5 s; frame0 = "SHE SAYS: NO CRITICIZING GOOGLE. FOR LIFE." with frame0Until where the voice reaches "for life"; words = the "words" array from ${ROOT}/public/v2/voice_words.json; sfx; shots cut on the line timings; LOOP last). Read the API in SketchReel.tsx, SketchIcons.tsx and board.ts first. A builder script is fine (e.g. ${ROOT}/scripts/v2/build_board.py, modelled on ${ROOT}/scripts/v3/build_board.py).\n2. Icons: if a needed object has no icon (e.g. a contract page, a pen, a stamp, an office building, a lamp, an envelope), ADD new icons to SketchIcons.tsx additively: new names only, appended, never changing existing ones (the video 3 session uses the file too). List any added icons in your return.\n3. Sounds: make our own first-second "signed!" chime (cheerful, two notes, ~0.3 s) and any other cues with ${ROOT}/scripts/v3/make_phone_sfx.py (extend it or write a small ${ROOT}/scripts/v2/make_sfx.py); save the wav files to ${ROOT}/public/v2/. Never use real system sounds.\n4. Run python3 ${ROOT}/scripts/v3/board_lint.py ${ROOT}/public/v2/animatic.json until it is clean.\n5. Check with stills: cd ${ROOT} && npx remotion still src/entry-v2.tsx Animatic ${SP}/v2s_<frame>.png --frame=<frame> --scale=0.25 (30 fps; at most 16 stills; look at them and fix what reads wrong).\n6. Make the cold-read sheet ${CR}/sheet.jpg: one frame per panel at its middle, plus the opening at 0.3, 1.2, 2.0, 3.0 and 5.0 s, each labelled with a number, in a montage; and ${CR}/index.json mapping numbers to panel ids and times.\n7. Write ${ROOT}/docs/v2/storyboard_g3.md: a panel table (id, time, line, the one idea, drawing, shot type COZY/SCALE/plain, move, transition, sound).\nDon't render a video and don't commit. Return at most 12 lines: the panels, icons added, sounds made, lint status.`,
-  { label: 'story-artist', phase: 'Build' })
+  { effort: 'max', label: 'story-artist', phase: 'Build' })
 
 phase('Check')
 const COLD = {
@@ -115,9 +115,9 @@ const PERSONAS = [
 const [cold, cine, std] = await Promise.all([
   parallel(PERSONAS.map((p, i) => () => agent(
     `You are ${p}. You are watching a short vertical video with the SOUND OFF; you only see these frames (numbered, with caption words). Look at ${CR}/sheet.jpg. For each numbered frame: what you see and what it means, whether you understood it, what is confusing. Be honest; judge the PICTURE (caption fragments are expected with sound off). Don't research.`,
-    { label: `cold-read:${i + 1}`, phase: 'Check', schema: COLD }))),
-  agent(`${CTX}\n\nYou are a cinematic reviewer. Look at ${CR}/sheet.jpg (index ${CR}/index.json) and the panel table ${ROOT}/docs/v2/storyboard_g3.md, against the docs (${DOCS}). Is there a cozy home base that returns, one big reveal, 1-2 scale cuts, purposeful variety of size and angle, and a banger opening (drawn live, escalating, never still)? Return at most 10 lines: what is missing, per panel.`, { label: 'cine-reviewer', phase: 'Check' }),
-  agent(`${CTX}\n\nYou are a standards editor and media lawyer. Look at ${CR}/sheet.jpg (index ${CR}/index.json), ${ROOT}/public/v2/animatic.json (all text elements) and ${ROOT}/docs/v2/storyboard_g3.md, against CORE_LINE section 2 and the factlock "Never say" list. Check every on-screen word and image: attribution, quotes, the oversight clause, no military imagery near "Google", Google's reply panel weight, source tags. Return at most 10 lines: each problem with the panel and the fix.`, { label: 'standards', phase: 'Check' }),
+    { effort: 'max', label: `cold-read:${i + 1}`, phase: 'Check', schema: COLD }))),
+  agent(`${CTX}\n\nYou are a cinematic reviewer. Look at ${CR}/sheet.jpg (index ${CR}/index.json) and the panel table ${ROOT}/docs/v2/storyboard_g3.md, against the docs (${DOCS}). Is there a cozy home base that returns, one big reveal, 1-2 scale cuts, purposeful variety of size and angle, and a banger opening (drawn live, escalating, never still)? Return at most 10 lines: what is missing, per panel.`, { effort: 'max', label: 'cine-reviewer', phase: 'Check' }),
+  agent(`${CTX}\n\nYou are a standards editor and media lawyer. Look at ${CR}/sheet.jpg (index ${CR}/index.json), ${ROOT}/public/v2/animatic.json (all text elements) and ${ROOT}/docs/v2/storyboard_g3.md, against CORE_LINE section 2 and the factlock "Never say" list. Check every on-screen word and image: attribution, quotes, the oversight clause, no military imagery near "Google", Google's reply panel weight, source tags. Return at most 10 lines: each problem with the panel and the fix.`, { effort: 'max', label: 'standards', phase: 'Check' }),
 ])
 const flags = {}
 cold.filter(Boolean).forEach(c => c.frames.forEach(f => { if (!f.understood) { (flags[f.n] = flags[f.n] || []).push(f.confusion || f.see) } }))
@@ -126,6 +126,6 @@ log(`not understood with sound off: ${Object.keys(flags).join(', ') || 'none'}`)
 phase('Fix')
 const fix = await agent(
   `${CTX}\n\nYou are the story artist. One fix round on ${ROOT}/public/v2/animatic.json.\nSound-off frames NOT understood (numbers -> panels via ${CR}/index.json):\n${JSON.stringify(flags)}\nCinematic reviewer:\n${cine}\nStandards:\n${std}\nFix what these flag: clearer, more literal drawings where a viewer was lost; the cinematography where it is missing; every standards problem. Lint clean, check changed panels with stills (at most 10), regenerate ${CR}/sheet.jpg and ${CR}/index.json the same way, update ${ROOT}/docs/v2/storyboard_g3.md. Don't render a video and don't commit. Return at most 8 lines.`,
-  { label: 'story-artist-fix', phase: 'Fix' })
+  { effort: 'max', label: 'story-artist-fix', phase: 'Fix' })
 
 return { ranking: ranked.map(c => ({ key: c.key, title: c.title, score: tot[c.key] })), build, flags, cine, std, fix }

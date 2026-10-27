@@ -30,5 +30,5 @@ const lenses = [
   { key: 'director', brief: 'You are a MOTION DIRECTOR / cinematographer (Arcane, Kurzgesagt, top motion-design reels). Judge camera energy, scale, contrast, focal clarity, the size of the key events on a phone, and rhythm against the voice. Propose motion and staging changes that land the story beats harder in this exact style.' },
 ]
 phase('Ideas')
-const out = await parallel(lenses.map(l => () => agent(`${CTX}\nLENS: ${l.brief}\nLook at every frame in ${FR} (and render more where needed). Propose at most 8 changes ranked by impact/cost, most valuable first; prefer few strong changes over many small ones.`, { label: `ideas:${l.key}`, phase: 'Ideas', schema: SCHEMA })))
+const out = await parallel(lenses.map(l => () => agent(`${CTX}\nLENS: ${l.brief}\nLook at every frame in ${FR} (and render more where needed). Propose at most 8 changes ranked by impact/cost, most valuable first; prefer few strong changes over many small ones.`, { effort: 'max', label: `ideas:${l.key}`, phase: 'Ideas', schema: SCHEMA })))
 return out

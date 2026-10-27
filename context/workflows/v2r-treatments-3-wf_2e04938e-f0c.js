@@ -60,7 +60,7 @@ Commit your file. Your final message: the file path and the concept in 3 lines.`
 
 phase('Treatments')
 const r = await parallel([
-  () => agent(TASK(5, "small-vs-vast", "Scale as the spine: one small person and her voice against vast institutions (a giant tech campus, the Pentagon, a city of offices), the cozy enclosed home against a huge world; the great-scale shot is the turn, and the payoff returns to the small, warm human scale."), { label: 'T5-small-vs-vast', phase: 'Treatments' }),
-  () => agent(TASK(6, "retention", "The retention editor's cut: designed from v1's measured drop-off (about 80% gone by 3 s on the first post; the leak is the first 15 s) for the most scroll-stopping first 1 s, 3 s, 5 s and 10 s, relentless visual pacing, open loops that pay off, and a share-worthy last beat, while staying true, fair and beautiful."), { label: 'T6-retention', phase: 'Treatments' }),
+  () => agent(TASK(5, "small-vs-vast", "Scale as the spine: one small person and her voice against vast institutions (a giant tech campus, the Pentagon, a city of offices), the cozy enclosed home against a huge world; the great-scale shot is the turn, and the payoff returns to the small, warm human scale."), { effort: 'max', label: 'T5-small-vs-vast', phase: 'Treatments' }),
+  () => agent(TASK(6, "retention", "The retention editor's cut: designed from v1's measured drop-off (about 80% gone by 3 s on the first post; the leak is the first 15 s) for the most scroll-stopping first 1 s, 3 s, 5 s and 10 s, relentless visual pacing, open loops that pay off, and a share-worthy last beat, while staying true, fair and beautiful."), { effort: 'max', label: 'T6-retention', phase: 'Treatments' }),
 ])
 return { T5: r[0], T6: r[1] }

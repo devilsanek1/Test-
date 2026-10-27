@@ -134,7 +134,7 @@ replaces. Work in ${V}. Follow docs/G5_BLOCKING.md sections 1, 5, 6, 7 and copy 
    --mp4 ... --scenes src/v2/film/scenes.json --captions src/v2/film/captions.json --voice public/v2/voice.wav --entry src/entry-v2-film.tsx
    --comp Film2 --frame0 "<line 1>|<line 2>" --frame0-until 6.12; look at one contact sheet (frame 0 must show the words + credit; one frame
    per panel with its credit; the loop seam). If you touched src/lib/Film.tsx, prove v3 is unchanged (one Film3 still before/after, identical).
-8. If you learned something generic (credits, a bare composition), add it in 1-3 lines to docs/G5_BLOCKING.md. Commit your paths.`, { label: 'engine', phase: 'Setup' }),
+8. If you learned something generic (credits, a bare composition), add it in 1-3 lines to docs/G5_BLOCKING.md. Commit your paths.`, { effort: 'max', label: 'engine', phase: 'Setup' }),
   () => agent(`${CTX}
 ${ALIVE}
 YOU ARE THE KIT AGENT. Build the shared look, cast and LIVING sets every lane uses, so 13 panels built by 5 agents look like one dense, living
@@ -194,7 +194,7 @@ src/v2/film/Film2.tsx, scenes.json, captions, credits in a cream tab at y 182-28
 5. video/src/v2/film/kit/README.md: the kit API in one page (each export, props, the sizes that read at phone size, variants, the time-of-day,
    cold-set and interview-room decisions, the ambient life pieces and how to keep a panel alive, the colour jobs), plus a "Consistency contract"
    (the same her, cat, contract, nook, town, mic, bubble and lettering in every panel; ink weights by depth; nothing busy in the caption band).
-   Commit your paths. Your report lists the exact sheet paths.`, { label: 'kit', phase: 'Setup' }),
+   Commit your paths. Your report lists the exact sheet paths.`, { effort: 'max', label: 'kit', phase: 'Setup' }),
 ])
 log('setup done: engine ' + (engine ? 'ok' : 'FAILED') + ', kit ' + (kit ? 'ok' : 'FAILED'))
 
@@ -235,7 +235,7 @@ Judge: are the sets (her nook at three sizes, her desk, the town outside her win
 pieces) as full and alive as the bar at phone size? Is it one consistent world with the style frame? Do her, the cat, the staffers, the bubble
 and the contract read at their smallest sizes? Anything sickly, grey, muddy, or cobalt off the heroine? Does the life strip show motion in
 several places at once? Return verdict 'pass' only if nothing must change; list at most 10 problems, the most important first, each with a
-concrete fix a kit builder can do in an hour or less.`, { label: 'kit-critic', phase: 'Kit review', schema: CRIT_SCHEMA })
+concrete fix a kit builder can do in an hour or less.`, { effort: 'max', label: 'kit-critic', phase: 'Kit review', schema: CRIT_SCHEMA })
 let kitFix = null
 if (kitCrit && kitCrit.verdict === 'fix' && kitCrit.problems.length) {
   kitFix = await agent(`${CTX}
@@ -247,7 +247,7 @@ life.jpg) and look at them next to ${SCR}/bar/density_bar.jpg. Typecheck, update
 KIT REPORT:
 ${kit || '(missing)'}
 ART DIRECTOR:
-${fmtCrit(kitCrit)}`, { label: 'kit-fix', phase: 'Kit review' })
+${fmtCrit(kitCrit)}`, { effort: 'max', label: 'kit-fix', phase: 'Kit review' })
 }
 log('kit review: ' + (kitCrit ? kitCrit.verdict + ', ' + kitCrit.problems.length + ' problems' : 'critic failed') + (kitFix ? '; fixed' : ''))
 
@@ -358,7 +358,7 @@ const lanes = await pipeline(LANES,
 ${ALIVE}
 ${laneCtx.split('<lane>').join(L.key)}
 YOUR LANE: ${L.key}. Panels: ${L.panels}. Scratch dir: ${SCR}/${L.key}/.
-${L.brief}`, { label: L.key, phase: 'Lanes' }),
+${L.brief}`, { effort: 'max', label: L.key, phase: 'Lanes' }),
   (build, L) => agent(`You are a fresh-eyes ART DIRECTOR and STORY CHECKER for one group of panels of a hand-drawn, flat-colour explainer reel (9:16,
 seen on a phone). Look at images; read code only if you must locate something. The owner's bar: every scene must FEEL ALIVE (a dense, detailed
 world, layered depth, a recurring living character where it belongs, ambient life that never stops; "hold" means the camera holds, not the
@@ -374,7 +374,7 @@ ${build || '(missing)'}
 Return verdict 'pass' only if nothing must change. At most 10 problems, most important first, each concrete and fixable in under an hour:
 emptier/flatter/stiller than the bar, a frozen moment, the subject lost in the dressing, a misread (what does a sound-off viewer think it is?),
 off-board staging, colour roles, text unreadable at phone size, fairness slips (Google lettering in P6-P10, quote marks, equal pages).`,
-    { label: L.key + ':critic', phase: 'Lanes', schema: CRIT_SCHEMA }).then((crit) => ({ build, crit })),
+    { effort: 'max', label: L.key + ':critic', phase: 'Lanes', schema: CRIT_SCHEMA }).then((crit) => ({ build, crit })),
   (bc, L) => (bc.crit && bc.crit.verdict === 'pass' && !bc.crit.problems.some((p) => p.severity === 'must')) ? { build: bc.build, crit: bc.crit, skipped: true } :
     agent(`${CTX}
 ${ALIVE}
@@ -386,7 +386,7 @@ Scratch dir: ${SCR}/${L.key}/.
 PANEL BRIEFS:
 ${L.brief}
 ART DIRECTOR:
-${fmtCrit(bc.crit)}`, { label: L.key + ':fix', phase: 'Lanes' }).then((fix) => ({ build: bc.build, crit: bc.crit, fix })),
+${fmtCrit(bc.crit)}`, { effort: 'max', label: L.key + ':fix', phase: 'Lanes' }).then((fix) => ({ build: bc.build, crit: bc.crit, fix })),
 )
 const laneReports = LANES.map((L, i) => {
   const r = lanes[i]
@@ -425,7 +425,7 @@ SETUP REPORTS:
 ### engine
 ${engine || 'FAILED'}
 ### kit
-${kitAll}`, { label: 'assemble', phase: 'Assemble' })
+${kitAll}`, { effort: 'max', label: 'assemble', phase: 'Assemble' })
 
 const coldread = await agent(`You are a sound-off cold reader for a 39-second vertical (9:16) short video, the kind people scroll past on Reels
 or TikTok. You know NOTHING about its topic: do not read any project files, docs, scripts or code. Look only at these two contact sheets of
@@ -440,7 +440,7 @@ Then from the CAPTIONS sheet: what story do you get now; which frames still don'
 background or colliding with detail; does any frame read as an accusation, a war or weapons image, or a logo of a real company.
 Also: which frames feel empty, flat or lifeless next to a lively illustrated reel, and which feel full and alive?
 Finish with the 6 most important problems, most important first, each as: frame number, what you saw, what a viewer would need.
-At most 50 lines. Be blunt and literal; do not guess what the makers meant.`, { label: 'cold-read', phase: 'Assemble' })
+At most 50 lines. Be blunt and literal; do not guess what the makers meant.`, { effort: 'max', label: 'cold-read', phase: 'Assemble' })
 
 const finish = await agent(`${CTX}
 ${ALIVE}
@@ -469,6 +469,6 @@ ASSEMBLER REPORT:
 ${assemble || 'FAILED (no report): check video/out and the scratch dir yourself, and render the film first'}
 
 COLD READ:
-${coldread || 'FAILED (no cold read): do the phone-size read yourself on the bare sheet'}`, { label: 'finish', phase: 'Assemble' })
+${coldread || 'FAILED (no cold read): do the phone-size read yourself on the bare sheet'}`, { effort: 'max', label: 'finish', phase: 'Assemble' })
 
 return { engine, kit, kitCrit, kitFix, lanes: laneReports, assemble, coldread, finish }

@@ -56,12 +56,12 @@ const runScene = async (id) => {
   const tag = `${CONTEXT}\nYOUR SCENE: ${id} (file src/scenes/Scene${nn}.tsx; local helpers in src/scenes/scene${nn}/). Its storyboard entry is scenes[] with id "${id}" in docs/storyboard_v3.json / _resolved.json and its section in docs/storyboard_v3.md.`
   if (!prebuilt.includes(id)) await agent(`${tag}
 BUILD the scene completely, exactly per the storyboard (every element, beat, camera key, label, sun/mascot/Bit action, transition in/out). Iterate visually: render stills at every beat, strips around the cuts, and run the QA gate until it passes and you'd score it >= 8/10 yourself. Write docs/scenes/${id}.md (what's in it, shims used, render cost, known gaps).
-Final message: summary, QA life score, ms/frame, shims used, open issues.${buildNotes[id] ? `\n${kitNote}\nFOR ${id}: ${buildNotes[id]}` : ''}`, { label: `build:${id}`, phase: 'Build' })
+Final message: summary, QA life score, ms/frame, shims used, open issues.${buildNotes[id] ? `\n${kitNote}\nFOR ${id}: ${buildNotes[id]}` : ''}`, { effort: 'max', label: `build:${id}`, phase: 'Build' })
 
   let last = null
   for (let round = 1; round <= ROUNDS; round++) {
     const reviews = await parallel(LENSES.map(l => () => agent(`${tag}
-You are an independent REVIEWER of scene ${id}. Do NOT edit repo files. LENS: ${l.brief} Be concrete (time/frame, what, exact fix). Severity: blocker = must fix to ship; major = clearly below the bar; minor = polish.`, { label: `review:${id}:${l.key}:r${round}`, phase: 'Review', schema: REVIEW_SCHEMA })))
+You are an independent REVIEWER of scene ${id}. Do NOT edit repo files. LENS: ${l.brief} Be concrete (time/frame, what, exact fix). Severity: blocker = must fix to ship; major = clearly below the bar; minor = polish.`, { effort: 'max', label: `review:${id}:${l.key}:r${round}`, phase: 'Review', schema: REVIEW_SCHEMA })))
     const rs = reviews.filter(Boolean)
     if (rs.length < LENSES.length) {
       // a reviewer died (e.g. usage limit): never count that as a pass
@@ -79,7 +79,7 @@ You are an independent REVIEWER of scene ${id}. Do NOT edit repo files. LENS: ${
     await agent(`${tag}
 FIX ROUND ${round} for scene ${id}. Reviewers found:
 ${JSON.stringify(findings, null, 1)}
-Fix every blocker and major and the cheap minors. Also swap any local shims for the shared kit pieces if they now exist in src/scenes/shared (check exports). Re-render, re-run the QA gate, LOOK at the results. Update docs/scenes/${id}.md. Final message: what changed per finding, new QA life score.${noteFor(id, round)}`, { label: `fix:${id}:r${round}`, phase: 'Fix' })
+Fix every blocker and major and the cheap minors. Also swap any local shims for the shared kit pieces if they now exist in src/scenes/shared (check exports). Re-render, re-run the QA gate, LOOK at the results. Update docs/scenes/${id}.md. Final message: what changed per finding, new QA life score.${noteFor(id, round)}`, { effort: 'max', label: `fix:${id}:r${round}`, phase: 'Fix' })
   }
   return { id, ...last }
 }

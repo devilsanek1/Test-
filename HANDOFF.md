@@ -247,6 +247,12 @@ Everything that agent knew is in this repo. This file is the map; the details li
 
 ## 4. Rules of engagement (from the owner and from how this session ran)
 
+- **All delegated work runs at MAX effort** (owner, 2026-10-27): workflows, sub-workflows, subagents, the agents they
+  start and helper sessions. The PreToolUse hook in `.claude/settings.json` (`.claude/hooks/max_effort.py`) denies an
+  Agent call without `effort: "max"`, a Workflow whose script has an `agent()` call without `effort: 'max'`, and a
+  helper session whose first prompt isn't exactly `/effort max`; `python3 .claude/hooks/max_effort.py --lint|--fix
+  <workflow.js>` checks or repairs a script (playbook, Process). A session only loads the hook if `.claude/settings.json`
+  existed when it started.
 - **Git:**
   - Branch **`video-production`** (it is the repo's default branch).
   - Commit and push after every meaningful step, only the files you changed: `git add <paths>` (never `-A` or `.`:

@@ -50,5 +50,5 @@ motion second".` },
 
 phase('Analyse')
 const results = await parallel(LENSES.map((L) => () => agent(`${CTX}
-YOUR LENS: ${L.ask}`, { label: 'riverside:' + L.key, phase: 'Analyse' })))
+YOUR LENS: ${L.ask}`, { effort: 'max', label: 'riverside:' + L.key, phase: 'Analyse' })))
 return LENSES.map((L, i) => `### ${L.key}\n${results[i] || 'FAILED'}`).join('\n\n')

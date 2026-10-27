@@ -65,7 +65,7 @@ const JUDGE = {
 phase('Write')
 const written = await parallel(WRITERS.map(w => () => agent(
   `${CTX}\n\nYou are ${w.lens}. Read the fact files first. Write 4 genuinely different replacement lines for LINE 2. Don't write files.`,
-  { label: `writer:${w.key}`, phase: 'Write', schema: OPTS })))
+  { effort: 'max', label: `writer:${w.key}`, phase: 'Write', schema: OPTS })))
 
 const seen = new Set()
 const cands = [{ id: 'L0', line: "You're up against AI data centers for memory chips… and losing.", source: 'current' }]
@@ -80,14 +80,14 @@ phase('React')
 const [panel, judged] = await Promise.all([
   parallel(PERSONAS.map(p => () => agent(
     `You are ${p.who}. You're scrolling, half-paying attention, and a short video starts. Below are different versions of its first ~6 seconds (what the narrator says). React honestly in your own voice to EACH version: would you keep watching, does anything make you roll your eyes or feel like hype, do you get what AI has to do with laptops? Then rank them all (1 = the one that works best on you). Don't research anything; just react.\n\nVersions (JSON):\n${JSON.stringify(inContext)}`,
-    { label: `viewer:${p.key}`, phase: 'React', schema: REACT }))),
+    { effort: 'max', label: `viewer:${p.key}`, phase: 'React', schema: REACT }))),
   agent(`${CTX}\n\nYou are a standards editor and script editor. Read the fact files. Score every LINE 2 option 1-10 on truth (fair to a normal viewer), flow (from the hook into line 3, setting up line 6 without stealing it), natural (sounds like a person talking), jolt (opens the gap). Be harsh.\n\nOptions (JSON):\n${JSON.stringify(cands)}`,
-    { label: 'judge:standards-flow', phase: 'React', schema: JUDGE }),
+    { effort: 'max', label: 'judge:standards-flow', phase: 'React', schema: JUDGE }),
 ])
 
 phase('Pick')
 const synth = await agent(
   `${CTX}\n\nYou are the head writer. Options for line 2 (L0 is the current line):\n${JSON.stringify(cands)}\n\nViewer panel (${PERSONAS.map(p => p.who).join(' | ')}):\n${JSON.stringify(panel.filter(Boolean))}\n\nStandards/flow judge:\n${JSON.stringify(judged)}\n\nWriters' notes on line 6:\n${JSON.stringify(line6)}\n\nWrite ${V3}/script/line2_options.md, short (max 40 lines):\n1. "How people react to the current line": 2-4 lines summarising the panel on L0, quoting them.\n2. "Pick one": the top 3 replacements, each with the line, why (panel + judge in a few words), and its ElevenLabs paste line (a short delivery tag in brackets, then the line; tags describe delivery only and never quote script words; CAPS for emphasis; … for a beat; numbers spelled out). Then a one-line recommendation.\n3. Line 6: keep it or change it (one line, with the paste line if changed).\nDon't commit. Return at most 8 lines: the 3 options and your recommendation.`,
-  { label: 'head-writer', phase: 'Pick' })
+  { effort: 'max', label: 'head-writer', phase: 'Pick' })
 
 return { synthesis: synth, panelOnCurrent: panel.filter(Boolean).map(p => p.reactions.find(r => r.id === 'L0')), judge: judged && judged.scores }

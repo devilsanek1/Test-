@@ -60,7 +60,7 @@ Build it to the approved bar, then check: typecheck; stills at the panel's key b
 the meter (and --cozy where it is a cozy hold). Iterate until it feels as full and alive as the pilot and every locked beat still lands.
 ${GIT}
 REPORT (at most 12 lines): what you added, the meter numbers (G5 -> now), the still sheet path, any shared kit additions, open items.`,
-    { label: L.key + ' build', phase: 'Lanes' }),
+    { effort: 'max', label: L.key + ' build', phase: 'Lanes' }),
   (built, L) => agent(`${CTX}
 YOU ARE AN INDEPENDENT REVIEWER for ${L.key} (${L.panels}). You did not build it. The lane's report is below. Render your own stills of the panel(s)
 at --scale=0.5 at 5-6 times (start, every timed beat, end) and a 0.25 phone look, put them beside the pilot (${V}/deliverables/v3/v3_g5b_pilot.mp4 at
@@ -70,14 +70,14 @@ in the clutter at phone size; a sickly or cold colour, or the hero/pop colours m
 tag, phone, data center, You, Pip, the time of day); motion that is too busy for a cozy hold or too still for a busy beat; anything broken. For each:
 what, where (time and screen area), and the concrete fix. Do not edit files.
 LANE REPORT:
-${built || 'FAILED'}`, { label: L.key + ' review', phase: 'Lanes' }),
+${built || 'FAILED'}`, { effort: 'max', label: L.key + ' review', phase: 'Lanes' }),
   (review, L, i) => agent(`${CTX}
 YOU ARE THE FIX LANE FOR ${L.key} (${L.panels}). An independent reviewer found the problems below. Fix every real one (skip one only if it is wrong,
 and say why), re-check with stills and the meter, and commit.
 ${GIT}
 REVIEW:
 ${review || 'FAILED'}
-REPORT (at most 10 lines): fixes, the final meter numbers, open items.`, { label: L.key + ' fix', phase: 'Lanes' }),
+REPORT (at most 10 lines): fixes, the final meter numbers, open items.`, { effort: 'max', label: L.key + ' fix', phase: 'Lanes' }),
 )
 const laneReports = LANES.map((L, i) => `### ${L.key}\n${results[i] || 'FAILED'}`).join('\n\n')
 
@@ -97,6 +97,6 @@ ${GIT}
 REPORT (at most 12 lines): the deliverable, the gate/density/cozy results (per panel PASS/WARN), the fixes, anything open for the owner.
 
 LANE REPORTS:
-${laneReports}`, { label: 'assemble', phase: 'Assemble' })
+${laneReports}`, { effort: 'max', label: 'assemble', phase: 'Assemble' })
 
 return { lanes: laneReports, assemble }

@@ -43,7 +43,7 @@ for (let i = 0; i < 14; i++) sheets.push({ n: i + 1, from: i * 12 + 1, to: Math.
 phase('Analyze')
 const analyzed = await parallel(sheets.map(s => () => agent(
   `${CTX}\n\nYour sheet: ${SP}/sheets/sheet_${String(s.n).padStart(2, '0')}.jpg (look at it with Read; each row is one shot: 3 frames at 10/50/90 % of the shot, labelled #shot, start time, duration, measured move). If a detail is too small, you may extract one larger frame with: ffmpeg -loglevel error -ss <seconds> -i ${SP}/arcane_s1.mp4 -frames:v 1 -vf scale=900:-1 ${SP}/zoom_${s.n}_<shot>.jpg (at most 4). The measured data for these shots (shots ${s.from}-${s.to}) is in ${ROWS} (a JSON array; read it and take the entries with "shot" ${s.from}-${s.to}); copy start_s, dur_s, move (as measured_move), zoom_pct, pan_x_pct_of_width (as pan_x), pan_y_pct_of_width (as pan_y) and easing into each record unchanged.\n\nClassify every shot on the sheet. Be precise and concrete; the recipe must be buildable in a 2D layered 9:16 frame. Don't write files except optional zoom frames in the scratchpad.`,
-  { label: `sheet:${s.n}`, phase: 'Analyze', schema: SHOT })))
+  { effort: 'max', label: `sheet:${s.n}`, phase: 'Analyze', schema: SHOT })))
 const recs = []
 analyzed.forEach(a => { if (a) a.shots.forEach(r => recs.push({ ...r, measured: r.measured_move })) })
 log(`${recs.length} shot records from ${analyzed.filter(Boolean).length}/14 sheets`)
@@ -65,16 +65,16 @@ const SECTIONS = [
 ]
 const written = await parallel(SECTIONS.map(s => () => agent(
   `${CTX}\n\nYou are a cinematographer writing one section of our cinematic guidebook. Section: ${s.brief}\n\nData: aggregate stats:\n${JSON.stringify(stats)}\n\nAll shot records (JSON):\n${JSON.stringify(recs)}\n\nAlso read ${LOOK}/COZY_AND_SCALE.md sections 4-5 (our current scale grammar K1-K10, some marked UNCERTAIN until measured) and say where the measurements confirm or change it. Write your section as markdown to ${LOOK}/research/cine_${s.key}.md (max ~120 lines): rules with numbers, evidence, reference shots (#, timestamp, description), 2D recipes for 9:16. Return at most 8 lines: the strongest rules.`,
-  { label: `write:${s.key}`, phase: 'Write' })))
+  { effort: 'max', label: `write:${s.key}`, phase: 'Write' })))
 
 phase('Edit')
 const ed = await agent(
   `${CTX}\n\nYou are the editor of our studio's cinematic guidebook. Read the three sections ${SECTIONS.map(s => `${LOOK}/research/cine_${s.key}.md`).join(', ')}, ${LOOK}/COZY_AND_SCALE.md, ${LOOK}/PALETTE.md, and ${ROOT}/src/v3/SketchReel.tsx (our animatic tool; its camera = {x,y,z} from/to with easing).\n\nWrite ${LOOK}/CINEMATIC_GUIDE.md, the guidebook every video uses from the storyboard (G3) to the blocking cut (G5). Max ~220 lines, practical, numbers over adjectives:\n1. One screen first: the 10 rules that matter most (each with a number).\n2. Shot vocabulary: a table of 8-12 named shot types we use (name, size, angle, lens feel, composition, typical duration, camera preset, purpose, 2 reference shots by # and timestamp in the source).\n3. Camera presets: named moves with numbers (zoom %, travel, duration, easing, parallax ratios), ready to put in SketchReel JSON and our kit.\n4. Composition and depth rules for 9:16 (how Arcane's 2.39:1 framings translate to vertical: what to keep, what to crop, where the caption band sits at the top).\n5. Light and colour rules mapped to our palettes.\n6. Transitions and sequencing: a small library of cut types and 3-4 mini-sequence templates (e.g. establish -> scale -> intimate).\n7. How this updates COZY_AND_SCALE.md's scale grammar (which K values are now measured).\n8. Source and method (the compilation, its id, what was measured, caveats: compilation editing, captions, season 1 only), and the rule that reference footage never goes into the repo.\nDon't commit. Return at most 10 lines: the 10 rules.`,
-  { label: 'editor', phase: 'Edit' })
+  { effort: 'max', label: 'editor', phase: 'Edit' })
 
 phase('Critic')
 const cr = await agent(
   `${CTX}\n\nYou are a sceptical director of photography and animation layout artist. Read ${LOOK}/CINEMATIC_GUIDE.md and spot-check it against the shot records below and a few sheets in ${SP}/sheets/ (look at 2-3). Fix in place: claims the data doesn't support, numbers that don't match the stats, rules too vague to use, recipes our 2D 9:16 kit can't do, anything that conflicts with the owner's rules (pop captions in a band at the top, no paper edge at the top, scale only occasionally, one hot pop colour). Keep it under ~220 lines. Return at most 6 lines: what you changed.\n\nStats:\n${JSON.stringify(stats)}\n\nShot records:\n${JSON.stringify(recs)}`,
-  { label: 'critic', phase: 'Critic' })
+  { effort: 'max', label: 'critic', phase: 'Critic' })
 
 return { stats, records: recs, editor: ed, critic: cr }

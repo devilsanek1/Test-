@@ -24,18 +24,18 @@ const LANES = [
 phase('Research')
 const res = await parallel(LANES.map(l => () => agent(
   `${CTX}\n\nYour lane: ${l.brief}\n\nWrite ${OUT}/${l.key}.md (max ~150 lines, grouped, sources with URLs and tags). Return at most 10 lines: the most useful rules or findings.`,
-  { label: `research:${l.key}`, phase: 'Research' })))
+  { effort: 'max', label: `research:${l.key}`, phase: 'Research' })))
 const ok = LANES.filter((l, i) => res[i]).map(l => `${OUT}/${l.key}.md`)
 log(`lanes done: ${ok.length}/5`)
 
 phase('Synthesis')
 const synth = await agent(
   `${CTX}\n\nYou are the look director. Read the research files: ${ok.join(', ')}.\n\nWrite ${LOOK}/COZY_AND_SCALE.md, the rulebook the storyboard (G3), look (G4) and blocking (G5) gates will use. Keep it tight (max ~170 lines), concrete and numeric:\n1. Principles (5-8 lines): what coziness and scale mean for us, and the rhythm between them (cozy holds the viewer, scale makes them feel the stakes; how often a scale moment, how long).\n2. Enclosure framing rules for 9:16 (ratios, angles, where walls/edges sit, sky share, foreground frames), with tiny ASCII thumbnails if helpful.\n3. Cozy rules (light pools, temperature contrast, density, sound).\n4. Scale shot grammar: a numbered library of 6-10 shots/moves inspired by Arcane (name, what it does emotionally, 2D recipe: layers, parallax ratios, camera path, easing, duration, haze), each marked EXISTS in our kit (with the file) or TO BUILD.\n5. Vertical short-form rules (readability, UI-safe zones, duration limits).\n6. How it applies to v3 (the nook frame 0, the data-center scale pull-back, the cozy ending), shot by shot in 5-8 lines; then 4-6 angle-agnostic shot ideas for v2 (e.g. an engineer's warm desk lamp at night vs a vast cold data center), tagged cozy / scale.\n7. Build list for G3-G5 (prioritised).\n8. The Arcane clip list for the owner (from the arcane lane), and what we'll measure from each clip (camera curves, easing, parallax, framing, shot length).\nCite sources inline briefly. Return at most 10 lines.`,
-  { label: 'look-director', phase: 'Synthesis' })
+  { effort: 'max', label: 'look-director', phase: 'Synthesis' })
 
 phase('Critic')
 const crit = await agent(
   `${CTX}\n\nYou are a sceptical animation director and a fact-checker in one. Read ${LOOK}/COZY_AND_SCALE.md and spot-check it against the research files ${ok.join(', ')}. Fix in place: claims the sources don't support, rules too vague to build (add numbers or cut them), recipes our 2D kit can't do as written, anything that would hurt readability at phone size, contradictions with the owner's rules (no paper edge at the top of the frame, pop captions, scale only occasionally) and with ${LOOK}/PALETTE.md. Keep it under ~170 lines. Return at most 8 lines: what you changed.`,
-  { label: 'critic', phase: 'Critic' })
+  { effort: 'max', label: 'critic', phase: 'Critic' })
 
 return { lanes: res.map((r, i) => r && { lane: LANES[i].key, summary: r }), synthesis: synth, critic: crit }

@@ -153,7 +153,8 @@ still asks for scale cuts and "size and angle at every cut", and `v3-g5b-rollout
 retired G5b bar (retired as a template). Rebuild the G3 and G5 templates on `docs/look/DIRECTION.md` and `CRAFT.md`
 before the next video's G3. The G0-G1 templates' STRUCTURE stands, but every copied brief needs four updates: today's
 date and search window (`v3-g0-topics-*.js` hard-codes 2026-10-25), the current look words from DIRECTION (its judges
-still say "hand-drawn ink"), `effort: 'max'` on every `agent()` call (none of the three sets it: playbook Process), and
+still say "hand-drawn ink"), `effort: 'max'` on every `agent()` call (every script in `context/workflows/` sets it since 2026-10-27; a copied or new
+one must pass `python3 .claude/hooks/max_effort.py --lint`, and the repo's hook denies a run that doesn't), and
 the through-line card (G0.5 drafts it from the pick, G1 completes it from the script's joins):
 
 | Gate | Tool / template | What it does |
@@ -179,6 +180,10 @@ the through-line card (G0.5 drafts it from the pick, G1 completes it from the sc
 
 ## Agent prompt rules
 
+- **All delegated work runs at MAX effort** (owner, 2026-10-27; playbook Process): `effort: 'max'` in every `agent()`
+  call, `effort: "max"` on every Agent tool call, `/effort max` as a helper session's first prompt, and every brief says
+  that anything its agent starts runs at max too. The hook in `.claude/settings.json` enforces it;
+  `python3 .claude/hooks/max_effort.py --lint|--fix <workflow.js>` checks or repairs a script.
 - Context: the gate's brief plus the scene's own data. **Point to sections, never "read all docs fully".**
 - A report is at most 12 lines. Cross-lane requests go in one block, in an exact format.
 - Lanes: one scene per agent session (G5: a lane owns a SEQUENCE and builds it panel by panel; one agent owns every

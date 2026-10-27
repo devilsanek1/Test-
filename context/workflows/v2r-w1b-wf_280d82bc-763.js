@@ -64,7 +64,7 @@ walkers / joggers / cyclists / dogs slots for K4's people, window switching, str
 slots where K4's people and K5's Pip plug in; positions from map.ts. ${V}/src/entry-v2r-canal.tsx (palette first): a "KitCanal" sheet and
 "CanalSample-S1/S2/S4/S8" 1080x1920 sample frames (sets assembled at the map's positions, people as simple placeholders until K4 exists).
 Render to ${SCR}/canal/ and put the samples at 216 px beside the teardown's v1 / reference 1 frames (canal_vs_refs.jpg): as full, specific
-and layered? Fix what isn't. ${V}/src/v2r/kit/canal/README.md. Commit your paths.`, { label: 'K6-canal', phase: 'W1' }),
+and layered? Fix what isn't. ${V}/src/v2r/kit/canal/README.md. Commit your paths.`, { effort: 'max', label: 'K6-canal', phase: 'W1' }),
   () => agent(`${CTX}
 YOU ARE K7, THE ARLINGTON KIT AGENT. Wait for ${V}/src/v2r/palette.ts and ${V}/src/v2r/world/map.ts (the engine and map agents commit them early: poll every 60 s for up to 30 min; start with design studies and reference frames meanwhile; if a file never comes, use TREATMENT.md's values through a local module and say so).
 Build ${V}/src/v2r/kit/dc/ (+ index.ts) per TREATMENT.md K7 and shots V2S5-V2S6: the public viewpoint terrace + canopy, blossom with a
@@ -76,6 +76,6 @@ aircraft, no weapons, no flags as villain signs), and S6's gate: the facade band
 service door "CLASSIFIED · AUTHORIZED PERSONNEL ONLY". ${V}/src/entry-v2r-dc.tsx (palette first): a "KitDC" sheet, a "CraneEnd" 1080x1920
 end frame of S5 and a "CraneMove" clip of the move with the TREATMENT's ease (check every frame's speed at 60 fps). Render to ${SCR}/dc/ and
 put the end frame at 216 px beside the teardown's scale frames (v1's scale shots; the Arcane-style great-scale cues in
-docs/look/CINEMATIC_GUIDE.md): does the scale feel GREAT? Fix what doesn't. ${V}/src/v2r/kit/dc/README.md. Commit your paths.`, { label: 'K7-dc', phase: 'W1' }),
+docs/look/CINEMATIC_GUIDE.md): does the scale feel GREAT? Fix what doesn't. ${V}/src/v2r/kit/dc/README.md. Commit your paths.`, { effort: 'max', label: 'K7-dc', phase: 'W1' }),
 ])
 return { canal, dc }

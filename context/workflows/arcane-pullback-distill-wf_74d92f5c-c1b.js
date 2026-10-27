@@ -58,7 +58,7 @@ plane, which planes get ink and which are flat shapes, how to get haze with flat
 ]
 const analyses = await parallel(lenses.map((L) => () => agent(`${CTX}
 YOUR LENS: ${L.ask}
-${ANALYST_OUT}`, { label: 'distil:' + L.key, phase: 'Distil' })))
+${ANALYST_OUT}`, { effort: 'max', label: 'distil:' + L.key, phase: 'Distil' })))
 const A = lenses.map((L, i) => `### ${L.key}\n${analyses[i] || 'FAILED'}`).join('\n\n')
 
 phase('Library')
@@ -84,7 +84,7 @@ Claude-Session: https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR
 then run once: git push origin HEAD:video-production (if rejected, leave it). Report in at most 10 lines with the sheet path.
 
 ANALYSES:
-${A}`, { label: 'library', phase: 'Library' })
+${A}`, { effort: 'max', label: 'library', phase: 'Library' })
 
 phase('Pick')
 const V3 = `
@@ -110,7 +110,7 @@ YOU ARE DIRECTOR ${i + 1}; your lens: ${lens}. Propose the BEST place in video 3
 the panel(s) and time window, the start frame (what the viewer sees close: their small world), the end frame (the vast thing revealed, the tiny
 figure or object with its back to us), the reveal order and the suspense on this voice line, the retimed duration and speed (faster than Arcane
 is expected), what it replaces in the locked board and what stays, and the risks (does every panel's one idea survive; does it read with the
-sound off; does it compete with the opening). At most 25 lines. Do not edit files.`, { label: 'director:' + (i + 1), phase: 'Pick' })))
+sound off; does it compete with the opening). At most 25 lines. Do not edit files.`, { effort: 'max', label: 'director:' + (i + 1), phase: 'Pick' })))
 
 const judge = await agent(`${CTX}
 ${V3}
@@ -120,7 +120,7 @@ and rework cost. Pick ONE (with grafts from the others) and write the build spec
 layouts in frame pixels, the move's shape and timing (eases, parallax planes as element moves), what each existing element becomes, and the words
 each beat lands on. At most 30 lines.
 
-${directors.map((d, i) => `### Director ${i + 1}\n${d || 'FAILED'}`).join('\n\n')}`, { label: 'judge', phase: 'Pick' })
+${directors.map((d, i) => `### Director ${i + 1}\n${d || 'FAILED'}`).join('\n\n')}`, { effort: 'max', label: 'judge', phase: 'Pick' })
 
 const board = await agent(`${CTX}
 ${V3}
@@ -139,6 +139,6 @@ Claude-Session: https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR
 then run once: git push origin HEAD:video-production (if rejected, leave it). Report in at most 10 lines.
 
 THE JUDGE'S PICK AND SPEC:
-${judge}`, { label: 'board', phase: 'Pick' })
+${judge}`, { effort: 'max', label: 'board', phase: 'Pick' })
 
 return { analyses: A, library, directors, judge, board }

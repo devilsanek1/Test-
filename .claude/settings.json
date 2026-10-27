@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Agent|Task|Workflow|mcp__claude-code-remote__create_session",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/max_effort.py\"",
+            "timeout": 30,
+            "statusMessage": "Checking max effort (owner rule)"
+          }
+        ]
+      }
+    ]
+  }
+}

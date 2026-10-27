@@ -75,7 +75,7 @@ const DRAFT = {
 phase('Spines')
 const spines = await parallel(DEVICES.map(d => () => agent(
   `${CTX}\n\nYou are a story architect for short documentary scripts. Your narrative device: ${d.lens}.\n\nRead the core line doc, the fact files and the brief sections first. Then design the STORY SPINE (not the final lines): the throughline question, the viewer's situation, the opening line, 5-9 beats each linked to the previous by but/so/because/which means, the turn, the payoff, and the 2-sentence retelling. Make it a story someone would retell, true to the facts. Don't write files.`,
-  { label: `spine:${d.key}`, phase: 'Spines', schema: SPINE })))
+  { effort: 'max', label: `spine:${d.key}`, phase: 'Spines', schema: SPINE })))
 const sp = DEVICES.map((d, i) => spines[i] ? { key: d.key, ...spines[i] } : null).filter(Boolean)
 
 phase('Judge spines')
@@ -86,7 +86,7 @@ const SJ = [
 ]
 const sj = await parallel(SJ.map(j => () => agent(
   `${CTX}\n\nYou are ${j.lens}. Read the fact files. Score each spine 1-10 on coherence, hook, truth, payoff, fit (30-45 s, drawable). Be harsh; use the full range. Say what to keep or graft, and the problems.\n\nSpines (JSON):\n${JSON.stringify(sp)}`,
-  { label: `judge:${j.key}`, phase: 'Judge spines', schema: SPINE_SCORES })))
+  { effort: 'max', label: `judge:${j.key}`, phase: 'Judge spines', schema: SPINE_SCORES })))
 const tot = {}
 sp.forEach(s => { tot[s.key] = 0 })
 sj.filter(Boolean).forEach(j => j.scores.forEach(s => { if (s.key in tot) tot[s.key] += 3 * s.coherence + 2 * s.hook + 2 * s.truth + 2 * s.payoff + s.fit }))
@@ -103,7 +103,7 @@ const WRITERS = [
 ]
 const drafts = await parallel(WRITERS.map(w => () => agent(
   `${CTX}\n\nYou are ${w.lens}.\n\nThe winning story spine (build on it; graft the judges' best ideas from the others if they make the story stronger):\n${JSON.stringify(win)}\n\nOther spines:\n${JSON.stringify(ranked.slice(1))}\n\nJudges' notes:\n${notes}\n\nWrite the full script, line by line. Every line must follow from the previous one (give the link). ${RHYTHM}\n\nCues in the owner's v1 format, e.g. [deadpan, like you're stating the obvious, tiny pause after the name]: short, human, never quoting script words. Read the fact files and the brief sections first. Also write it as readable markdown to ${V3}/script/story_draft_${w.key}.md. Don't commit.`,
-  { label: `writer:${w.key}`, phase: 'Write', schema: DRAFT })))
+  { effort: 'max', label: `writer:${w.key}`, phase: 'Write', schema: DRAFT })))
 const ds = WRITERS.map((w, i) => drafts[i] ? { id: `D${i + 1}`, key: w.key, ...drafts[i] } : null).filter(Boolean)
 const spoken = ds.map(d => ({ id: d.id, script: d.lines.map(l => l.vo).join(' ') }))
 
@@ -133,19 +133,19 @@ const FLOW = {
 const [panel, flow] = await Promise.all([
   parallel(PERSONAS.map(p => () => agent(
     `You are ${p.who}. You hear each of these short-video voice-overs ONCE while scrolling. For each: retell it to a friend from memory in 2 sentences, say whether it felt like a story that flows or a list of facts (1-10), whether you'd keep watching, what confused you, what felt like hype. Rank them. Don't research anything.\n\nScripts (JSON):\n${JSON.stringify(spoken)}`,
-    { label: `cold-read:${p.key}`, phase: 'Test', schema: RETELL }))),
+    { effort: 'max', label: `cold-read:${p.key}`, phase: 'Test', schema: RETELL }))),
   agent(`${CTX}\n\nYou are a script doctor and standards editor in one. Read the fact files. For each draft: check every consecutive pair of lines (is it joined by but/so/because, or only "and also"? any jump?), flag AI-sounding phrasing, flag every run of 3+ sentences over 5 words with no short sentence between (${RHYTHM}), check every claim against the fact files, score flow and truth 1-10, give up to 6 concrete fixes.\n\nDrafts (JSON):\n${JSON.stringify(ds)}`,
-    { label: 'flow+standards', phase: 'Test', schema: FLOW }),
+    { effort: 'max', label: 'flow+standards', phase: 'Test', schema: FLOW }),
 ])
 
 phase('Merge')
 const merged = await agent(
   `${CTX}\n\nYou are the head writer. Winning spine:\n${JSON.stringify(win)}\n\nDrafts:\n${JSON.stringify(ds)}\n\nCold-read panel (retellings, story-vs-list scores):\n${JSON.stringify(panel.filter(Boolean))}\n\nFlow + standards review:\n${JSON.stringify(flow)}\n\nWrite ONE final script. Start from the draft with the best retellings and flow, apply the fixes, graft the best lines. ${RHYTHM} Before you finish, save the spoken lines to a text file and run "python3 /home/user/Test-/video/scripts/voice/check_rhythm.py FILE"; fix the script until it prints OK. Then write:\n1. ${V3}/script/script_g1.md: header (core line, frame-0 text, word count, estimated length at 165 wpm); "The story in 3 sentences" (the spine); "The script" as a table (# / how it follows: but-so-because / delivery cue / line / picture / fact); "Facts used" with sources.\n2. ${V3}/script/script_elevenlabs.md: the paste file ONLY, nothing else in it: for each line a cue in brackets on its own line, then the spoken line, a blank line between lines. Paste-safe rules (the owner's ElevenLabs v4 read notes and quoted words aloud last time): only tags and spoken words, no titles or notes; tags describe delivery only and NEVER quote script words; put a short extra tag mid-line where the delivery changes; CAPS on the word to lean on; … for a beat; numbers and symbols spelled out (ten percent, five times, twenty twenty-seven).\nDon't commit. Return the final spoken script as one paragraph, the word count, and the 3-sentence story.`,
-  { label: 'head-writer', phase: 'Merge' })
+  { effort: 'max', label: 'head-writer', phase: 'Merge' })
 
 phase('Fact-check')
 const fc = await agent(
   `${CTX}\n\nYou are an adversarial fact-checker and a paste-file checker. Check ${V3}/script/script_g1.md line by line against the fact files (WebSearch, loaded with ToolSearch, only if a line goes beyond them): every claim, number and implication; US-only figures said as US. Fix in place with minimal wording changes that keep the story and the voice. Keep ${V3}/script/script_elevenlabs.md in sync, and check it is paste-safe (only bracket tags and spoken words; no tag quotes a script word; numbers spelled out). Add "Fact status: ..." under the header of script_g1.md. Don't commit. Return at most 8 lines: what you changed.`,
-  { label: 'fact-check', phase: 'Fact-check' })
+  { effort: 'max', label: 'fact-check', phase: 'Fact-check' })
 
 return { spineRanking: ranked.map(s => ({ key: s.key, score: tot[s.key], retell: s.retell })), panel: panel.filter(Boolean).map(p => p.reactions.map(r => ({ id: r.id, story_or_list: r.story_or_list, rank: r.rank }))), merged, factcheck: fc }

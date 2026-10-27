@@ -16,5 +16,5 @@ Style: match our v1 film exactly (look at frames: ffmpeg -loglevel error -ss <s>
 Palettes: read ${ROOT}/docs/look/PALETTE.md and ${ROOT}/docs/look/palettes.json. Make the comp take a palette prop and render three candidates: (A) "Mint & Clay 1.1", (B) "Sage Study" for the room with "Dusk" in the window (the sister-palette shift the PALETTE doc describes), (C) "Autumn Ochre". In each: one hero, one dark anchor, at most one pop (the price tag / Add to cart), following the colour jobs in PALETTE.md.
 
 Implementation: create ${ROOT}/src/v3/StyleNook.tsx (a component with a palette prop) and register a composition "StyleNook" in ${ROOT}/src/entry-v3.tsx (1 frame, or a few seconds if you add the lamp flicker-free idle; fps 60), with defaultProps for palette A; render stills with props: cd ${ROOT} && npx remotion still src/entry-v3.tsx StyleNook ${SP}/nook_<A|B|C>.png --props='{"palette":"<name>"}' --scale=0.5. Look at them, iterate (at most 10 renders in total), and when happy render the three finals at full scale to ${ROOT}/review/look/v3_g4/nook_A.png, nook_B.png, nook_C.png. Run "npx tsc --noEmit -p ." and make sure your files add no errors. Don't commit. Return at most 8 lines: what you built, file paths, and anything you'd flag.`,
-  { label: 'builder:style-nook', phase: 'Build' })
+  { effort: 'max', label: 'builder:style-nook', phase: 'Build' })
 return r

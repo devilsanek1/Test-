@@ -74,7 +74,7 @@ const JUDGES = [
 phase('Scout')
 const scouted = await parallel(SCOUTS.map(s => () => agent(
   `${CTX}\n\nYou are a story scout for: ${s.beat}.\n\nTask: find 3-4 strong, genuinely different candidate stories for video 4 that pass the brief's five tests and the hard exclusions. Prefer stories where the obvious headline hides a more surprising true mechanism. ${SEARCH}\n\nAlso write them as readable markdown to ${V4}/scouting/${s.key}.md. Don't commit. Return the candidates.`,
-  { label: `scout:${s.key}`, phase: 'Scout', schema: CANDS })))
+  { effort: 'max', label: `scout:${s.key}`, phase: 'Scout', schema: CANDS })))
 
 const cands = []
 SCOUTS.forEach((s, i) => { const r = scouted[i]; if (!r) return; r.candidates.forEach(c => cands.push({ id: `T${cands.length + 1}`, beat: s.key, ...c })) })
@@ -83,7 +83,7 @@ log(`${cands.length} candidates from ${scouted.filter(Boolean).length} scouts`)
 phase('Judge')
 const judged = await parallel(JUDGES.map(j => () => agent(
   `${CTX}\n\nYou are ${j.lens}.\n\nScore every candidate below 1-10 on: hook, relevance (broad audience cares), freshness, surprise, consequence (concrete for a normal person), evidence (solid, verifiable), visual (drawable, strong scale or cozy image), shareability (a reason to send it). Score 1 on everything for any candidate that breaks a hard exclusion. Be harsh and use the full range. Give each its best hook line (rewrite it if you can do better, truthfully). Pick your top 3.\n\nCandidates (JSON):\n${JSON.stringify(cands)}`,
-  { label: `judge:${j.key}`, phase: 'Judge', schema: SCORES })))
+  { effort: 'max', label: `judge:${j.key}`, phase: 'Judge', schema: SCORES })))
 
 const agg = {}
 cands.forEach(c => { agg[c.id] = { id: c.id, beat: c.beat, title: c.title, sum: 0, n: 0, ev: 0 } })
@@ -99,11 +99,11 @@ log(`top: ${ranking.slice(0, 3).map(r => `${r.id} ${r.score110}`).join(', ')}`)
 phase('Synthesis')
 const synth = await agent(
   `${CTX}\n\nYou are the head of editorial. 6 scouts proposed ${cands.length} candidates and 3 judges scored them. Read ${BRIEF} and in ${PLAYBOOK} "Hook and pacing", "Script and voice" and "Taste signals". The format model is ${ROOT}/docs/v3/archive/G0_TOPICS_options.md if it exists (else ${ROOT}/docs/v3/G0_TOPICS.md).\n\nRanking (weighted, out of 110; hook, consequence and evidence count double):\n${JSON.stringify(ranking)}\n\nJudge verdicts:\n${JSON.stringify(judged.filter(Boolean))}\n\nCandidates:\n${JSON.stringify(cands)}\n\nWrite the owner's decision doc to ${V4}/G0_TOPICS.md:\n1. "Pick one" (fits one phone screen, max 35 lines): 3 topics, each with a short name; what happened and when; the thesis sentence; frame-0 text; the hook line plus 2 alternates; the twist; why it should work (judge scores); the main risk. Then your recommendation in one line.\n2. Per topic: the so-what chain; the understanding shift (before / during / after, plus the tell-a-friend version); a rough 30-45 s beat outline as one coherent story (hook 0-3 s, stakes, explanation, twist, payoff; beats joined by but/so) with the key image per beat, including one scale moment and one cozy-enclosure moment; the real person and their attributed words if any; the facts with sources and dates; what's uncertain or disputed; fairness notes.\n3. The score table for all candidates and 3 runner-ups worth keeping for later videos.\nChoose 3 genuinely different topics (different beats where the scores allow; at least one not about AI). Never pick one whose average evidence score is below 7 or that breaks a hard exclusion. Everyday spoken language, no AI-sounding phrasing. Don't commit. Return at most 12 lines: the 3 topics with their hook lines and your recommendation.`,
-  { label: 'synthesis', phase: 'Synthesis' })
+  { effort: 'max', label: 'synthesis', phase: 'Synthesis' })
 
 phase('Fact-check')
 const fc = await agent(
   `${CTX}\n\nYou are an adversarial fact-checker. Check ${V4}/G0_TOPICS.md line by line: every claim, number, date, name, quote, hook line and implication, against the scouting files in ${V4}/scouting/ and with fresh WebSearch checks (load with ToolSearch if needed). Confirm each story's date really is recent and that no topic has Anthropic as a key entity. Flag framings that mislead even if every word is true. Fix problems in place with minimal wording changes that keep the punch. Under each topic add a line "Fact status: ...". Don't commit. Return at most 12 lines: what you changed and what is still uncertain.`,
-  { label: 'fact-check', phase: 'Fact-check' })
+  { effort: 'max', label: 'fact-check', phase: 'Fact-check' })
 
 return { ranking, synthesis: synth, factcheck: fc }

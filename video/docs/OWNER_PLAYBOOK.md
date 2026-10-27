@@ -220,9 +220,17 @@ Maintenance at the end).
   (12-24 drawings/s) while the camera glides; the G3 reel also renders at 60 (`G3_ANIMATIC.md`, 2026-10-26). — (v3, 2026-10-26).
 
 ## Process and communication
-- **EFFORT IS ALWAYS MAX:** every workflow agent passes `effort: 'max'` (the Agent tool's effort setting too) and every
-  helper session runs at /effort max with ultracode; a lazy video from a low effort setting is our failure. — ("the key
-  rule is we need to ensure the effort is MAX!", v2, 2026-10-27; owner, 2026-10-27).
+- **EFFORT IS ALWAYS MAX, for ALL delegated work:** every workflow and sub-workflow agent (`effort: 'max'` in each
+  `agent()` call), every subagent (the Agent tool's `effort: "max"`; only a "fork" inherits the session's effort), every
+  agent an agent starts (each brief says that anything its agent starts runs at max too) and every helper session (first
+  prompt exactly `/effort max`, ultracode on; check `effort_level: max` with get_session). The repo enforces it, so no
+  session has to remember: the PreToolUse hook in `.claude/settings.json` (`.claude/hooks/max_effort.py`) denies an
+  Agent call, a Workflow run or a helper session that isn't at max, and `python3 .claude/hooks/max_effort.py
+  --lint|--fix <workflow.js>` checks or repairs a script before it runs (every script in `context/workflows/` passes).
+  A scheduled task fires into an existing max-effort session (a fresh session per firing can't take `/effort max` first).
+  A lazy video from a low effort setting is our failure. — ("the key rule is we need to ensure the effort is MAX!", v2,
+  2026-10-27; "remember to use max effort in the subworkflows and agents work" and "persist this rule in general in our
+  repo - like all delegated work should be max effort", v4 G0.5, 2026-10-27).
 - **Parallelize as much as possible, inside the weekly and session limits (below): split independent work across helper
   cloud sessions (each its own machine) and archive each one as soon as its work is pushed and checked;** a helper takes
   one independent lane that needs its own machine, briefed fully, and its done-signal is a report file. On one machine,

@@ -30,18 +30,18 @@ const LANES = [
 phase('Research')
 const research = await parallel(LANES.map(l => () => agent(
   `${CTX}\n\nTask: research ${l.title}. ${l.brief}\n\nHow: use WebSearch and WebFetch (load them with ToolSearch "select:WebSearch,WebFetch" if they aren't loaded) and cross-check claims across sources; give exact attributions (author, work, year) and URLs, and mark anything you could not verify as UNVERIFIED. Write your findings to ${LOOK}/research/${l.key}.md (max about 180 lines: findings with sources, then "Rules for our look" as concrete, numbered rules with numbers). Don't commit.\n\nReturn at most 12 lines: the most useful rules and anything surprising.`,
-  { label: `research:${l.key}`, phase: 'Research' })))
+  { effort: 'max', label: `research:${l.key}`, phase: 'Research' })))
 const done = LANES.filter((l, i) => research[i]).map(l => `${LOOK}/research/${l.key}.md`)
 log(`research files: ${done.length}/${LANES.length}`)
 
 phase('Synthesis')
 const synth = await agent(
   `${CTX}\n\nYou are the art director. Read the research files ${done.join(', ')}, the owner's rules in ${ROOT}/docs/OWNER_PLAYBOOK.md (sections "Visual style", "Hook and pacing", "Captions"), and ${ROOT}/docs/PIPELINE_V2.md (gates G3 sketch animatic, G4 look, G5 blocking). Then write the look bible ${LOOK}/COZY_AND_SCALE.md:\n1. One screen first: the two twists in one sentence each, then max 8 rules for cozy enclosure and max 8 for scale, each with a number (ratios, % of frame, seconds, values), and the rhythm rule (how often to use scale, how cozy and scale alternate, where each sits in a 30-45 s video).\n2. Enclosure in a 9:16 frame: the height:width ratios and viewing angles turned into frame geometry, with small ASCII diagrams of 3 framings (close cozy, medium street, scale reveal).\n3. Coziness signals for our flat ink style: palette pairs (hex), light pools without gradients, shapes, textures, lived-in props; what to avoid.\n4. Scale grammar inspired by Arcane's camera work (not its footage): 5-8 named camera moves, each with layers, parallax factors, figure size, duration, easing and when to use it.\n5. How the two combine and how to use them respectfully on a serious topic.\n6. For video 2 (angle-agnostic): 8-12 shot ideas tagged cozy / scale / both, with which beat type each suits (hook, turn, peak, ending).\n7. Build list: what the kit has, what to add, effort, and at which gate (G3 shot vocabulary for the SketchReel, G4 style frames, G5 blocking).\n8. Sources (with authors and years).\nKeep it under about 250 lines, practical, with numbers rather than adjectives. Don't commit. Return at most 12 lines: the one-screen summary.`,
-  { label: 'synthesis', phase: 'Synthesis' })
+  { effort: 'max', label: 'synthesis', phase: 'Synthesis' })
 
 phase('Critic')
 const critic = await agent(
   `${CTX}\n\nYou are a sceptical critic: an urban designer who also art-directs animation. Check ${LOOK}/COZY_AND_SCALE.md against the research files ${done.join(', ')} and, where needed, with WebSearch: (1) every attribution, number and ratio is correct and attributed to the right person and work (fix it or mark it UNVERIFIED); (2) every rule is concrete enough that an animator could apply it in a 2D vertical frame without asking (add the missing number or example); (3) nothing contradicts the owner's playbook (no paper edge at the top of the frame, captions pop and stay readable, the first 2 s state the payoff, 30-45 s); (4) what is missing that would matter most for video 2. Fix problems in place with minimal edits. Don't commit. Return at most 10 lines: what you changed and what is still uncertain.`,
-  { label: 'critic', phase: 'Critic' })
+  { effort: 'max', label: 'critic', phase: 'Critic' })
 
 return { research: research.filter(Boolean), synthesis: synth, critic }

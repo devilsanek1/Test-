@@ -36,7 +36,7 @@ const STATUS_SCHEMA = {
 
 phase('Verify')
 const statuses = await parallel(['core', 'cine'].map(lane => () => agent(`${CONTEXT}
-You are the VERIFIER for the ${lane.toUpperCase()} lane. Do NOT edit repo files. For EVERY finding in docs/review/engine_r2_findings.json whose lane is "${lane}" (and any core/cine finding whose fix crosses into your lane), determine its current status by reading the code AND rendering evidence: fixed / partial / open / demo-only (affects only the demo's composition, not the kit). Mark kit_level true if real scenes would inherit the problem. Also add any NEW kit-level problem you notice while checking (status open). Be strict: "fixed" needs evidence.`, { label: `verify:${lane}`, phase: 'Verify', schema: STATUS_SCHEMA })))
+You are the VERIFIER for the ${lane.toUpperCase()} lane. Do NOT edit repo files. For EVERY finding in docs/review/engine_r2_findings.json whose lane is "${lane}" (and any core/cine finding whose fix crosses into your lane), determine its current status by reading the code AND rendering evidence: fixed / partial / open / demo-only (affects only the demo's composition, not the kit). Mark kit_level true if real scenes would inherit the problem. Also add any NEW kit-level problem you notice while checking (status open). Be strict: "fixed" needs evidence.`, { effort: 'max', label: `verify:${lane}`, phase: 'Verify', schema: STATUS_SCHEMA })))
 
 const all = statuses.filter(Boolean).flatMap(s => s.items)
 const todo = all.filter(i => i.status !== 'fixed' && (i.kit_level || i.severity === 'blocker'))
@@ -49,7 +49,7 @@ await parallel(['core', 'cine'].map(lane => () => {
   return agent(`${CONTEXT}
 YOU ARE THE ${lane.toUpperCase()} LANE. Fix these verified open items (kit-level first, blockers first):
 ${JSON.stringify(mine, null, 1)}
-Prefer fixing the toolkit default so every scene inherits it, and update the docs (ENGINE.md / CINE.md) so scene agents use the right API. Re-render and LOOK at the before/after. tsc must be clean. Final message: one line per item: what you changed and the evidence (paths of renders).`, { label: `fix:${lane}`, phase: 'Fix' })
+Prefer fixing the toolkit default so every scene inherits it, and update the docs (ENGINE.md / CINE.md) so scene agents use the right API. Re-render and LOOK at the before/after. tsc must be clean. Final message: one line per item: what you changed and the evidence (paths of renders).`, { effort: 'max', label: `fix:${lane}`, phase: 'Fix' })
 }))
 
 phase('Re-verify')
@@ -66,6 +66,6 @@ const REV_SCHEMA = {
 const rev = await agent(`${CONTEXT}
 You are a FRESH, adversarial reviewer. Do NOT edit repo files. These items were just worked on:
 ${JSON.stringify(todo, null, 1)}
-Check each one with renders and code reading. Then do a broader sanity pass a scene builder cares about: write a throwaway 6 s full-bleed scene in ${SCRATCH}/probe/ (NOT in the repo) that uses World, SkyCaptions tones, a CineCamera move with two keys, a camera-continuous transition, a TOD change, EndlessCity or a Monument, a kit Crowd, the Elephant mascot, and an un-build; render a strip and confirm it all behaves (velocity-continuous camera, no fades, un-build includes every element, on-palette relight, captions readable). Verdict ready-for-scenes only if a scene builder could rely on the kit without hitting these problems.`, { label: 're-verify', phase: 'Re-verify', schema: REV_SCHEMA })
+Check each one with renders and code reading. Then do a broader sanity pass a scene builder cares about: write a throwaway 6 s full-bleed scene in ${SCRATCH}/probe/ (NOT in the repo) that uses World, SkyCaptions tones, a CineCamera move with two keys, a camera-continuous transition, a TOD change, EndlessCity or a Monument, a kit Crowd, the Elephant mascot, and an un-build; render a strip and confirm it all behaves (velocity-continuous camera, no fades, un-build includes every element, on-palette relight, captions readable). Verdict ready-for-scenes only if a scene builder could rely on the kit without hitting these problems.`, { effort: 'max', label: 're-verify', phase: 'Re-verify', schema: REV_SCHEMA })
 log(`Re-verify: ${rev ? rev.verdict : 'n/a'} (${rev ? rev.still_open.length : '?'} still open)`)
 return { statuses: all, todo, rev }

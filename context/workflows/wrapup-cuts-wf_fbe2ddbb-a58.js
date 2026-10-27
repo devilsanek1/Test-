@@ -26,7 +26,7 @@ phase('Audit')
 const audit = await agent(`${CTX}
 AUDIT these cuts (do NOT edit files):
 ${list}
-For each: render Main every frame from cut-0.4 s to cut+0.4 s at half res plus the 2 frames either side at full res; build a strip and LOOK frame by frame against THE BAR. pass=true only if no blocker/major. Be concrete (frame, px, exact fix and which scene file it belongs in). Captions/edge-hint fixes are cross-lane: name the exact data change.`, { label: 'audit', phase: 'Audit', schema: AUDIT })
+For each: render Main every frame from cut-0.4 s to cut+0.4 s at half res plus the 2 frames either side at full res; build a strip and LOOK frame by frame against THE BAR. pass=true only if no blocker/major. Be concrete (frame, px, exact fix and which scene file it belongs in). Captions/edge-hint fixes are cross-lane: name the exact data change.`, { effort: 'max', label: 'audit', phase: 'Audit', schema: AUDIT })
 const results = []
 for (const c of (audit && audit.cuts) || []) {
   const blocking = c.problems.filter(p => p.severity !== 'minor')
@@ -35,7 +35,7 @@ for (const c of (audit && audit.cuts) || []) {
   const fixed = await agent(`${CTX}
 YOU OWN THE CUT ${c.cut}. Lane: src/scenes/Scene${a.slice(1)}.tsx + src/scenes/scene${a.slice(1)}/** and src/scenes/Scene${b.slice(1)}.tsx + src/scenes/scene${b.slice(1)}/**; append a short note (max 8 lines) to docs/scenes/${a}.md and ${b}.md. Do NOT edit src/lib, src/scenes/shared, src/data or other scenes: put caption/edge/shared needs under CROSS-LANE (exact). Change only what this cut needs, inside the last ~1.5 s of ${a} / first ~1.5 s of ${b}; never move a beat off its word; keep both QA gates passing. The auditor found:
 ${JSON.stringify(c.problems, null, 1)}
-Verify each on a render, fix the blockers/majors (and cheap minors), re-render the strip, LOOK, run both QA gates. Final message (max 12 lines): before -> after per problem, QA results, CROSS-LANE (exact), strip path.`, { label: `fix:${c.cut}`, phase: 'Fix' })
+Verify each on a render, fix the blockers/majors (and cheap minors), re-render the strip, LOOK, run both QA gates. Final message (max 12 lines): before -> after per problem, QA results, CROSS-LANE (exact), strip path.`, { effort: 'max', label: `fix:${c.cut}`, phase: 'Fix' })
   results.push({ cut: c.cut, score: c.score, pass: false, problems: c.problems, fixed })
 }
 return { audit, results }

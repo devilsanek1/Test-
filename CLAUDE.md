@@ -39,9 +39,15 @@ Top rules (details in the playbook):
 - Every lesson goes into the generic process (playbook, pipeline gate, studio toolkit) and is committed, so the next
   video doesn't repeat it.
 - Captions pop in place (no clipped roll-ins). No paper edge at the top of the frame or beside the caption band. Production renders at 60 fps.
+- **ALL delegated work runs at MAX effort** (owner, 2026-10-27: "all delegated work should be max effort"): every
+  workflow and sub-workflow agent (`effort: 'max'` in each `agent()` call), every subagent (the Agent tool's
+  `effort: "max"`; only a "fork" inherits the session's), every agent an agent starts (each brief says so), and every
+  helper session (first prompt exactly `/effort max`). The repo enforces it: the PreToolUse hook in
+  `.claude/settings.json` (`.claude/hooks/max_effort.py`) denies anything less, and
+  `python3 .claude/hooks/max_effort.py --lint|--fix <workflow.js>` checks or repairs a script before it runs.
 - **NO LIMIT ON TOKENS for creative output** (owner, 2026-10-26), inside the weekly limit (owner, 2026-10-27: finishing
   the videos in flight comes first): ideas, writing, design, set building, density, life, animation and polish get as
-  many agents, rounds and tokens as the quality needs; every subagent runs at MAX effort (owner, 2026-10-27). Never
+  many agents, rounds and tokens as the quality needs, all at MAX effort (above). Never
   trade quality for savings: brainstorms, competing ideas with judges and design explorations at the early gates are
   worth their tokens. Cut only waste: rework, reviews of things that will still change, polish before the story lock,
   and lost work (small checkpointed tasks).

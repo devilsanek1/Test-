@@ -63,7 +63,7 @@ no stoop or stick), the staff silhouettes and the blind rig, the reporter, the s
 piece: canvas px position/size, an optional build time "at" (ink draws on, then fills), a seed; at every size the shot list uses.
 ${V}/src/entry-v2r-cast.tsx (palette first): a "KitCast" sheet with every piece at every size + a crowd row at 216 px beside your reference 1
 frames. Render to ${SCR}/cast/ (kit_cast.png, people_vs_ref1.jpg, a walk strip). Does it read like reference 1's people? Fix what doesn't.
-${V}/src/v2r/kit/cast/README.md (API, sizes, poses). Commit your paths.`, { label: 'K4-cast', phase: 'W1' }),
+${V}/src/v2r/kit/cast/README.md (API, sizes, poses). Commit your paths.`, { effort: 'max', label: 'K4-cast', phase: 'W1' }),
   () => agent(`${CTX}
 YOU ARE K5, THE PIP AGENT: design and build a NEW Pip for this film ("towpath Pip", TREATMENT.md section 3 and K5): a pebble-round elephant,
 leaf ears that fold and flick, a short curled trunk, a three-hair tuft, teddy-bear soles, a short knitted mustard scarf lifting in the wind, its
@@ -75,6 +75,6 @@ idle life (blink, ear flick, breathing, scarf lift), sizes 44-120 px. ${V}/src/e
 character sheet: turnaround, every pose, sizes, against every ground colour of the palette) and a "PipActions" 1080x1920 clip composition
 (each action in sequence). Render the sheet and a strip of the actions to ${SCR}/pip/; check charm and readability at 216 px against
 reference 1's cat and v1's elephant (the teardown sheets): Pip must read as a lovable, specific character at 44 px and at 120 px. Fix what
-doesn't. ${V}/src/v2r/kit/pip/README.md. Commit your paths.`, { label: 'K5-pip', phase: 'W1' }),
+doesn't. ${V}/src/v2r/kit/pip/README.md. Commit your paths.`, { effort: 'max', label: 'K5-pip', phase: 'W1' }),
 ])
 return { cast, pip }

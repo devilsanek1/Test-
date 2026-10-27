@@ -59,7 +59,7 @@ const SCORE = {
 phase('Concepts')
 const concepts = await parallel(CONCEPTS.map(c => () => agent(
   `${CTX}\n\nYou are a storyboard director. Your concept: ${c.lens}.\n\nRead the two docs first. Write a shot list for the whole film (8-16 shots), each with start/end times that land cuts on words, what we see (simple, drawable, readable at phone size), the camera, the transition in, a tag and why it follows from the previous shot. Don't write files.`,
-  { label: `concept:${c.key}`, phase: 'Concepts', schema: SHOTS })))
+  { effort: 'max', label: `concept:${c.key}`, phase: 'Concepts', schema: SHOTS })))
 const cs = CONCEPTS.map((c, i) => concepts[i] ? { key: c.key, ...concepts[i] } : null).filter(Boolean)
 
 phase('Judge')
@@ -69,7 +69,7 @@ const JUDGES = [
 ]
 const judged = await parallel(JUDGES.map(j => () => agent(
   `${CTX}\n\nYou are ${j.lens}. Score each concept 1-10 on clarity, hook, flow, cinematic, buildable; say what to keep and what to fix.\n\nConcepts (JSON):\n${JSON.stringify(cs)}`,
-  { label: `judge:${j.key}`, phase: 'Judge', schema: SCORE })))
+  { effort: 'max', label: `judge:${j.key}`, phase: 'Judge', schema: SCORE })))
 const tot = {}
 cs.forEach(c => { tot[c.key] = 0 })
 judged.filter(Boolean).forEach(j => j.scores.forEach(s => { if (s.key in tot) tot[s.key] += 3 * s.clarity + 2 * s.hook + 2 * s.flow + 2 * s.cinematic + s.buildable }))
@@ -91,6 +91,6 @@ Shots must tile the timeline with no gaps: each shot's s = the previous shot's e
 
 const sb = await agent(
   `${CTX}\n\nYou are the storyboard artist. Build the winning concept as a sketch animatic, grafting the judges' "keep" ideas and applying their fixes.\n\nWinning concept:\n${JSON.stringify(ranked[0])}\n\nOther concepts:\n${JSON.stringify(ranked.slice(1))}\n\nJudges:\n${JSON.stringify(judged.filter(Boolean))}\n\n${SCHEMA}\n\nWrite ${ROOT}/public/v3/animatic.json. Keep drawings simple and bold (a sketch animatic, not final art): big readable shapes, 5-20 elements per shot, labels on anything ambiguous, value fills for cozy (warm) vs outside (cold). Then check it: from ${ROOT}, run "npx tsc --noEmit -p ." is not needed; instead render up to 6 stills at the key moments with "npx remotion still src/entry-v3.tsx Animatic /tmp/claude-0/-home-user-Test-/e0b06496-a313-5ced-bf0f-bc634eb12744/scratchpad/sb_<n>.png --frame=<f> --scale=0.33" (30 fps), look at them, and fix anything unreadable, overlapping the caption band, or off-frame. Don't render a video. Don't commit. Also write ${V3}/storyboard_g3.md: the shot list as a table (shot, time, what we see, camera, transition, cozy/scale) plus the concept in 2 sentences. Return at most 10 lines: the concept and the shot list in one line per shot.`,
-  { label: 'storyboard-artist', phase: 'Storyboard' })
+  { effort: 'max', label: 'storyboard-artist', phase: 'Storyboard' })
 
 return { ranking: ranked.map(c => ({ key: c.key, score: tot[c.key], idea: c.idea })), storyboard: sb }

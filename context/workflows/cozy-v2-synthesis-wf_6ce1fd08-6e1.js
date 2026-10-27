@@ -54,7 +54,7 @@ YOU ARE THE COZY LIBRARIAN. Evolve the coziness rules with both references, gene
    moves; motion only has to prove the place is alive) and the meter caveat (one long walk counts as one event; cozy holds are checked with moving
    figures per frame, frames without motion, steadiness of change).
 ${GIT}
-REPORT (at most 10 lines): what changed, where, and any contradiction with existing rules you resolved.`, { label: 'cozy librarian', phase: 'Write' }),
+REPORT (at most 10 lines): what changed, where, and any contradiction with existing rules you resolved.`, { effort: 'max', label: 'cozy librarian', phase: 'Write' }),
   () => agent(`${CTX}
 YOU ARE THE METER ENGINEER. Upgrade ${V}/scripts/qa/density.py ADDITIVELY (defaults and existing output unchanged; other agents are using it right now):
 add cozy-hold metrics per shot: camera motion removed first (a global 2D shift per frame), then moving blobs per frame (a proxy for moving figures),
@@ -63,7 +63,7 @@ speed in px/s at 1080. Validate on reference B (${SCR}/cozy3/ref.mov; expect ~2-
 reference A (${SCR}/cozy2/ref.mov, 0-7.9 s; expect 1-5 movers, mean ~3, camera 0) and on our v3 G5 cut (${V}/deliverables/v3/v3_g5_blocking.mp4 with
 ${V}/src/v3/film/scenes.json). Document the new flags in the script header and add a line to ${V}/docs/look/research/density_numbers.md with the three
 results. ${GIT}
-REPORT (at most 8 lines): the new metrics and the three validation results.`, { label: 'meter upgrade', phase: 'Write' }),
+REPORT (at most 8 lines): the new metrics and the three validation results.`, { effort: 'max', label: 'meter upgrade', phase: 'Write' }),
 ])
 
 phase('Critic')
@@ -76,7 +76,7 @@ an agent could not apply (vague, no number, no flat-colour translation); bloat t
 exact fix. If the docs are sound, say so. Do not edit files. At most 30 lines.
 
 LIBRARIAN REPORT:
-${docs || 'FAILED'}`, { label: 'critic', phase: 'Critic' })
+${docs || 'FAILED'}`, { effort: 'max', label: 'critic', phase: 'Critic' })
 
 phase('Fix')
 const fix = await agent(`${CTX}
@@ -85,7 +85,7 @@ CINEMATIC_GUIDE.md or STORYBOARD_STYLE.md only where a contradiction lives there
 REPORT (at most 8 lines).
 
 CRITIC:
-${critic || 'FAILED'}`, { label: 'fix', phase: 'Fix' })
+${critic || 'FAILED'}`, { effort: 'max', label: 'fix', phase: 'Fix' })
 
 phase('Apply')
 const apply = await agent(`${CTX}
@@ -97,6 +97,6 @@ refuge and its window as the prospect (could the view out be a living street see
 passing calmly in the snow?); which holds get the slow camera float instead of the push-in; where the motion lane sits in each cozy panel; where people
 rest next to motion; the colour and light notes in Autumn Ember (coloured shadows, tinted whites, a warm accent where the eye rests); what NOT to change
 (the locked story, camera moves, cuts). Mark anything that overrides density_plan_g5b.md. ${GIT}
-REPORT (at most 8 lines).`, { label: 'v3 apply', phase: 'Apply' })
+REPORT (at most 8 lines).`, { effort: 'max', label: 'v3 apply', phase: 'Apply' })
 
 return { docs, meter, critic, fix, apply }

@@ -32,7 +32,7 @@ BUILD the edge module and the lab:
    Each variant has a strength/amount parameter.
 3. src/dev/EdgeLab.tsx: renders three representative shots (KitDemo's street at ~7 s, CineDemo's monument shot and CineDemo's vista shot: import those components and time-offset them) under any variant, selectable via props or via a composition per variant (register what you need in src/dev/registry.ts).
 4. Outputs in ${OUT}/: (a) a comparison sheet PNG: rows = variants, columns = the three shots, full frames at readable size with labels; (b) a zoomed sheet of the top-left and bottom-right corners per variant (edges are the point); (c) 5 s MP4 clips per variant of the street and the monument with camera motion (half scale is fine), so the edge behaviour in motion can be judged. Look at everything yourself and iterate until each variant is the best version of its idea.
-Final message: what each variant does, file paths, render cost per frame for each variant, any limitations (e.g. pieces that ignore <Look>).`, { label: 'build', phase: 'Build' })
+Final message: what each variant does, file paths, render cost per frame for each variant, any limitations (e.g. pieces that ignore <Look>).`, { effort: 'max', label: 'build', phase: 'Build' })
 
 const JSCHEMA = {
   type: 'object',
@@ -52,7 +52,7 @@ const LENSES = [
 ]
 phase('Judge')
 const verdicts = await parallel(LENSES.map(l => () => agent(`${CONTEXT}
-You are a JUDGE. Do NOT edit files. Look at everything in ${OUT}/ (comparison sheet, corner zooms, and sample frames you extract from the clips with ffmpeg into /tmp/claude-0/-home-user-Test-/59905704-1101-50eb-baa8-b5e4e9d5d2d2/scratchpad/edgejudge/). LENS: ${l.brief} Score every variant 1–10, say why in one or two sentences, how it could be better, and pick your top 2.`, { label: `judge:${l.key}`, phase: 'Judge', schema: JSCHEMA })))
+You are a JUDGE. Do NOT edit files. Look at everything in ${OUT}/ (comparison sheet, corner zooms, and sample frames you extract from the clips with ffmpeg into /tmp/claude-0/-home-user-Test-/59905704-1101-50eb-baa8-b5e4e9d5d2d2/scratchpad/edgejudge/). LENS: ${l.brief} Score every variant 1–10, say why in one or two sentences, how it could be better, and pick your top 2.`, { effort: 'max', label: `judge:${l.key}`, phase: 'Judge', schema: JSCHEMA })))
 const v = verdicts.filter(Boolean)
 const tally = {}
 for (const x of v) for (const s of x.scores) { tally[s.variant] = (tally[s.variant] || 0) + s.score }
@@ -67,5 +67,5 @@ The judges ranked the edge variants (sum of 4 lenses): ${ranked.map(([k, s]) => 
 Their notes:
 ${notes}
 REFINE the top two (${top.join(' and ')}) using every improvement note, and keep "clean" as the control. Then produce the FINAL comparison for the user in ${OUT}/final/: (a) a 3-row sheet (clean, ${top[0]}, ${top[1]}) x the three shots, full frames, labeled; (b) corner zooms; (c) 6 s MP4 clips at FULL 1080x1920 for each of the three variants on the street shot with camera motion and captions, plus one side-by-side MP4 (three panels) for quick comparison. Update docs/EDGES.md with the API, the strength parameter, the integration line for Film, render cost, and limitations.
-Final message: paths of the final sheet and clips, and a one-paragraph plain-words description of each of the three for the user.`, { label: 'refine', phase: 'Refine' })
+Final message: paths of the final sheet and clips, and a one-paragraph plain-words description of each of the three for the user.`, { effort: 'max', label: 'refine', phase: 'Refine' })
 return { ranked, refined }
