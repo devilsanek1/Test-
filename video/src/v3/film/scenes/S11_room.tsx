@@ -89,6 +89,8 @@ export type RoomLife = {
   forklift?: [number, number, 1 | -1][];
   /** The yard worker's walk across the window: [t0, t1]. */
   worker?: [number, number];
+  /** The coffee machine's ready light comes on, with a puff of steam from the spout. */
+  brewAt?: number;
 };
 
 // ---------------------------------------------------------------- the ceiling and the high wall (above the band)
@@ -289,7 +291,7 @@ const DockView: React.FC<{life: RoomLife}> = ({life}) => {
         <Van x={x + 36} y={ground + 52} w={236} lights seed="s11/van" />
         <rect x={x + 36 - 118 + 2} y={ground + 52 - 236 * 0.5 + 70} width={8} height={16} fill={hazard ? EMBER.houseLit : EMBER.beam} />
         {fl}
-        <SnowLayers x={x} y={y} w={w} h={h} band={null} density={2.2} seed="s11/winsnow" />
+        <SnowLayers x={x} y={y} w={w} h={h} density={2.2} seed="s11/winsnow" />
       </g>
       {/* transoms, snow ridges outside each pane, frost, glints */}
       {[600, 958].map((ty) => (
@@ -325,7 +327,9 @@ const MUGS = [EMBER.hl, EMBER.dc, EMBER.card];
 
 /** A wall clock and a no-smoking plate in the right gutter (beside the band, never in it); a shelf of mugs and a jar;
  *  the coffee machine (its button blinks, the cup steams) with paper cups on top; a cabinet under it. */
-const CoffeeCorner: React.FC = () => {
+const CoffeeCorner: React.FC<{brewAt?: number}> = ({brewAt}) => {
+  const t = useTime();
+  const ready = brewAt !== undefined && t >= brewAt;
   const shelfY = 742;
   const base = 1194;
   return (
@@ -351,7 +355,18 @@ const CoffeeCorner: React.FC = () => {
       <Fill d={`M982 ${base - 360}h34l-4 -54h-26z`} color={EMBER.card} seed="s11/cups" />
       <path d={`M983 ${base - 380}h32M984 ${base - 396}h30`} stroke={EMBER.reveal} strokeWidth={3} />
       <Ink d={`M982 ${base - 360}h34l-4 -54h-26z`} width={W.hair} />
-      <CoffeeMachine x={966} y={base} w={190} h={360} seed="s11/coffee" />
+      {/* a mid-tone casing: the darkest upright at bar height stays the 5x bar */}
+      <CoffeeMachine x={966} y={base} w={190} h={360} body={EMBER.beam} seed="s11/coffee" />
+      {/* the ready light (steps on at brewAt) and a puff from the spout */}
+      <circle cx={1012} cy={base - 248} r={9} fill={ready ? EMBER.houseLit : EMBER.shelf} stroke={EMBER.ink} strokeWidth={W.hair} />
+      {ready
+        ? [0, 1, 2].map((i) => {
+            const u = (t - brewAt! - i * 0.08) / 0.7;
+            if (u < 0 || u > 1) return null;
+            const r = (8 + i * 3) * (1 - u * 0.6) + u * 10;
+            return <circle key={i} cx={1046 - i * 10 + u * (8 - i * 10)} cy={base - 92 - u * (90 + i * 20)} r={r} fill={EMBER.snow} />;
+          })
+        : null}
       {/* the cabinet */}
       <Fill rect={[CORNER_X - 4, base, 170, SKIRT - base + 20]} color={EMBER.shelf} seed="s11/cab" />
       <Fill rect={[CORNER_X - 10, base - 6, 180, 14]} color={EMBER.beam} offset={false} />
@@ -487,7 +502,7 @@ export const S11Room: React.FC<S11RoomProps> = ({life, children}) => (
     <Ceiling />
     <HighWall life={life} />
     <DockView life={life} />
-    <CoffeeCorner />
+    <CoffeeCorner brewAt={life.brewAt} />
     <WallFoot />
     <PriceBoard life={life}>{children}</PriceBoard>
   </>

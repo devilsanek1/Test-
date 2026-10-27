@@ -99,6 +99,10 @@ Everything that agent knew is in this repo. This file is the map; the details li
   ahead yes") and is the bar. RUNNING: `context/workflows/v3-g5b-rollout-*.js` (8 lanes build/review/fix, then a full-res
   assembly -> `deliverables/v3/v3_g5b.mp4`). Plans: `docs/v3/density_plan_g5b.md`, `cozy_v2_application.md` (overrides),
   `s9_scale_plan.md`. Next: owner notes on G5b, then G6 polish.
+  **2026-10-27 ~11:10 UTC, split (owner: "split it yes"):** all 8 builds + reviews done, fixes done for S13 and S5. The
+  remaining fixes run in three helper cloud sessions (briefs `video/docs/v3/g5b_split/brief_{A,B,C}.md`: A = S10-S14,
+  B = S7-S8 + S12, C = S11 + S16); each writes `video/docs/v3/g5b_reports/fix_*.md` when done. The S9 fix runs in the
+  orchestrator session; then the full-res assembly (`deliverables/v3/v3_g5b.mp4`).
 - **v3 status (2026-10-26 ~22:00 UTC): G5 blocking cut DELIVERED** (`deliverables/v3/v3_g5_blocking.mp4`, 60 fps, 540x960,
   gate check PASS; sheet `review/v3_g5/sheet.jpg`), waiting for the owner's notes. S9 + S9b were merged into one S5
   pull-back crane panel (owner: "swap"; library entry S5 in `docs/look/CINEMATIC_GUIDE.md`, from Arcane compilation shot #55).
