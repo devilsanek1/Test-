@@ -2,6 +2,13 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-27 22:25 UTC: look APPROVED, all lanes conforming
+
+The owner approved the G4 look clip ("okay good continue"; `deliverables/v2/v2r_G4_look.mp4`). Running now, each ONE agent + ONE critic round:
+L1 the look clip v2 (foreground at foreground scale on the steps); L2 S2; L3 S3+S4; L4 S5; L5 boards + S6 + S7; L6 S8 + the loop seam (reports
+due ~23:55-00:10 UTC, each with a 0.4-scale clip and CRAFT checks). Local: the sound revision (new joins). Next: assembly (full 60 fps render,
+gate_check incl. carriers, check_light, density), one whole-film review round, fixes, final mix, master, QA, cover, posting kit.
+
 ## Snapshot 2026-10-27 21:19 UTC (hourly)
 
 | part | owner | status |

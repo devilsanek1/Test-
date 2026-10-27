@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Video 2 premix: voice (public/v2/voice.wav) + the bed (public/v2r/music_bed.wav) + every cue in
-public/v2r/cues.json, summed exactly as Film plays them (cue at round(t * 60) frames, linear gain; a cue that runs
-past the film's end wraps onto its start, as the loop plays it), then measured and mastered to -14 LUFS / -1 dBTP.
+public/v2r/cue_sheet.json, summed exactly as Film would play them (cue at round(t * 60) frames, linear gain; a cue that
+runs past the film's end wraps onto its start, as the loop plays it), then measured and mastered to -14 LUFS / -1 dBTP.
 
-    python3 audio/v2r/premix.py          # -> scratchpad v2r/sound/premix.wav + premix_report.json + premix.png
-                                         #    and public/v2r/mix.wav (the mastered draft: Film audioSrc, sfx dropped)
+    python3 audio/v2r/premix.py          # -> scratchpad v2r/sound/premix.wav + premix_report.json + premix.png,
+                                         #    public/v2r/mix.wav (the master) and public/v2r/cues.json =
+                                         #    {"audio": "v2r/mix.wav", "sfx": []}: Film2R plays the master in place of
+                                         #    the voice (the browser's own sum of voice + bed + cues peaks over 0 dBTP)
 
 Measured (speech = the voiced spans in sheet.py, momentary 400 ms K-weighted loudness unless noted):
   integrated loudness + true peak of the master; the voice over the bed / the music / the air / the SFX bus while it
@@ -187,6 +189,55 @@ def onsets_vs_words(cues, words):
     return rows, after, within
 
 
+def voice_edge(v, t, win=0.003, ratio=40.0):
+    """does the voice alone have a click-like edge (|2nd difference| >= `ratio` x its 20 ms median) within +-win of t?"""
+    i0, i1 = max(2, n_of(t - 0.02)), min(len(v) - 2, n_of(t + 0.02))
+    d2 = np.abs(np.diff(v[i0 - 2:i1 + 2], 2))
+    loc = np.median(d2) + 1e-9
+    k0, k1 = n_of(t - win) - i0, n_of(t + win) - i0
+    return bool(d2[max(0, k0):max(1, k1)].max() / loc >= ratio)
+
+
+def join_check(per):
+    """THROUGHLINE s3 / DIRECTION rule 1 for sound: each join's carrier sound peaks on the midpoint (its loudest 20 ms
+    as placed in the film), and nothing but the carrier STARTS in [midpoint - 0.2, midpoint + 0.12): no other cue
+    (first audible sample, -30 dB of its peak), no life sound or bird (sheet.LIFE / sheet.BIRDS)."""
+    rows = []
+    for (j, mid, carrier, span, snd) in sheet.JOINS:
+        stem = sheet.file_stem(snd)
+        lo, hi = mid - sheet.JOIN_BEFORE, mid + sheet.JOIN_AFTER
+        car = [(c, one) for c, one in per if c["src"].endswith(f"/{stem}.wav") and lo - 0.4 <= frame_t(c["t"]) <= hi]
+        row = {"join": j, "midpoint": mid, "carrier": snd}
+        if car:
+            c, one = car[0]
+            m = one.mean(axis=1); w = n_of(0.02)
+            i0 = max(0, n_of(frame_t(c["t"])) - w); i1 = min(len(m), n_of(frame_t(c["t"])) + n_of(1.2))
+            e = np.sqrt(np.convolve(m[i0:i1] ** 2, np.ones(w) / w, "same")) + 1e-12
+            ipk = int(np.argmax(e)); imid = n_of(mid) - i0
+            row["peak_t"] = round((i0 + ipk) / SR, 3)
+            row["peak_vs_mid_ms"] = int(round(1000 * ((i0 + ipk) / SR - mid)))
+            row["at_mid_vs_peak_dB"] = round(float(a2db(e[min(len(e) - 1, max(0, imid))] / e[ipk])), 1)
+        others = []
+        for c, one in per:
+            if c["src"].endswith(f"/{stem}.wav"):
+                continue
+            x = load(PUBLIC.parent / c["src"]).mean(axis=1)
+            env = np.sqrt(np.convolve(x ** 2, np.ones(240) / 240, "same"))
+            t_on = frame_t(c["t"]) + int(np.argmax(env > env.max() * db2a(-30))) / SR
+            if lo <= t_on < hi:
+                others.append((c["src"].split("/")[-1][:-4], round(t_on, 3)))
+        for (t, kind, pn, note) in sheet.LIFE:
+            t_ = t + (sheet.JOIN_AFTER if kind in ("boat_ride", "fountain") else 0.0)
+            if lo <= t_ < hi:
+                others.append(("life:" + kind, t_))
+        for b_ in sheet.BIRDS:
+            if lo <= b_[0] < hi:
+                others.append(("bird", b_[0]))
+        row["others_starting_in_window"] = others
+        rows.append(row)
+    return rows
+
+
 def mono_fold(x):
     """the mix's mono fold-down against a coherent reference, 1/6 octave, 200 Hz-12 kHz: the deepest notch (dB)."""
     nf = 1 << 20
@@ -239,9 +290,11 @@ def plot(vs, bed, sfx, mixed, out):
         t, l = short_term_lufs(x, win=0.4, hop=0.02)
         ax[1].plot(t, l, col, lw=1.2, label=nm)
     for (sid, a, b) in sheet.SHOTS:
-        for a_ in ax:
-            a_.axvline(a, color="c", lw=1)
         ax[1].text(a + 0.1, -8, sid)
+    for (j, mid, carrier, span, snd) in sheet.JOINS:
+        for a_ in ax:
+            a_.axvline(mid, color="c", lw=1)
+            a_.axvspan(mid - sheet.JOIN_BEFORE, mid + sheet.JOIN_AFTER, color="c", alpha=0.08)
     for c in sheet.CUES:
         ax[1].axvline(c[0], color="tab:orange", lw=0.4, alpha=0.5)
     ax[1].set_ylim(-75, -5); ax[1].set_xlim(0, FILM_DUR); ax[1].grid(alpha=0.3); ax[1].legend(loc="lower right")
@@ -251,7 +304,7 @@ def plot(vs, bed, sfx, mixed, out):
 
 def main():
     SCRATCH.mkdir(parents=True, exist_ok=True)
-    cues = json.loads((PUBLIC / "cues.json").read_text())
+    cues = json.loads((PUBLIC / "cue_sheet.json").read_text())
     words = json.loads((PUBLIC / "voice_words_heard.json").read_text())["words"]
     v = load(VOICE, mono=True); v = np.pad(v, (0, max(0, N_FILM - len(v))))[:N_FILM]
     vs = np.stack([v, v], 1)
@@ -263,6 +316,10 @@ def main():
     mixed = master(raw)
     save(SCRATCH / "premix.wav", mixed)
     save(MIX_OUT, tpdf16(mixed), subtype="PCM_16")
+    (PUBLIC / "cues.json").write_text(json.dumps(
+        {"audio": "v2r/mix.wav", "sfx": [],
+         "note": "the mastered mix (voice + bed + every cue of cue_sheet.json, -14 LUFS / -1 dBTP), made by "
+                 "audio/v2r/premix.py; it replaces the voice (Film2R useCues), so no sfx play on top"}, indent=1) + "\n")
     rep = {"premix": str(SCRATCH / "premix.wav"), "public_mix": str(MIX_OUT),
            "duration_s": round(len(mixed) / SR, 4), "frames": FILM_DUR * FPS,
            "lufs_I": round(lufs(mixed), 2), "true_peak_dBTP": round(true_peak_db(mixed), 2),
@@ -306,6 +363,10 @@ def main():
     rep["cue_onsets"] = on
     rep["cues_0_12ms_after_a_word"] = after
     rep["cues_within_20ms_of_a_word"] = len(within)
+    # THROUGHLINE s3: the joins (carriers on their midpoints, nothing else starting in a join's window)
+    rep["joins"] = join_check(per)
+    rep["joins_failing"] = [r for r in rep["joins"] if r["others_starting_in_window"]
+                            or abs(r.get("peak_vs_mid_ms", 999)) > 40]
     # review item 7: the mono fold-down
     rep["mono_fold_worst_notch_dB_at_Hz"] = mono_fold(mixed)
     # review items 4-5: the arc full range / phone, the music in each pause (from bed.py's own report)
@@ -313,8 +374,14 @@ def main():
     if bedrep.exists():
         br = json.loads(bedrep.read_text())
         rep["arc"] = br.get("arc")
+        rep["music_onsets_in_join_windows"] = br.get("music_onsets_in_join_windows")
     # review item 10: the seam
-    rep["clicks_master"] = click_report(mixed)[0]
+    nclk, worst = click_report(mixed)
+    rep["clicks_master"] = nclk
+    rep["clicks_master_worst"] = [(round(float(t_), 3), round(float(r_), 1)) for (t_, r_) in worst]
+    # each flag against the voice alone: where the voice itself has a sharp edge (its second difference far above its
+    # own local level, a plosive's burst) within 3 ms, the flag is the voice's consonant, not an edit of ours
+    rep["clicks_master_not_the_voice"] = [w_ for w_ in rep["clicks_master_worst"] if not voice_edge(v, w_[0])]
     import qc as QC
     rep["loop_seam"] = QC.seam(mixed)
     rep["loop_seam"].update(seam_check(mixed))
@@ -322,7 +389,11 @@ def main():
     rep["section_LUFS_1s"] = {sid: round(float(np.mean(l1[(t1 >= a) & (t1 < b)])), 1) for (sid, a, b) in sheet.SHOTS}
     (SCRATCH / "premix_report.json").write_text(json.dumps(rep, indent=1))
     plot(vs, bed, sfx, mixed, SCRATCH / "premix.png")
-    short = {k: v_ for k, v_ in rep.items() if k not in ("cues", "cue_onsets", "hit_words", "arc")}
+    short = {k: v_ for k, v_ in rep.items() if k not in ("cues", "cue_onsets", "hit_words", "arc", "joins")}
+    print("joins (carrier peak vs the midpoint; anything else starting in the window):")
+    for r in rep["joins"]:
+        print(f"  {r['join']} {r['midpoint']:6.2f} {r['carrier']:14s} peak {r.get('peak_vs_mid_ms')} ms, "
+              f"{r.get('at_mid_vs_peak_dB')} dB at the midpoint; others {r['others_starting_in_window']}")
     print(json.dumps(short, indent=1))
     print("hit words: voice over bed + SFX (dB) 1-4 kHz [worst 30 ms], 4-10 kHz [worst 30 ms]:")
     for r in rep["hit_words"]:

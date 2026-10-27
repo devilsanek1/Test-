@@ -1,0 +1,456 @@
+[
+ {
+  "src": "v2r/music_bed.wav",
+  "t": 0.0,
+  "gain": 1.0,
+  "note": "the bed 'Towpath' (music + canal / Arlington air, pre-ducked under the locked voice): play as is"
+ },
+ {
+  "src": "v2r/sfx/pen_drawon.wav",
+  "t": 0.0,
+  "gain": 0.0783,
+  "note": "f0: the clean pen finishes drawing her, the door and W on (one stroke each, begun at -0.26 under the un-build), the colour floods from the sun outward (f1-f18), her coat last",
+  "under_db": 20,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/lamp_click_1.wav",
+  "t": 0.4,
+  "gain": 0.0927,
+  "note": "her lamp at W clicks OFF: the biggest window goes dark (the first picture of 'quit')",
+  "under_db": 20,
+  "set_by": "draft -5 dB"
+ },
+ {
+  "src": "v2r/sfx/exit_ding.wav",
+  "t": 0.45,
+  "gain": 0.0779,
+  "note": "OUR exit ding, two struck glass-chime notes rising a fourth (C6 -> F6): the glass doors start to slide (the first-second phone sound, DIRECTION rule 9)",
+  "under_db": 9,
+  "set_by": "fixed (draft +3.2 dB)"
+ },
+ {
+  "src": "v2r/sfx/door_glide.wav",
+  "t": 0.45,
+  "gain": 0.0328,
+  "note": "the glass doors' glide under the ding, open on 'quit' 0.52",
+  "under_db": 24,
+  "set_by": "draft -6 dB"
+ },
+ {
+  "src": "v2r/sfx/step_thup.wav",
+  "t": 0.9333,
+  "gain": 0.1257,
+  "note": "she steps out onto the towpath ('Google' 0.97)",
+  "under_db": 20,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/letter_pops.wav",
+  "t": 0.9333,
+  "gain": 0.0247,
+  "note": "the canopy letters fill-pop one by one: a quick ripple, done by 1.08 (before 'Goo-' opens)",
+  "under_db": 26,
+  "set_by": "draft -6 dB"
+ },
+ {
+  "src": "v2r/sfx/wings_1.wav",
+  "t": 1.46,
+  "gain": 0.1786,
+  "note": "five far birds lift off the bridge rail (picture 1.40; far, heard a little later) and wheel west: the claps in the pause after 'Google.'",
+  "under_db": 16,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/ghost_tick_1.wav",
+  "t": 1.9667,
+  "gain": 0.1328,
+  "note": "G1 pops (one soft wooden tick per ghost, ONE pitch) ('And' 2.00)",
+  "under_db": 14,
+  "set_by": "group"
+ },
+ {
+  "src": "v2r/sfx/ghost_tick_2.wav",
+  "t": 2.5,
+  "gain": 0.1225,
+  "note": "G2 pops ('contract')",
+  "under_db": 14,
+  "set_by": "group"
+ },
+ {
+  "src": "v2r/sfx/ghost_tick_3.wav",
+  "t": 3.1667,
+  "gain": 0.1612,
+  "note": "G3 pops ('bans')",
+  "under_db": 14,
+  "set_by": "group"
+ },
+ {
+  "src": "v2r/sfx/ghost_tick_4.wav",
+  "t": 3.7667,
+  "gain": 0.1168,
+  "note": "G4 pops ('criticizing')",
+  "under_db": 14,
+  "set_by": "group"
+ },
+ {
+  "src": "v2r/sfx/ghost_tick_1.wav",
+  "t": 4.2,
+  "gain": 0.1328,
+  "note": "G5 pops",
+  "under_db": 14,
+  "set_by": "group"
+ },
+ {
+  "src": "v2r/sfx/ghost_tick_2.wav",
+  "t": 4.75,
+  "gain": 0.1225,
+  "note": "G6 pops ('for'); the ambience dip 4.54-4.79 is in the bed",
+  "under_db": 14,
+  "set_by": "band"
+ },
+ {
+  "src": "v2r/sfx/outline_pops.wav",
+  "t": 4.95,
+  "gain": 0.0833,
+  "note": "'life': three bare outlines pop in down the towpath (air puffs above 5 kHz; then air, no note)",
+  "under_db": 15,
+  "set_by": "draft -5 dB"
+ },
+ {
+  "src": "v2r/sfx/ear_flap.wav",
+  "t": 4.95,
+  "gain": 0.0612,
+  "note": "Pip's leaf ears cover on 'life' (its one reaction)",
+  "under_db": 23,
+  "set_by": "draft -5 dB"
+ },
+ {
+  "src": "v2r/sfx/whoosh_dive_1.wav",
+  "t": 5.95,
+  "gain": 0.2626,
+  "note": "JOIN S1>S2, the A push-through into her dark window W 5.95-6.25: the air rises into it, 'through the glass' on the midpoint 6.10 (the plum bridge), settles, gone by 6.27",
+  "under_db": 12,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/window_outline.wav",
+  "t": 6.7833,
+  "gain": 0.2036,
+  "note": "'one': her dark window's A outline pops on (one frame), in the gap before 'one'",
+  "under_db": 17,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/board_clack_2.wav",
+  "t": 8.4,
+  "gain": 0.1877,
+  "note": "the newsstand A-board slides out: TOLD THE BBC (the ONE board sound) ('But')",
+  "under_db": 13,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/light_clicks.wav",
+  "t": 8.9333,
+  "gain": 0.2081,
+  "note": "'staff': the five windows round hers turn a cooler white",
+  "under_db": 19,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/notebook_flap.wav",
+  "t": 9.45,
+  "gain": 0.2373,
+  "note": "'BBC': the reporter's notebook opens",
+  "under_db": 19,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/blinds_five.wav",
+  "t": 10.26,
+  "gain": 0.1285,
+  "note": "'scared': five blinds drop to half one by one (10.26-10.60)",
+  "under_db": 16,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/blind_thump.wav",
+  "t": 12.1667,
+  "gain": 0.1366,
+  "note": "'contracts': the blind beside hers comes fully down",
+  "under_db": 15,
+  "set_by": "local, bus -0.9"
+ },
+ {
+  "src": "v2r/sfx/notebook_clap.wav",
+  "t": 12.7,
+  "gain": 0.3049,
+  "note": "the notebook claps shut (map notebookShutAt 12.70: clear of the join window)",
+  "under_db": 14,
+  "set_by": "sheet, bus -4.2"
+ },
+ {
+  "src": "v2r/sfx/lamp_click_2.wav",
+  "t": 12.98,
+  "gain": 0.0856,
+  "note": "JOIN S2>S3, the B match: her dark office window becomes her lit home window at M: her lamp clicks ON (the thread's own sound: OFF at 0.40, ON here, ON again at 34.95)",
+  "under_db": 20,
+  "set_by": "draft -5 dB"
+ },
+ {
+  "src": "v2r/sfx/whoosh_dive_2.wav",
+  "t": 14.71,
+  "gain": 0.1548,
+  "note": "JOIN S3>S4, the A push-through into her silhouette 14.71-15.01, 'through the glass' on 14.86 (the callback, 3 dB softer)",
+  "under_db": 15,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/pop_high_1.wav",
+  "t": 15.0333,
+  "gain": 0.2811,
+  "note": "her name tag pops (first build) ('She')",
+  "under_db": 16,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/pen_tick.wav",
+  "t": 16.6,
+  "gain": 0.1162,
+  "note": "the tag's second build (in the gap after 'AI')",
+  "under_db": 18,
+  "set_by": "band"
+ },
+ {
+  "src": "v2r/sfx/steps_stop.wav",
+  "t": 17.66,
+  "gain": 0.1492,
+  "note": "her last two steps; the stop lands at 17.96 ('objected')",
+  "under_db": 19,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/plate_knock.wav",
+  "t": 18.8833,
+  "gain": 0.2162,
+  "note": "'military': the DEC 2025 plate builds (wood knock + pop)",
+  "under_db": 15,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/pen_short_1.wav",
+  "t": 19.45,
+  "gain": 0.0786,
+  "note": "the APR 2026 plate pen-reveals, complete on 'heading'",
+  "under_db": 17,
+  "set_by": "band"
+ },
+ {
+  "src": "v2r/sfx/wings_2.wav",
+  "t": 19.7667,
+  "gain": 0.1452,
+  "note": "the flock flies west into the sun (19.78; the callback, 3 dB softer) ('heading')",
+  "under_db": 19,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/sun_through_1.wav",
+  "t": 20.4,
+  "gain": 0.2694,
+  "note": "JOIN S4>S5, the A push-through into the low October sun 20.40-20.70: a glass shimmer swells into the light and a small glass tink lands on the midpoint 20.55, 30 dB down by 'In' 20.67",
+  "under_db": 14,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/blossom_pops.wav",
+  "t": 20.7333,
+  "gain": 0.1575,
+  "note": "'April': the slot's trees burst into blossom in 4 frames (the calendar flip is retired)",
+  "under_db": 18,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/wipe_air.wav",
+  "t": 21.95,
+  "gain": 0.1127,
+  "note": "the lamppost wipes the backs at the crane's peak speed (22.02-22.19), its air pass centred 22.10",
+  "under_db": 17,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/pop_low.wav",
+  "t": 22.4,
+  "gain": 0.1881,
+  "note": "'Pentagon': the plaque pops (the bed's soft accent 1 is here too)",
+  "under_db": 16,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/window_warm.wav",
+  "t": 23.05,
+  "gain": 0.2362,
+  "note": "'use': the wing's windows warm on in ONE step: one far switch",
+  "under_db": 22,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/tree_wipe.wav",
+  "t": 23.62,
+  "gain": 0.1104,
+  "note": "JOIN S5>S6, the D wipe: one blossom tree crosses the lens right to left 23.62-23.98, its rush peaking on the midpoint 23.80",
+  "under_db": 18,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/pop.wav",
+  "t": 24.0,
+  "gain": 0.1821,
+  "note": "'any': the purpose line pops (never before the clause)",
+  "under_db": 17,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/pop_high_2.wav",
+  "t": 26.4667,
+  "gain": 0.266,
+  "note": "'veto' (26.50): Lawful use: decided by the Pentagon (REQUEST: the line pops on this frame)",
+  "under_db": 17,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/window_ticks.wav",
+  "t": 27.1,
+  "gain": 0.1974,
+  "note": "the facade windows light: three far switch-ons, flash-safe (frames 1626 / 1647 / 1670)",
+  "under_db": 21,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/sun_through_2.wav",
+  "t": 27.95,
+  "gain": 0.1898,
+  "note": "JOIN S6>S7, the A push-through into the April sun 27.95-28.25: the same glass shimmer and tink, on the midpoint 28.10 (the callback, 3 dB softer)",
+  "under_db": 17,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/board_clack_1.wav",
+  "t": 28.3333,
+  "gain": 0.2462,
+  "note": "GOOGLE SAYS: the header pops (THE same board file and level as hers)",
+  "under_db": 13,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/pen_short_2.wav",
+  "t": 29.6,
+  "gain": 0.0825,
+  "note": "'AI principles' pen-builds, complete on 30.04",
+  "under_db": 17,
+  "set_by": "group"
+ },
+ {
+  "src": "v2r/sfx/lamp_run.wav",
+  "t": 30.2,
+  "gain": 0.0774,
+  "note": "the forecourt lights come on in a run: three switch-ons (frames 1812 / 1836 / 1848; THE same file and level as hers)",
+  "under_db": 16,
+  "set_by": "draft -6 dB"
+ },
+ {
+  "src": "v2r/sfx/pen_long.wav",
+  "t": 30.74,
+  "gain": 0.1082,
+  "note": "'of any kind' pen-builds (THE same pen file and level as her quote)",
+  "under_db": 19,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/boat_pass.wav",
+  "t": 32.7,
+  "gain": 0.1104,
+  "note": "JOIN S7>S8, the D wipe: the narrowboat glides west past the lens 32.70-33.16, nearest on the midpoint 32.93 (nothing starts before 32.70)",
+  "under_db": 15,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/board_clack_1.wav",
+  "t": 33.1333,
+  "gain": 0.2462,
+  "note": "the wipe clears: SHE SAYS (THE same board file and level as Google's)",
+  "under_db": 13,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/ghost_tick_3.wav",
+  "t": 33.75,
+  "gain": 0.1141,
+  "note": "'can't': three ghosts pop ahead of her (3 dB softer, one pitch)",
+  "under_db": 17,
+  "set_by": "group"
+ },
+ {
+  "src": "v2r/sfx/ghost_tick_4.wav",
+  "t": 33.8333,
+  "gain": 0.0827,
+  "note": "second ghost",
+  "under_db": 17,
+  "set_by": "group"
+ },
+ {
+  "src": "v2r/sfx/ghost_tick_1.wav",
+  "t": 33.9,
+  "gain": 0.094,
+  "note": "third ghost",
+  "under_db": 17,
+  "set_by": "group"
+ },
+ {
+  "src": "v2r/sfx/door_latch.wav",
+  "t": 34.75,
+  "gain": 0.1328,
+  "note": "her door shuts behind her",
+  "under_db": 16,
+  "set_by": "local"
+ },
+ {
+  "src": "v2r/sfx/lamp_click_2.wav",
+  "t": 34.95,
+  "gain": 0.0606,
+  "note": "W lights: her home lamp ON (the 12.98 click; the 0.40 click's answer), 3 dB softer",
+  "under_db": 23,
+  "set_by": "draft -5 dB"
+ },
+ {
+  "src": "v2r/sfx/cloth_wipe.wav",
+  "t": 35.6833,
+  "gain": 0.1286,
+  "note": "'her words': the cafe owner wipes the board clean in one stroke",
+  "under_db": 17,
+  "set_by": "sheet, words -0.8"
+ },
+ {
+  "src": "v2r/sfx/pen_long.wav",
+  "t": 36.5,
+  "gain": 0.1082,
+  "note": "her quote pen-draws on (THE same pen as Google's); its strokes end by 36.97, before 'facts'",
+  "under_db": 19,
+  "set_by": "sheet"
+ },
+ {
+  "src": "v2r/sfx/lamp_run.wav",
+  "t": 37.2833,
+  "gain": 0.0774,
+  "note": "'facts': the lamps light west down the lane: three switch-ons (frames 2237 / 2261 / 2273; = Google's run, never the ding)",
+  "under_db": 16,
+  "set_by": "draft -6 dB"
+ },
+ {
+  "src": "v2r/sfx/pen_unbuild.wav",
+  "t": 38.82,
+  "gain": 0.0612,
+  "note": "JOIN S8>S1, the un-build 38.82-39.08: the pen's line rewinds, turns into frame 0's draw-on at the midpoint 38.95 and crossfades 15 ms into pen_drawon at the seam",
+  "under_db": 16,
+  "set_by": "sheet, seam match -5.9"
+ }
+]

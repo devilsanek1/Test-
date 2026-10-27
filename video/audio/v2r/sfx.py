@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Video 2 ("One Small Window") sound effects, all designed NEW for this film -> public/v2r/sfx/*.wav, and the cue
-sheet public/v2r/cues.json ([{src, t, gain, note}], the bed first at t 0).
+sheet public/v2r/cue_sheet.json ([{src, t, gain, note, ...}], the bed first at t 0; premix.py mixes it into mix.wav
+and points the film's public/v2r/cues.json at that master).
 
-    python3 audio/v2r/sfx.py            # render every sound + derive every gain + write cues.json (~1 min)
+    python3 audio/v2r/sfx.py            # render every sound + derive every gain + write cue_sheet.json (~1 min)
                                         # (run bed.py first: the bus and word guards count the bed)
 
 Every sound is synthesised here from first principles, no house kit, no platform sounds; two are shaped from CC0
@@ -534,7 +535,7 @@ def sun_through(v=1):
     (20.40-20.70), v2 into the April sun and out of the sunset one (27.95-28.25, the callback). A glass shimmer swells
     INTO the light (the reversed ring of the same glass, an air swell rising 0.9 -> 4.2 kHz); on the midpoint (+0.15)
     one small struck glass tink on A6 (the bed's key: inharmonic partials, noise-excited, a soft mallet), its
-    fundamental's tau 28 ms: 30 dB down ~0.1 s later, before 'In' (20.67) / 'But' (28.31). Light, never a sting."""
+    fundamental's tau 21 ms: 30 dB down ~0.1 s later, before 'In' (20.67) / 'But' (28.31). Light, never a sting."""
     d = 0.34; n = n_of(d); t = tt(d); s0 = 330 + 9 * v
     out = buf(d)
     ring = glass(1760.0, [1.0, 2.32, 4.25, 6.63], [0.11, 0.05, 0.025, 0.012], [1.0, 0.4, 0.16, 0.06], SUN_MID, s0,
@@ -544,10 +545,10 @@ def sun_through(v=1):
     c = np.interp(t, [0, SUN_MID, d], [900, 4200, 3000])
     env = np.where(t < SUN_MID, (t / SUN_MID) ** 2.2, np.exp(-(t - SUN_MID) / 0.012))
     out += decor(lambda sd: tv_bandpass(noise(d, sd), c, bw_oct=0.9) * env, s0 + 3, 0.7) * 0.35
-    tink = glass(1760.0, [1.0, 2.32, 4.25, 6.63], [0.028, 0.014, 0.008, 0.005], [1.0, 0.35, 0.14, 0.05], 0.18, s0 + 5,
+    tink = glass(1760.0, [1.0, 2.32, 4.25, 6.63], [0.021, 0.011, 0.006, 0.004], [1.0, 0.35, 0.14, 0.05], 0.18, s0 + 5,
                  mallet=0.3, mallet_band=(2000, 10000), body=0.06, beat_hz=1.3)
     put(out, tink, SUN_MID - 0.0005, 0.8, -0.35)
-    return slap(out, -18.0)
+    return out                     # no canal slap: the light is not in the canal (its reflections held it at -23 dB)
 
 
 # ------------------------------------------------------------------ V2S5 / V2S6 (20.55-28.10)
@@ -604,11 +605,11 @@ TREE_MID = 0.18        # tree_wipe: the wipe's midpoint, s after the cue (23.62 
 @sound
 def tree_wipe(v=1):
     """the blossom tree crossing the lens right to left (23.62-23.98, S5's Wiper): a soft close rush of leaves (a CC0
-    rustle grain, kept under 3.2 kHz: the voice is saying 'AI for') and the air of the trunk passing, right -> left,
+    rustle grain, kept under 2.6 kHz: the voice is saying 'AI for', its /f/ keeps its band) and the air of the trunk passing, right -> left,
     peaking on the midpoint 23.80; down 20 dB by 'any' (24.03)."""
     d = 0.42; n = n_of(d); t = tt(d); k = TREE_MID / d
     g = FLD.cut(FLD.load(347557, mono=True), 11.10, 11.10 + d, 0.01)
-    leaves = unit(bp(g, 300, 3200, 2)) * env_bell(n, k, 3.0)
+    leaves = unit(lp(bp(g, 300, 2600, 2), 2600, 2)) * env_bell(n, k, 3.0)
     c = np.interp(t, [0, TREE_MID, d], [250, 900, 300])
     air = tv_bandpass(noise(d, 371), c, bw_oct=1.1) * env_bell(n, k, 3.4)
     y = 0.6 * leaves + 0.45 * unit(air)
@@ -674,7 +675,7 @@ def door_latch(v=1):
     put(out, th, 0.0, 1.0, 0.25)
     put(out, struck([2450, 4100, 5900], [0.006, 0.004, 0.003], [1, .6, .3], 0.03, 442, exc_ms=0.1, noise_body=0.3,
                     contact_amp=0.4, contact_band=(2000, 10000), contact_dec=0.0006), 0.035, 0.5, 0.25)
-    return slap(out, -3.0)
+    return slap(out, -8.0)
 
 
 @sound
@@ -699,12 +700,12 @@ def pen_unbuild(v=1):
     midpoint 38.95, where it turns into the forward glide of frame 0's draw-on (S1's subject outline begins at -0.26,
     under the un-build) and runs on at a steady level INTO the seam, then SEAM_XF past it (the premix wraps it onto
     frame 0) with a fade-out as pen_drawon fades in: a 15 ms crossfade at a matched level (sfx.match_seam)."""
-    d = 16 / FPS
+    d = 16 / FPS                                                   # 38.8167 (frame 2329) -> the seam 39.0833
+    xf = n_of(0.006)                                               # the turn: a 6 ms overlap, no step
     a = pen_glide(UNBUILD_MID, 461)[::-1].copy()
     a *= np.linspace(0.12, 1.0, len(a)) ** 1.6
-    b = pen_glide(d - UNBUILD_MID + SEAM_XF, 102)
+    b = pen_glide(d - UNBUILD_MID + SEAM_XF + xf / SR, 102)       # its fade-out starts ON the seam
     b[-n_of(SEAM_XF):] *= np.cos(0.5 * np.pi * np.linspace(0, 1, n_of(SEAM_XF))) ** 2
-    xf = n_of(0.006)                                               # the turn: a 6 ms overlap, no step
     y = np.zeros(len(a) + len(b) - xf)
     y[: len(a)] += a
     a_tail = np.cos(0.5 * np.pi * np.linspace(0, 1, xf)) ** 2
@@ -995,7 +996,7 @@ def build(write=True):
         first_under.setdefault(fam, under)
         g_sheet = vref - under - f["event_lufs"]
         if fam in sheet.LEAD_SOUNDS:
-            lim, rule = sheet.DRAFT_LEVEL[fam] + sheet.VS_DRAFT[fam] - f["event_lufs"], "fixed (draft +4 dB)"
+            lim, rule = sheet.DRAFT_LEVEL[fam] + sheet.VS_DRAFT[fam] - f["event_lufs"], f"fixed (draft {sheet.VS_DRAFT[fam]:+.1f} dB)"
         else:
             lim, rule = gain_for(V, frame_t(t), under, f["event_lufs"], f["band_db"], f["dur"],
                                  f["tonality"] >= TONAL_MIN)
@@ -1038,13 +1039,13 @@ def build(write=True):
         cues.append({"src": f"v2r/sfx/{files[r['name']]['file']}.wav", "t": round(r["t"], 4), "gain": round(g, 4),
                      "note": r["note"], "under_db": r["under"], "set_by": rule})
     if write:
-        (PUBLIC / "cues.json").write_text(json.dumps(cues, indent=1, ensure_ascii=False) + "\n")
+        (PUBLIC / "cue_sheet.json").write_text(json.dumps(cues, indent=1, ensure_ascii=False) + "\n")
     rep = {"voice_speech_level": round(vref, 2), "files": files, "words": words, "bed_limited_words": bed_limited,
            "seam_match_db": round(seam_db, 2), "sun_tink_decay": ting_decay(arrs), "joins": join_report(arrs)}
     SCRATCH.mkdir(parents=True, exist_ok=True)
     (SCRATCH / "sfx_report.json").write_text(json.dumps(rep, indent=1))
     print(f"voice speech level {vref:.2f} LUFS (momentary median); {len(files)} files, {len(cues) - 1} cues -> "
-          f"{OUT} + {PUBLIC / 'cues.json'}")
+          f"{OUT} + {PUBLIC / 'cue_sheet.json'}")
     for k, v in files.items():
         print(f"  {v['file']:16s} {v['dur']:5.2f} s  event {v['event_lufs']:6.1f} LUFS  1-4 kHz {v['band_db']:6.1f} dB  "
               f"tonal {v['tonality']:.2f}  mono notch {v['mono_notch_db']:5.1f} dB  clicks {v['clicks']}")
@@ -1080,11 +1081,10 @@ def join_report(arrs):
     """every join's carrier: where its loudest 20 ms falls against the midpoint (designed offsets: DIVE_MID, SUN_MID,
     TREE_MID, BOAT_MID, UNBUILD_MID; the B match's click on its frame) and its level at the midpoint."""
     rows = []
-    cue_t = {c[1]: c[0] for c in sheet.CUES}
     for (j, mid, carrier, span, snd) in sheet.JOINS:
         y = arrs[snd]; m = st(y).mean(axis=1); w = n_of(0.02)
         e = np.sqrt(np.convolve(m ** 2, np.ones(w) / w, "same")) + 1e-12
-        t0 = frame_t(cue_t[snd])
+        t0 = frame_t(min((c[0] for c in sheet.CUES if c[1] == snd), key=lambda tc: abs(tc - mid)))
         ipk = int(np.argmax(e)); imid = min(len(e) - 1, max(0, n_of(mid - t0)))
         rows.append({"join": j, "carrier": snd, "cue_t": round(t0, 3), "peak_t": round(t0 + ipk / SR, 3),
                      "peak_vs_mid_ms": int(round(1000 * (t0 + ipk / SR - mid))),

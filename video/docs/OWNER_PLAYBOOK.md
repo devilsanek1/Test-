@@ -59,9 +59,21 @@ Maintenance at the end).
   lines (smooth, consistent weights, few of them, no jitter, no sketchy overshoot or double strokes), refined shapes,
   only the main thing with a full outline; hand-drawn warmth comes from shape and colour, not from scratchy lines.
   Spec: `docs/look/CRAFT.md` §c. — ("hand-drawn ink, flat colour, like reference video 1", v1, 2026-10-24; "too rough
-  and messy, a lot of rough lines, not clean at all; cleaner, more refined, gentle, premium", v3 G5b, 2026-10-27).
+  and messy, a lot of rough lines, not clean at all; cleaner, more refined, gentle, premium", v3 G5b, 2026-10-27; the clean pen with tiers and gentle light
+  APPROVED at v2's G4 look clip: "okay good continue", 2026-10-27).
 - **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
   gentle light pools that make sense; never absent and never "weirdly put". System: `docs/look/CRAFT.md` §d. — (v3 G5b,
+  2026-10-27; "the shadows added are better", v2 G4, 2026-10-27).
+- **DEPTH AND SEPARATION: every shot reads in distance, never a flat elevation.** The subject separates from what is
+  behind it (its own value and contrast against a calmer field: a building in front never melts into the buildings
+  behind it); distance shows in the colour (far planes lighter, cooler, less saturated and simpler: atmospheric
+  perspective, in flat colour) and in perspective (a ground plane that recedes: converging edges, foreshortened steps,
+  things smaller and paving finer with distance, overlaps), never stacked flat bands. A few subtle particles (motes in
+  the light, a drifting leaf, glints on water) make it natural. Proven libraries are welcome where they help (researched,
+  deterministic per frame for rendering). — ("the foreground and the main focus still blur with the background
+  supporting entities ... the Google office vs the building in the background: all blurred together, not clear to
+  separate one from the other, no distance effect, no perspective; the bottom part: little to no perspective or depth
+  ... research some libraries on GitHub ... add a bit of particles here and there to make things more natural", v2 G4,
   2026-10-27).
 - **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, line weight,
   saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle (smaller, lower contrast,
