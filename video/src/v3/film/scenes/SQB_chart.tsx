@@ -6,7 +6,7 @@
 //
 //   6.98-9.28   the line draws DOWNHILL with the voice ("Laptops get better for the same money"), 2005 -> Sept 2025,
 //               one small bump in 2021 (FL 1.6); the pen's head is a hero dot that stays on the
-//               stroke's end once drawn ("now": the eye waits there for the hook)
+//               stroke's end once drawn ("now": it pops once on "this past year", 11.80, and the hook turns up from it)
 //   10.32-10.50 a doodle laptop drops onto the line (~2010) and lands on "buy" (10.60): its screen says "$999"
 //   10.82       a shinier, bigger BETTER one pops onto the line right after it (~2015.5), the SAME "$999" ("one." 10.92):
 //               same money, better laptop = lower on the line (the index is quality-adjusted, FL 1.8/1.9)
@@ -133,6 +133,8 @@ export const CHART_BEATS = {
   hook: [13.85, 14.45] as [number, number],
   label: 14.74,
   source: 15.05,
+  /** "this past year" (11.88): the pen's dot at the line's end pops once (the eye waits where the hook will turn). */
+  pulse: 11.8,
 };
 export const LINE_W = 9;
 
@@ -167,9 +169,9 @@ export function doodlePose(year: number, w: number): {x: number; y: number; rot:
 const ScreenPrice: React.FC<{x: number; y: number; w: number; dark: boolean}> = ({x, y, w, dark}) => {
   const g = laptopGeo(x, y, w);
   const [cx, cy] = g.screenC;
-  const size = Math.round(w * 0.27);
+  const size = Math.round(w * 0.3);
   return (
-    <Txt x={cx + w * 0.08} y={cy + size * 0.24} size={size} fill={dark ? EMBER.core : EMBER.ink} fit={w * 0.6}>
+    <Txt x={cx + w * 0.12} y={cy + size * 0.26} size={size} fill={dark ? EMBER.core : EMBER.ink} fit={w * 0.5}>
       $999
     </Txt>
   );
@@ -296,6 +298,12 @@ export function strokeAt(T: number): {s: number; pen: boolean} {
   return {s: L_ALL, pen: true};
 }
 
+/** The pen dot's size at film time T: one pop on "this past year" (x1.5 and back over 0.3 s, a smooth swell). */
+function dotPulse(T: number): number {
+  const u = (T - CHART_BEATS.pulse) / 0.3;
+  return u <= 0 || u >= 1 ? 1 : 1 + 0.5 * Math.sin(Math.PI * u) ** 2;
+}
+
 /** THE CHART at film time T (H1 px; draw it as HomeSet's `card`). Nothing before 6.98 (the J1 seam sees the bare
  *  face only). */
 export const OldDealChart: React.FC<{T?: number}> = ({T: Tin}) => {
@@ -308,7 +316,7 @@ export const OldDealChart: React.FC<{T?: number}> = ({T: Tin}) => {
   return (
     <Tier tier="subject">
       <TPath d={pathOf(pts)} stroke={EMBER.hero} strokeWidth={LINE_W} strokeLinecap="round" strokeLinejoin="round" fill="none" graphic />
-      {pen ? <TCircle cx={head[0]} cy={head[1]} r={LINE_W * 0.95} fill={EMBER.hero} /> : null}
+      {pen ? <TCircle cx={head[0]} cy={head[1]} r={LINE_W * 0.95 * dotPulse(T)} fill={EMBER.hero} /> : null}
       <MineDoodle T={T} />
       <BetterDoodle T={T} />
       <Label T={T} />
