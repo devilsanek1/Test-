@@ -1190,7 +1190,7 @@ const BoardBand: React.FC = () => {
   );
 };
 
-/** The near lamp's pool on the paving (lights first in the lamp run, a 3-frame flicker): an organic flat shape. */
+/** The near lamp's pool on the paving (lights first in the lamp run, switching on once): an organic flat shape. */
 const POOL = {x: 930, y: 1640, rx: 170, ry: 40};
 const poolPath = (k: number) => {
   const pts: Pt[] = [];
@@ -1258,7 +1258,7 @@ const NearBand: React.FC = () => {
     return <Paint b={b} seed="s8near/band" />;
   }, []);
   const at = lampRunAt('nearPool');
-  const lit = t >= at && !(t >= at + 1 / 60 && t < at + 3 / 60);
+  const lit = t >= at; // on ONCE (STYLE.md flash safety: no flicker)
   const pool = new Batch();
   if (lit) {
     pool.fill(CM.lampCore, poolPath(1));
@@ -1503,7 +1503,7 @@ const NearLamp: React.FC = () => {
     return b;
   }, []);
   const at = lampRunAt('nearPool');
-  const lit = t >= at && !(t >= at + 1 / 60 && t < at + 3 / 60);
+  const lit = t >= at; // on ONCE (STYLE.md flash safety: no flicker)
   const g = new Batch();
   const lx = 1310;
   const arm = NLAMP.arm;

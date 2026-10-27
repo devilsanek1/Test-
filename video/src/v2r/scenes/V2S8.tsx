@@ -23,7 +23,7 @@ import * as MAP from '../world/map';
 import {CanalCast} from '../kit/canal/slots';
 import {k4Person} from '../kit/canal/k4k5';
 import type {ToneKey} from '../../lib/Film';
-import {seamZoom} from './V2S8_clock';
+import {floatXY, seamZoom} from './V2S8_clock';
 import {S8Sky, S8Far, S8South, S8Water, S8Boat, S8Ground, S8Front} from './V2S8_set';
 import {S8House, S8Window, S8DoorLeaf} from './V2S8_house';
 import {S8Board, S8Readers} from './V2S8_board';
@@ -35,8 +35,10 @@ export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 const V2S8: React.FC = () => {
   const t = useTime();
   const e = useExit();
-  // the seam push about W (1.00 until 37.70, 1.05 from 38.82): every part draws at the landing pose inside it
-  const cam = mat.about(mat.scale(seamZoom(t)), MAP.W.x, MAP.W.y);
+  // the seam push about W (1.00 until 37.70, 1.05 from 38.82) after the 2D float (zero whenever a move runs): every part
+  // draws at the landing pose inside it
+  const [fx, fy] = floatXY(t);
+  const cam = mat.mul(mat.translate(fx, fy), mat.about(mat.scale(seamZoom(t)), MAP.W.x, MAP.W.y));
   return (
     <World sky={e > 0 ? 'transparent' : skyBands('sunset', true)} horizon={900}>
       <XG m={cam}>
