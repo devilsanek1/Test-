@@ -5,6 +5,9 @@ animations, camera movements ... details ... as placeholders ... like an animate
 the final story in as little time as possible." Reference page: `docs/look/ref_animated_sketchbook.png`.
 This file is the stage spec. The DRAWING spec stays `docs/look/STORYBOARD_STYLE.md` (palette, line weights, panel
 rules); wherever the two conflict — §7's camera-plan rules included — this file wins (edit list: `docs/look/research/g3_spec_edits.md`).
+The film's craft target is `docs/look/CRAFT.md` (2026-10-27): its transition grammar is already this file's (§4); the
+other board-side changes (tiers as grey weights, the light rig, the thread) wait for the owner
+(`docs/retro/2026-10-27_v3_retro.md` §5).
 Why for every rule: the six research files in `docs/look/research/animatic_{reels,layout,rough,mograph,sketchlook,audit}.md`.
 
 ## 1. The principle: the film's rough pass
@@ -103,13 +106,16 @@ G5 adds no new motion — only colour, line, easing polish, secondary motion (`a
 - **Drawing budget** for a 40 s / ~15-shot reel: ~60-120 distinct drawings (2-4 poses x shots, + smears),
   spent unevenly — 2-3 poses on held dialogue shots, 6-12 drawings on the 1-3 shots whose meaning IS motion.
 
-**Transition grammar.** Every cut names its device in the board JSON (`animatic_mograph.md` §3). Lint ships the `device`
-field and the generic default-cut check first (§7 tier 1); each other device's specific check is built the first time a
-reel's camera plan uses that device. Dissolves: 0.2-0.4 s to soften, up to 1-2 s only for time passing.
+**Transition grammar: carry something, don't cut** (`docs/look/CRAFT.md` §a; owner, v3 G5b, 2026-10-27: "no clean
+transitions, just a bunch of shots put together"). Every join names its device and its carrier letter in the board JSON
+(`animatic_mograph.md` §3): A push-through, B thread match or match cut, C continuous camera, D object carry or wipe, E card
+flip or swipe, F plain cut (at most 2 per film). Lint ships the `device` field and the carrier check first (§7 tier 1);
+each device's specific check is built the first time a reel's camera plan uses that device. Dissolves: 0.2-0.4 s to
+soften, up to 1-2 s only for time passing.
 
 | Device | Must be decided at G3 (lintable) |
 |---|---|
-| cut (default) | nothing but the composition change; >= 20 % size or >= 30° angle change unless a declared match |
+| plain cut (F, never the default) | at most 2 per film, only on a "But" turn, the thread on screen on both sides; >= 20 % size or >= 30° angle change (else it reads as a jump cut) |
 | cut-on-action | same action split across the cut, same screen direction |
 | match-cut | anchor element at same position + scale in both panels; built from the first panel's element list; checked at the boundary frames |
 | morph | start shape, end shape, shared centre; PLAYED as 2-3 stepped drawings (start, one smear, end, popped on the cut word) so the morph's duration and feel are locked; a G5 tween keeps that duration or explicitly reopens G3 |
@@ -132,7 +138,7 @@ With script + voice locked (word timings = the clock); per-step budgets sum to t
    the dress/density pass and the G4 style frames run in parallel lanes).
 5. **Motion pass** (~20 min): camera keys, pose pops, smears, kit loops, transitions played.
 6. **Lint** (~5 min, `board_lint.py`) — boxes, bands, counts, PLUS the tier-1 checks (§7): five-values per move, speed
-   WARN, default-cut check, camera-plan cross-check, life-list coverage, unaccounted emptiness, dress layer on wides,
+   WARN, carrier check, camera-plan cross-check, life-list coverage, unaccounted emptiness, dress layer on wides,
    ambient on set panels.
 7. **Cold reads + ONE fix round** (~15 min): the sound-off read, then the sound-on pass, each run ONCE; batch every
    finding into one fix round, re-lint once. Anything still amber after that round ships to the owner with the amber
@@ -178,7 +184,7 @@ reel needs it — never ahead of a reel.** Nobody builds tooling before drawing 
 | `life: [...]` + one-placeholder-per-item lint; `negative: true`; emptiness grid check with the §6 exemptions (FAIL = >= 4 contiguous undeclared bare cells); >55 % bare-stage WARN; zero-ambient FAIL on set panels | board_lint | S-M |
 | Move spec completeness lint (the five values per camera move) | board_lint | S |
 | Speed lint as WARN: peak px/frame (camera + own move) vs ~15 px/frame at the render rate (~900 px/s at 60), measured only over moves >= 2 frames (snap()/pops exempt); whip/carry shots exempt, linted for direction + speed match across the cut; delete the hand loop in build_board_cine.py | board_lint | S |
-| Transition `device` field + the generic default-cut check (>= 20 % size or >= 30° change) | JSON schema + board_lint | S |
+| Transition `device` field + the carrier check (a carrier letter per join, at most 2 plain cuts, each plain cut >= 20 % size or >= 30° change: `CRAFT.md` §a) | JSON schema + board_lint | S |
 | Camera-plan cross-check: every plan row's move, transition device and `life:` item exists in the board JSON, or the plan row is edited | board_lint | S |
 | Red marks: STORYBOARD_STYLE §4 cases (1) and (3) FAIL on any owner-facing render (legal only in internal interim drafts) | board_lint | S |
 | `pose:'smear'` figure variant; snap() documented as the pose-change idiom | SketchReel (snap exists) | S |

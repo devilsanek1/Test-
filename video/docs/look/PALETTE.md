@@ -52,8 +52,8 @@ every palette against the DNA below.
 
 **The house DNA** keeps the palettes one family. The numbers are CIE L* (lightness) and C (colourfulness):
 - **Background:** soft and light (L* >= 75, C <= 20), never saturated or dark. It fills 50-80 % of the frame.
-- **Mids:** soft, from our clay family (cream, peach, sand, tan, sage) or the palette's own tints. Background props can
-  be single-colour line drawings.
+- **Mids:** soft, from our clay family (cream, peach, sand, tan, sage) or the palette's own tints. Background props are
+  flat shapes without lines (`CRAFT.md` §c); a line-drawn figure (reference 1's crowds) takes tier B's thin tinted line.
 - **Ink:** dark and warm (L* <= 25), never pure black, for captions and the darkest lines; drawn lines take their colour by
   attention tier (`CRAFT.md` §c: the subject's in its own shade). At least 7:1 contrast on the background.
 - **The references' trick, used tactically:**

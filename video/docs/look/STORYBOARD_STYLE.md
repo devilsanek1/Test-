@@ -6,9 +6,9 @@ sources agree; **REPORTED** = one secondary source or search summary; numbers wi
 
 **The film's craft target is `CRAFT.md`** (owner, 2026-10-27: one flowing story, one focus at a time, a clean line, gentle
 light): the board plans for it in grey (what carries each join, each beat's one subject, where the light comes from) and
-keeps its own sketch pen, never the film's. The board-side changes (tiers drawn as grey weights, a carrier for every join
-instead of "cut by default" and §7's "size or angle changes at every cut") are proposed in `docs/retro/2026-10-27_v3_retro.md`
-§5 and wait for the owner.
+keeps its own sketch pen, never the film's. A carrier for every join (`CRAFT.md` §a) already replaces "cut by default" and
+§7's "size or angle changes at every cut"; the other board-side changes (tiers drawn as grey weights, the light rig) are
+proposed in `docs/retro/2026-10-27_v3_retro.md` §5 and wait for the owner.
 
 ## 0. The principle (owner, 2026-10-26): signal per drawing
 A board exists to give the director (the owner) the most signal about the final film in the least drawing and review
@@ -156,7 +156,7 @@ in x 380-700 and 270-460 px wide (a tall subject such as a standing figure is me
 subject at least 648 px or cut by both side edges); a bare year ("2005") counts as an axis word, not the number; the camera's zoom
 changing by at most 2x within a shot. Plus the `G3_ANIMATIC.md` §7 tier-1 checks: dress-layer exemption, move
 five-values, speed WARN (~15 px/frame at the render rate, measured only over moves >= 2 frames, whip/carry shots
-exempt), the default-cut check, the camera-plan cross-check (every plan row's move / transition device / `life:` item
+exempt), the carrier check, the camera-plan cross-check (every plan row's move / transition device / `life:` item
 exists in the board JSON), `life:` coverage, unaccounted emptiness (subject breathing ring and edge margins exempt;
 FAIL = >= 4 contiguous undeclared bare cells), zero-ambient FAIL on set panels, red-mark cases (1)/(3) FAIL on
 owner-facing renders. Boxes are measured on screen (clipped to the frame and the stage above the notes strip); a subject cut by a frame edge
@@ -220,8 +220,9 @@ lines. Then check the whole film:
 - **Scale:** one moment (1.5-4 s) built as a ladder: a close-up of the one thing, the reveal of many, then ONE cut to a
   tiny figure (change the angle as well as the size, so the second wide steps up instead of repeating).
 - **An S5 pull-back lands on the tiny figure inside the move** instead of a separate scale cut (v3, 2026-10-26).
-- **Size or angle changes at every cut,** except a deliberate match (the same chart again, the same place later, the
-  callback to the opening's end frame), which keeps the exact frame so the change is the only difference.
+- **Every join carries** (`CRAFT.md` §a: a push-through, a match, a continuous camera, an object carry, a card flip); a
+  plain cut (at most 2, on a "But" turn) changes size or angle, except a deliberate match (the same chart again, the same
+  place later, the callback to the opening's end frame), which keeps the exact frame so the change is the only difference.
 - **Rise-over in board mode = two layers:** the camera rises a little (the world sinks ~120 px, so nothing enters the
   caption band; ease `unveil`, landing on the key word) while the near ledge drops on its own move with ease `outSine`
   over the WHOLE panel. Budget the speed on screen: camera + own move at most 15 px per 30 fps frame (a sine ease-out

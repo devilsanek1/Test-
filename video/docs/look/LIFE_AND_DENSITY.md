@@ -12,7 +12,8 @@ the calmest we have measured: fullness first, motion second (§0).
 **Density respects the attention hierarchy** (owner, v3 G5b, 2026-10-27: "too busy ... too many moving parts and I'm not
 sure what to keep my attention on"): fullness comes from a calm, well-tiered world, never from equal-weight clutter. The
 subject keeps the contrast, the line and the motion; dressing is tier C (no outlines, low contrast, still) and life is tier
-B (small, soft, slow, taking turns), as `CRAFT.md` §b sets them. Every rule below works inside those tiers.
+B near the story or C far off (small, soft, slow, taking turns), as `CRAFT.md` §b sets them: lighter, never fewer than the
+scene needs. Every rule below works inside those tiers.
 
 ## 0. Fullness first, motion second (owner's riverside reference, 2026-10-26: "it doesn't feel empty at all")
 - **The world's density and detail make a frame full even when little moves; motion only has to prove the place is
@@ -52,27 +53,28 @@ B (small, soft, slow, taking turns), as `CRAFT.md` §b sets them. Every rule bel
 | profile | for | fullness (density.py) | motion |
 |---|---|---|---|
 | DENSE-CALM | cozy holds (`COZY_AND_SCALE.md` 3b) | flat <= 30 %, detail >= 33 %, obj >= 120, set so both cozy refs pass made flat like for like (C3 at 24 flat colours 18 % / 37 % / 124; C2 flattened: flat 29 %, detail 33 %): flat and obj rise above BUSY, detail holds. Plus the hole, field and paused-frame checks above (the reference clip stays out of the repo) | `density.py --cozy` (§9): movers >= 2 (!! < 1), empty <= 5 % (!! > 20 %), cv <= 0.3 for a steady lane or <= 0.75 for one slow swell per 6-7 s (!! > 1.2), the camera locked (float ~0) or floating 8-15 px/s; the motion in one band; one quiet ambient element on (§6) |
-| BUSY | explainer beats and the opening (a scale hold has its own: `CINEMATIC_GUIDE.md` Scale cues 11) | §1 (flat <= 40 %, obj >= 105, detail >= 34 %) | §1 and §6 (>= 5 ev/s per film, no gap over 1 s) |
+| BUSY | explainer beats and the opening (a scale hold has its own: `CINEMATIC_GUIDE.md` Scale cues 11) | §1 (flat <= 40 %, obj >= 105, detail >= 34 %) | §6: the story's beat leads (`CRAFT.md` §b), supporting life small, steady and taking turns, never a still frame; ev/s is information |
 
   v3 G5 was neither: a third of the cozy fullness and half the busy motion (`--cozy`: movers 1.0, empty 56 %, cv 1.13,
-  float 2.3 px/s). Film averages of ev/s and gap are meant for BUSY shots only (cozy shots fill >= 50 % of a film's
-  non-chart time, `COZY_AND_SCALE.md` §1.3, and drag them down), but density.py and `gate_check.py --density` still average
-  every shot (a profile tag per shot is TO BUILD, `COZY_AND_SCALE.md` §7.6): until then, read a film-level ev/s WARN or
-  FAR on the BUSY shots' own rows.
+  float 2.3 px/s). Events/s and the gap are information, never a target (2026-10-27: the attention tiers keep supporting
+  life calm on purpose): a `gate_check.py --density` WARN, FAR or FAIL that comes only from ev/s or the gap is no reason to
+  add movers; judge the paused frame (above) and the eye test (`CRAFT.md` §b). The meter still scores them (its fix is in
+  the retro's tooling lane, `docs/retro/2026-10-27_v3_retro.md` §5).
 
 ## 1. The bar (measured on the references; warning signals)
 
 | signal (`scripts/qa/density.py`) | ref 1 | v1 | target | far under |
 |---|---|---|---|---|
-| medium motion events / s | 6.6 | 7.7 | >= 5 per film, >= 3.5 per shot | < 2.5 |
-| longest gap without a new event | 1.00 s | 1.67 s | <= 1.0 s | > 2.0 s |
+| medium motion events / s | 6.6 | 7.7 | information: the story's beats make it, never extra movers | - |
+| longest gap without a new event | 1.00 s | 1.67 s | information (never a still frame: the row below) | - |
 | near-static frames (longest run) | 1 % (0.07 s) | 3 % (0.40 s) | <= 5 % (run <= 0.4 s) | > 25 % |
 | flat share (empty one-colour tiles) | 20 % | 32 % | <= 40 % (aim 35 %) | > 55 % |
 | objects / canvas Mpx | 192 | 141 | >= 105 | < 70 |
 | fine-detail tiles | 58 % | 45 % | >= 34 % | < 22 % |
 
-These are the BUSY profile's targets (§0). Cozy holds (DENSE-CALM) are judged by §0's row and `density.py --cozy` (§9): the
-riverside measures 1.0-1.2 ev/s and a 2.4 s gap (FAR) with a moving figure in every frame.
+These are the BUSY profile's targets (§0); the two event rows are information since the attention tiers (2026-10-27).
+Cozy holds (DENSE-CALM) are judged by §0's row and `density.py --cozy` (§9): the riverside measures 1.0-1.2 ev/s and a
+2.4 s gap (FAR) with a moving figure in every frame.
 
 What one frame holds (count it on a still at phone size):
 
@@ -80,7 +82,7 @@ What one frame holds (count it on a still at phone size):
 |---|---|---|---|---|
 | wide / exterior | sky gap or ground, 15-35 % | 12+ | 3-4 | 10 to 300+ (far crowds count) |
 | medium / interior | the wall or sky behind the captions | 8+ | 2-3 | 2+ (a silhouette in a window counts) |
-| close / insert | the subject's own backing | 5+, cut by the frame edges | 2 | a row of 3-6 backs, or the character |
+| close / insert | the subject's own backing | 5+, cut by the frame edges | 2 | a row of 3-6 backs, or the character (a film with a "you" figure: you or the character, never strangers' backs) |
 | cozy wide (balcony, riverside) | ONE band at a frame edge: a jagged sky ~8-15 % above y 290, or a bounded floor up to 50-60 % (`COZY_AND_SCALE.md` 3b.1) | a field made of things (§0's DENSE-CALM row), lived-in infrastructure (wires, poles, antennas, railings) | overlapping, stacked upward (C3 6) | about half at rest (C2 / C3 held 5-8) |
 
 ## 2. Composition: where the density goes
@@ -117,13 +119,13 @@ What one frame holds (count it on a still at phone size):
 - **Back view always** (or rear 3/4): the head in the hair colour, a neck, a tombstone torso and one accessory each
   (beanie, hood, headphones, scarf, backpack, bag, raised phone); neighbours never share both hair and coat colour.
   Faces only in the protagonist's face beat. Extras are smaller and in mid colours, never mistaken for the protagonist.
-- **Sizes by depth (1080 x 1920 canvas):** A, foreground backs: heads 90-160 px, bodies cut by the bottom edge (head tops
-  ~y 1380-1560), 3-6 across, shoulders nearly touching, looking at the subject (on inserts and wall shots this row IS the
-  density). B, passers-by cut by a side edge: 500-1000 px tall, as framing. C, mid walkers: 110-260 px tall (backpacks,
-  bags, phones, a dog). D, far crowd: 15-60 px, fill only, rows x0.85 toward the horizon. E, window and balcony
-  people: 12-40 px silhouettes in lit windows, moving. A and B are framing in tier B (`CRAFT.md` §b): still or breathing
-  (<= 2 %W/s) while the subject acts; a film with a "you" figure has no strangers in the foreground (they read as you:
-  `CRAFT.md` §a).
+- **Sizes by depth (1080 x 1920 canvas; size names, never the attention tiers A-C of `CRAFT.md`):** near backs: heads
+  90-140 px (playbook: near heads <= ~140), bodies cut by the bottom edge (head tops ~y 1380-1560), 3-6 across, shoulders
+  nearly touching, looking at the subject (on inserts and wall shots this row IS the density). Passers-by cut by a side
+  edge: 500-1000 px tall, as framing. Mid walkers: 110-260 px tall (backpacks, bags, phones, a dog). Far crowd: 15-60 px,
+  fill only, rows x0.85 toward the horizon. Window and balcony people: 12-40 px silhouettes in lit windows, moving. Near
+  backs and passers-by are framing in attention tier B (`CRAFT.md` §b): still or breathing (<= 2 %W/s) while the subject
+  acts; a film with a "you" figure has no strangers in the foreground (they read as you: `CRAFT.md` §a).
 - **They do things:** walk, carry, point, raise a phone, shovel, lean in, bob 2-3 px; on the voice's key word heads turn
   or a phone goes up, 0.1-0.3 s after the cause.
 - **Rest counts; cozy life passes through.** In a wide about half the people are at rest (sitting on an edge, leaning,
@@ -146,20 +148,24 @@ What one frame holds (count it on a still at phone size):
   caption band or the right rail, never over the subject.
 
 ## 6. The idle layer and secondary motion (never a still frame)
-- **All idle life is tier B or C** (`CRAFT.md` §b): at most 3-4 supporting movers at a time, together <= 30 % of the
-  motion, taking turns (~0.6 entries/s) and out of the 0.4 s around a join, so the subject keeps >= 60 % of the motion in
-  its beat. A BUSY shot's cadence comes from the story building to the words (as in reference 1), never from more movers.
+- **All idle life is tier B or C** (`CRAFT.md` §b), set by its weight, never cut to a low count: at most 3-4 noticeable
+  supporting movers at a time (the small far ones at the references' level), B together <= 30 % of the motion and C
+  <= 10 %, taking turns (~0.6 entries/s), none entering or turning in the 0.4 s around a join, so the subject keeps
+  >= 60 % of the motion in its beat. A BUSY shot's cadence comes from the story building to the words (as in reference
+  1), never from more movers.
 - **Profile first (§0).** BUSY shots run the full idle layer and cadence below. DENSE-CALM (cozy) holds run on a steady lane
   (1-5 movers, never zero: `COZY_AND_SCALE.md` 3b.4) and a locked or floating camera (3b.5), and keep at least ONE quiet
   ambient element on (the playbook's "ambient life that never stops"): slow weather or a slow cloud, steam, a window
   switching, an occasional bird; calmer than the movers in contrast and speed, outside the caption band, with no visible
-  sway, shimmer or boil (neither cozy reference has any). The rest of the idle layer is optional there. The cadence rule
-  (>= 5/s, gap <= 1 s) is BUSY only; "never a still frame" holds for both.
-- **BUSY: always on, in every shot, from frame 0:** weather (snow, rain, leaves) and smoke or steam; clouds drifting at least
-  10 px/s; lights (bulbs twinkling, a window switching somewhere every 0.6-1.5 s); people walking, breathing, bobbing;
-  the character's idle; plus ONE small loop per shot (a swinging sign or tag, a fan, a clock hand, a forklift).
-- **Cadence:** new medium events >= 5/s with no gap over 1 s; after a burst, at most 0.5 s of small settling events,
-  never stillness; a big burst (10+ items within 4 frames) every 6-10 s on a number or a hero word (motion_spec §6, §9).
+  sway, shimmer or boil (neither cozy reference has any). The rest of the idle layer is optional there. "Never a still
+  frame" holds for both.
+- **BUSY: ambient on in every shot, from frame 0, at tier weight:** weather (snow, rain, leaves) or smoke or steam; clouds
+  drifting at least 10 px/s; one window or bulb changing at a time (every ~2-4 s, never a twinkle on every bulb); people at
+  rest or walking; the character's idle; at most ONE small loop per shot (a swinging sign or tag, a fan, a clock hand, a
+  forklift). Never all of them loud at once: the story's motion leads.
+- **Cadence:** the story's beats land on the voice's words; between them supporting life keeps going, so no stretch over
+  1 s has nothing moving; a burst (10+ items within 4 frames) only where the burst IS the beat (a number, a hero word:
+  motion_spec §6, §9), never extra life competing with it. Events/s is information, never a target (2026-10-27).
 - **Secondary motion:** the world reacts to the main action within 0.1-0.3 s (birds lift when a truck lurches, snow
   slides off a roof on a thud, heads turn, the character reacts). **Readability:** ambient motion is small, slow,
   low-contrast and off the subject's path; nothing in the background moves like the subject (v3 S9: dark specks in the
@@ -172,8 +178,9 @@ What one frame holds (count it on a still at phone size):
   place, never a new location made for it: `CRAFT.md` §a), with people looking at it: a paper on a noticeboard on
   a street wall (ref 9.0), an ATM receipt (ref 22.0), posters on a board (ref 25.8), a paper pinned to a street board
   with more on a wire (v1 23.0), a rooftop billboard (v1 30.0), an A-frame sign (v1 44.0), a price board, a shop window,
-  a phone in a hand. Around it: the place (wall, cornice, door, lamp, window corner, ground), a row of backs (tier B),
-  the character on or under it.
+  a phone in a hand. Around it: the place (wall, cornice, door, lamp, window corner, ground), a row of backs in tier B
+  (in a film with a "you" figure: you or the character, never strangers' backs, `CRAFT.md` §a), the character on or
+  under it.
 - The information stays straight-on, level and big (charts are never angled); the world goes round it. A matched
   insert (the same chart frame twice) keeps the same dressing; the audience's reaction carries the change.
 
@@ -184,7 +191,7 @@ What one frame holds (count it on a still at phone size):
   edges of things), key information no.
 - **The quiet field** (15-35 %; a bounded floor seen from a balcony up to 50-60 %, `COZY_AND_SCALE.md` 3b.1) and **the
   subject's ring**. **One breath beat per film** (at most 2.5 s, usually after
-  the heaviest line): fewer events (>= 2.5/s), still no gap over 1 s, the idle layer on, never a frozen frame.
+  the heaviest line): the story pauses, the idle layer stays on, never a frozen frame.
 - **Cozy holds** (DENSE-CALM, §0): little motion is fine, emptiness never: the fullness bar rises, the motion bar becomes
   `density.py --cozy` (§9).
 
@@ -220,7 +227,7 @@ python3 -I scripts/qa/gate_check.py ... --density     # WARN per shot; FAIL when
 | G4 look | the style frame is dressed at final density and judged beside reference 1 and v1 (a cozy frame also against §0's DENSE-CALM row and `COZY_AND_SCALE.md` 3b.8) |
 | kit (before the G5 lanes) | the dressing inventory for the video's settings, the people variants and the character's colourway; every piece on the kit sheet at each size a panel uses, checked at 0.25 scale |
 | G5 blocking | sets at full density, people placed, the character in every shot with key poses, the idle layer on (weather, lights, people idle, the character's idle, one loop per shot); each set judged paused first (§0); density.py before the owner sees it, cozy holds by `--cozy` (§9) with a locked or floating camera |
-| G6 polish | motion life refined: secondary motion, reactions on the voice's words, the cadence measured (BUSY shots: >= 5/s, gap <= 1 s; cozy holds: `--cozy`, §9), the character's hops across cuts and the loop; then edges and texture |
+| G6 polish | motion life refined inside the tiers: secondary motion, reactions on the voice's words, the attention check (`CRAFT.md` §b; cozy holds: `--cozy`, §9), the character's hops across cuts and the loop; then edges and texture |
 
 ## Approved bar (our own frames)
 The owner approved v3's G5b density pilot as the level to hit (2026-10-27, "go ahead yes"):

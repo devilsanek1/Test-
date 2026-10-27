@@ -74,8 +74,9 @@ case of an angle-independent measure, the enclosing mass's share of the screen, 
   frame; spines, mullions, hair in the anchor `#22332C` (~5 %); page L* >= 75 at night too. Hero (5-15 %) on the story's object,
   one hue all video, across the Sage -> Dusk shift too; ONE pop (amber `#F2A541` or coral `#FF7A4D`), 1-3 %, look-here only.
 - **Density:** abundance at the edges and the far side, a calm (never empty) centre: props cluster on the shelf, sill and
-  desk edge, which hold 3-6x the linework of the centre (3b.3), each >= 60 px, in many soft flat fills (line drawings only far
-  back); the paused frame must read full (`LIFE_AND_DENSITY.md` §0); >= 1 sign of care (steaming mug, blanket, plant)
+  desk edge, which hold 3-6x the detail of the centre (3b.3), each >= 60 px, in many soft flat fills (no lines on
+  dressing or far planes: `CRAFT.md` §c); the paused frame must read full (`LIFE_AND_DENSITY.md` §0); >= 1 sign of care
+  (steaming mug, blanket, plant)
   [CO §4]. Seen from outside, light 1-3 windows (a few lit windows read as human scale [EN §5]), never most (Kinkade
   [CO §5]); only ours in the pop.
 - **Shape:** inside rounded (lamp, mug, cushions, window corners), outside rectilinear and hard (curves are preferred: Bar &

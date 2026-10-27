@@ -1,8 +1,9 @@
 # G5 blocking cut: how to build any video's film (engine shell + lanes)
 
-G5 (`PIPELINE_V2.md` gate table): **real sets and props at draft quality, the FINAL camera, key poses, NO edges /
-paper / texture, 60 fps.** The owner judges staging, readability at phone size and transitions that play. The story,
-cut points, shot content and transitions are locked by the G3 board; G5 translates the monochrome board into real sets.
+G5 (`PIPELINE_V2.md` gate table): **real sets and props at draft finish in the film's clean pen and attention tiers
+(`docs/look/CRAFT.md`, never the sketch pen), the FINAL camera, key poses, NO edges / paper / texture, 60 fps.** The
+owner judges staging, readability at phone size and transitions that play. The story, cut points, shot content and
+transitions are locked by the G3 board; G5 translates the monochrome board into real sets.
 Video 3 is the reference implementation (`src/entry-v3-film.tsx`, `src/v3/film/`).
 
 ## 1. The shape: the whole film plays from minute one
