@@ -60,11 +60,9 @@ Format: **rule** — why / evidence (video, date).
 - **Arcane references: ENVIRONMENT ONLY, few and high-confidence** (buildings, cityscapes, interiors as spaces, wides;
   no faces or people). Build on our own videos incrementally (angles, composition, light, camera), never reinvent.
   Guide with sketches: `docs/look/CINEMATIC_GUIDE.md`. — ("targeted with high confidence", 2026-10-26).
-- **The owner's favourite Arcane shot: the pull-back crane reveal** (S1E1, the sisters on a rooftop, "It's nice getting
-  above it all, huh?": from the characters' small world, the camera pulls back and rises until they are tiny figures with
-  their backs to us, overlooking a vast sunlit city). "It has pretty much everything": suspense, sense of scale,
-  environment, composition and the camera movement. Use it as the model for a film's big reveal; distilled in
-  `docs/look/CINEMATIC_GUIDE.md`. — (v3, 2026-10-26).
+- **The owner's favourite Arcane shot: the pull-back crane reveal** (S1E1 rooftop: the camera pulls back and rises until
+  the sisters are tiny figures overlooking a vast city; "it has pretty much everything"): the model for a film's big reveal
+  (`docs/look/CINEMATIC_GUIDE.md`). — (v3, 2026-10-26).
 - **Second visual twist: coziness through a sense of enclosure**: framed, street-like spaces that hold the subject (ref
   `docs/look/ref_sense_of_enclosure.jpg`). Rules: `docs/look/COZY_AND_SCALE.md`. — (2026-10-25).
   **Coziness is a recurring topic we keep evolving, one reference at a time** (enclosure H:W ratios first; then the
@@ -74,6 +72,9 @@ Format: **rule** — why / evidence (video, date).
 - **Don't rely on reusable assets: every film's sets, characters, props, background life and music are made new for
   it,** in its own design (a new Pip drawing too, if the mascot appears). Engine primitives, timing, captions and QA tools
   are tools, not assets. — ("Don't rely on reusable assets", v2 restart, 2026-10-27).
+- **People small and simple, like the first example video (reference 1):** figures that live in the world (crowds, small
+  full figures, backs of heads, simple round heads), never big character models or close-up faces. — ("don't use big
+  models of people", v2 restart, 2026-10-27).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). — (v1 posted reel, 2026-10-25).
 - **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
@@ -150,7 +151,7 @@ Format: **rule** — why / evidence (video, date).
 - **Playable video starts at the sketch animatic (G3); from then on every gate is a video, never only stills.** Before
   G3 (topic, core line, script, voice): text and audio only, no MP4s, never several versions unless asked. — (v1, 2026-10-25; "why are there multiple versions", v3).
 - **Lock the story with a clean sketch/animatic before big commitments; push all polish late.** — (v1, 2026-10-25).
-- **Progress: the gate deliverable is the update; between gates, a short status covering all threads.** — (v1).
+- **Progress: the gate deliverable is the update, with a short status on all threads between; lean prompts and docs.** — (v1).
 - **Every cut sent to the owner says what stage it is and what the next stages add** (e.g. "blocking: staging only;
   next: density, life, polish, full-res"), so a draft is never mistaken for the final. — ("let me know if this is just
   an initial intermediate step", v3 G5, 2026-10-26).
@@ -160,7 +161,6 @@ Format: **rule** — why / evidence (video, date).
   reviewing what will still change, early polish). — (2026-10-25; owner, 2026-10-26).
 - **Locked means dropped:** rejected options go to the video's `archive/`, the gate doc keeps only the locked choice,
   later prompts never see them; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
-- **No wasted tokens or time:** short prompts, lean docs, nothing reviewed or polished that will still change. — (v1).
 - **Every lesson goes into the generic process, committed:** this playbook, a gate in `PIPELINE_V2.md`, or the studio
   toolkit, so the next video doesn't repeat it. — ("we gradually get better as a production studio", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
