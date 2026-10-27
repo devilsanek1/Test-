@@ -190,8 +190,13 @@ function frontBatch(): Batch {
   for (const w of WINDOWS) winFront(b, w);
   b.layer();
   for (const d of DOORS) doorInto(b, d);
-  // her door: a brass number plaque (blank) and two pots on her steps; a wall lantern
-  b.fill(CM.coatMustard, ovalPath(215, 928, 5, 3.4));
+  // her door: a lit wall lantern right of the case, a brass number plaque (blank) under it, two pots on her steps
+  b.rect(CM.anchor, 271, 926, 2, 9);
+  b.poly(CM.anchor, [[263, 936], [281, 936], [277, 930], [267, 930]]);
+  b.rect(CM.lampCore, 265.5, 936, 13, 17);
+  b.rect(CM.anchor, 271.3, 936, 1.4, 17);
+  b.rect(CM.anchor, 264, 953, 16, 3);
+  b.fill(CM.coatMustard, ovalPath(272, 980, 5, 3.6));
   potsInto(b, [168, 262], 1066, 14, 'herSteps');
   b.layer();
   // drainpipes on the party walls
@@ -231,7 +236,7 @@ function frontBatch(): Batch {
   b.rect(CM.paper, 657, G - 18, 22, 4);
   b.layer();
   // autumn creeper up her west end wall; a climbing rose round the stucco house's bay; ivy on the deep house
-  creeperInto(b, 165, 212, 690, G - 20, 'h1creep', [CM.leafRust, CM.brickDeep, CM.leafRust, CM.leafGold], 6, [[170, 896, 260, 1100]]);
+  creeperInto(b, 165, 218, 700, G - 20, 'h1creep', [CM.leafRust, CM.brickDeep, CM.leafRust, CM.leafGold, CM.box], 11, [[170, 896, 262, 1100], [HER_OPENING.x0 - 30, HER_OPENING.y0 - 40, HER_OPENING.x1 + 30, HER_OPENING.y1 + 10]]);
   creeperInto(b, 952, 1008, 760, G - 30, 'h3ivy', [CM.sage, CM.sage, CM.leafGold], 4, [[880, 900, 990, 1040]]);
   roseInto(b, 1012, 1034, 880, G - 40, 'h4rose');
   // the stucco house's bay roof planting

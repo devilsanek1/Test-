@@ -21,7 +21,8 @@ import {Person, Seated} from '../kit/cast';
 import {Batch, Paint, mix, crownD, blossomD, ellD, circleD, lineD, cloudD, frac} from '../kit/dc/core';
 import {birdD} from '../kit/dc/life';
 import {GATE, GT} from '../kit/dc/gate';
-import {DRIFT, dxOf, boardAt, adultH} from './V2S6_rig';
+import {DRIFT, dxOf, adultH} from './V2S6_rig';
+import {LEAF} from './V2S6_set';
 
 const smooth = (u: number) => {
   const k = Math.min(1, Math.max(0, u));
@@ -57,8 +58,8 @@ const LT = {
   petal: CM.blossom,
   petalShade: mix(CM.blossom, CM.shadeWarm, 0.28),
   petalLit: mix(CM.blossom, CM.paper, 0.45),
-  crown: mix(CM.sage, CM.shadeWarm, 0.1),
-  crownShade: mix(CM.sage, CM.shadeWarm, 0.38),
+  crown: CM.sage,
+  crownShade: mix(CM.sage, CM.waterDeep, 0.55),
   blossomShade: mix(CM.blossom, CM.shadeWarm, 0.3),
   bark: mix(CM.anchor, CM.line, 0.25),
   wood: CM.line,
@@ -222,7 +223,7 @@ type Mover = {
 
 const MOVERS: Mover[] = [
   {id: 'jogA', pose: 'jog', x: (t) => 1104 - 128 * t, feet: 866, dir: -1, rate: 2.8, traits: {coat: CM.coatMustard, hair: 'cap', hatColor: CM.coatSlate, acc: 'headphones', coatLen: 'jacket'}, on: [0, 3.2]},
-  {id: 'dogW', pose: 'walk', x: (t) => 742 + 84 * t, feet: 878, dir: 1, rate: 1.7, traits: {coat: CM.brick, hair: 'short', hairColor: CM.hair[3], acc: 'none', coatLen: 'mid'}, on: [0, 4.1]},
+  {id: 'dogW', pose: 'walk', x: (t) => 792 + 78 * t, feet: 878, dir: 1, rate: 1.7, traits: {coat: CM.brick, hair: 'short', hairColor: CM.hair[3], acc: 'none', coatLen: 'mid'}, on: [0, 4.1]},
   {id: 'cyc', pose: 'cycle', x: (t) => 1186 - 292 * (t - 2.12), feet: 870, dir: -1, rate: 0, traits: {coat: CM.coatOat, hair: 'beanie', hatColor: CM.brickDeep, acc: 'backpack', accColor: CM.coatSlate}, on: [2.12, 4.1]},
   {id: 'pram', pose: 'walk', x: (t) => 112 - 38 * t, feet: 858, dir: -1, rate: 1.5, traits: {coat: CM.coatPlum, hair: 'lowBun', hairColor: CM.hair[2], acc: 'tote', accColor: CM.coatOat, coatLen: 'long'}, on: [0, 4.1]},
   {id: 'jogB', pose: 'jog', x: (t) => -62 + 168 * (t - 0.35), feet: 874, dir: 1, rate: 2.9, traits: {coat: CM.sage, hair: 'bun', hairColor: CM.hair[4], acc: 'none', coatLen: 'jacket'}, on: [0.35, 1.9]},
@@ -310,17 +311,9 @@ export const S6Promenade: React.FC = () => {
       shadows.push(ellD(px + 14, m.feet + 2, 30, 2.6));
     }
   }
-  // the lawn bench (left strip) and its reader at rest (a newspaper, no masthead)
-  const bench = new Batch();
-  bench.rect(LT.iron, 6, 838, 5, 30);
-  bench.rect(LT.iron, 98, 838, 5, 30);
-  bench.rect(LT.wood, 4, 852, 102, 5);
-  shadows.push(`M8 868L112 866L122 873L12 874Z`);
   return (
     <>
       <path d={shadows.join('')} fill={LT.lawnShadow} />
-      <Paint b={bench} seed="s6bench" misreg={2} />
-      <Seated x={56} y={856} h={50} seed="s6/benchReader" read traits={{coat: CM.coatOat, hair: 'short', hairColor: CM.hair[0], acc: 'none'}} />
       {out}
       <Paint b={props} seed="s6props" misreg={2} />
     </>
@@ -429,39 +422,44 @@ export const S6LawnMid: React.FC = () => {
   const tdx = dxOf(14, t) - md;
   const tree = useMemo(() => {
     const B = new Batch();
-    treeInto(B, {x: 52, base: 958, rx: 92, ry: 78, cy: 722, bloom: 1.1, seed: 'ltL'});
+    treeInto(B, {x: 26, base: 958, rx: 92, ry: 78, cy: 722, bloom: 1.1, seed: 'ltL'});
     return B;
   }, []);
-  // the gardener (kneeling, back view, at rest: the head turns over the bed, the trowel works)
-  const gx = 902;
-  const gy = 936;
-  const turn = 0.35 + 0.25 * Math.sin(t * 1.7);
-  const dig = Math.sin(t * 7.5) * 4;
+  // the gardener: kneeling in front of the kit's right tulip bed (mid coords (1000, 930)), back to us, at rest but
+  // working (the head turns over the bed, the trowel digs); a barrow and a trug beside them on the lawn
+  const gx = 992;
+  const gy = 972;
+  const turn = 0.25 * Math.sin(t * 1.3);
+  const dig = Math.sin(Math.floor(t * 12) / 12 * 7.5) * 5;
   const g = new Batch();
-  // barrow (left of the gardener): tray, wheel, handles (iron + wood), a heap of soil
-  g.fill(LT.lawnShadow, ellD(846, gy + 6, 40, 4));
+  g.fill(LT.lawnShadow, ellD(gx + 30, gy + 3, 46, 5));
+  // barrow (left): tray, wheel, legs, handles
+  const bx = 900;
+  const by = gy - 4;
+  g.fill(LT.lawnShadow, ellD(bx + 24, by + 5, 38, 4));
   g.poly(mix(CM.coatSlate, CM.sage, 0.3), [
-    [812, gy - 34],
-    [868, gy - 34],
-    [858, gy - 12],
-    [820, gy - 12],
+    [bx - 30, by - 36],
+    [bx + 30, by - 36],
+    [bx + 20, by - 12],
+    [bx - 22, by - 12],
   ]);
-  g.fill(mix(CM.brickDeep, CM.anchor, 0.3), ellD(840, gy - 35, 26, 7));
-  g.ink(lineD([[868, gy - 30], [890, gy - 22]]), 1.6, CM.ink);
-  g.ink(`M${862 - 9} ${gy - 1}a9 9 0 1 0 18 0a9 9 0 1 0 -18 0`, 1.6, CM.ink);
-  g.ink(lineD([[816, gy - 12], [810, gy]]), 1.6, CM.ink);
-  // trug of bulbs + kneeling pad + the trowel
-  g.fill(CM.line, `M${gx + 20} ${gy - 12}h30l-4 12h-22Z`);
-  g.fill(CM.coatOat, ellD(gx + 35, gy - 13, 14, 4));
-  g.rect(CM.brickLight, gx - 24, gy - 4, 40, 6);
-  g.ink(lineD([[gx + 58, gy - 26 + dig], [gx + 70, gy - 8 + dig]]), 2.2, CM.ink);
+  g.fill(mix(CM.brickDeep, CM.anchor, 0.3), ellD(bx, by - 37, 28, 7));
+  g.fill(LEAF.body, ellD(bx + 8, by - 41, 12, 5));
+  g.ink(lineD([[bx + 30, by - 32], [bx + 54, by - 24]]), 1.6, CM.ink);
+  g.ink(`M${bx + 16} ${by - 1}a10 10 0 1 0 20 0a10 10 0 1 0 -20 0`, 1.6, CM.ink);
+  g.ink(lineD([[bx - 22, by - 12], [bx - 27, by]]), 1.6, CM.ink);
+  // trug of bulbs (right) + kneeling pad + the trowel
+  g.fill(CM.line, `M${gx + 34} ${gy - 14}h32l-5 14h-22Z`);
+  g.fill(CM.coatOat, ellD(gx + 50, gy - 15, 15, 4));
+  g.rect(CM.brickLight, gx - 26, gy - 5, 46, 7);
+  g.ink(lineD([[gx + 12, gy - 40 + dig], [gx + 20, gy - 18 + dig]]), 2.2, CM.ink);
   return (
     <>
       <g transform={`translate(${tdx.toFixed(2)} 0)`}>
         <Paint b={tree} seed="s6youngcherry" misreg={2} />
       </g>
       <Paint b={g} seed="s6garden" misreg={2} />
-      <Seated x={gx} y={gy - 18} h={62} seed="s6/gardener" turn={turn} traits={{coat: CM.coatMustard, hair: 'cap', hatColor: CM.sage, acc: 'none'}} />
+      <Seated x={gx} y={gy - 20} h={66} seed="s6/gardener" turn={turn} traits={{coat: CM.coatMustard, hair: 'cap', hatColor: CM.brickDeep, acc: 'none'}} />
     </>
   );
 };

@@ -43,63 +43,82 @@ const SEGS: Seg[] = [
 
 function wallsInto(b: Batch) {
   const r = rng('s4walls');
-  let ink = '';
-  let ticks = '';
-  for (const s of SEGS) {
+  const ink: string[] = [];
+  const ticks: string[] = [];
+  const pw = 14;
+  const gates = SEGS.filter((s) => s.kind === 'gate');
+  const walls = SEGS.filter((s) => s.kind !== 'gate');
+  // P0: wall bodies, gate piers, gate leaves
+  for (const s of walls) b.rect(s.c, s.x0, TOP, s.x1 - s.x0, FOOT - TOP);
+  for (const s of gates) {
+    for (const px of [s.x0, s.x1 - pw]) b.rect(s.c, px, TOP - 12, pw, FOOT - TOP + 12);
+    const gx0 = s.x0 + pw;
+    const gx1 = s.x1 - pw;
+    b.rect(s.gate as string, gx0, TOP - 4, gx1 - gx0, FOOT - TOP + 4);
+    b.fill(s.gate as string, `M${P(gx0, TOP - 4)}Q${P((gx0 + gx1) / 2, TOP - 14)} ${P(gx1, TOP - 4)}Z`);
+    ink.push(line(s.x0, TOP - 12, s.x0, FOOT, {seed: `s4gp${s.x0}`, over: 'small'}) + line(s.x1, TOP - 12, s.x1, FOOT, {seed: `s4gq${s.x0}`, over: 'small'}));
+  }
+  b.layer();
+  // P1: copings and pier caps, the coping's shade line, render patches, brick ticks
+  for (const s of walls) {
     const w = s.x1 - s.x0;
-    if (s.kind === 'gate') {
-      // two piers with stone caps, a plank door between, its ring handle and hinges
-      const pw = 14;
-      for (const px of [s.x0, s.x1 - pw]) {
-        b.rect(s.c, px, TOP - 12, pw, FOOT - TOP + 12);
-        b.rect(CM.limestone, px - 3, TOP - 18, pw + 6, 7);
-        b.fill(CM.limestone, domePath(px + pw / 2, TOP - 18, pw / 2 + 1, 6));
-      }
-      const gx0 = s.x0 + pw;
-      const gx1 = s.x1 - pw;
-      b.rect(s.gate as string, gx0, TOP - 4, gx1 - gx0, FOOT - TOP + 4);
-      b.fill(s.gate as string, `M${P(gx0, TOP - 4)}Q${P((gx0 + gx1) / 2, TOP - 14)} ${P(gx1, TOP - 4)}Z`);
-      for (let x = gx0 + 6; x < gx1 - 2; x += 6) b.rect(CM.shadeWarm, x, TOP, 1, FOOT - TOP - 4);
-      b.rect(CM.anchor, gx0 + 2, TOP + 18, gx1 - gx0 - 4, 3);
-      b.rect(CM.anchor, gx0 + 2, FOOT - 30, gx1 - gx0 - 4, 3);
-      b.fill(CM.coatMustard, ovalPath(gx1 - 7, (TOP + FOOT) / 2, 3, 3));
-      ink += line(s.x0, TOP - 12, s.x0, FOOT, {seed: `s4gp${s.x0}`, over: 'small'}) + line(s.x1, TOP - 12, s.x1, FOOT, {seed: `s4gq${s.x0}`, over: 'small'});
-      continue;
-    }
-    b.rect(s.c, s.x0, TOP, w, FOOT - TOP);
-    // coping stones on the wall
     b.rect(CM.limestone, s.x0 - 2, TOP - 7, w + 4, 8);
-    b.rect(CM.stoneShade, s.x0 - 2, TOP + 1, w + 4, 3);
     if (s.kind === 'render') {
       b.rect(CM.stoneShade, s.x0, FOOT - 16, w, 16);
       for (let k = 0; k < 3; k++) b.rect(CM.stoneShade, s.x0 + r.range(10, w - 40), r.range(TOP + 20, FOOT - 40), r.range(14, 30), 2);
     } else {
-      for (let k = 0; k < Math.round(w / 22); k++) ticks += `M${P(r.range(s.x0 + 4, s.x1 - 12), r.range(TOP + 10, FOOT - 8))}h${r.range(6, 11).toFixed(1)}`;
+      for (let k = 0; k < Math.round(w / 22); k++) ticks.push(`M${P(r.range(s.x0 + 4, s.x1 - 12), r.range(TOP + 10, FOOT - 8))}h${r.range(6, 11).toFixed(1)}`);
       for (let k = 0; k < Math.round(w / 40); k++) b.rect(s.c === CM.brickDeep ? CM.brick : CM.brickDeep, r.range(s.x0 + 4, s.x1 - 16), r.range(TOP + 12, FOOT - 10), r.range(8, 14), 3);
     }
+    ink.push(line(s.x0 - 2, TOP - 7, s.x1 + 2, TOP - 7, {seed: `s4wc${s.x0}`, over: 'small'}));
+  }
+  for (const s of gates) for (const px of [s.x0, s.x1 - pw]) b.rect(CM.limestone, px - 3, TOP - 18, pw + 6, 7);
+  b.layer();
+  // P2: under-coping shade, pier domes, gate planks, straps and knob, railings, the trellis, the wall lamp
+  for (const s of walls) b.rect(CM.stoneShade, s.x0 - 2, TOP + 1, s.x1 - s.x0 + 4, 3);
+  for (const s of gates) {
+    for (const px of [s.x0, s.x1 - pw]) b.fill(CM.limestone, domePath(px + pw / 2, TOP - 18, pw / 2 + 1, 6));
+    const gx0 = s.x0 + pw;
+    const gx1 = s.x1 - pw;
+    for (let x = gx0 + 6; x < gx1 - 2; x += 6) b.rect(CM.shadeWarm, x, TOP, 1, FOOT - TOP - 4);
+    b.rect(CM.anchor, gx0 + 2, TOP + 18, gx1 - gx0 - 4, 3);
+    b.rect(CM.anchor, gx0 + 2, FOOT - 30, gx1 - gx0 - 4, 3);
+    b.fill(CM.coatMustard, ovalPath(gx1 - 7, (TOP + FOOT) / 2, 3, 3));
+  }
+  const trellis: string[] = [];
+  for (const s of walls) {
     if (s.kind === 'railing') {
-      // iron railings on the coping: bars with spear tops, a top rail
       const ry = TOP - 62;
-      b.rect(CM.anchor, s.x0, ry + 6, w, 3);
-      b.rect(CM.anchor, s.x0, TOP - 16, w, 2.4);
+      b.rect(CM.anchor, s.x0, ry + 6, s.x1 - s.x0, 3);
+      b.rect(CM.anchor, s.x0, TOP - 16, s.x1 - s.x0, 2.4);
       for (let x = s.x0 + 6; x < s.x1 - 2; x += 11) {
         b.rect(CM.anchor, x - 1.1, ry + 2, 2.2, TOP - 8 - ry);
         b.poly(CM.anchor, [[x - 2.4, ry + 4], [x, ry - 3], [x + 2.4, ry + 4]]);
       }
     }
     if (s.kind === 'trellis') {
-      // a trellis on the wall with a climbing rose (sage, a few blooms), gone autumn-gold here and there
       const ty = TOP - 66;
       let tr = '';
       for (let x = s.x0 + 8; x < s.x1 - 4; x += 16) tr += `M${P(x, TOP - 6)}L${P(x + 16, ty)}M${P(x + 16, TOP - 6)}L${P(x, ty)}`;
       tr += `M${P(s.x0 + 4, ty)}L${P(s.x1 - 4, ty)}`;
-      b.ink(tr, 1.3, CM.line);
+      trellis.push(tr);
+    }
+    if (s.pot) {
+      const lx = s.x1 - 18;
+      b.rect(CM.anchor, lx - 2, TOP + 26, 4, 10);
+      b.poly(CM.anchor, [[lx - 9, TOP + 30], [lx, TOP + 23], [lx + 9, TOP + 30]]);
+    }
+  }
+  b.ink(trellis.join(''), 1.3, CM.line);
+  b.layer();
+  // P3: plants (trellis roses, ivy), the pot on the coping, the lamp's glass
+  for (const s of walls) {
+    const w = s.x1 - s.x0;
+    if (s.kind === 'trellis') {
       b.fill(CM.sage, lobes(s.x0 + 6, s.x1 - 6, TOP - 4, 54, `s4tr${s.x0}`, Math.round(w / 34)));
       b.fill(CM.leafGold, lobes(s.x0 + w * 0.55, s.x1 - 10, TOP - 8, 34, `s4tr2${s.x0}`, 2));
-      for (let k = 0; k < Math.round(w / 26); k++) b.fill(r.pick([CM.blossom, CM.box, CM.paper]), ovalPath(r.range(s.x0 + 10, s.x1 - 10), r.range(TOP - 50, TOP - 10), 3.6, 3.3));
     }
     if (s.ivy) {
-      // ivy spilling over the coping and down the face
       for (let k = 0; k < Math.round(w / 30); k++) {
         const ix = r.range(s.x0 + 4, s.x1 - 20);
         const drop = r.range(26, 90);
@@ -108,20 +127,25 @@ function wallsInto(b: Batch) {
       }
     }
     if (s.pot) {
-      // a geranium pot on the coping and a wall lamp (off) on the face
+      const px = s.x0 + w * 0.3;
+      b.fill(CM.sage, lobes(px - 13, px + 13, TOP - 21, 18, 's4wpot', 3));
+      const lx = s.x1 - 18;
+      b.poly(CM.glass, [[lx - 7, TOP + 30], [lx + 7, TOP + 30], [lx + 5, TOP + 44], [lx - 5, TOP + 44]]);
+    }
+  }
+  b.layer();
+  // P4: blooms, the pot itself (over the plant's base)
+  for (const s of walls) {
+    const w = s.x1 - s.x0;
+    if (s.kind === 'trellis') for (let k = 0; k < Math.round(w / 26); k++) b.fill(r.pick([CM.blossom, CM.box, CM.paper]), ovalPath(r.range(s.x0 + 10, s.x1 - 10), r.range(TOP - 50, TOP - 10), 3.6, 3.3));
+    if (s.pot) {
       const px = s.x0 + w * 0.3;
       b.poly(CM.brickDeep, [[px - 9, TOP - 22], [px + 9, TOP - 22], [px + 7, TOP - 7], [px - 7, TOP - 7]]);
-      b.fill(CM.sage, lobes(px - 13, px + 13, TOP - 21, 18, 's4wpot', 3));
       for (const [dx, dy] of [[-6, -32], [3, -36], [8, -28]]) b.fill(CM.box, ovalPath(px + dx, TOP + dy, 3.2, 3));
-      const lx = s.x1 - 18;
-      b.rect(CM.anchor, lx - 2, TOP + 26, 4, 10);
-      b.poly(CM.glass, [[lx - 7, TOP + 30], [lx + 7, TOP + 30], [lx + 5, TOP + 44], [lx - 5, TOP + 44]]);
-      b.poly(CM.anchor, [[lx - 9, TOP + 30], [lx, TOP + 23], [lx + 9, TOP + 30]]);
     }
-    ink += line(s.x0 - 2, TOP - 7, s.x1 + 2, TOP - 7, {seed: `s4wc${s.x0}`, over: 'small'});
   }
-  b.ink(ticks, 1.1, CM.brickDeep);
-  b.ink(ink, INK_PX.far, CM.ink, 0.25);
+  b.ink(ticks.join(''), 1.1, CM.brickDeep);
+  b.ink(ink.join(''), INK_PX.far, CM.ink, 0.25);
 }
 
 // ---------------------------------------------------------------- paving + coping
