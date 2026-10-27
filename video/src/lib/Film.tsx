@@ -515,7 +515,9 @@ export type Frame0Text = {
   spoken?: 'all' | 'first';
 };
 
-const F0 = {size: 72, baselines: [342, 432], captionBaseline: 545, captionScale: 0.84, sourceSize: 20, sourceBaseline: 550} as const;
+const F0 = {size: 72, baselines: [342, 432], captionBaseline: 545, captionScale: 0.84} as const;
+/** Frame0Text.source defaults (kept apart from F0: scripts/qa/gate_check.py parses the F0 line). */
+const F0_SOURCE = {size: 20, baseline: 550} as const;
 
 /** The frame-0 box at timeline second T: the last key at or before T (keys mode), else the static `highlight` on the
  *  last line. `looping` (the loop roll to the seam) shows the pre-key state, as at frame 0. */
@@ -565,7 +567,7 @@ const Frame0Words: React.FC<{f0: Frame0Text; tone: CaptionTone; T?: number; loop
         </text>
       ))}
       {f0.source ? (
-        <text x={cx} y={f0.sourceBaseline ?? F0.sourceBaseline} textAnchor="middle" fontFamily={captionFontStack} fontSize={f0.sourceSize ?? F0.sourceSize} fill={col.text}>
+        <text x={cx} y={f0.sourceBaseline ?? F0_SOURCE.baseline} textAnchor="middle" fontFamily={captionFontStack} fontSize={f0.sourceSize ?? F0_SOURCE.size} fill={col.text}>
           {f0.source}
         </text>
       ) : null}

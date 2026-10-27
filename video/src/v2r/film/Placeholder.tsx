@@ -9,7 +9,7 @@ import {Ink} from '../../lib/Ink';
 import {Look, useExit} from '../../lib/exit';
 import {useTime} from '../../lib/time';
 import {circle, line, rect} from '../../lib/sketch';
-import {captionFontStack} from '../../lib/font';
+import {captionFontStack, useCaptionFont} from '../../lib/font';
 import {CM, INK_PX, LIGHT, SHOT_LIGHT} from '../palette';
 
 export type PlaceholderProps = {
@@ -59,10 +59,11 @@ const SWATCHES: [string, string][] = [
 export const Placeholder: React.FC<PlaceholderProps> = ({id, title, words, picture, lane, sun, dur, bare}) => {
   const t = useTime();
   const exit = useExit();
+  const fontOk = useCaptionFont(); // the caption font, also when no captions are drawn (Film2RBare)
   const light = LIGHT[SHOT_LIGHT[id] ?? 'golden'];
   const bands = light.bands;
   const bandH = 70 / bands.length;
-  const textOn = exit < 0.25; // the lettering pops away early in an un-build (no fade)
+  const textOn = fontOk && exit < 0.25; // the lettering pops away early in an un-build (no fade)
   const T = (s: string, x: number, y: number, size: number, anchor: 'start' | 'middle' = 'start', fill = CM.ink) => (
     <text x={x} y={y} fontFamily={captionFontStack} fontSize={size} fill={fill} textAnchor={anchor}>
       {s}

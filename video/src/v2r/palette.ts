@@ -136,6 +136,20 @@ export const SHOT_LIGHT: Record<string, LightState> = {
   V2S8: 'sunset',
 };
 
+/** World sky bands for a light state, top -> horizon: the mint caption field, then the state's flat bands
+ *  (`late`: S8 / S7 late sunset, dusk mint above the sunset band). Pass World `horizon` >= 760: lib/World starts the
+ *  2nd band at y = horizon - max(160, horizon - 600), so it lands on y 600 exactly only when horizon - 600 >= 160 (a
+ *  lower horizon pulls a band up into the caption block y 317-556). A 3rd band starts 110 px above the horizon. */
+export function skyBands(state: LightState, late = false): string[] {
+  const L = LIGHT[state];
+  return [L.sky, ...(late && L.bandsLate ? L.bandsLate : L.bands)];
+}
+
+/** A World sky key for a light state (structurally lib/World's SkyKey; this module imports only theme.ts). */
+export function skyKey(state: LightState, t = 0, o: {late?: boolean; wipe?: 'down' | 'up' | 'left' | 'right' | 'snap'; dur?: number} = {}) {
+  return {t, color: skyBands(state, o.late), tod: TOD[state], wipe: o.wipe, dur: o.dur};
+}
+
 /** Caption tones: ink on the mint in every shot, the peach box under the key word. */
 export const CAPTION_TONE = 'dark' as const;
 export const CAPTION_COLORS = {text: CM.ink, highlight: CM.box, highlightText: CM.ink} as const;
