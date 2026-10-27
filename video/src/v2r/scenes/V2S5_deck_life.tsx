@@ -185,6 +185,40 @@ const person = (X: number, d: number, hm: number) => {
   return {x, y, h: hm * pxmD(d), k: pxmD(d)};
 };
 
+/** Where everyone is (X m, d m, height m; walkers: X0 at t 0 and v m/s). One table for the drawing and the QA. */
+export const CAST5 = {
+  railA: {X: 9.55, d: RAIL.d - 0.62, hm: 1.64},
+  railB: {X: 10.22, d: RAIL.d - 0.67, hm: 1.8},
+  railP: {X: 12.75, d: RAIL.d - 0.72, hm: 1.78, kid: 0.42},
+  benchA: {X: 6.55, d: 16.62, hm: 1.3},
+  benchB: {X: 7.45, d: 16.62, hm: 1.26},
+  jogger: {X0: 14.16, v: -2.75, d: 15.85, hm: 1.74},
+  dogWalker: {X0: 12.2, v: -1.3, d: 14.4, hm: 1.7},
+  stroller: {X0: -5.5, v: 1.15, d: 13.35, hm: 1.68},
+  guide: {X: 5.35, d: 13.05, hm: 1.62},
+  friendA: {X: 10.47, d: 15.0, hm: 1.72},
+  friendB: {X: 11.04, d: 15.1, hm: 1.66},
+  nearReader: {X: -0.85, d: 10.9, hm: 1.27},
+  kidFountain: {X: 3.42, d: 11.62, hm: 1.12},
+};
+
+/** Screen boxes (END coords) of the cast at scene time t: {key, x0, y0, x1, y1, h} (for the QA: sizes on screen over
+ *  the move, nobody over the pair / the plaque / the Pentagon's left two thirds). */
+export function castBoxes(t: number): {key: string; x0: number; y0: number; x1: number; y1: number; h: number}[] {
+  const out: {key: string; x0: number; y0: number; x1: number; y1: number; h: number}[] = [];
+  for (const [key, c] of Object.entries(CAST5)) {
+    const cc = c as {X?: number; X0?: number; v?: number; d: number; hm: number; kid?: number};
+    const X = cc.X ?? (cc.X0 ?? 0) + (cc.v ?? 0) * t;
+    const [x, y] = dpt(X, cc.d);
+    const k = pxmD(cc.d);
+    const h = (cc.hm + (cc.kid ?? 0)) * k;
+    const w = key === 'stroller' ? 1.35 * k : key === 'dogWalker' ? 1.4 * k : 0.5 * k;
+    const xc = key === 'stroller' ? x + 0.45 * k : key === 'dogWalker' ? x - 0.45 * k : x;
+    out.push({key, x0: xc - w / 2, y0: y - h, x1: xc + w / 2, y1: y, h});
+  }
+  return out;
+}
+
 /** The terrace's people and animals as depth-sortable items at scene time t. */
 export function lifeItems(t: number): LifeItem[] {
   const out: LifeItem[] = [];
@@ -192,12 +226,11 @@ export function lifeItems(t: number): LifeItem[] {
 
   // --- at the rail (right of the plaque): a couple looking out; a parent with a kid on the shoulders
   {
-    const dR = RAIL.d - 0.62;
-    const a = person(9.55, dR, 1.64);
-    const b = person(10.22, dR - 0.05, 1.8);
+    const a = person(CAST5.railA.X, CAST5.railA.d, CAST5.railA.hm);
+    const b = person(CAST5.railB.X, CAST5.railB.d, CAST5.railB.hm);
  add(a.y, 'railA', <g key="railA"><Shade x={a.x} y={a.y} k={a.k} /><Person x={a.x} y={a.y} h={a.h} seed="s5t/railA" traits={{hair: 'bun', hairColor: H[4], coat: COATS.slate, acc: 'tote', accColor: CM.coatOat} as TraitOverrides} /></g>);
     add(b.y, 'railB', <g key="railB"><Shade x={b.x} y={b.y} k={b.k} /><Person x={b.x} y={b.y} h={b.h} seed="s5t/railB" view="rear34" turn={-0.35 + 0.15 * Math.sin(t * 0.9)} traits={{hair: 'short', hairColor: H[1], coat: COATS.oat, acc: 'backpack', accColor: CM.brickDeep} as TraitOverrides} /></g>);
-    const p = person(12.75, dR - 0.1, 1.78);
+    const p = person(CAST5.railP.X, CAST5.railP.d, CAST5.railP.hm);
     const kidSeatY = p.y - p.h * 0.83;
     add(p.y, 'railP', (
       <g key="railP">
@@ -212,10 +245,10 @@ export function lifeItems(t: number): LifeItem[] {
 
   // --- the bench couple (second bench, right; bench X 6.0..8.0 at d 16.5): a cup lifts, a head turns
   {
-    const dB = 16.5 + 0.12;
-    const a = person(6.55, dB, 0);
-    const b = person(7.45, dB, 0);
-    const seatA = dpt(6.55, dB, 0.45)[1];
+    const dB = CAST5.benchA.d;
+    const a = person(CAST5.benchA.X, dB, 0);
+    const b = person(CAST5.benchB.X, dB, 0);
+    const seatA = dpt(CAST5.benchA.X, dB, 0.45)[1];
     const k = pxmD(dB);
     const cup = Math.max(0, Math.min(1, (Math.sin((t - 0.4) * 1.6) - 0.2) * 1.6));
     add(a.y - 0.01, 'benchA', <Seated key="benchA" x={a.x} y={seatA} h={0.84 * k} seed="s5t/benchA" cup={cup} side={-1} traits={{hair: 'long', hairColor: H[1], coat: COATS.mustard, acc: 'scarf', accColor: CM.coatPlum} as TraitOverrides} />);
@@ -224,18 +257,19 @@ export function lifeItems(t: number): LifeItem[] {
 
   // --- the jogger crossing right -> left (enters late: off the start window and the frame until the crane opens up)
   {
-    const d = 15.85;
-    const X = Xt(14.16, -2.75, t);
-    const j = person(X, d, 1.74);
+    const C = CAST5.jogger;
+    const d = C.d;
+    const X = Xt(C.X0, C.v, t);
+    const j = person(X, d, C.hm);
     add(j.y, 'jogger', <g key="jogger"><Shade x={j.x} y={j.y} k={j.k} w={0.4} /><Person x={j.x} y={j.y} h={j.h} seed="s5t/jog" pose="jog" view="profile" walk={{rate: 2.7}} stride={Math.min(0.8, strideFor((2.75 / 2.7) * j.k, j.h))} traits={{hair: 'crop', hairColor: H[2], coat: COATS.rust, acc: 'headphones', accColor: CM.anchor} as TraitOverrides} /></g>);
   }
 
   // --- someone walking a dog (right -> left), the dog trotting ahead on a lead
   {
-    const d = 14.4;
-    const v = -1.3;
-    const X = Xt(12.2, v, t);
-    const w = person(X, d, 1.7);
+    const C = CAST5.dogWalker;
+    const d = C.d;
+    const X = Xt(C.X0, C.v, t);
+    const w = person(X, d, C.hm);
     const dog = dpt(X - 0.95, d - 0.05);
     const hand: Pt = [w.x - w.h * 0.16, w.y - w.h * 0.45];
     add(w.y, 'dogWalker', (
@@ -250,10 +284,10 @@ export function lifeItems(t: number): LifeItem[] {
 
   // --- a parent pushing a stroller (left -> right), off the frame until the crane has opened up
   {
-    const d = 13.35;
-    const v = 1.15;
-    const X = Xt(-5.5, v, t);
-    const pp = person(X, d, 1.68);
+    const C = CAST5.stroller;
+    const d = C.d;
+    const X = Xt(C.X0, C.v, t);
+    const pp = person(X, d, C.hm);
     const st = dpt(X + 0.42, d);
     add(pp.y, 'stroller', (
       <g key="stroller">
@@ -266,7 +300,7 @@ export function lifeItems(t: number): LifeItem[] {
 
   // --- an older reader with a guidebook (standing, rear 3/4), beside the lectern
   {
-    const g = person(5.35, 13.05, 1.62);
+    const g = person(CAST5.guide.X, CAST5.guide.d, CAST5.guide.hm);
     add(g.y, 'guide', (
       <g key="guide">
         <Shade x={g.x} y={g.y} k={g.k} />
@@ -278,24 +312,23 @@ export function lifeItems(t: number): LifeItem[] {
 
   // --- two friends chatting at the right edge (one cut by it)
   {
-    const d = 15.0;
-    const a = person(10.47, d, 1.72);
-    const b = person(11.04, d + 0.1, 1.66);
+    const a = person(CAST5.friendA.X, CAST5.friendA.d, CAST5.friendA.hm);
+    const b = person(CAST5.friendB.X, CAST5.friendB.d, CAST5.friendB.hm);
     add(a.y, 'friendA', <g key="friendA"><Shade x={a.x} y={a.y} k={a.k} /><Person x={a.x} y={a.y} h={a.h} seed="s5t/frA" view="rear34" flip turn={0.4} traits={{hair: 'hood', coat: COATS.sage, acc: 'none'} as TraitOverrides} /></g>);
     add(b.y, 'friendB', <g key="friendB"><Shade x={b.x} y={b.y} k={b.k} /><Person x={b.x} y={b.y} h={b.h} seed="s5t/frB" view="profile" traits={{hair: 'curls', hairColor: H[1], coat: COATS.mustard, acc: 'tote', accColor: CM.paper} as TraitOverrides} /></g>);
   }
 
   // --- a reader on the near bench (bench X -1.5..1.5 at d 10.8), a takeaway cup on the slats beside them
   {
-    const dB = 10.8 + 0.1;
-    const r = person(-0.85, dB, 0);
-    const seat = dpt(-0.85, dB, 0.45)[1];
+    const dB = CAST5.nearReader.d;
+    const r = person(CAST5.nearReader.X, dB, 0);
+    const seat = dpt(CAST5.nearReader.X, dB, 0.45)[1];
     add(r.y - 0.01, 'nearReader', <Seated key="nearReader" x={r.x} y={seat} h={0.82 * r.k} seed="s5t/nearR" notebook={1} side={1} turn={0.1} traits={{hair: 'curls', hairColor: H[2], coat: COATS.oat, acc: 'none'} as TraitOverrides} />);
   }
 
   // --- a kid at the drinking fountain (fountain X 3.0, d 11.6): reaching up to the spout
   {
-    const kd = person(3.42, 11.62, 1.12);
+    const kd = person(CAST5.kidFountain.X, CAST5.kidFountain.d, CAST5.kidFountain.hm);
     add(kd.y, 'kidFountain', <g key="kidFountain"><Shade x={kd.x} y={kd.y} k={kd.k} w={0.26} /><Person x={kd.x} y={kd.y} h={kd.h} seed="s5t/kidF" view="profile" pose="reach" reach={[-kd.h * 0.36, -kd.h * (0.78 + 0.03 * Math.sin(t * 3))]} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: H[4], coat: COATS.mustard, acc: 'backpack', accColor: CM.brick} as TraitOverrides} /></g>);
   }
 
