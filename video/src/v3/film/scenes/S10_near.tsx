@@ -93,11 +93,11 @@ const Ruts: React.FC = () => {
 /** Meltwater puddles on the near road, each holding a lamp's warm reflection (flat steps that shimmer) and a drip ring
  *  now and then (small life on the near field). World (X, z) on the road. */
 const PUDDLES: {X: number; z: number; r: number; ph: number}[] = [
-  {X: -10, z: 13, r: 1.5, ph: 0},
-  {X: -7.6, z: 11.5, r: 1.2, ph: 1.3},
-  {X: -8.4, z: 16.5, r: 1.3, ph: 2.1},
-  {X: -9.6, z: 21, r: 1.1, ph: 0.7},
-  {X: -12.8, z: 18.5, r: 1.2, ph: 1.7},
+  {X: -10, z: 13, r: 2.0, ph: 0},
+  {X: -7.9, z: 11.2, r: 1.6, ph: 1.3},
+  {X: -8.6, z: 16.5, r: 1.7, ph: 2.1},
+  {X: -9.6, z: 21, r: 1.5, ph: 0.7},
+  {X: -12.8, z: 18.5, r: 1.5, ph: 1.7},
 ];
 const Puddles: React.FC = () => {
   const t = useTime();
@@ -108,13 +108,22 @@ const Puddles: React.FC = () => {
     const rx = p.r * k;
     const ry = rx * 0.26;
     const d = blob(x, y, rx, ry, {seed: `q/pud${i}`});
-    out.push(<path key={`p${i}`} d={d} fill={mixHex(EMBER.road, EMBER.dc, 0.22)} />);
-    out.push(<path key={`s${i}`} d={blob(x - rx * 0.12, y - ry * 0.12, rx * 0.74, ry * 0.56, {seed: `q/pus${i}`})} fill={mixHex(EMBER.skyLow, EMBER.road, 0.35)} />);
-    // the lamp's reflection: a thin warm column broken by the ripples, wobbling
-    const xc = x + rx * 0.2 + Math.sin(t * 3.1 + p.ph) * rx * 0.025;
-    const cw = Math.max(3, rx * 0.09) * (1 + 0.18 * Math.sin(t * 5 + p.ph));
-    out.push(<path key={`r${i}`} d={`M${xc - cw / 2} ${y - ry * 0.75}h${cw}l${-cw * 0.2} ${ry * 0.62}h${-cw * 0.6}Z M${xc - cw * 0.35} ${y - ry * 0.02}h${cw * 0.7}l${-cw * 0.15} ${ry * 0.42}h${-cw * 0.4}Z`} fill={EMBER.ring} />);
-    out.push(<path key={`h${i}`} d={`M${xc - cw * 0.9} ${y - ry * 0.08}h${cw * 1.8}`} stroke={EMBER.core} strokeWidth={Math.max(1.6, ry * 0.08)} strokeLinecap="round" />);
+    out.push(<path key={`p${i}`} d={d} fill={mixHex(EMBER.road, EMBER.dc, 0.4)} />);
+    out.push(<path key={`s${i}`} d={blob(x - rx * 0.1, y - ry * 0.1, rx * 0.78, ry * 0.6, {seed: `q/pus${i}`})} fill={mixHex(EMBER.sky, EMBER.road, 0.25)} />);
+    // the lamp's reflection: a warm column broken by the ripples into three tapering pieces, wobbling
+    const xc = x + rx * 0.22 + Math.sin(t * 3.1 + p.ph) * rx * 0.025;
+    const cw = Math.max(5, rx * 0.16) * (1 + 0.15 * Math.sin(t * 5 + p.ph));
+    let col = '';
+    [
+      [-0.8, -0.38, 1],
+      [-0.28, 0.06, 0.72],
+      [0.16, 0.44, 0.45],
+    ].forEach(([y0, y1, w]) => {
+      const ww = cw * w;
+      col += `M${(xc - ww / 2).toFixed(1)} ${(y + ry * y0).toFixed(1)}h${ww.toFixed(1)}l${(-ww * 0.12).toFixed(1)} ${(ry * (y1 - y0)).toFixed(1)}h${(-ww * 0.76).toFixed(1)}Z`;
+    });
+    out.push(<path key={`r${i}`} d={col} fill={EMBER.ring} />);
+    out.push(<ellipse key={`h${i}`} cx={xc} cy={y - ry * 0.62} rx={cw * 0.28} ry={ry * 0.12} fill={EMBER.core} />);
     // a drip ring every ~1.4 s
     const cyc = (t + p.ph) % 1.4;
     if (cyc < 0.6) {
