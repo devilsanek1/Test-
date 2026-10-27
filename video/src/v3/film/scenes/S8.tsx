@@ -27,7 +27,7 @@ import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER, Laptop, laptopGeo, MemoryStick, quadPt, ring, STICK_RATIO, type Pt} from '../kit';
 import {s7s8Float, S7_DUR} from './S7';
-import {BezelNote, KeyLegends, KeySprings, S8_LAND, S8DeskFront, S8Pip, S8WallTop} from './S8_edges';
+import {BezelNote, BezelSticker, KeyLegends, KeySprings, S8_LAND, S8DeskFront, S8Pip, S8WallTop} from './S8_edges';
 
 /** The rise (board move: from the cut, 0.4 s). */
 const RISE_AT = 0;
@@ -72,6 +72,7 @@ const S8: React.FC = () => {
         <S8DeskFront />
         <Laptop x={LAP.x} y={LAP.y} w={LAP.w} lidH={LAP.lidH} variant="old" screen={EMBER.dcSide} ink={4.8} seed="s8/lap" />
         <BezelNote x={22} y={598} />
+        <BezelSticker x={1004} y={1004} />
         <KeyLegends deck={g.deck} lid={g.lid} />
         <KeySprings deck={g.deck} />
         <defs>

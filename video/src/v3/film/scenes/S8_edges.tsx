@@ -18,7 +18,7 @@ import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {Cable, DeskGrain, EMBER, FramedPrint, Glasses, Leaf, Pip3, quadPt, ring, StringLights3, sway, Txt, WallMarks, W, type LookKey, type PipPoseKey, type Pt} from '../kit';
 import {PhotoLine} from './O1_life';
-import {Clementines, PhoneDown, SpiralNotebook} from './S7_desk';
+import {Clementines, Pen, PhoneDown, SpiralNotebook} from './S7_desk';
 
 type Quad = [Pt, Pt, Pt, Pt];
 
@@ -49,7 +49,7 @@ const Vines: React.FC = () => {
   return (
     <>
       {vine(968, 238, 0.4, 0)}
-      {vine(1046, 300, 1.7, 1)}
+      {vine(1046, 262, 1.7, 1)}
     </>
   );
 };
@@ -59,7 +59,7 @@ export const S8WallTop: React.FC = () => (
     <WallMarks x={60} y={30} w={500} h={160} n={4} seed="s8/wm1" />
     <WallMarks x={330} y={206} w={560} h={60} n={4} seed="s8/wm2" />
     {/* S7's sea print, at close size, between the bulbs */}
-    <FramedPrint x={640} y={128} w={136} h={146} picture="sea" seed="s8/print" ink={W.far} />
+    <FramedPrint x={486} y={126} w={136} h={146} picture="sea" seed="s8/print" ink={W.far} />
     {/* S7's instant photos on their cord, at close size (top left, bottoms ~214) */}
     <XG m={mat.scale(2)}>
       <PhotoLine x0={-30} y0={30} x1={150} y1={24} sag={10} />
@@ -89,6 +89,24 @@ export const BezelNote: React.FC<{x: number; y: number; size?: number}> = ({x, y
       {/* a little heart doodle */}
       <Ink d={`M${x + s * 0.74} ${y + s * 0.76}c-6 -10 -20 -4 -12 6l12 10l12 -10c8 -10 -6 -16 -12 -6z`} width={W.hair * 1.2} />
     </XG>
+  );
+};
+
+/** A round sticker on the lid's bottom bezel, right of the stick (the old laptop's: a snowflake on dusk blue). */
+export const BezelSticker: React.FC<{x: number; y: number; r?: number}> = ({x, y, r = 30}) => {
+  let flake = '';
+  for (let i = 0; i < 3; i++) {
+    const a = (i * Math.PI) / 3 + 0.2;
+    const dx = Math.cos(a) * r * 0.62;
+    const dy = Math.sin(a) * r * 0.62;
+    flake += `M${(x - dx).toFixed(1)} ${(y - dy).toFixed(1)}L${(x + dx).toFixed(1)} ${(y + dy).toFixed(1)}`;
+  }
+  return (
+    <>
+      <Fill d={circle(x, y, r)} color={EMBER.skyLow} seed="s8/stk" />
+      <path d={flake} stroke={EMBER.snow} strokeWidth={3.4} strokeLinecap="round" fill="none" />
+      <Ink d={circle(x, y, r, {seed: 's8/stkI'})} width={W.far} />
+    </>
   );
 };
 
@@ -210,6 +228,7 @@ export const S8DeskFront: React.FC = () => (
     {/* the spiral notebook and its pen, cut by the left edge (S7's notebook at close size) */}
     <SpiralNotebook quad={[[-330, 1508], [150, 1494], [190, 1900], [-300, 1930]]} rings={8} ringR={1.7} pen={[[-40, 1780], [236, 1590]]} penW={26} ink={W.front} seed="s8/nb" />
     <Biscuit x={378} y={1660} seed="s8/biscuit" />
+    <Pen from={[452, 1748]} to={[700, 1700]} wPx={22} color={EMBER.dc} seed="s8/pen2" />
     <Clementines x={236} y={1548} k={1.9} seed="s8/clem" />
     <Glasses x={598} y={1612} w={230} rot={9} seed="s8/glasses" ink={W.mid} />
     {[[488, 1560, 4], [520, 1590, 3], [460, 1600, 3.4], [640, 1700, 4]].map(([cx, cy, cr], i) => (
