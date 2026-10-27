@@ -59,3 +59,32 @@ the busy / calm strips, a labelled 216 px sheet beside ref 1 / v1, the 0-6.5 s c
 - Four builders run in local git worktrees (branches `l1-row`, `l1-set`, `l1-steps`, `l1-pip`, scratch only) with a part
   critic loop each; their files are merged into video-production when they pass, then the brief's critic loop and the
   six-viewer cold read. If this session dies: the pushed stubs render; restart the builders from the fix lists above.
+
+## 2026-10-27 15:10 UTC, third helper: CONTROLLED PAUSE (owner's 5-hour limit), state for the resume after 18:30
+**On video-production (pushed, typecheck clean, renders):** `V2S1.tsx` (assembly), `V2S1_clock.ts` (the contract),
+`V2S1_row.tsx` + `V2S1_row_fig.tsx` (+ dev entry `V2S1_row_entry.tsx`): her + the ghost row FINISHED (one figure for her and
+every ghost: belted long coat, collar, low bun, sleeves without hands, a ~27 px scissor on both freeze phases, slim, 15-20 px
+gaps; ghost legs in the head value clamped at G3; outlines knocked out); `V2S1_set.tsx` + `_set_core/_far/_life/_wing.tsx`:
+the world FINISHED (f0 line drawing of roofs / bridge / water flooding away region by region, door leaves that slide and
+stay visible, W dark with bars + lamp + chair + plant ring, recast far life on KEEP_CLEAR: jogger 1 runs WEST 0-0.9 instead
+of passing her at 1.60, jogger 2 passes her ~3.85 (one constant `S1_JOG1` in `_set_life` if the 1.60 pass is wanted), the
+bridge cyclist 0.25 at 150 px/s, birds over SUN0, the bend, every stroke ink). `stylecheck_L1.md` answered.
+**Still stubs on video-production:** `V2S1_steps.tsx` (+ `V2S1_public.tsx`) and `V2S1_pip.tsx` (no Pip at t < 0 already).
+**Work in progress, backed up on the remote:** `l1-wip-steps` (517744b: our bank redrawn: stone, hands-free stacked crowd,
+props, life; the builder was mid-way, STYLE v2 merged in) and `l1-wip-pip` (73f62b7, the first builder's 8b21e45: bollard
+at every t + Pip from t 0; the ears-cover readability not yet done). Also `l1-wip-row`, `l1-wip-set` (= what is merged).
+**Stopped agents:** workflow run `wf_3fa1231e-0f1` (script `<scratchpad>/tools/builders_v3.js`, a pipeline of 4 time-boxed
+continuation builders, 2 at a time): build:row and build:set DONE (cached); build:steps (agent a177a176, continuing the
+stacked crowd) and build:pip (agent a29aadf5, had just started) STOPPED. Same session: resume with
+`Workflow({scriptPath: <scratchpad>/tools/builders_v3.js, resumeFromRunId: "wf_3fa1231e-0f1", args: {parts: [row, set,
+steps, pip], until: {row: "15:20", set: "15:35", steps: <new>, pip: <new>}}})` (row / set keep their until so they stay
+cached). New container: `git worktree add` from `origin/l1-wip-steps` / `l1-wip-pip`, link node_modules per package.
+**Next, in order:** (1) finish steps + pip (2 agents); (2) merge them (`git checkout l1-steps -- <V2S1_steps*, V2S1_public>`,
+`l1-pip -- <V2S1_pip*>`), typecheck, render; (3) STYLE v2 deltas the builders did not have: birds, lamp posts, railings and
+the bollard NOT plum (kit defaults), flyers ceil 600, one or two thin cloud bars at 5-15 px/s in y < 290, the near-row low
+bun takes a light hair, no dark-bun extra within 300 px; the bare outlines O1-O3 sit on the brick bridge (read as brick
+figures at 216 px: a lighter backing behind x 40-160, y 930-1060); (4) review files (`<scratchpad>/tools/review.py <video>
+<out> --clip --qa`: density --only V2S1, deadframes, camspeed, colour_meter, band check on Film2RBare); (5) at most 2 critic
+-> fix rounds (`<scratchpad>/tools/critics.js`: the brief's prompt + standards / motion / completeness, 2 agents at a time);
+(6) the six-viewer cold read once (`<scratchpad>/tools/coldread.js`, args {dir: <review>/coldread}); (7) report_L1.md.
+Budget (orchestrator 14:34): <= 2 agents at a time, <= 2 critic rounds, shot-only 0.5-scale renders, one cold read.
