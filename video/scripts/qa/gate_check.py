@@ -33,7 +33,8 @@ Checks (FAIL = exit 1; WARN never fails):
              culls it), cut-like frames on its zoom legs (c - hold/2 - (dur - hold) * 0.45 ..
              c + hold/2 + (dur - hold) * 0.55, +-1 frame) are expected (not listed as extra); a window colour-matched
              to the bridge moves the visible out-cut one frame later (a WARN); the generic peak rule needs short legs
-             (v2r's 0.3 s passes; a 1.1 s default dive can FAIL a correct render: check it by eye);
+             (v2r's 0.3 s passes), so a long dive's cut (v3's 1.1 s J3) is also found as a SPIKE on its zoom legs:
+             within 1 frame, d >= --cut-min and >= 1.5x both neighbours' d;
              push-through without a bridge = one cut at c; foreground-wipe = NO hard cut (the element covers the
              change; its window c +- dur / 2 may hold cut-like frames, a cut within 1 frame of c is a WARN).
   seams      (opt-in by data) a matchcut with `"seam": true` (docs/G5_BLOCKING.md §2b, lib/sequence.tsx) joins two
@@ -374,9 +375,10 @@ def film_const(name: str, default: float) -> float:
 
 
 def transition_model(scenes: list[dict], fps: float) -> tuple[list, list, list, list]:
-    """From each scene's transitionIn: the expected hard cuts [(label, frame)], the windows [(label, f0, f1)] whose
-    cut-like frames belong to a transition (not listed as extra), the frames that must NOT cut [(label, frame)], and the
-    seams [(label, frame)] (a matchcut with "seam": true: no cut, the two builders' frames equal)."""
+    """From each scene's transitionIn: the expected hard cuts [(label, frame, on zoom legs)], the windows
+    [(label, f0, f1)] whose cut-like frames belong to a transition (not listed as extra), the frames that must NOT cut
+    [(label, frame)], and the seams [(label, frame)] (a matchcut with "seam": true: no cut, the two builders' frames
+    equal). A cut on zoom legs (a push-through's) may also be found as a spike over its neighbours (main)."""
     fr = lambda t: math.ceil(t * fps - 1e-6)  # noqa: E731
     expect, windows, no_cut, seams = [], [], [], []
     hold = film_const("PT_HOLD", PT_HOLD)
@@ -392,15 +394,15 @@ def transition_model(scenes: list[dict], fps: float) -> tuple[list, list, list, 
             # Film.tsx pushThrough: the zoom-in leg (d - hold) * 0.45 before the bridge, the pull-back 0.55 after it
             h = hold if tr.get("bridge") else 0.0
             if h:
-                expect += [(f"{sid} (into the push-through bridge)", fr(c - h / 2)), (f"{sid} (out of the push-through bridge)", fr(c + h / 2))]
+                expect += [(f"{sid} (into the push-through bridge)", fr(c - h / 2), True), (f"{sid} (out of the push-through bridge)", fr(c + h / 2), True)]
             else:
-                expect.append((sid, fr(c)))
+                expect.append((sid, fr(c), True))
             windows.append((sid, fr(c - h / 2 - (d - h) * 0.45) - 1, fr(c + h / 2 + (d - h) * 0.55) + 1))
         elif typ == "foreground-wipe":
             no_cut.append((f"{sid} (foreground wipe)", fr(c)))
             windows.append((sid, fr(c - d / 2) - 1, fr(c + d / 2) + 1))
         else:
-            expect.append((sid, fr(c)))
+            expect.append((sid, fr(c), False))
     return expect, windows, no_cut, seams
 
 
@@ -593,8 +595,17 @@ def main() -> int:
     expect, windows, no_cut, seams = transition_model([] if a.only else scenes[1:], fps)
     miss = []
     used = set()
-    for sid, f in expect:
+    spikes = []
+    for sid, f, legs in expect:
         hit = [c for c in cuts if abs(c - f) <= 1]
+        if not hit and legs:
+            # a long push-through: its zoom legs raise the neighbourhood median past the peak rule, but the scene
+            # change is still a spike over the frames on either side of it
+            sp = [n for n in (f - 1, f, f + 1) if 1 <= n < len(d) - 1 and d[n] >= a.cut_min and d[n] >= 1.5 * max(d[n - 1], d[n + 1])]
+            if sp:
+                n = max(sp, key=lambda k: d[k])
+                hit = [n]
+                spikes.append(f"{sid} frame {n} (d={d[n]:.1f}, x{d[n] / max(d[n - 1], d[n + 1], 1e-6):.1f} its neighbours)")
         if hit:
             used.add(hit[0])
             if hit[0] != f:
@@ -619,6 +630,7 @@ def main() -> int:
     in_tr = [c for c in cuts if c not in used and any(lo <= c <= hi for _, lo, hi in windows)]
     extra = [c for c in cuts if c not in used and c not in in_tr]
     trs = f"; {len(no_cut)} foreground wipe(s) without a cut" if no_cut else ""
+    trs += f"; push-through cut(s) found as a spike on the zoom legs: {', '.join(spikes)}" if spikes else ""
     trs += f"; {len(in_tr)} cut-like frame(s) inside transition windows (expected)" if in_tr else ""
     if miss:
         report("FAIL", "cuts", f"{len(miss)} scene start(s) without a cut within 1 frame: " + "; ".join(miss))

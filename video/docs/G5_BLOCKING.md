@@ -248,7 +248,7 @@ python3 -I scripts/qa/gate_check.py --mp4 <render.mp4> --scenes src/v3/film/scen
 It checks: fps 60 (the MP4 and the composition), duration = the voice (+-1 frame), an audio stream in sync, the cuts
 each scene's `transitionIn.type` should produce, within 1 frame (caption band and label strip masked): `cut`,
 `matchcut` and `camera-continuous` one hard cut at the start; `push-through` one (two with a `bridge`: into and out of
-it); `foreground-wipe` none (the element covers the change; a hard cut there is a WARN); a seam (`matchcut` +
+it; a long dive's cut also counts as a spike over its zoom legs, x1.5 both neighbours); `foreground-wipe` none (the element covers the change; a hard cut there is a WARN); a seam (`matchcut` +
 `seam: true`, §2b) none (a cut there is a FAIL), and with `--seam-comp` the seam probe compares its two builders'
 frames (over 1 % of the pixels differing by > 4 L* is a FAIL; without it, a WARN); an `unbuild` transitionIn is not
 modelled yet (expected as a cut); a join that stays inside one scene (carrier C) has no scene start at all. And every
