@@ -11,6 +11,7 @@ import {CM} from '../../palette';
 import {useTime} from '../../../lib/time';
 import {Batch, Paint, atm, atmShade, mix, crownD, ellD, lineD, polyD, ribbonD, rng, rand, frac, along, burstScale, blossomD, type Pt} from './core';
 import {MID, PENT, pentagon, shadowOffset} from './lens';
+import {BloomCrowns, type CrownSpec} from './bloom';
 
 // ---------------------------------------------------------------- MID ground tones (22 %)
 
@@ -21,10 +22,11 @@ export const MT = {
   road: atm(CM.paving, 2),
   roadEdge: atmShade(CM.stoneShade, 2),
   path: atm(mix(CM.paving, CM.paper, 0.4), 2),
-  tree: atmShade(mix(CM.sage, CM.shadeWarm, 0.18), 2),
+  tree: atm(mix(CM.sage, CM.anchor, 0.16), 2),
   treeLit: atm(mix(CM.sage, CM.leafGold, 0.12), 2),
-  treeDeep: atmShade(mix(CM.sage, CM.shadeCool, 0.3), 2),
+  treeDeep: atm(mix(CM.sage, CM.anchor, 0.32), 2),
   blossom: atm(CM.blossom, 2),
+  blossomShade: atmShade(mix(CM.blossom, CM.shadeWarm, 0.35), 2),
   white: atm(CM.paper, 2),
   shadow: atmShade(mix(CM.sage, CM.shadeWarm, 0.5), 2),
   roof: atm(CM.brick, 2),
@@ -35,7 +37,7 @@ export const MT = {
 };
 
 /** Local ground extent of the mid plane (metres): x across, y from the near edge to the far tree line. */
-export const MID_EXTENT = {x0: -2200, x1: 2200, y0: -720, y1: 330};
+export const MID_EXTENT = {x0: -2200, x1: 2200, y0: -720, y1: 245};
 
 /** Washington Boulevard (Route 27) along the Pentagon's west side, and its ramp toward the front (local metres). */
 export const WASH_BLVD: Pt[] = [
@@ -169,6 +171,19 @@ export const MidGround: React.FC<{seed?: string}> = ({seed = 'midg'}) => {
         tree(T, x, y, r.range(4, 7.5), pickCol(), `${seed}/g${g}/${k}`);
       }
     }
+    // the lawns in front of the long facade and left of it: dense groves (cherries, oaks, dogwoods) round the paths
+    for (let k = 0; k < 120; k++) {
+      const x = r.range(-470, 260);
+      const y = r.range(-345, -235);
+      if (!ok(x, y)) continue;
+      tree(T, x, y, r.range(3.4, 6.2), pickCol(), `${seed}/fg${k}`);
+    }
+    for (let k = 0; k < 80; k++) {
+      const x = r.range(-520, -300);
+      const y = r.range(-240, 230);
+      if (!ok(x, y)) continue;
+      tree(T, x, y, r.range(3.4, 6), pickCol(), `${seed}/lg${k}`);
+    }
     // the boulevard's street trees, both sides
     for (let u = 0.02; u < 0.98; u += 0.035) {
       const {p, dir} = along(WASH_BLVD, u);
@@ -180,9 +195,13 @@ export const MidGround: React.FC<{seed?: string}> = ({seed = 'midg'}) => {
       }
     }
     // the far tree line (Columbia Island's edge) that meets the river plane
-    for (let x = E.x0; x < E.x1; x += r.range(14, 26)) tree(T, x, E.y1 - r.range(0, 30), r.range(6, 10), pickCol(), `${seed}/fl${Math.round(x)}`);
+    for (let x = E.x0; x < E.x1; x += r.range(9, 16)) tree(T, x, E.y1 - r.range(0, 24), r.range(3.2, 5.5), pickCol(), `${seed}/fl${Math.round(x)}`);
     // the valley front: a band of crowns over the neighbourhood (near edge, mostly behind the balustrade)
     for (let x = -900; x < 1100; x += r.range(16, 30)) tree(T, x, r.range(-700, -560), r.range(6, 9), pickCol(), `${seed}/vf${Math.round(x)}`);
+    // the slope's foot just beyond the balustrade: a dense dark band of crowns that the rail's pale stone reads against
+    // (the drop: we look down onto treetops), a few in blossom
+    const darkCols = [MT.treeDeep, MT.tree, MT.treeDeep, MT.blossomShade];
+    for (let x = -1000; x < 1400; x += r.range(8, 15)) tree(T, x, r.range(-395, -300), r.range(4.2, 7.5), r.pick(darkCols), `${seed}/sf${Math.round(x)}`);
     B.fill(MT.shadow, T.shadow.join(''));
     B.layer();
     T.crowns.forEach((parts, col) => B.fill(col, parts.join('')));
@@ -239,6 +258,7 @@ export const NT = {
   crown: CM.shadeWarm,
   crownLit: mix(CM.brickDeep, CM.shadeWarm, 0.35),
   crownSage: mix(CM.sage, CM.shadeWarm, 0.55),
+  crownRim: mix(CM.brickLight, CM.blossom, 0.35),
   branch: CM.anchor,
   bud: mix(CM.leafRust, CM.shadeWarm, 0.3),
   blossom: CM.blossom,
@@ -253,6 +273,8 @@ export const NEAR_MID = {
   slotBottom: 880,
   /** The big tree that stands where the Pentagon will land (right), and the left mass. */
   bigTree: {cx: 830, cy: 790, rx: 320, ry: 205, trunkX: 760},
+  /** The light at the start: the sun in the slot (SUN1). Crowns are lit on the side facing it. */
+  light: [250, 650] as [number, number],
   leftMass: {x0: -80, x1: 172, top: 598},
 };
 
@@ -286,13 +308,22 @@ export type NearMidProps = {
   seed?: string;
 };
 
-/** The near-mid slope in START coords: crowns, branches, buds -> blossom (the 4-frame burst), the big tree's trunk. */
+/** The near-mid slope in START coords: the slope's crowns (dark masses, limbs, then blossom that bursts in 4 frames on
+ *  "April"), lit on the side facing the sun in the slot; the big tree's trunk. */
 export const NearMid: React.FC<NearMidProps> = ({burstAt, seed = 'nm'}) => {
-  const t = useTime();
   const crowns = useMemo(() => nearCrowns(seed), [seed]);
-  const stat = useMemo(() => {
+  const specs = useMemo<CrownSpec[]>(
+    () =>
+      crowns.map((c) => {
+        const dx = NEAR_MID.light[0] - c.cx;
+        const dy = NEAR_MID.light[1] - c.cy;
+        const dl = Math.hypot(dx, dy) || 1;
+        return {cx: c.cx, cy: c.cy, rx: c.rx, ry: c.ry, seed: c.seed, light: [dx / dl, dy / dl] as Pt, bloom: 0.55 + c.blossom * 0.5};
+      }),
+    [crowns],
+  );
+  const trunk = useMemo(() => {
     const B = new Batch();
-    // the big tree's trunk and main limbs (behind the crowns' lower lobes, above the balustrade)
     const bt = NEAR_MID.bigTree;
     B.poly(NT.branch, [
       [bt.trunkX - 34, 1060],
@@ -305,56 +336,12 @@ export const NearMid: React.FC<NearMidProps> = ({burstAt, seed = 'nm'}) => {
       [bt.trunkX + 18, 935],
       [bt.trunkX + 26, 1060],
     ]);
-    B.layer();
-    for (const c of crowns) B.fill(c.col, crownD(c.cx, c.cy, c.rx, c.ry, c.seed, Math.max(6, Math.round(c.rx / 22)), 0.3));
-    // a few dark branch strokes through the crowns (the canopy's structure)
-    B.layer();
-    const r = rng(`${seed}/br`);
-    for (const c of crowns) {
-      if (c.rx < 60) continue;
-      for (let k = 0; k < 3; k++) {
-        const a = r.range(-2.6, -0.5);
-        const x0 = c.cx + r.range(-0.3, 0.3) * c.rx;
-        const y0 = c.cy + c.ry * 0.5;
-        B.ink(lineD([[x0, y0], [x0 + Math.cos(a) * c.rx * 0.5, y0 + Math.sin(a) * c.ry * 0.7]]), 3.4, NT.branch);
-      }
-    }
     return B;
-  }, [crowns, seed]);
-  // blossom clusters (and buds before the burst), per crown, deterministic
-  const clusters = useMemo(() => {
-    const out: {x: number; y: number; r: number; shade: boolean; i: number}[] = [];
-    let i = 0;
-    for (const c of crowns) {
-      const g = rng(`${c.seed}/bl`);
-      const n = Math.round(((c.rx * c.ry) / 340) * c.blossom);
-      for (let k = 0; k < n; k++, i++) {
-        const a = g.range(0, Math.PI * 2);
-        const d = Math.sqrt(g.next()) * 0.86;
-        out.push({x: c.cx + Math.cos(a) * c.rx * d, y: c.cy + Math.sin(a) * c.ry * d * 0.9, r: g.range(5, 11) * (c.rx > 100 ? 1.25 : 1), shade: g.chance(0.45) || Math.cos(a) > 0.3, i});
-      }
-    }
-    return out;
-  }, [crowns]);
-  let bl = '';
-  let bs = '';
-  let bud = '';
-  for (const c of clusters) {
-    const s = burstScale(t, burstAt, c.i);
-    if (s <= 0) {
-      bud += ellD(c.x, c.y, 2.2, 1.8);
-      continue;
-    }
-    const d = blossomD(c.x, c.y, c.r * s, `nmc${c.i}`, 4);
-    if (c.shade) bs += d;
-    else bl += d;
-  }
+  }, []);
   return (
     <>
-      <Paint b={stat} seed={seed} misreg={4} />
-      {bud ? <path d={bud} fill={NT.bud} /> : null}
-      {bs ? <path d={bs} fill={NT.blossomShade} /> : null}
-      {bl ? <path d={bl} fill={NT.blossom} /> : null}
+      <Paint b={trunk} seed={`${seed}/trunk`} misreg={3} />
+      <BloomCrowns crowns={specs} burstAt={burstAt} seed={`${seed}/bl`} />
     </>
   );
 };

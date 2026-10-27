@@ -34,7 +34,7 @@ export const PT = {
   courtBlossom: atm(CM.blossom, 2),
   pavilion: atm(CM.paper, 2),
   pavilionRoof: atm(CM.brick, 2),
-  shadow: atmShade(mix(CM.sage, CM.shadeWarm, 0.5), 2),
+  shadow: atm(mix(CM.sage, CM.anchor, 0.2), 2),
   ink: inkCol(2),
 };
 
@@ -173,18 +173,6 @@ export const Pentagon: React.FC<PentagonProps> = ({warmAt, warmDur = 0.7, seed =
     // ---- 4. the roof: the outer pentagon at the roofline minus the courtyard (evenodd), lit
     b.layer();
     b.fill(PT.roofLit, annulus(PENT.apothem, PENT.courtApothem, H));
-    // two tones per ring per side: each band's half that slopes away from the sun is a step darker
-    for (let i = 0; i < 5; i++) {
-      const {n} = sideFrame(i);
-      const sunward = wallLight(n) > 0; // the outward slope of this side faces the sun
-      for (const [aO, aI] of PENT.rings) {
-        const mid = (aO + aI) / 2;
-        const [x0, x1] = sunward ? [mid, aI] : [aO, mid];
-        const hsO = halfSide(x0);
-        const hsI = halfSide(x1);
-        b.poly(PT.roofShade, [P3(sidePt(i, x0, -hsO), H), P3(sidePt(i, x0, hsO), H), P3(sidePt(i, x1, hsI), H), P3(sidePt(i, x1, -hsI), H)]);
-      }
-    }
     // ---- 5. the four light wells (deep, narrow, in shade) ...
     b.layer();
     for (let k = 0; k < PENT.rings.length - 1; k++) {
