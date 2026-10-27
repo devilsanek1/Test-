@@ -42,8 +42,9 @@ type StaffLook = {
 
 /** No two neighbours alike (W2-SW2, W2-SW4, SW2-SW3, SW3-SW4, SW4-SW5 touch). */
 export const STAFF_LOOK: Record<string, StaffLook> = {
-  W2: {hair: 'short', acc: 'lanyard', side: -1, broad: 1.95, idle: 'turn', period: 0.74, phase: 0.12, hand: 1},
-  SW2: {hair: 'crop', acc: 'headphones', side: 1, broad: 2.05, idle: 'shift', period: 0.86, phase: 0.47, hand: -1},
+  // keyed by map S2.staffWindows ids since the conform: SW1 (200, 795) at her old spot, W2 (465, 776) beside hers
+  SW1: {hair: 'short', acc: 'mug', side: -1, broad: 1.95, idle: 'turn', period: 0.74, phase: 0.12, hand: 1},
+  W2: {hair: 'crop', acc: 'headphones', side: 1, broad: 2.05, idle: 'shift', period: 0.86, phase: 0.47, hand: -1},
   SW3: {hair: 'short', acc: 'mug', side: -1, broad: 1.9, idle: 'turn', period: 0.66, phase: 0.29, hand: -1},
   SW4: {hair: 'crop', acc: 'headphones', side: 1, broad: 1.95, idle: 'shift', period: 0.8, phase: 0.05, hand: 1},
   SW5: {hair: 'tuft', acc: 'lanyard', side: 1, broad: 2.0, idle: 'turn', period: 0.62, phase: 0.38, hand: -1},
