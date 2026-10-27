@@ -1,21 +1,20 @@
 # Video 2 ("One Small Window"): STYLE, the look every lane builds to
 
 The definitive style direction of the finished film, from every style source, checked against the owner's reference images and frames of reference 1 and v1,
-then integrated with an independent coverage audit (2026-10-27). Read it FIRST, in full; then TREATMENT.md for your shots; then answer `lanes/STYLE_CHECK.md`.
-It adds no rule of its own: each rule cites its source ([measured] = measured for this page); where it is silent, the cited source decides. Precedence: the
-owner's words [PB, N2] > [TR] > [K2] / [K1] > the look docs > v1 specs; "A over B" marks a settled conflict, and a source still showing B is stale. Tags (in
-`video/docs/` unless a path is given): PB `OWNER_PLAYBOOK` · N2 `v2/OWNER_NOTES` · CB `CREATIVE_BRIEF` · TR `v2/TREATMENT` · HD / TD / BM `v2/direction/`
-house_digest, teardown, beat_map · CG / CS / LD / PAL `look/` CINEMATIC_GUIDE, COZY_AND_SCALE, LIFE_AND_DENSITY, PALETTE · ED `EDGES` · SB `style_bible` · MS
-`motion_spec` · K1 `src/v2r/palette.ts` · K2 `src/v2r/world/map.ts` · BUILD `v2/BUILD` · cast / pip / canal / dc = `src/v2r/kit/*/README.md` · CMN / L1 / L4S =
-`v2/lanes/` COMMON, handover_L1 (critic round 0), L4_spec.
+then integrated with a coverage audit (2026-10-27). Read it FIRST, in full; then TREATMENT.md for your shots; then answer `lanes/STYLE_CHECK.md`. It adds no
+rule of its own: each rule cites its source ([measured] = measured for this page); where it is silent, the cited source decides. Precedence: the owner's words
+[PB, N2] > [TR] > [K2] / [K1] > the look docs > v1 specs; "A over B" marks a settled conflict, and a source still showing B is stale. Tags (`video/docs/`
+unless a path is given): PB `OWNER_PLAYBOOK` · N2 `v2/OWNER_NOTES` · CB `CREATIVE_BRIEF` · TR `v2/TREATMENT` · HD / TD / BM `v2/direction/` house_digest,
+teardown, beat_map · CG / CS / LD / PAL `look/` CINEMATIC_GUIDE, COZY_AND_SCALE, LIFE_AND_DENSITY, PALETTE · ED `EDGES` · SB `style_bible` · MS `motion_spec` ·
+K1 `src/v2r/palette.ts` · K2 `src/v2r/world/map.ts` · BUILD `v2/BUILD` · cast / pip / canal / dc = `src/v2r/kit/*/README.md` · CMN / L1 / L4S = `v2/lanes/`
+COMMON, handover_L1 (critic round 0), L4_spec.
 
 ## 1. The look in one paragraph, and the 10 non-negotiables
 One London canal on one golden October evening, plus one trip through the sun to an April morning in Arlington [TR §2]: a full-bleed 9:16 world seen level
 across water or down a towpath, drawn like reference 1 and v1 in a loose, tapered, warm-brown architectural line over flat, misregistered fills in many light
-peach-cream, brick, sage and water tones under one flat mint sky holding the captions [TR §2, §5; HD §3]. Brick terraces, a canal wing of brick, stone and
-glass, narrowboats, lamps, gasholders; small simple people from behind; a new periwinkle elephant in a mustard scarf [TR §2-3]. One small woman in a long teal
-coat is the only teal, one working sun the only orange [TR §2; TD §2]. Everything moves a little, always, every cut carries motion, one pull-back crane makes
-the world vast [TD §2; CG S5]. Calm, legible, warm, serious, never menacing or sickly [TR §2, §6; PB].
+peach-cream, brick, sage and water tones under one flat mint sky holding the captions; brick terraces, a canal wing, narrowboats, lamps, gasholders; small
+simple people from behind; a new periwinkle elephant in a mustard scarf; one small woman in a long teal coat is the only teal, one working sun the only orange;
+everything moves a little, always; one pull-back crane makes the world vast. Calm, legible, warm, serious, never menacing or sickly [TR §2-6; HD §3; TD §2].
 1. **New:** every set, figure, Pip, prop, life element and the music is made NEW for this film; engine primitives and QA tools only [PB; CMN; TR §9].
 2. **One palette, fixed jobs:** "10 Canal Mint"; teal = HER only, orange = the sun only, plum = the ~5 % anchor; only the light changes [TR §2].
 3. **One quiet field:** the flat mint sky y 0-600 holds the captions; nothing is ever drawn in y 317-556; the bottom third is never quiet [TR §5; K2].
@@ -43,23 +42,23 @@ the world vast [TD §2; CG S5]. Calm, legible, warm, serious, never menacing or 
 | ghosts | paper `#FBF6EE`, ink 2.2 px; heads G1 `#3E2A3A` → G2 `#7D7387` → G3 `#A9A5B5` → G4 `#CFCCD6` → G5-G6 `#ECEAF0` | S1's row (+ 3 bare ink outlines) and S8's three | any other figure |
 | Pip | body `#9497D8` · shade `#7579C0` · inner ear, cheeks, soles `#F2C3CC` · scarf `#D4A960` | Pip only (body ΔE76 39-59 from every ground) | its hue on anything else |
 - **Family DNA, warm never sickly [PAL; HD §3; LD §2; PB]:** page L* >= 75, C* <= 20, 50-80 % as many fills · ink L* <= 25 at >= 7:1 (11.3:1 on the mint) ·
-  ONE hero (C* >= 30) · ONE tinted anchor (L* <= 40, ~5 %) instead of black · AT MOST one pop (C* >= 50, 1-3 %); jobs hold all film; dressing never takes the
-  hero or the pop; Google and the Pentagon stay quiet stone and brick, no hero colour, glow or rim [TR §2, §8 V3]. No beige, muddy tan, olive or grey (page
-  C* >= 4.5; the rejected cut's beige frame 0 [TD §3]); greens sage, never olive-khaki; warmth = peach creams, brick, red-brown wood, golden lamp pools.
+  ONE hero (C* >= 30) · ONE tinted anchor (L* <= 40, ~5 %) · AT MOST one pop (C* >= 50, 1-3 %); jobs hold all film; dressing never takes the hero or the pop;
+  Google and the Pentagon stay quiet stone and brick, no hero colour, glow or rim [TR §8 V3]; no beige, muddy tan, olive or grey (page C* >= 4.5; the
+  rejected cut's beige frame 0 [TD §3]); greens sage, never olive-khaki; warmth = peach creams, brick, red-brown wood, golden lamp pools.
 - **Her teal is the one saturated subject [PB over TR §2, §9]:** people this small make her coat ~0.3 % of a frame (coat + door + frame ~1-1.5 % in S8), so
   `problems()`'s "hero 5-15 % on her shots" reads low on every her shot. Expected: never "fix" it with a bigger her or teal on anything else.
 - **Loud tokens stay confetti [CS 3b.6; K1, measured]:** dressing aims at C* <= min(40, hero 33 - 10) ≈ 23; the locked tokens at or above the hero's 33 (mustard
   `#D4A960` 44: coats, Pip's scarf · leaves `#D6A563` 42, `#B8714F` 39 · lamp `#F7CF86` 42 · line `#9A563C` 37 · hair `#9A5A3E` 36 · brick `#C9806A` 35,
   `#A5604F` 34) go in patches < 1 % each, brick as broken facades and hints, never a field; confetti spans many hue families (C3: 52 patches in 11-12).
-- **CM only [K1; HD §3; TD DON'T 10]:** every fill is a `CM` token or a flat mix of two (the dc kit's `mix` / `atm` steps toward the sky); never CG's cloud or
-  Autumn Ember swatches (`#FAF1EA` `#ECD8CB` `#CFC5C4`, `#3A1F16`...), never Cream & Cobalt or Dusk (PB's "Cream & Cobalt for a serious story" was the dropped
-  cut's G4 pick: taste, not a lock). `colour_meter.py` still defaults to Cobalt: always pass `--hero '#0B8577' --pop '#EE6A2E'`.
+- **CM only [K1; HD §3; TD DON'T 10]:** every fill is a `CM` token or a flat mix of two (the dc kit's `mix` / `atm` steps); never CG's cloud or Autumn Ember
+  swatches (`#FAF1EA` `#ECD8CB` `#CFC5C4` `#3A1F16`...), never Cream & Cobalt or Dusk (PB's "Cream & Cobalt for a serious story" was the dropped cut's G4
+  pick: taste, not a lock); `colour_meter.py` still defaults to Cobalt: always pass `--hero '#0B8577' --pop '#EE6A2E'`.
 - **Shadows are colour [CS 3b.6; K1]:** one sun, one light direction, lit : shade ~3:1; flat polygons (or a 2-step band with a 15-25 px lighter penumbra),
   dL* -25 to -40, chroma x0.6-0.7, hue to plum on warm walls and 10-15° to blue on cool ones (`shadeWarm`, `shadeCool`), <= 3-4 % W long; whites tinted
   (C* 7-15), darks warm and rare (L* < 25 on <= 6 %); >= 10 % of the opposite temperature (water, panes, the dusk band) in every frame.
-- **Light = story time [K1 `LIGHT`; TR §2]:** one mint sky in every state; only the bands below y 600, lamps and season change, never a fill (per shot: §6's
-  table; S7 = S8 [V3]). Light comes from each shot's own sun (west = screen left on every north lens; S6's morning sun east = left) over SB §4's "from the
-  right"; S2 shows no disc (its sun is off-screen west): the film's one shot without one [TR §5 over TD §2.2].
+- **Light = story time [K1 `LIGHT`; TR §2]:** one mint sky in every state; only the bands below y 600, lamps and season change, never a fill (per shot: §6;
+  S7 = S8 [V3]). Light comes from each shot's own sun (west = screen left on every north lens; S6's morning sun east = left) over SB §4's "from the right";
+  S2 shows no disc (its sun is off-screen west): the film's one shot without one [TR §5 over TD §2.2].
 
 ## 3. Line, fill and texture
 - **Ink** `#2B1B0A` only, never black or coloured [SB §3]: by depth front 4.8 / mid 3.4 / far 2.2 / hair 1.6 px (`INK_PX`); figures >= 240 px tall 4.8,
@@ -67,15 +66,14 @@ the world vast [TD §2; CG S5]. Calm, legible, warm, serious, never menacing or 
 - **Loose architectural line [SB §3-4, §7, §11; TR §2]:** round caps, tapered ends; corners overshoot 3-15 px, structural lines run on; lines over 400 px in
   2-4 segments (6-16 px gaps), 0.3-1° off-axis; 20-40 % of each contour open (an edge side, a window's right or bottom, torso bottoms); cornices doubled 14-17
   px apart; brick = 4-8 hints per wall (L / T marks 18-30 px), never hatching; windows inked on 2-4 sides, panes 40-70 % filled; a glass glint = two hairline
-  diagonals at 60-70°, upper left. Lines only where they carry form: never round every silhouette, never on shadows, sky, ground, water or far planes;
-  wires, mullions, rails and bikes ink-only [PAL; HD §3].
+  diagonals at 60-70°. Lines only where they carry form: never round every silhouette, never on shadows, sky, ground, water or far planes [PAL; HD §3].
 - **Fills [SB §4]:** flat, misregistered 2-5 px from their line, one offset per object, mixed directions (Pip 3 right / 2 down); shade = a flat polygon one
   step darker, no outline. Nothing soft, nothing fades: no gradient, glow, bloom, blur, haze, god rays, vignette or opacity; every change is a pop, scale,
   wipe, slide or draw-on [TR §2; MS §0]. The ink-only state (frame 0, the loop) and the fills-only state must each read alone [SB §3; TR §4].
 - **Big fields are never bare, and still flat [CS 3b.7; TR §5]:** their "paint" is a few long tone-on-tone marks: water ripple dashes 15-55 px long, 6-8 px
-  thick (~10-15 per 100 x 100 px), stone dabs 25-80 px one value step darker, lane marks, leaves. That is drawing, not texture.
-- **The ghosts are the ONE closed outline, on purpose:** outline = not yet real, as in reference 1 (its empty expected grid at 0.0 s, its outline crowds of
-  bigger marches at 6.0-7.5 s) [TR §2; TD §1b]. **Texture OFF**; linework static per seed (no boil, shimmer or sway) [TR §2; CS 3b.7].
+  thick (~10-15 per 100 x 100 px), stone dabs 25-80 px one value step darker, lane marks, leaves: drawing, not texture.
+- **The ghosts are the ONE closed outline, on purpose** (outline = not yet real, as in reference 1's empty expected grid at 0.0 s and its outline crowds at
+  6.0-7.5 s) [TR §2; TD §1b]. **Texture OFF**; linework static per seed (no boil, shimmer or sway) [TR §2; CS 3b.7].
 - **Paper edges OFF** (Film2R `edges: false`). If asked for at the final: `paint-subtle`, no paper in y 0-620 [K2] or by the band, sides from y >= 640 [CS
   3b.7], keep rects round her, Pip, ghosts, boards, signs [TR §2]; the stock preset puts 14-25 px of paper at the TOP [ED §0]: fix that first [PB].
 
@@ -84,29 +82,28 @@ the world vast [TD §2; CG S5]. Calm, legible, warm, serious, never menacing or 
   hood, beanie, cap, scarf, backpack, tote, headphones, phone); two leg bars; few lines; never a face, features, hands or anatomy.
 - **Near backs [PB; N2; TR §5; measured]:** reference 1's front row: heads ~40 px, shoulders 70-80 px (4.0 s); its biggest backs (after a 1.9x push, 28.5 s)
   heads ~50 px, shoulders 110-120 px (SB §6: 48-56 / 100-110). So in EVERY shot a near head-back (head + shoulders cut by the frame bottom) is <= ~140 px
-  WIDE at the shoulders, head ~55-65 px; K4 `NearBack` is 0.84 x hv x broad (0.93-1.1) wide, so hv <= ~150. It caps the figure, never just its head. Over:
-  TR §5's S2 260-320, S3 260-300, S6 240-300, S7 200-260; K2 `S1_SHEET.seatedHeadPx.near` 250-330, `S6.nearHeads` 240-300, `BOTTOM_THIRD`; the cast and
-  canal defaults (`NearBack` / `S1Seated` notes, `S1_STEPS` busts 262-316 and its ~300 px middle row, `S2Set` hv 280 / 304); v1's 240-330 px backs. S1's
-  steps: the near row at the cap, the middle row seated ~110 px, the low row ~60 px [TR §5].
-- **Full figures [PB; TR §3; LD §4; cast]:** standing public 110-260 px in the mid band, never above ~260 (K4 `Person` allows 400: don't), far 15-60 fill
-  only, window people 12-60; seated up to ~190 (S2's staffer); the café owner and S8's two readers are small backs about her size (~150 px); no passer-by
-  framing a shot (LD §4's 500-1000 px). Floor [K2]: a story change >= 80 px, its carrier >= 130 px, staffer >= 180 seated, staff windows >= 90 x 90.
-- **The public [TR §3; LD §4; cast]:** 10-40 per shot (walkers, joggers, cyclists, boaters, readers, neighbours in windows), half at rest, no two neighbours
-  alike in hair and coat, NEVER teal or orange. **No look-alike** [LD §4; L1 must 3]: her signature (plum head, low bun, long coat, teal) is hers alone; no
-  extra pairs the darkest hair `#3E2A3A` (= G1's head, ΔE 6.5 from her plum) with a low bun or a long dark coat, none with a dark bun within ~300 px of her
-  or the row; S1's near-row "low bun with a mustard scarf" [TR §5] takes a light hair (`#B9B6C4` / `#D9B98A`).
+  WIDE at the shoulders, head ~55-65 px; K4 `NearBack` is 0.84 x hv x broad (0.93-1.1) wide, so hv <= ~150. It caps the figure, never just its head, over:
+  TR §5's S2 260-320, S3 260-300, S6 240-300, S7 200-260; K2 `S1_SHEET.seatedHeadPx.near` 250-330, `S6.nearHeads` 240-300, `BOTTOM_THIRD`; the cast and canal
+  defaults (`NearBack` / `S1Seated` notes, `S1_STEPS` busts 262-316 and ~300 px middle row, `S2Set` hv 280 / 304); v1's 240-330 px backs. S1's steps: the
+  near row at the cap, the middle row seated ~110 px, the low row ~60 px [TR §5].
+- **Full figures [PB; TR §3; LD §4; cast]:** standing public 110-260 px in the mid band, never above ~260 (K4 `Person` allows 400: don't), far 15-60 fill only,
+  window people 12-60; seated up to ~190 (S2's staffer); the café owner and S8's two readers are small backs about her size (~150 px); no passer-by framing
+  a shot (LD §4's 500-1000 px). Floor [K2]: a story change >= 80 px, its carrier >= 130 px, the staffer >= 180 seated, staff windows >= 90 x 90.
+- **The public and staff [TR §3, §8; LD §4; cast]:** 10-40 per shot (walkers, joggers, cyclists, boaters, readers, neighbours in windows), half at rest, no
+  two neighbours alike in hair and coat, NEVER teal or orange; Google's staff few, unnamed, faceless, never a row or count (V11); the reporter (no BBC marks),
+  S5's stranger (blank paper), the café owner: small backs. **No look-alike** [LD §4; L1 must 3]: her signature (plum head, low bun, long coat, teal) is
+  hers alone; no extra pairs the darkest hair `#3E2A3A` (= G1's head, ΔE 6.5 from her plum) with a low bun or a long dark coat, none with a dark bun within
+  ~300 px of her or the row; S1's near-row "low bun with a mustard scarf" [TR §5] takes a light hair (`#B9B6C4` / `#D9B98A`).
 - **Walkers [CS 3b.4; TR §4; MS §3]:** real speeds, equal in body heights at every depth: walk 0.7-1.1 bh/s, bike 1-3; S1 alone keeps TR's ~40 px/s stroll
-  (the row is built on it); S4: one stride shared by her and the truck, feet planted (`strideFor`); walks at 12 drawings/s; extras enter at an edge already
+  (the row is built on it); S4: one stride for her and the truck, feet planted (`strideFor`); walks at 12 drawings/s; extras enter at an edge already
   walking; a figure that APPEARS rises 0.2-0.33 s from behind a mass, never pops mid-frame.
 - **Her [TR §3; cast]:** invented, never a likeness (V4); a 150-170 px full figure (100 px/m), never under 130 px while carrying a story change; a dark-plum
   round head with a low bun, a long teal coat, a cream tote (S1: a desk plant); back, rear 3/4 or walking profile; one model sheet at every size; never in
   Washington (V13). S3's window IS S8's picture: one French window (teal frame, Juliet rail, blind UP, lamp on), house and sunset light; L3 and L6 compare.
 - **The ghosts [TR §3; cast; L1]:** six whole outline copies of HER (coat cut, collar, hem, bun), paper fill, closed 2.2 px ink; age only by whole-head value
   G1-G6, a scarf and softer back from G4, a shorter stride G5-G6; nothing frail; lockstep with a visible stride, each separate, 170 -> 135 px down the bend,
-  then three bare outlines 130 -> 120 px on "life"; the row goes on, the world passes through it unaware, nothing counts years, never a death read. S8: three
-  (G4-G6 cues), 140 -> 130 px, staying to the seam, un-built last with her window.
-- **Staff and others [TR §3, §8]:** five window silhouettes, a bench staffer (slate coat, auburn hair, lanyard, hood up), backs at S7's doors who never react:
-  few, unnamed, faceless, no row or count (V11); the reporter (no BBC marks), S5's stranger (blank paper), S8's café owner: small backs.
+  then three bare outlines 130 -> 120 px on "life"; the row goes on, the world passes through it unaware, nothing counts years, never a death read. S8:
+  three (G4-G6 cues), 140 -> 130 px, staying to the seam, un-built last with her window.
 - **Pip, drawn NEW [TR §3; pip; K2 `PIP`; HD §6]:** a pebble-round elephant, no neck; two big leaf ears that fold and flick; a one-curl trunk; a three-hair
   tuft; teddy-bear soles; a short knitted mustard scarf in the wind; ONE loose stroke per pose, 2-3 gaps; 86-120 px (>= 44 in S5's end); idle always (blink,
   ears, a fold-and-flick every 4-8 s, breath). It watches, turns its head BEFORE the voice names the next thing, reacts ONCE: S1 ears-cover on "life" · S2
@@ -128,26 +125,25 @@ the world vast [TD §2; CG S5]. Calm, legible, warm, serious, never menacing or 
 - **The checks [TR §9; LD §0]:** no hole > ~200 px outside the band and the top sky; no other flat region > 20 %; the y 1250-1920 mass as TR §5 lists it
   (never flat paving or bare water, nothing to read); a wide holds 12+ props, 3-4 planes (S5: 6), people (still ones count), >= 2 things cut by a frame edge,
   8+ specific dressing items; `deadframes` >= 8/10, no dead run > 0.40 s; ~25 events in the hook's first 3 s [TR §4].
-- **What fills a frame [LD §0-3; TD §2.13; TR §6]:** layers (backs cut by the bottom, a subject in the middle band, a living background, edge furniture); many
-  small things stacked by overlap; several colours per patch, varied repeats (4-5 building types, a different hat on each head); thin lines (never in y
-  290-600); lived-in infrastructure; signs of care (her plants, a neighbour watering, herb pots, the café's mugs); the subject keeps the strongest contrast,
-  the hero colour and a calm 30-60 px ring of one value round it [LD §2].
+- **What fills a frame [LD §0-3; TD §2.13]:** layers (backs cut by the bottom, a subject in the middle band, a living background, edge furniture); small things
+  stacked by overlap; several colours per patch, varied repeats (4-5 building types, a different hat on each head); thin lines (never in y 290-600); lived-in
+  infrastructure; signs of care (her plants, a neighbour watering, herb pots, the café's mugs); the subject keeps the strongest contrast, the hero colour
+  and a calm 30-60 px ring of one value round it [LD §2].
 - **Ambient life always on [PB; LD §6]:** BUSY: leaves, smoke or steam, clouds, a window switching every 0.6-1.5 s, walkers, Pip's idle; the world reacts
   within 0.1-0.3 s (birds lift, heads turn); ambient motion small, slow, low-contrast, off the subject's path, never over lettering ("Googlz") or in y
   290-600 [HD §8]. S1's sky: the hero cloud at 2 px/s (huge = slow) plus a thin bar or two at 5-15 px/s the same way, in y < 290 [TR §4; CG cue 10].
 - **The cozy lane, DENSE-CALM [CS 3b.4]:** life passes through ONE band, both ways: 1-5 movers, a new one every ~1-2.5 s, each entering and leaving at an edge
   or behind a mass already at cruising speed (no starts, stops or easing on screen), half the people at rest beside them, and NOTHING comes at the viewer
   (S8's cyclist's lamp crosses, never rides at the lens); bank, backdrop and water have no motion of their own; no sway, shimmer or boil.
-- **Builds and sync [MS §3, §6, §7; BM §2; TR]:** strokes draw on in 0.10-0.20 s, starting ~2 frames (60 fps) apart; fills 0.13-0.27 s after their outline
+- **Builds and sync [MS §3, §6, §7; BM §2]:** strokes draw on in 0.10-0.20 s, starting ~2 frames (60 fps) apart; fills 0.13-0.27 s after their outline
   (boards: fill-first); counting builds 0.10-0.17 s apart. TR's exact times win; elsewhere a small item leads its word ~0.1 s, a big build starts 0.25-0.40 s
   early so it completes ON the word, marks and Pip's beats land on the word (±0.05 s); nothing ever trails its word.
 - **Flash safety [CS §5; WCAG 2.3.1]:** never more than 3 flashes in any 1 s, at any size: a lamp, bulb or window switches on ONCE (drop the canal `Lamp`'s
   3-frame flicker from S7's 30.04 and S8's 37.18 runs); one bulb twinkles at a time; S2's five clicks and S6's 27.08-27.80 ticks are single steps.
 - **Prove it in the review files [LD §9; TR §9]:** `python3 -I scripts/qa/density.py <clip> --scenes src/v2r/film/scenes.json --only V2Sn` (+ `--cozy` on S3,
   S4, S7, S8, judged on their row: the default table and `gate_check --density` read cozy holds as FAR); `colour_meter.py <stills> --hero '#0B8577' --pop
-  '#EE6A2E' --band 290,600`; `deadframes.py <clip> --scenes src/v2r/film/scenes.json`; camspeed (§6); a band check (y 317-556 pure mint in every frame: no
-  committed tool yet); the paused sheet at 216 px beside reference 1, v1 and the G5b pilot; and the shot's ONE thing (TR §5, last column) told back by a
-  cold viewer who read nothing (frames only, 216 px, sound off): a critic who read TR is not cold.
+  '#EE6A2E' --band 290,600`; `deadframes.py <clip> --scenes src/v2r/film/scenes.json`; camspeed (§6); a band check (y 317-556 pure mint in every frame); the
+  paused sheet at 216 px beside reference 1, v1 and the G5b pilot; the shot's ONE thing (TR §5, last column) told back by a cold viewer who read nothing.
 
 ## 6. Cinematography
 | shot | vantage (dose) | profile | camera: ONE move each [TR §5] | in [BUILD §1] | light |
@@ -162,8 +158,8 @@ the world vast [TD §2; CG S5]. Calm, legible, warm, serious, never menacing or 
 | S8 | LANE along her towpath, looking west | DENSE-CALM | float -> ONE plain truck left 34.99-35.60 -> float -> the seam push 1.00 -> 1.05 about W | narrowboat wipe | sunset |
 - **Frame 0 to 5 s, and the loop [TR §4; PB Hook; CG "The opening"; MS §8]:** f0 = S1 in bare warm ink on paper under the frame-0 words, the sun half-coloured
   and Pip already in colour (reference 1's sun and cat), never a title card; f1-f18 colour floods shape by shape from SUN0, her coat LAST (f18, 0.30 s); voice
-  0.12 s; the exit ding 0.45 s; one continuous shot to 5.95, only the 5 % pull-out. The expected thing (her window goes dark 0.40, the doors slide 0.45-0.52,
-  she walks out free into the gold, birds lift 1.40), then reality overtaking it from 2.00: a ghost per clause, the row's one step and the extra outlines on
+  0.12 s; the exit ding 0.45 s; one continuous shot to 5.95, only the 5 % pull-out. The expected thing (her window dark 0.40, the doors slide 0.45-0.52, she
+  walks out free into the gold, birds lift 1.40), then reality overtaking it from 2.00: a ghost per clause, the row's one step and the extra outlines on
   "life" (4.98); the cover is 5.30. S8 ends on her lit window at W (860, 700) on a 1.05 push about W (37.70-38.82, held through the un-build: W = 157.5 x
   178.5 = S1's f0) [K2 MATCHES; brief_L6 over TR §5's float], then un-builds (fills shrink, ink retracts, the sky slab drops, ghosts and window last) onto
   S1's bare state, f0's first motions 3-4 frames before the seam; never a solid frame there.
@@ -177,46 +173,45 @@ the world vast [TD §2; CG S5]. Calm, legible, warm, serious, never menacing or 
   birds). Never menace: daylight, blossom, eye level or below, no flag, seal, guard, vehicle or glow [TR §8 V3].
 - **Great scale [CG Scale cues 1-11; PB]:** nothing ends inside the frame (every band past both side edges, something cut by all 4 edges); 5-7 planes, each
   2.2-3x smaller than the next nearer (S5: 6); the far band packed (rows every 9-10 px, each half hiding the next), detail PEAKING just under the horizon; flat
-  steps 0 / 12 / 22 / 40 / 65 % toward the sky, values 5 / 5 / 4 / 3 / 2, ink full, full, hairline, none, none, far shade leaning dusk-blue (no haze
-  gradient); 3/4 backlight (tops lit, camera-facing walls and the backs in shade, shadows toward us); feet 2-3 F (figure heights) below the horizon, then the
-  drop (past 3.5 F it reads as a map); one huge-yet-far landmark 1.1-1.4 F over the horizon, the darkest far shape against the palest cloud (the obelisk ~4x
-  true size [dc]); a hero cloud bank >= 1 W behind it (tops >= y 610); huge = slow (hero cloud 0-6 px/s, bars 5-15, one way); life on 3 speed tiers, never 1 s
-  still, nothing moving inside the city: birds 24-44 px, 5-6 wingspans/s, flap 3-4 Hz, entering at 70-80 % of the move. S5's contract figures (K2: a 62 px
-  stranger at feet 1238, ~7 F) break the 2-3 F cue: K2 changes only through the director, so until then L4 builds to it with L4S §3's mitigation and checks
-  at 216 px that the end never reads as a map.
+  steps 0 / 12 / 22 / 40 / 65 % toward the sky, values 5 / 5 / 4 / 3 / 2, ink full, full, hairline, none, none, far shade leaning dusk-blue (no haze); 3/4
+  backlight (tops lit, camera-facing walls and the backs in shade, shadows toward us); feet 2-3 F (figure heights) below the horizon, then the drop (past 3.5 F
+  it reads as a map); one huge-yet-far landmark 1.1-1.4 F over the horizon, the darkest far shape against the palest cloud (the obelisk ~4x true size [dc]);
+  a hero cloud bank >= 1 W behind it (tops >= y 610); huge = slow (hero cloud 0-6 px/s, bars 5-15, one way); life on 3 speed tiers, never 1 s still, nothing
+  moving inside the city: birds 24-44 px, 5-6 wingspans/s, flap 3-4 Hz, entering at 70-80 % of the move. S5's contract figures (K2: a 62 px stranger at feet
+  1238, ~7 F) break the 2-3 F cue; K2 changes only through the director, so until then L4 builds to it with L4S §3's mitigation and checks at 216 px that
+  the end never reads as a map.
 - **Cozy enclosure, held not shut [CS §1-3b; TR §6]:** her bank (S3, S4, S8) and the riverside holds (S1, S2, S7): brick, bank, boats and steps on 2-3 sides,
   ONE opening the subject faces (the canal, the lane), the institutions far outside; mass 35-70 % of the frame and >= 40 % of the perimeter; something in the
   top gutter (y 0-290: a branch, crowns, a lamp arm); >= 1 sign of care; busy edges, a calm never-empty centre; one low flat lamp pool (<= 2 rings, lighter
   toward the centre) against the cool canal; rounded inside, hard outside. TR's dose over CS's 8-15 % sky: our sky y 0-600 (31 %) is the caption field and
-  the only void, so enclosure comes from masses below y 600 and the side edges; every other opening is a bounded floor or water, its far end hidden.
-  RIVERSIDE: level, verticals vertical, overlap stacked upward, the VALUE SANDWICH (the darkest mass, L* 20-38, right behind the people's lane so light
-  figures pop; the lane neutral, C* <= 15; bank and water light again) [CS 3b.2]. LANE (S8; the owner's lane photo: H:W 1:1, ~27 % sky): one tall side, one
-  soft low side, a closed end (her house). Google's riverside is cozy because Google is never the threat (V3, A5 over CS §1.5); the comfort breaks once:
-  S5-S6, no cute props near the clause.
+  the only void, so enclosure comes from masses below y 600 and the side edges; other openings are bounded floors or water, far ends hidden. RIVERSIDE:
+  level, verticals vertical, overlap stacked upward, the VALUE SANDWICH (the darkest mass, L* 20-38, right behind the people's lane so light figures pop;
+  the lane neutral, C* <= 15; bank and water light again) [CS 3b.2]. LANE (S8; the owner's lane photo: H:W 1:1, ~27 % sky): one tall side, one soft low side,
+  a closed end (her house). Google's riverside is cozy: Google is never the threat (V3, A5 over CS §1.5); the comfort breaks once, S5-S6, no cute props there.
 - **Camera rules [K2 `CAMSPEED`; CG Rules 3; CS 3b.5; HD §5; TD §2.11]:** `camspeed` <= 7.5 px/f on long flat-ink moves, <= 15 on detailed layers (over
   PIPELINE_V2's 15, CG's 25 and the tool's 18); S5's flat wipe runs ~41 by design. The float law: translation only, 8-15 px/s path speed (peak 25), straight
   legs turning (eased) every 0.6-1.5 s, net within ±12 px of home, >= 40 px overscan, no zoom, rotation or parallax (one 10 px/s heading held for seconds
-  breaks it). NEVER a zoom in a hold (1-4 px/s reads frozen); a zoom is a story move (>= 3 % in <= 2 s, on a line) or the big move. TR's paired float + move
+  breaks it). NEVER a zoom in a hold (1-4 px/s reads frozen); a zoom is a story move (>= 3 % in <= 2 s, on a line) or the big move. TR's float + move pairs
   (S2, S7): the float eases home as the move starts; S8's truck is plain (no float multiplied in); speed continuous between segments; ease in, land over the
-  last third; no roll, compound move or cut mid-move; at or below eye level. Every cut is carried (the table's "in"); transitions sit in voice pauses >= 0.3 s,
-  midpoint on the new line's first word (S6's cut on "any" is the exception); no fades, dissolves or card flips. Measure every 60 fps frame: render them, then
-  `python3 -I scripts/camspeed.py --frames <dir> --fps 60 --limit 15` (7.5 for flat-ink moves; S5's wipe `--allow 1.47-1.64`, seconds from its first frame).
-  CG's S1-S5 are shot TYPES ("S2: locked, push <= 1 %" = the sun-behind-the-roofline type, not V2S2).
-- **Shape, never speed; 60 fps; the clock [PB Motion; CMN; HD §5; BUILD §2]:** copy a reference move's path, framing, reveal order and easing, then retime it
+  last third; no roll, compound move or cut mid-move; at or below eye level. Every cut is carried (the table's "in"), in a voice pause >= 0.3 s with the
+  midpoint on the new line's first word (S6's cut on "any" is the exception); no fades, dissolves or card flips. Measure every 60 fps frame: render them,
+  then `python3 -I scripts/camspeed.py --frames <dir> --fps 60 --limit 15` (7.5 for flat-ink moves; S5's wipe `--allow 1.47-1.64`, seconds from its first
+  frame). CG's S1-S5 are shot TYPES ("S2: locked, push <= 1 %" = the sun-behind-the-roofline type, not V2S2).
+- **Shape, never speed; 60 fps; the clock [PB Motion; CMN; BUILD §2]:** copy a reference move's path, framing, reveal order and easing, then retime it
   (Arcane's 11.5 s -> our 2.1 s); 60 fps, frame = round(t x 60), by time, deterministic; drawn poses step at 12/s while the camera glides. Beats run on the
   HEARD clock (`public/v2r/voice_words_heard.json`: "life" 4.98, "of any kind" 32.08) over HD §1's raw anchors; `useTime()` is shot-local, but K2 times and
   kit defaults (`Staffer`, `Reporter`, `StaffWindows`...) are FILM seconds: wrap them in `TimeShift` or use t = film - start.
 
 ## 7. Captions, text in the world, sound
-- **Captions (engine-owned) [PB; TR §5; BUILD §3; HD §3]:** burned in, Patrick Hand 98 px on baselines 387 / 510, <= 2 lines, centred, ink on the mint; they
-  POP in place (page, line, box), never a roll-in, page scroll or clipped letter (v1's 2.2 s roll failed); a change at least every 1.5 s; ONE peach box
-  `#F6B892` per line, ~0.06-0.1 s before its word, only on TR §5's key words; in screen space, never on a camera layer or shrinking.
+- **Captions (engine-owned) [PB; TR §5; BUILD §3]:** burned in, Patrick Hand 98 px on baselines 387 / 510, <= 2 lines, centred, ink on the mint; they POP in
+  place (page, line, box), never a roll-in, page scroll or clipped letter (v1's 2.2 s roll failed); a change at least every 1.5 s; ONE peach box `#F6B892`
+  per line, ~0.06-0.1 s before its word, only on TR §5's key words; in screen space, never on a camera layer or shrinking.
 - **The band [K2 `UI`, `SKYLINE_EXCEPTIONS`; BUILD §2-3; CG Rules 2]:** the block y 317-556 (x 95-945) sits on ONE flat field, the mint; NOTHING is ever drawn
   in y 317-556 (roof, cloud, bird, wire, puff, Pip's hop, life); the boxes reach y 299, so y 299-317 stays clear wherever a box can sit; y 290-600 is flat sky
-  except the named exceptions (S1's roof planting to y 575, sun tops >= 575, S5's cloud bank and obelisk tops >= 610; above the band, S1's hero cloud y
-  120-280 and plane branch y 0-240), over LD §8's passing weather; flyers and puffs keep to y >= 600 or the top gutter (`ceil={600}`: the canal kit's 580 is
-  too high); built tops start at y 600. Key reads x 120-880, y 290-1250; the right rail x > 780 below y 840 [K2 over LD §8's x > 950]; the bottom third
-  y 1250-1920 holds masses only, nothing to read.
+  but for the named exceptions (S1's roof planting to y 575, sun tops >= 575, S5's cloud bank and obelisk tops >= 610; above it, S1's hero cloud y 120-280
+  and plane branch y 0-240), over LD §8's passing weather; flyers and puffs keep to y >= 600 or the top gutter (`ceil={600}`: the canal kit's 580 is too
+  high); built tops start at y 600. Key reads x 120-880, y 290-1250; the rail x > 780 below y 840 [K2 over LD §8's x > 950]; the bottom third (y 1250+)
+  holds masses only, nothing to read.
 - **The frame-0 block [TR §4; BUILD §3]:** SHE SAYS: NO CRITICIZING / GOOGLE. FOR LIFE. (72 px, baselines 372 / 452, no quote marks) + "Source: BBC News, 21 Oct
   2026" (20 px, 550), to 5.95 s and from 39.04; only "She [quit] Google." (52 px) under it, 0.12-1.88; then the box walks the block's own words (SAYS 2.06 ·
   NO 3.14 · NO CRITICIZING 3.74 · FOR LIFE 4.77): "for life" on screen once, boxed once, always under SHE SAYS (V5).
@@ -228,7 +223,7 @@ the world vast [TD §2; CG S5]. Calm, legible, warm, serious, never menacing or 
   150-630, y 700-1220) and the deal board (S6); a fill-first pen reveal, ONE clack, ONE pen [TR §7].
 - **Quotes exact [TR §8 V6, A7; BM §3]:** quote marks ONLY on exact words: "for fear of retaliation" (F5) · "any lawful government purpose" (F10) · the full
   24-word oversight clause, never cut (F11) · "AI principles" (F13) · "of any kind" (F14) · "human oversight" (F16) · "talking about facts is not criticising"
-  (F18). Paraphrase unquoted (the F12 line); "for life" never quoted; British spelling only inside her quote (criticize, AUTHORIZED elsewhere); "Google"
+  (F18); paraphrase unquoted (the F12 line); "for life" never quoted; British spelling only inside her quote (criticize, AUTHORIZED elsewhere); "Google"
   hand-lettered, never its logo or colours; never "secret", "Department of War", "exclusive" (V17).
 - **Fair boards [TR §8 V9, A5, A8, V14, Q9]:** the deal board (the record) shows the full clause at the cut (24.00) and pops its purpose line ON "any" (24.03),
   both readable to 28.06. The identical pair is S7 GOOGLE SAYS and S8 SHE SAYS (in neither L5's nor L6's brief: it is the rule): the same face at B, sunset
@@ -266,13 +261,13 @@ the world vast [TD §2; CG S5]. Calm, legible, warm, serious, never menacing or 
   `src/v2/**`, `src/v3/film/kit/util.tsx`, a house music bed; tracing any frame.
 - **Emptiness and stillness [PB; LD; TD DON'T 6]:** a big flat empty field; an object alone on a blank wall; a hole > ~200 px; a quiet bottom third; bare
   paving or water; a still frame; a locked shot over ~1 s without inner events; 10+ s on one composition; motion on a void.
-- **Look, camera, text [§2-3, §6-7; TR §2, §5; MS §0; CG; CS 3b.5, §5]:** a palette per scene, a sister palette or a hex outside `CM`; a violet world; loud
-  fields; beige, tan, olive, grey, pure black, grey shadows; teal off her, orange off the sun, plum off its list · gradients, glow, bloom, blur, haze, god
-  rays, vignettes, opacity, fades, dissolves, card flips, texture, boiling lines, an outline round every silhouette, ink on sky, shadow, ground or far
-  planes, top or band-side paper · a zoom in a hold, roll, a compound or source-speed move, a cut mid-move, a second big move, a high angle on one person,
-  night-black frames, red skies, more than 3 flashes in a second, anything coming at the viewer in a cozy hold · anything in y 317-556, a roll-in, page
-  scroll or clipped letter, life over lettering, text below its floor, quote marks on paraphrase, "for life" quoted, stamped or without SHE SAYS (V5), a
-  drawn contract with readable clauses (V6).
+- **Look, camera, text [§2-3, §6-7; MS §0; CG; CS 3b.5, §5]:** a palette per scene, a sister palette or a hex outside `CM`; a violet world; loud fields; beige,
+  tan, olive, grey, pure black, grey shadows; teal off her, orange off the sun, plum off its list · gradients, glow, bloom, blur, haze, god rays, vignettes,
+  opacity, fades, dissolves, card flips, texture, boiling lines, an outline round every silhouette, ink on sky, shadow, ground or far planes, top or
+  band-side paper · a zoom in a hold, roll, a compound or source-speed move, a cut mid-move, a second big move, a high angle on one person, night-black
+  frames, red skies, more than 3 flashes in a second, anything coming at the viewer in a cozy hold · anything in y 317-556, a roll-in, page scroll or
+  clipped letter, life over lettering, text below its floor, quote marks on paraphrase, "for life" quoted, stamped or without SHE SAYS (V5), a drawn
+  contract with readable clauses (V6).
 - **Fairness [BM §4; TR §8]:** war imagery: weapons, drones, missiles, explosions, soldiers, tanks, crosshairs, targets, radar over cities, blood, skulls, war
   footage (V1) · Google lettering, products, vans or signs in the clause frame; racks, carts, screens, deliveries; anything implying targeting (V2) ·
   villains: a sinister HQ, looming figures, ominous stings, EXPOSED / glitch / siren graphics, hero vs villain light, glow or rim on Google or the Pentagon,
@@ -287,5 +282,5 @@ the world vast [TD §2; CG S5]. Calm, legible, warm, serious, never menacing or 
 - **Process:** no sketch stage (the owner's restart) over CLAUDE.md / PIPELINE_V2's G3; COMMON's review loop (<= 12 problems, up to 3 rounds) over TR §9's
   "max 6 findings, fix once, stop" (the MAX-effort rule [PB]). Every other conflict is settled where its rule stands, marked "over".
 - **Gaps:** `src/v2r/kit/boards/README.md` is missing (K3 so far: `WorldText.tsx`, `texts.ts`, a WIP `StatementBoard.tsx`; L5); "10 Canal Mint" is not in
-  `palettes.json` (K1 is the source); `docs/v2/LOOK.md` exists only in archive; the teardown's sheets live only in the orchestrator's scratch (re-extract,
-  §8); C2 / C3 exist in words only; no committed band check.
+  `palettes.json` (K1 is the source); `docs/v2/LOOK.md` exists only in archive; the teardown's sheets are only in the orchestrator's scratch (re-extract, §8);
+  C2 / C3 exist in words only; no committed band check.
