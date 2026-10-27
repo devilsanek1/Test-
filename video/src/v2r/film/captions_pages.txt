@@ -1,0 +1,79 @@
+# Video 2 (restart, "One Small Window") caption paging. One page per paragraph (blank line between pages), one caption
+# line per text line, [brackets] = a highlight box (one phrase per bracket; a phrase never spans two lines, so a quote
+# that wraps gets one box per line). Every word of the voice must appear once, in order. Times come from the HEARD
+# word file (public/v2r/voice_words_heard.json), never from here:
+#   python3 -I scripts/film_captions.py --words public/v2r/voice_words_heard.json --pages src/v2r/film/captions_pages.txt \
+#       --out src/v2r/film/captions.json --spell criticizing=criticising
+# (--spell: the last token is her quote, British spelling "criticising"; the transcript says "criticizing".)
+# TREATMENT section 4-5: pages of 1-2 lines, a change (a page or its 2nd line) every <= 1.5 s; quote marks only on
+# exact words; US spelling outside her quote. The frame-0 block (SHE SAYS: NO CRITICIZING / GOOGLE. FOR LIFE.) is NOT
+# a page: Film2R draws it, and `spoken: 'first'` shows only page 1 under it (pages 2-4 below stay hidden until 5.95,
+# but the paging still holds every word). Page 5 ("You'd think that's") is the first page after the block.
+
+She [quit] Google.
+
+And she says
+her contract
+
+bans her from
+criticizing it…
+
+for life.
+
+You'd think that's
+one [odd] contract.
+
+But Google's [staff]
+told the BBC
+
+they're [scared]
+to speak out,
+
+because of their
+[contracts].
+
+So why is [she]
+talking?
+
+She worked on
+Google's [AI]
+
+and told the BBC
+she [objected]
+
+to where its
+[military] work
+
+was heading.
+
+In [April],
+that meant
+
+a deal letting
+the [Pentagon]
+
+use its AI for
+
+[“any lawful]
+[government purpose”].
+
+Google can't [veto]
+how it's used.
+
+But [Google says]
+it follows
+
+its AI [principles],
+
+and bans
+retaliation
+
+[“of any kind”].
+
+She says she [can't]
+criticize Google.
+
+But in [her words],
+
+“talking about [facts]
+is not criticising”.
