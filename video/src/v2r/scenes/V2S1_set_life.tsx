@@ -24,6 +24,7 @@ import {CellPaint, Under, barPath, planeLeaf, S1_IRON, S1_HAZE} from './V2S1_set
 import {mixHex} from '../../lib/light';
 import {s1ArchOpening} from './V2S1_set_far';
 import {floodAt} from './V2S1_clock';
+import {edgeY} from './V2S1_steps_stone';
 
 const S = MAP.S1_SHEET;
 const frac = (x: number) => x - Math.floor(x);
@@ -151,7 +152,9 @@ const REFL: Refl[] = [
   {x0: 548, x1: 712, color: CM.lamp, depth: 28},
   {x0: 120, x1: 280, color: CM.sun, depth: 0},
 ];
-const WATER = {y0: S.water.y0 - 2, y1: S.water.y1 + 2, x0: -40, x1: 1120} as const;
+// the water runs on under our bank's slanted coping (it reaches y ~1300 at the right edge; the bank covers the rest)
+const WATER = {y0: S.water.y0 - 2, y1: S.water.y1 + 96, x0: -40, x1: 1120} as const;
+const WATER_H0 = S.water.y1 - S.water.y0 + 4;
 const WATER_FAR = mixHex(CM.water, S1_HAZE, 0.3);
 const WATER_NEAR = mixHex(CM.water, CM.waterDeep, 0.3);
 
@@ -165,9 +168,12 @@ export const S1Water: React.FC = () => {
     const b = new Batch();
     for (let x = x0; x < x1; x += 140) {
       b.rect(CM.water, x - 0.5, y0, 141, H);
-      // depth in three flat steps: the far water toward the haze, the near water a step deeper
-      b.rect(WATER_FAR, x - 0.5, y0 + 9, 141, H * 0.3);
-      b.rect(WATER_NEAR, x - 0.5, y1 - H * 0.3, 141, H * 0.3);
+      // depth in three flat steps: the far water toward the haze, the near water a step deeper along our coping (it
+      // runs to the ground's vanishing point, like the coping)
+      b.rect(WATER_FAR, x - 0.5, y0 + 9, 141, WATER_H0 * 0.3);
+      const xa = x - 0.5;
+      const xb = x + 140.5;
+      b.poly(WATER_NEAR, [[xa, edgeY(1184, xa)], [xb, edgeY(1184, xb)], [xb, edgeY(1222, xb)], [xa, edgeY(1222, xa)]]);
       b.rect(CM.waterDeep, x - 0.5, y0, 141, 9);
     }
     return b;

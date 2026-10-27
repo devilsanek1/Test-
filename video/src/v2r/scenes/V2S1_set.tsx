@@ -78,7 +78,7 @@ export const S1World: React.FC<S1WorldProps> = ({behindDoor, towpath, seated, pi
       <S1BoatStrips which="A" />
       <S1BoatStrips which="B" />
       <S1Boats />
-      <Ducks ducks={[{x: 470, y: 1182, size: 26, drake: true}, {x: 522, y: 1194, size: 24}, {x: 250, y: 1166, size: 22}]} seed="s1ducks" />
+      <Ducks ducks={[{x: 470, y: 1182, size: 26, drake: true}, {x: 522, y: 1194, size: 24}, {x: 300, y: 1158, size: 22}]} seed="s1ducks" />
     </Env>
     {seated}
     {/* (S1BankShade retired: the near foreground's big things carry their own form and front shades now) */}

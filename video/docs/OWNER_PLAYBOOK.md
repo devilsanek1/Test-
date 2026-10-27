@@ -77,6 +77,14 @@ Maintenance at the end).
   separate one from the other, no distance effect, no perspective; the bottom part: little to no perspective or depth
   ... research some libraries on GitHub ... add a bit of particles here and there to make things more natural", v2 G4,
   2026-10-27).
+- **ONE CONTINUOUS SKY, a gentle gradient, no abrupt colour seams.** The sky is one sky from the top of the frame to
+  the horizon: ONE gentle, smooth gradient (the sky is the one place a gradient is welcome), warmest around the sun and
+  toward the horizon, dithered so it never bands on a phone, nearly flat inside the caption band so captions keep their
+  contrast; the caption field is part of that sky, never a separate slab of another colour; the sun sits in sky that
+  agrees with it, and the far city takes the sky's lowest colour as its haze. Generally: two big fields of unrelated colour never
+  meet in a hard seam unless an object edge explains it. — ("what bothered me is different color of the space and sun,
+  like why is it blue sky and then suddenly abruptly orange, weird"; "maybe when it comes to sky we can find a beautiful
+  way to do a gentle gradient", v2 G4, 2026-10-27).
 - **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, line weight,
   saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle (smaller, lower contrast,
   thinner or no lines, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in
@@ -274,6 +282,11 @@ Maintenance at the end).
   "-> what we did" log, and the newest owner note wins; the full order, with the topic docs and the tie-breaks, is
   DIRECTION's intro. — ("evaluate this feedback and compact it with the overall
   stylistic direction ... the next agent should not be confused with conflicting instructions", 2026-10-27).
+- **Find the PRO way and the pro tools for every effect.** Before building a sky, depth, light, particles or any visual
+  effect, research how professional illustrators, motion designers and graphics engineers do it and which proven tools
+  exist (colour science such as OKLab interpolation, eased gradients, blue-noise dithering, proven libraries, encoder
+  settings); adopt the best, wrap it as a reusable lib + a QA check, never a hand-rolled approximation. — ("research some
+  libraries on GitHub"; "again find the pro way and tools to do it the best way you can", v2 G4, 2026-10-27).
 - **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
