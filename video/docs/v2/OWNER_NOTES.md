@@ -51,6 +51,22 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-27 (restart, direction stage): "don't use big models of people; the people we showed in the first example video
   are the right direction" -> no big character models or close-up faces in the new film: small, simple figures in the
   world like reference 1 (crowds, small full figures, backs of heads). -> rule: Visual style (people small and simple).
+- 2026-10-27 (restart, kit stage): "make sure to parallelize the work as much as you can, start more instances of cloud
+  machines if you have to, but clean them up after" -> lanes and kit work farmed out to helper cloud sessions (report file =
+  done-signal), each archived once its work is merged and checked. -> rule: Process (parallelize; archive helpers).
+- 2026-10-27: "They must all use ultracode effort btw - all support sessions you spin up" -> every helper's prompt says
+  ultracode and COMMON.md tells it to orchestrate with workflows; the running helpers were told. -> rule: Process (helpers).
+- 2026-10-27: (screenshot of a helper at "Opus 5.5 Medium") "the effort should be either max or ultracode" -> helpers restarted with
+  the first prompt `/effort ultracode on` ("Ultracode on: dynamic workflows on every task"), the task sent as a message;
+  `is_ultracode_active: true` verified. -> rule: Process (helpers).
+- 2026-10-27: "the key rule is we need to ensure the effort is MAX! ... we can't sacrifice the quality of the video because we
+  didn't set the proper effort level and the video ends up lazy" -> every agent at MAX effort: the local kit review and the
+  sound critique/revision restarted with effort 'max' on every agent; helper sessions restarted at /effort max (ultracode on
+  top). -> rule: Process (MAX effort, always).
+- 2026-10-27: "do each subsection understand the repo rules and the full stylistic direction? including colors, cinematic
+  references, etc?" -> not provably yet: a workflow writes one definitive `docs/v2/STYLE.md` from every style source, an
+  independent audit finds what the helpers could miss or what contradicts, COMMON.md makes STYLE.md the first mandatory read,
+  and every lane answers `lanes/STYLE_CHECK.md` (graded against a private key). -> rule: Process (lanes prove the style).
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in

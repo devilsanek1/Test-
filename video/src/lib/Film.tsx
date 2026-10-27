@@ -60,6 +60,8 @@
 //   frame0          the core line in words from frame 0 (Frame0Text): drawn in the caption band until `until` (and from
 //                   the loop roll to the seam, so the loop lands on frame 0), with the spoken captions moved down and
 //                   scaled under it; the captions move back on the first page change after `until` (pop captions).
+//                   Optional on Frame0Text (v2r): `source` (a small credit line held with the words), `keys` (the box
+//                   walks the block's own words on timed keys) and `spoken: 'first'` (only page 1 under the block).
 //   draftLabel      a burned-in "<label> · <scene id> · <m:ss.ss>" (small, mid grey, bottom-left), so the owner can
 //                   name a shot in feedback (pre-final cuts only).
 
@@ -498,12 +500,39 @@ export type Frame0Text = {
    *  the captions scale by `captionScale` about it (default 545 and 0.84: one line under the words, inside the band). */
   captionBaseline?: number;
   captionScale?: number;
+  /** OPTIONAL (v2r): a small source line held with the words (it pops in and out with them), e.g.
+   *  'Source: BBC News, 21 Oct 2026'. Caption font and colour, `sourceSize` px (default 20) at `sourceBaseline` (550). */
+  source?: string;
+  sourceSize?: number;
+  sourceBaseline?: number;
+  /** OPTIONAL (v2r): timed highlight keys. The box walks the block's OWN words, one box at a time (each key pops in
+   *  one frame): from timeline second `t` the box sits on `text` in line `line` (default: the first line containing
+   *  it). Before the first key, and from the loop roll on, `highlight` (if any) is shown. */
+  keys?: {t: number; text: string; line?: number}[];
+  /** OPTIONAL (v2r): 'all' (default) draws every spoken page under the words; 'first' draws only the FIRST spoken page
+   *  under the block: later pages that start before `until` are hidden (the paging file still holds every word) and
+   *  the next page after `until` pops as usual. */
+  spoken?: 'all' | 'first';
 };
 
 const F0 = {size: 72, baselines: [342, 432], captionBaseline: 545, captionScale: 0.84} as const;
+/** Frame0Text.source defaults (kept apart from F0: scripts/qa/gate_check.py parses the F0 line). */
+const F0_SOURCE = {size: 20, baseline: 550} as const;
+
+/** The frame-0 box at timeline second T: the last key at or before T (keys mode), else the static `highlight` on the
+ *  last line. `looping` (the loop roll to the seam) shows the pre-key state, as at frame 0. */
+function frame0BoxAt(f0: Frame0Text, T: number, looping: boolean): {line: number; text: string} | null {
+  const last = f0.lines.length - 1;
+  const base = f0.highlight && last >= 0 ? {line: last, text: f0.highlight} : null;
+  if (!f0.keys?.length || looping) return base;
+  const key = f0.keys.slice().sort((a, b) => a.t - b.t).filter((k) => k.t <= T + 1e-6).pop();
+  if (!key) return base;
+  const line = key.line ?? f0.lines.findIndex((l) => l.includes(key.text));
+  return line >= 0 ? {line, text: key.text} : base;
+}
 
 /** The frame-0 words (caption font, the caption tone's colours, the highlight box in the house geometry). */
-const Frame0Words: React.FC<{f0: Frame0Text; tone: CaptionTone}> = ({f0, tone}) => {
+const Frame0Words: React.FC<{f0: Frame0Text; tone: CaptionTone; T?: number; looping?: boolean}> = ({f0, tone, T = 0, looping = false}) => {
   const ok = useCaptionFont();
   const mode = capcheckMode();
   if (mode === 'bg') return null;
@@ -515,16 +544,17 @@ const Frame0Words: React.FC<{f0: Frame0Text; tone: CaptionTone}> = ({f0, tone}) 
   const size = widest > skyCaption.maxWidth ? Math.floor((size0 * skyCaption.maxWidth) / widest) : size0;
   const bl = f0.baselines ?? F0.baselines;
   const cx = skyCaption.cx;
-  const last = f0.lines.length - 1;
   let box: {x: number; y: number; w: number; h: number} | null = null;
-  if (f0.highlight && last >= 0) {
-    const ln = f0.lines[last];
-    const idx = ln.indexOf(f0.highlight);
+  const at = frame0BoxAt(f0, T, looping);
+  if (at) {
+    const ln = f0.lines[at.line];
+    const idx = ln.indexOf(at.text);
     if (idx >= 0) {
       const lw = measureCaption(ln, size);
       const x0 = cx - lw / 2 + measureCaption(ln.slice(0, idx), size);
       const pad = skyHighlightBox.padEm * size;
-      box = {x: x0 - pad, y: bl[last] - skyHighlightBox.topEm * size, w: measureCaption(f0.highlight, size) + 2 * pad, h: (skyHighlightBox.topEm + skyHighlightBox.bottomEm) * size};
+      const y = bl[at.line] ?? bl[bl.length - 1];
+      box = {x: x0 - pad, y: y - skyHighlightBox.topEm * size, w: measureCaption(at.text, size) + 2 * pad, h: (skyHighlightBox.topEm + skyHighlightBox.bottomEm) * size};
     }
   }
   return (
@@ -536,6 +566,11 @@ const Frame0Words: React.FC<{f0: Frame0Text; tone: CaptionTone}> = ({f0, tone}) 
           {l}
         </text>
       ))}
+      {f0.source ? (
+        <text x={cx} y={f0.sourceBaseline ?? F0_SOURCE.baseline} textAnchor="middle" fontFamily={captionFontStack} fontSize={f0.sourceSize ?? F0_SOURCE.size} fill={col.text}>
+          {f0.source}
+        </text>
+      ) : null}
     </svg>
   );
 };
@@ -787,15 +822,21 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
   // captions sit lowered under them until the first page change after `until` (and from the loop roll on)
   let f0Words = false;
   let f0Lowered = false;
+  let f0Looping = false;
+  let f0HideSpoken = false;
   if (frame0 && showCaptions) {
     const lead = MOTION.captionScroll.lead;
-    const nextPage = captions.slice().sort((a, b) => a.s - b.s).find((b) => b.s - lead >= frame0.until - 1e-6);
+    const sorted = captions.slice().sort((a, b) => a.s - b.s);
+    const nextPage = sorted.find((b) => b.s - lead >= frame0.until - 1e-6);
     const lowerUntil = nextPage ? nextPage.s - lead : Infinity;
     const looping = loopAt !== undefined && T >= loopAt;
     f0Words = T < frame0.until || looping;
     f0Lowered = T < lowerUntil || looping;
+    f0Looping = looping;
+    // spoken: 'first' (optional): only page 1 under the block; the later pages before `until` stay hidden
+    if (frame0.spoken === 'first' && sorted.length > 1) f0HideSpoken = !looping && T >= sorted[1].s - lead && T < lowerUntil;
   }
-  const caps = showCaptions ? (
+  const caps = showCaptions && !f0HideSpoken ? (
     <SkyCaptions beats={captions} tone={tone} regions={regions} loopAt={loopAt} loopEnd={seam} range={range} hookAtStart={!only} motion={captionMotion} />
   ) : null;
   const f0k = frame0?.captionScale ?? F0.captionScale;
@@ -815,7 +856,7 @@ export const Film: React.FC<FilmProps> = ({scenes: scenesIn, components, wipers 
         ) : (
           caps
         )}
-        {frame0 && f0Words ? <Frame0Words f0={frame0} tone={tone(T)} /> : null}
+        {frame0 && f0Words ? <Frame0Words f0={frame0} tone={tone(T)} T={T} looping={f0Looping} /> : null}
         {draftLabel ? <DraftLabel text={`${draftLabel} · ${labelId} · ${timecode(T)}`} /> : null}
       </AbsoluteFill>
       {audio ? <Audio src={staticFile(audioSrc ?? audioFile())} trimBefore={offset > 0 ? Math.round(offset * fps) : undefined} /> : null}

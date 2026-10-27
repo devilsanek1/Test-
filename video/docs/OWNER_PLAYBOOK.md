@@ -72,19 +72,16 @@ Format: **rule** — why / evidence (video, date).
 - **Don't rely on reusable assets: every film's sets, characters, props, background life and music are made new for
   it,** in its own design (a new Pip drawing too, if the mascot appears). Engine primitives, timing, captions and QA tools
   are tools, not assets. — ("Don't rely on reusable assets", v2 restart, 2026-10-27).
-- **People small and simple, like the first example video (reference 1):** figures that live in the world (crowds, small
-  full figures, backs of heads, simple round heads), never big character models or close-up faces. — ("don't use big
-  models of people", v2 restart, 2026-10-27).
+- **People small and simple like reference 1** (crowds, small full figures, backs of heads, round heads; near heads <= ~140 px),
+  never big character models or close-up faces. — ("don't use big models of people", v2 restart, 2026-10-27).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). — (v1 posted reel, 2026-10-25).
 - **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
   palette per video; within it one hero, one dark anchor, at most one pop. Rules: `docs/look/PALETTE.md`. — (2026-10-25).
-- **Warm, never sickly.** Beige, muddy tan, olive-brown lines and grey read "sick"; warmth = peach creams, terracotta,
-  red-brown lines, a golden lamp pool, warm shadows, a saturated dusk-blue outside. — ("not sick", v3 G4, 2026-10-26).
+- **Warm, never sickly:** no beige, muddy tan, olive or grey; peach creams, terracotta, red-brown lines, golden light, warm shadows. — (v3 G4, 2026-10-26).
 - **Texture and lines: VERY subtle.** Thin tapered lines only in key places; halftone tactically on a few elements as
   an optional last step (the film must work flat; the owner decides per video). — (texture test, 2026-10-25).
-- **Profile identity: mascot Pip (the purple PHP elephant) in the film's style;** avatar
-  `video/deliverables/profile/pip_power_button.png`. — (2026-10-25).
+- **Profile identity: mascot Pip (the purple PHP elephant), drawn in each film's style;** avatar `deliverables/profile/pip_power_button.png`. — (2026-10-25).
 
 ## Hook and pacing
 - **Every video has ONE core line, picked in its own step (G0.5) before the script:** the single sentence at the core
@@ -118,10 +115,9 @@ Format: **rule** — why / evidence (video, date).
   type, cozy/scale) in a big readable note, lean review loops. Spec: `docs/G3_ANIMATIC.md`. — ("frankly the most
   important stage ... more like an animated sketchbook", 2026-10-26; supersedes "animate only where timing is the
   question", v3 G3, 2026-10-26).
-- **Every shot reads instantly with the sound off: literal beats clever.** Show recognisable things: a laptop that looks
-  like a laptop, a data center like a building of servers, a plain labelled chart. No metaphors that need explaining.
-  Test every animatic with a sound-off cold read before the owner sees it. — (v3 G3, 2026-10-26).
-- **No physical metaphors the facts don't support;** show the real mechanism instead. — (v3 G3, 2026-10-26).
+- **Every shot reads instantly with the sound off: literal beats clever.** Recognisable things (a laptop that looks like a
+  laptop, a plain labelled chart), the real mechanism, never a metaphor the facts don't support or that needs explaining;
+  a sound-off cold read before the owner sees any cut. — (v3 G3, 2026-10-26).
 - **Drawn like a professional storyboard: monochrome, clarity first, and cinematic** (framing, angle, scale, coziness
   decided in the board; clarity from composition, never icons on blank paper; every panel names its shot type). Spec:
   `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
@@ -148,30 +144,31 @@ Format: **rule** — why / evidence (video, date).
   platform auto-captions stay off. — (v1 reel, 2026-10-25).
 
 ## Process and communication
-- **Helper cloud sessions are archived as soon as their work is pushed and checked** (keep the owner's session list
-  clean); a split names each helper's done-signal (a report file) so the orchestrator knows when to archive. — ("archive
-  them so we don't have the mess in the left side panel", v3, 2026-10-27).
-- **Playable video starts at the sketch animatic (G3); from then on every gate is a video, never only stills.** Before
-  G3 (topic, core line, script, voice): text and audio only, no MP4s, never several versions unless asked. — (v1, 2026-10-25; "why are there multiple versions", v3).
-- **Lock the story with a clean sketch/animatic before big commitments; push all polish late.** — (v1, 2026-10-25).
+- **Parallelize as much as possible: split independent work across helper cloud sessions (each its own machine) and
+  archive each one as soon as its work is pushed and checked;** each helper's done-signal is a report file, and every
+  helper runs at MAX effort with ultracode: boot it from a branch whose `.claude/settings.json` says `"ultracode": true`
+  with the first prompt `/effort max`, send the task as a message, check `effort_level: max` + `is_ultracode_active`. Every
+  lane must PROVE it knows the film's style: one STYLE.md per film (colours, line, people, cinema, references, NEVERs) and a
+  graded style check before it builds. — (v2/v3, 2026-10-27; "do each subsection understand ... the full stylistic direction?").
+- **Playable video from the sketch animatic (G3) on, never only stills; before G3 text and audio only, one version unless
+  asked. Lock the story before big commitments; polish late.** — (v1, 2026-10-25; "why are there multiple versions", v3).
 - **Progress: the gate deliverable is the update, with a short status on all threads between; lean prompts and docs.** — (v1).
 - **Every cut sent to the owner says what stage it is and what the next stages add** (e.g. "blocking: staging only;
   next: density, life, polish, full-res"), so a draft is never mistaken for the final. — ("let me know if this is just
   an initial intermediate step", v3 G5, 2026-10-26).
+- **EFFORT IS ALWAYS MAX:** every workflow agent passes `effort: 'max'`, every helper session runs at /effort max; a lazy
+  video from a low effort setting is our failure. — ("the key rule is we need to ensure the effort is MAX!", v2, 2026-10-27).
 - **NO LIMIT ON TOKENS for creative output; never trade quality for savings.** Ideas, scripts, judged competing ideas,
   design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
   reviewing what will still change, early polish). — (2026-10-25; owner, 2026-10-26).
-- **Locked means dropped:** rejected options go to the video's `archive/`, the gate doc keeps only the locked choice,
-  later prompts never see them; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
-- **Every lesson goes into the generic process, committed:** this playbook, a gate in `PIPELINE_V2.md`, or the studio
-  toolkit, so the next video doesn't repeat it. — ("we gradually get better as a production studio", v3, 2026-10-26).
+- **Locked means dropped:** rejected options go to `archive/`, never seen by later prompts; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
+- **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
   work (archive it), skip the gates the owner names (e.g. no sketch) and make the finished film directly with full
   creative freedom inside these principles; never patch the rejected cut. — ("No I don't like it, let's start from
   scratch ... let's not do the sketch. Do the video right away, full creative freedom", v2 G5, 2026-10-27).
-- **Once the owner says "final", don't redo it;** log ideas for the next video. — (v1, 2026-10-25).
-- **Deliver videos as a download as well;** in-app previews may play muted. — (v1, 2026-10-25).
+- **Once the owner says "final", don't redo it (log ideas for the next video); deliver videos as a download too** (in-app previews may play muted). — (v1, 2026-10-25).
 
 ## Platforms and posting
 - **Accounts: Instagram `what.the.fuss.is.about`** (Creator, Education); TikTok and YouTube Shorts under the same name,

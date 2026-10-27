@@ -2,7 +2,7 @@
 """film_captions.py: caption pages (a hand-written paging file) + the voice's word timings -> the house CaptionBeat JSON.
 
   python3 -I scripts/film_captions.py --words public/v3/voice_words.json --pages src/v3/film/captions_pages.txt \
-      --out src/v3/film/captions.json [--max-chars 20] [--hook]
+      --out src/v3/film/captions.json [--max-chars 20] [--hook] [--spell criticizing=criticising]
 
 Pages file: '#' lines are comments; one page per paragraph (blank line between pages); one caption line per text line;
 [brackets] mark a highlight (one phrase per bracket, never across two lines). Every voice word must appear exactly
@@ -12,6 +12,11 @@ caption text to the voice by characters, so spelling must match the transcript (
 Output (src/lib/Captions.tsx CaptionBeat, one page per line): {s, e, lines: [{text, s}], highlights: [{text, s}]}, all
 WORD-START seconds (the caption component applies its own leads; never shift times here). e = the next page's s; the
 last page ends on the voice's durationSec. --hook gives page 1 style "hook" (x1.06). Exit 1 on any alignment error.
+
+--spell VOICE=CAPTION (optional, repeatable): a caption token may spell a voice word differently, e.g. British
+"criticising" inside a quote where the transcript says "criticizing". Only tokens the paging file actually writes with
+the CAPTION spelling are mapped (so the paging file decides where: e.g. only the last token); a --spell that maps no
+token is a warning. Without --spell the script behaves exactly as before.
 """
 import argparse
 import json
@@ -49,7 +54,17 @@ def main() -> int:
     ap.add_argument("--out", required=True)
     ap.add_argument("--max-chars", type=int, default=20, help="warn above this many characters per line (+2 tolerated)")
     ap.add_argument("--hook", action="store_true", help='page 1 gets style "hook"')
+    ap.add_argument("--spell", action="append", default=[], metavar="VOICE=CAPTION",
+                    help="a caption spelling for a voice word, e.g. criticizing=criticising (repeatable)")
     a = ap.parse_args()
+    spell: list[tuple[str, str]] = []  # (normalised caption spelling, normalised voice spelling)
+    for sp in a.spell:
+        if "=" not in sp or not all(norm(x) for x in sp.split("=", 1)):
+            print(f"[film_captions] ERROR --spell '{sp}' is not VOICE=CAPTION", file=sys.stderr)
+            return 1
+        v, c = sp.split("=", 1)
+        spell.append((norm(c), norm(v)))
+    spell_used = {c: 0 for c, _ in spell}
 
     timing = json.loads(Path(a.words).read_text(encoding="utf8"))
     words = timing["words"]
@@ -70,6 +85,13 @@ def main() -> int:
         """Consume a caption token from the stream; return the start of the voice word its first character is in."""
         nonlocal pos
         n = norm(token)
+        for c, v in spell:  # --spell: the caption's own spelling stands for the voice word
+            if c in n and c != v:
+                cand = n.replace(c, v)
+                if "".join(ch for ch, _ in stream[pos:pos + len(cand)]) == cand:
+                    n = cand
+                    spell_used[c] += 1
+                    break
         if not n:
             return words[stream[min(pos, len(stream) - 1)][1]]["s"]
         got = "".join(ch for ch, _ in stream[pos:pos + len(n)])
@@ -115,6 +137,9 @@ def main() -> int:
     if not errors and pos != len(stream):
         rest = " ".join(w["w"] for w in words[stream[pos][1]:][:8])
         errors.append(f"the pages end before the voice does (next voice words: '{rest} ...')")
+    for c, k in spell_used.items():
+        if not k and not errors:
+            warns.append(f"--spell '{c}' mapped no caption token")
     for e in errors:
         print(f"[film_captions] ERROR {e}", file=sys.stderr)
     if errors:
