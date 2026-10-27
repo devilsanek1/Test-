@@ -15,7 +15,7 @@ import {Ink} from '../../../lib/Ink';
 import {blob, line, rect as rectInk, roundRect, torso} from '../../../lib/sketch';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {EMBER, Pip3, StickCrate, Txt, W, WinterPerson, backRowLayout, ease01, personGeo, puffs, rings, sway, winterPersonMat} from '../kit';
+import {EMBER, Pip3, StickCrate, Txt, W, WinterPerson, backRowLayout, backRowPhones, ease01, personGeo, puffs, rings, sway, winterPersonMat} from '../kit';
 import type {BackRowPerson, BackRowProps, Pip3Props, Pt} from '../kit';
 
 // ---------------------------------------------------------------- the beats a panel passes
@@ -30,6 +30,8 @@ export type CrowdLife = {
   headScratch?: [number, number];
   /** The clipboard's sheet lifts. */
   clipFlutter?: number[];
+  /** The raised phone's camera flash (2 frames at each time, at the phone's camera end). */
+  flashAt?: number[];
   pip?: Omit<Pip3Props, 'x' | 'y'>;
 };
 
@@ -192,6 +194,34 @@ const CratesAndPip: React.FC<{pip?: Omit<Pip3Props, 'x' | 'y'>}> = ({pip = {}}) 
   </>
 );
 
+// ---------------------------------------------------------------- the phone's flash
+
+/** A flat warm 8-point star with a white core over the raised phone's camera end, for 2 frames (no fade), as S4's;
+ *  it follows the phone (kit backRowPhones); no phone up, no flash. */
+const PhoneFlash: React.FC<{at?: number[]; row: BackRowProps}> = ({at = [], row}) => {
+  const t = useTime();
+  const hit = at.find((a) => t >= a && t < a + 2 / 60 + 1e-6);
+  if (hit === undefined) return null;
+  const phone = backRowPhones(row, t)[0];
+  if (!phone) return null;
+  const [cx, cy] = phone.top;
+  const big = t - hit < 1 / 60 ? 1 : 0.78;
+  let d = '';
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+    const r1 = (i % 2 ? 40 : 72) * big;
+    const p = (aa: number, rr: number) => `${(cx + Math.cos(aa) * rr).toFixed(1)} ${(cy + Math.sin(aa) * rr).toFixed(1)}`;
+    d += `M${p(a - 0.2, 16 * big)}L${p(a, r1)}L${p(a + 0.2, 16 * big)}Z`;
+  }
+  return (
+    <>
+      <path d={d} fill={EMBER.houseLit} />
+      <circle cx={cx} cy={cy} r={18 * big} fill={EMBER.houseLit} />
+      <circle cx={cx} cy={cy} r={11 * big} fill={EMBER.white} />
+    </>
+  );
+};
+
 // ---------------------------------------------------------------- the row
 
 /** The drivers' row with their arms, then Pip on the crates at the right (drawn first: the last back overlaps the
@@ -221,6 +251,7 @@ export const S11Crowd: React.FC<{life: CrowdLife}> = ({life}) => {
           </XG>
         );
       })}
+      <PhoneFlash at={life.flashAt} row={row} />
     </>
   );
 };

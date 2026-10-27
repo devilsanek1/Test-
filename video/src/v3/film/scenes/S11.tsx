@@ -46,12 +46,12 @@ const ROOM: RoomLife = {
 const CROWD: CrowdLife = {
   row: [
     // the dock hand: hi-vis, hard hat; the phone goes up after "five" to snap the board
-    {hair: 'short', wear: ['hivis', 'hardhat'], coat: EMBER.dcSide, phoneWin: [FIVE + 0.24, 99], moves: [{t: FIVE + 0.08, kind: 'recoil', amp: 1}]},
+    {hair: 'short', wear: ['hivis', 'hardhat'], coat: EMBER.dcSide, phoneWin: [FIVE + 0.24, 3.42], moves: [{t: FIVE + 0.08, kind: 'recoil', amp: 1}, {t: 3.42, kind: 'turn', amp: 1.4}]},
     // the laptop van's driver: the cap with the badge; a hand to the back of his head on "five", then turns to his
     // neighbour in the settle
-    {hair: 'cap', wear: ['badge'], coat: EMBER.dc, hat: EMBER.dcSide, coatDetail: ['quilt', 'yoke'], moves: [{t: 2.92, kind: 'lean', dir: 1, amp: 1.2}]},
+    {hair: 'cap', wear: ['badge'], coat: EMBER.dc, hat: EMBER.dcSide, coatDetail: ['quilt', 'yoke'], moves: [{t: 2.92, kind: 'lean', dir: 1, amp: 1.6}, {t: 2.92, kind: 'turn', amp: 1.8}]},
     // the coffee (a step back): two sips with the right hand, turns back to the van driver in the settle
-    {hair: 'beanie', acc: ['scarf'], coat: '#6B4A6E', hat: EMBER.hl, coatDetail: ['zip'], sMul: 0.95, dy: -8, moves: [{t: 3.0, kind: 'lean', dir: -1, amp: 1.2}]},
+    {hair: 'beanie', acc: ['scarf'], coat: '#6B4A6E', hat: EMBER.hl, coatDetail: ['zip'], sMul: 0.95, dy: -8, moves: [{t: 3.0, kind: 'lean', dir: -1, amp: 1.6}, {t: 3.0, kind: 'turn', amp: 1.8}]},
     // the clipboard (curly hair, headphones round the neck)
     {hair: 'curly', hairColor: '#7A3A24', acc: ['headphones'], coat: '#C98A64', coatDetail: ['quilt'], moves: [{t: FIVE + 0.12, kind: 'turn', amp: 1.6}]},
   ],
@@ -63,8 +63,11 @@ const CROWD: CrowdLife = {
   ],
   headScratch: [FIVE + 0.1, FIVE + 1.2],
   clipFlutter: [FIVE + 0.04],
+  // the dock hand snaps the board once the 5x has landed (the phone drops at 3.42)
+  flashAt: [2.62],
   pip: {
-    // Pip reads the short bar, follows the tall one up as it lands, covers its ears on "5x", then looks to the drivers
+    // Pip reads the short bar, follows the tall one up as it lands, covers its ears on "5x", looks to the drivers, then
+    // turns to us
     look: [
       {t: 0, v: -0.85},
       {t: BIG_AT + 0.05, v: -0.4},
@@ -74,6 +77,8 @@ const CROWD: CrowdLife = {
       {t: 0, pose: 'sit-back'},
       {t: FIVE + 0.1, pose: 'ears-cover'},
       {t: 3.05, pose: 'sit-back'},
+      // the settle: Pip turns to us, worried (S12 picks the worry up at the desk)
+      {t: 3.62, pose: 'sit-front', expression: 'worried'},
     ],
   },
 };
