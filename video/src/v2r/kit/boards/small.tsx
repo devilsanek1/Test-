@@ -29,29 +29,27 @@ import {rand} from '../../../lib/rng';
 import {S4, S5, shotById, type Rect, type XY} from '../../world/map';
 import {TYPE, WorldText, textW} from './WorldText';
 import {TXT_NAME_TAG, TXT_NEWS_BOX, TXT_PLAQUE, TXT_PLATES, TXT_SERVICE_DOOR} from './texts';
+import {BOARD_COLORS, KEY_WEIGHT, mixHex} from './StatementBoard';
 
 // ---------------------------------------------------------------- colour (CM tokens and flat mixes of them)
 
-/** A flat sRGB step between two palette colours (k 0 = a). A colour, never drawn as a gradient. */
-export function tone(a: string, b: string, k: number): string {
-  const A = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16));
-  const B = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
-  return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * k).toString(16).padStart(2, '0')).join('').toUpperCase();
-}
+/** A flat sRGB step between two palette colours (k 0 = a). A colour, never drawn as a gradient. (= StatementBoard's
+ *  `mixHex`: one implementation for the whole kit.) */
+export const tone = mixHex;
 
-/** Every colour these pieces use. The board family's values (StatementBoard BOARD_COLORS: frame, lit, shade, face,
- *  keyline, brass, shadow) so a tag, a plate and a board read as one kit. */
+/** Every colour these pieces use. The family colours ARE StatementBoard's BOARD_COLORS (frame, lit, shade, face,
+ *  keyline, brass, lettering, shadow), so a tag, a plate and a board read as one kit and can never drift apart. */
 export const SMALL_COLORS = {
-  frame: CM.anchor,
-  frameLit: CM.coatPlum,
-  frameShade: tone(CM.anchor, CM.ink, 0.5),
-  face: CM.paper,
-  keyline: CM.anchor,
-  brass: CM.coatMustard,
-  brassShade: CM.line,
-  lettering: CM.ink,
+  frame: BOARD_COLORS.frame,
+  frameLit: BOARD_COLORS.frameLit,
+  frameShade: BOARD_COLORS.frameShade,
+  face: BOARD_COLORS.face,
+  keyline: BOARD_COLORS.keyline,
+  brass: BOARD_COLORS.screw,
+  brassShade: BOARD_COLORS.screwSlot,
+  lettering: BOARD_COLORS.lettering,
   /** Ground shadows: a warm shade of the paving (colour, never grey). */
-  shadow: tone(CM.paving, CM.shadeWarm, 0.45),
+  shadow: BOARD_COLORS.shadow,
   // the news box: a slate honour box, lit on the sun side (screen left), no brand
   box: CM.coatSlate,
   boxLit: tone(CM.coatSlate, CM.lampCore, 0.36),
@@ -72,8 +70,7 @@ export const SMALL_COLORS = {
  *  down). Text-bearing faces stay exact (offset false). */
 export const MISREG: [number, number] = [2.2, 1.5];
 
-/** The board family's faux weight on key lines (>= 56 px), so they hold at 216 px wide (StatementBoard KEY_WEIGHT). */
-export const KEY_WEIGHT = 1.2;
+// Key lines (>= 56 px) use StatementBoard's KEY_WEIGHT (imported above): ONE faux weight for every key in the film.
 
 // ---------------------------------------------------------------- the clocks (scene-local defaults from map.ts)
 
