@@ -25,9 +25,11 @@ const X1 = 1260;
 export const PEAK_TONES = {
   gold: T9.pileGold,
   deep: T9.pileDeep,
-  lit: '#E8C08A',
-  pin: T9.pilePin,
-  chip: T9.pileChip,
+  lit: '#E0B680',
+  pin: '#DDBB8C',
+  /** The neighbours' chips: a calm warm brown (L* ~46), never the hero stick's near-black: the pile reads as sticks at
+   *  every zoom without a field of dark rectangles (the owner: "too busy"). */
+  chip: '#96694A',
   mound: '#B98757',
 } as const;
 
@@ -84,7 +86,7 @@ const PEAK_D = (() => {
       const sx = xl + u * (xr - xl) + r.jitter(step * 0.3);
       // near level inside the pile; at the silhouette (row ends, the crest rows) they jut out at an angle
       const jut = edge || dy < 20;
-      const rot = jut ? r.range(16, 40) * (sx < PEAK.x ? -1 : 1) * (r.chance(0.3) ? -1 : 1) : r.chance(0.05) ? r.range(30, 50) * r.sign() : r.jitter(14);
+      const rot = jut ? r.range(10, 28) * (sx < PEAK.x ? -1 : 1) * (r.chance(0.3) ? -1 : 1) : r.chance(0.04) ? r.range(20, 34) * r.sign() : r.jitter(8);
       // the right flank turns from the sky (upper left): more of its boards in shade
       const shade = r.chance(0.18 + 0.3 * Math.max(0, Math.min(1, (sx - PEAK.x) / 420)));
       row.push({x: sx + (jut && edge ? (i === 0 ? -w * 0.16 : w * 0.16) : 0), y: y + r.jitter(w * 0.07) - (jut ? r.range(1, 4) : 0), w: w * r.range(0.9, 1.04), rot, shade});
@@ -94,13 +96,13 @@ const PEAK_D = (() => {
   }
   // a few sticks round the summit stick, so it lies ON sticks (its neighbours at x27: real chips)
   const crest: S[] = [
-    {x: PEAK.x - 17, y: PEAK.y + 5, w: 26, rot: -14, shade: false},
-    {x: PEAK.x + 15, y: PEAK.y + 6, w: 25, rot: 12, shade: true},
-    {x: PEAK.x - 2, y: PEAK.y + 9, w: 27, rot: 3, shade: false},
-    {x: PEAK.x - 30, y: PEAK.y + 13, w: 26, rot: -24, shade: false},
-    {x: PEAK.x + 28, y: PEAK.y + 14, w: 26, rot: 22, shade: true},
-    {x: PEAK.x + 6, y: PEAK.y + 16, w: 27, rot: -6, shade: true},
-    {x: PEAK.x - 14, y: PEAK.y + 19, w: 27, rot: 8, shade: false},
+    {x: PEAK.x - 16, y: PEAK.y + 6, w: 26, rot: -12, shade: false},
+    {x: PEAK.x + 15, y: PEAK.y + 7, w: 25, rot: 10, shade: true},
+    {x: PEAK.x - 1, y: PEAK.y + 10, w: 27, rot: 2, shade: false},
+    {x: PEAK.x - 30, y: PEAK.y + 14, w: 26, rot: -20, shade: false},
+    {x: PEAK.x + 29, y: PEAK.y + 15, w: 26, rot: 18, shade: true},
+    {x: PEAK.x + 8, y: PEAK.y + 17, w: 27, rot: -4, shade: true},
+    {x: PEAK.x - 15, y: PEAK.y + 20, w: 27, rot: 5, shade: false},
   ];
   rows.push(crest);
   const groups: Group[] = [];
@@ -126,7 +128,7 @@ const PEAK_D = (() => {
     }
   }
   // the mound behind the sticks (no sky through the gaps), a little inside the silhouette
-  const mound: Pt[] = [[PEAK.x - (PEAK.base - PEAK.y) / PEAK.tanL + 10, PEAK.base], [PEAK.x, PEAK.y + 12], [X1, PEAK.y + (X1 - PEAK.x) * PEAK.tanR + 8], [X1, PEAK.base]];
+  const mound: Pt[] = [[PEAK.x - (PEAK.base - PEAK.y) / PEAK.tanL + 8, PEAK.base], [PEAK.x - 18, PEAK.y + 5], [PEAK.x - 10, PEAK.y + 1], [PEAK.x + 10, PEAK.y + 1], [PEAK.x + 18, PEAK.y + 5], [X1, PEAK.y + (X1 - PEAK.x) * PEAK.tanR + 6], [X1, PEAK.base]];
   return {groups, mound: polyD(mound)};
 })();
 
@@ -168,7 +170,7 @@ export const J3StickLight: React.FC<{x: number; y: number; w: number; rot: numbe
   const foot = P(0, h / 2);
   return (
     <>
-      <ContactShadow x={foot[0]} y={foot[1] + Math.max(1, h * 0.02)} w={w} h={Math.max(2, Math.min(16, h * 0.07))} k={1.06} />
+      <ContactShadow x={foot[0]} y={foot[1] + Math.max(1, h * 0.02)} w={w} h={Math.max(2, Math.min(14, h * 0.06))} k={1.06} tint="cast" />
       <Rim d={board} c={[x, y]} size={[w, h]} width={rimW} color={RIM_COLD} />
     </>
   );
