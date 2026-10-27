@@ -210,6 +210,14 @@ export function watchYaw(p: PoseParams, px = 96): WatchYaw {
   return {body, head, side, k};
 }
 
+/** Which ear faces us: 1 = ear A (Pip's model +x side), -1 = ear B, 0 = both show (a head seen square from the front
+ *  or the back). A face-on watcher hides its far ear behind its head, so a flick goes to the near one (idle.ts,
+ *  PipTrack). */
+export function nearEar(p: PoseParams, px = 96): 1 | -1 | 0 {
+  const s = Math.sin(watchYaw(p, px).head * D2R);
+  return s < -0.5 ? 1 : s > 0.5 ? -1 : 0;
+}
+
 // ---------------------------------------------------------------- output
 
 export type FillRole = 'body' | 'shade' | 'inner' | 'sole' | 'scarf' | 'eye' | 'cheek' | 'glint';

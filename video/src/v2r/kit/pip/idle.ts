@@ -5,7 +5,7 @@
 
 import {rand, Seed} from '../../../lib/rng';
 import {clamp} from './geom';
-import {PoseParams} from './model';
+import {nearEar, PoseParams} from './model';
 
 const TAU = Math.PI * 2;
 
@@ -92,7 +92,9 @@ export function applyIdle(p: PoseParams, t: number, seed: Seed, o: IdleOpts = {}
     const f = earFlickAt(t, seed);
     if (f.k) {
       const k = f.k * a;
-      if (f.side === 1) {
+      // a face-on watcher hides its far ear: the flick goes to the one we see
+      const side = nearEar(p) || f.side;
+      if (side === 1) {
         q.earDroopA -= 26 * k;
         q.earSwingA += 12 * k;
         q.earFoldA += 0.28 * Math.max(0, k);
