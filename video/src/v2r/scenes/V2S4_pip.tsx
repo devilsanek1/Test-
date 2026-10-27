@@ -1,7 +1,7 @@
 // V2S4_pip.tsx (lane L3, V2S4 STORY part): Pip (TREATMENT §3 "Pip per shot"; map.ts PIP V2S4, MATCHES; plan_L3 §1d;
 // V2S4_rig S4_PIP). Everything in WORLD px inside the push camera (the push is 1.00 until 18.40).
 //   14.86  the in-leap from the upper right is mid-air at the cut at (580, 1000), descending down-left, LEFT of her
-//   14.95  lands on the boat roof (470, 1218): squash, the ears flop
+//   14.95  lands on the boat roof (470, 1218): squash, the ears flop; its contact shadow grows under it as it lands
 //   15.15  rides the roof (bob + roll), the scarf streaming east in the wind of the truck; it watches her, and its head
 //          lifts to read the tag as each build pens on (one smooth gaze path: the kit resets a head turn when a target
 //          is swapped, so the gaze is ONE function of time)
@@ -13,7 +13,11 @@
 //          ABOVE Pip (V2S4.tsx), so the leap passes behind them and never covers their lettering; it never crosses her.
 // Its idle (blink, ears, breathing, tuft, tail, scarf) never stops.
 import React from 'react';
-import {PipTrack} from '../kit/pip';
+import {CM} from '../palette';
+import {Fill} from '../../lib/Fill';
+import {useTime} from '../../lib/time';
+import {PipTrack, PipTrackProps, trackAt} from '../kit/pip';
+import {ovalPath} from '../kit/canal/core';
 import {S4_BEATS, S4_HER_HEAD, S4_PIP} from './V2S4_rig';
 
 type XY = [number, number];
@@ -48,19 +52,38 @@ export function s4PipGaze(t: number): XY {
   return p;
 }
 
+/** The whole track (exported so QA / the cut checks can evaluate Pip anywhere with the kit's trackAt). */
+export const S4_PIP_TRACK: PipTrackProps = {
+  x: S4_PIP.inLeap.from[0],
+  y: S4_PIP.inLeap.from[1],
+  size: S4_PIP.size,
+  facing: 'back',
+  seed: 's4pip',
+  keys: [
+    {t: S4_PIP.inLeap.t0, hop: {to: S4_PIP.seat, dur: S4_PIP.inLeap.dur, height: S4_PIP.inLeap.height, style: 'leap'}},
+    {t: S4_BEATS.pipLand + 0.2, ride: {amp: 1.6, rate: 0.55}, target: s4PipGaze, wind: 1, dur: 0.35},
+    {t: S4_BEATS.stop, wind: 0.3, dur: 0.7},
+    {t: S4_BEATS.pipTurnWest, facing: 'left', dur: 0.3},
+    {t: S4_PIP.outLeap.t0, ride: null, hop: {to: S4_PIP.outLeap.to, dur: S4_PIP.outLeap.dur, height: S4_PIP.outLeap.height, style: 'leap'}},
+  ],
+};
+
+/** Its contact shadow on the roof (colour, never grey): a flat oval a little east of its seat (the low sun is west),
+ *  scaled by how high Pip is above the roof, so it grows as Pip lands and shrinks away as it leaps. */
+const RoofShadow: React.FC = () => {
+  const t = useTime();
+  const st = trackAt(S4_PIP_TRACK, t);
+  const [sx, sy] = S4_PIP.seat;
+  const lift = Math.max(0, sy - st.y);
+  const k = Math.max(0, 1 - lift / 90);
+  if (k <= 0.05) return null;
+  const cx = sx + 14 + (st.x - sx) * 0.6;
+  return <Fill d={ovalPath(cx, sy + 1, 44 * k, 6.5 * k)} color={CM.stoneShade} offset={false} seed="s4pipShadow" />;
+};
+
 export const S4Pip: React.FC = () => (
-  <PipTrack
-    x={S4_PIP.inLeap.from[0]}
-    y={S4_PIP.inLeap.from[1]}
-    size={S4_PIP.size}
-    facing="back"
-    seed="s4pip"
-    keys={[
-      {t: S4_PIP.inLeap.t0, hop: {to: S4_PIP.seat, dur: S4_PIP.inLeap.dur, height: S4_PIP.inLeap.height, style: 'leap'}},
-      {t: S4_BEATS.pipLand + 0.2, ride: {amp: 1.6, rate: 0.55}, target: s4PipGaze, wind: 1, dur: 0.35},
-      {t: S4_BEATS.stop, wind: 0.3, dur: 0.7},
-      {t: S4_BEATS.pipTurnWest, facing: 'left', dur: 0.3},
-      {t: S4_PIP.outLeap.t0, ride: null, hop: {to: S4_PIP.outLeap.to, dur: S4_PIP.outLeap.dur, height: S4_PIP.outLeap.height, style: 'leap'}},
-    ]}
-  />
+  <>
+    <RoofShadow />
+    <PipTrack {...S4_PIP_TRACK} />
+  </>
 );
