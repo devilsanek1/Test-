@@ -71,3 +71,4 @@
 | 2026-10-27 | `v3-g5b-assemble-wf_180b3ca4-a34.js` | 3 | 0 | (running) |
 | 2026-10-27 | `v4-g0-topics-wf_4d4df1c1-d0b.js` | 11 | 0 | v4 G0: 6 scouts (incl. ideas-bank recheck), 3 judges, synthesis, fact-check -> `video/docs/v4/G0_TOPICS.md` |
 | 2026-10-27 | `v4-g0-topics-tech-wf_d4d01b15-b1e.js` | 11 | 0 | v4 G0 round 2, tech + AI only (owner) -> `video/docs/v4/G0_TOPICS.md` |
+| 2026-10-27 | `v4-g05-facts-and-core-line-wf_cd902428-060.js` | running | | v4 G0.5: research (mechanism, fuss, voices), factlock, core line -> `video/docs/v4/CORE_LINE.md` |

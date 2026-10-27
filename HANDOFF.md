@@ -92,7 +92,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - Workflow `context/workflows/v4-g0-topics-wf_4d4df1c1-d0b.js` writes `video/docs/v4/scouting/*.md` and
   `video/docs/v4/G0_TOPICS.md` (top 3 for the owner). DONE 2026-10-27: A gas tanks (recommended), B commute to Zoom,
   C padlock key was 4. Owner: "lets focus on tech and AI related news" -> round 1 archived; round 2 (tech + AI only)
-  `context/workflows/v4-g0-topics-tech-*.js` -> `video/docs/v4/scouting_r2/`, `G0_TOPICS.md` DONE: A Spotify family QR (recommended), B AI songs + royalty pot, C router WPS hole. Next: owner picks; G0.5.
+  `context/workflows/v4-g0-topics-tech-*.js` -> `video/docs/v4/scouting_r2/`, `G0_TOPICS.md`. **LOCKED: B, AI songs and the shared royalty pot** (owner: "good amount of fuss about AI songs").
+- G0.5 running: `context/workflows/v4-g05-facts-and-core-line-*.js` -> `video/docs/v4/research/`, `CORE_LINE.md`. Next: owner picks the core line; then G1 story-first script.
 
 ## 2b. Update 2026-10-25 20:00 UTC: two agents, split by video
 
