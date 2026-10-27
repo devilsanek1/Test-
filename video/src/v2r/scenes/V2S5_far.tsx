@@ -70,7 +70,7 @@ const GULLS: {c: Pt; r: Pt; n: number; span: number; seed: number}[] = [
 
 /** The two V's of the hold (END coords): enter left of the frame at ~75 % of the move (t0), fly right and a little up. */
 const VS: {t0: number; from: Pt; v: number; rise: number; span: number; n: number; ink: number; glider: number}[] = [
-  {t0: 1.9, from: [150, 694], v: 242, rise: -9, span: 40, n: 7, ink: 0.18, glider: 3},
+  {t0: 1.9, from: [150, 694], v: 242, rise: -9, span: 38, n: 7, ink: 0.18, glider: 3},
   {t0: 2.08, from: [80, 652], v: 205, rise: -6, span: 27, n: 5, ink: 0.42, glider: -1},
 ];
 
@@ -95,8 +95,8 @@ export const S5FarLife: React.FC<{p: number}> = ({p}) => {
     for (let i = 0; i < V.n; i++) {
       const rank = Math.ceil(i / 2);
       const side = i === 0 ? 0 : i % 2 ? 1 : -1;
-      const x = hx - rank * V.span * 0.95;
-      const y = hy + side * rank * V.span * 0.52 + Math.sin(t * 2.1 + i * 1.3) * 1.6;
+      const x = hx - rank * V.span * 0.86 + Math.sin(t * 1.7 + i * 2.3) * 2.2;
+      const y = hy + side * rank * V.span * 0.46 + Math.sin(t * 2.1 + i * 1.3) * 1.6;
       const w = V.span * (1 - rank * 0.07);
       d += birdD(x, y, w, (t * 3.6 + i * 0.19) % 1, i === V.glider);
     }

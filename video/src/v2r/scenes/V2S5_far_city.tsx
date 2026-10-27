@@ -72,9 +72,13 @@ const FRONT: Tone = {
 type Kind = 'block' | 'gable' | 'hip' | 'tower' | 'long' | 'trees';
 type R = ReturnType<typeof rng>;
 
-/** A row of window dots across a facade (front rows only; 1.4 px dots on a ~4 px period, a third of them dark). */
+/** A few window dots on a facade (front rows only): 1-3 dots at irregular positions on half the facades, never a
+ *  regular row (the far plane slides ~12 px a frame at the peak: a fine regular pattern would strobe), so the detail
+ *  still peaks in the small back rows just under the horizon. */
 function windows(B: Batch, x: number, w: number, y: number, tone: Tone, r: R) {
-  for (let wx = x + Math.max(1.6, w * 0.3) + 1; wx < x + w - 1.8; wx += r.range(3.4, 4.4)) if (r.chance(0.72)) B.rect(tone.shadeDeep, wx, y, 1.4, 1.5);
+  if (!r.chance(0.5)) return;
+  const n = Math.min(3, Math.max(1, Math.floor(w / 5)));
+  for (let i = 0; i < n; i++) B.rect(tone.shadeDeep, x + Math.max(1.6, w * 0.3) + r.range(0.5, Math.max(0.6, w * 0.6 - 2)), y + r.range(-0.6, 1.4), 1.4, 1.5);
 }
 
 /** One far building (3-5 flat shapes: a face, its shade side on the left (the sun is to the right), a roof band). */
@@ -117,7 +121,7 @@ function building(B: Batch, kind: Kind, x: number, base: number, w: number, h: n
       // a long federal block: a colonnade band in shade under a flat roof slab
       B.rect(face, x, base - h, w, h);
       B.rect(tone.shade, x + w * 0.04, base - h * 0.64, w * 0.92, h * 0.36);
-      for (let cx = x + w * 0.07; cx < x + w * 0.95; cx += 2.6) B.rect(face, cx, base - h * 0.64, 1, h * 0.36);
+      B.rect(face, x + w * 0.04, base - h * 0.66, w * 0.92, 1.1);
       B.rect(tone.shade, x, base - h, sh * 0.7, h);
       B.rect(roof, x - 0.6, base - h - 2.2, w + 1.2, 2.6);
       return {roofY: base - h - 2.2};
@@ -136,10 +140,7 @@ function building(B: Batch, kind: Kind, x: number, base: number, w: number, h: n
       B.rect(tone.shade, x, base - h, sh, h);
       const rh = r.range(1.6, 2.8);
       B.rect(roof, x - 0.4, base - h - rh * 0.5, w + 0.8, rh);
-      if (tone.windows && h > 8) {
-        windows(B, x, w, base - h + rh + 1.6, tone, r);
-        if (h > 13) windows(B, x, w, base - h + rh + 5.6, tone, r);
-      }
+      if (tone.windows && h > 8) windows(B, x, w, base - h + rh + 2, tone, r);
       return {roofY: base - h - rh * 0.5};
     }
   }
@@ -240,6 +241,60 @@ function cityRow(B: Batch, i: number, seed: string, skip?: (x: number, w: number
   }
 }
 
+/** Skyline accents in the back rows (65 %): spires, a clock tower, a few taller blocks and the Basilica's dome and
+ *  campanile far to the right; they break the horizon by at most ~8 px, so the obelisk stays the one far shape over it
+ *  (the Capitol, the tiny second landmark, rises ~20 px). */
+function skylineAccents(B: Batch, seed: string) {
+  const r = rng(seed);
+  const base = CITY.rows[1] + 1;
+  for (let x = CITY.x0 + r.range(20, 120); x < CITY.x1; x += r.range(90, 190)) {
+    if (Math.abs(x - CITY.obelisk.x) < 60 || Math.abs(x - CITY.capitol.x) < 50) continue;
+    const k = r.pick(['spire', 'spire', 'tower', 'block', 'block'] as const);
+    if (k === 'spire') {
+      const h = r.range(14, 20);
+      B.rect(FAR.backStone, x - 2.2, base - h * 0.55, 4.4, h * 0.55);
+      B.rect(FAR.backShade, x - 2.2, base - h * 0.55, 1.4, h * 0.55);
+      B.poly(FAR.backSlate, [
+        [x - 2.4, base - h * 0.55],
+        [x, base - h - r.range(2, 5)],
+        [x + 2.4, base - h * 0.55],
+      ]);
+    } else if (k === 'tower') {
+      const h = r.range(16, 22);
+      const w = r.range(4.5, 6.5);
+      B.rect(FAR.backLit, x - w / 2, base - h, w, h);
+      B.rect(FAR.backShade, x - w / 2, base - h, w * 0.32, h);
+      B.poly(FAR.backSlate, [
+        [x - w / 2 - 0.4, base - h],
+        [x, base - h - w * 0.9],
+        [x + w / 2 + 0.4, base - h],
+      ]);
+    } else {
+      const h = r.range(13, 18);
+      const w = r.range(8, 14);
+      B.rect(FAR.backStone, x - w / 2, base - h, w, h);
+      B.rect(FAR.backShade, x - w / 2, base - h, w * 0.3, h);
+      B.rect(FAR.backSlate, x - w / 2 - 0.4, base - h - 1.6, w + 0.8, 1.8);
+    }
+  }
+  // the Old Post Office clock tower (right of the Mall) and the Basilica's dome + campanile (far right)
+  {
+    const x = 742;
+    B.rect(FAR.backLit, x - 3.4, base - 26, 6.8, 26);
+    B.rect(FAR.backShade, x - 3.4, base - 26, 2.2, 26);
+    B.poly(FAR.backSlate, [
+      [x - 4, base - 26],
+      [x, base - 33],
+      [x + 4, base - 26],
+    ]);
+    const bx = 1392;
+    B.rect(FAR.backLit, bx - 14, base - 8, 28, 8);
+    B.fill(FAR.backLit, `M${bx - 7} ${base - 8}A7 7.5 0 0 1 ${bx + 7} ${base - 8}Z`);
+    B.rect(FAR.backShade, bx + 11, base - 22, 4, 22);
+    B.rect(FAR.backLit, bx + 12.2, base - 22, 2.8, 22);
+  }
+}
+
 /** The far hills: two flat ridges on the horizon (the farther one paler), past both plane ends. */
 export const FarHills: React.FC<{seed?: string}> = ({seed = 's5hills'}) => {
   const b = useMemo(() => {
@@ -252,8 +307,8 @@ export const FarHills: React.FC<{seed?: string}> = ({seed = 's5hills'}) => {
       pts.push([CITY.x1, CITY.horizon + 8]);
       B.poly(col, pts);
     };
-    ridge(CITY.horizon - 3, 13, FAR.hillFar, `${seed}/r0`, 0.0042);
-    ridge(CITY.horizon + 1, 8, FAR.hill, `${seed}/r1`, 0.0061);
+    ridge(CITY.horizon - 9, 14, FAR.hillFar, `${seed}/r0`, 0.0042);
+    ridge(CITY.horizon - 3, 10, FAR.hill, `${seed}/r1`, 0.0061);
     return B;
   }, [seed]);
   return <Paint b={b} seed={seed} misreg={false} />;
@@ -293,6 +348,8 @@ export const FarCityS5: React.FC<{seed?: string; obelisk?: React.ReactNode}> = (
     cityRow(B, 0, seed);
     B.layer();
     cityRow(B, 1, seed, (x, w) => x + w > CITY.capitol.x - 30 && x < CITY.capitol.x + 30);
+    B.layer();
+    skylineAccents(B, `${seed}/acc`);
     B.layer();
     cityRow(B, 2, seed);
     B.layer();
