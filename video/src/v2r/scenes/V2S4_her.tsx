@@ -11,6 +11,7 @@
 // and each 12/s drawing samples the travel at the MIDDLE of its hold (the residual slip is +-4.6 px, never one-sided).
 import React, {useMemo} from 'react';
 import {useTime} from '../../lib/time';
+import {XG, mat} from '../../lib/xf';
 import {CM} from '../palette';
 import {HER, Person, strideFor} from '../kit/cast';
 import {Batch, Paint} from '../kit/canal/core';
@@ -84,13 +85,26 @@ export function herStrideAt(t: number): number {
   return HER_STRIDE * (1 - u * u * (3 - 2 * u));
 }
 
+/** Looking up at a tall sign she leans back a hair from the ankles (degrees, + = back for her left-facing profile),
+ *  with the head lift; it eases off a little when her eyes come down to the APR plate. Stepped at 12/s like the pose. */
+export function herLean(t: number): number {
+  const tq = Math.floor(t * 12 + 1e-6) / 12;
+  const k = (a: number, d: number) => {
+    const u = Math.max(0, Math.min(1, (tq - a) / d));
+    return u * u * (3 - 2 * u);
+  };
+  return 1.6 * k(S4_BEATS.lookUp + 0.04, 0.3) - 0.7 * k(19.5, 0.3);
+}
+
 export const S4Her: React.FC = () => {
   const t = useTime();
   const {x, feetY: y, h} = S4_HER;
   const stopped = t >= S4_BEATS.stop;
+  const lean = stopped ? herLean(t) : 0;
   return (
     <>
       <HerShadow />
+      <XG m={lean ? mat.about(mat.rotate(lean), x, y) : mat.I}>
       <Person
         x={x}
         y={y}
@@ -106,6 +120,7 @@ export const S4Her: React.FC = () => {
         stride={herStrideAt(t)}
         tilt={stopped ? herTilt(t) : 0}
       />
+      </XG>
     </>
   );
 };

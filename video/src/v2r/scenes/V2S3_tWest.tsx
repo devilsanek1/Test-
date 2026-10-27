@@ -134,18 +134,42 @@ function midBatch(): Batch {
   b.rect(CM.anchor, 30, wt + 6, 22, 4);
   b.rect(CM.anchor, 48, wt + 10, 2, 16);
   b.layer();
-  // the tree: trunk and limbs, then a scalloped autumn crown in four colours, its ink and leaf ticks
-  b.poly(CM.line, [[TREE.x - 9, TREE.base], [TREE.x - 5, 900], [TREE.x + 5, 900], [TREE.x + 10, TREE.base]]);
-  b.ink(`M${P(TREE.x - 3, 920)}Q${P(TREE.x - 30, 880)} ${P(TREE.x - 52, 860)}M${P(TREE.x + 2, 912)}Q${P(TREE.x + 30, 870)} ${P(TREE.x + 62, 852)}`, 3, CM.line);
+  // the tree: trunk and limbs, a scalloped crown, then autumn clumps (each its own loose outline), leaf ticks
+  b.poly(CM.line, [[TREE.x - 10, TREE.base], [TREE.x - 6, 930], [TREE.x - 16, 900], [TREE.x - 8, 898], [TREE.x + 1, 918], [TREE.x + 9, 896], [TREE.x + 16, 900], [TREE.x + 6, 930], [TREE.x + 11, TREE.base]]);
+  b.rect(CM.shadeWarm, TREE.x + 3, 930, 6, TREE.base - 930);
   b.layer();
-  const cr = crown(TREE.cx, TREE.cy, TREE.rx, TREE.ry, {seed: 's3tree', bumps: 13, round: 0.6});
+  const cr = crown(TREE.cx, TREE.cy, TREE.rx, TREE.ry, {seed: 's3tree', bumps: 14, round: 0.6});
   b.fill(CM.sage, cr);
-  b.fill(CM.leafGold, crown(TREE.cx + 38, TREE.cy + 18, 58, 50, {seed: 's3tree2', bumps: 8}));
-  b.fill(CM.leafRust, crown(TREE.cx - 46, TREE.cy + 30, 44, 38, {seed: 's3tree3', bumps: 7}));
-  b.fill(CM.coatMustard, crown(TREE.cx + 6, TREE.cy - 44, 46, 34, {seed: 's3tree4', bumps: 7}));
-  // gaps in the crown show limbs
-  b.ink(cr, TK.struct, CM.ink, 0.3);
-  b.ink(crownTicks(TREE.cx, TREE.cy, TREE.rx, TREE.ry, {seed: 's3treeT', n: 7, size: 9}), TK.detail);
+  b.layer();
+  // limbs seen in the gaps of the crown
+  b.ink(`M${P(TREE.x - 8, 900)}Q${P(TREE.x - 34, 872)} ${P(TREE.x - 62, 858)}M${P(TREE.x + 12, 898)}Q${P(TREE.x + 40, 868)} ${P(TREE.x + 70, 850)}M${P(TREE.x, 905)}Q${P(TREE.x + 4, 860)} ${P(TREE.x - 6, 820)}`, 3.2, CM.line);
+  b.layer();
+  const clumps: [number, number, number, number, string][] = [
+    [TREE.cx + 46, TREE.cy - 30, 40, 32, CM.leafGold],
+    [TREE.cx - 50, TREE.cy + 22, 38, 30, CM.leafRust],
+    [TREE.cx + 2, TREE.cy - 58, 42, 26, CM.coatMustard],
+    [TREE.cx + 58, TREE.cy + 34, 34, 28, CM.leafRust],
+    [TREE.cx - 62, TREE.cy - 34, 32, 26, CM.leafGold],
+    [TREE.cx - 6, TREE.cy + 46, 36, 26, CM.leafGold],
+  ];
+  let clumpInk = '';
+  clumps.forEach(([cx, cy, rx, ry, col], i) => {
+    const d = crown(cx, cy, rx, ry, {seed: `s3clump${i}`, bumps: 7, round: 0.66});
+    b.fill(col, d);
+    clumpInk += d;
+  });
+  b.ink(clumpInk, TK.detail, CM.ink, 0.55);
+  b.ink(cr, TK.struct, CM.ink, 0.28);
+  b.ink(crownTicks(TREE.cx, TREE.cy, TREE.rx * 0.9, TREE.ry * 0.9, {seed: 's3treeT', n: 6, size: 8}), TK.fine);
+  // loose single leaves round the crown's rim
+  {
+    const rl = rng('s3treeLeaves');
+    for (let i = 0; i < 26; i++) {
+      const a = rl.range(0, Math.PI * 2);
+      const rr = rl.range(0.86, 1.05);
+      b.fill(rl.pick([CM.leafGold, CM.leafRust, CM.coatMustard]), leafPath(TREE.cx + Math.cos(a) * TREE.rx * rr, TREE.cy + Math.sin(a) * TREE.ry * rr, rl.range(7, 10), 3.4, rl.range(0, 180)));
+    }
+  }
   b.layer();
   // the garden wall with a coping, a timber gate, ivy spilling over, a bin
   const g0 = 1004;

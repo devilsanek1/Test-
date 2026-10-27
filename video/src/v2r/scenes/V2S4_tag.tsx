@@ -16,7 +16,7 @@ import {line} from '../../lib/sketch';
 import {clamp, ease, springAt, useTime} from '../../lib/time';
 import {XG, mat} from '../../lib/xf';
 import {useCaptionFont} from '../../lib/font';
-import {P} from '../kit/canal/core';
+import {P, ovalPath} from '../kit/canal/core';
 import {WorldText} from '../kit/boards/WorldText';
 import {TXT_NAME_TAG} from '../kit/boards/texts';
 import * as MAP from '../world/map';
@@ -94,6 +94,8 @@ export const S4Tag: React.FC = () => {
         <Fill d={card} color={CM.paper} offset={[3, 2]} seed="s4tagCard" />
         {ext > 0.02 ? <Ink d={`M${P(X0 + 10, Y1A - 4)}L${P(X1 - 12, Y1A - 4)}`} width={INK_PX.hair} color={CM.stoneShade} seed="s4tagCrease" /> : null}
         <Ink d={outline} width={INK_PX.far} seed="s4tagEdge" />
+        {/* the knot where the thread ties onto the card (v1's labels carry a pin: a small dark mark) */}
+        <Fill d={ovalPath(CARD_END_X, bottom + 0.5, 3.4, 3)} color={CM.ink} offset={false} seed="s4tagKnot" />
         {LINES.map((l, i) => (
           <WorldText key={i} x={TX} y={l.y} size={l.size} text={l.text} at={l.at} dur={l.dur} weight={l.weight} seed={`s4tag${i}`} maxW={X1 - 14 - TX} />
         ))}

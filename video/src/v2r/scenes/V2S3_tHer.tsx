@@ -23,13 +23,13 @@ const X1 = F.x + F.w / 2; // 401.25
 const Y0 = F.y - F.h / 2; // 702.85
 const Y1 = F.y + F.h / 2; // 867.15
 /** The open leaves' free edges (an inward-open leaf seen from outside: a narrow strip at each jamb). */
-const LEAF_L = X0 + 22;
-const LEAF_R = X1 - 22;
+const LEAF_L = X0 + 13;
+const LEAF_R = X1 - 13;
 const FRAME = 7;
 
 // ---------------------------------------------------------------- her pacing (film seconds)
 
-const WALK = {t0: 13.12, t1: 14.56, from: 378, to: 292} as const;
+const WALK = {t0: 13.12, t1: 14.56, from: 362, to: 302} as const;
 const STEP_PX = 30;
 const STRIDE = strideFor(STEP_PX, S3_HER.h, 'profile');
 const smooth = (k: number) => {
@@ -175,12 +175,13 @@ function frameBatch(): Batch {
 export const blindBottom = (t: number): number => {
   const up = Y0 + 9;
   const start = Y0 + F.h * 0.35;
-  const t0 = 12.94;
+  const t0 = 12.98;
+  const dur = 0.1;
   if (t <= t0) return start;
-  const k = (t - t0) / 0.14;
-  if (k < 1) return start + (up - 4 - start) * (1 - Math.pow(1 - k, 2.2));
-  // overshoot 4 px past the roller, then settle (a damped spring)
-  const d = t - (t0 + 0.14);
+  const k = (t - t0) / dur;
+  if (k < 1) return start + (up - 4 - start) * (1 - Math.pow(1 - k, 1.8));
+  // overshoot 4 px past the roller, then settle (a damped spring, still by ~13.16)
+  const d = t - (t0 + dur);
   return up - 4 * Math.exp(-d * 18) * Math.cos(d * 32);
 };
 

@@ -144,8 +144,8 @@ function backBatch(): Batch {
     TK.detail,
   );
   // a satellite dish on the stucco house's stack
-  b.fill(CM.paper, ovalPath(1022, 640, 9, 11));
-  b.rect(CM.stoneShade, 1020, 638, 6, 3);
+  b.fill(CM.stoneShade, ovalPath(1022, 641, 8, 10));
+  b.rect(CM.shadeCool, 1022, 639, 7, 3);
   b.layer();
   // ---- dormers (cheeks and roofs) on the mansards
   for (const w of WINDOWS.filter((w) => w.bars === 'dormer')) {
