@@ -1,0 +1,159 @@
+# Video 2 ("One Small Window"): the through-line card and world bible (W1), conformed to DIRECTION
+
+Director, 2026-10-27 (resume after the pause). v2 was built before `docs/look/DIRECTION.md`; this card makes it one
+flowing story with the least rework. Order: owner's words > DIRECTION > `docs/look/CRAFT.md` > THIS card (thread, places,
+joins, tiers, light) > `TREATMENT.md` (story, words, timings; its fairness §8 binds this card too) > `STYLE.md` (values).
+Lanes build from `lanes/conform_Ln.md`. Times: film seconds on the heard clock (`direction/beat_map.md`). Spots: screen
+px at 1080 x 1920.
+
+## 1. The card
+1. **Core line (locked):** "She quit Google, and says her contract bans criticizing it, for life." Frame 0: SHE SAYS: NO
+   CRITICIZING GOOGLE. FOR LIFE. + "Source: BBC News, 21 Oct 2026". Payoff: "talking about facts is not criticising".
+2. **Thread: her window, the one small window.** Lamp-lit at Google, it goes dark when she quits (0.40); it is the one
+   dark pane while the staff's blinds come down (S2); lit and open at home while she talks (S3: the question); it waits
+   ahead of her on the walk home (S4); it lights when she gets home (34.95) and the film loops on it. Home spots: **W**
+   (860, 700) 150 x 170 (S1 office, S8 home) · **M** (335, 785) 133 x 164 (S2 her dark office window, S3 her lit home
+   window: the match) · S4 far left under the sun (>= 90 px wide). It reacts at the end of her beats: dark (quit, "for
+   life") · the one dark pane (the fear) · lit, blind up (why is she talking) · lights (her words).
+3. **Declared exception, "the other side" (S5-S7, 20.55-~33.0, 12.4 s): no thread.** Fairness outranks CRAFT §a.1 here
+   (the owner's brief §18-19, "fair, nonjudgmental, no manufactured villains", the source on its topic by DIRECTION's
+   ladder; CORE_LINE §2's equal weight for Google): she and anything of hers are never in Washington, and April is before
+   she quit (TREATMENT V13); Google's reply is its own beat with nothing of hers in it (A5, V14). The excursion leaves
+   from the thread (S4 pushes into the sun right above her far window), goes to April and back through the same sun
+   (S4->S5, S6->S7) and returns to her window at the first join that can reach her (the S7->S8 boat wipe opens on W).
+   Tried and rejected: the sun (DIRECTION retires the sun as a character; no disc in S2; not her arc) · Pip (the mascot
+   has its own rule) · the boards (four objects, none in 0-8.4 s) · her window pinned as a card in a corner of S5-S7
+   (puts her into Washington and into Google's beat). Owner confirms (§8).
+4. **Home place: the canal** (one London canal, one October evening: Google's bank, the towpath walk, her bank). Places:
+   (1) the canal; (2) Arlington on an April morning (S5, S6), entered and left through the sun. The ONE scale reveal: S5's
+   crane. Information is paper where we are: tag and plates (S4), news box and plaque (S5), deal board (S6), A-boards (S2,
+   S7, S8).
+5. **The "you": none** (POV only). No stranger's back in any foreground: strangers stay small in the mid and far ground;
+   the foreground (bottom third) holds only Pip and things.
+6. **Pip** (tier B, drawn new, C* <= 25: STYLE's new token): on both sides of every join, riding the carrier or in the
+   same screen spot (within ~200 px); it never hops across a cut. One reaction per shot (TREATMENT §3), none on Google's
+   beat.
+
+## 2. The thread on screen
+| shot | span | the thread | s |
+|---|---|---|---|
+| S1 | 0.00-6.10 | W lit, dark from 0.40; the dive into it | 6.10 |
+| S2 | 6.10-12.98 | her dark office window at M (pulled out of; its A outline pops on at 6.82) | 6.88 |
+| S3 | 12.98-14.86 | her lit home window at M, her silhouette inside (the push-through dives into her) | 1.88 |
+| S4 | 14.86-20.55 | her window ahead at the far left, enters ~15.4, under the sun at the push-through | ~5.1 |
+| S5-S7 | 20.55-~33.0 | none: the declared other side (§1.3) | 0 |
+| S8 | ~33.0-39.08 | W (pre-truck (700, 700); at W from 35.60), lights 34.95, the seam | ~6.1 |
+**Sum ~26.0 s = 67 % of 39.08 s; 98 % of the 26.6 s outside the declared other side; longest gap outside it ~0.6 s
+(S3 -> S4).** Without §1.3 both CRAFT FAIL lines fail; with it, both pass.
+
+## 3. Joins (0 plain cuts; shots average 4.9 s)
+At every join: the midpoint sits in the voice's pause, 0-0.25 s before the next sentence's first heard word; within
+midpoint +-0.2 s nothing enters, pops, turns or speeds up but the carrier (and Pip riding it); slow life keeps its pace;
+<= 4 movers within 0.4 s. A push-through is centred on the incoming shot's `start`. Pip never hops across.
+
+| join | midpoint · first word | carrier · engine (scenes.json `transitionIn` of the incoming shot) | what leads | Pip |
+|---|---|---|---|---|
+| S1->S2 | 6.10 · "You'd" 6.28 | A · `push-through` {from [860,700], to **[335,785]**, zoom 12, bridge #36223A, inkComp 0.6, dur 0.30} | the dive into W, out of her dark office window at M | stays on its bollard (700,1235), swept by the zoom; already seated on its S2 post (590,1050) |
+| S2->S3 | 12.98 · "So" 13.16 | B · `matchcut` | her dark office window at M -> her lit home window at M: same spot, same size (133 x 164) | (590,1050) in both |
+| S3->S4 | 14.86 · "She" 15.07 | A · `push-through` {from [330,742] (her silhouette's head), to [720,912] (her head in S4), zoom 12, bridge #36223A, dur 0.30} | into her at her window, out of her walking (the name tag pops 15.07) | swept; seated on the boat roof (470,1218) from S4's first frame |
+| S4->S5 | 20.55 · "In" 20.67 | A · `push-through` {from [250,650], to [250,650] (SUN1), zoom 7, no bridge, dur 0.30} | into the low October sun just above her window, out of the April sun in the slot | (470,1218) -> on the bench (415,1120) from S5's first frame |
+| S5->S6 | 23.92 · "any" 24.03 | D · `foreground-wipe` {element 'scene' (S5 exports `Wiper`: a blossom tree, trunk + crown ~300 px), dir 'right', dur 0.40}; **V2S6 start 23.92** | the tree crosses the lens left to right as S6's truck begins; the board is uncovered by 24.00 | tiny at the balustrade (366,1195) -> at the deal board's foot (~(360,1410)): the same screen area |
+| S6->S7 | 28.10 · "But" 28.31 | A · `push-through` {from [260,620], to [260,620] (SUN2), zoom 7, no bridge, dur 0.30}; **V2S7 start 28.10** | into the April sun, out of the October sunset sun: back to London | swept; on S7's board bollard (700,1205) from S7's first frame |
+| S7->S8 | 32.93 · "She" 33.16 | D · `foreground-wipe` (S7's narrowboat `Wiper`, dir 'left', dur 0.46): as built; the bow only after 32.70 (A5) | the narrowboat | rides it: S7's Pip stays put until the bow covers it (~32.83); S8's Pip on the stern 32.97, steps off 33.00, lands (450,1205) 33.20 |
+| S8->S1 | 38.95 · "She" 0.12 (next loop) | B + `unbuild` {dur 0.26, captionAt 39.04} | her lit home window W = her office window W at f0, both 150 x 170 at zoom 1.00 | board bollard (700,1205) -> f0 bollard (700,1235): a 30 px settle |
+
+## 4. Tiers per shot (CRAFT §b), mover budget, colour script
+A = the beat's 1-3 subject objects (the only full outline, the contrast, >= 60 % of the motion in its beat); B = Pip and
+people near the story (soft, small, steady, tinted line or none); C = the environment (no lines, low contrast, slow life).
+A promotion pops the A outline on (one frame) on its word; draw-ons only at frame 0 and where the drawing is the beat
+(the boards' pen lines in step with the voice: DIRECTION rule 8). Kit defaults: `src/v2r/kit/tiers.tsx` and each kit
+README's "Tiers". Noticeable supporting movers (a box over 0.3 % of the frame): at most 3 at once, taking turns.
+1. **S1** (golden). A: her + her ghost row (one subject) · W (0-0.40, 5.59-6.25) · the glass door (0.45-1.40). B: Pip,
+   the canopy letters, one far jogger, the small seated public on the lower steps. C: the wing (one window switch at a
+   time, >= 2 s apart), canal, moored boats, bridge + one bus, far roofs, hero cloud, birds lifting (1.40, 4.98). Colour:
+   frame 0 = paper, C landing as flat pale shapes, her / the door / W drawing their outline, Pip in colour -> the flood
+   from SUN0 by 0.30, her teal coat last; W lamp-gold -> plum dark (0.40); the ghosts paper, heads plum -> silver.
+2. **S2** (golden). A: her dark window (outline on at 6.82 "one") · the five staff windows (lights 8.96, silhouettes,
+   half blinds 10.26-10.60, the last blind 12.20) · the TOLD THE BBC board (from 8.44). B: Pip (head to the wall on "But"
+   8.30), reporter and staffer (notebook 9.48; hood ~10.85, after the blinds), newsagent. C: the wall, canal, passing
+   boat, far walkers, pigeons, urn steam. Colour: warm brick and gold panes; her pane the plum anchor; the five panes
+   cool to white at 8.96; warm-shade blinds; the board's cream face.
+3. **S3** (sunset flash-forward). A: her window with her silhouette on the phone. B: Pip (turns to her on "she" 13.96),
+   two lit neighbours. C: terrace, canal, heron, boat smoke, string lights (one twinkle at a time). Colour: rose band;
+   lamp-gold pane in its teal frame; her plum silhouette.
+4. **S4** (low sun). A: her (walk, stop on "objected" 17.96, look west) + the name tag (15.07-18.80) · the fingerpost
+   (plates from 18.92). B: Pip (turns west on "heading" 19.55), her far window (the thread's spot), walkers she passes. C:
+   towpath, lamps, benches, backs, gasholders, viaduct, the boat, water (no motion of its own), ducks, heron, smoke; birds
+   west 19.80. Colour: gold band; her teal coat; cream tag and plates; her far window dark in its teal frame.
+5. **S5** (April morning; the scale reveal). A: the slot's blossom burst ("April" 20.76) -> the news box (to ~21.75) ->
+   the Pentagon + the plaque (from 22.43). B: the stranger and Pip (the scale anchors). C: city, river, trees, the
+   lamppost wipe, joggers, cars, birds, clouds; the wing's windows warm in ONE step (23.08). Colour: cool mint sky, pale
+   gold band, blossom pinks, pale limestone; the far city in pale steps toward the sky.
+6. **S6** (April). A: the deal board (the clause from the reveal, the purpose line 24.03, the F12 line 26.40). B: Pip
+   (one ear flick on "veto" 26.50), the door staff (small backs). C: facade, door, fence, tulips, blossom, petals,
+   joggers; facade windows 27.08-27.80 at <= 3 switch-ons per second. Colour: the cream board under a pale sky; tulip
+   confetti; limestone.
+7. **S7** (sunset). A: Google's board (whole shot; the 4 % push lands on "principles" 30.04). B: Pip (sit-watch, NO
+   reaction), people in and out of the doors (small backs). C: the wing (plain lit windows), fountains (steady), plane
+   trees, festoons (30.04 run, <= 3 switch-ons per second), a cyclist, smoke. Colour: rose band; cream board; plain gold
+   windows.
+8. **S8** (sunset -> lamps). A: her + the three ghosts (her walk 33.16-34.75; the ghosts pop on "can't" 33.78) · W
+   (34.55-34.95, and the end) · her board (35.72 the wipe, 36.54 the quote). B: Pip (ears down on "can't"), the café
+   owner, the two readers (~150 px), her door. C: the lane, lamps (37.18 run, <= 3 per second), the café boat, canal,
+   roofs, sun, smoke, steam, walkers. Colour: rose band; teal door; W lamp-gold from 34.95; cream board; lamp-gold pools
+   run west 37.18.
+
+## 5. Light: one family, two rigs (CRAFT §d; `src/lib/light.tsx`, API in `src/lib/LIGHT.md`)
+- **`src/v2r/world/rigs.ts`** holds every rig (the integrator writes it with map.ts; lanes import it, never redefine it).
+  **Tint family, both sets:** `tintFamily(CM.shadeWarm #8C5E6B, {form 0.20, cast 0.28, contact 0.48})` (the engine demo's
+  `TINT_CANAL`): on paving form / cast / contact dL* -9 / -13 / -22, chroma kept; never a contact strip on water (it
+  greys: use a cast-strength strip at a waterline at most).
+- **RIG_CANAL** (S1, S2, S3, S4, S7, S8; = the demo's `CANAL_EVENING`): key = the low western sun, `sunLight({toward, el:
+  36})`, cast capped 0.8 h; ground 0.28; pools ['#FBE6C2', '#FFF2D9']; rim '#FFE7BE'; windows CM.lamp. North lenses
+  (S1-S4, S7): the sun at screen LEFT (in frame in S1, S3, S4, S7; off-screen left in S2), shadows fall right and a
+  little toward us (toward ~15). S8 looks west: the sun ahead (SUN8), shadows fall toward us (toward ~85), backlit form
+  (tops lit).
+- **RIG_APRIL** (S5, S6): the same family; key = the April morning sun, `el` ~40, no pools. S5 start: the sun in the slot
+  at the left -> shadows right and toward us; the crane turns the view and the sun ends upper right -> shadows left and
+  toward us (one direction per frame, matching the sun's side). S6 looks south (a >90° turn from S5's end, so the key may
+  change side at the wipe), the sun at the left (SUN2): shadows right, toward us.
+- Every shot: contact shadows under everything that touches a surface (people, ghosts, Pip, bollards, benches, boards'
+  legs, lamp bases, bikes, planters, tables, bags); cast shadows for people, posts, boards and trees along the key;
+  FormShade on the side away from the key (the right side on north lenses); `Shade` one step on planes turned from the
+  sun (facades, undersides). Rim only on her (S1, S4, S8). Lit panes are `LitWindow` (L* 85-92, no glow); her lit window
+  adds a `WindowSpill` (S3; S8 from 34.95); S8's lamps add pools (two flat steps, +4 L* over the paving) as they light
+  (37.18). No source moves between cuts; the sun keeps its screen spot through both sun push-throughs. The caption band
+  holds one value. The brightest 5 % sits on the beat's A (check_light).
+
+## 6. What stays, what changes
+| shot | keep exactly as built | change |
+|---|---|---|
+| S1 | frame-0 words, source, box keys; exit ding; her figure, walk, the ghost row (figures, timing, stop, step, outlines); wing, door, canopy, W; the far towpath bend; KEEP_CLEAR | frame 0 drawn in the clean pen (pale C, A outlines drawing on, then the flood); the 5 % pull-out retired (zoom 1.00); near head-backs out, things in; life cut to budget; Pip's 5.90 hop out; tiers, light, pen |
+| S2 | the wall; the staff windows' story; bench figures; the board slide; Pip's head turn; the near lamp | her dark window to M (the staff window there moves to (200, 795)); the ring -> her window's A outline; the 6 % push retired; head-backs out, things in; hood after the blinds; Pip's hops out; tiers, light, pen |
+| S3 | terrace; her window (= S8's); the boat | ease-back retired; Pip to (590, 1050), no landing or leap; head-backs out; exit = push-through into her; tiers, light, pen |
+| S4 | the walk, stride, tag builds, post + plates, the boat foreground | opens out of her head; her house + window at the far left; gasholder off the sun; the 6 % push retired; exit = push-through into SUN1; Pip seated, no hops; tiers, light, pen |
+| S5 | the crane: planes, ease, wipe, swap, plaque, the end frame | opens out of the sun; calendar flip retired (the sun as a character); the windows warm in one step; exit = its blossom-tree `Wiper`; Pip seated, no hops; light, pen |
+| S6 | gate set, deal board, truck, facade, door | opens behind S5's wipe (23.92); readers' backs out, things in; Pip to the board's foot; exit = push-through into SUN2; light, pen |
+| S7 | forecourt, Google's board, the 4 % push, Pip at the bollard, the wiper | opens out of the sun (28.10); café backs out, things in; flash-safe lamp run; light, pen |
+| S8 | lane, her walk, door, W, board + wipe + quote, ghosts, lamp run, stern hand-off, readers | seam push retired (W = S1's W at 1.00); the un-build lands on S1's new frame-0 state; light (W spill, lamp pools), pen |
+Pen, every lane: the tiered clean pen is global (`lib/pen.ts` `setPen('clean')` via `src/v2r/pen.ts`; kit tier defaults
+by the engine): delete per-element ink weights (`INK_PX.*`), every `over` / `breaks` / `jitter` / `drift` / `misreg` /
+`open` / `exitLoose` option, hatching, scribbles, ripple dashes, brick and stone dabs, leaf specks. Rng placement jitter
+stays.
+
+## 7. Shared files (one owner each; lanes edit only their own files)
+- **Integrator** (with map.ts, one commit): `film/scenes.json` transitions and starts per §3 (V2S2 `to` [335,785]; V2S4,
+  V2S5, V2S7 push-throughs; V2S6 wipe start 23.92; V2S7 start 28.10); `world/rigs.ts` (§5); map.ts: S1 pull-out, S2 push,
+  S3 ease-back, S4 push and S8 seam push retired; S2 her window at M and the swapped staff window; S3 Pip seat (590,
+  1050); PIP_HOP_S2_S3, the calendar flip, every pipLeap / pipHop retired; S4 her-window spot; S6 Pip at the board's
+  foot; MATCHES carriers; BOTTOM_THIRD = things; SUN8 (420, 625); the Pip token at C* <= 25.
+- **L1** exports S1's frame-0 state (t < 0) for L6's un-build; **L2** sends its final near lamp (x, y, h, w, colour) to
+  L3.
+- Assembly (the orchestrator's transition pass): carry, eye jump, colour shift (declared light changes: S2->S3, S3->S4,
+  S4->S5, S6->S7, S8->S1) and movers per join on a 0.4-scale render (CRAFT §e).
+
+## 8. For the owner
+1. Confirm §1.3: her window cannot be in Washington (April, before she quit) or in Google's equal-weight beat, so S5-S7
+   (12.4 s) run without it; outside them it is on screen 98 % of the time. The alternative, both boards re-staged on the
+   canal beside her window, costs ~2 lane-days and weakens the fairness design (the deal next to her home, Google's words
+   in her frame); not recommended.
