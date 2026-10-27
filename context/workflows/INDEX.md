@@ -62,7 +62,8 @@
 | 2026-10-26 | `cozy-ref-riverside-wf_8b57016c-c16.js` | 4 | 0 | `context/agent_reports/2026-10-26_cozy-ref-riverside.md` |
 | 2026-10-26 | `cozy-v2-synthesis-wf_6ce1fd08-6e1.js` | 5 | 0 | `context/agent_reports/2026-10-26_cozy-v2-synthesis.md` |
 | 2026-10-26 | `g3-animated-sketchbook-wf_6ef4f230-229.js` | 11 | 0 | `context/agent_reports/2026-10-26_g3-animated-sketchbook.md` |
-| 2026-10-27 | `v3-g5b-rollout-wf_6a965600-a92.js` | 25 | 0 | (running) |
+| 2026-10-27 | `v3-g5b-rollout-wf_6a965600-a92.js` | 21 | 0 | stopped after builds + reviews; fixes split to helper sessions (`video/docs/v3/g5b_split/`, reports in `video/docs/v3/g5b_reports/`) |
 | 2026-10-27 | `v2r-understand-a-wf_f778c5a9-855.js` | 2 | 0 | v2 restart: house digest + beat map -> `video/docs/v2/direction/` |
 | 2026-10-27 | `v2r-understand-b-wf_a6c52303-658.js` | 2 | 0 | v2 restart: teardown + toolkit -> `video/docs/v2/direction/` |
 | 2026-10-27 | `v2r-treatments-{1,2,3}-*.js` | 6 | 0 | v2 restart: six competing treatments (camera journey, the line, Pip witness, documentary, small vs vast, retention) -> `video/docs/v2/direction/treatments/` |
+| 2026-10-27 | `v3-g5b-assemble-wf_180b3ca4-a34.js` | 3 | 0 | (running) |
