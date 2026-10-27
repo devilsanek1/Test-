@@ -256,7 +256,7 @@
  {
   "src": "v2r/sfx/sun_through_1.wav",
   "t": 20.4,
-  "gain": 0.2626,
+  "gain": 0.2694,
   "note": "JOIN S4>S5, the A push-through into the low October sun 20.40-20.70: a glass shimmer swells into the light and a small glass tink lands on the midpoint 20.55, 30 dB down by 'In' 20.67",
   "under_db": 14,
   "set_by": "sheet"
@@ -328,7 +328,7 @@
  {
   "src": "v2r/sfx/sun_through_2.wav",
   "t": 27.95,
-  "gain": 0.184,
+  "gain": 0.1898,
   "note": "JOIN S6>S7, the A push-through into the April sun 27.95-28.25: the same glass shimmer and tink, on the midpoint 28.10 (the callback, 3 dB softer)",
   "under_db": 17,
   "set_by": "sheet"

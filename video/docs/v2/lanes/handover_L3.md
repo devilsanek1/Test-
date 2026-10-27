@@ -1,3 +1,24 @@
+# >>> Paused 22:40 UTC for the depth pass (third session, session_014PwCXJs9nWENkpKqVhHWMP) <<<
+**State:** resumed 22:16 on the orchestrator's conform message; read DIRECTION.md, CRAFT.md §a-§d, THROUGHLINE.md, `conform_L3.md`
+(wins over everything below), `src/lib/LIGHT.md`, `src/lib/tier.tsx`, the kit READMEs' "Tiers", `world/rigs.ts`, map.ts S3/S4 (the
+integrator already retired the S3 ease-back and the S4 push: from = to = 1.00; S3 Pip seat (590, 1050); `S4.herWindow` (135, 698)
+90 x 102; scenes.json V2S4 / V2S5 push-throughs) and watched `deliverables/v2/v2r_G4_look.mp4`. Rendered the built shots under the
+global clean pen (0.4 scale). **No code changed since the resume** (last code commit d961a34; typecheck clean); no agent running.
+**Next, in order (after the depth section lands in conform_L3.md):**
+1. Mechanics myself: `V2S3_rig.ts` float -> one smooth out-and-back 2D leg, (1 - cos 2pi u) / 2 x (6, -3.5) px over 12.98-14.60, home
+   at 12.98 and from 14.60 (add `s3FloatDy`, apply dx + dy in `V2S3.tsx`); `S3_PIP` -> seated at (590, 1050), size 100, seed
+   'pipS2', no hops (`V2S3_pip.tsx`: drop the in-hop and the exit leap, keep the turn on "she" 13.90-13.98); `V2S3_tHer.tsx` WALK.to
+   302 -> 330 (still from 14.56/14.60; measure her head on (330, 742) at full size: a 10 px miss is 120 px at zoom 12); `V2S4_pip.tsx`
+   -> seated on the roof (470, 1218) from the first frame (drop the in-leap and the 20.25 out-leap; keep ride, gaze, the turn west
+   19.55; a contact shadow); the name tag widened to x 590-1000, y 600-800 (body 30: name / "research engineer," / "Google DeepMind
+   (Google's AI lab)"; build 2: "3 years · resigned Oct 2026" / a one-line credit) + map.ts S4.nameTag in the same commit (the
+   orchestrator's 15:00 instruction; the builds and text stay).
+2. Art conform, ONE agent at a time (S3, then S4), per conform_L3.md §1-§4 (+ the new depth section): tiers, RIG_CANAL light
+   (contact / cast / form, LitWindow + WindowSpill, rim on her), hand-drawn marks out, S3 window = S8's (closed leaves, teal mullion,
+   gold shade, two shelves), S3 foreground things + L2's final held lamp, Pip's railing seat at (590, 1050), S4 far house + window,
+   the gasholder lattice off the sun, life <= 3 noticeable movers, water with no motion of its own.
+3. One combined critic (check_light.py --sky '#BCDCCF', measure.py, the joins, the squint test) -> fixes -> report_L3.md.
+
 # L3 handover (V2S3 + V2S4): first session, stopped at the orchestrator's request
 
 **Done:** the direction is read (TREATMENT, map.ts S3/S4/PIP/MATCHES, BUILD.md, canal/cast/pip READMEs) and the plan below is set. No scene code is written yet:

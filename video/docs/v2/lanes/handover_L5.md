@@ -1,3 +1,35 @@
+## PAUSED 22:40 UTC for the depth pass (L5, session `session_014PwCXJBpuhBWJAJtA6vrSe`)
+State: resumed 22:16 on the new direction (DIRECTION.md, CRAFT §a-§d, THROUGHLINE.md, conform_L5.md); read them all, rendered the
+current S6 / S7 at 0.4 (Film2R 23.9-31.5) beside the approved G4 look clip. NO code changed since the 15:06 checkpoint (tree
+clean, `npx tsc --noEmit -p .` 0 errors). The integrator already moved S6 to 23.80 (S5's blossom-tree wipe) and S7 to 28.10
+(push-through out of SUN2), zeroed every S6 drift and put S6's Pip seat at (360, 1410) in map.ts; the kit's tiers and the
+clean pen are global (boards default to `support`).
+Next, in order (conform_L5.md wins; then the depth section the orchestrator adds):
+1. K3: check a board promoted with `tier="subject"` (one closed 3.0 px outline in the stiles' own deep warm shade, keys at
+   full contrast, popping on in one frame); README: "the legs' contact and cast shadows come from the scene's rig".
+2. V2S6: wrap the scene body in `<TimeShift by={0.2}>` (the dc kit's door / window times and every V2S6_* part stay on the
+   film-24.00 clock; shot now 23.80-28.10 = inner -0.20..4.10); `<DealBoard tier="subject" clackAt={0.03} />`; delete
+   `S6Readers` + the passer-by, the pigeons' flutter (`S6NearFront`), the petal GUST (keep the steady fall), the Pip
+   arrival + hop (`S6PipHop`, track keys) -> Pip seated still at (360, 1410) from the first frame, ear flick 'A' at 2.50
+   (inner), no other motion; staff walk-in from >= 24.40 (inner >= 0.40) or already under way; nothing enters / pops /
+   turns 23.60-24.00 and 27.90-28.30; promenade -> one jogger + small far C figures (< 0.3 % each), no sparrow lift near the
+   joins; facade windows 27.08-27.80 in <= 3 grouped switch-ons (draw GateFacade under 3 x-clips with lightAt [t,t] each,
+   e.g. 27.08 / 27.44 / 27.80); RIG_APRIL light (contact: board legs, posts, bench, rack, Pip, jogger, staff; cast: board,
+   posts, people; Shade on facade planes turned from the sun; FormShade on round things).
+3. V2S7: `S7_T0` = 28.10 in V2S7_pip.ts (delete `pipHopAt` / `PIP_HOP` / `S6_T0`); W7 and DOOR_KEYS etc. in V2S7_rig.ts are
+   film-28.06-local: shift them by -0.04 (or wrap in `<TimeShift by={-0.04}>`); `<GoogleBoard tier="subject" t0={-0.04}
+   headerAt={0.23} creditAt={0.23} clackAt={0.23} />` (header 28.33); Pip seated on the bollard from the first frame
+   (delete S7PipHop); delete the cafe's seated backs (`CAFE.s1`, `s0`), `NEAR_BACKS`, `RIM_SITTERS`, `STANDER` near people ->
+   cafe things (cups, saucer, folded paper, coat over a chair) + the cafe's people small and at rest in the mid ground;
+   the light run 30.10-30.60 in <= 3 switch-ons (group festoonA / B / tree / basin / cafe lights into 3 steps), bulbs
+   `SourceCore`, no flicker; nothing starts 32.50-33.10 but the wiper; delete hand-drawn specks / dash rows (V2S7_set,
+   V2S7_life first); RIG_CANAL light (contact under the board's legs, tables, chairs, bikes, planters, bollard, Pip; cast
+   for the board, tables, plane trees; Shade on the wing's planes turned from the sun).
+4. ONE combined critic agent (CRAFT §a-§d + check_light.py + fairness TREATMENT §8 + squint + joins vs THROUGHLINE), fixes,
+   then report_L5.md per conform_L5.md §6 (0.4 clip of Film2R 23.6-33.3, check_light at 25.0 / 27.5 / 29.0 / 31.5, line
+   measure at 25.0 / 31.0, the join frames, Pip's clause gap, flashes, movers, tsc).
+Renders of the pre-conform state: scratchpad `conform/now_sheet.png`, `conform/look_sheet.png` (lost on a restart).
+
 # L5 handover (boards K3 + V2S6 + V2S7), 2026-10-27
 
 ## Done (pushed)

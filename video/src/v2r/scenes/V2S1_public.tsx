@@ -86,6 +86,8 @@ export const FOOT: Foot[] = [
   {x: 842, y: 1378, w: 96, h: 10}, // umbrella
   {x: 432, y: 1800, w: 40, h: 34, cast: true}, // thermos + mugs
 ];
+/** The low row's footprints alone (the things moved to V2S1_fore's clusters: the scatter is retired). */
+export const LOW_FOOT: Foot[] = FOOT.slice(0, LOW.length);
 
 const Tote: React.FC = () => {
   const x = 212;
