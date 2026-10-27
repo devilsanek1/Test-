@@ -8,6 +8,102 @@ and the plum.
 Commits: 14ac5f5 ... 0b7f2a3 (the conform and the pre-critic clip); c8a9aed, 66aa2af and the last L1 commit (the fixes
 after the critic and after the cold viewer, then this clip).
 
+## v2: the owner's depth notes + the orchestrator's foreground fix (the clip to show the owner next)
+**The clip:** `video/deliverables/v2/v2r_G4_look_v2.mp4`: the same frames 0-367 (0.00-6.13 s), 1080x1920, 60 fps, with
+the voice.
+**The sheets:**
+- `video/deliverables/v2/v2r_G4_look_v2_sheet.jpg`: 0.4 scale, every 0.25 s.
+- **Before / after** `video/deliverables/v2/v2r_G4_look_v2_before_after.jpg`: 0.4 scale at 0.0, 0.5, 3.0 and 5.3 s; the
+  top row is the first look clip, the bottom row is v2.
+
+The commits are 955e4c3 (the foreground) and efbd8b8 (the depth pass), plus this report's commit.
+
+**What the owner asked:** "the foreground and the main focus still blurs with the background ... no distance effect
+nor perspective ... the bottom part ... little to no perspective or depth here at all".
+
+**1. Separation: the Google wing in front of the far city**
+- **Atmospheric perspective in flat colour.** Every plane of the west gap mixes toward one cool haze `S1_HAZE`
+  (#EADCD8, pale rose-lilac), using `hazeBatch` (V2S1_set_core). Three clear steps (`HAZE_K`), and every far plane drops
+  its lines:
+
+  | plane | haze | windows |
+  |---|---|---|
+  | farthest roofs and the gasholder | 0.80 | none |
+  | middle terraces | 0.62 | none |
+  | near terraces | 0.46 | sash windows kept, never near-black; the 1.80 window still switches |
+  | the bridge and the bus | 0.30 | |
+  | the bridge's railing | 0.36 | |
+
+  The aerials are gone.
+- **A calm field behind the wing's west edge.** The far block right behind it is a plain cool block (no windows, no
+  roof garden), so the wing's pale pier reads against a clear, darker field.
+- **The wing itself is unchanged**: its full value range, and her and the row at the strongest contrast.
+
+At 3.0 s, before and after:
+
+| region | L* | C* | local contrast |
+|---|---|---|---|
+| far city, before | 75.1 | 22.5 | 7.2 |
+| far city, after | 80.3 | 16.7 | **4.0** |
+| the wing (both) | 75.3 | 17.9 | 8.6 |
+
+The city's C* includes the bottom of the sun disc. The city used to be as dark as the wing, more saturated and nearly as
+busy; now the wing has 2.2x its local contrast.
+
+**2. Perspective on the ground.** One vanishing point, (540, 965), for every receding edge.
+- **The treads.** Stone blocks, ~1-1.4 m, staggered by half a block from tread to tread. Their joints are thin flat
+  strips running to the vanishing point, finer with distance (0.8 px far, 3.4 px near), in a warm mid stone (L* ~80, a
+  value step, never a dark line). The block contrast grows toward us: the near treads alternate with oat, the far ones
+  with paving.
+- **The far towpath (the quay).** Two-tone slabs whose sides run to the same point, finer and closer in value than ours.
+- **The water.** Three depth steps: the far third mixes toward the haze, the near third a step deeper. The reflection
+  bands now thicken toward us (the far band was the thicker one).
+- **The foreground** (V2S1_fore, from the orchestrator's 22:13 brief). Big, simple tier-C things at near scale, cut by
+  the frame edges, in three layers:
+  - mid: a stone bench cut by the right edge, with a backpack and a flask;
+  - near: a stone planter with a bay tree cut by the left edge, a canvas tote at its foot, two stacked flower crates, a
+    café table with cups and a paper, two rattan bistro chairs;
+  - front: a stone parapet across the bottom with a book, a folded scarf and leaves on its cap, and its pier cut by the
+    right edge, with a pot of thyme.
+
+  The props sit only in those clusters. The old scatter (`ThingsOn`, `Leaves`, the bike, the guitar case...) is
+  retired; the code stays in V2S1_public for now.
+- **Light on the new things.** Contact and cast shadows; a form step on the side away from the sun; the faces turned to
+  us one Shade step.
+  - The old off-screen-tree shade across the near steps (`S1BankShade`) is retired: it cut the new things at an
+    arbitrary height.
+  - The bank's lit stone is now `BANK_LIT` #EFDDC9 (L* ~89), just under the frame's brightest 5 %, so the brightest area
+    stays on the subject.
+
+**3. Particles: a marked, empty slot.** `S1Particles` in V2S1.tsx, between the Look and the sun's half. It is for motes
+in the low sun's light, a drifting leaf or two from the plane branch, and glints on the water. It gets filled from
+`src/lib/particles.tsx` when the shared toolkit lands; nothing hand-rolled.
+
+**Checks (v2):**
+- **check_light A/B:** OK at all three times, with the brightest 5 % now on the subject:
+
+  | time | brightest 5 % from the subject | greyed px |
+  |---|---|---|
+  | 0.5 s | 0.007 H | 21 |
+  | 3.0 s | 0.003 H | 23 |
+  | 5.3 s | 0.013 H | 35 |
+
+- **Line metrics:** strokes **64 / 70 per Mpx: OK** (budget 80). Short strokes 48 / 50 (budget 25): still over, down from
+  63-65. Dark-line 0.83 / 1.42 %: OK.
+- **Local contrast:** the environment band (y 600-1215) is 6.8, within 7 (was 7.2). The bank is 2.3 (soft).
+- **Typecheck:** clean.
+
+**Not touched:** the sun (the owner may comment on it), the camera (locked), and every map spot (W, her path, Pip's
+bollard, the caption band). map.ts is unchanged.
+
+**Open:**
+- No critic or cold-viewer round has run on v2 yet.
+- The particles are waiting for the shared lib.
+
+---
+
+# The first look clip (kept for the record)
+
 ## What changed (conform_L1 §1-§8; DIRECTION and CRAFT win over everything built before)
 - **§1 Frame 0 in the clean pen.** For t < 0 and at f0 the world is paper with flat pale shapes (`S1_PALE` 0.7 toward
   the page through `Look cascade.pale`, no lines). Only the subject's outlines draw on, one closed stroke per object, from
