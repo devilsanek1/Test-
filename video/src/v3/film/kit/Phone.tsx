@@ -113,7 +113,7 @@ const PhoneBody: React.FC<PhoneProps> = ({
     <XG m={phoneMat(x, y, w, h, rot)}>
       <Fill d={roundRect(0, 0, w, h, 56 * k)} color={EMBER.anchor} at={fillAt(at)} seed={`${seed}/body`} />
       <Fill d={roundRect(16 * k, 16 * k, w - 32 * k, h - 32 * k, 42 * k)} color={EMBER.screen} at={fillAt(at, 0.03)} offset={false} />
-      <Ink d={roundRect(0, 0, w, h, 56 * k, {seed: `${seed}/o`})} at={at} width={ink} />
+      <Ink d={roundRect(0, 0, w, h, 56 * k, {seed: `${seed}/o`})} inside={roundRect(0, 0, w, h, 56 * k)} at={at} width={ink} />
       <Fill d={roundRect(160 * k, 30 * k, 80 * k, 20 * k, 10 * k)} color={EMBER.anchor} at={fillAt(at, 0.05)} offset={false} />
       {/* header: back chevron, title, cart (+ badge) */}
       <Ink d={poly([[52 * k, 70 * k], [40 * k, 82 * k], [52 * k, 94 * k]], {joined: true, seed: `${seed}/chev`})} at={b(at, 0.08)} width={thin} />
@@ -160,7 +160,7 @@ const PhoneBody: React.FC<PhoneProps> = ({
       {/* "Add to cart": the pop */}
       <XG m={mat.about(mat.scale(press), bt.x + bt.w / 2, bt.y + bt.h / 2)}>
         <Fill d={roundRect(bt.x, bt.y, bt.w, bt.h, 20 * k)} color={EMBER.pop} at={fillAt(at, 0.1)} seed={`${seed}/btn`} />
-        <Ink d={roundRect(bt.x, bt.y, bt.w, bt.h, 20 * k, {seed: `${seed}/btnI`})} at={b(at, 0.1)} width={3.4} />
+        <Ink d={roundRect(bt.x, bt.y, bt.w, bt.h, 20 * k, {seed: `${seed}/btnI`})} inside={roundRect(bt.x, bt.y, bt.w, bt.h, 20 * k)} at={b(at, 0.1)} width={3.4} tone={EMBER.pop} />
         <Show at={fillAt(at, 0.12)}>
           <Txt x={bt.x + bt.w / 2} y={bt.y + bt.h * 0.69} size={46 * k} fill={EMBER.popText} fit={bt.w * 0.86}>
             {buttonText}
@@ -224,7 +224,7 @@ const HandBody: React.FC<HandProps> = ({phone, thumbTo, pressAt, at, seed = 'han
       {fingers.map((f, i) => (
         <XG key={i} m={mat.compose(mat.translate(f.x, f.y), mat.rotate(f.r))}>
           <Fill d={roundRect(-56 * k, -22 * k, 82 * k, 44 * k, 21 * k)} color={EMBER.skin} at={fillAt(at, 0.04 * i)} seed={`${seed}/f${i}`} />
-          <Ink d={roundRect(-56 * k, -22 * k, 82 * k, 44 * k, 21 * k, {seed: `${seed}/fI${i}`})} at={b(at, 0.03 * i)} width={3.4} />
+          <Ink d={roundRect(-56 * k, -22 * k, 82 * k, 44 * k, 21 * k, {seed: `${seed}/fI${i}`})} inside={roundRect(-56 * k, -22 * k, 82 * k, 44 * k, 21 * k)} at={b(at, 0.03 * i)} width={3.4} />
           <Ink d={line(4 * k, -11 * k, 7 * k, 11 * k, {over: [0, 0], seed: `${seed}/fn${i}`})} at={b(at, 0.1)} width={1.6} />
         </XG>
       ))}

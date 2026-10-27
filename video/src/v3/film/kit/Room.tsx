@@ -20,10 +20,11 @@ import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
-import {At, b, fillAt, Pt, Show, Txt, W} from './util';
+import {At, b, fillAt, Pt, Show, Txt, W, TCircle, TPath, TRect} from './util';
 import {rings, sway, sway2, twinkle} from './idle';
 import {Steam} from './Weather';
 import {tiered} from '../../../lib/tier';
+import {isClean} from '../../../lib/pen';
 
 /** The plant greens: the palette's leaf and one flat step lighter (leaves alternate). */
 export const LEAF2 = '#5B7A50';
@@ -249,7 +250,7 @@ const PlantBody: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, trai
       <Fill d={polyPath(potPts)} color={pot} at={fillAt(at)} seed={`${seed}/pot`} />
       <Fill rect={[x - pw * 0.54, y - ph - 2, pw * 1.08, rimH]} color={EMBER.books[4]} at={fillAt(at, 0.02)} offset={false} />
       <Ink d={poly([[x - pw / 2, y - ph + rimH], [x - pw * 0.38, y], [x + pw * 0.38, y], [x + pw / 2, y - ph + rimH]], {seed: `${seed}/potI`, over: [0, 0]}) + rectInk(x - pw * 0.54, y - ph - 2, pw * 1.08, rimH, {seed: `${seed}/rimI`, over: [2, 2]})} at={at} width={ink} />
-      {snow ? <path d={blob(x, y - ph - 3, pw * 0.5, ph * 0.16, {seed: `${seed}/psn`})} fill={EMBER.snow} /> : null}
+      {snow ? <TPath d={blob(x, y - ph - 3, pw * 0.5, ph * 0.16, {seed: `${seed}/psn`})} fill={EMBER.snow} /> : null}
     </>
   );
   const leafAt = fillAt(at, 0.08);
@@ -278,7 +279,7 @@ const PlantBody: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, trai
         const dx = (sway2(t, amp, period, ph0) + shake * 3) * u * u + bend * Math.sin(u * Math.PI);
         pts.push([vx0 + dx, top + 6 + u * len]);
       }
-      vines.push(<path key={`v${v}`} d={smooth(pts)} fill="none" stroke={EMBER.leaf} strokeWidth={2.2} strokeLinecap="round" />);
+      vines.push(<TPath thing key={`v${v}`} d={smooth(pts)} fill="none" stroke={EMBER.leaf} strokeWidth={2.2} strokeLinecap="round" />);
       const nl = Math.max(3, Math.round(len / 34));
       for (let k = 1; k <= nl; k++) {
         const u = k / (nl + 0.3);
@@ -320,7 +321,7 @@ const PlantBody: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, trai
       const len = size * r.range(0.3, 0.6) * (1 - Math.abs(a + 90) / 260);
       const tip: Pt = [x + Math.cos((a * Math.PI) / 180) * len * 0.9, top + Math.sin((a * Math.PI) / 180) * len];
       const dx = sway2(t, amp * 0.8, period * 1.4, i) + shake * 3;
-      vines.push(<path key={`st${i}`} d={`M${x} ${top}Q${(x + tip[0]) / 2} ${top - len * 0.25} ${tip[0] + dx} ${tip[1]}`} fill="none" stroke={EMBER.leaf} strokeWidth={3} strokeLinecap="round" />);
+      vines.push(<TPath thing key={`st${i}`} d={`M${x} ${top}Q${(x + tip[0]) / 2} ${top - len * 0.25} ${tip[0] + dx} ${tip[1]}`} fill="none" stroke={EMBER.leaf} strokeWidth={3} strokeLinecap="round" />);
       leafEls.push(<Leaf key={`fl${i}`} x={tip[0] + dx} y={tip[1]} s={size * r.range(0.22, 0.3)} rot={a + 90} color={i % 2 ? EMBER.leaf : LEAF2} seed={`${seed}/fl${i}`} at={leafAt} ink={W.far} vein />);
     }
   } else {
@@ -353,7 +354,7 @@ const PlantBody: React.FC<PlantProps> = ({x, y, kind = 'pothos', size = 80, trai
           {potEl}
         </>
       )}
-      {snow ? <path d={blob(x, top - size * 0.12, pw * 0.42, size * 0.06 + 3, {seed: `${seed}/lsn`})} fill={EMBER.snow} /> : null}
+      {snow ? <TPath d={blob(x, top - size * 0.12, pw * 0.42, size * 0.06 + 3, {seed: `${seed}/lsn`})} fill={EMBER.snow} /> : null}
     </>
   );
 };
@@ -367,7 +368,7 @@ const LeafBody: React.FC<{x: number; y: number; s: number; rot?: number; color?:
     <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot))}>
       <Fill d={d} color={color} at={at} seed={`${seed}/lf`} />
       {ink > 0 ? <Ink d={d} at={at === undefined ? undefined : at - 0.12} width={ink} order="all" /> : null}
-      {vein ? <Ink d={`M0 ${-s * 0.1}L0 ${-s * 0.85}`} at={at} width={W.hair} color={LEAF2} /> : null}
+      {vein ? <Ink thing d={`M0 ${-s * 0.1}L0 ${-s * 0.85}`} at={at} width={W.hair} color={LEAF2} /> : null}
     </XG>
   );
 };
@@ -451,19 +452,19 @@ const StringLights3Body: React.FC<StringLights3Props> = ({from, to, points, sag 
     const dim = every > 0 && twinkle(t, seed, k, n, every);
     const color = !lit ? EMBER.card : dim ? BULB_DIM : BULBS[k % BULBS.length];
     if (lit && !dim && halo) {
-      halos.push(<circle key={`h2${k}`} cx={sx} cy={cy} r={r * 2.6} fill={halo[0]} />);
-      halos.push(<circle key={`h1${k}`} cx={sx} cy={cy} r={r * 1.75} fill={halo[1]} />);
+      halos.push(<TCircle key={`h2${k}`} cx={sx} cy={cy} r={r * 2.6} fill={halo[0]} />);
+      halos.push(<TCircle key={`h1${k}`} cx={sx} cy={cy} r={r * 1.75} fill={halo[1]} />);
     }
-    bulbs.push(<path key={`b${k}`} d={blob(sx + 1.2, cy + 1, r * 0.82, r, {seed: `${seed}/b${k}`})} fill={color} />);
+    bulbs.push(<TPath key={`b${k}`} d={blob(sx + 1.2, cy + 1, r * 0.82, r, {seed: `${seed}/b${k}`})} fill={color} />);
     outl += `M${(sx - r * 0.82).toFixed(1)} ${cy.toFixed(1)}a${(r * 0.82).toFixed(1)} ${r.toFixed(1)} 0 1 0 ${(r * 1.64).toFixed(1)} 0a${(r * 0.82).toFixed(1)} ${r.toFixed(1)} 0 1 0 ${(-r * 1.64).toFixed(1)} 0`;
     outl += `M${(sx - r * 0.35).toFixed(1)} ${(cy - r * 0.95).toFixed(1)}h${(r * 0.7).toFixed(1)}`;
   }
   return (
     <>
       {halos}
-      <path d={wire + stems} fill="none" stroke={EMBER.ink} strokeWidth={ink} strokeLinecap="round" />
+      <TPath thing d={wire + stems} fill="none" stroke={EMBER.ink} strokeWidth={ink} strokeLinecap="round" />
       {bulbs}
-      <path d={outl} fill="none" stroke={EMBER.ink} strokeWidth={ink} />
+      <TPath d={outl} fill="none" stroke={EMBER.ink} strokeWidth={ink} />
     </>
   );
 };
@@ -516,7 +517,7 @@ const PinboardBody: React.FC<PinboardProps> = ({x, y, w, h, items = ['photo', 'n
       <Fill rect={[x, y, w, h]} color={'#C98A64'} at={fillAt(at, 0.02)} offset={false} />
       <Ink d={rectInk(x - fr, y - fr, w + 2 * fr, h + 2 * fr, {seed: `${seed}/fo`, over: [3, 6]}) + rectInk(x, y, w, h, {seed: `${seed}/fi`, over: [0, 2]})} at={at} width={ink} />
       <Show at={fillAt(at, 0.04)}>
-        <path d={corkSpecks(x, y, w, h, seed)} fill={EMBER.beam} />
+        <TPath d={corkSpecks(x, y, w, h, seed)} fill={EMBER.beam} />
       </Show>
       {plan.map((it, i) => {
         if (avoid && it.x < avoid[0] + avoid[2] && it.x + it.w > avoid[0] && it.y < avoid[1] + avoid[3] && it.y + it.h > avoid[1]) return null;
@@ -526,7 +527,7 @@ const PinboardBody: React.FC<PinboardProps> = ({x, y, w, h, items = ['photo', 'n
         return (
           <XG key={i} m={mat.about(mat.rotate(rot), px, py)}>
             <PinnedThing kind={it.kind} x={it.x} y={it.y} w={it.w} h={it.h} color={it.color} seed={`${seed}/${i}`} at={b(at, 0.12 + i * 0.03)} />
-            <circle cx={px} cy={py} r={4.5} fill={i % 2 ? EMBER.anchor : EMBER.dcSide} />
+            <TCircle cx={px} cy={py} r={4.5} fill={i % 2 ? EMBER.anchor : EMBER.dcSide} />
           </XG>
         );
       })}
@@ -566,7 +567,7 @@ const PinnedThingBody: React.FC<{kind: PinItem | 'flyer' | 'concert' | 'card' | 
         <Box x={x} y={y} w={w} h={h} color={EMBER.card} at={at} seed={`${seed}/p`} ink={W.hair} over={[0, 1]} />
         <Fill rect={[x + m, y + m, w - 2 * m, h - m * 3.2]} color={EMBER.skyLow} at={fillAt(at, 0.03)} offset={false} />
         <Fill d={polyPath([[x + m, y + h - m * 2.2], [x + w * 0.35, y + h * 0.4], [x + w * 0.55, y + h * 0.58], [x + w * 0.7, y + h * 0.46], [x + w - m, y + h - m * 2.2]])} color={EMBER.leaf} at={fillAt(at, 0.05)} offset={false} />
-        <circle cx={x + w * 0.75} cy={y + h * 0.25} r={w * 0.07} fill={EMBER.core} />
+        <TCircle cx={x + w * 0.75} cy={y + h * 0.25} r={w * 0.07} fill={EMBER.core} />
       </>
     );
   }
@@ -657,7 +658,7 @@ const PinnedThingBody: React.FC<{kind: PinItem | 'flyer' | 'concert' | 'card' | 
       <Box x={x} y={y} w={w} h={h} color={EMBER.card} at={at} seed={`${seed}/sl`} ink={W.hair} over={[0, 1]} />
       <Ink d={line(x + w * 0.12, y + h * 0.22, x + w * 0.82, y + h * 0.22, {over: [0, 0], seed: `${seed}/s1`}) + line(x + w * 0.12, y + h * 0.38, x + w * 0.6, y + h * 0.38, {over: [0, 0], seed: `${seed}/s2`}) + line(x + w * 0.12, y + h * 0.52, x + w * 0.7, y + h * 0.52, {over: [0, 0], seed: `${seed}/s3`})} at={b(at, 0.08)} width={W.hair} />
       <Show at={fillAt(at, 0.06)}>
-        <path d={bars} stroke={EMBER.ink} strokeWidth={2} />
+        <TPath d={bars} stroke={EMBER.ink} strokeWidth={2} />
       </Show>
     </>
   );
@@ -763,7 +764,7 @@ const HeadphonesBody: React.FC<{x: number; y: number; w?: number; seed?: string;
   const band = `M${x - w * 0.38} ${y - ch * 0.6}C${x - w * 0.4} ${y - w * 0.55} ${x + w * 0.4} ${y - w * 0.55} ${x + w * 0.38} ${y - ch * 0.6}`;
   return (
     <>
-      <Ink d={band} at={at} width={w * 0.07} color={color} taper={false} />
+      <Ink thing d={band} at={at} width={w * 0.07} color={color} taper={false} />
       <Ink d={band} at={at} width={ink * 0.6} />
       {[-1, 1].map((s) => (
         <React.Fragment key={s}>
@@ -827,12 +828,12 @@ const CableBody: React.FC<{points: Pt[]; plug?: boolean; width?: number; color?:
   const ang = (Math.atan2(p1[1] - p0[1], p1[0] - p0[0]) * 180) / Math.PI;
   return (
     <>
-      <path d={d} fill="none" stroke={EMBER.ink} strokeWidth={width + ink * 2} strokeLinecap="round" />
-      <path d={d} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" />
+      <TPath d={d} fill="none" stroke={EMBER.ink} strokeWidth={width + ink * 2} strokeLinecap="round" />
+      <TPath thing d={d} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" />
       {plug ? (
         <g transform={`translate(${p0[0]} ${p0[1]}) rotate(${ang.toFixed(1)})`}>
-          <rect x={-width * 3.2} y={-width * 0.9} width={width * 3.4} height={width * 1.8} fill={EMBER.card} stroke={EMBER.ink} strokeWidth={ink} />
-          <path d={`M${-width * 3.2} ${-width * 0.4}h${-width}M${-width * 3.2} ${width * 0.4}h${-width}`} stroke={EMBER.ink} strokeWidth={ink * 1.3} />
+          <TRect x={-width * 3.2} y={-width * 0.9} width={width * 3.4} height={width * 1.8} fill={EMBER.card} stroke={EMBER.ink} strokeWidth={ink} />
+          <TPath thing d={`M${-width * 3.2} ${-width * 0.4}h${-width}M${-width * 3.2} ${width * 0.4}h${-width}`} stroke={EMBER.ink} strokeWidth={ink * 1.3} />
         </g>
       ) : null}
     </>
@@ -846,7 +847,7 @@ const GlassesBody: React.FC<{x: number; y: number; w?: number; rot?: number; see
   return (
     <XG m={mat.about(mat.rotate(rot), x, y)}>
       <Fill d={ellipse(x - w * 0.27, y, r, r * 0.8, {seed: `${seed}/l1`}) + ellipse(x + w * 0.27, y, r, r * 0.8, {seed: `${seed}/l2`})} color={EMBER.frost} at={fillAt(at)} offset={false} />
-      <Ink d={ellipse(x - w * 0.27, y, r, r * 0.8, {seed: `${seed}/i1`}) + ellipse(x + w * 0.27, y, r, r * 0.8, {seed: `${seed}/i2`}) + `M${x - w * 0.06} ${y - r * 0.2}Q${x} ${y - r * 0.5} ${x + w * 0.06} ${y - r * 0.2}` + `M${x - w * 0.48} ${y - r * 0.3}L${x - w * 0.3} ${y - r * 1.1}M${x + w * 0.48} ${y - r * 0.3}L${x + w * 0.3} ${y - r * 1.1}`} at={at} width={ink} />
+      <Ink thing d={ellipse(x - w * 0.27, y, r, r * 0.8, {seed: `${seed}/i1`}) + ellipse(x + w * 0.27, y, r, r * 0.8, {seed: `${seed}/i2`}) + `M${x - w * 0.06} ${y - r * 0.2}Q${x} ${y - r * 0.5} ${x + w * 0.06} ${y - r * 0.2}` + `M${x - w * 0.48} ${y - r * 0.3}L${x - w * 0.3} ${y - r * 1.1}M${x + w * 0.48} ${y - r * 0.3}L${x + w * 0.3} ${y - r * 1.1}`} at={at} width={ink} />
       <Ink d={line(x - w * 0.34, y - r * 0.2, x - w * 0.26, y - r * 0.5, {over: [0, 0], seed: `${seed}/g`})} at={b(at, 0.1)} width={W.hair} color={EMBER.white} />
     </XG>
   );
@@ -867,6 +868,7 @@ export const Speaker = tiered('environment', {}, SpeakerBody);
 /** Wood-grain strokes on the desk: 4-8 short organic pairs (a wavy stroke and a shorter companion), the odd knot, one
  *  flat step under the desk colour; never a long straight line (that reads as a table edge). */
 const DeskGrainBody: React.FC<{x: number; y: number; w: number; h: number; n?: number; seed?: string; at?: At; color?: string}> = ({x, y, w, h, n = 6, seed = 'grain', at, color = GRAIN}) => {
+  if (isClean()) return null; // texture made of strokes: never under the clean pen (CRAFT §c)
   const r = rng(`grain/${seed}`);
   let d = '';
   for (let i = 0; i < n; i++) {
@@ -889,7 +891,7 @@ const DeskGrainBody: React.FC<{x: number; y: number; w: number; h: number; n?: n
 export const DeskGrain = tiered('environment', {}, DeskGrainBody);
 
 /** Plaster hints on a wall (scattered little ticks, one step under the wall). */
-const WallMarksBody: React.FC<{x: number; y: number; w: number; h: number; n?: number; seed?: string; at?: At; color?: string}> = ({x, y, w, h, n = 8, seed = 'wall', at, color = PLASTER}) => <Ink d={wallTicks(x, y, w, h, {seed: `wm/${seed}`, n, size: 16})} at={at} width={W.far} color={color} />;
+const WallMarksBody: React.FC<{x: number; y: number; w: number; h: number; n?: number; seed?: string; at?: At; color?: string}> = ({x, y, w, h, n = 8, seed = 'wall', at, color = PLASTER}) => isClean() ? null : <Ink d={wallTicks(x, y, w, h, {seed: `wm/${seed}`, n, size: 16})} at={at} width={W.far} color={color} />;
 export const WallMarks = tiered('environment', {}, WallMarksBody);
 
 /** The lamp's pull chain swinging (S7's loop): beads from (x, y) down `len`, a pendulum with a jolt option. */
@@ -908,8 +910,8 @@ const PullChainBody: React.FC<{x: number; y: number; len?: number; amp?: number;
   }
   return (
     <>
-      <path d={beads} fill={EMBER.ink} />
-      <path d={blob(ex, ey + 9, 5, 8, {seed: 'pullk'})} fill={EMBER.beam} stroke={EMBER.ink} strokeWidth={1.6} />
+      <TPath d={beads} fill={EMBER.ink} />
+      <TPath d={blob(ex, ey + 9, 5, 8, {seed: 'pullk'})} fill={EMBER.beam} stroke={EMBER.ink} strokeWidth={1.6} />
     </>
   );
 };
@@ -995,7 +997,7 @@ const CoatHookBody: React.FC<{x: number; y: number; h?: number; coat?: string; s
         <Fill d={scarfD} color={EMBER.hl} at={fillAt(at, 0.1)} seed={`${seed}/s`} />
         <Fill d={`M${x + cw * 0.06} ${y + h * 0.3}h${cw * 0.18}v${h * 0.06}h${-cw * 0.18}zM${x + cw * 0.07} ${y + h * 0.5}h${cw * 0.18}v${h * 0.06}h${-cw * 0.18}z`} color={EMBER.beam} at={fillAt(at, 0.12)} offset={false} />
         <Ink d={scarfD} at={b(at, 0.08)} width={W.far} />
-        <circle cx={x} cy={y + 4} r={6} fill={EMBER.anchor} />
+        <TCircle cx={x} cy={y + 4} r={6} fill={EMBER.anchor} />
       </XG>
     </>
   );
@@ -1008,7 +1010,7 @@ const ToteBagBody: React.FC<{x: number; y: number; w?: number; seed?: string; at
   const d = `M${x - w / 2} ${y - h}L${x + w / 2} ${y - h * 0.94}L${x + w * 0.56} ${y}L${x - w * 0.56} ${y}Z`;
   return (
     <>
-      <Ink d={`M${x - w * 0.3} ${y - h}Q${x - w * 0.1} ${y - h * 1.6} ${x + w * 0.05} ${y - h * 0.98}M${x + w * 0.1} ${y - h * 0.98}Q${x + w * 0.3} ${y - h * 1.5} ${x + w * 0.32} ${y - h * 0.95}`} at={at} width={ink * 0.8} />
+      <Ink thing d={`M${x - w * 0.3} ${y - h}Q${x - w * 0.1} ${y - h * 1.6} ${x + w * 0.05} ${y - h * 0.98}M${x + w * 0.1} ${y - h * 0.98}Q${x + w * 0.3} ${y - h * 1.5} ${x + w * 0.32} ${y - h * 0.95}`} at={at} width={ink * 0.8} />
       <Fill d={d} color={color} at={fillAt(at)} seed={`${seed}/b`} />
       <Fill d={crown(x, y - h * 0.48, w * 0.18, w * 0.16, {seed: `${seed}/pr`, bumps: 5})} color={EMBER.leaf} at={fillAt(at, 0.05)} offset={false} />
       <Ink d={poly([[x - w / 2, y - h], [x + w / 2, y - h * 0.94], [x + w * 0.56, y], [x - w * 0.56, y]], {closed: true, seed: `${seed}/i`, over: [1, 3]})} at={at} width={ink} />
@@ -1043,8 +1045,8 @@ export const CupSteam = tiered('environment', {}, CupSteamBody);
 /** A cosy glow ring: a flat lighter disc under a light source on a wall (the halo step, no gradient). */
 const HaloStepBody: React.FC<{cx: number; cy: number; r: number; colors?: [string, string]}> = ({cx, cy, r, colors = [EMBER.core, EMBER.ring]}) => (
   <>
-    <circle cx={cx} cy={cy} r={r} fill={colors[0]} />
-    <circle cx={cx} cy={cy} r={r * 0.62} fill={colors[1]} />
+    <TCircle cx={cx} cy={cy} r={r} fill={colors[0]} />
+    <TCircle cx={cx} cy={cy} r={r * 0.62} fill={colors[1]} />
   </>
 );
 export const HaloStep = tiered('environment', {}, HaloStepBody);

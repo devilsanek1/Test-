@@ -128,7 +128,7 @@ const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, old
       {stringD ? <Ink d={stringD} at={at} width={2.2} /> : null}
       <XG m={m}>
         <Fill d={polyPath(shape)} color={back ? EMBER.heroDeep : body} at={fillAt(at)} seed={`${seed}/body`} />
-        <Ink d={poly(shape, {closed: true, seed: `${seed}/o`, over: w < 240 ? [0, 3] : [2, 7]})} at={at} width={ink} />
+        <Ink d={poly(shape, {closed: true, seed: `${seed}/o`, over: w < 240 ? [0, 3] : [2, 7]})} inside={polyPath(shape)} at={at} width={ink} />
         {/* the eyelet: the blue pop ring around the hole */}
         <Fill d={blob(hx, hy, w * 0.045, w * 0.045, {seed: `${seed}/ring`})} color={tone === 'pop' ? EMBER.card : EMBER.pop} at={fillAt(at, 0.04)} offset={false} />
         <Fill d={blob(hx, hy, w * 0.022, w * 0.022, {seed: `${seed}/hole`})} color={EMBER.wall} at={fillAt(at, 0.06)} offset={false} />

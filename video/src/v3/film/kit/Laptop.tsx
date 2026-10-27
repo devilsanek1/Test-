@@ -12,6 +12,7 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
 import {At, b, fillAt, lerp, Pt, quadPt, Show, Txt, W} from './util';
 import {tiered} from '../../../lib/tier';
+import {isClean} from '../../../lib/pen';
 
 export type LaptopProps = {
   /** Centre of the hinge line (canvas px). */
@@ -76,13 +77,14 @@ const LaptopBody: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = 'old
   const kw = Math.max(3, w * 0.027);
   // at close-up size (w >= 800) the dashed rows read as solid bars: draw separate key caps instead (12 per row, the
   // orange deck showing between them), on the same three rows (S8's stick comes up through the third)
+  const clean = isClean();
   const caps =
-    w >= 800
+    w >= 800 || clean
       ? [0.18, 0.36, 0.54]
           .flatMap((v, i) => {
             const u0 = 0.09 - i * 0.012;
             const u1 = 0.91 + i * 0.012;
-            const n = 12;
+            const n = clean && w < 800 ? (w < 260 ? 6 : 9) : 12;
             const step = (u1 - u0) / n;
             const hv = 0.055;
             return Array.from({length: n}, (_, j) => {
@@ -110,7 +112,18 @@ const LaptopBody: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = 'old
       <Fill d={polyPath(g.lid)} color={EMBER.hero} at={fillAt(at)} seed={`${seed}/lid`} />
       <Fill d={polyPath(g.scr)} color={scr} at={fillAt(at, 0.05)} offset={false} seed={`${seed}/scr`} />
       {children ? <Show at={fillAt(at, 0.05)}>{children}</Show> : null}
-      <Ink d={poly(g.lid, {closed: true, seed: `${seed}/lidI`, over})} at={at} width={ink} />
+      {clean ? (
+        lidOnly ? (
+          <Ink d={poly(g.lid, {closed: true})} inside={polyPath(g.lid)} at={at} width={ink} />
+        ) : (
+          <>
+            <Ink d={poly([g.lid[0], g.lid[1], g.lid[2], g.deck[2], g.edge[2], g.edge[3], g.deck[3], g.lid[3]], {closed: true})} inside={polyPath(g.lid) + polyPath([g.lid[3], g.lid[2], g.deck[2], g.edge[2], g.edge[3], g.deck[3]])} at={at} width={ink} />
+            <Ink d={poly([g.lid[3], g.lid[2]]) + poly([g.deck[3], g.deck[2]])} at={b(at, 0.04)} width={thin} />
+          </>
+        )
+      ) : (
+        <Ink d={poly(g.lid, {closed: true, seed: `${seed}/lidI`, over})} at={at} width={ink} />
+      )}
       <Ink d={poly(g.scr, {closed: true, seed: `${seed}/scrI`, over: [0, 2]})} at={b(at, 0.06)} width={thin} />
       <Ink d={glint(glintAt[0], glintAt[1], w * 0.14, {seed: `${seed}/gl`})} at={b(at, 0.2)} width={thin} color={isNew ? EMBER.white : EMBER.core} />
       {lidOnly ? null : (
@@ -118,9 +131,9 @@ const LaptopBody: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = 'old
           {/* deck + its front edge (the hero's flat shade step) */}
           <Fill d={polyPath(g.edge)} color={EMBER.heroDeep} at={fillAt(at, 0.06)} seed={`${seed}/edge`} />
           <Fill d={polyPath(g.deck)} color={EMBER.hero} at={fillAt(at, 0.04)} seed={`${seed}/deck`} />
-          <Ink d={poly(g.deck, {closed: true, seed: `${seed}/deckI`, over}) + poly([g.edge[1], g.edge[2], g.edge[3], g.edge[0]], {seed: `${seed}/edgeI`, over: [0, 2]})} at={b(at, 0.04)} width={ink} />
+          {clean ? null : <Ink d={poly(g.deck, {closed: true, seed: `${seed}/deckI`, over}) + poly([g.edge[1], g.edge[2], g.edge[3], g.edge[0]], {seed: `${seed}/edgeI`, over: [0, 2]})} at={b(at, 0.04)} width={ink} />}
           {caps ? (
-            <Fill d={caps} color={EMBER.anchor} at={fillAt(at, 0.14)} offset={false} seed={`${seed}/caps`} />
+            <Fill d={caps} color={clean && w < 800 ? EMBER.heroDeep : EMBER.anchor} at={fillAt(at, 0.14)} offset={false} seed={`${seed}/caps`} />
           ) : (
             <Ink d={rows.join('')} at={b(at, 0.14)} width={kw} color={EMBER.anchor} dash={`${(w * 0.05).toFixed(1)} ${(w * 0.018).toFixed(1)}`} taper={false} />
           )}
@@ -133,7 +146,7 @@ const LaptopBody: React.FC<LaptopProps> = ({x, y, w, lidH = 0.64, variant = 'old
           ) : null}
         </>
       )}
-      {isNew ? (
+      {isNew && !clean ? (
         <Ink
           d={sparkle(g.lid[1][0] + w * 0.1, g.lid[1][1] - w * 0.02, w * 0.045) + sparkle(g.lid[0][0] - w * 0.06, lerp(g.lid[0][1], g.lid[3][1], 0.62), w * 0.03)}
           at={b(at, 0.3)}

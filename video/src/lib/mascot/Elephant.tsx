@@ -231,7 +231,7 @@ export const Elephant: React.FC<ElephantProps> = ({
       wVar: cleanPen ? 0 : undefined,
       draw: frac,
     });
-    if (d) bucket.push(<path key={i} d={d} fill={l.color ?? c.ink} />);
+    if (d) bucket.push(<path key={i} d={d} fill={l.color ?? c.line ?? c.ink} />);
   }
   if (bucket === clipped && clipped.length) {
     out.push(

@@ -9,7 +9,7 @@ import {Fill} from '../../../lib/Fill';
 import {line, poly, polyPath, rect as rectInk} from '../../../lib/sketch';
 import {useTime, prog, ease, clamp} from '../../../lib/time';
 import {EMBER} from '../palette';
-import {At, b, fillAt, lerp, Pt, Pop, Show, Txt} from './util';
+import {At, b, fillAt, lerp, Pt, Pop, Show, Txt, TCircle, TPath} from './util';
 import {MemoryStick} from './Memory';
 import {tiered} from '../../../lib/tier';
 
@@ -23,7 +23,7 @@ const ChartCardBody: React.FC<{x: number; y: number; w: number; h: number; at?: 
     {children}
   </>
 );
-export const ChartCard = tiered('support', {tone: EMBER.card}, ChartCardBody);
+export const ChartCard = tiered('support', {tone: EMBER.card, lines: true}, ChartCardBody);
 
 // ---------------------------------------------------------------- line chart
 
@@ -152,9 +152,9 @@ const LineChartBody: React.FC<LineChartProps> = ({
           );
         })}
       </Show>
-      {shown.length > 1 ? <path d={pathOf(shown)} stroke={color} strokeWidth={lineWidth} strokeLinecap="round" strokeLinejoin="round" fill="none" /> : null}
-      {hookShown.length > 1 ? <path d={pathOf(hookShown)} stroke={color} strokeWidth={lineWidth} strokeLinecap="round" strokeLinejoin="round" fill="none" /> : null}
-      {head ? <circle cx={head[0]} cy={head[1]} r={lineWidth * 1.15} fill={color} stroke={EMBER.ink} strokeWidth={2.2} /> : null}
+      {shown.length > 1 ? <TPath d={pathOf(shown)} stroke={color} strokeWidth={lineWidth} strokeLinecap="round" strokeLinejoin="round" fill="none" /> : null}
+      {hookShown.length > 1 ? <TPath d={pathOf(hookShown)} stroke={color} strokeWidth={lineWidth} strokeLinecap="round" strokeLinejoin="round" fill="none" /> : null}
+      {head ? <TCircle cx={head[0]} cy={head[1]} r={lineWidth * 1.15} fill={color} stroke={EMBER.ink} strokeWidth={2.2} /> : null}
       {label ? (
         <Pop at={labelAt} x={lp[0]} y={lp[1]} overshoot>
           <Txt x={lp[0]} y={lp[1]} size={Math.min(120, w * 0.16)} fill={color}>

@@ -9,7 +9,7 @@ import {blob, circle, hline, line, poly, polyPath, rect as rectInk, vline} from 
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {EMBER} from '../palette';
-import {At, b, fillAt, Pt, Show, Txt} from './util';
+import {At, b, fillAt, Pt, Show, Txt, TCircle, TRect} from './util';
 import {tiered} from '../../../lib/tier';
 
 // ---------------------------------------------------------------- sky + snow
@@ -37,7 +37,7 @@ const SnowfallBody: React.FC<{x: number; y: number; w: number; h: number; n?: nu
     const rad = r.range(2.6, 4.6) * size;
     const fy = y + ((((y0 - y + sp * t) % h) + h) % h);
     const fx = x0 + Math.sin(t * 0.9 + i) * 4;
-    out.push(<circle key={i} cx={fx} cy={fy} r={rad} fill={EMBER.snow} />);
+    out.push(<TCircle key={i} cx={fx} cy={fy} r={rad} fill={EMBER.snow} />);
   }
   return <>{out}</>;
 };
@@ -179,7 +179,7 @@ const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'n
   const strips: React.ReactNode[] = [];
   for (let i = 0; i < nRows; i++) {
     const ry = rowsTop + i * rowGap;
-    strips.push(<rect key={`s${i}`} x={g.x0 + sideW + w * 0.04} y={ry} width={w - sideW - w * 0.08} height={rowH} fill={side} />);
+    strips.push(<TRect key={`s${i}`} x={g.x0 + sideW + w * 0.04} y={ry} width={w - sideW - w * 0.08} height={rowH} fill={side} />);
     if (far && !mini) continue;
     for (let tx = g.x0 + sideW + w * 0.06, j = 0; tx + tickW < g.x1 - w * 0.05; tx += step, j++) {
       if (lr.chance(0.12)) continue;
@@ -187,7 +187,7 @@ const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'n
       const rate = lr.range(0.6, 1.6);
       const off = blink && Math.sin(t * rate * 2.3 + ph) > 0.93;
       if (off) continue;
-      ticks.push(<rect key={`t${i}_${j}`} x={tx} y={ry + rowH * 0.3} width={tickW} height={Math.max(2.5, rowH * 0.4)} fill={EMBER.led} />);
+      ticks.push(<TRect key={`t${i}_${j}`} x={tx} y={ry + rowH * 0.3} width={tickW} height={Math.max(2.5, rowH * 0.4)} fill={EMBER.led} />);
     }
   }
   const outline: Pt[] = [[g.x0, y], [g.x0, g.top], [g.x1, g.top], [g.x1, y]];
@@ -242,7 +242,7 @@ const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'n
     </>
   );
 };
-export const DataCenter = tiered((p) => (p.variant === 'far' ? 'environment' : p.variant === 'mini' ? 'subject' : 'support'), {tone: (p) => (p.variant === 'dark' || p.darkAt !== undefined ? EMBER.dcDark : EMBER.dc), bg: EMBER.sky}, DataCenterBody);
+export const DataCenter = tiered((p) => (p.variant === 'far' ? 'environment' : p.variant === 'mini' ? 'subject' : 'support'), {tone: (p) => (p.variant === 'dark' || p.darkAt !== undefined ? EMBER.dcDark : EMBER.dc), bg: EMBER.sky, lines: true}, DataCenterBody);
 
 // ---------------------------------------------------------------- our roof: the ledge (parapet) and a vent
 
@@ -290,7 +290,7 @@ const RoofLedgeBody: React.FC<RoofLedgeProps> = ({y, x0 = -60, x1 = 1140, h = 14
     </>
   );
 };
-export const RoofLedge = tiered('support', {tone: EMBER.brick, bg: EMBER.sky}, RoofLedgeBody);
+export const RoofLedge = tiered('environment', {tone: EMBER.brick, bg: EMBER.sky}, RoofLedgeBody);
 
 export type RoofVentProps = {
   /** Body centre x and the roof line it stands on (canvas px). */
@@ -322,4 +322,4 @@ const RoofVentBody: React.FC<RoofVentProps> = ({x: vx, y, w: vw = 64, h: vh = 70
     </>
   );
 };
-export const RoofVent = tiered('support', {tone: EMBER.brickShade, bg: EMBER.sky}, RoofVentBody);
+export const RoofVent = tiered('environment', {tone: EMBER.brickShade, bg: EMBER.sky}, RoofVentBody);

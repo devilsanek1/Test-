@@ -20,7 +20,8 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
 import {At, b, fillAt, Pt} from './util';
 import {DataCenter, DataCenterProps, NightSky, Snowfall, TownBand} from './Outside';
-import {tiered} from '../../../lib/tier';
+import {tiered, TierPart} from '../../../lib/tier';
+import {isClean} from '../../../lib/pen';
 
 const W_MID = 3.4;
 const W_THIN = 2.2;
@@ -121,7 +122,7 @@ const NookBody: React.FC<NookProps> = ({variant = 'pov', layout, frost = true, l
       {L.floorY !== undefined ? <Floor y={L.floorY} at={b(at, 0.08)} seed={seed} /> : null}
       {L.shelf ? <Shelf L={L} at={b(at, 0.02)} seed={seed} /> : null}
       <WindowView L={L} frost={frost} t={t} at={b(at, 0.04)} seed={seed}>
-        {children ?? <NookOutside variant={variant} at={b(at, 0.1)} />}
+        <TierPart bg={EMBER.sky}>{children ?? <NookOutside variant={variant} at={b(at, 0.1)} />}</TierPart>
       </WindowView>
       <Desk L={L} lampOn={lampOn} at={b(at, 0.06)} seed={seed} />
       <Lamp pose={L.lamp} lit={lampOn} at={b(at, 0.08)} seed={seed} />
@@ -130,7 +131,7 @@ const NookBody: React.FC<NookProps> = ({variant = 'pov', layout, frost = true, l
     </>
   );
 };
-export const Nook = tiered('support', {tone: EMBER.wall}, NookBody);
+export const Nook = tiered('environment', {tone: EMBER.wall}, NookBody);
 
 /** The home base's ONE window alone (reveal, frame, the glass with the outside as children, mullion, latch, frost, the
  *  inside sill), in the variant's canvas px, without the wall, desk or lamp: for the desk shots that hang the same window
@@ -141,11 +142,11 @@ const NookWindowBody: React.FC<{variant?: 'pov' | 'objective'; layout?: Partial<
   const t = useTime();
   return (
     <WindowView L={L} frost={frost} t={t} at={b(at, 0.04)} seed={seed}>
-      {children ?? <NookOutside variant={variant} at={b(at, 0.1)} />}
+      <TierPart bg={EMBER.sky}>{children ?? <NookOutside variant={variant} at={b(at, 0.1)} />}</TierPart>
     </WindowView>
   );
 };
-export const NookWindow = tiered('support', {tone: EMBER.trim}, NookWindowBody);
+export const NookWindow = tiered('environment', {tone: EMBER.trim}, NookWindowBody);
 
 // ---------------------------------------------------------------- the outside through the window (board layouts)
 
@@ -354,7 +355,7 @@ const WindowView: React.FC<{L: NookLayout; frost: boolean; t: number; at?: At; s
               <Fill key={i} d={d} color={EMBER.frost} at={fillAt(at, 0.08)} offset={false} />
             ))}
             <Fill d={snowPile} color={EMBER.snow} at={fillAt(at, 0.08)} offset={false} />
-            <Ink d={star(g.x + 40, g.y + g.h - 34, 8) + star(g.x + 88, g.y + g.h - 18, 5) + star(g.x + g.w - 36, g.y + g.h - 32, 7)} at={b(at, 0.2)} width={W_HAIR} />
+            {isClean() ? null : <Ink d={star(g.x + 40, g.y + g.h - 34, 8) + star(g.x + 88, g.y + g.h - 18, 5) + star(g.x + g.w - 36, g.y + g.h - 32, 7)} at={b(at, 0.2)} width={W_HAIR} />}
           </>
         ) : null}
       </g>
@@ -433,7 +434,7 @@ const LampBody: React.FC<{pose: LampPose; lit?: boolean; at?: At; seed?: string}
     </>
   );
 };
-export const Lamp = tiered('support', {tone: EMBER.anchor}, LampBody);
+export const Lamp = tiered('environment', {tone: EMBER.anchor}, LampBody);
 
 /** The steaming mug (a sign of care; steam = a small slow loop). (x, top) = its left side and rim. `steam={false}` drops
  *  the ink steam lines (S13: ink lines over the navy glass read as wires; the lane draws light puffs instead). */
@@ -458,7 +459,7 @@ const MugBody: React.FC<{x: number; top: number; t?: number; at?: At; seed?: str
       <Ink d={line(x0, top, x0, bot - 14, {over: [0, 0], seed: `${seed}/mg1`}) + line(x1, top, x1, bot - 14, {over: [0, 0], seed: `${seed}/mg2`}) + `M${x0} ${bot - 18}Q${x0} ${bot} ${x0 + 18} ${bot}L${x1 - 18} ${bot}Q${x1} ${bot} ${x1} ${bot - 18}`} at={at} width={W_MID} />
       <Fill d={blob((x0 + x1) / 2, top, (x1 - x0) / 2, 11, {seed: `${seed}/rim`})} color={EMBER.anchor} at={fillAt(at, 0.04)} offset={false} />
       <Ink d={ellipse((x0 + x1) / 2, top, (x1 - x0) / 2, 11, {seed: `${seed}/rimI`})} at={b(at, 0.04)} width={W_MID} />
-      {steamOn && (at === undefined || tNow >= at + 0.3) ? <Ink d={steam(x0 + w * 0.33, 0) + steam(x0 + w * 0.67, 2.1)} width={W_THIN} /> : null}
+      {steamOn && !isClean() && (at === undefined || tNow >= at + 0.3) ? <Ink d={steam(x0 + w * 0.33, 0) + steam(x0 + w * 0.67, 2.1)} width={W_THIN} /> : null}
     </>
   );
 };
@@ -483,4 +484,4 @@ const NotebookBody: React.FC<{at?: At; seed?: string; dy?: number}> = ({at, seed
     </>
   );
 };
-export const Notebook = tiered('support', {tone: EMBER.paper}, NotebookBody);
+export const Notebook = tiered('environment', {tone: EMBER.paper}, NotebookBody);

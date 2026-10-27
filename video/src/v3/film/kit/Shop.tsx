@@ -20,7 +20,7 @@ import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
-import {At, b, fillAt, Pt, Show, Txt, W} from './util';
+import {At, b, fillAt, Pt, Show, Txt, W, TCircle, TPath, TRect} from './util';
 import {crossing, ease01, rings, sway} from './idle';
 import {PinnedThing} from './Room';
 import {Icicles, SnowCap, SnowLayers, SnowSill, Steam} from './Weather';
@@ -93,22 +93,22 @@ const CardBoardBody: React.FC<CardBoardProps> = ({card, margin = 27, kind = 'not
               {it.c.kind === 'note' ? <Ink d={rectInk(it.x, it.y, it.w, it.h, {seed: `${seed}/ni${it.i}`, over: [0, 1]})} at={b(at, 0.1)} width={W.hair} /> : null}
             </>
           )}
-          <circle cx={it.x + it.w / 2} cy={it.y + 8} r={5} fill={it.i % 2 ? EMBER.anchor : EMBER.dcSide} />
+          <TCircle cx={it.x + it.w / 2} cy={it.y + 8} r={5} fill={it.i % 2 ? EMBER.anchor : EMBER.dcSide} />
         </XG>
       ))}
       {kind === 'notice' ? (
         <Show at={fillAt(at, 0.12)}>
           {/* glass glints at the corners, outside the card */}
-          <path d={glint(x + 14, y + h - 30, 46, {seed: `${seed}/g1`}) + glint(x + w - 60, y + 40, 40, {seed: `${seed}/g2`})} fill="none" stroke={EMBER.white} strokeWidth={W.far} strokeLinecap="round" />
+          <TPath d={glint(x + 14, y + h - 30, 46, {seed: `${seed}/g1`}) + glint(x + w - 60, y + 40, 40, {seed: `${seed}/g2`})} fill="none" stroke={EMBER.white} strokeWidth={W.far} strokeLinecap="round" />
         </Show>
       ) : null}
       {/* pins at the card's top corners (the lane's card sits on them) */}
-      <circle cx={card.x + 24} cy={card.y + 12} r={6} fill={EMBER.anchor} />
-      <circle cx={card.x + card.w - 24} cy={card.y + 12} r={6} fill={EMBER.anchor} />
+      <TCircle cx={card.x + 24} cy={card.y + 12} r={6} fill={EMBER.anchor} />
+      <TCircle cx={card.x + card.w - 24} cy={card.y + 12} r={6} fill={EMBER.anchor} />
     </>
   );
 };
-export const CardBoard = tiered('support', {tone: EMBER.beam}, CardBoardBody);
+export const CardBoard = tiered('environment', {tone: EMBER.beam}, CardBoardBody);
 
 /** A clipboard with a sheet and a metal clip (hangs on a board's corner, or a driver holds it). */
 const ClipboardBody: React.FC<{x: number; y: number; w: number; h: number; seed?: string; at?: At; ink?: number; flutterAt?: number[]}> = ({x, y, w, h, seed = 'clip', at, ink = W.mid, flutterAt}) => {
@@ -128,7 +128,7 @@ const ClipboardBody: React.FC<{x: number; y: number; w: number; h: number; seed?
     </>
   );
 };
-export const Clipboard = tiered('support', {tone: EMBER.card}, ClipboardBody);
+export const Clipboard = tiered('environment', {tone: EMBER.card}, ClipboardBody);
 
 // ---------------------------------------------------------------- the shop's street wall (S4 / S6)
 
@@ -180,7 +180,7 @@ const DrainpipeBody: React.FC<{x: number; y0: number; y1: number; w?: number; se
       <Fill rect={[x - w / 2 + 3, y0, 4, y1 - y0]} color={EMBER.skyLow} at={fillAt(at, 0.03)} offset={false} />
       <Ink d={line(x - w / 2, y0, x - w / 2, y1, {over: [0, 0], seed: `${seed}/l`}) + line(x + w / 2, y0, x + w / 2, y1, {over: [0, 0], seed: `${seed}/r`}) + br} at={at} width={ink} />
       <Icicles x0={x - w / 2} x1={x + w / 2} y={y1} n={2} len={[18, 34]} seed={`${seed}/ice`} />
-      <path d={blob(x + w * 0.2, y1 + 50, w * 1.2, 10, {seed: `${seed}/heap`})} fill={EMBER.frost} />
+      <TPath d={blob(x + w * 0.2, y1 + 50, w * 1.2, 10, {seed: `${seed}/heap`})} fill={EMBER.frost} />
     </>
   );
 };
@@ -212,7 +212,7 @@ const DisplayWindowBody: React.FC<{x: number; y: number; w: number; h: number; s
       <Fill rect={[mx, my, mw, mh]} color={EMBER.anchor} at={fillAt(at, 0.05)} seed={`${seed}/m`} />
       <Fill rect={[mx + 6, my + 6, mw - 12, mh - 12]} color={EMBER.dc} at={fillAt(at, 0.06)} offset={false} />
       <Show at={fillAt(at, 0.08)}>
-        <circle cx={bx} cy={by} r={8} fill={EMBER.skyLow} />
+        <TCircle cx={bx} cy={by} r={8} fill={EMBER.skyLow} />
       </Show>
       <Fill rect={[mx + mw * 0.42, my + mh, mw * 0.16, ih * 0.62 - (my - iy) - mh]} color={EMBER.anchor} at={fillAt(at, 0.05)} offset={false} />
       {/* boxes on the floor of the window */}
@@ -226,7 +226,7 @@ const DisplayWindowBody: React.FC<{x: number; y: number; w: number; h: number; s
       <Fill rect={[ix + iw * 0.6, shelfY - 60, 70, 54]} color={EMBER.card} at={fillAt(at, 0.08)} offset={false} />
       <Ink d={rectInk(x, y, w, h, {seed: `${seed}/i`, over: [4, 8]}) + rectInk(ix, iy, iw, ih, {seed: `${seed}/ii`, over: [0, 2]}) + rectInk(mx, my, mw, mh, {seed: `${seed}/mi`, over: [0, 1]})} at={at} width={ink} />
       <Show at={fillAt(at, 0.1)}>
-        <path d={glint(ix + iw * 0.7, iy + ih * 0.12, 60, {seed: `${seed}/g`})} fill="none" stroke={EMBER.white} strokeWidth={W.far} strokeLinecap="round" />
+        <TPath d={glint(ix + iw * 0.7, iy + ih * 0.12, 60, {seed: `${seed}/g`})} fill="none" stroke={EMBER.white} strokeWidth={W.far} strokeLinecap="round" />
       </Show>
       <SnowSill x0={x - 6} x1={x + w + 6} y={y + h} h={14} seed={`${seed}/sill`} ink={W.hair} />
     </>
@@ -279,11 +279,11 @@ const ShopDoorBody: React.FC<{x: number; y: number; w: number; h: number; bellAt
       <Fill rect={[gx + gw * 0.06, gy + gh * 0.56, 12, gh * 0.12]} color={EMBER.frost} at={fillAt(at, 0.06)} offset={false} />
       <Ink d={rectInk(x, y, w, h, {seed: `${seed}/i`, over: [4, 10]}) + rectInk(gx, gy, gw, gh, {seed: `${seed}/gi`, over: [0, 2]}) + line(gx + 10, gy + gh * 0.58, gx + 10, gy + gh * 0.7, {over: [0, 0], seed: `${seed}/bar`})} at={at} width={ink} />
       <Show at={fillAt(at, 0.1)}>
-        <path d={glint(gx + gw * 0.7, gy + gh * 0.08, 70, {seed: `${seed}/g`})} fill="none" stroke={EMBER.white} strokeWidth={W.far} strokeLinecap="round" />
+        <TPath d={glint(gx + gw * 0.7, gy + gh * 0.08, 70, {seed: `${seed}/g`})} fill="none" stroke={EMBER.white} strokeWidth={W.far} strokeLinecap="round" />
       </Show>
       {/* the OPEN sign on its string */}
       <XG m={mat.about(mat.rotate(ang), sx + sw / 2, gy + 6)}>
-        <path d={`M${sx + sw / 2} ${gy + 6}L${sx + sw * 0.15} ${sy}M${sx + sw / 2} ${gy + 6}L${sx + sw * 0.85} ${sy}`} stroke={EMBER.ink} strokeWidth={W.hair} fill="none" />
+        <TPath thing d={`M${sx + sw / 2} ${gy + 6}L${sx + sw * 0.15} ${sy}M${sx + sw / 2} ${gy + 6}L${sx + sw * 0.85} ${sy}`} stroke={EMBER.ink} strokeWidth={W.hair} fill="none" />
         <Fill d={roundRect(sx, sy, sw, sh, 8)} color={EMBER.card} at={fillAt(at, 0.08)} seed={`${seed}/os`} />
         <Show at={fillAt(at, 0.1)}>
           <Txt x={sx + sw / 2} y={sy + sh * 0.72} size={sh * 0.62} fill={EMBER.beam} fit={sw * 0.84}>
@@ -294,8 +294,8 @@ const ShopDoorBody: React.FC<{x: number; y: number; w: number; h: number; bellAt
       </XG>
       {/* the bell over the door */}
       <XG m={mat.about(mat.rotate(bellA), gx + gw * 0.25, y - 2)}>
-        <path d={`M${gx + gw * 0.25} ${y - 2}v14`} stroke={EMBER.ink} strokeWidth={W.hair} />
-        <path d={`M${gx + gw * 0.25 - 14} ${y + 36}Q${gx + gw * 0.25 - 14} ${y + 10} ${gx + gw * 0.25} ${y + 10}Q${gx + gw * 0.25 + 14} ${y + 10} ${gx + gw * 0.25 + 14} ${y + 36}Z`} fill={EMBER.books[0]} stroke={EMBER.ink} strokeWidth={W.far} />
+        <TPath thing d={`M${gx + gw * 0.25} ${y - 2}v14`} stroke={EMBER.ink} strokeWidth={W.hair} />
+        <TPath d={`M${gx + gw * 0.25 - 14} ${y + 36}Q${gx + gw * 0.25 - 14} ${y + 10} ${gx + gw * 0.25} ${y + 10}Q${gx + gw * 0.25 + 14} ${y + 10} ${gx + gw * 0.25 + 14} ${y + 36}Z`} fill={EMBER.books[0]} stroke={EMBER.ink} strokeWidth={W.far} />
       </XG>
     </>
   );
@@ -366,7 +366,7 @@ const ShopShelvingBody: React.FC<ShopShelvingProps> = ({x, y, w, h, shelves = 3,
             <Fill rect={[it.x, top, it.w, it.h - 22]} color={EMBER.anchor} at={fillAt(at, 0.05)} seed={`${seed}/${key}m`} />
             <Fill rect={[it.x + 7, top + 7, it.w - 14, it.h - 36]} color={EMBER.dc} at={fillAt(at, 0.06)} offset={false} />
             <Show at={fillAt(at, 0.08)}>
-              <rect x={sx} y={top + 16 + Math.sin(t * 1.3) * 12} width={26} height={16} fill={EMBER.skyLow} />
+              <TRect x={sx} y={top + 16 + Math.sin(t * 1.3) * 12} width={26} height={16} fill={EMBER.skyLow} />
             </Show>
             <Fill rect={[it.x + it.w * 0.4, top + it.h - 22, it.w * 0.2, 22]} color={EMBER.anchor} at={fillAt(at, 0.05)} offset={false} />
             <Ink d={rectInk(it.x, top, it.w, it.h - 22, {seed: `${seed}/${key}mi`, over: [0, 1]})} at={b(at, 0.04)} width={W.far} />
@@ -377,11 +377,11 @@ const ShopShelvingBody: React.FC<ShopShelvingProps> = ({x, y, w, h, shelves = 3,
         const leds = [0, 1, 2, 3].map((j) => (Math.sin(t * (3 + j * 1.7) + j * 2) > 0.2 ? EMBER.led : EMBER.dcSide));
         out.push(
           <React.Fragment key={key}>
-            <path d={`M${it.x + 14} ${top}l-8 -46M${it.x + it.w - 14} ${top}l8 -46`} stroke={EMBER.anchor} strokeWidth={4} strokeLinecap="round" />
+            <TPath thing d={`M${it.x + 14} ${top}l-8 -46M${it.x + it.w - 14} ${top}l8 -46`} stroke={EMBER.anchor} strokeWidth={4} strokeLinecap="round" />
             <Fill d={roundRect(it.x, top, it.w, it.h, 8)} color={EMBER.anchor} at={fillAt(at, 0.05)} seed={`${seed}/${key}r`} />
             <Show at={fillAt(at, 0.08)}>
               {leds.map((c, j) => (
-                <rect key={j} x={it.x + 18 + j * 20} y={top + it.h * 0.4} width={9} height={7} fill={c} />
+                <TRect key={j} x={it.x + 18 + j * 20} y={top + it.h * 0.4} width={9} height={7} fill={c} />
               ))}
             </Show>
           </React.Fragment>,
@@ -407,20 +407,20 @@ const ShopShelvingBody: React.FC<ShopShelvingProps> = ({x, y, w, h, shelves = 3,
   for (let k = 0; k < 4; k++) {
     const hx = x + 50 + k * (w - 100) / 3;
     const sw2 = sway(t, 2, 2.8, k);
-    out.push(<Ink key={`hk${k}`} d={line(hx, hy - 20, hx, hy + 10, {over: [0, 0], seed: `${seed}/hk${k}`})} at={b(at, 0.1)} width={W.far} />);
+    out.push(<Ink thing key={`hk${k}`} d={line(hx, hy - 20, hx, hy + 10, {over: [0, 0], seed: `${seed}/hk${k}`})} at={b(at, 0.1)} width={W.far} />);
     out.push(
       <XG key={`hg${k}`} m={mat.about(mat.rotate(sw2), hx, hy + 10)}>
         {k % 2 === 0 ? (
           <>
             <Fill d={roundRect(hx - 30, hy + 10, 60, 90, 6)} color={EMBER.card} at={fillAt(at, 0.12)} seed={`${seed}/pk${k}`} />
-            <path d={`M${hx - 16} ${hy + 40}q16 -18 32 0q-16 18 -32 0`} fill="none" stroke={EMBER.dcSide} strokeWidth={4} />
+            <TPath thing d={`M${hx - 16} ${hy + 40}q16 -18 32 0q-16 18 -32 0`} fill="none" stroke={EMBER.dcSide} strokeWidth={4} />
             <Ink d={roundRect(hx - 30, hy + 10, 60, 90, 6, {closed: false, seed: `${seed}/pki${k}`})} at={b(at, 0.1)} width={W.hair} />
           </>
         ) : (
           <>
-            <path d={`M${hx - 26} ${hy + 60}C${hx - 30} ${hy + 4} ${hx + 30} ${hy + 4} ${hx + 26} ${hy + 60}`} fill="none" stroke={EMBER.dcSide} strokeWidth={8} strokeLinecap="round" />
-            <rect x={hx - 36} y={hy + 50} width={20} height={30} rx={6} fill={EMBER.dcSide} />
-            <rect x={hx + 16} y={hy + 50} width={20} height={30} rx={6} fill={EMBER.dcSide} />
+            <TPath d={`M${hx - 26} ${hy + 60}C${hx - 30} ${hy + 4} ${hx + 30} ${hy + 4} ${hx + 26} ${hy + 60}`} fill="none" stroke={EMBER.dcSide} strokeWidth={8} strokeLinecap="round" />
+            <TRect x={hx - 36} y={hy + 50} width={20} height={30} rx={6} fill={EMBER.dcSide} />
+            <TRect x={hx + 16} y={hy + 50} width={20} height={30} rx={6} fill={EMBER.dcSide} />
           </>
         )}
       </XG>,
@@ -445,12 +445,12 @@ const ShopWindowViewBody: React.FC<{x: number; y: number; w: number; h: number; 
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>
-        <rect x={x} y={y} width={w} height={h} fill={EMBER.sky} />
-        <rect x={x} y={y + h * 0.5} width={w} height={h * 0.22} fill={EMBER.roofs} />
+        <TRect x={x} y={y} width={w} height={h} fill={EMBER.sky} />
+        <TRect x={x} y={y + h * 0.5} width={w} height={h * 0.22} fill={EMBER.roofs} />
         {[0.12, 0.42, 0.7].map((u, i) => (
-          <rect key={i} x={x + w * u} y={y + h * 0.56} width={w * 0.1} height={h * 0.07} fill={EMBER.houseLit} />
+          <TRect key={i} x={x + w * u} y={y + h * 0.56} width={w * 0.1} height={h * 0.07} fill={EMBER.houseLit} />
         ))}
-        <rect x={x} y={ground} width={w} height={h} fill={EMBER.snow} />
+        <TRect x={x} y={ground} width={w} height={h} fill={EMBER.snow} />
         <LampPost3 x={x + w * 0.72} y={ground + 6} h={h * 0.55} arm="top" seed={`${seed}/lp`} ink={W.far} />
         {walkers.map((wk, i) => {
           const dir = wk.dir ?? 1;
@@ -460,7 +460,7 @@ const ShopWindowViewBody: React.FC<{x: number; y: number; w: number; h: number; 
       </g>
       <Ink d={rectInk(x - 16, y - 16, w + 32, h + 32, {seed: `${seed}/fi`, over: [4, 8]}) + rectInk(x, y, w, h, {seed: `${seed}/gi`, over: [0, 2]})} at={at} width={ink} />
       <Show at={fillAt(at, 0.1)}>
-        <path d={glint(x + w * 0.2, y + h * 0.15, 70, {seed: `${seed}/g`})} fill="none" stroke={EMBER.white} strokeWidth={W.far} strokeLinecap="round" />
+        <TPath d={glint(x + w * 0.2, y + h * 0.15, 70, {seed: `${seed}/g`})} fill="none" stroke={EMBER.white} strokeWidth={W.far} strokeLinecap="round" />
       </Show>
     </>
   );
@@ -477,8 +477,8 @@ const CardReaderBody: React.FC<{x: number; y: number; w?: number; seed?: string;
       <Fill d={roundRect(x - w / 2, y - h, w, h, w * 0.14)} color={EMBER.anchor} at={fillAt(at)} seed={`${seed}/b`} />
       <Fill rect={[x - w * 0.34, y - h * 0.86, w * 0.68, h * 0.3]} color={EMBER.dc} at={fillAt(at, 0.04)} offset={false} />
       <Show at={fillAt(at, 0.06)}>
-        {[0, 1, 2].map((r) => [0, 1, 2].map((c) => <rect key={`${r}${c}`} x={x - w * 0.3 + c * w * 0.22} y={y - h * 0.48 + r * h * 0.13} width={w * 0.16} height={h * 0.08} fill={EMBER.reveal} />))}
-        <circle cx={x + w * 0.3} cy={y - h * 0.92} r={w * 0.05} fill={on ? EMBER.led : EMBER.dcSide} />
+        {[0, 1, 2].map((r) => [0, 1, 2].map((c) => <TRect key={`${r}${c}`} x={x - w * 0.3 + c * w * 0.22} y={y - h * 0.48 + r * h * 0.13} width={w * 0.16} height={h * 0.08} fill={EMBER.reveal} />))}
+        <TCircle cx={x + w * 0.3} cy={y - h * 0.92} r={w * 0.05} fill={on ? EMBER.led : EMBER.dcSide} />
       </Show>
       <Ink d={roundRect(x - w / 2, y - h, w, h, w * 0.14, {closed: false, seed: `${seed}/i`})} at={at} width={ink} />
     </>
@@ -518,9 +518,9 @@ const ReceiptPrinterBody: React.FC<{x: number; y: number; w?: number; feedAt?: n
     <>
       {L > 1 ? (
         <>
-          <rect x={sx - pw / 2} y={top} width={pw} height={sy - top + 2} fill={EMBER.card} />
-          <path d={strip} fill="none" stroke={EMBER.ink} strokeWidth={W.hair} />
-          <path d={ticks} stroke={EMBER.ink} strokeWidth={1.2} />
+          <TRect x={sx - pw / 2} y={top} width={pw} height={sy - top + 2} fill={EMBER.card} />
+          <TPath d={strip} fill="none" stroke={EMBER.ink} strokeWidth={W.hair} />
+          <TPath d={ticks} stroke={EMBER.ink} strokeWidth={1.2} />
         </>
       ) : null}
       <Fill d={roundRect(x - w / 2, y - h, w, h, w * 0.1)} color={EMBER.card} at={fillAt(at)} seed={`${seed}/b`} />
@@ -529,9 +529,9 @@ const ReceiptPrinterBody: React.FC<{x: number; y: number; w?: number; feedAt?: n
       {hang > 0 ? (
         <>
           {/* the hanging part, in front of the printer and over the counter edge, curling at its end */}
-          <path d={`M${hx - pw / 2} ${top - 14}h${pw}v${hang}q0 ${pw * 0.5} ${-pw * 0.5} ${pw * 0.5}q${-pw * 0.5} 0 ${-pw * 0.5} ${-pw * 0.3}z`} fill={EMBER.card} />
-          <path d={`M${hx - pw / 2} ${top - 14}v${hang + pw * 0.2}M${hx + pw / 2} ${top - 14}v${hang}q0 ${pw * 0.5} ${-pw * 0.5} ${pw * 0.5}q${-pw * 0.5} 0 ${-pw * 0.5} ${-pw * 0.3}`} fill="none" stroke={EMBER.ink} strokeWidth={W.hair} />
-          <path d={Array.from({length: Math.floor(hang / 14)}, (_, i) => `M${hx - pw * 0.32} ${top + 4 + i * 14}h${pw * (0.35 + ((i * 7) % 4) * 0.1)}`).join('')} stroke={EMBER.ink} strokeWidth={1.2} />
+          <TPath d={`M${hx - pw / 2} ${top - 14}h${pw}v${hang}q0 ${pw * 0.5} ${-pw * 0.5} ${pw * 0.5}q${-pw * 0.5} 0 ${-pw * 0.5} ${-pw * 0.3}z`} fill={EMBER.card} />
+          <TPath thing d={`M${hx - pw / 2} ${top - 14}v${hang + pw * 0.2}M${hx + pw / 2} ${top - 14}v${hang}q0 ${pw * 0.5} ${-pw * 0.5} ${pw * 0.5}q${-pw * 0.5} 0 ${-pw * 0.5} ${-pw * 0.3}`} fill="none" stroke={EMBER.ink} strokeWidth={W.hair} />
+          <TPath d={Array.from({length: Math.floor(hang / 14)}, (_, i) => `M${hx - pw * 0.32} ${top + 4 + i * 14}h${pw * (0.35 + ((i * 7) % 4) * 0.1)}`).join('')} stroke={EMBER.ink} strokeWidth={1.2} />
         </>
       ) : null}
     </>
@@ -544,7 +544,7 @@ const PaperBagBody: React.FC<{x: number; y: number; w?: number; seed?: string; a
   const h = w * 1.1;
   return (
     <>
-      <Ink d={`M${x - w * 0.22} ${y - h}Q${x - w * 0.22} ${y - h * 1.35} ${x} ${y - h * 1.35}Q${x + w * 0.22} ${y - h * 1.35} ${x + w * 0.22} ${y - h}`} at={at} width={ink * 0.8} />
+      <Ink thing d={`M${x - w * 0.22} ${y - h}Q${x - w * 0.22} ${y - h * 1.35} ${x} ${y - h * 1.35}Q${x + w * 0.22} ${y - h * 1.35} ${x + w * 0.22} ${y - h}`} at={at} width={ink * 0.8} />
       <Fill d={polyPath([[x - w / 2, y - h], [x + w / 2, y - h], [x + w * 0.46, y], [x - w * 0.46, y]])} color={KRAFT} at={fillAt(at)} seed={`${seed}/b`} />
       <Fill rect={[x - w * 0.2, y - h * 0.6, w * 0.4, h * 0.22]} color={EMBER.card} at={fillAt(at, 0.04)} offset={false} />
       <Ink d={poly([[x - w / 2, y - h], [x + w / 2, y - h], [x + w * 0.46, y], [x - w * 0.46, y]], {closed: true, seed: `${seed}/i`, over: [1, 2]}) + line(x - w * 0.5, y - h * 0.88, x + w * 0.5, y - h * 0.88, {over: [0, 0], seed: `${seed}/f`})} at={at} width={ink} />
@@ -561,7 +561,7 @@ const UsbJarBody: React.FC<{x: number; y: number; w?: number; seed?: string; at?
   for (let i = 0; i < 6; i++) {
     const sx = x - w * 0.32 + i * w * 0.12;
     const a = r.range(-25, 25);
-    sticks.push(<rect key={i} x={sx} y={y - h * 1.05} width={w * 0.1} height={h * 0.4} fill={[EMBER.dc, EMBER.hl, EMBER.beam, EMBER.reveal][i % 4]} transform={`rotate(${a.toFixed(1)} ${sx} ${y - h * 0.7})`} />);
+    sticks.push(<TRect key={i} x={sx} y={y - h * 1.05} width={w * 0.1} height={h * 0.4} fill={[EMBER.dc, EMBER.hl, EMBER.beam, EMBER.reveal][i % 4]} transform={`rotate(${a.toFixed(1)} ${sx} ${y - h * 0.7})`} />);
   }
   return (
     <>
@@ -602,7 +602,7 @@ const StripLightBody: React.FC<{x: number; y: number; w: number; flickerAt?: num
   }
   return (
     <>
-      {halo && lit ? <path d={`M${x + 20} ${y + 30}L${x + w - 20} ${y + 30}L${x + w + 40} ${y + 110}L${x - 40} ${y + 110}Z`} fill={EMBER.core} /> : null}
+      {halo && lit ? <TPath d={`M${x + 20} ${y + 30}L${x + w - 20} ${y + 30}L${x + w + 40} ${y + 110}L${x - 40} ${y + 110}Z`} fill={EMBER.core} /> : null}
       <Fill rect={[x, y, w, 30]} color={EMBER.card} at={fillAt(at)} seed={`${seed}/h`} />
       <Fill rect={[x + 10, y + 18, w - 20, 12]} color={lit ? EMBER.core : EMBER.reveal} at={fillAt(at, 0.03)} offset={false} />
       <Ink d={rectInk(x, y, w, 30, {seed: `${seed}/i`, over: [3, 6]}) + line(x + w * 0.2, y, x + w * 0.2, y - 60, {over: [0, 0], seed: `${seed}/c1`}) + line(x + w * 0.8, y, x + w * 0.8, y - 60, {over: [0, 0], seed: `${seed}/c2`})} at={at} width={ink} />
@@ -615,7 +615,7 @@ export const StripLight = tiered('environment', {}, StripLightBody);
 const CableTrayBody: React.FC<{x0: number; x1: number; y: number; seed?: string; at?: At; ink?: number}> = ({x0, x1, y, seed = 'tray', at, ink = W.far}) => (
   <>
     <Fill rect={[x0, y, x1 - x0, 22]} color={EMBER.frost} at={fillAt(at)} offset={false} />
-    <path d={`M${x0 + (x1 - x0) * 0.3} ${y + 22}q60 50 120 0M${x0 + (x1 - x0) * 0.62} ${y + 22}q40 34 80 0`} fill="none" stroke={EMBER.dcSide} strokeWidth={6} />
+    <TPath d={`M${x0 + (x1 - x0) * 0.3} ${y + 22}q60 50 120 0M${x0 + (x1 - x0) * 0.62} ${y + 22}q40 34 80 0`} fill="none" stroke={EMBER.dcSide} strokeWidth={6} />
     <Ink d={rectInk(x0, y, x1 - x0, 22, {seed: `${seed}/i`, over: [6, 12], edges: 'tb'})} at={at} width={ink} />
   </>
 );
@@ -633,12 +633,12 @@ const DockWindowBody: React.FC<{x: number; y: number; w: number; h: number; fork
     if (c) {
       fl = (
         <g transform={`translate(${c.x} ${ground})`}>
-          <rect x={-50} y={-60} width={80} height={40} fill={EMBER.pot} />
-          <path d={`M30 -10V-110M40 -10V-110M36 -20H80`} stroke={EMBER.anchor} strokeWidth={5} />
-          <rect x={44} y={-58} width={40} height={36} fill={KRAFT} />
-          <circle cx={-30} cy={-14} r={14} fill={EMBER.anchor} />
-          <circle cx={18} cy={-14} r={14} fill={EMBER.anchor} />
-          <path d={`M-40 -60V-110H20V-60`} fill="none" stroke={EMBER.anchor} strokeWidth={4} />
+          <TRect x={-50} y={-60} width={80} height={40} fill={EMBER.pot} />
+          <TPath thing d={`M30 -10V-110M40 -10V-110M36 -20H80`} stroke={EMBER.anchor} strokeWidth={5} />
+          <TRect x={44} y={-58} width={40} height={36} fill={KRAFT} />
+          <TCircle cx={-30} cy={-14} r={14} fill={EMBER.anchor} />
+          <TCircle cx={18} cy={-14} r={14} fill={EMBER.anchor} />
+          <TPath thing d={`M-40 -60V-110H20V-60`} fill="none" stroke={EMBER.anchor} strokeWidth={4} />
         </g>
       );
     }
@@ -653,14 +653,14 @@ const DockWindowBody: React.FC<{x: number; y: number; w: number; h: number; fork
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>
-        <rect x={x} y={y} width={w} height={h} fill={EMBER.sky} />
-        <rect x={x} y={ground} width={w} height={h} fill={EMBER.snow} />
+        <TRect x={x} y={y} width={w} height={h} fill={EMBER.sky} />
+        <TRect x={x} y={ground} width={w} height={h} fill={EMBER.snow} />
         {/* the truck's back */}
-        <rect x={x + w * 0.1} y={y + h * 0.25} width={w * 0.8} height={h * 0.5} fill={EMBER.card} />
-        <path d={`M${x + w * 0.5} ${y + h * 0.25}v${h * 0.5}`} stroke={EMBER.ink} strokeWidth={2.2} />
-        <rect x={x + w * 0.14} y={y + h * 0.66} width={w * 0.1} height={h * 0.05} fill={tl ? EMBER.hl : EMBER.beam} />
-        <rect x={x + w * 0.76} y={y + h * 0.66} width={w * 0.1} height={h * 0.05} fill={tl ? EMBER.hl : EMBER.beam} />
-        <path d={blob(x + w * 0.5, y + h * 0.25, w * 0.42, 8, {seed: `${seed}/ts`})} fill={EMBER.snow} />
+        <TRect x={x + w * 0.1} y={y + h * 0.25} width={w * 0.8} height={h * 0.5} fill={EMBER.card} />
+        <TPath thing d={`M${x + w * 0.5} ${y + h * 0.25}v${h * 0.5}`} stroke={EMBER.ink} strokeWidth={2.2} />
+        <TRect x={x + w * 0.14} y={y + h * 0.66} width={w * 0.1} height={h * 0.05} fill={tl ? EMBER.hl : EMBER.beam} />
+        <TRect x={x + w * 0.76} y={y + h * 0.66} width={w * 0.1} height={h * 0.05} fill={tl ? EMBER.hl : EMBER.beam} />
+        <TPath d={blob(x + w * 0.5, y + h * 0.25, w * 0.42, 8, {seed: `${seed}/ts`})} fill={EMBER.snow} />
         {fl}
         <SnowLayers x={x} y={y} w={w} h={h} band={null} density={2} seed={`${seed}/sn`} />
       </g>
@@ -681,9 +681,9 @@ const CoffeeMachineBody: React.FC<{x: number; y: number; w?: number; h?: number;
       <Fill rect={[x + w * 0.1, y - h * 0.86, w * 0.8, h * 0.22]} color={EMBER.dc} at={fillAt(at, 0.03)} offset={false} />
       <Fill rect={[x + w * 0.2, y - h * 0.45, w * 0.6, h * 0.3]} color={EMBER.dcSide} at={fillAt(at, 0.03)} offset={false} />
       <Show at={fillAt(at, 0.06)}>
-        <circle cx={x + w * 0.25} cy={y - h * 0.56} r={w * 0.05} fill={on ? EMBER.houseLit : EMBER.beam} />
-        <circle cx={x + w * 0.42} cy={y - h * 0.56} r={w * 0.05} fill={EMBER.reveal} />
-        <path d={`M${x + w * 0.4} ${y - h * 0.2}h${w * 0.2}l-${w * 0.02} ${h * 0.08}h-${w * 0.16}z`} fill={EMBER.card} stroke={EMBER.ink} strokeWidth={W.hair} />
+        <TCircle cx={x + w * 0.25} cy={y - h * 0.56} r={w * 0.05} fill={on ? EMBER.houseLit : EMBER.beam} />
+        <TCircle cx={x + w * 0.42} cy={y - h * 0.56} r={w * 0.05} fill={EMBER.reveal} />
+        <TPath d={`M${x + w * 0.4} ${y - h * 0.2}h${w * 0.2}l-${w * 0.02} ${h * 0.08}h-${w * 0.16}z`} fill={EMBER.card} stroke={EMBER.ink} strokeWidth={W.hair} />
       </Show>
       <Steam x={x + w * 0.5} y={y - h * 0.21} seed={`${seed}/st`} rise={50} r1={6} />
       <Ink d={roundRect(x, y - h, w, h, 14, {closed: false, seed: `${seed}/i`})} at={at} width={ink} />
@@ -722,7 +722,7 @@ const BootMatBody: React.FC<{x: number; y: number; w?: number; h?: number; seed?
     <>
       <Fill d={roundRect(x, y, w, h, 10)} color={EMBER.dcSide} at={fillAt(at)} seed={`${seed}/b`} />
       <Show at={fillAt(at, 0.05)}>
-        <path d={prints} fill={EMBER.frost} />
+        <TPath d={prints} fill={EMBER.frost} />
       </Show>
       <Ink d={roundRect(x, y, w, h, 10, {closed: false, seed: `${seed}/i`})} at={at} width={ink} />
     </>

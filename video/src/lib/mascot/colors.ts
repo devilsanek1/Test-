@@ -10,6 +10,9 @@ export type Colorway = {
   nail: string; // toenails
   shine: string; // tiny eye highlight (wide eyes only)
   ink: string; // linework (always the theme ink)
+  /** Optional: the brush strokes' colour when it differs from `ink` (the clean pen's tinted mascot line; eyes and
+   *  other solids keep `ink`). Default: ink. */
+  line?: string;
 };
 
 export const COLORWAYS = {

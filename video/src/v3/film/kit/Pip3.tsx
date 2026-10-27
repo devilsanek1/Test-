@@ -25,9 +25,10 @@ import {POSE_BOUNDS} from '../../../lib/mascot/poses';
 import {earFlap, tailSwish, breath} from '../../../lib/mascot/idle';
 import {blob, circle, smooth} from '../../../lib/sketch';
 import {EMBER} from '../palette';
-import {At, Pt} from './util';
+import {At, Pt, TPath} from './util';
 import {ease01, hopY} from './idle';
-import {tiered} from '../../../lib/tier';
+import {tiered, useTierHere} from '../../../lib/tier';
+import {hexToLab, isClean, labToHex, shadeL, type Tier} from '../../../lib/pen';
 
 // ---------------------------------------------------------------- the colourway
 
@@ -44,6 +45,25 @@ export const PIP_EMBER: Colorway = {
   shine: EMBER.white,
   ink: EMBER.ink,
 };
+
+/** The clean pen's mascot (docs/look/CRAFT.md §b: tier B unless the line is about Pip): a softer lilac (C* <= 25 on the
+ *  support tier, <= 18 on the environment tier), a same-hue line (the body's shade, -20 L*) at ~2 px, and no line at all
+ *  on the environment tier; the subject keeps the full lilac with its deep shade as the line. Eyes keep the dark ink. */
+const capC = (hex: string, cmax: number, dL = 0) => {
+  const lab = hexToLab(hex);
+  if (!lab) return hex;
+  const C = Math.hypot(lab[1], lab[2]);
+  const k = C > cmax ? cmax / C : 1;
+  return labToHex([lab[0] + dL, lab[1] * k, lab[2] * k]);
+};
+export function pipLook(tier: Tier): {colorway: Colorway; lineK: number; ink: number} {
+  if (!isClean()) return {colorway: PIP_EMBER, lineK: 1, ink: 1};
+  if (tier === 'subject') return {colorway: {...PIP_EMBER, line: shadeL(PIP_EMBER.body, -35, 16)}, lineK: 0.8, ink: 1};
+  const cmax = tier === 'support' ? 25 : 18;
+  const body = capC(PIP_EMBER.body, cmax, 2);
+  const shade = capC(PIP_EMBER.shade, cmax, 2);
+  return {colorway: {...PIP_EMBER, body, shade, line: shadeL(body, -20, 20)}, lineK: 0.55, ink: tier === 'support' ? 1 : 0};
+}
 
 /** The snow-lit rim (an ink-only copy in snow white, nudged up-left, peeking past the outline). */
 const PIP_RIM: Colorway = {name: 'Pip rim', body: EMBER.snow, shade: EMBER.snow, earInner: EMBER.snow, cheek: EMBER.snow, nail: EMBER.snow, shine: EMBER.snow, ink: EMBER.snow};
@@ -160,6 +180,7 @@ const Pip3Body: React.FC<Pip3Props> = ({
 }) => {
   const tNow = useTime();
   const t = tIn ?? tNow;
+  const look3 = pipLook(useTierHere());
   if (at !== undefined && t < at) return null;
   const draw = at === undefined ? 1 : drawIn(t, at, drawDur);
   const exit = exitAt === undefined ? 0 : unbuild(t, exitAt);
@@ -215,20 +236,20 @@ const Pip3Body: React.FC<Pip3Props> = ({
   const sy = 1 - squash;
   return (
     <>
-      {outdoor ? <Elephant {...common} x={P.x - 2.2} y={P.y - 2.6} colorway={PIP_RIM} fill={0} lineWeight={lineWeight * 1.2} /> : null}
-      <Elephant {...common} colorway={PIP_EMBER} lineWeight={lineWeight} />
+      {outdoor && !isClean() ? <Elephant {...common} x={P.x - 2.2} y={P.y - 2.6} colorway={PIP_RIM} fill={0} lineWeight={lineWeight * 1.2} /> : null}
+      <Elephant {...common} colorway={look3.colorway} lineWeight={lineWeight * look3.lineK} ink={look3.ink} />
       {cap > 0.02 && capPose && draw >= 1 && exit <= 0 ? (
         <g transform={`translate(${P.x.toFixed(2)} ${P.y.toFixed(2)}) rotate(${P.rot.toFixed(2)}) scale(${(fx * scale).toFixed(4)} ${scale.toFixed(4)}) scale(${sx.toFixed(4)} ${sy.toFixed(4)})`}>
           <g transform={capFly > 0 && capFly < 1 ? `translate(${(capFly * 26).toFixed(2)} ${(-capFly * 18).toFixed(2)}) rotate(${(capFly * 40).toFixed(1)} 0 ${top + 8})` : undefined}>
-            <path d={blob(curLook * 2.4, top + 9 - 2 * cap, 6 + 11 * cap, 3 + 4.5 * cap, {seed: `pipcap${seed}`})} fill={EMBER.snow} />
-            <path d={smooth([[curLook * 2.4 - (6 + 11 * cap), top + 10], [curLook * 2.4, top + 7.5 - 6.5 * cap], [curLook * 2.4 + 6 + 11 * cap, top + 10]])} fill="none" stroke={EMBER.ink} strokeWidth={1.6 / scale} strokeLinecap="round" />
+            <TPath d={blob(curLook * 2.4, top + 9 - 2 * cap, 6 + 11 * cap, 3 + 4.5 * cap, {seed: `pipcap${seed}`})} fill={EMBER.snow} />
+            <TPath d={smooth([[curLook * 2.4 - (6 + 11 * cap), top + 10], [curLook * 2.4, top + 7.5 - 6.5 * cap], [curLook * 2.4 + 6 + 11 * cap, top + 10]])} fill="none" stroke={EMBER.ink} strokeWidth={1.6 / scale} strokeLinecap="round" />
           </g>
         </g>
       ) : null}
     </>
   );
 };
-export const Pip3 = tiered('support', {}, Pip3Body);
+export const Pip3 = tiered('support', {lines: true, tone: PIP_EMBER.body}, Pip3Body);
 
 // ---------------------------------------------------------------- PipTiny (S9's end: two backs at the rail)
 
@@ -253,6 +274,9 @@ export type PipTinyProps = {
  *  the trunk's curl peeking past one cheek, a tail with a tuft; idle ear flicks and tail swish. */
 const PipTinyBody: React.FC<PipTinyProps> = ({x, y, h = 56, side = 'r', hopAt, at, seed = 5, ink = 2.2, outdoor = true}) => {
   const t = useTime();
+  const pl = pipLook(useTierHere()).colorway;
+  const clean = isClean();
+  const mis = clean ? undefined : 'translate(1.5 1)'; // the clean pen registers fills exactly
   if (at !== undefined && t < at) return null;
   const pop = at === undefined ? 1 : Math.min(1, 0.2 + 0.8 * ease01(t, at, 0.12));
   const k = h / 56;
@@ -273,37 +297,37 @@ const PipTinyBody: React.FC<PipTinyProps> = ({x, y, h = 56, side = 'r', hopAt, a
   const g = (
     <g transform={`translate(${x.toFixed(2)} ${(y + dy).toFixed(2)}) scale(${(k * pop * (1 + sq * 0.5)).toFixed(4)} ${(k * pop * (1 - sq)).toFixed(4)})`}>
       {/* rim (outdoors): a snow sliver up-left */}
-      {outdoor ? (
+      {outdoor && !clean ? (
         <g transform="translate(-1.4 -1.6)">
-          <path d={body + head} fill={EMBER.snow} />
+          <TPath d={body + head} fill={EMBER.snow} />
           <g transform={`rotate(${(-eL).toFixed(2)} -9 -39)`}>
-            <path d={ear(-1, eL)} fill={EMBER.snow} />
+            <TPath d={ear(-1, eL)} fill={EMBER.snow} />
           </g>
           <g transform={`rotate(${eR.toFixed(2)} 9 -39)`}>
-            <path d={ear(1, eR)} fill={EMBER.snow} />
+            <TPath d={ear(1, eR)} fill={EMBER.snow} />
           </g>
         </g>
       ) : null}
-      <path d={smooth(tailPts)} fill="none" stroke={EMBER.ink} strokeWidth={W} strokeLinecap="round" />
-      <path d={circle(tailPts[3][0], tailPts[3][1] + 1.5, 2.2, {seed: `pt/tt${seed}`})} fill={EMBER.ink} />
+      <TPath thing d={smooth(tailPts)} fill="none" stroke={EMBER.ink} strokeWidth={W} strokeLinecap="round" />
+      <TPath d={circle(tailPts[3][0], tailPts[3][1] + 1.5, 2.2, {seed: `pt/tt${seed}`})} fill={EMBER.ink} />
       <g transform={`rotate(${(-eL).toFixed(2)} -9 -39)`}>
-        <path d={ear(-1, eL)} fill={side === 'r' ? PIP_EMBER.shade : PIP_EMBER.body} transform="translate(1.5 1)" />
-        <path d={ear(-1, eL)} fill="none" stroke={EMBER.ink} strokeWidth={W} />
+        <TPath d={ear(-1, eL)} fill={side === 'r' ? pl.shade : pl.body} transform={mis} />
+        <TPath d={ear(-1, eL)} fill="none" stroke={EMBER.ink} strokeWidth={W} />
       </g>
       <g transform={`rotate(${eR.toFixed(2)} 9 -39)`}>
-        <path d={ear(1, eR)} fill={side === 'r' ? PIP_EMBER.body : PIP_EMBER.shade} transform="translate(1.5 1)" />
-        <path d={ear(1, eR)} fill="none" stroke={EMBER.ink} strokeWidth={W} />
+        <TPath d={ear(1, eR)} fill={side === 'r' ? pl.body : pl.shade} transform={mis} />
+        <TPath d={ear(1, eR)} fill="none" stroke={EMBER.ink} strokeWidth={W} />
       </g>
-      <path d={body} fill={PIP_EMBER.body} transform="translate(1.5 1)" />
-      <path d={head} fill={PIP_EMBER.body} transform="translate(1.5 1)" />
-      <path d={body} fill="none" stroke={EMBER.ink} strokeWidth={W} />
-      <path d={head} fill="none" stroke={EMBER.ink} strokeWidth={W} />
+      <TPath d={body} fill={pl.body} transform={mis} />
+      <TPath d={head} fill={pl.body} transform={mis} />
+      <TPath d={body} fill="none" stroke={EMBER.ink} strokeWidth={W} />
+      <TPath d={head} fill="none" stroke={EMBER.ink} strokeWidth={W} />
       {/* back wrinkles (the cat's stripes) and the trunk curl */}
-      <path d={`M-7 -22Q0 -19.5 7 -22M-5.5 -17Q0 -15 5.5 -17`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.75} strokeLinecap="round" />
-      <path d={smooth(curl)} fill="none" stroke={EMBER.ink} strokeWidth={5.6 + W * 1.6} strokeLinecap="round" />
-      <path d={smooth(curl)} fill="none" stroke={PIP_EMBER.body} strokeWidth={5.6} strokeLinecap="round" />
+      <TPath d={`M-7 -22Q0 -19.5 7 -22M-5.5 -17Q0 -15 5.5 -17`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.75} strokeLinecap="round" />
+      <TPath d={smooth(curl)} fill="none" stroke={EMBER.ink} strokeWidth={5.6 + W * 1.6} strokeLinecap="round" />
+      <TPath thing d={smooth(curl)} fill="none" stroke={pl.body} strokeWidth={5.6} strokeLinecap="round" />
     </g>
   );
   return g;
 };
-export const PipTiny = tiered('support', {}, PipTinyBody);
+export const PipTiny = tiered('support', {lines: true, tone: PIP_EMBER.body}, PipTinyBody);

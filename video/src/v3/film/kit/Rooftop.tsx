@@ -88,7 +88,7 @@ const BrickStackBody: React.FC<BrickStackProps> = ({x, y, w, h, capH = w * 0.07,
     </>
   );
 };
-export const BrickStack = tiered('support', {tone: EMBER.brick, bg: EMBER.sky}, BrickStackBody);
+export const BrickStack = tiered('environment', {tone: EMBER.brick, bg: EMBER.sky}, BrickStackBody);
 
 // ---------------------------------------------------------------- the chimney pot that crosses the lens
 
@@ -106,7 +106,7 @@ const ChimneyPotBody: React.FC<{x: number; y: number; w: number; color?: string;
     </>
   );
 };
-export const ChimneyPot = tiered('support', {tone: EMBER.pot, bg: EMBER.sky}, ChimneyPotBody);
+export const ChimneyPot = tiered('environment', {tone: EMBER.pot, bg: EMBER.sky}, ChimneyPotBody);
 
 // ---------------------------------------------------------------- the mid town with the lit street
 
@@ -191,8 +191,8 @@ const MidTownBody: React.FC<MidTownProps> = ({x0, x1, rows, street: st, lamps = 
         <React.Fragment key={`${i}${side}`}>
           <Fill d={ellipse(hx - side * poolRx * 0.2, y + 3 * k, poolRx, Math.max(1.6, poolRx * 0.28), {seed: `${seed}/pool${i}${side}`})} color={EMBER.houseLit} at={fillAt(at, 0.1)} offset={false} />
           {/* a snow-lit edge on the post (a flat light line beside the dark one), so it reads against the house fronts */}
-          <Ink d={vline(cx - side * postW * 0.75, y, y - postH + 2 * k, {over: [0, 0], seed: `${seed}/postL${i}${side}`})} at={b(at, 0.1)} width={Math.max(1.2, postW * 0.6)} color={EMBER.snow} taper={false} />
-          <Ink d={vline(cx, y, y - postH, {over: [0, 0], seed: `${seed}/post${i}${side}`}) + line(cx, y - postH, hx, y - postH + 2 * k, {over: [0, 0], seed: `${seed}/arm${i}${side}`})} at={b(at, 0.1)} width={postW} color={EMBER.anchor} taper={false} />
+          <Ink thing d={vline(cx - side * postW * 0.75, y, y - postH + 2 * k, {over: [0, 0], seed: `${seed}/postL${i}${side}`})} at={b(at, 0.1)} width={Math.max(1.2, postW * 0.6)} color={EMBER.snow} taper={false} />
+          <Ink thing d={vline(cx, y, y - postH, {over: [0, 0], seed: `${seed}/post${i}${side}`}) + line(cx, y - postH, hx, y - postH + 2 * k, {over: [0, 0], seed: `${seed}/arm${i}${side}`})} at={b(at, 0.1)} width={postW} color={EMBER.anchor} taper={false} />
           {/* the lamp: a warm halo disc around a bright core (flat steps, no gradient) */}
           <Fill d={blob(hx, hy, headR * 1.9, headR * 1.6, {seed: `${seed}/halo${i}${side}`})} color={EMBER.houseLit} at={fillAt(at, 0.12)} offset={false} />
           <Fill d={blob(hx, hy, headR, headR * 0.8, {seed: `${seed}/lamp${i}${side}`})} color={EMBER.core} at={fillAt(at, 0.12)} offset={false} />
@@ -272,4 +272,4 @@ const RoofDeckBody: React.FC<RoofDeckProps> = ({y, x0, x1, h, vp, planks = 9, ex
     </>
   );
 };
-export const RoofDeck = tiered('support', {tone: EMBER.desk, bg: EMBER.sky}, RoofDeckBody);
+export const RoofDeck = tiered('environment', {tone: EMBER.desk, bg: EMBER.sky}, RoofDeckBody);

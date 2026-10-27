@@ -10,8 +10,9 @@ import {rng} from '../../../lib/rng';
 import {useTime, prog, ease, clamp} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
-import {At, b, fillAt, lerp, Pt, Show} from './util';
+import {At, b, fillAt, lerp, Pt, Show, TPath, TRect} from './util';
 import {tiered} from '../../../lib/tier';
+import {isClean} from '../../../lib/pen';
 
 // ---------------------------------------------------------------- one stick
 
@@ -96,9 +97,9 @@ const MemoryStickBody: React.FC<MemoryStickProps> = ({x, y, w, rot = 0, at, seed
       {smd ? <Fill d={smd} color={EMBER.boardDeep} at={fillAt(at, 0.06)} offset={false} seed={`${seed}/smd`} /> : null}
       {flat ? null : (
         <>
-          <Ink d={poly(g.outline, {closed: true, seed: `${seed}/o`, over, jitter: small ? 0.3 : 0.8})} at={at} width={iw} />
+          <Ink d={poly(g.outline, {closed: true, seed: `${seed}/o`, over, jitter: small ? 0.3 : 0.8})} inside={polyPath(g.outline)} at={at} width={iw} />
           <Show at={fillAt(at, 0.04)}>
-            <path d={sep.join('')} stroke={EMBER.boardDeep} strokeWidth={Math.max(1, Math.min(3, w / 120))} fill="none" strokeLinecap="butt" />
+            {isClean() && w < 260 ? null : <TPath d={sep.join('')} stroke={EMBER.boardDeep} strokeWidth={Math.max(1, Math.min(3, w / 120))} fill="none" strokeLinecap="butt" />}
           </Show>
           <Ink d={line(g.x0 + w * 0.05, g.pinTop, g.x0 + w * 0.95, g.pinTop, {over: [0, 0], seed: `${seed}/pl`})} at={b(at, 0.05)} width={Math.max(1.2, iw * 0.55)} />
           {chipMarks ? <Ink d={chipMarks} at={b(at, 0.12)} width={1.6} color={EMBER.boardDeep} /> : null}
@@ -183,7 +184,7 @@ const StickFlightBody: React.FC<StickFlightOpts & {seed?: string; ink?: number; 
   }
   return (
     <>
-      {trailD ? <path d={trailD} stroke={EMBER.ink} strokeWidth={1.8} strokeLinecap="round" fill="none" /> : null}
+      {trailD && !isClean() ? <TPath d={trailD} stroke={EMBER.ink} strokeWidth={1.8} strokeLinecap="round" fill="none" /> : null}
       <MemoryStick x={pose.x} y={pose.y} w={pose.w} rot={pose.rot} seed={seed} ink={ink} />
     </>
   );
@@ -276,11 +277,11 @@ const RawStick: React.FC<{s: PileStick; scale: number}> = ({s, scale}) => {
   for (let i = 0; i < 4; i++) chips += `M${(x0 + w * 0.06 + i * (cw + w * 0.04)).toFixed(1)} ${(y0 + h * 0.13).toFixed(1)}h${cw.toFixed(1)}v${(h * 0.5).toFixed(1)}h${(-cw).toFixed(1)}Z`;
   return (
     <g transform={`translate(${s.x.toFixed(1)} ${s.y.toFixed(1)}) rotate(${s.rot.toFixed(1)})`}>
-      <rect x={x0} y={y0} width={w} height={h} fill={s.shade ? EMBER.boardDeep : EMBER.board} />
-      <rect x={x0 + w * 0.05} y={y0 + h * 0.76} width={w * 0.9} height={h * 0.24} fill={EMBER.pin} />
+      <TRect x={x0} y={y0} width={w} height={h} fill={s.shade ? EMBER.boardDeep : EMBER.board} />
+      <TRect x={x0 + w * 0.05} y={y0 + h * 0.76} width={w * 0.9} height={h * 0.24} fill={EMBER.pin} />
       {/* every pile stick shows its black chips (the stick's signature; v3 cold read: pale label backs read as hay) */}
-      <path d={chips} fill={EMBER.chip} />
-      <rect x={x0} y={y0} width={w} height={h} fill="none" stroke={EMBER.ink} strokeWidth={1.7} strokeLinejoin="round" />
+      <TPath d={chips} fill={EMBER.chip} />
+      <TRect x={x0} y={y0} width={w} height={h} fill="none" stroke={EMBER.ink} strokeWidth={1.7} strokeLinejoin="round" />
     </g>
   );
 };

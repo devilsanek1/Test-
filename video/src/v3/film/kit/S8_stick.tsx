@@ -13,6 +13,7 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
 import {STICK_RATIO} from './Memory';
 import {tiered} from '../../../lib/tier';
+import {TCircle, TPath, TRect} from './util';
 
 export type StickDetailProps = {x: number; y: number; w: number; rot?: number; chips?: number; seed?: string};
 
@@ -59,7 +60,7 @@ const StickDetailBody: React.FC<StickDetailProps> = ({x, y, w, rot = 0, chips = 
   let lines = '';
   for (let i = 0; i < chips; i++) {
     const cx = x0 + margin + i * (cw + gap);
-    print.push(<circle key={`d${i}`} cx={cx + cw * 0.12} cy={cy + ch * 0.16} r={Math.max(1.6, w / 180)} fill={EMBER.boardDeep} />);
+    print.push(<TCircle key={`d${i}`} cx={cx + cw * 0.12} cy={cy + ch * 0.16} r={Math.max(1.6, w / 180)} fill={EMBER.boardDeep} />);
     lines += line(cx + cw * 0.18, cy + ch * 0.55, cx + cw * 0.78, cy + ch * 0.55, {over: [0, 0], seed: `${seed}/p1${i}`});
     lines += line(cx + cw * 0.18, cy + ch * 0.72, cx + cw * 0.56, cy + ch * 0.72, {over: [0, 0], seed: `${seed}/p2${i}`});
   }
@@ -75,12 +76,12 @@ const StickDetailBody: React.FC<StickDetailProps> = ({x, y, w, rot = 0, chips = 
   }
   return (
     <XG m={mat.compose(mat.translate(x, y), mat.rotate(rot))}>
-      <path d={traces} stroke={EMBER.boardDeep} strokeWidth={hair * 1.3} fill="none" strokeLinejoin="round" />
-      <path d={parts} fill={EMBER.chip} />
+      <TPath d={traces} stroke={EMBER.boardDeep} strokeWidth={hair * 1.3} fill="none" strokeLinejoin="round" />
+      <TPath d={parts} fill={EMBER.chip} />
       {print}
-      <path d={lines} stroke={EMBER.reveal} strokeWidth={hair * 1.4} fill="none" strokeLinecap="round" />
-      <rect x={lx} y={ly} width={lw} height={lh} rx={2} fill={EMBER.card} stroke={EMBER.ink} strokeWidth={hair * 1.2} />
-      <path d={bars} stroke={EMBER.ink} strokeWidth={hair * 1.1} fill="none" />
+      <TPath d={lines} stroke={EMBER.reveal} strokeWidth={hair * 1.4} fill="none" strokeLinecap="round" />
+      <TRect x={lx} y={ly} width={lw} height={lh} rx={2} fill={EMBER.card} stroke={EMBER.ink} strokeWidth={hair * 1.2} />
+      <TPath d={bars} stroke={EMBER.ink} strokeWidth={hair * 1.1} fill="none" />
       <Ink d={line(lx + lw * 0.08, ly + lh * 0.28, lx + lw * 0.7, ly + lh * 0.28, {over: [0, 0], seed: `${seed}/lab`})} width={hair * 1.2} />
     </XG>
   );

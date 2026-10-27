@@ -23,11 +23,11 @@
 //   support      B: supporting life (Pip, people, an audience, steam) and story objects off-beat (the data center):
 //                NO outline: shapes part by value; a scope with `lines` (close values touch; the mascot) draws
 //                same-hue lines x0.53 (3.4 -> 1.8; 1.4-2.2 px) at the tone's L* -20, or with no tone a deep warm
-//                brown at 42 % over what is under it; fills pulled 10 % toward the background, chroma x0.85 (<= 30);
-//                motion x0.5.
+//                brown at 42 % over what is under it; fills' value pulled 8 % toward the background's, chroma x0.9
+//                (<= 40), hue kept; motion x0.5.
 //   environment  C: the room, shelves, desk dressing, the street, the town, weather: NO line. Strokes that ARE the
-//                thing (wires, rails, a bird's V) as hairlines 1.2-1.6 px near their background's value; fills
-//                pulled 22 % toward the background, chroma x0.8 (<= 34); motion x0.4.
+//                thing (wires, rails, a bird's V) as hairlines 1.2-1.6 px near their background's value; fills' value
+//                pulled 16 % toward the background's, chroma x0.85 (<= 36), hue kept; motion x0.4.
 //   Untagged ink (a scene's own hand-drawn pieces) is 'support' WITH lines (thin, tinted) until the scene tiers it.
 //   On every tier: a LIGHT line (an ink lighter than L* 64: glints, snow edges, rims) stays light and <= 1.8 px; a
 //   GRAPHIC mark (a stroke >= 6 px wide, or dashed: the lamp rod, a mug handle, key rows) keeps its width and colour;
@@ -67,8 +67,8 @@ export type TierSpec = {
 
 export const CLEAN_TIERS: Record<Tier, TierSpec> = {
   subject: {k: 0.88, min: 1.2, max: 3.0, drop: 35, floor: 16, color: '#4B2A1E', alpha: 1, contours: true, strokes: true, minStroke: 0, pull: 0, chromaK: 1, chromaMax: 200, motion: 1},
-  support: {k: 0.53, min: 1.4, max: 2.2, drop: 20, floor: 20, color: '#5A2E1E', alpha: 0.42, contours: false, strokes: false, minStroke: 8, pull: 0.1, chromaK: 0.85, chromaMax: 30, motion: 0.5},
-  environment: {k: 0.4, min: 1.2, max: 1.6, drop: 14, floor: 24, color: '#5A2E1E', alpha: 0.22, contours: false, strokes: false, minStroke: 24, pull: 0.22, chromaK: 0.8, chromaMax: 34, motion: 0.4},
+  support: {k: 0.53, min: 1.4, max: 2.2, drop: 20, floor: 20, color: '#5A2E1E', alpha: 0.42, contours: false, strokes: false, minStroke: 8, pull: 0.08, chromaK: 0.9, chromaMax: 40, motion: 0.5},
+  environment: {k: 0.4, min: 1.2, max: 1.6, drop: 14, floor: 24, color: '#5A2E1E', alpha: 0.22, contours: false, strokes: false, minStroke: 24, pull: 0.16, chromaK: 0.85, chromaMax: 36, motion: 0.4},
 };
 
 export type PenConfig = {
@@ -207,8 +207,10 @@ export function shadeL(hex: string, dL: number, floor = 16): string {
 /** True for a colour registered as emissive (a light source). */
 export const isEmissive = (hex: string) => PEN.emissive.has(hex.toUpperCase());
 
-/** A fill colour on a calmer tier: pulled toward `bg` by spec.pull (Lab), chroma x chromaK capped at chromaMax.
- *  Identity for the subject, emissive colours and non-hex paints. */
+/** A fill colour on a calmer tier: its VALUE pulled toward the background's by spec.pull (the local contrast drops),
+ *  its chroma x chromaK capped at chromaMax, its hue kept (never mixed toward the background's hue: a blue pulled
+ *  toward a peach wall would go grey; "warm, never sickly"). Identity for the subject, emissive colours and non-hex
+ *  paints. */
 export function tierFill(hex: string, tier: Tier, bg: string = PEN.bg): string {
   const s = PEN.tiers[tier];
   if (s.pull <= 0 && s.chromaK >= 1 && s.chromaMax >= 200) return hex;
@@ -216,17 +218,11 @@ export function tierFill(hex: string, tier: Tier, bg: string = PEN.bg): string {
   return cached(`f${hex}|${tier}|${bg}`, () => {
     const lab = hexToLab(hex);
     if (!lab) return hex;
-    const g = hexToLab(bg) ?? lab;
-    const L = lab[0] + (g[0] - lab[0]) * s.pull;
-    let a = lab[1] + (g[1] - lab[1]) * s.pull;
-    let b = lab[2] + (g[2] - lab[2]) * s.pull;
-    const C = Math.hypot(a, b);
-    const C2 = Math.min(C * s.chromaK, s.chromaMax);
-    if (C > 1e-6) {
-      a *= C2 / C;
-      b *= C2 / C;
-    }
-    return labToHex([L, a, b]);
+    const gL = hexToLab(bg)?.[0] ?? lab[0];
+    const L = lab[0] + (gL - lab[0]) * s.pull;
+    const C = Math.hypot(lab[1], lab[2]);
+    const k = C > 1e-6 ? Math.min(C * s.chromaK, s.chromaMax) / C : 0;
+    return labToHex([L, lab[1] * k, lab[2] * k]);
   });
 }
 

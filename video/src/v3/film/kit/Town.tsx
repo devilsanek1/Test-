@@ -17,10 +17,11 @@ import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
-import {At, b, fillAt, Pt, Show, Txt, W} from './util';
+import {At, b, fillAt, Pt, Show, Txt, W, TCircle, TPath, TRect} from './util';
 import {stepped, sway, sway2, windowLit} from './idle';
 import {Smoke, Steam} from './Weather';
 import {tiered} from '../../../lib/tier';
+import {isClean} from '../../../lib/pen';
 
 export type HouseKind = 'cottage' | 'terrace' | 'block' | 'mansard' | 'shop';
 
@@ -79,8 +80,8 @@ const TownHouseBody: React.FC<TownHouseProps> = ({x, y, w, h: hIn, kind = 'cotta
     for (let i = 0; i < nd; i++) {
       const dx = x + w * 0.14 + (i * w * 0.72) / Math.max(1, nd - 1) - w * 0.06;
       const dw = w * 0.12;
-      out.push(<rect key={`dm${i}`} x={dx} y={rt - dw * 0.7} width={dw} height={dw * 0.9} fill={color} />);
-      out.push(<path key={`dms${i}`} d={polyPath([[dx - 3, rt - dw * 0.7], [dx + dw / 2, rt - dw * 1.2], [dx + dw + 3, rt - dw * 0.7]])} fill={EMBER.snow} />);
+      out.push(<TRect key={`dm${i}`} x={dx} y={rt - dw * 0.7} width={dw} height={dw * 0.9} fill={color} />);
+      out.push(<TPath key={`dms${i}`} d={polyPath([[dx - 3, rt - dw * 0.7], [dx + dw / 2, rt - dw * 1.2], [dx + dw + 3, rt - dw * 0.7]])} fill={EMBER.snow} />);
     }
   } else if (kind === 'block') {
     bodyD = polyPath([[x, y], [x, top], [x + w, top], [x + w, y]]);
@@ -104,15 +105,15 @@ const TownHouseBody: React.FC<TownHouseProps> = ({x, y, w, h: hIn, kind = 'cotta
   const chW = Math.max(5, w * 0.1);
   const pre: React.ReactNode[] = [];
   if (hasCh) {
-    pre.push(<rect key="ch" x={chX} y={chTop} width={chW} height={top - chTop + 8} fill={EMBER.dcSide} />);
-    pre.push(<path key="chs" d={blob(chX + chW / 2, chTop - 1, chW * 0.75, 3 + w * 0.02, {seed: `${seed}/chs`})} fill={EMBER.snow} />);
+    pre.push(<TRect key="ch" x={chX} y={chTop} width={chW} height={top - chTop + 8} fill={EMBER.dcSide} />);
+    pre.push(<TPath key="chs" d={blob(chX + chW / 2, chTop - 1, chW * 0.75, 3 + w * 0.02, {seed: `${seed}/chs`})} fill={EMBER.snow} />);
     if (smoke ?? true) pre.push(<Smoke key="sm" x={chX + chW / 2} y={chTop - 3} seed={`${seed}/sm`} rise={w * 0.9} r1={Math.max(4, w * 0.12)} r0={Math.max(2, w * 0.04)} drift={w * 0.5} />);
   }
   if (antenna ?? (kind === 'block' || kind === 'terrace')) {
     const ax = x + w * (kind === 'block' ? 0.3 : 0.25);
     const ay = kind === 'block' ? top - 4 : top - w * 0.22;
     const ah = w * 0.42;
-    pre.push(<path key="ant" d={`M${ax} ${ay}v${-ah}M${ax - w * 0.12} ${ay - ah * 0.7}h${w * 0.24}M${ax - w * 0.08} ${ay - ah * 0.45}h${w * 0.16}`} stroke={EMBER.dcSide} strokeWidth={Math.max(1.4, w * 0.015)} />);
+    pre.push(<TPath thing key="ant" d={`M${ax} ${ay}v${-ah}M${ax - w * 0.12} ${ay - ah * 0.7}h${w * 0.24}M${ax - w * 0.08} ${ay - ah * 0.45}h${w * 0.16}`} stroke={EMBER.dcSide} strokeWidth={Math.max(1.4, w * 0.015)} />);
   }
   // ---- windows
   const wins: {x: number; y: number; w: number; h: number}[] = [];
@@ -127,29 +128,29 @@ const TownHouseBody: React.FC<TownHouseProps> = ({x, y, w, h: hIn, kind = 'cotta
       wins.push({x: wx, y: wy, w: ww, h: wh});
     }
   const nW = wins.length;
-  const body = <path key="body" d={bodyD} fill={color} />;
+  const body = <TPath key="body" d={bodyD} fill={color} />;
   const winEls = wins.map((wd, i) => {
     const lit = windowLit(t, `town/${seed}`, i, nW, {litFrac});
-    return <rect key={`w${i}`} x={wd.x} y={wd.y} width={wd.w} height={wd.h} fill={lit ? EMBER.houseLit : EMBER.dcDark} />;
+    return <TRect key={`w${i}`} x={wd.x} y={wd.y} width={wd.w} height={wd.h} fill={lit ? EMBER.houseLit : EMBER.dcDark} />;
   });
   const extra: React.ReactNode[] = [];
   if (kind === 'block') {
     // balconies: a rail under every other window row
     for (let ry = 1; ry < rows; ry++) {
       const by = top + (h / rows) * (ry + 0.3) + (h / rows) * 0.5;
-      extra.push(<rect key={`bal${ry}`} x={x + w * 0.1} y={by} width={w * 0.8} height={Math.max(2, w * 0.03)} fill={EMBER.dcSide} />);
-      extra.push(<path key={`bals${ry}`} d={`M${x + w * 0.1} ${by - 1.5}h${w * 0.8}`} stroke={EMBER.snow} strokeWidth={Math.max(1.4, w * 0.02)} />);
+      extra.push(<TRect key={`bal${ry}`} x={x + w * 0.1} y={by} width={w * 0.8} height={Math.max(2, w * 0.03)} fill={EMBER.dcSide} />);
+      extra.push(<TPath key={`bals${ry}`} d={`M${x + w * 0.1} ${by - 1.5}h${w * 0.8}`} stroke={EMBER.snow} strokeWidth={Math.max(1.4, w * 0.02)} />);
     }
-    if (dish ?? true) extra.push(<path key="dish" d={`M${x + w * 0.78} ${top + h * 0.22}a${w * 0.08} ${w * 0.08} 0 0 1 ${w * 0.08} ${w * 0.1}z`} fill={EMBER.frost} />);
+    if (dish ?? true) extra.push(<TPath key="dish" d={`M${x + w * 0.78} ${top + h * 0.22}a${w * 0.08} ${w * 0.08} 0 0 1 ${w * 0.08} ${w * 0.1}z`} fill={EMBER.frost} />);
   }
   if (kind === 'shop') {
     const aw = polyPath([[x - 3, top + h * 0.5], [x + w + 3, top + h * 0.5], [x + w + 8, top + h * 0.62], [x - 8, top + h * 0.62]]);
-    extra.push(<path key="aw" d={aw} fill={EMBER.beam} />);
-    extra.push(<rect key="shopwin" x={x + w * 0.08} y={top + h * 0.66} width={w * 0.6} height={h * 0.28} fill={EMBER.core} />);
-    extra.push(<rect key="door" x={x + w * 0.74} y={top + h * 0.64} width={w * 0.18} height={h * 0.36} fill={EMBER.houseLit} />);
+    extra.push(<TPath key="aw" d={aw} fill={EMBER.beam} />);
+    extra.push(<TRect key="shopwin" x={x + w * 0.08} y={top + h * 0.66} width={w * 0.6} height={h * 0.28} fill={EMBER.core} />);
+    extra.push(<TRect key="door" x={x + w * 0.74} y={top + h * 0.64} width={w * 0.18} height={h * 0.36} fill={EMBER.houseLit} />);
     extra.push(
       <Show key="sg" at={fillAt(at, 0.06)}>
-        <rect x={x + w * 0.1} y={top + h * 0.36} width={w * 0.8} height={h * 0.12} fill={EMBER.core} />
+        <TRect x={x + w * 0.1} y={top + h * 0.36} width={w * 0.8} height={h * 0.12} fill={EMBER.core} />
         {!far && w >= 70 ? (
           <Txt x={x + w / 2} y={top + h * 0.455} size={Math.max(10, h * 0.1)} fill={EMBER.beam} fit={w * 0.74}>
             {sign}
@@ -158,14 +159,14 @@ const TownHouseBody: React.FC<TownHouseProps> = ({x, y, w, h: hIn, kind = 'cotta
       </Show>,
     );
   }
-  if (dish && kind !== 'block') extra.push(<path key="dish2" d={`M${x + w * 0.15} ${top + h * 0.15}a${w * 0.07} ${w * 0.07} 0 0 1 ${w * 0.07} ${w * 0.09}z`} fill={EMBER.frost} />);
+  if (dish && kind !== 'block') extra.push(<TPath key="dish2" d={`M${x + w * 0.15} ${top + h * 0.15}a${w * 0.07} ${w * 0.07} 0 0 1 ${w * 0.07} ${w * 0.09}z`} fill={EMBER.frost} />);
   const show = at === undefined || t >= fillAt(at)!;
   if (!show) return iw ? <Ink d={poly(roof, {seed: `${seed}/ri`, over: [1, 3]})} at={at} width={iw} /> : null;
   return (
     <>
       {pre}
       {body}
-      <path d={snowD} fill={EMBER.snow} />
+      <TPath d={snowD} fill={EMBER.snow} />
       {winEls}
       {extra}
       {iw ? <Ink d={poly(roof, {seed: `${seed}/ri`, over: [1, 3]}) + line(x, top, x, y, {over: [0, 0], seed: `${seed}/l`}) + line(x + w, top, x + w, y, {over: [0, 0], seed: `${seed}/r`})} at={at} width={iw} /> : null}
@@ -212,12 +213,12 @@ const RoofNeighbourBody: React.FC<{x: number; y: number; h?: number; kind?: 'sho
   const frame = Math.floor(stepped(t + rng(`nb/${seed}`).range(0, 2), 4) * 4) % 4;
   // body: legs, coat, head (side-ish silhouette, no face)
   const lean = kind === 'shovel' ? [10, 2, -8, 4][frame] : 0;
-  const head = <circle cx={2 * f} cy={-38} r={6} fill={EMBER.anchor} />;
+  const head = <TCircle cx={2 * f} cy={-38} r={6} fill={EMBER.anchor} />;
   const bodyEl = (
     <>
-      <path d={`M-4 -16L-6 0M4 -16L6 0`} stroke={EMBER.anchor} strokeWidth={4} strokeLinecap="round" />
-      <path d={roundRect(-8, -33, 16, 19, 6)} fill={coat} />
-      <path d={blob(2 * f, -44, 6.5, 3, {seed: `${seed}/hat`})} fill={EMBER.hl} />
+      <TPath thing d={`M-4 -16L-6 0M4 -16L6 0`} stroke={EMBER.anchor} strokeWidth={4} strokeLinecap="round" />
+      <TPath d={roundRect(-8, -33, 16, 19, 6)} fill={coat} />
+      <TPath d={blob(2 * f, -44, 6.5, 3, {seed: `${seed}/hat`})} fill={EMBER.hl} />
       {head}
     </>
   );
@@ -228,20 +229,20 @@ const RoofNeighbourBody: React.FC<{x: number; y: number; h?: number; kind?: 'sho
     tool = (
       <>
         <g transform={`rotate(${ang} 0 -24)`}>
-          <path d={`M0 -24L${16 * f} -2`} stroke={EMBER.beam} strokeWidth={2.4} strokeLinecap="round" />
-          <path d={`M${13 * f} -4l${8 * f} 6l${-4 * f} 5l${-8 * f} -6z`} fill={EMBER.dcSide} />
+          <TPath thing d={`M0 -24L${16 * f} -2`} stroke={EMBER.beam} strokeWidth={2.4} strokeLinecap="round" />
+          <TPath d={`M${13 * f} -4l${8 * f} 6l${-4 * f} 5l${-8 * f} -6z`} fill={EMBER.dcSide} />
         </g>
-        {puff ? <path d={blob(24 * f, -40, 9, 6, {seed: `${seed}/puff`}) + blob(32 * f, -48, 6, 4, {seed: `${seed}/puff2`})} fill={EMBER.snow} /> : null}
+        {puff ? <TPath d={blob(24 * f, -40, 9, 6, {seed: `${seed}/puff`}) + blob(32 * f, -48, 6, 4, {seed: `${seed}/puff2`})} fill={EMBER.snow} /> : null}
       </>
     );
   } else {
     const reach = Math.sin(t * 1.4) * 6;
     tool = (
       <>
-        <path d={`M3 -30L${10 * f} ${-52 - reach}`} stroke={coat} strokeWidth={4} strokeLinecap="round" />
-        <path d={`M${10 * f} ${-54 - reach}Q${40 * f} -40 ${70 * f} -50`} fill="none" stroke={EMBER.ink} strokeWidth={1.2} />
+        <TPath thing d={`M3 -30L${10 * f} ${-52 - reach}`} stroke={coat} strokeWidth={4} strokeLinecap="round" />
+        <TPath thing d={`M${10 * f} ${-54 - reach}Q${40 * f} -40 ${70 * f} -50`} fill="none" stroke={EMBER.ink} strokeWidth={1.2} />
         {[0.3, 0.55, 0.8].map((u, i) => (
-          <circle key={i} cx={(10 + 60 * u) * f} cy={-54 - reach * (1 - u) + 10 * Math.sin(u * Math.PI)} r={2.4} fill={Math.floor(t * 2 + i) % 3 ? EMBER.houseLit : EMBER.core} />
+          <TCircle key={i} cx={(10 + 60 * u) * f} cy={-54 - reach * (1 - u) + 10 * Math.sin(u * Math.PI)} r={2.4} fill={Math.floor(t * 2 + i) % 3 ? EMBER.houseLit : EMBER.core} />
         ))}
       </>
     );
@@ -268,10 +269,10 @@ const PennantBody: React.FC<{x: number; y: number; h?: number; w?: number; color
   const tip = pts[4];
   return (
     <>
-      <path d={`M${x} ${y}V${y - h}`} stroke={EMBER.anchor} strokeWidth={2.4} />
-      <path d={`M${x} ${y - h + 2}` + pts.slice(1).map(([px, py]) => `L${px.toFixed(1)} ${py.toFixed(1)}`).join('') + `L${x} ${y - h + 18}Z`} fill={color} />
-      <path d={`M${x} ${y - h + 2}L${tip[0].toFixed(1)} ${tip[1].toFixed(1)}L${x} ${y - h + 18}`} fill="none" stroke={EMBER.ink} strokeWidth={1.6} strokeLinejoin="round" />
-      <path d={blob(x, y - h - 2, 4, 2, {seed: `${seed}/s`})} fill={EMBER.snow} />
+      <TPath thing d={`M${x} ${y}V${y - h}`} stroke={EMBER.anchor} strokeWidth={2.4} />
+      <TPath d={`M${x} ${y - h + 2}` + pts.slice(1).map(([px, py]) => `L${px.toFixed(1)} ${py.toFixed(1)}`).join('') + `L${x} ${y - h + 18}Z`} fill={color} />
+      <TPath d={`M${x} ${y - h + 2}L${tip[0].toFixed(1)} ${tip[1].toFixed(1)}L${x} ${y - h + 18}`} fill="none" stroke={EMBER.ink} strokeWidth={1.6} strokeLinejoin="round" />
+      <TPath d={blob(x, y - h - 2, 4, 2, {seed: `${seed}/s`})} fill={EMBER.snow} />
     </>
   );
 };
@@ -286,10 +287,10 @@ const FoldingChairBody: React.FC<{x: number; y: number; w?: number; seed?: strin
   const d = `M${x - w * 0.35} ${y}L${x + w * 0.3} ${y - h * 0.48}M${x + w * 0.3} ${y}L${x - w * 0.3} ${y - h * 0.48}M${x - w * 0.36} ${y - h * 0.48}L${x + w * 0.36} ${y - h * 0.48}M${x + w * 0.3} ${y - h * 0.48}L${x + w * 0.38} ${y - h}`;
   return (
     <>
-      <Ink d={d} at={at} width={iw} color={EMBER.beam} />
+      <Ink thing d={d} at={at} width={iw} color={EMBER.beam} />
       <Ink d={line(x + w * 0.33, y - h * 0.85, x + w * 0.37, y - h * 0.6, {over: [0, 0], seed: `${seed}/b`})} at={at} width={w * 0.12} color={EMBER.beam} taper={false} />
-      <path d={blob(x, y - h * 0.5 - w * 0.06, w * 0.38, w * 0.08, {seed: `${seed}/cush`})} fill={EMBER.snow} />
-      <path d={blob(x + w * 0.36, y - h - w * 0.03, w * 0.07, w * 0.04, {seed: `${seed}/top`})} fill={EMBER.snow} />
+      <TPath d={blob(x, y - h * 0.5 - w * 0.06, w * 0.38, w * 0.08, {seed: `${seed}/cush`})} fill={EMBER.snow} />
+      <TPath d={blob(x + w * 0.36, y - h - w * 0.03, w * 0.07, w * 0.04, {seed: `${seed}/top`})} fill={EMBER.snow} />
       <Ink d={`M${x - w * 0.38} ${y - h * 0.5 - w * 0.06}Q${x} ${y - h * 0.5 - w * 0.2} ${x + w * 0.38} ${y - h * 0.5 - w * 0.06}`} at={b(at, 0.06)} width={W.hair} />
     </>
   );
@@ -303,10 +304,10 @@ const SideTableBody: React.FC<{x: number; y: number; w?: number; mug?: boolean; 
   const mw = w * 0.26;
   return (
     <>
-      <Ink d={`M${x} ${y - h}L${x} ${y}M${x - w * 0.3} ${y}L${x + w * 0.3} ${y}`} at={at} width={iw} color={EMBER.anchor} />
+      <Ink thing d={`M${x} ${y - h}L${x} ${y}M${x - w * 0.3} ${y}L${x + w * 0.3} ${y}`} at={at} width={iw} color={EMBER.anchor} />
       <Fill d={roundRect(x - w / 2, y - h - 10, w, 12, 5)} color={EMBER.beam} at={fillAt(at)} seed={`${seed}/t`} />
       <Ink d={roundRect(x - w / 2, y - h - 10, w, 12, 5, {closed: false, seed: `${seed}/ti`})} at={at} width={iw} />
-      <path d={blob(x - w * 0.28, y - h - 13, w * 0.18, 4, {seed: `${seed}/sn`})} fill={EMBER.snow} />
+      <TPath d={blob(x - w * 0.28, y - h - 13, w * 0.18, 4, {seed: `${seed}/sn`})} fill={EMBER.snow} />
       {mug ? (
         <>
           <Fill d={roundRect(x + w * 0.05, y - h - 10 - mw * 1.1, mw, mw * 1.1, mw * 0.18)} color={EMBER.mug} at={fillAt(at, 0.04)} seed={`${seed}/m`} />
@@ -340,16 +341,16 @@ const LaundryLineBody: React.FC<{a: Pt; b: Pt; sag?: number; n?: number; size?: 
     else d = `M${px - s * 0.45} ${py}h${s * 0.9}v${s * 1.1}h${-s * 0.9}z`;
     items.push(
       <g key={i} transform={`rotate(${a2.toFixed(2)} ${px} ${py})`}>
-        <path d={d} fill={colors[i % colors.length]} transform="translate(2 1.5)" />
-        <path d={d} fill="none" stroke={EMBER.ink} strokeWidth={ink * 0.8} strokeLinejoin="round" />
-        <path d={`M${px - 3} ${py - 3}v6M${px + 3} ${py - 3}v6`} stroke={EMBER.beam} strokeWidth={2} />
+        <TPath d={d} fill={colors[i % colors.length]} transform={isClean() ? undefined : 'translate(2 1.5)'} />
+        <TPath d={d} fill="none" stroke={EMBER.ink} strokeWidth={ink * 0.8} strokeLinejoin="round" />
+        <TPath thing d={`M${px - 3} ${py - 3}v6M${px + 3} ${py - 3}v6`} stroke={EMBER.beam} strokeWidth={2} />
       </g>,
     );
   }
   return (
     <>
-      <path d={smooth(pts)} fill="none" stroke={EMBER.ink} strokeWidth={ink * 0.7} />
-      <path d={smooth(pts.slice(1, 4).map(([x, y]) => [x, y - 2] as Pt))} fill="none" stroke={EMBER.snow} strokeWidth={3} strokeLinecap="round" />
+      <TPath thing d={smooth(pts)} fill="none" stroke={EMBER.ink} strokeWidth={ink * 0.7} />
+      <TPath d={smooth(pts.slice(1, 4).map(([x, y]) => [x, y - 2] as Pt))} fill="none" stroke={EMBER.snow} strokeWidth={3} strokeLinecap="round" />
       {items}
     </>
   );
@@ -360,9 +361,9 @@ export const LaundryLine = tiered('environment', {bg: EMBER.sky}, LaundryLineBod
 const ShovelBody: React.FC<{x: number; y: number; h?: number; lean?: number; seed?: string; at?: At; ink?: number}> = ({x, y, h = 160, lean = 12, seed = 'shovel', at, ink = W.far}) => (
   <XG m={mat.about(mat.rotate(lean), x, y)}>
     <Ink d={line(x, y - h * 0.22, x, y - h, {over: [0, 0], seed: `${seed}/h`})} at={at} width={h * 0.04} color={EMBER.beam} taper={false} />
-    <Ink d={line(x - h * 0.06, y - h, x + h * 0.06, y - h, {over: [0, 0], seed: `${seed}/g`})} at={at} width={h * 0.03} color={EMBER.anchor} taper={false} />
+    <Ink thing d={line(x - h * 0.06, y - h, x + h * 0.06, y - h, {over: [0, 0], seed: `${seed}/g`})} at={at} width={h * 0.03} color={EMBER.anchor} taper={false} />
     <Fill d={polyPath([[x - h * 0.15, y - h * 0.24], [x + h * 0.15, y - h * 0.24], [x + h * 0.17, y], [x - h * 0.17, y]])} color={EMBER.dcSide} at={fillAt(at)} seed={`${seed}/b`} />
-    <path d={blob(x, y - h * 0.24, h * 0.13, h * 0.03 + 1, {seed: `${seed}/sn`})} fill={EMBER.snow} />
+    <TPath d={blob(x, y - h * 0.24, h * 0.13, h * 0.03 + 1, {seed: `${seed}/sn`})} fill={EMBER.snow} />
     <Ink d={poly([[x - h * 0.15, y - h * 0.24], [x + h * 0.15, y - h * 0.24], [x + h * 0.17, y], [x - h * 0.17, y]], {closed: true, seed: `${seed}/bi`, over: [0, 1]})} at={at} width={ink} />
   </XG>
 );
@@ -371,14 +372,14 @@ export const Shovel = tiered('environment', {bg: EMBER.sky}, ShovelBody);
 /** A satellite dish and an antenna for any roof (base on (x, y)). */
 const RoofAerialsBody: React.FC<{x: number; y: number; s?: number; dish?: boolean; antenna?: boolean}> = ({x, y, s = 1, dish = true, antenna = true}) => (
   <g transform={`translate(${x} ${y}) scale(${s})`}>
-    {antenna ? <path d={`M0 0v-60M-18 -44h36M-12 -30h24M-8 -18h16`} stroke={EMBER.dcSide} strokeWidth={2.4} /> : null}
+    {antenna ? <TPath thing d={`M0 0v-60M-18 -44h36M-12 -30h24M-8 -18h16`} stroke={EMBER.dcSide} strokeWidth={2.4} /> : null}
     {dish ? (
       <>
-        <path d={`M30 0v-16`} stroke={EMBER.dcSide} strokeWidth={2.4} />
-        <path d={`M18 -16a14 14 0 0 1 26 -10z`} fill={EMBER.frost} stroke={EMBER.ink} strokeWidth={1.4} />
+        <TPath thing d={`M30 0v-16`} stroke={EMBER.dcSide} strokeWidth={2.4} />
+        <TPath d={`M18 -16a14 14 0 0 1 26 -10z`} fill={EMBER.frost} stroke={EMBER.ink} strokeWidth={1.4} />
       </>
     ) : null}
-    <path d={blob(0, -61, 4, 2, {seed: 'aer'})} fill={EMBER.snow} />
+    <TPath d={blob(0, -61, 4, 2, {seed: 'aer'})} fill={EMBER.snow} />
   </g>
 );
 export const RoofAerials = tiered('environment', {bg: EMBER.sky}, RoofAerialsBody);

@@ -25,7 +25,7 @@ import {mat, Mat, XG} from '../../../lib/xf';
 import {mix} from '../../../lib/cine/util';
 import {blob, circle, roundRect, smooth, torso} from '../../../lib/sketch';
 import {EMBER} from '../palette';
-import {At, Pt} from './util';
+import {At, Pt, TCircle, TPath, TRect} from './util';
 import {bob, loopPos, puffs, ring, shuttle, sway, windowLit, WindowForce} from './idle';
 import {tiered} from '../../../lib/tier';
 
@@ -214,15 +214,15 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
     const canopy = `M${cx - R} ${cy + R * 0.18}Q${cx - R * 0.9} ${cy - R * 0.62} ${cx} ${cy - R * 0.66}Q${cx + R * 0.9} ${cy - R * 0.62} ${cx + R} ${cy + R * 0.18}` + scallops(cx - R, cx + R, cy + R * 0.18, 5, R * 0.1) + 'Z';
     back.push(
       <g key="umb">
-        <path d={`M${cx} ${cy - R * 0.66}L${cx + hw * 0.1} ${-g.h * 0.6}`} stroke={EMBER.anchor} strokeWidth={W * 1.1} strokeLinecap="round" />
+        <TPath thing d={`M${cx} ${cy - R * 0.66}L${cx + hw * 0.1} ${-g.h * 0.6}`} stroke={EMBER.anchor} strokeWidth={W * 1.1} strokeLinecap="round" />
       </g>,
     );
     over.push(
       <g key="umbC">
-        <path d={canopy} fill={pick.hat === EMBER.wall ? EMBER.dcSide : pick.hat} transform={`translate(${2 / s} ${1.4 / s})`} />
-        <path d={canopy} fill="none" stroke={EMBER.ink} strokeWidth={W} strokeLinejoin="round" />
-        <path d={`M${cx} ${cy - R * 0.66}L${cx - R * 0.45} ${cy + R * 0.16}M${cx} ${cy - R * 0.66}L${cx + R * 0.45} ${cy + R * 0.16}`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.6} />
-        {wear.includes('snow') ? <path d={blob(cx, cy - R * 0.6, R * 0.55, R * 0.1, {seed: fx('us')})} fill={EMBER.snow} /> : null}
+        <TPath d={canopy} fill={pick.hat === EMBER.wall ? EMBER.dcSide : pick.hat} transform={`translate(${2 / s} ${1.4 / s})`} />
+        <TPath d={canopy} fill="none" stroke={EMBER.ink} strokeWidth={W} strokeLinejoin="round" />
+        <TPath thing d={`M${cx} ${cy - R * 0.66}L${cx - R * 0.45} ${cy + R * 0.16}M${cx} ${cy - R * 0.66}L${cx + R * 0.45} ${cy + R * 0.16}`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.6} />
+        {wear.includes('snow') ? <TPath d={blob(cx, cy - R * 0.6, R * 0.55, R * 0.1, {seed: fx('us')})} fill={EMBER.snow} /> : null}
       </g>,
     );
   }
@@ -234,10 +234,10 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
     const by = -g.h * 0.12;
     over.push(
       <g key="bag">
-        <path d={`M${bx - bw * 0.3} ${by}Q${bx} ${by - bh * 0.7} ${bx + bw * 0.3} ${by}`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.7} />
-        <path d={roundRect(bx - bw / 2, by, bw, bh, 4)} fill={pick.bag} transform={`translate(${1.6 / s} ${1 / s})`} />
-        <path d={roundRect(bx - bw / 2, by, bw, bh, 4, {closed: false, seed: fx('bagI')})} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.9} />
-        <path d={`M${bx - bw * 0.3} ${by + bh * 0.42}L${bx + bw * 0.3} ${by + bh * 0.42}`} stroke={EMBER.ink} strokeWidth={W * 0.5} />
+        <TPath thing d={`M${bx - bw * 0.3} ${by}Q${bx} ${by - bh * 0.7} ${bx + bw * 0.3} ${by}`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.7} />
+        <TPath d={roundRect(bx - bw / 2, by, bw, bh, 4)} fill={pick.bag} transform={`translate(${1.6 / s} ${1 / s})`} />
+        <TPath d={roundRect(bx - bw / 2, by, bw, bh, 4, {closed: false, seed: fx('bagI')})} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.9} />
+        <TPath d={`M${bx - bw * 0.3} ${by + bh * 0.42}L${bx + bw * 0.3} ${by + bh * 0.42}`} stroke={EMBER.ink} strokeWidth={W * 0.5} />
       </g>,
     );
   }
@@ -249,12 +249,12 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
     over.push(
       <g key="cof">
         {steam.map((p, i) => (
-          <circle key={i} cx={cx + p.x} cy={cy - cw * 0.5 + p.y} r={p.r} fill={EMBER.snow} />
+          <TCircle key={i} cx={cx + p.x} cy={cy - cw * 0.5 + p.y} r={p.r} fill={EMBER.snow} />
         ))}
-        <path d={`M${cx - cw / 2} ${cy}L${cx - cw * 0.4} ${cy + cw * 1.3}L${cx + cw * 0.4} ${cy + cw * 1.3}L${cx + cw / 2} ${cy}Z`} fill={EMBER.wall} />
-        <path d={`M${cx - cw * 0.58} ${cy - cw * 0.15}h${cw * 1.16}v${cw * 0.3}h${-cw * 1.16}Z`} fill={EMBER.beam} />
-        <path d={`M${cx - cw / 2} ${cy}L${cx - cw * 0.4} ${cy + cw * 1.3}L${cx + cw * 0.4} ${cy + cw * 1.3}L${cx + cw / 2} ${cy}`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.7} />
-        <path d={blob(cx + cw * 0.1, cy + cw * 0.95, cw * 0.55, cw * 0.45, {seed: fx('ch')})} fill={EMBER.skin} />
+        <TPath d={`M${cx - cw / 2} ${cy}L${cx - cw * 0.4} ${cy + cw * 1.3}L${cx + cw * 0.4} ${cy + cw * 1.3}L${cx + cw / 2} ${cy}Z`} fill={EMBER.wall} />
+        <TPath d={`M${cx - cw * 0.58} ${cy - cw * 0.15}h${cw * 1.16}v${cw * 0.3}h${-cw * 1.16}Z`} fill={EMBER.beam} />
+        <TPath d={`M${cx - cw / 2} ${cy}L${cx - cw * 0.4} ${cy + cw * 1.3}L${cx + cw * 0.4} ${cy + cw * 1.3}L${cx + cw / 2} ${cy}`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.7} />
+        <TPath d={blob(cx + cw * 0.1, cy + cw * 0.95, cw * 0.55, cw * 0.45, {seed: fx('ch')})} fill={EMBER.skin} />
       </g>,
     );
   }
@@ -265,11 +265,11 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
     const bh = g.w * 0.4;
     over.push(
       <g key="clip" transform={`rotate(${(-12 + sway(t, 2, 2.4, 1)).toFixed(2)} ${cx} ${cy})`}>
-        <path d={`M${cx - bw / 2} ${cy}h${bw}v${bh}h${-bw}Z`} fill={EMBER.beam} />
-        <path d={`M${cx - bw * 0.4} ${cy + bh * 0.08}h${bw * 0.8}v${bh * 0.86}h${-bw * 0.8}Z`} fill={EMBER.card} />
-        <path d={`M${cx - bw * 0.28} ${cy + bh * 0.3}h${bw * 0.56}M${cx - bw * 0.28} ${cy + bh * 0.48}h${bw * 0.5}M${cx - bw * 0.28} ${cy + bh * 0.66}h${bw * 0.4}`} stroke={EMBER.ink} strokeWidth={W * 0.4} />
-        <path d={`M${cx - bw * 0.16} ${cy - bh * 0.04}h${bw * 0.32}v${bh * 0.1}h${-bw * 0.32}Z`} fill={EMBER.anchor} />
-        <path d={`M${cx - bw / 2} ${cy}h${bw}v${bh}h${-bw}Z`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.8} />
+        <TPath d={`M${cx - bw / 2} ${cy}h${bw}v${bh}h${-bw}Z`} fill={EMBER.beam} />
+        <TPath d={`M${cx - bw * 0.4} ${cy + bh * 0.08}h${bw * 0.8}v${bh * 0.86}h${-bw * 0.8}Z`} fill={EMBER.card} />
+        <TPath d={`M${cx - bw * 0.28} ${cy + bh * 0.3}h${bw * 0.56}M${cx - bw * 0.28} ${cy + bh * 0.48}h${bw * 0.5}M${cx - bw * 0.28} ${cy + bh * 0.66}h${bw * 0.4}`} stroke={EMBER.ink} strokeWidth={W * 0.4} />
+        <TPath d={`M${cx - bw * 0.16} ${cy - bh * 0.04}h${bw * 0.32}v${bh * 0.1}h${-bw * 0.32}Z`} fill={EMBER.anchor} />
+        <TPath d={`M${cx - bw / 2} ${cy}h${bw}v${bh}h${-bw}Z`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.8} />
       </g>,
     );
   }
@@ -282,12 +282,12 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
             <path d={vest} />
           </clipPath>
         </defs>
-        <path d={vest} fill={WINTER.hivis} />
+        <TPath d={vest} fill={WINTER.hivis} />
         <g clipPath={`url(#${clipId})`}>
-          <rect x={-g.w} y={-g.h * 0.42} width={g.w * 2} height={g.h * 0.09} fill={WINTER.hivisBand} />
-          <rect x={-g.w} y={-g.h * 0.22} width={g.w * 2} height={g.h * 0.09} fill={WINTER.hivisBand} />
+          <TRect x={-g.w} y={-g.h * 0.42} width={g.w * 2} height={g.h * 0.09} fill={WINTER.hivisBand} />
+          <TRect x={-g.w} y={-g.h * 0.22} width={g.w * 2} height={g.h * 0.09} fill={WINTER.hivisBand} />
         </g>
-        <path d={vest} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.7} />
+        <TPath d={vest} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.7} />
       </g>,
     );
   }
@@ -300,10 +300,10 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
     const ey = sy - g.w * (0.55 + 0.6 * k);
     over.push(
       <g key="pt">
-        <path d={`M${sx} ${sy}L${ex} ${ey}`} stroke={EMBER.ink} strokeWidth={g.w * 0.19 + W * 2} strokeLinecap="round" />
-        <path d={`M${sx} ${sy}L${ex} ${ey}`} stroke={pick.coat} strokeWidth={g.w * 0.19} strokeLinecap="round" />
-        <path d={blob(ex + g.w * 0.02, ey - g.w * 0.05, g.w * 0.075, g.w * 0.095, {seed: fx('ph')})} fill={EMBER.skin} />
-        <path d={`M${ex + g.w * 0.02} ${ey - g.w * 0.1}l${g.w * 0.04} ${-g.w * 0.12}`} stroke={EMBER.skin} strokeWidth={g.w * 0.05} strokeLinecap="round" />
+        <TPath d={`M${sx} ${sy}L${ex} ${ey}`} stroke={EMBER.ink} strokeWidth={g.w * 0.19 + W * 2} strokeLinecap="round" />
+        <TPath thing d={`M${sx} ${sy}L${ex} ${ey}`} stroke={pick.coat} strokeWidth={g.w * 0.19} strokeLinecap="round" />
+        <TPath d={blob(ex + g.w * 0.02, ey - g.w * 0.05, g.w * 0.075, g.w * 0.095, {seed: fx('ph')})} fill={EMBER.skin} />
+        <TPath thing d={`M${ex + g.w * 0.02} ${ey - g.w * 0.1}l${g.w * 0.04} ${-g.w * 0.12}`} stroke={EMBER.skin} strokeWidth={g.w * 0.05} strokeLinecap="round" />
       </g>,
     );
   }
@@ -316,9 +316,9 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
     const ey = sy - Math.cos((a * Math.PI) / 180) * len;
     over.push(
       <g key="wv">
-        <path d={`M${sx} ${sy}L${ex} ${ey}`} stroke={EMBER.ink} strokeWidth={g.w * 0.19 + W * 2} strokeLinecap="round" />
-        <path d={`M${sx} ${sy}L${ex} ${ey}`} stroke={pick.coat} strokeWidth={g.w * 0.19} strokeLinecap="round" />
-        <path d={blob(ex, ey - 4, g.w * 0.075, g.w * 0.095, {seed: fx('wh')})} fill={EMBER.skin} />
+        <TPath d={`M${sx} ${sy}L${ex} ${ey}`} stroke={EMBER.ink} strokeWidth={g.w * 0.19 + W * 2} strokeLinecap="round" />
+        <TPath thing d={`M${sx} ${sy}L${ex} ${ey}`} stroke={pick.coat} strokeWidth={g.w * 0.19} strokeLinecap="round" />
+        <TPath d={blob(ex, ey - 4, g.w * 0.075, g.w * 0.095, {seed: fx('wh')})} fill={EMBER.skin} />
       </g>,
     );
   }
@@ -327,12 +327,12 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
     const er = hr * 0.38;
     over.push(
       <g key="em">
-        <path d={`M${-hr * 1.02} ${hy}A${hr * 1.06} ${hr * 1.06} 0 0 1 ${hr * 1.02} ${hy}`} fill="none" stroke={EMBER.ink} strokeWidth={W * 2.2} strokeLinecap="round" />
-        <path d={`M${-hr * 1.02} ${hy}A${hr * 1.06} ${hr * 1.06} 0 0 1 ${hr * 1.02} ${hy}`} fill="none" stroke={pick.hat} strokeWidth={W * 1.1} strokeLinecap="round" />
+        <TPath d={`M${-hr * 1.02} ${hy}A${hr * 1.06} ${hr * 1.06} 0 0 1 ${hr * 1.02} ${hy}`} fill="none" stroke={EMBER.ink} strokeWidth={W * 2.2} strokeLinecap="round" />
+        <TPath thing d={`M${-hr * 1.02} ${hy}A${hr * 1.06} ${hr * 1.06} 0 0 1 ${hr * 1.02} ${hy}`} fill="none" stroke={pick.hat} strokeWidth={W * 1.1} strokeLinecap="round" />
         {[-1, 1].map((sg) => (
           <g key={sg}>
-            <path d={blob(sg * hr * 1.0 + 1.2 / s, hy + hr * 0.1 + 1 / s, er, er * 1.1, {seed: fx(`em${sg}`)})} fill={pick.hat} />
-            <path d={circle(sg * hr * 1.0, hy + hr * 0.1, er, {seed: fx(`emi${sg}`)})} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.85} />
+            <TPath d={blob(sg * hr * 1.0 + 1.2 / s, hy + hr * 0.1 + 1 / s, er, er * 1.1, {seed: fx(`em${sg}`)})} fill={pick.hat} />
+            <TPath d={circle(sg * hr * 1.0, hy + hr * 0.1, er, {seed: fx(`emi${sg}`)})} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.85} />
           </g>
         ))}
       </g>,
@@ -342,8 +342,8 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
     const by = hy - hr * 0.05;
     over.push(
       <g key="hh">
-        <path d={`M${-hr * 1.2} ${by}A${hr * 1.06} ${hr * 1.06} 0 0 1 ${hr * 1.2} ${by}Z`} fill={WINTER.hardhat} />
-        <path d={`M${-hr * 1.32} ${by}L${hr * 1.32} ${by}M${-hr * 1.2} ${by}A${hr * 1.06} ${hr * 1.06} 0 0 1 ${hr * 1.2} ${by}`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.9} strokeLinecap="round" />
+        <TPath d={`M${-hr * 1.2} ${by}A${hr * 1.06} ${hr * 1.06} 0 0 1 ${hr * 1.2} ${by}Z`} fill={WINTER.hardhat} />
+        <TPath d={`M${-hr * 1.32} ${by}L${hr * 1.32} ${by}M${-hr * 1.2} ${by}A${hr * 1.06} ${hr * 1.06} 0 0 1 ${hr * 1.2} ${by}`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.9} strokeLinecap="round" />
       </g>,
     );
   }
@@ -354,8 +354,8 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
     const bw = hr * 0.62;
     over.push(
       <g key="bd">
-        <path d={roundRect(bx - bw / 2, by - bw * 0.36, bw, bw * 0.72, bw * 0.12)} fill={EMBER.card} />
-        <path d={`M${bx - bw * 0.26} ${by - bw * 0.16}h${bw * 0.52}v${bw * 0.28}h${-bw * 0.52}Z M${bx - bw * 0.36} ${by + bw * 0.14}h${bw * 0.72}`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.45} />
+        <TPath d={roundRect(bx - bw / 2, by - bw * 0.36, bw, bw * 0.72, bw * 0.12)} fill={EMBER.card} />
+        <TPath d={`M${bx - bw * 0.26} ${by - bw * 0.16}h${bw * 0.52}v${bw * 0.28}h${-bw * 0.52}Z M${bx - bw * 0.36} ${by + bw * 0.14}h${bw * 0.72}`} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.45} />
       </g>,
     );
   }
@@ -373,10 +373,10 @@ const WinterPersonBody: React.FC<WinterPersonProps> = (props) => {
           </clipPath>
         </defs>
         <g clipPath={`url(#${sid})`}>
-          <path d={blob(-g.w * 0.3, -g.h + g.w * 0.02, g.w * 0.2, g.w * 0.07, {seed: fx('s1')})} fill={EMBER.snow} />
-          <path d={blob(g.w * 0.32, -g.h + g.w * 0.03, g.w * 0.18, g.w * 0.065, {seed: fx('s2')})} fill={EMBER.snow} />
+          <TPath d={blob(-g.w * 0.3, -g.h + g.w * 0.02, g.w * 0.2, g.w * 0.07, {seed: fx('s1')})} fill={EMBER.snow} />
+          <TPath d={blob(g.w * 0.32, -g.h + g.w * 0.03, g.w * 0.18, g.w * 0.065, {seed: fx('s2')})} fill={EMBER.snow} />
         </g>
-        <path d={blob(hr * 0.1, capTop, hr * 0.62, hr * 0.2, {seed: fx('sh')})} fill={EMBER.snow} />
+        <TPath d={blob(hr * 0.1, capTop, hr * 0.62, hr * 0.2, {seed: fx('sh')})} fill={EMBER.snow} />
       </g>,
     );
   }
@@ -436,16 +436,16 @@ const CoatDetails: React.FC<{kinds: CoatDetail[]; g: ReturnType<typeof personGeo
       const t = Math.max(2.4 * px, w * 0.028);
       folds += `M${x0} ${yy.toFixed(2)}Q0 ${(yy + sag * 2).toFixed(2)} ${x1} ${yy.toFixed(2)}L${x1} ${(yy + t).toFixed(2)}Q0 ${(yy + sag * 2 + t).toFixed(2)} ${x0} ${(yy + t).toFixed(2)}Z`;
     }
-    parts.push(<path key="qf" d={folds} fill={fold} />);
-    parts.push(<path key="qs" d={seams} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.42} strokeLinecap="round" />);
+    parts.push(<TPath key="qf" d={folds} fill={fold} />);
+    parts.push(<TPath key="qs" d={seams} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.42} strokeLinecap="round" />);
   }
   if (kinds.includes('yoke')) {
     // a shoulder yoke: the seam dips a little at the centre back, a stitch line follows it 3 screen px below
     const yy = -h + R * 0.62;
     const d = `M${x0} ${yy.toFixed(2)}Q0 ${(yy + w * 0.12).toFixed(2)} ${x1} ${yy.toFixed(2)}`;
     const ds = `M${x0} ${(yy + 3.2 * px).toFixed(2)}Q0 ${(yy + w * 0.12 + 3.2 * px).toFixed(2)} ${x1} ${(yy + 3.2 * px).toFixed(2)}`;
-    parts.push(<path key="ys" d={ds} fill="none" stroke={stitch} strokeWidth={Math.max(1.2 * px, W * 0.32)} strokeDasharray={`${(4 * px).toFixed(2)} ${(3 * px).toFixed(2)}`} />);
-    parts.push(<path key="yi" d={d} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.45} strokeLinecap="round" />);
+    parts.push(<TPath key="ys" d={ds} fill="none" stroke={stitch} strokeWidth={Math.max(1.2 * px, W * 0.32)} strokeDasharray={`${(4 * px).toFixed(2)} ${(3 * px).toFixed(2)}`} />);
+    parts.push(<TPath key="yi" d={d} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.45} strokeLinecap="round" />);
   }
   if (kinds.includes('zip')) {
     // a hood zip across the upper back under the collar: tape, teeth ticks, a pull tab hanging at one end
@@ -464,9 +464,9 @@ const CoatDetails: React.FC<{kinds: CoatDetail[]; g: ReturnType<typeof personGeo
     const d = `M${za} ${yy.toFixed(2)}Q${mid} ${(yy + w * 0.1).toFixed(2)} ${zb} ${yy.toFixed(2)}`;
     const tabX = za + (zb - za) * 0.82;
     const tabY = yy + w * 0.05 * (1 - Math.pow(0.64, 2));
-    parts.push(<path key="zt" d={d} fill="none" stroke={stitch} strokeWidth={tape} strokeLinecap="round" />);
-    parts.push(<path key="zk" d={teeth} fill="none" stroke={EMBER.ink} strokeWidth={Math.max(0.9 * px, W * 0.22)} />);
-    parts.push(<path key="zp" d={roundRect(tabX - w * 0.025, tabY + tape * 0.3, w * 0.05, w * 0.1, w * 0.012)} fill={EMBER.snow} stroke={EMBER.ink} strokeWidth={W * 0.35} />);
+    parts.push(<TPath key="zt" d={d} fill="none" stroke={stitch} strokeWidth={tape} strokeLinecap="round" />);
+    parts.push(<TPath key="zk" d={teeth} fill="none" stroke={EMBER.ink} strokeWidth={Math.max(0.9 * px, W * 0.22)} />);
+    parts.push(<TPath key="zp" d={roundRect(tabX - w * 0.025, tabY + tape * 0.3, w * 0.05, w * 0.1, w * 0.012)} fill={EMBER.snow} stroke={EMBER.ink} strokeWidth={W * 0.35} />);
   }
   if (kinds.includes('pockets')) {
     // two flap pockets low on the sides: the flap in a darker coat tone, its seam and a stitch under it
@@ -476,8 +476,8 @@ const CoatDetails: React.FC<{kinds: CoatDetail[]; g: ReturnType<typeof personGeo
       const pw = w * 0.3;
       const ph = w * 0.075;
       const flap = `M${cx - pw / 2} ${yy}L${cx + pw / 2} ${yy - sg * w * 0.01}L${cx + pw / 2 - w * 0.01} ${yy + ph}L${cx - pw / 2 + w * 0.01} ${yy + ph - sg * w * 0.01}Z`;
-      parts.push(<path key={`pf${sg}`} d={flap} fill={fold} stroke={EMBER.ink} strokeWidth={W * 0.4} strokeLinejoin="round" />);
-      parts.push(<path key={`pw${sg}`} d={`M${cx - pw * 0.42} ${yy + ph * 2.1}L${cx + pw * 0.42} ${yy + ph * 2.1 - sg * w * 0.008}`} stroke={stitch} strokeWidth={Math.max(1.2 * px, W * 0.3)} strokeDasharray={`${(4 * px).toFixed(2)} ${(3 * px).toFixed(2)}`} />);
+      parts.push(<TPath key={`pf${sg}`} d={flap} fill={fold} stroke={EMBER.ink} strokeWidth={W * 0.4} strokeLinejoin="round" />);
+      parts.push(<TPath key={`pw${sg}`} d={`M${cx - pw * 0.42} ${yy + ph * 2.1}L${cx + pw * 0.42} ${yy + ph * 2.1 - sg * w * 0.008}`} stroke={stitch} strokeWidth={Math.max(1.2 * px, W * 0.3)} strokeDasharray={`${(4 * px).toFixed(2)} ${(3 * px).toFixed(2)}`} />);
     }
   }
   return (
@@ -582,7 +582,7 @@ const BackRowBody: React.FC<BackRowProps> = (props) => {
     </>
   );
 };
-export const BackRow = tiered('support', {}, BackRowBody);
+export const BackRow = tiered('support', {lines: true}, BackRowBody);
 
 /** Every raised phone in a BackRow at t (canvas px, the row's space): {i, top (camera end), mid}. A flash or a glint
  *  aimed at `top` follows the phone through the row's layout, leans and breath. */
@@ -657,12 +657,12 @@ const DogBody: React.FC<{x: number; y: number; h: number; t: number; dir?: numbe
   const leg = Math.sin(t * 9) * 3;
   return (
     <g transform={`translate(${x} ${y}) scale(${dir * k} ${k})`}>
-      <path d={`M-12 -2L-12 ${-9 + leg * 0.2}M-6 -2L-6 -9M8 -2L8 -9M13 -2L13 ${-9 - leg * 0.2}`} stroke={EMBER.ink} strokeWidth={3.2} strokeLinecap="round" />
-      <path d={blob(0, -14, 16, 7, {seed: 'dogb'})} fill={color} />
-      <path d={blob(16, -21, 7, 6, {seed: 'dogh'})} fill={color} />
-      <path d={`M21 -22l5 2`} stroke={EMBER.ink} strokeWidth={2.4} strokeLinecap="round" />
-      <path d={`M-15 -17q-5 ${-5 + Math.sin(t * 12) * 2} -8 -9`} fill="none" stroke={color} strokeWidth={3.4} strokeLinecap="round" />
-      <path d={`M13 -27l2 -5 3 5`} fill={color} />
+      <TPath thing d={`M-12 -2L-12 ${-9 + leg * 0.2}M-6 -2L-6 -9M8 -2L8 -9M13 -2L13 ${-9 - leg * 0.2}`} stroke={EMBER.ink} strokeWidth={3.2} strokeLinecap="round" />
+      <TPath d={blob(0, -14, 16, 7, {seed: 'dogb'})} fill={color} />
+      <TPath d={blob(16, -21, 7, 6, {seed: 'dogh'})} fill={color} />
+      <TPath d={`M21 -22l5 2`} stroke={EMBER.ink} strokeWidth={2.4} strokeLinecap="round" />
+      <TPath thing d={`M-15 -17q-5 ${-5 + Math.sin(t * 12) * 2} -8 -9`} fill="none" stroke={color} strokeWidth={3.4} strokeLinecap="round" />
+      <TPath d={`M13 -27l2 -5 3 5`} fill={color} />
     </g>
   );
 };
@@ -734,31 +734,31 @@ const TinyBody: React.FC<{x: number; y: number; h: number; t: number; coat: stri
   const ink = h >= 34;
   const fig = (ox: number, c: string) => (
     <g transform={`translate(${ox} 0)`}>
-      <path d={`M-4 -14L${-4 + ph * 2.2} 0M4 -14L${4 - ph * 2.2} 0`} stroke={EMBER.anchor} strokeWidth={4.4} strokeLinecap="round" />
-      <path d={`M-8 -13Q-9 -31 0 -31Q9 -31 8 -13Z`} fill={c} />
-      <circle cx={0} cy={-35.5 + Math.abs(ph) * 0.6} r={5.4} fill={hair} />
-      {ink ? <path d={`M-8 -13Q-9 -31 0 -31Q9 -31 8 -13`} fill="none" stroke={EMBER.ink} strokeWidth={1.6 / k} /> : null}
+      <TPath thing d={`M-4 -14L${-4 + ph * 2.2} 0M4 -14L${4 - ph * 2.2} 0`} stroke={EMBER.anchor} strokeWidth={4.4} strokeLinecap="round" />
+      <TPath d={`M-8 -13Q-9 -31 0 -31Q9 -31 8 -13Z`} fill={c} />
+      <TCircle cx={0} cy={-35.5 + Math.abs(ph) * 0.6} r={5.4} fill={hair} />
+      {ink ? <TPath d={`M-8 -13Q-9 -31 0 -31Q9 -31 8 -13`} fill="none" stroke={EMBER.ink} strokeWidth={1.6 / k} /> : null}
     </g>
   );
   return (
     <g transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${k.toFixed(3)})`}>
       {kind === 'sledge' ? (
         <g transform={`scale(${dir} 1)`}>
-          <path d={`M-6 -16L-24 -5`} stroke={EMBER.ink} strokeWidth={1.4} />
-          <path d={`M-40 -6h18v4h-18z`} fill={EMBER.beam} />
-          <path d={`M-42 -1h22`} stroke={EMBER.ink} strokeWidth={1.8} strokeLinecap="round" />
+          <TPath thing d={`M-6 -16L-24 -5`} stroke={EMBER.ink} strokeWidth={1.4} />
+          <TPath d={`M-40 -6h18v4h-18z`} fill={EMBER.beam} />
+          <TPath thing d={`M-42 -1h22`} stroke={EMBER.ink} strokeWidth={1.8} strokeLinecap="round" />
         </g>
       ) : null}
       {kind === 'dog' ? (
         <g transform={`translate(${dir * 13} 0) scale(${dir} 1)`}>
-          <path d={blob(0, -6, 7, 3.4, {seed: 'td'})} fill={EMBER.beam} />
-          <circle cx={7} cy={-9} r={3} fill={EMBER.beam} />
-          <path d={`M-4 -3v3M4 -3v3`} stroke={EMBER.anchor} strokeWidth={2} />
+          <TPath d={blob(0, -6, 7, 3.4, {seed: 'td'})} fill={EMBER.beam} />
+          <TCircle cx={7} cy={-9} r={3} fill={EMBER.beam} />
+          <TPath thing d={`M-4 -3v3M4 -3v3`} stroke={EMBER.anchor} strokeWidth={2} />
         </g>
       ) : null}
       {kind === 'pair' ? fig(-8, coat) : null}
       {fig(kind === 'pair' ? 8 : 0, kind === 'pair' ? EMBER.reveal : coat)}
-      {kind === 'umbrella' ? <path d={`M-15 -40Q0 -56 15 -40Z`} fill={EMBER.dcSide} /> : null}
+      {kind === 'umbrella' ? <TPath d={`M-15 -40Q0 -56 15 -40Z`} fill={EMBER.dcSide} /> : null}
     </g>
   );
 };
@@ -818,7 +818,7 @@ const WindowSilhouetteBody: React.FC<WindowSilhouetteProps> = ({x, y, w, h, who 
       fig = (
         <>
           <Bust x={bx} y={y + h + fh * 0.18} h={fh * 0.9} color={sil} bobT={t} nod={nod} />
-          <rect x={bx - fw * 0.28} y={y + h - fh * 0.24} width={fw * 0.56} height={fh * 0.2} fill={EMBER.card} transform={`rotate(-8 ${bx} ${y + h - fh * 0.14})`} />
+          <TRect x={bx - fw * 0.28} y={y + h - fh * 0.24} width={fw * 0.56} height={fh * 0.2} fill={EMBER.card} transform={`rotate(-8 ${bx} ${y + h - fh * 0.14})`} />
         </>
       );
     } else if (who === 'wave') {
@@ -827,7 +827,7 @@ const WindowSilhouetteBody: React.FC<WindowSilhouetteProps> = ({x, y, w, h, who 
       fig = (
         <>
           <Bust x={bx} y={y + h} h={fh} color={sil} bobT={t} />
-          <path d={`M${bx + fw * 0.3} ${y + h - fh * 0.45}l${fw * 0.3 * Math.sin((a * Math.PI) / 180) + fw * 0.12} ${-fh * 0.45}`} stroke={sil} strokeWidth={fw * 0.2} strokeLinecap="round" />
+          <TPath thing d={`M${bx + fw * 0.3} ${y + h - fh * 0.45}l${fw * 0.3 * Math.sin((a * Math.PI) / 180) + fw * 0.12} ${-fh * 0.45}`} stroke={sil} strokeWidth={fw * 0.2} strokeLinecap="round" />
         </>
       );
     } else if (who === 'cook') {
@@ -844,18 +844,18 @@ const WindowSilhouetteBody: React.FC<WindowSilhouetteProps> = ({x, y, w, h, who 
           <rect x={x} y={y} width={w} height={h} />
         </clipPath>
       </defs>
-      <rect x={x} y={y} width={w} height={h} fill={on ? litColor : dark} />
+      <TRect x={x} y={y} width={w} height={h} fill={on ? litColor : dark} />
       <g clipPath={`url(#${id})`}>
         {fig}
         {on && curtains ? (
           <>
-            <path d={`M${x} ${y}h${w * 0.2}q${-w * 0.06} ${h * 0.5} ${w * 0.04} ${h}h${-w * 0.24}z`} fill={EMBER.hl} />
-            <path d={`M${x + w} ${y}h${-w * 0.2}q${w * 0.06} ${h * 0.5} ${-w * 0.04} ${h}h${w * 0.24}z`} fill={EMBER.hl} />
+            <TPath d={`M${x} ${y}h${w * 0.2}q${-w * 0.06} ${h * 0.5} ${w * 0.04} ${h}h${-w * 0.24}z`} fill={EMBER.hl} />
+            <TPath d={`M${x + w} ${y}h${-w * 0.2}q${w * 0.06} ${h * 0.5} ${-w * 0.04} ${h}h${w * 0.24}z`} fill={EMBER.hl} />
           </>
         ) : null}
-        {plant ? <path d={blob(x + w * 0.78, y + h - h * 0.12, w * 0.1, h * 0.14, {seed: `${seed}/pl`})} fill={on ? EMBER.leaf : dark} /> : null}
+        {plant ? <TPath d={blob(x + w * 0.78, y + h - h * 0.12, w * 0.1, h * 0.14, {seed: `${seed}/pl`})} fill={on ? EMBER.leaf : dark} /> : null}
       </g>
-      {!far ? <path d={`M${x} ${y}h${w}v${h}h${-w}Z`} fill="none" stroke={EMBER.ink} strokeWidth={ink} /> : null}
+      {!far ? <TPath d={`M${x} ${y}h${w}v${h}h${-w}Z`} fill="none" stroke={EMBER.ink} strokeWidth={ink} /> : null}
     </g>
   );
 };
@@ -868,8 +868,8 @@ const Bust: React.FC<{x: number; y: number; h: number; color: string; bobT: numb
   const hr = h * 0.17;
   return (
     <g transform={`translate(${x.toFixed(1)} ${(y + b2).toFixed(1)})`}>
-      <path d={`M${-sw / 2} 0Q${-sw / 2} ${-h * 0.5} 0 ${-h * 0.52}Q${sw / 2} ${-h * 0.5} ${sw / 2} 0Z`} fill={color} />
-      <circle cx={0} cy={-h * 0.52 - hr * 0.9 + nod} r={hr} fill={color} />
+      <TPath d={`M${-sw / 2} 0Q${-sw / 2} ${-h * 0.5} 0 ${-h * 0.52}Q${sw / 2} ${-h * 0.5} ${sw / 2} 0Z`} fill={color} />
+      <TCircle cx={0} cy={-h * 0.52 - hr * 0.9 + nod} r={hr} fill={color} />
     </g>
   );
 };
@@ -934,9 +934,9 @@ const MiniCrateBody: React.FC<{x: number; y: number; w: number}> = ({x, y, w}) =
   const h = w * 0.55;
   return (
     <g>
-      <path d={`M${x - w * 0.36} ${y - h * 1.12}h${w * 0.2}v${h * 0.3}h${-w * 0.2}zM${x - w * 0.08} ${y - h * 1.18}h${w * 0.2}v${h * 0.34}h${-w * 0.2}zM${x + w * 0.18} ${y - h * 1.1}h${w * 0.18}v${h * 0.28}h${-w * 0.18}z`} fill={EMBER.board} />
-      <rect x={x - w / 2} y={y - h} width={w} height={h} fill={EMBER.beam} />
-      <path d={`M${x - w / 2} ${y - h}h${w}v${h}h${-w}ZM${x - w / 2} ${y - h * 0.5}h${w}`} fill="none" stroke={EMBER.ink} strokeWidth={1.8} />
+      <TPath d={`M${x - w * 0.36} ${y - h * 1.12}h${w * 0.2}v${h * 0.3}h${-w * 0.2}zM${x - w * 0.08} ${y - h * 1.18}h${w * 0.2}v${h * 0.34}h${-w * 0.2}zM${x + w * 0.18} ${y - h * 1.1}h${w * 0.18}v${h * 0.28}h${-w * 0.18}z`} fill={EMBER.board} />
+      <TRect x={x - w / 2} y={y - h} width={w} height={h} fill={EMBER.beam} />
+      <TPath d={`M${x - w / 2} ${y - h}h${w}v${h}h${-w}ZM${x - w / 2} ${y - h * 0.5}h${w}`} fill="none" stroke={EMBER.ink} strokeWidth={1.8} />
     </g>
   );
 };

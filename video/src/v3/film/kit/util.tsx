@@ -8,6 +8,8 @@ import {useTime, prog, ease, clamp} from '../../../lib/time';
 import {depthInk} from '../../../lib/theme';
 import {captionFontStack, measureCaption, useCaptionFont} from '../../../lib/font';
 import {mat, XG} from '../../../lib/xf';
+import {isClean} from '../../../lib/pen';
+import {useTierLine, useTierPaint, useTierScope} from '../../../lib/tier';
 import {EMBER} from '../palette';
 
 export type At = number | undefined;
@@ -75,3 +77,42 @@ export const quadPt = (q: [Pt, Pt, Pt, Pt], u: number, v: number): Pt => {
   const bot: Pt = [lerp(q[3][0], q[2][0], u), lerp(q[3][1], q[2][1], u)];
   return [lerp(top[0], bot[0], v), lerp(top[1], bot[1], v)];
 };
+
+// ---------------------------------------------------------------- raw SVG on the attention tiers (clean pen)
+
+/** Tier options of a raw SVG element (lib/tier.tsx): `thing` = the stroke IS the object (a wire, an arm, a bird's V),
+ *  kept on every tier; `contour` false = an open edge stroke rather than a closed outline; `tone` = the fill it bounds;
+ *  `graphic` = a shape drawn with a stroke (width and colour kept). */
+export type TierSvg = {thing?: boolean; contour?: boolean; tone?: string; graphic?: boolean};
+
+/** Resolve a raw element's paint on the tier here: a hex `fill` gets the tier's fill colour; a `stroke` gets the tier's
+ *  line (width, colour, opacity) or is dropped (a dashed stroke off the subject is texture: dropped too). Under the
+ *  default sketch pen everything passes through unchanged. */
+function useTierSvg<P extends {fill?: string; stroke?: string; strokeWidth?: number | string; strokeDasharray?: number | string}>(p: P & TierSvg): Omit<P, keyof TierSvg> {
+  const line = useTierLine();
+  const paint = useTierPaint();
+  const scope = useTierScope();
+  const {thing, contour, tone, graphic, ...rest} = p;
+  if (!isClean()) return rest as Omit<P, keyof TierSvg>;
+  const out: Record<string, unknown> = {...rest};
+  if (typeof rest.fill === 'string' && rest.fill.startsWith('#')) out.fill = paint(rest.fill);
+  const hasFill = rest.fill !== undefined && rest.fill !== 'none';
+  if (rest.stroke !== undefined && rest.stroke !== 'none') {
+    const subject = (scope?.tier ?? 'support') === 'subject';
+    const res = rest.strokeDasharray !== undefined && !subject && !thing ? {display: 'none' as const} : line(rest.stroke, Number(rest.strokeWidth ?? 1), {thing, contour, tone, graphic});
+    if (res.display === 'none') {
+      if (hasFill) out.stroke = 'none';
+      else out.display = 'none';
+    } else Object.assign(out, res);
+  }
+  return out as Omit<P, keyof TierSvg>;
+}
+
+/** <path> on the attention tiers (see TierSvg). */
+export const TPath: React.FC<React.SVGProps<SVGPathElement> & TierSvg> = (p) => <path {...(useTierSvg(p as never) as React.SVGProps<SVGPathElement>)} />;
+/** <rect> on the attention tiers. */
+export const TRect: React.FC<React.SVGProps<SVGRectElement> & TierSvg> = (p) => <rect {...(useTierSvg(p as never) as React.SVGProps<SVGRectElement>)} />;
+/** <circle> on the attention tiers. */
+export const TCircle: React.FC<React.SVGProps<SVGCircleElement> & TierSvg> = (p) => <circle {...(useTierSvg(p as never) as React.SVGProps<SVGCircleElement>)} />;
+/** <ellipse> on the attention tiers. */
+export const TEllipse: React.FC<React.SVGProps<SVGEllipseElement> & TierSvg> = (p) => <ellipse {...(useTierSvg(p as never) as React.SVGProps<SVGEllipseElement>)} />;

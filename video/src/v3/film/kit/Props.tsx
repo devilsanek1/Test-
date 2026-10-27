@@ -8,7 +8,7 @@ import {blob, circle, crown, ellipse, hline, line, poly, polyPath, rect as rectI
 import {useTime, prog, ease} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
-import {At, b, fillAt, Pt, Show, Txt} from './util';
+import {At, b, fillAt, Pt, Show, Txt, TCircle, TPath} from './util';
 import {Laptop} from './Laptop';
 import {tiered} from '../../../lib/tier';
 
@@ -80,7 +80,7 @@ const ChipFactoryL: React.FC<Omit<ChipFactoryProps, 'doorSide'>> = ({x, y, w = 3
   return (
     <>
       {puffs.map((p, i) => (
-        <circle key={i} cx={p.cx} cy={p.cy} r={p.r} fill={EMBER.snow} />
+        <TCircle key={i} cx={p.cx} cy={p.cy} r={p.r} fill={EMBER.snow} />
       ))}
       <Fill rect={[ch.x, ch.top, ch.w, g.top - ch.top]} color={EMBER.brickShade} at={fillAt(at, 0.02)} seed={`${seed}/ch`} />
       <Fill rect={[ch.x - 4, ch.top - 4, ch.w + 8, 10]} color={EMBER.anchor} at={fillAt(at, 0.04)} offset={false} />
@@ -98,7 +98,7 @@ const ChipFactoryL: React.FC<Omit<ChipFactoryProps, 'doorSide'>> = ({x, y, w = 3
       ))}
       <Fill rect={[cx - cs / 2, cy - cs / 2, cs, cs]} color={EMBER.chip} at={fillAt(at, 0.06)} offset={false} />
       <Show at={fillAt(at, 0.06)}>
-        <path d={pins} stroke={EMBER.pin} strokeWidth={Math.max(2, w * 0.012)} fill="none" />
+        <TPath d={pins} stroke={EMBER.pin} strokeWidth={Math.max(2, w * 0.012)} fill="none" />
       </Show>
       <Ink
         d={poly(roof, {seed: `${seed}/rI`, over: [2, 5]}) + rectInk(g.x0, g.top, w, g.h, {seed: `${seed}/bI`, edges: 'lr', over: [0, 0]}) + rectInk(g.door.x, g.door.y, g.door.w, g.door.h, {seed: `${seed}/dI`, edges: 'tlr', over: [0, 3]}) + rectInk(ch.x, ch.top, ch.w, g.top - th * 0.4 - ch.top, {seed: `${seed}/cI`, edges: 'tlr', over: [0, 2]}) + hline(g.x0 - 10, g.x1 + 10, y, {seed: `${seed}/gI`, over: [4, 8]})}
@@ -109,7 +109,7 @@ const ChipFactoryL: React.FC<Omit<ChipFactoryProps, 'doorSide'>> = ({x, y, w = 3
     </>
   );
 };
-export const ChipFactory = tiered('support', {tone: EMBER.brick, bg: EMBER.sky}, ChipFactoryBody);
+export const ChipFactory = tiered('environment', {tone: EMBER.brick, bg: EMBER.sky}, ChipFactoryBody);
 
 // ---------------------------------------------------------------- the chip maker (S14's speaker)
 
@@ -131,7 +131,7 @@ const ChipMakerBody: React.FC<{x: number; y: number; h?: number; facing?: 'l' | 
       <Fill d={legs} color={EMBER.card} at={fillAt(at)} seed={`${seed}/l`} />
       <Fill d={body} color={EMBER.card} at={fillAt(at)} seed={`${seed}/b`} />
       <Ink d={body + legs} at={at} width={ink} />
-      {point ? <Ink d={arm} at={b(at, 0.04)} width={9 * u} color={EMBER.card} taper={false} /> : null}
+      {point ? <Ink thing d={arm} at={b(at, 0.04)} width={9 * u} color={EMBER.card} taper={false} /> : null}
       {point ? <Ink d={arm} at={b(at, 0.04)} width={1.6} /> : null}
       <Fill d={blob(headC[0], headC[1], 14 * u, 15 * u, {seed: `${seed}/h`})} color={EMBER.card} at={fillAt(at, 0.02)} />
       <Ink d={ellipse(headC[0], headC[1], 14 * u, 15 * u, {seed: `${seed}/hI`})} at={b(at, 0.02)} width={ink} />
@@ -199,7 +199,7 @@ const VanBody: React.FC<VanProps> = ({x, y, w = 380, flip, lights = true, decalW
   );
   return flip ? <XG m={mat.about(mat.scale(-1, 1), x, y)}>{content}</XG> : content;
 };
-export const Van = tiered('support', {tone: EMBER.reveal, bg: EMBER.sky}, VanBody);
+export const Van = tiered('environment', {tone: EMBER.reveal, bg: EMBER.sky}, VanBody);
 
 // ---------------------------------------------------------------- waiting dots
 
@@ -215,7 +215,7 @@ const WaitingDotsBody: React.FC<{x: number; y: number; r?: number; gap?: Pt; n?:
         const lift = ph < 0.3 ? Math.sin((ph / 0.3) * Math.PI) * r * 0.7 : 0;
         const pop = at === undefined ? 1 : prog(t, at + i * 0.08, 0.12, ease.outCubic);
         if (pop <= 0) return null;
-        return <circle key={i} cx={x + gap[0] * i} cy={y + gap[1] * i - lift} r={r * (0.2 + 0.8 * pop)} fill={color} stroke={EMBER.ink} strokeWidth={1.6} />;
+        return <TCircle key={i} cx={x + gap[0] * i} cy={y + gap[1] * i - lift} r={r * (0.2 + 0.8 * pop)} fill={color} stroke={EMBER.ink} strokeWidth={1.6} />;
       })}
     </>
   );
@@ -259,7 +259,7 @@ const SpeechBubbleBody: React.FC<BubbleProps> = ({cx, cy, rx, ry, to, at, seed =
     </XG>
   );
 };
-export const SpeechBubble = tiered('support', {tone: EMBER.card}, SpeechBubbleBody);
+export const SpeechBubble = tiered('support', {tone: EMBER.card, lines: true}, SpeechBubbleBody);
 
 /** A thought bubble: a cloud with two small circles trailing to the thinker's head; content as children. */
 const ThoughtBubbleBody: React.FC<BubbleProps> = ({cx, cy, rx, ry, to, at, seed = 'thought', ink = 3.4, children}) => {
@@ -288,7 +288,7 @@ const ThoughtBubbleBody: React.FC<BubbleProps> = ({cx, cy, rx, ry, to, at, seed 
     </XG>
   );
 };
-export const ThoughtBubble = tiered('support', {tone: EMBER.card}, ThoughtBubbleBody);
+export const ThoughtBubble = tiered('support', {tone: EMBER.card, lines: true}, ThoughtBubbleBody);
 
 // ---------------------------------------------------------------- wall clock
 
@@ -312,10 +312,10 @@ const WallClockBody: React.FC<{cx: number; cy: number; r?: number; at?: At; seed
       <Fill d={blob(cx, cy, r, r, {seed: `${seed}/face`})} color={EMBER.card} at={fillAt(at, 0.02)} offset={false} />
       <Ink d={circle(cx, cy, r * 1.14, {seed: `${seed}/rI`}) + circle(cx, cy, r, {seed: `${seed}/fI`})} at={at} width={ink} />
       <Show at={fillAt(at, 0.04)}>
-        <path d={ticks} stroke={EMBER.ink} strokeWidth={Math.max(1.6, r * 0.04)} strokeLinecap="round" />
-        <path d={handD(hourDeg, r * 0.45) + handD(minDeg, r * 0.68)} stroke={EMBER.ink} strokeWidth={Math.max(2.4, r * 0.075)} strokeLinecap="round" />
-        <path d={handD(sec * 6, r * 0.74)} stroke={EMBER.beam} strokeWidth={Math.max(1.4, r * 0.035)} strokeLinecap="round" />
-        <circle cx={cx} cy={cy} r={Math.max(2.5, r * 0.07)} fill={EMBER.ink} />
+        <TPath d={ticks} stroke={EMBER.ink} strokeWidth={Math.max(1.6, r * 0.04)} strokeLinecap="round" />
+        <TPath thing d={handD(hourDeg, r * 0.45) + handD(minDeg, r * 0.68)} stroke={EMBER.ink} strokeWidth={Math.max(2.4, r * 0.075)} strokeLinecap="round" />
+        <TPath thing d={handD(sec * 6, r * 0.74)} stroke={EMBER.beam} strokeWidth={Math.max(1.4, r * 0.035)} strokeLinecap="round" />
+        <TCircle cx={cx} cy={cy} r={Math.max(2.5, r * 0.07)} fill={EMBER.ink} />
       </Show>
     </>
   );

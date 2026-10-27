@@ -16,7 +16,7 @@ import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {blob, crown, smooth} from '../../../lib/sketch';
 import {EMBER} from '../palette';
-import {At, Pt} from './util';
+import {At, Pt, TPath, TRect} from './util';
 import {events, puffs, PuffOpts, windowLit, WindowForce} from './idle';
 import {WindowSilhouette, SilWho} from './People3';
 import {tiered} from '../../../lib/tier';
@@ -87,7 +87,7 @@ const SnowLayersBody: React.FC<SnowLayersProps> = ({x = -100, y = -100, w = 1280
       if (rad < 0.5) continue;
       d += `M${(fx - rad).toFixed(1)} ${fy.toFixed(1)}a${rad.toFixed(1)} ${rad.toFixed(1)} 0 1 0 ${(2 * rad).toFixed(1)} 0a${rad.toFixed(1)} ${rad.toFixed(1)} 0 1 0 ${(-2 * rad).toFixed(1)} 0`;
     }
-    if (d) out.push(<path key={L} d={d} fill={color ?? spec.color} />);
+    if (d) out.push(<TPath key={L} d={d} fill={color ?? spec.color} />);
   }
   return <>{out}</>;
 };
@@ -114,13 +114,13 @@ const SnowSillBody: React.FC<{x0: number; x1: number; y: number; h?: number; see
   for (let i = 0; i < drips; i++) {
     const dx = r2.range(x0 + 10, x1 - 10);
     const dl = r2.range(6, 14);
-    dr.push(<path key={i} d={`M${dx - 3} ${y}Q${dx} ${y + dl * 1.4} ${dx + 3} ${y}Z`} fill={EMBER.snow} />);
+    dr.push(<TPath key={i} d={`M${dx - 3} ${y}Q${dx} ${y + dl * 1.4} ${dx + 3} ${y}Z`} fill={EMBER.snow} />);
   }
   return (
     <>
-      <path d={fillD} fill={EMBER.snow} />
+      <TPath d={fillD} fill={EMBER.snow} />
       {dr}
-      {ink > 0 ? <path d={top} fill="none" stroke={EMBER.ink} strokeWidth={ink} strokeLinecap="round" /> : null}
+      {ink > 0 ? <TPath d={top} fill="none" stroke={EMBER.ink} strokeWidth={ink} strokeLinecap="round" /> : null}
     </>
   );
 };
@@ -131,8 +131,8 @@ const SnowCapBody: React.FC<{x: number; y: number; w: number; h?: number; over?:
   const d = blob(x + w / 2, y - h * 0.35, w / 2 + over, h * 0.65, {seed: `cap/${seed}`});
   return (
     <>
-      <path d={d} fill={EMBER.snow} />
-      {ink > 0 ? <path d={`M${x - over} ${y - h * 0.2}Q${x + w / 2} ${y - h * 1.15} ${x + w + over} ${y - h * 0.2}`} fill="none" stroke={EMBER.ink} strokeWidth={ink} strokeLinecap="round" /> : null}
+      <TPath d={d} fill={EMBER.snow} />
+      {ink > 0 ? <TPath d={`M${x - over} ${y - h * 0.2}Q${x + w / 2} ${y - h * 1.15} ${x + w + over} ${y - h * 0.2}`} fill="none" stroke={EMBER.ink} strokeWidth={ink} strokeLinecap="round" /> : null}
     </>
   );
 };
@@ -157,8 +157,8 @@ const FrostBody: React.FC<{x: number; y: number; w: number; h: number; corners?:
     }
     out.push(
       <g key={c}>
-        <path d={d} fill={EMBER.frost} />
-        {ink > 0 ? <path d={ticks} fill="none" stroke={EMBER.ink} strokeWidth={ink} strokeLinecap="round" /> : null}
+        <TPath d={d} fill={EMBER.frost} />
+        {ink > 0 ? <TPath d={ticks} fill="none" stroke={EMBER.ink} strokeWidth={ink} strokeLinecap="round" /> : null}
       </g>,
     );
   });
@@ -200,8 +200,8 @@ const PuffTrainBody: React.FC<PuffTrainProps> = ({x, y, color = EMBER.skyLow, in
   if (!d) return null;
   return (
     <>
-      <path d={d} fill={color} />
-      {ink > 0 ? <path d={d} fill="none" stroke={EMBER.ink} strokeWidth={ink} /> : null}
+      <TPath d={d} fill={color} />
+      {ink > 0 ? <TPath d={d} fill="none" stroke={EMBER.ink} strokeWidth={ink} /> : null}
     </>
   );
 };
@@ -288,12 +288,12 @@ const NearFrontsBody: React.FC<NearFrontsProps> = ({x0, x1, y, h = [70, 110], n 
     if (hs.chimney !== null) {
       const chx = hs.x + hs.w * hs.chimney;
       const chTop = hs.gable ? peak + (top - peak) * Math.abs(hs.chimney - 0.5) * 2 - 26 : top - 24;
-      out.push(<rect key={`ch${i}`} x={chx} y={chTop} width={14} height={top - chTop + 10} fill={body} />);
-      out.push(<rect key={`chs${i}`} x={chx - 2} y={chTop - 4} width={18} height={6} fill={EMBER.snow} />);
+      out.push(<TRect key={`ch${i}`} x={chx} y={chTop} width={14} height={top - chTop + 10} fill={body} />);
+      out.push(<TRect key={`chs${i}`} x={chx - 2} y={chTop - 4} width={18} height={6} fill={EMBER.snow} />);
       if (smoke) out.push(<Smoke key={`sm${i}`} x={chx + 7} y={chTop - 4} seed={`${seed}/sm${i}`} rise={90} />);
     }
-    out.push(<path key={`h${i}`} d={d} fill={i % 2 ? EMBER.dcSide : body} />);
-    out.push(<path key={`s${i}`} d={snowD} fill={EMBER.snow} />);
+    out.push(<TPath key={`h${i}`} d={d} fill={i % 2 ? EMBER.dcSide : body} />);
+    out.push(<TPath key={`s${i}`} d={snowD} fill={EMBER.snow} />);
   });
   const W = plan.windows.length;
   plan.windows.forEach((wd, i) => {
@@ -336,7 +336,7 @@ const SkyCloudsBody: React.FC<SkyCloudsProps> = ({x0 = -200, x1 = 1280, y0 = 40,
     // a flat-bottomed cloud: crown top, straight base
     d += crown(cx, cy, cw / 2, ch, {seed: `${seed}/${i}`, bumps: 5, round: 0.62});
   }
-  return <path d={d} fill={color} />;
+  return <TPath d={d} fill={color} />;
 };
 export const SkyClouds = tiered('environment', {bg: EMBER.sky}, SkyCloudsBody);
 
@@ -347,7 +347,7 @@ const LowCloudsBody: React.FC<{y: number; h?: number; x0?: number; x1?: number; 
   const pts: Pt[] = [];
   const n = 12;
   for (let i = 0; i <= n; i++) pts.push([x0 + ((x1 - x0) * i) / n + Math.sin(t * 0.2 + i) * drift, y - h * r.range(0.45, 1)]);
-  return <path d={smooth(pts) + `L${x1} ${y + 2}L${x0} ${y + 2}Z`} fill={color} />;
+  return <TPath d={smooth(pts) + `L${x1} ${y + 2}L${x0} ${y + 2}Z`} fill={color} />;
 };
 export const LowClouds = tiered('environment', {bg: EMBER.sky}, LowCloudsBody);
 
@@ -367,7 +367,7 @@ const BirdVBody: React.FC<{at: number; from: Pt; to: Pt; dur?: number; n?: numbe
     const lift = Math.sin(t * 2 * Math.PI * 2.6 + i * 1.3) * w * 0.6;
     d += `M${bx - w} ${by - lift}Q${bx - w * 0.4} ${by - w * 0.3} ${bx} ${by}Q${bx + w * 0.4} ${by - w * 0.3} ${bx + w} ${by - lift}`;
   }
-  return <path d={d} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" />;
+  return <TPath thing d={d} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" />;
 };
 export const BirdV = tiered('environment', {bg: EMBER.sky}, BirdVBody);
 
@@ -396,13 +396,13 @@ const IciclesBody: React.FC<{x0: number; x1: number; y: number; n?: number; len?
       const c = ice[k % ice.length];
       const fy = y + c.l + 4 + 420 * d * d;
       const rr = 3 * (1 - Math.max(0, d - 0.3) / 0.15);
-      if (rr > 0.4) drops.push(<path key={k} d={blob(c.x + 0.6, fy, rr * 0.8, rr * 1.2, {seed: `dr${k}`})} fill={EMBER.frost} />);
+      if (rr > 0.4) drops.push(<TPath key={k} d={blob(c.x + 0.6, fy, rr * 0.8, rr * 1.2, {seed: `dr${k}`})} fill={EMBER.frost} />);
     }
   }
   return (
     <>
-      <path d={fill} fill={EMBER.frost} />
-      {ink > 0 ? <path d={line} fill="none" stroke={EMBER.ink} strokeWidth={ink} strokeLinejoin="round" /> : null}
+      <TPath d={fill} fill={EMBER.frost} />
+      {ink > 0 ? <TPath d={line} fill="none" stroke={EMBER.ink} strokeWidth={ink} strokeLinejoin="round" /> : null}
       {drops}
     </>
   );
