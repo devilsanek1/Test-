@@ -14,11 +14,12 @@ import {Newsstand} from '../kit/canal/newsstand';
 import {Planter, Bench, bikeInto, drainInto, binInto, Lamp} from '../kit/canal/towpath';
 import {PerspBoat} from '../kit/canal/boat';
 import * as MAP from '../world/map';
+import {S2_BENCH, S2_BENCH_SEAT} from './V2S2_Layout';
 
 // ---------------------------------------------------------------- S2
 
 /** The S2 bench's seat line (the bench people sit on it, the backrest covers their lower backs). */
-export const S2_BENCH_SEAT = MAP.S2.bench.y1 - (MAP.S2.bench.x1 - MAP.S2.bench.x0) * 0.42 * 0.55;
+export {S2_BENCH_SEAT};
 
 /** Our bank's water edge in S2 (the railing's foot) and the railing's top (a post at x 590 tops out at y 1050:
  *  Pip's seat, map S2.pipSeat). */
@@ -166,12 +167,12 @@ export const V2S2Set: React.FC<V2S2SetProps> = ({story, staffCoolAt, storyOverla
     drainInto(b, 470, 1760, 120, 's2drain');
     // long golden-hour shadows to the right across our towpath (the low sun is west = screen left)
     const sun: Pt = [-900, 900];
-    for (const [x, y, w, len] of [[600, 1230, 30, 320], [760, 1230, 30, 300], [190, 1252, 40, 360], [530, 1252, 40, 330], [120, 1650, 180, 300], [80, 1292, 120, 260]] as [number, number, number, number][]) shadowInto(b, x, y, w, len, sun, CM.stoneShade, 0.15);
+    for (const [x, y, w, len] of [[620, 1290, 30, 320], [780, 1290, 30, 300], [190, 1252, 40, 360], [530, 1252, 40, 330], [120, 1650, 180, 300], [80, 1292, 120, 260]] as [number, number, number, number][]) shadowInto(b, x, y, w, len, sun, CM.stoneShade, 0.15);
     // a bike rack with two bikes behind the passers-by, a bin by the bench
     for (const x of [250, 330, 410]) b.ink(`M${P(x, 1352)}L${P(x, 1300)}Q${P(x + 20, 1278)} ${P(x + 40, 1300)}L${P(x + 40, 1352)}`, INK_PX.mid, CM.anchor);
     bikeInto(b, 300, 1356, 34, 's2rb1', CM.coatSlate, 1);
     bikeInto(b, 392, 1360, 34, 's2rb2', CM.brick, -1);
-    binInto(b, 836, 1262, 70, 's2bin');
+    binInto(b, 842, 1330, 70, 's2bin');
     // two puddles mirroring the sky (a leaf afloat in one)
     for (const [px, py, pw] of [[300, 1420, 150], [760, 1640, 210]] as [number, number, number][]) {
       b.fill(CM.glass, `M${P(px - pw / 2, py)}Q${P(px - pw * 0.2, py - pw * 0.12)} ${P(px + pw * 0.1, py - pw * 0.08)}Q${P(px + pw / 2, py - pw * 0.06)} ${P(px + pw * 0.45, py + pw * 0.05)}Q${P(px, py + pw * 0.14)} ${P(px - pw / 2, py)}Z`);
@@ -214,7 +215,7 @@ export const V2S2Set: React.FC<V2S2SetProps> = ({story, staffCoolAt, storyOverla
       {agent}
       {pip}
       {bench}
-      <Bench x={(MAP.S2.bench.x0 + MAP.S2.bench.x1) / 2} y={MAP.S2.bench.y1} w={MAP.S2.bench.x1 - MAP.S2.bench.x0} view="back" seed="s2bench" />
+      <Bench x={(S2_BENCH.x0 + S2_BENCH.x1) / 2} y={S2_BENCH.y1} w={S2_BENCH.x1 - S2_BENCH.x0} view="back" seed="s2bench" />
       <Planter x0={-30} x1={230} y={1650} h={190} seed="s2planter" />
       {/* the near lamp, lowered so its swan-neck arm leaves the frame below y 600 (never near the caption band) */}
       <Lamp x={930} y={1990} h={1290} w={30} variant="near" seed="s2nearlamp" />
