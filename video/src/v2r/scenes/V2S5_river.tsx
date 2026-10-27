@@ -1,5 +1,6 @@
 // V2S5_river.tsx (lane L4): the S5 RIVER plane (the far shore's cherries, the Potomac, the bridges, the near bank, the
 // parkway) in END coords, and its PullPlane (RIVER_PL: the rig's slide, re-slotted under the shot's horizon).
+// Import rule: never import V2S5_rig / V2S5_set / V2S5_figs (the rig imports this file).
 import React from 'react';
 import {RiverPlane} from '../kit/dc/vista';
 import {RIVER, type PullPlane} from '../kit/dc/crane';
