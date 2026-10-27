@@ -14,7 +14,8 @@
 //   always: the promenade (joggers, a dog walker, a cyclist, a parent with a stroller, a walker), the gardener, birds,
 //   petals, pigeons fluttering as a passer-by comes past, the readers (one turns to her neighbour), tulips nodding.
 // Parts: V2S6_rig (shared numbers), V2S6_board (the deal board slot), V2S6_pip, V2S6_life (beyond the fence),
-// V2S6_near (the near plane). The set is the dc kit's GateSet; its slots carry every part.
+// V2S6_near (the near plane), V2S6_set (dressing + the kit colour fixes). The set is the dc kit's GateSet; its slots
+// carry every part.
 import React from 'react';
 import {World} from '../../lib/World';
 import {skyBands, TOD} from '../palette';
@@ -23,7 +24,8 @@ import type {ToneKey} from '../../lib/Film';
 import {S6Board} from './V2S6_board';
 import {S6PipOnPost, S6PipHop} from './V2S6_pip';
 import {S6Clouds, S6Birds, S6LawnTrees, S6Promenade, S6Staff, S6LawnMid, S6Petals} from './V2S6_life';
-import {S6Near, S6Readers} from './V2S6_near';
+import {S6NearBack, S6NearFront, S6Readers} from './V2S6_near';
+import {S6HedgeFix, S6ShrubFix, S6Border} from './V2S6_set';
 
 export const captionTone: ToneKey[] = [{t: 0, tone: 'dark'}];
 
@@ -43,12 +45,20 @@ const V2S6: React.FC = () => (
           <S6Promenade />
         </>
       }
-      mid={<S6LawnMid />}
+      mid={
+        <>
+          <S6HedgeFix />
+          <S6LawnMid />
+        </>
+      }
       board={<S6Board />}
       pip={<S6PipOnPost />}
       near={
         <>
-          <S6Near />
+          <S6NearBack />
+          <S6ShrubFix />
+          <S6Border />
+          <S6NearFront />
           <S6Readers />
         </>
       }
