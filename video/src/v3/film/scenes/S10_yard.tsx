@@ -10,7 +10,7 @@ import {Ink} from '../../../lib/Ink';
 import {blob, rect as rectInk} from '../../../lib/sketch';
 import {useTime} from '../../../lib/time';
 import {EMBER, Forklift, GateBooth, Guard, Pallet, PostSign, SnowCap, StickCrate, Worker, WinterPerson, personGeo, W} from '../kit';
-import {P, X_FENCE, X_ROAD_R, figK, kAtZ, mixHex, quad, type QueueBeats} from './S10_geo';
+import {P, X_FENCE, figK, kAtZ, mixHex, quad, type QueueBeats} from './S10_geo';
 import {HALO_SNOW, QLamp, type Item} from './S10_left';
 
 /** The gate: the booth's base centre and width (beside the door, right of the road's end). */
@@ -169,7 +169,7 @@ export function yardItems(beats: QueueBeats): Item[] {
   const items: Item[] = [...fenceItems()];
   // ---- the gate (the booth beside the door, the barrier across the road's end, the guard)
   const kGate = kAtZ(96);
-  items.push({k: kGate, el: <GateBooth key="booth" x={BOOTH.x} y={BOOTH.y} w={BOOTH.w} arm={84} armSide="left" liftAt={beats.barrierLiftAt} seed="q/booth" ink={W.far} />});
+  items.push({k: kGate, el: <GateBooth key="booth" x={BOOTH.x} y={BOOTH.y} w={BOOTH.w} arm={58} armSide="left" liftAt={beats.barrierLiftAt} seed="q/booth" ink={W.far} />});
   items.push({k: kGate + 0.3, el: <Guard key="guard" x={GUARD.x} y={GUARD.y} h={GUARD.h} stepAt={beats.guardStepAt} stepTo={GUARD.stepTo} waveAt={beats.guardWaveAt} seed="q/guard" />});
   // ---- workers in the yard (hi-vis, crates of sticks), the forklift (the loop)
   const kW = kAtZ(84);
@@ -230,12 +230,12 @@ export function yardItems(beats: QueueBeats): Item[] {
     const [x, y] = P(X_FENCE + 1.6, k, 0);
     items.push({k: k + 0.05, el: <PostSign key="deliv" x={Math.min(x, 872)} y={y + 4} w={150} h={36} post={44} text="DELIVERIES" size={24} color={EMBER.card} seed="q/deliv" ink={W.far} />});
   }
-  // ---- one lamp post on the right kerb (past the first data center's right side)
+  // ---- one lamp post on the right pavement by the fence (clear of the data center's ring and the chip maker's feet)
   {
     const z = 46;
     const k = kAtZ(z);
-    const [x, y] = P(X_ROAD_R + 0.7, k, 0);
-    items.push({k, el: <QLamp key="lpR" x={x + 6} y={y} h={5 * k} halo={HALO_SNOW} r={[1.6, 1.0]} seed="q/lpR" />});
+    const [x, y] = P(X_FENCE - 0.6, k, 0);
+    items.push({k, el: <QLamp key="lpR" x={x} y={y} h={5 * k} halo={HALO_SNOW} r={[1.6, 1.0]} seed="q/lpR" />});
   }
   return items;
 }
@@ -245,7 +245,7 @@ export const YardGround: React.FC = () => {
   const pools: React.ReactNode[] = [];
   [
     {z: 54, X: 1.4, r: 4.5},
-    {z: 46, X: -6.2, r: 2.4},
+    {z: 46, X: -4.6, r: 2.2},
   ].forEach((p, i) => {
     const k = kAtZ(p.z);
     const [x, y] = P(p.X, k, 0);
