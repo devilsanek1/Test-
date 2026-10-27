@@ -66,7 +66,8 @@ building, and it decides the outcome:
   viewer's situation, beats joined by but/so, the turn, the payoff that lands the core line), judged; (2) 2-3 writers
   draft the winning spine; (3) a cold-read panel retells each draft (a list-like retelling fails) plus a flow critic
   (every line follows from the previous) and a fact check; (4) one merged script. Never structure a script as a list of
-  facts to prove.
+  facts to prove. **Rhythm (owner, 2026-10-27):** short sentences (<= 5 words) break up the long ones, at least one
+  after every 1-2 long sentences; the merged script must pass `scripts/voice/check_rhythm.py` before it goes to the owner.
 - **G3 animatic:** 2-3 visual concepts for the whole film, judged internally; the owner sees one animatic (one-version rule).
 - **G4 look:** 2-4 style-frame directions when the topic needs a new look.
 
@@ -119,7 +120,7 @@ in `context/workflows/` (the v3 ones are the current best versions):
 | G0.5 core line | `v3-g05-core-line-*.js` | 6 emotional-lever writers, 4 judges, viewer personas + sceptics on finalists, top 3 |
 | G1 script | `v3-g1-story-*.js` | story spines first, judges, 3 writers, cold-read retell panel, flow critic, merge, fact-check |
 | any line | `v3-line2-fix-*.js` | replacement lines tested in context by viewer personas + a standards/flow judge |
-| G1/G2 voice | `docs/ELEVENLABS.md`; `video/scripts/voice/` | paste-file rules + `check_paste.py`; `check_take.py` (transcribe + diff), `clean_take.py`, `transcribe.py` |
+| G1/G2 voice | `docs/ELEVENLABS.md`; `video/scripts/voice/` | paste-file rules + `check_paste.py`; `check_rhythm.py` (long sentences broken by short ones); `check_take.py` (transcribe + diff), `clean_take.py`, `transcribe.py` |
 | G2 voice (API) | `video/scripts/voice/generate_take.py` | per-line generation with the owner's voice, ASR check (Parakeet + Whisper), auto-regenerate, stitch; needs `ELEVENLABS_API_KEY` |
 | G2 sound | `video/audio/tools/make_phone_sfx.py` | our own positive phone sounds (like pop, ding, swoosh, cart add) |
 | G3 animatic | `video/src/v3/SketchReel.tsx` + `v3-g3-animatic-*.js` | 3 visual concepts, judges, storyboard artist writes the animatic JSON; SketchReel draws it with voice and pop captions |

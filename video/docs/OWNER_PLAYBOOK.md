@@ -24,7 +24,9 @@ Format: **rule** — why / evidence (video, date).
   - Spine first, then lines. A list of facts to prove is input, never the structure.
   - Test: someone who hears it once can retell it as a story.
   — ("just a collection of sentences", v3 G1, 2026-10-26).
-- **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24).
+- **Everyday spoken language; check every sentence for AI-sounding wording.** — (v1, 2026-10-24). **Rhythm: never a run of
+  long sentences; put a short one (5 words or fewer, e.g. "Let's find out." "But there was a problem.") after every 1-2
+  long ones, at the turns,** gated by `scripts/voice/check_rhythm.py` OK at G1. — (owner's reference reel, 2026-10-27).
 - **Scripts come with detailed emotional / delivery cues; the owner always gets the full script text with any take.** — (v1).
 - **We generate the narration with the owner's ElevenLabs voice through the API, for every video** (voice id and model
   in `docs/voice/VOICE.md`, procedure `docs/voice/API_QUICKSTART.md`, details `docs/ELEVENLABS.md`): paste format v2
@@ -75,6 +77,8 @@ Format: **rule** — why / evidence (video, date).
 - **People small and simple, like the first example video (reference 1):** figures that live in the world (crowds, small
   full figures, backs of heads, simple round heads), never big character models or close-up faces. — ("don't use big
   models of people", v2 restart, 2026-10-27).
+- **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
+  platform auto-captions stay off. — (v1 reel, 2026-10-25).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). — (v1 posted reel, 2026-10-25).
 - **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
@@ -140,10 +144,6 @@ Format: **rule** — why / evidence (video, date).
   ... in a short reel we would speed it up", v3, 2026-10-26).
 - **Render at 60 fps from G5 to the final** ("smoother and more crispy"). Animate by time; drawn motion may stay stepped
   (12-24 drawings/s) while the camera glides; the G3 reel also renders at 60 (`G3_ANIMATIC.md`, 2026-10-26). — (v3, 2026-10-26).
-
-## Captions
-- **Captions are burned in and pop in place (or rise without clipping);** a reveal that cuts letters looks like a glitch;
-  platform auto-captions stay off. — (v1 reel, 2026-10-25).
 
 ## Process and communication
 - **Parallelize as much as possible: split independent work across helper cloud sessions (each its own machine) and

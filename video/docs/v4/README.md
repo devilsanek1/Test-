@@ -41,7 +41,8 @@ Relaunch **unchanged** with the Workflow tool:
 3 research lanes (mechanism, the fuss, voices + guardrails) -> `research/factlock.md` -> 6 lever writers -> 4 judges ->
 4 viewer personas + 2 sceptics per finalist -> `CORE_LINE.md` (top 3) -> truth check. About 35 agents.
 Then: show the owner the top 3 lines on one screen; after the pick, archive the rest and go to G1 (story-first script,
-template `context/workflows/v3-g1-story-*.js`), then G2 voice via the ElevenLabs API (`video/docs/voice/API_QUICKSTART.md`).
+template `context/workflows/v3-g1-story-*.js`, which now enforces the rhythm rule: short sentences of 5 words or
+fewer between the long ones, `video/scripts/voice/check_rhythm.py` OK), then G2 voice via the ElevenLabs API (`video/docs/voice/API_QUICKSTART.md`).
 
 ## Files in this folder
 - `G0_TOPICS.md`: the locked topic (only the pick).
