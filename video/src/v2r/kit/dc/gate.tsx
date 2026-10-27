@@ -35,7 +35,8 @@ export const GATE = {
   door: S6.serviceDoor0,
   /** The mid plane: the footpath's back kerb (the board's legs), the fence, the corner post (cap = Pip's seat). */
   kerbY: 1252,
-  fence: {top: 852, base: 1236},
+  /** A low, open park fence (calm: never a security wall), pickets every 34 px; the tall corner post rises over it. */
+  fence: {top: 1010, base: 1236},
   post: {x: S6.pipSeat0.x, cap: S6.pipSeat0.y, w: 54},
   board: S6.board0,
   sun: SUN2,
@@ -61,6 +62,7 @@ export const GT = {
   joint: mix(CM.paving, CM.line, 0.4),
   kerb: CM.limestone,
   iron: CM.anchor,
+  rail: mix(CM.line, CM.anchor, 0.35),
   ironLit: mix(CM.anchor, CM.paneUnlit, 0.55),
   soil: mix(CM.brickDeep, CM.anchor, 0.35),
   tulip: [CM.box, CM.blossom, CM.coatMustard, CM.paper, CM.brick],
@@ -220,11 +222,12 @@ export const GateLawnTrees: React.FC<{seed?: string}> = ({seed = 'lawntrees'}) =
     const B = new Batch();
     const r = rng(seed);
     const trees: [number, number, number][] = [];
-    for (let x = -200; x < 1500; x += r.range(150, 260)) trees.push([x, r.range(48, 70), r.range(0.4, 0.8)]);
+    // a few cherries on the lawn, kept clear of the service door's bay (x 820-1090 at the cut) so the door reads
+    for (let x = -200; x < 1500; x += r.range(230, 330)) if (x < 800 || x > 1110) trees.push([x, r.range(40, 56), r.range(0.5, 0.85)]);
     for (const [x, rr] of trees) {
-      B.rect(GT.bark, x - 3, 828, 6, 50);
-      B.fill(GT.crownShade, crownD(x + 8, 800, rr * 1.15, rr * 0.8, `${seed}/s${x}`, 7, 0.3));
-      B.fill(GT.crown, crownD(x - 6, 786, rr, rr * 0.72, `${seed}/c${x}`, 7, 0.3));
+      B.rect(GT.bark, x - 3, 838, 6, 44);
+      B.fill(GT.crownShade, crownD(x + 8, 812, rr * 1.15, rr * 0.7, `${seed}/s${x}`, 7, 0.3));
+      B.fill(GT.crown, crownD(x - 6, 800, rr, rr * 0.62, `${seed}/c${x}`, 7, 0.3));
     }
     B.layer();
     let bl = '';
@@ -235,8 +238,8 @@ export const GateLawnTrees: React.FC<{seed?: string}> = ({seed = 'lawntrees'}) =
         const a = r.range(0, Math.PI * 2);
         const d = Math.sqrt(r.next()) * 0.85;
         const bx = x + Math.cos(a) * rr * d;
-        const by = 790 + Math.sin(a) * rr * 0.7 * d;
-        if (by < 735) continue;
+        const by = 804 + Math.sin(a) * rr * 0.6 * d;
+        if (by < 760) continue;
         const db = blossomD(bx, by, r.range(6, 10), `${seed}/b${x}/${i}`, 4);
         if (Math.cos(a) < 0.2) bl += db;
         else bs += db;
@@ -261,19 +264,42 @@ export const GateFence: React.FC<{seed?: string}> = ({seed = 'fence'}) => {
     // the lawn behind the fence down to the footpath (eye level: it recedes to the facade's foot)
     B.rect(GT.lawn, x0, 880, x1 - x0, base - 880 + 6);
     for (let y = 900; y < base; y += 46) B.rect(GT.lawnLit, x0, y, x1 - x0, 10);
+    // a gravel walk across the lawn (receding to the facade) and two oval tulip beds: the lawn is a place, never a slab
+    B.poly(GT.pavingLit, [[560, 870], [600, 870], [980, base - 90], [880, base - 90]]);
+    for (const [cx, cy, rx] of [[300, 940, 120], [1000, 930, 110], [-120, 960, 130]] as [number, number, number][]) {
+      B.fill(GT.soil, ellD(cx, cy, rx, 14));
+      let hd = '';
+      for (let k = -rx + 10; k < rx - 8; k += 9) hd += ellD(cx + k, cy - 6 + Math.abs(k) * 0.03, 3.6, 4.6);
+      B.fill(GT.tulip[Math.abs(cx) % 3], hd);
+    }
     // the footpath under the board (paving, its joints converging on the eye's vanishing point)
     B.layer();
     B.rect(GT.paving, x0, base, x1 - x0, GATE.kerbY + 30 - base);
     B.layer();
-    // the fence: two rails and spear-topped pickets every 20 px (dark iron), behind the board
-    B.rect(GT.iron, x0, top + 24, x1 - x0, 7);
-    B.rect(GT.iron, x0, base - 40, x1 - x0, 7);
+    // a low hedge behind the fence (the lawn's edge), then the fence: two rails and slim pickets with round finials,
+    // painted the warm line colour (a park fence), stone piers every ~6 bays
+    let hedge = '';
+    for (let x = x0; x < x1; x += 46) hedge += crownD(x, base - 92, 40, 30, `${seed}/h${x}`, 6, 0.4);
+    B.fill(GT.hedge, hedge);
+    B.rect(GT.hedge, x0, base - 96, x1 - x0, 92);
+    B.layer();
+    B.rect(GT.rail, x0, top + 18, x1 - x0, 6);
+    B.rect(GT.rail, x0, base - 34, x1 - x0, 6);
     let pk = '';
-    for (let x = x0; x < x1; x += 20) {
-      if (Math.abs(x - GATE.post.x) < GATE.post.w * 0.6) continue;
-      pk += `M${x} ${base}V${top + 8}l4 -10l4 10V${base}Z`;
+    let fin = '';
+    for (let x = x0; x < x1; x += 34) {
+      if (Math.abs(x - GATE.post.x) < GATE.post.w * 0.7) continue;
+      pk += `M${x - 2.5} ${base}V${top + 8}h5V${base}Z`;
+      fin += circleD(x, top + 4, 5);
     }
-    B.fill(GT.iron, pk);
+    B.fill(GT.rail, pk);
+    B.fill(GT.rail, fin);
+    for (let x = x0 + 40; x < x1; x += 34 * 6) {
+      if (Math.abs(x - GATE.post.x) < 120) continue;
+      B.rect(GT.stone, x - 10, top - 6, 20, base - top + 6);
+      B.rect(GT.stoneShade, x + 4, top - 6, 6, base - top + 6);
+      B.rect(GT.stoneLit, x - 13, top - 10, 26, 6);
+    }
     // the tall corner post: a limestone pier with a cap (Pip's seat on top), lit left (the sun is east = left)
     const P = GATE.post;
     B.layer();
@@ -378,9 +404,10 @@ export const GateNear: React.FC<{seed?: string}> = ({seed = 'near'}) => {
 };
 
 /** S6's set on its truck: sky pieces + sun (fixed: SUN2), far facade, lawn trees, mid fence (with the board slot),
- *  near plane. Slots: `board` (K3 deal board, mid plane), `pip` (mid plane, on the post cap), `mid` (a jogger),
+ *  near plane. Slots: `board` (K3 deal board, mid plane), `pip` (mid plane, on the post cap), `mid`, `lawn` (a jogger on
+ *  the lawn path beyond the fence: small),
  *  `near` (K4's readers' head-backs), `doorPeople` (K4 staff at the door, far plane). */
-export const GateSet: React.FC<{board?: React.ReactNode; pip?: React.ReactNode; mid?: React.ReactNode; near?: React.ReactNode; doorPeople?: React.ReactNode; sky?: boolean; bars?: React.ReactNode}> = ({board, pip, mid, near, doorPeople, sky = false, bars}) => {
+export const GateSet: React.FC<{board?: React.ReactNode; pip?: React.ReactNode; mid?: React.ReactNode; lawn?: React.ReactNode; near?: React.ReactNode; doorPeople?: React.ReactNode; sky?: boolean; bars?: React.ReactNode}> = ({board, pip, mid, lawn: lawnSlot, near, doorPeople, sky = false, bars}) => {
   const t = useTime();
   const far = gateDx(GATE_DRIFT.far, t);
   const lawn = gateDx(GATE_DRIFT.lawn, t);
@@ -396,6 +423,7 @@ export const GateSet: React.FC<{board?: React.ReactNode; pip?: React.ReactNode; 
       </g>
       <g transform={`translate(${lawn.toFixed(2)} 0)`}>
         <GateLawnTrees />
+        {lawnSlot}
       </g>
       <g transform={`translate(${md.toFixed(2)} 0)`}>
         <GateFence />

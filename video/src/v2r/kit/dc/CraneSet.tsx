@@ -1,4 +1,4 @@
-// dc/Crane.tsx: the S5 set, assembled on the crane rig (crane.ts): every Arlington plane in its PullLayer on ONE
+// dc/CraneSet.tsx: the S5 set, assembled on the crane rig (crane.ts): every Arlington plane in its PullLayer on ONE
 // progress, plus slots for the cast (K4), Pip (K5), the news box and the plaque (K3). Lane L4 owns S5; this is the
 // set it builds on (and what the kit's CraneEnd / CraneMove compositions render).
 //
@@ -20,7 +20,7 @@ import {FarPlane, RiverPlane, VISTA} from './vista';
 import {MidGround} from './valley';
 import {NearMid} from './valley';
 import {Pentagon} from './pentagon';
-import {Terrace, StrangerBench, TerraceTree, LampPost, LAMP_RIGHT, NearPetals} from './terrace';
+import {Terrace, StrangerBench, TerraceTree, CornerTree, LampPost, LAMP_RIGHT, NearPetals, Pigeons} from './terrace';
 import {BirdV, Gulls} from './life';
 import {CM} from '../../palette';
 
@@ -63,6 +63,7 @@ export const CraneSet: React.FC<CraneSetProps> = ({p: pIn, figuresStart, figures
       </PullLayer>
       <PullLayer m={planeMat(DECK, p)}>
         <Terrace />
+        <Pigeons />
         {deckEnd}
         {swapped ? figuresEnd : null}
       </PullLayer>
@@ -75,6 +76,7 @@ export const CraneSet: React.FC<CraneSetProps> = ({p: pIn, figuresStart, figures
         <TerraceTree burstAt={CRANE_T.april} />
       </PullLayer>
       <PullLayer m={boxMat(L2_BOX, p)}>
+        <CornerTree />
         <XG m={[1, 0, 0, 1, LAMP_RIGHT.x, LAMP_RIGHT.base]}>
           <LampPost h={LAMP_RIGHT.h} />
         </XG>
@@ -84,7 +86,7 @@ export const CraneSet: React.FC<CraneSetProps> = ({p: pIn, figuresStart, figures
           <LampPost h={WIPE.h} basket seed="wipe" />
         </XG>
       ) : null}
-      <NearPetals />
+      <NearPetals n={10} />
     </>
   );
 };

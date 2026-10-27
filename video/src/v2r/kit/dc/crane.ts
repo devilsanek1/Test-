@@ -122,15 +122,29 @@ export function craneSpeeds(): SpeedRow[] {
     ['river', (t) => planeMat(RIVER, craneP(t)), grid([0, 540, 1080, 1500], [836, 870])],
     ['mid (Pentagon, lawns)', (t) => planeMat(MID_PL, craneP(t)), grid([0, 322, 800, 1080, 1280], [846, 980, 1104])],
     ['near-mid (slope crowns)', (t) => startMat(NEAR_MID_PL, craneP(t)), grid([0, 300, 600, 900, 1080], [598, 880, 1010])],
-    ['deck (terrace, figures)', (t) => planeMat(DECK, craneP(t)), grid([0, 318, 700, 1080], [1180, 1238, 1600, 1920])],
+    ['deck (terrace, figures)', (t) => planeMat(DECK, craneP(t)), grid([-200, 0, 200, 318, 500, 700, 900, 1080, 1300], [1180, 1238, 1350, 1450, 1550, 1650, 1800, 1920])],
     ['terrace tree (T1 box)', (t) => boxMat(T1_BOX, craneP(t)), grid([-170, 100, 290], [642, 1000, 1268])],
     ['end lamppost (L2 box)', (t) => boxMat(L2_BOX, craneP(t)), grid([LAMP_RIGHT.x], [LAMP_RIGHT.base - LAMP_RIGHT.h, LAMP_RIGHT.base - 200])],
     ['wipe lamppost (flat mass)', (t) => wipeMat(craneP(t)), [[0, -560] as Pt, [0, -380] as Pt, [-230, -380] as Pt, [230, -380] as Pt]],
   ];
+  // only points ON SCREEN at that frame count (a plane's far corners can be off-frame while they move fastest)
+  const onScreen = (q: Pt) => q[0] > -40 && q[0] < 1120 && q[1] > 0 && q[1] < 1920;
   return rows.map(([layer, at, pts]) => {
-    const s = planeSpeed(at, pts, t0, t1);
-    return {layer, max: Math.round(s.max * 10) / 10, at: Math.round((s.at + S5_T0) * 100) / 100};
+    let best = {max: 0, at: t0};
+    for (let f = Math.round(t0 * 60); f < Math.round(t1 * 60); f++) {
+      const a = at(f / 60);
+      const b = at((f + 1) / 60);
+      for (const q of pts) {
+        const pa = applyMat(a, q);
+        if (!onScreen(pa)) continue;
+        const pb = applyMat(b, q);
+        const v = Math.hypot(pb[0] - pa[0], pb[1] - pa[1]);
+        if (v > best.max) best = {max: v, at: f / 60};
+      }
+    }
+    return {layer, max: Math.round(best.max * 10) / 10, at: Math.round((best.at + S5_T0) * 100) / 100};
   });
 }
+void planeSpeed;
 
 void cubicBezier;

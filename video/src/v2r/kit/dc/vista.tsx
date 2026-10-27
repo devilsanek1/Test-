@@ -30,9 +30,9 @@ export const VISTA = {
   /** The hero cloud bank: flat base on the horizon, lobed top (>= 623); a low saddle behind the obelisk. */
   bank: {x0: 170, x1: 1990, base: 800, topMin: 626},
   /** The far city band (the far shore at y 836). */
-  cityY: [804, 836] as [number, number],
+  cityY: [798, 836] as [number, number],
   /** The river plane: far shore, water, near bank, the deep parkland band. */
-  river: {shore: 834, water: [836, 857] as [number, number], nearBank: [855, 880] as [number, number], deep: 1120},
+  river: {shore: 834, water: [836, 864] as [number, number], nearBank: [862, 884] as [number, number], deep: 1120},
 };
 
 // ---------------------------------------------------------------- tones
@@ -41,17 +41,17 @@ export const VT = {
   // far (65 %)
   hill: atm(CM.sage, 4),
   hillFar: mix(atm(CM.sage, 4), CM.sky, 0.4),
-  cityLit: atm(CM.paper, 4),
-  cityWarm: atm(CM.stucco, 4),
-  cityStone: atm(CM.limestone, 4),
-  cityShade: atmShade(CM.stoneShade, 4),
-  cityRoof: atmShade(mix(CM.stoneShade, CM.brick, 0.25), 4),
+  cityLit: mix(CM.paper, CM.sky, 0.45),
+  cityWarm: mix(CM.stucco, CM.sky, 0.48),
+  cityStone: mix(CM.limestone, CM.sky, 0.5),
+  cityShade: atmShade(CM.stoneShade, 3),
+  cityRoof: atmShade(mix(CM.stoneShade, CM.brick, 0.3), 3),
   cityBrick: atm(CM.brickDeep, 4),
-  cityTree: atmShade(CM.sage, 4),
+  cityTree: atmShade(mix(CM.sage, CM.shadeWarm, 0.15), 3),
   cityGlass: atmShade(CM.glass, 4),
   // the obelisk: one step nearer than its plane (the darkest far shape on the palest cloud)
-  obLit: atm(CM.limestone, 3),
-  obShade: atmShade(mix(CM.stoneShade, CM.limestone, 0.2), 3),
+  obLit: atm(CM.limestone, 2),
+  obShade: atmShade(mix(CM.stoneShade, CM.shadeCool, 0.3), 2),
   obInk: mix(atmShade(CM.stoneShade, 3), CM.shadeWarm, 0.35),
   // sky
   bankCrown: CM.paper,
@@ -86,7 +86,7 @@ export const VT = {
 const BANK_LOBES: [number, number, number][] = [
   [205, 190, 88],
   [298, 210, 118],
-  [396, 170, 82], // the saddle behind the obelisk (top 718)
+  [396, 150, 64], // a low saddle behind the obelisk (the needle stands in the bank's gap)
   [505, 240, 150],
   [660, 300, 172],
   [820, 260, 140],
@@ -118,8 +118,6 @@ export const CloudBank: React.FC<{seed?: string}> = ({seed = 'bank'}) => {
     for (let x = x0 + 30; x <= x1 - 30; x += 70) belly.push([x + 35, base - 18 - 6 * Math.sin(x * 0.021)]);
     belly.push([x1 - 30, base + 2]);
     B.poly(VT.bankBelly, belly);
-    // the saddle behind the obelisk: a paler, lower field so the needle reads dark on light
-    B.fill(VT.bankSaddle, cloudD(330, 470, base - 10, [[398, 130, 62]]));
     return B;
   }, []);
   return <Paint b={b} seed={seed} misreg={false} />;
@@ -132,12 +130,30 @@ export const HighBars: React.FC<{drift?: number; seed?: string}> = ({drift = 4, 
     const r = rng(seed);
     const out: {x: number; y: number; w: number; h: number}[] = [];
     const rows = [148, 196, 236, 278];
-    for (let i = 0; i < 9; i++) out.push({x: -600 + i * 300 + r.range(-60, 60), y: rows[i % rows.length] + r.range(-10, 10), w: r.range(170, 420), h: r.range(12, 20)});
+    for (let i = 0; i < 9; i++) out.push({x: -600 + i * 300 + r.range(-60, 60), y: rows[i % rows.length] + r.range(-6, 6), w: r.range(170, 420), h: r.range(12, 18)});
     return out;
   }, [seed]);
   const dx = drift * t;
   let body = '';
   let lit = '';
+  // two big flat cloud masses in the top gutter (y <= 290: never in the band), lobed tops, flat bases
+  for (const [x0, w, base, hh] of [
+    [-260, 640, 262, 150],
+    [560, 760, 208, 120],
+    [1420, 600, 250, 140],
+  ] as [number, number, number, number][]) {
+    const x = x0 + dx * 0.6;
+    body += cloudD(x, x + w, base, [
+      [x + w * 0.2, w * 0.36, hh * 0.62],
+      [x + w * 0.45, w * 0.42, hh],
+      [x + w * 0.72, w * 0.38, hh * 0.74],
+      [x + w * 0.9, w * 0.2, hh * 0.4],
+    ]);
+    lit += cloudD(x + w * 0.24, x + w * 0.82, base - hh * 0.3, [
+      [x + w * 0.44, w * 0.34, hh * 0.62],
+      [x + w * 0.66, w * 0.26, hh * 0.42],
+    ]);
+  }
   for (const s of bars) {
     const x = s.x + dx;
     body += cloudD(x, x + s.w, s.y + s.h, [
@@ -229,11 +245,11 @@ function cityBlocks(seed: string): {blocks: Block[]; marks: string[]} {
   const r = rng(seed);
   const blocks: Block[] = [];
   const [yTop, yBase] = VISTA.cityY;
-  const rows = 6;
+  const rows = 8;
   const cols = [VT.cityLit, VT.cityStone, VT.cityWarm, VT.cityLit, VT.cityStone];
   for (let row = 0; row < rows; row++) {
     const base = yTop + 4 + ((yBase - yTop - 4) * (row + 1)) / rows; // farther rows higher
-    const hMax = 5 + row * 1.6;
+    const hMax = 5 + row * 2.1;
     let x = VISTA.x0 + r.range(0, 12);
     while (x < VISTA.x1) {
       const w = r.range(6, 16) * (0.8 + row * 0.08);
@@ -244,9 +260,9 @@ function cityBlocks(seed: string): {blocks: Block[]; marks: string[]} {
   }
   // tree breaks along the Mall and the shore (dark-ish clumps between the rows)
   const marks: string[] = [];
-  for (let i = 0; i < 70; i++) {
+  for (let i = 0; i < 90; i++) {
     const x = r.range(VISTA.x0, VISTA.x1);
-    marks.push(crownD(x, yBase - r.range(1, 8), r.range(5, 11), r.range(2.5, 4), `${seed}/tr${i}`, 4, 0.5));
+    marks.push(crownD(x, yBase - r.range(1, 10), r.range(3, 7), r.range(1.8, 3), `${seed}/tr${i}`, 4, 0.5));
   }
   return {blocks, marks};
 }
@@ -265,6 +281,12 @@ export const FarCity: React.FC<{seed?: string}> = ({seed = 'city'}) => {
     };
     ridge(800, 9, VT.hillFar, `${seed}/r0`);
     ridge(806, 6, VT.hill, `${seed}/r1`);
+    B.layer();
+    // the infinity strip: the suburbs beyond, one step paler, packed specks on the ridge (the city runs on)
+    {
+      const r2 = rng(`${seed}/inf`);
+      for (let x = VISTA.x0; x < VISTA.x1; x += r2.range(3, 7)) B.rect(r2.chance(0.5) ? VT.hillFar : VT.cityLit, x, 797 - r2.range(0, 4), r2.range(2.5, 5), r2.range(2, 5));
+    }
     B.layer();
     const {blocks, marks} = cityBlocks(seed);
     // rows back to front (blocks are already generated back -> front)
@@ -311,22 +333,22 @@ export const Obelisk: React.FC<{x?: number; base?: number; top?: number; w?: num
   const L: Pt[] = [
     [x - w / 2, base],
     [x - wt / 2, shaftTop],
-    [x - wt * 0.1, shaftTop],
-    [x - w * 0.1, base],
+    [x + wt * 0.12, shaftTop],
+    [x + w * 0.12, base],
   ];
   const R: Pt[] = [
-    [x - w * 0.1, base],
-    [x - wt * 0.1, shaftTop],
+    [x + w * 0.12, base],
+    [x + wt * 0.12, shaftTop],
     [x + wt / 2, shaftTop],
     [x + w / 2, base],
   ];
   const capL: Pt[] = [
     [x - wt / 2, shaftTop],
     [x, top],
-    [x - wt * 0.1, shaftTop],
+    [x + wt * 0.12, shaftTop],
   ];
   const capR: Pt[] = [
-    [x - wt * 0.1, shaftTop],
+    [x + wt * 0.12, shaftTop],
     [x, top],
     [x + wt / 2, shaftTop],
   ];
@@ -403,10 +425,10 @@ export const RiverPlane: React.FC<{seed?: string}> = ({seed = 'river'}) => {
     // the near bank: park trees, the parkway (a thin pale road), the boat basin
     B.layer();
     B.rect(VT.park, VISTA.x0, R.nearBank[0], VISTA.x1 - VISTA.x0, R.nearBank[1] - R.nearBank[0]);
-    B.rect(VT.road, VISTA.x0, 861, VISTA.x1 - VISTA.x0, 3);
+    B.rect(VT.road, VISTA.x0, 868, VISTA.x1 - VISTA.x0, 3);
     // the boat basin (a lagoon inlet), right of centre
-    B.fill(VT.water, ellD(760, 869, 110, 7));
-    for (let i = 0; i < 16; i++) B.rect(VT.boat, 670 + i * 11 + r.range(-2, 2), 866 + (i % 2) * 4, 6, 2.2);
+    B.fill(VT.water, ellD(760, 876, 110, 7));
+    for (let i = 0; i < 16; i++) B.rect(VT.boat, 670 + i * 11 + r.range(-2, 2), 873 + (i % 2) * 4, 6, 2.2);
     B.layer();
     for (let i = 0; i < 160; i++) {
       const x = r.range(VISTA.x0, VISTA.x1);
@@ -425,9 +447,9 @@ export const RiverPlane: React.FC<{seed?: string}> = ({seed = 'river'}) => {
   let gd = '';
   for (const g of glints) if (frac(t * g.hz + g.ph) < 0.55) gd += `M${(g.x).toFixed(1)} ${g.y.toFixed(1)}h${g.w.toFixed(1)}`;
   const rowers = [
-    {x0: 120, v: 9, y: 846},
-    {x0: 980, v: -7, y: 851},
-    {x0: 1420, v: 8, y: 848},
+    {x0: 120, v: 9, y: 848},
+    {x0: 980, v: -7, y: 856},
+    {x0: 1420, v: 8, y: 851},
   ];
   let rw = '';
   for (const rr of rowers) {
@@ -436,8 +458,8 @@ export const RiverPlane: React.FC<{seed?: string}> = ({seed = 'river'}) => {
     rw += `M${x - 8} ${rr.y}h16M${x - 3} ${rr.y - 3 + stroke}l2 6M${x + 3} ${rr.y - 3 - stroke}l-2 6`;
   }
   const sails = [
-    {x0: 560, v: 3, y: 852},
-    {x0: 1260, v: -2.5, y: 846},
+    {x0: 560, v: 3, y: 858},
+    {x0: 1260, v: -2.5, y: 850},
   ];
   let sd = '';
   for (const s of sails) {
@@ -450,7 +472,7 @@ export const RiverPlane: React.FC<{seed?: string}> = ({seed = 'river'}) => {
     const dir = i % 2 ? 1 : -1;
     const span = VISTA.x1 - VISTA.x0;
     const x = VISTA.x0 + frac(rand(seed, `car${i}`) + (dir * t * 38) / span) * span;
-    cars.push(<rect key={i} x={x} y={dir > 0 ? 860.5 : 862.5} width={6.5} height={2.4} fill={VT.carCols[i % VT.carCols.length]} />);
+    cars.push(<rect key={i} x={x} y={dir > 0 ? 867.5 : 869.5} width={6.5} height={2.4} fill={VT.carCols[i % VT.carCols.length]} />);
   }
   return (
     <>

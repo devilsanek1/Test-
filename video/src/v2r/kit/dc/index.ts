@@ -7,5 +7,5 @@ export * from './valley';
 export * from './terrace';
 export * from './life';
 export * from './crane';
-export * from './Crane';
+export * from './CraneSet';
 export * from './gate';
