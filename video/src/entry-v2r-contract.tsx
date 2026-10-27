@@ -37,7 +37,7 @@ import {Look} from './lib/exit';
 import {useCaptionFont} from './lib/font';
 import scenesJson from './v2r/film/scenes.json';
 import captionsJson from './v2r/film/captions.json';
-import {Her, HerWindow, Ghost, BareOutline, GhostRow, S8Ghosts, Person, Seated, NearBack, WindowPerson, StaffWindow, Staffer, Reporter, Stranger, CafeOwner, FarCrowd, scatterCrowd, strideFor, castRow, pin} from './v2r/kit/cast';
+import {Her, HerWindow, Ghost, BareOutline, GhostRow, S8Ghosts, S1Seated, Person, Seated, NearBack, WindowPerson, StaffWindow, Staffer, Reporter, Stranger, CafeOwner, FarCrowd, scatterCrowd, strideFor, castRow, pin} from './v2r/kit/cast';
 import type {HairKind} from './v2r/kit/cast';
 import {Pip, PipTrack} from './v2r/kit/pip';
 import type {PipKey} from './v2r/kit/pip';
@@ -86,7 +86,7 @@ function verdict(kind: Kind, b: Box, size?: number): {txt: string; c: string} {
     case 'carrier':
       return h >= M.LEGIBILITY.carrierFigureMinH ? {txt: `h ${h} >= 130`, c: C.ok} : {txt: `h ${h} < 130 FAIL`, c: C.fail};
     case 'group':
-      return {txt: 'group: the row goes on', c: C.note};
+      return {txt: 'group', c: C.note};
     case 'person':
       if (w > 180) return {txt: `w ${w} > 180 FAIL`, c: C.fail};
       if (h > 250) return {txt: `h ${h}: not small`, c: C.note};
@@ -169,7 +169,7 @@ const Row: React.FC<{y: number; h: number; title?: string; bg?: string; ground?:
 const Floor: React.FC<{y: number; label: string; x0?: number; x1?: number}> = ({y, label, x0 = 0, x1 = SW}) => (
   <>
     <line x1={x0} y1={y} x2={x1} y2={y} stroke={C.rule} strokeWidth={1.6} strokeDasharray="10 7" />
-    <Tx x={x1 - 6} y={y - 5} s={14} a="end" c={C.rule} b>
+    <Tx x={x1 - 4} y={y - 5} s={13} a="end" c={C.rule} b>
       {label}
     </Tx>
   </>
@@ -552,19 +552,22 @@ const PipS1: React.FC = () => (
     ]}
   />
 );
-const SampleS1: React.FC = () => {
+const SampleS1Inner: React.FC<{kitSeated?: boolean}> = ({kitSeated}) => {
   const t = useTime();
   const z = M.s1Zoom(Math.max(t, 0));
   return (
     <World sky={skyBands('golden')} horizon={1000}>
       <XG m={mat.about(mat.scale(z), M.W.x, M.W.y)}>
         <CanalCast person={k4Person} pip={k5Pip}>
-          <S1Set towpath={<S1Row />} behindDoor={<S1Door />} seated={<S1People />} pip={<PipS1 />} />
+          <S1Set towpath={<S1Row />} behindDoor={<S1Door />} seated={kitSeated ? <S1Seated /> : <S1People />} pip={<PipS1 />} />
         </CanalCast>
       </XG>
     </World>
   );
 };
+const SampleS1: React.FC = () => <SampleS1Inner />;
+/** The same frame with K4's S1Seated as shipped (near row hv 262-326): the size the owner's rule replaces. */
+const SampleS1Kit: React.FC = () => <SampleS1Inner kitSeated />;
 
 // ---------------------------------------------------------------- V2S2 (film 6.10-12.98; the sample at 10.00)
 
@@ -966,9 +969,10 @@ const SAMPLE_T: {id: M.ShotId; T: number}[] = [
   {id: 'V2S4', T: 17.0},
   {id: 'V2S8', T: 37.0},
 ];
-/** One assembled shot under the film's captions at film second `at` (+ the composition's frame / 60). */
-const ContractFrame: React.FC<{id: string; at?: number}> = ({id, at = 0}) => (
-  <Film scenes={SCENES} components={SAMPLES} captions={CAPTIONS} only={id} offset={at} audio={false} captionMotion="pop" frame0={FRAME0} edges={false} />
+/** One assembled shot under the film's captions at film second `at` (+ the composition's frame / 60); `bare` = no
+ *  captions and no frame-0 words (the caption-band check: nothing of the kit may be drawn in y 317-556). */
+const ContractFrame: React.FC<{id: string; at?: number; bare?: boolean}> = ({id, at = 0, bare}) => (
+  <Film scenes={SCENES} components={SAMPLES} captions={CAPTIONS} only={id} offset={at} audio={false} showCaptions={!bare} captionMotion="pop" frame0={bare ? undefined : FRAME0} edges={false} />
 );
 
 /** The map's key shapes of a shot at T (map.ts shotShapes), as thin outlines for the sheet's sample frames. */
@@ -1003,7 +1007,7 @@ const Header: React.FC<{y: number}> = ({y}) => {
     ['green = pass, red = FAIL, amber = note. Rules: carrier >= 130 px tall · story change >= 80 px', CM.bandGold],
     ['near head-backs <= 140 px wide · no figure wider than 180 px (1/6 frame) · Pip 86-120 (S5 end >= 44)', CM.bandGold],
     ['K3 boards / tag / post / box / plaque = STAND-INS (WorldText + texts.ts); L5 builds the real ones.', CM.blossom],
-    ['1 her · 2 ghosts · 3 public · 4 seated + near · 5 S2 windows · 6 Pip · 7 canal 1:1 · 8 Arlington · 9 samples', CM.paper],
+    ['1 her · 2 ghosts · 3 public · 4 seated + near · 5 S2 windows · 6 Pip · 7 clearances · 8 canal · 9 Arlington · 10 samples', CM.paper],
   ];
   return (
     <svg style={{position: 'absolute', left: 0, top: y}} width={SW} height={HEAD_H}>
@@ -1030,8 +1034,8 @@ const Her1: React.FC<{y: number}> = ({y}) => {
   const g = 280;
   const ly = g + 22;
   return (
-    <Row y={y} h={H1} title="S1 (golden) · her at the S1 scale sheet: 153 behind the glass (facade 90 px/m), 170 on her line (100 px/m)" ground={g}>
-      <Floor y={g - 130} label="130 px carrier floor" />
+    <Row y={y} h={H1} title="S1 (golden) · the S1 scale sheet: her 153 behind the glass (90 px/m), 170 on her line (100 px/m)" ground={g}>
+      <Floor y={g - 130} label="130" />
       <rect x={6} y={g - 234} width={178} height={234} fill={CM.glass} />
       <Item x={95} ly={ly} name="S1 f0 behind door" spec="153" kind="carrier">
         <Her x={95} y={g} h={153} view="rear34" step={0.5} stride={S1_STRIDE} plant />
@@ -1067,8 +1071,8 @@ const Her2: React.FC<{y: number}> = ({y}) => {
   const ly = g + 22;
   const st4 = strideFor(34, 170, 'profile');
   return (
-    <Row y={y} h={H2} title="S4 (low sun) · walking home in profile 170 · S8 (sunset) · walking home, back 150, at her door" ground={g} bands={[[460, SW, CM.bandSunset]]}>
-      <Floor y={g - 130} label="130 px carrier floor" />
+    <Row y={y} h={H2} title="S4 (low sun) · walking home in profile 170 · S8 (sunset) · walking home, back 150, her door" ground={g} bands={[[460, SW, CM.bandSunset]]}>
+      <Floor y={g - 130} label="130" />
       <Item x={90} ly={ly} name="S4 profile" spec="170" kind="carrier">
         <Her x={90} y={g} h={170} view="profile" step={0} stride={st4} />
       </Item>
@@ -1128,7 +1132,7 @@ const H3 = 380;
 const Her3: React.FC<{y: number}> = ({y}) => {
   const g = 300;
   return (
-    <Row y={y} h={H3} title="S3 (sunset flash-forward) · her French window at W2_CUT 133×164: her silhouette 137 at the match, 130 after the 0.95 ease-back" bg={CM.bandSunset} ground={g}>
+    <Row y={y} h={H3} title="S3 (sunset) · her French window at W2_CUT 133×164: silhouette 137 at the match, 130 after the ease-back" bg={CM.bandSunset} ground={g}>
       <S3Panel x={14} y={34} z={1} id="kcS3a" />
       <S3Panel x={330} y={34} z={0.95} id="kcS3b" />
       <Tx x={164} y={g + 26} s={16} a="middle" b>
@@ -1186,7 +1190,7 @@ const Ghost2: React.FC<{y: number}> = ({y}) => {
   const row = M.s1RowAt(T);
   const step = s1Step(T);
   return (
-    <Row y={y} h={G2H} title="the row's members at their cover heights, measured (spaced 106 px; paper fill, closed 2.2 px ink, age = whole-head value)" ground={g}>
+    <Row y={y} h={G2H} title="the row at its cover heights, measured (spaced 106 px; paper fill, 2.2 px ink, age = head value)" ground={g}>
       <Floor y={g - 130} label="130" />
       {M.S1_ROW.map((m, i) => {
         const x = 56 + i * 106;
@@ -1212,7 +1216,7 @@ const G3H = 320;
 const Ghost3: React.FC<{y: number}> = ({y}) => {
   const g = 240;
   return (
-    <Row y={y} h={G3H} title="the pop: outline 0.10 s, paper fill 2 f later, a 4-frame settle (G3 at 151) · bare outline O1 (130)" ground={g}>
+    <Row y={y} h={G3H} title="the pop: outline 0.10 s, paper fill 2 f later, 4-frame settle (G3 at 151) · bare outline O1 (130)" ground={g}>
       {[0, 2, 4, 6, 8, 14].map((f, i) => (
         <TimeShift key={f} by={-(f / 60)}>
           <Item x={70 + i * 112} ly={g + 22} name={`G3 +${f} f`} spec="151">
@@ -1235,7 +1239,7 @@ const G4H = 330;
 const Ghost4: React.FC<{y: number}> = ({y}) => {
   const g = 250;
   return (
-    <Row y={y} h={G4H} title="S8 callback (sunset): three ghosts with G4-G6's cues at map S8.ghosts (140 / 135 / 130), back view; her 150; Pip 96" bg={CM.bandSunset} ground={g}>
+    <Row y={y} h={G4H} title="S8 callback (sunset): G4-G6 cues at map S8.ghosts 140 / 135 / 130, back view · her 150 · Pip 96" bg={CM.bandSunset} ground={g}>
       <Floor y={g - 130} label="130" />
       {M.S8.ghosts.map((s, i) => (
         <Item key={s.id} x={120 + i * 150} ly={g + 22} name={s.id} spec={`${s.h}`} kind="carrier">
@@ -1288,52 +1292,52 @@ const Pub2: React.FC<{y: number}> = ({y}) => {
   const g = 220;
   const ly = g + 22;
   return (
-    <Row y={y} h={P2H} title="S2 far towpath (receding 120 → 40) · S4 her towpath: walker 160, cyclist 165, dog 44 · S1 boater (tiller)" ground={g}>
-      <Item x={48} ly={ly} name="S2 120" kind="person">
-        <Person x={48} y={g} h={120} seed="kc/p/s2a" pose="walk" view="profile" walk={{rate: 1.7}} traits={{acc: 'tote'}} />
+    <Row y={y} h={P2H} title="S2 far towpath 120 → 40 · S4 her towpath: walker 160, cyclist 165, dog 44 · S1 boater (tiller)" ground={g}>
+      <Item x={52} ly={ly} name="S2 120" kind="person">
+        <Person x={52} y={g} h={120} seed="kc/p/s2a" pose="walk" view="profile" walk={{rate: 1.7}} traits={{acc: 'tote'}} />
       </Item>
-      <Item x={128} ly={ly} name="S2 80" kind="person">
-        <Person x={128} y={g} h={80} seed="kc/p/s2b" pose="walk" view="profile" flip walk={{rate: 1.7}} />
+      <Item x={158} ly={ly} name="S2 80" kind="person">
+        <Person x={158} y={g} h={80} seed="kc/p/s2b" pose="walk" view="profile" flip walk={{rate: 1.7}} />
       </Item>
-      <Item x={196} ly={ly} name="S2 40" kind="person">
-        <Person x={196} y={g} h={40} seed="kc/p/s2c" pose="walk" view="profile" walk={{rate: 1.7}} />
+      <Item x={256} ly={ly} name="S2 40" kind="person">
+        <Person x={256} y={g} h={40} seed="kc/p/s2c" pose="walk" view="profile" walk={{rate: 1.7}} />
       </Item>
-      <Item x={262} ly={ly} name="S2 jog 100" kind="person">
-        <Person x={262} y={g} h={100} seed="kc/p/s2d" pose="jog" view="profile" walk={{rate: 2.8}} traits={{hair: 'cap'}} />
+      <Item x={356} ly={ly} name="S2 jog" spec="100" kind="person">
+        <Person x={356} y={g} h={100} seed="kc/p/s2d" pose="jog" view="profile" walk={{rate: 2.8}} traits={{hair: 'cap'}} />
       </Item>
-      <Item x={410} ly={ly} name="S4 walker" spec="160" kind="person">
-        <Person x={410} y={g} h={160} seed="kc/p/s4w" pose="walk" view="profile" flip walk={{rate: 1.6}} traits={{acc: 'backpack'}} />
+      <Item x={480} ly={ly} name="S4 walker" spec="160" kind="person">
+        <Person x={480} y={g} h={160} seed="kc/p/s4w" pose="walk" view="profile" flip walk={{rate: 1.6}} traits={{acc: 'backpack'}} />
       </Item>
-      <Item x={600} ly={ly} name="S4 cyclist" spec="165" kind="person">
-        <Person x={600} y={g} h={165} seed="kc/p/s4c" pose="cycle" view="profile" />
+      <Item x={640} ly={ly} name="S4 cyclist" spec="165" kind="person">
+        <Person x={640} y={g} h={165} seed="kc/p/s4c" pose="cycle" view="profile" />
       </Item>
-      <Item x={790} ly={ly} name="S4 dog (K6 slot)" spec="44" kind="none">
-        <CastSlot s={{id: 'kcdog', x: 790, y: g, h: 44, pose: 'dog', seed: 's4dog', dir: 1, gait: 0.2}} />
+      <Item x={810} ly={ly} name="S4 dog (K6 slot)" spec="44" kind="none">
+        <CastSlot s={{id: 'kcdog', x: 810, y: g, h: 44, pose: 'dog', seed: 's4dog', dir: 1, gait: 0.2}} />
       </Item>
-      <Item x={960} ly={ly} name="S1 boater" spec="tiller 120" kind="person">
-        <Person x={960} y={g} h={120} seed="kc/p/tiller" pose="tiller" view="profile" flip traits={{hair: 'beanie'}} />
+      <Item x={975} ly={ly} name="S1 boater" spec="tiller 120" kind="person">
+        <Person x={975} y={g} h={120} seed="kc/p/tiller" pose="tiller" view="profile" flip traits={{hair: 'beanie'}} />
       </Item>
     </Row>
   );
 };
 
-const P3H = 420;
+const P3H = 470;
 const Pub3: React.FC<{y: number}> = ({y}) => {
-  const g = 340;
+  const g = 390;
   const ly = g + 22;
   return (
-    <Row y={y} h={P3H} title="S8 (sunset) · the lane receding 150 → 92 · cyclists: contract 170 vs S8Set's default 300 · a neighbour reading" bg={CM.bandSunset} ground={g}>
+    <Row y={y} h={P3H} title="S8 (sunset) · the lane 150 → 92 · cyclist: contract 170 vs S8Set's default 300 · a neighbour reading" bg={CM.bandSunset} ground={g}>
       <Item x={70} ly={ly} name="S8 walker" spec="150" kind="person">
         <Person x={70} y={g} h={150} seed="kc/p/s8a" pose="walk" view="back" walk={{rate: 1.6}} traits={{acc: 'scarf'}} />
       </Item>
-      <Item x={180} ly={ly} name="S8 120" kind="person">
-        <Person x={180} y={g} h={120} seed="kc/p/s8b" pose="walk" view="rear34" walk={{rate: 1.6}} />
+      <Item x={190} ly={ly} name="S8 120" kind="person">
+        <Person x={190} y={g} h={120} seed="kc/p/s8b" pose="walk" view="rear34" walk={{rate: 1.6}} />
       </Item>
-      <Item x={270} ly={ly} name="S8 92" kind="person">
-        <Person x={270} y={g} h={92} seed="kc/p/s8c" pose="walk" view="back" walk={{rate: 1.6}} />
+      <Item x={300} ly={ly} name="S8 92" kind="person">
+        <Person x={300} y={g} h={92} seed="kc/p/s8c" pose="walk" view="back" walk={{rate: 1.6}} />
       </Item>
-      <Item x={420} ly={ly} name="S8 cyclist" spec="170 (contract)" kind="person">
-        <Person x={420} y={g} h={170} seed="kc/p/s8cy" pose="cycle" view="profile" />
+      <Item x={450} ly={ly} name="S8 cyclist" spec="170 (contract)" kind="person">
+        <Person x={450} y={g} h={170} seed="kc/p/s8cy" pose="cycle" view="profile" />
       </Item>
       <Item x={700} ly={ly} name="S8Set cyclist" spec="300 (kit)" kind="person">
         <Person x={700} y={g} h={300} seed="kc/p/s8big" pose="cycle" view="profile" />
@@ -1376,21 +1380,21 @@ const Seat1: React.FC<{y: number}> = ({y}) => {
   const g = 220;
   const ly = g + 22;
   const L: [number, number, Partial<{cup: number; turn: number; read: boolean; phone: boolean}>][] = [
-    [50, 58, {}],
-    [128, 61, {turn: -0.5}],
-    [206, 56, {read: true}],
-    [284, 60, {cup: 1}],
-    [398, 84, {cup: 0.5}],
-    [510, 88, {turn: 0.6}],
-    [622, 90, {phone: true}],
-    [750, 112, {read: true}],
-    [878, 116, {cup: 1}],
-    [1006, 120, {}],
+    [52, 58, {}],
+    [150, 61, {turn: -0.5}],
+    [248, 56, {read: true}],
+    [346, 60, {cup: 1}],
+    [456, 84, {cup: 0.5}],
+    [562, 88, {turn: 0.6}],
+    [668, 90, {phone: true}],
+    [786, 112, {read: true}],
+    [904, 116, {cup: 1}],
+    [1024, 120, {}],
   ];
   return (
     <Row y={y} h={N1H} title="S1 steps · seated backs: low row 56-62, middle rows 84-90 and 112-120 (cup, turn, read, phone)" bg={CM.limestone} ground={g}>
       {L.map(([x, h, o], i) => (
-        <Item key={i} x={x} ly={ly} name={i < 4 ? 'S1 low' : i < 7 ? 'S1 mid' : 'S1 mid 2'} spec={`${h}`} kind="person">
+        <Item key={i} x={x} ly={ly} name={i < 4 ? 'low' : i < 7 ? 'mid' : 'mid 2'} spec={`${h}`} kind="person">
           <Seated x={x} y={g} h={h} seed={`kc/seat/${i}`} cup={o.cup} turn={o.turn} read={o.read} phone={o.phone} ink={h < 70 ? INK_PX.hair : INK_PX.far} />
         </Item>
       ))}
@@ -1408,7 +1412,7 @@ const NEAR_HAIRS: [HairKind, string][] = [
 ];
 const N2H = 330;
 const Near2: React.FC<{y: number}> = ({y}) => (
-  <Row y={y} h={N2H} title="near head-backs cut by the frame bottom, the CONTRACT size: hv 150 (~130-140 px wide, like reference 1's front row)" bg={CM.limestone}>
+  <Row y={y} h={N2H} title="near head-backs cut by the frame bottom, CONTRACT size hv 150 (~125-140 px wide, ref 1's front row)" bg={CM.limestone}>
     {NEAR_HAIRS.map(([hair, name], i) => (
       <Item key={hair} x={90 + i * 180} ly={56} name={name} spec="hv 150" kind="near">
         <NearBack x={90 + i * 180} y={N2H} hv={150} seed={`kc/near/${hair}`} traits={{hair}} model={hair === 'lowBun' ? {scarf: CM.coatMustard} : undefined} ink={INK_PX.mid} />
@@ -1419,7 +1423,7 @@ const Near2: React.FC<{y: number}> = ({y}) => (
 
 const N3H = 440;
 const Near3: React.FC<{y: number}> = ({y}) => (
-  <Row y={y} h={N3H} title="the near sizes still in map.ts / the kit (S1 250-330 · S2 260-320 · S3 260-300 · S6 240-300 · S7 200-260): over the cap" bg={CM.stucco}>
+  <Row y={y} h={N3H} title="near sizes still in map.ts / the kit (S1 250-330 · S2 260-320 · S6 240-300 · S7 200-260): over the cap" bg={CM.stucco}>
     {(
       [
         [200, 'S7 map min', 'curls'],
@@ -1435,13 +1439,13 @@ const Near3: React.FC<{y: number}> = ({y}) => (
   </Row>
 );
 
-const N4H = 360;
+const N4H = 380;
 const Bench4: React.FC<{y: number}> = ({y}) => {
   const g = 280;
   const Ts = [9.0, 9.7, 10.6, 13.0];
   const lab = ['9.00 before', '9.70 turned + notebook', '10.60 hood up', '13.00 shut'];
   return (
-    <Row y={y} h={N4H} title="S2 bench (film times): the reporter (165, satchel, notebook) + the staffer (>= 180 seated: slate coat, lanyard, the hood)" ground={g}>
+    <Row y={y} h={N4H} title="S2 bench (film times): the reporter 165 (satchel, notebook) + the staffer >= 180 seated (the hood)" ground={g}>
       {Ts.map((T, i) => {
         const x0 = 12 + i * 268;
         return (
@@ -1457,7 +1461,7 @@ const Bench4: React.FC<{y: number}> = ({y}) => {
                 <Staffer x={x0 + 180} y={g - 52} h={180} />
               </Item>
             </TimeShift>
-            <Tx x={x0 + 125} y={g + 70} s={15} a="middle" c={C.head} b>
+            <Tx x={x0 + 125} y={g + 88} s={15} a="middle" c={C.head} b>
               {lab[i]}
             </Tx>
           </g>
@@ -1467,12 +1471,29 @@ const Bench4: React.FC<{y: number}> = ({y}) => {
   );
 };
 
+const BT_SRC: [number, number, number, number] = [0, 1220, 1080, 700];
+const BT_H = winH(BT_SRC, 0.5) + 12;
+const BottomS1: React.FC<{y: number}> = ({y}) => (
+  <>
+    <Window y={y + 4} x={0} src={BT_SRC} scale={0.5} label="S1 bottom third AS SHIPPED: K4 S1Seated (near hv 262-326)">
+      <At T={2.5} start={0}>
+        <SampleS1Kit />
+      </At>
+    </Window>
+    <Window y={y + 4} x={540} src={BT_SRC} scale={0.5} label="the CONTRACT rows: 4 seated rows + near hv 140-154">
+      <At T={2.5} start={0}>
+        <SampleS1 />
+      </At>
+    </Window>
+  </>
+);
+
 const N5H = 400;
 const Extras5: React.FC<{y: number}> = ({y}) => {
   const g = 320;
   const ly = g + 22;
   return (
-    <Row y={y} h={N5H} title="S5 the stranger (reading, start 100 seated = Fig 150; end 41) · S8 the café owner wiping (k 0 / 0.5 / 1) at 170, and 300" ground={g}>
+    <Row y={y} h={N5H} title="S5 the stranger (start seated 100 = Fig 150, end 41) · S8 the café owner wiping (k 0 / 0.5 / 1) 170, 300" ground={g}>
       <Item x={90} ly={ly} name="S5 stranger" spec="seated 100" kind="person">
         <Stranger x={90} y={g - 50} h={100} />
       </Item>
@@ -1505,7 +1526,7 @@ const Staff5: React.FC<{y: number}> = ({y}) => (
     <svg style={{position: 'absolute', left: 0, top: y}} width={SW} height={ST_H}>
       <rect width={SW} height={ST_H} fill={C.strip} />
       <Tx x={20} y={ST_H - 22} s={16} c={C.head} b>
-        {`map S2 windows: ${M.S2.staffWindows.map((w) => `${w.id} ${w.w}×${w.h}`).join(' · ')} (each >= 90 × 90) · her dark window 140×170, ringed 6.82`}
+        {`map S2: ${M.S2.staffWindows.map((w) => `${w.id} ${w.w}×${w.h}`).join(' · ')} (>= 90) · hers 140×170`}
       </Tx>
     </svg>
     {STAFF_T.map((T, i) => (
@@ -1522,11 +1543,11 @@ const Staff5: React.FC<{y: number}> = ({y}) => (
 
 type PipCell = {name: string; spec: string; size: number; kind?: Kind; bg: string; perch?: 'bollard' | 'post' | 'box' | 'roof' | 'bench' | 'cap' | 'none'; el: (x: number, y: number) => React.ReactNode};
 const PIP_H = 300;
-const PIP_SEAT = 200;
+const PIP_SEAT = 172;
 const Perch: React.FC<{x: number; y: number; kind: PipCell['perch']}> = ({x, y, kind}) => {
   if (kind === 'none' || !kind) return null;
   if (kind === 'bollard') return <path d={`M${x - 24} ${y + 50}L${x - 18} ${y + 8}Q${x} ${y - 4} ${x + 18} ${y + 8}L${x + 24} ${y + 50}Z`} fill={CM.anchor} stroke={CM.ink} strokeWidth={2.2} />;
-  if (kind === 'post') return <rect x={x - 12} y={y} width={24} height={60} fill={CM.anchor} stroke={CM.ink} strokeWidth={2.2} />;
+  if (kind === 'post') return <rect x={x - 12} y={y} width={24} height={54} fill={CM.anchor} stroke={CM.ink} strokeWidth={2.2} />;
   if (kind === 'box') return <rect x={x - 70} y={y} width={140} height={30} fill={CM.brickDeep} stroke={CM.ink} strokeWidth={2.2} />;
   if (kind === 'roof') return <rect x={x - 85} y={y} width={170} height={22} fill={CM.sage} stroke={CM.ink} strokeWidth={2.2} />;
   if (kind === 'bench') return <rect x={x - 80} y={y} width={160} height={14} fill={CM.line} stroke={CM.ink} strokeWidth={2.2} />;
@@ -1538,9 +1559,9 @@ const PipRow: React.FC<{y: number; title: string; cells: PipCell[]}> = ({y, titl
       const x = 90 + i * 180;
       return (
         <g key={i}>
-          <rect x={x - 88} y={32} width={176} height={PIP_SEAT + 18} fill={c.bg} />
+          <rect x={x - 88} y={32} width={176} height={PIP_SEAT + 56 - 32} fill={c.bg} />
           <Perch x={x} y={PIP_SEAT} kind={c.perch} />
-          <Item x={x} ly={PIP_SEAT + 40} name={c.name} spec={c.spec} kind={c.kind ?? 'pip'} size={c.size}>
+          <Item x={x} ly={PIP_SEAT + 76} name={c.name} spec={c.spec} kind={c.kind ?? 'pip'} size={c.size}>
             {c.el(x, PIP_SEAT)}
           </Item>
         </g>
@@ -1597,6 +1618,17 @@ const PIP_ROWS: {title: string; cells: PipCell[]}[] = [
     ],
   },
   {
+    title: 'motion: alert · mid-hop at the S2 → S3 match (12.98) · S3 leap out left · S4 hop to the sun · S5 leap · S8 hop home',
+    cells: [
+      {name: 'alert', spec: 'ears up', size: 100, bg: C.page, perch: 'bollard', el: (x, y) => <Pip x={x} y={y} size={100} pose="alert" facing="back" seed="kc/pp25" />},
+      {name: 'S2→S3 mid-hop', spec: '12.98 match', size: 96, bg: G, perch: 'none', el: (x, y) => <Pip x={x} y={y - 24} size={96} pose="tuck" facing="left" seed="kc/pp26" />},
+      {name: 'S3 leap left', spec: '14.70', size: 96, bg: S, perch: 'none', el: (x, y) => <Pip x={x} y={y - 30} size={96} pose="leap" facing="left" lookUp={0.3} seed="kc/pp27" />},
+      {name: 'S4 hop to sun', spec: '20.25', size: 100, bg: G, perch: 'none', el: (x, y) => <Pip x={x} y={y - 30} size={100} pose="leap" facing="left" lookUp={0.5} seed="kc/pp28" />},
+      {name: 'S5 leap up-right', spec: '23.90 (end size)', size: S5_PIP / DECK.k, kind: 'pipEnd', bg: A, perch: 'none', el: (x, y) => <Pip x={x} y={y - 30} size={S5_PIP / DECK.k} pose="leap" facing="right" seed="kc/pp29" />},
+      {name: 'S8 hop home', spec: '38.82 → f0', size: 96, bg: S, perch: 'none', el: (x, y) => <Pip x={x} y={y - 24} size={96} pose="tuck" facing="right" seed="kc/pp30" />},
+    ],
+  },
+  {
     title: 'states: frame 0 (Pip keeps its colour on the bare-ink page) · draw-on · un-build (no opacity) · the size range 86 / 120',
     cells: [
       {
@@ -1641,6 +1673,7 @@ const PIP_ROWS: {title: string; cells: PipCell[]}[] = [
 
 type Win = {src: [number, number, number, number]; label: string; el: React.ReactNode; scale?: number; x?: number};
 const CANAL_WINS: Win[] = [
+  {src: [0, 0, 1080, 316], label: 'S1 2.50 · the sky above the caption band: the plane branch (y 0-240), the hero cloud (y 120-280)', el: <At T={2.5} start={0}><SampleS1 /></At>},
   {src: [0, 580, 1080, 540], label: 'S1 2.50 · the wing (door, canopy "Google", W plum), the west gap (SUN0, far roofs, bridge), the far towpath: her + G1', el: <At T={2.5} start={0}><SampleS1 /></At>},
   {src: [0, 1100, 1080, 320], label: 'S1 2.50 · the water, two moored boats, ducks, the landing with Pip\'s waterline bollard, the low row', el: <At T={2.5} start={0}><SampleS1 /></At>},
   {src: [0, 980, 1080, 350], label: 'S2 10.00 · newsstand, A-board TOLD THE BBC (K3 stand-in), the bench (reporter, staffer), Pip on the railing post', el: <At T={10.0} start={S2_T0}><SampleS2 /></At>},
@@ -1672,7 +1705,7 @@ const CANAL_H = CANAL_WINS.reduce((s, w) => s + winH(w.src, w.scale ?? 1) + 10, 
 
 const LIFE_H = 520;
 const Life: React.FC<{y: number}> = ({y}) => (
-  <Row y={y} h={LIFE_H} title="the life layer at its sizes: birds 9 / 13 / 16 · pigeons · ducks · heron · smoke · steam · string lights · leaves · cloud" bg={CM.sky}>
+  <Row y={y} h={LIFE_H} title="the life layer at its sizes: birds 9 / 13 / 16 · pigeons · ducks · heron · smoke · lights · leaves" bg={CM.sky}>
     <rect x={0} y={250} width={SW} height={140} fill={CM.water} />
     <rect x={0} y={390} width={SW} height={130} fill={CM.paving} />
     <line x1={20} y1={150} x2={640} y2={150} stroke={CM.anchor} strokeWidth={3} />
@@ -1818,6 +1851,174 @@ const Samples: React.FC<{y: number}> = ({y}) => (
   </>
 );
 
+// ---------------------------------------------------------------- 7. clearances: the map's seats vs the kit's real drawings
+
+type ClashCell = {name: string; shot: string; src: [number, number, number, number]; need?: number; bg: string; a: React.ReactNode; b: React.ReactNode; ctx?: React.ReactNode};
+const CL_W = 262;
+const CL_IMG = 236;
+const CL_H = CL_IMG + 96;
+/** Two pieces at their map positions (frame px), each measured (live SVG bbox): their overlap or gap against `need`
+ *  (0 = must not overlap; S6 = 200 px from the clause). The picture is the region `src`, fitted into the cell. */
+const Clash: React.FC<{x: number; cell: ClashCell; id: string}> = ({x, cell, id}) => {
+  const ra = useRef<SVGGElement>(null);
+  const rb = useRef<SVGGElement>(null);
+  const [res, setRes] = useState<{A: Box; B: Box; ix: number; iy: number; gap: number} | null>(null);
+  const [handle] = useState(() => delayRender(`kit contract: clearance ${cell.name}`));
+  useLayoutEffect(() => {
+    if (res || !ra.current || !rb.current) return;
+    const a = ra.current.getBBox();
+    const b = rb.current.getBBox();
+    const A = {x: a.x, y: a.y, w: a.width, h: a.height};
+    const B = {x: b.x, y: b.y, w: b.width, h: b.height};
+    const ix = Math.min(A.x + A.w, B.x + B.w) - Math.max(A.x, B.x);
+    const iy = Math.min(A.y + A.h, B.y + B.h) - Math.max(A.y, B.y);
+    const dx = Math.max(0, B.x - (A.x + A.w), A.x - (B.x + B.w));
+    const dy = Math.max(0, B.y - (A.y + A.h), A.y - (B.y + B.h));
+    setRes({A, B, ix, iy, gap: ix > 0 && iy > 0 ? 0 : Math.hypot(dx, dy)});
+  }, [res]);
+  useEffect(() => {
+    if (res) continueRender(handle);
+  }, [res, handle]);
+  const [sx, sy, sw, sh] = cell.src;
+  const k = Math.min(CL_W / sw, CL_IMG / sh);
+  const need = cell.need ?? 0;
+  let v: {txt: string; c: string} | null = null;
+  if (res) {
+    const over = res.ix > 0 && res.iy > 0;
+    if (over) v = {txt: `OVERLAP ${Math.round(res.ix)}×${Math.round(res.iy)} px FAIL`, c: C.fail};
+    else if (res.gap < need) v = {txt: `gap ${Math.round(res.gap)} < ${need} FAIL`, c: C.fail};
+    else v = {txt: `gap ${Math.round(res.gap)} px${need ? ` >= ${need}` : ''} OK`, c: C.ok};
+  }
+  return (
+    <g>
+      <defs>
+        <clipPath id={id}>
+          <rect x={x} y={34} width={sw * k} height={sh * k} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>
+        <rect x={x} y={34} width={sw * k} height={sh * k} fill={cell.bg} />
+        <XG m={mat.compose(mat.translate(x, 34), mat.scale(k), mat.translate(-sx, -sy))}>
+          {cell.ctx}
+          <g ref={rb}>{cell.b}</g>
+          <g ref={ra}>{cell.a}</g>
+          {res ? (
+            <>
+              <rect x={res.B.x} y={res.B.y} width={res.B.w} height={res.B.h} fill="none" stroke={C.rule} strokeWidth={2 / k} strokeDasharray={`${8 / k} ${5 / k}`} />
+              <rect x={res.A.x} y={res.A.y} width={res.A.w} height={res.A.h} fill="none" stroke={C.map} strokeWidth={2 / k} strokeDasharray={`${8 / k} ${5 / k}`} />
+            </>
+          ) : null}
+        </XG>
+      </g>
+      <rect x={x} y={34} width={sw * k} height={sh * k} fill="none" stroke={CM.ink} strokeWidth={1.5} />
+      <Tx x={x + 4} y={34 + CL_IMG + 20} s={15} b>
+        {cell.name}
+      </Tx>
+      <Tx x={x + 4} y={34 + CL_IMG + 38} s={13} c={C.mute}>
+        {cell.shot}
+      </Tx>
+      {v ? (
+        <Tx x={x + 4} y={34 + CL_IMG + 57} s={14} c={v.c} b>
+          {v.txt}
+        </Tx>
+      ) : null}
+    </g>
+  );
+};
+/** L5's planned A-board frame round a face rect (stiles ~30 px, rails ~18 px). */
+const frameRect = (r: M.Rect, stile = 30, rail = 18) => <rect x={r.x0 - stile} y={r.y0 - rail} width={r.x1 - r.x0 + stile * 2} height={r.y1 - r.y0 + rail * 2} fill={CM.anchor} />;
+const S6_CLAUSE: M.Rect = {x0: M.S6.board0.x0 + 20, y0: M.S6.clauseTopMinY, x1: M.S6.board0.x1 - 20, y1: M.S6.board0.y1 - 70};
+const CLASH_ROWS: ClashCell[][] = [
+  [
+    {
+      name: 'S2 Pip vs the reporter',
+      shot: 'seat (590,1050) 96 · reporter 165',
+      src: [440, 880, 380, 360],
+      bg: CM.bandGold,
+      ctx: (
+        <>
+          <Staffer x={M.S2.staffer.x} y={S2_BENCH_SEAT} h={M.S2.staffer.h} turnAt={-1} hoodAt={99} />
+          <rect x={M.S2.bench.x0} y={S2_BENCH_SEAT} width={M.S2.bench.x1 - M.S2.bench.x0} height={14} fill={CM.line} />
+        </>
+      ),
+      b: <Reporter x={M.S2.reporter.x} y={S2_BENCH_SEAT} h={M.S2.reporter.h} openAt={-1} shutAt={99} />,
+      a: <Pip x={M.S2.pipSeat.x} y={M.S2.pipSeat.y} size={96} facing="back" target={[M.W2.x, M.W2.y]} seed="kc/cl1" />,
+    },
+    {
+      name: 'S2 Pip vs the A-board',
+      shot: 'seat 96 · A-board face y 1050',
+      src: [400, 900, 300, 260],
+      bg: CM.bandGold,
+      b: <rect x={M.S2.aBoard.x0 - 16} y={M.S2.aBoard.y0 - 12} width={M.S2.aBoard.x1 - M.S2.aBoard.x0 + 32} height={M.S2.aBoard.y1 - M.S2.aBoard.y0 + 24} fill={CM.anchor} />,
+      a: <Pip x={M.S2.pipSeat.x} y={M.S2.pipSeat.y} size={96} facing="back" target={[M.W2.x, M.W2.y]} seed="kc/cl2" />,
+    },
+    {
+      name: 'S3 Pip vs her window',
+      shot: 'seat (462,878) 96 · W2_CUT',
+      src: [240, 680, 330, 250],
+      bg: CM.bandSunset,
+      b: <rect x={M.W2_CUT.x - M.W2_CUT.w / 2} y={M.W2_CUT.y - M.W2_CUT.h / 2} width={M.W2_CUT.w} height={M.W2_CUT.h} fill={CM.lamp} stroke={CM.hero} strokeWidth={5} />,
+      a: <Pip x={M.S3.pipSeat.x} y={M.S3.pipSeat.y} size={96} facing="back" look={-0.6} seed="kc/cl3" />,
+    },
+    {
+      name: 'S4 Pip vs her',
+      shot: 'seat (470,1218) 100 · her 170',
+      src: [380, 860, 420, 400],
+      bg: CM.bandGold,
+      b: <Her x={M.S4.her.x} y={M.S4.her.feetY} h={M.S4.her.h} view="profile" step={0.3} stride={strideFor(34, 170)} />,
+      a: <Pip x={M.S4.pipSeat.x} y={M.S4.pipSeat.y} size={100} pose="ride" facing="back" seed="kc/cl4" />,
+    },
+  ],
+  [
+    {
+      name: 'S5 Pip vs the news box',
+      shot: 'seat (415,1120) 108 · box x 470',
+      src: [320, 880, 400, 360],
+      bg: CM.skyHigh,
+      b: <rect x={M.S5.start.newsBox.x0} y={M.S5.start.newsBox.y0} width={M.S5.start.newsBox.x1 - M.S5.start.newsBox.x0} height={M.S5.start.newsBox.y1 - M.S5.start.newsBox.y0 - 56} fill={CM.coatSlate} />,
+      a: <Pip x={M.S5.start.pipSeat.x} y={M.S5.start.pipSeat.y} size={S5_PIP} facing="back" seed="kc/cl5" />,
+    },
+    {
+      name: 'S6 Pip vs the F11 clause',
+      shot: 'post (770,720) 98 · clause y 920',
+      src: [100, 600, 760, 640],
+      need: M.LEGIBILITY.pipClauseClearPx,
+      bg: CM.skyHigh,
+      b: <rect x={S6_CLAUSE.x0} y={S6_CLAUSE.y0} width={S6_CLAUSE.x1 - S6_CLAUSE.x0} height={S6_CLAUSE.y1 - S6_CLAUSE.y0} fill={CM.stucco} />,
+      a: <Pip x={M.S6.pipSeat0.x} y={M.S6.pipSeat0.y} size={98} facing="back" target={[960, 790]} seed="kc/cl6" />,
+    },
+    {
+      name: 'S7 / S8 Pip vs the board',
+      shot: 'bollard (700,1205) 96 · B + 30',
+      src: [560, 1020, 260, 250],
+      bg: CM.bandSunset,
+      ctx: <Bollard x={M.BOARD_BOLLARD.x} y={M.BOARD_BOLLARD.y + 44} h={44} seed="kc/cl7b" />,
+      b: frameRect(M.B),
+      a: <Pip x={M.BOARD_BOLLARD.x} y={M.BOARD_BOLLARD.y} size={96} facing="back" seed="kc/cl7" />,
+    },
+    {
+      name: 'S8 ghosts vs the board',
+      shot: 'S8.ghosts x 658-734 · B + 30',
+      src: [560, 880, 260, 240],
+      bg: CM.bandSunset,
+      b: frameRect(M.B),
+      a: <S8Ghosts at={-10} />,
+    },
+  ],
+];
+const CLASH_ROW_H = CL_H + 8;
+const ClashRows: React.FC<{y: number}> = ({y}) => (
+  <>
+    {CLASH_ROWS.map((row, r) => (
+      <Row key={r} y={y + r * CLASH_ROW_H} h={CLASH_ROW_H} title={r === 0 ? 'clearances 1: magenta = A (Pip, ghosts), red = B; both measured live' : 'clearances 2: (S6: >= 200 px from every clause line, TREATMENT section 3)'} bg={C.strip}>
+        {row.map((c, i) => (
+          <Clash key={c.name} x={6 + i * 268} cell={c} id={`kcClash${r}${i}`} />
+        ))}
+      </Row>
+    ))}
+  </>
+);
+
 // ---------------------------------------------------------------- the layout
 
 const SECTIONS: Sec[] = [
@@ -1840,20 +2041,23 @@ const SECTIONS: Sec[] = [
   {h: N1H, C: Seat1},
   {h: N2H, C: Near2},
   {h: N3H, C: Near3},
+  {h: BT_H, C: BottomS1},
   {h: N4H, C: Bench4},
   {h: N5H, C: Extras5},
   secHead('5', 'S2 STAFF WINDOWS', 'K6 WingS2 at its pose (zoom 1.00) + K4 StaffWindow (silhouette, step back, Blind) through storyOverlay, 1:1'),
   {h: ST_H, C: Staff5},
   secHead('6', 'PIP', 'K5 towpath Pip: every pose of the shot list at its size and perch; drawn bbox includes the ears (span) and the tail'),
   ...PIP_ROWS.map((r) => ({h: PIP_H, C: ({y}: {y: number}) => <PipRow y={y} title={r.title} cells={r.cells} />})),
-  secHead('7', 'CANAL · 1:1', 'K6 sets at the map poses with K4 + K5 plugged in (the sample assemblies), windows at true size'),
+  secHead('7', 'CLEARANCES', 'map.ts seats and rects vs the kit\'s real drawings (live bbox): no overlap, S6 >= 200 px from the clause'),
+  {h: 2 * CLASH_ROW_H, C: ClashRows},
+  secHead('8', 'CANAL · 1:1', 'K6 sets at the map poses with K4 + K5 plugged in (the sample assemblies), windows at true size'),
   {h: CANAL_H, C: CanalWins},
   {h: LIFE_H, C: Life},
   {h: WIPER_H, C: Wiper},
-  secHead('8', 'ARLINGTON (K7)', 'CraneSet (S5: start, peak, end) and GateSet (S6) with K4 + K5 + K3 stand-ins; 0.5 frames, then 1:1 windows'),
+  secHead('9', 'ARLINGTON (K7)', 'CraneSet (S5: start, peak, end) and GateSet (S6) with K4 + K5 + K3 stand-ins; 0.5 frames, then 1:1 windows'),
   {h: 2 * DC_PAIR_H, C: DcPairs},
   {h: DC_WINS_H, C: DcWins},
-  secHead('9', 'THE FOUR ASSEMBLED SAMPLE FRAMES', 'V2S1 2.50 · V2S2 10.00 · V2S4 17.00 · V2S8 37.00, at 0.5, under the film\'s captions'),
+  secHead('10', 'THE FOUR ASSEMBLED SAMPLE FRAMES', 'V2S1 2.50 · V2S2 10.00 · V2S4 17.00 · V2S8 37.00, at 0.5, under the film\'s captions'),
   {h: SAMPLE_H, C: Samples},
 ];
 const SHEET_H = SECTIONS.reduce((s, x) => s + x.h, 0);
@@ -1883,12 +2087,23 @@ const FRAME_COMPS: Record<string, React.FC> = {
   V2S4: () => <ContractFrame id="V2S4" />,
   V2S8: () => <ContractFrame id="V2S8" />,
 };
+const BARE_COMPS: Record<string, React.FC> = {
+  V2S1: () => <ContractFrame id="V2S1" bare />,
+  V2S2: () => <ContractFrame id="V2S2" bare />,
+  V2S4: () => <ContractFrame id="V2S4" bare />,
+  V2S8: () => <ContractFrame id="V2S8" bare />,
+};
 const ContractRoot: React.FC = () => (
   <>
     <Composition id="KitContract" component={KitContract} fps={FPS} width={SW} height={SHEET_H} durationInFrames={1} />
     {SAMPLE_T.map((s) => (
-      <Composition key={s.id} id={`KitContractFrame-${s.id}`} component={FRAME_COMPS[s.id]} fps={FPS} width={1080} height={1920} durationInFrames={FILM_F} />
+      <React.Fragment key={s.id}>
+        <Composition id={`KitContractFrame-${s.id}`} component={FRAME_COMPS[s.id]} fps={FPS} width={1080} height={1920} durationInFrames={FILM_F} />
+        <Composition id={`KitContractBare-${s.id}`} component={BARE_COMPS[s.id]} fps={FPS} width={1080} height={1920} durationInFrames={FILM_F} />
+      </React.Fragment>
     ))}
+    <Composition id="KitContractS5" component={SampleS5} fps={FPS} width={1080} height={1920} durationInFrames={M.frameOf(24.0 - 20.55)} />
+    <Composition id="KitContractS6" component={SampleS6} fps={FPS} width={1080} height={1920} durationInFrames={M.frameOf(28.06 - 24.0)} />
   </>
 );
 
