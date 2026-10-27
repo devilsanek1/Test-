@@ -40,6 +40,7 @@ import {
   type Pt,
 } from '../kit';
 import {O1Desk, O1FarTown, O1Listing, O1Mug, O1NearLife, O1Pip, O1Plume, O1Wall} from './O1_dress';
+import {LandSprays} from './O1_life';
 
 // ---------------------------------------------------------------- timing (O1-local seconds = VO seconds)
 
@@ -147,6 +148,7 @@ const Outside: React.FC = () => (
     <O1FarTown />
     <TownBand y={HORIZON + 2} houses={[{x: 205, w: 70, lit: true}, {x: 762, w: 60, lit: true, chimney: true}]} far at={-0.1} seed="o1/town" />
     <DataCenterBeat />
+    <LandSprays lands={FLIGHTS.map((f) => ({t: f.t0 + FLIGHT - 0.04, x: f.land[0], y: f.land[1]}))} />
     <O1Plume />
     <O1NearLife />
   </>

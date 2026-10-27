@@ -10,10 +10,14 @@
 //                (warm windows switching, two silhouettes, chimney smoke), a street lamp, walkers, three snow layers.
 // Frame 0: the dressing's ink is mid-draw (at -0.14 .. -0.02, lighter weights than the window, phone and tag); fills
 // land by ~0.2; the life pops after (bulbs 0.3-1.0, the candle 0.62). t < 0 = bare lines only (the loop underlay).
-// Pip: watches the phone, follows each stick up the glass (1.88 / 2.18 / 2.40), a small hop on "pricier" (2.62),
-// ears-cover when the building goes dark (4.16), then faces the dark building; in S15 (O1 time 7.56) its head turns
-// from the building down to the tag. Scripted outside beats: a neighbour's light off at 4.6 (and 6.44 = S15 37.0),
-// a walker reaches the lamp at 5.0, another passes under it at 7.04 (= S15 37.6).
+// More dressing and life in O1_life.tsx (G5b pilot pass 2): photos on a cord, a lit paper star, a wall calendar,
+// mittens, letters, a radio, an open planner; outside an outside-sill snow ridge, icicles, a shoveller, snow sliding
+// off the eaves (1.18, 5.36; S15 6.80, 7.80), roof-snow sprays on each stick landing, a car in S15's street.
+// Pip: watches the phone, turns round to you on "Buying a laptop soon?" (0.92-1.56: sit-front), follows each stick up
+// the glass (1.88 / 2.18 / 2.40), a small hop on "pricier" (2.62), ears-cover when the building goes dark (4.16),
+// then faces the dark building; in S15 (O1 time 7.56) it turns round from the building to the tag (sit-front).
+// Scripted outside beats: a neighbour's light off at 4.6 (and 6.44 = S15 37.0), a walker reaches the lamp at 5.0,
+// another passes under it at 7.04 (= S15 37.6), a car rolls along the street from 5.9 (S15 36.46).
 import React from 'react';
 import {Fill} from '../../../lib/Fill';
 import {Ink} from '../../../lib/Ink';
@@ -21,7 +25,7 @@ import {blob, circle, ellipse, line, roundRect, textLines} from '../../../lib/sk
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {Letters, Mittens, O1GlassLife, PhotoLine, Planner, Radio, StarLantern} from './O1_life';
+import {Letters, Mittens, O1GlassLife, PhotoLine, Planner, Radio, StarLantern, StreetCar} from './O1_life';
 import {
   b,
   BookStack,
@@ -119,9 +123,11 @@ export const O1NearLife: React.FC = () => {
   return (
     <>
       <NearFronts x0={168} x1={912} y={1036} h={[42, 64]} n={4} seed="o1/near" at={0.02} sil={{2: 'cross', 6: 'read', 9: 'wave'}} force={[{i: 9, t: -9, on: true}, {i: 9, t: 4.6, on: false}, {i: 4, t: -9, on: true}, {i: 4, t: 6.44, on: false}]} />
-      <LampPost3 x={LAMP_X} y={1132} h={130} arm="top" seed="o1/lamp" at={0.04} ink={0} />
       <Stroller t={t} t0={2.9} t1={9} x0={LAMP_X + 63} x1={LAMP_X - 120} y={1040} h={30} coat={EMBER.beam} kind="dog" />
       <Stroller t={t} t0={3.2} t1={9} x0={LAMP_X - 115} x1={LAMP_X + 59} y={1042} h={28} coat={EMBER.skyLow} hair={EMBER.books[3]} />
+      {/* S15's hold: a car rolls along the street right to left (O1 5.9 = VO 36.46) */}
+      <StreetCar t0={5.9} t1={9.2} x0={950} x1={170} y={1056} />
+      <LampPost3 x={LAMP_X} y={1132} h={130} arm="top" seed="o1/lamp" at={0.04} ink={0} />
       <O1GlassLife />
       <SnowLayers x={180} y={630} w={720} h={430} band={null} seed="o1/snowL" at={0.1} wind={-6} density={1.5} />
     </>
@@ -195,6 +201,7 @@ const PIP_KEYS: PipPoseKey[] = [
   {t: 1.56, pose: 'sit-back'}, // ...and back to the phone before the first stick
   {t: 4.16, pose: 'ears-cover'},
   {t: 4.96, pose: 'sit-back'},
+  {t: S15_TURN, pose: 'sit-front'}, // S15 "ends up on your": it turns round from the building to the tag (S16 picks it up beside the tag)
 ];
 const PIP_LOOK: LookKey[] = [
   {t: -9, v: -0.5}, // down-left at the phone and its $999

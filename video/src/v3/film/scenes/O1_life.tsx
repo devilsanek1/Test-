@@ -16,7 +16,7 @@ import {Ink} from '../../../lib/Ink';
 import {blob, circle, line, polyPath, roundRect, textLines, wire, wirePoint} from '../../../lib/sketch';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {b, EMBER, fillAt, Icicles, Pop, RoofNeighbour, Show, SnowSill, sway, W, type At, type Pt} from '../kit';
+import {b, Car3, EMBER, fillAt, Icicles, Pop, RoofNeighbour, Show, SnowSill, sway, W, type At, type Pt} from '../kit';
 
 // ---------------------------------------------------------------- the wall
 
@@ -263,6 +263,45 @@ export const SnowSlide: React.FC<{x: number; t0: number; y0?: number; y1?: numbe
   return <>{parts}</>;
 };
 
+/** Secondary motion on the stick landings: each stick that sinks into the data center's roof kicks up a low spray of
+ *  roof snow that spreads along the roof line and shrinks to nothing (0.42 s). Fill only (far plane). */
+export const LandSprays: React.FC<{lands: {t: number; x: number; y: number}[]}> = ({lands}) => {
+  const t = useTime();
+  return (
+    <>
+      {lands.map((l, i) => {
+        const u = (t - l.t) / 0.42;
+        if (u < 0 || u >= 1) return null;
+        const grow = Math.sin(Math.PI * Math.min(1, u * 1.15));
+        const rx = 14 + 36 * u;
+        const ry = (6 + 10 * u) * grow;
+        if (ry < 0.6) return null;
+        const bits = [-1, -0.4, 0.4, 1].map((k, j) => {
+          const bx = l.x + k * (20 + 46 * u);
+          const by = l.y - 10 - 26 * Math.sin(Math.PI * u) * (1 - Math.abs(k) * 0.3);
+          const r = 4.5 * (1 - u);
+          return r > 0.6 ? <path key={j} d={circle(bx, by, r)} fill={EMBER.snow} /> : null;
+        });
+        return (
+          <React.Fragment key={i}>
+            <path d={blob(l.x, l.y - ry * 0.6, rx, ry, {seed: `o1/spray${i}`})} fill={EMBER.snow} />
+            {bits}
+          </React.Fragment>
+        );
+      })}
+    </>
+  );
+};
+
+/** A car rolling along the street under the neighbours' fronts (right to left, headlights on, exhaust), fill only.
+ *  Seen in S15's hold (O1 5.9-9.2), once the lowered phone has cleared the street; ~2.4 car lengths / s. */
+export const StreetCar: React.FC<{t0: number; t1: number; x0: number; x1: number; y: number; w?: number}> = ({t0, t1, x0, x1, y, w = 86}) => {
+  const t = useTime();
+  if (t < t0 || t > t1) return null;
+  const x = x0 + ((x1 - x0) * (t - t0)) / (t1 - t0);
+  return <Car3 x={x} y={y} w={w} view="side" dir={x1 >= x0 ? 1 : -1} color={EMBER.beam} beam={EMBER.frost} lights snow exhaust rolling ink={0} seed="o1/car" />;
+};
+
 /** Outside life at the glass edges: a snow ridge on the outside sill, icicles under the lintel, a shoveller. */
 export const O1GlassLife: React.FC = () => (
   <>
@@ -272,9 +311,10 @@ export const O1GlassLife: React.FC = () => (
     </Show>
     <SnowSill x0={176} x1={904} y={1060} h={13} seed="o1/osill" ink={0} at={0.04} drips={0} />
     {/* snow sliding off the eaves: during the question (O1 1.18, left of the building), after the sign (5.36, right
-        of the mullion, behind Pip) and in S15's hold (O1 6.92 = VO 37.48) */}
+        of the mullion, behind Pip) and twice in S15's hold (O1 6.80 / 7.80 = VO 37.36 / 38.36) */}
     <SnowSlide x={286} t0={1.18} seed="o1/slide1" />
     <SnowSlide x={872} t0={5.36} w={40} y1={1050} seed="o1/slide2" />
-    <SnowSlide x={262} t0={6.92} w={42} seed="o1/slide3" />
+    <SnowSlide x={262} t0={6.8} w={42} seed="o1/slide3" />
+    <SnowSlide x={792} t0={7.8} w={38} seed="o1/slide4" />
   </>
 );
