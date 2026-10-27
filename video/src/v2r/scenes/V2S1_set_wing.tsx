@@ -21,7 +21,7 @@ import {s1Layout} from '../kit/canal/wing';
 import {litAt, Pigeons} from '../kit/canal/life';
 import {HandLetteredGoogle} from '../kit/canal/lettering';
 import * as MAP from '../world/map';
-import {CellPaint, barPath} from './V2S1_set_core';
+import {CellPaint, barPath, Under, UnderPaint} from './V2S1_set_core';
 
 // ---------------------------------------------------------------- the layout (local metres: u east, v down)
 
@@ -381,15 +381,18 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
   b.poly(CM.limestone, q(u0 - 0.14, v0 + h, w + 0.28, 0.1));
   b.poly(CM.stoneShade, q(u0 - 0.14, v0 + h + 0.085, w + 0.28, 0.035));
   b.layer();
-  const [rx, ry] = pp(0.4, 1.032);
-  const s = PM.pxPerM(u0 + w * 0.4);
-  const RX = s * 0.15;
-  const RY = s * 0.04;
+  // the ring her plant left: a dark stain ring with a pale dust-free centre, a few soil crumbs and a dropped leaf;
+  // sized to read at 216 px (~44 x 12 px), every line in ink (the kit drew it in CM.line)
+  const [rx, ry] = pp(0.42, 1.04);
+  const s = PM.pxPerM(u0 + w * 0.42);
+  const RX = s * 0.24;
+  const RY = s * 0.066;
   b.fill(CM.shadeWarm, `M${P(rx - RX, ry)}A${RX.toFixed(1)} ${RY.toFixed(1)} 0 1 0 ${P(rx + RX, ry)}A${RX.toFixed(1)} ${RY.toFixed(1)} 0 1 0 ${P(rx - RX, ry)}Z`);
-  b.fill(CM.limestone, ovalPath(rx, ry - 0.4, RX * 0.72, RY * 0.5));
-  for (const [dx, dy] of [[1.5, -0.2], [1.75, 0.3], [-1.45, 0.25]] as [number, number][]) b.fill(CM.line, ovalPath(rx + dx * RX * 0.8, ry + dy * RY, 1.6, 1.1));
-  b.fill(CM.sage, leafPath(rx + RX * 1.9, ry - 1, 13, 4, -14));
-  inkM.push(ellipse(rx, ry, RX, RY, {seed: 's1W/ring', wobble: 0.02, overlap: 14}));
+  b.fill(CM.paper, ovalPath(rx, ry - 0.3, RX * 0.7, RY * 0.52));
+  for (const [dx, dy, sz] of [[1.25, -0.3, 2.2], [1.45, 0.35, 1.6], [-1.3, 0.3, 2], [-1.12, -0.5, 1.4], [1.1, 0.8, 1.3]] as [number, number, number][]) b.fill(CM.brickDeep, ovalPath(rx + dx * RX, ry + dy * RY, sz, sz * 0.7));
+  b.fill(CM.sage, leafPath(rx + RX * 1.75, ry - 1.5, 16, 5, -18));
+  inkM.push(ellipse(rx, ry, RX, RY, {seed: 's1W/ring', wobble: 0.02, overlap: 16}));
+  inkF.push(ellipse(rx, ry - 0.3, RX * 0.7, RY * 0.52, {seed: 's1W/ring2', wobble: 0.03, overlap: 6}));
   // W's lines: the frame (closed), the glass edge, the mullions, the sill, the chair and the lamp
   inkM.push(poly(qq(0, 0, 1, 1), {closed: true, over: 'small', seed: 's1W/frame'}));
   inkF.push(line(...pp(0.12 - 0.022, 0.01), ...pp(0.12 - 0.022, 0.99), {seed: 's1W/m1', over: 'none'}));
@@ -469,6 +472,22 @@ export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
     const parts = bay.split ? [[bay.u0 + 0.045, bay.u0 + (bay.u1 - bay.u0) * bay.split - 0.025], [bay.u0 + (bay.u1 - bay.u0) * bay.split + 0.025, bay.u1 - 0.045]] : [[bay.u0 + 0.045, bay.u1 - 0.045]];
     for (const [a, c] of parts) panes.push([a, va, c - a, vb - va]);
   }
+  // the frame-0 drawing of the panes (their fills are paper until the flood): a room line, a desk or a sill line and a
+  // glass glint per pane, each pane's group gone on the frame its colour lands (the bare-line state reads dense)
+  const under = useMemo(() => {
+    const u = new Under();
+    panes.forEach(([u0, v0, w, h], k) => {
+      const r = rng(`s1paneU/${k}`);
+      const pp = (a: number, c: number) => p(u0 + a * w, v0 + c * h);
+      const [cx, cy] = pp(0.5, 0.5);
+      const lo = r.range(0.56, 0.68);
+      let d = `M${P(...pp(0.04, lo))}L${P(...pp(0.96, lo - r.range(0.06, 0.16)))}`;
+      d += `M${P(...pp(0.12, 0.86))}L${P(...pp(0.88, 0.86))}`;
+      d += `M${P(...pp(0.62, 0.04))}L${P(...pp(0.42, 0.3))}M${P(...pp(0.74, 0.04))}L${P(...pp(0.56, 0.26))}`;
+      u.add(cx, cy, d, INK_PX.hair);
+    });
+    return u;
+  }, []);
   panes.forEach(([u0, v0, w, h], k) => {
     const lit = litAt(t, 's1wing', k, panes.length, {litFrac: 0.55});
     paneInto(dyn, inkP, u0, v0, w, h, lit, `s1pane/${k}/${lit ? 'L' : 'U'}`, k % 4);
@@ -486,6 +505,7 @@ export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
     <>
       <CellPaint b={stat} seed="s1wing/stat" cell={110} />
       <CellPaint b={dyn} seed="s1wing/panes" cell={110} live />
+      <UnderPaint u={under} seed="s1wing/paneU" />
       <CellPaint b={wb} seed="s1wing/W" cell={400} live />
       <CellPaint b={lobby} seed="s1wing/lobby" cell={400} />
       {behindDoor}

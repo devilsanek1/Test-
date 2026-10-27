@@ -383,11 +383,12 @@ type BirdSpec = {x: number; y: number; delay: number; dur: number; c1: Pt; c2: P
 /** The five on the bridge railing (lift 1.40: the bus and the cyclist pass them) and the six on the far roofs (lift
  *  on "life" 4.98). Plum, 30-40 px wingspan on the railing set; each wheels west on a curve, never above y 580. */
 const RAIL_BIRDS: BirdSpec[] = [
-  {x: 150, y: BRIDGE.railTop, delay: 0.0, dur: 1.55, c1: [228, 650], c2: [-170, 598], size: 18, ph: 0.3},
-  {x: 166, y: BRIDGE.railTop, delay: 0.06, dur: 1.7, c1: [250, 668], c2: [-150, 622], size: 17, ph: 1.9},
-  {x: 181, y: BRIDGE.railTop, delay: 0.03, dur: 1.62, c1: [262, 640], c2: [-190, 606], size: 19, ph: 3.1},
-  {x: 197, y: BRIDGE.railTop, delay: 0.11, dur: 1.82, c1: [280, 676], c2: [-140, 640], size: 16, ph: 4.4},
-  {x: 214, y: BRIDGE.railTop, delay: 0.16, dur: 1.75, c1: [300, 652], c2: [-160, 616], size: 18, ph: 5.2},
+  // the quadratic's midpoint (u 0.5) = 0.25 perch + 0.5 c1 + 0.25 c2 lands on the disc (200, 690): they wheel ACROSS it
+  {x: 150, y: BRIDGE.railTop, delay: 0.0, dur: 1.55, c1: [318, 598], c2: [-170, 612], size: 18, ph: 0.3},
+  {x: 166, y: BRIDGE.railTop, delay: 0.06, dur: 1.7, c1: [330, 612], c2: [-150, 634], size: 17, ph: 1.9},
+  {x: 181, y: BRIDGE.railTop, delay: 0.03, dur: 1.62, c1: [312, 590], c2: [-190, 600], size: 19, ph: 3.1},
+  {x: 197, y: BRIDGE.railTop, delay: 0.11, dur: 1.82, c1: [340, 624], c2: [-140, 648], size: 16, ph: 4.4},
+  {x: 214, y: BRIDGE.railTop, delay: 0.16, dur: 1.75, c1: [326, 604], c2: [-160, 622], size: 18, ph: 5.2},
 ];
 const ROOF_BIRDS: BirdSpec[] = [
   {x: 44, y: NEAR[0].top - 30 * 0.75, delay: 0.0, dur: 1.9, c1: [96, 690], c2: [-210, 612], size: 12, ph: 0.6},

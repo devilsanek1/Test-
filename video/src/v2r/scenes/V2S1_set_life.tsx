@@ -18,7 +18,7 @@ import {Batch, P, Pt, rng, ovalPath, lerp, leafPath, lobes} from '../kit/canal/c
 import {boatInto, boatGeom, BoatOpts} from '../kit/canal/boat';
 import {bollardInto} from '../kit/canal/towpath';
 import {Puffs} from '../kit/canal/life';
-import {Person} from '../kit/cast';
+import {Person, Seated} from '../kit/cast';
 import * as MAP from '../world/map';
 import {CellPaint, Under, UnderPaint, barPath, planeLeaf} from './V2S1_set_core';
 import {floodAt} from './V2S1_clock';
@@ -130,7 +130,7 @@ export const S1FarTowpath: React.FC = () => {
 /** Bollards and lamp posts along the far towpath, shrinking round the bend (the row's diminishing reads as "down the
  *  bending towpath"). Lamps stand at the path's back (the wall side), bollards on the coping. */
 const S1_BOLLARDS = [770, 430, 262, 160, 66];
-const S1_FAR_LAMPS = [{x: 1046, h: 366}, {x: 752, h: 340}, {x: 360, h: 0}, {x: 205, h: 0}];
+const S1_FAR_LAMPS = [{x: 1046, h: 366}, {x: 752, h: 340}, {x: 360, h: 0}, {x: 6, h: 0}];
 export const S1PathFurniture: React.FC = () => {
   const b = useMemo(() => {
     const b = new Batch();
@@ -315,23 +315,26 @@ export const S1Boats: React.FC = () => (
   </>
 );
 
-/** The boater: a small back-ish figure (3/4) at A's stern, a cap, a mustard jumper (no plum, no bun, no long coat:
- *  LOOKALIKE_RADIUS_PX), slowly coiling a rope: a gentle sway, a turn of the head on the ding. */
+/** The boater: a small seated back on boat A's cabin roof (the visible end, behind boat B), a beanie and a mustard
+ *  jumper (no plum, no bun, no long coat: LOOKALIKE_RADIUS_PX), a mug that rises to the mouth and back (every ~3 s),
+ *  the head turning toward the ding (0.47-1.3). */
 const Boater: React.FC = () => {
   const t = useTime();
   const g = boatGeom(BOAT_A);
-  const x = g.X(0.03);
-  const y = g.gunTop + 1;
-  const sway = Math.sin(t * 2.1) * 0.06;
-  return <Person x={x} y={y} h={112} seed="s1/boater" pose="stand" view="rear34" turn={t > 0.47 && t < 1.3 ? 0.5 : sway} traits={{hair: 'beanie', hatColor: CM.brick, coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />;
+  const x = 962;
+  const y = g.roofY - g.roofH - (BOAT_A.topView ?? 0) * 0.4;
+  const ph = (t + 0.4) / 3.1;
+  const k = ph - Math.floor(ph);
+  const cup = k < 0.18 ? k / 0.18 : k < 0.42 ? 1 : k < 0.6 ? 1 - (k - 0.42) / 0.18 : 0;
+  return <Seated x={x} y={y} h={64} seed="s1/boater" cup={cup} turn={t > 0.47 && t < 1.3 ? 0.55 : Math.sin(t * 0.9) * 0.12} traits={{hair: 'beanie', hatColor: CM.brick, coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none'}} />;
 };
 
 /** A ginger cat curled on boat B's roof: a loaf of leafRust with a tail curl; lifts its head at 1.10 and 4.98. */
 const Cat: React.FC = () => {
   const t = useTime();
   const g = boatGeom(BOAT_B);
-  const x = g.X(0.62);
-  const y = g.roofY - g.roofH - 6;
+  const x = 1004;
+  const y = g.roofY - g.roofH - (BOAT_B.topView ?? 0) * 0.45;
   const up = (a: number) => Math.max(0, Math.min(1, (t - a) / 0.12)) * Math.max(0, Math.min(1, (a + 1.3 - t) / 0.2));
   const lift = Math.max(up(MAP.S1_CLOCK.doorsShut), up(MAP.S1_LIFE_T));
   const b = new Batch();
@@ -351,22 +354,24 @@ const Cat: React.FC = () => {
 
 // ---------------------------------------------------------------- the far-towpath life
 
-/** Jogger 1 (TREATMENT f96): in frame at f0 on the bend (x ~57, ink only), runs EAST at 360 px/s (~2.4 body heights/s)
- *  on the path's back half, out of the doorway zone until 1.25 (x 507), passes BEHIND her at 1.66, clear of her by
- *  ~1.85, gone right by 3.0. Cap, mustard top, slate tights (no plum, bun or long coat near her). */
-export const S1_JOG1 = {pass: 1.66, at: 655, speed: 360} as const;
-/** Jogger 2 (TREATMENT f195): enters left ~1.9, runs EAST at 295 px/s through the row unaware (G3 ~3.40, after G3's
- *  pop), passes her ~3.95, beyond x 600 by 4.4 (the row's zone), gone right by ~5.8. Beanie, rust top. */
-export const S1_JOG2 = {pass: 3.95, at: 561, speed: 295} as const;
+/** Jogger 1: in frame at f0 on the bend (x 236, ink only), runs WEST at 340 px/s (~2.3 body heights/s) under the
+ *  bridge and out of the left edge by ~0.9: the hook's first second has a runner and the bare-line bend a figure, and
+ *  the doorway (0.40-1.25) and her 1.25-2.45 stand-alone stay clear (V2S1_clock KEEP_CLEAR: a pass at 1.60 would cross
+ *  her and the doorway, so TREATMENT f96's "a jogger passes her" is jogger 2's pass at 3.85). Cap, mustard top. */
+export const S1_JOG1 = {pass: 0, at: 236, speed: -340} as const;
+/** Jogger 2 (TREATMENT f195): enters left ~2.26, runs EAST at 380 px/s (~2.4 body heights/s) through the row unaware
+ *  (G3 ~3.40, 100+ px clear of G3's pop at 3.20), passes behind her at 3.85, beyond x 600 by 4.4 (the row's zone) and
+ *  off the right edge before the cover (5.30). Beanie, rust top. */
+export const S1_JOG2 = {pass: 3.85, at: 565, speed: 380} as const;
 export const s1Jog1X = (t: number) => S1_JOG1.at + S1_JOG1.speed * (t - S1_JOG1.pass);
 export const s1Jog2X = (t: number) => S1_JOG2.at + S1_JOG2.speed * (t - S1_JOG2.pass);
 
-const Jogger: React.FC<{x: number; seed: string; traits: React.ComponentProps<typeof Person>['traits']; rate: number}> = ({x, seed, traits, rate}) => {
+const Jogger: React.FC<{x: number; seed: string; traits: React.ComponentProps<typeof Person>['traits']; rate: number; flip: boolean}> = ({x, seed, traits, rate, flip}) => {
   if (x < -70 || x > 1150) return null;
   const xx = Math.max(-200, Math.min(1300, x));
   const feet = MAP.s1TowpathFeetY(Math.max(0, Math.min(1080, xx))) - 9;
   const h = MAP.s1FigureHAt(Math.max(0, Math.min(1080, xx))) * 0.94;
-  return <Person x={xx} y={feet} h={h} seed={seed} pose="jog" view="profile" flip walk={{rate}} traits={traits} />;
+  return <Person x={xx} y={feet} h={h} seed={seed} pose="jog" view="profile" flip={flip} walk={{rate}} traits={traits} />;
 };
 
 /** A walker far right on the towpath behind the boats (calm: 0.9 body heights/s east, then gone at the edge). */
@@ -376,8 +381,8 @@ export const S1FarLife: React.FC = () => {
   const t = useTime();
   return (
     <>
-      <Jogger x={s1Jog1X(t)} seed="s1/jog1" rate={2.9} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: CM.hair[1], coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none', shoes: CM.paper}} />
-      <Jogger x={s1Jog2X(t)} seed="s1/jog2" rate={2.7} traits={{hair: 'beanie', hatColor: CM.sage, coat: CM.leafRust, coatLen: 'jacket', trousers: CM.shadeCool, acc: 'headphones', accColor: CM.coatOat, shoes: CM.paper}} />
+      <Jogger x={s1Jog1X(t)} seed="s1/jog1" rate={2.9} flip={false} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: CM.hair[1], coat: CM.coatMustard, coatLen: 'jacket', trousers: CM.coatSlate, acc: 'none', shoes: CM.paper}} />
+      <Jogger x={s1Jog2X(t)} seed="s1/jog2" rate={2.8} flip traits={{hair: 'beanie', hatColor: CM.sage, coat: CM.leafRust, coatLen: 'jacket', trousers: CM.shadeCool, acc: 'none', shoes: CM.paper}} />
       {/* a man reading the moorings sign far right, behind the boats: a slight sway, a turn on the ding */}
       <Person x={S1_WALKER.x0 + 140} y={MAP.s1TowpathFeetY(1045) - 14} h={MAP.s1FigureHAt(1045) * 0.9} seed="s1/standR" pose="stand" view="back" turn={t > 0.5 && t < 1.6 ? -0.45 : Math.sin(t * 1.3) * 0.08} traits={{hair: 'short', hairColor: CM.hair[2], coat: CM.coatSlate, coatLen: 'jacket', trousers: CM.line, acc: 'backpack', accColor: CM.brick}} />
     </>
