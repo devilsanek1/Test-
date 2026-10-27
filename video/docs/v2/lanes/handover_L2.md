@@ -51,3 +51,40 @@ Setup checked: `npm ci` OK, the headless shell path in remotion.config.ts exists
 5. Measure head-back widths (<= ~140 px) and add more near-ground life if density/deadframes ask for it.
 6. Review files per brief_L2.md, the critic loop (no workflow or critic round was run yet), report_L2.md.
 - REQUEST: swap to L5's ToldTheBBCBoard when it lands.
+
+## 2026-10-27 ~15:10 UTC, third helper (/effort max session): PAUSED by the orchestrator (5-hour limit); resume after 18:30 UTC
+**State on video-production (pushed, V2S2 typechecks; other lanes' WIP may show tsc errors, e.g. V2S5_deck_props.tsx):**
+- Round 0 critic panel (4 lenses: art director, sound-off, standards, motion) on the inherited build: **all FAIL**. Musts: Pip read as sitting
+  on the reporter's head; the bottom third was one flat paving slab; paper-white pictograms + dog read as ghosts / a sheep; the plum near lamp-post
+  ate the dark budget (dark 9.6-10.5 %, cap 8 %, STYLE: no plum on lamps/railings/birds); pale blinds on pale panes; notebook and staffer turn
+  invisible; life stalls 7.15-8.26 and 10.67-12.85 (density gap 1.07 s); the A-board whipped in at ~53 px/f; far movers popped behind Pip.
+- Fix round 1 (stopped mid-way; workflow run `wf_851604d1-77e`, script
+  `~/.claude/projects/-home-user-Test-/<session>/workflows/scripts/l2-v2s2-fix1-wf_851604d1-77e.js`; both builders were IN FLIGHT, so a
+  `resumeFromRunId` re-runs them from scratch: DON'T; start a fresh single agent from the lists below).
+  - **Builder B (DONE on disk, first verify pass only):** `V2S2_Layout.ts` (bench x 600-800, y 1110-1290, seat 1243.8: heads >= 40 px under
+    Pip's seat), `V2S2_Bench.tsx` (staffer drawn first, reporter's visible notebook page opens 9.48 / scribbles / claps 12.85, staffer
+    turn + lean 9.48, hood + hunch 10.36), `V2S2_Staff.tsx` (own staff windows: people-shaped mono silhouettes, idle, deeper step-back,
+    blinds CM.shadeWarm, W2 full 12.20), `V2S2_Board.tsx` (shove 8.42, easeInOutSine slide, newsagent drawn poses, text relaid: 3 body lines,
+    credit in ink), `V2S2_Pip.tsx` (low hop-in, lands facing front ~6.71, ONE swivel to the wall 8.28-8.44, hop 12.85 unchanged),
+    `V2S2.tsx` (camera: outSine pull, small float; screen-space mint mask y 0-600 + one cloud y 150-270). I moved the bench FURNITURE onto
+    the layout in V2S2_Set.tsx at the pause. Not yet measured: board px/f, Pip clearances, the float law (see 4 below).
+  - **Builder A (NOTHING written; plan only):** V2S2_Near.tsx (York-stone flag courses, sett channel, drain, leaf drifts; DELETE the paper-white
+    pictograms; planter with grass blades; newspaper bundles + crate at the kiosk foot; a café cluster x ~230-480, y ~1330-1560), the near lamp
+    in CM.line moved to x ~1030 / w ~20-22 + its bike; V2S2_Wall.tsx (pane-switch overlay on cols -1, 3-6 every 0.6-1.5 s, never a story pane,
+    never 8.90-9.25 / 10.20-10.70, never the same pane twice within 1 s; rooftop features tops >= 612; parapet pigeons lift 7.45 / 10.30 /
+    11.60; kiosk clock tick loop; urn steam scale 1.0, ceil 600); V2S2_Far.tsx (far movers enter at the right edge and REST at x 690-780, none
+    ending in open view, >= 20 px clear of Pip; far lamps in CM.line, drop the u 2.5 lamp; the passing narrowboat from the right edge ~10.65 in
+    open water, bow >= x 600, steerer + puffs; ducks paddle off its wake); V2S2_Life.tsx (3-4 near head-backs hv <= 150 with sway / bob, a
+    coloured inked dog on a lead nosing a leaf 8.0-9.0 then trotting 10.4, paving pigeons flutter, a cyclist head-back 7.3-8.2 L->R, a jogger
+    11.0-11.9 R->L). Railing rails/bars to CM.line (STYLE §2). Kiosk awning clear of SW5 (x1 ~110).
+**Next, in order (ONE agent at a time, owner budget):**
+1. One builder agent: builder A's list above (V2S2_Set / Life / new Near, Wall, Far) + verify (tsc grep V2S2, stills at 0.5 / full, dark <= 7 %).
+2. Swap the stand-in board for L5's `ToldTheBBCBoard` (kit/boards; FILM s, `clackAt` ~8.44 or the slide's end; frame x 134-586, back wedge 595,
+   shadow to ~661: hide board + shadow behind the kiosk before 8.42; keep >= 15 px between Pip (590, 1050) and the frame: shift the slide's rest
+   dx <= 12 px left if needed); the newsagent <= 260 px tall (now 262).
+3. The orchestrator's style decisions: float = straight legs turning every 0.6-1.5 s, net within +-12 px, home at 12.80; flash safety (never > 3
+   flashes in any 1 s); near backs <= ~140 px wide; no plum on lamps / railings / far lamps / birds.
+4. L3 holds my near lamp across the 12.98 match cut: send L3 (session_014PwCXJs9nWENkpKqVhHWMP) the final lamp x / y / h / w / variant / color.
+5. Review files: `review.sh r1` (scratch: renders this shot's frames only) -> ONE combined critic (the brief's prompt + motion/standards) ->
+   fixes -> report_L2.md (REQUESTS: map S2 bench/figure boxes as in V2S2_Layout; K4 StaffWindow blind colour + silhouettes; K6 wall stepped tiers
+   + switchCols + Movers that rest instead of vanishing; K8 bridge hold 6 frames at 60 fps; caption boxes reach y 299).

@@ -33,8 +33,11 @@ const lookAt = (t: number): V2 => {
   return [s[0] - md, s[1] + 10];
 };
 
-/** The arrival arc (solved so the cut frame shows it at (694, 714), rising to 707 at 0.05 and landing at 0.12). */
-const ARRIVE = {from: [586.3, 826] as V2, t0: -0.17, dur: 0.29, height: 52};
+/** The arrival arc, solved so the cut frame shows Pip mid-leap at (694, 719) moving right, topping out at 717.8
+ *  (0.047) and landing on the cap at 0.12. It stays this low on purpose: Pip's airborne silhouette (head + tuft) is
+ *  ~117 px above its feet, so feet >= 717 keep it below the band margin (y >= 600), and feet <= 720 keep it >= 200 px
+ *  from the clause (top y 920). Take-off (-0.28, behind the board) is never drawn. */
+const ARRIVE = {from: [516.7, 760.5] as V2, t0: -0.28, dur: 0.4, height: 16};
 
 export const S6_PIP_TRACK: PipTrackProps = {
   x: ARRIVE.from[0],
@@ -70,7 +73,10 @@ export const S6PipOnPost: React.FC = () => {
   return <PipDrawing x={st.x} y={st.y} size={SIZE} params={st.params} squash={st.squash + wind} rotate={st.rotate} draw={st.draw} exit={exit} paint="colour" inkPx={defaultInk(SIZE) * inkScale} seed={SEED} />;
 };
 
-/** Pip's take-off into the S6 -> S7 hop, in SCREEN space (draw it above the whole set). */
+/** Pip's take-off into the S6 -> S7 hop, in SCREEN space (draw it above the whole set). The path is V2S7_pip's
+ *  pipHopAt (a level launch off the cap at y 720: the clause and the band margin both hold). The pose blends from the
+ *  crouch to S7's first-frame pose (the tuck, facing the watcher's 3/4 back, wind -0.7), so the cut hands over; the
+ *  squash goes from the crouch to 0 (never a stretch: the head + tuft stay at y >= 600). */
 export const S6PipHop: React.FC = () => {
   const t = useTime();
   const exit = useExit();
@@ -79,16 +85,12 @@ export const S6PipHop: React.FC = () => {
   const T = T0 + t;
   const h = pipHopAt(T);
   if (!h || h.side !== 'V2S6') return null;
+  const kCut = (PIP_HOP.tCut - PIP_HOP.t0) / (PIP_HOP.t1 - PIP_HOP.t0);
   const kh = (T - PIP_HOP.t0) / (PIP_HOP.t1 - PIP_HOP.t0);
   const base = trackAt(S6_PIP_TRACK, PIP_HOP_T - 1e-3).params;
-  const air = smooth(Math.min(1, kh / 0.18));
-  const leap = {...poseParams('leap'), yaw: FACING.left, look: 0, wind: 1};
-  const params = applyIdle(blendParams(base, leap, air), t, SEED, {flick: false, amount: 0.5});
-  // stretch on the take-off, rounding toward the apex (motion.ts hopAt's shape)
-  const squash = kh < 0.5 ? -0.16 * (1 - kh * 2) : 0;
-  const n = pipHopAt(Math.min(PIP_HOP.t1, T + 1 / 120));
-  const vx = n ? n.x - h.x : -1;
-  const vy = n ? n.y - h.y : 0;
-  const lean = Math.max(-60, Math.min(60, (Math.atan2(vy, Math.abs(vx) + 1e-6) * 180) / Math.PI)) * 0.18 * (vx < 0 ? -1 : 1);
-  return <PipDrawing x={h.x} y={h.y} size={SIZE} params={params} squash={squash} rotate={lean} exit={exit} paint="colour" inkPx={defaultInk(SIZE) * inkScale} seed={SEED} />;
+  const air = smooth(Math.min(1, kh / (kCut * 0.75)));
+  const tuck = {...poseParams('tuck'), yaw: FACING.back, wind: -0.7};
+  const params = applyIdle(blendParams(base, tuck, air), t, SEED, {flick: false, amount: 0.6});
+  const squash = 0.14 * (1 - smooth(kh / kCut));
+  return <PipDrawing x={h.x} y={h.y} size={SIZE} params={params} squash={squash} exit={exit} paint="colour" inkPx={defaultInk(SIZE) * inkScale} seed={SEED} />;
 };

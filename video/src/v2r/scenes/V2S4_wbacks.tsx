@@ -16,7 +16,7 @@ import {line} from '../../lib/sketch';
 import {Batch, Paint, P, rng, ovalPath, lobes, leafPath, lerp, frac, r1} from '../kit/canal/core';
 import {litAt, Puffs} from '../kit/canal/life';
 import {WindowPerson} from '../kit/cast';
-import {ROW, PLANE_X, sunClear, WIND} from './V2S4_wcore';
+import {ROW, PLANE_X, sunClear, WIND, CLEAN, WINK} from './V2S4_wcore';
 
 const K = 0.6;
 const [X0, X1] = PLANE_X(K);
@@ -62,7 +62,7 @@ function warehouseInto(b: Batch) {
   }
   for (let rr = 0; rr < 3; rr++) b.rect(CM.shadeWarm, lx - 0.7, top + 20 + rr * 80, 1.4, 50);
   b.ink(`M${P(lx + 26, top + 8)}L${P(lx + 26, top + 40)}`, 1, CM.ink);
-  b.ink(line(x1, top - 4, x1, GROUND, {seed: 's4ware/r', over: 'small'}) + line(x0, top - 5, x1 + 4, top - 5, {seed: 's4ware/t', over: 'small'}), HAIR);
+  b.ink(line(x1, top - 4, x1, GROUND, {...CLEAN, seed: 's4ware/r'}) + line(x0, top - 5, x1 + 4, top - 5, {...CLEAN, seed: 's4ware/t'}), WINK.backs);
 }
 
 // ---------------------------------------------------------------- the allotment yard in the sun's gap
@@ -156,7 +156,6 @@ function housesInto(b: Batch) {
   const stacksInk: string[] = [];
   const aer: string[] = [];
   const pipes: string[] = [];
-  const slates: string[] = [];
   // P0: roofs, rear walls
   HOUSES.forEach((h) => {
     const w = h.x1 - h.x0;
@@ -170,9 +169,6 @@ function housesInto(b: Batch) {
     const r = rng(`s4house/${i}`);
     const e = extOf(h);
     b.rect(CM.stoneShade, h.x0 + 4, h.ridge - 3, w - 8, 3.5);
-    let sl = '';
-    for (let y = h.ridge + 9; y < h.eave - 3; y += 9) sl += `M${P(h.x0 + 6, y)}L${P(h.x1 - 6, y + r.jitter(0.6))}`;
-    slates.push(sl);
     if (h.render) b.rect(CM.stoneShade, h.x0, h.eave, w, 6);
     b.rect(CM.limestone, h.x0 - 3, h.eave - 1, w + 6, 4);
     if (h.dormer) b.rect(CM.stucco, h.x0 + w * 0.3, h.ridge + 4, w * 0.42, h.eave - h.ridge - 4);
@@ -194,6 +190,11 @@ function housesInto(b: Batch) {
     const e = extOf(h);
     const wy = h.eave + 22;
     b.rect(CM.anchor, h.x0 - 3, h.eave + 3, w + 6, 2.2);
+    // the low sun is west: the eaves throw a thin shade band, the extension's east end and the dormer's east cheek
+    // are in shade, the dormer drops a small shadow east across the slope
+    b.rect(h.render ? CM.stoneShade : CM.shadeWarm, h.x0, h.eave + 5, w, 4);
+    b.poly(CM.shadeWarm, [[e.x1 - 7, h.extTop + (h.ext === 'left' ? 10 : 16)], [e.x1, h.extTop + (h.ext === 'left' ? 9 : 15)], [e.x1, GROUND], [e.x1 - 7, GROUND]]);
+    if (h.dormer) b.poly(CM.paneUnlit, [[h.x0 + w * 0.72, h.ridge + 6], [h.x0 + w * 0.72 + 14, h.ridge + 14], [h.x0 + w * 0.72 + 14, h.eave - 2], [h.x0 + w * 0.72, h.eave - 2]]);
     if (h.dormer) {
       const dx = h.x0 + w * 0.3;
       const dw = w * 0.42;
@@ -239,7 +240,7 @@ function housesInto(b: Batch) {
     const cw = 22;
     const ctop = Math.max(ROW.top + 6, h.ridge - 16 - r.range(0, 4));
     b.rect(i % 2 ? CM.brickLight : CM.brick, h.x0 - cw / 2, ctop, cw, h.ridge - ctop + 6);
-    stacksInk.push(line(h.x0 - cw / 2, ctop, h.x0 - cw / 2, h.ridge + 4, {seed: `s4stk${i}`, over: 'small'}));
+    stacksInk.push(line(h.x0 - cw / 2, ctop, h.x0 - cw / 2, h.ridge + 4, {...CLEAN, seed: `s4stk${i}`}));
     if (i !== 2) {
       const ay = Math.max(ROW.top, ctop - 18);
       aer.push(`M${P(h.x0 + 4, ctop - 4)}L${P(h.x0 + 4, ay)}M${P(h.x0 - 6, ay + 3)}L${P(h.x0 + 14, ay + 3)}M${P(h.x0 - 3, ay + 7)}L${P(h.x0 + 11, ay + 7)}`);
@@ -254,14 +255,14 @@ function housesInto(b: Batch) {
     const cw = 22;
     const ctop = Math.max(ROW.top + 6, h.ridge - 16 - r.range(0, 4));
     b.rect(CM.limestone, h.x0 - cw / 2 - 2, ctop, cw + 4, 3.5);
+    b.rect(CM.shadeWarm, h.x0 + 1, ctop + 3.5, cw / 2 - 1, h.ridge - ctop + 2);
     for (let p = 0; p < 3; p++) b.rect(p === 1 ? CM.leafRust : CM.brickDeep, h.x0 - cw / 2 + 2 + p * 6.5, Math.max(ROW.top, ctop - 5), 5, 5);
     b.rect(CM.stoneShade, h.x0 + w * 0.45, h.eave + 30, 14, 7);
     const fdx = lerp(e.x0, e.x1, 0.3);
     b.rect(CM.paper, fdx + 19, h.extTop + 31, 2, GROUND - h.extTop - 31);
   });
-  b.ink(slates.join(''), 0.7, CM.shadeCool);
-  b.ink(HOUSES.map((h, i) => line(h.x0 - 3, h.eave, h.x1 + 3, h.eave, {seed: `s4eave${i}`, over: 'small'})).join(''), HAIR);
-  b.ink(stacksInk.join(''), HAIR);
+  b.ink(HOUSES.map((h, i) => line(h.x0 - 3, h.eave, h.x1 + 3, h.eave, {...CLEAN, seed: `s4eave${i}`})).join(''), WINK.backs);
+  b.ink(stacksInk.join(''), WINK.backs);
   b.ink(aer.join(''), 1.0, CM.ink);
   b.ink(pipes.join(''), 0.6, CM.ink);
 }
@@ -316,6 +317,8 @@ function treesInto(b: Batch, t: number) {
   }
   b.layer();
   for (const g of geo) b.fill(CM.coatMustard, lobes(g.x - g.R * 0.3 + g.sw, g.x + g.R * 0.35 + g.sw, g.cy - g.R * 0.25, g.R * 0.6, `${g.seed}/d`, 2));
+  b.layer();
+  for (const g of geo) b.fill(CM.shadeWarm, lobes(g.x + g.R * 0.35 + g.sw, g.x + g.R * 0.95 + g.sw, g.cy + g.R * 0.78, g.R * 0.5, `${g.seed}/e`, 2));
   b.ink(geo.map((g) => `M${P(g.x, g.cy + g.R * 0.5)}L${P(g.x - g.R * 0.35, g.cy - g.R * 0.05)}M${P(g.x, g.cy + g.R * 0.35)}L${P(g.x + g.R * 0.32, g.cy)}`).join(''), 1.4, CM.line);
 }
 
@@ -355,7 +358,7 @@ function washingInto(b: Batch, t: number) {
   ];
   items.forEach(([u, w, h, c], i) => {
     const [x, y] = at(u);
-    const fl = Math.sin(t * 5.2 + i * 1.7) * 0.5 + Math.sin(t * 8.3 + i) * 0.2;
+    const fl = Math.sin(t * 2.6 + i * 1.7) * 0.5 + Math.sin(t * 4.1 + i) * 0.2;
     const lean = WIND * (3 + fl * 4);
     b.poly(c, [[x - w / 2, y], [x + w / 2, y], [x + w / 2 + lean, y + h * (0.92 + fl * 0.06)], [x - w / 2 + lean * 0.8, y + h]]);
   });

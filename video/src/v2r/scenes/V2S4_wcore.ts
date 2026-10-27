@@ -64,3 +64,22 @@ export const smooth01 = (v: number) => {
 };
 /** 12 drawings/s clock. */
 export const q12 = (t: number) => Math.floor(t * 12 + 1e-6) / 12;
+
+/** The owner's line (OWNER_PLAYBOOK, 2026-10-27): clean, confident, smooth; no jitter, no sketchy overshoot, no
+ *  broken double strokes. Spread into lib/sketch line / rect opts. */
+export const CLEAN = {over: 'none', jitter: 0.2, drift: 0.05, breaks: false} as const;
+
+/** Attention hierarchy (OWNER_PLAYBOOK, 2026-10-27): she, the post and Pip carry the contrast and the 3.4 px line;
+ *  the supporting world is quieter. Ink weights of the world's parts. */
+export const WINK = {
+  /** People on the towpath (her line is 3.4). */
+  people: 1.9,
+  kid: 1.5,
+  /** Towpath furniture and walls. */
+  props: 1.8,
+  /** Our boat (the near plane: heavier than the towpath, still under the subject's weight). */
+  boat: 2.8,
+  boatFine: 2.0,
+  /** The backs. */
+  backs: 1.2,
+} as const;

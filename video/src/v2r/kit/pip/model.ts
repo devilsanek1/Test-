@@ -134,8 +134,10 @@ export const WATCH = {
   /** ...and at <= 60 px, further round toward the profile (the elephant silhouette carries the 44 px S5 end). */
   bodySmall: 62,
   /** The watcher's head: degrees PAST the profile toward us from 72 px up (a 3/4 front: the trunk curl, one eye, the
-   *  blush); none at <= 60 px (a clean profile). */
+   *  blush)... */
   past: 34,
+  /** ...and at <= 60 px a profile, turned just enough that the eye clears the trunk's root. */
+  pastSmall: 14,
   /** |look| >= this turns the face fully to that side. */
   sideLook: 0.3,
   /** The back sector: the cheat is full while the body is >= `full` deg from facing us, gone at <= `none`. */
@@ -145,8 +147,8 @@ export const WATCH = {
   camBody: 26,
   camHead: 5,
   /** How far the ears follow a turned head (the plain rig lags them at 0.5 so a head turned away keeps a leaf on each
-   *  side; the watcher's face-on head carries them further, so the near leaf sits behind its eye, not over it). */
-  earLag: 0.75,
+   *  side; the watcher's face-on head carries them all the way: the near leaf flares out behind its eye). */
+  earLag: 1,
 };
 
 /** Wrap degrees to [-180, 180). */
@@ -187,7 +189,7 @@ export function watchYaw(p: PoseParams, px = 96): WatchYaw {
   const sg = side > 0 ? 1 : -1;
   // size: a clean profile at <= 60 px, the 3/4 front from 72 px
   const big = smooth((px - 60) / 12);
-  const past = WATCH.past * big;
+  const past = lerp(WATCH.pastSmall, WATCH.past, big);
   const bodyOff = lerp(WATCH.bodySmall, WATCH.body, big);
   // side 0 = the back of the head (180); side +-1 = (90 - past) deg off facing us on that side
   const phiHw = sg * (180 - Math.abs(side) * (90 + past));
@@ -206,6 +208,14 @@ export function watchYaw(p: PoseParams, px = 96): WatchYaw {
     head = lerp(fh, sg * WATCH.camHead, tc);
   }
   return {body, head, side, k};
+}
+
+/** Which ear faces us: 1 = ear A (Pip's model +x side), -1 = ear B, 0 = both show (a head seen square from the front
+ *  or the back). A face-on watcher hides its far ear behind its head, so a flick goes to the near one (idle.ts,
+ *  PipTrack). */
+export function nearEar(p: PoseParams, px = 96): 1 | -1 | 0 {
+  const s = Math.sin(watchYaw(p, px).head * D2R);
+  return s < -0.5 ? 1 : s > 0.5 ? -1 : 0;
 }
 
 // ---------------------------------------------------------------- output

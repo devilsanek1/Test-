@@ -25,7 +25,7 @@ import {bikeInto} from '../kit/canal/towpath';
 import {puffs} from '../../v3/film/kit/idle';
 import {rideAt} from '../kit/pip/motion';
 import {S4_BEATS, s4PathSpeed, s4PlaneDx, S4_K, S4_TRUCK} from './V2S4_rig';
-import {ROW, PLANE_X, WIND, clamp01} from './V2S4_wcore';
+import {ROW, PLANE_X, WIND, clamp01, CLEAN, WINK} from './V2S4_wcore';
 
 const FRONT = INK_PX.front;
 const MID = INK_PX.mid;
@@ -120,12 +120,12 @@ function cabinInto(b: Batch) {
   const mid = (x0 + x1) / 2;
   b.rect(CM.brickDeep, x0, y0, mid - 2 - x0, y1 - y0);
   b.rect(CM.brickDeep, mid + 2, y0, x1 - mid - 2, y1 - y0);
-  b.fill(CM.paper, ovalPath(CASTLE.x, CASTLE.y, CASTLE.rx, CASTLE.ry));
+  b.fill(CM.stucco, ovalPath(CASTLE.x, CASTLE.y, CASTLE.rx, CASTLE.ry));
   b.layer();
   // L4: glass, the door panels (cream border), the castle's lake and hills
   for (const p of PORTS) b.fill(CM.glass, ovalPath(p.x, PORT_Y, PORT_R, PORT_R));
-  for (const [a, c] of [[x0, mid - 2], [mid + 2, x1]] as [number, number][]) b.fill(CM.coatOat, ringRR(a + 10, y0 + 12, c - 10, y1 - 12, 10, 5));
-  for (const [a, c] of [[x0, mid - 2], [mid + 2, x1]] as [number, number][]) b.rect(CM.paper, a + 15, y0 + 17, c - a - 30, y1 - y0 - 34);
+  for (const [a, c] of [[x0, mid - 2], [mid + 2, x1]] as [number, number][]) b.fill(CM.coatMustard, ringRR(a + 10, y0 + 12, c - 10, y1 - 12, 10, 3));
+  for (const [a, c] of [[x0, mid - 2], [mid + 2, x1]] as [number, number][]) b.rect(CM.stucco, a + 14, y0 + 16, c - a - 28, y1 - y0 - 32);
   const cs = CASTLE.rx / 50;
   b.fill(CM.water, `M${P(CASTLE.x - 46 * cs, CASTLE.y + 26 * cs)}Q${P(CASTLE.x, CASTLE.y + 18 * cs)} ${P(CASTLE.x + 46 * cs, CASTLE.y + 26 * cs)}Q${P(CASTLE.x, CASTLE.y + 44 * cs)} ${P(CASTLE.x - 46 * cs, CASTLE.y + 26 * cs)}Z`);
   b.fill(CM.sage, lobes(CASTLE.x - 50 * cs, CASTLE.x - 8 * cs, CASTLE.y + 24 * cs, 18 * cs, 'castleHillA', 2));
@@ -217,16 +217,16 @@ function cabinInto(b: Batch) {
 function cabinInk(b: Batch) {
   b.layer();
   let d = '';
-  d += line(XL, CT, XR, CT, {seed: 's4cab/top', over: 'none', breaks: false});
-  d += line(XL, GW, XR, GW + 1, {seed: 's4cab/gw', over: 'none', breaks: false});
-  b.ink(d, MID, CM.ink, 0.25);
+  d += line(XL, CT, XR, CT, {...CLEAN, seed: 's4cab/top'});
+  d += line(XL, GW, XR, GW, {...CLEAN, seed: 's4cab/gw'});
+  b.ink(d, WINK.boat, CM.ink, 0.1);
   let m = '';
   const {x0, x1, y0, y1} = DOORS;
-  m += line(x0 - 9, y0 - 9, x1 + 9, y0 - 9, {seed: 's4door/t', over: 'small'}) + line(x0 - 9, y0 - 9, x0 - 9, y1 + 3, {seed: 's4door/l', over: 'small'}) + line(x1 + 9, y0 - 9, x1 + 9, y1 + 3, {seed: 's4door/r', over: 'small'});
-  m += line((x0 + x1) / 2, y0, (x0 + x1) / 2, y1, {seed: 's4door/m', over: 'none'});
-  for (const p of PORTS) m += circleInk(p.x, PORT_Y, PORT_R + 12, {seed: `s4port${p.x}`});
+  m += line(x0 - 9, y0 - 9, x1 + 9, y0 - 9, {...CLEAN, seed: 's4door/t'}) + line(x0 - 9, y0 - 9, x0 - 9, y1 + 3, {...CLEAN, seed: 's4door/l'}) + line(x1 + 9, y0 - 9, x1 + 9, y1 + 3, {...CLEAN, seed: 's4door/r'});
+  m += line((x0 + x1) / 2, y0, (x0 + x1) / 2, y1, {...CLEAN, seed: 's4door/m'});
+  for (const p of PORTS) m += circleInk(p.x, PORT_Y, PORT_R + 12, {seed: `s4port${p.x}`, wobble: 0.004});
   m += `M${P(CASTLE.x - CASTLE.rx - 6, CASTLE.y)}A${r1(CASTLE.rx + 6)} ${r1(CASTLE.ry + 6)} 0 0 1 ${P(CASTLE.x + CASTLE.rx + 6, CASTLE.y)}`;
-  b.ink(m, MID, CM.ink, 0.3);
+  b.ink(m, WINK.boatFine, CM.ink, 0.12);
 }
 
 /** Rope fenders hanging over the side from the roof rail (they swing a little with the boat). */
@@ -248,7 +248,7 @@ function fendersInto(b: Batch, t: number) {
     let rp = '';
     for (let k = 1; k < 7; k++) rp += `M${P(fx - 16, fy + k * 9)}Q${P(fx, fy + k * 9 + 4)} ${P(fx + 16, fy + k * 9)}`;
     rope.push(rp);
-    b.ink(`M${P(fx - 15, fy)}Q${P(fx - 18, fy + 32)} ${P(fx - 14, fy + 64)}`, MID, CM.ink, 0.3);
+    b.ink(`M${P(fx - 15, fy)}Q${P(fx - 18, fy + 32)} ${P(fx - 14, fy + 64)}`, WINK.boatFine, CM.ink, 0.1);
   }
   b.ink(rope.join(''), 1.3, CM.line);
 }
@@ -298,7 +298,22 @@ function roofInto(b: Batch) {
 }
 
 /** The items standing on the roof (static parts, back to front). */
+/** Short east shadows on the roof top (the low sun is west): flat stone-shade shapes past each standing thing. */
+function roofShadowsInto(b: Batch) {
+  const sh = (x0: number, x1: number, y: number, len: number, d = 5) => b.poly(CM.stoneShade, [[x0, y - 2], [x1, y - 2], [x1 + len, y + d], [x0 + len * 0.7, y + d]]);
+  sh(26, 132, RN - 18, 18, 7); // the coiled rope
+  sh(130, 182, RN - 8, 16); // the bucket
+  sh(190, 240, RN - 12, 22); // the can
+  for (const h of HERBS) sh(h.x - h.w * 0.38, h.x + h.w * 0.38, h.base, 16, 4);
+  sh(700, 790, RN - 10, 20); // the bike
+  sh(830, 896, RN - 10, 24); // the lifebuoy
+  sh(934, 956, RN - 12, 40, 6); // the chimney
+  sh(980, 1120, RN - 8, 14); // the logs
+}
+
 function roofItemsInto(b: Batch) {
+  roofShadowsInto(b);
+  b.layer();
   const inks: string[] = [];
   // a coiled rope (left)
   const rx = 78;
@@ -355,7 +370,7 @@ function roofItemsInto(b: Batch) {
   b.layer();
   b.rect(CM.coatMustard, chx - 12, RF - 68, 24, 7);
   b.rect(CM.coatMustard, chx - 14, RN - 20, 28, 8);
-  inks.push(line(chx - 11, RN - 14, chx - 11, RF - 100, {seed: 's4chim', over: 'small'}));
+  inks.push(line(chx - 11, RN - 14, chx - 11, RF - 100, {...CLEAN, seed: 's4chim'}));
   // the log pile and a coal sack (cut by the right edge)
   b.layer();
   for (let k = 0; k < 12; k++) {
@@ -372,7 +387,7 @@ function roofItemsInto(b: Batch) {
     b.fill(row === 1 ? CM.leafGold : CM.coatOat, ovalPath(x, y, 9, 7.6));
   }
   b.ink(Array.from({length: 12}, (_, k) => circleInk(992 + (k % 4) * 26 + (Math.floor(k / 4) % 2) * 13, RN - 12 - Math.floor(k / 4) * 22, 4, {seed: `s4log${k}`})).join(''), 0.9, CM.line);
-  b.ink(inks.join(''), MID, CM.ink, 0.3);
+  b.ink(inks.join(''), WINK.boatFine, CM.ink, 0.12);
 }
 
 /** Herb pots: terracotta, the herbs leaning east and fluttering; the ones by Pip flinch when it lands. */
@@ -402,7 +417,7 @@ function herbsInto(b: Batch, t: number) {
   const thyme: string[] = [];
   HERBS.forEach((h, i) => {
     const {x, w} = h;
-    const sway = WIND * (2.4 + Math.sin(t * 3.1 + i * 1.7) * 2.2 + Math.sin(t * 7.3 + i) * 0.9) + (h.flinch ? fl : 0);
+    const sway = WIND * (2.4 + Math.sin(t * 2.0 + i * 1.7) * 2.0 + Math.sin(t * 4.3 + i) * 0.7) + (h.flinch ? fl : 0);
     const top = h.base - w * 0.9 - 3;
     if (h.kind === 'basil' || h.kind === 'geranium') {
       b.fill(CM.sage, `M${P(x - w * 0.62, top)}Q${P(x - w * 0.72 + sway * 0.6, top - w * 0.95)} ${P(x + sway, top - w * 1.25)}Q${P(x + w * 0.72 + sway * 0.6, top - w * 0.95)} ${P(x + w * 0.62, top)}Z`);
@@ -424,7 +439,7 @@ function herbsInto(b: Batch, t: number) {
   });
   b.ink(blades.join(''), 2.4, CM.sage);
   b.ink(thyme.join(''), 2.8, CM.leafGold);
-  b.ink(pots.join(''), MID * 0.7, CM.ink, 0.3);
+  b.ink(pots.join(''), WINK.boatFine * 0.8, CM.ink, 0.12);
 }
 
 /** The stove's smoke: a long puff train blown east (never above world y 590). */
@@ -462,23 +477,23 @@ const wrapX = (px: number, off: number) => NX0 + frac((px + off - NX0) / NSPAN) 
 function nearLayout() {
   const r = rng('s4near');
   const refl: {px: number; len: number; y: number; h: number; row: number; keep: number}[] = [];
-  const rows = [5, 13, 22, 32, 43, 56, 71, 89, 110];
+  const rows = [4, 11, 19, 29, 41, 56, 74];
   rows.forEach((dy, k) => {
     const keep = 1 - k / rows.length;
     let px = NX0 + r.range(0, 30);
     while (px < NX1) {
-      const len = r.range(22, 80) * (0.5 + keep * 0.6);
-      const dens = k === 3 ? 0.35 : 0.25 + keep * 0.65;
+      const len = (k < 3 ? r.range(60, 150) : r.range(22, 70)) * (0.5 + keep * 0.6);
+      const dens = k < 3 ? 0.85 : k === 3 ? 0.22 : 0.15 + keep * 0.45;
       if (r.chance(dens)) refl.push({px, len, y: NY0 + dy + r.jitter(1.8 + k * 0.3), h: 3.6 + k * 0.6 + r.range(0, 1.4), row: k, keep});
-      px += len + r.range(10, 40) * (1.4 - keep * 0.7);
+      px += len + (k < 3 ? r.range(4, 14) : r.range(14, 46) * (1.4 - keep * 0.7));
     }
   });
-  const rip = Array.from({length: 44}, () => {
+  const rip = Array.from({length: 30}, () => {
     const v = r.next();
     return {px: r.range(NX0, NX1), y: NY0 + 34 + v * (NY1 - NY0 - 44), s: lerp(1, 2, v), w: r.range(30, 92)};
   });
-  const foam = Array.from({length: 30}, () => ({px: r.range(NX0, NX1), len: r.range(24, 70), dy: r.range(-2, 5)}));
-  const glints = Array.from({length: 18}, () => ({x: r.range(XL, XR), y: NY0 + 26 + r.next() * (NY1 - NY0 - 36), per: r.range(1.2, 2.6), ph: r.next()}));
+  const foam = Array.from({length: 22}, () => ({px: r.range(NX0, NX1), len: r.range(24, 64), dy: r.range(-2, 4)}));
+  const glints = Array.from({length: 10}, () => ({x: r.range(XL, XR), y: NY0 + 40 + r.next() * (NY1 - NY0 - 50), per: r.range(1.4, 2.8), ph: r.next()}));
   const leaves = Array.from({length: 13}, (_, i) => ({px: r.range(NX0, NX1), y: r.range(NY0 + 44, NY1 - 24), rot: r.range(-30, 30), i}));
   const twigs = Array.from({length: 2}, (_, i) => ({px: r.range(NX0, NX1), y: r.range(NY0 + 70, NY1 - 40), i}));
   return {refl, rip, foam, glints, leaves, twigs};
@@ -534,14 +549,14 @@ export const NearWater: React.FC<{lay: ReturnType<typeof nearLayout>}> = ({lay})
     const ux = (w.x1 - w.x0) / L;
     const uy = (w.y1 - w.y0) / L;
     const reach = L * (0.15 + 0.85 * go);
-    const flow = (t * (60 + 160 * go) + i * 37) % 90;
-    for (let s = -flow; s < reach; s += 90) {
+    const flow = (t * (60 + 160 * go) + i * 37) % 130;
+    for (let s = -flow; s < reach; s += 130) {
       if (s < 0) continue;
       const len = Math.min(52, reach - s) * (0.6 + 0.4 * go);
       if (len < 6) continue;
       const ax = w.x0 + ux * s;
       const ay = w.y0 + uy * s;
-      const th = 2.8 - (s / L) * 1.4;
+      const th = 2.0 - (s / L) * 1.0;
       b.fill(CM.paper, `M${P(ax, ay)}L${P(ax + ux * len, ay + uy * len)}L${P(ax + ux * len - 2, ay + uy * len + th)}L${P(ax - 2, ay + th)}Z`);
     }
   });

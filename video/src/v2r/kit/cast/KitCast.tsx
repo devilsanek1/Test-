@@ -24,6 +24,7 @@ import {StaffWindow, Staffer, Reporter} from './Staff';
 import {Stranger, CafeOwner} from './Extras';
 import {FarCrowd, scatterCrowd} from './Crowd';
 import {S1Seated} from './S1Seated';
+import {Dog, DogCoat, DogPose, handAt} from './Dog';
 import {stepsAt, strideFor} from './gait';
 
 export const SHEET = {w: 2160, h: 5760};
@@ -577,6 +578,84 @@ export const WalkTest: React.FC = () => {
         <Ghost x={640} y={250} h={160} age={5} step={undefined} />
         <Person x={800} y={250} h={150} seed="ws1" walk={{rate: 1.9}} traits={{hair: 'long', acc: 'backpack'}} />
         <Person x={960} y={250} h={140} seed="ws2" view="profile" pose="jog" walk={{rate: 2.8}} traits={{hair: 'cap'}} />
+      </svg>
+    </AbsoluteFill>
+  );
+};
+
+
+/** Seated variants (the art director's must, 2026-10-27): the four arm states x three views, leans, a pair, a child. */
+export const SeatTest: React.FC = () => {
+  const ARMS = ['lap', 'knees', 'back', 'hug'] as const;
+  const VIEWS = ['back', 'rear34', 'profile'] as const;
+  return (
+    <AbsoluteFill style={{background: CM.stucco}}>
+      <svg width={1080} height={1920} viewBox="0 0 1080 1920">
+        {VIEWS.map((v, j) => (
+          <g key={v}>
+            <Fill rect={[0, 380 + j * 360, 1080, 40]} color={CM.limestone} offset={false} />
+            {ARMS.map((a, i) => (
+              <g key={a}>
+                <Seated x={140 + i * 250} y={380 + j * 360} h={200} seed={`st/${v}/${a}`} arms={a} view={v} traits={{hair: (['short', 'bun', 'curls', 'beanie'] as const)[i], acc: (['backpack', 'scarf', 'tote', 'none'] as const)[i]}} />
+                <Label x={140 + i * 250} y={420 + j * 360} size={22} anchor="middle">{`${v} ${a}`}</Label>
+              </g>
+            ))}
+          </g>
+        ))}
+        <Fill rect={[0, 1460, 1080, 40]} color={CM.limestone} offset={false} />
+        <Seated x={90} y={1460} h={150} seed="st/l1" lean={-6} arms="lap" />
+        <Seated x={230} y={1460} h={150} seed="st/l2" lean={6} arms="knees" />
+        <Seated x={400} y={1460} h={150} seed="st/p1" lean={7} arms="lap" traits={{hair: 'long'}} />
+        <Seated x={490} y={1466} h={146} seed="st/p2" lean={-7} arms="lap" armAround={[-80, -100]} traits={{hair: 'short'}} />
+        <Seated x={650} y={1460} h={150} seed="st/c1" arms="back" />
+        <Seated x={760} y={1462} h={92} seed="st/kid" child arms="hug" traits={{hair: 'beanie'}} />
+        <Seated x={900} y={1460} h={150} seed="st/cup" cup={1} side={1} view="rear34" flip />
+        <Fill rect={[0, 1780, 1080, 40]} color={CM.limestone} offset={false} />
+        {[100, 92, 76, 60, 44].map((h, i) => (
+          <Seated key={h} x={80 + i * 120} y={1780} h={h} seed={`st/sz${i}`} arms={ARMS[i % 4]} view={i === 3 ? 'rear34' : 'back'} />
+        ))}
+        <Person x={760} y={1780} h={120} seed="st/kidS" child traits={{hair: 'curls'}} />
+        <Person x={850} y={1780} h={190} seed="st/adultS" />
+        <NearBack x={990} y={1920} hv={210} seed="st/nb" lean={5} />
+      </svg>
+    </AbsoluteFill>
+  );
+};
+
+
+/** The dog (K4, 2026-10-27): poses x coats, sizes 30-90, the back view, a lead to a walker's hand, at 1:1. */
+export const DogTest: React.FC = () => {
+  const t = useTime();
+  const POSES: DogPose[] = ['trot', 'walk', 'stand', 'sniff', 'sit', 'lie'];
+  const COATS: DogCoat[] = ['gold', 'rust', 'brown'];
+  const walker = {x: 760, y: 1700, h: 150};
+  const reach: [number, number] = [-walker.h * 0.2, -walker.h * 0.45];
+  const hand = handAt(walker.x, walker.y, reach);
+  return (
+    <AbsoluteFill style={{background: CM.stucco}}>
+      <svg width={1080} height={1920} viewBox="0 0 1080 1920">
+        {COATS.map((c, j) => (
+          <g key={c}>
+            <Fill rect={[0, 300 + j * 300, 1080, 30]} color={CM.paving} offset={false} />
+            {POSES.map((p, i) => (
+              <g key={p}>
+                <Dog x={110 + i * 170} y={300 + j * 300} h={90} pose={p} coat={c} seed={`dt/${c}/${p}`} walk={p === 'trot' ? {rate: 3.4} : p === 'walk' ? {rate: 2.2} : undefined} />
+                <Label x={110 + i * 170} y={340 + j * 300} size={20} anchor="middle">{`${c} ${p}`}</Label>
+              </g>
+            ))}
+          </g>
+        ))}
+        <Fill rect={[0, 1220, 1080, 30]} color={CM.paving} offset={false} />
+        {[90, 70, 52, 40, 30].map((h, i) => (
+          <Dog key={h} x={90 + i * 120} y={1220} h={h} pose="trot" view={i % 2 ? 'back' : 'side'} coat={COATS[i % 3]} seed={`dt/sz${i}`} walk={{rate: 3.2}} />
+        ))}
+        <Dog x={760} y={1220} h={60} pose="trot" view="back" coat="rust" seed="dt/back60" walk={{rate: 3.2}} />
+        <Dog x={900} y={1220} h={48} pose="lie" coat="gold" seed="dt/lieDown" headDown />
+        <Fill rect={[0, 1700, 1080, 40]} color={CM.paving} offset={false} />
+        <Person x={walker.x} y={walker.y} h={walker.h} seed="dt/walker" pose="reach" view="profile" reach={reach} walk={{rate: 1.8}} traits={{acc: 'none'}} />
+        <Dog x={560} y={1700} h={52} pose="sniff" coat="gold" seed="dt/lead" lead={hand} />
+        <Dog x={260} y={1700} h={64} pose="trot" coat="brown" seed="dt/trot64" walk={{rate: 3.4, phase: 0.5}} flip />
+        <Label x={24} y={60} size={28}>{`K4 DOG: poses x coats at 90 px; sizes 90-30 (side / back); lead; t ${t.toFixed(2)}`}</Label>
       </svg>
     </AbsoluteFill>
   );

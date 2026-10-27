@@ -377,10 +377,10 @@ def life_layer(n):
             place_c(y, unit_rms(g) * db2a(-12), t, 1.0, p)
         elif kind == "duck_land":      # a mallard comes down on the canal: wings and water
             g = FLD.cut(FLD.load(263104), 60.95, 62.15, 0.04).mean(axis=1)
-            place_c(y, unit_rms(lp(hp(g, 150, 2), 6000, 2)) * db2a(-7), t, 1.0, p)
+            place_c(y, unit_rms(lp(hp(g, 150, 2), 6000, 2)) * db2a(-10), t, 1.0, p)
         elif kind == "dog":            # trotting: the collar's jingle and the paws on stone
-            j = FLD.cut(FLD.load(611827), 2.08 if t < 5 else 6.10, 3.30 if t < 5 else 7.0, 0.03).mean(axis=1)
-            place_c(y, unit_rms(lp(hp(j, 1800, 2), 7500, 2)) * db2a(-16 if t < 5 else -19), t + 0.05, 1.0, p)
+            j = FLD.cut(FLD.load(611827), 2.08 if t < 5 else 6.10, 2.72 if t < 5 else 6.70, 0.03).mean(axis=1)
+            place_c(y, unit_rms(lp(hp(j, 1800, 2), 7000, 2)) * db2a(-20 if t < 5 else -22), t + 0.05, 1.0, p)
             place_c(y, unit_rms(paws(t, 6, 4.2, int(t * 100))) * db2a(-13 if t < 5 else -17), t, 1.0, p)
         elif kind == "boat_pass":      # S2: a narrowboat comes up the canal from the vanishing point
             d = 5.9; g = FLD.cut(FLD.load(576577), 3.0, 3.0 + d, 0.8).mean(axis=1)
@@ -629,6 +629,7 @@ def guard_spans(gdb, thr=-1.0):
 # ---------------------------------------------------------------- the hit-word band carve
 CARVE_BANDS = {"1-4k": (1000.0, 4000.0), "4-10k": (4000.0, 10000.0)}
 CARVE_MARGIN = 12.0       # the bed >= 12 dB under the voice's own band on a hit word (the SFX get the rest)
+CARVE_MARGIN_OTHER = 9.0  # and >= 9 dB under it on every other word (the voice on top everywhere)
 
 
 def band_power(x, band, win=0.03, hop=0.01):
@@ -641,23 +642,26 @@ def band_power(x, band, win=0.03, hop=0.01):
 
 
 def carve_plan(v, bed):
-    """per hit word and band: how many dB the bed must give (over the word's active frames) to sit CARVE_MARGIN
-    under the voice there. Returns [(t0, t1, band, dB)]."""
+    """per word and band: how many dB the bed must give (over the word's active frames) to sit CARVE_MARGIN (a hit
+    word) or CARVE_MARGIN_OTHER (any other word) under the voice there. Returns [(t0, t1, band, dB, word)]."""
     plan = []
+    hits = set(sheet.HIT_WORDS)
     for bn, band in CARVE_BANDS.items():
         tv, ev = band_power(v, band); _, eb = band_power(bed, band)
         lv = 10 * np.log10(ev + 1e-30)
-        for (w, s) in sheet.HIT_WORDS:
-            a, b = sheet.word_span(w, s)
+        for x in sheet.WORDS:
+            w, s = x["w"], x["s"]
+            a, b = s - sheet.WORD_PAD, x["e"] + sheet.WORD_PAD
             m = (tv >= a) & (tv <= b)
             if not m.any():
                 continue
             act = m & (lv >= lv[m].max() - 12.0) & (lv > -75.0)
             if not act.any():
                 continue
+            need = CARVE_MARGIN if (w, s) in hits else CARVE_MARGIN_OTHER
             margin = 10 * np.log10(ev[act].sum() / (eb[act].sum() + 1e-30))
-            if margin < CARVE_MARGIN:
-                plan.append((a, b, bn, float(CARVE_MARGIN - margin)))
+            if margin < need:
+                plan.append((a, b, bn, float(need - margin), w))
     return plan
 
 
@@ -671,7 +675,7 @@ def carve(xs, plan, nfft=2048, hop=256):
     tf = (np.arange(nfr) * hop) / SR
     G = np.zeros((len(f), nfr))
     lf = np.log2(np.maximum(f, 1.0))
-    for (a, b, bn, d) in plan:
+    for (a, b, bn, d, _w) in plan:
         lo, hi = CARVE_BANDS[bn]
         wf = np.clip(np.minimum((lf - np.log2(lo)) / 0.5 + 1, (np.log2(hi) - lf) / 0.5 + 1), 0, 1)
         wt = np.clip(np.minimum((tf - (a - 0.04)) / 0.04, ((b + 0.04) - tf) / 0.04), 0, 1)
@@ -791,7 +795,7 @@ def main():
            "google_side_trim_dB": round(trim, 2),
            "guard_extra_dB_max": round(float(-a2db(g).min()), 1),
            "guard_active_s": guard_spans(a2db(g)),
-           "hit_word_carve": [(round(a, 2), round(b, 2), bn, round(dd, 1)) for (a, b, bn, dd) in plan],
+           "word_carve": [(w_, round(a, 2), round(b, 2), bn, round(dd, 1)) for (a, b, bn, dd, w_) in plan],
            "life_sounded": life_rep,
            "clicks": click_report(bed)[0],
            "seam_step": float(np.abs(bed[0] - bed[-1]).max()),
