@@ -1,14 +1,14 @@
 // SQB_chart (HOME lane; docs/v3/flow_v2.md §4 SQB, §5): THE CHART on the nook's card (home_set's CARD, right of the
-// window), drawn in H1 px right after the card's paper and static face (title, subtitle, axes, 2005, 2025), so it sits
-// in the room's ambient light like the paper it is printed on (card unlit: no light layer, no shadow of its own).
+// window), drawn in H1 px right after the card's paper and static face (title, subtitle, axes, 2005, 2025), so it is
+// lit exactly like the paper it is printed on: the card is unlit (CRAFT §d.9; no light layer or shadow of its own).
 // Keyed on FILM time: SQB draws it as its subject, SQC draws the finished card through J2's pan back (the same
 // component, so the J2 seam is one drawing).
 //
 //   6.98-9.28   the line draws DOWNHILL with the voice ("Laptops get better for the same money"), 2005 -> Sept 2025,
-//               one small bump in 2021 (FL 1.6); the pen's head is a hero dot that stays on the
-//               stroke's end once drawn ("now": it pops once on "this past year", 11.80, and the hook turns up from it)
+//               one small bump in 2021 (FL 1.6); the pen's head is a hero dot that stays on the stroke's end once
+//               drawn ("now": it pops once on "this past year", 11.80, and the hook turns up from it)
 //   10.32-10.50 a doodle laptop drops onto the line (~2010) and lands on "buy" (10.60): its screen says "$999"
-//   10.82       a shinier, bigger BETTER one pops onto the line right after it (~2015.5), the SAME "$999" ("one." 10.92):
+//   10.82       a shinier, bigger BETTER one pops onto the line right after it (~2015.6), the SAME "$999" ("one." 10.92):
 //               same money, better laptop = lower on the line (the index is quality-adjusted, FL 1.8/1.9)
 //   13.85-14.45 the line hooks UP (Sept 2025 -> Sept 2026), ending just before "up" (14.52)
 //   14.74       "+9.7%" pops alone, above the hook ("almost10%" 14.84)
@@ -140,8 +140,8 @@ export const LINE_W = 9;
 
 // ================================================================= the doodles (two kit laptops standing ON the line)
 
-/** A doodle: a kit laptop standing on the line at `year` (its deck's front edge on the stroke's top, tilted with the
- *  line), "$999" on its screen. */
+/** A doodle: a kit laptop standing on the line at `year` (its deck's front edge on the stroke, tilted a hint of the
+ *  line's slope), "$999" on its screen. Their years leave the right third to the hook and its number. */
 export const DOODLES = {
   mine: {year: 2010.0, w: 84},
   better: {year: 2015.6, w: 96},
