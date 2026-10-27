@@ -4,7 +4,7 @@
 // r 65 at p 0 (the S4 -> S5 match-cut), and the figures' seats come from the contract through the deck plane.
 //   END coords = the screen when the crane lands (p 1); START coords = the screen of the held start (p 0).
 import {S5, SUN1} from '../world/map';
-import {CRANE_T, craneP, DECK, FAR, RIVER, planeMat, startMat, applyMat, matScale, swapAt, type PullPlane} from '../kit/dc/crane';
+import {CRANE_T, craneP, DECK, FAR, planeMat, startMat, applyMat, matScale, swapAt, type PullPlane} from '../kit/dc/crane';
 import type {Pt} from '../../lib/sketch';
 import {FAR_END} from './V2S5_far';
 
@@ -19,8 +19,6 @@ export const FAR_S5: PullPlane = (() => {
   return {o, k, off: [SUN1.x - o[0] - k * (s.x - o[0]), SUN1.y - o[1] - k * (s.y - o[1])]};
 })();
 
-/** The river plane keeps the kit's slide; its vertical slot follows the far plane's horizon shift. */
-export const RIVER_S5: PullPlane = {...RIVER, o: [RIVER.o[0], RIVER.o[1] + FAR_END.dy], off: RIVER.off};
 
 /** End coords of a START-coords point riding the deck (the inverse of the deck's p 0 map). */
 export const deckEndOf = (q: Pt): Pt => {
