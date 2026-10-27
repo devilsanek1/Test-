@@ -1,13 +1,10 @@
-// V2S8 set (lane L6): STUB (the kit's S8Set at the clock's plane offsets). The set builder replaces this file.
+// V2S8 set (lane L6): STUB. The set builder replaces this file (sun, far, south bank, water, cafe boat, ground bands,
+// near band). Every export draws at the landing pose and shifts by its plane offset (V2S8_clock).
 import React from 'react';
-import {useTime} from '../../lib/time';
-import {S8Set} from '../kit/canal/sets';
-import {planeOffset, S8T} from './V2S8_clock';
-
-export const S8Back: React.FC = () => {
-  const t = useTime();
-  return <S8Set dxHouse={planeOffset('house', t)} dxNear={planeOffset('board', t)} wAt={S8T.wLights} lampRunAt={S8T.facts} board={null} pip={<></>} />;
-};
-export const S8Window: React.FC = () => null;
-export const S8DoorLeaf: React.FC = () => null;
+export const S8Sky: React.FC = () => null;
+export const S8Far: React.FC = () => null;
+export const S8South: React.FC = () => null;
+export const S8Water: React.FC = () => null;
+export const S8Boat: React.FC = () => null;
+export const S8Ground: React.FC = () => null;
 export const S8Front: React.FC = () => null;
