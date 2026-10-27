@@ -1,11 +1,14 @@
 /**
- * K2 MAP CONTRACT, video 2 "One Small Window" (docs/v2/TREATMENT.md sections 2-5 and 9). README: ./README.md.
+ * K2 MAP CONTRACT, video 2 "One Small Window" (docs/v2/TREATMENT.md sections 2-5 and 9), CONFORMED 2026-10-27 to
+ * docs/look/DIRECTION.md, docs/look/CRAFT.md and docs/v2/THROUGHLINE.md (they win where they differ; the lanes' own
+ * orders are docs/v2/lanes/conform_L1..L6.md). README: ./README.md.
  *
- * THE one source of truth every lane (L1-L7) and kit (K3-K7) builds to: the map, the shared spots, the shot clock,
- * the S1 scale sheet, the ghost row, Pip's seats and beats, every cut's match point, the legibility floor and the UI
- * zones. NUMBERS ONLY: nothing here draws and nothing here imports (pure TS, usable from node QA scripts). Colour
- * values appear only where a spec needs them and mirror K1 (`src/v2r/palette.ts` owns every token, the ink weights
- * included: `INK_PX`, `CM.ghostHead`, `SHOT_LIGHT`).
+ * THE one source of truth every lane (L1-L7) and kit (K3-K7) builds to: the map, the shared spots, the thread's spots
+ * (her window: W, M, S4's far window), the shot clock, the S1 scale sheet, the ghost row, Pip's seats and beats, every
+ * join's carrier and match point, the legibility floor and the UI zones. NUMBERS ONLY: nothing here draws and nothing
+ * here imports (pure TS, usable from node QA scripts). Colour values appear only where a spec needs them and mirror K1
+ * (`src/v2r/palette.ts` owns every token, the authored ink widths included: `INK_PX`, `CM.ghostHead`, `SHOT_LIGHT`);
+ * the light rigs live beside this file in `rigs.ts` (it imports lib/light, so it cannot live here).
  *
  * CONVENTIONS (read before using a number):
  *  - Units: px in the 1080 x 1920 frame; seconds of the voice clock (`public/v2/voice.wav`, 39.08 s). Frame = round(t * 60).
@@ -15,7 +18,11 @@
  *  - "y <= 600" in the treatment means "no higher on screen than y 600" (top edge at y >= 600). Same reading here.
  *  - Positions are SCREEN positions at each shot's `pose` moment (SHOTS[i].pose, POSE_T). `shotShapes(id, t)` maps
  *    them through the shot's camera (anchors and endpoints are contract; the curve between endpoints is the lane's).
- *  - A cut's match point is given in SCREEN space at the cut (MATCHES): both lanes hit it exactly.
+ *  - A join's match point is given in SCREEN space at the join (MATCHES): both lanes hit it exactly. Every join names
+ *    its carrier (A-F, CRAFT §a); none is a plain cut, and Pip never hops across one (it rides the carrier or keeps
+ *    its screen spot).
+ *  - RETIRED fields (the conform) keep their names and a neutral value (a zoom from 1.00 to 1.00, a zero-height hop)
+ *    so built code compiles until its lane conforms; the comment says what replaced them. Never build on one.
  *  - Change a number only with the director; a lane that needs a change puts one line under REQUESTS in its report.
  *  - Overlay any shot at any time: composition `MapContractShot` {id, t} in src/entry-v2r-map.tsx.
  */
@@ -107,7 +114,7 @@ export const cubicBezier = (x1: number, y1: number, x2: number, y2: number) => (
 // ---------------------------------------------------------------------------------------------------------------
 export const UI = {
   frame: {x0: 0, y0: 0, x1: FRAME_W, y1: FRAME_H} as Rect,
-  /** Captions pop in place inside this band on ONE flat field. NOTHING else is drawn here (no Pip, roof, hop arc, life). */
+  /** Captions pop in place inside this band on ONE flat field. NOTHING else is drawn here (no Pip, roof, wiper, life). */
   captionBand: {x0: 0, y0: 317, x1: FRAME_W, y1: 556} as Rect,
   /** The ONE quiet field of every shot: the flat sky = the caption field. Flat horizon bands only below y 600. */
   quietSky: {x0: 0, y0: 0, x1: FRAME_W, y1: 600} as Rect,
@@ -117,7 +124,8 @@ export const UI = {
   keyRead: {x0: 120, y0: 290, x1: 880, y1: 1250} as Rect,
   /** The platform's right rail (like / comment / share): masses only. Never Pip, a board, a key read. */
   rightRail: {x0: 780, y0: 840, x1: FRAME_W, y1: FRAME_H} as Rect,
-  /** The bottom third runs under the platform UI: never quiet (each shot's mass in BOTTOM_THIRD), nothing to read. */
+  /** The bottom third runs under the platform UI: never quiet (each shot's mass in BOTTOM_THIRD), nothing to read, and
+   *  THINGS only: no stranger's back in any foreground (DIRECTION rule 3; only Pip and things down here). */
   bottomThird: {x0: 0, y0: 1250, x1: FRAME_W, y1: FRAME_H} as Rect,
   /** Paper edges (`paint-subtle`, final only, if the owner wants them): never in y 0-620. */
   noPaperEdge: {x0: 0, y0: 0, x1: FRAME_W, y1: 620} as Rect,
@@ -127,7 +135,7 @@ export const UI = {
 export const SKYLINE_EXCEPTIONS = {
   /** S1: the roof-terrace planting may reach up to y 575 (never higher). */
   s1RoofPlantingTopMinY: 575,
-  /** Sun discs: SUN2 top = 575 (19 px clear of the band); SUN1 top 585; SUN0 top 610; the S8 sun top 600. */
+  /** Sun discs: SUN2 top = 575 (19 px clear of the band); SUN1 top 585; SUN0 top 610; SUN8 top 585; S5's end sun 586. */
   sunTopMinY: 575,
   /** S5: the cloud bank and the obelisk tops stay at y >= 610. */
   s5CloudObeliskTopMinY: 610,
@@ -143,7 +151,7 @@ export const LEGIBILITY = {
   carrierFigureMinH: 130,
   /** The S2 bench staffer, seated (the hood change = head + shoulders >= 80 px). */
   benchStafferSeatedMinH: 180,
-  /** S3: her French-window silhouette at the match (so it stays >= 130 after the 5 % ease-back). */
+  /** S3: her French-window silhouette at the match (>= 130; S3 holds zoom 1.00: the ease-back is retired). */
   s3SilhouetteMinHAtMatch: 137,
   /** S2 staff windows: each >= 90 x 90. */
   staffWindowMinPx: 90,
@@ -198,7 +206,7 @@ export const MAP_PLACES: Place[] = [
   {id: 'cafeBoat', side: 'water', chainM: 540, what: 'the cafe boat moored below her terrace, its quote-of-the-day A-board on the towpath edge (her board at B in S8)', shots: ['V2S8']},
   {id: 'herLane', side: 'north', chainM: 560, what: 'her towpath running WEST to a bend, lamps receding; her house at the bend facing down the lane', shots: ['V2S8']},
   {id: 'gasholdersViaduct', side: 'north', chainM: 900, what: 'gasholders and a viaduct far west', shots: ['V2S4', 'V2S8']},
-  {id: 'southSteps', side: 'south', chainM: 10, what: 'our broad canal-side stone steps facing the wing, people sitting (the S1 lens sits here)', shots: ['V2S1']},
+  {id: 'southSteps', side: 'south', chainM: 10, what: 'our broad canal-side stone steps facing the wing (the S1 lens sits here): things on the near steps, a few people sitting only on the step by the water', shots: ['V2S1']},
   {id: 'southTowpath', side: 'south', chainM: 30, what: 'the south towpath facing the wing: newsstand, bench, railing (the S2 lens)', shots: ['V2S2']},
   {id: 'arlingtonViewpoint', side: 'arlington', chainM: 0, what: 'a public viewpoint terrace SOUTH-WEST of the Pentagon looking NORTH-EAST: lawns, parkway, the Pentagon, the Potomac, the low white city, the Washington Monument', shots: ['V2S5']},
   {id: 'pentagonGate', side: 'arlington', chainM: 0, what: "the Pentagon's perimeter footpath looking SOUTH: a low limestone facade band, a fence with a tall corner post, blossom, tulip beds, a service door 'CLASSIFIED · AUTHORIZED PERSONNEL ONLY'", shots: ['V2S6']},
@@ -232,38 +240,55 @@ export const SHOT_LIGHT_MAP: Record<ShotId, LightState> = {
 // ---------------------------------------------------------------------------------------------------------------
 // 3. Shared spots (TREATMENT section 5, "Shared spots (K2)")
 // ---------------------------------------------------------------------------------------------------------------
-/** W: her OFFICE window in S1 (first storey, the biggest pane; lamp-lit, dark from 0.40) AND her lit HOME window at the
- *  end of S8 (the loop seam). Centre (860, 700), 150 x 170 (1.65 x 1.9 m at the facade's 90 px/m). */
+/** THE THREAD (THROUGHLINE §1.2): her window, the one small window. Its home spots: W (S1, S8), M (S2, S3) and S4's far
+ *  window (`S4.herWindow`); S5-S7 run without it (the owner-approved fairness stretch, 20.55-33.00). */
+/** W: her OFFICE window in S1 (first storey, the biggest pane; lamp-lit, dark from 0.40: "quit") AND her lit HOME window
+ *  at the end of S8 (lights 34.95; the loop seam). Centre (860, 700), 150 x 170 (1.65 x 1.9 m at the facade's 90 px/m),
+ *  at zoom 1.00 in both shots (S1's pull-out and S8's seam push are retired). */
 export const W: Spot = {x: 860, y: 700, w: 150, h: 170};
-/** W2: the first staff window in S2 (base pose) = her French window in S3 (the window match-cut). */
-export const W2: Spot = {x: 335, y: 785, w: 125, h: 155};
-/** W2 at the S2 -> S3 cut, after S2's 6 % story push anchored on W2 (TREATMENT: 133 x 164). */
-export const W2_CUT: Spot = {x: 335, y: 785, w: 132.5, h: 164.3};
-/** The suns. SUN0 = S1's west gap; SUN1 = the S4 -> S5 match; SUN2 = S6 morning = S7 sunset (19 px clear of the band). */
+/** M: the thread's match spot (THROUGHLINE §1.2): her DARK office window in S2 (pulled out of at 6.10; the one dark pane
+ *  among the staff's) = her LIT home window in S3 (blind up, she is on the phone): the B match at 12.98. 132.5 x 164.3
+ *  (TREATMENT's 133 x 164) for the whole of S2 and S3: no story push, no ease-back. */
+export const M: Spot = {x: 335, y: 785, w: 132.5, h: 164.3};
+/** = M. Before the conform W2 was the first STAFF window here (125 x 155, pushed to 133 x 164 by S2's retired 6 % push);
+ *  her window now holds the spot and that staff window moved to her old place (S2.staffWindows SW1). Name kept. */
+export const W2: Spot = M;
+/** = M (S2's window at the match: there is no push any more, so it is this size throughout). Name kept. */
+export const W2_CUT: Spot = M;
+/** The suns: one per frame, a source that never moves between cuts, never a character (DIRECTION rule 5, "Retired").
+ *  SUN0 = S1's west gap; SUN1 = S4's low sun just above her far window = S5's April sun in the slot (the S4 -> S5 A
+ *  push-through); SUN2 = S6's April morning = S7's sunset (the S6 -> S7 A push-through; 19 px clear of the band). */
 export const SUN0: Disc = {x: 200, y: 690, r: 80};
 export const SUN1: Disc = {x: 250, y: 650, r: 65};
 export const SUN2: Disc = {x: 260, y: 620, r: 45};
-/** S8's low sun over the canal past her board (20 px clear of B's top, never touching it). Fixed through S8's truck. */
-export const SUN8: Disc = {x: 420, y: 640, r: 40};
+/** S8's low sun ahead, over the canal past her board (THROUGHLINE §7: top 585, 35 px clear of B's top). Fixed through S8's
+ *  truck; it un-builds before S1's SUN0 shows through at the seam (two suns never share a frame). */
+export const SUN8: Disc = {x: 420, y: 625, r: 40};
 /** B: the A-board FACE (Google's in S7 at its push landing 30.04; hers in S8 from the truck landing 35.60). */
 export const B: Rect = {x0: 150, y0: 700, x1: 630, y1: 1220};
 export const B_LEGS_Y1 = 1250;
 /** Pip's board bollard beside B (S7, S8): base-centre. Clears B's face and the rail. */
 export const BOARD_BOLLARD: Seat = {x: 700, y: 1205};
-/** Pip's S1 waterline bollard (f0, and the loop landing). */
+/** Pip's S1 waterline bollard (f0, the whole of S1, and the loop: a 30 px settle from BOARD_BOLLARD, no hop). */
 export const S1_BOLLARD: Seat = {x: 700, y: 1235};
-/** Plum bridge colour of the S1 -> S2 push-through (= K1 CM.anchor). */
+/** Plum bridge colour of the S1 -> S2 and S3 -> S4 push-throughs (her plum = K1 CM.anchor); the two sun push-throughs
+ *  (S4 -> S5, S6 -> S7) have no bridge. */
 export const PLUM_BRIDGE = '#36223A';
 
 // ---------------------------------------------------------------------------------------------------------------
-// 4. Shots V2S1-V2S8 (TREATMENT section 5; = K8 src/v2r/film/scenes.json). Ids never clash with v1's edge hints.
+// 4. Shots V2S1-V2S8 (TREATMENT section 5 + THROUGHLINE §3; = K8 src/v2r/film/scenes.json). Ids never clash with v1's
+//    edge hints.
 // ---------------------------------------------------------------------------------------------------------------
+/** A join's carrier (DIRECTION rule 1, CRAFT §a; lib/Film `FilmCarrier`): A push-through, B thread match, C continuous
+ *  camera, D object carry or wipe, E card flip or swipe, F plain cut (at most 2, on a "But" turn). This film: A, B, A, A,
+ *  D, A, D, and the loop's B (0 plain cuts). */
+export type Carrier = 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+/** t0..t1 = the transition's span (its midpoint = the incoming shot's `start`, on the next sentence's first word). */
 export type TransitionIn =
   | {type: 'film-start'}
-  | {type: 'push-through'; t0: number; t1: number; from: XY; to: XY; zoom: number; bridge: string; inkComp: number}
-  | {type: 'matchcut'; t0: number; t1: number; on: string}
-  | {type: 'cut-on-action'; on: string}
-  | {type: 'foreground-wipe'; t0: number; t1: number; element: 'scene'; dir: 'left'; on: string};
+  | {type: 'push-through'; carrier: 'A'; t0: number; t1: number; from: XY; to: XY; zoom: number; bridge?: string; inkComp: number}
+  | {type: 'matchcut'; carrier: 'B'; t0: number; t1: number; on: string}
+  | {type: 'foreground-wipe'; carrier: 'D'; t0: number; t1: number; element: 'scene'; dir: 'left'; on: string};
 
 export type ShotSpec = {
   id: ShotId;
@@ -276,8 +301,10 @@ export type ShotSpec = {
   lane: 'L1' | 'L2' | 'L3' | 'L4' | 'L5' | 'L6';
   set: string;
   framing: string;
-  /** BUSY: >= 3.5 events/s, no gap > 1 s, flat <= 40 %. DENSE-CALM: >= 2 movers always, flat <= 30 %. SCALE: S5. */
-  mood: 'BUSY' | 'DENSE-CALM' | 'SCALE';
+  /** The alive profile (LIFE_AND_DENSITY §0), INFORMATION only: STORY-LED (was "BUSY": the opening and explainer beats,
+   *  the meter's flat <= 40 %), DENSE-CALM (cozy holds, flat <= 30 %, `density.py --cozy`), SCALE (S5). No events/s
+   *  quota anywhere; at most 3-4 noticeable supporting movers at once, taking turns (DIRECTION rule 3, CRAFT §b). */
+  mood: 'STORY-LED' | 'DENSE-CALM' | 'SCALE';
   light: LightState;
   /** The moment the listed screen positions are exact (POSE_T[id]). */
   pose: string;
@@ -290,73 +317,75 @@ const shot = (s: Omit<ShotSpec, 'startF' | 'endF' | 'light'>): ShotSpec => ({...
 
 export const SHOTS: ShotSpec[] = [
   shot({
-    id: 'V2S1', name: 'Walking out', start: 0.0, end: 6.1, lane: 'L1', mood: 'BUSY', set: 'A frontal (S1 scale sheet)',
+    id: 'V2S1', name: 'Walking out', start: 0.0, end: 6.1, lane: 'L1', mood: 'STORY-LED', set: 'A frontal (S1 scale sheet)',
     words: 'She quit Google. And she says her contract bans her from criticizing it... for life.',
     framing: 'RIVERSIDE across the canal from a seated eye level on our steps, looking north',
-    pose: '5.30, the cover (zoom 1.00 from 4.90); earlier: s1Screen(p, t) (the pull-out about W)',
+    pose: '5.30, the cover; zoom 1.00 at every t (the pull-out is retired): every S1 spot is its zoom-1.00 value',
     transitionIn: {type: 'film-start'},
     explains: 'She left, and she says the rule covers the whole rest of her life.',
   }),
   shot({
-    id: 'V2S2', name: 'The wall', start: 6.1, end: 12.98, lane: 'L2', mood: 'BUSY', set: 'A from the south bank',
+    id: 'V2S2', name: 'The wall', start: 6.1, end: 12.98, lane: 'L2', mood: 'STORY-LED', set: 'A from the south bank',
     words: "You'd think that's one odd contract. But Google's staff told the BBC they're scared to speak out, because of their contracts.",
     framing: 'RIVERSIDE from the south towpath; the wing in 3/4, cut by the left edge, receding right',
-    pose: '6.70 (the push-through pull-back landed, zoom 1.00); the story push maps by scaleAbout(p, W2, 1.06) at the cut',
-    transitionIn: {type: 'push-through', t0: 5.95, t1: 6.25, from: {x: 860, y: 700}, to: {x: 200, y: 795}, zoom: 12, bridge: PLUM_BRIDGE, inkComp: 0.6},
+    pose: '6.70 (the pull-back out of M landed, zoom 1.00; the 6 % story push is retired: her window at M to the match)',
+    transitionIn: {type: 'push-through', carrier: 'A', t0: 5.95, t1: 6.25, from: {x: W.x, y: W.y}, to: {x: M.x, y: M.y}, zoom: 12, bridge: PLUM_BRIDGE, inkComp: 0.6},
     explains: 'Not one odd contract: a few Google staff, in their account to the BBC, are scared too.',
   }),
   shot({
     id: 'V2S3', name: 'Her window', start: 12.98, end: 14.86, lane: 'L3', mood: 'DENSE-CALM', set: 'B across the water',
     words: 'So why is she talking?',
     framing: 'RIVERSIDE across the water to her terrace (a flash-forward in S8 sunset light)',
-    pose: '12.98 (the match, zoom 1.00); the ease-back maps by scaleAbout(p, W2, 0.95) by 13.60',
-    transitionIn: {type: 'matchcut', t0: 12.81, t1: 13.16, on: 'W2: the S2 staff window W2_CUT = her French window (same spot, same size)'},
+    pose: '12.98 (the match; zoom 1.00 throughout, the ease-back is retired; the 2D float home at 12.98 and from 14.60)',
+    transitionIn: {type: 'matchcut', carrier: 'B', t0: 12.81, t1: 13.16, on: 'M: her dark office window (S2) = her lit home window (S3), the same spot and size'},
     explains: 'Unlike the blinds, her window is open: she is the one talking.',
   }),
   shot({
     id: 'V2S4', name: 'The walk home', start: 14.86, end: 20.55, lane: 'L3', mood: 'DENSE-CALM', set: 'B: her towpath from the water',
     words: "She worked on Google's AI and told the BBC she objected to where its military work was heading.",
     framing: 'RIVERSIDE truck from the water, a narrowboat gliding with us as the foreground',
-    pose: '17.96 (the stop on "objected": the post lands at x ~575); the 6 % push about SUN1 lands SUN1 at the cut',
-    transitionIn: {type: 'cut-on-action', on: "Pip's leap out of S3 (14.70) -> Pip lands on the boat roof (14.95)"},
+    pose: '17.96 (the stop on "objected": the post lands at x ~575); zoom 1.00 throughout (the push toward SUN1 is retired), the hold home by 20.40',
+    transitionIn: {type: 'push-through', carrier: 'A', t0: 14.71, t1: 15.01, from: {x: 330, y: 742}, to: {x: 720, y: 912}, zoom: 12, bridge: PLUM_BRIDGE, inkComp: 0.6},
     explains: "Who she is (an insider at Google's AI lab who objected, then quit) and that \"heading\" was a direction: unclassified, then classified.",
   }),
   shot({
-    id: 'V2S5', name: 'The far side', start: 20.55, end: 24.0, lane: 'L4', mood: 'SCALE', set: 'C Arlington heights',
+    id: 'V2S5', name: 'The far side', start: 20.55, end: 23.8, lane: 'L4', mood: 'SCALE', set: 'C Arlington heights',
     words: 'In April, that meant a deal letting the Pentagon use its AI for',
     framing: 'the S5 pull-back crane, the ONE big move: under a blossoming canopy -> the Arlington view',
-    pose: 'start = the hold 20.55-21.30; end = the hold 23.40-24.00',
-    transitionIn: {type: 'matchcut', t0: 20.1, t1: 20.67, on: 'SUN1 (250, 650) r 65 (cut 20.55, inside the pause)'},
+    pose: 'start = the hold 20.55-21.30; end = the hold 23.40-23.98 (under the blossom-tree wipe 23.62-23.98)',
+    transitionIn: {type: 'push-through', carrier: 'A', t0: 20.4, t1: 20.7, from: {x: SUN1.x, y: SUN1.y}, to: {x: SUN1.x, y: SUN1.y}, zoom: 7, inkComp: 0.6},
     explains: 'April: the deal was with the US Department of Defense, a user the size of this view.',
   }),
   shot({
-    id: 'V2S6', name: 'The gate', start: 24.0, end: 28.06, lane: 'L5', mood: 'BUSY', set: 'D the gate',
+    id: 'V2S6', name: 'The gate', start: 23.8, end: 28.1, lane: 'L5', mood: 'STORY-LED', set: 'D the gate',
     words: '"any lawful government purpose". Google can\'t veto how it\'s used.',
-    framing: 'eye level, straight-on, looking south along the perimeter fence',
-    pose: 'linear in time 24.00 -> 28.06 (the lateral truck: the board drifts right 25 px/s)',
-    transitionIn: {type: 'cut-on-action', on: "Pip's leap (S5 23.90) -> Pip lands on the fence's tall corner post (the cut on \"any\", 24.00)"},
+    framing: 'eye level, straight-on, looking south along the perimeter fence; HELD at its 24.00 pose (the truck is retired)',
+    pose: '24.00, held: every listed position is exact 23.80-28.10 (locked or a slow 2D float)',
+    transitionIn: {type: 'foreground-wipe', carrier: 'D', t0: 23.62, t1: 23.98, element: 'scene', dir: 'left', on: "S5's Wiper: one blossom tree close to the lens, right to left, clipped at y >= 560 (S5's end sun covered first, SUN2 and the deal board uncovered last)"},
     explains: "The deal's exact words with their limit; lawful use is the Pentagon's call, not Google's.",
   }),
   shot({
-    id: 'V2S7', name: 'Google says', start: 28.06, end: 32.93, lane: 'L5', mood: 'DENSE-CALM', set: 'A forecourt (west end)',
+    id: 'V2S7', name: 'Google says', start: 28.1, end: 32.93, lane: 'L5', mood: 'DENSE-CALM', set: 'A forecourt (west end)',
     words: 'But Google says it follows its AI principles and bans retaliation "of any kind".',
     framing: "eye level from the forecourt at the wing's west end, looking north; uninterrupted to 32.70",
-    pose: '30.04 (the 4 % push landed on "principles": B exact); at 28.06 everything is scaleAbout(p, B centre, 1/1.04)',
-    transitionIn: {type: 'matchcut', t0: 27.82, t1: 28.31, on: 'SUN2 (260, 620) r 45 (S6 morning = S7 sunset)'},
+    pose: '30.04 (the 4 % push landed on "principles": B exact); before 28.40 everything is scaleAbout(p, B centre, 1/1.04); SUN2 is screen-fixed',
+    transitionIn: {type: 'push-through', carrier: 'A', t0: 27.95, t1: 28.25, from: {x: SUN2.x, y: SUN2.y}, to: {x: SUN2.x, y: SUN2.y}, zoom: 7, inkComp: 0.6},
     explains: "Google's answers to the deal (its AI principles) and to the fear (no retaliation), in its own words, at equal weight.",
   }),
   shot({
     id: 'V2S8', name: 'Her words', start: 32.93, end: 39.08, lane: 'L6', mood: 'DENSE-CALM', set: 'B: her lane',
     words: 'She says she can\'t criticize Google. But in her words, "talking about facts is not criticising".',
     framing: 'LANE along her towpath, looking west',
-    pose: 'pre-truck to 34.99 (her board at x -100-380); landing 35.60 and 38.82 (board at B, W at (860, 700))',
-    transitionIn: {type: 'foreground-wipe', t0: 32.7, t1: 33.16, element: 'scene', dir: 'left', on: "S7's Wiper (a narrowboat travelling west; bow in only after 32.70)"},
+    pose: 'pre-truck to 34.99 (her board at x -100-380); from the landing 35.60 to the end: board at B, W at (860, 700) = S1 frame 0\'s W (the seam push is retired)',
+    transitionIn: {type: 'foreground-wipe', carrier: 'D', t0: 32.7, t1: 33.16, element: 'scene', dir: 'left', on: "S7's Wiper (a narrowboat travelling west; bow in only after 32.70); Pip rides its stern"},
     explains: 'Her claim still stands (she says), and she talks anyway: in her words, talking about facts is not criticising.',
   }),
 ];
 
 /** The time at which each shot's listed positions are exact. */
 export const POSE_T: Record<ShotId, number> = {V2S1: 5.3, V2S2: 6.7, V2S3: 12.98, V2S4: 17.96, V2S5: 21.0, V2S6: 24.0, V2S7: 30.04, V2S8: 35.6};
+/** The loop join (S8 -> S1): B (W = W at zoom 1.00) + the un-build 38.82-39.08 (scenes.json V2S8 `transitionOut`). */
+export const LOOP_CARRIER: Carrier = 'B';
 
 export const shotById = (id: ShotId): ShotSpec => {
   const s = SHOTS.find((x) => x.id === id);
@@ -457,47 +486,57 @@ export const S1_SHEET = {
   water: {y0: 1110, y1: 1215},
   /** Two moored boats right: masses in the rail. */
   boatsRight: {x0: 760, y0: 1080, x1: FRAME_W, y1: 1215} as Rect,
-  /** Our bank: the waterline 1215 -> the bottom; five broad stone steps rising toward us, ~14 seated backs. */
+  /** Our bank: the waterline 1215 -> the bottom; five broad stone steps rising toward us, holding THINGS (THROUGHLINE
+   *  §1.5, DIRECTION rule 3: no stranger's back in the foreground): step edges as flat 2-tone bands, a tote, two takeaway
+   *  cups, a folded newspaper, a scarf left on a step, a bike cut by the bottom-right, a planter of grasses, leaves. */
   ourBank: {y0: 1215, y1: FRAME_H},
   stepsCount: 5,
-  stepsSeated: 14,
-  /** Seated head-backs: near row cut by the bottom (the whole back <= ~140 px WIDE at the shoulders, head ~55-65: the
-   *  owner's people rule, STYLE.md), middle (~110), low by the water (~60). */
-  seatedHeadPx: {near: [110, 140] as const, middle: 110, low: 60},
+  /** The seated public: ONLY on the step by the water (the landing, seat line y ~1300: the mid ground; tier B), half at
+   *  rest, no two alike, x 620-780 clear for Pip's bollard (as built: 7 figures, 56-62 px). The near and middle rows of
+   *  seated backs are RETIRED. */
+  stepsSeated: 7,
+  seatedHeadPx: {low: 60},
   pipBollard: S1_BOLLARD,
   heroCloud: {x0: 640, y0: 120, x1: 1000, y1: 280} as Rect,
   heroCloudDriftPxS: 2,
   planeBranch: {x0: 0, y0: 0, x1: 220, y1: 240} as Rect,
 } as const;
 
-/** The S1 camera: a 5 % pull-out 1.05 -> 1.00 (ease-in) over 0-4.90, ANCHORED ON W, so W's centre is identical on every
- *  frame (the loop seam); then the push-through into W 5.95-6.25 (Film 'push-through', inkComp 0.6, plum bridge). */
+/** The S1 camera: zoom 1.00 at every t, held locked or on the 2D float (eased straight legs within +-12 px, home by
+ *  5.90); then the A push-through into W 5.95-6.25 (Film 'push-through', inkComp 0.6, plum bridge). `pullOut` is
+ *  RETIRED (no zoom in a hold: DIRECTION rule 8; THROUGHLINE §6): from = to = 1.00, so s1Zoom / s1Screen are the
+ *  identity and every S1 spot is its zoom-1.00 value; kept so built code compiles. */
 export const S1_CAMERA = {
-  pullOut: {from: 1.05, to: 1.0, t0: 0, t1: 4.9, anchor: {x: W.x, y: W.y}, ease: 'in'} as ZoomKey,
+  pullOut: {from: 1.0, to: 1.0, t0: 0, t1: 4.9, anchor: {x: W.x, y: W.y}, ease: 'in'} as ZoomKey,
   pushThrough: {t0: 5.95, t1: 6.25, into: {x: W.x, y: W.y} as XY, zoom: 12, bridge: PLUM_BRIDGE, inkComp: 0.6},
 };
 export const s1Zoom = (t: number): number => zoomAt(S1_CAMERA.pullOut, t);
 /** S1 world (zoom 1.00) -> screen at time t. */
 export const s1Screen = (p: XY, t: number): XY => scaleAbout(p, S1_CAMERA.pullOut.anchor, s1Zoom(t));
 
-/** The S1 clock: the spot-tied moments every S1 builder, K4/K5 and sound share (TREATMENT section 4). */
+/** The S1 clock: the spot-tied moments every S1 builder, K4/K5 and sound share (TREATMENT section 4, THROUGHLINE §4.1).
+ *  Frame 0 (DIRECTION rule 9): paper; the C world lands as flat PALE shapes; the A subjects' outlines (her behind the
+ *  glass door, the door, W) draw on as one stroke each with Pip's tinted line, from t ~-0.26 so f0 shows them mid-draw;
+ *  no colour before the flood (the sun half-coloured: the flood starts from it); the flood from SUN0 by 0.30, Pip with
+ *  it, her teal coat last (f18). */
 export const S1_CLOCK = {
   flood: {t0: 0.02, t1: 0.3, origin: {x: SUN0.x, y: SUN0.y} as XY, herCoatLastF: 18},
   voiceShe: 0.12,
   wLampOff: 0.4,
   doorsStart: 0.45, // OUR EXIT DING
   doorsOpen: 0.52,
-  steppingOut: 0.97, // "Google": canopy letters fill-pop one by one
-  doorsShut: 1.1, // a bus crosses the far bridge
+  steppingOut: 0.97, // "Google": the canopy letters pop one by one (A: a pop is A's, never B's)
+  doorsShut: 1.1, // a bus crosses the far bridge (once)
   pipHeadFollows: 1.25,
-  birdsLiftBridge: 1.4,
+  birdsLiftBridge: 1.4, // the ONLY bird lift in S1: small and far, her step out (none on the 4.98 hit)
   ghostPops: [2.0, 2.53, 3.2, 3.8, 4.2, 4.79],
   stop: {t0: 4.54, t1: 4.98}, // the "...": everyone stops mid-stride, the ambience dips (to 4.79)
-  life: 4.98, // ONE step together, three outlines, birds off the far roofs, Pip ears-cover
+  life: 4.98, // ONE step together, three outlines pop, Pip ears-cover (the hit is the row's: no birds)
   cover: 5.3,
   herLooksBack: 5.59,
+  /** RETIRED (THROUGHLINE §3): Pip stays on its bollard; the push-through into W sweeps it. Kept for built code. */
   pipHopsUpLeft: 5.9,
-  dive: {t0: 5.95, t1: 6.25},
+  dive: {t0: 5.95, t1: 6.25}, // the A push-through into W; in 5.80-6.40 nothing enters, pops or turns but the dive
 } as const;
 
 /** S1 frame-0 words (mirror of TREATMENT section 4; K8's Frame0Text renders them). All inside y 317-556. */
@@ -589,7 +628,7 @@ export const GHOST_PAPER_HEX = '#FBF6EE';
 export const GHOST_POP = {outlineS: 0.1, fillDelayF: 2, settleF: 4} as const;
 /** The "...": 4.54 she stops, every ghost stops mid-stride (the ambience dips to 4.79); all still until the 4.98 step. */
 export const S1_ROW_STOP = {t0: 4.54, t1: 4.98} as const;
-/** On "life" (4.98, f299): the whole row takes ONE step, three outlines pop, birds lift off the far roofs, Pip ears-cover. */
+/** On "life" (4.98, f299): the whole row takes ONE step, three outlines pop, Pip ears-cover (no other mover joins in). */
 export const S1_LIFE_T = 4.98;
 
 /**
@@ -618,26 +657,34 @@ export const s1RowAt = (t: number): RowPose[] => {
 // 7. Per-shot layouts (screen px at each shot's pose; TREATMENT section 5 table + the bottom third)
 // ---------------------------------------------------------------------------------------------------------------
 export const S2 = {
-  /** Her dark window; an ink ring draws round it at 6.82 ("one"). */
-  herDarkWindow: {x: 200, y: 795, w: 140, h: 170} as Spot,
+  /** Her DARK office window at M (THROUGHLINE §1.2: the thread's match spot; the staff window that sat here moved to her
+   *  old spot, SW1). Pulled out of at 6.10; the plum anchor all shot (the one dark pane: the thread's reaction). */
+  herDarkWindow: M,
+  /** 6.82 "one": her window's own A outline pops on (one frame; one closed 3.0 px line in the frame's own deep warm
+   *  shade, the only full outline in the frame). */
+  outlineAt: 6.82,
+  /** = outlineAt. RETIRED name: the drawn ink ring is board notation (G5_BLOCKING §2), never a drawn circle. */
   ringAt: 6.82,
-  /** The five staff windows around hers (each >= 90 x 90). Order = the blind order. */
+  /** The five staff windows round hers (each >= 90 x 90). Order = the blind order. The id 'W2' marks the window whose
+   *  blind comes FULLY down on "contracts" 12.20 (built code keys it): since the conform, the one beside hers. */
   staffWindows: [
-    {id: 'W2', x: 335, y: 785, w: 125, h: 155},
-    {id: 'SW2', x: 465, y: 776, w: 110, h: 140},
+    {id: 'SW1', x: 200, y: 795, w: 140, h: 170},
+    {id: 'W2', x: 465, y: 776, w: 110, h: 140},
     {id: 'SW3', x: 460, y: 948, w: 100, h: 90},
     {id: 'SW4', x: 330, y: 955, w: 110, h: 95},
     {id: 'SW5', x: 190, y: 960, w: 120, h: 100},
   ] as (Spot & {id: string})[],
-  /** 8.96 "staff": the five turn a cooler white, a standing silhouette in each (five light clicks, 0.04 s apart). */
+  /** 8.96 "staff": the five turn a cooler white in ONE step each, a standing silhouette in each (five clicks, 0.04 s
+   *  apart: single steps, flash-safe). */
   staffOnAt: 8.96,
   staffOnStagger: 0.04,
   /** 10.26-10.60 "scared": the five blinds drop to HALF one by one (0.085 s apart), the silhouettes step back. */
   blindsAt: 10.26,
   blindsStagger: 0.085,
-  /** 10.36: the bench staffer's hood goes up (whole-head shape change; head + shoulders >= 80 px). */
-  hoodAt: 10.36,
-  /** 12.20 "contracts": W2's blind comes fully down (blind thump). */
+  /** ~10.85: the bench staffer's hood goes up, AFTER the blinds (never two story actions at once; head + shoulders
+   *  >= 80 px). Was 10.36. */
+  hoodAt: 10.85,
+  /** 12.20 "contracts": the blind of 'W2' (465, 776), beside hers, comes fully down (blind thump). */
   w2BlindDownAt: 12.2,
   /** The wing, cut by the left edge, receding right: rows at the left edge; ~400 windows (one batched path, LOD);
    *  the stepped tiers small behind it, all at y >= 600; pigeons on the parapet. */
@@ -650,43 +697,69 @@ export const S2 = {
   bench: {x0: 560, y0: 1040, x1: 780, y1: 1230} as Rect,
   reporter: {x: 612, feetY: 1230, h: 165} as Fig,
   staffer: {x: 714, feetY: 1230, h: 180} as Fig,
-  /** 9.48 "BBC": the notebook opens, the staffer turns to the reporter; 12.85 the notebook claps shut. */
+  /** 9.48 "BBC": the notebook opens, the staffer turns to the reporter; the notebook claps shut by 12.70 (was 12.85):
+   *  nothing enters, pops or turns in 12.78-13.18 (the match). */
   notebookOpenAt: 9.48,
-  notebookShutAt: 12.85,
+  notebookShutAt: 12.7,
+  /** Pip's railing post, from the first frame (no hop-in) to the match, and the SAME screen spot in S3 (no hop). */
   pipSeat: {x: 590, y: 1050} as Seat,
   camera: {
-    /** Out of the push-through: 1.12 -> 1.00 ease-out 6.10-6.70 about her dark window. */
-    pullBack: {from: 1.12, to: 1.0, t0: 6.1, t1: 6.7, anchor: {x: 200, y: 795}, ease: 'out'} as ZoomKey,
-    /** A float 10 px/s that is back at 0 (or absorbed) so W2's centre lands at (335, 785) at the cut. */
+    /** Out of the push-through: 1.12 -> 1.00 ease-out 6.10-6.70 about her dark window at M. */
+    pullBack: {from: 1.12, to: 1.0, t0: 6.1, t1: 6.7, anchor: {x: M.x, y: M.y}, ease: 'out'} as ZoomKey,
+    /** The 2D float (translation only: straight eased legs turning every 0.6-1.5 s, within +-12 px), home exactly at 12.98
+     *  so M is exact on the match. */
     floatPxS: 10,
-    /** The 6 % story push on W2 8.50-12.80 (ease in-out). */
-    push: {from: 1.0, to: 1.06, t0: 8.5, t1: 12.8, anchor: {x: W2.x, y: W2.y}, ease: 'inOut'} as ZoomKey,
+    /** RETIRED (the 6 % story push: no zoom in a hold, DIRECTION rule 8): from = to = 1.00, kept for built code. */
+    push: {from: 1.0, to: 1.0, t0: 8.5, t1: 12.8, anchor: {x: M.x, y: M.y}, ease: 'inOut'} as ZoomKey,
   },
 } as const;
 
 export const S3 = {
-  /** Her French window at the match = W2_CUT (teal frame, Juliet rail, blind UP, lamp on, plants). */
-  frenchWindow: W2_CUT,
-  /** Her full-figure silhouette pacing inside, phone at her ear: >= 137 px at the match (>= 130 after the ease-back),
-   *  feet on the window's floor line; pacing range x 290-380 (clear of Pip). 14.28 her free hand moves. */
+  /** Her lit HOME window at M (= S2's dark office window: the B match at 12.98; teal frame, Juliet rail, blind UP, lamp
+   *  on, plants; = S8's window). The thread, A in this shot. */
+  frenchWindow: M,
+  /** Her full-figure silhouette pacing inside, phone at her ear: 140 px (>= 137 at the match), feet on the window's floor
+   *  line; pacing range x 290-380. 14.28 her free hand moves. From `stillFrom` 14.60 she stands still at x 330 with her
+   *  head on `pushFrom` (330, 742), where the A push-through into her starts (at zoom 12 a 10 px miss is 120 px). */
   silhouette: {x: 330, feetY: 862, h: 140} as Fig,
   pacingX: [290, 380] as const,
   handMovesAt: 14.28,
-  /** Her window box (Pip on its right end, clear of the window opening and of her). */
+  stillFrom: 14.6,
+  pushFrom: {x: 330, y: 742} as XY,
+  /** Her window box (plants; no longer Pip's seat). */
   windowBox: {x0: 255, y0: 868, x1: 520, y1: 900} as Rect,
-  pipSeat: {x: 462, y: 878} as Seat,
+  /** Pip on her terrace's front railing below and right of her window, from the first frame: S2's screen spot (590, 1050)
+   *  on both sides of the match (THROUGHLINE §3); turns to her on "she" 13.96, then stays (the push-through sweeps it). */
+  pipSeat: {x: 590, y: 1050} as Seat,
   /** Her terrace across the water: two storeys + mansard; chimneys and aerials all at y >= 600; two lit neighbours. */
   terraceTopMinY: 600,
-  /** Bottom third: the moored narrowboat roof y ~1260-1330, cabin 1330-1580; our towpath y 1640-1920. */
+  /** Bottom third: the moored narrowboat roof y ~1260-1330, cabin 1330-1580; our towpath y 1640-1920 with things only (a
+   *  bench with a bag left on it, a mooring bollard and its rope, leaves, the lamp foot held from S2): no head-backs. */
   boatRoofY: [1260, 1330] as const,
   boatCabinY: [1330, 1580] as const,
   ourTowpathY: [1640, 1920] as const,
-  camera: {easeBack: {from: 1.0, to: 0.95, t0: 13.0, t1: 13.6, anchor: {x: W2.x, y: W2.y}, ease: 'out'} as ZoomKey, floatPxS: [8, 12] as const},
+  camera: {
+    /** RETIRED (the 5 % ease-back: no zoom in a hold): from = to = 1.00, kept for built code. */
+    easeBack: {from: 1.0, to: 1.0, t0: 13.0, t1: 13.6, anchor: {x: M.x, y: M.y}, ease: 'out'} as ZoomKey,
+    /** The 2D float (eased straight legs within +-12 px), home at 12.98 (M exact on the match) and from 14.60. */
+    floatPxS: [8, 12] as const,
+  },
 } as const;
 
 export const S4 = {
   /** Her: walking LEFT in profile, 170 px (100 px/m at her line, as S1), screen-fixed at x ~720 while the world trucks. */
   her: {x: 720, feetY: 1070, h: 170} as Fig,
+  /** The A push-through from S3 pulls back out of her head here (14.86-15.01); the name tag pops on "She" 15.07. */
+  pullFrom: {x: 720, y: 912} as XY,
+  /** THE THREAD in S4 (THROUGHLINE §1.2, §2): her house's first-floor French window ahead at the far left, in the backs
+   *  plane (0.6x the path's 310 px truck): half in from the left edge by ~15.4, whole by ~16.1-16.3; teal frame, Juliet
+   *  rail, blind UP, a DARK pane (she is not home yet); tier B (the thread's home spot), >= 90 px wide; at the stop she
+   *  looks west along the plates toward it, and the push-through into SUN1 leaves from the sun right beside it.
+   *  THROUGHLINE's "~(150, 790)" sits behind the DEC plate (x 110-560, y 755-855, the nearer path plane, up from 18.92),
+   *  which would hide most of it to the join; this spot keeps its x and lifts it clear: 10 px above the plate's top and
+   *  10 px left of SUN1's disc (x >= 185), at its pose (17.96). Never over the plates, the tag or the band. */
+  herWindow: {x: 135, y: 690, w: 90, h: 111} as Spot,
+  backsPlaneK: 0.6,
   towpathY: [860, 1080] as const,
   /** The fingerpost at the stop (17.96): ONE post at x ~575, two arrow plates pointing WEST, time order top-to-bottom,
    *  fill-first pen reveal; she never touches it. Plate lettering: key 56 px, body 34 px, credit small. */
@@ -699,16 +772,18 @@ export const S4 = {
   nameTag: {x0: 600, y0: 600, x1: 880, y1: 800} as Rect,
   nameTagBuilds: [15.07, 16.6] as const,
   nameTagOffAt: 18.8,
-  /** Truck west at her pace (far roofs 0.3x) -> stop on "objected" (0.6 s ease-out ending 17.96) -> 6 % push about
-   *  SUN1 18.40-20.10 (ease-in), landing SUN1 at (250, 650) r 65 at the cut. */
-  camera: {truckFarRoofsK: 0.3, stop: {t0: 17.36, t1: 17.96}, push: {from: 1.0, to: 1.06, t0: 18.4, t1: 20.1, anchor: {x: SUN1.x, y: SUN1.y}, ease: 'in'} as ZoomKey},
-  /** SUN1 drawn at r 65 / 1.06 at the pose, so the push lands r 65 at the cut (the centre is the anchor: fixed). */
-  sunAtPose: {x: SUN1.x, y: SUN1.y, r: SUN1.r / 1.06} as Disc,
+  /** Truck west at her pace (far roofs 0.3x) -> stop on "objected" (0.6 s ease-out ending 17.96) -> hold, locked or the
+   *  2D float, home by `homeBy` 20.40 so the A push-through (20.40-20.70) starts exactly on SUN1. `push` is RETIRED (the
+   *  6 % push toward SUN1: no zoom in a hold): from = to = 1.00, kept for built code. */
+  camera: {truckFarRoofsK: 0.3, stop: {t0: 17.36, t1: 17.96}, push: {from: 1.0, to: 1.0, t0: 18.4, t1: 20.1, anchor: {x: SUN1.x, y: SUN1.y}, ease: 'in'} as ZoomKey, homeBy: 20.4},
+  /** SUN1 as drawn: (250, 650) r 65 at zoom 1.00 (no push to land it any more), the gasholder lattice off it. */
+  sunAtPose: {x: SUN1.x, y: SUN1.y, r: SUN1.r} as Disc,
   /** The narrowboat foreground: roof edge y ~1220 (herb pots, a bike, a coiled rope, a chimney, Pip). */
   boatRoofY: 1220,
   boatCabinY: [1290, 1660] as const,
   waterY: [1700, 1920] as const,
-  /** Pip rides the boat roof LEFT of her (x 470), so neither its landing nor its hop into the sun ever crosses her. */
+  /** Pip seated on the boat roof LEFT of her (x 470) from the first frame (no landing, no hop into the sun: the
+   *  push-throughs sweep it); it turns west on "heading" 19.55 (its one reaction). */
   pipSeat: {x: 470, y: 1218} as Seat,
   stopAt: 17.96,
   birdsWestAt: 19.8,
@@ -727,12 +802,17 @@ export const S5 = {
     pipSeat: {x: 415, y: 1120} as Seat,
     /** The US newspaper box, no masthead: face 310 px wide; headline 40 px x 3 lines + an 18 px credit. */
     newsBox: {x0: 470, y0: 880, x1: 780, y1: 1230} as Rect,
-    /** 20.76 "April": the disc flips into a calendar page APRIL 2026 and back by 21.20; blossom bursts in 4 frames. */
-    calendarFlip: {t0: 20.76, t1: 21.2},
+    /** 20.76 "April": the slot's trees burst into blossom in 4 frames (the beat's A); Pip looks up at the blossom (its
+     *  one reaction). The disc stays a disc. */
+    aprilAt: 20.76,
     blossomBurstF: 4,
+    /** RETIRED (the sun as a character: DIRECTION "Retired"): no calendar flip. Kept for kit/dc/crane.ts until L4
+     *  conforms. */
+    calendarFlip: {t0: 20.76, t1: 21.2},
   },
-  /** The crane: hold 20.55-21.30 -> ONE ease 21.30-23.40 (dolly back + crane up + ~75 deg arc) -> hold to 24.00. */
-  move: {t0: 21.3, t1: 23.4, bezier: [0.35, 0.03, 0.45, 1.0] as const, holdEnd: 24.0},
+  /** The crane: hold 20.55-21.30 -> ONE ease 21.30-23.40 (dolly back + crane up + ~75 deg arc) -> hold to 23.98 (S5 ends
+   *  at 23.80, the middle of its blossom-tree wipe 23.62-23.98). */
+  move: {t0: 21.3, t1: 23.4, bezier: [0.35, 0.03, 0.45, 1.0] as const, holdEnd: 23.98},
   /** By progress p (times from S5_EASE). The lamppost wipe needs >= 10 frames: p 0.40-0.50 is only 7 (f1324-1331),
    *  so it is widened to 22.02-22.19 (f1321-1331, p ~0.37-0.51). */
   beats: [
@@ -742,73 +822,103 @@ export const S5 = {
     {p0: 0.7, p1: 0.7, t0: 22.43, t1: 22.43, what: 'the Pentagon clears the tree ON "Pentagon"; the plaque pops (The Pentagon · US Department of Defense)'},
     {p0: 0.77, p1: 0.96, t0: 22.54, t1: 23.02, what: 'the obelisk rises'},
   ],
+  /** 23.08: the wing's windows warm in ONE flat step (one change), never one by one. */
   windowsWarmAt: 23.08,
   end: {
     /** Sky y 0-800; the horizon y ~800; a flat lobed cloud bank (top >= 610) cut by the right edge, behind the obelisk. */
     horizonY: 800,
     cloudBankTopMinY: 610,
-    /** The stranger and Pip tiny at the balustrade, feet <= 1240; Pip >= 44 px (the scale anchor). Suggested spots. */
+    /** The stranger and Pip tiny at the balustrade, feet <= 1240; Pip >= 44 px (the scale anchor). As built (V2S5_rig:
+     *  the deck mapping of the start seats): the stranger (318, 1238) 62 px, Pip (366, 1195). */
     figuresFeetMaxY: 1240,
     pipMinH: 44,
-    pipSeat: {x: 360, y: 1236} as Seat,
+    pipSeat: {x: 366, y: 1195} as Seat,
     stranger: {x: 318, feetY: 1238, h: 62} as Fig,
-    /** Flat steps toward the sky (ink full -> none), 6 planes; detailed layers <= 15 px/f. */
+    /** The end sun at the right edge (as built; top 586): the wipe covers it first (~23.68). */
+    sun: {x: 1058, y: 646, r: 60} as Disc,
+    /** Flat steps toward the sky, 6 planes (far planes draw no line: C); detailed layers <= 15 px/f. */
     flatStepsPct: [0, 12, 22, 40, 65] as const,
     planes: 6,
   },
+  /** The OUT join, D (THROUGHLINE §3): S5 exports `Wiper`, ONE blossom tree passing close to the lens (trunk + crown
+   *  ~300 px wide, half ~150; flat fills, no outline: C), crossing RIGHT TO LEFT 23.62-23.98 (midpoint 23.80 = V2S6's
+   *  start), clipped at y >= 560 (its crown covers both discs: tops 586 and 575; the band stays one flat field). S5's end
+   *  sun is covered first (~23.68), S6's SUN2 and deal board uncovered last (~23.88; the board clear by ~23.90): two
+   *  suns never share a frame. The tiny Pip holds the balustrade until the tree covers it (~23.81). */
+  wipe: {t0: 23.62, t1: 23.98, half: 150, clipMinY: 560},
+  /** RETIRED (Pip never hops across a join): no 23.90 leap. Kept for kit/dc/crane.ts until L4 conforms. */
   pipLeapAt: 23.9,
 } as const;
 
 export const S6 = {
-  /** The deal board 560 x 560 (mid plane), drifting right with the lateral truck (parallel to the lens): exactly
-   *  100 px over 24.00-28.06 = 24.63 px/s (TREATMENT's "25 px/s" would end 1.5 px inside the rail). */
+  /** The deal board 560 x 560 (mid plane), HELD at its 24.00 pose for the whole shot, 23.80-28.10 (THROUGHLINE §4.6:
+   *  the 4 s parallax truck is RETIRED, DIRECTION rule 8: a hold is locked or a slow 2D float). board1 = board0. */
   board0: {x0: 120, y0: 680, x1: 680, y1: 1240} as Rect,
-  board1: {x0: 220, y0: 680, x1: 780, y1: 1240} as Rect,
-  boardDriftPxS: 100 / 4.06,
-  /** The F11 clause block starts at y >= 920 (keeps Pip >= 200 px away on the corner post). Up at the cut. */
+  board1: {x0: 120, y0: 680, x1: 680, y1: 1240} as Rect,
+  /** RETIRED drift (the truck): 0. The dc gate kit's GATE_DRIFT reads it (and facadeDriftPxS, nearCrossPxS). */
+  boardDriftPxS: 0,
+  /** The F11 clause block: its ink top at y >= 920, its last line's ink bottom at y <= 1108 (K3 DEAL_LAYOUT: the 5th
+   *  line's baseline 1099). Up when the wipe uncovers the board. */
   clauseTopMinY: 920,
+  clauseBottomMaxY: 1108,
+  /** The purpose line pops ON "any" 24.03, after the wipe; the F12 line on "veto" 26.40 (V9). */
   purposeLineAt: 24.03,
   f12LineAt: 26.4,
-  /** The low limestone facade band (cut by both edges) + its service door; the facade plane drifts ~10 px/s. */
+  /** The low limestone facade band (cut by both edges) + its service door (held: no drift). */
   facadeBandY: [705, 835] as const,
   serviceDoor0: {x0: 900, y0: 735, x1: 1020, y1: 835} as Rect,
-  facadeDriftPxS: 10,
+  facadeDriftPxS: 0,
   doorShutsAt: [25.0, 27.4] as const,
+  /** The facade windows light 27.08-27.80, at most 3 switch-ons per second (flash-safe). */
   facadeWindowsLight: [27.08, 27.8] as const,
-  nearCrossPxS: 65,
-  /** Pip on the fence's tall corner post, right of the board, watching the service door: (770, 720) -> (870, 720). */
-  pipSeat0: {x: 770, y: 720} as Seat,
-  pipSeat1: {x: 870, y: 720} as Seat,
-  pipLandBy: 24.12,
+  nearCrossPxS: 0,
+  /** The staff walk-in to the service door starts >= 24.40 (outside the join window 23.60-24.00), or is already under way. */
+  staffWalkInMinT: 24.4,
+  /** The fence's tall corner post right of the board: its cap. A set position (the dc gate kit's GATE.post); it was
+   *  Pip's seat before the conform. */
+  cornerPost: {x: 770, y: 720} as Seat,
+  /** Pip at the deal board's foot, seated on the paving in front of it and STILL from the first frame (THROUGHLINE §3:
+   *  the column of S5's tiny Pip (366, 1195), swapped in by the tree ~23.85); at `pipH` 98 px its head is 204 px under
+   *  the clause's last line (>= 200). pipSeat1 = pipSeat0 (no drift). No arrival, no hop out: the push-through into SUN2
+   *  sweeps it. Its one reaction: an ear flick on "veto" 26.50. */
+  pipSeat0: {x: 360, y: 1410} as Seat,
+  pipSeat1: {x: 360, y: 1410} as Seat,
+  pipH: 98,
   pipEarFlickAt: 26.5,
-  pipHopAt: 27.95,
   sun: SUN2,
-  /** Near plane: three readers' head-backs cut by the bottom (<= ~140 px wide, STYLE.md; x 60-700), crossing with the truck. */
-  nearHeads: {x0: 60, x1: 700, hPx: [110, 140] as const},
+  /** Near plane: things only (THROUGHLINE §1.5): the tulip beds' kerb, a bench, a bike rack (in the rail), fence posts
+   *  with blossom; petals are declared falling weather. The three readers' head-backs are RETIRED. */
 } as const;
-const s6u = (t: number): number => Math.min(28.06, Math.max(24, t)) - 24;
+/** S6 is held: every drift is 0, so these return the pose (kept for the kits and built code). */
+const s6u = (t: number): number => Math.min(28.1, Math.max(23.8, t)) - 23.8;
 export const s6BoardAt = (t: number): Rect => shiftRect(S6.board0, s6u(t) * S6.boardDriftPxS);
 export const s6PipSeatAt = (t: number): Seat => ({x: S6.pipSeat0.x + s6u(t) * S6.boardDriftPxS, y: S6.pipSeat0.y});
 export const s6ServiceDoorAt = (t: number): Rect => shiftRect(S6.serviceDoor0, s6u(t) * S6.facadeDriftPxS);
 
 export const S7 = {
-  /** Google's A-board GOOGLE SAYS at B (exact at the push landing 30.04). Plain lit windows behind it, no silhouettes. */
+  /** Google's A-board GOOGLE SAYS at B (exact at the push landing 30.04), A for the whole shot. Plain lit windows
+   *  behind it, no silhouettes. */
   board: B,
   /** The canopy "Google", right of the board. */
   canopyGoogle: {x0: 660, y0: 760, x1: 900, y1: 810} as Rect,
   parapetMinY: 600,
+  /** SUN2, screen-fixed: the push-through out of S6's April sun lands here (27.95-28.25). */
   sun: SUN2,
+  /** Pip sit-watching on the board bollard from the first frame (no hop in; NO reaction: V14), the same pose as S8's (A5);
+   *  it stays seated until the narrowboat's bow covers it (~32.83). */
   pipSeat: BOARD_BOLLARD,
-  /** The ONE 4 % story push 28.40-30.04 about B's centre (ease in-out), landing on "principles". */
+  /** The ONE 4 % story push 28.40-30.04 about B's centre (ease in-out), landing on "principles" (A5: kept). */
   camera: {push: {from: 1 / 1.04, to: 1.0, t0: 28.4, t1: 30.04, anchor: rectCentre(B), ease: 'inOut'} as ZoomKey, floatPxS: [8, 12] as const},
   boardBeats: [
-    {t: 28.36, what: 'GOOGLE SAYS header + board clack'},
+    {t: 28.33, what: 'GOOGLE SAYS header + board clack (28.32-28.34: after the join window, leading "Google" 28.36)'},
     {t: 29.65, what: 'follows its "AI principles" pen-draws (56 px), complete on 30.04'},
-    {t: 30.04, what: 'the string lights come on in a run'},
+    {t: 30.1, what: 'the festoons light in a run 30.10-30.60 (<= 3 switch-ons per second), just after the pen completes'},
     {t: 30.3, what: 'small row: Google\'s AI Principles: "human oversight" (20 px, F16)'},
     {t: 30.74, what: 'bans retaliation "of any kind" pen-draws (56 px), complete on 32.08'},
   ],
-  /** Bottom third: two cafe tables, seated backs (heads 200-260 px) cut by the bottom-left; fountain rim bottom-right. */
+  /** Bottom third: things only (THROUGHLINE §1.5): cafe tables and chairs with cups, a folded newspaper, a coat over a
+   *  chair-back, a saucer; a bike rack, a planter of grasses, the fountain basin's rim bottom-right. The cafe's people sit
+   *  in the mid ground, small and at rest: no seated backs at the bottom. Nothing starts in 32.50-33.10 but the wiper. */
   uninterruptedTo: 32.7,
 } as const;
 
@@ -822,10 +932,13 @@ export const S8 = {
   doorPre: {x0: 520, y0: 880, x1: 610, y1: 1060} as Rect,
   door: {x0: 680, y0: 880, x1: 770, y1: 1060} as Rect,
   /** W above-right of the door (house plane): (700, 700) -> (860, 700) = W, the loop seam. */
+  /** W (THE THREAD) above-right of the door (house plane): (700, 700) -> (860, 700) = W, the loop seam. Uncovered by
+   *  the boat's stern ~33.0; lights 34.95 (LitWindow + a WindowSpill: the thread's answer). */
   wPre: {x: 700, y: 700, w: 150, h: 170} as Spot,
   w: W,
   sun: SUN8,
-  /** Pip rides the wiping narrowboat in, hops to the board bollard 33.20 (pre-truck (450, 1205)), rides the truck. */
+  /** Pip rides the wiping narrowboat in on its stern deck (32.97), steps off 33.00, lands on the pre-truck board bollard
+   *  (450, 1205) at 33.20 (it rides the carrier: no hop across the join), rides the truck to BOARD_BOLLARD. */
   pipSeatPre: {x: 450, y: 1205} as Seat,
   pipSeat: BOARD_BOLLARD,
   /** She walks home (back, ~150 px) from 33.16, from the near right toward her door; reaches it 34.55; it shuts 34.75;
@@ -852,8 +965,16 @@ export const S8 = {
     {id: 'S8G6', x: 734, feetY: 1060, h: 130},
   ] as (Fig & {id: string})[],
   ghostsPopAt: 33.78,
-  /** Float 8-15 px/s 37.70-38.82 that turns back to the landing pose by 38.82; un-build 38.82-39.08 into S1's t < 0. */
+  /** The float law after the truck (home at 35.60 and at 38.82); the seam push is RETIRED (S1 opens at zoom 1.00, so W
+   *  here IS S1's frame-0 window). Un-build 38.82-39.08 onto S1's NEW frame-0 state (flat pale shapes, the subject's
+   *  outline and Pip's tinted line drawing on: L1 exports it); S8's sun un-builds before SUN0 shows through (never two
+   *  suns); W and the ghosts leave last; Pip settles 30 px from BOARD_BOLLARD to S1_BOLLARD (no hop). Nothing new enters,
+   *  pops or turns in 38.72-39.08 but the un-build. */
   unbuild: {t0: 38.82, t1: 39.08, f0: 2329, f1: 2345},
+  /** The cafe owner wipes her board from its LEFT side (the long-handled squeegee), standing just left of it at its depth,
+   *  between the board and the cafe boat (feet <= ~1265, ~210 px, rear 3/4 or profile), never in front of the face. NO
+   *  ONE in front of the board: the two readers are RETIRED (v3's retired S4 model; Q9 (c)). */
+  cafeOwner: {side: 'left', feetMaxY: 1265, h: 210},
   /** Bottom third: the cafe boat's stern deck x 0-560; NO near heads (only the board rhymes with S7). */
   sternDeck: {x0: 0, y0: 1300, x1: 560, y1: FRAME_H} as Rect,
 } as const;
@@ -861,69 +982,73 @@ export const S8 = {
 export const s8TruckU = (t: number): number => EASE.inOut(prog(t, S8.truck.t0, S8.truck.t1));
 
 // ---------------------------------------------------------------------------------------------------------------
-// 8. Pip (TREATMENT section 3): seats per shot, beats, and the global rules.
+// 8. Pip (TREATMENT section 3, THROUGHLINE §1.6 and §3): seats per shot, beats, and the global rules.
 // ---------------------------------------------------------------------------------------------------------------
 export const PIP_RULES = {
   hPx: [86, 120] as const,
   /** Never in the caption band, never in the right rail, never over HER, >= 200 px from the F11 clause. */
   never: ['captionBand', 'rightRail', 'overHer', 'within200pxOfClause'] as const,
-  /** Pip's hop / leap arcs stay at y >= 600 (they never cross the band; S3's exit leaves through the LEFT edge). */
+  /** Pip NEVER hops across a join (DIRECTION "Retired"): on both sides of every join it is swept by a push-through, rides
+   *  a wipe's carrier, or keeps its screen spot (within ~200 px). Any move INSIDE a shot keeps its arc at y >= 600. */
   arcMinY: 600,
   /** One reaction per shot, never a gag near harm, none on Google's beat. */
   oneReactionPerShot: true,
+  /** Tier B (DIRECTION rule 2, CRAFT §b): <= 1 % of the frame (close-ups too), its colours at C* <= 25 (K1 CM.pip*), a
+   *  same-hue line <= 2.2 px; only blinks and ear moves (<= 10 %W/s) while the subject moves; clear of the subject. */
+  maxFrameShare: 0.01,
 } as const;
 
 export type PipBeat = {t: number; what: string};
 export type PipShot = {shot: ShotId; seat: Seat; seatEnd?: Seat; hEnd?: number; beats: PipBeat[]; reaction: string};
 export const PIP: PipShot[] = [
   {shot: 'V2S1', seat: S1_BOLLARD, reaction: 'ears-cover on "life"', beats: [
-    {t: 0, what: 'already in colour at f0 on the waterline bollard'},
+    {t: 0, what: 'on the waterline bollard; at f0 its tinted line draws on with the subject and its colour comes with the flood (no full-colour Pip at f0)'},
     {t: 1.25, what: 'head follows her'},
-    {t: 4.98, what: 'EARS-COVER (+ ear flap)'},
-    {t: 5.9, what: 'hops up-left into the dive (arc at y >= 600)'},
+    {t: 4.98, what: 'EARS-COVER (+ ear flap): its one reaction'},
+    {t: 5.95, what: 'stays on its bollard: the A push-through into W sweeps it out (no hop)'},
   ]},
   {shot: 'V2S2', seat: S2.pipSeat, reaction: 'head turns to the wall on "But"', beats: [
-    {t: 6.7, what: 'landed on the railing post behind the bench by the end of the pull-back'},
+    {t: 6.1, what: 'already seated on the railing post on the first frame: the pull-back out of M brings it in (no hop-in)'},
     {t: 8.3, what: '"But": its head turns to the wall (leads the eye; no shrug, no double-take)'},
-    {t: 12.85, what: 'hops toward W2 (crosses the match-cut on PIP_HOP_S2_S3)'},
+    {t: 12.98, what: 'holds (590, 1050) across the B match: the same screen spot in S3 (no hop)'},
   ]},
   {shot: 'V2S3', seat: S3.pipSeat, reaction: 'turns to her on "she"', beats: [
-    {t: 13.1, what: 'lands on her window box (soft land)'},
-    {t: 13.9, what: 'turns to her on "she"'},
-    {t: 14.7, what: 'leaps up-LEFT and leaves through the left edge at y 620-700 (never through the top: the band)'},
+    {t: 12.98, what: 'on her terrace\'s front railing at (590, 1050), S2\'s spot, from the first frame (no landing)'},
+    {t: 13.96, what: 'turns to her on "she"'},
+    {t: 14.71, what: 'stays put: the A push-through into her sweeps it (no leap)'},
   ]},
   {shot: 'V2S4', seat: S4.pipSeat, reaction: 'turns west on "heading"', beats: [
-    {t: 14.86, what: 'mid-air at the cut, descending down-left LEFT of her (x 520-640, y 940-1060): never over her'},
-    {t: 14.95, what: 'lands on the boat roof'},
+    {t: 14.86, what: 'seated on the boat roof, left of her, from the first frame: the pull-back out of her head brings it in'},
     {t: 19.55, what: 'turns west (leads "heading")'},
-    {t: 20.25, what: 'hops toward the sun (mid-air at the cut 20.55; arc at y >= 600)'},
+    {t: 20.4, what: 'stays put: the A push-through into SUN1 sweeps it (no hop)'},
   ]},
-  {shot: 'V2S5', seat: S5.start.pipSeat, seatEnd: S5.end.pipSeat, hEnd: 44, reaction: 'looks up at the calendar sun', beats: [
-    {t: 20.55, what: 'comes down out of the sun\'s direction onto the bench beside the stranger (seated by 20.70)'},
-    {t: 20.76, what: 'looks up at the calendar sun; the scale anchor through the move (>= 44 px at the end)'},
-    {t: 23.9, what: 'leaps up-right'},
+  {shot: 'V2S5', seat: S5.start.pipSeat, seatEnd: S5.end.pipSeat, hEnd: 44, reaction: 'looks up at the blossom on "April"', beats: [
+    {t: 20.55, what: 'seated beside the stranger on the bench from the first frame (no arrival)'},
+    {t: 20.76, what: 'looks up at the blossom on "April"; the scale anchor through the crane (>= 44 px at the end)'},
+    {t: 23.62, what: 'holds the balustrade (366, 1195) until the tree covers it (~23.81): the wipe swaps it in the same column'},
   ]},
   {shot: 'V2S6', seat: S6.pipSeat0, seatEnd: S6.pipSeat1, reaction: 'one ear flick on "veto" (no droop)', beats: [
-    {t: 24.0, what: 'lands on the fence\'s tall corner post right of the board (by 24.12), watching the service door'},
+    {t: 23.8, what: 'seated and still at the deal board\'s foot (360, 1410), uncovered by the tree ~23.85'},
     {t: 26.5, what: 'one ear flick on "veto"'},
-    {t: 27.95, what: 'hops'},
+    {t: 27.95, what: 'stays put: the A push-through into SUN2 sweeps it (no hop)'},
   ]},
   {shot: 'V2S7', seat: BOARD_BOLLARD, reaction: 'NONE (sit-watch; neutral on Google\'s beat: no tilt, no nod)', beats: [
-    {t: 28.2, what: 'sit-watch at the board bollard (the same pose as S8)'},
+    {t: 28.1, what: 'sit-watch at the board bollard from the first frame (the pull-back out of SUN2; no hop): the same pose as S8 (A5)'},
+    {t: 32.83, what: 'still seated as the narrowboat\'s bow covers it'},
   ]},
   {shot: 'V2S8', seat: S8.pipSeatPre, seatEnd: BOARD_BOLLARD, reaction: 'ears down on "can\'t"', beats: [
-    {t: 32.93, what: 'rides the wiping narrowboat in'},
-    {t: 33.2, what: 'hops to the board bollard (pre-truck (450, 1205)); rides the truck to (700, 1205)'},
+    {t: 32.97, what: 'rides the wiping narrowboat in on its stern deck (the carrier); steps off 33.00'},
+    {t: 33.2, what: 'lands on the pre-truck board bollard (450, 1205); rides the truck to (700, 1205)'},
     {t: 33.78, what: 'ears down on "can\'t"'},
-    {t: 37.7, what: 'looks up at W on "not"'},
-    {t: 38.82, what: 'hops to f0\'s bollard (700, 1235) on the un-build'},
+    {t: 37.7, what: 'looks up at W on "not" (a lead, not a second reaction)'},
+    {t: 38.82, what: 'settles 30 px down to f0\'s bollard (700, 1235) on the un-build (no hop)'},
   ]},
 ];
 export const pipShot = (id: ShotId): PipShot => PIP.find((p) => p.shot === id) as PipShot;
 
-/** Pip's hop across the S2 -> S3 window match-cut: ONE screen-space arc both lanes evaluate.
- *  From the S2 seat at the push's 1.06 (605, 1066) at 12.85 to the S3 seat at 13.10, apex 50 px. */
-export const PIP_HOP_S2_S3 = {t0: 12.85, t1: 13.1, from: scaleAbout(S2.pipSeat, S2.camera.push.anchor, 1.06), to: S3.pipSeat, apexPx: 50};
+/** RETIRED (THROUGHLINE §3: Pip never hops across a join): Pip holds (590, 1050) on both sides of the S2 -> S3 match.
+ *  Kept as a zero-height "hop" from that spot to itself so built code compiles until L2 and L3 conform. */
+export const PIP_HOP_S2_S3 = {t0: 12.85, t1: 13.1, from: {x: S2.pipSeat.x, y: S2.pipSeat.y} as XY, to: {x: S3.pipSeat.x, y: S3.pipSeat.y} as XY, apexPx: 0};
 export const pipHopS2S3At = (t: number): XY => {
   const {t0, t1, from, to, apexPx} = PIP_HOP_S2_S3;
   const u = prog(t, t0, t1);
@@ -931,88 +1056,109 @@ export const pipHopS2S3At = (t: number): XY => {
 };
 
 // ---------------------------------------------------------------------------------------------------------------
-// 9. MATCH POINTS: what BOTH lanes of every cut hit, in SCREEN space at the cut
+// 9. MATCH POINTS: what BOTH lanes of every join hit, in SCREEN space at the join (THROUGHLINE §3)
 // ---------------------------------------------------------------------------------------------------------------
 /** side: which shot draws it ('out' = the outgoing shot, 'in' = the incoming one, 'both' = the same screen spot in both). */
 export type MatchShape = {label: string; side: 'out' | 'in' | 'both'; spot?: Spot; disc?: Disc; rect?: Rect; seat?: Seat};
-export type MatchPoint = {cut: string; t: number; f: number; out: ShotId; in: ShotId; kind: string; shapes: MatchShape[]; rule: string};
+/** `t` = the join's midpoint (the incoming shot's start; the loop: the film's end). Every join: within its midpoint
+ *  +-0.2 s nothing enters, pops, turns or speeds up but the carrier (and Pip riding it); slow life keeps its pace; <= 4
+ *  movers within 0.4 s; two suns never share a frame. */
+export type MatchPoint = {cut: string; t: number; f: number; out: ShotId; in: ShotId; carrier: Carrier; kind: string; shapes: MatchShape[]; rule: string};
 
 export const MATCHES: MatchPoint[] = [
   {
-    cut: 'S1 -> S2 push-through', t: 6.1, f: frameOf(6.1), out: 'V2S1', in: 'V2S2', kind: 'push-through 5.95-6.25 (plum bridge, zoom 12, inkComp 0.6)',
+    cut: 'S1 -> S2 push-through', t: 6.1, f: frameOf(6.1), out: 'V2S1', in: 'V2S2', carrier: 'A', kind: 'push-through 5.95-6.25 (zoom 12, plum bridge 6.05-6.15, inkComp 0.6)',
     shapes: [
-      {label: 'S1: dive INTO W (her dark office window)', side: 'out', spot: W},
-      {label: 'S2: pull back OUT of her dark window', side: 'in', spot: S2.herDarkWindow},
+      {label: 'S1: dive INTO W (her office window, dark from 0.40)', side: 'out', spot: W},
+      {label: 'S2: pull back OUT of her dark office window at M', side: 'in', spot: M},
+      {label: 'S1: Pip on its bollard, swept by the zoom', side: 'out', seat: S1_BOLLARD},
+      {label: 'S2: Pip seated on its railing post from the first frame', side: 'in', seat: S2.pipSeat},
     ],
-    rule: 'Film push-through {from [860, 700], to [200, 795], bridge #36223A, inkComp 0.6, dur 0.30}; S2 then pulls 1.12 -> 1.00 on the same window 6.10-6.70.',
+    rule: 'Film push-through {from [860, 700], to [335, 785], zoom 12, bridge #36223A, inkComp 0.6, dur 0.30}; midpoint 6.10, 0.18 s before "You\'d" 6.28; S2 pulls 1.12 -> 1.00 about M 6.10-6.70; nothing enters, pops or turns in 5.80-6.40 but the dive.',
   },
   {
-    cut: 'S2 -> S3 window match-cut', t: 12.98, f: frameOf(12.98), out: 'V2S2', in: 'V2S3', kind: 'matchcut 12.81-13.16',
+    cut: 'S2 -> S3 window match (the thread)', t: 12.98, f: frameOf(12.98), out: 'V2S2', in: 'V2S3', carrier: 'B', kind: 'matchcut at M (both floats home)',
     shapes: [
-      {label: 'W2 (S2 staff window, blind down) = her French window (S3, blind up)', side: 'both', spot: W2_CUT},
-      {label: 'Pip mid-hop', side: 'both', seat: pipHopS2S3At(12.98)},
+      {label: 'her DARK office window (S2) = her LIT home window (S3)', side: 'both', spot: M},
+      {label: 'Pip in the same spot (no hop)', side: 'both', seat: S2.pipSeat},
     ],
-    rule: 'W2 centre (335, 785), 133 x 164 in BOTH shots at 12.98; Pip on PIP_HOP_S2_S3 on both sides of the cut.',
+    rule: 'M centre (335, 785), 132.5 x 164.3 in BOTH at 12.98; Pip at (590, 1050) on both sides; midpoint 12.98, 0.18 s before "So" 13.16; nothing enters, pops or turns in 12.78-13.18 (the notebook claps by 12.70).',
   },
   {
-    cut: 'S3 -> S4 cut on action', t: 14.86, f: frameOf(14.86), out: 'V2S3', in: 'V2S4', kind: "cut on Pip's leap",
+    cut: 'S3 -> S4 push-through (into her)', t: 14.86, f: frameOf(14.86), out: 'V2S3', in: 'V2S4', carrier: 'A', kind: 'push-through 14.71-15.01 (zoom 12, plum bridge, inkComp 0.6)',
     shapes: [
-      {label: 'S3: Pip leaving up-left through the left edge', side: 'out', rect: {x0: 0, y0: 620, x1: 120, y1: 700}},
-      {label: 'S4: Pip mid-air, descending down-left (left of her)', side: 'in', rect: {x0: 520, y0: 940, x1: 640, y1: 1060}},
+      {label: "S3: into her silhouette's head (she stands still from 14.60)", side: 'out', seat: S3.pushFrom},
+      {label: 'S4: out of her head (her walking, 170 px)', side: 'in', seat: S4.pullFrom},
+      {label: 'S3: Pip on the terrace railing, swept', side: 'out', seat: S3.pipSeat},
+      {label: 'S4: Pip seated on the boat roof from the first frame', side: 'in', seat: S4.pipSeat},
     ],
-    rule: 'Pip moves LEFT (west) on both sides, rising in S3, falling in S4; it lands on the boat roof (470, 1218) at 14.95, never crossing her.',
+    rule: 'Film push-through {from [330, 742], to [720, 912], zoom 12, bridge #36223A, inkComp 0.6, dur 0.30}; midpoint 14.86, 0.21 s before "She" 15.07 (the name tag pops on it); nothing else enters, pops or turns in 14.66-15.06; a declared light change (sunset -> low sun).',
   },
   {
-    cut: 'S4 -> S5 sun match-cut', t: 20.55, f: frameOf(20.55), out: 'V2S4', in: 'V2S5', kind: 'matchcut on SUN1 (inside the 20.10-20.67 pause)',
-    shapes: [{label: 'SUN1 in both', side: 'both', disc: SUN1}],
-    rule: 'SUN1 centre (250, 650), r 65 on screen at 20.55 in BOTH; S4 draws r 61.3 at its pose so its 6 % push lands r 65.',
-  },
-  {
-    cut: 'S5 -> S6 cut on action', t: 24.0, f: frameOf(24.0), out: 'V2S5', in: 'V2S6', kind: 'cut on Pip\'s leap (on "any", the one cut outside a pause)',
+    cut: 'S4 -> S5 push-through (into the sun)', t: 20.55, f: frameOf(20.55), out: 'V2S4', in: 'V2S5', carrier: 'A', kind: 'push-through 20.40-20.70 (zoom 7, no bridge, inkComp 0.6)',
     shapes: [
-      {label: 'S5: Pip leaps up-right from the balustrade (23.90)', side: 'out', seat: S5.end.pipSeat},
-      {label: 'S6: Pip lands on the corner post by 24.12', side: 'in', seat: S6.pipSeat0},
-      {label: 'S6: the deal board UP at the cut (frame, tag, FULL clause, credit)', side: 'in', rect: S6.board0},
+      {label: "SUN1: S4's low October sun beside her far window = S5's April sun in the slot", side: 'both', disc: SUN1},
+      {label: "S4: her far window (the thread's last frame before the stretch)", side: 'out', spot: S4.herWindow},
+      {label: 'S4: Pip on the boat roof, swept', side: 'out', seat: S4.pipSeat},
+      {label: 'S5: Pip seated on the bench from the first frame', side: 'in', seat: S5.start.pipSeat},
     ],
-    rule: 'Pip moves up-right on both sides; the clause is readable from 24.00, the purpose line pops ON "any" 24.03.',
+    rule: 'SUN1 (250, 650) r 65 at zoom 1.00 in both (S4\'s push is retired); midpoint 20.55, 0.12 s before "In" 20.67; nothing enters, pops or turns in 20.35-20.75; a declared light change (October -> April). The fairness stretch (S5-S7) runs without the thread.',
   },
   {
-    cut: 'S6 -> S7 sun match-cut', t: 28.06, f: frameOf(28.06), out: 'V2S6', in: 'V2S7', kind: 'matchcut on SUN2 (27.82-28.31)',
-    shapes: [{label: 'SUN2 in both (S6 morning = S7 sunset)', side: 'both', disc: SUN2}],
-    rule: 'SUN2 centre (260, 620), r 45 in BOTH at 28.06 (19 px clear of the band, >= 15 px above every board top).',
+    cut: 'S5 -> S6 foreground wipe', t: 23.8, f: frameOf(23.8), out: 'V2S5', in: 'V2S6', carrier: 'D', kind: "foreground-wipe 23.62-23.98: S5's Wiper (one blossom tree, right to left, clipped at y >= 560)",
+    shapes: [
+      {label: "S5: the end sun at the right edge, covered first (~23.68)", side: 'out', disc: S5.end.sun},
+      {label: 'S6: SUN2 and the deal board, uncovered last (~23.88; the board clear by ~23.90)', side: 'in', rect: S6.board0},
+      {label: 'S5: the tiny Pip at the balustrade, covered ~23.81', side: 'out', seat: S5.end.pipSeat},
+      {label: "S6: Pip at the board's foot, uncovered ~23.85 (the same column)", side: 'in', seat: S6.pipSeat0},
+    ],
+    rule: 'Film foreground-wipe {element "scene", dir "left", dur 0.36}; V2S6 starts 23.80, 0.23 s before "any" 24.03 (the quote\'s first word, mid-sentence: the one forced exception); never two suns in a frame; the purpose line pops on "any" 24.03, after the wipe; the staff walk-in starts >= 24.40.',
   },
   {
-    cut: 'S7 -> S8 foreground wipe', t: 32.93, f: frameOf(32.93), out: 'V2S7', in: 'V2S8', kind: "foreground-wipe 32.70-33.16, S7's Wiper (a narrowboat, dir left)",
+    cut: 'S6 -> S7 push-through (into the sun)', t: 28.1, f: frameOf(28.1), out: 'V2S6', in: 'V2S7', carrier: 'A', kind: 'push-through 27.95-28.25 (zoom 7, no bridge, inkComp 0.6)',
+    shapes: [
+      {label: "SUN2: S6's April morning sun = S7's London sunset sun (screen-fixed)", side: 'both', disc: SUN2},
+      {label: "S6: Pip at the board's foot, swept", side: 'out', seat: S6.pipSeat0},
+      {label: 'S7: Pip seated on the board bollard from the first frame', side: 'in', seat: BOARD_BOLLARD},
+    ],
+    rule: 'SUN2 (260, 620) r 45 in both (19 px clear of the band, >= 15 px above every board top); midpoint 28.10, 0.21 s before "But" 28.31; the deal board holds still and readable to >= 27.95; nothing enters, pops or turns in 27.90-28.30 (the GOOGLE SAYS header lands 28.32-28.34); a declared light change (April -> sunset).',
+  },
+  {
+    cut: 'S7 -> S8 foreground wipe', t: 32.93, f: frameOf(32.93), out: 'V2S7', in: 'V2S8', carrier: 'D', kind: "foreground-wipe 32.70-33.16, S7's Wiper (a narrowboat travelling west, dir left)",
     shapes: [
       {label: "S7: Google's board (at 32.70)", side: 'out', rect: B},
       {label: 'S8: her board before the truck', side: 'in', rect: S8.boardPre},
+      {label: "S7: Pip seated until the bow covers it (~32.83)", side: 'out', seat: BOARD_BOLLARD},
+      {label: "S8: Pip rides the stern in (32.97), lands 33.20", side: 'in', seat: S8.pipSeatPre},
     ],
-    rule: "The bow enters only after 32.70 (Google's beat is never cut short); the wipe clears to S8 by 33.16 (board clack).",
+    rule: "The bow enters only after 32.70 (Google's beat is never cut short, A5); the wipe clears to S8 by 33.16 (board clack); midpoint 32.93, 0.23 s before \"She\" 33.16; the stern uncovers W ~33.0 (the thread returns at its next join).",
   },
   {
-    cut: 'S8 -> S1 loop (un-build)', t: 39.08, f: DURATION_F, out: 'V2S8', in: 'V2S1', kind: 'unbuild 38.82-39.08 onto S1 t < 0 (captions back at 39.04)',
+    cut: 'S8 -> S1 loop (un-build)', t: 39.08, f: DURATION_F, out: 'V2S8', in: 'V2S1', carrier: 'B', kind: 'unbuild 38.82-39.08 onto S1 t < 0 (captions back at 39.04)',
     shapes: [
       {label: 'S8 end: her lit HOME window = W', side: 'out', spot: W},
-      {label: 'S1 f0: her OFFICE window (zoom 1.05 about W)', side: 'in', spot: scaleSpotAbout(W, W, 1.05)},
+      {label: 'S1 f0: her OFFICE window = W (zoom 1.00)', side: 'in', spot: W},
       {label: "S8: Pip on the board bollard (700, 1205)", side: 'out', seat: BOARD_BOLLARD},
       {label: "S1 f0: Pip on the waterline bollard (700, 1235)", side: 'in', seat: S1_BOLLARD},
     ],
-    rule: 'W centre identical; size 150 x 170 (S8) vs 157.5 x 178.5 (S1 f0 at zoom 1.05): S8 may end its last float on a 1.05 push about W to make it exact.',
+    rule: "W (860, 700) 150 x 170 in both (S1's pull-out and S8's seam push are retired); the un-build lands on S1's new frame-0 state (flat pale shapes, the subject's outline and Pip's tinted line drawing on); S8's sun un-builds before SUN0 shows (never two suns); Pip settles 30 px (no hop); the midpoint 38.95 leads the next loop's \"She\" (0.24 heard) by 0.37 s: the file's tail and lead.",
   },
 ];
 
 // ---------------------------------------------------------------------------------------------------------------
-// 10. The bottom third, y 1250-1920 (TREATMENT section 5): never flat paving or bare water, nothing to read.
+// 10. The bottom third, y 1250-1920 (TREATMENT section 5, THROUGHLINE §1.5): never flat paving or bare water, nothing
+//     to read, THINGS only: no stranger's back in any foreground (DIRECTION rule 3); strangers stay small in the mid
+//     and far ground. Only Pip and things down here.
 // ---------------------------------------------------------------------------------------------------------------
 export const BOTTOM_THIRD: Record<ShotId, string> = {
-  V2S1: 'our canal-side steps: five broad stone steps (edges 3.4-4.8 px), ~14 seated backs in three rows: near head-backs cut by the bottom (<= ~140 px wide at the shoulders: a hood, a beanie, a knitted hat, curls, a cap), a middle row (~110 px), a low row by the water (~60 px); cups, tote bags, a dog lying down, a bike cut by the bottom-right',
-  V2S2: 'our towpath: broken paving lines, leaves, a drain cover, the A-board and bench legs; a planter of grasses cut by the left edge (x 0-230, y 1290-1650); a bike locked to a lamp-post whose foot is cut by the bottom-right (x 860-960); two head-backs cut by the bottom (<= ~140 px wide, x 300-720: a beanie, a cap); a dog nosing a leaf',
-  V2S3: 'the narrowboat moored along our bank, cut by both edges: roof y ~1260-1330 (herb pots, a bike, a coiled rope, a chimney with smoke), cabin side y 1330-1580 (sage, plum gunwale stripe, cream portholes); our coping; our towpath y 1640-1920 with two head-backs cut by the bottom (<= ~140 px wide) and a lamp-post foot bottom-right',
+  V2S1: "our canal-side steps: five broad stone steps (their edges as flat 2-tone bands) holding things: a tote, two takeaway cups, a folded newspaper, a scarf left on a step, a bike cut by the bottom-right, a planter of grasses, a few leaves as flat shapes; the densest band. The seated public sits ONLY on the step by the water (seat line ~1300, ~60 px, the mid ground), half at rest. No seated backs nearer than that",
+  V2S2: "our towpath: York-stone paving as long 2-tone bands, a drain cover, a few fallen leaves as flat shapes, the planter of grasses cut by the left edge (x 0-230, y 1290-1650), a bike locked to the near lamp-post's foot cut by the bottom-right (the lamp slim, x ~1030, CM.line; L3 holds it across the match), newspaper bundles and a crate at the kiosk foot, the dog lying at rest by the kiosk. No head-backs",
+  V2S3: "the narrowboat moored along our bank, cut by both edges: roof y ~1260-1330 (herb pots, a bike, a coiled rope, a chimney with smoke), cabin side y 1330-1580 (sage, plum gunwale stripe, cream portholes); our coping; our towpath y 1640-1920 with things: a bench with a bag left on it, a mooring bollard and its rope, a few fallen leaves as flat shapes, the lamp foot held from S2. No head-backs",
   V2S4: 'the narrowboat beside us: cabin side y 1290-1660 (sage, plum gunwale stripe, cream portholes with curtains, a painted flower panel, fenders); water y 1700-1920 with the wake and floating leaves',
-  V2S5: "start: the bench front, the stranger's bag, petal-strewn paving, the news box's base, a tree root cut by the bottom-left. End: the terrace floor from the crane's height (paving joints, petal drifts, a bench, a bin, a stroller), roots bottom-left, the lamppost base bottom-right",
-  V2S6: "the fence's kerb and tulip beds; three readers' head-backs cut by the bottom (<= ~140 px wide, x 60-700) crossing with the truck; a bike rack and a bench in the rail",
-  V2S7: 'the forecourt: two cafe tables with seated backs (<= ~140 px wide, cut by the bottom-left), a bike rack, a planter of grasses, paving joints, the fountain basin rim bottom-right',
-  V2S8: "the cafe boat's stern deck bottom-left (x 0-560: two small tables, mugs, a folded chair, a potted bay, a coiled rope), towpath paving with leaves and a drain, a planter and a lamp-post foot bottom-right. NO near heads",
+  V2S5: "start: the bench front, the stranger's bag, petals as a few flat shapes on the paving, the news box's base, a tree root cut by the bottom-left. End: the terrace floor from the crane's height (paving bands, petal drifts, a bench, a bin, a stroller), roots bottom-left, the lamppost base bottom-right",
+  V2S6: "the near plane, things: the tulip beds' kerb, a bench, a bike rack (in the rail), fence posts with blossom, falling petals (declared weather); Pip seated at the deal board's foot (360, 1410). No readers' head-backs",
+  V2S7: "the forecourt, things: cafe tables and chairs with cups, a folded newspaper, a coat over a chair-back, a saucer (cut by the bottom-left); a bike rack, a planter of grasses, paving joints, the fountain basin's rim bottom-right. The cafe's people sit in the mid ground, small and at rest: no seated backs at the bottom",
+  V2S8: "the cafe boat's stern deck bottom-left (x 0-560: two small tables, mugs, a folded chair, a potted bay, a coiled rope), towpath paving bands with leaves and a drain, a planter and a lamp-post foot bottom-right. NO near heads, and no one in front of her board",
 };
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -1072,7 +1218,7 @@ const s1Shapes = (t: number): Shape[] => {
     L('line', 'horizon y 965 (hidden)', [{x: 0, y: S1_LENS.horizonY}, {x: FRAME_W, y: S1_LENS.horizonY}]),
     R('mass', 'water y 1110-1215', {x0: 0, y0: sh.water.y0, x1: FRAME_W, y1: sh.water.y1}),
     R('mass', 'two moored boats (masses)', sh.boatsRight),
-    R('mass', 'our steps: ~14 seated backs (near heads 250-330 px)', {x0: 0, y0: 1290, x1: FRAME_W, y1: FRAME_H}),
+    R('mass', 'our steps: things only (the seated public only by the water, ~60 px)', {x0: 0, y0: 1290, x1: FRAME_W, y1: FRAME_H}),
     R('mass', 'hero cloud (2 px/s)', sh.heroCloud),
     R('mass', 'plane branch', sh.planeBranch),
   ];
@@ -1088,7 +1234,7 @@ const s2Shapes = (t: number): Shape[] => {
     R('mass', 'the wing in 3/4 (cut by the left edge, receding right; ~400 windows)', {x0: 0, y0: 600, x1: 900, y1: 1030}),
     L('line', 'first-storey row y 700-880 at the left', [{x: 0, y: 700}, {x: 900, y: 760}]),
     L('line', 'ground row y 900-1010 at the left', [{x: 0, y: 1010}, {x: 900, y: 940}]),
-    R('key', 'her dark window (ring 6.82)', spotRect(S2.herDarkWindow)),
+    R('key', 'her dark window at M (A outline 6.82)', spotRect(S2.herDarkWindow)),
     ...S2.staffWindows.map((w) => R('key', `${w.id} ${w.w} x ${w.h}`, spotRect(w))),
     ...(t >= S2.aBoardOutAt ? [R('text', 'A-board TOLD THE BBC (8.44)', S2.aBoard)] : []),
     R('mass', 'bench', S2.bench),
@@ -1096,8 +1242,8 @@ const s2Shapes = (t: number): Shape[] => {
     F('figure', 'staffer >= 180 px seated (hood 10.36)', S2.staffer, SEATED_ASPECT_OVERLAY),
     P('Pip: railing post (590, 1050)', S2.pipSeat),
     R('mass', 'planter of grasses', {x0: 0, y0: 1290, x1: 230, y1: 1650}),
-    R('mass', 'two head-backs cut by the bottom', {x0: 300, y0: 1600, x1: 720, y1: FRAME_H}),
-    R('mass', 'bike + lamp-post foot', {x0: 860, y0: 1250, x1: 960, y1: FRAME_H}),
+    R('mass', 'paving bands, drain cover, leaves, bundles + crate, the dog at rest (things only)', {x0: 230, y0: 1290, x1: 940, y1: FRAME_H}),
+    R('mass', 'bike + the near lamp-post foot (x ~1030)', {x0: 940, y0: 1250, x1: FRAME_W, y1: FRAME_H}),
   ];
   return zoomShapes(zoomShapes(base, S2.camera.pullBack, t), S2.camera.push, t);
 };
@@ -1105,13 +1251,13 @@ const s2Shapes = (t: number): Shape[] => {
 const s3Shapes = (t: number): Shape[] => {
   const base: Shape[] = [
     R('mass', 'her terrace (two storeys + mansard, tops at y >= 600)', {x0: 0, y0: 600, x1: FRAME_W, y1: 1060}),
-    R('key', 'her French window = W2_CUT (blind UP, lamp on)', spotRect(W2_CUT)),
+    R('key', 'her lit home window at M (blind UP, lamp on)', spotRect(M)),
     F('her', 'her silhouette >= 137 px, phone', S3.silhouette),
     R('mass', 'window box', S3.windowBox),
-    P('Pip: window box (462, 878)', S3.pipSeat),
+    P('Pip: terrace railing (590, 1050) = S2', S3.pipSeat),
     R('mass', 'water', {x0: 0, y0: 1080, x1: FRAME_W, y1: 1260}),
     R('mass', 'moored narrowboat (roof 1260-1330, cabin 1330-1580)', {x0: 0, y0: 1260, x1: FRAME_W, y1: 1580}),
-    R('mass', 'our towpath + two head-backs', {x0: 0, y0: 1640, x1: FRAME_W, y1: FRAME_H}),
+    R('mass', 'our towpath: bench + bag, bollard + rope, leaves, lamp foot (things only)', {x0: 0, y0: 1640, x1: FRAME_W, y1: FRAME_H}),
   ];
   return zoomShapes(base, S3.camera.easeBack, t);
 };
@@ -1119,7 +1265,8 @@ const s3Shapes = (t: number): Shape[] => {
 const s4Shapes = (t: number): Shape[] => {
   const base: Shape[] = [
     R('mass', 'terrace backs, warehouses, gasholders, viaduct (tops >= 600)', {x0: 0, y0: 600, x1: FRAME_W, y1: 860}),
-    D('sun', 'SUN1 at the pose (r 61.3 -> 65 at the cut)', S4.sunAtPose),
+    D('sun', 'SUN1 (250, 650) r 65 (zoom 1.00; the push-through into it)', S4.sunAtPose),
+    R('mass', 'THE THREAD: her far window (B, dark pane)', spotRect(S4.herWindow)),
     R('mass', 'her towpath y 860-1080', {x0: 0, y0: 860, x1: FRAME_W, y1: 1080}),
     L('line', 'the post (x ~575)', [{x: S4.post.x, y: S4.post.topY}, {x: S4.post.x, y: S4.post.footY}]),
     ...(t >= S4.decPlateAt ? [R('text', 'plate DEC 2025 (56 px) / unclassified', S4.plateDec2025)] : []),
@@ -1140,7 +1287,7 @@ const s5Shapes = (t: number): Shape[] => {
     return [
       R('mass', 'blossoming canopy (warm-dark)', {x0: 0, y0: 600, x1: FRAME_W, y1: 1060}),
       R('key', 'the bright slot', s.slot),
-      D('sun', 'SUN1 (calendar APRIL 2026 20.76-21.20)', s.sun),
+      D('sun', 'SUN1 in the slot (the push-through out of it; the disc stays a disc)', s.sun),
       R('mass', 'bench', s.bench),
       F('figure', 'the stranger (back, newspaper)', s.stranger, SEATED_ASPECT_OVERLAY),
       P('Pip: beside the stranger', s.pipSeat),
@@ -1158,6 +1305,7 @@ const s5Shapes = (t: number): Shape[] => {
     R('mass', 'parkway, tiny cars, lawns with joggers', {x0: 0, y0: 1050, x1: FRAME_W, y1: 1180}),
     F('figure', 'the stranger (tiny)', e.stranger, FIGURE_ASPECT_OVERLAY),
     P('Pip >= 44 px (the scale anchor)', e.pipSeat, 48),
+    D('sun', 'the end sun (covered first by the wipe)', e.sun),
     R('mass', 'terrace floor from the crane height', {x0: 0, y0: 1250, x1: FRAME_W, y1: FRAME_H}),
   ];
 };
@@ -1169,10 +1317,10 @@ const s6Shapes = (t: number): Shape[] => {
     R('mass', 'limestone facade band (y 705-835)', {x0: 0, y0: 705, x1: FRAME_W, y1: 835}),
     R('mass', 'service door (shuts 25.0, 27.4)', s6ServiceDoorAt(t)),
     R('text', 'the deal board 560 x 560 (clause first; purpose on "any")', b),
-    R('text', 'the F11 clause block (top >= 920)', {x0: b.x0 + 20, y0: S6.clauseTopMinY, x1: b.x1 - 20, y1: b.y1 - 70}),
-    P('Pip: corner post (ear flick 26.50)', s6PipSeatAt(t)),
-    R('mass', 'kerb, tulip beds, near posts + blossom (65 px/s)', {x0: 0, y0: 1240, x1: FRAME_W, y1: 1400}),
-    R('mass', "three readers' head-backs (<= ~140 px wide)", {x0: S6.nearHeads.x0, y0: 1620, x1: S6.nearHeads.x1, y1: FRAME_H}),
+    R('text', 'the F11 clause block (ink 920-1108)', {x0: b.x0 + 20, y0: S6.clauseTopMinY, x1: b.x1 - 20, y1: S6.clauseBottomMaxY}),
+    R('mass', 'the corner post (cap 770, 720)', {x0: S6.cornerPost.x - 27, y0: S6.cornerPost.y, x1: S6.cornerPost.x + 27, y1: 1250}),
+    P("Pip: the board's foot (360, 1410), still (ear flick 26.50)", s6PipSeatAt(t), S6.pipH),
+    R('mass', 'near plane: kerb, tulip beds, bench, bike rack, posts + blossom (things only)', {x0: 0, y0: 1240, x1: FRAME_W, y1: FRAME_H}),
   ];
 };
 
@@ -1184,7 +1332,7 @@ const s7Shapes = (t: number): Shape[] => {
     R('text', "B: Google's board GOOGLE SAYS", B),
     L('line', 'B legs to 1250', [{x: B.x0 + 40, y: B.y1}, {x: B.x0 + 40, y: B_LEGS_Y1}]),
     P('Pip: board bollard (700, 1205)', BOARD_BOLLARD),
-    R('mass', 'cafe tables, seated backs (heads 200-260 px)', {x0: 0, y0: 1400, x1: 620, y1: FRAME_H}),
+    R('mass', 'cafe tables and chairs with things (no seated backs)', {x0: 0, y0: 1400, x1: 620, y1: FRAME_H}),
     R('mass', 'fountain basin rim', {x0: 760, y0: 1500, x1: FRAME_W, y1: FRAME_H}),
   ];
   return zoomShapes(base, S7.camera.push, t);
@@ -1247,9 +1395,9 @@ export const CHECK_T: Record<ShotId, number[]> = {
   V2S2: [6.7, 8.96, 10.36, 12.98],
   V2S3: [12.98, 13.6, 14.28],
   V2S4: [16.6, 17.96, 19.8, 20.55],
-  V2S5: [21.0, 23.8],
-  V2S6: [24.0, 26.5, 28.06],
-  V2S7: [28.06, 30.04, 32.08],
+  V2S5: [21.0, 23.62],
+  V2S6: [23.8, 24.03, 26.5, 28.1],
+  V2S7: [28.1, 30.04, 32.08],
   V2S8: [33.78, 34.0, 35.6, 37.18, 38.82],
 };
 
@@ -1286,11 +1434,11 @@ export const contractProblems = (): ContractIssue[] => {
       });
     });
   });
-  // S6: Pip >= 200 px from the clause block.
-  [24, 26.5, 28.06].forEach((t) => {
+  // S6: Pip >= 200 px from the clause block (its ink 920-1108; Pip at its S6 size).
+  [23.8, 26.5, 28.1].forEach((t) => {
     const b = s6BoardAt(t);
-    const clause: Rect = {x0: b.x0 + 20, y0: S6.clauseTopMinY, x1: b.x1 - 20, y1: b.y1 - 70};
-    const g = rectGap(pipBox(s6PipSeatAt(t)), clause);
+    const clause: Rect = {x0: b.x0 + 20, y0: S6.clauseTopMinY, x1: b.x1 - 20, y1: S6.clauseBottomMaxY};
+    const g = rectGap(pipBox(s6PipSeatAt(t), S6.pipH), clause);
     if (g < LEGIBILITY.pipClauseClearPx) out.push({shot: 'V2S6', t, what: `Pip is ${g.toFixed(0)} px from the clause`, severity: 'error'});
   });
   // Suns: clear of the band; SUN2 >= 15 px above every board top; the S8 sun never touches her board.
@@ -1306,9 +1454,20 @@ export const contractProblems = (): ContractIssue[] => {
     if (Math.min(w.w, w.h) < LEGIBILITY.staffWindowMinPx) out.push({shot: 'V2S2', t: 8.96, what: `staff window ${w.id} < 90 px`, severity: 'error'});
   });
   if (S3.silhouette.h * S3.camera.easeBack.to < LEGIBILITY.carrierFigureMinH) out.push({shot: 'V2S3', t: 13.6, what: 'her silhouette < 130 px after the ease-back', severity: 'error'});
-  // The S2 -> S3 match: W2 at the cut = W2_CUT on both sides.
-  const w2s2 = scaleSpotAbout(W2, S2.camera.push.anchor, zoomAt(S2.camera.push, 12.98));
-  if (Math.abs(w2s2.w - W2_CUT.w) > 1 || Math.abs(w2s2.h - W2_CUT.h) > 1) out.push({shot: 'V2S2', t: 12.98, what: 'W2 at the cut differs from W2_CUT', severity: 'error'});
+  // The S2 -> S3 match: her window at M on both sides (S2's window at the match = S3's).
+  const ms2 = scaleSpotAbout(S2.herDarkWindow, S2.camera.push.anchor, zoomAt(S2.camera.push, 12.98));
+  if (Math.abs(ms2.x - S3.frenchWindow.x) > 1 || Math.abs(ms2.y - S3.frenchWindow.y) > 1 || Math.abs(ms2.w - S3.frenchWindow.w) > 1 || Math.abs(ms2.h - S3.frenchWindow.h) > 1) out.push({shot: 'V2S2', t: 12.98, what: 'her window at the match differs between S2 and S3 (M)', severity: 'error'});
+  // Joins: every join names its carrier (CRAFT §a); at most 2 plain cuts (F), and each on a "But" turn; Pip on both sides.
+  const joins = SHOTS.slice(1).map((sh) => sh.transitionIn);
+  if (joins.some((ti) => ti.type === 'film-start')) out.push({shot: 'ALL', t: 0, what: 'a join without a carrier', severity: 'error'});
+  const plain = MATCHES.filter((m) => m.carrier === 'F').length;
+  if (plain > 2) out.push({shot: 'ALL', t: 0, what: `${plain} plain cuts (F; at most 2)`, severity: 'error'});
+  MATCHES.forEach((m) => {
+    const sh = shotById(m.in);
+    const want = m.in === 'V2S1' ? LOOP_CARRIER : sh.transitionIn.type === 'film-start' ? null : sh.transitionIn.carrier;
+    if (want !== m.carrier) out.push({shot: m.in, t: m.t, what: `MATCHES carrier ${m.carrier} != the shot's transitionIn ${want}`, severity: 'error'});
+    if (m.in !== 'V2S1' && Math.abs(m.t - sh.start) > 1e-6) out.push({shot: m.in, t: m.t, what: `the join's midpoint ${m.t} != the shot's start ${sh.start}`, severity: 'error'});
+  });
   // S5 progress hits TREATMENT's marks within 0.02.
   ([[21.75, 0.15], [22.16, 0.48], [22.43, 0.7], [23.02, 0.96]] as [number, number][]).forEach(([t, p]) => {
     const got = S5_EASE(prog(t, S5.move.t0, S5.move.t1));

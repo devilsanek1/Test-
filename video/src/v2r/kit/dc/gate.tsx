@@ -1,13 +1,13 @@
 // dc/gate.tsx: S6's gate (TREATMENT section 5 S6, section 8; the K2 contract S6): the Pentagon's perimeter footpath at
-// eye level, looking SOUTH (the morning sun in the east = screen left, SUN2), on a lateral truck LEFT 24.00-28.06
-// (so everything drifts right: the far facade 10 px/s, the board's mid plane 24.6 px/s, the near plane 65 px/s).
+// eye level, looking SOUTH (the morning sun in the east = screen left, SUN2), HELD at its 24.00 pose (2026-10-27,
+// docs/v2/THROUGHLINE.md §4.6: the lateral truck is retired, DIRECTION rule 8: every plane's drift is 0).
 //
 //   FAR   GateFacade: the low limestone facade band (y 705-835, cut by both edges), a row of tall windows between
 //         pilasters (they light one by one past both edges 27.08-27.80), the sliding service door (x 900-1020 at 24.00)
 //         with its plate CLASSIFIED / AUTHORIZED PERSONNEL ONLY; it slides shut behind people at 25.0 and 27.4 (the
 //         people are K4's: `doorPeople` slot). A hedge and a lawn strip at its foot; blossom trees on the lawn.
 //   MID   GateFence: the footpath (paving in perspective), the picket fence behind the deal board, THE TALL CORNER
-//         POST right of the board (its cap = Pip's seat (770, 720) -> (870, 720)), tulip beds at the fence's foot.
+//         POST right of the board (its cap: map S6.cornerPost (770, 720); Pip now sits at the board's foot), tulip beds.
 //   NEAR  GateNear: the near kerb, stone bollards with a low chain, a flowering shrub cut by the left edge, a bike rack
 //         and a bench in the right rail (masses), petals on the paving. K4's three readers' head-backs go on top.
 // Fairness (V1/V2/V10/V12/V15): an institutional facade, calm, in daylight: no guard, camera, flag, seal, vehicle,
@@ -25,8 +25,8 @@ import {useTierLine, tiered, Slot} from '../tiers';
 export const S6_T0 = 24.0;
 export const GATE_DUR = 28.06 - 24.0;
 
-/** Plane drifts (px/s, rightward: the camera trucks left). The mid plane = the deal board's (contract). */
-export const GATE_DRIFT = {far: S6.facadeDriftPxS, lawn: 15, mid: S6.boardDriftPxS, near: S6.nearCrossPxS};
+/** Plane drifts (px/s): ALL 0 since the conform (S6 is held; the contract's S6 drifts are 0, the lawn's too). */
+export const GATE_DRIFT = {far: S6.facadeDriftPxS, lawn: 0, mid: S6.boardDriftPxS, near: S6.nearCrossPxS};
 /** Drift of a plane at scene time t (linear: the contract's s6u). */
 export const gateDx = (v: number, t: number) => v * Math.min(GATE_DUR, Math.max(0, t));
 
@@ -34,11 +34,11 @@ export const GATE = {
   horizon: 836,
   facade: {y0: S6.facadeBandY[0], y1: S6.facadeBandY[1], x0: -260, x1: 1400},
   door: S6.serviceDoor0,
-  /** The mid plane: the footpath's back kerb (the board's legs), the fence, the corner post (cap = Pip's seat). */
+  /** The mid plane: the footpath's back kerb (the board's legs), the fence, the corner post (cap = map S6.cornerPost). */
   kerbY: 1252,
   /** A low, open park fence (calm: never a security wall), pickets every 34 px; the tall corner post rises over it. */
   fence: {top: 1010, base: 1236},
-  post: {x: S6.pipSeat0.x, cap: S6.pipSeat0.y, w: 54},
+  post: {x: S6.cornerPost.x, cap: S6.cornerPost.y, w: 54},
   board: S6.board0,
   sun: SUN2,
 };
