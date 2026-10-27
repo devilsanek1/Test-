@@ -9,9 +9,10 @@ import React from 'react';
 import {Ink} from '../../../lib/Ink';
 import {blob, rect as rectInk} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
+import {mat, XG} from '../../../lib/xf';
 import {useTime} from '../../../lib/time';
-import {BackRow, Bike3, BusStop, EMBER, Exhaust, Pip3, RoadDress, SnowCap, W, Wire3, ring} from '../kit';
-import type {BackRowPerson, PipPoseKey, Pt} from '../kit';
+import {backRowLayout, Bike3, WinterPerson, BusStop, EMBER, Exhaust, Footprints, Pip3, RoadDress, SnowCap, W, Walker, Wire3, ring, roadPt, roadScale} from '../kit';
+import type {BackRowPerson, BackRowProps, PipPoseKey, Pt} from '../kit';
 import {P, X_ROAD_L, X_ROAD_R, kAtZ, mixHex, quad, type QueueBeats} from './S10_geo';
 import {HALO_SNOW, QLamp, type Item} from './S10_left';
 
@@ -38,8 +39,78 @@ export const RoadGround: React.FC = () => {
   return (
     <>
       <RoadDress road={ROAD} fill={false} manhole={{u: 0.78, d: 0.05, steam: true}} seed="q/road" />
+      <TrackEdges />
       {pools}
       <Slush />
+      <Reflections />
+      <Footprints points={FORECOURT_STEPS} size={13} shrink={0.7} seed="q/fcfp" />
+    </>
+  );
+};
+
+/** Hair ink along the tyre tracks' edges on the near half of the road (the field reads as a trodden street). */
+const TrackEdges: React.FC = () => {
+  let d = '';
+  for (const u of [0.24, 0.33, 0.56, 0.65]) {
+    let first = true;
+    for (let i = 0; i <= 18; i++) {
+      const dd = 0.005 + (i / 18) * 0.5;
+      const [x, y] = roadPt(ROAD, u + Math.sin(i * 1.3 + u * 9) * 0.004, dd);
+      d += `${first ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
+      first = false;
+    }
+  }
+  return <Ink d={d} width={W.hair} color={mixHex(EMBER.road, EMBER.dcSide, 0.45)} />;
+};
+
+/** Warm streaks on the wet road under the lamps and the shopfronts (flat, short, broken). */
+const Reflections: React.FC = () => {
+  const r = rng('q/refl');
+  let d = '';
+  const spots: [number, number, number][] = [
+    [0.04, 0.12, 3],
+    [0.06, 0.2, 3],
+    [0.1, 0.06, 2],
+  ];
+  for (const [u, dd, n] of spots) {
+    for (let i = 0; i < n; i++) {
+      const [x, y] = roadPt(ROAD, u + r.range(-0.02, 0.03), dd + i * 0.012);
+      const len = r.range(24, 52) * roadScale(ROAD, dd);
+      d += `M${x.toFixed(0)} ${y.toFixed(0)}h${len.toFixed(0)}`;
+    }
+  }
+  return <path d={d} stroke={mixHex(EMBER.road, EMBER.ring, 0.55)} strokeWidth={4} strokeLinecap="round" />;
+};
+
+/** A trail of footprints across the near forecourt (from the bus stop to the right edge). */
+const FORECOURT_STEPS: Pt[] = Array.from({length: 13}, (_, i) => {
+  const k = kAtZ(19.8 - i * 0.05);
+  const [x, y] = P(-2.4 + i * 0.42, k, 0);
+  return [x, y + Math.sin(i * 0.9) * 4] as Pt;
+});
+
+/** A snowman by the bench (a kid's work: a terracotta scarf, coal buttons, twig arms). Base centre on y, h = height. */
+const Snowman: React.FC<{x: number; y: number; h: number; seed: string}> = ({x, y, h, seed}) => {
+  const t = useTime();
+  const r1 = h * 0.3;
+  const r2 = h * 0.21;
+  const r3 = h * 0.15;
+  const c1 = y - r1;
+  const c2 = c1 - r1 - r2 * 0.75;
+  const c3 = c2 - r2 - r3 * 0.7;
+  const tail = Math.sin(t * 2.4) * h * 0.02;
+  return (
+    <>
+      <path d={`M${x - r2 * 0.8} ${c2}l${-h * 0.32} ${-h * 0.16}M${x + r2 * 0.8} ${c2}l${h * 0.3} ${-h * 0.2}l${h * 0.06} ${-h * 0.07}`} stroke={EMBER.anchor} strokeWidth={Math.max(1.6, h * 0.025)} strokeLinecap="round" />
+      <path d={blob(x, c1, r1, r1 * 0.94, {seed: `${seed}/1`}) + blob(x, c2, r2, r2 * 0.95, {seed: `${seed}/2`}) + blob(x, c3, r3, r3, {seed: `${seed}/3`})} fill={EMBER.snow} />
+      <path d={blob(x, c1, r1, r1 * 0.94, {seed: `${seed}/1`}) + blob(x, c2, r2, r2 * 0.95, {seed: `${seed}/2`}) + blob(x, c3, r3, r3, {seed: `${seed}/3`})} fill="none" stroke={EMBER.ink} strokeWidth={W.far} />
+      <path d={`M${x - r2 * 0.9} ${c2 - r2 * 0.75}q${r2 * 0.9} ${r2 * 0.4} ${r2 * 1.8} 0l${-r2 * 0.1} ${r2 * 0.25}q${-r2 * 0.8} ${r2 * 0.35} ${-r2 * 1.6} 0z`} fill={EMBER.pot} />
+      <path d={`M${x + r2 * 0.4} ${c2 - r2 * 0.6}l${r2 * 0.25 + tail} ${r2 * 0.9}l${r2 * 0.22} ${-r2 * 0.05}z`} fill={EMBER.pot} />
+      <circle cx={x} cy={c2 - r2 * 0.1} r={Math.max(1.6, h * 0.022)} fill={EMBER.anchor} />
+      <circle cx={x} cy={c2 + r2 * 0.35} r={Math.max(1.6, h * 0.022)} fill={EMBER.anchor} />
+      <circle cx={x - r3 * 0.35} cy={c3 - r3 * 0.15} r={Math.max(1.4, h * 0.018)} fill={EMBER.anchor} />
+      <circle cx={x + r3 * 0.35} cy={c3 - r3 * 0.15} r={Math.max(1.4, h * 0.018)} fill={EMBER.anchor} />
+      <path d={`M${x} ${c3 + r3 * 0.05}l${r3 * 0.7} ${r3 * 0.12}l${-r3 * 0.7} ${r3 * 0.14}z`} fill={EMBER.pot} />
     </>
   );
 };
@@ -106,11 +177,12 @@ const Hydrant: React.FC<{x: number; y: number; h: number; seed: string}> = ({x, 
 // ---------------------------------------------------------------- the front row
 
 const FRONT_TOP = 1482;
-const frontRow = (beats: QueueBeats) => {
+const frontRow = (beats: QueueBeats): BackRowProps => {
+  // the kid is drawn last (index 2) but stands in the middle, in front of the adults, so the pointing arm stays on top
   const people: BackRowPerson[] = [
     {hair: 'bun', wear: ['bag'], coat: '#6B4A6E', coatDetail: ['quilt', 'yoke'], sMul: 1.04, dy: 0, dx: -6},
-    {hair: 'beanie', wear: ['point'], pointAt: beats.kidPointAt, coat: EMBER.pot, hat: EMBER.dcSide, coatDetail: ['quilt', 'zip'], sMul: 0.72, dy: 84, dx: -4},
-    {hair: 'short', acc: ['scarf'], wear: ['coffee'], coat: EMBER.dc, coatDetail: ['quilt', 'yoke'], phoneWin: beats.phoneWin, sMul: 1.0, dy: 14, dx: 16},
+    {hair: 'short', acc: ['scarf'], wear: ['coffee'], coat: EMBER.dc, coatDetail: ['quilt', 'yoke'], sMul: 1.0, dy: 14, dx: 146},
+    {hair: 'beanie', wear: ['point'], pointAt: beats.kidPointAt, coat: EMBER.pot, hat: EMBER.dcSide, coatDetail: ['quilt', 'zip'], sMul: 0.72, dy: 84, dx: -134},
   ];
   return {x0: 600, x1: 990, top: FRONT_TOP, head: 106, n: 3, seed: 'q/front', people, snow: true, lookX: 760};
 };
@@ -145,6 +217,19 @@ export function nearItems(beats: QueueBeats): Item[] {
     const [x, y] = P(1.2, k, 0);
     items.push({k, el: <Bench key="bench" x={x} y={y} w={1.6 * k} seed="q/bench" />});
   }
+  // the snowman by the bench; a walker with a dog crossing the forecourt (sideways, toward the bus stop)
+  {
+    const k = kAtZ(19.2);
+    const [x, y] = P(0.25, k, 0);
+    items.push({k, el: <Snowman key="snowman" x={x} y={y} h={1.25 * k} seed="q/snowman" />});
+  }
+  {
+    const z = 19.6;
+    const k = kAtZ(z);
+    const a = P(2.6, k, 0);
+    const bb = P(-5.2, k, 0);
+    items.push({k: k + 0.05, el: <Walker key="fcw" from={a} to={bb} h={1.74 * k} speed={68} phase={0.42} pause={1.1} seed="q/fcw" wear={['snow']} acc={['scarf']} dog />});
+  }
   // the tall lamp post on the near right (cut by the front row)
   {
     const k = kAtZ(15.5);
@@ -158,9 +243,25 @@ export function nearItems(beats: QueueBeats): Item[] {
     items.push({k, el: <Hydrant key="hyd" x={x} y={y} h={0.75 * k} seed="q/hyd" />});
   }
   // the front row (nearest of all)
-  items.push({k: 400, el: <BackRow key="front" {...frontRow(beats)} />});
+  items.push({k: 400, el: <FrontRow key="front" beats={beats} />});
   return items;
 }
+
+/** The front row (kit BackRow's layout, drawn here so the kid, last in the row, is MIRRORED: the kit's pointing arm goes
+ *  up-right, a mirrored back view points up-left, up the queue). */
+const FrontRow: React.FC<{beats: QueueBeats}> = ({beats}) => {
+  const t = useTime();
+  const props = frontRow(beats);
+  return (
+    <>
+      {backRowLayout(props, t).map(({i, person, lean, cx, hipY}) => (
+        <XG key={i} m={i === 2 ? mat.compose(mat.about(mat.scale(-1, 1), cx, hipY), mat.about(mat.rotate(-lean), cx, hipY)) : mat.about(mat.rotate(lean), cx, hipY)}>
+          <WinterPerson {...person} />
+        </XG>
+      ))}
+    </>
+  );
+};
 
 // ---------------------------------------------------------------- the van's life (inside the van's group)
 

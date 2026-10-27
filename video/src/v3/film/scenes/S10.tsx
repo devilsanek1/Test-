@@ -24,7 +24,6 @@ const BEATS: QueueBeats = {
   carPass: [0.72, 2.9],
   pipDroopAt: 1.66,
   kidPointAt: 0.4,
-  phoneWin: [1.62, 9],
 };
 
 const S10: React.FC = () => <QueueSet id="S10" dur={DUR} beats={BEATS} />;
