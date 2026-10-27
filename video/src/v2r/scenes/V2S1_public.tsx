@@ -13,6 +13,7 @@ import {Fill} from '../../lib/Fill';
 import {Ink} from '../../lib/Ink';
 import {CM} from '../palette';
 import {floodAt} from './V2S1_clock';
+import {GROUND_VP, edgeY} from './V2S1_steps_stone';
 import {Seated, castRow, pin} from '../kit/cast';
 import type {TraitOverrides} from '../kit/cast';
 
@@ -24,8 +25,12 @@ const ell = (cx: number, cy: number, rx: number, ry: number) => `M${r1(cx - rx)}
 // ---------------------------------------------------------------- the low row (tier B)
 
 type Sitter = {x: number; h: number; traits: TraitOverrides; turns?: [number, number][]; lean?: number};
-/** Seat line on the landing (the step by the water); Pip's bollard keeps x 610-790 clear. */
-export const LOW_SEAT_Y = 1292;
+/** Seat line on the landing (the step by the water), as its y at x 540: the landing runs to the ground's vanishing
+ *  point (V2S1_steps_stone), so each sitter sits on it at its own x, smaller toward the bridge and bigger toward us
+ *  (the size gradient). Pip's bollard keeps x 610-790 clear. */
+export const LOW_SEAT_Y = 1276;
+export const lowSeatY = (x: number) => edgeY(LOW_SEAT_Y, x);
+export const lowScale = (x: number) => (x - GROUND_VP[0]) / (540 - GROUND_VP[0]);
 export const LOW: Sitter[] = [
   {x: 64, h: 60, traits: {hair: 'beanie', hatColor: CM.coatMustard, coat: CM.coatSlate}},
   {x: 158, h: 63, traits: {hair: 'short', hairColor: CM.hair[2], coat: CM.coatOat, acc: 'tote'}, turns: [[2.62, 0.45], [4.1, 0]]},
@@ -53,7 +58,7 @@ export const LowRow: React.FC = () => {
   return (
     <>
       {LOW.map((s, i) => (
-        <Seated key={i} x={s.x} y={LOW_SEAT_Y} h={s.h} seed={`v2s1/low2/${i}`} traits={{...pin(traits[i]), ...s.traits}} turn={keyed(t, s.turns)} lean={s.lean} ink={0} />
+        <Seated key={i} x={s.x} y={lowSeatY(s.x)} h={s.h * lowScale(s.x)} seed={`v2s1/low2/${i}`} traits={{...pin(traits[i]), ...s.traits}} turn={keyed(t, s.turns)} lean={s.lean} ink={0} />
       ))}
     </>
   );
@@ -64,7 +69,7 @@ export const LowRow: React.FC = () => {
 /** Every thing's footprint on the stone (x centre, base y, width, height) for its contact and cast shadows. */
 export type Foot = {x: number; y: number; w: number; h: number; cast?: boolean};
 export const FOOT: Foot[] = [
-  ...LOW.map((s) => ({x: s.x, y: LOW_SEAT_Y + 2, w: s.h * 0.62, h: s.h, cast: true})),
+  ...LOW.map((s) => ({x: s.x, y: lowSeatY(s.x) + 2, w: s.h * lowScale(s.x) * 0.62, h: s.h * lowScale(s.x), cast: true})),
   {x: 212, y: 1486, w: 52, h: 58, cast: true}, // tote
   {x: 470, y: 1384, w: 18, h: 26, cast: true}, // cup A
   {x: 908, y: 1642, w: 26, h: 38, cast: true}, // cup B
