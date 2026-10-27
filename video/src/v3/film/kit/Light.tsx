@@ -244,7 +244,10 @@ export type LightRig = {
   tints: Tints;
   /** The pool on this set's ground: [outer, inner], both LIGHTER and WARMER than the ground they land on. */
   pool: [string, string];
-  /** The open ground in ambient light (exteriors: the snow at L* 83; paint the ground with it, or let Ambient do it). */
+  /** The set's ground in its LIT palette colour (the desk, the snow): what pools, casts and contacts land on. */
+  surface: string;
+  /** The open ground in ambient light (exteriors: the snow at L* 83, painted directly; interiors: the surface x the
+   *  ambient tint, which Ambient applies). Default multiply(surface, tints.ambient). */
   groundAmbient?: string;
   /** The lit variant for rims (warm lamp core). */
   rim: string;
@@ -266,8 +269,10 @@ export type LightRig = {
   wash?: Ellipse;
 };
 
-/** The warm interior tints (light.md C.3; contact lightened so it stays >= L* 45 on the ambient desk). */
-export const TINT_ROOM: Tints = {ambient: '#EEDCDC', form: '#EEDCDC', cast: '#E3CCD3', contact: '#CEACB8'};
+/** The warm interior tints (light.md C.3). The ambient turns the wall only 10 deg (peach stays peach: wall 91 -> 82,
+ *  desk 68 -> 61); form and cast turn toward rose / plum (the coloured shadows); contact lightened from #C8A3B0 so a
+ *  contact strip on the AMBIENT desk stays >= L* 45 (the ladder's floor). */
+export const TINT_ROOM: Tints = {ambient: '#EEDED8', form: '#EEDCDC', cast: '#E3CCD3', contact: '#CEACB8'};
 /** The dusk exterior tints: snow 93 -> 78 violet (form, cast), contact deeper; ambient = the open snow 93 -> 83. */
 export const TINT_DUSK: Tints = {ambient: '#DFE1ED', form: '#D3CFEA', cast: '#D3CFEA', contact: '#B4AED8'};
 
@@ -275,7 +280,7 @@ const BASE = {
   rim: EMBER.core,
   lift: '#4A2E10',
   halo: '#8A8FB5',
-  window: '#FCD994',
+  window: '#FFD27A',
   spill: '#EBD8C8',
   source: '#FFF4DA',
 };
@@ -314,6 +319,7 @@ export function nookRig(L: {lamp: {head: Pt; rot: number; scale?: number; base: 
     cap: 1.5,
     tints: TINT_ROOM,
     pool: ['#EBB07F', '#F6CD98'],
+    surface: EMBER.desk,
     ...BASE,
     form: {frac: 0.34},
     soft: {contact: 3.5, cast: [2, 12], hole: 12, wash: 26},
@@ -337,6 +343,7 @@ export const RIGS: Record<'nook' | 'shop' | 'street' | 'roof', LightRig> = {
     cap: 0.8,
     tints: TINT_ROOM,
     pool: ['#EBB07F', '#F6CD98'],
+    surface: EMBER.desk,
     ...BASE,
     form: {frac: 0.3},
     soft: {contact: 3.5, cast: [2, 10], hole: 12, wash: 26},
@@ -352,6 +359,7 @@ export const RIGS: Record<'nook' | 'shop' | 'street' | 'roof', LightRig> = {
     cap: 1.2,
     tints: TINT_DUSK,
     pool: ['#EADBD2', '#F6E4CA'],
+    surface: EMBER.snow,
     groundAmbient: '#C9CFE6',
     ...BASE,
     rim: '#F6E4CA',
@@ -368,6 +376,7 @@ export const RIGS: Record<'nook' | 'shop' | 'street' | 'roof', LightRig> = {
     cap: 0.8,
     tints: TINT_DUSK,
     pool: ['#EADBD2', '#F6E4CA'],
+    surface: EMBER.snow,
     groundAmbient: '#C9CFE6',
     ...BASE,
     rim: '#F6E4CA',
@@ -385,6 +394,30 @@ export function streetLamp(src: Pt, base: Pt, o: {k?: number; ground?: number} =
   const H = Math.max(40, base[1] - src[1]);
   const rx = H * (o.k ?? 0.8);
   return {kind: 'point', src, foot: [src[0], base[1]], H, pool: {cx: src[0], cy: base[1], rx, ry: rx * (o.ground ?? 0.25)}};
+}
+
+/** The set's ground in ambient light (see `groundAmbient`). */
+export const groundAmbientOf = (rig: LightRig) => rig.groundAmbient ?? multiply(rig.surface, rig.tints.ambient);
+
+/** A pool's two steps: the outer ellipse and the inner one (k x its size), leaning toward the source's foot (the light
+ *  is strongest right under it). LightPool draws them; CastShadow shades each with its own tint. */
+export function poolSteps(pool: Ellipse, foot?: Pt, k = 0.6): {outer: Ellipse; inner: Ellipse} {
+  const fx = foot ? foot[0] : pool.cx;
+  const fy = foot ? foot[1] : pool.cy;
+  return {outer: pool, inner: {cx: pool.cx + (fx - pool.cx) * 0.35, cy: pool.cy + (fy - pool.cy) * 0.35 - pool.ry * 0.06, rx: pool.rx * k, ry: pool.ry * k}};
+}
+
+/** Cast-shadow tints INSIDE a pool, one per step: the set's cast tint, but never darker (per channel) than what brings
+ *  that step down to the unlit ground just outside the pool, a third of a cast step deeper. So a shadow in a lamp's light
+ *  reads as "the light is blocked here", gentle on a bright pool and never darker than the dark beyond its edge (a lamp
+ *  pool on night snow: 88 -> 78 against ambient snow 83, not 74). */
+export function poolCastTints(rig: LightRig): [string, string] {
+  const floor = multiply(groundAmbientOf(rig), step(rig.tints.cast, 0.35));
+  const cast = hexRgb(rig.tints.cast);
+  return rig.pool.map((p) => {
+    const t = hexRgb(tintFor(p, floor));
+    return rgbHex(Math.max(cast[0], t[0]), Math.max(cast[1], t[1]), Math.max(cast[2], t[2]));
+  }) as [string, string];
 }
 
 // ================================================================= context: <Lit rig> (and the global off switch)
@@ -646,13 +679,33 @@ export const CastShadow: React.FC<CastShadowProps> = ({x, y, w, depth, pts, h, l
   const vl = Math.hypot(v[0], v[1]);
   const tip: Pt = [v[0] + (v[0] / vl) * s1 * 0.5, v[1] + (v[1] / vl) * s1 * 0.5];
   const pen = hull([...grow(fp, s0), ...add(grow(fp, s1), tip)]);
-  const clipD = clip === false ? null : clip === 'pool' ? (l && l.kind === 'point' && l.pool ? ellipseD(l.pool) : null) : typeof clip === 'string' ? clip : ellipseD(clip);
-  const body = (
+  const body = (c: string) => (
     <>
-      <LF d={polyD(pen)} color={step(color, 0.5)} at={at} exit={exit} />
-      <LF d={polyD(core)} color={color} at={at} exit={exit} />
+      <LF d={polyD(pen)} color={step(c, 0.5)} at={at} exit={exit} />
+      <LF d={polyD(core)} color={c} at={at} exit={exit} />
     </>
   );
+  // inside a lamp's pool: each pool step gets its own tint (poolCastTints), so the shadow is "the light blocked" and
+  // never darker than the unlit ground beyond the pool's edge
+  if (clip === 'pool' && l && l.kind === 'point' && l.pool && tint === undefined) {
+    const P = poolSteps(l.pool, l.foot);
+    const [t0, t1] = poolCastTints(rig);
+    return (
+      <Multiply shared>
+        <defs>
+          <clipPath id={`${id}o`} clipPathUnits="userSpaceOnUse">
+            <path d={ellipseD(P.outer) + ellipseD(P.inner)} clipRule="evenodd" />
+          </clipPath>
+          <clipPath id={`${id}i`} clipPathUnits="userSpaceOnUse">
+            <path d={ellipseD(P.inner)} />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${id}o)`}>{body(t0)}</g>
+        <g clipPath={`url(#${id}i)`}>{body(t1)}</g>
+      </Multiply>
+    );
+  }
+  const clipD = clip === false ? null : clip === 'pool' ? (l && l.kind === 'point' && l.pool ? ellipseD(l.pool) : null) : typeof clip === 'string' ? clip : ellipseD(clip);
   return (
     <Multiply shared>
       {clipD ? (
@@ -662,10 +715,10 @@ export const CastShadow: React.FC<CastShadowProps> = ({x, y, w, depth, pts, h, l
               <path d={clipD} />
             </clipPath>
           </defs>
-          <g clipPath={`url(#${id})`}>{body}</g>
+          <g clipPath={`url(#${id})`}>{body(color)}</g>
         </>
       ) : (
-        body
+        body(color)
       )}
     </Multiply>
   );
@@ -851,8 +904,11 @@ export type LightHole = {
 };
 
 /** The ambient step (light.md C.2, C.7 "room falloff"): ONE multiply of the set's `ambient` tint over `region` (default
- *  the whole frame), with HOLES painted back to white in order: the lamp's wall wash (a 2-step ~26 px edge), the pool,
- *  every object standing lit in the pool, and every source (the window glass, a screen, a lamp's mouth: hard edges).
+ *  the whole frame), with HOLES painted back to white in order: the lamp's wall wash (a 2-step ~26 px edge, `washHole`),
+ *  the pool (hard: its own two steps are its gradient; a soft band there reads as a third ring, a target), every object
+ *  standing lit in the pool, and every source (the window glass, a screen, a lamp's mouth: hard edges).
+ *  Outdoors under the clean pen the environment tier already pulls far snow toward the sky (93 -> ~82, the ambient
+ *  target): never stack an Ambient on a tiered outside (the nook's window view needs none).
  *  The palette values become the LIT values; everything else sits one step down (wall L* 91 -> 82, desk 68 -> 61).
  *  Never concentric target rings; inside the caption band (y 290-600) the wall must stay one value (a hole's edge there
  *  is a mistake: `lightProblems` reports it for ellipse holes). Place it LAST over the set (after the objects). */
@@ -949,16 +1005,22 @@ export const LightPool: React.FC<{pool?: Ellipse; light?: PointLight; colors?: [
   if (off || !P) return null;
   const [co, ci] = colors ?? rig.pool;
   // the inner step leans toward the source's foot (the light is strongest right under it)
-  const fx = l ? l.foot[0] : P.cx;
-  const fy = l ? l.foot[1] : P.cy;
-  const ix = P.cx + (fx - P.cx) * 0.35;
-  const iy = P.cy + (fy - P.cy) * 0.35 - P.ry * 0.06;
+  const S = poolSteps(P, l?.foot, inner);
   return (
     <>
-      <LF d={ellipseD(P)} color={co} at={at} />
-      <LF d={ellipseD({cx: ix, cy: iy, rx: P.rx * inner, ry: P.ry * inner})} color={ci} at={at} />
+      <LF d={ellipseD(S.outer)} color={co} at={at} />
+      <LF d={ellipseD(S.inner)} color={ci} at={at} />
     </>
   );
+};
+
+/** A lit window pane at dusk (light.md C.2: L* 85-92, the brightest warm things outside; rig.window), exact and never
+ *  recoloured by a tier; pair a ground-floor pane with its WindowSpill. With the light off (`<Lit off>`, the A/B
+ *  render) it paints the old EMBER.houseLit, so the A side is the kit's look before the light system. */
+export const LitWindow: React.FC<{rect: [number, number, number, number]; color?: string; at?: At}> = ({rect, color, at}) => {
+  const rig = useRig();
+  if (useOff()) return <LF rect={rect} color={EMBER.houseLit} at={at} />;
+  return <LF rect={rect} color={color ?? rig.window} at={at} />;
 };
 
 /** A lit window's light on the ground in front of it (light.md C.7): a flat trapezoid from the wall's foot under the
@@ -1027,11 +1089,12 @@ export const PoolLift: React.FC<{of?: React.ReactNode; d?: string; pool?: Ellips
 
 /** The subject's lit edge (light.md C.8): 4-6 px INSIDE the silhouette along the key side (the object minus a copy
  *  moved away from the light: thickest where the edge faces the key, nothing where it turns away), limited to `cover`
- *  (0.25-0.5) of the contour, in the lit variant (rig.rim, the lamp core). Only on the story subject (You, the hero
+ *  (0.25-0.5) of the contour (by itself it keeps the key-facing half: a box's two key-facing sides; `cover` trims a round
+ *  thing further), in the lit variant (rig.rim, the lamp core). Only on the story subject (You, the hero
  *  laptop or tag), only when the key is behind or to the side or the subject is in front of a darker field. Never an
  *  offset copy of the outline. `from="fill"` = the window's cool fill instead of the key. The object: its path `d`, or
  *  the SAME element you drew (`of`, with its centre `c` and `size`). */
-export const Rim: React.FC<{d?: string; of?: React.ReactNode; c?: Pt; size?: [number, number]; width?: number; cover?: number; color?: string; from?: 'key' | 'fill'; at?: At}> = ({d, of, c: cIn, size, width = 5, cover = 0.4, color, from = 'key', at}) => {
+export const Rim: React.FC<{d?: string; of?: React.ReactNode; c?: Pt; size?: [number, number]; width?: number; cover?: number; color?: string; from?: 'key' | 'fill'; at?: At}> = ({d, of, c: cIn, size, width = 5, cover, color, from = 'key', at}) => {
   const rig = useRig();
   const off = useOff();
   const t = useTime();
@@ -1042,9 +1105,10 @@ export const Rim: React.FC<{d?: string; of?: React.ReactNode; c?: Pt; size?: [nu
   const paper = usePaper(c);
   if (off || paper || (!d && !of) || (at !== undefined && t < at)) return null;
   const v = lightDir(rig, c, from);
-  // the half-plane on the key side holding `cover` of the contour (a circle's chord at R cos(pi cover))
+  // the moved copy alone keeps the key-facing half of the contour (a box: its two key-facing sides, whole); `cover`
+  // < 0.5 trims a ROUND thing further with a half-plane on the key side (a circle's chord at R cos(pi cover))
   const R = (Math.abs(v[0]) * bw + Math.abs(v[1]) * bh) / 2;
-  const s = R * Math.cos(Math.PI * Math.min(0.5, Math.max(0.05, cover)));
+  const s = cover === undefined ? -4 * R : R * Math.cos(Math.PI * Math.min(0.5, Math.max(0.05, cover)));
   const o: Pt = [c[0] - v[0] * s, c[1] - v[1] * s];
   const n: Pt = [-v[1], v[0]];
   const B = 4000;
