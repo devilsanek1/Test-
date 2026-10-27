@@ -299,9 +299,9 @@ def ear_flap(v=1):
 
 @sound
 def whoosh_dive(v=1):
-    """the push-through into her dark window: air rising then settling (decorrelated L/R: no comb), a muffled
-    'through the glass' bump."""
-    d = 0.44; n = n_of(d)
+    """the push-through into her dark window (5.95-6.25): air rising then settling (decorrelated L/R: no comb), a
+    muffled 'through the glass' bump; gone by 6.27, before "You'd"."""
+    d = 0.32; n = n_of(d)
     c = np.concatenate([np.geomspace(350, 1600, int(n * 0.62)), np.geomspace(1600, 900, n - int(n * 0.62))])
 
     def one(sd):
@@ -310,7 +310,7 @@ def whoosh_dive(v=1):
     out = decor(one, 130, 0.7)
     bump = struck([140, 330], [0.05, 0.03], [1, .4], 0.14, 132, exc_ms=1.2, noise_body=0.4, contact_amp=0.15,
                   contact_band=(150, 1500), contact_dec=0.004)
-    put(out, bump, 0.30, 0.3, 0.0)
+    put(out, bump, 0.20, 0.3, 0.0)
     return out
 
 
@@ -320,7 +320,7 @@ def pencil_ring(v=1):
     """an ink ring drawn round her dark window: one continuous circular graphite stroke, a lift at the end."""
     d = 0.44; n = n_of(d); t = tt(d)
     sp = 0.72 + 0.28 * np.sin(2 * np.pi * 2.3 * t + 0.6)
-    return pan(graphite(d, 140, sp, 1.0) * stroke_env(n, 0.008, 0.035), -0.3)
+    return pan(lp(graphite(d, 140, sp, 1.0), 6500, 2) * stroke_env(n, 0.008, 0.035), -0.3)
 
 
 @sound
@@ -654,6 +654,7 @@ BAND_UNDER = 6.0       # and >= 6 dB under the voice's own 1-4 kHz (diction) whe
 BAND_UNDER_TONAL = 0.0  # measured-tonal sounds (tonality() >= TONAL_MIN): never above the voice's 1-4 kHz there
 TONAL_MIN = 0.85       # share of a sound's 1-4 kHz energy in its strongest partials for the tonal relaxation
 WORD_MIN = 6.0         # hit words: the voice >= 6 dB over bed + SFX at 1-4 and 4-10 kHz (review item 1)
+WORD_MIN_OTHER = 3.0   # every other word: >= 3 dB (the voice on top everywhere; the bed is carved to >= 9 dB)
 WORD_MARGIN = 0.5
 BANDS = {"1-4k": (1000.0, 4000.0), "4-10k": (4000.0, 10000.0)}
 UNTRIMMED = {"pencil_reverse"}                   # exact length: it ends on the film's last frame (+ the crossfade)

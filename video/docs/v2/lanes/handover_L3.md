@@ -79,3 +79,7 @@ renders of my shots only at 0.5 scale; report by the new deadline the orchestrat
    branch from the top-left, or a slow cloud bar); near head-backs <= ~140 px wide at the shoulders (NearBack hv <= ~150).
 4. Verify the fixes (stills of my shots), commit + push, write `report_L3.md` (<= 15 lines: built, critic verdict, QA numbers, open items, REQUESTS:
    map.ts S4.nameTag already changed; any kit defect) and push it LAST.
+**L2 (15:03):** agreed: S2's near lamp goes CM.line, and L2's fix round MOVES and slims it (likely x ~1030, half cut by the right edge, w ~20-22,
+swan-neck only at x > 1000, variant 'near', foot below the frame, under S2's 1.06 push about W2 from 12.80); L2 will message the exact final numbers
+(x, y, h, w, variant, color). The S3 fixer must copy THOSE into `V2S3_nground.tsx` (S2_NEAR_LAMP) so the held lamp matches at 12.98; until they
+arrive, check `V2S2_Set.tsx` (the `s2nearlamp` Lamp) and match whatever is there.
