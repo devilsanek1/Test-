@@ -549,17 +549,18 @@ def pencil_reverse():
 
 # ------------------------------------------------------------------ measurement + cue sheet
 LOCAL_UNDER = 8.5      # house: every SFX >= 8 dB under the voice where it lands (broadband, momentary)
-BAND_UNDER = 6.0       # and >= 6 dB under the voice's own 1-4 kHz (diction) where it lands
+BAND_UNDER = 6.0       # and >= 6 dB under the voice's own 1-4 kHz (diction) where it lands (noise-like sounds)
+BAND_UNDER_TONAL = 0.0  # tonal sounds (sheet.TONAL): never above the voice's 1-4 kHz where it lands
 
 
-def gain_for(V, t, under, lv_ev, lb_ev, dur):
+def gain_for(V, t, under, lv_ev, lb_ev, dur, tonal):
     """the cue's gain (dB): `under` the voice's speech level, and, where it lands on speech, LOCAL_UNDER under the
     voice there and BAND_UNDER under its 1-4 kHz there. Returns (gain_db, the rule that set it)."""
     rules = {"sheet": V["vref"] - under - lv_ev}
     here = M.local_voice(V, t, dur)
     if here is not None:
         rules["local"] = here[0] - LOCAL_UNDER - lv_ev
-        rules["band"] = here[1] - BAND_UNDER - lb_ev
+        rules["band"] = here[1] - (BAND_UNDER_TONAL if tonal else BAND_UNDER) - lb_ev
     k = min(rules, key=rules.get)
     return rules[k], k
 
@@ -581,9 +582,18 @@ def build(write=True):
     vref = V["vref"]
     cues = [{"src": "v2r/music_bed.wav", "t": 0.0, "gain": 1.0,
              "note": "the bed 'Towpath' (music + canal / Arlington air, pre-ducked under the locked voice): play as is"}]
+    # each cue's own limit, then one common step per file (same idea = same level relation, A5 equal boards)
+    lim = []
     for (t, name, under, note) in sheet.CUES:
         f = files[name]
-        g_db, rule = gain_for(V, frame_t(t), under, f["event_lufs"], f["band_db"], f["dur"])
+        g_db, rule = gain_for(V, frame_t(t), under, f["event_lufs"], f["band_db"], f["dur"], name in sheet.TONAL)
+        lim.append((g_db, rule, V["vref"] - under - f["event_lufs"]))
+    step = {}
+    for (t, name, under, note), (g_db, rule, g_sheet) in zip(sheet.CUES, lim):
+        step[name] = min(step.get(name, 0.0), g_db - g_sheet)
+    for (t, name, under, note), (g_db, rule, g_sheet) in zip(sheet.CUES, lim):
+        g_db = g_sheet + step[name]
+        rule = rule if abs(g_db - lim[sheet.CUES.index((t, name, under, note))][0]) < 0.05 else "group"
         g = float(db2a(g_db))
         if g > 1.0:
             print(f"WARNING {name} @{t}: gain {g:.2f} > 1 (file too quiet for -{under} dB): clipped to 1", file=sys.stderr)

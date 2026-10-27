@@ -53,7 +53,7 @@ def cue_levels(y):
 
 def local_voice(V, t0, dur):
     """the voice's mean level (broadband, band) over the speech frames the cue overlaps; None = the cue is in a pause."""
-    m = (V["t"] >= t0 - 0.1) & (V["t"] <= t0 + min(dur, 0.6) + 0.1) & V["sp"]
+    m = (V["t"] >= t0 - 0.05) & (V["t"] <= t0 + min(dur, 0.6)) & V["sp"]
     if not m.any():
         return None
     return float(np.mean(V["lv"][m])), float(np.mean(V["lb"][m]))

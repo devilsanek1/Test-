@@ -25,15 +25,22 @@ MARK = {"pizz_false_relief": 6.28, "pulse_in": 8.44, "scared": 10.31, "pulse_out
         "accent1": 22.43, "clause_pulse": 24.00, "clause_end": 27.82, "google_pulse": 28.31, "google_end": 32.70,
         "motif_alone": 33.16, "held_breath": 36.18, "quote": 36.54, "accent2": 37.18, "dip": (4.54, 4.79)}
 
-# THE cue sheet: (t, file stem in public/v2r/sfx, dB under the voice, note). Same idea = same file.
+# Tonal sounds (energy in a few partials: a bell, a glass, a wood block, a pop's glide) mask the voice's 1-4 kHz
+# diction far less than noise of the same level, so the 1-4 kHz rule is relaxed for them (premix still reports it).
+TONAL = {"exit_ding", "ghost_tick", "glass_tone", "lamp_run", "outline_pops", "letter_pops", "pop", "pop_high",
+         "pop_low", "swap_pop", "pip_hop", "board_clack", "plate_knock", "blossom_pops"}
+
+# THE cue sheet: (t, file stem in public/v2r/sfx, dB under the voice, note). Same idea = same file, and every cue
+# of one file keeps the level relation written here (a callback's -3 dB; Google's and her board sounds equal):
+# when one of them has to come down for the voice, they all come down together.
 CUES = [
     # V2S1 Walking out (0.00-6.10): no music; air + canal (in the bed) + these
-    (0.00, "pencil_flood", 17, "f0: the bare ink scene, colour floods from the sun outward (f1-f18)"),
-    (0.40, "lamp_click", 18, "her lamp at W clicks OFF: the biggest window goes dark (the first picture of 'quit')"),
+    (0.00, "pencil_flood", 20, "f0: the bare ink scene, colour floods from the sun outward (f1-f18)"),
+    (0.40, "lamp_click", 20, "her lamp at W clicks OFF: the biggest window goes dark (the first picture of 'quit')"),
     (0.45, "exit_ding", 9, "OUR exit ding: the glass doors start to slide apart (first-second phone sound)"),
-    (0.45, "door_glide", 21, "the glass doors' glide under the ding, fully open on 'quit' 0.52"),
+    (0.45, "door_glide", 24, "the glass doors' glide under the ding, fully open on 'quit' 0.52"),
     (0.97, "step_thup", 20, "she steps out onto the towpath ('Google')"),
-    (0.99, "letter_pops", 21, "the canopy letters fill-pop one by one"),
+    (0.99, "letter_pops", 26, "the canopy letters fill-pop one by one"),
     (1.40, "wings", 16, "five birds lift off the bridge rail and wheel west (in the pause 1.46-2.00)"),
     (2.00, "ghost_tick", 14, "G1 pops (one soft wooden tick per ghost, ONE pitch)"),
     (2.53, "ghost_tick", 14, "G2 pops ('contract')"),
@@ -42,7 +49,7 @@ CUES = [
     (4.20, "ghost_tick", 14, "G5 pops"),
     (4.79, "ghost_tick", 14, "G6 pops ('for'); the ambience dip 4.54-4.79 is in the bed"),
     (4.98, "outline_pops", 15, "'life': three bare outlines pop in down the towpath (then air: no note, no riser)"),
-    (4.98, "ear_flap", 19, "Pip's ears-cover on 'life'"),
+    (4.98, "ear_flap", 23, "Pip's ears-cover on 'life'"),
     (5.95, "whoosh_dive", 12, "push-through dive into the dark window (in the pause 5.59-6.28)"),
     # V2S2 The wall (6.10-12.98)
     (6.82, "pencil_ring", 17, "an ink ring draws round her dark window"),
@@ -83,7 +90,7 @@ CUES = [
     (28.36, "board_clack", 13, "GOOGLE SAYS: the header pops (same board sound, same level as hers)"),
     (29.65, "pen_short", 17, "'AI principles' pen-builds, complete on 30.04"),
     (30.04, "lamp_run", 16, "the string lights come on in a run (same sound and level as hers at 37.18)"),
-    (30.74, "pen_long", 17, "'of any kind' pen-builds, complete on 32.08"),
+    (30.74, "pen_long", 19, "'of any kind' pen-builds, complete on 32.08"),
     (32.70, "boat_chug", 15, "the narrowboat foreground wipe (nothing starts before 32.70)"),
     # V2S8 Her words (32.93-39.08)
     (33.16, "board_clack", 13, "the wipe clears: SHE SAYS (same board sound, same level as Google's)"),
@@ -91,9 +98,9 @@ CUES = [
     (33.86, "ghost_tick", 17, "second ghost"),
     (33.94, "ghost_tick", 17, "third ghost"),
     (34.75, "door_latch", 16, "her door shuts behind her"),
-    (34.95, "lamp_click", 21, "W lights (her home lamp: the 0.40 click as a callback, 3 dB softer)"),
+    (34.95, "lamp_click", 23, "W lights (her home lamp: the 0.40 click as a callback, 3 dB softer)"),
     (35.72, "cloth_wipe", 17, "'her words': the café owner wipes the board clean in one stroke"),
-    (36.54, "pen_long", 17, "her quote pen-draws on (the same pen as Google's)"),
+    (36.54, "pen_long", 19, "her quote pen-draws on (the same pen as Google's)"),
     (37.18, "lamp_run", 16, "'facts': the lamps light in a run down the lane (= Google's 30.04, never the ding)"),
     (38.82, "pencil_reverse", 16, "the un-build: a reversed pencil into frame 0 (meets 0.00's pencil flood)"),
 ]

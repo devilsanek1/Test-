@@ -22,6 +22,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from dsp import (SR, PUBLIC, VOICE, SCRATCH, N_FILM, FILM_DUR, FPS, np, bp, db2a, a2db, save, load, lufs,  # noqa
                  true_peak_db, short_term_lufs, click_report, frame_t, n_of)
 import sheet  # noqa: E402
+import measure as M  # noqa: E402
 import mix as HM  # noqa: E402  (audio/mix.py: circular glue + the true-peak limiter)
 
 MIX_OUT = PUBLIC / "mix.wav"
@@ -151,26 +152,26 @@ def main():
         if p.exists():
             comp[nm] = load(p)[:N_FILM] * bed_gain
     rep["voice_over"] = {k: stats(gap(vs, x)) for k, x in comp.items()}
+    tv_, lv_ = short_term_lufs(vs, win=0.4, hop=0.05); _, ls_ = short_term_lufs(sfx, win=0.4, hop=0.05)
+    k_ = min(len(lv_), len(ls_)); m_ = speech_mask(tv_[:k_]) & (ls_[:k_] > -70)
+    rep["sfx_bus_frames_within_8dB"] = [(round(float(a), 2), round(float(b), 1)) for a, b in
+                                        zip(tv_[:k_][m_], (lv_[:k_] - ls_[:k_])[m_]) if b < 8]
     bg, bt = band_gap(vs, bed + sfx)
+    rep["band_frames_below_0dB"] = [(round(float(t), 2), round(float(d), 1)) for d, t in zip(bg, bt) if d < 0]
     rep["band_1_4kHz_voice_over_rest"] = stats(bg)
     rep["band_1_4kHz_worst"] = [(round(float(t), 2), round(float(d), 1)) for d, t in sorted(zip(bg, bt))[:5]]
-    # every cue's own gap to the voice (the cue's loudest 400 ms vs the voice's momentary level at that moment)
-    tv, lv = short_term_lufs(vs, win=0.4, hop=0.01)
-    vref = float(np.median(lv[speech_mask(tv)]))
+    # every cue's own gap to the voice: vs its speech level, vs the voice where it lands, and in 1-4 kHz there
+    V = M.voice_tracks()
     rows = []
     for c, one in per:
         a = frame_t(c["t"])
-        seg = one[max(0, n_of(a) - n_of(0.2)): n_of(a) + n_of(1.0)]
-        if not np.any(seg):
-            continue
-        _, lc = short_term_lufs(np.concatenate([np.zeros((n_of(0.4), 2)), seg, np.zeros((n_of(0.4), 2))]),
-                                win=0.4, hop=0.01)
-        ev = float(lc.max())
-        m = (tv >= a - 0.1) & (tv <= a + 0.5) & speech_mask(tv)
-        vloc = float(lv[m].max()) if m.any() else None
+        x = load(PUBLIC.parent / c["src"]) * c["gain"]
+        ev, eb = M.cue_levels(x)
+        here = M.local_voice(V, a, len(x) / SR)
         rows.append({"t": c["t"], "src": c["src"].split("/")[-1][:-4], "gain": c["gain"],
-                     "under_speech_level": round(vref - ev, 1),
-                     "under_voice_here": (round(vloc - ev, 1) if vloc is not None else "pause")})
+                     "under_speech_level": round(V["vref"] - ev, 1),
+                     "under_voice_here": (round(here[0] - ev, 1) if here else "pause"),
+                     "band_under_voice_here": (round(here[1] - eb, 1) if here else "pause")})
     rep["cues"] = rows
     rep["cues_closer_than_8dB"] = [r for r in rows if isinstance(r["under_voice_here"], float) and r["under_voice_here"] < 8]
     rep["clicks_master"] = click_report(mixed)[0]
@@ -182,9 +183,10 @@ def main():
     plot(vs, bed, sfx, mixed, SCRATCH / "premix.png")
     short = {k: v for k, v in rep.items() if k != "cues"}
     print(json.dumps(short, indent=1))
-    print("cues (t, file, gain, dB under the speech level, dB under the voice at that moment):")
+    print("cues (t, file, gain, dB under the speech level, dB under the voice where it lands, the same in 1-4 kHz):")
     for r in rows:
-        print(f"  {r['t']:6.2f} {r['src']:15s} {r['gain']:.4f} {r['under_speech_level']:6.1f} {r['under_voice_here']}")
+        print(f"  {r['t']:6.2f} {r['src']:15s} {r['gain']:.4f} {r['under_speech_level']:6.1f} {r['under_voice_here']}"
+              f"  band {r['band_under_voice_here']}")
 
 
 if __name__ == "__main__":

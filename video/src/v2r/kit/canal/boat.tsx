@@ -10,6 +10,7 @@ import {CM, INK_PX} from '../../palette';
 import {useTime} from '../../../lib/time';
 import {line, circle as circleInk, rect as rectInk} from '../../../lib/sketch';
 import type {WiperProps} from '../../../lib/Film';
+import {Plane} from '../../../lib/persp';
 import {Batch, Paint, P, r1, rng, inkFor, ovalPath, domePath, lobes, leafPath, lerp, Pt} from './core';
 import {bikeInto} from './towpath';
 import {Puffs} from './life';
@@ -347,3 +348,29 @@ export const BoatWiper: React.FC<WiperProps> & {half?: number} = ({x, dir}) => {
 BoatWiper.half = WIPE_LEN / 2 + 40;
 
 export {rectInk};
+
+// ---------------------------------------------------------------- a boat in perspective (S2's moored and passing boats)
+
+const PB_LEN = 1000;
+const PB_H = 300;
+
+/** A narrowboat seen obliquely: the flat side model mapped onto a screen quad between its stern and bow waterline
+ *  points (hStern / hBow = the model's full height there, px). Fill / Ink are projected by lib/persp's Plane. */
+export const PerspBoat: React.FC<{stern: Pt; bow: Pt; hStern: number; hBow: number; seed: string; cabin?: string; lit?: boolean; cafe?: boolean}> = ({stern, bow, hStern, hBow, seed, cabin, lit, cafe}) => {
+  const b = useMemo(() => {
+    const b = new Batch();
+    boatInto(b, {x: 0, water: PB_H - 8, len: PB_LEN, h: 160, dir: 1, seed, cabin, topView: 0, roofItems: false, panel: true, lit, cafe, ink: INK_PX.far}, 0);
+    return b;
+  }, [seed, cabin, lit, cafe]);
+  const quad: [Pt, Pt, Pt, Pt] = [
+    [stern[0], stern[1] - hStern],
+    [bow[0], bow[1] - hBow],
+    [bow[0], bow[1]],
+    [stern[0], stern[1]],
+  ];
+  return (
+    <Plane quad={quad} w={PB_LEN} h={PB_H}>
+      <Paint b={b} seed={`pboat/${seed}`} />
+    </Plane>
+  );
+};

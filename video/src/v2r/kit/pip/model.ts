@@ -203,7 +203,11 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
 
   // ---- head rig: head-local -> body-local (roll, pitch, yaw relative to the body) -> view
   const headDrop = p.headDrop + bodyTopShift * 0.9;
-  const H0: V3 = [HEAD.x, HEAD.y + headDrop, HEAD.z];
+  // seen from behind a head turn is nearly invisible, so it is played big: the head leans and tilts toward the side
+  // it looks at, and the trunk lifts out past the cheek (backness 0 facing us .. 1 facing away)
+  const backness = clamp(-Math.cos(p.yaw * D2R) * 1.3);
+  const turnedAway = backness > 0.4 && Math.abs(p.look) > 0.22;
+  const H0: V3 = [HEAD.x - p.look * 3.5 * backness * Math.sign(-Math.cos(p.yaw * D2R) || 1), HEAD.y + headDrop, HEAD.z];
   const sgn = cT < -0.05 ? -1 : 1;
   // a near-front / near-back body: the head squares up to the camera axis at look 0 (so look +-1 turns it the same
   // amount either way); a profile keeps its head in line with the body
@@ -211,7 +215,7 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
   const squareTo = Math.abs(yawD - 180) <= 32 ? 180 - yawD : yawD <= 32 ? -yawD : yawD >= 328 ? 360 - yawD : 0;
   const psi = (p.look * 95 * D2R) / sgn + squareTo * D2R;
   const phi = p.lookUp * 38 * D2R;
-  const rho = p.headTilt * D2R;
+  const rho = (p.headTilt + p.look * 8 * backness) * D2R;
   const makeRot = (yawR: number, pitchR: number, rollR: number) => {
     const cP = Math.cos(pitchR);
     const sP = Math.sin(pitchR);
@@ -259,7 +263,10 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
   for (const s of [1, -1] as const) {
     const A = s === 1 ? 'A' : 'B';
     const droop = (s === 1 ? p.earDroopA : p.earDroopB) * D2R;
-    const swing = ((s === 1 ? p.earSwingA : p.earSwingB) - earBack) * D2R;
+    const swing0 = s === 1 ? p.earSwingA : p.earSwingB;
+    // from behind, an ear swung past 100 deg would vanish round the face: keep it at the side, pressed forward
+    const swingV = swing0 > 100 ? lerp(swing0, 100, backness) : swing0;
+    const swing = (swingV - earBack) * D2R;
     const fold = clamp(s === 1 ? p.earFoldA : p.earFoldB, 0, 1);
     const att: V3 = [s * 22.5, -9, -6];
     // a rigid leaf frame: at rest the midrib points straight out sideways, the upper half-blade up, the inner (pink)
@@ -297,7 +304,7 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
     const nB = v3.rot(nFront, d, foldAng);
     // past 90 deg of forward swing the leaf wraps round the front of the face (ears-cover): the root stays at the
     // side, the blade is carried forward over the face
-    const wrap = clamp(((s === 1 ? p.earSwingA : p.earSwingB) - 90) / 70);
+    const wrap = clamp((swingV - 90) / 70);
     const mid = (u: number): V3 =>
       v3.add(v3.add(v3.add(att, v3.mul(d, u * EAR.len)), v3.mul(w, -EAR.bend * EAR.len * u * u)), [0, 0, wrap * 34 * Math.sqrt(u)]);
     const hw = (u: number) => Math.pow(Math.sin(Math.PI * Math.pow(u, 0.72)), 0.85);
@@ -322,7 +329,11 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
     const bladeDepth = earPt(mid(0.6))[2] - hc[2];
     // in front of the head unless the root has gone round the back (the far ear in a profile)
     const front = wrap > 0.3 ? bladeDepth > 0 : rootDepth > -HEAD.rz * 0.42;
-    const layer = front ? 0.6 + rootDepth * 0.001 : -2 + rootDepth * 0.001;
+    // over the shoulder: seen from behind with the head turned, the ear on the look side tucks behind the head and
+    // the trunk shows in front of it
+    const rootX = earPt(att)[0];
+    const lookSide = turnedAway && Math.sign(rootX - hc[0]) === Math.sign(p.look);
+    const layer = lookSide ? 0.35 + rootDepth * 0.0005 : front ? 0.6 + rootDepth * 0.001 : -2 + rootDepth * 0.001;
     const fillRole: FillRole = front ? 'body' : 'shade';
     const nUp = earVec(nFront);
     const nLow = earVec(nB);
@@ -373,7 +384,7 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
 
   // ---- trunk: down a little, then one curl forward and up
   {
-    const raise = p.trunkRaise * D2R;
+    const raise = (p.trunkRaise + 60 * Math.abs(p.look) * backness) * D2R;
     const g: V3 = [0, Math.cos(raise), Math.sin(raise)];
     const f0: V3 = [0, -Math.sin(raise), Math.cos(raise)];
     const chi = (38 + p.trunkSide) * D2R;
@@ -403,7 +414,7 @@ export function buildPip(p: PoseParams, o: BuildOpts = {lod: 1}): PipGeom {
       depthSum += q[2] - hc[2];
     }
     const front = depthSum / (steps + 1) > -HEAD.rz * 0.3;
-    parts.push({id: 'trunk', group: 'trunk', shape: tubeShape(C, R), layer: front ? 0.7 : -2.5, fill: 'body', union: true, lines: front});
+    parts.push({id: 'trunk', group: 'trunk', shape: tubeShape(C, R), layer: front ? 0.7 : turnedAway ? 0.38 : -2.5, fill: 'body', union: true, lines: front || turnedAway});
     // two little trunk creases (only side-on: seen end-on they read as a mouth)
     if (front && o.lod && Math.abs(Math.sin(headYawTot)) > 0.55) {
       for (const k of [0.22, 0.36]) {

@@ -155,7 +155,7 @@ export const MID_CAM = new Pinhole({f: 3000, h: 1600 * Math.tan((13 * Math.PI) /
 
 /** Where the Pentagon lands in the END frame: left vertex x, far roofline y, drawn width. The right part runs past the
  *  right edge (two facades + the rings cut by it). */
-export const PENT_PLACE = {left: 318, top: 866, width: 980};
+export const PENT_PLACE = {left: 322, top: 846, width: 960};
 
 function fitMid(): Fit {
   const pts: Pt[] = [];
