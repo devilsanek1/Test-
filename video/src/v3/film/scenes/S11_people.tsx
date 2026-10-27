@@ -12,7 +12,7 @@
 import React from 'react';
 import {Fill} from '../../../lib/Fill';
 import {Ink} from '../../../lib/Ink';
-import {blob, line, rect as rectInk, roundRect} from '../../../lib/sketch';
+import {blob, line, rect as rectInk, roundRect, torso} from '../../../lib/sketch';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER, Pip3, StickCrate, Txt, W, WinterPerson, backRowLayout, ease01, personGeo, puffs, rings, sway, winterPersonMat} from '../kit';
@@ -95,7 +95,7 @@ const HeadArm: React.FC<{g: ReturnType<typeof personGeo>; coat: string; ink: num
   const hw = g.w / 2;
   const rub = k > 0.95 ? Math.sin((t - win[0]) * 15) * g.hr * 0.14 : 0;
   const low: Arm = {sh: [hw * 0.74, -g.h + g.w * 0.3], el: [hw * 1.1, -g.h + g.w * 0.7], ha: [hw * 1.05, -g.h + g.w * 1.1]};
-  const up: Arm = {sh: [hw * 0.74, -g.h + g.w * 0.3], el: [hw * 1.42, g.hy + g.hr * 0.5], ha: [g.hr * 0.5 + rub, g.hy - g.hr * 0.5]};
+  const up: Arm = {sh: [hw * 0.74, -g.h + g.w * 0.3], el: [hw * 1.22, g.hy - g.hr * 0.35], ha: [g.hr * 0.4 + rub, g.hy - g.hr * 0.8]};
   return <Sleeve arm={lerpArm(low, up, k)} w={g.w} coat={coat} ink={ink} seed={seed} />;
 };
 
@@ -124,6 +124,28 @@ const ClipArm: React.FC<{g: ReturnType<typeof personGeo>; coat: string; ink: num
         <path d={roundRect(bx + bw * 0.32, by - bh * 0.03, bw * 0.36, bh * 0.1, bw * 0.03)} fill={EMBER.frost} stroke={EMBER.ink} strokeWidth={ink * 0.5} />
       </g>
       <path d={blob(arm.ha[0], arm.ha[1], g.w * 0.08, g.w * 0.095, {seed: `${seed}/h`})} fill={EMBER.skin} stroke={EMBER.ink} strokeWidth={ink * 0.6} />
+    </>
+  );
+};
+
+/** The dock hand's hi-vis: the kit's vest bands sit low on a long back (past the frame), so two reflective bands across
+ *  the shoulders, clipped to the same vest outline (kit WinterPerson 'hivis'). */
+const VestBands: React.FC<{g: ReturnType<typeof personGeo>; ink: number; seed: string}> = ({g, ink, seed}) => {
+  const vest = torso(0, 0, g.w * 0.8, g.h * 0.9, 0.3, 0.06);
+  const id = `vb-${seed.replace(/[^a-zA-Z0-9]/g, '')}`;
+  return (
+    <>
+      <defs>
+        <clipPath id={id}>
+          <path d={vest} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>
+        <rect x={-g.w} y={-g.h * 0.8} width={g.w * 2} height={g.w * 0.085} fill={EMBER.snow} />
+        <rect x={-g.w} y={-g.h * 0.64} width={g.w * 2} height={g.w * 0.085} fill={EMBER.snow} />
+        <path d={`M${-g.w} ${-g.h * 0.8}H${g.w}M${-g.w} ${-g.h * 0.64 + g.w * 0.085}H${g.w}`} stroke={EMBER.ink} strokeWidth={ink * 0.3} />
+        <path d={`M0 ${-g.h * 0.9}V0`} stroke={EMBER.ink} strokeWidth={ink * 0.35} strokeDasharray={`${g.w * 0.03} ${g.w * 0.02}`} />
+      </g>
     </>
   );
 };
@@ -183,7 +205,8 @@ export const S11Crowd: React.FC<{life: CrowdLife}> = ({life}) => {
         const coat = person.coat ?? EMBER.dc;
         const seed = `s11/arm${i}`;
         let arm: React.ReactNode = null;
-        if (i === ROLE.coffee) arm = <CoffeeArm g={g} coat={coat} ink={ink} sips={life.sips ?? []} seed={seed} />;
+        if (i === ROLE.phone) arm = <VestBands g={g} ink={ink} seed={seed} />;
+        else if (i === ROLE.coffee) arm = <CoffeeArm g={g} coat={coat} ink={ink} sips={life.sips ?? []} seed={seed} />;
         else if (i === ROLE.van && life.headScratch) arm = <HeadArm g={g} coat={coat} ink={ink} win={life.headScratch} seed={seed} />;
         else if (i === ROLE.clip) arm = <ClipArm g={g} coat={coat} ink={ink} flutter={life.clipFlutter} seed={seed} />;
         return (
