@@ -5,8 +5,9 @@
 // shade cut by the left edge, lit; YOUR laptop (the old one: dark screen) centred on the desk, w 420, in the golden
 // lamp pool (690 px wide, wider than the laptop, so it reads as light, not a mat). On "your" (17.24) the see-inside
 // bubble pops upper right (board: centre 680, 728, r 112, above y 840; small element, so 0.10 s ahead of the word) and
-// grows out of a spot on the keyboard; the memory stick (the kit stick, w 170) pops inside it a beat later. No window
-// (saved for O1, S13 and S15).
+// grows out of a spot on the keyboard; the memory stick (the kit stick, w 170) pops inside it a beat later. Fixer pass
+// (G5b review): the board's "no window" is overridden: the desk the film returns to seven times faces O1's window, so its
+// lower part stands behind the laptop (S7_desk.tsx S7WallLow, scenes/desk_window.tsx), the pinboard a side piece.
 // G5b (owner: "way too empty"; the approved pilot's bar): the desk world dressed to O1's level around the locked board
 // (S7_desk.tsx: string lights, photos, a hanging pothos, a print, the pinboard, a wall shelf, the calendar, books, a
 // candle, the mug, a speaker, headphones, biscuits, glasses, sticky notes, the charger into the laptop, a spiral
@@ -79,7 +80,7 @@ const S7: React.FC = () => {
         <S7DeskBack />
         <Lamp pose={{base: [-300, 1090], elbow: [-90, 640], head: [8, 792], rot: -24, scale: 1.55}} seed="s7/lamp" />
         <S7PullChain />
-        {/* S12's dusk-blue thermos on the back row behind Pip (the same desk; the cool share) */}
+        {/* S12's dusk-blue thermos on the back row (the same desk; the cool share) */}
         <S12Thermos x={818} y={1104} />
         <S7Mug />
         <Laptop x={S7_LAP.x} y={S7_LAP.y} w={S7_LAP.w} variant="old" screen={EMBER.dcSide} seed="s7/lap" />

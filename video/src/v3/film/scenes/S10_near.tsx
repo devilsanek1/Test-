@@ -481,7 +481,8 @@ export const VanLife: React.FC<{van: {x: number; y: number; w: number}; beats: Q
   const pipX = x0 + boxW * 0.62 + slide;
   const pipY = top - 5;
   const out: React.ReactNode[] = [
-    <Pip3 key="pip" x={pipX} y={pipY} scale={0.94} keys={keys} jolts={beats.pipDroopAt !== undefined ? [beats.pipDroopAt] : undefined} outdoor snowCap={[0, 4.2]} shakeAt={beats.pipShakeAt} seed={5} />,
+    // plush-size (G5b review): ~45 px on the ~200 px van, under the adults at the bus stop (~70 px) at this depth
+    <Pip3 key="pip" x={pipX} y={pipY} scale={0.48} keys={keys} jolts={beats.pipDroopAt !== undefined ? [beats.pipDroopAt] : undefined} outdoor snowCap={[0, 4.2]} shakeAt={beats.pipShakeAt} seed={5} />,
   ];
   // snow sliding off the roof on the shove: chunks drop off the back edge and burst on the road
   if (pushAt !== undefined && t >= pushAt) {

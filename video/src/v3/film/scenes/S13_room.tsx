@@ -9,8 +9,8 @@
 //   left wall  the shelf's bottom filled (books, a jar), a coat and a striped scarf on a hook rail by the shelf (below the
 //              bubble's calm ring), a tote bag slumped under it.
 //   under desk the radiator with a sock drying on it (sways), a wall socket, a wicker bin.
-//   desk       a desk calendar on 2026 (it sets up S14's 2027), a pen cup, a book stack with headphones, a succulent on the
-//              sill (right of the mullion).
+//   desk       YOUR laptop closed in the lamp's pool left of the lamp (fixer pass), a desk calendar on 2026 (it sets up
+//              S14's 2027), a pen cup, a book stack with headphones, a succulent on the sill (right of the mullion).
 //   floor      floorboards (short seams), a striped rug, slippers, Pip asleep on the rug (it waits with you: slow breath,
 //              z's popping every ~0.7 s), an open book face down, a floor plant cut by the right edge, a pouf and a yarn
 //              basket cut by the bottom edge.
@@ -263,12 +263,31 @@ export const S13ToteAndBin: React.FC = () => (
  *  head); its steam is light puffs that read as vapour on the navy glass (never ink lines over the glass). */
 const DESK_MUG = {x: 936, top: 1048, k: 0.51};
 
+/** YOUR laptop, closed, lying in the lamp's pool left of the lamp (fixer pass, G5b review: S7 / S8 established it on
+ *  this desk; the density plan's "the laptop closed"): small and calm under the BETTER bubble, the kit laptop's hero lid
+ *  seen from slightly above (a thin slab), its deep-orange front edge, a frost sticker. (x0, y) = the front-left foot. */
+const ClosedLaptop: React.FC<{x0: number; y: number; w: number}> = ({x0, y, w}) => {
+  const d = w * 0.16;
+  const th = Math.max(5, w * 0.05);
+  const lid = polyPath([[x0 + d * 0.5, y - th - d], [x0 + w + d * 0.4, y - th - d - 2], [x0 + w, y - th], [x0, y - th]]);
+  const edge = polyPath([[x0, y - th], [x0 + w, y - th], [x0 + w, y], [x0, y]]);
+  return (
+    <>
+      <Fill d={edge} color={EMBER.heroDeep} seed="s13/clapE" />
+      <Fill d={lid} color={EMBER.hero} seed="s13/clapL" />
+      <Fill d={blob(x0 + w * 0.68, y - th - d * 0.5, w * 0.06, d * 0.22, {seed: 's13/clapS'})} color={EMBER.frost} offset={false} />
+      <Ink d={lid + edge} width={W.far} />
+    </>
+  );
+};
+
 export const S13Desk: React.FC = () => (
   <>
     <XG m={mat.about(mat.scale(DESK_MUG.k), DESK_MUG.x, DESK_MUG.top)}>
       <Mug x={DESK_MUG.x} top={DESK_MUG.top} seed="s13/mug" steam={false} />
     </XG>
     <Steam x={DESK_MUG.x + 25} y={DESK_MUG.top - 6} n={5} life={2.3} rise={100} drift={12} r0={4} r1={12} wobble={5} seed="s13/mugsteam" color={EMBER.card} />
+    <ClosedLaptop x0={566} y={1100} w={112} />
     <Calendar x={772} y={1020} w={84} from="2026" seed="s13/cal" ink={W.far} />
     <PenCup x={884} y={1100} w={42} seed="s13/pens" ink={W.far} color={EMBER.books[3]} />
     <BookStack x={1038} y={1106} w={120} n={3} seed="s13/stack" ink={W.far} />
