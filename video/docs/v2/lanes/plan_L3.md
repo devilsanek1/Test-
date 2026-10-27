@@ -6,6 +6,16 @@ the shared clocks are `src/v2r/scenes/V2S3_rig.ts` and `V2S4_rig.ts` (film secon
 `<TimeShift by={-START}>`, so `useTime()` inside is FILM time). The v0 skeletons (`V2S3.tsx`, `V2S4.tsx`) render the kit sets at
 the right spots and times; the build replaces them with finished drawing, density and life.
 
+## Builders and their files (four run at once; each edits ONLY its own files, renders the composite to judge them)
+| builder | owns (create / replace) | the part interface it keeps |
+|---|---|---|
+| S4 WORLD | `V2S4_far.tsx` (`S4Far` 0.3x, `S4Backs` 0.6x), `V2S4_path.tsx` (`S4Path` 1.0x with `children` = the post, `S4Canal`), `V2S4_boat.tsx` (`S4Boat`), new `V2S4_w*.tsx` helpers | each plane part slides itself by `s4PlaneDx(S4_K.<plane>, t)`; drawn at the 17.96 pose |
+| S4 STORY | `V2S4_post.tsx`, `V2S4_tag.tsx`, `V2S4_her.tsx`, `V2S4_pip.tsx`, `V2S4.tsx` (the integration: camera, order) | keeps importing the world parts by name and order |
+| S3 FAR | `V2S3_terrace.tsx` (`S3Sun`, `S3Terrace` incl. her window + silhouette, `S3Canal`), new `V2S3_t*.tsx` helpers | WORLD px at the 12.98 match (identity camera) |
+| S3 NEAR + STORY | `V2S3_near.tsx` (`S3Near`), `V2S3_pip.tsx` (`S3Pip`), `V2S3.tsx` (the integration: camera, order), new `V2S3_n*.tsx` helpers | keeps importing the far parts by name and order |
+The rigs (`V2S3_rig.ts`, `V2S4_rig.ts`) and this plan are the orchestrator's: read-only for builders (a wrong number goes in
+your summary). Never edit another builder's file; if one breaks the bundle, wait a minute and retry.
+
 ## 0. Rules every part keeps (COMMON.md, TREATMENT; the critic checks each)
 - **Files:** L3 owns `src/v2r/scenes/V2S3*.{ts,tsx}` and `V2S4*.{ts,tsx}` only. Never edit a kit, map.ts, palette.ts, lib/, another
   lane's scene, the registry or any doc but this one. A kit defect: work around it in your own files (fork a kit function into
