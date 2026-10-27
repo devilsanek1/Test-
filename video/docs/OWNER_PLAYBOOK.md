@@ -78,8 +78,7 @@ Format: **rule** — why / evidence (video, date).
   as a screen recording under the status bar). — (v1 posted reel, 2026-10-25).
 - **Palette: a family of house palettes as tools, not a cage.** A soft, warm, "no screaming colours" base; one sister
   palette per video; within it one hero, one dark anchor, at most one pop. Rules: `docs/look/PALETTE.md`. — (2026-10-25).
-- **Warm, never sickly.** Beige, muddy tan, olive-brown lines and grey read "sick"; warmth = peach creams, terracotta,
-  red-brown lines, a golden lamp pool, warm shadows, a saturated dusk-blue outside. — ("not sick", v3 G4, 2026-10-26).
+- **Warm, never sickly:** no beige, muddy tan, olive or grey; peach creams, terracotta, red-brown lines, golden light, warm shadows. — (v3 G4, 2026-10-26).
 - **Texture and lines: VERY subtle.** Thin tapered lines only in key places; halftone tactically on a few elements as
   an optional last step (the film must work flat; the owner decides per video). — (texture test, 2026-10-25).
 - **Profile identity: mascot Pip (the purple PHP elephant), drawn in each film's style;** avatar `deliverables/profile/pip_power_button.png`. — (2026-10-25).
