@@ -94,7 +94,7 @@ const Tote: React.FC = () => {
     <>
       <Fill d={poly([[x - 24, y - 50], [x + 24, y - 50], [x + 27, y], [x - 27, y]])} color={CM.coatOat} seed="bank/tote" offset={false} />
       <Fill d={poly([[x - 25, y - 30], [x + 25, y - 30], [x + 26, y - 22], [x - 26, y - 22]])} color={CM.sage} seed="bank/toteBand" offset={false} />
-      <Ink d={`M${x - 13} ${y - 50}Q${x} ${y - 74} ${x + 13} ${y - 50}`} width={2} color={CM.line} thing at={floodAt(x, y)} seed="bank/toteH" />
+      <Ink d={`M${x - 13} ${y - 50}Q${x} ${y - 74} ${x + 13} ${y - 50}`} width={2} color={SMALL_DARK} thing at={floodAt(x, y)} seed="bank/toteH" />
     </>
   );
 };
@@ -105,7 +105,7 @@ const Cup: React.FC<{x: number; y: number; h: number; k: string}> = ({x, y, h, k
     <>
       <Fill d={poly([[x - w / 2, y - h], [x + w / 2, y - h], [x + w * 0.38, y], [x - w * 0.38, y]])} color={CM.paper} seed={`bank/${k}`} offset={false} />
       <Fill d={poly([[x - w * 0.47, y - h * 0.66], [x + w * 0.47, y - h * 0.66], [x + w * 0.43, y - h * 0.34], [x - w * 0.43, y - h * 0.34]])} color={CM.brick} seed={`bank/${k}s`} offset={false} />
-      <Fill d={poly([[x - w * 0.54, y - h * 1.08], [x + w * 0.54, y - h * 1.08], [x + w * 0.5, y - h * 0.96], [x - w * 0.5, y - h * 0.96]])} color={CM.line} seed={`bank/${k}l`} offset={false} />
+      <Fill d={poly([[x - w * 0.54, y - h * 1.08], [x + w * 0.54, y - h * 1.08], [x + w * 0.5, y - h * 0.96], [x - w * 0.5, y - h * 0.96]])} color={SMALL_DARK} seed={`bank/${k}l`} offset={false} />
     </>
   );
 };
@@ -144,7 +144,7 @@ const Flask: React.FC = () => {
   return (
     <>
       <Fill d={poly([[x - 9, y - 46], [x + 9, y - 46], [x + 9, y], [x - 9, y]])} color={CM.sage} seed="bank/flask" offset={false} />
-      <Fill d={poly([[x - 7, y - 54], [x + 7, y - 54], [x + 7, y - 46], [x - 7, y - 46]])} color={CM.coatSlate} seed="bank/flaskCap" offset={false} />
+      <Fill d={poly([[x - 7, y - 54], [x + 7, y - 54], [x + 7, y - 46], [x - 7, y - 46]])} color={CM.stoneShade} seed="bank/flaskCap" offset={false} />
     </>
   );
 };
@@ -174,6 +174,10 @@ const Bike: React.FC = () => {
     </>
   );
 };
+
+/** The small dark bits of the things (lids, caps, handles): a light warm brick (L* ~74). On the calm C band a thin
+ *  dark mark reads as a tick, never as a lid (CRAFT §c; critic G4: short strokes). */
+const SMALL_DARK = CM.brickLight;
 
 /** The planter's wood: a light warm wood (L* ~64), never a dark slab in the calm C band (critic G4). */
 const PLANTER_WOOD = '#C48F70';
@@ -220,6 +224,7 @@ const LEAVES: [number, number, number, number, string][] = [
   [700, 1880, 24, 15, CM.leafRust],
 ];
 const Leaves: React.FC = () => {
+  // rust leaves (L* ~50 after the tier) read as dark ticks on the pale stone: they lie in brick light instead
   const d = (x: number, y: number, L: number, a: number) => {
     const r = (a * Math.PI) / 180;
     const ux = Math.cos(r) * L;
@@ -229,7 +234,7 @@ const Leaves: React.FC = () => {
   return (
     <>
       <Fill d={LEAVES.filter((l) => l[4] === CM.leafGold).map((l) => d(l[0], l[1], l[2], l[3])).join('')} color={CM.leafGold} seed="bank/leavesG" offset={false} />
-      <Fill d={LEAVES.filter((l) => l[4] === CM.leafRust).map((l) => d(l[0], l[1], l[2], l[3])).join('')} color={CM.leafRust} seed="bank/leavesR" offset={false} />
+      <Fill d={LEAVES.filter((l) => l[4] === CM.leafRust).map((l) => d(l[0], l[1], l[2], l[3])).join('')} color={CM.brickLight} seed="bank/leavesR" offset={false} />
     </>
   );
 };
@@ -300,7 +305,7 @@ const Picnic: React.FC = () => {
     <>
       {[CM.paper, CM.box, CM.paper, CM.box, CM.paper].map((c, k) => stripe(k, c))}
       <Fill d={`M${bx - 32} ${by - 30}L${bx + 32} ${by - 30}L${bx + 26} ${by}L${bx - 26} ${by}Z`} color={CM.leafGold} seed="bank/basket" offset={false} />
-      <Ink d={`M${bx - 22} ${by - 30}Q${bx} ${by - 62} ${bx + 22} ${by - 30}`} width={3} color={CM.line} thing at={floodAt(bx, by)} seed="bank/basketH" />
+      <Ink d={`M${bx - 22} ${by - 30}Q${bx} ${by - 62} ${bx + 22} ${by - 30}`} width={3} color={SMALL_DARK} thing at={floodAt(bx, by)} seed="bank/basketH" />
       <Fill d={ell(bx + 52, by - 6, 9, 9) + ell(bx + 68, by - 4, 8, 8)} color={CM.brick} seed="bank/apples" offset={false} />
     </>
   );
@@ -330,7 +335,7 @@ const Carrier: React.FC = () => {
       {[-21, -7, 7, 21].map((dx, i) => (
         <React.Fragment key={i}>
           <Fill d={poly([[x + dx - 7, y - 40], [x + dx + 7, y - 40], [x + dx + 5, y - 16], [x + dx - 5, y - 16]])} color={CM.paper} seed={`bank/cc${i}`} offset={false} />
-          <Fill d={poly([[x + dx - 8, y - 43], [x + dx + 8, y - 43], [x + dx + 7, y - 39], [x + dx - 7, y - 39]])} color={i % 2 ? CM.line : CM.coatSlate} seed={`bank/ccl${i}`} offset={false} />
+          <Fill d={poly([[x + dx - 8, y - 43], [x + dx + 8, y - 43], [x + dx + 7, y - 39], [x + dx - 7, y - 39]])} color={i % 2 ? SMALL_DARK : CM.stoneShade} seed={`bank/ccl${i}`} offset={false} />
         </React.Fragment>
       ))}
     </>
@@ -345,7 +350,7 @@ const PottedPlant: React.FC = () => {
     <>
       <Fill d={`M${x - 4} ${y - 30}C${x - 26} ${y - 40} ${x - 30} ${y - 66} ${x - 10} ${y - 64}C${x - 4} ${y - 60} ${x - 2} ${y - 44} ${x - 4} ${y - 30}ZM${x + 4} ${y - 30}C${x + 24} ${y - 44} ${x + 30} ${y - 70} ${x + 8} ${y - 68}C${x + 2} ${y - 62} ${x + 2} ${y - 46} ${x + 4} ${y - 30}ZM${x} ${y - 30}C${x - 8} ${y - 52} ${x - 4} ${y - 78} ${x + 2} ${y - 78}C${x + 8} ${y - 76} ${x + 6} ${y - 50} ${x} ${y - 30}Z`} color={CM.sage} seed="bank/plantLeaves" offset={false} />
       <Fill d={poly([[x - 20, y - 32], [x + 20, y - 32], [x + 15, y], [x - 15, y]])} color={CM.brick} seed="bank/plantPot" offset={false} />
-      <Fill d={poly([[x - 22, y - 36], [x + 22, y - 36], [x + 21, y - 29], [x - 21, y - 29]])} color={CM.brickDeep} seed="bank/plantRim" offset={false} />
+      <Fill d={poly([[x - 22, y - 36], [x + 22, y - 36], [x + 21, y - 29], [x - 21, y - 29]])} color={CM.brickLight} seed="bank/plantRim" offset={false} />
     </>
   );
 };
@@ -357,7 +362,7 @@ const Umbrella: React.FC = () => {
   return (
     <>
       <Fill d={`M${x - 50} ${y - 2}L${x + 30} ${y - 9}Q${x + 40} ${y - 6} ${x + 30} ${y - 1}L${x - 50} ${y + 4}Z`} color={CM.coatPlum} seed="bank/umbrella" offset={false} />
-      <Ink d={`M${x + 32} ${y - 5}L${x + 44} ${y - 6}Q${x + 52} ${y - 2} ${x + 46} ${y + 4}`} width={2.4} color={CM.line} thing at={floodAt(x, y)} seed="bank/umbrellaH" />
+      <Ink d={`M${x + 32} ${y - 5}L${x + 44} ${y - 6}Q${x + 52} ${y - 2} ${x + 46} ${y + 4}`} width={2.4} color={SMALL_DARK} thing at={floodAt(x, y)} seed="bank/umbrellaH" />
     </>
   );
 };
