@@ -42,7 +42,7 @@ function legValues(age: number, v: LegVariant): {legs: string; shoes: string} {
   return {legs: GH[i], shoes: GH[Math.max(0, i - 1)]};
 }
 
-/** G1-G6: paper coat, the whole-head value, G4+ a scarf one value darker than the head and a softer back. */
+/** G1-G6: paper coat, the whole-head value, G4+ a grey-silver scarf and a softer back. */
 export const ghostSpec = (age: number, v: LegVariant = 'clamp'): FigSpec => {
   const a = Math.max(1, Math.min(6, Math.round(age)));
   return {
@@ -50,7 +50,8 @@ export const ghostSpec = (age: number, v: LegVariant = 'clamp'): FigSpec => {
     coat: CM.ghostPaper,
     head: GH[a - 1],
     ...legValues(a, v),
-    scarf: a >= 4 ? GH[Math.min(a - 2, 3)] : undefined,
+    // the scarf one fixed grey-silver (G3's head value): one step under G4's silver, and it still reads at 216 px on G5-G6's white
+    scarf: a >= 4 ? GH[2] : undefined,
     soft: a >= 4 ? (a - 3) / 3 : 0,
   };
 };
