@@ -204,7 +204,7 @@ export const Sit: React.FC<SitProps> = (p) => {
   const lean = p.lean ?? 0;
   return (
     <>
-      {p.shadow !== false ? <Shade x={p.x} y={p.y} w={M.W * 1.15} len={Math.max(8, M.H * 0.16)} seed={`${p.seed}/sh`} /> : null}
+      {p.shadow !== false ? <Shade x={p.x + M.W * 0.12} y={p.y} w={M.W * 0.98} len={Math.max(6, M.H * 0.1)} seed={`${p.seed}/sh`} /> : null}
       <FigureG x={p.x} y={p.y + (p.dy ?? 0)} seed={p.seed}>
         {lean ? <XG m={mat.rotate(lean)}>{body}</XG> : body}
       </FigureG>
@@ -228,6 +228,9 @@ export type RiseProps = {
   stretch?: number;
   /** Walking: the step count (12 drawings/s), the view, facing right. */
   walk?: {step: number; view?: 'back' | 'rear34'; right?: boolean; stride?: number};
+  /** Standing view when not walking (default back) and facing right. */
+  view?: 'back' | 'rear34';
+  right?: boolean;
   turn?: number;
   ink?: number;
   shadow?: boolean;
@@ -243,7 +246,7 @@ export const Rise: React.FC<RiseProps> = (p) => {
   const inkOn = lod <= 1;
   const k = Math.max(0, Math.min(1, p.k));
   const walking = !!p.walk;
-  const view = p.walk?.view ?? 'back';
+  const view = p.walk?.view ?? p.view ?? 'back';
   const st = walking ? q100(p.walk!.step) : 0;
   const stretch = q100(p.stretch ?? 0);
   const key = JSON.stringify(['v2s1rise', p.seed, p.traits ?? 0, H, view, walking, st, stretch, q100(p.turn ?? 0), p.walk?.stride ?? 1]);
@@ -276,8 +279,8 @@ export const Rise: React.FC<RiseProps> = (p) => {
   const W = H * 0.33 * m.broad;
   return (
     <>
-      {p.shadow !== false ? <Shade x={p.x} y={p.y} w={W * (walking ? 0.9 : 1.1)} len={Math.max(8, H * (0.16 + 0.1 * k))} seed={`${p.seed}/sh`} /> : null}
-      <FigureG x={p.x} y={p.y} flip={p.walk?.right} seed={p.seed}>
+      {p.shadow !== false ? <Shade x={p.x + W * 0.12} y={p.y} w={W * (walking ? 0.8 : 0.95)} len={Math.max(6, H * (0.1 + 0.06 * k))} seed={`${p.seed}/sh`} /> : null}
+      <FigureG x={p.x} y={p.y} flip={p.walk?.right ?? p.right} seed={p.seed}>
         {k < 1 ? (
           <>
             <defs>
