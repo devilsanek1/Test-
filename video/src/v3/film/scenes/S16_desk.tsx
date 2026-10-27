@@ -165,6 +165,10 @@ export const S16DeskFront: React.FC = () => (
       <SpiralNotebook quad={[[-80, 1566], [318, 1538], [350, 1890], [-70, 1934]]} seed="s16/nb" />
     </ExitFade>
     <PageDoodle />
+    {/* a dusk-blue felt desk pad under the letters and the coins (a stitched edge) */}
+    <Fill d={polyPath([[470, 1662], [772, 1642], [780, 1846], [466, 1868]])} color={EMBER.dc} seed="s16/pad" />
+    <Ink d={polyPath([[484, 1674], [758, 1656], [766, 1832], [480, 1852]])} width={2} color={EMBER.skyLow} />
+    <Ink d={polyPath([[470, 1662], [772, 1642], [780, 1846], [466, 1868]])} width={W.far} />
     <Pen from={[40, 1900]} to={[356, 1682]} wPx={16} seed="s16/nb/pen" />
     <Pen from={[616, 1628]} to={[772, 1596]} wPx={13} color={EMBER.books[4]} seed="s16/pencil" />
     <Coins x={668} y={1772} />

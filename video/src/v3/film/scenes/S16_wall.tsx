@@ -125,6 +125,33 @@ const NightPrint: React.FC<{x: number; y: number; w: number; h: number; town?: b
   );
 };
 
+/** A pair of dusk-blue mittens on a string from a wall peg (a skyLow cuff, a snowflake stitch); they sway. */
+const Mittens: React.FC<{x: number; y: number}> = ({x, y}) => {
+  const t = useTime();
+  const one = (cx: number, cy: number, flip: number, k: string) => {
+    const body = roundRect(cx - 22, cy, 44, 58, 18);
+    const thumb = circle(cx + flip * 22, cy + 26, 10);
+    return (
+      <React.Fragment key={k}>
+        <Fill d={body + thumb} color={EMBER.dc} seed={`s16/mit${k}`} />
+        <Fill rect={[cx - 22, cy - 4, 44, 16]} color={EMBER.skyLow} offset={false} />
+        <Ink d={`M${cx - 6} ${cy + 34}l12 0M${cx} ${cy + 28}l0 12`} width={2} color={EMBER.snow} />
+        <Ink d={body + thumb + `M${cx - 22} ${cy + 12}h44`} width={W.hair} />
+      </React.Fragment>
+    );
+  };
+  return (
+    <>
+      <Fill d={circle(x, y, 6)} color={EMBER.beam} offset={false} />
+      <XG m={mat.about(mat.rotate(sway(t, 2, 3.6, 1.3)), x, y)}>
+        <Ink d={`M${x} ${y}L${x - 26} ${y + 34}M${x} ${y}L${x + 26} ${y + 40}`} width={W.hair} />
+        {one(x - 28, y + 38, -1, 'L')}
+        {one(x + 28, y + 44, 1, 'R')}
+      </XG>
+    </>
+  );
+};
+
 /** A dusk-blue knitted scarf hung over the pinboard's top-left corner: one end down the board's left side (stripes,
  *  a fringe), the other short over the top. */
 const Scarf: React.FC<{x: number; y: number}> = ({x, y}) => {
@@ -225,6 +252,7 @@ export const S16WallLow: React.FC = () => (
     <WallMarks x={330} y={860} w={360} h={60} n={2} seed="s16/wm5" />
     {/* over the lamp's rod, left: a small blue-hour snow print (the room's cool share) */}
     <NightPrint x={24} y={622} w={100} h={112} seed="s16/print2" />
+    <Mittens x={180} y={640} />
     {/* the pocket between the lamp shade, the shelf and the tag: a night print of the town (~40 px clear of the tag) */}
     <NightPrint x={150} y={842} w={118} h={136} town seed="s16/print3" />
     <Shelf />
