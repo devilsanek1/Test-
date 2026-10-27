@@ -66,6 +66,11 @@ export type PipKey = {
   t: number;
   /** Blend to this pose (facing and head keep their own channels). */
   pose?: PoseName | Partial<PoseParams>;
+  /** Blend only these raw parameters (every other channel keeps its value), e.g. {toCam: 1} or {watch: 0}. */
+  set?: Partial<PoseParams>;
+  /** A pose that faces us (toCam > 0, e.g. earsCover): the head starts turning to the camera this many seconds BEFORE
+   *  t, so the pose lands from the front ON t (S1: the turn at 4.86, the cover on "life" 4.98). Default 0.12; 0 = none. */
+  lead?: number;
   /** Blend time for this key's changes (s). Default 0.16 (pose), 0.3 (facing / look). */
   dur?: number;
   facing?: FacingName | number;
@@ -108,8 +113,20 @@ export type PipTrackProps = {
 export type PipTrackState = {x: number; y: number; params: PoseParams; squash: number; rotate: number; draw: number; exit: number; hop: HopState | null};
 
 /** The track's state at time t (pure; also handy for a scene that needs to know where Pip is, e.g. a wiper). */
+/** The keys in time order, with the turn-to-camera lead of every pose that faces us (toCam > 0) as its own key. */
+function expandKeys(keys: PipKey[], over: Partial<PoseParams>): PipKey[] {
+  const out: PipKey[] = [];
+  for (const k of keys) {
+    out.push(k);
+    if (k.pose === undefined) continue;
+    const lead = k.lead ?? 0.12;
+    if (lead > 0 && poseParams(k.pose, over).toCam > 0) out.push({t: k.t - lead, set: {toCam: 1}, dur: lead});
+  }
+  return out.sort((a, b) => a.t - b.t);
+}
+
 export function trackAt(p: PipTrackProps, t: number): PipTrackState {
-  const keys = [...p.keys].sort((a, b) => a.t - b.t);
+  const keys = expandKeys(p.keys, p.params ?? {});
   const base = poseParams(p.pose ?? 'sit', p.params ?? {});
   if (p.facing !== undefined) base.yaw = typeof p.facing === 'number' ? p.facing : FACING[p.facing];
   // ---- the blended parameter channel
@@ -145,6 +162,10 @@ export function trackAt(p: PipTrackProps, t: number): PipTrackState {
       }
       changed = true;
     }
+    if (k.set !== undefined) {
+      for (const key of Object.keys(k.set) as (keyof PoseParams)[]) next[key] = k.set[key] as number;
+      changed = true;
+    }
     if (k.facing !== undefined) {
       next.yaw = typeof k.facing === 'number' ? k.facing : FACING[k.facing];
       changed = true;
@@ -164,7 +185,7 @@ export function trackAt(p: PipTrackProps, t: number): PipTrackState {
     if (changed) {
       target = next;
       tStart = k.t;
-      dur = k.dur ?? (k.pose !== undefined ? 0.16 : 0.3);
+      dur = k.dur ?? (k.pose !== undefined || k.set !== undefined ? 0.16 : 0.3);
     }
     if (k.target !== undefined) {
       tgt = k.target;
@@ -223,13 +244,15 @@ export function trackAt(p: PipTrackProps, t: number): PipTrackState {
     x = h.to[0];
     y = h.to[1];
   }
-  // ---- head follows a target (eased in over 0.25 s)
+  // ---- head follows a target (eased in over 0.25 s). Turned to the camera (toCam) the target stops lifting the head;
+  // its look still picks the side the turn goes round (model.ts watchYaw), so the turn never swaps sides
   if (tgt) {
     const pt = typeof tgt === 'function' ? tgt(t) : tgt;
     const size = p.size ?? 96;
     const a = aimAt([x, y - size * 0.74], pt);
     const wgt = smooth(clamp((t - tgtSince) / 0.25)) * (hop ? 1 - hop.air : 1);
-    params = {...params, look: lerp(params.look, a.look, wgt), lookUp: lerp(params.lookUp, Math.max(params.lookUp, a.lookUp), wgt)};
+    const wUp = wgt * (1 - clamp(params.toCam));
+    params = {...params, look: lerp(params.look, a.look, wgt), lookUp: lerp(params.lookUp, Math.max(params.lookUp, a.lookUp), wUp)};
   }
   // ---- a boat roof
   if (ride) {
