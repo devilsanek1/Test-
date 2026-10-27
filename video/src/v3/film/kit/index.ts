@@ -28,12 +28,12 @@ export type {LineChartProps, BarChartProps, Bar} from './Charts';
 export {ChipFactory, chipFactoryGeo, ChipMaker, Van, WaitingDots, SpeechBubble, ThoughtBubble, WallClock, Calendar} from './Props';
 export type {ChipFactoryProps, VanProps, BubbleProps} from './Props';
 // ---- G5b: the dressing and life kit (kit/README.md "Life and density kit"; docs/v3/density_plan_g5b.md §2)
-export {TAU, sway, sway2, bob, ring, rings, hopY, stepped, ease01, events, twinkle, windowLit, loopPos, crossing, shuttle, puffs, sweep} from './idle';
-export type {WindowForce, PuffOpts, Puff} from './idle';
+export {TAU, sway, sway2, bob, ring, rings, hopY, stepped, ease01, events, twinkle, windowLit, loopPos, crossing, shuttle, puffs, sweep, floatCam} from './idle';
+export type {WindowForce, PuffOpts, Puff, FloatOpts} from './idle';
 export {Pip3, PipTiny, PIP_EMBER, pipPlace} from './Pip3';
 export type {Pip3Props, PipPoseKey, LookKey, PipHop, PipTinyProps} from './Pip3';
-export {WINTER, personGeo, WinterPerson, BackRow, Walker, Dog, TinyWalkers, Tiny, WindowSilhouette, WindowLife, Worker, MiniCrate, Guard} from './People3';
-export type {Wear, PersonMove, WinterPersonProps, BackRowPerson, BackRowProps, WalkerProps, TinyKind, TinyWalkersProps, SilWho, WindowSilhouetteProps, LifeWindow, WorkerProps} from './People3';
+export {WINTER, personGeo, WinterPerson, winterPersonMat, winterPhoneAt, BackRow, backRowLayout, backRowPhones, Walker, Dog, TinyWalkers, Tiny, WindowSilhouette, WindowLife, Worker, MiniCrate, Guard} from './People3';
+export type {Wear, CoatDetail, PersonMove, WinterPersonProps, BackRowPerson, BackRowProps, WalkerProps, TinyKind, TinyWalkersProps, SilWho, WindowSilhouetteProps, LifeWindow, WorkerProps} from './People3';
 export {BAND, SnowLayers, SnowSill, SnowCap, Frost, PuffTrain, Smoke, Steam, CoolingPlume, Exhaust, NearFronts, SkyClouds, LowClouds, BirdV, Icicles} from './Weather';
 export type {SnowLayer, SnowLayersProps, PuffTrainProps, NearFrontsProps, SkyCloudsProps} from './Weather';
 export {LEAF2, ShelfFill, Book, WallShelf, Plant, Leaf, StringLights3, Pinboard, PinnedThing, FramedPrint, Poster, PenCup, Headphones, BookStack, StickyNotes, Cable, Glasses, Speaker, DeskGrain, WallMarks, PullChain, Radiator, Rug, CoatHook, ToteBag, Slippers, CupSteam, HaloStep, useJolt} from './Room';

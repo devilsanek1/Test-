@@ -29,14 +29,15 @@ export const S4_LIFE: StreetLife = {
   flutterAt: [LAPTOPS + 0.05, SAME + 0.05],
   // "Laptops": the raised phone takes the picture (a 2-frame flash once it is up)
   flashAt: [LAPTOPS + 0.2],
+  // coat detail (kit WinterPerson coatDetail): the five backs are the frame's biggest fills, so none stays one flat coat
   row: [
-    {wear: ['earmuffs'], acc: ['scarf', 'strap'], coat: EMBER.wall, moves: [{t: 0.5, kind: 'turn', amp: 1.6}, {t: 3.1, kind: 'turn', amp: 1.4}]},
-    {hair: 'long', acc: ['scarf'], coat: EMBER.dc, moves: [{t: 2.4, kind: 'turn', amp: 1.6}]},
+    {wear: ['earmuffs'], acc: ['scarf', 'strap'], coat: EMBER.wall, coatDetail: ['quilt'], moves: [{t: 0.5, kind: 'turn', amp: 1.6}, {t: 3.1, kind: 'turn', amp: 1.4}]},
+    {hair: 'long', acc: ['scarf'], coat: EMBER.dc, coatDetail: ['quilt', 'yoke'], moves: [{t: 2.4, kind: 'turn', amp: 1.6}]},
     // "Laptops": the phone goes up at the chart (it stays up into S6, which drops it on "up")
-    {hair: 'cap', acc: ['phone', 'backpack'], coat: EMBER.skyLow, dy: 34, phoneWin: [LAPTOPS - 0.06, 99], moves: [{t: LAPTOPS - 0.06, kind: 'lean', amp: 1.4}]},
+    {hair: 'cap', acc: ['phone', 'backpack'], coat: EMBER.skyLow, coatDetail: ['zip'], dy: 34, phoneWin: [LAPTOPS - 0.06, 99], moves: [{t: LAPTOPS - 0.06, kind: 'lean', amp: 1.4}]},
     // "same money": a back nudges its neighbour
-    {hair: 'beanie', acc: ['strap', 'collar'], coat: '#6B4A6E', moves: [{t: 1.75, kind: 'turn', amp: 1.5}, {t: SAME, kind: 'nudge', dir: 1, amp: 1.4}]},
-    {acc: ['hood', 'backpack'], coat: EMBER.beam, moves: [{t: 1.0, kind: 'turn', amp: 1.5}, {t: SAME + 0.12, kind: 'turn', amp: 1.8}]},
+    {hair: 'beanie', acc: ['strap', 'collar'], coat: '#6B4A6E', coatDetail: ['quilt', 'zip'], moves: [{t: 1.75, kind: 'turn', amp: 1.5}, {t: SAME, kind: 'nudge', dir: 1, amp: 1.4}]},
+    {acc: ['hood', 'backpack'], coat: EMBER.beam, coatDetail: ['yoke'], moves: [{t: 1.0, kind: 'turn', amp: 1.5}, {t: SAME + 0.12, kind: 'turn', amp: 1.8}]},
   ],
   pip: {
     // Pip reads the line as it draws: the head steps down the slope with the line's head, a nod on "better"

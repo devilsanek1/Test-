@@ -225,3 +225,108 @@ export function sweep(t: number, ats: number[], dur = 0.8): number | null {
   for (const a of ats) if (t >= a && t <= a + dur) return (t - a) / dur;
   return null;
 }
+
+// ---------------------------------------------------------------- the cozy float (a camera that drifts, translation only)
+
+export type FloatOpts = {
+  /** The shot's length (s): the legs fill [0, dur]. */
+  dur: number;
+  seed: string;
+  /** Leg speed range (px/s; COZY_AND_SCALE / cozy v2 §3: 8-12, peak <= 25). */
+  speed?: [number, number];
+  /** Half-extent of the drift box about home (px): [x, y]. Default [12, 10] (O1's set: the window top stays >= 603). */
+  box?: [number, number];
+  /** Leg length range (s; a turn every 0.6-1.5 s). */
+  leg?: [number, number];
+  /** Start exactly at home (a matched frame at the cut in). Default true. */
+  startHome?: boolean;
+  /** Pass through home on the last frame, still moving (the next shot cuts in on axis). Default true. */
+  endHome?: boolean;
+  /** Eased turn length (s; clamped to under half the shorter leg). Default 0.34. */
+  turn?: number;
+};
+
+type FloatPlan = {pts: [number, number][]; t: number[]; u: [number, number][]; tau: number};
+const FLOAT_CACHE = new Map<string, FloatPlan>();
+
+function floatPlan(o: FloatOpts): FloatPlan {
+  const key = JSON.stringify(o);
+  const hit = FLOAT_CACHE.get(key);
+  if (hit) return hit;
+  const [v0, v1] = o.speed ?? [8, 12];
+  const [bx, by] = o.box ?? [12, 10];
+  const [l0, l1] = o.leg ?? [0.6, 1.5];
+  const startHome = o.startHome ?? true;
+  const endHome = o.endHome ?? true;
+  const n = Math.max(1, Math.round(o.dur / ((l0 + l1) / 2 + 0.0)));
+  let best: FloatPlan | null = null;
+  let bestErr = Infinity;
+  for (let tri = 0; tri < 400 && bestErr > 0; tri++) {
+    const R = (k: string) => rand(`float/${o.seed}`, `${tri}/${k}`);
+    // leg times: seeded weights, normalised to the shot, each within [l0, l1] when the shot allows
+    const wts = Array.from({length: n}, (_, i) => 0.75 + 0.5 * R(`w${i}`));
+    const sum = wts.reduce((a, b) => a + b, 0);
+    const d = wts.map((w) => (w / sum) * o.dur);
+    const t = [0];
+    for (const di of d) t.push(t[t.length - 1] + di);
+    const pts: [number, number][] = [startHome ? [0, 0] : [(R('sx') * 2 - 1) * bx * 0.6, (R('sy') * 2 - 1) * by * 0.6]];
+    let err = 0;
+    let prevA = R('a0') * TAU;
+    for (let i = 0; i < n; i++) {
+      const p = pts[i];
+      if (i === n - 1 && endHome) {
+        pts.push([0, 0]);
+        const v = Math.hypot(p[0], p[1]) / d[i];
+        err += v < v0 ? v0 - v : v > v1 ? v - v1 : 0;
+      } else {
+        // a straight leg at a seeded speed, turning 70-180 deg from the last one ("and back")
+        const v = v0 + (v1 - v0) * R(`v${i}`);
+        const a = i === 0 ? prevA : prevA + Math.PI * (0.39 + 0.61 * R(`a${i}`)) * (R(`s${i}`) < 0.5 ? -1 : 1);
+        prevA = a;
+        pts.push([p[0] + Math.cos(a) * v * d[i], p[1] + Math.sin(a) * v * d[i]]);
+      }
+      const q = pts[i + 1];
+      err += Math.max(0, Math.abs(q[0]) - bx) + Math.max(0, Math.abs(q[1]) - by);
+      err += d[i] < l0 && o.dur >= l0 * n ? l0 - d[i] : d[i] > l1 ? d[i] - l1 : 0;
+    }
+    if (err < bestErr) {
+      bestErr = err;
+      const u = d.map((di, i) => [(pts[i + 1][0] - pts[i][0]) / di, (pts[i + 1][1] - pts[i][1]) / di] as [number, number]);
+      const tau = Math.min(o.turn ?? 0.34, 0.45 * Math.min(...d));
+      best = {pts, t, u, tau};
+    }
+  }
+  FLOAT_CACHE.set(key, best!);
+  return best!;
+}
+
+/** The cozy float (cozy v2 §3, COZY_AND_SCALE §7.6): the camera's offset from home at t, [dx, dy] px, sub-pixel and
+ *  seeded. Straight legs at 8-12 px/s, each turn eased (the velocity blends over `turn` s, so the path keeps the legs'
+ *  ends and never leaves the box), a turn every 0.6-1.5 s and back, inside +-box of home; from home at t 0 (a matched
+ *  cut in) and back through home on the last frame, still moving (the next shot cuts in on axis). Move the WORLD by
+ *  the offset (`mat.translate(dx, dy)` round the set): the captions, UI and paper edge stay fixed. */
+export function floatCam(t: number, o: FloatOpts): [number, number] {
+  const P = floatPlan(o);
+  const n = P.u.length;
+  const tt = Math.max(0, Math.min(o.dur, t));
+  let i = 0;
+  while (i < n - 1 && tt >= P.t[i + 1]) i++;
+  // the polyline position, then the eased turn near a corner (a symmetric velocity blend keeps the corners' ends)
+  let x = P.pts[i][0] + P.u[i][0] * (tt - P.t[i]);
+  let y = P.pts[i][1] + P.u[i][1] * (tt - P.t[i]);
+  const h = P.tau / 2;
+  const corr = (c: number, ua: [number, number], ub: [number, number]) => {
+    // offset of the blended path from the polyline inside [c - h, c + h]
+    const s = tt - (c - h);
+    if (s <= 0 || s >= P.tau) return;
+    const k = s / P.tau;
+    const blend = P.tau * (k * k * k - (k * k * k * k) / 2); // integral of smoothstep over [0, k] (times tau)
+    // blended: ua * s + (ub - ua) * blend; polyline: ua * s before c, ua * h + ub * (s - h) after
+    const poly = s <= h ? [ua[0] * s, ua[1] * s] : [ua[0] * h + ub[0] * (s - h), ua[1] * h + ub[1] * (s - h)];
+    x += ua[0] * s + (ub[0] - ua[0]) * blend - poly[0];
+    y += ua[1] * s + (ub[1] - ua[1]) * blend - poly[1];
+  };
+  if (i > 0) corr(P.t[i], P.u[i - 1], P.u[i]);
+  if (i < n - 1) corr(P.t[i + 1], P.u[i], P.u[i + 1]);
+  return [x, y];
+}

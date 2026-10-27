@@ -23,6 +23,7 @@ import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {
   BackRow,
+  backRowPhones,
   CardBoard,
   Cornice,
   EMBER,
@@ -50,7 +51,7 @@ import {
   rings,
   sway,
 } from '../kit';
-import type {BackRowPerson, CornerItem, Pip3Props, Pt} from '../kit';
+import type {BackRowPerson, BackRowProps, CornerItem, Pip3Props, Pt} from '../kit';
 import {Bike3} from '../kit';
 import {BOARD_HOOK, BOARD_LINE, breathe} from './S4_wall';
 
@@ -436,16 +437,16 @@ const Planter: React.FC = () => (
   </>
 );
 
-/** The raised phone's camera end (row back 2, after its lean): where its flash bursts. */
-const PHONE_AT: Pt = [694, 1346];
-
 /** A camera flash over the raised phone's top: a flat warm 8-point star with a white core, shown for 2 frames (no
- *  fade; warm, so it reads against the white card behind it). */
-const PhoneFlash: React.FC<{at?: number[]}> = ({at = []}) => {
+ *  fade; warm, so it reads against the white card behind it). It bursts at the camera end of the row's raised phone
+ *  (kit `backRowPhones`: it follows the phone through the row's layout, lean and breath); no phone up, no flash. */
+const PhoneFlash: React.FC<{at?: number[]; row: BackRowProps}> = ({at = [], row}) => {
   const t = useTime();
   const hit = at.find((a) => t >= a && t < a + 2 / 60 + 1e-6);
   if (hit === undefined) return null;
-  const [cx, cy] = PHONE_AT;
+  const phone = backRowPhones(row, t)[0];
+  if (!phone) return null;
+  const [cx, cy] = phone.top;
   const big = t - hit < 1 / 60 ? 1 : 0.78;
   const star = (rLong: number, rShort: number, r0: number, half: number) => {
     let d = '';
@@ -478,6 +479,7 @@ export type S4StreetProps = {
  *  (children); in front: Pip on the rail, the row of backs, the snow. */
 export const S4Street: React.FC<S4StreetProps> = ({life, children}) => {
   const pip = life.pip ?? {};
+  const row: BackRowProps = {x0: -50, x1: 1130, top: 1462, head: 116, n: life.rowN ?? 5, seed: 's4st/row', snow: true, lookX: 560, people: life.row, riseAt: life.riseAt};
   return (
     <>
       {/* the wall is the World's sky (EMBER.wall); a car's headlights sweep across it */}
@@ -504,8 +506,8 @@ export const S4Street: React.FC<S4StreetProps> = ({life, children}) => {
       {life.squeezeAt !== undefined ? (
         <BackRow x0={920} x1={1240} top={1440} head={112} n={1} seed="s4st/sq" snow lookX={560} people={life.squeeze ? [life.squeeze] : undefined} riseAt={{0: life.squeezeAt}} />
       ) : null}
-      <BackRow x0={-50} x1={1130} top={1462} head={116} n={life.rowN ?? 5} seed="s4st/row" snow lookX={560} people={life.row} riseAt={life.riseAt} />
-      <PhoneFlash at={life.flashAt} />
+      <BackRow {...row} />
+      <PhoneFlash at={life.flashAt} row={row} />
       <SnowLayers band={BAND} seed="s4st/snow" layers={['far', 'mid', 'near']} density={0.9} />
     </>
   );

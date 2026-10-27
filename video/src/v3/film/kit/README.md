@@ -125,6 +125,7 @@ compositions `KitLifeO1`, `KitLifeS4` (kit pieces at the plan's places; the lane
 | `loopPos`, `crossing`, `shuttle` (with `holdK`) | a wrapping mover, a one-off crossing, a back-and-forth (forklift, pacing worker) |
 | `puffs(t, opts, originY)` | a puff train that grows, rises, drifts and SHRINKS TO NOTHING (`ceil`: never above the band) |
 | `sweep(t, ats, dur)` | a headlight band's progress |
+| `floatCam(t, {dur, seed, speed [8, 12], box [12, 10], leg [0.6, 1.5], startHome, endHome, turn 0.34})` | the cozy FLOAT (cozy v2 §3): the camera's [dx, dy] from home, straight legs that turn back eased, inside the box; from home at t 0 and back through home on the last frame, still moving. Wrap the set in `mat.translate(dx, dy)` (S15) |
 
 ## The living character: Pip in Autumn Ember (`Pip3.tsx`)
 
@@ -138,8 +139,8 @@ compositions `KitLifeO1`, `KitLifeS4` (kit pieces at the plan's places; the lane
 
 | Export | Props / notes |
 |---|---|
-| `WinterPerson` | Person + `wear`: earmuffs, umbrella, bag, coffee (steam), clipboard, hivis (peach with snow-white bands), hardhat, snow (hat + shoulders, clipped to the coat), badge (the van driver's cap), point (`pointAt`), wave (`waveAt`); `phoneWin` [t0, t1] (the phone goes up and drops), `moves` [{t, kind: lean / recoil / nudge / hop / turn, amp, dir}], `breathe` (2 px, staggered by seed). Colours by seed from `WINTER` (never rust, hero or pop). `x y` = hip line, `s` scale. `personGeo(seed, {torsoH, legs})` = the house figure's w, h, hr, round, head top. |
-| `BackRow` | tier A: `x0 x1` `top` (the head tops' line) `head` (90-160 px) `n` (3-6), `people` (per-person overrides), `moves` (whole row, staggered 2 frames), `lookX` (all lean toward the subject), `snow`, `riseAt` {i: t} (someone squeezes in from below). Long torsos run past the frame bottom. |
+| `WinterPerson` | Person + `wear`: earmuffs, umbrella, bag, coffee (steam), clipboard, hivis (peach with snow-white bands), hardhat, snow (hat + shoulders, clipped to the coat), badge (the van driver's cap), point (`pointAt`), wave (`waveAt`); `phoneWin` [t0, t1] (the phone goes up and drops), `moves` [{t, kind: lean / recoil / nudge / hop / turn, amp, dir}], `breathe` (2 px, staggered by seed). Colours by seed from `WINTER` (never rust, hero or pop). `x y` = hip line, `s` scale. `personGeo(seed, {torsoH, legs})` = the house figure's w, h, hr, round, head top. `coatDetail` [quilt, yoke, zip, pockets] (tone-on-tone folds + thin ink on the coat, clipped to it, under hair / scarf / hood / pack: no front-row back stays one flat fill; drawn through the house Person's `torsoOver` slot). `winterPhoneAt(props, t)` = where its raised phone is ({top: the camera end, mid}, canvas px; null while down); `winterPersonMat(props, t)` = its local -> canvas matrix. |
+| `BackRow` | tier A: `x0 x1` `top` (the head tops' line) `head` (90-160 px) `n` (3-6), `people` (per-person overrides), `moves` (whole row, staggered 2 frames), `lookX` (all lean toward the subject), `snow`, `riseAt` {i: t} (someone squeezes in from below). Long torsos run past the frame bottom. `backRowPhones(rowProps, t)` = every raised phone [{i, top, mid}] in the row's space (S4's flash follows it); `backRowLayout(rowProps, t)` = each back's WinterPerson props and lean. |
 | `Walker` | tier C (110-260 px): `from to` (feet), `h` (`h1` into depth), `speed` / `phase` / `pause` (wraps) or `window` [t0, t1] (crosses once), `dog`, `wear`, stepping legs. `Dog`. |
 | `TinyWalkers`, `Tiny` | tier D (15-60 px), fill-only: `from to` `n` `h` [near, far] `kinds` (walker, dog, sledge, umbrella, pair) `both` directions. |
 | `WindowSilhouette` | a pane with a neighbour: `who` cross / read / wave / cook / stand / none, `lit` (bool or fn of t), `curtains`, `plant`, `far` (no ink). |

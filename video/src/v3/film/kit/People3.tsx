@@ -4,6 +4,8 @@
 // fill-only), people in lit windows (E: WindowSilhouette, WindowLife), and the factory's workers and guard.
 //
 //   <WinterPerson x={300} y={1700} s={2.6} wear={['earmuffs', 'snow']} seed="a1" />      hip line at y
+//   <WinterPerson ... coatDetail={['quilt', 'yoke']} />                                 a puffer's channels, a seam
+//   winterPhoneAt(props, t) / backRowPhones(rowProps, t)                                 where a raised phone is (a flash)
 //   <BackRow x0={40} x1={1040} top={1460} head={128} n={5} seed="s4row" moves={[...]} /> heads' tops at y = top
 //   <Walker from={[100, 1180]} to={[980, 1180]} h={180} speed={70} seed="w1" />          a mid walker that wraps
 //   <TinyWalkers from={[120, 1210]} to={[960, 1150]} n={12} h={[30, 18]} seed="tw" />   tier D, with a dog / sledge
@@ -19,7 +21,8 @@ import React, {useId, useMemo} from 'react';
 import {Person, PersonProps, Hair, Acc} from '../../../lib/kit/Person';
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
-import {mat, XG} from '../../../lib/xf';
+import {mat, Mat, XG} from '../../../lib/xf';
+import {mix} from '../../../lib/cine/util';
 import {blob, circle, roundRect, smooth, torso} from '../../../lib/sketch';
 import {EMBER} from '../palette';
 import {At, Pt} from './util';
@@ -70,7 +73,13 @@ export type PersonMove = {
   dir?: number;
 };
 
-export type WinterPersonProps = Omit<PersonProps, 'acc' | 'idle' | 'x' | 'y' | 's' | 'ink'> & {
+/** Coat detail over the torso (tone-on-tone + thin ink, clipped to the coat, under the hair, scarf, hood, pack and phone
+ *  arm): quilt = a puffer's horizontal channels (each with a short shadow fold under it); yoke = a curved shoulder seam
+ *  with a stitch line; zip = a zip across the upper back under the collar (a hood zip: teeth ticks, a pull tab); pockets
+ *  = two flap pockets low on the sides (walkers; a BackRow's long torso hides them past the frame). */
+export type CoatDetail = 'quilt' | 'yoke' | 'zip' | 'pockets';
+
+export type WinterPersonProps = Omit<PersonProps, 'acc' | 'idle' | 'x' | 'y' | 's' | 'ink' | 'torsoOver'> & {
   /** Hip line (canvas px) and scale (s 1: torso ~92 px wide, head ~46 px). */
   x: number;
   y: number;
@@ -94,42 +103,32 @@ export type WinterPersonProps = Omit<PersonProps, 'acc' | 'idle' | 'x' | 'y' | '
   coat?: string;
   hat?: string;
   bagColor?: string;
+  /** Detail on the coat so a big back is not one flat fill (front rows, near walkers): see CoatDetail. */
+  coatDetail?: CoatDetail[];
 };
 
 /** Ink by on-screen head size (the depth ladder). */
 const inkForHead = (headPx: number) => (headPx >= 90 ? 4.8 : headPx >= 40 ? 3.4 : headPx >= 18 ? 2.2 : 0);
 
-export const WinterPerson: React.FC<WinterPersonProps> = (props) => {
-  const {x, y, s = 1, wear = [], acc: accIn, phoneWin, pointAt, waveAt, breathe = 2, moves = [], ink, coat, hat, bagColor, seed = 'wp', ...rest} = props;
-  const t = useTime();
-  const clipId = 'wp' + useId().replace(/[^a-zA-Z0-9]/g, '');
-  const pick = useMemo(() => {
-    const rr = rng(`winter/${seed}`);
-    return {
-      coat: coat ?? rr.pick(WINTER.coats),
-      hat: hat ?? rr.pick(WINTER.hats),
-      hair: rr.pick(WINTER.hair),
-      legs: rr.pick(WINTER.legs),
-      bag: bagColor ?? rr.pick(WINTER.bags),
-      ph: rr.range(0, 6.28),
-      hz: rr.range(0.32, 0.5),
-    };
-  }, [seed, coat, hat, bagColor]);
-  const g = personGeo(seed, {torsoH: rest.torsoH, legs: rest.legs});
-  const headPx = g.hr * 2 * s;
-  const inkPx = ink ?? inkForHead(headPx);
-  // the phone is raised only inside its window
-  let acc: Acc[] = (accIn ?? []).slice();
-  if (phoneWin) {
-    const up = t >= phoneWin[0] && t < phoneWin[1];
-    acc = acc.filter((a) => a !== 'phone');
-    if (up) acc.push('phone');
-  }
-  // body colour must differ from the hair (Person also guards it)
-  const hairColor = rest.hairColor ?? (pick.hair === pick.coat ? EMBER.ink : pick.hair);
-  // moves: offsets in screen px
+/** The seeded picks of a WinterPerson (colours, breathing clock). Shared by the component and the geometry helpers, in
+ *  the same draw order (a given colour skips its draw). */
+function winterPick(seed: string | number, coat?: string, hat?: string, bagColor?: string) {
+  const rr = rng(`winter/${seed}`);
+  return {
+    coat: coat ?? rr.pick(WINTER.coats),
+    hat: hat ?? rr.pick(WINTER.hats),
+    hair: rr.pick(WINTER.hair),
+    legs: rr.pick(WINTER.legs),
+    bag: bagColor ?? rr.pick(WINTER.bags),
+    ph: rr.range(0, 6.28),
+    hz: rr.range(0.32, 0.5),
+  };
+}
+
+/** A WinterPerson's offsets at t from its breath and moves (screen px, deg). */
+function winterOffsets(t: number, moves: PersonMove[], breathe: number, hz: number, ph: number) {
   let dx = 0;
-  let dy = bob(t, breathe, pick.hz, pick.ph);
+  let dy = bob(t, breathe, hz, ph);
   let rot = 0;
   for (const m of moves) {
     const a = m.amp ?? 1;
@@ -150,6 +149,56 @@ export const WinterPerson: React.FC<WinterPersonProps> = (props) => {
       rot += ring(t, m.t, 4 * a, 1.6, 3);
     }
   }
+  return {dx, dy, rot};
+}
+
+/** The accessories a WinterPerson draws at t (the raised phone only inside `phoneWin`). */
+function winterAcc(accIn: Acc[] | undefined, phoneWin: [number, number] | undefined, t: number): Acc[] {
+  let acc: Acc[] = (accIn ?? []).slice();
+  if (phoneWin) {
+    const up = t >= phoneWin[0] && t < phoneWin[1];
+    acc = acc.filter((a) => a !== 'phone');
+    if (up) acc.push('phone');
+  }
+  return acc;
+}
+
+/** The figure-local -> canvas matrix a WinterPerson draws in at t (local: hip line y 0, s 1). */
+export function winterPersonMat(p: Pick<WinterPersonProps, 'x' | 'y' | 's' | 'seed' | 'moves' | 'breathe' | 'coat' | 'hat' | 'bagColor'>, t: number): Mat {
+  const seed = p.seed ?? 'wp';
+  const pick = winterPick(seed, p.coat, p.hat, p.bagColor);
+  const o = winterOffsets(t, p.moves ?? [], p.breathe ?? 2, pick.hz, pick.ph);
+  return mat.compose(mat.translate(p.x + o.dx, p.y + o.dy), mat.rotate(o.rot), mat.scale(p.s ?? 1));
+}
+
+const applyM = (m: Mat, q: Pt): Pt => [m[0] * q[0] + m[2] * q[1] + m[4], m[1] * q[0] + m[3] * q[1] + m[5]];
+
+/** Where a WinterPerson's RAISED phone is at t (canvas px): `top` = the top centre of the phone (its camera end, where
+ *  a flash bursts), `mid` = its centre; null while the phone is down. Mirrors the house Person's phone arm, so a flash
+ *  follows the figure through its moves, breath and any layout change. */
+export function winterPhoneAt(p: WinterPersonProps, t: number): {top: Pt; mid: Pt} | null {
+  if (!winterAcc(p.acc, p.phoneWin, t).includes('phone')) return null;
+  const g = personGeo(p.seed ?? 'wp', {torsoH: p.torsoH, legs: p.legs});
+  const hx = g.w * 0.56 + 0.5;
+  const hyy = g.hy - g.hr * 1.5;
+  const m = winterPersonMat(p, t);
+  return {top: applyM(m, [hx, hyy - 42]), mid: applyM(m, [hx, hyy - 19])};
+}
+
+export const WinterPerson: React.FC<WinterPersonProps> = (props) => {
+  const {x, y, s = 1, wear = [], acc: accIn, phoneWin, pointAt, waveAt, breathe = 2, moves = [], ink, coat, hat, bagColor, coatDetail, seed = 'wp', ...rest} = props;
+  const t = useTime();
+  const clipId = 'wp' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const pick = useMemo(() => winterPick(seed, coat, hat, bagColor), [seed, coat, hat, bagColor]);
+  const g = personGeo(seed, {torsoH: rest.torsoH, legs: rest.legs});
+  const headPx = g.hr * 2 * s;
+  const inkPx = ink ?? inkForHead(headPx);
+  // the phone is raised only inside its window
+  const acc = winterAcc(accIn, phoneWin, t);
+  // body colour must differ from the hair (Person also guards it)
+  const hairColor = rest.hairColor ?? (pick.hair === pick.coat ? EMBER.ink : pick.hair);
+  // moves: offsets in screen px
+  const {dx, dy, rot} = winterOffsets(t, moves, breathe, pick.hz, pick.ph);
   const W = inkPx / s; // local ink
   const hy = g.hy;
   const hr = g.hr;
@@ -330,11 +379,13 @@ export const WinterPerson: React.FC<WinterPersonProps> = (props) => {
       </g>,
     );
   }
+  const detail = coatDetail && coatDetail.length ? <CoatDetails kinds={coatDetail} g={g} s={s} W={W} coat={rest.body ?? pick.coat} clipId={`${clipId}c`} seed={seed} /> : null;
   return (
     <XG m={mat.compose(mat.translate(x + dx, y + dy), mat.rotate(rot), mat.scale(s))}>
       {back}
       <Person
         {...rest}
+        torsoOver={detail}
         x={0}
         y={0}
         s={1}
@@ -350,6 +401,92 @@ export const WinterPerson: React.FC<WinterPersonProps> = (props) => {
       />
       {over}
     </XG>
+  );
+};
+
+/** The coat detail of one WinterPerson (figure-local px; see CoatDetail). Tone-on-tone folds in the coat's own hue
+ *  (mixed toward the warm dark anchor: colour, never grey), thin ink, everything clipped to the coat's outline and
+ *  inset from its sides (the fill's misregistration offset never shows a line past the fill). */
+const CoatDetails: React.FC<{kinds: CoatDetail[]; g: ReturnType<typeof personGeo>; s: number; W: number; coat: string; clipId: string; seed: string | number}> = ({kinds, g, s, W, coat, clipId, seed}) => {
+  const {w, h} = g;
+  const hw = w / 2;
+  const R = Math.min(w * g.round, h * 0.8);
+  const fold = mix(coat, EMBER.anchor, 0.2);
+  const stitch = mix(coat, EMBER.anchor, 0.34);
+  const px = 1 / Math.max(0.05, s); // one screen px in local px
+  // the clip: the coat inset by half its outline (+ a screen px), so no fold paints over the outline's inner half
+  const ins = W * 0.5 + px;
+  const coatPath = torso(0, 0, w - 2 * ins, h - ins, g.round, 0.07);
+  const x0 = -hw * 1.1;
+  const x1 = hw * 1.1;
+  const r = rng(`coat/${seed}`);
+  const parts: React.ReactNode[] = [];
+  if (kinds.includes('quilt')) {
+    // channels about a fifth of the back's width apart (a puffer), from under the shoulders to the hem; each seam
+    // smiles a little (the back is round) and carries a short fold in a darker coat tone just under it
+    const step = w * r.range(0.19, 0.23);
+    const sag = w * 0.035;
+    let folds = '';
+    let seams = '';
+    for (let y = -h + R * 0.8 + r.range(0, step * 0.3); y < -2; y += step) {
+      const yy = y + r.jitter(w * 0.008);
+      seams += `M${x0} ${yy.toFixed(2)}Q0 ${(yy + sag * 2).toFixed(2)} ${x1} ${yy.toFixed(2)}`;
+      const t = Math.max(2.4 * px, w * 0.028);
+      folds += `M${x0} ${yy.toFixed(2)}Q0 ${(yy + sag * 2).toFixed(2)} ${x1} ${yy.toFixed(2)}L${x1} ${(yy + t).toFixed(2)}Q0 ${(yy + sag * 2 + t).toFixed(2)} ${x0} ${(yy + t).toFixed(2)}Z`;
+    }
+    parts.push(<path key="qf" d={folds} fill={fold} />);
+    parts.push(<path key="qs" d={seams} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.42} strokeLinecap="round" />);
+  }
+  if (kinds.includes('yoke')) {
+    // a shoulder yoke: the seam dips a little at the centre back, a stitch line follows it 3 screen px below
+    const yy = -h + R * 0.62;
+    const d = `M${x0} ${yy.toFixed(2)}Q0 ${(yy + w * 0.12).toFixed(2)} ${x1} ${yy.toFixed(2)}`;
+    const ds = `M${x0} ${(yy + 3.2 * px).toFixed(2)}Q0 ${(yy + w * 0.12 + 3.2 * px).toFixed(2)} ${x1} ${(yy + 3.2 * px).toFixed(2)}`;
+    parts.push(<path key="ys" d={ds} fill="none" stroke={stitch} strokeWidth={Math.max(1.2 * px, W * 0.32)} strokeDasharray={`${(4 * px).toFixed(2)} ${(3 * px).toFixed(2)}`} />);
+    parts.push(<path key="yi" d={d} fill="none" stroke={EMBER.ink} strokeWidth={W * 0.45} strokeLinecap="round" />);
+  }
+  if (kinds.includes('zip')) {
+    // a hood zip across the upper back under the collar: tape, teeth ticks, a pull tab hanging at one end
+    const yy = -h + R * 0.34;
+    const za = -hw * 0.62;
+    const zb = hw * 0.62;
+    const tape = Math.max(3 * px, w * 0.03);
+    let teeth = '';
+    const n = 14;
+    for (let k = 0; k <= n; k++) {
+      const xx = za + ((zb - za) * k) / n;
+      const yk = yy + (w * 0.05) * (1 - Math.pow((2 * (xx - (za + zb) / 2)) / (zb - za), 2));
+      teeth += `M${xx.toFixed(2)} ${(yk - tape * 0.5).toFixed(2)}L${xx.toFixed(2)} ${(yk + tape * 0.5).toFixed(2)}`;
+    }
+    const mid = (za + zb) / 2;
+    const d = `M${za} ${yy.toFixed(2)}Q${mid} ${(yy + w * 0.1).toFixed(2)} ${zb} ${yy.toFixed(2)}`;
+    const tabX = za + (zb - za) * 0.82;
+    const tabY = yy + w * 0.05 * (1 - Math.pow(0.64, 2));
+    parts.push(<path key="zt" d={d} fill="none" stroke={stitch} strokeWidth={tape} strokeLinecap="round" />);
+    parts.push(<path key="zk" d={teeth} fill="none" stroke={EMBER.ink} strokeWidth={Math.max(0.9 * px, W * 0.22)} />);
+    parts.push(<path key="zp" d={roundRect(tabX - w * 0.025, tabY + tape * 0.3, w * 0.05, w * 0.1, w * 0.012)} fill={EMBER.snow} stroke={EMBER.ink} strokeWidth={W * 0.35} />);
+  }
+  if (kinds.includes('pockets')) {
+    // two flap pockets low on the sides: the flap in a darker coat tone, its seam and a stitch under it
+    for (const sg of [-1, 1]) {
+      const cx = sg * hw * 0.55;
+      const yy = -h * 0.3;
+      const pw = w * 0.3;
+      const ph = w * 0.075;
+      const flap = `M${cx - pw / 2} ${yy}L${cx + pw / 2} ${yy - sg * w * 0.01}L${cx + pw / 2 - w * 0.01} ${yy + ph}L${cx - pw / 2 + w * 0.01} ${yy + ph - sg * w * 0.01}Z`;
+      parts.push(<path key={`pf${sg}`} d={flap} fill={fold} stroke={EMBER.ink} strokeWidth={W * 0.4} strokeLinejoin="round" />);
+      parts.push(<path key={`pw${sg}`} d={`M${cx - pw * 0.42} ${yy + ph * 2.1}L${cx + pw * 0.42} ${yy + ph * 2.1 - sg * w * 0.008}`} stroke={stitch} strokeWidth={Math.max(1.2 * px, W * 0.3)} strokeDasharray={`${(4 * px).toFixed(2)} ${(3 * px).toFixed(2)}`} />);
+    }
+  }
+  return (
+    <g>
+      <defs>
+        <clipPath id={clipId}>
+          <path d={coatPath} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${clipId})`}>{parts}</g>
+    </g>
   );
 };
 
@@ -394,13 +531,11 @@ export type BackRowProps = {
 
 const ROW_HAIR: Hair[] = ['beanie', 'short', 'long', 'cap', 'bun', 'curly'];
 
-/** A row of 3-6 backs along the bottom of an insert, shoulders nearly touching, looking at the subject; they breathe
- *  (staggered bobs), react on the voice's words (lean, recoil, nudge, phone up / down, point) and carry the density of a
- *  wall shot. Long torsos run past the frame bottom. */
-export const BackRow: React.FC<BackRowProps> = ({x0, x1, top, head = 128, n = 5, seed = 'row', people = [], moves = [], stagger = 2 / 60, lookX, snow, riseAt, at}) => {
-  const t = useTime();
-  if (at !== undefined && t < at) return null;
-  const out: React.ReactNode[] = [];
+/** BackRow's placement of each person at t (canvas px): its WinterPerson props and the lean about its hip. Shared by
+ *  BackRow and `backRowPhones`, in the same seeded order (a person still below the frame keeps its slot hidden). */
+export function backRowLayout(props: BackRowProps, t: number) {
+  const {x0, x1, top, head = 128, n = 5, seed = 'row', people = [], moves = [], stagger = 2 / 60, lookX, snow, riseAt} = props;
+  const out: {i: number; person: WinterPersonProps; lean: number; cx: number; hipY: number}[] = [];
   const step = (x1 - x0) / n;
   const r = rng(`row/${seed}`);
   for (let i = 0; i < n; i++) {
@@ -423,14 +558,42 @@ export const BackRow: React.FC<BackRowProps> = ({x0, x1, top, head = 128, n = 5,
     const wear: Wear[] = [...(p.wear ?? []), ...(snow ? (['snow'] as Wear[]) : [])];
     const mv = [...moves.map((m) => ({...m, t: m.t + i * stagger, dir: m.dir ?? (lookX !== undefined ? Math.sign(lookX - cx) : 0)})), ...(p.moves ?? [])];
     const lean = lookX !== undefined ? Math.max(-3, Math.min(3, (lookX - cx) / 160)) : 0;
-    out.push(
-      <XG key={i} m={mat.about(mat.rotate(lean), cx, hipY)}>
-        <WinterPerson {...p} x={cx} y={hipY} s={s} seed={pseed} torsoH={torsoH} hair={hair} wear={wear} moves={mv} />
-      </XG>,
-    );
+    const {dx: _dx, dy: _dy, sMul: _sMul, ...rest} = p;
+    out.push({i, cx, hipY, lean, person: {...rest, x: cx, y: hipY, s, seed: pseed, torsoH, hair, wear, moves: mv}});
   }
-  return <>{out}</>;
+  return out;
+}
+
+/** A row of 3-6 backs along the bottom of an insert, shoulders nearly touching, looking at the subject; they breathe
+ *  (staggered bobs), react on the voice's words (lean, recoil, nudge, phone up / down, point) and carry the density of a
+ *  wall shot. Long torsos run past the frame bottom. */
+export const BackRow: React.FC<BackRowProps> = (props) => {
+  const t = useTime();
+  if (props.at !== undefined && t < props.at) return null;
+  return (
+    <>
+      {backRowLayout(props, t).map(({i, person, lean, cx, hipY}) => (
+        <XG key={i} m={mat.about(mat.rotate(lean), cx, hipY)}>
+          <WinterPerson {...person} />
+        </XG>
+      ))}
+    </>
+  );
 };
+
+/** Every raised phone in a BackRow at t (canvas px, the row's space): {i, top (camera end), mid}. A flash or a glint
+ *  aimed at `top` follows the phone through the row's layout, leans and breath. */
+export function backRowPhones(props: BackRowProps, t: number): {i: number; top: Pt; mid: Pt}[] {
+  if (props.at !== undefined && t < props.at) return [];
+  const out: {i: number; top: Pt; mid: Pt}[] = [];
+  for (const {i, person, lean, cx, hipY} of backRowLayout(props, t)) {
+    const ph = winterPhoneAt(person, t);
+    if (!ph) continue;
+    const m = mat.about(mat.rotate(lean), cx, hipY);
+    out.push({i, top: applyM(m, ph.top), mid: applyM(m, ph.mid)});
+  }
+  return out;
+}
 
 // ---------------------------------------------------------------- mid walkers (tier C)
 
