@@ -2,6 +2,19 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-27 19:19 UTC (hourly)
+
+| part | owner | status |
+|---|---|---|
+| Groundwork: THROUGHLINE.md + conform_L1..L6 | local workflow `wf_fbca738e-09e` (director -> critic -> integrator) | director still writing (started 18:40) |
+| Engine: lib/light.tsx | same workflow (engine agent) | DONE, pushed (dc9c1bc) |
+| Engine: tiered clean pen + kit tier defaults for v2r | same workflow | DONE, pushed (7b400c4); proving it now (before/after stills, v3 identical) |
+| Lanes L1-L6 | cloud helpers | idle since 15:07 (no spend); resume when their conform brief lands |
+| Sound revision, kit review | local, paused | sound resumes once THROUGHLINE fixes the joins; kit review re-scoped (Pip fixes stay) |
+
+**Spend:** orchestrator $3,550.84 cumulative (+$36 since 18:47, ~$70/h); helpers idle. Owner 18:47: weekly 59 %, session 0 %. Projection to
+the finished film ~$650-800 (~22-28 % of the week) -> ~81-87 %.
+
 ## Snapshot 2026-10-27 18:45 UTC: RESUMED, conforming to DIRECTION
 
 The session limit reset at 18:30 (owner: "Okay the limits seem to reset"). While paused, the video 3 session landed the owner-approved
