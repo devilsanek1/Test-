@@ -65,7 +65,7 @@ scene needs. Every rule below works inside those tiers.
   life calm on purpose): a `gate_check.py --density` WARN, FAR or FAIL that comes only from ev/s or the gap is no reason to
   add movers, and any density FAIL counts as a WARN at the gate; judge the paused frame (above) and the eye test
   (`CRAFT.md` §b). The meter still scores them (its fix is the craft tooling lane, `PIPELINE_V2.md`). The profile was
-  named "BUSY" until 2026-10-27 (v2r's shot map still uses that tag): the owner's "too busy" is the failure, never a target.
+  named "BUSY" until 2026-10-27 (v2r's shot map now says STORY-LED too): the owner's "too busy" is the failure, never a target.
 
 ## 1. The bar (measured on the references; warning signals)
 

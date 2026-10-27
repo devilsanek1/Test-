@@ -78,6 +78,17 @@ findings as a numbered list (most important first, each with a concrete fix) in 
 const rev = await agent(`${CTX}
 YOU ARE THE SOUND AGENT (revision). A music director reviewed your draft. Apply every fix that makes it better (say why for any you skip),
 re-render the bed, SFX, cues and the premix, re-measure, update docs/v2/SOUND.md. Commit your paths.
+RESUMING (2026-10-27 ~21:25 UTC): a previous run of this revision was stopped at 15:05 (a controlled pause) with bed.py / sfx.py / premix.py
+part-revised and committed: read git log for video/audio/v2r and continue from the files as they are. SINCE THEN THE OWNER APPROVED A NEW
+DIRECTION (it wins): video/docs/look/DIRECTION.md + CRAFT.md, applied to v2 in video/docs/v2/THROUGHLINE.md and video/src/v2r/film/scenes.json.
+For sound that means: the JOINS changed (read THROUGHLINE's join table and scenes.json: S1->S2 push into the window, S2->S3 window match, S3->S4
+push into her silhouette, S4->S5 and S6->S7 pushes into the sun, S5->S6 a right-to-left blossom-tree wipe 23.62-23.98 with S6 starting 23.80,
+S7 at 28.10, S7->S8 the narrowboat wipe, the loop = window match + un-build): put each join's sound on its carrier and its midpoint, and drop
+every Pip-hop / leap whoosh at a cut (Pip no longer hops across cuts); retired camera moves (S1's pull-out, S2's 6 % push, S6's truck, the
+seam push) lose their swells; 'alive but calm' (DIRECTION 3): supporting life sounds stay small and take turns, the subject's beat owns the
+sound; frame 0 (DIRECTION 9): the voice from the first frames and a POSITIVE phone-ish sound in the first second (v2 has the exit ding at
+0.45 s: keep it if it reads positive). Fold all of this into the revision, then re-measure (-14 LUFS, true peak), and in SOUND.md list
+every cue that moved and why.
 YOUR DRAFT REPORT:
 ${draft || '(missing)'}
 MUSIC DIRECTOR:

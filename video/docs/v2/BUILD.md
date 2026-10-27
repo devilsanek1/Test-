@@ -1,6 +1,7 @@
 # Video 2 ("One Small Window"): how the film is wired (engine K1 + K8)
 
-The direction is `TREATMENT.md` (read it in full); this page is only the plumbing. Pattern: v3's G5 shell (`G5_BLOCKING.md` §1-7).
+The direction is `docs/look/DIRECTION.md` (with `CRAFT.md`), this film's `THROUGHLINE.md` and the story in `TREATMENT.md` (they
+win in that order; `STYLE.md` holds the values); this page is only the plumbing. Pattern: v3's G5 shell (`G5_BLOCKING.md` §1-7).
 
 ## 1. Wiring
 | file | owner | what |
@@ -8,12 +9,12 @@ The direction is `TREATMENT.md` (read it in full); this page is only the plumbin
 | `src/v2r/palette.ts` | engine K1 | "10 Canal Mint": role tokens `CM.*` (exact TREATMENT §2 hex), the house theme tokens rewritten IN PLACE at load, the four light states (`LIGHT`, `TOD`, `SHOT_LIGHT`, `skyBands` / `skyKey`), caption tones, `problems()`. **Every entry imports it FIRST.** |
 | `src/entry-v2r-film.tsx` | engine K8 | `Film2R` (2345 f, 60 fps, props `{draftLabel}`: ON for reviews, `false` for the final), `Film2RShot {id}`, `Film2R-<ID>`, `Film2RBare` (no captions / frame-0 words / credits / label). |
 | `src/v2r/film/Film2R.tsx` | engine | `<Film>` + the data below; the frame-0 block (`FILM2R_FRAME0`), engine credits, the push-through bridge, cues. |
-| `src/v2r/film/scenes.json` | engine | V2S1-V2S8: TREATMENT §5 times + transitions (+ `light`, `lane`, `note`). Hand-written. |
+| `src/v2r/film/scenes.json` | engine (integrator) | V2S1-V2S8: THROUGHLINE §3's times and transitions, each with its join's `carrier` (+ `light`, `lane`, `note`). Hand-written. |
 | `src/v2r/film/captions_pages.txt` -> `captions.json` | engine | pop captions on the HEARD clock (§4). |
 | `public/v2r/voice_words_heard.json` | engine | `public/v2/voice_words.json` with beat_map §2's audible onsets / voiced ends; "can't" + "veto" split. |
 | `src/v2r/scenes/index.ts` + `src/v2r/film/Placeholder.tsx` | engine | the registry; the palette-card placeholder every shot starts as. |
 | `src/v2r/scenes/V2S<n>.tsx` + `V2S<n>_*.tsx` | its lane (L1-L6) | the shot. Replace the placeholder file whole. |
-| `src/v2r/world/map.ts` K2 · `kit/cast` K4 · `kit/pip` K5 · `kit/canal` K6 · `kit/dc` K7 · `kit/boards` K3 (L5) | kit agents | shared spots / scale sheet and the film's own kit (each with its `src/entry-v2r-<kit>.tsx`). |
+| `src/v2r/world/map.ts` K2 + `world/rigs.ts` (the light rigs) · `kit/cast` K4 · `kit/pip` K5 · `kit/canal` K6 · `kit/dc` K7 · `kit/boards` K3 (L5) | kit agents | shared spots / scale sheet and the film's own kit (each with its `src/entry-v2r-<kit>.tsx`). |
 | `audio/v2r/**`, `public/v2r/**` (not the heard words) | sound K9 / L7 | `public/v2r/cues.json`: `[{src, t, gain}]` or `{"sfx": [...], "audio": "v2r/mix.wav"}` (`audio` replaces the voice: the final mix; cues whose file is not in public/ yet are skipped). |
 
 Transitions (scenes.json = `docs/v2/THROUGHLINE.md` §3; every `transitionIn` names its `carrier`, so `gate_check.py` runs
@@ -32,9 +33,10 @@ figure wiper there (a stand-in only).
   scenes.json start); a word heard at film time w lands at `t = w - start` (`voice_words_heard.json`, never the raw json). Seconds
   only, deterministic (`lib/rng`, never `Math.random`), flat fills, no opacity / blur / gradient, 60 fps (frame = round(t x 60)).
 - Import from the lib modules themselves (`lib/World`, `lib/Fill`, `lib/Ink`, `lib/time`, `lib/rng`, `lib/sketch`, `lib/exit`,
-  `lib/ShotCam`, `lib/persp`, `lib/inkComp`, `lib/font`, `lib/stage`), the palette (`src/v2r/palette`), `world/map.ts` and `kit/**`.
-  Never the barrel `lib/index` (it pulls `lib/kit` and the cine kit), never v1 / v3 / v2 sets (TREATMENT §9), never `Film2R.tsx`
-  (circular: it imports the registry).
+  `lib/ShotCam`, `lib/persp`, `lib/inkComp`, `lib/font`, `lib/stage`, `lib/tier`, `lib/light`, `lib/idle`, `lib/pullback`), the palette
+  (`src/v2r/palette`), `world/map.ts`, `world/rigs.ts` and `kit/**`. Never the barrel `lib/index` (it pulls `lib/kit` and the cine kit),
+  never another film's folder (v1's `src/scenes`, `src/v2/**`, `src/v3/**`: v3's `idle.ts` and `Pullback.tsx` were ported to `lib/idle.ts`
+  and `lib/pullback.tsx`), never `Film2R.tsx` (circular: it imports the registry).
 - Optional exports: `captionTone: ToneKey[]` (always `[{t: 0, tone: 'dark'}]` here: ink on the mint); `Wiper: WiperComponent`
   (V2S5: one blossom tree for the wipe into S6, clipped at y >= 560; V2S7: the narrowboat for the wipe into S8; screen px
   centred on x, opaque over its body full height, static `half` = real half-width, static `captionRegions`).
@@ -61,13 +63,13 @@ figure wiper there (a stand-in only).
 - Credits: the frame-0 source line (0-5.95, and from 39.04) and S8's caption-band source 33.16-36.54 (`FILM2R_CREDITS`); every other
   credit is drawn on its object by its lane (TREATMENT §8).
 
-## 4. Previews (always GL / --gl=angle, --concurrency=2; stills at --scale=0.5 plus one 0.25 phone look)
+## 4. Previews (always GL / --gl=angle, --concurrency=2; the conform: stills and short clips at --scale 0.25-0.4 only, no full-film renders but the orchestrator's assembly)
 ```bash
 E=--entry=src/entry-v2r-film.tsx
-GL=angle node scripts/render-frames.mjs Film2R-V2S4 <dir> 0.2,1.0,2.5 $E --scale=0.5          # shot-local seconds
-GL=angle node scripts/render-frames.mjs Film2R <dir> 12.95,12.98,13.0 $E --scale=0.5           # a cut in context (film s)
-npx remotion render src/entry-v2r-film.tsx Film2R-V2S4 <out>.mp4 --gl=angle --concurrency=2 --scale=0.5
-npx remotion render src/entry-v2r-film.tsx Film2R <out>.mp4 --gl=angle --concurrency=2 --scale=0.5     # review cut (label on)
+GL=angle node scripts/render-frames.mjs Film2R-V2S4 <dir> 0.2,1.0,2.5 $E --scale=0.4          # shot-local seconds
+GL=angle node scripts/render-frames.mjs Film2R <dir> 12.95,12.98,13.0 $E --scale=0.4           # a join in context (film s)
+npx remotion render src/entry-v2r-film.tsx Film2R-V2S4 <out>.mp4 --gl=angle --concurrency=2 --scale=0.4
+npx remotion render src/entry-v2r-film.tsx Film2R <out>.mp4 --gl=angle --concurrency=2 --scale=0.4     # the assembly's review cut (label on)
 npx remotion render src/entry-v2r-film.tsx Film2R out/v2r_final.mp4 --gl=angle --concurrency=2 --crf 14 --props='{"draftLabel":false}'
 npx remotion render src/entry-v2r-film.tsx Film2RBare <out>.mp4 --gl=angle --concurrency=2 --scale=0.25 # sound-off cold read
 ```

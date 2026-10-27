@@ -8,10 +8,19 @@ from `direction/beat_map.md` §2 ("life" 4.98, "veto" 26.50, "of any kind" 32.08
 NEW (engine primitives only, §9). **Builders read THIS file;** the six treatments and the judges' notes are background, never specs. Every
 shared spot, the map, the S1 scale sheet and the legibility floor live in ONE contract file (K2, §9).
 
-> **Read `STYLE.md` first (2026-10-27): where it settles a conflict with this page, STYLE.md wins.** Above all: every near
-> head-back is <= ~140 px WIDE at the shoulders (head ~55-65), so §5's 200-330 px near heads are overruled; her hero teal is
-> PRESENT on her shots (she is small), not 5-15 % (§9); no low bun + mustard scarf in any crowd (her look-alike). S5's end
-> keeps map.ts's 62 px stranger (L4's spec, approved by the orchestrator).
+> **Conformed 2026-10-27: `docs/look/DIRECTION.md` (with `docs/look/CRAFT.md`) and this film's `THROUGHLINE.md` win wherever
+> this page differs** (the order: the owner's words > DIRECTION > CRAFT > the pipeline and look docs > THROUGHLINE > this page >
+> `STYLE.md`, the film's values; DIRECTION's intro has the full ladder; the lanes' orders are `lanes/conform_<id>.md`, the spots
+> `src/v2r/world/map.ts`). This page stays the story, the words, the timings, the texts on objects and the fairness rules (§8
+> binds every page). Superseded here, in short (THROUGHLINE §6 per shot): her window is the thread (her dark office window sits
+> at M (335, 785), the old W2 spot, so S2 -> S3 is a B match of her own window); every join carries something (push-throughs
+> into W, into her, into both suns; S5's blossom-tree wipe into S6, which starts 23.80; S7 starts 28.10; no plain cut, no
+> calendar flip) and Pip never hops across one (§3's hops and leaps go); no zoom in a hold (S1's pull-out, S2's push, S3's
+> ease-back, S4's push to the sun, S6's truck, S8's seam push go); no stranger's back in any foreground (§5's near heads, S1's
+> seated rows but the one by the water, S8's readers go); frame 0 is drawn in the clean pen (pale shapes, the subject's outline
+> and Pip's tinted line drawing on; no full-colour Pip); §2's loose line, overshoots and misregistration yield to the clean pen
+> with attention tiers; one light rig per set; Pip is tier B (C* <= 25, STYLE §2's new hex); her teal is PRESENT on her shots,
+> not 5-15 %; §9's BUSY events-per-second rows are information and its review loop is `lanes/COMMON.md`'s.
 
 ## 1. Concept, the understanding shift, why it stops, holds and gets shared
 **One sentence:** a small woman walks out of Google's canal-side building into a golden October evening, and on each clause of her claim an
@@ -314,8 +323,8 @@ the clause.
 ## 9. Production plan (owner rule: no reusable assets; engine primitives only)
 - **TOOLS as-is:** `src/lib/Film.tsx` (`matchcut`, `push-through`, `foreground-wipe` + scene `Wiper`, `cut`, `unbuild` loop, `captionMotion:
   'pop'`, `frame0`, `audioSrc`, `edges`), `World` + tod, `ShotCam` + `Layer`, `Look cascade`, `UnBuild`, `useExit`, `Ink`, `Fill`, `sketch`,
-  `inkComp`, `persp`, `time`, `rng`, `font`, `Captions`; `src/v3/film/kit/idle.ts` and `Pullback.tsx` (`PullLayer`, `planeMat`, `cubicBezier`;
-  never `kit/util.tsx`: it loads EMBER); `film_captions.py`; the audio tools; the QA scripts (`colour_meter --hero '#0B8577' --pop '#EE6A2E'
+  `inkComp`, `persp`, `time`, `rng`, `font`, `Captions`; `src/lib/idle.ts` and `src/lib/pullback.tsx` (`PullLayer`, `planeMat`, `cubicBezier`;
+  ported from v3's kit on 2026-10-27: a film never imports another film's folder); `film_captions.py`; the audio tools; the QA scripts (`colour_meter --hero '#0B8577' --pop '#EE6A2E'
   --band 290,600`). **Studied, never shipped:** cine generators, `lib/kit` people and placement, the `lib/mascot` rig, v1 sets, the v3 kit,
   every house bed.
 - **Three small engine edits:** (1) `Frame0Text.source` (a small line at baseline 550, held with the words); (2) `Frame0Text.keys` +

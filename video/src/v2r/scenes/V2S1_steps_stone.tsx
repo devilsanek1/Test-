@@ -25,9 +25,9 @@ export const BANK = {
  *  edge's height at the band's top (grows toward us). */
 export const BANDS = [
   {k: 0, y0: BANK.landing[0], y1: BANK.nosings[0], top: CM.paving, edge: 0},
-  {k: 1, y0: BANK.nosings[0], y1: BANK.nosings[1], top: CM.limestone, edge: 7},
-  {k: 2, y0: BANK.nosings[1], y1: BANK.nosings[2], top: CM.stucco, edge: 9},
-  {k: 3, y0: BANK.nosings[2], y1: BANK.nosings[3], top: CM.limestone, edge: 12},
+  {k: 1, y0: BANK.nosings[0], y1: BANK.nosings[1], top: CM.stucco, edge: 7},
+  {k: 2, y0: BANK.nosings[1], y1: BANK.nosings[2], top: CM.paving, edge: 9},
+  {k: 3, y0: BANK.nosings[2], y1: BANK.nosings[3], top: CM.stucco, edge: 12},
   {k: 4, y0: BANK.nosings[3], y1: BANK.nosings[4], top: CM.paving, edge: 15},
   {k: 5, y0: BANK.nosings[4], y1: BANK.bottom, top: CM.stucco, edge: 18},
 ] as const;
@@ -40,7 +40,8 @@ export const edgePath = (k: number): string => {
 
 const xOf = (u: number, y: number) => BANK.vp[0] + u * (y - BANK.vp[1]);
 const uOf = (x: number, y: number) => (x - BANK.vp[0]) / (y - BANK.vp[1]);
-const TONES = [CM.limestone, CM.stucco, CM.paving];
+// warm stones only: a shadow multiplied onto limestone (C* ~8) drops under C* 8 and reads grey (check_light)
+const TONES = [CM.stucco, CM.paving, CM.stucco];
 
 /** One tread: the lit top as a few long slabs in neighbouring light stones (each its own Fill so the flood ripples
  *  across the steps), the step edge strip at its top. */
@@ -73,17 +74,17 @@ export const StoneBand: React.FC<{k: number; seed?: string}> = ({k, seed = 'v2s1
       {g.slabs.map((s) => (
         <Fill key={s.seed} d={s.d} color={s.color} seed={s.seed} offset={false} />
       ))}
-      {g.edge ? <Fill d={g.edge} color={CM.limestone} seed={`${seed}/edge${k}`} offset={false} /> : null}
+      {g.edge ? <Fill d={g.edge} color={CM.paving} seed={`${seed}/edge${k}`} offset={false} /> : null}
     </>
   );
 };
 
-/** The coping along our waterline: a limestone top and its rounded lip one tone down (two flat tones, no line). */
+/** The coping along our waterline: a stucco top and its rounded lip one tone down (two flat tones, no line). */
 export const Coping: React.FC<{seed?: string}> = ({seed = 'v2s1bank'}) => {
   const [y0, y1] = BANK.coping;
   return (
     <>
-      <Fill d={poly([[-80, y0], [1160, y0], [1160, y1 + 2], [-80, y1 + 2]])} color={CM.limestone} seed={`${seed}/copTop`} offset={false} />
+      <Fill d={poly([[-80, y0], [1160, y0], [1160, y1 + 2], [-80, y1 + 2]])} color={CM.stucco} seed={`${seed}/copTop`} offset={false} />
       <Fill d={poly([[-80, y0], [1160, y0], [1160, y0 + 5], [-80, y0 + 5]])} color={CM.stoneShade} seed={`${seed}/copLip`} offset={false} />
     </>
   );

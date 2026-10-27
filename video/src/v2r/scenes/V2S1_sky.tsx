@@ -1,12 +1,14 @@
 // V2S1 helper (lane L1): the sky flood and the frame-0 sun. The World sky stays paper (frame 0 is ink on paper); the
 // mint sky and the gold band flood out of SUN0 as one growing disc (f2-f5, TREATMENT section 4), ahead of the kit's own
-// cascade (lib/exit Look). Before the flood the sun is half-coloured (ref 1's sun on the bare page) with a loose ink
-// ring for its other half; from the flood on, the set's SunDisc carries it.
+// cascade (lib/exit Look). Before the flood the sun is half-coloured (the colour already pouring in from the low left)
+// and its other half a flat PALE shape like everything else (no ink ring: no line on anything but the subject at f0);
+// from the flood on, the set's SunDisc carries it.
 import React, {useId} from 'react';
 import {Fill} from '../../lib/Fill';
-import {Ink} from '../../lib/Ink';
+import {mixHex} from '../../lib/light';
+import {S1_PALE} from './V2S1_clock';
 import {useTime} from '../../lib/time';
-import {CM, INK_PX} from '../palette';
+import {CM} from '../palette';
 import * as MAP from '../world/map';
 
 const S1_FLOOD = MAP.S1_CLOCK.flood;
@@ -34,7 +36,7 @@ export const SkyFlood: React.FC = () => {
   );
 };
 
-/** Frame 0's sun: the lower-left half in colour, a loose ink ring for the rest (only before the flood reaches it). */
+/** Frame 0's sun: the lower-left half in colour, the rest pale (only before the flood reaches it). */
 export const SunHalf: React.FC = () => {
   const t = useTime();
   if (t >= S1_FLOOD.t0) return null;
@@ -42,11 +44,11 @@ export const SunHalf: React.FC = () => {
   // a half disc cut on a diagonal (the colour already pouring in from the low-left)
   const a0 = (200 * Math.PI) / 180;
   const half = `M${x + r * Math.cos(a0 - Math.PI)} ${y + r * Math.sin(a0 - Math.PI)}A${r} ${r} 0 0 1 ${x + r * Math.cos(a0)} ${y + r * Math.sin(a0)}Z`;
-  const ring = `M${x + r * 1.02 * Math.cos(a0 + 0.1)} ${y + r * 1.02 * Math.sin(a0 + 0.1)}A${r * 1.02} ${r * 1.02} 0 0 1 ${x + r * 1.02 * Math.cos(a0 - Math.PI - 0.25)} ${y + r * 1.02 * Math.sin(a0 - Math.PI - 0.25)}`;
+  const disc = `M${x - r} ${y}A${r} ${r} 0 1 0 ${x + r} ${y}A${r} ${r} 0 1 0 ${x - r} ${y}Z`;
   return (
     <>
+      <Fill d={disc} color={mixHex(CM.sun, CM.white, S1_PALE)} offset={false} lookExempt exit={false} seed="s1sunpale" />
       <Fill d={half} color={CM.sun} offset={false} lookExempt exit={false} seed="s1sunhalf" />
-      <Ink d={ring} width={INK_PX.mid} seed="s1sunring" exit={false} />
     </>
   );
 };

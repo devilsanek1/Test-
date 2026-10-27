@@ -3,15 +3,24 @@
 // greyer each time, pops one step ahead; on "life" the whole row takes ONE step and three bare outlines pop down the bend.
 // Every member is the SAME drawing (V2S1_row_fig: her long belted coat, collar, low bun, sleeves, a walking scissor), so
 // the copies read as her, never as gowns: G1 = her now (dark plum head) -> G6 white-silver with a scarf; the coats
-// paper with the film's ONE closed outline (2.2 px); legs and shoes walk below a mid-calf hem in lockstep (s1Step).
+// paper; legs and shoes walk below a mid-calf hem in lockstep (s1Step). TIER A (CRAFT §b): her, the ghosts and the
+// three bare outlines are the shot's subject (<Tier tier="subject">): the only full outline in the frame, one closed
+// 3.0 px line in a deep warm shade (authored at INK_PX.mid, the clean pen sets it). Behind the glass (frame 0 and the
+// loop underlay) her outline DRAWS ON as one stroke from S1_DRAW.at, her fills pale until the flood. Light: her form
+// shade (the right, away from the sun) and her rim (her coat's left edge, the key side) here; the ground shadows
+// V2S1_light.
 import React, {createContext, useContext} from 'react';
 import {useTime, clamp} from '../../lib/time';
 import * as MAP from '../world/map';
-import {CM} from '../palette';
+import {CM, INK_PX} from '../palette';
+import {Tier} from '../../lib/tier';
+import {FormShade, Rim} from '../../lib/light';
+import {S1LobbyContact} from './V2S1_light';
 import {HER} from '../kit/cast/Her';
 import {drawn} from '../kit/cast/gait';
-import {C, s1Step, s1HerXAt, HER_COAT_AT} from './V2S1_clock';
-import {FigSpec, RowFigure} from './V2S1_row_fig';
+import {C, s1Step, s1HerXAt, HER_COAT_AT, S1_DRAW} from './V2S1_clock';
+import {FigSpec, RowFigure, figParts, FIG_H} from './V2S1_row_fig';
+import {XG, mat} from '../../lib/xf';
 
 // ---------------------------------------------------------------- the looks (one model sheet)
 
@@ -60,9 +69,10 @@ export const ghostStride = (age: number) => (age >= 5 ? 0.78 : age >= 4 ? 0.9 : 
 /** O1-O3: ink only, no fill, no age cue. */
 export const OUTLINE_SPEC: FigSpec = {kind: 'outline'};
 
-/** Ink on screen: her 3.4 (130-240 px), the ghosts and outlines 2.2 (K1 ghostInkPx). */
-const HER_INK = 3.4;
-const GHOST_INK = CM.ghostInkPx;
+/** Ink as authored (the clean pen's subject tier makes it 3.0 px on screen): ONE weight for the whole row (line weight
+ *  by depth is retired: DIRECTION "Retired"). */
+const HER_INK = INK_PX.mid;
+const GHOST_INK = INK_PX.mid;
 
 /** Her look back at W over her right shoulder (5.59, 0.22 s). */
 const lookBack = (t: number) => {
@@ -83,8 +93,25 @@ export const S1Row: React.FC = () => {
   // far members first (the bend's far end is screen-left): they sit behind
   members.sort((a, b) => a.p.x - b.p.x);
   const her = poses[0];
+  const hx = s1HerXAt(t);
+  const herFig = <RowFigure seed="s1row/her" spec={herSpec(CM.hero)} x={hx} y={her.feetY} h={her.h} step={step} turn={lookBack(t)} inkPx={HER_INK} />;
+  const herC: [number, number] = [hx, her.feetY - her.h / 2];
+  const herSize: [number, number] = [her.h * 0.36, her.h];
+  // the rim on her COAT's left edge only (CRAFT §d.8: the subject's key side; conform_L1 §7): the coat part alone
+  const coatD = figParts(herSpec(CM.hero), {step: Math.round(step * 100) / 100, stride: 1, turn: Math.round(lookBack(t) * 50) / 50})
+    .filter((q) => q.d && ['coat', 'armN', 'collar'].includes(q.k))
+    .map((q) => q.d)
+    .join('');
+  const sc = her.h / FIG_H;
+  const coatEl = coatD ? (
+    <XG m={mat.compose(mat.translate(hx, her.feetY), mat.scale(sc, sc))}>
+      <path d={coatD} fill="#FFFFFF" />
+    </XG>
+  ) : (
+    herFig
+  );
   return (
-    <>
+    <Tier tier="subject">
       {members.map(({m, p}) => {
         const age = m.kind === 'ghost' ? Number(m.id.slice(1)) : 0;
         return (
@@ -104,8 +131,10 @@ export const S1Row: React.FC = () => {
           />
         );
       })}
-      <RowFigure seed="s1row/her" spec={herSpec(CM.hero)} x={s1HerXAt(t)} y={her.feetY} h={her.h} step={step} turn={lookBack(t)} inkPx={HER_INK} />
-    </>
+      {herFig}
+      <FormShade of={herFig} c={herC} size={herSize} />
+      <Rim of={coatEl} c={[hx, her.feetY - her.h * 0.45]} size={[her.h * 0.34, her.h * 0.6]} width={3.5} cover={0.35} />
+    </Tier>
   );
 };
 
@@ -114,15 +143,13 @@ export const S1Row: React.FC = () => {
 export const S1HerBehindDoor: React.FC = () => {
   const t = useTime();
   if (t >= C.steppingOut) return null;
+  const x = s1HerXAt(t);
+  const y = MAP.S1_HER_STEP_OUT.feetFrom;
+  const h = MAP.S1_SHEET.herHAtFacade;
   return (
-    <RowFigure
-      seed="s1row/her"
-      spec={herSpec(t < HER_COAT_AT ? CM.white : CM.hero)}
-      x={s1HerXAt(t)}
-      y={MAP.S1_HER_STEP_OUT.feetFrom}
-      h={MAP.S1_SHEET.herHAtFacade}
-      step={s1Step(t)}
-      inkPx={HER_INK}
-    />
+    <Tier tier="subject">
+      <S1LobbyContact x={x} y={y} h={h} />
+      <RowFigure seed="s1row/her" spec={herSpec(t < HER_COAT_AT ? CM.white : CM.hero)} x={x} y={y} h={h} step={s1Step(t)} inkPx={HER_INK} draw={S1_DRAW} />
+    </Tier>
   );
 };

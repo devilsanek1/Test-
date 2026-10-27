@@ -12,6 +12,7 @@ import {useTime, clamp, ease} from '../../lib/time';
 import {Fill} from '../../lib/Fill';
 import {Ink} from '../../lib/Ink';
 import {CM} from '../palette';
+import {floodAt} from './V2S1_clock';
 import {Seated, castRow, pin} from '../kit/cast';
 import type {TraitOverrides} from '../kit/cast';
 
@@ -52,7 +53,7 @@ export const LowRow: React.FC = () => {
   return (
     <>
       {LOW.map((s, i) => (
-        <Seated key={i} x={s.x} y={LOW_SEAT_Y} h={s.h} seed={`v2s1/low2/${i}`} traits={{...pin(traits[i]), ...s.traits}} turn={keyed(t, s.turns)} lean={s.lean} at={-0.22 + i * 0.02} />
+        <Seated key={i} x={s.x} y={LOW_SEAT_Y} h={s.h} seed={`v2s1/low2/${i}`} traits={{...pin(traits[i]), ...s.traits}} turn={keyed(t, s.turns)} lean={s.lean} ink={0} />
       ))}
     </>
   );
@@ -89,7 +90,7 @@ const Tote: React.FC = () => {
     <>
       <Fill d={poly([[x - 24, y - 50], [x + 24, y - 50], [x + 27, y], [x - 27, y]])} color={CM.coatOat} seed="bank/tote" offset={false} />
       <Fill d={poly([[x - 25, y - 30], [x + 25, y - 30], [x + 26, y - 22], [x - 26, y - 22]])} color={CM.sage} seed="bank/toteBand" offset={false} />
-      <Ink d={`M${x - 13} ${y - 50}Q${x} ${y - 74} ${x + 13} ${y - 50}`} width={2} color={CM.line} thing seed="bank/toteH" />
+      <Ink d={`M${x - 13} ${y - 50}Q${x} ${y - 74} ${x + 13} ${y - 50}`} width={2} color={CM.line} thing at={floodAt(x, y)} seed="bank/toteH" />
     </>
   );
 };
@@ -157,9 +158,9 @@ const Bike: React.FC = () => {
   const frame = `M${ax} ${wy}L${crank[0]} ${crank[1]}L${seat[0]} ${seat[1] + 14}L${ax} ${wy}M${crank[0]} ${crank[1]}L${bar[0] - 14} ${bar[1] + 30}L${seat[0]} ${seat[1] + 14}M${bar[0] - 14} ${bar[1] + 30}L${bx} ${wy}`;
   return (
     <>
-      <Ink d={wheel(ax) + wheel(bx)} width={3} color={CM.line} thing seed="bank/bikeW" />
-      <Ink d={frame} width={4} color={CM.brickDeep} thing tone={CM.brickDeep} seed="bank/bikeF" />
-      <Ink d={`M${bar[0] - 30} ${bar[1]}L${bar[0] + 16} ${bar[1] - 6}`} width={3.4} color={CM.line} thing seed="bank/bikeBar" />
+      <Ink d={wheel(ax) + wheel(bx)} width={3} color={CM.line} thing at={floodAt(1000, 1800)} seed="bank/bikeW" />
+      <Ink d={frame} width={4} color={CM.brickDeep} thing tone={CM.brickDeep} at={floodAt(1000, 1800)} seed="bank/bikeF" />
+      <Ink d={`M${bar[0] - 30} ${bar[1]}L${bar[0] + 16} ${bar[1] - 6}`} width={3.4} color={CM.line} thing at={floodAt(1000, 1800)} seed="bank/bikeBar" />
       <Fill d={ell(seat[0], seat[1], 26, 8)} color={CM.coatSlate} seed="bank/bikeSeat" offset={false} />
       <Fill d={ell(crank[0], crank[1], 14, 14)} color={CM.brickDeep} seed="bank/bikeCrank" offset={false} />
     </>
@@ -282,7 +283,7 @@ const Picnic: React.FC = () => {
     <>
       {[CM.paper, CM.box, CM.paper, CM.box, CM.paper].map((c, k) => stripe(k, c))}
       <Fill d={`M${bx - 32} ${by - 30}L${bx + 32} ${by - 30}L${bx + 26} ${by}L${bx - 26} ${by}Z`} color={CM.leafGold} seed="bank/basket" offset={false} />
-      <Ink d={`M${bx - 22} ${by - 30}Q${bx} ${by - 62} ${bx + 22} ${by - 30}`} width={3} color={CM.line} thing seed="bank/basketH" />
+      <Ink d={`M${bx - 22} ${by - 30}Q${bx} ${by - 62} ${bx + 22} ${by - 30}`} width={3} color={CM.line} thing at={floodAt(bx, by)} seed="bank/basketH" />
       <Fill d={ell(bx + 52, by - 6, 9, 9) + ell(bx + 68, by - 4, 8, 8)} color={CM.brick} seed="bank/apples" offset={false} />
     </>
   );

@@ -2,10 +2,9 @@
 // flat depth steps (a gasholder frame and cool stone blocks far, light brick and stucco terraces, then brick terrace
 // backs with chimney stacks, pots, aerials and sash windows; tops y ~790), SUN0 (200, 690) r 80 ON TOP of them (ref 1's
 // sun), the road bridge (deck y ~960: an iron railing, a stone string course, brick spandrels and a segmental arch)
-// with its traffic seen through the railing: the f15 cyclist riding WEST (out from behind the wing's corner ~0.25), a
-// double-decker crossing on 1.10; the five birds on the railing that lift at 1.40 and wheel west ACROSS THE SUN; the six
-// birds on the far roofs that lift on "life" (4.98). Far planes get NO ink in colour (STYLE section 3): their lines are
-// an f0-only underdrawing that vanishes on the frame the flood reaches each building (V2S1_set_core Under).
+// with its traffic seen through the railing: a double-decker crossing once on 1.10; the five birds on the railing that
+// lift at 1.40 and wheel west ACROSS THE SUN. Tier C (V2S1_set wraps it in <Tier tier="environment">): flat 2-tone
+// shapes, no line; frame 0 shows them as pale shapes (the Look cascade's `pale`), no underdrawing.
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
@@ -15,7 +14,7 @@ import {Batch, P, Pt, rng, ovalPath, lobes, lerp, domePath, r1} from '../kit/can
 import {litAt} from '../kit/canal/life';
 import {Person} from '../kit/cast';
 import * as MAP from '../world/map';
-import {CellPaint, Under, UnderPaint, barPath, ringPath} from './V2S1_set_core';
+import {CellPaint, Under, barPath, ringPath, S1_IRON} from './V2S1_set_core';
 import {floodAt} from './V2S1_clock';
 
 const S = MAP.S1_SHEET;
@@ -61,7 +60,7 @@ const MID: Bld[] = [
 const NEAR: Bld[] = [
   {x0: -30, x1: 62, top: 814, wall: CM.brick, roof: 'pitch', roofCol: CM.brickDeep, stacks: [[40, 26]], aerial: [40], win: {w: 11, h: 17, gx: 24, gy: 30}},
   {x0: 62, x1: 152, top: 808, wall: CM.stucco, roof: 'mansard', stacks: [[84, 24], [138, 22]], win: {w: 11, h: 17, gx: 25, gy: 30}},
-  {x0: 152, x1: 222, top: 826, wall: CM.brickDeep, roof: 'flat', tank: true, win: {w: 12, h: 18, gx: 23, gy: 30, arch: true}},
+  {x0: 152, x1: 222, top: 826, wall: CM.brick, roof: 'flat', tank: true, win: {w: 12, h: 18, gx: 23, gy: 30, arch: true}},
   {x0: 222, x1: 292, top: 818, wall: CM.brickLight, roof: 'pitch', roofCol: CM.brick, stacks: [[248, 26]], aerial: [248], win: {w: 11, h: 17, gx: 24, gy: 30}},
   {x0: 292, x1: 356, top: 830, wall: CM.brick, roof: 'flat', garden: true, win: {w: 11, h: 17, gx: 22, gy: 30}},
 ];
@@ -91,7 +90,7 @@ function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 5
     for (let k = 0; k < nd; k++) {
       const dx = x0 + w * 0.14 + (k * (w * 0.72)) / Math.max(1, nd - 1 || 1) - (nd === 1 ? -w * 0.22 : 0);
       b.rect(CM.stucco, dx - 1, top - rh * 0.78, 11, rh * 0.62);
-      b.rect(CM.paneUnlit, dx + 1.5, top - rh * 0.66, 6, rh * 0.44);
+      b.rect(S1_IRON, dx + 1.5, top - rh * 0.66, 6, rh * 0.44);
       sil += rectInk(dx - 1, top - rh * 0.78, 11, rh * 0.62, {seed: `s1farD/${key}${k}`, over: 'none', open: 0.3});
     }
     sil += poly([[x0 - 1, top], [x0 + w * 0.08, top - rh], [x1 - w * 0.08, top - rh], [x1 + 1, top]], {seed: `s1farM/${key}`, over: 'small'});
@@ -112,7 +111,7 @@ function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 5
     b.rect(o.wall === CM.brickLight ? CM.brick : CM.brickLight, sx - sw / 2, st, sw, base - st + 1);
     b.rect(CM.stoneShade, sx - sw / 2 - 1.5, st, sw + 3, 2.5);
     const pots = Math.max(2, Math.round(sw / 5));
-    for (let k = 0; k < pots; k++) b.rect(k % 2 ? CM.brickDeep : CM.leafRust, sx - sw / 2 + 1 + (k * (sw - 2)) / pots, st - 5, Math.max(2.4, (sw - 2) / pots - 1.4), 5);
+    for (let k = 0; k < pots; k++) b.rect(k % 2 ? CM.brick : CM.brickLight, sx - sw / 2 + 1 + (k * (sw - 2)) / pots, st - 5, Math.max(2.4, (sw - 2) / pots - 1.4), 5);
     sil += rectInk(sx - sw / 2, st, sw, base - st, {seed: `s1farS/${key}${sx}`, over: 'none', edges: 'tlr'});
     for (let k = 0; k < pots; k++) {
       const px = sx - sw / 2 + 1 + (k * (sw - 2)) / pots + 1;
@@ -123,14 +122,14 @@ function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 5
     const stack = (o.stacks ?? []).find(([sx]) => sx === ax);
     const base = (o.roof === 'pitch' || o.roof === 'mansard' ? top - rh * 0.55 : top - 4) - (stack ? stack[1] : 0) - 5;
     const at = Math.max(ceil + 4, base - 20);
-    b.fill(CM.shadeCool, barPath([ax, base], [ax, at], 1.6));
-    b.fill(CM.shadeCool, barPath([ax - 8, at + 4], [ax + 8, at + 4], 1.4));
-    b.fill(CM.shadeCool, barPath([ax - 5, at + 9], [ax + 5, at + 9], 1.4));
+    b.fill(S1_IRON, barPath([ax, base], [ax, at], 1.6));
+    b.fill(S1_IRON, barPath([ax - 8, at + 4], [ax + 8, at + 4], 1.4));
+    b.fill(S1_IRON, barPath([ax - 5, at + 9], [ax + 5, at + 9], 1.4));
     sil += `M${P(ax, base)}L${P(ax, at)}M${P(ax - 8, at + 4)}L${P(ax + 8, at + 4)}`;
   }
   if (o.tank) {
     b.rect(CM.stoneShade, x0 + w * 0.6, top - 20, 18, 16);
-    b.rect(CM.shadeCool, x0 + w * 0.6 - 1, top - 22, 20, 3);
+    b.rect(S1_IRON, x0 + w * 0.6 - 1, top - 22, 20, 3);
     sil += rectInk(x0 + w * 0.6, top - 20, 18, 16, {seed: `s1farT/${key}`, over: 'none', edges: 'tlr'});
   }
   if (o.garden) {
@@ -180,23 +179,19 @@ const FarRoofs: React.FC = () => {
   const n = wins.length;
   wins.forEach(({w, row, bld, k}, i) => {
     const forced = row === FAR_LIGHT.row && bld === FAR_LIGHT.bld && k === FAR_LIGHT.k;
-    const on = forced ? t >= FAR_LIGHT.at : litAt(t, 's1farwin', i, n, {litFrac: 0.2, gap: [0.7, 1.6]});
+    // the life budget: ONE window switch at a time, >= 2 s apart in the whole shot (this one 1.80, the wing's 3.90):
+    // every other far window holds its frame-0 state
+    const on = forced ? t >= FAR_LIGHT.at : litAt(0, 's1farwin', i, n, {litFrac: 0.2, gap: [0.7, 1.6]});
     const v = rng(`s1farwc/${w.key}`).next();
-    const col = on ? CM.lamp : v < 0.5 ? CM.paneUnlit : v < 0.82 ? CM.glass : CM.shadeCool;
+    const col = on ? CM.lamp : v < 0.5 ? S1_IRON : v < 0.82 ? CM.glass : CM.stoneShade;
     if (w.arch) wb.fill(col, `M${P(w.x, w.y + w.h)}L${P(w.x, w.y + w.w / 2)}A${r1(w.w / 2)} ${r1(w.w / 2)} 0 0 1 ${P(w.x + w.w, w.y + w.w / 2)}L${P(w.x + w.w, w.y + w.h)}Z`);
     else wb.rect(col, w.x, w.y, w.w, w.h);
-    if (row === 'near' && !on) {
-      // the sash bar + a sky glint on the upper sash
-      wb.rect(CM.stucco, w.x - 1, w.y + w.h * 0.48, w.w + 2, 1.6);
-      if (v < 0.5) wb.rect(CM.glass, w.x, w.y, w.w, w.h * 0.3);
-    }
     if (row === 'near') wb.rect(CM.limestone, w.x - 1.5, w.y + w.h, w.w + 3, 2.5);
   });
   return (
     <>
       <CellPaint b={stat} seed="s1far/stat" cell={70} misreg={0.6} />
       <CellPaint b={wb} seed="s1far/win" cell={70} misreg={0} live />
-      <UnderPaint u={under} seed="s1far/under" />
     </>
   );
 };
@@ -260,6 +255,17 @@ const archPath = (grow = 0, close = true) => {
   return close ? d + `L${P(A.cx + half, BRIDGE.base)}Z` : d;
 };
 
+/** The arch opening (closed), cut at y <= yMax: what shows through the bridge (the far jogger is clipped to it). */
+export const s1ArchOpening = (yMax: number): string => {
+  const half = A.half;
+  let d = `M${P(A.cx - half, yMax)}`;
+  for (let k = 0; k <= 24; k++) {
+    const x = A.cx - half + (2 * half * k) / 24;
+    d += `L${P(x, Math.min(yMax, archY(x) ?? A.spring))}`;
+  }
+  return d + `L${P(A.cx + half, yMax)}Z`;
+};
+
 /** The bridge body (behind the traffic): the string course, spandrels, the arch and what shows through it. */
 function bridgeBody(): {b: Batch; u: Under} {
   const b = new Batch();
@@ -287,18 +293,6 @@ function bridgeBody(): {b: Batch; u: Under} {
   u.add(110, 990, line(x0, deck, x1, deck, {seed: 's1br/deck', over: 'small'}) + line(x0, course, x1, course, {seed: 's1br/course', over: 'small'}), INK_PX.far);
   u.add(110, 1010, archPath(0, false) + archPath(11, false) + `M${P(A.cx - 7, A.crown - 13)}L${P(A.cx - 5, A.crown + 2)}M${P(A.cx + 7, A.crown - 13)}L${P(A.cx + 5, A.crown + 2)}`, INK_PX.far);
   u.add(275, 1010, line(268, course, 268, base, {seed: 's1br/pil', over: 'none'}), INK_PX.hair);
-  // a few brick coursing marks and the water line under the arch
-  let tk = '';
-  const r = rng('s1br/ticks');
-  for (let k = 0; k < 14; k++) {
-    const x = r.range(x0 + 20, x1 - 20);
-    const y = r.range(course + 8, base - 8);
-    const ay = archY(x, 14);
-    if (ay !== null && y > ay - 4) continue;
-    b.rect(CM.brickDeep, x, y, 7, 2);
-    tk += `M${P(x, y)}L${P(x + 7, y)}`;
-  }
-  u.add(110, 1000, tk + line(A.cx - A.half + 6, base - 14, A.cx + A.half - 6, base - 14, {seed: 's1br/wl', over: 'none'}), INK_PX.hair);
   return {b, u};
 }
 
@@ -308,7 +302,7 @@ function bridgeRail(): {b: Batch; u: Under} {
   const b = new Batch();
   const u = new Under();
   const {x0, x1, railTop, deck} = BRIDGE;
-  const iron = CM.shadeCool;
+  const iron = S1_IRON;
   b.rect(iron, x0, railTop, x1 - x0, 3);
   b.rect(iron, x0, deck - 4, x1 - x0, 2.4);
   let bars = '';
@@ -336,10 +330,6 @@ function bridgeRail(): {b: Batch; u: Under} {
 
 // ---------------------------------------------------------------- the traffic on the deck (seen through the railing)
 
-/** The f15 cyclist: out from behind the wing's west corner ~0.25, riding WEST at 150 px/s (~2.7 body heights/s). */
-export const S1_CYCLIST = {x0: 330, at: 0.25, speed: 150, h: 55} as const;
-export const s1CyclistX = (t: number) => S1_CYCLIST.x0 - S1_CYCLIST.speed * (t - S1_CYCLIST.at);
-/** The double-decker: crossing EAST on the far lane, centred x 120 on 1.10 (TREATMENT f66), behind the wing by ~2.3. */
 export const S1_BUS = {cx: 120, at: 1.1, speed: 260, h: 84, len: 200} as const;
 export const s1BusX = (t: number) => S1_BUS.cx + S1_BUS.speed * (t - S1_BUS.at);
 
@@ -365,49 +355,17 @@ const Bus: React.FC = () => {
   }
   b.rect(CM.box, xl + L - 24, y0 + 5, 18, 8);
   b.rect(CM.brickDeep, xl, y1 - 10, L, 3);
-  for (const wx of [xl + 30, xl + L - 40]) b.fill(CM.anchor, ovalPath(wx, y1 - 4, 9, 9));
+  for (const wx of [xl + 30, xl + L - 40]) b.fill(CM.coatSlate, ovalPath(wx, y1 - 4, 9, 9));
   return <CellPaint b={b} seed="s1bus" cell={1000} misreg={0} live />;
-};
-
-/** The cyclist: K4's rider in profile, riding left (west); on the near lane of the deck. */
-const Cyclist: React.FC = () => {
-  const t = useTime();
-  const x = s1CyclistX(t);
-  if (x > 380 || x < -60) return null;
-  // a far figure (55 px) is fill only in colour (STYLE section 4); its lines only in the bare-line state. K4's bike is ink
-  // only (wheels + frame), so in colour the bike is drawn here as thin FILLS on K4's own cycle geometry (body.ts
-  // cycleParts, drawn facing left, H = h exact): slate tyres, frame and bar.
-  const bare = t < floodAt(x, BRIDGE.deck - 30);
-  const H = S1_CYCLIST.h;
-  const y = BRIDGE.deck;
-  const wr = H * 0.2;
-  const wb = H * 0.62;
-  const at = (dx: number, dy: number): Pt => [x + dx, y + dy];
-  const bb = at(H * 0.04, -wr * 0.95);
-  const seat = at(H * 0.12, -H * 0.58);
-  const head = at(-H * 0.18, -H * 0.56);
-  const bar = at(-H * 0.22, -H * 0.66);
-  const b = new Batch();
-  if (!bare) {
-    for (const wx of [-wb / 2, wb / 2]) b.fill(CM.paneUnlit, ringPath(x + wx, y - wr, wr, wr, 1.9));
-    const fw = 1.7;
-    for (const [a, c] of [[at(wb / 2, -wr), bb], [bb, seat], [bb, head], [head, bar], [seat, at(-H * 0.17, -H * 0.56)], [head, at(-wb / 2, -wr)]] as [Pt, Pt][]) b.fill(CM.coatSlate, barPath(a, c, fw));
-    b.fill(CM.paneUnlit, barPath([bar[0] - H * 0.04, bar[1] - H * 0.01], [bar[0] + H * 0.04, bar[1] + H * 0.01], 1.8));
-  }
-  return (
-    <>
-      <CellPaint b={b} seed="s1cycbike" cell={1000} misreg={0} live />
-      <Person x={x} y={y} h={H} exact seed="s1/cyclist" pose="cycle" view="profile" pedal={1.4} ink={bare ? INK_PX.hair : 0} traits={{hair: 'cap', coat: CM.coatMustard, trousers: CM.coatSlate, acc: 'backpack', accColor: CM.coatSlate, hatColor: CM.brick}} />
-    </>
-  );
 };
 
 // ---------------------------------------------------------------- birds
 
 type BirdSpec = {x: number; y: number; delay: number; dur: number; c1: Pt; c2: Pt; size: number; ph: number};
 
-/** The five on the bridge railing (lift 1.40: the bus and the cyclist pass them) and the six on the far roofs (lift
- *  on "life" 4.98). Plum, 30-40 px wingspan on the railing set; each wheels west on a curve, never above y 580. */
+/** The five on the bridge railing: they lift at 1.40 (her step out; the bus has just passed them) and wheel west on a
+ *  curve across the sun, never above y 600. Small and far, slate (never the plum anchor). The six on the far roofs that
+ *  lifted on "life" are cut (the hit at 4.98 is the row's). */
 const RAIL_BIRDS: BirdSpec[] = [
   // the quadratic's midpoint (u 0.5) = 0.25 perch + 0.5 c1 + 0.25 c2 lands on the disc (200, 690): they wheel ACROSS it
   {x: 150, y: BRIDGE.railTop, delay: 0.0, dur: 1.55, c1: [318, 598], c2: [-170, 612], size: 18, ph: 0.3},
@@ -416,16 +374,10 @@ const RAIL_BIRDS: BirdSpec[] = [
   {x: 197, y: BRIDGE.railTop, delay: 0.11, dur: 1.82, c1: [340, 624], c2: [-140, 648], size: 16, ph: 4.4},
   {x: 214, y: BRIDGE.railTop, delay: 0.16, dur: 1.75, c1: [326, 604], c2: [-160, 622], size: 18, ph: 5.2},
 ];
-const ROOF_BIRDS: BirdSpec[] = [
-  {x: 44, y: NEAR[0].top - 30 * 0.75, delay: 0.0, dur: 1.9, c1: [96, 690], c2: [-210, 612], size: 12, ph: 0.6},
-  {x: 88, y: NEAR[1].top - 24, delay: 0.08, dur: 2.0, c1: [150, 700], c2: [-180, 628], size: 11, ph: 2.2},
-  {x: 120, y: NEAR[1].top - 24, delay: 0.04, dur: 1.85, c1: [182, 684], c2: [-170, 604], size: 12, ph: 3.3},
-  {x: 175, y: NEAR[2].top - 4, delay: 0.14, dur: 2.1, c1: [236, 706], c2: [-150, 640], size: 11, ph: 4.1},
-  {x: 205, y: NEAR[2].top - 4, delay: 0.1, dur: 1.95, c1: [262, 690], c2: [-160, 618], size: 12, ph: 5.0},
-  {x: 250, y: NEAR[3].top - 22, delay: 0.19, dur: 2.05, c1: [300, 712], c2: [-140, 632], size: 11, ph: 0.9},
-];
+/** Birds are slate (tier C), never the plum anchor (the anchor is W's alone). */
+const BIRD = CM.coatSlate;
 
-function birdsInto(b: Batch, t: number, birds: BirdSpec[], liftAt: number, ceil = 584) {
+function birdsInto(b: Batch, t: number, birds: BirdSpec[], liftAt: number, ceil = 600) {
   for (const s of birds) {
     const sz = s.size;
     const t0 = liftAt + s.delay;
@@ -434,9 +386,9 @@ function birdsInto(b: Batch, t: number, birds: BirdSpec[], liftAt: number, ceil 
       const peck = Math.max(0, Math.sin(t * 1.3 + s.ph * 3) - 0.85) * 5;
       const by = s.y - sz * 0.3;
       const face = s.ph > 3 ? 1 : -1;
-      b.fill(CM.anchor, ovalPath(s.x, by, sz * 0.38, sz * 0.24));
-      b.fill(CM.anchor, ovalPath(s.x + face * sz * 0.32, by - sz * 0.2 + peck * 0.3, sz * 0.15, sz * 0.14));
-      b.fill(CM.anchor, `M${P(s.x - face * sz * 0.28, by - sz * 0.02)}L${P(s.x - face * sz * 0.62, by + sz * 0.1)}L${P(s.x - face * sz * 0.28, by + sz * 0.12)}Z`);
+      b.fill(BIRD, ovalPath(s.x, by, sz * 0.38, sz * 0.24));
+      b.fill(BIRD, ovalPath(s.x + face * sz * 0.32, by - sz * 0.2 + peck * 0.3, sz * 0.15, sz * 0.14));
+      b.fill(BIRD, `M${P(s.x - face * sz * 0.28, by - sz * 0.02)}L${P(s.x - face * sz * 0.62, by + sz * 0.1)}L${P(s.x - face * sz * 0.28, by + sz * 0.12)}Z`);
       continue;
     }
     const tau = t - t0;
@@ -461,9 +413,9 @@ function birdsInto(b: Batch, t: number, birds: BirdSpec[], liftAt: number, ceil 
     // body (a short lens along the heading) + two wings swinging up and down + a tail
     const hx = Math.cos(tilt) * dir;
     const hy = Math.sin(tilt);
-    b.fill(CM.anchor, `M${P(bx - hx * sz * 0.45, by - hy * sz * 0.45)}Q${P(bx - hy * sz * 0.2, by + hx * dir * sz * 0.2)} ${P(bx + hx * sz * 0.48, by + hy * sz * 0.48)}Q${P(bx + hy * sz * 0.2, by - hx * dir * sz * 0.2)} ${P(bx - hx * sz * 0.45, by - hy * sz * 0.45)}Z`);
-    b.fill(CM.anchor, `M${P(bx - sz * 0.12, by)}Q${P(bx - span * 0.5, by - wy - sz * 0.25)} ${P(bx - span, by - wy)}L${P(bx - span * 0.55, by - wy * 0.4 + sz * 0.08)}L${P(bx + sz * 0.06, by + sz * 0.08)}Z`);
-    b.fill(CM.anchor, `M${P(bx + sz * 0.12, by)}Q${P(bx + span * 0.5, by - wy - sz * 0.25)} ${P(bx + span, by - wy)}L${P(bx + span * 0.55, by - wy * 0.4 + sz * 0.08)}L${P(bx - sz * 0.06, by + sz * 0.08)}Z`);
+    b.fill(BIRD, `M${P(bx - hx * sz * 0.45, by - hy * sz * 0.45)}Q${P(bx - hy * sz * 0.2, by + hx * dir * sz * 0.2)} ${P(bx + hx * sz * 0.48, by + hy * sz * 0.48)}Q${P(bx + hy * sz * 0.2, by - hx * dir * sz * 0.2)} ${P(bx - hx * sz * 0.45, by - hy * sz * 0.45)}Z`);
+    b.fill(BIRD, `M${P(bx - sz * 0.12, by)}Q${P(bx - span * 0.5, by - wy - sz * 0.25)} ${P(bx - span, by - wy)}L${P(bx - span * 0.55, by - wy * 0.4 + sz * 0.08)}L${P(bx + sz * 0.06, by + sz * 0.08)}Z`);
+    b.fill(BIRD, `M${P(bx + sz * 0.12, by)}Q${P(bx + span * 0.5, by - wy - sz * 0.25)} ${P(bx + span, by - wy)}L${P(bx + span * 0.55, by - wy * 0.4 + sz * 0.08)}L${P(bx - sz * 0.06, by + sz * 0.08)}Z`);
   }
 }
 
@@ -473,13 +425,6 @@ const RailBirds: React.FC = () => {
   birdsInto(b, t, RAIL_BIRDS, MAP.S1_CLOCK.birdsLiftBridge);
   return <CellPaint b={b} seed="s1railbirds" cell={1000} misreg={0} live />;
 };
-const RoofBirds: React.FC = () => {
-  const t = useTime();
-  const b = new Batch();
-  birdsInto(b, t, ROOF_BIRDS, MAP.S1_CLOCK.life);
-  return <CellPaint b={b} seed="s1roofbirds" cell={1000} misreg={0} live />;
-};
-
 // ---------------------------------------------------------------- the west gap
 
 export const S1WestGap: React.FC = () => {
@@ -488,14 +433,10 @@ export const S1WestGap: React.FC = () => {
   return (
     <>
       <FarRoofs />
-      <RoofBirds />
       <SunDisc />
       <CellPaint b={body.b} seed="s1bridge/body" cell={90} misreg={0.7} />
-      <UnderPaint u={body.u} seed="s1bridge/bodyU" />
       <Bus />
-      <Cyclist />
       <CellPaint b={rail.b} seed="s1bridge/rail" cell={90} misreg={0} />
-      <UnderPaint u={rail.u} seed="s1bridge/railU" />
       <RailBirds />
     </>
   );

@@ -12,7 +12,8 @@ positions; people, ghosts, Pip and boards as kit placeholders):
 ## How lanes use it
 - **Sets** (`sets.tsx`): `S1Set`, `S2Set`, `S4Set`, `S8Set` are full layer stacks drawn at the shot's pose (zoom 1.00,
   screen px = world px). Put them inside your `<World>` / camera; story events are props with the TREATMENT's defaults
-  (S1: `lampOffAt` 0.40, `lettersAt` 0.97, `birdsBridgeAt` 1.40, `birdsRoofsAt` 4.98, `busAt`, `duckLandsAt`; S2:
+  (S1: `lampOffAt` 0.40, `lettersAt` 0.97, `birdsBridgeAt` 1.40, `birdsRoofsAt` 4.98 and `duckLandsAt` (both cut by the
+  conform: the 4.98 hit is the row's), `busAt`; S2:
   `staffCoolAt`, `story`, `boatAt`; S4: `dxFar/dxBacks/dxPath` per-plane truck offsets, `birdsAt`; S8: `dxHouse`,
   `dxNear` (pre-truck = map `S8.truck`), `wAt` (W lights), `lampRunAt` (the lamp + string-light run)). Lanes may
   instead compose the pieces below in their own `Layer`s.
@@ -33,8 +34,9 @@ positions; people, ghosts, Pip and boards as kit placeholders):
 | `WingS2`, `s2x/s2y/s2g/s2u` | wall.tsx | the receding wall: columns 0-2 on the map, then one-point toward VP (1400, 700); windows 150 px -> ~10 px; the stepped tiers (~380 tiny windows, one batch) at y >= 600 |
 | `TerraceRow`, `sashInto`, `doorInto`, `potsInto`, `terraceBacksInto` | terrace.tsx | two storeys + mansard (tops >= 600), her French window (teal frame, Juliet rail, blind up, lamp, `inside` slot for K4) and teal door on exact map rects; neighbours (window slots), balconies with string lights; rear elevations for S4 |
 | `Water`, `copingInto` | water.tsx | bank shade, broken reflections (`reflections`, `reflTop`), ripples drifting, glints switching, `wake` |
-| `Towpath` (+ `bend`), `Lamp` (`lightAt`, `pool`, `variant: 'near'`), `Railing`, `Bench`, `Bollard`, `Planter`, `Bike`, bins, drains, `Tree` | towpath.tsx | paving that is never flat, the coping and rings; heritage lamps with a 3-frame flicker on; a near swan-neck post whose arm leaves the frame (never crosses the band) |
-| `Steps`, `S1_STEPS`, `S1_SEATED` | steps.tsx | S1's bottom third: coping, landing, five treads, Pip's waterline bollard (map `S1_BOLLARD`), cups, bags, a bike; 14 seated slots in three rows (near busts 262-316, middle ~300 seated, low ~160) + a dog |
+| `Towpath` (+ `bend`), `Lamp` (`lightAt`, `pool`, `variant: 'near'`), `Railing`, `Bench`, `Bollard`, `Planter`, `Bike`, bins, drains, `Tree` | towpath.tsx | paving that is never flat, the coping and rings; heritage lamps with a 3-frame flicker on (drop it in S7's and S8's runs: each lamp switches on ONCE, flash-safe); a near swan-neck post whose arm leaves the frame (never crosses the band) |
+| `Steps`, `S1_STEPS`, `S1_SEATED` | steps.tsx | S1's bottom third: coping, landing, five treads, Pip's waterline bollard (map `S1_BOLLARD`), cups, bags, a bike; seated slots in three rows (since the conform only the low row on the landing by the water, ~60 px, is used: no
+  stranger's back in the foreground, DIRECTION rule 3) + a dog (at rest) |
 | `Narrowboat`, `boatInto`, `PerspBoat`, `CafeDeck`, `BoatWiper` | boat.tsx | slate hull + ONE plum gunwale stripe, sage / oat / brick cabins, portholes with curtains, flower panel, fenders, roof dressing (pots, bike, rope, can, mop), chimney + smoke; `hullK` for top-down views (S4); the cafe boat (`cafe`: hatch, bunting); S8's stern deck; S7's foreground wipe (`BoatWiper.half` set) |
 | `FarRoofs`, `roofRowInto`, `gasholderInto`, `viaductInto` + `ViaductTrain`, `roadBridgeInto` + `BridgeBus`, `warehouseInto` | far.tsx | seeded roof rows in flat depth steps (stone / light brick / brick), chimney stacks, pots, aerials, sash windows that switch; King's-Cross-like gasholder frames |
 | `Newsstand` | newsstand.tsx | S2's kiosk: awning, magazines, folded papers (no legible print), urn steam, a newsagent slot |

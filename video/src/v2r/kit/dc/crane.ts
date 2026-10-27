@@ -1,4 +1,4 @@
-// dc/crane.ts: the S5 pull-back crane rig for the Arlington planes (TREATMENT section 6; src/v3/film/kit/Pullback.tsx
+// dc/crane.ts: the S5 pull-back crane rig for the Arlington planes (TREATMENT section 6; src/lib/pullback.tsx
 // PullLayer / planeMat / cubicBezier; the K2 contract src/v2r/world/map.ts S5).
 //
 // ONE progress p on ONE ease, cubicBezier(0.35, 0.03, 0.45, 1.0) over 21.30-23.40 (p 0.15 at 21.75, 0.48 at 22.16,
@@ -22,7 +22,7 @@
 // the foreground sweeps left; the near slope sinks while the valley rises into view (crane + dolly).
 
 import {S5, S5_EASE, SUN1} from '../../world/map';
-import {cubicBezier, planeMat, boxMat, startMat, planeScale, applyMat, matScale, planeSpeed, type PullPlane, type PullBox} from '../../../v3/film/kit/Pullback';
+import {cubicBezier, planeMat, boxMat, startMat, planeScale, applyMat, matScale, planeSpeed, type PullPlane, type PullBox} from '../../../lib/pullback';
 import {mat, type Mat} from '../../../lib/xf';
 import type {Pt} from '../../../lib/sketch';
 import {VISTA} from './vista';
