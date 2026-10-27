@@ -31,7 +31,7 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   Owner: "let me know how to setup the elevenlabs key - lets actually do it here" -> steps given: a new restricted key
   (Text to Speech + Voices read, credit limit), delete the pasted one, store it as the environment's network secret
   `ELEVENLABS_API_KEY`; a new session (a helper in the same environment) sees it.
-- 2026-10-27 ~23:15 UTC: the owner pasted the ElevenLabs key they had created before ("this is the key i already
+- 2026-10-27 ~22:50 UTC: the owner pasted the ElevenLabs key they had created before ("this is the key i already
   created before ...") -> not repeated, filed or put in any prompt; the chat export's redaction
   (`context/scratchpad_tools/export_context.py`) missed a bare 64-hex string, so it now redacts hex runs of 48+
   characters. The API showed it was the key's ID, not the key (`api_key_id_used_as_api_key`: keys start with `sk_` and
@@ -39,6 +39,6 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   setup note. Owner: "its fine if it works only in this chat" -> the voice step may use a key in this session only; the
   owner rotates the key (or makes a new one) to get the `sk_...` value; the recommended home is the environment's
   network secret `ELEVENLABS_API_KEY` (a helper session in the same environment sees it).
-- 2026-10-27 ~23:30 UTC: "make sure to commit the progress periodically if we get stopped on the usage limits" ->
+- 2026-10-27 ~22:55 UTC: "make sure to commit the progress periodically if we get stopped on the usage limits" ->
   `video/scripts/autocheckpoint.sh` runs in the background on v4's paths (a commit and push every 10 minutes when they
   changed), on top of a commit after every agent; agents write their output file early. -> rule: Process (limits).

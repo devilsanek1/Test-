@@ -10,6 +10,9 @@ and `video/docs/PIPELINE_V2.md`.
   earlier v4 branch `claude/tender-bardeen-j7duak` is merged into it, with `video-production` as of 22:30 UTC). Not yet
   merged into `video-production`: ask the owner before pushing there.
 - The earlier session (G0, the pause): https://claude.ai/code/session_014PwCXHBSouhcawFp12X9sT.
+- Checkpoints: a commit after every agent, plus `video/scripts/autocheckpoint.sh claude/busy-lovelace-83r39e video/docs/v4`
+  in the background (every 10 minutes when v4's files changed; restart it after a session restart, and add v4's
+  `public/`, `assets/` and `src/` paths once those exist).
 
 ## Status by gate
 | Gate | Status | File |
