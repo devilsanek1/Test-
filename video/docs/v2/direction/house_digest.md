@@ -72,9 +72,11 @@ stays the look"); the approved density bar `deliverables/v3/v3_g5b_pilot.mp4` (L
   round every silhouette, never on shadows, sky, ground or far things (PB Texture; PAL "Texture and lines"; CS 3b.7).
 - **Fills** (SB §4): flat; no gradient, blur, glow, haze, bloom or opacity (CG "Not for us"); misregistered 2-5 px off the
   ink (one offset per object); windows 40-70 % partly filled; shade = a flat polygon one step darker; one light direction.
-- **People** (SB §6; LD §4): back view or rear 3/4: head in the hair colour, tombstone torso, one accessory each, neighbours
-  never sharing hair and coat colour; faces only in a protagonist's one face beat; real people generic, never real staff's
-  likeness (CS §5); Arcane gives environments only (PB; CG).
+- **People small and simple, like reference 1** (PB Visual style, owner 2026-10-27: "don't use big models of people"):
+  figures that live in the world (crowds, small full figures, backs of heads, simple round heads), **never big character
+  models or close-up faces** (this overrides LD §4's protagonist face beat). Back view or rear 3/4: head in the hair
+  colour, tombstone torso, one accessory each, neighbours never sharing hair and coat (SB §6; LD §4); real people generic,
+  never real staff's likeness (CS §5); Arcane gives environments only (PB; CG).
 - **Palette = a family of tools** (PB; PAL; 9 palettes in `palettes.json`): one per film, a sister palette at most for one
   deliberate shift. **DNA:** a soft light page (L* >= 75, C <= 20) over 50-80 % of the frame, made of many light fills,
   never one slab (CS 3b.6); ink L* <= 25 at >= 7:1; **one hero** (C >= 30, 5-15 %, on the subject or story object), **one
@@ -202,10 +204,10 @@ stays the look"); the approved density bar `deliverables/v3/v3_g5b_pilot.mp4` (L
   63 objects/Mpx (v1 32 % / 45 % / 141); nobody in 9 of 14 shots; 31 % of moving pixels on void; 1.4 % push-ins at ~2 px/s
   read frozen; a 540x960 render blurred the dressing. So: fullness first, people in every shot, float not push, full size.
   v3 G3 ("what does the AI mountain signify?"): literal shots, the real mechanism, a sound-off cold read first (N3; PB).
-- **The rejected v2 cut (no reasons given; this is OUR read of its frames):** it PASSED the meter (6.5 events/s, flat 19 %,
+- **The rejected v2 cut (no reasons given at the time; OUR read of its frames):** it PASSED the meter (6.5 events/s, flat 19 %,
   detail 46 % on `deliverables/v2/archive/v2_g5_blocking.mp4`) and was still rejected: the meter is never the bar. It was
-  **tableaux**: one room seen four times, an office, a top-down desk four times; people seated FACING the camera with faces
-  and scribble speech bubbles; a document whose typed lines repeated the narration for ~10 s (text explained, animation
+  **tableaux**: one room seen four times, an office, a top-down desk four times; big people seated FACING the camera with
+  faces and scribble speech bubbles (since confirmed by the owner: "don't use big models of people", N2 2026-10-27); a document whose typed lines repeated the narration for ~10 s (text explained, animation
   did not); **stillness of idea**: motes ticked, but the middle third held one desk frame across four lines; **off the
   house look**: uniform cartoon outlines, a saturated violet/cobalt wash over whole sets instead of a light page with a
   5-15 % hero, almost none of v1's architecture, streets, sky band, sun or crowds of backs; **the living character** a cat
@@ -233,7 +235,7 @@ stays the look"); the approved density bar `deliverables/v3/v3_g5b_pilot.mp4` (L
 6. Does the animation explain (a mechanism, a comparison, a real example), never just illustrate or print the narration?
 7. Does the picture add something worth knowing every 3-5 s, with no beat re-using a frame without new information?
 8. Beside v1 and reference 1, the house look: loose warm open ink, flat misregistered fills, no gradient, glow, blur, fade?
-9. People from behind, anonymous and varied; real people generic; at most one face beat; no uniform cartoon outlines?
+9. People small, simple and from behind, like reference 1: no big character model, no close-up face, no cartoon outlines?
 10. One palette (+ one sister shift at most): light soft page, hero 5-15 % on the story object, ~5 % anchor, <= 1 pop?
 11. Warm, never sickly: no beige, muddy tan, olive or grey; coloured shadows; >= 10 % opposite temperature per frame?
 12. Paused at phone size beside the bar: no hole over ~200 px outside the caption band and quiet field, no flat field > 20 %?
