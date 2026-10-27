@@ -16,10 +16,10 @@ import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {EMBER} from '../kit';
+import {EMBER, Show, Txt} from '../kit';
 import {BarChart} from '../kit/Charts';
 import {breathe} from './S4_wall';
-import {BARS, S11Room, type RoomLife} from './S11_room';
+import {BARS, CARD, TALL_BAR_X, S11Room, type RoomLife} from './S11_room';
 import {S11Crowd, type CrowdLife} from './S11_people';
 
 const START = 25.24;
@@ -33,20 +33,24 @@ const VALUE_AT = FIVE - 0.1;
 /** The room's life: the forklift crosses the dock window early (the old empty start) and again in the settle; the
  *  strip light flickers once before "left"; the board's papers lift on "five". */
 const ROOM: RoomLife = {
-  flickerAt: [0.76],
+  // a second stepped flicker in the settle (the sign jolts with it): a beat where nothing else moves
+  flickerAt: [0.76, 3.3],
   flutterAt: [FIVE + 0.06],
   forklift: [
     [0.06, 1.12, 1],
     [2.4, 3.5, -1],
   ],
   worker: [-0.6, 4.6],
+  // the coffee machine's ready light and a puff of steam on "And" (the still coffee corner)
+  brewAt: 3.95,
 };
 
 /** The drivers and Pip (coat colours from the Ember families; the cap carries the laptop badge). */
 const CROWD: CrowdLife = {
   row: [
     // the dock hand: hi-vis, hard hat; the phone goes up after "five" to snap the board
-    {hair: 'short', wear: ['hivis', 'hardhat'], coat: EMBER.dcSide, phoneWin: [FIVE + 0.24, 3.42], moves: [{t: FIVE + 0.08, kind: 'recoil', amp: 1}, {t: 3.42, kind: 'turn', amp: 1.4}]},
+    // (a step forward, so the raised phone and its flash stay under the card)
+    {hair: 'short', wear: ['hivis', 'hardhat'], coat: EMBER.dcSide, dy: 56, sMul: 1.04, phoneWin: [FIVE + 0.24, 3.42], moves: [{t: FIVE + 0.08, kind: 'recoil', amp: 1}, {t: 3.42, kind: 'turn', amp: 1.4}]},
     // the laptop van's driver: the cap with the badge; a hand to the back of his head on "five", then turns to his
     // neighbour in the settle
     {hair: 'cap', wear: ['badge'], coat: EMBER.dc, hat: EMBER.dcSide, coatDetail: ['quilt', 'yoke'], moves: [{t: 2.92, kind: 'lean', dir: 1, amp: 1.6}, {t: 2.92, kind: 'turn', amp: 1.8}]},
@@ -66,18 +70,19 @@ const CROWD: CrowdLife = {
   // the dock hand snaps the board once the 5x has landed (the phone drops at 3.42)
   flashAt: [2.62],
   pip: {
-    // Pip reads the short bar, follows the tall one up as it lands, covers its ears on "5x", looks to the drivers, then
-    // turns to us
+    // Pip reads the short bar, follows the tall one up as it lands, covers its ears on "5x" (turning to us), lowers its
+    // paws looking to the drivers, then looks at us (one turn, no flip back)
     look: [
       {t: 0, v: -0.85},
       {t: BIG_AT + 0.05, v: -0.4},
-      {t: 2.9, v: -0.7},
+      {t: 3.0, v: -0.6},
+      {t: 3.62, v: 0},
     ],
     keys: [
       {t: 0, pose: 'sit-back'},
       {t: FIVE + 0.1, pose: 'ears-cover'},
-      {t: 3.05, pose: 'sit-back'},
-      // the settle: Pip turns to us, worried (S12 picks the worry up at the desk)
+      {t: 3.0, pose: 'sit-front'},
+      // the settle: worried at us (S12 picks the worry up at the desk)
       {t: 3.62, pose: 'sit-front', expression: 'worried'},
     ],
   },
@@ -103,6 +108,15 @@ const S11: React.FC = () => {
             valueAt={VALUE_AT}
             seed="s11/bars"
           />
+          {/* the card's title (S4's style) and "now" under the tall bar, with it */}
+          <Txt x={BARS.x + BARS.w * 0.3} y={CARD.y + 96} size={54} fit={BARS.w * 0.56}>
+            Memory chip price
+          </Txt>
+          <Show at={BIG_AT}>
+            <Txt x={TALL_BAR_X} y={BARS.y + 70} size={56}>
+              now
+            </Txt>
+          </Show>
         </S11Room>
         <S11Crowd life={CROWD} />
       </XG>
