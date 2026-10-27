@@ -36,7 +36,12 @@ A clash is a bug: fix the lower doc in the same turn.
   the story, the mascot): soft (C* <= 25), small, steady, a tinted line or none; C, the environment: no outlines, low
   contrast, slow life only. The film's recurring living character is in every shot (Pip by default, drawn new per
   film; another character only if the story asks, named in W1), tier B unless the line is about it: <= 1 % of the
-  frame. Squint at phone size: the eye is on the beat's subject. -> `CRAFT.md` §b; `LIFE_AND_DENSITY.md` §5.
+  frame. Squint at phone size: the eye is on the beat's subject. **Depth and separation too** (owner, v2 G4): the
+  subject never melts into what is behind it (its own value against a calmer field); distance shows in colour (far
+  planes lighter, cooler, less saturated, simpler: atmospheric perspective in flat colour) and in perspective (a ground
+  that recedes: converging edges, foreshortening, things smaller and texture finer with distance, overlaps), never a
+  flat elevation of stacked bands; a few subtle particles (motes, a leaf, glints) make it natural. -> `CRAFT.md` §b, §f;
+  `LIFE_AND_DENSITY.md` §5.
 - **3. Alive but calm: full, never empty, never busy.** Every paused frame is full: a world made of things, people
   (small and simple like reference 1, seen from behind or in rear 3/4, no faces: they act with their pose, near heads
   <= ~140 px, many at rest; in the foreground only the one "you" or the mascot, strangers small in the mid and far
