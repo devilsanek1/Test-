@@ -3,9 +3,11 @@
 // waist (LOCKED, y 1395); we see its top (a wooden top with grain, the things on it) and, under its near edge, the
 // staff side's open cubbies: paper bags, binders, receipt rolls, a cable box, boxed laptops, a pen cup, a stapler, a
 // toolbox, flyers, an extension lead, a cash box. On the top: a counter bell, the card reader (LED blinks), the receipt
-// printer (your receipt feeds out and curls over the near edge: the loop, 9.70-10.30 VO), a jar of USB sticks, a
-// business-card stand, a pen. In front of it all, the assistant: a big back view cut by the left and bottom edges
-// (the shop's dusk-blue polo, the S4 shopkeeper's hair, a lanyard), breathing; the head turns after the pop.
+// printer (your receipt feeds out, loops over the printer's face, lies flat on the top, rolls over the near edge and
+// hangs a short S with a curled end: the loop, 9.70-10.30 VO), a jar of USB sticks, a business-card stand, a pen. In
+// front of it all, the assistant: a big back view cut by the left and bottom edges (the shop's dusk-blue polo with
+// seams, a box pleat and pull folds, a small wordmark, the S4 shopkeeper's hair in a bun with a pencil, a lanyard card
+// swinging at the side), breathing; the head turns after the pop.
 // Nothing here enters your laptop's and tag's ring (x ~370-670, y ~1090-1400) or Pip's spot (x ~220-330).
 import React, {useId} from 'react';
 import {Fill} from '../../../lib/Fill';
@@ -378,8 +380,10 @@ export const S5Assistant: React.FC<{turnAt: number}> = ({turnAt}) => {
   const folds =
     `M${w * 0.1} ${-h + w * 0.5}Q${w * 0.22 + fs} ${-h + w * 0.62} ${w * 0.36 + fs} ${-h + w * 0.68}` +
     `M${w * 0.14} ${-h + w * 0.78}Q${w * 0.26 + fs} ${-h + w * 0.84} ${w * 0.38 + fs} ${-h + w * 0.86}` +
-    `M${-w * 0.38} ${-h + w * 0.6}Q${-w * 0.26 + fs} ${-h + w * 0.7} ${-w * 0.14 + fs} ${-h + w * 0.74}` +
-    `M${-w * 0.34} ${-h + w * 0.98}Q${-w * 0.2 + fs} ${-h + w * 1.02} ${-w * 0.08 + fs} ${-h + w * 1.08}`;
+    `M${-w * 0.38} ${-h + w * 0.6}Q${-w * 0.24 + fs} ${-h + w * 0.7} ${-w * 0.08 + fs} ${-h + w * 0.76}` +
+    `M${-w * 0.44} ${-h + w * 0.82}Q${-w * 0.26 + fs} ${-h + w * 0.86} ${-w * 0.08 + fs} ${-h + w * 0.94}` +
+    `M${-w * 0.34} ${-h + w * 0.98}Q${-w * 0.2 + fs} ${-h + w * 1.02} ${-w * 0.08 + fs} ${-h + w * 1.08}` +
+    `M${-w * 0.26} ${-h + w * 1.16}Q${-w * 0.14 + fs} ${-h + w * 1.18} ${-w * 0.04 + fs} ${-h + w * 1.25}`;
   // the wordmark under the yoke
   const ly = yoke + w * 0.13;
   // the lanyard: round the back of the neck, over the right shoulder, down the side to a card that swings
@@ -403,6 +407,7 @@ export const S5Assistant: React.FC<{turnAt: number}> = ({turnAt}) => {
         <g clipPath={`url(#${clip})`}>
           <path d={pleatShade} fill={EMBER.dcSide} />
           <path d={folds} fill="none" stroke={EMBER.dcSide} strokeWidth={4.4 * k} strokeLinecap="round" />
+          <path d={folds} fill="none" stroke={EMBER.ink} strokeWidth={1.3 * k} strokeLinecap="round" transform={`translate(0 ${-1.6 * k})`} />
           <path d={sleeves + sides} fill="none" stroke={EMBER.dcSide} strokeWidth={3.4 * k} strokeLinecap="round" />
           <path d={sleeves + sides + pleat} fill="none" stroke={EMBER.ink} strokeWidth={seamInk} strokeLinecap="round" />
           <path d={[-1, 1].map((sg) => `M${sg * w * 0.33} ${-h + 4}Q${sg * w * 0.39} ${-h + w * 0.26} ${sg * w * 0.5} ${-h + w * 0.4}`).join('')} fill="none" stroke={EMBER.skyLow} strokeWidth={1.4 * k} strokeDasharray={`${3 * k} ${2.4 * k}`} />

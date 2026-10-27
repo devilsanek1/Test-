@@ -7,7 +7,8 @@
 //     house fronts opposite with lit windows switching and a neighbour, the snowy pavement, a lamp post with its halo,
 //     falling snow, passers-by: one with an umbrella, one with a dog, a big one right outside the glass), a roller
 //     blind, a run of bulbs on the window head, frost and glints; a customer in front of it (mid-depth, back view,
-//     beanie, snow on the shoulders) holding up a laptop box to read it; heads turn after the pop;
+//     beanie, snow on the shoulders) reading a kraft laptop box held at the right shoulder, head a quarter turned to
+//     it; on the pop the head swings round to three-quarters (cheek, nose tip) up at the new laptop and the box dips;
 //   the near wall (right, the shelf's wall): a pegboard of accessories on hooks (mice, cables, earbuds, headphones,
 //     SD cards, chargers) that sway and jolt with the pop; on the BETTER shelf beside the slot a router (LEDs) and a
 //     box stack that hop 4 px with the pop, shelf labels; under it a hook bar with packs, the lower shelf (a monitor

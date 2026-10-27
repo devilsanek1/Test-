@@ -11,8 +11,11 @@
 // passers-by and a customer reading a box; the near wall's pegboard of accessories, the shelf's router and boxes, the
 // lower shelf with a monitor cycling slides) and S5_counter.tsx (the counter seen from the till side: its top with the
 // bell, card reader, receipt printer and USB jar, the staff cubbies full of bags, binders, rolls and boxes; the shop
-// assistant's big back in the foreground). Pip sits on the counter watching you; its head whips to the BETTER laptop
-// just before your face turns (it points the eye), and on "buy one" it turns to us and shrugs. BUSY profile (cozy v2:
+// assistant's big back in the foreground) and S5_slot.tsx (the empty slot dressed as a display waiting for a laptop:
+// an acrylic riser, empty hooks, unlit spots, a blank shelf-edge card; all covered or lit by the pop). Pip sits on the
+// counter watching you (back view); 3 frames before your face turns it whips round (a pose pop to trunk-up, eyes wide,
+// the trunk thrown up at the BETTER laptop: it points the eye), and on "buy one" it turns to us and shrugs. The demo
+// screen's ad changes at 0.15 and 1.5 only (0.3-1.1 s stays still for the pop and the face). BUSY profile (cozy v2:
 // "breathe as built").
 import React from 'react';
 import {World} from '../../../lib/World';
