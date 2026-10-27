@@ -24,6 +24,7 @@ import {StaffWindow, Staffer, Reporter} from './Staff';
 import {Stranger, CafeOwner} from './Extras';
 import {FarCrowd, scatterCrowd} from './Crowd';
 import {S1Seated} from './S1Seated';
+import {Dog, DogCoat, DogPose, handAt} from './Dog';
 import {stepsAt, strideFor} from './gait';
 
 export const SHEET = {w: 2160, h: 5760};
@@ -616,6 +617,45 @@ export const SeatTest: React.FC = () => {
         <Person x={760} y={1780} h={120} seed="st/kidS" child traits={{hair: 'curls'}} />
         <Person x={850} y={1780} h={190} seed="st/adultS" />
         <NearBack x={990} y={1920} hv={210} seed="st/nb" lean={5} />
+      </svg>
+    </AbsoluteFill>
+  );
+};
+
+
+/** The dog (K4, 2026-10-27): poses x coats, sizes 30-90, the back view, a lead to a walker's hand, at 1:1. */
+export const DogTest: React.FC = () => {
+  const t = useTime();
+  const POSES: DogPose[] = ['trot', 'walk', 'stand', 'sniff', 'sit', 'lie'];
+  const COATS: DogCoat[] = ['gold', 'rust', 'brown'];
+  const walker = {x: 760, y: 1700, h: 150};
+  const reach: [number, number] = [-walker.h * 0.2, -walker.h * 0.45];
+  const hand = handAt(walker.x, walker.y, reach);
+  return (
+    <AbsoluteFill style={{background: CM.stucco}}>
+      <svg width={1080} height={1920} viewBox="0 0 1080 1920">
+        {COATS.map((c, j) => (
+          <g key={c}>
+            <Fill rect={[0, 300 + j * 300, 1080, 30]} color={CM.paving} offset={false} />
+            {POSES.map((p, i) => (
+              <g key={p}>
+                <Dog x={110 + i * 170} y={300 + j * 300} h={90} pose={p} coat={c} seed={`dt/${c}/${p}`} walk={p === 'trot' ? {rate: 3.4} : p === 'walk' ? {rate: 2.2} : undefined} />
+                <Label x={110 + i * 170} y={340 + j * 300} size={20} anchor="middle">{`${c} ${p}`}</Label>
+              </g>
+            ))}
+          </g>
+        ))}
+        <Fill rect={[0, 1220, 1080, 30]} color={CM.paving} offset={false} />
+        {[90, 70, 52, 40, 30].map((h, i) => (
+          <Dog key={h} x={90 + i * 120} y={1220} h={h} pose="trot" view={i % 2 ? 'back' : 'side'} coat={COATS[i % 3]} seed={`dt/sz${i}`} walk={{rate: 3.2}} />
+        ))}
+        <Dog x={760} y={1220} h={60} pose="trot" view="back" coat="rust" seed="dt/back60" walk={{rate: 3.2}} />
+        <Dog x={900} y={1220} h={48} pose="lie" coat="gold" seed="dt/lieDown" headDown />
+        <Fill rect={[0, 1700, 1080, 40]} color={CM.paving} offset={false} />
+        <Person x={walker.x} y={walker.y} h={walker.h} seed="dt/walker" pose="reach" view="profile" reach={reach} walk={{rate: 1.8}} traits={{acc: 'none'}} />
+        <Dog x={560} y={1700} h={52} pose="sniff" coat="gold" seed="dt/lead" lead={hand} />
+        <Dog x={260} y={1700} h={64} pose="trot" coat="brown" seed="dt/trot64" walk={{rate: 3.4, phase: 0.5}} flip />
+        <Label x={24} y={60} size={28}>{`K4 DOG: poses x coats at 90 px; sizes 90-30 (side / back); lead; t ${t.toFixed(2)}`}</Label>
       </svg>
     </AbsoluteFill>
   );
