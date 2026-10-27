@@ -471,23 +471,36 @@ export function aerialInk(x: number, y0: number, y1: number, seed: string, dir =
 export function creeperInto(b: Batch, x0: number, x1: number, yTop: number, yBot: number, seed: string, cols: string[], n: number, holes: [number, number, number, number][] = []) {
   const r = rng(seed);
   const inHole = (x: number, y: number) => holes.some(([hx0, hy0, hx1, hy1]) => x > hx0 && x < hx1 && y > hy0 && y < hy1);
+  let stems = '';
   for (let v = 0; v < n; v++) {
     let x = r.range(x0, x1);
     let y = yBot - r.range(0, 30);
     const top = lerp(yTop, yBot, r.range(0, 0.45));
     let a = -Math.PI / 2 + r.jitter(0.5);
+    let pen = false;
     while (y > top) {
       a += r.jitter(0.5);
       a = Math.max(-Math.PI * 0.85, Math.min(-Math.PI * 0.15, a));
-      x += Math.cos(a) * 7;
-      y += Math.sin(a) * 7;
-      if (x < x0 - 10 || x > x1 + 10) break;
-      if (inHole(x, y)) continue;
+      const nx = x + Math.cos(a) * 7;
+      const ny = y + Math.sin(a) * 7;
+      if (nx < x0 - 10 || nx > x1 + 10) break;
+      if (inHole(nx, ny)) {
+        pen = false;
+        x = nx;
+        y = ny;
+        continue;
+      }
+      // the woody stem (thin) under the leaves
+      stems += `${pen ? 'L' : 'M'}${P(nx, ny)}`;
+      pen = true;
+      x = nx;
+      y = ny;
       const s = r.range(5, 8.5);
       b.fill(r.pick(cols), leafPath(x + r.jitter(4), y + r.jitter(3), s, s * 0.5, r.range(0, 180)));
       if (r.chance(0.5)) b.fill(r.pick(cols), leafPath(x + r.jitter(6), y + r.jitter(5), s * 0.9, s * 0.45, r.range(0, 180)));
     }
   }
+  b.ink(stems, 1.1, CM.line);
 }
 
 /** A climbing rose round a door: leaves + blooms. */

@@ -11,8 +11,8 @@ before G6, instead of review agents). Generic: any entry / composition + its MP4
   python3 -I scripts/qa/gate_check.py --mp4 out/v2r.mp4 --scenes src/v2r/film/scenes.json \
       --captions src/v2r/film/captions.json --voice public/v2/voice.wav \
       --frame0 "SHE SAYS: NO CRITICIZING|GOOGLE. FOR LIFE." --frame0-until 5.95 \
-      --frame0-geom '{"size":72,"baselines":[372,452],"captionBaseline":516,"captionScale":0.531,"spoken":"first",
-                      "keys":["SAYS:","NO CRITICIZING","FOR LIFE."],"source":"Source: BBC News, 21 Oct 2026",
+      --frame0-geom '{"size":72,"baselines":[372,452],"captionBaseline":516,"captionScale":0.5306,"spoken":"first",
+                      "keys":["SAYS:","NO","NO CRITICIZING","FOR LIFE."],"source":"Source: BBC News, 21 Oct 2026",
                       "sourceSize":20,"sourceBaseline":550}'
 
 Checks (FAIL = exit 1; WARN never fails):
@@ -25,10 +25,15 @@ Checks (FAIL = exit 1; WARN never fails):
              local peak well above its neighbourhood) vs the scenes' starts: every scene start must have a detected cut
              within 1 frame (first frame of a scene = ceil(start * fps)). Extra detected cuts are listed as WARN
              (a big in-shot event looks like a cut). The expected cuts follow each scene's `transitionIn.type`
-             (lib/Film.tsx): cut / matchcut / camera-continuous / unbuild / none = one hard cut at the start c;
+             (lib/Film.tsx), always on (v1's wipes S07 / S10 get the new verdicts too): cut / matchcut /
+             camera-continuous / none = one hard cut at the start c (an `unbuild` transitionIn is not modelled: it is
+             expected as a cut, though Film's un-build ends on the incoming scene with none);
              push-through WITH a `bridge` colour = two cuts, into the flat bridge at c - 0.05 and out of it at
-             c + 0.05 (Film's PT_HOLD 0.1 s), cut-like frames on its zoom legs (c - hold/2 - (dur - hold) * 0.45 ..
-             c + hold/2 + (dur - hold) * 0.55, +-1 frame) are expected (not listed as extra);
+             c + 0.05 (Film's PT_HOLD 0.1 s; the bridge itself is drawn by the film, e.g. Film2R's Bridges: lib/Film
+             culls it), cut-like frames on its zoom legs (c - hold/2 - (dur - hold) * 0.45 ..
+             c + hold/2 + (dur - hold) * 0.55, +-1 frame) are expected (not listed as extra); a window colour-matched
+             to the bridge moves the visible out-cut one frame later (a WARN); the generic peak rule needs short legs
+             (v2r's 0.3 s passes; a 1.1 s default dive can FAIL a correct render: check it by eye);
              push-through without a bridge = one cut at c; foreground-wipe = NO hard cut (the element covers the
              change; its window c +- dur / 2 may hold cut-like frames, a cut within 1 frame of c is a WARN).
   captions   from the JSON, laid out like SkyCaptions (src/lib/Captions.tsx, tokens read from src/lib/theme.ts,
@@ -40,9 +45,10 @@ Checks (FAIL = exit 1; WARN never fails):
              numbers: size, baselines, captionBaseline, captionScale (as in F0), plus the optional v2r fields:
              "spoken": "first" (only page 1 under the block: the later pages before the first page change after
              --frame0-until are never drawn, so they are skipped), "keys": [texts] (the box walks these words: every
-             line holding one gets the highlight box's extents), "highlight" (the box on the last line, as before)
-             and "source" / "sourceSize" / "sourceBaseline" (the source line: inside the band and the safe width,
-             clear of the lowered captions). Without it the result is exactly as before.
+             line holding one gets the highlight box's y extents; its x pad is not modelled), "highlight" (the box on
+             the last line, as before) and "source" / "sourceSize" / "sourceBaseline" (the source line: inside the
+             band and the safe width, and no overlap with the lowered captions' glyph ink and boxes, above or below
+             it). Without --frame0-geom the captions result is exactly as before.
   density    (--density, optional) scripts/qa/density.py on the MP4 with the scenes: medium events per second, the
              longest gap, near-static frames, flat share, objects and fine detail per shot vs targets measured on
              reference 1 and v1 (docs/look/research/density_numbers.md). WARN per shot under target; FAIL only when
@@ -202,6 +208,11 @@ def page_layout(b: dict, sky: dict, typ: dict, font: Font) -> list[dict]:
     return [{"text": l["text"], "size": size, "baseline": bls[i], "width": font.width(l["text"], size)} for i, l in enumerate(lines)]
 
 
+def has_highlight(b: dict, text: str) -> bool:
+    """A line of page b carries one of its highlight boxes."""
+    return any(h["text"].strip(" .,!?;:") and h["text"].strip(" .,!?;:").lower() in text.lower() for h in b.get("highlights", []))
+
+
 def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
     sky, hb, typ, f0 = tokens()
     f0 = {**f0, **a.frame0_geom}
@@ -247,8 +258,7 @@ def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
         for ln in page_layout(b, sky, typ, font):
             t, bt = font.ink(ln["text"], ln["size"])
             top, bot = ln["baseline"] + t, ln["baseline"] + bt
-            hl = any(h["text"].strip(" .,!?;:") and h["text"].strip(" .,!?;:").lower() in ln["text"].lower() for h in b.get("highlights", []))
-            if hl:
+            if has_highlight(b, ln["text"]):
                 top = min(top, ln["baseline"] - hb["topEm"] * ln["size"])
                 bot = max(bot, ln["baseline"] + hb["bottomEm"] * ln["size"])
             sy0, sy1 = Y(top), Y(bot)
@@ -285,12 +295,12 @@ def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
         f0_bottom = f0["baselines"][min(len(f0_lines), len(f0["baselines"])) - 1] + hb["bottomEm"] * size
         low = [b for j, b in enumerate(caps) if b["s"] - lead < lower_until and j not in hidden]
         src = f0.get("source")
-        src_top = math.inf
+        src_y = None
         if src:
             ss, sbl = float(f0.get("sourceSize", 20)), float(f0.get("sourceBaseline", 550))
             t, bt = font.ink(src, ss)
             w = font.width(src, ss)
-            src_top = sbl + t
+            src_y = (sbl + t, sbl + bt)
             if sbl + t < band[0] - 0.5 or sbl + bt > band[1] + 0.5 or sky["cx"] - w / 2 < x_lo or sky["cx"] + w / 2 > x_hi:
                 report("FAIL", "captions", f"frame-0 source '{src}': y {sbl + t:.0f}-{sbl + bt:.0f}, x {sky['cx'] - w / 2:.0f}-{sky['cx'] + w / 2:.0f} outside the band / safe width")
                 bad += 1
@@ -300,10 +310,17 @@ def check_captions(caps: list[dict], a, voice_s: float, fps: float) -> None:
                 if y_top < f0_bottom - 0.5:
                     report("FAIL", "captions", f"lowered page '{ln['text']}' (top y {y_top:.0f}) overlaps the frame-0 words (bottom y {f0_bottom:.0f})")
                     bad += 1
-                y_bot = f0["captionBaseline"] + (ln["baseline"] + hb["bottomEm"] * ln["size"] - sky["oneLine"]) * f0["captionScale"]
-                if y_bot > src_top + 0.5:
-                    report("FAIL", "captions", f"lowered page '{ln['text']}' (bottom y {y_bot:.0f}) overlaps the frame-0 source line (top y {src_top:.0f})")
-                    bad += 1
+                if src_y:
+                    # what is drawn (glyph ink with its descenders, + the box on a highlighted line), lowered; an
+                    # interval test, so a source line above or below the captions passes when nothing touches
+                    t, bt = font.ink(ln["text"], ln["size"])
+                    top, bot = ln["baseline"] + t, ln["baseline"] + bt
+                    if has_highlight(b, ln["text"]):
+                        top, bot = min(top, ln["baseline"] - hb["topEm"] * ln["size"]), max(bot, ln["baseline"] + hb["bottomEm"] * ln["size"])
+                    c0, c1 = (f0["captionBaseline"] + (y - sky["oneLine"]) * f0["captionScale"] for y in (top, bot))
+                    if c1 > src_y[0] + 0.5 and c0 < src_y[1] - 0.5:
+                        report("FAIL", "captions", f"lowered page '{ln['text']}' (y {c0:.0f}-{c1:.0f}) overlaps the frame-0 source line (y {src_y[0]:.0f}-{src_y[1]:.0f})")
+                        bad += 1
     end = caps[-1].get("e", caps[-1]["s"]) if caps else 0
     if abs(end - voice_s) > 1 / fps + 1e-6:
         report("FAIL", "captions", f"the last page ends at {end:.3f} s, the voice at {voice_s:.3f} s")
@@ -357,7 +374,8 @@ def transition_model(scenes: list[dict], fps: float) -> tuple[list, list, list]:
         c, sid = s["start"], s["id"]
         tr = s.get("transitionIn") or {"type": "cut"}
         typ = tr.get("type", "cut")
-        d = float(tr.get("dur", TDUR.get(typ, 0.0)))
+        dur = tr.get("dur")
+        d = float(dur) if dur is not None else TDUR.get(typ, 0.0)  # Film: t.dur ?? FILM_DEFAULT_DUR[t.type]
         if typ == "push-through":
             # Film.tsx pushThrough: the zoom-in leg (d - hold) * 0.45 before the bridge, the pull-back 0.55 after it
             h = hold if tr.get("bridge") else 0.0
