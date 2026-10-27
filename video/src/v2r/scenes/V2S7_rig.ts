@@ -138,14 +138,14 @@ export const runAt = (id: RunId) => W7.principles + RUN_STEP * RUN_ORDER.indexOf
 
 // ---------------------------------------------------------------- life schedule (local s)
 
-/** The glass doors: [t, open 0..1]. In at 0.62-1.55 (a staffer goes in), out at 2.62-3.5 (one comes out). */
+/** The glass doors: [t, open 0..1]. In at 0.62-1.62 (a staffer goes in), out at 2.86-3.84 (one comes out). */
 export const DOOR_KEYS: [number, number][] = [
   [0.62, 0],
   [0.86, 1],
   [1.38, 1],
   [1.62, 0],
-  [2.62, 0],
-  [2.86, 1],
-  [3.36, 1],
-  [3.6, 0],
+  [2.86, 0],
+  [3.1, 1],
+  [3.6, 1],
+  [3.84, 0],
 ];

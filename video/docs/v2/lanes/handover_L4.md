@@ -61,3 +61,40 @@ figure/Pip polish. Then critics (art director, sound-off, SCALE, SPEED per frame
   full-size start/end, motion strips, 0.5 clip + density + camera check).
 - Running: workflow `v2r-l4-crane-build` (sky&far -> valley, terrace -> figures&text, then start). Next: critic panel (art
   director, sound-off, SCALE, speed/motion, fairness, completeness), fix rounds until pass, report_L4.md.
+
+## 2026-10-27 ~15:10 UTC, CONTROLLED PAUSE (orchestrator: the account's 5-hour limit; resume after 18:30 UTC on its message)
+**State (everything committed and pushed; typecheck clean for V2S5, 0 errors in the tree at the pause):**
+- Spec `L4_spec.md` (follows the integrated STYLE.md: nothing overhead at the start; STYLE §5 proofs) and `stylecheck_L4.md` (answered) pushed.
+- Director's decisions (orchestrator, 15:01): the 62 px end stranger at feet 1238 + the terrace mitigations APPROVED (no map.ts change); the
+  news box headline at BODY 34 px (3 lines; nothing between 34 and 56); nothing overhead in S5 (no top-gutter fringe).
+- SKY & FAR (done to its round 2+, files `V2S5_far*.tsx`, `V2S5_river.tsx`): horizon 750, END sun (1058.5, 646) r 60.2 (the far plane sits 12
+  px lower at the start, so END tops >= 610 hold at every p), flat cumulus caps in the top gutter, a warm bank, packed city rows with roof bands,
+  street trees and skyline accents, the obelisk the darkest far shape, Lincoln / Jefferson / Kennedy / bridges / rowers / sails / parkway cars,
+  deep parkland under the river (y 848-1290, so no gap while the mid plane rises); sky life = gulls + two V's of birds riding the far plane's map
+  (y >= 610). River near edge (THE JOIN for the mid plane) = END y 848.
+- TERRACE (done to its round 2, `V2S5_deck*.tsx`): the deck re-fit to the far horizon (`V2S5_deck_cam`), a 2-value static dapple (shade zone
+  round the pair = the start's warm-dark floor), an OPEN-back stranger's bench (under/over parts; the whole seated back shows), 13 terrace people +
+  a dog, a stroller, pigeons, tulip beds with hoop fences, benches, a fountain, a lectern, a bike; backlit frames (tree left, lamppost + corner
+  crown right), the wipe lamppost's baskets; `V2S5_deck_qa.ts`; dev entry `V2S5_deck_dev.tsx` (DeckShots: many stills in one bundle).
+- TEXT: `V2S5_text.tsx` = K3's NewsBox (its front page re-lettered at body 34 + the 18 px credit; NOT yet rendered: check first) + K3's Plaque at
+  x 605, bottom 1246, stand false (plate 441-769 x 1119-1246; renders well at 22.44 / 23.70).
+- NOT YET DONE: FIGURES (`V2S5_figs.tsx` is still the previous helper's: Pip starts at (292, 700) with a hop at -0.12 and is at ~(346, 846) at
+  the cut, but L3's S4 Pip is mid-air at (292, 721) on screen at 20.55 (`V2S4_rig.ts` S4_PIP.outLeap: from (470, 1218) world to (200, 600),
+  20.25 + 0.45 s, height 100, through the 1.06 push about SUN1; kit `hopAt` = lerp - height x 4k(1-k), k linear); the end Pip + leap toward S6's
+  (770, 720) at 3.35 unchecked) · VALLEY (`V2S5_mid.tsx`, `V2S5_nearmid.tsx` are still the kit's: the near-mid's bare branch tips reach y ~574
+  at x ~950 at the start (band margin), the mid plane's join with the river at 848 unverified) · START (`V2S5_start.tsx` empty: spec §4's
+  start-only near masses: trunk + roots bottom-left, a tulip-bed rim bottom-right, twigs, pigeons, dropping out down-left by p ~0.35).
+**Stopped agents:** workflow `v2r-l4-crane-build`, runId `wf_b2afaa3d-bc2`, script
+`/root/.claude/projects/-home-user-Test-/77c1a0dc-af15-5a35-a3e3-e76f15ecdd7f/workflows/scripts/v2r-l4-crane-build-wf_b2afaa3d-bc2.js`
+(sky-far agent ab40529b5c97d4696 and terrace agent a162b0811ab598a30 were mid round 3; valley / figures / start never started). Do NOT resume it
+(budget rules: one agent at a time; the rest is done as targeted fixes below). The 16:05 hard-stop reminder was deleted.
+**Next steps, in order (budget: at most ONE agent at a time, one combined critic, one fixer, then the report):**
+1. (lead, no agent) Pip's arrival in `V2S5_figs.tsx`: at scene 0 exactly L3's (292, 721), a short drop onto the backrest (415, 1120) by ~0.17-0.2
+   s (arc never above y 600), lookUp on "April" 0.21 kept; check the swap (S5Shot frames 92-98) and the leap (frames 199-206) toward (770, 720).
+2. (lead) Render-check the news box at 34; near-mid branch tips >= y 600 at the start (fork `NearMid` into `V2S5_nearmid.tsx`, clamp the twigs);
+   the mid/river join at p 0 / 0.5 / 1.
+3. `bash L4_tools/make_review.sh r1` (copy the tools to the scratch dir first; re-extract the 216 px reference rows).
+4. ONE combined critic agent (art director + sound-off, scale, QA: the three prompts of `critics_wf.js` in one) on `review/r1`.
+5. ONE fixer agent on the musts (incl. spec §4's start-only layers if flagged), then a quick re-render of the key frames by the lead.
+6. `report_L4.md` (<= 15 lines: built, the critic verdict, QA numbers, open items, REQUESTS: L5 move K3 NewsBox's headline default to 34 ·
+   map.ts take a PIP_S4_S5 hop contract if L3/L4 numbers drift · L3 confirm (292, 721) at 20.55) -> commit + push LAST.

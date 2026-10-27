@@ -74,8 +74,19 @@ const VS: {t0: number; from: Pt; v: number; rise: number; span: number; n: numbe
   {t0: 2.08, from: [80, 652], v: 205, rise: -6, span: 27, n: 5, ink: 0.42, glider: -1},
 ];
 
+/** A far flock low over the city (the smallest step of the birds' size ladder: V 38 / far V 27 / gulls 13 / this 8 px),
+ *  drifting left slowly while it wheels a little (END coords). */
+const FLOCK = {c: [640, 772] as Pt, n: 7, span: 8, vx: -9, seed: 0.6};
+
 export const S5FarLife: React.FC<{p: number}> = ({p}) => {
   const t = useTime();
+  let flock = '';
+  for (let i = 0; i < FLOCK.n; i++) {
+    const a = t * 0.9 + i * 0.9 + FLOCK.seed;
+    const x = FLOCK.c[0] + FLOCK.vx * t + Math.cos(a) * (14 + i * 5) + (i - 3) * 9;
+    const y = FLOCK.c[1] + Math.sin(a * 1.3) * (3 + i * 0.7) - Math.abs(i - 3) * 2.2;
+    flock += birdD(x, y, FLOCK.span - (i % 3), (t * 4.6 + i * 0.37) % 1);
+  }
   let gulls = '';
   for (const g of GULLS) {
     for (let i = 0; i < g.n; i++) {
@@ -104,6 +115,7 @@ export const S5FarLife: React.FC<{p: number}> = ({p}) => {
   }
   return (
     <XG m={farMat(p)}>
+      <path d={flock} stroke={mix(CM.anchor, CM.sky, 0.55)} strokeWidth={1.2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
       <path d={gulls} stroke={mix(CM.anchor, CM.sky, 0.42)} strokeWidth={1.7} fill="none" strokeLinecap="round" strokeLinejoin="round" />
       {vs.map((v, i) => (
         <path key={i} d={v.d} stroke={mix(CM.anchor, CM.sky, v.ink)} strokeWidth={v.w} fill="none" strokeLinecap="round" strokeLinejoin="round" />
