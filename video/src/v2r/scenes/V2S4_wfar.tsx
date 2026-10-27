@@ -258,7 +258,7 @@ const FLOCK = Array.from({length: 8}, (_, i) => {
   const r = rng(`s4flock/${i}`);
   const x = lerp(G1.cx + 8, G1.cx + G1.r * 0.9, (i + r.range(0.1, 0.9)) / 8);
   const bow = G1.r * 0.06 * Math.sqrt(Math.max(0, 1 - ((x - G1.cx) / G1.r) ** 2));
-  return {x, y: G1.top - bow - 6.5, face: r.chance(0.6) ? -1 : 1, ph: r.range(0, 6.28), delay: r.range(0, 0.16), vx: r.range(250, 320), cruise: r.range(628, 690), s: r.range(8.5, 11)};
+  return {x, y: G1.top - bow - 8, face: r.chance(0.6) ? -1 : 1, ph: r.range(0, 6.28), delay: r.range(0, 0.16), vx: r.range(250, 320), cruise: r.range(630, 690), s: r.range(13, 16)};
 });
 
 function flockInto(b: Batch, t: number) {

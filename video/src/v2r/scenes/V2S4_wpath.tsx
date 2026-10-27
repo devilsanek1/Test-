@@ -273,6 +273,28 @@ function blowingInto(b: Batch, t: number) {
   }
 }
 
+
+/** Pigeons on the garden wall's coping (east of her at the pose): bob, peck, shuffle a step now and then. */
+function wallPigeonsInto(b: Batch, t: number) {
+  const s = 18;
+  const birds = [1002, 1030, 1064].map((x0, i) => {
+    const r = rng(`s4wpig/${i}`);
+    const face = r.chance(0.5) ? 1 : -1;
+    const x = x0 + face * 6 * Math.floor(frac(t / (2.6 + i * 0.7) + r.next()) * 2);
+    const peck = Math.max(0, Math.sin(t * 1.9 + i * 2.1) - 0.55) * 7;
+    return {x, face, peck, by: TOP - 8 - s * 0.34};
+  });
+  for (const p of birds) b.fill(CM.stoneShade, ovalPath(p.x, p.by, s * 0.46, s * 0.3));
+  b.layer();
+  for (const p of birds) {
+    b.fill(CM.shadeCool, ovalPath(p.x - p.face * s * 0.08, p.by - s * 0.05, s * 0.28, s * 0.14));
+    b.fill(CM.shadeCool, ovalPath(p.x + p.face * s * 0.38, p.by - s * 0.27 + p.peck, s * 0.15, s * 0.15));
+    b.fill(CM.shadeCool, `M${P(p.x - p.face * s * 0.36, p.by)}L${P(p.x - p.face * s * 0.72, p.by + s * 0.08)}L${P(p.x - p.face * s * 0.34, p.by + s * 0.16)}Z`);
+    b.rect(CM.box, p.x - s * 0.08, TOP - 9, s * 0.06, 2.4);
+    b.rect(CM.box, p.x + s * 0.06, TOP - 9, s * 0.06, 2.4);
+  }
+}
+
 // ---------------------------------------------------------------- the plane
 
 export const PathPlane: React.FC = () => {
@@ -295,6 +317,8 @@ export const PathPlane: React.FC = () => {
   anglerInto(dyn, t);
   dyn.layer();
   blowingInto(dyn, t);
+  dyn.layer();
+  wallPigeonsInto(dyn, t);
   return (
     <>
       <Paint b={stat} seed="s4pathSt" />
