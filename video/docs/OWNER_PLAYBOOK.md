@@ -4,17 +4,22 @@ This is the memory of the owner's feedback across videos: **approach-level rules
 video). Read it before starting any video, and before every gate of `docs/PIPELINE_V2.md`. **Before any visual work,
 also read `docs/look/DIRECTION.md`:** the one page of the current look and storytelling direction, distilled from the
 rules below (its numbers: `docs/look/CRAFT.md`). Only the owner's words outrank it: this file, and for one film
-`docs/vN/OWNER_NOTES.md` (the chain: Process, "New feedback is INTEGRATED").
+what the owner said in `docs/vN/OWNER_NOTES.md` (the quoted words; the "-> what we did" half of a line is our log, with
+no owner rank). The chain: Process, "New feedback is INTEGRATED"; in full, `docs/look/DIRECTION.md`'s intro.
 
 **Capturing feedback (owner, 2026-10-26): split every note in the same turn and commit it.** A note about THIS video
 (pick, line, take, shot) goes to `docs/vN/OWNER_NOTES.md`; a lesson about our approach goes HERE as a general rule with a
 short evidence tag (vN, date); a concrete note that teaches something general goes to both. A reversed rule moves to
-"Retired". The owner's master creative brief is `docs/CREATIVE_BRIEF.md` (the source; this file does not replace it).
+"Retired". The owner's master creative brief is `docs/CREATIVE_BRIEF.md`: the source for the channel, story selection
+and writing, which this file does not replace; where a later rule here differs (the length, the sound effects, the voice
+paste), the later rule wins, as the brief's banner lists.
 
 Format: **rule** — why / evidence (video, date).
 
-**Last reviewed for coherence: 2026-10-27 (fifth pass: the post-v3 direction integrated, `docs/look/DIRECTION.md`
-linked) · no size budget: coherent and clear wins over short** (owner, 2026-10-27; see Maintenance at the end).
+**Last reviewed for coherence: 2026-10-27 (sixth pass: a cold read as if starting video 4, every conflict it found fixed
+at its source: the card's timing, one version, people without faces, Pip in every shot, the line's colour, parallel
+work and the budget, the brief) · no size budget: coherent and clear wins over short** (owner, 2026-10-27; see
+Maintenance at the end).
 
 ## Audience and goal
 - **Short-form first: TikTok / Instagram Reels / YouTube Shorts, vertical 1080x1920.** — (v1, 2026-10-24).
@@ -65,7 +70,8 @@ linked) · no size budget: coherent and clear wins over short** (owner, 2026-10-
   = "I don't know what to keep my attention on". Tiers: `docs/look/CRAFT.md` §b. — (v3 G5b, 2026-10-27).
 - **Every scene must FEEL ALIVE, calm and tiered: that is the key, not an object count.** A dense, detailed world (a
   city full of buildings and windows, a room full of real things), people near and far, layered depth, a recurring
-  living character, ambient life that never stops (clouds, birds, steam, lights switching). A dense world makes a frame
+  living character in every shot (Pip by default, as reference 1's cat and v1's Pip were; at tier B), ambient life
+  that never stops (clouds, birds, steam, lights switching). A dense world makes a frame
   full even when little moves (Arcane's rooftop; the owner's riverside reference "doesn't feel empty at all"). The
   density sits mostly in the calm environment tier at low contrast, so full never means busy (`docs/look/CRAFT.md` §b).
   The bar: reference 1 (France) and v1 (PHP), then each film's own G3 density key; `scripts/qa/density.py` is a warning
@@ -90,13 +96,16 @@ linked) · no size budget: coherent and clear wins over short** (owner, 2026-10-
   each new reference is measured (composition, movement, texture, camera, details) and folded into `COZY_AND_SCALE.md`.
   — ("really figure out what about the scene brings out this feeling; this is a recurring topic we need to evolve", 2026-10-26).
 - **Don't rely on reusable assets: every film's sets, characters, props, background life and music are made new for
-  it,** in its own design (a new Pip drawing too, if the mascot appears). Engine primitives, timing, captions and QA tools
-  are tools, not assets; the kit pieces in `src/lib` (cine, kit, mascot) are references to learn from, never a film's
-  sets. — ("Don't rely on reusable assets", v2 restart, 2026-10-27).
-- **People small and simple like reference 1** (crowds, small full figures seen from behind, round heads; near heads
-  <= ~140 px), never big character models or close-up faces. **In the foreground only the film's one "you" or the
+  it,** in its own design (a new Pip drawing too). Engine primitives (light and shadow layers included), timing,
+  captions and QA tools are tools, not assets; the kit pieces in `src/lib` (cine, kit, mascot) are references to learn
+  from, never a film's sets, and a film never imports another film's folder (`src/vN/`). — ("Don't rely on reusable
+  assets", v2 restart, 2026-10-27).
+- **People small and simple like reference 1** (crowds, small full figures seen from behind or in rear 3/4, round
+  heads; near heads <= ~140 px), never big character models or faces: they act with their pose (reach, shrug, slump,
+  look up), as reference 1's do; only the mascot has a face. **In the foreground only the film's one "you" or the
   mascot;** strangers stay small in the mid and far ground (a row of strangers' backs in front reads as "you"). —
-  ("don't use big models of people", v2 restart, 2026-10-27; v3 retro, 2026-10-27).
+  ("don't use big models of people; the people in the first example video are the right direction", v2 restart,
+  2026-10-27; v3 retro, 2026-10-27).
 - **Paper edges ('paint-subtle') are liked, but never at the top of the frame or beside the caption band** (it read
   as a screen recording under the status bar). Each film decides them with its G4 look clip, 'paint-subtle' at most
   (`docs/EDGES.md`). — (v1 posted reel, 2026-10-25).
@@ -105,21 +114,24 @@ linked) · no size budget: coherent and clear wins over short** (owner, 2026-10-
 - **Warm, never sickly:** no beige, muddy tan, olive or grey; peach creams, terracotta, red-brown lines, golden light,
   warm shadows. — ("we need to have a warm feeling, not sick", v3 G4, 2026-10-26).
 - **Texture and lines: VERY subtle.** Lines only in key places: the clean pen's tiers (the main thing's outline and a
-  few inner details; `docs/look/CRAFT.md` §c). Halftone tactically on a few elements as an optional last step (the film
-  must work flat; the owner decides per video). — ("very subtle texture pieces and the black outlines, VERY subtle but
-  in key places", texture test, 2026-10-25).
+  few inner details; `docs/look/CRAFT.md` §c). The owner's "black outlines" are read as dark, warm lines in the
+  object's own deep shade, never one near-black ink on everything (v3 G5b's was "too rough"); captions keep the dark
+  ink; the owner judges the line in each G4 look clip. Halftone tactically on a few elements as an optional last step
+  (the film must work flat; the owner decides per video). — ("very subtle texture pieces and the black outlines, VERY
+  subtle but in key places", texture test, 2026-10-25; "cleaner, more refined, gentle, premium", v3 G5b, 2026-10-27).
 - **Profile identity: mascot Pip (the purple PHP elephant), drawn in each film's style;** avatar `deliverables/profile/pip_power_button.png`. — (2026-10-25).
 
 ## Hook and pacing
 - **Every video has ONE core line, picked in its own step (G0.5) before the script:** the single sentence at the core
   of the message with the biggest emotional reaction. It drives frame 0, the hook, the cover and the payoff; every line
-  serves it. It ships with its THROUGH-LINE CARD (one thread object, one home place, one "you", a carrier for every
-  join: `docs/look/CRAFT.md` §a). — (v3, 2026-10-25; card: v3 retro, owner yes, 2026-10-27).
+  serves it. From the pick we draft its THROUGH-LINE CARD (one thread object, one home place, one "you":
+  `docs/look/CRAFT.md` §a); the script (G1) completes it with a carrier for every join, taken from the script's own
+  joins, and the owner approves the card with the script. — (v3, 2026-10-25; card: v3 retro, owner yes, 2026-10-27).
 - **The first 3 s / first scene must be a banger ("something is about to happen"):**
   - frame 0 is the scene being made, drawn on in the clean pen: the subject's outline (with the supporting lines)
     first, then colour floods in within ~0.3 s (the lined films drew every line first; the owner sees the clean-pen
     version in the next G4 look clip);
-  - voice from the first frames;
+  - voice from the first frames (the first word at ~0.12 s, the locked voice file's lead; never a silent lead);
   - the hook's claim made physical and escalating: the expected thing shown, then reality overtaking it at ~2 s,
     through the real mechanism;
   - something new every few frames from the story's own build (the subject and its mechanism), never from extra
@@ -138,12 +150,13 @@ linked) · no size budget: coherent and clear wins over short** (owner, 2026-10-
   §a). — (v1; joins, v3 G5b, 2026-10-27).
 
 ## Storyboard (G3) and flow
-- **The pipeline after v3 (owner APPROVED, 2026-10-27: "Yes"):** a DESIGNED sketch. With the core line comes a
-  through-line card (one thread object, one home place, one "you", a carrier for every join); a text world bible (sets,
-  one light rig per set, colour script, tiers per shot) runs alongside the script; the G3 animated sketchbook decides
-  flow, focus and light, not just the story; then a short playable LOOK CLIP in the final style is approved before the
-  full build; G5 fills what G3 decided, one lane per sequence, with no new places or movers. The owner may skip gates by
-  name. Details: `docs/retro/2026-10-27_v3_retro.md`, `docs/PIPELINE_V2.md`. — (v3 retro, 2026-10-27).
+- **The pipeline after v3 (owner APPROVED, 2026-10-27: "Yes"):** a DESIGNED sketch. From the core line comes a
+  through-line card (one thread object, one home place, one "you"), completed with the script (a carrier for every
+  join); a text world bible (sets, one light rig per set, the proposed palette and a colour-script line per beat,
+  tiers per shot) runs alongside the script; the G3 animated sketchbook decides flow, focus and light, not just the
+  story; after the G3 lock, a short playable LOOK CLIP in the final style is approved before the full build; G5 fills
+  what G3 decided, one lane per sequence, with no new places or movers. The owner may skip gates by name. Details:
+  `docs/retro/2026-10-27_v3_retro.md`, `docs/PIPELINE_V2.md`. — (v3 retro, 2026-10-27).
 - **One flowing story, never a bunch of shots stitched together.** Every join carries the eye and the story into the
   next shot (a shared object, a match, a continuous camera, the subject's motion leading out and in); the main arc is
   visible across the whole film. Life and detail are DESIGNED into the shot together with its hierarchy from the start,
@@ -175,7 +188,8 @@ linked) · no size budget: coherent and clear wins over short** (owner, 2026-10-
 - **Palettes: the warm, everyday one for a money / everyday-life story** (#9 Autumn Ember; #7 Autumn Ochre read sick).
   — (v3 G4).
 - **Palettes: the clean "news" one (Cream & Cobalt) for a serious story,** with a cold sister palette (Dusk) only for
-  the one scale beat. — (v2 G4).
+  the one scale beat. — (v2 G4; that cut was later restarted, and the restart's own judges, not the owner, chose
+  "10 Canal Mint").
 
 ## Motion
 - **A reference move gives the SHAPE, never the speed.** Copy its path, framing, reveal order and easing shape, then
@@ -191,18 +205,25 @@ linked) · no size budget: coherent and clear wins over short** (owner, 2026-10-
 
 ## Process and communication
 - **EFFORT IS ALWAYS MAX:** every workflow agent passes `effort: 'max'` (the Agent tool's effort setting too) and every
-  helper session runs at /effort max with ultracode; a lazy video from a low effort setting is our failure. Helper cloud
-  sessions are started for creative work only when needed and briefed fully. — ("the key rule is we need to ensure the
-  effort is MAX!", v2, 2026-10-27; owner, 2026-10-27).
-- **Parallelize as much as possible: split independent work across helper cloud sessions (each its own machine) and
-  archive each one as soon as its work is pushed and checked;** each helper's done-signal is a report file. Boot a
-  helper from a branch whose `.claude/settings.json` says `"ultracode": true` with the first prompt `/effort max`, send
-  the task as a message, check `effort_level: max` + `is_ultracode_active`. Every lane must PROVE it knows the film's
-  style: one STYLE.md per film (colours, line, people, cinema, references, NEVERs), built inside
-  `docs/look/DIRECTION.md`, and a graded style check before it builds. — (v2/v3, 2026-10-27; "do each subsection
-  understand ... the full stylistic direction?").
-- **Playable video from the sketch animatic (G3) on, never only stills; before G3 text and audio only, one version unless
-  asked. Lock the story before big commitments; polish late.** — (v1, 2026-10-25; "why are there multiple versions", v3).
+  helper session runs at /effort max with ultracode; a lazy video from a low effort setting is our failure. — ("the key
+  rule is we need to ensure the effort is MAX!", v2, 2026-10-27; owner, 2026-10-27).
+- **Parallelize as much as possible, inside the weekly and session limits (below): split independent work across helper
+  cloud sessions (each its own machine) and archive each one as soon as its work is pushed and checked;** a helper takes
+  one independent lane that needs its own machine, briefed fully, and its done-signal is a report file. On one machine,
+  run at most about 4 agents at once (this container runs about 2 render-heavy ones well; `docs/PIPELINE_V2.md` rule 5).
+  Boot a helper from a branch whose `.claude/settings.json` says `"ultracode": true` with the first prompt `/effort max`,
+  send the task as a message, check `effort_level: max` + `is_ultracode_active`. Every lane must PROVE it knows the
+  film's style: one STYLE.md per film, with the film's VALUES only (palette and colour jobs, the pen's constants, a light
+  rig per set, the tier map, people sizes, references, NEVERs), inside `docs/look/DIRECTION.md` and `CRAFT.md`, never
+  restating or overriding a rule (v2's STYLE.md predates DIRECTION and is not the template), and a graded style check
+  before it builds. — (v2/v3, 2026-10-27: "parallelize the work as much as you can, start more instances of cloud
+  machines if you have to, but clean them up after"; "spin up as many parallel work sessions as you need"; "do each
+  subsection understand ... the full stylistic direction?").
+- **Playable video from the sketch animatic (G3) on, never only stills; before G3 text and audio only. One version: one
+  deliverable per gate (one script, one take, one animatic, one look clip), never several renders or takes of one gate
+  unless asked;** a choice the owner makes (the topic, the core line, the hook line) comes as up to 3 options on one
+  screen of text. **Lock the story before big commitments; polish late.** — (v1, 2026-10-25; "why are there multiple
+  versions and why is it needed at all at this point?", on three G2 MP4s of one take, v3, 2026-10-25).
 - **Progress: the gate deliverable is the update; between gates, a short text status on all active threads** (about
   every 30 minutes in a long build), never a rendered status reel; lean prompts and docs. — ("every 30 mins share the
   progress on all active ongoing threads", v1, 2026-10-24).
@@ -210,7 +231,7 @@ linked) · no size budget: coherent and clear wins over short** (owner, 2026-10-
   next: G6 easing, G7 sound, full res"), so a draft is never mistaken for the final. — ("let me know if this is just an
   initial intermediate step", v3 G5, 2026-10-26).
 - **The weekly limit is the real budget: finishing the video comes first** (using up to 100 % of the week is fine if the video
-  is completed). Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. The **5-hour
+  is completed; with several films in flight they share it, and finishing them comes before starting a new one). Track the spend hourly (helpers' `cost_usd`, workflow tokens), budget every lane, finish before polishing. The **5-hour
   session limit** is a hard wall shared by every session: watch both; before it hits, PAUSE in a controlled way (every lane stops its
   agents, commits + pushes, writes its handover; schedule the resume after the reset), so nothing is lost. Before any
   restart, re-read the current direction (`docs/look/DIRECTION.md`, the playbook and the docs they link: other sessions
@@ -218,13 +239,16 @@ linked) · no size budget: coherent and clear wins over short** (owner, 2026-10-
 - **NO LIMIT ON TOKENS for creative output (inside the weekly limit); never trade quality for savings.** Ideas, scripts, judged competing ideas,
   design explorations, set building, density, life, animation and polish get as many agents, rounds and tokens as the
   quality needs (workflows larger than the default size guideline too); only true waste is cut (rework, lost work,
-  reviewing what will still change, early polish). — (2026-10-25; owner, 2026-10-26).
+  reviewing what will still change, early polish, a review loop that has stopped improving the shot: `docs/PIPELINE_V2.md`
+  rule 2). — (2026-10-25; owner, 2026-10-26).
 - **Locked means dropped:** rejected options go to `archive/`, never seen by later prompts; unused topics go to `docs/IDEAS_BANK.md`. — (v3, 2026-10-25).
 - **New feedback is INTEGRATED, never just appended:** when a note changes the direction, rewrite or retire every rule and
   doc it contradicts in the same pass, so the next agent never meets conflicting instructions. The current visual and
   storytelling direction lives in one place, `docs/look/DIRECTION.md`. **Which doc wins:** owner's words (playbook;
   vN/OWNER_NOTES) > DIRECTION > CRAFT > PIPELINE_V2 > G3_ANIMATIC, G5_BLOCKING > look/*.md > the film's STYLE.md (values
-  only) > v1-era docs (API and measurements, never style). — ("evaluate this feedback and compact it with the overall
+  only) > v1-era docs (API and measurements, never style); the owner's words are what the owner said, never our
+  "-> what we did" log, and the newest owner note wins; the full order, with the topic docs and the tie-breaks, is
+  DIRECTION's intro. — ("evaluate this feedback and compact it with the overall
   stylistic direction ... the next agent should not be confused with conflicting instructions", 2026-10-27).
 - **Every lesson goes into the generic process, committed** (playbook, a PIPELINE gate, the studio toolkit). — ("we gradually get better", v3, 2026-10-26).
 - **A rejected cut restarts clean.** When the owner says "I don't like it, start from scratch", drop the old visual
@@ -261,6 +285,10 @@ linked) · no size budget: coherent and clear wins over short** (owner, 2026-10-
 - ~~Cuts locked to the beat~~ → joins on the beat, each carrying something (v3 G5b, 2026-10-27).
 - ~~Density and life added after the sketch ("blocking: staging only; next: density, life, polish")~~ → designed into
   G3 with their tiers; G5 fills G3's plan (v3 G5b, 2026-10-27).
+- ~~A face for the protagonist's emotion beat (v3's waist-up "you" facing us)~~ → people have no faces, like reference
+  1; the pose acts; only the mascot has a face (v2 restart rule, 2026-10-27).
+- ~~The G4 look as stills made in parallel with G3~~ → a playable look clip after the G3 lock, approved before G5
+  (the approved pipeline, 2026-10-27).
 
 ## Maintenance (keep this file coherent and clear)
 No size budget (owner, 2026-10-27: "let's not focus on the playbook being a certain size; keep it as coherent and clear as

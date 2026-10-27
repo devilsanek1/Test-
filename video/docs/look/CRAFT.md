@@ -11,8 +11,11 @@ plain cut as G3's default, G5's draft line, the events-per-second quota). Subtle
 means empty: keep the life and the things a scene needs, lower their weight. The one-page summary of the direction is
 `DIRECTION.md`; a film's STYLE.md picks its values inside these rules. **Which doc wins:** owner's words (playbook;
 vN/OWNER_NOTES) > DIRECTION > CRAFT > PIPELINE_V2 > G3_ANIMATIC, G5_BLOCKING > look/*.md > the film's STYLE.md (values
-only) > v1-era docs (API and measurements, never style). Two-film thresholds are warnings with a declared exception,
-except §a's two FAILs. Px at 1080 x 1920, CIE L* and C*, %W/s = % of frame width/s; measures: §e.
+only) > v1-era docs (API and measurements, never style); in full, with the tie-breaks: DIRECTION's intro. This page's
+thresholds come from two films, so they are warnings with a declared exception, except §a's two FAILs. The board lint's
+completeness checks (`G3_ANIMATIC.md` §7: a missing carrier, tier or rig field, a set panel with no ambient move,
+undeclared bare paper, a red mark on an owner-facing render) are not craft thresholds: they check that the board shows
+its signal, and they keep their FAIL. Px at 1080 x 1920, CIE L* and C*, %W/s = % of frame width/s; measures: §e.
 
 ## a. One flowing story
 **The through-line** (written down beside the core line, before any drawing):
@@ -45,7 +48,8 @@ except §a's two FAILs. Px at 1080 x 1920, CIE L* and C*, %W/s = % of frame widt
 - **Timing:** the transition's midpoint lands on the first word of the new sentence, in the voice's pause; during it the
   carrier leads (the mascot may ride with it) and nothing else enters, pops, turns or speeds up, while slow life already
   moving (snow, steam, a far walker) keeps its pace: a freeze reads as a glitch. Shots average >= 3.5 s (ref 1 5.2, v1
-  4.6, v3 2.9).
+  4.6, v3 2.9; a shot is one panel, from one join between panels to the next: a C move inside a panel keeps one shot),
+  so a 40 s film has about 10-12.
 
 **Check** (every join; in brackets ref 1 / v1 / v3 G5b):
 - Shot list (scenes.json `carrier` once the field lands): every join has a carrier letter, at most 2 are F; the thread's
@@ -173,17 +177,21 @@ G4 frame), halos as opaque discs, no cast or contact shadow in any kit file, no 
 10. **How much:** night interior 20-30 % lit (pool and wash), 45-60 % ambient, 10-20 % shadow shapes; night exterior 8-15 %
     warm-lit, ground ambient at least 50 %; day 20-30 % shade and cast. Every object in a lit zone gets a form and a
     contact shadow, every person a cast shadow too; supporting life stays in the ambient band.
-- **Code (shapes, not blur): `lib/light.tsx`, to build** (first version, opt-in: v3's `src/v3/film/kit/Light.tsx`). A
+- **Code (shapes, not blur): `lib/light.tsx`** (2026-10-27: being ported from v3's opt-in first version,
+  `src/v3/film/kit/Light.tsx`; the craft tooling lane finishes it, `PIPELINE_V2.md`). These are engine primitives, not
+  assets, and a film never imports another film's folder (`src/vN/`): a new film takes them from `lib/light.tsx`. A
   `LightRig` context per set; `<ShadowLayer>` = one isolated
   `<g style={{mixBlendMode: 'multiply'}}>` after the fills, before the ink (no double-darkening), holding `<ContactShadow>`,
   `<CastShadow>` (the footprint swept along the light) and `<FormShade>` (the path clipped to the side away from the key);
   then `<LightPool>`, `<PoolLift>`, `<Rim>`; ink and captions on top, unlit. Soft edges: 2 flat steps, no `feGaussianBlur`.
 
-**Check** (the G4 look clip and every render; to port as `scripts/qa/check_light.py`): every pool at least +4 L* over its
-ground; a halo's radius at most 1.7x its lantern; the brightest 5 % (sky and caption band out) centred within 0.15 H of
-the subject; no shadow pixel under C* 8, nor under L* 35 except on an anchor-dark surface; one value in the caption band;
-the G4 look clip already shows the rig with form, cast and contact shadows. Eye check: for every shadow, point at its
-light; for every object in the light, point at its shadow.
+**Check** (the G4 look clip and every render): every pool at least +4 L* over its ground; a halo's radius at most 1.7x
+its lantern; the brightest 5 % (sky and caption band out) centred within 0.15 H of the subject; no shadow pixel under C* 8,
+nor under L* 35 except on an anchor-dark surface; one value in the caption band; the G4 look clip already shows the rig
+with form, cast and contact shadows. `scripts/qa/check_light.py` (built in the v3 rework: an A/B of the same frame with
+the light layers off and on) checks the pools, the brightest 5 %, the shadow colour and the caption band; the halo and
+the three shadow kinds are an eye check. Eye check: for every shadow, point at its light; for every object in the
+light, point at its shadow.
 
 ## e. How to measure (until `scripts/qa` has these: the retro's tooling lane)
 OpenCV, captions masked. **Joins** (frames 108 px wide, OpenCV 8-bit Lab): carry = share of pixels whose mean |ΔLab| < 8
