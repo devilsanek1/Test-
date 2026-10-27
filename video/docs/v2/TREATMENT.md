@@ -186,7 +186,7 @@ W2 (335, 785) 125 x 155 in S2 (133 x 164 at the cut, after S2's push) · SUN0 (2
 
 **The bottom third, y 1250-1920** (masses that run under the platform UI; never flat paving or bare water; nothing to read):
 - **S1:** our canal-side steps: five broad stone steps (edge lines 3.4-4.8 px) with ~14 people sitting, backs to us, in three rows: near heads
-  cut by the bottom across the full width (250-330 px: a hood, a beanie, a low bun with a mustard scarf, curls, a cap), a middle row (heads
+  cut by the bottom across the full width (at most ~140 px wide each, like reference 1's front row; owner rule "don't use big models of people", 2026-10-27, overrides the earlier 250-330 px: a hood, a beanie, a low bun with a mustard scarf, curls, a cap), a middle row (heads
   ~110 px), a low row by the water (~60 px); takeaway cups, tote bags, a dog lying down, a bike leaning, cut by the bottom-right.
 - **S2:** our towpath: broken paving lines, leaves, a drain cover, the A-board's and bench's legs; a planter of grasses cut by the left edge
   (x 0-230, y 1290-1650); a bike locked to a lamp-post whose foot is cut by the bottom-right (x 860-960); two passers-by's head-backs cut by
@@ -328,7 +328,7 @@ before lanes):
   outlines 130 -> 120 as the towpath bends away (feet -> y 1065) · **Google's facade**, 1.5 m behind her line: 90 px/m, base y 1082; ground
   storey 3.2 m (y 794-1082); the glass door 2.6 x 2.0 m (234 x 180 px, y 848-1082, x 540-720); canopy fascia y 800-845 with ~48 px letters; W a
   first-storey window 1.65 x 1.9 m (150 x 170 px) at (860, 700); the parapet y ~600 (-> 640 at the west corner); the tiers behind it out of
-  sight · **our steps:** near head-backs 250-330 px. **The legibility floor:** a story change >= 80 px in its smallest dimension at 1080, a
+  sight · **our steps:** near head-backs at most ~140 px wide (reference 1's front row is ~90-110 px; the owner's people rule overrides the earlier 250-330 px). **The legibility floor:** a story change >= 80 px in its smallest dimension at 1080, a
   figure that carries one >= 130 px tall (the S2 bench staffer >= 180 px seated); key lines >= 56 px.
 - **K3 lettering + boards (ONE owner: L5):** `WorldText` on `src/lib/font.ts`; `StatementBoard` (one enamel A-board face for TOLD THE BBC /
   GOOGLE SAYS / SHE SAYS at B, plus the deal board; one type scale: keys >= 56 px, body 30-34 px, credits 18-20 px; fill-first pen reveal, line
