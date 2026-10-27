@@ -388,18 +388,22 @@ export function band(cam: GroundCam, a: [number, number], b: [number, number], w
 export type Step = {
   /** The tread (near-left, near-right, far-right, far-left). */
   tread: Pt[];
-  /** The riser face toward the camera, or null when it faces away (steps going down away from us show nosings only). */
+  /** The riser face toward the camera (an 'up' flight: at the tread's near edge, from the level below), or null when
+   *  it faces away (a 'down' flight shows nosings only). */
   riser: Pt[] | null;
   /** The tread's near depth and its level. */
   z: number;
   level: number;
 };
 
-/** A flight of n steps (tread depth `tread`, rise `rise`, metres) from x0 to x1, starting at depth z0 on level0 and
+export type FlightOpts = {x0: number; x1: number; z0: number; tread: number; rise: number; n: number; level0?: number; dir?: 'down' | 'up'};
+
+/** A flight of n steps (tread depth `tread`, rise `rise`, metres) from x0 to x1, the first tread at depth z0 on level0,
  *  going 'down' (away from the camera, toward lower levels: steps to the water; risers face away, so each nosing hides
- *  the near part of the tread below it) or 'up' (risers face us). FAR FIRST, the order to draw them in (a nearer tread
- *  covers what it hides); foreshortened by the camera, so the treads compress toward the horizon. */
-export function flight(cam: GroundCam, o: {x0: number; x1: number; z0: number; tread: number; rise: number; n: number; level0?: number; dir?: 'down' | 'up'}): Step[] {
+ *  the near part of the tread below it) or 'up' (each riser faces us, the first one rising from level0 - rise). FAR
+ *  FIRST, the order to draw them in (a nearer step covers what it hides); foreshortened by the camera, so the treads
+ *  compress toward the horizon. */
+export function flight(cam: GroundCam, o: FlightOpts): Step[] {
   const out: Step[] = [];
   const sgn = (o.dir ?? 'down') === 'down' ? -1 : 1;
   const l0 = o.level0 ?? 0;
@@ -407,11 +411,28 @@ export function flight(cam: GroundCam, o: {x0: number; x1: number; z0: number; t
     const z = o.z0 + i * o.tread;
     const level = l0 + sgn * i * o.rise;
     const tread = groundPoly(cam, o.x0, o.x1, z, z + o.tread, level);
-    // going up, the riser at the tread's far edge rises toward the next tread and faces the camera
-    const riser = sgn > 0 && i < o.n - 1 ? frontFace(cam, o.x0, o.x1, z + o.tread, level, level + o.rise) : null;
+    const riser = sgn > 0 ? frontFace(cam, o.x0, o.x1, z, level - o.rise, level) : null;
     out.push({tread, riser, z, level});
   }
   return out;
+}
+
+/** The side of a flight at x (its cheek: the stepped profile seen from the side, down to `base`), one closed polygon:
+ *  a vertical face running into the picture, so its edges converge on the VP. Draw it on the side that faces the camera
+ *  (x0 when the camera is right of the flight, x1 when it is left). */
+export function flightCheek(cam: GroundCam, o: FlightOpts, x: number, base?: number): Pt[] {
+  const sgn = (o.dir ?? 'down') === 'down' ? -1 : 1;
+  const l0 = o.level0 ?? 0;
+  const lastL = l0 + sgn * (o.n - 1) * o.rise;
+  const b = base ?? Math.min(l0 - (sgn > 0 ? o.rise : 0), lastL) - 0.001;
+  const pts: Pt[] = [cam.pt(x, o.z0, b)];
+  for (let i = 0; i < o.n; i++) {
+    const z = o.z0 + i * o.tread;
+    const level = l0 + sgn * i * o.rise;
+    pts.push(cam.pt(x, z, level), cam.pt(x, z + o.tread, level));
+  }
+  pts.push(cam.pt(x, o.z0 + o.n * o.tread, b));
+  return pts;
 }
 
 /** The lib/persp.tsx Quad (TL, TR, BR, BL) of a ground rectangle, for <Plane quad={...} w h>: lay the dressing out flat in
