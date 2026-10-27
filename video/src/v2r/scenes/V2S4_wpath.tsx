@@ -198,7 +198,7 @@ function copingInto(b: Batch) {
 const LAMPS = [{x: 40, h: 290}, {x: 905, h: 290}, {x: 1392, h: 290}];
 
 function furnitureInto(b: Batch) {
-  const sh = (x: number, y: number, w: number, len = SHADOW.len) => b.poly(CM.stoneShade, [[x - w / 2, y - 1], [x + w / 2, y - 2], [x + w / 2 + len, y + 4], [x - w / 2 + len * 0.85, y + 6]]);
+  const sh = (x: number, y: number, w: number, len: number = SHADOW.len) => b.poly(CM.stoneShade, [[x - w / 2, y - 1], [x + w / 2, y - 2], [x + w / 2 + len, y + 4], [x - w / 2 + len * 0.85, y + 6]]);
   for (const l of LAMPS) sh(l.x, 1062, 16, 30);
   // planters of grasses at the wall foot (one under the plates, one by the far gate)
   sh(190, 1006, 90);

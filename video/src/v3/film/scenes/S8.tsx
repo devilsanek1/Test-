@@ -28,7 +28,7 @@ import {mat, XG} from '../../../lib/xf';
 import {EMBER, Laptop, laptopGeo, MemoryStick, quadPt, ring, STICK_RATIO, type Pt} from '../kit';
 import {s7s8Float, S7_DUR} from './S7';
 import {StickDetail} from '../kit/S8_stick';
-import {BezelNote, BezelSticker, KeyLegends, KeySprings, S8_LAND, S8DeskFront, S8Pip, S8WallTop} from './S8_edges';
+import {BezelNote, BezelSticker, KeyLegends, KeySprings, S8_LAND, S8DeskFront, S8Pip, S8WallTop, S8Window} from './S8_edges';
 
 /** The rise (board move: from the cut, 0.4 s). */
 const RISE_AT = 0;
@@ -68,6 +68,7 @@ const S8: React.FC = () => {
     <World sky={EMBER.wall}>
       <XG m={mat.translate(dx, dy)}>
         <S8WallTop />
+        <S8Window />
         <Fill rect={[-80, 700, 1240, 1400]} color={EMBER.desk} offset={false} />
         <Fill d={blob(POOL.cx, POOL.cy, POOL.rx, POOL.ry, {seed: 's8/pool1', wobble: 0.015})} color={EMBER.ring} offset={false} />
         <Fill d={blob(POOL.cx - 20, POOL.cy + 6, POOL.rx * 0.6, POOL.ry * 0.6, {seed: 's8/pool2', wobble: 0.02})} color={EMBER.core} offset={false} />

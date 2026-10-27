@@ -3,12 +3,13 @@
 // docs/v3/cozy_v2_application.md). The lamp pool under the tag stays the tag's calm ring; the clutter sits at both
 // depths round it, cut by the edges, in the room's warm family plus the dusk-blue cool share (headphones, the
 // notebook's cover, the pen, the cable), never the hero orange or the blue pop:
-//   back     the pen cup cut by the right edge, the mug (steam) at the pool's right rim, behind Pip.
-//   mid      the charger from the laptop's right side across the desk to the right edge, two clementines (one half
-//            peeled), reading glasses, sticky notes (one flutters in the tag's air), headphones cut by the right edge.
-//   front    a spiral notebook (dusk-blue cover) and a pen cut by the left edge, letters, a dusk-blue paperback cut by
-//            the bottom edge (your phone is in your hand in S15 and O1, so never on the desk here),
-//            O1's open planner cut by the bottom-right corner, crumbs, wood grain.
+//   back     the pen cup cut by the right edge, the mug (steam) at the pool's right rim, in front of Pip on the sill.
+//   mid      the charger from the laptop's right side across the desk to the right edge, the plate of biscuits left of
+//            the pool (S15 / O1 keep the biscuits and the headphones on the LEFT: fixer pass, G5b review), reading
+//            glasses, sticky notes (one flutters in the tag's air), two clementines (one half peeled) on the right.
+//   front    a spiral notebook (dusk-blue cover) and a pen cut by the left edge (the headphones lie just behind it),
+//            letters, a dusk-blue paperback cut by the bottom edge (your phone is in your hand in S15 and O1, so never
+//            on the desk here), O1's open planner cut by the bottom-right corner, crumbs, wood grain.
 // Everything is built from the cut (no `at`): S16 opens on a hard cut. Raw-SVG pieces sit in ExitFade so the loop's
 // un-build takes them with the fills.
 import React from 'react';
@@ -100,12 +101,14 @@ export const S16DeskMid: React.FC = () => (
     <ExitFade x={700} y={1600}>
       <Cable points={[PORT, [352, 1440], [420, 1566], [600, 1622], [850, 1606], [1150, 1650]]} plug width={7} color={EMBER.dcSide} />
     </ExitFade>
-    <Clementines x={444} y={1522} k={1.3} seed="s16/clem" />
+    {/* the headphones in front of the laptop at the left edge (S15 / O1: in the lamp light at the left) */}
+    <Headphones x={84} y={1530} w={190} seed="s16/hp" ink={W.far} />
+    {/* the biscuits left of the pool (S15's side), crumbs strayed toward the notebook (S16DeskFront) */}
+    <Biscuits x={478} y={1536} k={1.05} seed="s16/biscuits" />
     {/* reading glasses on the pool's front rim (the lenses catch the lamp) */}
     <Glasses x={690} y={1438} w={150} rot={-8} seed="s16/glasses" ink={W.far} />
     <StickyNotes x={760} y={1510} n={2} size={78} flutterAt={[S16_TURN + 0.18, 1.72]} seed="s16/sticky" />
-    <Headphones x={980} y={1478} w={224} seed="s16/hp" ink={W.far} />
-    <Biscuits x={930} y={1652} k={1.15} seed="s16/biscuits" />
+    <Clementines x={930} y={1486} k={1.3} seed="s16/clem" />
   </>
 );
 

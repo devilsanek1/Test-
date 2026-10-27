@@ -41,6 +41,9 @@ export type PriceTagProps = {
   sway?: number;
   /** Turn the tag over from this time (0.36 s): the back shows a small data center. */
   turnAt?: number;
+  /** The turn's progress 0..1 given directly (0 = front, 1 = back; overrides `turnAt`): S16's loop un-build turns the
+   *  tag back to its front as it travels onto O1's frame-0 tag. */
+  turn?: number;
   /** The sign on the back's mini data center (default "AI": the full "AI DATA CENTER" is ~6 px at phone size). */
   backSign?: string;
   /** 'hero' (burnt orange, default) | 'pop' (the style frame's blue tag). */
@@ -79,7 +82,7 @@ function tickerNow(t: number, value?: string, ticker?: TickerStep[]): {v: string
   return {v, since};
 }
 
-export const PriceTag: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, oldSize: oldK = 0.16, oldTone = 'white', oldAt, strikeAt, stringFrom, rot = 0, sway = 0, turnAt, backSign = 'AI', tone = 'hero', at, seed = 'tag', ink = 3.4}) => {
+export const PriceTag: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, oldSize: oldK = 0.16, oldTone = 'white', oldAt, strikeAt, stringFrom, rot = 0, sway = 0, turnAt, turn, backSign = 'AI', tone = 'hero', at, seed = 'tag', ink = 3.4}) => {
   const t = useTime();
   const h = w * 0.5;
   const shape = tagShape(w);
@@ -95,8 +98,8 @@ export const PriceTag: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, 
   // turn-over: |cos| squash about the tag's centre; the back shows after the half-way point
   let sx = 1;
   let back = false;
-  if (turnAt !== undefined && t >= turnAt) {
-    const p = prog(t, turnAt, 0.36, ease.inOutSine);
+  if (turn !== undefined || (turnAt !== undefined && t >= turnAt)) {
+    const p = turn !== undefined ? clamp(turn) : prog(t, turnAt!, 0.36, ease.inOutSine);
     sx = Math.cos(Math.PI * p);
     back = p > 0.5;
     sx = Math.abs(sx) < 0.02 ? 0.02 : Math.abs(sx);

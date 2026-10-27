@@ -55,20 +55,20 @@ export function herTilt(t: number): number {
 /** The model as Her.tsx draws it (cheek crescent on, the cream tote). */
 const MODEL = {...HER, cheek: true};
 
-/** Her long low-sun shadow on the paving: the light is SUN1 low in the west, so it runs EAST (screen right) along the
- *  towpath, a shade-colour slab that stays on the paving (it never reaches the coping at y 1082). */
+/** Her shadow on the paving (STYLE §2: one sun low in the west, shadows are colour, flat, SHORT: <= ~40 px past the
+ *  object): the same east-falling quad the world's walkers get (V2S4_wcore SHADOW), so one light rules the frame. */
 const HerShadow: React.FC = () => {
   const b = useMemo(() => {
     const x = S4_HER.x;
     const y = S4_HER.feetY;
+    const w = S4_HER.h * 0.22;
+    const len = 34;
     const s = new Batch();
     s.poly(CM.stoneShade, [
-      [x - 13, y - 1],
-      [x + 10, y - 3],
-      [x + 178, y + 3],
-      [x + 186, y + 7],
-      [x + 30, y + 6],
-      [x - 10, y + 4],
+      [x - w * 0.5, y - 1],
+      [x + w * 0.5, y - 2],
+      [x + w * 0.5 + len, y + 4],
+      [x - w * 0.3 + len * 0.9, y + 6],
     ]);
     return s;
   }, []);

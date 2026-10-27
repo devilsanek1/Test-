@@ -134,7 +134,8 @@ export const QueueSet: React.FC<{dur: number; s14?: QueueS14; beats?: QueueBeats
       el: (
         <React.Fragment key="dc1">
           <CoolingPlume x={DC1.x - DC1.w * 0.36} y={DC1.y - DC1.h - 14} seed="q/plume" rise={110} drift={-40} r1={18} />
-          <DataCenter x={DC1.x} y={DC1.y} w={DC1.w} h={DC1.h} signLitAt={dc1Lit ? 0 : undefined} seed="q/dc1" />
+          {/* dark (O1 after 4.04, S9, S15: the near-black body): the building has gone dark (G5b review) */}
+          <DataCenter x={DC1.x} y={DC1.y} w={DC1.w} h={DC1.h} variant="dark" signLitAt={dc1Lit ? 0 : undefined} seed="q/dc1" />
         </React.Fragment>
       ),
     },
