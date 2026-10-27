@@ -26,59 +26,81 @@ import {NewsBox, Plaque} from './V2S5_text';
 /** The wipe lamppost is drawn while p is inside this range (it enters / leaves outside the frame). */
 export const WIPE_P: [number, number] = [0.02, 0.75];
 
-export const S5Set: React.FC<{p?: number}> = ({p: pIn}) => {
+/** The set's layer groups (for `only`): start, far, sky, river, mid, nearmid, deck, figs, text, frames, wipe, near. */
+export type S5Layer = 'start' | 'far' | 'sky' | 'river' | 'mid' | 'nearmid' | 'deck' | 'figs' | 'text' | 'frames' | 'wipe' | 'near';
+
+export const S5Set: React.FC<{p?: number; only?: S5Layer[]}> = ({p: pIn, only}) => {
   const t = useTime();
   const p = pIn ?? craneP(t);
   const swapped = pIn !== undefined ? pIn >= SWAP_P : t >= swapAt;
   const deck = planeMat(PLANES.deck, p);
   const deckStart = startMat(PLANES.deck, p);
+  const on = (l: S5Layer) => !only || only.includes(l);
   return (
     <>
-      <S5StartBack p={p} />
-      <PullLayer m={planeMat(PLANES.far, p)}>
-        <S5Far />
-      </PullLayer>
-      <S5FarLife p={p} />
-      <PullLayer m={planeMat(PLANES.river, p)}>
-        <S5River />
-      </PullLayer>
-      <PullLayer m={planeMat(PLANES.mid, p)}>
-        <S5Mid />
-      </PullLayer>
-      <PullLayer m={startMat(PLANES.nearmid, p)}>
-        <S5NearMid />
-      </PullLayer>
+      {on('start') ? <S5StartBack p={p} /> : null}
+      {on('far') ? (
+        <PullLayer m={planeMat(PLANES.far, p)}>
+          <S5Far />
+        </PullLayer>
+      ) : null}
+      {on('sky') ? <S5FarLife p={p} /> : null}
+      {on('river') ? (
+        <PullLayer m={planeMat(PLANES.river, p)}>
+          <S5River />
+        </PullLayer>
+      ) : null}
+      {on('mid') ? (
+        <PullLayer m={planeMat(PLANES.mid, p)}>
+          <S5Mid />
+        </PullLayer>
+      ) : null}
+      {on('nearmid') ? (
+        <PullLayer m={startMat(PLANES.nearmid, p)}>
+          <S5NearMid />
+        </PullLayer>
+      ) : null}
       <PullLayer m={deck}>
-        <S5Deck />
-        {swapped ? <FiguresEnd /> : null}
+        {on('deck') ? <S5Deck /> : null}
+        {swapped && on('figs') ? <FiguresEnd /> : null}
       </PullLayer>
-      {swapped ? null : (
+      {swapped || !on('figs') ? null : (
         <PullLayer m={deckStart}>
           <FiguresStart />
         </PullLayer>
       )}
-      <PullLayer m={deck}>
-        <S5DeckOver />
-      </PullLayer>
-      <PullLayer m={deckStart}>
-        <NewsBox />
-      </PullLayer>
-      <PullLayer m={deck}>
-        <Plaque at={T5.pentagon} />
-      </PullLayer>
-      <PullLayer m={boxMat(PLANES.tree, p)}>
-        <S5TreeLeft />
-      </PullLayer>
-      <PullLayer m={boxMat(PLANES.right, p)}>
-        <S5RightFrame />
-      </PullLayer>
-      {p > WIPE_P[0] && p < WIPE_P[1] ? (
+      {on('deck') ? (
+        <PullLayer m={deck}>
+          <S5DeckOver />
+        </PullLayer>
+      ) : null}
+      {on('text') ? (
+        <>
+          <PullLayer m={deckStart}>
+            <NewsBox />
+          </PullLayer>
+          <PullLayer m={deck}>
+            <Plaque at={T5.pentagon} />
+          </PullLayer>
+        </>
+      ) : null}
+      {on('frames') ? (
+        <>
+          <PullLayer m={boxMat(PLANES.tree, p)}>
+            <S5TreeLeft />
+          </PullLayer>
+          <PullLayer m={boxMat(PLANES.right, p)}>
+            <S5RightFrame />
+          </PullLayer>
+        </>
+      ) : null}
+      {on('wipe') && p > WIPE_P[0] && p < WIPE_P[1] ? (
         <XG m={wipeMat(p)}>
           <S5WipeProp />
         </XG>
       ) : null}
-      <S5NearEnd p={p} />
-      <S5StartFore p={p} />
+      {on('near') ? <S5NearEnd p={p} /> : null}
+      {on('start') ? <S5StartFore p={p} /> : null}
     </>
   );
 };
