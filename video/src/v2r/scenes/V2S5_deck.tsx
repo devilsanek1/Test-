@@ -45,9 +45,10 @@ function props(): Prop[] {
     }),
     bin(-2.25, 11.1),
     fountain(3.0, 11.6),
-    crabPlanter(-2.2, 12.3, 'L'),
+    crabPlanter(-3.3, 13.5, 'L'),
     lectern(4.35, 12.75),
-    tulipBed(-1.2, 3.6, 8.2, 9.7, 'near', true),
+    tulipBed(-1.0, 1.6, 8.2, 9.7, 'nearL'),
+    tulipBed(2.3, 4.0, 8.2, 9.5, 'nearR'),
   ];
 }
 

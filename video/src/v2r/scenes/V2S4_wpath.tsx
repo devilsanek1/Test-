@@ -91,9 +91,9 @@ function wallsInto(b: Batch) {
       const ry = TOP - 62;
       b.rect(CM.anchor, s.x0, ry + 6, s.x1 - s.x0, 3);
       b.rect(CM.anchor, s.x0, TOP - 16, s.x1 - s.x0, 2.4);
-      for (let x = s.x0 + 6; x < s.x1 - 2; x += 11) {
-        b.rect(CM.anchor, x - 1.1, ry + 2, 2.2, TOP - 8 - ry);
-        b.poly(CM.anchor, [[x - 2.4, ry + 4], [x, ry - 3], [x + 2.4, ry + 4]]);
+      for (let x = s.x0 + 7; x < s.x1 - 2; x += 15) {
+        b.rect(CM.anchor, x - 0.9, ry + 2, 1.8, TOP - 8 - ry);
+        b.poly(CM.anchor, [[x - 2.2, ry + 4], [x, ry - 3], [x + 2.2, ry + 4]]);
       }
     }
     if (s.kind === 'trellis') {

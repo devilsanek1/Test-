@@ -194,7 +194,7 @@ function pavingInto(L: Levels) {
  *  leaving the frame on the right (the lantern hangs out of frame). */
 function lampInto(L: Levels) {
   const x = NG.lampX;
-  const top = 1222;
+  const top = 1240;
   const col = CM.anchor;
   // its long shadow on the paving (to the right, away from the low sun)
   groundShadow(L.at(0), x - 30, x + 30, 1930, 190, 30);
@@ -207,8 +207,9 @@ function lampInto(L: Levels) {
   // the column (tapering) up to the collar and the swan neck
   b.poly(col, [[x - 13, 1868], [x + 13, 1868], [x + 10.5, top], [x - 10.5, top]]);
   b.poly(col, [[x - 17, top + 16], [x + 17, top + 16], [x + 14, top - 8], [x - 14, top - 8]]);
-  b.fill(col, `M${P(x - 9, top - 6)}Q${P(x - 12, top - 70)} ${P(x + 60, top - 92)}Q${P(x + 150, top - 112)} ${P(1200, top - 140)}L${P(1200, top - 122)}Q${P(x + 150, top - 94)} ${P(x + 62, top - 74)}Q${P(x + 8, top - 58)} ${P(x + 9, top - 6)}Z`);
-  b.fill(col, `M${P(x + 8, top - 30)}Q${P(x + 40, top - 34)} ${P(x + 52, top - 62)}L${P(x + 46, top - 64)}Q${P(x + 36, top - 42)} ${P(x + 8, top - 40)}Z`);
+  // the swan-neck arm: it leaves the frame over the canal (y ~1140), clear of her towpath and its cyclist
+  b.fill(col, `M${P(x - 9, top - 6)}Q${P(x - 12, top - 58)} ${P(x + 58, top - 76)}Q${P(x + 150, top - 92)} ${P(1200, top - 104)}L${P(1200, top - 87)}Q${P(x + 150, top - 75)} ${P(x + 60, top - 59)}Q${P(x + 8, top - 46)} ${P(x + 9, top - 6)}Z`);
+  b.fill(col, `M${P(x + 8, top - 26)}Q${P(x + 38, top - 30)} ${P(x + 50, top - 52)}L${P(x + 44, top - 54)}Q${P(x + 34, top - 36)} ${P(x + 8, top - 35)}Z`);
   // brass bands, flutes, the shade side (warm), the lit edge (the low sun from the left)
   const c = L.at(2);
   c.rect(CM.coatMustard, x - 12.5, 1592, 25, 8);
@@ -220,7 +221,7 @@ function lampInto(L: Levels) {
   c.rect(CM.coatPlum, x - 9, top + 20, 3, 1866 - top - 24);
   // ink: the column's lit edge and the plinth's top edges (front weight, loose), the arm's upper edge
   c.ink(line(x - 13, 1868, x - 10.5, top, {seed: 's3ng/lampL', over: 'small', drift: 0.05, bow: 0.8}) + line(x - 44, 1952, x + 44, 1952, {seed: 's3ng/plinthT', over: 'small', drift: 0.1}) + line(x - 31, 1880, x + 31, 1880, {seed: 's3ng/plinth2', over: 'small', drift: 0.1}), INK_PX.front, CM.ink, 0.2);
-  c.ink(`M${P(x - 9, top - 6)}Q${P(x - 12, top - 70)} ${P(x + 60, top - 92)}Q${P(x + 150, top - 112)} ${P(1200, top - 140)}`, INK_PX.mid, CM.ink, 0.25);
+  c.ink(`M${P(x - 9, top - 6)}Q${P(x - 12, top - 58)} ${P(x + 58, top - 76)}Q${P(x + 150, top - 92)} ${P(1200, top - 104)}`, INK_PX.mid, CM.ink, 0.25);
 }
 
 // ---------------------------------------------------------------- life

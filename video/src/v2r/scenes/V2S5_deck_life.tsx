@@ -177,6 +177,9 @@ const Book: React.FC<{x: number; y: number; w: number}> = ({x, y, w}) => (
 /** Coat colours for the public here (no CM.box: the peach is the caption key box's job). */
 const COATS = {slate: CM.coatSlate, mustard: CM.coatMustard, oat: CM.coatOat, plum: CM.coatPlum, sage: CM.sage, brick: CM.brick, brickLight: CM.brickLight, stone: CM.stoneShade, rust: CM.leafRust, deep: CM.brickDeep};
 
+/** A flat contact shadow under a standing figure (toward us-left: the sun is beyond, right). */
+const Shade: React.FC<{x: number; y: number; k: number; w?: number}> = ({x, y, k, w = 0.34}) => <path d={ellD(x - 0.1 * k, y + 0.02 * k, w * k, 0.075 * k)} fill={DT.deep} />;
+
 const person = (X: number, d: number, hm: number) => {
   const [x, y] = dpt(X, d);
   return {x, y, h: hm * pxmD(d), k: pxmD(d)};
@@ -192,12 +195,13 @@ export function lifeItems(t: number): LifeItem[] {
     const dR = RAIL.d - 0.62;
     const a = person(9.55, dR, 1.64);
     const b = person(10.22, dR - 0.05, 1.8);
-    add(a.y, 'railA', <Person key="railA" x={a.x} y={a.y} h={a.h} seed="s5t/railA" traits={{hair: 'bun', hairColor: H[4], coat: COATS.slate, acc: 'tote', accColor: CM.coatOat} as TraitOverrides} />);
-    add(b.y, 'railB', <Person key="railB" x={b.x} y={b.y} h={b.h} seed="s5t/railB" view="rear34" turn={-0.35 + 0.15 * Math.sin(t * 0.9)} traits={{hair: 'short', hairColor: H[1], coat: COATS.oat, acc: 'backpack', accColor: CM.brickDeep} as TraitOverrides} />);
+ add(a.y, 'railA', <g key="railA"><Shade x={a.x} y={a.y} k={a.k} /><Person x={a.x} y={a.y} h={a.h} seed="s5t/railA" traits={{hair: 'bun', hairColor: H[4], coat: COATS.slate, acc: 'tote', accColor: CM.coatOat} as TraitOverrides} /></g>);
+    add(b.y, 'railB', <g key="railB"><Shade x={b.x} y={b.y} k={b.k} /><Person x={b.x} y={b.y} h={b.h} seed="s5t/railB" view="rear34" turn={-0.35 + 0.15 * Math.sin(t * 0.9)} traits={{hair: 'short', hairColor: H[1], coat: COATS.oat, acc: 'backpack', accColor: CM.brickDeep} as TraitOverrides} /></g>);
     const p = person(12.75, dR - 0.1, 1.78);
     const kidSeatY = p.y - p.h * 0.83;
     add(p.y, 'railP', (
       <g key="railP">
+        <Shade x={p.x} y={p.y} k={p.k} />
         <Person x={p.x} y={p.y} h={p.h} exact seed="s5t/railP" traits={{hair: 'short', hairColor: H[2], coat: COATS.sage, acc: 'none'} as TraitOverrides} />
         {/* the kid's legs over the parent's shoulders, then the kid */}
         <path d={lineD([[p.x - p.h * 0.07, kidSeatY + 1], [p.x - p.h * 0.1, kidSeatY + p.h * 0.1]]) + lineD([[p.x + p.h * 0.07, kidSeatY + 1], [p.x + p.h * 0.1, kidSeatY + p.h * 0.1]])} stroke={CM.coatSlate} strokeWidth={Math.max(2, p.h * 0.045)} strokeLinecap="round" fill="none" />
@@ -221,22 +225,23 @@ export function lifeItems(t: number): LifeItem[] {
   // --- the jogger crossing right -> left (enters late: off the start window and the frame until the crane opens up)
   {
     const d = 15.85;
-    const X = Xt(10.6, -2.75, t);
+    const X = Xt(14.16, -2.75, t);
     const j = person(X, d, 1.74);
-    add(j.y, 'jogger', <Person key="jogger" x={j.x} y={j.y} h={j.h} seed="s5t/jog" pose="jog" view="profile" walk={{rate: 2.7}} stride={strideFor(2.75 / 2.7 * j.k, j.h)} traits={{hair: 'crop', hairColor: H[2], coat: COATS.rust, acc: 'headphones', accColor: CM.anchor} as TraitOverrides} />);
+    add(j.y, 'jogger', <g key="jogger"><Shade x={j.x} y={j.y} k={j.k} w={0.4} /><Person x={j.x} y={j.y} h={j.h} seed="s5t/jog" pose="jog" view="profile" walk={{rate: 2.7}} stride={Math.min(0.8, strideFor((2.75 / 2.7) * j.k, j.h))} traits={{hair: 'crop', hairColor: H[2], coat: COATS.rust, acc: 'headphones', accColor: CM.anchor} as TraitOverrides} /></g>);
   }
 
   // --- someone walking a dog (right -> left), the dog trotting ahead on a lead
   {
     const d = 14.4;
     const v = -1.3;
-    const X = Xt(10.4, v, t);
+    const X = Xt(12.2, v, t);
     const w = person(X, d, 1.7);
     const dog = dpt(X - 0.95, d - 0.05);
     const hand: Pt = [w.x - w.h * 0.16, w.y - w.h * 0.45];
     add(w.y, 'dogWalker', (
       <g key="dogWalker">
-        <Dog x={dog[0]} y={dog[1]} hb={0.42 * w.k} t={t} col={CM.coatOat} ear={mix(CM.coatOat, CM.line, 0.45)} />
+        <Shade x={w.x} y={w.y} k={w.k} />
+        <Dog x={dog[0]} y={dog[1]} hb={0.42 * w.k} t={t} col={CM.line} ear={mix(CM.line, CM.anchor, 0.45)} />
         <path d={`M${hand[0]} ${hand[1]}Q${(hand[0] + dog[0]) / 2} ${hand[1] + w.h * 0.12} ${dog[0] - 0.22 * w.k} ${dog[1] - 0.48 * w.k}`} stroke={CM.anchor} strokeWidth={1.2} fill="none" />
         <Person x={w.x} y={w.y} h={w.h} seed="s5t/dogW" pose="reach" view="profile" reach={[-w.h * 0.17, -w.h * 0.46]} walk={{rate: 2.0}} stride={strideFor(1.3 / 2 * w.k, w.h)} traits={{hair: 'beanie', hatColor: CM.leafRust, hairColor: H[0], coat: COATS.plum, acc: 'none'} as TraitOverrides} />
       </g>
@@ -247,11 +252,12 @@ export function lifeItems(t: number): LifeItem[] {
   {
     const d = 13.35;
     const v = 1.15;
-    const X = Xt(-4.35, v, t);
+    const X = Xt(-5.5, v, t);
     const pp = person(X, d, 1.68);
     const st = dpt(X + 0.42, d);
     add(pp.y, 'stroller', (
       <g key="stroller">
+        <Shade x={pp.x} y={pp.y} k={pp.k} />
         <Stroller x={st[0]} y={st[1]} k={pp.k} t={t} />
         <Person x={pp.x} y={pp.y} h={pp.h} seed="s5t/strollerP" pose="reach" view="profile" flip reach={[-pp.h * 0.24, -pp.h * 0.56]} walk={{rate: 1.8}} stride={strideFor((1.15 / 1.8) * pp.k, pp.h)} traits={{hair: 'lowBun', hairColor: H[3], coat: COATS.brick, acc: 'strap', accColor: CM.coatOat} as TraitOverrides} />
       </g>
@@ -263,6 +269,7 @@ export function lifeItems(t: number): LifeItem[] {
     const g = person(5.35, 13.05, 1.62);
     add(g.y, 'guide', (
       <g key="guide">
+        <Shade x={g.x} y={g.y} k={g.k} />
         <Person x={g.x} y={g.y} h={g.h} seed="s5t/guide" view="rear34" turn={0.3} pose="reach" reach={[-g.h * 0.2, -g.h * 0.6]} traits={{hair: 'short', hairColor: H[3], coat: COATS.plum, acc: 'scarf', accColor: CM.coatMustard} as TraitOverrides} />
         <Book x={g.x - g.h * 0.24} y={g.y - g.h * 0.66} w={g.h * 0.16} />
       </g>
@@ -271,11 +278,11 @@ export function lifeItems(t: number): LifeItem[] {
 
   // --- two friends chatting at the right edge (one cut by it)
   {
-    const d = 15.1;
-    const a = person(10.15, d, 1.72);
-    const b = person(10.95, d + 0.1, 1.66);
-    add(a.y, 'friendA', <Person key="friendA" x={a.x} y={a.y} h={a.h} seed="s5t/frA" view="rear34" flip turn={0.4} traits={{hair: 'hood', coat: COATS.sage, acc: 'none'} as TraitOverrides} />);
-    add(b.y, 'friendB', <Person key="friendB" x={b.x} y={b.y} h={b.h} seed="s5t/frB" view="profile" traits={{hair: 'curls', hairColor: H[1], coat: COATS.mustard, acc: 'tote', accColor: CM.paper} as TraitOverrides} />);
+    const d = 15.0;
+    const a = person(10.47, d, 1.72);
+    const b = person(11.04, d + 0.1, 1.66);
+    add(a.y, 'friendA', <g key="friendA"><Shade x={a.x} y={a.y} k={a.k} /><Person x={a.x} y={a.y} h={a.h} seed="s5t/frA" view="rear34" flip turn={0.4} traits={{hair: 'hood', coat: COATS.sage, acc: 'none'} as TraitOverrides} /></g>);
+    add(b.y, 'friendB', <g key="friendB"><Shade x={b.x} y={b.y} k={b.k} /><Person x={b.x} y={b.y} h={b.h} seed="s5t/frB" view="profile" traits={{hair: 'curls', hairColor: H[1], coat: COATS.mustard, acc: 'tote', accColor: CM.paper} as TraitOverrides} /></g>);
   }
 
   // --- a reader on the near bench (bench X -1.5..1.5 at d 10.8), a takeaway cup on the slats beside them
@@ -289,7 +296,7 @@ export function lifeItems(t: number): LifeItem[] {
   // --- a kid at the drinking fountain (fountain X 3.0, d 11.6): reaching up to the spout
   {
     const kd = person(3.42, 11.62, 1.12);
-    add(kd.y, 'kidFountain', <Person key="kidFountain" x={kd.x} y={kd.y} h={kd.h} seed="s5t/kidF" view="profile" pose="reach" reach={[-kd.h * 0.36, -kd.h * (0.78 + 0.03 * Math.sin(t * 3))]} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: H[4], coat: COATS.mustard, acc: 'backpack', accColor: CM.brick} as TraitOverrides} />);
+    add(kd.y, 'kidFountain', <g key="kidFountain"><Shade x={kd.x} y={kd.y} k={kd.k} w={0.26} /><Person x={kd.x} y={kd.y} h={kd.h} seed="s5t/kidF" view="profile" pose="reach" reach={[-kd.h * 0.36, -kd.h * (0.78 + 0.03 * Math.sin(t * 3))]} traits={{hair: 'cap', hatColor: CM.coatSlate, hairColor: H[4], coat: COATS.mustard, acc: 'backpack', accColor: CM.brick} as TraitOverrides} /></g>);
   }
 
   // --- pigeons: a flock in front of the pair (the start's life: 2.4x there), a few take off in the hold; more by the
@@ -303,6 +310,11 @@ export function lifeItems(t: number): LifeItem[] {
       {X: 2.95, d: 18.6, dir: 1},
       {X: 3.6, d: 17.4, dir: -1},
       {X: 0.2, d: 17.6, dir: 1, lift: {at: 3.12, to: [-80, 1250]}},
+      {X: -0.6, d: 18.5, dir: -1},
+      {X: 1.6, d: 16.9, dir: 1},
+      {X: 3.2, d: 16.4, dir: -1},
+      {X: -1.1, d: 17.2, dir: 1},
+      {X: 0.9, d: 15.9, dir: -1},
     ];
     add(dpt(0, 18.3)[1], 'pigeonsA', <Pigeons key="pigeonsA" spots={spots} seed="s5t/pgA" t={t} />);
     const spots2: PigeonSpot[] = [

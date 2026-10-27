@@ -99,7 +99,7 @@ export const S3Water: React.FC = () => {
 };
 
 /** The heron's mooring post: a timber post standing in the water off the far coping. */
-const POST = {x: 834, top: 1150, bottom: 1236, w: 12} as const;
+const POST = {x: 1046, top: 1150, bottom: 1236, w: 12} as const;
 
 const PostAndRings: React.FC = () => {
   const b = useMemo(() => {

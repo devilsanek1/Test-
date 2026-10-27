@@ -2,17 +2,18 @@
 //
 //   paving    a limestone BORDER BAND along the balustrade (long slabs), a brick HEADER course, then a field of stone
 //             FLAGS in random bond (courses parallel to the rail; the longitudinal joints converge on the deck's VP above
-//             the pair: the lines lead up to them), a band of brick setts across the terrace, drain grates.
-//   light     2 values, STATIC (STYLE section 3: no boil, no sway): the whole floor is drawn twice, in the canopy's shade
-//             tones and in sunlit tones, and the sunlit copy is clipped to the LIGHT shapes: lobed sun flecks everywhere
-//             (sparse and small round the pair: the start's warm-dark floor), long lobed shafts from beyond the rail on the
-//             right (they fan from the low morning sun's azimuth), and a few pools in the near zone.
-//   drifts    petals along the plinth, against the kerbs and bench legs, in the joints, scattered (sized to read at both
-//             scales: 2-4 px at the end = 5-10 px at the start).
+//             the pair: the lines lead up to them; a few worn / patched flags), a band of brick setts across the terrace.
+//   light     2 values, STATIC (STYLE section 3: no boil, no sway): the whole floor is drawn twice, in the canopy's warm
+//             shade and in sun, and the sunlit copy is clipped to the LIGHT shapes: a pool of the slot's light under the
+//             bench and the news box (the start's lit patch, the end pair's light ground), the border band lit on the
+//             right, clusters of lobed sun flecks (a few small ones round the pair: the start's warm-dark floor), broad
+//             lit pools on the right; the near corners stay dark (the terrace tree and the corner crown).
+//   drifts    petals (small teardrops at any angle) along the plinth, caught in the joints, heaped against kerbs and
+//             legs, scattered; sized to read at both scales (2-4 px at the end = 5-10 px at the start).
 // Joints are drawn in the paving's own darker tone, never in ink (STYLE: no ink on the ground).
 import React, {useMemo} from 'react';
-import {Batch, Paint, crownD, ellD, lineD, polyD, rng, smoothClosed, type Pt} from '../kit/dc/core';
-import {CAM, dpt, dAt, pxmD, pxmY, RAIL, DT, START_WIN} from './V2S5_deck_cam';
+import {Batch, Paint, crownD, lineD, polyD, rng, type Pt} from '../kit/dc/core';
+import {CAM, dpt, dAt, pxmD, pxmY, RAIL, DT, START_WIN, SPOT} from './V2S5_deck_cam';
 
 /** The floor's extent (END coords): beyond both edges and below the frame at every p. */
 const FX0 = -80;
@@ -27,32 +28,29 @@ export const COURSES = (() => {
   const band0 = CAM.railD - 0.04;
   const band1 = band0 - 1.5;
   const head1 = band1 - 0.32;
-  // the field: courses 0.6-0.95 m deep, toward the camera, until beyond the frame's bottom
   const r = rng('s5deck/courses');
   const field: number[] = [head1];
   let d = head1;
   while (d > D_NEAR - 0.6) {
-    d -= r.range(0.62, 0.92);
+    d -= r.range(0.48, 0.72);
     field.push(d);
   }
-  // the brick sett band across the terrace (two courses of setts), between field courses ~4.6 m from the rail
-  const setts = {d0: head1 - 4.45, d1: head1 - 4.45 - 0.42};
+  // the brick sett band across the terrace (two courses of setts), ~4.4 m in from the header
+  const setts = {d0: head1 - 4.4, d1: head1 - 4.4 - 0.42};
   return {band0, band1, head1, field, setts};
 })();
 
 type Tone = 'lit' | 'shade';
 
-/** Picks a floor tone for a course / slab in the lit or shade version. */
 const T = (tone: Tone) =>
   tone === 'lit'
-    ? {base: DT.lit, var: [DT.litHi, DT.litWarm, DT.litCool], joint: DT.jointLit, band: DT.band, bandJoint: DT.jointLit, header: DT.header, sett: DT.brickSett, sett2: DT.brickSettLight}
-    : {base: DT.shade, var: [DT.shadeHi, DT.shadeLo, DT.shadeCool], joint: DT.jointShade, band: DT.bandShade, bandJoint: DT.jointShade, header: DT.headerShade, sett: DT.brickSettShade, sett2: DT.shadeLo};
+    ? {base: DT.lit, var: [DT.litHi, DT.litWarm, DT.litCool], patch: DT.litWarm, joint: DT.jointLit, band: DT.band, bandJoint: DT.jointLit, header: DT.header, headerJoint: DT.headerShade, sett: DT.brickSett, sett2: DT.brickSettLight}
+    : {base: DT.shade, var: [DT.shadeHi, DT.shadeLo, DT.shadeCool], patch: DT.shadeLo, joint: DT.jointShade, band: DT.bandShade, bandJoint: DT.jointShade, header: DT.headerShade, headerJoint: DT.deep, sett: DT.brickSettShade, sett2: DT.shadeLo};
 
 /** The paving in one light (the same geometry for both: seeds fixed). */
 function paving(B: Batch, tone: Tone) {
   const C = T(tone);
   const {band0, band1, head1, field, setts} = COURSES;
-  // base
   B.rect(C.base, FX0, RAIL.base - 3, FX1 - FX0, FY1 - RAIL.base + 3);
   // the border band (limestone, long slabs 1.6-2.2 m along the rail)
   {
@@ -64,10 +62,10 @@ function paving(B: Batch, tone: Tone) {
     let j = '';
     for (let X = xa; X < xb; X += r.range(1.6, 2.2)) j += lineD([dpt(X, band0), dpt(X, band1)]);
     B.layer();
-    B.ink(j, 1.4, C.bandJoint);
-    B.ink(lineD([[FX0, y1], [FX1, y1]]), 1.6, C.bandJoint);
+    B.ink(j, 1.3, C.bandJoint);
+    B.ink(lineD([[FX0, y1], [FX1, y1]]), 1.5, C.bandJoint);
   }
-  // the header course (brick on edge, small units)
+  // the header course (brick on edge)
   {
     const y0 = dpt(0, band1)[1];
     const y1 = dpt(0, head1)[1];
@@ -75,43 +73,49 @@ function paving(B: Batch, tone: Tone) {
     const [xa, xb] = xRange(band1);
     let j = '';
     for (let X = xa; X < xb; X += 0.22) j += lineD([dpt(X, band1), dpt(X, head1)]);
-    B.ink(j, 0.8, mix2(C.header, C.joint));
+    B.ink(j, 0.8, C.headerJoint);
   }
-  // the field: flags in random bond
+  // the field: flags in random bond, a few tinted, a few worn (a lighter / darker corner patch)
   B.layer();
   const r = rng('s5deck/flags');
   const tints = new Map<string, string>();
   const addTint = (col: string, d: string) => tints.set(col, (tints.get(col) ?? '') + d);
   let trans = '';
   let longi = '';
+  let cracks = '';
   for (let i = 0; i < field.length - 1; i++) {
     const d0 = field[i];
     const d1 = field[i + 1];
-    // skip the sett band's courses (drawn below)
     const [xa, xb] = xRange(d1);
     const yA = dpt(0, d0)[1];
     trans += lineD([[FX0, yA], [FX1, yA]]);
     let X = xa - r.range(0, 1.2);
     while (X < xb) {
-      const w = r.range(0.85, 1.45);
+      const w = r.range(0.6, 1.05);
       const k = r.next();
-      if (k < 0.24) {
-        const col = C.var[Math.floor(k * 12.5) % C.var.length];
-        addTint(col, polyD([dpt(X + 0.04, d0 - 0.03), dpt(X + w - 0.04, d0 - 0.03), dpt(X + w - 0.04, d1 + 0.03), dpt(X + 0.04, d1 + 0.03)]));
+      if (k < 0.22) {
+        const col = C.var[Math.floor(k * 13.7) % C.var.length];
+        addTint(col, polyD([dpt(X + 0.035, d0 - 0.03), dpt(X + w - 0.035, d0 - 0.03), dpt(X + w - 0.035, d1 + 0.03), dpt(X + 0.035, d1 + 0.03)]));
+      } else if (k < 0.3) {
+        // a worn corner patch
+        const u = r.range(0.35, 0.65);
+        addTint(C.patch, polyD([dpt(X + 0.035, d0 - 0.03), dpt(X + w * u, d0 - 0.03), dpt(X + 0.035, d0 - (d0 - d1) * r.range(0.4, 0.8))]));
+      } else if (k < 0.34) {
+        // a hairline crack across the flag
+        cracks += lineD([dpt(X + w * r.range(0.1, 0.4), d0 - 0.02), dpt(X + w * r.range(0.4, 0.6), (d0 + d1) / 2), dpt(X + w * r.range(0.6, 0.9), d1 + 0.02)]);
       }
       X += w;
       longi += lineD([dpt(X, d0), dpt(X, d1)]);
     }
   }
   tints.forEach((d, col) => B.fill(col, d));
-  // the brick sett band (two courses of setts) across the field
+  // the brick sett band (two courses, staggered)
   {
     const {d0, d1} = setts;
     const y0 = dpt(0, d0)[1];
     const y1 = dpt(0, d1)[1];
     B.rect(C.sett, FX0, y0, FX1 - FX0, y1 - y0);
     const dm = (d0 + d1) / 2;
-    B.rect(C.sett2, FX0, dpt(0, dm)[1] - 0.6, FX1 - FX0, 1.2);
     const [xa, xb] = xRange(d1);
     let j = '';
     for (let X = xa; X < xb; X += 0.21) {
@@ -120,29 +124,22 @@ function paving(B: Batch, tone: Tone) {
     }
     B.layer();
     B.ink(j, 0.9, C.joint);
+    B.ink(lineD([[FX0, dpt(0, dm)[1]], [FX1, dpt(0, dm)[1]]]), 0.9, C.joint);
     B.ink(lineD([[FX0, y0], [FX1, y0]]) + lineD([[FX0, y1], [FX1, y1]]), 1.5, C.joint);
   }
   B.layer();
-  // joints: width grows toward us (thin far, ~2.4 px at the bottom)
   B.ink(trans, 1.5, C.joint);
-  B.ink(longi, 1.3, C.joint);
-}
-
-/** sRGB mix 50/50 (helper for a joint between two tones). */
-function mix2(a: string, b: string): string {
-  const h = (s: string) => [1, 3, 5].map((i) => parseInt(s.slice(i, i + 2), 16));
-  const A = h(a);
-  const Bc = h(b);
-  return '#' + A.map((v, i) => Math.round((v + Bc[i]) / 2).toString(16).padStart(2, '0')).join('').toUpperCase();
+  B.ink(longi, 1.25, C.joint);
+  B.ink(cracks, 0.8, C.joint);
 }
 
 /** Drain grates: small iron gratings in the field (static). */
 function grates(B: Batch) {
   const spots: [number, number][] = [
-    [1.4, 18.4],
-    [8.6, 15.2],
-    [-0.4, 12.4],
-    [4.4, 10.2],
+    [1.5, 18.1],
+    [8.4, 15.3],
+    [-0.3, 12.1],
+    [5.2, 10.4],
   ];
   for (const [X, d] of spots) {
     const a = dpt(X - 0.3, d + 0.25);
@@ -161,58 +158,103 @@ function grates(B: Batch) {
 
 // ---------------------------------------------------------------- the light: 2-value static dapple
 
+const inWin = (x: number, y: number) => x > START_WIN.x0 - 30 && x < START_WIN.x1 + 20 && y < START_WIN.y1 + 20;
+
+/** One fleck: a lobed spot, wider than deep (the floor is seen at a slant). */
+const fleck = (x: number, y: number, rx: number, seed: string) => crownD(x, y, rx, rx * 0.42, seed, 5, 0.1);
+
 /** The sunlit shapes (END coords) as one path: the lit copy of the floor is clipped to it. */
 export function lightShapes(): string {
   const r = rng('s5deck/light');
   let d = '';
-  // the low morning sun beyond the view, right: shafts fan from its azimuth on the horizon
-  const sun: Pt = [1110, CAM.hz];
-  const inWin = (x: number, y: number) => x > START_WIN.x0 - 30 && x < START_WIN.x1 + 10 && y < START_WIN.y1 + 10;
-  // 1. long shafts from beyond the rail (right of the start window), lobed edges
-  const shaftAt = [770, 840, 905, 985, 1060, 1130];
-  shaftAt.forEach((x0, i) => {
-    const y0 = RAIL.base + 6;
-    const w0 = r.range(10, 22);
-    const len = r.range(420, 760);
-    const ux = x0 - sun[0];
-    const uy = y0 - sun[1];
-    const n = Math.hypot(ux, uy);
-    const dx = ux / n;
-    const dy = uy / n;
-    const L: Pt[] = [];
-    const R: Pt[] = [];
-    const steps = 9;
-    for (let k = 0; k <= steps; k++) {
-      const u = k / steps;
-      const cx = x0 + dx * len * u;
-      const cy = y0 + dy * len * u;
-      const w = (w0 + (w0 * 2.6 - w0) * u) * (1 + 0.28 * Math.sin(u * 9 + i * 2.1)) * (k === 0 ? 0.4 : 1);
-      L.push([cx - dy * w * 0.5 + r.jitter(2), cy + dx * w * 0.5]);
-      R.push([cx + dy * w * 0.5 + r.jitter(2), cy - dx * w * 0.5]);
-    }
-    d += smoothClosed([...L, ...R.reverse()]);
-  });
-  // 2. sun flecks: small lobed spots, sparse and small round the pair (the start's warm-dark floor), more elsewhere
-  for (let i = 0; i < 150; i++) {
-    const x = r.range(FX0, FX1);
-    const y = r.range(RAIL.base + 4, FY1);
-    const win = inWin(x, y);
-    if (win && r.chance(0.55)) continue;
-    const s = pxmY(y) * (win ? r.range(0.08, 0.2) : r.range(0.1, 0.34));
-    d += crownD(x, y, s * r.range(1.3, 2.2), s * r.range(0.45, 0.75), `s5deck/fl${i}`, 5, 0.15);
+  const bandY0 = RAIL.base + 2;
+  const bandY1 = dpt(0, COURSES.band1)[1];
+  // 1. the slot's light: broken lit patches on the border band round the news box's feet and beside the bench (the
+  //    box stands in the slot's light; the pair's ground is light at the end), ending in flecks toward us
+  {
+    const patches: [number, number, number][] = [
+      [SPOT.newsBox.x0 + 12, SPOT.newsBox.x0 + 58, 0.9],
+      [SPOT.newsBox.x0 + 70, SPOT.newsBox.x1 + 14, 1],
+      [SPOT.bench.x1 - 30, SPOT.bench.x1 + 6, 0.55],
+      [SPOT.bench.x0 + 4, SPOT.bench.x0 + 34, 0.5],
+    ];
+    patches.forEach(([x0, x1, k], i) => {
+      const pts: Pt[] = [];
+      for (let x = x0; x <= x1; x += 9) pts.push([x, bandY0 + r.range(0, 3)]);
+      for (let x = x1; x >= x0; x -= 8) pts.push([x + r.jitter(3), bandY0 + (bandY1 - bandY0) * k * r.range(0.75, 1) + 5 * Math.sin(x * 0.11 + i)]);
+      d += polyD(pts);
+    });
+    for (let i = 0; i < 14; i++) d += fleck(r.range(SPOT.bench.x0 - 10, SPOT.newsBox.x1 + 30), r.range(bandY1 - 6, bandY1 + 34), r.range(3, 8), `s5deck/sl${i}`);
   }
-  // 3. pools in the near zone (gaps in the near crowns' shade): lobed, wider than deep
+  // 2. the border band lit on the right (sun over the balustrade between the slope's crowns), broken by the piers'
+  //    shadows (wedges) and ragged toward us
+  {
+    const pierXs: number[] = [];
+    for (let X = -1.8 - 3.6 * 30; X < 60; X += 3.6) pierXs.push(CAM.vpx + (CAM.f * X) / RAIL.d);
+    let x = 668;
+    const segs: [number, number][] = [];
+    for (const px of pierXs.filter((p) => p > 668).sort((a, b) => a - b)) {
+      segs.push([x, px - 4]);
+      x = px + 22;
+    }
+    segs.push([x, FX1]);
+    segs.forEach(([a, b], i) => {
+      if (b - a < 8) return;
+      const pts: Pt[] = [[a, bandY0], [b, bandY0]];
+      for (let xx = b; xx >= a; xx -= 18) pts.push([xx - 6, bandY1 + r.range(-3, 8) + (i % 2) * 3]);
+      d += polyD(pts);
+    });
+  }
+  // 3. broad lit pools on the right (between the slope crowns' shadows), lobed, with satellite flecks
   const pools: [number, number, number, number][] = [
-    [520, 1590, 120, 30],
-    [700, 1660, 150, 40],
-    [330, 1780, 130, 36],
-    [600, 1850, 170, 46],
+    [770, 1300, 92, 20],
+    [960, 1338, 120, 26],
+    [880, 1420, 70, 18],
+    [1060, 1470, 110, 28],
+    [700, 1478, 60, 15],
+    [560, 1572, 70, 16],
+    [470, 1840, 120, 30],
   ];
   pools.forEach(([x, y, rx, ry], i) => {
-    d += crownD(x, y, rx, ry, `s5deck/pool${i}`, 8, 0.12);
+    d += crownD(x, y, rx, ry, `s5deck/pool${i}`, 8, 0.1);
+    for (let j = 0; j < 6; j++) d += fleck(x + r.jitter(rx * 1.5), y + r.jitter(ry * 1.4), rx * r.range(0.06, 0.16), `s5deck/pf${i}/${j}`);
   });
+  // 4. the canopy's dapple: clusters of merging lobed flecks (sizes 0.1-0.45 m), their density by zone: ~30 % lit round
+  //    the pair (the start window: warm-dark, yet a dappled floor), more on the open terrace, none in the near-left
+  //    corner (the terrace tree's shade), little under the corner crown
+  const weight = (x: number, y: number) => {
+    if (x < 300 && y > 1560) return 0;
+    if (x < 150) return 0.1;
+    if (x > 880 && y > 1600) return 0.15;
+    if (inWin(x, y)) return 0.65;
+    return 1;
+  };
+  let placed = 0;
+  for (let i = 0; i < 400 && placed < 70; i++) {
+    const cx = r.range(FX0 + 30, FX1 - 10);
+    const cy = r.range(RAIL.base + 40, FY1 - 10);
+    if (r.next() > weight(cx, cy)) continue;
+    placed++;
+    const k = pxmY(cy);
+    const n = 5 + r.int(0, 9);
+    const sp = k * r.range(0.6, 1.3);
+    for (let j = 0; j < n; j++) {
+      const x = cx + r.jitter(sp);
+      const y = cy + r.jitter(sp * 0.28);
+      const fall = 1 - Math.min(1, Math.abs(x - cx) / (sp + 1)) * 0.6;
+      d += fleck(x, y, Math.max(2, pxmY(y) * r.range(0.1, 0.36) * fall), `s5deck/fc${i}/${j}`);
+    }
+  }
   return d;
 }
+
+/** A petal: a small teardrop at angle a (s = its half-length). */
+const petalD = (x: number, y: number, s: number, a: number) => {
+  const c = Math.cos(a);
+  const sn = Math.sin(a);
+  const P = (u: number, v: number) => `${(x + u * c - v * sn).toFixed(1)} ${(y + (u * sn + v * c) * 0.6).toFixed(1)}`;
+  return `M${P(-s, 0)}Q${P(-s * 0.1, -s * 0.75)} ${P(s, 0)}Q${P(-s * 0.1, s * 0.75)} ${P(-s, 0)}Z`;
+};
 
 /** Petal drifts and scattered petals (static), deterministic. */
 function drifts(B: Batch) {
@@ -220,41 +262,52 @@ function drifts(B: Batch) {
   let a = '';
   let b = '';
   let c = '';
-  const put = (x: number, y: number, s: number, k: number) => {
-    const e = ellD(x, y, s, s * 0.58);
+  const put = (x: number, y: number, s: number) => {
+    const k = r.next();
+    const e = petalD(x, y, s, r.range(0, Math.PI));
     if (k < 0.45) a += e;
-    else if (k < 0.85) b += e;
+    else if (k < 0.82) b += e;
     else c += e;
   };
-  // along the balustrade's plinth (a continuous drift line)
-  for (let x = FX0; x < FX1; x += r.range(3, 9)) put(x, RAIL.base + r.range(0.5, 6), r.range(1.6, 2.6), r.next());
-  // against the header course's far edge
-  const yb = dpt(0, COURSES.band1)[1];
-  for (let x = FX0; x < FX1; x += r.range(7, 20)) put(x, yb + r.range(-1, 2), r.range(1.5, 2.3), r.next());
-  // clumps (in the corners of flags, round the legs of things, in the shade)
-  for (let cI = 0; cI < 34; cI++) {
-    const cy = r.range(RAIL.base + 14, FY1);
-    const cx = r.range(FX0 + 40, FX1 - 40);
-    const n = r.int(9, 24);
-    const sp = pxmY(cy) * r.range(0.25, 0.6);
-    for (let i = 0; i < n; i++) {
-      const x = cx + r.range(-1, 1) * sp;
-      const y = cy + r.range(-0.3, 0.3) * sp;
-      put(x, y, 1.5 + pxmY(y) * 0.032 * r.range(0.7, 1.25), r.next());
+  const sz = (y: number) => 1.5 + pxmY(y) * 0.034 * r.range(0.75, 1.25);
+  // along the balustrade's plinth: a continuous drift with heaps
+  for (let x = FX0; x < FX1; x += r.range(2.5, 7)) {
+    put(x, RAIL.base + r.range(0.5, 5.5), sz(RAIL.base));
+    if (r.chance(0.12)) for (let i = 0; i < 6; i++) put(x + r.jitter(6), RAIL.base + r.range(1, 6), sz(RAIL.base));
+  }
+  // caught in the joints: runs of petals along transverse joints (the grooves hold them)
+  const {field} = COURSES;
+  for (let i = 1; i < field.length; i++) {
+    const y = dpt(0, field[i])[1];
+    let x = FX0 + r.range(0, 200);
+    while (x < FX1) {
+      const len = r.range(20, 90) * (pxmY(y) / 60);
+      if (r.chance(0.45)) for (let u = 0; u < len; u += r.range(3, 7) * (pxmY(y) / 60)) put(x + u, y + r.jitter(1.2), sz(y));
+      x += len + r.range(60, 240);
     }
   }
+  // along the header course's far edge
+  const yb = dpt(0, COURSES.band1)[1];
+  for (let x = FX0; x < FX1; x += r.range(5, 16)) put(x, yb + r.range(-1, 2), sz(yb));
+  // clumps in the corners of flags and in the shade
+  for (let cI = 0; cI < 30; cI++) {
+    const cy = r.range(RAIL.base + 14, FY1);
+    const cx = r.range(FX0 + 40, FX1 - 40);
+    const n = r.int(8, 20);
+    const sp = pxmY(cy) * r.range(0.22, 0.5);
+    for (let i = 0; i < n; i++) put(cx + r.range(-1, 1) * sp, cy + r.range(-0.3, 0.3) * sp, sz(cy));
+  }
   // scattered
-  for (let i = 0; i < 700; i++) {
+  for (let i = 0; i < 520; i++) {
     const y = r.range(RAIL.base + 6, FY1);
-    const x = r.range(FX0, FX1);
-    put(x, y, 1.4 + pxmY(y) * 0.03 * r.range(0.6, 1.3), r.next());
+    put(r.range(FX0, FX1), y, sz(y) * r.range(0.8, 1.05));
   }
   B.fill(DT.petal, a);
   B.fill(DT.petalShade, b);
   B.fill(DT.petalLit, c);
 }
 
-/** The floor (END coords): shade copy, the sunlit copy clipped to the light shapes, grates, drifts. */
+/** The deep shade in the near corners (the terrace tree, the corner crown) is simply the shade copy: no light there. */
 export const DeckFloor: React.FC = () => {
   const shade = useMemo(() => {
     const B = new Batch();
@@ -285,7 +338,7 @@ export const DeckFloor: React.FC = () => {
       <g clipPath="url(#s5deck-light)">
         <Paint b={lit} seed="s5deck/floorL" misreg={false} />
       </g>
-      <Paint b={over} seed="s5deck/floorO" misreg={2} />
+      <Paint b={over} seed="s5deck/floorO" misreg={false} />
     </>
   );
 };

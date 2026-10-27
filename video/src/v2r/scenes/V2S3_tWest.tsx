@@ -144,21 +144,24 @@ function midBatch(): Batch {
   // limbs seen in the gaps of the crown
   b.ink(`M${P(TREE.x - 8, 900)}Q${P(TREE.x - 34, 872)} ${P(TREE.x - 62, 858)}M${P(TREE.x + 12, 898)}Q${P(TREE.x + 40, 868)} ${P(TREE.x + 70, 850)}M${P(TREE.x, 905)}Q${P(TREE.x + 4, 860)} ${P(TREE.x - 6, 820)}`, 3.2, CM.line);
   b.layer();
+  // autumn clumps lit from the west: gold and mustard on the sun side, rust on the shaded east side; their contours
+  // mostly open (the crown's outline carries the form)
   const clumps: [number, number, number, number, string][] = [
-    [TREE.cx + 46, TREE.cy - 30, 40, 32, CM.leafGold],
-    [TREE.cx - 50, TREE.cy + 22, 38, 30, CM.leafRust],
-    [TREE.cx + 2, TREE.cy - 58, 42, 26, CM.coatMustard],
-    [TREE.cx + 58, TREE.cy + 34, 34, 28, CM.leafRust],
-    [TREE.cx - 62, TREE.cy - 34, 32, 26, CM.leafGold],
-    [TREE.cx - 6, TREE.cy + 46, 36, 26, CM.leafGold],
+    [TREE.cx - 48, TREE.cy - 30, 46, 36, CM.leafGold],
+    [TREE.cx - 4, TREE.cy - 62, 46, 26, CM.coatMustard],
+    [TREE.cx + 54, TREE.cy + 12, 46, 40, CM.leafRust],
+    [TREE.cx + 18, TREE.cy + 52, 40, 26, CM.leafRust],
+    [TREE.cx - 66, TREE.cy + 26, 30, 26, CM.leafGold],
+    [TREE.cx + 30, TREE.cy - 22, 26, 20, CM.leafGold],
+    [TREE.cx - 22, TREE.cy + 20, 24, 18, CM.coatMustard],
   ];
   let clumpInk = '';
   clumps.forEach(([cx, cy, rx, ry, col], i) => {
-    const d = crown(cx, cy, rx, ry, {seed: `s3clump${i}`, bumps: 7, round: 0.66});
+    const d = crown(cx, cy, rx, ry, {seed: `s3clump${i}`, bumps: 8, round: 0.6});
     b.fill(col, d);
     clumpInk += d;
   });
-  b.ink(clumpInk, TK.detail, CM.ink, 0.55);
+  b.ink(clumpInk, TK.fine, CM.ink, 0.6);
   b.ink(cr, TK.struct, CM.ink, 0.28);
   b.ink(crownTicks(TREE.cx, TREE.cy, TREE.rx * 0.9, TREE.ry * 0.9, {seed: 's3treeT', n: 6, size: 8}), TK.fine);
   // loose single leaves round the crown's rim

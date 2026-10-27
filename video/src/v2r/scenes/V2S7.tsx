@@ -31,9 +31,9 @@ import {
   S7Planter,
 } from './V2S7_set';
 import {
-  S7WalkersA, S7WalkersBC, S7StaffInside, S7StaffOutside, S7StepSitters, S7CafeT1People, S7CafeNearPeople, S7FarWalkers,
-  S7Jets, S7Water, S7Festoons, S7CafeLights, S7FallingLeaves, S7GroundLeaves, S7Smoke, S7Steam, S7Pigeons,
-  S7GroundPigeons,
+  S7WalkersA, S7WalkersBC, S7StaffInside, S7StaffOutside, S7StepSitters, S7CafeT1People, S7NearBacks, S7RimSitters,
+  S7Stander, S7FarWalkers, S7Jets, S7Water, S7Festoons, S7CafeLights, S7FallingLeaves, S7GroundLeaves, S7Smoke, S7Steam,
+  S7Pigeons, S7GroundPigeons,
 } from './V2S7_life';
 import {S7Board} from './V2S7_board';
 import {S7PipHop, S7PipSeat} from './V2S7_pipdraw';
@@ -81,6 +81,7 @@ const V2S7: React.FC = () => {
           <S7TreeLCrown />
         </SkyClip>
         <S7WalkersBC />
+        <S7Stander />
         <S7Board />
         <S7Bollard />
         <S7PipSeat />
@@ -88,6 +89,7 @@ const V2S7: React.FC = () => {
         <S7Water />
         <S7BasinLights lit={litBasin} />
         <S7Jets />
+        <S7RimSitters />
         <S7CafeBack />
         <S7CafeT1People />
         <S7CafeT1Chairs />
@@ -97,7 +99,7 @@ const V2S7: React.FC = () => {
         <S7CafeNear />
         <S7CafeLights />
         <S7Steam />
-        <S7CafeNearPeople />
+        <S7NearBacks />
         <S7Planter />
       </XG>
       <S7PipHop />

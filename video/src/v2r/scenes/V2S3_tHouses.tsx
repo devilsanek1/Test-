@@ -51,7 +51,7 @@ export const WINDOWS: WinSpec[] = [
   {id: 'h1gr', x: 442, y: 922, w: 22, h: 112, bars: '1/1', surround: 'plain', wall: CM.brick, lit: false, unlit: 'sky', sill: false},
   // the stock-brick house: the WATERING neighbour's window (lit, lower sash up), a blind, the lit front room
   {id: 'h2a', x: 566, y: 708, w: 66, h: 136, bars: '2/2', surround: 'hood', wall: CM.brickLight, lit: true, inner: 'frame', open: 50, box: true, curtain: CM.blossom},
-  {id: 'h2b', x: 668, y: 708, w: 66, h: 136, bars: '2/2', surround: 'hood', wall: CM.brickLight, lit: false, unlit: 'blind', blind: 0.36},
+  {id: 'h2b', x: 668, y: 708, w: 66, h: 136, bars: '2/2', surround: 'hood', wall: CM.brickLight, lit: [{t: 14.45, on: true}], inner: 'lamp', unlit: 'blind', blind: 0.36, curtain: CM.sage},
   {id: 'h2g', x: 562, y: 920, w: 86, h: 114, bars: '6/6', surround: 'stucco', wall: CM.stucco, lit: true, inner: 'lamp', curtain: CM.coatMustard},
   // the dark-brick house: a narrow sash that switches on, the balcony's French door, a dormer, the kitchen
   {id: 'h3n', x: 794, y: 714, w: 38, h: 130, bars: '2/2', surround: 'arch', wall: CM.brickDeep, lit: [{t: 14.05, on: true}], inner: 'curtains', curtain: CM.sage},
@@ -61,7 +61,7 @@ export const WINDOWS: WinSpec[] = [
   // the stucco house (cut by the right edge): the KETTLE neighbour's window, a dormer that switches on, the bay
   {id: 'h4a', x: 1036, y: 710, w: 62, h: 134, bars: '2/2', surround: 'stucco', wall: CM.sage, lit: true, inner: 'shelf', curtain: CM.leafRust},
   {id: 'h4d', x: 1082, y: 641, w: 38, h: 18, bars: 'dormer', surround: 'plain', wall: CM.shadeCool, lit: [{t: 13.45, on: true}], inner: 'none', sill: false},
-  {id: 'h4g1', x: 1030, y: 922, w: 30, h: 110, bars: '1/1', surround: 'plain', wall: CM.stucco, lit: true, inner: 'none', sill: false},
+  {id: 'h4g1', x: 1030, y: 922, w: 30, h: 110, bars: '1/1', surround: 'plain', wall: CM.stucco, lit: [{t: 13.75, on: false}], inner: 'none', sill: false},
   {id: 'h4g2', x: 1068, y: 916, w: 76, h: 118, bars: '2/2', surround: 'plain', wall: CM.stucco, lit: true, inner: 'lamp', curtain: CM.sage, sill: false},
 ];
 
