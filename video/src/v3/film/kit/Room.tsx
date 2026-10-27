@@ -61,11 +61,13 @@ export type ShelfFillProps = {
   trailing?: boolean;
   at?: At;
   ink?: number;
+  /** Book colours by index (optional; default EMBER.books, same length): a panel can swap a few for the cool family. */
+  books?: string[];
 };
 
 /** Varied books (5+ colours, 14-40 wide, 80-150 tall, upright, leaning and in lying stacks) with a framed photo, a jar,
  *  a small plant and a trailing pothos over one plank's lip. Never a stamped row. */
-export const ShelfFill: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = 'shelf', photo = true, jar = true, plant = true, trailing = true, at, ink = W.mid}) => {
+export const ShelfFill: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = 'shelf', photo = true, jar = true, plant = true, trailing = true, at, ink = W.mid, books = EMBER.books}) => {
   const items = useMemo(() => {
     const r = rng(`shelfF/${seed}`);
     const out: React.ReactNode[] = [];
@@ -110,7 +112,7 @@ export const ShelfFill: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = '
             const bw = sw * r.range(0.86, 1);
             const c = pickBook(r, lastC);
             lastC = c;
-            out.push(<Book key={`ly${pi}_${k}_${j}`} x={x + r.jitter(4) * scale} y={y - bh} w={bw} h={bh} color={EMBER.books[c]} seed={`${seed}/ly${pi}_${k}_${j}`} at={b(at, 0.06 + j * 0.02)} ink={ink} lying />);
+            out.push(<Book key={`ly${pi}_${k}_${j}`} x={x + r.jitter(4) * scale} y={y - bh} w={bw} h={bh} color={books[c]} seed={`${seed}/ly${pi}_${k}_${j}`} at={b(at, 0.06 + j * 0.02)} ink={ink} lying />);
             y -= bh;
           }
           x += sw + r.range(4, 9) * scale;
@@ -124,7 +126,7 @@ export const ShelfFill: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = '
           const c = pickBook(r, lastC);
           lastC = c;
           const lean = j === n - 1 && r.chance(0.3) ? r.range(8, 16) : 0;
-          out.push(<Book key={`b${pi}_${k}_${j}`} x={x} y={pk.y - bh} w={bw} h={bh} color={EMBER.books[c]} seed={`${seed}/b${pi}_${k}_${j}`} at={b(at, j * 0.015)} ink={ink} lean={lean} />);
+          out.push(<Book key={`b${pi}_${k}_${j}`} x={x} y={pk.y - bh} w={bw} h={bh} color={books[c]} seed={`${seed}/b${pi}_${k}_${j}`} at={b(at, j * 0.015)} ink={ink} lean={lean} />);
           x += bw + (lean ? bh * Math.sin((lean * Math.PI) / 180) : r.range(0, 2) * scale);
         }
         x += r.range(6, 16) * scale;
@@ -135,7 +137,7 @@ export const ShelfFill: React.FC<ShelfFillProps> = ({planks, scale = 1, seed = '
       }
     });
     return out;
-  }, [planks.map((p) => `${p.x0},${p.x1},${p.y},${p.room}`).join('|'), scale, seed, photo, jar, plant, trailing, at, ink]);
+  }, [planks.map((p) => `${p.x0},${p.x1},${p.y},${p.room}`).join('|'), scale, seed, photo, jar, plant, trailing, at, ink, books.join(',')]);
   return <>{items}</>;
 };
 
@@ -193,9 +195,9 @@ const Jar: React.FC<{x: number; y: number; w: number; h: number; seed: string; a
 };
 
 /** A small wall shelf (plank on two brackets) with its own contents (S7's right shelf: a plant and 3 books). */
-export const WallShelf: React.FC<{x: number; y: number; w: number; seed?: string; at?: At; ink?: number; contents?: boolean; room?: number}> = ({x, y, w, seed = 'wshelf', at, ink = W.mid, contents = true, room = 130}) => (
+export const WallShelf: React.FC<{x: number; y: number; w: number; seed?: string; at?: At; ink?: number; contents?: boolean; room?: number; books?: string[]}> = ({x, y, w, seed = 'wshelf', at, ink = W.mid, contents = true, room = 130, books}) => (
   <>
-    {contents ? <ShelfFill planks={[{x0: x + 8, x1: x + w - 8, y, room}]} seed={seed} photo={false} jar={false} trailing={false} at={b(at, 0.1)} ink={ink} /> : null}
+    {contents ? <ShelfFill planks={[{x0: x + 8, x1: x + w - 8, y, room}]} seed={seed} photo={false} jar={false} trailing={false} at={b(at, 0.1)} ink={ink} books={books} /> : null}
     <Box x={x} y={y} w={w} h={16} color={EMBER.beam} seed={`${seed}/pk`} at={at} ink={ink} over={[4, 4]} />
     <Ink d={poly([[x + w * 0.15, y + 16], [x + w * 0.15, y + 48], [x + w * 0.15 + 30, y + 16]], {seed: `${seed}/br1`, over: [0, 0]}) + poly([[x + w * 0.85, y + 16], [x + w * 0.85, y + 48], [x + w * 0.85 - 30, y + 16]], {seed: `${seed}/br2`, over: [0, 0]})} at={b(at, 0.06)} width={W.far} />
   </>
@@ -894,8 +896,10 @@ export const PullChain: React.FC<{x: number; y: number; len?: number; amp?: numb
 
 // ---------------------------------------------------------------- S13: radiator, rug, coat hook, tote, slippers
 
-/** A radiator under the window (cream fins), a sock drying on it that sways. */
-export const Radiator: React.FC<{x: number; y: number; w?: number; h?: number; sock?: boolean; seed?: string; at?: At; ink?: number}> = ({x, y, w = 420, h = 180, sock = true, seed = 'rad', at, ink = W.mid}) => {
+/** A radiator under the window (cream fins), a sock drying on it that sways. `color` repaints the body (default the
+ *  cream card); `shade` adds a flat shade strip on the right of every fin (S13: a warm painted radiator, never the
+ *  brightest block in the lower half). */
+export const Radiator: React.FC<{x: number; y: number; w?: number; h?: number; sock?: boolean; seed?: string; at?: At; ink?: number; color?: string; shade?: string}> = ({x, y, w = 420, h = 180, sock = true, seed = 'rad', at, ink = W.mid, color = EMBER.card, shade}) => {
   const t = useTime();
   const fins = Math.round(w / 34);
   let finD = '';
@@ -904,7 +908,10 @@ export const Radiator: React.FC<{x: number; y: number; w?: number; h?: number; s
   const sa = sway(t, 2.5, 3.4, 1);
   return (
     <>
-      <Fill d={roundRect(x, y, w, h, 14)} color={EMBER.card} at={fillAt(at)} seed={`${seed}/b`} />
+      <Fill d={roundRect(x, y, w, h, 14)} color={color} at={fillAt(at)} seed={`${seed}/b`} />
+      {shade !== undefined
+        ? Array.from({length: fins - 1}, (_, i) => <Fill key={`sh${i}`} rect={[x + (w * (i + 1)) / fins, y + 12, (w / fins) * 0.34, h - 22]} color={shade} at={fillAt(at, 0.04)} offset={false} />)
+        : null}
       <Ink d={roundRect(x, y, w, h, 14, {closed: false, seed: `${seed}/i`})} at={at} width={ink} />
       <Ink d={finD} at={b(at, 0.08)} width={W.far} />
       <Ink d={line(x - 30, y + h - 20, x, y + h - 20, {over: [0, 0], seed: `${seed}/pipe`}) + circle(x - 14, y + h - 32, 9, {seed: `${seed}/valve`})} at={b(at, 0.1)} width={W.far} />
@@ -946,8 +953,9 @@ export const Rug: React.FC<{quad: [Pt, Pt, Pt, Pt]; stripes?: number; colors?: s
   return <>{out}</>;
 };
 
-/** A coat hook rail with a coat and a striped scarf hanging (they sway a hair). */
-export const CoatHook: React.FC<{x: number; y: number; h?: number; coat?: string; seed?: string; at?: At; ink?: number}> = ({x, y, h = 380, coat = EMBER.dc, seed = 'coat', at, ink = W.mid}) => {
+/** A coat hook rail with a coat and a striped scarf hanging (they sway a hair). `children` (optional) are drawn on the
+ *  coat (over its fill, under its ink and the scarf) inside the sway, in canvas px: the coat's own detail (S13). */
+export const CoatHook: React.FC<{x: number; y: number; h?: number; coat?: string; seed?: string; at?: At; ink?: number; children?: React.ReactNode}> = ({x, y, h = 380, coat = EMBER.dc, seed = 'coat', at, ink = W.mid, children}) => {
   const t = useTime();
   const a = sway(t, 0.8, 4.4);
   const cw = h * 0.42;
@@ -959,6 +967,7 @@ export const CoatHook: React.FC<{x: number; y: number; h?: number; coat?: string
       <Ink d={rectInk(x - 90, y - 16, 180, 22, {seed: `${seed}/ri`, over: [4, 4]})} at={at} width={ink} />
       <XG m={mat.about(mat.rotate(a), x, y)}>
         <Fill d={coatD} color={coat} at={fillAt(at, 0.06)} seed={`${seed}/c`} />
+        {children}
         <Ink d={coatD + `M${x} ${y + 20}L${x} ${y + h * 0.95}`} at={b(at, 0.04)} width={ink} />
         <Fill d={scarfD} color={EMBER.hl} at={fillAt(at, 0.1)} seed={`${seed}/s`} />
         <Fill d={`M${x + cw * 0.06} ${y + h * 0.3}h${cw * 0.18}v${h * 0.06}h${-cw * 0.18}zM${x + cw * 0.07} ${y + h * 0.5}h${cw * 0.18}v${h * 0.06}h${-cw * 0.18}z`} color={EMBER.beam} at={fillAt(at, 0.12)} offset={false} />

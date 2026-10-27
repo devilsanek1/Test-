@@ -652,12 +652,13 @@ export const DockWindow: React.FC<{x: number; y: number; w: number; h: number; f
 };
 
 /** A coffee machine (cut by an edge): a lit button that blinks, a cup in the tray with steam. */
-export const CoffeeMachine: React.FC<{x: number; y: number; w?: number; h?: number; seed?: string; at?: At; ink?: number}> = ({x, y, w = 200, h = 380, seed = 'coffee', at, ink = W.mid}) => {
+/** `body`: the casing colour (optional; default the anchor brown). */
+export const CoffeeMachine: React.FC<{x: number; y: number; w?: number; h?: number; seed?: string; at?: At; ink?: number; body?: string}> = ({x, y, w = 200, h = 380, seed = 'coffee', at, ink = W.mid, body = EMBER.anchor}) => {
   const t = useTime();
   const on = Math.floor(t * 1.1) % 2 === 0;
   return (
     <>
-      <Fill d={roundRect(x, y - h, w, h, 14)} color={EMBER.anchor} at={fillAt(at)} seed={`${seed}/b`} />
+      <Fill d={roundRect(x, y - h, w, h, 14)} color={body} at={fillAt(at)} seed={`${seed}/b`} />
       <Fill rect={[x + w * 0.1, y - h * 0.86, w * 0.8, h * 0.22]} color={EMBER.dc} at={fillAt(at, 0.03)} offset={false} />
       <Fill rect={[x + w * 0.2, y - h * 0.45, w * 0.6, h * 0.3]} color={EMBER.dcSide} at={fillAt(at, 0.03)} offset={false} />
       <Show at={fillAt(at, 0.06)}>

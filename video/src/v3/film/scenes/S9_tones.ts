@@ -31,10 +31,11 @@ export const T9 = {
   // the campus and the mountain (far)
   hallB: '#373E5D',
   pylon: '#505A81',
-  pileGold: '#CFA67C',
-  pileDeep: '#BD956D',
-  pilePin: '#DDC29B',
-  pileChip: '#463E46',
+  // the mountain: gold memory, the warmest far shape (G5b review: L 71 / C 36 gold, warm-dark chips, no grey)
+  pileGold: '#D4A46E',
+  pileDeep: '#C69563',
+  pilePin: '#E4C595',
+  pileChip: '#5A4232',
   pileInk: '#826A5A',
   // the mid band (22 %)
   midDark: '#424C71',
@@ -47,6 +48,9 @@ export const T9 = {
   nmWin: '#ECB266',
   litWall: '#C2CBE3',
   road: '#8E99C0',
+  /** The street's shade-side pavement (one step over the road; only the lamp-lit right side is bright, so the street
+   *  reads as a lit canyon, never two bright converging legs of a mast). */
+  paveShade: '#9AA5C9',
   pool: '#C9A784',
   // our roof (warm, in shade)
   deck: EMBER.brickShade,
@@ -55,5 +59,18 @@ export const T9 = {
   deckSnowLit: '#CBD5EC',
   footprint: '#8790B4',
   parapet: EMBER.beam,
+  // G5b review: the parapet face in shade (L 24), its coping stones, the plank grain, the hut front one step lighter
+  // than the deck (L 41) with its window's light on the wall, the snowman's dusk-blue scarf, the sparrows
+  parapetShade: '#5A2D20',
+  coping: '#7A4A3A',
+  deckGrain: '#6A3220',
+  hutFront: EMBER.beam,
+  hutSpill: '#B4603C',
+  scarf: EMBER.jeans,
+  sparrow: '#C98A64',
+  // the close back at the start (folds a clear step off the sweater) and the crossing pot's soot
+  sweaterFold: '#7E3220',
+  sweaterLit: '#BC5A3A',
+  potSoot: '#6A3220',
   stackShade: '#6A3220',
 } as const;

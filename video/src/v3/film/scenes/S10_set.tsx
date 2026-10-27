@@ -64,8 +64,10 @@ export const DC2 = {x: 458, y: 1232, w: 300, h: 210};
 export const VAN = {x: 260, y: 1428, w: 380};
 /** The board's push of the van in S14 (down the road, cut by the frame edges). */
 const VAN_PUSH: Pt = [-190, 170];
-/** S14's chip maker at the door: feet x and height (G5b: 92 -> 106 px, so he reads at phone size). */
-export const MAKER = {x: 796, h: 106};
+/** S14's chip maker at the door: feet and height. G5b: he steps forward onto the forecourt in front of the facade
+ *  (feet 856 -> 878, between the chip sign and the door) so he can be bigger (92 -> 118 px) and read at phone size
+ *  without dwarfing the door. */
+export const MAKER = {x: 812, y: 878, h: 118};
 
 // ---- the sticks: the board's six, one every 0.35 s, each 0.8 s from the door into the data center's roof
 const STICK_T0 = 0.1;
@@ -115,7 +117,7 @@ export const QueueSet: React.FC<{dur: number; s14?: QueueS14; beats?: QueueBeats
   const vanTop = VAN.y - VAN.w * 0.5;
   const makerX = MAKER.x;
   const makerH = MAKER.h;
-  const makerHead: Pt = [makerX - 14 * (makerH / 112), FAB.y - makerH + 15 * (makerH / 112)];
+  const makerHead: Pt = [makerX - 14 * (makerH / 112), MAKER.y - makerH + 15 * (makerH / 112)];
   const lifeBeats: QueueBeats = s14 ? {...beats, pushAt: s14.pushAt, pushDur: s14.pushDur} : beats;
   // ---- everything that stands, sorted far to near by its ground scale k (S10_geo)
   const items: Item[] = [
@@ -125,7 +127,7 @@ export const QueueSet: React.FC<{dur: number; s14?: QueueS14; beats?: QueueBeats
     // the chip factory, its door at the right end (on the road); no steam (the caption band is right above)
     {k: kAtY(FAB.y), el: <ChipFactory key="fab" x={FAB.x} y={FAB.y} w={FAB.w} doorSide="r" steam={false} seed="q/fab" />},
     // S14: the chip maker speaks from the door (facing the road, arm out)
-    ...(s14 ? [{k: kAtY(FAB.y) + 0.1, el: <ChipMaker key="maker" x={makerX} y={FAB.y} h={makerH} facing="l" at={s14.makerAt} seed="q/maker" />}] : []),
+    ...(s14 ? [{k: kAtY(MAKER.y), el: <ChipMaker key="maker" x={makerX} y={MAKER.y} h={makerH} facing="l" at={s14.makerAt} seed="q/maker" />}] : []),
     // the first data center, first at the door (its sign lit while it is the subject), a cooling plume off its left unit
     {
       k: kAtY(DC1.y),

@@ -5,14 +5,13 @@
 // snowy trees, a pair chatting under a lamp and walkers heading up the road. Fills the upper-left quadrant round the
 // queue without touching the road (the queue's lane) or the caption band (every roof ridge stays under y 612).
 import React, {useId} from 'react';
-import {Fill} from '../../../lib/Fill';
 import {Ink} from '../../../lib/Ink';
 import {blob} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {EMBER, LampPost3, SnowTree, Smoke, Txt, Walker, WinterPerson, personGeo, windowLit, W} from '../kit';
 import type {Pt} from '../kit';
-import {F, P, X_ROAD_L, X_WALL_L, kAtZ, mixHex, quad, type QueueBeats} from './S10_geo';
+import {P, X_ROAD_L, X_WALL_L, kAtZ, mixHex, quad, type QueueBeats} from './S10_geo';
 
 export type Item = {k: number; el: React.ReactNode};
 
@@ -30,7 +29,7 @@ type House = {
   roof: Roof;
   wall: string;
   /** A shopfront on the ground floor: its window colour, its awning colour and the blade sign (text or picto). */
-  shop?: {win: string; awning: string; sign: string; signColor: string; lights?: boolean};
+  shop?: {win: string; awning: string; sign: string; signColor: string; lights?: boolean; bladeU?: number; awEnd?: number};
   /** Silhouettes in these window indices. */
   sil?: Record<number, 'cross' | 'stand' | 'read'>;
   chimney?: number[];
@@ -47,18 +46,16 @@ const WALLS = {
   terra: '#B0603E',
 };
 
-/** The street, near to far (Z in m). The near ones are cut by the left edge and the van; past Z ~45 only the roofs show
- *  over the first data center, and past ~90 the factory hides them. */
+/** The street, near to far (Z in m). The near ones are cut by the left edge and the van; past Z ~42 the walls hide
+ *  behind the first data center and only their snowy roofs show over it (a calm ground for the landing sticks: low
+ *  eaves, no lit windows there); the street stops at Z ~64, where its walls would start to cover the factory's facade. */
 const HOUSES: House[] = [
-  {z: 13.5, len: 9.5, h: 9.2, rise: 3.0, dep: 10, roof: 'side', wall: WALLS.plum, shop: {win: EMBER.core, awning: EMBER.hl, sign: 'CAFE', signColor: EMBER.card, lights: true}, sil: {3: 'stand'}, chimney: [0.7]},
-  {z: 23.3, len: 8.2, h: 7.4, rise: 3.2, dep: 9, roof: 'front', wall: WALLS.steel, sil: {1: 'cross'}, chimney: [0.3], skylight: true},
-  {z: 31.8, len: 10, h: 9.6, rise: 2.8, dep: 10, roof: 'side', wall: WALLS.terra, shop: {win: EMBER.houseLit, awning: EMBER.dcSide, sign: 'BAKERY', signColor: EMBER.wall}, sil: {4: 'read'}, chimney: [0.25, 0.8], skylight: true},
-  {z: 42.2, len: 7.2, h: 8.2, dep: 9, roof: 'flat', wall: WALLS.navy},
-  {z: 49.8, len: 9, h: 10.4, rise: 2.6, dep: 10, roof: 'side', wall: WALLS.violet, chimney: [0.6]},
-  {z: 59.2, len: 8, h: 7.2, rise: 3.0, dep: 9, roof: 'front', wall: WALLS.brick, chimney: [0.5]},
-  {z: 67.6, len: 10, h: 9, rise: 2.8, dep: 10, roof: 'side', wall: WALLS.dusk, chimney: [0.4], skylight: true},
-  {z: 78, len: 8.5, h: 8, dep: 9, roof: 'flat', wall: WALLS.plum},
-  {z: 86.9, len: 9.5, h: 9.8, rise: 2.6, dep: 10, roof: 'side', wall: WALLS.steel, chimney: [0.5]},
+  {z: 13.5, len: 9.5, h: 9.2, rise: 3.0, dep: 10, roof: 'side', wall: WALLS.plum, sil: {3: 'stand'}, chimney: [0.7]},
+  {z: 23.3, len: 8.2, h: 7.4, rise: 3.2, dep: 9, roof: 'front', wall: WALLS.steel, shop: {win: EMBER.core, awning: EMBER.hl, sign: 'CAFE', signColor: EMBER.card, lights: true}, sil: {1: 'cross'}, chimney: [0.3], skylight: true},
+  {z: 31.8, len: 10, h: 9.6, rise: 2.8, dep: 10, roof: 'side', wall: WALLS.terra, shop: {win: EMBER.houseLit, awning: EMBER.beam, sign: 'BAKERY', signColor: EMBER.wall, bladeU: 0.24, awEnd: 0.22}, sil: {4: 'read'}, chimney: [0.25, 0.8], skylight: true},
+  {z: 42.2, len: 7.2, h: 6.6, dep: 9, roof: 'flat', wall: WALLS.navy},
+  {z: 49.8, len: 9, h: 7, rise: 3, dep: 10, roof: 'side', wall: WALLS.violet, chimney: [0.6]},
+  {z: 59.2, len: 5, h: 6.5, rise: 2.6, dep: 9, roof: 'front', wall: WALLS.brick, chimney: [0.5]},
 ];
 
 const shade = (c: string) => mixHex(c, EMBER.dcDark, 0.42);
@@ -107,7 +104,7 @@ const PaneSil: React.FC<{z0: number; z1: number; h0: number; h1: number; who: 'c
 };
 
 /** One house of the left street, drawn far-to-near by the caller (nearer houses overlap). */
-const StreetHouse: React.FC<{hs: House; i: number; beats: QueueBeats}> = ({hs, i}) => {
+const StreetHouse: React.FC<{hs: House; i: number}> = ({hs, i}) => {
   const t = useTime();
   const seed = `qh${i}`;
   const z0 = hs.z;
@@ -181,10 +178,12 @@ const StreetHouse: React.FC<{hs: House; i: number; beats: QueueBeats}> = ({hs, i
     out.push(<path key="shopin" d={winQuad(sz0 + (sz1 - sz0) * 0.08, sz0 + (sz1 - sz0) * 0.4, 0.5, 1.2)} fill={EMBER.ring} />);
     out.push(<path key="door" d={winQuad(z0 + hs.len * 0.74, z0 + hs.len * 0.88, 0, 2.4)} fill={EMBER.houseLit} />);
     // the awning: a slab tilted out over the pavement
-    const aw = quad([P(Xw, kAtZ(sz0 - 0.3), 3.0), P(Xw, kAtZ(z0 + hs.len * 0.9), 3.0), P(Xw + 1.3, kAtZ(z0 + hs.len * 0.9), 2.5), P(Xw + 1.3, kAtZ(sz0 - 0.3), 2.5)]);
+    // (`awEnd`: the bakery's awning stops short of the first data center's edge, so the subject keeps a clean outline)
+    const ae = z0 + hs.len * (hs.shop.awEnd ?? 0.9);
+    const aw = quad([P(Xw, kAtZ(sz0 - 0.3), 3.0), P(Xw, kAtZ(ae), 3.0), P(Xw + 1.3, kAtZ(ae), 2.5), P(Xw + 1.3, kAtZ(sz0 - 0.3), 2.5)]);
     out.push(<path key="awning" d={aw} fill={hs.shop.awning} />);
-    out.push(<path key="awsn" d={quad([P(Xw, kAtZ(sz0 - 0.3), 3.05), P(Xw, kAtZ(z0 + hs.len * 0.9), 3.05), P(Xw + 0.7, kAtZ(z0 + hs.len * 0.9), 2.85), P(Xw + 0.7, kAtZ(sz0 - 0.3), 2.85)])} fill={EMBER.snow} />);
-    out.push(<Ink key="awi" d={quad([P(Xw + 1.3, kAtZ(sz0 - 0.3), 2.5), P(Xw + 1.3, kAtZ(z0 + hs.len * 0.9), 2.5)]).replace(/Z$/, '')} width={iw} />);
+    out.push(<path key="awsn" d={quad([P(Xw, kAtZ(sz0 - 0.3), 3.05), P(Xw, kAtZ(ae), 3.05), P(Xw + 0.7, kAtZ(ae), 2.85), P(Xw + 0.7, kAtZ(sz0 - 0.3), 2.85)])} fill={EMBER.snow} />);
+    out.push(<Ink key="awi" d={quad([P(Xw + 1.3, kAtZ(sz0 - 0.3), 2.5), P(Xw + 1.3, kAtZ(ae), 2.5)]).replace(/Z$/, '')} width={iw} />);
   }
   // drainpipe at the far end, a wall lamp
   const dp0 = wallPt(z1 - 0.15, 0);
@@ -267,7 +266,7 @@ const StreetHouse: React.FC<{hs: House; i: number; beats: QueueBeats}> = ({hs, i
   });
   // blade sign (faces the camera: hangs from the wall over the pavement)
   if (hs.shop) {
-    const kz = kAtZ(z0 + hs.len * 0.1);
+    const kz = kAtZ(z0 + hs.len * (hs.shop.bladeU ?? 0.1));
     const s0 = P(Xw + 0.2, kz, 4.3);
     const s1 = P(Xw + 1.9, kz, 3.4);
     const bw = s1[0] - s0[0];
@@ -323,7 +322,7 @@ export const QLamp: React.FC<{x: number; y: number; h: number; halo: [string, st
 /** Warm halo steps for a lamp seen against snow or pale ground. */
 export const HALO_SNOW: [string, string] = [mixHex(EMBER.snow, EMBER.ring, 0.42), mixHex(EMBER.ring, EMBER.core, 0.25)];
 /** ... and against the dusk-blue house walls. */
-export const HALO_WALL: [string, string] = [mixHex(EMBER.dc, EMBER.ring, 0.35), mixHex(EMBER.ring, EMBER.core, 0.2)];
+export const HALO_WALL: [string, string] = [mixHex(EMBER.snow, EMBER.ring, 0.42), mixHex(EMBER.ring, EMBER.core, 0.2)];
 
 /** Feet point on the left pavement: X (m), Z (m). */
 const pave = (X: number, z: number): Pt => P(X, kAtZ(z), 0);
@@ -342,11 +341,52 @@ const Chatters: React.FC<{z: number; X: number; seed: string}> = ({z, X, seed}) 
   return <>{out}</>;
 };
 
+/** A slab of snow sliding off an eave (z0..z1 along the wall at eave height h): it creeps out, tips, drops in three
+ *  pieces and bursts into powder on the pavement. Secondary life on the street (S10 1.05; S14 the same frame: 1.05). */
+const SnowSlide: React.FC<{z0: number; z1: number; h: number; at: number; seed: string}> = ({z0, z1, h, at, seed}) => {
+  const t = useTime();
+  const d = t - at;
+  if (d < 0 || d > 1.1) return null;
+  const r = rng(`slide/${seed}`);
+  const out: React.ReactNode[] = [];
+  const pieces = 3;
+  for (let i = 0; i < pieces; i++) {
+    const za = z0 + ((z1 - z0) * i) / pieces;
+    const zb = z0 + ((z1 - z0) * (i + 1)) / pieces;
+    const zc = (za + zb) / 2;
+    const k = kAtZ(zc);
+    const creep = Math.min(1, d / 0.25) * 0.35;
+    const fall = Math.max(0, d - 0.25 - i * 0.04);
+    const hh = Math.max(0, h - 4.9 * fall * fall * 2.4);
+    if (hh <= 0.05) continue;
+    const a = P(X_WALL_L + 0.35 + creep, kAtZ(za), hh);
+    const c = P(X_WALL_L + 0.35 + creep, kAtZ(zb), hh);
+    const th = 0.32 * k;
+    out.push(<path key={`p${i}`} d={quad([[a[0], a[1] - th], [c[0], c[1] - th], [c[0], c[1]], [a[0], a[1]]])} fill={EMBER.snow} />);
+    out.push(<path key={`pi${i}`} d={`M${a[0].toFixed(1)} ${(a[1] - th).toFixed(1)}L${c[0].toFixed(1)} ${(c[1] - th).toFixed(1)}`} stroke={EMBER.ink} strokeWidth={1.4} />);
+  }
+  // the powder burst where it lands (flat puffs that grow and shrink to nothing)
+  const land = 0.25 + Math.sqrt(h / (4.9 * 2.4));
+  const b = d - land;
+  if (b > 0 && b < 0.55) {
+    const k = kAtZ((z0 + z1) / 2);
+    const [gx, gy] = P(X_WALL_L + 0.9, k, 0);
+    let pd = '';
+    for (let q = 0; q < 5; q++) {
+      const g = Math.sin((b / 0.55) * Math.PI);
+      const rr = (0.25 + r.range(0, 0.25)) * k * g;
+      if (rr > 0.6) pd += blob(gx + (q - 2) * 0.35 * k + r.jitter(4), gy - 0.25 * k - b * 0.6 * k, rr, rr * 0.7, {seed: `${seed}/b${q}`});
+    }
+    if (pd) out.push(<path key="burst" d={pd} fill={EMBER.snow} />);
+  }
+  return <>{out}</>;
+};
+
 export function leftItems(beats: QueueBeats): Item[] {
   const items: Item[] = [];
   // houses far to near: each sorts by its near end
   HOUSES.forEach((hs, i) => {
-    items.push({k: kAtZ(hs.z) - 0.01, el: <StreetHouse key={`h${i}`} hs={hs} i={i} beats={beats} />});
+    items.push({k: kAtZ(hs.z) - 0.01, el: <StreetHouse key={`h${i}`} hs={hs} i={i} />});
   });
   // lamp posts on the left pavement (X -15.9), lit, true size
   for (const z of [20, 28]) {
@@ -379,7 +419,13 @@ export function leftItems(beats: QueueBeats): Item[] {
     const a2 = pave(-17.6, 22);
     const b2 = pave(-17.6, 34);
     items.push({k: kAtZ(29), el: <Walker key="wk2" from={a2} to={b2} h={1.7 * kAtZ(22)} h1={1.7 * kAtZ(34)} speed={46} phase={0.62} pause={0.4} seed="q/wk2" wear={['bag', 'snow']} />});
+    // one coming DOWN the pavement under an umbrella (two-way traffic), on a fixed window so both panels match
+    const a3 = pave(-17.0, 37);
+    const b3 = pave(-17.0, 23.5);
+    items.push({k: kAtZ(31), el: <Walker key="wk3" from={a3} to={b3} h={1.72 * kAtZ(37)} h1={1.72 * kAtZ(23.5)} window={[-1.6, 4.6]} seed="q/wk3" wear={['umbrella']} />});
   }
+  // a slab of snow slides off the bakery's eave
+  items.push({k: kAtZ(33.5), el: <SnowSlide key="slide" z0={32.4} z1={35.6} h={9.55} at={1.05} seed="q/slide" />});
   return items;
 }
 
@@ -395,7 +441,26 @@ export const LeftGround: React.FC = () => {
     const [x, y] = P(p.X, k, 0);
     pools.push(<ellipse key={i} cx={x} cy={y} rx={p.r * k} ry={p.r * k * 0.28} fill={p.c} />);
   });
-  return <>{pools}</>;
+  // the CAFE's and BAKERY's windows spill warm light across the pavement onto the road's edge (two flat steps)
+  const spills: React.ReactNode[] = [];
+  [
+    {z0: 24.3, z1: 28.7, reach: 4.4},
+    {z0: 33.0, z1: 37.4, reach: 3.6},
+  ].forEach((sp, i) => {
+    const a = P(X_WALL_L, kAtZ(sp.z0), 0);
+    const b = P(X_WALL_L, kAtZ(sp.z1), 0);
+    const c = P(X_WALL_L + sp.reach, kAtZ(sp.z1 - 1.2), 0);
+    const d = P(X_WALL_L + sp.reach, kAtZ(sp.z0 - 1.6), 0);
+    spills.push(<path key={`so${i}`} d={quad([a, b, c, d])} fill={mixHex(EMBER.snow, EMBER.ring, 0.5)} />);
+    const c2 = P(X_WALL_L + sp.reach * 0.5, kAtZ(sp.z1 - 0.6), 0);
+    const d2 = P(X_WALL_L + sp.reach * 0.5, kAtZ(sp.z0 - 0.8), 0);
+    spills.push(<path key={`si${i}`} d={quad([a, b, c2, d2])} fill={mixHex(EMBER.ring, EMBER.core, 0.4)} />);
+  });
+  return (
+    <>
+      {spills}
+      {pools}
+    </>
+  );
 };
 
-export const LEFT_F = F;

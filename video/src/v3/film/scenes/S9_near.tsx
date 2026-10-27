@@ -3,6 +3,11 @@
 // a run of five lit dormers, two smoking stacks and a neighbour shovelling; the canyon slot between (its left wall in
 // shade, its right wall lit behind your head, string lights across); right, a mansard (a row of dormer windows 10 x 14
 // on 26) with a skylight ridge aimed at the campus; a flat roof behind the stair hut. End-frame coordinates.
+// G5b review 2 + 3: the canyon slot behind your head (its pale lit wall ran up into the street like a mast, and its
+// string lights ended at your stick) is now a GAP HOUSE whose snowy roof continues the terrace's snow band at your head
+// (the street disappears behind its ridge at y 1246, 60 px above your head; your hair reads dark on the pale roof, your
+// sweater on its dark eave and wall). The held stick keeps a CALM RING (>= 40 px: x 490-630, y 1245-1355): the mansard
+// starts at x 500 with a tall dark slate slope (cornice 1360), no windows, caps or bulbs inside the ring.
 // Start-frame guard: in x 187-347 (the start slot) nothing rises above y 1237 (it would peek over the start parapet);
 // the stacks stand at x >= 360 (behind the brick stack at p 0).
 import React from 'react';
@@ -11,7 +16,6 @@ import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {EMBER, BrickStack, RoofNeighbour, Smoke, StringLights3, RoofAerials, W} from '../kit';
 import {T9} from './S9_tones';
-import {canyonAt} from './S9_town';
 
 type Pt = [number, number];
 const f1 = (v: number) => v.toFixed(1);
@@ -20,54 +24,39 @@ const polyD = (pts: Pt[]) => pts.map(([x, y], i) => `${i ? 'L' : 'M'}${f1(x)} ${
 
 // ---------------------------------------------------------------- geometry (end coords)
 const TERRACE = {x0: -60, x1: 434, ridge: 1252, eave: 1318, base: 1520};
-const MANSARD = {x0: 518, x1: 836, top: 1250, slope: 1262, cornice: 1320, base: 1520};
+const MANSARD = {x0: 500, x1: 836, top: 1250, slope: 1262, cornice: 1360, base: 1520};
+/** The held stick's calm ring (end coords): nothing lit, no caps, no bulbs inside it. */
+const RING = {x0: 490, x1: 640, y0: 1245, y1: 1356};
+const inRing = (x: number, y: number, w: number, h: number) => x + w > RING.x0 && x < RING.x1 && y + h > RING.y0 && y < RING.y1;
+/** The gap house between the terrace and the mansard (its roof hides the street's foot). */
+const GAP = {x0: 404, x1: 520, ridge: 1246, eave: 1318};
 const FLAT = {x0: 830, x1: 1160, top: 1236};
 export const NEAR_STACKS = [
   {x: 354, y: 1214, w: 30},
   {x: 396, y: 1206, w: 34},
 ];
 const DORMERS = [262, 290, 318, 346, 374].map((x) => ({x, y: 1278, w: 17, h: 15}));
-const MANSARD_WINS = Array.from({length: 11}, (_, i) => ({x: MANSARD.x0 + 14 + i * 26, y: 1274, w: 10, h: 14}));
+/** The mansard's dormer windows: a top row (outside the stick's ring) and a lower row further right. */
+const MANSARD_WINS = [
+  ...Array.from({length: 12}, (_, i) => ({x: MANSARD.x0 + 14 + i * 26, y: 1274, w: 10, h: 14})),
+  ...Array.from({length: 7}, (_, i) => ({x: MANSARD.x0 + 166 + i * 26, y: 1318, w: 10, h: 14})),
+].filter((w) => !inRing(w.x - 4, w.y - 7, w.w + 8, w.h + 7));
 /** The window that pops on in the hold (~2.9 s): the hold's one new light. */
-const POP_WIN = 6;
+const POP_WIN = 3;
 const POP_AT = 2.9;
 
-const SLOT = (() => {
-  // the canyon between the masses: dark inside, its right wall lit (storeys of window ticks 9 x 12 -> 3 x 4)
-  const yT = 1236;
-  const yB = 1520;
-  const [lT, rT] = canyonAt(yT);
-  const slot: Pt[] = [[canyonAt(yB)[0] - 6, yB], [lT - 4, yT], [rT + 4, yT], [canyonAt(yB)[1] + 6, yB]];
-  const wallX = (y: number) => {
-    const [l, r] = canyonAt(y);
-    return l + (r - l) * 0.46;
-  };
-  // lit only behind your head (y >= 1290): above it the wall is dark with warm windows (no light column up the street)
-  const yL = 1290;
-  const wall: Pt[] = [[wallX(yB), yB], [wallX(yL), yL], [canyonAt(yL)[1] + 4, yL], [canyonAt(yB)[1] + 6, yB]];
-  const wallDark: Pt[] = [[wallX(yL), yL], [wallX(yT), yT], [rT + 4, yT], [canyonAt(yL)[1] + 4, yL]];
-  let ticks = '';
-  let lit = '';
-  const r = rng('s9/slotwin');
-  for (let y = 1398; y > yT + 6; ) {
-    const k = (y - yT) / (1398 - yT);
-    const th = 4 + 8 * k;
-    const tw = 3 + 6 * k;
-    const x0 = wallX(y) + 3;
-    const x1 = canyonAt(y)[1] + 2;
-    for (let x = x0; x + tw < x1; x += tw * 1.9) {
-      if (r.chance(y < yL ? 0.35 : 0.3)) lit += rectD(x, y - th, tw, th);
-      else ticks += rectD(x, y - th, tw, th);
-    }
-    y -= th * 2.1;
-  }
-  // the shade wall on the left: a few lit windows
-  let leftLit = '';
-  for (const [y, k] of [[1300, 0.4], [1356, 0.75]] as const) {
-    const x = canyonAt(y)[0] + 2;
-    leftLit += rectD(x, y - 10 * k - 4, 4 + 4 * k, 8 + 8 * k);
-  }
-  return {slot: polyD(slot), wall: polyD(wall), wallDark: polyD(wallDark), ticks, lit, leftLit};
+const GAP_D = (() => {
+  const {x0, x1, ridge, eave} = GAP;
+  // a snowy roof plane facing us (tile courses as calm hairlines), a dark ridge cap, the eave's shade band, the wall
+  // (the same snow band as the terrace's roof: one horizontal band at your head, never a pale column under the street)
+  const roof = rectD(x0, ridge, x1 - x0, eave + 4 - ridge);
+  let courses = '';
+  for (let y = ridge + 14; y < eave - 12; y += 13) courses += `M${x0} ${y}H${x1}`;
+  const cap = rectD(x0, ridge - 2, x1 - x0, 4);
+  const shade = rectD(x0, eave - 10, x1 - x0, 14);
+  const wall = rectD(x0, eave + 2, x1 - x0, 1520 - eave);
+  const gutter = rectD(x0 - 2, eave + 1, x1 - x0 + 4, 5);
+  return {roof, courses, cap, shade, wall, gutter};
 })();
 
 const TERRACE_D = (() => {
@@ -103,9 +92,15 @@ const MANSARD_D = (() => {
   let fwinLit = '';
   const r = rng('s9/mansardWin');
   for (let x = x0 + 16; x < x1 - 20; x += 30) {
-    const d = rectD(x, cornice + 16, 13, 20);
-    if (r.chance(0.5)) fwinLit += d;
+    const d = rectD(x, cornice + 12, 13, 18);
+    if (r.chance(0.5) && x > RING.x1 + 20) fwinLit += d;
     else fwin += d;
+  }
+  // slate courses on the tall slope (calm: one step lighter than the slate)
+  let slates = '';
+  for (let y = slope + 10; y < cornice - 4; y += 11) {
+    const k = (y - slope) / (cornice - slope);
+    slates += `M${f1(x0 + 10 - 10 * k)} ${y}H${f1(x1 - 10 + 10 * k)}`;
   }
   // the skylight ridge (620, 1395) -> (720, 1250): a glazed strip aimed at the campus
   const a: Pt = [620, 1398];
@@ -124,7 +119,7 @@ const MANSARD_D = (() => {
     else panes += d;
   }
   const ridgeLine = `M${a[0]} ${a[1]}L${bb[0]} ${bb[1]}`;
-  return {flat, slope: slopeD, cornice: corniceD, facade, caps, fwin, fwinLit, strip, panes, panesLit, ridgeLine};
+  return {flat, slope: slopeD, cornice: corniceD, facade, caps, fwin, fwinLit, strip, panes, panesLit, ridgeLine, slates};
 })();
 
 export const NearRoofs: React.FC = () => {
@@ -138,9 +133,18 @@ export const NearRoofs: React.FC = () => {
       <path d={rectD(FLAT.x0, FLAT.top, FLAT.x1 - FLAT.x0, 300)} fill={EMBER.roofs} />
       <path d={rectD(FLAT.x0 - 3, FLAT.top - 6, FLAT.x1 - FLAT.x0 + 6, 10)} fill={EMBER.snow} />
       <RoofAerials x={968} y={FLAT.top - 2} s={1.15} />
+      {/* ---- the gap house (behind your head; the terrace and the mansard overlap its sides) */}
+      <path d={GAP_D.wall} fill={EMBER.roofs} />
+      <path d={GAP_D.roof} fill={EMBER.snow} />
+      <path d={GAP_D.courses} fill="none" stroke={EMBER.frost} strokeWidth={1.4} />
+      <path d={GAP_D.shade} fill={EMBER.frost} />
+      <path d={GAP_D.gutter} fill={EMBER.dcSide} />
+      <path d={GAP_D.cap} fill={EMBER.dcSide} />
+      <Ink d={`M${GAP.x0} ${GAP.ridge - 2}H${GAP.x1}`} width={W.mid} />
       {/* ---- the mansard */}
       <path d={MANSARD_D.flat} fill={EMBER.snow} />
       <path d={MANSARD_D.slope} fill={EMBER.roofs} />
+      <path d={MANSARD_D.slates} fill="none" stroke={EMBER.dc} strokeWidth={1.2} />
       {MANSARD_WINS.map((w, i) => (
         <path key={i} d={rectD(w.x, w.y, w.w, w.h)} fill={i === POP_WIN ? (pop ? EMBER.houseLit : EMBER.dcDark) : i % 3 === 0 ? EMBER.houseLit : i % 3 === 1 ? EMBER.dcDark : T9.nmWin} />
       ))}
@@ -154,13 +158,6 @@ export const NearRoofs: React.FC = () => {
       <path d={MANSARD_D.panesLit} fill={EMBER.houseLit} />
       <Ink d={MANSARD_D.ridgeLine} width={1.6} color={EMBER.dcDark} />
       <Ink d={`M${MANSARD.x0} ${MANSARD.cornice}L${MANSARD.x0 + 10} ${MANSARD.slope}L${MANSARD.x1 - 10} ${MANSARD.slope}L${MANSARD.x1} ${MANSARD.cornice}`} width={W.mid} />
-      {/* ---- the canyon slot (the drop): dark, its right wall lit behind your head */}
-      <path d={SLOT.slot} fill={EMBER.dcDark} />
-      <path d={SLOT.wall} fill={T9.litWall} />
-      <path d={SLOT.wallDark} fill={EMBER.dc} />
-      <path d={SLOT.ticks} fill={EMBER.dc} />
-      <path d={SLOT.lit} fill={EMBER.houseLit} />
-      <path d={SLOT.leftLit} fill={EMBER.houseLit} />
       {/* ---- the terrace */}
       <path d={TERRACE_D.facade} fill={EMBER.roofs} />
       <path d={TERRACE_D.wins} fill={EMBER.dcDark} />
@@ -186,8 +183,8 @@ export const NearRoofs: React.FC = () => {
         </React.Fragment>
       ))}
       <RoofNeighbour x={302} y={1314} h={40} kind="shovel" seed="s9/shov" coat={EMBER.hl} />
-      {/* string lights across the slot */}
-      <StringLights3 from={[420, 1258]} to={[528, 1268]} sag={12} n={7} r={3.6} halo={false} sway={1} every={0.5} seed="s9/sl3" ink={1.4} />
+      {/* string lights along the terrace's gutter, far left (the slot's span ended at your stick: G5b review 2) */}
+      <StringLights3 from={[-20, 1326]} to={[236, 1330]} sag={10} n={9} r={3.6} halo={false} sway={1} every={0.5} seed="s9/sl3" ink={1.4} />
     </>
   );
 };

@@ -227,9 +227,11 @@ export type YouSeatedProps = {
   at?: At;
   seed?: string;
   ink?: number;
+  /** Head tilt in degrees about the neck's base (negative = chin up / toward the upper left). Default 0. */
+  headRot?: number;
 };
 
-export const YouSeated: React.FC<YouSeatedProps> = ({x, y, head: H = 92, floorY, at, seed = 'youS', ink = 4.8}) => {
+export const YouSeated: React.FC<YouSeatedProps> = ({x, y, head: H = 92, floorY, at, seed = 'youS', ink = 4.8, headRot = 0}) => {
   const t = useTime();
   const breathe = Math.sin(t * 1.6) * 1.2;
   const floor = floorY ?? y + H * 1.45;
@@ -295,13 +297,15 @@ export const YouSeated: React.FC<YouSeatedProps> = ({x, y, head: H = 92, floorY,
       <Fill d={arm} color={YOU.sweater} at={fillAt(at, 0.05)} seed={`${seed}/arm`} />
       <Ink d={arm} at={b(at, 0.05)} width={inner} open={0.12} />
       <Fill d={blob(x + H * 1.68, shY + H * 1.72, H * 0.14, H * 0.12, {seed: `${seed}/hand`})} color={YOU.skin} at={fillAt(at, 0.07)} />
-      <Fill d={neck} color={YOU.skin} at={fillAt(at, 0.04)} offset={false} />
-      <Fill d={headD} color={YOU.skin} at={fillAt(at, 0.05)} seed={`${seed}/headF`} />
-      <Fill d={ear} color={YOU.skin} at={fillAt(at, 0.06)} />
-      <Fill d={hairD} color={YOU.hair} at={fillAt(at, 0.07)} seed={`${seed}/hair`} />
-      <Ink d={headD} at={b(at, 0.05)} width={ink} open={0.1} />
-      <Ink d={ellipse(hcx + H * 0.36, hcy + H * 0.06, H * 0.08, H * 0.12, {seed: `${seed}/earI`})} at={b(at, 0.08)} width={inner} />
-      <Ink d={hairD} at={b(at, 0.07)} width={inner} open={0.2} />
+      <XG m={headRot ? mat.about(mat.rotate(headRot), hcx, shY + H * 0.06) : mat.I}>
+        <Fill d={neck} color={YOU.skin} at={fillAt(at, 0.04)} offset={false} />
+        <Fill d={headD} color={YOU.skin} at={fillAt(at, 0.05)} seed={`${seed}/headF`} />
+        <Fill d={ear} color={YOU.skin} at={fillAt(at, 0.06)} />
+        <Fill d={hairD} color={YOU.hair} at={fillAt(at, 0.07)} seed={`${seed}/hair`} />
+        <Ink d={headD} at={b(at, 0.05)} width={ink} open={0.1} />
+        <Ink d={ellipse(hcx + H * 0.36, hcy + H * 0.06, H * 0.08, H * 0.12, {seed: `${seed}/earI`})} at={b(at, 0.08)} width={inner} />
+        <Ink d={hairD} at={b(at, 0.07)} width={inner} open={0.2} />
+      </XG>
       {/* the chair back over the lower back */}
       <Fill d={backD} color={YOU.chair} at={fillAt(at, 0.08)} seed={`${seed}/back`} />
       <Ink d={poly([[x - H * 1.08, y + H * 0.42], [x - H * 1.08, y - H * 1.9], [x - H * 0.78, y - H * 1.96], [x - H * 0.72, y + H * 0.42]], {seed: `${seed}/backI`, over: [1, 3]})} at={b(at, 0.08)} width={ink} />

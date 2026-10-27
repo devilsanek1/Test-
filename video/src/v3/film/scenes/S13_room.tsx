@@ -16,10 +16,17 @@
 //              basket cut by the bottom edge.
 // Everything is there from the cut (no builds). Idle life: bulbs twinkle, the star turns, photos and the pothos sway, the
 // sock and the coat sway a hair, Pip breathes and its z's rise and shrink to nothing (no opacity).
-import React from 'react';
+// Fix pass (independent review): the desk mug is a small cup (w 50) whose steam is light puffs (vapour on the navy glass,
+// never ink lines over it); the radiator is painted (reveal, shaded fins) with a towel and a valve on its pipe, so it
+// no longer outshines you; the coat has a hood lining, lapels, a sleeve and cuff, buttons, pocket flaps, folds and a hem
+// band, with a beanie and mittens on a string on the rail; the lower third stacks things in stepped sizes (a throw
+// half on the pouf trailing onto the rug, a floor cushion, a yarn ball rolled out of the basket whose thread snakes
+// across the rug to Pip's paw, a mug on a coaster and a plate with clementine peel by the open book, a dropped pencil,
+// grain and knots in the floorboards).
+import React, {useId} from 'react';
 import {Fill} from '../../../lib/Fill';
 import {Ink} from '../../../lib/Ink';
-import {blob, circle, ellipse, line, polyPath} from '../../../lib/sketch';
+import {blob, circle, ellipse, line, polyPath, smooth} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
@@ -27,10 +34,12 @@ import {
   BookStack,
   Calendar,
   CoatHook,
+  DeskGrain,
   EMBER,
   FramedPrint,
   Glasses,
   Headphones,
+  Mug,
   PenCup,
   Pip3,
   Plant,
@@ -39,6 +48,7 @@ import {
   Rug,
   ShelfFill,
   Slippers,
+  Steam,
   StringLights3,
   sway,
   ToteBag,
@@ -107,6 +117,114 @@ const Bin: React.FC<{x: number; y: number; w?: number}> = ({x, y, w = 84}) => {
   );
 };
 
+/** The coat on the hook (x 214, y 986, h 330: the kit CoatHook's geometry), so the detail can be clipped to it. */
+const COAT = {x: 214, y: 986, h: 330};
+/** The coat's own detail, drawn by CoatHook over its fill and under its ink and the scarf (inside its sway): the hood's
+ *  lining in the neck, the lapels, the left sleeve with its cuff, buttons, pocket flaps, tone-on-tone folds, a hem band. */
+const CoatDetail: React.FC = () => {
+  const id = 's13coat' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const {x, y, h} = COAT;
+  const cw = h * 0.42;
+  const coatD = `M${x - cw * 0.22} ${y + 10}Q${x - cw * 0.6} ${y + h * 0.2} ${x - cw * 0.55} ${y + h}L${x + cw * 0.55} ${y + h}Q${x + cw * 0.6} ${y + h * 0.2} ${x + cw * 0.22} ${y + 10}Z`;
+  const tone = EMBER.sky; // one flat step under the coat (skyLow): tone-on-tone
+  const lapL = polyPath([[x - 32, y + 12], [x - 3, y + 22], [x - 3, y + 96], [x - 44, y + 56]]);
+  const lapR = polyPath([[x + 32, y + 12], [x + 3, y + 22], [x + 3, y + 96], [x + 44, y + 56]]);
+  const cuff = polyPath([[x - 76, y + 226], [x - 38, y + 230], [x - 40, y + 252], [x - 78, y + 248]]);
+  const flapL = polyPath([[x - 66, y + 206], [x - 20, y + 202], [x - 21, y + 220], [x - 64, y + 224]]);
+  const flapR = polyPath([[x + 32, y + 202], [x + 74, y + 206], [x + 72, y + 224], [x + 33, y + 220]]);
+  const folds =
+    `M${x - 30} ${y + 44}Q${x - 36} ${y + 140} ${x - 40} ${y + 230}` + // the sleeve's inner edge
+    `M${x - 48} ${y + 252}Q${x - 52} ${y + 290} ${x - 56} ${y + h}` +
+    `M${x - 16} ${y + 120}Q${x - 18} ${y + 230} ${x - 24} ${y + h}` +
+    `M${x + 50} ${y + 70}Q${x + 60} ${y + 180} ${x + 64} ${y + h}` +
+    `M${x + 30} ${y + 240}Q${x + 34} ${y + 280} ${x + 36} ${y + h}`;
+  const buttons = [110, 160, 210, 262].map((dy) => circle(x - 10, y + dy, 5.5)).join('');
+  return (
+    <>
+      <defs>
+        <clipPath id={id}>
+          <path d={coatD} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>
+        <Fill d={ellipse(x, y + 16, 36, 22, {seed: 's13/hood'})} color={tone} offset={false} />
+        <Fill rect={[x - 100, y + h - 18, 200, 18]} color={tone} offset={false} />
+        <Fill d={cuff} color={tone} offset={false} />
+        <Fill d={flapL + flapR} color={tone} offset={false} />
+        <Ink d={folds} width={W.far} color={tone} />
+        <Fill d={lapL + lapR} color={EMBER.skyLow} offset={false} />
+        <Ink d={lapL + lapR} width={W.hair} color={EMBER.dc} />
+        <Ink d={flapL + flapR + cuff} width={W.hair} color={EMBER.dc} />
+        <Fill d={buttons} color={EMBER.dcSide} offset={false} />
+      </g>
+    </>
+  );
+};
+
+/** On the rail beside the coat: a knitted beanie (ribbed brim, a pompom) and mittens on a string over a peg; each
+ *  sways a hair about its peg. */
+const RailThings: React.FC = () => {
+  const t = useTime();
+  const bx = 288;
+  const by = 992;
+  const beanieA = sway(t, 1.4, 3.9, 0.8);
+  const crownD = `M${bx - 22} ${by + 16}L${bx + 22} ${by + 16}L${bx + 21} ${by + 40}Q${bx + 18} ${by + 66} ${bx} ${by + 66}Q${bx - 18} ${by + 66} ${bx - 21} ${by + 40}Z`;
+  let ribs = '';
+  for (let i = -3; i <= 3; i++) ribs += `M${bx + i * 6} ${by + 3}l0 12`;
+  const mx = 146;
+  const my = 992;
+  const mitA = sway(t, 1.8, 3.4, 2.2);
+  const mitten = (cx: number, top: number) =>
+    `M${cx - 14} ${top}L${cx - 14} ${top + 28}Q${cx - 14} ${top + 44} ${cx} ${top + 44}Q${cx + 14} ${top + 44} ${cx + 14} ${top + 28}L${cx + 14} ${top}Z`;
+  const mA = mitten(130, 1064);
+  const mB = mitten(166, 1082);
+  const thumbs = blob(146, 1086, 6, 9, {seed: 's13/thA'}) + blob(182, 1104, 6, 9, {seed: 's13/thB'});
+  return (
+    <>
+      <XG m={mat.about(mat.rotate(mitA), mx, my)}>
+        <Ink d={`M130 1064C128 1010 140 990 ${mx} ${my}C152 994 166 1030 166 1082`} width={W.hair} />
+        <Fill d={thumbs} color={EMBER.books[4]} offset={false} />
+        <Fill d={mA + mB} color={EMBER.books[4]} seed="s13/mit" />
+        <Fill rect={[115, 1064, 30, 10]} color={EMBER.card} offset={false} />
+        <Fill rect={[151, 1082, 30, 10]} color={EMBER.card} offset={false} />
+        <Ink d={mA + mB + thumbs} width={W.far} />
+        <Fill d={circle(130, 1092, 3.2) + circle(166, 1110, 3.2)} color={EMBER.card} offset={false} />
+      </XG>
+      <XG m={mat.about(mat.rotate(beanieA), bx, by)}>
+        <Fill d={crownD} color={EMBER.books[0]} seed="s13/beanie" />
+        <Ink d={`M${bx - 12} ${by + 30}Q${bx - 10} ${by + 50} ${bx - 4} ${by + 62}M${bx + 10} ${by + 28}Q${bx + 10} ${by + 48} ${bx + 6} ${by + 62}`} width={W.hair} color={EMBER.beam} />
+        <Fill rect={[bx - 24, by, 48, 17]} color={EMBER.books[4]} offset={false} />
+        <Ink d={ribs} width={W.hair} color={EMBER.beam} />
+        <Ink d={crownD + `M${bx - 24} ${by}h48v17h-48Z`} width={W.far} />
+        <Fill d={blob(bx, by + 72, 11, 10, {seed: 's13/pom'})} color={EMBER.card} />
+        <Ink d={blob(bx, by + 72, 11, 10, {seed: 's13/pom'})} width={W.hair} />
+      </XG>
+      <circle cx={mx} cy={my - 1} r={5} fill={EMBER.anchor} />
+      <circle cx={bx} cy={by - 1} r={5} fill={EMBER.anchor} />
+    </>
+  );
+};
+
+/** A striped tea towel folded over the radiator's top bar (left part), a hair of sway. */
+const Towel: React.FC<{x: number; y: number; w: number; h: number}> = ({x, y, w, h}) => {
+  const t = useTime();
+  const a = sway(t, 0.6, 4.1, 1.7);
+  const body = polyPath([[x, y + 8], [x + w, y + 8], [x + w + 3, y + h], [x - 3, y + h]]);
+  const fold = polyPath([[x - 3, y - 8], [x + w + 3, y - 8], [x + w + 1, y + 12], [x - 1, y + 12]]);
+  let fringe = '';
+  for (let i = 0; i <= 8; i++) fringe += `M${x - 2 + (i * (w + 4)) / 8} ${y + h}l0 7`;
+  return (
+    <XG m={mat.about(mat.rotate(a), x + w / 2, y)}>
+      <Fill d={body} color={EMBER.books[0]} seed="s13/towel" />
+      <Fill rect={[x - 2, y + h - 34, w + 4, 7]} color={EMBER.beam} offset={false} />
+      <Fill rect={[x - 2, y + h - 22, w + 4, 4]} color={EMBER.beam} offset={false} />
+      <Fill d={fold} color={EMBER.boardDeep} offset={false} />
+      <Ink d={body + fold} width={W.far} />
+      <Ink d={fringe} width={W.hair} />
+    </XG>
+  );
+};
+
 export const S13WallLow: React.FC = () => (
   <>
     <WallMarks x={150} y={1150} w={160} h={160} n={3} seed="s13/wm2" />
@@ -114,9 +232,18 @@ export const S13WallLow: React.FC = () => (
     {/* the shelf's foot: books and a jar on the floor inside the shelf (its last board is at 1140) */}
     <ShelfFill planks={[{x0: -16, x1: 72, y: FLOOR_Y - 2, room: 190}]} seed="s13/shelffoot" photo={false} plant={false} trailing={false} />
     {/* a coat and a striped scarf on a hook rail by the shelf, below the bubble's calm ring */}
-    <CoatHook x={214} y={986} h={330} coat={EMBER.skyLow} seed="s13/coat" />
-    {/* under the desk: the radiator with a sock drying on it (sways), a socket, a wicker bin */}
-    <Radiator x={608} y={1200} w={350} h={150} seed="s13/rad" ink={W.far} />
+    <CoatHook x={COAT.x} y={COAT.y} h={COAT.h} coat={EMBER.skyLow} seed="s13/coat">
+      <CoatDetail />
+    </CoatHook>
+    <RailThings />
+    {/* under the desk: the radiator (painted the warm reveal tone, shaded fins: never brighter than you) with a sock
+        drying on it (sways) and a towel over its bar; its pipe into the floor with a valve; a socket; a wicker bin */}
+    <Radiator x={608} y={1200} w={350} h={150} seed="s13/rad" ink={W.far} color={EMBER.reveal} shade="#C4968B" />
+    <Towel x={634} y={1196} w={84} h={100} />
+    <Fill rect={[891, 1346, 11, 40]} color="#C4968B" offset={false} />
+    <Ink d={`M891 1346L891 1386M902 1346L902 1386M884 1382h25`} width={W.hair} />
+    <Fill d={circle(896.5, 1366, 9)} color={EMBER.beam} offset={false} />
+    <Ink d={circle(896.5, 1366, 9) + `M887.5 1366h18M896.5 1357v18`} width={W.hair} />
     <Fill rect={[992, 1352, 30, 24]} color={EMBER.card} offset={false} />
     <Ink d={`M992 1352h30v24h-30Z` + circle(1001, 1364, 2.4) + circle(1013, 1364, 2.4)} width={W.hair} />
   </>
@@ -132,8 +259,16 @@ export const S13ToteAndBin: React.FC = () => (
 
 // ---------------------------------------------------------------- the desk and the sill
 
+/** The tea on the desk: the kit mug scaled to w 50 about its rim's left end (the old 98 px one was bigger than your
+ *  head); its steam is light puffs that read as vapour on the navy glass (never ink lines over the glass). */
+const DESK_MUG = {x: 936, top: 1048, k: 0.51};
+
 export const S13Desk: React.FC = () => (
   <>
+    <XG m={mat.about(mat.scale(DESK_MUG.k), DESK_MUG.x, DESK_MUG.top)}>
+      <Mug x={DESK_MUG.x} top={DESK_MUG.top} seed="s13/mug" steam={false} />
+    </XG>
+    <Steam x={DESK_MUG.x + 25} y={DESK_MUG.top - 6} n={5} life={2.3} rise={100} drift={12} r0={4} r1={12} wobble={5} seed="s13/mugsteam" color={EMBER.card} />
     <Calendar x={772} y={1020} w={84} from="2026" seed="s13/cal" ink={W.far} />
     <PenCup x={884} y={1100} w={42} seed="s13/pens" ink={W.far} color={EMBER.books[3]} />
     <BookStack x={1038} y={1106} w={120} n={3} seed="s13/stack" ink={W.far} />
@@ -160,6 +295,13 @@ const Floorboards: React.FC = () => {
     <>
       <Ink d={d} width={W.far} color={EMBER.beam} />
       <Ink d={joints} width={W.hair} color={EMBER.beam} />
+      {/* grain and knots in the boards that show (the rug covers the middle) */}
+      <DeskGrain x={0} y={1404} w={1080} h={38} n={5} seed="s13/fg0" color={EMBER.beam} />
+      <DeskGrain x={-10} y={1452} w={190} h={230} n={4} seed="s13/fgL" color={EMBER.beam} />
+      <DeskGrain x={960} y={1460} w={140} h={220} n={3} seed="s13/fgR" color={EMBER.beam} />
+      <DeskGrain x={0} y={1702} w={1080} h={38} n={7} seed="s13/fg1" color={EMBER.beam} />
+      <DeskGrain x={0} y={1748} w={1080} h={86} n={7} seed="s13/fg2" color={EMBER.beam} />
+      <Ink d={[[612, 1724], [318, 1792], [1010, 1776], [88, 1426], [1040, 1600]].map(([kx, ky], i) => ellipse(kx, ky, 10, 4, {seed: `s13/knot${i}`}) + ellipse(kx, ky, 4, 1.6, {seed: `s13/knoti${i}`})).join('')} width={W.hair} color={EMBER.beam} />
     </>
   );
 };
@@ -244,6 +386,107 @@ const RugPattern: React.FC<{quad: [Pt, Pt, Pt, Pt]}> = ({quad}) => {
   );
 };
 
+// ---------------------------------------------------------------- the lower third: things in stepped sizes on the rug
+
+/** The rolled-out yarn ball and its thread: out of the basket (behind its rim), snaking across the boards and the rug,
+ *  through the ball and on to Pip's front paw (Pip played, then fell asleep: a small story link). */
+const YARN = {x: 872, y: 1668, r: 21};
+const THREAD: Pt[] = [[806, 1814], [784, 1782], [836, 1752], [806, 1722], [846, 1694], [YARN.x - 6, YARN.y + 8]];
+const THREAD2: Pt[] = [[YARN.x - 16, YARN.y - 10], [826, 1640], [800, 1614], [822, 1588], [794, 1566], [778, 1552]];
+
+/** A plaid throw: its tail on the boards and the rug's front edge (behind the pouf); the drape over the pouf is in
+ *  S13FloorFront. Terracotta with cream checks. */
+const THROW_TAIL = polyPath([[150, 1772], [232, 1704], [318, 1684], [366, 1712], [306, 1764], [250, 1806]]);
+const THROW_DRAPE = polyPath([[118, 1752], [178, 1749], [228, 1762], [258, 1790], [264, 1860], [258, 1940], [222, 1930], [196, 1948], [166, 1928], [150, 1880], [132, 1830], [106, 1788]]);
+const Plaid: React.FC<{d: string; box: [number, number, number, number]; seed: string}> = ({d, box, seed}) => {
+  const id = 's13plaid' + useId().replace(/[^a-zA-Z0-9]/g, '');
+  const [x0, y0, x1, y1] = box;
+  let checks = '';
+  for (let x = x0 + 12; x < x1; x += 34) checks += `M${x} ${y0}L${x + 10} ${y1}`;
+  for (let y = y0 + 10; y < y1; y += 30) checks += `M${x0} ${y}L${x1} ${y + 8}`;
+  return (
+    <>
+      <Fill d={d} color={EMBER.pot} seed={seed} />
+      <defs>
+        <clipPath id={id}>
+          <path d={d} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>
+        <Ink d={checks} width={5} color={EMBER.wall} taper={false} />
+        <Ink d={checks} width={W.hair} color={EMBER.beam} taper={false} />
+      </g>
+      <Ink d={d} width={W.mid} />
+    </>
+  );
+};
+
+/** A floor cushion on the rug's right (a tufted square seen from above, piping, a button). */
+const Cushion: React.FC<{x: number; y: number; w: number; h: number}> = ({x, y, w, h}) => {
+  const d = `M${x - w / 2 + 10} ${y - h / 2}Q${x} ${y - h / 2 + 8} ${x + w / 2 - 10} ${y - h / 2}Q${x + w / 2 + 6} ${y} ${x + w / 2 - 6} ${y + h / 2}Q${x} ${y + h / 2 - 8} ${x - w / 2 + 6} ${y + h / 2}Q${x - w / 2 - 6} ${y} ${x - w / 2 + 10} ${y - h / 2}Z`;
+  const tufts = `M${x - w * 0.36} ${y - h * 0.3}Q${x - w * 0.1} ${y - h * 0.08} ${x} ${y}M${x + w * 0.36} ${y - h * 0.3}Q${x + w * 0.1} ${y - h * 0.08} ${x} ${y}M${x - w * 0.36} ${y + h * 0.32}Q${x - w * 0.1} ${y + h * 0.1} ${x} ${y}M${x + w * 0.36} ${y + h * 0.32}Q${x + w * 0.1} ${y + h * 0.1} ${x} ${y}`;
+  return (
+    <>
+      <Fill d={blob(x + 6, y + h / 2 + 2, w * 0.5, 9, {seed: 's13/cushsh'})} color="#D9A58A" offset={false} />
+      <Fill d={d} color={EMBER.skyLow} seed="s13/cush" />
+      <Ink d={tufts} width={W.far} color={EMBER.sky} />
+      <Ink d={d} width={W.mid} />
+      <Fill d={circle(x, y, 6)} color={EMBER.card} offset={false} />
+      <Ink d={circle(x, y, 6)} width={W.hair} />
+    </>
+  );
+};
+
+/** A plate with a half-peeled clementine and curls of peel. */
+const PeelPlate: React.FC<{x: number; y: number}> = ({x, y}) => {
+  const plate = ellipse(x, y, 48, 16, {seed: 's13/plate'});
+  const peel = (px: number, py: number, k: number) => `M${px} ${py}q${12 * k} ${-9 * k} ${24 * k} ${1 * k}q${8 * k} ${8 * k} ${-3 * k} ${14 * k}q${-12 * k} ${3 * k} ${-21 * k} ${-5 * k}z`;
+  const peels = peel(x + 6, y - 2, 0.9) + peel(x - 40, y - 4, 0.75) + peel(x + 24, y + 4, 0.6);
+  return (
+    <>
+      <Fill d={plate} color={EMBER.card} seed="s13/plateF" />
+      <Ink d={plate + ellipse(x, y - 1, 34, 10, {seed: 's13/plate2'})} width={W.far} />
+      <Fill d={peels} color={EMBER.pot} offset={false} />
+      <Ink d={peels} width={W.hair} />
+      <Fill d={blob(x - 14, y - 8, 15, 13, {seed: 's13/clem'})} color={EMBER.books[0]} seed="s13/clemF" />
+      <Fill d={`M${x - 29} ${y - 9}Q${x - 14} ${y - 2} ${x + 1} ${y - 9}L${x - 2} ${y}Q${x - 14} ${y + 6} ${x - 26} ${y}Z`} color={EMBER.pot} offset={false} />
+      <Ink d={ellipse(x - 14, y - 8, 15, 13, {seed: 's13/clemI'}) + `M${x - 14} ${y - 20}L${x - 14} ${y - 8}M${x - 22} ${y - 17}L${x - 19} ${y - 8}`} width={W.hair} />
+    </>
+  );
+};
+
+/** A small mug on a cork coaster (the kit mug scaled about its rim's left end), cooled: no steam. */
+const RugMug: React.FC<{x: number; top: number; k: number}> = ({x, top, k}) => {
+  const w = 98 * k;
+  const base = top + 112 * k;
+  return (
+    <>
+      <Fill d={ellipse(x + w / 2 + 4, base, w * 0.82, 10, {seed: 's13/coaster'})} color={EMBER.desk} seed="s13/coasterF" />
+      <Ink d={ellipse(x + w / 2 + 4, base, w * 0.82, 10, {seed: 's13/coasterI'})} width={W.hair} />
+      <XG m={mat.about(mat.scale(k), x, top)}>
+        <Mug x={x} top={top} seed="s13/rugmug" steam={false} />
+      </XG>
+    </>
+  );
+};
+
+/** On the rug and the boards in front of it, all there from the cut. */
+export const S13RugThings: React.FC = () => (
+  <>
+    <Plaid d={THROW_TAIL} box={[140, 1680, 370, 1810]} seed="s13/throwT" />
+    <Cushion x={978} y={1640} w={136} h={80} />
+    <Ink d={smooth(THREAD) + smooth(THREAD2)} width={3} color={EMBER.books[4]} taper={false} />
+    <Fill d={blob(YARN.x, YARN.y, YARN.r, YARN.r * 0.92, {seed: 's13/yarn'})} color={EMBER.books[4]} seed="s13/yarnF" />
+    <Ink d={blob(YARN.x, YARN.y, YARN.r, YARN.r * 0.92, {seed: 's13/yarn'}) + `M${YARN.x - 14} ${YARN.y - 8}Q${YARN.x} ${YARN.y + 4} ${YARN.x + 15} ${YARN.y - 4}M${YARN.x - 12} ${YARN.y + 7}Q${YARN.x + 2} ${YARN.y + 14} ${YARN.x + 13} ${YARN.y + 6}`} width={W.hair} />
+    <RugMug x={330} top={1580} k={0.42} />
+    <PeelPlate x={606} y={1652} />
+    {/* a pencil dropped on the boards */}
+    <Fill d={polyPath([[600, 1744], [700, 1724], [702, 1732], [602, 1752]])} color={EMBER.books[0]} offset={false} />
+    <Fill d={polyPath([[700, 1724], [716, 1726], [702, 1732]])} color={EMBER.paper} offset={false} />
+    <Ink d={polyPath([[600, 1744], [700, 1724], [716, 1726], [702, 1732], [602, 1752]])} width={W.hair} />
+  </>
+);
+
 /** Behind you: the floorboards, the rug, the slippers, the floor plant, the open book. */
 export const S13FloorBack: React.FC = () => {
   const rug: [Pt, Pt, Pt, Pt] = [[168, 1412], [962, 1412], [1076, 1694], [56, 1694]];
@@ -265,6 +508,7 @@ export const S13FloorBack: React.FC = () => {
 export const S13FloorFront: React.FC = () => (
   <>
     <Pouf x={96} y={1800} rx={150} ry={46} />
+    <Plaid d={THROW_DRAPE} box={[100, 1740, 270, 1960]} seed="s13/throwD" />
     {/* a stack of books on the floorboards (cut by the bottom edge) with your glasses on it */}
     <BookStack x={470} y={1880} w={170} n={4} seed="s13/floorstack" ink={W.far} scale={1.3} />
     <Glasses x={560} y={1762} w={100} rot={-8} seed="s13/glasses" ink={W.far} />

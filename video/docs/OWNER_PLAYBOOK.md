@@ -148,6 +148,9 @@ Format: **rule** — why / evidence (video, date).
   platform auto-captions stay off. — (v1 reel, 2026-10-25).
 
 ## Process and communication
+- **Helper cloud sessions are archived as soon as their work is pushed and checked** (keep the owner's session list
+  clean); a split names each helper's done-signal (a report file) so the orchestrator knows when to archive. — ("archive
+  them so we don't have the mess in the left side panel", v3, 2026-10-27).
 - **Playable video starts at the sketch animatic (G3); from then on every gate is a video, never only stills.** Before
   G3 (topic, core line, script, voice): text and audio only, no MP4s, never several versions unless asked. — (v1, 2026-10-25; "why are there multiple versions", v3).
 - **Lock the story with a clean sketch/animatic before big commitments; push all polish late.** — (v1, 2026-10-25).
