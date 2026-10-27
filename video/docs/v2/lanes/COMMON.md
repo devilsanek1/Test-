@@ -5,7 +5,7 @@ is github.com/devilsanek1/Test-, branch `video-production` (checked out for you)
 sessions to go faster; other helpers and the video 3 session push to the same branch.
 
 ## ULTRACODE (owner, 2026-10-27: "they must all use ultracode effort - all support sessions you spin up")
-This session runs in **ultracode** mode: optimise for the most exhaustive, correct, beautiful result, not the fastest or cheapest. Use the
+This session runs at **MAX effort with ultracode** on (owner: "the key rule is we need to ensure the effort is MAX"): optimise for the most exhaustive, correct, beautiful result, not the fastest or cheapest. Use the
 Workflow tool for every substantive task (read its workflow-authoring reference first): e.g. parallel builder agents for the parts of your
 shots, adversarial critics with distinct lenses (art director, sound-off viewer, standards, motion), loop-until-pass fix rounds, a
 completeness critic. Mind the machine: about 2 workflow agents run at a time per workflow on a 4-CPU container, so keep renders at
@@ -41,6 +41,9 @@ world/map.ts = the contract for every position, kit/cast, kit/pip, kit/canal, ki
   hold; nothing drawn in the caption band y 317-556.
 
 ## Setup (once)
+FIRST: you were started from the branch `v2r-helper-boot` (it only adds `.claude/settings.json` with `"ultracode": true`, so your session
+boots in ultracode; your first prompt set /effort max). Switch to the real branch before anything else:
+`git fetch origin video-production && git checkout -B video-production origin/video-production`. Never push to `v2r-helper-boot`.
 `cd video && npm ci`. `video/remotion.config.ts` hard-codes a headless-shell path under /opt/pw-browsers: if it differs in your container, pass
 `--browser-executable` on the command line (do not commit a config change). ALWAYS render with `--gl=angle` (5-8x faster than the default).
 Python: numpy, opencv-python-headless, pillow (pip install if missing); ffmpeg, ImageMagick. References for comparison (never commit their

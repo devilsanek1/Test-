@@ -26,3 +26,18 @@
 **Next:** build V2S4 (set, her, tag, fingerpost, Pip ride/turn/leap per map PIP + MATCHES), then V2S3 (the W2 match, the ease-back, the HerWindow,
 Pip's land / turn / leap out of the left edge at y 620-700). Then make the review files, run the critic loop (ultracode: a Workflow with art-director /
 sound-off / standards / motion critics), and write report_L3.md.
+
+## 2026-10-27, second session (ultracode), stopped at the orchestrator's request for the max-effort session
+**Done:** setup checked in a fresh container (`npm ci`; `pip install opencv-python-headless fonttools brotli numpy pillow`; the remotion.config
+browser path exists; `CanalSample-S4` renders at ~0.5 s/frame at 0.5 scale). Re-read the direction; still NO scene code: `V2S3.tsx` / `V2S4.tsx`
+are the engine placeholders. K3 still has no Fingerpost / tag component (`src/v2r/kit/boards` = `WorldText.tsx` + `texts.ts` only: words from
+`TXT_NAME_TAG` / `TXT_PLATES`), so L3 builds the post and tag itself (`V2S4_post.tsx`, `V2S4_tag.tsx`) unless L5 lands one.
+**Workflow:** a build workflow (two parallel builders, one per shot, self-reviewing renders) was launched and STOPPED before it wrote any file;
+its builder briefs are a good starting prompt: `~/.claude/projects/-home-user-Test-/<session>/workflows/scripts/v2r-l3-build-wf_837d1d64-aeb.js`
+(not in the repo; the gist is below).
+**Decisions in those briefs (keep or revise):** S4 path plane dx -280 -> 0 (constant to local 2.50, ease to 0 at 3.10 = 17.96), backs 0.6x,
+far 0.3x; post on the path plane landing x 575; credits F8 / F9 on a small paper notice on the post under the plates (x ~150-560, y ~975-1055),
+pen-revealed with each plate; the tag may grow down to y ~840 (x <= 880) so build 2 (more + credit) fits with body 30 px (26 minimum + a
+REQUEST); Pip S4 lands (470, 1218) 14.95, rides, faces left 19.55, leaps to the sun 20.25; S3 uses `pipHopS2S3At` across the cut, leaps out of the
+left edge (x 0-120, y 620-700 at 14.86); check `lib/Film.tsx` for how `matchcut` renders S3 at negative local t; S3 near head-backs <= ~140 px wide.
+**Next:** build V2S4, then V2S3, the review files (COMMON.md), the critic loop, report_L3.md.
