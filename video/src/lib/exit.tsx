@@ -123,7 +123,16 @@ export type LookV = {
   fills: 'color' | 'paper' | 'none';
   /** Paper until a radiating wave reaches the fill's centre: colour floods out from `origin` at `speed` px/s from `at`
    *  (the reference's opening fill cascade: ~2-3 regions per frame from the vanishing point). */
-  cascade?: {at: number; origin: [number, number]; speed?: number};
+  cascade?: {
+    at: number;
+    origin: [number, number];
+    speed?: number;
+    /** OPT-IN (the clean pen's frame 0, v3 rework): before the wave reaches a fill it shows as a flat PALE shape, its
+     *  colour mixed `pale` (0..1) of the way toward `paper` (default palette.white), instead of plain paper; `backdrop`
+     *  fills (light layers' tints, skies) stay paper white. Omit = paper white, exactly as before. */
+    pale?: number;
+    paper?: string;
+  };
 };
 const LookCtx = createContext<LookV>({ink: true, fills: 'color'});
 export const useLook = () => useContext(LookCtx);

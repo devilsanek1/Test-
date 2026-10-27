@@ -91,6 +91,17 @@ const AreaCtx = createContext<number>(panelGeo.w * panelGeo.h);
 /** Reference area for "how big is this fill" (un-build order). <World> sets the full frame; the card uses the panel. */
 export const FrameArea = AreaCtx.Provider;
 
+// ---------------------------------------------------------------- the cascade's pale state (opt-in)
+
+const HEX6 = /^#[0-9a-f]{6}$/i;
+/** sRGB mix of a fill colour toward the paper by k (the Look cascade's `pale` state; non-hex paints go to paper). */
+function mixPale(c: string, paper: string, k: number): string {
+  if (!HEX6.test(c) || !HEX6.test(paper)) return paper;
+  const a = [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+  const b = [1, 3, 5].map((i) => parseInt(paper.slice(i, i + 2), 16));
+  return '#' + a.map((v, i) => Math.round(v + (b[i] - v) * k).toString(16).padStart(2, '0')).join('');
+}
+
 // ---------------------------------------------------------------- Fill
 
 /** Fill entrance modes. `'fade'` is @deprecated: it is a 1-frame snap (nothing fades); use 'snap'. */
@@ -214,7 +225,8 @@ export const Fill: React.FC<FillProps> = ({
   else if (!lookExempt && look.cascade) {
     const c = look.cascade;
     const dist = Math.hypot(m[0] * (box.x + box.w / 2) + m[2] * (box.y + box.h / 2) + m[4] - c.origin[0], m[1] * (box.x + box.w / 2) + m[3] * (box.y + box.h / 2) + m[5] - c.origin[1]);
-    if (t < c.at + dist / (c.speed ?? 2600)) paint = palette.white;
+    // the pale state (opt-in) tints shapes; a backdrop (a light layer's tint, a sky) stays paper white as before
+    if (t < c.at + dist / (c.speed ?? 2600)) paint = c.pale !== undefined && !backdrop ? mixPale(paint, c.paper ?? palette.white, c.pale) : palette.white;
   }
   const size = Math.sqrt(Math.min(1, (box.w * box.h * Math.abs(m[0] * m[3] - m[1] * m[2])) / area));
   const drain = exit ? exitFillProgress(e, sync ? sync.jitter : jit, size) : 0;

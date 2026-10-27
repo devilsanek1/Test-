@@ -137,6 +137,9 @@ export type DataCenterProps = {
   /** Sign panel height (px; default by variant). A small building far in a wide (S9's 340 px hall at the end of the
    *  pull-back) takes a taller panel so its letters stay ~40 px. */
   signH?: number;
+  /** The server lights' colour (default EMBER.led). Additive (v3 rework): a softer value keeps the rows of lights a
+   *  quiet texture when the building is not the beat's subject. */
+  ledColor?: string;
 };
 
 export function dataCenterGeo(x: number, y: number, w: number, h?: number, variant: DataCenterVariant = 'normal', signH?: number) {
@@ -148,7 +151,7 @@ export function dataCenterGeo(x: number, y: number, w: number, h?: number, varia
   return {H, top, sign, x0: x - w / 2, x1: x + w / 2};
 }
 
-const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH}) => {
+const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'normal', sign = 'AI DATA CENTER', signAt, darkAt, signLitAt, units = 3, blink = true, at, seed = 'dc', ink = 3.4, signH, ledColor = EMBER.led}) => {
   const t = useTime();
   const variant: DataCenterVariant = darkAt !== undefined && t >= darkAt ? 'dark' : v0;
   const g = dataCenterGeo(x, y, w, h, v0, signH);
@@ -187,7 +190,7 @@ const DataCenterBody: React.FC<DataCenterProps> = ({x, y, w, h, variant: v0 = 'n
       const rate = lr.range(0.6, 1.6);
       const off = blink && Math.sin(t * rate * 2.3 + ph) > 0.93;
       if (off) continue;
-      ticks.push(<TRect key={`t${i}_${j}`} x={tx} y={ry + rowH * 0.3} width={tickW} height={Math.max(2.5, rowH * 0.4)} fill={EMBER.led} />);
+      ticks.push(<TRect key={`t${i}_${j}`} x={tx} y={ry + rowH * 0.3} width={tickW} height={Math.max(2.5, rowH * 0.4)} fill={ledColor} />);
     }
   }
   const outline: Pt[] = [[g.x0, y], [g.x0, g.top], [g.x1, g.top], [g.x1, y]];

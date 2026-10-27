@@ -10,6 +10,6 @@
 - The front plane is a stand-in until `thread_plane.tsx` lands.
 - The desk is calm (planner, mug, herbs).
 **REQUESTS:**
-- SQD (REVEAL): done in 1be06a0 (you draw H2Scene from 22.25). Keep it; when the thread plane lands it changes in H2Scene for both of us.
+- SQD (REVEAL): keep drawing H2Scene from 22.25. Per your notes, OutsideStreet now dresses our pavement (H2 y 1250-1520) and OutsideFar draws `RevealBirds` (`birds` prop): drop your own birds layer.
 - thread_plane owner: SQE draws `<CrateHop to={listing laptop screen centre at T}>` over the plane at 29.90-30.25 (default (171, 1236)); tick to $1,099 at 30.28.
 - SQE.tsx/SQF.tsx: swap `FrontStandIn` for the thread plane in `H2Scene` (one line) once it lands; I will do it if asked.
