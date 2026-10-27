@@ -24,7 +24,8 @@ import {blob, circle, ellipse, line, poly, polyPath, roundRect, smooth, textLine
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {Letters, Mittens, PhotoLine, Planner, Radio, StarLantern} from './O1_life';
+import {Letters, Mittens, PhotoLine, StarLantern} from './O1_life';
+import {ClosedPlanner, DuskRadio} from './S12_props';
 import {
   Book,
   BookStack,
@@ -317,7 +318,7 @@ export const S7DeskMid: React.FC = () => (
     <Mittens x={8} y={1352} />
     <Biscuits x={170} y={1404} seed="s7/biscuits" />
     <Clementines x={352} y={1424} seed="s7/clem" />
-    <Radio x={944} y={1596} w={116} />
+    <DuskRadio x={944} y={1596} w={116} />
     <ClipDish x={708} y={1470} />
     {/* the charger: from the right edge across the desk, under Pip, into the laptop's right port */}
     <Cable points={[S7_PORT, [812, 1226], [900, 1258], [1004, 1246], [1130, 1292]]} plug width={7} color={EMBER.dcSide} />
@@ -475,7 +476,8 @@ export const S7DeskFront: React.FC = () => (
     <Letters x={500} y={1466} />
     <Pen from={[598, 1606]} to={[752, 1548]} wPx={14} color={EMBER.dc} seed="s7/pen2" />
     <PhoneDown x={430} y={1690} seed="s7/phone" />
-    <Planner x={770} y={1650} />
+    {/* the planner closed in its dusk cover and the dusk radio: the same desk as S12 (cozy v2 §4 cool share) */}
+    <ClosedPlanner x={770} y={1650} />
     {/* crumbs strayed off the plate */}
     {[[262, 1452, 3], [286, 1440, 2.4], [240, 1470, 2]].map(([cx, cy, cr], i) => (
       <Fill key={i} d={circle(cx, cy, cr)} color={EMBER.books[6]} offset={false} />

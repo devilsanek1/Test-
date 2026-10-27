@@ -109,7 +109,7 @@ const Hoop: React.FC<{cx: number; cy: number; r: number; jolt?: number}> = ({cx,
 /** A small paper note taped at both top corners (a shopping list), slightly crooked. */
 const TapedList: React.FC<{x: number; y: number; w: number; h: number; rot: number}> = ({x, y, w, h, rot}) => (
   <XG m={mat.about(mat.rotate(rot), x + w / 2, y + h / 2)}>
-    <Fill rect={[x, y, w, h]} color={EMBER.card} seed="s12/list" />
+    <Fill rect={[x, y, w, h]} color={EMBER.frost} seed="s12/list" />
     <Ink d={`M${x} ${y}h${w}v${h}h${-w}Z`} width={W.hair} />
     {[0, 1, 2, 3].map((i) => (
       <path key={i} d={`M${x + 10} ${y + 18 + i * 13}h${w * (i === 2 ? 0.4 : 0.62)}`} stroke={EMBER.ink} strokeWidth={1.5} strokeLinecap="round" />
@@ -119,7 +119,7 @@ const TapedList: React.FC<{x: number; y: number; w: number; h: number; rot: numb
   </XG>
 );
 
-/** A small framed night print (a dusk sky, a snowy hill, a cottage with a lit window, a moon): the cool share and the
+/** A small framed night print (dusk frame, a dusk sky, a snowy hill, a cottage with a lit window, a moon): the cool share and the
  *  stick's dark ground early in its flight (it enters on plain wall above it, then crosses it). */
 const NightPrint: React.FC<{x: number; y: number; w: number; h: number}> = ({x, y, w, h}) => {
   const ix = x + 9;
@@ -128,7 +128,7 @@ const NightPrint: React.FC<{x: number; y: number; w: number; h: number}> = ({x, 
   const ih = h - 18;
   return (
     <>
-      <Fill rect={[x, y, w, h]} color={EMBER.beam} seed="s12/np" />
+      <Fill rect={[x, y, w, h]} color={EMBER.dc} seed="s12/np" />
       <Fill rect={[ix, iy, iw, ih]} color={EMBER.sky} offset={false} />
       <Fill d={`M${ix} ${iy + ih}L${ix} ${iy + ih * 0.66}Q${ix + iw * 0.4} ${iy + ih * 0.46} ${ix + iw} ${iy + ih * 0.7}L${ix + iw} ${iy + ih}Z`} color={EMBER.snow} offset={false} />
       <Fill rect={[ix + iw * 0.56, iy + ih * 0.46, iw * 0.22, ih * 0.18]} color={EMBER.books[4]} offset={false} />
@@ -150,7 +150,7 @@ export const S12WallLow: React.FC<{ding: number; settle?: number}> = ({ding, set
     <WallMarks x={150} y={640} w={150} h={110} n={2} seed="s12/wm1" />
         <WallMarks x={520} y={772} w={60} h={50} n={1} seed="s12/wm3" />
     {/* left: S7's leaf print over the lamp's rod */}
-    <FramedPrint x={30} y={624} w={98} h={110} picture="leaf" seed="s12/print2" ink={W.far} />
+    <FramedPrint x={30} y={624} w={98} h={110} picture="leaf" seed="s12/print2" ink={W.far} frame={EMBER.dc} />
     {/* the night print under the stick's entrance (it enters on plain wall at (240, 704), then crosses the dusk blue) */}
     <NightPrint x={190} y={770} w={140} h={130} />
     {/* centre: the hoop on a nail, a taped list beside it (both clear of the stick's path, x < 330 above y 790) */}
@@ -164,7 +164,7 @@ export const S12WallLow: React.FC<{ding: number; settle?: number}> = ({ding, set
     <TapedCard x={958} y={618} w={94} h={62} jolt={ding + 0.1} />
     <Socket x={268} y={948} />
     {/* two sticky reminders by the lid's top-right corner */}
-    <WallNote x={782} y={846} s={54} rot={-7} color={EMBER.core} jolt={ding + 0.05} seed="s12/wn1" />
+    <WallNote x={782} y={846} s={54} rot={-7} color={EMBER.frost} jolt={ding + 0.05} seed="s12/wn1" />
     <WallNote x={812} y={896} s={50} rot={6} color={EMBER.hl} jolt={ding + 0.08} drop={settle} seed="s12/wn2" />
   </>
 );
