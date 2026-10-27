@@ -101,6 +101,8 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
 - 2026-10-27 ~23:00 UTC: "I think it might make the sky much nicer" / "again find the pro way and tools to do it the best way you can"
   -> playbook rule "Find the PRO way and the pro tools"; a researched lib/sky.tsx (OKLab eased gradient, sun warmth, blue-noise dither, a
   banding check on the encoded mp4) before S1 v3.
+- 2026-10-27 ~23:30 UTC, budget: weekly 68 % (23:22); "V3 is managed by separate account" -> this account's weekly % is video 2's
+  own (plus the idle v4 research session); recalibrated to ~$25 per weekly % (23-29): ~$800 left, video 2 needs ~$500-700 -> ~88-96 %.
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
