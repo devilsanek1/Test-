@@ -135,7 +135,7 @@ export const UI = {
 export const SKYLINE_EXCEPTIONS = {
   /** S1: the roof-terrace planting may reach up to y 575 (never higher). */
   s1RoofPlantingTopMinY: 575,
-  /** Sun discs: SUN2 top = 575 (19 px clear of the band); SUN1 top 585; SUN0 top 610; SUN8 top 585; S5's end sun 586. */
+  /** Sun discs: SUN2 top = 575 (19 px clear of the band); SUN1 top 585; SUN0 top 720 (behind the far roofs from y ~752); SUN8 top 585; S5's end sun 586. */
   sunTopMinY: 575,
   /** S5: the cloud bank and the obelisk tops stay at y >= 610. */
   s5CloudObeliskTopMinY: 610,
@@ -261,7 +261,9 @@ export const W2_CUT: Spot = M;
 /** The suns: one per frame, a source that never moves between cuts, never a character (DIRECTION rule 5, "Retired").
  *  SUN0 = S1's west gap; SUN1 = S4's low sun just above her far window = S5's April sun in the slot (the S4 -> S5 A
  *  push-through); SUN2 = S6's April morning = S7's sunset (the S6 -> S7 A push-through; 19 px clear of the band). */
-export const SUN0: Disc = {x: 200, y: 690, r: 80};
+/** (L1, 2026-10-27, the owner's continuous-sky note: an evening sun in its sky, not a sticker) 65 % of the old r 80 and
+ *  lower, setting behind the west gap's far roofs (tops y ~752-830); S4/S5 keep their own suns. */
+export const SUN0: Disc = {x: 196, y: 772, r: 52};
 export const SUN1: Disc = {x: 250, y: 650, r: 65};
 export const SUN2: Disc = {x: 260, y: 620, r: 45};
 /** S8's low sun ahead, over the canal past her board (THROUGHLINE §7: top 585, 35 px clear of B's top). Fixed through S8's
@@ -1217,7 +1219,7 @@ const s1Shapes = (t: number): Shape[] => {
     R('key', 'W: her office window (dark 0.40)', spotRect(W)),
     R('mass', 'west gap: far roofs y ~790, bridge deck ~960', {x0: 0, y0: sh.farRoofTopY, x1: 330, y1: 1095}),
     L('line', 'bridge deck y 960', [{x: 0, y: sh.bridgeDeckY}, {x: 330, y: sh.bridgeDeckY}]),
-    D('sun', 'SUN0 (200, 690) r 80', SUN0),
+    D('sun', 'SUN0 (196, 772) r 52', SUN0),
     L('line', 'her line: far towpath feet (bend)', S1_TOWPATH_FEET),
     L('line', 'horizon y 965 (hidden)', [{x: 0, y: S1_LENS.horizonY}, {x: FRAME_W, y: S1_LENS.horizonY}]),
     R('mass', 'water y 1110-1215', {x0: 0, y0: sh.water.y0, x1: FRAME_W, y1: sh.water.y1}),

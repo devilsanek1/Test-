@@ -1,12 +1,10 @@
-// V2S1 helper (lane L1): the sky flood and the frame-0 sun. The World sky stays paper (frame 0 is ink on paper); the
-// mint sky and the gold band flood out of SUN0 as one growing disc (f2-f5, TREATMENT section 4), ahead of the kit's own
-// cascade (lib/exit Look). Before the flood the sun is half-coloured (the colour already pouring in from the low left)
-// and its other half a flat PALE shape like everything else (no ink ring: no line on anything but the subject at f0);
-// from the flood on, the set's SunDisc carries it.
+// V2S1 helper (lane L1): the sky flood. The World sky stays paper (frame 0 is pale shapes on paper); ONE continuous sky
+// (S1_SKY: the caption field's mint, then five flat steps to the warm horizon) floods out of SUN0 as one growing disc
+// (f2-f5, TREATMENT section 4), ahead of the kit's own cascade (lib/exit Look). The sun itself (frame 0's half-coloured
+// disc too) is the set's SunDisc (V2S1_set_far), drawn behind the far roofs.
 import React, {useId} from 'react';
 import {Fill} from '../../lib/Fill';
-import {mixHex} from '../../lib/light';
-import {S1_PALE} from './V2S1_clock';
+import {S1_SKY, S1_SKY_Y} from './V2S1_set_core';
 import {useTime} from '../../lib/time';
 import {CM} from '../palette';
 import * as MAP from '../world/map';
@@ -29,26 +27,12 @@ export const SkyFlood: React.FC = () => {
         </clipPath>
       </defs>
       <g clipPath={`url(#${id})`}>
-        <Fill rect={[-120, -120, 1320, 720]} color={CM.sky} offset={false} lookExempt exit={false} seed="s1sky" />
-        <Fill rect={[-120, 600, 1320, 520]} color={CM.bandGold} offset={false} lookExempt exit={false} seed="s1band" />
+        {S1_SKY.map((c, i) => {
+          const y0 = i === 0 ? -120 : S1_SKY_Y[i - 1];
+          const y1 = i < S1_SKY_Y.length ? S1_SKY_Y[i] + 1 : 1120;
+          return <Fill key={i} rect={[-120, y0, 1320, y1 - y0]} color={c} offset={false} lookExempt exit={false} seed={`s1sky${i}`} />;
+        })}
       </g>
-    </>
-  );
-};
-
-/** Frame 0's sun: the lower-left half in colour, the rest pale (only before the flood reaches it). */
-export const SunHalf: React.FC = () => {
-  const t = useTime();
-  if (t >= S1_FLOOD.t0) return null;
-  const {x, y, r} = MAP.SUN0;
-  // a half disc cut on a diagonal (the colour already pouring in from the low-left)
-  const a0 = (200 * Math.PI) / 180;
-  const half = `M${x + r * Math.cos(a0 - Math.PI)} ${y + r * Math.sin(a0 - Math.PI)}A${r} ${r} 0 0 1 ${x + r * Math.cos(a0)} ${y + r * Math.sin(a0)}Z`;
-  const disc = `M${x - r} ${y}A${r} ${r} 0 1 0 ${x + r} ${y}A${r} ${r} 0 1 0 ${x - r} ${y}Z`;
-  return (
-    <>
-      <Fill d={disc} color={mixHex(CM.sun, CM.white, S1_PALE)} offset={false} lookExempt exit={false} seed="s1sunpale" />
-      <Fill d={half} color={CM.sun} offset={false} lookExempt exit={false} seed="s1sunhalf" />
     </>
   );
 };

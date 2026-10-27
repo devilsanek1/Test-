@@ -24,7 +24,7 @@ import {Lit} from '../../lib/light';
 import {RIG_CANAL} from '../world/rigs';
 import {CM} from '../palette';
 import {FLOOD, FLOOD_ORIGIN, S1_PALE} from './V2S1_clock';
-import {SkyFlood, SunHalf} from './V2S1_sky';
+import {SkyFlood} from './V2S1_sky';
 import {S1World} from './V2S1_set';
 import {S1Row, S1HerBehindDoor} from './V2S1_row';
 import {S1Steps} from './V2S1_steps';
@@ -47,7 +47,6 @@ const V2S1: React.FC = () => (
         <S1World behindDoor={<S1HerBehindDoor />} towpath={<S1Row />} seated={<S1Steps />} pip={<S1Pip />} />
       </Look>
       <S1Particles />
-      <SunHalf />
     </Lit>
   </World>
 );
