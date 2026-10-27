@@ -21,13 +21,13 @@ import {World} from './lib/World';
 import {Fill} from './lib/Fill';
 import {Ink} from './lib/Ink';
 import {Tier} from './lib/tier';
-import {TimeShift} from './lib/time';
+import {useTime} from './lib/time';
 import {tierFill} from './lib/pen';
 import {ellipseD, Lit, polyD, rectD} from './lib/light';
 import {RIG_CANAL} from './v2r/world/rigs';
 import {rng} from './lib/rng';
-import {backing, band, depthProblems, flight, groundCam, groundPoly, makeAtmosphere, nearStep, planeLod, recede, rowsZ, seamTone, sideFace, sizeProblems, toneOnTone, type GroundCam} from './lib/depth';
-import {glitterPath, particleProblems, Particles, type ParticlesProps} from './lib/particles';
+import {backing, band, depthProblems, flight, flightCheek, groundCam, groundPoly, makeAtmosphere, nearStep, planeLod, recede, rowsZ, seamTone, sizeProblems, toneOnTone, type GroundCam} from './lib/depth';
+import {glitterPath, particleProblems, particlesAt, Particles, type ParticlesProps} from './lib/particles';
 import type {Pt} from './lib/sketch';
 
 const W = 1080;
@@ -62,10 +62,11 @@ const FAR_SRC = [CM.brickLight, CM.brick, CM.stucco, CM.limestone];
  *  front row. Same shapes in both modes; only the colours and the detail change. */
 function farRows(): Bld[] {
   const out: Bld[] = [];
+  // the farther rows stand higher (a city rising behind: RIVERSIDE's stacking upward), so each shows above the next
   const rows: {plane: number; w: [number, number]; top: [number, number]; win: number}[] = [
-    {plane: 4, w: [14, 26], top: [908, 930], win: 0},
-    {plane: 3, w: [24, 44], top: [850, 896], win: 5},
-    {plane: 2, w: [44, 82], top: [796, 858], win: 8},
+    {plane: 4, w: [14, 26], top: [796, 836], win: 0},
+    {plane: 3, w: [24, 44], top: [834, 876], win: 5},
+    {plane: 2, w: [44, 82], top: [884, 930], win: 8},
   ];
   for (const row of rows) {
     const r = rng(`demo/far/${row.plane}`);
@@ -117,7 +118,9 @@ const Wing: React.FC<{mode: Mode}> = ({mode}) => {
   // the calm backing field behind the lit fin (CRAFT §f.3): a far gasholder rising behind the wing's west corner, its
   // value set to part from the fin by >= 15 L* AS SHOWN (the fin and the gasholder are both tier C here)
   const finShown = tierFill(CM.stucco, 'environment', CM.sky);
-  const gas = backing(finShown, SKY_STEPS[1], {tier: 'environment', bg: CM.sky});
+  // the field is a FAR-PLANE colour (its plane's step, here a dusty lavender stone at +2), never the sky's own hue:
+  // a sky step between mint and gold darkened in its own hue turns khaki
+  const gas = backing(finShown, recede(CM.stoneShade, 2, ATM), {tier: 'environment', bg: CM.sky});
   return (
     <Tier tier="environment" bg={CM.sky}>
       {flat ? null : (
@@ -228,67 +231,54 @@ const Quay: React.FC<{mode: Mode}> = ({mode}) => {
   const g1 = nearStep(CM.paving, -0.5, ATM);
   const g2 = nearStep(CM.paving, -1, ATM);
   const seam = (c: string) => seamTone(c, 7);
-  // a flight of steps cut into the quay at the left, down to the water: drawn first (the pit), then the quay with the
-  // hole (evenodd), then the joints clipped to the quay; its left wall (the cheek, facing the camera) recedes
-  const STEPS = {x0: -2.0, x1: -0.6, z0: 5.6};
-  const steps = flight(CAM, {x0: STEPS.x0, x1: STEPS.x1, z0: STEPS.z0, tread: 0.62, rise: 0.17, n: 3, level0: -0.17, dir: 'down'});
-  // a quay band z0..z1 minus the part of the flight's hole inside it (evenodd: the hole must lie inside the band)
-  const quayArea = (z0: number, z1: number) => {
-    const h0 = Math.max(z0, STEPS.z0);
-    const h1 = Math.min(z1, Z_COPING);
-    return polyD(groundPoly(CAM, -12, 12, z0, z1)) + (h1 > h0 ? polyD(groundPoly(CAM, STEPS.x0, STEPS.x1, h0, h1, 0)) : '');
-  };
-  const bench = boxAt(CAM, 0.95, 4.2, 1.8, 0.45, 0.45);
-  const benchBack = polyD([CAM.pt(0.05, 4.65, 0.45), CAM.pt(1.85, 4.65, 0.45), CAM.pt(1.85, 4.65, 0.85), CAM.pt(0.05, 4.65, 0.85)]);
-  const planter = boxAt(CAM, -1.15, 3.1, 0.7, 0.7, 0.5);
-  const bollards = [-1.6, 1.9].map((x) => boxAt(CAM, x, Z_COPING - 0.45, 0.24, 0.24, 0.62));
-  const tote = boxAt(CAM, 0.6, 4.25, 0.36, 0.12, 0.42, 0.45);
-  const cups = [0.4, 0.52].map((x) => boxAt(CAM, x, Z_COPING - 0.3, 0.08, 0.08, 0.12));
+  // a flight of broad steps rising AWAY from us at the right (up to a footbridge): its risers face the camera, its
+  // treads foreshorten, its cheek's stepped profile runs into the picture; cut by the right edge
+  const FL = {x0: 1.15, x1: 3.2, z0: 3.4, tread: 0.55, rise: 0.15, n: 6, level0: 0.15, dir: 'up' as const};
+  const steps = flight(CAM, FL);
+  // things sized by the ONE camera, set out along lines that run into the picture: a row of bollards (they shrink with
+  // distance, their feet on one receding line), a row of planters, cups and a tote by the coping
+  const bollards = [3.0, 4.3, 5.6, 6.9].map((z) => ({z, ...boxAt(CAM, -1.35, z, 0.22, 0.22, 0.6)}));
+  const planters = [3.6, 5.4].map((z) => ({z, ...boxAt(CAM, 0.75, z, 0.6, 0.6, 0.42)}));
+  const cups = [0.1, 0.22].map((x) => boxAt(CAM, x, Z_COPING - 0.28, 0.08, 0.08, 0.12));
+  const tote = boxAt(CAM, -0.35, Z_COPING - 0.5, 0.34, 0.14, 0.38);
   return (
     <Tier tier="environment" bg={CM.sky}>
-      <defs>
-        <clipPath id="depthDemoQuay" clipPathUnits="userSpaceOnUse">
-          <path d={quayArea(zNear - 1, Z_COPING)} clipRule="evenodd" />
-        </clipPath>
-      </defs>
-      {/* the pit: the water at its foot, the treads far first (each nosing hides the tread below), the cheek */}
-      <Fill d={polyD(groundPoly(CAM, STEPS.x0, STEPS.x1, STEPS.z0, Z_COPING + 0.4, -0.6))} color={CM.waterDeep} offset={false} />
+      {/* the quay in three value steps toward us, the coping by the water */}
+      <Fill d={polyD(groundPoly(CAM, -12, 12, 4.5, Z_COPING))} color={g0} offset={false} backdrop />
+      <Fill d={polyD(groundPoly(CAM, -12, 12, 3.2, 4.5))} color={g1} offset={false} backdrop />
+      <Fill d={polyD(groundPoly(CAM, -12, 12, zNear - 1, 3.2))} color={g2} offset={false} backdrop />
+      <Fill d={polyD(groundPoly(CAM, -12, 12, Z_COPING - 0.3, Z_COPING))} color={CM.limestone} offset={false} />
+      {/* joints: along z (receding to the VP) and across (cross joints), flat tone bands narrowing with distance */}
+      {xs.map((x, i) => (
+        <Fill key={`x${i}`} d={polyD(band(CAM, [x, zNear - 1], [x, Z_COPING - 0.3], 0.05))} color={seam(g0)} offset={false} />
+      ))}
+      {zs.slice(1).map((z, i) => (
+        <Fill key={`z${i}`} d={polyD(band(CAM, [-12, z], [12, z], 0.04))} color={seam(z < 3.2 ? g2 : z < 4.5 ? g1 : g0)} offset={false} />
+      ))}
+      {/* the flight: cheek first, then each step far first (riser, then tread) */}
+      <Fill d={polyD(flightCheek(CAM, FL, FL.x0, 0))} color={nearStep(CM.stucco, -1.2, ATM)} offset={false} />
       {steps.map((st, i) => (
         <React.Fragment key={`s${i}`}>
-          <Fill d={polyD(st.tread)} color={i % 2 ? CM.stucco : CM.limestone} offset={false} />
-          <Fill d={polyD(band(CAM, [STEPS.x0, st.z], [STEPS.x1, st.z], 0.05, st.level))} color={seam(CM.stucco)} offset={false} />
+          {st.riser ? <Fill d={polyD(st.riser)} color={nearStep(CM.limestone, -0.6, ATM)} offset={false} /> : null}
+          <Fill d={polyD(st.tread)} color={CM.stucco} offset={false} />
         </React.Fragment>
       ))}
-      <Fill d={polyD(sideFace(CAM, STEPS.x0, STEPS.z0, Z_COPING, -0.6, 0))} color={nearStep(CM.paving, -1.6, ATM)} offset={false} />
-      {/* the quay in three value steps toward us, the coping by the water, all with the flight's hole */}
-      <Fill d={quayArea(4.5, Z_COPING)} color={g0} offset={false} backdrop rule="evenodd" />
-      <Fill d={quayArea(3.2, 4.5)} color={g1} offset={false} backdrop rule="evenodd" />
-      <Fill d={quayArea(zNear - 1, 3.2)} color={g2} offset={false} backdrop rule="evenodd" />
-      <Fill d={quayArea(Z_COPING - 0.3, Z_COPING)} color={CM.limestone} offset={false} rule="evenodd" />
-      {/* joints: along z (receding to the VP) and across (cross joints), flat tone bands narrowing with distance */}
-      <g clipPath="url(#depthDemoQuay)">
-        {xs.map((x, i) => (
-          <Fill key={`x${i}`} d={polyD(band(CAM, [x, zNear - 1], [x, Z_COPING - 0.3], 0.05))} color={seam(g0)} offset={false} />
-        ))}
-        {zs.slice(1).map((z, i) => (
-          <Fill key={`z${i}`} d={polyD(band(CAM, [-12, z], [12, z], 0.04))} color={seam(z < 3.2 ? g2 : z < 4.5 ? g1 : g0)} offset={false} />
-        ))}
-      </g>
-      {/* things sized by the camera: the near ones bigger per metre, never smaller */}
-      {bollards.map((b, i) => (
+      {/* the rows, far first */}
+      {[...bollards].reverse().map((b, i) => (
         <React.Fragment key={`b${i}`}>
-          <Thing d={b.front} color={CM.anchor} />
-          <Thing d={b.top} color={CM.coatPlum} />
+          <Thing d={b.front} color={CM.line} />
+          <Thing d={b.top} color={CM.brickDeep} />
+        </React.Fragment>
+      ))}
+      {[...planters].reverse().map((b, i) => (
+        <React.Fragment key={`p${i}`}>
+          <Thing d={b.front} color={CM.brickDeep} />
+          <Thing d={b.top} color={CM.sage} />
         </React.Fragment>
       ))}
       {cups.map((c, i) => (
         <Thing key={`c${i}`} d={c.front} color={CM.paper} />
       ))}
-      <Thing d={planter.front} color={CM.line} />
-      <Thing d={planter.top} color={CM.sage} />
-      <Thing d={benchBack} color={CM.line} />
-      <Thing d={bench.front} color={CM.brickDeep} />
-      <Thing d={bench.top} color={CM.line} />
       <Thing d={tote.front} color={CM.coatMustard} />
     </Tier>
   );
@@ -306,24 +296,26 @@ export const DEMO_FIELDS: ParticlesProps[] = [
   {kind: 'birds', seed: 'demo/birds', region: {rect: [0, 150, W, 120]}, on: CM.sky, plane: 3, atm: ATM, count: 3, joins: JOINS, dir: 1},
 ];
 
-const ParticleLayer: React.FC<{trails: boolean}> = ({trails}) => (
-  <>
-    {DEMO_FIELDS.map((f) =>
-      trails ? (
-        <React.Fragment key={f.seed}>
-          {[0.75, 0.5, 0.25].map((k) => (
-            <TimeShift key={k} by={k}>
-              <Particles {...f} />
-            </TimeShift>
-          ))}
-          <Particles {...f} />
-        </React.Fragment>
-      ) : (
-        <Particles key={f.seed} {...f} />
-      ),
+/** Debug only (never film): each field's particle centres over the last 3 s, every 0.1 s, as small magenta dots. */
+const Trails: React.FC<{t: number}> = ({t}) => (
+  <g>
+    {DEMO_FIELDS.flatMap((f) =>
+      Array.from({length: 30}, (_, k) => particlesAt(t - k * 0.1, f).map((p) => <circle key={`${f.seed}${k}${p.id}`} cx={p.x} cy={p.y} r={k === 0 ? 4 : 2} fill={k === 0 ? '#C4291C' : '#D04AB4'} />)),
     )}
-  </>
+  </g>
 );
+
+const ParticleLayer: React.FC<{trails: boolean}> = ({trails}) => {
+  const t = useTime();
+  return (
+    <>
+      {DEMO_FIELDS.map((f) => (
+        <Particles key={f.seed} {...f} />
+      ))}
+      {trails ? <Trails t={t} /> : null}
+    </>
+  );
+};
 
 // ---------------------------------------------------------------- the composition
 

@@ -1,0 +1,41 @@
+{
+ "name": "v1 @20.5 s (the side street; the walker)",
+ "units": "frac",
+ "silhouettes": [
+  {
+   "name": "the walker (subject)",
+   "tier": "A",
+   "grab": [
+    0.44,
+    0.655,
+    0.645,
+    0.805
+   ],
+   "roi": [
+    [
+     0.4,
+     0.64,
+     0.55,
+     0.8
+    ]
+   ]
+  }
+ ],
+ "ground": [
+  {
+   "name": "the side street",
+   "roi": [
+    0.0,
+    0.6,
+    1.0,
+    1.0
+   ],
+   "vps": [
+    [
+     0.375,
+     0.525
+    ]
+   ]
+  }
+ ]
+}
