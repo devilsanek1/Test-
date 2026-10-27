@@ -116,6 +116,12 @@ Format: **rule** — why / evidence (video, date).
 - **Every frame at least 8/10, no dead frames, cuts locked to the beat.** — (v1).
 
 ## Storyboard (G3)
+- **The pipeline after v3 (owner APPROVED, 2026-10-27: "Yes"):** a DESIGNED sketch. With the core line comes a
+  through-line card (one thread object, one home place, one "you", a carrier for every join); a text world bible (sets,
+  one light rig per set, colour script, tiers per shot) runs alongside the script; the G3 animated sketchbook decides
+  flow, focus and light, not just the story; then a short playable LOOK CLIP in the final style is approved before the
+  full build; G5 fills what G3 decided, one lane per sequence, with no new places or movers. Details:
+  `docs/retro/2026-10-27_v3_retro.md`, `docs/PIPELINE_V2.md`. — (v3 retro, 2026-10-27).
 - **One flowing story, never a bunch of shots stitched together.** Every cut carries the eye and the story into the next
   shot (a shared object, a match, a continuous camera, the subject's motion leading out and in); the main arc is visible
   across the whole film. Life and detail are DESIGNED into the shot together with its hierarchy from the start, never
