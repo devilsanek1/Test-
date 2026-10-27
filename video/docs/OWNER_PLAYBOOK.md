@@ -173,9 +173,8 @@ Format: **rule** — why / evidence (video, date).
 ## Platforms and posting
 - **Accounts: Instagram `what.the.fuss.is.about`** (Creator, Education); TikTok and YouTube Shorts under the same name,
   handle and avatar. Posting texts per video: `docs/POSTING_KIT.md`. — (2026-10-25).
-- **AI label ON** (AI narration voice) on every platform. — (2026-10-25).
 - **Upload at the highest quality and natively on each platform** (checklist in `docs/POSTING_KIT.md`). — (2026-10-25).
-- **No paid boost until 3-5 posts exist;** then boost the best organic performer for profile visits. — (2026-10-25).
+- **AI label ON everywhere; no paid boost until 3-5 posts exist,** then boost the best organic performer. — (2026-10-25).
 
 ## Performance log (one line per video and check)
 - v1 "PHP bug", IG after 45 min: 155 views, avg 21 s of 55 s, likes 3.9 %; ~80 % gone by 3 s. — 2026-10-25.
