@@ -63,6 +63,10 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   didn't set the proper effort level and the video ends up lazy" -> every agent at MAX effort: the local kit review and the
   sound critique/revision restarted with effort 'max' on every agent; helper sessions restarted at /effort max (ultracode on
   top). -> rule: Process (MAX effort, always).
+- 2026-10-27: "do each subsection understand the repo rules and the full stylistic direction? including colors, cinematic
+  references, etc?" -> not provably yet: a workflow writes one definitive `docs/v2/STYLE.md` from every style source, an
+  independent audit finds what the helpers could miss or what contradicts, COMMON.md makes STYLE.md the first mandatory read,
+  and every lane answers `lanes/STYLE_CHECK.md` (graded against a private key). -> rule: Process (lanes prove the style).
 
 ## Posting
 - 2026-10-26: "should we link the Google article in our post?" -> cite the source (BBC, with the headline and date) in
