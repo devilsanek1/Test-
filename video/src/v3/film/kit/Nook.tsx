@@ -416,8 +416,9 @@ export const Lamp: React.FC<{pose: LampPose; lit?: boolean; at?: At; seed?: stri
   );
 };
 
-/** The steaming mug (a sign of care; steam = a small slow loop). (x, top) = its left side and rim. */
-export const Mug: React.FC<{x: number; top: number; t?: number; at?: At; seed?: string; w?: number}> = ({x, top, t: tIn, at, seed = 'mug', w = 98}) => {
+/** The steaming mug (a sign of care; steam = a small slow loop). (x, top) = its left side and rim. `steam={false}` drops
+ *  the ink steam lines (S13: ink lines over the navy glass read as wires; the lane draws light puffs instead). */
+export const Mug: React.FC<{x: number; top: number; t?: number; at?: At; seed?: string; w?: number; steam?: boolean}> = ({x, top, t: tIn, at, seed = 'mug', w = 98, steam: steamOn = true}) => {
   const tNow = useTime();
   const t = tIn ?? tNow;
   const x0 = x;
@@ -438,7 +439,7 @@ export const Mug: React.FC<{x: number; top: number; t?: number; at?: At; seed?: 
       <Ink d={line(x0, top, x0, bot - 14, {over: [0, 0], seed: `${seed}/mg1`}) + line(x1, top, x1, bot - 14, {over: [0, 0], seed: `${seed}/mg2`}) + `M${x0} ${bot - 18}Q${x0} ${bot} ${x0 + 18} ${bot}L${x1 - 18} ${bot}Q${x1} ${bot} ${x1} ${bot - 18}`} at={at} width={W_MID} />
       <Fill d={blob((x0 + x1) / 2, top, (x1 - x0) / 2, 11, {seed: `${seed}/rim`})} color={EMBER.anchor} at={fillAt(at, 0.04)} offset={false} />
       <Ink d={ellipse((x0 + x1) / 2, top, (x1 - x0) / 2, 11, {seed: `${seed}/rimI`})} at={b(at, 0.04)} width={W_MID} />
-      {at === undefined || tNow >= at + 0.3 ? <Ink d={steam(x0 + w * 0.33, 0) + steam(x0 + w * 0.67, 2.1)} width={W_THIN} /> : null}
+      {steamOn && (at === undefined || tNow >= at + 0.3) ? <Ink d={steam(x0 + w * 0.33, 0) + steam(x0 + w * 0.67, 2.1)} width={W_THIN} /> : null}
     </>
   );
 };

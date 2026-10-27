@@ -894,8 +894,10 @@ export const PullChain: React.FC<{x: number; y: number; len?: number; amp?: numb
 
 // ---------------------------------------------------------------- S13: radiator, rug, coat hook, tote, slippers
 
-/** A radiator under the window (cream fins), a sock drying on it that sways. */
-export const Radiator: React.FC<{x: number; y: number; w?: number; h?: number; sock?: boolean; seed?: string; at?: At; ink?: number}> = ({x, y, w = 420, h = 180, sock = true, seed = 'rad', at, ink = W.mid}) => {
+/** A radiator under the window (cream fins), a sock drying on it that sways. `color` repaints the body (default the
+ *  cream card); `shade` adds a flat shade strip on the right of every fin (S13: a warm painted radiator, never the
+ *  brightest block in the lower half). */
+export const Radiator: React.FC<{x: number; y: number; w?: number; h?: number; sock?: boolean; seed?: string; at?: At; ink?: number; color?: string; shade?: string}> = ({x, y, w = 420, h = 180, sock = true, seed = 'rad', at, ink = W.mid, color = EMBER.card, shade}) => {
   const t = useTime();
   const fins = Math.round(w / 34);
   let finD = '';
@@ -904,7 +906,10 @@ export const Radiator: React.FC<{x: number; y: number; w?: number; h?: number; s
   const sa = sway(t, 2.5, 3.4, 1);
   return (
     <>
-      <Fill d={roundRect(x, y, w, h, 14)} color={EMBER.card} at={fillAt(at)} seed={`${seed}/b`} />
+      <Fill d={roundRect(x, y, w, h, 14)} color={color} at={fillAt(at)} seed={`${seed}/b`} />
+      {shade !== undefined
+        ? Array.from({length: fins - 1}, (_, i) => <Fill key={`sh${i}`} rect={[x + (w * (i + 1)) / fins, y + 12, (w / fins) * 0.34, h - 22]} color={shade} at={fillAt(at, 0.04)} offset={false} />)
+        : null}
       <Ink d={roundRect(x, y, w, h, 14, {closed: false, seed: `${seed}/i`})} at={at} width={ink} />
       <Ink d={finD} at={b(at, 0.08)} width={W.far} />
       <Ink d={line(x - 30, y + h - 20, x, y + h - 20, {over: [0, 0], seed: `${seed}/pipe`}) + circle(x - 14, y + h - 32, 9, {seed: `${seed}/valve`})} at={b(at, 0.1)} width={W.far} />
