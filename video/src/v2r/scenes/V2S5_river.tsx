@@ -247,25 +247,26 @@ function riverBack(seed: string): Batch {
       const ah = th(km) * 0.62;
       B.fill(RIV.arch, `M${a[0].toFixed(1)} ${a[1].toFixed(1)}Q${m[0].toFixed(1)} ${(m[1] - ah * 2).toFixed(1)} ${b[0].toFixed(1)} ${b[1].toFixed(1)}Z`);
     }
-    // the 14th Street spans: a lit deck edge over a face on slim piers (the third the darker rail bridge)
+    // the 14th Street spans: a lit deck edge over a shaded face on slim piers (the third the darker rail bridge)
     RIVER.fourteenth.forEach(({far: f, near: nn}, i) => {
-      const th = i === 2 ? 1.8 : 2.6;
+      const thF = i === 2 ? 1.6 : 2.2;
+      const thN = i === 2 ? 2.6 : 3.6;
       B.poly(i === 2 ? RIV.bridgeShade : RIV.bridge, [
-        [f[0], f[1] - th / 2],
-        [nn[0], nn[1] - th / 2],
-        [nn[0], nn[1] + th / 2 + 0.8],
-        [f[0], f[1] + th / 2],
+        [f[0], f[1] - 0.6],
+        [nn[0], nn[1] - 0.8],
+        [nn[0], nn[1] - 0.8 + thN],
+        [f[0], f[1] - 0.6 + thF],
       ]);
-      if (i !== 2)
-        B.poly(RIV.bridgeLit, [
-          [f[0], f[1] - th / 2 - 0.5],
-          [nn[0], nn[1] - th / 2 - 0.7],
-          [nn[0], nn[1] - th / 2 + 0.5],
-          [f[0], f[1] - th / 2 + 0.3],
-        ]);
+      B.poly(RIV.bridgeLit, [
+        [f[0], f[1] - 1.5],
+        [nn[0], nn[1] - 2],
+        [nn[0], nn[1] - 0.6],
+        [f[0], f[1] - 0.5],
+      ]);
       for (let k = 0.05; k < 1; k += 0.07) {
         const p = lerpP(f, nn, k);
-        B.rect(RIV.bridgeShade, p[0] - 0.8, p[1] + th / 2, 1.6, 2.2 + 3.2 * k);
+        const th = thF + (thN - thF) * k;
+        B.rect(RIV.bridgeShade, p[0] - 0.8, p[1] - 0.6 + th, 1.6, 2 + 3 * k);
       }
     });
   }

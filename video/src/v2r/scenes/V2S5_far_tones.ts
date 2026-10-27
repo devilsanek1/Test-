@@ -79,9 +79,10 @@ export const RIV = {
   waterDeep: mix(mix(CM.water, CM.shadeCool, 0.2), S, 0.3),
   waterLit: mix(CM.glass, CM.paper, 0.35),
   glint: CM.paper,
-  bridge: mix(CM.limestone, S, 0.28),
-  bridgeLit: mix(CM.paper, S, 0.22),
-  bridgeShade: mix(mix(CM.stoneShade, CM.shadeCool, 0.35), S, 0.28),
+  /** bridges: a lit deck edge (paper) over a face in shade (the sun is ahead: the faces toward us are shaded) */
+  bridge: mix(mix(CM.stoneShade, CM.limestone, 0.35), S, 0.12),
+  bridgeLit: mix(CM.paper, S, 0.08),
+  bridgeShade: mix(mix(CM.stoneShade, CM.shadeCool, 0.45), S, 0.18),
   arch: mix(mix(CM.water, CM.shadeCool, 0.42), S, 0.25),
   temple: mix(CM.paper, S, 0.2),
   templeShade: mix(mix(CM.stoneShade, CM.shadeCool, 0.3), S, 0.25),
