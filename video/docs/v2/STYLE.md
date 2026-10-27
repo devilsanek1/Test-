@@ -95,12 +95,13 @@ behind; a new periwinkle elephant; one small woman in teal; one working sun; eve
   G1-G6, a scarf and softer back from G4, a shorter stride G5-G6; nothing frail; lockstep, each separate, 170 -> 135 px down the bend, three bare outlines
   130 -> 120 px on "life"; the row goes on, the world passes through it, nothing counts years, never death. S8: three, 140 -> 130 px, to the seam, last out.
 - **Pip, drawn NEW [TR §3; pip; K2 `PIP`; HD §6]:** a pebble-round elephant, no neck; two big leaf ears that fold and flick; a one-curl trunk; a three-hair
-  tuft; teddy-bear soles; a short knitted mustard scarf in the wind; ONE loose stroke per pose, 2-3 gaps; 86-120 px (>= 44 in S5's end); idle always. It
-  watches, turns its head BEFORE the voice names the next thing, reacts ONCE: S1 ears-cover on "life" · S2 head to the wall on "But" · S3 turns to her on
-  "she" · S4 turns west on "heading" · S5 looks up at the calendar · S6 one ear flick on "veto" (no droop) · S7 NONE · S8 ears down on "can't" (looking up at
-  W on "not" is a lead); beats on her words stay small [TR §3 over LD §5]. It hops across cuts (arcs at y >= 600); S3's exit is the LEFT edge, y 620-700 [K2
-  over TR §3]. One Pip at a time: S1 draws it from t >= 0 only (S8's lands on f0's bollard in the t < 0 underlay) [BUILD §2; L6]; it rides S7's wiping boat in
-  (L5 and L6 agree the hand-off). Never in y 317-556, the rail (x > 780, y > 840) or over her; >= 200 px from the F11 clause; no gag near harm; not furniture.
+  tuft; teddy-bear soles; a short knitted mustard scarf in the wind; ONE loose stroke per pose, 2-3 gaps; 86-120 px (>= 44 in S5's end) and `#9497D8`, over
+  HD / LD's 86-130, TD's 5-10 % and the house `#8D90CC`; idle always. It watches, turns its head BEFORE the voice names the next thing, reacts ONCE: S1
+  ears-cover on "life" · S2 head to the wall on "But" · S3 turns to her on "she" · S4 turns west on "heading" · S5 looks up at the calendar · S6 one ear flick
+  on "veto" (no droop) · S7 NONE · S8 ears down on "can't" (looking up at W on "not" is a lead); beats on her words stay small [TR §3 over LD §5]. It hops
+  across cuts (arcs at y >= 600); S3's exit is the LEFT edge, y 620-700 [K2 over TR §3]. One Pip at a time: S1 draws it from t >= 0 only (S8's lands on f0's
+  bollard in the t < 0 underlay) [BUILD §2; L6]; it rides S7's wiping boat in (L5 and L6 agree the hand-off). Never in y 317-556, the rail (x > 780, y >
+  840) or over her; >= 200 px from the F11 clause; no gag near harm; not furniture.
 
 ## 5. Fullness and life
 - **The bar [PB; LD §0; TR §9]:** every PAUSED frame at 216 px beside reference 1 and v1 reads as full and specific (approved bar: v3's G5b pilot, flat
