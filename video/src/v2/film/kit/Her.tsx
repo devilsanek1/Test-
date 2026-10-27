@@ -691,6 +691,24 @@ export const HerBack: React.FC<HerBackProps> = ({x, y, h, facing = 'r', hand, ch
   const aw = 0.075 * h;
   // head: the back of it, turned a little toward the laptop (a sliver of cheek on the facing side, no face)
   const headD = blob(H[0], H[1], r * 0.92, r, {seed: `${seed}/head`, wobble: 0.012});
+  // LOST PROFILE (finisher, after the cold read "a blue blob or curtain"): the curve of her cheek and jaw turned toward
+  // the laptop beyond the hair, an ear tucked into the hair, a lash tick at the cheek's edge: a person seen from behind
+  const cheekD = smooth(
+    (
+      [
+        [0.56, -0.4],
+        [0.98, -0.3],
+        [1.17, 0.04],
+        [1.13, 0.46],
+        [0.94, 0.8],
+        [0.62, 0.92],
+        [0.5, 0.3],
+      ] as Pt[]
+    ).map(([u, v]): Pt => [H[0] + s * u * r, H[1] + v * r]),
+    {closed: true, tension: 0.42},
+  );
+  const earD = blob(H[0] + s * 0.66 * r, H[1] + 0.1 * r, 0.14 * r, 0.22 * r, {seed: `${seed}/ear`, wobble: 0.02});
+  const lashD = line(H[0] + s * 1.1 * r, H[1] - 0.12 * r, H[0] + s * 1.22 * r, H[1] - 0.2 * r, {over: [0, 0], seed: `${seed}/lash`});
   const hair = smooth(
     (
       [
@@ -703,17 +721,17 @@ export const HerBack: React.FC<HerBackProps> = ({x, y, h, facing = 'r', hand, ch
         [-0.4, 3.55],
         [0.35, 3.3],
         [0.88, 2.4],
-        [0.92, 1.2],
-        [0.66, 0.55],
-        [0.7, -0.05],
-        [0.86, -0.6],
+        [0.9, 1.2],
+        [0.6, 0.55],
+        [0.6, -0.08],
+        [0.8, -0.64],
       ] as Pt[]
     ).map(([u, v]): Pt => [H[0] + s * (u + (v > 1 ? swh * Math.min(1, (v - 1) / 2) : 0)) * r, H[1] + v * r]),
     {closed: true, tension: 0.42},
   );
   const strands = [0.1, -0.35, -0.75].map((u, i) => smooth(([[u + 0.1, -0.7], [u - 0.05, 0.6], [u - 0.02, 2.0], [u + 0.08, 3.0 - i * 0.2]] as Pt[]).map(([uu, v]): Pt => [H[0] + s * uu * r, H[1] + v * r]))).join('');
   // a group of lit strands on the lamp side (the lamp is ahead of her, toward `facing`), swaying with the mass
-  const hiStrands = [0.42, 0.55, 0.66, 0.3]
+  const hiStrands = [0.36, 0.47, 0.54, 0.26]
     .map((u, i) => smooth(([[u - 0.05, -0.62 + i * 0.05], [u + 0.04, 0.2], [u - 0.02 + swh * 0.4, 1.4], [u - 0.12 + swh * 0.8, 2.3 - i * 0.25]] as Pt[]).map(([uu, v]): Pt => [H[0] + s * uu * r, H[1] + v * r])))
     .join('');
   // the sweater's shadow side (away from the lamp) and its folds: shoulder blade, the armpit crease, the sleeve's
@@ -760,6 +778,11 @@ export const HerBack: React.FC<HerBackProps> = ({x, y, h, facing = 'r', hand, ch
       <HandShape p={Z} r={0.034 * h} dir={[dz[0] / dl, dz[1] / dl]} ink={ink} at={at} seed={`${seed}/hand`} />
       <Fill d={headD} color={HER.skin} at={fillAt(at, 0.02)} seed={`${seed}/headF`} />
       <Ink d={headD} width={ink} at={b(at, 0.02)} open={0.1} />
+      <Fill d={cheekD} color={HER.skin} at={fillAt(at, 0.02)} seed={`${seed}/cheekF`} />
+      <Ink d={cheekD} width={ink} at={b(at, 0.02)} open={0.1} />
+      <Ink d={lashD} width={Math.max(2, ink * 0.6)} at={b(at, 0.03)} />
+      <Fill d={earD} color={CC.cheek} at={fillAt(at, 0.03)} offset={false} />
+      <Ink d={earD} width={Math.max(2, ink * 0.7)} at={b(at, 0.03)} open={0.2} />
       <Fill d={hair} color={HER.hair} at={fillAt(at, 0.04)} seed={`${seed}/hair`} />
       <Ink d={hair} width={ink * 0.8} at={b(at, 0.04)} open={0.1} />
       <Ink d={strands} width={Math.max(1.6, ink * 0.4)} color={HER.hairShade} at={b(at, 0.08)} />

@@ -57,7 +57,7 @@ export const OVERLAY_COLORS = {ink: CC.ink, cream: CC.paper, muted: CC.muted, po
 
 /** Frame 0 states the payoff in words (owner playbook; board frame0 "SHE SAYS: NO CRITICIZING GOOGLE. FOR LIFE."),
  *  the fairness rule's SHE SAYS on screen for all of O1. Layout (screen px, all inside the caption band 290-600):
- *  words 70 px on 340 / 424 (glyph top 293), the credit 34 px on 472, the spoken one-line pages lowered to 556 at 0.68
+ *  words 70 px on 340 / 424 (glyph top 293), the credit 38 px on 474 (34 read too small on a phone), the spoken one-line pages lowered to 556 at 0.68
  *  (box top 496, glyph bottom ~576). */
 export const FILM2_FRAME0: Frame0Text = {
   lines: ['SHE SAYS: NO CRITICIZING', 'GOOGLE. FOR LIFE.'],
@@ -69,13 +69,14 @@ export const FILM2_FRAME0: Frame0Text = {
   captionScale: 0.68,
 };
 /** The frame-0 credit (board frame0Credit), a small muted line under the words, as in the style frame desk_A.png. */
-export const FILM2_FRAME0_CREDIT = {text: BOARD.frame0Credit ?? 'Her account to BBC News, 21 Oct 2026', size: 34, baseline: 472};
+export const FILM2_FRAME0_CREDIT = {text: BOARD.frame0Credit ?? 'Her account to BBC News, 21 Oct 2026', size: 38, baseline: 474};
 /** The frame-0 highlight box on the pop (LOOK.md: the one pop goes on the highlighted clause and FOR LIFE). */
 export const FILM2_FRAME0_HIGHLIGHT = OVERLAY_COLORS.pop;
 
 /** The credit slot: a fixed safe spot under the platform's top UI (y < 180) and above the caption band (y 290+),
- *  centred on the caption centre. The LAST line's baseline is fixed; a second line grows upward. */
-export const CREDIT_SLOT = {cx: skyCaption.cx, baseline: 271, size: 38, pitch: 44, padX: 16, padY: 9, maxWidth: 820, nameSize: 46, rx: 8} as const;
+ *  centred on the caption centre. The LAST line's baseline is fixed; a second line grows upward. Sizes 42 / name 48
+ *  (finisher: 38 / 46 read too small on a phone in the cold read); a two-line tab spans y ~182-288. */
+export const CREDIT_SLOT = {cx: skyCaption.cx, baseline: 272, size: 42, pitch: 47, padX: 16, padY: 7, maxWidth: 840, nameSize: 48, rx: 8} as const;
 
 // ---------------------------------------------------------------- the overlay
 

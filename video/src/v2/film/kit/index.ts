@@ -9,7 +9,7 @@ export type {CCRole, DuskRole, ColdRoles, ColdSetName} from '../palette';
 export {b, fillAt, FILL_LAG, W, inkForHead, lerp, lerpPt, add, dirDeg, applyM, quadPt, BuildWave, BuildWaveCtx, radialWave, Ink, Fill, useWaveColour, Show, Pop, Rot, Placed, textW, Letter, Txt} from './util';
 export type {At, Pt, BuildWaveV, LetterProps} from './util';
 // ambient life (every panel lives the same way)
-export {loopT, stepT, swayAt, onOff, Live, Clouds, cloudPath, Bird, birdPath, birdShape, Flock, Steam, DustMotes, WallClock, Sway, CandleFlame, leafD} from './Ambient';
+export {loopT, stepT, swayAt, onOff, Live, Clouds, cloudPath, Bird, birdPath, birdShape, Flock, Steam, DustMotes, WallClock, Sway, CandleFlame, LampMoth, leafD} from './Ambient';
 export type {CloudsProps, FlockProps, SteamProps, DustMotesProps, WallClockProps} from './Ambient';
 // the town outside her window
 export {DuskTown} from './Town';

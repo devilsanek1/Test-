@@ -73,7 +73,7 @@ const P5: React.FC = () => (
   <NookDeskClose>
     <Laptop x={530} y={953} w={460} screen="ai" seed="ks/p5lap" />
     <Cat x={1010} y={1330} size={300} pose="loaf" facing="l" seed="ks/p5cat" />
-    <HerBack x={60} y={1600} h={1100} facing="r" seed="ks/p5her" />
+    <HerBack x={120} y={1600} h={1100} facing="r" seed="ks/p5her" />
   </NookDeskClose>
 );
 

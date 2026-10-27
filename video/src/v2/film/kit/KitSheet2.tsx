@@ -109,7 +109,7 @@ const A_P5: React.FC = () => (
     <rect x={-100} y={980} width={1300} height={1000} fill={CC.desk} />
     <Laptop x={530} y={953} w={460} screen="ai" seed="sh/p5lap" />
     <Cat x={1010} y={1330} size={300} pose="loaf" facing="l" seed="sh/p5cat" />
-    <HerBack x={60} y={1600} h={1100} facing="r" seed="sh/p5her" />
+    <HerBack x={120} y={1600} h={1100} facing="r" seed="sh/p5her" />
   </>
 );
 

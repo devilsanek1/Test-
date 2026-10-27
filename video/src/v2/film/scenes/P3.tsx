@@ -56,7 +56,8 @@ const P3: React.FC = () => {
         <InterviewTableTop seed="p3top" />
         <Staffer {...B} variant="B" part="arms" seed="p3B" />
         <Staffer {...A} variant="A" part="arms" hands={arms.hands} elbows={arms.elbows} seed="p3A" />
-        <NameTent {...INTERVIEW.tent} seed="p3tent" />
+        {/* finisher: GOOGLE STAFF under NAME WITHHELD (the cold read asked "who are they?"; the caption says "Google's staff") */}
+        <NameTent {...INTERVIEW.tent} w={360} h={104} sub="GOOGLE STAFF" seed="p3tent" />
         <Mic x={INTERVIEW.mic.x} y={INTERVIEW.mic.y} w={INTERVIEW.mic.w} tilt={10} seed="p3mic" />
       </XG>
     </World>

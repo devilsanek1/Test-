@@ -215,3 +215,13 @@ Five panel lanes, a kit lane and an engine lane, each with an art-director revie
 - **The loop seam, a zoomed window set:** in an un-build the far plane (the town) shrinks early, so whatever sits
   behind it (the window's trim and recess fills) shows as a solid block for a few frames; let those fills leave with
   the far plane (the same shrink about the glass centre). Check the seam strip for any solid block of one colour.
+- **The finisher's round (bare cold read -> small kit fixes, one render):** the kit sheet at every size and the kit
+  critic paid off: one model each (her, the cat, the contract, the nook, the town) plus the palette module, and the cold
+  reader saw the same her / cat / nook / town in every panel; cobalt and the pop never drifted. The per-lane aliveness
+  critics made every panel full (the meter passed all but P11's detail), but they judged frames; the BARE cold read at
+  phone size found the rest, each a kit-sized fix: life crossing lettering (a white mote on the clause's "e" read
+  "Googlz": `DustMotes avoid`), a cropped figure losing its shape (P5's back cut by the edge read "a blue blob": in
+  frame + a lost profile), speech lines read as an empty form (scribbles that keep rewriting), people with no "who"
+  (GOOGLE STAFF on the tent). Life the eye cannot see is not life (a paper-white moth on the lit wall: P2 / P6 had
+  0-mover stretches; read per-frame movers, not the mean). Play the shot before acting on a still-sheet artefact (pop
+  pages as fragments, a rise as duplicates). Next time: the bare cold read on the FIRST assembly, routed to the lanes.

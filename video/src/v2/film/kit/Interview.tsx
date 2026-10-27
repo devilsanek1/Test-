@@ -12,7 +12,8 @@
 // 1362, front 1532 .. 1732; mic (185, 1352, w 150); A (640, 1780, h 900); B (905, 1780, h 820).
 //   <InterviewRoom>       everything behind the staffers (wall, glass wall + town, softbox, partition + office, shelves)
 //   <InterviewTableTop>   the dressing on the table (recorder, glasses, cable, pen): after <InterviewTable/>
-//   <NameTent>            a folded name tent on the table: NAME WITHHELD as an object in the room
+//   <NameTent>            a folded name tent on the table: NAME WITHHELD as an object in the room (`sub`: an
+//                         affiliation line under it, P3 "GOOGLE STAFF")
 
 import React, {useId} from 'react';
 import {blob, ellipse, hline, line, poly, polyPath, rect, roundRect, smooth, vline} from '../../../lib/sketch';
@@ -232,7 +233,7 @@ export const InterviewRoom: React.FC<{at?: At; seed?: string; passer?: number | 
 /** A folded name tent standing on the table (the bottom edge's centre x, y; w, h): its front face with the lettering
  *  (P3: NAME WITHHELD in front of the one who spoke: an object in the room, never a floating caption), the top ridge,
  *  and optionally a black redaction bar over a name line above the words (`redact`). Words stay above y 1520. */
-export const NameTent: React.FC<{x: number; y: number; w?: number; h?: number; text?: string; redact?: boolean; at?: At; seed?: string}> = ({x, y, w = 300, h = 74, text = 'NAME WITHHELD', redact = false, at, seed = 'tent'}) => {
+export const NameTent: React.FC<{x: number; y: number; w?: number; h?: number; text?: string; sub?: string; redact?: boolean; at?: At; seed?: string}> = ({x, y, w = 300, h = 74, text = 'NAME WITHHELD', sub, redact = false, at, seed = 'tent'}) => {
   const x0 = x - w / 2;
   const top = y - h;
   const face: [number, number][] = [[x0 + 8, top], [x0 + w - 8, top], [x0 + w, y], [x0, y]];
@@ -244,9 +245,15 @@ export const NameTent: React.FC<{x: number; y: number; w?: number; h?: number; t
       <Fill d={polyPath(face)} color={CC.paper} at={fillAt(at)} seed={`${seed}/f`} />
       <Ink d={poly(face, {closed: true, seed: `${seed}/fI`, over: 'small'}) + poly(back, {closed: false, seed: `${seed}/bI`, over: [0, 0]})} width={W.mid} at={at} />
       {redact ? <Fill rect={[x - w * 0.3, top + h * 0.14, w * 0.6, h * 0.26]} color={CC.anchor} offset={false} at={fillAt(at, 0.04)} /> : null}
-      <Letter x={x} y={redact ? y - h * 0.16 : y - h * 0.3} size={redact ? h * 0.34 : h * 0.46} fit={w * 0.88} anchor="middle" at={b(at, 0.08)}>
+      <Letter x={x} y={redact ? y - h * 0.16 : sub ? y - h * 0.5 : y - h * 0.3} size={redact ? h * 0.34 : sub ? h * 0.4 : h * 0.46} fit={w * 0.88} anchor="middle" at={b(at, 0.08)}>
         {text}
       </Letter>
+      {/* an affiliation line under the name (P3: who they are, for a sound-off reader) */}
+      {sub && !redact ? (
+        <Letter x={x} y={y - h * 0.1} size={h * 0.34} fit={w * 0.84} anchor="middle" at={b(at, 0.1)}>
+          {sub}
+        </Letter>
+      ) : null}
     </>
   );
 };

@@ -8,6 +8,7 @@
 //   <WallClock>   a wall clock; the second hand ticks every second (a 3 screen-px stroke: it reads on a phone)
 //   <Sway>        rotates its children about a pivot by a slow seeded sway (plant leaves, a hanging cord)
 //   <CandleFlame> a stepped flicker
+//   <LampMoth>    a pale moth circling a lamp (O1's moth, generalised: the nook lamps P2 / P4 / P13 and P6's lamp)
 //   <Live>        gate for raw-SVG life: appears with `at` (or with the BuildWave's colour), shrinks away in an un-build
 //   helpers       onOff (a seeded light switching on / off), swayAt, loopT, stepT
 // Every rate has a parameter (`speed`, `period`, `rate`): G6 raises the density to >= 5 medium events / s.
@@ -265,11 +266,14 @@ export type DustMotesProps = {
   color?: string;
   /** Drift speed factor (default 1). */
   rate?: number;
+  /** Rects [x, y, w, h] (canvas px) the motes never cross (a mote there is not drawn): keep them off lettering (the
+   *  clause: a white mote on the "e" of Google read "Googlz" at phone size). */
+  avoid?: [number, number, number, number][];
   seed?: string;
   at?: At;
 };
 
-export const DustMotes: React.FC<DustMotesProps> = ({cx, cy, rx, ry, n = 10, r = 3.6, color = CC.paper, rate = 1, seed = 'motes', at}) => {
+export const DustMotes: React.FC<DustMotesProps> = ({cx, cy, rx, ry, n = 10, r = 3.6, color = CC.paper, rate = 1, avoid, seed = 'motes', at}) => {
   const t = useTime() * rate;
   const g = rng(`motes/${seed}`);
   const k = useInkScale();
@@ -286,6 +290,7 @@ export const DustMotes: React.FC<DustMotesProps> = ({cx, cy, rx, ry, n = 10, r =
     if (v < -1) v += 2;
     const px = cx + u * rx * 0.92;
     const py = cy + v * ry * 0.92;
+    if (avoid && avoid.some(([ax, ay, aw, ah]) => px > ax - r && px < ax + aw + r && py > ay - r && py < ay + ah + r)) continue;
     out.push(<circle key={i} cx={px} cy={py} r={r * g.range(0.7, 1.25) * Math.max(0.7, k)} fill={color} />);
   }
   return (
@@ -363,6 +368,34 @@ export const CandleFlame: React.FC<{x: number; y: number; h?: number; seed?: str
     <Live at={at} c={[x, y]}>
       <path d={d} fill={CC.flame} stroke={CC.ink} strokeWidth={W.hair * k} strokeLinejoin="round" />
       <path d={`M${x} ${y - 2}Q${x - h * 0.12} ${y - hh * 0.3} ${x + lean * 0.5} ${y - hh * 0.55}Q${x + h * 0.12} ${y - hh * 0.3} ${x} ${y - 2}Z`} fill={CC.candle} />
+    </Live>
+  );
+};
+
+// ---------------------------------------------------------------- a moth circling a lamp
+
+/** A moth circling a lamp's light (always on: a looping path, wings stepped at 14 / s), O1's moth generalised so every
+ *  lamp in her home has one (finisher: P2 / P6 had too few movers in their holds). Centre (cx, cy) and orbit radii
+ *  (rx, ry) in canvas px; `size` scales the glyph (1 = O1's: ~30 px span); `color` = the wings (default the red-brown
+ *  trim: a pale moth vanished against the lamp-lit wall at phone size, and the density meter could not see it). */
+export const LampMoth: React.FC<{cx: number; cy: number; rx?: number; ry?: number; period?: number; size?: number; color?: string; seed?: string; at?: At}> = ({cx, cy, rx = 74, ry = 30, period = 2.1, size = 1, color = CC.trim, seed = 'moth', at}) => {
+  const t = useTime();
+  const k = useInkScale();
+  const a = (2 * Math.PI * loopT(t, period, rand(seed, 'ph') * period)) / period;
+  const x = cx + rx * Math.cos(a) + rx * 0.19 * Math.sin(2 * a);
+  const y = cy + ry * Math.sin(a) + ry * 0.33 * Math.sin(3 * a + 1);
+  const flap = Math.floor(stepT(t, 14) * 14) % 2 === 0;
+  const z = size;
+  const wing = (sd: number) => {
+    const span = (flap ? 15 : 8) * z;
+    const tip: Pt = [x + sd * span, y - (flap ? 5 : 10) * z];
+    const back: Pt = [x + sd * span * 0.7, y + 8 * z];
+    return `M${x} ${y - 3 * z}Q${tip[0]} ${tip[1] - 6 * z} ${tip[0]} ${tip[1]}Q${back[0] + sd * 4 * z} ${back[1]} ${x} ${y + 4 * z}Z`;
+  };
+  return (
+    <Live at={at} c={[cx, cy]}>
+      <path d={wing(-1) + wing(1)} fill={color} stroke={CC.ink} strokeWidth={1.8 * k} strokeLinejoin="round" />
+      <ellipse cx={x} cy={y + z} rx={3.2 * z} ry={7 * z} fill={CC.ink} />
     </Live>
   );
 };

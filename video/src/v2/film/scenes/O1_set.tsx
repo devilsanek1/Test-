@@ -52,6 +52,7 @@ import {
   type BuildWaveV,
   CC,
   clauseRow,
+  CL_X,
   ContractPage,
   DeskBack,
   DESK_SHELF_UP,
@@ -75,6 +76,15 @@ import {
   W,
 } from '../kit';
 import {DeskBits, FairyLights, Moth, Phone, ShelfTendril, TownLines, UnderBox, UnderDesk, WallDress} from './O1_dress';
+
+/** The clause's words on the page (canvas px at rest, padded): the lamp's motes never cross them (finisher: a white
+ *  mote on the "e" read "Googlz" at phone size in O1 / P12). */
+const CLAUSE_BOX: [number, number, number, number] = (() => {
+  const pts = [[CL_X - 12, 192], [CL_X + 330, 192], [CL_X - 12, 330], [CL_X + 330, 330]].map(([u, v]) => pagePoint(O1_PAGE, u, v));
+  const xs = pts.map((p) => p[0]);
+  const ys = pts.map((p) => p[1]);
+  return [Math.min(...xs), Math.min(...ys), Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)];
+})();
 
 // ---------------------------------------------------------------- timing (O1-local seconds = VO seconds)
 
@@ -420,7 +430,7 @@ export const O1Set: React.FC<O1SetProps> = ({mode = 'o1'}) => {
       <O1RunOn L={L} slide={slide} motion={motion} />
       {built(
         <>
-          <DustMotes cx={DESK.pool.cx + 40} cy={DESK.pool.cy - 60} rx={DESK.pool.rx * 0.9} ry={DESK.pool.ry * 0.8} n={12} r={3.6} seed="o1/motes" />
+          <DustMotes cx={DESK.pool.cx + 40} cy={DESK.pool.cy - 60} rx={DESK.pool.rx * 0.9} ry={DESK.pool.ry * 0.8} n={12} r={3.6} avoid={[CLAUSE_BOX]} seed="o1/motes" />
           <Pen dx={-600} dy={30} />
           <DeskMug />
           <LampHead />

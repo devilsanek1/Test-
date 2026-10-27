@@ -29,7 +29,7 @@ import {InkScale} from '../../../lib/inkComp';
 import {ExitFade} from '../../../lib/exit';
 import {CC} from '../palette';
 import {applyM, At, b, Fill, fillAt, Ink, Pt, W} from './util';
-import {CandleFlame, DustMotes, leafD, Live, Steam, Sway, swayAt, WallClock} from './Ambient';
+import {CandleFlame, DustMotes, LampMoth, leafD, Live, Steam, Sway, swayAt, WallClock} from './Ambient';
 import {DuskTown, DuskTownProps} from './Town';
 import {Books, spineColour} from './Desk';
 import {Mic} from './Props';
@@ -583,6 +583,8 @@ const NookDesk: React.FC<{lampOn?: boolean; mic?: boolean; at?: At}> = ({lampOn 
           <Mic x={NOOK.mic.x} y={NOOK.mic.y} w={NOOK.mic.w} seed="nookmic" at={at} />
         </>
       ) : null}
+      {/* a moth circling the lamp (O1's, the same home): a mover that never stops in the nook's holds */}
+      {lampOn ? <LampMoth cx={L.x - 6} cy={L.y - 124} rx={66} ry={26} period={2.3} size={1.25} seed="nookmoth" at={at} /> : null}
     </>
   );
 };
@@ -765,8 +767,9 @@ export const NookRoom: React.FC<NookRoomProps> = ({layout = 'wide', town, cat, l
  *  pen; the near desk: grain, a mug ring, a network printout under the notebook's corner, sticky notes, her phone FACE
  *  UP (`phoneOn`: a notification lights it once), a pencil cup, books, the desk's front lip and a drawer; the mug at
  *  CLOSE_MUG (front right of the pool) with thin warm steam. On top: the kit Laptop (530, 953, w 460, screen "ai"), her
- *  cat sitting in the pool (Cat sit at (792, 1246), size 168, look at the hub (530, 856)) and HerBack (x 60, 1600,
- *  h 1100: the board's 110 moved left for the hero budget; its chair back crosses her waist). */
+ *  cat sitting in the pool (Cat sit at (792, 1246), size 168, look at the hub (530, 856)) and HerBack (x 120, 1600,
+ *  h 1100, near the board's 110: her head, its lost profile and both shoulders in frame; its chair back crosses her
+ *  waist). */
 /** Her phone lying face up (top-left x, y; the geometry `g` per set): a warm screen; a notification lights it in
  *  [on0, on1) (lane L3's fix: the kit's navy slab read as a black box at phone size). */
 type PhoneUpGeo = {w: number; h: number; r: number; sh: Pt; scr: [number, number, number, number, number]; note: [number, number, number, number]; l1: [number, number, number]; l2: [number, number, number]; dot: Pt; bar: Pt; seed: string};
@@ -890,9 +893,10 @@ export const NookDeskClose: React.FC<{town?: Partial<DuskTownProps>; slab?: bool
     <PotPlant x={1000} y={892} w={50} h={40} kind="succulent" seed="p5sill" at={at} />
     {/* the top edge: the home's high shelf (above the caption band), a trailing plant hanging right */}
     <HighShelf x0={-40} x1={660} y={250} seed="p5hs" at={at} />
-    <Sway x={880} y={-20} amp={1.6} hz={0.17} seed="p5hang">
-      <Ink d={line(880, -20, 864, 200, {over: [0, 0], seed: 'p5h1'}) + line(880, -20, 896, 200, {over: [0, 0], seed: 'p5h2'})} width={W.hair} at={at} />
-      <PotPlant x={854} y={200} w={54} h={36} kind="trailing" seed="p5hangpot" at={at} />
+    {/* (finisher: moved right from x 880, clear of the engine's name super, which sat on it in the cold read) */}
+    <Sway x={990} y={-20} amp={1.6} hz={0.17} seed="p5hang">
+      <Ink d={line(990, -20, 974, 200, {over: [0, 0], seed: 'p5h1'}) + line(990, -20, 1006, 200, {over: [0, 0], seed: 'p5h2'})} width={W.hair} at={at} />
+      <PotPlant x={964} y={200} w={54} h={36} kind="trailing" seed="p5hangpot" at={at} />
     </Sway>
     {/* the wall left and centre: corkboard (behind her head), a print over the laptop */}
     <Corkboard x={34} y={640} w={300} h={230} seed="p5cork" at={at} />
@@ -1041,6 +1045,8 @@ export const NookAngle: React.FC<{town?: Partial<DuskTownProps>; slab?: boolean;
       <Fill d={blob(760, A.deskFront + 24, 10, 6, {seed: 'p6knob2'})} color={CC.anchor} offset={false} at={fillAt(at)} />
       {/* on the desk: the lamp (beside the mic), a mug, books, papers, a pen, her phone face up, a standing photo, a stack */}
       <TableLamp x={L.x} y={A.deskBack + 12} h={L.h} glow={false} pool={0} motes={false} seed="p6lamp" at={at} />
+      {/* a moth circling the lamp (O1's, the same home), clear of the mic's head and the bubble */}
+      <LampMoth cx={150} cy={A.deskBack + 6 - L.h} rx={70} ry={28} period={2.2} size={1.25} seed="p6moth" at={at} />
       <NookMug x={18} top={1468} w={70} seed="p6mug" at={at} />
       <BookPile x={-20} y={1636} w={200} n={3} seed="p6deskbooks" at={at} />
       <Fill d={polyPath([[300, 1552], [520, 1542], [530, 1630], [306, 1640]])} color={CC.paper} at={fillAt(at)} seed="p6paper" />

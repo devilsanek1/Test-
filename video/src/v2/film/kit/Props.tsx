@@ -14,6 +14,7 @@
 import React from 'react';
 import {blob, crown, ellipse, glint, hline, line, poly, polyPath, rect, roundRect, smooth, textLines} from '../../../lib/sketch';
 import {ease as E, prog, useTime} from '../../../lib/time';
+import {rng} from '../../../lib/rng';
 import {mat, Mat, XG} from '../../../lib/xf';
 import {useCaptionFont} from '../../../lib/font';
 import {CC, COLD} from '../palette';
@@ -375,7 +376,20 @@ export const Bubble: React.FC<BubbleProps> = ({x, y, w, h = w * 0.66, tail, at, 
   }
   const d = smooth(pts, {closed: true, tension: 0.3});
   const ink = w >= 360 ? W.front : 4.2;
-  const lines = [[0.3, 0.56], [0.44, 0.66], [0.58, 0.4]].map(([v, lw], i) => hline(cx - (w * lw) / 2, cx + (w * lw) / 2, y + h * v, {seed: `${seed}/l${i}`, over: [0, 0]})).join('');
+  // no text: three hand-written speech squiggles (never words: her bubble holds only her own word), written on with the
+  // pop, then rewritten one line at a time while the bubble shows (finisher: three straight rules read as an empty
+  // placeholder in the cold read; scribbled speech that keeps coming reads as "she is talking")
+  const t = useTime();
+  const T0 = (at ?? -10) + 0.1;
+  const speech = [[0.3, 0.56], [0.44, 0.66], [0.58, 0.4]].map(([v, lw], i) => {
+    const first = T0 + i * 0.06;
+    const per = 1.8;
+    const off = 0.8 + i * 0.6;
+    const u = t - first - off;
+    const k = u < 0 ? 0 : Math.floor(u / per) + 1;
+    const start = k === 0 ? first : first + off + (k - 1) * per;
+    return {d: speechScribble(cx - (w * lw) / 2, cx + (w * lw) / 2, y + h * v, h * 0.035, `${seed}/l${i}/${k}`), start, dur: k === 0 ? 0.2 : 0.45, k};
+  });
   return (
     <PopFrom at={at} x={tail[0]} y={tail[1]}>
       <Fill d={d} color={CC.paper} offset={false} />
@@ -385,10 +399,26 @@ export const Bubble: React.FC<BubbleProps> = ({x, y, w, h = w * 0.66, tail, at, 
           {text}
         </Letter>
       ) : (
-        <Ink d={lines} width={W.mid} at={at !== undefined ? at + 0.1 : undefined} dur={0.2} />
+        speech.map((l, i) => <Ink key={`${i}/${l.k}`} d={l.d} width={W.mid} at={l.start} dur={l.dur} />)
       )}
     </PopFrom>
   );
+};
+
+/** A line of scribbled speech from x0 to x1 at y: two or three "words" of hand-written zigzag (amplitude `amp` px). */
+const speechScribble = (x0: number, x1: number, y: number, amp: number, seed: string): string => {
+  const r = rng(seed);
+  let out = '';
+  let x = x0;
+  while (x < x1 - 12) {
+    const wl = Math.min(x1 - x, r.range(46, 96));
+    const n = Math.max(3, Math.round(wl / 12));
+    const pts: Pt[] = [];
+    for (let j = 0; j <= n; j++) pts.push([x + (wl * j) / n, y + (j % 2 ? -1 : 1) * amp * r.range(0.45, 1.1)]);
+    out += smooth(pts, {tension: 0.45});
+    x += wl + r.range(12, 20);
+  }
+  return out;
 };
 
 /** Pops from (x, y): 0.15 -> 1.08 -> 1 over 0.22 s (no fade). */

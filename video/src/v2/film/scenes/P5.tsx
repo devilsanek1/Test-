@@ -22,6 +22,9 @@ const LAP = {x: 530, y: 953, w: 460};
 const HUB: [number, number] = [530, 856];
 /** Her cat sitting in the pool (the ground point, size): the same sitting cat P6 shows on the desk's right end. */
 const CAT = {x: 792, y: 1246, size: 168};
+/** Her (HerBack x): 120, near the board's 110 (finisher: at 60 her head sat cut on the frame's edge and her back read as
+ *  "a blue blob or curtain" in the cold read; here her head, its lost profile and both shoulders read; hero ~10 %). */
+const P5_HER_X = 120;
 
 const P5: React.FC = () => {
   const z = 1; // HOLD: the camera locked (the board's; COZY_AND_SCALE 3b.5: never a zoom in a hold)
@@ -31,7 +34,7 @@ const P5: React.FC = () => {
         <NookDeskClose>
           <Laptop x={LAP.x} y={LAP.y} w={LAP.w} screen="ai" seed="p5/laptop" />
           <Cat x={CAT.x} y={CAT.y} size={CAT.size} pose="sit" facing="l" look={HUB} seed="p5/cat" />
-          <HerBack x={60} y={1600} h={1100} facing="r" seed="p5/her" />
+          <HerBack x={P5_HER_X} y={1600} h={1100} facing="r" seed="p5/her" />
         </NookDeskClose>
       </XG>
     </World>
