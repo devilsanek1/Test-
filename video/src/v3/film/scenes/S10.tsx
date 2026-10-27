@@ -7,13 +7,27 @@
 // (on "They", 0.00); the sticks, the server lights, the dots and the snow keep the hold alive.
 //
 // Camera: HOLD, 1.5 % breathe anchored on the data center (shared with S14, the exact same frame).
+// G5b: the street round the queue (S10_set.tsx and its planes S10_far / S10_left / S10_yard / S10_near).
 import React from 'react';
 import {type ToneKey} from '../../../lib';
+import type {QueueBeats} from './S10_geo';
 import {QueueSet} from './S10_set';
 
 const DUR = 2.56;
+/** G5b life beats (panel seconds; VO = 22.68 + t): the guard steps out on "pay" (0.24) and waves the data center in on
+ *  "first dibs" (1.52) as the barrier lifts; a car crosses the hill road; the kid in the front row points up the
+ *  queue; Pip jolts, worried, on "first dibs". */
+const BEATS: QueueBeats = {
+  guardStepAt: 0.26,
+  guardWaveAt: 1.6,
+  barrierLiftAt: [1.54],
+  carPass: [0.72, 2.9],
+  pipDroopAt: 1.66,
+  kidPointAt: 0.4,
+  phoneWin: [1.62, 9],
+};
 
-const S10: React.FC = () => <QueueSet id="S10" dur={DUR} />;
+const S10: React.FC = () => <QueueSet id="S10" dur={DUR} beats={BEATS} />;
 export default S10;
 
 /** White captions on the dusk-blue sky (5.3:1). */

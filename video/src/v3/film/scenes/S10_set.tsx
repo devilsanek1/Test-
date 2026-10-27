@@ -14,10 +14,23 @@
 // first one steps back to mid), and the van shoved back down the road, cut by the frame edges.
 //
 // Camera: HOLD with a 1.5 % breathe anchored on the data center (G5_BLOCKING: holds may breathe 1.5-2 %).
+//
+// G5b (density lane): the frame is the same; a whole street now stands round the queue in the road's own perspective
+// (S10_geo.ts: one camera from the locked road): the far plane (clouds over the band, the hill town, the chip works:
+// S10_far), the left street of houses and shops with lamp posts, trees and walkers (S10_left), the factory gate, the
+// yard and its workers, a forklift (the loop) and the DELIVERIES sign (S10_yard), the dressed road, the forecourt with
+// the bus stop and the front row of backs (S10_near), Pip on the van's roof. Everything sorts by depth (ground scale k)
+// round the queue's own pieces. `beats` carries what S10 and S14 do differently (S10.tsx, S14.tsx).
+
 import React from 'react';
 import {World, ShotCam, Fill, Ink, hline, line, polyPath, ease, prog, useTime, mat, XG} from '../../../lib';
 import {Layer, type CamKey} from '../../../lib/cine/camera';
-import {EMBER, FILM_TOD, ChipFactory, chipFactoryGeo, ChipMaker, DataCenter, Snowfall, SpeechBubble, Calendar, StickFlight, TownBand, Van, WaitingDots, type Pt} from '../kit';
+import {EMBER, FILM_TOD, ChipFactory, chipFactoryGeo, ChipMaker, CoolingPlume, DataCenter, SnowLayers, SpeechBubble, Calendar, StickFlight, Van, WaitingDots, type Pt} from '../kit';
+import {FarPlane} from './S10_far';
+import {kAtY, type QueueBeats} from './S10_geo';
+import {LeftGround, leftItems, type Item} from './S10_left';
+import {RoadGround, VanLife, nearItems} from './S10_near';
+import {YardGround, yardItems} from './S10_yard';
 
 // ---- the set (canvas px at camera rest; the board's coordinates translated to the kit props)
 export const HORIZON = 800;
@@ -51,17 +64,8 @@ export const DC2 = {x: 458, y: 1232, w: 300, h: 210};
 export const VAN = {x: 260, y: 1428, w: 380};
 /** The board's push of the van in S14 (down the road, cut by the frame edges). */
 const VAN_PUSH: Pt = [-190, 170];
-
-// far houses on the horizon (left of the factory; fill only)
-const HOUSES = [
-  {x: -16, w: 58, lit: true, chimney: true},
-  {x: 70, w: 50, lit: false},
-  {x: 150, w: 62, lit: true},
-  {x: 262, w: 52, lit: true, chimney: true},
-  {x: 352, w: 56, lit: false},
-  {x: 452, w: 50, lit: true},
-  {x: 540, w: 54, lit: true, chimney: true},
-];
+/** S14's chip maker at the door: feet x and height (G5b: 92 -> 106 px, so he reads at phone size). */
+export const MAKER = {x: 796, h: 106};
 
 // ---- the sticks: the board's six, one every 0.35 s, each 0.8 s from the door into the data center's roof
 const STICK_T0 = 0.1;
@@ -97,8 +101,9 @@ export type QueueS14 = {
   pushDur: number;
 };
 
-/** The whole queue set. `dur` = the panel length (the breathe), `s14` = the reprise's changes. */
-export const QueueSet: React.FC<{dur: number; s14?: QueueS14; id: string}> = ({dur, s14, id}) => {
+/** The whole queue set. `dur` = the panel length (the breathe), `s14` = the reprise's changes, `beats` = the life's
+ *  scripted beats (guard, barrier, workers, birds, bus stop, front row, Pip). */
+export const QueueSet: React.FC<{dur: number; s14?: QueueS14; beats?: QueueBeats; id: string}> = ({dur, s14, beats = {}, id}) => {
   const t = useTime();
   // S14: the van shove and the second data center's slide
   const push = s14 ? prog(t, s14.pushAt, s14.pushDur, ease.outCubic) : 0;
@@ -108,57 +113,102 @@ export const QueueSet: React.FC<{dur: number; s14?: QueueS14; id: string}> = ({d
   const dc2Off = -(DC2.x + DC2.w / 2 + 40) * (1 - slide); // fully off the left edge before it starts
   const dc1Lit = !s14 || t < s14.litSwapAt;
   const vanTop = VAN.y - VAN.w * 0.5;
-  const makerX = 792;
-  const makerH = 92;
-  const makerHead: Pt = [makerX - 14, FAB.y - makerH + 12];
+  const makerX = MAKER.x;
+  const makerH = MAKER.h;
+  const makerHead: Pt = [makerX - 14 * (makerH / 112), FAB.y - makerH + 15 * (makerH / 112)];
+  const lifeBeats: QueueBeats = s14 ? {...beats, pushAt: s14.pushAt, pushDur: s14.pushDur} : beats;
+  // ---- everything that stands, sorted far to near by its ground scale k (S10_geo)
+  const items: Item[] = [
+    ...leftItems(lifeBeats),
+    ...yardItems(lifeBeats),
+    ...nearItems(lifeBeats),
+    // the chip factory, its door at the right end (on the road); no steam (the caption band is right above)
+    {k: kAtY(FAB.y), el: <ChipFactory key="fab" x={FAB.x} y={FAB.y} w={FAB.w} doorSide="r" steam={false} seed="q/fab" />},
+    // S14: the chip maker speaks from the door (facing the road, arm out)
+    ...(s14 ? [{k: kAtY(FAB.y) + 0.1, el: <ChipMaker key="maker" x={makerX} y={FAB.y} h={makerH} facing="l" at={s14.makerAt} seed="q/maker" />}] : []),
+    // the first data center, first at the door (its sign lit while it is the subject), a cooling plume off its left unit
+    {
+      k: kAtY(DC1.y),
+      el: (
+        <React.Fragment key="dc1">
+          <CoolingPlume x={DC1.x - DC1.w * 0.36} y={DC1.y - DC1.h - 14} seed="q/plume" rise={110} drift={-40} r1={18} />
+          <DataCenter x={DC1.x} y={DC1.y} w={DC1.w} h={DC1.h} signLitAt={dc1Lit ? 0 : undefined} seed="q/dc1" />
+        </React.Fragment>
+      ),
+    },
+    // the sticks lob from the door into its roof
+    {
+      k: kAtY(DC1.y) + 0.05,
+      el: (
+        <React.Fragment key="sticks">
+          {STICK_TO.map((x, i) => {
+            const t0 = STICK_T0 + i * STICK_GAP;
+            return <StickFlight key={i} seed={`q/st${i}`} from={STICK_FROM} to={[x, DC1_ROOF - 4]} t0={t0} t1={t0 + STICK_FLY} arc={STICK_ARC} w0={80} w1={96} rot0={-8} rot1={-28} end="shrink" />;
+          })}
+        </React.Fragment>
+      ),
+    },
+    // the van's waiting dots (behind the newcomer, which blocks them as it cuts in)
+    {
+      k: kAtY(DC2.y) - 0.05,
+      el: (
+        <XG key="dots" m={mat.translate(vdx, vdy)}>
+          <WaitingDots x={372} y={vanTop - 40} r={11} />
+        </XG>
+      ),
+    },
+    // S14: the second, darker data center cuts in from the left
+    ...(s14 && slide > 0
+      ? [
+          {
+            k: kAtY(DC2.y),
+            el: (
+              <XG key="dc2" m={mat.translate(dc2Off, 0)}>
+                <DataCenter x={DC2.x} y={DC2.y} w={DC2.w} h={DC2.h} variant="dark" signLitAt={s14.litSwapAt} seed="q/dc2" />
+              </XG>
+            ),
+          },
+        ]
+      : []),
+    // the laptop van, waiting (shoved back in S14), with Pip on its roof
+    {
+      k: kAtY(VAN.y),
+      el: (
+        <XG key="van" m={mat.translate(vdx, vdy)}>
+          <VanLife van={VAN} beats={lifeBeats} layer="under" />
+          {/* THE laptop on its box at the board's size (kit decalW) */}
+          <Van x={VAN.x} y={VAN.y} w={VAN.w} decalW={140} seed="q/van" />
+          <VanLife van={VAN} beats={lifeBeats} layer="over" />
+        </XG>
+      ),
+    },
+  ];
+  items.sort((p, q) => p.k - q.k);
   return (
     <World stage="context" sky={[{t: 0, tod: FILM_TOD, color: EMBER.sky}]}>
       <ShotCam keys={queueCam(dur)}>
         <Layer depth={0}>
-          {/* sky step, snowfield, horizon */}
+          {/* sky step, snowfield, the far plane (clouds over the band, the hill town, the chip works) */}
           <Fill rect={[-200, BAND_Y, 1480, HORIZON - BAND_Y + 4]} color={EMBER.skyLow} offset={false} />
           <Fill rect={[-200, HORIZON, 1480, 1400]} color={EMBER.snow} offset={false} />
-          <Ink d={hline(-60, 1140, HORIZON, {seed: 'q/hor', over: [0, 0]})} width={2.2} />
-          <TownBand y={HORIZON + 2} houses={HOUSES} far seed="q/town" />
-          {/* the road to the factory door */}
+          <FarPlane beats={lifeBeats} />
+          <Ink d={hline(560, 1140, HORIZON + 64, {seed: 'q/hor', over: [0, 0]})} width={2.2} />
+          {/* the road to the factory door, dressed; the pavements' light pools */}
           <Fill d={ROAD_D} color={EMBER.road} offset={false} seed="q/road" />
           <Ink d={line(ROAD_FAR[0][0], FAB.y, -60, Y_LEFT_EXIT, {seed: 'q/rl', over: [0, 0]}) + line(ROAD_FAR[1][0], FAB.y, roadR(1990), 1990, {seed: 'q/rr', over: [0, 0]})} width={2.2} />
-          {/* the chip factory, its door at the right end (on the road); no steam (the caption band is right above) */}
-          <ChipFactory x={FAB.x} y={FAB.y} w={FAB.w} doorSide="r" steam={false} seed="q/fab" />
-          {/* S14: the chip maker speaks from the door (facing the road, arm out) */}
-          {s14 ? <ChipMaker x={makerX} y={FAB.y} h={makerH} facing="l" at={s14.makerAt} seed="q/maker" /> : null}
-          {/* the first data center, first at the door (its sign lit while it is the subject) */}
-          <DataCenter x={DC1.x} y={DC1.y} w={DC1.w} h={DC1.h} signLitAt={dc1Lit ? 0 : undefined} seed="q/dc1" />
-          {/* the sticks lob from the door into its roof */}
-          {STICK_TO.map((x, i) => {
-            const t0 = STICK_T0 + i * STICK_GAP;
-            return (
-              <StickFlight key={i} seed={`q/st${i}`} from={STICK_FROM} to={[x, DC1_ROOF - 4]} t0={t0} t1={t0 + STICK_FLY} arc={STICK_ARC} w0={80} w1={96} rot0={-8} rot1={-28} end="shrink" />
-            );
-          })}
-          {/* the van's waiting dots (behind the newcomer, which blocks them as it cuts in) */}
-          <XG m={mat.translate(vdx, vdy)}>
-            <WaitingDots x={372} y={vanTop - 40} r={11} />
-          </XG>
-          {/* S14: the second, darker data center cuts in from the left */}
-          {s14 && slide > 0 ? (
-            <XG m={mat.translate(dc2Off, 0)}>
-              <DataCenter x={DC2.x} y={DC2.y} w={DC2.w} h={DC2.h} variant="dark" signLitAt={s14.litSwapAt} seed="q/dc2" />
-            </XG>
-          ) : null}
-          {/* the laptop van, waiting (shoved back in S14) */}
-          <XG m={mat.translate(vdx, vdy)}>
-            {/* THE laptop on its box at the board's size (kit decalW) */}
-            <Van x={VAN.x} y={VAN.y} w={VAN.w} decalW={140} seed="q/van" />
-          </XG>
-          {/* falling snow under the caption band */}
-          <Snowfall x={-20} y={612} w={1120} h={1000} n={22} seed="q/snow" />
+          <RoadGround />
+          <LeftGround />
+          <YardGround />
+          {items.map((it) => it.el)}
+          {/* falling snow in three layers (half density in the caption band) */}
+          <SnowLayers density={0.85} seed="q/snowL" />
           {/* S14: the speech bubble, the calendar flipping 2026 -> 2027 */}
           {s14 ? (
             <SpeechBubble cx={450} cy={720} rx={170} ry={112} to={makerHead} at={s14.bubbleAt} seed="q/bubble">
               <Calendar x={365} y={642} w={170} from="2026" to="2027" flipAt={s14.flipAt} seed="q/cal" />
             </SpeechBubble>
           ) : null}
+          <g data-id={id} />
         </Layer>
       </ShotCam>
     </World>

@@ -12,6 +12,7 @@
 // Camera: HOLD, 1.5 % breathe anchored on the first data center (as S10).
 import React from 'react';
 import {type ToneKey} from '../../../lib';
+import type {QueueBeats} from './S10_geo';
 import {QueueSet, type QueueS14} from './S10_set';
 
 const DUR = 2.96;
@@ -26,7 +27,21 @@ const CHANGES: QueueS14 = {
   pushDur: 0.3,
 };
 
-const S14: React.FC = () => <QueueSet id="S14" dur={DUR} s14={CHANGES} />;
+/** G5b life beats: on "chip" (0.16) the workers at the door stop and turn to the chip maker; as the second data center
+ *  lands (1.28-1.4) the sparrows lift off the wire, the bus stop turns, the kid points at it, the guard steps out and
+ *  the barrier lifts for it; Pip slides and clings on the shove (VanLife) and shakes the snow off (1.9). */
+const BEATS: QueueBeats = {
+  workersStopAt: 0.16,
+  birdsLiftAt: 1.3,
+  busTurnAt: 1.34,
+  kidPointAt: 1.36,
+  guardStepAt: 1.3,
+  guardWaveAt: 1.68,
+  barrierLiftAt: [1.64],
+  pipShakeAt: 1.9,
+};
+
+const S14: React.FC = () => <QueueSet id="S14" dur={DUR} s14={CHANGES} beats={BEATS} />;
 export default S14;
 
 /** White captions on the dusk-blue sky (5.3:1). */

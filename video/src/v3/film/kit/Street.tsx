@@ -744,8 +744,9 @@ export type Wire3Props = {
   /** Extra parallel wires (gap px). */
   n?: number;
   gap?: number;
-  /** Birds sitting on the (first) wire: count / positions (0..1 along), size, and when they lift off and wheel away. */
-  birds?: {n?: number; us?: number[]; size?: number; liftAt?: number; color?: string};
+  /** Birds sitting on the (first) wire: count / positions (0..1 along), size, and when they lift off and wheel away.
+   *  `rise` / `fly` (px / s, defaults 240 / 260) shape the getaway: a low flat dash keeps them under a caption band. */
+  birds?: {n?: number; us?: number[]; size?: number; liftAt?: number; color?: string; rise?: number; fly?: number};
   ink?: number;
   seed?: string;
   at?: At;
@@ -773,8 +774,8 @@ export const Wire3: React.FC<Wire3Props> = ({a, b: bb, sag = 26, n = 1, gap = 10
       if (lift !== undefined && t >= lift) {
         const d = t - lift;
         if (d > 1.7) return;
-        const fx = bx + dirB * (d * 260 + d * d * 80);
-        const fy = by - d * 240 + d * d * 40 + Math.sin(d * 6 + ph) * 6;
+        const fx = bx + dirB * (d * (birds.fly ?? 260) + d * d * 80);
+        const fy = by - d * (birds.rise ?? 240) + d * d * 40 * ((birds.rise ?? 240) / 240) + Math.sin(d * 6 + ph) * 6;
         const w = size * 0.6;
         const lf = Math.sin(t * 2 * Math.PI * 3.2 + ph) * w * 0.7;
         out.push(<path key={`f${i}`} d={`M${fx - w} ${fy - lf}Q${fx - w * 0.4} ${fy - w * 0.3} ${fx} ${fy}Q${fx + w * 0.4} ${fy - w * 0.3} ${fx + w} ${fy - lf}`} fill="none" stroke={col} strokeWidth={2.2} strokeLinecap="round" />);
