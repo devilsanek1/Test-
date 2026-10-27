@@ -13,7 +13,8 @@
 //   credits        one small ink-on-cream tab in a fixed safe spot (screen y ~195-287: under the platform UI, above the
 //                  caption band, clear of the key action), keyed by the panel on screen; P5 = a larger name super
 //                  (name over role); hidden while the frame-0 words show (O1, the loop roll), so the seam = frame 0
-//   draft          G5: no edges / paper / texture; a burned-in "G5 · <panel> · <timecode>" label
+//   draft          G5: no edges / paper / texture; a burned-in "G5 blocking · <panel> · <timecode>" label (ends x ~520:
+//                  clear of the run-on's years at the bottom of O1 / P12)
 // Compositions: src/entry-v2-film.tsx (Film2, Film2Shot {id}, Film2-<ID>, Film2Bare). How-to: docs/G5_BLOCKING.md.
 import React from 'react';
 import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
@@ -29,8 +30,10 @@ import {CC} from './palette';
 
 export const FILM2_FPS = 60;
 export const FILM2_VOICE = 'v2/voice.wav';
-/** The gate label burned into every pre-final cut. */
-export const FILM2_GATE = 'G5';
+/** The gate label burned into every pre-final cut: the stage by name (owner playbook: "every cut says what stage it is
+ *  and what the next stages add"; the next stages go in the message that sends the cut: a longer label ran over the
+ *  run-on's years at the bottom of O1 / P12). */
+export const FILM2_GATE = 'G5 blocking';
 
 /** A v2 panel: the house scene plus its credit (the board's small-print slot). */
 export type Film2Scene = FilmScene & {credit?: string; creditStyle?: 'name'};

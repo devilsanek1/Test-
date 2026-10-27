@@ -8,16 +8,14 @@
 // (secondary: smaller than the screen, left of the right rail), its head turned up-left to the screen with its eyes
 // open, so its eye-line leads to the AI network; its tail flicks. She types in bursts; her phone lights once. The engine
 // draws her name super in the top credit tab.
-// Camera: HOLD, breathing in 1.5 % on the screen; the room lives.
+// Camera: HOLD, locked (never a zoom in a hold); the room lives.
 import React from 'react';
 import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
-import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {Cat, CC, HerBack, Laptop, NookDeskClose} from '../kit';
 
 const START = 15.0;
-const DUR = 16.6 - START;
 /** The laptop (the board's hinge centre and width). */
 const LAP = {x: 530, y: 953, w: 460};
 /** The AI network's hub on the screen (the cat's eye-line). */
@@ -26,8 +24,7 @@ const HUB: [number, number] = [530, 856];
 const CAT = {x: 792, y: 1246, size: 168};
 
 const P5: React.FC = () => {
-  const t = useTime();
-  const z = 1 + 0.015 * prog(t, 0, DUR, ease.inOutSine);
+  const z = 1; // HOLD: the camera locked (the board's; COZY_AND_SCALE 3b.5: never a zoom in a hold)
   return (
     <World sky={CC.wall}>
       <XG m={mat.about(mat.scale(z), LAP.x, LAP.y - 90)}>

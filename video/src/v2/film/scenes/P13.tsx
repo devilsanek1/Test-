@@ -7,7 +7,7 @@
 // Her cat sits on the sill watching her, and when the bubble pops it looks up at it (its eye-line lifts the viewer to
 // the word); its idle clock (seed picked for this hold) puts an ear twitch at ~37.65 s, a big tail flick at ~38.15 s
 // and a curious head tilt at ~38.5 s into the long hold. She talks from "her words" on (the mouth, a nod, an
-// open-hand gesture). Camera: HOLD, breathing in 1.5 % on the bubble; the room keeps living (the town at 1.3x its draft
+// open-hand gesture). Camera: HOLD, locked (never a zoom in a hold); the room keeps living (the town at 1.3x its draft
 // rate in this longest hold: a neighbour's window lights at ~38.27 s above her head; the clock's readable second hand).
 // THE LOOP SEAM: the engine un-builds this panel over its last 0.3 s (18 frames, f2327-2344) on top of O1's t < 0
 // bare-line state. The AD's fix round, on the house recipe (lines loose, fills shrink small first, ink retracts):
@@ -62,7 +62,7 @@ const P13: React.FC = () => {
   const react = prog(t, POP + 0.14, 0.22, ease.outCubic);
   const bubbleW = nookWorld('m12', [BUB.x + BUB.w * 0.55, BUB.y + BUB.h * 0.5]);
   const look = lerpPt([mouthW[0] + 20, mouthW[1] + 10], bubbleW, react);
-  const z = 1 + 0.015 * prog(t, 0, DUR, ease.inOutSine);
+  const z = 1; // HOLD: the camera locked (the board's; COZY_AND_SCALE 3b.5: never a zoom in a hold)
   // the bubble leaves first, as one shape, into her mouth (a reversed pop): ~4 frames
   const bubbleK = 1 - ease.inQuad(prog(exit, 0, 0.2));
   return (

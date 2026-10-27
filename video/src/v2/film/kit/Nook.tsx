@@ -26,6 +26,7 @@ import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, Mat, XG} from '../../../lib/xf';
 import {InkScale} from '../../../lib/inkComp';
+import {ExitFade} from '../../../lib/exit';
 import {CC} from '../palette';
 import {applyM, At, b, Fill, fillAt, Ink, Pt, W} from './util';
 import {CandleFlame, DustMotes, leafD, Live, Steam, Sway, swayAt, WallClock} from './Ambient';
@@ -479,8 +480,12 @@ const NookWindow: React.FC<{blindY: number; town?: Partial<DuskTownProps>; at?: 
   const folds: [number, number][] = Array.from({length: nf}, (_, i) => [gy - 8 + ((blindY - gy + 8) * i) / nf, gy - 8 + ((blindY - gy + 8) * (i + 1)) / nf]);
   return (
     <>
-      <Fill rect={[N.x0, N.top, N.x1 - N.x0, N.sillY - N.top]} color={CC.wallShade} offset={false} at={fillAt(at)} />
-      <Fill rect={[gx - 10, gy - 10, gw + 20, gh + 10]} color={CC.trim} offset={false} at={fillAt(at)} />
+      {/* the recess and the trim behind the glass leave WITH the town in an un-build (the same shrink about the glass's
+          centre): left behind, the trim read as a solid brown block at the loop seam (lane L2's request) */}
+      <ExitFade x={gx + gw / 2} y={gy + gh / 2}>
+        <Fill rect={[N.x0, N.top, N.x1 - N.x0, N.sillY - N.top]} color={CC.wallShade} offset={false} at={fillAt(at)} />
+        <Fill rect={[gx - 10, gy - 10, gw + 20, gh + 10]} color={CC.trim} offset={false} at={fillAt(at)} />
+      </ExitFade>
       <DuskTown x={gx} y={gy} w={gw} h={gh} horizon={gy + gh * 0.55} moon={[gx + gw * 0.8, blindY + 46]} {...town} seed={town?.seed ?? 'nooktown'} at={at} />
       {/* the blind (a Roman blind: fabric down to blindY in soft folds, alternate folds one step down; its bar, the
           fold shadow it casts on the glass, the pull cord with its toggle) */}

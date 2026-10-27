@@ -5,7 +5,7 @@
 // page, never angled). This file adds only what the four panels share:
 //   - the framing: one page centre on screen (540, PAGE_CY) for every panel; P7 / P9 / P11 at INSERT_Z (the page reads
 //     ~550 px wide: block 2 of the deal at ~41 px, readable at phone size), P10 = 0.85 x that (the boarded pull-back).
-//     Holds breathe 1.5 % about the page centre (the CAMERA holds; the world keeps living).
+//     Holds are LOCKED (the CAMERA holds, never a zoom in a hold: COZY_AND_SCALE 3b.5; the world keeps living).
 //   - the page words, hand-lettered with the kit's Letter, under ONE header style (PageHead: the same size, centring
 //     and y on every page, so the four pages read as one form): the signed DEAL page (P7), the deal's words in two
 //     quoted blocks (P9, P10: block 1 never without block 2), GOOGLE SAYS (P11, with its two read-along underlines).
@@ -27,7 +27,7 @@ import {InkScale} from '../../../lib/inkComp';
 import {useCaptionFont} from '../../../lib/font';
 import {blob, ellipse, line, polyPath, rect, roundRect, smooth} from '../../../lib/sketch';
 import {rand, rng} from '../../../lib/rng';
-import {ease, prog, useTime} from '../../../lib/time';
+import {ease, useTime} from '../../../lib/time';
 import {mat, type Mat, XG} from '../../../lib/xf';
 import {CC, COLD, COLD_CENTRE, ColdSet, Fill, INSERT_PAGES, Ink, InsertPage, Letter, Live, loopT, Stamp, stepT, textW, W, type Pt} from '../kit';
 
@@ -57,8 +57,6 @@ export type ColdInsertProps = {
   /** The panel's start on the film clock (s): the official's notes run on film time, so they keep growing across the
    *  four inserts. */
   from: number;
-  /** The panel's length (s): the hold breathes in 1.5 % over it; 0 = no breathing. */
-  breathe?: number;
   /** A colleague's hand slides a document onto the left pile at this scene time (s); false = not in this shot. */
   slide?: number | false;
   /** Stamp slam times (s): the water glass jumps (a burst of rings) on each. */
@@ -70,9 +68,9 @@ export type ColdInsertProps = {
 };
 
 /** The cold insert: the kit's cold set, the shared insert life, the page and its words. */
-export const ColdInsert: React.FC<ColdInsertProps> = ({z, from, breathe = 0, slide = false, kicks = [], children, over}) => {
+export const ColdInsert: React.FC<ColdInsertProps> = ({z, from, slide = false, kicks = [], children, over}) => {
   const t = useTime();
-  const zz = z * (1 + (breathe > 0 ? 0.015 * prog(t, 0, breathe, ease.inOutSine) : 0));
+  const zz = z;
   // the glass also jumps when the slid document lands on the pile (the same beat on both pages)
   const allKicks = slide === false ? kicks : [...kicks, slide + 0.41];
   return (

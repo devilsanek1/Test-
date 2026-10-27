@@ -3,7 +3,7 @@
 // box, header and framing as P9 and P11; the official at our edge of the desk takes notes): the signed DEAL page (the
 // shared DEAL header, its typed body, two signatures in two different hands) and an APRIL 2026 stamp slamming on "April"
 // at the top right under the header (it lands on the stamp sound, 20.76; paper-backed, so it covers the rows under it).
-// HOLD (breathing 1.5 %); the world keeps living (the window light with a cloud's shadow, a passer-by's shadow and a
+// HOLD (the camera locked); the world keeps living (the window light with a cloud's shadow, a passer-by's shadow and a
 // branch swaying in it, the lamp's dust motes, the coffee's steam, the smartphone, the phone's line lights, the pen,
 // the official's notes, the page corner in the draft, the water glass jumping on the slam). No cat, no Google
 // lettering, never a face.
@@ -14,10 +14,9 @@ import {ColdInsert, INSERT_Z, InsertStamp, SignedDealWords, X, Y} from './P9_pag
 
 /** The stamp sound is at 20.76 (t 0.24): the slam starts 0.09 s earlier so it LANDS on it. */
 const SLAM = 0.24 - 0.09;
-const DUR = 21.32 - 20.52;
 
 const P7: React.FC = () => (
-  <ColdInsert z={INSERT_Z} from={20.52} breathe={DUR} kicks={[SLAM]} over={<InsertStamp x={X(318)} y={Y(124)} w={240} text="APRIL 2026" at={SLAM} backing="plain" />}>
+  <ColdInsert z={INSERT_Z} from={20.52} kicks={[SLAM]} over={<InsertStamp x={X(318)} y={Y(124)} w={240} text="APRIL 2026" at={SLAM} backing="plain" />}>
     <SignedDealWords />
   </ColdInsert>
 );

@@ -7,7 +7,7 @@
 // box at (250, 650); after its pop it floats (a slow breath about her mouth). The band is plain wall (the board: the
 // glass starts at the band's lower edge; the kit NookRoom's `bandTop` paints out the rod, the recess top and the blind
 // above it).
-// Camera: HOLD, breathing in 1.5 % on her and the bubble; the room keeps living (the clock's readable second hand).
+// Camera: HOLD, locked (never a zoom in a hold); the room keeps living (the clock's readable second hand).
 import React from 'react';
 import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
@@ -35,7 +35,7 @@ const P4: React.FC = () => {
   const react = prog(t, POP + 0.12, 0.2, ease.outCubic);
   const bubbleW = nookWorld('m14', [BUB.x + BUB.w * 0.62, BUB.y + BUB.h * 0.55]);
   const look = lerpPt([mouthW[0] + 30, mouthW[1]], bubbleW, react);
-  const z = 1 + 0.015 * prog(t, 0, DUR, ease.inOutSine);
+  const z = 1; // HOLD: the camera locked (the board's; COZY_AND_SCALE 3b.5: never a zoom in a hold)
   return (
     <World sky={CC.wall}>
       <XG m={mat.about(mat.scale(z), 520, 1000)}>

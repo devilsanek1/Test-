@@ -6,7 +6,7 @@
 // the board's (150) and hand-lettered CONTRACT over its clause band, so with the sound off the long strip reads as
 // O1's JOB CONTRACT running on, not a till receipt. The run-on keeps creeping toward us through the
 // whole shot (it never stops: the core line, made physical). Her cat sits on the sill and watches the run-on's leading
-// edge (its eye-line leads the viewer down to it). Camera: HOLD (the board), breathing in 1.5 % on her page; the world
+// edge (its eye-line leads the viewer down to it). Camera: HOLD (the board), the camera locked; the world
 // inside keeps living (the town, steam, the lamp's motes, the clock, the curtain, her idle life, the cat's life).
 // Credit (Film2's tab): "Her account to BBC News, 21 Oct 2026".
 import React from 'react';
@@ -35,8 +35,7 @@ const P2: React.FC = () => {
   const p = runP(t);
   // the leading edge of the run-on: the cat watches it (nook world px = P2 canvas px)
   const lead: Pt = [lerp(RUN.from.x0, RUN.to.x0, p) + lerp(RUN.from.x1 - RUN.from.x0, RUN.to.x1 - RUN.to.x0, p) / 2, lerp(RUN.from.y, RUN.to.y, p)];
-  // HOLD, breathing in 1.5 % on her page
-  const z = 1 + 0.015 * prog(t, 0, DUR, ease.inOutSine);
+  const z = 1; // HOLD: the camera locked (the board's; COZY_AND_SCALE 3b.5: never a zoom in a hold)
   return (
     <World sky={CC.wall}>
       <XG m={mat.about(mat.scale(z), PAGE.x + 60, 1330)}>

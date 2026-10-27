@@ -10,17 +10,16 @@
 // "told the BBC" (his mouth moves once, then he goes quiet and worried); B, worried, rests his chin on his hand. An
 // ordinary underline draws on under CONTRACT on "contracts" (12.20, the pencil sound). Notes on the frosted glass; a
 // second colleague carries archive boxes past behind it and a flock crosses the dusk in the glass wall.
-// No cat here (it lives in her home only). Camera: HOLD, breathing in 1.5 % toward A and the page; the room lives.
+// No cat here (it lives in her home only). Camera: HOLD, locked (never a zoom in a hold); the room lives.
 import React from 'react';
 import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
-import {ease, prog, useTime} from '../../../lib/time';
+import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {CC, INTERVIEW, InterviewRoom, InterviewTable, InterviewTableTop, Mic, NameTent, P3_STAFF, Staffer, type Pt} from '../kit';
 import {P3Contract, P3GlassNotes, P3Underline} from './P3_life';
 
 const START = 8.36;
-const DUR = 13.24 - START;
 /** The pencil on "contracts" (12.20): the underline starts a hair before the sound and lands on it. */
 const LINE_AT = 12.2 - START - 0.06;
 
@@ -43,7 +42,7 @@ const P3: React.FC = () => {
   // A answers the BBC: his mouth moves from "told" through "BBC" (a beat early: lead the voice), then he is quiet
   const aTalk: [number, number][] = [[9.2 - START, 10.1 - START]];
   const arms = aArms(t);
-  const z = 1 + 0.015 * prog(t, 0, DUR, ease.inOutSine);
+  const z = 1; // HOLD: the camera locked (the board's; COZY_AND_SCALE 3b.5: never a zoom in a hold)
   return (
     <World sky={CC.studio}>
       <XG m={mat.about(mat.scale(z), 520, 1300)}>

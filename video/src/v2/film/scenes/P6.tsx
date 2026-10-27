@@ -9,7 +9,7 @@
 // chest for ONE worried beat on "objected", then talks on. Her cat sits on the desk's right end (the same desk and the
 // same sitting cat as P5, partly behind the floor plant, left of the right rail), watching her; its head turns up to
 // the bubble when it pops. A notification lights her phone once, late. Nothing military, no Google lettering.
-// Camera: HOLD, breathing in 1.5 % on her face and the bubble; the room lives.
+// Camera: HOLD, locked (never a zoom in a hold); the room lives.
 import React from 'react';
 import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
@@ -18,7 +18,6 @@ import {mat, XG} from '../../../lib/xf';
 import {Bubble, Cat, CC, HerSeated, Mic, NOOK_ANGLE, NookAngle, herMouth, lerpPt, type Pt} from '../kit';
 
 const START = 16.6;
-const DUR = 20.52 - START;
 /** The like-pop on "told" (16.76): the pop starts a beat before it, so the sound lands on its overshoot. */
 const POP = 16.76 - START - 0.08;
 /** The board's speech box (screen px). */
@@ -40,7 +39,7 @@ const P6: React.FC = () => {
   // the cat watches her mouth, then turns up to the bubble as it pops
   const react = prog(t, POP + 0.12, 0.22, ease.outCubic);
   const look = lerpPt([mouth[0], mouth[1] - 40], [BUB.x + BUB.w * 0.7, BUB.y + BUB.h * 0.6], react);
-  const z = 1 + 0.015 * prog(t, 0, DUR, ease.inOutSine);
+  const z = 1; // HOLD: the camera locked (the board's; COZY_AND_SCALE 3b.5: never a zoom in a hold)
   const seed = 'p6/her';
   const her = {x: H.x, y: H.y, h: H.h, facing: 'l' as const, view: 'front34' as const, face: 'worried' as const, talking, clutch, seed};
   return (
