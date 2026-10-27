@@ -51,6 +51,26 @@ def cue_levels(y):
     return float(l.max()), float(b.max())
 
 
+def place_wrapped(dst, src, t):
+    """add src into the film-long dst at t; what runs past the film's end wraps onto its start (the loop: the premix
+    does the same, review item 10)."""
+    s = st(src); i = int(round(t * SR)); n = len(dst)
+    k = min(len(s), n - i)
+    dst[i:i + k] += s[:k]
+    rest = s[k:]
+    while len(rest):
+        m = min(len(rest), n)
+        dst[:m] += rest[:m]; rest = rest[m:]
+    return dst
+
+
+def notch_band(y, lo, hi, gain_db):
+    """a broad band cut (or boost): y + (g - 1) * the band (zero-phase 4th-order band-pass)."""
+    import scipy.signal as ss
+    sos = ss.butter(2, [lo, hi], "bandpass", fs=SR, output="sos")
+    return y + (10 ** (gain_db / 20) - 1) * ss.sosfiltfilt(sos, y, axis=0)
+
+
 def local_voice(V, t0, dur):
     """the voice's level (broadband, band) over the speech frames the cue overlaps, taken low (25th percentile: the
     soft syllables count, not just the loud ones); None = the cue sits in a pause."""

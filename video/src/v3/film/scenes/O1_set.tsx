@@ -141,7 +141,9 @@ const Stick: React.FC<{f: Flight; t: number; P: ReturnType<typeof planes>}> = ({
 
 // ---------------------------------------------------------------- the outside (far plane, clipped to the glass)
 
-const Outside: React.FC = () => (
+/** The view through the window (O1 canvas px, O1 time): exported for the desk shots that show the same window
+ *  (scenes/desk_window.tsx: S7, S8, S12, S16), always at O1 time >= O1_END (the building dark, its sign lit). */
+export const O1Outside: React.FC = () => (
   <>
     <NightSky x={GLASS.x - 30} y={GLASS.y - 30} w={GLASS.w + 60} h={GLASS.h + 60} at={0.04} />
     <Fill rect={[GLASS.x - 30, HORIZON, GLASS.w + 60, GLASS.y + GLASS.h - HORIZON + 30]} color={EMBER.snow} at={0.08} offset={false} mode="snap" />
@@ -164,6 +166,15 @@ const DataCenterBeat: React.FC = () => {
 };
 
 // ---------------------------------------------------------------- the tag
+
+/** Where the tag's string ties on (the listing laptop's front-left corner), room px at the phone's rest (t < 0): S16's
+ *  loop un-build carries its tag (and string) onto O1's frame-0 tag. */
+export const o1TagStringFrom = (): Pt => {
+  const corner = LAP.deck[3];
+  return phonePoint(PH, corner[0] + 4, corner[1] - 6);
+};
+/** O1's front-plane matrix at time t (the phone, the hand, the tag): the loop's frame 0 is t < 0 (zoom 1.07). */
+export const o1FrontMat = (t: number): Mat => planes(t).front;
 
 /** The tag: complete in ink with its "$999" on frame 0 (and through the loop underlay), fills from 0.12; the ticker. */
 const Tag: React.FC<{t: number; dy: number}> = ({t, dy}) => {
@@ -216,7 +227,7 @@ export const O1Set: React.FC = () => {
   // the outside sits in the far plane: inside the room plane's group, undo the room and apply the far zoom
   const outside = (
     <XG m={mat.mul(mat.inv(P.room), P.far)}>
-      <Outside />
+      <O1Outside />
     </XG>
   );
   return (

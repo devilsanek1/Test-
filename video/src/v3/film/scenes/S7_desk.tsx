@@ -1,19 +1,22 @@
 // S7_desk (lane S7-S8, G5b): the home base's DESK set at S7's close (16.60-18.28), dressed to the approved pilot's level
 // (O1's desk world: docs/look/LIFE_AND_DENSITY.md "Approved bar"; docs/v3/density_plan_g5b.md §1 S7, overridden by
 // docs/v3/cozy_v2_application.md). Everything sits AROUND the locked board (the laptop at 420 in the lamp pool, the lamp
-// shade cut by the left edge, the see-inside bubble upper right on "your"; no window):
+// shade cut by the left edge, the see-inside bubble upper right on "your"):
 //   wall top     (above the caption band, y < 290) warm string lights swagged from the top edge, instant photos pegged on
 //                a cord, a pothos in a hanging pot, a small sea print, plaster ticks.
-//   wall low     (y 615-1000) a cork pinboard between the lamp and the bubble (photos, notes, the sea postcard, a ticket;
-//                nothing behind the bubble), a wall shelf cut by the right edge (books, a trailing pothos), the 2026 wall
-//                calendar, a socket with the lamp's plug.
+//   wall low     (y 615-1000) a cork pinboard between the lamp and the window (photos, notes, the sea postcard, a ticket),
+//                a leaf print, a socket with the lamp's plug; right of the pinboard O1'S WINDOW behind the laptop (fixer
+//                pass, G5b review: one back wall for the desk; scenes/desk_window.tsx): its sill on the desk's back edge,
+//                the frosted glass with the lit town and the snow, the dark data center's roof and sign cropped by the
+//                head (the calendar, the shelf and the postcard sit right of the window, off this frame, as in O1).
 //   desk back    a book stack with a pen cup, a candle in a jar (the flame flickers), the mug (steam), a small speaker.
 //   desk mid     headphones in the pool's rim, a plate of biscuits, glasses, sticky notes (one flutters at 16.7), the
 //                charger cable running into the laptop's right port (it leads the eye in).
 //   desk front   a spiral notebook and a pen cut by the left edge, letters, your phone face down cut by the bottom edge,
 //                O1's open planner cut by the bottom-right corner, wood grain, crumbs.
-//   Pip          on the desk right of the laptop (1.4x), watching it; turns up to the bubble a few frames before it pops,
-//                then rises on its toes (a small hop) on "your" (17.24).
+//   Pip          on the lamp pool in front of the laptop's right half (1.4x; fixer pass, G5b review: S8's cut-in spot,
+//                S8's (800, 1640) mapped back through the 3.33x cut-in), watching the screen; turns round to us a few
+//                frames before the bubble pops, then rises on its toes (a small hop) on "your" (17.24).
 // Cool share (cozy v2 §4, >= 10 %): the laptop's off screen in dcSide (S7.tsx), the dusk-blue notebook cover, the sea
 // print and postcard, the headphones, the pen cup, Pip's lilac. Dressing never takes the hero orange or the blue pop.
 // Every piece is built from the cut (no `at`): S7 opens on a hard cut, not on a draw-on.
@@ -25,6 +28,7 @@ import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
 import {Letters, Mittens, PhotoLine, StarLantern} from './O1_life';
+import {DeskWindow, S7_WINDOW} from './desk_window';
 import {ClosedPlanner, DuskRadio} from './S12_props';
 import {
   Book,
@@ -133,35 +137,6 @@ const Socket: React.FC<{x: number; y: number}> = ({x, y}) => {
   );
 };
 
-/** A postcard taped to the wall (a snowy hill under a dusk sky), its free corner lifting a hair in the room's air. */
-const TapedCard: React.FC<{x: number; y: number; w: number; h: number}> = ({x, y, w, h}) => {
-  const t = useTime();
-  const a = 5 + sway(t, 0.8, 4.6, 0.9);
-  return (
-    <XG m={mat.about(mat.rotate(a), x + w / 2, y + 4)}>
-      <Fill rect={[x, y, w, h]} color={EMBER.card} seed="s7/tc" />
-      <Fill rect={[x + 5, y + 5, w - 10, h * 0.6]} color={EMBER.sky} offset={false} />
-      <Fill d={`M${x + 5} ${y + h - 5}L${x + 5} ${y + h * 0.56}Q${x + w * 0.45} ${y + h * 0.3} ${x + w - 5} ${y + h * 0.58}L${x + w - 5} ${y + h - 5}Z`} color={EMBER.snow} offset={false} />
-      <Fill d={circle(x + w * 0.72, y + h * 0.26, 6)} color={EMBER.houseLit} offset={false} />
-      <Fill rect={[x + w * 0.36, y - 7, 26, 12]} color={EMBER.frost} offset={false} />
-      <Ink d={`M${x} ${y}h${w}v${h}h${-w}Z`} width={W.hair} />
-    </XG>
-  );
-};
-
-/** A sticky note stuck on the wall, a line of writing, its bottom edge lifting a hair. */
-const WallNote: React.FC<{x: number; y: number; s: number; rot: number; color: string; seed: string}> = ({x, y, s, rot, color, seed}) => {
-  const t = useTime();
-  const a = rot + sway(t, 0.7, 3.7, x * 0.01);
-  return (
-    <XG m={mat.about(mat.rotate(a), x + s / 2, y)}>
-      <Fill rect={[x, y, s, s]} color={color} seed={`${seed}/f`} />
-      <Ink d={`M${x} ${y}h${s}v${s}h${-s}Z`} width={W.hair} />
-      <Ink d={line(x + s * 0.15, y + s * 0.4, x + s * 0.8, y + s * 0.38, {over: [0, 0], seed: `${seed}/l1`}) + line(x + s * 0.15, y + s * 0.62, x + s * 0.6, y + s * 0.62, {over: [0, 0], seed: `${seed}/l2`})} width={W.hair} />
-    </XG>
-  );
-};
-
 /** A small ceramic dish of paper clips and coins (dusk-blue glaze, matched S12's: the cool share). */
 const ClipDish: React.FC<{x: number; y: number}> = ({x, y}) => {
   const dish = ellipse(x, y, 52, 18, {seed: 's7/dish'});
@@ -182,27 +157,20 @@ const ClipDish: React.FC<{x: number; y: number}> = ({x, y}) => {
   );
 };
 
+/** The window behind the desk (fixer pass, G5b review: the desk the film returns to seven times faces ONE window, O1's):
+ *  O1's window at 0.85x right of the pinboard (scenes/desk_window.tsx S7_WINDOW), its sill on the desk's back edge, the
+ *  head cropping the data center's roof and sign (dim behind the laptop and the bubble). O1 time from 6.2 (S8 goes on). */
+export const S7_WINDOW_O1_AT = 6.2;
+
 export const S7WallLow: React.FC = () => (
   <>
     <WallMarks x={196} y={880} w={110} h={70} n={2} seed="s7/wm3" />
-    <WallMarks x={470} y={640} w={80} h={160} n={2} seed="s7/wm4" />
-    {/* the pinboard between the lamp and the bubble; nothing pinned behind the bubble (x >= 560) */}
+    {/* the pinboard between the lamp and the window: a side piece, left of the window's reveal */}
     <Pinboard x={192} y={636} w={276} h={194} items={['photo', 'note', 'postcard', 'ticket', 'note', 'photo']} flutterAt={[NOTE_FLUTTER + 0.04, 0.96]} seed="s7/pin" ink={W.far} />
-    {/* a wall shelf cut by the right edge: books, and a pothos trailing over its lip (the leaf sway idle) */}
-    <WallShelf x={838} y={806} w={290} room={118} seed="s7/shelf" ink={W.far} />
-    <Plant x={872} y={806} kind="pothos" size={50} trail={118} amp={3} period={3.4} seed="s7/shelfpothos" ink={W.far} />
-    <Calendar x={952} y={866} w={100} from="2026" seed="s7/cal" ink={W.far} />
-    {/* three dusk-toned spines at the shelf's right end, cut by the edge (cozy v2 §4: the cool share) */}
-    <Book x={1032} y={806 - 92} w={20} h={92} color={EMBER.dc} seed="s7/dk1" ink={W.far} />
-    <Book x={1052} y={806 - 80} w={17} h={80} color={EMBER.skyLow} seed="s7/dk2" ink={W.far} />
-    <Book x={1069} y={806 - 98} w={22} h={98} color={EMBER.dcSide} seed="s7/dk3" ink={W.far} />
     <Socket x={268} y={948} />
-    {/* left of the pinboard, over the lamp's rod: a small leaf print; right, over the shelf: a taped postcard */}
+    {/* left of the pinboard, over the lamp's rod: a small leaf print */}
     <FramedPrint x={30} y={624} w={98} h={110} picture="leaf" seed="s7/print2" ink={W.far} />
-    <TapedCard x={958} y={618} w={94} h={62} />
-    {/* two sticky notes on the wall by the laptop's top-right corner (reminders) */}
-    <WallNote x={776} y={896} s={56} rot={-7} color={EMBER.core} seed="s7/wn1" />
-    <WallNote x={808} y={946} s={52} rot={6} color={EMBER.hl} seed="s7/wn2" />
+    <DeskWindow m={S7_WINDOW.m} glassTop={S7_WINDOW.glassTop} o1At={S7_WINDOW_O1_AT} />
   </>
 );
 
@@ -238,7 +206,7 @@ const Candle: React.FC<{x: number; y: number; w?: number; seed: string}> = ({x, 
   );
 };
 
-/** Behind the laptop: books + pen cup + candle left, the mug and a speaker right (the mug stays behind Pip). */
+/** Behind the laptop: books + pen cup + candle left, the mug and a speaker right. */
 export const S7DeskBack: React.FC = () => (
   <>
     <BookStack x={40} y={1086} w={156} n={3} seed="s7/stack" ink={W.far} />
@@ -249,7 +217,7 @@ export const S7DeskBack: React.FC = () => (
   </>
 );
 
-/** The mug (as G5 built it, moved right of Pip: it keeps steaming at the pool's right rim). */
+/** The mug (as G5 built it: it keeps steaming at the pool's right rim). */
 export const S7Mug: React.FC = () => <Mug x={912} top={1058} w={84} seed="s7/mug" />;
 
 // ---------------------------------------------------------------- the desk: mid
@@ -320,7 +288,7 @@ export const S7DeskMid: React.FC = () => (
     <Clementines x={352} y={1424} seed="s7/clem" />
     <DuskRadio x={944} y={1596} w={116} />
     <ClipDish x={708} y={1470} />
-    {/* the charger: from the right edge across the desk, under Pip, into the laptop's right port */}
+    {/* the charger: from the right edge across the desk into the laptop's right port */}
     <Cable points={[S7_PORT, [812, 1226], [900, 1258], [1004, 1246], [1130, 1292]]} plug width={7} color={EMBER.dcSide} />
     <Glasses x={962} y={1352} w={122} rot={-14} seed="s7/glasses" ink={W.far} />
     <StickyNotes x={842} y={1402} n={2} size={68} flutterAt={[NOTE_FLUTTER]} seed="s7/sticky" />
@@ -533,10 +501,11 @@ export const ScreenGlint: React.FC<{scr: [Pt, Pt, Pt, Pt]; at: number; dur?: num
 
 // ---------------------------------------------------------------- Pip
 
-const PIP = {x: 846, y: 1194, scale: 1.4};
+/** S8's Pip (800, 1640) mapped back through the cut-in (S8 = S7 x 3.33 about the laptop: 540, 1145 -> 540, 1080). */
+const PIP = {x: 620, y: 1306, scale: 1.4};
 /** "your" (17.24). */
 const YOUR = 17.24 - 16.6;
-/** Pip watches the laptop from behind the pool's rim (back view), then WHIPS ROUND to face us a few frames before the
+/** Pip watches the laptop's screen from the pool in front of it (back view), then WHIPS ROUND to face us a few frames before the
  *  bubble pops (17.07: it points the eye, as O1's turn at 0.92), wide-eyed and looking up-left at the bubble's spot,
  *  rises on its toes as it pops, and on "your" throws its trunk up toward the bubble (flipped 'trunk-up': up-left),
  *  holding it to the cut (S8 picks it up facing us). Flipped, so a positive look is screen-left in every pose. */
@@ -546,8 +515,8 @@ const PIP_KEYS: PipPoseKey[] = [
   {t: YOUR, pose: 'trunk-up', expression: 'wide'},
 ];
 const PIP_LOOK: LookKey[] = [
-  {t: -9, v: 0.55},
-  {t: 17.07 - 16.6, v: 0.85},
+  {t: -9, v: 0.12},
+  {t: 17.07 - 16.6, v: 0.5},
 ];
 
 export const S7Pip: React.FC = () => (

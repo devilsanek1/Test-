@@ -88,7 +88,7 @@ export const WorldText: React.FC<WorldTextProps> = ({
   useCaptionFont();
   const t = useTime();
   const e = useExit();
-  const id = useId().replace(/:/g, '');
+  const id = useId().replace(/[^a-zA-Z0-9]/g, '');
   const m: TextMode = mode ?? (at === undefined ? 'none' : 'pen');
   if (at !== undefined && t < at) return null;
   const w0 = textW(text, size, letterSpacing);

@@ -36,3 +36,4 @@ Next:
 - v2r new (BUILD.md command): PASS (0 fail, 2 warn: V2S2's out-of-bridge cut at f370 not f369, since the dark window is colour-matched to the
   plum bridge, f369 d=5.1; extra cut-like 9, 14, 24, 1248, 2330, 2336). Old script: FAIL cuts V2S2 (366) + V2S8 (1976).
 - Running: critic workflow (lenses v3 compat, v2r transitions, frame-0 geometry vs pixels, edge cases, docs) -> merge -> adversarial verify -> fixes.
+- Done: fixes in ffab363, report in report_QA.md (critic round cut short for budget by the orchestrator).

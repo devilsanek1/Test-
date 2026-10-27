@@ -1,0 +1,121 @@
+// K3 lettering + boards barrel (docs/v2/TREATMENT.md sections 5, 8 and 9 K3; API, per-shot use and swaps: ./README.md).
+// Import the palette module first in any entry. Every word comes from texts.ts; every letter goes through WorldText.
+//   import {GoogleBoard, HerBoard, wipeEdgeX, herWipe, NameTag, Fingerpost, NewsBox, Plaque} from '../kit/boards';
+// (The review compositions live in ./sheets.tsx and are registered by src/entry-v2r-boards.tsx; not exported here.)
+
+// ---- the lettering primitive and the one type scale
+export {TYPE, WorldText, textW, penAt, penDur, flowBaselines} from './WorldText';
+export type {TextMode, WorldTextProps, TextLine} from './WorldText';
+
+// ---- every word the objects carry (exact; never retype a line)
+export {TXT_TOLD_THE_BBC, TXT_NAME_TAG, TXT_PLATES, TXT_NEWS_BOX, TXT_PLAQUE, TXT_DEAL, TXT_GOOGLE, TXT_HER, TXT_SERVICE_DOOR} from './texts';
+
+// ---- the ONE enamel A-board, its four presets, geometry and motion helpers
+export {
+  StatementBoard,
+  BoardShadow,
+  DealBoard,
+  GoogleBoard,
+  HerBoard,
+  ToldTheBBCBoard,
+  boardFrame,
+  boardDy,
+  clackDy,
+  landDy,
+  CLACK,
+  LAND,
+  wipeEdgeX,
+  herWipe,
+  HER_WIPE_SEED,
+  WIPE_DUR,
+  menuSmudges,
+  lineExtent,
+  dealContent,
+  googleContent,
+  herContent,
+  bbcContent,
+  bbcBody,
+  DEAL_LAYOUT,
+  GOOGLE_LAYOUT,
+  HER_LAYOUT,
+  BBC_LAYOUT,
+  DEAL_T,
+  GOOGLE_T,
+  HER_T,
+  DEAL_GEOM,
+  B_GEOM,
+  BBC_GEOM,
+  S6_FACE,
+  S6_LEGS_Y1,
+  S2_LEGS_Y1,
+  BBC_FRAME,
+  BOARD_COLORS,
+  KEY_WEIGHT,
+  CREDIT_WEIGHT,
+  weightFor,
+  FRAME_SEED,
+  mixHex,
+} from './StatementBoard';
+export type {
+  BoardGeom,
+  BoardFrameOpts,
+  BoardLine,
+  BoardRule,
+  Wipe,
+  StatementBoardProps,
+  DealBoardProps,
+  GoogleBoardProps,
+  HerBoardProps,
+  ToldTheBBCBoardProps,
+} from './StatementBoard';
+
+// ---- the small lettered objects: the name tag, the fingerpost, the news box, the plaque, a door sign
+export {
+  PaperTag,
+  NameTag,
+  tagLayout,
+  TAG,
+  NAME_TAG_ROWS,
+  NAME_TAG_TO,
+  Fingerpost,
+  ArrowPlate,
+  SignPost,
+  plateBodySize,
+  POST,
+  NewsBox,
+  NEWS_BOX,
+  Plaque,
+  plaqueLayout,
+  plaqueBodySize,
+  PLAQUE_MOUNT,
+  PLAQUE_COPING_Y,
+  DoorSign,
+  doorSignLayout,
+  SMALL_CLOCK,
+  SMALL_COLORS,
+  MISREG,
+  tone,
+  EM,
+  inkTop,
+  inkBottom,
+  popK,
+  offK,
+  edgeInk,
+  insetPoly,
+  circlePath,
+} from './small';
+export type {
+  TagRow,
+  TagLayout,
+  PaperTagProps,
+  NameTagProps,
+  PlateText,
+  ArrowPlateProps,
+  PostProps,
+  FingerpostProps,
+  NewsBoxProps,
+  PlaqueLayout,
+  PlaqueProps,
+  DoorSignLayout,
+  DoorSignProps,
+} from './small';

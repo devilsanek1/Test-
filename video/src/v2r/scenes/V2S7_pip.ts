@@ -1,6 +1,7 @@
 // V2S7_pip.ts (lane L5): the maths V2S6 and V2S7 share, so both sides of the SUN2 match-cut (28.06) agree.
 //   1. S7's camera: the ONE 4 % story push about B's centre (map S7.camera.push, 28.40-30.04, ease in-out) and a
-//      float of S7_FLOAT_VX px/s that is zero at the pose time 30.04 (B exact). The sun (SUN2) is screen-fixed.
+//      gentle 2D float (translation only, STYLE.md section 6: legs turning back within +-12 px of home, ~5-12 px/s)
+//      that passes through zero at the pose time 30.04 (B exact). The sun (SUN2) is screen-fixed.
 //   2. Pip's hop across the cut: it leaves S6's corner post at 27.95 up-left, reaches the top of its arc ON the cut
 //      (feet y <= 720 for all of S6: >= 200 px from the deal board's clause), and in S7 drops onto the board bollard
 //      (vertical speed 0 at the cut, like a ball at its apex), landing at S7_PIP_LAND. One screen-space path.
@@ -10,14 +11,17 @@ import {B, BOARD_BOLLARD, S6, S7, zoomAt, type XY} from '../world/map';
 export const S6_T0 = 24.0;
 export const S7_T0 = 28.06;
 
-/** The float (px/s, world drifting right = the camera travels west, like S6's truck and S8's), zero at 30.04. */
-export const S7_FLOAT_VX = 9;
+/** The float: dx = AX sin(WX (T - 30.04)), dy = AY sin(WY (T - 30.04)). Zero at 30.04; |dx| <= 12, |dy| <= 5 (home
+ *  +-12 px); speed ~12 px/s at 30.04, never 0 (the two legs turn at different times). Over 28.06-33.16: dx -11.9 ->
+ *  +12 (31.89) -> +5.6, dy -2.7 -> -5 (28.83) -> +5 (31.25) -> -4. */
+export const S7_FLOAT = {ax: 12, wx: 0.85, ay: 5, wy: 1.3} as const;
 export const S7_POSE_T = 30.04;
 
-/** S7 camera at film time T: zoom z about B's centre, then the float (dx). World coords = the 30.04 pose. */
+/** S7 camera at film time T: zoom z about B's centre, then the float (dx, dy). World coords = the 30.04 pose. */
 export function s7CamAt(T: number): {z: number; ax: number; ay: number; dx: number; dy: number} {
   const k = S7.camera.push;
-  return {z: zoomAt(k, T), ax: k.anchor.x, ay: k.anchor.y, dx: S7_FLOAT_VX * (T - S7_POSE_T), dy: 0};
+  const u = T - S7_POSE_T;
+  return {z: zoomAt(k, T), ax: k.anchor.x, ay: k.anchor.y, dx: S7_FLOAT.ax * Math.sin(S7_FLOAT.wx * u), dy: S7_FLOAT.ay * Math.sin(S7_FLOAT.wy * u)};
 }
 
 /** A world point (S7's 30.04 pose) on screen at film time T. */
@@ -40,7 +44,7 @@ export const PIP_HOP = {
   /** The arc's top, ON the cut: right of S7's board frame (x <= 642 at 28.06), above the canopy letters (y >= 768). */
   apex: {x: 732, y: 702} as XY,
   /** Rise of the S6 half above the straight line (px). */
-  rise: 26,
+  rise: 16,
 };
 /** Where S7's Pip lands: the board bollard on screen at the landing time. */
 export const S7_PIP_LAND: XY = s7Screen(BOARD_BOLLARD, PIP_HOP.t1);

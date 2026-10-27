@@ -3,7 +3,7 @@
 Every L4 builder, fixer and critic reads THIS file in full, plus `COMMON.md`, `brief_L4.md`, `TREATMENT.md` (§1, §2
 palette + line, §3 cast + Pip, §5 row S5 + its bottom third + its texts, §6 the scale moment, §8 fairness, §9 acceptance
 bar), `docs/look/CINEMATIC_GUIDE.md` (S5 + "Scale cues"), `docs/look/LIFE_AND_DENSITY.md` §0-1 and the kit READMEs
-(`src/v2r/kit/dc`, `cast`, `pip`). When `docs/v2/STYLE.md` lands it outranks this file on style (pull before you start).
+(`src/v2r/kit/dc`, `cast`, `pip`). `docs/v2/STYLE.md` (the film's definitive style page) outranks this file on style: read its §1-9 too.
 Where this file decides something the treatment leaves open, it is the lane's call, made here once.
 
 ## 0. The bar, and where the baseline stands
@@ -115,8 +115,11 @@ lamppost base cut by the bottom-right").** Make it a FIELD MADE OF THINGS:
   viewpoint sign without legible words, lamp bases, drain grates, pigeons (a few take off in the hold);
 - the near edge: big near masses cut by the bottom (a hedge / tulip bed rim / the tree's roots / the lamppost base) so the
   floor has a size gradient (near things 2-3x the rail people);
-- life in the hold: walkers, the stroller rolls, the dog trots, pigeons, petals, the baskets sway, a jogger; nothing over
-  the pair, the plaque or the Pentagon's left 2/3.
+- life in the hold: walkers (0.7-1.1 body heights/s, 12 drawings/s), the stroller rolls, the dog trots, pigeons, petals,
+  the baskets nod, a jogger; nothing over the pair, the plaque or the Pentagon's left 2/3. The scale hold's life (CG cue 11,
+  STYLE §5): 3-4 kinds of mover on 3 speed tiers in the SKY (a V of birds, gulls, clouds 0-6 px/s) and BY THE FIGURES (the
+  terrace), never 1 s still, <= ~2 % of the frame, never competing with the pair and the landmark; NOTHING moves inside
+  the far city; the mid plane gets at most a few slow tiny movers (joggers, a car on the boulevard), never at the building.
 
 **3b. The scale checklist (the SCALE critic reads it on the end frame at full size AND at 216 px):** nothing ends inside
 the frame (every band runs past both side edges behind the side frames; something is cut by all four edges) · 5-7
@@ -146,7 +149,7 @@ never 1 s still. Then, at phone size: does the world keep going, and is it alive
   pigeon or two) that DROP OUT down-left as the crane rises (near things move fastest; gone by p ~0.35), plus an optional
   blossom fringe in the top-left gutter (y <= 240) that leaves LEFT by p ~0.12. Life in the hold: Pip lands and looks up,
   the calendar flip, the 4-frame burst, petals drifting down through the frame below y 600, the stranger turns a page,
-  pigeons peck, the dapple's flecks shift with the leaves (shape changes, never opacity), a far jogger crosses the slot.
+  pigeons peck, a far jogger crosses the slot, gulls. The dapple is STATIC (STYLE §3: no boil, shimmer or visible sway).
 - **Sizes:** the stranger 150 px (feet to head top; seated), Pip 108 px: both are the legibility floor's carriers here.
 
 ## 5. The move (0.75-2.85): one breath out, never menace
