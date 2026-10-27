@@ -2,6 +2,16 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Snapshot 2026-10-27 22:45 UTC: the owner's depth notes come first
+
+The owner on the G4 look clip: the subject blurs with the background (the Google wing melts into the far city), no distance effect, no
+perspective, the steps have no depth; shadows better; research GitHub libraries for more natural effects; add a few particles; "let's address
+those first, distill and generalize into the production pipeline so the quality compounds, and show me this scene once again". Done/doing:
+playbook rule DEPTH AND SEPARATION + DIRECTION rule 2 (committed); L2-L6 PAUSED cleanly (handovers); L1 does S1's depth pass by hand now (atmospheric
+perspective on the far city, the wing separated, the steps receding to a vanishing point) with a slot for particles; local workflow
+`wf_5d776523-d28`: library scout + depth analyst -> builder (lib/depth.ts, lib/particles.tsx, scripts/qa/check_depth.py, DEPTH.md, CRAFT §f,
+PIPELINE_V2 gates, v2 brief sections) -> adversarial critic. Then L1 adds the particles and re-renders the look clip (v3) for the owner.
+
 ## Snapshot 2026-10-27 22:25 UTC: look APPROVED, all lanes conforming
 
 The owner approved the G4 look clip ("okay good continue"; `deliverables/v2/v2r_G4_look.mp4`). Running now, each ONE agent + ONE critic round:
