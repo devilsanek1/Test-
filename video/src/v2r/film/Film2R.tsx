@@ -70,15 +70,21 @@ export const FILM2R_CREDITS: Film2RCredit[] = [{from: 33.16, to: 36.54, text: SO
 /** The sound lane's cue file (optional): a bare [{src, t, gain}] array or {sfx, audio}. */
 type CueFile = FilmSfx[] | {sfx?: FilmSfx[]; audio?: string};
 
-/** Reads public/v2r/cues.json when it exists (no file = voice only, no cues). */
+/** The public files (names relative to public/), or null where the API is unavailable. */
+function publicNames(): Set<string> | null {
+  try {
+    return new Set(getStaticFiles().map((f) => f.name));
+  } catch {
+    return null;
+  }
+}
+
+/** Reads public/v2r/cues.json when it exists (no file = voice only, no cues). Cues whose file is not in public/ yet
+ *  (the sound lane mid-work) are skipped, and a missing `audio` falls back to the voice, so a half-written cue sheet
+ *  never breaks a render. */
 function useCues(): {sfx: FilmSfx[]; audio?: string} {
-  const [has] = useState(() => {
-    try {
-      return getStaticFiles().some((f) => f.name === FILM2R_CUES);
-    } catch {
-      return false;
-    }
-  });
+  const [names] = useState(publicNames);
+  const has = names?.has(FILM2R_CUES) ?? false;
   const [handle] = useState(() => (has ? delayRender('v2r cues.json') : null));
   const [cues, setCues] = useState<{sfx: FilmSfx[]; audio?: string}>({sfx: []});
   useEffect(() => {
@@ -86,11 +92,13 @@ function useCues(): {sfx: FilmSfx[]; audio?: string} {
     fetch(staticFile(FILM2R_CUES))
       .then((r) => r.json() as Promise<CueFile>)
       .then((j) => {
-        setCues(Array.isArray(j) ? {sfx: j} : {sfx: j.sfx ?? [], audio: j.audio});
+        const ok = (src?: string) => !!src && (!names || names.has(src));
+        const raw = Array.isArray(j) ? {sfx: j} : {sfx: j.sfx ?? [], audio: j.audio};
+        setCues({sfx: raw.sfx.filter((c) => ok(c.src)), audio: ok(raw.audio) ? raw.audio : undefined});
         continueRender(handle);
       })
       .catch((err) => cancelRender(err));
-  }, [handle]);
+  }, [handle, names]);
   return cues;
 }
 

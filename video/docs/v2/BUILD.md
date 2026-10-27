@@ -14,7 +14,7 @@ The direction is `TREATMENT.md` (read it in full); this page is only the plumbin
 | `src/v2r/scenes/index.ts` + `src/v2r/film/Placeholder.tsx` | engine | the registry; the palette-card placeholder every shot starts as. |
 | `src/v2r/scenes/V2S<n>.tsx` + `V2S<n>_*.tsx` | its lane (L1-L6) | the shot. Replace the placeholder file whole. |
 | `src/v2r/world/map.ts` K2 · `kit/cast` K4 · `kit/pip` K5 · `kit/canal` K6 · `kit/dc` K7 · `kit/boards` K3 (L5) | kit agents | shared spots / scale sheet and the film's own kit (each with its `src/entry-v2r-<kit>.tsx`). |
-| `audio/v2r/**`, `public/v2r/**` (not the heard words) | sound K9 / L7 | `public/v2r/cues.json`: `[{src, t, gain}]` or `{"sfx": [...], "audio": "v2r/mix.wav"}` (`audio` replaces the voice: the final mix). |
+| `audio/v2r/**`, `public/v2r/**` (not the heard words) | sound K9 / L7 | `public/v2r/cues.json`: `[{src, t, gain}]` or `{"sfx": [...], "audio": "v2r/mix.wav"}` (`audio` replaces the voice: the final mix; cues whose file is not in public/ yet are skipped). |
 
 Transitions (scenes.json): S1 cut (film start) · S2 `push-through` from W (860,700) into her dark window (200,795), zoom 12, plum
 bridge, `inkComp` 0.6, dur 0.30 (out-leg 5.96-6.05, bridge 6.05-6.15, in-leg 6.15-6.26) · S3 `matchcut` (W2) · S4 cut (Pip's leap) · S5
