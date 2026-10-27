@@ -105,6 +105,8 @@ export type StreetLife = {
   flutterAt?: number[];
   /** The bell over the door rings (the OPEN sign jolts with it). */
   bellAt?: number[];
+  /** The raised phone's camera flash: a flat star behind the phone for 2 frames at each time (S4: "Laptops"). */
+  flashAt?: number[];
   /** The row of backs (row order, left to right) and a person squeezing in from below: index -> time. */
   row?: BackRowPerson[];
   rowN?: number;
@@ -434,6 +436,36 @@ const Planter: React.FC = () => (
   </>
 );
 
+/** The raised phone's camera end (row back 2, after its lean): where its flash bursts. */
+const PHONE_AT: Pt = [694, 1346];
+
+/** A camera flash over the raised phone's top: a flat warm 8-point star with a white core, shown for 2 frames (no
+ *  fade; warm, so it reads against the white card behind it). */
+const PhoneFlash: React.FC<{at?: number[]}> = ({at = []}) => {
+  const t = useTime();
+  const hit = at.find((a) => t >= a && t < a + 2 / 60 + 1e-6);
+  if (hit === undefined) return null;
+  const [cx, cy] = PHONE_AT;
+  const big = t - hit < 1 / 60 ? 1 : 0.78;
+  const star = (rLong: number, rShort: number, r0: number, half: number) => {
+    let d = '';
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+      const r1 = (i % 2 ? rShort : rLong) * big;
+      const p = (aa: number, rr: number) => `${(cx + Math.cos(aa) * rr).toFixed(1)} ${(cy + Math.sin(aa) * rr).toFixed(1)}`;
+      d += `M${p(a - half, r0 * big)}L${p(a, r1)}L${p(a + half, r0 * big)}Z`;
+    }
+    return d;
+  };
+  return (
+    <>
+      <path d={star(78, 44, 18, 0.2)} fill={EMBER.houseLit} />
+      <circle cx={cx} cy={cy} r={20 * big} fill={EMBER.houseLit} />
+      <circle cx={cx} cy={cy} r={12 * big} fill={EMBER.white} />
+    </>
+  );
+};
+
 // ---------------------------------------------------------------- the set
 
 export type S4StreetProps = {
@@ -473,6 +505,7 @@ export const S4Street: React.FC<S4StreetProps> = ({life, children}) => {
         <BackRow x0={920} x1={1240} top={1440} head={112} n={1} seed="s4st/sq" snow lookX={560} people={life.squeeze ? [life.squeeze] : undefined} riseAt={{0: life.squeezeAt}} />
       ) : null}
       <BackRow x0={-50} x1={1130} top={1462} head={116} n={life.rowN ?? 5} seed="s4st/row" snow lookX={560} people={life.row} riseAt={life.riseAt} />
+      <PhoneFlash at={life.flashAt} />
       <SnowLayers band={BAND} seed="s4st/snow" layers={['far', 'mid', 'near']} density={0.9} />
     </>
   );

@@ -21,9 +21,11 @@ import {blob, circle, ellipse, line, roundRect, textLines} from '../../../lib/sk
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
+import {Letters, Mittens, O1GlassLife, PhotoLine, Planner, Radio, StarLantern} from './O1_life';
 import {
   b,
   BookStack,
+  Calendar,
   Cable,
   DeskGrain,
   EMBER,
@@ -120,7 +122,8 @@ export const O1NearLife: React.FC = () => {
       <LampPost3 x={LAMP_X} y={1132} h={130} arm="top" seed="o1/lamp" at={0.04} ink={0} />
       <Stroller t={t} t0={2.9} t1={9} x0={LAMP_X + 63} x1={LAMP_X - 120} y={1040} h={30} coat={EMBER.beam} kind="dog" />
       <Stroller t={t} t0={3.2} t1={9} x0={LAMP_X - 115} x1={LAMP_X + 59} y={1042} h={28} coat={EMBER.skyLow} hair={EMBER.books[3]} />
-      <SnowLayers x={180} y={630} w={720} h={430} band={null} seed="o1/snowL" at={0.1} wind={-6} />
+      <O1GlassLife />
+      <SnowLayers x={180} y={630} w={720} h={430} band={null} seed="o1/snowL" at={0.1} wind={-6} density={1.5} />
     </>
   );
 };
@@ -149,6 +152,9 @@ export const O1Wall: React.FC = () => (
     <WallMarks x={952} y={940} w={110} h={120} n={2} seed="o1/wm2" at={-0.1} />
     <HangingPlant x={322} y={128} at={-0.13} />
     <FramedPrint x={430} y={36} w={86} h={104} picture="sun" seed="o1/print2" at={-0.11} ink={W.far} />
+    {/* G5b+: instant photos pegged on a cord (above the band) and a lit paper star hung from the slope */}
+    <PhotoLine x0={180} y0={188} x1={284} y1={198} sag={12} at={-0.1} />
+    <StarLantern x={942} hookY={-12} cy={70} r={32} at={-0.09} litAt={0.46} />
     {/* warm string lights under the attic beam (above the caption band), blinking on one by one 0.3-1.0 */}
     <StringLights3 points={[[574, 8], [744, 96], [904, 180], [1012, 234]]} sag={20} n={11} r={8} onAt={0.3} onDur={0.7} seed="o1/lights" at={-0.08} />
     {/* the shelf: a trailing pothos over the lower board's lip (the Nook's own pot plant moved off this board) */}
@@ -156,6 +162,7 @@ export const O1Wall: React.FC = () => (
     {/* right of the window: a print and a postcard (the right rail carries dressing only) */}
     <FramedPrint x={956} y={644} w={108} h={146} picture="mountain" seed="o1/print" at={-0.12} ink={W.far} />
     <Postcard x={962} y={826} w={92} h={64} at={-0.06} />
+    <Calendar x={964} y={918} w={92} from="2026" seed="o1/cal" at={-0.07} ink={W.far} />
     {/* the sill: a succulent between the lamp shade and its rod */}
     <Plant x={292} y={1060} kind="succulent" size={40} seed="o1/sillsu" at={-0.08} ink={W.far} />
   </>
@@ -184,13 +191,15 @@ const PIP_X = 866;
 const PIP_Y = 1060;
 const PIP_KEYS: PipPoseKey[] = [
   {t: -9, pose: 'sit-back'},
+  {t: 0.92, pose: 'sit-front'}, // "Buying a laptop soon?": it turns round to you...
+  {t: 1.56, pose: 'sit-back'}, // ...and back to the phone before the first stick
   {t: 4.16, pose: 'ears-cover'},
   {t: 4.96, pose: 'sit-back'},
 ];
 const PIP_LOOK: LookKey[] = [
   {t: -9, v: -0.5}, // down-left at the phone and its $999
-  {t: 0.98, v: -0.05}, // a glance at the building as its sign pops... (after the colour, a beat late)
-  {t: 1.44, v: -0.55}, // ...and back to the tag
+  {t: 0.92, v: 0.15}, // turned round: looks up at you
+  {t: 1.56, v: -0.55}, // back to the tag
   {t: LAUNCH[0] + 0.06, v: -0.95}, // follows the first stick up the glass
   {t: LAUNCH[1] + 0.04, v: -0.4},
   {t: LAUNCH[1] + 0.12, v: -0.95},
@@ -287,12 +296,17 @@ export const O1Desk: React.FC = () => (
     {/* the lamp's cable runs off the left edge under the biscuits */}
     <Cable points={[[332, 1190], [300, 1300], [190, 1326], [70, 1298], [-40, 1334]]} width={6} color={EMBER.anchor} at={-0.04} />
     <Headphones x={128} y={1238} w={150} seed="o1/hp" at={-0.1} ink={W.far} />
+    <Mittens x={30} y={1330} at={-0.09} />
     <Biscuits x={150} y={1404} at={-0.08} />
+    <Letters x={282} y={1488} at={-0.07} />
     <Plant x={58} y={1540} kind="cactus" size={78} seed="o1/cactus" at={-0.07} ink={W.far} />
     {/* back right: two lying books with a pen cup, a candle in a jar in front of them */}
     <BookStack x={902} y={1194} w={134} n={2} seed="o1/stack" at={-0.1} ink={W.far} />
     <PenCup x={1048} y={1196} w={54} seed="o1/pens" at={-0.08} ink={W.far} />
     <Candle x={986} y={1336} at={-0.04} litAt={0.62} />
+    <Radio x={1012} y={1424} w={112} at={-0.06} />
+    {/* front right: an open planner cut by the corner, under the hand */}
+    <Planner x={786} y={1690} at={-0.05} />
     {/* front right, beside the thumb: glasses and two sticky notes */}
     <Glasses x={890} y={1450} w={116} rot={-12} seed="o1/glasses" at={-0.06} ink={W.far} />
     <StickyNotes x={872} y={1558} n={2} size={74} seed="o1/sticky" at={-0.04} />
