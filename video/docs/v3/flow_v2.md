@@ -90,7 +90,7 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
 |---|---|---|---|---|---|
 | SQA | tag (each tick) -> DC 4.04 | sticks (small), hand, Pip | room, town, snow | nook; tag rim (left) while it ticks | "its price goes up each time a stick flies to the AI data center" |
 | SQB | line -> doodles -> hook, +9.7% | tag, Pip, dim phone | wall, notes, window strip | nook, lamp off left; card unlit; pins cast down-right | "the same money bought more for 20 years; now +9.7%" |
-| SQC | listing laptop -> stick | tag, Pip, hand | room, DC calm | nook; the stick's warm rim (upper left) | "your laptop runs on that stick" |
+| SQC | listing laptop -> stick | tag, Pip, hand | room, DC calm | nook; the stick's warm rim (on its lamp side, left; CRAFT §d.8) | "your laptop runs on that stick" |
 | SQD | stick -> DC -> mountain | streams, 2 trucks on the road | town, clouds, birds, snow | street; pile tops a step lighter; cold rim on the summit stick | "one of a mountain of sticks by the data center" |
 | SQE | truck; van + crate; 5x; hop + tag; BETTER van; flip + trucks | waiting vans, workers, guard, Pip, tag | street, lamps, walker + dog, steam, town, DC | street + the gate's pool as THE light; van unlit until 25.72 | "their trucks first; one crate, 5x; your price up; the better one stuck; 2027 tighter" |
 | SQF | DC sign -> tag | Pip | window view | nook on the tag: rim left, form shade right third | "the data center ends up on the price tag" |
