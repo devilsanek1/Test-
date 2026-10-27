@@ -9,12 +9,14 @@ import React from 'react';
 import {S3Boat} from './V2S3_nboat';
 import {S3NearWater, S3Ground, S3LampFoot} from './V2S3_nground';
 import {S3HeadBacks} from './V2S3_nfolk';
+import {S3Dress} from './V2S3_ndress';
 
 export const S3Near: React.FC = () => (
   <>
     <S3NearWater />
     <S3Boat />
     <S3Ground />
+    <S3Dress />
     <S3HeadBacks />
     <S3LampFoot />
   </>

@@ -11,7 +11,8 @@ import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime} from '../../lib/time';
 import {line, ellipse as ellipseInk} from '../../lib/sketch';
-import {Batch, Paint, P, rng, frac, ovalPath, leafPath, lerp, shadowInto} from '../kit/canal/core';
+import {Batch, Paint, P, rng, frac, ovalPath, leafPath, lerp} from '../kit/canal/core';
+import {groundShadow} from './V2S3_ndress';
 import type {Pt} from '../kit/canal/core';
 import {NB, boatBob, ringPath, Levels} from './V2S3_nboat';
 
@@ -30,7 +31,6 @@ export const NG = {
   lampX: 912,
 } as const;
 
-const SUN: Pt = [96, 652];
 const LEAF = [CM.leafGold, CM.leafRust, CM.coatMustard, CM.leafGold, CM.brick];
 
 // ---------------------------------------------------------------- the static ground
@@ -136,7 +136,7 @@ function pavingInto(L: Levels) {
   tints.ink(joints, 2, CM.line, 0.12);
   tints.ink(cracks, 1.2, CM.line);
   // the drain grate (perspective trapezoid, iron frame, slots)
-  const dg = {x: 648, y: 1716, w: 92, h: 30};
+  const dg = {x: 404, y: 1774, w: 92, h: 30};
   L.at(3).poly(CM.paneUnlit, [[dg.x - dg.w / 2 - 6, dg.y - 4], [dg.x + dg.w / 2 + 6, dg.y - 4], [dg.x + dg.w / 2 + 9, dg.y + dg.h + 4], [dg.x - dg.w / 2 - 9, dg.y + dg.h + 4]]);
   const gr = L.at(4);
   gr.poly(CM.stoneShade, [[dg.x - dg.w / 2, dg.y], [dg.x + dg.w / 2, dg.y], [dg.x + dg.w / 2 + 3, dg.y + dg.h], [dg.x - dg.w / 2 - 3, dg.y + dg.h]]);
@@ -176,7 +176,7 @@ function lampInto(L: Levels) {
   const top = 1222;
   const col = CM.anchor;
   // its long shadow on the paving (to the right, away from the low sun)
-  shadowInto(L.at(0), x + 14, 1905, 40, 120, SUN, CM.stoneShade, 0.5);
+  groundShadow(L.at(0), x - 30, x + 30, 1930, 190, 30);
   const b = L.at(1);
   // plinth: base block, a moulding, the fluted drum, a collar
   b.poly(col, [[x - 44, 2030], [x + 44, 2030], [x + 40, 1952], [x - 40, 1952]]);
