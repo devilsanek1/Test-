@@ -17,7 +17,7 @@ import React from 'react';
 import {CM, INK_PX} from '../../palette';
 import {useTime} from '../../../lib/time';
 import {wire as wirePath, wirePoint} from '../../../lib/sketch';
-import {puffs, windowLit, twinkle, bob} from '../../../v3/film/kit/idle';
+import {puffs, windowLit, twinkle, bob} from '../../../lib/idle';
 import {Batch, Paint, P, Pt, r1, rand, rng, ovalPath, leafPath, lobes, clamp01, frac, ease01, lerp} from './core';
 import {CastSlot, PersonSlot, Pose} from './slots';
 import {tiered, tieredAll} from '../tiers';

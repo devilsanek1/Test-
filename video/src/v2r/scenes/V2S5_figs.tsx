@@ -1,34 +1,35 @@
-// V2S5_figs.tsx (lane L4): the S5 figures. START coords (drawn through the deck's start map until the swap): the
-// stranger reading an open newspaper on the bench, Pip landing beside them out of the sun's direction, looking up at
-// the calendar sun on "April". END coords (from the swap, in the deck plane): the same two, tiny, at the balustrade;
-// Pip leaps up-right at 23.90 (the cut on action into S6).
+// V2S5_figs.tsx (lane L4): the S5 figures, tier B (the scale anchors; conform_L4 §1, §5; THROUGHLINE §3-4). START coords
+// (drawn through the deck's start map until the swap): the stranger, a small full figure reading an open newspaper on the
+// bench, and Pip SEATED on the backrest beside them from the first frame (S5 opens out of the sun by a push-through: no
+// arrival hop, no landing). 0.21 "April": Pip looks up at the slot's blossom (its ONE reaction), then settles to watch
+// the view; the stranger turns a page once (0.60). END coords (from the swap behind the lamppost wipe, in the deck
+// plane): the same two, tiny, at the balustrade; Pip stays put (no leap): S5's blossom-tree Wiper covers it ~23.81 and
+// S6's Pip appears at the deal board's foot (360, 1410) in the same column.
 import React from 'react';
 import {Stranger} from '../kit/cast';
 import {PipTrack} from '../kit/pip';
-import {SUN1} from '../world/map';
 import {FIG, T5, DECK} from './V2S5_rig';
 
-/** Scene times. */
-const LAND = 0.15; // Pip seated by 20.70
-const LOOK = T5.april; // 20.76 "April"
+/** Scene times: "April" 0.21 (heard 20.76); the look-up returns by ~0.9. */
+const LOOK = T5.april;
+/** Where Pip looks on "April": the slot trees' tops bursting into blossom (START coords). */
+const BLOSSOM: [number, number] = [330, 885];
 
 export const FiguresStart: React.FC = () => {
   const s = FIG.start.stranger;
   const pip = FIG.start.pip;
   return (
     <>
-      <Stranger x={s.x} y={s.feetY - 50} h={s.h - 50} turnPageAt={[1.05, 2.4]} seed="s5/stranger" />
+      <Stranger x={s.x} y={s.feetY - 50} h={s.h - 50} turnPageAt={[0.6]} seed="s5/stranger" />
       <PipTrack
-        x={292}
-        y={700}
+        x={pip.x}
+        y={pip.y}
         size={FIG.start.pipSize}
         facing="back"
         seed="s5pip"
         keys={[
-          {t: -0.12, hop: {to: [pip.x, pip.y], dur: 0.27, height: 40, style: 'tuck'}},
-          {t: LAND + 0.02, pose: 'sit', dur: 0.12},
-          {t: LOOK - 0.04, pose: 'lookUp', dur: 0.14, target: [SUN1.x, SUN1.y]},
-          {t: T5.flip[1] + 0.25, pose: 'sit', dur: 0.25, target: null},
+          {t: LOOK - 0.06, pose: 'lookUp', dur: 0.14, target: BLOSSOM},
+          {t: 0.7, pose: 'sit', dur: 0.25, target: null},
         ]}
       />
     </>
@@ -41,14 +42,7 @@ export const FiguresEnd: React.FC = () => {
   return (
     <>
       <Stranger x={s.x} y={s.feetY - 50 / DECK.k} h={(s.h * DECK.k - 50) / DECK.k} seed="s5/stranger" />
-      <PipTrack
-        x={pip[0]}
-        y={pip[1]}
-        size={FIG.end.pipSize}
-        facing="back"
-        seed="s5pip"
-        keys={[{t: T5.pipLeap, hop: {to: [560, 980], dur: 0.36, height: 90, style: 'leap'}}]}
-      />
+      <PipTrack x={pip[0]} y={pip[1]} size={FIG.end.pipSize} facing="back" seed="s5pip" keys={[]} />
     </>
   );
 };

@@ -10,7 +10,7 @@
 // one phase. Feet are planted through stance (the foot moves back under the hip at the walking speed).
 // Geometry is built once per drawing at a canonical 170 px and placed with a scale (h / 170); ink widths are given in
 // SCREEN px and divided by the scale, so every size has the same model sheet and the depth ladder's line weight.
-// Colours: CM tokens only; ink CM.ink only (thin coloured details are fills). Nothing fades: pops are pen draw-ons
+// Colours: CM tokens only; each line its own fill's deep shade under the clean pen (thin coloured details are fills). Nothing fades: pops are pen draw-ons
 // and snap fills; the un-build is the engine's (one ExitSync per figure).
 import React, {useId} from 'react';
 import {Fill} from '../../lib/Fill';
@@ -511,7 +511,12 @@ export const FigDraw: React.FC<FigDrawProps> = ({parts, inkPx, scale, at, inkDur
   const out: React.ReactNode[] = [];
   const defs: React.ReactNode[] = [];
   const off: [number, number] | false = offset === false ? false : [offset[0] / scale, offset[1] / scale];
+  // each line is its own fill's deep shade (CRAFT §c: the object's own shade, never one near-black ink): a part with
+  // no fill of its own (a seam, the bun's outer arc) takes the fill it sits on; the bare outlines take the paper's
+  let lastFill: string = CM.ghostPaper;
   parts.forEach((p, i) => {
+    const tone = p.fill ?? lastFill;
+    if (p.fill) lastFill = p.fill;
     if (!knockout && p.d && p.fill) {
       out.push(<Fill key={`f${p.k}`} d={p.d} color={p.fill} at={fillAt} mode="snap" offset={p.exact || off === false ? false : off} seed={`${seed}/${p.k}`} />);
     }
@@ -522,6 +527,7 @@ export const FigDraw: React.FC<FigDrawProps> = ({parts, inkPx, scale, at, inkDur
           d={p.ink}
           width={(inkPx * (p.w ?? 1)) / scale}
           color={CM.ink}
+          tone={knockout ? CM.ghostPaper : tone}
           at={at}
           order="all"
           pace="free"
@@ -591,6 +597,9 @@ export type RowFigureProps = {
   offset?: [number, number] | false;
   /** Scale of the default misregistration's x part (the row's ghosts keep it small: their gaps are x). */
   misregX?: number;
+  /** Frame 0's draw-on (instead of a pop): the fills are there (pale until the flood), the outline draws on as ONE
+   *  stroke (every part at once) from `at` over `dur`. */
+  draw?: {at: number; dur: number};
   seed: string;
   /** Inside a parent's ExitSync already. */
   noSync?: boolean;
@@ -598,7 +607,7 @@ export type RowFigureProps = {
 
 export const POP = {outlineS: 0.1, fillDelayS: 2 / 60, settleS: 4 / 60, settleFrom: 1.06} as const;
 
-export const RowFigure: React.FC<RowFigureProps> = ({spec, x, y, h, step, stride = 1, turn = 0, inkPx, at, knockout, offset, misregX = 1, seed, noSync}) => {
+export const RowFigure: React.FC<RowFigureProps> = ({spec, x, y, h, step, stride = 1, turn = 0, inkPx, at, knockout, offset, misregX = 1, draw, seed, noSync}) => {
   const t = useTime();
   if (at !== undefined && t < at) return null;
   const sq = Math.round(step * 100) / 100;
@@ -614,7 +623,7 @@ export const RowFigure: React.FC<RowFigureProps> = ({spec, x, y, h, step, stride
   const off = offset ?? misreg(h, seed, misregX);
   const g = (
     <XG m={mat.compose(mat.translate(x, y), mat.scale(s, s))}>
-      <FigDraw parts={parts} inkPx={inkPx} scale={s} at={at} inkDur={POP.outlineS} fillAt={fillAt} knockout={knockout} offset={off} seed={seed} />
+      <FigDraw parts={parts} inkPx={inkPx} scale={s} at={draw ? draw.at : at} inkDur={draw ? draw.dur : POP.outlineS} fillAt={fillAt} knockout={knockout} offset={off} seed={seed} />
     </XG>
   );
   return noSync ? g : <ExitSync seed={`fig/${seed}`}>{g}</ExitSync>;

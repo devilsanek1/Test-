@@ -9,19 +9,21 @@
 //   <S1Wing behindDoor={...} />   the facade + the lobby + (behindDoor) + the door's fixed frame
 //   <S1DoorLeaves />              the two sliding glass leaves (after the wing): slide out 0.45 -> open 0.52, settle
 //                                 0.58, PARKED over the brick door piers (still visible), shut behind her 0.97 -> 1.10
-//   <S1WingLife />                pigeons on the canopy (shuffle 0.15) and on a sill
+//   <S1WingLife />                pigeons at rest on the canopy and on a sill
 // Kit defects worked around here (kit/canal/wing.tsx WingFront): coloured strokes (the plant blades in CM.line, the
 // brick ticks in CM.brickDeep, W's plant ring in CM.line), leaves hidden in pockets, W a flat plum slab.
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {useTime, clamp} from '../../lib/time';
-import {line, poly, glint, ellipse} from '../../lib/sketch';
+import {line, poly, glint} from '../../lib/sketch';
 import {Batch, PlaneMap, P, Pt, rng, ovalPath, lobes, lerp, leafPath, domePath} from '../kit/canal/core';
 import {s1Layout} from '../kit/canal/wing';
 import {litAt, Pigeons} from '../kit/canal/life';
 import {HandLetteredGoogle} from '../kit/canal/lettering';
 import * as MAP from '../world/map';
-import {CellPaint, barPath, Under, UnderPaint} from './V2S1_set_core';
+import {CellPaint, barPath, S1_IRON} from './V2S1_set_core';
+import {Tier} from '../../lib/tier';
+import {S1_DRAW, wIsSubject, doorIsSubject} from './V2S1_clock';
 
 // ---------------------------------------------------------------- the layout (local metres: u east, v down)
 
@@ -127,24 +129,7 @@ function facadeStatic(): Batch {
     b.poly(CM.brickLight, q(a - 0.01, 0, c - a + 0.02, HM));
   }
   b.layer();
-  // brick coursing hints: short tick fills in clusters on the solid brick (piers, the corner panel, the door piers)
-  const solid: [number, number, number, number][] = [
-    [CORNER + 0.04, V_HEAD + 0.1, 0.2, V_SILL - V_HEAD - 0.2],
-    [PIER_L.u0 + 0.05, V_FLOOR + 0.25, PIER_L.u1 - PIER_L.u0 - 0.1, V_PLINTH - V_FLOOR - 0.4],
-    [PIER_R.u0 + 0.05, V_FLOOR + 0.25, PIER_R.u1 - PIER_R.u0 - 0.1, V_PLINTH - V_FLOOR - 0.4],
-    [UPPER[2].u1 + 0.02, V_HEAD + 0.12, WU0 - UPPER[2].u1 - 0.04, V_SILL - V_HEAD - 0.25],
-  ];
-  for (const [u0, v0, w, h] of solid) {
-    const n = Math.max(2, Math.round((w * h) / 0.35));
-    for (let k = 0; k < n; k++) {
-      const uu = u0 + r.range(0, w);
-      const vv = v0 + r.range(0, h);
-      for (let j = 0; j < r.int(2, 3); j++) {
-        const [x, y] = p(uu + (j % 2) * 0.13, vv + j * 0.075);
-        b.rect(j % 2 ? CM.brick : CM.stucco, x, y, 8, 2.2);
-      }
-    }
-  }
+  // (no brick coursing ticks: CRAFT §c, big areas flat)
   b.layer();
   // the coping cap, the band between the storeys (W's sill course), the plinth, each in strips
   for (let k = 0; k < strips.length - 1; k++) {
@@ -177,15 +162,15 @@ function facadeStatic(): Batch {
   b.poly(CM.limestone, q(DU1, DV0 - 0.1, 0.12, HM - DV0 + 0.1));
   b.poly(CM.stoneShade, q(DU0, DV0, 0.07, HM - DV0));
   b.layer();
-  // ---- fins: slim limestone, a warm shadow strip to their right (the sun is west)
+  // ---- fins: slim limestone (their short shades to the right are the light layer's: s1WingShadows)
   for (const [u, full] of FINS) {
     const v1 = full ? V_PLINTH : V_SILL;
     b.poly(CM.limestone, q(u - 0.065, 0.02, 0.13, v1 - 0.02));
-    b.poly(CM.shadeWarm, q(u + 0.065, 0.06, 0.05, v1 - 0.06));
   }
   // ---- the canopy slab: soffit shadow under the fascia, the fascia (sign face), its top band
   const F = S.canopyFascia;
-  b.rect(CM.shadeWarm, F.x0 - 6, F.y1, F.x1 - F.x0 + 12, 8);
+  // the soffit is limestone; its one Shade step is the light layer's (s1WingShadows)
+  b.rect(CM.limestone, F.x0 - 6, F.y1, F.x1 - F.x0 + 12, 8);
   b.rect(CM.stoneShade, F.x0 - 6, F.y1 + 8, F.x1 - F.x0 + 12, 3);
   b.rect(CM.paper, F.x0, F.y0, F.x1 - F.x0, F.y1 - F.y0);
   b.rect(CM.limestone, F.x0 - 10, F.y0 - 7, F.x1 - F.x0 + 20, 8);
@@ -197,12 +182,12 @@ function facadeStatic(): Batch {
   ];
   for (const [bay, va, vb] of frames) {
     const fw = 0.045;
-    b.poly(CM.paneUnlit, q(bay.u0, va, bay.u1 - bay.u0, fw));
-    b.poly(CM.paneUnlit, q(bay.u0, vb - fw * 1.4, bay.u1 - bay.u0, fw * 1.4));
-    b.poly(CM.paneUnlit, q(bay.u0, va, fw, vb - va));
-    b.poly(CM.paneUnlit, q(bay.u1 - fw, va, fw, vb - va));
-    if (bay.split) b.poly(CM.paneUnlit, q(bay.u0 + (bay.u1 - bay.u0) * bay.split - 0.025, va, 0.05, vb - va));
-    if (bay.transom) b.poly(CM.paneUnlit, q(bay.u0, va + (vb - va) * bay.transom, bay.u1 - bay.u0, 0.035));
+    b.poly(S1_IRON, q(bay.u0, va, bay.u1 - bay.u0, fw));
+    b.poly(S1_IRON, q(bay.u0, vb - fw * 1.4, bay.u1 - bay.u0, fw * 1.4));
+    b.poly(S1_IRON, q(bay.u0, va, fw, vb - va));
+    b.poly(S1_IRON, q(bay.u1 - fw, va, fw, vb - va));
+    if (bay.split) b.poly(S1_IRON, q(bay.u0 + (bay.u1 - bay.u0) * bay.split - 0.025, va, 0.05, vb - va));
+    if (bay.transom) b.poly(S1_IRON, q(bay.u0, va + (vb - va) * bay.transom, bay.u1 - bay.u0, 0.035));
   }
   // ---- the ink: coping, band, plinth, corner, fins, window frames + bars, canopy, door surround (loose, open)
   let st = '';
@@ -281,29 +266,28 @@ function paneInto(b: Batch, ink: string[], u0: number, v0: number, w: number, h:
   if (!lit) {
     b.poly(CM.glass, qq(0, 0, 1, 1));
     const lo = r.range(0.52, 0.66);
-    b.poly(CM.shadeCool, [pp(0, lo), pp(1, lo - r.range(0.08, 0.2)), pp(1, 1), pp(0, 1)]);
-    b.poly(CM.paneUnlit, qq(0, 0.86, 1, 0.14));
+    // tier C: the room's tones stay mid (never a thin near-dark bar in a narrow pane)
+    b.poly(S1_IRON, [pp(0, lo), pp(1, lo - r.range(0.08, 0.2)), pp(1, 1), pp(0, 1)]);
+    b.poly('#868FA4', qq(0, 0.86, 1, 0.14));
     b.poly(CM.skyHigh, [pp(0.18, 0), pp(0.5, 0), pp(0.06, 0.42), pp(0, 0.42), pp(0, 0.26)]);
     b.poly(CM.paper, [pp(0.62, 0), pp(0.7, 0), pp(0.44, 0.28), pp(0.38, 0.28)]);
     return;
   }
+  // one flat lamp value (no brighter core): the lit panes stay a step under W, the thread (critic G4)
   b.poly(CM.lamp, qq(0, 0, 1, 1));
-  b.poly(CM.lampCore, qq(0.08, 0.1, 0.84, 0.46));
   if (kind === 0) {
     // a pendant lamp over a long table
-    b.poly(CM.anchor, [pp(0.36, 0.3), pp(0.64, 0.3), pp(0.56, 0.21), pp(0.44, 0.21)]);
+    b.poly(S1_IRON, [pp(0.36, 0.3), pp(0.64, 0.3), pp(0.56, 0.21), pp(0.44, 0.21)]);
     b.poly(CM.paper, qq(0.46, 0.3, 0.08, 0.03));
     b.poly(CM.brickLight, qq(0, 0.72, 1, 0.07));
-    b.poly(CM.line, qq(0.1, 0.79, 0.04, 0.21));
-    b.poly(CM.line, qq(0.86, 0.79, 0.04, 0.21));
     ink.push(line(...pp(0.5, 0), ...pp(0.5, 0.21), {seed: `${seed}/cord`, over: 'none'}));
   } else if (kind === 1) {
     // a shelf of books and a plant
-    b.poly(CM.line, qq(0.05, 0.44, 0.9, 0.035));
-    for (let k = 0; k < 6; k++) b.poly(r.pick([CM.brick, CM.sage, CM.coatMustard, CM.paneUnlit, CM.box, CM.leafRust]), qq(0.08 + k * 0.12, 0.3 + r.range(0, 0.03), 0.08, 0.14));
+    b.poly(CM.brickLight, qq(0.05, 0.44, 0.9, 0.035));
+    for (let k = 0; k < 6; k++) b.poly(r.pick([CM.brickLight, CM.sage, CM.coatMustard, CM.glass, CM.box, CM.leafGold]), qq(0.08 + k * 0.12, 0.3 + r.range(0, 0.03), 0.08, 0.14));
     const [cx, cy] = pp(0.74, 0.9);
     const s = PM.pxPerM(u0) * w * 0.2;
-    b.fill(CM.brickDeep, `M${P(cx - s * 0.5, cy)}L${P(cx + s * 0.5, cy)}L${P(cx + s * 0.4, cy + s * 0.5)}L${P(cx - s * 0.4, cy + s * 0.5)}Z`);
+    b.fill(CM.brick, `M${P(cx - s * 0.5, cy)}L${P(cx + s * 0.5, cy)}L${P(cx + s * 0.4, cy + s * 0.5)}L${P(cx - s * 0.4, cy + s * 0.5)}Z`);
     b.fill(CM.sage, lobes(cx - s, cx + s, cy, s * 1.7, `${seed}/pl`, 3));
     ink.push(line(...pp(0.05, 0.44), ...pp(0.95, 0.44), {seed: `${seed}/sh`, over: 'small'}));
   } else if (kind === 2) {
@@ -311,9 +295,9 @@ function paneInto(b: Batch, ink: string[], u0: number, v0: number, w: number, h:
     const [cx, cy] = pp(0.28, 1);
     const s = PM.pxPerM(u0) * w * 0.3;
     b.fill(CM.sage, lobes(cx - s, cx + s, cy - s * 0.3, s * 2.1, `${seed}/bp`, 4));
-    b.poly(CM.brickDeep, qq(0.17, 0.84, 0.24, 0.16));
+    b.poly(CM.brick, qq(0.17, 0.84, 0.24, 0.16));
     b.poly(CM.paper, qq(0.58, 0.22, 0.28, 0.22));
-    b.poly(CM.coatPlum, qq(0.62, 0.26, 0.2, 0.06));
+    b.poly(CM.leafGold, qq(0.62, 0.26, 0.2, 0.06));
     b.poly(CM.sage, qq(0.62, 0.33, 0.12, 0.07));
     ink.push(poly(qq(0.58, 0.22, 0.28, 0.22), {closed: true, over: 'none', seed: `${seed}/pic`}));
   } else {
@@ -347,31 +331,28 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
     // one step lighter than the plum: the shelf + box files, the chair back, the desk edge, the anglepoise she
     // switched off (arm up, shade tipped); all kept off W's very centre (the dive goes through it)
     b.poly(CM.coatPlum, qq(0.05, 0.27, 0.3, 0.025));
-    for (let k = 0; k < 3; k++) b.poly(CM.coatPlum, qq(0.07 + k * 0.085, 0.15, 0.06, 0.12));
+    // the box files as one stepped block (the dark slivers between them read as ticks)
+    for (let k = 0; k < 3; k++) b.poly(CM.coatPlum, qq(0.07 + k * 0.085, 0.15 + [0, 0.015, 0.006][k], 0.086, 0.12 - [0, 0.015, 0.006][k]));
     b.poly(CM.coatPlum, qq(0, 0.78, 1, 0.03));
     b.fill(CM.coatPlum, `M${P(...pp(0.14, 1))}L${P(...pp(0.14, 0.64))}Q${P(...pp(0.24, 0.56))} ${P(...pp(0.34, 0.64))}L${P(...pp(0.34, 0.78))}L${P(...pp(0.3, 0.78))}L${P(...pp(0.3, 1))}Z`);
-    b.fill(CM.coatPlum, `M${P(...pp(0.74, 0.78))}L${P(...pp(0.86, 0.78))}L${P(...pp(0.84, 0.75))}L${P(...pp(0.76, 0.75))}Z`);
-    b.fill(CM.coatPlum, barPath(pp(0.8, 0.76), pp(0.86, 0.6), 3));
-    b.fill(CM.coatPlum, barPath(pp(0.86, 0.6), pp(0.76, 0.5), 3));
-    b.fill(CM.coatPlum, `M${P(...pp(0.7, 0.5))}L${P(...pp(0.79, 0.44))}L${P(...pp(0.82, 0.53))}Z`);
-    // a glint: the glass still catches the sky at the top-right corner
-    b.poly(CM.paneUnlit, [pp(0.98, 0.02), pp(0.98, 0.2), pp(0.8, 0.02)]);
-    b.poly(CM.skyHigh, [pp(0.98, 0.03), pp(0.98, 0.09), pp(0.92, 0.03)]);
+    b.fill(CM.coatPlum, `M${P(...pp(0.7, 0.78))}L${P(...pp(0.82, 0.78))}L${P(...pp(0.8, 0.75))}L${P(...pp(0.72, 0.75))}Z`);
+    b.fill(CM.coatPlum, barPath(pp(0.76, 0.76), pp(0.8, 0.6), 3));
+    b.fill(CM.coatPlum, barPath(pp(0.8, 0.6), pp(0.7, 0.5), 3));
+    b.fill(CM.coatPlum, `M${P(...pp(0.64, 0.5))}L${P(...pp(0.73, 0.44))}L${P(...pp(0.76, 0.53))}Z`);
   } else {
     // lamp-lit: her desk lamp on (a flat pool on the desk, never a glow), the shelf of box files, the chair back
     b.poly(CM.lamp, qq(0, 0, 1, 1));
     b.poly(CM.lampCore, qq(0.36, 0.08, 0.58, 0.62));
     b.poly(CM.line, qq(0.05, 0.27, 0.3, 0.025));
-    for (let k = 0; k < 3; k++) b.poly([CM.brick, CM.paneUnlit, CM.coatMustard][k], qq(0.07 + k * 0.085, 0.15, 0.06, 0.12));
+    for (let k = 0; k < 3; k++) b.poly([CM.brick, CM.paneUnlit, CM.coatMustard][k], qq(0.07 + k * 0.085, 0.15 + [0, 0.015, 0.006][k], 0.086, 0.12 - [0, 0.015, 0.006][k]));
     b.poly(CM.brickLight, qq(0, 0.78, 1, 0.03));
     b.poly(CM.lampCore, [pp(0.62, 0.78), pp(0.96, 0.78), pp(0.9, 0.7), pp(0.7, 0.7)]);
     b.fill(CM.coatSlate, `M${P(...pp(0.14, 1))}L${P(...pp(0.14, 0.64))}Q${P(...pp(0.24, 0.56))} ${P(...pp(0.34, 0.64))}L${P(...pp(0.34, 0.78))}L${P(...pp(0.3, 0.78))}L${P(...pp(0.3, 1))}Z`);
-    b.fill(CM.anchor, `M${P(...pp(0.74, 0.78))}L${P(...pp(0.86, 0.78))}L${P(...pp(0.84, 0.75))}L${P(...pp(0.76, 0.75))}Z`);
-    b.fill(CM.anchor, barPath(pp(0.8, 0.76), pp(0.86, 0.6), 3));
-    b.fill(CM.anchor, barPath(pp(0.86, 0.6), pp(0.76, 0.5), 3));
-    b.fill(CM.anchor, `M${P(...pp(0.7, 0.5))}L${P(...pp(0.79, 0.44))}L${P(...pp(0.82, 0.53))}Z`);
-    b.fill(CM.paper, ovalPath(...pp(0.765, 0.53), 3.5, 2.5));
-    b.poly(CM.glass, [pp(0.98, 0.02), pp(0.98, 0.18), pp(0.82, 0.02)]);
+    b.fill(CM.coatSlate, `M${P(...pp(0.7, 0.78))}L${P(...pp(0.82, 0.78))}L${P(...pp(0.8, 0.75))}L${P(...pp(0.72, 0.75))}Z`);
+    b.fill(CM.coatSlate, barPath(pp(0.76, 0.76), pp(0.8, 0.6), 3));
+    b.fill(CM.coatSlate, barPath(pp(0.8, 0.6), pp(0.7, 0.5), 3));
+    b.fill(CM.coatSlate, `M${P(...pp(0.64, 0.5))}L${P(...pp(0.73, 0.44))}L${P(...pp(0.76, 0.53))}Z`);
+    b.fill(CM.paper, ovalPath(...pp(0.705, 0.53), 3.5, 2.5));
   }
   // the glazing: two slim stone mullions near the sides (kept out of the dive's centre) as fills; their lines in ink
   b.layer();
@@ -381,26 +362,18 @@ function wInto(b: Batch, inkF: string[], inkM: string[], dark: boolean) {
   b.poly(CM.limestone, q(u0 - 0.14, v0 + h, w + 0.28, 0.1));
   b.poly(CM.stoneShade, q(u0 - 0.14, v0 + h + 0.085, w + 0.28, 0.035));
   b.layer();
-  // the ring her plant left: a dark stain ring with a pale dust-free centre, a few soil crumbs and a dropped leaf;
-  // sized to read at 216 px (~44 x 12 px), every line in ink (the kit drew it in CM.line)
+  // the ring her plant left: a stain ring one step darker than the sill with a pale dust-free centre and a dropped
+  // leaf; sized to read at 216 px (~44 x 12 px), flat fills only (an inked ring read as a halo, critic G4)
   const [rx, ry] = pp(0.42, 1.04);
   const s = PM.pxPerM(u0 + w * 0.42);
   const RX = s * 0.24;
   const RY = s * 0.066;
   b.fill(CM.shadeWarm, `M${P(rx - RX, ry)}A${RX.toFixed(1)} ${RY.toFixed(1)} 0 1 0 ${P(rx + RX, ry)}A${RX.toFixed(1)} ${RY.toFixed(1)} 0 1 0 ${P(rx - RX, ry)}Z`);
   b.fill(CM.paper, ovalPath(rx, ry - 0.3, RX * 0.7, RY * 0.52));
-  for (const [dx, dy, sz] of [[1.25, -0.3, 2.2], [1.45, 0.35, 1.6], [-1.3, 0.3, 2], [-1.12, -0.5, 1.4], [1.1, 0.8, 1.3]] as [number, number, number][]) b.fill(CM.brickDeep, ovalPath(rx + dx * RX, ry + dy * RY, sz, sz * 0.7));
   b.fill(CM.sage, leafPath(rx + RX * 1.75, ry - 1.5, 16, 5, -18));
-  inkM.push(ellipse(rx, ry, RX, RY, {seed: 's1W/ring', wobble: 0.02, overlap: 16}));
-  inkF.push(ellipse(rx, ry - 0.3, RX * 0.7, RY * 0.52, {seed: 's1W/ring2', wobble: 0.03, overlap: 6}));
-  // W's lines: the frame (closed), the glass edge, the mullions, the sill, the chair and the lamp
-  inkM.push(poly(qq(0, 0, 1, 1), {closed: true, over: 'small', seed: 's1W/frame'}));
-  inkF.push(line(...pp(0.12 - 0.022, 0.01), ...pp(0.12 - 0.022, 0.99), {seed: 's1W/m1', over: 'none'}));
-  inkF.push(line(...pp(0.88 + 0.022, 0.01), ...pp(0.88 + 0.022, 0.99), {seed: 's1W/m2', over: 'none'}));
-  inkF.push(line(...p(u0 - 0.14, v0 + h), ...p(u0 + w + 0.14, v0 + h), {seed: 's1W/sill', over: 'small'}));
-  inkF.push(line(...pp(0.05, 0.27), ...pp(0.35, 0.27), {seed: 's1W/shelf', over: 'none'}));
-  inkF.push(`M${P(...pp(0.14, 0.94))}L${P(...pp(0.14, 0.64))}Q${P(...pp(0.24, 0.56))} ${P(...pp(0.34, 0.64))}L${P(...pp(0.34, 0.78))}`);
-  inkF.push(`M${P(...pp(0.8, 0.76))}L${P(...pp(0.86, 0.6))}L${P(...pp(0.76, 0.5))}M${P(...pp(0.7, 0.5))}L${P(...pp(0.79, 0.44))}L${P(...pp(0.82, 0.53))}`);
+  // W's line: the frame, one closed path with no corner overshoot; the mullions, the sill, the shelf, the chair and the
+  // lamp are flat fills (their lines and the overshoot ticks broke the short-stroke budget, critic G4)
+  inkM.push(poly(qq(0, 0, 1, 1), {closed: true, over: 'none', seed: 's1W/frame'}));
 }
 
 // ---------------------------------------------------------------- the lobby behind the door
@@ -424,7 +397,7 @@ function lobbyStatic(): Batch {
   b.fill(CM.sage, lobes(plx - pls * 0.3, plx + pls * 0.3, ply - pls * 0.34, pls * 1.05, 's1lobby/plant', 3));
   for (let j = 0; j < 3; j++) {
     const [lx, ly] = p(du0 + (du1 - du0) * (0.22 + j * 0.28), dv0 + 0.34);
-    b.fill(CM.anchor, domePath(lx, ly, 7, 6));
+    b.fill(S1_IRON, domePath(lx, ly, 7, 6));
     b.fill(CM.lampCore, ovalPath(lx, ly + 1.5, 4.5, 2));
   }
   let d = '';
@@ -451,6 +424,9 @@ function doorFrameStatic(): Batch {
 
 // ---------------------------------------------------------------- the wing
 
+/** The life budget's window switches: one at a time, >= 2 s apart (the far terrace's at 1.80, this one at 3.90). */
+const WING_SWITCH = {pane: 6, at: 3.9} as const;
+
 export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) => {
   const t = useTime();
   const stat = useMemo(() => facadeStatic(), []);
@@ -472,45 +448,38 @@ export const S1Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
     const parts = bay.split ? [[bay.u0 + 0.045, bay.u0 + (bay.u1 - bay.u0) * bay.split - 0.025], [bay.u0 + (bay.u1 - bay.u0) * bay.split + 0.025, bay.u1 - 0.045]] : [[bay.u0 + 0.045, bay.u1 - 0.045]];
     for (const [a, c] of parts) panes.push([a, va, c - a, vb - va]);
   }
-  // the frame-0 drawing of the panes (their fills are paper until the flood): a room line, a desk or a sill line and a
-  // glass glint per pane, each pane's group gone on the frame its colour lands (the bare-line state reads dense)
-  const under = useMemo(() => {
-    const u = new Under();
-    panes.forEach(([u0, v0, w, h], k) => {
-      const r = rng(`s1paneU/${k}`);
-      const pp = (a: number, c: number) => p(u0 + a * w, v0 + c * h);
-      const [cx, cy] = pp(0.5, 0.5);
-      const lo = r.range(0.56, 0.68);
-      let d = `M${P(...pp(0.04, lo))}L${P(...pp(0.96, lo - r.range(0.06, 0.16)))}`;
-      d += `M${P(...pp(0.12, 0.86))}L${P(...pp(0.88, 0.86))}`;
-      d += `M${P(...pp(0.62, 0.04))}L${P(...pp(0.42, 0.3))}M${P(...pp(0.74, 0.04))}L${P(...pp(0.56, 0.26))}`;
-      u.add(cx, cy, d, INK_PX.hair);
-    });
-    return u;
-  }, []);
   panes.forEach(([u0, v0, w, h], k) => {
-    const lit = litAt(t, 's1wing', k, panes.length, {litFrac: 0.55});
+    const lit = k === WING_SWITCH.pane ? t >= WING_SWITCH.at : litAt(0, 's1wing', k, panes.length, {litFrac: 0.55});
     paneInto(dyn, inkP, u0, v0, w, h, lit, `s1pane/${k}/${lit ? 'L' : 'U'}`, k % 4);
   });
-  dyn.ink(inkP.join(''), INK_PX.hair);
+  // tier C: the panes carry no lines (their cords, shelves and frames were short strokes, critic G4); inkP unused
+  void inkP;
   // W: lamp-lit, then plum dark from the lamp click (one frame)
   const wb = new Batch();
   const wInkF: string[] = [];
   const wInkM: string[] = [];
   wInto(wb, wInkF, wInkM, t >= W_LAMP_OFF);
-  wb.ink(wInkF.join(''), INK_PX.far);
-  wb.ink(wInkM.join(''), INK_PX.mid);
+  // every W line in the shade of the pane it bounds (CRAFT §c: never one near-black ink): the lamp's, then the plum's
+  const wTone = t >= W_LAMP_OFF ? CM.anchor : CM.lamp;
+  wb.ink(wInkF.join(''), INK_PX.far, CM.ink, 0, {tone: wTone});
+  wb.ink(wInkM.join(''), INK_PX.mid, CM.ink, 0, {tone: wTone});
   const F = S.canopyFascia;
   return (
     <>
       <CellPaint b={stat} seed="s1wing/stat" cell={110} />
       <CellPaint b={dyn} seed="s1wing/panes" cell={110} live />
-      <UnderPaint u={under} seed="s1wing/paneU" />
-      <CellPaint b={wb} seed="s1wing/W" cell={400} live />
+      {/* W, the thread: the subject (one closed outline drawing on at frame 0) before the lamp click and from her look
+          back; support otherwise (no outline, its plum anchor barely calmed) */}
+      <Tier tier={wIsSubject(t) ? 'subject' : 'support'}>
+        <CellPaint b={wb} seed="s1wing/W" cell={400} live draw={S1_DRAW} />
+      </Tier>
       <CellPaint b={lobby} seed="s1wing/lobby" cell={400} />
       {behindDoor}
-      <CellPaint b={frame} seed="s1wing/doorframe" cell={400} misreg={0.5} />
-      <HandLetteredGoogle cx={(F.x0 + F.x1) / 2} baseline={F.y0 + (F.y1 - F.y0) * 0.8} cap={Math.min(S.canopyLetterPx, (F.y1 - F.y0) * 0.84)} at={MAP.S1_CLOCK.steppingOut} each={0.06} />
+      {/* the glass door + its canopy letters: the subject from frame 0 through her step-out (the letters pop on 0.97) */}
+      <Tier tier={doorIsSubject(t) ? 'subject' : 'environment'}>
+        <CellPaint b={frame} seed="s1wing/doorframe" cell={400} misreg={0.5} draw={S1_DRAW} />
+        <HandLetteredGoogle cx={(F.x0 + F.x1) / 2} baseline={F.y0 + (F.y1 - F.y0) * 0.8} cap={Math.min(S.canopyLetterPx, (F.y1 - F.y0) * 0.84)} at={MAP.S1_CLOCK.steppingOut} each={0.06} />
+      </Tier>
     </>
   );
 };
@@ -569,13 +538,14 @@ export const S1DoorLeaves: React.FC = () => {
     b.poly(CM.line, q(hu, v0 + (v1 - v0) * 0.36, 0.04, 0.025));
     outer += poly(q(a, v0, leafW, v1 - v0), {closed: true, over: 'small', seed: `s1leaf${side}/o`});
     inner += poly(q(a + st, v0 + rail, leafW - 2 * st, v1 - v0 - rail - kick), {closed: true, over: 'none', seed: `s1leaf${side}/i`});
-    // the glint: two ink strokes in the upper glass (above her head at f0)
-    const [gx, gy] = p(a + st + 0.14, v0 + rail + 0.68);
-    inner += glint(gx, gy, 30, {seed: `s1leaf${side}/g`, angle: -58, gap: 8});
   }
   b.ink(outer, INK_PX.mid);
   b.ink(inner, INK_PX.far);
-  return <CellPaint b={b} seed="s1leaves" cell={400} misreg={0.6} live />;
+  return (
+    <Tier tier={doorIsSubject(t) ? 'subject' : 'environment'}>
+      <CellPaint b={b} seed="s1leaves" cell={400} misreg={0.6} live draw={S1_DRAW} />
+    </Tier>
+  );
 };
 
 // ---------------------------------------------------------------- life on the wing
@@ -586,10 +556,20 @@ export const S1WingLife: React.FC = () => {
   const [, ys] = p((UPPER[2].u0 + UPPER[2].u1) / 2, V_SILL);
   return (
     <>
-      <Pigeons ledge={[F.x0 + 4, F.x1 - 4, F.y0 - 7]} n={4} size={17} seed="s1canopy" shuffleAt={[MAP.S1_CLOCK.voiceShe + 0.03]} />
+      <Pigeons ledge={[F.x0 + 4, F.x1 - 4, F.y0 - 7]} n={4} size={17} seed="s1canopy" />
       <Pigeons ledge={[x0, x1, ys]} n={2} size={15} seed="s1sill2" />
     </>
   );
+};
+
+/** The wing's shadow shapes for the light layer (V2S1_light): each fin's short shade falling right on the facade
+ *  (the sun is west), and the canopy soffit (one Shade step). Screen px. */
+export const s1WingShadows = (): {fins: string[]; soffit: string} => {
+  const toD = (pts: Pt[]) => `M${pts.map((pt) => P(pt[0], pt[1])).join('L')}Z`;
+  const fins = FINS.map(([u, full]) => toD(q(u + 0.065, 0.06, 0.07, (full ? V_PLINTH : V_SILL) - 0.06)));
+  const F = S.canopyFascia;
+  const soffit = `M${P(F.x0 - 6, F.y1)}L${P(F.x1 + 6, F.y1)}L${P(F.x1 + 6, F.y1 + 8)}L${P(F.x0 - 6, F.y1 + 8)}Z`;
+  return {fins, soffit};
 };
 
 export {PM as S1_WING_PLANE, UPPER as S1_WING_UPPER, LOWER as S1_WING_LOWER, V_SILL as S1_WING_V_SILL, V_PLINTH as S1_WING_V_PLINTH, HM as S1_WING_HM};

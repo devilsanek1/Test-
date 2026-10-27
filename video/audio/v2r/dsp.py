@@ -260,13 +260,15 @@ def smooth_rand(n, rate_hz, seed, lo=0.0, hi=1.0):
 
 
 def finish_sfx(y, name, out_dir, peak_db=-1.0, fade_in_ms=1.5, fade_out_ms=25.0, trim=True, thr_db=-62.0):
-    """Trim silence, short fades, DC-free, stereo, normalised to `peak_db` dBFS, 48 kHz 24-bit."""
+    """Trim the silent tail (never the head: a file's first sample is its cue time, and the join carriers peak on
+    their midpoint at a designed offset from it), short fades, DC-free, stereo, normalised to `peak_db` dBFS, 48 kHz
+    24-bit."""
     y = st(np.asarray(y, dtype=np.float64))
     y = hp(y, 18.0, 2)
     if trim:
         a = np.abs(y).max(axis=1)
         on = np.where(a > a.max() * db2a(thr_db))[0]
-        y = y[max(0, on[0] - 24): on[-1] + 1]
+        y = y[: on[-1] + 1]
     fi = min(len(y) // 4, int(fade_in_ms * 1e-3 * SR)); fo = min(len(y) // 3, int(fade_out_ms * 1e-3 * SR))
     if fi > 0:
         y[:fi] *= np.linspace(0, 1, fi)[:, None]

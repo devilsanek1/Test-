@@ -30,8 +30,8 @@ move maps them about its anchor (`scaleAbout`); match points are screen px AT th
   `S1_CAMERA` (zoom 1.00 throughout: the pull-out is retired; the dive), `s1Screen` (the identity now), `S1_CLOCK`
   (frame 0 drawn in the clean pen, the flood), `FRAME0_TEXT`.
 - The ghost row: `S1_ROW` (her, G1-G6, O1-O3: cover x, pop time, word, head value, cues), `s1HerX`, `s1RowAt(t)`
-  (lockstep: every member walks her metres, compressed into the bend), `GHOST_POP`, `S1_ROW_STOP`, `S1_LIFE_T`,
-  `S8_GHOSTS_SPEC`.
+  (lockstep: every member walks her metres, compressed into the bend), `GHOST_POP`, `S1_ROW_STOP`, `S1_LIFE_T`;
+  S8's three: `S8.ghosts`.
 - Per shot: `S2` (her dark window at M, the five staff windows, blinds, bench, A-board, camera), `S3`, `S4` (+ her far
   window), `S5` (+ `S5_EASE`, progress beats, the blossom-tree wipe out), `S6` (held: `s6BoardAt`, `s6PipSeatAt` return
   the pose; the corner post), `S7`, `S8` (+ `s8TruckU`, the three ghosts, the cafe owner).
@@ -47,8 +47,9 @@ move maps them about its anchor (`scaleAbout`); match points are screen px AT th
 - S1 and S8 both show W at zoom 1.00 (150 x 170): the loop seam matches with no pull-out and no seam push.
 - S1 feet follow the one lens: G6 feet 1068, O3 1057 (sizes exactly 170 -> 135, outlines 130 -> 120).
 - Her window takes M in S2 (the staff window there moved to her old spot): the S2 -> S3 match is the thread itself.
-- S4's far window sits at (135, 690), 90 x 111: THROUGHLINE's ~(150, 790) lies behind the DEC plate (x 110-560,
-  y 755-855 from 18.92), so the spot keeps its x and rises clear of the plate and of SUN1's disc.
+- S4's far window sits at (135, 698), 90 x 102 (S8's W proportion): the draft's ~(150, 790) lay behind the DEC plate
+  (x 110-560, y 755-855 from 18.92) and crossed SUN1's disc, so the spot rises clear of both (6 px above the plate, left
+  of the disc) and leaves y 600-647 for her house's eave, mansard and pots.
 - S5's lamppost wipe runs 22.02-22.19 (p 0.37-0.51): p 0.40-0.50 is only 7 frames, the treatment asks >= 10.
 - S6 is held (drift 0): Pip sits at the board's foot (360, 1410) at 98 px, its head 204 px under the clause's last
   line; the corner post keeps its own spot (`S6.cornerPost`).

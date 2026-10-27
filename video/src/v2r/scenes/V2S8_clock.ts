@@ -96,11 +96,11 @@ export const planeOffset = (p: PlaneId, t: number) => planeDx(PLANE_DX[p], t);
 
 /** THE FLOAT (STYLE.md section 6, the float law): translation only, the whole picture together (no parallax), eased straight
  *  legs turning every 0.6-1.5 s, 8-15 px/s (peak <= 25), net within +-12 px of home, and back home (0) when a move starts
- *  (the truck 34.99, the seam push 37.70) so every K2 spot is exact. Two runs: the wipe -> the truck; the landing -> the push.
+ *  (the truck 34.99, the un-build 38.82) so every K2 spot is exact. Two runs: the wipe -> the truck; the landing -> the un-build.
  *  Keys: [scene t, dx, dy]. */
 export const FLOAT_KEYS: [number, number, number][][] = [
   [[L(32.7), 0, 0], [L(33.55), 9, -4], [L(34.3), 2, 5], [L(34.99), 0, 0]],
-  [[L(35.6), 0, 0], [L(36.4), -8, -3], [L(37.1), -1, 5], [L(37.7), 0, 0]],
+  [[L(35.6), 0, 0], [L(36.4), -8, -3], [L(37.15), -1, 5], [L(38.0), 7, 1], [L(38.82), 0, 0]],
 ];
 export const floatXY = (t: number): [number, number] => {
   for (const run of FLOAT_KEYS) {
@@ -207,9 +207,10 @@ export const PIP_BOARD_FACING = 'backLeft' as const;
 export const PIP_SEAT = {x: MAP.BOARD_BOLLARD.x, y: MAP.BOARD_BOLLARD.y} as const;
 /** Pip's size at the board bollard: S7's PIP_SIZE_S7 (A5: the same Pip pose at both boards). */
 export const PIP_SIZE = 100;
-/** Pip's seam hop: 38.82 -> 38.97 from the board bollard down onto S1's f0 bollard, both in landing coords under the
- *  1.05 seam push (S1's world at its frame-0 zoom 1.05 about W is the same space): (700, 1205) -> (700, 1235). */
-export const PIP_SEAM = {t0: S8T.unbuildT0, land: L(38.97), to: {x: MAP.S1_BOLLARD.x, y: MAP.S1_BOLLARD.y}, height: 26} as const;
+/** Pip's seam SETTLE (conform_L6 §1, THROUGHLINE §3: a 30 px step down, no hop): 38.82 -> 38.98 from the board
+ *  bollard (700, 1205) onto S1's f0 bollard (700, 1235), zoom 1.00; it un-builds with the shot (late), so the loop lands
+ *  on S1's frame 0, where S1's own Pip draws on from t 0 (V2S1_clock S1_F0: absent at t < 0). */
+export const PIP_SEAM = {t0: S8T.unbuildT0, land: L(38.98), to: {x: MAP.S1_BOLLARD.x, y: MAP.S1_BOLLARD.y}, height: 0} as const;
 /** S1's clock relative to S8's: S1 time = S8 time - S1_SHIFT (the loop underlay runs at film T - 2345 / 60). */
 export const S1_SHIFT = 2345 / 60 - S8_START;
 /** S1's frame-0 Pip, mirrored from V2S1_pip.tsx `S1Pip` (L1; it draws nothing at t < 0): from PIP_SEAM.land on, S8 draws THIS Pip on S1's clock
@@ -221,30 +222,26 @@ export const pipSeatAt = (t: number) => ({x: PIP_SEAT.x + planeOffset('board', t
 
 // ---------------------------------------------------------------- the lamp run on "facts" (37.18)
 
-/** ONE run, near -> far ("west down the lane"), everything alike (Q9 c: no item singled out; the board never lights).
- *  Each part lights its own lamps at lampRunAt(id); string lights use StringLights' own `step` inside their slot. */
-export const LAMP_RUN_STEP = 0.06;
-export const LAMP_RUN_ORDER = [
-  'nearPool', // the near lamp-post's pool on the paving (bottom right; its lantern is off-frame)
-  'houseLamp', // the heritage lamp on the forecourt right of her house
-  'carriageR', // the neighbour's carriage lamp
-  'festoon', // the festoon along the terrace fronts, bulb by bulb right -> left (0.03 s per bulb)
-  'carriageL', // the carriage lamp by her door (lights like every other: no item singled out)
-  'canalLamp1', // canal-side lamp heads above the board, near -> far
-  'canalLamp2',
-  'boatLights', // the cafe boat's cabin-roof lights
-  'farWindows', // windows beyond the bend, a ripple
-] as const;
-export type LampRunId = (typeof LAMP_RUN_ORDER)[number];
-export const lampRunAt = (id: LampRunId) => S8T.facts + LAMP_RUN_STEP * LAMP_RUN_ORDER.indexOf(id);
+/** ONE run, near -> far ("west down the lane"), everything alike (Q9 c: no item singled out; the board never lights),
+ *  FLASH-SAFE (STYLE / THROUGHLINE: <= 3 switch-ons in any 1 s): four lamps, 0.34 s apart, each switching on ONCE and
+ *  laying its pool (two flat steps). Every other light (the carriage lamps, the festoons, the cafe boat's lights, the
+ *  far windows) is already on at sunset: `lampRunAt` gives them -10 (on from the start). */
+export const LAMP_RUN_STEP = 0.34;
+export const LAMP_RUN_ORDER = ['nearPool', 'houseLamp', 'canalLamp1', 'canalLamp2'] as const;
+export type LampRunId = (typeof LAMP_RUN_ORDER)[number] | 'carriageR' | 'festoon' | 'carriageL' | 'boatLights' | 'farWindows';
+export const lampRunAt = (id: LampRunId): number => {
+  const i = (LAMP_RUN_ORDER as readonly string[]).indexOf(id);
+  return i < 0 ? -10 : S8T.facts + LAMP_RUN_STEP * i;
+};
 
 // ---------------------------------------------------------------- ground (the paving profile, for the sets)
 
 /** Ground plane shear (kept for old callers): use groundOffset(y, t) for the rigid bands. */
 export const groundDxAtY = (y: number, t: number) => groundOffset(y, t);
 
-/** The seam push (zoom about W), 1.00 -> 1.05 over 37.70-38.82, ease in-out, held after. */
-export const SEAM_ZOOM = 1.05;
+/** The seam push is RETIRED (conform_L6 §1: S1 opens at zoom 1.00, so W (860, 700) 150 x 170 already IS S1's frame-0
+ *  window). Kept as a constant 1.00 so old callers stay exact. */
+export const SEAM_ZOOM = 1.0;
 export const seamZoom = (t: number) => {
   const p = prog(t, S8T.pushT0, S8T.pushT1 - S8T.pushT0);
   return 1 + (SEAM_ZOOM - 1) * p * p * (3 - 2 * p);
@@ -255,7 +252,7 @@ export const pushPt = (x: number, y: number, t: number): [number, number] => {
   return [MAP.W.x + (x - MAP.W.x) * z, MAP.W.y + (y - MAP.W.y) * z];
 };
 
-/** Pip's seam target: S1's f0 bollard on screen at S1's zoom 1.05 about W = (692, 1261.75). */
+/** Pip's seam target: S1's f0 bollard on screen (zoom 1.00: (700, 1235)). */
 export const S1_F0_PIP = {x: MAP.W.x + (MAP.S1_BOLLARD.x - MAP.W.x) * SEAM_ZOOM, y: MAP.W.y + (MAP.S1_BOLLARD.y - MAP.W.y) * SEAM_ZOOM};
 
 /** Nothing drawn above this landing-pose y (so the 1.05 push about W keeps every built top at screen y >= 600). */

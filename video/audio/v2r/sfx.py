@@ -1,23 +1,28 @@
 #!/usr/bin/env python3
 """Video 2 ("One Small Window") sound effects, all designed NEW for this film -> public/v2r/sfx/*.wav, and the cue
-sheet public/v2r/cues.json ([{src, t, gain, note}], the bed first at t 0).
+sheet public/v2r/cue_sheet.json ([{src, t, gain, note, ...}], the bed first at t 0; premix.py mixes it into mix.wav
+and points the film's public/v2r/cues.json at that master).
 
-    python3 audio/v2r/sfx.py            # render every sound + derive every gain + write cues.json (~1 min)
+    python3 audio/v2r/sfx.py            # render every sound + derive every gain + write cue_sheet.json (~1 min)
                                         # (run bed.py first: the bus and word guards count the bed)
 
-Every sound is synthesised here from first principles: no samples, no house kit, no platform sounds (the one exception
-is boat_chug, built from CC0 grains of a narrowboat engine, see field.py). Families (TREATMENT s7): one positive phone
-sound (the exit ding: two struck glass-chime notes rising a fourth, C6 -> F6, the bed's key); one wooden tick at ONE
-pitch for every ghost; ONE board clack and ONE pen for the statement boards (A5: Google's and hers the same FILE); a
-pop / hop family for Pip; paper and graphite for the drawn world; glass for light.
+Every sound is synthesised here from first principles, no house kit, no platform sounds; two are shaped from CC0
+field-recording grains, as the air is (field.py): the narrowboat's pass (its engine and wash) and the blossom tree's
+rustle. Families (TREATMENT s7): one positive phone sound (the exit ding: two struck glass-chime notes rising a fourth,
+C6 -> F6, the bed's key); one wooden tick at ONE pitch for every ghost; ONE board clack and ONE pen for the statement
+boards (A5: Google's and hers the same FILE); the clean pen for the drawn world (frame 0's draw-on and the un-build);
+glass for light (the ding, the suns, the lamps); air for the carriers (the dives, the tree, the boat).
 
-Revision 2 (music director's review): impacts are struck objects with a noise body and the contact noise of the hit,
-never bare decaying sines, and they share ONE outdoor slap (dsp.slap); 2-4 round-robin variants where a sound
-repeats (`name:k` in the sheet); stereo noise is decorrelated by independent seeds (dsp.decor), never a
-sub-millisecond copy (no comb, a clean mono fold-down); the ding is a struck glass chime (1 ms mallet, tau 0.2 s);
-the sun match-cuts are struck glass tings 30 dB down before the next word; the lamp runs and the long pen are timed
-into the vowels of BOTH boards' key words (one file each); the un-build crossfades 15 ms into the flood at a matched
-level. Files: 48 kHz, 24-bit stereo, peak -1 dBFS, trimmed, DC-free; the film level is the cue's `gain`.
+Revision 2 (music director's review + DIRECTION / THROUGHLINE): impacts are struck objects with a noise body and the
+contact noise of the hit, never bare decaying sines, and they share ONE outdoor slap (dsp.slap); round-robin variants
+where a sound repeats (`name:k` in the sheet); stereo noise is decorrelated by independent seeds (dsp.decor), never
+a sub-millisecond copy (no comb, a clean mono fold-down); the ding is a struck glass chime (1 ms mallet, tau 0.2 s);
+every join's sound rides its carrier and PEAKS ON ITS MIDPOINT (sheet.JOINS: the files keep their head, so the cue
+time + the designed offset is the midpoint); the sun push-throughs are a glass shimmer into a struck tink 30 dB down
+before the next word; the lamp runs are three flash-safe switch-ons in the vowels of BOTH boards' key words (one
+file); the long pen falls silent before "facts"; the un-build turns into frame 0's draw-on and crossfades 15 ms into
+it at a matched level. Files: 48 kHz, 24-bit stereo, peak -1 dBFS, tail-trimmed, DC-free; the film level is the
+cue's `gain`.
 """
 from __future__ import annotations
 
@@ -31,6 +36,7 @@ from dsp import (SR, PUBLIC, VOICE, SCRATCH, N_FILM, np, ss, bp, lp, hp, env_ad,
                  short_term_lufs, click_report, frame_t, FPS, FILM_DUR, decor, contact, body_noise, struck, slap)
 import sheet  # noqa: E402
 import measure as M  # noqa: E402
+import field as FLD  # noqa: E402  (CC0 grains: the boat's pass, the tree's rustle)
 
 OUT = PUBLIC / "sfx"
 SOUNDS = {}
@@ -56,17 +62,6 @@ def unit(y):
 
 
 # ------------------------------------------------------------------ primitives
-def graphite(dur, seed, speed=None, bright=1.0, grain=0.07):
-    """Pencil on paper: band-limited hiss + sparse 'tooth' grains (brighter with speed) + a quiet paper body."""
-    n = n_of(dur); r = rng(seed)
-    sp = np.ones(n) if speed is None else speed
-    hiss = bp(r.standard_normal(n), 1800, 7800, 2)
-    g = (r.random(n) < grain) * r.standard_normal(n)
-    tooth = bp(g, 2600, 9500, 2)
-    body = bp(r.standard_normal(n), 320, 1300, 2)
-    return (0.55 * hiss + 0.9 * tooth) * sp ** 1.5 * bright + 0.22 * body * sp
-
-
 def stroke_env(n, att=0.006, rel=0.018):
     e = np.ones(n)
     a = min(n // 3, int(att * SR)); r_ = min(n // 3, int(rel * SR))
@@ -159,24 +154,42 @@ def flap(dur, lo, hi, seed, att=0.004, dec=0.010):
     return bp(noise(dur, seed), lo, hi, 2) * env_ad(n_of(dur), att, dec)
 
 
+def pen_glide(d, seed, speed=None):
+    """THE clean pen in one steady stroke (DIRECTION rule 4: one confident line, no jitter, no tooth): a felt tip's
+    smooth fibre hiss with very few grains and a faint glide tone; `speed` (0..1 per sample) shapes its level and
+    brightness. Mono, unit-ish."""
+    r = rng(seed); n = n_of(d)
+    sp = np.ones(n) if speed is None else speed
+    fib = bp(r.standard_normal(n), 2400, 7200, 2) * 0.6 + bp(r.standard_normal(n), 600, 1500, 1) * 0.07
+    grains = bp((r.random(n) < 0.006) * r.standard_normal(n), 4000, 9000, 2) * 0.35
+    f_g = r.uniform(4300, 4700) * (0.95 + 0.07 * sp)
+    glide = np.sin(2 * np.pi * np.cumsum(f_g) / SR) * 0.02
+    return lp((fib + grains) * sp ** 1.3 + glide * sp, 8000, 2)
+
+
 # ------------------------------------------------------------------ V2S1 (0.00-6.10)
-SEAM_XF = 0.015        # the un-build's crossfade into the flood (s)
+SEAM_XF = 0.015        # the un-build's crossfade into frame 0's draw-on (s)
+DRAW_END = 0.26        # S1_DRAW: the subject's outline draws on -0.26 .. +0.26 (f0 = mid-draw)
 
 
 @sound
-def pencil_flood(v=1):
-    """f0: three quick hatch strokes, then the colour wash floods out from the sun (0.06-0.40). It opens with a 15 ms
-    fade-in: the crossfade from the un-build's reversed pencil, at a matched level (no notch at the loop seam)."""
-    out = buf(0.62)
-    for k, (s, d, p) in enumerate([(0.00, 0.075, -0.25), (0.08, 0.06, 0.05), (0.145, 0.08, 0.3)]):
-        n = n_of(d)
-        sp = 0.85 + 0.15 * np.sin(np.pi * np.arange(n) / n) if k == 0 else 0.7 + 0.3 * np.sin(np.pi * np.arange(n) / n)
-        e = stroke_env(n, SEAM_XF if k == 0 else 0.004, 0.015)
-        put(out, graphite(d, 100 + k, sp) * e, s, 0.55, p)
-    d = 0.34; n = n_of(d)                     # the wash is done by ~0.40, before the lamp click and the ding
-    wash = decor(lambda sd: tv_bandpass(noise(d, sd), np.geomspace(480, 2600, n), bw_oct=1.0) * env_bell(n, 0.40, 1.6),
+def pen_drawon(v=1):
+    """f0 (DIRECTION rule 9): the clean pen's ONE stroke per subject (her, the door, W) is half drawn at frame 0 and
+    finishes at 0.26: a steady felt-tip glide already in motion (it began at -0.26, under the un-build), easing off as
+    the pen lifts; the colour floods out from the sun 0.02-0.30: a soft rising wash that peaks at ~0.12 and is 15 dB
+    down by 0.24, before the /sh/ of "She" (0.25). It opens with the 15 ms crossfade from the un-build (no notch at the
+    loop seam; sfx.match_seam sets the level)."""
+    out = buf(0.50)
+    n = n_of(DRAW_END + 0.03); t = np.arange(n) / SR
+    sp = np.where(t < DRAW_END - 0.07, 1.0, np.clip(1.0 - (t - (DRAW_END - 0.07)) / 0.10, 0.12, 1.0))   # eases as it lifts
+    st_ = pen_glide(DRAW_END + 0.03, 101, sp)
+    st_[: n_of(SEAM_XF)] *= np.sin(0.5 * np.pi * np.linspace(0, 1, n_of(SEAM_XF))) ** 2
+    st_[-n_of(0.012):] *= np.cos(0.5 * np.pi * np.linspace(0, 1, n_of(0.012))) ** 2
+    put(out, st_, 0.0, 0.62, 0.1)
+    d = 0.30; nw = n_of(d)                                 # the flood: 0.02-0.32, peak ~0.12
+    wash = decor(lambda sd: tv_bandpass(noise(d, sd), np.geomspace(520, 2400, nw), bw_oct=1.0) * env_bell(nw, 0.33, 1.7),
                  7, 0.65)
-    out[n_of(0.06): n_of(0.06) + n] += wash * 0.55
+    out[n_of(0.02): n_of(0.02) + nw] += wash * 0.42
     return out
 
 
@@ -196,15 +209,17 @@ def lamp_click(v=1):
 
 @sound
 def exit_ding(v=1):
-    """OUR positive phone sound: two struck glass-chime notes rising a fourth (C6 -> F6, the bed's key), 85 ms apart:
+    """OUR positive phone sound: two struck glass-chime notes rising a fourth (C6 -> F6, the bed's key), 58 ms apart:
     inharmonic partials, a 1 ms hard-mallet transient, the fundamental's decay constant 0.2 s; a 60 ms air flick
     lifts off with the first strike (the 'sent'). Never Apple's or Instagram's."""
     out = buf(1.10)
     ratios = [1.0, 2.405, 4.36, 6.83, 9.71]
     decs = [0.20, 0.075, 0.036, 0.018, 0.010]
     amps = [1.0, 0.30, 0.12, 0.05, 0.02]
+    # the second strike 58 ms after the first (0.508): both mallets land in the /k/ closure of "quit" (0.45-0.53),
+    # never on its burst
     put(out, glass(1046.50, ratios, decs, amps, 1.05, 41, mallet=0.42, body=0.10, beat_hz=0.9), 0.000, 1.0, -0.15)
-    put(out, glass(1396.91, ratios, decs, amps, 1.0, 42, mallet=0.42, body=0.10, beat_hz=0.9), 0.085, 0.92, 0.15)
+    put(out, glass(1396.91, ratios, decs, amps, 1.0, 42, mallet=0.42, body=0.10, beat_hz=0.9), 0.058, 0.92, 0.15)
     d = 0.06; n = n_of(d)
     fl = decor(lambda sd: tv_bandpass(noise(d, sd), np.geomspace(3500, 9000, n), bw_oct=0.6) * env_bell(n, 0.5, 1.4),
                43, 0.8)
@@ -264,13 +279,17 @@ def wings(v=1):
 @sound
 def ghost_tick(v=1):
     """ONE soft wooden tick, ONE pitch (C6 main mode, identical in every variant): a felt mallet on a small hard-wood
-    block: its modes with their noisy body, a woody knock around 520 Hz (not a sine), the felt's contact."""
+    block: its modes with their noisy body, a woody knock around 520-830 Hz (noise rung through the block's low
+    resonances, not a sine), and the short broadband 'tok' of the felt meeting the wood, so the block reads as wood
+    (review item 9: never a bare decaying sine)."""
     s0 = 91 + 17 * v; r = rng(s0)
-    y = struck([1046.5, 2721.0 * r.uniform(0.99, 1.01), 4605.0 * r.uniform(0.99, 1.01)], [0.022, 0.008, 0.004],
-               [1.0, 0.12 * r.uniform(0.85, 1.15), 0.03], 0.12, s0, exc_ms=1.6, noise_body=0.30, contact_amp=0.22,
-               contact_band=(400, 3500), contact_dec=0.0012, spread=0.004, n_extra=1)
-    y += 0.45 * unit(body_noise([523.25, 830.0], [0.016, 0.008], [1, .35], 0.12, s0 + 9, q=6.0))
-    return slap(pan(lp(y, 3200, 2), -0.1), -6.0)
+    y = struck([1046.5, 2721.0 * r.uniform(0.99, 1.01), 4605.0 * r.uniform(0.99, 1.01)], [0.018, 0.007, 0.004],
+               [1.0, 0.12 * r.uniform(0.85, 1.15), 0.03], 0.12, s0, exc_ms=1.6, noise_body=0.55, contact_amp=0.45,
+               contact_band=(500, 5000), contact_dec=0.0016, spread=0.004, n_extra=1)
+    y += 0.5 * unit(body_noise([523.25, 830.0, 1310.0], [0.014, 0.008, 0.005], [1, .45, .25], 0.12, s0 + 9, q=5.0))
+    tok = bp(noise(0.02, s0 + 11), 700, 2600, 2) * env_ad(n_of(0.02), 0.0006, 0.004)
+    y[: len(tok)] += 0.35 * unit(tok)
+    return slap(pan(lp(y, 3600, 2), -0.1), -6.0)
 
 
 @sound
@@ -297,30 +316,35 @@ def ear_flap(v=1):
     return out
 
 
+DIVE_MID = 0.15        # whoosh_dive: the carrier's midpoint, s after the cue (the push-throughs run 0.30 s)
+
+
 @sound
 def whoosh_dive(v=1):
-    """the push-through into her dark window (5.95-6.25): air rising then settling (decorrelated L/R: no comb), a
-    muffled 'through the glass' bump; gone by 6.27, before "You'd"."""
-    d = 0.32; n = n_of(d)
-    c = np.concatenate([np.geomspace(350, 1600, int(n * 0.62)), np.geomspace(1600, 900, n - int(n * 0.62))])
+    """the A push-throughs with the plum bridge: v1 into her dark window W (5.95-6.25), v2 into her silhouette in her
+    lit window (14.71-15.01). The air rises INTO the glass, a muffled 'through the glass' bump lands ON the midpoint
+    (+0.15 s: the plum bridge frame), then the air settles as the new shot opens (decorrelated L/R: no comb); gone by
+    +0.32, before the next word (0.18-0.21 s after the midpoint)."""
+    d = 0.32; n = n_of(d); k = DIVE_MID / d
+    c = np.concatenate([np.geomspace(350, 1600, int(n * k)), np.geomspace(1600, 900, n - int(n * k))])
 
     def one(sd):
-        y = tv_bandpass(noise(d, sd), c, bw_oct=1.1) * env_bell(n, 0.62, 1.6)
-        return y + 0.35 * lp(noise(d, sd + 1), 220) * env_bell(n, 0.6, 2.0)
-    out = decor(one, 130, 0.7)
-    bump = struck([140, 330], [0.05, 0.03], [1, .4], 0.14, 132, exc_ms=1.2, noise_body=0.4, contact_amp=0.15,
-                  contact_band=(150, 1500), contact_dec=0.004)
-    put(out, bump, 0.20, 0.3, 0.0)
+        y = tv_bandpass(noise(d, sd), c, bw_oct=1.1) * env_bell(n, k, 1.6)
+        return y + 0.35 * lp(noise(d, sd + 1), 220) * env_bell(n, k, 2.0)
+    s0 = 130 + 40 * (v - 1)
+    out = decor(one, s0, 0.7)
+    bump = struck([140 * (1 - 0.03 * (v - 1)), 330], [0.05, 0.03], [1, .4], 0.14, s0 + 2, exc_ms=1.2, noise_body=0.4,
+                  contact_amp=0.15, contact_band=(150, 1500), contact_dec=0.004)
+    put(out, bump, DIVE_MID - 0.002, 0.3, 0.0)
     return out
 
 
 # ------------------------------------------------------------------ V2S2 (6.10-12.98)
 @sound
-def pencil_ring(v=1):
-    """an ink ring drawn round her dark window: one continuous circular graphite stroke, a lift at the end."""
-    d = 0.44; n = n_of(d); t = tt(d)
-    sp = 0.72 + 0.28 * np.sin(2 * np.pi * 2.3 * t + 0.6)
-    return pan(lp(graphite(d, 140, sp, 1.0), 6500, 2) * stroke_env(n, 0.008, 0.035), -0.3)
+def window_outline(v=1):
+    """'one': her dark window's A outline pops on in ONE frame (6.82; the drawn ring is retired: a pop is A's): one
+    soft round pop, a felt attack and a breath of air, toward her window at M (screen left)."""
+    return pan(popper(1000, 480, 0.06, 0.018, 220, 0.2), -0.35)
 
 
 @sound
@@ -344,13 +368,15 @@ def board_clack(v=1):
 
 @sound
 def light_clicks(v=1):
-    """'staff': the five windows round hers turn a cooler white: five tiny switch clicks, left of frame."""
+    """'staff': the five windows round hers turn a cooler white in ONE step (conform_L2 s6): five tiny switch clicks
+    within 40 ms, one cluster, left of frame (done before the vowel of "staff" opens)."""
     out = buf(0.22); r = rng(160)
-    for k, (s, p) in enumerate(zip([0, 0.035, 0.08, 0.12, 0.165], [-0.38, -0.14, -0.65, -0.39, -0.15])):
+    for k, (s, p) in enumerate(zip([0, 0.011, 0.019, 0.029, 0.04], [-0.38, -0.14, -0.65, -0.39, -0.15])):
         f = r.uniform(0.95, 1.05)
-        c = struck([2600 * f, 4300 * f], [0.003, 0.002], [1, .5], 0.02, 160 + k, exc_ms=0.12, noise_body=0.3,
-                   contact_amp=0.4, contact_band=(1500, 9000), contact_dec=0.0006, n_extra=1)
-        put(out, c, s, r.uniform(0.8, 1.0), p)
+        c = struck([900 * f, 1450 * f, 2300 * f], [0.006, 0.004, 0.002], [1, .5, .2], 0.03, 160 + k, exc_ms=0.2,
+                   noise_body=0.35, contact_amp=0.4, contact_band=(400, 2500), contact_dec=0.0008, n_extra=1)
+        put(out, lp(c, 2600, 4), s, r.uniform(0.8, 1.0), p)          # a soft bank of switches, under 2.6 kHz: the
+        #                                                              /z s t/ of "Google's staff" keep their band
     return slap(out, -8.0)
 
 
@@ -416,34 +442,8 @@ def notebook_clap(v=1):
 
 # ------------------------------------------------------------------ V2S3 / V2S4 (12.98-20.55)
 @sound
-def swap_pop(v=1):
-    """the window match-cut: one soft round pop."""
-    return pan(popper(1000, 480, 0.06, 0.018, 220, 0.2), -0.25)
-
-
-@sound
-def pip_land(v=1):
-    """Pip's teddy-bear soles land: a soft padded 'pmf' (a padded body, not a sine)."""
-    d = 0.09; n = n_of(d); s0 = 230 + 11 * v
-    y = hp(lp(noise(d, s0), 900), 120) * env_ad(n, 0.004, 0.02)
-    y += 0.6 * unit(body_noise([150 * (1 + 0.03 * (v - 1)), 260], [0.02, 0.012], [1, .4], d, s0 + 3, q=4.0))
-    return slap(pan(y, 0.0), -10.0)
-
-
-@sound
-def pip_hop(v=1):
-    """Pip hops: a small springy upward glide and a breath of air (the hop half of the pop family)."""
-    d = 0.11; n = n_of(d); k = [1.0, 1.035, 0.97][(v - 1) % 3]; s0 = 240 + 13 * v
-    f = np.concatenate([np.geomspace(420 * k, 980 * k, n_of(0.075)), np.full(n - n_of(0.075), 980.0 * k)])
-    y = 0.8 * np.sin(2 * np.pi * np.cumsum(f) / SR) * env_ad(n, 0.006, 0.035)
-    y += 0.12 * np.sin(2 * np.pi * np.cumsum(np.geomspace(840 * k, 1960 * k, n)) / SR) * env_ad(n, 0.006, 0.025)
-    y += 0.25 * bp(noise(d, s0), 1000, 5000) * env_ad(n, 0.002, 0.015)
-    return pan(y, 0.0)
-
-
-@sound
 def pop_high(v=1):
-    """a small bright pop: a tag or a line landing."""
+    """a small bright pop: a tag (v1) or a line (v2) landing."""
     k = [1.0, 0.965][(v - 1) % 2]
     return pan(popper(2600 * k, 1700 * k, 0.035, 0.008, 250 + 7 * v, 0.2), 0.0)
 
@@ -489,61 +489,81 @@ def plate_knock(v=1):
     return slap(out, -6.0)
 
 
+def pen_line(plan, seed, dur, strokes=(1.0, 0.9, 0.8, 0.75)):
+    """THE pen drawing one board line: (kind, start, length) taps and strokes (at `strokes` gains); silent between."""
+    out = np.zeros(n_of(dur))
+    k = 0
+    for item in plan:
+        if item[0] == "tap":
+            place(out, pen_tap(seed, 0.6), item[1])
+        else:
+            k += 1
+            place(out, pen_stroke(item[2], seed + 31 * k, k), item[1], strokes[k - 1])
+    return lp(out, 9000, 2)
+
+
+# THE pen, short lines: each build's strokes timed into what its line leaves free.
+#   v1 the APR 2026 plate (19.45-19.80): a gap at +0.215-0.32 holds the /z/ of "was" (19.69-19.75);
+#   v2 'AI principles' (29.60, complete 30.04): every stroke inside the vowel of "AI" (29.61-29.92), done by 29.90,
+#      before the /pr/ of "principles" (29.94).
+PEN_SHORT = {1: [("tap", 0.000), ("stroke", 0.020, 0.085), ("stroke", 0.125, 0.090), ("stroke", 0.320, 0.050)],
+             2: [("tap", 0.000), ("stroke", 0.020, 0.080), ("stroke", 0.120, 0.080), ("stroke", 0.220, 0.080)]}
+
+
 @sound
 def pen_short(v=1):
-    """THE pen, a short line (0.38 s): the APR plate (v1), 'AI principles' (v2)."""
-    return pan(felt_pen(4, 310 + 37 * (v - 1), total=0.38), -0.15)
+    """THE pen, a short line: the APR plate (v1), 'AI principles' (v2): a tap, three strokes (PEN_SHORT)."""
+    return pan(pen_line(PEN_SHORT[v], 310 + 37 * (v - 1), 0.40), -0.15)
 
 
-# THE long pen, ONE file for Google's 'of any kind' (30.73) and her quote (36.50) (A5): a tap, then three strokes,
-# timed into what both lines leave free (her /t/ 36.53-36.57, /k/ 36.73-36.75, /t/ 37.03 and "facts" from 37.06;
-# Google's /z/ 31.06-31.10, /t/ 31.20-31.24): nothing after +0.47 s (review item 1: the pen ends before "facts").
-PEN_LONG = [("tap", 0.000, 0.012), ("stroke", 0.115, 0.090), ("stroke", 0.255, 0.050), ("stroke", 0.375, 0.070)]
+# THE long pen, ONE file for Google's 'of any kind' (30.74) and her quote (36.50) (A5): a tap, then three strokes,
+# timed into what both lines leave free (her /t/ 36.53-36.61, /k/ 36.73-36.75 and "facts" from 37.05; Google's /b/
+# 30.83, /z/ 31.06-31.10, /t/ 31.20): nothing after +0.45 s (review item 1: the pen ends by 36.95, before "facts").
+PEN_LONG = [("tap", 0.000), ("stroke", 0.115, 0.090), ("stroke", 0.255, 0.050), ("stroke", 0.375, 0.070)]
 
 
 @sound
 def pen_long(v=1):
-    """THE pen, the long line: the tip touches, then three strokes (PEN_LONG); the rest of the build is silent."""
-    out = np.zeros(n_of(0.50))
-    for k, (kind, s, d) in enumerate(PEN_LONG):
-        if kind == "tap":
-            place(out, pen_tap(320, 0.6), s)
-        else:
-            place(out, pen_stroke(d, 320 + 31 * k, k), s, [1.0, 0.9, 0.8][k - 1])
-    return pan(lp(out, 9000, 2), -0.15)
+    """THE pen, the long line: the tip touches (in the pause before the line), then three strokes (PEN_LONG) in the
+    vowels of "talking" / "bans" (their consonants stay clear); the rest of the build is silent."""
+    return pan(pen_line(PEN_LONG, 320, 0.50), -0.15)
+
+
+SUN_MID = 0.15         # sun_through: the carrier's midpoint, s after the cue
 
 
 @sound
-def glass_ting(v=1):
-    """the sun match-cuts: ONE struck glass ting on A6 (the bed's key): inharmonic partials, a noise excitation and a
-    soft mallet; 30 dB down 0.22 s after the strike (before 'In' 20.67 / 'But' 28.31). v2 = the callback."""
-    y = glass(1760.0, [1.0, 2.32, 4.25, 6.63], [0.062, 0.03, 0.016, 0.009], [1.0, 0.35, 0.14, 0.05], 0.26,
-              330 + 9 * v, mallet=0.22, mallet_band=(1500, 9000), body=0.10, beat_hz=1.3)
-    return slap(pan(y, 0.12 - 0.24 * (v - 1)), -9.0)
+def sun_through(v=1):
+    """the A push-throughs through a sun (zoom 7, no bridge): v1 into the low October sun and out of the April one
+    (20.40-20.70), v2 into the April sun and out of the sunset one (27.95-28.25, the callback). A glass shimmer swells
+    INTO the light (the reversed ring of the same glass, an air swell rising 0.9 -> 4.2 kHz); on the midpoint (+0.15)
+    one small struck glass tink on A6 (the bed's key: inharmonic partials, noise-excited, a soft mallet), its
+    fundamental's tau 21 ms: 30 dB down ~0.1 s later, before 'In' (20.67) / 'But' (28.31). Light, never a sting."""
+    d = 0.34; n = n_of(d); t = tt(d); s0 = 330 + 9 * v
+    out = buf(d)
+    ring = glass(1760.0, [1.0, 2.32, 4.25, 6.63], [0.11, 0.05, 0.025, 0.012], [1.0, 0.4, 0.16, 0.06], SUN_MID, s0,
+                 mallet=0.0, body=0.12, beat_hz=1.3)[::-1].copy()
+    ring *= np.linspace(0, 1, len(ring)) ** 0.8
+    put(out, ring, 0.0, 0.5, -0.35)
+    c = np.interp(t, [0, SUN_MID, d], [900, 4200, 3000])
+    env = np.where(t < SUN_MID, (t / SUN_MID) ** 2.2, np.exp(-(t - SUN_MID) / 0.012))
+    out += decor(lambda sd: tv_bandpass(noise(d, sd), c, bw_oct=0.9) * env, s0 + 3, 0.7) * 0.35
+    tink = glass(1760.0, [1.0, 2.32, 4.25, 6.63], [0.021, 0.011, 0.006, 0.004], [1.0, 0.35, 0.14, 0.05], 0.18, s0 + 5,
+                 mallet=0.3, mallet_band=(2000, 10000), body=0.06, beat_hz=1.3)
+    put(out, tink, SUN_MID - 0.0005, 0.8, -0.35)
+    return out                     # no canal slap: the light is not in the canal (its reflections held it at -23 dB)
 
 
-# ------------------------------------------------------------------ V2S5 / V2S6 (20.55-28.06)
-@sound
-def calendar_flip(v=1):
-    """'April': the sun flips into a calendar page and back by 21.20: a paper flip, a softer flip back."""
-    out = buf(0.66); r = rng(340)
-    for k, (s, g) in enumerate([(0.0, 1.0), (0.40, 0.6)]):
-        d = 0.17; n = n_of(d)
-        y = bp(noise(d, 341 + k), 700, 6500) * env_bell(n, 0.25, 1.2)
-        y += bp((r.random(n) < 0.015) * r.standard_normal(n), 2500, 9000) * np.exp(-tt(d) / 0.05) * 0.5
-        y += 0.25 * lp(noise(d, 343 + k), 400) * env_ad(n, 0.01, 0.03)
-        put(out, y, s, g, -0.4)
-    return out
-
-
+# ------------------------------------------------------------------ V2S5 / V2S6 (20.55-28.10)
 @sound
 def blossom_pops(v=1):
-    """the slot's trees burst into blossom in 4 frames: a scatter of tiny petal pops and a breath of air."""
+    """'April': the slot's trees burst into blossom in 4 frames: a scatter of tiny petal pops (each a little glide with
+    a puff, never a bare sine) and a breath of air."""
     out = buf(0.30); r = rng(350)
     for k in range(16):
-        f = r.uniform(2400, 4200); d = 0.02
-        y = np.sin(2 * np.pi * f * tt(d)) * np.exp(-tt(d) / 0.004) + 0.2 * hp(noise(d, 351 + k), 3000) * np.exp(-tt(d) / 0.002)
-        put(out, y, r.uniform(0, 0.13), r.uniform(0.3, 1.0), r.uniform(-0.8, 0.2))
+        f = r.uniform(2400, 4200)
+        put(out, popper(f, f * 0.72, 0.02, 0.004, 351 + k, 0.3, (3000, 9000)), r.uniform(0, 0.13), r.uniform(0.3, 1.0),
+            r.uniform(-0.8, 0.2))
     d = 0.18
     put(out, bp(noise(d, 370), 1500, 7000) * env_bell(n_of(d), 0.3, 1.5) * 0.15, 0.0, 1.0, -0.3)
     return out
@@ -551,72 +571,114 @@ def blossom_pops(v=1):
 
 @sound
 def wipe_air(v=1):
-    """the lamppost wipes the backs at the crane's peak speed: a close, quick air pass, right to left."""
+    """the lamppost wipes the backs at the crane's peak speed (22.02-22.19): a close, quick air pass, right to left,
+    peaking at +0.15 (22.10, the lamppost's midpoint)."""
     d = 0.30; n = n_of(d)
     c = np.concatenate([np.geomspace(300, 1800, n // 2), np.geomspace(1800, 600, n - n // 2)])
     y = tv_bandpass(noise(d, 380), c, bw_oct=1.0) * env_bell(n, 0.5, 1.4)
     y += 0.3 * lp(noise(d, 381), 250) * env_bell(n, 0.5, 2.0)
-    return pan_sweep(y, 0.7, -0.7)
+    return pan_sweep(lp(y, 2800, 4), 0.7, -0.7)                       # under 2.8 kHz: "letting"'s /t/ keeps its band
+
+
+def far_switch(seed):
+    """one far window switching on: a tiny switch tick (its contact and a little body)."""
+    return lp(struck([2200 * rng(seed).uniform(0.98, 1.02), 3700], [0.0035, 0.0022], [1, .45], 0.015, seed, exc_ms=0.15,
+                     noise_body=0.3, contact_amp=0.35, contact_band=(1200, 8000), contact_dec=0.0006, n_extra=1), 6000)
+
+
+@sound
+def window_warm(v=1):
+    """'use' (23.08): the Pentagon wing's windows warm on in ONE flat step (map windowsWarmAt): one far switch, right."""
+    return slap(pan(far_switch(395), 0.4), -9.0)
 
 
 @sound
 def window_ticks(v=1):
-    """windows warm on along a wing / a facade, one by one: seven tiny far switch ticks, never accelerating."""
-    out = buf(0.66); r = rng(390 + 50 * v)
-    for k, s in enumerate([0, 0.09, 0.19, 0.27, 0.38, 0.47, 0.58]):
-        y = struck([2200 * r.uniform(0.98, 1.02), 3700], [0.0035, 0.0022], [1, .45], 0.015, 391 + k + 50 * v,
-                   exc_ms=0.15, noise_body=0.3, contact_amp=0.35, contact_band=(1200, 8000), contact_dec=0.0006,
-                   n_extra=1)
-        put(out, lp(y, 6000), s + r.normal(0, 0.004), r.uniform(0.7, 1.0), -0.5 + k / 6)
+    """S6, 27.10-27.83: the facade windows light, three far switch-ons on sheet.WINDOW_TICK_FRAMES (flash-safe, <= 3 per
+    second; 27.10 in 'how it's', 27.45 in 'used', 27.83 in the pause), left to right along the facade band."""
+    out = buf(0.90)
+    for k, f_ in enumerate(sheet.WINDOW_TICK_FRAMES):
+        put(out, far_switch(441 + k), f_ / FPS, [1.0, 0.85, 0.75][k], [-0.45, 0.05, 0.5][k])
     return slap(out, -9.0)
 
 
-# ------------------------------------------------------------------ V2S7 / V2S8 (28.06-39.08)
-# THE lamp run, ONE file for Google's string lights (30.18) and her lane's lamps (37.23) (A5): seven small glass
-# bulbs tinking on, on exact frames after the cue (the picture lights them on these frames); timed into the vowels of
-# BOTH key words ("principles": /s/ 30.11-30.17, /z/ 30.45-30.55; "facts is": /ts/ 37.50-37.64, /z/ 37.76-37.84).
-LAMP_RUN_FRAMES = [0, 4, 7, 11, 26, 29, 37]
+TREE_MID = 0.18        # tree_wipe: the wipe's midpoint, s after the cue (23.62 -> 23.80)
 
 
 @sound
+def tree_wipe(v=1):
+    """the blossom tree crossing the lens right to left (23.62-23.98, S5's Wiper): a soft close rush of leaves (a CC0
+    rustle grain, kept under 2.4 kHz: the voice is saying 'AI for', its /f/ keeps its band) and the air of the trunk passing, right -> left,
+    peaking on the midpoint 23.80; down 20 dB by 'any' (24.03)."""
+    d = 0.42; n = n_of(d); t = tt(d); k = TREE_MID / d
+    g = FLD.cut(FLD.load(347557, mono=True), 11.10, 11.10 + d, 0.01)
+    leaves = unit(lp(bp(g, 300, 2400, 2), 2400, 4)) * env_bell(n, k, 3.0)
+    c = np.interp(t, [0, TREE_MID, d], [250, 900, 300])
+    air = tv_bandpass(noise(d, 371), c, bw_oct=1.1) * env_bell(n, k, 3.4)
+    y = lp(0.6 * leaves + 0.45 * unit(air), 2200, 4)              # all of it under 2.2 kHz: the /f/ of "for" (23.76)
+    p = -0.8 * np.tanh((t - TREE_MID) / 0.09)
+    return pan_curve(y, p)
+
+
+def pan_curve(x, p):
+    """mono -> stereo with a per-sample pan curve (constant power)."""
+    th = (np.clip(p, -1, 1) + 1) * np.pi / 4
+    return np.stack([x * np.cos(th), x * np.sin(th)], axis=1) * np.sqrt(2)
+
+
+# ------------------------------------------------------------------ V2S7 / V2S8 (28.10-39.08)
+@sound
 def lamp_run(v=1):
-    """lights coming on in a run: seven small struck glass bulbs (inharmonic, noise-excited), one pitch family around
-    D8, panning across; never the ding."""
-    out = buf(0.75); r = rng(400)
-    for k, f_ in enumerate(LAMP_RUN_FRAMES):
+    """THE lamp run (A5: ONE file for Google's forecourt lights on 'principles' and her lane's lamps on 'facts'): three
+    switch-ons on sheet.LAMP_RUN_FRAMES (0 / +24 / +36 frames: flash-safe, <= 3 per second), each a small struck glass
+    bulb (D8: inharmonic, noise-excited, 30 dB down in 76 ms) over the soft warm 'fwump' of a light coming up; near to
+    far, a little right to left. Never the ding."""
+    out = buf(0.80); r = rng(400)
+    for k, f_ in enumerate(sheet.LAMP_RUN_FRAMES):
+        g, p = [1.0, 0.82, 0.68][k], [0.15, 0.0, -0.15][k]
         f = 4698.6 * (1 + 0.004 * r.uniform(-1, 1))
-        y = glass(f, [1.0, 1.54, 2.27], [0.022, 0.011, 0.006], [1.0, 0.35, 0.12], 0.09, 400 + k, mallet=0.5,
+        y = glass(f, [1.0, 1.54, 2.27], [0.022, 0.011, 0.006], [1.0, 0.35, 0.12], 0.10, 400 + k, mallet=0.5,
                   mallet_band=(3000, 14000), body=0.18, beat_hz=0.0)
-        put(out, y, f_ / FPS, (1.0 - 0.04 * k) * r.uniform(0.85, 1.0), -0.4 + 0.8 * k / (len(LAMP_RUN_FRAMES) - 1))
+        put(out, y, f_ / FPS, g, p)
+        w = lp(hp(noise(0.12, 410 + k), 80), 420) * env_ad(n_of(0.12), 0.015, 0.05)
+        put(out, 0.25 * unit(w), f_ / FPS, g, p)
     return out
 
 
+BOAT_MID = 0.23        # boat_pass: the wipe's midpoint, s after the cue (32.70 -> 32.93)
+
+
 @sound
-def boat_chug(v=1):
-    """the narrowboat wipes the frame: a soft diesel putter passing close (6.2 Hz) and its bow wash, left to right."""
-    d = 1.0; n = n_of(d)
-    y = np.zeros(n)
-    for k in range(int(d * 6.2)):
-        p = 0.8 * unit(body_noise([62, 124, 186], [0.03, 0.02, 0.012], [1, .5, .25], 0.08, 410 + k, q=6.0))
-        p += 0.5 * lp(noise(0.08, 420 + k), 300) * np.exp(-tt(0.08) / 0.02)
-        p *= env_ad(len(p), 0.004, 10.0)
-        place(y, p, k / 6.2)
-    y *= env_bell(n, 0.45, 1.5)
-    y += 0.35 * hp(lp(noise(d, 430), 900), 150) * env_bell(n, 0.55, 1.6)
-    return pan_sweep(y, -0.6, 0.6)
+def boat_pass(v=1):
+    """the narrowboat gliding west past the lens (32.70-33.16, S7's Wiper): its diesel putter (a CC0 narrowboat
+    engine grain) with a small doppler glide (+2.5 % approaching, -2.5 % going), the bow wash just behind it, right ->
+    left, nearest on the midpoint 32.93. It starts at 32.70 (nothing earlier: Google's line runs to 32.70 untouched)
+    and is ~16 dB down by 'She' (33.16)."""
+    d = 0.80; n = n_of(d); t = tt(d)
+    x = FLD.load(576577, mono=True)
+    rate = 1.0 + 0.025 * -np.tanh((t - BOAT_MID) / 0.08)
+    pos = n_of(14.0) + np.cumsum(rate)
+    eng = lp(hp(np.interp(pos, np.arange(len(x)), x), 60, 2), 2500, 2)
+    env = np.where(t < BOAT_MID, np.sin(0.5 * np.pi * t / BOAT_MID) ** 2, np.exp(-(t - BOAT_MID) / 0.12))
+    w_ = FLD.cut(FLD.load(318064, mono=True), 9.20, 9.20 + d, 0.02)
+    wash = bp(w_, 200, 2600, 2)
+    env2 = np.interp(t, t + 0.05, env, left=0.0)
+    y = 0.8 * unit(eng) * env + 0.5 * unit(wash) * env2
+    p = -0.75 * np.tanh((t - BOAT_MID) / 0.15)
+    return pan_curve(y, p)
 
 
 @sound
 def door_latch(v=1):
     """her teal door shuts behind her down the lane: a soft wooden close, the latch, the lane's slap."""
     out = buf(0.50)
-    th = struck([92, 185, 340], [0.06, 0.035, 0.02], [1, .6, .3], 0.42, 440, exc_ms=1.0, noise_body=0.45,
-                contact_amp=0.25, contact_band=(150, 3000), contact_dec=0.004)
-    th[: n_of(0.06)] += 0.4 * lp(noise(0.06, 441), 600) * np.exp(-tt(0.06) / 0.025)
+    th = struck([92, 185, 340], [0.05, 0.03, 0.018], [1, .6, .3], 0.42, 440, exc_ms=1.0, noise_body=0.8,
+                contact_amp=0.5, contact_band=(150, 3000), contact_dec=0.005)
+    th[: n_of(0.08)] += 0.7 * lp(noise(0.08, 441), 700) * np.exp(-tt(0.08) / 0.03)   # the wooden body's thud: noise, not a hum
     put(out, th, 0.0, 1.0, 0.25)
     put(out, struck([2450, 4100, 5900], [0.006, 0.004, 0.003], [1, .6, .3], 0.03, 442, exc_ms=0.1, noise_body=0.3,
                     contact_amp=0.4, contact_band=(2000, 10000), contact_dec=0.0006), 0.035, 0.5, 0.25)
-    return slap(out, -3.0)
+    return slap(out, -8.0)
 
 
 @sound
@@ -632,20 +694,28 @@ def cloth_wipe(v=1):
     return pan_sweep(lp(y, 3800, 2), -0.5, 0.2)
 
 
+UNBUILD_MID = 0.13     # pen_unbuild: the loop join's midpoint (38.95), s after the cue (38.82)
+
+
 @sound
-def pencil_reverse(v=1):
-    """the un-build: a pencil scribble played backwards, swelling INTO the loop seam. It ends on the film's last frame
-    at -6 dB of its swell and runs SEAM_XF on (wrapping onto frame 0 in the premix) with a fade-out, as the flood fades
-    in: a 15 ms crossfade at a matched level (premix wraps cue overflow; sfx.py matches the levels)."""
-    d = 16 / FPS; n = n_of(d); t = tt(d)
-    sp = 0.6 + 0.4 * np.abs(np.sin(2 * np.pi * 9 * t))
-    y = graphite(d, 460, sp, 1.0) * env_ad(n, 0.004, 0.09)
-    y = y[::-1].copy()                                             # swells toward the seam
-    w = np.interp(t, [0, d * 0.78, d], [1.0, 1.0, db2a(-6.0)])     # and eases to -6 dB as it meets the flood
-    y *= w
-    tail = graphite(SEAM_XF, 461, None, 1.0) * np.cos(0.5 * np.pi * np.linspace(0, 1, n_of(SEAM_XF))) ** 2
-    tail *= np.sqrt(np.mean(y[-n_of(0.01):] ** 2)) / (np.sqrt(np.mean(graphite(SEAM_XF, 461) ** 2)) + 1e-12)
-    return pan(np.concatenate([y, tail]), 0.0)
+def pen_unbuild(v=1):
+    """the loop (B + un-build, 38.82-39.08): S8's lines retract, the clean pen's stroke reversed, swelling to the
+    midpoint 38.95, where it turns into the forward glide of frame 0's draw-on (S1's subject outline begins at -0.26,
+    under the un-build) and runs on at a steady level INTO the seam, then SEAM_XF past it (the premix wraps it onto
+    frame 0) with a fade-out as pen_drawon fades in: a 15 ms crossfade at a matched level (sfx.match_seam)."""
+    d = 16 / FPS                                                   # 38.8167 (frame 2329) -> the seam 39.0833
+    xf = n_of(0.006)                                               # the turn: a 6 ms overlap, no step
+    a = pen_glide(UNBUILD_MID, 461)[::-1].copy()
+    a *= np.linspace(0.12, 1.0, len(a)) ** 1.6
+    b = pen_glide(d - UNBUILD_MID + SEAM_XF + xf / SR, 102)       # its fade-out starts ON the seam
+    b[-n_of(SEAM_XF):] *= np.cos(0.5 * np.pi * np.linspace(0, 1, n_of(SEAM_XF))) ** 2
+    y = np.zeros(len(a) + len(b) - xf)
+    y[: len(a)] += a
+    a_tail = np.cos(0.5 * np.pi * np.linspace(0, 1, xf)) ** 2
+    y[len(a) - xf: len(a)] *= a_tail
+    bb = b.copy(); bb[:xf] *= np.sin(0.5 * np.pi * np.linspace(0, 1, xf)) ** 2
+    y[len(a) - xf:] += bb
+    return pan(y * 0.62, 0.1)
 
 
 # ------------------------------------------------------------------ measurement + cue sheet
@@ -657,7 +727,7 @@ WORD_MIN = 6.0         # hit words: the voice >= 6 dB over bed + SFX at 1-4 and 
 WORD_MIN_OTHER = 3.0   # every other word: >= 3 dB (the voice on top everywhere; the bed is carved to >= 9 dB)
 WORD_MARGIN = 0.5
 BANDS = {"1-4k": (1000.0, 4000.0), "4-10k": (4000.0, 10000.0)}
-UNTRIMMED = {"pencil_reverse"}                   # exact length: it ends on the film's last frame (+ the crossfade)
+UNTRIMMED = {"pen_unbuild", "pen_drawon"}      # exact length: the seam's crossfade pair
 
 
 def tonality(y):
@@ -879,14 +949,14 @@ def word_guard(rows, arrs, bed, extra, iters=12):
 
 def match_seam(rows, arrs):
     """the un-build's last 15 ms (2-8 kHz) = the flood's first 15-45 ms at their gains: the crossfade at the loop
-    seam keeps one level (review item 10). Returns the dB to add to pencil_reverse."""
+    seam keeps one level (review item 10). Returns the dB to add to pen_unbuild."""
     def rms(x, a, b):
         z = bp(st(x).mean(axis=1), 2000, 8000, 4)[n_of(a): n_of(b)]
         return np.sqrt(np.mean(z ** 2) + 1e-30)
-    gf = next(r["g_tot"] for r in rows if r["fam"] == "pencil_flood")
-    gr = next(r["g_tot"] for r in rows if r["fam"] == "pencil_reverse")
-    rev = arrs[next(r["name"] for r in rows if r["fam"] == "pencil_reverse")]
-    flo = arrs[next(r["name"] for r in rows if r["fam"] == "pencil_flood")]
+    gf = next(r["g_tot"] for r in rows if r["fam"] == "pen_drawon")
+    gr = next(r["g_tot"] for r in rows if r["fam"] == "pen_unbuild")
+    rev = arrs[next(r["name"] for r in rows if r["fam"] == "pen_unbuild")]
+    flo = arrs[next(r["name"] for r in rows if r["fam"] == "pen_drawon")]
     d0 = len(rev) / SR - SEAM_XF
     lr = a2db(rms(rev, d0 - 0.015, d0)) + gr
     lf = a2db(rms(flo, SEAM_XF, SEAM_XF + 0.03)) + gf
@@ -929,7 +999,7 @@ def build(write=True):
         first_under.setdefault(fam, under)
         g_sheet = vref - under - f["event_lufs"]
         if fam in sheet.LEAD_SOUNDS:
-            lim, rule = sheet.DRAFT_LEVEL[fam] + sheet.VS_DRAFT[fam] - f["event_lufs"], "fixed (draft +4 dB)"
+            lim, rule = sheet.DRAFT_LEVEL[fam] + sheet.VS_DRAFT[fam] - f["event_lufs"], f"fixed (draft {sheet.VS_DRAFT[fam]:+.1f} dB)"
         else:
             lim, rule = gain_for(V, frame_t(t), under, f["event_lufs"], f["band_db"], f["dur"],
                                  f["tonality"] >= TONAL_MIN)
@@ -953,7 +1023,7 @@ def build(write=True):
         r["g_tot"] = r["g_db"] + extra[r["fam"]]
     seam_db = match_seam(rows, arrs)
     for r in rows:
-        if r["fam"] == "pencil_reverse":
+        if r["fam"] == "pen_unbuild":
             r["g_tot"] += seam_db
     cues = [{"src": "v2r/music_bed.wav", "t": 0.0, "gain": 1.0,
              "note": "the bed 'Towpath' (music + canal / Arlington air, pre-ducked under the locked voice): play as is"}]
@@ -963,7 +1033,7 @@ def build(write=True):
             rule += f", bus {bus_extra[r['fam']]:+.1f}"
         if extra[r["fam"]] - bus_extra[r["fam"]] < -0.05:
             rule += f", words {extra[r['fam']] - bus_extra[r['fam']]:+.1f}"
-        if r["fam"] == "pencil_reverse":
+        if r["fam"] == "pen_unbuild":
             rule += f", seam match {seam_db:+.1f}"
         g = float(db2a(r["g_tot"]))
         if g > 1.0:
@@ -972,13 +1042,13 @@ def build(write=True):
         cues.append({"src": f"v2r/sfx/{files[r['name']]['file']}.wav", "t": round(r["t"], 4), "gain": round(g, 4),
                      "note": r["note"], "under_db": r["under"], "set_by": rule})
     if write:
-        (PUBLIC / "cues.json").write_text(json.dumps(cues, indent=1, ensure_ascii=False) + "\n")
+        (PUBLIC / "cue_sheet.json").write_text(json.dumps(cues, indent=1, ensure_ascii=False) + "\n")
     rep = {"voice_speech_level": round(vref, 2), "files": files, "words": words, "bed_limited_words": bed_limited,
-           "seam_match_db": round(seam_db, 2), "glass_ting_decay": ting_decay(arrs)}
+           "seam_match_db": round(seam_db, 2), "sun_tink_decay": ting_decay(arrs), "joins": join_report(arrs)}
     SCRATCH.mkdir(parents=True, exist_ok=True)
     (SCRATCH / "sfx_report.json").write_text(json.dumps(rep, indent=1))
     print(f"voice speech level {vref:.2f} LUFS (momentary median); {len(files)} files, {len(cues) - 1} cues -> "
-          f"{OUT} + {PUBLIC / 'cues.json'}")
+          f"{OUT} + {PUBLIC / 'cue_sheet.json'}")
     for k, v in files.items():
         print(f"  {v['file']:16s} {v['dur']:5.2f} s  event {v['event_lufs']:6.1f} LUFS  1-4 kHz {v['band_db']:6.1f} dB  "
               f"tonal {v['tonality']:.2f}  mono notch {v['mono_notch_db']:5.1f} dB  clicks {v['clicks']}")
@@ -988,22 +1058,41 @@ def build(write=True):
     for w in words:
         raw = f"  (raw {w.get('1-4k_raw')} / {w.get('4-10k_raw')})" if "1-4k_raw" in w else ""
         print(f"  {w['t']:6.2f} {w['word']:13s} {w['1-4k']} [{w.get('1-4k_min')}]  {w['4-10k']} [{w.get('4-10k_min')}]{raw}")
-    print("bed-limited:", bed_limited, " seam match", round(seam_db, 2), "dB  ting decay", rep["glass_ting_decay"])
+    print("bed-limited:", bed_limited, " seam match", round(seam_db, 2), "dB  sun tink decay", rep["sun_tink_decay"])
+    for j in rep["joins"]:
+        print(f"  join {j['join']}: {j['carrier']} peaks {j['peak_vs_mid_ms']:+d} ms from the midpoint, "
+              f"{j['at_mid_vs_peak_dB']:+.1f} dB there")
     return cues, files, vref
 
 
 def ting_decay(arrs):
-    """dB under its own peak (50 ms RMS) 0.22 s and 0.31 s after the strike: >= 30 before the next word."""
+    """the sun push-throughs: dB under the tink's peak (20 ms RMS) 0.12 s and 0.21 s after the midpoint (the next
+    words: 'In' 20.67 = +0.12, 'But' 28.31 = +0.21): >= 30 before the next word."""
     out = {}
     for name, y in arrs.items():
-        if not name.startswith("glass_ting"):
+        if not name.startswith("sun_through"):
             continue
-        m = st(y).mean(axis=1); w = n_of(0.05)
+        m = st(y).mean(axis=1); w = n_of(0.02)
         e = np.sqrt(np.convolve(m ** 2, np.ones(w) / w, "same"))
-        pk = e.max()
-        out[name] = {f"{d}": round(float(a2db(e[min(len(e) - 1, n_of(d))] / pk)), 1) if n_of(d) < len(e) else -120.0
-                     for d in (0.22, 0.31)}
+        i0 = n_of(SUN_MID)
+        pk = e[i0: i0 + n_of(0.03)].max()
+        out[name] = {f"+{d}": round(float(a2db(e[min(len(e) - 1, i0 + n_of(d))] / pk)), 1) for d in (0.12, 0.21)}
     return out
+
+
+def join_report(arrs):
+    """every join's carrier: where its loudest 20 ms falls against the midpoint (designed offsets: DIVE_MID, SUN_MID,
+    TREE_MID, BOAT_MID, UNBUILD_MID; the B match's click on its frame) and its level at the midpoint."""
+    rows = []
+    for (j, mid, carrier, span, snd) in sheet.JOINS:
+        y = arrs[snd]; m = st(y).mean(axis=1); w = n_of(0.02)
+        e = np.sqrt(np.convolve(m ** 2, np.ones(w) / w, "same")) + 1e-12
+        t0 = frame_t(min((c[0] for c in sheet.CUES if c[1] == snd), key=lambda tc: abs(tc - mid)))
+        ipk = int(np.argmax(e)); imid = min(len(e) - 1, max(0, n_of(mid - t0)))
+        rows.append({"join": j, "carrier": snd, "cue_t": round(t0, 3), "peak_t": round(t0 + ipk / SR, 3),
+                     "peak_vs_mid_ms": int(round(1000 * (t0 + ipk / SR - mid))),
+                     "at_mid_vs_peak_dB": round(float(a2db(e[imid] / e[ipk])), 1)})
+    return rows
 
 
 if __name__ == "__main__":

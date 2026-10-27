@@ -2,6 +2,42 @@
 
 Updated by the orchestrator every hour (scheduled check-in) and at every milestone. Newest snapshot first.
 
+## Note 2026-10-27 23:05 UTC: sound revision 2 DONE (be9ecc0)
+
+Joins on their carriers and midpoints, no Pip hops, a positive glass-chime ding at 0.45, calm air from the conformed life, the music director's 12
+fixes; -14.01 LUFS / -1.25 dBTP; every hit word has the voice >= 6 dB over everything at 1-4 and 4-10 kHz; Film2R now plays `public/v2r/mix.wav`
+(cues.json points at it). Open: one listen on phone speakers + earbuds; re-time `sheet.CUES` from the final picture (W4). Requests for the lanes when
+they resume: L5 S7 festoon in three switch-ons on f1812 / 1836 / 1848; S6 `f12LineAt` 26.40 -> 26.467 (f1588) and facade windows on f1626 / 1647 /
+1670; L6 S8 lamp run on f2237 / 2261 / 2273 (same spacing as S7, fairness A5).
+
+## Snapshot 2026-10-27 22:45 UTC: the owner's depth notes come first
+
+The owner on the G4 look clip: the subject blurs with the background (the Google wing melts into the far city), no distance effect, no
+perspective, the steps have no depth; shadows better; research GitHub libraries for more natural effects; add a few particles; "let's address
+those first, distill and generalize into the production pipeline so the quality compounds, and show me this scene once again". Done/doing:
+playbook rule DEPTH AND SEPARATION + DIRECTION rule 2 (committed); L2-L6 PAUSED cleanly (handovers); L1 does S1's depth pass by hand now (atmospheric
+perspective on the far city, the wing separated, the steps receding to a vanishing point) with a slot for particles; local workflow
+`wf_5d776523-d28`: library scout + depth analyst -> builder (lib/depth.ts, lib/particles.tsx, scripts/qa/check_depth.py, DEPTH.md, CRAFT §f,
+PIPELINE_V2 gates, v2 brief sections) -> adversarial critic. Then L1 adds the particles and re-renders the look clip (v3) for the owner.
+
+## Snapshot 2026-10-27 22:25 UTC: look APPROVED, all lanes conforming
+
+The owner approved the G4 look clip ("okay good continue"; `deliverables/v2/v2r_G4_look.mp4`). Running now, each ONE agent + ONE critic round:
+L1 the look clip v2 (foreground at foreground scale on the steps); L2 S2; L3 S3+S4; L4 S5; L5 boards + S6 + S7; L6 S8 + the loop seam (reports
+due ~23:55-00:10 UTC, each with a 0.4-scale clip and CRAFT checks). Local: the sound revision (new joins). Next: assembly (full 60 fps render,
+gate_check incl. carriers, check_light, density), one whole-film review round, fixes, final mix, master, QA, cover, posting kit.
+
+## Snapshot 2026-10-27 21:19 UTC (hourly)
+
+| part | owner | status |
+|---|---|---|
+| Groundwork integrator (STYLE values-only, TREATMENT banner, COMMON, THROUGHLINE §7) | local workflow (resumed after a container restart at ~20:45) | finishing: docs done, final typecheck + push |
+| G4 look clip (S1, 0-~6.3 s) | L1 helper (resumed 20:57) | building: clean-pen frame 0 (pale cascade, subject draw-on), camera locked, tiers, light rig RIG_CANAL, life cut to budget (0e97dec); due ~22:30 |
+| L2-L6 conform | helpers, idle | wait for the owner's approval of the look clip (approved pipeline: G4 before the lanes) |
+
+**Spend:** orchestrator $3,607.51 (+$26 in the last hour); L1 +$28.5 since 20:57. Owner 20:59: session 13 % (resets ~23:30), weekly 62 %.
+Projection: video 2 needs ~22-28 % more of the week -> ~85-90 % with the v3 rework sharing the week.
+
 ## Snapshot 2026-10-27 20:19 UTC (hourly)
 
 | part | owner | status |

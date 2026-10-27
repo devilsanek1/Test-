@@ -3,19 +3,18 @@
 //              Look cascade (the flood out of SUN0, V2S1_clock FLOOD) colours a big piece region by region, "shape by
 //              shape", instead of one colour of the whole set at once. All regions of one (layer, colour) share ONE
 //              misregistration offset, so strips of one wall never open seams.
-//   Under      the frame-0 UNDERDRAWING: ink that only the bare-line state shows. Far planes and the water get no ink
-//              in colour (STYLE section 3), so their lines live only until the flood reaches their region (floodAt):
-//              each group vanishes on the frame its own colour lands. t < 0 (the loop underlay) shows it all.
+//   Under      RETIRED (2026-10-27, DIRECTION rule 9): the old bare-ink f0 underdrawing. Frame 0 is now the clean pen's
+//              PALE shapes (V2S1_clock S1_F0) with only the subject's outline drawing on; `Under` is a sink that keeps
+//              nothing, left only so the builders that made their f0 lines inline with their fills still compile.
 // Plus small drawing helpers: thin bars as FILLS (a thin coloured element is a thin fill, never a coloured line).
-// Every line here is CM.ink: never a coloured stroke (STYLE section 3).
+// Every line here is CM.ink: the clean pen sets its width and colour by the tier in scope (C draws none).
 import React, {useMemo} from 'react';
 import {Fill, bbox} from '../../lib/Fill';
 import {Ink} from '../../lib/Ink';
-import {useTime} from '../../lib/time';
 import {rng} from '../../lib/rng';
 import {CM} from '../palette';
 import {Batch, P, Pt} from '../kit/canal/core';
-import {floodAt} from './V2S1_clock';
+import {mixHex} from '../../lib/light';
 
 export type {Pt};
 
@@ -25,6 +24,33 @@ export function offsetFor(seed: string, k = 1): [number, number] {
   const a = r.range(0, Math.PI * 2);
   const m = r.range(2, 3.6) * k;
   return [Math.cos(a) * m, Math.sin(a) * m * 0.8];
+}
+
+/** Tier C's iron and frames (window frames, railings, lamp posts, bollards, aerials, far panes): a MID slate, half way
+ *  from the slate to the stone shade (L* ~63), so thin dark bars never read as lines in the calm world (CRAFT §b-§c). */
+export const S1_IRON = '#939AAD';
+
+/** THE HAZE (atmospheric perspective in flat colour; the owner's depth note, 2026-10-27): what the air between us and
+ *  the far city mixes every far plane toward: lighter, cooler and lower in chroma than the warm near world (pale
+ *  rose-lilac, L* ~89, C* ~5), so the warm wing stands clearly in front of the city. */
+export const S1_HAZE = '#EADCD8';
+
+/** Mix a batch's fills toward the haze, layer by layer (`ks[i]` for layer i; the last k for any further layer), and
+ *  drop its ink: a far plane is simpler and carries no lines. */
+export function hazeBatch(b: Batch, ks: number[], haze = S1_HAZE): Batch {
+  b.layers.forEach((l, i) => {
+    const k = ks[Math.min(i, ks.length - 1)];
+    const fills = new Map<string, string[]>();
+    l.fills.forEach((ds, c) => {
+      const m = mixHex(c, haze, k);
+      const a = fills.get(m);
+      if (a) a.push(...ds);
+      else fills.set(m, [...ds]);
+    });
+    l.fills = fills;
+    l.inks = new Map();
+  });
+  return b;
 }
 
 // ---------------------------------------------------------------- CellPaint
@@ -75,10 +101,12 @@ export type CellPaintProps = {
   misreg?: number;
   /** true: the batch is rebuilt every frame (moving / switching things): skip the memo. */
   live?: boolean;
+  /** The lines draw on as ONE stroke (every part at once) from `at` over `dur` (frame 0's subject outlines). */
+  draw?: {at: number; dur: number};
 };
 
 /** Renders a Batch: per layer, its fills split by region (one <Fill> per colour per cell), then its inks. */
-export const CellPaint: React.FC<CellPaintProps> = ({b, seed, cell = 120, misreg = 1, live = false}) => {
+export const CellPaint: React.FC<CellPaintProps> = ({b, seed, cell = 120, misreg = 1, live = false, draw}) => {
   const memo = useMemo(() => (live ? null : split(b, cell, seed, misreg)), [live ? null : b, cell, seed, misreg, live]);
   const s = memo ?? split(b, cell, seed, misreg);
   return (
@@ -89,7 +117,7 @@ export const CellPaint: React.FC<CellPaintProps> = ({b, seed, cell = 120, misreg
             <Fill key={g.key} d={g.d} color={g.color} offset={g.off} seed={`${seed}/${g.key}`} />
           ))}
           {l.inks.map((g) => (
-            <Ink key={g.key} d={g.d} width={g.w} color={CM.ink} open={g.open} seed={`${seed}/${g.key}`} />
+            <Ink key={g.key} d={g.d} width={g.w} color={CM.ink} open={g.open} seed={`${seed}/${g.key}`} {...(draw ? {at: draw.at, dur: draw.dur, order: 'all' as const, pace: 'free' as const} : {})} />
           ))}
         </React.Fragment>
       ))}
@@ -97,36 +125,14 @@ export const CellPaint: React.FC<CellPaintProps> = ({b, seed, cell = 120, misreg
   );
 };
 
-// ---------------------------------------------------------------- the frame-0 underdrawing
+// ---------------------------------------------------------------- the retired frame-0 underdrawing
 
-/** Ink groups that live only until the flood reaches their region (world px). Build once (useMemo), paint with
- *  <UnderPaint>. Each group = one region point + one weight. */
+/** RETIRED: keeps nothing (see the header). */
 export class Under {
-  g = new Map<string, {x: number; y: number; w: number; parts: string[]}>();
-  /** Add stroke(s) `d` to the group at region point (x, y) with weight w. */
-  add(x: number, y: number, d: string, w = 1.6): this {
-    if (!d) return this;
-    const k = `${Math.round(x)},${Math.round(y)},${w}`;
-    const a = this.g.get(k);
-    if (a) a.parts.push(d);
-    else this.g.set(k, {x, y, w, parts: [d]});
+  add(_x: number, _y: number, _d: string, _w = 1.6): this {
     return this;
   }
 }
-
-/** Paints an Under: every group while t < floodAt(its point) (+ `lag` s: hold the line a frame or two past the flood). */
-export const UnderPaint: React.FC<{u: Under; seed: string; lag?: number}> = ({u, seed, lag = 0}) => {
-  const t = useTime();
-  const out: React.ReactNode[] = [];
-  u.g.forEach((g, k) => {
-    if (t >= floodAt(g.x, g.y) + lag) return;
-    out.push(<Ink key={k} d={g.parts.join('')} width={g.w} seed={`${seed}/${k}`} />);
-  });
-  return <>{out}</>;
-};
-
-/** Is the flood still before (x, y)? (the bare-line state of that spot, t < 0 included) */
-export const bareAt = (t: number, x: number, y: number) => t < floodAt(x, y);
 
 // ---------------------------------------------------------------- small fill helpers
 

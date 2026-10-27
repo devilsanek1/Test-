@@ -2,9 +2,9 @@
 // map.ts sections 5-6). Pure numbers, nothing draws here. Every part reads its beats, the flood timing, the lockstep
 // and the zones the life keeps clear from this file, so the parts built in parallel agree frame for frame.
 //
-// Conventions: scene seconds = film seconds (S1 starts at 0; t < 0 is the loop underlay, -0.26 ... 0, the bare-line
-// state). Parts draw in WORLD px = zoom-1.00 screen px (the cover pose, 5.30); V2S1.tsx wraps them in the pull-out
-// camera (map s1Zoom: 1.05 -> 1.00 about W, ease-in, 0-4.90) and in the Look cascade (the flood).
+// Conventions: scene seconds = film seconds (S1 starts at 0; t < 0 is the loop underlay, -0.26 ... 0, the clean pen's
+// drawing state: S1_F0). Parts draw in WORLD px = screen px: the camera is LOCKED at zoom 1.00 (conform_L1 §2: the 5 %
+// pull-out is retired, map s1Zoom = 1.00); V2S1.tsx wraps them in the Look cascade (the pale state, then the flood).
 import {clamp} from '../../lib/time';
 import {drawn} from '../kit/cast/gait';
 import * as MAP from '../world/map';
@@ -34,6 +34,45 @@ export const floodAt = (x: number, y: number): number => {
 };
 /** Her coat stays paper to f18: the eye lands on her last. */
 export const HER_COAT_AT = 0.3;
+
+// ---------------------------------------------------------------- frame 0 in the clean pen (DIRECTION rule 9)
+/** Before the flood every fill but a backdrop is mix(colour, paper, S1_PALE) (lib/exit Look `cascade.pale`): C and B land
+ *  as flat PALE shapes, no lines. 0.7 reads as a clearly pale first state at 0.4 scale and still parts the planes. */
+export const S1_PALE = 0.7;
+/** The subject's outline draws on as ONE stroke per object (every part at once over `dur`), from `at`, so f0 (t 0) shows
+ *  it mid-draw (~half): her behind the glass, the door (frame + leaves), W's frame. */
+export const S1_DRAW = {at: -0.26, dur: 0.52} as const;
+/** Tier A spans (film s): W is the subject before the lamp click and from her look back to the dive (support, no
+ *  outline, between them); the door (with its
+ *  canopy letters) from frame 0 through her step-out and the doors shutting (A at 0.45-1.40 in conform_L1 §5; it is
+ *  also one of frame 0's three drawn subjects, so it holds A from the loop underlay on). */
+export const S1_TIER_A = {w: [[-1, 0.4], [5.59, 6.25]] as [number, number][], door: [-1, 1.4] as [number, number]} as const;
+export const wIsSubject = (t: number) => S1_TIER_A.w.some(([a, b]) => t >= a && t < b);
+export const doorIsSubject = (t: number) => t >= S1_TIER_A.door[0] && t < S1_TIER_A.door[1];
+/** Pip: absent at t < 0 (S8's Pip owns the loop seam); from t 0 its tinted line draws on over 0.30 s, its fills paper
+ *  until the flood reaches its seat (~0.15), then its colour. */
+export const S1_PIP = {seat: [700, 1235] as [number, number], from: 0, drawDur: 0.3, size: 100} as const;
+
+/**
+ * S1_F0: the t < 0 / frame-0 state, for lane L6 (S8 un-builds onto it; the loop seam). Everything at zoom 1.00, screen px.
+ *   paper sky (World sky CM.white); every fill PALE (mix toward the paper by `pale`), backdrops paper; NO line on
+ *   anything but the subject; the subject's outlines draw on from `outline.at` over `outline.dur` (f0 = mid-draw):
+ *   her behind the glass door (mid-stride, x 692, feet MAP.S1_HER_STEP_OUT.feetFrom), the door frame + its two leaves
+ *   (shut), W's frame (W lamp-lit, CM.lamp flat pane); the sun half-coloured (SunHalf: the lower-left half CM.sun, the
+ *   rest pale); Pip ABSENT at t < 0 (its bollard drawn, pale); Pip's line draws on from t 0 on its seat.
+ *   Then the flood from SUN0 (FLOOD: t0 0.02, 5800 px/s), her teal coat last (HER_COAT_AT 0.30).
+ */
+export const S1_F0 = {
+  pale: S1_PALE,
+  /** The page (CM.white, the World sky at f0): what the pale shapes are mixed toward. */
+  paper: '#FBF3E6',
+  outline: {at: S1_DRAW.at, dur: S1_DRAW.dur, perObject: 'one stroke (all parts at once)'},
+  drawn: ['her behind the glass door', 'the door frame + leaves', "W's frame"],
+  sunHalf: true,
+  flood: {t0: FLOOD.t0, speed: FLOOD.speed, origin: FLOOD_ORIGIN, herCoatAt: HER_COAT_AT},
+  W: {x: MAP.W.x, y: MAP.W.y, w: MAP.W.w, h: MAP.W.h, zoom: 1.0, state: 'lamp-lit until 0.40, then plum'},
+  pip: {absentBefore: 0, seat: S1_PIP.seat, lineFrom: S1_PIP.from, lineDur: S1_PIP.drawDur, bollardTop: S1_PIP.seat},
+} as const;
 
 // ---------------------------------------------------------------- her walk = the row's lockstep
 /**
