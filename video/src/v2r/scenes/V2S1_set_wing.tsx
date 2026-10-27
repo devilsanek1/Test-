@@ -9,7 +9,7 @@
 //   <S1Wing behindDoor={...} />   the facade + the lobby + (behindDoor) + the door's fixed frame
 //   <S1DoorLeaves />              the two sliding glass leaves (after the wing): slide out 0.45 -> open 0.52, settle
 //                                 0.58, PARKED over the brick door piers (still visible), shut behind her 0.97 -> 1.10
-//   <S1WingLife />                pigeons on the canopy (shuffle 0.15) and on a sill
+//   <S1WingLife />                pigeons at rest on the canopy and on a sill
 // Kit defects worked around here (kit/canal/wing.tsx WingFront): coloured strokes (the plant blades in CM.line, the
 // brick ticks in CM.brickDeep, W's plant ring in CM.line), leaves hidden in pockets, W a flat plum slab.
 import React, {useMemo} from 'react';
@@ -266,8 +266,9 @@ function paneInto(b: Batch, ink: string[], u0: number, v0: number, w: number, h:
   if (!lit) {
     b.poly(CM.glass, qq(0, 0, 1, 1));
     const lo = r.range(0.52, 0.66);
-    b.poly(CM.shadeCool, [pp(0, lo), pp(1, lo - r.range(0.08, 0.2)), pp(1, 1), pp(0, 1)]);
-    b.poly(CM.paneUnlit, qq(0, 0.86, 1, 0.14));
+    // tier C: the room's tones stay mid (never a thin near-dark bar in a narrow pane)
+    b.poly(S1_IRON, [pp(0, lo), pp(1, lo - r.range(0.08, 0.2)), pp(1, 1), pp(0, 1)]);
+    b.poly('#868FA4', qq(0, 0.86, 1, 0.14));
     b.poly(CM.skyHigh, [pp(0.18, 0), pp(0.5, 0), pp(0.06, 0.42), pp(0, 0.42), pp(0, 0.26)]);
     b.poly(CM.paper, [pp(0.62, 0), pp(0.7, 0), pp(0.44, 0.28), pp(0.38, 0.28)]);
     return;
@@ -276,19 +277,17 @@ function paneInto(b: Batch, ink: string[], u0: number, v0: number, w: number, h:
   b.poly(CM.lampCore, qq(0.08, 0.1, 0.84, 0.46));
   if (kind === 0) {
     // a pendant lamp over a long table
-    b.poly(CM.coatSlate, [pp(0.36, 0.3), pp(0.64, 0.3), pp(0.56, 0.21), pp(0.44, 0.21)]);
+    b.poly(S1_IRON, [pp(0.36, 0.3), pp(0.64, 0.3), pp(0.56, 0.21), pp(0.44, 0.21)]);
     b.poly(CM.paper, qq(0.46, 0.3, 0.08, 0.03));
     b.poly(CM.brickLight, qq(0, 0.72, 1, 0.07));
-    b.poly(CM.line, qq(0.1, 0.79, 0.04, 0.21));
-    b.poly(CM.line, qq(0.86, 0.79, 0.04, 0.21));
     ink.push(line(...pp(0.5, 0), ...pp(0.5, 0.21), {seed: `${seed}/cord`, over: 'none'}));
   } else if (kind === 1) {
     // a shelf of books and a plant
-    b.poly(CM.line, qq(0.05, 0.44, 0.9, 0.035));
-    for (let k = 0; k < 6; k++) b.poly(r.pick([CM.brick, CM.sage, CM.coatMustard, CM.paneUnlit, CM.box, CM.leafRust]), qq(0.08 + k * 0.12, 0.3 + r.range(0, 0.03), 0.08, 0.14));
+    b.poly(CM.brickLight, qq(0.05, 0.44, 0.9, 0.035));
+    for (let k = 0; k < 6; k++) b.poly(r.pick([CM.brickLight, CM.sage, CM.coatMustard, CM.glass, CM.box, CM.leafGold]), qq(0.08 + k * 0.12, 0.3 + r.range(0, 0.03), 0.08, 0.14));
     const [cx, cy] = pp(0.74, 0.9);
     const s = PM.pxPerM(u0) * w * 0.2;
-    b.fill(CM.brickDeep, `M${P(cx - s * 0.5, cy)}L${P(cx + s * 0.5, cy)}L${P(cx + s * 0.4, cy + s * 0.5)}L${P(cx - s * 0.4, cy + s * 0.5)}Z`);
+    b.fill(CM.brick, `M${P(cx - s * 0.5, cy)}L${P(cx + s * 0.5, cy)}L${P(cx + s * 0.4, cy + s * 0.5)}L${P(cx - s * 0.4, cy + s * 0.5)}Z`);
     b.fill(CM.sage, lobes(cx - s, cx + s, cy, s * 1.7, `${seed}/pl`, 3));
     ink.push(line(...pp(0.05, 0.44), ...pp(0.95, 0.44), {seed: `${seed}/sh`, over: 'small'}));
   } else if (kind === 2) {
@@ -296,9 +295,9 @@ function paneInto(b: Batch, ink: string[], u0: number, v0: number, w: number, h:
     const [cx, cy] = pp(0.28, 1);
     const s = PM.pxPerM(u0) * w * 0.3;
     b.fill(CM.sage, lobes(cx - s, cx + s, cy - s * 0.3, s * 2.1, `${seed}/bp`, 4));
-    b.poly(CM.brickDeep, qq(0.17, 0.84, 0.24, 0.16));
+    b.poly(CM.brick, qq(0.17, 0.84, 0.24, 0.16));
     b.poly(CM.paper, qq(0.58, 0.22, 0.28, 0.22));
-    b.poly(CM.coatPlum, qq(0.62, 0.26, 0.2, 0.06));
+    b.poly(CM.leafGold, qq(0.62, 0.26, 0.2, 0.06));
     b.poly(CM.sage, qq(0.62, 0.33, 0.12, 0.07));
     ink.push(poly(qq(0.58, 0.22, 0.28, 0.22), {closed: true, over: 'none', seed: `${seed}/pic`}));
   } else {
@@ -404,7 +403,7 @@ function lobbyStatic(): Batch {
   b.fill(CM.sage, lobes(plx - pls * 0.3, plx + pls * 0.3, ply - pls * 0.34, pls * 1.05, 's1lobby/plant', 3));
   for (let j = 0; j < 3; j++) {
     const [lx, ly] = p(du0 + (du1 - du0) * (0.22 + j * 0.28), dv0 + 0.34);
-    b.fill(CM.coatSlate, domePath(lx, ly, 7, 6));
+    b.fill(S1_IRON, domePath(lx, ly, 7, 6));
     b.fill(CM.lampCore, ovalPath(lx, ly + 1.5, 4.5, 2));
   }
   let d = '';
@@ -559,7 +558,7 @@ export const S1WingLife: React.FC = () => {
   const [, ys] = p((UPPER[2].u0 + UPPER[2].u1) / 2, V_SILL);
   return (
     <>
-      <Pigeons ledge={[F.x0 + 4, F.x1 - 4, F.y0 - 7]} n={4} size={17} seed="s1canopy" shuffleAt={[MAP.S1_CLOCK.voiceShe + 0.03]} />
+      <Pigeons ledge={[F.x0 + 4, F.x1 - 4, F.y0 - 7]} n={4} size={17} seed="s1canopy" />
       <Pigeons ledge={[x0, x1, ys]} n={2} size={15} seed="s1sill2" />
     </>
   );

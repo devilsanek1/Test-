@@ -60,7 +60,7 @@ const MID: Bld[] = [
 const NEAR: Bld[] = [
   {x0: -30, x1: 62, top: 814, wall: CM.brick, roof: 'pitch', roofCol: CM.brickDeep, stacks: [[40, 26]], aerial: [40], win: {w: 11, h: 17, gx: 24, gy: 30}},
   {x0: 62, x1: 152, top: 808, wall: CM.stucco, roof: 'mansard', stacks: [[84, 24], [138, 22]], win: {w: 11, h: 17, gx: 25, gy: 30}},
-  {x0: 152, x1: 222, top: 826, wall: CM.brickDeep, roof: 'flat', tank: true, win: {w: 12, h: 18, gx: 23, gy: 30, arch: true}},
+  {x0: 152, x1: 222, top: 826, wall: CM.brick, roof: 'flat', tank: true, win: {w: 12, h: 18, gx: 23, gy: 30, arch: true}},
   {x0: 222, x1: 292, top: 818, wall: CM.brickLight, roof: 'pitch', roofCol: CM.brick, stacks: [[248, 26]], aerial: [248], win: {w: 11, h: 17, gx: 24, gy: 30}},
   {x0: 292, x1: 356, top: 830, wall: CM.brick, roof: 'flat', garden: true, win: {w: 11, h: 17, gx: 22, gy: 30}},
 ];
@@ -111,7 +111,7 @@ function bldInto(b: Batch, u: Under, o: Bld, key: string, inkW: number, ceil = 5
     b.rect(o.wall === CM.brickLight ? CM.brick : CM.brickLight, sx - sw / 2, st, sw, base - st + 1);
     b.rect(CM.stoneShade, sx - sw / 2 - 1.5, st, sw + 3, 2.5);
     const pots = Math.max(2, Math.round(sw / 5));
-    for (let k = 0; k < pots; k++) b.rect(k % 2 ? CM.brickDeep : CM.leafRust, sx - sw / 2 + 1 + (k * (sw - 2)) / pots, st - 5, Math.max(2.4, (sw - 2) / pots - 1.4), 5);
+    for (let k = 0; k < pots; k++) b.rect(k % 2 ? CM.brick : CM.brickLight, sx - sw / 2 + 1 + (k * (sw - 2)) / pots, st - 5, Math.max(2.4, (sw - 2) / pots - 1.4), 5);
     sil += rectInk(sx - sw / 2, st, sw, base - st, {seed: `s1farS/${key}${sx}`, over: 'none', edges: 'tlr'});
     for (let k = 0; k < pots; k++) {
       const px = sx - sw / 2 + 1 + (k * (sw - 2)) / pots + 1;
