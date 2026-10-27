@@ -68,3 +68,9 @@ Concrete notes on this one video: picks, lines, takes, shots. Approach-level les
   panels (S5, S7-S14, S16), then G6 polish.
 - 2026-10-27, G5b (`deliverables/v3/v3_g5b.mp4`): "Okay let's post this, give me the cover page and the text". -> shipped at
   G5b (no G6 polish, no music bed): posting master `v3_final.mp4` (no draft label, -14 LUFS, TV range), cover, `POSTING.md`.
+- 2026-10-27, after G5b, "let's finish this" (post it) plus general feedback: "too busy, too incoherent; no story, no clean
+  transitions, just a bunch of shots put together"; "we did the sketch first and then added a whole bunch of details to
+  make it feel alive, which is wrong"; "too many moving parts, I'm not sure what to keep my attention on"; "too rough and
+  messy, a lot of rough lines; cleaner, more refined, gentle, premium"; "we don't have shadows much and the light is weirdly
+  put". -> rules: Visual style (clean premium; light and shadow; attention hierarchy), Storyboard (one flowing story);
+  a process retro on sketch-first. v3 ships as is.

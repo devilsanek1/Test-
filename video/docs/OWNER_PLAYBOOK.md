@@ -44,6 +44,17 @@ Format: **rule** — why / evidence (video, date).
 
 ## Visual style
 - **Hand-drawn ink, flat colour, like reference video 1.** — (v1, 2026-10-24).
+- **CLEAN, REFINED, GENTLE, PREMIUM: never rough or messy.** Clean, confident lines (smooth, consistent weights, few of
+  them, no jitter, no sketchy overshoot or double strokes), refined shapes; hand-drawn warmth comes from shape and colour,
+  not from scratchy lines. — ("too rough and messy, a lot of rough lines, not clean at all; cleaner, more refined, gentle,
+  premium", v3 G5b, 2026-10-27).
+- **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
+  gentle light pools that make sense; never absent and never "weirdly put". — (v3 G5b, 2026-10-27).
+- **ATTENTION HIERARCHY: one main arc, one focus at a time.** The story's subject gets the contrast, line weight,
+  saturation and the clear motion; supporting life (a bird, walkers, snow, steam) stays subtle (smaller, lower contrast,
+  thinner or no lines, softer colour, calmer motion): alive, but never competing. Supporting environment may be drawn in
+  a softer, simpler style than the subject; not every moving piece gets the same treatment. Too many equal moving parts
+  = "I don't know what to keep my attention on". — (v3 G5b, 2026-10-27).
 - **Every scene must FEEL ALIVE: that is the key, not an object count.** A dense, detailed world (a city full of
   buildings and windows, a room full of real things), people near and far, layered depth, a recurring living character,
   ambient life that never stops (clouds, birds, steam, lights switching). A dense world makes a frame full even when
@@ -103,6 +114,11 @@ Format: **rule** — why / evidence (video, date).
 - **Every frame at least 8/10, no dead frames, cuts locked to the beat.** — (v1).
 
 ## Storyboard (G3)
+- **One flowing story, never a bunch of shots stitched together.** Every cut carries the eye and the story into the next
+  shot (a shared object, a match, a continuous camera, the subject's motion leading out and in); the main arc is visible
+  across the whole film. Life and detail are DESIGNED into the shot together with its hierarchy from the start, never
+  bolted onto a finished sketch afterwards ("we did the sketch first and then added a whole bunch of details to make it
+  feel alive, which is wrong"). Whether sketch-first helps at all is under review (`docs/retro/`). — (v3 G5b, 2026-10-27).
 - **G3 is the most important gate: an ANIMATED SKETCHBOOK of the final film, optimised for SIGNAL, not quality.** With
   script and voice locked, the animatic gives the director the closest signal to the final story in the least drawing
   and review time: story, transitions, animations and camera moves already very close to final — PLAYED, not only
