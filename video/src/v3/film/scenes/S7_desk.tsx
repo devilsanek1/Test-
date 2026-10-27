@@ -24,7 +24,7 @@ import {blob, circle, ellipse, line, poly, polyPath, roundRect, textLines} from 
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {Letters, PhotoLine, Planner} from './O1_life';
+import {Letters, Mittens, PhotoLine, Planner} from './O1_life';
 import {
   BookStack,
   Cable,
@@ -75,16 +75,35 @@ const HangingPlant: React.FC<{x: number; y: number; seed: string}> = ({x, y, see
   );
 };
 
+/** The attic slope cut by the top-right corner (O1's room: the ceiling comes down over the desk), its beam and planks. */
+const Slope: React.FC = () => {
+  const k = 0.62;
+  const x0 = 744;
+  const yAt = (x: number) => -50 + (x - x0) * k;
+  const slope: Pt[] = [[x0, -80], [1170, -80], [1170, yAt(1170)]];
+  const beam: Pt[] = [[x0, -50], [1170, yAt(1170)], [1170, yAt(1170) + 26], [x0 - 42, -50]];
+  const planks = [60, 120].map((d) => line(x0 + d / k, -50, 1170, yAt(1170) - d, {over: [0, 0], seed: `s7/pl${d}`})).join('');
+  return (
+    <>
+      <Fill d={polyPath(slope)} color={EMBER.slope} offset={false} />
+      <Fill d={polyPath(beam)} color={EMBER.beam} seed="s7/beam" />
+      <Ink d={line(x0, -50, 1170, yAt(1170), {over: [0, 0], seed: 's7/eave'}) + line(x0 - 42, -50, 1170, yAt(1170) + 26, {over: [0, 0], seed: 's7/eave2'})} width={W.mid} />
+      <Ink d={planks} width={W.far} />
+    </>
+  );
+};
+
 export const S7WallTop: React.FC = () => (
   <>
     <WallMarks x={30} y={18} w={430} h={120} n={5} seed="s7/wm1" />
-    <WallMarks x={640} y={196} w={330} h={62} n={3} seed="s7/wm2" />
-    {/* warm string lights swagged from the top edge (bulbs y 60-170; a bulb twinkles every ~0.5 s) */}
-    <StringLights3 points={[[-40, 4], [330, 96], [742, 84], [1120, -6]]} sag={24} n={8} r={9} sway={1.6} seed="s7/lights" />
+    <WallMarks x={470} y={210} w={260} h={50} n={2} seed="s7/wm2" />
+    <Slope />
+    {/* warm string lights swagged from the beam to the left edge (bulbs y 60-180; a bulb twinkles every ~0.5 s) */}
+    <StringLights3 points={[[-40, 4], [300, 100], [700, 92], [1000, 104]]} sag={24} n={8} r={9} sway={1.6} seed="s7/lights" />
     {/* instant photos pegged on a cord, top left (bottoms ~258: clear of the band) */}
     <PhotoLine x0={44} y0={182} x1={298} y1={172} sag={12} />
-    <HangingPlant x={566} y={150} seed="s7/hang" />
-    <FramedPrint x={846} y={128} w={116} h={134} picture="sea" seed="s7/print" ink={W.far} />
+    <HangingPlant x={452} y={150} seed="s7/hang" />
+    <FramedPrint x={612} y={146} w={104} h={118} picture="sea" seed="s7/print" ink={W.far} />
   </>
 );
 
@@ -203,10 +222,38 @@ const Biscuits: React.FC<{x: number; y: number; k?: number; seed: string}> = ({x
 /** The laptop's right side port (the kit laptop's right deck side, S7.tsx's geometry): the charger plug sits in it. */
 export const S7_PORT: Pt = [768, 1198];
 
+/** Two clementines on the desk, one half peeled (a winter desk; warm confetti, never the hero orange). */
+const Clementines: React.FC<{x: number; y: number; seed: string}> = ({x, y, seed}) => {
+  const fruit = (cx: number, cy: number, r: number, i: number, peeled: boolean) => (
+    <React.Fragment key={i}>
+      <Fill d={blob(cx, cy, r, r * 0.86, {seed: `${seed}/f${i}`})} color={peeled ? EMBER.books[0] : EMBER.pot} seed={`${seed}/fF${i}`} />
+      {peeled ? <Fill d={`M${cx - r * 0.9} ${cy - r * 0.1}Q${cx - r * 0.2} ${cy + r * 0.25} ${cx + r * 0.9} ${cy - r * 0.05}L${cx + r * 0.7} ${cy + r * 0.6}Q${cx} ${cy + r * 0.95} ${cx - r * 0.7} ${cy + r * 0.6}Z`} color={EMBER.pot} offset={false} /> : null}
+      <Ink d={ellipse(cx, cy, r, r * 0.86, {seed: `${seed}/fi${i}`})} width={W.far} />
+      {peeled ? (
+        <Ink d={line(cx, cy - r * 0.8, cx, cy + r * 0.1, {over: [0, 0], seed: `${seed}/seg${i}`}) + line(cx - r * 0.45, cy - r * 0.6, cx - r * 0.3, cy + r * 0.1, {over: [0, 0], seed: `${seed}/seg2${i}`})} width={W.hair} color={EMBER.pot} />
+      ) : (
+        <Fill d={blob(cx + r * 0.1, cy - r * 0.84, r * 0.26, r * 0.12, {seed: `${seed}/lf${i}`})} color={EMBER.leaf} offset={false} />
+      )}
+    </React.Fragment>
+  );
+  return (
+    <>
+      {/* a curl of peel */}
+      <Fill d={`M${x + 50} ${y + 22}q16 -10 30 2q10 10 -4 18q-14 4 -26 -6z`} color={EMBER.pot} seed={`${seed}/peel`} />
+      <Ink d={`M${x + 50} ${y + 22}q16 -10 30 2q10 10 -4 18q-14 4 -26 -6z`} width={W.hair} />
+      {fruit(x, y, 30, 0, false)}
+      {fruit(x + 46, y - 16, 27, 1, true)}
+    </>
+  );
+};
+
 export const S7DeskMid: React.FC = () => (
   <>
     <Headphones x={108} y={1252} w={172} seed="s7/hp" ink={W.far} />
-    <Biscuits x={150} y={1398} seed="s7/biscuits" />
+    <Mittens x={8} y={1352} />
+    <Biscuits x={170} y={1404} seed="s7/biscuits" />
+    <Clementines x={352} y={1424} seed="s7/clem" />
+    <Plant x={1030} y={1584} kind="cactus" size={74} seed="s7/cactus" ink={W.far} />
     {/* the charger: from the right edge across the desk, under Pip, into the laptop's right port */}
     <Cable points={[S7_PORT, [812, 1226], [900, 1258], [1004, 1246], [1130, 1292]]} plug width={7} color={EMBER.dcSide} />
     <Glasses x={962} y={1352} w={122} rot={-14} seed="s7/glasses" ink={W.far} />
@@ -219,7 +266,7 @@ export const S7DeskMid: React.FC = () => (
 /** A spiral notebook (dusk-blue cover, ruled pages, the wire spiral along its top) lying in perspective, cut by the
  *  frame edge; `quad` = the cover's back-left, back-right, front-right, front-left. A pen lies across it. Shared with S8
  *  (its spiral and pen cut by the left edge). */
-export const SpiralNotebook: React.FC<{quad: [Pt, Pt, Pt, Pt]; rings?: number; pen?: [Pt, Pt]; ink?: number; seed: string}> = ({quad, rings = 9, pen, ink = W.mid, seed}) => {
+export const SpiralNotebook: React.FC<{quad: [Pt, Pt, Pt, Pt]; rings?: number; ringR?: number; pen?: [Pt, Pt]; penW?: number; ink?: number; seed: string}> = ({quad, rings = 9, ringR = 1, pen, penW = 16, ink = W.mid, seed}) => {
   const [bl, br, fr, fl] = quad;
   const P = (u: number, v: number): Pt => {
     const top: Pt = [bl[0] + (br[0] - bl[0]) * u, bl[1] + (br[1] - bl[1]) * u];
@@ -246,7 +293,7 @@ export const SpiralNotebook: React.FC<{quad: [Pt, Pt, Pt, Pt]; rings?: number; p
   let spiral = '';
   for (let i = 0; i < rings; i++) {
     const [sx, sy] = P(0.06 + (0.88 * (i + 0.5)) / rings, 0.03);
-    spiral += ellipse(sx, sy - 6, 7, 13, {seed: `${seed}/s${i}`});
+    spiral += ellipse(sx, sy - 6 * ringR, 7 * ringR, 13 * ringR, {seed: `${seed}/s${i}`});
   }
   return (
     <>
@@ -258,7 +305,7 @@ export const SpiralNotebook: React.FC<{quad: [Pt, Pt, Pt, Pt]; rings?: number; p
       <path d={`M${margin[0][0]} ${margin[0][1]}L${margin[1][0]} ${margin[1][1]}`} stroke={EMBER.hl} strokeWidth={1.6} fill="none" />
       <Ink d={writing} width={1.6} />
       <Ink d={spiral} width={W.hair * 1.4} order="all" />
-      {pen ? <Pen from={pen[0]} to={pen[1]} seed={`${seed}/pen`} /> : null}
+      {pen ? <Pen from={pen[0]} to={pen[1]} wPx={penW} seed={`${seed}/pen`} /> : null}
     </>
   );
 };
