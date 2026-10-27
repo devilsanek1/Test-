@@ -230,6 +230,24 @@ const RoomRight: React.FC = () => (
   </>
 );
 
+/** A roof window in the slope over the card wall (H1 px; seen in SQB's framing): the night sky in it, a snow edge. */
+const SKY_PANE: Pt[] = [[1318, 52], [1502, 52], [1522, 214], [1298, 214]];
+const SKY_FRAME: Pt[] = [[1296, 30], [1524, 30], [1548, 236], [1272, 236]];
+const Skylight: React.FC = () => (
+  <>
+    <Fill d={polyD(SKY_FRAME)} color={EMBER.reveal} at={-0.44} offset={false} />
+    <Tier tier="environment" bg={EMBER.sky}>
+      <Fill d={polyD(SKY_PANE)} color={EMBER.sky} at={-0.42} offset={false} />
+      <Fill d={polyD([[1300, 200], [1520, 200], [1522, 214], [1298, 214]])} color={EMBER.snow} at={-0.4} offset={false} />
+    </Tier>
+    <Show at={0.3}>
+      {([[1360, 96, 2.6], [1452, 76, 2], [1418, 150, 2.2]] as [number, number, number][]).map(([x, y, r], i) => (
+        <circle key={i} cx={x} cy={y} r={r} fill={EMBER.snow} />
+      ))}
+    </Show>
+  </>
+);
+
 /** The card's static face (title, subtitle, axes, the two years): the chart on it is SQB's. */
 const CardFace: React.FC = () => {
   const P = PLOT;
@@ -282,8 +300,10 @@ const MUG = {x: 872, top: 1130, w: 92};
 const BOOKS_R = {x: 968, y: 1206, w: 128};
 const PENS = {x: 1052, y: 1150, w: 50};
 const GLASSES = {x: 902, y: 1444, w: 110};
-const PLANT_X = {x: 1610, y: 1196};
-const BOOKS_X = {x: 1716, y: 1204, w: 132};
+const SNAKE = {x: 1590, y: 1212, size: 236};
+const BOOKS_X = {x: 1690, y: 1210, w: 150};
+const PENS_X = {x: 1214, y: 1206, w: 54};
+const BOOKS_P = {x: 1300, y: 1208, w: 132};
 
 /** The piece that lies LIT in the pool (its silhouette is an Ambient hole; it gets form + cast shadows). */
 const headphones = <Headphones x={HEAD.x} y={HEAD.y} w={HEAD.w} seed="home/hp" at={0.02} />;
@@ -320,6 +340,7 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
       </Nook>
       <Tier tier="environment">
         <RoomRight />
+        <Skylight />
         {/* the top band: one print, the string lights along the slope (no glow discs) */}
         <FramedPrint x={430} y={40} w={84} h={100} picture="sun" seed="home/print" at={-0.4} />
         <StringLights3 points={[[574, 8], [744, 96], [904, 180], [1090, 262]]} sag={18} n={10} r={7} every={1.6} halo={false} seed="home/lights" at={0.18} />
@@ -354,8 +375,10 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
         <ContactShadow x={MUG.x + MUG.w / 2} y={MUG.top + MUG.w * 1.14} w={MUG.w} />
         <ContactShadow x={BOOKS_R.x + BOOKS_R.w / 2} y={BOOKS_R.y} w={BOOKS_R.w} h={10} />
         <ContactShadow x={GLASSES.x} y={GLASSES.y + 6} w={GLASSES.w} h={7} />
-        <ContactShadow x={PLANT_X.x} y={PLANT_X.y} w={70} h={10} />
+        <ContactShadow x={SNAKE.x} y={SNAKE.y} w={SNAKE.size * 0.38} h={10} />
         <ContactShadow x={BOOKS_X.x + BOOKS_X.w / 2} y={BOOKS_X.y} w={BOOKS_X.w} h={10} />
+        <ContactShadow x={PENS_X.x} y={PENS_X.y} w={PENS_X.w} h={8} />
+        <ContactShadow x={BOOKS_P.x + BOOKS_P.w / 2} y={BOOKS_P.y} w={BOOKS_P.w} h={10} />
       </ShadowLayer>
       <Tier tier="environment">
         {headphones}
@@ -366,8 +389,10 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
         <BookStack x={BOOKS_R.x} y={BOOKS_R.y} w={BOOKS_R.w} n={2} seed="home/booksR" at={-0.37} />
         <PenCup x={PENS.x} y={PENS.y + 10} w={PENS.w} seed="home/pens" at={-0.36} />
         <Glasses x={GLASSES.x} y={GLASSES.y} w={GLASSES.w} rot={-10} seed="home/glasses" at={-0.36} />
-        <Plant x={PLANT_X.x} y={PLANT_X.y} kind="pothos" size={70} trail={70} seed="home/plantX" at={-0.36} />
+        <Plant x={SNAKE.x} y={SNAKE.y} kind="snake" size={SNAKE.size} seed="home/snake" at={-0.36} />
         <BookStack x={BOOKS_X.x} y={BOOKS_X.y} w={BOOKS_X.w} n={3} seed="home/booksX" at={-0.36} />
+        <PenCup x={PENS_X.x} y={PENS_X.y} w={PENS_X.w} seed="home/pensX" at={-0.36} />
+        <BookStack x={BOOKS_P.x} y={BOOKS_P.y} w={BOOKS_P.w} n={2} seed="home/booksP" at={-0.36} />
         <Lamp pose={LAMP} lit at={NOOK_AT + 0.08} seed="home/nook" />
       </Tier>
       {room}
@@ -388,7 +413,7 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
       <Ambient
         tint={ambientTint(T)}
         region={AMBIENT_REGION}
-        holes={[{rect: [GLASS.x, GLASS.y, GLASS.w, GLASS.h]}, {rect: [NOOK.mullionX - 7, GLASS.y, 14, GLASS.h], kind: 'dark'}, {e: POOL}, {of: headphones}]}
+        holes={[{rect: [GLASS.x, GLASS.y, GLASS.w, GLASS.h]}, {rect: [NOOK.mullionX - 7, GLASS.y, 14, GLASS.h], kind: 'dark'}, {d: polyD(SKY_PANE)}, {e: POOL}, {of: headphones}]}
       />
       <XG m={mat.compose(mat.translate(LAMP.head[0], LAMP.head[1]), mat.rotate(LAMP.rot))}>
         <SourceCore d={ellipseD({cx: 0, cy: 100, rx: 64, ry: 12})} />

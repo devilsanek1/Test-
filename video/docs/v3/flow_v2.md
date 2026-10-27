@@ -70,7 +70,7 @@ frames (shared pieces at film time); gate_check must read it as "no cut, frames 
 - **SQD THEIR MOUNTAIN.** 19.40: the same stick on the pile's summit, sky above; its neighbours are kit MemorySticks at H2 size
   (~26 px), so x27 shows real chips (never hay). ONE pull-back on the S5 ease (155 f, 19.40-21.98) to just outside our window: the
   far plane starts x27 (`planeMat` {o: the summit in H2 px, off: (540, 870) - o, k: 27}), town planes rise from the bottom, our
-  street last; the DC's lit sign in frame by 20.80, the whole mountain by 21.32, thoom 21.72 (p 0.985); hold 21.98-22.35 (S9's
+  street last; the DC's lit sign in frame by ~21.0 (whole DC by ~21.35; orchestrator, 2026-10-27: the x27 S5 move cannot bring it in earlier), the whole mountain by 21.32, thoom 21.72 (p 0.985); hold 21.98-22.35 (S9's
   birds); then J4. S9's streams from 21.0 only, <= 1 per 0.25 s, no trails.
 - **SQE FIRST DIBS.** 23.10-24.20 crates of gold sticks go into a DC truck in the gate's pool (two line-only workers); 24.20 the
   barrier lifts, 24.30-25.24 it drives up the road as a second rolls in; the van waits unlit. Push x1.25 about (600, 1120)
