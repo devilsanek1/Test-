@@ -20,6 +20,7 @@ import {rand, rng} from '../../lib/rng';
 import {Person, Seated} from '../kit/cast';
 import {Batch, Paint, mix, crownD, blossomD, ellD, circleD, lineD, cloudD, frac} from '../kit/dc/core';
 import {birdD} from '../kit/dc/life';
+import {BloomCrowns, BLOOM_NEAR, type BloomTones, type CrownSpec} from '../kit/dc/bloom';
 import {GATE, GT} from '../kit/dc/gate';
 import {DRIFT, dxOf, adultH} from './V2S6_rig';
 import {LEAF} from './V2S6_set';
@@ -146,70 +147,65 @@ export const S6Birds: React.FC = () => {
 // ---------------------------------------------------------------- the lawn trees (lawn plane, behind the promenade)
 
 type TreeSpec = {x: number; base: number; rx: number; ry: number; cy: number; bloom: number; seed: string};
-/** Flowering cherries rooted at the facade's foot (crown tops >= 612: never above y 600). Lawn coords. Kept off the
- *  sun (x 215-305), off Pip's sky (x 680-900) and off the service door (x 900-1060). */
+/** Flowering cherries rooted at the facade's foot, drawn like S5's (the dc kit's BloomCrowns: a dark mass, plum limbs,
+ *  pink clumps lit on the sun's side = screen left, single flowers), so the April morning is one world across the cut.
+ *  Crown tops = cy - 1.16 ry >= 612 (never above y 600). Lawn coords. Kept off the sun (x 215-305), off Pip's calm ring
+ *  (x 690-900) and off the service door (x 900-1060). */
 const LAWN_TREES: TreeSpec[] = [
-  {x: 395, base: 852, rx: 86, ry: 64, cy: 690, bloom: 1, seed: 'lt1'},
-  {x: 560, base: 852, rx: 96, ry: 70, cy: 700, bloom: 0.9, seed: 'lt2'},
-  {x: 1150, base: 856, rx: 104, ry: 82, cy: 700, bloom: 1, seed: 'lt3'},
+  {x: 420, base: 852, rx: 90, ry: 72, cy: 700, bloom: 0.95, seed: 'lt1'},
+  {x: 572, base: 852, rx: 94, ry: 74, cy: 704, bloom: 0.85, seed: 'lt2'},
+  {x: 1152, base: 856, rx: 104, ry: 80, cy: 706, bloom: 1, seed: 'lt3'},
 ];
+/** The far trees sit one small flat step back toward the sky (the facade's foot), never a haze. */
+const BLOOM_FAR: BloomTones = Object.fromEntries(Object.entries(BLOOM_NEAR).map(([k, v]) => [k, mix(v, CM.sky, 0.1)])) as BloomTones;
+const LIGHT: [number, number] = [-0.95, -0.3];
 
-const treeInto = (B: Batch, s: TreeSpec) => {
-  const r = rng(s.seed);
-  // trunk + two limbs (ink), flat bark
-  B.poly(LT.bark, [
-    [s.x - 6, s.base],
-    [s.x - 4, s.cy + s.ry * 0.3],
-    [s.x + 4, s.cy + s.ry * 0.3],
-    [s.x + 6, s.base],
-  ]);
-  B.ink(lineD([[s.x - 2, s.base], [s.x - 1, s.cy + s.ry * 0.2], [s.x - s.rx * 0.38, s.cy - s.ry * 0.12]]), 2.2, CM.ink, 0.2);
-  B.ink(lineD([[s.x + 1, s.cy + s.ry * 0.45], [s.x + s.rx * 0.34, s.cy - s.ry * 0.05]]), 1.6, CM.ink, 0.2);
-  // shade mass, crown, blossom clumps (flat, misregistered by Paint)
-  B.fill(LT.crownShade, crownD(s.x + 10, s.cy + 10, s.rx * 1.02, s.ry * 0.86, `${s.seed}/s`, 9, 0.35));
-  B.fill(LT.crown, crownD(s.x - 6, s.cy, s.rx * 0.9, s.ry * 0.8, `${s.seed}/c`, 9, 0.35));
-  let bl = '';
-  let bs = '';
-  let bt = '';
-  const n = Math.round(46 * s.bloom);
-  for (let i = 0; i < n; i++) {
-    const a = r.range(0, Math.PI * 2);
-    const d = Math.sqrt(r.next()) * 0.92;
-    const bx = s.x + Math.cos(a) * s.rx * d;
-    const by = s.cy + Math.sin(a) * s.ry * 0.85 * d;
-    if (by - 12 < 612) continue;
-    const db = blossomD(bx, by, r.range(9, 15), `${s.seed}/b${i}`, 4);
-    if (Math.cos(a) > 0.35 && Math.sin(a) > -0.2) bs += db;
-    else if (Math.sin(a) < -0.5) bt += db;
-    else bl += db;
-  }
-  B.fill(LT.blossomShade, bs);
-  B.fill(CM.blossom, bl);
-  B.fill(LT.petalLit, bt);
-  // a short flat shadow on the lawn strip, to the right (the sun is screen-left)
-  B.poly(LT.lawnShadow, [
+const crownOf = (s: TreeSpec): CrownSpec => ({cx: s.x, cy: s.cy, rx: s.rx, ry: s.ry, seed: s.seed, light: LIGHT, bloom: s.bloom, ink: 2.2});
+
+/** A trunk under a crown (flat bark, the lit side left) and its short flat shadow to the right on the ground. */
+const trunkInto = (B: Batch, s: TreeSpec, shadow: string) => {
+  const top = s.cy + s.ry * 0.55;
+  B.poly(shadow, [
     [s.x - 4, s.base],
-    [s.x + s.rx * 0.9, s.base - 2],
-    [s.x + s.rx * 0.95, s.base + 5],
+    [s.x + s.rx * 0.8, s.base - 2],
+    [s.x + s.rx * 0.86, s.base + 5],
     [s.x - 2, s.base + 6],
   ]);
+  B.poly(LT.bark, [
+    [s.x - 7, s.base],
+    [s.x - 5, top],
+    [s.x + 5, top],
+    [s.x + 7, s.base],
+  ]);
+  B.poly(mix(LT.bark, CM.paper, 0.25), [
+    [s.x - 7, s.base],
+    [s.x - 5, top],
+    [s.x - 2, top],
+    [s.x - 3, s.base],
+  ]);
+  B.ink(lineD([[s.x + 7, s.base], [s.x + 5, top]]), 2.2, CM.ink, 0.2);
 };
 
 export const S6LawnTrees: React.FC = () => {
   const b = useMemo(() => {
     const B = new Batch();
-    for (const s of LAWN_TREES) {
-      treeInto(B, s);
-      B.layer();
-    }
+    for (const s of LAWN_TREES) trunkInto(B, s, LT.lawnShadow);
     return B;
   }, []);
-  return <Paint b={b} seed="s6lawntrees" misreg={2} />;
+  const crowns = useMemo(() => LAWN_TREES.map(crownOf), []);
+  return (
+    <>
+      <Paint b={b} seed="s6lawntrunks" misreg={2} />
+      <BloomCrowns crowns={crowns} tones={BLOOM_FAR} seed="s6lawncrowns" misreg={2} />
+    </>
+  );
 };
 
 // ---------------------------------------------------------------- the promenade (lawn plane)
 
 type Mover = {
+  /** Standing still (a pause: the walk stops mid-stride) at scene t. */
+  still?: (t: number) => boolean;
   id: string;
   pose: 'walk' | 'jog' | 'cycle';
   /** screen x at scene t (the camera's drift is removed when drawing in lawn coords). */
@@ -223,15 +219,17 @@ type Mover = {
 
 const MOVERS: Mover[] = [
   {id: 'jogA', pose: 'jog', x: (t) => 1104 - 128 * t, feet: 866, dir: -1, rate: 2.8, traits: {coat: CM.coatMustard, hair: 'cap', hatColor: CM.coatSlate, acc: 'headphones', coatLen: 'jacket'}, on: [0, 3.2]},
-  {id: 'dogW', pose: 'walk', x: (t) => 792 + 78 * t, feet: 878, dir: 1, rate: 1.7, traits: {coat: CM.brick, hair: 'short', hairColor: CM.hair[3], acc: 'none', coatLen: 'mid'}, on: [0, 4.1]},
+  // the dog walker stops while the dog sniffs the tulip bed (2.55-2.95), then walks on (a new event at 2.95)
+  {id: 'dogW', pose: 'walk', x: (t) => 792 + 78 * Math.min(t, 2.55) + 78 * Math.max(0, t - 2.95), still: (t) => t > 2.55 && t < 2.95, feet: 878, dir: 1, rate: 1.7, traits: {coat: CM.brick, hair: 'short', hairColor: CM.hair[3], acc: 'none', coatLen: 'mid'}, on: [0, 4.1]},
   {id: 'cyc', pose: 'cycle', x: (t) => 1186 - 292 * (t - 2.12), feet: 870, dir: -1, rate: 0, traits: {coat: CM.coatOat, hair: 'beanie', hatColor: CM.brickDeep, acc: 'backpack', accColor: CM.coatSlate}, on: [2.12, 4.1]},
   {id: 'pram', pose: 'walk', x: (t) => 112 - 38 * t, feet: 858, dir: -1, rate: 1.5, traits: {coat: CM.coatPlum, hair: 'lowBun', hairColor: CM.hair[2], acc: 'tote', accColor: CM.coatOat, coatLen: 'long'}, on: [0, 4.1]},
   {id: 'jogB', pose: 'jog', x: (t) => -62 + 168 * (t - 0.35), feet: 874, dir: 1, rate: 2.9, traits: {coat: CM.sage, hair: 'bun', hairColor: CM.hair[4], acc: 'none', coatLen: 'jacket'}, on: [0.35, 1.9]},
   {id: 'walkC', pose: 'walk', x: (t) => -46 + 60 * (t - 2.25), feet: 862, dir: 1, rate: 1.6, traits: {coat: CM.coatSlate, hair: 'curls', hairColor: CM.hair[1], acc: 'strap', accColor: CM.coatMustard, coatLen: 'mid'}, on: [2.25, 4.1]},
+  {id: 'jogC', pose: 'jog', x: (t) => -64 + 176 * (t - 3.3), feet: 876, dir: 1, rate: 3.0, traits: {coat: CM.brickLight, hair: 'short', hairColor: CM.hair[2], acc: 'none', coatLen: 'jacket'}, on: [3.3, 4.1]},
 ];
 
 /** The dog (a small terrier in profile, trotting): screen feet (x, y), facing dir, height h (back), gait phase. */
-const dogInto = (B: Batch, x: number, y: number, dir: 1 | -1, h: number, ph: number) => {
+const dogInto = (B: Batch, x: number, y: number, dir: 1 | -1, h: number, ph: number, sniff = 0) => {
   const L = h * 1.45;
   const legA = Math.sin(ph) * h * 0.18;
   const bob = Math.abs(Math.sin(ph)) * h * 0.05;
@@ -249,8 +247,8 @@ const dogInto = (B: Batch, x: number, y: number, dir: 1 | -1, h: number, ph: num
   }
   B.fill(col, ellD(x, by, L * 0.42, h * 0.27));
   // head + ear + muzzle (in front), tail up (behind)
-  const hx = x + dir * L * 0.46;
-  const hy = by - h * 0.28;
+  const hx = x + dir * L * (0.46 + sniff * 0.08);
+  const hy = by - h * 0.28 + sniff * h * 0.42;
   B.fill(col, circleD(hx, hy, h * 0.24));
   B.fill(col, ellD(hx + dir * h * 0.22, hy + h * 0.06, h * 0.14, h * 0.09));
   B.fill(LT.dog[2], ellD(hx - dir * h * 0.05, hy - h * 0.12, h * 0.08, h * 0.14));
@@ -295,13 +293,14 @@ export const S6Promenade: React.FC = () => {
       out.push(<Person key={m.id} x={x} y={m.feet} h={h} seed={`s6/${m.id}`} pose="cycle" view="profile" flip={flip} traits={m.traits} pedal={1.3} />);
       continue;
     }
-    out.push(<Person key={m.id} x={x} y={m.feet} h={h} seed={`s6/${m.id}`} pose={m.pose} view="profile" flip={flip} walk={{rate: m.rate, phase: rand('s6walk', m.id) * 4}} traits={m.traits} />);
+    const still = m.still ? m.still(t) : false;
+    out.push(<Person key={m.id} x={x} y={m.feet} h={h} seed={`s6/${m.id}`} pose={still ? 'stand' : m.pose} view="profile" flip={flip} walk={still ? undefined : {rate: m.rate, phase: rand('s6walk', m.id) * 4}} traits={m.traits} />);
     if (m.id === 'dogW') {
       // the dog trots ahead on a lead; its trot runs at 12 drawings/s like the people
       const ph = Math.floor(t * 12) / 12;
       const dogX = x + 66;
       const dh = 26;
-      dogInto(props, dogX, m.feet + 2, 1, dh, ph * 13);
+      dogInto(props, dogX, m.feet + 2, 1, dh, still ? 0.4 : ph * 13, still ? 1 : 0);
       shadows.push(ellD(dogX + 8, m.feet + 3, 24, 2.6));
       props.ink(`M${(x + h * 0.1).toFixed(1)} ${(m.feet - h * 0.46).toFixed(1)}Q${(x + 36).toFixed(1)} ${(m.feet - h * 0.2).toFixed(1)} ${(dogX + 26).toFixed(1)} ${(m.feet - dh * 0.95).toFixed(1)}`, 1.4, CM.ink);
     }
@@ -420,11 +419,13 @@ export const S6LawnMid: React.FC = () => {
   const md = dxOf(DRIFT.mid, t);
   // the young cherry: lawn-depth drift ~14 px/s
   const tdx = dxOf(14, t) - md;
+  const young: TreeSpec = {x: 26, base: 958, rx: 96, ry: 80, cy: 728, bloom: 1.1, seed: 'ltL'};
   const tree = useMemo(() => {
     const B = new Batch();
-    treeInto(B, {x: 26, base: 958, rx: 92, ry: 78, cy: 722, bloom: 1.1, seed: 'ltL'});
+    trunkInto(B, young, LT.lawnShadow);
     return B;
   }, []);
+  const youngCrown = useMemo(() => [crownOf(young)], []);
   // the gardener: kneeling in front of the kit's right tulip bed (mid coords (1000, 930)), back to us, at rest but
   // working (the head turns over the bed, the trowel digs); a barrow and a trug beside them on the lawn
   const gx = 992;
@@ -457,9 +458,10 @@ export const S6LawnMid: React.FC = () => {
     <>
       <g transform={`translate(${tdx.toFixed(2)} 0)`}>
         <Paint b={tree} seed="s6youngcherry" misreg={2} />
+        <BloomCrowns crowns={youngCrown} seed="s6youngcrown" misreg={3} />
       </g>
       <Paint b={g} seed="s6garden" misreg={2} />
-      <Seated x={gx} y={gy - 20} h={66} seed="s6/gardener" turn={turn} traits={{coat: CM.coatMustard, hair: 'cap', hatColor: CM.brickDeep, acc: 'none'}} />
+      <Seated x={gx} y={gy - 20} h={66} seed="s6/gardener" turn={turn} traits={{coat: CM.coatOat, hair: 'cap', hatColor: CM.brickDeep, acc: 'none'}} />
     </>
   );
 };

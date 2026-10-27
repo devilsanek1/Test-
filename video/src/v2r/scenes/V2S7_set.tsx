@@ -1,25 +1,28 @@
 // V2S7_set.tsx (lane L5): the SET of V2S7 "Google says", back to front, in WORLD px (the 30.04 pose; V2S7.tsx wraps
 // every part in the S7 camera). TREATMENT section 5 row S7 + the bottom third; STYLE.md sections 2-6.
 //   S7SkyBand  (screen) the flat sunset band low in the west gap (below y 630; the sky above is World's, = S8's)
-//   S7Far      the west gap past the wing's corner: far London roofs in flat depth steps, a gasholder frame, far trees,
-//              the forecourt's west railing; SUN2 sets behind these roofs (drawn before them, screen-fixed)
+//   S7Far      the west gap past the wing's corner: far London roofs in flat depth steps (windows switching, chimney
+//              pots, aerials), far street trees, the forecourt's west railing; SUN2 sets behind these roofs (drawn
+//              before them, screen-fixed)
 //   S7TreeL / S7TreeR   two young London planes (mottled bark, crowns in y 618-884): trunk + limbs, then the crown
 //   S7Wing     the kit's WingS7 (plain lit windows, the "Google" canopy, the glass doors on DOOR_KEYS), clipped at
 //              y 605 so its roof planting never rises above the band margin (screen y >= 600 under the float)
 //   S7Steps    three low treads along the wing's frontage (people sit on them)
-//   S7Ground   the forecourt paving (receding joints to VP, slab colours, leaves, tree grates, a drain)
+//   S7Ground   the forecourt: bands of granite setts between limestone kerbs (joints to VP), a slot drain, leaves
 //   S7Bollard  Pip's stone bollard (cap = map BOARD_BOLLARD) and its short shadow
 //   S7Basin    the fountain basin (near right): far rim, water, the left end lit by the low sun, the near rim + face
-//   S7Cafe     two bistro tables (cups, saucers, a menu card, a teapot, a vase) and chairs, with slots for the people
+//   S7Cafe*    three bistro tables (cups, saucers, menu cards, a teapot, a vase) and chairs; the people are V2S7_life's
 //   S7Rack / S7Planter   Sheffield stands with two bikes; a planter of grasses (the bottom centre)
 // Colours: CM role tokens (and flat shadow mixes of them); ink by depth; no gradient, glow, blur or opacity.
 import React, {useMemo} from 'react';
 import {CM, INK_PX} from '../palette';
 import {line, poly, crown as crownD, crownTicks, blob, circle as circleInk, wire as wirePath} from '../../lib/sketch';
 import {Batch, Paint, P, Pt, ovalPath, domePath, lobes, leafPath, lerp, rng, shadowInto} from '../kit/canal/core';
-import {roofRowInto, gasholderInto} from '../kit/canal/far';
+import {roofRowInto} from '../kit/canal/far';
 import {bikeInto, drainInto} from '../kit/canal/towpath';
 import {WingS7} from '../kit/canal/wing';
+import {HandLetteredGoogle} from '../kit/canal/lettering';
+import {Fill} from '../../lib/Fill';
 import {
   WING, SKY_CLIP_Y, STEPS, VP, kAt, alongVP, TREE_L, TREE_R, BOLLARD, BASIN, basinLeftAt, JETS, CAFE, RACK, PLANTER,
   LIGHT, SHADOW_LEN, mixHex, DOOR_KEYS,
@@ -63,13 +66,10 @@ export const S7Far: React.FC<{t: number}> = ({t}) => {
     const b = new Batch();
     const ceil = SKY_CLIP_Y + 2;
     // row 1, farthest: pale stone and limestone, fill only (atmospheric step)
-    roofRowInto(b, {x0: -60, x1: 380, base: 800, top: 646, spread: 26, seed: 's7/far1', walls: [CM.stoneShade, CM.limestone, CM.stoneShade, CM.glass], roof: CM.shadeCool, wRange: [36, 92], ceil});
-    b.layer();
-    // a King's Cross gasholder frame far off, left of the sun (its top ring low, pale)
-    gasholderInto(b, 64, 790, 58, 170, 's7/gas', {color: CM.stoneShade, ink: 1.1, ceil});
+    roofRowInto(b, {x0: -60, x1: 380, base: 800, top: 664, spread: 14, seed: 's7/far1', walls: [CM.stoneShade, CM.limestone, CM.stoneShade, CM.glass], roof: CM.shadeCool, wRange: [36, 92], ceil});
     b.layer();
     // row 2: light brick and stucco, a few lit windows, fill only
-    roofRowInto(b, {x0: -60, x1: 380, base: 820, top: 676, spread: 18, seed: 's7/far2', walls: [CM.brickLight, CM.stucco, CM.limestone, CM.brickLight, CM.paving], roof: CM.shadeWarm, wRange: [44, 110], ceil, win: 5});
+    roofRowInto(b, {x0: -60, x1: 380, base: 820, top: 690, spread: 12, seed: 's7/far2', walls: [CM.brickLight, CM.stucco, CM.limestone, CM.brickLight, CM.paving], roof: CM.shadeWarm, wRange: [44, 110], ceil, win: 5});
     b.layer();
     // far street trees in autumn between the rows and the railing (column left of the board)
     const r = rng('s7/fartrees');
@@ -315,6 +315,21 @@ export const S7Wing: React.FC<{behindDoor?: React.ReactNode}> = ({behindDoor}) =
   </SkyClip>
 );
 
+/** PATCH over a K6 kit bug (REQUEST filed): WingFront draws the fins' structure ink AFTER the canopy fascia, so in
+ *  the S7 layout the fin lines at x ~768 and ~894 cross the fascia and the second "o" reads as a "b" ("Gobgle").
+ *  Paint the fascia's own paper over those two lines (the SAME Fill seed as the kit's fascia, so the same
+ *  misregistration) and redraw the kit's hand-lettered "Google" on top (identical strokes: no doubling). */
+export const S7CanopyFix: React.FC = () => {
+  const F = WING.canopy;
+  const strips = [768.2, 894.2].map((x) => `M${P(x - 5, F.y0 + 1)}H${(x + 5).toFixed(1)}V${(F.y1 - 1).toFixed(1)}H${(x - 5).toFixed(1)}Z`).join('');
+  return (
+    <>
+      <Fill d={strips} color={CM.paper} seed={`wingS7/stat/5/${CM.paper}`} />
+      <HandLetteredGoogle cx={(F.x0 + F.x1) / 2} baseline={F.y0 + (F.y1 - F.y0) * 0.78} cap={Math.min(40, (F.y1 - F.y0) * 0.86)} />
+    </>
+  );
+};
+
 // ---------------------------------------------------------------- the front steps
 
 export const S7Steps: React.FC = () => {
@@ -353,78 +368,102 @@ export const S7Steps: React.FC = () => {
 
 // ---------------------------------------------------------------- the forecourt paving
 
-/** Ground depth (m from the lens) of screen y, for the slab rows (f = 1800 px). */
-const depthAt = (y: number) => 1800 / Math.max(1e-6, kAt(y));
-const yAtDepth = (d: number) => VP.y + (1800 / d) * ((1012 - VP.y) / 72);
+/** Ground depth (m from the lens) of screen y, and back (f = 1800 px at the wing's 25 m). */
+const F_GROUND = (1012 - VP.y) * 25;
+const depthAt = (y: number) => F_GROUND / Math.max(1e-6, y - VP.y);
+const yAtDepth = (d: number) => VP.y + F_GROUND / d;
 
+/** Granary-Square-like paving: E-W bands of small granite setts (0.30 x 0.18 m, running bond, joints receding to VP)
+ *  between limestone kerb bands, a slot drain, a few setts in other tones, specks and leaves. A field MADE of small
+ *  things (LIFE_AND_DENSITY section 0), never one slab. */
 export const S7Ground: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
     const r = rng('s7/ground');
     const top = STEPS.treads[STEPS.treads.length - 1];
     k.rect(CM.paving, -60, top, 1200, 1960 - top);
-    // slab rows 0.9 m deep, 1.2 m wide, running bond; joints recede to VP; colour variety slab by slab
-    const rows: number[] = [];
-    for (let d = depthAt(top) - 0.3; d > 5.6; d -= 0.9) rows.push(yAtDepth(d));
-    rows.push(1990);
+    const gx = (x0g: number, y: number) => VP.x + x0g * kAt(y);
+    const quad = (ga: number, gb: number, ya: number, yb: number): Pt[] => [[gx(ga, ya), ya], [gx(gb, ya), ya], [gx(gb, yb), yb], [gx(ga, yb), yb]];
     let joints = '';
-    const slabCols = [CM.stucco, CM.limestone, PAVING_DARK, CM.paving, CM.stucco];
-    for (let i = 0; i < rows.length - 1; i++) {
-      const ya = Math.max(top, rows[i]);
-      const yb = rows[i + 1];
-      const kk = kAt((ya + yb) / 2);
-      const slabW = 1.2;
-      const off = (i % 2) * 0.6;
-      // ground metres at the row's mid line -> x through VP: x = VP.x + gx * k
-      for (let gx = -8 - off; gx < 9; gx += slabW) {
-        const xa0 = VP.x + gx * kAt(ya);
-        const xa1 = VP.x + (gx + slabW) * kAt(ya);
-        const xb0 = VP.x + gx * kAt(yb);
-        const xb1 = VP.x + (gx + slabW) * kAt(yb);
-        if (Math.max(xa1, xb1) < -60 || Math.min(xa0, xb0) > 1140) continue;
-        const pick = r.next();
-        if (pick < 0.42) k.poly(slabCols[Math.floor(r.next() * slabCols.length)], [[xa0 + 1, ya + 1], [xa1 - 1, ya + 1], [xb1 - 1, yb - 1], [xb0 + 1, yb - 1]]);
-        // the receding joint at the slab's left edge (broken: never a grid)
-        if (r.chance(0.7)) {
-          const u0 = r.range(0, 0.25);
-          const u1 = r.range(0.7, 1);
-          joints += `M${P(lerp(xa0, xb0, u0), lerp(ya, yb, u0))}L${P(lerp(xa0, xb0, u1), lerp(ya, yb, u1))}`;
+    let kerbs = '';
+    const tones = [CM.stucco, CM.limestone, PAVING_DARK, CM.stucco, mixHex(CM.paving, CM.coatOat, 0.5)];
+    // bands from the far end (the steps' foot) toward the lens
+    let d = depthAt(top);
+    let band = 0;
+    while (d > 7.4) {
+      // a kerb band (0.3 m limestone) then a sett band (1.6-2.2 m)
+      const dk = d - 0.3;
+      const ya = yAtDepth(d);
+      const yb = yAtDepth(dk);
+      k.poly(band % 2 ? CM.limestone : CM.stucco, quad(-12, 12, Math.max(top, ya), yb));
+      k.rect(SH_STONE, -60, yb - 1.2, 1200, Math.max(1.4, (yb - ya) * 0.12));
+      kerbs += `M${P(-60, yb)}L${P(1140, yb + r.jitter(0.8))}`;
+      // kerb joints every 0.9 m
+      for (let g = -12; g < 12; g += 0.9) joints += `M${P(gx(g, ya), ya + 1)}L${P(gx(g, yb), yb - 1)}`;
+      d = dk;
+      const bandDepth = r.range(1.6, 2.2);
+      const dEnd = Math.max(7.0, d - bandDepth);
+      // rows of setts
+      let row = 0;
+      while (d > dEnd + 0.01) {
+        const dn = Math.max(dEnd, d - 0.18);
+        const y0 = yAtDepth(d);
+        const y1 = yAtDepth(dn);
+        const tall = y1 - y0;
+        if (tall >= 5.5) {
+          const off = row % 2 ? 0.15 : 0;
+          for (let g = -12 + off; g < 12; g += 0.3) {
+            const xa = gx(g, y0);
+            if (xa > 1150 || gx(g + 0.3, y1) < -70) continue;
+            if (r.chance(0.72)) joints += `M${P(xa, y0 + 0.8)}L${P(gx(g, y1), y1 - 0.8)}`;
+            if (r.chance(0.09)) k.poly(tones[Math.floor(r.next() * tones.length)], quad(g + 0.012, g + 0.288, y0 + 1, y1 - 1));
+          }
+          // the row joint, broken
+          let x = -60 + r.range(0, 40);
+          while (x < 1140) {
+            const L = r.range(80, 260);
+            if (r.chance(0.78)) joints += `M${P(x, y1 + r.jitter(0.5))}L${P(x + L, y1 + r.jitter(0.6))}`;
+            x += L + r.range(6, 30);
+          }
         }
+        d = dn;
+        row++;
       }
-      // the row's cross joint, in broken runs
-      let x = -60 + r.range(0, 80);
-      while (x < 1140) {
-        const L = r.range(60, 200) * (kk / 120);
-        if (r.chance(0.7)) joints += `M${P(x, yb + r.jitter(0.6))}L${P(x + L, yb + r.jitter(0.8))}`;
-        x += L + r.range(14, 60) * (kk / 120);
-      }
+      band++;
     }
-    k.ink(joints, 1.5, JOINT);
+    k.ink(joints, 1.15, JOINT);
+    k.ink(kerbs, 1.4, mixHex(CM.paving, CM.line, 0.7));
+    // a slot drain across the forecourt (a dark slot with a steel lip)
+    const yd = yAtDepth(10.6);
+    for (let x = -60; x < 1140; x += 230) {
+      k.rect(CM.shadeCool, x + 4, yd, 222, 2.4);
+      k.rect(CM.paper, x + 4, yd - 1.4, 222, 1.4);
+    }
     // specks and fallen leaves (more near the trees and the bottom)
     k.layer();
-    for (let i = 0; i < 70; i++) {
+    for (let i = 0; i < 90; i++) {
       const y = r.range(top + 10, 1915);
       const sx = r.range(-20, 1100);
-      const s = 0.04 * kAt(y);
+      const s = 0.035 * kAt(y);
       k.fill(CM.stoneShade, ovalPath(sx, y, Math.max(1, s * 0.6), Math.max(0.8, s * 0.35)));
     }
     const leafCols = [CM.leafGold, CM.leafRust, CM.coatMustard, CM.leafGold];
     const nearTree = (cx: number, base: number, n: number, spread: number, seed: string) => {
       const q = rng(seed);
       for (let i = 0; i < n; i++) {
-        const y = base + q.range(-6, spread * 0.5);
+        const y = base + q.range(-6, spread * 0.6);
         const x = cx + q.jitter(spread);
-        const s = 0.11 * kAt(y);
-        k.fill(leafCols[i % leafCols.length], leafPath(x, y, s, s * 0.34, q.range(-40, 40)));
+        const sz = 0.11 * kAt(y);
+        k.fill(leafCols[i % leafCols.length], leafPath(x, y, sz, sz * 0.34, q.range(-40, 40)));
       }
     };
-    nearTree(TREE_R.x, TREE_R.base + 8, 16, 120, 's7/leavesR');
-    nearTree(TREE_L.x + 20, TREE_L.base + 10, 12, 110, 's7/leavesL');
-    for (let i = 0; i < 26; i++) {
-      const y = r.range(1250, 1910);
+    nearTree(TREE_R.x - 20, TREE_R.base + 8, 20, 130, 's7/leavesR');
+    nearTree(TREE_L.x + 30, TREE_L.base + 10, 16, 120, 's7/leavesL');
+    for (let i = 0; i < 40; i++) {
+      const y = r.range(1240, 1910);
       const x = r.range(-10, 1090);
-      const s = 0.1 * kAt(y);
-      k.fill(leafCols[i % leafCols.length], leafPath(x, y, s, s * 0.34, r.range(-50, 50)));
+      const sz = 0.1 * kAt(y);
+      k.fill(leafCols[i % leafCols.length], leafPath(x, y, sz, sz * 0.34, r.range(-50, 50)));
     }
     // tree grates (iron, seen from above) round both trunks
     k.layer();
@@ -434,14 +473,13 @@ export const S7Ground: React.FC = () => {
       const dz = kk * 0.09;
       k.poly(CM.shadeCool, [[tr.x - hw, tr.base - dz], [tr.x + hw, tr.base - dz], [tr.x + hw * 1.08, tr.base + dz], [tr.x - hw * 1.08, tr.base + dz]]);
       let g = '';
-      for (let s = 1; s < 7; s++) {
-        const u = s / 7;
+      for (let i = 1; i < 7; i++) {
+        const u = i / 7;
         g += `M${P(lerp(tr.x - hw, tr.x + hw, u), tr.base - dz + 1)}L${P(lerp(tr.x - hw * 1.08, tr.x + hw * 1.08, u), tr.base + dz - 1)}`;
       }
       k.ink(g, 1.2, CM.paneUnlit);
     }
-    // a drain cover between the cafe and the basin
-    drainInto(k, 640, 1712, 74, 's7/drain');
+    drainInto(k, 640, 1690, 70, 's7/drain');
     return k;
   }, []);
   return <Paint b={b} seed="s7/ground" />;
@@ -449,7 +487,7 @@ export const S7Ground: React.FC = () => {
 
 // ---------------------------------------------------------------- the ground shadows of standing things
 
-/** Short colour shadows (light from the left): the trees, the bollard, the board's legs, the basin's west end. */
+/** Short colour shadows (light from the left): the trees, the bollard (the board's is K3's own BoardShadow). */
 export const S7Shadows: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
@@ -457,10 +495,6 @@ export const S7Shadows: React.FC = () => {
     shadowInto(k, TREE_R.x + 6, TREE_R.base, 34, SHADOW_LEN * 0.9, L, SH_PAVING);
     shadowInto(k, TREE_L.x + 6, TREE_L.base, 32, SHADOW_LEN * 0.9, L, SH_PAVING);
     shadowInto(k, BOLLARD.x + 4, BOLLARD.base, BOLLARD.w * 1.02, SHADOW_LEN, L, SH_PAVING);
-    // the board's feet (its own flat shadow is short: under and to the right of each leg)
-    shadowInto(k, 134, 1250, 34, SHADOW_LEN, L, SH_PAVING);
-    shadowInto(k, 650, 1250, 34, SHADOW_LEN, L, SH_PAVING);
-    k.rect(SH_PAVING, 116, 1246, 560, 7);
     return k;
   }, []);
   return <Paint b={b} seed="s7/shadows" misreg={false} />;
@@ -628,14 +662,16 @@ function chairInto(b: Batch, x: number, seatY: number, W: number, o: {empty?: bo
   b.ink(`M${P(x - sw * 0.42, seatY - back * 0.55)}Q${P(x, seatY - back * 0.66)} ${P(x + sw * 0.42, seatY - back * 0.55)}`, iw * 0.8, col);
 }
 
-/** The far table T1 and the empty chair across it (behind the table). The sitters come next (V2S7_life). */
+/** The far tables T1 and T0 (cut by the left edge) and the empty chairs across them. The sitters come next. */
 export const S7CafeBack: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
-    const T1 = CAFE.t1;
+    const {t0: T0, t1: T1} = CAFE;
     chairInto(k, T1.x + 4, T1.top - 6, 64, {empty: true, color: CM.coatSlate, ink: INK_PX.far});
+    chairInto(k, T0.x + 6, T0.top - 6, 60, {empty: true, color: CM.line, ink: INK_PX.far});
     k.layer();
     tableInto(k, T1, 's7/t1', 'far');
+    tableInto(k, T0, 's7/t0', 'far');
     return k;
   }, []);
   return <Paint b={b} seed="s7/cafeBack" />;
@@ -645,8 +681,8 @@ export const S7CafeBack: React.FC = () => {
 export const S7CafeT1Chairs: React.FC = () => {
   const b = useMemo(() => {
     const k = new Batch();
-    for (const s of CAFE.s1) chairInto(k, s.x, s.seat + 3, s.h * 0.62, {color: s.x < 300 ? CM.line : CM.coatSlate, ink: INK_PX.mid});
-    chairInto(k, CAFE.t1.x - 152, 1512, 72, {empty: true, color: CM.line, ink: INK_PX.mid});
+    for (const s of [...CAFE.s1, CAFE.s0]) chairInto(k, s.x, s.seat + 3, s.h * 0.62, {color: s.x > 300 ? CM.coatSlate : CM.line, ink: INK_PX.mid});
+    chairInto(k, CAFE.t1.x - 110, 1478, 70, {empty: true, color: CM.coatSlate, ink: INK_PX.mid});
     return k;
   }, []);
   return <Paint b={b} seed="s7/cafeT1Chairs" />;

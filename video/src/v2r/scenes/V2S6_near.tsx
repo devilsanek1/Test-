@@ -145,17 +145,31 @@ const troughBatch = (): Batch => {
   for (const tr of TROUGHS) {
     const w = tr.x1 - tr.x0;
     const r = rng(tr.seed);
-    B.poly(NT.shadow, [[tr.x1, tr.base - 4], [tr.x1 + 36, tr.base - 6], [tr.x1 + 40, tr.base + 6], [tr.x1, tr.base + 6]]);
-    B.rect(NT.trough, tr.x0, tr.top, w, tr.base - tr.top);
-    // dressed stone blocks: alternate tones, a lit top course
-    for (let x = tr.x0; x < tr.x1 - 4; x += r.range(42, 60)) B.rect(r.chance(0.5) ? NT.troughLit : NT.trough, x + 2, tr.top + 12, Math.min(r.range(36, 54), tr.x1 - x - 18), 22);
+    // its short flat shadow on the paving (the sun is low on the left)
+    B.poly(NT.shadow, [[tr.x1 + 5, tr.base - 6], [tr.x1 + 40, tr.base - 8], [tr.x1 + 44, tr.base + 5], [tr.x1 + 5, tr.base + 6]]);
+    // the box: lit front face, a paper rim, the shade end on the right, a plinth shadow
+    B.rect(NT.troughLit, tr.x0, tr.top, w, tr.base - tr.top);
     B.rect(CM.paper, tr.x0 - 5, tr.top - 8, w + 10, 11);
-    B.rect(NT.troughShade, tr.x1 - 18, tr.top + 3, 18, tr.base - tr.top - 3);
-    B.rect(NT.troughShade, tr.x0, tr.base - 9, w, 9);
+    B.rect(NT.troughShade, tr.x1 - 16, tr.top + 3, 16, tr.base - tr.top - 3);
+    B.rect(NT.trough, tr.x0, tr.base - 10, w - 16, 10);
     B.rect(NT.soil, tr.x0 + 4, tr.top - 13, w - 8, 6);
+    // trailing ivy over the front edge (small leaves, two greens)
+    let ivy = '';
+    let ivyS = '';
+    for (let x = tr.x0 + r.range(4, 30); x < tr.x1 - 30; x += r.range(34, 70)) {
+      const len = r.range(16, 40);
+      for (let k = 0; k < len; k += 7) {
+        const d = ellD(x + Math.sin(k * 0.3) * 3, tr.top - 2 + k, 5, 3.2);
+        if ((k / 7) % 2) ivyS += d;
+        else ivy += d;
+      }
+    }
+    B.layer();
+    B.fill(LEAF.shade, ivyS);
+    B.fill(LEAF.body, ivy);
     B.ink(lineD([[tr.x0 - 5, tr.base], [tr.x0 - 5, tr.top - 8], [tr.x1 + 5, tr.top - 8], [tr.x1 + 5, tr.base]]), 3.4, CM.ink, 0.18);
-    B.ink(lineD([[tr.x0 + 6, tr.top + 3], [tr.x1 - 8, tr.top + 3]]), 1.6, CM.ink, 0.3);
-    B.ink(lineD([[tr.x0 + 6, tr.top + 35], [tr.x1 - 22, tr.top + 35]]), 1.6, NT.troughShade, 0.4);
+    // block joints
+    for (let x = tr.x0 + r.range(50, 70); x < tr.x1 - 30; x += r.range(64, 92)) B.ink(lineD([[x, tr.top + 4], [x + 1, tr.base - 2]]), 1.6, NT.troughShade, 0.25);
   }
   return B;
 };
@@ -210,7 +224,7 @@ const Daffodils: React.FC<{t: number}> = ({t}) => {
 
 // ---------------------------------------------------------------- pigeons
 
-type Pig = {x: number; y: number; dir: 1 | -1; flutter?: {at: number; dx: number; up: number}};
+type Pig = {x: number; y: number; dir: 1 | -1; flutter?: {at: number; dx: number; up: number}; arrive?: {at: number; dur: number; from: [number, number]}};
 // the passer-by reaches ~160 px left of each startled pigeon at about these times (see passerX)
 const PIGEONS: Pig[] = [
   {x: 262, y: 1700, dir: 1, flutter: {at: 1.6, dx: 200, up: 104}},
@@ -219,6 +233,8 @@ const PIGEONS: Pig[] = [
   {x: 488, y: 1736, dir: -1},
   {x: 584, y: 1704, dir: 1},
   {x: 672, y: 1738, dir: -1},
+  // one flies in over the border from the left edge (3.18) and lands among them (3.62): from screen (-50, 1560)
+  {x: 150, y: 1718, dir: 1, arrive: {at: 3.18, dur: 0.44, from: [-50 - 65 * 3.18, 1560]}},
 ];
 const PIG_S = 60;
 
@@ -281,6 +297,21 @@ const Pigeons: React.FC<{t: number}> = ({t}) => {
     let fly = 0;
     let dir = Math.cos((td + ph) * 0.8) >= 0 ? p.dir : (-p.dir as 1 | -1);
     let gy = y;
+    if (p.arrive) {
+      const a = p.arrive;
+      if (t < a.at) return;
+      const k = Math.min(1, (t - a.at) / a.dur);
+      if (k < 1) {
+        // a glide down with the wings beating, braking into the landing (the near plane carries the landing spot)
+        const e = 1 - (1 - k) * (1 - k);
+        x = a.from[0] + (p.x - a.from[0]) * e;
+        y = a.from[1] + (p.y - a.from[1]) * k * k;
+        gy = p.y;
+        fly = 1;
+        peck = 0;
+        dir = 1;
+      }
+    }
     if (p.flutter && t >= p.flutter.at) {
       const f = p.flutter;
       const k = Math.min(1, (t - f.at) / 0.66);
@@ -315,6 +346,7 @@ export const S6Readers: React.FC = () => {
   const t = useTime();
   const nr = dxOf(DRIFT.near, t);
   const turn2 = t < 1.5 ? 0 : t < 1.75 ? -0.9 * smooth((t - 1.5) / 0.25) : t < 2.3 ? -0.9 : -0.9 * (1 - smooth((t - 2.3) / 0.3));
+  const turn3 = 0.7 * smooth((t - 3.4) / 0.3);
   const px = passerX(t);
   const bob = (k: number) => Math.round(Math.sin(t * 1.9 + k) * 1.2 * 2) / 2;
   return (
@@ -323,7 +355,7 @@ export const S6Readers: React.FC = () => {
         <NearBack x={px - nr} y={1924 - Math.abs(Math.sin(t * 9.4)) * 4} hv={PASSER.hv} seed="s6/passer" traits={{hair: 'short', hairColor: CM.hair[2], coat: CM.sage, acc: 'headphones', accColor: CM.anchor, broad: PASSER.broad}} />
       ) : null}
       {READERS.map((r, i) => (
-        <NearBack key={r.seed} x={r.x} y={1920 + bob(i * 2.1)} hv={r.hv} seed={r.seed} traits={r.traits} turn={i === 1 ? turn2 : 0} />
+        <NearBack key={r.seed} x={r.x} y={1920 + bob(i * 2.1)} hv={r.hv} seed={r.seed} traits={r.traits} turn={i === 1 ? turn2 : i === 2 ? turn3 : 0} />
       ))}
     </>
   );
@@ -348,7 +380,7 @@ export const S6NearBack: React.FC = () => {
       <Paint b={paving} seed="s6paving" misreg={2} />
       <Paint b={troughs} seed="s6troughs" misreg={3} />
       <Daffodils t={t} />
-      <Seated x={985} y={1367} h={104} seed="s6/benchReader2" read traits={{coat: CM.brickLight, hair: 'long', hairColor: CM.hair[0], acc: 'none'}} />
+      <Seated x={985} y={1367} h={104} seed="s6/benchReader2" read turn={-0.55 * smooth((t - 3.12) / 0.28)} traits={{coat: CM.brickLight, hair: 'long', hairColor: CM.hair[0], acc: 'none'}} />
       <Paint b={backrest} seed="near" misreg={3} />
     </>
   );
