@@ -208,9 +208,10 @@ export type FigPart = {
 };
 
 const R = 0.102 * FIG_H; // head radius 17.3
-/** The torso's width factor: shoulders 0.238 H (40.5 px at 170): the row's measured gaps ~15 px on the straight (brief
- *  "0.24-0.26 x h at the shoulders"; ink and misregistration add ~3 px to the drawn width). */
-const WK = 0.953;
+/** The torso's width factor: shoulders 0.225 H (38.3 px at 170; with the 2.2 px ink, anti-aliasing and the small fill
+ *  offset the drawn silhouette is ~43 px = 0.25 H, the brief's "0.24-0.26 x h"), so the row's measured gaps are >= ~16 px
+ *  on the straight (rowgaps.py on RowOnly) and the bend's far end keeps a visible gap. */
+const WK = 0.9;
 const X = (v: number) => v * WK;
 
 /** The figure's parts, back to front, in local px (feet line y 0, the hips' centre x 0, facing LEFT). */
@@ -318,8 +319,8 @@ export function figParts(spec: FigSpec, pose: FigPose): FigPart[] {
 
   // ---- the coat: slim shoulders, a belted waist, a gently flared hem below the knee with a centre back vent; every
   // point inside +-0.127 H (the shoulder line) so neighbours keep their gap
-  const flL = 0.3 + 1.25 * spread;
-  const flR = 0.2 + 0.6 * spread;
+  const flL = 0.2 + 0.95 * spread;
+  const flR = 0.1 + 0.45 * spread;
   const yL = -1.2 * spread;
   const yR = -0.7 * spread;
   const left: Pt[] = [
@@ -330,10 +331,10 @@ export function figParts(spec: FigSpec, pose: FigPose): FigPart[] {
     [X(-20.5), sY + 24],
     [X(-18.0), bY],
     [X(-18.9), bY + 15],
-    [X(-19.8), hY - 15],
-    [X(-20.0 - flL), hY + yL],
+    [X(-19.3), hY - 15],
+    [X(-19.3 - flL), hY + yL],
   ];
-  const right: Pt[] = left.map(([x, y], i): Pt => (i === left.length - 1 ? [X(20.0 + flR), hY + yR] : [-x, y]));
+  const right: Pt[] = left.map(([x, y], i): Pt => (i === left.length - 1 ? [X(19.3 + flR), hY + yR] : [-x, y]));
   const vx = 2.2;
   const vo = 0.5 + 2.6 * spread;
   const vn = 2.4 + 6.6 * spread;
@@ -391,28 +392,29 @@ export function figParts(spec: FigSpec, pose: FigPose): FigPart[] {
     const cuff: Pt = [X(-18.8), -81.5 + pb];
     const ad = limb([piv, elbow, cuff], [X(5.7), X(5.2), X(5.2)]);
     out.push({k: 'armN', d: ad, fill: spec.coat, ink: ad});
+    const PX = 2.6; // the plant sits 2.6 px in from the first sheet: its leaves set G1's gap
     const pot = polyPath([
-      [-24.2, -90.4 + pb],
-      [-12.9, -90.4 + pb],
-      [-14.2, -77.2 + pb],
-      [-22.9, -77.2 + pb],
+      [-24.2 + PX, -90.4 + pb],
+      [-12.9 + PX, -90.4 + pb],
+      [-14.2 + PX, -77.2 + pb],
+      [-22.9 + PX, -77.2 + pb],
     ]);
     out.push({k: 'pot', d: pot, fill: spec.plant.pot, ink: pot, w: 0.8});
     const rim = polyPath([
-      [-24.9, -93.4 + pb],
-      [-12.2, -93.4 + pb],
-      [-12.4, -90.2 + pb],
-      [-24.7, -90.2 + pb],
+      [-24.9 + PX, -93.4 + pb],
+      [-12.2 + PX, -93.4 + pb],
+      [-12.4 + PX, -90.2 + pb],
+      [-24.7 + PX, -90.2 + pb],
     ]);
     out.push({k: 'potRim', d: rim, fill: spec.plant.pot, ink: rim, w: 0.75});
     const leafs: [number, number, number][] = [
-      [-24.0, -109.0, 3.0],
-      [-22.6, -117.5, 3.3],
-      [-18.4, -121.0, 3.4],
-      [-13.8, -116.5, 3.2],
-      [-10.4, -108.0, 2.8],
+      [-24.0 + PX, -109.0, 3.0],
+      [-22.6 + PX, -117.5, 3.3],
+      [-18.4 + PX, -121.0, 3.4],
+      [-13.8 + PX, -116.5, 3.2],
+      [-10.4 + PX, -108.0, 2.8],
     ];
-    const base: Pt = [-18.6, -92.6 + pb];
+    const base: Pt = [-18.6 + PX, -92.6 + pb];
     leafs.forEach(([tx, ty, hw], i) => {
       const tip: Pt = [tx + Math.sin(pose.step * 1.7 + i * 1.3) * 0.5, ty + pb];
       const mx = (base[0] + tip[0]) / 2;
@@ -477,8 +479,9 @@ export function figParts(spec: FigSpec, pose: FigPose): FigPart[] {
     const inner: Pt = [hc[0] + R * (0.95 - 0.5 * Math.min(1, turn)), hc[1] + R * 0.25];
     out.push({k: 'cheek', d: crClosed([...arc, inner], 0.45), fill: spec.skin, exact: true});
   }
-  const br = 0.5 * R;
-  const bc: Pt = [hc[0] + R * (0.72 - 1.04 * turn), hc[1] + R * (0.6 + 0.04 * turn)];
+  // the low bun: big enough to read as a bun at 216 px (a clear second round on the head's lower back)
+  const br = 0.56 * R;
+  const bc: Pt = [hc[0] + R * (0.76 - 1.06 * turn), hc[1] + R * (0.62 + 0.04 * turn)];
   out.push({k: 'bun', d: circlePath(bc[0], bc[1], br), fill: spec.head, ink: outsideArc(bc, br, hc, R), exact: true});
   return out;
 }

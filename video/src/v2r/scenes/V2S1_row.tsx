@@ -28,7 +28,7 @@ export const herSpec = (coat: string): FigSpec => ({
   plant: {pot: CM.brick, leaf: CM.sage},
 });
 
-/** How the ghosts' legs and shoes are valued (the 216 px read test, b_row/legs): 'clamp' (chosen) = the head value
+/** How the ghosts' legs and shoes are valued (the 216 px read test, scratch b_row/r4/legs_cmp.png): 'clamp' (chosen) = the head value
  *  down to G3's grey-silver and no paler (G1 dark like her trousers, G2 mid, G3-G6 #A9A5B5), shoes one step darker;
  *  'head' = the head value all the way (G5-G6 near-white legs); 'mid' = one fixed mid grey for every ghost. */
 export type LegVariant = 'clamp' | 'head' | 'mid';
@@ -99,7 +99,7 @@ export const S1Row: React.FC = () => {
             inkPx={GHOST_INK}
             at={m.popT ?? undefined}
             knockout={m.kind === 'outline'}
-            misregX={0.48}
+            misregX={0.3}
           />
         );
       })}
