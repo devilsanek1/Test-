@@ -11,6 +11,10 @@ shots, adversarial critics with distinct lenses (art director, sound-off viewer,
 completeness critic. Mind the machine: about 2 workflow agents run at a time per workflow on a 4-CPU container, so keep renders at
 --concurrency=2 and --gl=angle.
 
+## Handover
+If `video/docs/v2/lanes/handover_<your id>.md` exists, an earlier helper started your lane (it was replaced so the lane runs in ultracode
+mode): read it first and CONTINUE from its pushed work (git log for its commits); never start over or discard it.
+
 ## The video and the owner
 Topic: a former Google DeepMind research engineer told BBC News (21 Oct 2026) she quit over where Google's military AI work was heading, and says
 her contract bans her from criticizing Google, for life. The owner rejected our first production ("No I don't like it ... start from scratch ...
