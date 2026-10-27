@@ -87,6 +87,64 @@ export const S16WallTop: React.FC = () => (
 
 // ---------------------------------------------------------------- the wall below the band (y 615-1250)
 
+/** A small framed print of the blue hour (the cool family): dusk sky, a moon, snow ground; `town` adds two snowy roofs
+ *  with a lit window. Never a window: a warm frame and a cream mat round it. */
+const NightPrint: React.FC<{x: number; y: number; w: number; h: number; town?: boolean; seed: string}> = ({x, y, w, h, town, seed}) => {
+  const f = w * 0.09;
+  const m = w * 0.07;
+  const ix = x + f + m;
+  const iy = y + f + m;
+  const iw = w - 2 * (f + m);
+  const ih = h - 2 * (f + m);
+  const gy = iy + ih * 0.7;
+  const roofs = town
+    ? polyPath([[ix + iw * 0.06, gy], [ix + iw * 0.06, gy - ih * 0.2], [ix + iw * 0.26, gy - ih * 0.36], [ix + iw * 0.46, gy - ih * 0.2], [ix + iw * 0.46, gy]]) +
+      polyPath([[ix + iw * 0.54, gy], [ix + iw * 0.54, gy - ih * 0.14], [ix + iw * 0.72, gy - ih * 0.28], [ix + iw * 0.92, gy - ih * 0.14], [ix + iw * 0.92, gy]])
+    : '';
+  const caps = town
+    ? polyPath([[ix + iw * 0.04, gy - ih * 0.19], [ix + iw * 0.26, gy - ih * 0.38], [ix + iw * 0.48, gy - ih * 0.19], [ix + iw * 0.26, gy - ih * 0.31]]) +
+      polyPath([[ix + iw * 0.52, gy - ih * 0.13], [ix + iw * 0.72, gy - ih * 0.3], [ix + iw * 0.94, gy - ih * 0.13], [ix + iw * 0.72, gy - ih * 0.24]])
+    : '';
+  const hill = `M${ix} ${gy - ih * 0.06}Q${ix + iw * 0.45} ${gy - ih * 0.2} ${ix + iw} ${gy - ih * 0.02}V${iy + ih}H${ix}Z`;
+  return (
+    <>
+      <Fill rect={[x, y, w, h]} color={EMBER.beam} seed={`${seed}/fr`} />
+      <Fill rect={[x + f, y + f, w - 2 * f, h - 2 * f]} color={EMBER.card} offset={false} />
+      <Fill rect={[ix, iy, iw, ih]} color={EMBER.sky} offset={false} />
+      <Fill rect={[ix, iy + ih * 0.42, iw, ih * 0.3]} color={EMBER.skyLow} offset={false} />
+      <Fill d={circle(ix + iw * 0.76, iy + ih * 0.2, iw * 0.09)} color={EMBER.snow} offset={false} />
+      {town ? <Fill d={roofs} color={EMBER.dc} offset={false} /> : null}
+      {town ? <Fill d={caps} color={EMBER.snow} offset={false} /> : null}
+      {town ? <Fill rect={[ix + iw * 0.2, gy - ih * 0.16, iw * 0.1, ih * 0.1]} color={EMBER.houseLit} offset={false} /> : null}
+      <Fill d={town ? `M${ix} ${gy}H${ix + iw}V${iy + ih}H${ix}Z` : hill} color={EMBER.snow} offset={false} />
+      {[0.12, 0.34, 0.58].map((u, i) => (
+        <Fill key={i} d={circle(ix + iw * u, iy + ih * (0.1 + i * 0.07), 1.8)} color={EMBER.snow} offset={false} />
+      ))}
+      <Ink d={`M${x} ${y}h${w}v${h}h${-w}Z` + `M${ix} ${iy}h${iw}v${ih}h${-iw}Z`} width={W.far} />
+    </>
+  );
+};
+
+/** A dusk-blue knitted scarf hung over the pinboard's top-left corner: one end down the board's left side (stripes,
+ *  a fringe), the other short over the top. */
+const Scarf: React.FC<{x: number; y: number}> = ({x, y}) => {
+  const t = useTime();
+  const a = sway(t, 0.6, 4.1, 2.2);
+  const long = polyPath([[x - 26, y - 8], [x + 34, y - 4], [x + 30, y + 236], [x - 32, y + 240]]);
+  const short = polyPath([[x - 18, y - 8], [x + 30, y - 4], [x + 64, y + 54], [x + 22, y + 66]]);
+  const stripes = [150, 178, 206].map((d) => `M${x - 30} ${y + d}L${x + 32} ${y + d - 2}`).join('');
+  const fringe = [-18, -8, 2, 12, 22].map((d) => `M${x + d} ${y + 238}l${(d % 3) - 1} 18`).join('');
+  return (
+    <XG m={mat.about(mat.rotate(a), x + 6, y)}>
+      <Fill d={long} color={EMBER.dc} seed="s16/scarfL" />
+      <Fill d={short} color={EMBER.dcSide} seed="s16/scarfS" />
+      <Ink d={stripes} width={7} color={EMBER.skyLow} />
+      <Ink d={long + short} width={W.far} />
+      <Ink d={fringe} width={3} color={EMBER.dc} />
+    </XG>
+  );
+};
+
 /** A sticky note on the wall (a line of writing), its free bottom edge lifting a hair; it flutters in the air. */
 const WallNote: React.FC<{x: number; y: number; s: number; rot: number; color: string; seed: string; flutterAt?: number}> = ({x, y, s, rot, color, seed, flutterAt}) => {
   const t = useTime();
@@ -144,11 +202,14 @@ const Jar: React.FC<{x: number; y: number; w: number; seed: string}> = ({x, y, w
   );
 };
 
+/** The shelf's book colours: two of the warm family swapped for the dusk blues (the room's cool share). */
+const SHELF_BOOKS = EMBER.books.map((c, i) => (i === 2 ? EMBER.skyLow : i === 6 ? EMBER.dc : c));
+
 /** The wall shelf over the tag: a plank on brackets with books (kit ShelfFill), a framed photo, a jar, and a pothos
  *  trailing over its left end. */
 const Shelf: React.FC = () => (
   <>
-    <WallShelf x={236} y={800} w={492} room={128} seed="s16/shelf" ink={W.far} />
+    <WallShelf x={236} y={800} w={492} room={128} seed="s16/shelf" ink={W.far} books={SHELF_BOOKS} />
     <StandingPhoto x={604} y={800} w={70} seed="s16/sphoto" />
     <Jar x={676} y={800} w={44} seed="s16/jar" />
     <ExitFade x={282} y={820}>
@@ -162,21 +223,25 @@ export const S16WallLow: React.FC = () => (
     <WallMarks x={170} y={880} w={100} h={80} n={2} seed="s16/wm3" />
     <WallMarks x={760} y={1010} w={90} h={90} n={2} seed="s16/wm4" />
     <WallMarks x={330} y={860} w={360} h={60} n={2} seed="s16/wm5" />
-    {/* over the lamp's rod, left: a small leaf print */}
-    <FramedPrint x={24} y={622} w={100} h={112} picture="leaf" seed="s16/print2" ink={W.far} />
+    {/* over the lamp's rod, left: a small blue-hour snow print (the room's cool share) */}
+    <NightPrint x={24} y={622} w={100} h={112} seed="s16/print2" />
+    {/* the pocket between the lamp shade, the shelf and the tag: a night print of the town (~40 px clear of the tag) */}
+    <NightPrint x={150} y={842} w={118} h={136} town seed="s16/print3" />
     <Shelf />
     {/* right column: the 2026 calendar, the clock (its second hand ticks), the pinboard cut by the right edge */}
     <ExitFade x={844} y={672}>
       <Calendar x={792} y={624} w={104} from="2026" seed="s16/cal" ink={W.far} />
     </ExitFade>
     <ExitFade x={1006} y={676}>
-      <WallClock cx={1006} cy={676} r={50} seed="s16/clock" ink={W.far} startMin={12} />
+      <WallClock cx={1006} cy={676} r={50} seed="s16/clock" ink={W.far} startMin={54} />
     </ExitFade>
     <ExitFade x={960} y={860}>
       <Pinboard x={806} y={772} w={330} h={196} items={['photo', 'note', 'postcard', 'ticket', 'note', 'photo']} flutterAt={[0.14, AIR, 1.62]} seed="s16/pin" ink={W.far} />
     </ExitFade>
+    {/* a dusk-blue scarf hung over the pinboard's corner */}
+    <Scarf x={812} y={768} />
     {/* two sticky notes on the wall over Pip (reminders) */}
     <WallNote x={848} y={1010} s={54} rot={-6} color={EMBER.core} seed="s16/wn1" flutterAt={AIR + 0.08} />
-    <WallNote x={912} y={1034} s={50} rot={7} color={EMBER.hl} seed="s16/wn2" flutterAt={1.54} />
+    <WallNote x={912} y={1034} s={50} rot={7} color={EMBER.frost} seed="s16/wn2" flutterAt={1.54} />
   </>
 );
