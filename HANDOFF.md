@@ -93,6 +93,9 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
   `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
+- **v3 status (2026-10-27 ~14:40 UTC): G5b DELIVERED** (`deliverables/v3/v3_g5b.mp4`, 1080x1920, 60 fps, gate PASS,
+  film density 6.8 ev/s, flat 19 %, detail 52 %; sheet `review/v3_g5b/sheet.jpg`; render recipe in G5_BLOCKING.md 8b,
+  chunked per panel). Waiting for the owner's notes; next G6 polish (easing, secondary motion, subtle edges) + G7 sound.
 - **v3 status (2026-10-27): G5b density + life.** The owner judged G5 "way too empty"; new rules: feel alive (not a
   quota), great scale, coziness v2 (two measured references, `docs/look/COZY_AND_SCALE.md` 3b), `docs/look/LIFE_AND_DENSITY.md`
   + `scripts/qa/density.py` (--cozy). The density pilot (`deliverables/v3/v3_g5b_pilot.mp4`, O1 + S4/S6) was APPROVED ("go
