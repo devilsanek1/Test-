@@ -1,7 +1,7 @@
 // scenes/outside.tsx: THE OUTSIDE at H2 (the WINDOW lane owns it; docs/v3/flow_v2.md §3): one geography seen from our
 // window, standing at the glass. SQD draws it through its own camera (the pull-back lands on it), SQE and SQF through
-// h2_window's cameras; every builder draws it read-only, on FILM time (each plane reads useFilmT(): film seconds, also inside a
-// itself and gives its kit pieces film time), so the frames match bit for bit across J4 and J5.
+// h2_window's cameras; every builder draws it read-only, on FILM time (each plane reads useFilmT(), film seconds even
+// inside another FilmClock, and gives its kit pieces film time), so the frames match bit for bit across J4 and J5.
 //
 // H2 at rest (canvas px): flat sky behind the caption band (white captions); horizon y 930: THE DATA CENTER (S9's hall,
 // dark, its sign lit) w 330 at x 230-560, THE MOUNTAIN (S9's PeakPile re-laid: summit (800, 640), crest sticks ~26 px,
@@ -633,6 +633,14 @@ export const OutsideStreet: React.FC = () => {
           </React.Fragment>
         ))}
         {ws.map((w, i) => (w.y >= 1150 ? <Worker key={`wf${i}`} {...w} /> : null))}
+        {/* slow life in the queue: soft exhaust puffs at the waiting vans' tails (C: small, slow, shrink to nothing) */}
+        {vs.filter((v) => v.id === 'van2' || v.id === 'better').map((v) =>
+          puffs(T, {n: 3, life: 2.4, rise: 26, drift: 22, r0: 2, r1: 6, wobble: 2, seed: `h2/ex/${v.id}`}).map((q, i) => (
+            <path key={`${v.id}${i}`} d={ellD(v.x + VAN_W / 2 + 6 + q.x, v.y - 8 + q.y, q.r * 1.3, q.r)} fill={mixHex(EMBER.snow, EMBER.road, 0.35)} />
+          )),
+        )}
+        {/* a small car crosses the street's far side while the payoff holds (C: flat, slow) */}
+        <FarCar T={T} />
         {/* ONE small crate onto our van's roof on "left" (26.04) */}
         <CrateFlight {...CRATE_ON} line />
         {/* the barrier across the lane's exit: striped arm on a post, lifts on "first dibs" */}
@@ -679,6 +687,23 @@ export const CrateHop: React.FC<{to?: Pt}> = ({to}) => {
   const T = useFilmT();
   const q = crateHop(T, to);
   return q ? <CrateBox x={q.x} y={q.y + (q.w * 0.62) / 2} w={q.w} rot={q.rot} line /> : null;
+};
+
+/** A small car on the street's far side (36.4-41.2, right to left at ~105 px/s): a flat body, a cabin, two lit
+ *  headlights' dots; C tier, behind everything in the pool. */
+const FarCar: React.FC<{T: number}> = ({T}) => {
+  if (T < 36.4 || T > 41.2) return null;
+  const x = 1150 - (T - 36.4) * 105;
+  const y = 1132;
+  return (
+    <g>
+      <path d={roundPoly([[x - 34, y - 14], [x - 20, y - 26], [x + 14, y - 26], [x + 26, y - 14], [x + 36, y - 12], [x + 36, y], [x - 36, y]], 5)} fill={'#8E6A88'} />
+      <path d={roundPoly([[x - 16, y - 23], [x + 11, y - 23], [x + 20, y - 15], [x - 25, y - 15]], 3)} fill={'#7D8AB6'} />
+      <path d={rrect(x - 22, y - 30, 30, 5, 2.5)} fill={EMBER.snow} />
+      <path d={ellD(x - 38, y - 8, 2.4, 2.4)} fill={EMBER.core} />
+      <path d={ellD(x - 20, y, 6, 6) + ellD(x + 22, y, 6, 6)} fill={EMBER.anchor} />
+    </g>
+  );
 };
 
 /** A walker with a dog on the far pavement (C: flat, no line, slow). */

@@ -9,8 +9,8 @@
 //                x1.12 -> 1, the town x1.07 -> 1, the far field x1.03 -> 1 (we pull back in through our own glass; a
 //                declared light change: into the warm room). Before 22.35 it holds the start state (SQD's last frames
 //                draw H2View there), after 22.95 identity.
-//   pushCam(T)   SQE's one push: x1.25 about (600, 1120) for the street and the window over 24.90-25.70 (inOutSine),
-//                released over 28.93-29.60; with depth: the town x1.15, the far field x1.08 (the mountain's summit stays
+//   pushCam(T)   SQE's one push: x1.35 about (600, 1120) (flow_v2 §7's read fallback over its x1.25) for the street and the window over 24.90-25.70 (inOutSine),
+//                released over 28.93-29.60; with depth: the town x1.2, the far field x1.08 (the mountain's summit stays
 //                under the caption band).
 //   h2Cams(T)    push x entry: what SQE and SQF draw through.
 // <H2View> draws the three outside planes and this window through h2Cams at film time; the sky is the World's.
@@ -36,7 +36,7 @@ const I = mat.I;
 const zoomAbout = (s: number, c: Pt): Mat => mat.about(mat.scale(s), c[0], c[1]);
 
 export const ENTRY = {t0: 22.35, t1: 22.95, c: [540, 1100] as Pt, win: 3.0, street: 1.12, town: 1.07, far: 1.03};
-export const PUSH = {in0: 24.9, in1: 25.7, out0: 28.93, out1: 29.6, c: [600, 1120] as Pt, street: 1.25, town: 1.15, far: 1.08};
+export const PUSH = {in0: 24.9, in1: 25.7, out0: 28.93, out1: 29.6, c: [600, 1120] as Pt, street: 1.35, town: 1.2, far: 1.08};
 
 /** J4's move (see the header): one progress, each plane its own start scale, log-linear. */
 export function entryCam(T: number): H2Cams {
