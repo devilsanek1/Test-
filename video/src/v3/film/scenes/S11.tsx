@@ -82,8 +82,9 @@ const CROWD: CrowdLife = {
       {t: 0, pose: 'sit-back'},
       {t: FIVE + 0.1, pose: 'ears-cover'},
       {t: 3.0, pose: 'sit-front'},
-      // the settle: worried at us (S12 picks the worry up at the desk)
-      {t: 3.62, pose: 'sit-front', expression: 'worried'},
+      // the settle: worried at us (S12 picks the worry up at the desk). 'wide', as S12 opens: the shared 'worried' brow
+      // reads as a cross V (G5b review)
+      {t: 3.62, pose: 'sit-front', expression: 'wide'},
     ],
   },
 };

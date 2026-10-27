@@ -146,12 +146,88 @@ def pan_sweep(x, p0, p1):
     return np.stack([x * np.cos(th), x * np.sin(th)], axis=1) * np.sqrt(2)
 
 
-def widen(x, width=0.3, ms=0.7):
-    """mono -> stereo with a little decorrelation (short opposite delays)."""
-    d = max(1, int(ms * 1e-3 * SR))
-    L = (1 - width) * x + width * np.concatenate([x[d:], np.zeros(d)])
-    R = (1 - width) * x + width * np.concatenate([np.zeros(d), x[:-d]])
+def decor(fn, seed, width=0.6):
+    """Noise-built sound -> stereo with NO comb filter: `fn(seed)` renders the mono sound from its noise seed; L and R
+    share a common render and each adds its own independently seeded render (width 0 = mono, 1 = fully independent).
+    The mono fold-down is a smooth level change, never a notch (a sub-millisecond copy would comb: review item 7)."""
+    th = 0.5 * np.pi * float(np.clip(width, 0, 1))
+    c = fn(seed); l_ = fn(seed + 7919); r_ = fn(seed + 15887)
+    n = min(len(c), len(l_), len(r_))
+    L = np.cos(th) * c[:n] + np.sin(th) * l_[:n]
+    R = np.cos(th) * c[:n] + np.sin(th) * r_[:n]
     return np.stack([L, R], axis=1)
+
+
+def contact(dur, lo, hi, dec, seed, rise=0.0002):
+    """the contact noise of an impact: a band-limited noise burst, near-instant rise, exponential decay (s)."""
+    n = n_of(dur); t = np.arange(n) / SR
+    e = np.minimum(1.0, t / max(rise, 1e-6)) * np.exp(-t / max(dec, 1e-6))
+    return bp(rng(seed).standard_normal(n), lo, min(hi, 0.45 * SR), 2) * e
+
+
+def body_noise(freqs, decays, amps, dur, seed, q=18.0):
+    """the noisy body of a struck object: noise rung through narrow resonances at its main modes, each decaying with
+    its mode (what a real block adds around its partials: they are never bare sines)."""
+    n = n_of(dur); t = np.arange(n) / SR; r = rng(seed); y = np.zeros(n)
+    for f, d, a in zip(freqs, decays, amps):
+        if f >= 0.45 * SR:
+            continue
+        bw = f / q
+        y += a * bp(r.standard_normal(n), max(20.0, f - bw / 2), min(0.45 * SR, f + bw / 2), 1) * np.exp(-t / d)
+    return y
+
+
+def struck(freqs, decays, amps, dur, seed, exc_ms=0.6, noise_body=0.35, contact_amp=0.25, contact_band=(600, 9000),
+           contact_dec=0.0015, spread=0.012, n_extra=2):
+    """A struck object that does not sound synthetic: its modes (with a few weak, fast neighbours around each, as a
+    real block has), their noisy body, and the contact noise of the hit itself. Unit-ish peak."""
+    r = rng(seed)
+    F, D, A = list(freqs), list(decays), list(amps)
+    for f, d, a in zip(freqs, decays, amps):
+        for _ in range(n_extra):
+            F.append(f * (1 + r.uniform(-spread, spread) * 3)); D.append(d * r.uniform(0.25, 0.55))
+            A.append(a * r.uniform(0.08, 0.22))
+    y = modal(F, D, A, dur, exc_ms=exc_ms, seed=seed)
+    y = y / (np.abs(y).max() + 1e-12)
+    nb = body_noise(freqs, decays, amps, dur, seed + 1)
+    y += noise_body * nb / (np.abs(nb).max() + 1e-12)
+    if contact_amp:
+        c = contact(min(dur, 0.03), contact_band[0], contact_band[1], contact_dec, seed + 2)
+        y[: len(c)] += contact_amp * c / (np.abs(c).max() + 1e-12)
+    nf = min(len(y) // 4, int(0.004 * SR))
+    y[len(y) - nf:] *= np.cos(0.5 * np.pi * np.linspace(0, 1, nf)) ** 2
+    return y
+
+
+def _slap_ir():
+    """THE film's one outdoor slap (review item 9): the canal walls, the facades across the water: three early
+    reflections per side at 40-80 ms, each duller than the last, and a short diffuse tail. Stereo, deterministic."""
+    n = n_of(0.24); ir = np.zeros((n, 2))
+    taps = {0: [(0.043, -11.0), (0.061, -15.0), (0.078, -19.0)], 1: [(0.047, -12.0), (0.066, -15.5), (0.083, -20.0)]}
+    for ch, tl in taps.items():
+        for k, (d, g) in enumerate(tl):
+            i = n_of(d); ir[i, ch] += db2a(g)
+        ir[:, ch] = lp(ir[:, ch], 5200 - 700 * ch, 2)
+    t = np.arange(n) / SR
+    for ch in range(2):
+        tail = rng(9100 + ch).standard_normal(n) * np.exp(-np.maximum(t - 0.07, 0) / 0.045) * (t > 0.07) * db2a(-27)
+        ir[:, ch] += lp(hp(tail, 180), 4200, 2)
+    return hp(ir, 150, 2)
+
+
+SLAP_IR = None
+
+
+def slap(y, send_db=-4.0):
+    """y (mono or stereo) + the shared outdoor slap at `send_db` (the reflections sit ~15 dB and more under)."""
+    global SLAP_IR
+    if SLAP_IR is None:
+        SLAP_IR = _slap_ir()
+    y = st(y)
+    m = y.mean(axis=1)
+    wet = np.stack([ss.fftconvolve(m, SLAP_IR[:, k]) for k in range(2)], axis=1)
+    out = np.zeros((len(wet), 2)); out[: len(y)] += y
+    return out + wet * db2a(send_db)
 
 
 def st(x):

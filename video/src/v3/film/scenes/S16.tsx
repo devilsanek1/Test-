@@ -6,15 +6,21 @@
 // data center drawn on its back (the like-pop at 39.88 lands as the back appears). The engine un-builds the panel over
 // its last 0.3 s into O1's bare-line frame 0 (the loop): every piece is kit Ink / Fill (raw SVG in ExitFade /
 // ExitShrink), and the tag shrinks as one group.
-// G5b (owner: "way too empty"; the approved pilot's bar): the same desk world as O1 / S7 dressed round the locked frame
-// (S16_wall.tsx: the attic slope with the paper star, string lights, photos on a cord, a hanging pothos, a sea print, the
-// wall shelf over the tag, a leaf print, the calendar, the ticking clock, the pinboard, sticky notes; S16_desk.tsx: the
-// pen cup, the mug, the charger, clementines, glasses, sticky notes, headphones, the spiral notebook, letters, a
-// dusk-blue paperback, the planner; the room's cool share >= 10 %: night prints, mittens, a scarf, blue books, a felt
-// pad, the screen's desktop), the lamp's pull chain swinging (the loop), and Pip on the desk right of the tag at 1.8x,
-// watching it: it leans in place as the tag turns (39.70), holds still through the flip, shrugs at us on "tag" (40.3);
-// it shrinks with the un-build. The tag's flip moves the room's air a beat later (pinboard notes, a sticky
-// note, the lights, the pothos settle through 40.1-40.8: no stillness before the un-build).
+// G5b (owner: "way too empty"; the approved pilot's bar): the same desk world as O1 / S15 dressed round the locked frame
+// (S16_wall.tsx: the attic slope with the paper star, string lights, photos on a cord, a hanging pothos, a sea print;
+// below the band O1'S WINDOW at the cut-in's 1.275x on S15's axis: the frosted glass, the lit town, the dark data center
+// with its lit sign right behind the tag; S16_desk.tsx: the pen cup, the mug, the charger, clementines, glasses, sticky
+// notes, the headphones and the biscuits at the left (S15's sides), the spiral notebook, letters, a dusk-blue
+// paperback, the planner; the screen's desktop), the lamp's pull chain swinging (the loop), and Pip ON THE SILL right of
+// the tag (S15's spot through the cut-in: O1's Pip at 1.275x), watching it: it leans in place as the tag turns (39.70),
+// holds still through the flip, shrugs at us on "tag" (40.3); it shrinks with the un-build. The tag's flip moves the
+// room's air a beat later (the lights, the pothos, a sticky note settle through 40.1-40.8: no stillness before the
+// un-build). Fixer pass (G5b review): the back wall was a second room (a shelf, a pinboard, a clock), the props flipped
+// sides, and the un-build left flat rects; now the window, S15's sides, and the loop below.
+// The loop un-build (fixer pass): the window, the desk slab and what lies flat on it leave under ONE falling erase edge
+// (desk_window.tsx EraseDown: fills with their lines, never a flat rect shrinking to its centre); the standing things
+// un-build as the house recipe; the tag travels and turns back to its front onto O1's frame-0 tag (O1_set TAG through
+// O1's frame-0 front plane), string and all, then dissolves over O1's "$999" outline, so the tag carries across the seam.
 // Camera (cozy v2 §3, OVERRIDES g5b: docs/v3/cozy_v2_application.md): the FLOAT replaces the invisible 1.5 % breathe:
 // translation only, 8-12 px/s legs that turn back (eased) within +-12 / +-10 px of home; it starts at home (the cut-in
 // on S15's axis) and passes back through home on the last frame; the captions and the UI stay fixed. Every set reaches
@@ -22,14 +28,14 @@
 import React from 'react';
 import {World} from '../../../lib/World';
 import type {ToneKey} from '../../../lib/Film';
-import {ExitFade, ExitShrink, useExit} from '../../../lib/exit';
-import {useTime} from '../../../lib/time';
+import {ExitFade, ExitProvider, ExitShrink, NoExit, useExit} from '../../../lib/exit';
+import {ease, prog, useTime} from '../../../lib/time';
 import {mat, XG} from '../../../lib/xf';
-import {EMBER, floatCam, Lamp, Laptop, laptopGeo, Pip3, PriceTag, PullChain, quadPt, W, type LookKey, type PipPoseKey, type Pt} from '../kit';
-import {Fill} from '../../../lib/Fill';
-import {Ink} from '../../../lib/Ink';
+import {EMBER, floatCam, Lamp, Laptop, laptopGeo, Pip3, PriceTag, PullChain, ScreenDesktop, type LookKey, type PipPoseKey, type Pt} from '../kit';
 import {S16Desk, S16DeskBack, S16DeskFront, S16DeskMid, S16Grain} from './S16_desk';
-import {S16_TURN, S16WallLow, S16WallTop} from './S16_wall';
+import {S16_SILL_Y, S16_TURN, S16_WINDOW, S16WallLow, S16WallTop} from './S16_wall';
+import {EraseDown} from './desk_window';
+import {o1FrontMat, o1TagStringFrom, TAG as O1_TAG} from './O1_set';
 
 const DUR = 41.15 - 38.84;
 const TURN_AT = S16_TURN;
@@ -44,7 +50,8 @@ const TAG = {x: 310, y: 1010, w: 460, rot: -8};
 
 // ---------------------------------------------------------------- Pip
 
-const PIP = {x: 884, y: 1328, scale: 1.8};
+/** Pip on the window's sill right of the tag: O1's Pip (866, 1060, 1x) through the cut-in (S16_WINDOW: 1.275x). */
+const PIP = {x: S16_WINDOW.m[0] * 866 + S16_WINDOW.m[4], y: S16_SILL_Y, scale: 1.275};
 /** Pip watches the tag (head turned left), glances up its string (0.3), leans in as it turns (a small tilt in place, no
  *  hop), holds still through the flip (eyes on the tag), then shrugs at us on "tag" and settles: one reaction, never on
  *  the subject's beat (LIFE_AND_DENSITY §5). */
@@ -78,30 +85,41 @@ const S16Pip: React.FC = () => {
   );
 };
 
-/** THE laptop's screen as a desktop (never a landscape: it must not read as a window): a document window with a
- *  dusk-blue title bar and lines, a dock row of app squares, a cursor. Screen-space canvas px over the lid's quad. */
-const ScreenDesktop: React.FC<{scr: [Pt, Pt, Pt, Pt]}> = ({scr}) => {
-  const P = (u: number, v: number) => quadPt(scr, u, v);
-  const q = (u0: number, v0: number, u1: number, v1: number) => {
-    const pts = [P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)];
-    return `M${pts.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join('L')}Z`;
-  };
-  const docLines = [0.3, 0.38, 0.46, 0.54, 0.62].map((v, i) => q(0.5, v, i === 4 ? 0.74 : 0.9, v + 0.025)).join('');
-  const dock = [EMBER.dc, EMBER.skyLow, EMBER.books[0], EMBER.dcSide, EMBER.hl, EMBER.sky];
-  const c = P(0.8, 0.7);
+// ---------------------------------------------------------------- the loop: erase edge + the tag onto O1's tag
+
+/** The falling erase edge (exit 0.06 -> 0.72 of the 0.3 s un-build, ~12 frames): from the window head to the frame bottom. */
+const ERASE = {y0: 600, y1: 2000, e0: 0.06, e1: 0.72};
+/** O1's frame-0 tag (t < 0: the front plane at 1.07) and its string's tie point, in screen px. */
+const O1F = o1FrontMat(-1);
+const ap = (m: number[], p: Pt): Pt => [m[0] * p[0] + m[2] * p[1] + m[4], m[1] * p[0] + m[3] * p[1] + m[5]];
+const O1_TAG_XY = ap(O1F, [O1_TAG.x, O1_TAG.y]);
+const O1_TAG_W = O1_TAG.w * O1F[0];
+const O1_TAG_FROM = ap(O1F, o1TagStringFrom());
+const lerp = (a: number, b: number, u: number) => a + (b - a) * u;
+
+/** The tag: hangs from THE laptop's corner and turns over at 39.70 (its back: the data center). In the un-build it
+ *  travels (exit 0 -> 0.6) onto O1's frame-0 tag and turns back to its front on the way (0.04 -> 0.44), its string's
+ *  far end sliding to the listing laptop's corner, whole (no un-build of its own while it moves); then it dissolves
+ *  (0.55 -> 1) over O1's "$999" outline, which is already drawn there. */
+const S16Tag: React.FC<{corner: Pt; dx: number; dy: number}> = ({corner, dx, dy}) => {
+  const t = useTime();
+  const e = useExit();
+  const u = ease.inOutCubic(prog(e, 0, 0.6));
+  const x = lerp(TAG.x, O1_TAG_XY[0] - dx, u);
+  const y = lerp(TAG.y, O1_TAG_XY[1] - dy, u);
+  const w = lerp(TAG.w, O1_TAG_W, u);
+  const rot = lerp(TAG.rot, O1_TAG.rot, u);
+  const from: Pt = [lerp(corner[0], O1_TAG_FROM[0] - dx, u), lerp(corner[1], O1_TAG_FROM[1] - dy, u)];
+  const turn = e > 0 ? 1 - ease.inOutSine(prog(e, 0.04, 0.4)) : t >= TURN_AT ? prog(t, TURN_AT, 0.36, ease.inOutSine) : 0;
+  const c: Pt = [x + w * 0.55, y + w * 0.25];
   return (
-    <>
-      <Fill d={q(0.44, 0.1, 0.96, 0.74)} color={EMBER.frost} offset={false} />
-      <Fill d={q(0.44, 0.1, 0.96, 0.19)} color={EMBER.dcSide} offset={false} />
-      <Fill d={docLines} color={EMBER.dc} offset={false} />
-      <Fill d={q(0.36, 0.84, 0.97, 0.95)} color={EMBER.frost} offset={false} />
-      {dock.map((col, i) => (
-        <Fill key={i} d={q(0.39 + i * 0.097, 0.855, 0.46 + i * 0.097, 0.935)} color={col} offset={false} />
-      ))}
-      <Fill d={`M${c[0]} ${c[1]}l0 22l6 -6l5 10l4 -2l-5 -10l9 0Z`} color={EMBER.white} offset={false} />
-      <Ink d={q(0.44, 0.1, 0.96, 0.74)} width={W.hair} />
-      <Ink d={`M${c[0]} ${c[1]}l0 22l6 -6l5 10l4 -2l-5 -10l9 0Z`} width={1.6} />
-    </>
+    <NoExit>
+      <ExitProvider value={prog(e, 0.55, 0.45)}>
+        <ExitShrink x={c[0]} y={c[1]}>
+          <PriceTag x={x} y={y} w={w} value="$1,099" old="$999" stringFrom={from} rot={rot} sway={1.2} turn={turn} seed="s16/tag" />
+        </ExitShrink>
+      </ExitProvider>
+    </NoExit>
   );
 };
 
@@ -115,14 +133,19 @@ const S16: React.FC = () => {
   const g = laptopGeo(LAP.x, LAP.y, LAP.w);
   // the string ties on at the lid's top-right corner
   const corner: Pt = [g.lid[1][0] - 6, g.lid[1][1] + 10];
-  const tagC: Pt = [TAG.x + TAG.w * 0.55, TAG.y + TAG.w * 0.25];
   return (
     <World sky={unbuilding ? 'transparent' : EMBER.wall}>
       <XG m={mat.translate(dx, dy)}>
         <S16WallTop />
-        <S16WallLow />
-        <S16Desk />
-        <S16Grain />
+        <EraseDown {...ERASE}>
+          <S16WallLow />
+        </EraseDown>
+        {/* Pip on the sill (the wall plane: behind the desk's back row, the mug and its steam) */}
+        <S16Pip />
+        <EraseDown {...ERASE}>
+          <S16Desk />
+          <S16Grain />
+        </EraseDown>
         <Lamp pose={{base: [-170, 1250], elbow: [-60, 650], head: [92, 790], rot: 32, scale: 1.25}} seed="s16/lamp" />
         <ExitFade x={96} y={940}>
           <PullChain x={96} y={938} len={44} amp={8} jolt={[TURN_AT + 0.14]} />
@@ -132,11 +155,10 @@ const S16: React.FC = () => {
           <ScreenDesktop scr={g.scr} />
         </Laptop>
         <S16DeskMid />
-        <S16Pip />
-        <S16DeskFront />
-        <ExitShrink x={tagC[0]} y={tagC[1]}>
-          <PriceTag x={TAG.x} y={TAG.y} w={TAG.w} value="$1,099" old="$999" stringFrom={corner} rot={TAG.rot} sway={1.2} turnAt={TURN_AT} seed="s16/tag" />
-        </ExitShrink>
+        <EraseDown {...ERASE}>
+          <S16DeskFront />
+        </EraseDown>
+        <S16Tag corner={corner} dx={dx} dy={dy} />
       </XG>
     </World>
   );

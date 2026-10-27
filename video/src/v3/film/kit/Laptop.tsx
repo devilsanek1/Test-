@@ -10,7 +10,7 @@ import {Fill} from '../../../lib/Fill';
 import {glint, line, poly, polyPath} from '../../../lib/sketch';
 import {mat, XG} from '../../../lib/xf';
 import {EMBER} from '../palette';
-import {At, b, fillAt, lerp, Pt, quadPt, Show, Txt} from './util';
+import {At, b, fillAt, lerp, Pt, quadPt, Show, Txt, W} from './util';
 
 export type LaptopProps = {
   /** Centre of the hinge line (canvas px). */
@@ -165,6 +165,33 @@ const LaptopLabel: React.FC<{x: number; y: number; w: number; text: string; at?:
           {text}
         </Txt>
       </Show>
+    </>
+  );
+};
+
+/** THE laptop's screen as a desktop (S16's; S12 shows the same laptop, so the same desktop) (never a landscape: it must not read as a window): a document window with a
+ *  dusk-blue title bar and lines, a dock row of app squares, a cursor. Screen-space canvas px over the lid's quad. */
+export const ScreenDesktop: React.FC<{scr: [Pt, Pt, Pt, Pt]}> = ({scr}) => {
+  const P = (u: number, v: number) => quadPt(scr, u, v);
+  const q = (u0: number, v0: number, u1: number, v1: number) => {
+    const pts = [P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)];
+    return `M${pts.map((p) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`).join('L')}Z`;
+  };
+  const docLines = [0.3, 0.38, 0.46, 0.54, 0.62].map((v, i) => q(0.5, v, i === 4 ? 0.74 : 0.9, v + 0.025)).join('');
+  const dock = [EMBER.dc, EMBER.skyLow, EMBER.books[0], EMBER.dcSide, EMBER.hl, EMBER.sky];
+  const c = P(0.8, 0.7);
+  return (
+    <>
+      <Fill d={q(0.44, 0.1, 0.96, 0.74)} color={EMBER.frost} offset={false} />
+      <Fill d={q(0.44, 0.1, 0.96, 0.19)} color={EMBER.dcSide} offset={false} />
+      <Fill d={docLines} color={EMBER.dc} offset={false} />
+      <Fill d={q(0.36, 0.84, 0.97, 0.95)} color={EMBER.frost} offset={false} />
+      {dock.map((col, i) => (
+        <Fill key={i} d={q(0.39 + i * 0.097, 0.855, 0.46 + i * 0.097, 0.935)} color={col} offset={false} />
+      ))}
+      <Fill d={`M${c[0]} ${c[1]}l0 22l6 -6l5 10l4 -2l-5 -10l9 0Z`} color={EMBER.white} offset={false} />
+      <Ink d={q(0.44, 0.1, 0.96, 0.74)} width={W.hair} />
+      <Ink d={`M${c[0]} ${c[1]}l0 22l6 -6l5 10l4 -2l-5 -10l9 0Z`} width={1.6} />
     </>
   );
 };
