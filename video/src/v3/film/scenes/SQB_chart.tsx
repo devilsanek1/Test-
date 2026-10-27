@@ -255,7 +255,7 @@ export const LABEL = (() => {
   const top = P(HOOK.end[0], HOOK.end[1]);
   return {x: CARD.x + CARD.w - 26, y: top[1] - 30, size: 110};
 })();
-const SOURCE = {x: CARD.x + CARD.w / 2, y: CARD.y + CARD.h - 13, size: 22};
+const SOURCE = {x: CARD.x + CARD.w / 2, y: CARD.y + CARD.h - 12, size: 24};
 
 const Label: React.FC<{T: number}> = ({T}) => {
   if (T < CHART_BEATS.label) return null;
