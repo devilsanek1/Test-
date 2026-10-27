@@ -5,14 +5,13 @@
 // snowy trees, a pair chatting under a lamp and walkers heading up the road. Fills the upper-left quadrant round the
 // queue without touching the road (the queue's lane) or the caption band (every roof ridge stays under y 612).
 import React, {useId} from 'react';
-import {Fill} from '../../../lib/Fill';
 import {Ink} from '../../../lib/Ink';
 import {blob} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {useTime} from '../../../lib/time';
 import {EMBER, LampPost3, SnowTree, Smoke, Txt, Walker, WinterPerson, personGeo, windowLit, W} from '../kit';
 import type {Pt} from '../kit';
-import {F, P, X_ROAD_L, X_WALL_L, kAtZ, mixHex, quad, type QueueBeats} from './S10_geo';
+import {P, X_ROAD_L, X_WALL_L, kAtZ, mixHex, quad, type QueueBeats} from './S10_geo';
 
 export type Item = {k: number; el: React.ReactNode};
 
@@ -105,7 +104,7 @@ const PaneSil: React.FC<{z0: number; z1: number; h0: number; h1: number; who: 'c
 };
 
 /** One house of the left street, drawn far-to-near by the caller (nearer houses overlap). */
-const StreetHouse: React.FC<{hs: House; i: number; beats: QueueBeats}> = ({hs, i}) => {
+const StreetHouse: React.FC<{hs: House; i: number}> = ({hs, i}) => {
   const t = useTime();
   const seed = `qh${i}`;
   const z0 = hs.z;
@@ -385,7 +384,7 @@ export function leftItems(beats: QueueBeats): Item[] {
   const items: Item[] = [];
   // houses far to near: each sorts by its near end
   HOUSES.forEach((hs, i) => {
-    items.push({k: kAtZ(hs.z) - 0.01, el: <StreetHouse key={`h${i}`} hs={hs} i={i} beats={beats} />});
+    items.push({k: kAtZ(hs.z) - 0.01, el: <StreetHouse key={`h${i}`} hs={hs} i={i} />});
   });
   // lamp posts on the left pavement (X -15.9), lit, true size
   for (const z of [20, 28]) {
@@ -443,4 +442,3 @@ export const LeftGround: React.FC = () => {
   return <>{pools}</>;
 };
 
-export const LEFT_F = F;
