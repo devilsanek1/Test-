@@ -2,6 +2,7 @@ export const meta = {
   name: 'docs-coherence-pass',
   description: 'Make the studio docs one coherent direction after the v3 feedback: a single DIRECTION page, a cross-doc conflict sweep, fixes at the source, a playbook coherence review, and a fresh next-video agent read-through',
   phases: [
+    { title: 'Apply', detail: 'the owner-approved pipeline changes into the process docs' },
     { title: 'Sweep', detail: 'DIRECTION page draft + conflict sweep (parallel)' },
     { title: 'Fix', detail: 'resolve every conflict at its source; playbook coherence review' },
     { title: 'Fresh read', detail: 'a next-video agent reads the docs cold; fix what confuses it' },
@@ -23,8 +24,8 @@ video should not be confused with conflicting instructions"; "let's not focus on
 as we can". The newest direction (wins over anything older): the owner's general feedback after v3 G5b (verbatim in ${V}/docs/v3/OWNER_NOTES.md, the
 2026-10-27 entries) and its distillation: ${V}/docs/OWNER_PLAYBOOK.md (Visual style: clean premium, light and shadow, attention hierarchy; Storyboard:
 one flowing story), ${V}/docs/look/CRAFT.md (the craft spec: through-line and transitions, tiers, clean line, light and shadow; written and critic-checked
-today) and ${V}/docs/retro/2026-10-27_v3_retro.md (the sketch-first verdict; its pipeline changes are split into "Applied now" and "For a yes": the
-owner has NOT yet approved the "For a yes" part, so docs must present it as a pending proposal, not as the rule). Still valid and important: feel alive
+today) and ${V}/docs/retro/2026-10-27_v3_retro.md (the sketch-first verdict and the pipeline changes). The owner APPROVED the retro's pipeline
+proposal on 2026-10-27 ("Yes"): the "For a yes" changes are now the rule (the pipeline applier below puts them into the process docs first). Still valid and important: feel alive
 (full, never empty, but calm and tiered, not busy), warm never sickly (palettes), coziness v2 and great scale (COZY_AND_SCALE, CINEMATIC_GUIDE), the
 opening banger, story-first scripts, the API voice, 60 fps, captions, the posting rules, max effort for subagents, no token limit for creative work.
 THE DOCS: ${ROOT}/CLAUDE.md, ${ROOT}/HANDOFF.md (sections 0-1 and the "how we work" parts; leave per-video status lines alone),
@@ -33,6 +34,16 @@ ${V}/docs/look/CINEMATIC_GUIDE.md, ${V}/docs/look/COZY_AND_SCALE.md, ${V}/docs/l
 ${V}/docs/ELEVENLABS.md, and the v1-era look docs that agents may still open (${V}/docs/style_bible.md, ${V}/docs/style_bible_ref2.md,
 ${V}/docs/motion_spec.md, ${V}/docs/ENGINE.md, ${V}/docs/EDGES.md, ${V}/docs/CINE.md).`
 
+phase('Apply')
+const applied = await agent(`${CTX}
+YOU ARE THE PIPELINE APPLIER. The owner approved the retro's pipeline proposal. Apply EVERY "For a yes" change in ${V}/docs/retro/2026-10-27_v3_retro.md
+(and the judge's gate list it summarises) to the process docs as the new rule: ${V}/docs/PIPELINE_V2.md (gate table rows G0.5/G1 through-line card, the
+W1 world bible, G3, G4 look clip, G5 sequence lanes, G6 life by tiers, anti-waste rule 6 thresholds, the tooling lane), ${V}/docs/G3_ANIMATIC.md (what
+G3 decides and freezes, the contract rows), ${V}/docs/G5_BLOCKING.md (sequences, fill what G3 decided, entry and exit checks) and
+${V}/docs/look/STORYBOARD_STYLE.md where it describes G3. Mark the retro doc's proposal section "APPROVED by the owner 2026-10-27" and update the line
+at the top of PIPELINE_V2.md. Keep each doc's job; no new rules beyond the approved proposal. ${GIT}
+REPORT (at most 10 lines): what changed per file.`, { label: 'apply pipeline', phase: 'Apply', effort: 'max' })
+
 phase('Sweep')
 const [direction, sweep] = await parallel([
   () => agent(`${CTX}
@@ -40,14 +51,13 @@ YOU ARE THE DIRECTION WRITER. Draft ${V}/docs/look/DIRECTION.md: ONE page (aim ~
 and storytelling direction, written for the next agent starting a video. It states the direction in plain rules (story and flow; attention hierarchy;
 alive but calm; clean premium line; gentle light and shadow; warm palettes; cozy and scale; motion and camera; the opening; captions), each with a link
 to the detailed doc that holds the numbers, and an explicit "this page wins over older docs" line plus a list of retired ideas (e.g. scratchy sketch lines
-in finals, misregistered fills, equal-weight clutter, an events-per-second quota, a new place per chart, plain cuts by default). Mark pending items as
-pending (the pipeline proposal awaiting the owner's yes). Do not edit any other file yet. ${GIT}
+in finals, misregistered fills, equal-weight clutter, an events-per-second quota, a new place per chart, plain cuts by default). Include the approved pipeline in one short section (link PIPELINE_V2.md). Do not edit any other file yet. ${GIT}
 REPORT: the path and a 6-line summary.`, { label: 'direction', phase: 'Sweep', effort: 'max' }),
   () => agent(`${CTX}
 YOU ARE THE CONFLICT SWEEPER. Read every doc listed and find every instruction that conflicts with the newest direction or with another doc (e.g. rough
 or misregistered ink as the house style, "something new every few frames" as a quota, ">= 5 events/s", "always-on idle layer" without tiers, "a cut by
 default", "change size and angle at every cut", "dense set dressing" without the hierarchy, a new place per chart, strangers' backs as the foreground
-audience, rules that reference retired tools or thresholds, pipeline rules stated as approved when they are still a proposal). For each: file, line or
+audience, rules that reference retired tools or thresholds, the approved post-v3 pipeline not yet reflected somewhere, or older gate wording that contradicts it). For each: file, line or
 section, the conflicting text (short quote), what it conflicts with, and the exact resolution (rewrite to X / retire with a pointer / keep because Y).
 Do not edit files. Save the list to /tmp/claude-0/-home-user-Test-/e0b06496-a313-5ced-bf0f-bc634eb12744/scratchpad/coherence/conflicts.md and return it
 (at most ~120 lines).`, { label: 'sweep', phase: 'Sweep', effort: 'max' }),
@@ -82,4 +92,4 @@ REPORT (at most 10 lines).
 FRESH READER:
 ${fresh || 'FAILED'}`, { label: 'final fix', phase: 'Fresh read', effort: 'max' })
 
-return { direction, sweep, fix, fresh, fix2 }
+return { applied, direction, sweep, fix, fresh, fix2 }

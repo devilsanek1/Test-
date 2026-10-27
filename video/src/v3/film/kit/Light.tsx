@@ -30,6 +30,7 @@
 // Opt-in and local to v3: nothing in lib/ changes; a panel without these layers renders exactly as before.
 
 import React, {createContext, useContext, useId} from 'react';
+import {getInputProps} from 'remotion';
 import {getBoundingBox} from '@remotion/paths';
 import {Fill} from '../../../lib/Fill';
 import {ExitFade, exitFillProgress, Look, useExit, useLook} from '../../../lib/exit';
@@ -286,10 +287,17 @@ export type LightRig = {
  *  on the AMBIENT desk stays at L* 46.6 (the ladder's 45+; the retro's #C8A3B0 at full strength gave 44). The ambient
  *  #EEDED8 turns the wall only 10 deg (peach stays peach: wall 91 -> 82, desk 68 -> 61). */
 export const TINT_ROOM: Tints = tintFamily('#CBA6A6', {form: 0.4, cast: 0.55, contact: 0.9}, '#EEDED8');
-/** The dusk exterior family: violet base #B4AED8 at 0.50 / 0.58 / 1.0 = form #DAD6EC, cast #D4D0E8 (CRAFT's #D3CFEA),
- *  contact #B4AED8: on the ambient snow (83) -11 / -13 / -23. The ambient #DFE1ED = the open snow 93 -> 83
- *  (tintFor(EMBER.snow, '#C9CFE6')). */
-export const TINT_DUSK: Tints = tintFamily('#B4AED8', {form: 0.5, cast: 0.58, contact: 1}, '#DFE1ED');
+/** The dusk exterior family: violet base #BBA8DA (h 306) at 0.50 / 0.58 / 1.0. On the ambient snow (83): form / cast /
+ *  contact dL* -12 / -13 / -23, turning 13-18 deg toward violet (CRAFT §d.3: cool surfaces 10-16); warm light surfaces
+ *  keep their chroma (a cream shoe 10.5 -> 10.2, the pool's outer step 7 -> 10.6, a window spill 11 -> 9.8): CRAFT's
+ *  bluer #B4AED8 / #D3CFEA greyed them (cream 7.5, spill 7.3: a violet on a warm light cancels toward grey; measured with
+ *  scripts/qa/check_light.py). The ambient #DFE1ED = the open snow 93 -> 83 (tintFor(EMBER.snow, '#C9CFE6')). */
+export const TINT_DUSK: Tints = tintFamily('#BBA8DA', {form: 0.5, cast: 0.58, contact: 1}, '#DFE1ED');
+
+/** The desk pool on CRAFT §d.2's ladder: ring #FFD7A4 (L* 88), core #FFE8C1 (L* 93), both warmer than the desk. (§d.7's
+ *  example #EBB07F / #F6CD98, L* 76 / 85, sits under the ambient wall's 82 at the ring: the brightest 5 % then lands on
+ *  the upper wall, not on the subject in the pool; measured in the demo.) */
+export const POOL_DESK: [string, string] = ['#FFD7A4', '#FFE8C1'];
 
 const BASE = {
   rim: EMBER.core,
@@ -337,7 +345,7 @@ export function nookRig(L: {lamp: {head: Pt; rot: number; scale?: number; base: 
     ground: L.pool.ry / L.pool.rx,
     cap: 1.5,
     tints: TINT_ROOM,
-    pool: ['#EBB07F', '#F6CD98'],
+    pool: POOL_DESK,
     surface: EMBER.desk,
     ...BASE,
     form: {frac: 0.34},
@@ -361,7 +369,7 @@ export const RIGS: Record<'nook' | 'shop' | 'street' | 'roof', LightRig> = {
     ground: 0.3,
     cap: 0.8,
     tints: TINT_ROOM,
-    pool: ['#EBB07F', '#F6CD98'],
+    pool: POOL_DESK,
     surface: EMBER.desk,
     ...BASE,
     form: {frac: 0.3},
@@ -426,16 +434,25 @@ export function poolSteps(pool: Ellipse, foot?: Pt, k = 0.6): {outer: Ellipse; i
   return {outer: pool, inner: {cx: pool.cx + (fx - pool.cx) * 0.35, cy: pool.cy + (fy - pool.cy) * 0.35 - pool.ry * 0.06, rx: pool.rx * k, ry: pool.ry * k}};
 }
 
-/** Cast-shadow tints INSIDE a pool, one per step: the set's cast tint, but never darker (per channel) than what brings
- *  that step down to the unlit ground just outside the pool, a third of a cast step deeper. So a shadow in a lamp's light
- *  reads as "the light is blocked here", gentle on a bright pool and never darker than the dark beyond its edge (a lamp
- *  pool on night snow: 88 -> 78 against ambient snow 83, not 74). */
+/** Cast-shadow tints INSIDE a pool, one per step: the set's cast tint, weakened (a lower strength of the same family)
+ *  just enough that the shadow never lands darker than the unlit ground beyond the pool's edge (its ambient, a third of
+ *  a cast step deeper). So a shadow in a lamp's light reads as "the light blocked here": gentle on a bright desk pool
+ *  (there the full cast tint is already lighter) and, on a lamp pool over night snow, 88 -> ~79 against the ambient
+ *  snow's 83 (the full tint gave 74: a shadow ending in a lighter dark at the pool's edge). Same hue as every other
+ *  shadow of the set (a "light removed" tint toward the cool ground cannot be reached by a multiply on a warm pool: the
+ *  blue channel caps, and it lands grey, C* ~5; measured with scripts/qa/check_light.py). */
 export function poolCastTints(rig: LightRig): [string, string] {
-  const floor = multiply(groundAmbientOf(rig), step(rig.tints.cast, 0.35));
-  const cast = hexRgb(rig.tints.cast);
+  const floorL = lch(multiply(groundAmbientOf(rig), step(rig.tints.cast, 0.35))).L;
   return rig.pool.map((p) => {
-    const t = hexRgb(tintFor(p, floor));
-    return rgbHex(Math.max(cast[0], t[0]), Math.max(cast[1], t[1]), Math.max(cast[2], t[2]));
+    if (lch(multiply(p, rig.tints.cast)).L >= floorL) return rig.tints.cast;
+    let lo = 0;
+    let hi = 1;
+    for (let i = 0; i < 24; i++) {
+      const k = (lo + hi) / 2;
+      if (lch(multiply(p, step(rig.tints.cast, k))).L > floorL) lo = k;
+      else hi = k;
+    }
+    return step(rig.tints.cast, lo);
   }) as [string, string];
 }
 
@@ -443,10 +460,24 @@ export function poolCastTints(rig: LightRig): [string, string] {
 
 type LitV = {rig: LightRig; off: boolean};
 const LitCtx = createContext<LitV>({rig: RIGS.nook, off: false});
-/** Every light layer below reads this rig. `off` renders none of them (A/B renders: the same panel unlit). */
+/** Every light layer below reads this rig. `off` renders none of them (A/B renders: the same panel unlit; or, for any
+ *  composition, the input prop `--props='{"lightOff":true}'`). */
 export const Lit: React.FC<{rig: LightRig; off?: boolean; children?: React.ReactNode}> = ({rig, off = false, children}) => <LitCtx.Provider value={{rig, off}}>{children}</LitCtx.Provider>;
 export const useRig = () => useContext(LitCtx).rig;
-const useOff = () => useContext(LitCtx).off;
+/** The render's input props say `{"lightOff": true}`: every light layer of every composition is off (the A side of
+ *  scripts/qa/check_light.py's A/B, with no panel edited). Read once. */
+let GLOBAL_OFF: boolean | null = null;
+const globalOff = () => {
+  if (GLOBAL_OFF === null) {
+    try {
+      GLOBAL_OFF = (getInputProps() as {lightOff?: unknown} | undefined)?.lightOff === true;
+    } catch {
+      GLOBAL_OFF = false;
+    }
+  }
+  return GLOBAL_OFF;
+};
+const useOff = () => useContext(LitCtx).off || globalOff();
 /** True inside `<Lit off>` (the A side of an A/B render): a panel's own light-dependent colours switch back with it. */
 export const useLightOff = useOff;
 
@@ -1015,8 +1046,8 @@ export const Ambient: React.FC<{region?: [number, number, number, number] | stri
 
 // ================================================================= light shapes (opaque, lighter + warmer)
 
-/** A lamp's pool on its ground (light.md C.7): two opaque flat steps LIGHTER and WARMER than the ground (desk: outer
- *  #EBB07F L* 76, inner #F6CD98 L* 85; snow: #EADBD2 88, #F6E4CA 91). The inner step sits toward the source. Draw it on
+/** A lamp's pool on its ground (CRAFT §d.2, §d.7): two opaque flat steps LIGHTER and WARMER than the ground (desk:
+ *  `POOL_DESK` ring L* 88, core 93; snow: #EADBD2 88, #F6E4CA 91). The inner step sits toward the source. Draw it on
  *  the ground before the shadows and objects. Default: the key's (or `light`'s) pool. */
 export const LightPool: React.FC<{pool?: Ellipse; light?: PointLight; colors?: [string, string]; inner?: number; at?: At}> = ({pool, light, colors, inner = 0.6, at}) => {
   const rig = useRig();
@@ -1058,13 +1089,14 @@ export const WindowSpill: React.FC<{win: [number, number, number, number]; base:
 };
 
 /** A lantern's halo (light.md C.7): at most ONE flat step on the SKY only (draw it right after the sky), r <= 1.7x the
- *  lantern width; or none. Never a disc over the ground or the houses. */
-export const Halo: React.FC<{x: number; y: number; w: number; r?: number; color?: string; at?: At}> = ({x, y, w, r, color, at}) => {
+ *  lantern width; or none. Never a disc over the ground or the houses. `on` = the sky colour behind it when that is not
+ *  the plain sky (the lighter horizon band `skyLow`): the step is taken from it (+7 L*, warmer), so it still shows. */
+export const Halo: React.FC<{x: number; y: number; w: number; r?: number; color?: string; on?: string; at?: At}> = ({x, y, w, r, color, on, at}) => {
   const rig = useRig();
   const off = useOff();
   if (off) return null;
   const R = Math.min(r ?? w * 1.4, w * 1.7);
-  return <LF d={ellipseD({cx: x, cy: y, rx: R, ry: R})} color={color ?? rig.halo} at={at} />;
+  return <LF d={ellipseD({cx: x, cy: y, rx: R, ry: R})} color={color ?? (on ? relit(on, 7, {warm: 20}) : rig.halo)} at={at} />;
 };
 
 /** A source's core (a lantern's glass, a bulb, the lamp's mouth): the brightest warm value (L* 95-98, <= 1 % of the

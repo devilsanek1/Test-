@@ -72,11 +72,20 @@ export const LIGHT_SHEET = {w: 2160, h: 1920};
 
 const NOOK = NOOK_LAYOUT.pov;
 /** The lamp, screen-left (the key), its head over the laptop's left shoulder. */
-const LAMP: LampPose = {base: [150, 1290], elbow: [196, 1020], head: [330, 990], rot: -22};
-/** Its pool on the desk: wider than the laptop (it reads as light, not a mat), centred right of the mouth's foot. */
-const POOL: Ellipse = {cx: 470, cy: 1400, rx: 330, ry: 100};
+const LAMP: LampPose = {base: [150, 1290], elbow: [196, 1020], head: [330, 990], rot: -22, scale: 1.15};
+/** Its pool on the desk: wider than the laptop (it reads as light, not a mat), centred right of the mouth's foot. 5x the
+ *  mouth's half-width (CRAFT §d.7 says 2.5-3.5x): in a frame this full of wall the lit desk round the subject must cover
+ *  the brightest 5 % (§d.2), and the ambient wall sits at 82; a tighter desk shot (S7) passes with a 3.5x pool. */
+const POOL: Ellipse = {cx: 470, cy: 1410, rx: 450, ry: 135};
 /** The kit Nook's own pool, shrunk away when the rig's LightPool replaces it. */
-const NO_POOL: Ellipse = {cx: 470, cy: 1400, rx: 0.5, ry: 0.5};
+const NO_POOL: Ellipse = {cx: 470, cy: 1410, rx: 0.5, ry: 0.5};
+/** The room's planes turned from the lamp (CRAFT §d.7 "room falloff: planes"): the attic slope (the Nook's own
+ *  geometry: it faces down, far from a low lamp), the shelf's upper cubbies (the lowest one, by the lamp, stays lit),
+ *  and a darker strip under each board. */
+const SLOPE: Pt[] = [[560, -40], [1120, -40], [1120, -30 + 560 * (284 / 550)]];
+const SHELF_X1 = 116;
+const CUBBIES: [number, number, number, number][] = [[-30, -30, SHELF_X1 + 30, 298], [-30, 284, SHELF_X1 + 30, 300], [-30, 600, SHELF_X1 + 30, 256]];
+const UNDERSIDES = [284, 600, 872].map((y) => rectD(-30, y, SHELF_X1 + 30, 9)).join('');
 /** The rig: the lamp is the key; no wall wash (the anglepoise stands in front of the glass: a wash's edge would wrap
  *  round the window and read as the window glowing). */
 export const RIG_NOOK_DEMO = nookRig({lamp: LAMP, pool: POOL, glass: NOOK.glass});
@@ -137,14 +146,20 @@ export const LightNook: React.FC<{lit?: boolean}> = ({lit = true}) => {
     {of: tag},
     {of: books},
     {of: penCup},
+    {of: mug},
   ];
   return (
     <Lit rig={rig} off={!lit}>
       <Nook variant="pov" layout={{lamp: LAMP, pool: lit ? NO_POOL : POOL, mug: null}} seed="light/nook" />
       {/* the outside keeps its own light: the clean pen's environment tier already lays its snow at ~L* 82 (the night
           ambient), so no Ambient is stacked on it */}
+      <Shade d={polyD(SLOPE)} />
+      <Shade d={CUBBIES.map((r) => rectD(r[0], r[1], r[2], r[3])).join('')} />
+      <Shade d={UNDERSIDES} tint="cast" />
       <LightPool />
       <ShadowLayer exclude={[ellipseD({cx: LAMP.base[0], cy: LAMP.base[1], rx: 56, ry: 15})]}>
+        {/* the crease where the desk meets the wall and the sill: a corner, the cheapest depth cue */}
+        <ContactShadow x={540} y={NOOK.deskY} w={1200} d={rectD(-60, NOOK.deskY, 1200, 6)} tint="cast" away={0} />
         <ContactShadow x={LAMP.base[0]} y={LAMP.base[1] + 8} w={112} h={12} />
         <ContactShadow x={224} y={1436} w={128} />
         <CastShadow x={224} y={1428} w={128} depth={14} h={62} />
@@ -153,6 +168,7 @@ export const LightNook: React.FC<{lit?: boolean}> = ({lit = true}) => {
         <ContactShadow x={LAP.x} y={LAP.y} w={LAP.w} d={polyD(deckFront)} />
         <CastShadow x={LAP.x} y={LAP.y} w={LAP.w} pts={hinge} h={LG.H} />
         <ContactShadow x={MUG.x + MUG.w / 2} y={MUG.top + MUG.w * 1.14} w={MUG.w} />
+        <CastShadow x={MUG.x + MUG.w / 2} y={MUG.top + MUG.w * 1.14 - 6} w={MUG.w} h={MUG.w * 1.14} />
         <ContactShadow x={150} y={1730} w={400} d={polyD(NOTEBOOK_COVER)} away={5} />
         <ContactShadow x={PIP.x} y={PIP.y} w={62} />
       </ShadowLayer>
@@ -163,9 +179,11 @@ export const LightNook: React.FC<{lit?: boolean}> = ({lit = true}) => {
       {mug}
       <Pip3 x={PIP.x} y={PIP.y} scale={PIP.scale} pose="sit-front" seed={7} />
       <Notebook seed="light/nb" />
-      {/* form: the side away from the lamp, one step (the books are left of the mouth: their left ends; the pen cup right) */}
+      {/* form: the side away from the lamp, one step (the books are left of the mouth: their left ends; the pen cup and the
+          mug right) */}
       <FormShade of={books} c={[224, 1405]} size={[128, 62]} />
       <FormShade of={penCup} c={[PENCUP.x, PENCUP.y - 32]} size={[PENCUP.w, 64]} />
+      <FormShade of={mug} c={[MUG.x + MUG.w / 2, MUG.top + MUG.w * 0.57]} size={[MUG.w, MUG.w * 1.14]} />
       {/* the tag hangs in front of the lid: its shadow lands on the lid, down and away from the lamp */}
       <Shadow d={TAG_D} dx={drop[0]} dy={drop[1]} clip={LID_D} soft={2} />
       {/* the room one step down outside the light (falloff); holes: the glass, the pool, the lit objects */}
@@ -300,8 +318,8 @@ export const LightStreet: React.FC<{lit?: boolean}> = ({lit = true}) => {
     <Lit rig={rig} off={!lit}>
       <NightSky bandY={1050} horizon={HORIZON} />
       {/* one halo step per lantern, on the sky only (drawn before anything stands in front of it) */}
-      <Halo x={LANTERN.c[0]} y={LANTERN.c[1]} w={LANTERN.lw} />
-      <Halo x={FAR_LANTERN.c[0]} y={FAR_LANTERN.c[1]} w={FAR_LANTERN.lw} />
+      <Halo x={LANTERN.c[0]} y={LANTERN.c[1]} w={LANTERN.lw} on={EMBER.skyLow} />
+      <Halo x={FAR_LANTERN.c[0]} y={FAR_LANTERN.c[1]} w={FAR_LANTERN.lw} on={EMBER.skyLow} />
       {/* the open snow: its ambient value (the light system lowers it from L* 93 to 83 so pools and windows read) */}
       <Fill rect={[-200, HORIZON - 2, 1480, 2200 - HORIZON]} color={lit ? groundAmbientOf(rig) : EMBER.snow} mode="snap" offset={false} backdrop />
       <Tier tier="environment" bg={EMBER.sky}>
