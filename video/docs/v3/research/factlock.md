@@ -88,3 +88,5 @@ quote the series. Search snippets were used for everything else. Before G8, open
   "Cheap ones go first" is now measured (US PCs under $500 -18.7% vs -7.0% overall, Q1 2026).
 - Explanation: "The few companies that make it" can become "three companies make almost 9 in 10 of the world's memory chips".
 - Relief line: "analysts don't expect relief before 2027-28" holds. Micron says it gets tighter first.
+
+**G8 check, 2026-10-27:** the BLS series page (data.bls.gov/timeseries/CUUR0000SEEE01, 12-month % view) read in this session: 2026 Jan 1.6, Feb 0.9, Mar 2.2, Apr 2.3, May 1.3, Jun -0.8, Jul 3.9, Aug 8.4, **Sep 9.7**. Fact 1.1 ticked.
