@@ -118,10 +118,9 @@ Format: **rule** — why / evidence (video, date).
   type, cozy/scale) in a big readable note, lean review loops. Spec: `docs/G3_ANIMATIC.md`. — ("frankly the most
   important stage ... more like an animated sketchbook", 2026-10-26; supersedes "animate only where timing is the
   question", v3 G3, 2026-10-26).
-- **Every shot reads instantly with the sound off: literal beats clever.** Show recognisable things: a laptop that looks
-  like a laptop, a data center like a building of servers, a plain labelled chart. No metaphors that need explaining.
-  Test every animatic with a sound-off cold read before the owner sees it. — (v3 G3, 2026-10-26).
-- **No physical metaphors the facts don't support;** show the real mechanism instead. — (v3 G3, 2026-10-26).
+- **Every shot reads instantly with the sound off: literal beats clever.** Recognisable things (a laptop that looks like a
+  laptop, a plain labelled chart), the real mechanism, never a metaphor the facts don't support or that needs explaining;
+  a sound-off cold read before the owner sees any cut. — (v3 G3, 2026-10-26).
 - **Drawn like a professional storyboard: monochrome, clarity first, and cinematic** (framing, angle, scale, coziness
   decided in the board; clarity from composition, never icons on blank paper; every panel names its shot type). Spec:
   `docs/look/STORYBOARD_STYLE.md`. — ("very simple, avoid colours for now", v3 G3, 2026-10-26).
@@ -151,9 +150,8 @@ Format: **rule** — why / evidence (video, date).
 - **Helper cloud sessions are archived as soon as their work is pushed and checked** (keep the owner's session list
   clean); a split names each helper's done-signal (a report file) so the orchestrator knows when to archive. — ("archive
   them so we don't have the mess in the left side panel", v3, 2026-10-27).
-- **Playable video starts at the sketch animatic (G3); from then on every gate is a video, never only stills.** Before
-  G3 (topic, core line, script, voice): text and audio only, no MP4s, never several versions unless asked. — (v1, 2026-10-25; "why are there multiple versions", v3).
-- **Lock the story with a clean sketch/animatic before big commitments; push all polish late.** — (v1, 2026-10-25).
+- **Playable video from the sketch animatic (G3) on, never only stills; before G3 text and audio only, one version unless
+  asked. Lock the story before big commitments; polish late.** — (v1, 2026-10-25; "why are there multiple versions", v3).
 - **Progress: the gate deliverable is the update, with a short status on all threads between; lean prompts and docs.** — (v1).
 - **Every cut sent to the owner says what stage it is and what the next stages add** (e.g. "blocking: staging only;
   next: density, life, polish, full-res"), so a draft is never mistaken for the final. — ("let me know if this is just
