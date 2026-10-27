@@ -482,7 +482,10 @@ const NO_POOL: Ellipse = {cx: POOL.cx, cy: POOL.cy, rx: 0.5, ry: 0.5};
 const NOOK_LAYOUT_HOME = {pool: NO_POOL, mug: null, notebook: false, desk: {x0: -60, x1: 1140}, shelf: {...NOOK.shelf!, plant: undefined}};
 /** The room's planes turned from the lamp (CRAFT §d.7 falloff by planes): the attic slope (+ its extension), the
  *  shelf's upper cubbies, the board undersides (the demo's numbers: kit/KitSheetLight.tsx). */
-const SLOPE_SHADE = polyD([[560, -60], [1120, -60], [1120, -30 + 560 * SLOPE_K]]) + polyD([[1100, -60], [ROOM_X1 + 200, -60], [ROOM_X1 + 200, BEAM_TOP], [1100, BEAM_TOP]]);
+const SLOPE_SHADE = polyD([[560, -60], [1120, -60], [1120, -30 + 560 * SLOPE_K]]);
+/** The slope over the right extension (seen in SQB's framing): its own shape, so frame 0's colour wave reaches each part
+ *  by its own centre (one shape spanning both landed its shade at 0.33 s, after everything else). */
+const SLOPE_SHADE_X = polyD([[1120, -60], [ROOM_X1 + 200, -60], [ROOM_X1 + 200, BEAM_TOP], [1120, BEAM_TOP]]);
 const SHELF_X1 = 116;
 const CUBBIES = [[-30, -30, SHELF_X1 + 30, 298], [-30, 284, SHELF_X1 + 30, 300], [-30, 600, SHELF_X1 + 30, 256]].map((r) => rectD(r[0], r[1], r[2], r[3])).join('');
 const UNDERSIDES = [284, 600, 872].map((y) => rectD(-30, y, SHELF_X1 + 30, 9)).join('');
@@ -606,6 +609,7 @@ export const HomeRoom: React.FC<HomeRoomProps> = ({T, cam, card, room}) => {
         <FormShade key={i} of={el} c={c} size={size} />
       ))}
       <Shade d={SLOPE_SHADE} />
+      <Shade d={SLOPE_SHADE_X} />
       <Shade d={CUBBIES} />
       <Shade d={UNDERSIDES} tint="cast" />
       {/* the card and the notes stand a hair off the wall: soft drop shadows falling AWAY from the lamp (it is low on

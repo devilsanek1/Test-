@@ -182,9 +182,9 @@ const twoStep = (T: number, w: [number, number][]) => {
 export const screenDim = (T: number): number => twoStep(T, SCREEN_LIT);
 /** 0 = the tag at full strength (its beat), 0.5 = the half step, 1 = off-beat (tier B). */
 export const tagDim = (T: number): number => twoStep(T, TAG_FULL);
-/** The tag's idle sway (deg): 1.2 on its beats, 0.55 off-beat (tier B motion, CRAFT §b: calmer than the beat's
- *  subject), the amplitude eased over 0.6 s from each switch (the angle stays continuous; never a jump). */
-export function tagSway(T: number): number {
+/** How far off its beat the thread is at film time T: 0 on a TAG_FULL beat, 1 off-beat, eased over 0.6 s from each
+ *  switch (it scales the plane's idle motion, so every angle and offset stays continuous: never a jump). */
+export function offbeat(T: number): number {
   const ev: [number, number][] = [];
   for (const [a, b] of TAG_FULL) ev.push([a, 0], [b, 1]);
   ev.sort((x, y) => x[0] - y[0]);
@@ -198,9 +198,11 @@ export function tagSway(T: number): number {
     t0 = t;
   }
   const u = Math.min(1, Math.max(0, (T - t0) / 0.6));
-  const off = from + (level - from) * u * u * (3 - 2 * u);
-  return 1.2 - 0.65 * off;
+  return from + (level - from) * u * u * (3 - 2 * u);
 }
+/** The tag's idle sway (deg): 1.2 on its beats, 0.55 off-beat (tier B motion, CRAFT §b: calmer than the beat's
+ *  subject). */
+export const tagSway = (T: number): number => 1.2 - 0.65 * offbeat(T);
 /** The dim step: a warm multiply toward peach (screen white -> #F2D9C8, L* 88, C* 13), never greige or grey. */
 export const DIM_TINT = '#F2D9C8';
 const DIM_HALF = '#F9ECE4';
@@ -288,10 +290,12 @@ export function thumbAt(T: number, w: number): Pt {
  *  on film time so both sides of every seam draw it identically. Life on the subject itself, never a camera move. */
 export function handFloat(T: number): {dx: number; dy: number; rot: number} {
   const w = (p: number) => (Math.PI * 2) / p;
+  // off its beat the plane is tier B: half the float (CRAFT §b, support motion x0.5), eased with offbeat()
+  const a = 1 - 0.5 * offbeat(T);
   return {
-    dx: 1.6 * Math.sin(T * w(4.3) + 0.7) + 0.5 * Math.sin(T * w(1.9) + 2.1),
-    dy: 2.6 * Math.sin(T * w(3.1) + 0.2) + 0.7 * Math.sin(T * w(1.7) + 1.3),
-    rot: 0.25 * Math.sin(T * w(3.7) + 1.1),
+    dx: a * (1.6 * Math.sin(T * w(4.3) + 0.7) + 0.5 * Math.sin(T * w(1.9) + 2.1)),
+    dy: a * (2.6 * Math.sin(T * w(3.1) + 0.2) + 0.7 * Math.sin(T * w(1.7) + 1.3)),
+    rot: a * 0.25 * Math.sin(T * w(3.7) + 1.1),
   };
 }
 
@@ -381,7 +385,7 @@ const TagFrame0: React.FC<{S: ThreadState; tagAt: number}> = ({S, tagAt}) => {
   return (
     <>
       <Look fills="none">
-        <PriceTag x={x} y={y} w={w} rot={rot} sway={1.2} stringFrom={stringFrom} value="$999" seed="thread/tag" />
+        <PriceTag x={x} y={y} w={w} rot={rot} sway={1.2} stringFrom={stringFrom} stringThrough value="$999" seed="thread/tag" />
       </Look>
       {T < fillT ? (
         <XG m={mat.compose(mat.translate(hole[0], hole[1]), mat.rotate(rot + 1.2 * Math.sin(T * 1.7 + 0)), mat.translate(-w * 0.12, -w * 0.25))}>

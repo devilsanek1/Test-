@@ -134,9 +134,17 @@ const PriceTagBody: React.FC<PriceTagProps> = ({x, y, w, value, ticker, old, old
   let stringD = '';
   if (stringFrom) {
     const [ax, ay] = stringFrom;
-    const mx = (ax + holeAbs[0]) / 2;
-    const my = Math.max(ay, holeAbs[1]) + Math.abs(holeAbs[0] - ax) * 0.08 + 6;
-    stringD = smooth([stringFrom, [mx, my], holeAbs]);
+    if (stringThrough) {
+      // tied through the hole: a taut string with a slight bow, entering the eyelet from above (never a sag below the
+      // hole, which would hook round the ring's underside)
+      const mx = (ax + holeAbs[0]) / 2 + (holeAbs[1] - ay) * 0.035;
+      const my = (ay + holeAbs[1]) / 2;
+      stringD = smooth([stringFrom, [mx, my], holeAbs]);
+    } else {
+      const mx = (ax + holeAbs[0]) / 2;
+      const my = Math.max(ay, holeAbs[1]) + Math.abs(holeAbs[0] - ax) * 0.08 + 6;
+      stringD = smooth([stringFrom, [mx, my], holeAbs]);
+    }
   }
   const stringInk = stringD ? <Ink thing d={stringD} at={at} width={2.2} color={stringThrough ? (dim >= 0.5 ? TAG_DIM.line : TAG_STRING) : undefined} /> : null;
   return (
