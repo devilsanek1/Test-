@@ -1,13 +1,92 @@
-// V2S4_her.tsx (lane L3, V2S4 STORY part): HER, screen-fixed at x 720 while the world trucks: walking LEFT in profile
-// (steps = travel / 62 px: the feet never slide), slowing with the truck, stopping on "objected" (17.96) and looking
-// west along the post (stopLook). STUB (v0): the story build refines it.
-import React from 'react';
+// V2S4_her.tsx (lane L3, V2S4 STORY part): HER, screen-fixed at x 720 while the world trucks (TREATMENT §3, §5 S4;
+// plan_L3 §1). She walks LEFT (west) in profile, 170 px, her steps clocked by the truck's travel (V2S4_rig): the
+// planted foot moves with the paving, the steps slow as the truck slows, and on "objected" (17.96) she stops in the
+// passing position (one foot comes down: a tiny settle, never a pop of the figure). 18.06 her head lifts to the post
+// and its plates (west, along the arrows); when the APR plate starts (19.48) her eyes come down a line to read it.
+// Never a protest gesture; she never touches the post. She is the ONLY teal in the frame (the kit's HER model sheet).
+//
+// Honest feet. body.ts swings the planted leg as fx = hip - L sin(A sin(pi step)): fed a step count that is linear in
+// the travel, that foot first lags the paving, then overtakes it (up to ~40 % off at mid-stance). `honestStep` warps
+// the count inside each stance so the planted foot moves LINEARLY with the ground (exactly one 62 px step per stance),
+// and each 12/s drawing samples the travel at the MIDDLE of its hold (the residual slip is +-4.6 px, never one-sided).
+import React, {useMemo} from 'react';
 import {useTime} from '../../lib/time';
-import {Her, strideFor} from '../kit/cast';
-import {S4_BEATS, S4_HER, s4HerSteps} from './V2S4_rig';
+import {CM} from '../palette';
+import {HER, Person, strideFor} from '../kit/cast';
+import {Batch, Paint} from '../kit/canal/core';
+import {S4_BEATS, S4_HER, S4_TRUCK, s4Travel} from './V2S4_rig';
+
+/** Her stride factor (the feet never slide: one step = 62 px at 170 px tall). */
+export const HER_STRIDE = strideFor(S4_HER.stepPx, S4_HER.h);
+/** body.ts profile leg swing amplitude (22 deg x stride). */
+const SWING = ((22 * Math.PI) / 180) * HER_STRIDE;
+
+/** Warp a travel-linear step count so the planted foot tracks the ground linearly (see header). Identity at every
+ *  half step (contact, passing position, toe-off), monotone in between. */
+export function honestStep(s: number): number {
+  const sp = s - 0.5; // stances run n + 0.5 -> n + 1.5
+  const n = Math.floor(sp);
+  const u = sp - n;
+  const g = Math.asin((1 - 2 * u) * Math.sin(SWING)) / SWING; // the planted leg's swing phase for linear travel
+  return n + 0.5 + Math.acos(Math.max(-1, Math.min(1, g))) / Math.PI;
+}
+
+/** Her step count at film t: 12 drawings/s, each sampled at the middle of its hold, capped at the stop (5.0 = the
+ *  passing position, where one foot comes down into the stand). */
+export function herStepAt(t: number): number {
+  const tq = Math.floor(t * 12 + 1e-6) / 12;
+  const travel = s4Travel(Math.min(tq + 1 / 24, S4_BEATS.stop));
+  return honestStep(Math.min(S4_TRUCK.steps, travel / S4_HER.stepPx));
+}
+
+/** Her head after the stop (degrees, - = up), stepped at 12 drawings/s: level -> lifts to the post and the DEC plate
+ *  (18.06) -> down a line to the APR plate as it pens (19.48). */
+export function herTilt(t: number): number {
+  const tq = Math.floor(t * 12 + 1e-6) / 12;
+  const k = (a: number, d: number) => {
+    const u = Math.max(0, Math.min(1, (tq - a) / d));
+    return 1 - (1 - u) * (1 - u) * (1 - u);
+  };
+  return -10 * k(S4_BEATS.lookUp, 0.22) + 5 * k(19.48, 0.25);
+}
+
+/** The model as Her.tsx draws it (cheek crescent on, the cream tote). */
+const MODEL = {...HER, cheek: true};
+
+/** Her long low-sun shadow on the paving: the light is SUN1 low in the west, so it runs EAST (screen right) along the
+ *  towpath, a shade-colour slab that stays on the paving (it never reaches the coping at y 1082). */
+const HerShadow: React.FC = () => {
+  const b = useMemo(() => {
+    const x = S4_HER.x;
+    const y = S4_HER.feetY;
+    const s = new Batch();
+    s.poly(CM.stoneShade, [
+      [x - 13, y - 1],
+      [x + 10, y - 3],
+      [x + 178, y + 3],
+      [x + 186, y + 7],
+      [x + 30, y + 6],
+      [x - 10, y + 4],
+    ]);
+    return s;
+  }, []);
+  return <Paint b={b} seed="s4herShadow" misreg={false} />;
+};
 
 export const S4Her: React.FC = () => {
   const t = useTime();
-  if (t >= S4_BEATS.stop) return <Her x={S4_HER.x} y={S4_HER.feetY} h={S4_HER.h} pose="stopLook" seed="s4her" />;
-  return <Her x={S4_HER.x} y={S4_HER.feetY} h={S4_HER.h} pose="walk" view="profile" step={s4HerSteps(t)} stride={strideFor(S4_HER.stepPx, S4_HER.h)} seed="s4her" />;
+  const {x, feetY: y, h} = S4_HER;
+  const common = {x, y, h, seed: 's4her', exact: true, stride: HER_STRIDE, ink: 3.4, model: MODEL, traits: HER} as const;
+  const fig =
+    t < S4_BEATS.stop ? (
+      <Person {...common} pose="walk" view="profile" step={herStepAt(t)} />
+    ) : (
+      <Person {...common} pose="stand" view="profile" tilt={herTilt(t)} />
+    );
+  return (
+    <>
+      <HerShadow />
+      {fig}
+    </>
+  );
 };
