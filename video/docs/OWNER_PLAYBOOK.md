@@ -83,8 +83,7 @@ Format: **rule** — why / evidence (video, date).
   red-brown lines, a golden lamp pool, warm shadows, a saturated dusk-blue outside. — ("not sick", v3 G4, 2026-10-26).
 - **Texture and lines: VERY subtle.** Thin tapered lines only in key places; halftone tactically on a few elements as
   an optional last step (the film must work flat; the owner decides per video). — (texture test, 2026-10-25).
-- **Profile identity: mascot Pip (the purple PHP elephant) in the film's style;** avatar
-  `video/deliverables/profile/pip_power_button.png`. — (2026-10-25).
+- **Profile identity: mascot Pip (the purple PHP elephant), drawn in each film's style;** avatar `deliverables/profile/pip_power_button.png`. — (2026-10-25).
 
 ## Hook and pacing
 - **Every video has ONE core line, picked in its own step (G0.5) before the script:** the single sentence at the core
