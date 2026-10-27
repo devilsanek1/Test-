@@ -59,7 +59,7 @@ Maintenance at the end).
   lines (smooth, consistent weights, few of them, no jitter, no sketchy overshoot or double strokes), refined shapes,
   only the main thing with a full outline; hand-drawn warmth comes from shape and colour, not from scratchy lines.
   Spec: `docs/look/CRAFT.md` §c. — ("hand-drawn ink, flat colour, like reference video 1", v1, 2026-10-24; "too rough
-  and messy, a lot of rough lines, not clean at all; cleaner, more refined, gentle, premium", v3 G5b, 2026-10-27); the clean pen with tiers and gentle light
+  and messy, a lot of rough lines, not clean at all; cleaner, more refined, gentle, premium", v3 G5b, 2026-10-27; the clean pen with tiers and gentle light
   APPROVED at v2's G4 look clip: "okay good continue", 2026-10-27).
 - **Light and shadow: gentle, but always there.** One consistent light direction per scene, soft form and cast shadows,
   gentle light pools that make sense; never absent and never "weirdly put". System: `docs/look/CRAFT.md` §d. — (v3 G5b,
