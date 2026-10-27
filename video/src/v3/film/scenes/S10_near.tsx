@@ -10,7 +10,7 @@ import {Ink} from '../../../lib/Ink';
 import {blob, rect as rectInk} from '../../../lib/sketch';
 import {rng} from '../../../lib/rng';
 import {mat, XG} from '../../../lib/xf';
-import {useTime} from '../../../lib/time';
+import {ease, prog, useTime} from '../../../lib/time';
 import {backRowLayout, Bike3, WinterPerson, BusStop, EMBER, Exhaust, Footprints, Pip3, RoadDress, SnowCap, W, Walker, Wire3, ring, roadPt, roadScale} from '../kit';
 import type {BackRowPerson, BackRowProps, PipPoseKey, Pt} from '../kit';
 import {P, X_ROAD_L, X_ROAD_R, kAtZ, mixHex, quad, type QueueBeats} from './S10_geo';
@@ -284,21 +284,23 @@ export const VanLife: React.FC<{van: {x: number; y: number; w: number}; beats: Q
     ]);
     return (
       <>
-        <path d={beam} fill={mixHex(EMBER.road, EMBER.snow, 0.7)} />
+        <path d={beam} fill={HALO_SNOW[0]} />
         <Exhaust x={x0 - 4} y={van.y - van.w * 0.06} dir={-1} size={1.1} seed="q/vanex" />
       </>
     );
   }
-  // Pip: rides the roof, looking up the queue; S10 a worried jolt on "first dibs"; S14 slides and clings on the shove,
-  // then shakes the snow off
+  // Pip: rides the roof, looking up the queue; S10 on "first dibs" a silhouette change that reads from the back (ears
+  // clamped down, a look round toward camera, worried); S14 slides and clings on the shove, then shakes the snow off
   const pushAt = beats.pushAt;
   const keys: PipPoseKey[] = [{t: -1, pose: 'sit-back', look: 0.55}];
-  if (beats.pipDroopAt !== undefined) keys.push({t: beats.pipDroopAt, pose: 'sit-back', look: 0.3, expression: 'worried'});
+  if (beats.pipDroopAt !== undefined) keys.push({t: beats.pipDroopAt, pose: 'ears-cover', look: -0.35, expression: 'worried'});
   if (pushAt !== undefined) {
     keys.push({t: pushAt + 0.02, pose: 'ears-cover', look: -0.4, expression: 'wide'});
     keys.push({t: pushAt + 0.62, pose: 'sit-back', look: 0.55});
   }
-  const slide = pushAt !== undefined ? ring(t, pushAt, 30, 1.6, 4.5) : 0;
+  // the slide nets RIGHTWARD (inertia toward the cab, the van is shoved back-left): Pip ends near the box's front end,
+  // feet at screen x ~115, clear of the left edge and left of the waiting dots
+  const slide = pushAt !== undefined ? ring(t, pushAt, 30, 1.6, 4.5) + 76 * prog(t, pushAt, (beats.pushDur ?? 0.3) + 0.12, ease.outCubic) : 0;
   const pipX = x0 + boxW * 0.62 + slide;
   const pipY = top - 5;
   const out: React.ReactNode[] = [
