@@ -93,6 +93,12 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - **Video 3 is produced by session https://claude.ai/code/session_01K4EiJphpZBfCkniV3UU3wR.** It is at G0 (topic
   scouting): workflow `context/workflows/v3-g0-topics-wf_b78a4844-2b3.js` writes `video/docs/v3/scouting/*.md` and
   `video/docs/v3/G0_TOPICS.md` (top 3 fresh topics for the owner to pick).
+- **v3 status (2026-10-27): G5b density + life.** The owner judged G5 "way too empty"; new rules: feel alive (not a
+  quota), great scale, coziness v2 (two measured references, `docs/look/COZY_AND_SCALE.md` 3b), `docs/look/LIFE_AND_DENSITY.md`
+  + `scripts/qa/density.py` (--cozy). The density pilot (`deliverables/v3/v3_g5b_pilot.mp4`, O1 + S4/S6) was APPROVED ("go
+  ahead yes") and is the bar. RUNNING: `context/workflows/v3-g5b-rollout-*.js` (8 lanes build/review/fix, then a full-res
+  assembly -> `deliverables/v3/v3_g5b.mp4`). Plans: `docs/v3/density_plan_g5b.md`, `cozy_v2_application.md` (overrides),
+  `s9_scale_plan.md`. Next: owner notes on G5b, then G6 polish.
 - **v3 status (2026-10-26 ~22:00 UTC): G5 blocking cut DELIVERED** (`deliverables/v3/v3_g5_blocking.mp4`, 60 fps, 540x960,
   gate check PASS; sheet `review/v3_g5/sheet.jpg`), waiting for the owner's notes. S9 + S9b were merged into one S5
   pull-back crane panel (owner: "swap"; library entry S5 in `docs/look/CINEMATIC_GUIDE.md`, from Arcane compilation shot #55).
