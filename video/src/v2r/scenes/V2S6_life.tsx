@@ -144,6 +144,48 @@ export const S6Birds: React.FC = () => {
   );
 };
 
+/** A second, higher pair in the top gutter (y 150-250: the quiet field, never the band), left -> right from 2.85. */
+export const S6SkyBirds: React.FC = () => {
+  const t = useTime();
+  const t0 = 2.85;
+  if (t < t0) return null;
+  const u = t - t0;
+  const x1 = -40 + 330 * u;
+  const y1 = 214 - 22 * u + 5 * Math.sin(u * 2.1);
+  const x2 = x1 - 40;
+  const y2 = y1 + 15 + 3 * Math.sin(u * 2.7 + 1);
+  return (
+    <>
+      <path d={birdD(x2, y2, 20, (t * 4.0 + 0.3) % 1)} stroke={LT.birdFar} strokeWidth={2.1} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={birdD(x1, y1, 23, (t * 3.6) % 1)} stroke={LT.birdFar} strokeWidth={2.3} fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </>
+  );
+};
+
+/** Five sparrows lift off the cherry crown peeking over the board (3.42) and fly low to the left across the sun,
+ *  y >= 606 (wing tips >= 600): never in the band margin. Lawn coords (counter-drifted to a screen path). */
+export const S6Sparrows: React.FC = () => {
+  const t = useTime();
+  const t0 = 3.42;
+  if (t < t0) return null;
+  const lawn = dxOf(DRIFT.lawn, t);
+  const u = t - t0;
+  let d = '';
+  for (let i = 0; i < 5; i++) {
+    const delay = (i % 3) * 0.05 + i * 0.02;
+    const k = Math.max(0, u - delay);
+    if (k <= 0) continue;
+    const sx = 404 + i * 17 + 15 * t0;
+    const sy = 640 + (i % 2) * 9;
+    // up off the crown, then level and fast to the left
+    const x = sx - 300 * k - 120 * k * k;
+    const y = Math.max(606 + (i % 3) * 5, sy - 70 * k + 30 * k * k);
+    if (x < -30) continue;
+    d += birdD(x - lawn, y, 13 + (i % 2) * 2, (t * 5.2 + i * 0.27) % 1);
+  }
+  return <path d={d} stroke={LT.bird} strokeWidth={1.9} fill="none" strokeLinecap="round" strokeLinejoin="round" />;
+};
+
 // ---------------------------------------------------------------- the lawn trees (lawn plane, behind the promenade)
 
 type TreeSpec = {x: number; base: number; rx: number; ry: number; cy: number; bloom: number; seed: string};
@@ -152,12 +194,20 @@ type TreeSpec = {x: number; base: number; rx: number; ry: number; cy: number; bl
  *  Crown tops = cy - 1.16 ry >= 612 (never above y 600). Lawn coords. Kept off the sun (x 215-305), off Pip's calm ring
  *  (x 690-900) and off the service door (x 900-1060). */
 const LAWN_TREES: TreeSpec[] = [
-  {x: 420, base: 852, rx: 90, ry: 72, cy: 700, bloom: 0.95, seed: 'lt1'},
-  {x: 572, base: 852, rx: 94, ry: 74, cy: 704, bloom: 0.85, seed: 'lt2'},
-  {x: 1152, base: 856, rx: 104, ry: 80, cy: 706, bloom: 1, seed: 'lt3'},
+  {x: 420, base: 852, rx: 90, ry: 72, cy: 700, bloom: 2.6, seed: 'lt1'},
+  {x: 572, base: 852, rx: 94, ry: 74, cy: 704, bloom: 2.4, seed: 'lt2'},
+  {x: 1152, base: 856, rx: 104, ry: 80, cy: 706, bloom: 2.6, seed: 'lt3'},
 ];
-/** The far trees sit one small flat step back toward the sky (the facade's foot), never a haze. */
-const BLOOM_FAR: BloomTones = Object.fromEntries(Object.entries(BLOOM_NEAR).map(([k, v]) => [k, mix(v, CM.sky, 0.1)])) as BloomTones;
+/** S6's cherries in the April morning, lit from the left (front-side light, not S5's backlight): a mauve mass under
+ *  pink clumps, plum limbs; the far ones one small flat step back toward the sky (never a haze). */
+const BLOOM_S6: BloomTones = {
+  ...BLOOM_NEAR,
+  base: mix(CM.shadeWarm, CM.blossom, 0.38),
+  shade: mix(CM.shadeWarm, CM.blossom, 0.6),
+  mid: mix(CM.blossom, CM.shadeWarm, 0.18),
+  lit: mix(CM.blossom, CM.paper, 0.32),
+};
+const BLOOM_FAR: BloomTones = Object.fromEntries(Object.entries(BLOOM_S6).map(([k, v]) => [k, mix(v, CM.sky, 0.1)])) as BloomTones;
 const LIGHT: [number, number] = [-0.95, -0.3];
 
 const crownOf = (s: TreeSpec): CrownSpec => ({cx: s.x, cy: s.cy, rx: s.rx, ry: s.ry, seed: s.seed, light: LIGHT, bloom: s.bloom, ink: 2.2});
@@ -217,15 +267,22 @@ type Mover = {
   on: [number, number];
 };
 
+// The service door's plate (CLASSIFIED / AUTHORIZED PERSONNEL ONLY) is lettering: nobody crosses it while it shows (the
+// door shut 1.00-2.30 and from 3.40). The right strip's movers pass the door only while it stands open (0-1.0, 2.3-3.4).
 const MOVERS: Mover[] = [
-  {id: 'jogA', pose: 'jog', x: (t) => 1104 - 128 * t, feet: 866, dir: -1, rate: 2.8, traits: {coat: CM.coatMustard, hair: 'cap', hatColor: CM.coatSlate, acc: 'headphones', coatLen: 'jacket'}, on: [0, 3.2]},
-  // the dog walker stops while the dog sniffs the tulip bed (2.55-2.95), then walks on (a new event at 2.95)
-  {id: 'dogW', pose: 'walk', x: (t) => 792 + 78 * Math.min(t, 2.55) + 78 * Math.max(0, t - 2.95), still: (t) => t > 2.55 && t < 2.95, feet: 878, dir: 1, rate: 1.7, traits: {coat: CM.brick, hair: 'short', hairColor: CM.hair[3], acc: 'none', coatLen: 'mid'}, on: [0, 4.1]},
-  {id: 'cyc', pose: 'cycle', x: (t) => 1186 - 292 * (t - 2.12), feet: 870, dir: -1, rate: 0, traits: {coat: CM.coatOat, hair: 'beanie', hatColor: CM.brickDeep, acc: 'backpack', accColor: CM.coatSlate}, on: [2.12, 4.1]},
+  // right strip, door open: a jogger and a cyclist overtaking her, both heading left behind the post and the board
+  {id: 'jogA', pose: 'jog', x: (t) => 1062 - 150 * t, feet: 866, dir: -1, rate: 2.8, traits: {coat: CM.coatMustard, hair: 'cap', hatColor: CM.coatSlate, acc: 'headphones', coatLen: 'jacket'}, on: [0, 2.7]},
+  {id: 'cyc', pose: 'cycle', x: (t) => 1196 - 300 * t, feet: 870, dir: -1, rate: 0, traits: {coat: CM.coatOat, hair: 'beanie', hatColor: CM.brickDeep, acc: 'backpack', accColor: CM.coatSlate}, on: [0, 1.75]},
+  // right strip, left of the door: a runner at rest (stretching), who sets off left at 2.0
+  {id: 'rest', pose: 'jog', x: (t) => (t < 2.0 ? 872 : 872 - 150 * (t - 2.0) * Math.min(1, (t - 2.0) / 0.25)), still: (t) => t < 2.0, feet: 862, dir: -1, rate: 2.7, traits: {coat: CM.brickLight, hair: 'bun', hairColor: CM.hair[2], acc: 'none', coatLen: 'jacket'}, on: [0, 3.2]},
+  // right strip, door open again: a runner bursts out from behind the post heading right and is gone by 3.35
+  {id: 'jogB2', pose: 'jog', x: (t) => 860 + 228 * (t - 2.35), feet: 874, dir: 1, rate: 3.0, traits: {coat: CM.coatSlate, hair: 'short', hairColor: CM.hair[1], acc: 'none', coatLen: 'jacket'}, on: [2.35, 3.4]},
+  // left strip: a parent with a stroller heading out left; a jogger; the dog walker coming in; a late jogger
   {id: 'pram', pose: 'walk', x: (t) => 112 - 38 * t, feet: 858, dir: -1, rate: 1.5, traits: {coat: CM.coatPlum, hair: 'lowBun', hairColor: CM.hair[2], acc: 'tote', accColor: CM.coatOat, coatLen: 'long'}, on: [0, 4.1]},
   {id: 'jogB', pose: 'jog', x: (t) => -62 + 168 * (t - 0.35), feet: 874, dir: 1, rate: 2.9, traits: {coat: CM.sage, hair: 'bun', hairColor: CM.hair[4], acc: 'none', coatLen: 'jacket'}, on: [0.35, 1.9]},
-  {id: 'walkC', pose: 'walk', x: (t) => -46 + 60 * (t - 2.25), feet: 862, dir: 1, rate: 1.6, traits: {coat: CM.coatSlate, hair: 'curls', hairColor: CM.hair[1], acc: 'strap', accColor: CM.coatMustard, coatLen: 'mid'}, on: [2.25, 4.1]},
-  {id: 'jogC', pose: 'jog', x: (t) => -64 + 176 * (t - 3.3), feet: 876, dir: 1, rate: 3.0, traits: {coat: CM.brickLight, hair: 'short', hairColor: CM.hair[2], acc: 'none', coatLen: 'jacket'}, on: [3.3, 4.1]},
+  // the dog walker stops while the dog sniffs the verge (3.0-3.38), then walks on
+  {id: 'dogW', pose: 'walk', x: (t) => -64 + 72 * Math.min(t - 1.5, 1.5) + 72 * Math.max(0, t - 3.38), still: (t) => t > 3.0 && t < 3.38, feet: 878, dir: 1, rate: 1.7, traits: {coat: CM.brick, hair: 'short', hairColor: CM.hair[3], acc: 'none', coatLen: 'mid'}, on: [1.5, 4.1]},
+  {id: 'jogC', pose: 'jog', x: (t) => -64 + 176 * (t - 3.3), feet: 876, dir: 1, rate: 3.0, traits: {coat: CM.coatMustard, hair: 'curls', hairColor: CM.hair[1], acc: 'none', coatLen: 'jacket'}, on: [3.3, 4.1]},
 ];
 
 /** The dog (a small terrier in profile, trotting): screen feet (x, y), facing dir, height h (back), gait phase. */
@@ -419,7 +476,7 @@ export const S6LawnMid: React.FC = () => {
   const md = dxOf(DRIFT.mid, t);
   // the young cherry: lawn-depth drift ~14 px/s
   const tdx = dxOf(14, t) - md;
-  const young: TreeSpec = {x: 26, base: 958, rx: 96, ry: 80, cy: 728, bloom: 1.1, seed: 'ltL'};
+  const young: TreeSpec = {x: 26, base: 958, rx: 96, ry: 80, cy: 728, bloom: 2.8, seed: 'ltL'};
   const tree = useMemo(() => {
     const B = new Batch();
     trunkInto(B, young, LT.lawnShadow);
@@ -458,7 +515,7 @@ export const S6LawnMid: React.FC = () => {
     <>
       <g transform={`translate(${tdx.toFixed(2)} 0)`}>
         <Paint b={tree} seed="s6youngcherry" misreg={2} />
-        <BloomCrowns crowns={youngCrown} seed="s6youngcrown" misreg={3} />
+        <BloomCrowns crowns={youngCrown} tones={BLOOM_S6} seed="s6youngcrown" misreg={3} />
       </g>
       <Paint b={g} seed="s6garden" misreg={2} />
       <Seated x={gx} y={gy - 20} h={66} seed="s6/gardener" turn={turn} traits={{coat: CM.coatOat, hair: 'cap', hatColor: CM.brickDeep, acc: 'none'}} />
