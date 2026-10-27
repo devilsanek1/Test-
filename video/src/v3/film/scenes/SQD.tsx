@@ -15,7 +15,7 @@
 // town, clouds, birds, snow. Light: the street rig (the open sky the key, upper left): the pile's tops a step lighter, a
 // cold rim on the summit stick, contact shadows under all that stands; the gate's floodlight the street's one pool.
 // Planes and their maps: SQD_rig.ts. Stand-ins for the shared pieces (outside, h2_window, thread_plane): SQD_standin.
-import React, {useId} from 'react';
+import React from 'react';
 import {World} from '../../../lib';
 import {useFilmTime} from '../../../lib/sequence';
 import {Tier} from '../../../lib/tier';
@@ -40,9 +40,8 @@ const SQD: React.FC = () => {
   // THE stick, in screen px (so at t 0 it is SQC's stick to the pixel)
   const sc = applyMat(far, [SUMMIT_STICK.x, SUMMIT_STICK.y]);
   const sw = SUMMIT_STICK.w * matScale(far);
-  const clipId = 'sqdsnow' + useId().replace(/[^a-zA-Z0-9]/g, '');
   return (
-    <World stage="context" sky={[{t: 0, tod: FILM_TOD, color: EMBER.sky}]}>
+    <World sky={[{t: 0, tod: FILM_TOD, color: EMBER.sky}]}>
       <Lit rig={RIGS.street}>
         <Tier tier="environment" bg={EMBER.sky}>
           <PullLayer m={far}>
@@ -59,16 +58,10 @@ const SQD: React.FC = () => {
           <PullLayer m={town}>
             <OutsideTown onRoad={<RoadTrucks T={T} />} />
             <ThoomPuffs at={THOOM - SQD_START} pts={PUFFS} size={6} seed="sqd/town" />
+            {/* falling snow in the town's air (far, sparse, under the caption band): it rises with the town, so no flake
+                is ever magnified by the x27 far plane or the push-through */}
+            <SnowLayers x={-120} y={640} w={1320} h={760} layers={['far']} density={0.45} band={null} seed="sqd/far" />
           </PullLayer>
-          {/* falling snow, far and sparse, kept under the caption band (screen y >= 625) */}
-          <defs>
-            <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
-              <rect x={-10} y={625} width={1100} height={1310} />
-            </clipPath>
-          </defs>
-          <g clipPath={`url(#${clipId})`}>
-            <SnowLayers x={-40} y={600} w={1160} h={1360} layers={['far']} density={0.45} band={null} seed="sqd/far" />
-          </g>
           <PullLayer m={street}>
             <OutsideStreet />
           </PullLayer>
