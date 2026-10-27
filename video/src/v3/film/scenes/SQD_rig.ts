@@ -20,6 +20,8 @@ export const SQD_END = 22.68;
 /** The move: 155 f on the S5 ease, 19.40-21.98; then the hold (the birds) to 22.35; J4's entry 22.35-22.95. */
 export const MOVE = 155 / 60;
 export const MOVE_END = SQD_START + MOVE;
+/** SQD's own life (streams, trucks) is in by then; from here SQD draws SQE's H2Scene (J4's seam by construction). */
+export const LIFE_END = 22.25;
 /** "mountain." (VO 21.72): the thoom (p 0.985). */
 export const THOOM = 21.72;
 

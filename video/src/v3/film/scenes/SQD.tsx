@@ -8,8 +8,8 @@
 // the bands above and below it change. The far plane starts at x27 (planeMat {o: the summit stick, off: (540, 870) -
 // o, k: 27}); the town rises from the bottom, then our street, then our sill and desk.
 // OUT, J4 (a seam mid-entry at 22.68, frame 1361): the pull lands on h2_window's entry start state and from 21.98 SQD
-// draws the H2 view through h2Cams on FILM time exactly as SQE does (outside's three planes, h2_window's window and
-// desk, the front plane rising into LEFT from 22.45); its own life is done by 22.20 (nothing new moves 22.28-23.08).
+// draws the H2 view through h2Cams on FILM time; from 22.25 (its own life done: nothing new moves 22.28-23.08) it draws
+// SQE's own H2Scene (outside's three planes, h2_window's window and desk, the front plane rising into LEFT from 22.45).
 // Hierarchy (flow_v2 §5): A the stick -> the DC (its lit sign: the brightest cold light; in frame from ~21.0) -> the
 // mountain (whole by ~21.35, the thoom on "mountain." 21.72); B the streams (from 21.0) and two trucks on the road; C the
 // town, clouds, birds, snow. Light: the street rig (the open sky the key, upper left): the pile's tops a step lighter, a
@@ -24,10 +24,10 @@ import {XG} from '../../../lib/xf';
 import {InkScale} from '../../../lib/inkComp';
 import {EMBER, FILM_TOD} from '../kit';
 import {Lit, RIGS} from '../kit/Light';
-import {OutsideFar, OutsideTown, OutsideStreet} from './outside';
+import {OutsideFar, OutsideTown, OutsideStreet, FilmClock} from './outside';
 import {H2Window} from './h2_window';
-import {FrontStandIn} from './SQE_front';
-import {sqdCams, inkZoom, applyMat, matScale, SUMMIT_STICK, MOVE_END} from './SQD_rig';
+import {H2Scene} from './SQE';
+import {sqdCams, inkZoom, applyMat, matScale, SUMMIT_STICK, MOVE_END, LIFE_END} from './SQD_rig';
 import {J3Stick, J3StickLight} from './SQD_peak';
 import {RevealStreams, RoadTrucks, RevealBirds} from './SQD_life';
 
@@ -39,36 +39,52 @@ const SQD: React.FC = () => {
   // draws the same stick at H2 size (its summit stick)
   const sc = applyMat(c.far, [SUMMIT_STICK.x, SUMMIT_STICK.y]);
   const sw = SUMMIT_STICK.w * matScale(c.far);
+  const birds = (
+    <XG m={c.far}>
+      <RevealBirds T={T} />
+    </XG>
+  );
+  // From LIFE_END (22.25: SQD's own streams and trucks are in) SQD draws SQE's own H2 picture (h2_window's planes
+  // through h2Cams, the front plane rising into LEFT), so J4's seam is one drawing by construction
+  if (T >= LIFE_END) {
+    return (
+      <World sky={[{t: 0, tod: FILM_TOD, color: EMBER.sky}]}>
+        <H2Scene />
+        <FilmClock>{birds}</FilmClock>
+      </World>
+    );
+  }
   return (
     <World sky={[{t: 0, tod: FILM_TOD, color: EMBER.sky}]}>
-      <XG m={c.far}>
-        <InkScale {...inkZoom('far', c.far, T)}>
-          <OutsideFar summit={!moving} streams={<RevealStreams T={T} />} />
-          <RevealBirds T={T} />
-        </InkScale>
-      </XG>
-      {moving ? (
-        <Lit rig={RIGS.street}>
-          <J3StickLight x={sc[0]} y={sc[1]} w={sw} rot={SUMMIT_STICK.rot} />
-          <J3Stick x={sc[0]} y={sc[1]} w={sw} rot={SUMMIT_STICK.rot} />
-        </Lit>
-      ) : null}
-      <XG m={c.town}>
-        <InkScale {...inkZoom('town', c.town, T)}>
-          <OutsideTown onRoad={<RoadTrucks T={T} />} />
-        </InkScale>
-      </XG>
-      <XG m={c.street}>
-        <InkScale {...inkZoom('street', c.street, T)}>
-          <OutsideStreet />
-        </InkScale>
-      </XG>
-      <XG m={c.win}>
-        <InkScale {...inkZoom('win', c.win, T)}>
-          <H2Window />
-        </InkScale>
-      </XG>
-      {T >= 22.4 ? <FrontStandIn T={T} /> : null}
+      <FilmClock>
+        <XG m={c.far}>
+          <InkScale {...inkZoom('far', c.far, T)}>
+            <OutsideFar summit={!moving} streams={<RevealStreams T={T} />} />
+          </InkScale>
+        </XG>
+        {birds}
+        {moving ? (
+          <Lit rig={RIGS.street}>
+            <J3StickLight x={sc[0]} y={sc[1]} w={sw} rot={SUMMIT_STICK.rot} />
+            <J3Stick x={sc[0]} y={sc[1]} w={sw} rot={SUMMIT_STICK.rot} />
+          </Lit>
+        ) : null}
+        <XG m={c.town}>
+          <InkScale {...inkZoom('town', c.town, T)}>
+            <OutsideTown onRoad={<RoadTrucks T={T} />} />
+          </InkScale>
+        </XG>
+        <XG m={c.street}>
+          <InkScale {...inkZoom('street', c.street, T)}>
+            <OutsideStreet />
+          </InkScale>
+        </XG>
+        <XG m={c.win}>
+          <InkScale {...inkZoom('win', c.win, T)}>
+            <H2Window />
+          </InkScale>
+        </XG>
+      </FilmClock>
     </World>
   );
 };
