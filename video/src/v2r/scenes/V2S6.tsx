@@ -23,7 +23,7 @@ import {GateSet} from '../kit/dc/gate';
 import type {ToneKey} from '../../lib/Film';
 import {S6Board} from './V2S6_board';
 import {S6PipOnPost, S6PipHop} from './V2S6_pip';
-import {S6Clouds, S6Birds, S6LawnTrees, S6Promenade, S6Staff, S6LawnMid, S6Petals} from './V2S6_life';
+import {S6Clouds, S6SkyBirds, S6Birds, S6Sparrows, S6LawnTrees, S6Promenade, S6Staff, S6LawnMid, S6Petals} from './V2S6_life';
 import {S6NearBack, S6NearFront, S6Readers} from './V2S6_near';
 import {S6HedgeFix, S6ShrubFix, S6Border} from './V2S6_set';
 
@@ -36,12 +36,18 @@ const SKY = skyBands('april');
 const V2S6: React.FC = () => (
   <World sky={SKY} tod={TOD.april} horizon={760}>
     <GateSet
-      bars={<S6Clouds />}
+      bars={
+        <>
+          <S6Clouds />
+          <S6SkyBirds />
+        </>
+      }
       doorPeople={<S6Staff />}
       lawn={
         <>
           <S6LawnTrees />
           <S6Birds />
+          <S6Sparrows />
           <S6Promenade />
         </>
       }
