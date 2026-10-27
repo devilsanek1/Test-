@@ -8,6 +8,33 @@ and the plum.
 Commits: 14ac5f5 ... 0b7f2a3 (the conform and the pre-critic clip); c8a9aed, 66aa2af and the last L1 commit (the fixes
 after the critic and after the cold viewer, then this clip).
 
+## One continuous sky + the evening sun (the owner's sky note, 2026-10-27; before the particles)
+**Stills:** `video/docs/v2/lanes/img/L1_sky_0.4.jpg` (0.4 scale, at 0.5, 3.0 and 5.3 s).
+
+**What the owner said:** "what bothered me is different color of the space and sun, like why is it blue sky and then
+suddenly abruptly orange, weird". It is now a playbook rule (ONE CONTINUOUS SKY) and DIRECTION rule 6.
+
+- **One sky** (`S1_SKY` and `S1_SKY_Y` in V2S1_set_core, painted by V2S1_sky's flood):
+  - The caption field's mint (#BCDCCF) stays flat down to y 572, so the caption band (y 317-556) is one value and the
+    caption contrast is unchanged: the band's sky is still L* 85.1.
+  - Below it, five flat steps through pale cream-gold to a warm peach horizon: #CEDECD, #DFE1CB, #EDE3C9, #F8E0C3,
+    #FBD9BB. Each step is dE 4-6 with dL* <= 2.
+  - The steps hide behind the wing's roofline (y ~600) and show only over the west gap. No seam between unrelated
+    colours anywhere.
+- **An evening sun.** SUN0 is now **(196, 772) r 52**, 65 % of r 80, and lower.
+  - It sits in the warmest step and sets **behind** the west gap's far roofs: it is drawn before them now.
+  - One flat halo (#FFD4AE) one step warmer than its sky, 1.6x the disc (CRAFT §d allows up to 1.7x).
+  - Frame 0's half-coloured disc moved into the set's `SunDisc`, behind the roofs too. `SunHalf` is retired.
+  - The colour role is unchanged: orange on the sun only. The flood still starts from the sun: its origin follows
+    SUN0 in `map.ts`.
+  - **map.ts changed:** SUN0, and its notes in UI and the map sheet. S4 and S5 keep their own suns.
+- **The far city's haze is the lowest sky step** (#FBD9BB, `S1_HAZE`), so the atmospheric perspective agrees with the
+  sky.
+- **check_light A/B:** OK at 0.5, 3.0 and 5.3 s. The brightest 5 % sits 0.044-0.049 H from the subject, and the light
+  layer leaves the caption band flat (spread 0.0). Typecheck clean.
+
+---
+
 ## v2: the owner's depth notes + the orchestrator's foreground fix (the clip to show the owner next)
 **The clip:** `video/deliverables/v2/v2r_G4_look_v2.mp4`: the same frames 0-367 (0.00-6.13 s), 1080x1920, 60 fps, with
 the voice.
