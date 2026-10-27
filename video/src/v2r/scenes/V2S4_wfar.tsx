@@ -294,9 +294,11 @@ export function farStatic(): Batch {
   for (const g of GAS) gasFrameInto(b, g);
   b.layer();
   const winsA = farRowInto(b, {x0: X0, x1: X1, base: ROW.wallTop, top: 728, spread: 10, seed: 's4farA', walls: [CM.limestone, CM.stoneShade, CM.glass, CM.limestone], roofs: [CM.stoneShade, CM.shadeCool, CM.stoneShade], w: [44, 96], win: 4, lit: 0});
+  b.layer();
   winsInto(b, winsA, 's4farAw', 0, 0);
   b.layer();
   const winsB = farRowInto(b, {x0: X0, x1: X1, base: ROW.wallTop, top: 752, spread: 8, seed: 's4farB', walls: [CM.brickLight, CM.stucco, CM.limestone, CM.brickLight, CM.stoneShade], roofs: [CM.shadeCool, CM.shadeWarm, CM.paneUnlit], w: [52, 120], win: 5, lit: 0.12});
+  b.layer();
   winsInto(b, winsB, 's4farBw', 0.14, 0);
   b.layer();
   viaductInto(b);
