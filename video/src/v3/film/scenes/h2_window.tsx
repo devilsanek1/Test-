@@ -17,12 +17,11 @@
 import React from 'react';
 import {clamp, ease, prog} from '../../../lib/time';
 import {mat, XG, type Mat} from '../../../lib/xf';
-import {useFilmTime} from '../../../lib/sequence';
 import {Tier} from '../../../lib/tier';
 import {EMBER, Mug, type Pt} from '../kit';
 import {Ambient, ContactShadow, FormShade, LightPool, Lit, nookRig, Shadow, ShadowLayer, mixHex} from '../kit/Light';
 import {ellD, roundPoly, rrect} from '../kit/Fleet';
-import {FilmClock, OutsideFar, OutsideStreet, OutsideTown} from './outside';
+import {FilmClock, OutsideFar, OutsideStreet, OutsideTown, useFilmT} from './outside';
 
 // ---------------------------------------------------------------- geometry (H2 canvas px at rest)
 
@@ -93,7 +92,7 @@ const FROST = (() => {
 export const H2Window: React.FC = () => {
   const mugX = 780;
   const mugTop = 1352;
-  const mug = <Mug x={mugX} top={mugTop} w={112} seed="h2/mug" />;
+  const mug = <Mug x={mugX} top={mugTop} w={112} steam={false} seed="h2/mug" />;
   const planner = rrect(470, 1580, 300, 190, 10);
   return (
     <FilmClock>
@@ -114,6 +113,7 @@ export const H2Window: React.FC = () => {
           <Shadow d={`M-200 ${DESK.y}H1280V${DESK.y + 12}H-200Z`} tint="cast" soft={6} />
           <ContactShadow x={mugX + 49} y={mugTop + 128} w={112} h={12} />
           <ContactShadow x={620} y={1770} w={300} d={rrect(470, 1764, 300, 12, 6)} />
+          <ContactShadow x={970} y={1600} w={70} h={10} />
         </ShadowLayer>
         <Tier tier="environment" bg={EMBER.wall}>
           {/* a closed planner and a pencil (flat, soft corners) */}
@@ -123,6 +123,10 @@ export const H2Window: React.FC = () => {
           <path d={roundPoly([[820, 1700], [990, 1640], [996, 1652], [826, 1712]], 3)} fill={EMBER.board} />
           <path d={ellD(906, 1667, 3, 3)} fill={EMBER.ink} />
           {mug}
+          {/* a small pot of herbs at the desk's right (flat leaves, a terracotta pot) */}
+          <path d={roundPoly([[930, 1520], [1010, 1520], [1000, 1600], [940, 1600]], 6)} fill={EMBER.pot} />
+          <path d={rrect(924, 1510, 92, 16, 6)} fill={mixHex(EMBER.pot, EMBER.beam, 0.3)} />
+          <path d={[[952, 1470, 14, 30, -20], [972, 1458, 13, 34, 4], [992, 1472, 14, 30, 24], [962, 1488, 11, 22, -40], [986, 1490, 11, 22, 40]].map(([x, y, rx, ry, a]) => `M${x} ${y + ry}Q${x - rx * 1.2 + a * 0.3} ${y} ${x + a * 0.4} ${y - ry}Q${x + rx * 1.2 + a * 0.3} ${y} ${x} ${y + ry}Z`).join('')} fill={'#6F8F62'} />
         </Tier>
         <FormShade of={mug} c={[mugX + 49, mugTop + 60]} size={[112, 128]} />
         <Ambient region={[-200, DESK.y, 1480, 920]} holes={[{e: H2_POOL}]} />
@@ -133,7 +137,7 @@ export const H2Window: React.FC = () => {
 
 /** The whole H2 view through h2Cams at film time: the far field, the town, the street, then this window and desk. */
 export const H2View: React.FC<{cams?: H2Cams}> = ({cams}) => {
-  const T = useFilmTime();
+  const T = useFilmT();
   const c = cams ?? h2Cams(T);
   return (
     <>
