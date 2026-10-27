@@ -69,8 +69,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
   line to section 2b. Films in flight share the weekly limit and finishing them comes first, so before the new video's
   first big fan-out (G0's scouts and judges) check the week's usage against what the films in flight still need, and
   ask the owner if it is tight. First steps: create `video/docs/vN/OWNER_NOTES.md`; check the voice key
-  (`[ -n "$ELEVENLABS_API_KEY" ] && echo set`; without it, tell the owner before G2: they add the secret, or they paste
-  the take); then `video/docs/PIPELINE_V2.md` from G0, copying the G0-G1 templates' structure with a fresh brief (its
+  (`[ -n "$ELEVENLABS_API_KEY" ] && echo set`; without it, tell the owner before G2: they add the secret, or they make
+  the take in ElevenLabs from our full paste text); then `video/docs/PIPELINE_V2.md` from G0, copying the G0-G1 templates' structure with a fresh brief (its
   "Studio toolkit" lists what each template's brief needs updated). The craft tooling lane (PIPELINE_V2) must land
   before the new video's G3; G0-G2 never wait for it.
 
