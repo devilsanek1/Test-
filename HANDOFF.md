@@ -91,7 +91,8 @@ Everything that agent knew is in this repo. This file is the map; the details li
 - Owner: "research another video topic starting with step 1; the topic must not include Anthropic as the key entity."
 - Workflow `context/workflows/v4-g0-topics-wf_4d4df1c1-d0b.js` writes `video/docs/v4/scouting/*.md` and
   `video/docs/v4/G0_TOPICS.md` (top 3 for the owner). DONE 2026-10-27: A gas tanks (recommended), B commute to Zoom,
-  C padlock key was 4. Next: the owner picks; archive the rest; then G0.5 core line.
+  C padlock key was 4. Owner: "lets focus on tech and AI related news" -> round 1 archived; round 2 (tech + AI only)
+  `context/workflows/v4-g0-topics-tech-*.js` -> `video/docs/v4/scouting_r2/`, `G0_TOPICS.md`. Next: owner picks; G0.5.
 
 ## 2b. Update 2026-10-25 20:00 UTC: two agents, split by video
 
